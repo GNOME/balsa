@@ -84,6 +84,9 @@ extern "C" {
         /* style for changing the color of address labels when the
          * address isn't valid: */
         GtkStyle *bad_address_style;  
+#ifdef HAVE_GPGME
+	guint gpg_mode;
+#endif
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

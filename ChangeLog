@@ -1,3 +1,15 @@
+2003-03-24  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
+	further work on GPG
+	* libbalsa/message.h: add sig_state field.
+	* libbalsa/send.c: proper encryption when multiple recipients.
+	* libbalsa/rfc3156.[hc]: better error handling.
+	* src/balsa-icons.[hc]: new pixmaps.
+	* src/balsa-index.c: improve the display of the sig/encrypt state.
+	* src/balsa-message.c: implement balsa_message_scan_signatures()
+	* src/sendmsg-window.h: add gpg_mode field.
+	* src/sendmsg-window.c: gpg mode switching UI.
+
 2003-03-24  Carlos Morgado  <chbm@chbm.nu>
 
 	* HACKING: added contacts

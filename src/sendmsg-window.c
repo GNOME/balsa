@@ -105,6 +105,10 @@ static gint toggle_keywords_cb(GtkWidget *, BalsaSendmsg *);
 static void toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_format_cb(GtkCheckMenuItem * check_menu_item,
                              BalsaSendmsg * bsmsg);
+#ifdef HAVE_GPGME
+static void toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+#endif
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
 static void sw_spell_check_response(BalsaSpellCheck * spell_check,
@@ -480,9 +484,11 @@ static GnomeUIInfo opts_menu[] = {
 			   toggle_format_cb, NULL),
 #ifdef HAVE_GPGME
 #define OPTS_MENU_SIGN_POS 2
-    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), NULL, NULL, NULL),
+    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), NULL,
+			   toggle_sign_cb, NULL),
 #define OPTS_MENU_ENCRYPT_POS 3
-    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), NULL, NULL, NULL),
+    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), NULL,
+			   toggle_encrypt_cb, NULL),
 #endif
     GNOMEUIINFO_END
 };
@@ -2581,6 +2587,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->window = window = gnome_app_new("balsa", NULL);
     msg->type = type;
     msg->spell_checker = NULL;
+#ifdef HAVE_GPGME
+    msg->gpg_mode = 0;
+#endif
 
     if (message) {
         /* ref message so we don't lose it even if it is deleted */
@@ -3206,6 +3215,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     }
 
     message->date = time(NULL);
+#ifdef HAVE_GPGME
+    message->gpg_mode = bsmsg->gpg_mode;
+#endif
 
     return message;
 }
@@ -3252,11 +3264,9 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);
 
 #ifdef HAVE_GPGME
-    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(opts_menu[OPTS_MENU_SIGN_POS].widget)))
-	message->gpg_mode |= LIBBALSA_GPG_SIGN;
-    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(opts_menu[OPTS_MENU_ENCRYPT_POS].widget)))
-       message->gpg_mode |= LIBBALSA_GPG_ENCRYPT;
-    g_message("sending message with gpg mode %d", message->gpg_mode);
+    balsa_information(LIBBALSA_INFORMATION_DEBUG,
+		      _("sending message with gpg mode %d"),
+		      message->gpg_mode);
 #endif
 
     if(queue_only)
@@ -3678,6 +3688,26 @@ toggle_format_cb(GtkCheckMenuItem * check_menu_item, BalsaSendmsg * bsmsg)
 {
     bsmsg->flow = gtk_check_menu_item_get_active(check_menu_item);
 }
+
+#ifdef HAVE_GPGME
+static void 
+toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+	bsmsg->gpg_mode |= LIBBALSA_GPG_SIGN;
+    else
+	bsmsg->gpg_mode &= ~LIBBALSA_GPG_SIGN;
+}
+
+static void 
+toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+	bsmsg->gpg_mode |= LIBBALSA_GPG_ENCRYPT;
+    else
+	bsmsg->gpg_mode &= ~LIBBALSA_GPG_ENCRYPT;
+}
+#endif
 
 /* init_menus:
    performs the initial menu setup: shown headers as well as correct

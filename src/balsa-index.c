@@ -1251,12 +1251,26 @@ bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
                                    BALSA_PIXMAP_INFO_ATTACHMENT,
                                    GTK_ICON_SIZE_MENU, NULL);
 #ifdef HAVE_GPGME
-    else if (libbalsa_message_is_pgp_signed(message) ||
-	     libbalsa_message_is_pgp_encrypted(message))
-	/* FIXME: provide different icons for signed and encrypted */
+    else if (libbalsa_message_is_pgp_signed(message)) {
+	if (message->sig_state == LIBBALSA_MESSAGE_SIGNATURE_GOOD)
+	    attach_pixbuf =
+		gtk_widget_render_icon(GTK_WIDGET(index->window),
+				       BALSA_PIXMAP_INFO_SIGN_GOOD,
+				       GTK_ICON_SIZE_MENU, NULL);
+	else if (message->sig_state == LIBBALSA_MESSAGE_SIGNATURE_BAD)
+	    attach_pixbuf =
+		gtk_widget_render_icon(GTK_WIDGET(index->window),
+				       BALSA_PIXMAP_INFO_SIGN_BAD,
+				       GTK_ICON_SIZE_MENU, NULL);
+	else
+	    attach_pixbuf =
+		gtk_widget_render_icon(GTK_WIDGET(index->window),
+				       BALSA_PIXMAP_INFO_SIGN,
+				       GTK_ICON_SIZE_MENU, NULL);
+    } else if (libbalsa_message_is_pgp_encrypted(message))
         attach_pixbuf =
             gtk_widget_render_icon(GTK_WIDGET(index->window),
-                                   BALSA_PIXMAP_INFO_LOCK,
+                                   BALSA_PIXMAP_INFO_ENCR,
                                    GTK_ICON_SIZE_MENU, NULL);
 #endif
 

@@ -1455,6 +1455,19 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 }
 
 
+#ifdef HAVE_GPGME
+static GList *
+get_mailbox_names(GList *list, ADDRESS *a)
+{
+    while (a) {
+	if (a->mailbox)
+	    list = g_list_append(list, a->mailbox);
+	a = a->next;
+    }
+    return list;
+}
+#endif
+
 /* libbalsa_create_msg:
    copies message to msg.
    PS: seems to be broken when queu == 1 - further execution of
@@ -1616,20 +1629,32 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		}
 	    case LIBBALSA_GPG_ENCRYPT:
 	    case LIBBALSA_GPG_ENCRYPT | LIBBALSA_GPG_SIGN:
-		/* FIXME: what to do if we have *multiple* recipients? */
 		{
+		    GList *encrypt_for = NULL;
 		    gboolean success;
+
+		    /* build a list containing the addresses of all to:, cc:
+		       and the from: address. Note: don't add bcc: addresses
+		       as they would be visible in the encrypted block. */
+		    encrypt_for = get_mailbox_names(encrypt_for, msg->env->to);
+		    encrypt_for = get_mailbox_names(encrypt_for, msg->env->cc);
+		    encrypt_for = g_list_append(encrypt_for,
+						msg->env->from->mailbox);
+		    if (msg->env->bcc)
+			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					     _("This message will not be encrpyted for the BCC: recipient(s)."));
 
 		    if (message->gpg_mode & LIBBALSA_GPG_SIGN)
 			success = 
 			    libbalsa_sign_encrypt_mutt_body(&msg->content,
 							    msg->env->from->mailbox, 
-							    msg->env->to->mailbox,
+							    encrypt_for,
 							    NULL);
 		    else
 			success = 
 			    libbalsa_encrypt_mutt_body(&msg->content,
-						       msg->env->to->mailbox);
+						       encrypt_for);
+		    g_list_free(encrypt_for);
 			
 		    if (success) {
 			/* encryption was successful, update the message parameters */

@@ -36,7 +36,8 @@
 typedef struct _LibBalsaSignatureInfo LibBalsaSignatureInfo;
 
 struct _LibBalsaSignatureInfo {
-    GpgmeSigStat gpgme_status;
+    GpgmeSigStat status;
+    GpgmeValidity validity;
     gchar *sign_name;
     gchar *sign_email;
     gchar *fingerprint;
@@ -50,10 +51,10 @@ gboolean libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body);
 gboolean libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
 				 gchar **micalg, GtkWindow *parent);
 gboolean libbalsa_encrypt_mutt_body(MuttBody **encrypt_body,
-				    const gchar *rfc822_for);
+				    GList *rfc822_for);
 gboolean libbalsa_sign_encrypt_mutt_body(MuttBody **se_body,
 					 const gchar *rfc822_signer,
-					 const gchar *rfc822_for,
+					 GList *rfc822_for,
 					 GtkWindow *parent);
 
 gboolean libbalsa_body_check_signature(LibBalsaMessageBody *body);
@@ -62,6 +63,7 @@ LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody *body,
 
 LibBalsaSignatureInfo *libbalsa_signature_info_destroy(LibBalsaSignatureInfo* info);
 const gchar *libbalsa_gpgme_sig_stat_to_gchar(GpgmeSigStat stat);
+const gchar *libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity);
 
 #endif /* HAVE_GPGME */
 

@@ -70,6 +70,9 @@
 #include "pixmaps/info_attachment.xpm"
 #ifdef HAVE_GPGME
 #  include "pixmaps/info_lock.xpm"
+#  include "pixmaps/info_lock_good.xpm"
+#  include "pixmaps/info_lock_bad.xpm"
+#  include "pixmaps/info_lock_encr.xpm"
 #endif
 
 #include "pixmaps/menu_flagged.xpm"
@@ -191,7 +194,10 @@ register_balsa_pixmaps(void)
         { BALSA_PIXMAP_INFO_NEW,        info_new_xpm },
         { BALSA_PIXMAP_INFO_ATTACHMENT, info_attachment_xpm },
 #ifdef HAVE_GPGME
-        { BALSA_PIXMAP_INFO_LOCK,       info_lock_xpm },
+        { BALSA_PIXMAP_INFO_SIGN,       info_sign_xpm },
+        { BALSA_PIXMAP_INFO_SIGN_GOOD,  info_sign_good_xpm },
+        { BALSA_PIXMAP_INFO_SIGN_BAD,   info_sign_bad_xpm },
+        { BALSA_PIXMAP_INFO_ENCR,       info_encr_xpm },
 #endif
     };
 

@@ -511,6 +511,58 @@ bm_focus_on_first_child(BalsaMessage * bm)
     g_list_free(children);
 }
 
+#ifdef HAVE_GPGME
+static gint
+balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * message)
+{
+    gint result = LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN;
+
+    for (; body; body = body->next) {
+	if (libbalsa_is_pgp_signed(body)) {
+	    LibBalsaSignatureInfo *checkResult;
+	    gchar *sender = libbalsa_address_to_gchar(message->from, -1);
+
+	    if (!body->parts->next->sig_info)
+		libbalsa_body_check_signature(body->parts);
+	    checkResult = body->parts->next->sig_info;
+
+	    if (checkResult) {
+		if (checkResult->status == GPGME_SIG_STAT_GOOD) {
+		    if (result != LIBBALSA_MESSAGE_SIGNATURE_BAD)
+			result = LIBBALSA_MESSAGE_SIGNATURE_GOOD;
+		    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+					 _("detected a good signature"));
+		} else {
+		    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+					 _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+					 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message),
+					 libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
+		}
+	    } else {
+		result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				     _("Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"),
+				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
+	    }
+	    g_free(sender);
+	}
+
+	/* scan embedded messages */
+	if (body->parts) {
+	    gint sub_result =
+		balsa_message_scan_signatures(body->parts, message);
+	    if (sub_result == LIBBALSA_MESSAGE_SIGNATURE_BAD ||
+		(sub_result == LIBBALSA_MESSAGE_SIGNATURE_GOOD &&
+		 result != LIBBALSA_MESSAGE_SIGNATURE_BAD))
+		result = sub_result;
+	}
+    }
+
+    return result;
+}
+#endif
+
 gboolean
 balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 {
@@ -563,31 +615,18 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	/* try to decrypt the message... */
 	message->body_list->parts =
 	    libbalsa_body_decrypt(message->body_list->parts, NULL);
-
-    if (libbalsa_is_pgp_signed(message->body_list)) {
-	LibBalsaSignatureInfo *checkResult;
-	gchar *sender = libbalsa_address_to_gchar(message->from, -1);
-
-	if (!message->body_list->parts->next->sig_info)
-	    libbalsa_body_check_signature(message->body_list->parts);
-	checkResult = message->body_list->parts->next->sig_info;
-
-	if (checkResult) {
-	    if (checkResult->gpgme_status == GPGME_SIG_STAT_GOOD)
-		libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-				     _("The signature of the message sent by %s with subject \"%s\" is good."), 
-				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
-	    else
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
-				     sender, LIBBALSA_MESSAGE_GET_SUBJECT(message),
-				     libbalsa_gpgme_sig_stat_to_gchar(checkResult->gpgme_status));
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("Checking the signature of the message "
-                                   "sent by %s with subject \"%s\" failed."),
-				 sender, LIBBALSA_MESSAGE_GET_SUBJECT(message));
-	g_free(sender);
+    
+    /* scan the message for signatures */
+    message->sig_state = 
+ 	balsa_message_scan_signatures(message->body_list, message);
+    if (message->sig_state != LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN) {
+ 	GList *notify = NULL;
+ 	notify = g_list_append(notify, message);
+ 	/* send the message the signal to update the signature status icon.
+ 	   The flag value must not match anything in src/balsa-index.c,
+ 	   mailbox_messages_changed_status().  */
+ 	g_signal_emit_by_name(G_OBJECT(message->mailbox), 
+ 			      "messages-status-changed", notify, 42);
     }
 #endif
 
@@ -786,7 +825,7 @@ add_header_sigstate(BalsaMessage * bm, LibBalsaSignatureInfo *siginfo)
     if (gtk_text_buffer_get_char_count(buffer))
         gtk_text_buffer_insert(buffer, &insert, "\n", 1);
     /* FIXME: do we want to have these colors selectable by the user? */
-    if (siginfo->gpgme_status == GPGME_SIG_STAT_GOOD) {
+    if (siginfo->status == GPGME_SIG_STAT_GOOD) {
 	sigStateCol.red = 0x0;
 	sigStateCol.green = 0x8000;
 	sigStateCol.blue = 0x0;
@@ -800,7 +839,7 @@ add_header_sigstate(BalsaMessage * bm, LibBalsaSignatureInfo *siginfo)
 					   &sigStateCol,
 					   NULL);
     gtk_text_buffer_insert_with_tags(buffer, &insert,
-                                     libbalsa_gpgme_sig_stat_to_gchar(siginfo->gpgme_status),
+                                     libbalsa_gpgme_sig_stat_to_gchar(siginfo->status),
 				     -1, color_tag, NULL);
 }
 #endif
@@ -869,8 +908,6 @@ display_headers(BalsaMessage * bm)
 
 #ifdef HAVE_GPGME
     if (libbalsa_is_pgp_signed(message->body_list)) {
-	if (!message->body_list->parts->next->sig_info)
-	    libbalsa_body_check_signature(message->body_list->parts);
 	if (message->body_list->parts->next->sig_info)
 	    add_header_sigstate(bm, message->body_list->parts->next->sig_info);
     }
@@ -903,23 +940,6 @@ part_info_init_audio(BalsaMessage * bm, BalsaPartInfo * info)
 }
 
 #ifdef HAVE_GPGME
-static LibBalsaMessageBody *
-find_signature_parent(LibBalsaMessageBody *start, LibBalsaMessageBody *sigBody)
-{
-    for (; start; start = start->next) {
-	if (start->parts && start->parts->next && start->parts->next == sigBody)
-	    return start;
-	if (start->parts) {
-	    LibBalsaMessageBody *result = 
-		find_signature_parent(start->parts, sigBody);
-	    if (result)
-		return result;
-	}
-    }
-    return NULL;
-}
-
-
 static void
 part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
 {
@@ -928,25 +948,12 @@ part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
     LibBalsaSignatureInfo *sig_info = info->body->sig_info;
 
     if (!sig_info) {
-	/* the signatures of embedded messages are not yet checked */
-	LibBalsaMessageBody *prevbdy =
-	    find_signature_parent(info->body->message->body_list, info->body);
-
-	if (!prevbdy || !libbalsa_is_pgp_signed(prevbdy)) {
-	    part_info_init_unknown(bm, info);
-	    return;
-	}
-	libbalsa_body_check_signature(prevbdy->parts);
-	sig_info = info->body->sig_info;
-	if (!sig_info) {
-	    part_info_init_unknown(bm, info);
-	    return;
-	}
+	part_info_init_unknown(bm, info);
+	return;
     }
 
-    msg = g_string_new(libbalsa_gpgme_sig_stat_to_gchar(sig_info->gpgme_status));
+    msg = g_string_new(libbalsa_gpgme_sig_stat_to_gchar(sig_info->status));
     if (sig_info->sign_name || sig_info->sign_email || sig_info->fingerprint) {
-	msg = g_string_append(msg, _("\n\nSignature details:"));
 	if (sig_info->sign_name) {
 	    g_string_append_printf(msg, _("\nSigned by: %s"),
 				   sig_info->sign_name);
@@ -956,6 +963,8 @@ part_info_init_pgp_signature(BalsaMessage * bm, BalsaPartInfo * info)
 	} else if (sig_info->sign_email)
 	    g_string_append_printf(msg, _("Mail address: %s"),
 				       sig_info->sign_email);
+	g_string_append_printf(msg, _("\nValidity: %s"),
+			       libbalsa_gpgme_validity_to_gchar(sig_info->validity));
 	if (sig_info->fingerprint)
 	    g_string_append_printf(msg, _("\nKey fingerprint: %s"),
 				   sig_info->fingerprint);

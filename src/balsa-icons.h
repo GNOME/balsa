@@ -88,7 +88,10 @@
 #define BALSA_PIXMAP_INFO_NEW                   "balsa_info_new"
 #define BALSA_PIXMAP_INFO_ATTACHMENT            "balsa_info_attachment"
 #ifdef HAVE_GPGME
-#  define BALSA_PIXMAP_INFO_LOCK                "balsa_info_lock"
+#  define BALSA_PIXMAP_INFO_SIGN                "balsa_info_sign"
+#  define BALSA_PIXMAP_INFO_SIGN_GOOD           "balsa_info_sign_good"
+#  define BALSA_PIXMAP_INFO_SIGN_BAD            "balsa_info_sign_bad"
+#  define BALSA_PIXMAP_INFO_ENCR                "balsa_info_encr"
 #endif
 
 void register_balsa_pixmaps(void);

@@ -69,6 +69,11 @@ enum _LibBalsaMsgCreateResult {
     LIBBALSA_MESSAGE_SEND_ERROR
 };
 
+#ifdef HAVE_GPGME
+#define  LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN     0
+#define  LIBBALSA_MESSAGE_SIGNATURE_GOOD        1
+#define  LIBBALSA_MESSAGE_SIGNATURE_BAD        -1
+#endif
 
 struct _LibBalsaMessage {
     GObject object;
@@ -126,8 +131,11 @@ struct _LibBalsaMessage {
     gchar *message_id;
 
 #ifdef HAVE_GPGME
-    /* GPG sign and/or encrypt message */
+    /* GPG sign and/or encrypt message (sending) */
     guint gpg_mode;
+
+    /* signature status (received message) */
+    gint sig_state;
 #endif
 
     /* a forced multipart subtype or NULL for mixed */

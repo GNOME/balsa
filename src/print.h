@@ -22,8 +22,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
- 
+
 extern void message_print_cb(GtkWidget *widget, gpointer cbdata);
+extern void message_print(LibBalsaMessage *msg);
 
 #ifdef __cplusplus
 }

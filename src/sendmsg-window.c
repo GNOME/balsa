@@ -48,6 +48,7 @@
 #include "address-book.h"
 #include "expand-alias.h"
 #include "main.h"
+#include "print.h"
 #include "spell-check.h"
 
 static gchar *read_signature (void);
@@ -1428,7 +1429,6 @@ bsmsg2message(BalsaSendmsg *bsmsg)
                                               g_strdup (list->data));
       }
     } 
-
     message->references = g_list_prepend (message->references, 
                                           g_strdup (bsmsg->orig_message->message_id));
     
@@ -1446,15 +1446,12 @@ bsmsg2message(BalsaSendmsg *bsmsg)
   }
   
   body = libbalsa_message_body_new (message);
-
   body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
 					gtk_text_get_length (
 					   GTK_TEXT (bsmsg->text)));
   if(balsa_app.wordwrap)
      libbalsa_wrap_string (body->buffer, balsa_app.wraplength);
-
   body->charset = g_strdup(bsmsg->charset);
-
   libbalsa_message_append_part (message, body);
 
   {				/* handle attachments */
@@ -1471,6 +1468,10 @@ bsmsg2message(BalsaSendmsg *bsmsg)
     }
   }
 
+  tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
+  message->fcc_mailbox = tmp ? g_strdup(tmp) : NULL;
+  message->date = time(NULL);
+
   return message;
 }
 
@@ -1479,7 +1480,6 @@ static gint
 send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   LibBalsaMessage *message;
-  gchar *tmp;
   if(! is_ready_to_send(bsmsg)) return FALSE;
 
   libbalsa_set_charset(bsmsg->charset);
@@ -1487,13 +1487,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
      fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
   message = bsmsg2message (bsmsg);
-
-  tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
-  if ( tmp )
-    message->fcc_mailbox = g_strdup(tmp);
-  else
-    message->fcc_mailbox = NULL;
-
 
   if (libbalsa_message_send (message)) {
     if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
@@ -1522,17 +1515,14 @@ static gint
 postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   LibBalsaMessage *message;
-
+  
   message = bsmsg2message(bsmsg);
-
-  if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
-      && bsmsg->orig_message)
-     libbalsa_message_postpone (message, bsmsg->orig_message, 
-				gtk_entry_get_text (
-					GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
+  
+  if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL))
+    libbalsa_message_postpone(message, bsmsg->orig_message,
+			      message->fcc_mailbox);
   else
-     libbalsa_message_postpone (message, NULL, gtk_entry_get_text (
-	GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
+    libbalsa_message_postpone(message, NULL, message->fcc_mailbox);
 
  if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message)
    {
@@ -1546,26 +1536,12 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   return TRUE;
 }
 
+#ifndef HAVE_GNOME_PRINT
 /* very harsh print handler. Prints headers and the body only, as raw text
 */
 static gint 
 print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-
-#ifdef GNOME_PRINT
-#error this is not finished yet!
-#define FNT_SZ 12
-   GnomePrintFont * fnt;
-   GnomePrintContext * prn = gnome_print_context_new(
-      gnome_print_default_printer());
-
-   fnt = gnome_print_find_font("Times", FNT_SZ);
-   gnome_print_set_font(prn,fnt);
-
-
-   gnome_print_context_close(prn);
-   gnome_print_context_free (prn);
-#else
    gchar* str;
    gchar* dest;
    FILE * lpr;
@@ -1605,9 +1581,18 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
       gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
       gnome_dialog_run (GNOME_DIALOG (msgbox));
    }
-#endif
    return TRUE;
 }
+#else
+static gint 
+print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+  LibBalsaMessage *msg = bsmsg2message(bsmsg);
+  message_print(msg);
+  gtk_object_destroy( GTK_OBJECT(msg) );
+  return TRUE;
+}
+#endif
 
 static void
 cut_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)

@@ -1,3 +1,12 @@
+2000-09-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.[hc]: libbalsa_message_get_text_content() added
+	to be able to print composed messages that are not in any mailbox.
+	* src/print.[hc]: modified accordingly. don't print when preview is
+	selected. Export message_print(LibBalsaMessage*).
+	* src/sendmsg-window.c: fix printing composed messages with
+	gnome-print. 
+	
 2000-09-19  Matthew Guenther <guentherm@asme.org>
 
 	* README: Add (another!) note about pspell library dependency.

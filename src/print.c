@@ -22,7 +22,7 @@
 #include <config.h>
 #include <balsa-app.h>
 
-void message_print_cb(GtkWidget *widget, gpointer cbdata);
+#include "print.h"
 
 #ifndef HAVE_GNOME_PRINT
 
@@ -369,7 +369,6 @@ prepare_page_header(PrintInfo *pi)
 static PrintInfo* 
 print_info_new(const gchar* paper, LibBalsaMessage *msg, GnomePrintDialog *dlg)
 {
-  GString * str;
   PrintInfo * pi = g_new0(PrintInfo, 1);
   pi->paper = gnome_paper_with_name(paper);
   pi->master = gnome_print_master_new_from_dialog(dlg);
@@ -395,11 +394,7 @@ print_info_new(const gchar* paper, LibBalsaMessage *msg, GnomePrintDialog *dlg)
 
   pi->message = msg;
   prepare_page_header(pi);
-  libbalsa_message_body_ref(msg);
-  str = content2reply(msg, NULL, pi->chars_per_line);
-  libbalsa_message_body_unref(msg);
-  pi->buff    = str->str;
-  g_string_free(str, FALSE);
+  pi->buff     = libbalsa_message_get_text_content(msg, pi->chars_per_line);
   pi->line_buf = g_malloc( pi->chars_per_line+1);
 
   pi->total_lines = linecount(pi->buff);
@@ -446,12 +441,9 @@ is_font_ok(const gchar *font_name)
 
 void message_print_cb(GtkWidget *widget, gpointer cbdata)
 {
-  GtkWidget * dialog;
-  PrintInfo* pi;
   GtkWidget *index;
   GList *list;
   LibBalsaMessage *msg;
-  gboolean preview = FALSE;
 
   g_return_if_fail(cbdata);
 
@@ -462,7 +454,18 @@ void message_print_cb(GtkWidget *widget, gpointer cbdata)
   msg = LIBBALSA_MESSAGE(
     gtk_clist_get_row_data (GTK_CLIST(index), GPOINTER_TO_INT (list->data)));
    /* print only first selected message */
-  
+
+  message_print(msg);
+}
+
+void message_print(LibBalsaMessage *msg)
+{
+  GtkWidget * dialog;
+  PrintInfo* pi;
+  gboolean preview = FALSE;
+
+  g_return_if_fail(msg);
+
   if(!is_font_ok(BALSA_PRINT_HEAD_FONT) || !is_font_ok(BALSA_PRINT_BODY_FONT))
     return;
   dialog = gnome_print_dialog_new (_("Print mesage"),
@@ -486,13 +489,13 @@ void message_print_cb(GtkWidget *widget, gpointer cbdata)
 
   /* do the Real Job */
   print_message(pi);
-  gnome_print_master_print(pi->master);
 
   if(preview) {
     GnomePrintMasterPreview * preview_widget = gnome_print_master_preview_new(
       pi->master, _("Balsa: message print preview"));
     gtk_widget_show(GTK_WIDGET(preview_widget));
-  } 
+  } else gnome_print_master_print(pi->master);
+
   print_info_destroy(pi);
 }
 

@@ -64,7 +64,7 @@ struct _LibBalsaMessage
 	/* remail header if any */
 	gchar *remail;
 
-	/* message composition date string */
+	/* message composition date */
 	time_t date;
 
 	/* from, sender, and reply addresses */
@@ -156,5 +156,6 @@ const gchar *libbalsa_message_charset  (LibBalsaMessage *message);
 gint libbalsa_message_has_attachment (LibBalsaMessage* message);
 
 GList *libbalsa_message_user_hdrs(LibBalsaMessage *message);
+gchar* libbalsa_message_get_text_content(LibBalsaMessage* msg, gint line_len);
 
 #endif /* __LIBBALSA_MESSAGE_H__ */

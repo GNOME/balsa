@@ -133,8 +133,6 @@ static void address_book_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
 static void address_book_response(GtkWidget * ab, gint response,
                                   LibBalsaAddressEntry * address_entry);
 
-static gint set_locale(BalsaSendmsg *, gint);
-
 #if !defined(ENABLE_TOUCH_UI)
 static void edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg);
 #endif
@@ -940,7 +938,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
         g_object_unref(G_OBJECT(bsmsg->bad_address_style));
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
-    g_free(bsmsg->charset);
 
     if (bsmsg->spell_checker)
         gtk_widget_destroy(bsmsg->spell_checker);
@@ -1899,8 +1896,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     
     attach_data->filename = filename;
-    attach_data->force_mime_type = forced_mime_type 
-	? g_strdup(forced_mime_type) : NULL;
+    attach_data->force_mime_type = g_strdup(forced_mime_type);
     
     attach_data->delete_on_destroy = is_a_temp_file;
     can_inline = !is_a_temp_file &&
@@ -3548,20 +3544,8 @@ create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
         locales_sorted = TRUE;
     }
     /* find the preferred charset... */
-    selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
-    if (bsmsg->charset
-	&& g_ascii_strcasecmp(locales[selected_pos].charset, 
-                              bsmsg->charset) != 0) {
-	for(i=0; 
-	    i<ELEMENTS(locales) && 
-		g_ascii_strcasecmp(locales[i].charset, bsmsg->charset) != 0;
-	    i++)
-	    ;
-        selected_pos = (i == ELEMENTS(locales)) ?
-            find_locale_index_by_locale("en_US") : i;
-    }
-    
-    set_locale(bsmsg, selected_pos);
+    bsmsg->locale_index = selected_pos =
+        find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
 
     for(i=0; i<ELEMENTS(locales); i++) {
         GtkWidget *w = 
@@ -3691,8 +3675,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
              || (type != SEND_NORMAL && message != NULL));
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
-    bsmsg->charset  = NULL;
-    bsmsg->locale   = NULL;
+    bsmsg->locale_index = (guint) -1;
     bsmsg->fcc_url  = NULL;
     bsmsg->ident = balsa_app.current_ident;
     bsmsg->update_config = FALSE;
@@ -3867,8 +3850,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gnome_app_set_contents(GNOME_APP(window), main_box);
 
     /* set the menus - and language index */
-    if (message && !bsmsg->charset)
-	bsmsg->charset = libbalsa_message_charset(message);
     init_menus(bsmsg);
 
     /* Connect to "text-changed" here, so that we catch the initial text
@@ -4258,10 +4239,8 @@ attachment2message(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
     /* create the attachment */
     body = libbalsa_message_body_new(message);
     body->filename = g_strdup(attachment->filename);
-    if (attachment->force_mime_type)
-	body->content_type = g_strdup(attachment->force_mime_type);
-    if (attachment->charset)
-	body->charset = g_strdup(attachment->charset);
+    body->content_type = g_strdup(attachment->force_mime_type);
+    body->charset = g_strdup(attachment->charset);
     body->attach_mode = attachment->mode;
     libbalsa_message_append_part(message, body);
 
@@ -4377,8 +4356,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     /* Disable undo and redo, because buffer2 was changed. */
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 
-    body->charset = g_strdup(libbalsa_text_attr_string(body->buffer) ?
-                             bsmsg->charset : "us-ascii");
+    body->charset =
+        g_strdup(g_mime_charset_best(body->buffer, strlen(body->buffer)));
     libbalsa_message_append_part(message, body);
 
     /* add attachments */
@@ -4397,35 +4376,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     return message;
 }
 
-static gboolean
-is_charset_ok(BalsaSendmsg *bsmsg)
-{
-    gchar *tmp, *res;
-    gsize bytes_read, bytes_written;
-    GError *err = NULL;
-    GtkTextIter start, end;
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    tmp = gtk_text_iter_get_text(&start, &end);
-    res = g_convert(tmp, strlen(tmp), bsmsg->charset, "UTF-8", 
-		    &bytes_read, &bytes_written, &err);
-    g_free(tmp);
-    g_free(res);
-    if (err) {
-        balsa_information_parented
-            (GTK_WINDOW(bsmsg->window),
-             LIBBALSA_INFORMATION_ERROR,
-             _("The message cannot be encoded in charset %s.\n"
-               "Please choose a language for this message.\n"
-               "For multi-language messages, choose UTF-8."),
-             bsmsg->charset);
-        g_error_free(err);
-        return FALSE;
-    }
-    return TRUE;
-}
 /* "send message" menu and toolbar callback.
  * FIXME: automatic charset detection, as libmutt does for strings?
  */
@@ -4442,11 +4392,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
 
-    if (balsa_app.debug)
-	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
-
-    if(!is_charset_ok(bsmsg))
-        return FALSE;
 #ifdef HAVE_GPGME
     if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0 &&
         (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
@@ -4570,8 +4515,6 @@ message_postpone(BalsaSendmsg * bsmsg)
     gboolean successp;
     LibBalsaMessage *message;
 
-    if(!is_charset_ok(bsmsg))
-        return FALSE;
     message = bsmsg2message(bsmsg);
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
@@ -5064,20 +5007,6 @@ init_menus(BalsaSendmsg * bsmsg)
     check_readiness(bsmsg);
 }
 
-/* set_locale:
-   bsmsg is the compose window,
-   idx - corresponding entry index in locales.
-*/
-
-static gint
-set_locale(BalsaSendmsg * bsmsg, gint idx)
-{
-    g_free(bsmsg->charset);
-    bsmsg->charset = g_strdup(locales[idx].charset);
-    bsmsg->locale = locales[idx].locale;
-    return FALSE;
-}
-
 /* spell_check_cb
  * 
  * Start the spell check
@@ -5106,9 +5035,11 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     /* configure the spell checker */
     balsa_spell_check_set_text(sc, text_view);
-    balsa_spell_check_set_language(sc, bsmsg->locale);
-
-    balsa_spell_check_set_character_set(sc, bsmsg->charset);
+    balsa_spell_check_set_language(sc,
+                                   locales[bsmsg->locale_index].locale);
+    balsa_spell_check_set_character_set(sc,
+                                        locales[bsmsg->locale_index].
+                                        charset);
     balsa_spell_check_set_module(sc,
 				 spell_check_modules_name
 				 [balsa_app.module]);
@@ -5136,11 +5067,10 @@ sw_spell_check_response(BalsaSpellCheck * spell_check, gint response,
 static void
 lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
-    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w))) {
-	gint i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
-						   GNOMEUIINFO_KEY_UIDATA));
-	set_locale(bsmsg, i);
-    }
+    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w)))
+        bsmsg->locale_index =
+            GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
+                                              GNOMEUIINFO_KEY_UIDATA));
 }
 
 /* sendmsg_window_new_from_list:

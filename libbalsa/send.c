@@ -282,8 +282,9 @@ lbs_set_content(GMimePart * mime_part, gchar * content)
     stream = g_mime_stream_mem_new();
     g_mime_stream_write(stream, content, strlen(content));
 
-    wrapper = g_mime_data_wrapper_new();
-    g_mime_data_wrapper_set_stream(wrapper, stream);
+    wrapper =
+        g_mime_data_wrapper_new_with_stream(stream,
+                                            GMIME_PART_ENCODING_DEFAULT);
     g_object_unref(stream);
 
     g_mime_part_set_content_object(mime_part, wrapper);
@@ -300,8 +301,6 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
     g_return_val_if_fail(body, NULL);
     
     charset=body->charset;
-
-    g_return_val_if_fail(charset, NULL);
 
     if (body->content_type) {
         /* Use the suplied mime type */
@@ -324,7 +323,9 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
     g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_INLINE);
     g_mime_part_set_encoding(mime_part, encoding_style);
     g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
-					     "charset", charset);
+                                             "charset",
+                                             charset ? charset :
+                                             "us-ascii");
     if (flow) {
 	g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
 						 "DelSp", "Yes");
@@ -332,9 +333,9 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
 						 "Format", "Flowed");
     }
 
-    if (g_ascii_strcasecmp(charset, "UTF-8")!=0 &&
-	g_ascii_strcasecmp(charset, "UTF8")!=0 &&
-	g_ascii_strcasecmp(charset, "US-ASCII")!=0)
+    if (charset &&
+	g_ascii_strcasecmp(charset, "UTF-8")!=0 &&
+	g_ascii_strcasecmp(charset, "UTF8")!=0)
     {
 	GMimeStream *stream, *filter_stream;
 	GMimeFilter *filter;
@@ -344,18 +345,18 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
 	filter_stream = g_mime_stream_filter_new_with_stream(stream);
 	filter = g_mime_filter_charset_new("UTF-8", charset);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+	g_object_unref(G_OBJECT(filter));
 
 	g_mime_stream_write(filter_stream, body->buffer, strlen(body->buffer));
-
-	wrapper = g_mime_data_wrapper_new();
-	g_mime_data_wrapper_set_stream(wrapper, stream);
-	g_mime_data_wrapper_set_encoding (wrapper, GMIME_PART_ENCODING_DEFAULT);
-	g_mime_part_set_content_object(mime_part, wrapper);
-
-	g_object_unref(G_OBJECT(wrapper));
-	g_object_unref(G_OBJECT(filter));
 	g_object_unref(filter_stream);
+
+        wrapper =
+            g_mime_data_wrapper_new_with_stream(stream,
+                                                GMIME_PART_ENCODING_DEFAULT);
 	g_object_unref(stream);
+
+	g_mime_part_set_content_object(mime_part, wrapper);
+	g_object_unref(G_OBJECT(wrapper));
     } else
 	lbs_set_content(mime_part, body->buffer);
 

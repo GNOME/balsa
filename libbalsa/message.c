@@ -282,31 +282,6 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
     return charset;
 }
 
-/* Note: libbalsa_message_charset returns a pointer to a newly allocated
- * string containing the canonical form of the charset field, or NULL.
- * When the pointer is nonNULL, the string must be deallocated with
- * g_free. */
-gchar *
-libbalsa_message_charset(LibBalsaMessage * message)
-{
-    LibBalsaMessageBody *body;
-    const gchar *charset;
-    const char *tmp;
-    g_return_val_if_fail(message != NULL, NULL);
-    body = message->body_list;
-    g_return_val_if_fail(body != NULL, NULL);
-
-    charset = body->charset;
-    if (!charset) {
-        charset = libbalsa_message_body_charset(body);
-        if (!charset)
-            return NULL;
-    }
-    tmp = g_mime_charset_canon_name(charset);
-    return g_strdup(tmp);
-}
-
-
 static void
 canonize_header_value(gchar *value)
 {

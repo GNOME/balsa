@@ -67,8 +67,7 @@ extern "C" {
 	LibBalsaMessage *orig_message;
 	SendType type;
 	/* language selection related data */
-	gchar *charset;
-	const gchar *locale;
+	guint locale_index;
 	GtkWidget *current_language_menu;
 	/* identity related data */
 	LibBalsaIdentity* ident;

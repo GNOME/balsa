@@ -5,6 +5,11 @@
 	* libmutt/imap.c: do check the NOOP server response.
 	* src/balsa-mblist.c: actual mailbox polling.
 	
+2000-05-02  Pawel Salek <pawsa@theochem.kth.se>
+	* src/balsa-message.c, src/sendmsg-window.c:
+	Martynas Kunigëlis <mkunigelis@alna.lt> patch for Baltic language
+	support.
+
 2000-05-02  Peter Williams  <peter@beta.newton.cx>
 
 	* configure.in : change GLIB_CFLAGS to GNORBA_CFLAGS

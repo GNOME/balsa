@@ -76,6 +76,7 @@ static gint iso_3_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_5_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_8_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_9_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_13_cb(GtkWidget* , BalsaSendmsg *);
 
 /* Standard DnD types */
 enum
@@ -217,11 +218,13 @@ static GnomeUIInfo iso_charset_menu[] = {
   GNOMEUIINFO_ITEM_NONE( N_ ("_Central European (ISO-8859-2)"), NULL,iso_2_cb),
 #define ISO_CHARSET_3_POS 3
   GNOMEUIINFO_ITEM_NONE( N_ ("_South European (ISO-8859-3)"), NULL, iso_3_cb),
-#define ISO_CHARSET_5_POS 4
+#define ISO_CHARSET_13_POS 4
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Baltic (ISO-8859-13)"), NULL, iso_13_cb),
+#define ISO_CHARSET_5_POS 5
   GNOMEUIINFO_ITEM_NONE( N_ ("Cy_rillic (ISO-8859-5)"), NULL, iso_5_cb),
-#define ISO_CHARSET_8_POS 5
+#define ISO_CHARSET_8_POS 6
   GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
-#define ISO_CHARSET_9_POS 6
+#define ISO_CHARSET_9_POS 7
   GNOMEUIINFO_ITEM_NONE( N_ ("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
   GNOMEUIINFO_END
 };
@@ -234,6 +237,7 @@ static gchar* iso_charset_names[] = {
    "ISO-8859-15",
    "ISO-8859-2",
    "ISO-8859-3",
+   "ISO-8859-13",
    "ISO-8859-5",
    "ISO-8859-8",
    "ISO-8859-9",
@@ -1607,6 +1611,8 @@ static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  2, ISO_CHARSET_2_POS); }
 static gint iso_3_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  3, ISO_CHARSET_3_POS); }
+static gint iso_13_cb(GtkWidget* widget, BalsaSendmsg *bmsg)
+{return set_iso_charset(bmsg, 13, ISO_CHARSET_13_POS); }
 static gint iso_5_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg,  5, ISO_CHARSET_5_POS); }
 static gint iso_8_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)

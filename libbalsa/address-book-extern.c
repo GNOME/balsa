@@ -211,7 +211,7 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
     gchar command[LINE_LEN];
     GList *address_list = NULL;
 
-    list = NULL;
+    *list = NULL;
     /* Start the program */
     g_snprintf(command, sizeof(command), "%s \"%s\"", 
                addr_externq->load, pattern);

@@ -1667,7 +1667,7 @@ char *mutt_quote_string (const char *s)
   *pr = 0;
   return (r);
 }
-#ifndef LIBMUTT
+
 void mutt_prepare_envelope (ENVELOPE *env)
 {
   char buffer[LONG_STRING];
@@ -1689,7 +1689,9 @@ void mutt_prepare_envelope (ENVELOPE *env)
     env->to->mailbox = safe_strdup (buffer);
   }
 
+#ifndef LIBMUTT
   mutt_set_followup_to (env);
+#endif
 
   /* Take care of 8-bit => 7-bit conversion. */
   rfc2047_encode_adrlist (env->to);
@@ -1708,7 +1710,7 @@ void mutt_prepare_envelope (ENVELOPE *env)
   if (!env->message_id)
     env->message_id = mutt_gen_msgid ();
 }
-#endif  
+
 void mutt_bounce_message (HEADER *h, ADDRESS *to)
 {
   int i;

@@ -32,9 +32,32 @@
 /* prototype this so that this file doesn't whine.  this function isn't in
  * mutt any longer, so we had to provide it inside mutt for libmutt :-)
  */
-int mutt_send_message (HEADER *msg);
+int mutt_send_message (HEADER * msg);
+static void encode_descriptions (BODY * b);
 
-BODY * add_mutt_body_plain (void);
+BODY *add_mutt_body_plain (void);
+
+/* from mutt's send.c */
+static void 
+encode_descriptions (BODY * b)
+{
+  BODY *t;
+  char tmp[LONG_STRING];
+
+  for (t = b; t; t = t->next)
+    {
+      if (t->description)
+	{
+	  rfc2047_encode_string (tmp, sizeof (tmp), (unsigned char *) t->description
+	    );
+	  safe_free ((void **) &t->description);
+	  t->description = safe_strdup (tmp);
+	}
+      if (t->parts)
+	encode_descriptions (t->parts);
+    }
+}
+
 
 BODY *
 add_mutt_body_plain (void)
@@ -140,6 +163,12 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
     }
 
   msg->content = mutt_make_multipart (msg->content);
+
+  mutt_prepare_envelope (msg->env);
+
+  encode_descriptions (msg->content);
+
+
 
   switch (balsa_app.outbox->type)
     {

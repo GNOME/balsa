@@ -31,6 +31,7 @@
 #include "config.h"
 #include <dirent.h>
 #include <string.h>
+#include <ctype.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -368,6 +369,16 @@ get_cache_name(LibBalsaMailboxImap* mailbox, const gchar* type)
     return fname;
 }
 
+static gchar*
+get_cache_name_body(LibBalsaMailboxImap* mailbox, ImapUID uid)
+{
+    gchar* fname = get_cache_name(mailbox, "body");
+    ImapUID uid_validity = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
+    gchar *fn = g_strdup_printf("%s/%u-%u", fname, uid_validity, uid);
+    g_free(fname);
+    return fn;
+}
+
 /* clean_cache:
    removes unused entries from the cache file.
 */
@@ -382,9 +393,7 @@ clean_cache(LibBalsaMailbox* mailbox)
     GList *lst, *remove_list;
     ImapUID uid_validity = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
 
-    /* libmutt sometimes forcibly fastclose's mailbox, take precautions */
-    RETURN_VAL_IF_CONTEXT_CLOSED(mailbox, FALSE);
-
+    return TRUE; /* FIXME: implement proper cache cleaning scheme */
     dir = opendir(fname);
     if(!dir) {
         g_free(fname);
@@ -545,8 +554,14 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
-    if(msg_info->message)
+    if(msg_info->message) {
+	gchar *fn =
+            get_cache_name_body(mimap, IMAP_MESSAGE_UID(msg_info->message));
+        unlink(fn); /* ignore error; perhaps the message 
+                     * was not in the cache.  */
+        g_free(fn);
         g_object_unref(G_OBJECT(msg_info->message));
+    }
     g_array_remove_index(mimap->messages_info, seqno-1);
 
     for (i = seqno - 1; i < mimap->messages_info->len; i++) {
@@ -738,10 +753,10 @@ get_cache_stream(LibBalsaMailbox *mailbox, unsigned uid)
 
     g_assert(mimap->handle);
     uidval = imap_mbox_handle_get_validity(mimap->handle);
-
     cache_name = get_cache_name(mimap, "body");
     msg_name   = g_strdup_printf("%s/%u-%u", cache_name, uidval, uid);
-    stream = fopen(msg_name,"rb");
+
+    stream = fopen(msg_name, "rb");
     if(!stream) {
         FILE *cache;
 	ImapResponse rc;
@@ -1422,6 +1437,7 @@ libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox,
 static void
 lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
 {
+    int i;
     g_return_if_fail(lbbody);
     g_return_if_fail(imap_body);
 
@@ -1452,23 +1468,31 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     case IMBDISP_OTHER:
 	lbbody->content_dsp = imap_body->content_dsp_other; break;
     }
-
-    lbbody->mime_type = g_ascii_strdown(imap_body_get_mime_type(imap_body),-1);
+    lbbody->mime_type = imap_body_get_mime_type(imap_body);
+    for(i=0; lbbody->mime_type[i]; i++)
+        lbbody->mime_type[i] = tolower(lbbody->mime_type[i]);
     lbbody->filename  = g_strdup(imap_body_get_param(imap_body, "name"));
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
     if(imap_body->envelope) {
         lbbody->embhdrs = g_new0(LibBalsaMessageHeaders, 1);
         lb_set_headers(lbbody->embhdrs, imap_body->envelope, TRUE);
     }
-    if(imap_body->child) {
-        LibBalsaMessageBody *body = libbalsa_message_body_new(lbbody->message);
-        lbm_imap_construct_body(body, imap_body->child);
-        lbbody->parts = body;
-    }
     if(imap_body->next) {
         LibBalsaMessageBody *body = libbalsa_message_body_new(lbbody->message);
         lbm_imap_construct_body(body, imap_body->next);
         lbbody->next = body;
+    }
+    /* message/rfc822 requires special treatment for compatibility with
+     * rest of balsa. If the first child of the message/rfc822 is a multipart,
+     * we append it as a sibling of message/rfc822. */
+    if(imap_body->child) {
+        LibBalsaMessageBody *body = libbalsa_message_body_new(lbbody->message);
+        lbm_imap_construct_body(body, imap_body->child);
+        if(imap_body->media_basic == IMBMEDIA_MESSAGE_RFC822 &&
+           imap_body->child->media_basic == IMBMEDIA_MULTIPART) {
+            body->next = lbbody->next;
+            lbbody->next = body;
+        } else lbbody->parts = body;
     }
 }
 
@@ -1507,7 +1531,8 @@ is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
             g_string_prepend(s, buf);
             return TRUE;
         }
-        i++;
+        if(body->body_type != LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
+            i++;
     }
     return FALSE;
 }
@@ -1559,12 +1584,12 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 
 	cache_name = get_cache_name(mimap, "part");
 	part_name   = 
-	    g_strdup_printf("%s/%u-%u-%u", cache_name,
+	    g_strdup_printf("%s/%u-%u-%s", cache_name,
 			    imap_mbox_handle_get_validity(mimap->handle),
 			    IMAP_MESSAGE_UID(msg),
-			    atoi(section) );
-	
+			    section);
 	fp = fopen(part_name,"rb+");
+        
 	if(!fp) { /* no cache element */
 	    struct part_data dt;
 	    GMimePart *prefilt;
@@ -1584,7 +1609,6 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 					     append_str, &dt);
 	    if(rc != IMR_OK)
 		g_error("FIXME: error handling here!\n");
-	    g_free(section);
 	    
 	    UNLOCK_MAILBOX(msg->mailbox);
 		
@@ -1599,9 +1623,12 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	    libbalsa_assure_balsa_dir();
 	    mkdir(cache_name, S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
 	    fp = fopen(part_name, "wb+");
-	    if(!fp)
+	    if(!fp) {
+                g_free(section); 
+                g_free(cache_name);
+                g_free(part_name);
 		return NULL; /* something better ? */
-	    
+            }
 	    if( (dt.body->media_basic == IMBMEDIA_TEXT) &&
 		!g_ascii_strcasecmp( "plain", dt.body->media_subtype ) ) {
 		GMimeFilter *crlffilter; 	    
@@ -1637,8 +1664,10 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	    g_object_unref (parser);
 	}
 	g_object_unref (partstream);
+	g_free(section); 
+        g_free(cache_name);
+        g_free(part_name);
     }
-    
     bod = g_mime_part_get_content (GMIME_PART(part->mime_part), &len);
 
     *sz = len;

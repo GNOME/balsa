@@ -280,8 +280,6 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
     int fd;
     int flags = O_CREAT | O_EXCL | O_WRONLY;
 
-    g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
-
 #ifdef O_NOFOLLOW
     flags |= O_NOFOLLOW;
 #endif

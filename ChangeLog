@@ -1,3 +1,9 @@
+2003-11-29  Pawel Salek
+
+	* libbalsa/body.c: we can save msg body without mime_part.
+	* libbalsa/mailbox_imap.c: translate msg structure in the same way
+	the other drivers do. Fix caching of nested parts and memory leaks.
+
 2003-11-23  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: fix memory leak.

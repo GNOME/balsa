@@ -258,7 +258,8 @@ g_mime_gpgme_hash_name(GMimeCipherContext * context, GMimeCipherHash hash)
 	p = "pgp-haval-5-160";
 	break;
     default:
-	return NULL;
+	if (!(p = ctx->micalg))
+	    return p;
     }
 
     /* S/MIME (RFC2633) doesn't like the leading "pgp-" */

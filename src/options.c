@@ -27,11 +27,47 @@ static Personality *optionspersselected;
 static GtkWidget *account_list;
 static personality_box_options *options = NULL;
 
-static void personality_delete_one (GtkWidget *, gpointer); 
+static void personality_delete_one (GtkWidget *, gpointer);
 static void personality_edit (GtkWidget *, gpointer);
 static void personality_pop3_edit (Personality *);
 static void personality_imap_edit (Personality *);
 static void personality_mbox_edit (Personality *);
+
+static void 
+personality_destroy_edit (personality_box_options * options)
+{
+  gtk_widget_destroy (options->accountname);
+
+  gtk_widget_destroy (options->realname);
+  gtk_widget_destroy (options->replyto);
+
+  if (options->pers->type == 0)
+    {
+      gtk_widget_destroy (options->pop3_pop3server);
+      gtk_widget_destroy (options->pop3_smtpserver);
+      gtk_widget_destroy (options->pop3_username);
+      gtk_widget_destroy (options->pop3_password);
+      gtk_widget_destroy (options->pop3_check_mail);
+      gtk_widget_destroy (options->pop3_default_mailbox);
+    }
+  else if (options->pers->type == 1)
+    {
+      gtk_widget_destroy (options->imap_imapserver);
+      gtk_widget_destroy (options->imap_smtpserver);
+      gtk_widget_destroy (options->imap_username);
+      gtk_widget_destroy (options->imap_password);
+      gtk_widget_destroy (options->imap_check_mail);
+      gtk_widget_destroy (options->imap_default_mailbox);
+    }
+  else if (options->pers->type == 2)
+    {
+      gtk_widget_destroy (options->local_mblocation);
+      gtk_widget_destroy (options->local_smtpserver);
+      gtk_widget_destroy (options->local_default_mailbox);
+      gtk_widget_destroy (options->local_check_mail);
+    }
+  options->pers = NULL;
+}
 
 gint
 delete_event (GtkWidget * widget, gpointer data)
@@ -355,8 +391,8 @@ change_options (GtkWidget * widget, personality_box_options * options)
   gnome_config_set_string ("Realname", gtk_entry_get_text (GTK_ENTRY (options->realname)));
   gnome_config_set_string ("Replyto", gtk_entry_get_text (GTK_ENTRY (options->replyto)));
 
-  currentpers->realname = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->realname)));
-  currentpers->replyto = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->replyto)));
+  currentpers->realname = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->realname)));
+  currentpers->replyto = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->replyto)));
 
   if (currentpers->type == 0)
     {
@@ -365,10 +401,10 @@ change_options (GtkWidget * widget, personality_box_options * options)
       gnome_config_set_string ("POP3_username", gtk_entry_get_text (GTK_ENTRY (options->pop3_username)));
       gnome_config_set_string ("POP3_password", gtk_entry_get_text (GTK_ENTRY (options->pop3_password)));
 
-      currentpers->p_pop3server = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->pop3_pop3server)));
-      currentpers->p_smtpserver = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->pop3_smtpserver)));
-      currentpers->p_username = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->pop3_username)));
-      currentpers->p_password = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->pop3_password)));
+      currentpers->p_pop3server = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->pop3_pop3server)));
+      currentpers->p_smtpserver = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->pop3_smtpserver)));
+      currentpers->p_username = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->pop3_username)));
+      currentpers->p_password = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->pop3_password)));
     }
 
   if (currentpers->type == 1)
@@ -378,10 +414,10 @@ change_options (GtkWidget * widget, personality_box_options * options)
       gnome_config_set_string ("IMAP_username", gtk_entry_get_text (GTK_ENTRY (options->imap_username)));
       gnome_config_set_string ("IMAP_password", gtk_entry_get_text (GTK_ENTRY (options->imap_password)));
 
-      currentpers->i_imapserver = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->imap_imapserver)));
-      currentpers->i_smtpserver = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->imap_smtpserver)));
-      currentpers->i_username = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->imap_username)));
-      currentpers->i_password = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->imap_password)));
+      currentpers->i_imapserver = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->imap_imapserver)));
+      currentpers->i_smtpserver = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->imap_smtpserver)));
+      currentpers->i_username = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->imap_username)));
+      currentpers->i_password = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->imap_password)));
     }
 
   if (currentpers->type == 2)
@@ -389,12 +425,14 @@ change_options (GtkWidget * widget, personality_box_options * options)
       gnome_config_set_string ("LOCAL_mblocation", gtk_entry_get_text (GTK_ENTRY (options->local_mblocation)));
       gnome_config_set_string ("LOCAL_smtpserver", gtk_entry_get_text (GTK_ENTRY (options->local_smtpserver)));
 
-      currentpers->l_mblocation = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->local_mblocation)));
-      currentpers->l_smtpserver = (gchar *)cpystr(gtk_entry_get_text (GTK_ENTRY (options->local_smtpserver)));
+      currentpers->l_mblocation = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->local_mblocation)));
+      currentpers->l_smtpserver = (gchar *) cpystr (gtk_entry_get_text (GTK_ENTRY (options->local_smtpserver)));
     }
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();
+
+  personality_destroy_edit (options);
 }
 
 void
@@ -497,10 +535,10 @@ personality_box (GtkWidget * widget, gpointer data)
   gtk_widget_set_usize (button, 70, 30);
   gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
 
-   gtk_signal_connect_object (GTK_OBJECT (button),
-   "clicked",
-   (GtkSignalFunc) personality_delete_one,
-   NULL);
+  gtk_signal_connect_object (GTK_OBJECT (button),
+			     "clicked",
+			     (GtkSignalFunc) personality_delete_one,
+			     NULL);
 
   gtk_widget_show (button);
 
@@ -593,28 +631,28 @@ static void
 personality_delete_one (GtkWidget * widget, gpointer something)
 {
   gint row = selected_clist_row (account_list);
-  GString *gs=g_string_new(NULL);
+  GString *gs = g_string_new (NULL);
   gpointer *data = gtk_clist_get_row_data (GTK_CLIST (account_list), row);
   gint persnum = ((Personality *) (data))->persnum;
 
   gnome_config_pop_prefix ();
   gnome_config_sync ();
 
-  gtk_clist_remove(GTK_CLIST(account_list),row);
+  gtk_clist_remove (GTK_CLIST (account_list), row);
 
-  g_string_sprintf(gs,"/balsa/Accounts/%i",persnum);
-  fprintf(stderr,"cleaning key: %s\n",gs->str);
-  gnome_config_clean_key(gs->str);
+  g_string_sprintf (gs, "/balsa/Accounts/%i", persnum);
+  fprintf (stderr, "cleaning key: %s\n", gs->str);
+  gnome_config_clean_key (gs->str);
 
   g_string_truncate (gs, 0);
 
-  g_string_sprintf(gs,"/balsa/%s/",((Personality *) (data))->name);
-  fprintf(stderr,"cleaning section: %s\n",gs->str);
+  g_string_sprintf (gs, "/balsa/%s/", ((Personality *) (data))->name);
+  fprintf (stderr, "cleaning section: %s\n", gs->str);
   gnome_config_clean_section (gs->str);
-  g_string_free(gs,1);
+  g_string_free (gs, 1);
   gnome_config_sync ();
 
-  mainOptions->pers=g_list_remove(mainOptions->pers,data);
+  mainOptions->pers = g_list_remove (mainOptions->pers, data);
 }
 
 static void

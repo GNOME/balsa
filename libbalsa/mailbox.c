@@ -639,16 +639,6 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 {
     GSList *filters;
     GSList *lst;
-    static LibBalsaCondition cond_recent =
-    {
-        FALSE,
-        CONDITION_FLAG,
-        {
-            {
-                LIBBALSA_MESSAGE_FLAG_RECENT
-            }
-        }
-    };
     static LibBalsaCondition cond_and =
     {
         FALSE,
@@ -671,7 +661,15 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     }
 
     libbalsa_lock_mailbox(mailbox);
-    cond_and.match.andor.left = &cond_recent;
+    if (!cond_and.match.andor.left)
+	cond_and.match.andor.left =
+	    libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+					    libbalsa_condition_new_flag_enum
+					    (FALSE,
+					     LIBBALSA_MESSAGE_FLAG_RECENT),
+					    libbalsa_condition_new_flag_enum
+					    (TRUE,
+					     LIBBALSA_MESSAGE_FLAG_DELETED));
     for (lst = filters; lst; lst = g_slist_next(lst)) {
         LibBalsaFilter *filter = lst->data;
         LibBalsaMailboxSearchIter *search_iter;

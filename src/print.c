@@ -637,8 +637,14 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
     FILE *fp;
     size_t len;
     gchar *html_text;
+    gchar *conttype;
+    LibBalsaHTMLType html_type;
 
-    if (!libbalsa_html_can_print()) {
+    conttype = libbalsa_message_body_get_content_type(body);
+    html_type = libbalsa_html_type(conttype);
+    g_free(conttype);
+
+    if (!libbalsa_html_can_print() || !html_type) {
 	prepare_default(pi, body);
 	return;
     }
@@ -646,7 +652,7 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
     dialog =
 	gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
 			       GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-			       _("Processing an HTML message part, "
+			       _("Preparing an HTML part, "
 				 "which must start on a new page.\n"
 				 "Print this part?"));
     response = gtk_dialog_run(GTK_DIALOG(dialog));
@@ -675,6 +681,8 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body)
     fclose(fp);
     if (!html_text)
 	return;
+
+    len = libbalsa_html_filter(html_type, &html_text, len);
 
     pdata = g_new(HtmlInfo, 1);
     pdata->id_tag = BALSA_PRINT_TYPE_HTML;
@@ -1257,6 +1265,8 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	{"text/html", prepare_default},   /* don't print html source */
 #else /* HAVE_GTKHTML */
 	{"text/html", prepare_html},
+	{"text/enriched", prepare_html},
+	{"text/richtext", prepare_html},
 #endif /* HAVE_GTKHTML */
 	{"text", prepare_plaintext},
 	{"image", prepare_image},

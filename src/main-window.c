@@ -830,8 +830,11 @@ check_messages_thread( Mailbox *mbox )
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, "Local Mail",0,0 );
-  mailbox_check_new_messages( mbox );
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox->name,0,0 );
+
+  if( CLIENT_CONTEXT_OPEN(mbox)) {
+    mailbox_check_new_messages( mbox );
+    MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox->name,0,0 );
+  }
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, "Finished",0,0 );
 

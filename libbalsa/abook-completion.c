@@ -45,9 +45,9 @@ completion_data_new(LibBalsaAddress * address, gboolean alias)
 
 #ifdef CASE_INSENSITIVE_NAME
     ret->string =
-        g_ascii_strup(alias ? address->id : address->full_name, -1);
+        g_ascii_strup(alias ? address->nick_name : address->full_name, -1);
 #else
-    ret->string = g_strdup(alias ? address->id : address->full_name);
+    ret->string = g_strdup(alias ? address->nick_name : address->full_name);
 #endif
 
     return ret;

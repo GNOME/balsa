@@ -239,7 +239,7 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
 #endif
         address = libbalsa_address_new();
         /* The externq database doesn't support Id's, sorry! */
-        address->id = g_strdup(_("No-Id"));
+        address->nick_name = g_strdup(_("No-Id"));
         address->address_list = g_list_append(address_list, g_strdup(email));
 
         if (name)address->full_name = g_strdup(name);

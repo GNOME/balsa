@@ -288,7 +288,7 @@ create_vcard_page(AddressBookConfig * abc)
 				   ab ? abc->address_book->name : NULL, 
 				   label);
 
-    label = gtk_label_new(_("_File Name"));
+    label = gtk_label_new_with_mnemonic(_("_File Name"));
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
 		     GTK_FILL, GTK_FILL, 10, 10);
@@ -328,7 +328,7 @@ create_externq_page(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("_Address Book Name"), table, 0);
+    label = create_label(_("Address _Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : NULL, 
 				   label);
@@ -390,7 +390,7 @@ create_ldif_page(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("_Address Book Name"), table, 0);
+    label = create_label(_("Address _Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   abc->address_book 
 				   ? abc->address_book->name : NULL, 
@@ -450,7 +450,7 @@ create_ldap_page(AddressBookConfig * abc)
     abc->link_id = "LDAP";
     /* mailbox name */
 
-    label = create_label(_("_Address Book Name"), table, 0);
+    label = create_label(_("Address _Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : name, 
 				   label);

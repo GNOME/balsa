@@ -1,3 +1,12 @@
+2003-01-11  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address-book-ldif.c: fix UTF-8 issues and nicknames.
+	* src/address-book-config.c: missing _with_mnemonic().
+	* libbalsa/abook-completion.c: cleanup address field naming.
+	* libbalsa/address-book-{extern,ldap,vcard}.c: 
+	* libbalsa/address.[ch]: ditto.
+	* src/store-address.c: add more mnemonics.
+	
 2003-01-11  PeterB
 
         * src/balsa-index.c (balsa_index_set_threading_type): Reselect

@@ -41,23 +41,28 @@ enum _LibBalsaAddressField {
     FIRST_NAME,
     MIDDLE_NAME,
     LAST_NAME,
+    NICK_NAME,
     ORGANIZATION,
     EMAIL_ADDRESS,
     NUM_FIELDS
 };
 
+/* General address structure. it should possible subclass more compact
+   rfc2822_mailbox, or something.
+*/
 struct _LibBalsaAddress {
     GObject parent;
 
     /*
      * ID
      * VCard FN: Field
-     * An ldap feature..
+     * LDAP/LDIF: xmozillanickname
      */
-    gchar *id;
+    gchar *nick_name;
 
     /* First and last names
      * VCard: N: field
+     * LDAP/LDIF: cn
      * Full name is the bit in <> in an rfc822 address
      */
     gchar *full_name;

@@ -269,7 +269,7 @@ load_vcard_file(LibBalsaAddressBook *ab)
 	    if (address_list) {
 		address = libbalsa_address_new();
 
-		address->id = id ? id : g_strdup(_("No-Id"));
+		address->nick_name = id ? id : g_strdup(_("No-Id"));
 
 		address->address_list = g_list_reverse(address_list);
 

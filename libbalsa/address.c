@@ -72,7 +72,7 @@ libbalsa_address_class_init(LibBalsaAddressClass * klass)
 static void
 libbalsa_address_init(LibBalsaAddress * addr)
 {
-    addr->id = NULL;
+    addr->nick_name = NULL;
     addr->full_name = NULL;
     addr->first_name = NULL;
     addr->middle_name = NULL;
@@ -91,7 +91,7 @@ libbalsa_address_finalize(GObject * object)
 
     addr = LIBBALSA_ADDRESS(object);
 
-    g_free(addr->id);           addr->id = NULL;
+    g_free(addr->nick_name);    addr->nick_name = NULL;
     g_free(addr->full_name);    addr->full_name = NULL;
     g_free(addr->first_name);   addr->first_name = NULL;
     g_free(addr->middle_name);  addr->middle_name = NULL;

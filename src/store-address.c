@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -111,7 +111,7 @@ store_address_dialog(struct store_address_info * info)
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    _("Save"),  SA_RESPONSE_SAVE,
+                                    _("_Save"),  SA_RESPONSE_SAVE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
     GtkWidget *vbox = GTK_DIALOG(dialog)->vbox;
@@ -192,6 +192,9 @@ store_address_from_entries(struct store_address_info * info,
     address->last_name =
         g_strstrip(gtk_editable_get_chars
     	       (GTK_EDITABLE(entries[LAST_NAME]), 0, -1));
+    address->nick_name =
+        g_strstrip(gtk_editable_get_chars
+    	       (GTK_EDITABLE(entries[NICK_NAME]), 0, -1));
     address->organization =
         g_strstrip(gtk_editable_get_chars
     	       (GTK_EDITABLE(entries[ORGANIZATION]), 0, -1));
@@ -303,12 +306,13 @@ store_address_add_address(struct store_address_info * info,
     gint cnt2;
 
     gchar *labels[NUM_FIELDS] = {
-	N_("Card Name:"),
-	N_("First Name:"),
-	N_("Middle Name:"),
-	N_("Last Name:"),
-	N_("Organization:"),
-	N_("Email Address:")
+	N_("_Displayed Name:"),
+	N_("_First Name:"),
+	N_("_Middle Name:"),
+	N_("_Last Name:"),
+	N_("_Nickname:"),
+	N_("O_rganization:"),
+	N_("_Email Address:")
     };
 
     gchar **names;
@@ -394,8 +398,9 @@ store_address_add_address(struct store_address_info * info,
     gtk_box_pack_start(GTK_BOX(vbox), table, TRUE, TRUE, 0);
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
-	label = gtk_label_new(_(labels[cnt]));
+	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
 	entries[cnt] = gtk_entry_new();
+	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
 
 	gtk_table_attach(GTK_TABLE(table), label, 0, 1, cnt + 1, cnt + 2,
 			 GTK_FILL, GTK_FILL, 4, 4);

@@ -379,7 +379,7 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     name = create_name(first, last);
 
     address = libbalsa_address_new();
-    address->id = id ? id : g_strdup(_("No-Id"));
+    address->nick_name = id ? id : g_strdup(_("No-Id"));
     if (name)
 	address->full_name = name;
     else if (id)

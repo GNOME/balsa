@@ -741,10 +741,12 @@ void
 libbalsa_mailbox_link_message(LibBalsaMailbox * mailbox, LibBalsaMessage*msg)
 {
     msg->mailbox = mailbox;
+    mailbox->message_list = g_list_prepend(mailbox->message_list, msg);
     
+    if (msg->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        return;
     if (msg->flags & LIBBALSA_MESSAGE_FLAG_NEW)
         mailbox->unread_messages++;
-    mailbox->message_list = g_list_prepend(mailbox->message_list, msg);
     mailbox->total_messages++;
 }
 

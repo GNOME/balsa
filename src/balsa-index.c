@@ -534,6 +534,11 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     DO_CLIST_WORKAROUND(GTK_CLIST(bindex));
 }
 
+/*
+  See: http://mail.gnome.org/archives/balsa-list/2000-November/msg00212.html
+  for discussion of the GtkCtree bug. The bug is triggered when one
+  attempts to delete a collapsed message thread.
+*/
 void
 balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
 {
@@ -565,6 +570,18 @@ balsa_index_del(BalsaIndex * bindex, LibBalsaMessage * message)
 	    
 	    if(sibling!=NULL)sibling=GTK_CTREE_ROW(sibling)->sibling;
 	    else{sibling=GTK_CTREE_ROW(node)->sibling;}
+
+
+	    /* BEGIN GtkCTree bug workaround. */
+           if(sibling==NULL){
+             gboolean expanded;
+             gtk_ctree_get_node_info(GTK_CTREE(bindex), node,
+                                     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                                     &expanded);
+             if(!expanded)
+               gtk_ctree_expand(GTK_CTREE(bindex), node);
+           }
+	   /* end GtkCTRee bug workaround. */
 
 	    while(1){
 		if(children==NULL)break;

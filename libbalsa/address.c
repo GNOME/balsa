@@ -161,7 +161,7 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
 {
     LibBalsaAddress *address;
 
-    if (!caddr)
+    if (!caddr || (caddr->personal==NULL && caddr->mailbox==NULL))
 	return NULL;
 
     address = libbalsa_address_new();

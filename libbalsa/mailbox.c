@@ -755,7 +755,10 @@ libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
     return res;
 }
 
-/* internal c-client translation */
+/* internal c-client translation:
+ * mutt lists can cantain null adresses for address strings like
+ * "To: Dear Friends,". We do remove them.
+ */
 static LibBalsaMessage *
 translate_message(HEADER * cur)
 {
@@ -780,17 +783,17 @@ translate_message(HEADER * cur)
 
     for (addy = cenv->to; addy; addy = addy->next) {
 	addr = libbalsa_address_new_from_libmutt(addy);
-	message->to_list = g_list_append(message->to_list, addr);
+	if(addr) message->to_list = g_list_append(message->to_list, addr);
     }
 
     for (addy = cenv->cc; addy; addy = addy->next) {
 	addr = libbalsa_address_new_from_libmutt(addy);
-	message->cc_list = g_list_append(message->cc_list, addr);
+	if(addr) message->cc_list = g_list_append(message->cc_list, addr);
     }
 
     for (addy = cenv->bcc; addy; addy = addy->next) {
 	addr = libbalsa_address_new_from_libmutt(addy);
-	message->bcc_list = g_list_append(message->bcc_list, addr);
+	if(addr) message->bcc_list = g_list_append(message->bcc_list, addr);
     }
 
     /* Get fcc from message */

@@ -1,3 +1,10 @@
+2001-01-15   Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/address.c:
+	* libbalsa/mailbox.c: handle properly NULL addresses.
+	* src/balsa-index.c: workaround peculiar GtkCTree behavior by
+	Atsuhiko Yamanaka <ymnk@jcraft.com>. 
+
 2001-01-14  Matthew Guenther  <guentherm@asme.org>
 
 	* website/screenshots.html.in: Add new screenshots from v1.0.1,

@@ -1,3 +1,10 @@
+2003-04-07 08:43  PeterB
+
+	* libbalsa/misc.c, libbalsa/misc.h, src/pref-manager.c: Remove
+	libbalsa_{de}escape_specials; use g_str{escape,compress} instead.
+	* libbalsa/misc.c: Streamline libbalsa_make_string_from_list_p
+	(Manu).
+
 2003-04-06  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/mailbox_pop3.c: fix progress dialog for multiple POP servers

@@ -1056,17 +1056,14 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
 }
 
 void
-libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox, guint seqno)
+libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox, guint seqno,
+				  LibBalsaMailboxSearchIter * search_iter)
 {
-    LibBalsaMailboxSearchIter *search_iter;
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(search_iter != NULL);
 
-    if (!mailbox->view_filter)
-	return;
-
-    search_iter = libbalsa_mailbox_search_iter_new(mailbox->view_filter);
     if (!libbalsa_mailbox_message_match(mailbox, seqno, search_iter))
 	libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
-    libbalsa_mailbox_search_iter_free(search_iter);
 }
 
 /* Search iters */
@@ -1082,6 +1079,16 @@ libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
     iter->user_data = NULL;
 
     return iter;
+}
+
+/* Create a LibBalsaMailboxSearchIter for a mailbox's view_filter. */
+LibBalsaMailboxSearchIter *
+libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox)
+{
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+
+    return mailbox->view_filter ?
+	libbalsa_mailbox_search_iter_new(mailbox->view_filter) : NULL;
 }
 
 void

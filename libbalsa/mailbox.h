@@ -339,6 +339,8 @@ gboolean libbalsa_mailbox_message_match(LibBalsaMailbox  *mailbox,
 /* Search iter */
 LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_new(LibBalsaCondition
 							    * condition);
+LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_view(LibBalsaMailbox
+							     * mailbox);
 gboolean libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 					   LibBalsaMailboxSearchIter 
 					   * search_iter,
@@ -419,7 +421,10 @@ void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox * mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
-void libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox, guint seqno);
+void libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox,
+				       guint seqno,
+				       LibBalsaMailboxSearchIter
+				       * search_iter);
 
 /* Search */
 gboolean libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox,

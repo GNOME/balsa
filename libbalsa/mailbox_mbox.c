@@ -320,8 +320,11 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 	    msg_info.from = g_mime_parser_get_from(gmime_parser);
 	    msg_info.message =
 		lbm_mbox_message_new(mime_message, &msg_info);
-	    if (msg_info.message)
+	    if (msg_info.message) {
 		g_array_append_val(mbox->messages_info, msg_info);
+		msg_info.message->msgno = mbox->messages_info->len;
+		msg_info.message->mailbox = (LibBalsaMailbox *) mbox;
+	    }
 	}
 	g_mime_object_unref(GMIME_OBJECT(mime_message));
     }
@@ -335,6 +338,7 @@ free_message_info(struct message_info *msg_info)
     g_free(msg_info->from);
 
     if (msg_info->message) {
+	msg_info->message->msgno = 0;
 	msg_info->message->mailbox = NULL;
 	g_object_unref(msg_info->message);
     }
@@ -951,9 +955,6 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     msg_info = &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
 			      struct message_info, msgno-1);
-
-    if (!msg_info->message)
-	libbalsa_mailbox_local_load_message(mailbox, msgno);
 
     return msg_info->message;
 }

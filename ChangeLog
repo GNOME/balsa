@@ -1,3 +1,10 @@
+2001-04-15  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index.[hc]: Add balsa_index_set_first_new_message to
+	find the first unread message in an index by row, instead of by
+	message number.  Change balsa_index_set_threading_type to use
+	this.
+
 2001-04-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main.c: GConf-1.0.0 compatibility. remove duplicate of

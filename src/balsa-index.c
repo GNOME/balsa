@@ -447,6 +447,7 @@ bi_get_largest_selected(GtkCList * clist)
     return h;
 }
 
+
 static void
 clist_click_column(GtkCList * clist, gint column, gpointer data)
 {
@@ -465,6 +466,36 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
 	gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
 	gtk_clist_moveto(clist, h, 0, 1.0, 0.0);
 }
+
+
+/* 
+ * Search the index, locate the first unread message, and update the
+ * index's first_new_message field to point at that message.  If no
+ * unread messages are found, first_new_message is set to NULL
+ */
+void 
+balsa_index_set_first_new_message(BalsaIndex * bindex)
+{
+
+    LibBalsaMessage* message;
+    gint i = 0;
+    
+    g_return_if_fail(bindex != NULL);
+    bindex->first_new_message = NULL;
+    
+    while (i < GTK_CLIST(bindex->ctree)->rows) {
+        message = LIBBALSA_MESSAGE(
+            gtk_clist_get_row_data(GTK_CLIST(bindex->ctree), i));
+        
+        if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
+            bindex->first_new_message = message;
+            return;
+        }
+        ++i;
+    }
+}
+
+
 
 /* 
  * This is an idle handler. Be sure to use gdk_threads_{enter/leave}
@@ -485,12 +516,16 @@ moveto_handler(BalsaIndex * bindex)
 
     gdk_threads_enter();
 
-    if(bindex->first_new_message != NULL) {
+    if (bindex->first_new_message != NULL) {
         row_data = bindex->first_new_message;
     } else if ((list = GTK_CLIST (bindex->ctree)->selection) != NULL) {
         list = g_list_last (list);
         row_data = list->data;
+    } else {
+        row_data = gtk_clist_get_row_data(GTK_CLIST(bindex->ctree),
+                                          GTK_CLIST(bindex->ctree)->rows - 1);
     }
+        
         
     if (row_data) {
         row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree),
@@ -586,6 +621,7 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     balsa_index_set_sort_order(bindex, mbnode->sort_field, 
 			       mbnode->sort_type);
     balsa_index_set_threading_type(bindex, mbnode->threading_type);
+    balsa_index_set_first_new_message(bindex);
 
     gtk_idle_add((GtkFunction) moveto_handler, bindex);
 
@@ -652,10 +688,6 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
                                  (gpointer) message);
 
     balsa_index_set_col_images(bindex, node, message);
-
-    if (bindex->first_new_message == NULL)
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	    bindex->first_new_message = message;
 
     DO_CLIST_WORKAROUND(GTK_CLIST(bindex->ctree));
 }
@@ -789,6 +821,32 @@ balsa_index_select_next(BalsaIndex * bindex)
 
     balsa_index_select_row(bindex, h + 1);
 }
+
+
+/* 
+ * select the first unread message in the index, otherwise select the
+ * last message.
+ */
+void
+balsa_index_select_first_unread(BalsaIndex* bindex)
+{
+    gint row;
+    
+
+    g_return_if_fail(bindex != NULL);
+    
+    balsa_index_set_first_new_message(bindex);
+
+    if (bindex->first_new_message != NULL) {
+        row = gtk_clist_find_row_from_data (GTK_CLIST(bindex->ctree), 
+                                            bindex->first_new_message);
+    } else {
+        row = GTK_CLIST(bindex->ctree)->rows - 1;
+    }
+    
+    balsa_index_select_row(bindex, row);
+}
+
 
 
 /* balsa_index_select_next_unread:
@@ -2017,11 +2075,6 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     gtk_clist_sort(clist);
     DO_CLIST_WORKAROUND(clist);
     gtk_clist_thaw(clist);
-
-    /* FIXME this might could be cleaned up some */
-    if(bindex->first_new_message==NULL && i)
-	bindex->first_new_message=
-	    LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, i-1));
 
     msg = BALSA_MESSAGE(balsa_app.main_window->preview);
     if ( msg && msg->message &&

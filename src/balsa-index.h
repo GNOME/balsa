@@ -79,6 +79,7 @@ extern "C" {
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
     void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
 				    GtkSortType order);
+    void balsa_index_set_first_new_message(BalsaIndex * bindex);
 
 /* adds a new message */
     void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
@@ -90,6 +91,7 @@ extern "C" {
 
 /* select up/down the index */
     void balsa_index_select_next(BalsaIndex *);
+    void balsa_index_select_first_unread(BalsaIndex*);
     void balsa_index_select_next_unread(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
     void balsa_index_select_row(BalsaIndex * bindex, gint row);

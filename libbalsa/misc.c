@@ -38,7 +38,10 @@ mailbox_node_new (gchar * name, Mailbox * mb, gint i)
   MailboxNode *mbn;
   mbn = g_malloc (sizeof (MailboxNode));
   mbn->name = g_strdup (name);
-  mbn->mailbox = mb;
+  if (mb)
+    mbn->mailbox = mb;
+  else
+    mbn->mailbox = NULL;
   mbn->IsDir = i;
   mbn->expanded = FALSE;
   return mbn;

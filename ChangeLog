@@ -4,8 +4,9 @@
 	* src/balsa-index.c (balsa_index_selected_list): ref current
 	message as all others.
 
-2004-08-12 16:07  PeterB
+2004-08-12 20:22  PeterB
 
+	* libbalsa/: mailbox.c, message.c: plug leaks.
 	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c: cache
 	mtimes on first check instead of making careful check.
 	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,

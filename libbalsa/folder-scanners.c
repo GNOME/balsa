@@ -150,7 +150,7 @@ struct browser_state
 
 static void
 libbalsa_imap_add_folder(char *folder, int delim, int noselect, int noscan,
-			 struct browser_state *state)
+			 int marked, struct browser_state *state)
 {
     if (folder[strlen(folder) - 1] == delim)
 	return;
@@ -165,7 +165,7 @@ libbalsa_imap_add_folder(char *folder, int delim, int noselect, int noscan,
 	state->subfolders =
 	    g_list_append(state->subfolders, g_strdup(folder));
 
-    state->handle_imap_path(folder, delim, noselect, noscan,
+    state->handle_imap_path(folder, delim, noselect, noscan, marked,
 			    state->cb_data);
 }
 
@@ -174,7 +174,7 @@ libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
 		      ImapMboxFlags * flags, char *folder,
 		      struct browser_state *state)
 {
-    gboolean noselect;
+    gboolean noselect, marked;
     gboolean noscan;
 
     g_return_if_fail(folder && *folder);
@@ -185,11 +185,12 @@ libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
     noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
 	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
 	&& !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
-
+    marked = IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED);
     if (state->subscribed)
 	state->mark_imap_path(folder, noselect, noscan, state->cb_data);
     else
-	libbalsa_imap_add_folder(folder, delim, noselect, noscan, state);
+	libbalsa_imap_add_folder(folder, delim, noselect, noscan,
+                                 marked, state);
 }
 
 static void
@@ -197,7 +198,7 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
 		      ImapMboxFlags * flags, char *folder,
 		      struct browser_state *state)
 {
-    gboolean noselect;
+    gboolean noselect, marked;
     gboolean noscan;
 
     g_return_if_fail(folder && *folder);
@@ -206,8 +207,9 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
     noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
 	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
 	&& !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
+    marked = IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED);
 
-    libbalsa_imap_add_folder(folder, delim, noselect, noscan, state);
+    libbalsa_imap_add_folder(folder, delim, noselect, noscan, marked, state);
 }
 
 /* executed with GDK lock OFF.
@@ -345,7 +347,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
          * and we'll mark it as scanned, because the only reason for
          * using this option is to pickup an INBOX that isn't in the
          * tree specified by the prefix */
-        handle_imap_path("INBOX", '/', FALSE, TRUE, cb_data);
+        handle_imap_path("INBOX", '/', FALSE, TRUE, FALSE, cb_data);
     }
 
     i = 0;

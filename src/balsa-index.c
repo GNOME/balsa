@@ -253,6 +253,7 @@ bndx_popup_menu(GtkWidget * widget)
 
 /* BalsaIndex instance init method; no tree store is set on the tree
  * view--that's handled later, when the view is populated. */
+#define INDEX_ICON_SZ 16
 static void
 bndx_instance_init(BalsaIndex * index)
 {
@@ -290,6 +291,7 @@ bndx_instance_init(BalsaIndex * index)
 
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
+    gtk_cell_renderer_set_fixed_size(renderer, INDEX_ICON_SZ, INDEX_ICON_SZ);
     column =
         gtk_tree_view_column_new_with_attributes("S", renderer,
                                                  "pixbuf", LB_MBOX_MARKED_COL,
@@ -299,6 +301,7 @@ bndx_instance_init(BalsaIndex * index)
 
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
+    gtk_cell_renderer_set_fixed_size(renderer, INDEX_ICON_SZ, INDEX_ICON_SZ);
     column =
         gtk_tree_view_column_new_with_attributes("A", renderer,
                                                  "pixbuf", LB_MBOX_ATTACH_COL,
@@ -1043,10 +1046,10 @@ balsa_index_set_column_widths(BalsaIndex * index)
 #endif
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MARKED_COL),
-                                         26); /* icon width+2 */
+                                         INDEX_ICON_SZ+2); 
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_ATTACH_COL),
-                                         26); /* icon width+2 */
+                                         INDEX_ICON_SZ+2);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_FROM_COL),
                                          balsa_app.index_from_width);

@@ -1512,6 +1512,7 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
                                  LibBalsaCondition *cond,
                                  gboolean update_immediately)
 {
+    LOCK_MAILBOX(mailbox);
     if(update_immediately) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
                                                                 cond);
@@ -1521,6 +1522,7 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
             libbalsa_condition_free(mailbox->view_filter);
         mailbox->view_filter = cond;
     }
+    UNLOCK_MAILBOX(mailbox);
 }
 
 static void mbox_sort_helper(LibBalsaMailbox * mbox, GNode * parent);

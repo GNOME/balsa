@@ -28,7 +28,7 @@ typedef gboolean ImapCheck(const char *fn, LibBalsaServer * server,
 typedef void ImapMark(const char *fn, gint noselect, gint noscan,
 		      gpointer data);
 typedef void ImapHandler(const char *fn, char delim, gint noselect,
-			 gint noscan, gpointer data);
+			 gint marked, gint noscan, gpointer data);
 
 /* read_dir used by mailbox-node append-subtree callback */
 void libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix, 

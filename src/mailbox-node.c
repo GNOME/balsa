@@ -50,8 +50,8 @@ static GObjectClass *parent_class = NULL;
 typedef struct imap_scan_item_ imap_scan_item;
 struct imap_scan_item_ {
     gchar *fn;
-    gboolean scanned, selectable;
     LibBalsaMailbox **special;
+    unsigned scanned:1, selectable:1, marked:1;
 };
 
 static void balsa_mailbox_node_class_init(BalsaMailboxNodeClass *
@@ -73,7 +73,7 @@ static GNode* add_local_mailbox(GNode*root, const char*d_name, const char* fn);
 static GNode* add_local_folder(GNode*root, const char*d_name, const char* fn);
 
 static void handle_imap_path(const char *fn, char delim, int noselect,
-			     int noscan, void *data);
+			     int noscan, int marked, void *data);
 static gint check_imap_path(const char *fn, LibBalsaServer * server,
 			    guint depth);
 static void mark_imap_path(const gchar * fn, gint noselect, gint noscan,
@@ -380,6 +380,11 @@ imap_dir_cb_real(void* r)
 	n = imap_scan_create_mbnode(root, item, imap_tree.delim);
 	if(item->selectable)
 	    imap_scan_attach_mailbox(n, item);
+        if(item->marked) {
+            libbalsa_mailbox_set_unread_messages_flag
+                (BALSA_MAILBOX_NODE(n->data)->mailbox, TRUE);
+        }
+        
     }
     imap_scan_destroy_tree(&imap_tree);
 
@@ -1195,13 +1200,14 @@ imap_scan_create_mbnode(GNode * root, imap_scan_item * isi, char delim)
 */
 static void
 add_imap_entry(const char *fn, char delim, gboolean noscan,
-	       gboolean selectable, void *data)
+	       gboolean selectable, gboolean marked, void *data)
 {
     imap_scan_tree *tree = (imap_scan_tree *) data;
     imap_scan_item *item = g_new0(imap_scan_item, 1);
     item->fn = g_strdup(fn);
     item->scanned = noscan;
     item->selectable = selectable;
+    item->marked = marked;
 
     tree->list = g_slist_prepend(tree->list, item);
     tree->delim = delim;
@@ -1224,7 +1230,7 @@ imap_scan_destroy_tree(imap_scan_tree * tree)
 
 static void
 handle_imap_path(const char *fn, char delim, int noselect, int noscan,
-		 void *data)
+		 int marked, void *data)
 {
     if (!noselect) {
 	const gchar *basename = strrchr(fn, delim);
@@ -1236,7 +1242,7 @@ handle_imap_path(const char *fn, char delim, int noselect, int noscan,
 	printf("handle_imap_path: Adding mailbox of path \"%s\" "
 	       "delim `%c' noselect %d noscan %d\n",
 	       fn, delim, noselect, noscan);
-    add_imap_entry(fn, delim, noscan, !noselect, data);
+    add_imap_entry(fn, delim, noscan, !noselect, marked, data);
 }
 
 /*

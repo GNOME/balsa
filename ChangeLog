@@ -1,3 +1,11 @@
+2004-03-08  Pawel Salek
+
+	* libbalsa/folder-scanners.[ch]: pass around Marked mailbox flag.
+	* libbalsa/mailbox.c: lock mailbox in ::set_threading.
+	* src/balsa-index.c: set fixed column sizes.
+	* src/balsa-mblist.c: use Marked mailbox flags.
+	* src/mailbox-node.c: ditto.
+
 2004-03-07  Pawel Salek
 
 	* configure.in: check for gtk2.3

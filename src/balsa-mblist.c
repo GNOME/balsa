@@ -1260,7 +1260,7 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                        TOTAL_COLUMN,  "",
                        -1);
     g_free(name);
-    if (mbnode->mailbox && MAILBOX_OPEN(mbnode->mailbox))
+    if (mbnode->mailbox)
 	bmbl_node_style(GTK_TREE_MODEL(store), iter);    
     return TRUE;
 }

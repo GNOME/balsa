@@ -227,16 +227,28 @@ libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
 
 }
 
-
-LibBalsaMessage*
+static void libbalsa_mailbox_link_message(LibBalsaMailboxLocal * mailbox,
+					  LibBalsaMessage * msg);
+LibBalsaMessage *
 libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox, guint msgno)
 {
+    LibBalsaMessage *message;
+
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), NULL);
     g_return_val_if_fail(msgno > 0, NULL);
+    g_return_val_if_fail(msgno <= (guint) mailbox->total_messages, NULL);
 
-    return LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)
-        ->load_message(mailbox, msgno);
+    message = libbalsa_message_new();
+    LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)->load_message(mailbox,
+							    msgno,
+							    message);
+    message->msgno = msgno;
+    libbalsa_message_headers_update(message);
+    libbalsa_mailbox_link_message(LIBBALSA_MAILBOX_LOCAL(mailbox), message);
+    libbalsa_message_set_icons(message);
+
+    return message;
 }
 
 static void
@@ -328,25 +340,17 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
  *  Mailbox lock MUST BE HELD before calling this function.
  */
 void
-libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox)
+libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
 {
-    glong msgno;
-    LibBalsaMessage *message;
     guint new_messages = 0;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
     if (MAILBOX_CLOSED(mailbox))
 	return;
 
-    for (msgno = mailbox->messages + 1; mailbox->new_messages > 0; msgno++) {
-	message = libbalsa_mailbox_local_load_message(mailbox, msgno);
-	if (!message)
-		continue;
-	libbalsa_message_headers_update(message);
-	libbalsa_mailbox_link_message(LIBBALSA_MAILBOX_LOCAL(mailbox),
-                                      message);
-	++new_messages;
-    }
+    while (++msgno <= (guint) mailbox->total_messages)
+	if (libbalsa_mailbox_local_load_message(mailbox, msgno))
+	    ++new_messages;
 
     if (new_messages)
 	g_signal_emit_by_name(G_OBJECT(mailbox), "changed");
@@ -403,11 +407,11 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
             (!view_filter || match_condition(view_filter, msg, TRUE));
         if(old_match && !new_match) {
             printf("removing %ld (%ld) from view\n", msgno, msg->msgno);
-            libbalsa_mailbox_msgno_removed(mailbox, msgno);
+	    libbalsa_mailbox_msgno_filt_out(mailbox, msgno);
         }
         if(!old_match && new_match) {
             printf("adding %ld (%ld) to the view\n", msgno, msg->msgno);
-            libbalsa_mailbox_msgno_inserted(mailbox, msgno);
+	    libbalsa_mailbox_msgno_filt_in(mailbox, msgno);
         }
     }
     printf("%s finished\n", __func__);

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* vim:set ts=4 sw=4 ai: */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2882,12 +2882,8 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     g_return_if_fail(GTK_IS_HTML(widget));
     g_return_if_fail(requisition != NULL);
 
-    requisition->width  = (widget->style->klass->xthickness + 1) * 2;
-    requisition->height = (widget->style->klass->ythickness + 1) * 2;
-
-    requisition->width  += GTK_LAYOUT(widget)->hadjustment->upper -1 /*EMP*/;
-    requisition->height += GTK_LAYOUT(widget)->vadjustment->upper -1 /*EMP*/;
-
+    requisition->width  = GTK_LAYOUT(widget)->hadjustment->upper;
+    requisition->height = GTK_LAYOUT(widget)->vadjustment->upper;
 }
 
 static gboolean

@@ -1,5 +1,7 @@
-2004-03-15 05:17  PeterB
+2004-03-15 15:02  PeterB
 
+	* src/balsa-index.c: don't connect to mailbox's "row-changed"
+	signal--"changed" is enough.
 	* src/balsa-mblist.c: update total messages when mailbox is closed.
 	* libbalsa/: message.c, message.h: check that flags really change.
 	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:

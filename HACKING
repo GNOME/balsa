@@ -1,6 +1,13 @@
 The following are some general guidelines for adding code to Balsa:
 -------------------------------------------------------------------
 
+The prefered address for reaching Balsa developers is 
+ balsa-maintainer@theochem.kth.se
+The prefered place to discuss general Balsa development is
+ balsa-list@gnome.org
+Refer to AUTHORS for the list of active developers.
+
+
 The code has generally three layers:
 
   |--------------------|

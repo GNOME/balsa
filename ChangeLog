@@ -1,3 +1,7 @@
+2003-03-24  Carlos Morgado  <chbm@chbm.nu>
+
+	* HACKING: added contacts
+
 2003-03-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: fix misspelling (bug 109074)

@@ -1,3 +1,13 @@
+2003-12-16 13:33  PeterB
+
+	* src/balsa-app.c: Remove imap keep-alive code--it's now handled by
+	LibBalsaImapServer.
+	* libbalsa/mailbox_imap.c: Remove unnecessary mailbox locking.
+	* libbalsa/imap-server.c: Keep active connection alive; use
+	client-side of monitor to track activity; use a subthread without
+	gdk lock to avoid confusing libbalsa_mailbox_msgno_changed; plug
+	memory leak in force-disconnect.
+
 2003-12-16  Carlos Morgado  <chbm gnome.org>
 
 	* src/balsa-bonobo.c (Message): 

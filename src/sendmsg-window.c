@@ -157,10 +157,10 @@ create_popup_menu (GnomeIconList * ilist, gint num)
 static void
 select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event)
 {
-/*
+
    if (!event || event->button != 3)
    return;
- */
+
   gtk_menu_popup (GTK_MENU (create_popup_menu (ilist, num)), NULL, NULL, NULL, NULL, event->button, event->time);
 }
 

@@ -5,9 +5,6 @@ TODO LIST:
  * inbox/outbox/trash should be able to be IMAP
     this can be done by editing ~/.balsarc
 
- * fix checking for new mail inside mailboxes.
-     The mailbox name should be in bold.
-
  * digest/undigest mail.
 
  * add mutt keybindings
@@ -19,9 +16,6 @@ Nat's ideas:
 
  * In the message composition window, hitting TAB will bring the cursor to
    the next text entry box.  Make it so that hitting ENTER does the same thing.
-
- * XmHTML doesn't seem to support cutting of text for pasting.  This
-   sucks.  Fix it.
 
  * When you reply to a message, the message is quoted with the '>'
    character.  Make automatic message quoting optional and make it

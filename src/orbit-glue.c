@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /*
  * Copyright (C) 1998-2000 Free Software Foundation
  *
@@ -663,6 +663,9 @@ static void
 impl_GNOME_Balsa_App_open_compose_window(impl_POA_GNOME_Balsa_App * servant,
 					 CORBA_Environment * ev)
 {
+
+    
+
 }
 
 static GNOME_Balsa_Message
@@ -690,4 +693,68 @@ impl_GNOME_Balsa_App_open_unread_mailbox(impl_POA_GNOME_Balsa_App * servant,
    GNOME_Balsa_FolderBrowser retval;
 
    return retval;
+}
+
+
+
+void
+balsa_corba_init( int *argc, char **argv, CORBA_Environment *ev)
+{
+    PortableServer_ObjectId objid = {0, sizeof("balsa"), "balsa" };
+    PortableServer_POA the_poa;
+    GNOME_Pilot_Daemon acc;
+    static gboolean object_initialised = FALSE;
+
+    if ( object_initialised ) return;
+    
+    object_initialised = TRUE;
+    
+    
+    CORBA_exception_init(ev); /* FIXME */
+    
+    orb = gnome_CORBA_init(PACKAGE,VERSION,
+			   argc,argv,
+			   GNORBA_INIT_SERVER_FUNC,ev);
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+    
+    the_poa = (PortableServer_POA)CORBA_ORB_resolve_initial_references(orb, "RootPOA", ev);
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+
+    
+    POA_GNOME_Balsa_App__init(&daemon_servant, ev); /*FIXME?*/
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+ 
+
+    PortableServer_POAManager_activate(PortableServer_POA__get_the_POAManager(the_poa, ev), ev);
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+
+    
+    PortableServer_POA_activate_object_with_id(the_poa, &objid, &daemon_servant, ev);
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+    
+    acc = PortableServer_POA_servant_to_reference(the_poa, &daemon_servant, ev);
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+
+    
+    switch(goad_server_register(CORBA_OBJECT_NIL,acc,"gpilotd","object",ev)) {
+    case -2:
+	/* FIXME: better handling here */
+	g_message(_("The gnome-pilot daemon is already running"));
+	exit (0);
+	break;
+    case -1:
+	/* FIXME: better handling here */
+	g_print("GOAD Name server failure\n");
+	exit (1);
+	break;
+    }
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+    
+    
+    CORBA_Object_release(acc, ev);
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+    
+    ORBit_custom_run_setup(orb, ev);
+    g_return_if_fail(ev->_major == CORBA_NO_EXCEPTION);
+	
 }

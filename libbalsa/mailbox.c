@@ -149,7 +149,7 @@ do_mutt_error (char *str,...)
 
 /* We're gonna set Mutt global vars here */
 void
-mailbox_init (gchar * inbox_path)
+mailbox_init (gchar * inbox_path, my_variadic_function error_func)
 {
   struct utsname utsname;
   char *p;
@@ -167,7 +167,7 @@ mailbox_init (gchar * inbox_path)
 
   Hostname = g_get_host_name ();
 
-  mutt_error = &do_mutt_error;
+  mutt_error = &error_func;
 
   Fqdn = g_strdup (Hostname);
 

@@ -48,6 +48,36 @@ static gint read_signature ();
 static gint check_for_new_messages ();
 #endif
 
+static void
+error_exit_cb (GtkWidget * widget, gpointer data)
+{
+  balsa_exit ();
+}
+
+static void
+balsa_error (char *fmt,...)
+{
+  GtkWidget *messagebox;
+  va_list ap;
+
+  va_start (ap, fmt);
+  g_warning (fmt, ap);
+
+  messagebox = gnome_message_box_new (fmt,
+				      GNOME_MESSAGE_BOX_ERROR,
+				      GNOME_STOCK_BUTTON_OK,
+				      NULL);
+  gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
+  gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+  gtk_widget_show (messagebox);
+
+  gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",
+		      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
+
+  va_end (ap);
+}
+
+
 void
 init_balsa_app (int argc, char *argv[])
 {
@@ -83,8 +113,8 @@ init_balsa_app (int argc, char *argv[])
 
   if (config_load (BALSA_CONFIG_FILE) == FALSE)
     {
-      fprintf(stderr, "*** Could not load config file %s!\n",
-	      BALSA_CONFIG_FILE);
+      fprintf (stderr, "*** Could not load config file %s!\n",
+	       BALSA_CONFIG_FILE);
       initialize_balsa (argc, argv);
       return;
     }
@@ -92,9 +122,9 @@ init_balsa_app (int argc, char *argv[])
   /* Load all the global settings.  If there's an error, then some crucial
      piece of the global settings was not available, and we need to run
      balsa-init. */
-  if (config_global_load() == FALSE)
+  if (config_global_load () == FALSE)
     {
-      fprintf(stderr, "*** config_global_load failed\n");
+      fprintf (stderr, "*** config_global_load failed\n");
       initialize_balsa (argc, argv);
       return;
     }
@@ -108,7 +138,7 @@ init_balsa_app (int argc, char *argv[])
   if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
       balsa_app.trash == NULL)
     {
-      fprintf(stderr, "*** One of inbox/outbox/trash is NULL\n");
+      fprintf (stderr, "*** One of inbox/outbox/trash is NULL\n");
       initialize_balsa (argc, argv);
       return;
     }
@@ -133,7 +163,7 @@ do_load_mailboxes ()
     case MAILBOX_MAILDIR:
     case MAILBOX_MBOX:
     case MAILBOX_MH:
-      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path);
+      mailbox_init (MAILBOX_LOCAL (balsa_app.inbox)->path, balsa_error);
       break;
 
     case MAILBOX_IMAP:
@@ -142,7 +172,7 @@ do_load_mailboxes ()
     case MAILBOX_POP3:
       break;
     default:
-      fprintf(stderr, "do_load_mailboxes: Unknown mailbox type\n");
+      fprintf (stderr, "do_load_mailboxes: Unknown mailbox type\n");
       break;
     }
 
@@ -194,7 +224,7 @@ check_for_new_messages ()
 static gint
 mailboxes_init (void)
 {
-  return config_mailboxes_init();
+  return config_mailboxes_init ();
 }
 
 static void

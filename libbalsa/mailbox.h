@@ -31,6 +31,8 @@
 #define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
 
 
+typedef *(my_variadic_function)(gchar* fmt, ...);
+
 /*
  * enumes
  */
@@ -234,7 +236,7 @@ typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
 /*
  * call before using any mailbox functions
  */
-void mailbox_init (gchar * inbox);
+void mailbox_init (gchar * inbox, my_variadic_function);
 
 gint set_imap_username (Mailbox * mb);
 void check_all_pop3_hosts (Mailbox *);

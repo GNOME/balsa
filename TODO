@@ -2,10 +2,6 @@ TODO LIST:
 
 For 0.4.5 release:
 
- * mutt_error - message box
- 
- * inbox/outbox/trash should be able to be IMAP
-
  * fix balsa-init's text box thing
 
 
@@ -17,6 +13,8 @@ little things:
 
 
 later stuff:
+
+ * inbox/outbox/trash should be able to be IMAP
 
  * fix checking for new mail inside mailboxes.
      we have a full mail tray and an empty one.  full should be used to show

@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-01-24 08:25+0100\n"
-"PO-Revision-Date: 2003-01-24 08:38+0100\n"
+"POT-Creation-Date: 2003-05-13 11:09+0200\n"
+"PO-Revision-Date: 2003-05-13 11:10+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -261,7 +261,7 @@ msgstr "Naozaj chcete odstráni» oznaèenú identitu?"
 msgid "New"
 msgstr "Nový"
 
-#: libbalsa/identity.c:1069 src/balsa-index.c:2303
+#: libbalsa/identity.c:1069 src/balsa-index.c:2305
 #: src/filter-edit-dialog.c:249 src/mailbox-node.c:625 src/pref-manager.c:1445
 #: src/pref-manager.c:2487
 msgid "Delete"
@@ -279,20 +279,20 @@ msgstr "+"
 msgid "Do Not"
 msgstr "-"
 
-#: libbalsa/libbalsa.c:89 libmutt/mutt_socket.c:489
+#: libbalsa/libbalsa.c:90 libmutt/mutt_socket.c:489
 msgid "unknown error"
 msgstr "neznáma chyba"
 
-#: libbalsa/libbalsa.c:411
+#: libbalsa/libbalsa.c:409
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Adresár LDAP pre %s"
 
-#: libbalsa/libbalsa.c:518
+#: libbalsa/libbalsa.c:516
 msgid "This certificate belongs to:\n"
 msgstr "Tento certifikát patrí:\n"
 
-#: libbalsa/libbalsa.c:526
+#: libbalsa/libbalsa.c:524
 msgid ""
 "\n"
 "This certificate was issued by:\n"
@@ -300,7 +300,7 @@ msgstr ""
 "\n"
 "Tento certifikát bol vydaný:\n"
 
-#: libbalsa/libbalsa.c:535
+#: libbalsa/libbalsa.c:533
 #, c-format
 msgid ""
 "This certificate is valid\n"
@@ -313,19 +313,19 @@ msgstr ""
 "do %s\n"
 "Odtlaèok: %s"
 
-#: libbalsa/libbalsa.c:544
+#: libbalsa/libbalsa.c:542
 msgid "IMAP TLS certificate"
 msgstr "IMAP TLS certifikát"
 
-#: libbalsa/libbalsa.c:545
+#: libbalsa/libbalsa.c:543
 msgid "Accept Once"
 msgstr "Akceptova» raz"
 
-#: libbalsa/libbalsa.c:545
+#: libbalsa/libbalsa.c:543
 msgid "Accept&Save"
 msgstr "Akceptova» a ulo¾i»"
 
-#: libbalsa/libbalsa.c:546
+#: libbalsa/libbalsa.c:544
 msgid "Reject"
 msgstr "Odmietnu»"
 
@@ -355,7 +355,7 @@ msgstr "Neznámy typ po¹tovej schránky: %s"
 msgid "Could not create a mailbox of type %s"
 msgstr "Nemô¾em vytvori» po¹tovú schránku typu %s"
 
-#: libbalsa/mailbox_imap.c:647
+#: libbalsa/mailbox_imap.c:649
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: Otváram %s Poèet odkazov: %d\n"
@@ -425,12 +425,12 @@ msgstr "Nemô¾em vytvori» prieèinok typu MH v %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Nemô¾em vytvori» ¹truktúru MH v %s (%s)"
 
-#: libbalsa/mailbox_pop3.c:219
+#: libbalsa/mailbox_pop3.c:221
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Otváram %s Poèet odkazov: %d\n"
 
-#: libbalsa/mailbox_pop3.c:273
+#: libbalsa/mailbox_pop3.c:275
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
@@ -439,7 +439,7 @@ msgstr ""
 "Chyba doèasného súboru po¹tovej schránky %s protokolu POP3:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:289
+#: libbalsa/mailbox_pop3.c:292
 #, c-format
 msgid ""
 "POP3 mailbox %s accessing error:\n"
@@ -448,12 +448,12 @@ msgstr ""
 "Chyba pri prístupe k po¹tovej schránke %s protokolu POP3:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:311
+#: libbalsa/mailbox_pop3.c:314
 #, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr "Chyba doèasnej po¹tovej schránky %s protokolu POP3:\n"
 
-#: libbalsa/mailbox_pop3.c:335
+#: libbalsa/mailbox_pop3.c:338
 #, c-format
 msgid ""
 "Error placing messages from %s on %s\n"
@@ -1334,38 +1334,6 @@ msgstr "Koniec"
 msgid "Help"
 msgstr "Pomocník"
 
-#: libmutt/mutt_ssl_nss.c:55
-#, c-format
-msgid "%s failed (error %d)"
-msgstr "%s zlyhalo (chyba %d)"
-
-#: libmutt/mutt_ssl_nss.c:130
-#, c-format
-msgid "SSL_AuthCertificate failed (error %d)"
-msgstr "SSL_AuthCertificate zlyhalo (chyba %d)"
-
-#. BALSA : again, iteraction with user from libmutt. all this must
-#. be ripped out and moved up. this is even worse than the SSL,
-#. we don't show the use the cert details
-#. DANGER WILL ROBINSON - we always accept certificates
-#: libmutt/mutt_ssl_nss.c:243
-msgid "WARNING: the certificate is being accepted"
-msgstr "UPOZORNENIE: certifikát je akceptovaný"
-
-#: libmutt/mutt_ssl_nss.c:261
-#, c-format
-msgid "Unable to find ip for host %s"
-msgstr "Nemô¾em nájs» hostiteµa %s"
-
-#: libmutt/mutt_ssl_nss.c:273
-msgid "PR_NewTCPSocket failed."
-msgstr "PR_NewTCPSocket zlyhalo."
-
-#: libmutt/mutt_ssl_nss.c:319
-#, c-format
-msgid "Unable to connect to host %s"
-msgstr "Nemô¾em sa spoji» s hostiteµom %s"
-
 #: libmutt/mh.c:608
 #, c-format
 msgid "Reading %s... %d"
@@ -1480,7 +1448,7 @@ msgstr "%d ponechaných."
 msgid "Can't write message"
 msgstr "Nemô¾em zapísa» správu"
 
-#: libmutt/parse.c:618
+#: libmutt/parse.c:619
 msgid "multipart message has no boundary parameter!"
 msgstr "viacdielna správa nemá parameter hranice!"
 
@@ -1527,7 +1495,7 @@ msgid "Address Book Configuration"
 msgstr "Konfigurácia adresára"
 
 #: src/address-book-config.c:151 src/folder-conf.c:186 src/folder-conf.c:534
-#: src/mailbox-conf.c:417
+#: src/mailbox-conf.c:426
 msgid "Update"
 msgstr "Aktualizova»"
 
@@ -1603,7 +1571,7 @@ msgid "_Base Domain Name"
 msgstr "_Základné meno domény"
 
 #: src/address-book-config.c:652 src/filter-edit-callbacks.c:805
-#: src/filter-run-dialog.c:311 src/mailbox-conf.c:406 src/pref-manager.c:1443
+#: src/filter-run-dialog.c:311 src/mailbox-conf.c:415 src/pref-manager.c:1443
 #: src/pref-manager.c:2485
 msgid "Add"
 msgstr "Prida»"
@@ -1706,69 +1674,69 @@ msgstr "Otváram po¹tovú schránku %s. Prosím èakajte..."
 msgid "To"
 msgstr "Pre"
 
-#: src/balsa-index.c:1226
+#: src/balsa-index.c:1225
 msgid "No message found\n"
 msgstr "Nebola nájdená ¾iadna správa\n"
 
-#: src/balsa-index.c:2220
+#: src/balsa-index.c:2222
 msgid "Cannot access the message's body\n"
 msgstr "Nemô¾em získa» telo správy\n"
 
-#: src/balsa-index.c:2258
+#: src/balsa-index.c:2260
 msgid "View Source"
 msgstr "Zobrazi» zdroj"
 
-#: src/balsa-index.c:2260
+#: src/balsa-index.c:2262
 msgid "Reply..."
 msgstr "Odpoveda»..."
 
-#: src/balsa-index.c:2262
+#: src/balsa-index.c:2264
 msgid "Reply To All..."
 msgstr "Odpoveda» v¹etkým..."
 
-#: src/balsa-index.c:2264
+#: src/balsa-index.c:2266
 msgid "Reply To Group..."
 msgstr "Odpoveda» skupine..."
 
-#: src/balsa-index.c:2266
+#: src/balsa-index.c:2268
 msgid "Forward Attached..."
 msgstr "Posla» ïalej ako prílohu..."
 
-#: src/balsa-index.c:2268
+#: src/balsa-index.c:2270
 msgid "Forward Inline..."
 msgstr "Posla» ïalej citované..."
 
-#: src/balsa-index.c:2270
+#: src/balsa-index.c:2272
 msgid "Store Address..."
 msgstr "Ulo¾i» adresu..."
 
-#: src/balsa-index.c:2308
+#: src/balsa-index.c:2310
 msgid "Undelete"
 msgstr "Obnovi» vymazané"
 
-#: src/balsa-index.c:2313
+#: src/balsa-index.c:2315
 msgid "Move To Trash"
 msgstr "Presunú» do ko¹a"
 
-#: src/balsa-index.c:2317
+#: src/balsa-index.c:2319
 msgid "Toggle"
 msgstr "Oznaèi»"
 
-#: src/balsa-index.c:2319 src/filter-edit-callbacks.c:732
+#: src/balsa-index.c:2321 src/filter-edit-callbacks.c:732
 #: src/main-window.c:440
 msgid "Flagged"
 msgstr "Znaèka"
 
-#: src/balsa-index.c:2321 src/balsa-mblist.c:424
+#: src/balsa-index.c:2323 src/balsa-mblist.c:424
 #: src/filter-edit-callbacks.c:732
 msgid "Unread"
 msgstr "Nepreèítané"
 
-#: src/balsa-index.c:2326
+#: src/balsa-index.c:2328
 msgid "Move"
 msgstr "Presunú»"
 
-#: src/balsa-mblist.c:424 src/mailbox-conf.c:1028
+#: src/balsa-mblist.c:424 src/mailbox-conf.c:1053
 msgid "Mailbox"
 msgstr "Po¹tová schránka"
 
@@ -1964,11 +1932,11 @@ msgstr "Ulo¾i»..."
 msgid "could not create temporary file %s"
 msgstr "nemô¾em vytvori» doèasný súbor %s"
 
-#: src/balsa-message.c:3203
+#: src/balsa-message.c:3199
 msgid "reply to MDN?"
 msgstr "odpoveda» na MDN?"
 
-#: src/balsa-message.c:3215
+#: src/balsa-message.c:3211
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2358,7 +2326,7 @@ msgid "Descriptive _Name:"
 msgstr "Popisné me_no:"
 
 #. pop server
-#: src/folder-conf.c:208 src/mailbox-conf.c:874 src/mailbox-conf.c:954
+#: src/folder-conf.c:208 src/mailbox-conf.c:892 src/mailbox-conf.c:979
 msgid "_Server:"
 msgstr "_Server:"
 
@@ -2413,8 +2381,8 @@ msgstr ""
 msgid "Rename INBOX"
 msgstr "Premenova» Doruèenú po¹tu"
 
-#: src/folder-conf.c:412 src/folder-conf.c:611 src/mailbox-conf.c:245
-#: src/mailbox-conf.c:258 src/mailbox-conf.c:269 src/sendmsg-window.c:1433
+#: src/folder-conf.c:412 src/folder-conf.c:613 src/mailbox-conf.c:254
+#: src/mailbox-conf.c:267 src/mailbox-conf.c:278 src/sendmsg-window.c:1433
 #: src/toolbar-factory.c:175
 msgid "Cancel"
 msgstr "Zru¹i»"
@@ -2452,11 +2420,11 @@ msgstr "P_odprieèinok prieèinka:"
 msgid "Browse..."
 msgstr "Prehliada»..."
 
-#: src/folder-conf.c:573 src/mailbox-conf.c:1013
+#: src/folder-conf.c:573 src/mailbox-conf.c:867 src/mailbox-conf.c:1038
 msgid "_Identity:"
 msgstr "_Identita:"
 
-#: src/folder-conf.c:597
+#: src/folder-conf.c:599
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
@@ -2464,7 +2432,7 @@ msgstr ""
 "Tento prieèinok nie je ulo¾ený v konfigurácii. Neviem ako ho mám odstráni» "
 "zo vzdialeného servera."
 
-#: src/folder-conf.c:605
+#: src/folder-conf.c:607
 #, c-format
 msgid ""
 "This will remove the folder %s from the list.\n"
@@ -2476,7 +2444,7 @@ msgstr ""
 "pridanie.\n"
 "Èo chcete urobi»?"
 
-#: src/folder-conf.c:610 src/mailbox-conf.c:243 src/mailbox-conf.c:268
+#: src/folder-conf.c:612 src/mailbox-conf.c:252 src/mailbox-conf.c:277
 msgid "Remove from list"
 msgstr "Odstráni» zo zoznamu"
 
@@ -2496,11 +2464,11 @@ msgstr "CHYBA: "
 msgid "FATAL: "
 msgstr "ZÁVA®NÉ: "
 
-#: src/mailbox-conf.c:201
+#: src/mailbox-conf.c:210
 msgid "No mailbox selected."
 msgstr "Nebola vybraná ¾iadna po¹tová schránka."
 
-#: src/mailbox-conf.c:229
+#: src/mailbox-conf.c:238
 #, c-format
 msgid ""
 "Mailbox '%s' is used by balsa and I cannot remove it.\n"
@@ -2511,7 +2479,7 @@ msgstr ""
 "odstráni». Ak ju naozaj chcete odstráni», priraïte jej funkciu nejakej\n"
 "inej po¹tovej schránke."
 
-#: src/mailbox-conf.c:237
+#: src/mailbox-conf.c:246
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes.\n"
@@ -2526,11 +2494,11 @@ msgstr ""
 "na jej opätovné sprístupnenie.\n"
 "Èo chcete urobi»?"
 
-#: src/mailbox-conf.c:244
+#: src/mailbox-conf.c:253
 msgid "Remove from list and disk"
 msgstr "Odstráni» zo zoznamu a z disku"
 
-#: src/mailbox-conf.c:251
+#: src/mailbox-conf.c:260
 #, c-format
 msgid ""
 "This will remove the mailbox %s and all its messages from your IMAP server.\n"
@@ -2546,11 +2514,11 @@ msgstr ""
 "schránky.s týmto menom.\n"
 "Èo chcete urobi»?"
 
-#: src/mailbox-conf.c:257
+#: src/mailbox-conf.c:266
 msgid "Remove from server"
 msgstr "Odstráni» zo servera"
 
-#: src/mailbox-conf.c:263
+#: src/mailbox-conf.c:272
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -2562,20 +2530,20 @@ msgstr ""
 "sprístupnenie.\n"
 "Èo chcete urobi»?"
 
-#: src/mailbox-conf.c:320
+#: src/mailbox-conf.c:329
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Aaaach! po¹tová schránka nenájdená medzi uzlami balsa_app.mailbox?\n"
 
-#: src/mailbox-conf.c:368
+#: src/mailbox-conf.c:377
 msgid "Mailbox Configurator"
 msgstr "Konfigurátor po¹tovej schránky"
 
-#: src/mailbox-conf.c:566
+#: src/mailbox-conf.c:580
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
 
-#: src/mailbox-conf.c:681
+#: src/mailbox-conf.c:699
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2585,58 +2553,58 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:817 src/mailbox-conf.c:867 src/mailbox-conf.c:948
+#: src/mailbox-conf.c:835 src/mailbox-conf.c:885 src/mailbox-conf.c:973
 msgid "Mailbox _Name:"
 msgstr "Me_no po¹tovej schránky:"
 
 #. path to file
-#: src/mailbox-conf.c:825
+#: src/mailbox-conf.c:843
 msgid "Mailbox _Path:"
 msgstr "Cesta k _po¹tovej schránke:"
 
-#: src/mailbox-conf.c:849
-msgid "Identity:"
-msgstr "Identita:"
-
 #. username
-#: src/mailbox-conf.c:881 src/mailbox-conf.c:961
+#: src/mailbox-conf.c:899 src/mailbox-conf.c:986
 msgid "_Username:"
 msgstr "Meno po_u¾ívateµa:"
 
 #. password field
-#: src/mailbox-conf.c:887 src/mailbox-conf.c:976
+#: src/mailbox-conf.c:905 src/mailbox-conf.c:1001
 msgid "Pass_word:"
 msgstr "_Heslo:"
 
-#: src/mailbox-conf.c:894
+#: src/mailbox-conf.c:912
 msgid "Use _APOP Authentication"
 msgstr "Pou¾i» overovanie toto¾nosti _APOP"
 
-#: src/mailbox-conf.c:900
+#: src/mailbox-conf.c:918
 msgid "_Delete messages from server after download"
 msgstr "_Vymaza» správy zo servera po stiahnutí"
 
-#: src/mailbox-conf.c:905
+#: src/mailbox-conf.c:923
 msgid "_Filter messages through procmail"
 msgstr "_Filtrova» správy cez procmail"
 
-#: src/mailbox-conf.c:910
+#: src/mailbox-conf.c:927
+msgid "Fi_lter Command:"
+msgstr "Príkaz fi_ltra::"
+
+#: src/mailbox-conf.c:935
 msgid "_Enable check for new mail"
 msgstr "Povoli» kontrolu novej _elektronickej po¹ty"
 
-#: src/mailbox-conf.c:920
+#: src/mailbox-conf.c:945
 msgid "_Use SSL (pop3s)"
 msgstr "Po_u¾i» SSL (pop3s)"
 
-#: src/mailbox-conf.c:969
+#: src/mailbox-conf.c:994
 msgid "_Remember Password"
 msgstr "_Zapamäta» heslo"
 
-#: src/mailbox-conf.c:981
+#: src/mailbox-conf.c:1006
 msgid "F_older Path:"
 msgstr "Cesta k zl_o¾ke:"
 
-#: src/mailbox-conf.c:1008
+#: src/mailbox-conf.c:1033
 msgid "Use SSL (imaps)"
 msgstr "Pou¾i» SSL (imaps)"
 

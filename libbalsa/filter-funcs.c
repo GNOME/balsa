@@ -404,6 +404,7 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
     switch (new_cnd->type) {
     case CONDITION_STRING:
         new_cnd->match.string.string  = g_strdup(cnd->match.string.string);
+	new_cnd->match.string.fields = cnd->match.string.fields;
     new_cnd->match.string.user_header 
         = (cnd->match.string.user_header)
         ? g_strdup(cnd->match.string.user_header) : NULL;
@@ -428,6 +429,7 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
         break;
     case CONDITION_FLAG:
         new_cnd->match.flags=cnd->match.flags;
+	break;
     case CONDITION_AND:
     case CONDITION_OR:
         new_cnd->match.andor.left =

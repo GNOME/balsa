@@ -22,8 +22,10 @@
 
 #include "config.h"
 
-#define _POSIX_SOURCE 1
-#include <gnome.h>
+#define _XOPEN_SOURCE          500
+#define _XOPEN_SOURCE_EXTENDED 1
+#define _POSIX_SOURCE          1
+#include <libgnome/gnome-i18n.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -323,7 +325,7 @@ static void parse_mailbox(LibBalsaMailboxMh * mailbox)
 	struct message_info *msg_info;
 	if (check_filename(filename) == FALSE)
 	    continue;
-	msgno = atoi(filename);
+	sscanf(filename, "%d", &msgno);
 	if (msgno > mailbox->messages_info->len)
 	    g_array_set_size(mailbox->messages_info, msgno);
 	msg_info = &g_array_index(mailbox->messages_info,
@@ -370,10 +372,10 @@ static void handle_seq_line(LibBalsaMailboxMh * mailbox, gchar *line)
 	if (line) {
 	    guint end;
 	    *line++='\0';
-	    end=atoi(line);
+            sscanf(line,"%d", &end);
 	    if (end > messages_info->len)
 		g_array_set_size(messages_info, end);
-	    for (nr = atoi(*seq); nr <= end; nr++)
+	    for (sscanf(*seq,"%d", &nr); nr <= end; nr++)
 	    {
 		if (!nr)
 		    continue;
@@ -382,7 +384,7 @@ static void handle_seq_line(LibBalsaMailboxMh * mailbox, gchar *line)
 		msg_info->orig_flags |= flag;
 	    }
 	} else {
-	    nr = atoi(*seq);
+	    sscanf(*seq, "%d", &nr);
 	    if (!nr)
 		continue;
 	    if (nr > messages_info->len)

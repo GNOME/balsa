@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#define _POSIX_SOURCE 1
+#define _ISOC99_SOURCE 1
 #include <ctype.h>
 #include <string.h>
 #include <sys/types.h>
@@ -576,6 +576,7 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 static void
 libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 {
+    static const struct timespec req = { 0, 50000000 }; 
     static const int RETRIES_COUNT = 50;
     int check, cnt;
 #ifdef DEBUG
@@ -600,7 +601,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	       (check = libbalsa_mailbox_close_backend(mailbox)) == FALSE) {
 	    UNLOCK_MAILBOX(mailbox);
 	    g_print("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
-            usleep(10000); /* wait tenth second */
+            nanosleep(&req, NULL); /* wait tenth second */
 	    libbalsa_mailbox_check(mailbox);
 	    LOCK_MAILBOX(mailbox);
 	    cnt++;

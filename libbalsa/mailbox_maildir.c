@@ -22,8 +22,9 @@
 
 #include "config.h"
 
-#define _POSIX_SOURCE 1
-#include <gnome.h>
+#define _XOPEN_SOURCE          500
+#define _XOPEN_SOURCE_EXTENDED 1
+#include <libgnome/gnome-i18n.h>
 
 #include <unistd.h>
 #include <fcntl.h>

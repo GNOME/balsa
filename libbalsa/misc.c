@@ -22,7 +22,8 @@
 
 #include "config.h"
 
-#define _SVID_SOURCE 1
+#define _SVID_SOURCE           1
+#define _XOPEN_SOURCE          500
 #include <stdio.h>
 #include <sys/utsname.h>
 #include <ctype.h>

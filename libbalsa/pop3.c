@@ -25,7 +25,9 @@
 
 #include "config.h"
 
-#define _POSIX_SOURCE 1
+/* BSD for strncasecmp */
+#define _BSD_SOURCE 1
+#define _ISOC99_SOURCE 1
 
 #include <sys/types.h>
 #include <sys/socket.h>

@@ -22,7 +22,8 @@
 
 #include "config.h"
 
-#define _POSIX_SOURCE 1
+#define _BSD_SOURCE    1
+#define _ISOC99_SOURCE 1
 
 #include <fcntl.h>
 #include <errno.h>
@@ -105,14 +106,15 @@ void
 libbalsa_wait_for_sending_thread(gint max_time)
 {
     gint sleep_time = 0;
-    static const int DOZE_LENGTH = 20*1000; /* microseconds */
+#define DOZE_LENGTH (20*1000)
+    static const struct timespec req = { 0, DOZE_LENGTH*1000 };/*nanoseconds*/
 
     if(max_time<0) max_time = G_MAXINT;
     else max_time *= 1000000; /* convert to microseconds */
     while(sending_threads>0 && sleep_time<max_time) {
         while(gtk_events_pending())
             gtk_main_iteration_do(FALSE);
-        usleep(DOZE_LENGTH);
+        nanosleep(&req, NULL);
         sleep_time += DOZE_LENGTH;
     }
 }

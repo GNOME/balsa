@@ -1,3 +1,9 @@
+2003-10-31 Pawel Salek
+
+	* libbalsa/folder-scanners.c: fix yesterday's change.
+	* libbalsa/mailbox{,_maildir,_mh}.c:
+	* libbalsa/{misc,pop3,send}.c: ditto.
+
 2003-10-30 Pawel Salek
 
 	* libbalsa/{folder-scanner,misc,pop3,send}.c: 

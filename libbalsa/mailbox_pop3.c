@@ -304,11 +304,12 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				 mailbox->name, 
 				 LIBBALSA_MAILBOX(m->inbox)->name,
 				 tmp_path);
+        libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
 	}
     } else {
+    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
 	unlink((const char*)tmp_path);
     }
-    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
     gtk_object_destroy(GTK_OBJECT(tmp_mailbox));	
     g_free(tmp_path);
 }

@@ -1,8 +1,14 @@
+2003-10-01 15:16  PeterB
+
+	* libbalsa/mailbox.c: Avoid filters warning if there aren't any;
+	more careful mbox_model_get_{iter,path}.
+
 2003-09-30  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/mailbox.c: restore nice display of "from" field.
 	* libbalsa/mailbox_imap.c: cleanup.
 	* src/balsa-index.c: restore switching between threading modes.
+
 2003-09-30 18:11  PeterB
 
 	* libbalsa/mailbox.c: More tree model cleanup.

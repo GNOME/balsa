@@ -1,3 +1,9 @@
+2003-06-03 00:57  PeterB
+
+	* src/: balsa-message.c, balsa-message.h, main-window.c,
+	message-window.c, sendmsg-window.c, sendmsg-window.h: Handle cut,
+	copy, and paste using clipboard signals (fixes #113337).
+
 2003-06-02  Carlos Morgado  <chbm chbm.nu>
 
 	* libbalsa/folder-scanners.c (libbalsa_scanner_mdir): 

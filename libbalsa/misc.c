@@ -208,7 +208,7 @@ wrap_string(gchar* str, int width)
    gchar *lnbeg, *sppos, *ptr;
    gint te = 0;
 
-   g_assert(str != NULL);
+   g_return_if_fail(str != NULL);
    lnbeg= sppos = ptr = str;
 
    while(*ptr) {

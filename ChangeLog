@@ -1,3 +1,12 @@
+2000-04-07  Peter Williams  <peter@beta.newton.cx>
+
+	* libbalsa/misc.c (wrap_string): Aborting when
+	  the input string is null is a bit excessive...
+
+	* configure.in, Makefile.am: Whoopsie, forgot
+	  to remove the stuff for the website from these
+	  files.
+
 2000-04-07 Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: multiple attachment selection.

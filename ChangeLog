@@ -17,6 +17,13 @@
 	* src/folder-conf.c: same.
 	* src/mailbox-conf.c: do not use removed path field.
 	* src/mailbox-node.c: same.
+
+	* libbalsa/folder-scanners.c: make the output less verbose.
+	* src/balsa-app.c: remove duplicated mailboxes in local tree.
+	* src/mailbox-node.c: use the URL power to place special mailboxes
+	in proper places of the folder tree.
+	* src/pref-manager.c: show list widget so it can compute its size
+	properly (Albrecht Dreﬂ).
 	
 2001-07-31  Pawel Salek  <pawsa@theochem.kth.se>
 

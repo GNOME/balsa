@@ -1,3 +1,12 @@
+2002-03-09  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libinit_balsa/*: get rid of gob.
+	* configure.in: remove test for gob.
+
+2002-03-05  Pawel Salek <pawsa@theochem.kth.se>
+
+	* README, NEWS, configure.in: release balsa-1.3.3
+
 2002-03-04  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/filter.[hc], libbalsa/mailbox_{local,pop3}.c: filter

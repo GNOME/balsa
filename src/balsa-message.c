@@ -4107,6 +4107,8 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
     gboolean rfc2440_no_pubkey = FALSE;
 
     /* check if this is a RFC2440 part */
+    if (!GMIME_IS_PART(info->body->mime_part))
+	return FALSE;
     rfc2440mode = g_mime_part_check_rfc2440(GMIME_PART(info->body->mime_part));
     if (rfc2440mode == GMIME_PART_RFC2440_NONE)
         return FALSE;

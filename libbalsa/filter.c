@@ -364,6 +364,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 {
     gboolean result=FALSE;
     LibBalsaMailbox *mbox;
+    LibBalsaMailboxSearchIter *iter_view;
 
     if (msgnos->len == 0)
 	return FALSE;
@@ -419,6 +420,17 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
     case FILTER_NOTHING:
 	/* Nothing to do */
 	break;
+    }
+
+    iter_view = libbalsa_mailbox_search_iter_view(mailbox);
+    if (iter_view) {
+	guint i;
+
+	for (i = 0; i < msgnos->len; i++)
+	    libbalsa_mailbox_msgno_filt_check(mailbox,
+					      g_array_index(msgnos, guint, i),
+					      iter_view);
+	libbalsa_mailbox_search_iter_free(iter_view);
     }
 
     UNLOCK_MAILBOX(mailbox);

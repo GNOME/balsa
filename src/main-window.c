@@ -3007,10 +3007,9 @@ find_real(BalsaIndex * bindex, gboolean again)
 
 	cnd->type = CONDITION_STRING;
 
-	if (search_iter) {
-	    libbalsa_mailbox_search_iter_free(search_iter);
-	    search_iter = NULL;
-	}
+	libbalsa_mailbox_search_iter_free(search_iter);
+	search_iter = NULL;
+
         if(ok == FIND_RESPONSE_FILTER) {
             LibBalsaMailbox *mailbox = 
                 BALSA_INDEX(bindex)->mailbox_node->mailbox;

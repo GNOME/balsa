@@ -217,10 +217,8 @@ bndx_destroy(GtkObject * obj)
 	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
 	    libbalsa_mailbox_close(mailbox);
 
-	    if (index->search_iter) {
-		libbalsa_mailbox_search_iter_free(index->search_iter);
-		index->search_iter = NULL;
-	    }
+	    libbalsa_mailbox_search_iter_free(index->search_iter);
+	    index->search_iter = NULL;
 	}
         g_object_unref(index->mailbox_node);
 	index->mailbox_node = NULL;
@@ -462,14 +460,13 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	     * the message still matches the view filter. */
 	    index->selected = g_slist_delete_link(index->selected, list);
 	    if (iter_view)
-		libbalsa_mailbox_msgno_deselected(message->mailbox,
+		libbalsa_mailbox_msgno_filt_check(message->mailbox,
 						  message->msgno, 
 						  iter_view);
 	}
 	gtk_tree_path_free(path);
     }
-    if (iter_view)
-	libbalsa_mailbox_search_iter_free(iter_view);
+    libbalsa_mailbox_search_iter_free(iter_view);
 
     sci.selected = &index->selected;
     sci.message = NULL;

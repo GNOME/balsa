@@ -428,28 +428,16 @@ static void
 lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                              LibBalsaCondition *view_filter)
 {
+    LibBalsaMailboxSearchIter *iter_view;
     guint msgno;
 
+    iter_view = libbalsa_mailbox_search_iter_new(view_filter);
     for (msgno = 1;
 	 msgno <= libbalsa_mailbox_total_messages(mailbox);
-	 msgno++) {
-        LibBalsaMessage *msg = 
-            libbalsa_mailbox_get_message(mailbox, msgno);
-        gboolean match = 
-            (!view_filter ||
-	     libbalsa_condition_matches(view_filter, msg, TRUE));
-	      
-	if (g_node_find(mailbox->msg_tree, G_PRE_ORDER,
-	                  G_TRAVERSE_ALL, GUINT_TO_POINTER(msgno))) {
-	    if (!match) {
-		libbalsa_mailbox_msgno_filt_out(mailbox, msgno);
-	    }
-	} else {
-	    if (match) {
-		libbalsa_mailbox_msgno_filt_in(mailbox, msgno);
-	    }
-	}
-    }
+	 msgno++)
+	libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view);
+    libbalsa_mailbox_search_iter_free(iter_view);
+
     printf("%s finished\n", __func__);
     if(mailbox->view_filter)
         libbalsa_condition_free(mailbox->view_filter);
@@ -467,6 +455,7 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox,
  * methods, which ensure that message->mime_msg != NULL, then chain up
  * to this one.
  */
+
 static void
 libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                       LibBalsaMessage *message,

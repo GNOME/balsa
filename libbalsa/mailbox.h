@@ -420,7 +420,7 @@ void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox * mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
-void libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox,
+void libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox,
 				       guint seqno,
 				       LibBalsaMailboxSearchIter
 				       * search_iter);

@@ -1098,14 +1098,26 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
 }
 
 void
-libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox, guint seqno,
+libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
 				  LibBalsaMailboxSearchIter * search_iter)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    g_return_if_fail(search_iter != NULL);
+    gboolean match;
 
-    if (!libbalsa_mailbox_message_match(mailbox, seqno, search_iter))
-	libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    if (!mailbox->msg_tree)
+	return;
+
+    match = search_iter ?
+	libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
+    if (g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+		    GUINT_TO_POINTER(seqno))) {
+	if (!match)
+	    libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
+    } else {
+	if (match)
+	    libbalsa_mailbox_msgno_filt_in(mailbox, seqno);
+    }
 }
 
 /* Search iters */
@@ -1114,7 +1126,8 @@ libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
 {
     LibBalsaMailboxSearchIter *iter;
 
-    g_return_val_if_fail(condition != NULL, NULL);
+    if (!condition)
+	return NULL;
 
     iter = g_new(LibBalsaMailboxSearchIter, 1);
     iter->mailbox = NULL;
@@ -1131,15 +1144,18 @@ libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox)
 {
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
 
-    return mailbox->view_filter ?
-	libbalsa_mailbox_search_iter_new(mailbox->view_filter) : NULL;
+    return libbalsa_mailbox_search_iter_new(mailbox->view_filter);
 }
 
 void
 libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * search_iter)
 {
-    LibBalsaMailbox *mailbox = search_iter->mailbox;
+    LibBalsaMailbox *mailbox;
 
+    if (!search_iter)
+	return;
+
+    mailbox = search_iter->mailbox;
     if (mailbox && LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free)
 	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(search_iter);
 

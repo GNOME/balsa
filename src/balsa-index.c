@@ -1790,10 +1790,12 @@ balsa_message_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag,
         (flag ==
          LIBBALSA_MESSAGE_FLAG_NEW ? is_all_flagged : !is_all_flagged);
 
+    gtk_clist_freeze(GTK_CLIST(balsa_app.mblist));
     for (list=GTK_CLIST(index->ctree)->selection; list; list=list->next) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
         (*cb) (message, new_flag);
     }
+    gtk_clist_thaw(GTK_CLIST(balsa_app.mblist));
     libbalsa_mailbox_sync_backend(index->mailbox_node->mailbox);
 }
 

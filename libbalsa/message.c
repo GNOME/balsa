@@ -603,7 +603,7 @@ libbalsa_message_real_set_read_flag(LibBalsaMessage * message,
 	    libbalsa_mailbox_set_unread_messages_flag(message->mailbox,
 						      FALSE);
 
-    } else if (!set) {
+    } else if (!set && !(message->flags & LIBBALSA_MESSAGE_FLAG_NEW)) {
 	libbalsa_lock_mutt();
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_READ, FALSE);
 	mutt_set_flag(CLIENT_CONTEXT(message->mailbox), cur, M_OLD, FALSE);

@@ -343,14 +343,6 @@ AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES` )
 dnl bleah
 
 dnl ##########################################################################
-dnl Things needed by CVS user
-dnl ##########################################################################
-
-if test x"$BALSA_FROM_CVS" = xyes ; then
-	GOB_CHECK(0.93.4)
-fi
-
-dnl ##########################################################################
 dnl Have ESMTP ?
 dnl ##########################################################################
 
@@ -596,6 +588,17 @@ fi
 
 AC_MSG_CHECKING([for CVS information])
 AC_MSG_RESULT($BALSA_FROM_CVS)
+
+dnl ##########################################################################
+dnl Things needed by CVS user
+dnl ##########################################################################
+
+if test x"$BALSA_FROM_CVS" = xyes ; then
+    AC_CHECK_PROG(GOB,gob,gob,gob-not-found)
+    if test "$GOB" = gob-not-found; then
+        AC_MSG_ERROR([GOB is required to compile balsa from CVS])
+    fi 
+fi
 
 dnl ##########################################################################
 dnl Create files.

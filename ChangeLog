@@ -1,3 +1,9 @@
+2001-11-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/folder-conf.c: help button closed dialog (#64349).
+	* libbalsa/message.c: 
+	* src/balsa-index.c: don't set new messages new (#64415).
+
 2001-11-12  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/message.h: make compile with MESSAGE_COPY_CONTENT

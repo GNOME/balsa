@@ -255,24 +255,6 @@ build_left_side(void)
     return vbox;
 }				/* end build_left_side() */
 
-/* Used to populate mailboxes option menu */
-
-static void
-add_mailbox_to_option_menu(GtkCTree * ctree,GtkCTreeNode *node,gpointer menu)
-{
-    GtkWidget * item;
-    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
-
-    if (mbnode->mailbox) {
-	/* OK this node is a mailbox */
-	item = gtk_menu_item_new_with_label(mbnode->mailbox->name);
-	gtk_object_set_data(GTK_OBJECT(item), "mailbox",
-			    mbnode->mailbox);
-	
-	gtk_menu_append(GTK_MENU(menu), item);
-	gtk_widget_show(item);
-    }
-}
 /*
  * build_match_page()
  *
@@ -379,10 +361,10 @@ build_match_page()
  * Builds the "Action" page of the main notebook
  */
 static GtkWidget *
-build_action_page()
+build_action_page(GtkWindow * window)
 {
     GtkWidget *page, *frame, *table;
-    GtkWidget *box = NULL;
+    GtkWidget *box;
     GtkWidget *menu,* item;
     GtkCTreeNode * node;
     gint i;
@@ -436,26 +418,16 @@ build_action_page()
 					      ELEMENTS(fe_actions),
 					      GTK_SIGNAL_FUNC
 					      (fe_action_selected));
-    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu, TRUE, FALSE,
-		       1);
+    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu,
+                       TRUE, FALSE, 1);
 
-    /* We populate the option menu with mailboxes name
-     * FIXME : This is done once for all, but user could
-     * remove or add mailboxes behind us : we should connect
-     * ourselves to signals to refresh the options in these cases
-     */
-
-    menu = gtk_menu_new();
-    for(node=gtk_ctree_node_nth(GTK_CTREE(balsa_app.mblist), 0);
-	node; 
-	node=GTK_CTREE_NODE_NEXT(node))
-	gtk_ctree_pre_recursive(GTK_CTREE(balsa_app.mblist), 
-				node,
-				add_mailbox_to_option_menu,
-				menu);
-    fe_mailboxes = gtk_option_menu_new();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(fe_mailboxes), menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0);
+    /* FIXME : we use the global mru folder list, perhaps we should use
+       our own. We'll see this later, for now let's make something usable
+       the old way was way too ugly and even unusable for users with zillions
+       of mailboxes. Yes there are ;-)!
+    */
+    fe_mailboxes = balsa_mblist_mru_option_menu(window,
+						&balsa_app.folder_mru);
     gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
 
     return page;
@@ -468,7 +440,7 @@ build_action_page()
  * Builds the right side of the dialog
  */
 static GtkWidget *
-build_right_side(void)
+build_right_side(GtkWindow * window)
 {
     GtkWidget *rightside;
     GtkWidget *notebook, *page;
@@ -484,7 +456,7 @@ build_right_side(void)
     page = build_match_page();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
 			     page, gtk_label_new(_("Match")));
-    page = build_action_page();
+    page = build_action_page(window);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
 			     page, gtk_label_new(_("Action")));
 
@@ -563,9 +535,9 @@ filters_edit_dialog(void)
     sep = gtk_vseparator_new();
     gtk_box_pack_start(GTK_BOX(hbox), sep, FALSE, FALSE, 2);
 
-    fe_right_page = piece = build_right_side();
+    fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), piece, TRUE, TRUE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE, 2);
 
     fe_user_headers_list=NULL;
     /* Populate the clist of filters */

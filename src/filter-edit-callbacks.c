@@ -1480,7 +1480,7 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
         /* We clear all widgets */
         gtk_entry_set_text(GTK_ENTRY(fe_name_entry),"");
         gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),"");
-	gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0);
+        /*gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0); */
         gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),"");
         gtk_clist_clear(fe_conditions_list);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),FALSE);
@@ -1501,7 +1501,7 @@ void
 fe_apply_pressed(GtkWidget * widget, gpointer data)
 {
     LibBalsaFilter *fil,*old;
-    gchar *temp,*mailbox_name=NULL;
+    gchar *temp;
     GtkWidget * menu;
     GtkWindow* parent = GTK_WINDOW(gtk_widget_get_ancestor(widget, 
                                                            GTK_TYPE_WINDOW));
@@ -1530,14 +1530,6 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     /* Set the type associated with the selected item */
     action=GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(menu),"value"));
     
-    if (action!=FILTER_TRASH) {
-	/* Retrieve the selected malibox */
-	menu=gtk_menu_get_active(GTK_MENU(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_mailboxes))));
-	/* FIXME : this could lead to something weird if user has
-           removed the mailbox behind us */
-	mailbox_name=LIBBALSA_MAILBOX(gtk_object_get_data(GTK_OBJECT(menu),"mailbox"))->name;
-    }
-
     if (!fe_conditions_list->rows) {
         balsa_information(LIBBALSA_INFORMATION_ERROR, parent,
                           _("Filter must have conditions."));
@@ -1576,8 +1568,8 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     FILTER_SETFLAG(fil,FILTER_COMPILED);
 
     for (i=0; i<fe_conditions_list->rows && filter_errno==FILTER_NOERR; i++) {
-      LibBalsaCondition *cond = gtk_clist_get_row_data(fe_conditions_list,i);
-      libbalsa_filter_prepend_condition(fil, libbalsa_condition_clone(cond));
+        LibBalsaCondition *cond = gtk_clist_get_row_data(fe_conditions_list,i);
+        libbalsa_filter_prepend_condition(fil, libbalsa_condition_clone(cond));
     }
 
     fil->conditions=g_slist_reverse(fil->conditions);
@@ -1593,8 +1585,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     fil->action=action;
 
     if (fil->action!=FILTER_TRASH)
-        fil->action_string=g_strdup(mailbox_name);
-
+        fil->action_string=g_strdup(balsa_mblist_mru_option_menu_get(fe_mailboxes));
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_popup_button))) {
         static gchar defstring[] = N_("Filter has matched");
         gchar *tmpstr;
@@ -1689,22 +1680,9 @@ fe_clist_select_row(GtkWidget * widget, gint row, gint column,
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_op_codes_option_menu), 
                                 fil->conditions_op-1);
 
-    if (fil->action!=FILTER_TRASH && fil->action_string) {
-	gint i;
-	GList * items;
-	
-	items=
-	    gtk_container_children(GTK_CONTAINER(gtk_option_menu_get_menu(GTK_OPTION_MENU(fe_mailboxes))));
-	for (i=0;items;
-	     items=g_list_next(items)) {
-	    gchar * name=LIBBALSA_MAILBOX(gtk_object_get_data(GTK_OBJECT(items->data),"mailbox"))->name;
-	    if (name && !strcmp(name,fil->action_string))
-		break;
-	    else i++;
-	}
-	gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), i);
-    }
-
+    if (fil->action!=FILTER_TRASH && fil->action_string)
+        balsa_mblist_mru_option_menu_set(fe_mailboxes,
+                                         fil->action_string);
     /* We free the conditions */
     fe_free_associated_conditions();
 

@@ -74,8 +74,8 @@ else
   mutt_cv_snprintf=no
   AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF)], [mutt_cv_snprintf=yes])
   AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF)], [mutt_cv_snprintf=yes])
-  if test $mutt_cv_snprintf = yes; then
-    AC_LIBOBJ([snprintf])
+  if test $mutt_cv_snprintf != yes; then
+    AC_ERROR([Sorry, cannot compile this any longer.])
   fi
 fi
 
@@ -197,8 +197,6 @@ AC_DEFINE(USE_SOCKET)
 LIBIMAP="-Limap -limap"
 LIBIMAPDEPS="\$(top_srcdir)/imap/imap.h imap/libimap.a"
 AM_CONDITIONAL(BUILD_IMAP, test x$need_imap = xyes)
-AC_LIBOBJ([account.o])
-AC_LIBOBJ([mutt_socket.o])
 
 dnl ##########################################################################
 dnl Enable GSS?

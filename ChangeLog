@@ -1,3 +1,9 @@
+2002-06-07 Steve Wall <hitched97@myrealbox.com>
+
+	* src/pref-manager.c: convert the three radio buttons to a single
+	option menu. Break two extremely long strings into pieces.  String
+	capitalization.
+
 2002-06-05  Albrecht Dreﬂ <albrecht.dress@arcormail.de>
 
 	* src/balsa-app.[hc], src/save-restore.c: configurable print fonts.

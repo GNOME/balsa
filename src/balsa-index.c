@@ -257,8 +257,6 @@ balsa_index_init(BalsaIndex * bindex)
 {
     GtkCList *clist;
     GtkObject* adj;
-    GdkPixmap* pixmap;
-    GdkPixmap* mask;
     
 
     /*

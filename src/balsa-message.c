@@ -513,6 +513,22 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
       data = balsa_message_text_item (message->date, row[1], 0.0, 0.0);
     }
 
+  if (message->from)
+    {
+      gchar *from;
+      next_height = next_row_height (row);
+
+      item = balsa_message_text_item (_("From:"), row[0], 0.0, next_height);
+
+      if (message->from->personal)
+	from = g_strdup_printf ("%s <%s>", message->from->personal, message->from->mailbox);
+      else
+	from = g_strdup (message->from->mailbox);
+
+      data = balsa_message_text_item (from, row[1], 0.0, next_height);
+      g_free (from);
+    }
+
   if (message->to_list)
     {
       next_height = next_row_height (row);
@@ -535,22 +551,6 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
       item = balsa_message_text_item (_("Bcc:"), row[0], 0.0, next_height);
       data = balsa_message_text_item (make_string_from_list (message->bcc_list),
 				      row[1], 0.0, next_height);
-    }
-
-  if (message->from)
-    {
-      gchar *from;
-      next_height = next_row_height (row);
-
-      item = balsa_message_text_item (_("From:"), row[0], 0.0, next_height);
-
-      if (message->from->personal)
-	from = g_strdup_printf ("%s <%s>", message->from->personal, message->from->mailbox);
-      else
-	from = g_strdup (message->from->mailbox);
-
-      data = balsa_message_text_item (from, row[1], 0.0, next_height);
-      g_free (from);
     }
 
   if (message->subject)

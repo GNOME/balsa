@@ -1,5 +1,13 @@
 1999-12-20  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
 
+	* src/balsa-message.c (headers2canvas): Changed the From field to
+	be right after Date field.
+
+	* src/pref-manager.c: Removed two warnings due to repeated gtk
+	instructions.
+
+	* src/Makefile.am: Rearranged the file.
+
 	* libmutt/*:
 	* libbalsa/message.c:
 	* libbalsa/mailbox.c:

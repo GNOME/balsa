@@ -918,7 +918,9 @@ create_misc_page ()
   
   pui->wordwrap = gtk_check_button_new_with_label( "Wrap Outgoing Text at:" );
   pui->wraplength = gtk_spin_button_new(GTK_ADJUSTMENT(adj), 0, 0);
+/*
   gtk_box_pack_start( GTK_BOX(hbox), pui->wordwrap, FALSE, FALSE, 5);
+*/
 
   label = gtk_label_new( "Characters" );
   gtk_box_pack_start( GTK_BOX(hbox), pui->wordwrap, FALSE, FALSE, 2);
@@ -1070,7 +1072,8 @@ create_printing_page ()
    pui->PrintBreakline = gtk_check_button_new_with_label(_("Break line"));
    gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->PrintBreakline), TRUE, TRUE, 2);
  
-   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+/*   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+ */
 
   return vbox;
 

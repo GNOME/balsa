@@ -41,20 +41,16 @@ balsa_SOURCES =	\
 	sendmsg-window.c	\
 	sendmsg-window.h	\
 	threads.h
-
-
 #	index-child.h		\
 
-INCLUDES=						\
-	-DGNOMELOCALEDIR=\""$(datadir)/locale"\"	\
-	-I.						\
-	-I${top_srcdir}/libbalsa			\
-	-I${top_srcdir}					\
-	-I$(top_srcdir)/idl				\
-	-I$(top_builddir)/idl				\
-	-I${top_builddir}/libmutt			\
+INCLUDES = \
+	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
+	-I. \
+	-I${top_srcdir} \
+	-I${top_srcdir}/libbalsa \
+	-I$(top_builddir)/idl \
+	-I${top_builddir}/libmutt \
 	 $(GNOME_INCLUDEDIR)
-	    
 
 #libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt
 balsa_LDADD = \

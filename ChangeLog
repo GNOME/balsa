@@ -1,3 +1,9 @@
+2005-02-20 12:05  PeterB
+
+	* src/: balsa-icons.h, balsa-index.c, main-window.c: remove
+	BALSA_PIXMAP_MENU_* definitions.
+	* src/balsa-message.c: make OK the default response in save dialog.
+
 2005-02-20 Craig Routledge <webstuff at craigroutledge dot com>
 
 	* src/main-window.c: bump the date in the about dialog.
@@ -5,10 +11,6 @@
 	up to sync with the user interface.
 	* src/balsa-message.c: add tooltips to the "check crypto" and
 	"attachment" icons.
-
-2005-02-20 11:29  PeterB
-
-	* src/balsa-message.c: make OK the default response in save dialog.
 
 2005-02-16 20:20  Albrecht Dreß <albrecht dot dress at arcor dot de>
 

@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-12-27 10:33+0100\n"
-"PO-Revision-Date: 2002-12-27 10:33+0100\n"
+"POT-Creation-Date: 2002-12-28 11:02+0100\n"
+"PO-Revision-Date: 2002-12-28 11:03+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -475,19 +475,19 @@ msgstr "Hämtar meddelande %d av %d"
 msgid "Received %d bytes of %d"
 msgstr "Mottog %d byte av %d"
 
-#: libbalsa/send.c:212 libbalsa/send.c:219
+#: libbalsa/send.c:211 libbalsa/send.c:218
 msgid "Sending Mail..."
 msgstr "Skickar brev..."
 
-#: libbalsa/send.c:215 src/main-window.c:1777
+#: libbalsa/send.c:214 src/main-window.c:1778
 msgid "_Hide"
 msgstr "_Dölj"
 
-#: libbalsa/send.c:362
+#: libbalsa/send.c:360
 msgid "Unable to open sentbox - could not get IMAP server information"
 msgstr "Kan inte öppna utkorg - kunde inte få tag i IMAP-serverinformation."
 
-#: libbalsa/send.c:772
+#: libbalsa/send.c:768
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -496,40 +496,40 @@ msgstr ""
 "Systemet kommer att försöka skicka om meddelandet igen tills\n"
 "du tar bort det."
 
-#: libbalsa/send.c:800
+#: libbalsa/send.c:795
 msgid "Connected to MTA"
 msgstr "Ansluten till MTA"
 
-#: libbalsa/send.c:807
+#: libbalsa/send.c:802
 #, c-format
 msgid "From: %d <%s>"
 msgstr "Från: %d <%s>"
 
-#: libbalsa/send.c:810
+#: libbalsa/send.c:805
 #, c-format
 msgid "From %s: %d %s"
 msgstr "Från %s: %d %s"
 
-#: libbalsa/send.c:818
+#: libbalsa/send.c:813
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Till: %d <%s>"
 
-#: libbalsa/send.c:821
+#: libbalsa/send.c:816
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Till %s: %d %s"
 
-#: libbalsa/send.c:845
+#: libbalsa/send.c:840
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:858
+#: libbalsa/send.c:853
 msgid "Disconnected"
 msgstr "Frånkopplad"
 
-#: libbalsa/send.c:1029
+#: libbalsa/send.c:1024
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -543,7 +543,7 @@ msgstr ""
 "via: \"host:smtp\".\n"
 "Meddelandet är kvar i utkorgen."
 
-#: libbalsa/send.c:1039
+#: libbalsa/send.c:1034
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1652,7 +1652,7 @@ msgstr "Flera brevlådor med namnet \"%s\""
 msgid "From"
 msgstr "Från"
 
-#: src/balsa-index.c:240 src/filter-edit-callbacks.c:1002
+#: src/balsa-index.c:240
 msgid "Subject"
 msgstr "Ämne"
 
@@ -1701,8 +1701,8 @@ msgstr "Vidarebefordra _inuti..."
 msgid "_Store Address..."
 msgstr "_Lagra adress..."
 
-#: src/balsa-index.c:2100 src/mailbox-node.c:779 src/main-window.c:526
-#: src/pref-manager.c:1510 src/pref-manager.c:2599
+#: src/balsa-index.c:2100 src/filter-edit-dialog.c:216 src/mailbox-node.c:777
+#: src/main-window.c:526 src/pref-manager.c:1510 src/pref-manager.c:2599
 msgid "_Delete"
 msgstr "_Ta bort"
 
@@ -1734,7 +1734,7 @@ msgstr "_Flytta till"
 msgid "Mailbox"
 msgstr "Brevlåda"
 
-#: src/balsa-mblist.c:344 src/filter-edit-callbacks.c:775
+#: src/balsa-mblist.c:344 src/filter-edit-callbacks.c:783
 msgid "Unread"
 msgstr "Olästa"
 
@@ -1746,15 +1746,15 @@ msgstr "Totalt"
 msgid "Failed to find mailbox"
 msgstr "Misslyckades med att hitta brevlådan"
 
-#: src/balsa-mblist.c:1781
+#: src/balsa-mblist.c:1780
 msgid "_Other..."
 msgstr "_Annan..."
 
-#: src/balsa-mblist.c:1842
+#: src/balsa-mblist.c:1841
 msgid "Choose destination folder"
 msgstr "Välj destinationsmapp"
 
-#: src/balsa-mblist.c:2154
+#: src/balsa-mblist.c:2153
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Visad brevlåda: %s med %ld meddelanden, %ld nya"
@@ -1780,8 +1780,7 @@ msgstr "Ämne:"
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:776 src/filter-edit-callbacks.c:995 src/print.c:343
-#: src/store-address.c:272
+#: src/balsa-message.c:776 src/print.c:343 src/store-address.c:272
 msgid "From:"
 msgstr "Från:"
 
@@ -1789,14 +1788,13 @@ msgstr "Från:"
 msgid "Reply-To:"
 msgstr "Svara-till:"
 
-#: src/balsa-message.c:785 src/filter-edit-callbacks.c:988 src/print.c:353
-#: src/store-address.c:273
+#: src/balsa-message.c:785 src/print.c:353 src/store-address.c:273
 msgid "To:"
 msgstr "Till:"
 
 #. cc:
-#: src/balsa-message.c:786 src/filter-edit-callbacks.c:1009 src/print.c:354
-#: src/sendmsg-window.c:1842 src/store-address.c:274
+#: src/balsa-message.c:786 src/print.c:354 src/sendmsg-window.c:1842
+#: src/store-address.c:274
 msgid "Cc:"
 msgstr "Kopia:"
 
@@ -1953,7 +1951,7 @@ msgstr ""
 msgid "reply to MDN?"
 msgstr "svara till MDN?"
 
-#: src/filter-edit-callbacks.c:284 src/filter-edit-callbacks.c:788
+#: src/filter-edit-callbacks.c:284
 msgid "One of the specified fields contains:"
 msgstr "Ett av de angivna fälten innehåller:"
 
@@ -1961,7 +1959,7 @@ msgstr "Ett av de angivna fälten innehåller:"
 msgid "None of the specified fields contains:"
 msgstr "Inga av de angivna fälten innehåller:"
 
-#: src/filter-edit-callbacks.c:287 src/filter-edit-callbacks.c:815
+#: src/filter-edit-callbacks.c:287
 msgid "One of the regular expressions matches"
 msgstr "Ett av de reguljära uttrycken matchar"
 
@@ -1969,7 +1967,7 @@ msgstr "Ett av de reguljära uttrycken matchar"
 msgid "None of the regular expressions matches"
 msgstr "Inget av de reguljära uttrycken matchar"
 
-#: src/filter-edit-callbacks.c:290 src/filter-edit-callbacks.c:867
+#: src/filter-edit-callbacks.c:290 src/filter-edit-callbacks.c:878
 msgid "Match when date is in the interval:"
 msgstr "Matcha då datumet är i intervallet:"
 
@@ -1977,7 +1975,7 @@ msgstr "Matcha då datumet är i intervallet:"
 msgid "Match when date is outside the interval:"
 msgstr "Matcha då datumet är utanför intervallet:"
 
-#: src/filter-edit-callbacks.c:293 src/filter-edit-callbacks.c:905
+#: src/filter-edit-callbacks.c:293 src/filter-edit-callbacks.c:916
 msgid "Match when one of these flags is set:"
 msgstr "Matcha då en av dessa flaggor är inställd:"
 
@@ -1985,131 +1983,158 @@ msgstr "Matcha då en av dessa flaggor är inställd:"
 msgid "Match when none of these flags is set:"
 msgstr "Matcha då ingen av dessa flaggor är inställd:"
 
-#: src/filter-edit-callbacks.c:445
+#: src/filter-edit-callbacks.c:446
 msgid "You must specify the name of the user header to match on"
 msgstr "Du måste ange namnet på användarhuvudet att matcha på"
 
-#: src/filter-edit-callbacks.c:460
+#: src/filter-edit-callbacks.c:461
 msgid "You must specify at least one field for matching"
 msgstr "Du måste ange minst ett fält för matchning"
 
-#: src/filter-edit-callbacks.c:470
+#: src/filter-edit-callbacks.c:471
 msgid "You must provide a string"
 msgstr "Du måste ange en sträng"
 
-#: src/filter-edit-callbacks.c:477
+#: src/filter-edit-callbacks.c:478
 msgid "You must provide at least one regular expression"
 msgstr "Du måste ange minst ett reguljärt uttryck"
 
-#: src/filter-edit-callbacks.c:489
+#: src/filter-edit-callbacks.c:490
 msgid "Low date is incorrect"
 msgstr "Undre datumet är felaktigt"
 
-#: src/filter-edit-callbacks.c:500
+#: src/filter-edit-callbacks.c:501
 msgid "High date is incorrect"
 msgstr "Övre datumet är felaktigt"
 
-#: src/filter-edit-callbacks.c:508
+#: src/filter-edit-callbacks.c:509
 msgid "Low date is greater than high date"
 msgstr "Undre datumet är större än övre datumet"
 
-#: src/filter-edit-callbacks.c:775
+#: src/filter-edit-callbacks.c:783
 msgid "Deleted"
 msgstr "Borttaget"
 
-#: src/filter-edit-callbacks.c:775
+#: src/filter-edit-callbacks.c:783
 msgid "Replied"
 msgstr "Besvarat"
 
-#: src/filter-edit-callbacks.c:775 src/main-window.c:424
+#: src/filter-edit-callbacks.c:783 src/main-window.c:424
 msgid "Flagged"
 msgstr "Flaggad"
 
-#: src/filter-edit-callbacks.c:801
-msgid "Contain/Does not contain"
-msgstr "Innehåller/Innehåller inte"
+#: src/filter-edit-callbacks.c:797
+msgid "One of the specified f_ields contains"
+msgstr "Ett av de angivna f_älten innehåller"
+
+#: src/filter-edit-callbacks.c:812
+msgid "Contain/Does _Not Contain"
+msgstr "Innehåller/Innehåller i_nte"
+
+#: src/filter-edit-callbacks.c:826
+msgid "_One of the regular expressions matches"
+msgstr "_Ett av de reguljära uttrycken matchar"
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:842 src/filter-run-dialog.c:312
-msgid "Add"
-msgstr "Lägg till"
+#: src/filter-edit-callbacks.c:853 src/filter-run-dialog.c:312
+msgid "A_dd"
+msgstr "L_ägg till"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:846 src/filter-edit-dialog.c:309
-#: src/filter-run-dialog.c:317 src/sendmsg-window.c:1261
-msgid "Remove"
-msgstr "Ta bort"
+#: src/filter-edit-callbacks.c:857 src/filter-edit-dialog.c:310
+#: src/filter-run-dialog.c:317
+msgid "_Remove"
+msgstr "_Ta bort"
 
-#: src/filter-edit-callbacks.c:850
-msgid "One matches/None matches"
-msgstr "Ett matchar/Inget matchar"
+#: src/filter-edit-callbacks.c:861
+msgid "One _Matches/None Matches"
+msgstr "Ett _matchar/Inget matchar"
 
-#: src/filter-edit-callbacks.c:887
+#: src/filter-edit-callbacks.c:898
 msgid "Inside/outside the date interval"
 msgstr "Inuti/Utanför datumintervallet"
 
-#: src/filter-edit-callbacks.c:934
+#: src/filter-edit-callbacks.c:945
 msgid "Match when one flag is set/when no flag is set"
 msgstr "Matcha då en flagga är inställd/då ingen flagga är inställd"
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:952
-msgid "Match in:"
-msgstr "Matcha på:"
+#: src/filter-edit-callbacks.c:963
+msgid "Match In"
+msgstr "Matcha i"
 
-#: src/filter-edit-callbacks.c:964
-msgid "All"
-msgstr "Alla"
+#: src/filter-edit-callbacks.c:975
+msgid "_All"
+msgstr "_Alla"
 
-#: src/filter-edit-callbacks.c:972
-msgid "Clear"
-msgstr "Töm"
+#: src/filter-edit-callbacks.c:983
+msgid "C_lear"
+msgstr "T_öm"
 
-#: src/filter-edit-callbacks.c:981
-msgid "Body"
-msgstr "Meddelandetext"
+#: src/filter-edit-callbacks.c:992 src/main-window.c:2686
+msgid "_Body"
+msgstr "_Meddelandetext"
 
-#: src/filter-edit-callbacks.c:1016
-msgid "User header:"
-msgstr "Användarhuvud:"
+#. To:
+#: src/filter-edit-callbacks.c:999 src/main-window.c:2687
+#: src/sendmsg-window.c:1831
+msgid "_To:"
+msgstr "_Till:"
 
-#: src/filter-edit-callbacks.c:1034
-msgid "Selected condition search type:"
-msgstr "Vald villkorssökningstyp:"
+#: src/filter-edit-callbacks.c:1006 src/main-window.c:2688
+msgid "_From:"
+msgstr "_Från:"
 
-#: src/filter-edit-callbacks.c:1117
+#: src/filter-edit-callbacks.c:1014 src/main-window.c:2689
+#: src/sendmsg-window.c:297
+msgid "_Subject"
+msgstr "_Ärende"
+
+#: src/filter-edit-callbacks.c:1021 src/main-window.c:2690
+msgid "_Cc:"
+msgstr "_Kopia:"
+
+#: src/filter-edit-callbacks.c:1028
+msgid "_User header:"
+msgstr "_Användarhuvud:"
+
+#: src/filter-edit-callbacks.c:1052
+msgid "Search T_ype:"
+msgstr "Sökt_yp:"
+
+#: src/filter-edit-callbacks.c:1129
 msgid "Edit condition for filter: "
 msgstr "Redigera villkor för filter: "
 
-#: src/filter-edit-callbacks.c:1528
+#: src/filter-edit-callbacks.c:1540
 msgid "New filter"
 msgstr "Nytt filter"
 
-#: src/filter-edit-callbacks.c:1656
+#: src/filter-edit-callbacks.c:1669
 msgid "No filter name specified."
 msgstr "Inget filternamn angavs."
 
-#: src/filter-edit-callbacks.c:1661
+#: src/filter-edit-callbacks.c:1674
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Filtret \"%s\" finns redan."
 
-#: src/filter-edit-callbacks.c:1674
+#: src/filter-edit-callbacks.c:1687
 msgid "Filter must have conditions."
 msgstr "Filtret måste ha villkor."
 
-#: src/filter-edit-callbacks.c:1733
+#: src/filter-edit-callbacks.c:1746
 msgid "Filter has matched"
 msgstr "Filtret har matchat"
 
-#: src/filter-edit-callbacks.c:1751
+#: src/filter-edit-callbacks.c:1764
 msgid "You must provide a sound to play"
 msgstr "Du måste tillhandahålla ett ljud att spela"
 
-#: src/filter-edit-callbacks.c:1882
+#: src/filter-edit-callbacks.c:1895
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Exempel: skriv 31 december 2000 som %s)"
@@ -2159,69 +2184,68 @@ msgid "AND"
 msgstr "OCH"
 
 #. new button
-#: src/filter-edit-dialog.c:210 src/filter-edit-dialog.c:305
-#: src/main-window.c:431
-msgid "New"
-msgstr "Ny"
-
-#: src/filter-edit-dialog.c:216
-msgid "Delete"
-msgstr "Ta bort"
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:749 src/main-window.c:282
+msgid "_New"
+msgstr "_Nytt"
 
 #. The name entry
 #: src/filter-edit-dialog.c:242
-msgid "Filter name:"
-msgstr "Filternamn:"
+msgid "_Filter name:"
+msgstr "_Filternamn:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
-#: src/filter-edit-dialog.c:257
+#: src/filter-edit-dialog.c:258
 msgid "Operation between conditions"
 msgstr "Åtgärd mellan villkor"
 
-#: src/filter-edit-dialog.c:300
-msgid "Edit"
-msgstr "Redigera"
+#: src/filter-edit-dialog.c:301
+msgid "_Edit"
+msgstr "_Redigera"
+
+#: src/filter-edit-dialog.c:306
+msgid "Ne_w"
+msgstr "N_y"
 
 #. The notification area
-#: src/filter-edit-dialog.c:335
+#: src/filter-edit-dialog.c:336
 msgid "Notification:"
 msgstr "Påkalla uppmärksamhet:"
 
 #. Notification buttons
-#: src/filter-edit-dialog.c:345
+#: src/filter-edit-dialog.c:346
 msgid "Play sound:"
 msgstr "Spela ljud:"
 
-#: src/filter-edit-dialog.c:351
+#: src/filter-edit-dialog.c:352
 msgid "Use Sound..."
 msgstr "Använd ljud..."
 
-#: src/filter-edit-dialog.c:364
+#: src/filter-edit-dialog.c:365
 msgid "Popup text:"
 msgstr "Visa textruta:"
 
 #. The action area
-#: src/filter-edit-dialog.c:385
+#: src/filter-edit-dialog.c:386
 msgid "Action to perform:"
 msgstr "Åtgärd som ska utföras:"
 
-#: src/filter-edit-dialog.c:436
+#: src/filter-edit-dialog.c:437
 msgid "Match"
 msgstr "Matcha"
 
-#: src/filter-edit-dialog.c:439
+#: src/filter-edit-dialog.c:440
 msgid "Action"
 msgstr "Händelse"
 
-#: src/filter-edit-dialog.c:451
+#: src/filter-edit-dialog.c:452
 msgid "Revert"
 msgstr "Återgå"
 
-#: src/filter-edit-dialog.c:480
+#: src/filter-edit-dialog.c:481
 msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr "En filterkörningdialog är öppen. Stäng den innan du kan ändra filter."
 
-#: src/filter-edit-dialog.c:493
+#: src/filter-edit-dialog.c:494
 msgid "Balsa Filters"
 msgstr "Balsa-filter"
 
@@ -2255,7 +2279,7 @@ msgstr ""
 "Du kan inte associera det med samma brevlåda (det orsakar rekursion)."
 
 #: src/filter-run-dialog.c:187
-msgid "Balsa Filters of mailbox : "
+msgid "Balsa Filters of Mailbox : "
 msgstr "Balsa-filter för brevlåda: "
 
 #: src/filter-run-dialog.c:228
@@ -2267,14 +2291,14 @@ msgid "On exit"
 msgstr "Vid avslut"
 
 #. up button
-#: src/filter-run-dialog.c:349 src/toolbar-prefs.c:490
-msgid "Up"
-msgstr "Upp"
+#: src/filter-run-dialog.c:349
+msgid "_Up"
+msgstr "_Upp"
 
 #. down button
-#: src/filter-run-dialog.c:354 src/toolbar-prefs.c:506
-msgid "Down"
-msgstr "Ner"
+#: src/filter-run-dialog.c:354
+msgid "Do_wn"
+msgstr "Ne_d"
 
 #: src/filter-run-dialog.c:397
 msgid ""
@@ -2305,12 +2329,12 @@ msgid "Descriptive _Name:"
 msgstr "Beskrivande _namn:"
 
 #. pop server
-#: src/folder-conf.c:214 src/mailbox-conf.c:870 src/mailbox-conf.c:958
+#: src/folder-conf.c:214 src/mailbox-conf.c:877 src/mailbox-conf.c:965
 msgid "_Server:"
 msgstr "_Server:"
 
 #. username
-#: src/folder-conf.c:220 src/mailbox-conf.c:877
+#: src/folder-conf.c:220 src/mailbox-conf.c:884
 msgid "Use_r name:"
 msgstr "Använda_rnamn:"
 
@@ -2542,58 +2566,58 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:824 src/mailbox-conf.c:864 src/mailbox-conf.c:952
+#: src/mailbox-conf.c:828 src/mailbox-conf.c:871 src/mailbox-conf.c:959
 msgid "Mailbox _Name:"
 msgstr "Brevlåde_namn:"
 
 #. path to file
-#: src/mailbox-conf.c:831
+#: src/mailbox-conf.c:835
 msgid "Mailbox _Path:"
 msgstr "Sökväg till _brevlådan:"
 
-#: src/mailbox-conf.c:833
+#: src/mailbox-conf.c:837
 msgid "Mailbox Path"
 msgstr "Sökväg till brevlådan"
 
 #. password field
-#: src/mailbox-conf.c:883 src/mailbox-conf.c:979
+#: src/mailbox-conf.c:890 src/mailbox-conf.c:986
 msgid "Pass_word:"
 msgstr "_Lösenord:"
 
-#: src/mailbox-conf.c:890
+#: src/mailbox-conf.c:897
 msgid "Use _APOP Authentication"
 msgstr "Använd _APOP-autentisering"
 
-#: src/mailbox-conf.c:896
+#: src/mailbox-conf.c:903
 msgid "_Delete messages from server after download"
 msgstr "_Ta bort meddelanden från servern efter hämtning"
 
-#: src/mailbox-conf.c:901
+#: src/mailbox-conf.c:908
 msgid "_Filter messages through procmail"
 msgstr "_Filtrera meddelanden genom procmail"
 
-#: src/mailbox-conf.c:906
+#: src/mailbox-conf.c:913
 msgid "_Enable check for new mail"
 msgstr "_Använd kontroll av ny e-post"
 
-#: src/mailbox-conf.c:916
+#: src/mailbox-conf.c:923
 msgid "Use SS_L (pop3s)"
 msgstr "Använd SS_L (pop3s)"
 
 #. username
-#: src/mailbox-conf.c:965
+#: src/mailbox-conf.c:972
 msgid "_Username:"
 msgstr "_Användarnamn:"
 
-#: src/mailbox-conf.c:973
+#: src/mailbox-conf.c:980
 msgid "_Remember Password"
 msgstr "_Kom ihåg lösenord"
 
-#: src/mailbox-conf.c:984
+#: src/mailbox-conf.c:991
 msgid "F_older Path:"
 msgstr "Sökväg till _mapp:"
 
-#: src/mailbox-conf.c:1007
+#: src/mailbox-conf.c:1014
 msgid "Use SS_L (imaps)"
 msgstr "Använd SS_L (imaps)"
 
@@ -2606,86 +2630,82 @@ msgstr "Mappversionen att skriva."
 msgid "Scanning %s. Please wait..."
 msgstr "Genomsöker %s. Var vänlig vänta..."
 
-#: src/mailbox-node.c:736
+#: src/mailbox-node.c:734
 msgid "Local _mbox mailbox..."
 msgstr "Lokal _mbox-brevlåda..."
 
-#: src/mailbox-node.c:738
+#: src/mailbox-node.c:736
 msgid "Local Mail_dir mailbox..."
 msgstr "Lokal Mail_dir-brevlåda..."
 
-#: src/mailbox-node.c:740
+#: src/mailbox-node.c:738
 msgid "Local M_H mailbox..."
 msgstr "Lokal M_H-brevlåda..."
 
-#: src/mailbox-node.c:742
+#: src/mailbox-node.c:740
 msgid "Remote _IMAP mailbox..."
 msgstr "_IMAP-fjärrbrevlåda..."
 
-#: src/mailbox-node.c:745
+#: src/mailbox-node.c:743
 msgid "Remote IMAP _folder..."
 msgstr "IMAP-fjärr_mapp..."
 
-#: src/mailbox-node.c:747
+#: src/mailbox-node.c:745
 msgid "Remote IMAP _subfolder..."
 msgstr "IMAP-fjärr_undermapp..."
 
-#: src/mailbox-node.c:751 src/main-window.c:282
-msgid "_New"
-msgstr "_Nytt"
-
 #. clicked on the empty space
-#: src/mailbox-node.c:758 src/mailbox-node.c:790 src/mailbox-node.c:811
+#: src/mailbox-node.c:756 src/mailbox-node.c:788 src/mailbox-node.c:809
 msgid "_Rescan"
 msgstr "_Läs om"
 
-#: src/mailbox-node.c:767
+#: src/mailbox-node.c:765
 msgid "_Open"
 msgstr "_Öppna"
 
-#: src/mailbox-node.c:770 src/main-window.c:610
+#: src/mailbox-node.c:768 src/main-window.c:610
 msgid "_Close"
 msgstr "_Stäng"
 
-#: src/mailbox-node.c:776
+#: src/mailbox-node.c:774
 msgid "_Properties..."
 msgstr "_Egenskaper..."
 
-#: src/mailbox-node.c:786
+#: src/mailbox-node.c:784
 msgid "_Subscribe"
 msgstr "_Prenumerera"
 
-#: src/mailbox-node.c:788
+#: src/mailbox-node.c:786
 msgid "_Unsubscribe"
 msgstr "_Säg upp prenumeration"
 
-#: src/mailbox-node.c:796
+#: src/mailbox-node.c:794
 msgid "Mark as _Inbox"
 msgstr "Markera som _inkorg"
 
-#: src/mailbox-node.c:799
+#: src/mailbox-node.c:797
 msgid "_Mark as Sentbox"
 msgstr "_Markera som skickatkorg"
 
-#: src/mailbox-node.c:802
+#: src/mailbox-node.c:800
 msgid "Mark as _Trash"
 msgstr "Markera som _papperskorg"
 
-#: src/mailbox-node.c:805
+#: src/mailbox-node.c:803
 msgid "Mark as D_raftbox"
 msgstr "Markera som u_tkastkorg"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:808
+#: src/mailbox-node.c:806
 msgid "_Edit/Apply filters"
 msgstr "_Redigera/Tillämpa filter"
 
-#: src/mailbox-node.c:897
+#: src/mailbox-node.c:895
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokala brevlådan %s inläst som: %s\n"
 
-#: src/mailbox-node.c:929
+#: src/mailbox-node.c:927
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Lokal mapp %s\n"
@@ -2803,7 +2823,7 @@ msgid "Manage filters"
 msgstr "Hantera filter"
 
 #: src/main-window.c:350
-msgid "_Export filters"
+msgid "_Export Filters"
 msgstr "_Exportera filter"
 
 #: src/main-window.c:350
@@ -2901,6 +2921,10 @@ msgstr "Fäll ihop alla expanderade trådar"
 #: src/main-window.c:424
 msgid "Toggle flagged"
 msgstr "Flagga av/på"
+
+#: src/main-window.c:431
+msgid "New"
+msgstr "Ny"
 
 #: src/main-window.c:431
 msgid "Toggle New"
@@ -3068,8 +3092,8 @@ msgid "Delete messages from the Trash mailbox"
 msgstr "Ta bort meddelanden från papperskorgsbrevlådan"
 
 #: src/main-window.c:619
-msgid "Edit/Apply Filters"
-msgstr "Redigera/Tillämpa filter"
+msgid "Edit/Apply _Filters"
+msgstr "Redigera/Tillämpa _filter"
 
 #: src/main-window.c:620
 msgid "Filter the content of the selected mailbox"
@@ -3107,7 +3131,7 @@ msgstr ""
 "Balsa skickar ett brev nu.\n"
 "Avbryt skickande?"
 
-#: src/main-window.c:1370
+#: src/main-window.c:1371
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -3115,11 +3139,11 @@ msgstr ""
 "Kunde inte öppna brevlådan!\n"
 "Var vänlig och kontrollera inställningarna för brevlådan."
 
-#: src/main-window.c:1643
+#: src/main-window.c:1644
 msgid "Copyright (C) 1997-2002"
 msgstr "Copyright © 1997-2002"
 
-#: src/main-window.c:1647
+#: src/main-window.c:1648
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3131,89 +3155,68 @@ msgstr ""
 "\n"
 "Om du vill rapportera fel kan du göra det på: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1774
+#: src/main-window.c:1775
 msgid "Checking Mail..."
 msgstr "Kontrollerar e-post..."
 
-#: src/main-window.c:2073
+#: src/main-window.c:2074
 msgid "Finished Checking."
 msgstr "Slutförde kontroll."
 
-#: src/main-window.c:2143
+#: src/main-window.c:2144
 #, c-format
 msgid "Sending error: %s"
 msgstr "Fel vid sänding: %s"
 
-#: src/main-window.c:2238
+#: src/main-window.c:2239
 msgid "Balsa: New mail"
 msgstr "Balsa: Ny post"
 
-#: src/main-window.c:2248
+#: src/main-window.c:2249
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Du har fått %d nya meddelanden."
 
-#: src/main-window.c:2249
+#: src/main-window.c:2250
 msgid "You have received 1 new message."
 msgstr "Du har fått 1 nytt meddelande."
 
-#: src/main-window.c:2640
+#: src/main-window.c:2641
 msgid "Search mailbox"
 msgstr "Sök i brevlåda"
 
-#: src/main-window.c:2658
+#: src/main-window.c:2659
 msgid "_Reverse search"
 msgstr "_Omvänd sökning"
 
-#: src/main-window.c:2661
+#: src/main-window.c:2662
 msgid "_Search for:"
 msgstr "_Sök efter:"
 
-#: src/main-window.c:2674
+#: src/main-window.c:2675
 msgid "In:"
 msgstr "I:"
 
-#: src/main-window.c:2685
-msgid "_Body"
-msgstr "_Meddelandetext"
-
-#. To:
-#: src/main-window.c:2686 src/sendmsg-window.c:1831
-msgid "_To:"
-msgstr "_Till:"
-
-#: src/main-window.c:2687
-msgid "_From:"
-msgstr "_Från:"
-
-#: src/main-window.c:2688 src/sendmsg-window.c:297
-msgid "_Subject"
-msgstr "_Ärende"
-
-#: src/main-window.c:2689
-msgid "_Cc:"
-msgstr "_Kopia:"
-
-#: src/main-window.c:2811
+#: src/main-window.c:2812
 msgid "You can apply filters only on mailbox\n"
 msgstr "Du kan endast tillämpa filter på brevlåda\n"
 
-#: src/main-window.c:2846 src/main-window.c:2865
+#: src/main-window.c:2847 src/main-window.c:2866
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Sparande av brevlådan %s misslyckades."
 
-#: src/main-window.c:3058
+#: src/main-window.c:3059
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: src/main-window.c:3060
+#: src/main-window.c:3061
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3151
+#: src/main-window.c:3152
 msgid "Cannot access the message's body\n"
 msgstr "Kan inte komma åt meddelandehuvudet\n"
 
@@ -4259,6 +4262,10 @@ msgstr ""
 msgid "Attach as Reference?"
 msgstr "Bifoga som referens?"
 
+#: src/sendmsg-window.c:1261
+msgid "Remove"
+msgstr "Ta bort"
+
 #: src/sendmsg-window.c:1272
 msgid "attach as reference"
 msgstr "bifoga som referens"
@@ -4767,6 +4774,75 @@ msgstr "Tillgängliga knappar"
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
 
+#: src/toolbar-prefs.c:490
+msgid "Up"
+msgstr "Upp"
+
+#: src/toolbar-prefs.c:506
+msgid "Down"
+msgstr "Ned"
+
+#~ msgid "Invalid filter: %s"
+#~ msgstr "Ogiltigt filter: %s"
+
+#~ msgid "Bad mailbox name for filter: %s"
+#~ msgstr "Felaktigt brevlådenamn för filtret: %s"
+
+#~ msgid "Uploading message..."
+#~ msgstr "Lämnar meddelande..."
+
+#~ msgid "Add"
+#~ msgstr "Lägg till"
+
+#~ msgid "All"
+#~ msgstr "Alla"
+
+#~ msgid "Clear"
+#~ msgstr "Töm"
+
+#~ msgid "User header:"
+#~ msgstr "Användarhuvud:"
+
+#~ msgid "Search Type:"
+#~ msgstr "Söktyp:"
+
+#~ msgid "Filter name:"
+#~ msgstr "Filternamn:"
+
+#~ msgid "Balsa Filters of Mailbox: "
+#~ msgstr "Balsa-filter för brevlåda: "
+
+#~ msgid "_Export filters"
+#~ msgstr "_Exportera filter"
+
+#~ msgid "Export Filters"
+#~ msgstr "Exportera filter"
+
+#~ msgid "Edit/Apply Filters"
+#~ msgstr "Redigera/Tillämpa filter"
+
+#~ msgid "Error during filters loading: "
+#~ msgstr "Fel vid filterinläsning: "
+
+#~ msgid ""
+#~ "Error during filters loading: %s\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Fel vid filterinläsning: %s\n"
+#~ "%s"
+
+#~ msgid "Body"
+#~ msgstr "Meddelandetext"
+
+#~ msgid "Selected condition search type:"
+#~ msgstr "Vald villkorssökningstyp:"
+
+#~ msgid "Delete"
+#~ msgstr "Ta bort"
+
+#~ msgid "Edit"
+#~ msgstr "Redigera"
+
 #~ msgid "Identity Name:"
 #~ msgstr "Identitetsnamn:"
 
@@ -5173,9 +5249,6 @@ msgstr "Anpassa verktygsrad"
 #~ msgid "+"
 #~ msgstr "+"
 
-#~ msgid "_Edit"
-#~ msgstr "_Redigera"
-
 #~ msgid "_Set Default"
 #~ msgstr "_Ställ in standardalternativ"
 
@@ -5350,6 +5423,9 @@ msgstr "Anpassa verktygsrad"
 #~ msgid "Error : not enough memory"
 #~ msgstr "Fel: inte tillräckligt med minne"
 
+#~ msgid "Error: not enough memory"
+#~ msgstr "Fel: inte tillräckligt med minne"
+
 #~ msgid "Invalid filter name\n"
 #~ msgstr "Ogiltigt filternamn\n"
 
@@ -5391,9 +5467,6 @@ msgstr "Anpassa verktygsrad"
 
 #~ msgid "Run on:"
 #~ msgstr "Kör på:"
-
-#~ msgid "Search type:"
-#~ msgstr "Söktyp:"
 
 #~ msgid "Disposition:"
 #~ msgstr "Disposition:"

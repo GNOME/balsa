@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 1999-11-24 18:21+0100\n"
-"PO-Revision-Date: 1999-10-25 01:49+02:00\n"
+"POT-Creation-Date: 1999-11-26 03:17+0100\n"
+"PO-Revision-Date: 1999-11-27 16:23+01:00\n"
 "Last-Translator: Kenneth Christiansen - <kenneth@ripen.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
 "MIME-Version: 1.0\n"
@@ -36,7 +36,7 @@ msgstr "Kladder"
 
 #: src/balsa-init.c:71
 msgid "Sentbox"
-msgstr "Sendt post"
+msgstr "Sendt_post"
 
 #: src/balsa-init.c:72
 msgid "Outbox"
@@ -48,7 +48,7 @@ msgstr "Indbakke"
 
 #: src/balsa-init.c:129
 msgid "Configure Balsa"
-msgstr ""
+msgstr "Indstil Balsa"
 
 #. Start page ****************************************
 #. This text we must linebreak manually.
@@ -65,30 +65,30 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
-"Det synes at være første gang du køre Balsa. De følgende trin\n"
-"vil sætte Balsa op ved at spørge dig nogle få simple spørgsmål\n"
-"Når du nar gennemgået disse trin, kan du selvfølgelig godt ændre\n"
-"indstillingerne igen, ved at benytte Balsas præferencer menu.\n"
-"Tjek venligst Balsas om... boks ud, for mere information om \n"
-"hvordan man kontakter forfatterne eller rapportere fejl."
-
-
+"Det ser ud til at være første gang du kører Balsa. De følgende\n"
+"trin vil sætte Balsa op ved at stille dig nogle få enkle spørgsmål.\n"
+"Når du har gennemgået disse trin, kan du selvfølgelig godt ændre\n"
+"indstillingerne igen, ved at benytte Balsas præference-menu.\n"
+"Læs venligst Balsas Om... boks for mere information om\n"
+"hvordan man kontakter forfatterne eller rapporterer fejl."
 
 #. User info ****************************************
 #: src/balsa-init.c:152
 msgid "User Settings"
-msgstr "Bruger indstillinger"
+msgstr "Brugerindstillinger"
 
 #: src/balsa-init.c:158
 msgid ""
 "Please enter information about yourself. If you don't\n"
 "use an SMTP server, enter \"localhost\" into the box."
 msgstr ""
+"Indtast venligst lidt information om dig selv. Hvis du ikke\n"
+"bruger en SMTP server, skriv bare \"localhost\" i feltet."
 
 #. Folders ****************************************
 #: src/balsa-init.c:171
 msgid "Mail Directory Settings"
-msgstr "Postmappe indstillinger"
+msgstr "Postmappeindstillinger"
 
 #. Finish ****************************************
 #: src/balsa-init.c:208
@@ -100,6 +100,8 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
+"Du har nu færdig med at opsætte Balsa. Hyg dig!\n"
+"   -- Balsaudviklingsholdet"
 
 #: src/balsa-init.c:302
 msgid "Create Mail Directory?"
@@ -116,7 +118,7 @@ msgstr ""
 
 #: src/balsa-init.c:315
 msgid "There is a serious internal error.\n"
-msgstr "Der er en seriøs internfejl.\n"
+msgstr "Der opstod en alvorlig intern fejl.\n"
 
 #: src/balsa-init.c:350
 msgid "Error Creating Directory"
@@ -132,14 +134,14 @@ msgstr ""
 #: src/balsa-init.c:384
 #, c-format
 msgid "Configure %s"
-msgstr "Konfigurer %s"
+msgstr "Indstil %s"
 
 #: src/balsa-init.c:389
 #, c-format
 msgid ""
 "Please specify a filename for mail folder \"%s\". (It will be created if it "
 "does not exist.)"
-msgstr ""
+msgstr "Angiv venligst et filnavn for postmappen \"%s\". (Den vil blive oprettet hvis den ikke eksisterer.)"
 
 #: src/balsa-init.c:441
 msgid "Create Mailbox?"
@@ -147,7 +149,7 @@ msgstr "Opret postkasse?"
 
 #: src/balsa-init.c:448
 msgid "OOPS BUG"
-msgstr "OOPS FEJL"
+msgstr "HOVSA EN FEJL"
 
 #: src/balsa-init.c:524
 #, c-format
@@ -288,7 +290,7 @@ msgstr "Ned"
 msgid "New"
 msgstr "Ny"
 
-#: src/filter-edit-dialog.c:194 src/main-window.c:257 src/pref-manager.c:617
+#: src/filter-edit-dialog.c:194 src/main-window.c:257 src/pref-manager.c:658
 msgid "Delete"
 msgstr "Slet"
 
@@ -313,7 +315,7 @@ msgid "Match string:"
 msgstr "Find tekst:"
 
 #: src/filter-edit-dialog.c:380 src/mailbox-conf.c:281 src/mailbox-conf.c:1065
-#: src/pref-manager.c:607
+#: src/pref-manager.c:648
 msgid "Add"
 msgstr "Tilføj"
 
@@ -561,12 +563,10 @@ msgid "Fetch new incoming mail"
 msgstr "Hent ny indkommende post"
 
 #: src/main-window.c:119
-#, fuzzy
 msgid "Pr_int"
-msgstr "Udskriv"
+msgstr "_Udskriv"
 
 #: src/main-window.c:119
-#, fuzzy
 msgid "Print current mail"
 msgstr "Udskriv dette brev"
 
@@ -732,7 +732,7 @@ msgstr "Svar"
 
 #: src/main-window.c:267
 msgid "Reply to all"
-msgstr "Svar til alle"
+msgstr "Svar alle"
 
 #: src/main-window.c:270
 msgid "Forward"
@@ -777,8 +777,7 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Balsa epostklienten er en del af GNOME skrivebordsmiljøet.  Information om "
-"Balsa kan findes på http://www.balsa.net/\n"
+"Balsa epostklienten er en del af GNOME skrivebordsmiljøet.  Information om Balsa kan findes på http://www.balsa.net/\n"
 "\n"
 "Rapportér venligst fejl på: http://bugs.gnome.org/"
 
@@ -831,7 +830,7 @@ msgid "Balsa Preferences"
 msgstr "Balsa indstillinger"
 
 #. identity page
-#: src/pref-manager.c:172 src/pref-manager.c:505
+#: src/pref-manager.c:172 src/pref-manager.c:524
 msgid "Identity"
 msgstr "Identitet"
 
@@ -846,132 +845,142 @@ msgid "Display"
 msgstr "Udseende"
 
 #. Misc page
-#: src/pref-manager.c:193 src/pref-manager.c:735
+#: src/pref-manager.c:193 src/pref-manager.c:776
 msgid "Misc"
 msgstr "Diverse"
 
 #. Encoding page
-#: src/pref-manager.c:200 src/pref-manager.c:816
+#: src/pref-manager.c:200 src/pref-manager.c:854
 msgid "Encoding"
 msgstr "Indkodning"
 
 #. Printing page
-#: src/pref-manager.c:206 src/pref-manager.c:871
-#, fuzzy
+#: src/pref-manager.c:206 src/pref-manager.c:909
 msgid "Printing"
-msgstr "Udskriv"
+msgstr "Udskrivning"
 
 #. your name
-#: src/pref-manager.c:513
+#: src/pref-manager.c:532
 msgid "Your name:"
 msgstr "Dit navn:"
 
 #. email address
-#: src/pref-manager.c:523
+#: src/pref-manager.c:542
 msgid "E-Mail address:"
-msgstr "E-post adresse:"
+msgstr "E-postadresse:"
 
 #. reply-to address
-#: src/pref-manager.c:533
+#: src/pref-manager.c:552
 msgid "Reply-to address:"
 msgstr "Svar-til adresse:"
 
-#. signature
-#: src/pref-manager.c:543
-msgid "Signature:"
-msgstr "Signatur:"
+#. Signature stuff
+#: src/pref-manager.c:563
+msgid "Signature"
+msgstr "Signatur"
 
-#: src/pref-manager.c:577
+#: src/pref-manager.c:571
+msgid "Signature file:"
+msgstr "Signaturfil:"
+
+#: src/pref-manager.c:582
+msgid "Include signature when sending mail"
+msgstr "Inkludér signatur når du sender post"
+
+#: src/pref-manager.c:586
+msgid "Include signature when forwarding mail"
+msgstr "Inkludér signatur når du videresender post"
+
+#: src/pref-manager.c:590
+msgid "Include signature when replying to mail"
+msgstr "Inkludér signatur når du svarer på post"
+
+#: src/pref-manager.c:618
 msgid "Remote Mailbox Servers"
 msgstr "Eksterne postkasseservere"
 
-#: src/pref-manager.c:586
+#: src/pref-manager.c:627
 msgid "Type"
 msgstr "Type"
 
-#: src/pref-manager.c:587
+#: src/pref-manager.c:628
 msgid "Mailbox name"
 msgstr "Navn på postkasse"
 
-#: src/pref-manager.c:612
+#: src/pref-manager.c:653
 msgid "Modify"
 msgstr "Modificér"
 
-#: src/pref-manager.c:622
+#: src/pref-manager.c:663
 msgid "Local Mail"
 msgstr "Lokal post"
 
-#: src/pref-manager.c:628
+#: src/pref-manager.c:669
 msgid "Local mail directory:"
 msgstr "Lokal postmappe:"
 
 #. smtp server
-#: src/pref-manager.c:635
+#: src/pref-manager.c:676
 msgid "Outgoing Mail"
 msgstr "Udgående post"
 
-#: src/pref-manager.c:644
+#: src/pref-manager.c:685
 msgid "Remote SMTP Server"
 msgstr "Ekstern SMTP server"
 
-#: src/pref-manager.c:654
+#: src/pref-manager.c:695
 msgid "Local mail user agent"
 msgstr "Brugeragent for lokal post"
 
 #. Toolbars
-#: src/pref-manager.c:687
+#: src/pref-manager.c:728
 msgid "Toolbars"
 msgstr "Værktøjslinier"
 
 #. Main window
-#: src/pref-manager.c:704
+#: src/pref-manager.c:745
 msgid "Main window"
 msgstr "Hovedvindue"
 
-#: src/pref-manager.c:707
+#: src/pref-manager.c:748
 msgid "Use preview pane"
 msgstr "Vis brev i lille vindue"
 
-#: src/pref-manager.c:714
+#: src/pref-manager.c:755
 msgid "View mailbox content informations "
 msgstr "Vis information om postkasseindhold "
 
-#: src/pref-manager.c:743
+#: src/pref-manager.c:784
 msgid "Debug"
 msgstr "Aflusing"
 
-#: src/pref-manager.c:746
-msgid "Show check box"
-msgstr ""
-
-#: src/pref-manager.c:752
+#: src/pref-manager.c:790
 msgid "Reply prefix:"
 msgstr "Svarprefiks:"
 
-#: src/pref-manager.c:766
+#: src/pref-manager.c:804
 msgid "Font:"
 msgstr "Skrifttype:"
 
-#: src/pref-manager.c:781
+#: src/pref-manager.c:819
 msgid "Browse..."
 msgstr "Gennemse..."
 
-#: src/pref-manager.c:827
+#: src/pref-manager.c:865
 msgid "Charset:"
 msgstr "Tegnsæt:"
 
-#: src/pref-manager.c:881
-#, fuzzy
+#: src/pref-manager.c:919
 msgid "Print command:"
-msgstr "Kommando:"
+msgstr "Udskrivningskommando:"
 
-#: src/pref-manager.c:892
+#: src/pref-manager.c:930
 msgid "Linesize:"
-msgstr ""
+msgstr "Linielængde:"
 
-#: src/pref-manager.c:904
+#: src/pref-manager.c:942
 msgid "Break line"
-msgstr ""
+msgstr "Ombryd linier"
 
 #: src/sendmsg-window.c:73
 msgid "Send"
@@ -1023,10 +1032,12 @@ msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "Sadly, this means you cannot attach any files.\n"
 msgstr ""
+"Vedhæftningsikonen (balsa/attachment.png) kunne ikke findes.\n"
+"Desværre betyder det at du ikke kan vedhæfte filer.\n"
 
 #: src/sendmsg-window.c:196
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: src/sendmsg-window.c:211
 #, c-format
@@ -1106,4 +1117,3 @@ msgstr "Postkasse: Åbning af %s referencetal: %d\n"
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postkasse: Lukker %s referencetal: %d\n"
-

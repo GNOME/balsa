@@ -72,6 +72,7 @@ struct _MailboxIMAP
     gchar *user;
     gchar *passwd;
     gchar *server;
+    gchar *path;
   };
 
 typedef struct _MailboxNNTP MailboxNNTP;
@@ -84,6 +85,7 @@ struct _MailboxNNTP
     gchar *user;
     gchar *passwd;
     gchar *server;
+    gchar *newsgroup;
   };
 
 typedef union _MailboxUnion MailboxUnion;

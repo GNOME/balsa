@@ -30,13 +30,14 @@
 
 static void load_global_settings ();
 static void setup_local_mailboxes ();
+static void my_special_mailbox ();
 
 
 void
 init_balsa_app (int argc, char *argv[])
 {
   /* include linkage for the c-client library */
-#include "linkage.c"
+  #include "linkage.c"
 
   /* initalize application structure before ALL ELSE */
   balsa_app.user = NULL;
@@ -51,6 +52,7 @@ init_balsa_app (int argc, char *argv[])
 
   load_global_settings ();
   setup_local_mailboxes ();
+  my_special_mailbox ();
 
   /* create main window */
   balsa_app.main_window = create_main_window ();
@@ -97,6 +99,26 @@ setup_local_mailboxes ()
             }
         }
     }
+}
+
+
+/* PAVLOV: This is where you can hard-code your own
+ *         mailbox for testing!
+ */
+static void
+my_special_mailbox ()
+{
+  MailboxPOP3 *pop3;
+
+  /*
+  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
+  pop3->name = g_strdup ("MyPOP Box");
+  pop3->user = g_strdup ("jay");
+  pop3->passwd = g_strdup ("");
+  pop3->server = g_strdup ("zen");
+
+  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
+  */
 }
 
 

@@ -91,6 +91,7 @@ mailbox_new (MailboxType type)
       imap->user = NULL;
       imap->passwd = NULL;
       imap->server = NULL;
+      imap->path = NULL;
       break;
       
     case MAILBOX_NNTP:
@@ -101,6 +102,7 @@ mailbox_new (MailboxType type)
       nntp->user = NULL;
       nntp->passwd = NULL;
       nntp->server = NULL;
+      nntp->newsgroup = NULL;
       break;
     }
   
@@ -177,6 +179,7 @@ mailbox_free (Mailbox * mailbox)
 int
 mailbox_open (Mailbox * mailbox)
 {
+  gchar buffer[MAILTMPLEN];
   Mailbox *old_mailbox;
   MailboxMBox *mbox;
   MailboxPOP3 *pop3;
@@ -207,6 +210,52 @@ mailbox_open (Mailbox * mailbox)
 	  return FALSE;
 	}
       break;
+
+
+    case MAILBOX_POP3:
+      pop3 = (MailboxPOP3 *) mailbox;
+      balsa_app.auth_mailbox = mailbox;
+
+      sprintf (buffer, "{%s/pop3}INBOX", pop3->server);
+
+      pop3->stream = mail_open (NIL, buffer, NIL);
+      if (pop3->stream == NIL)
+	{
+	  balsa_app.current_mailbox = old_mailbox;
+	  return FALSE;
+	}
+      break;
+
+
+    case MAILBOX_IMAP:
+      imap = (MailboxIMAP *) mailbox;
+      balsa_app.auth_mailbox = mailbox;
+
+      sprintf (buffer, "{%s/imap}%s", imap->server, imap->path);
+
+      imap->stream = mail_open (NIL, buffer, NIL);
+      if (pop3->stream == NIL)
+	{
+	  balsa_app.current_mailbox = old_mailbox;
+	  return FALSE;
+	}
+      break;
+
+
+    case MAILBOX_NNTP:
+      nntp = (MailboxNNTP *) mailbox;
+      balsa_app.auth_mailbox = mailbox;
+
+      sprintf (buffer, "{%s/nntp}%s", nntp->server, nntp->newsgroup);
+
+      nntp->stream = mail_open (NIL, buffer, NIL);
+      if (nntp->stream == NIL)
+	{
+	  balsa_app.current_mailbox = old_mailbox;
+	  return FALSE;
+	}
+      break;
+
 
     default:
       balsa_app.current_mailbox = old_mailbox;

@@ -43,7 +43,7 @@ struct _BalsaSaveFileInfo
   };
 
 
-BalsaSaveFileInfo * balsa_save_file_info_new (GtkWidget * widget, Message * message, BODY * body);
+BalsaSaveFileInfo *balsa_save_file_info_new (GtkWidget * widget, Message * message, BODY * body);
 static void item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data);
 static void save_MIME_part (GtkObject * o, BalsaSaveFileInfo *);
 
@@ -309,8 +309,12 @@ balsa_message_set (BalsaMessage * bmessage,
   body2canvas (bmessage, message);
   bm_group = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
 
-  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (bm_group), &x1, &y1, &x2, &y2);
-  gnome_canvas_set_scroll_region (GNOME_CANVAS (bmessage), x1 - 10, y1 - 10, x2 + 10, y2 + 10);
+  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (bm_group),
+				&x1, &y1, &x2, &y2);
+
+  gnome_canvas_set_scroll_region (GNOME_CANVAS (bmessage),
+				  x1 - 10, y1 - 10,
+				  x2 + 10, y2 + 10);
 }
 
 static GnomeCanvasItem *

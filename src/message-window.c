@@ -21,7 +21,6 @@
 
 #include <gnome.h>
 #include "balsa-app.h"
-#include "balsa-index.h"
 #include "balsa-message.h"
 #include "main-window.h"
 #include "misc.h"
@@ -30,35 +29,32 @@ typedef struct _MessageWindow MessageWindow;
 struct _MessageWindow
   {
     GtkWidget *window;
-    GtkWidget *index;
 
     GtkWidget *bmessage;
   };
 
-void message_window_new (Message *message);
+void message_window_new (Message * message);
 
 /* callbacks */
 static void destroy_message_window (GtkWidget * widget);
-static void close_message_window (GtkWidget * widget);
-
-static void set_message_window_data (GtkObject * object, MessageWindow * mw);
-static MessageWindow *get_index_window_data (GtkObject * object);
 
 void
-message_window_new(Message *message)
+message_window_new (Message * message)
 {
   MessageWindow *mw;
   GtkWidget *vbox;
+  GtkWidget *table;
+  GtkWidget *hscrollbar;
+  GtkWidget *vscrollbar;
 
   if (!message)
     return;
 
   mw = g_malloc0 (sizeof (MessageWindow));
 
-  /* TODO check to see if already open */
+  mw->window = gnome_app_new ("balsa", "Message");
+  gtk_object_set_data (GTK_OBJECT (mw->window), "msgwin", mw);
 
-  mw->window = gnome_app_new ("balsa", "message");
-  set_message_window_data(GTK_OBJECT(mw->window),mw);
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
 		      (GtkSignalFunc) destroy_message_window,
@@ -71,56 +67,38 @@ message_window_new(Message *message)
 
   vbox = gtk_vbox_new (TRUE, 0);
   gnome_app_set_contents (GNOME_APP (mw->window), vbox);
-  gtk_widget_show (vbox);
+
+  table = gtk_table_new (2, 2, FALSE);
 
   mw->bmessage = balsa_message_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), mw->bmessage, TRUE, TRUE, 0);
+
+  gtk_table_attach_defaults (GTK_TABLE (table), mw->bmessage, 0, 1, 0, 1);
+
+  hscrollbar = gtk_hscrollbar_new (GTK_LAYOUT (mw->bmessage)->hadjustment);
+  GTK_WIDGET_UNSET_FLAGS (hscrollbar, GTK_CAN_FOCUS);
+  gtk_table_attach (GTK_TABLE (table), hscrollbar, 0, 1, 1, 2,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+  vscrollbar = gtk_vscrollbar_new (GTK_LAYOUT (mw->bmessage)->vadjustment);
+  GTK_WIDGET_UNSET_FLAGS (vscrollbar, GTK_CAN_FOCUS);
+  gtk_table_attach (GTK_TABLE (table), vscrollbar, 1, 2, 0, 1,
+		    GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+
+
+  gtk_box_pack_start (GTK_BOX (vbox), table, TRUE, TRUE, 0);
   balsa_message_set (BALSA_MESSAGE (mw->bmessage), message);
-  gtk_widget_show(mw->bmessage);
-  
-  gtk_widget_show (mw->window);
-}
 
-/*
- * set/get data convience functions used for attaching the
- * IndexWindow structure to GTK objects so it can be retrieved
- * in callbacks
- */
-static void
-set_message_window_data (GtkObject * object, MessageWindow * mw)
-{
-  gtk_object_set_data (object, "message_window_data", (gpointer) mw);
-}
-
-
-static MessageWindow *
-get_index_window_data (GtkObject * object)
-{
-  return gtk_object_get_data (object, "message_window_data");
-}
-
-
-static void
-close_message_window (GtkWidget * widget)
-{
-  MessageWindow *mw = get_index_window_data (GTK_OBJECT (widget));
-  gtk_widget_destroy (mw->window);
-  gtk_widget_destroy (mw->bmessage);
+  gtk_widget_show_all (mw->window);
 }
 
 static void
 destroy_message_window (GtkWidget * widget)
 {
-  MessageWindow *mw = get_index_window_data (GTK_OBJECT (widget));
+  MessageWindow *mw = gtk_object_get_data (GTK_OBJECT (widget), "msgwin");
+  gtk_object_remove_data (GTK_OBJECT (widget), "msgwin");
 
-#if 0
-  /* remove the mailbox from the open mailbox list */
-  open_mailbox_list = g_list_remove (open_mailbox_list, nmw);
-
-#endif
-
-  close_message_window (widget);
+  gtk_widget_destroy (mw->window);
+  gtk_widget_destroy (mw->bmessage);
 
   g_free (mw);
 }
-

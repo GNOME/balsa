@@ -465,7 +465,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
    * the clist selection mode to a mode that doesn't automagicly select, select
    * manually, then switch back */
   gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
-				GTK_SELECTION_SINGLE);
+				GTK_SELECTION_EXTENDED);
 
   list = mailbox->message_list;
   while (list)
@@ -656,7 +656,7 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
     return;
 
   if (!event || event->button != 3)
-    return;
+   return;
 
   gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   bindex = BALSA_INDEX (data);

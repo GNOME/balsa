@@ -271,17 +271,13 @@ idle_handler_cb (GtkWidget * widget)
   message = gtk_object_get_data (GTK_OBJECT (widget), "message");
   data = gtk_object_get_data (GTK_OBJECT (widget), "data");
 
-  if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
-    message_window_new (message);
+  if (bevent && bevent->button == 3)
+    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget))),
+		    NULL, NULL, NULL, NULL,
+		    bevent->button, bevent->time);
 
-  else if (bevent && bevent->button == 3)
-    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget))), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
-
-  else
-    {
-      if (BALSA_MESSAGE (((IndexChild *) data)->message))
-	balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
-    }
+  else if (BALSA_MESSAGE (((IndexChild *) data)->message))
+    balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
 
   handler = 0;
 
@@ -303,6 +299,11 @@ index_select_cb (GtkWidget * widget,
 
   set_imap_username (message->mailbox);
 
+  if (bevent && bevent->type == GDK_2BUTTON_PRESS)
+  {
+	  message_window_new (message);
+return;
+  }
   gtk_object_set_data (GTK_OBJECT (widget), "message", message);
   gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
   gtk_object_set_data (GTK_OBJECT (widget), "data", data);

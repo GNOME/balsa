@@ -1,3 +1,8 @@
+2004-08-27 08:22  PeterB
+
+	* libbalsa/mailbox_mbox.c: clear unread message count when clearing
+	the mailbox.
+
 2004-08-26 16:48  PeterB
 
 	* libbalsa/body.c, src/balsa-message.c: default content-disposition

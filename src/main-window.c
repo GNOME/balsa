@@ -1342,8 +1342,9 @@ show_about_box(void)
 {
     GtkWidget *about;
     const gchar *authors[] = {
-	"Ian Campbell <ijc25@cam.ac.uk>",
+	"Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
 	"Matthew Guenther <guentherm@asme.org>",
+	"Carlos Mongado <chbm@chbm.nu>",
 	"Pawel Salek <pawsa@theochem.kth.se>",
 	"and many others (see AUTHORS file)",
 	NULL

@@ -1,3 +1,10 @@
+2001-07-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/pop3.c: use reentrant getaddrinfo instead of gethostbyname.
+	* src/balsa-mblist.c: make use of the MailboxNode expansion status.
+	* src/main-window.c: update maintainer/author list.
+	* src/print.c: fix printing messages containing tabs.
+
 2001-07-06  Matthew Guenther <guentherm@asme.org>
 
 	* src/balsa-identity.c (config_dialog_ok_cb): Save and sync

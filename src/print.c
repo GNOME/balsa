@@ -133,44 +133,65 @@ gnome_print_show_with_charset(PrintInfo * pi, char const * text)
 }
 
 static int
-print_wrap_string(gchar * str, GnomeFont * font, gint width)
+print_wrap_string(gchar ** str, GnomeFont * font, gint width, gint tab_width)
 {
-    gchar *ptr, *line = str, *last_space = NULL;
+    gchar *ptr, *line = *str;
     gchar *eol;
-    int lines = 1;
-    double line_width;
-    g_return_val_if_fail(str, 0);
+    gint lines = 1;
+    GString *wrapped;
+    gdouble space_width = gnome_font_get_width_string_n(font, " ", 1);
 
-    line_width = 0;
-    g_strchomp(str);
+    g_return_val_if_fail(*str, 0);
+
+    g_strchomp(*str);
+    wrapped = g_string_new("");
     while (line) {
 	eol = strchr(line, '\n');
 	if (eol)
 	    *eol = '\0';
 	ptr = line;
 	while (*ptr) {
-	    line_width = 0;
-	    last_space = NULL;
+	    gint pos = 0;
+	    gdouble line_width = 0.0;
+	    gint last_space = 0;
+
 	    while (*ptr && (line_width <= width || !last_space)) {
-		if (isspace((int)*ptr)) {
-		    *ptr = ' ';
-		    last_space = ptr;
+		if (*ptr == '\t') {
+		    gint i, spc = ((pos / tab_width) + 1) * tab_width - pos;
+
+		    for (i = 0; line_width <= width && i < spc; i++, pos++) {
+			wrapped = g_string_append_c(wrapped, ' ');
+			last_space = wrapped->len - 1;
+			line_width += space_width;
+		    }
+		} else {
+		    if (isspace((int)*ptr)) {
+			wrapped = g_string_append_c(wrapped, ' ');
+			last_space = wrapped->len - 1;
+			line_width += space_width;
+		    } else {
+			wrapped = g_string_append_c(wrapped, *ptr);
+			line_width += gnome_font_get_width_string_n(font, ptr, 1);
+		    }
+		    pos++;
 		}
-		line_width += gnome_font_get_width_string_n(font, ptr++, 1);
+		ptr++;
 	    }
 	    if (*ptr) {
-		*last_space = '\n';
-		ptr = last_space + 1;
+		wrapped->str[last_space] = '\n';
 		lines++;
 	    }
 	}
 	line = eol;
 	if (eol) {
-	    *eol = '\n';
+	    wrapped = g_string_append_c(wrapped, '\n');
 	    lines++;
 	    line++;
 	}
     }
+    g_free(*str);
+    *str = wrapped->str;
+    g_string_free(wrapped, FALSE);
     return lines;
 }
 
@@ -182,21 +203,13 @@ print_wrap_string(gchar * str, GnomeFont * font, gint width)
 static gchar *
 print_line(PrintInfo * pi, gchar * pointer)
 {
-    int pos = 0, i;
+    int pos = 0;
     gchar *linebuffer;
 
     linebuffer = g_malloc(pi->chars_per_line + 1);
     while (*pointer && *pointer != '\n') {
 	if (pos < pi->chars_per_line) {
-	    switch (*pointer) {
-	    case '\t':
-		for (i = 0;
-		     pos + i < pi->chars_per_line && i < pi->tab_width;
-		     i++) linebuffer[pos++] = ' ';
-		break;
-	    default:
-		linebuffer[pos++] = *pointer;
-	    }
+	    linebuffer[pos++] = *pointer;
 	}
 	pointer++;
     }
@@ -331,7 +344,7 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     g_string_free(footer_string, FALSE);
 
     font = gnome_font_new(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_FOOT_SIZE);
-    print_wrap_string(pi->footer, font, pi->printable_width);
+    print_wrap_string(&pi->footer, font, pi->printable_width, pi->tab_width);
     gtk_object_unref(GTK_OBJECT(font));    
     
     pdata->header_label_width = 0;
@@ -345,9 +358,9 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 
     lines = 0;
     for (i = 1; i < hdr; i += 2)
-	lines += print_wrap_string(pdata->headers[i], font,
+	lines += print_wrap_string(&pdata->headers[i], font,
 				   pi->printable_width -
-				   pdata->header_label_width);
+				   pdata->header_label_width, pi->tab_width);
 
     if (pi->ypos - lines * BALSA_PRINT_HEAD_SIZE < pi->margin_bottom) {
 	lines -= (pi->ypos - pi->margin_bottom) / BALSA_PRINT_HEAD_SIZE;
@@ -492,7 +505,8 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     
     /* wrap lines (if necessary) */
     font = gnome_font_new(BALSA_PRINT_BODY_FONT, BALSA_PRINT_BODY_SIZE);
-    pdata->lines = print_wrap_string(pdata->textbuf, font, pi->printable_width);
+    pdata->lines = print_wrap_string(&pdata->textbuf, font, pi->printable_width,
+				     pi->tab_width);
     gtk_object_unref(GTK_OBJECT(font));
 
     /* calculate the y end position */
@@ -594,15 +608,15 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
 	pdata->label_width = gnome_font_get_width_string(font, pdata->labels[2]);
     pdata->label_width += 6;
 
-    lines = print_wrap_string(pdata->labels[1], font,
+    lines = print_wrap_string(&pdata->labels[1], font,
 			      pi->printable_width - pdata->label_width - 
-			      pdata->image_width - 10);
+			      pdata->image_width - 10, pi->tab_width);
     if (!lines)
 	lines = 1;
     if (pdata->labels[3])
-	lines += print_wrap_string(pdata->labels[3], font,
+	lines += print_wrap_string(&pdata->labels[3], font,
 				   pi->printable_width - pdata->label_width - 
-				   pdata->image_width - 10);
+				   pdata->image_width - 10, pi->tab_width);
     pdata->text_height = lines * BALSA_PRINT_HEAD_SIZE;
 
     pdata->part_height = (pdata->text_height > pdata->image_height) ?

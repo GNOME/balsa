@@ -174,6 +174,58 @@ computeAuthHash(char *stamp, char *hash, const char *passwd) {
 static PopStatus
 pop_connect(int *s, const gchar *host, gint port)
 {
+#ifdef HAVE_GETADDRINFO
+/* --- IPv4/6 --- */
+
+  /* "65536\0" */
+  char portstr[6];
+  struct addrinfo hints;
+  struct addrinfo* res;
+  struct addrinfo* cur;
+  int sa_size, rc;
+
+  /* we accept v4 or v6 STREAM sockets */
+  memset (&hints, 0, sizeof (hints));
+
+  hints.ai_family = ( 1/*option (OPTUSEIPV6) */) ?  AF_UNSPEC : AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+
+  snprintf (portstr, sizeof (portstr), "%d", port);
+  if(getaddrinfo (host, portstr, &hints, &res))
+      return POP_HOST_NOT_FOUND;
+
+  for(cur = res; cur != NULL; cur = cur->ai_next) {
+      *s = socket (cur->ai_family, cur->ai_socktype, cur->ai_protocol);
+      fcntl(*s, F_SETFD,FD_CLOEXEC);
+      if(*s<0) continue;
+
+      if (cur->ai_addr->sa_family == AF_INET)
+	  sa_size = sizeof (struct sockaddr_in);
+      else if (cur->ai_addr->sa_family == AF_INET6)
+	  sa_size = sizeof (struct sockaddr_in6);
+      else {
+	  libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			       _("Unknown POP socket family: %d"), 
+			       cur->ai_addr->sa_family);
+	  return POP_CONNECT_FAILED;
+      }
+      if((rc = connect(*s, cur->ai_addr, sa_size)) == 0) break;
+      close(*s);   
+  }
+  freeaddrinfo (res);
+  if(cur == NULL)
+      return POP_CONNECT_FAILED;
+#else
+  /* IPv4 only. Actually, we should never allow this code to compile
+     because gethostbyname() is not reentrant.  One should use
+     gethostbyname_r() instead but is it worth it? getaddrinfo is more
+     universal. You can override this warning by configuring balsa
+     with --disable-more-warnings. Or --disable-threads. Or
+     provide a patch.
+  */
+#ifdef _REENTRANT
+#warning "getaddrinfo() is not available, using a thread unsafe code."
+#endif
     struct sockaddr_in sin;
     gint32 n;
     struct hostent *he;
@@ -195,6 +247,7 @@ pop_connect(int *s, const gchar *host, gint port)
     
     if (connect(*s, (struct sockaddr *)&sin, sizeof(struct sockaddr_in)) == -1)
 	return POP_CONNECT_FAILED;
+#endif
 
     fcntl(*s, F_SETFL, O_NONBLOCK);
 

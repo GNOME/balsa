@@ -714,7 +714,7 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 				    /* same icon when expanded: */
 				    balsa_icon_get_pixmap(in),
 				    balsa_icon_get_bitmap(in),
-				    FALSE, FALSE);
+				    FALSE, mbnode->expanded);
 	}
 	gtk_signal_connect(GTK_OBJECT(mbnode->mailbox),
 			   "set-unread-messages-flag",

@@ -295,29 +295,29 @@ config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg)
     mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
     pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
     pl_dict_add_str_str (mbox_dict, "Username",
-			 LIBBALSA_MAILBOX_POP3(mailbox)->user);
+			 LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user);
     /* Do not save the password if the field is NULL.  This is here
        so that asving the password to the balsarc file can be optional */
-    if (LIBBALSA_MAILBOX_POP3(mailbox)->passwd)
+    if (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd)
     {
       gchar *buff;
-      buff = rot (LIBBALSA_MAILBOX_POP3(mailbox)->passwd);
+      buff = rot (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd);
       pl_dict_add_str_str (mbox_dict, "Password",
 			   buff);
       g_free (buff);
     }
     pl_dict_add_str_str (mbox_dict, "Server",
-			 LIBBALSA_MAILBOX_POP3 (mailbox)->host);
+			 LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host);
     {
       char tmp[32];
       
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->port);
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port);
       pl_dict_add_str_str (mbox_dict, "Port", tmp);
       
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->check);
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3(mailbox)->check);
       pl_dict_add_str_str (mbox_dict, "Check", tmp);
       
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server);
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server);
       pl_dict_add_str_str (mbox_dict, "Delete", tmp);
     }
     
@@ -338,23 +338,23 @@ config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg)
     mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAP");
     pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
     pl_dict_add_str_str (mbox_dict, "Server",
-			 LIBBALSA_MAILBOX_IMAP (mailbox)->host);
+			 LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host);
     
     /* Add the Port entry */
     {
       char tmp[MAX_PROPLIST_KEY_LEN];
-      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_IMAP(mailbox)->port);
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port);
       pl_dict_add_str_str (mbox_dict, "Port", tmp);
     }
     
     pl_dict_add_str_str (mbox_dict, "Path", LIBBALSA_MAILBOX_IMAP (mailbox)->path);
     pl_dict_add_str_str (mbox_dict, "Username",
-			 LIBBALSA_MAILBOX_IMAP (mailbox)->user);
+			 LIBBALSA_MAILBOX_REMOTE_SERVER (mailbox)->user);
     
-    if (LIBBALSA_MAILBOX_IMAP(mailbox)->passwd != NULL)
+    if (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd != NULL)
     {
       gchar *buff;
-      buff = rot (LIBBALSA_MAILBOX_IMAP(mailbox)->passwd);
+      buff = rot (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd);
       pl_dict_add_str_str (mbox_dict, "Password", buff);
       g_free (buff);
     }
@@ -564,23 +564,25 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     }
   else if (!strcasecmp (type, "POP3"))	/* POP3 mailbox */
     {
+      LibBalsaServer *server;
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new ());
       mailbox->name = mailbox_name;
+      server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
       if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
 	return FALSE;
-      libbalsa_mailbox_set_username(mailbox, field);
+      libbalsa_server_set_username(server, field);
 
       field = pl_dict_get_str (mbox, "Password");
       if ( field != NULL )
       {
 	gchar *buff ;
 	buff = rot (field);
-	libbalsa_mailbox_set_password (mailbox, buff);
+	libbalsa_server_set_password (server, buff);
 	g_free (buff);
       }
       else
-	libbalsa_mailbox_set_password (mailbox, NULL);
+	libbalsa_server_set_password (server, NULL);
 
       field = pl_dict_get_str (mbox, "Server");
       if (field == NULL) 
@@ -589,9 +591,9 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	gchar *port;
 	port = pl_dict_get_str (mbox, "Port");
 	if ( port != NULL )
-	  libbalsa_mailbox_set_host (mailbox, field, atoi(port));
+	  libbalsa_server_set_host (server, field, atoi(port));
 	else
-	  libbalsa_mailbox_set_host (mailbox, field, 110);
+	  libbalsa_server_set_host (server, field, 110);
       }
 
       if ((field = pl_dict_get_str (mbox, "Check")) == NULL)
@@ -614,13 +616,19 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     }
   else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
     {
-      LibBalsaMailboxImap * m;
+      LibBalsaMailboxImap *m;
+      LibBalsaServer *s;
+
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
       mailbox->name = mailbox_name;
+
+
       m = LIBBALSA_MAILBOX_IMAP(mailbox);
-      if( !get_raw_imap_data(mbox, &m->user, 
-			     &m->passwd, &m->host,
-			     &m->port, &m->path) ){
+      s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+
+      if( !get_raw_imap_data(mbox, &s->user, 
+			     &s->passwd, &s->host,
+			     &s->port, &m->path) ){
 	  gtk_object_destroy( GTK_OBJECT(mailbox) );
 	  return FALSE;
       }
@@ -1341,8 +1349,8 @@ mailbox_get_pkey(const LibBalsaMailbox * mailbox)
 
     if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) )
     {
-	    pkey = g_strdup_printf( "%s %d", LIBBALSA_MAILBOX_POP3 (mailbox)->host, 
-				    LIBBALSA_MAILBOX_POP3(mailbox)->port ); 
+	    pkey = g_strdup_printf( "%s %d", LIBBALSA_MAILBOX_REMOTE_SERVER (mailbox)->host, 
+				    LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port ); 
     }
     else if ( LIBBALSA_IS_MAILBOX_LOCAL(mailbox) )
     {
@@ -1351,8 +1359,8 @@ mailbox_get_pkey(const LibBalsaMailbox * mailbox)
     }
     else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
     {
-      pkey = g_strdup_printf( "%s %d %s", LIBBALSA_MAILBOX_IMAP (mailbox)->host, 
-			      LIBBALSA_MAILBOX_IMAP (mailbox)->port, LIBBALSA_MAILBOX_IMAP (mailbox)->path );
+      pkey = g_strdup_printf( "%s %d %s", LIBBALSA_MAILBOX_REMOTE_SERVER (mailbox)->host, 
+			      LIBBALSA_MAILBOX_REMOTE_SERVER (mailbox)->port, LIBBALSA_MAILBOX_IMAP (mailbox)->path );
     } 
     else
     {

@@ -374,27 +374,29 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
   else if ( LIBBALSA_IS_MAILBOX_POP3(mailbox) )
   {
     LibBalsaMailboxPop3 *pop3;
+    LibBalsaServer *server;
 
     mcw->the_page = MC_PAGE_POP3;
     
     pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     
-    port = g_strdup_printf ("%d", pop3->port);
+    port = g_strdup_printf ("%d", server->port);
 
     if (  mailbox->name )
       gtk_entry_set_text (GTK_ENTRY (mcw->pop_mailbox_name),
 			  mailbox->name);
 
-    if ( pop3->host )
-      gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), pop3->host);
+    if ( server->host )
+      gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), server->host);
 
     gtk_entry_set_text (GTK_ENTRY (mcw->pop_port), port);
 
-    if ( pop3->user )
-      gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), pop3->user);
+    if ( server->user )
+      gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), server->user);
 
-    if ( pop3->passwd )
-      gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), pop3->passwd);
+    if ( server->passwd )
+      gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), server->passwd);
 
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), 
 				  pop3->check);
@@ -407,23 +409,25 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
   else if ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) )
   {
     LibBalsaMailboxImap *imap;
+    LibBalsaServer *server;
 
     mcw->the_page = MC_PAGE_IMAP;
 
     imap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
     if ( mailbox->name ) 
       gtk_entry_set_text (GTK_ENTRY (mcw->imap_mailbox_name), 
 			  mailbox->name);
     
-    port = g_strdup_printf( "%d", imap->port );
+    port = g_strdup_printf("%d", server->port);
     
-    if ( imap->host ) 
-      gtk_entry_set_text (GTK_ENTRY (mcw->imap_server), imap->host);
-    if ( imap->user )
-      gtk_entry_set_text (GTK_ENTRY (mcw->imap_username), imap->user);
-    if ( imap->passwd )
-      gtk_entry_set_text (GTK_ENTRY (mcw->imap_password), imap->passwd);
+    if ( server->host ) 
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_server), server->host);
+    if ( server->user )
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_username), server->user);
+    if ( server->passwd )
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_password), server->passwd);
     gtk_entry_set_text (GTK_ENTRY (mcw->imap_port), port );
     
     if ( imap->path )
@@ -537,12 +541,7 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
 {
   LibBalsaMailboxImap *mb_imap;
   LibBalsaMailboxPop3 *mb_pop3;
-
-  gchar *username = NULL;
-  gchar *password = NULL;
-
-  gchar *host = NULL;
-  gint port = -1;
+  LibBalsaServer *server;
 
   int field_check;
 
@@ -561,25 +560,30 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
       gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
     g_free (mailbox->name);
     g_free (LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
-    mailbox->name = g_strdup (gtk_entry_get_text (
-      GTK_ENTRY (mcw->local_mailbox_name)));
+    mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
     LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
     config_mailbox_update (mailbox, old_mbox_pkey);
   }
   else if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) ) 
   {
     mb_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-    
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+
     g_free (mailbox->name);
     
     mailbox->name = g_strdup (gtk_entry_get_text (
       GTK_ENTRY (mcw->pop_mailbox_name)));
     
-    username = gtk_entry_get_text (GTK_ENTRY (mcw->pop_username));
-    password = gtk_entry_get_text (GTK_ENTRY (mcw->pop_password));
-    host = gtk_entry_get_text (GTK_ENTRY (mcw->pop_server));
-    port = atoi (gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)));
-    
+    libbalsa_server_set_username(server,
+				 gtk_entry_get_text(GTK_ENTRY(mcw->pop_username)));
+
+    libbalsa_server_set_password(server,
+				 gtk_entry_get_text(GTK_ENTRY(mcw->pop_password)));
+
+    libbalsa_server_set_host(server,
+			     gtk_entry_get_text(GTK_ENTRY(mcw->pop_server)),
+			     atoi(gtk_entry_get_text(GTK_ENTRY(mcw->pop_port))));
+
     mb_pop3->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
     mb_pop3->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
     
@@ -588,21 +592,26 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
   else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
   {
     mb_imap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     
     g_free (mailbox->name);
     g_free (mb_imap->path);
     
-    mailbox->name = g_strdup (gtk_entry_get_text (
-      GTK_ENTRY (mcw->imap_mailbox_name)));
+    mailbox->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->imap_mailbox_name)));
     
-    username = gtk_entry_get_text (GTK_ENTRY (mcw->imap_username));
-    password = gtk_entry_get_text (GTK_ENTRY (mcw->imap_password));
-    host = gtk_entry_get_text (GTK_ENTRY (mcw->imap_server));
-    port = atoi (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)));
+
+    libbalsa_server_set_username(server,
+				 gtk_entry_get_text(GTK_ENTRY(mcw->imap_username)));
+
+    libbalsa_server_set_password(server,
+				 gtk_entry_get_text(GTK_ENTRY(mcw->imap_password)));
+
+    libbalsa_server_set_host(server,
+			     gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
+			     atoi(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
     
-    mb_imap->path =  g_strdup ( gtk_entry_get_text (
-      GTK_ENTRY(gnome_entry_gtk_entry(
-	GNOME_ENTRY (mcw->imap_folderpath)))));
+    mb_imap->path =  g_strdup(gtk_entry_get_text(
+			       GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY(mcw->imap_folderpath))) ));
     
     if ( mb_imap->path == NULL ) 
       mb_imap->path = g_strdup ("INBOX");
@@ -619,10 +628,6 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
     /* Do nothing for now */
   }
 
-  libbalsa_mailbox_set_username (mailbox, username);
-  libbalsa_mailbox_set_password (mailbox, password);
-  libbalsa_mailbox_set_host (mailbox, host, port);
-  
   return 1;
 }
 
@@ -683,9 +688,13 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
       mailbox->name = g_strdup (gtk_entry_get_text (
 	  GTK_ENTRY (mcw->pop_mailbox_name)));
 
-      libbalsa_mailbox_set_username (mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
-      libbalsa_mailbox_set_password (mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
-      libbalsa_mailbox_set_host (mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), atoi (gtk_entry_get_text (GTK_ENTRY (mcw->pop_port))));
+      libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+				    gtk_entry_get_text(GTK_ENTRY(mcw->pop_username)));
+      libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+				    gtk_entry_get_text(GTK_ENTRY(mcw->pop_password)));
+      libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+				gtk_entry_get_text(GTK_ENTRY(mcw->pop_server)),
+				atoi (gtk_entry_get_text(GTK_ENTRY(mcw->pop_port))));
 
       LIBBALSA_MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
       LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
@@ -723,10 +732,13 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 
 	fill_in_imap_data(&mailbox->name, &m->path);
 
-	libbalsa_mailbox_set_username(mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
-	libbalsa_mailbox_set_password(mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
-	libbalsa_mailbox_set_host(mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)),
-				  atol ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)) ) );
+	libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+				      gtk_entry_get_text(GTK_ENTRY(mcw->imap_username)));
+	libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+				      gtk_entry_get_text(GTK_ENTRY(mcw->imap_password)));
+	libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+				  gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
+				  atol(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
 
 	if (!LIBBALSA_MAILBOX_IMAP (mailbox)->path[0]) 
 	    /* FIXME: disable when IMAPDir stuff becomes functional */

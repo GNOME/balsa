@@ -250,9 +250,9 @@ balsa_find_notebook_page(LibBalsaMailbox *mailbox)
 }
 
 static void
-set_password (gchar * pword, LibBalsaMailbox *mailbox)
+set_password (gchar *pword, LibBalsaMailbox *mailbox)
 {
-  libbalsa_mailbox_set_password( mailbox, pword);
+  libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox), pword);
   g_free(pword);
 }
 
@@ -264,8 +264,8 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox * m
   page->mailbox = mailbox;
 
   /* FIXME: This is ugly... */
-  if ((LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) ||
-      (LIBBALSA_IS_MAILBOX_POP3(mailbox) && !LIBBALSA_MAILBOX_POP3(mailbox)->passwd))
+  if ((LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd) ||
+      (LIBBALSA_IS_MAILBOX_POP3(mailbox) && !LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd))
   {
     GtkWidget *dialog;
     gint button;

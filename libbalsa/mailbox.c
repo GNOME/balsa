@@ -121,10 +121,10 @@ check_all_pop3_hosts (LibBalsaMailbox *to, GList *mailboxes)
     mailbox = list->data;
     if (LIBBALSA_MAILBOX_POP3 (mailbox)->check)
     {
-      PopHost = g_strdup (LIBBALSA_MAILBOX_POP3(mailbox)->host);
-      PopPort = (LIBBALSA_MAILBOX_POP3(mailbox)->port);
-      PopPass = g_strdup (LIBBALSA_MAILBOX_POP3(mailbox)->passwd);
-      PopUser = g_strdup (LIBBALSA_MAILBOX_POP3(mailbox)->user);
+      PopHost = g_strdup (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host);
+      PopPort = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port;
+      PopUser = g_strdup (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user);
+      PopPass = g_strdup (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd);
 
 #ifdef BALSA_USE_THREADS
       sprintf( msgbuf, "POP3: %s", LIBBALSA_MAILBOX_POP3(mailbox)->mailbox.name );
@@ -199,14 +199,14 @@ mailbox_add_for_checking (LibBalsaMailbox * mailbox)
       path = LIBBALSA_MAILBOX_LOCAL (mailbox)->path;
       user = passwd = NULL;
   }
-  else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && LIBBALSA_MAILBOX_IMAP(mailbox)->user 
-           && LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) {
+  else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user 
+           && LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd) {
       path = g_strdup_printf("{%s:%i}%s", 
-			     LIBBALSA_MAILBOX_IMAP(mailbox)->host,
-			     LIBBALSA_MAILBOX_IMAP(mailbox)->port,
+			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host,
+			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port,
 			     LIBBALSA_MAILBOX_IMAP(mailbox)->path);
-      user   = LIBBALSA_MAILBOX_IMAP(mailbox)->user;
-      passwd = LIBBALSA_MAILBOX_IMAP(mailbox)->passwd;
+      user   = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user;
+      passwd = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd;
   } else 
       return;
 
@@ -230,8 +230,8 @@ libbalsa_mailbox_has_new_messages (LibBalsaMailbox * mailbox)
       path = g_strdup(LIBBALSA_MAILBOX_LOCAL(mailbox)->path);
   else if(LIBBALSA_IS_MAILBOX_IMAP(mailbox))
       path = g_strdup_printf("{%s:%i}%s", 
-			     LIBBALSA_MAILBOX_IMAP(mailbox)->host,
-			     LIBBALSA_MAILBOX_IMAP(mailbox)->port,
+			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host,
+			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port,
 			     LIBBALSA_MAILBOX_IMAP(mailbox)->path);
   else return FALSE;
 
@@ -245,15 +245,54 @@ libbalsa_mailbox_has_new_messages (LibBalsaMailbox * mailbox)
   return FALSE;
 }
 
+
+
+static void libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *klass);
+static void libbalsa_mailbox_remote_init(LibBalsaMailboxRemote *mailbox);
+
+GtkType
+libbalsa_mailbox_remote_get_type (void)
+{
+  static GtkType mailbox_type = 0;
+
+  if (!mailbox_type)
+    {
+      static const GtkTypeInfo mailbox_info =
+      {
+	"LibBalsaMailboxRemote",
+	sizeof (LibBalsaMailbox),
+	sizeof (LibBalsaMailboxClass),
+	(GtkClassInitFunc) libbalsa_mailbox_remote_class_init,
+	(GtkObjectInitFunc) libbalsa_mailbox_remote_init,
+        /* reserved_1 */ NULL,
+	/* reserved_2 */ NULL,
+	(GtkClassInitFunc) NULL,
+      };
+
+      mailbox_type = gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
+    }
+
+  return mailbox_type;
+}
+
+static void
+libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *klass)
+{
+}
+
+static void
+libbalsa_mailbox_remote_init(LibBalsaMailboxRemote *mailbox)
+{
+  mailbox->server = NULL;
+}
+
+
 enum {
   OPEN_MAILBOX,
   CLOSE_MAILBOX,
   MESSAGE_STATUS_CHANGED,
   MESSAGE_NEW,
   MESSAGE_DELETE,
-  SET_USERNAME,
-  SET_PASSWORD,
-  SET_HOST,
   LAST_SIGNAL
 };
 
@@ -333,27 +372,6 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, message_delete),
 		    gtk_marshal_NONE__POINTER,
 		    GTK_TYPE_NONE, 1, LIBBALSA_TYPE_MESSAGE);
-  libbalsa_mailbox_signals[SET_USERNAME] =
-    gtk_signal_new ("set-username",
-		    GTK_RUN_FIRST,
-		    object_class->type,
-		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, set_username),
-		    gtk_marshal_NONE__STRING,
-		    GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
-  libbalsa_mailbox_signals[SET_PASSWORD] =
-    gtk_signal_new ("set-password",
-		    GTK_RUN_FIRST,
-		    object_class->type,
-		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, set_password),
-		    gtk_marshal_NONE__STRING,
-		    GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
-  libbalsa_mailbox_signals[SET_HOST] =
-    gtk_signal_new ("set-host",
-		    GTK_RUN_FIRST,
-		    object_class->type,
-		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, set_host),
-		    gtk_marshal_NONE__POINTER_INT,
-		    GTK_TYPE_NONE, 2, GTK_TYPE_STRING, GTK_TYPE_INT);
   
   gtk_object_class_add_signals (object_class, libbalsa_mailbox_signals, LAST_SIGNAL);
 
@@ -367,10 +385,6 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
   klass->message_delete = NULL;
 
   klass->get_message_stream = NULL;
-
-  klass->set_username = NULL;
-  klass->set_password = NULL;
-  klass->set_host = NULL;
 }
 
 static void
@@ -426,33 +440,6 @@ libbalsa_mailbox_close(LibBalsaMailbox *mailbox)
   g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
   gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[CLOSE_MAILBOX]);
-}
-
-void 
-libbalsa_mailbox_set_username(LibBalsaMailbox *mailbox, const gchar *name)
-{
-  g_return_if_fail(mailbox != NULL);
-  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_USERNAME], name);
-}
-
-void 
-libbalsa_mailbox_set_password(LibBalsaMailbox *mailbox, const gchar *passwd)
-{
-  g_return_if_fail(mailbox != NULL);
-  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_PASSWORD], passwd);
-}
-
-void 
-libbalsa_mailbox_set_host(LibBalsaMailbox *mailbox, const gchar *host, gint port)
-{
-  g_return_if_fail(mailbox != NULL);
-  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_HOST], host, port);
 }
 
 FILE*

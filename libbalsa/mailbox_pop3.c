@@ -41,9 +41,6 @@ static void libbalsa_mailbox_pop3_class_init (LibBalsaMailboxPop3Class *klass);
 static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox);
 
 static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean append);
-static void libbalsa_mailbox_pop3_set_username (LibBalsaMailbox *mailbox, const gchar *username);
-static void libbalsa_mailbox_pop3_set_passwd (LibBalsaMailbox *mailbox, const gchar *passwd);
-static void libbalsa_mailbox_pop3_set_host (LibBalsaMailbox *mailbox, const gchar *host, gint port);
 
 GtkType
 libbalsa_mailbox_pop3_get_type (void)
@@ -64,7 +61,7 @@ libbalsa_mailbox_pop3_get_type (void)
 	(GtkClassInitFunc) NULL,
       };
 
-      mailbox_type = gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
+      mailbox_type = gtk_type_unique(libbalsa_mailbox_remote_get_type(), &mailbox_info);
     }
 
   return mailbox_type;
@@ -79,44 +76,36 @@ libbalsa_mailbox_pop3_class_init (LibBalsaMailboxPop3Class *klass)
   object_class = GTK_OBJECT_CLASS(klass);
   libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-  parent_class = gtk_type_class(libbalsa_mailbox_get_type());
+  parent_class = gtk_type_class(libbalsa_mailbox_remote_get_type());
 
   object_class->destroy = libbalsa_mailbox_pop3_destroy;
 
   libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
-
-  libbalsa_mailbox_class->set_username = libbalsa_mailbox_pop3_set_username;
-  libbalsa_mailbox_class->set_password = libbalsa_mailbox_pop3_set_passwd;
-  libbalsa_mailbox_class->set_host = libbalsa_mailbox_pop3_set_host;
-
 }
 
 static void
 libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox)
 {
+  LibBalsaMailboxRemote *remote;
   mailbox->check = FALSE;
   mailbox->delete_from_server = FALSE;
 
-  mailbox->host = NULL;
-  mailbox->port = 110;
-  mailbox->user = NULL;
-  mailbox->passwd = NULL;
-
+  remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
+  remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
 }
 
 static void
 libbalsa_mailbox_pop3_destroy (GtkObject *object)
 {
   LibBalsaMailboxPop3 *mailbox = LIBBALSA_MAILBOX_POP3(object);
+  LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(object);
 
   if (!mailbox)
     return;
 
-  g_free (mailbox->host);
-  g_free (mailbox->user);
-  g_free (mailbox->passwd);
-
   g_free (mailbox->last_popped_uid);
+
+  gtk_object_destroy(GTK_OBJECT(remote->server));
 
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
@@ -158,9 +147,9 @@ static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean appen
   pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
   if ( append )
-    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (pop->host, M_APPEND, NULL);
+    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, M_APPEND, NULL);
   else
-    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (pop->host, 0, NULL);
+    CLIENT_CONTEXT (mailbox) = mx_open_mailbox (LIBBALSA_MAILBOX_REMOTE_SERVER(pop)->host, 0, NULL);
 
   if (CLIENT_CONTEXT_OPEN (mailbox))
   {
@@ -183,38 +172,4 @@ static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean appen
   
   UNLOCK_MAILBOX (mailbox);
 
-}
-
-static void libbalsa_mailbox_pop3_set_username (LibBalsaMailbox *mailbox, const gchar *username)
-{
-  LibBalsaMailboxPop3 *pop3;
-  g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
-
-  pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-
-  g_free(pop3->user);
-  pop3->user = g_strdup(username);
-}
-
-static void libbalsa_mailbox_pop3_set_passwd (LibBalsaMailbox *mailbox, const gchar *passwd)
-{
-  LibBalsaMailboxPop3 *pop3;
-  g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
-
-  pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-
-  g_free(pop3->passwd);
-  pop3->passwd = g_strdup(passwd);
-}
-
-static void libbalsa_mailbox_pop3_set_host (LibBalsaMailbox *mailbox, const gchar *host, gint port)
-{
-  LibBalsaMailboxPop3 *pop3;
-  g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
-
-  pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-
-  g_free(pop3->host);
-  pop3->host = g_strdup(host);
-  pop3->port = port;
 }

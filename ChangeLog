@@ -1,3 +1,31 @@
+2000-07-26  Stuart Parmenter <pavlov@netscape.com>
+	* libbalsa/Makefile.am:
+	* libbalsa/libbalsa.h:
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_imap.h:
+	* libbalsa/mailbox_pop3.c:
+	* libbalsa/mailbox_pop3.h:
+	* libbalsa/misc.c:
+	* libbalsa/server.c:
+	* libbalsa/server.h:
+	* src/balsa-index-page.c:
+	* src/mailbox-conf.c:
+	* src/save-restore.c:
+
+	Added LibBalsaServer object and LibBalsaMailboxRemote.  IMAP and
+ 	POP3 are now LibBalsaMailboxRemotes which contain a
+ 	LibBalsaServer.  This keeps the server information seperate from
+ 	the mailbox information.  Multiple mailboxes on an IMAP server for
+ 	example should point to the same server (they currently create
+ 	their own server object..  this should be fixed.  I will add a
+ 	hashtable to do this later.)  This abstraction should help in
+ 	added a server to the mailbox list and make things a bit more
+ 	simple.  LibBalsaServers should have a GNode tree of their
+ 	mailboxes, but they do not currently.  This will happen when I
+ 	remove the current MailboxNode stuff.
+
 2000-07-25  Stuart Parmenter <pavlov@netscape.com>
 	* src/mailbox-conf.c
 

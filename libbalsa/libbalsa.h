@@ -22,6 +22,7 @@
 #define __LIBBALSA_H__
 
 typedef struct _LibBalsaMailbox LibBalsaMailbox;
+typedef struct _LibBalsaMailboxRemote LibBalsaMailboxRemote;
 typedef struct _LibBalsaMessage LibBalsaMessage;
 typedef struct _LibBalsaContact LibBalsaContact;
 typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
@@ -40,6 +41,8 @@ typedef struct body MuttBody;
 #include "files.h"
 #include "misc.h"
 #include "mime.h"
+
+#include "server.h"
 
 #include "mailbox.h"
 #include "mailbox_local.h"

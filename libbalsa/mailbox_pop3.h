@@ -34,13 +34,7 @@ typedef struct _LibBalsaMailboxPop3Class LibBalsaMailboxPop3Class;
 
 struct _LibBalsaMailboxPop3
 {
-  LibBalsaMailbox mailbox;
-
-  gchar *host;
-  gint port;
-
-  gchar *user;
-  gchar *passwd;
+  LibBalsaMailboxRemote mailbox;
 
   gboolean check;
   gboolean delete_from_server;
@@ -49,7 +43,7 @@ struct _LibBalsaMailboxPop3
 
 struct _LibBalsaMailboxPop3Class
 {
-  LibBalsaMailboxClass klass;
+  LibBalsaMailboxRemoteClass klass;
 };
 
 GtkObject *libbalsa_mailbox_pop3_new(void);

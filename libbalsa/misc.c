@@ -156,13 +156,15 @@ add_imap_mbox_cb(const char * file, int isdir, gpointer data)
 	node = g_node_new (mbnode);
     }
     else {
+        LibBalsaServer *server;
 	mailbox = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
 	LIBBALSA_MAILBOX(mailbox)->name = g_strdup(basename);
+
+	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+	libbalsa_server_set_username(server, p->user);
+	libbalsa_server_set_password(server, p->passwd);
+	libbalsa_server_set_host(server, p->host, p->port);
 	
-	mailbox->user   = g_strdup(p->user);
-	mailbox->passwd = g_strdup(p->passwd);
-	mailbox->host   = g_strdup(p->host);
-	mailbox->port   = p->port;
 	mailbox->path	= g_strdup(file);
 
 	mailbox_add_for_checking ( LIBBALSA_MAILBOX(mailbox) );

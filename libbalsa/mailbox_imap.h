@@ -34,22 +34,15 @@ typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
 
 struct _LibBalsaMailboxImap
 {
-  LibBalsaMailbox mailbox;
-
-  gchar *host;
-  gint port;
-
-  gchar *user;
-  gchar *passwd;
+  LibBalsaMailboxRemote mailbox;
 
   gchar *path;
   gchar *tmp_file_path;
-
 };
 
 struct _LibBalsaMailboxImapClass
 {
-  LibBalsaMailboxClass klass;
+  LibBalsaMailboxRemoteClass klass;
 };
 
 GtkObject *libbalsa_mailbox_imap_new(void);

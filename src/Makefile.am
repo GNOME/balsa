@@ -14,6 +14,7 @@ balsa_SOURCES =	\
 	pref-manager.c		\
 	save-restore.c		\
 	sendmsg-window.c	\
+	addrbook.c		\
 	addrbook-manager.c	\
 	balsa-init.c
 

@@ -23,6 +23,7 @@
 #include "config.h"
 #include <gnome.h>
 #include "balsa-app.h"
+#include "addrbook.h"
 #include "addrbook-manager.h"
 
 gint delete_event (GtkWidget *, gpointer);

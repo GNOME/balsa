@@ -17,13 +17,5 @@
  * 02111-1307, USA.
  */
 
-typedef struct _addyb_item addyb_item;
-struct _addyb_item
-  {
-    gchar *name;
-    GList *email;
-    gchar *comments;
-  };
-
 void addressbook_init();
 void addressbook_window_new(GtkWidget *, gpointer);

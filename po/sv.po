@@ -663,7 +663,7 @@ msgstr "Användarnamn:"
 #. toggle for check
 #: src/mailbox-conf.c:1005 src/main-window.c:362
 msgid "Check"
-msgstr "Kolla"
+msgstr "Hämta"
 
 #. toggle for deletion from server
 #: src/mailbox-conf.c:1013
@@ -864,7 +864,7 @@ msgstr "_Brevlåda"
 
 #: src/main-window.c:362
 msgid "Check Email"
-msgstr "Kolla e-post"
+msgstr "Hämta epost"
 
 #: src/main-window.c:366
 msgid "Delete Message"

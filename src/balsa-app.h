@@ -85,8 +85,8 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
-#define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-semicondensed-*-13-*-*-*-c-*-iso8859-1"
-#define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
+#define DEFAULT_MESSAGE_FONT "monospace 11"
+#define DEFAULT_SUBJECT_FONT "helvetica Bold 11"
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
 #define DEFAULT_PAPER_SIZE "A4"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"

@@ -204,8 +204,6 @@ static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 static void show_mbtree_cb(GtkWidget * widget, gpointer data);
 static void show_mbtabs_cb(GtkWidget * widget, gpointer data);
 
-static void set_icon(GnomeApp * app);
-
 static void notebook_size_alloc_cb(GtkWidget * notebook,
                                    GtkAllocation * alloc);
 static void mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
@@ -1006,9 +1004,6 @@ balsa_window_new()
     balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_PREVIEW,
                                     balsa_app.previewpane);
 
-    /* we can only set icon after realization, as we have no windows before. */
-    g_signal_connect(G_OBJECT(window), "realize",
-                     G_CALLBACK(set_icon), NULL);
     g_signal_connect(G_OBJECT(window), "size_allocate",
                      G_CALLBACK(mw_size_alloc_cb), NULL);
     g_signal_connect(G_OBJECT (window), "destroy",
@@ -2991,70 +2986,6 @@ balsa_change_window_layout(BalsaWindow *window)
     gtk_widget_show(window->vpaned);
     gtk_widget_show(window->hpaned);
 
-}
-
-static void
-set_icon(GnomeApp * app)
-{
-    GdkPixbuf *pb = NULL;
-    GdkWindow *ic_win, *w;
-    GdkWindowAttr att;
-    XIconSize *is;
-    gint i, count, j;
-    char *filename;
-
-    w = GTK_WIDGET(app)->window;
-
-    if ((XGetIconSizes(GDK_DISPLAY(), GDK_ROOT_WINDOW(), &is, &count))
-        && (count > 0)) {
-        i = 0;                  /* use first icon size - not much point using the others */
-        att.width = is[i].max_width;
-        att.height = is[i].max_height;
-        /*
-         * raster had:
-         * att.height = 3 * att.width / 4;
-         * but this didn't work  (it scaled the icons incorrectly
-         */
-
-        /* make sure the icon is inside the min and max sizes */
-        if (att.height < is[i].min_height)
-            att.height = is[i].min_height;
-        if (att.height > is[i].max_height)
-            att.height = is[i].max_height;
-        if (is[i].width_inc > 0) {
-            j = ((att.width - is[i].min_width) / is[i].width_inc);
-            att.width = is[i].min_width + (j * is[i].width_inc);
-        }
-        if (is[i].height_inc > 0) {
-            j = ((att.height - is[i].min_height) / is[i].height_inc);
-            att.height = is[i].min_height + (j * is[i].height_inc);
-        }
-        XFree(is);
-    } else {
-        /* no icon size hints at all? ok - invent our own size */
-        att.width = 32;
-        att.height = 24;
-    }
-    att.event_mask = GDK_ALL_EVENTS_MASK;
-    att.wclass = GDK_INPUT_OUTPUT;
-    att.window_type = GDK_WINDOW_TOPLEVEL;
-    att.x = 0;
-    att.y = 0;
-    att.visual = gdk_rgb_get_visual();
-    att.colormap = gdk_rgb_get_colormap();
-    ic_win = gdk_window_new(NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
-    gdk_window_set_icon(w, ic_win, NULL, NULL);
-
-    if( (filename = balsa_pixmap_finder("balsa_icon.png")) ) {
-#if BALSA_MAJOR < 2
-        pb = gdk_pixbuf_new_from_file(filename);
-#else
-        pb = gdk_pixbuf_new_from_file(filename, NULL);
-#endif                          /* BALSA_MAJOR < 2 */
-        gdk_window_clear(ic_win);
-        g_object_unref(G_OBJECT(pb));
-        g_free(filename);
-    }
 }
 
 /* PKGW: remember when they change the position of the vpaned. */

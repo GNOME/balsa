@@ -1,3 +1,8 @@
+2003-07-25  Darko Obradovic <dobradovic gmx.de>
+
+	* src/main.c: set up the icon in a GNOME-2 compatible fashion.
+	* src/main-window.c: remove unused set_icon() routine.
+
 2003-07-23  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/balsa-app.h: change date defaults as suggested in #118118.

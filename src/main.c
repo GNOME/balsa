@@ -22,9 +22,7 @@
 #include "config.h"
 
 #include <gnome.h>
-#ifdef HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H
 #include <libgnomeui/gnome-window-icon.h>
-#endif
 
 #ifdef GTKHTML_HAVE_GCONF
 # include <gconf/gconf.h>
@@ -388,11 +386,7 @@ main(int argc, char *argv[])
     mailboxes_init();
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
-#ifdef HAVE_LIBGNOMEUI_GNOME_WINDOW_ICON_H
     gnome_window_icon_set_default_from_file(default_icon);
-#endif
-    /* GTK-2.2 has a function for this but we do not require 2.2 yet.
-       gtk_window_set_default_icon_from_file(default_icon, NULL); */
     g_free(default_icon);
 
     signal( SIGPIPE, SIG_IGN );

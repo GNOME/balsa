@@ -429,8 +429,10 @@ balsa_index_add (BalsaIndex * bindex,
 void
 balsa_index_select_next (BalsaIndex * bindex)
 {
-  gint row;
   GtkCList *clist;
+  GList *list;
+  gint i = 0;
+  gint h = 0;
 
   g_return_if_fail (bindex != NULL);
 
@@ -439,20 +441,29 @@ balsa_index_select_next (BalsaIndex * bindex)
   if (!clist->selection)
     return;
 
-  row = (gint) clist->selection->data + 1;
+  list = clist->selection;
+  while (list)
+    {
+      i = (gint) list->data;
+      if (i > h)
+	h = i;
+      list = list->next;
+    }
 
-  gtk_clist_select_row (clist, row, -1);
+  gtk_clist_select_row (clist, h + 1, -1);
 
-  if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
-    gtk_clist_moveto (clist, row, 0, 1.0, 0.0);
+  if (gtk_clist_row_is_visible (clist, h + 1) != GTK_VISIBILITY_FULL)
+    gtk_clist_moveto (clist, h + 1, 0, 1.0, 0.0);
 }
 
 
 void
 balsa_index_select_previous (BalsaIndex * bindex)
 {
-  gint row;
   GtkCList *clist;
+  GList *list;
+  gint i = 0;
+  gint h = 0;
 
   g_return_if_fail (bindex != NULL);
 
@@ -461,12 +472,21 @@ balsa_index_select_previous (BalsaIndex * bindex)
   if (!clist->selection)
     return;
 
-  row = (gint) clist->selection->data - 1;
+  h = clist->rows;		/* set this to the max number of rows */
 
-  gtk_clist_select_row (clist, row, -1);
+  list = clist->selection;
+  while (list)			/* look for the selected row with the lowest number */
+    {
+      i = (gint) list->data;
+      if (i < h)
+	h = i;
+      list = list->next;
+    }
 
-  if (gtk_clist_row_is_visible (clist, row) != GTK_VISIBILITY_FULL)
-    gtk_clist_moveto (clist, row, 0, 0.0, 0.0);
+  gtk_clist_select_row (clist, h - 1, -1);
+
+  if (gtk_clist_row_is_visible (clist, h - 1) != GTK_VISIBILITY_FULL)
+    gtk_clist_moveto (clist, h - 1, 0, 0.0, 0.0);
 }
 
 

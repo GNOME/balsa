@@ -59,14 +59,14 @@ index_child_get_type (void)
 
 /* callbacks */
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
-static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
+static GtkWidget *create_menu (BalsaIndex * bindex);
 
 /* menu item callbacks */
 static void message_status_set_new_cb (GtkWidget *, Message *);
 static void message_status_set_read_cb (GtkWidget *, Message *);
 static void message_status_set_answered_cb (GtkWidget *, Message *);
-static void delete_message_cb (GtkWidget *, Message *);
-static void undelete_message_cb (GtkWidget *, Message *);
+static void delete_message_cb (GtkWidget *, BalsaIndex *);
+static void undelete_message_cb (GtkWidget *, BalsaIndex *);
 
 void
 index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
@@ -170,8 +170,8 @@ idle_handler_cb (GtkWidget * widget)
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
 
-   else if (bevent && bevent->button == 3)
-   gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
+  else if (bevent && bevent->button == 3)
+    gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget))), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
 
   else
     balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
@@ -209,7 +209,7 @@ index_select_cb (GtkWidget * widget,
  * CLIST Callbacks
  */
 static GtkWidget *
-create_menu (BalsaIndex * bindex, Message * message)
+create_menu (BalsaIndex * bindex)
 {
   GtkWidget *menu, *menuitem, *submenu, *smenuitem;
 
@@ -261,22 +261,19 @@ create_menu (BalsaIndex * bindex, Message * message)
   gtk_widget_show (menuitem);
 
 #endif
-  if (message->flags & MESSAGE_FLAG_DELETED)
-    {
-      menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("Undelete"));
-      gtk_signal_connect (GTK_OBJECT (menuitem),
-			  "activate",
-			  (GtkSignalFunc) undelete_message_cb,
-			  message);
-    }
-  else
-    {
-      menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
-      gtk_signal_connect (GTK_OBJECT (menuitem),
-			  "activate",
-			  (GtkSignalFunc) delete_message_cb,
-			  message);
-    }
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
+  gtk_signal_connect (GTK_OBJECT (menuitem),
+		      "activate",
+		      (GtkSignalFunc) delete_message_cb,
+		      bindex);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("Undelete"));
+  gtk_signal_connect (GTK_OBJECT (menuitem),
+		      "activate",
+		      (GtkSignalFunc) undelete_message_cb,
+		      bindex);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
 
@@ -312,21 +309,52 @@ message_status_set_answered_cb (GtkWidget * widget, Message * message)
 
 
 static void
-delete_message_cb (GtkWidget * widget, Message * message)
+delete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
 {
-  g_return_if_fail (widget != NULL);
+  GtkCList *clist;
+  GList *list;
+  Message *message;
+  gint i = 0;
 
-  message_delete (message);
-  balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (bindex != NULL);
+
+  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  list = clist->selection;
+  while (list)
+    {
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message_delete (message);
+      i++;
+      list = list->next;
+    }
+
+  if (i == 1)
+    balsa_index_select_next (bindex);
 }
 
 static void
-undelete_message_cb (GtkWidget * widget, Message * message)
+undelete_message_cb (GtkWidget * widget, BalsaIndex * bindex)
 {
-  g_return_if_fail (widget != NULL);
+  GtkCList *clist;
+  GList *list;
+  Message *message;
+  gint i = 0;
 
-  message_undelete (message);
-  balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (bindex != NULL);
+
+  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  list = clist->selection;
+  while (list)
+    {
+      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message_undelete (message);
+      list = list->next;
+    }
+
+  if (i == 1)
+    balsa_index_select_next (bindex);
 }
 
 static void

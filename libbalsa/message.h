@@ -319,7 +319,8 @@ gboolean libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message);
 
 GList *libbalsa_message_find_user_hdr(LibBalsaMessage * message, 
                                       const gchar * find);
-FILE* libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id);
+GMimeStream *libbalsa_message_get_part_by_id(LibBalsaMessage * message,
+                                             const gchar * id);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     LibBalsaAddress *address);

@@ -452,14 +452,13 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
    return a message part identified by Content-ID=id
    message must be referenced. (FIXME?)
 */
-FILE*
+GMimeStream *
 libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
 {
     LibBalsaMessageBody* body = 
 	libbalsa_message_body_get_by_id(msg->body_list,	id);
     if(!body) return NULL;
-    if(!libbalsa_message_body_save_temporary(body)) return NULL;
-    return fopen(body->temp_filename, "r");
+    return libbalsa_message_body_get_stream(body);
 }
 
 

@@ -10,6 +10,7 @@ libbalsa/address-book.c
 libbalsa/address-entry.c
 libbalsa/address.c
 libbalsa/body.c
+libbalsa/files.c
 libbalsa/filter-error.c
 libbalsa/filter-file.c
 libbalsa/filter.c

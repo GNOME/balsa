@@ -1211,6 +1211,45 @@ libbalsa_utf8_sanitize(gchar **text, gboolean fallback,
     return FALSE;
 }
 
+/* libbalsa_utf8_strstr() returns TRUE if s2 is a substring of s1.
+ * libbalsa_utf8_strstr is case insensitive
+ * this functions understands utf8 strings (as you might have guessed ;-)
+ */
+gboolean
+libbalsa_utf8_strstr(const gchar *s1, const gchar *s2)
+{
+    const gchar * p,* q;
+
+    /* convention : NULL string is contained in anything */
+    if (!s2) return TRUE;
+    /* s2 is non-NULL, so if s1==NULL we return FALSE :)*/
+    if (!s1) return FALSE;
+    /* OK both are non-NULL now*/
+    /* If s2 is the empty string return TRUE */
+    if (!*s2) return TRUE;
+    while (*s1) {
+	/* We look for the first char of s2*/
+	for (;*s1 &&
+		 g_unichar_toupper(g_utf8_get_char(s2))!=g_unichar_toupper(g_utf8_get_char(s1));
+	     s1 = g_utf8_next_char(s1));
+	if (*s1) {
+	    /* We found the first char let see if this potential match is an actual one */
+	    s1 = g_utf8_next_char(s1);
+	    q = s1;
+	    p = g_utf8_next_char(s2);
+	    while (*q && *p && 
+		   g_unichar_toupper(g_utf8_get_char(p))
+		   ==g_unichar_toupper(g_utf8_get_char(q))) {
+		p = g_utf8_next_char(p);
+		q = g_utf8_next_char(q);
+	    }
+	    /* We have a match if p has reached the end of s2, ie *p==0 */
+	    if (!*p) return TRUE;
+	}
+    }
+    return FALSE;
+}
+
 /* The LibBalsaCodeset enum is not used for anything currently, but this
  * list must be the same length, and should probably be kept consistent: */
 LibBalsaCodesetInfo libbalsa_codeset_info[LIBBALSA_NUM_CODESETS] = {

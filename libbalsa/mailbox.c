@@ -272,26 +272,6 @@ libbalsa_mailbox_dispose(GObject * object)
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
 
-/* LibBalsaMailboxEntry handling code which is to be used for message
- * intex caching.  Mailbox index entry used for caching (almost) all
- * columns provided by GtkTreeModel interface. Size matters. */
-struct LibBalsaMailboxIndexEntry_ {
-    gchar *from;
-    gchar *subject;
-    time_t msg_date;
-    time_t internal_date;
-    unsigned short status_icon;
-    unsigned short attach_icon;
-    unsigned long size;
-    unsigned unseen:1;
-#define CACHE_UNSEEN_CHILD FALSE
-#if CACHE_UNSEEN_CHILD
-    /* Code for managing this cached bit is incomplete; if calculating
-     * has-unseen-child status on the fly is a performance hit, we'll
-     * have to finish it. */
-    unsigned has_unseen_child:1;
-#endif /* CACHE_UNSEEN_CHILD */
-} ;
 
 static gchar*
 get_from_field(LibBalsaMessage *message)

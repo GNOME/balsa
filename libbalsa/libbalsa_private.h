@@ -32,6 +32,26 @@ gchar *libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n);
 /* misc.c: */
 gchar *libbalsa_make_string_from_list_p(const GList * the_list);
 
+/* LibBalsaMailboxEntry handling code which is to be used for message
+ * intex caching.  Mailbox index entry used for caching (almost) all
+ * columns provided by GtkTreeModel interface. Size matters. */
+struct LibBalsaMailboxIndexEntry_ {
+    gchar *from;
+    gchar *subject;
+    time_t msg_date;
+    time_t internal_date;
+    unsigned short status_icon;
+    unsigned short attach_icon;
+    unsigned long size;
+    unsigned unseen:1;
+#define CACHE_UNSEEN_CHILD FALSE
+#if CACHE_UNSEEN_CHILD
+    /* Code for managing this cached bit is incomplete; if calculating
+     * has-unseen-child status on the fly is a performance hit, we'll
+     * have to finish it. */
+    unsigned has_unseen_child:1;
+#endif /* CACHE_UNSEEN_CHILD */
+} ;
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

@@ -129,6 +129,7 @@ gboolean libbalsa_mktempdir(gchar ** name);
 LibBalsaCodeset libbalsa_set_fallback_codeset(LibBalsaCodeset codeset);
 gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,
                                 gchar const **target);
+gboolean libbalsa_utf8_strstr(const gchar *s1,const gchar *s2);
 void libbalsa_insert_with_url(GtkTextBuffer * buffer,
                               const char *chars,
                               GtkTextTag * tag,

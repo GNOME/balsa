@@ -1,3 +1,11 @@
+2006-01-02  Pawel Salek
+
+	* libbalsa/filter.c, libbalsa/misc.[hc]: move in_string_utf8() to misc
+	* libbalsa/libbalsa_private.h:
+	* libbalsa/mailbox.c: move LibBalsaMailboxEntry def to private.h
+	* libbalsa/mailbox_local.c: implement faster searching code
+	(manyfold speedup for large mailboxes).
+
 2004-12-31 12:08  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	* libbalsa/body.h, libbalsa/files.c, libbalsa/files.h,

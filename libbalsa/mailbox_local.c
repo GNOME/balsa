@@ -30,6 +30,7 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "filter-funcs.h"
 #include "mailbox-filter.h"
 #include "misc.h"
 
@@ -363,17 +364,150 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
                                                             expunge);
 }
 
-/* Search iters */
+/* Search iters. We do not use the fallback version because it does
+   lot of reparsing. Instead, we use LibBalsaMailboxIndex entry
+   whenever possible - it is so quite frequently. This is a big
+   improvement for mailboxes of several megabytes and few thousand
+   messages.
+*/
+
+static gboolean
+message_match_real(LibBalsaMailbox *mailbox, guint msgno,
+                   LibBalsaCondition *cond)
+{
+    LibBalsaMessage *message = NULL;
+    gboolean match = FALSE;
+    gboolean is_refed = FALSE;
+    gchar *str;
+    LibBalsaMailboxIndexEntry *entry =
+        g_ptr_array_index(mailbox->mindex, msgno-1);
+
+    switch (cond->type) {
+    case CONDITION_STRING:
+        if(CONDITION_CHKMATCH(cond,
+                              CONDITION_MATCH_CC|CONDITION_MATCH_BODY|
+                              CONDITION_MATCH_US_HEAD))
+            message = libbalsa_mailbox_get_message(mailbox, msgno);
+
+        if(CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC) ||
+           CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
+            is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
+            if (!is_refed) {
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("Unable to load message body to "
+                                       "match filter"));
+                return FALSE; /* We don't want to match if an error occured */
+            }
+        }
+
+        /* do the work */
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
+            if(mailbox->view && mailbox->view->show == LB_MAILBOX_SHOW_TO)
+                match = libbalsa_utf8_strstr(entry->from,
+                                             cond->match.string.string);
+            else {
+                g_return_val_if_fail(message, FALSE);
+                str=libbalsa_make_string_from_list(message->headers->to_list);
+                match = libbalsa_utf8_strstr(str,cond->match.string.string);
+                g_free(str);
+            }
+            if(match) break;
+	}
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)) {
+            if(mailbox->view && mailbox->view->show == LB_MAILBOX_SHOW_FROM)
+                match = libbalsa_utf8_strstr(entry->from,
+                                             cond->match.string.string);
+            else if(message->headers->from) {
+                g_return_val_if_fail(message, FALSE);
+                str = libbalsa_address_to_gchar(message->headers->from,0);
+                match = libbalsa_utf8_strstr(str,cond->match.string.string);
+                g_free(str);
+            }
+	    if (match) break;
+        }
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
+	    if (libbalsa_utf8_strstr(entry->subject,
+                                     cond->match.string.string)) { 
+                match = TRUE;
+                break;
+            }
+	}
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
+            g_return_val_if_fail(is_refed, FALSE);
+	    str = libbalsa_make_string_from_list(message->headers->cc_list);
+	    match = libbalsa_utf8_strstr(str,cond->match.string.string);
+	    g_free(str);
+	    if (match) break;
+	}
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+            g_return_val_if_fail(is_refed, FALSE);
+	    if (cond->match.string.user_header) {
+		GList * header =
+		    libbalsa_message_find_user_hdr(message,
+                                                   cond->match.string
+                                                   .user_header);
+		if (header) {
+		    gchar ** tmp = header->data;
+		    if (libbalsa_utf8_strstr(tmp[1],
+                                             cond->match.string.string)) {
+			match = TRUE;
+			break;
+		    }
+		}
+	    }
+	}
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
+            GString *body;
+            g_return_val_if_fail(is_refed, FALSE);
+	    if (!message->mailbox)
+		return FALSE; /* We don't want to match if an error occured */
+	    body = content2reply(message,NULL,0,FALSE,FALSE);
+	    if (body) {
+		if (body->str)
+                    match = libbalsa_utf8_strstr(body->str,
+                                                 cond->match.string.string);
+		g_string_free(body,TRUE);
+	    }
+	}
+	break;
+    case CONDITION_REGEX:
+        break;
+    case CONDITION_DATE:
+        match = 
+            entry->msg_date >= cond->match.date.date_low &&
+            (cond->match.date.date_high==0 || 
+             entry->msg_date<=cond->match.date.date_high);
+        break;
+    case CONDITION_FLAG:
+        match = libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                                 cond->match.flags, 0);
+        break;
+    case CONDITION_AND:
+        match =
+            message_match_real(mailbox, msgno, cond->match.andor.left) &&
+            message_match_real(mailbox, msgno, cond->match.andor.right);
+        break;
+    case CONDITION_OR:
+        match =
+            message_match_real(mailbox, msgno, cond->match.andor.left) ||
+            message_match_real(mailbox, msgno, cond->match.andor.right);
+        break;
+    case CONDITION_NONE:
+        break;
+    }
+    if(message) {
+        if(is_refed) libbalsa_message_body_unref(message);
+        g_object_unref(message);
+    }
+    /* To avoid warnings */
+    return cond->negate ? !match : match;
+}
 static gboolean
 libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
 				     guint msgno,
 				     LibBalsaMailboxSearchIter * iter)
 {
-    LibBalsaMessage *message =
-	libbalsa_mailbox_get_message(mailbox, msgno);
-    gboolean res = libbalsa_condition_matches(iter->condition, message);
-    g_object_unref(message);
-    return res;
+    return message_match_real(mailbox, msgno, iter->condition);
 }
 
 /* libbalsa_mailbox_link_message:

@@ -1,3 +1,14 @@
+2003-09-26 05:30  PeterB
+
+	* src/mailbox-node.c: Change mark_imap_path() to set noselect as
+	well as noscan.
+	* libbalsa/: folder-scanners.c, folder-scanners.h: Handle
+	"lsub-response" signal; in subscribed mode, use LSUB command to
+	list paths, then followup with LIST command to get authoritative
+	flags.
+	* libbalsa/imap/imap-handle.c: Use an enum for signals; new
+	"lsub-response" signal; shared parser for LIST and LSUB responses.
+
 2003-09-25  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/Makefile.am: remove -DLIBMUTT

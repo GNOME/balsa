@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include <sys/poll.h>
 #include <unistd.h>
+#include <glib.h>
 
 #ifdef USE_TLS
 # include <openssl/ssl.h>
@@ -597,7 +598,7 @@ sio_printf (struct siobuf *sio, const char *format, ...)
   assert (sio != NULL && format != NULL);
 
   va_start (alist, format);
-  len = vsnprintf (buf, sizeof buf, format, alist);
+  len = g_vsnprintf (buf, sizeof buf, format, alist);
   va_end (alist);
   if (len >= (int) sizeof buf - 1)
     len = sizeof buf - 1;

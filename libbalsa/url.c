@@ -74,7 +74,7 @@ mutt_getvaluebyname (const char *name, const struct mapping_t *map)
   int i;
  
   for (i = 0; map[i].name; i++)
-    if (g_strcasecmp (map[i].name, name) == 0)
+    if (g_ascii_strcasecmp (map[i].name, name) == 0)
       return (map[i].value);
   return (-1);
 }
@@ -120,7 +120,7 @@ url_scheme_t url_check_scheme (const char *s)
   
   if (!s || !(t = strchr (s, ':')))
     return U_UNKNOWN;
-  if ((t - s) + 1 >= sizeof (sbuf))
+  if ((t - s) + 1 >= (glong) sizeof (sbuf))
     return U_UNKNOWN;
   
   g_stpcpy (sbuf, s);
@@ -137,7 +137,8 @@ int url_parse_file (char *d, const char *src, size_t dl)
 {
   if (strncasecmp (src, "file:", 5))
     return -1;
-  else if (!g_strncasecmp (src, "file://", 7))	/* we don't support remote files */
+  else if (!g_ascii_strncasecmp (src, "file://", 7))
+    /* we don't support remote files */
     return -1;
   else
     g_stpcpy (d, src + 5);

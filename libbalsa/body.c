@@ -32,6 +32,7 @@
 #include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
+#include "misc.h"
 
 LibBalsaMessageBody *
 libbalsa_message_body_new(LibBalsaMessage * message)

@@ -57,7 +57,7 @@ imap_auth_login(ImapMboxHandle* handle, const char* user, const char* pass)
   imap_quote_string(q_user, sizeof (q_user), user);
   imap_quote_string(q_pass, sizeof (q_pass), pass);
 
-  snprintf (buf, sizeof (buf), "LOGIN %s %s", q_user, q_pass);
+  g_snprintf (buf, sizeof (buf), "LOGIN %s %s", q_user, q_pass);
   rc = imap_cmd_exec(handle, buf);
   return  (rc== IMR_OK) ?  IMAP_SUCCESS : IMAP_AUTH_FAILURE;
 }

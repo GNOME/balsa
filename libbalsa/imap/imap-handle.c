@@ -65,7 +65,6 @@ struct _ImapMboxHandleClass {
 #define IMAP_MBOX_IS_AUTHENTICATED(h) ((h)->state == IMHS_AUTHENTICATED)
 #define IMAP_MBOX_IS_SELECTED(h)      ((h)->state == IMHS_SELECTED)
 
-typedef enum _ImapHandleSignal ImapHandleSignal;
 enum _ImapHandleSignal {
   FETCH_RESPONSE,
   LIST_RESPONSE,
@@ -74,6 +73,7 @@ enum _ImapHandleSignal {
   EXISTS_NOTIFY,
   LAST_SIGNAL
 };
+typedef enum _ImapHandleSignal ImapHandleSignal;
 
 static GObjectClass *parent_class = NULL;
 static guint imap_mbox_handle_signals[LAST_SIGNAL] = { 0 };

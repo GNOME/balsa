@@ -33,6 +33,7 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "misc.h"
 /* for mx_lock_file and mx_unlock_file */
 #include "mailbackend.h"
 

@@ -590,6 +590,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 	g_free (tmp);
       }
       break;
+
     case SEND_FORWARD:
       {
 	gchar *tmp;
@@ -621,13 +622,16 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
       tmp = make_string_from_list (message->to_list);
       gtk_entry_set_text (GTK_ENTRY (msg->cc), tmp);
-
-      gtk_entry_append_text (GTK_ENTRY (msg->cc), ", ");
-
-      tmp = make_string_from_list (message->cc_list);
-      gtk_entry_append_text (GTK_ENTRY (msg->cc), tmp);
-
       g_free (tmp);
+
+      if (messages->cc_list)
+	{
+	  gtk_entry_append_text (GTK_ENTRY (msg->cc), ", ");
+
+	  tmp = make_string_from_list (message->cc_list);
+	  gtk_entry_append_text (GTK_ENTRY (msg->cc), tmp);
+	  g_free (tmp);
+	}
     }
 
   gtk_box_pack_end (GTK_BOX (vbox),
@@ -737,7 +741,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message->cc_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)));
 
   message->reply_to = address_new ();
-  /* FIXME: include personal here? */
+
   message->reply_to->personal = g_strdup (balsa_app.real_name);
   message->reply_to->mailbox = g_strdup (balsa_app.replyto);
 
@@ -762,7 +766,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
 
   if (balsa_send_message (message))
-    if (bsmsg->type == SEND_REPLY)
+    if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
       {
 	if (bsmsg->orig_message)
 	  message_reply (bsmsg->orig_message);

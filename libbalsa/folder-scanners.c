@@ -139,8 +139,7 @@ libbalsa_scanner_local_dir(GNode *rnode, const gchar * prefix,
  * --------------------------------------------------------------------- */
 struct browser_state
 {
-  ImapHandler* mailbox_handler;
-  ImapHandler* folder_handler;
+  ImapHandler* handle_imap_path;
   ImapMark* mark_imap_path;
   GList* subfolders;
   gboolean subscribed;
@@ -149,46 +148,35 @@ struct browser_state
 };
 
 static void
-libbalsa_imap_add_folder (ImapMboxHandle* handle,
-                          int delim, ImapMboxFlags *flags, char *folder,
-                          struct browser_state *state)
+libbalsa_imap_add_folder(ImapMboxHandle * handle,
+			 int delim, ImapMboxFlags * flags, char *folder,
+			 struct browser_state *state)
 {
-    int isFolder = 0;
-    int isMailbox = 0;
+    gboolean noselect;
+    gboolean noscan;
 
     g_return_if_fail(folder && *folder);
-    if (folder[strlen(folder)-1] == delim)
+    if (folder[strlen(folder) - 1] == delim)
 	return;
 
     state->delim = delim;
-    if(!IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOSELECT)) {
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                             "ADDING MAILBOX %s\n", folder);
-	++isMailbox;
-    }
+
+    noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
+    /* These flags are different, but both mean that we don't need to
+     * scan the folder: */
+    noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
+	      || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN));
 
     /* this extra check is needed for subscribed folder handling. 
      * Read RFC when in doubt. */
-    if(!g_list_find_custom(state->subfolders, folder,
-			   (GCompareFunc)strcmp) && 
-       !IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS) &&
-       !IMAP_MBOX_HAS_FLAG(*flags,IMLIST_HASNOCHILDREN)) {
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                             "ADDING FOLDER  %s %x\n", folder, *flags);
-	    
-        state->subfolders = g_list_append(state->subfolders,
-                                          g_strdup(folder));
-	++isFolder;
-    }
+    if (!g_list_find_custom(state->subfolders, folder,
+			    (GCompareFunc) strcmp)
+	&& !noscan)
+	state->subfolders =
+	    g_list_append(state->subfolders, g_strdup(folder));
 
-    if (isMailbox)
-	state->mailbox_handler(folder, delim, state->cb_data);
-    else if (isFolder)
-	state->folder_handler(folder, delim, state->cb_data);
-
-    if (IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS)||
-        IMAP_MBOX_HAS_FLAG(*flags,IMLIST_HASNOCHILDREN))
-        state->mark_imap_path(folder, state->cb_data);
+    state->handle_imap_path(folder, delim, noselect, noscan,
+			    state->cb_data);
 }
 
 /* executed with GDK lock OFF.
@@ -226,6 +214,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     else
 	imap_mbox_list(handle, imap_path);
     g_free(imap_path);
+    state->mark_imap_path(path, state->cb_data);
 
     list = state->subfolders;
     state->subfolders = NULL;
@@ -233,7 +222,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     ++*depth;
     browse = FALSE;
     for (el = list; el && !browse; el = g_list_next(el))
-        browse = check_imap_path(server, el->data, *depth);
+        browse = check_imap_path(el->data, server, *depth);
 
     if (browse)
         for (el = list; el; el = g_list_next(el))
@@ -252,8 +241,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
                           gboolean list_inbox,
                           ImapCheck check_imap_path,
                           ImapMark mark_imap_path,
-			  ImapHandler folder_handler, 
-			  ImapHandler mailbox_handler,
+			  ImapHandler handle_imap_path,
 			  gpointer cb_data)
 {
     struct browser_state state;
@@ -267,8 +255,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     if (!handle)
 	return;
 
-    state.mailbox_handler = mailbox_handler;
-    state.folder_handler  = folder_handler;
+    state.handle_imap_path = handle_imap_path;
     state.mark_imap_path  = mark_imap_path;
     state.cb_data         = cb_data;
     state.subscribed      = subscribed;
@@ -284,7 +271,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
          * and we'll mark it as scanned, because the only reason for
          * using this option is to pickup an INBOX that isn't in the
          * tree specified by the prefix */
-        mailbox_handler("INBOX", '/', cb_data);
+        handle_imap_path("INBOX", '/', FALSE, TRUE, cb_data);
         mark_imap_path("INBOX", cb_data);
     }
 

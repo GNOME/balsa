@@ -72,11 +72,11 @@ static gboolean imap_scan_children_idle(BalsaMailboxNode ** mn);
 static GNode* add_local_mailbox(GNode*root, const char*d_name, const char* fn);
 static GNode* add_local_folder(GNode*root, const char*d_name, const char* fn);
 
-static void add_imap_mailbox(const char *fn, char delim, gpointer data);
-static void add_imap_folder(const char *fn, char delim, gpointer data);
-static gint check_imap_url(LibBalsaServer * server, const char *fn,
-                           guint depth);
-static void mark_imap_entry(const char *fn, gpointer data);
+static void handle_imap_path(const char *fn, char delim, int noselect,
+			     int noscan, void *data);
+static gint check_imap_path(const char *fn, LibBalsaServer * server,
+			    guint depth);
+static void mark_imap_path(const char *fn, void *data);
 
 enum {
     SAVE_CONFIG,
@@ -301,8 +301,8 @@ imap_scan_attach_mailbox(GNode* node, imap_scan_item * isi)
     m->path = g_strdup(isi->fn);
     libbalsa_mailbox_imap_update_url(m);
     if(balsa_app.debug)
-        printf("add_imap_mailbox: add mbox of name %s (full path %s)\n",
-               isi->fn, LIBBALSA_MAILBOX(m)->url);
+        printf("imap_scan_attach_mailbox: add mbox of name %s "
+	       "(full path %s)\n", isi->fn, LIBBALSA_MAILBOX(m)->url);
     /* avoid allocating the name again: */
     LIBBALSA_MAILBOX(m)->name = mbnode->name;
     mbnode->name = NULL;
@@ -347,9 +347,9 @@ imap_dir_cb_real(void* r)
 
     libbalsa_scanner_imap_dir(root, mb->server, mb->dir, mb->subscribed,
                               mb->list_inbox, 
-                              check_imap_url,
-                              mark_imap_entry,
-			      add_imap_folder, add_imap_mailbox,
+                              check_imap_path,
+                              mark_imap_path,
+			      handle_imap_path,
 			      &imap_tree);
     if (!balsa_app.mailbox_nodes) {
         /* Quitt'n time! */
@@ -1176,16 +1176,17 @@ imap_scan_create_mbnode(GNode * root, imap_scan_item * isi, char delim)
     return g_node_append(parent, node);
 }
 
-/* add_imap_mailbox:
+/* handle_imap_path:
    add given mailbox unless its base name begins on dot.
 */
 static void
-add_imap_entry(const char* fn, char delim, gboolean selectable, void* data)
+add_imap_entry(const char *fn, char delim, gboolean noscan,
+	       gboolean selectable, void *data)
 {
     imap_scan_tree *tree = (imap_scan_tree *) data;
     imap_scan_item *item = g_new0(imap_scan_item, 1);
     item->fn = g_strdup(fn);
-    item->scanned = FALSE;
+    item->scanned = noscan;
     item->selectable = selectable;
 
     tree->list = g_slist_prepend(tree->list, item);
@@ -1208,30 +1209,24 @@ imap_scan_destroy_tree(imap_scan_tree * tree)
 }
 
 static void
-add_imap_mailbox(const char* fn, char delim, void* data)
-{ 
-    const gchar *basename = strrchr(fn, delim);
-    if(!basename) basename = fn;
-    else { 
-	if(*++basename == '.' && delim != '.') /* ignore mailboxes
-						  that begin with a dot */
-	    return; 
+handle_imap_path(const char *fn, char delim, int noselect, int noscan,
+		 void *data)
+{
+    if (!noselect) {
+	const gchar *basename = strrchr(fn, delim);
+	if (basename && *++basename == '.' && delim != '.')
+	    /* ignore mailboxes that begin with a dot */
+	    return;
     }
-    if(balsa_app.debug) 
-	printf("add_imap_mailbox: Adding mailbox of path %s\n", fn);
-    add_imap_entry(fn, delim, TRUE, data);
-}
-
-static void
-add_imap_folder(const char* fn, char delim, void* data)
-{ 
-    if(balsa_app.debug) 
-	printf("add_imap_folder: Adding folder of path %s\n", fn);
-    add_imap_entry(fn, delim, FALSE, data); 
+    if (balsa_app.debug)
+	printf("handle_imap_path: Adding mailbox of path \"%s\" "
+	       "delim `%c' noselect %d noscan %d\n",
+	       fn, delim, noselect, noscan);
+    add_imap_entry(fn, delim, noscan, !noselect, data);
 }
 
 /*
- * check_imap_url: Check an imap path to see whether we need to scan it.
+ * check_imap_path: Check an imap path to see whether we need to scan it.
  * 
  * server:      LibBalsaServer for the folders;
  * fn:          folder name;
@@ -1246,7 +1241,7 @@ struct _CheckImapPathInfo {
 };
 
 static void
-check_imap_url_func(const gchar * url, LibBalsaMailboxView * view,
+check_imap_path_func(const gchar * url, LibBalsaMailboxView * view,
                      CheckImapPathInfo * cipi)
 {
     if ((view->exposed || view->open) && !cipi->must_scan)
@@ -1255,7 +1250,7 @@ check_imap_url_func(const gchar * url, LibBalsaMailboxView * view,
 }
 
 static gint
-check_imap_url(LibBalsaServer * server, const gchar *fn, guint depth)
+check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
 {
     CheckImapPathInfo cipi;
 
@@ -1268,27 +1263,27 @@ check_imap_url(LibBalsaServer * server, const gchar *fn, guint depth)
     cipi.imap_url = libbalsa_imap_url(server, fn);
     cipi.must_scan = FALSE;
     g_hash_table_foreach(balsa_app.mailbox_views,
-                         (GHFunc) check_imap_url_func, &cipi);
+                         (GHFunc) check_imap_path_func, &cipi);
     if(balsa_app.debug) 
-	printf("check_imap_url: path \"%s\" must_scan %d.\n",
+	printf("check_imap_path: path \"%s\" must_scan %d.\n",
                cipi.imap_url, cipi.must_scan);
     g_free(cipi.imap_url);
 
     return cipi.must_scan;
 }
 
-/* mark_imap_entry:
+/* mark_imap_path:
  *
  * find the imap_scan_item for fn and mark it as scanned.
  */
 static void
-mark_imap_entry(const char *fn, gpointer data)
+mark_imap_path(const char *fn, gpointer data)
 {
     imap_scan_tree *tree = data;
     GSList *list;
 
     if(balsa_app.debug) 
-	printf("mark_imap_entry: find path \"%s\".\n", fn);
+	printf("mark_imap_path: find path \"%s\".\n", fn);
     for (list = tree->list; list; list = list->next) {
         imap_scan_item *item = list->data;
         if (!strcmp(item->fn, fn)) {

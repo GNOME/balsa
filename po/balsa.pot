@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-19 23:29-0400\n"
+"POT-Creation-Date: 1998-08-21 07:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#: src/balsa-index.c:186
+#: src/balsa-index.c:184
 msgid "From"
 msgstr ""
 
-#: src/balsa-index.c:187
+#: src/balsa-index.c:185
 msgid "Subject"
 msgstr ""
 
-#: src/balsa-index.c:188
+#: src/balsa-index.c:186
 msgid "Date"
 msgstr ""
 
@@ -113,35 +113,35 @@ msgstr ""
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#: src/index-child.c:198
+#: src/index-child.c:192
 msgid "Transfer"
 msgstr ""
 
-#: src/index-child.c:216
+#: src/index-child.c:210
 msgid "Change Status"
 msgstr ""
 
-#: src/index-child.c:219
+#: src/index-child.c:213
 msgid "Unread"
 msgstr ""
 
-#: src/index-child.c:225
+#: src/index-child.c:219
 msgid "Read"
 msgstr ""
 
-#: src/index-child.c:231
+#: src/index-child.c:225
 msgid "Replied"
 msgstr ""
 
-#: src/index-child.c:237
+#: src/index-child.c:231
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:247 src/main-window.c:262
+#: src/index-child.c:241 src/main-window.c:262
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:255 src/main-window.c:248 src/main-window.c:411
+#: src/index-child.c:249 src/main-window.c:248 src/main-window.c:411
 msgid "Delete"
 msgstr ""
 
@@ -393,7 +393,7 @@ msgstr ""
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1357
+#: libbalsa/mailbox.c:1352
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

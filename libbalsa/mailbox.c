@@ -1304,6 +1304,8 @@ mime_content_type2str (int contenttype)
       return "TEXT";
     case TYPEVIDEO:
       return "VIDEO";
+    default:
+      return "";
     }
 }
 
@@ -1318,12 +1320,6 @@ message_body_ref (Message * message)
   HEADER *cur;
   MESSAGE *msg;
   BODY *b;
-  FILE *fp;
-  STATE s;
-  gchar *buf;
-  gchar tmpfile[PATH_MAX];
-  gchar tmpfile1[PATH_MAX];
-  size_t size;
 
   if (!message)
     return;
@@ -1350,7 +1346,6 @@ message_body_ref (Message * message)
     }
   if (msg != NULL)
     {
-      GString *mbuf = g_string_new (NULL);
       BODY *bdy = cur->content;
 
       if (balsa_app.debug)

@@ -200,8 +200,9 @@ balsa_message_set (BalsaMessage * bmessage,
   /* HTML footer */
   buff = g_realloc (buff, strlen (buff) + strlen (HTML_FOOT) + 1);
   strcat (buff, HTML_FOOT);
-
+#ifdef DEBUG
   fprintf (stderr, buff);
+#endif
 /* set message contents */
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
   g_free (buff);

@@ -1,3 +1,9 @@
+2000-11-07  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* lt.po: Updated Lithuanian translation.
+	* update.pl: Updated from gnumeric.
+	* update.sh: Removed, it's obsolete.
+
 2000-11-06  Manuel de Vega Barreiro <barreiro@arrakis.es>
 
 	* es.po: Updated Spanish translation

@@ -1017,10 +1017,6 @@ static GtkWidget *
 create_text_area(BalsaSendmsg * msg)
 {
     GtkWidget *table;
-    GtkWidget *hscrollbar;
-    GtkWidget *vscrollbar;
-
-    table = gtk_table_new(2, 2, FALSE);
 
     msg->text = gtk_text_new(NULL, NULL);
     gtk_text_set_editable(GTK_TEXT(msg->text), TRUE);
@@ -1028,20 +1024,11 @@ create_text_area(BalsaSendmsg * msg)
     balsa_spell_check_set_text(BALSA_SPELL_CHECK(msg->spell_checker),
 			       GTK_TEXT(msg->text));
 
-    /*gtk_widget_set_usize (msg->text, 
-       (82 * 7) + (2 * msg->text->style->klass->xthickness), 
-       -1); */
-    gtk_widget_show(msg->text);
-    gtk_table_attach_defaults(GTK_TABLE(table), msg->text, 0, 1, 0, 1);
-    hscrollbar = gtk_hscrollbar_new(GTK_TEXT(msg->text)->hadj);
-    GTK_WIDGET_UNSET_FLAGS(hscrollbar, GTK_CAN_FOCUS);
-    gtk_table_attach(GTK_TABLE(table), hscrollbar, 0, 1, 1, 2,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
-
-    vscrollbar = gtk_vscrollbar_new(GTK_TEXT(msg->text)->vadj);
-    GTK_WIDGET_UNSET_FLAGS(vscrollbar, GTK_CAN_FOCUS);
-    gtk_table_attach(GTK_TABLE(table), vscrollbar, 1, 2, 0, 1,
-		     GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+    table = gtk_scrolled_window_new(GTK_TEXT(msg->text)->hadj,
+				    GTK_TEXT(msg->text)->vadj);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
+    				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(table), msg->text);
 
     gtk_widget_show_all(GTK_WIDGET(table));
 

@@ -1,3 +1,8 @@
+2000-11-07  Gediminas Paulauskas  <menesis@delfi.lt>
+
+	* src/sendmsg-window.c: (create_text_area) put text widget in scrolled
+	window instead of table+scrollbars. Do not show useless hor. scrollbar.
+
 2000-11-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: fix message multiplication in threaded code on

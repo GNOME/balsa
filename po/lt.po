@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.0\n"
-"POT-Creation-Date: 2000-10-16 23:50+0300\n"
-"PO-Revision-Date: 2000-10-17 00:38+0300\n"
+"POT-Creation-Date: 2000-11-07 13:54+0200\n"
+"PO-Revision-Date: 2000-11-07 12:54+0200\n"
 "Last-Translator: Gediminas Paulauskas <menesis@delfi.lt>\n"
 "Language-Team: Lithuanian <komp_lt@konferencijos.lt>\n"
 "MIME-Version: 1.0\n"
@@ -27,29 +27,36 @@ msgid ""
 "Failed to bind to server: %s\n"
 "Check that the servername is valid."
 msgstr ""
+"nepavyko prisiriðti prie serverio: %s\n"
+"Patikrink, ar serverio vardas teisingas."
 
 #: libbalsa/address-book-ldap.c:246
 #, c-format
 msgid "Failed to do a search: %sCheck that the base name is valid."
 msgstr ""
 
-#: libbalsa/address-book-ldap.c:322 libbalsa/address-book-vcard.c:189
+#: libbalsa/address-book-ldap.c:322 libbalsa/address-book-vcard.c:192
 msgid "No-Id"
 msgstr "Be-Id"
 
-#: libbalsa/address-book-ldap.c:329 libbalsa/address-book-vcard.c:198
+#: libbalsa/address-book-ldap.c:329 libbalsa/address-book-vcard.c:201
 msgid "No-Name"
 msgstr "Be-Vardo"
 
-#: libbalsa/address-book-vcard.c:315
+#: libbalsa/address-book-vcard.c:170
+#, c-format
+msgid "Could not open vCard address book %s."
+msgstr "Negalëjau atidaryti vCard adresø knygelës %s."
+
+#: libbalsa/address-book-vcard.c:318
 #, c-format
 msgid "%s is already in address book."
 msgstr "%s jau yra adresø knygelëje."
 
-#: libbalsa/address-book-vcard.c:325
+#: libbalsa/address-book-vcard.c:328
 #, c-format
-msgid "Cannot open vCard address book %s\n"
-msgstr "Negaliu atidaryti vCard adresø knygelës %s\n"
+msgid "Cannot open vCard address book %s for saving\n"
+msgstr "Negaliu atidaryti iðsaugojimui vCard adresø knygelës %s\n"
 
 #: libbalsa/address-book.c:170
 #, c-format
@@ -66,17 +73,17 @@ msgstr "Nëra tokio adresø knygelës tipo: %s"
 msgid "Could not create a address book of type %s"
 msgstr "Negaliu sukurti tipo %s adresø knygelës"
 
-#: libbalsa/mailbox.c:276
+#: libbalsa/mailbox.c:275
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Negaliu ákelti dëþutës %s"
 
-#: libbalsa/mailbox.c:283
+#: libbalsa/mailbox.c:282
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Nëra tokio dëþutës tipo: %s"
 
-#: libbalsa/mailbox.c:291
+#: libbalsa/mailbox.c:290
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Negaliu sukurti tipo %s dëþutës"
@@ -96,12 +103,12 @@ msgstr "LibBalsaMailboxLocal: Atidarau %s Pasikartojimas: %d\n"
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Atidarau %s Pasikartojimas: %d\n"
 
-#: libbalsa/send.c:788
+#: libbalsa/send.c:753
 #, c-format
 msgid "Could not find address for host %s."
 msgstr "Nepavyko rasti adreso hostui %s."
 
-#: libbalsa/send.c:794
+#: libbalsa/send.c:759
 #, c-format
 msgid "Error: Could not find address for host %s."
 msgstr "Klaida: Nepavyko rasti adreso hostui %s."
@@ -173,8 +180,8 @@ msgstr "Viskas atlikta!"
 msgid "Please enter information about yourself."
 msgstr "Praðom ávesti þinias apie save."
 
-#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:228
-#: src/address-book.c:446
+#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:252
+#: src/address-book.c:470
 msgid "Name:"
 msgstr "Vardas:"
 
@@ -219,13 +226,17 @@ msgstr ""
 "savaime. Praðom uþmesti aká á ¥Apie...´ dialogà, ten rasi daugiau\n"
 "informacijos, kaip susisiekti su autoriais ar praneðti klaidas."
 
-#: libinit_balsa/balsa-initdruid.gob:96
+#: libinit_balsa/balsa-initdruid.gob:97
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
 "Tu iðeisi ið Balsa. Nejaugi\n"
 "tikrai nori tai padaryti?"
+
+#: libinit_balsa/balsa-initdruid.gob:119
+msgid "GnomeCard Address Book"
+msgstr "GnomeCard Adresø knygelë"
 
 #: libinit_balsa/helper.c:142
 #, c-format
@@ -564,44 +575,44 @@ msgstr "Sertiðikatas iðsaugotas"
 msgid "Continue?"
 msgstr "Tæsti?"
 
-#: src/address-book.c:216
+#: src/address-book.c:240
 msgid "Add New Address"
 msgstr "Pridëti naujà adresà"
 
-#: src/address-book.c:235
+#: src/address-book.c:259
 msgid "E-Mail Address:"
 msgstr "El. paðto adresas:"
 
-#: src/address-book.c:363 src/filter-edit-dialog.c:130
+#: src/address-book.c:387 src/filter-edit-dialog.c:130
 msgid "Name"
 msgstr "Vardas"
 
-#: src/address-book.c:363
+#: src/address-book.c:387
 msgid "E-Mail Address"
 msgstr "El. paðto adresas"
 
-#: src/address-book.c:370
+#: src/address-book.c:394
 msgid "Address Book"
 msgstr "Adresø knygelë"
 
-#: src/address-book.c:499
+#: src/address-book.c:523
 msgid "Send-To"
 msgstr "Siøsti kam"
 
-#: src/address-book.c:523
+#: src/address-book.c:549
 msgid "Run GnomeCard"
 msgstr "Paleisti GnomeCard"
 
-#: src/address-book.c:532
+#: src/address-book.c:558
 msgid "Re-Import"
 msgstr "Vël importuoti"
 
 #. mode switching stuff
-#: src/address-book.c:540
+#: src/address-book.c:566
 msgid "Import first address only"
 msgstr "Importuoti tik pirmà adresà"
 
-#: src/address-book.c:543
+#: src/address-book.c:569
 msgid "Import all adresses"
 msgstr "Importuoti visus adresus"
 
@@ -636,8 +647,8 @@ msgid "Address Book Name:"
 msgstr "Adresø knygelës pavadinimas:"
 
 #: src/address-book-config.c:321
-msgid "Path"
-msgstr "Kelias"
+msgid "File name"
+msgstr "Bylos vardas"
 
 #: src/address-book-config.c:333 src/address-book-config.c:404
 msgid "Expand aliases as you type"
@@ -657,6 +668,15 @@ msgstr ""
 msgid "Add"
 msgstr "Pridëti"
 
+#: src/address-book-config.c:506
+#, c-format
+msgid ""
+"The address book file path '%s' is not correct.\n"
+"Do you want to correct the file name?"
+msgstr ""
+"Adresø knygelës kelias ¥%s´ nëra teisingas.\n"
+"Ar nori já pataisyti?"
+
 #: src/balsa-app.c:72
 #, c-format
 msgid ""
@@ -671,7 +691,7 @@ msgstr ""
 msgid "Mailbox password for %s@%s:"
 msgstr "Paðto dëþutës %s@%s slaptaþodis: "
 
-#: src/balsa-index-page.c:256
+#: src/balsa-index-page.c:257
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -679,41 +699,41 @@ msgstr ""
 "Negaliu atidaryti paðto dëþutës!\n"
 "Praðom patikrinti dëþutës savybes."
 
-#: src/balsa-index-page.c:512
+#: src/balsa-index-page.c:526
 msgid "Reply..."
 msgstr "Atsakyti..."
 
-#: src/balsa-index-page.c:516
+#: src/balsa-index-page.c:530
 msgid "Reply To All..."
 msgstr "Atsakyti visiems..."
 
-#: src/balsa-index-page.c:520
+#: src/balsa-index-page.c:534
 msgid "Forward..."
 msgstr "Persiøsti..."
 
-#: src/balsa-index-page.c:525
+#: src/balsa-index-page.c:539
 msgid "Undelete"
 msgstr "Sugràþinti"
 
-#: src/balsa-index-page.c:528 src/filter-edit-dialog.c:224
-#: src/main-window.c:452 src/mblist-window.c:483 src/pref-manager.c:1243
+#: src/balsa-index-page.c:542 src/filter-edit-dialog.c:224
+#: src/main-window.c:442 src/mblist-window.c:475 src/pref-manager.c:1243
 #: src/pref-manager.c:2253
 msgid "Delete"
 msgstr "Iðtrinti"
 
-#: src/balsa-index-page.c:532
+#: src/balsa-index-page.c:546
 msgid "Move To Trash"
 msgstr "Iðmesti á ðiukðlinæ"
 
-#: src/balsa-index-page.c:537
+#: src/balsa-index-page.c:551
 msgid "Store Address..."
 msgstr "Áraðyti adresà..."
 
-#: src/balsa-index-page.c:540
+#: src/balsa-index-page.c:554
 msgid "Toggle Flagged"
 msgstr "Perjungti svarbà"
 
-#: src/balsa-index-page.c:549
+#: src/balsa-index-page.c:557
 msgid "Transfer"
 msgstr "Perkelti"
 
@@ -747,100 +767,104 @@ msgstr "Nauji"
 msgid "Total"
 msgstr "Iðvis"
 
-#: src/balsa-mblist.c:734
+#: src/balsa-mblist.c:736
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Rodoma dëþutë %s: %ld laiðkai, %ld nauji"
 
-#: src/balsa-message.c:285 src/balsa-message.c:288
+#: src/balsa-message.c:287 src/balsa-message.c:290
 msgid "Save MIME Part"
 msgstr "Iðsaugoti MIME dalá"
 
-#: src/balsa-message.c:286
+#: src/balsa-message.c:288
 msgid "Save"
 msgstr "Iðsaugoti"
 
-#: src/balsa-message.c:286 src/sendmsg-window.c:155 src/sendmsg-window.c:657
-#: src/sendmsg-window.c:1751 src/sendmsg-window.c:1774
+#: src/balsa-message.c:288 src/sendmsg-window.c:155 src/sendmsg-window.c:634
+#: src/sendmsg-window.c:1715 src/sendmsg-window.c:1738
 msgid "Cancel"
 msgstr "Atðaukti"
 
-#: src/balsa-message.c:298
+#: src/balsa-message.c:300
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "Pasirink vardà bylos, á kurià iðsaugoti ðià laiðko dalá:"
 
-#: src/balsa-message.c:329
+#: src/balsa-message.c:331
 #, c-format
 msgid " Could not save %s:%s "
 msgstr "Negaliu iðsaugoti %s:%s"
 
 #. Subject:
-#: src/balsa-message.c:604 src/print.c:358 src/sendmsg-window.c:899
+#: src/balsa-message.c:625 src/print.c:358 src/sendmsg-window.c:876
 msgid "Subject:"
 msgstr "Tema:"
 
-#: src/balsa-message.c:607 src/print.c:361
+#: src/balsa-message.c:628 src/print.c:361
 msgid "Date:"
 msgstr "Data:"
 
 #. From:
-#: src/balsa-message.c:612 src/filter-edit-dialog.c:316 src/print.c:348
-#: src/sendmsg-window.c:890
+#: src/balsa-message.c:633 src/filter-edit-dialog.c:316 src/print.c:348
+#: src/sendmsg-window.c:867
 msgid "From:"
 msgstr "Nuo:"
 
 #. To:
-#: src/balsa-message.c:616 src/filter-edit-dialog.c:306 src/print.c:353
-#: src/sendmsg-window.c:893
+#: src/balsa-message.c:637 src/filter-edit-dialog.c:306 src/print.c:353
+#: src/sendmsg-window.c:870
 msgid "To:"
 msgstr "Kam:"
 
-#: src/balsa-message.c:617
+#: src/balsa-message.c:638
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/balsa-message.c:618
+#: src/balsa-message.c:639
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:621
+#: src/balsa-message.c:642
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:687
+#: src/balsa-message.c:708
 msgid "Could not load image. It is most likely corrupted."
 msgstr "Negaliu ákelti paveikslëlio. Tikriausiai jis sugadintas."
 
-#: src/balsa-message.c:692
+#: src/balsa-message.c:713
 msgid "Couldn't render image\n"
 msgstr "Nepavyko parodyti paveikslëlio\n"
 
-#: src/balsa-message.c:751
+#: src/balsa-message.c:771
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Nei perþiûros, nei atidarymo veiksmas ðiam turinio tipui nëra apibrëþtas "
 "Gnome MIME."
 
-#: src/balsa-message.c:755
+#: src/balsa-message.c:775
 #, c-format
 msgid "Content Type: %s"
 msgstr "Turinio tipas: %s"
 
-#: src/balsa-message.c:760
+#: src/balsa-message.c:780
 #, c-format
 msgid "Filename: %s"
 msgstr "Bylos vardas: %s"
 
-#: src/balsa-message.c:768
+#: src/balsa-message.c:788
 msgid "Save part"
 msgstr "Iðsaugoti dalá"
 
-#: src/balsa-message.c:791
+#: src/balsa-message.c:812
 #, c-format
 msgid "View part with %s"
 msgstr "Perþiûrëti dalá su %s"
 
-#: src/balsa-message.c:1463
+#: src/balsa-message.c:1417
+msgid "Save..."
+msgstr "Iðsaugoti..."
+
+#: src/balsa-message.c:1474
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "nepavyko sukurti laikinos bylos %s"
@@ -941,7 +965,7 @@ msgstr "Tekste"
 msgid "Match string:"
 msgstr "Ieðkoma eilutë:"
 
-#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:565
+#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:543
 msgid "Remove"
 msgstr "Paðalinti"
 
@@ -1037,7 +1061,8 @@ msgstr "Vietinë paðto dëþutë ákelta vardu %s\n"
 #: src/mailbox-conf.c:151
 #, c-format
 msgid ""
-"This will remove the mailbox %s and it's files permanently from your system.\n"
+"This will remove the mailbox %s and it's files permanently from your "
+"system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 "Að visam laikui ið sistemos iðtrinsiu paðto dëþutæ ¥%s´ \n"
@@ -1182,7 +1207,7 @@ msgid "Use APOP"
 msgstr "Naudoti APOP"
 
 #. toggle for check
-#: src/mailbox-conf.c:917 src/main-window.c:447
+#: src/mailbox-conf.c:917 src/main-window.c:437
 msgid "Check"
 msgstr "Tikrinti"
 
@@ -1194,322 +1219,322 @@ msgstr "Iðtrinti ið serverio"
 msgid "Folder path:"
 msgstr "Aplanko kelias:"
 
-#: src/main-window.c:202
+#: src/main-window.c:184
 msgid "_Message..."
 msgstr "_Laiðkas..."
 
-#: src/main-window.c:202
+#: src/main-window.c:184
 msgid "Compose a new message"
 msgstr "Sukurti naujà laiðkà"
 
-#: src/main-window.c:207
+#: src/main-window.c:189
 msgid "_Mailbox..."
 msgstr "_Dëþutë..."
 
-#: src/main-window.c:207
+#: src/main-window.c:189
 msgid "Add a new mailbox"
 msgstr "Pridëti naujà dëþutæ"
 
-#: src/main-window.c:214
+#: src/main-window.c:196
 msgid "_New"
 msgstr "_Naujas"
 
-#: src/main-window.c:218
+#: src/main-window.c:200
 msgid "_Continue"
 msgstr "_Tæsti"
 
-#: src/main-window.c:219
+#: src/main-window.c:201
 msgid "Continue editing current message"
 msgstr "Tæsti esamos þinutës taisymà"
 
-#: src/main-window.c:226
+#: src/main-window.c:208
 msgid "_Get New Mail"
 msgstr "_Gauti naujus laiðkus"
 
-#: src/main-window.c:226
+#: src/main-window.c:208
 msgid "Fetch new incoming mail"
 msgstr "Parsiøsti naujà gaunamà paðtà"
 
-#: src/main-window.c:232
+#: src/main-window.c:214
 msgid "_Send Queued Mail"
 msgstr "Ið_siøsti eilëje laukiantá paðtà"
 
-#: src/main-window.c:233
+#: src/main-window.c:215
 msgid "Send mail from the outbox"
 msgstr "Iðsiøsti paðtà ið ¥Siunèiama´ dëþutës"
 
-#: src/main-window.c:241
+#: src/main-window.c:223
 msgid "_Address Book..."
 msgstr "_Adresø knygelë..."
 
-#: src/main-window.c:242
+#: src/main-window.c:224
 msgid "Opens the address book"
 msgstr "Atidaryti adresø knygelæ"
 
-#: src/main-window.c:279
+#: src/main-window.c:262
 msgid "_Filters..."
 msgstr "_Filtrai..."
 
-#: src/main-window.c:279
+#: src/main-window.c:262
 msgid "Manage filters"
 msgstr "Tvarkyti filtrus"
 
-#: src/main-window.c:286
+#: src/main-window.c:269
 msgid "N_o Headers"
 msgstr "_Jokiø antraðèiø"
 
-#: src/main-window.c:286
+#: src/main-window.c:269
 msgid "Display no headers"
 msgstr "Nerodyti jokiø antraðèiø"
 
-#: src/main-window.c:288
+#: src/main-window.c:271
 msgid "S_elected Headers"
 msgstr "_Pasirinktos antraðtës"
 
-#: src/main-window.c:289
+#: src/main-window.c:272
 msgid "Display selected headers"
 msgstr "Rodyti tik pasirinktas antraðtes"
 
-#: src/main-window.c:291
+#: src/main-window.c:274
 msgid "All _Headers"
 msgstr "_Visos antraðtës"
 
-#: src/main-window.c:291
+#: src/main-window.c:274
 msgid "Display all headers"
 msgstr "Rodyti visas antraðtes"
 
-#: src/main-window.c:298
+#: src/main-window.c:281
 msgid "_Show Mailbox Tree"
 msgstr "_Rodyti dëþuèiø medá"
 
-#: src/main-window.c:302
+#: src/main-window.c:285
 msgid "Show Mailbox _Tabs"
 msgstr "Rodyti dëþuèiø _korteles"
 
-#: src/main-window.c:307 src/message-window.c:94
+#: src/main-window.c:290 src/message-window.c:94
 msgid "_Wrap"
 msgstr "_Lauþyti"
 
-#: src/main-window.c:318 src/message-window.c:103
+#: src/main-window.c:301 src/message-window.c:103
 msgid "_Reply..."
 msgstr "_Atsakyti..."
 
-#: src/main-window.c:319
+#: src/main-window.c:302
 msgid "Reply to the current message"
 msgstr "Atsakyti á esamà laiðkà"
 
-#: src/main-window.c:325
+#: src/main-window.c:308
 msgid "Reply To _All..."
 msgstr "Atsakyti _visiems..."
 
-#: src/main-window.c:326
+#: src/main-window.c:309
 msgid "Reply to all recipients of the current message"
 msgstr "Atsakyti visiems esamos þinutës gavëjams"
 
-#: src/main-window.c:332 src/message-window.c:114
+#: src/main-window.c:315 src/message-window.c:114
 msgid "_Forward..."
 msgstr "_Persiøsti..."
 
-#: src/main-window.c:333
+#: src/main-window.c:316
 msgid "Forward the current message"
 msgstr "Persiøsti esamà þinutæ"
 
-#: src/main-window.c:339 src/message-window.c:119
+#: src/main-window.c:322 src/message-window.c:119
 msgid "Next Part"
 msgstr "Kita dalis"
 
-#: src/main-window.c:339 src/message-window.c:119
+#: src/main-window.c:322 src/message-window.c:119
 msgid "Next Part in Message"
 msgstr "Kita laiðko dalis"
 
-#: src/main-window.c:344 src/message-window.c:123
+#: src/main-window.c:327 src/message-window.c:123
 msgid "Previous Part"
 msgstr "Praeita dalis"
 
-#: src/main-window.c:345 src/message-window.c:124
+#: src/main-window.c:328 src/message-window.c:124
 msgid "Previous Part in Message"
 msgstr "Praeita laiðko dalis"
 
-#: src/main-window.c:350 src/message-window.c:128
+#: src/main-window.c:333 src/message-window.c:128
 msgid "Save Current Part..."
 msgstr "Iðsaugoti esamà dalá..."
 
-#: src/main-window.c:351 src/message-window.c:129
+#: src/main-window.c:334 src/message-window.c:129
 msgid "Save Current Part in Message"
 msgstr "Iðsaugoti esamà dalá á laiðkà"
 
-#: src/main-window.c:358
+#: src/main-window.c:341
 msgid "_Delete"
 msgstr "_Iðtrinti"
 
-#: src/main-window.c:358
+#: src/main-window.c:341
 msgid "Delete the current message"
 msgstr "Iðtrinti esamà laiðkà"
 
-#: src/main-window.c:364
+#: src/main-window.c:347
 msgid "_Undelete"
 msgstr "_Sugràþinti"
 
-#: src/main-window.c:364
+#: src/main-window.c:347
 msgid "Undelete the message"
 msgstr "Sugràþinti iðtrintà laiðkà"
 
-#: src/main-window.c:370
+#: src/main-window.c:353
 msgid "_Toggle Flagged"
 msgstr "Perjungti s_varbà"
 
-#: src/main-window.c:370
+#: src/main-window.c:353
 msgid "Toggle flagged"
 msgstr "Perjungti svarbà"
 
-#: src/main-window.c:377
+#: src/main-window.c:360
 msgid "_Store Address..."
 msgstr "Á_raðyti adresà..."
 
-#: src/main-window.c:378
+#: src/main-window.c:361
 msgid "Store address of sender in addressbook"
 msgstr "Áraðyti siuntëjo adresà á adresø knygelæ"
 
-#: src/main-window.c:387
+#: src/main-window.c:370
 msgid "Next Message"
 msgstr "Kitas laiðkas"
 
-#: src/main-window.c:392
+#: src/main-window.c:375
 msgid "Previous Message"
 msgstr "Praeitas laiðkas"
 
-#: src/main-window.c:397 src/main-window.c:398
+#: src/main-window.c:380 src/main-window.c:381
 msgid "Next Unread Message"
 msgstr "Kitas neskaitytas laiðkas"
 
-#: src/main-window.c:403
+#: src/main-window.c:386
 msgid "_Edit..."
 msgstr "_Taisyti..."
 
-#: src/main-window.c:403
+#: src/main-window.c:386
 msgid "Edit the selected mailbox"
 msgstr "Taisyti pasirinktà dëþutæ"
 
-#: src/main-window.c:406
+#: src/main-window.c:389
 msgid "_Delete..."
 msgstr "_Paðalinti..."
 
-#: src/main-window.c:407
+#: src/main-window.c:390
 msgid "Delete the selected mailbox"
 msgstr "Paðalinti pasirinktà dëþutæ"
 
-#: src/main-window.c:412
+#: src/main-window.c:395
 msgid "Co_mmit Current"
 msgstr "Á_raðyti rodomà"
 
-#: src/main-window.c:414
+#: src/main-window.c:397
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Áraðyti pakeitimus dabar atidarytoje dëþutëje"
 
-#: src/main-window.c:418
+#: src/main-window.c:401
 msgid "_Close"
 msgstr "_Uþdaryti"
 
-#: src/main-window.c:418
+#: src/main-window.c:401
 msgid "Close mailbox"
 msgstr "Uþdaryti dëþutæ"
 
-#: src/main-window.c:422
+#: src/main-window.c:405
 msgid "Empty _Trash"
 msgstr "Ið_valyti ðiukðles"
 
-#: src/main-window.c:423
+#: src/main-window.c:406
 msgid "Delete Messages from the trash mailbox"
 msgstr "Iðtrinti laiðkus ið ðiukðliø dëþutës"
 
-#: src/main-window.c:439
+#: src/main-window.c:428
 msgid "_Message"
 msgstr "_Laiðkas"
 
-#: src/main-window.c:440
+#: src/main-window.c:429
 msgid "Mail_box"
 msgstr "_Dëþutë"
 
-#: src/main-window.c:447
+#: src/main-window.c:437
 msgid "Check Email"
 msgstr "Tikrinti paðtà"
 
-#: src/main-window.c:452
+#: src/main-window.c:442
 msgid "Delete Message"
 msgstr "Iðtrinti laiðkà"
 
-#: src/main-window.c:457
+#: src/main-window.c:447
 msgid "Compose"
 msgstr "Sukurti"
 
-#: src/main-window.c:457
+#: src/main-window.c:447
 msgid "Compose Message"
 msgstr "Sukurti laiðkà"
 
-#: src/main-window.c:461
+#: src/main-window.c:451
 msgid "Continue"
 msgstr "Tæsti"
 
-#: src/main-window.c:465
+#: src/main-window.c:455
 msgid "Reply"
 msgstr "Atsakyti"
 
-#: src/main-window.c:469
+#: src/main-window.c:459
 msgid ""
 "Reply\n"
 "To All"
 msgstr "Ats. visiems"
 
-#: src/main-window.c:469
+#: src/main-window.c:459
 msgid "Reply to all"
 msgstr "Atsakyti visiems"
 
-#: src/main-window.c:473
+#: src/main-window.c:463
 msgid "Forward"
 msgstr "Persiøsti"
 
-#: src/main-window.c:479
+#: src/main-window.c:469
 msgid "Previous"
 msgstr "Praeitas"
 
-#: src/main-window.c:479
+#: src/main-window.c:469
 msgid "Open Previous message"
 msgstr "Atidaryti praeità laiðkà"
 
-#: src/main-window.c:484
+#: src/main-window.c:474
 msgid "Next"
 msgstr "Kitas"
 
-#: src/main-window.c:484
+#: src/main-window.c:474
 msgid "Open Next message"
 msgstr "Atidaryti kità laiðkà"
 
-#: src/main-window.c:488
+#: src/main-window.c:478
 msgid ""
 "Next\n"
 "Unread"
 msgstr "Neskaitytas"
 
-#: src/main-window.c:488
+#: src/main-window.c:478
 msgid "Open Next Unread Message"
 msgstr "Atidaryti kità neskaitytà laiðkà"
 
-#: src/main-window.c:492 src/print.c:60 src/sendmsg-window.c:152
+#: src/main-window.c:482 src/print.c:60 src/sendmsg-window.c:152
 msgid "Print"
 msgstr "Spausdinti"
 
-#: src/main-window.c:492
+#: src/main-window.c:482
 msgid "Print current message"
 msgstr "Atspausdinti esamà laiðkà"
 
-#: src/main-window.c:1111
+#: src/main-window.c:1106
 msgid "Copyright (C) 1997-2000"
 msgstr "Copyright (C) 1997-2000"
 
-#: src/main-window.c:1114
+#: src/main-window.c:1109
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  Information "
-"on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  "
+"Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
@@ -1518,22 +1543,22 @@ msgstr ""
 "\n"
 "Norëdamas praneðti klaidas, daryk tai http://bugs.gnome.org/"
 
-#: src/main-window.c:1489
+#: src/main-window.c:1482
 #, c-format
 msgid "Sending error: %s"
 msgstr "Siuntimo klaida: %s"
 
-#: src/main-window.c:1867
+#: src/main-window.c:1828
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Nepavyko áraðyti dëþutës %s."
 
-#: src/main-window.c:2051
+#: src/main-window.c:2012
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (tik skaitymui)"
 
-#: src/main-window.c:2053
+#: src/main-window.c:2014
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -1583,40 +1608,40 @@ msgstr "Juodraðèiai"
 msgid "Trash"
 msgstr "Ðiukðlës"
 
-#: src/mblist-window.c:468
+#: src/mblist-window.c:460
 msgid "Add New Mailbox..."
 msgstr "Pridëti naujà dëþutæ..."
 
-#: src/mblist-window.c:477
+#: src/mblist-window.c:469
 msgid "Open"
 msgstr "Atidaryti"
 
-#: src/mblist-window.c:479
+#: src/mblist-window.c:471
 msgid "Close"
 msgstr "Uþdaryti"
 
-#: src/mblist-window.c:481
+#: src/mblist-window.c:473
 msgid "Properties..."
 msgstr "Savybës..."
 
-#: src/mblist-window.c:487
+#: src/mblist-window.c:479
 msgid "Mark as Inbox"
 msgstr "Padaryti Gauta"
 
-#: src/mblist-window.c:488
+#: src/mblist-window.c:480
 msgid "Mark as Sentbox"
 msgstr "Padaryti Iðsiøsta"
 
-#: src/mblist-window.c:489
+#: src/mblist-window.c:481
 msgid "Mark as Trash"
 msgstr "Padaryti Ðiukðlës"
 
-#: src/mblist-window.c:490
+#: src/mblist-window.c:482
 msgid "Mark as Draftbox"
 msgstr "Padaryti Juodraðèiai"
 
-#: src/mblist-window.c:509 src/mblist-window.c:525 src/mblist-window.c:544
-#: src/mblist-window.c:559
+#: src/mblist-window.c:501 src/mblist-window.c:517 src/mblist-window.c:536
+#: src/mblist-window.c:551
 msgid "No mailbox selected."
 msgstr "Jokia dëþutë neparinkta."
 
@@ -1694,7 +1719,7 @@ msgstr "Normaliai"
 
 #: src/pref-manager.c:199
 msgid "Bad Spellers"
-msgstr ""
+msgstr "Blogi tikrintuvai"
 
 #: src/pref-manager.c:224
 msgid "Balsa Preferences"
@@ -2226,123 +2251,127 @@ msgstr "Ko_mentarai"
 msgid "_Keywords"
 msgstr "_Raktaþodþiai"
 
-#: src/sendmsg-window.c:280 src/sendmsg-window.c:362
+#: src/sendmsg-window.c:281 src/sendmsg-window.c:362
 msgid "Brazilian"
 msgstr "Brazilø"
 
-#: src/sendmsg-window.c:281 src/sendmsg-window.c:365
+#: src/sendmsg-window.c:282 src/sendmsg-window.c:364
 msgid "Catalan"
 msgstr "Katalonø"
 
-#: src/sendmsg-window.c:282 src/sendmsg-window.c:368
+#: src/sendmsg-window.c:283 src/sendmsg-window.c:366
 msgid "Danish"
 msgstr "Danø"
 
-#: src/sendmsg-window.c:283 src/sendmsg-window.c:374
+#: src/sendmsg-window.c:284 src/sendmsg-window.c:370
 msgid "Dutch"
 msgstr "Olandø"
 
-#: src/sendmsg-window.c:284 src/sendmsg-window.c:377
+#: src/sendmsg-window.c:285 src/sendmsg-window.c:372
 msgid "English"
 msgstr "Anglø"
 
-#: src/sendmsg-window.c:285 src/sendmsg-window.c:380
+#: src/sendmsg-window.c:286 src/sendmsg-window.c:374
 msgid "Estonian"
 msgstr "Estø"
 
-#: src/sendmsg-window.c:286 src/sendmsg-window.c:383
+#: src/sendmsg-window.c:287 src/sendmsg-window.c:376
 msgid "Finnish"
 msgstr "Suomiø"
 
-#: src/sendmsg-window.c:287 src/sendmsg-window.c:386
+#: src/sendmsg-window.c:288 src/sendmsg-window.c:378
 msgid "French"
 msgstr "Prancûzø"
 
-#: src/sendmsg-window.c:288 src/sendmsg-window.c:371
+#: src/sendmsg-window.c:289 src/sendmsg-window.c:368
 msgid "German"
 msgstr "Vokieèiø"
 
-#: src/sendmsg-window.c:289 src/sendmsg-window.c:389
+#: src/sendmsg-window.c:290 src/sendmsg-window.c:380
 msgid "Greek"
 msgstr "Graikø"
 
-#: src/sendmsg-window.c:290 src/sendmsg-window.c:392
+#: src/sendmsg-window.c:291 src/sendmsg-window.c:382
 msgid "Hungarian"
 msgstr "Vengrø"
 
-#: src/sendmsg-window.c:291 src/sendmsg-window.c:395
+#: src/sendmsg-window.c:292 src/sendmsg-window.c:384
 msgid "Italian"
 msgstr "Italø"
 
-#: src/sendmsg-window.c:292 src/sendmsg-window.c:398
+#: src/sendmsg-window.c:293 src/sendmsg-window.c:386
 msgid "Japanese"
 msgstr "Japonø"
 
-#: src/sendmsg-window.c:297 src/sendmsg-window.c:401
+#: src/sendmsg-window.c:298 src/sendmsg-window.c:388
 msgid "Korean"
 msgstr "Korëjieèiø"
 
-#: src/sendmsg-window.c:298 src/sendmsg-window.c:404
+#: src/sendmsg-window.c:299 src/sendmsg-window.c:390
 msgid "Latvian"
 msgstr "Latviø"
 
-#: src/sendmsg-window.c:299 src/sendmsg-window.c:407
+#: src/sendmsg-window.c:300 src/sendmsg-window.c:392
 msgid "Lithuanian"
 msgstr "Lietuviø"
 
-#: src/sendmsg-window.c:300 src/sendmsg-window.c:410
+#: src/sendmsg-window.c:301 src/sendmsg-window.c:394
 msgid "Norwegian"
 msgstr "Norvegø"
 
-#: src/sendmsg-window.c:301 src/sendmsg-window.c:413
+#: src/sendmsg-window.c:302 src/sendmsg-window.c:396
 msgid "Polish"
 msgstr "Lenkø"
 
-#: src/sendmsg-window.c:302 src/sendmsg-window.c:416
+#: src/sendmsg-window.c:303 src/sendmsg-window.c:398
 msgid "Portugese"
 msgstr "Portugalø"
 
-#: src/sendmsg-window.c:303 src/sendmsg-window.c:419
-msgid "Russian"
-msgstr "Rusø"
+#: src/sendmsg-window.c:304 src/sendmsg-window.c:400
+msgid "Russian (ISO)"
+msgstr "Rusø (ISO)"
 
-#: src/sendmsg-window.c:304 src/sendmsg-window.c:422
+#: src/sendmsg-window.c:305 src/sendmsg-window.c:402
+msgid "Russian (KOI)"
+msgstr "Rusø (KOI)"
+
+#: src/sendmsg-window.c:306 src/sendmsg-window.c:404
 msgid "Slovak"
 msgstr "Slovakø"
 
-#: src/sendmsg-window.c:305 src/sendmsg-window.c:425
+#: src/sendmsg-window.c:307 src/sendmsg-window.c:406
 msgid "Spanish"
 msgstr "Ispanø"
 
-#: src/sendmsg-window.c:306 src/sendmsg-window.c:428
+#: src/sendmsg-window.c:308 src/sendmsg-window.c:408
 msgid "Swedish"
 msgstr "Ðvedø"
 
-#: src/sendmsg-window.c:307 src/sendmsg-window.c:431
+#: src/sendmsg-window.c:309 src/sendmsg-window.c:410
 msgid "Turkish"
 msgstr "Turkø"
 
-#: src/sendmsg-window.c:308 src/sendmsg-window.c:434
+#: src/sendmsg-window.c:310 src/sendmsg-window.c:412
 msgid "Ukrainian"
 msgstr "Ukrainieèiø"
 
-#: src/sendmsg-window.c:315
+#: src/sendmsg-window.c:317
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:316
+#: src/sendmsg-window.c:318
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:347
+#: src/sendmsg-window.c:349
 msgid "_Show"
 msgstr "_Rodyti"
 
-#: src/sendmsg-window.c:349
+#: src/sendmsg-window.c:351
 msgid "_Language"
 msgstr "_Kalba"
 
-#: src/sendmsg-window.c:631
+#: src/sendmsg-window.c:607
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -2350,62 +2379,62 @@ msgstr ""
 "Neina rasti priedo paveikslëlio (balsa/attachment.png).\n"
 "Tai reiðkia, kad tu negali prisegti jokiø bylø.\n"
 
-#: src/sendmsg-window.c:646
+#: src/sendmsg-window.c:622
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr ""
 "Negaliu gauti info apie bylà ¥%s´: \n"
 "%s\n"
 
-#: src/sendmsg-window.c:651
+#: src/sendmsg-window.c:628
 #, c-format
-msgid "Attachment is not a regular file: '%s'\n"
-msgstr "Priedas nëra paprasta byla: ¥%s´\n"
+msgid "Attachment is not a regular file or cannot be read: '%s'\n"
+msgstr "Priedas nëra paprasta byla, arba neina jos perskaityti: ¥%s´\n"
 
-#: src/sendmsg-window.c:716
+#: src/sendmsg-window.c:693
 msgid "Attach file"
 msgstr "Prisegti bylà"
 
 #. cc:
-#: src/sendmsg-window.c:904
+#: src/sendmsg-window.c:881
 msgid "cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:910
+#: src/sendmsg-window.c:887
 msgid "bcc:"
 msgstr "Bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:916
+#: src/sendmsg-window.c:893
 msgid "fcc:"
 msgstr "Fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:951
+#: src/sendmsg-window.c:928
 msgid "Reply To:"
 msgstr "Atsakyti kam:"
 
 #. Attachment list
-#: src/sendmsg-window.c:957
+#: src/sendmsg-window.c:934
 msgid "Attachments:"
 msgstr "Priedai:"
 
 #. Comments:
-#: src/sendmsg-window.c:1002
+#: src/sendmsg-window.c:979
 msgid "Comments:"
 msgstr "Komentarai:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1005
+#: src/sendmsg-window.c:982
 msgid "Keywords:"
 msgstr "Raktaþodþiai:"
 
-#: src/sendmsg-window.c:1115
+#: src/sendmsg-window.c:1079
 msgid "you"
 msgstr "tu"
 
-#: src/sendmsg-window.c:1120
+#: src/sendmsg-window.c:1084
 #, c-format
 msgid ""
 "\n"
@@ -2414,7 +2443,7 @@ msgstr ""
 "\n"
 "%s, %s raðë:\n"
 
-#: src/sendmsg-window.c:1123
+#: src/sendmsg-window.c:1087
 #, c-format
 msgid ""
 "\n"
@@ -2423,40 +2452,40 @@ msgstr ""
 "\n"
 "%s raðë:\n"
 
-#: src/sendmsg-window.c:1203
+#: src/sendmsg-window.c:1167
 msgid "Reply to "
 msgstr "Atsakyti kam "
 
-#: src/sendmsg-window.c:1208
+#: src/sendmsg-window.c:1172
 msgid "Forward message"
 msgstr "Persiøsti laiðkà"
 
-#: src/sendmsg-window.c:1213
+#: src/sendmsg-window.c:1177
 msgid "Continue message"
 msgstr "Tæsti laiðkà"
 
-#: src/sendmsg-window.c:1218
+#: src/sendmsg-window.c:1182
 msgid "New message"
 msgstr "Naujas laiðkas"
 
-#: src/sendmsg-window.c:1477
+#: src/sendmsg-window.c:1441
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Negaliu atidaryti bylos %s.\n"
 
-#: src/sendmsg-window.c:1479
+#: src/sendmsg-window.c:1443
 msgid "Loading..."
 msgstr "Ákeliu..."
 
-#: src/sendmsg-window.c:1506
+#: src/sendmsg-window.c:1470
 msgid "Include file"
 msgstr "Áterpti bylà"
 
-#: src/sendmsg-window.c:1749
+#: src/sendmsg-window.c:1713
 msgid "Cannot execute print command."
 msgstr "Negaliu ávykdyti spausdinimo komandos."
 
-#: src/sendmsg-window.c:1772
+#: src/sendmsg-window.c:1736
 msgid "Error executing lpr"
 msgstr "Klaida vykdant lpr"
 
@@ -2465,8 +2494,7 @@ msgid "Replace the current word with the selected suggestion"
 msgstr "Pakeisti esamà þodá pasirinktu pasiûlymu"
 
 #: src/spell-check.c:487
-msgid ""
-"Replace all occurances of the current word with the selected suggestion"
+msgid "Replace all occurances of the current word with the selected suggestion"
 msgstr "Pakeisti visus esamo þodþio pasitaikymus pasirinktu pasiûlymu"
 
 #: src/spell-check.c:494
@@ -2537,4 +2565,3 @@ msgstr "Jokia adresø knygelë neparinkta..."
 #: src/store-address.c:255
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Atsipraðau, kabliataðkiai varde neleidþiami!\n"
-

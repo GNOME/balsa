@@ -206,7 +206,7 @@ load_mailboxes (gchar * name)
 	    }
 	  break;
 
-	case 7:		/*  POP3  */
+	case 1:		/*  POP3  */
 	  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
 	  pop3->name = g_strdup (name);
 	  pop3->user = gnome_config_get_string ("username");
@@ -214,7 +214,7 @@ load_mailboxes (gchar * name)
 	  pop3->server = gnome_config_get_string ("server");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
 	  break;
-	case 8:		/*  IMAP  */
+	case 2:		/*  IMAP  */
 	  imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
 	  imap->name = g_strdup (name);
 	  imap->user = gnome_config_get_string ("username");
@@ -223,7 +223,7 @@ load_mailboxes (gchar * name)
 	  imap->path = gnome_config_get_string ("Path");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
 	  break;
-	case 9:		/*  NNTP  */
+	case 3:		/*  NNTP  */
 	  nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
 	  nntp->name = g_strdup (name);
 	  nntp->user = gnome_config_get_string ("username");
@@ -231,6 +231,37 @@ load_mailboxes (gchar * name)
 	  nntp->server = gnome_config_get_string ("server");
 	  nntp->newsgroup = gnome_config_get_string ("newsgroup");
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
+          break;
+
+/* old */
+	case 7:
+	  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
+	  pop3->name = g_strdup (name);
+	  pop3->user = gnome_config_get_string ("username");
+	  pop3->passwd = gnome_config_get_string ("password");
+	  pop3->server = gnome_config_get_string ("server");
+	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
+	  gnome_config_set_int ("Type", 1);
+	  break;
+	case 8:
+	  imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
+	  imap->name = g_strdup (name);
+	  imap->user = gnome_config_get_string ("username");
+	  imap->passwd = gnome_config_get_string ("password");
+	  imap->server = gnome_config_get_string ("server");
+	  imap->path = gnome_config_get_string ("Path");
+	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
+	  gnome_config_set_int ("Type", 2);
+	  break;
+	case 9:
+	  nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
+	  nntp->name = g_strdup (name);
+	  nntp->user = gnome_config_get_string ("username");
+	  nntp->passwd = gnome_config_get_string ("password");
+	  nntp->server = gnome_config_get_string ("server");
+	  nntp->newsgroup = gnome_config_get_string ("newsgroup");
+	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
+	  gnome_config_set_int ("Type", 3);
 	  break;
 
 
@@ -291,6 +322,7 @@ load_mailboxes (gchar * name)
 		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
 		}
 	    }
+	  gnome_config_set_int ("Type", 0);
 	  break;
 
 	}

@@ -1,3 +1,11 @@
+2001-01-12  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-icons.h: BALSA_PIXMAP_ENVELOPE
+	* src/balsa-icons.c: BALSA_PIXMAP_ENVELOPE
+
+	* src/balsa-index-page.c: added toggle submenu with flagged and new 
+	* src/balsa-index-page.h: added toggle submenu with flagged and new 
+
 2001-01-11   Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/mailbox-node.c: fix crash on right button click out of mailbox 

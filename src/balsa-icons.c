@@ -203,4 +203,5 @@ register_balsa_pixmaps(void)
                            next_unread_menu_xpm, 16, 15);
 
     register_balsa_pixmap (BALSA_PIXMAP_FLAGGED, flagged_xpm, 16, 16);
+    register_balsa_pixmap (BALSA_PIXMAP_ENVELOPE, envelope_xpm, 16, 16);
 }

@@ -73,6 +73,7 @@ void balsa_message_delete(GtkWidget * widget, gpointer index);
 void balsa_message_undelete(GtkWidget * widget, gpointer index);
 
 void balsa_message_toggle_flagged(GtkWidget * widget, gpointer index);
+void balsa_message_toggle_new(GtkWidget * widget, gpointer index);
 
 void balsa_index_page_reset(BalsaIndexPage * page);
 gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);

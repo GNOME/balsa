@@ -29,6 +29,7 @@
 #define BALSA_PIXMAP_NEXT_UNREAD_MENU "next_unread_menu"
 
 #define BALSA_PIXMAP_FLAGGED "flagged"
+#define BALSA_PIXMAP_ENVELOPE "envelope"
 
 typedef enum {
     BALSA_ICON_INBOX,

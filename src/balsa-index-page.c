@@ -556,9 +556,23 @@ create_menu(BalsaIndex * bindex)
 			   _("Store Address..."),
 			   balsa_store_address, bindex, TRUE);
 
-    create_stock_menu_item (menu, BALSA_PIXMAP_FLAGGED, _("Toggle Flagged"),
-                            balsa_message_toggle_flagged, bindex, TRUE);
+    menuitem = gtk_menu_item_new_with_label(_("Toggle"));
+    submenu = gtk_menu_new();
+    
+    create_stock_menu_item( submenu, BALSA_PIXMAP_FLAGGED, _("Flagged"),
+			    balsa_message_toggle_flagged, bindex, TRUE);
+     
+    create_stock_menu_item( submenu, BALSA_PIXMAP_ENVELOPE, _("New"),
+		    balsa_message_toggle_new, bindex, TRUE);
 
+    gtk_widget_show(submenu);
+
+    gtk_widget_show(menuitem);
+    
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
+
+    gtk_menu_append(GTK_MENU(menu), menuitem);
+    
     menuitem = gtk_menu_item_new_with_label(_("Transfer"));
     gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
     submenu = gtk_menu_new();
@@ -802,7 +816,7 @@ balsa_message_previous(GtkWidget * widget, gpointer index)
 }
 
 
-/* This function toggles the FLAGGED attribute of a message
+/* This function toggles the FLAGGED attribute of a list of messages
  */
 void
 balsa_message_toggle_flagged(GtkWidget * widget, gpointer index)
@@ -839,6 +853,34 @@ balsa_message_toggle_flagged(GtkWidget * widget, gpointer index)
 	    libbalsa_message_unflag(message);
 	} else {
 	    libbalsa_message_flag(message);
+	}
+
+	list = list->next;
+    }
+    libbalsa_mailbox_commit_changes(BALSA_INDEX(index)->mailbox);
+}
+
+/* This function toggles the NEW attribute of a list of messages
+ */
+void
+balsa_message_toggle_new(GtkWidget * widget, gpointer index)
+{
+    GList *list;
+    LibBalsaMessage *message;
+
+    g_return_if_fail(widget != NULL);
+    g_return_if_fail(index != NULL);
+
+    list = GTK_CLIST(index)->selection;
+
+    while (list) {
+	message = gtk_ctree_node_get_row_data(GTK_CTREE(index),
+					      list->data);
+
+	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
+	    libbalsa_message_read(message);
+	} else {
+	    libbalsa_message_unread(message);
 	}
 
 	list = list->next;

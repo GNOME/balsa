@@ -383,6 +383,18 @@ static void
 create_mailbox_if_not_present (gchar * filename)
 {
   struct stat st;
+  gchar *dir;
+  dir = g_dirname (filename);
+
+  if (stat (dir, &st) != 0)
+    {
+      int ret;
+      ret = mkdir (dir, S_IRUSR | S_IWUSR | S_IXUSR);
+      if (ret == -1)
+	g_error ("Error creating directory %s: %s",
+		 dir, strerror (errno));
+    }
+  g_free (dir);
 
   if (stat (filename, &st) != 0)
     creat (filename, S_IRUSR | S_IWUSR);

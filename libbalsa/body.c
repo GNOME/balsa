@@ -486,21 +486,27 @@ libbalsa_message_body_is_delsp(LibBalsaMessageBody * body)
     return delsp;
 }
     
-LibBalsaMessageBody*
-libbalsa_message_body_get_by_id(LibBalsaMessageBody* body, const gchar* id)
+LibBalsaMessageBody *
+libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
+				const gchar * id)
 {
-    LibBalsaMessageBody* res;
-    const gchar* bodyid;
+    LibBalsaMessageBody *res;
 
-    g_return_val_if_fail(id, NULL);
-    bodyid = g_mime_object_get_content_id(body->mime_part);
+    g_return_val_if_fail(id != NULL, NULL);
 
-    if( bodyid && strcmp(id, bodyid) ==0)
-	return body;
-    if(body->parts && 
-       (res=libbalsa_message_body_get_by_id(body->parts, id))!=NULL)
+    if (!body)
+	return NULL;
+
+    if (body->mime_part) {
+	const gchar *bodyid =
+	    g_mime_object_get_content_id(body->mime_part);
+
+	if (bodyid && strcmp(id, bodyid) == 0)
+	    return body;
+    }
+
+    if ((res = libbalsa_message_body_get_by_id(body->parts, id)) != NULL)
 	return res;
-    if(body->next)
-	return libbalsa_message_body_get_by_id(body->next, id);
-    else return NULL;
+
+    return libbalsa_message_body_get_by_id(body->next, id);
 }

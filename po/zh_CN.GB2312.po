@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "POT-Creation-Date: 2000-12-05 18:50+0800\n"
-"PO-Revision-Date: 2000-12-05 19:20+0800\n"
+"PO-Revision-Date: 2000-12-06 14:10+0800\n"
 "Last-Translator: Dillion Chen <dillon.chen@turbolinux.com.cn>\n"
-"Language-Team: TLDN\n"
+"Language-Team: zh_CN.GB2312\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=gb2312\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -315,6 +315,12 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
+"你是第一次运行 Balsa. 以下的步骤将要向你问一些简单\n"
+"的问题来设置好 Balsa.\n"
+"一旦你完成了这些步骤, 你也可以在以后通过首选项来改变\n"
+"设置. 如果需要创建文件或者目录, Balsa 会自动进行.\n"
+"请在 Balsa 的 '关于' 中查看如何联系作者或报告错误\n"
+"的详细信息."
 
 #: libinit_balsa/balsa-initdruid.gob:97
 msgid ""
@@ -406,7 +412,7 @@ msgstr "超过锁计数, 删除 %s 的锁?"
 #: libmutt/mx.c:131
 #, c-format
 msgid "Can't dotlock %s.\n"
-msgstr ""
+msgstr "无法锁定 %s.\n"
 
 #: libmutt/mx.c:189
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -560,15 +566,15 @@ msgstr "正在取得文件夹列表..."
 
 #: libmutt/imap/imap_ssl.c:92
 msgid "Filling entropy pool"
-msgstr ""
+msgstr "填充熵池"
 
 #: libmutt/imap/imap_ssl.c:124
 msgid "Failed to find enough entropy on your system"
-msgstr ""
+msgstr "无法在系统中找到足够的熵"
 
 #: libmutt/imap/imap_ssl.c:139
 msgid "SSL disabled due the lack of entropy"
-msgstr ""
+msgstr "因为缺少熵信息, 已禁用 SSL"
 
 #: libmutt/imap/imap_ssl.c:219
 msgid "Unable to get certificate from peer"
@@ -840,7 +846,7 @@ msgstr "保存地址..."
 
 #: src/balsa-index-page.c:553
 msgid "Toggle Flagged"
-msgstr ""
+msgstr "反转标志"
 
 # src/index-child.c:399
 #: src/balsa-index-page.c:556
@@ -848,7 +854,6 @@ msgid "Transfer"
 msgstr "传送"
 
 # src/balsa-index.c:231
-#. FIXME:
 #: src/balsa-index.c:304
 msgid "From"
 msgstr "发件人"
@@ -1649,11 +1654,11 @@ msgstr "取消删除邮件"
 
 #: src/main-window.c:341
 msgid "_Toggle Flagged"
-msgstr ""
+msgstr "反转标志(_T)"
 
 #: src/main-window.c:341
 msgid "Toggle flagged"
-msgstr ""
+msgstr "反转标志"
 
 #: src/main-window.c:348
 msgid "_Store Address..."
@@ -2001,8 +2006,9 @@ msgid "Normal"
 msgstr "普通"
 
 #: src/pref-manager.c:202
+#, FIXME
 msgid "Bad Spellers"
-msgstr ""
+msgstr "仔细检查"
 
 # src/pref-manager.c:117
 #: src/pref-manager.c:226
@@ -2266,27 +2272,27 @@ msgstr "选中的信头:"
 #. Information messages frame...
 #: src/pref-manager.c:1520
 msgid "Information Messages"
-msgstr "信息"
+msgstr "消息"
 
 #. gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
 #. gtk_table_set_col_spacings(GTK_TABLE(information_table), 5);
 #: src/pref-manager.c:1528
 msgid "Informational Messages"
-msgstr ""
+msgstr "一般消息"
 
 #: src/pref-manager.c:1541
 msgid "Warning Messages"
-msgstr "警告信息"
+msgstr "警告消息"
 
 # src/main-window.c:200
 #: src/pref-manager.c:1554
 msgid "Error Messages"
-msgstr "错误信息"
+msgstr "错误消息"
 
 # src/main-window.c:211
 #: src/pref-manager.c:1567
 msgid "Debug Messages"
-msgstr "调试信息"
+msgstr "调试消息"
 
 #: src/pref-manager.c:1627
 msgid "characters"
@@ -2612,7 +2618,7 @@ msgstr "西班牙语"
 
 #: src/sendmsg-window.c:292 src/sendmsg-window.c:374
 msgid "Catalan"
-msgstr ""
+msgstr "加泰罗尼亚语"
 
 # src/balsa-init.c:533
 #: src/sendmsg-window.c:293 src/sendmsg-window.c:376
@@ -2846,87 +2852,81 @@ msgstr "新建邮件"
 #: src/sendmsg-window.c:1487
 #, c-format
 msgid "Could not open the file %s.\n"
-msgstr ""
+msgstr "无法打开文件 %s.\n"
 
 #: src/sendmsg-window.c:1489
 msgid "Loading..."
-msgstr ""
+msgstr "正在载入..."
 
 #: src/sendmsg-window.c:1516
 msgid "Include file"
-msgstr ""
+msgstr "包含文件"
 
 #: src/sendmsg-window.c:1786
 msgid "Cannot execute print command."
-msgstr ""
+msgstr "无法执行打印命令."
 
 #: src/sendmsg-window.c:1809
 msgid "Error executing lpr"
-msgstr ""
+msgstr "在执行 lpr 时发生错误"
 
 #: src/spell-check.c:482
 msgid "Replace the current word with the selected suggestion"
-msgstr ""
+msgstr "把当前词替换为选中的建议词"
 
 # src/main-window.c:120
 #: src/spell-check.c:489
-#, fuzzy
 msgid "Replace all occurences of the current word with the selected suggestion"
-msgstr "对所有接收者回复"
+msgstr "把所有出现的这个词替换为选中的建议词"
 
 #: src/spell-check.c:496
 msgid "Skip the current word"
-msgstr ""
+msgstr "跳过当前词"
 
 # src/main-window.c:120
 #: src/spell-check.c:501
-#, fuzzy
 msgid "Skip all occurances of the current word"
-msgstr "对所有接收者回复"
+msgstr "以后不检查这个词"
 
 #: src/spell-check.c:507
 msgid "Add the current word to your personal dictionary"
-msgstr ""
+msgstr "把当前词添加到你的个人词典中"
 
 #: src/spell-check.c:513
 msgid "Finish spell checking"
-msgstr ""
+msgstr "完成拼写检查"
 
 #: src/spell-check.c:518
 msgid "Revert all changes and finish spell checking"
-msgstr ""
+msgstr "恢复所有更改, 完成拼写检查"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
 #: src/store-address.c:52
-#, fuzzy
 msgid "Card Name:"
-msgstr "邮件箱名:"
+msgstr "卡片名:"
 
 # src/filter-edit-dialog.c:456
 #: src/store-address.c:52
-#, fuzzy
 msgid "First Name:"
-msgstr "过滤名"
+msgstr "名:"
 
 # src/mailbox-conf.c:671 src/mailbox-conf.c:706
 #: src/store-address.c:53
-#, fuzzy
 msgid "Last Name:"
-msgstr "邮件箱名:"
+msgstr "姓:"
 
 #: src/store-address.c:53
 msgid "Organization:"
-msgstr ""
+msgstr "机构:"
 
 # src/balsa-init.c:261 src/pref-manager.c:377
 #: src/store-address.c:54
-#, fuzzy
 msgid "Email Address:"
-msgstr "邮件地址"
+msgstr "邮件地址:"
 
 #: src/store-address.c:75
 msgid "In order to store an address, you must select a message.\n"
-msgstr ""
+msgstr "为了保存地址, 你必须要选择一个邮件.\n"
 
 #: src/store-address.c:86
 msgid "You may only store one address at a time.\n"

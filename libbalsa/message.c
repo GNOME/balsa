@@ -1119,15 +1119,19 @@ libbalsa_message_set_dispnotify(LibBalsaMessage *message,
 /* libbalsa_message_get_subject:
    get constant pointer to the subject of the message; 
 */
-const gchar*
+const gchar *
 libbalsa_message_get_subject(LibBalsaMessage* msg)
 {
+    const gchar *ret;
+
     if(msg->header && msg->mailbox) { /* a message in a mailbox... */
         g_return_val_if_fail(CLIENT_CONTEXT_OPEN(msg->mailbox), NULL);
 	/* g_print("Returning libmutt's pointer\n"); */
-	return msg->header->env->subject;
+	ret = msg->header->env->subject;
     } else
-	return msg->subj;
+	ret = msg->subj;
+
+    return ret ? ret : _("(No subject)");
 }
 
 

@@ -103,7 +103,8 @@ struct _LibBalsaMessage {
      * on sending. */
     gchar *subj;
 #ifdef MESSAGE_COPY_CONTENT
-#define LIBBALSA_MESSAGE_GET_SUBJECT(m) ((m)->subj)
+#define LIBBALSA_MESSAGE_GET_SUBJECT(m) \
+    ((m)->subj ? (m)->subj : _("(No subject)"))
 #else
 #define LIBBALSA_MESSAGE_GET_SUBJECT(m) libbalsa_message_get_subject(m)
 #endif

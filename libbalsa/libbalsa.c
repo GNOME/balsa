@@ -31,6 +31,10 @@
 #include <sys/utsname.h>
 #include <stdarg.h>
 
+#ifdef HAVE_GNOME_VFS
+# include <libgnomevfs/gnome-vfs-init.h>
+#endif
+
 #if ENABLE_LDAP
 #include <ldap.h>
 #endif

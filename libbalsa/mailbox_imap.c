@@ -39,6 +39,7 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "misc.h"
 #include "mx.h"
 #include "imap/message.h"
 #include "imap/imap_private.h"
@@ -735,8 +736,8 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     key.dptr  = (char*)uid;
     key.dsize = sizeof(ImapUID)*2;
     if(dbf && gdbm_exists(dbf, key)) {
-	balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			  "imap cache: found %d/%d", uid[0], uid[1]);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+	                     "imap cache: found %d/%d", uid[0], uid[1]);
         data = gdbm_fetch(dbf, key);
         stream = tmpfile();
         fwrite(data.dptr, data.dsize, sizeof(char), stream);
@@ -760,9 +761,9 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	    assure_balsa_dir();
 	    dbf = gdbm_open(fname, 0, GDBM_WRITER, S_IRUSR|S_IWUSR, NULL);
 	    if(dbf) {
-		balsa_information(LIBBALSA_INFORMATION_DEBUG,
-				  "imap cache: pushing %d/%d",
-				  uid[0], uid[1] );
+		libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+		                     "imap cache: pushing %d/%d",
+			              uid[0], uid[1] );
 		gdbm_store(dbf, key, data, GDBM_REPLACE);
 		gdbm_close(dbf);
 	    

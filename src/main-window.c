@@ -1326,6 +1326,10 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 
     /* Enable relavent menu items... */
     enable_mailbox_menus(mbnode);
+    if (balsa_app.mblist->display_info)
+        balsa_mblist_update_mailbox(balsa_app.mblist, mbnode->mailbox);
+    balsa_mblist_have_new(balsa_app.mblist);
+
     gdk_threads_leave();
 #ifdef BALSA_USE_THREADS
     pthread_mutex_unlock(&open_lock);

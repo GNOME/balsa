@@ -1,3 +1,14 @@
+2002-04-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: add extra warnings.
+	* libbalsa/libbalsa.c: missing gnome-vfs include.
+	* libbalsa/mailbox_imap.c: missing misc.h include.
+	* libbalsa/mailbox_{local,pop3}.c: remove balsa dependency.
+	* libbalsa/mailbox_{maildir,mh}.c: missing include.
+	* libbalsa/message.c: use libbalsa_information instead of balsa_info.
+	* src/balsa-mblist.c, src/main-window.c: set status AFTER mailbox
+	is opened - fix #79487.
+	
 2002-04-21  Matthew Guenther <guentherm@asme.org>
 
 	* libbalsa/send.c (message2HEADER): Send custom user headers along

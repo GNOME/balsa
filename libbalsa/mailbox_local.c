@@ -244,11 +244,8 @@ run_filters_on_reception(LibBalsaMailbox * mailbox)
     GSList * filters;
     GList * new_messages;
 
-    /* Load associated filters if needed */
-    if (!mailbox->filters)
-	config_mailbox_filters_load(mailbox);
-
-    filters = libbalsa_mailbox_filters_when(mailbox->filters,FILTER_WHEN_INCOMING);
+    filters = libbalsa_mailbox_filters_when(mailbox->filters,
+                                            FILTER_WHEN_INCOMING);
     /* We apply filter if needed */
     if (filters) {
 	new_messages=libbalsa_extract_new_messages(mailbox->message_list);

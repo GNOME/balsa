@@ -858,8 +858,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
 	if (!msg) { /*FIXME: crude but necessary error handling */
 	    message->mailbox->disconnected = TRUE;
 	    message->mailbox->readonly = TRUE;
-	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      "disconnected mode!");
+	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 "disconnected mode!");
 
             UNLOCK_MAILBOX(message->mailbox);
 	    if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||

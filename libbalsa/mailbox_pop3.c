@@ -37,10 +37,6 @@
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
-#else
-/* FIXME: Balsa dependency */
-#include "src/save-restore.h"	/*config_mailbox_update */
-#include "src/mailbox-conf.h"
 #endif
 
 #ifdef BALSA_SHOW_ALL
@@ -307,10 +303,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 #ifdef BALSA_SHOW_ALL
 	GSList * filters; 
 
-	/* Load associated filters if needed */
-	if (!mailbox->filters)
-	    libbalsa_mailbox_filters_load_config(mailbox);
-	
 	filters = libbalsa_mailbox_filters_when(mailbox->filters,
 						FILTER_WHEN_INCOMING);
 	if (filters) {

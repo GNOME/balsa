@@ -359,15 +359,12 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 	gtk_clist_set_column_width(GTK_CLIST
 				   ((BALSA_INDEX(page)->ctree)),
 				   6, balsa_app.index_size_width);
+        balsa_mblist_have_new(balsa_app.mblist);
     } else { /* page with mailbox not found, open it */
 	balsa_window_open_mbnode(balsa_app.main_window, 
 				 BALSA_MAILBOX_NODE(gnode->data));
-
-	if (balsa_app.mblist->display_info)
-	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
     }
     
-    balsa_mblist_have_new(balsa_app.mblist);
 }
 
 void
@@ -810,6 +807,18 @@ balsa_mblist_column_click(GtkCList * clist, gint column, gpointer data)
 
     gtk_ctree_sort_recursive(GTK_CTREE(data), NULL);
 }
+static void
+mblist_update_statusbar(LibBalsaMailbox* m)
+{
+    gchar* desc;
+    g_return_if_fail(m);
+    desc =
+        g_strdup_printf(_("Shown mailbox: %s with %ld messages, %ld new"),
+                        m->name, m->total_messages, m->unread_messages);
+    
+    gnome_appbar_set_default(balsa_app.appbar, desc);
+    g_free(desc);
+}
 
 /* balsa_mblist_set_style [MBG]
  * 
@@ -874,6 +883,7 @@ balsa_mblist_set_style(BalsaMBList * mblist)
 void
 balsa_mblist_have_new(BalsaMBList * bmbl)
 {
+    BalsaMailboxNode* mbn;
     g_return_if_fail(bmbl != NULL);
     balsa_mblist_set_style(bmbl);
 
@@ -884,6 +894,8 @@ balsa_mblist_have_new(BalsaMBList * bmbl)
 			     balsa_mblist_folder_style, NULL);
     gtk_clist_thaw(GTK_CLIST(bmbl));
 
+    if( (mbn=mblist_get_selected_node(bmbl)) != NULL)
+        mblist_update_statusbar(mbn->mailbox);
 }
 
 /* balsa_mblist_update_mailbox [MBG]
@@ -931,14 +943,7 @@ balsa_mblist_update_mailbox(BalsaMBList * mblist,
 			     balsa_mblist_folder_style, NULL);
 
     gtk_clist_thaw(GTK_CLIST(mblist));
-
-    desc =
-	g_strdup_printf(_("Shown mailbox: %s with %ld messages, %ld new"),
-			mailbox->name, mailbox->total_messages,
-			mailbox->unread_messages);
-
-    gnome_appbar_set_default(balsa_app.appbar, desc);
-    g_free(desc);
+    mblist_update_statusbar(mailbox);
 }
 
 static void

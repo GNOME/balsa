@@ -29,6 +29,7 @@
 #include <errno.h>
 
 #include "libbalsa.h"
+#include "misc.h"
 #include "mailbackend.h"
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-06 17:42-0500\n"
-"PO-Revision-Date: 2005-01-06 14:48-0400\n"
+"POT-Creation-Date: 2005-01-07 16:18-0500\n"
+"PO-Revision-Date: 2005-01-07 14:48-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: en_CA <adamw@FreeBSD.org>\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "Cannot search in the address book"
 msgid "Cannot add duplicate entry"
 msgstr "Cannot add duplicate entry"
 
-#: libbalsa/address-book.c:407 src/main-window.c:2203 src/main-window.c:4191
+#: libbalsa/address-book.c:407 src/main-window.c:2187 src/main-window.c:4176
 #: src/sendmsg-window.c:4810
 msgid "Unknown error"
 msgstr "Unknown error"
@@ -523,7 +523,7 @@ msgstr "IMAP server has shut the connection: %s Reconnecting..."
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Opening %s Refcount: %d\n"
 
-#: libbalsa/mailbox_imap.c:1040 libbalsa/mailbox_imap.c:2067
+#: libbalsa/mailbox_imap.c:1040 libbalsa/mailbox_imap.c:2106
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Downloading %ld kB"
@@ -542,12 +542,16 @@ msgstr ""
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "No path found for mailbox \"%s\"; using \"%s\""
 
-#: libbalsa/mailbox_imap.c:2259
+#: libbalsa/mailbox_imap.c:1555 libbalsa/mailbox_imap.c:1595
+msgid "Cannot get IMAP handle"
+msgstr "Cannot get IMAP handle"
+
+#: libbalsa/mailbox_imap.c:2298
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Uploading %ld kB"
 
-#: libbalsa/mailbox_imap.c:2446
+#: libbalsa/mailbox_imap.c:2485
 msgid "Server-side threading not supported."
 msgstr "Server-side threading not supported."
 
@@ -1241,7 +1245,7 @@ msgstr "Try again later."
 msgid "Sending Mail..."
 msgstr "Sending Mail..."
 
-#: libbalsa/send.c:240 src/main-window.c:2641
+#: libbalsa/send.c:240 src/main-window.c:2625
 msgid "_Hide"
 msgstr "_Hide"
 
@@ -1796,7 +1800,7 @@ msgstr "Enable _TLS"
 msgid "Error displaying %s: %s\n"
 msgstr "Error displaying %s: %s\n"
 
-#: src/address-book-config.c:623 src/mailbox-conf.c:622
+#: src/address-book-config.c:623 src/mailbox-conf.c:630
 #: src/pref-manager.c:1748 src/pref-manager.c:3016
 msgid "_Add"
 msgstr "_Add"
@@ -1843,7 +1847,7 @@ msgstr "Mailbox _password for %s@%s:"
 msgid "Password needed"
 msgstr "Password needed"
 
-#: src/balsa-app.c:95 src/folder-conf.c:344
+#: src/balsa-app.c:95 src/folder-conf.c:346
 msgid "_Remember password"
 msgstr "_Remember password"
 
@@ -1974,11 +1978,11 @@ msgstr "_Other..."
 msgid "Choose destination folder"
 msgstr "Choose destination folder"
 
-#: src/balsa-mblist.c:1895
+#: src/balsa-mblist.c:1917 src/balsa-mblist.c:1920
 msgid "Other..."
 msgstr "Other..."
 
-#: src/balsa-mblist.c:2188
+#: src/balsa-mblist.c:2241
 #, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1987,7 +1991,7 @@ msgstr[1] "Shown mailbox: %s with %d messages, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2194
+#: src/balsa-mblist.c:2247
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
@@ -2487,17 +2491,17 @@ msgstr "_All"
 msgid "C_lear"
 msgstr "C_lear"
 
-#: src/filter-edit-callbacks.c:1133 src/main-window.c:3788
+#: src/filter-edit-callbacks.c:1133 src/main-window.c:3772
 msgid "_Body"
 msgstr "_Body"
 
 #. To:
-#: src/filter-edit-callbacks.c:1140 src/main-window.c:3789
+#: src/filter-edit-callbacks.c:1140 src/main-window.c:3773
 #: src/sendmsg-window.c:2797
 msgid "_To:"
 msgstr "_To:"
 
-#: src/filter-edit-callbacks.c:1147 src/main-window.c:3790
+#: src/filter-edit-callbacks.c:1147 src/main-window.c:3774
 msgid "_From:"
 msgstr "_From:"
 
@@ -2505,7 +2509,7 @@ msgstr "_From:"
 msgid "_Subject"
 msgstr "_Subject"
 
-#: src/filter-edit-callbacks.c:1162 src/main-window.c:3792
+#: src/filter-edit-callbacks.c:1162 src/main-window.c:3776
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -2752,76 +2756,76 @@ msgstr ""
 "The filters dialogue is opened, close it before you can run filters on any "
 "mailbox"
 
-#: src/folder-conf.c:269
+#: src/folder-conf.c:271
 msgid "Remote IMAP folder"
 msgstr "Remote IMAP folder"
 
 #. must NOT be modal
-#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:633
+#: src/folder-conf.c:274 src/folder-conf.c:727 src/mailbox-conf.c:641
 msgid "_Update"
 msgstr "_Update"
 
-#: src/folder-conf.c:272 src/folder-conf.c:704
-msgid "_Create"
-msgstr "_Create"
+#: src/folder-conf.c:274
+msgid "C_reate"
+msgstr "C_reate"
 
-#: src/folder-conf.c:294 src/mailbox-conf.c:1131 src/mailbox-conf.c:1222
+#: src/folder-conf.c:296 src/mailbox-conf.c:1139 src/mailbox-conf.c:1230
 msgid "_Basic"
 msgstr "_Basic"
 
-#: src/folder-conf.c:299
+#: src/folder-conf.c:301
 msgid "_Max number of connections"
 msgstr "_Maximum number of connections"
 
-#: src/folder-conf.c:306 src/mailbox-conf.c:1292
+#: src/folder-conf.c:308 src/mailbox-conf.c:1300
 msgid "Enable _persistent cache"
 msgstr "Enable _persistent cache"
 
-#: src/folder-conf.c:314 src/mailbox-conf.c:1296
+#: src/folder-conf.c:316 src/mailbox-conf.c:1304
 msgid "Enable _bug workarounds"
 msgstr "Enable _bug workarounds"
 
-#: src/folder-conf.c:320 src/mailbox-conf.c:1185 src/mailbox-conf.c:1298
+#: src/folder-conf.c:322 src/mailbox-conf.c:1193 src/mailbox-conf.c:1306
 msgid "_Advanced"
 msgstr "_Advanced"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:323
+#: src/folder-conf.c:325
 msgid "Descriptive _Name:"
 msgstr "Descriptive _Name:"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:330 src/mailbox-conf.c:1139 src/mailbox-conf.c:1231
+#: src/folder-conf.c:332 src/mailbox-conf.c:1147 src/mailbox-conf.c:1239
 msgid "_Server:"
 msgstr "_Server:"
 
 #. username
-#: src/folder-conf.c:338 src/mailbox-conf.c:1147
+#: src/folder-conf.c:340 src/mailbox-conf.c:1155
 msgid "Use_r name:"
 msgstr "Use_r name:"
 
-#: src/folder-conf.c:349
+#: src/folder-conf.c:351
 msgid "_Password:"
 msgstr "_Password:"
 
-#: src/folder-conf.c:354
+#: src/folder-conf.c:356
 msgid "Subscribed _folders only"
 msgstr "Subscribed _folders only"
 
-#: src/folder-conf.c:356
+#: src/folder-conf.c:358
 msgid "Always show _INBOX"
 msgstr "Always show _INBOX"
 
-#: src/folder-conf.c:359
+#: src/folder-conf.c:361
 msgid "Pr_efix"
 msgstr "Pr_efix"
 
-#: src/folder-conf.c:504
+#: src/folder-conf.c:509
 msgid "Select parent folder"
 msgstr "Select parent folder"
 
-#: src/folder-conf.c:577
+#: src/folder-conf.c:583
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2836,19 +2840,29 @@ msgstr ""
 "INBOX and its subfolders will remain.\n"
 "What would you like to do?"
 
-#: src/folder-conf.c:583
+#: src/folder-conf.c:589
 msgid "Question"
 msgstr "Question"
 
-#: src/folder-conf.c:588
+#: src/folder-conf.c:594
 msgid "Rename INBOX"
 msgstr "Rename INBOX"
 
-#: src/folder-conf.c:590
+#: src/folder-conf.c:596
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/folder-conf.c:686
+#: src/folder-conf.c:617
+#, c-format
+msgid "Folder rename failed. Reason: %s"
+msgstr "Folder rename failed. Reason: %s"
+
+#: src/folder-conf.c:669
+#, c-format
+msgid "Folder creation failed. Reason: %s"
+msgstr "Folder creation failed. Reason: %s"
+
+#: src/folder-conf.c:709
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -2856,32 +2870,40 @@ msgstr ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 
-#: src/folder-conf.c:701
+#: src/folder-conf.c:724
 msgid "Remote IMAP subfolder"
 msgstr "Remote IMAP subfolder"
 
-#: src/folder-conf.c:725
+#: src/folder-conf.c:727
+msgid "_Create"
+msgstr "_Create"
+
+#: src/folder-conf.c:748
 msgid "Rename or move subfolder"
 msgstr "Rename or move subfolder"
 
-#: src/folder-conf.c:726
+#: src/folder-conf.c:749
 msgid "Create subfolder"
 msgstr "Create subfolder"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:733
+#: src/folder-conf.c:756
 msgid "_Folder name:"
 msgstr "_Folder name:"
 
-#: src/folder-conf.c:739
-msgid "_Subfolder of:"
-msgstr "_Subfolder of:"
+#: src/folder-conf.c:765
+msgid "Host:"
+msgstr "Host:"
 
-#: src/folder-conf.c:744
+#: src/folder-conf.c:771
 msgid "_Browse..."
 msgstr "_Browse..."
 
-#: src/folder-conf.c:775
+#: src/folder-conf.c:780
+msgid "_Subfolder of:"
+msgstr "_Subfolder of:"
+
+#: src/folder-conf.c:809
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -2889,7 +2911,7 @@ msgstr ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
 
-#: src/folder-conf.c:784
+#: src/folder-conf.c:818
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2898,7 +2920,7 @@ msgstr ""
 "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 
-#: src/folder-conf.c:789
+#: src/folder-conf.c:823
 msgid "Confirm"
 msgstr "Confirm"
 
@@ -2921,13 +2943,13 @@ msgstr "ERROR: "
 msgid "FATAL: "
 msgstr "FATAL: "
 
-#: src/mailbox-conf.c:213 src/mailbox-conf.c:1385 src/pref-manager.c:364
+#: src/mailbox-conf.c:213 src/mailbox-conf.c:1393 src/pref-manager.c:364
 #: src/pref-manager.c:3392 src/pref-manager.c:3398 src/pref-manager.c:3520
 #: src/pref-manager.c:3526
 msgid "Never"
 msgstr "Never"
 
-#: src/mailbox-conf.c:214 src/mailbox-conf.c:1386 src/pref-manager.c:3521
+#: src/mailbox-conf.c:214 src/mailbox-conf.c:1394 src/pref-manager.c:3521
 #: src/pref-manager.c:3527
 msgid "If Possible"
 msgstr "If Possible"
@@ -3016,20 +3038,25 @@ msgstr ""
 msgid "_Remove from list"
 msgstr "_Remove from list"
 
-#: src/mailbox-conf.c:562 src/sendmsg-window.c:1179
+#: src/mailbox-conf.c:512
+#, c-format
+msgid "Folder deletion failed. Reason: %s"
+msgstr "Folder deletion failed. Reason: %s"
+
+#: src/mailbox-conf.c:570 src/sendmsg-window.c:1179
 msgid "Select Identity"
 msgstr "Select Identity"
 
-#: src/mailbox-conf.c:589
+#: src/mailbox-conf.c:597
 msgid "Mailbox Configurator"
 msgstr "Mailbox Configurator"
 
-#: src/mailbox-conf.c:784
+#: src/mailbox-conf.c:792
 #, c-format
 msgid "%s on %s"
 msgstr "%s on %s"
 
-#: src/mailbox-conf.c:922
+#: src/mailbox-conf.c:930
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -3039,86 +3066,86 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:1087 src/mailbox-conf.c:1134 src/mailbox-conf.c:1225
+#: src/mailbox-conf.c:1095 src/mailbox-conf.c:1142 src/mailbox-conf.c:1233
 msgid "Mailbox _Name:"
 msgstr "Mailbox _Name:"
 
 #. path to file
-#: src/mailbox-conf.c:1095
+#: src/mailbox-conf.c:1103
 msgid "Mailbox _Path:"
 msgstr "Mailbox _Path:"
 
-#: src/mailbox-conf.c:1097
+#: src/mailbox-conf.c:1105
 msgid "Mailbox Path"
 msgstr "Mailbox Path"
 
 #. password field
-#: src/mailbox-conf.c:1153 src/mailbox-conf.c:1253
+#: src/mailbox-conf.c:1161 src/mailbox-conf.c:1261
 msgid "Pass_word:"
 msgstr "Pass_word:"
 
-#: src/mailbox-conf.c:1161
+#: src/mailbox-conf.c:1169
 msgid "_Delete messages from server after download"
 msgstr "_Delete messages from server after download"
 
-#: src/mailbox-conf.c:1166
+#: src/mailbox-conf.c:1174
 msgid "_Filter messages through procmail"
 msgstr "_Filter messages through procmail"
 
-#: src/mailbox-conf.c:1170
+#: src/mailbox-conf.c:1178
 msgid "Fi_lter Command:"
 msgstr "Fi_lter Command:"
 
-#: src/mailbox-conf.c:1178
+#: src/mailbox-conf.c:1186
 msgid "_Enable check for new mail"
 msgstr "_Enable check for new mail"
 
-#: src/mailbox-conf.c:1189
+#: src/mailbox-conf.c:1197
 msgid "Disable _APOP"
 msgstr "Disable _APOP"
 
 #. username
-#: src/mailbox-conf.c:1239
+#: src/mailbox-conf.c:1247
 msgid "_Username:"
 msgstr "_Username:"
 
-#: src/mailbox-conf.c:1247
+#: src/mailbox-conf.c:1255
 msgid "_Remember Password"
 msgstr "_Remember Password"
 
-#: src/mailbox-conf.c:1258
+#: src/mailbox-conf.c:1266
 msgid "F_older Path:"
 msgstr "F_older Path:"
 
-#: src/mailbox-conf.c:1346
+#: src/mailbox-conf.c:1354
 msgid "Identity:"
 msgstr "Identity:"
 
-#: src/mailbox-conf.c:1352
+#: src/mailbox-conf.c:1360
 msgid "(No identity set)"
 msgstr "(No identity set)"
 
-#: src/mailbox-conf.c:1356
+#: src/mailbox-conf.c:1364
 msgid "C_hange..."
 msgstr "C_hange..."
 
-#: src/mailbox-conf.c:1363
+#: src/mailbox-conf.c:1371
 msgid "Show address:"
 msgstr "Show address:"
 
-#: src/mailbox-conf.c:1366
+#: src/mailbox-conf.c:1374
 msgid "_From"
 msgstr "_From"
 
-#: src/mailbox-conf.c:1372
+#: src/mailbox-conf.c:1380
 msgid "_To"
 msgstr "_To"
 
-#: src/mailbox-conf.c:1387 src/pref-manager.c:3394 src/pref-manager.c:3400
+#: src/mailbox-conf.c:1395 src/pref-manager.c:3394 src/pref-manager.c:3400
 msgid "Always"
 msgstr "Always"
 
-#: src/mailbox-conf.c:1393
+#: src/mailbox-conf.c:1401
 msgid ""
 "decrypt and check\n"
 "signatures automatically"
@@ -3848,11 +3875,11 @@ msgstr ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 
-#: src/main-window.c:1379 src/main-window.c:4877
+#: src/main-window.c:1379 src/main-window.c:4864
 msgid "Subject or Sender _Contains:"
 msgstr "Subject or Sender _Contains:"
 
-#: src/main-window.c:2202
+#: src/main-window.c:2186
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -3861,13 +3888,13 @@ msgstr ""
 "Unable to Open Mailbox!\n"
 "%s."
 
-#: src/main-window.c:2519
-msgid "translator_credits"
+#: src/main-window.c:2503
+msgid "translator-credits"
 msgstr ""
 "Maintainer: Adam Weinberger <adamw@gnome.org>\n"
 "Alexander Winston <alexander.winston@comcast.net>"
 
-#: src/main-window.c:2535
+#: src/main-window.c:2519
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3879,105 +3906,105 @@ msgstr ""
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:2638
+#: src/main-window.c:2622
 msgid "Checking Mail..."
 msgstr "Checking Mail..."
 
-#: src/main-window.c:2837
+#: src/main-window.c:2821
 #, c-format
 msgid "IMAP Server %s: %s"
 msgstr "IMAP Server %s: %s"
 
-#: src/main-window.c:2840
+#: src/main-window.c:2824
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Local mailbox: %s"
 
-#: src/main-window.c:2977
+#: src/main-window.c:2961
 msgid "Finished Checking."
 msgstr "Finished Checking."
 
-#: src/main-window.c:3039
+#: src/main-window.c:3023
 #, c-format
 msgid "Sending error: %s"
 msgstr "Sending error: %s"
 
-#: src/main-window.c:3124
+#: src/main-window.c:3108
 msgid "Balsa: New mail"
 msgstr "Balsa: New mail"
 
-#: src/main-window.c:3136
+#: src/main-window.c:3120
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "You have received %d new message."
 msgstr[1] "You have received %d new messages."
 
-#: src/main-window.c:3139
+#: src/main-window.c:3123
 msgid "You have new mail."
 msgstr "You have new mail."
 
-#: src/main-window.c:3750
+#: src/main-window.c:3734
 msgid "Search mailbox"
 msgstr "Search mailbox"
 
-#: src/main-window.c:3767
+#: src/main-window.c:3751
 msgid "_Search for:"
 msgstr "_Search for:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3780
+#: src/main-window.c:3764
 msgid "In:"
 msgstr "In:"
 
-#: src/main-window.c:3791
+#: src/main-window.c:3775
 msgid "S_ubject"
 msgstr "S_ubject"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3796
+#: src/main-window.c:3780
 msgid "Show only matching messages"
 msgstr "Show only matching messages"
 
 #. Frame with OK button
-#: src/main-window.c:3817
+#: src/main-window.c:3801
 msgid "Open next matching message"
 msgstr "Open next matching message"
 
-#: src/main-window.c:3828
+#: src/main-window.c:3812
 msgid "_Reverse search"
 msgstr "_Reverse search"
 
-#: src/main-window.c:3833
+#: src/main-window.c:3817
 msgid "_Wrap around"
 msgstr "_Wrap around"
 
-#: src/main-window.c:3909
+#: src/main-window.c:3893
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Error displaying help: %s\n"
 
-#: src/main-window.c:3994
+#: src/main-window.c:3978
 msgid "You can apply filters only on mailbox\n"
 msgstr "You can apply filters only on mailbox\n"
 
-#: src/main-window.c:4190
+#: src/main-window.c:4175
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Could not open trash: %s"
 
-#: src/main-window.c:4317
+#: src/main-window.c:4304
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (readonly)"
 
-#: src/main-window.c:4319
+#: src/main-window.c:4306
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:4876
+#: src/main-window.c:4863
 msgid "Subject or Receiver _Contains:"
 msgstr "Subject or Receiver _Contains:"
 

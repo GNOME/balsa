@@ -155,6 +155,7 @@ libbalsa_message_body_save (LibBalsaMessageBody *body, gchar *prefix, gchar *fil
   STATE s;
 
   stream = libbalsa_mailbox_get_message_stream (body->message->mailbox, body->message);
+  
   if ( stream == NULL )
     return FALSE;
 

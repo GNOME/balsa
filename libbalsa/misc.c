@@ -167,7 +167,6 @@ add_imap_mbox_cb(const char * file, int isdir, gpointer data)
 	
 	mailbox->path	= g_strdup(file);
 
-	mailbox_add_for_checking ( LIBBALSA_MAILBOX(mailbox) );
 	node = g_node_new (mailbox_node_new (
 	    basename, LIBBALSA_MAILBOX(mailbox), FALSE));
     }

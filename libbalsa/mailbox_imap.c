@@ -38,8 +38,11 @@ static void libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass);
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox);
 static void libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append);
 static FILE* libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message);
+static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox);
 
-/*static guint mailbox_signals[LAST_SIGNAL] = { 0 };*/
+static void server_settings_changed(LibBalsaServer *server, LibBalsaMailbox *mailbox);
+static void server_user_settings_changed_cb(LibBalsaServer *server, gchar* string, LibBalsaMailbox *mailbox);
+static void server_host_settings_changed_cb(LibBalsaServer *server, gchar* host, gint port, LibBalsaMailbox *mailbox);
 
 static void set_mutt_username (LibBalsaMailboxImap *mailbox);
 
@@ -83,6 +86,8 @@ libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass)
 
   libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
   libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_imap_get_message_stream;
+
+  libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
 }
 
 static void
@@ -94,6 +99,13 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox)
 
   remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
   remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
+
+  gtk_signal_connect(GTK_OBJECT(remote->server), "set-username",
+		     GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
+  gtk_signal_connect(GTK_OBJECT(remote->server), "set-password",
+		     GTK_SIGNAL_FUNC(server_user_settings_changed_cb), (gpointer)mailbox);
+  gtk_signal_connect(GTK_OBJECT(remote->server), "set-host",
+		     GTK_SIGNAL_FUNC(server_host_settings_changed_cb), (gpointer)mailbox);
 }
 
 static void
@@ -105,9 +117,12 @@ libbalsa_mailbox_imap_destroy (GtkObject *object)
   g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP (object) );
 
   mailbox = LIBBALSA_MAILBOX_IMAP(object);
+
   remote = LIBBALSA_MAILBOX_REMOTE(object);
 
   g_free(mailbox->path);
+
+  libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 
   gtk_object_destroy(GTK_OBJECT(remote->server));
 
@@ -130,8 +145,30 @@ set_mutt_username (LibBalsaMailboxImap * mb)
 {
   g_return_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mb));
 
-  ImapUser = LIBBALSA_MAILBOX_REMOTE(mb)->server->user;
-  ImapPass = LIBBALSA_MAILBOX_REMOTE(mb)->server->passwd;
+  ImapUser = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->user;
+  ImapPass = LIBBALSA_MAILBOX_REMOTE_SERVER(mb)->passwd;
+}
+
+/* Unregister an old notification and add a current one */
+static void
+server_settings_changed(LibBalsaServer *server, LibBalsaMailbox *mailbox)
+{
+  libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
+
+  if ( server->user && server->passwd && server->host )
+    libbalsa_notify_register_mailbox(mailbox);
+}
+
+static void 
+server_user_settings_changed_cb(LibBalsaServer *server, gchar* string, LibBalsaMailbox *mailbox)
+{
+  server_settings_changed(server, mailbox);
+}
+
+static void
+server_host_settings_changed_cb(LibBalsaServer *server, gchar* host, gint port, LibBalsaMailbox *mailbox)
+{
+  server_settings_changed(server, mailbox);
 }
 
 static void 
@@ -183,10 +220,8 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
       mailbox->messages = 0;
       mailbox->total_messages = 0;
       mailbox->unread_messages = 0;
-      mailbox->has_unread_messages = FALSE; /* has_unread_messages will be reset
-					       by load_messages anyway */
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
-      libbalsa_mailbox_load_messages (mailbox); /*0*/
+      libbalsa_mailbox_load_messages (mailbox);
 
       /* increment the reference count */
       mailbox->open_ref++;
@@ -214,32 +249,44 @@ libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMess
   return stream;
 }
 
-#if 0
-/* mailbox_imap_has_new_messages:
-   returns non-zero when the IMAP mbox in question has new messages.
-   should it load new messages, too?
-
-   REMARK: imap is now checked as ordinary file mailboxes, via Buffy system.
-*/
-gint
-mailbox_imap_has_new_messages(LibBalsaMailboxIMAP *mailbox)
+static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 {
-    gint res;
-    gchar * tmp;
+  if ( mailbox->open_ref == 0 )
+  {
+    mailbox->new_messages = libbalsa_notify_check_mailbox(mailbox);
+  }
+  else
+  {
+    gint i = 0;
+    gint index_hint;
 
-    g_assert(mailbox!=NULL);
+    LOCK_MAILBOX(mailbox);
+    
+    index_hint = CLIENT_CONTEXT (mailbox)->vcount;
 
-    if(MAILBOX(mailbox)->has_unread_messages)
-	return MAILBOX(mailbox)->has_unread_messages;
-
-    tmp = g_strdup_printf("{%s:%i}%s", 
-			  mailbox->server->host,
-			  mailbox->server->port,
-			  mailbox->path);
-    libbalsa_mailbox_imap_set_username ( mailbox );
-    res = imap_buffy_check (tmp);
-    g_free(tmp);
-    /* if(res) MAILBOX(mailbox)->has_unread_messages = res; */
-    return res;
-}
+    if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0)
+    {
+      UNLOCK_MAILBOX (mailbox);
+      g_print ("error or something\n");
+    }
+    else if (i == M_NEW_MAIL || i == M_REOPENED)
+    {
+      /* g_print ("got new mail! yippie!\n"); */
+      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
+      
+      if (mailbox->new_messages > 0)
+      {
+#ifndef BALSA_USE_THREADS
+	libbalsa_mailbox_load_messages (mailbox);
 #endif
+      }
+    UNLOCK_MAILBOX (mailbox);
+    }
+  }
+
+  /* FIXME: Could emit a signal here. To signify that there are new messages in this mailbox
+   * If the mailbox if open there is a signal for each new message, but if it is closed then
+   * is no signal 
+   */
+
+}

@@ -36,7 +36,6 @@
 #include "misc.h"
 #include "save-restore.h"
 #include "mailbox-conf.h"
-#include "mutt.h"
 #include "quote-color.h"
 
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
@@ -552,15 +551,15 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       path = pl_dict_get_str (mbox, "Path");
       if (path == NULL)
 	return FALSE;
-      
+
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, FALSE));
+
       if ( mailbox == NULL ) {
 	fprintf (stderr, "config_mailbox_init: Cannot create "
 		   "local mailbox %s\n", mailbox_name);
 	return FALSE;
       }
       mailbox->name = mailbox_name;
-      mailbox_add_for_checking(mailbox);
 
     }
   else if (!strcasecmp (type, "POP3"))	/* POP3 mailbox */
@@ -591,6 +590,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       else {
 	gchar *port;
 	port = pl_dict_get_str (mbox, "Port");
+
 	if ( port != NULL )
 	  libbalsa_server_set_host (server, field, atoi(port));
 	else
@@ -614,6 +614,8 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
+
+      return TRUE; /* Don't put POP mailbox in mailbox nodes */
     }
   else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
     {
@@ -993,7 +995,7 @@ config_global_load (void)
       balsa_app.charset = g_strdup(DEFAULT_CHARSET);
   else
       balsa_app.charset = g_strdup(field);
-  mutt_set_charset (balsa_app.charset);
+  libbalsa_set_charset (balsa_app.charset);
 
   if (( field = pl_dict_get_str (globals, "EncodingStyle")) == NULL)
       balsa_app.encoding_style = /*DEFAULT_ENCODING*/ 2;

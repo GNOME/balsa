@@ -416,16 +416,15 @@ libbalsa_message_real_set_read_flag(LibBalsaMessage *message, gboolean set)
     message->mailbox->unread_messages-- ;
 
     if (message->mailbox->unread_messages <= 0) 
-      message->mailbox->has_unread_messages = FALSE;
-
+      libbalsa_mailbox_set_unread_messages_flag(message->mailbox, FALSE);
+      
     /*  send_watcher_mark_read_message (message->mailbox, message); */
   } else if (!set){
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_READ, TRUE);
 
     message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
     message->mailbox->unread_messages++;
-    message->mailbox->has_unread_messages = TRUE;
-    /*  send_watcher_mark_unread_message (message->mailbox, message); */
+    libbalsa_mailbox_set_unread_messages_flag(message->mailbox, TRUE);
   }
 
   UNLOCK_MAILBOX (message->mailbox);
@@ -468,8 +467,8 @@ libbalsa_message_real_set_deleted_flag(LibBalsaMessage *message, gboolean set)
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
           message->mailbox->unread_messages--;
 
-          if (message->mailbox->unread_messages <= 0) 
-            message->mailbox->has_unread_messages = FALSE;
+          if (message->mailbox->unread_messages <= 0)
+	    libbalsa_mailbox_set_unread_messages_flag(message->mailbox, FALSE);
         }
         
 	message->mailbox->total_messages--;

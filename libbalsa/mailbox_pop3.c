@@ -28,10 +28,11 @@
 #include "libbalsa_private.h"
 #include "mailbackend.h"
 
-/*static guint mailbox_signals[LAST_SIGNAL] = { 0 };*/
-
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
+#else
+/* FIXME: Balsa dependency */
+#include "src/save-restore.h" /*config_mailbox_update*/
 #endif
 
 static LibBalsaMailboxClass *parent_class = NULL;
@@ -41,6 +42,11 @@ static void libbalsa_mailbox_pop3_class_init (LibBalsaMailboxPop3Class *klass);
 static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox);
 
 static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean append);
+static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox);
+
+#ifdef BALSA_USE_THREADS
+static void error_in_thread( const char *format, ... );
+#endif
 
 GtkType
 libbalsa_mailbox_pop3_get_type (void)
@@ -81,6 +87,9 @@ libbalsa_mailbox_pop3_class_init (LibBalsaMailboxPop3Class *klass)
   object_class->destroy = libbalsa_mailbox_pop3_destroy;
 
   libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
+
+  libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
+
 }
 
 static void
@@ -92,6 +101,8 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox)
 
   remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
   remote->server = LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
+  remote->server->port = 110;
+
 }
 
 static void
@@ -156,8 +167,6 @@ static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean appen
     mailbox->messages = 0;
     mailbox->total_messages = 0;
     mailbox->unread_messages = 0;
-    mailbox->has_unread_messages = FALSE; /* has_unread_messages will be reset
-					     by load_messages anyway */
     mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
     libbalsa_mailbox_load_messages (mailbox); /*0*/
     
@@ -173,3 +182,106 @@ static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean appen
   UNLOCK_MAILBOX (mailbox);
 
 }
+
+static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
+{
+  char uid[80];
+
+#ifdef BALSA_USE_THREADS
+  char msgbuf[160];
+  MailThreadMessage *threadmsg;
+  void (*mutt_error_backup)( const char *, ... );
+
+  /* Otherwise we get multithreaded GTK+ calls... baaad */
+  mutt_error_backup = mutt_error;
+  mutt_error = error_in_thread;
+
+/*  Only check if lock has been set */
+  pthread_mutex_lock( &mailbox_lock);
+  if( !checking_mail )
+  {
+    pthread_mutex_unlock( &mailbox_lock);
+    return;
+  }
+  pthread_mutex_unlock( &mailbox_lock );
+#endif /* BALSA_USE_THREADS */
+  
+  if (LIBBALSA_MAILBOX_POP3 (mailbox)->check)
+  {
+    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    PopHost = g_strdup (server->host);
+    PopPort = (server->port);
+    PopPass = g_strdup (server->passwd);
+    PopUser = g_strdup (server->user);
+
+#ifdef BALSA_USE_THREADS
+    sprintf( msgbuf, "POP3: %s", mailbox->name );
+    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
+#endif
+    
+    if( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
+      uid[0] = 0;
+    else
+      strcpy( uid, LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
+    
+    PopUID = uid;
+
+    /* Delete it if necessary */
+    if (LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server)
+    {
+      set_option(OPTPOPDELETE);
+    }
+    else
+    {
+      unset_option(OPTPOPDELETE);
+    }
+    
+    mutt_fetchPopMail ();
+    g_free (PopHost);
+    g_free (PopPass);
+    g_free (PopUser);
+
+    if( LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
+	strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
+    {
+      if( LIBBALSA_MAILBOX_POP3( mailbox )->last_popped_uid )
+	g_free ( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
+      LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
+      
+#ifdef BALSA_USE_THREADS
+      threadmsg = g_new (MailThreadMessage, 1);
+      threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
+      threadmsg->mailbox = (void *) mailbox;
+      write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
+#else
+      config_mailbox_update( 
+	mailbox, mailbox_get_pkey(mailbox) );
+#endif
+    }
+  }
+
+#ifdef BALSA_USE_THREADS
+  mutt_error = mutt_error_backup;
+#endif
+
+}
+
+#ifdef BALSA_USE_THREADS
+/* FIXME: Can remove by using GDK_THREAD_ENTER perhaps */
+static void error_in_thread( const char *format, ... )
+{
+	va_list val;
+	gchar *submessage, *message;
+	MailThreadMessage *tmsg;
+
+	va_start( val, format );
+	submessage = g_strdup_vprintf( format, val );
+	va_end( val );
+
+	message = g_strconcat( _("Error: "), submessage, NULL );
+	g_free( submessage );
+
+	MSGMAILTHREAD( tmsg, MSGMAILTHREAD_ERROR, message );
+	g_free( message );
+}
+#endif

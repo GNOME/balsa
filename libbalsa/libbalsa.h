@@ -41,6 +41,7 @@ typedef struct body MuttBody;
 #include "files.h"
 #include "misc.h"
 #include "mime.h"
+#include "notify.h"
 
 #include "server.h"
 

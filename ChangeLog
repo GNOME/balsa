@@ -1,3 +1,33 @@
+2000-08-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/Makefile.am: Add notify.[ch]. A wrapper for the mutt
+	buffy module. 
+	* libbalsa/libbalsa.c(libbalsa_init): Call libbalsa_notify_init()
+	* libbalsa/libbalsa.h: Include notify.h
+	* libbalsa/mailbox.[ch]: Add two new signals, check and
+	set_unread_messages_flag. check is a virtual function which
+	abstracts the operation of checking a mailbox. Remove
+	libbalsa_mailbox_check_for_new_messages and libbalsa_mailbox_
+	replaced both with libbalsa_mailbox_check.
+	* libbalsa/mailbox_local.c, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_pop.c: implement the check function, make use of
+	libbalsa_notify where appropriate. Mailboxes now handle adding
+	themselves for notification internally, so
+	add_mailbox_for_checking() is no longer needed.
+	* libbalsa/message.c: Use
+	libbalsa_mailbox_set_unread_messages_flag instead of modifying the
+	flag directly - emits signal.
+	* libbalsa/send.c: Use libbalsa_mailbox_check().
+	* src/balsa-mblist.c: Use the set-unread-messages-flag signal instead
+	of directly polling each mailbox on update. This also removes the
+	need for a separate thread, since expensive work happens in the
+	same thread as checking is done.
+	* src/main-window.c: Update check_messages thread to work with new
+	checking system.
+	* src/save-restore.c: Don't put POP3 mailboxes in the list with
+	the others, they live in balsa_app.inbox_input. Use
+	libbalsa_set_charset not mutt_set_charset.
+	
 2000-08-15  Matthew Guenther <mguenthe@attcanada.ca>
 
 	* src/balsa-index-page.c: Fix mailbox updating, AppBar stuff.

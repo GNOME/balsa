@@ -8,6 +8,8 @@ LibBalsaAddress* libbalsa_address_new_from_libmutt(ADDRESS *caddr);
 
 #ifdef BALSA_USE_THREADS
 
+/*  #define DEBUG */
+
 #ifdef DEBUG
 #define DMSG1(s) fprintf(stderr,s)
 #define DMSG2(a,b) fprintf(stderr,a,b)

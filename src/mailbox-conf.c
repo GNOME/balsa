@@ -380,7 +380,7 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
     
     pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    
+
     port = g_strdup_printf ("%d", server->port);
 
     if (  mailbox->name )
@@ -759,7 +759,6 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
     }
 
   config_mailbox_add (mailbox, NULL);
-  mailbox_add_for_checking (mailbox);
   *mbox = mailbox;
   return TRUE;
 }

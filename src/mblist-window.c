@@ -203,8 +203,7 @@ mblist_open_mailbox (LibBalsaMailbox * mailbox)
     balsa_mblist_update_mailbox (balsa_app.mblist, mailbox);
   }
 #endif
-
-/*   balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree)); */
+  balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
 }
 
 

@@ -105,17 +105,13 @@ struct _LibBalsaMailboxClass
 				    LibBalsaMessage *message);
   void (* message_status_changed)  (LibBalsaMailbox *mailbox,
 				    LibBalsaMessage *message);
-
-  void (* set_username)            (LibBalsaMailbox *mailbox,
-				    const gchar *name);
-  void (* set_password)            (LibBalsaMailbox *mailbox,
-				    const gchar *passwd);
-  void (* set_host)                (LibBalsaMailbox *mailbox,
-				    const gchar *host, gint port);
+  void (* set_unread_messages_flag)(LibBalsaMailbox *mailbox,
+				    gboolean flag);
 
   /* Virtual Functions */
   FILE* (* get_message_stream)     (LibBalsaMailbox *mailbox,
 				    LibBalsaMessage *message);
+  void  (* check)                  (LibBalsaMailbox *mailbox);
 };
 
 GtkType libbalsa_mailbox_get_type (void);
@@ -130,6 +126,8 @@ void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_free_messages (LibBalsaMailbox * mailbox);
 
+void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolean has_unread);
+     
 FILE *libbalsa_mailbox_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message);
 
 /*
@@ -139,11 +137,7 @@ void libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort)
 
 void libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox );
 
-void check_all_pop3_hosts (LibBalsaMailbox *, GList *);
-void mailbox_add_for_checking (LibBalsaMailbox *);
-
-gint libbalsa_mailbox_has_new_messages (LibBalsaMailbox * mailbox);
-gint libbalsa_mailbox_check_for_new_messages (LibBalsaMailbox *);
+void libbalsa_mailbox_check (LibBalsaMailbox *mailbox);
 
 /*
  * misc mailbox releated functions

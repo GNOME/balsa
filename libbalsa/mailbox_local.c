@@ -43,9 +43,8 @@ static void libbalsa_mailbox_local_class_init (LibBalsaMailboxLocalClass *klass)
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal *mailbox);
 static void libbalsa_mailbox_local_destroy (GtkObject *object);
 
-/*static guint mailbox_signals[LAST_SIGNAL] = { 0 };*/
-
 static void libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append);
+static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox);
 static FILE* libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *message);
 
 GtkType
@@ -88,6 +87,7 @@ libbalsa_mailbox_local_class_init (LibBalsaMailboxLocalClass *klass)
 
   libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
   libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_local_get_message_stream;
+  libbalsa_mailbox_class->check = libbalsa_mailbox_local_check;
 }
 
 static void
@@ -96,21 +96,8 @@ libbalsa_mailbox_local_init(LibBalsaMailboxLocal *mailbox)
   mailbox->path = NULL;
 }
 
-static void
-libbalsa_mailbox_local_destroy (GtkObject *object)
-{
-  LibBalsaMailboxLocal *mailbox = LIBBALSA_MAILBOX_LOCAL(object);
-
-  if (!mailbox)
-    return;
-
-  g_free(mailbox->path);
-
-  if (GTK_OBJECT_CLASS(parent_class)->destroy)
-    (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
-}
-
-GtkObject* libbalsa_mailbox_local_new(const gchar *path, gboolean create)
+GtkObject* 
+libbalsa_mailbox_local_new(const gchar *path, gboolean create)
 {
   LibBalsaMailbox *mailbox;
   LibBalsaMailboxType type;
@@ -162,11 +149,31 @@ GtkObject* libbalsa_mailbox_local_new(const gchar *path, gboolean create)
 
   LIBBALSA_MAILBOX_LOCAL(mailbox)->path = g_strdup(path);
 
+  libbalsa_notify_register_mailbox(mailbox);
+
   return GTK_OBJECT(mailbox);
 
 }
 
-static void libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append)
+static void
+libbalsa_mailbox_local_destroy (GtkObject *object)
+{
+  LibBalsaMailboxLocal *mailbox;
+
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX_LOCAL (object) );
+
+  mailbox = LIBBALSA_MAILBOX_LOCAL(object);
+
+  libbalsa_notify_unregister_mailbox ( LIBBALSA_MAILBOX(mailbox) );
+
+  g_free(mailbox->path);
+
+  if (GTK_OBJECT_CLASS(parent_class)->destroy)
+    (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
+}
+
+static void
+libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append)
 {
   struct stat st;
   LibBalsaMailboxLocal *local;
@@ -208,10 +215,8 @@ static void libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean appen
       mailbox->messages = 0;
       mailbox->total_messages = 0;
       mailbox->unread_messages = 0;
-      mailbox->has_unread_messages = FALSE; /* has_unread_messages will be reset
-					       by load_messages anyway */
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
-      libbalsa_mailbox_load_messages (mailbox); /*0*/
+      libbalsa_mailbox_load_messages (mailbox);
 
       /* increment the reference count */
       mailbox->open_ref++;
@@ -265,3 +270,31 @@ libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMess
   return stream;
 }
 
+static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox)
+{
+  if ( mailbox->open_ref == 0 )
+  {
+    if ( libbalsa_notify_check_mailbox(mailbox) )
+      libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+  }
+  else
+  {
+    gint i = 0;
+    gint index_hint;
+
+    LOCK_MAILBOX(mailbox);
+
+    index_hint = CLIENT_CONTEXT (mailbox)->vcount;
+
+    if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0)
+    {
+      g_print ("error or something\n");
+    }
+    else if (i == M_NEW_MAIL || i == M_REOPENED)
+    {
+      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
+      libbalsa_mailbox_load_messages (mailbox);
+    }
+    UNLOCK_MAILBOX (mailbox);
+  }
+}

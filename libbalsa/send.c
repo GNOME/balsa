@@ -317,7 +317,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
 		      first_message->message, NULL, 1, NULL);
       
       if (save_box->open_ref > 0) {
-	libbalsa_mailbox_check_for_new_messages(save_box);
+	libbalsa_mailbox_check(save_box);
 #ifdef BALSA_USE_THREADS
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
 		      "Load Sent/Outbox", NULL, save_box, 0);
@@ -520,7 +520,7 @@ libbalsa_message_postpone (LibBalsaMessage * message,
   g_free(tmp);
 
   if (balsa_app.draftbox->open_ref > 0)
-    libbalsa_mailbox_check_for_new_messages (balsa_app.draftbox);
+    libbalsa_mailbox_check (balsa_app.draftbox);
   mutt_free_header (&msg);
 
   return TRUE;

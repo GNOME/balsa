@@ -87,7 +87,7 @@ enum {
   GSList *list = NULL;
   
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
-static void check_messages_thread( LibBalsaMailbox *mbox );
+static void check_messages_thread( gpointer data );
 #endif
 
 static void balsa_window_class_init(BalsaWindowClass *klass);
@@ -101,15 +101,10 @@ GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 void       balsa_window_open_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
 void       balsa_window_close_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
 static gchar * get_open_mailboxes_string(void);
-/*FIXME unused
-static guint pbar_timeout;
-*/
+
+static void check_mailbox_list (GList *list);
+
 static gint about_box_visible = FALSE;
-
-/* FIXME unused main window widget components
-static gint progress_timeout (gpointer data);
-*/
-
 
 /* dialogs */
 static void show_about_box (void);
@@ -950,6 +945,23 @@ show_about_box (void)
 }
 
 
+/* Check all mailboxes in a list */
+static void 
+check_mailbox_list (GList *mailbox_list)
+{
+  GList *list;
+  LibBalsaMailbox *mailbox;
+
+  list = g_list_first(mailbox_list);
+  while(list)
+  {
+    mailbox = LIBBALSA_MAILBOX(list->data);
+    libbalsa_mailbox_check(mailbox);
+    
+    list = g_list_next (list);
+  }
+}
+
 /*
  * Callbacks
  */
@@ -971,18 +983,7 @@ check_new_messages_auto_cb (gpointer data)
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *index = NULL;
-  LibBalsaMailbox *mbox = NULL;
-
-  if(data)
-    {
-      index = balsa_window_find_current_index(BALSA_WINDOW(data));
-      if (index)
-	mbox = BALSA_INDEX(index)->mailbox;
-      else
-	mbox = balsa_app.inbox;
-    }
-  else mbox = balsa_app.inbox;
+  libbalsa_notify_start_check();
 
 #ifdef BALSA_USE_THREADS
 /*  Only Run once -- If already checking mail, return.  */
@@ -1028,18 +1029,18 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
       
       gtk_widget_show_all( progress_dialog );
     }
+  
 /* initiate threads */
   pthread_create( &get_mail_thread,
   		NULL,
   		(void *) &check_messages_thread,
-		mbox );
+		NULL );
 #else
-  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
+  check_mailbox_list (balsa_app.inbox_input); 
 
   balsa_mblist_have_new (balsa_app.mblist);
 #endif
 }
-
 /* send_outbox_messages_cb:
    tries again to send the messages queued in outbox.
 */
@@ -1052,8 +1053,10 @@ send_outbox_messages_cb (GtkWidget * widget, gpointer data)
 
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
+static gint mailbox_check_func ( GNode *mbox, gpointer data );
+
 static void
-check_messages_thread( LibBalsaMailbox *mbox )
+check_messages_thread( gpointer data )
 {
 /*  
  *  It is assumed that this will always be called as a pthread,
@@ -1063,22 +1066,38 @@ check_messages_thread( LibBalsaMailbox *mbox )
   MailThreadMessage *threadmessage;
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
-  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
+  check_mailbox_list (balsa_app.inbox_input); 
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail", 0,0);
 
-  if( mbox && mbox->context != NULL ) {
-    libbalsa_mailbox_check_for_new_messages( mbox );
-    MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox, mbox->name, 0,0 );
-  }
+  libbalsa_mailbox_check ( balsa_app.inbox );
+  libbalsa_mailbox_check ( balsa_app.sentbox );
+  libbalsa_mailbox_check ( balsa_app.draftbox );
+  libbalsa_mailbox_check ( balsa_app.outbox );
+  libbalsa_mailbox_check ( balsa_app.trash );
+  
+  g_node_traverse (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, mailbox_check_func, NULL );
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, mbox, "Finished", 0,0);
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished", 0,0);
 
   pthread_mutex_lock( &mailbox_lock );
   checking_mail = 0;
   pthread_mutex_unlock( &mailbox_lock );
 
   pthread_exit( 0 );
+}
+
+static gint
+mailbox_check_func ( GNode *node, gpointer data )
+{
+  MailboxNode *mbnode = (MailboxNode*)node->data;
+
+  if ( !mbnode || mbnode->IsDir)
+    return FALSE;
+
+  libbalsa_mailbox_check ( mbnode->mailbox );
+
+  return FALSE;
 }
 
 /* mail_progress_notify_cb:
@@ -1195,6 +1214,7 @@ mail_progress_notify_cb( )
 		gnome_appbar_refresh(balsa_app.appbar);
 		gnome_appbar_set_progress(balsa_app.appbar,0.0);
 	      }
+	    balsa_mblist_have_new(balsa_app.mblist);
 	    break;
 
 	  case MSGMAILTHREAD_ERROR:
@@ -1365,8 +1385,7 @@ send_progress_notify_cb( )
 	
     return TRUE;
 }
-#endif USE_BALSA_THREADS
-
+#endif
 
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window)
 {
@@ -1576,14 +1595,6 @@ filter_dlg_cb (GtkWidget * widget, gpointer data)
   filter_edit_dialog (NULL);
 }
 #endif
-
-/*FIXME unused (#if0'ed out in GNOMEUI defs)
-static void
-mblist_window_cb (GtkWidget * widget, gpointer data)
-{
-  //  mblist_open_window (mdi);
-}
-*/
 
 /* closes the mailbox on the notebook's active page */
 static void

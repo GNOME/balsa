@@ -43,8 +43,6 @@
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
-#else
-#include "src/save-restore.h" /*config_mailbox_update*/
 #endif
 
 /* Class functions */
@@ -53,6 +51,7 @@ static void libbalsa_mailbox_init(LibBalsaMailbox *mailbox);
 static void libbalsa_mailbox_destroy (GtkObject *object);
 
 static void libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox);
+static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolean flag);
 
 /* Callbacks */
 static void message_status_changed_cb (LibBalsaMessage *message, LibBalsaMailbox *mb );
@@ -64,192 +63,6 @@ static void libbalsa_marshal_POINTER__OBJECT (GtkObject * object,
 					       GtkSignalFunc func,
 					       gpointer func_data, GtkArg * args);
 
-#ifdef BALSA_USE_THREADS
-static void error_in_thread( const char *format, ... );
-
-static void error_in_thread( const char *format, ... )
-{
-	va_list val;
-	gchar *submessage, *message;
-	MailThreadMessage *tmsg;
-
-	va_start( val, format );
-	submessage = g_strdup_vprintf( format, val );
-	va_end( val );
-
-	message = g_strconcat( _("Error: "), submessage, NULL );
-	g_free( submessage );
-
-	MSGMAILTHREAD( tmsg, MSGMAILTHREAD_ERROR, message );
-	g_free( message );
-}
-#endif
-
-void
-check_all_pop3_hosts (LibBalsaMailbox *to, GList *mailboxes)
-{
-  GList *list;
-  LibBalsaMailbox *mailbox;
-  char uid[80];
-
-#ifdef BALSA_USE_THREADS
-  char msgbuf[160];
-  MailThreadMessage *threadmsg;
-  void (*mutt_error_backup)( const char *, ... );
-
-  /* Otherwise we get multithreaded GTK+ calls... baaad */
-  mutt_error_backup = mutt_error;
-  mutt_error = error_in_thread;
-
-/*  Only check if lock has been set */
-  pthread_mutex_lock( &mailbox_lock);
-  if( !checking_mail )
-  {
-    pthread_mutex_unlock( &mailbox_lock);
-    return;
-  }
-  pthread_mutex_unlock( &mailbox_lock );
-#endif BALSA_USE_THREADS
-
-/*    balsa_error_toggle_fatality( FALSE ); */
-
-  list = g_list_first (mailboxes);
-  
-  /* 1. Spoolfile is set in mailbox_init; 
-     2. the 'to' folder doesn't have to be local, can be IMAP
-     3. remove this comment when its meaning become obvious.
-     Spoolfile = MAILBOX_LOCAL (to)->path;
-  */
-     
-  while (list)
-  {
-    mailbox = list->data;
-    if (LIBBALSA_MAILBOX_POP3 (mailbox)->check)
-    {
-      PopHost = g_strdup (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host);
-      PopPort = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port;
-      PopUser = g_strdup (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user);
-      PopPass = g_strdup (LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd);
-
-#ifdef BALSA_USE_THREADS
-      sprintf( msgbuf, "POP3: %s", LIBBALSA_MAILBOX(mailbox)->name );
-      MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
-#endif
- 
-      if( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
-        uid[0] = 0;
-      else
-        strcpy( uid, LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
-
-      PopUID = uid;
-
-      /* Delete it if necessary */
-      if (LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server)
-      {
-        set_option(OPTPOPDELETE);
-      }
-      else
-      {
-        unset_option(OPTPOPDELETE);
-      }
-
-      mutt_fetchPopMail ();
-      g_free (PopHost);
-      g_free (PopPass);
-      g_free (PopUser);
-
-      if( LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
-         strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
-      {
-	      if( LIBBALSA_MAILBOX_POP3( mailbox )->last_popped_uid )
-		      g_free ( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
-        LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
-
-#ifdef BALSA_USE_THREADS
-	threadmsg = g_new (MailThreadMessage, 1);
-	threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
-	threadmsg->mailbox = (void *) mailbox;
-	/*  LIBBALSA_MAILBOX_POP3(mailbox)->mailbox.name */
-        write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
-#else
-	config_mailbox_update( 
-	    mailbox, mailbox_get_pkey(mailbox) );
-#endif
-      }
-    }
-    list = list->next;
-  }
-
-#ifdef BALSA_USE_THREADS
-  mutt_error = mutt_error_backup;
-#endif
-
-/*    balsa_error_toggle_fatality( TRUE ); */
-  return;
-}
-
-/* mailbox_add_for_checking:
-   adds given mailbox to the list of mailboxes to be checked for modification
-   via mutt's buffy mechanism.
-*/
-void
-mailbox_add_for_checking (LibBalsaMailbox * mailbox)
-{
-  BUFFY *tmp;
-  gchar *path, *user, *passwd;
-
-  g_return_if_fail(mailbox != NULL);
-
-  if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-      path = LIBBALSA_MAILBOX_LOCAL (mailbox)->path;
-      user = passwd = NULL;
-  }
-  else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user 
-           && LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd) {
-      path = g_strdup_printf("{%s:%i}%s", 
-			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host,
-			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port,
-			     LIBBALSA_MAILBOX_IMAP(mailbox)->path);
-      user   = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->user;
-      passwd = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->passwd;
-  } else 
-      return;
-
-  tmp = buffy_add_mailbox(path, user, passwd);
-  
-  if(LIBBALSA_IS_MAILBOX_IMAP(mailbox)) 
-      g_free(path);
-}
-
-/* mailbox_have_new_messages:
-   assumes that mutt_buffy_notify() has been called - this function
-   is expensive and should be called only once 
-*/
-gint
-libbalsa_mailbox_has_new_messages (LibBalsaMailbox * mailbox)
-{
-  BUFFY *tmp = NULL;
-  gchar * path;
-
-  if(LIBBALSA_IS_MAILBOX_LOCAL(mailbox))
-      path = g_strdup(LIBBALSA_MAILBOX_LOCAL(mailbox)->path);
-  else if(LIBBALSA_IS_MAILBOX_IMAP(mailbox))
-      path = g_strdup_printf("{%s:%i}%s", 
-			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->host,
-			     LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)->port,
-			     LIBBALSA_MAILBOX_IMAP(mailbox)->path);
-  else return FALSE;
-
-  for (tmp = Incoming; tmp; tmp = tmp->next)
-  {
-      if (strcmp (tmp->path, path) == 0) {
-	  g_free(path);
-	  return tmp->new;
-      }
-  }
-  return FALSE;
-}
-
 enum {
   OPEN_MAILBOX,
   CLOSE_MAILBOX,
@@ -257,6 +70,8 @@ enum {
   MESSAGE_NEW,
   MESSAGE_DELETE,
   GET_MESSAGE_STREAM,
+  CHECK,
+  SET_UNREAD_MESSAGES_FLAG,
   LAST_SIGNAL
 };
 
@@ -337,6 +152,14 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 		    gtk_marshal_NONE__POINTER,
 		    GTK_TYPE_NONE, 1, LIBBALSA_TYPE_MESSAGE);
 
+  libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG] =
+    gtk_signal_new ("set-unread-messages-flag",
+		    GTK_RUN_FIRST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, set_unread_messages_flag),
+		    gtk_marshal_NONE__BOOL,
+		    GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
+
   /* Virtual functions. Use GTK_RUN_NO_HOOKS
      which prevents the signal being connected to */
   libbalsa_mailbox_signals[GET_MESSAGE_STREAM] =
@@ -346,6 +169,13 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, get_message_stream),
 		    libbalsa_marshal_POINTER__OBJECT,
 		    GTK_TYPE_POINTER, 1, LIBBALSA_TYPE_MESSAGE);
+  libbalsa_mailbox_signals[CHECK] =
+    gtk_signal_new ("check",
+		    GTK_RUN_LAST|GTK_RUN_NO_HOOKS,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, check),
+		    gtk_marshal_NONE__NONE,
+		    GTK_TYPE_NONE, 0);
 
   gtk_object_class_add_signals (object_class, libbalsa_mailbox_signals, LAST_SIGNAL);
 
@@ -353,12 +183,15 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 
   klass->open_mailbox = NULL;
   klass->close_mailbox = libbalsa_mailbox_real_close;
+  klass->set_unread_messages_flag = libbalsa_mailbox_real_set_unread_messages_flag;
 
   klass->message_status_changed = NULL;
   klass->message_new = NULL;
   klass->message_delete = NULL;
 
   klass->get_message_stream = NULL;
+  klass->check = NULL;
+
 }
 
 static void
@@ -416,6 +249,22 @@ libbalsa_mailbox_close(LibBalsaMailbox *mailbox)
   gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[CLOSE_MAILBOX]);
 }
 
+void
+libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolean has_unread)
+{
+  if ( has_unread != mailbox->has_unread_messages )
+    gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG], has_unread);
+}
+
+void
+libbalsa_mailbox_check (LibBalsaMailbox *mailbox)
+{
+  g_return_if_fail (mailbox != NULL);
+  g_return_if_fail (LIBBALSA_IS_MAILBOX(mailbox));
+
+  gtk_signal_emit (GTK_OBJECT(mailbox), libbalsa_mailbox_signals[CHECK]);
+}
+
 FILE*
 libbalsa_mailbox_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *message)
 {
@@ -450,7 +299,6 @@ libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox)
       mailbox->messages = 0;
       mailbox->total_messages = 0;
       mailbox->unread_messages = 0;
-      mailbox->has_unread_messages = FALSE;
   
       /* now close the mail stream and expunge deleted
        * messages -- the expunge may not have to be done */
@@ -459,7 +307,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox)
 	  while( (check=mx_close_mailbox (CLIENT_CONTEXT (mailbox), NULL) )) {
 	      UNLOCK_MAILBOX (mailbox);
 	      g_print("libbalsa_mailbox_real_close: close failed, retrying...\n");
-	      libbalsa_mailbox_check_for_new_messages(mailbox);
+	      libbalsa_mailbox_check(mailbox);
 	      LOCK_MAILBOX (mailbox);
 	  }
 	  free (CLIENT_CONTEXT (mailbox));
@@ -470,53 +318,16 @@ libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox)
   UNLOCK_MAILBOX (mailbox);
 }
 
+static void 
+libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox *mailbox, gboolean flag)
+{
+  mailbox->has_unread_messages = flag;
+}
+
 void
 libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort)
 {
   mutt_sort_headers (CLIENT_CONTEXT (mailbox), sort);
-}
-
-gint
-libbalsa_mailbox_check_for_new_messages (LibBalsaMailbox * mailbox)
-{
-  gint i = 0;
-  gint index_hint;
-
-  if (!mailbox)
-    return FALSE;
-
-  LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
-  RETURN_VAL_IF_CONTEXT_CLOSED (mailbox, FALSE);
-
-  index_hint = CLIENT_CONTEXT (mailbox)->vcount;
-
-  if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0)
-    {
-      UNLOCK_MAILBOX (mailbox);
-      g_print ("error or something\n");
-    }
-  else if (i == M_NEW_MAIL || i == M_REOPENED)
-    {
-      /* g_print ("got new mail! yippie!\n"); */
-      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
-
-      if (mailbox->new_messages > 0)
-	{
-
-#ifndef BALSA_USE_THREADS
-	  libbalsa_mailbox_load_messages (mailbox); /*1*/
-#endif
-	  UNLOCK_MAILBOX(mailbox);
-	  return TRUE;
-	}
-      else
-	{
-	  UNLOCK_MAILBOX (mailbox);
-	  return FALSE;
-	}
-    }
-  UNLOCK_MAILBOX (mailbox);
-  return FALSE;
 }
 
 /*
@@ -530,6 +341,9 @@ libbalsa_mailbox_load_messages (LibBalsaMailbox * mailbox)
   glong msgno;
   LibBalsaMessage *message;
   HEADER *cur = 0;
+
+  if ( CLIENT_CONTEXT_CLOSED(mailbox) )
+    return;
 
   for (msgno = mailbox->messages;
        mailbox->new_messages > 0;
@@ -594,7 +408,7 @@ libbalsa_mailbox_load_messages (LibBalsaMailbox * mailbox)
     }
 
   if (mailbox->unread_messages > 0)
-    mailbox->has_unread_messages = TRUE;
+    libbalsa_mailbox_set_unread_messages_flag(mailbox,TRUE);
 }
 
 

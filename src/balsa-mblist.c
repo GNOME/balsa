@@ -33,21 +33,16 @@
 
 #include "libbalsa.h"
 
-/*FIXME: must go*/
-#include "libmutt/mutt.h" 
-
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #include "threads.h"
-/* FIXME: mutt dependency */
-#include "libbalsa_private.h"
 #endif
 
 enum
 {
   SELECT_MAILBOX,
   LAST_SIGNAL
-  };
+};
 
 /* object arguments */
 enum
@@ -62,8 +57,11 @@ static void select_mailbox(GtkCTree * ctree, GtkCTreeNode * row, gint column);
 static void button_event_press_cb(GtkCTree * ctree, GdkEventButton * event,
 				  gpointer user_data);
 
+static void balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox *mailbox, gboolean flag, BalsaMBList *mblist);
+
 static BalsaMBListClass *parent_class = NULL;
 
+static void balsa_mblist_disconnect_mailbox_signals(GtkCTree *tree, GtkCTreeNode *node, gpointer data);
 
 /* callbacks */
 static gboolean mailbox_nodes_to_ctree(GtkCTree *, guint, GNode *,
@@ -83,12 +81,7 @@ static void balsa_mblist_column_click (GtkCList * clist, gint column,
 
 static void mailbox_tree_expand(GtkCTree *, GList *, gpointer);
 static void mailbox_tree_collapse(GtkCTree *, GList *, gpointer);
-static void balsa_mblist_check_new (GtkCTree *, GtkCTreeNode *, gpointer);
-static void balsa_mblist_mailbox_style (GtkCTree *ctree, GtkCTreeNode *node, MailboxNode *mbnode
-#ifdef BALSA_SHOW_INFO
-, gboolean display_info
-#endif
-);
+static void balsa_mblist_mailbox_style (GtkCTree *ctree, GtkCTreeNode *node, MailboxNode *mbnode);
 
 static void balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data);
 GdkFont* balsa_widget_get_bold_font (GtkWidget* widget);
@@ -98,10 +91,6 @@ static void balsa_mblist_set_style (BalsaMBList* mblist);
 static gint numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2);
 #endif
 static gint mblist_mbnode_compare (gconstpointer a, gconstpointer b);
-
-#ifdef BALSA_USE_THREADS
-static void balsa_mblist_thread (BalsaMBList* mblist);
-#endif
 
 guint
 balsa_mblist_get_type(void)
@@ -339,7 +328,11 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
   text[1] = "";
   text[2] = "";
 #endif
-      
+
+  gtk_signal_connect(GTK_OBJECT(mailbox), "set-unread-messages-flag", 
+		     GTK_SIGNAL_FUNC(balsa_mblist_unread_messages_changed_cb), 
+		     (gpointer)mblist);
+		     
   ctnode = gtk_ctree_insert_node (GTK_CTREE (mblist),
 				  NULL, NULL, text, 4,
 				  balsa_icon_get_pixmap (icon),
@@ -350,6 +343,21 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
   gtk_ctree_node_set_row_data_full (GTK_CTREE (mblist), ctnode, mbnode,
 				    (GtkDestroyNotify)mailbox_node_destroy);
 
+}
+
+/* balsa_mblist_disconnect_mailbox_signals
+ *
+ * Remove the signals we attached to the mailboxes.
+ */
+static void
+balsa_mblist_disconnect_mailbox_signals(GtkCTree *tree, GtkCTreeNode *node, gpointer data)
+{
+  MailboxNode *mbnode = gtk_ctree_node_get_row_data(tree, node);
+
+  if ( mbnode->mailbox ) {
+    gtk_signal_disconnect_by_func(GTK_OBJECT(mbnode->mailbox), balsa_mblist_unread_messages_changed_cb,
+				  (gpointer)tree);
+  }
 }
 
 /* balsa_mblist_redraw 
@@ -369,7 +377,8 @@ void balsa_mblist_redraw (BalsaMBList * bmbl)
 
   ctree = GTK_CTREE (bmbl);
 
-  /* mutt_buffy_notify(); balsa_mblist_have_new calls m_b_n(). */
+  gtk_ctree_post_recursive (GTK_CTREE (bmbl), NULL, 
+			    balsa_mblist_disconnect_mailbox_signals, NULL);
 
   gtk_clist_freeze (GTK_CLIST (ctree));
   gtk_clist_clear (GTK_CLIST (ctree));
@@ -455,7 +464,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
     } 
     else if (LIBBALSA_IS_MAILBOX_LOCAL(mbnode->mailbox)) 
     {
-      if (libbalsa_mailbox_has_new_messages (mbnode->mailbox))
+      if (mbnode->mailbox->new_messages > 0)
       {
 	gtk_ctree_set_node_info (ctree, cnode,
 				 mbnode->mailbox->name, 5,
@@ -465,7 +474,6 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				 G_NODE_IS_LEAF (gnode),
 				 FALSE);
       } else {
-	mbnode->mailbox->has_unread_messages = FALSE;
 	gtk_ctree_set_node_info (ctree, cnode,
 				 mbnode->mailbox->name, 5,
 				 balsa_icon_get_pixmap(BALSA_ICON_TRAY_EMPTY),
@@ -474,7 +482,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 				 G_NODE_IS_LEAF (gnode),
 				 FALSE);
       }
-      
+
       gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
       
     }
@@ -482,6 +490,12 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
     {
       g_error ("Unknown mailbox type\n");
     }
+  }
+
+  if ( mbnode->mailbox ) {
+    gtk_signal_connect(GTK_OBJECT(mbnode->mailbox), "set-unread-messages-flag", 
+		       GTK_SIGNAL_FUNC(balsa_mblist_unread_messages_changed_cb), 
+		       (gpointer)ctree);
   }
 
   if (mbnode->name && !mbnode->mailbox)
@@ -713,135 +727,16 @@ balsa_mblist_set_style (BalsaMBList* mblist)
 void
 balsa_mblist_have_new (BalsaMBList * bmbl)
 {
-  mutt_buffy_notify();
 
   balsa_mblist_set_style (bmbl);
 
-#ifdef BALSA_USE_THREADS
-  /* If we're using threads, let the program know we've started: */
-  pthread_mutex_lock (&mailbox_lock);
-
-  if (updating_mblist || checking_mail) {
-    pthread_mutex_unlock (&mailbox_lock);
-    return;
-  }
-  updating_mblist = 1;
-  pthread_mutex_unlock (&mailbox_lock);
-
-#else
-  gtk_clist_freeze (GTK_CLIST (&(bmbl->ctree)));
-#endif
-
-  /* Recursively call balsa_mblist_check_new on every node in the
-   * mailbox list */
-  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
-			    balsa_mblist_check_new, NULL);
-
-#ifdef BALSA_USE_THREADS
-  /* If there are any mailboxes that need to be updated, they will be
-   * in the mailbox list ->update_list variable.  */
-  if (bmbl->update_list) {
-    /* Start a thread to update the mailboxes: */
-    pthread_create(&mblist_thread,
-                   NULL,
-                   (void *) &balsa_mblist_thread,
-                   bmbl );
-    return;
-  } else {
-    /* Nothing to be updated, give up the lock. */
-    pthread_mutex_lock (&mailbox_lock);
-    updating_mblist = 0;
-    pthread_mutex_unlock (&mailbox_lock);
-  }
-
-  /* The threaded code has to freeze here, because we do our own
-     freezing in the thread, so we didn't freeze the list earlier. */
-  gtk_clist_freeze (GTK_CLIST (&(bmbl->ctree)));
-#endif /* BALSA_USE_THREADS */
+  gtk_clist_freeze (GTK_CLIST(bmbl));
 
   /* Update the folder styles based on the mailbox styles */
-  gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, 
+  gtk_ctree_post_recursive (GTK_CTREE (bmbl), NULL, 
 			    balsa_mblist_folder_style, NULL);
-  gtk_clist_thaw (GTK_CLIST (&(bmbl->ctree)));
+  gtk_clist_thaw (GTK_CLIST (bmbl));
 
-}
-
-/* balsa_mblist_check_new [MBG]
- * (GtkCTreeFunc)
- *  
- * ctree:  The ctree that contains the mailbox nodes
- * node:  The node that is currently being called by the recursion
- * data:  The data that was passed on by the gtk_ctree_(pre|post)_recursive
- *
- * Description: This function is meant to be called as a part of a
- * recursive call gtk_ctree_(pre|post)_recursive, to traverse through
- * the tree and change the fonts of any mailboxes that have at least
- * one new message. It currently calls mailbox_check_new_messages on
- * the mailbox, but this may change.
- * */
-static void
-balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
-{
-        MailboxNode *cnode_data;
-        LibBalsaMailbox *mailbox;
-        
-        BalsaMBList* bmbl;
-        gint new_messages;
-        gchar* desc;
-        int blah = 0;
-        
-        /* Get the mailbox */
-        cnode_data = gtk_ctree_node_get_row_data (ctree, node);
-
-        /* If it's a directory or not a mailbox, we don't want to go
-         * any further */
-        if (cnode_data->IsDir || !LIBBALSA_IS_MAILBOX (cnode_data->mailbox))
-                return;
-        
-        bmbl = BALSA_MBLIST (ctree);
-        mailbox = LIBBALSA_MAILBOX (cnode_data->mailbox);
-
-        if (g_strcasecmp (mailbox->name,"junk") == 0)
-          blah = 1;
-
-        /* If it's already open we can get conflicting results since
-         * we're checking the file on disk as opposed to the mailbox
-         * in memory */
-        if (mailbox->open_ref == 0) {
-          mailbox->has_unread_messages = libbalsa_mailbox_has_new_messages (mailbox);
-        } else {
-          /* If the mailbox is already open, try to check for changes
-           * in the mailbox, and any new messages in those changes. */
-          if ((new_messages = libbalsa_mailbox_check_for_new_messages (mailbox))) {
-            /* The mailbox gets updated automatically by
-             * the above function (in non-threaded code),
-             * but we also need to update the index */
-            
-#ifdef BALSA_USE_THREADS
-            /* If we're using threads, just add the mailbox to the
-             * list to be updated in balsa_mblist_have_new */
-            bmbl->update_list = g_list_append (bmbl->update_list, mailbox);
-#else
-            /* We've already updated the mailbox, but the index needs
-             * to reflect those changes. */
-            BalsaIndex* index;
-            index = BALSA_INDEX (balsa_find_notebook_page (mailbox)->index);
-            balsa_index_refresh (index);
-#endif /* BALSA_USE_THREADS */
-
-            desc = g_strdup_printf (_("Mailbox %s has %d new messages"), mailbox->name, new_messages);
-            gnome_appbar_push (balsa_app.appbar, desc);
-            g_free (desc);
-          }
-        }
-
-        /* We want to call this in both modes, because threaded only
-         * calls this when the mailbox is open.  */
-        balsa_mblist_mailbox_style (ctree, node, cnode_data
-#ifdef BALSA_SHOW_INFO
-                                    ,bmbl->display_content_info
-#endif /* BALSA_SHOW_INFO */
-                );
 }
 
 /* balsa_mblist_update_mailbox [MBG]
@@ -862,7 +757,7 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox)
   gchar * desc;
 
   /* try and find the mailbox in both sub trees */
-  node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (&(mblist->ctree)), NULL,
+  node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (mblist), NULL,
 					    mailbox, mblist_mbnode_compare);
   
   if (node == NULL)
@@ -873,24 +768,21 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox)
   
   /* We want to freeze here to speed things up and prevent ugly
    * flickering */
-  gtk_clist_freeze (GTK_CLIST (&(mblist->ctree)));
-  balsa_mblist_mailbox_style (GTK_CTREE (&(mblist->ctree)), 
+  gtk_clist_freeze (GTK_CLIST (mblist));
+  balsa_mblist_mailbox_style (GTK_CTREE (mblist), 
                               node, 
-                              gtk_ctree_node_get_row_data (&(mblist->ctree), node)
-#ifdef BALSA_SHOW_INFO
-                              ,balsa_app.mblist->display_content_info
-#endif
-                              );
+                              gtk_ctree_node_get_row_data (GTK_CTREE(mblist), node));
 
   /* Do the folder styles as well */
-  gtk_ctree_post_recursive (GTK_CTREE (&(mblist->ctree)), NULL, 
+  gtk_ctree_post_recursive (GTK_CTREE (mblist), NULL, 
 			    balsa_mblist_folder_style, NULL);
 
-  gtk_clist_thaw (GTK_CLIST (&(mblist->ctree)));
+  gtk_clist_thaw (GTK_CLIST (mblist));
 
   desc = g_strdup_printf (_("Shown mailbox: %s with %ld messages, %ld new"), 
                           mailbox->name, mailbox->total_messages,
                           mailbox->unread_messages);
+
   gnome_appbar_set_default (balsa_app.appbar, desc);
   g_free(desc);
 }
@@ -907,11 +799,7 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox)
  * balsa_mblist_check_new, hence the (slightly) strange arguments.
  * */
 static void 
-balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *mbnode
-#ifdef BALSA_SHOW_INFO
-                                        , gboolean display_info
-#endif
-                                        )
+balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *mbnode)
 {
   BalsaMBList* mblist;
   LibBalsaMailbox* mailbox;
@@ -927,7 +815,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
   
   mblist = BALSA_MBLIST (ctree);
   mailbox = mbnode->mailbox;
-  
+
   if (mailbox->has_unread_messages) {
     
     /* set the style of the unread maibox list, even if it's already 
@@ -954,7 +842,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
 #ifdef BALSA_SHOW_INFO
     /* If we have a count of the unread messages, and we are showing
        * columns, put the number in the unread column */
-    if (display_info && mailbox->unread_messages > 0 ) {
+    if (mblist->display_content_info && mailbox->unread_messages > 0 ) {
       text = g_strdup_printf ("%ld", mailbox->unread_messages);
       gtk_ctree_node_set_text (ctree, node, 1, text);
       g_free(text);
@@ -998,7 +886,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
 #ifdef BALSA_SHOW_INFO
     /* If we're showing unread column info, get rid of whatever's
      * there Also set the flag */
-    if (display_info){
+    if (mblist->display_content_info){
             gtk_ctree_node_set_text (ctree, node, 1, "");
             mbnode->style &= ~MBNODE_STYLE_UNREAD_MESSAGES;
     }
@@ -1008,7 +896,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
 #ifdef BALSA_SHOW_INFO
   /* We only want to do this if the mailbox is open, otherwise leave
    * the message numbers untouched in the display */
-  if (display_info && mailbox->open_ref && mailbox->total_messages >= 0){
+  if (mblist->display_content_info && mailbox->open_ref && mailbox->total_messages >= 0){
     if (mailbox->total_messages > 0) {
       text = g_strdup_printf ("%ld", mailbox->total_messages);
       gtk_ctree_node_set_text (ctree, node, 2, text);
@@ -1232,87 +1120,24 @@ balsa_widget_get_bold_font (GtkWidget* widget)
   return font;
 }
 
-
-/* Mailbox list updating thread stuff. */
-#ifdef BALSA_USE_THREADS
-
 static void
-balsa_mblist_thread (BalsaMBList* mblist)
+balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox *mailbox, gboolean flag, BalsaMBList *mblist)
 {
   GtkCTreeNode *node;
-  BalsaIndex* index;
-  GList* list;
-  GList* tmp;
-  LibBalsaMailbox* mailbox;
-  gint i, number_of_mailboxes;
 
-  i = 0;
-  number_of_mailboxes = 0;
-
-  list = mblist->update_list;
-
-  pthread_mutex_lock (&appbar_lock);
-  if (!updating_progressbar) {
-    updating_progressbar = 1;
-    number_of_mailboxes = g_list_length (list);
-  }
-  pthread_mutex_unlock (&appbar_lock);
-
-  gdk_threads_enter ();
-  gtk_clist_freeze (GTK_CLIST (&(mblist->ctree)));
-
-  while (list) {
-    mailbox = LIBBALSA_MAILBOX (list->data);
-    
-    /* load the messages */
-    LOCK_MAILBOX (mailbox);
-    libbalsa_mailbox_load_messages (mailbox);
-    UNLOCK_MAILBOX (mailbox);
-    
-    node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (&(mblist->ctree)), NULL, mailbox, mblist_mbnode_compare);
-    
-    if (node) {
-      balsa_mblist_mailbox_style (GTK_CTREE (&(mblist->ctree)), 
-                                  node, 
-                                  gtk_ctree_node_get_row_data (GTK_CTREE(&(mblist->ctree)), node)
-#ifdef BALSA_SHOW_INFO
-                                  ,balsa_app.mblist->display_content_info
-#endif
-        );
-      
-      index = BALSA_INDEX (balsa_find_notebook_page (mailbox)->index);
-      balsa_index_refresh (index);
-    }
-    
-    tmp = list;
-    list = list->next;
-    g_list_remove (mblist->update_list, tmp->data);
-    i++;
-
-    if (number_of_mailboxes)
-      gnome_appbar_set_progress (balsa_app.appbar, i/number_of_mailboxes);
-  }
-
-  if (mblist->update_list) {
-    /* g_list_free (mblist->update_list); */
-    mblist->update_list = NULL;
-  }
-
-  gtk_ctree_post_recursive (GTK_CTREE (&(mblist->ctree)), NULL, balsa_mblist_folder_style, NULL);
-
-  gnome_appbar_set_progress (balsa_app.appbar, 0.0);
-  gtk_clist_thaw (GTK_CLIST (&(mblist->ctree)));
-  gdk_threads_leave ();
-
-  pthread_mutex_lock (&mailbox_lock);
-  updating_mblist = 0;
-  pthread_mutex_unlock (&mailbox_lock);
-
-  pthread_mutex_lock (&appbar_lock);
-  updating_progressbar = 0;
-  pthread_mutex_lock (&appbar_lock);
-        
-  pthread_exit (0);
+  /* try and find the mailbox in both sub trees */
+  node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (mblist), NULL,
+					    mailbox, mblist_mbnode_compare);
+  
+  if (node == NULL)
+    return;
+  
+  /* We want to freeze here to speed things up and prevent ugly
+   * flickering */
+  gtk_clist_freeze (GTK_CLIST (mblist));
+  balsa_mblist_mailbox_style (GTK_CTREE (mblist), 
+			      node, 
+			      gtk_ctree_node_get_row_data (GTK_CTREE(mblist), node));
+  gtk_clist_thaw(GTK_CLIST(mblist));
+  
 }
-
-#endif /* BALSA_USE_THREADS */

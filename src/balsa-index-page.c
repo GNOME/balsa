@@ -384,8 +384,9 @@ idle_handler_cb(GtkWidget * widget)
   gnome_appbar_pop (balsa_app.appbar);
 
   /* Update the style and message counts in the mailbox list */
-  balsa_mblist_update_mailbox (balsa_app.mblist, 
-                               BALSA_INDEX (widget)->mailbox);
+  /* ijc: Are both of these needed now */
+  balsa_mblist_update_mailbox (balsa_app.mblist,
+			       BALSA_INDEX (widget)->mailbox);
   balsa_mblist_have_new (balsa_app.mblist);
 
   gtk_object_remove_data (GTK_OBJECT (widget), "bevent");

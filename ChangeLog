@@ -1,3 +1,8 @@
+2003-12-10 13:01  PeterB
+
+	* src/message-window.c: Manage sensitivity of next-flagged button,
+	too.
+
 2003-12-09 10:37  PeterB
 
 	* libbalsa/mailbox.c: Keep the tree-view better informed about

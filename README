@@ -41,6 +41,13 @@ all of your mailboxes in the righthand pane, such as unread
 messages, etc. This *can* cause problems, but is basically
 stable now, so it is enabled by default.
 
+--disable-more-warnings
+	Balsa by default is very sensitive to compilation warnings
+which often mean simply programming or configuration errors. If you
+are sure this is not the case, or you cannot change your system setup
+use this option to compile the code and hope for the best. 
+(some Solaris setups require this).
+
 --enable-threads
 	Compile Balsa with threading for more responsiveness.
 This works very well and should be enabled if possible.

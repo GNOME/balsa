@@ -257,8 +257,9 @@ balsa_index_init(BalsaIndex * bindex)
 {
     GtkCList *clist;
     GtkObject* adj;
+    GdkFont *font;
+    int row_height;
     
-
     /*
      * status
      * priority
@@ -296,7 +297,7 @@ balsa_index_init(BalsaIndex * bindex)
     gtk_container_add (GTK_CONTAINER (bindex), GTK_WIDGET (bindex->ctree));
 
     gtk_signal_connect(GTK_OBJECT(clist), "click_column",
-		       GTK_SIGNAL_FUNC(clist_click_column), NULL);
+		       GTK_SIGNAL_FUNC(clist_click_column), bindex);
 
     gtk_clist_set_selection_mode(clist, GTK_SELECTION_EXTENDED);
     gtk_clist_set_column_justification(clist, 0, GTK_JUSTIFY_RIGHT);
@@ -310,7 +311,11 @@ balsa_index_init(BalsaIndex * bindex)
     gtk_clist_set_column_width(clist, 3, balsa_app.index_from_width);
     gtk_clist_set_column_width(clist, 4, balsa_app.index_subject_width);
     gtk_clist_set_column_width(clist, 5, balsa_app.index_date_width);
-    gtk_clist_set_row_height(clist, 16);
+    font = gtk_widget_get_style (GTK_WIDGET(clist))->font;
+    row_height = font->ascent + font->descent+2;
+    
+    if(row_height<16) /* pixmap height */
+	gtk_clist_set_row_height(clist, 16);
 
     /* Set default sorting behaviour */
     gtk_clist_set_sort_column(clist, 5);
@@ -467,34 +472,14 @@ bi_get_largest_selected(GtkCList * clist)
 static void
 clist_click_column(GtkCList * clist, gint column, gpointer data)
 {
-    gint h;
+    GtkSortType sort_type = clist->sort_type;
 
-    if (column == clist->sort_column) {
-	clist->sort_type = (clist->sort_type == GTK_SORT_ASCENDING) ?
+    if (column == clist->sort_column)
+	sort_type = (sort_type == GTK_SORT_ASCENDING) ?
 	    GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
-    } else
-	gtk_clist_set_sort_column(clist, column);
-
-    switch (column) {
-    case 0:
-	gtk_clist_set_compare_func(clist, numeric_compare);
-	break;
-    case 5:
-	gtk_clist_set_compare_func(clist, date_compare);
-	break;
-    default:
-	gtk_clist_set_compare_func(clist, NULL);
-    }
-
-    gtk_clist_sort(clist);
-    DO_CLIST_WORKAROUND(clist);
-
-    if ((h = bi_get_largest_selected(clist)) >= 0 &&
-	gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
-	gtk_clist_moveto(clist, h, 0, 1.0, 0.0);
+	
+    balsa_index_set_sort_order(BALSA_INDEX(data), column, sort_type);
 }
-
-
 
 /* 
  * This is an idle handler. Be sure to use gdk_threads_{enter/leave}
@@ -619,10 +604,10 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     }
 
     /* do threading */
-    balsa_index_threading(bindex);
+    balsa_index_set_threading_type(bindex, mbnode->threading_type);
+    balsa_index_set_sort_order(bindex, mbnode->sort_field, 
+			       mbnode->sort_type);
 
-    gtk_clist_sort(GTK_CLIST(bindex->ctree));
-    DO_CLIST_WORKAROUND(GTK_CLIST(bindex->ctree));
     gtk_clist_thaw(GTK_CLIST(bindex->ctree));
 
     /* FIXME this might could be cleaned up some */
@@ -1422,7 +1407,7 @@ balsa_message_replytogroup(GtkWidget * widget, gpointer user_data)
     g_return_if_fail(user_data != NULL);
 
     index = BALSA_INDEX (user_data);
-    list = GTK_CLIST(index)->selection;
+    list = GTK_CLIST(index->ctree)->selection;
     while (list) {
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
 	sm = sendmsg_window_new(widget, message, SEND_REPLY_GROUP);
@@ -2090,3 +2075,37 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     }
 }
 
+void
+balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
+{
+    gint h;
+    GtkCList * clist;
+    g_return_if_fail(bindex->mailbox_node);
+    g_return_if_fail(column>=0 && column <=5);
+    g_return_if_fail(order == GTK_SORT_DESCENDING || 
+		     order == GTK_SORT_ASCENDING);
+
+    clist = GTK_CLIST(bindex->ctree);
+    bindex->mailbox_node->sort_field = column;
+    bindex->mailbox_node->sort_type  = order;
+    clist->sort_type = order;
+    gtk_clist_set_sort_column(clist, column);
+
+    switch (column) {
+    case 0:
+	gtk_clist_set_compare_func(clist, numeric_compare);
+	break;
+    case 5:
+	gtk_clist_set_compare_func(clist, date_compare);
+	break;
+    default:
+	gtk_clist_set_compare_func(clist, NULL);
+    }
+
+    gtk_clist_sort(clist);
+    DO_CLIST_WORKAROUND(clist);
+
+    if ((h = bi_get_largest_selected(clist)) >= 0 &&
+	gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
+	gtk_clist_moveto(clist, h, 0, 1.0, 0.0);
+}

@@ -1095,17 +1095,11 @@ static void
 part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 {
     FILE *fp;
-
-    gchar *ptr = 0;
+    gboolean ishtml;
+    gchar *content_type;
+    gchar *ptr = NULL;
     size_t alloced;
-    gchar **l = NULL;
-    gchar **lines = NULL;
-    gchar *line = NULL;
-    /*
-       GdkColor color[MAX_QUOTED_COLOR];
-       GdkColormap * colormap;
-       GtkStyle * style = NULL;
-     */
+    gchar **l = NULL, **lines = NULL, *line = NULL;
     gint quote_level = 0;
 
     if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
@@ -1121,67 +1115,64 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 			  info->body->temp_filename);
 	return;
     }
-
+    
     alloced = libbalsa_readfile(fp, &ptr);
+    if (!ptr) return;
 
-    if (ptr) {
-	gboolean ishtml;
-	gchar *content_type;
-
-	content_type = libbalsa_message_body_get_content_type(info->body);
-	ishtml = (g_strcasecmp(content_type, "text/html") == 0);
-	g_free(content_type);
-
-	/* This causes a memory leak */
-	/* if( info->body->filename == NULL ) */
-	/*   info->body->filename = g_strdup( "textfile" ); */
-
-	if (ishtml) {
+    content_type = libbalsa_message_body_get_content_type(info->body);
+    ishtml = (g_strcasecmp(content_type, "text/html") == 0);
+    g_free(content_type);
+    
+    /* This causes a memory leak */
+    /* if( info->body->filename == NULL ) */
+    /*   info->body->filename = g_strdup( "textfile" ); */
+    
+    if (ishtml) {
 #ifdef HAVE_GTKHTML
-	    part_info_init_html(bm, info, ptr, alloced);
+	part_info_init_html(bm, info, ptr, alloced);
 #else
-	    part_info_init_unknown(bm, info);
+	part_info_init_unknown(bm, info);
 #endif
+    } else {
+	regex_t rex;
+	
+	GtkWidget *item = NULL;
+	GdkFont *fnt = NULL;
+	
+	fnt = find_body_font(info->body);
+	if (bm->wrap_text)
+	    libbalsa_wrap_string(ptr, balsa_app.wraplength);
+	
+	if (!fnt)
+	    fnt = gdk_fontset_load(balsa_app.message_font);
+	
+	item = gtk_text_new(NULL, NULL);
+	
+	gtk_signal_connect(GTK_OBJECT(item), "key_press_event",
+			   (GtkSignalFunc)balsa_message_key_press_event,
+			   (gpointer) bm);
+	gtk_signal_connect(GTK_OBJECT(item), "focus_in_event",
+			   (GtkSignalFunc)balsa_message_focus_in_part,
+			   (gpointer) bm);
+	gtk_signal_connect(GTK_OBJECT(item), "focus_out_event",
+			   (GtkSignalFunc)balsa_message_focus_out_part,
+			   (gpointer) bm);
+	gtk_signal_connect(GTK_OBJECT(item), "size_request",
+			   (GtkSignalFunc)balsa_gtk_text_size_request,
+			   (gpointer) bm);
+	
+	allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
+			      0, MAX_QUOTED_COLOR - 1);
+	/* Grab colour from the Theme.
+	   style = gtk_widget_get_style (GTK_WIDGET (bm));
+	   color = (GdkColor) style->text[GTK_STATE_PRELIGHT];
+	*/
+	
+	if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
+	    g_warning
+		("part_info_init_mimetext: quote regex compilation failed.");
+	    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, ptr, -1);
 	} else {
-	    regex_t rex;
-
-	    GtkWidget *item = NULL;
-	    GdkFont *fnt = NULL;
-
-	    if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0)
-		g_warning
-		    ("part_info_init_mimetext: quote regex compilation failed.");
-	    fnt = find_body_font(info->body);
-	    if (bm->wrap_text)
-		libbalsa_wrap_string(ptr, balsa_app.wraplength);
-
-	    if (!fnt)
-		fnt = gdk_fontset_load(balsa_app.message_font);
-
-	    item = gtk_text_new(NULL, NULL);
-
-	    gtk_signal_connect(GTK_OBJECT(item), "key_press_event",
-			       (GtkSignalFunc)
-			       balsa_message_key_press_event,
-			       (gpointer) bm);
-	    gtk_signal_connect(GTK_OBJECT(item), "focus_in_event",
-			       (GtkSignalFunc) balsa_message_focus_in_part,
-			       (gpointer) bm);
-	    gtk_signal_connect(GTK_OBJECT(item), "focus_out_event",
-			       (GtkSignalFunc)
-			       balsa_message_focus_out_part,
-			       (gpointer) bm);
-	    gtk_signal_connect(GTK_OBJECT(item), "size_request",
-			       (GtkSignalFunc) balsa_gtk_text_size_request,
-			       (gpointer) bm);
-
-	    allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
-				  0, MAX_QUOTED_COLOR - 1);
-	    /* Grab colour from the Theme.
-	       style = gtk_widget_get_style (GTK_WIDGET (bm));
-	       color = (GdkColor) style->text[GTK_STATE_PRELIGHT];
-	     */
-
 	    lines = l = g_strsplit(ptr, "\n", -1);
 	    for (line = *lines; line != NULL; line = *(++lines)) {
 		line = g_strconcat(line, "\n", NULL);
@@ -1191,29 +1182,27 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 		if (quote_level != 0)
 		    gtk_text_insert(GTK_TEXT(item), fnt,
 				    &balsa_app.quoted_color[quote_level -
-							    1], NULL, line,
-				    -1);
+							   1], NULL, 
+				    line, -1);
 		else
-		    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, line,
-				    -1);
+		    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, 
+				    line, -1);
 		g_free(line);
 	    }
 	    g_strfreev(l);
 	    regfree(&rex);
-
-	    gtk_text_set_editable(GTK_TEXT(item), FALSE);
-
-	    gtk_widget_show(item);
-	    info->focus_widget = item;
-	    info->widget = item;
-	    info->can_display = TRUE;
 	}
-	g_free(ptr);
-
-	fclose(fp);
-
+	
+	gtk_text_set_editable(GTK_TEXT(item), FALSE);
+	
+	gtk_widget_show(item);
+	info->focus_widget = item;
+	info->widget = item;
+	info->can_display = TRUE;
     }
-
+    g_free(ptr);
+    
+    fclose(fp);
 }
 
 #ifdef HAVE_GTKHTML

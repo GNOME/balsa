@@ -31,6 +31,8 @@
 #include "libbalsa.h"
 #include "mailbackend.h"
 
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 gchar *
 libbalsa_get_hostname(void)
 {
@@ -54,6 +56,71 @@ libbalsa_get_domainname(void)
 	return g_strdup(domainname);
     }
     return NULL;
+}
+
+struct {
+    char escaped_char;
+    char replacement;
+} char_translations[] = {
+    { '\t','t' },
+    { '\n','n' }
+};
+gchar *
+libbalsa_escape_specials(const gchar* str)
+{
+    int special_cnt = 0, length = 0,i;
+    const gchar *str_ptr;
+    gchar *res, *res_ptr;
+    
+    g_return_val_if_fail(str, NULL);
+    for(str_ptr = str; *str_ptr; str_ptr++, length++)
+	for(i = 0; i<ELEMENTS(char_translations); i++)
+	    if(*str_ptr == char_translations[i].escaped_char) {
+		special_cnt++;
+		break;
+	    }
+    
+    res = res_ptr = g_new(gchar, length+special_cnt+1);
+    
+    for(str_ptr = str; *str_ptr; str_ptr++) {
+	for(i = 0; i<ELEMENTS(char_translations); i++)
+	    if(*str_ptr == char_translations[i].escaped_char) 
+		break;
+	if(i<ELEMENTS(char_translations)) {
+	    *res_ptr++ = '\\';
+	    *res_ptr++ = char_translations[i].replacement;
+	} else 
+	    *res_ptr++ = *str_ptr;
+    }
+    *res_ptr = '\0';
+    return res;
+}
+	    
+gchar *
+libbalsa_deescape_specials(const gchar* str)
+{
+    const gchar *src;
+    gchar *dest;
+    int i;
+    gchar* res = g_strdup(str);
+
+    g_return_val_if_fail(str, NULL);
+    src = dest = res;
+    while(*src) {
+	if(*src == '\\') {
+	    for(i = 0; i<ELEMENTS(char_translations); i++)
+		if(src[1] == char_translations[i].replacement) 
+		    break;
+	    if(i<ELEMENTS(char_translations)) {
+		*dest++ = char_translations[i].escaped_char;
+		src += 2;
+		continue;
+	    }
+	}
+	*dest++ = *src++;
+    }
+    *dest = '\0';
+    return res;
 }
 
 /* FIXME: Move to address.c and change name to

@@ -66,17 +66,14 @@ make_rfc822(gchar *full_name, gchar *address)
     gchar *new_str;
     gint i;
 
-    g_message("make_rfc822(): Start.");
     found_comma = FALSE;
     for (i=0; full_name[i]; i++)
 	if (full_name[i] == ',') found_comma = TRUE;
     if (found_comma) {
-        g_message("make_rfc822(): Found a comma.");
 	new_str = g_strdup_printf("\042%s\042 <%s>", full_name, address);
 	g_message("make_rfc822(): New str [%s]", new_str);
     } else
 	new_str = g_strdup_printf("%s <%s>", full_name, address);
-    g_message("make_rfc822(): Stop.");
     return new_str;
 }
 	
@@ -183,13 +180,11 @@ expand_alias_find_match(emailData *addy)
 	 * find the one we want.
 	 */
 	if (match) {
-	    g_message("expand_alias_find_match(): Found a match.");
 	    i = tab;
 	    if ((i == 0) && (strlen(prefix) > strlen(input))) {
 		addr = LIBBALSA_ADDRESS(match->data);
 
 	    } else {
-		g_message("expand_alias_find_match(): Found multiple matches.");
 		for (search = match; i > 0; i--) {
 		    search = g_list_next(search);
 		    if (!search) {

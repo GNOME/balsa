@@ -309,12 +309,12 @@ static GnomeUIInfo shown_hdrs_menu[] = {
 };
 
 static GnomeUIInfo threading_menu[] = {
-    GNOMEUIINFO_RADIOITEM(N_("Flat index"), N_("No threading at all"),
+    GNOMEUIINFO_RADIOITEM(N_("_Flat index"), N_("No threading at all"),
 			 threading_flat_cb, NULL),
-    GNOMEUIINFO_RADIOITEM(N_("Simple threading"),
+    GNOMEUIINFO_RADIOITEM(N_("S_imple threading"),
 			  N_("Simple threading algorithm"),
 			  threading_simple_cb, NULL),
-    GNOMEUIINFO_RADIOITEM(N_("JWZ threading"), 
+    GNOMEUIINFO_RADIOITEM(N_("_JWZ threading"), 
 			  N_("Elaborate JWZ threading"),
 			  threading_jwz_cb, NULL),
     GNOMEUIINFO_END
@@ -656,21 +656,6 @@ balsa_window_new()
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
     gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar,
 				       window);
-
-    /* Disable menu items at start up */
-    enable_mailbox_menus(NULL);
-    enable_message_menus(NULL);
-    enable_edit_menus(NULL);
-    balsa_window_enable_continue();
-
-    /* we can only set icon after realization, as we have no windows before. */
-    gtk_signal_connect(GTK_OBJECT(window), "realize",
-		       GTK_SIGNAL_FUNC(set_icon), NULL);
-    gtk_signal_connect(GTK_OBJECT(window), "size_allocate",
-		       GTK_SIGNAL_FUNC(mw_size_alloc_cb), NULL);
-    gtk_signal_connect (GTK_OBJECT (window), "delete-event",
-                        GTK_SIGNAL_FUNC (balsa_window_delete_cb), NULL);
-
     appbar =
 	GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
     gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));
@@ -777,6 +762,21 @@ balsa_window_new()
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
 				       (view_menu[MENU_VIEW_MAILBOX_TABS_POS].widget),
 				       TRUE);
+
+    /* Disable menu items at start up */
+    enable_mailbox_menus(NULL);
+    enable_message_menus(NULL);
+    enable_edit_menus(NULL);
+    balsa_window_enable_continue();
+
+    /* we can only set icon after realization, as we have no windows before. */
+    gtk_signal_connect(GTK_OBJECT(window), "realize",
+		       GTK_SIGNAL_FUNC(set_icon), NULL);
+    gtk_signal_connect(GTK_OBJECT(window), "size_allocate",
+		       GTK_SIGNAL_FUNC(mw_size_alloc_cb), NULL);
+    gtk_signal_connect (GTK_OBJECT (window), "delete-event",
+                        GTK_SIGNAL_FUNC (balsa_window_delete_cb), NULL);
+
 
     return GTK_WIDGET(window);
 }
@@ -988,8 +988,6 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
 	return;
     }
 
-    balsa_index_set_threading_type(BALSA_INDEX (index), 
-                                   mbnode->threading_type);
     label = gtk_label_new(mbnode->mailbox->name);
 
     /* store for easy access */
@@ -1643,7 +1641,6 @@ balsa_window_find_current_index(BalsaWindow * window)
     index = gtk_notebook_get_nth_page(GTK_NOTEBOOK(window->notebook),
 				     gtk_notebook_get_current_page
 				     (GTK_NOTEBOOK(window->notebook)));
-
     if (!index)
 	return NULL;
 

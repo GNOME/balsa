@@ -65,7 +65,7 @@
  */
 #define MAX_QUOTED_COLOR 4
 #define DEFAULT_QUOTED_COLOR "rgb:0000/5000/5000"
-#define DEFAULT_QUOTE_REGEX "^(([ \t]|[A-Z])*[|>:}#])+"
+#define DEFAULT_QUOTE_REGEX "^(([ \tA-Z])\1*[|>:}#])+"
 
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
@@ -75,7 +75,7 @@
 
 #define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
-#define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M:%S %z"
+#define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78

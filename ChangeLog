@@ -1,3 +1,20 @@
+2001-02-01  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* INSTALL: update info about gtkhtml and RH.
+	* README: descripbe --disable-more-warnings
+	* libbalsa/misc.[hc]: add  libbalsa_(de)?escape_specials to allow
+	reasonable configuration of regexps.
+	* src/balsa-app.c: initialize fields to be on the safe side.
+	* src/balsa-app.h: change defaults for QuoteRegexp and date.
+	* src/balsa-index.[ch]: handle larger fonts nicer. support sorting
+	via mailbox-node. Add balsa_index_set_sort_order().
+	* src/balsa-mblist.c: handle larger fonts nicely.
+	* src/balsa-message.c: don't hang on corrupted regexp.
+	* src/expand-alias.c: be less verbose.
+	* src/mailbox-node.h: add fields for persistent sort order.
+	* src/main-window.c: aviod double sorting on balsa-index creation.
+	* src/pref-manager.c: use deescape_specials.
+	
 2001-01-31  Matthew Guenther  <guentherm@asme.org>
 
 	* src/main-window.c (balsa_window_real_open_mailboxnode): previous

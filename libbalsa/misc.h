@@ -33,6 +33,8 @@ size_t libbalsa_readfile(FILE * fp, char **buf);
 
 gchar *libbalsa_get_hostname(void);
 gchar *libbalsa_get_domainname(void);
+gchar *libbalsa_escape_specials(const gchar* str);
+gchar *libbalsa_deescape_specials(const gchar* str);
 
 gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);

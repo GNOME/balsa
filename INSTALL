@@ -36,6 +36,8 @@ Build Instructions:
 	You need pspell-devel (obligatory) and gnome-print-devel 
 	(recommended) packages installed.
 
+	Balsa works also very nicely with gtkhtml >= 0.8 and openldap.
+
 	# ./configure
 	# make
 
@@ -58,5 +60,6 @@ Notes:
 	and make sure you have at least /usr/lib/libgnome.so.32.3.11.
 
 	Experimental gcc 2.96 distributed with RedHat 7.0 generates 
-	spurious warning messages. You have to configure balsa with 
-	explicitly specified --disable-more-warnings option.
+	spurious warning messages. You have to update your compiler 
+	(strongly recommended!) or configure balsa with explicitly 
+	specified --disable-more-warnings option.

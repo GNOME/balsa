@@ -77,6 +77,8 @@ extern "C" {
                                            BalsaMailboxNode * mbnode);
     void balsa_index_refresh(BalsaIndex * bindex);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
+    void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
+				    GtkSortType order);
 
 /* adds a new message */
     void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);

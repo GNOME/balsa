@@ -492,14 +492,12 @@ balsa_mblist_init(BalsaMBList * tree)
     gtk_object_set (GTK_OBJECT (tree), "show_content_info", 
                     balsa_app.mblist_show_mb_content_info, NULL);
 
-    /* gtk_ctree_set_show_stub(GTK_CTREE(tree), FALSE);
-       gtk_clist_set_row_height(GTK_CLIST(tree), 16); */
     style = gtk_widget_get_style (GTK_WIDGET (tree));
     font = style->font;
-    text_height = font->ascent + font->descent;
-    
-    gtk_clist_set_row_height (GTK_CLIST (tree),
-			      text_height <16 ? 16 : text_height);
+    text_height = font->ascent + font->descent+2;
+
+    if(text_height < 16) /* pixmap height */
+	gtk_clist_set_row_height (GTK_CLIST (tree), 16);
 
     gtk_clist_set_column_width(GTK_CLIST(tree), 0,
 			       balsa_app.mblist_name_width);

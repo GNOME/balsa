@@ -181,7 +181,6 @@ dir_conf_edit(BalsaMailboxNode* mb)
 static void
 read_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
-    printf("read_dir_cb: reading from %s\n", mb->name);
     scanner_local_dir(r, mb->name, add_local_folder, add_local_mailbox);
 }
 

@@ -194,6 +194,7 @@ balsa_app_init(void)
     balsa_app.previewpane = TRUE;
 
     /* GUI settings */
+    balsa_app.mblist = NULL;
     balsa_app.mblist_width = 100;
     balsa_app.mw_width = MW_DEFAULT_WIDTH;
     balsa_app.mw_height = MW_DEFAULT_HEIGHT;
@@ -375,11 +376,11 @@ gnome_stock_button_with_label(const char *icon, const char *label)
 static gint
 find_mailbox(GNode * g1, gpointer data)
 {
-    BalsaMailboxNode *n1 = (BalsaMailboxNode *) g1->data;
+    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) g1->data;
     gpointer *d = data;
     LibBalsaMailbox *mb = *(LibBalsaMailbox **) data;
 
-    if (!n1 || n1->mailbox != mb)
+    if (!mbnode || mbnode->mailbox != mb)
         return FALSE;
 
     *(++d) = g1;

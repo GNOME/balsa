@@ -501,6 +501,7 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     GtkWidget *balsa_window;
     GtkWidget *entry_widget;
     GtkWidget *menu_item;
+    gchar* tmp;
 
     if (page_num != -1)
 	return;
@@ -625,8 +626,9 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 
     g_free(balsa_app.quote_regex);
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
-    balsa_app.quote_regex =
-	g_strdup(gtk_entry_get_text(GTK_ENTRY(entry_widget)));
+    tmp = gtk_entry_get_text(GTK_ENTRY(entry_widget));
+    balsa_app.quote_regex = libbalsa_deescape_specials(tmp);
+    g_free(tmp);
 
 #ifndef HAVE_GNOME_PRINT
     /* printing */
@@ -729,6 +731,7 @@ set_prefs(void)
 {
     GtkWidget *entry_widget;
     gint i;
+    gchar* tmp;
 
     for (i = 0; i < NUM_TOOLBAR_MODES; i++)
 	if (balsa_app.toolbar_style == toolbar_type[i]) {
@@ -845,7 +848,9 @@ set_prefs(void)
     /* arp */
     gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
     entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY(pui->quote_pattern));
-    gtk_entry_set_text(GTK_ENTRY(entry_widget), balsa_app.quote_regex);
+    tmp = libbalsa_escape_specials(balsa_app.quote_regex);
+    gtk_entry_set_text(GTK_ENTRY(entry_widget), tmp);
+    g_free(tmp);
 
     /* message font */
     gtk_entry_set_text(GTK_ENTRY(pui->message_font),

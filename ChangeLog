@@ -1,5 +1,13 @@
-2004-12-06 13:04  PeterB
+2004-12-06 16:23  PeterB
 
+	* libbalsa/: address.c, address.h: parse string with group address;
+	implement libbalsa_address_set_copy_member() to make a copy of a
+	LibBalsaAddress containing only one mailbox.
+	* libbalsa/address-entry.c: parse entry text with group address;
+	make only one completion item per address.
+	* libbalsa/address-book-vcard.c: when not in dist_list_mode and a
+	completion item has more than one address, make multiple
+	single-address LibBalsaAddress objects.
 	* libbalsa/: address.c, address.h, message.c: implement and use
 	libbalsa_address_new_list_from_gmime(); do not ignore RFC 2822
 	group addresses.

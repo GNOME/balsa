@@ -190,15 +190,22 @@ gchar *
 libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 				    const gchar * param)
 {
-    const gchar *res;
-    const GMimeContentType *type;
+    gchar *res;
 
     g_return_val_if_fail(body != NULL, NULL);
 
-    type=g_mime_object_get_content_type(body->mime_part);
-    res = g_mime_content_type_get_parameter(type, param);
+    if (body->mime_part) {
+	const GMimeContentType *type =
+	    g_mime_object_get_content_type(body->mime_part);
+	res = g_strdup(g_mime_content_type_get_parameter(type, param));
+    } else {
+	GMimeContentType *type =
+	    g_mime_content_type_new_from_string(body->mime_type);
+	res = g_strdup(g_mime_content_type_get_parameter(type, param));
+	g_mime_content_type_destroy(type);
+    }
 
-    return g_strdup(res);
+    return res;
 }
 
 /* libbalsa_message_body_save_temporary:
@@ -328,20 +335,28 @@ libbalsa_message_body_get_content_type(LibBalsaMessageBody * body)
 gboolean
 libbalsa_message_body_is_multipart(LibBalsaMessageBody * body)
 {
-    return GMIME_IS_MULTIPART(body->mime_part);
+    return body->mime_part ?
+	GMIME_IS_MULTIPART(body->mime_part) :
+	body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART;
 }
 
 gboolean
 libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
 {
     const gchar *disposition;
-    GMimePart *mime_part;
-    g_return_val_if_fail(body->mime_part != NULL, FALSE);
-    g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
 
-    mime_part = GMIME_PART(body->mime_part);
-    disposition=g_mime_part_get_content_disposition(mime_part);
-    return (disposition && g_ascii_strcasecmp(disposition, GMIME_DISPOSITION_INLINE)==0);
+    if (body->mime_part) {
+	GMimePart *mime_part;
+	g_return_val_if_fail(GMIME_IS_PART(body->mime_part), FALSE);
+
+	mime_part = GMIME_PART(body->mime_part);
+	disposition = g_mime_part_get_content_disposition(mime_part);
+    } else
+	disposition = body->content_dsp;
+
+    return (disposition
+	    && g_ascii_strcasecmp(disposition,
+				  GMIME_DISPOSITION_INLINE) == 0);
 }
 
 /* libbalsa_message_body_is_flowed:

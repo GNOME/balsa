@@ -238,13 +238,28 @@ libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers)
 const gchar *
 libbalsa_message_body_charset(LibBalsaMessageBody * body)
 {
-    gchar *charset = NULL;
+    const gchar *charset = NULL;
 
-    if (GMIME_IS_MULTIPART(body->mime_part))
-	g_mime_multipart_foreach(GMIME_MULTIPART(body->mime_part),
-			    libbalsa_message_find_charset, &charset);
-    else
-	libbalsa_message_find_charset(body->mime_part, &charset);
+    if (body->mime_part) {
+	gchar *tmp = NULL;
+
+	if (GMIME_IS_MULTIPART(body->mime_part))
+	    g_mime_multipart_foreach(GMIME_MULTIPART(body->mime_part),
+				     libbalsa_message_find_charset, &tmp);
+	else
+	    libbalsa_message_find_charset(body->mime_part, &tmp);
+	charset = tmp;
+    } else {
+	do {
+	    if (body->charset) {
+		charset = body->charset;
+		break;
+	    }
+	    if (body->parts)
+		charset = libbalsa_message_body_charset(body->parts);
+	} while (!charset && (body = body->next));
+    }
+
     return charset;
 }
 

@@ -210,37 +210,56 @@ libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info,
  *               <0 body is multipart/signed, but not conforming to RFC3156
  *               =0 unsigned
  */
+
+static gint
+body_is_type(LibBalsaMessageBody * body, const gchar * type,
+	     const gchar * sub_type)
+{
+    gint retval;
+
+    if (body->mime_part) {
+	const GMimeContentType *content_type =
+	    g_mime_object_get_content_type(body->mime_part);
+	retval = g_mime_content_type_is_type(content_type, type, sub_type);
+    } else {
+	GMimeContentType *content_type =
+	    g_mime_content_type_new_from_string(body->mime_type);
+	retval = g_mime_content_type_is_type(content_type, type, sub_type);
+	g_mime_content_type_destroy(content_type);
+    }
+
+    return retval;
+}
+
 gint
 libbalsa_is_pgp_signed(LibBalsaMessageBody *body)
 {
-    GMimeObject *mb_body, *mb_sig;
-    const GMimeContentType *content_type;
-    const gchar *micalg;
-    const gchar *protocol;
+    gchar *micalg;
+    gchar *protocol;
     gint result;
 
     g_return_val_if_fail(body != NULL, 0);
-    g_return_val_if_fail(body->mime_part != NULL, 0);
-    if (!body->parts || !body->parts->next || !body->parts->next->mime_part)
+    g_return_val_if_fail(body->mime_part != NULL ||
+	                 body->mime_type != NULL, 0);
+    if (!body->parts || !body->parts->next ||
+	!(body->parts->next->mime_part || body->parts->next->mime_type))
 	return 0;
 
-    mb_body = body->mime_part;
-    mb_sig = body->parts->next->mime_part;
-    content_type = g_mime_object_get_content_type(mb_body);
+    micalg = libbalsa_message_body_get_parameter(body, "micalg");
+    protocol = libbalsa_message_body_get_parameter(body, "protocol");
 
-    micalg = g_mime_content_type_get_parameter(content_type, "micalg");
-    protocol = g_mime_content_type_get_parameter(content_type, "protocol");
-
-    result = g_mime_content_type_is_type(content_type, "multipart", "signed");
-    content_type = g_mime_object_get_content_type(mb_sig);
+    result = body_is_type(body, "multipart", "signed");
 
     if (result) {
 	if (!(micalg && !g_ascii_strncasecmp("pgp-", micalg, 4) &&
 	      protocol && !g_ascii_strcasecmp("application/pgp-signature", protocol) &&
-	      g_mime_content_type_is_type(content_type,
-					  "application", "pgp-signature")))
+	      body_is_type(body->parts->next,
+			   "application", "pgp-signature")))
 	    result = -1;  /* bad multipart/signed stuff... */
     }
+
+    g_free(micalg);
+    g_free(protocol);
 
     return result;
 }
@@ -254,39 +273,34 @@ libbalsa_is_pgp_signed(LibBalsaMessageBody *body)
 gint
 libbalsa_is_pgp_encrypted(LibBalsaMessageBody *body)
 {
-    const GMimeContentType *content_type;
-    const gchar *protocol;
-    LibBalsaMessageBody *cparts;
+    gchar *protocol;
     gint result;
 
     g_return_val_if_fail(body != NULL, 0);
-    g_return_val_if_fail(body->mime_part != NULL, 0);
+    g_return_val_if_fail(body->mime_part != NULL ||
+			 body->mime_type != NULL, 0);
     if (body->parts == NULL)
 	return 0;
-    g_return_val_if_fail(body->parts->mime_part != NULL, 0);
+    g_return_val_if_fail(body->parts->mime_part != NULL ||
+			 body->parts->mime_type != NULL, 0);
 
-    content_type = g_mime_object_get_content_type(body->mime_part);
-
-    protocol = g_mime_content_type_get_parameter(content_type, "protocol");
-
-    cparts = body->parts;
+    protocol = libbalsa_message_body_get_parameter(body, "protocol");
 
     /* FIXME: verify that body contains "Version: 1" */
-    result = g_mime_content_type_is_type(content_type, "multipart", "encrypted");
-    content_type = g_mime_object_get_content_type(cparts->mime_part);
+    result = body_is_type(body, "multipart", "encrypted");
 
     if (result) {
+	LibBalsaMessageBody *cparts = body->parts;
 	if (!(protocol &&
 	      !g_ascii_strcasecmp("application/pgp-encrypted", protocol) &&
-	      g_mime_content_type_is_type(content_type,
-					  "application", "pgp-encrypted") &&
-	      cparts->next && cparts->next->mime_part &&
-	      (content_type =
-		  g_mime_object_get_content_type(cparts->next->mime_part)) &&
-	      g_mime_content_type_is_type(content_type,
-					  "application", "octet-stream")))
+	      body_is_type(cparts, "application", "pgp-encrypted") &&
+	      cparts->next &&
+	      (cparts->next->mime_part || cparts->next->mime_type) &&
+	      body_is_type(cparts->next, "application", "octet-stream")))
 	    result = -1;  /* bad multipart/encrypted... */
     }
+
+    g_free(protocol);
 
     return result;
 }

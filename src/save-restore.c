@@ -313,7 +313,7 @@ save_global_settings ()
   gnome_config_set_string ("smtp server", balsa_app.smtp_server);
 
   gnome_config_set_string ("inbox", balsa_app.inbox_path);
-  gnome_config_set_string ("outbox", balsa_app.trash_path);
+  gnome_config_set_string ("outbox", balsa_app.outbox_path);
   gnome_config_set_string ("trash", balsa_app.trash_path);
   gnome_config_set_string ("local mail directory", balsa_app.local_mail_directory);
   gnome_config_set_int ("main window width", (gint) balsa_app.mw_width);

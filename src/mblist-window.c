@@ -40,6 +40,10 @@ static void destroy_mblist_window (GtkWidget * widget);
 static void close_mblist_window (GtkWidget * widget);
 static void mailbox_select_cb (GtkCTree *, GtkCTreeNode *, gint);
 
+
+static void open_cb (GtkWidget *, gpointer);
+static void close_cb (GtkWidget *, gpointer);
+
 void
 mblist_open_window (GnomeMDI * mdi)
 {
@@ -55,7 +59,7 @@ mblist_open_window (GnomeMDI * mdi)
 
   mblw->window = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (mblw->window), "Mailboxes");
-  
+
   mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
 		      "destroy",
@@ -82,24 +86,68 @@ mblist_open_window (GnomeMDI * mdi)
 
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area), bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 2);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
   gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
-                                   BALSA_BUTTON_WIDTH/2,
-                                   BALSA_BUTTON_HEIGHT/2);
+				 BALSA_BUTTON_WIDTH / 2,
+				 BALSA_BUTTON_HEIGHT / 2);
   gtk_widget_show (bbox);
 
   button = gtk_button_new_with_label ("Open");
   gtk_container_add (GTK_CONTAINER (bbox), button);
-  gtk_widget_show(button);
+  gtk_signal_connect_object (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (open_cb), NULL);
+  gtk_widget_show (button);
 
   button = gtk_button_new_with_label ("Close");
   gtk_container_add (GTK_CONTAINER (bbox), button);
-  gtk_widget_show(button);
+  gtk_signal_connect_object (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (close_cb), NULL);
+  gtk_widget_show (button);
 
   gtk_widget_show (mblw->window);
 }
 
+static void
+open_cb (GtkWidget * widget, gpointer data)
+{
+  IndexChild *index_child;
+  GtkCTreeNode *ctnode;
+  Mailbox *mailbox;
+  GnomeMDIChild *child;
+
+  if (!GTK_CLIST (mblw->ctree)->selection)
+    return;
+
+  ctnode = GTK_CLIST (mblw->ctree)->selection->data;
+  mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
+
+  index_child = index_child_new (mblw->mdi, mailbox);
+  if (index_child)
+    {
+      gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
+      gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
+    }
+}
+
+static void
+close_cb (GtkWidget * widget, gpointer data)
+{
+  GtkCTreeNode *ctnode;
+  Mailbox *mailbox;
+  GnomeMDIChild *child;
+
+  if (!GTK_CLIST (mblw->ctree)->selection)
+    return;
+
+  ctnode = GTK_CLIST (mblw->ctree)->selection->data;
+  mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
+
+  if (mailbox)
+    {
+      child = gnome_mdi_find_child (mblw->mdi, mailbox->name);
+      if (child)
+	gnome_mdi_remove_child (mblw->mdi, child, TRUE);
+    }
+}
 
 void
 mblist_add_mailbox (Mailbox * mailbox)
@@ -147,7 +195,7 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 {
   IndexChild *index_child;
   Mailbox *mailbox;
-  GdkEventButton *bevent = (GdkEventButton*)gtk_get_current_event ();
+  GdkEventButton *bevent = (GdkEventButton *) gtk_get_current_event ();
 
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     {

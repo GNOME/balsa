@@ -86,6 +86,11 @@ IndexChild *
 index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 {
   IndexChild *child;
+  GnomeMDIChild *mdichild;
+
+  mdichild = gnome_mdi_find_child (mdi, mailbox->name);
+  if (mdichild)
+    return NULL;
 
   child = gtk_type_new (index_child_get_type ());
   if (child)
@@ -162,7 +167,7 @@ index_child_create_view (GnomeMDIChild * child)
 
   iw->message = balsa_message_new ();
   gtk_paned_add2 (GTK_PANED (vpane), iw->message);
-  gtk_widget_set_usize(vpane, 1, 250);
+  gtk_widget_set_usize (vpane, 1, 250);
   gtk_widget_show (iw->message);
 
 

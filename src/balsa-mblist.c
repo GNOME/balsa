@@ -46,7 +46,6 @@ enum
   ARG_SHOW_CONTENT_INFO
 };
 
-
 static gint balsa_mblist_signals[LAST_SIGNAL] = {0};
 
 static void select_mailbox(GtkCTree * ctree, GtkCTreeNode * row, gint column);
@@ -80,8 +79,11 @@ static void balsa_mblist_mailbox_style (GtkCTree *ctree, GtkCTreeNode *node, Mai
 , gboolean display_info
 #endif
 );
+
 static void balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data);
 GdkFont* balsa_widget_get_bold_font (GtkWidget* widget);
+static void balsa_mblist_set_style (BalsaMBList* mblist);
+
 #ifdef BALSA_SHOW_INFO
 static gint numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2);
 #endif
@@ -641,6 +643,52 @@ balsa_mblist_column_click (GtkCList * clist, gint column,
 #endif
 }
 
+/* balsa_mblist_set_style [MBG]
+ * 
+ * mblist:  The mailbox list to set the style for
+ * 
+ * Description: This is simply a function that sets the style for the
+ * unread mailboxes and folders in a mailbox list.  It uses the colour
+ * stored in balsa_app, and sets the font to bold.  It should be
+ * called before calling balsa_mblist_have_unread,
+ * balsa_mblist_update_mailbox, or any function that uses
+ * balsa_mblist_mailbox_style, or folder_style.
+ * */
+static void 
+balsa_mblist_set_style (BalsaMBList* mblist)
+{
+  GdkColor color;
+  GdkFont* font;
+  GtkStyle* style;
+  
+  /* Get the base style the user is using */
+  style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (mblist)));
+
+  /* Attempt to set the font to bold */
+  gdk_font_unref (style->font);
+  font = balsa_widget_get_bold_font (GTK_WIDGET (mblist));
+  style->font = font;
+  gdk_font_ref (style->font);
+
+  /* Get and attempt to allocate the colour */
+  color = balsa_app.mblist_unread_color;
+  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (), 
+                                 &color, FALSE, TRUE)) {
+    fprintf (stderr, "Couldn't allocate colour for unread mailboxes!\n");
+    gdk_color_black (gdk_colormap_get_system(), &color);
+  }
+  
+  /* Just put it in the normal state for now */
+  style->fg[GTK_STATE_NORMAL] = color;
+
+  /* Unref the old style (if it's already been set, and point to the
+   * new style */
+  if (mblist->unread_mailbox_style != NULL)
+    gtk_style_unref (mblist->unread_mailbox_style);
+  mblist->unread_mailbox_style = style;
+}
+
+
 /* balsa_mblist_have_new [MBG]
  * 
  * bmbl:  The BalsaMBList that you want to check
@@ -652,6 +700,7 @@ balsa_mblist_column_click (GtkCList * clist, gint column,
 void
 balsa_mblist_have_new (BalsaMBList * bmbl)
 {
+  balsa_mblist_set_style (bmbl);
   gtk_clist_freeze (GTK_CLIST (&(bmbl->ctree)));
   gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, balsa_mblist_check_new, NULL);
   gtk_ctree_post_recursive (GTK_CTREE (&(bmbl->ctree)), NULL, balsa_mblist_folder_style, NULL);
@@ -681,14 +730,21 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
 /* Get the mailbox */
   cnode_data = gtk_ctree_node_get_row_data (ctree, node);
 
+  /* If it's a directory or not a mailbox, we don't want to go any
+   * further */
   if (cnode_data->IsDir || !BALSA_IS_MAILBOX (cnode_data->mailbox))
     return;
 
   mailbox = BALSA_MAILBOX (cnode_data->mailbox);
 
+  /* If it's not local the mail-check function won't work, and if it's
+   * already open we can get conflicting results since we're checking
+   * the file on disk as opposed to the mailbox in memory */
   if (!BALSA_IS_MAILBOX_LOCAL (mailbox) || mailbox->open_ref > 0)
     return;
 
+  /* Call the actual function to determine the presence of new unread
+   * messages */
   if (mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path)){
     mailbox->has_unread_messages = TRUE;
   } else {
@@ -713,29 +769,34 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
  * total_messages. Selects the mailbox (important when previous mailbox
  * was closed).
  * */
-
 void 
 balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
 {
   GtkCTreeNode *node;
   gchar * desc;
 
-/* try and find the mailbox in both sub trees */
+  /* try and find the mailbox in both sub trees */
   node = gtk_ctree_find_by_row_data_custom (GTK_CTREE (&(mblist->ctree)), NULL,
 					    mailbox, mblist_mbnode_compare);
   
   if (node == NULL)
-     return;
+    return;
 
+  /* Set the style for the next batch of formatting */
+  balsa_mblist_set_style (mblist);
+  
+  /* We want to freeze here to speed things up and prevent ugly
+   * flickering */
   gtk_clist_freeze (GTK_CLIST (&(mblist->ctree)));
-  balsa_mblist_mailbox_style (GTK_CTREE (&mblist->ctree), 
+  balsa_mblist_mailbox_style (GTK_CTREE (&(mblist->ctree)), 
                               node, 
-                              gtk_ctree_node_get_row_data (&(mblist->ctree), 
-							   node)
+                              gtk_ctree_node_get_row_data (&(mblist->ctree), node)
 #ifdef BALSA_SHOW_INFO
                               ,balsa_app.mblist->display_content_info
 #endif
                               );
+
+  /* Do the folder styles as well */
   gtk_ctree_post_recursive (GTK_CTREE (&(mblist->ctree)), NULL, 
 			    balsa_mblist_folder_style, NULL);
   gtk_clist_thaw (GTK_CLIST (&(mblist->ctree)));
@@ -771,15 +832,15 @@ balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
  * balsa_mblist_check_new, hence the (slightly) strange arguments.
  * */
 static void 
-balsa_mblist_mailbox_style (GtkCTree *ctree, GtkCTreeNode *node, MailboxNode *mbnode 
+balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *mbnode
 #ifdef BALSA_SHOW_INFO
                                         , gboolean display_info
 #endif
                                         )
 {
+  BalsaMBList* mblist;
   Mailbox* mailbox;
   GtkStyle* style;
-  GdkFont* font;
   BalsaIconName icon;
   gboolean tmp_is_leaf, tmp_expanded;
 #ifdef BALSA_SHOW_INFO
@@ -789,40 +850,35 @@ balsa_mblist_mailbox_style (GtkCTree *ctree, GtkCTreeNode *node, MailboxNode *mb
   if (node == NULL)
     return;
   
+  mblist = BALSA_MBLIST (ctree);
   mailbox = mbnode->mailbox;
   
   if (mailbox->has_unread_messages) {
-    /* If we haven't already, set the icon and font */
-    if (!(mbnode->style & MBNODE_STYLE_ICONFULL) || 1) {
-      style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (ctree)));
+    
+    /* set the style of the unread maibox list, even if it's already 
+     * set... in case the user has changed the colour or font since the
+     * last style update */    
+    gtk_ctree_node_set_row_style (ctree, node, mblist->unread_mailbox_style);
       
-      gdk_font_unref (style->font);
-      font = balsa_widget_get_bold_font (GTK_WIDGET (ctree));
-      style->font = font;
-      gdk_font_ref (style->font);
-
-      gtk_ctree_node_set_row_style (ctree, node, style);
-      gtk_style_unref (style);
+    tmp_is_leaf = GTK_CTREE_ROW (node)->is_leaf;
+    tmp_expanded = GTK_CTREE_ROW (node)->expanded;
       
-      tmp_is_leaf = GTK_CTREE_ROW (node)->is_leaf;
-      tmp_expanded = GTK_CTREE_ROW (node)->expanded;
-
-      if (mailbox == balsa_app.trash)
-        icon = BALSA_ICON_TRASH;
-      else
-        icon = BALSA_ICON_TRAY_FULL;
+    if (mailbox == balsa_app.trash)
+      icon = BALSA_ICON_TRASH;
+    else
+      icon = BALSA_ICON_TRAY_FULL;
       
-      gtk_ctree_set_node_info (ctree, node, mailbox->name, 5,  
-                               balsa_icon_get_pixmap (icon),
-                               balsa_icon_get_bitmap (icon),
-                               NULL, NULL, tmp_is_leaf, tmp_expanded);
+    gtk_ctree_set_node_info (ctree, node, mailbox->name, 5,  
+                             balsa_icon_get_pixmap (icon),
+                             balsa_icon_get_bitmap (icon),
+                             NULL, NULL, tmp_is_leaf, tmp_expanded);
       
-      mbnode->style |= MBNODE_STYLE_ICONFULL;
-    }
+    mbnode->style |= MBNODE_STYLE_ICONFULL;
+    
 
 #ifdef BALSA_SHOW_INFO
     /* If we have a count of the unread messages, and we are showing
-     * columns, put the number in the unread column */
+       * columns, put the number in the unread column */
     if (display_info && mailbox->unread_messages > 0) {
       text = g_strdup_printf ("%ld", mailbox->unread_messages);
       gtk_ctree_node_set_text (ctree, node, 1, text);
@@ -831,12 +887,15 @@ balsa_mblist_mailbox_style (GtkCTree *ctree, GtkCTreeNode *node, MailboxNode *mb
       mbnode->style |= MBNODE_STYLE_UNREAD_MESSAGES;
     }
 #endif
+    
   } else {
     /* If the clist entry currently has the unread messages icon, set
      * it back, otherwise we can ignore this. */
     if (mbnode->style & MBNODE_STYLE_ICONFULL) {
       style = gtk_widget_get_style (GTK_WIDGET (ctree));
       gtk_ctree_node_set_row_style (ctree, node, style);
+      gtk_style_unref (style);
+      
       tmp_is_leaf = GTK_CTREE_ROW (node)->is_leaf;
       tmp_expanded = GTK_CTREE_ROW (node)->expanded;
       
@@ -896,14 +955,15 @@ balsa_mblist_mailbox_style (GtkCTree *ctree, GtkCTreeNode *node, MailboxNode *mb
 static void 
 balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data)
 {
+  BalsaMBList* mblist;
   MailboxNode* mbnode;
   GtkCTreeNode* parent;
   GtkStyle* style;
-  GdkFont* font;
   static guint32 has_unread;
 
   parent = GTK_CTREE_ROW (node)->parent;
   mbnode = gtk_ctree_node_get_row_data (ctree, node);
+  mblist = BALSA_MBLIST (ctree);
 
   /* If we're on a leaf, just see if it's displayed as unread */
   if (GTK_CTREE_ROW (node)->is_leaf && !(mbnode->IsDir)) {
@@ -919,15 +979,8 @@ balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data)
     /* We're on a folder here, see if any of the leaves were displayed
      * as having unread messages, change the syle accordingly */
     if (has_unread & (1 << (GTK_CTREE_ROW (node)->level + 1))) {
-      style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET (ctree)));
-
-      gdk_font_unref (style->font);
-      font = balsa_widget_get_bold_font (GTK_WIDGET (ctree));
-      style->font = font;
-      gdk_font_ref (style->font);
-
-      gtk_ctree_node_set_row_style (ctree, node, style);
-      gtk_style_unref (style);
+      
+      gtk_ctree_node_set_row_style (ctree, node, mblist->unread_mailbox_style);
 
       mbnode->style |= MBNODE_STYLE_ICONFULL;
 
@@ -945,6 +998,7 @@ balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data)
       /* This folder's style needs to be reset to the vanilla style */
       style = gtk_widget_get_style (GTK_WIDGET (ctree));
       gtk_ctree_node_set_row_style (ctree, node, style);
+      gtk_style_unref (style);
     
       mbnode->style &= ~MBNODE_STYLE_ICONFULL;
       return;
@@ -1020,7 +1074,9 @@ mblist_mbnode_compare (gconstpointer a, gconstpointer b)
  * 
  * Description: This function takes a widget and returns a bold
  * version of font that it is currently using.  If it fails, it simply
- * returns the default font of the widget. */
+ * returns the default font of the widget.  This function does not
+ * update the reference count of any fonts, so assume nothing 
+ * */
 GdkFont* 
 balsa_widget_get_bold_font (GtkWidget* widget)
 {

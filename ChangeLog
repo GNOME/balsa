@@ -1,3 +1,18 @@
+2000-03-17 Matthew Guenther <mguenther@netcom.ca>
+	* src/sendmsg-window.c (bsmsg2message): enable In-Reply-To and 
+	References headers
+	* libbalsa/send.c (balsa_create_message): enable In-Reply-To and
+	References headers
+	* libbalsa/message.h: Added references var to Message struct
+	* libbalsa/message.c: Init and destruction of references variable
+	* src/balsa-mblist.c: cleaner style setting, add colour
+	* src/pref-manager.c: add colour picker for mblist unread mailbox 
+	color
+	* src/save-restore.c: save/load colour for mblist
+	* src/balsa-app.c: field to store colour and defaults
+	* configure.in: change --enable-info do default yes, better (less 
+	broken) option description
+
 2000-03-15  Pawel Salek<pawsa@theochem.kth.se>
 	
 	* src/balsa-app.[hc], src/pref-manager.c,src/save-restore.c,

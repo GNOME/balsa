@@ -889,6 +889,7 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   FILE *tempfp;
   HEADER *msg_tmp;
   MESSAGE *mensaje;
+  LIST *in_reply_to;
 				
   if (!msg->env)
     msg->env = mutt_new_envelope ();
@@ -898,6 +899,7 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
     LIST *sptr = UserHeader;
     LIST *dptr = msg->env->userhdrs;
     LIST *delptr = 0;
+
     while (sptr)
       {
 	dptr->data = g_strdup (sptr->data);
@@ -925,6 +927,21 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list (message->to_list));
   msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list (message->cc_list));
   msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
+
+  /* If the message has references set, add them to he envelope */
+  if (message->references != NULL) {        
+    msg->env->references = mutt_new_list ();
+    msg->env->references->next = NULL;
+    msg->env->references->data =  g_strdup (message->references);
+
+    /* There's no specific header for In-Reply-To, just add it to the user
+     * headers */
+    in_reply_to = mutt_new_list ();
+    in_reply_to->next = msg->env->userhdrs;
+    in_reply_to->data = g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
+    msg->env->userhdrs = in_reply_to;
+  }
+  
 
   if ((list = message->body_list) == NULL )
   {

@@ -23,9 +23,9 @@ UI:
    D Same look as now, except mailbox list in a splitter and not a handlebox
  D Mailbox list in the main window
      D Allow the mailbox tree to be resized
- * finish move and copy
- * put deleted items in the trash and remove them from the current clist
- P mailboxes with new mail should have bold text
+ P finish move and copy
+ D put deleted items in the trash and remove them from the current clist
+ D mailboxes with new mail should have bold text
  P DND messages into mailboxes
      P Attachments in new mail
      P move/copy messages via DND

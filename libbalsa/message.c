@@ -102,6 +102,7 @@ libbalsa_message_init (Message *message)
   message->cc_list = NULL;
   message->bcc_list = NULL;
   message->fcc_mailbox = NULL;
+  message->references = NULL;
   message->in_reply_to = NULL;
   message->message_id = NULL;
   message->body_ref = 0;
@@ -195,6 +196,7 @@ libbalsa_message_real_destroy(GtkObject *object)
 	address_list_free(message->cc_list);
 	address_list_free(message->bcc_list);
 	g_free (message->subject);
+        g_free (message->references);
 	g_free (message->in_reply_to);
 	g_free (message->message_id); 
 }

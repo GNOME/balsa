@@ -923,6 +923,23 @@ config_global_load (void)
   else
 	  balsa_app.empty_trash_on_exit = atoi(field);
 
+  /* Here we load the unread mailbox colour for the mailbox list */
+  if ((field = pl_dict_get_str (globals, "MBListUnreadColorRed")) == NULL)
+    balsa_app.mblist_unread_color.red = MBLIST_UNREAD_COLOR_RED;
+  else
+    balsa_app.mblist_unread_color.red = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "MBListUnreadColorGreen")) == NULL)
+    balsa_app.mblist_unread_color.green = MBLIST_UNREAD_COLOR_GREEN;
+  else
+    balsa_app.mblist_unread_color.green = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "MBListUnreadColorBlue")) == NULL)
+    balsa_app.mblist_unread_color.blue = MBLIST_UNREAD_COLOR_BLUE;
+  else
+    balsa_app.mblist_unread_color.blue = atoi (field);
+
+
   /* How we format dates */
   if ((field = pl_dict_get_str (globals, "DateFormat")) == NULL)
     balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
@@ -1122,6 +1139,15 @@ config_global_save (void)
 
   snprintf ( tmp, sizeof(tmp), "%d", balsa_app.empty_trash_on_exit);
   pl_dict_add_str_str (globals, "EmptyTrash", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.red);
+  pl_dict_add_str_str (globals, "MBListUnreadColorRed", tmp);
+  
+  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.green);
+  pl_dict_add_str_str (globals, "MBListUnreadColorGreen", tmp);
+
+  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.blue);
+  pl_dict_add_str_str (globals, "MBListUnreadColorBlue", tmp);
 
   if( balsa_app.date_string )
 	  pl_dict_add_str_str (globals, "DateFormat", balsa_app.date_string );

@@ -82,6 +82,9 @@ struct _Message
   Mailbox *fcc_mailbox;
 
   /* replied message ID */
+  gchar *references;
+
+  /* replied message ID; from address on date*/
   gchar *in_reply_to;
 
   /* message ID */

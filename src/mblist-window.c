@@ -159,13 +159,11 @@ mblist_open_mailbox (Mailbox * mailbox)
 
   c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
 
-  /* If we currently have a page open, commit whatever changes have
-   * occurred, and update the time last visited */
+  /* If we currently have a page open, update the time last visited */
   if (c != -1) { 
     page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
     page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
     g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use); 
-    mailbox_commit_flagged_changes (BALSA_INDEX_PAGE (page)->mailbox); 
   } 
   
   if( mailbox->open_ref ) {
@@ -318,6 +316,7 @@ mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, Gd
   if (!mblw)
     return;
 }
+
 
 static void
 mb_open_cb (GtkWidget * widget, Mailbox * mailbox)

@@ -32,6 +32,7 @@ struct _BalsaMBList
     GtkCTree ctree;
 
     GList *watched_mailbox; /* list of mailbox watched */
+    GtkStyle *unread_mailbox_style; /* store the style of unread mailboxes */
 #ifdef BALSA_SHOW_INFO
     gboolean display_content_info; /* shall the number of messages be displayed ? */
 #endif

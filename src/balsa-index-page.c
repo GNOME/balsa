@@ -384,16 +384,17 @@ idle_handler_cb(GtkWidget * widget)
 		    bevent->button, bevent->time);
   }
   if (bmsg) {
-      if (BALSA_MESSAGE(bmsg)) {
-	 if (message) {
-              balsa_message_set(BALSA_MESSAGE(bmsg), message);
-	      mailbox_commit_flagged_changes (message->mailbox); 
-	 } else
-              balsa_message_clear (BALSA_MESSAGE (bmsg));
-      }
+    if (BALSA_MESSAGE(bmsg)) {
+      if (message) 
+        balsa_message_set(BALSA_MESSAGE(bmsg), message);
+      else
+        balsa_message_clear (BALSA_MESSAGE (bmsg));
+    }
   }
-
+  
   handler = 0;
+
+  /* Update the style and message counts in the mailbox list */
   balsa_mblist_update_mailbox (balsa_app.mblist, 
 			       BALSA_INDEX(widget)->mailbox);
 

@@ -54,6 +54,11 @@
 #define INFO_FIELD_LENGTH 10
 #endif
 
+/* Default colour for mailboxes with unread messages */
+#define MBLIST_UNREAD_COLOR_RED 0
+#define MBLIST_UNREAD_COLOR_BLUE 65535
+#define MBLIST_UNREAD_COLOR_GREEN 0
+
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
 
@@ -150,7 +155,9 @@ extern struct BalsaApplication
   gint mblist_newmsg_width;
   gint mblist_totalmsg_width;
 #endif
-
+  /* Colour of mailboxes with unread messages in mailbox list */
+  GdkColor mblist_unread_color;
+  
   GtkToolbarStyle toolbar_style;
   GnomeMDIMode mdi_style;
   gint pwindow_option;

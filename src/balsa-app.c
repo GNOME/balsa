@@ -145,6 +145,10 @@ balsa_app_init (void)
   balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
 #endif
 
+  balsa_app.mblist_unread_color.red = MBLIST_UNREAD_COLOR_RED;
+  balsa_app.mblist_unread_color.blue = MBLIST_UNREAD_COLOR_BLUE;
+  balsa_app.mblist_unread_color.green = MBLIST_UNREAD_COLOR_GREEN;
+
   /* arp */
   balsa_app.quote_str = NULL;
 

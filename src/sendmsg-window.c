@@ -1154,6 +1154,8 @@ bsmsg2message(BalsaSendmsg *bsmsg)
   Message * message;
   Body * body;
   gchar * tmp;
+  gchar recvtime[50];
+  struct tm *footime;
 
   message = message_new ();
 
@@ -1174,6 +1176,19 @@ bsmsg2message(BalsaSendmsg *bsmsg)
       strlen(tmp)>0) 
      message->reply_to = make_address_from_string(tmp);
 
+  if (bsmsg->orig_message != NULL) {
+    message->references = g_strdup (bsmsg->orig_message->message_id);
+    
+    footime = localtime (&bsmsg->orig_message->datet);
+    strftime (recvtime, sizeof (recvtime), "%a, %b %d, %Y at %H:%M:%S %z", footime);
+    message->in_reply_to = g_strconcat (bsmsg->orig_message->message_id, 
+                                        "; from ", 
+                                        bsmsg->orig_message->from->mailbox, 
+                                        " on ", 
+                                        recvtime, 
+                                        NULL);
+  }
+  
   body = body_new ();
 
   body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
@@ -1212,7 +1227,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   if(! is_ready_to_send(bsmsg)) return FALSE;
 
-  message = bsmsg2message(bsmsg);
+  message = bsmsg2message (bsmsg);
 
   tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
   message->fcc_mailbox = NULL;
@@ -1262,6 +1277,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
           {
             /* TODO: Find message to be marked as being answered with message
              * ID, mailbox type and mailbox name. */
+            /* [MBG] Isn't this already done with the reply? */
           }
       }
   }

@@ -77,6 +77,9 @@ typedef struct _PropertyUI {
 	GtkWidget *PrintCommand;
 	GtkWidget *PrintBreakline;
 	GtkWidget *PrintLinesize;
+
+        /* colours */
+        GtkWidget *unread_color;
 	  
 } PropertyUI;
 
@@ -445,7 +448,9 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
 	gtk_signal_connect (GTK_OBJECT (pui->selected_headers), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
-
+        gtk_signal_connect (GTK_OBJECT (pui->unread_color), "released",
+                            GTK_SIGNAL_FUNC (properties_modified_cb), pui->pbox);
+        
 	gtk_widget_show_all ( GTK_WIDGET(pui->pbox));
 
 } /* open_preferences_manager */
@@ -595,6 +600,10 @@ apply_prefs (GtkWidget * pbox, PropertyUI * pui)
 	   GTK_ENTRY (pui->selected_headers)) );
 	g_strdown(balsa_app.selected_headers);
 
+        /* unread mailbox color */
+        gdk_colormap_free_colors (gdk_colormap_get_system (), &balsa_app.mblist_unread_color, 1);
+        gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->unread_color), &(balsa_app.mblist_unread_color.red), &(balsa_app.mblist_unread_color.green), &(balsa_app.mblist_unread_color.blue), 0);
+
 	// XXX
 	//  refresh_main_window ();
 	
@@ -602,6 +611,7 @@ apply_prefs (GtkWidget * pbox, PropertyUI * pui)
 	 * close window and free memory
 	 */
 	config_global_save ();
+        balsa_mblist_redraw (balsa_app.mblist);
 
 	/*
 	 * Setting the Apply buttin insensitive again
@@ -716,6 +726,8 @@ set_prefs (void)
 	if(balsa_app.selected_headers) 
 	   gtk_entry_set_text (GTK_ENTRY (pui->selected_headers),
 			       balsa_app.selected_headers);
+
+        gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->unread_color), balsa_app.mblist_unread_color.red, balsa_app.mblist_unread_color.green, balsa_app.mblist_unread_color.blue, 0);
 }
 
 void
@@ -1491,6 +1503,9 @@ create_misc_page ( )
 	GtkWidget *table6;
 	GtkWidget *label27;
 	GtkWidget *label;
+        GtkWidget *color_frame;
+        GtkWidget *unread_color_table;
+        GtkWidget *unread_color_label;
 
 	vbox9 = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show (vbox9);
@@ -1557,6 +1572,32 @@ create_misc_page ( )
 			  (GtkAttachOptions) (  GTK_JUSTIFY_RIGHT ), 0, 0);
 	gtk_label_set_justify (GTK_LABEL (label27), GTK_JUSTIFY_RIGHT);
 
+        /* mblist unread colour  */
+        color_frame = gtk_frame_new (_("Colors"));
+        gtk_widget_show (GTK_WIDGET (color_frame));
+	gtk_box_pack_start (GTK_BOX (vbox9), color_frame, FALSE, FALSE, 0);
+
+        unread_color_table = gtk_table_new (2, 1, FALSE);
+        gtk_widget_show (unread_color_table);
+        gtk_container_add (GTK_CONTAINER (color_frame), unread_color_table);
+        gtk_container_set_border_width (GTK_CONTAINER (unread_color_table), 0);
+
+        unread_color_label = gtk_label_new (_("Mailbox with unread messages colour"));
+        gtk_widget_show (unread_color_label);
+        gtk_table_attach (GTK_TABLE (unread_color_table),
+                          unread_color_label, 0, 1, 0, 1,
+                          GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
+        gtk_label_set_justify (GTK_LABEL (unread_color_label), GTK_JUSTIFY_RIGHT);
+
+        pui->unread_color = gnome_color_picker_new ();
+        gnome_color_picker_set_title (GNOME_COLOR_PICKER (pui->unread_color), _("Mailbox with unread messages colour"));
+        gnome_color_picker_set_dither (GNOME_COLOR_PICKER (pui->unread_color) , TRUE);
+        gtk_widget_show (pui->unread_color);
+        gtk_container_set_border_width (GTK_CONTAINER (pui->unread_color), 5);
+        gtk_table_attach (GTK_TABLE (unread_color_table), 
+                          pui->unread_color, 1, 2, 0, 1,
+                          GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+        
 	return vbox9;
 }
 
@@ -1599,8 +1640,8 @@ properties_modified_cb (GtkWidget * widget, GtkWidget * pbox)
 	
 	btn = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(pbox), "btn_apply");
 	gtk_widget_set_sensitive (btn, TRUE);
-
 }
+
 
 static void
 font_changed (GtkWidget * widget, GtkWidget * pbox)

@@ -25,6 +25,7 @@
 #include "balsa-app.h"
 #include "save-restore.h"
 #include "quote-color.h"
+#include "toolbar-prefs.h"
 
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define FOLDER_SECTION_PREFIX "folder-"
@@ -79,6 +80,70 @@ d_get_gint(const gchar * key, gint def_val)
     gint def;
     gint res = gnome_config_get_int_with_default(key, &def);
     return def ? def_val : res;
+}
+
+static void
+free_toolbars(void)
+{
+    int i, j;
+    
+    if(!balsa_app.toolbars == 0)
+	return;
+    
+    for(i=0; i<balsa_app.toolbar_count; i++) {
+	for(j=0; balsa_app.toolbars[i][j]; j++)
+	    g_free(balsa_app.toolbars[i][j]);
+	free((char *)balsa_app.toolbars[i]);
+    }
+    free((void *)balsa_app.toolbars);
+    free((void *)balsa_app.toolbar_ids);
+}
+
+/* load_toolbars:
+   loads customized toolbars for main/message preview and compose windows.
+*/
+static void
+load_toolbars(void)
+{
+    gint i, j, items;
+    char tmpkey[256];
+
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    
+    balsa_app.toolbar_wrap_button_text=d_get_gint("WrapButtonText", 1);
+    
+    free_toolbars();
+    
+    balsa_app.toolbar_ids=
+	(int *)g_malloc(sizeof(int)*MAXTOOLBARS);
+    balsa_app.toolbars=	(char ***)g_malloc(sizeof(char *)*MAXTOOLBARS);
+    
+    balsa_app.toolbar_count=d_get_gint("ToolbarCount", 0);
+    if(balsa_app.toolbar_count)	{
+	for(i=0; i<balsa_app.toolbar_count; i++) {
+	    balsa_app.toolbars[i]=
+		(char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
+			
+	    sprintf(tmpkey, "Toolbar%dID", i);
+	    balsa_app.toolbar_ids[i] = d_get_gint(tmpkey, -1);
+
+	    if(balsa_app.toolbar_ids[i] == -1) {
+		balsa_app.toolbars[i][0]=NULL;
+		continue;
+	    }
+
+	    sprintf(tmpkey, "Toolbar%dItemCount", i);
+	    items=d_get_gint(tmpkey, 0);
+	    
+	    for(j=0; j<items; j++) {
+		sprintf(tmpkey, "Toolbar%dItem%d", i, j);
+		balsa_app.toolbars[i][j]=  gnome_config_get_string(tmpkey);
+	    }
+	    balsa_app.toolbars[i][j]=NULL;
+	}
+	
+    }
+    gnome_config_pop_prefix();
 }
 
 /* config_mailbox_set_as_special:
@@ -346,7 +411,7 @@ config_global_load(void)
 #endif
     config_address_books_load();
     config_identities_load();
-
+    
     /* Section for the balsa_information() settings... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
 
@@ -626,6 +691,9 @@ config_global_load(void)
     gnome_config_clean_key("AddressBookDistMode");
 
     gnome_config_pop_prefix();
+    
+    /* Toolbars */
+    load_toolbars();
 
     /* Last used paths options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
@@ -641,7 +709,8 @@ config_global_load(void)
 gint config_save(void)
 {
     gchar **open_mailboxes_vector;
-    gint i;
+    gint i, j;
+	char tmpkey[32];
 
     config_address_books_save();
     config_identities_save();
@@ -816,6 +885,30 @@ gint config_save(void)
 
     gnome_config_pop_prefix();
 
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+
+	gnome_config_set_int("WrapButtonText", balsa_app.toolbar_wrap_button_text);
+
+	gnome_config_set_int("ToolbarCount", balsa_app.toolbar_count);
+
+	if(balsa_app.toolbar_count > 0)
+	{
+		for(i=0;i<balsa_app.toolbar_count;i++)
+		{
+			sprintf(tmpkey, "Toolbar%dID", i);
+			gnome_config_set_int(tmpkey, balsa_app.toolbar_ids[i]);
+
+			for(j=0;balsa_app.toolbars[i][j];j++)
+			{
+				sprintf(tmpkey, "Toolbar%dItem%d", i, j);
+				gnome_config_set_string(tmpkey, balsa_app.toolbars[i][j]);
+			}
+			sprintf(tmpkey, "Toolbar%dItemCount", i);
+			gnome_config_set_int(tmpkey, j);
+		}
+	}
+
+    gnome_config_pop_prefix();
     
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
     if(balsa_app.attach_dir)

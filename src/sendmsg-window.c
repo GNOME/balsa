@@ -72,6 +72,7 @@
 #include "main.h"
 #include "print.h"
 #include "spell-check.h"
+#include "toolbar-factory.h"
 
 #define GNOME_MIME_BUG_WORKAROUND 1
 
@@ -141,49 +142,6 @@ static void wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_par_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
-
-
-static GnomeUIInfo main_toolbar[] = {
-#define TOOL_SEND_POS 0
-    GNOMEUIINFO_ITEM_STOCK(N_("Send"), N_("Send this message"),
-			   send_message_toolbar_cb,
-			   GNOME_STOCK_PIXMAP_MAIL_SND),
-    GNOMEUIINFO_SEPARATOR,
-#define TOOL_ATTACH_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("Attach"),
-			   N_("Add attachments to this message"),
-			   attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
-    GNOMEUIINFO_SEPARATOR,
-#define TOOL_POSTPONE_POS 4
-    GNOMEUIINFO_ITEM_STOCK(N_("Postpone"),
-			   N_("Continue this message later"),
-			   postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
-    GNOMEUIINFO_SEPARATOR,
-#define TOOL_IDENT_POS 6
-    GNOMEUIINFO_ITEM_STOCK(N_("Select Identity"),
-                           N_("Set identity to use for this message"),
-                           change_identity_dialog_cb,
-                           BALSA_PIXMAP_IDENTITY),
-    GNOMEUIINFO_SEPARATOR,
-#define TOOL_SPELLING_POS 8
-    GNOMEUIINFO_ITEM_STOCK(N_("Spelling"),
-			   N_
-			   ("Run a spell check on the current message"),
-			   spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
-    GNOMEUIINFO_SEPARATOR,
-#define TOOL_PRINT_POS 10
-    GNOMEUIINFO_ITEM_STOCK(N_("Print"), N_("Print"),
-			   print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
-    GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_ITEM_STOCK(N_("Cancel"), N_("Cancel this message"),
-			   close_window, GNOME_STOCK_PIXMAP_CLOSE),
-    GNOMEUIINFO_END
-};
-
-static const int main_toolbar_spell_disable[] = { 
-    TOOL_SEND_POS,  TOOL_ATTACH_POS,   TOOL_POSTPONE_POS, 
-    TOOL_IDENT_POS, TOOL_SPELLING_POS, TOOL_PRINT_POS 
-};
 
 static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_INCLUDE_POS 0
@@ -290,6 +248,12 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_TOGGLEITEM(N_("_Keywords"), NULL, toggle_keywords_cb,
 			   NULL),
     GNOMEUIINFO_END
+};
+
+static char * main_toolbar_spell_disable[] = {
+    GNOME_STOCK_PIXMAP_MAIL_SND,  GNOME_STOCK_PIXMAP_ATTACH,
+    GNOME_STOCK_PIXMAP_SAVE, BALSA_PIXMAP_IDENTITY,
+    GNOME_STOCK_PIXMAP_SPELLCHECK, GNOME_STOCK_PIXMAP_CLOSE
 };
 
 #if MENU_TOGGLE_KEYWORDS_POS+1 != VIEW_MENU_LENGTH
@@ -514,6 +478,7 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 static gint
 delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
+	release_toolbars(((BalsaSendmsg *) data)->window);
     balsa_sendmsg_destroy((BalsaSendmsg *) data);
     g_message("delete_event_cb(): Stop.");
     return TRUE;
@@ -1507,12 +1472,30 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     fill_language_menu();
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, msg);
-    gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar,
-				       msg);
+
+    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_MAIL_SND,
+				GTK_SIGNAL_FUNC(send_message_toolbar_cb), msg);
+    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_ATTACH,
+				GTK_SIGNAL_FUNC(attach_clicked), msg);
+    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_SAVE,
+				GTK_SIGNAL_FUNC(postpone_message_cb), msg);
+    set_toolbar_button_callback(1, BALSA_PIXMAP_IDENTITY,
+				GTK_SIGNAL_FUNC(change_identity_dialog_cb), 
+				msg);
+    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_SPELLCHECK,
+				GTK_SIGNAL_FUNC(spell_check_cb), msg);
+    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_PRINT,
+				GTK_SIGNAL_FUNC(print_message_cb), msg);
+    set_toolbar_button_callback(1, GNOME_STOCK_PIXMAP_CLOSE,
+				GTK_SIGNAL_FUNC(close_window), msg);
+
+    gnome_app_set_toolbar(GNOME_APP(window),
+			  get_toolbar(GTK_WIDGET(window), 1));
 
     msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
     msg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
-    msg->ready_widgets[2] = main_toolbar[TOOL_SEND_POS].widget;
+    msg->ready_widgets[2] = get_tool_widget(window, 1,
+			GNOME_STOCK_PIXMAP_MAIL_SND);
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* set options - just the Disposition Notification request for now */
@@ -1532,7 +1515,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     for(i=0; i<ELEMENTS(main_toolbar_spell_disable); i++)
 	list = g_list_prepend(
-	    list, main_toolbar[main_toolbar_spell_disable[i]].widget);
+	    list, get_tool_widget(window, 1, main_toolbar_spell_disable[i]));
     msg->spell_check_disable_list = list;
 
     /* create the top portion with the to, from, etc in it */

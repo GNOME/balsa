@@ -48,6 +48,9 @@
 #include "pixmaps/reply_to_all_menu.xpm"
 #include "pixmaps/next_unread.xpm"
 #include "pixmaps/next_unread_menu.xpm"
+#include "pixmaps/flag_new.xpm"
+#include "pixmaps/mark_all.xpm"
+#include "pixmaps/all_headers.xpm"
 
 #include "pixmaps/small-close.xpm"
 
@@ -213,4 +216,8 @@ register_balsa_pixmaps(void)
 
     register_balsa_pixmap(BALSA_PIXMAP_IDENTITY, identity_xpm, 24, 24);
     register_balsa_pixmap(BALSA_PIXMAP_IDENTITY_MENU, identity_xpm, 16, 16);
+    register_balsa_pixmap(BALSA_PIXMAP_FLAG_UNREAD, flag_new_xpm, 24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_MARK_ALL_MSGS, mark_all_xpm, 24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_SHOW_ALL_HEADERS, all_headers_xpm, 
+			  24, 24);
 }

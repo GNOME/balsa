@@ -36,6 +36,10 @@
 #define BALSA_PIXMAP_IDENTITY "identity"
 #define BALSA_PIXMAP_IDENTITY_MENU "identity_menu"
 
+#define BALSA_PIXMAP_FLAG_UNREAD "flag_unread"
+#define BALSA_PIXMAP_MARK_ALL_MSGS "mark_all_msgs"
+#define BALSA_PIXMAP_SHOW_ALL_HEADERS "show_all_headers"
+
 typedef enum {
     BALSA_ICON_INBOX,
     BALSA_ICON_OUTBOX,

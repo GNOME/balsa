@@ -42,6 +42,13 @@ message_print_cb(GtkWidget * widget, gpointer cbdata)
 	"This version of balsa is compiled without gnome-print support.\n"
 	"Printing is not possible."));
 }
+void
+message_print(LibBalsaMessage *msg)
+{
+    balsa_information(LIBBALSA_INFORMATION_ERROR, _(
+	"This version of balsa is compiled without gnome-print support.\n"
+	"Printing is not possible."));
+}
 #else
 
 #include <ctype.h>

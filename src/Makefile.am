@@ -50,7 +50,11 @@ balsa_BASE_SOURCES =	\
 	quote-color.h		\
 	threads.h		\
 	spell-check.c		\
-	spell-check.h		
+	spell-check.h		\
+	toolbar-prefs.c		\
+	toolbar-prefs.h		\
+	toolbar-factory.c	\
+	toolbar-factory.h
 
 balsa_IDL_SOURCES = \
 	balsa-common.c		\

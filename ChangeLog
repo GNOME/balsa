@@ -1,3 +1,23 @@
+2001-07-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	all-bars3.patch from M. Thielker <balsa@t-data.com>
+	* src/Makefile.am: add toolbar-prefs.[hc] and toolbar-factory.[hc]
+	* src/balsa-app.h: add toolbar_count, toolbar_ids, toolbars and
+	toolbar_wrap_button_text fields.
+	* src/balsa-icons.[hc]: add flag_new.xpm and mark_all.xpm and 
+	all_headers.xpm
+	* src/main-window.c: switch to new customizable toolbars.
+	* src/message-window.c: same.
+	* src/sendmsg-window.c: same.
+	* src/pixmaps/all_headers.xpm:
+	* src/pixmaps/flag_new.xpm: 
+	* src/pixmaps/mark_all.xpm: add pixmaps.
+	* src/print.c: add extra warning function when gnome-print
+	unavailable.
+	* src/save-restore.c: save/read toolbars.
+	* src/toolbar-factory.[hc]: implement toolbar creation.
+	* src/toolbar-prefs.[hc]: implement toolbar configuration.
+	
 2001-07-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: add menu shortcut for identities.

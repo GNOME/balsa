@@ -462,14 +462,14 @@ load_messages (Mailbox * mailbox, gint emit)
   Message *message;
   HEADER *cur;
 
-  for (msgno = mailbox->messages - mailbox->new_messages;
+  for (msgno = mailbox->messages - mailbox->new_messages + 1;
        msgno <= mailbox->messages;
        msgno++)
     {
       cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
 
       if (!cur)
-        continue;
+	continue;
 
       message = translate_message (cur->env);
       message->mailbox = mailbox;
@@ -973,10 +973,13 @@ void
 message_body_ref (Message * message)
 {
   Body *body;
-
+  HEADER *cur;
+  MESSAGE *msg;
 
   if (!message)
     return;
+
+  cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   if (message->body_ref > 0)
     {
@@ -985,8 +988,18 @@ message_body_ref (Message * message)
     }
 
   /*
-   * load message body -- lameness
+   * load message body
    */
+  if ((msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno)) != NULL)
+    {
+ /*     mutt_view_attachment (msg->fp, cur->content, M_REGULAR);
+*/ 
+      message->body_list = g_list_append(message->body_list,
+		      g_strdup(msg->fp));
+      message->body_ref++;
+	    mx_close_message (&msg);
+    }
+
 #if 0
   body = body_new ();
   body->buffer = g_strdup (mail_fetchtext (CLIENT_STREAM (message->mailbox),

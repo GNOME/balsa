@@ -1,3 +1,9 @@
+2003-09-25 09:15  PeterB
+
+	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,
+	src/mailbox-node.c: Combine IMAP folder and mailbox handlers;
+	general cleanup of IMAP code.
+
 2003-09-24  Magick  <magick Linux-Fan.com>
 
 	* configure.in: support for --disable-{flock,fcntl} options.

@@ -174,19 +174,52 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
 
 static gboolean needs_quotes(const gchar *str)
 {
-    return (strchr(str, ',')!=NULL); /* *** For now */
+    gboolean quoted = FALSE;
 
+    while (*str) {
+        if (*str == '\\') {
+            if (*++str)
+                ++str;
+        } else {
+            if (*str == '"')
+                quoted = !quoted;
+            else if (!quoted
+                /* RFC 2822 specials, less '"': */
+                 && strchr("()<>[]:;@\\,.", *str))
+                return TRUE;
+            ++str;
+        }
+    }
+    return FALSE;
 }
 
 static gchar *rfc2822_mailbox(const gchar *full_name, gchar *address)
 {
     gchar *new_str;
 
-    if(full_name && needs_quotes(full_name))
-	new_str = g_strdup_printf("\042%s\042 <%s>", full_name, address);
-    else if(full_name)
-	new_str = g_strdup_printf("%s <%s>", full_name, address);
-    else
+    if(full_name) {
+        gchar *dequote = g_new(char, strlen(full_name) + 1);
+        const gchar *p = full_name;
+        gchar *q = dequote;
+    
+        do {
+            if (*p == '\\') {
+                *q++ = *p++;
+                if (*p)
+                    *q++ = *p++;
+            } else if (*p == '"')
+                ++p;
+            else
+                *q++ = *p++;
+        } while (*p);
+        *q = '\0';
+
+        if (needs_quotes(dequote))
+	    new_str = g_strdup_printf("\042%s\042 <%s>", dequote, address);
+        else
+            new_str = g_strdup_printf("%s <%s>", dequote, address);
+        g_free(dequote);
+    } else
 	new_str = g_strdup(address);
     return new_str;
 }

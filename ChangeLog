@@ -1,3 +1,8 @@
+2001-11-10  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/address.c: better mail address quoting (#62429).
+	* src/store-address.c: UI improvements in "Store Address" dialog.
+
 2001-11-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/message.h: have a copy of msgno for faster sorting.

@@ -71,13 +71,23 @@ balsa_store_address(GtkWidget * widget, gpointer user_data)
     info->current_address_book = NULL;
     dialog = store_address_dialog(info);
 
-    gnome_dialog_close_hides(GNOME_DIALOG(dialog), TRUE);
     if (info->entries_list) {
         GtkNotebook *notebook = GTK_NOTEBOOK(info->notebook);
-        while (gnome_dialog_run(GNOME_DIALOG(dialog)) == 0) {
+        gint button;
+
+        gnome_dialog_close_hides(GNOME_DIALOG(dialog), TRUE);
+        /* button ==  0 => OK
+         * button ==  1 => save
+         * button ==  2 => close
+         * button == -1    if user closed dialog using the window
+         *                   decorations */
+        while ((button = gnome_dialog_run(GNOME_DIALOG(dialog))) == 0 
+                || button == 1) {
             gint page = gtk_notebook_get_current_page(notebook);
             GList *list = g_list_nth(info->entries_list, page);
             store_address_from_entries(info, list->data);
+            if (button == 0)
+                break;
         }
         g_list_foreach(info->entries_list, (GFunc) g_free, NULL);
         g_list_free(info->entries_list);
@@ -94,7 +104,9 @@ GtkWidget *
 store_address_dialog(struct store_address_info * info)
 {
     GtkWidget *dialog =
-        gnome_dialog_new(_("Store Address"), _("Save in address book"),
+        gnome_dialog_new(_("Store Address"),
+                         GNOME_STOCK_BUTTON_OK,
+                         "Save",
                          GNOME_STOCK_BUTTON_CLOSE, NULL);
     GtkWidget *vbox = GNOME_DIALOG(dialog)->vbox;
     GtkWidget *frame;
@@ -103,6 +115,10 @@ store_address_dialog(struct store_address_info * info)
     gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
     frame = store_address_note_frame(info);
     gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), 
+                       gtk_label_new(_("Save this address "
+                                       "and close the dialog?")),
+                       TRUE, TRUE, 0);
     gtk_widget_show_all(dialog);
     return dialog;
 }

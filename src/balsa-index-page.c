@@ -314,14 +314,12 @@ static gint handler = 0;
 static gboolean
 idle_handler_cb(GtkWidget * widget)
 {
-  GdkEventButton *bevent;
   BalsaMessage *bmsg;
   LibBalsaMessage *message;
   gpointer data;
 
   gdk_threads_enter();
 
-  bevent = gtk_object_get_data(GTK_OBJECT (widget), "bevent");
   message = gtk_object_get_data(GTK_OBJECT (widget), "message");
   data = gtk_object_get_data(GTK_OBJECT (widget), "data");
   
@@ -334,11 +332,7 @@ idle_handler_cb(GtkWidget * widget)
   /* get the preview pane from the index page's BalsaWindow parent */
   bmsg = BALSA_MESSAGE(BALSA_WINDOW(BALSA_INDEX_PAGE(data)->window)->preview);
   
-  if (bevent && bevent->button == 3) {
-    gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
-                    NULL, NULL, NULL, NULL,
-                    bevent->button, bevent->time);
-  } else if (bmsg && BALSA_MESSAGE(bmsg)) {
+  if (bmsg && BALSA_MESSAGE(bmsg)) {
       if (message)
         balsa_message_set (BALSA_MESSAGE(bmsg), message);
       else
@@ -348,14 +342,15 @@ idle_handler_cb(GtkWidget * widget)
   handler = 0;
 
   gnome_appbar_pop (balsa_app.appbar);
-
+  if(message)
+    gtk_object_unref(GTK_OBJECT(message));
+  gtk_object_unref(GTK_OBJECT(data));
   /* Update the style and message counts in the mailbox list */
   /* ijc: Are both of these needed now */
   balsa_mblist_update_mailbox (balsa_app.mblist,
 			       BALSA_INDEX (widget)->mailbox);
   balsa_mblist_have_new (balsa_app.mblist);
 
-  gtk_object_remove_data (GTK_OBJECT (widget), "bevent");
   gtk_object_remove_data (GTK_OBJECT (widget), "message");
   gtk_object_remove_data (GTK_OBJECT (widget), "data");
 
@@ -363,10 +358,21 @@ idle_handler_cb(GtkWidget * widget)
   return FALSE;
 }
 
+static void
+replace_attached_data(GtkObject *obj,const gchar *key, GtkObject* data)
+{
+  GtkObject *old;
+  if( (old=gtk_object_get_data (obj, key)) )
+    gtk_object_unref(old);
+  gtk_object_set_data (obj, key, data);
+  if(data)
+    gtk_object_ref(data);
+}
+
 void
 balsa_index_update_message (BalsaIndexPage *index_page)
 {
-    LibBalsaMessage *message;
+    GtkObject *message;
     BalsaIndex *index;
     GtkCList *list;
     
@@ -375,19 +381,20 @@ balsa_index_update_message (BalsaIndexPage *index_page)
     if (g_list_find (list->selection, (gpointer) list->focus_row) == NULL)
         message = NULL;
     else
-        message = LIBBALSA_MESSAGE (gtk_clist_get_row_data (list, list->focus_row));
-    gtk_object_set_data (GTK_OBJECT (index), "message", message);
-    gtk_object_set_data (GTK_OBJECT (index), "bevent", NULL);
-    gtk_object_set_data (GTK_OBJECT (index), "data", index_page);
+        message = GTK_OBJECT (gtk_clist_get_row_data (list, list->focus_row));
+
+    replace_attached_data (GTK_OBJECT (index), "message", message);
+    replace_attached_data (GTK_OBJECT (index), "data", GTK_OBJECT(index_page));
 
     /* this way we only display one message, not lots and lots, and
        we also avoid flicker due to consecutive unselect/select */
     /* [MBG] FIXME: Commented this out to solve problem with
      * multi-threaded mailbox updating.  Doesn't seem to have an
      * adverse affect as described above
+     * ref messages so the don't get destroyed in meantime.
      * */
     /* if (!handler) */
-	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
+    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
 }
 
 static void
@@ -396,27 +403,19 @@ index_select_cb (GtkWidget * widget,
 		 GdkEventButton * bevent,
 		 gpointer data)
 {
-    g_return_if_fail (widget != NULL);
-    g_return_if_fail (BALSA_IS_INDEX (widget));
-    g_return_if_fail (message != NULL);
-    
-    /* Is this needed? I can't see why - ijc */
-    /* removed since this should be encapsulated in the class */
-/*      if ( LIBBALSA_IS_MAILBOX_IMAP(message->mailbox) ) */
-/*        libbalsa_mailbox_imap_set_username (LIBBALSA_MAILBOX_IMAP(message->mailbox)); */
-
-    gtk_object_set_data (GTK_OBJECT (widget), "message", message);
-    gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
-    gtk_object_set_data (GTK_OBJECT (widget), "data", data);
-
-    /* this way we only display one message, not lots and lots, and
-       we also avoid flicker due to consecutive unselect/select */
-    /* [MBG] FIXME: Commented this out to solve problem with
-     * multi-threaded mailbox updating.  Doesn't seem to have an
-     * adverse affect as described above
-     * */
-/*     if (!handler) */
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (BALSA_IS_INDEX (widget));
+  g_return_if_fail (message != NULL);
+  
+  if (bevent && bevent->button == 3) {
+    gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
+                    NULL, NULL, NULL, NULL,
+                    bevent->button, bevent->time);
+  } else {
+    replace_attached_data (GTK_OBJECT (widget), "message",GTK_OBJECT(message));
+    replace_attached_data (GTK_OBJECT (widget), "data", GTK_OBJECT(data));
     handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
+  }
 }
 
 static void
@@ -425,26 +424,23 @@ index_unselect_cb (GtkWidget * widget,
                    GdkEventButton * bevent,
                    gpointer data)
 {
-    g_return_if_fail (widget != NULL);
-    g_return_if_fail (BALSA_IS_INDEX (widget));
-    g_return_if_fail (message != NULL);
-    
-    if (g_list_find (GTK_CLIST (widget)->selection,
-                     (gpointer) GTK_CLIST (widget)->focus_row) != NULL)
-        return;
-
-    gtk_object_set_data (GTK_OBJECT (widget), "message", NULL);
-    gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
-    gtk_object_set_data (GTK_OBJECT (widget), "data", data);
-
-    /* this way we only display one message, not lots and lots, and
-       we also avoid flicker due to consecutive unselect/select */
-    /* [MBG] FIXME: Commented this out to solve problem with
-     * multi-threaded mailbox updating.  Doesn't seem to have an
-     * adverse affect as described above
-     * */
-/*     if (!handler) */
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (BALSA_IS_INDEX (widget));
+  g_return_if_fail (message != NULL);
+  
+  if (g_list_find (GTK_CLIST (widget)->selection,
+		   (gpointer) GTK_CLIST (widget)->focus_row) != NULL)
+    return;
+  
+  if (bevent && bevent->button == 3) {
+    gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
+                    NULL, NULL, NULL, NULL,
+                    bevent->button, bevent->time);
+  } else {
+    replace_attached_data (GTK_OBJECT (widget), "message", NULL);
+    replace_attached_data (GTK_OBJECT (widget), "data",  GTK_OBJECT(data));
     handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
+  }
 }
 
 

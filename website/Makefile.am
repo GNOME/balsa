@@ -1,5 +1,4 @@
 IN_FILES = \
-	download.html.in \
 	faq.html.in \
 	features.html.in \
 	screenshots.html.in \
@@ -7,6 +6,7 @@ IN_FILES = \
 	style.css.in
 
 HTML_FILES = \
+	download.html \
 	index.html \
 	main.html \
 	download.html \

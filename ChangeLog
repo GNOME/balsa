@@ -1,3 +1,7 @@
+2000-09-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index-page.c: bug fix for the idle_handler_cb() crashes.
+	
 2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/threads.h: Sync the definition of MailThreadMessage to

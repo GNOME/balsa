@@ -4892,6 +4892,9 @@ libbalsa_msg_perform_crypto(LibBalsaMessage * message,
 {
     chk_crypto_t chk_crypto;
 
+    if (!message->body_list)
+	return;
+
     /* check if the user requested to ignore any crypto stuff */
     if (chk_mode == LB_MAILBOX_CHK_CRYPT_NEVER)
 	return;

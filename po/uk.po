@@ -436,16 +436,16 @@ msgstr ""
 #: libmutt/handler.c:1320
 #, c-format
 msgid "[-- This %s/%s attachment "
-msgstr ""
+msgstr "[-- Це долучення %s/%s "
 
 #: libmutt/handler.c:1327
 #, c-format
 msgid "(size %s bytes) "
-msgstr ""
+msgstr "(обсяг: %s байт╕в)"
 
 #: libmutt/handler.c:1329
 msgid "has been deleted --]\n"
-msgstr ""
+msgstr "було видалено --]\n"
 
 #: libmutt/handler.c:1332
 #, c-format
@@ -554,14 +554,13 @@ msgstr "Поштову скриньку створено."
 #. * than we previously saw
 #.
 #: libmutt/imap/command.c:305
-#, fuzzy
 msgid "Fatal error.  Message count is out of sync!"
-msgstr "Пов╕домлення про фатальн╕ помилки"
+msgstr "Фатальна помилка. Л╕чильник пов╕домлень розсинхрон╕зовано!"
 
 #: libmutt/imap/command.c:346
 #, c-format
 msgid "One of IMAP connections has been closed: %s"
-msgstr ""
+msgstr "Одне ╕з з'╓днань IMAP було закрито: %s"
 
 #: libmutt/imap/imap.c:89
 #, c-format
@@ -580,7 +579,7 @@ msgstr "В╕дб╕р %s..."
 #. STATUS not supported
 #: libmutt/imap/imap.c:668
 msgid "Unable to append to IMAP mailboxes at this server"
-msgstr ""
+msgstr "Неможливо додати до поштових скриньок IMAP на цьому сервер╕"
 
 #. command failed cause folder doesn't exist
 #: libmutt/imap/imap.c:677 libmutt/imap/message.c:577
@@ -593,9 +592,9 @@ msgid "Closing connection to IMAP server..."
 msgstr "Закривання з'╓днання з сервером IMAP..."
 
 #: libmutt/imap/imap.c:877
-#, fuzzy, c-format
+#, c-format
 msgid "Marking %d messages deleted..."
-msgstr "Перем╕щення прочитаних пов╕домлень у %s..."
+msgstr "В╕дм╕чання %d пов╕домлень стертими..."
 
 #: libmutt/imap/imap.c:896
 #, c-format

@@ -473,12 +473,14 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 				     LibBalsaMailboxThreadingType
 				     thread_type)
 {
-    int i;
+    GList *l;
+
     if (mailbox->msg_tree)
 	g_node_destroy(mailbox->msg_tree);
     mailbox->msg_tree = g_node_new(NULL);
-    for (i = 1; i <= mailbox->total_messages; i++)
-	g_node_append_data(mailbox->msg_tree, GINT_TO_POINTER(i));
+    for (l = LIBBALSA_MAILBOX_LOCAL(mailbox)->msg_list; l; l = l->next)
+	g_node_append_data(mailbox->msg_tree,
+		GINT_TO_POINTER(LIBBALSA_MESSAGE(l->data)->msgno));
     mailbox->stamp++;
 
     /* Since we're starting out with a flat list, we'll do nothing for
@@ -562,8 +564,7 @@ lbml_make_msg_array(ThreadingInfo * ti)
 {
     GList *list;
 
-    ti->msg_array_len =
-	g_list_length(LIBBALSA_MAILBOX_LOCAL(ti->mailbox)->msg_list);
+    ti->msg_array_len = ti->mailbox->total_messages;
     ti->msg_array = g_new(LibBalsaMessage *, ti->msg_array_len);
 
     for (list = LIBBALSA_MAILBOX_LOCAL(ti->mailbox)->msg_list; list;

@@ -604,6 +604,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 {
     GNode *node;
     BalsaMailboxNode * mbnode;
+    gboolean update_config = 1;
 
     mcw->mailbox = gtk_type_new(mcw->mailbox_type);
     mcw->mailbox->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)));
@@ -613,11 +614,21 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	gchar *path;
 
 	path = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path));
-	libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), 
-					path);
+	if(libbalsa_mailbox_local_set_path(
+					   LIBBALSA_MAILBOX_LOCAL(mcw->mailbox), path) != 0) {
+	    gtk_object_destroy(GTK_OBJECT(mcw->mailbox));
+	    mcw->mailbox = NULL;
+	    return;
+	}
 
-	node =g_node_new(mbnode);
-	g_node_append(balsa_app.mailbox_nodes, node);
+	update_config = balsa_app.local_mail_directory == NULL
+	    || strncmp(balsa_app.local_mail_directory, path,
+		       strlen(balsa_app.local_mail_directory)) != 0;
+
+	if(update_config) {
+	    node =g_node_new(mbnode);
+	    g_node_append(balsa_app.mailbox_nodes, node);
+	}
     } else if ( LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox) ) {
 	/* POP3 Mailboxes */
 	update_pop_mailbox(mcw);
@@ -632,7 +643,14 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	g_assert_not_reached();
     }
 
-    config_mailbox_add(mcw->mailbox, NULL);
+    if(update_config)
+	config_mailbox_add(mcw->mailbox, NULL);
+    else {
+	gchar *dir = g_dirname(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox)->path);
+	/* FIXME ME: find the node and rescan so it appears*/
+
+	g_free(dir);
+    }
 
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */

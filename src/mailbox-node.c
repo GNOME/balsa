@@ -171,8 +171,11 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
     libbalsa_server_save_config(mn->server);
     gnome_config_set_string("Name",      mn->name);
     gnome_config_set_string("Directory", mn->dir);
-    gnome_config_set_bool("Subscribed", mn->subscribed);
-
+    gnome_config_set_bool("Subscribed",  mn->subscribed);
+    gnome_config_set_int("Threading",    mn->threading_type);
+    gnome_config_set_int("SortType",     mn->sort_type);
+    gnome_config_set_int("SortField",    mn->sort_field);
+    
     g_free(mn->config_prefix);
     mn->config_prefix = g_strdup(prefix);
 }
@@ -273,6 +276,7 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
 BalsaMailboxNode*
 balsa_mailbox_node_new_from_config(const gchar* prefix)
 {
+    gint def;
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
     gnome_config_push_prefix(prefix);
 
@@ -294,7 +298,13 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 
     folder->dir = gnome_config_get_string("Directory");
     folder->subscribed =
-	gnome_config_get_bool("Subscribed");
+	gnome_config_get_bool("Subscribed"); 
+    folder->threading_type = gnome_config_get_int_with_default("Threading", &def);
+    if(def) folder->threading_type = BALSA_INDEX_THREADING_SIMPLE;
+    folder->sort_type = gnome_config_get_int_with_default("SortType", &def);
+    if(def) folder->sort_type = GTK_SORT_ASCENDING;
+    folder->sort_field = gnome_config_get_int_with_default("SortField", &def);
+    if(def) folder->sort_field = BALSA_SORT_NO;
     gnome_config_pop_prefix();
 
     return folder;

@@ -1,35 +1,48 @@
-az: Vasif Ismailoglu MD <azerb_linux@hotmail.com>
-bg: Peter Dobrev <p.dobrev@softhome.net>
-ca: Softcatalà <tradgnome@softcatala.org>
-cs: Adam Purkrt <adampurkrt@yahoo.com>
-da: Keld Simonsen <keld@dkuug.dk>
-de: Christian Neumair <chris@gnome-de.org>
-el: Simos Xenitellis <simos@hellug.gr>
-en_GB: Robert Brady <rwb197@zepler.org>
-es: Javier Gómez Sierras <jgomsi@obelix.umh.es>
-et: Lemmit Toomet <leone@cafe.ee>
-fi: Antti Ahvensalmi <aahven@mbnet.fi>
-fr: Laurent Cheylus <foxy@free.fr>
-ga: Seán Ó Ceallaigh <s_oceallaigh@yahoo.com>
-hu: Tímár András <timar@gnome.hu>
-it: Marco Pozzato <marco_pozzato@linuxfan.com>
-ja: Takeshi Aihana <aihana@gnome.gr.jp>
-ko: Sung-Hyun Nam <namsh@kldp.org>
-lt: Gediminas Paulauskas <menesis@delfi.lt>
-nl: Vincent van Adrighem <V.vanAdrighem@dirck.mine.nu>
-nn: Roy-Magne Mo <rmo@sunnmore.net>
-no: Kjartan Maraas <kmaraas@gnome.org>
-pl: GNOME PL Team <translators@gnome.pl>
-pt_BR: Ariel Bressan da Silva <ariel@conectiva.com.br>
-pt: Carlos Morgado <chbm@chbm.nu>
-ro: Miºu Moldovan <dumol@go.ro> 
-ru: Valek Filippov <frob@df.ru>
-sk: Marcel Telka <marcel@telka.sk>
-sl: Andraz Tori <andraz.tori1@guest.arnes.si>
-sr: Danilo Šegan  <dsegan@gmx.net>, Strahinja Radić <mr99164@alas.matf.bg.ac.yu>
-sv: Christian Rose <menthos@menthos.com>
-tr: Yýldýrým Karslýoðlu <ykarslioglu@superonline.com>
-uk: Yuriy Syrota <rasta@renome.rovno.ua>
-wa: Pablo Saratxaga <pablo@mandrakesoft.com>
-zh_CN: Wang Jian <lark@linux.net.cn>
-zh_TW: Joe Man <trmetal@yahoo.com.hk>
+am.po:"Last-Translator: Ge'ez Frontier Foundation <locales@geez.org>\n"
+az.po:"Last-Translator: Mətin Əmirov <metin@karegen.com>\n"
+be.po:"Last-Translator: Vital Khilko <dojlid@mova.org>\n"
+bg.po:"Last-Translator: Peter Dobrev <p.dobrev@softhome.net>\n"
+ca.po:"Last-Translator: Softcatal� <tradgnome@softcatala.org>\n"
+cs.po:"Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
+da.po:"Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
+de.po:"Last-Translator: Christian Neumair <chris@gnome-de.org>\n"
+el.po:"Last-Translator: Hellenic translation team <i18ngr@lists.hellug.gr>\n"
+en_CA.po:"Last-Translator: Adam Weinberger <adamw@FreeBSD.org>\n"
+en_GB.po:"Last-Translator: Robert Brady <rwb197@zepler.org>\n"
+es.po:"Last-Translator: Francisco Javier F. Serrador <serrador@cvs.gnome.org>\n"
+et.po:"Last-Translator: Lemmit Toomet <leone@cafe.ee>>\n"
+fi.po:"Last-Translator: Antti Ahvensalmi <aahven@mbnet.fi>\n"
+fr.po:"Last-Translator: Vincent Carriere <carriere_vincent@yahoo.fr>\n"
+ga.po:"Last-Translator: Alastair McKinstry <mckinstry@computer.org> \n"
+he.po:"Last-Translator: Gil 'Dolfin' Osher <dolfin@rpg.org.il>\n"
+hi.po:"Last-Translator: Bhopal team <anuragseetha@yahoo.com>\n"
+hr.po:"Last-Translator: auto\n"
+hu.po:"Last-Translator: Andras Timar <timar@gnome.hu>\n"
+it.po:"Last-Translator: Marco Pozzato <marco_pozzato@linuxfan.com>\n"
+ja.po:"Last-Translator: KAMAGASAKO Masatoshi <emerald@gnome.gr.jp>\n"
+ko.po:"Last-Translator: Sung-Hyun Nam <namsh@kldp.org>\n"
+lt.po:"Last-Translator: Gediminas Paulauskas <menesis@delfi.lt>\n"
+lv.po:"Last-Translator: Artis Trops  <hornet@navigator.lv>\n"
+mk.po:"Last-Translator: Ime Prezime <email@adresa.com>\n"
+ml.po:"Last-Translator: FSF-India <locale@gnu.org.in>\n"
+ms.po:"Last-Translator: Hasbullah Bin Pit <sebol@ikhlas.com>\n"
+nl.po:"Last-Translator: Tino Meinen <a.t.meinen@chello.nl>\n"
+nn.po:"Last-Translator: Roy-Magne Mo <rmo@sunnmore.net>\n"
+no.po:"Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
+pl.po:"Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
+pt_BR.po:"Last-Translator: Ariel Bressan da Silva <ariel@conectiva.com.br>\n"
+pt.po:"Last-Translator: Carlos Morgado <chbm@gnome.org>\n"
+ro.po:"Last-Translator: Mişu Moldovan <dumol@go.ro>\n"
+ru.po:"Last-Translator: Valek Filippov <frob@df.ru>\n"
+sk.po:"Last-Translator: Marcel Telka <marcel@telka.sk>\n"
+sl.po:"Last-Translator: Tadej Janež <tadej_janez@email.si>\n"
+sq.po:"Last-Translator: Laurent Dhima <laurenti@alblinux.net>\n"
+sr@Latn.po:"Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
+sr.po:"Last-Translator: Страхиња Радић <mr99164@alas.matf.bg.ac.yu>\n"
+sv.po:"Last-Translator: Christian Rose <menthos@menthos.com>\n"
+tr.po:"Last-Translator: Y�ld�r�m Karsl�o�lu <ykarslioglu@superonline.com>\n"
+uk.po:"Last-Translator: Yuriy Syrota <yuri@renome.rovno.ua>\n"
+vi.po:"Last-Translator: Trinh Minh Thanh <tmthanh@yahoo.com>\n"
+wa.po:"Last-Translator: Pablo Saratxaga <pablo@mandrakesoft.com>\n"
+zh_CN.po:"Last-Translator: Dillion Chen <dillon.chen@turbolinux.com.cn>\n"
+zh_TW.po:"Last-Translator: Joe Man <trmetal@yahoo.com.hk>\n"

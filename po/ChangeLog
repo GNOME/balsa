@@ -1,3 +1,8 @@
+2002-11-23  Christophe Merlet  <redfox@redfoxcenter.org>
+
+	* fr.po: Updated French translation from work of
+	Gildas Guillemot <g.guillemot@laposte.net>.
+
 2002-11-19  Dmitry G. Mastrukov  <dmitry@taurussoft.org>
 
 	* ru.po: updated Russian translation
@@ -275,7 +280,7 @@
 
 	* sv.po: Updated Swedish translation.
 
-2002-02-05  Christophe Merlet  <redfox@eikonex.org>
+2002-02-05  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation from work of
 	Laurent Cheylus <foxy@free.fr>.
@@ -493,7 +498,7 @@
 
 	* sv.po: Updated Swedish translation.
 
-2001-10-23  Christophe Merlet  <redfox@eikonex.org>
+2001-10-23  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Minor update of French translation from
 	Emmanuel Allaud <e.allaud@wanadoo.fr>.
@@ -502,7 +507,7 @@
 
 	* sk.po: Updated Slovak translation from Marcel Telka <marcel@telka.sk>.
 
-2001-10-21  Christophe Merlet  <redfox@eikonex.org>
+2001-10-21  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Pseudo update of French translation.
 
@@ -563,7 +568,7 @@
 
 	* ja.po: Small fix.
 
-2001-09-20  Christophe Merlet  <redfox@eikonex.org>
+2001-09-20  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation from contributions of
 	Christophe Fergeau <christophe.fergeau@laposte.net>.
@@ -893,7 +898,7 @@
 
 	* sk.po: updated Slovak translation from Marcel Telka <marcel@telka.sk>.
 
-2001-03-11  Christophe Merlet  <redfox@eikonex.org>
+2001-03-11  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation.
 
@@ -921,7 +926,7 @@
 
 	* sk.po: updated Slovak translation from Marcel Telka <marcel@telka.sk>.
 
-2001-02-16  Christophe Merlet  <redfox@eikonex.org>
+2001-02-16  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation.
 
@@ -937,7 +942,7 @@
 
 	* hu.po: updated Hungarian translation.
 
-2001-02-13  Christophe Merlet  <redfox@eikonex.org>
+2001-02-13  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation.
 
@@ -957,7 +962,7 @@
 
         * es_ES.po: Removed it's the same as es.po
 
-2001-02-06  Christophe Merlet  <redfox@eikonex.org>
+2001-02-06  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation.
 
@@ -1047,7 +1052,7 @@
 	* hu.po: Updated Hungarian translation from
 	  Andras Timar <timar@gnome.hu>
 
-2001-01-11  Christophe Merlet  <redfox@eikonex.org>
+2001-01-11  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation.
 
@@ -1092,7 +1097,7 @@
 	* az.po: Added AZeri file
 	* {fr,ja,nl,pl,ro,sl,wa}.po: corrected syntax erros and enabled header
 
-2001-01-04  Christophe Merlet  <redfox@eikonex.org>
+2001-01-04  Christophe Merlet  <christophe@merlet.net>
 
 	* fr.po: Updated French translation.
 

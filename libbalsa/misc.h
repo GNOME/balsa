@@ -68,4 +68,6 @@ gchar *g_get_host_name (void);
 
 gboolean find_word(const gchar * word, const gchar* str);
 void wrap_string(gchar* str, int width);
+gchar *balsa_guess_mail_spool( void );
+
 #endif /* __MISC_H__ */

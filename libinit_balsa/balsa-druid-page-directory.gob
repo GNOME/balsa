@@ -43,6 +43,7 @@ enum __ed_types {
 #include "balsa-app.h"
 #include "save-restore.h"
 #include "balsa-druid-page-error.h"
+#include "misc.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -164,15 +165,7 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 			GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL,
 			8, 4 );
 
-		init_presets[INBOX] = getenv( "MAIL" );
-		if( init_presets[INBOX] )
-			init_presets[INBOX] = g_strdup( init_presets[INBOX] );
-		else {
-		    init_presets[INBOX] = getenv( "USER" );
-		    init_presets[INBOX] = init_presets[INBOX] ? 
-			g_strconcat( "/var/spool/mail/", init_presets[INBOX], NULL ) :
-			g_strdup(""); /* no clue what is the inbox location  */
-		}
+		init_presets[INBOX] = balsa_guess_mail_spool();
 
 		init_widgets[INBOX] = &( self->_priv->inbox );
 		init_widgets[OUTBOX] = &( self->_priv->outbox );

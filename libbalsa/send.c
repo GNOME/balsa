@@ -889,7 +889,7 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
 gchar** balsa_lookup_mime_type (const gchar* path)
 {
         gchar** tmp;
-        gchar* mime_type;
+        const gchar* mime_type;
         
 
         mime_type = gnome_mime_type_or_default_of_file (path, "application/octet-stream");

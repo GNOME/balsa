@@ -4274,6 +4274,7 @@ static void
 set_list_post_address(BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message = bsmsg->orig_message;
+    GList *p;
 
     if (message->mailbox->view->mailing_list_address) {
         gchar *tmp =
@@ -4283,20 +4284,20 @@ set_list_post_address(BalsaSendmsg * bsmsg)
  			       NULL);
         gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
         g_free(tmp);
-    } else {
-        if (!set_list_post_rfc2369(bsmsg, message->headers->user_hdrs)) {
-            /* we didn't find "list-post", so try some nonstandard
-             * alternatives: */
-            GList *p;
-            for (p = message->headers->user_hdrs; p; p = g_list_next(p)) {
-                gchar **pair = p->data;
-                if (libbalsa_find_word(pair[0],
-                                       "x-beenthere x-mailing-list")) {
-                    gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), pair[1]);
-                    break;
-                }
-            }
-        }
+        return;
+    }
+
+    if ((p = libbalsa_message_find_user_hdr(message, "list-post"))
+	&& set_list_post_rfc2369(bsmsg, p))
+	return;
+
+    /* we didn't find "list-post", so try some nonstandard
+     * alternatives: */
+
+    if ((p = libbalsa_message_find_user_hdr(message, "x-beenthere"))
+	|| (p = libbalsa_message_find_user_hdr(message, "x-mailing-list"))) {
+	gchar **pair = p->data;
+	gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), pair[1]);
     }
 }
 
@@ -4305,57 +4306,48 @@ set_list_post_address(BalsaSendmsg * bsmsg)
 static gboolean
 set_list_post_rfc2369(BalsaSendmsg * bsmsg, GList * p)
 {
-    while (p) {
-        gchar **pair = p->data;
-        if (libbalsa_find_word(pair[0], "list-post")) {
-            /* RFC 2369: To allow for future extension, client
-             * applications MUST follow the following guidelines for
-             * handling the contents of the header fields described in
-             * this document:
-             * 1) Except where noted for specific fields, if the content
-             *    of the field (following any leading whitespace,
-             *    including comments) begins with any character other
-             *    than the opening angle bracket '<', the field SHOULD
-             *    be ignored.
-             * 2) Any characters following an angle bracket enclosed URL
-             *    SHOULD be ignored, unless a comma is the first
-             *    non-whitespace/comment character after the closing
-             *    angle bracket.
-             * 3) If a sub-item (comma-separated item) within the field
-             *    is not an angle-bracket enclosed URL, the remainder of
-             *    the field (the current, and all subsequent sub-items)
-             *    SHOULD be ignored. */
-            gchar *url = pair[1];
-            /* RFC 2369: The client application should use the
-             * left most protocol that it supports, or knows how to
-             * access by a separate application. */
-            while (*(url = rfc2822_skip_comments(url)) == '<') {
-                gchar *close = strchr(++url, '>');
-                if (!close)
-                    /* broken syntax--break and return FALSE */
-                    break;
-                if (g_ascii_strncasecmp(url, "mailto:", 7) == 0) {
-                    /* we support mailto! */
-                    *close = '\0';
-                    sendmsg_window_process_url(url + 7,
-                                               sendmsg_window_set_field,
-                                               bsmsg);
-                    return TRUE;
-                }
-                if (!(*++close
-                      && *(close = rfc2822_skip_comments(close)) == ','))
-                    break;
-                url = ++close;
-            }
-            /* RFC 2369: There MUST be no more than one of each field
-             * present in any given message; so we can quit after
-             * (unsuccessfully) processing one. */
-            return FALSE;
-        }
-        /* it wasn't a list-post line */
-        p = g_list_next(p);
+    gchar **pair;
+    gchar *url;
+
+    pair = p->data;
+    url = pair[1];
+
+    /* RFC 2369: To allow for future extension, client
+     * applications MUST follow the following guidelines for
+     * handling the contents of the header fields described in
+     * this document:
+     * 1) Except where noted for specific fields, if the content
+     *    of the field (following any leading whitespace,
+     *    including comments) begins with any character other
+     *    than the opening angle bracket '<', the field SHOULD
+     *    be ignored.
+     * 2) Any characters following an angle bracket enclosed URL
+     *    SHOULD be ignored, unless a comma is the first
+     *    non-whitespace/comment character after the closing
+     *    angle bracket.
+     * 3) If a sub-item (comma-separated item) within the field
+     *    is not an angle-bracket enclosed URL, the remainder of
+     *    the field (the current, and all subsequent sub-items)
+     *    SHOULD be ignored. */
+    /* RFC 2369: The client application should use the
+     * left most protocol that it supports, or knows how to
+     * access by a separate application. */
+    while (*(url = rfc2822_skip_comments(url)) == '<') {
+	gchar *close = strchr(++url, '>');
+	if (!close)
+	    /* broken syntax--break and return FALSE */
+	    break;
+	if (g_ascii_strncasecmp(url, "mailto:", 7) == 0) {
+	    /* we support mailto! */
+	    *close = '\0';
+	    sendmsg_window_process_url(url + 7,
+				       sendmsg_window_set_field, bsmsg);
+	    return TRUE;
+	}
+	if (!(*++close && *(close = rfc2822_skip_comments(close)) == ','))
+	    break;
+	url = ++close;
     }
-    /* we didn't find a list-post line */
     return FALSE;
 }
 

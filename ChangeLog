@@ -1,3 +1,8 @@
+2005-02-07 20:45  PeterB
+
+	* src/: save-restore.c, toolbar-factory.c, toolbar-factory.h: fix
+	old toolbar button compatibility.
+
 2005-02-07  Pawel Salek
 
 	* src/address-book-config.c: compile with gtk-2.4

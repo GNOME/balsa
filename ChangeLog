@@ -1,3 +1,7 @@
+2004-11-21 12:22  PeterB
+
+	* configure.in: use enableval, not withval, with --enable-* option.
+
 2004-11-20  Pawel Salek
 
 	* NEWS, configure.in: modify for balsa-2.2.6 release.

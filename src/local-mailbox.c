@@ -36,6 +36,7 @@ load_local_mailboxes ()
   struct dirent *d;
   struct stat st;
   char filename[PATH_MAX + 1];
+  char mh[PATH_MAX + 1];
   MailboxType mailbox_type;
   Mailbox *mailbox;
 
@@ -48,10 +49,10 @@ load_local_mailboxes ()
   while ((d = readdir (dp)) != NULL)
     {
       sprintf (filename, "%s/%s", balsa_app.local_mail_directory, d->d_name);
-      
+
       if (lstat (filename, &st) < 0)
 	continue;
- 
+
       if (!S_ISREG (st.st_mode))
 	continue;
 
@@ -62,9 +63,22 @@ load_local_mailboxes ()
 	  mailbox->name = g_strdup (d->d_name);
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
 	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
-	  
+
 	  if (balsa_app.debug)
 	    g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));
 	}
+      else
+	{
+	  sprintf (mh, "#mh/%s", filename);
+	  mailbox_type = mailbox_valid (mh);
+	  if (mailbox_type == MAILBOX_MH)
+	    {
+	      mailbox = mailbox_new (mailbox_type);
+	      mailbox->name = g_strdup (d->d_name);
+	      MAILBOX_LOCAL (mailbox)->path = g_strdup (mh);
+	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
+	    }
+	}
+
     }
 }

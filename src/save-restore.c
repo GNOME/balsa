@@ -653,9 +653,12 @@ config_global_load (void)
     balsa_app.mw_height = atoi (field);
 
   if ((field = pl_dict_get_str (globals, "MailboxListWidth")) == NULL)
-    balsa_app.mblist_width = 200;
+    balsa_app.mblist_width = 170;
   else
     balsa_app.mblist_width = atoi (field);
+  /* FIXME this can be removed later */
+  if (balsa_app.mblist_width < 100)
+	  balsa_app.mblist_width = 170;
 
   /* arp --- LeadinStr for "reply to" leadin. */
   if ((field = pl_dict_get_str (globals, "LeadinStr")) == NULL)

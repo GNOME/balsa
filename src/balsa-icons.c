@@ -18,6 +18,8 @@
  */
 
 #include <gnome.h>
+#include <gdk/gdkx.h>
+
 #include "balsa-icons.h"
 
 #include "pixmaps/inbox.xpm"
@@ -60,7 +62,8 @@ static BalsaIcon envelope;
 static void
 imlib_magic_stuff (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
-#ifdef IMLIB_WORKS_CORRECTLY
+/* FIXME imlib sucks and doesn't work. */
+#if 0
   GdkImlibImage *im;
   im = gdk_imlib_create_image_from_xpm_data (data);
   gdk_imlib_render (im, im->rgb_width, im->rgb_height);
@@ -69,13 +72,10 @@ imlib_magic_stuff (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
   gdk_imlib_destroy_image (im);
   im = NULL;
 #endif
-
-  *pmap = gdk_pixmap_colormap_create_from_xpm_d(NULL,
-		  NULL,
+  *pmap = gdk_pixmap_create_from_xpm_d(GDK_ROOT_PARENT(),
 		  bmap,
 		  0,
 		  data);
-
 }
 
 void

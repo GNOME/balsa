@@ -444,11 +444,14 @@ sd_response_ok(SelectDialogInfo * sdi)
  */
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+typedef struct _IdentityDeleteInfo IdentityDeleteInfo;
 
 /* button actions */
 static gboolean close_cb(GtkWidget * dialog);
 static void new_ident_cb(GtkTreeView * tree, GtkWidget * dialog);
 static void delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog);
+static void delete_ident_response(GtkWidget * confirm, gint response,
+                                  IdentityDeleteInfo * di);
 static void help_ident_cb(void);
 
 static void set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
@@ -1045,26 +1048,43 @@ identity_delete_selected(GtkTreeView * tree, GtkWidget * dialog)
 /* 
  * Delete the currently selected identity after confirming. 
  */
+struct _IdentityDeleteInfo {
+    GtkTreeView *tree;
+    GtkWidget *dialog;
+};
 static void
 delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
 {
     LibBalsaIdentity* ident, **default_id;
     GtkWidget* confirm;
-    GtkWidget* parent;
+    IdentityDeleteInfo *di;
     
     ident = get_selected_identity(tree);
     default_id = g_object_get_data(G_OBJECT(tree), "default-id");
     g_return_if_fail(ident != *default_id);
-    parent = gtk_widget_get_ancestor(GTK_WIDGET(tree), GTK_TYPE_WINDOW);
-    confirm = gtk_message_dialog_new(GTK_WINDOW(parent),
+    confirm = gtk_message_dialog_new(GTK_WINDOW(dialog),
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_MESSAGE_QUESTION,
                                      GTK_BUTTONS_OK_CANCEL,
                                      _("Do you really want to delete"
                                        " the selected identity?"));
-                      
-    if(gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_OK)
-        identity_delete_selected(tree, dialog);
+    di = g_new(IdentityDeleteInfo, 1);
+    di->tree = tree;
+    di->dialog = dialog;
+    g_signal_connect(G_OBJECT(confirm), "response",
+                     G_CALLBACK(delete_ident_response), di);
+    g_object_weak_ref(G_OBJECT(confirm), (GWeakNotify) g_free, di);
+    gtk_widget_set_sensitive(dialog, FALSE);
+    gtk_widget_show_all(confirm);
+}
+
+static void 
+delete_ident_response(GtkWidget * confirm, gint response,
+                      IdentityDeleteInfo * di)
+{
+    if(response == GTK_RESPONSE_OK)
+        identity_delete_selected(di->tree, di->dialog);
+    gtk_widget_set_sensitive(di->dialog, TRUE);
     gtk_widget_destroy(confirm);
 }
 

@@ -34,33 +34,44 @@
 #include "address-book-vcard.h"
 #include "information.h"
 
+/* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
+
 /* FIXME: Arbitrary constant */
-/* Perhaps the whole thing could be rewritten to use a g_scanner ?? */
 #define LINE_LEN 256
+/* FIXME: Make an option */
+#define CASE_INSENSITIVE_NAME
 
 static GtkObjectClass *parent_class = NULL;
 
-static void
-libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass *
-				       klass);
-static void libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard *
-					     ab);
+typedef struct _CompletionData CompletionData;
+struct _CompletionData {
+    gchar *string;
+    LibBalsaAddress *address;
+};
+
+static void libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass *klass);
+static void libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard *ab);
 static void libbalsa_address_book_vcard_destroy(GtkObject * object);
 
 static void libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab);
-static void libbalsa_address_book_vcard_store_address(LibBalsaAddressBook *
-						      ab,
-						      LibBalsaAddress *
-						      new_address);
+static void libbalsa_address_book_vcard_store_address(LibBalsaAddressBook *ab,
+						      LibBalsaAddress *new_address);
 
-static void libbalsa_address_book_vcard_save_config(LibBalsaAddressBook *
-						    ab,
+static void libbalsa_address_book_vcard_save_config(LibBalsaAddressBook *ab,
 						    const gchar * prefix);
-static void libbalsa_address_book_vcard_load_config(LibBalsaAddressBook *
-						    ab,
+static void libbalsa_address_book_vcard_load_config(LibBalsaAddressBook *ab,
 						    const gchar * prefix);
+static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * ab,
+							 const gchar * prefix,
+							 gchar ** new_prefix);
 
 static gchar *extract_name(const gchar * string);
+
+static CompletionData *completion_data_new(LibBalsaAddress * address,
+					   gboolean alias);
+static void completion_data_free(CompletionData * data);
+static gchar *completion_data_extract(CompletionData * data);
+static gint address_compare(LibBalsaAddress *a, LibBalsaAddress *b);
 
 GtkType libbalsa_address_book_vcard_get_type(void)
 {
@@ -109,12 +120,18 @@ libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass *
 	libbalsa_address_book_vcard_save_config;
     address_book_class->load_config =
 	libbalsa_address_book_vcard_load_config;
+
+    address_book_class->alias_complete =
+	libbalsa_address_book_vcard_alias_complete;
+
 }
 
 static void
 libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard * ab)
 {
     ab->path = NULL;
+    ab->name_complete  = g_completion_new((GCompletionFunc)completion_data_extract);
+    ab->alias_complete = g_completion_new((GCompletionFunc)completion_data_extract);
 }
 
 static void
@@ -125,6 +142,12 @@ libbalsa_address_book_vcard_destroy(GtkObject * object)
     addr_vcard = LIBBALSA_ADDRESS_BOOK_VCARD(object);
 
     g_free(addr_vcard->path);
+
+    g_list_foreach(addr_vcard->name_complete->items, (GFunc)completion_data_free, NULL);
+    g_list_foreach(addr_vcard->alias_complete->items, (GFunc)completion_data_free, NULL);
+    
+    g_completion_free(addr_vcard->name_complete);
+    g_completion_free(addr_vcard->alias_complete);
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
 	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -146,6 +169,7 @@ libbalsa_address_book_vcard_new(const gchar * name, const gchar * path)
     return ab;
 }
 
+/* FIXME: Could stat the file to see if it has changed since last time we read it */
 static void
 libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
 {
@@ -154,7 +178,9 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
     gchar *name = NULL, *id = NULL;
     gint in_vcard = FALSE;
     GList *list = NULL;
+    GList *completion_list = NULL;
     GList *address_list = NULL;
+    CompletionData *cmp_data;
 
     LibBalsaAddressBookVcard *addr_vcard;
 
@@ -163,6 +189,12 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
     g_list_foreach(ab->address_list, (GFunc) gtk_object_unref, NULL);
     g_list_free(ab->address_list);
     ab->address_list = NULL;
+
+    g_list_foreach(addr_vcard->name_complete->items, (GFunc)completion_data_free, NULL);
+    g_list_foreach(addr_vcard->alias_complete->items, (GFunc)completion_data_free, NULL);
+
+    g_completion_clear_items(addr_vcard->name_complete);
+    g_completion_clear_items(addr_vcard->alias_complete);
 
     gc = fopen(addr_vcard->path, "r");
 
@@ -203,7 +235,7 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
 
 		/* FIXME: Split into Firstname and Lastname... */
 
-		list = g_list_append(list, address);
+		list = g_list_prepend(list, address);
 		address_list = NULL;
 	    } else {		/* record without e-mail address, ignore */
 		g_free(name);
@@ -243,7 +275,29 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
     }
     fclose(gc);
 
+    list = g_list_sort(list, (GCompareFunc)address_compare);
     ab->address_list = list;
+
+    completion_list = NULL;
+    while ( list ) {
+	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data), FALSE);
+	completion_list = g_list_prepend(completion_list, cmp_data);
+	list = g_list_next(list);
+    }
+    completion_list = g_list_reverse(completion_list);
+    g_completion_add_items(addr_vcard->name_complete, completion_list);
+    g_list_free(completion_list);
+
+    completion_list = NULL;
+    list = ab->address_list;
+    while( list ) {
+	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data), TRUE);
+	completion_list = g_list_prepend(completion_list, cmp_data);
+	list = g_list_next(list);
+    }
+    completion_list = g_list_reverse(completion_list);
+    g_completion_add_items(addr_vcard->alias_complete, completion_list);
+    g_list_free(completion_list);
 }
 
 static gchar *
@@ -392,3 +446,115 @@ libbalsa_address_book_vcard_load_config(LibBalsaAddressBook * ab,
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);
 }
+
+static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * ab,
+							 const gchar * prefix, 
+							 gchar ** new_prefix)
+{
+    LibBalsaAddressBookVcard *vc;
+    GList *resa = NULL, *resb = NULL;
+    GList *res = NULL;
+    gchar *p1 = NULL, *p2 = NULL;
+    LibBalsaAddress *addr1, *addr2;
+
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_VCARD(ab), NULL);
+
+    vc = LIBBALSA_ADDRESS_BOOK_VCARD(ab);
+
+    if ( ab->expand_aliases == FALSE )
+	return NULL;
+
+    resa = g_completion_complete(vc->name_complete, (gchar*)prefix, &p1);
+    resb = g_completion_complete(vc->alias_complete, (gchar*)prefix, &p2);
+
+    if ( p1 && p2 ) {
+	if ( strlen(p1) > strlen(p2) ) {
+	    *new_prefix = p1;
+	    g_free(p2);
+	} else {
+	    *new_prefix = p2;
+	    g_free(p1);
+	}
+    } else {
+	*new_prefix = p1?p1:p2;
+    }
+
+    /*
+      Extract a list of addresses.
+    */
+    while ( resa && resb ) {
+	addr1 = ((CompletionData*)resa->data)->address;
+	addr2 = ((CompletionData*)resb->data)->address;
+
+	if ( addr1 == addr2 ) {
+	    res = g_list_prepend(res, addr1);
+	    gtk_object_ref(GTK_OBJECT(addr1));
+	    resa = g_list_next(resa);
+	    resb = g_list_next(resb);
+	} else if ( resb == NULL || address_compare(addr1, addr2) > 0 ) {
+	    res = g_list_prepend(res, addr1);
+	    gtk_object_ref(GTK_OBJECT(addr1));
+	    resa = g_list_next(resa);
+	} else {
+	    res = g_list_prepend(res, addr2);
+	    gtk_object_ref(GTK_OBJECT(addr2));
+	    resb = g_list_next(resb);
+	}
+    }
+    res = g_list_reverse(res);
+
+    return res;
+}
+
+/*
+ * Create a new CompletionData
+ */
+static CompletionData *
+completion_data_new(LibBalsaAddress * address, gboolean alias)
+{
+    CompletionData *ret;
+
+    ret = g_new0(CompletionData, 1);
+
+    /*  gtk_object_ref(GTK_OBJECT(address)); */
+    ret->address = address;
+
+    if (alias)
+	ret->string = g_strdup(address->id);
+    else
+	ret->string = g_strdup(address->full_name);
+
+#ifdef CASE_INSENSITIVE_NAME
+    g_strup(ret->string);
+#endif
+
+    return ret;
+}
+
+/*
+ * Free a CompletionData
+ */
+static void
+completion_data_free(CompletionData * data)
+{
+    /*  gtk_object_unref(GTK_OBJECT(data->address)); */
+
+    g_free(data->string);
+    g_free(data);
+}
+
+/*
+ * The GCompletionFunc
+ */
+static gchar *
+completion_data_extract(CompletionData * data)
+{
+    return data->string;
+}
+
+static gint
+address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
+{
+    return g_strcasecmp(a->full_name, b->full_name);
+}
+

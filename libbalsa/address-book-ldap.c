@@ -53,16 +53,17 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab);
 static void
 libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab);
 
-static void libbalsa_address_book_ldap_add_from_server(LibBalsaAddressBook
-						       * ab,
+static void libbalsa_address_book_ldap_add_from_server(LibBalsaAddressBook *ab,
 						       LDAPMessage * e);
 
-static void libbalsa_address_book_ldap_save_config(LibBalsaAddressBook *
-						   ab,
+static void libbalsa_address_book_ldap_save_config(LibBalsaAddressBook *ab,
 						   const gchar * prefix);
-static void libbalsa_address_book_ldap_load_config(LibBalsaAddressBook *
-						   ab,
+static void libbalsa_address_book_ldap_load_config(LibBalsaAddressBook *ab,
 						   const gchar * prefix);
+
+static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * ab,
+							 const gchar * prefix, 
+							 gchar ** new_prefix);
 
 static gchar *create_name(gchar *, gchar *);
 
@@ -110,6 +111,8 @@ libbalsa_address_book_ldap_class_init(LibBalsaAddressBookLdapClass * klass)
     address_book_class->load_config =
 	libbalsa_address_book_ldap_load_config;
 
+    address_book_class->alias_complete = 
+	libbalsa_address_book_vcard_alias_complete;
 }
 
 static void
@@ -398,4 +401,12 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);
 }
 
+static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * ab,
+							 const gchar * prefix, 
+							 gchar ** new_prefix)
+{
+    g_return_val_if_fail ( LIBBALSA_ADDRESS_BOOK_LDAP(ab), NULL);
+    g_warning(_("Alias completion not supported for LDAP - Yet!\n"));
+    return NULL;
+}
 #endif				/*LDAP_ENABLED */

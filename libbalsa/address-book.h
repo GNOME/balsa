@@ -57,6 +57,8 @@ struct _LibBalsaAddressBookClass {
 
     void (*save_config) (LibBalsaAddressBook * ab, const gchar * prefix);
     void (*load_config) (LibBalsaAddressBook * ab, const gchar * prefix);
+
+    GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix, gchar ** new_prefix);
 };
 
 GtkType libbalsa_address_book_get_type(void);
@@ -73,4 +75,16 @@ void libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 void libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix);
 
+/*
+
+ Returns a list of LibBalsaAddress objects. The caller is responsible
+ for unref()ing these address objects when it is finished with them
+ and for freeing the list.
+
+*/
+GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab, 
+					    const gchar *prefix,
+					    gchar **new_prefix);
+
 #endif
+

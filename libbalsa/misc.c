@@ -605,6 +605,25 @@ libbalsa_marshal_POINTER__OBJECT(GtkObject * object, GtkSignalFunc func,
     *return_val = (*rfunc) (object, GTK_VALUE_OBJECT(args[0]), func_data);
 }
 
+/* libbalsa_marshall_POINTER__POINTER_POINTER:
+   Marshalling function
+*/
+typedef gpointer(*GtkSignal_POINTER__POINTER_POINTER) (GtkObject *object,
+						       gpointer *param1,
+						       gpointer *param2,
+						       gpointer user_data);
+void
+libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, GtkSignalFunc func,
+					   gpointer func_data, GtkArg *args)
+{
+    GtkSignal_POINTER__POINTER_POINTER rfunc;
+    gpointer *return_val;
+
+    return_val = GTK_RETLOC_POINTER(args[2]);
+    rfunc = (GtkSignal_POINTER__POINTER_POINTER) func;
+    *return_val = (*rfunc) (object, GTK_VALUE_POINTER(args[0]), GTK_VALUE_POINTER(args[1]), func_data);
+}
+
 /*
  * Find  the named mailbox from the balsa_app.mailbox_nodes by it's
  * name

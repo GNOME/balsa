@@ -43,6 +43,9 @@ struct _LibBalsaAddressBookVcard {
     LibBalsaAddressBook parent;
 
     gchar *path;
+
+    GCompletion *name_complete;
+    GCompletion *alias_complete;
 };
 
 struct _LibBalsaAddressBookVcardClass {

@@ -26,6 +26,7 @@
 
 #include "address-book.h"
 #include "information.h"
+#include "misc.h"
 
 static GtkObjectClass *parent_class = NULL;
 
@@ -46,6 +47,7 @@ enum {
     STORE_ADDRESS,
     SAVE_CONFIG,
     LOAD_CONFIG,
+    ALIAS_COMPLETE,
     LAST_SIGNAL
 };
 
@@ -109,6 +111,12 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
 					 load_config),
 		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
 		       GTK_TYPE_POINTER);
+    libbalsa_address_book_signals[ALIAS_COMPLETE] =
+	gtk_signal_new("alias-complete", GTK_RUN_LAST, object_class->type,
+		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass,
+					 alias_complete),
+		       libbalsa_marshall_POINTER__POINTER_POINTER, GTK_TYPE_POINTER, 2,
+		       GTK_TYPE_POINTER, GTK_TYPE_POINTER);
 
     gtk_object_class_add_signals(object_class,
 				 libbalsa_address_book_signals,
@@ -118,6 +126,7 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
     klass->store_address = NULL;
     klass->save_config = libbalsa_address_book_real_save_config;
     klass->load_config = libbalsa_address_book_real_load_config;
+    klass->alias_complete = NULL;
 
     object_class->destroy = libbalsa_address_book_destroy;
 }
@@ -242,6 +251,20 @@ libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
     gnome_config_pop_prefix();
 }
 
+GList *
+libbalsa_address_book_alias_complete(LibBalsaAddressBook *ab,
+				     const gchar * prefix,
+				     gchar ** new_prefix)
+{
+    GList *res = NULL;
+
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), NULL);
+
+    gtk_signal_emit(GTK_OBJECT(ab), libbalsa_address_book_signals[ALIAS_COMPLETE], prefix, new_prefix, &res);
+    return res;
+
+}
+
 static void
 libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix)
@@ -270,3 +293,4 @@ libbalsa_address_book_real_load_config(LibBalsaAddressBook * ab,
     g_free(ab->name);
     ab->name = gnome_config_get_string("Name=Address Book");
 }
+

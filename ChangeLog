@@ -1,3 +1,13 @@
+2000-11-28  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/address-book.[ch]: New function
+	libbalsa_address_book_alias_complete.
+	* libbalsa/address-book-vcard.[ch]: Implement new function.
+	* libbalsa/address-book-ldap.[ch]: Stub for new function.
+	* libbalsa/misc.[ch]: New marshalling function.
+	* src/expand-alias.c, src/sendmsg-window.c: Make use of new
+	address book functionality.
+
 2000-11-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/spell-check.c, src/print.c: misspellings removed.

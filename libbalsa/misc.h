@@ -77,6 +77,9 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
 				      GtkSignalFunc func,
 				      gpointer func_data, GtkArg * args);
+void libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, 
+						GtkSignalFunc func,
+						gpointer func_data, GtkArg *args);
 
 GNode *find_gnode_in_mbox_list(GNode * gnode_list,
 			       LibBalsaMailbox * mailbox);

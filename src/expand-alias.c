@@ -84,18 +84,6 @@ typedef struct {
 } inputData;
 
 /*
- * Struct to keep track of the items in a completion
- *
- * string is the string to complete on
- * address is the associated address
- */
-typedef struct _CompletionData CompletionData;
-struct _CompletionData {
-    gchar *string;
-    LibBalsaAddress *address;
-};
-
-/*
  * Function prototypes or something...
  */
 static void clip_expand_cursor(inputData * input);
@@ -119,27 +107,6 @@ static inputData *process_keystroke_add_key(inputData * input,
 					    gchar * add);
 static inputData *process_keystroke(inputData * input, GtkWidget * widget,
 				    GdkEventKey * event);
-
-/*
- * Functions for managing CompletionData structures
- */
-static CompletionData *completion_data_new(LibBalsaAddress * address,
-					   gboolean alias);
-static void completion_data_free(CompletionData * data);
-static gchar *completion_data_extract(CompletionData * data);
-
-/*
- * FIXME: Unfortunately, I can't do this without a global.
- * Need to rewrite the addressbook routines with some kind
- * of cache.
- * 
- * [ijc] it should now be possible to add the completions as
- * a per address book field (implemented in LibBalsaAddressBook)
- */
-static GList *address_name_data = NULL;
-static GList *address_alias_data = NULL;
-static GCompletion *complete_name = NULL;
-static GCompletion *complete_alias = NULL;
 
 /*
  * next_entrybox()
@@ -192,30 +159,72 @@ expand_input(gchar ** input, gint * tabs)
     gchar *output = NULL;	/* We return this.            */
     LibBalsaAddress *addr = NULL;	/* Process the list data.     */
     gint i;			/* A counter for the tabs.    */
+    GList *ab_list;             /* To iterate address books   */
+    GList *partial_res = NULL;  /* The result froma single address book */
+    gchar *partial_prefix;
+    gchar *str;
 
     if (strlen(*input) > 0) {
-	if (complete_name) {
+
+	str = g_strdup(*input);
 #ifdef CASE_INSENSITIVE_NAME
-	    gchar *str;
-	    str = g_strdup(*input);
-	    g_strup(str);
-	    match = g_completion_complete(complete_name, str, &prefix);
-	    g_free(str);
-#else
-	    match = g_completion_complete(complete_name, *input, &prefix);
-#endif				/* CASE_INSENSITIVE_NAME */
+	g_strup(str);
+#endif
+
+	ab_list = balsa_app.address_book_list;
+	while(ab_list) {
+	    libbalsa_address_book_load(LIBBALSA_ADDRESS_BOOK(ab_list->data));
+	    partial_res = libbalsa_address_book_alias_complete(LIBBALSA_ADDRESS_BOOK(ab_list->data), str, &partial_prefix);
+	    
+	    if ( partial_res != NULL ) {
+		if ( match != NULL )
+		    match = g_list_concat(match, partial_res);
+		else 
+		    match = partial_res;
+		
+		if ( prefix == NULL ) {
+		    prefix = partial_prefix;
+		} else {
+		    gchar *new_pfix;
+		    gint len = 0;
+
+		    /* 
+		       We have to find the longest common prefix of both options.
+		       Tedious.
+		    */
+		    if ( strlen(partial_prefix) < strlen(prefix) )
+			new_pfix = g_strdup(prefix);
+		    else
+			new_pfix = g_strdup(partial_prefix);
+
+		    while( TRUE ) {
+			if ( *(prefix+len) == 0 || *(partial_prefix+len) == 0 ) {
+			    *(new_pfix+len) = '\0';
+			    break;
+			} else if ( *(prefix+len) != *(partial_prefix+len) ) {
+			    *(new_pfix+len) = '\0';
+			    break;
+			} else {
+			    *(new_pfix+len) = *(prefix+len);
+			    len++;
+			}
+		    }
+		    g_free(prefix); g_free(partial_prefix);
+		    prefix = new_pfix;
+		}
+	    }
+	    
+	    ab_list = g_list_next(ab_list);
 	}
-	if (!match && complete_alias)
-	    match = g_completion_complete(complete_alias, *input, &prefix);
+	g_free(str);
 
 	if (match) {
 	    i = *tabs;
 	    if ((i == 1) && (strlen(prefix) > strlen(*input))) {
-		addr =
-		    LIBBALSA_ADDRESS(((CompletionData *) match->data)->address);
-		output =
-		    g_strdup_printf("%s <%s>", addr->full_name,
-				    (gchar *) addr->address_list->data);
+		addr = LIBBALSA_ADDRESS(match->data);
+
+		output = g_strdup_printf("%s <%s>", addr->full_name,
+					 (gchar *) addr->address_list->data);
 		g_free(*input);
 		if (g_list_next(match))
 		    *input = g_strndup(output, strlen(prefix));
@@ -229,12 +238,12 @@ expand_input(gchar ** input, gint * tabs)
 			search = match;
 		    }
 		}
-		addr =
-		    LIBBALSA_ADDRESS(((CompletionData *) search->data)->address);
-		output =
-		    g_strdup_printf("%s <%s>", addr->full_name,
-				    (gchar *) addr->address_list->data);
+		addr = LIBBALSA_ADDRESS(search->data);
+		output = g_strdup_printf("%s <%s>", addr->full_name,
+					 (gchar *) addr->address_list->data);
+
 	    }
+	    g_list_foreach(match, (GFunc)gtk_object_unref, NULL);
 	} else {
 	    output = NULL;
 	}
@@ -839,15 +848,6 @@ key_pressed_cb(GtkWidget * widget, GdkEventKey * event, gpointer user_data)
 	return FALSE;
 
     /*
-     * Check if GCompletion is valid - we reload the addressbook
-     * if someone closed it.
-     *
-     * This fixes multiple compose windows.
-     */
-    if (address_name_data == NULL && address_alias_data == NULL)
-	alias_load_addressbook();
-
-    /*
      * Grab the old information from the widget - this way the user
      * can switch back and forth between To: and Cc:
      */
@@ -988,136 +988,4 @@ destroy_cb(GtkWidget * widget, gpointer user_data)
     data = NULL;
 
     gtk_object_set_data(GTK_OBJECT(widget), "old_input", (gpointer) data);
-}
-
-void
-alias_free_addressbook(void)
-{
-    if (address_name_data) {
-	g_list_foreach(address_name_data, (GFunc) completion_data_free,
-		       NULL);
-	g_list_free(address_name_data);
-	address_name_data = NULL;
-    }
-
-    if (address_alias_data) {
-	g_list_foreach(address_alias_data, (GFunc) completion_data_free,
-		       NULL);
-	g_list_free(address_alias_data);
-	address_alias_data = NULL;
-    }
-}
-
-/*
- * alias_load_addressbook ()
- *
- * Input: None.
- * Output: None.
- * 
- * Load the addresses. We take a copy of the list - This means that if
- * the addressbook is modified while we the user composes a messages, 
- * the old addressbook is used for alias expansion.
- *
- * The alternative is to load it with every keystroke (really slow)
- * or program the addresses with a caching structure (lots of work)
- */
-void
-alias_load_addressbook(void)
-{
-    GList *address_book_list, *address_list;
-    LibBalsaAddressBook *address_book;
-
-    alias_free_addressbook();
-
-    address_book_list = balsa_app.address_book_list;
-    while (address_book_list) {
-	address_book = LIBBALSA_ADDRESS_BOOK(address_book_list->data);
-
-	if (address_book->expand_aliases) {
-	    CompletionData *data;
-
-	    libbalsa_address_book_load(address_book);
-
-	    address_list = address_book->address_list;
-	    while (address_list) {
-		data =
-		    completion_data_new(LIBBALSA_ADDRESS
-					(address_list->data), TRUE);
-		if (data != NULL)
-		    address_alias_data =
-			g_list_append(address_alias_data, data);
-
-		data =
-		    completion_data_new(LIBBALSA_ADDRESS
-					(address_list->data), FALSE);
-		if (data != NULL)
-		    address_name_data =
-			g_list_append(address_name_data, data);
-
-		address_list = g_list_next(address_list);
-	    }
-	}
-	address_book_list = g_list_next(address_book_list);
-    }
-
-    if (address_alias_data || address_name_data) {
-
-	if (complete_name)
-	    g_completion_free(complete_name);
-
-	if (complete_alias)
-	    g_completion_free(complete_alias);
-
-	complete_name = g_completion_new((GCompletionFunc)completion_data_extract);
-	g_completion_add_items(complete_name, address_name_data);
-
-	complete_alias = g_completion_new((GCompletionFunc)completion_data_extract);
-	g_completion_add_items(complete_alias, address_alias_data);
-    }
-}
-
-/*
- * Create a new CompletionData
- */
-static CompletionData *
-completion_data_new(LibBalsaAddress * address, gboolean alias)
-{
-    CompletionData *ret;
-
-    ret = g_new0(CompletionData, 1);
-
-    gtk_object_ref(GTK_OBJECT(address));
-    ret->address = address;
-
-    if (alias)
-	ret->string = g_strdup(address->id);
-    else
-	ret->string = g_strdup(address->full_name);
-
-#ifdef CASE_INSENSITIVE_NAME
-    g_strup(ret->string);
-#endif
-
-    return ret;
-}
-
-/*
- * Free a CompletionData
- */
-static void
-completion_data_free(CompletionData * data)
-{
-    gtk_object_unref(GTK_OBJECT(data->address));
-
-    g_free(data->string);
-    g_free(data);
-}
-
-/*
- * The GCompletionFunc
- */
-static gchar *
-completion_data_extract(CompletionData * data)
-{
-    return data->string;
 }

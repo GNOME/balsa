@@ -436,10 +436,6 @@ static gint
 delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
     balsa_sendmsg_destroy((BalsaSendmsg *) data);
-    if (balsa_app.debug)
-	g_message
-	    ("delete_event_cb(): Calling alias_free_addressbook().\n");
-    alias_free_addressbook();
     return TRUE;
 }
 
@@ -1165,8 +1161,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->charset  = NULL;
     msg->locale   = NULL;
     msg->update_config = FALSE;
-
-    alias_load_addressbook();
 
     switch (type) {
     case SEND_REPLY:

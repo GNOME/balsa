@@ -182,6 +182,22 @@ authinteract (auth_client_request_t request, char **result, int fields,
     }
     return 1;
 }
+
+#if HAVE_SMTP_STARTTLS
+static int
+tlsinteract (char *buf, int buflen, int rwflag, void *arg)
+{
+  char *pw;
+  int len;
+
+  pw = balsa_app.smtp_certificate_passphrase;
+  len = strlen (pw);
+  if (len + 1 > buflen)
+    return 0;
+  strcpy (buf, pw);
+  return len;
+}
+#endif
 #endif /* ESMTP */
 
 void
@@ -207,6 +223,13 @@ balsa_app_init(void)
     balsa_app.smtp_authctx = auth_create_context ();
     auth_set_mechanism_flags (balsa_app.smtp_authctx, AUTH_PLUGIN_PLAIN, 0);
     auth_set_interact_cb (balsa_app.smtp_authctx, authinteract, NULL);
+
+#if HAVE_SMTP_STARTTLS
+    /* Use our callback for X.509 certificate passwords.  If STARTTLS is
+       not in use or disabled in configure, the following is harmless. */
+    balsa_app.smtp_certificate_passphrase = NULL;
+    smtp_starttls_set_password_cb (tlsinteract, NULL);
+#endif
 #endif
 
     balsa_app.inbox = NULL;

@@ -458,7 +458,12 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 
     session = smtp_create_session ();
     smtp_set_server (session, smtp_server);
- 
+
+#if HAVE_SMTP_STARTTLS
+    /* Tell libESMTP it can use the SMTP STARTTLS extension.  */
+    smtp_starttls_enable (session, Starttls_ENABLED);
+#endif
+
     /* Now tell libESMTP it can use the SMTP AUTH extension.  */
     smtp_auth_set_context (session, smtp_authctx);
  

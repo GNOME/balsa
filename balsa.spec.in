@@ -4,8 +4,8 @@
 # and link against glibc version of regex library.
 Summary:   Balsa Mail Client
 Name:      balsa
-Version:   @BALSA_SHORT_VERSION@
-Release:   @BALSA_RELEASE@
+Version:   @BALSA_VERSION@
+Release:   1
 Copyright: GPL
 Group:     Applications/Internet
 Source0:   %{name}-%{version}.tar.bz2

@@ -1,6 +1,6 @@
 2001-08-25  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* configure.in: clean up and fix 
+	* configure.in: clean up and fix; check if libESMTP has TLS
 	* libbalsa/Makefile.am: remove duplicate compiler options.
 	* libinit_balsa/Makefile.am: 
 	* src/Makefile.am: Same.
@@ -10,7 +10,15 @@
 	(spotted by Stephen P. Wall <Steve_Wall@redcom.com>).
 	* libbalsa/send.c: enable TLS in SMTP whenever possible.
 	* src/main-window.c: don't imap_check_test() NULLs.
+	* Makefile.am: clean up versioning.
+	* balsa.spec.in: replace BALSA_SHORT_VERSION-> BALSA_VERSION
 
+	SMTP TLS support by Brian Stafford.
+	* acconfig.h:  add HAVE_SMTP_STARTLS 
+	* src/balsa-app.[hc]: add smtp_certificate_passphrase field.
+	* src/pref-manager.c: configure passpahrase.
+	* src/save-restore.c: save and restore it.
+	
 2001-08-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Clean up using hints from Morten Welinder <terra@diku.dk>

@@ -49,6 +49,9 @@ typedef struct _PropertyUI {
     GtkWidget *mail_servers;
 #if ENABLE_ESMTP
     GtkWidget *smtp_server, *smtp_user, *smtp_passphrase;
+#if HAVE_SMTP_STARTTLS
+    GtkWidget *smtp_certificate_passphrase;
+#endif
 #endif
     GtkWidget *mail_directory;
     GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
@@ -320,6 +323,12 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->smtp_passphrase), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+
+#if HAVE_SMTP_STARTTLS
+    gtk_signal_connect(GTK_OBJECT(pui->smtp_certificate_passphrase), "changed",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+#endif
 #endif
 
     for (i = 0; i < NUM_ENCODING_MODES; i++) {
@@ -487,6 +496,12 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     g_free(balsa_app.smtp_passphrase);
     balsa_app.smtp_passphrase =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_passphrase)));
+
+#if HAVE_SMTP_STARTTLS
+    g_free(balsa_app.smtp_certificate_passphrase);
+    balsa_app.smtp_certificate_passphrase =
+	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->smtp_certificate_passphrase)));
+#endif
 #endif
 
     g_free(balsa_app.local_mail_directory);
@@ -712,6 +727,12 @@ set_prefs(void)
     if (balsa_app.smtp_passphrase)
 	gtk_entry_set_text(GTK_ENTRY(pui->smtp_passphrase),
 			   balsa_app.smtp_passphrase);
+
+#if HAVE_SMTP_STARTTLS
+    if (balsa_app.smtp_certificate_passphrase)
+	gtk_entry_set_text(GTK_ENTRY(pui->smtp_certificate_passphrase),
+			   balsa_app.smtp_certificate_passphrase);
+#endif
 #endif
 
     gtk_entry_set_text(GTK_ENTRY(pui->mail_directory),
@@ -1103,6 +1124,9 @@ create_mailserver_page(gpointer data)
     GtkWidget *fileentry2;
 #if ENABLE_ESMTP
     GtkWidget *frame5, *table4, *label16, *label17, *label18;
+#if HAVE_SMTP_STARTTLS
+    GtkWidget *label19;
+#endif
 #endif
 
     table3 = gtk_table_new(3, 1, FALSE);
@@ -1167,6 +1191,11 @@ create_mailserver_page(gpointer data)
 		     (GtkAttachOptions) (GTK_FILL), 0, 0);
     gtk_container_set_border_width(GTK_CONTAINER(frame5), 5);
 
+#if HAVE_SMTP_STARTTLS
+    table4 = gtk_table_new(3, 4, FALSE);
+#else
+    table4 = gtk_table_new(2, 4, FALSE);
+#endif
     table4 = gtk_table_new(2, 4, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table4), 3);
     gtk_table_set_col_spacings(GTK_TABLE(table4), 3);
@@ -1201,6 +1230,23 @@ create_mailserver_page(gpointer data)
     gtk_table_attach(GTK_TABLE(table4), pui->smtp_passphrase, 3, 4, 1, 2,
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
+
+    /* STARTTLS */
+#if HAVE_SMTP_STARTTLS
+
+    label19 = gtk_label_new(_("Certificate Pass Phrase"));
+    gtk_table_attach(GTK_TABLE(table4), label19, 2, 3, 2, 3,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+    pui->smtp_certificate_passphrase = gtk_entry_new();
+    gtk_entry_set_visibility (GTK_ENTRY(pui->smtp_certificate_passphrase),
+                              FALSE);
+
+    gtk_table_attach(GTK_TABLE(table4),
+                     pui->smtp_certificate_passphrase, 3, 4, 2, 3,
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+		     (GtkAttachOptions) (0), 0, 0);
+#endif
 #endif
     /* fill in data */
     update_mail_servers();

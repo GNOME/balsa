@@ -1,4 +1,4 @@
-SUBDIRS = macros po intl sounds images help libmutt libbalsa libinit_balsa src
+SUBDIRS = macros po sounds images help libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
@@ -25,9 +25,9 @@ dist-hook: balsa.spec
 
 @MAINT@RPM: balsa.spec
 @MAINT@	rm -f *.rpm
-@MAINT@	$(MAKE) distdir="$(PACKAGE)-@BALSA_SHORT_VERSION@" dist
+@MAINT@	$(MAKE) distdir="$(PACKAGE)-@BALSA_VERSION@" dist
 @MAINT@	cp $(top_srcdir)/rpm-po.patch $(top_builddir)/rpm-po.patch
-@MAINT@	rpm -ta "./$(PACKAGE)-@BALSA_SHORT_VERSION@.tar.gz"
+@MAINT@	rpm -ta "./$(PACKAGE)-@BALSA_VERSION@.tar.gz"
 @MAINT@	rm $(top_builddir)/rpm-po.patch
 @MAINT@	-test -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" \
 @MAINT@		&& cp -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" .

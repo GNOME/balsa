@@ -31,6 +31,7 @@
 #include "information-dialog.h"
 
 #if ENABLE_ESMTP
+#include <libesmtp.h>			/* part of libESMTP */
 #include <auth-client.h>		/* part of libESMTP */
 #endif
 
@@ -159,6 +160,7 @@ extern struct BalsaApplication {
     gchar *smtp_user;
     gchar *smtp_passphrase;
     auth_context_t smtp_authctx;
+    gchar *smtp_certificate_passphrase;
 #endif
 
     BalsaWindow *main_window;

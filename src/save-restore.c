@@ -641,6 +641,9 @@ config_global_load(void)
     }
     balsa_app.smtp_user = gnome_config_get_string("ESMTPUser");
     balsa_app.smtp_passphrase = gnome_config_get_string("ESMTPPassphrase");
+#if HAVE_SMTP_STARTTLS
+    balsa_app.smtp_certificate_passphrase = gnome_config_get_string("ESMTPCertificatePassphrase");
+#endif
 #endif
     /* ... outgoing mail */
     balsa_app.encoding_style = gnome_config_get_int("EncodingStyle=2");
@@ -865,6 +868,9 @@ gint config_save(void)
     gnome_config_set_string("ESMTPServer", balsa_app.smtp_server);
     gnome_config_set_string("ESMTPUser", balsa_app.smtp_user);
     gnome_config_set_string("ESMTPPassphrase", balsa_app.smtp_passphrase);
+#if HAVE_SMTP_STARTTLS
+    gnome_config_set_string("ESMTPCertificatePassphrase", balsa_app.smtp_certificate_passphrase);
+#endif 
 #endif 
    gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);

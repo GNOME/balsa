@@ -402,6 +402,9 @@ else
 	AC_MSG_RESULT([no])
 fi	  
 
+AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
+	     AC_DEFINE(HAVE_SMTP_STARTLS),,-lesmtp)
+
 dnl ##########################################################################
 dnl Enable GSS?
 dnl ##########################################################################

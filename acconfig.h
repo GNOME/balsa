@@ -40,6 +40,7 @@
 
 /* ESMTP support? */
 #undef ENABLE_ESMTP
+#undef HAVE_SMTP_STARTLS
 
 #undef BALSA_STD_PREFIX
 #undef BALSA_DATA_PREFIX

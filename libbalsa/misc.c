@@ -29,6 +29,8 @@
 #include <errno.h>
 #include <dirent.h>
 
+#include <gnome.h>
+
 #ifdef HAVE_GNOME_VFS
 # include <libgnomevfs/gnome-vfs-file-info.h>
 # include <libgnomevfs/gnome-vfs-ops.h>
@@ -50,7 +52,7 @@
 gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
-    gchar *mime_type;
+    const gchar *mime_type;
 #ifdef HAVE_GNOME_VFS
     GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
     gchar* uri;

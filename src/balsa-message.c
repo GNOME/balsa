@@ -33,9 +33,6 @@
 #include "balsa-message.h"
 #include "misc.h"
 
-#define HTML_HEAD "<html><body bgcolor=#ffffff><p><tt>\n"
-#define HTML_FOOT "</tt></p></body></html>\n"
-
 /* mime */
 gchar *content2html (Message * message);
 

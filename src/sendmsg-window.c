@@ -45,7 +45,7 @@ static void attach_clicked (GtkWidget *, gpointer);
 
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
-static GtkWidget *menu_items[7];
+static GtkWidget *menu_items[8];
 GtkTooltips *tooltips;
 
 

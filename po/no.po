@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.5\n"
-"POT-Creation-Date: 2000-09-24 22:59+0200\n"
+"POT-Creation-Date: 2000-09-25 11:28+0200\n"
 "PO-Revision-Date: 2000-09-24 23:11+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -757,7 +757,7 @@ msgstr "Vist postboks: %s med %ld meldinger, %ld nye"
 msgid "Save MIME Part"
 msgstr "Lagre MIME-del"
 
-#: src/balsa-message.c:244 src/balsa-message.c:1224
+#: src/balsa-message.c:244 src/balsa-message.c:1222
 msgid "Save"
 msgstr "Lagre"
 
@@ -777,72 +777,72 @@ msgstr ""
 msgid " Could not save %s:%s "
 msgstr " Kunne ikke lagre %s:%s "
 
-#: src/balsa-message.c:546 src/print.c:348
+#: src/balsa-message.c:544 src/print.c:348
 msgid "Date:"
 msgstr "Dato:"
 
 #. From:
-#: src/balsa-message.c:551 src/filter-edit-dialog.c:337 src/print.c:336
+#: src/balsa-message.c:549 src/filter-edit-dialog.c:337 src/print.c:336
 #: src/sendmsg-window.c:810
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
-#: src/balsa-message.c:555 src/filter-edit-dialog.c:325 src/print.c:341
+#: src/balsa-message.c:553 src/filter-edit-dialog.c:325 src/print.c:341
 #: src/sendmsg-window.c:812
 msgid "To:"
 msgstr "Til:"
 
-#: src/balsa-message.c:556
+#: src/balsa-message.c:554
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/balsa-message.c:557
+#: src/balsa-message.c:555
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:560
+#: src/balsa-message.c:558
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:562 src/print.c:345 src/sendmsg-window.c:817
+#: src/balsa-message.c:560 src/print.c:345 src/sendmsg-window.c:817
 msgid "Subject:"
 msgstr "Emne:"
 
-#: src/balsa-message.c:628
+#: src/balsa-message.c:626
 msgid "Could not load image. It is most likely corrupted."
 msgstr "Kunne ikke laste bildet. Det sannsynligvis korrupt."
 
-#: src/balsa-message.c:633
+#: src/balsa-message.c:631
 msgid "Couldn't render image\n"
 msgstr "Kunne ikke rendre bildet\n"
 
-#: src/balsa-message.c:683
+#: src/balsa-message.c:681
 #, c-format
 msgid "View part with %s"
 msgstr "Vis del med %s"
 
-#: src/balsa-message.c:691
+#: src/balsa-message.c:689
 msgid "No view action defined in gnome MIME for this content type"
 msgstr ""
 "Ingen handling for visning definert i GNOME-mime for denne innholdstypen"
 
-#: src/balsa-message.c:695
+#: src/balsa-message.c:693
 #, c-format
 msgid "Content Type: %s"
 msgstr "Innholdstype: %s"
 
-#: src/balsa-message.c:700
+#: src/balsa-message.c:698
 #, c-format
 msgid "Filename: %s"
 msgstr "Filnavn: %s"
 
-#: src/balsa-message.c:707
+#: src/balsa-message.c:705
 msgid "Save part"
 msgstr "Lagre del"
 
-#: src/balsa-message.c:1293
+#: src/balsa-message.c:1291
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "Kunne ikke opprette midlertidig fil %s"
@@ -1437,11 +1437,11 @@ msgstr "Skriv ut"
 msgid "Print current message"
 msgstr "Skriv ut denne meldingen"
 
-#: src/main-window.c:1001
+#: src/main-window.c:987
 msgid "Copyright (C) 1997-2000"
 msgstr "Copyright (C) 1997-2000"
 
-#: src/main-window.c:1003
+#: src/main-window.c:989
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1453,28 +1453,28 @@ msgstr ""
 "\n"
 "Vennligst rapporter feil på: http://bugs.gnome.org/"
 
-#: src/main-window.c:1381
+#: src/main-window.c:1367
 #, c-format
 msgid "Sending error: %s"
 msgstr "Feil under sending: %s"
 
-#: src/main-window.c:1609
+#: src/main-window.c:1595
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
 "For å lagre en adresse må du først åpne en postboks og velge en melding.\n"
 
-#: src/main-window.c:1709
+#: src/main-window.c:1695
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Endring av postboks %s feilet."
 
-#: src/main-window.c:1895
+#: src/main-window.c:1881
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivebeskyttet)"
 
-#: src/main-window.c:1897
+#: src/main-window.c:1883
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -2377,6 +2377,35 @@ msgstr "Feil under kjøring av lpr"
 #, c-format
 msgid "Locale %s (%s) is not available on this computer."
 msgstr "Locale %s (%s) er ikke tilgjengelig på denne datamaskinen."
+
+#: src/spell-check.c:479
+msgid "Replace the current word with the selected suggestion"
+msgstr ""
+
+#: src/spell-check.c:484
+msgid "Replace all occurances of the current word with the selected suggestion"
+msgstr ""
+
+#: src/spell-check.c:491
+msgid "Skip the current word"
+msgstr ""
+
+#: src/spell-check.c:496
+#, fuzzy
+msgid "Skip all occurances of the current word"
+msgstr "Svar til alle mottakere av denne meldingen"
+
+#: src/spell-check.c:502
+msgid "Add the current word to your personal dictionar"
+msgstr ""
+
+#: src/spell-check.c:507
+msgid "Finish spell checking"
+msgstr ""
+
+#: src/spell-check.c:511
+msgid "Revert all changes and finish spell checking"
+msgstr ""
 
 #: src/store-address.c:50
 msgid "Card Name:"

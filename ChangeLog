@@ -1,3 +1,8 @@
+2003-05-05 08:30  PeterB
+
+	* src/sendmsg-window.c: Replace some stray `msg's with `bsmsg'.
+	* libbalsa/misc.h: Don't include "libbalsa.h".
+
 2003-05-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/sendmsg-window.c: fix bug 112266.

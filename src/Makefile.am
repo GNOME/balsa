@@ -6,7 +6,6 @@ balsa_SOURCES =	\
 	balsa-message.c		\
 	index-child.c		\
 	local-mailbox.c		\
-	mailbox.c		\
 	mailbox-manager.c	\
 	main-window.c		\
 	main.c			\
@@ -21,9 +20,10 @@ balsa_SOURCES =	\
 	addrbook-manager.c	\
 	balsa-init.c
 
-INCLUDES=-I. -I$(srcdir)/../c-client $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I../libbalsa -I$(srcdir)/../c-client $(GNOME_INCLUDEDIR)
 
-balsa_LDADD = $(top_builddir)/c-client/libc-client.a \
+balsa_LDADD = $(top_builddir)/libbalsa/libbalsa.a \
+	$(top_builddir)/c-client/libc-client.a \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \

@@ -1,4 +1,4 @@
-SUBDIRS = po intl c-client src macros
+SUBDIRS = po intl libbalsa c-client src macros
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change

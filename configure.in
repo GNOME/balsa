@@ -59,6 +59,7 @@ Makefile
 po/Makefile.in
 macros/Makefile
 intl/Makefile
+libbalsa/Makefile
 src/Makefile
 c-client/Makefile
 ],[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

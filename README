@@ -58,15 +58,6 @@ wherever Gnome lives. Balsa will be able to find all the files
 that it needs, but Gnome may not be able to locate certain
 resources such as balsa.desktop, balsa.soundlist, etc.
 
---disable-flock
-	Some OSes (like Solaris) are known to be not full
-BSD-compatible.  You may want in such a case to disable flock mailbox
-locking and use fcntl/lockf functions instead.
-
---enable-fcntl
-	This enables alternative fcntl file locking scheme. This
-function is sometimes troublesome over NFS but is POSIX compatible.
-
 --with-gpgme
         Use GPGME library for message signing and encryption. 
 GPGME version more recent than  0.3.x w/ x >= 14 is required. 
@@ -94,16 +85,15 @@ Libraries:
 	Balsa uses libESMTP library available at 
 http://www.stafford.uklinux.net/libesmtp/
 The current version is available at
-http://www.stafford.uklinux.net/libesmtp/libesmtp-1.0.tar.bz2
+http://www.stafford.uklinux.net/libesmtp/libesmtp-1.0.3r1.tar.bz2
 
 You can grab {i386,src}.rpm that has this option enabled from
 ftp://ftp.chbm.nu/pub/ (built on RH 6.2) or from
-http://balsa.gnome.org/libesmtp-1.0-1.i386.rpm
-http://balsa.gnome.org/libesmtp-1.0-1.src.rpm
+http://balsa.gnome.org/libesmtp-1.0.3r1-1.i386.rpm
+http://balsa.gnome.org/libesmtp-devel-1.0.3r1-1.i386.rpm
+http://balsa.gnome.org/libesmtp-1.0.3r1-1.src.rpm
 	
-	The binaries are compiled against libgnomeui-2.0.1, if you use
-older/newer libraries, you will need to recompile balsa from the
-source.  Balsa also needs the pspell spell checking libraries.
+Balsa also needs the aspell spell checking libraries.
 
 	Make sure you have libtool installed (if you get some error 
 messages during compilation or when running precompiled binaries saying that

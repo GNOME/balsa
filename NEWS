@@ -1,3 +1,14 @@
+* Balsa-2.2.1 release. Release date 2004-07-06
+
+- IMAP mailboxes could be incorrectly marked as read-only.
+- message selection behaves more sanely.
+- 64-bit fixes.
+- memory leaks fixed.
+- handle better imap servers without server-side threading and limits
+  on number of concurent connections.
+- quick "Sender or Subject" message index filtering.
+- various UI improvements.
+
 * Balsa-2.2.0 release. Release date 2004-07-06
 
 - fix 143322, 143263, 145701.

@@ -58,8 +58,8 @@ extern void balsa_exit ();
 
 
 /* main window widget components */
-static GtkMenuBar *create_menu (GnomeMDI *);
-static GtkToolbar *create_toolbar (GnomeMDI *);
+static GtkMenuBar *create_menu (GnomeMDI *, GtkWidget *app);
+static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget *app);
 
 
 /* dialogs */
@@ -159,7 +159,7 @@ refresh_main_window ()
  * the menubar for the main window
  */
 
-static GtkMenuBar *create_menu (GnomeMDI * mdi)
+static GtkMenuBar *create_menu (GnomeMDI * mdi, GtkWidget *app)
 {
   gint i = 0;
   GtkWidget *menubar;
@@ -399,7 +399,7 @@ static GtkMenuBar *create_menu (GnomeMDI * mdi)
 /*
  * the toolbar for the main window
  */
-static GtkToolbar *create_toolbar (GnomeMDI *mdi)
+static GtkToolbar *create_toolbar (GnomeMDI *mdi, GtkWidget *app)
 {
   GtkWidget *window;
   GtkWidget *toolbar;
@@ -407,6 +407,8 @@ static GtkToolbar *create_toolbar (GnomeMDI *mdi)
   GtkWidget *label;
 
   mw->toolbar = toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
+
+  window = app;
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),

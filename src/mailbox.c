@@ -93,12 +93,6 @@ typedef struct
 } MailboxPrivate;
 
 
-
-
-
-
-
-
 /* the mailbox to be referenced by any of the c-client
  * callbacks for authorization, new messages, etc... */
 static Mailbox *client_mailbox = NULL;

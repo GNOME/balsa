@@ -1,3 +1,9 @@
+2000-08-07  Ian Campbell  <ijc25@cam.ac.uk>
+	* src/main-window.c: Set progress_dialog and friends to NULL in
+	progress_dialog_destroy_cb. This solves a crash when checking
+	after pressing the `Hide' button, fixes bug #14861.
+	
+
 2000-08-07  Pawel Salek  <pawsa@theochem.kth.se>		
 
 	* src/sendmsg-window.c: use mutt_set_charset() for setting charset.

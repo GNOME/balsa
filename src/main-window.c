@@ -1220,7 +1220,10 @@ void
 progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
 {
   gtk_widget_destroy( widget );
-  widget = NULL;
+  progress_dialog = NULL;
+  progress_dialog_source = NULL;
+  progress_dialog_message = NULL;
+  progress_dialog_bar = NULL;
 }
 
 gboolean

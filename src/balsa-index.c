@@ -1116,7 +1116,7 @@ static void balsa_index_set_style(BalsaIndex * bindex,
 	        style can't be use as it isn't initialised yet the first time
 		we call this. */
     
-    if(thread_has_unread(ctree, node)) { /* chbm */
+    if(!GTK_CTREE_ROW(node)->expanded && thread_has_unread(ctree, node)) {
 	style = balsa_app.mblist->unread_mailbox_style;
     } else
 	style = gtk_widget_get_style(GTK_WIDGET(balsa_app.mblist));
@@ -1204,7 +1204,6 @@ button_event_release_cb(GtkWidget * clist, GdkEventButton * event,
     if(gtk_clist_get_selection_info(GTK_CLIST(bindex->ctree), 
 				    event->x, event->y, &row, &column)) {
 	balsa_index_set_style_recursive(bindex, gtk_ctree_node_nth (bindex->ctree, row));
-	balsa_index_set_parent_style(bindex, gtk_ctree_node_nth (bindex->ctree, row));
     }
 
 }
@@ -2239,13 +2238,14 @@ balsa_index_update_tree(BalsaIndex *bindex, gboolean expand)
 
     gtk_clist_freeze(clist);
     for(node=gtk_ctree_node_nth(tree, 0); node; node=GTK_CTREE_NODE_NEXT(node)) {
-	balsa_index_set_style_recursive( bindex, node); /*`chbm */
 	if(expand)
 	    gtk_ctree_expand_recursive(tree, node);
 	else
 	    gtk_ctree_collapse_recursive(tree, node);
 	if(!msg_node && msg && msg->message)
 	    msg_node=gtk_ctree_find_by_row_data(tree, node, msg->message);
+
+	balsa_index_set_style_recursive( bindex, node); /* chbm */
     }
     
     if ( msg_node ) {

@@ -1,3 +1,18 @@
+2004-03-07  Pawel Salek
+
+	* configure.in: check for gtk2.3
+	* libbalsa/Makefile.am: add option_menu.[hc]
+	* libbalsa/files.c: try harder when looking for images.
+	* libbalsa/mailbox.c: use fixed_height gtk2.4 mode.
+	* libbalsa/imap/imap-{handle,tls}.c: silence.
+	* src/Makefile.am: enable deprecated for gtk-2.4
+	* src/ab-window.c: use option_menu
+	* src/store-address.c: ditto.
+	* src/balsa-index.c: setup fixed_height mode.
+	* src/mailbox-conf.c: compile against gnome-2.6
+	* src/main.c: do not panic on missing icons.
+	* src/pref-manager.c: ask gnome-2.6 to enable deprecated stuff.
+
 2004-03-07 12:33  PeterB
 
 	* libbalsa/filter.c, libbalsa/filter.h, libbalsa/libbalsa.h,
@@ -18,7 +33,7 @@
 	libbalsa/mailbox_imap.c, libbalsa/imap/imap-commands.c,
 	src/balsa-index.c, src/balsa-message.c: plug memory leaks.
 
-2004-02-05  Pawel Salek
+2004-03-05  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: use single API for one and multiple
 	message copying/flagging.

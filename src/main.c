@@ -488,8 +488,10 @@ main(int argc, char *argv[])
     mailboxes_init();
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
-    gnome_window_icon_set_default_from_file(default_icon);
-    g_free(default_icon);
+    if(default_icon) { /* may be NULL for developer installations */
+        gnome_window_icon_set_default_from_file(default_icon);
+        g_free(default_icon);
+    }
 
     signal( SIGPIPE, SIG_IGN );
     gnome_triggers_do("", "program", "balsa", "startup", NULL);

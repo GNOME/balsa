@@ -381,7 +381,7 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     g_free(mime_type);
 
     buf = libbalsa_mailbox_get_message_part(body->message, body, &len);
-    if (len && (g_mime_stream_write(stream, buf, len) == -1
+    if (len && (g_mime_stream_write(stream, (char*)buf, len) == -1
 		|| g_mime_stream_flush(stream) == -1)) {
 	g_object_unref(stream);
 	/* FIXME: unlink??? */

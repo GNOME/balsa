@@ -1053,8 +1053,16 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 
     label = create_label(_("F_older Path:"), table, ++row);
 
+#ifdef HAVE_GTK24
+    mcw->mb_data.imap.folderpath = entry = gtk_entry_new();
+#else
     entry = gnome_entry_new("IMAPFolderHistory");
     mcw->mb_data.imap.folderpath = gnome_entry_gtk_entry(GNOME_ENTRY(entry));
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX");
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Sent");
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Draft");
+    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.outbox");
+#endif
     gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath), "INBOX");
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
@@ -1064,10 +1072,6 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     g_signal_connect(G_OBJECT(mcw->mb_data.imap.folderpath), "changed",
                      G_CALLBACK(check_for_blank_fields), mcw);
 
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Sent");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.Draft");
-    gnome_entry_append_history(GNOME_ENTRY(entry), 1, "INBOX.outbox");
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 

@@ -327,10 +327,11 @@ check_cipher_strength(ImapMboxHandle *handle, SSL *ssl)
 ImapResponse
 imap_handle_setup_ssl(ImapMboxHandle *handle, SSL *ssl)
 {
-  fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
-  ERR_print_errors_fp(stderr);
-  fprintf(stderr, "\nEnd of print_errors\n");
-
+  if(ERR_peek_error()) {
+    fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
+    ERR_print_errors_fp(stderr);
+    fprintf(stderr, "\nEnd of print_errors\n");
+  }
   if(sio_set_tlsclient_ssl (handle->sio, ssl)) {
     handle->using_tls = 1;
     /* forget capabilities. */

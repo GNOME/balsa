@@ -30,6 +30,12 @@
    key and replace the key on every change of the sort method.  
 */
 
+/* TREE_VIEW_FIXED_HEIGHT enables hight-performance mode of GtkTreeView
+ * very useful for large mailboxes (#msg >5000) but: a. is available only
+ * in gtk2>=2.3.5 b. may expose some bugs in gtk.
+ */
+#define TREE_VIEW_FIXED_HEIGHT 1
+
 #include "config.h"
 
 #include <stdio.h>
@@ -254,7 +260,21 @@ bndx_instance_init(BalsaIndex * index)
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
-    
+
+#if defined(HAVE_GTK24) && defined(TREE_VIEW_FIXED_HEIGHT)
+    {
+        GValue val = {0};
+        g_value_init (&val, G_TYPE_BOOLEAN);
+        g_value_set_boolean(&val, TRUE);
+        g_object_set_property(G_OBJECT(index), "fixed_height_mode",
+                              &val);
+        g_value_unset(&val);
+    }
+#define set_sizing(col) \
+      gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_FIXED)
+#else
+#define set_sizing(col)
+#endif
     /* Index column */
     column = gtk_tree_view_column_new();
     gtk_tree_view_column_set_title(column, "#");
@@ -266,7 +286,7 @@ bndx_instance_init(BalsaIndex * index)
                                         "text", LB_MBOX_MSGNO_COL,
                                         NULL);
     gtk_tree_view_column_set_sort_column_id(column, LB_MBOX_MSGNO_COL);
-    gtk_tree_view_append_column(tree_view, column);
+    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
 
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
@@ -275,7 +295,7 @@ bndx_instance_init(BalsaIndex * index)
                                                  "pixbuf", LB_MBOX_MARKED_COL,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
-    gtk_tree_view_append_column(tree_view, column);
+    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
 
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
@@ -284,7 +304,7 @@ bndx_instance_init(BalsaIndex * index)
                                                  "pixbuf", LB_MBOX_ATTACH_COL,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
-    gtk_tree_view_append_column(tree_view, column);
+     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     /* From/To column */
     renderer = gtk_cell_renderer_text_new();
     column = 
@@ -345,7 +365,7 @@ bndx_instance_init(BalsaIndex * index)
                                         NULL);
     gtk_tree_view_column_set_sort_column_id(column,
                                             LB_MBOX_SIZE_COL);
-    gtk_tree_view_append_column(tree_view, column);
+    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
 
     /* Initialize some other members */
     index->mailbox_node = NULL;
@@ -1012,6 +1032,21 @@ balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
 
+#if defined(HAVE_GTK24) && defined(TREE_VIEW_FIXED_HEIGHT)
+    /* so that fixed width works properly */
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
+                                         (tree_view, LB_MBOX_MSGNO_COL),
+                                         40); /* get a better guess */ 
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
+                                         (tree_view, LB_MBOX_SIZE_COL),
+                                         40); /* get a better guess */ 
+#endif
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
+                                         (tree_view, LB_MBOX_MARKED_COL),
+                                         26); /* icon width+2 */
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
+                                         (tree_view, LB_MBOX_ATTACH_COL),
+                                         26); /* icon width+2 */
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_FROM_COL),
                                          balsa_app.index_from_width);

@@ -68,7 +68,10 @@ else
   libgnomeprintui-2.0 >= 1.106.0
   ])
 fi
-  
+
+if $PKG_CONFIG --atleast-version=2.3.5 gtk+-2.0; then
+  AC_DEFINE(HAVE_GTK24,1,[Define if Gtk+ >=2.3.5 is available])
+fi
 BALSA_CFLAGS="$BALSA_CFLAGS $LGPRINT_CFLAGS"
 BALSA_LIBS="$BALSA_LIBS $LGPRINT_LIBS"
 

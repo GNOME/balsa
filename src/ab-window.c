@@ -26,6 +26,7 @@
 #include "balsa-app.h"
 #include "sendmsg-window.h"
 #include "ab-window.h"
+#include "option_menu.h"
 
 enum {
     LIST_COLUMN_NAME,
@@ -197,11 +198,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	*hbox,
 	*box2,
 	*scrolled_window,
-	*ab_option, *ab_menu, *menu_item,
+	*ab_option,
 	*frame, *label;
+    GObject *ab_menu;
     GList *ab_list;
     LibBalsaAddressBook *address_book;
-    guint default_offset = 0;
+    int curr_idx, active_idx;
 
     ab->current_address_book = NULL;
     gtk_window_set_title(GTK_WINDOW(ab), _("Address Book"));
@@ -226,37 +228,28 @@ balsa_ab_window_init(BalsaAbWindow *ab)
                                 (balsa_ab_window_select_recipient));
 
     /* The address book selection menu */
-    ab_menu = gtk_menu_new();
+    ab_menu = libbalsa_option_menu_new();
 
     ab->current_address_book = balsa_app.default_address_book;
 
     ab_list = balsa_app.address_book_list;
+    curr_idx = active_idx = 0;
     while (ab_list) {
 	address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
 	if (ab->current_address_book == NULL)
 	    ab->current_address_book = address_book;
 	
-	menu_item = gtk_menu_item_new_with_label(address_book->name);
-	gtk_widget_show(menu_item);
-	gtk_menu_shell_append(GTK_MENU_SHELL(ab_menu), menu_item);
+        libbalsa_option_menu_append(ab_menu, address_book->name, 
+                                    address_book);
 	
-	g_object_set_data(G_OBJECT(menu_item), "address-book",
-			  address_book);
-	g_signal_connect(G_OBJECT(menu_item), "activate",
-			 G_CALLBACK(balsa_ab_window_menu_changed), ab);
-	
-	if (address_book == balsa_app.default_address_book)
-	    gtk_menu_set_active(GTK_MENU(ab_menu), default_offset);
-	
-	default_offset++;
-	
-	ab_list = g_list_next(ab_list);
+        if(address_book == balsa_app.default_address_book)
+            active_idx = curr_idx;
+        curr_idx++;
+        ab_list = g_list_next(ab_list);
     }
-    gtk_widget_show(ab_menu);
 
-    ab_option = gtk_option_menu_new();
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
-    gtk_widget_show(ab_option);
+    ab_option = libbalsa_option_menu_get_widget
+        (ab_menu, G_CALLBACK(balsa_ab_window_menu_changed), ab);
 
     gtk_box_pack_start(GTK_BOX(vbox), ab_option, FALSE, FALSE, 0);
 
@@ -391,6 +384,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_show(box2);
     gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 1);
     
+    libbalsa_option_menu_set_active(ab_option, active_idx);
     gtk_widget_grab_focus(ab->filter_entry);
 }
 
@@ -815,8 +809,7 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 {
     LibBalsaAddressBook *addr;
 
-    addr = LIBBALSA_ADDRESS_BOOK(g_object_get_data
-                                 (G_OBJECT(widget), "address-book"));
+    addr = LIBBALSA_ADDRESS_BOOK(libbalsa_option_menu_get_active_data(widget));
     g_assert(addr != NULL);
 
     ab->current_address_book = addr;

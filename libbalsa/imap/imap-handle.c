@@ -36,6 +36,7 @@
 
 #if defined(USE_TLS)
 #include <openssl/ssl.h>
+#include <openssl/err.h>
 #endif
 
 #include "libimap-marshal.h"
@@ -1022,7 +1023,19 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   g_return_val_if_fail(handle, IMR_BAD);
   g_return_val_if_fail(handle->state != IMHS_DISCONNECTED, IMR_BAD);
 
-  imap_cmd_get_tag(handle->sio, tag, sizeof(tag)); /* handle errors */
+#ifdef USE_TLS
+  if(ERR_peek_error()) {
+    fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
+    ERR_print_errors_fp(stderr);
+    fprintf(stderr, "\nEnd of print_errors\n");
+  }
+#endif
+  if( imap_cmd_get_tag(handle->sio, tag, sizeof(tag))<0) {
+    printf("connection severed.\n");
+    close(handle->sd);
+    handle->state = IMHS_DISCONNECTED;
+    return IMR_SEVERED;
+  }
   /* handle untagged messages. The caller still gets its shot afterwards. */
   if (strcmp(tag, "*") == 0) {
     gpointer p;

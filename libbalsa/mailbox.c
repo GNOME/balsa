@@ -1820,6 +1820,9 @@ lbm_node_has_unread_child(LibBalsaMailbox * lmm, GNode * node)
     return FALSE;
 }
 
+#ifndef HAVE_GTK24
+#define g_value_take_string g_value_set_string_take_ownership
+#endif
 static void
 mbox_model_get_value(GtkTreeModel *tree_model,
 		     GtkTreeIter  *iter,
@@ -1836,7 +1839,9 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 		     column < (int) ELEMENTS(mbox_model_col_type));
  
     msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );
-#ifdef GTK2_FETCHES_ONLY_VISIBLE_CELLS
+    /* gtk2-2.3.5 can in principle do it  but we want to be sure.
+     */
+#if defined(HAVE_GTK24) && defined(GTK2_FETCHES_ONLY_VISIBLE_CELLS)
     msg = libbalsa_mailbox_get_message(lmm, msgno);
 #else 
     { GdkRectangle a, b, c, d; 
@@ -1885,7 +1890,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     case LB_MBOX_FROM_COL:
 	if(msg) {
 	    tmp = get_from_field(msg);
-	    g_value_set_string_take_ownership(value, tmp);
+	    g_value_take_string(value, tmp);
 	} else g_value_set_static_string(value, "from unknown");
         break;
     case LB_MBOX_SUBJECT_COL:
@@ -1896,13 +1901,13 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     case LB_MBOX_DATE_COL:
 	if(msg) {
 	    tmp = libbalsa_message_date_to_gchar(msg, "%x %X");
-	    g_value_set_string_take_ownership(value, tmp);
+	    g_value_take_string(value, tmp);
 	} else g_value_set_static_string(value, "unknown");
 	break;
     case LB_MBOX_SIZE_COL:
 	if(msg) {
 	    tmp = libbalsa_message_size_to_gchar(msg, FALSE);
-	    g_value_set_string_take_ownership(value, tmp);
+	    g_value_take_string(value, tmp);
 	} else g_value_set_static_string(value, "unknown");
 	break;
     case LB_MBOX_MESSAGE_COL:

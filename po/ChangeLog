@@ -2,7 +2,8 @@
 
 	* POTFILES.in: Added src/balsa-app.c, src/spell-check.c
 	and removed libmutt/pager.h.
-	
+	* no.po: Updated Norwegian translation.
+		
 2000-04-25  Andreas Hyden  <a.hyden@cyberpoint.se>
 
 	* sv.po: Updated Swedish translation.

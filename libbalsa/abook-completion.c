@@ -22,6 +22,8 @@
 
 #include "config.h"
 
+#include <string.h>
+
 #include "abook-completion.h"
 #include "information.h"
 #include "misc.h"
@@ -32,8 +34,13 @@
  * Create a new CompletionData
  */
 CompletionData *
-completion_data_new(LibBalsaAddress * address, gboolean alias)
+completion_data_new(LibBalsaAddress * address)
 {
+    GString *string;
+    GList *list;
+#ifdef CASE_INSENSITIVE_NAME
+    gchar *string_n;
+#endif
     CompletionData *ret;
 
     ret = g_new0(CompletionData, 1);
@@ -41,11 +48,23 @@ completion_data_new(LibBalsaAddress * address, gboolean alias)
     g_object_ref(address);
     ret->address = address;
 
+    string = g_string_new(address->full_name);
+    if (address->nick_name
+        && strcmp(address->nick_name, address->full_name)) {
+        g_string_append_c(string, ' ');
+        g_string_append(string, address->nick_name);
+    }
+    for (list = address->address_list; list; list = list->next) {
+	g_string_append_c(string, ' ');
+	g_string_append(string, list->data);
+    }
 #ifdef CASE_INSENSITIVE_NAME
-    ret->string =
-        g_ascii_strup(alias ? address->nick_name : address->full_name, -1);
+    string_n = g_utf8_normalize(string->str, -1, G_NORMALIZE_ALL);
+    g_string_free(string, TRUE);
+    ret->string = g_utf8_casefold(string_n, -1);
+    g_free(string_n);
 #else
-    ret->string = g_strdup(alias ? address->nick_name : address->full_name);
+    ret->string = g_string_free(string, FALSE);
 #endif
 
     return ret;
@@ -78,4 +97,28 @@ address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
     g_return_val_if_fail(b != NULL, 1);
 
     return g_ascii_strcasecmp(a->full_name, b->full_name);
+}
+
+/*
+ * A GCompletionStrncmpFunc for matching words instead of the whole
+ * string.
+ *
+ * s1 is the user input, s2 is the target.
+ */
+
+gint
+strncmp_word(const gchar * s1, const gchar * s2, gsize n)
+{
+    const gchar *match;
+    gint retval;
+
+    match = s2;
+    do {
+	if (!(retval = strncmp(s1, match, n)))
+	    break;
+	if ((match = strchr(match, ' ')))
+	    ++match;
+    } while (match);
+
+    return retval;
 }

@@ -50,7 +50,6 @@ struct _LibBalsaAddressBookLdif {
     time_t mtime;
 
     GCompletion *name_complete;
-    GCompletion *alias_complete;
 };
 
 struct _LibBalsaAddressBookLdifClass {

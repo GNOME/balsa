@@ -50,7 +50,6 @@ struct _LibBalsaAddressBookVcard {
     time_t mtime;
 
     GCompletion *name_complete;
-    GCompletion *alias_complete;
 };
 
 struct _LibBalsaAddressBookVcardClass {

@@ -140,11 +140,6 @@ libbalsa_address_book_externq_init(LibBalsaAddressBookExtern * ab)
     ab->save = NULL;
     ab->address_list = NULL;
     ab->mtime = 0;
-
-    ab->name_complete  = 
-	g_completion_new((GCompletionFunc)completion_data_extract);
-    ab->alias_complete = 
-	g_completion_new((GCompletionFunc)completion_data_extract);
 }
 
 static void

@@ -35,10 +35,10 @@ struct _CompletionData {
 	LibBalsaAddress *address;
 };
 
-CompletionData *completion_data_new(LibBalsaAddress * address,
-					   gboolean alias);
+CompletionData *completion_data_new(LibBalsaAddress * address);
 void completion_data_free(CompletionData * data);
 gchar *completion_data_extract(CompletionData * data);
 gint address_compare(LibBalsaAddress *a, LibBalsaAddress *b);
+gint strncmp_word(const gchar * s1, const gchar * s2, gsize n);
 
 #endif

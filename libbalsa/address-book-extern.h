@@ -49,9 +49,6 @@ struct _LibBalsaAddressBookExtern {
     GList *address_list;
 
     time_t mtime;
-
-    GCompletion *name_complete;
-    GCompletion *alias_complete;
 };
 
 struct _LibBalsaAddressBookExternClass {

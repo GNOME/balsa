@@ -2257,12 +2257,14 @@ static GList *
 lbae_get_matching_addresses(const gchar * prefix)
 {
     GList *match = NULL, *list;
-    gchar *prefix_up;
+    gchar *prefix_n;
+    gchar *prefix_f;
 
-    prefix_up = g_utf8_strup(prefix, -1);
+    prefix_n = g_utf8_normalize(prefix, -1, G_NORMALIZE_ALL);
+    prefix_f = g_utf8_casefold(prefix_n, -1);
+    g_free(prefix_n);
     for (list = lbae_address_book_list; list; list = list->next) {
         LibBalsaAddressBook *ab;
-        gchar *new_prefix;
 
         ab = LIBBALSA_ADDRESS_BOOK(list->data);
         if (!ab->expand_aliases || ab->is_expensive)
@@ -2271,11 +2273,10 @@ lbae_get_matching_addresses(const gchar * prefix)
         match =
             g_list_concat(match,
                           libbalsa_address_book_alias_complete(ab,
-                                                               prefix_up,
-                                                               &new_prefix));
-        g_free(new_prefix);
+                                                               prefix_f,
+                                                               NULL));
     }
-    g_free(prefix_up);
+    g_free(prefix_f);
 
     return match;
 }

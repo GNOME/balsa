@@ -150,10 +150,9 @@ libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif * ab)
     ab->address_list = NULL;
     ab->mtime = 0;
 
-    ab->name_complete  = 
+    ab->name_complete = 
 	g_completion_new((GCompletionFunc)completion_data_extract);
-    ab->alias_complete = 
-	g_completion_new((GCompletionFunc)completion_data_extract);
+    g_completion_set_compare(ab->name_complete, strncmp_word);
 }
 
 static void
@@ -164,8 +163,6 @@ ab_ldif_clear(LibBalsaAddressBookLdif *addr_ldif)
     addr_ldif->address_list = NULL;
     
     g_list_foreach(addr_ldif->name_complete->items, 
-		   (GFunc)completion_data_free, NULL);
-    g_list_foreach(addr_ldif->alias_complete->items, 
 		   (GFunc)completion_data_free, NULL);
 }
 
@@ -182,8 +179,6 @@ libbalsa_address_book_ldif_finalize(GObject * object)
 
     g_completion_free(addr_ldif->name_complete); 
     addr_ldif->name_complete = NULL;
-    g_completion_free(addr_ldif->alias_complete);
-    addr_ldif->alias_complete = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -488,7 +483,6 @@ load_ldif_file(LibBalsaAddressBook *ab)
     ab_ldif_clear(addr_ldif);
     
     g_completion_clear_items(addr_ldif->name_complete);
-    g_completion_clear_items(addr_ldif->alias_complete);
     
     if( (gc = fopen(addr_ldif->path, "r")) == NULL)
         return FALSE;
@@ -595,22 +589,14 @@ load_ldif_file(LibBalsaAddressBook *ab)
     addr_ldif->address_list = list;
 
     completion_list = NULL;
-    for (;list; list = g_list_next(list)) {
-	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data), FALSE);
+    for (;list; list = list->next) {
+	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data));
 	completion_list = g_list_prepend(completion_list, cmp_data);
     }
     completion_list = g_list_reverse(completion_list);
     g_completion_add_items(addr_ldif->name_complete, completion_list);
     g_list_free(completion_list);
 
-    completion_list = NULL;
-    for(list = addr_ldif->address_list; list; list = g_list_next(list) ) {
-	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data), TRUE);
-	completion_list = g_list_prepend(completion_list, cmp_data);
-    }
-    completion_list = g_list_reverse(completion_list);
-    g_completion_add_items(addr_ldif->alias_complete, completion_list);
-    g_list_free(completion_list);
     ab->dist_list_mode = TRUE;
     return TRUE;
 }
@@ -783,10 +769,8 @@ libbalsa_address_book_ldif_alias_complete(LibBalsaAddressBook * ab,
 					  gchar ** new_prefix)
 {
     LibBalsaAddressBookLdif *vc;
-    GList *resa = NULL, *resb = NULL;
+    GList *list;
     GList *res = NULL;
-    gchar *p1 = NULL, *p2 = NULL;
-    LibBalsaAddress *addr1, *addr2;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDIF(ab), NULL);
 
@@ -797,49 +781,14 @@ libbalsa_address_book_ldif_alias_complete(LibBalsaAddressBook * ab,
 
     load_ldif_file(ab);
 
-    resa = g_completion_complete(vc->name_complete, (gchar*)prefix, &p1);
-    resb = g_completion_complete(vc->alias_complete, (gchar*)prefix, &p2);
-
-    if ( p1 && p2 ) {
-	if ( strlen(p1) > strlen(p2) ) {
-	    *new_prefix = p1;
-	    g_free(p2);
-	} else {
-	    *new_prefix = p2;
-	    g_free(p1);
-	}
-    } else {
-	*new_prefix = p1?p1:p2;
+    for (list = g_completion_complete(vc->name_complete, (gchar *) prefix,
+                                      new_prefix);
+         list; list = list->next) {
+        LibBalsaAddress *address =
+            ((CompletionData *) list->data)->address;
+        g_object_ref(address);
+        res = g_list_prepend(res, address);
     }
 
-    /*
-      Extract a list of addresses.
-      pick any of them if two addresses point to the same structure.
-      pick addr1 if it is available and there is no addr2
-                    or it is smaller than addr1.
-      in other case, pick addr2 (one of addr1 or addr2 must be not-null).
-    */
-    while ( resa || resb ) {
-	addr1 = resa ? ((CompletionData*)resa->data)->address : NULL;
-	addr2 = resb ? ((CompletionData*)resb->data)->address : NULL;
-
-	if (addr1 == addr2) {
-	    res = g_list_prepend(res, addr1);
-	    g_object_ref(addr1);
-	    resa = g_list_next(resa);
-	    resb = g_list_next(resb);
-	} else if (resa != NULL &&
-		   (resb == NULL || address_compare(addr1, addr2) > 0) ) {
-	    res = g_list_prepend(res, addr1);
-	    g_object_ref(addr1);
-	    resa = g_list_next(resa);
-	} else {
-	    res = g_list_prepend(res, addr2);
-	    g_object_ref(addr2);
-	    resb = g_list_next(resb);
-	}
-    }
-    res = g_list_reverse(res);
-
-    return res;
+    return g_list_reverse(res);
 }

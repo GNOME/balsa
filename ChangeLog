@@ -1,6 +1,9 @@
-2004-11-02 08:39  PeterB
+2004-11-02 15:30  PeterB
 
-	* src/sendmsg-window.c: be more careful with address list.
+	* src/ab-window.c: connect to "changed" signal after initializing
+	the combo-box.
+	* libbalsa/address.c: be more careful with address list.
+	* src/sendmsg-window.c: ditto.
 
 2004-10-31 15:47  PeterB
 

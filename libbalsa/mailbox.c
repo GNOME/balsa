@@ -647,7 +647,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
 	cur = CLIENT_CONTEXT(mailbox)->hdrs[msgno];
 
-	if (!(cur && cur->env && cur->content))
+	if (!(cur && cur->env && cur->content && !cur->deleted))
 	    continue;
 
 	if (cur->env->subject &&

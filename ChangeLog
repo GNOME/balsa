@@ -1,4 +1,10 @@
-2001-12-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+2002-01-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: error message on missing GOB was unclear.
+	* libbalsa/mailbox.c: do not load deleted messages. (This has to
+	be configurable in general). (PB)
+
+2002-01-08  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-app.h: hightlight bad addresses.
 	* src/pref-manager.c: configure bad address color.

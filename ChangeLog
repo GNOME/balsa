@@ -1,3 +1,7 @@
+2002-07-11  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/libbalsa.c: fix deadlock while scaning imap
+
 2002-06-27  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/folder-scanners.c:

@@ -1,3 +1,7 @@
+2000-11-29  Carlos Morgado  <chbm@chbm.nu>
+
+	* rfc1524.c: (mutt_adv_mktemp) use mkstemp like the doctor ordered
+
 2000-11-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Atsuhiko Yamanaka's <ymnk@jcraft.com> patch for multithreaded msg view.

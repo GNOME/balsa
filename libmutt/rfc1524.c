@@ -455,7 +455,7 @@ void mutt_adv_mktemp (char *s, size_t l)
   if (s[0] == '\0')
   {
     snprintf (s, l, "%s/muttXXXXXX", buf);
-    mktemp (s);
+    mkstemp (s);
   }
   else
   {
@@ -466,7 +466,7 @@ void mutt_adv_mktemp (char *s, size_t l)
     if ((period = strrchr (tmp, '.')) != NULL)
       *period = 0;
     snprintf (s, l, "%s/%s.XXXXXX", buf, tmp);
-    mktemp (s);
+    mkstemp (s);
     if (period != NULL)
     {
       *period = '.';

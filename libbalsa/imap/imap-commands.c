@@ -962,7 +962,8 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   str = enum_flag_to_str(flg);
   for(i=0; i<msgcnt; i++) {
     ImapMessage *msg = imap_mbox_handle_get_msg(h, seqno[i]);
-    ImapFlagCache *f = &g_array_index(h->flag_cache, ImapFlagCache, i);
+    ImapFlagCache *f =
+      &g_array_index(h->flag_cache, ImapFlagCache, seqno[i]-1);
     f->known_flags |= flg;
     if(state)
       f->flag_values |= flg;

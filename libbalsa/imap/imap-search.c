@@ -378,22 +378,23 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
 static gboolean
 collect_needed_flags(ImapSearchKey *s, ImapMsgFlag *flag)
 {
+  gboolean res;
   switch(s->type) {
   case IMSE_NOT: 
-    return collect_needed_flags(s->d.not, flag) && 
-      collect_needed_flags(s->next, flag);
+    res = collect_needed_flags(s->d.not, flag);
+    break;
   case IMSE_OR:
-    return collect_needed_flags(s->d.or.l, flag) && 
-      collect_needed_flags(s->d.or.r, flag) && 
-      collect_needed_flags(s->next, flag);
+    res = collect_needed_flags(s->d.or.l, flag) &&
+      collect_needed_flags(s->d.or.r, flag);
+    break;
   case IMSE_FLAG:
-    *flag |= s->d.flag.sys_flag; break;
-  case IMSE_STRING:
-  case IMSE_DATE:
-  case IMSE_SIZE:
+    *flag |= s->d.flag.sys_flag; res = TRUE; break;
+  default:
     return FALSE;
   }
-  return TRUE;
+  if(res && s->next)
+    res = collect_needed_flags(s->next, flag);
+  return res;
 }
 
 static gboolean
@@ -403,13 +404,11 @@ search_key_matches(ImapSearchKey *s, ImapMsgFlag flag)
   switch(s->type) {
   case IMSE_NOT: 
     res =
-      !search_key_matches(s->d.not, flag) && 
-      search_key_matches(s->next, flag);
+      !search_key_matches(s->d.not, flag);
     break;
   case IMSE_OR:
     res = (search_key_matches(s->d.or.l, flag) ||
-      search_key_matches(s->d.or.r, flag)) && 
-      search_key_matches(s->next, flag);
+           search_key_matches(s->d.or.r, flag));
     break;
   case IMSE_FLAG:
     res = (flag & s->d.flag.sys_flag);
@@ -417,7 +416,11 @@ search_key_matches(ImapSearchKey *s, ImapMsgFlag flag)
   default: 
     return FALSE;
   }
-  return s->negated ? !res : res;
+  if(s->negated)
+    res = !res;
+  if(res && s->next)
+    res = search_key_matches(s->next, flag);  
+  return res;
 }
 
 static gboolean

@@ -49,7 +49,8 @@ static gint check_for_new_messages ();
 void
 init_balsa_app (int argc, char *argv[])
 {
-
+  gchar *tmp;
+	
   /* 
    * initalize application structure before ALL ELSE 
    * to some reasonable defaults
@@ -92,7 +93,12 @@ init_balsa_app (int argc, char *argv[])
 
   /* Check to see if this is the first time we've run balsa */
 
-  if (strcmp(gnome_config_get_string ("/balsa/Global/inbox"), "") == 0)
+  if (!(tmp = gnome_config_get_string("/balsa/Global/inbox")))
+    {
+      initialize_balsa (argc, argv);
+      return;
+    }
+  else if (strcmp(tmp, "") == 0)
     {
       initialize_balsa (argc, argv);
       return;
@@ -125,7 +131,8 @@ read_signature ()
 
   gchar path[PATH_MAX];
   sprintf (path, "%s/.signature", g_get_home_dir ());
-  fp = fopen (path, "r");
+  if (!(fp = fopen (path, "r")))
+	  return FALSE;
   len = readfile(fp, &balsa_app.signature);
   if (len != 0)
     balsa_app.signature[len - 1] = '\0';

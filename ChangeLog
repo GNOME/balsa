@@ -1,3 +1,20 @@
+2001-01-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Implement threading configuration.
+	* src/balsa-index-page.[ch]: rememberMailboxNode instead of
+	LibBalsaMailbox. FIXME: balsa-index-page and balsa-index should 
+	be merged together, present structure is an artefact of old GTK.
+	* src/balsa-index-threading.h: fix the include list.
+	* src/balsa-index.[hc]: add balsa_index_set_threading_type().
+	* src/balsa-mblist.[hc]: all the shown mailboxes have now respective
+	mailbox_nodes and are in balsa_app.mailbox_nodes.
+	* src/mailbox-conf.c: update API.
+	* src/mailbox-node.[ch]: add threading field.
+	* src/main-window.[hc]: handle mailbox nodes instead of mailboxes.
+	add threading UI callbacks.
+	* src/save-restore.c: all the shown mailboxes have now respective
+	mailbox_nodes and are in balsa_app.mailbox_nodes
+	
 2001-01-22  Gediminas Paulauskas  <menesis@delfi.lt>
 	
 	* src/*.c: Changed some terminology and capitalization. Sorry

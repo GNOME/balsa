@@ -46,17 +46,16 @@ struct _BalsaWindow {
 struct _BalsaWindowClass {
     GnomeAppClass parent_class;
 
-    void (*open_mailbox) (BalsaWindow * window, LibBalsaMailbox * mailbox);
-    void (*close_mailbox) (BalsaWindow * window,
-			   LibBalsaMailbox * mailbox);
+    void (*open_mbnode)  (BalsaWindow * window, BalsaMailboxNode * mbnode);
+    void (*close_mbnode) (BalsaWindow * window, BalsaMailboxNode * mbnode);
 };
 
 GtkType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_refresh(BalsaWindow * window);
-void balsa_window_open_mailbox();
-void balsa_window_close_mailbox();
+void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
+void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_enable_continue(void);
 void balsa_change_window_layout(BalsaWindow *window);
 gboolean mail_progress_notify_cb(void);

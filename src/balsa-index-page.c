@@ -183,13 +183,13 @@ void
 balsa_index_page_reset(BalsaIndexPage * page)
 {
     GtkWidget *current_page, *window;
-    LibBalsaMailbox *mailbox;
+    BalsaMailboxNode *mbnode;
     gint i;
 
     if (!page)
 	return;
 
-    mailbox = page->mailbox;
+    mbnode = page->mailbox_node;
     window = page->window;
 
     i = gtk_notebook_current_page(GTK_NOTEBOOK(balsa_app.notebook));
@@ -198,12 +198,11 @@ balsa_index_page_reset(BalsaIndexPage * page)
     current_page =
 	gtk_object_get_data(GTK_OBJECT(current_page), "indexpage");
 
-    balsa_window_close_mailbox(BALSA_WINDOW(window), mailbox);
-    balsa_window_open_mailbox(BALSA_WINDOW(window), mailbox);
+    balsa_window_close_mbnode(BALSA_WINDOW(window), mbnode);
+    balsa_window_open_mbnode(BALSA_WINDOW(window),  mbnode);
 
     gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),
-			  balsa_find_notebook_page_num(BALSA_INDEX_PAGE
-						       (current_page)->mailbox));
+			  balsa_find_notebook_page_num(mbnode->mailbox));
 
 }
 
@@ -218,7 +217,7 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
 	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
 	 i++) {
 	cur_page = gtk_object_get_data(GTK_OBJECT(cur_page), "indexpage");
-	if (BALSA_INDEX_PAGE(cur_page)->mailbox == mailbox)
+	if (BALSA_INDEX_PAGE(cur_page)->mailbox_node->mailbox == mailbox)
 	    return i;
     }
 
@@ -237,7 +236,7 @@ balsa_find_notebook_page(LibBalsaMailbox * mailbox)
 	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
 	 i++) {
 	page = gtk_object_get_data(GTK_OBJECT(page), "indexpage");
-	if (BALSA_INDEX_PAGE(page)->mailbox == mailbox)
+	if (BALSA_INDEX_PAGE(page)->mailbox_node->mailbox == mailbox)
 	    return BALSA_INDEX_PAGE(page);
     }
 
@@ -246,15 +245,16 @@ balsa_find_notebook_page(LibBalsaMailbox * mailbox)
 }
 
 gboolean
-balsa_index_page_load_mailbox(BalsaIndexPage * page,
-			      LibBalsaMailbox * mailbox)
+balsa_index_page_load_mailbox_node(BalsaIndexPage * page,
+				   BalsaMailboxNode * mbnode)
 {
     GtkWidget *messagebox;
 
-    page->mailbox = mailbox;
-    libbalsa_mailbox_open(mailbox, FALSE);
+    g_return_val_if_fail(mbnode->mailbox, FALSE);
+    page->mailbox_node = mbnode;
+    libbalsa_mailbox_open(mbnode->mailbox, FALSE);
 
-    if (mailbox->open_ref == 0) {
+    if (mbnode->mailbox->open_ref == 0) {
 	messagebox =
 	    gnome_message_box_new(_
 				  ("Unable to Open Mailbox!\nPlease check the mailbox settings."),
@@ -265,11 +265,11 @@ balsa_index_page_load_mailbox(BalsaIndexPage * page,
 	gtk_window_set_position(GTK_WINDOW(messagebox),
 				GTK_WIN_POS_CENTER);
 	gtk_widget_show(messagebox);
-	page->mailbox = NULL;
+	page->mailbox_node = NULL;
 	return TRUE;
     }
 
-    balsa_index_set_mailbox(BALSA_INDEX(page->index), mailbox);
+    balsa_index_set_mailbox(BALSA_INDEX(page->index), mbnode->mailbox);
     return FALSE;
 }
 
@@ -310,10 +310,10 @@ balsa_index_page_close_and_destroy(GtkObject * obj)
 
     /*page->window references our owner */
 
-    if (page->mailbox) {
-	libbalsa_mailbox_close(page->mailbox);
+    if (page->mailbox_node && page->mailbox_node->mailbox) {
+	libbalsa_mailbox_close(page->mailbox_node->mailbox);
 
-	page->mailbox = NULL;
+	page->mailbox_node = NULL;
     }
 
     if (parent_class->destroy)
@@ -651,7 +651,8 @@ transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
 			    gtk_notebook_get_current_page(GTK_NOTEBOOK
 							  (balsa_app.notebook)))),
 			  "indexpage"));
-    if (page->mailbox == mailbox)	/*Transferring to same mailbox? */
+    if (page->mailbox_node->mailbox == mailbox)	
+        /*Transferring to same mailbox? */
 	return;
 
     {

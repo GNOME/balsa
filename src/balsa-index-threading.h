@@ -21,8 +21,7 @@
 #ifndef __BALSA_INDEX_THREADING_H__
 #define __BALSA_INDEX_THREADING_H__
 
-#include <gnome.h>
-#include "libbalsa.h"
+#include "balsa-index.h"
 
 #ifdef __cplusplus
 extern "C"

@@ -31,6 +31,7 @@
 #include "balsa-mblist.h"
 #include "libbalsa.h"
 #include "mailbox-node.h"
+#include "main-window.h"
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -318,6 +319,9 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 {
     GtkWidget *page = NULL;
     int i, c;
+    GNode *gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+
+    g_return_if_fail(gnode);
 
     c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
 
@@ -360,13 +364,24 @@ mblist_open_mailbox(LibBalsaMailbox * mailbox)
 				   ((BALSA_INDEX_PAGE(page)->index)),
 				   5, balsa_app.index_date_width);
     } else { /* page with mailbox not found, open it */
-	balsa_window_open_mailbox(balsa_app.main_window, mailbox);
+	balsa_window_open_mbnode(balsa_app.main_window, 
+				 BALSA_MAILBOX_NODE(gnode->data));
 
 	if (balsa_app.mblist->display_info)
 	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
     }
     
     balsa_mblist_have_new(balsa_app.mblist);
+}
+
+void
+mblist_close_mailbox(LibBalsaMailbox * mailbox)
+{
+    GNode *gnode =
+	find_gnode_in_mbox_list(balsa_app.mailbox_nodes,mailbox);
+    g_return_if_fail(gnode);
+    balsa_window_close_mbnode(balsa_app.main_window, 
+			      BALSA_MAILBOX_NODE(gnode->data));
 }
 
 static void
@@ -543,6 +558,7 @@ balsa_mblist_init(BalsaMBList * tree)
     balsa_mblist_repopulate(tree);
 }
 
+#if 0
 /* balsa_mblist_insert_mailbox 
  *   
  * mblist:  The mailbox list where the mailbox is to be inserted
@@ -583,6 +599,7 @@ balsa_mblist_insert_mailbox(BalsaMBList * mblist,
 				     gtk_object_destroy);
 
 }
+#endif
 
 /* balsa_mblist_disconnect_mailbox_signals
  *
@@ -633,14 +650,6 @@ balsa_mblist_repopulate(BalsaMBList * bmbl)
     gtk_clist_set_column_visibility(GTK_CLIST(ctree), 1, bmbl->display_info);
     gtk_clist_set_column_visibility(GTK_CLIST(ctree), 2, bmbl->display_info);
 
-    balsa_mblist_insert_mailbox(bmbl, balsa_app.inbox, BALSA_ICON_INBOX);
-    balsa_mblist_insert_mailbox(bmbl, balsa_app.outbox, BALSA_ICON_OUTBOX);
-    balsa_mblist_insert_mailbox(bmbl, balsa_app.sentbox,
-				BALSA_ICON_TRAY_EMPTY);
-    balsa_mblist_insert_mailbox(bmbl, balsa_app.draftbox,
-				BALSA_ICON_TRAY_EMPTY);
-    balsa_mblist_insert_mailbox(bmbl, balsa_app.trash, BALSA_ICON_TRASH);
-
     if (balsa_app.mailbox_nodes) {
 	GNode *walk;
 	GtkCTreeNode *node;
@@ -677,8 +686,19 @@ mailbox_nodes_to_ctree(GtkCTree * ctree, guint depth, GNode * gnode,
 	if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
 	    g_assert_not_reached();
 	else {
-	    BalsaIconName in = (mbnode->mailbox->new_messages > 0)
+	    BalsaIconName in;
+	    if(mbnode->mailbox == balsa_app.inbox)
+		in = BALSA_ICON_INBOX;
+	    else if(mbnode->mailbox == balsa_app.outbox)
+		in = BALSA_ICON_OUTBOX;
+	    else if(mbnode->mailbox == balsa_app.sentbox)
+		in = BALSA_ICON_TRAY_EMPTY;
+	    else if(mbnode->mailbox == balsa_app.trash)
+		in = BALSA_ICON_TRASH;
+	    else
+		in = (mbnode->mailbox->new_messages > 0)
 		? BALSA_ICON_TRAY_FULL : BALSA_ICON_TRAY_EMPTY;
+
 	    gtk_ctree_set_node_info(ctree, cnode,
 				    mbnode->mailbox->name, 5,
 				    balsa_icon_get_pixmap(in),

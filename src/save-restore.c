@@ -253,19 +253,20 @@ config_mailbox_init(const gchar * prefix)
 	balsa_app.inbox_input =
 	    g_list_append(balsa_app.inbox_input, 
 			  balsa_mailbox_node_new_from_mailbox(mailbox));
-    } else if (strcmp("Inbox/", key) == 0)
-	balsa_app.inbox = mailbox;
-    else if (strcmp("Outbox/", key) == 0)
-	balsa_app.outbox = mailbox;
-    else if (strcmp("Sentbox/", key) == 0)
-	balsa_app.sentbox = mailbox;
-    else if (strcmp("Draftbox/", key) == 0)
-	balsa_app.draftbox = mailbox;
-    else if (strcmp("Trash/", key) == 0)
-	balsa_app.trash = mailbox;
-    else {
+    } else {
 	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
 	g_node_append(balsa_app.mailbox_nodes, node);
+
+	if (strcmp("Inbox/", key) == 0)
+	    balsa_app.inbox = mailbox;
+	else if (strcmp("Outbox/", key) == 0)
+	    balsa_app.outbox = mailbox;
+	else if (strcmp("Sentbox/", key) == 0)
+	    balsa_app.sentbox = mailbox;
+	else if (strcmp("Draftbox/", key) == 0)
+	    balsa_app.draftbox = mailbox;
+	else if (strcmp("Trash/", key) == 0)
+	    balsa_app.trash = mailbox;
     }
     return TRUE;
 }				/* config_mailbox_init */

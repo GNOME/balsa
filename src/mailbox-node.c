@@ -134,6 +134,7 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->mailbox = NULL;
     mn->style = 0;
     mn->name = NULL;
+    mn->threading_type = BALSA_INDEX_THREADING_JWZ;
 }
 
 static void
@@ -318,7 +319,7 @@ static void
 mb_close_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    balsa_window_close_mailbox(balsa_app.main_window, mbnode->mailbox);
+    balsa_window_close_mbnode(balsa_app.main_window, mbnode);
     balsa_mblist_have_new(balsa_app.mblist);
 }
 

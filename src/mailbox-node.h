@@ -24,6 +24,7 @@
 
 #include <gtk/gtk.h>
 #include "libbalsa.h"
+#include "balsa-index-threading.h"
 
 #define BALSA_TYPE_MAILBOX_NODE          (balsa_mailbox_node_get_type ())
 #define BALSA_MAILBOX_NODE(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX_NODE, BalsaMailboxNode)
@@ -57,6 +58,7 @@ struct _BalsaMailboxNode {
     BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
     LibBalsaMailbox * mailbox; /* != NULL for leaves only */
     gchar *name;       /* used for folders, i.e. when mailbox == NULL */
+    BalsaIndexThreadingType threading_type;
     BalsaMailboxNodeStyle style;
     int expanded:1; /* used for folders */
     int remote:1;   /* is dirname or server field used in data union.

@@ -41,7 +41,7 @@ typedef struct _BalsaIndexPageClass BalsaIndexPageClass;
 struct _BalsaIndexPage {
     GtkObject object;
 
-    LibBalsaMailbox *mailbox;
+    BalsaMailboxNode *mailbox_node;
     GTimeVal last_use;
     GtkWidget *window;		/* "real" BalsaWindow parent */
     GtkWidget *sw;
@@ -54,8 +54,8 @@ struct _BalsaIndexPageClass {
 
 GtkType balsa_index_page_get_type(void);
 GtkObject *balsa_index_page_new(BalsaWindow * window);
-gboolean balsa_index_page_load_mailbox(BalsaIndexPage * page,
-				       LibBalsaMailbox * mailbox);
+gboolean balsa_index_page_load_mailbox_node(BalsaIndexPage * page,
+					    BalsaMailboxNode * mbnode);
 void balsa_index_page_close_and_destroy(GtkObject * obj);
 
 void balsa_message_reply(GtkWidget * widget, gpointer index);

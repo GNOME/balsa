@@ -63,7 +63,7 @@ extern "C" {
     void balsa_index_set_mailbox(BalsaIndex * bindex,
 				 LibBalsaMailbox * mailbox);
     void balsa_index_refresh(BalsaIndex * bindex);
-
+    void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
 
 /* adds a new message */
     void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);

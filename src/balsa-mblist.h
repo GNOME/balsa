@@ -66,6 +66,9 @@ GList *mblist_find_all_unread_mboxes(void);
 LibBalsaMailbox* mblist_find_mbox_by_name(BalsaMBList * mblist,
 					     const char* name);
 void mblist_open_mailbox(LibBalsaMailbox * mailbox);
+void mblist_close_mailbox(LibBalsaMailbox * mailbox);
 BalsaMailboxNode* mblist_get_selected_node(BalsaMBList *mblist);
+BalsaMailboxNode* mblist_get_node_by_mailbox(BalsaMBList *mblist,
+					     LibBalsaMailbox * mailbox);
 
 #endif

@@ -1102,3 +1102,28 @@ balsa_index_refresh(BalsaIndex * bindex)
 
     gtk_clist_thaw(GTK_CLIST(bindex));
 }
+
+void
+balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
+{
+    GList *list;
+    g_return_if_fail(bindex);
+
+    bindex->threading_type = thtype;
+
+    printf("Setting threading to %d\n", thtype);
+    if(bindex->mailbox) {
+	gtk_clist_freeze(GTK_CLIST(bindex));
+	gtk_clist_clear(GTK_CLIST(bindex));
+	list = bindex->mailbox->message_list;
+	while (list) {
+	    balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
+	    list = list->next;
+	}
+	
+	balsa_index_threading(bindex);
+	gtk_clist_sort(GTK_CLIST(bindex));
+	DO_CLIST_WORKAROUND(GTK_CLIST(bindex));
+	gtk_clist_thaw(GTK_CLIST(bindex));
+    }
+}

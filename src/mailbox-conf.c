@@ -31,7 +31,6 @@
 #include "balsa-app.h"
 #include "balsa-mblist.h"
 #include "mailbox-conf.h"
-#include "main-window.h"
 #include "mailbox-node.h"
 #include "pref-manager.h"
 #include "save-restore.h"
@@ -198,7 +197,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 
     /* Close the mailbox, in case it was open */
     if (!LIBBALSA_IS_MAILBOX_POP3(mailbox))
-	balsa_window_close_mailbox(balsa_app.main_window, mailbox);
+	mblist_close_mailbox(mailbox);
 
     /* Delete local files */
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox) && button == 1)

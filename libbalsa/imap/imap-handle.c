@@ -733,17 +733,11 @@ imap_envelope_free(ImapEnvelope *env)
 }
 
 /* ================ BEGIN OF BODY STRUCTURE FUNCTIONS ================== */
-static gboolean
-imap_str_case_equal(gconstpointer v, gconstpointer v2)
-{
-  return g_ascii_strcasecmp(v, v2) == 0;
-}
-
 ImapBody*
 imap_body_new(void)
 {
   ImapBody *body = g_malloc0(sizeof(ImapBody));
-  body->params = g_hash_table_new_full(g_str_hash, imap_str_case_equal, 
+  body->params = g_hash_table_new_full(g_str_hash, g_str_equal, 
                                        g_free, g_free);
   return body;
 }
@@ -786,13 +780,16 @@ imap_body_set_desc(ImapBody* body, char* str)
 void
 imap_body_add_param(ImapBody *body, char *key, char *val)
 {
+  int c;
+  for(c=0; key[c]; c++)
+    key[c] = tolower(key[c]);
   g_hash_table_insert(body->params, key, val);
 }
 
 const gchar*
-imap_body_get_param(ImapBody *body, const gchar *param)
+imap_body_get_param(ImapBody *body, const gchar *key)
 {
-  return g_hash_table_lookup(body->params, param);
+  return g_hash_table_lookup(body->params, key);
 }
 
 gchar*
@@ -1734,9 +1731,11 @@ ir_body_fld_param_hash(struct siobuf* sio, GHashTable * params)
       key = imap_get_string(sio);
       if(sio_getc(sio) != ' ') { g_free(key); return IMR_PROTOCOL; }
       val = imap_get_string(sio);
-      if(params) 
+      if(params) {
+        for(c=0; key[c]; c++)
+          key[c] = tolower(key[c]);
         g_hash_table_insert(params, key, val);
-      else {
+      } else {
         g_free(key); g_free(val);
       }
     } while( (c=sio_getc(sio)) != ')');
@@ -1767,7 +1766,6 @@ static ImapResponse
 ir_body_fld_desc(struct siobuf* sio, ImapBody *body)
 {
   gchar* desc = imap_get_nstring(sio);
-  /* if(desc) printf("body fld-desc=%s\n", desc); */
   if(body)
     imap_body_set_desc(body, desc);
   else g_free(desc);
@@ -1875,7 +1873,7 @@ ir_body_fld_dsp (struct siobuf *sio, ImapBody * body)
   if (body)
     {
       body->dsp_params =
-	g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free,
+	g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
 			       g_free);
       rc = ir_body_fld_param_hash (sio, body->dsp_params);
     }
@@ -1995,7 +1993,7 @@ ir_body_ext_mpart (struct siobuf *sio, ImapBody * body,
   if (body)
     {
       body->ext.mpart.params =
-	g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free,
+	g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
 			       g_free);
       rc = ir_body_fld_param_hash (sio, body->ext.mpart.params);
     }

@@ -1454,7 +1454,6 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     }
 
     lbbody->mime_type = g_ascii_strdown(imap_body_get_mime_type(imap_body),-1);
-    lbbody->filename  = g_strdup(imap_body->desc);
     lbbody->filename  = g_strdup(imap_body_get_param(imap_body, "name"));
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
     if(imap_body->envelope) {

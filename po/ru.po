@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-06-16 12:23+0000\n"
-"PO-Revision-Date: 2000-06-16 12:26+00:00\n"
+"POT-Creation-Date: 2000-06-17 19:02+0000\n"
+"PO-Revision-Date: 2000-06-17 19:03+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -259,7 +259,7 @@ msgid "Mailbox password:"
 msgstr "Пароль для почтового ящика:"
 
 #. password field
-#: src/balsa-index-page.c:301 src/mailbox-conf.c:991 src/mailbox-conf.c:1090
+#: src/balsa-index-page.c:301 src/mailbox-conf.c:995 src/mailbox-conf.c:1094
 msgid "Password:"
 msgstr "Пароль:"
 
@@ -305,8 +305,8 @@ msgid "Transfer"
 msgstr "Передать"
 
 #: src/balsa-index-page.c:833
-msgid "No ;'s!\n"
-msgstr ""
+msgid "Sorry, no semicolons are allowed in the name!\n"
+msgstr "Извините, в имени не допустимо наличие точки с запятой!\n"
 
 #: src/balsa-index-page.c:870
 msgid "The Card Name field must be non-empty.\n"
@@ -373,7 +373,7 @@ msgstr "Дата"
 msgid "To"
 msgstr "Кому"
 
-#: src/balsa-mblist.c:221 src/mailbox-conf.c:1185
+#: src/balsa-mblist.c:221 src/mailbox-conf.c:1188
 msgid "Mailbox"
 msgstr "Почтовый ящик"
 
@@ -398,7 +398,7 @@ msgstr "Сохранить MIME-закодированную часть"
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/balsa-message.c:214 src/mailbox-conf.c:670 src/sendmsg-window.c:130
+#: src/balsa-message.c:214 src/mailbox-conf.c:680 src/sendmsg-window.c:130
 #: src/sendmsg-window.c:429 src/sendmsg-window.c:1101
 #: src/sendmsg-window.c:1408 src/sendmsg-window.c:1431
 msgid "Cancel"
@@ -490,8 +490,8 @@ msgid "Outbound"
 msgstr "Исходящие"
 
 #: src/filter-edit-dialog.c:32
-msgid "Pre-send"
-msgstr ""
+msgid "Before Sending"
+msgstr "Перед отправкой"
 
 #: src/filter-edit-dialog.c:33
 msgid "Demand"
@@ -573,7 +573,7 @@ msgstr "В тексте письма"
 msgid "Match string:"
 msgstr "Строка для сравнения:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:285 src/mailbox-conf.c:1150
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:286 src/mailbox-conf.c:1153
 #: src/pref-manager.c:873
 msgid "Add"
 msgstr "Добавить"
@@ -662,7 +662,7 @@ msgstr "Восстановить"
 msgid "Balsa Filters"
 msgstr "Управление фильтрами"
 
-#: src/mailbox-conf.c:162
+#: src/mailbox-conf.c:163
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -672,7 +672,7 @@ msgstr ""
 "Почтовый ящик %s и все его содержимое будут удалены из системы.\n"
 "Вы уверены, что Вы этого хотите?"
 
-#: src/mailbox-conf.c:167
+#: src/mailbox-conf.c:168
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -684,122 +684,126 @@ msgstr ""
 "почтовый ящик\"\n"
 " Вы уверены, что Вы этого хотите?"
 
-#: src/mailbox-conf.c:196
+#: src/mailbox-conf.c:197
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Почтовый ящик не найден в узлах balsa_app.mailbox?\n"
 
-#: src/mailbox-conf.c:240
+#: src/mailbox-conf.c:241
 msgid "Mailbox Configurator"
 msgstr "Конфигурация почт. ящика"
 
-#: src/mailbox-conf.c:295 src/mailbox-conf.c:1144
+#: src/mailbox-conf.c:296 src/mailbox-conf.c:1147
 msgid "Update"
 msgstr "Обновить"
 
-#: src/mailbox-conf.c:439 src/mailbox-conf.c:455 src/mailbox-conf.c:468
+#: src/mailbox-conf.c:436 src/mailbox-conf.c:442 src/mailbox-conf.c:466
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Вы должны заполнить поле названия почтового ящика."
 
-#: src/mailbox-conf.c:442
+#: src/mailbox-conf.c:445
 msgid "You need to fill in the folderpath field."
 msgstr "Вам необходимо заполнить поле \"Путь к папке\"."
 
-#: src/mailbox-conf.c:444
+#: src/mailbox-conf.c:447
 msgid "You need to fill in the IMAP Server field"
 msgstr "Вы должны заполнить поле IMAP-сервера"
 
-#: src/mailbox-conf.c:446
+#: src/mailbox-conf.c:449
 msgid "You need to fill in the username field"
 msgstr "Вы должны заполнить поле имени пользователя"
 
-#: src/mailbox-conf.c:448
+#: src/mailbox-conf.c:451
 msgid "You need to fill in the password field"
 msgstr "Вы должны заполнить поле пароля"
 
-#: src/mailbox-conf.c:450
+#: src/mailbox-conf.c:453
 msgid "You need to fill in the port field"
 msgstr "Вы должны заполнить поле порта"
 
-#: src/mailbox-conf.c:472
+#: src/mailbox-conf.c:470
 msgid "You need to fill in the user field."
 msgstr "Вы должны заполнить поле пользователя."
 
-#: src/mailbox-conf.c:476
+#: src/mailbox-conf.c:474
 msgid "You need to fill in the password field."
 msgstr "Вы должны заполнить поле пароля."
 
-#: src/mailbox-conf.c:480
+#: src/mailbox-conf.c:478
 msgid "You need to fill in the server field."
 msgstr "Вы должны заполнить поле сервера."
 
-#: src/mailbox-conf.c:484
+#: src/mailbox-conf.c:482
 msgid "You need to fill in the port field."
 msgstr "Вы должны заполнить поле \"Порт\"."
 
-#: src/mailbox-conf.c:488
+#: src/mailbox-conf.c:486
 msgid "Some of the fields are blank."
 msgstr "Некоторые из полей пусты."
 
-#: src/mailbox-conf.c:669
+#: src/mailbox-conf.c:639
+#, c-format
+msgid "%s on %s"
+msgstr "%s на %s"
+
+#: src/mailbox-conf.c:679
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Не удалось создать почтовый ящик '%s': %s\n"
 
-#. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:734
-msgid " on "
-msgstr " на "
-
-#: src/mailbox-conf.c:847
+#: src/mailbox-conf.c:838
 msgid "New mailbox type:"
 msgstr "Тип нового почтового ящика"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:853
+#: src/mailbox-conf.c:844
 msgid "Local mailbox"
 msgstr "Местный почтовый ящик"
 
-#: src/mailbox-conf.c:861
-msgid "IMAP server"
-msgstr "IMAP сервер"
+#: src/mailbox-conf.c:854
+msgid "Single IMAP folder"
+msgstr "Одна папка IMAP"
+
+#: src/mailbox-conf.c:863
+msgid "IMAP folder set"
+msgstr "Установлена папка IMAP"
 
 #. mailbox name
-#: src/mailbox-conf.c:884 src/mailbox-conf.c:919 src/mailbox-conf.c:1036
+#: src/mailbox-conf.c:888 src/mailbox-conf.c:923 src/mailbox-conf.c:1040
 msgid "Mailbox Name:"
 msgstr "Название почтового ящика:"
 
 #. path to file
-#: src/mailbox-conf.c:894
+#: src/mailbox-conf.c:898
 msgid "Mailbox path:"
 msgstr "Путь к почтовому ящику:"
 
 #. pop server
-#: src/mailbox-conf.c:936 src/mailbox-conf.c:1046
+#: src/mailbox-conf.c:940 src/mailbox-conf.c:1050
 msgid "Server:"
 msgstr "Сервер:"
 
 #. pop port
-#: src/mailbox-conf.c:955 src/mailbox-conf.c:1060
+#: src/mailbox-conf.c:959 src/mailbox-conf.c:1064
 msgid "Port:"
 msgstr "Порт:"
 
 #. username
-#: src/mailbox-conf.c:974 src/mailbox-conf.c:1075
+#: src/mailbox-conf.c:978 src/mailbox-conf.c:1079
 msgid "Username:"
 msgstr "Имя пользоватеся:"
 
 #. toggle for check
-#: src/mailbox-conf.c:1006 src/main-window.c:394
+#: src/mailbox-conf.c:1010 src/main-window.c:394
 msgid "Check"
 msgstr "Проверить"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1014
+#: src/mailbox-conf.c:1018
 msgid "Delete from server"
 msgstr "Удалить с сервера"
 
-#: src/mailbox-conf.c:1103
+#: src/mailbox-conf.c:1107
 msgid "Folder path:"
 msgstr "Путь к папке:"
 

@@ -124,7 +124,7 @@ typedef void (*ImapUserCb)(ImapMboxHandle *h, ImapUserEventType ue, void *arg,
 typedef void (*ImapMonitorCb)(const char *buffer, int length, int direction,
                               void *arg);
 
-typedef void (*ImapFlagsCb)(unsigned seqno, void *arg);
+typedef void (*ImapFlagsCb)(unsigned cnt, const unsigned seqno[], void *arg);
 typedef void (*ImapSearchCb)(ImapMboxHandle*handle, unsigned seqno, void *arg);
 typedef void(*ImapListCb)(ImapMboxHandle*handle, int delim,
                           const char* mbox, gboolean *flags, void*);

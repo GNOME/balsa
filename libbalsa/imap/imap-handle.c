@@ -1586,7 +1586,7 @@ flags_tasklet(ImapMboxHandle *h, void *data)
 {
   unsigned seqno = GPOINTER_TO_UINT(data);
   if(h->flags_cb)
-    h->flags_cb(seqno, h->flags_arg);
+    h->flags_cb(1, &seqno, h->flags_arg);
 }
 
 static ImapResponse

@@ -1,3 +1,10 @@
+2004-03-18  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: process flags in batches.
+	* libbalsa/imap/imap-commands.c: send batches of flags via imap_cb
+	* libbalsa/imap/imap-handle.c: similarly here.
+	* libbalsa/imap/imap-handle.h: change imap_cb typedef.
+
 2004-03-16 17:13  PeterB
 
 	* libbalsa/mailbox.c: show unread status of deleted messages.

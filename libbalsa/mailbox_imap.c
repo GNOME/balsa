@@ -509,36 +509,47 @@ lbimap_update_flags(LibBalsaMessage *message, ImapMessage *imsg)
    LibBalsaMessage.  We ignore the info in this case.
 */
 static void
-imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
+imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
 {
-    struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
-    ImapMessage *imsg  = imap_mbox_handle_get_msg(mimap->handle, seqno);
-    if(msg_info->message) {
-	LibBalsaMessageFlag old_flags = msg_info->message->flags;
-	LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-	gboolean locked;
-	GList *list;
-
-	/* We don't know if the mailbox is locked,
-	 * ...so we check. */
-	locked = HAVE_MAILBOX_LOCKED(mailbox);
-	if (!locked)
-	    LOCK_MAILBOX(mailbox);
-
-        lbimap_update_flags(msg_info->message, imsg);
-        libbalsa_message_set_icons(msg_info->message);
-        libbalsa_mailbox_msgno_changed(mailbox, seqno);
-
-	list = g_list_prepend(NULL, msg_info->message);
-	libbalsa_mailbox_messages_status_changed(mailbox, list,
-						 (old_flags ^
-						  msg_info->message->flags));
-	g_list_free_1(list);
-	libbalsa_mailbox_invalidate_iters(mailbox);
-
-	if (!locked)
-	    UNLOCK_MAILBOX(mailbox);
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+    unsigned i;
+    gboolean locked;
+    /* We don't know if the mailbox is locked,
+     * ...so we check. */
+    locked = HAVE_MAILBOX_LOCKED(mailbox);
+    if (!locked)
+        LOCK_MAILBOX(mailbox);
+    for(i=0; i<cnt; i++) {
+        struct message_info *msg_info = 
+            message_info_from_msgno(mimap, seqno[i]);
+        ImapMessage *imsg  = 
+            imap_mbox_handle_get_msg(mimap->handle, seqno[i]);
+        if(msg_info->message) {
+            LibBalsaMessageFlag old_flags = msg_info->message->flags;
+            GList *list;
+            
+            lbimap_update_flags(msg_info->message, imsg);
+            libbalsa_message_set_icons(msg_info->message);
+            libbalsa_mailbox_msgno_changed(mailbox, seqno[i]);
+            
+            list = g_list_prepend(NULL, msg_info->message);
+            libbalsa_mailbox_messages_status_changed
+                (mailbox, list,
+                 (old_flags ^
+                  msg_info->message->flags));
+            g_list_free_1(list);
+            /* changing flags does not remove or add elements so
+               invalidating iterators should not be necessary, should
+               it?  In any case, we do it here in the loop body or not
+               at all, if we do not want to dead-lock. Also, if we
+               decide to act on changed flags, we should probably do
+               it in msgno_changed() for consistency.
+               libbalsa_mailbox_invalidate_iters(mailbox);
+            */
+        }
     }
+    if (!locked)
+        UNLOCK_MAILBOX(mailbox);
 }
 
 /* Forward reference. */

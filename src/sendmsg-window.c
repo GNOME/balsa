@@ -199,9 +199,9 @@ create_menu (BalsaSendmsg * bmsg)
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
   menu_items[i] = NULL;
-
+/*
   g_print ("%d menu items\n", i);
-
+*/
   gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
   return menubar;
 }

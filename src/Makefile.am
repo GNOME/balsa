@@ -17,7 +17,7 @@ balsa_SOURCES =	\
 	save-restore.c		\
 	sendmsg-window.c
 
-INCLUDES=-I. -I../libbalsa $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I${top_srcdir}/libbalsa -I${top_srcdir}/libmutt $(GNOME_INCLUDEDIR)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \

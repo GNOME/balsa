@@ -72,7 +72,7 @@ balsa_exit ()
   mailbox = balsa_app.inbox;
   if (balsa_app.debug)
     g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-  while (mailbox->open_ref > 0)
+  while (mailbox && mailbox->open_ref > 0)
     mailbox_open_unref (mailbox);
 
   mailbox = balsa_app.outbox;

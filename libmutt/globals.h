@@ -77,7 +77,7 @@ WHERE char *StatusString;
 WHERE char *Tempdir;
 WHERE char *Tochars;
 WHERE char *Username;
-WHERE char *Visual;
+/*WHERE char *Visual; */
 
 WHERE char *LastFolder;
 

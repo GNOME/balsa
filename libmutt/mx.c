@@ -404,9 +404,7 @@ int mx_get_magic (const char *path)
 
     /* check for mh-style mailbox */
 
-    snprintf (tmp, sizeof (tmp), "%s/.mh_sequences", path);
-    if (access (tmp, F_OK) == 0)
-      return (M_MH);
+    return (M_MH);
 
   }
   else if (st.st_size == 0)

@@ -19,6 +19,14 @@
 
 #include "config.h"
 
+#include <mutt.h>
+#include <mime.h>
+
+#define obstack_chunk_alloc malloc
+#define obstack_chunk_free  free
+
+#include <obstack.h>
+
 #include <gtk-xmhtml/gtk-xmhtml.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,6 +37,9 @@
 #define HTML_HEAD "<html><body bgcolor=#ffffff><p><tt>\n"
 #define HTML_FOOT "</tt></p></body></html>\n"
 
+/* mime */
+gchar *content2html (Message * message);
+
 /* widget */
 static void balsa_message_class_init (BalsaMessageClass * klass);
 static void balsa_message_init (BalsaMessage * bmessage);
@@ -36,8 +47,8 @@ static void balsa_message_size_request (GtkWidget * widget, GtkRequisition * req
 static void balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
 /* static */
-static gchar *message2html (Message * message);
-static gchar *text2html (char *buff);
+
+static void  text2html (gchar* txt, struct obstack* html_buffer);
 
 static GtkBinClass *parent_class = NULL;
 
@@ -193,90 +204,8 @@ balsa_message_set (BalsaMessage * bmessage,
   message_body_ref (bmessage->message);
 
   /* set message contents */
-  buff = message2html (message);
+  buff = content2html (message);
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
   message_body_unref (bmessage->message);
-  g_free (buff);
 }
-
-
-static gchar *
-message2html (Message * message)
-{
-  GString *mbuff = g_string_new (NULL);
-  Body *body;
-  gchar *buff;
-  gchar tbuff[1024];
-  FILE* msg_stream;
-    
-  g_string_append (mbuff, "<html><body bgcolor=#ffffff><p>");
-
-
-  if (message->date)
-    {
-      g_string_append (mbuff, "<b>Date: </b>");
-      /* date */
-      buff = text2html (message->date);
-      g_string_append (mbuff, buff);
-      g_free (buff);
-    }
-
-  if (message->to_list)
-    {
-      g_string_append (mbuff, "<br><b>To: </b>");
-
-      /* to */
-      buff = text2html (make_string_from_list (message->to_list));
-      g_string_append (mbuff, buff);
-      g_free (buff);
-    }
-
-  if (message->from)
-    {
-      g_string_append (mbuff, "<br><b>From: </b>");
-
-      /* from */
-      if (message->from->personal)
-	snprintf (tbuff, 1024, "%s <%s>",
-		  message->from->personal,
-		  message->from->mailbox);
-      else
-	snprintf (tbuff, 1024, "%s", message->from->mailbox);
-
-      buff = text2html (tbuff);
-      g_string_append (mbuff, buff);
-      g_free (buff);
-    }
-
-  if (message->subject)
-    {
-      g_string_append (mbuff, "<br><b>Subject: </b>");
-
-      /* subject */
-      buff = text2html (message->subject);
-      g_string_append (mbuff, buff);
-      g_free (buff);
-    }
-
-  g_string_append (mbuff, "<br></p><p>");
-
-	
-
-  
-  if (message->body_list)
-    {
-      body = (Body *) message->body_list->data;
-      if (body)
-	if (body->buffer)
-	  {
-	    g_string_append (mbuff, body->buffer);
-	  }
-    }
-
-  g_string_append (mbuff, "</p></body></html>");
-  buff = mbuff->str;
-  g_string_free (mbuff, 0);
-  return buff;
-}
-
 

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-06 20:06-0400\n"
+"POT-Creation-Date: 1998-08-07 14:14-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/local-mailbox.c:117
+#: src/local-mailbox.c:118
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
@@ -373,7 +373,7 @@ msgstr ""
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1480
+#: libbalsa/mailbox.c:1152
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

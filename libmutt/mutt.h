@@ -16,6 +16,9 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
+#ifndef __MUTT_H__
+#define __MUTT_H__
+
 #include "muttconfig.h"
 
 #include <stdio.h>
@@ -574,3 +577,4 @@ typedef struct
 
 #include "protos.h"
 #include "globals.h"
+#endif

@@ -933,6 +933,12 @@ message_free (Message * message)
   g_free (message);
 }
 
+gchar*
+message_pathname(Message * message)
+{
+  return  CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno]->path;
+}
+
 
 void
 message_move (Message * message, Mailbox * mailbox)
@@ -1067,6 +1073,35 @@ translate_message (HEADER * cur)
   return message;
 }
 
+
+
+
+char*
+mime_content_type2str(int contenttype)
+{
+  switch (contenttype)
+    {
+    case TYPEOTHER:
+      return "OTHER";
+    case TYPEAUDIO:
+      return "AUDIO";
+    case TYPEAPPLICATION:
+      return "APPLICATION";
+    case TYPEIMAGE:
+      return "IMAGE";
+    case TYPEMULTIPART:
+      return "MULTIPART";
+    case TYPETEXT:
+      return "TEXT";
+    case TYPEVIDEO:
+      return "VIDEO";
+    }
+}
+
+      
+
+
+
 void
 message_body_ref (Message * message)
 {
@@ -1096,7 +1131,7 @@ message_body_ref (Message * message)
    * load message body
    */
   msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
-  
+  fseek(msg->fp, cur->content->offset, 0);
   if (cur->content->type == TYPEMULTIPART)
     {
       cur->content->parts = mutt_parse_multipart(msg->fp,
@@ -1106,99 +1141,47 @@ message_body_ref (Message * message)
     }
   else
     {
-      cur->content->parts = mutt_parse_messageRFC822(msg->fp, cur->content);
+      cur->content->parts = cur->content;
     }
   if (msg != NULL)
     {
-      GString* mbuf = g_string_new(NULL);
+      GString* mbuf = g_string_new("");
       BODY* bdy = cur->content;
-      gchar msg_filename[PATH_MAX];
-      FILE* msg_stream;
       
       if (balsa_app.debug)
 	g_print (_ ("Loading message: %s/%s\n"), TYPE (b->type), b->subtype);
-
       b = cur->content;
-      fprintf(stderr,"After loading message\n");
-      fprintf(stderr,"header->mime    = %d\n", cur->mime);
-      fprintf(stderr,"header->offset  = %d\n", cur->offset);
-      fprintf(stderr,"header->content = %p\n", cur->content);
-      fprintf(stderr," \n\nDumping Message\n");
-      fprintf(stderr,"Dumping a %s[%d] message\n", content_type2str(cur->content->type), cur->content->type);
-      bdy = cur->content->parts;
-      switch(message->mailbox->type)
+      if (balsa_app.debug)
 	{
-	case MAILBOX_MH:
-	case MAILBOX_MAILDIR:
-	  snprintf(msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL(message->mailbox)->path, cur->path);
-	  errno = 0;
-	  msg_stream = fopen(msg_filename, "r");
-	  if (!msg_stream || ferror(msg_stream)) {
-	    fprintf(stderr,"Open of %s failed. Errno = %d, errmsg = '%s'\n",
-		    msg_filename, errno, sys_errlist[errno]);
-	    return;
-	  }
-	  break;
-	default:
-	  msg_stream = fopen(MAILBOX_LOCAL (message->mailbox)->path, "r");
-	  break;
+	  fprintf(stderr,"After loading message\n");
+	  fprintf(stderr,"header->mime    = %d\n", cur->mime);
+	  fprintf(stderr,"header->offset  = %d\n", cur->offset);
+	  fprintf(stderr,"header->content = %p\n", cur->content);
+	  fprintf(stderr," \n\nDumping Message\n");
+	  fprintf(stderr,"Dumping a %s[%d] message\n",
+		  mime_content_type2str(cur->content->type),
+		  cur->content->type);
 	}
-
+      bdy = cur->content->parts;
       while (bdy)
 	{
-	  fprintf(stderr,"h->c->type      = %s[%d]\n",content_type2str(bdy->type), bdy->type);
-	  fprintf(stderr,"h->c->subtype   = %s\n", bdy->subtype);
-	  fprintf(stderr,"======\n");
-	  g_string_append(mbuf, part2html(bdy, msg_stream, 0));
-	  g_string_append(mbuf, "<BR><HR><BR>\n");
+
+	  if (balsa_app.debug)
+	    {
+	      fprintf(stderr,"h->c->type      = %s[%d]\n",mime_content_type2str(bdy->type), bdy->type);
+	      fprintf(stderr,"h->c->subtype   = %s\n", bdy->subtype);
+	      fprintf(stderr,"======\n");
+	    }
+	  body = body_new ();
+	  body->mutt_body = bdy;
+	  fprintf(stderr, "message_body_ref: message->body = %p -> %p\n", body, bdy);
+	  message->body_list = g_list_append (message->body_list, body);
 	  bdy = bdy->next;
+	  
 	}
       
-      mx_close_message (&msg);
-      body = body_new ();
-      body->buffer = g_strdup (mbuf->str);
-      message->body_list = g_list_append (message->body_list, body);
       message->body_ref++;
-      g_string_free(mbuf, TRUE);
-#if 0      
-  
-
-      memset (&s, 0, sizeof (s));
-      mutt_mktemp (tmpfile);
-
-      switch (message->mailbox->type)
-	{
-	case MAILBOX_MH:
-	case MAILBOX_MAILDIR:
-	  snprintf (tmpfile1, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, cur->path);
-	  fp = fopen (tmpfile1, "r");
-	  break;
-	default:
-	  fp = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
-	  break;
-	}
-      s.fpout = fopen (tmpfile, "w+");
-      fseek ((s.fpin = fp), b->offset, 0);
-      mutt_decode_attachment (b, &s);
-
-      fclose (fp);
-
-      fflush (s.fpout);
-      size = readfile (s.fpout, &buf);
-
-      buf[size - 1] = '\0';
-
-      fclose (s.fpout);
-
-      body = body_new ();
-      body->buffer = g_strdup (buf);
-      message->body_list = g_list_append (message->body_list, body);
-      message->body_ref++;
-      g_free (buf);
-
       mx_close_message (&msg);
-      unlink (tmpfile);
-#endif
     }
   /*
    * emit read message
@@ -1231,8 +1214,10 @@ message_body_unref (Message * message)
 	  body = (Body *) list->data;
 	  list = list->next;
 
-	  g_free (body->mime);
-	  g_free (body->buffer);
+	  if (body->htmlized)
+	    g_free (body->htmlized);
+	  if (body->buffer)
+	    g_free (body->buffer);
 	}
 
       g_list_free (message->body_list);
@@ -1316,8 +1301,9 @@ body_new ()
   Body *body;
 
   body = g_malloc (sizeof (Body));
-  body->mime = NULL;
+  body->htmlized = NULL;
   body->buffer = NULL;
+  body->mutt_body = NULL;
   return body;
 }
 
@@ -1328,7 +1314,9 @@ body_free (Body * body)
   if (!body)
     return;
 
-  g_free (body->mime);
-  g_free (body->buffer);
+  if (body->htmlized)
+    g_free (body->htmlized);
+  if (body->buffer)
+    g_free (body->buffer);
   g_free (body);
 }

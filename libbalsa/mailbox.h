@@ -20,6 +20,8 @@
 #ifndef __MAILBOX_H__
 #define __MAILBOX_H__
 
+#include "mutt.h"
+
 /*
  * public macros
  */
@@ -170,7 +172,7 @@ struct _Message
   {
     /* the mailbox this message belongs to */
     Mailbox *mailbox;
-
+    
     /* flags */
     MessageFlags flags;
 
@@ -218,8 +220,9 @@ struct _Address
 
 struct _Body
   {
-    gchar *mime;
-    gchar *buffer;
+    gchar   *buffer;		/* holds raw data of the MIME part, or NULL */
+    gchar   *htmlized;		/* holds htmlrep of buffer, or NULL */
+    BODY    *mutt_body;		/* pointer to BODY struct of mutt message */
   };
 
 

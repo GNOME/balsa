@@ -32,6 +32,7 @@
 #include "mailbox.h"
 #include "misc.h"
 
+
 static gboolean
 do_traverse (GNode * node, gpointer data)
 {
@@ -119,14 +120,21 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 }
 
 static int
-strisnum (gchar * str)
+is_mh_message (gchar * str)
 {
   gint i, len;
   len = strlen (str);
+
+  /* check for ,[0-9]+ deleted messages */
+  if (len && *str == ',' && is_mh_message(&str[1]))
+    return 0;
+
   for (i = 0; i < len; i++)
     {
       if (!isdigit (str[i]))
-	return 0;
+	{
+	  return 0;
+	}
     }
   return 1;
 }
@@ -141,13 +149,15 @@ read_dir (gchar * prefix, struct dirent *d)
   struct stat st;
   MailboxType mailbox_type;
 
+  
   if (!d)
     return;
 
   if (d->d_name[0] == '.')
     return;
 
-  sprintf (filename, "%s/%s", prefix, d->d_name);
+  
+  snprintf (filename, PATH_MAX, "%s/%s", prefix, d->d_name);
 
   if (stat (filename, &st) == -1)
     return;
@@ -156,9 +166,13 @@ read_dir (gchar * prefix, struct dirent *d)
     {
       mailbox_type = mailbox_valid (filename);
       if (mailbox_type == MAILBOX_MH)
-	add_mailbox (d->d_name, filename, mailbox_type, 1);
+	{
+	  add_mailbox (d->d_name, filename, mailbox_type, 1);
+	}
       else
-	add_mailbox (d->d_name, filename, MAILBOX_UNKNOWN, 1);
+	{
+	  add_mailbox (d->d_name, filename, MAILBOX_UNKNOWN, 1);
+	}
       dpc = opendir (filename);
       if (!dpc)
 	return;
@@ -168,31 +182,35 @@ read_dir (gchar * prefix, struct dirent *d)
     }
   else
     {
-      if (!strisnum (d->d_name))
+      if (!is_mh_message (d->d_name))
 	{
-
+	  
 	  mailbox_type = mailbox_valid (filename);
 	  if (mailbox_type != MAILBOX_UNKNOWN)
-	    add_mailbox (d->d_name, filename, mailbox_type, 0);
+	    {
+	      add_mailbox (d->d_name, filename, mailbox_type, 0);
+	    }
 	}
     }
 }
+
 
 void
 load_local_mailboxes ()
 {
   DIR *dp;
   struct dirent *d;
+  struct stat st;
 
   dp = opendir (balsa_app.local_mail_directory);
   if (!dp)
     return;
-
+  
   while ((d = readdir (dp)) != NULL)
     {
       if (d->d_name[0] == '.')
 	continue;
       read_dir (balsa_app.local_mail_directory, d);
-    }
+	}
   closedir (dp);
 }

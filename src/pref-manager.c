@@ -34,8 +34,10 @@ typedef struct _PropertyUI
     GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
     GtkRadioButton *mdi_type[NUM_MDI_MODES];
 
-    GtkWidget *real_name, *email, *smtp_server, *mail_directory;
-    
+    GtkWidget *real_name, *email, *replyto, *signature;
+
+    GtkWidget *smtp_server, *mail_directory;
+
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
   }
@@ -76,9 +78,8 @@ gchar *mdi_type_label[NUM_MDI_MODES] =
 
 /* notebook pages */
 static GtkWidget *create_identity_page (void);
-static GtkWidget *create_mailboxes_page (void);
-static GtkWidget *create_view_page (void);
-static GtkWidget *create_mdi_page (void);
+static GtkWidget *create_mailservers_page (void);
+static GtkWidget *create_display_page (void);
 static GtkWidget *create_misc_page (void);
 
 
@@ -129,24 +130,17 @@ open_preferences_manager (void)
 			     label);
 
   /* mailboxes page */
-  label = gtk_label_new (_ ("Mailboxes"));
+  label = gtk_label_new (_ ("Mail Servers"));
   gtk_notebook_append_page (
 		    GTK_NOTEBOOK (GNOME_PROPERTY_BOX (pui->pbox)->notebook),
-			     create_mailboxes_page (),
+			     create_mailservers_page (),
 			     label);
 
-  /* view page */
-  label = gtk_label_new (_ ("View"));
+  /* display page */
+  label = gtk_label_new (_ ("Display"));
   gtk_notebook_append_page (
 		    GTK_NOTEBOOK (GNOME_PROPERTY_BOX (pui->pbox)->notebook),
-			     create_view_page (),
-			     label);
-
-  /* MDI page */
-  label = gtk_label_new (_ ("MDI"));
-  gtk_notebook_append_page (
-		    GTK_NOTEBOOK (GNOME_PROPERTY_BOX (pui->pbox)->notebook),
-			     create_mdi_page (),
+			     create_display_page (),
 			     label);
 
   /* Misc page */
@@ -257,8 +251,8 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 	break;
       }
 
-  balsa_app.debug = GTK_TOGGLE_BUTTON(pui->debug)->active;
-  balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
+  balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
+  balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
 
   refresh_main_window ();
 
@@ -301,7 +295,7 @@ set_prefs (void)
   g_string_free (str, TRUE);
 
   gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
- 
+
   gtk_entry_set_text (GTK_ENTRY (pui->mail_directory), balsa_app.local_mail_directory);
 
   gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->previewpane), balsa_app.previewpane);
@@ -319,11 +313,12 @@ create_identity_page (void)
   GtkWidget *vbox;
   GtkWidget *table;
   GtkWidget *label;
+  GtkWidget *button;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
 
-  table = gtk_table_new (3, 2, FALSE);
+  table = gtk_table_new (4, 3, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 5);
 
   /* your name */
@@ -346,14 +341,28 @@ create_identity_page (void)
   gtk_table_attach (GTK_TABLE (table), pui->email, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-  /* smtp server */
-  label = gtk_label_new (_ ("SMTP server:"));
+  /* reply-to address */
+  label = gtk_label_new (_ ("Reply-to address:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL, 10, 10);
 
-  pui->smtp_server = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), pui->smtp_server, 1, 2, 2, 3,
+  pui->replyto = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pui->replyto, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  /* signature */
+  label = gtk_label_new (_ ("Signature:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_FILL, GTK_FILL, 10, 10);
+
+  pui->signature = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pui->signature, 1, 2, 3, 4,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  button = gtk_button_new_with_label ("Browse");
+  gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
   return vbox;
@@ -363,38 +372,70 @@ create_identity_page (void)
  * mailboxes notebook page
  */
 static GtkWidget *
-create_mailboxes_page ()
+create_mailservers_page ()
 {
   GtkWidget *vbox;
-  GtkWidget *table;
   GtkWidget *label;
-
+  GtkWidget *frame;
+  GtkWidget *hbox;
+  GtkWidget *bbox;
+  GtkWidget *button;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
 
-  table = gtk_table_new (1, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 5);
+  frame = gtk_frame_new ("POP3 Servers");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+
+  hbox = gtk_hbox_new (FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (frame), hbox);
+
+  label = gtk_label_new ("clist goes here");
+  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 2);
+
+  bbox = gtk_vbutton_box_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), bbox, FALSE, FALSE, 2);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), 25, 15);
+
+  button = gtk_button_new_with_label ("Add");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  button = gtk_button_new_with_label ("Modify");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  button = gtk_button_new_with_label ("Delete");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+
+  frame = gtk_frame_new ("Local Mail");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+  hbox = gtk_hbox_new (TRUE, 0);
+  gtk_container_add (GTK_CONTAINER (frame), hbox);
 
   label = gtk_label_new (_ ("Local mail directory:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
+  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 2);
   pui->mail_directory = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), pui->mail_directory, 1, 2, 0, 1,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+  gtk_box_pack_start (GTK_BOX (hbox), pui->mail_directory, TRUE, TRUE, 2);
+
+  /* smtp server */
+  frame = gtk_frame_new ("Sending Mail");
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+  hbox = gtk_hbox_new (TRUE, 0);
+  gtk_container_add (GTK_CONTAINER (frame), hbox);
+
+  label = gtk_label_new (_ ("SMTP Server:"));
+  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 2);
+  pui->smtp_server = gtk_entry_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), pui->smtp_server, TRUE, TRUE, 2);
 
   return vbox;
 }
 
 
 /*
- * view notebook page
+ * display notebook page
  */
 static GtkWidget *
-create_view_page ()
+create_display_page ()
 {
   GtkWidget *vbox, *vbox1;
   GtkWidget *frame;
@@ -428,24 +469,7 @@ create_view_page ()
   pui->previewpane = gtk_check_button_new_with_label (_ ("Use preview pane"));
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->previewpane));
 
-  return vbox;
-}
-
-/*
- * MDI notebook page
- */
-static GtkWidget *
-create_mdi_page ()
-{
-  GtkWidget *vbox, *vbox1;
-  GtkWidget *frame;
-  GSList *group;
-  gint i;
-
-  vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 10);
-
-  /* MDI */
+/* MDI */
   frame = gtk_frame_new (_ ("MDI"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
@@ -466,7 +490,7 @@ create_mdi_page ()
 }
 
 static GtkWidget *
-create_misc_page()
+create_misc_page ()
 {
   GtkWidget *vbox;
   GtkWidget *frame;

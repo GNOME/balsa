@@ -20,7 +20,6 @@
 
 #include <string.h>
 #include <gnome.h>
-#include <gdk/gdkkeysyms.h>
 
 #include "balsa-app.h"
 #include "balsa-index.h"
@@ -172,7 +171,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   menu = gtk_menu_new ();
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Get New Mail"));
-  gtk_widget_add_accelerator (w, "activate", accel, GDK_Tab, 0, GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator (w, "activate", accel, '\t', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) check_new_messages_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
@@ -215,6 +214,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   gtk_menu_append (GTK_MENU (menu), w);
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Forward"));
+  gtk_widget_add_accelerator (w, "activate", accel, 'F', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) forward_message_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 

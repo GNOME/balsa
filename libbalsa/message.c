@@ -277,6 +277,7 @@ message_user_hdrs(Message *message)
 
     for(tmp = cur->env->userhdrs; tmp; tmp = tmp->next) {
 	pair = g_strsplit(tmp->data,":",1);
+	g_strchug(pair[1]);
 	res = g_list_append(res, pair);
     }
     

@@ -1,3 +1,7 @@
+2002-03-21  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* sk.po: Updated Slovak translation by Marcel Telka <marcel@telka.sk>.
+
 2002-03-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* POTFILES.in: mispelled keymaps_def.h -> keymap_defs.h

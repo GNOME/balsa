@@ -1139,7 +1139,7 @@ bmbl_store_add_gnode(GtkTreeStore * store, GtkTreeIter * parent,
  * */
 static gboolean
 bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
-        BalsaMailboxNode * mbnode)
+		      BalsaMailboxNode * mbnode)
 {
     const gchar *in;
     gchar *name;
@@ -1193,6 +1193,8 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                        TOTAL_COLUMN,  "",
                        -1);
     g_free(name);
+    if (mbnode->mailbox && mbnode->mailbox->open_ref>0)
+	bmbl_node_style(GTK_TREE_MODEL(store), iter);    
     return TRUE;
 }
 
@@ -1422,14 +1424,11 @@ bmbl_mbnode_tab_style(BalsaMailboxNode *mbnode, gint unread)
 
 /* bmbl_node_style [MBG]
  * 
- * ctree:  The ctree containing the mailbox
- * node:  The ctreenode that is associated with the mailbox
- * mailbox:  The mailbox that is to have it's style changed
- * display_info:  whether or not to display the columns
- * 
+ * model:  The model containing the mailbox
+ * iter : the iterator pointing on the mailbox node
  * Description: A function to actually do the changing of the style,
  * and is called by both balsa_mblist_update_mailbox, and
- * balsa_mblist_check_new, hence the (slightly) strange arguments.
+ * balsa_mblist_check_new
  *
  * NOTES: ignore special mailboxes.
  * */

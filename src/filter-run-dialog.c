@@ -184,7 +184,7 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox)
     /* We set the dialog title */
     p->mbox=mbox;
     libbalsa_mailbox_open(p->mbox); 
-    dialog_title=g_strconcat(_("Balsa Filters of mailbox : "),
+    dialog_title=g_strconcat(_("Balsa Filters of Mailbox : "),
                              p->mbox->name,NULL);
     gtk_window_set_title(GTK_WINDOW(p),dialog_title);
     gtk_window_set_wmclass(GTK_WINDOW(p), "filter-run", "Balsa");
@@ -309,12 +309,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     /* FIXME : I saw a lot of different ways to create button with
        pixmaps, hope this one is correct*/
     /* Right/Add button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, _("Add"));
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, _("A_dd"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_add_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, _("Remove"));
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, _("_Remove"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_remove_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -346,12 +346,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* up button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_UP, _("Up"));
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_UP, _("_Up"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_up_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_DOWN, _("Down"));
+    button = balsa_stock_button_with_label(GTK_STOCK_GO_DOWN, _("Do_wn"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);

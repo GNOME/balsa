@@ -347,7 +347,7 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_ITEM_STOCK(N_("F_ilters..."), N_("Manage filters"),
                            filter_dlg_cb, GTK_STOCK_PROPERTIES),
-    GNOMEUIINFO_ITEM_STOCK(N_("_Export filters"), N_("Export filters as Sieve scripts"),
+    GNOMEUIINFO_ITEM_STOCK(N_("_Export Filters"), N_("Export filters as Sieve scripts"),
 			   filter_export_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_END
 };
@@ -616,7 +616,7 @@ static GnomeUIInfo mailbox_menu[] = {
                            empty_trash, GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_APPLY_FILTERS 16
-    GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply Filters"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply _Filters"),
                            N_("Filter the content of the selected mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_END
@@ -1018,8 +1018,9 @@ enable_mailbox_menus(BalsaIndex * index)
         MENU_MAILBOX_NEXT_POS,        MENU_MAILBOX_PREV_POS,
         MENU_MAILBOX_NEXT_UNREAD_POS, MENU_MAILBOX_NEXT_FLAGGED_POS,
         MENU_MAILBOX_MARK_ALL_POS,    MENU_MAILBOX_DELETE_POS,
-        MENU_MAILBOX_EDIT_POS,
-        MENU_MAILBOX_COMMIT_POS,      MENU_MAILBOX_CLOSE_POS };
+        MENU_MAILBOX_EDIT_POS,        MENU_MAILBOX_COMMIT_POS,
+	MENU_MAILBOX_CLOSE_POS,       MENU_MAILBOX_APPLY_FILTERS
+    };
 
     const static int threading_menu_entries[] = {
         MENU_THREADING_FLAT_POS,      MENU_THREADING_SIMPLE_POS,
@@ -2807,7 +2808,7 @@ filter_run_cb(GtkWidget * widget, gpointer data)
 	/* FIXME : Perhaps should we be able to apply filters on folders (ie recurse on all mailboxes in it),
 	   but there are problems of infinite recursion (when one mailbox being filtered is also the destination
 	   of the filter action (eg a copy)). So let's see that later :) */
-	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
+	balsa_information(LIBBALSA_INFORMATION_WARNING, 
                           _("You can apply filters only on mailbox\n"));
 }
 

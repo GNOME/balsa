@@ -329,7 +329,8 @@ get_condition_type(void)
     return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"));
 }
 
-/* fe_negate_condition :handle pressing on the "Contain/Does not Contain"... buttons */
+/* fe_negate_condition :handle pressing on the "Contain/Does not
+   Contain"... buttons */
 static void
 fe_negate_condition(GtkWidget * widget, gpointer data)
 {
@@ -761,6 +762,13 @@ condition_dialog_response(GtkWidget * dialog, gint response,
     }
 }
 
+static void
+condition_dialog_destroy(GtkWidget * dialog, gint response,
+			 gpointer throwaway)
+{
+    condition_dialog = NULL;
+}
+
 /* build_type_notebook
  * build the notebook containing one page for each condition type (simple, regex, date, flag)
  */
@@ -785,7 +793,8 @@ static void build_type_notebook()
     page = gtk_table_new(5, 3, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
 
-    fe_type_simple_label = gtk_label_new(_("One of the specified fields contains:"));
+    fe_type_simple_label = 
+	gtk_label_new_with_mnemonic(_("One of the specified f_ields contains"));
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_simple_label,
                      0, 5, 0, 1,
@@ -797,8 +806,10 @@ static void build_type_notebook()
                      fe_type_simple_entry,
                      0, 5, 1, 2,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(fe_type_simple_label),
+				  fe_type_simple_entry);
 
-    button = gtk_button_new_with_label(_("Contain/Does not contain"));
+    button = gtk_button_new_with_mnemonic(_("Contain/Does _Not Contain"));
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
     gtk_table_attach(GTK_TABLE(page),
@@ -812,7 +823,7 @@ static void build_type_notebook()
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
 
     fe_type_regex_label = 
-        gtk_label_new(_("One of the regular expressions matches"));
+        gtk_label_new_with_mnemonic(_("_One of the regular expressions matches"));
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_regex_label,
                      0, 5, 0, 1,
@@ -839,15 +850,15 @@ static void build_type_notebook()
                      box,
                      0, 5, 4, 5,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    button = gtk_button_new_with_label(_("Add"));
+    button = gtk_button_new_with_mnemonic(_("A_dd"));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_add_pressed), NULL);
-    fe_regex_remove_button = gtk_button_new_with_label(_("Remove"));
+    fe_regex_remove_button = gtk_button_new_with_mnemonic(_("_Remove"));
     gtk_box_pack_start(GTK_BOX(box), fe_regex_remove_button, TRUE, TRUE, 0);
     g_signal_connect(G_OBJECT(fe_regex_remove_button), "clicked",
                      G_CALLBACK(fe_remove_pressed), NULL);
-    button = gtk_button_new_with_label(_("One matches/None matches"));
+    button = gtk_button_new_with_mnemonic(_("One _Matches/None Matches"));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
@@ -943,13 +954,13 @@ static void build_type_notebook()
 static
 void build_condition_dialog()
 {
-    GtkWidget * table,* frame,* button,* page,* box;
+    GtkWidget * table,* label,* button,* page,* box;
 
     page = gtk_table_new(7, 2, FALSE);
     /* builds the toggle buttons to specify fields concerned by the conditions of
      * the filter */
     
-    fe_match_frame = gtk_frame_new(_("Match in:"));
+    fe_match_frame = gtk_frame_new(_("Match In"));
     gtk_frame_set_label_align(GTK_FRAME(fe_match_frame), 
                               GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(fe_match_frame), GTK_SHADOW_ETCHED_IN);
@@ -961,7 +972,7 @@ void build_condition_dialog()
     table = gtk_table_new(5, 2, TRUE);
     gtk_container_add(GTK_CONTAINER(fe_match_frame), table);
     
-    button = gtk_button_new_with_label(_("All"));
+    button = gtk_button_new_with_mnemonic(_("_All"));
     gtk_table_attach(GTK_TABLE(table),
                      button,
                      0, 1, 4, 5,
@@ -969,7 +980,7 @@ void build_condition_dialog()
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_match_fields_buttons_cb),
                      GINT_TO_POINTER(1));
-    button = gtk_button_new_with_label(_("Clear"));
+    button = gtk_button_new_with_mnemonic(_("C_lear"));
     gtk_table_attach(GTK_TABLE(table),
                      button,
                      1, 2, 4, 5,
@@ -978,42 +989,43 @@ void build_condition_dialog()
                      G_CALLBACK(fe_match_fields_buttons_cb),
                      GINT_TO_POINTER(3));
     
-    fe_matching_fields_body = gtk_check_button_new_with_label(_("Body"));
+    fe_matching_fields_body = gtk_check_button_new_with_mnemonic(_("_Body"));
     gtk_table_attach(GTK_TABLE(table),
                      fe_matching_fields_body,
                      0, 1, 0, 1,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     g_signal_connect(G_OBJECT(fe_matching_fields_body), "toggled",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_to = gtk_check_button_new_with_label(_("To:"));
+    fe_matching_fields_to = gtk_check_button_new_with_mnemonic(_("_To:"));
     gtk_table_attach(GTK_TABLE(table),
                      fe_matching_fields_to,
                      0, 1, 1, 2,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     g_signal_connect(G_OBJECT(fe_matching_fields_to), "toggled",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_from = gtk_check_button_new_with_label(_("From:"));
+    fe_matching_fields_from = gtk_check_button_new_with_mnemonic(_("_From:"));
     gtk_table_attach(GTK_TABLE(table),
                      fe_matching_fields_from,
                      1, 2, 1, 2,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     g_signal_connect(G_OBJECT(fe_matching_fields_from), "toggled",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_subject = gtk_check_button_new_with_label(_("Subject"));
+    fe_matching_fields_subject = 
+	gtk_check_button_new_with_mnemonic(_("_Subject"));
     gtk_table_attach(GTK_TABLE(table),
                      fe_matching_fields_subject,
                      0, 1, 2, 3,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     g_signal_connect(G_OBJECT(fe_matching_fields_subject), "toggled",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_cc = gtk_check_button_new_with_label(_("Cc:"));
+    fe_matching_fields_cc = gtk_check_button_new_with_mnemonic(_("_Cc:"));
     gtk_table_attach(GTK_TABLE(table),
                      fe_matching_fields_cc,
                      1, 2, 2, 3,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     g_signal_connect(G_OBJECT(fe_matching_fields_cc), "toggled",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_us_head = gtk_check_button_new_with_label(_("User header:"));
+    fe_matching_fields_us_head = gtk_check_button_new_with_mnemonic(_("_User header:"));
     gtk_table_attach(GTK_TABLE(table),
                      fe_matching_fields_us_head,
                      0, 1, 3, 4,
@@ -1031,21 +1043,19 @@ void build_condition_dialog()
                      1, 2, 3, 4,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     
-    frame = gtk_frame_new(_("Selected condition search type:"));
-    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
-    gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 5);
+    box = gtk_hbox_new(FALSE, 5);
     gtk_table_attach(GTK_TABLE(page),
-                     frame,
+                     box,
                      0, 2, 2, 3,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
-    box = gtk_hbox_new(FALSE, 5);
-    gtk_container_add(GTK_CONTAINER(frame), box);
 
+    label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
+    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
     fe_search_option_menu = 
         fe_build_option_menu(fe_search_type, ELEMENTS(fe_search_type),
                              G_CALLBACK(fe_typesmenu_cb));
     gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);
 
     build_type_notebook();
     gtk_table_attach(GTK_TABLE(page),
@@ -1106,6 +1116,8 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
 
         g_signal_connect(G_OBJECT(condition_dialog), "response",
                          G_CALLBACK(condition_dialog_response), NULL);
+        g_signal_connect(G_OBJECT(condition_dialog), "destroy",
+                         G_CALLBACK(condition_dialog_destroy), NULL);
         /* Now we build the dialog*/
         build_condition_dialog();
         /* For now this box is modal */
@@ -1572,6 +1584,7 @@ fe_new_pressed(GtkWidget * widget, gpointer data)
 
     /* Adds "New Filter" to the list of actual new filters names */
     new_filters_names=g_list_prepend(new_filters_names,g_strdup(new_item));
+    gtk_widget_grab_focus(fe_name_label);
 }                       /* end fe_new_pressed() */
 
 /*

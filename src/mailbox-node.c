@@ -587,9 +587,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 	/* FIXME: the expanded state needs to be preserved; it would 
 	   be reset when all the children are removed */
 	gboolean expanded = mn->expanded;
-        //balsa_mailbox_nodes_lock(TRUE);
 	balsa_remove_children_mailbox_nodes(gnode);
-        //balsa_mailbox_nodes_unlock(TRUE);
         balsa_mailbox_node_append_subtree(mn, gnode);
 	if (expanded)
             /* if this is an IMAP node, we must scan the children */

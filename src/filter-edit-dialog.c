@@ -207,13 +207,13 @@ build_left_side(void)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* new button */
-    fe_new_button = balsa_stock_button_with_label(GTK_STOCK_NEW, _("New"));
+    fe_new_button = balsa_stock_button_with_label(GTK_STOCK_NEW, _("_New"));
     g_signal_connect(G_OBJECT(fe_new_button), "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
     /* delete button */
     fe_delete_button =
-        balsa_stock_button_with_label(GNOME_STOCK_TRASH, _("Delete"));
+        balsa_stock_button_with_label(GNOME_STOCK_TRASH, _("_Delete"));
     g_signal_connect(G_OBJECT(fe_delete_button), "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
@@ -239,7 +239,7 @@ build_match_page()
 
     /* The name entry */
 
-    fe_name_label = gtk_label_new(_("Filter name:"));
+    fe_name_label = gtk_label_new_with_mnemonic(_("_Filter name:"));
     gtk_table_attach(GTK_TABLE(page),
 		     fe_name_label,
 		     0, 2, 0, 1,
@@ -251,6 +251,7 @@ build_match_page()
 		     fe_name_entry,
 		     2, 10, 0, 1,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(fe_name_label), fe_name_entry);
 
     /* The filter op-code : "OR" or "AND" all the conditions */ 
 
@@ -297,16 +298,16 @@ build_match_page()
 		     box,
 		     0, 5, 8, 9,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    fe_condition_edit_button = gtk_button_new_with_label(_("Edit"));
+    fe_condition_edit_button = gtk_button_new_with_mnemonic(_("_Edit"));
     gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
     gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button, TRUE, TRUE, 0);
     g_signal_connect(G_OBJECT(fe_condition_edit_button), "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(0));
-    button = gtk_button_new_with_label(_("New"));
+    button = gtk_button_new_with_mnemonic(_("Ne_w"));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(1));
-    fe_condition_delete_button = gtk_button_new_with_label(_("Remove"));
+    fe_condition_delete_button = gtk_button_new_with_mnemonic(_("_Remove"));
     gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
     gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button, TRUE, 
                        TRUE, 0);

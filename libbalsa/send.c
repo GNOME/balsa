@@ -188,7 +188,6 @@ static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
 
-// GtkWidget *send_progress = NULL;
 GtkWidget *send_progress_message = NULL;
 GtkWidget *send_dialog = NULL;
 GtkWidget *send_dialog_bar = NULL;
@@ -357,14 +356,12 @@ write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
         /* balsa was started. This should be safe because we have already */
         /* established that fccbox is in fact an IMAP mailbox */
         if(server == (LibBalsaServer *)NULL) {
-            libbalsa_unlock_mutt();
             libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
                                  _("Unable to open sentbox - could not get IMAP server information"));
             return -1;
         }
         if (!(server->passwd && *server->passwd) &&
             !(server->passwd = libbalsa_server_get_password(server, fccbox))) {
-            libbalsa_unlock_mutt();
             libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
                                  "Unable to open sentbox - could not get passwords for server");
             return -1;
@@ -756,7 +753,6 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
     if (mqi != NULL)
       mqi->refcount--;
 
-    gdk_threads_enter();
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0) {
@@ -772,7 +768,6 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
 	    _("Message submission problem, placing it into your outbox.\n" 
 	      "System will attempt to resubmit the message until you delete it."));
     }
-    gdk_threads_leave();
     if (mqi != NULL && mqi->refcount <= 0)
         msg_queue_item_destroy(mqi);
     send_unlock();
@@ -1049,10 +1044,10 @@ balsa_send_message_real(SendMessageInfo* info) {
        on the messages with a 2xx status recorded against them.  However
        its possible for individual recipients to fail too.  Need a way to
        report it all.  */
+    gdk_threads_enter();
     smtp_enumerate_messages (info->session, handle_successful_send, 
                              &session_started);
 
-    gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox);
     gdk_threads_leave();
 

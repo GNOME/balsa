@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 2\n"
-"POT-Creation-Date: 2003-07-02 20:13+0200\n"
-"PO-Revision-Date: 2003-07-02 20:12+0200\n"
+"POT-Creation-Date: 2003-07-09 10:23+0200\n"
+"PO-Revision-Date: 2003-07-09 10:21+0200\n"
 "Last-Translator: Danilo Šegan <danilo@prevod.org>\n"
 "Language-Team: Serbian (sr) <serbiangnome-lista@nongnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -117,40 +117,40 @@ msgstr "Pokušaj primene neispravnog filtera"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Neispravni filteri %s za sanduče %s"
 
-#: libbalsa/filter.c:202 libbalsa/filter.c:279
+#: libbalsa/filter.c:203 libbalsa/filter.c:280
 msgid "Unable to load message body to match filter"
 msgstr "Ne može da učita telo poruke radi poređenja sa filterom"
 
-#: libbalsa/filter.c:479
+#: libbalsa/filter.c:480
 #, c-format
 msgid "Invalid filter: %s"
 msgstr "Neispravan filter: %s"
 
-#: libbalsa/filter.c:593 libbalsa/filter.c:612
+#: libbalsa/filter.c:594 libbalsa/filter.c:613
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "Loše ime sandučeta u filteru: %s"
 
-#: libbalsa/filter.c:597
+#: libbalsa/filter.c:598
 msgid "Error when copying messages"
 msgstr "Greška pri kopiranju poruka."
 
-#: libbalsa/filter.c:605
+#: libbalsa/filter.c:606
 msgid "Error when trashing messages"
 msgstr "Greška pri prebacivanju poruka u smeće"
 
-#: libbalsa/filter.c:616
+#: libbalsa/filter.c:617
 msgid "Error when moving messages"
 msgstr "Greška pri premeštanju poruka"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2406
-#: src/sendmsg-window.c:2407
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2285
+#: src/sendmsg-window.c:2286
 msgid "Re:"
 msgstr "Odg:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2435 src/sendmsg-window.c:2436
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2315 src/sendmsg-window.c:2316
 msgid "Fwd:"
 msgstr "Prosl:"
 
@@ -463,22 +463,22 @@ msgstr ""
 "Greška pri premeštanju poruka iz %s u %s\n"
 "Poruke su ostavljene u %s\n"
 
-#: libbalsa/message.c:438
+#: libbalsa/message.c:461
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr "Polazno sanduče (%s) se može samo čitati. Ne može da premesti poruke"
 
-#: libbalsa/message.c:447 libbalsa/message.c:559
+#: libbalsa/message.c:470 libbalsa/message.c:582
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for writing"
 msgstr "Ne može da upisuje u odredišno sanduče (%s)"
 
-#: libbalsa/message.c:498
+#: libbalsa/message.c:521
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "Ne može da kopira u odredišno sanduče (%s)"
 
-#: libbalsa/message.c:1134
+#: libbalsa/message.c:1157
 msgid "(No subject)"
 msgstr "(Bez naslova)"
 
@@ -922,7 +922,7 @@ msgstr "gpgme ne može da napravi nove podatke: %s"
 msgid "Sending Mail..."
 msgstr "Šalje poštu..."
 
-#: libbalsa/send.c:221 src/main-window.c:1818
+#: libbalsa/send.c:221 src/main-window.c:1820
 msgid "_Hide"
 msgstr "_Sakrij"
 
@@ -965,8 +965,8 @@ msgstr ""
 msgid "Connected to MTA"
 msgstr "Povezan na server za slanje"
 
-#: libbalsa/send.c:886 src/balsa-message.c:1203 src/print.c:356
-#: src/sendmsg-window.c:791 src/sendmsg-window.c:2226 src/store-address.c:322
+#: libbalsa/send.c:886 src/balsa-message.c:1230 src/print.c:349
+#: src/sendmsg-window.c:666 src/sendmsg-window.c:2103 src/store-address.c:323
 msgid "From:"
 msgstr "Od:"
 
@@ -974,8 +974,8 @@ msgstr "Od:"
 msgid "From"
 msgstr "Od"
 
-#: libbalsa/send.c:897 src/balsa-message.c:1212 src/print.c:366
-#: src/sendmsg-window.c:790 src/sendmsg-window.c:2232 src/store-address.c:323
+#: libbalsa/send.c:897 src/balsa-message.c:1239 src/print.c:353
+#: src/sendmsg-window.c:665 src/sendmsg-window.c:2110 src/store-address.c:324
 msgid "To:"
 msgstr "Za:"
 
@@ -1010,7 +1010,7 @@ msgstr ""
 "Problem na SMTP serveru (%d): %s\n"
 "Poruka je zadržana među odlaznom poštom."
 
-#: libbalsa/send.c:1551 libbalsa/send.c:1770
+#: libbalsa/send.c:1551 libbalsa/send.c:1775
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Ova poruka neće biti šifrovana za skrivene primaoce."
 
@@ -1128,7 +1128,7 @@ msgstr "Molim unesite podatke o sebi."
 msgid "_Name:"
 msgstr "_Ime:"
 
-#: libinit_balsa/balsa-druid-page-user.c:79 src/store-address.c:362
+#: libinit_balsa/balsa-druid-page-user.c:79 src/store-address.c:364
 msgid "_Email Address:"
 msgstr "Adresa _e-pošte:"
 
@@ -1498,7 +1498,7 @@ msgstr "Odjavljuje pretplatu za %s..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr "Ne može da preuzme zaglavlja sa ovog izdanja IMAP servera."
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2790
+#: libmutt/imap/message.c:89 src/balsa-message.c:2855
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "Ne može da napravi privremenu datoteku %s"
@@ -1888,7 +1888,7 @@ msgstr "%d zadržanih."
 msgid "Can't write message"
 msgstr "Ne može da upišeporuku"
 
-#: libmutt/parse.c:619
+#: libmutt/parse.c:624
 msgid "multipart message has no boundary parameter!"
 msgstr "poruka iz više delova ne sadrži parametar za granicu!"
 
@@ -2239,47 +2239,47 @@ msgstr "Izaberite odredišni direktorijum"
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Prikazano sanduče: %s sa %ld poruka, i od toga %ld novih"
 
-#: src/balsa-message.c:323
+#: src/balsa-message.c:327
 msgid "Content"
 msgstr "Sadržaj"
 
-#: src/balsa-message.c:395
+#: src/balsa-message.c:399
 msgid "Message parts"
 msgstr "Delovi poruke"
 
-#: src/balsa-message.c:479
+#: src/balsa-message.c:483
 msgid "File already exists. Overwrite?"
 msgstr "Datoteka već postoji. Presnimiti preko nje?"
 
-#: src/balsa-message.c:491
+#: src/balsa-message.c:495
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "Ne može da sačuva „%s“: %s"
 
-#: src/balsa-message.c:505
+#: src/balsa-message.c:509
 #, c-format
 msgid "Save %s MIME Part"
 msgstr "Sačuvaj %s MIME deo"
 
-#: src/balsa-message.c:660
+#: src/balsa-message.c:664
 msgid "Save selected..."
 msgstr "Sačuvaj izabrano..."
 
-#: src/balsa-message.c:798 src/balsa-message.c:949 src/balsa-message.c:2002
-#: src/balsa-message.c:2058
+#: src/balsa-message.c:807 src/balsa-message.c:957 src/balsa-message.c:2057
+#: src/balsa-message.c:2113
 msgid "(No sender)"
 msgstr "(Nema pošiljaoca)"
 
-#: src/balsa-message.c:821 src/balsa-message.c:2046
+#: src/balsa-message.c:829 src/balsa-message.c:2101
 msgid "detected a good signature"
 msgstr "prepoznao je ispravan potpis"
 
-#: src/balsa-message.c:826 src/balsa-message.c:2053
+#: src/balsa-message.c:834 src/balsa-message.c:2108
 msgid "detected a good signature with insufficient validity/trust"
 msgstr "prepoznao je ispravan potpis sa nedovoljno ispravnosti/poverenja"
 
-#: src/balsa-message.c:834 src/balsa-message.c:843 src/balsa-message.c:2067
-#: src/balsa-message.c:2076
+#: src/balsa-message.c:842 src/balsa-message.c:851 src/balsa-message.c:2122
+#: src/balsa-message.c:2131
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2289,7 +2289,7 @@ msgstr ""
 "Provera potpisa poruke poslatu od strane %s sa temom „%s“ je dala rezultat:\n"
 "%s"
 
-#: src/balsa-message.c:850
+#: src/balsa-message.c:858
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2297,7 +2297,7 @@ msgid ""
 msgstr ""
 "Provera potpisa poruke poslatu od strane %s sa temom „%s“ je neuspešna!"
 
-#: src/balsa-message.c:855
+#: src/balsa-message.c:863
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a \"multipart/signed\" "
@@ -2307,7 +2307,7 @@ msgstr ""
 "Poruka poslata od strane %s sa temom „%s“ sadrži deo sa potpisom, ali je "
 "struktura neispravna. Potpis, ako uopšte postoji, se ne može proveriti."
 
-#: src/balsa-message.c:956
+#: src/balsa-message.c:964
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a \"multipart/encrypted"
@@ -2316,131 +2316,131 @@ msgstr ""
 "Poruka poslata od strane %s sa temom „%s“ sadrži šifrovani deo, ali je "
 "struktura neispravna."
 
-#: src/balsa-message.c:1194 src/print.c:338 src/sendmsg-window.c:796
-#: src/sendmsg-window.c:2221
+#: src/balsa-message.c:1222 src/print.c:338 src/sendmsg-window.c:671
+#: src/sendmsg-window.c:2098
 msgid "Subject:"
 msgstr "Tema:"
 
-#: src/balsa-message.c:1198 src/print.c:345 src/sendmsg-window.c:2215
+#: src/balsa-message.c:1225 src/print.c:344 src/sendmsg-window.c:2092
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:1209 src/sendmsg-window.c:792
+#: src/balsa-message.c:1236 src/sendmsg-window.c:667
 msgid "Reply-To:"
 msgstr "Odgovor za:"
 
 #. cc:
-#: src/balsa-message.c:1213 src/print.c:367 src/sendmsg-window.c:794
-#: src/sendmsg-window.c:1942 src/sendmsg-window.c:2238 src/store-address.c:324
+#: src/balsa-message.c:1240 src/print.c:354 src/sendmsg-window.c:669
+#: src/sendmsg-window.c:1817 src/sendmsg-window.c:2117 src/store-address.c:325
 msgid "Cc:"
 msgstr "Kopija:"
 
 #. bcc:
-#: src/balsa-message.c:1214 src/print.c:368 src/sendmsg-window.c:793
-#: src/sendmsg-window.c:1947 src/store-address.c:325
+#: src/balsa-message.c:1241 src/print.c:355 src/sendmsg-window.c:668
+#: src/sendmsg-window.c:1822 src/store-address.c:326
 msgid "Bcc:"
 msgstr "Nevidljiva kopija:"
 
-#: src/balsa-message.c:1217 src/print.c:369
+#: src/balsa-message.c:1244 src/print.c:356
 msgid "Fcc:"
 msgstr "Kopija u datoteku:"
 
-#: src/balsa-message.c:1222 src/print.c:375
+#: src/balsa-message.c:1249 src/print.c:361
 msgid "Disposition-Notification-To:"
 msgstr "Obaveštenje o slanju:"
 
-#: src/balsa-message.c:1371 src/balsa-message.c:1387 src/balsa-message.c:1417
-#: src/balsa-message.c:1470
+#: src/balsa-message.c:1404 src/balsa-message.c:1420 src/balsa-message.c:1450
+#: src/balsa-message.c:1503
 msgid "Content Type: external-body\n"
 msgstr "Vrsta sadržaja: spoljašnji sadržaj\n"
 
-#: src/balsa-message.c:1372
+#: src/balsa-message.c:1405
 msgid "Access type: local-file\n"
 msgstr "Način pristupa: lokalna datoteka\n"
 
-#: src/balsa-message.c:1373 src/balsa-message.c:1424 src/balsa-message.c:1557
+#: src/balsa-message.c:1406 src/balsa-message.c:1457 src/balsa-message.c:1612
 #, c-format
 msgid "File name: %s"
 msgstr "Naziv datoteke: %s"
 
-#: src/balsa-message.c:1388
+#: src/balsa-message.c:1421
 msgid "Access type: URL\n"
 msgstr "Način pristupa: Internet adresa\n"
 
-#: src/balsa-message.c:1389
+#: src/balsa-message.c:1422
 #, c-format
 msgid "URL: %s"
 msgstr "Adresa: %s"
 
-#: src/balsa-message.c:1418
+#: src/balsa-message.c:1451
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Način pristupa: %s\n"
 
-#: src/balsa-message.c:1421
+#: src/balsa-message.c:1454
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP: %s\n"
 
-#: src/balsa-message.c:1423
+#: src/balsa-message.c:1456
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Direktorijum: %s\n"
 
-#: src/balsa-message.c:1471
+#: src/balsa-message.c:1504
 msgid "Access type: mail-server\n"
 msgstr "Način pristupa: server za poštu\n"
 
-#: src/balsa-message.c:1472
+#: src/balsa-message.c:1505
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Server za poštu: %s\n"
 
-#: src/balsa-message.c:1474
+#: src/balsa-message.c:1507
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Tema: %s\n"
 
-#: src/balsa-message.c:1485
+#: src/balsa-message.c:1518
 msgid "Send message to obtain this part"
 msgstr "Pošaljite poruku da biste dobili ovaj deo"
 
-#: src/balsa-message.c:1565
+#: src/balsa-message.c:1620
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Vrsta: %s (%s)"
 
-#: src/balsa-message.c:1568
+#: src/balsa-message.c:1623
 #, c-format
 msgid "Content Type: %s"
 msgstr "Vrsta sadržaja: %s"
 
-#: src/balsa-message.c:1579
+#: src/balsa-message.c:1634
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Nije definisana akcija za gledanje ili otvaranje u Gnomovim podešavanjima za "
 "ovu vrstu sadržaja"
 
-#: src/balsa-message.c:1585
+#: src/balsa-message.c:1640
 msgid "Save part"
 msgstr "Sačuvaj deo"
 
-#: src/balsa-message.c:1609 src/balsa-message.c:1634
+#: src/balsa-message.c:1664 src/balsa-message.c:1689
 #, c-format
 msgid "View part with %s"
 msgstr "Gledaj deo pomoću %s"
 
-#: src/balsa-message.c:1924
+#: src/balsa-message.c:1979
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Poziva adresu %s..."
 
-#: src/balsa-message.c:1933 src/balsa-message.c:2709 src/balsa-message.c:3330
+#: src/balsa-message.c:1988 src/balsa-message.c:2774 src/balsa-message.c:3395
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Greška pri prikazivanju %s: %s\n"
 
-#: src/balsa-message.c:1957
+#: src/balsa-message.c:2012
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -2449,12 +2449,12 @@ msgstr ""
 "Greška pri upisu u privremenu datoteku „%s“.\n"
 "Proverite ovlašćenja za direktorijum."
 
-#: src/balsa-message.c:1965
+#: src/balsa-message.c:2020
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Ne može da pristupi privremenoj datoteci %s."
 
-#: src/balsa-message.c:2008
+#: src/balsa-message.c:2063
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -2463,42 +2463,51 @@ msgstr ""
 "Poruka poslate od strane %s sa temom „%s“ sadrži 8-bitne znakove, ali ne \n"
 "i zaglavlje koje opisuje korišćeni zapis (pretvoreno u %s)"
 
-#: src/balsa-message.c:2362
+#: src/balsa-message.c:2417
 msgid "mixed parts"
 msgstr "mešani delovi"
 
-#: src/balsa-message.c:2364
+#: src/balsa-message.c:2419
 msgid "alternative parts"
 msgstr "dopunski delovi"
 
-#: src/balsa-message.c:2366
+#: src/balsa-message.c:2421
 msgid "signed parts"
 msgstr "potpisani delovi"
 
-#: src/balsa-message.c:2368
+#: src/balsa-message.c:2423
 msgid "encrypted parts"
 msgstr "šifrovani delovi"
 
-#: src/balsa-message.c:2370
+#: src/balsa-message.c:2425
+msgid "rfc822 message"
+msgstr "RFC822 poruka"
+
+#: src/balsa-message.c:2427
 #, c-format
 msgid "\"%s\" parts"
 msgstr "„%s“ delovi"
 
-#: src/balsa-message.c:2483
+#: src/balsa-message.c:2462
+#, c-format
+msgid "rfc822 message (from %s, subject \"%s\")"
+msgstr "RFC822 poruka (napisa %s, tema „%s“)"
+
+#: src/balsa-message.c:2548
 #, c-format
 msgid "Open with %s"
 msgstr "Otvori pomoću %s"
 
-#: src/balsa-message.c:2621
+#: src/balsa-message.c:2686
 msgid "Save..."
 msgstr "Sačuvaj..."
 
-#: src/balsa-message.c:2835
+#: src/balsa-message.c:2900
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "ne može da napravi privremenu datoteku %s"
 
-#: src/balsa-message.c:3573
+#: src/balsa-message.c:3640
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2509,7 +2518,7 @@ msgstr ""
 "obaveštenje o prijemu poruke (MDN) pošalje na „%s“.\n"
 "Da li želite da pošaljete ovo obaveštenje?"
 
-#: src/balsa-message.c:3580
+#: src/balsa-message.c:3647
 msgid "Reply to MDN?"
 msgstr "Odgovori na zahtev?"
 
@@ -2638,17 +2647,17 @@ msgstr "_Sve"
 msgid "C_lear"
 msgstr "_Obriši"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2748
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2750
 msgid "_Body"
 msgstr "_Sadržaj"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2749
-#: src/sendmsg-window.c:1931
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2751
+#: src/sendmsg-window.c:1806
 msgid "_To:"
 msgstr "_Za:"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2750
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2752
 msgid "_From:"
 msgstr "_Od:"
 
@@ -2656,7 +2665,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "_Tema"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2752
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2754
 msgid "_Cc:"
 msgstr "_Kopija:"
 
@@ -3119,7 +3128,7 @@ msgstr "_Ukloni sa spiska"
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Ups! sanduče nije nađeno među balsa_app.mailbox čvorovima?\n"
 
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:936
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:811
 msgid "Select Identity"
 msgstr "Izaberite identitet"
 
@@ -3775,7 +3784,14 @@ msgstr ""
 "Ne može da pristupi sandučetu!\n"
 "Molim proverite podešavanja sandučeta."
 
-#: src/main-window.c:1688
+#: src/main-window.c:1675
+msgid "translator_credits"
+msgstr ""
+"Danilo Šegan <danilo@prevod.org>\n"
+"\n"
+"http://www.prevod.org/"
+
+#: src/main-window.c:1690
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3788,73 +3804,73 @@ msgstr ""
 "Ukoliko treba da prijavite greške, molim to učinite na: http://bugzilla."
 "gnome.org/"
 
-#: src/main-window.c:1815
+#: src/main-window.c:1817
 msgid "Checking Mail..."
 msgstr "Proverava poštu..."
 
-#: src/main-window.c:2115
+#: src/main-window.c:2117
 msgid "Finished Checking."
 msgstr "Završena provera."
 
-#: src/main-window.c:2179
+#: src/main-window.c:2181
 #, c-format
 msgid "Sending error: %s"
 msgstr "Greška pri slanju: %s"
 
-#: src/main-window.c:2275
+#: src/main-window.c:2277
 msgid "Balsa: New mail"
 msgstr "Balsa: nova pošta"
 
 # bug: plural-forms
-#: src/main-window.c:2287
+#: src/main-window.c:2289
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Primili ste %d novih poruka."
 
-#: src/main-window.c:2288
+#: src/main-window.c:2290
 msgid "You have received 1 new message."
 msgstr "Primili ste 1 novu poruku."
 
-#: src/main-window.c:2708
+#: src/main-window.c:2710
 msgid "Search mailbox"
 msgstr "Pretraži sanduče"
 
-#: src/main-window.c:2721
+#: src/main-window.c:2723
 msgid "_Reverse search"
 msgstr "_Obrnuta pretraga"
 
-#: src/main-window.c:2724
+#: src/main-window.c:2726
 msgid "_Search for:"
 msgstr "Pre_traži za:"
 
-#: src/main-window.c:2737
+#: src/main-window.c:2739
 msgid "In:"
 msgstr "U:"
 
-#: src/main-window.c:2751
+#: src/main-window.c:2753
 msgid "S_ubject"
 msgstr "T_ema"
 
-#: src/main-window.c:2866
+#: src/main-window.c:2868
 msgid "You can apply filters only on mailbox\n"
 msgstr "Filtere možete primeniti samo na sanduče\n"
 
-#: src/main-window.c:2910 src/main-window.c:2929
+#: src/main-window.c:2912 src/main-window.c:2931
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Neuspešno čuvanje izmena u sandučetu %s."
 
-#: src/main-window.c:3122
+#: src/main-window.c:3124
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (samo za čitanje)"
 
-#: src/main-window.c:3124
+#: src/main-window.c:3126
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3222
+#: src/main-window.c:3224
 msgid "Cannot access the message's body\n"
 msgstr "Ne može da pristupi telu poruke\n"
 
@@ -4187,7 +4203,7 @@ msgstr "Tiha provera u pozadini (bez poruka u liniji sa stanjem)"
 msgid "Quoted and Flowed Text"
 msgstr "Citirani i uključeni tekst"
 
-#: src/pref-manager.c:1744 src/sendmsg-window.c:3793
+#: src/pref-manager.c:1744 src/sendmsg-window.c:3715
 msgid "Quoted Text Regular Expression"
 msgstr "Regularni izraz za citirani tekst"
 
@@ -4416,7 +4432,7 @@ msgid "Invalid or incomplete address label color"
 msgstr "Neispravna ili nepotpuna boja za oznake adresa"
 
 #. create a 2nd notebook page for the fonts
-#: src/pref-manager.c:2279 src/print.c:1375
+#: src/pref-manager.c:2279 src/print.c:1413
 msgid "Fonts"
 msgstr "Fontovi"
 
@@ -4595,64 +4611,64 @@ msgstr "obavezno"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Greška pri prikazivanju link_id %s: %s\n"
 
-#: src/print.c:252
+#: src/print.c:253
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Strana: %i/%i"
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:793
+#: src/print.c:830
 msgid "Type:"
 msgstr "Vrsta:"
 
-#: src/print.c:796
+#: src/print.c:833
 msgid "File name:"
 msgstr "Naziv datoteke:"
 
-#: src/print.c:1281
+#: src/print.c:1319
 msgid "Font available for printing"
 msgstr "Font dostupan za štampu"
 
-#: src/print.c:1287
+#: src/print.c:1325
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr "Font <b>nije</b> dostupan za štampu. Najsličniji: %s"
 
-#: src/print.c:1300
+#: src/print.c:1338
 msgid "Select Font"
 msgstr "Izaberite font"
 
-#: src/print.c:1333
+#: src/print.c:1371
 msgid "Change..."
 msgstr "Izmeni..."
 
-#: src/print.c:1366
+#: src/print.c:1404
 msgid "Print message"
 msgstr "Štampaj poruku"
 
-#: src/print.c:1378
+#: src/print.c:1416
 msgid "Header font"
 msgstr "Slova za zaglavlje"
 
-#: src/print.c:1380
+#: src/print.c:1418
 msgid "Body font"
 msgstr "Slova za sadržaj"
 
-#: src/print.c:1382
+#: src/print.c:1420
 msgid "Footer font"
 msgstr "Slova za podnožje"
 
 #. highlight cited stuff
-#: src/print.c:1386
+#: src/print.c:1424
 msgid "Highlight cited text"
 msgstr "Istakni citirani tekst"
 
-#: src/print.c:1390
+#: src/print.c:1428
 msgid "_Enable highlighting of cited text"
 msgstr "_Omogući isticanje citiranog teksta"
 
-#: src/print.c:1415
+#: src/print.c:1453
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -4661,7 +4677,7 @@ msgstr ""
 "Balsa ne može da pronađe font „%s“.\n"
 "Koristite list „Fontovi“ u prozorčetu „Štampaj poruku“ da ga promenite."
 
-#: src/print.c:1503
+#: src/print.c:1558
 msgid "Balsa: message print preview"
 msgstr "Balsa: pregled poruke pred štampu"
 
@@ -4682,7 +4698,7 @@ msgstr ""
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "Opcija kojom se zanemaruje polje za format je sada uklonjena."
 
-#: src/save-restore.c:894
+#: src/save-restore.c:910
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
@@ -4690,7 +4706,7 @@ msgstr ""
 "Opcija za slanje format polja je sada u meniju Opcije u prozoru za pisanje "
 "poruke."
 
-#: src/save-restore.c:929
+#: src/save-restore.c:945
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
@@ -4821,198 +4837,187 @@ msgstr "_Primedbe"
 msgid "_Keywords"
 msgstr "_Ključne reči"
 
-#: src/sendmsg-window.c:341 src/sendmsg-window.c:412
-msgid "Brazilian"
-msgstr "Brazilski"
+#: src/sendmsg-window.c:340
+msgid "_Brazilian"
+msgstr "_Brazilski"
 
-#: src/sendmsg-window.c:343 src/sendmsg-window.c:414
-msgid "Catalan"
-msgstr "Katalonski"
+#: src/sendmsg-window.c:341
+msgid "_Catalan"
+msgstr "_Katalonski"
 
-#: src/sendmsg-window.c:345 src/sendmsg-window.c:416
-msgid "Chinese Simplified"
-msgstr "Pojednostavljeni kineski"
+#: src/sendmsg-window.c:342
+msgid "_Chinese Simplified"
+msgstr "_Kineski (pojednostavljeni)"
 
-#: src/sendmsg-window.c:347 src/sendmsg-window.c:418
-msgid "Chinese Traditional"
-msgstr "Tradicionalni kineski"
+#: src/sendmsg-window.c:343
+msgid "_Chinese Traditional"
+msgstr "_Kineski (tradicionalni)"
 
-#: src/sendmsg-window.c:349 src/sendmsg-window.c:420
-msgid "Czech"
-msgstr "Češki"
+#: src/sendmsg-window.c:344
+msgid "_Czech"
+msgstr "_Češki"
 
-#: src/sendmsg-window.c:351 src/sendmsg-window.c:422
-msgid "Danish"
-msgstr "Danski"
+#: src/sendmsg-window.c:345
+msgid "_Danish"
+msgstr "_Danski"
 
-#: src/sendmsg-window.c:353 src/sendmsg-window.c:434
-msgid "German"
-msgstr "Nemački"
+#: src/sendmsg-window.c:346
+msgid "_Dutch"
+msgstr "_Holandski"
 
-#: src/sendmsg-window.c:355 src/sendmsg-window.c:424
-msgid "Dutch"
-msgstr "Holandski"
+#: src/sendmsg-window.c:348
+msgid "_English (American)"
+msgstr "_Engleski (američki)"
 
-#. English -> American English, argh...
-#: src/sendmsg-window.c:358 src/sendmsg-window.c:426
-msgid "English"
-msgstr "Engleski"
+#: src/sendmsg-window.c:349
+msgid "_English (British)"
+msgstr "_Engleski (britanski)"
 
-#: src/sendmsg-window.c:360 src/sendmsg-window.c:428
-msgid "Esperanto"
-msgstr "Esperanto"
+#: src/sendmsg-window.c:350
+msgid "_Esperanto"
+msgstr "_Esperanto"
+
+#: src/sendmsg-window.c:351
+msgid "_Estonian"
+msgstr "_Estonski"
+
+#: src/sendmsg-window.c:352
+msgid "_Finnish"
+msgstr "_Finski"
+
+#: src/sendmsg-window.c:353
+msgid "_French"
+msgstr "_Francuski"
+
+#: src/sendmsg-window.c:354
+msgid "_German"
+msgstr "_Nemački"
+
+#: src/sendmsg-window.c:355
+msgid "_Greek"
+msgstr "_Grčki"
+
+#: src/sendmsg-window.c:356
+msgid "_Hebrew"
+msgstr "_Hebrejski"
+
+#: src/sendmsg-window.c:357
+msgid "_Hungarian"
+msgstr "_Mađarski"
+
+#: src/sendmsg-window.c:358
+msgid "_Italian"
+msgstr "_Italijanski"
+
+#: src/sendmsg-window.c:359
+msgid "_Japanese"
+msgstr "_Japanski"
+
+#: src/sendmsg-window.c:360
+msgid "_Korean"
+msgstr "_Korejski"
+
+#: src/sendmsg-window.c:361
+msgid "_Latvian"
+msgstr "_Letonski"
 
 #: src/sendmsg-window.c:362
-msgid "Estonian"
-msgstr "Estonski"
+msgid "_Lithuanian"
+msgstr "_Litvanski"
 
-#: src/sendmsg-window.c:364 src/sendmsg-window.c:430
-msgid "Finnish"
-msgstr "Finski"
+#: src/sendmsg-window.c:363
+msgid "_Norwegian"
+msgstr "_Norveški"
 
-#: src/sendmsg-window.c:366 src/sendmsg-window.c:432
-msgid "French"
-msgstr "Francuski"
+#: src/sendmsg-window.c:364
+msgid "_Polish"
+msgstr "_Poljski"
 
-#: src/sendmsg-window.c:368 src/sendmsg-window.c:436
-msgid "Greek"
-msgstr "Grčki"
+#: src/sendmsg-window.c:365
+msgid "_Portugese"
+msgstr "_Portugalski"
 
-#: src/sendmsg-window.c:370 src/sendmsg-window.c:438
-msgid "Hebrew"
-msgstr "Hebrejski"
+#: src/sendmsg-window.c:366
+msgid "_Romanian"
+msgstr "_Rumunski"
 
-#: src/sendmsg-window.c:372 src/sendmsg-window.c:440
-msgid "Hungarian"
-msgstr "Mađarski"
+#: src/sendmsg-window.c:367
+msgid "_Russian (ISO)"
+msgstr "_Ruski (ISO)"
 
-#: src/sendmsg-window.c:374 src/sendmsg-window.c:442
-msgid "Italian"
-msgstr "Italijanski"
+#: src/sendmsg-window.c:368
+msgid "_Russian (KOI)"
+msgstr "_Ruski (KOI)"
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:444
-msgid "Japanese"
-msgstr "Japanski"
+#: src/sendmsg-window.c:369
+msgid "_Slovak"
+msgstr "_Slovački"
 
-#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
-msgid "Korean"
-msgstr "Korejski"
+#: src/sendmsg-window.c:370
+msgid "_Spanish"
+msgstr "_Španski"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
-msgid "Latvian"
-msgstr "Letonski"
+#: src/sendmsg-window.c:371
+msgid "_Swedish"
+msgstr "_Švedski"
 
-#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
-msgid "Lithuanian"
-msgstr "Litvanski"
+#: src/sendmsg-window.c:372
+msgid "_Turkish"
+msgstr "_Turski"
 
-#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
-msgid "Norwegian"
-msgstr "Norveški"
+#: src/sendmsg-window.c:373
+msgid "_Ukrainian"
+msgstr "_Ukrajinski"
 
-#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
-msgid "Polish"
-msgstr "Poljski"
+#: src/sendmsg-window.c:374
+msgid "_Generic UTF-8"
+msgstr "_Opšti UTF-8"
 
-#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
-msgid "Portugese"
-msgstr "Portugalski"
-
-#: src/sendmsg-window.c:390 src/sendmsg-window.c:462
-msgid "Romanian"
-msgstr "Rumunski"
-
-#: src/sendmsg-window.c:392 src/sendmsg-window.c:464
-msgid "Russian (ISO)"
-msgstr "Ruski (ISO)"
-
-#: src/sendmsg-window.c:394 src/sendmsg-window.c:466
-msgid "Russian (KOI)"
-msgstr "Ruski (KOI)"
-
-#: src/sendmsg-window.c:396 src/sendmsg-window.c:468
-msgid "Slovak"
-msgstr "Slovački"
-
-#: src/sendmsg-window.c:398 src/sendmsg-window.c:470
-msgid "Spanish"
-msgstr "Španski"
-
-#: src/sendmsg-window.c:400 src/sendmsg-window.c:472
-msgid "Swedish"
-msgstr "Švedski"
-
-#: src/sendmsg-window.c:402 src/sendmsg-window.c:474
-msgid "Turkish"
-msgstr "Turski"
-
-#: src/sendmsg-window.c:404 src/sendmsg-window.c:476
-msgid "Ukrainian"
-msgstr "Ukrajinski"
-
-#: src/sendmsg-window.c:406
-msgid "Generic UTF-8"
-msgstr "Opšti UTF-8"
-
-#: src/sendmsg-window.c:478
-msgid "UTF-8"
-msgstr "UTF-8"
-
-# bug: LC_COLLATE?
-#: src/sendmsg-window.c:486
-msgid "_A-J"
-msgstr "_A–J"
-
-# bug: LC_COLLATE?
-#: src/sendmsg-window.c:487
-msgid "_K-Z"
-msgstr "_K–Z"
-
-#: src/sendmsg-window.c:497
+#: src/sendmsg-window.c:386
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG koristi MIME mod"
 
-#: src/sendmsg-window.c:503
+#: src/sendmsg-window.c:392
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG koristi stari OpenPGP mod"
 
-#: src/sendmsg-window.c:514
+#: src/sendmsg-window.c:403
 msgid "_Request Disposition Notification"
 msgstr "_Zahtevaj obaveštenje o prijemu"
 
-#: src/sendmsg-window.c:517
+#: src/sendmsg-window.c:406
 msgid "_Format = Flowed"
 msgstr "_Zapis = uključeno"
 
-#: src/sendmsg-window.c:522
+#: src/sendmsg-window.c:411
 msgid "_Sign Message"
 msgstr "_Potpiši poruku"
 
-#: src/sendmsg-window.c:523
+#: src/sendmsg-window.c:412
 msgid "signs the message using GnuPG"
 msgstr "potpiši poruku pomoću GnuPG-a"
 
-#: src/sendmsg-window.c:526
+#: src/sendmsg-window.c:415
 msgid "_Encrypt Message"
 msgstr "_Šifruj poruku"
 
-#: src/sendmsg-window.c:527
+#: src/sendmsg-window.c:416
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "potpiši poruku pomoću GnuPG-a za sve vidljive primaoce"
 
-#: src/sendmsg-window.c:572
+#: src/sendmsg-window.c:461
 msgid "_Show"
 msgstr "_Prikaži"
 
-#: src/sendmsg-window.c:574
+#: src/sendmsg-window.c:463
 msgid "_Language"
 msgstr "_Jezik"
 
-#: src/sendmsg-window.c:576
+#: src/sendmsg-window.c:465
 msgid "_Options"
 msgstr "_Opcije"
 
-#: src/sendmsg-window.c:659
+#: src/sendmsg-window.c:548
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -5022,11 +5027,11 @@ msgstr ""
 "Sačuvati poruku među nedovršenim porukama?"
 
 #. Comments:
-#: src/sendmsg-window.c:795 src/sendmsg-window.c:2035
+#: src/sendmsg-window.c:670 src/sendmsg-window.c:1911
 msgid "Comments:"
 msgstr "Primedbe:"
 
-#: src/sendmsg-window.c:1243
+#: src/sendmsg-window.c:1118
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5041,43 +5046,43 @@ msgstr ""
 "\n"
 "Da li zaista želite da prikačite ovu datoteku kao referencu?"
 
-#: src/sendmsg-window.c:1254
+#: src/sendmsg-window.c:1129
 msgid "Attach as Reference?"
 msgstr "Priloži kao referencu?"
 
-#: src/sendmsg-window.c:1345
+#: src/sendmsg-window.c:1220
 msgid "Remove"
 msgstr "Ukloni"
 
-#: src/sendmsg-window.c:1356
+#: src/sendmsg-window.c:1231
 msgid "attach as reference"
 msgstr "priloži kao referencu"
 
-#: src/sendmsg-window.c:1362
+#: src/sendmsg-window.c:1237
 msgid "attach as file"
 msgstr "priloži kao datoteku"
 
-#: src/sendmsg-window.c:1510
+#: src/sendmsg-window.c:1385
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Ne može da sazna podatke za datoteku „%s“: %s"
 
-#: src/sendmsg-window.c:1515
+#: src/sendmsg-window.c:1390
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Prilog %s nije obična datoteka."
 
-#: src/sendmsg-window.c:1518
+#: src/sendmsg-window.c:1393
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Ne može da učita datoteku %s\n"
 
-#: src/sendmsg-window.c:1572
+#: src/sendmsg-window.c:1447
 msgid "Attach file"
 msgstr "Priloži datoteku uz poruku"
 
-#: src/sendmsg-window.c:1668 src/sendmsg-window.c:1730
-#: src/sendmsg-window.c:2902
+#: src/sendmsg-window.c:1543 src/sendmsg-window.c:1605
+#: src/sendmsg-window.c:2824
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5086,68 +5091,68 @@ msgstr ""
 "Mogući razlog: nedovoljno prostora za privremeni smeštaj"
 
 #. From:
-#: src/sendmsg-window.c:1926
+#: src/sendmsg-window.c:1801
 msgid "F_rom:"
 msgstr "O_d:"
 
 #. Subject:
-#: src/sendmsg-window.c:1938
+#: src/sendmsg-window.c:1813
 msgid "S_ubject:"
 msgstr "_Tema:"
 
 #. fcc:
-#: src/sendmsg-window.c:1952
+#: src/sendmsg-window.c:1827
 msgid "F_cc:"
 msgstr "U _datoteku:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1981
+#: src/sendmsg-window.c:1857
 msgid "_Reply To:"
 msgstr "_Odgovor za:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1988
+#: src/sendmsg-window.c:1864
 msgid "_Attachments:"
 msgstr "_Prilozi:"
 
 #. Keywords:
-#: src/sendmsg-window.c:2038
+#: src/sendmsg-window.c:1914
 msgid "Keywords:"
 msgstr "Ključne reči:"
 
-#: src/sendmsg-window.c:2200
+#: src/sendmsg-window.c:2077
 msgid "you"
 msgstr "vi"
 
-#: src/sendmsg-window.c:2209
+#: src/sendmsg-window.c:2086
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------prosleđena poruka od %s------\n"
 
-#: src/sendmsg-window.c:2242
+#: src/sendmsg-window.c:2121
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID poruke: %s\n"
 
-#: src/sendmsg-window.c:2248
+#: src/sendmsg-window.c:2127
 msgid "References:"
 msgstr "Reference:"
 
-#: src/sendmsg-window.c:2258
+#: src/sendmsg-window.c:2137
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "%s — %s napisa:\n"
 
-#: src/sendmsg-window.c:2260
+#: src/sendmsg-window.c:2139
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s napisa:\n"
 
-#: src/sendmsg-window.c:3064
+#: src/sendmsg-window.c:2986
 msgid "Choose charset"
 msgstr "Izaberite skup znakova:"
 
-#: src/sendmsg-window.c:3071
+#: src/sendmsg-window.c:2993
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5155,16 +5160,16 @@ msgstr ""
 "Ova datoteka nije ni u US-ASCII niti UTF-8 zapisu.\n"
 "Molim izaberite skup znakova kojom je zapisana datoteka."
 
-#: src/sendmsg-window.c:3137
+#: src/sendmsg-window.c:3059
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Ne može da otvori datoteku %s.\n"
 
-#: src/sendmsg-window.c:3159
+#: src/sendmsg-window.c:3081
 msgid "Include file"
 msgstr "Uključi datoteku"
 
-#: src/sendmsg-window.c:3417
+#: src/sendmsg-window.c:3339
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5173,7 +5178,7 @@ msgstr ""
 "Poruka se ne može prevesti u skup znakova %s.\n"
 "Molim izaberite jezik za ovu poruku."
 
-#: src/sendmsg-window.c:3436
+#: src/sendmsg-window.c:3358
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5183,32 +5188,32 @@ msgstr ""
 "poruke se potpisuje i/ili šifruje. Ukoliko je potrebno zaštititi celu "
 "poruku, treba da izaberete MIME mod. Da li zaista želite da nastavite?"
 
-#: src/sendmsg-window.c:3449
+#: src/sendmsg-window.c:3371
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "šalje poruku pomoću GPG-a %d"
 
-#: src/sendmsg-window.c:3792
+#: src/sendmsg-window.c:3714
 #, c-format
 msgid "Could not compile %s"
 msgstr "Ne može da prevede %s"
 
-#: src/sendmsg-window.c:4335
+#: src/sendmsg-window.c:4247
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odgovor za %s: %s"
 
-#: src/sendmsg-window.c:4340
+#: src/sendmsg-window.c:4252
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Prosledi poruku za %s: %s"
 
-#: src/sendmsg-window.c:4344
+#: src/sendmsg-window.c:4256
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Nastavi poruku za %s: %s"
 
-#: src/sendmsg-window.c:4348
+#: src/sendmsg-window.c:4260
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nova poruka za %s: %s"
@@ -5273,27 +5278,27 @@ msgstr "Izaberite adresar"
 msgid "Choose Address"
 msgstr "Izaberite adresu"
 
-#: src/store-address.c:356
+#: src/store-address.c:358
 msgid "_Displayed Name:"
 msgstr "P_rikazano ime:"
 
-#: src/store-address.c:357
+#: src/store-address.c:359
 msgid "_First Name:"
 msgstr "_Ime:"
 
-#: src/store-address.c:358
+#: src/store-address.c:360
 msgid "_Middle Name:"
 msgstr "_Srednje ime:"
 
-#: src/store-address.c:359
+#: src/store-address.c:361
 msgid "_Last Name:"
 msgstr "_Prezime:"
 
-#: src/store-address.c:360
+#: src/store-address.c:362
 msgid "_Nickname:"
 msgstr "_Nadimak:"
 
-#: src/store-address.c:361
+#: src/store-address.c:363
 msgid "O_rganization:"
 msgstr "Organi_zacija:"
 
@@ -5604,6 +5609,20 @@ msgstr "Gore"
 #: src/toolbar-prefs.c:506
 msgid "Down"
 msgstr "Dole"
+
+#~ msgid "English"
+#~ msgstr "Engleski"
+
+#~ msgid "UTF-8"
+#~ msgstr "UTF-8"
+
+# bug: LC_COLLATE?
+#~ msgid "_A-J"
+#~ msgstr "_A–J"
+
+# bug: LC_COLLATE?
+#~ msgid "_K-Z"
+#~ msgstr "_K–Z"
 
 #~ msgid "Trust"
 #~ msgstr "Poverenje"

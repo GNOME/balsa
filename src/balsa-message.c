@@ -39,6 +39,7 @@
 #include <gtkhtml/gtkhtml.h>
 #endif
 
+#include "quote-color.h"
 #define BGLINKCOLOR "LightSteelBlue1"
 
 struct _BalsaPartInfo
@@ -102,7 +103,6 @@ static void balsa_gtk_html_size_request (GtkWidget *widget, GtkRequisition *requ
 #endif
 static void balsa_icon_list_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data);
 
-static gboolean is_a_quote (gchar *);
 static void part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_other (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info);
@@ -909,18 +909,6 @@ reflow_string(gchar* str, gint mode, gint *cur_pos, int width)
 }
 
 
-static gboolean
-is_a_quote (gchar *str)
-{
-   gchar *s;
-
-   s = str;
-   if (s[0] != '>') return FALSE;
-   while (s[0] == '>') s++;
-   if (s[0] == ' ') return TRUE;
-   	else return FALSE;
-}
-
 /* END OF HELPER FUNCTIONS ----------------------------------------------- */
 
 static void
@@ -934,8 +922,12 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
   gchar ** l = NULL;
   gchar ** lines = NULL;
   gchar * line = NULL;
-  GdkColor color;
-  GdkColormap* colormap;
+  /*
+  GdkColor color[MAX_QUOTED_COLOR];
+  GdkColormap * colormap;
+  GtkStyle * style = NULL;
+  */
+  gint quote_level = 0;
 
 
   libbalsa_message_body_save_temporary ( info->body, NULL );
@@ -999,17 +991,24 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
       gtk_signal_connect(GTK_OBJECT(item), "size_request",
 			 (GtkSignalFunc)balsa_gtk_text_size_request, (gpointer)bm);
 
-      gdk_color_parse ("#005050", &color); /* FIXME: take it from prefs */
-      colormap = gdk_window_get_colormap (GTK_WIDGET(bm)->window);
-      if (!gdk_colormap_alloc_color (colormap, &color, FALSE, TRUE))
-	gdk_color_black (colormap, &color);
+      /*gdk_color_parse ("#005050", &color);*/ /* FIXME: take it from prefs */
+      allocate_quote_colors (GTK_WIDGET (bm), balsa_app.quoted_color,
+	    0, MAX_QUOTED_COLOR - 1);
+      /* Grab colour from the Theme.
+      style = gtk_widget_get_style (GTK_WIDGET (bm));
+      color = (GdkColor) style->text[GTK_STATE_PRELIGHT];
+      */
 
       lines = l = g_strsplit (ptr, "\n", -1);
       for (line = *lines; line != NULL; line = *(++lines))
       {
 	 line = g_strconcat (line, "\n", NULL);
-	 if (is_a_quote (line))
-	    gtk_text_insert(GTK_TEXT(item), fnt, &color, NULL, line, -1);
+	 quote_level = is_a_quote (line);
+	 if (quote_level > MAX_QUOTED_COLOR)
+	    quote_level = MAX_QUOTED_COLOR;
+	 if (quote_level != 0)
+	    gtk_text_insert(GTK_TEXT(item), fnt,
+		  &balsa_app.quoted_color[quote_level - 1], NULL, line, -1);
 	 else
 	    gtk_text_insert(GTK_TEXT(item), fnt, NULL, NULL, line, -1);
 	 g_free (line);

@@ -709,16 +709,6 @@ process_keystroke (inputData* input, GtkWidget *widget, GdkEventKey *event)
 
       case GDK_Shift_L:
       case GDK_Shift_R:
-      case GDK_Control_L:
-      case GDK_Control_R:
-      case GDK_Meta_L:
-      case GDK_Meta_R:
-      case GDK_Alt_L:
-      case GDK_Alt_R:
-      case GDK_Super_L:
-      case GDK_Super_R:
-      case GDK_Hyper_L:
-      case GDK_Hyper_R:
 	 break;
 	 
       default:
@@ -807,6 +797,31 @@ key_pressed_cb(GtkWidget *widget,
 {
    inputData* input;
    gint *i;
+   
+   /*
+    * Skip ALL special characters, and let gtkentry() process them.
+    * This allows, for example, Ctrl-S to send the message.
+    */
+   switch (event->keyval)
+   {
+      case GDK_Control_L:
+      case GDK_Control_R:
+      case GDK_Meta_L:
+      case GDK_Meta_R:
+      case GDK_Alt_L:
+      case GDK_Alt_R:
+      case GDK_Super_L:
+      case GDK_Super_R:
+      case GDK_Hyper_L:
+      case GDK_Hyper_R:
+        return FALSE;
+   }
+   /*
+    * We cannot use GDK_MODIFIER_MASK because that would trap SHIFT.
+    */
+   if (event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK | GDK_MOD2_MASK
+                       | GDK_MOD3_MASK | GDK_MOD4_MASK | GDK_MOD5_MASK))
+      return FALSE;
    
    /*
     * Check if GCompletion is valid - we reload the addressbook
@@ -1006,6 +1021,8 @@ alias_load_addressbook (void)
 {
     alias_free_addressbook ();
     addresses = ab_load_addresses (FALSE);
+    if (complete_name) g_completion_free (complete_name);
+    if (complete_alias) g_completion_free (complete_alias);
     complete_name = g_completion_new (
                     (GCompletionFunc) extract_name_from_address);
     g_completion_add_items(complete_name, addresses);

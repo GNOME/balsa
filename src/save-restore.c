@@ -37,6 +37,7 @@
 #include "save-restore.h"
 #include "mailbox-conf.h"
 #include "mutt.h"
+#include "quote-color.h"
 
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
@@ -1063,6 +1064,43 @@ config_global_load (void)
     balsa_app.mblist_unread_color.blue = atoi (field);
 
 
+  /*
+   * Here we load the quoted text colour for the mailbox list.
+   * We load two colours, and recalculate the gradient.
+   */
+  if ((field = pl_dict_get_str (globals, "QuotedColorStartRed")) == NULL)
+    balsa_app.quoted_color[0].red = QUOTED_COLOR_RED;
+  else
+    balsa_app.quoted_color[0].red = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "QuotedColorStartGreen")) == NULL)
+    balsa_app.quoted_color[0].green = QUOTED_COLOR_GREEN;
+  else
+    balsa_app.quoted_color[0].green = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "QuotedColorStartBlue")) == NULL)
+    balsa_app.quoted_color[0].blue = QUOTED_COLOR_BLUE;
+  else
+    balsa_app.quoted_color[0].blue = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "QuotedColorEndRed")) == NULL)
+    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red = QUOTED_COLOR_RED;
+  else
+    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "QuotedColorEndGreen")) == NULL)
+    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green = QUOTED_COLOR_GREEN;
+  else
+    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "QuotedColorEndBlue")) == NULL)
+    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue = QUOTED_COLOR_BLUE;
+  else
+    balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue = atoi (field);
+
+  make_gradient (balsa_app.quoted_color, 0, MAX_QUOTED_COLOR - 1);
+
+
   /* address book location */
   if ((field = pl_dict_get_str (globals, "AddressBookDistMode")) != NULL)
     balsa_app.ab_dist_list_mode = atoi (field);
@@ -1292,6 +1330,27 @@ config_global_save (void)
 
   snprintf (tmp, sizeof (tmp), "%hd", balsa_app.mblist_unread_color.blue);
   pl_dict_add_str_str (globals, "MBListUnreadColorBlue", tmp);
+
+  /*
+   * Quoted color - we only save the first and last, and recalculate
+   * the gradient when Balsa starts.
+   */
+  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.quoted_color[0].red);
+  pl_dict_add_str_str (globals, "QuotedColorStartRed", tmp);
+  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.quoted_color[0].green);
+  pl_dict_add_str_str (globals, "QuotedColorStartGreen", tmp);
+  snprintf (tmp, sizeof (tmp), "%hd", balsa_app.quoted_color[0].blue);
+  pl_dict_add_str_str (globals, "QuotedColorStartBlue", tmp);
+  snprintf (tmp, sizeof (tmp), "%hd",
+	balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red);
+  pl_dict_add_str_str (globals, "QuotedColorEndRed", tmp);
+  snprintf (tmp, sizeof (tmp), "%hd",
+	balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green);
+  pl_dict_add_str_str (globals, "QuotedColorEndGreen", tmp);
+  snprintf (tmp, sizeof (tmp), "%hd",
+	balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue);
+  pl_dict_add_str_str (globals, "QuotedColorEndBlue", tmp);
+  make_gradient (balsa_app.quoted_color, 0, MAX_QUOTED_COLOR - 1);
 
   /* address book */
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.ab_dist_list_mode);

@@ -59,6 +59,15 @@
 #define MBLIST_UNREAD_COLOR_BLUE 65535
 #define MBLIST_UNREAD_COLOR_GREEN 0
 
+/*
+ * Default colour for quoted text
+ * oh no, I used the US spelling.
+ */
+#define MAX_QUOTED_COLOR 10
+#define QUOTED_COLOR_RED 0
+#define QUOTED_COLOR_BLUE 20480
+#define QUOTED_COLOR_GREEN 20480
+
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
 
@@ -164,6 +173,9 @@ extern struct BalsaApplication
         GdkVisual* visual;
         GdkColormap* colormap;
   GdkColor mblist_unread_color;
+
+  /* Colour of quoted text. */
+  GdkColor quoted_color[MAX_QUOTED_COLOR];
   
   GtkToolbarStyle toolbar_style;
   GnomeMDIMode mdi_style;

@@ -40,6 +40,8 @@ balsa_SOURCES =	\
 	save-restore.h		\
 	sendmsg-window.c	\
 	sendmsg-window.h	\
+	quote-color.c	\
+	quote-color.h	\
 	threads.h
 #	index-child.h		\
 #	spell-check.c		\

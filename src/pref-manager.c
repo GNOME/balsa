@@ -79,6 +79,8 @@ typedef struct _PropertyUI {
 
         /* colours */
         GtkWidget *unread_color;
+	GtkWidget *quoted_color_start;
+	GtkWidget *quoted_color_end;
 
 	/* address book */
 	GtkWidget *ab_location;
@@ -324,7 +326,13 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	gtk_signal_connect (GTK_OBJECT (pui->selected_headers), "changed",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+
+	/* Colour */
         gtk_signal_connect (GTK_OBJECT (pui->unread_color), "released",
+                            GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+        gtk_signal_connect (GTK_OBJECT (pui->quoted_color_start), "released",
+                            GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
+        gtk_signal_connect (GTK_OBJECT (pui->quoted_color_end), "released",
                             GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
 	/* address book */
 	gtk_signal_connect (GTK_OBJECT (pui->ab_location), "changed",
@@ -493,6 +501,16 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	  &balsa_app.mblist_unread_color, 1);
         gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->unread_color), &(balsa_app.mblist_unread_color.red), &(balsa_app.mblist_unread_color.green), &(balsa_app.mblist_unread_color.blue), 0);
 
+        /* quoted text color */
+        gdk_colormap_free_colors (
+	  gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
+	  &balsa_app.quoted_color[0], 1);
+        gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->quoted_color_start), &(balsa_app.quoted_color[0].red), &(balsa_app.quoted_color[0].green), &(balsa_app.quoted_color[0].blue), 0);
+        gdk_colormap_free_colors (
+	  gdk_window_get_colormap (GTK_WIDGET(pbox)->window),
+	  &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1], 1);
+        gnome_color_picker_get_i16 (GNOME_COLOR_PICKER(pui->quoted_color_end), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green), &(balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue), 0);
+
 	/* address book */
 	g_free (balsa_app.ab_location);
 	balsa_app.ab_location = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->ab_location)));
@@ -618,7 +636,10 @@ set_prefs (void)
 	   gtk_entry_set_text (GTK_ENTRY (pui->selected_headers),
 			       balsa_app.selected_headers);
 
+	/* Colour */
         gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->unread_color), balsa_app.mblist_unread_color.red, balsa_app.mblist_unread_color.green, balsa_app.mblist_unread_color.blue, 0);
+        gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->quoted_color_start), balsa_app.quoted_color[0].red, balsa_app.quoted_color[0].green, balsa_app.quoted_color[0].blue, 0);
+        gnome_color_picker_set_i16 (GNOME_COLOR_PICKER(pui->quoted_color_end), balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red, balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green, balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue, 0);
 
 	/* address book */
 	gtk_entry_set_text (GTK_ENTRY (pui->ab_location), 
@@ -1159,6 +1180,7 @@ create_display_page ( )
 	GtkWidget *label18;
 	GSList    *group;
 	GtkWidget *vbox2;
+	/*GtkWidget *frame16;*/
 	GtkWidget *format_frame, *format_table, *format_widget;
 	
 	vbox2 = gtk_vbox_new (FALSE, 0);
@@ -1404,6 +1426,11 @@ create_misc_page ( )
         GtkWidget *color_frame;
         GtkWidget *unread_color_box;
         GtkWidget *unread_color_label;
+        GtkWidget *quoted_color_box_start;
+        GtkWidget *quoted_color_label_start;
+        GtkWidget *quoted_color_box_end;
+        GtkWidget *quoted_color_label_end;
+	GtkWidget *vbox12;
         GtkWidget *ab_frame, *ab_box, *fileentry1;
 
 	vbox9 = gtk_vbox_new (FALSE, 0);
@@ -1479,10 +1506,14 @@ create_misc_page ( )
         gtk_container_set_border_width (GTK_CONTAINER (color_frame), 5);
 	gtk_box_pack_start (GTK_BOX (vbox9), color_frame, FALSE, FALSE, 0);
 
+	vbox12 = gtk_vbox_new (FALSE, 0);
+	gtk_widget_show (vbox12);
+	gtk_container_add (GTK_CONTAINER (color_frame), vbox12);
+	gtk_container_set_border_width (GTK_CONTAINER (vbox12), 5);
+
         unread_color_box = gtk_hbox_new (FALSE, 0);
         gtk_widget_show (unread_color_box);
-        gtk_container_add (GTK_CONTAINER (color_frame), unread_color_box);
-        gtk_container_set_border_width (GTK_CONTAINER (unread_color_box), 0);
+        gtk_box_pack_start_defaults (GTK_BOX (vbox12), unread_color_box);
 
         pui->unread_color = gnome_color_picker_new ();
         gnome_color_picker_set_title (GNOME_COLOR_PICKER (pui->unread_color), _("Mailbox with unread messages colour"));
@@ -1498,6 +1529,53 @@ create_misc_page ( )
                             FALSE, FALSE, 5);
         gtk_label_set_justify (GTK_LABEL (unread_color_label), 
                                GTK_JUSTIFY_LEFT);
+
+	/*
+	 * Colours for quoted text.
+	 */
+	quoted_color_box_start = gtk_hbox_new (FALSE, 0);
+	gtk_widget_show (quoted_color_box_start);
+        gtk_box_pack_start_defaults (GTK_BOX (vbox12), quoted_color_box_start);
+	pui->quoted_color_start = gnome_color_picker_new ();
+	gnome_color_picker_set_title
+	   (GNOME_COLOR_PICKER (pui->quoted_color_start),
+	    _("Colour of quoted text"));
+	gnome_color_picker_set_dither
+	   (GNOME_COLOR_PICKER (pui->quoted_color_start), TRUE);
+	gtk_widget_show (pui->quoted_color_start);
+	gtk_box_pack_start (GTK_BOX (quoted_color_box_start),
+	      pui->quoted_color_start, FALSE, FALSE, 5);
+	gtk_container_set_border_width
+	   (GTK_CONTAINER (pui->quoted_color_start), 5);
+
+	quoted_color_label_start = gtk_label_new (_("Quoted text colour"));
+	gtk_widget_show (quoted_color_label_start);
+	gtk_box_pack_start (GTK_BOX (quoted_color_box_start),
+	      quoted_color_label_start, FALSE, FALSE, 5);
+	gtk_label_set_justify (GTK_LABEL (quoted_color_label_start),
+	      GTK_JUSTIFY_LEFT);
+
+	quoted_color_box_end = gtk_hbox_new (FALSE, 0);
+	gtk_widget_show (quoted_color_box_end);
+        gtk_box_pack_start_defaults (GTK_BOX (vbox12), quoted_color_box_end);
+	pui->quoted_color_end = gnome_color_picker_new ();
+	gnome_color_picker_set_title
+	   (GNOME_COLOR_PICKER (pui->quoted_color_end),
+	    _("Colour of quoted text"));
+	gnome_color_picker_set_dither
+	   (GNOME_COLOR_PICKER (pui->quoted_color_end), TRUE);
+	gtk_widget_show (pui->quoted_color_end);
+	gtk_box_pack_start (GTK_BOX (quoted_color_box_end),
+	      pui->quoted_color_end, FALSE, FALSE, 5);
+	gtk_container_set_border_width
+	   (GTK_CONTAINER (pui->quoted_color_end), 5);
+
+	quoted_color_label_end = gtk_label_new (_("Quoted text colour"));
+	gtk_widget_show (quoted_color_label_end);
+	gtk_box_pack_start (GTK_BOX (quoted_color_box_end),
+	      quoted_color_label_end, FALSE, FALSE, 5);
+	gtk_label_set_justify (GTK_LABEL (quoted_color_label_end),
+	      GTK_JUSTIFY_LEFT);
 
 	/* address book */
         ab_frame = gtk_frame_new (_("Address Book"));

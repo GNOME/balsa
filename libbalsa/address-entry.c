@@ -2262,7 +2262,7 @@ lbae_get_name_from_address(LibBalsaAddress * address, const gchar * prefix)
         LibBalsaAddress *tmp_address;
 
         tmp_address = libbalsa_address_new();
-        libbalsa_address_set_copy(address, tmp_address);
+        libbalsa_address_set_copy(tmp_address, address);
         g_free(tmp_address->full_name);
         tmp_address->full_name = g_strdup(tmp_address->nick_name);
 

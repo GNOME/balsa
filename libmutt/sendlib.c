@@ -556,7 +556,7 @@ int mutt_write_mime_body (BODY *a, FILE *f)
 void mutt_generate_boundary (PARAMETER **parm)
 {
   char rs[BOUNDARYLEN + 1];
-  char *p = rs;
+  char *p;
   int i;
 #ifdef LIBMUTT
   static int seeded = 0;
@@ -568,7 +568,15 @@ void mutt_generate_boundary (PARAMETER **parm)
 #endif
 
   rs[BOUNDARYLEN] = 0;
-  for (i=0;i<BOUNDARYLEN;i++) 
+  /* start the boundary with `=_', as suggested in RFC 2045:
+   * ensures that it can't match a string in a quoted-printable part;
+   * also ensures that it can't match a string in a base64-encoded 
+   * part, which would also seem to be a possibility with this
+   * construction. */
+  rs[0] = '=';
+  rs[1] = '_';
+  p = &rs[2];
+  for (i=2;i<BOUNDARYLEN;i++) 
     *p++ = B64Chars[LRAND() % sizeof (B64Chars)];
   *p = 0;
   

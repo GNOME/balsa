@@ -304,7 +304,7 @@ extern struct BalsaApplication {
     /* compose: request a disposition notification */
     gboolean req_dispnotify;   
     gboolean always_queue_sent_mail;
- 
+    gboolean copy_to_sentbox;
 
     /* appbar */
     GnomeAppBar *appbar;

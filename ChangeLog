@@ -1,3 +1,15 @@
+2001-10-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/save-restore.c: handle corrupted toolbar configuration.
+	* src/toolbar-factory.c: some probably never printed warnings.
+	
+	Steve Wall <hitched97@myrealbox.com> fix of #61471.
+	* src/sendmsg-window.c: add blank item to Fcc list,
+        use NULL for fcc mailbox if Fcc box is empty.
+	* src/save-restore.c: save/restore setting of CopyToSentbox
+	* src/pref-manager.c: add the CopyToSentbox check-box to preferences
+	* src/balsa-app.h: add flag to balsa_app structure.
+
 2001-10-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: improve index center on expand/collapse.

@@ -1,5 +1,4 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
  * Copyright (C) 1998-2001 Stuart Parmenter and others, see AUTHORS file.
  *
@@ -29,7 +28,7 @@
 
    - the option would be to use setlocale to hit gdk_fontset_load()
      but...  there is an yet unidentified problem that leads to a
-     nasty deferred setup-depentent crash with double free symptoms,
+     nasty deferred setup-dependent crash with double free symptoms,
      when the selected font set is unavailable on the machine (and
      probably in other cases, too). I am tempted to write a test
      program and send it over to GDK gurus.
@@ -1457,7 +1456,11 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     glist = g_list_append(glist, balsa_app.draftbox->name);
     glist = g_list_append(glist, balsa_app.outbox->name);
     glist = g_list_append(glist, balsa_app.trash->name);
-    
+    if (balsa_app.copy_to_sentbox)
+	glist = g_list_append(glist, "");
+    else
+	glist = g_list_prepend(glist, "");
+
     /* FIXME: glist = g_list_concat(glist, mblist_get_mailbox_name_list()) */
 
     gtk_combo_set_popdown_strings(GTK_COMBO(msg->fcc[1]), glist);
@@ -2662,7 +2665,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     message = bsmsg2message(bsmsg);
-    fcc = message->fcc_mailbox 
+    fcc = message->fcc_mailbox && *(message->fcc_mailbox)
 	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
 	: NULL;
 

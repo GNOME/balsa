@@ -219,13 +219,13 @@ get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
 	}
 
     if(!lp) {
-		g_list_free(children);
+	g_list_free(children);
 	return NULL;
-	}
+    }
 	
     child=(GtkWidget *)(lp->data);
 
-	if(children)
+    if(children)
 	g_list_free(children);
 	
     if(!child)
@@ -458,8 +458,11 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
     for(j=0; balsa_app.toolbars[index][j]; j++) {
 	button=get_toolbar_button_index(balsa_app.toolbars[index][j]);
 	
-	if(button == -1)
+	if(button == -1) {
+	    g_warning("button '%s' not found. ABORT!\n",
+		      balsa_app.toolbars[index][j]);
 	    continue;
+	}
 
 	if(!*(balsa_app.toolbars[index][j])) {
 	    gtk_toolbar_append_space(bar);

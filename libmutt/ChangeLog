@@ -1,3 +1,7 @@
+2001-10-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* sendlib.c: robust mime boundary by Peter Bloomfield (#62156).
+
 2001-10-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* mx.c: when asked to sync mailbox, just do it, don't ask questions.

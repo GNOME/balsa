@@ -92,6 +92,7 @@ typedef struct _PropertyUI {
     GtkWidget *remember_open_mboxes;
     GtkWidget *mblist_show_mb_content_info;
     GtkWidget *always_queue_sent_mail;
+    GtkWidget *copy_to_sentbox;
     GtkWidget *autoquote;
     GtkWidget *reply_strip_html_parts;
     GtkWidget *forward_attached;
@@ -398,6 +399,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->always_queue_sent_mail), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->copy_to_sentbox), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->autoquote), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->reply_strip_html_parts), "toggled",
@@ -630,6 +633,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	GTK_TOGGLE_BUTTON(pui->forward_attached)->active;
     balsa_app.always_queue_sent_mail =
 	GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
+    balsa_app.copy_to_sentbox =
+	GTK_TOGGLE_BUTTON(pui->copy_to_sentbox)->active;
 
     balsa_app.close_mailbox_auto =
 	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
@@ -874,6 +879,8 @@ set_prefs(void)
 				 balsa_app.send_rfc2646_format_flowed);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail),
 				 balsa_app.always_queue_sent_mail);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->copy_to_sentbox),
+				 balsa_app.copy_to_sentbox);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->autoquote),
 				 balsa_app.autoquote);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts),
@@ -1634,6 +1641,11 @@ outgoing_page(gpointer data)
 	pui->always_queue_sent_mail =
 	gtk_check_button_new_with_label(_("Send button always queues outgoing mail in outbox"));
 	gtk_box_pack_start(GTK_BOX(vbox2), pui->always_queue_sent_mail,
+				FALSE, TRUE, 0);
+
+	pui->copy_to_sentbox =
+	gtk_check_button_new_with_label(_("Copy outgoing messages to sentbox"));
+	gtk_box_pack_start(GTK_BOX(vbox2), pui->copy_to_sentbox,
 				FALSE, TRUE, 0);
 
     frame2 = gtk_frame_new(_("Encoding"));

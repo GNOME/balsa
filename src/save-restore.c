@@ -86,6 +86,14 @@ d_get_gint(const gchar * key, gint def_val)
 }
 
 static void
+free_toolbar(int i)
+{
+    int j;
+    for(j=0; balsa_app.toolbars[i][j]; j++)
+	g_free(balsa_app.toolbars[i][j]);
+    g_free(balsa_app.toolbars[i]);
+}
+static void
 free_toolbars(void)
 {
     int i, j;
@@ -93,13 +101,10 @@ free_toolbars(void)
     if(!balsa_app.toolbars == 0)
 	return;
     
-    for(i=0; i<balsa_app.toolbar_count; i++) {
-	for(j=0; balsa_app.toolbars[i][j]; j++)
-	    g_free(balsa_app.toolbars[i][j]);
-	free((char *)balsa_app.toolbars[i]);
-    }
-    free((void *)balsa_app.toolbars);
-    free((void *)balsa_app.toolbar_ids);
+    for(i=0; i<balsa_app.toolbar_count; i++) 
+	free_toolbar(i);
+    g_free((void *)balsa_app.toolbars);
+    g_free((void *)balsa_app.toolbar_ids);
 }
 
 /* load_toolbars:
@@ -122,29 +127,39 @@ load_toolbars(void)
     balsa_app.toolbars=	(char ***)g_malloc(sizeof(char *)*MAXTOOLBARS);
     
     balsa_app.toolbar_count=d_get_gint("ToolbarCount", 0);
-    if(balsa_app.toolbar_count)	{
-	for(i=0; i<balsa_app.toolbar_count; i++) {
-	    balsa_app.toolbars[i]=
-		(char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
-			
-	    sprintf(tmpkey, "Toolbar%dID", i);
-	    balsa_app.toolbar_ids[i] = d_get_gint(tmpkey, -1);
-
-	    if(balsa_app.toolbar_ids[i] == -1) {
-		balsa_app.toolbars[i][0]=NULL;
-		continue;
-	    }
-
-	    sprintf(tmpkey, "Toolbar%dItemCount", i);
-	    items=d_get_gint(tmpkey, 0);
-	    
-	    for(j=0; j<items; j++) {
-		sprintf(tmpkey, "Toolbar%dItem%d", i, j);
-		balsa_app.toolbars[i][j]=  gnome_config_get_string(tmpkey);
-	    }
-	    balsa_app.toolbars[i][j]=NULL;
+    for(i=0; i<balsa_app.toolbar_count; i++) {
+	balsa_app.toolbars[i]=
+	    (char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
+	
+	sprintf(tmpkey, "Toolbar%dID", i);
+	balsa_app.toolbar_ids[i] = d_get_gint(tmpkey, -1);
+	
+	if(balsa_app.toolbar_ids[i] == -1) {
+	    balsa_app.toolbars[i][0]=NULL;
+	    continue;
 	}
 	
+	sprintf(tmpkey, "Toolbar%dItemCount", i);
+	items=d_get_gint(tmpkey, 0);
+	
+	for(j=0; j<items; j++) {
+	    sprintf(tmpkey, "Toolbar%dItem%d", i, j);
+	    balsa_app.toolbars[i][j]=  gnome_config_get_string(tmpkey);
+	}
+	balsa_app.toolbars[i][j]=NULL;
+	/* validate */
+	for(j=0; balsa_app.toolbars[i][j]; j++) {
+	    if(get_toolbar_button_index(balsa_app.toolbars[i][j])<0) {
+		/* validation failed: roll the toolbar back. */
+		free_toolbar(i); 
+		balsa_app.toolbars[i] = NULL;
+		balsa_app.toolbar_ids[i] = -1;
+		i--;
+		balsa_app.toolbar_count--;
+		g_warning("I dropped a toolbar. Are you up/downgrading?");
+		break;
+	    }
+	}
     }
     gnome_config_pop_prefix();
 }
@@ -680,6 +695,7 @@ config_global_load(void)
 	gnome_config_get_bool("ForwardAttached=true");
 
 	balsa_app.always_queue_sent_mail = d_get_gint("AlwaysQueueSentMail", 0);
+	balsa_app.copy_to_sentbox = d_get_gint("CopyToSentbox", 1);
 
     gnome_config_pop_prefix();
 
@@ -917,6 +933,7 @@ gint config_save(void)
     gnome_config_set_bool("ForwardAttached", balsa_app.forward_attached);
 
 	gnome_config_set_int("AlwaysQueueSentMail", balsa_app.always_queue_sent_mail);
+	gnome_config_set_int("CopyToSentbox", balsa_app.copy_to_sentbox);
     gnome_config_pop_prefix();
 
     /* Compose window ... */

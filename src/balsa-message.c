@@ -103,13 +103,6 @@ balsa_message_new (void)
 
   gtk_widget_set_style (GTK_WIDGET (bmessage), style);
 
-  /*
-     gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (bmessage)),
-     gnome_canvas_rect_get_type (),
-     "x1", 0.0, "y1", 0.0,
-     "x2", 1000.0, "y2", 1000.0,
-     "fill_color", "white", NULL);
-   */
   return GTK_WIDGET (bmessage);
 }
 
@@ -179,8 +172,8 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
   bmessage->headers =
     GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
 					       GNOME_TYPE_CANVAS_GROUP,
-					       "x", (double) 0.0,
-					       "y", (double) 0.0,
+					       "x", (double) 10.0,
+					       "y", (double) 10.0,
 					       NULL));
 
   if (message->date)

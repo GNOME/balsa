@@ -48,6 +48,9 @@ close_all_mailboxes (GNode * node, gpointer data)
       {
 	mailbox = ((MailboxNode *) node->data)->mailbox;
 
+	if (!mailbox)
+	  return FALSE;
+
 	if (balsa_app.debug)
 	  g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
 
@@ -70,10 +73,13 @@ balsa_exit ()
 		   NULL);
 
   mailbox = balsa_app.inbox;
-  if (balsa_app.debug)
-    g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-  while (mailbox && mailbox->open_ref > 0)
-    mailbox_open_unref (mailbox);
+  if (mailbox)
+    {
+      if (balsa_app.debug)
+	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+      while (mailbox->open_ref > 0)
+	mailbox_open_unref (mailbox);
+    }
 
   mailbox = balsa_app.outbox;
   if (mailbox)

@@ -337,9 +337,12 @@ mimetext2html(BODY* bdy, FILE* fp, struct obstack* bfr)
   fflush(s.fpout);
   alloced = readfile(s.fpout, &ptr);
   ptr[alloced - 1] = '\0';
-  if (strcmp(bdy->subtype,"html") == 0)
+  if (strcmp(bdy->subtype,"html") == 0 ||
+		  strcmp(bdy->subtype,"enriched") == 0)
     {
       obstack_append_string(bfr, ptr);
+      free(ptr);
+      unlink(tmp_file_name);
       return;
     }
   text2html(ptr, bfr);

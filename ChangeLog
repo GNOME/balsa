@@ -1,3 +1,8 @@
+2004-02-07 18:08  PeterB
+
+	* src/sendmsg-window.c: Steve Wall <balsa-user@wallfamily.us>;
+	smarter choice of identity, better handling of signatures.
+
 2004-02-07  Pawel Salek
 
 	* libbalsa/mailbox.[hc]: do not sort/thread unless requested.

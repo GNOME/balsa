@@ -465,7 +465,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 	  c = message->date;
 	  if (c)
 	    {
-	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "On ", 4);
+	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "On ", 3);
 	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " ", 1);
 	    }

@@ -123,8 +123,6 @@ balsa_information_dialog(LibBalsaInformationType type, char *msg)
 {
     GtkWidget *messagebox;
 
-    g_warning(msg);
-
     messagebox =
 	gnome_error_dialog_parented(msg,
 				    GTK_WINDOW(balsa_app.main_window));

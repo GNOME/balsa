@@ -1863,8 +1863,7 @@ address_book_cb(GtkWindow *widget, gpointer data)
     ab = balsa_address_book_new(FALSE);
     gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(balsa_app.main_window));
 
-    /* FIXME: Run's as modal. Need to find a way to not do this. I suspect there isn't one. */
-    gnome_dialog_run_and_close(GNOME_DIALOG(ab));
+    gtk_widget_show(GTK_WIDGET(ab));
 }
 
 #ifdef BALSA_SHOW_ALL

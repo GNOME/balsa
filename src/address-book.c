@@ -29,7 +29,6 @@
 #define LIST_COLUMN_NAME        0
 #define LIST_COLUMN_ADDRESS     1
 
-
 /*
   This struct holds the information associated with each row of a clist:
 
@@ -50,8 +49,6 @@ struct _AddressBookEntry
 /* Object system functions ... */
 static void balsa_address_book_init(BalsaAddressBook *ab);
 static void balsa_address_book_class_init(BalsaAddressBookClass *klass);
-static void balsa_address_book_set_composing(BalsaAddressBook *ab, 
-					     gboolean composing);
 
 /* CListRow data ... */
 static AddressBookEntry *address_book_entry_new(LibBalsaAddress *address, 
@@ -72,6 +69,9 @@ static void balsa_address_book_menu_changed(GtkWidget * widget,
 					    BalsaAddressBook *ab);
 static void balsa_address_book_run_gnomecard(GtkWidget * widget, gpointer data);
 static void balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook *ab);
+static void balsa_address_book_button_clicked (BalsaAddressBook *ab, 
+					       gint button_number, 
+					       gpointer data);
 
 /* address and recipient list management ... */
 static void balsa_address_book_swap_clist_entry(GtkCList * src, GtkCList * dst);
@@ -105,8 +105,8 @@ balsa_address_book_get_type(void)
 	    sizeof(BalsaAddressBookClass),
 	    (GtkClassInitFunc) balsa_address_book_class_init,
 	    (GtkObjectInitFunc) balsa_address_book_init,
-	    (GtkArgSetFunc) NULL,
-	    (GtkArgGetFunc) NULL,
+	    NULL, /*reserved*/
+	    NULL, /*reserved*/
 	};
 	ab_type = gtk_type_unique(GNOME_TYPE_DIALOG, &ab_info);
     }
@@ -120,7 +120,22 @@ balsa_address_book_new(gboolean composing)
 
     ret = gtk_type_new(BALSA_TYPE_ADDRESS_BOOK);
 
-    balsa_address_book_set_composing(BALSA_ADDRESS_BOOK(ret), composing);
+    BALSA_ADDRESS_BOOK(ret)->composing = composing;
+
+    if ( composing ) {
+	gnome_dialog_append_buttons(GNOME_DIALOG(ret), 
+				    GNOME_STOCK_BUTTON_OK,
+				    GNOME_STOCK_BUTTON_CANCEL,
+				    NULL);
+	gtk_widget_show(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->send_to_box));
+	gtk_widget_show(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->arrow_box));
+    } else {
+	gnome_dialog_append_buttons(GNOME_DIALOG(ret),
+				    GNOME_STOCK_BUTTON_CLOSE,
+				    NULL);
+	gtk_widget_hide(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->send_to_box));
+	gtk_widget_hide(GTK_WIDGET(BALSA_ADDRESS_BOOK(ret)->arrow_box));
+    }
 
     return ret;
 
@@ -145,18 +160,16 @@ balsa_address_book_init(BalsaAddressBook *ab)
     static gchar *titles[2] = { N_("Name"), N_("E-Mail Address") };
     
     ab->current_address_book = NULL;
-
     gtk_window_set_title(GTK_WINDOW(ab), _("Address Book"));
 
-    gnome_dialog_append_buttons(GNOME_DIALOG(ab), 
-				GNOME_STOCK_BUTTON_OK,
-				GNOME_STOCK_BUTTON_CANCEL,
-				NULL);
 #ifdef ENABLE_NLS
     titles[0] = _(titles[0]);
     titles[1] = _(titles[1]);
 #endif
 
+    gtk_signal_connect(GTK_OBJECT(ab), "clicked",
+		       GTK_SIGNAL_FUNC(balsa_address_book_button_clicked), NULL);
+		     
     vbox = GNOME_DIALOG(ab)->vbox;
 
     gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
@@ -174,7 +187,7 @@ balsa_address_book_init(BalsaAddressBook *ab)
     gtk_widget_show(ab->address_clist);
     gtk_signal_connect(GTK_OBJECT(ab->address_clist), "select_row",
 		       GTK_SIGNAL_FUNC(balsa_address_book_select_address), ab);
-
+    
     /* The clist for selected addresses in compose mode */
     ab->recipient_clist = gtk_clist_new_with_titles(2, titles);
     gtk_clist_set_selection_mode(GTK_CLIST(ab->recipient_clist),
@@ -266,7 +279,7 @@ balsa_address_book_init(BalsaAddressBook *ab)
     ab->arrow_box = gtk_vbox_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(hbox), ab->arrow_box, FALSE, FALSE, 1);
     gtk_widget_show(ab->arrow_box);
-
+    
     /* FIXME: Can make a stock button in one call... */
     w = gtk_button_new();
     stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
@@ -278,7 +291,7 @@ balsa_address_book_init(BalsaAddressBook *ab)
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
 		       GTK_SIGNAL_FUNC(balsa_address_book_move_to_recipient_list),
 		       ab);
-
+    
     w = gtk_button_new();
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
@@ -289,16 +302,16 @@ balsa_address_book_init(BalsaAddressBook *ab)
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
 		       GTK_SIGNAL_FUNC(balsa_address_book_remove_from_recipient_list),
 		       ab);
-
+    
     /* Column for selected addresses in compose mode */
     ab->send_to_box = gtk_vbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(hbox), ab->send_to_box, TRUE, TRUE, 1);
-
+    
     label = gtk_label_new(_("Send-To"));
     gtk_widget_show(label);
     gtk_box_pack_start(GTK_BOX(ab->send_to_box), label,
 		       FALSE, FALSE, 1);
-
+    
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_show(scrolled_window);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
@@ -331,7 +344,6 @@ balsa_address_book_init(BalsaAddressBook *ab)
 
     /* mode switching stuff */
     frame = gtk_frame_new(_("Treat multiple addresses as:"));
-/*      gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0); */
     gtk_widget_show(frame);
 
     ab->single_address_mode_radio = gtk_radio_button_new_with_label
@@ -364,24 +376,6 @@ balsa_address_book_init(BalsaAddressBook *ab)
 static void
 balsa_address_book_class_init(BalsaAddressBookClass *klass)
 {
-}
-
-/*
-  Show or hide the recipient list and friends
-*/
-static void
-balsa_address_book_set_composing(BalsaAddressBook *ab, gboolean composing)
-{
-    if ( composing ) {
-	gtk_widget_show(ab->send_to_box);
-	gtk_widget_show(ab->arrow_box);
-	gtk_window_set_modal(GTK_WINDOW(ab), TRUE);
-    } else {
-	gtk_widget_hide(ab->send_to_box);
-	gtk_widget_hide(ab->arrow_box);
-	gtk_window_set_modal(GTK_WINDOW(ab), FALSE);
-    }
-    ab->composing = composing;
 }
 
 /*
@@ -619,6 +613,8 @@ balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *ad
 	entry = address_book_entry_new(address, -1);
 	gtk_clist_set_row_data_full(GTK_CLIST(ab->address_clist), rownum, entry,
 				    (GtkDestroyNotify)address_book_entry_unref);
+	g_free(listdata[LIST_COLUMN_ADDRESS]);
+
     } else {
 	address_list = address->address_list;
 	count = 0;
@@ -781,4 +777,11 @@ address_book_entry_unref(AddressBookEntry *entry)
 
     gtk_object_unref(GTK_OBJECT(entry->address));
     g_free(entry);
+}
+
+static void
+balsa_address_book_button_clicked (BalsaAddressBook *ab, gint button_number, gpointer data)
+{
+    if ( !ab->composing )
+	gtk_widget_destroy(GTK_WIDGET(ab));
 }

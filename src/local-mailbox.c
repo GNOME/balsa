@@ -176,10 +176,11 @@ add_mailbox(const gchar * name, const gchar * path,
 	mailbox->name = g_strdup(name);
 
 	if (isdir && type == LIBBALSA_TYPE_MAILBOX_MH ) {
-	    /*      g_strdup (g_basename (g_dirname (myfile))) */
+	    char *dirname = g_dirname(path);
 	    node = g_node_new(mailbox_node_new(path, mailbox, TRUE));
 	    rnode = find_my_node(balsa_app.mailbox_nodes, G_LEVEL_ORDER,
-				 G_TRAVERSE_ALL, g_dirname(path));
+				 G_TRAVERSE_ALL, dirname);
+	    g_free(dirname);
 	} else {
 	    char *dirname = g_dirname(path);
 	    node = g_node_new(mailbox_node_new(path, mailbox, FALSE));

@@ -1,3 +1,11 @@
+2000-12-21  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/main-window.c: Show adddress book non-modal.
+	* src/address-book.c: Better non-compose mode. Plug some leaks
+	* src/information-dialog.c: Don't print a warning message to
+	console when showing an error dialog.
+	* src/local-mailbox.c: Plug memory leak
+
 2000-12-20  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-mblist.c: When an open mailbox has no unread messages,

@@ -12,7 +12,10 @@ Please make sure you have the following things:
 	gnome-libs  >= 1.0.8
 	libPropList >= 0.9.1
 
-	If you do not have these, please check http://www.balsa.net/download.html
+	If you do not have these, please check:
+
+	http://www.balsa.net/download.html
+
 	for links to these packages. Or try http://www.gnome.org, 
 	http://www.gtk.org, and http://www.enlightenment.org.
 
@@ -31,5 +34,11 @@ Installation:
 
 Notes:
 
-	You may need to remove your ~/.balsarc file: balsa sometimes gets confused 
-	when it cannot parse the configuration file. Sorry for the inconvenience.
+	Balsa does not play nice with older versions of egcs, if you
+	are using an earlier version than 2.95 of this compiler and
+	have troubles with segfaults, try compiling with optimizations
+	turned off or upgrading.
+
+	You may need to remove your ~/.balsarc file: balsa sometimes
+	gets confused when it cannot parse the configuration
+	file. Sorry for the inconvenience.

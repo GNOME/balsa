@@ -1,5 +1,12 @@
 2000-08-11  Matthew Guenther <mguenthe@attcanada.ca>
 
+	* INSTALL: Add warning about older versions of egcs causing
+	problems with Balsa.
+
+	* TODO: Clean up formatting, update some items.
+
+2000-08-11  Matthew Guenther <mguenthe@attcanada.ca>
+
 	* libbalsa/libbalsa.c: Set OPTCHECKNEW option.
 	* src/balsa-app.[hc]: Add application colormap, visual variables.
 

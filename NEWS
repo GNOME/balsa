@@ -1,3 +1,9 @@
+* Balsa-2.0.7 release. Release date 2003-02-09
+
+- message threading improvements.
+- IMAP connections pinged to prevent timeouts.
+- configurable procmail commands used for POP filtering.
+
 * Balsa-2.0.6 release. Release date 2003-01-29
 
 - authenticated LDAP binding. Option to use TLS for LDAP.

@@ -1,5 +1,6 @@
 2003-02-08  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* NEWS,configure.in: release balsa-2.0.7
 	* libbalsa/misc.[hc]: implement libbalsa_urlencode() as in bug #105605.
 	* libbalsa/mailbox_imap.c: use it.
 

@@ -1,3 +1,7 @@
+2003-04-06  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/mailbox_pop3.c: fix progress dialog for multiple POP servers
+
 2003-04-04 06:07  PeterB
 
 	* src/sendmsg-window.c: Fix Edit => Wrap Body.

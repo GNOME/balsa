@@ -322,18 +322,19 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 static void
 progress_cb(void* mailbox, char *msg, int prog, int tot)
 {
-    int msg_type;
-
-    if (tot==-1) msg_type = LIBBALSA_NTFY_FINISHED;
+    /* tot=-1 means finished */
+    if (tot==-1)
+	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox), 
+					 LIBBALSA_NTFY_PROGRESS, 0,
+					 1, "Finished");
     else {
-	msg_type = LIBBALSA_NTFY_MSGINFO;
 	if (tot>0)
 	    libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox), 
 					     LIBBALSA_NTFY_PROGRESS, prog,
 					     tot, msg);
+	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox),
+					 LIBBALSA_NTFY_MSGINFO, prog, tot, msg);
     }
-    libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox), 
-                                     msg_type, prog, tot, msg);
 }
 
 

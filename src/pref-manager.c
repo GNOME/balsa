@@ -130,7 +130,6 @@ typedef struct _PropertyUI {
     GtkWidget *message_title_format;
 
     /* colours */
-    GtkWidget *unread_color;
     GtkWidget *quoted_color[MAX_QUOTED_COLOR];
     GtkWidget *url_color;
     GtkWidget *bad_address_color;
@@ -209,7 +208,6 @@ static GtkWidget *status_messages_subpage(gpointer data);
 static GtkWidget *information_messages_group(GtkWidget * page);
 
 static GtkWidget *colors_subpage(gpointer data);
-static GtkWidget *mailbox_colors_group(GtkWidget * page);
 static GtkWidget *message_colors_group(GtkWidget * page);
 static GtkWidget *link_color_group(GtkWidget * page);
 static GtkWidget *composition_window_group(GtkWidget * page);
@@ -611,9 +609,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		     G_CALLBACK(properties_modified_cb), property_box);
 
     /* Colour */
-    g_signal_connect(G_OBJECT(pui->unread_color), "released",
-		     G_CALLBACK(properties_modified_cb), property_box);
-
     for(i=0;i<MAX_QUOTED_COLOR;i++)
 	g_signal_connect(G_OBJECT(pui->quoted_color[i]), "released",
 			 G_CALLBACK(properties_modified_cb), property_box);
@@ -867,15 +862,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.message_title_format =
         gtk_editable_get_chars(GTK_EDITABLE(pui->message_title_format),
                                0, -1);
-
-    /* unread mailbox color */
-    gdk_colormap_free_colors(gdk_drawable_get_colormap
-			     (GTK_WIDGET(pbox)->window),
-			     &balsa_app.mblist_unread_color, 1);
-    gnome_color_picker_get_i16(GNOME_COLOR_PICKER(pui->unread_color),
-			       &(balsa_app.mblist_unread_color.red),
-			       &(balsa_app.mblist_unread_color.green),
-			       &(balsa_app.mblist_unread_color.blue), 0);
 
     /* quoted text color */
     for(i=0;i<MAX_QUOTED_COLOR;i++) {
@@ -1167,11 +1153,6 @@ set_prefs(void)
 			   balsa_app.message_title_format);
 
     /* Colour */
-    gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->unread_color),
-			       balsa_app.mblist_unread_color.red,
-			       balsa_app.mblist_unread_color.green,
-			       balsa_app.mblist_unread_color.blue, 0);
-
     for(i=0;i<MAX_QUOTED_COLOR;i++)
 	gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->quoted_color[i]),
 				   balsa_app.quoted_color[i].red,
@@ -2137,25 +2118,11 @@ colors_subpage(gpointer data)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, mailbox_colors_group(page));
     pm_page_add(page, message_colors_group(page));
     pm_page_add(page, link_color_group(page));
     pm_page_add(page, composition_window_group(page));
 
     return page;
-}
-
-static GtkWidget *
-mailbox_colors_group(GtkWidget * page)
-{
-    GtkWidget *group;
-
-    group = pm_group_new(_("Mailbox Colors"));
-    pui->unread_color =
-        color_box(GTK_BOX(pm_group_get_vbox(group)),
-                  _("Mailbox with unread messages color"));
-
-    return group;
 }
 
 static GtkWidget *

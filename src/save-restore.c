@@ -811,9 +811,6 @@ config_global_load(void)
     /* Mailbox checking ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
 
-    /* ... color */
-    load_color("UnreadColor=" MBLIST_UNREAD_COLOR,
-	       &balsa_app.mblist_unread_color);
     /* ... show mailbox content info */
     balsa_app.mblist_show_mb_content_info =
 	gnome_config_get_bool("ShowMailboxContentInfo=true");
@@ -1175,7 +1172,6 @@ config_save(void)
     /* Mailbox list options */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
 
-    save_color("UnreadColor", &balsa_app.mblist_unread_color);
     gnome_config_set_bool("ShowMailboxContentInfo",
 			  balsa_app.mblist_show_mb_content_info);
 

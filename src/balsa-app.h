@@ -68,9 +68,6 @@
 #define TOTALMSGCOUNT_DEFAULT_WIDTH 45
 #define INFO_FIELD_LENGTH 10
 
-/* Default colour for mailboxes with unread messages */
-#define MBLIST_UNREAD_COLOR "dark green"
-
 /*
  * Default colour for quoted text
  * oh no, I used the US spelling.
@@ -257,7 +254,6 @@ extern struct BalsaApplication {
     /* Colour of mailboxes with unread messages in mailbox list */
     GdkVisual *visual;
     GdkColormap *colormap;
-    GdkColor mblist_unread_color;
 
     /* Colour of quoted text. */
     gchar *quote_regex;

@@ -380,8 +380,6 @@ balsa_app_init(void)
     balsa_app.visual = gdk_visual_get_best();
     balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE);
 
-    gdk_color_parse(MBLIST_UNREAD_COLOR, &balsa_app.mblist_unread_color);
-
     /* arp */
     balsa_app.quote_str = NULL;
 

@@ -61,8 +61,8 @@ enum {
     MBNODE_COLUMN = 0,         /* we use 0 in other code */
     ICON_COLUMN,
     NAME_COLUMN,
-    COLOR_COLUMN,
     WEIGHT_COLUMN,
+    STYLE_COLUMN,
     UNREAD_COLUMN,
     TOTAL_COLUMN,
     N_COLUMNS
@@ -340,8 +340,8 @@ bmbl_init(BalsaMBList * mblist)
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", NAME_COLUMN,
-                                        "foreground-gdk", COLOR_COLUMN,
                                         "weight", WEIGHT_COLUMN,
+                                        "style", STYLE_COLUMN,
                                         NULL);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width(column,
@@ -457,8 +457,8 @@ bmbl_get_store(void)
                                G_TYPE_POINTER,    /* MBNODE_COLUMN */
                                GDK_TYPE_PIXBUF,   /* ICON_COLUMN   */
                                G_TYPE_STRING,     /* NAME_COLUMN   */
-                               GDK_TYPE_COLOR,    /* COLOR_COLUMN  */
                                PANGO_TYPE_WEIGHT, /* WEIGHT_COLUMN */
+                               PANGO_TYPE_STYLE,  /* STYLE_COLUMN */
                                G_TYPE_STRING,     /* UNREAD_COLUMN */
                                G_TYPE_STRING      /* TOTAL_COLUMN  */
             );
@@ -1254,8 +1254,8 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                            (GTK_WIDGET(balsa_app.main_window), in,
                             GTK_ICON_SIZE_MENU, NULL),
                        NAME_COLUMN,   name,
-                       COLOR_COLUMN,  NULL,
                        WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
+                       STYLE_COLUMN, PANGO_STYLE_NORMAL,
                        UNREAD_COLUMN, "",
                        TOTAL_COLUMN,  "",
                        -1);
@@ -1350,6 +1350,7 @@ bmbl_folder_style(GtkTreeModel * model, GtkTreeIter * iter)
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
     gboolean show_unread;
+    gboolean has_unread_child;
     static guint32 has_unread = 0; /*FIXME: is this the right initial value?*/
     GtkTreePath *path = gtk_tree_model_get_path(model, iter);
     gint depth = gtk_tree_path_get_depth(path);
@@ -1369,7 +1370,8 @@ bmbl_folder_style(GtkTreeModel * model, GtkTreeIter * iter)
      * first, does it have unread mail? */
     show_unread = mailbox ? mailbox->has_unread_messages : FALSE;
 
-    if (has_unread & (1 << (depth + 1))) {
+    has_unread_child = has_unread & (1 << (depth + 1));
+    if (has_unread_child) {
         /* some child has unread mail */
         show_unread = TRUE;
         has_unread &= ~(1 << (depth + 1));
@@ -1380,16 +1382,15 @@ bmbl_folder_style(GtkTreeModel * model, GtkTreeIter * iter)
         has_unread |= 1 << (depth);
         /* set as unread, even if it already was */
         mbnode->style |= MBNODE_STYLE_NEW_MAIL;
-        gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                           COLOR_COLUMN, &balsa_app.mblist_unread_color,
-                           WEIGHT_COLUMN, PANGO_WEIGHT_BOLD,
-                           -1);
+        if (has_unread_child)
+	    gtk_tree_store_set(GTK_TREE_STORE(model), iter,
+			       STYLE_COLUMN, PANGO_STYLE_OBLIQUE, -1);
     } else if (mbnode->style & MBNODE_STYLE_NEW_MAIL) {
         /* reset to the vanilla style */
         mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                           COLOR_COLUMN, NULL,
                            WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
+                           STYLE_COLUMN, PANGO_STYLE_NORMAL,
                            -1);
     }
 }
@@ -1459,12 +1460,12 @@ bmbl_mbnode_tab_foreach(GtkWidget * widget, gpointer data)
 			      bmbl_mbnode_tab_foreach, data);
     else if (GTK_IS_LABEL(widget)) {
 	gint unread = GPOINTER_TO_INT(data);
-	static GdkColor init_color = { 0, 0, 0, 0, };
-	GdkColor *color =
-	    unread ? &balsa_app.mblist_unread_color : &init_color;
-
-	gtk_widget_modify_fg(widget, GTK_STATE_NORMAL, color);
-	gtk_widget_modify_fg(widget, GTK_STATE_ACTIVE, color);
+	gchar *str = unread ?
+	    g_strconcat("<b>", gtk_label_get_text(GTK_LABEL(widget)),
+			"</b>", NULL) :
+	    g_strdup(gtk_label_get_text(GTK_LABEL(widget)));
+	gtk_label_set_markup(GTK_LABEL(widget), str);
+	g_free(str);
     }
 }
 
@@ -1522,8 +1523,6 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
                                    (GTK_WIDGET(balsa_app.main_window),
                                     BALSA_PIXMAP_MBOX_TRAY_FULL,
                                     GTK_ICON_SIZE_MENU, NULL),
-                               COLOR_COLUMN,
-                               &balsa_app.mblist_unread_color,
                                WEIGHT_COLUMN, PANGO_WEIGHT_BOLD, -1);
 
             /* update the notebook label */
@@ -1557,8 +1556,8 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
                                    gtk_widget_render_icon
                                        (GTK_WIDGET(balsa_app.main_window),
                                         icon, GTK_ICON_SIZE_MENU, NULL),
-                                   COLOR_COLUMN, NULL,
-                                   WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL, -1);
+                                   WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
+                                   STYLE_COLUMN, PANGO_STYLE_NORMAL, -1);
                 bmbl_mbnode_tab_style(mbnode, 0);
 
                 mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;

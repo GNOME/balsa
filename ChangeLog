@@ -1,3 +1,8 @@
+2000-11-21  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c (fill_mailbox_passwords): fix checking of pop3
+	passwords
+
 2000-11-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	fix #32805.

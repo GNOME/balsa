@@ -1,3 +1,7 @@
+2000-05-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: #9422 bug fix.
+	
 2000-05-11  Peter Williams  <peter@beta.newton.cx>
 
 	* src/cfg-memory-widgets.[ch]: New files -- new 'memory'

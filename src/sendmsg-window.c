@@ -968,9 +968,17 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
     gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
 
-    /* Add ident->bcc to the list--the sender might have already set
-     * some. FIXME: first remove any bcc entry that matches
-     * old_ident->bcc? */
+    /* We'll add the auto-bcc for the new identity, but we don't clear
+     * any current bcc entries unless it's exactly the auto-bcc for the
+     * old identity; this will avoid accumulating duplicates if the user
+     * switches identities that have the same auto-bcc, but at the same
+     * time will leave any other bcc entries that have been set up;
+     * ideally, we might parse the bcc list and remove the old auto-bcc,
+     * but that looks like a lot of work...  pb */
+    if (bsmsg->ident->bcc &&
+	strcmp(gtk_entry_get_text(GTK_ENTRY(bsmsg->bcc[1])),
+	       bsmsg->ident->bcc) == 0)
+	gtk_entry_set_text(GTK_ENTRY(bsmsg->bcc[1]), "");
     append_comma_separated(GTK_EDITABLE(bsmsg->bcc[1]), ident->bcc);
     
     /* change the subject to use the reply/forward strings */

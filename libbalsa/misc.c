@@ -386,95 +386,80 @@ libbalsa_wrap_string(gchar * str, int width)
  * if the text is coming off the wire, use the RFC specs
  * if it's coming off the screen, don't destuff unquoted lines
  * */
-static void
-unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
+
+typedef struct {
+    gint quote_depth;
+    gchar *str;
+} rfc2646text;
+
+static GList *
+unwrap_rfc2646(gchar * str, gboolean from_screen)
 {
-    gchar *str = NULL;
-    gchar **lines, **l;
-    gint ql = 0;
+    GList *list = NULL;
 
-    lines = l = g_strsplit(par, "\n", -1);
+    while (*str) {
+        /* make a line of output */
+        rfc2646text *text = g_new(rfc2646text, 1);
+        GString *string = g_string_new(NULL);
+        gboolean chomp = TRUE;
 
-    while (*lines) {
-        gint quote_level;
-        gboolean flowed = FALSE;
-        gchar *pending = NULL;
-        gboolean tagged = FALSE;
-        gint tmp;
-        gboolean is_sig;
+        text->quote_depth = -1;
 
-        if (!str) {
-            str = *lines++;
-            ql = strspn(str, QUOTE_STRING);
-        }
-        quote_level = ql;
-        tmp = str[ql];
-        str[ql] = '\0';
-        g_string_append(result, str);
-        str[ql] = tmp;
+        while (*str) {
+            /* process a line of input */
+            gboolean sig_sep;
+            gchar *p;
+            gint len;
 
-        do {
-            gchar *dq = &str[ql];
-
-            is_sig = (strcmp(dq, "-- ") == 0);
-            if (is_sig && pending)
+            for (p = str; *p == '>'; p++)
+                /* nothing */;
+            len = p - str;
+            sig_sep = (strncmp(p, "-- \n", 4) == 0);
+            if (text->quote_depth < 0)
+                text->quote_depth = len;
+            else if (len != text->quote_depth || sig_sep)
+                /* broken! a flowed line was followed by either a line
+                 * with different quote depth, or a sig separator
+                 *
+                 * we'll break before updating str, so we pick up this
+                 * line again on the next pass through this loop */
                 break;
-            /* destuff if coming off the wire or quoted: */
-            if (*dq == ' ' && (!from_screen || quote_level > 0))
-                ++dq;
-            /* flush any pending line */
-            if (pending) {
-                if (!tagged) {
-                    /* 
-                     * insert a tagging character to show whether this
-                     * object is a paragraph or a fixed line
-                     *
-                     * we don't currently use this information, but we
-                     * might want to later
-                     *
-                     * it also serves to separate the quote string from
-                     * the text, which might begin with '>'
-                     * */
-                    g_string_append_c(result, flowed ? 'p' : 'f');
-                    tagged = TRUE;
+
+            if (*p == ' ' && (!from_screen || len > 0))
+                /* space stuffed */
+                p++;
+
+            /* move str to the start of the next line, if any */
+            for (str = p; *str && *str != '\n'; str++)
+                /* nothing */;
+            len = str - p;
+            if (*str)
+                str++;
+
+            if (len > 0) {
+                g_string_append_len(string, p, len);
+                if (p[--len] != ' ' || sig_sep) {
+                    chomp = FALSE;
+                    break;
                 }
-                g_string_append(result, pending);
             }
-            /* hold this line as pending */
-            pending = dq;
-            flowed = (!is_sig) && *dq && dq[strlen(dq) - 1] == ' ';
-            if (!flowed || !*lines) {
-                str = NULL;
-                break;
-            }
-            str = *lines++;
-            ql = strspn(str, QUOTE_STRING);
-        } while (ql == quote_level);
-        /* 
-         * end of paragraph; either:
-         * - str is a sig-separator; or
-         * - str has a new quote level; or
-         * - the last line was fixed, not flowed; or
-         * - we ran out of data.
-         *
-         * if it's a new quote level, we must trim trailing spaces from
-         * any pending line
-         * */
-        if (flowed && (is_sig || ql != quote_level)) {
-            gchar *p = pending;
+        }
+        text->str = string->str;
+        g_string_free(string, FALSE);
+        if (chomp) {
+            gchar *p = text->str;
             while (*p)
                 p++;
-            while (--p >= pending && *p == ' ');
+            while (--p >= text->str && *p == ' ')
+                /* nothing */ ;
             *++p = '\0';
         }
-        if (!tagged)
-            g_string_append_c(result, flowed ? 'p' : 'f');
-        g_string_append(result, pending);
-        g_string_append_c(result, '\n');
+        list = g_list_append(list, text);
     }
 
-    g_strfreev(l);
+    return list;
 }
+
 /*
  * we'll use one routine to wrap the paragraphs
  *
@@ -482,43 +467,30 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
  * if it's going to the screen, don't space-stuff unquoted lines
  * */
 static void
-dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
+dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                gboolean quote, GString * result)
 {
-    gchar **lines, **l;
-
-    lines = l = g_strsplit(par, "\n", -1);
-
     /* outer loop over paragraphs */
-    while (*lines && **lines) {
-        gchar *str, *quote_string;
-        size_t ql;
+    while (list) {
+        rfc2646text *text = list->data;
+        gchar *str;
+        gint qd;
 
-        str = *lines++;
-        ql = strspn(str, QUOTE_STRING);
-        if (quote || ql) {
-            if (quote) {
-                gint tmp = str[ql];
-                str[ql] = '\0';
-                quote_string = g_strconcat(QUOTE_STRING, str, NULL);
-                str[ql] = tmp;
-            } else
-                quote_string = g_strndup(str, ql);
-        } else
-            quote_string = "";
-        /* skip over quote string and tag character: */
-        str += ql + 1;
+        str = text->str;
+        qd = text->quote_depth;
+        if (quote)
+            qd++;
         /* one output line per middle loop */
         do {                    /* ... while (*str); */
             gboolean first_word = TRUE;
             gchar *start = str;
             gchar *line_break = start;
-            gint len = ql;
+            gint len = qd;
+            gint i;
 
             /* start of line: emit quote string */
-            g_string_append(result, quote_string);
-            if (quote)
-                ++len;
+            for (i = 0; i < qd; i++)
+                g_string_append_c(result, '>');
             /* space-stuffing:
              * - for the wire, stuffing is required for lines beginning
              *   with ` ', `>', or `From '
@@ -587,14 +559,16 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
              * */
             if (str > start && isspace((int)str[-1]) && str[-1] != ' ')
                 g_string_append_c(result, ' ');
-            g_string_append_c(result, '\n');
+            if (*str)           /* line separator */
+                g_string_append_c(result, '\n');
         } while (*str);         /* end of loop over output lines */
 
-        if (*quote_string)
-            g_free(quote_string);
+        g_free(text->str);
+        g_free(text);
+        list = g_list_next(list);
+        if (list)               /* paragraph separator */
+            g_string_append_c(result, '\n');
     }                           /* end of paragraph */
-
-    g_strfreev(l);
 }
 
 /* GString *libbalsa_process_text_rfc2646:
@@ -617,16 +591,11 @@ libbalsa_process_text_rfc2646(gchar * par, gint width,
 {
     gint len = strlen(par);
     GString *result = g_string_sized_new(len);
-    gchar *str;
+    GList *list;
 
-    unwrap_rfc2646(par, from_screen, result);
-    str = result->str;
-    len = result->len;
-    g_string_free(result, FALSE);
-
-    result = g_string_sized_new(len);
-    dowrap_rfc2646(str, width, to_screen, quote, result);
-    g_free(str);
+    list = unwrap_rfc2646(par, from_screen);
+    dowrap_rfc2646(list, width, to_screen, quote, result);
+    g_list_free(list);
 
     return result;
 }

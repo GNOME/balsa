@@ -639,7 +639,6 @@ set_icon (GdkWindow * w)
       att.width = 32;
       att.height = 24;
     }
-  g_print ("width:  %i\nheight: %i\n", att.width, att.height);
   att.wclass = GDK_INPUT_OUTPUT;
   att.window_type = GDK_WINDOW_TOPLEVEL;
   att.x = 0;

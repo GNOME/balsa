@@ -236,6 +236,8 @@ void print_message(GtkWidget *widget, gpointer data)
 }
 
 #else
+
+#include <ctype.h>
 #include <libgnomeprint/gnome-print.h>
 #include <libgnomeprint/gnome-print-dialog.h>
 #include <libgnomeprint/gnome-print-master.h>
@@ -243,7 +245,10 @@ void print_message(GtkWidget *widget, gpointer data)
 #include <libbalsa.h>
 
 #define BALSA_PRINT_BODY_FONT "Courier"
+#define BALSA_PRINT_BODY_SIZE 10
 #define BALSA_PRINT_HEAD_FONT "Helvetica"
+#define BALSA_PRINT_HEAD_SIZE 11
+
 
 typedef struct _PrintInfo {
   /* gnome print info */
@@ -262,7 +267,7 @@ typedef struct _PrintInfo {
   float page_width, page_height;
   float margin_top, margin_bottom, margin_left, margin_right;
   float printable_width, printable_height;
-  float header_height;
+  float header_height, header_label_width;
   gint  total_lines;
   gint  lines_per_page, chars_per_line;
 
@@ -272,6 +277,7 @@ typedef struct _PrintInfo {
   /* balsa data */
   LibBalsaMessage *message;
   gchar * buff, *pointer, *line_buf;
+  gchar** headers; /* can be released with g_strfreev() */
 
 } PrintInfo;
 
@@ -287,6 +293,79 @@ static guint linecount(const gchar *str)
   return cnt;
 }
 
+static int
+print_wrap_string(gchar* str, GnomeFont *font, gint width)
+{
+  gchar* ptr = str, *last_space = NULL;
+  int lines = 1, line_width;
+  g_return_val_if_fail(str, 0);
+
+  line_width = 0;
+  g_strchomp(str);
+  while(*ptr) {
+    line_width = 0;
+    last_space = NULL;
+    while(*ptr && (line_width <= width || !last_space) ) {
+      if(isspace(*ptr)) { *ptr = ' '; last_space = ptr; }
+      line_width += gnome_font_get_width(font, *ptr++);
+    }
+    if(*ptr) {
+      *last_space = '\n'; ptr = last_space + 1;
+      lines++;
+    }
+  }
+  return lines;
+}
+
+/* prepare_page_header:
+   helper function to fill in PrintInfo structure. Finds out which headers
+   are available, adds them to the list, wraps, and computes the total
+   header height. The wrapping is as good as one can get, for variable width
+   fonts, too.
+*/
+static void
+prepare_page_header(PrintInfo *pi)
+{
+  const int MAX_HDRS = 4; /* max number of printed headers */
+  int hdr = 0, i, width, lines;
+  GnomeFont *font;
+
+  pi->headers = g_new0(gchar*, (MAX_HDRS+1)*2);
+
+  if (pi->message->from) {
+    pi->headers[hdr++] =  g_strdup(_("From:"));
+    pi->headers[hdr++] = libbalsa_address_to_gchar(pi->message->from);
+  }
+
+  if (pi->message->to_list) {
+    pi->headers[hdr++] = g_strdup(_("To:"));
+    pi->headers[hdr++] = libbalsa_make_string_from_list(pi->message->to_list);
+  }
+  if (pi->message->subject) {
+    pi->headers[hdr++] = g_strdup(_("Subject:"));
+    pi->headers[hdr++] = g_strdup(pi->message->subject);
+  }
+  pi->headers[hdr++] = g_strdup(_("Date:"));
+  pi->headers[hdr++] = libbalsa_message_date_to_gchar(pi->message, 
+						      balsa_app.date_string);
+
+  pi->header_label_width = 0;
+  font = gnome_font_new(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_HEAD_SIZE);
+  for(i=0; i<hdr; i+=2) {
+    width = gnome_font_get_width_string(font, pi->headers[i]);
+    if(width>pi->header_label_width) pi->header_label_width = width;
+  }
+  pi->header_label_width += 6; /* pts */
+
+  lines = 0;
+  for(i=1; i<hdr; i+=2)
+    lines += print_wrap_string(pi->headers[i], font, 
+			       pi->printable_width-pi->header_label_width);
+
+  pi->header_height = lines*BALSA_PRINT_HEAD_SIZE;
+  gtk_object_unref(GTK_OBJECT(font));
+}
+  
 static PrintInfo* 
 print_info_new(const gchar* paper, LibBalsaMessage *msg, GnomePrintDialog *dlg)
 {
@@ -308,7 +387,6 @@ print_info_new(const gchar* paper, LibBalsaMessage *msg, GnomePrintDialog *dlg)
   pi->margin_bottom = 0.75*72;   /* get it from gnome-print            */
   pi->margin_left   = 0.75*72;
   pi->margin_right  = 0.75*72;
-  pi->header_height = 0.73*72;  /* this one is VERY arbitrary */  
   pi->printable_width  = pi->page_width  - pi->margin_left - pi->margin_right;
   pi->printable_height = pi->page_height - pi->margin_top  - pi->margin_bottom;
 
@@ -316,6 +394,7 @@ print_info_new(const gchar* paper, LibBalsaMessage *msg, GnomePrintDialog *dlg)
   pi->tab_width = 8;
 
   pi->message = msg;
+  prepare_page_header(pi);
   libbalsa_message_body_ref(msg);
   str = content2reply(msg, NULL, pi->chars_per_line);
   libbalsa_message_body_unref(msg);
@@ -336,6 +415,7 @@ static void
 print_info_destroy(PrintInfo *pi)
 {
   /* ... */
+  g_strfreev(pi->headers);                     pi->headers    = NULL;
   g_free(pi->line_buf);                        pi->line_buf   = NULL;
   g_free(pi->buff);                            pi->buff       = NULL;
   g_free(pi->font_name);                       pi->font_name  = NULL;
@@ -411,8 +491,6 @@ void message_print_cb(GtkWidget *widget, gpointer cbdata)
   if(preview) {
     GnomePrintMasterPreview * preview_widget = gnome_print_master_preview_new(
       pi->master, _("Balsa: message print preview"));
-    /* gtk_signal_connect(GTK_OBJECT(preview_widget), "destroy_event",
-       GTK_SIGNAL_FUNC(destroy_printinfo), pi); */
     gtk_widget_show(GTK_WIDGET(preview_widget));
   } 
   print_info_destroy(pi);
@@ -492,30 +570,21 @@ print_line(PrintInfo *pi, int line_on_page)
 }
 
 static void
-print_header_gchar(PrintInfo *pi, GnomeFont* font, gint xpos, gint *ypos, 
-		   gint line_height,  const gchar * label, const gchar *text)
+print_header_val(GnomePrintContext *pc, gint x, gint *y, gint line_height,
+		 gchar* val)
 {
-  gint width;
-  gnome_print_moveto(pi->pc, xpos, *ypos);
-  gnome_print_show(pi->pc, label);
-  width = gnome_font_get_width_string(font, label);
-  gnome_print_moveto(pi->pc, xpos+width+12, *ypos);
-  gnome_print_show(pi->pc, text);
+  gchar *ptr, *eol;
 
-  *ypos -= line_height;
-}
-
-static void
-print_header_glist(PrintInfo *pi, GnomeFont* font, gint xpos, gint *ypos, 
-		   gint line_height,  const gchar *label,  const GList * list) 
-{
-  gchar * value;
-
-  if ( list == NULL )  return;
-
-  value = libbalsa_make_string_from_list (list);
-  print_header_gchar(pi, font, xpos, ypos, line_height, label, value);
-  g_free(value);
+  ptr = val;
+  while(ptr) {
+    eol = strchr(ptr, '\n');
+    if(eol) *eol = '\0';
+    gnome_print_moveto(pc, x, *y);
+    gnome_print_show(pc, ptr);
+    ptr = eol;
+    if(eol) { *eol = '\n'; ptr++; }
+    *y -= line_height;
+  } 
 }
 
 static void
@@ -523,35 +592,24 @@ print_header(PrintInfo *pi, guint page)
 {
   GnomeFont * font;
   gchar * page_no = g_strdup_printf(_("Page: %i/%i"), page, pi->pages);
-  gchar * date;
-  int h = pi->header_height/4, width, ypos;
+  int width, ypos, i;
 
   ypos = pi->page_height-pi->margin_top;
-  font = gnome_font_new(BALSA_PRINT_HEAD_FONT, 12);
+  font = gnome_font_new(BALSA_PRINT_HEAD_FONT, BALSA_PRINT_HEAD_SIZE);
   gnome_print_setfont(pi->pc, font);
   width = gnome_font_get_width_string(font, page_no);
   gnome_print_moveto(pi->pc, pi->page_width-pi->margin_left-width, ypos);
   gnome_print_show(pi->pc, page_no);
   g_free(page_no);
 
-  if (pi->message->from) {
-     gchar *from = libbalsa_address_to_gchar (pi->message->from);
-     print_header_gchar(pi,font,pi->margin_left, &ypos, h, _("From:"), from);
-     g_free (from);
+  for(i=0; pi->headers[i]; i+=2) {
+    gnome_print_moveto(pi->pc, pi->margin_left, ypos);
+    gnome_print_show(pi->pc, pi->headers[i]);
+    print_header_val(pi->pc, pi->margin_left+pi->header_label_width, &ypos,
+		     BALSA_PRINT_HEAD_SIZE, pi->headers[i+1]);
   }
 
-  if (pi->message->to_list) {
-     print_header_glist(pi,font,pi->margin_left, &ypos, h, _("To:"), 
-			pi->message->to_list);
-  }
-  if (pi->message->subject) {
-     print_header_gchar(pi,font, pi->margin_left, &ypos, h, _("Subject:"), 
-			pi->message->subject);
-  }
-
-  date = libbalsa_message_date_to_gchar (pi->message, balsa_app.date_string);
-  print_header_gchar(pi,font, pi->margin_left, &ypos, h, _("Date:"), date);
-  g_free(date);
+  gtk_object_unref(GTK_OBJECT(font));
 }
 
 #endif

@@ -1,3 +1,7 @@
+2000-09-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: wrap headers too.
+	
 2000-09-15  Pawel Salek  <pawsa@theochem.kth.se>
 	use gnome-print if available.
 	* acconfig.h: HAVE_GNOME_PRINT added.

@@ -1,3 +1,8 @@
+1999-01-06  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (file_menu): Use Ctrl-Q as the exit-app
+ 	accelerator.
+
 1998-12-28  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	* src/mblist-window.c (mblist_open_window): added the dnd reception

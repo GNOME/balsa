@@ -92,6 +92,14 @@ d_get_gint(const gchar * key, gint def_val)
     return def ? def_val : res;
 }
 
+static gfloat
+d_get_gfloat(const gchar * key, gfloat def_val)
+{
+    gint def;
+    gfloat res = gnome_config_get_int_with_default(key, &def);
+    return def ? def_val : res;
+}
+
 static void
 free_toolbar(int i)
 {
@@ -633,7 +641,20 @@ config_global_load(void)
     g_free(balsa_app.paper_size);
     balsa_app.paper_size =
 	gnome_config_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
-
+    g_free(balsa_app.print_header_font);
+    balsa_app.print_header_font =
+	gnome_config_get_string("PrintHeaderFont=" DEFAULT_PRINT_HEADER_FONT);
+    balsa_app.print_header_size = 
+	d_get_gfloat("PrintHeaderSize", DEFAULT_PRINT_HEADER_SIZE);
+    balsa_app.print_footer_size =
+	d_get_gfloat("PrintFooterSize", DEFAULT_PRINT_FOOTER_SIZE);
+    g_free(balsa_app.print_body_font);
+    balsa_app.print_body_font =
+	gnome_config_get_string("PrintBodyFont=" DEFAULT_PRINT_BODY_FONT);
+    balsa_app.print_body_size =
+	d_get_gfloat("PrintBodySize", DEFAULT_PRINT_BODY_SIZE);
+    balsa_app.print_highlight_cited =
+	gnome_config_get_bool("PrintHighlightCited=false");
     gnome_config_pop_prefix();
 
     /* Spelling options ... */
@@ -942,6 +963,12 @@ gint config_save(void)
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
     gnome_config_set_string("PaperSize",balsa_app.paper_size);
+    gnome_config_set_string("PrintHeaderFont", balsa_app.print_header_font);
+    gnome_config_set_float("PrintHeaderSize", balsa_app.print_header_size);
+    gnome_config_set_float("PrintFooterSize", balsa_app.print_footer_size);
+    gnome_config_set_string("PrintBodyFont", balsa_app.print_body_font);
+    gnome_config_set_float("PrintBodySize", balsa_app.print_body_size);
+    gnome_config_set_bool("PrintHighlightCited", balsa_app.print_highlight_cited);
     gnome_config_pop_prefix();
 
     /* Spelling options ... */

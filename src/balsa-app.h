@@ -89,6 +89,11 @@
 #define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
 #define DEFAULT_PAPER_SIZE "A4"
+#define DEFAULT_PRINT_HEADER_FONT "Helvetica"
+#define DEFAULT_PRINT_HEADER_SIZE 11.0
+#define DEFAULT_PRINT_FOOTER_SIZE 7.0
+#define DEFAULT_PRINT_BODY_FONT "Courier"
+#define DEFAULT_PRINT_BODY_SIZE 10.0
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_MESSAGE_TITLE_FORMAT "Message from %F: %s"
 #define DEFAULT_ENCODING ENC8BIT
@@ -310,6 +315,12 @@ extern struct BalsaApplication {
 
     /* printing */
     gchar* paper_size; /* A4 or Letter */
+    gchar* print_header_font;  /* font for printing headers and footers */
+    gfloat print_header_size;  /* size fpr printing headers */
+    gfloat print_footer_size;  /* size for printing footers */
+    gchar* print_body_font;    /* font for printing text parts */
+    gfloat print_body_size;    /* size for printing text parts */
+    gboolean print_highlight_cited;
 
     /* compose: shown headers */
     gchar *compose_headers;

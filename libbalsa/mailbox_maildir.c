@@ -421,7 +421,7 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	if (msg_info) {
 	    g_free(key);
 	    if (FLAGS_REALLY_DIFFER(msg_info->orig_flags, flags)) {
-		g_warning("Message flags for \"%s\" changed\n",
+		g_message("Message flags for \"%s\" changed\n",
                           msg_info->key);
 		msg_info->orig_flags = flags;
 	    }

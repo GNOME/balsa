@@ -1,3 +1,8 @@
+2002-02-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* sendlib.c (mutt_write_mime_header): re-enable disposition: 
+	now that libbalsa uses it
+
 2002-02-27  Carlos Morgado  <chbm@chbm.nu>
 
 	* imap/command.c (cmd_parse_capabilities): unbreak patch aplied 

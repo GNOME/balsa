@@ -406,8 +406,6 @@ int mutt_write_mime_header (BODY *a, FILE *f)
   if (a->description)
     fprintf(f, "Content-Description: %s\n", a->description);
 
-#ifndef LIBMUTT /* don't use Content-Disposition till we have 
-		 a proper UI*/
   fprintf (f, "Content-Disposition: %s", DISPOSITION (a->disposition));
 
   if (a->use_disp)
@@ -439,7 +437,6 @@ int mutt_write_mime_header (BODY *a, FILE *f)
   }
 
   fputc ('\n', f);
-#endif
 
   if (a->encoding != ENC7BIT)
     fprintf(f, "Content-Transfer-Encoding: %s\n", ENCODING (a->encoding));

@@ -33,6 +33,7 @@ struct _IndexWindow
     guint watcher_id;
     GtkWidget *window;
     GtkWidget *index;
+    GtkAccelGroup *accel;
   };
 
 static GList *open_mailbox_list = NULL;
@@ -52,6 +53,10 @@ static void set_index_window_data (GtkObject * object, IndexWindow * iw);
 static IndexWindow *get_index_window_data (GtkObject * object);
 
 static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
+
+/* index callbacks */
+static void next_message_cb (GtkWidget * widget);
+static void previous_message_cb (GtkWidget * widget);
 
 /* menu item callbacks */
 static void delete_message_cb (GtkWidget * widget, Message * message);
@@ -78,17 +83,19 @@ create_new_index (Mailbox * mailbox)
 
   iw->window = gnome_app_new ("balsa", iw->mailbox->name);
 
+  iw->accel = gtk_accel_group_new ();
+  
   set_index_window_data (GTK_OBJECT (iw->window), iw);
   gtk_signal_connect (GTK_OBJECT (iw->window),
 		      "destroy",
 		      (GtkSignalFunc) destroy_index_window,
 		      NULL);
-
-  gtk_signal_connect (GTK_OBJECT (iw->window),
-		      "delete_event",
-		      (GtkSignalFunc) destroy_index_window,
-		      NULL);
-
+/*
+   gtk_signal_connect (GTK_OBJECT (iw->window),
+   "delete_event",
+   (GtkSignalFunc) destroy_index_window,
+   NULL);
+ */
   vbox = gtk_vbox_new (TRUE, 0);
   gnome_app_set_contents (GNOME_APP (iw->window), vbox);
   gtk_widget_show (vbox);
@@ -201,7 +208,7 @@ index_select_cb (GtkWidget * widget,
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
   else if (bevent && bevent->button == 3)
-    gtk_widget_show (create_menu (BALSA_INDEX (widget), message));
+    gtk_menu_popup (GTK_MENU(create_menu (BALSA_INDEX (widget), message)),NULL,NULL,NULL,NULL,bevent->button,bevent->time);
 }
 /*
  * CLIST Callbacks
@@ -312,4 +319,20 @@ undelete_message_cb (GtkWidget * widget, Message * message)
 
   message_undelete (message);
   /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
+}
+
+static void
+next_message_cb (GtkWidget * widget)
+{
+  IndexWindow *iw = get_index_window_data (GTK_OBJECT (widget));
+  g_return_if_fail (widget != NULL);
+  balsa_index_select_next (BALSA_INDEX (iw->index));
+}
+
+static void
+previous_message_cb (GtkWidget * widget)
+{
+  IndexWindow *iw = get_index_window_data (GTK_OBJECT (widget));
+  g_return_if_fail (widget != NULL);
+  balsa_index_select_previous (BALSA_INDEX (iw->index));
 }

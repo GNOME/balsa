@@ -1,3 +1,7 @@
+2004-11-11 07:29  PeterB/Pawel
+
+	* src/balsa-message.c: deprecation cleanup.
+
 2004-11-10  Pawel Salek
 
 	* src/balsa-index.c: search for "To" field in sentbox-type mailboxes.

@@ -2866,40 +2866,115 @@ read_signature(BalsaSendmsg *msg)
 
 /* opens the load file dialog box, allows selection of the file and includes
    it at current point */
+static const gchar* conv_charsets[] = {
+ "ISO-8859-1", "ISO-8859-15", "ISO-8859-2", "ISO-8859-9", "ISO-8859-13",
+ "EUC-KR", "EUC-JP", "EUC-TW", "KOI8-R"
+};
+enum{
+    CHARSET_COLUMN,
+    N_COLUMNS
+};
+
 static void
 do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
 {
     const gchar *fname;
-    guint cnt;
-    gchar buf[4096];
     FILE *fl;
     BalsaSendmsg *bsmsg;
 
     bsmsg = (BalsaSendmsg *) g_object_get_data(G_OBJECT(fs), "balsa-data");
     fname = gtk_file_selection_get_filename(GTK_FILE_SELECTION(fs));
 
-    if (!(fl = fopen(fname, "rt"))) {
+    if ((fl = fopen(fname, "rt")) ==NULL) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Could not open the file %s.\n"), fname);
-    } else {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-
-	gnome_appbar_push(balsa_app.appbar, _("Loading..."));
-
-	while ((cnt = fread(buf, 1, sizeof(buf), fl)) > 0) {
-	    if (balsa_app.debug)
-		printf("%s cnt: %d (max: %d)\n", fname, cnt, sizeof(buf));
-	    gtk_text_buffer_insert_at_cursor(buffer, buf, cnt);
-	}
-	if (balsa_app.debug)
-	    printf("%s cnt: %d (max: %d)\n", fname, cnt, sizeof(buf));
-
-	fclose(fl);
-	gnome_appbar_pop(balsa_app.appbar);
+	return;
     }
-    gtk_widget_destroy(GTK_WIDGET(fs));
 
+    GtkTextBuffer *buffer =
+	gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    gchar* string = NULL;
+    size_t len = libbalsa_readfile(fl, &string);
+    fclose(fl);
+    
+    if(g_utf8_validate(string, -1, NULL)) {
+	gtk_text_buffer_insert_at_cursor(buffer, string, len);
+	g_free(string);
+	gtk_widget_destroy(GTK_WIDGET(fs));
+	return;
+    }
+
+    /* the tough part */
+
+    GError* err = NULL;
+    gsize bytes_read, bytes_written;
+    gchar* s;
+    guint i;
+    /* const gchar* prev = "UTF-8"; */
+    GtkCellRenderer *renderer;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeViewColumn *column;
+    GtkWidget * dialog =
+	gtk_dialog_new_with_buttons(_("Choose charset"),
+				    GTK_WINDOW(bsmsg->window),
+				    GTK_DIALOG_DESTROY_WITH_PARENT,
+				    GTK_STOCK_OK, GTK_RESPONSE_OK,
+				    GTK_STOCK_CANCEL, GTK_STOCK_CANCEL,
+				    NULL);
+    GtkWidget* info = 
+	gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
+			"Please choose the charset used to encode the file."));
+    GtkListStore* store = gtk_list_store_new(N_COLUMNS,
+					     G_TYPE_STRING);
+    GtkWidget* tree = 
+	gtk_tree_view_new_with_model (GTK_TREE_MODEL(store));
+    g_object_unref(store);
+    
+    renderer = gtk_cell_renderer_text_new ();
+    column = gtk_tree_view_column_new_with_attributes("Name", renderer,
+						      "text", CHARSET_COLUMN,
+						      NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
+                       info, FALSE, TRUE, 5);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
+                       tree, TRUE, TRUE, 5);
+    gtk_widget_show(info);
+    gtk_widget_show(tree);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+                                    GTK_RESPONSE_OK);
+
+    for(i=0; i<ELEMENTS(conv_charsets); i++) {
+	gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, CHARSET_COLUMN, conv_charsets[i], -1);
+    }
+
+    do {
+	const gchar* charset = NULL;
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
+	    break;
+	GtkTreeSelection *select =
+	    gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+	if (gtk_tree_selection_get_selected(select, &model, &iter))
+	    gtk_tree_model_get(model, &iter, CHARSET_COLUMN, &charset, -1);
+	g_print("Trying charset: %s\n", charset);
+	s=g_convert(string, len, "UTF-8", charset,
+		    &bytes_read, &bytes_written, &err);
+	if(!err) {
+	    gtk_text_buffer_insert_at_cursor(buffer, s, bytes_written);
+	    g_free(s);
+	    break;
+	}
+	g_free(s);
+	g_error_free(err);
+    } while(1);
+
+    g_free(string);
+    gtk_widget_destroy(dialog);
+
+    gtk_widget_destroy(GTK_WIDGET(fs));
 }
 
 static gint

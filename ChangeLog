@@ -1,3 +1,8 @@
+2002-12-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: include correctly non-UTF-8 files.
+	* balsa.spec.in: fix #102150.
+	
 2002-12-28  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/filter-run-dialog.c, src/save-restore.c:

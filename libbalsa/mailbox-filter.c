@@ -60,25 +60,21 @@ libbalsa_mailbox_filters_when(GSList * filters, gint when)
 gchar*
 mailbox_filters_section_lookup(const gchar * name)
 {
-    gint pref_len=strlen(MAILBOX_FILTERS_SECTION_PREFIX);
-    guint name_len;
-
     gchar * key, *section = NULL;
     void * iterator;
 
     g_return_val_if_fail(name && name[0],NULL);
-    name_len=strlen(name);
     iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
     while (!section &&
 	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
-	if (strncmp(key, MAILBOX_FILTERS_SECTION_PREFIX, pref_len) == 0) {
+	if (libbalsa_str_has_prefix(key, MAILBOX_FILTERS_SECTION_PREFIX)) {
 	    gchar *url;
 
 	    section = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    gnome_config_push_prefix(section);
 	    url = gnome_config_get_string(MAILBOX_FILTERS_URL_KEY);
 	    gnome_config_pop_prefix();
-	    if (strncmp(url, name, name_len)) {
+	    if (strcmp(url, name) != 0) {
 		g_free(section);
 		section = NULL;
 	    }

@@ -1,5 +1,7 @@
-2004-12-26 11:28  PeterB
+2004-12-26 18:45  PeterB
 
+	* libbalsa/body.c: g_mime_data_wrapper_write_to_stream() decodes
+	the transfer-encoding--we must not.
 	* libbalsa/files.c: look for themed mime-type icon.
 
 2004-12-24  Pawel Salek

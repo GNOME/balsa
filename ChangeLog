@@ -1,3 +1,8 @@
+2002-01-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c: do not remove main level inboxes and folders
+	on rescanning.p
+
 2002-01-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	W. Michael Petullo <mike@flyn.org> attachment patch + some cleanup.

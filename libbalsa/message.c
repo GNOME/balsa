@@ -566,7 +566,7 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
 	if(message->mailbox==NULL) continue;
-	if (libbalsa_mailbox_copy_message(message, dest))
+	if (libbalsa_mailbox_copy_message(message, dest) != -1)
 	    rethread = TRUE;
     }
 

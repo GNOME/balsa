@@ -149,7 +149,7 @@ do_mutt_error (char *str,...)
 
 /* We're gonna set Mutt global vars here */
 void
-mailbox_init (gchar * inbox_path, my_variadic_function error_func)
+mailbox_init (gchar * inbox_path, void (*error_func)(const char* fmt, ...))
 {
   struct utsname utsname;
   char *p;
@@ -167,7 +167,7 @@ mailbox_init (gchar * inbox_path, my_variadic_function error_func)
 
   Hostname = g_get_host_name ();
 
-  mutt_error = &error_func;
+  mutt_error = error_func;
 
   Fqdn = g_strdup (Hostname);
 
@@ -1328,6 +1328,11 @@ message_body_ref (Message * message)
    * load message body
    */
   msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno);
+  if (!msg)
+    {
+      message->body_ref--;
+      return;
+    }
   fseek (msg->fp, cur->content->offset, 0);
   if (cur->content->type == TYPEMULTIPART)
     {

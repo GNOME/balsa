@@ -134,6 +134,21 @@ typedef struct ImapEnvelope_ {
   gchar *message_id;
 } ImapEnvelope;
 
+typedef enum {
+  IMFETCH_BODYSTRUCT = 1<<0,
+  IMFETCH_ENV        = 1<<1,
+  IMFETCH_FLAGS      = 1<<2,
+  IMFETCH_RFC822SIZE = 1<<3,
+  IMFETCH_UID        = 1<<4,
+  IMFETCH_CONTENT_TYPE = 1<<5,
+  IMFETCH_REFERENCES   = 1<<6,
+  IMFETCH_LIST_POST    = 1<<7,
+  IMFETCH_RFC822HEADERS = 1<<8,
+  IMFETCH_RFC822HEADERS_SELECTED = 1<<9, /* non-overlapping with ENV. */
+  IMFETCH_HEADER_MASK  = (IMFETCH_CONTENT_TYPE | IMFETCH_REFERENCES |
+                          IMFETCH_LIST_POST)
+} ImapFetchType;
+
 typedef struct ImapBody_ ImapBody;
 
 typedef enum { IMBMEDIA_MULTIPART,
@@ -201,6 +216,14 @@ typedef struct ImapMessage_ {
      Almost.
   */
   gchar *fetched_header_fields;
+  ImapFetchType available_headers; /* Used internally. Informs, what
+                                    * fields are supposed to be
+                                    * already in
+                                    * fetched_header_fields. Checking
+                                    * the content of the string is not
+                                    * sufficient: we would keep
+                                    * sending requests if the header
+                                    * in question is not present. */
 } ImapMessage;
 
 typedef struct _ImapMboxHandle      ImapMboxHandle;

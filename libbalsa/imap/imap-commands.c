@@ -17,8 +17,11 @@
  * 02111-1307, USA.
  */
 #define _XOPEN_SOURCE 500
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap_private.h"
@@ -91,10 +94,18 @@ simple_coealesce_func(int i, unsigned msgno[])
 struct fetch_data {
   ImapMboxHandle* h;
   ImapFetchType ift;
+  ImapFetchType req_fetch_type; /* an union of what is requested with
+                                 * what is fetched already: eg. POST |
+                                 *  CONTENT_TYPE -> RFC822_SELECTED */
 };
 static unsigned
 need_fetch(unsigned seqno, struct fetch_data* fd)
 {
+  ImapFetchType header[] =
+    { IMFETCH_CONTENT_TYPE, IMFETCH_REFERENCES, IMFETCH_LIST_POST };
+  unsigned i;
+  ImapFetchType available_headers;
+
   g_return_val_if_fail(seqno>=1 && seqno<=fd->h->exists, 0);
   if(fd->h->msg_cache[seqno-1] == NULL) return seqno;
   if( (fd->ift & IMFETCH_ENV) 
@@ -103,24 +114,23 @@ need_fetch(unsigned seqno, struct fetch_data* fd)
       && fd->h->msg_cache[seqno-1]->body == NULL) return seqno;
   if( (fd->ift & IMFETCH_RFC822SIZE) 
       && fd->h->msg_cache[seqno-1]->rfc822size <0) return seqno;
-  if(fd->ift & IMFETCH_HEADER_MASK) {
-    const gchar *fetched_headers = 
-      fd->h->msg_cache[seqno-1]->fetched_header_fields;
-    if(fetched_headers == NULL)
-        return seqno;
-    /* FIXME: take care of case sensivity */
-    if(fd->ift & IMFETCH_CONTENT_TYPE &&
-       strstr(fetched_headers, "Content-Type:") == NULL) return seqno;
-    if(fd->ift & IMFETCH_REFERENCES &&
-       strstr(fetched_headers, "References:") == NULL) return seqno;
-    if(fd->ift & IMFETCH_LIST_POST &&
-       strstr(fetched_headers, "List-Post:") == NULL) return seqno;
+
+  available_headers = fd->h->msg_cache[seqno-1]->available_headers;
+  for(i=0; i<ELEMENTS(header); i++) {
+    if( (fd->ift & header[i]) &&
+        !(available_headers & (header[i]|IMFETCH_RFC822HEADERS|
+                               IMFETCH_RFC822HEADERS_SELECTED))) {
+      if(available_headers&IMFETCH_HEADER_MASK)
+        fd->req_fetch_type = IMFETCH_RFC822HEADERS_SELECTED;
+      return seqno;
+    }
   }
-  /* FIXME: the tests below are unsatifactory... */
-  if(fd->ift & IMFETCH_RFC822HEADERS)
-    return seqno;
-  if(fd->ift & IMFETCH_RFC822HEADERS_SELECTED)
-    return seqno;
+  if( (fd->ift & IMFETCH_RFC822HEADERS) &&
+     !(available_headers & IMFETCH_RFC822HEADERS)) return seqno;
+  if( (fd->ift & IMFETCH_RFC822HEADERS_SELECTED) &&
+     !(available_headers & (IMFETCH_RFC822HEADERS|
+                            IMFETCH_RFC822HEADERS_SELECTED))) return seqno;
+
   return 0;
 }
 
@@ -613,6 +623,43 @@ ic_construct_header_list(const char **hdr, ImapFetchType ift)
   hdr[idx] = NULL;
 }
 
+/* set_avail_headers interprets given sequence string as constructed
+ * by coalesce_seq_no and set the available_headers field for all the
+ * cached message structures. We need of course to reset the
+ * available_headers for header-relevant fetches, not for arbitrary
+ * ones (BODYSTRUCTURE). */
+static void
+set_avail_headers(ImapMboxHandle *h, const char *seq, ImapFetchType ift)
+{
+  const char *s = seq;
+  char *tmp;
+  unsigned lo, hi; 
+
+  if( !(ift & (IMFETCH_HEADER_MASK|IMFETCH_RFC822HEADERS|
+               IMFETCH_RFC822HEADERS_SELECTED)) ) return;
+  while(*s) {
+    lo = strtoul(s, &tmp, 10);
+    switch(*tmp) {
+    case '\0':
+    case ',':
+      if(h->msg_cache[lo-1])
+        h->msg_cache[lo-1]->available_headers = ift;
+      break;
+    case ':': hi = strtoul(tmp+1, &tmp, 10);
+      for(;lo<=hi; lo++)
+        if(h->msg_cache[lo-1]) {
+          h->msg_cache[lo-1]->available_headers = ift;
+        }
+      
+      break;
+    default: g_warning("unexpected sequence %s\n", seq);
+    }
+    if(*tmp==',') tmp++;
+    s = tmp;
+  }
+      
+}
+
 ImapResponse
 imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
                              unsigned lo, unsigned hi, ImapFetchType ift)
@@ -625,7 +672,7 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   struct fetch_data fd;
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
-  fd.h = handle; fd.ift = ift;
+  fd.h = handle; fd.ift = fd.req_fetch_type = ift;
   
   if(lo>hi) return IMR_OK;
   if(lo<1) lo = 1;
@@ -633,8 +680,9 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   seq = coalesce_seq_range(lo, hi, cf, &fd);
   if(seq) {
     const char* hdr[13];
-    ic_construct_header_list(hdr, ift);
+    ic_construct_header_list(hdr, fd.req_fetch_type);
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
+    if(rc == IMR_OK) set_avail_headers(handle, seq, fd.req_fetch_type);
     g_free(seq);
   } else rc = IMR_OK;
   return rc;
@@ -652,15 +700,16 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   if(cnt == 0) return IMR_OK;
 
-  fd.fd.h = handle; fd.fd.ift = ift;
+  fd.fd.h = handle; fd.fd.ift = fd.fd.req_fetch_type = ift;
   fd.set = set;
   cf = (CoalesceFunc)(mbox_view_is_active(&handle->mbox_view)
                       ? need_fetch_view_set : need_fetch_set);
   seq = coalesce_seq_range(1, cnt, cf, &fd);
   if(seq) {
     const char* hdr[13];
-    ic_construct_header_list(hdr, ift);
+    ic_construct_header_list(hdr, fd.fd.req_fetch_type);
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
+    if(rc == IMR_OK) set_avail_headers(handle, seq, fd.fd.req_fetch_type);
     g_free(seq);
   } else rc = IMR_OK;
   return rc;

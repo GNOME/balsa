@@ -7,6 +7,9 @@
 	threading.
 	* src/information-dialog.c: loose no info messages.
 	* src/main.c: shutdown nicely imap connections.
+	* libbalsa/imap/imap-commands.c: carefully avoid refetching headers.
+	* libbalsa/imap/imap-handle.h:
+	* libbalsa/imap/libimap.h: move ImapFetchType to libimap.h
 
 2004-07-18  Pawel Salek
 

@@ -245,6 +245,13 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 		} else {
 			unset_option(OPTPOPDELETE);
 		}
+
+		/* Use Apop ? */
+		if (LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop) {
+			set_option(OPTPOPAPOP);
+		} else {
+			unset_option(OPTPOPAPOP);
+		}
     
 		mutt_fetchPopMail ();
 		g_free (PopHost);

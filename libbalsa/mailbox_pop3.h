@@ -41,6 +41,7 @@ struct _LibBalsaMailboxPop3
   gboolean check;
   gboolean delete_from_server;
   gchar *last_popped_uid;
+  gboolean use_apop;
 };
 
 struct _LibBalsaMailboxPop3Class

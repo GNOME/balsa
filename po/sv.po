@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "POT-Creation-Date: 2002-05-10 20:19+0200\n"
-"PO-Revision-Date: 2002-05-10 20:22+0200\n"
-"Last-Translator: Christian Rose <menthos@menthos.com>\n"
+"PO-Revision-Date: 2002-06-01 11:00+0200\n"
+"Last-Translator: Patrik Wallström <pawal@blipp.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -43,8 +43,8 @@ msgstr "Namnlös"
 #: libbalsa/address-book-extern.c:272
 #, c-format
 msgid "Could not add address to address book %s while trying to execute: %s"
-msgstr ""
-"Kunde inte lägga till adress till adressboken %s vid försök att köra: %s"
+msgstr "Kunde inte lägga till adress till adressboken %s vid försök att "
+"köra: %s"
 
 #: libbalsa/address-book-ldap.c:209
 msgid ""
@@ -574,15 +574,20 @@ msgid ""
 "via: \"host:smtp\".\n"
 "Message is left in outbox."
 msgstr ""
+"SMTP-servern vägrade anslutning.\n"
+"Balsa använder som standard sändartjänsten (587).\n"
+"Om du vill skicka e-post genom relä-service (25) måste du ange det explicit "
+"via: \"host:smtp\".\n"
+"Meddelandet är kvar i utkorgen."
 
 #: libbalsa/send.c:1046
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 msgstr ""
-"SMTP-protokollfel. Kan inte vidarebefordra.\n"
-"Ditt meddelande ligger kvar i utkorgen."
+"SMTP-serverproblem (%d): %s\n"
+"Meddelandet är kvar i utboxen."
 
 #: libbalsa/source-viewer.c:46 src/main-window.c:522
 msgid "_Select Text"
@@ -657,11 +662,8 @@ msgid "Mail Files"
 msgstr "Brevfiler"
 
 #: libinit_balsa/balsa-druid-page-directory.c:336
-#, fuzzy
 msgid "Problem Creating Mailboxes"
-msgstr ""
-"Problem med att skapa brevlådor\n"
-"%s"
+msgstr "Problem med att skapa brevlådor"
 
 #: libinit_balsa/balsa-druid-page-finish.c:45
 msgid "All Done!"
@@ -704,18 +706,14 @@ msgid "User Settings"
 msgstr "Användarinställningar"
 
 #: libinit_balsa/balsa-druid-page-user.c:189
-#, fuzzy
 msgid "Local Mail Problem"
-msgstr ""
-"Problem med lokal e-post\n"
-"%s"
+msgstr "Lokalt e-postproblem"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:37
 msgid "Welcome to Balsa!"
 msgstr "Välkommen till Balsa!"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:40
-#, fuzzy
 msgid ""
 "You seem to be running Balsa for the first time. The following\n"
 "steps will set up Balsa by asking a few simple questions. Once\n"
@@ -767,13 +765,13 @@ msgstr "Konfigurera Balsa"
 #: libmutt/attach.c:111 libmutt/attach.c:238 libmutt/attach.c:432
 #: libmutt/attach.c:918
 msgid "Can't match nametemplate, continue?"
-msgstr ""
+msgstr "Kan inte matcha namnmall, fortsätt?"
 
 #. For now, editing requires a file, no piping
 #: libmutt/attach.c:123
 #, c-format
 msgid "Mailcap compose entry requires %%s"
-msgstr ""
+msgstr "Mailcap-redigering för denna post kräver %%s"
 
 #: libmutt/attach.c:131 libmutt/attach.c:256
 #, c-format
@@ -782,38 +780,37 @@ msgstr "Fel vid körning av \"%s\"!"
 
 #: libmutt/attach.c:141
 msgid "Failure to open file to parse headers."
-msgstr ""
+msgstr "Fel vid öppnande av fil för att tolka e-posthuvuden."
 
 #: libmutt/attach.c:172
 msgid "Failure to open file to strip headers."
-msgstr ""
+msgstr "Fel vid öppnande av fil för att rensa e-posthuvuden."
 
 #: libmutt/attach.c:190
 #, c-format
 msgid "No mailcap compose entry for %s, creating empty file."
-msgstr ""
+msgstr "Ingen mailcap-post för %s, skapar tom fil."
 
 #. For now, editing requires a file, no piping
 #: libmutt/attach.c:250
 #, c-format
 msgid "Mailcap Edit entry requires %%s"
-msgstr ""
+msgstr "Redigering av mailcap-post kräver %%s"
 
 #: libmutt/attach.c:269
 #, c-format
 msgid "No mailcap edit entry for %s"
-msgstr ""
+msgstr "Ingen redigeringspost i mailcap för %s"
 
 #: libmutt/attach.c:398
 msgid "No matching mailcap entry found.  Viewing as text."
-msgstr ""
+msgstr "Ingen matchande mailcap-post funnen. Visar som text."
 
 #: libmutt/attach.c:411
 msgid "MIME type not defined.  Cannot view attachment."
-msgstr ""
+msgstr "MIME-typ inte definierad. Kan inte visa bilaga."
 
 #: libmutt/attach.c:501
-#, fuzzy
 msgid "Cannot create filter"
 msgstr "Kan inte skapa filter"
 
@@ -823,18 +820,16 @@ msgid "Can't create filter"
 msgstr "Kan inte skapa filter"
 
 #: libmutt/attach.c:739
-#, fuzzy
 msgid "Attachment saved."
-msgstr "Bifogade filer:"
+msgstr "Bilagan sparad."
 
 #: libmutt/attach.c:790
-#, fuzzy
 msgid "Write fault!"
-msgstr "Standard"
+msgstr "Skrivfel!"
 
 #: libmutt/attach.c:1032
 msgid "I don't know how to print that!"
-msgstr ""
+msgstr "Jag vet inte hur man skriver ut detta!"
 
 #: libmutt/handler.c:1333
 msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
@@ -872,13 +867,12 @@ msgstr "[-- Standard fel för automatvy av %s --]\n"
 
 #: libmutt/handler.c:1632
 msgid "[-- Error: message/external-body has no access-type parameter --]\n"
-msgstr ""
-"[-- Fel: message/external-body text har ingen parameter för åtkomsttyp --]\n"
+msgstr "[-- Fel: message/external-body text har ingen parameter för åtkomsttyp --]\n"
 
 #: libmutt/handler.c:1651
 #, c-format
 msgid "[-- This %s/%s attachment "
-msgstr "[-- Denna %s/%s bilaga "
+msgstr "[-- Denna %s/%s-bilaga "
 
 #: libmutt/handler.c:1658
 #, c-format
@@ -906,16 +900,14 @@ msgstr ""
 "[-- försvunnit. --]\n"
 
 #: libmutt/handler.c:1696
-#, fuzzy, c-format
+#, c-format
 msgid "[-- This %s/%s attachment is not included, --]\n"
-msgstr "[-- Denna %s/%s bilaga "
+msgstr "[-- Denna %s/%s-bilaga är inte inkluderad, --]\n"
 
 #: libmutt/handler.c:1700
-#, fuzzy, c-format
+#, c-format
 msgid "[-- and the indicated access-type %s is unsupported --]\n"
-msgstr ""
-"[-- Denna %s/%s-bilaga är inte inkluderad, --]\n"
-"[-- och den indikerade åtkomsttypen %s stöds inte --]\n"
+msgstr "[-- och den indikerade åtkomsttypen %s stöds inte --]\n"
 
 #: libmutt/handler.c:1821
 msgid "Error: multipart/signed has no protocol."
@@ -995,7 +987,7 @@ msgstr "SASL-autentisering misslyckades."
 #: libmutt/imap/browse.c:85 libmutt/imap/imap.c:537
 #, c-format
 msgid "%s is an invalid IMAP path"
-msgstr ""
+msgstr "%s är en ogiltig IMAP-sökväg"
 
 #: libmutt/imap/browse.c:102
 msgid "Getting namespaces..."
@@ -1006,9 +998,8 @@ msgid "Getting folder list..."
 msgstr "Hämtar mapplista..."
 
 #: libmutt/imap/browse.c:229
-#, fuzzy
 msgid "No such folder"
-msgstr "Kopiera till mapp:"
+msgstr "Ingen sådan mapp"
 
 #: libmutt/imap/browse.c:314
 msgid "Create mailbox: "
@@ -1102,9 +1093,8 @@ msgid "CLOSE failed"
 msgstr "CLOSE misslyckades"
 
 #: libmutt/imap/imap.c:1373
-#, fuzzy
 msgid "Bad mailbox name"
-msgstr "Ogiltigt brevlådenamn\n"
+msgstr "Ogiltigt brevlådenamn"
 
 #: libmutt/imap/imap.c:1385
 #, c-format
@@ -1122,7 +1112,7 @@ msgid "Unable to fetch headers from this IMAP server version."
 msgstr "Kan inte hämta brevhuvuden från denna version av IMAP-servern."
 
 #: libmutt/imap/message.c:89
-#, fuzzy, c-format
+#, c-format
 msgid "Could not create temporary file %s"
 msgstr "Kunde inte skapa temporär fil %s"
 
@@ -1164,7 +1154,7 @@ msgstr "%s [%s]\n"
 
 #: libmutt/lib.c:59 libmutt/lib.c:74 libmutt/lib.c:105
 msgid "Out of memory!"
-msgstr ""
+msgstr "Slut på minne!"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:295
 #, c-format
@@ -1209,7 +1199,7 @@ msgstr "Skriver meddelanden... %d (%d%%)"
 #.
 #: libmutt/mbox.c:941
 msgid "Committing changes..."
-msgstr ""
+msgstr "Sparar ändringar..."
 
 #: libmutt/mbox.c:972
 #, c-format
@@ -1249,8 +1239,8 @@ msgstr "Slår upp %s..."
 
 #: libmutt/mutt_socket.c:420 libmutt/mutt_socket.c:460
 #, c-format
-msgid "Could not find the host \"%s\""
-msgstr "Kunde inte hitta servern \"%s\"."
+msgid "Could not find the host \"%s\"."
+msgstr "Kunde inte hitta värden \"%s\"."
 
 #: libmutt/mutt_socket.c:424 libmutt/mutt_socket.c:465
 #, c-format
@@ -1281,18 +1271,17 @@ msgid "SSL disabled due the lack of entropy"
 msgstr "SSL är avstängt på grund av entropibrist"
 
 #: libmutt/mutt_ssl.c:369
-#, fuzzy
 msgid "I/O error"
-msgstr "Inget fel"
+msgstr "I/O-fel"
 
 #: libmutt/mutt_ssl.c:372
 msgid "unspecified protocol error"
-msgstr ""
+msgstr "ospecificerat protokollfel"
 
 #: libmutt/mutt_ssl.c:378
-#, fuzzy, c-format
+#, c-format
 msgid "SSL failed: %s"
-msgstr "CLOSE misslyckades"
+msgstr "SSL misslyckades: %s"
 
 #: libmutt/mutt_ssl.c:387
 msgid "Unable to get certificate from peer"
@@ -1391,14 +1380,14 @@ msgid "Certificate saved"
 msgstr "Certifikat sparat"
 
 #: libmutt/mutt_ssl_nss.c:55
-#, fuzzy, c-format
+#, c-format
 msgid "%s failed (error %d)"
-msgstr "Öppnande av %s misslyckades. Felnummer = %d, "
+msgstr "%s misslyckades (fel %d)"
 
 #: libmutt/mutt_ssl_nss.c:130
 #, c-format
 msgid "SSL_AuthCertificate failed (error %d)"
-msgstr ""
+msgstr "SSL_AuthCertificate misslyckades (fel %d)"
 
 #. BALSA : again, iteraction with user from libmutt. all this must
 #. be ripped out and moved up. this is even worse than the SSL,
@@ -1406,26 +1395,26 @@ msgstr ""
 #. DANGER WILL ROBINSON - we always accept certificates
 #: libmutt/mutt_ssl_nss.c:243
 msgid "WARNING: the certificate is being accepted"
-msgstr ""
+msgstr "VARNING: certifikatet accepteras"
 
 #: libmutt/mutt_ssl_nss.c:261
 #, c-format
 msgid "Unable to find ip for host %s"
-msgstr ""
+msgstr "Kunde inte hitta ip för datorn %s"
 
 #: libmutt/mutt_ssl_nss.c:273
 msgid "PR_NewTCPSocket failed."
-msgstr ""
+msgstr "PR_NewTCPSocket misslyckades."
 
 #: libmutt/mutt_ssl_nss.c:319
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to connect to host %s"
-msgstr "Kunde inte ansluta till %s (%s)."
+msgstr "Kunde inte ansluta till %s"
 
 #: libmutt/mh.c:608
-#, fuzzy, c-format
+#, c-format
 msgid "Reading %s... %d"
-msgstr "Läser %s..."
+msgstr "Läser %s... %d"
 
 #: libmutt/mx.c:119
 #, c-format
@@ -1538,18 +1527,17 @@ msgid "Can't write message"
 msgstr "Kan inte skriva meddelande"
 
 #: libmutt/parse.c:605
-#, fuzzy
 msgid "multipart message has no boundary parameter!"
-msgstr "Fel: multipart/encrypted har ingen protokollparameter!"
+msgstr "multipart-meddelandet har ingengränsparameter!"
 
 #: libmutt/sendlib.c:462
 msgid "No boundary parameter found! [report this error]"
-msgstr ""
+msgstr "Ingen gränsparameter hittad! [rapportera detta fel]"
 
 #: libmutt/sendlib.c:496
 #, c-format
 msgid "%s no longer exists!"
-msgstr ""
+msgstr "%s existerar inte längre!"
 
 #. pipe down kid, this isn't really important. otoh balsa
 #. * might be using the wrong code path here.
@@ -1557,28 +1545,28 @@ msgstr ""
 #. * might be wrong
 #.
 #: libmutt/sendlib.c:926
-#, fuzzy, c-format
+#, c-format
 msgid "Can't stat %s: %s"
-msgstr " Kunde inte spara %s: %s"
+msgstr "Kunde inte erhålla status på %s: %s"
 
 #: libmutt/sendlib.c:933
-#, fuzzy, c-format
+#, c-format
 msgid "%s isn't a regular file."
-msgstr "Bilagan %s är ingen vanlig fil."
+msgstr "%s är ingen vanlig fil."
 
 #: libmutt/sendlib.c:1109
-#, fuzzy, c-format
+#, c-format
 msgid "Could not open %s"
-msgstr "Kunde inte öppna filen %s.\n"
+msgstr "Kunde inte öppna %s"
 
 #: libmutt/sendlib.c:2111
 #, c-format
 msgid "Error sending message, child exited %d (%s)."
-msgstr ""
+msgstr "Fel vid sändning av meddelande, processen avslutades %d (%s)."
 
 #: libmutt/sendlib.c:2118
 msgid "Output of the delivery process"
-msgstr ""
+msgstr "Resultat av leveransprocessen"
 
 #: src/address-book-config.c:122
 msgid "Address Book Configuration"
@@ -1930,7 +1918,7 @@ msgstr "Katalog: %s\n"
 
 #: src/balsa-message.c:979
 msgid "Access type: mail-server\n"
-msgstr "Åtkomsttyp: mail-server\n"
+msgstr "Åtkomsttyp: e-postserver\n"
 
 #: src/balsa-message.c:980
 #, c-format
@@ -2256,8 +2244,7 @@ msgstr "Återgå"
 
 #: src/filter-edit-dialog.c:551
 msgid "A filter run dialog is open.Close it before you can modify filters."
-msgstr ""
-"En filterkörningdialoger är öppen. Stäng den innan du kan ändra filter."
+msgstr "En filterkörningdialog är öppen. Stäng den innan du kan ändra filter."
 
 #: src/filter-edit-dialog.c:564
 msgid "Balsa Filters"
@@ -2321,7 +2308,7 @@ msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"FIlterdialogen är öppen, stäng den innan du kan köra filter på någon brevlåda"
+"Filterdialogen är öppen, stäng den innan du kan köra filter på någon brevlåda"
 
 #: src/folder-conf.c:162 src/folder-conf.c:470
 #, c-format
@@ -2437,9 +2424,8 @@ msgid "_Subfolder of:"
 msgstr "_Undermapp till:"
 
 #: src/folder-conf.c:544
-#, fuzzy
 msgid "Browse..."
-msgstr "_Bläddra..."
+msgstr "Bläddra..."
 
 #: src/folder-conf.c:572
 msgid ""
@@ -3180,14 +3166,12 @@ msgstr "Sök ett meddelande"
 #. find_dialog_button_cb,&f);
 #.
 #: src/main-window.c:2565
-#, fuzzy
 msgid "Reverse search"
-msgstr "_Omvänd sökning"
+msgstr "Omvänd sökning"
 
 #: src/main-window.c:2568
-#, fuzzy
 msgid "Search for:"
-msgstr "_Sök efter:"
+msgstr "Sök efter:"
 
 #: src/main-window.c:2580
 msgid "In:"
@@ -3553,8 +3537,8 @@ msgstr "Citera automatiskt originalet vid svar"
 
 #: src/pref-manager.c:1773
 msgid "Don't include HTML parts as text when replying or forwarding mail"
-msgstr ""
-"Inkludera inte HTML-delar som text vid svar eller vidarebefordran av e-post"
+msgstr "Inkludera inte HTML-delar som text vid svar eller vidarebefordran "
+"av e-post"
 
 #: src/pref-manager.c:1779
 msgid "Forward a mail as attachment instead of quoting it"
@@ -3928,8 +3912,8 @@ msgstr ""
 
 #: src/print.c:1095
 msgid "Check your paper type configuration or balsa preferences\n"
-msgstr ""
-"Kontrollera din papperstypskonfiguration eller dina balsa-inställningar\n"
+msgstr "Kontrollera din papperstypskonfiguration eller dina "
+"balsa-inställningar\n"
 
 #: src/print.c:1098
 msgid "Paper"
@@ -4259,9 +4243,8 @@ msgid "Select Identity"
 msgstr "Välj identitet"
 
 #: src/sendmsg-window.c:1231
-#, fuzzy
 msgid "attach as reference?"
-msgstr "bifoga som referens"
+msgstr "bifoga som referens?"
 
 #: src/sendmsg-window.c:1246
 #, c-format
@@ -4301,7 +4284,7 @@ msgid ""
 "Your balsa installation is corrupted."
 msgstr ""
 "Standardbifogningsbilden (balsa/attachment.png) kan inte hittas:\n"
-"Din balsainstallation är trasig."
+"Din balsainstallation är felaktig."
 
 #: src/sendmsg-window.c:1478
 #, c-format
@@ -4353,17 +4336,15 @@ msgstr "du"
 #. empty message, only non-text content, etc
 #: src/sendmsg-window.c:2205
 msgid "<No Text Body>\n"
-msgstr ""
+msgstr "<Inget textinnehåll>\n"
 
 #: src/sendmsg-window.c:2208
-#, fuzzy
 msgid "----- End Forwarded Message -----\n"
-msgstr "------vidarebefordrat meddelande från %s------\n"
+msgstr "----- Slut på vidarebefordrat meddelande -----\n"
 
 #: src/sendmsg-window.c:2210
-#, fuzzy
 msgid "----- End Included Message -----\n"
-msgstr "------vidarebefordrat meddelande från %s------\n"
+msgstr "----- Slut på infogat meddelande -----\n"
 
 #: src/sendmsg-window.c:2218
 #, c-format
@@ -4396,14 +4377,12 @@ msgid "Date: %s\n"
 msgstr "Datum: %s\n"
 
 #: src/sendmsg-window.c:2265
-#, fuzzy
 msgid "----- Begin Forwarded Message -----\n"
-msgstr "------vidarebefordrat meddelande från %s------\n"
+msgstr "----- Start av vidarebefordrat meddelande -----\n"
 
 #: src/sendmsg-window.c:2267
-#, fuzzy
 msgid "----- Begin Included Message -----\n"
-msgstr "------vidarebefordrat meddelande från %s------\n"
+msgstr "----- Start av infogat meddelande -----\n"
 
 #: src/sendmsg-window.c:2274
 #, c-format
@@ -4663,7 +4642,7 @@ msgstr "Skicka"
 
 #: src/toolbar-factory.c:167
 msgid "Exchange"
-msgstr ""
+msgstr "Utväxla"
 
 #: src/toolbar-factory.c:169
 msgid "Attach"
@@ -4682,9 +4661,8 @@ msgid "Save the current item"
 msgstr "Spara det aktuella objektet"
 
 #: src/toolbar-factory.c:173
-#, fuzzy
 msgid "Identity"
-msgstr "Redigera identitet"
+msgstr "Identitet"
 
 #: src/toolbar-factory.c:174
 msgid "Set identity to use for this message"
@@ -4743,7 +4721,6 @@ msgid "Close current mailbox"
 msgstr "Stäng aktuell brevlåda"
 
 #: src/toolbar-factory.c:189
-#, fuzzy
 msgid "Msg Preview"
 msgstr "Förhandsgranska"
 
@@ -5160,7 +5137,7 @@ msgstr "+"
 #~ msgstr "Alltid osynlig kopia till:"
 
 #~ msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
-#~ msgstr "Tyvärr. Balsa kan (ännu) inte skapa en epostkatalogsbrevlåda"
+#~ msgstr "Tyvärr. Balsa kan (ännu) inte skapa en e-postkatalogsbrevlåda"
 
 #~ msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
 #~ msgstr "Tyvärr. Balsa kan (ännu) inte skapa en MH-brevlåda"

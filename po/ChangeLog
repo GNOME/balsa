@@ -1,3 +1,11 @@
+2002-06-01  Patrik Wallstrom  <pawal@blipp.com>
+
+	* sv.po: Updated Swedish translation
+
+2002-06-01  gettextize  <bug-gnu-utils@gnu.org>
+
+	* Makefile.in.in: Upgrade to gettext-0.10.38.
+
 2002-05-15  Carlos Morgado  <chbm@chbm.nu>
 
 	* POTFILES.skip: added libmutt/attach.c. silly me

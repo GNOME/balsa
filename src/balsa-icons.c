@@ -60,13 +60,22 @@ static BalsaIcon envelope;
 static void
 imlib_magic_stuff (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
+#ifdef IMLIB_WORKS_CORRECTLY
   GdkImlibImage *im;
   im = gdk_imlib_create_image_from_xpm_data (data);
   gdk_imlib_render (im, im->rgb_width, im->rgb_height);
-  *pmap = gdk_imlib_move_image (im);
-  *bmap = gdk_imlib_move_mask (im);
+  *pmap = gdk_imlib_copy_image (im);
+  *bmap = gdk_imlib_copy_mask (im);
   gdk_imlib_destroy_image (im);
   im = NULL;
+#endif
+
+  *pmap = gdk_pixmap_colormap_create_from_xpm_d(NULL,
+		  NULL,
+		  bmap,
+		  0,
+		  data);
+
 }
 
 void

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 22:49+0100\n"
-"PO-Revision-Date: 2004-09-04 14:40+0200\n"
+"POT-Creation-Date: 2004-09-21 00:13+0200\n"
+"PO-Revision-Date: 2004-09-21 00:10+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -404,14 +404,13 @@ msgid "Cannot connect to the server: %s"
 msgstr "Nemôžem sa spojiť so serverom: %s"
 
 #: libbalsa/imap-server.c:510
-#, fuzzy
 msgid "Cannot connect to the server"
-msgstr "Nemôžem sa spojiť so serverom: %s"
+msgstr "Nemôžem sa spojiť so serverom"
 
 #: libbalsa/imap-server.c:658
 #, c-format
 msgid "Exceeded the number of connections per server %s"
-msgstr ""
+msgstr "Počet spojení na server %s bol prekročený"
 
 #: libbalsa/libbalsa.c:283
 #, c-format
@@ -624,9 +623,9 @@ msgid "%s: could not get message stream."
 msgstr "%s: nepodarilo sa získať prúd správ."
 
 #: libbalsa/mailbox_mbox.c:1533
-#, fuzzy, c-format
+#, c-format
 msgid "Error copying message to mailbox %s!"
-msgstr "Nepodarilo sa skopírovať správu do poštovej schránky \"%s\"."
+msgstr "Chyba pri kopírovaní správy do poštovej schránky %s!"
 
 #: libbalsa/mailbox_mh.c:172
 #, c-format
@@ -2077,9 +2076,8 @@ msgid "part %s: %s"
 msgstr "časť %s: %s"
 
 #: src/balsa-message.c:2796
-#, fuzzy
 msgid "encrypted: "
-msgstr "zašifrované časti"
+msgstr "zašifrované: "
 
 #: src/balsa-message.c:2878
 #, c-format
@@ -2116,11 +2114,13 @@ msgid "Reply to MDN?"
 msgstr "Odpovedať na MDN?"
 
 #: src/balsa-message.c:4436
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This is an inline OpenPGP signed %s message part:\n"
 "%s"
-msgstr "Toto je časť správy podpísaná pomocou OpenPGP:\n"
+msgstr ""
+"Toto je vložená časť správy %s podpísaná pomocou OpenPGP:\n"
+"%s"
 
 #: src/balsa-message.c:4454
 msgid "_Run gpg to import this key"
@@ -2132,6 +2132,9 @@ msgid ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
+"Táto činnosť nemôže byť vykonaná, pretože táto správa je zobrazená viac ako "
+"raz.\n"
+"Prosím, zatvorte ostatné inštancie tejto správy a skúste znova."
 
 #: src/balsa-message.c:4606
 #, c-format
@@ -2187,17 +2190,16 @@ msgid "S/MIME"
 msgstr "S/MIME"
 
 #: src/balsa-message.c:4715 src/balsa-message.c:4820
-#, fuzzy
 msgid "Detected a good signature"
-msgstr "_Vykonať podpis"
+msgstr "Zdetekovaný dobrý podpis"
 
 #: src/balsa-message.c:4721
 msgid "Detected a good signature with insufficient validity"
-msgstr ""
+msgstr "Zdetekovaný dobrý podpis s nedostatočnou platnosťou"
 
 #: src/balsa-message.c:4726 src/balsa-message.c:4824
 msgid "Detected a good signature with insufficient validity/trust"
-msgstr ""
+msgstr "Zdetekovaný dobrý podpis s nedostatočnou platnosťou/dôverou"
 
 #: src/balsa-message.c:4733 src/balsa-message.c:4830
 #, c-format
@@ -2674,9 +2676,8 @@ msgid "Subscribed _folders only"
 msgstr "Len prihlásené _priečinky"
 
 #: src/folder-conf.c:356
-#, fuzzy
 msgid "Always show _INBOX"
-msgstr "Vždy zobr_aziť priečinok 'Doručená pošta'"
+msgstr "Vždy zobr_aziť Doručenú poštu"
 
 #: src/folder-conf.c:359
 msgid "Pr_efix"
@@ -2984,11 +2985,12 @@ msgid "Always"
 msgstr "vždy"
 
 #: src/mailbox-conf.c:1333
-#, fuzzy
 msgid ""
 "decrypt and check\n"
 "signatures automatically"
-msgstr "dešifrovanie a overenie podpisu zlyhalo"
+msgstr ""
+"dešifrovať a overiť\n"
+"podpisy automaticky"
 
 #: src/mailbox-node.c:266
 msgid "The folder edition to be written."
@@ -3549,14 +3551,13 @@ msgid "Delete messages from the Trash mailbox"
 msgstr "Vymazať správy z koša"
 
 #: src/main-window.c:748
-#, fuzzy
 msgid "Select _Filters"
-msgstr "Filtre programu Balsa"
+msgstr "Vybrať _filtre"
 
 #: src/main-window.c:749 src/main-window.c:1068
-#, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Označiť všetky správy v aktuálnej poštovej schránke"
+msgstr ""
+"Vybrať filtre, ktoré budú aplikované automaticky na aktuálnu poštovú schránku"
 
 #: src/main-window.c:762
 msgid "_Toolbars..."
@@ -3587,19 +3588,16 @@ msgid "New mailbox..."
 msgstr "Nová poštová schránka..."
 
 #: src/main-window.c:796
-#, fuzzy
 msgid "New \"Maildir\" mailbox..."
-msgstr "Lokálna poštová schránka typu Maildir..."
+msgstr "Nová poštová schránka typu \"Maildir\"..."
 
 #: src/main-window.c:800
-#, fuzzy
 msgid "New \"MH\" mailbox..."
-msgstr "Lokálna poštová schránka typu MH..."
+msgstr "Nová poštová schránka typu \"MH\"..."
 
 #: src/main-window.c:830
-#, fuzzy
 msgid "_Compress Mailbox"
-msgstr "Zatvoriť poštovú schránku"
+msgstr "_Skomprimovať poštovú schránku"
 
 #: src/main-window.c:860
 msgid "Mail_boxes"
@@ -3607,11 +3605,11 @@ msgstr "Poštové schrán_ky"
 
 #: src/main-window.c:885
 msgid "By _Arrival"
-msgstr ""
+msgstr "Podľa _príchodu"
 
 #: src/main-window.c:885
 msgid "Arrival order"
-msgstr ""
+msgstr "Poradie príchodu"
 
 #: src/main-window.c:889
 msgid "By _Sender"
@@ -3619,16 +3617,15 @@ msgstr "Podľa _odosielateľa"
 
 #: src/main-window.c:889
 msgid "Sender order"
-msgstr ""
+msgstr "Poradie odosielateľa"
 
 #: src/main-window.c:893
 msgid "By S_ubject"
 msgstr "Podľa _predmetu"
 
 #: src/main-window.c:893
-#, fuzzy
 msgid "Subject order"
-msgstr "Predmet"
+msgstr "Poradie predmetu"
 
 #: src/main-window.c:897
 msgid "By Si_ze"
@@ -3644,9 +3641,8 @@ msgid "_Threaded"
 msgstr "Vlákna"
 
 #: src/main-window.c:901
-#, fuzzy
 msgid "Use message threading"
-msgstr "J_ednoduché vlákna"
+msgstr "Použiť vlákna správ"
 
 #: src/main-window.c:909
 msgid "_Descending"
@@ -3654,25 +3650,23 @@ msgstr "_Zostupne"
 
 #: src/main-window.c:909
 msgid "Sort in a descending order"
-msgstr ""
+msgstr "Triediť v zostupnom poradí"
 
 #: src/main-window.c:930
 msgid "_Headers"
 msgstr "_Hlavičky"
 
 #: src/main-window.c:933
-#, fuzzy
 msgid "_Sort Mailbox"
-msgstr "Zobraziť _strom poštových schránok"
+msgstr "_Usporiadať poštovú schránku"
 
 #: src/main-window.c:948
 msgid "_View filter"
 msgstr "_Zobraziť filter"
 
 #: src/main-window.c:949
-#, fuzzy
 msgid "Enable quick message index filter"
-msgstr "Nemôžem načítať telo správy pre filtráciu"
+msgstr "Povoliť filter rýchleho indexu správ"
 
 #: src/main-window.c:985 src/main-window.c:1059 src/sendmsg-window.c:502
 #: src/sendmsg-window.c:560 src/sendmsg-window.c:620
@@ -3694,19 +3688,16 @@ msgstr "Poslať ďalej aktuálnu správu"
 
 #. D
 #: src/main-window.c:1052
-#, fuzzy
 msgid "_Delete to Trash"
-msgstr "Presunúť do _Koša"
+msgstr "_Vymazať do Koša"
 
 #: src/main-window.c:1064
-#, fuzzy
 msgid "_Manage..."
-msgstr "Z_meniť..."
+msgstr "_Spravovať..."
 
 #: src/main-window.c:1067
-#, fuzzy
 msgid "_Select Filters"
-msgstr "Filtre programu Balsa"
+msgstr "_Vybrať filtre"
 
 #: src/main-window.c:1085
 msgid "_Filters"
@@ -3780,9 +3771,8 @@ msgstr[1] "Prijali ste %d novú správu."
 msgstr[2] "Prijali ste %d nové správy."
 
 #: src/main-window.c:3068
-#, fuzzy
 msgid "You have new mail."
-msgstr "Prijali ste %d nových správ."
+msgstr "Máte novú poštu."
 
 #: src/main-window.c:3677
 msgid "Search mailbox"
@@ -3817,9 +3807,8 @@ msgid "_Reverse search"
 msgstr "_Spätné vyhľadávanie"
 
 #: src/main-window.c:3760
-#, fuzzy
 msgid "_Wrap around"
-msgstr "_Zalomiť text"
+msgstr "_Prechádzať dookola"
 
 #: src/main-window.c:3836
 #, c-format
@@ -3911,7 +3900,7 @@ msgstr "Kôš"
 
 #: src/main.c:511
 msgid "Compressing mail folders..."
-msgstr ""
+msgstr "Komprimujem poštové priečinky..."
 
 #: src/message-window.c:81
 msgid "N_o Headers"
@@ -3987,14 +3976,12 @@ msgid "Bad Spellers"
 msgstr "Zlé preklepy"
 
 #: src/pref-manager.c:352
-#, fuzzy
 msgid "Message number"
-msgstr "Zdroj správy"
+msgstr "Číslo správy"
 
 #: src/pref-manager.c:356
-#, fuzzy
 msgid "Sender"
-msgstr "Odoslať"
+msgstr "Odosielateľ"
 
 #: src/pref-manager.c:360
 msgid "Flat"
@@ -4205,7 +4192,7 @@ msgstr ""
 
 #: src/pref-manager.c:1718
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
@@ -4335,7 +4322,7 @@ msgstr "Správa"
 
 #: src/pref-manager.c:2022
 msgid "Sort and Thread"
-msgstr ""
+msgstr "Triedenie a vlákna"
 
 #: src/pref-manager.c:2047
 msgid "Main Window"
@@ -4443,23 +4430,20 @@ msgid "Message Subject Font"
 msgstr "Písmo predmetu správy"
 
 #: src/pref-manager.c:2317
-#, fuzzy
 msgid "Sorting and Threading"
-msgstr "Vlákna"
+msgstr "Triedenie a vytváranie vláken"
 
 #: src/pref-manager.c:2321
-#, fuzzy
 msgid "Default sort column"
-msgstr "predvolený šifrovací protokol"
+msgstr "Predvolený stĺpec triedenia"
 
 #: src/pref-manager.c:2325
 msgid "Default threading style"
 msgstr "Predvolený štýl vláken"
 
 #: src/pref-manager.c:2330
-#, fuzzy
 msgid "Expand threads on open"
-msgstr "Rozbaliť strom poštových schránok pri otvorení"
+msgstr "Rozbaliť vlákna pri otvorení"
 
 #: src/pref-manager.c:2406
 msgid "Pspell Settings"
@@ -4518,11 +4502,11 @@ msgstr ""
 
 #: src/pref-manager.c:2518
 msgid "Hide messages marked as deleted"
-msgstr ""
+msgstr "Skryť správy označené na vymazanie"
 
 #: src/pref-manager.c:2520
 msgid "The following settings are global."
-msgstr ""
+msgstr "Nasledujúce nastavenia sú globálne."
 
 #: src/pref-manager.c:2525
 #, fuzzy
@@ -4530,9 +4514,8 @@ msgid "Expunge deleted messages when mailbox is closed"
 msgstr "Automaticky zobraziť správu pri otvorení poštovej schránky"
 
 #: src/pref-manager.c:2532
-#, fuzzy
 msgid " ...and if mailbox is unused more than"
-msgstr "Automaticky potvrdiť poštovú schránku, ak je nepoužívaná dlhšie ako"
+msgstr "...a keď je poštová schránka nepoužívaná dlhšie ako"
 
 #: src/pref-manager.c:2567
 msgid "Options"
@@ -4916,9 +4899,8 @@ msgid "Attach _Message(s)"
 msgstr "Pripojiť _správu/správy"
 
 #: src/sendmsg-window.c:321 src/sendmsg-window.c:508
-#, fuzzy
 msgid "Sen_d"
-msgstr "Odoslať"
+msgstr "Odos_lať"
 
 #: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:121
 msgid "Send this message"
@@ -4937,9 +4919,8 @@ msgid "_Postpone"
 msgstr "_Odložiť"
 
 #: src/sendmsg-window.c:334 src/sendmsg-window.c:495
-#, fuzzy
 msgid "_Save"
-msgstr "Uložiť"
+msgstr "_Uložiť"
 
 #: src/sendmsg-window.c:335 src/sendmsg-window.c:496
 msgid "Save this message"
@@ -5052,9 +5033,8 @@ msgid "Sa_ve and Close"
 msgstr ""
 
 #: src/sendmsg-window.c:513
-#, fuzzy
 msgid "Send _Later"
-msgstr "Odoslanie zlyhalo"
+msgstr "Odoslať _neskôr"
 
 #: src/sendmsg-window.c:735
 #, c-format
@@ -5237,47 +5217,42 @@ msgid "sending message with gpg mode %d"
 msgstr "odosielanie správy v režime gpg %d"
 
 #: src/sendmsg-window.c:3922
-#, fuzzy
 msgid "Message could not be created"
-msgstr "S adresárom sa nepodarilo pracovať."
+msgstr "Nepodarilo sa vytvoriť správu"
 
 #: src/sendmsg-window.c:3924
 msgid "Message could not be queued in outbox"
-msgstr ""
+msgstr "Nepodarilo sa správu zaradiť do pošty na odoslanie"
 
 #: src/sendmsg-window.c:3926
-#, fuzzy
 msgid "Message could not be saved in sentbox"
-msgstr "%s: nepodarilo sa otvoriť %s."
+msgstr "Správu sa nepodarilo uložiť do odoslanej pošty"
 
 #: src/sendmsg-window.c:3928
-#, fuzzy
 msgid "Message could not be sent"
-msgstr "%s: nepodarilo sa otvoriť %s."
+msgstr "Správu sa nepodarilo odoslať"
 
 #: src/sendmsg-window.c:3932
-#, fuzzy, c-format
+#, c-format
 msgid "Send failed: %s"
-msgstr "Odoslanie zlyhalo"
+msgstr "Odoslanie zlyhalo: %s"
 
 #: src/sendmsg-window.c:4016
 msgid "Could not postpone message."
 msgstr "Nepodarilo sa odložiť správu."
 
 #: src/sendmsg-window.c:4030
-#, fuzzy
 msgid "Message postponed."
-msgstr "Písmo správy"
+msgstr "Správa odložená."
 
 #: src/sendmsg-window.c:4046
-#, fuzzy, c-format
+#, c-format
 msgid "Could not open draftbox: %s"
-msgstr "Nemôžem znova otvoriť poštovú schránku!"
+msgstr ""
 
 #: src/sendmsg-window.c:4068
-#, fuzzy
 msgid "Message saved."
-msgstr "Správa"
+msgstr "Správa uložená."
 
 #: src/sendmsg-window.c:4230
 #, c-format
@@ -5537,9 +5512,8 @@ msgid "Close"
 msgstr "Zatvoriť"
 
 #: src/toolbar-factory.c:133
-#, fuzzy
 msgid "Close the compose window"
-msgstr "Okno novej správy"
+msgstr "Zatvoriť okno písania novej správy"
 
 #: src/toolbar-factory.c:134
 msgid ""
@@ -5679,156 +5653,3 @@ msgstr "Hore"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dole"
-
-#~ msgid ""
-#~ "Error copying message to mailbox %s!\n"
-#~ "Mailbox might have been corrupted!"
-#~ msgstr ""
-#~ "Chyba pri kopírovaní správy do poštovej schránky %s!\n"
-#~ "Poštovaá schránka je možno poškodená!"
-
-#~ msgid ""
-#~ "Error writing to temporary file %s.\n"
-#~ "Check the directory permissions."
-#~ msgstr ""
-#~ "Chyba pri zápise do dočasného súboru %s.\n"
-#~ "Skontrolujte prístupové práva priečinka."
-
-#~ msgid "Cannot open temporary file %s."
-#~ msgstr "Nemôžem otvoriť dočasný súbor %s."
-
-#~ msgid ""
-#~ "SMTP server refused connection.\n"
-#~ "Balsa by default uses submission service (587).\n"
-#~ "If you want to submit mail using relay service (25),specify it explicitly "
-#~ "via: \"host:smtp\".\n"
-#~ "Message is left in outbox."
-#~ msgstr ""
-#~ "SMTP server odmietol spojenie.\n"
-#~ "Balsa štandardne používa odosielaciu službu (587).\n"
-#~ "Ak chcete odosielať poštu pomocou doručovacej služby (25), zadajte to "
-#~ "pomocou: \"hostiteľ:smtp\".\n"
-#~ "Správa bola ponechaná medzi poštou na odoslanie."
-
-#~ msgid "This message will not be encrpyted for the BCC: recipient(s)."
-#~ msgstr "Táto správa nebude zašifrovaná pre skrytých príjemcov."
-
-#~ msgid "Please enter information about yourself."
-#~ msgstr "Zadajte, prosím, vaše osobné informácie."
-
-#~ msgid "_Name:"
-#~ msgstr "_Meno:"
-
-#~ msgid ""
-#~ "You seem to be running Balsa for the first time. The following steps will "
-#~ "set up Balsa by asking a few simple questions. Once you have completed "
-#~ "these steps, you can always change them later in Balsa's preferences. If "
-#~ "any files or directories need to be created, it will be done so "
-#~ "automatically.\n"
-#~ "  Please check the about box in Balsa's main window for more information "
-#~ "about contacting the authors or reporting bugs."
-#~ msgstr ""
-#~ "Zdá sa, že ste spustili program Balsa prvýkrát. V nasledujúcich krokoch "
-#~ "nastavíte program Balsa zodpovedaním na niekoľko jednoduchých otázok. Po "
-#~ "ukončení tohoto nastavovania možete parametre programu kedykoľvek zmeniť "
-#~ "v predvoľbách programu Balsa. Ak bude potrebné vytvoriť nejaké súbory "
-#~ "alebo adresáre, Balsa tak urobí automaticky.\n"
-#~ "  Pozrite si, prosím, okno 'O aplikácii' v hlavnom okne programu Balsa, "
-#~ "aby ste získali viac informácií o kontaktoch na autorov a o postupe "
-#~ "hlásenia chýb v programe."
-
-#~ msgid "Total"
-#~ msgstr "Celkom"
-
-#, fuzzy
-#~ msgid "By _Date"
-#~ msgstr "Dátum"
-
-#~ msgid "Cannot access the message's body\n"
-#~ msgstr "Nemôžem získať telo správy\n"
-
-#~ msgid "Display message size as number of lines"
-#~ msgstr "Zobraziť veľkosť správy ako počet riadkov"
-
-#~ msgid "invalid crypto engine for RFC2440"
-#~ msgstr "neplatná podpora šifrovania pre RFC2440"
-
-#~ msgid "%s: could not get data: %s"
-#~ msgstr "%s: nepodarilo sa získať údaje: %s"
-
-#~ msgid "Could not send \"%s\" to \"%s\""
-#~ msgstr "Nepodarilo sa odoslať \"%s\" pre \"%s\""
-
-#~ msgid "remember passphrase for"
-#~ msgstr "zapamätať heslo pre"
-
-#~ msgid ""
-#~ "The mailbox \"%s\" does not appear to be valid.\n"
-#~ "Your system does not allow for creation of mailboxes\n"
-#~ "in /var/spool/mail. Balsa wouldn't function properly\n"
-#~ "until the system created the mailboxes. Please change\n"
-#~ "the mailbox path or check your system configuration."
-#~ msgstr ""
-#~ "Zdá sa, že poštová schránka \"%s\" nie je platná. Váš systém\n"
-#~ "neumožňuje vytvoriť poštové schránky v adresári /var/spool/mail.\n"
-#~ "Balsa nemôže pracovať správne dokiaľ systém nevytvorí poštové\n"
-#~ "schránky. Prosím zmeňte cestu k poštovej schránke alebo\n"
-#~ "skontrolujte konfiguráciu vášho systému."
-
-#~ msgid "Show from _name"
-#~ msgstr "Zobraziť z _mena"
-
-#~ msgid "Show _Patches"
-#~ msgstr "Zobraziť _záplaty"
-
-#~ msgid "Co_mmit Current"
-#~ msgstr "_Potvrdiť aktuálnu"
-
-#~ msgid "Commit _All"
-#~ msgstr "Potvrdiť _všetky"
-
-#~ msgid "Commit the changes in all mailboxes"
-#~ msgstr "Potvrdiť zmeny vo všetkých poštových schránkach"
-
-#~ msgid "Edit/Apply _Filters"
-#~ msgstr "Upraviť/Aplikovať _filtre"
-
-#~ msgid "Filter the content of the selected mailbox"
-#~ msgstr "Filtrovať obsah vybranej poštovej schránky"
-
-#~ msgid "_Remove Duplicates"
-#~ msgstr "_Odstrániť duplikáty"
-
-#~ msgid "Remove duplicated messages from the selected mailbox"
-#~ msgstr "Odstrániť duplikátne správy zo zvolenej poštovej schránky"
-
-#~ msgid "Message window title format:"
-#~ msgstr "Formát názvu okna správy:"
-
-#~ msgid "Delete immediately and irretrievably"
-#~ msgstr "Vymazať okamžite a neobnoviteľne"
-
-#~ msgid "Sa_ve"
-#~ msgstr "_Uložiť"
-
-#~ msgid "_Attachments"
-#~ msgstr "Prí_lohy"
-
-#~ msgid "Co_mments"
-#~ msgstr "Ko_mentáre"
-
-#~ msgid "_Keywords"
-#~ msgstr "_Kľúčové slová"
-
-#~ msgid "Comments:"
-#~ msgstr "Komentáre:"
-
-#~ msgid "Keywords:"
-#~ msgstr "Kľúčové slová:"
-
-#~ msgid "Cancel this message"
-#~ msgstr "Stornovať túto správu"
-
-#~ msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-#~ msgstr ""
-#~ "Aaaach! poštová schránka nenájdená medzi uzlami balsa_app.mailbox?\n"

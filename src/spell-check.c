@@ -1286,13 +1286,14 @@ next_word(BalsaSpellCheck * spell_check)
 
     /* match the next word */
     if (!at_end && line) {
+	guint line_len=strlen(line);
 #ifdef HAVE_PCRE
 	rm[0] = rm[1] = 0;
-	pcre_exec(new_word_rex, NULL, line, strlen(line), 0, 0, rm ,3);
+	pcre_exec(new_word_rex, NULL, line, line_len, 0, 0, rm ,3);
 
 	if (rm[0] == rm[1]) {
-	    spell_check->start_pos += strlen(line) + offset;
-	    spell_check->end_pos += strlen(line) + offset;
+	    spell_check->start_pos += line_len + offset;
+	    spell_check->end_pos += line_len + offset;
 	    in_line = FALSE;
 	} else {
 	    spell_check->start_pos += (rm[0] + offset);
@@ -1305,8 +1306,8 @@ next_word(BalsaSpellCheck * spell_check)
 	regexec(new_word_rex, line, 1, &rm, 0);
 
 	if (rm.rm_so == rm.rm_eo) {
-	    spell_check->start_pos += strlen(line) + offset;
-	    spell_check->end_pos += strlen(line) + offset;
+	    spell_check->start_pos += line_len + offset;
+	    spell_check->end_pos += line_len + offset;
 	    in_line = FALSE;
 	} else {
 	    spell_check->start_pos += (rm.rm_so + offset);

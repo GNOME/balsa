@@ -1264,6 +1264,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 		/* use BASE64 encoding for non-text mime types 
 		   use 8BIT for message */
 		libbalsa_lock_mutt();
+		newbdy->disposition = DISPATTACH;
 		if(!strcasecmp(mime_type[0],"message") && 
 		   !strcasecmp(mime_type[1],"rfc822")) {
 		    newbdy->encoding = ENC8BIT;
@@ -1437,6 +1438,7 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		    /* use BASE64 encoding for non-text mime types 
 		       use 8BIT for message */
 		    libbalsa_lock_mutt();
+		    newbdy->disposition = DISPATTACH;
 		    if(!strcasecmp(mime_type[0],"message") && 
 		       !strcasecmp(mime_type[1],"rfc822")) {
 			newbdy->encoding = ENC8BIT;

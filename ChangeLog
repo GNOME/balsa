@@ -1,3 +1,12 @@
+2004-12-31 12:08  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	* libbalsa/body.h, libbalsa/files.c, libbalsa/files.h,
+	libbalsa/send.c, src/balsa-message.c, src/print.c,
+	src/sendmsg-window.c, src/pixmaps/info_lock.xpm,
+	src/pixmaps/info_lock_bad.xpm, src/pixmaps/info_lock_encr.xpm,
+	src/pixmaps/info_lock_good.xpm, src/pixmaps/info_lock_sigtrust.xpm:
+	new attachment handling code.
+
 2004-12-30 17:04  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h, mailbox_local.c: reduce the

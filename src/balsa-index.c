@@ -54,6 +54,7 @@
 static void balsa_index_class_init(BalsaIndexClass * klass);
 static void balsa_index_init(BalsaIndex * index);
 static void balsa_index_close_and_destroy(GtkObject * obj);
+static gboolean bndx_popup_menu(GtkWidget * widget);
 
 static gint date_compare(LibBalsaMessage * m1, LibBalsaMessage * m2);
 static gint numeric_compare(LibBalsaMessage * m1, LibBalsaMessage * m2);
@@ -135,7 +136,7 @@ static void bndx_drag_cb(GtkWidget* widget,
                                 guint time,
                                 gpointer user_data);
 static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
-static GtkWidget* bndx_popup_menu_prepare(BalsaIndex * index);
+static void bndx_do_popup(BalsaIndex * index, GdkEventButton * event);
 static GtkWidget *create_stock_menu_item(GtkWidget * menu,
                                          const gchar * type,
                                          const gchar * label,
@@ -212,6 +213,7 @@ balsa_index_class_init(BalsaIndexClass * klass)
                      G_TYPE_NONE, 0);
 
     object_class->destroy = balsa_index_close_and_destroy;
+    widget_class->popup_menu = bndx_popup_menu;
     klass->index_changed = NULL;
 }
 
@@ -1303,11 +1305,11 @@ bndx_button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreePath *path;
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     BalsaIndex *index = BALSA_INDEX(widget);
 
     g_return_val_if_fail(event, FALSE);
-    if (event->button != 3)
+    if (event->type != GDK_BUTTON_PRESS || event->button != 3
+        || event->window != gtk_tree_view_get_bin_window(tree_view))
         return FALSE;
 
     /* pop up the context menu:
@@ -1315,18 +1317,29 @@ bndx_button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
      *   the selection;
      * - if it isn't, select it (cancelling any previous selection)
      * - then create and show the menu */
-    if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(tree_view),
-                                      event->x, event->y, &path,
-                                      NULL, NULL, NULL)) {
+    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
+                                      &path, NULL, NULL, NULL)) {
+        GtkTreeSelection *selection =
+            gtk_tree_view_get_selection(tree_view);
+
         if (!gtk_tree_selection_path_is_selected(selection, path))
             bndx_select_row(index, path);
         gtk_tree_path_free(path);
     }
 
-    gtk_menu_popup(GTK_MENU(bndx_popup_menu_prepare(index)),
-                   NULL, NULL, NULL, NULL,
-                   event->button, event->time);
+    bndx_do_popup(index, event);
 
+    return TRUE;
+}
+
+/* bndx_popup_menu:
+ * default handler for the "popup-menu" signal, which is issued when the
+ * user hits shift-F10
+ */
+static gboolean
+bndx_popup_menu(GtkWidget * widget)
+{
+    bndx_do_popup(BALSA_INDEX(widget), NULL);
     return TRUE;
 }
 
@@ -2007,19 +2020,19 @@ bndx_popup_menu_create(BalsaIndex * index)
         GtkSignalFunc func;
     } entries[] = {
         {
-        GNOME_STOCK_BOOK_OPEN, N_("View Source"),
+        GNOME_STOCK_BOOK_OPEN, N_("_View Source"),
                 GTK_SIGNAL_FUNC(bndx_view_source)}, {
-        BALSA_PIXMAP_MENU_REPLY, N_("Reply..."),
+        BALSA_PIXMAP_MENU_REPLY, N_("_Reply..."),
                 GTK_SIGNAL_FUNC(balsa_message_reply)}, {
-        BALSA_PIXMAP_MENU_REPLY_ALL, N_("Reply To All..."),
+        BALSA_PIXMAP_MENU_REPLY_ALL, N_("Reply To _All..."),
                 GTK_SIGNAL_FUNC(balsa_message_replytoall)}, {
-        BALSA_PIXMAP_MENU_REPLY_GROUP, N_("Reply To Group..."),
+        BALSA_PIXMAP_MENU_REPLY_GROUP, N_("Reply To _Group..."),
                 GTK_SIGNAL_FUNC(balsa_message_replytogroup)}, {
-        BALSA_PIXMAP_MENU_FORWARD, N_("Forward Attached..."),
+        BALSA_PIXMAP_MENU_FORWARD, N_("_Forward Attached..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_attached)}, {
-        BALSA_PIXMAP_MENU_FORWARD, N_("Forward Inline..."),
+        BALSA_PIXMAP_MENU_FORWARD, N_("Forward _Inline..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_inline)}, {
-        GNOME_STOCK_BOOK_RED, N_("Store Address..."),
+        GNOME_STOCK_BOOK_RED, N_("_Store Address..."),
                 GTK_SIGNAL_FUNC(balsa_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
     unsigned i;
@@ -2032,27 +2045,27 @@ bndx_popup_menu_create(BalsaIndex * index)
 
     index->delete_item =
         create_stock_menu_item(menu, GNOME_STOCK_TRASH,
-                               _("Delete"),
+                               _("_Delete"),
                                GTK_SIGNAL_FUNC(balsa_message_delete),
                                index);
     index->undelete_item =
         create_stock_menu_item(menu, GTK_STOCK_UNDELETE,
-                               _("Undelete"),
+                               _("_Undelete"),
                                GTK_SIGNAL_FUNC(balsa_message_undelete),
                                index);
     index->move_to_trash_item =
         create_stock_menu_item(menu, GNOME_STOCK_TRASH,
-                               _("Move To Trash"),
+                               _("Move To _Trash"),
                                GTK_SIGNAL_FUNC
                                (balsa_message_move_to_trash), index);
 
-    menuitem = gtk_menu_item_new_with_label(_("Toggle"));
+    menuitem = gtk_menu_item_new_with_mnemonic(_("T_oggle"));
     submenu = gtk_menu_new();
     create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_FLAGGED,
-                           _("Flagged"),
+                           _("_Flagged"),
                            GTK_SIGNAL_FUNC(balsa_message_toggle_flagged),
                            index);
-    create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_NEW, _("Unread"),
+    create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_NEW, _("_Unread"),
                            GTK_SIGNAL_FUNC(balsa_message_toggle_new),
                            index);
 
@@ -2060,19 +2073,19 @@ bndx_popup_menu_create(BalsaIndex * index)
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    menuitem = gtk_menu_item_new_with_label(_("Move to"));
+    menuitem = gtk_menu_item_new_with_mnemonic(_("_Move to"));
     index->move_to_item = menuitem;
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     return menu;
 }
 
-/*
- * bndx_popup_menu_prepare: set sensitivity of menuitems on the popup
+/* bndx_do_popup: common code for the popup menu;
+ * set sensitivity of menuitems on the popup
  * menu, and populate the mru submenu
  */
-static GtkWidget *
-bndx_popup_menu_prepare(BalsaIndex * index)
+static void
+bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
 {
     GtkWidget *menu = index->popup_menu;
     GtkWidget *submenu;
@@ -2081,6 +2094,8 @@ bndx_popup_menu_prepare(BalsaIndex * index)
     gboolean any;
     gboolean any_deleted = FALSE;
     gboolean any_not_deleted = FALSE;
+    gint event_button;
+    guint event_time;
  
     BALSA_DEBUG();
 
@@ -2121,7 +2136,15 @@ bndx_popup_menu_prepare(BalsaIndex * index)
 
     gtk_widget_show_all(menu);
 
-    return menu;
+    if (event) {
+        event_button = event->button;
+        event_time = event->time;
+    } else {
+        event_button = 0;
+        event_time = gtk_get_current_event_time();
+    }
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+                   event_button, event_time);
 }
 
 static GtkWidget *
@@ -2132,7 +2155,7 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 #if BALSA_MAJOR < 2
     GtkWidget *menuitem = gnome_stock_menu_item(type, label);
 #else
-    GtkWidget *menuitem = gtk_image_menu_item_new_with_label(label);
+    GtkWidget *menuitem = gtk_image_menu_item_new_with_mnemonic(label);
     GtkWidget *image = gtk_image_new_from_stock(type, GTK_ICON_SIZE_MENU);
 
     gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);

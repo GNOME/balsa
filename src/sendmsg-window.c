@@ -144,6 +144,13 @@ static void address_changed_cb(LibBalsaAddressEntry * address_entry,
 static void set_ready(LibBalsaAddressEntry * address_entry,
                       BalsaSendmsgAddress *sma);
 
+/* icon list callbacks */
+static void select_attachment(GnomeIconList * ilist, gint num,
+                              GdkEventButton * event, gpointer data);
+static gboolean sw_popup_menu_cb(GtkWidget * widget, gpointer data);
+/* helper */
+static gboolean sw_do_popup(GnomeIconList * ilist, GdkEventButton * event);
+
 /* Standard DnD types */
 enum {
     TARGET_MESSAGES,
@@ -234,9 +241,9 @@ static GnomeUIInfo edit_menu[] = {
      GDK_z, GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_ADD_SIGNATURE 7
-    {GNOME_APP_UI_ITEM, N_("Insert _Signature"), NULL,
+    {GNOME_APP_UI_ITEM, N_("Insert Si_gnature"), NULL,
      (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_z, GDK_CONTROL_MASK, NULL},
+     GDK_g, GDK_CONTROL_MASK, NULL},
 #define EDIT_MENU_QUOTE 8
     {GNOME_APP_UI_ITEM, N_("_Quote Message(s)"), NULL,
      (gpointer) quote_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
@@ -252,7 +259,7 @@ static GnomeUIInfo edit_menu[] = {
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SPELL_CHECK 13
-    GNOMEUIINFO_ITEM_STOCK(N_("_Check Spelling"), 
+    GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
                            N_("Check the spelling of the message"),
                            spell_check_cb,
                            GNOME_STOCK_MENU_SPELLCHECK),
@@ -1250,12 +1257,21 @@ file_attachment(GtkWidget * widget, GnomeIconList * ilist)
 }
 
 /* the menu is created on right-button click on an attachement */
-static GtkWidget *
-create_popup_menu(GnomeIconList * ilist, gint num)
+static gboolean
+sw_do_popup(GnomeIconList * ilist, GdkEventButton * event)
 {
+    GList *list;
+    gint num;
+    attachment_t *attach;
     GtkWidget *menu, *menuitem;
-    attachment_t *attach = 
-	(attachment_t *)gnome_icon_list_get_icon_data(ilist, num);
+    gint event_button;
+    guint event_time;
+
+    if (!(list = gnome_icon_list_get_selection(ilist)))
+        return FALSE;
+
+    num = GPOINTER_TO_INT(list->data);
+    attach = (attachment_t *)gnome_icon_list_get_icon_data(ilist, num);
 
     menu = gtk_menu_new();
     menuitem = gtk_menu_item_new_with_label(_("Remove"));
@@ -1285,7 +1301,16 @@ create_popup_menu(GnomeIconList * ilist, gint num)
 	gtk_widget_show(menuitem);
     }
 
-    return menu;
+    if (event) {
+        event_button = event->button;
+        event_time = event->time;
+    } else {
+        event_button = 0;
+        event_time = gtk_get_current_event_time();
+    }
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+                   event_button, event_time);
+    return TRUE;
 }
 
 /* select_icon --------------------------------------------------------------
@@ -1303,8 +1328,17 @@ select_attachment(GnomeIconList * ilist, gint num, GdkEventButton * event,
     if (event == NULL)
 	return;
     if (event->type == GDK_BUTTON_PRESS && event->button == 3)
-	gtk_menu_popup(GTK_MENU(create_popup_menu(ilist, num)),
-		       NULL, NULL, NULL, NULL, event->button, event->time);
+        sw_do_popup(ilist, event);
+}
+
+/* sw_popup_menu_cb:
+ * callback for the "popup-menu" signal, which is issued when the user
+ * hits shift-F10
+ */
+static gboolean
+sw_popup_menu_cb(GtkWidget * widget, gpointer data)
+{
+    return sw_do_popup(GNOME_ICON_LIST(widget), NULL);
 }
 
 static void
@@ -1676,7 +1710,8 @@ static void
 create_email_or_string_entry(GtkWidget * table, const gchar * label,
                              int y_pos, GtkWidget * arr[])
 {
-    arr[0] = gtk_label_new(label);
+    arr[0] = gtk_label_new_with_mnemonic(label);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), arr[1]);
     gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(arr[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
@@ -1823,17 +1858,17 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     msg->bad_address_style = NULL;
 
     /* From: */
-    create_email_entry(table, _("From:"), 0, GNOME_STOCK_MENU_BOOK_BLUE,
+    create_email_entry(table, _("F_rom:"), 0, GNOME_STOCK_MENU_BOOK_BLUE,
                        msg, msg->from,
                        &msg->from_info, 1, 1);
 
     /* To: */
-    create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED,
+    create_email_entry(table, _("_To:"), 1, GNOME_STOCK_MENU_BOOK_RED,
                        msg, msg->to,
                        &msg->to_info, 1, -1);
 
     /* Subject: */
-    create_string_entry(table, _("Subject:"), 2, msg->subject);
+    create_string_entry(table, _("S_ubject:"), 2, msg->subject);
     /* cc: */
     create_email_entry(table, _("Cc:"), 3, GNOME_STOCK_MENU_BOOK_YELLOW,
                        msg, msg->cc,
@@ -1845,7 +1880,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
                        &msg->bcc_info, 0, -1);
 
     /* fcc: */
-    msg->fcc[0] = gtk_label_new(_("Fcc:"));
+    msg->fcc[0] = gtk_label_new_with_mnemonic(_("F_cc:"));
     gtk_misc_set_alignment(GTK_MISC(msg->fcc[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(msg->fcc[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
@@ -1867,20 +1902,21 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     msg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(msg->window),
                                      &balsa_app.fcc_mru);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(msg->fcc[0]), msg->fcc[1]);
     align = gtk_alignment_new(0, 0.5, 0, 1);
     gtk_container_add(GTK_CONTAINER(align), msg->fcc[1]);
     gtk_table_attach(GTK_TABLE(table), align, 1, 3, 5, 6,
 		     GTK_FILL, GTK_FILL, 0, 0);
 
     /* Reply To: */
-    create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_BLUE,
+    create_email_entry(table, _("_Reply To:"), 6, GNOME_STOCK_MENU_BOOK_BLUE,
                        msg, msg->reply_to,
                        &msg->reply_to_info, 0, -1);
 
 
 
     /* Attachment list */
-    msg->attachments[0] = gtk_label_new(_("Attachments:"));
+    msg->attachments[0] = gtk_label_new_with_mnemonic(_("_Attachments:"));
     gtk_misc_set_alignment(GTK_MISC(msg->attachments[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(msg->attachments[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
@@ -1913,6 +1949,8 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 
     gtk_signal_connect(GTK_OBJECT(msg->attachments[1]), "select_icon",
 		       GTK_SIGNAL_FUNC(select_attachment), NULL);
+    g_signal_connect(G_OBJECT(msg->attachments[1]), "popup-menu",
+                     G_CALLBACK(sw_popup_menu_cb), NULL);
 
     gnome_icon_list_set_selection_mode(GNOME_ICON_LIST
 				       (msg->attachments[1]),

@@ -111,6 +111,8 @@ static void save_part(BalsaPartInfo * info);
 
 static void select_icon_cb(GnomeIconList * ilist, gint num,
 			   GdkEventButton * event, BalsaMessage * bm);
+static gboolean bm_popup_menu_cb(GtkWidget * widget, gpointer data);
+static gboolean bm_do_popup(GnomeIconList * ilist, GdkEventButton * event);
 static BalsaPartInfo *add_part(BalsaMessage *bm, gint part);
 static void add_multipart(BalsaMessage *bm, LibBalsaMessageBody *parent);
 static void select_part(BalsaMessage * bm, gint part);
@@ -262,6 +264,8 @@ balsa_message_init(BalsaMessage * bm)
 				       GTK_SELECTION_MULTIPLE);
     g_signal_connect(G_OBJECT(bm->part_list), "select_icon",
 		     G_CALLBACK(select_icon_cb), bm);
+    g_signal_connect(G_OBJECT(bm->part_list), "popup-menu",
+                     G_CALLBACK(bm_popup_menu_cb), NULL);
     g_signal_connect(G_OBJECT(bm->part_list), "size_request",
 		     G_CALLBACK(balsa_icon_list_size_request),
 		     (gpointer) bm);
@@ -415,25 +419,55 @@ static void
 select_icon_cb(GnomeIconList * ilist, gint num, GdkEventButton * event,
 	       BalsaMessage * bm)
 {
-
-    BalsaPartInfo *info;
-
     if (event == NULL)
 	return;
 
     if (event->button == 1) {
 	select_part(bm, num);
     } else if (event->button == 3) {
-	info = (BalsaPartInfo *) gnome_icon_list_get_icon_data(ilist, num);
-	
-	g_assert(info != NULL);
-
-	if (info->popup_menu) {
-	    gtk_menu_popup(GTK_MENU(info->popup_menu),
-			   NULL, NULL, NULL, NULL,
-			   event->button, event->time);
-	}
+        bm_do_popup(ilist, event);
     }
+}
+
+/* bm_popup_menu_cb:
+ * callback for the "popup-menu" signal, which is issued when the user
+ * hits shift-F10
+ */
+static gboolean
+bm_popup_menu_cb(GtkWidget * widget, gpointer data)
+{
+    return bm_do_popup(GNOME_ICON_LIST(widget), NULL);
+}
+
+static gboolean
+bm_do_popup(GnomeIconList * ilist, GdkEventButton * event)
+{
+    GList *list;
+    gint num;
+    BalsaPartInfo *info;
+
+    if (!(list = gnome_icon_list_get_selection(ilist)))
+        return FALSE;
+
+    num = GPOINTER_TO_INT(list->data);
+    info = (BalsaPartInfo *) gnome_icon_list_get_icon_data(ilist, num);
+    g_assert(info != NULL);
+    if (info->popup_menu) {
+        gint event_button;
+        guint event_time;
+
+        if (event) {
+            event_button = event->button;
+            event_time = event->time;
+        } else {
+            event_button = 0;
+            event_time = gtk_get_current_event_time();
+        }
+        gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL, NULL, NULL,
+                       event_button, event_time);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 static void
@@ -2140,7 +2174,7 @@ balsa_message_next_part(BalsaMessage * bmessage)
 	return;
 
     if ((list = gnome_icon_list_get_selection(gil))) {
-	index = (gint) list->data;
+	index = GPOINTER_TO_INT(list->data);
 	if (++index >= icons)
 	    index = 0;
     }
@@ -2165,7 +2199,7 @@ balsa_message_previous_part(BalsaMessage * bmessage)
 	return;
 
     if ((list = gnome_icon_list_get_selection(gil))) {
-	index = (gint) list->data;
+	index = GPOINTER_TO_INT(list->data);
 
 	if (--index < 0)
 	    index = icons - 1;

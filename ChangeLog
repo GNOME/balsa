@@ -1,3 +1,8 @@
+2002-09-25  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: show popup menu with Shift-F10
+	* src/balsa-message.c, src/sendmsg-window.c: ditto. (+shortcuts by PS)
+
 2002-09-24  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/address-book-config.c: check external program load and save

@@ -2164,6 +2164,8 @@ address_book_delete_cb (GtkWidget * widget, gpointer data)
 
 	config_address_book_delete(address_book);
 	balsa_app.address_book_list = g_list_remove(balsa_app.address_book_list,address_book);
+	if(balsa_app.default_address_book == address_book)
+		balsa_app.default_address_book = NULL;
 
 	gtk_object_unref(GTK_OBJECT(address_book));
 

@@ -10,6 +10,10 @@
 	* src/balsa-message.c: add missing charsets.
 	* src/sendmsg-window.c: use user's language, if this does 
 	not conflict with the message's charset.
+	* src/pref-manager.c: fix deferred crash on default address book 
+	deletion.
+	* src/address-book-config.c: show 'expand aliases' checkbox on 
+	adding mailbox.
 	
 2000-09-27  Ian Campbell  <ijc25@cam.ac.uk>
 

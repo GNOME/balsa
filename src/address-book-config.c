@@ -214,7 +214,6 @@ balsa_address_book_config_new (LibBalsaAddressBook *address_book)
 			g_assert_not_reached();
 
 		address_book->expand_aliases = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->expand_aliases_button));
-
 	}
 	gtk_widget_destroy(abc->window);
 	g_free(abc);
@@ -286,26 +285,22 @@ create_vcard_page(AddressBookConfig *abc)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL,
 		    10, 10);
-  gtk_widget_show (label);
 
   abc->name_entry = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), abc->name_entry, 1, 2, 0, 1,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
-  gtk_widget_show (abc->name_entry);
 
   label = gtk_label_new (_("Path"));
   gtk_misc_set_alignment (GTK_MISC(label), 1.0, 0.5);
   gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
 		   GTK_FILL, GTK_FILL,
 		   10, 10);
-  gtk_widget_show(label);
 
   abc->ab_specific.vcard.path = gnome_file_entry_new("VCARD ADDRESS BOOK PATH", "Select path for address book");
   gtk_table_attach (GTK_TABLE (table), abc->ab_specific.vcard.path, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
-  gtk_widget_show(abc->ab_specific.vcard.path);
 
   abc->expand_aliases_button = gtk_check_button_new_with_label ( _("Expand aliases as you type"));
   gtk_table_attach(GTK_TABLE (table), abc->expand_aliases_button, 1, 2, 2, 3,
@@ -324,7 +319,7 @@ create_vcard_page(AddressBookConfig *abc)
 	  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(abc->expand_aliases_button), abc->address_book->expand_aliases);
   }
 
-  gtk_widget_show (table);
+  gtk_widget_show_all (table);
   return table;
 
 }

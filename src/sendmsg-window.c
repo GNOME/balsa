@@ -34,6 +34,9 @@
      program and send it over to GDK gurus.
 
    Locale data is then used exclusively for the spelling checking.  */
+
+
+#if FINALLY_PORTED
 #include "config.h"
 
 #include "libbalsa.h"
@@ -3984,3 +3987,4 @@ rfc2822_skip_comments(gchar * str)
     }
     return str;
 }
+#endif

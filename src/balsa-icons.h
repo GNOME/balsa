@@ -96,4 +96,6 @@ void balsa_icons_init(void);
 GdkPixmap *balsa_icon_get_pixmap(BalsaIconName icon);
 GdkBitmap *balsa_icon_get_bitmap(BalsaIconName icon);
 void register_balsa_pixmaps(void);
+void balsa_icon_create(const gchar ** data, GdkPixmap ** pmap,
+                       GdkBitmap ** bmap);
 #endif

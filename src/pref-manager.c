@@ -20,7 +20,7 @@
  */
 
 /* MAKE SURE YOU USE THE HELPER FUNCTIONS, like create_table(), etc. */
-
+#if 0
 #include "config.h"
 
 #include <gnome.h>
@@ -2775,3 +2775,4 @@ refresh_preferences_manager(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->browse_wrap),
                                  balsa_app.browse_wrap);
 }
+#endif

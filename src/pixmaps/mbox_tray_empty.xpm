@@ -1,5 +1,5 @@
 /* XPM */
-static char * mbox_tray_empty_xpm[] = {
+static const char * mbox_tray_empty_xpm[] = {
 "16 16 16 1",
 " 	c None",
 ".	c #000000",

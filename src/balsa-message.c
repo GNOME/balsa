@@ -20,6 +20,7 @@
  * 02111-1307, USA.
  */
 
+#if 0
 #include "config.h"
 
 #include <errno.h>
@@ -3197,3 +3198,4 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
     gtk_widget_hide (dialog);
     gtk_object_destroy(GTK_OBJECT(dialog));
 }
+#endif

@@ -37,19 +37,11 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "pixmaps/other_enabled.xpm"
+#include "balsa-icons.h"
 
 /* Global vars */
 
 extern GList * fr_dialogs_opened;
-
-static void
-get_pixmap_and_mask_from_xpm(char* xpm[],
-                             GdkPixmap **pixmap, GdkBitmap **mask)
-{
-    GdkPixbuf *pb = gdk_pixbuf_new_from_xpm_data((const char**)xpm);
-    gdk_pixbuf_render_pixmap_and_mask(pb, pixmap, mask, 0);
-    gdk_pixbuf_unref(pb);
-}
 
 /* FIXME : we should single out invalid filters in the list (eg with colors) */
 /* FIXME : implement error reporting */
@@ -275,7 +267,7 @@ void selected_list_select_row_event_cb(GtkWidget *widget,
                             1 << (column-1));
     } else {
 	/* now for the pixmap from gdk */
-	get_pixmap_and_mask_from_xpm(other_enabled_xpm, &pixmap, &mask);
+	balsa_icon_create(other_enabled_xpm, &pixmap, &mask);
 	gtk_clist_set_pixmap(p->selected_filters, row, column, pixmap,mask);
 	gdk_pixmap_unref(pixmap);
 	gdk_bitmap_unref(mask);

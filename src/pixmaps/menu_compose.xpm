@@ -1,5 +1,5 @@
 /* XPM */
-static char * menu_compose_xpm[] = {
+static const char * menu_compose_xpm[] = {
 "16 16 161 2",
 "  	c None",
 ". 	c #3C321C",

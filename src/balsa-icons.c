@@ -19,6 +19,8 @@
  * 02111-1307, USA.
  */
 
+#if 0
+
 #include <gnome.h>
 #include <gdk/gdkx.h>
 
@@ -119,34 +121,35 @@ static BalsaIcon info_flagged;
 static BalsaIcon info_new;
 static BalsaIcon info_attachment;
 
-static void
-create_icon(gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
+void
+balsa_icon_create(const gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
     /* Is there any reason to use gdkpixbuf here? */
-    *pmap = gdk_pixmap_create_from_xpm_d(GDK_ROOT_PARENT(), bmap, 0, data);
+    *pmap = gdk_pixmap_create_from_xpm_d(GDK_ROOT_PARENT(), bmap, 0,
+                                         (gchar **) data);
 }
 
 void
 balsa_icons_init(void)
 {
-    create_icon(mbox_draft_xpm,		&mbox_draft.p,		&mbox_draft.b);
-    create_icon(mbox_in_xpm,		&mbox_in.p,		&mbox_in.b);
-    create_icon(mbox_out_xpm,		&mbox_out.p,		&mbox_out.b);
-    create_icon(mbox_sent_xpm,		&mbox_sent.p,		&mbox_sent.b);
-    create_icon(mbox_trash_xpm,		&mbox_trash.p,		&mbox_trash.b);
+    balsa_icon_create(mbox_draft_xpm,		&mbox_draft.p,		&mbox_draft.b);
+    balsa_icon_create(mbox_in_xpm,		&mbox_in.p,		&mbox_in.b);
+    balsa_icon_create(mbox_out_xpm,		&mbox_out.p,		&mbox_out.b);
+    balsa_icon_create(mbox_sent_xpm,		&mbox_sent.p,		&mbox_sent.b);
+    balsa_icon_create(mbox_trash_xpm,		&mbox_trash.p,		&mbox_trash.b);
 
-    create_icon(mbox_tray_empty_xpm,	&mbox_tray_empty.p,	&mbox_tray_empty.b);
-    create_icon(mbox_tray_full_xpm,	&mbox_tray_full.p,	&mbox_tray_full.b);
+    balsa_icon_create(mbox_tray_empty_xpm,	&mbox_tray_empty.p,	&mbox_tray_empty.b);
+    balsa_icon_create(mbox_tray_full_xpm,	&mbox_tray_full.p,	&mbox_tray_full.b);
 
-    create_icon(mbox_dir_closed_xpm,	&mbox_dir_closed.p,	&mbox_dir_closed.b);
-    create_icon(mbox_dir_open_xpm,	&mbox_dir_open.p,	&mbox_dir_open.b);
+    balsa_icon_create(mbox_dir_closed_xpm,	&mbox_dir_closed.p,	&mbox_dir_closed.b);
+    balsa_icon_create(mbox_dir_open_xpm,	&mbox_dir_open.p,	&mbox_dir_open.b);
 
-    create_icon(info_replied_xpm,	&info_replied.p,	&info_replied.b);
-    create_icon(info_read_xpm,		&info_read.p,		&info_read.b);
-    create_icon(info_forward_xpm,	&info_forward.p,	&info_forward.b);
-    create_icon(info_flagged_xpm,	&info_flagged.p,	&info_flagged.b);
-    create_icon(info_new_xpm,		&info_new.p,		&info_new.b);
-    create_icon(info_attachment_xpm,	&info_attachment.p,	&info_attachment.b);
+    balsa_icon_create(info_replied_xpm,	&info_replied.p,	&info_replied.b);
+    balsa_icon_create(info_read_xpm,		&info_read.p,		&info_read.b);
+    balsa_icon_create(info_forward_xpm,	&info_forward.p,	&info_forward.b);
+    balsa_icon_create(info_flagged_xpm,	&info_flagged.p,	&info_flagged.b);
+    balsa_icon_create(info_new_xpm,		&info_new.p,		&info_new.b);
+    balsa_icon_create(info_attachment_xpm,	&info_attachment.p,	&info_attachment.b);
 }
 
 GdkPixmap *
@@ -204,82 +207,83 @@ balsa_icon_get_bitmap(BalsaIconName name)
 }
 
 static void
-register_balsa_pixmap(const gchar* name, char** data, guint xsize, guint ysize)
+register_balsa_pixmap(const gchar * stock_id, const char ** data,
+                      GtkIconFactory * factory)
 {
-    GnomeStockPixmapEntryData *entry;
-    entry = g_malloc0(sizeof(*entry));
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_xpm_data(data);
+    GtkIconSet *icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
 
-    entry->type     = GNOME_STOCK_PIXMAP_TYPE_DATA;
-    entry->xpm_data = data;
-    entry->width    = xsize;
-    entry->height   = ysize;
-    gnome_stock_pixmap_register(name, GNOME_STOCK_PIXMAP_REGULAR,
-				(GnomeStockPixmapEntry *) entry);
+    gtk_icon_factory_add(factory, stock_id, icon_set);
 }
 
 void
 register_balsa_pixmaps(void)
 {
     const struct {
-	const char* name;
-	char** xpm;
-	int w, h;
+	const char *name;
+	const char **xpm;
     } icons[] = {
 	/* Toolbar icons */
-	{ BALSA_PIXMAP_ATTACHMENT,	    balsa_attachment_xpm,  24, 24 },
-	{ BALSA_PIXMAP_NEW,		    balsa_compose_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_CONTINUE,	    balsa_continue_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_RECEIVE,		    balsa_receive_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_REPLY,		    balsa_reply_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_REPLY_ALL,	    balsa_reply_all_xpm,   24, 24 },
-	{ BALSA_PIXMAP_REPLY_GROUP,	    balsa_reply_group_xpm, 24, 24 },
-	{ BALSA_PIXMAP_FORWARD,		    balsa_forward_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_NEXT,		    balsa_next_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_PREVIOUS,	    balsa_previous_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_POSTPONE,	    balsa_postpone_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_PRINT,		    balsa_print_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_SAVE,		    balsa_save_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_SEND,		    balsa_send_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_SEND_RECEIVE,	    balsa_send_receive_xpm,24, 24 },
-	{ BALSA_PIXMAP_TRASH,		    balsa_trash_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_TRASH_EMPTY,	    balsa_trash_empty_xpm, 24, 24 },
-	{ BALSA_PIXMAP_NEXT_UNREAD,	    balsa_next_unread_xpm, 24, 24 },
-	{ BALSA_PIXMAP_NEXT_FLAGGED,	    balsa_next_flagged_xpm,24, 24 },
-	{ BALSA_PIXMAP_SHOW_HEADERS,	    balsa_show_headers_xpm,24, 24 },
-	{ BALSA_PIXMAP_SHOW_PREVIEW,	    balsa_show_preview_xpm,24, 24 },
-	{ BALSA_PIXMAP_MARKED_NEW,	    balsa_marked_new_xpm,  24, 24 },
-	{ BALSA_PIXMAP_MARKED_ALL,	    balsa_marked_all_xpm,  24, 24 },
-	{ BALSA_PIXMAP_IDENTITY,	    balsa_identity_xpm,	   24, 24 },
-	{ BALSA_PIXMAP_CLOSE_MBOX,	    balsa_close_mbox_xpm,  24, 24 },
+	{ BALSA_PIXMAP_ATTACHMENT,	    balsa_attachment_xpm},
+	{ BALSA_PIXMAP_NEW,		    balsa_compose_xpm},
+	{ BALSA_PIXMAP_CONTINUE,	    balsa_continue_xpm},
+	{ BALSA_PIXMAP_RECEIVE,		    balsa_receive_xpm},
+	{ BALSA_PIXMAP_REPLY,		    balsa_reply_xpm},
+	{ BALSA_PIXMAP_REPLY_ALL,	    balsa_reply_all_xpm},
+	{ BALSA_PIXMAP_REPLY_GROUP,	    balsa_reply_group_xpm},
+	{ BALSA_PIXMAP_FORWARD,		    balsa_forward_xpm},
+	{ BALSA_PIXMAP_NEXT,		    balsa_next_xpm},
+	{ BALSA_PIXMAP_PREVIOUS,	    balsa_previous_xpm},
+	{ BALSA_PIXMAP_POSTPONE,	    balsa_postpone_xpm},
+	{ BALSA_PIXMAP_PRINT,		    balsa_print_xpm},
+	{ BALSA_PIXMAP_SAVE,		    balsa_save_xpm},
+	{ BALSA_PIXMAP_SEND,		    balsa_send_xpm},
+	{ BALSA_PIXMAP_SEND_RECEIVE,	    balsa_send_receive_xpm},
+	{ BALSA_PIXMAP_TRASH,		    balsa_trash_xpm},
+	{ BALSA_PIXMAP_TRASH_EMPTY,	    balsa_trash_empty_xpm},
+	{ BALSA_PIXMAP_NEXT_UNREAD,	    balsa_next_unread_xpm},
+	{ BALSA_PIXMAP_NEXT_FLAGGED,	    balsa_next_flagged_xpm},
+	{ BALSA_PIXMAP_SHOW_HEADERS,	    balsa_show_headers_xpm},
+	{ BALSA_PIXMAP_SHOW_PREVIEW,	    balsa_show_preview_xpm},
+	{ BALSA_PIXMAP_MARKED_NEW,	    balsa_marked_new_xpm},
+	{ BALSA_PIXMAP_MARKED_ALL,	    balsa_marked_all_xpm},
+	{ BALSA_PIXMAP_IDENTITY,	    balsa_identity_xpm},
+	{ BALSA_PIXMAP_CLOSE_MBOX,	    balsa_close_mbox_xpm},
 
 	/* Menu icons */
-	{ BALSA_PIXMAP_MENU_NEW,	    menu_new_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_FLAGGED,	    menu_flagged_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_IDENTITY,	    menu_identity_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_FORWARD,	    menu_forward_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_REPLY,	    menu_reply_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_REPLY_ALL,	    menu_reply_all_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_REPLY_GROUP,    menu_reply_group_xpm,  16, 16 },
-	{ BALSA_PIXMAP_MENU_POSTPONE,	    menu_postpone_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_PRINT,	    menu_print_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_NEXT,	    menu_next_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_PREVIOUS,	    menu_previous_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_SAVE,	    menu_save_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_SEND,	    menu_send_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_SEND_RECEIVE,   menu_send_receive_xpm, 16, 16 },
-	{ BALSA_PIXMAP_MENU_COMPOSE,	    menu_compose_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_ATTACHMENT,	    menu_attachment_xpm,   16, 16 },
-	{ BALSA_PIXMAP_MENU_RECEIVE,	    menu_receive_xpm,	   16, 16 },
-	{ BALSA_PIXMAP_MENU_NEXT_FLAGGED,   menu_next_flagged_xpm, 16, 16 },
-	{ BALSA_PIXMAP_MENU_NEXT_UNREAD,    menu_next_unread_xpm,  16, 16 },
-	{ BALSA_PIXMAP_MENU_MARK_ALL,	    menu_mark_all_xpm,	   16, 16 },
+	{ BALSA_PIXMAP_MENU_NEW,	    menu_new_xpm},
+	{ BALSA_PIXMAP_MENU_FLAGGED,	    menu_flagged_xpm},
+	{ BALSA_PIXMAP_MENU_IDENTITY,	    menu_identity_xpm},
+	{ BALSA_PIXMAP_MENU_FORWARD,	    menu_forward_xpm},
+	{ BALSA_PIXMAP_MENU_REPLY,	    menu_reply_xpm},
+	{ BALSA_PIXMAP_MENU_REPLY_ALL,	    menu_reply_all_xpm},
+	{ BALSA_PIXMAP_MENU_REPLY_GROUP,    menu_reply_group_xpm},
+	{ BALSA_PIXMAP_MENU_POSTPONE,	    menu_postpone_xpm},
+	{ BALSA_PIXMAP_MENU_PRINT,	    menu_print_xpm},
+	{ BALSA_PIXMAP_MENU_NEXT,	    menu_next_xpm},
+	{ BALSA_PIXMAP_MENU_PREVIOUS,	    menu_previous_xpm},
+	{ BALSA_PIXMAP_MENU_SAVE,	    menu_save_xpm},
+	{ BALSA_PIXMAP_MENU_SEND,	    menu_send_xpm},
+	{ BALSA_PIXMAP_MENU_SEND_RECEIVE,   menu_send_receive_xpm},
+	{ BALSA_PIXMAP_MENU_COMPOSE,	    menu_compose_xpm},
+	{ BALSA_PIXMAP_MENU_ATTACHMENT,	    menu_attachment_xpm},
+	{ BALSA_PIXMAP_MENU_RECEIVE,	    menu_receive_xpm},
+	{ BALSA_PIXMAP_MENU_NEXT_FLAGGED,   menu_next_flagged_xpm},
+	{ BALSA_PIXMAP_MENU_NEXT_UNREAD,    menu_next_unread_xpm},
+	{ BALSA_PIXMAP_MENU_MARK_ALL,	    menu_mark_all_xpm},
 
 	/* Other icons */
-	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm,    9, 9 },
+	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm},
     };
 
     unsigned i;
+    GtkIconFactory *factory = gtk_icon_factory_new();
+
+    gtk_icon_factory_add_default(factory);
+
     for(i = 0; i < ELEMENTS(icons); i++)
 	register_balsa_pixmap(icons[i].name, icons[i].xpm,
-			      icons[i].w, icons[i].h);
+                              factory);
 }
+
+#endif

@@ -1,5 +1,5 @@
 /* XPM */
-static char * mbox_dir_closed_xpm[] = {
+static const char * mbox_dir_closed_xpm[] = {
 "16 16 70 1",
 " 	c None",
 ".	c #000000",

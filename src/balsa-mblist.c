@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <gtk/gtkfeatures.h>
+/* #include <gtk/gtkfeatures.h> */
 #include <string.h>
 #if BALSA_MAJOR < 2
 #include <gdk/gdkprivate.h>

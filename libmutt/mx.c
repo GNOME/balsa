@@ -913,10 +913,12 @@ int mx_sync_mailbox (CONTEXT *ctx)
   if (ctx->dontwrite)
   {
     char buf[STRING], tmp[STRING];
+#ifdef FULL_MUTT    
     if (km_expand_key (buf, sizeof(buf),
                        km_find_func (MENU_MAIN, OP_TOGGLE_WRITE)))
       snprintf (tmp, sizeof(tmp), " Press '%s' to toggle write", buf);
     else
+#endif    
       strfcpy (tmp, "Use 'toggle-write' to re-enable write!", sizeof(tmp));
 
     mutt_error ("Mailbox is marked unwritable. %s", tmp);

@@ -1271,6 +1271,7 @@ void mutt_body_handler (BODY *b, STATE *s)
       }
     }
   }
+#ifdef FULL_MUTT
   else if (s->flags & M_DISPLAY)
   {
     fprintf (s->fpout, "[-- %s/%s is unsupported ", TYPE (b->type), b->subtype);
@@ -1284,4 +1285,5 @@ void mutt_body_handler (BODY *b, STATE *s)
     }
     fputs (" --]\n", s->fpout);
   }
+#endif  
 }

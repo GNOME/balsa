@@ -73,7 +73,7 @@ WHERE char *Signature;
 WHERE char *SimpleSearch;
 WHERE char *Spoolfile;
 WHERE char *StChars;
-WHERE char *Status;
+WHERE char *StatusString;
 WHERE char *Tempdir;
 WHERE char *Tochars;
 WHERE char *Username;

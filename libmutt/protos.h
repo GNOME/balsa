@@ -54,7 +54,7 @@ int _mutt_aside_thread (HEADER *, short, short);
 
 typedef const char * format_t (char *, size_t, char, const char *, const char *, const char *, const char *, unsigned long, format_flag);
 
-void mutt_FormatString (char *, size_t, const char *, format_t *, unsigned long, format_flag);
+void mutt_FormatString (char *, size_t, const char *, const int width, format_t *, unsigned long, format_flag);
 
 void mutt_update_encoding (BODY *a);
 

@@ -547,9 +547,9 @@ hdr_format_str (char *dest,
   }
 
   if (optional)
-    mutt_FormatString (dest, destlen, ifstring, hdr_format_str, (unsigned long) hfi, flags);
+    mutt_FormatString (dest, destlen, ifstring, COLS, hdr_format_str, (unsigned long) hfi, flags);
   else if (flags & M_FORMAT_OPTIONAL)
-    mutt_FormatString (dest, destlen, elsestring, hdr_format_str, (unsigned long) hfi, flags);
+    mutt_FormatString (dest, destlen, elsestring, COLS, hdr_format_str, (unsigned long) hfi, flags);
 
   return (src);
 }
@@ -562,5 +562,5 @@ _mutt_make_string (char *dest, size_t destlen, const char *s, CONTEXT *ctx, HEAD
   hfi.hdr = hdr;
   hfi.ctx = ctx;
 
-  mutt_FormatString (dest, destlen, s, hdr_format_str, (unsigned long) &hfi, flags);
+  mutt_FormatString (dest, destlen, s, COLS, hdr_format_str, (unsigned long) &hfi, flags);
 }

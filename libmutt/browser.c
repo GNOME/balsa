@@ -237,7 +237,8 @@ static void add_folder (MUTTMENU *m, struct browser_state *state,
   folder.name = name;
   folder.f = s;
   folder.new = new;
-  mutt_FormatString (buffer, sizeof (buffer), FolderFormat, folder_format_str,
+  mutt_FormatString (buffer, sizeof (buffer), FolderFormat, COLS,
+  		     folder_format_str,
 		     (unsigned long) &folder, 0);
 
   if (state->entrylen == state->entrymax)

@@ -827,6 +827,7 @@ char *mutt_substrdup (const char *begin, const char *end)
 void mutt_FormatString (char *dest,		/* output buffer */
 			size_t destlen,		/* output buffer len */
 			const char *src,	/* template string */
+			const int width,	/* width to format to */
 			format_t *callback,	/* callback for processing */
 			unsigned long data,	/* callback data */
 			format_flag flags)	/* callback flags */
@@ -919,7 +920,7 @@ void mutt_FormatString (char *dest,		/* output buffer */
 	if (count > wlen)
 	{
 	  count -= wlen; /* how many chars left on this line */
-	  mutt_FormatString (buf, sizeof (buf), src, callback, data, flags);
+	  mutt_FormatString (buf, sizeof (buf), src, COLS, callback, data, flags);
 	  len = strlen (buf);
 	  if (count > len)
 	  {
@@ -1028,7 +1029,9 @@ FILE *mutt_open_read (const char *path, pid_t *thepid)
     char *s = safe_strdup (path);
 
     s[len - 1] = 0;
+#ifdef MUTT_CURSES    
     endwin ();
+#endif    
     *thepid = mutt_create_filter (s, NULL, &f, NULL);
     free (s);
   }

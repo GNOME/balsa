@@ -71,7 +71,7 @@ int alias_search (MUTTMENU *m, regex_t *re, int n)
   char s[LONG_STRING];
   int slen = sizeof(s);
 
-  mutt_FormatString (s, slen, NONULL (AliasFmt), alias_format_str,
+  mutt_FormatString (s, slen, NONULL (AliasFmt), alias_format_str, COLS,
                     (unsigned long) ((ALIAS **) m->data)[n], 0);
   return regexec (re, s, 0, NULL, 0);
 }
@@ -79,7 +79,8 @@ int alias_search (MUTTMENU *m, regex_t *re, int n)
 
 void alias_entry (char *s, size_t slen, MUTTMENU *m, int num)
 {
-  mutt_FormatString (s, slen, NONULL (AliasFmt), alias_format_str, (unsigned long) ((ALIAS **) m->data)[num], 0);
+  mutt_FormatString (s, slen, NONULL (AliasFmt), alias_format_str, COLS,
+  		    (unsigned long) ((ALIAS **) m->data)[num], 0);
 }
 
 int alias_tag (MUTTMENU *menu, int n)

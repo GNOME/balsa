@@ -94,6 +94,4 @@ extern struct binding_t OpEditor[];
 extern struct binding_t OpQuery[];
 
 
-#include "keymap_defs.h"
-
 #endif /* KEYMAP_H */

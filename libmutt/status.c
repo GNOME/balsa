@@ -272,5 +272,5 @@ status_format_str (char *buf, size_t buflen, char op, const char *src,
 
 void menu_status_line (char *buf, size_t buflen, MUTTMENU *menu, const char *p)
 {
-  mutt_FormatString (buf, buflen, p, status_format_str, (unsigned long) menu, 0);
+  mutt_FormatString (buf, buflen, p, COLS, status_format_str, (unsigned long) menu, 0);
 }

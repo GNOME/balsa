@@ -390,7 +390,7 @@ void mutt_index_menu (void)
 
       if (menu->redraw & REDRAW_STATUS) 
       {
-	menu_status_line (buf, sizeof (buf), menu, NONULL (Status));
+	menu_status_line (buf, sizeof (buf), menu, NONULL (StatusString));
 	CLEARLINE (option (OPTSTATUSONTOP) ? 0 : LINES-2);
 	SETCOLOR (MT_COLOR_STATUS);
 	printw ("%-*.*s", COLS, COLS, buf);

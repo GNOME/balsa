@@ -61,7 +61,9 @@ static GtkTargetEntry mblist_drop_types[] = {
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
+#if 0
 static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };
+#endif
 
 static BalsaMBListClass *parent_class = NULL;
 
@@ -162,6 +164,7 @@ balsa_mblist_class_init(BalsaMBListClass * klass)
     object_class = (GtkObjectClass *) klass;
     tree_class = GTK_CTREE_CLASS(klass);
 
+#if 0
     balsa_mblist_signals[SELECT_MAILBOX] =
 	gtk_signal_new("select_mailbox",
 		       GTK_RUN_LAST,
@@ -173,6 +176,7 @@ balsa_mblist_class_init(BalsaMBListClass * klass)
 
     gtk_object_class_add_signals(object_class, balsa_mblist_signals,
 				 LAST_SIGNAL);
+#endif
 
     object_class->destroy = balsa_mblist_destroy;
     parent_class = gtk_type_class(gtk_ctree_get_type());
@@ -418,6 +422,8 @@ mblist_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 	g_return_val_if_fail(mbnode != NULL, FALSE);
 
 	switch(event->button) {
+#if 0
+	/* handled by select_mailbox(): */
         case 1:
 	    balsa_app.mblist->currently_selected_ctree_node = node; 
 	    if(mbnode->mailbox)
@@ -427,6 +433,7 @@ mblist_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 			    balsa_mblist_signals[SELECT_MAILBOX],
 			    mbnode->mailbox, row, event);
 	    break;
+#endif
 	case 3:
 	    gtk_ctree_select(ctree, node);
 	    gtk_menu_popup(GTK_MENU(
@@ -538,6 +545,28 @@ balsa_mblist_init(BalsaMBList * tree)
     balsa_mblist_repopulate(tree);
 }
 
+/* select_mailbox
+ *
+ * This function is called when the user clicks on the mailbox list,
+ * to open the mailbox.
+ * this does not belong in mblist_button_press_cb():
+ * In contrast with `button_press_event', `tree_select_row' doesn't seem
+ * to be triggered by clicking on the expand/collapse icon. 
+ * Tested against UW-IMAP (pawsa@theochem.kth.se) and Cyrus IMAP tree
+ * Peter Bloomfield <bloomfld@eos.ncsu.edu>.
+ **/
+static void
+select_mailbox(GtkCTree * ctree, GtkCTreeNode * row, gint column)
+{
+    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, row);
+
+    g_return_if_fail(mbnode != NULL);
+
+    balsa_app.mblist->currently_selected_ctree_node = row; /* row is a node! */
+    if(mbnode->mailbox)
+	mblist_open_mailbox(mbnode->mailbox);
+}
+
 /* balsa_mblist_default_signal_bindings:
    connect signals useful for the left-hand side mailbox tree
    but useless for the transfer menu.
@@ -549,6 +578,8 @@ mblist_default_signal_bindings(BalsaMBList * mblist)
 		       GTK_SIGNAL_FUNC(mblist_button_press_cb), NULL);
     gtk_signal_connect(GTK_OBJECT(mblist), "key_press_event",
 		       GTK_SIGNAL_FUNC(mblist_key_press_cb), NULL);
+    gtk_signal_connect(GTK_OBJECT(mblist), "tree_select_row",
+		       GTK_SIGNAL_FUNC(select_mailbox), (gpointer) NULL);
     gtk_signal_connect(GTK_OBJECT(mblist),
 		       "resize_column",
 		       GTK_SIGNAL_FUNC(balsa_mblist_column_resize),

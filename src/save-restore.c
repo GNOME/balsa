@@ -391,6 +391,9 @@ config_global_load(void)
     balsa_app.mw_width = gnome_config_get_int("MainWindowWidth=640");
     balsa_app.mw_height = gnome_config_get_int("MainWindowHeight=480");
     balsa_app.mblist_width = gnome_config_get_int("MailboxListWidth=100");
+    /* sendmsg window sizes */
+    balsa_app.sw_width = gnome_config_get_int("SendMsgWindowWidth=640");
+    balsa_app.sw_height = gnome_config_get_int("SendMsgWindowHeight=480");
     /* FIXME: PKGW: why comment this out? Breaks my Transfer context menu. */
     if (balsa_app.mblist_width < 100)
 	balsa_app.mblist_width = 170;
@@ -672,6 +675,8 @@ gint config_save(void)
     gnome_config_set_int("MainWindowWidth", balsa_app.mw_width);
     gnome_config_set_int("MainWindowHeight", balsa_app.mw_height);
     gnome_config_set_int("MailboxListWidth", balsa_app.mblist_width);
+    gnome_config_set_int("SendMsgWindowWidth", balsa_app.sw_width);
+    gnome_config_set_int("SendMsgWindowHeight", balsa_app.sw_height);
     gnome_config_set_int("NotebookHeight", balsa_app.notebook_height);
 
     gnome_config_pop_prefix();

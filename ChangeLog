@@ -1,3 +1,17 @@
+2001-07-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	M. Thielker <balsa@t-data.com>: hush gcc-3.0 warnings.
+	* src/balsa-index-threading.c, src/filter-edit-callbacks.c: add break
+
+	christophe barbe <christophe.barbe@online.fr>:
+	* src/sendmsg-window.c: get rid of widget_set_usize().
+	* src/balsa-app.[hc]: store suggested window dimensions.
+	* src/save-restore.c: save suggested compose window dimensions.
+
+	Peter Bloomfield <bloomfld@eos.ncsu.edu>
+	* src/balsa-mblist.c: mailbox opening for mixed mailbox/folder nodes
+	via expand/collapse signals.
+
 2001-07-09  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c: separator before identity button

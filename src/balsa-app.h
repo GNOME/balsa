@@ -205,6 +205,8 @@ extern struct BalsaApplication {
     gint mw_width;
     gint mw_height;
     gint mblist_width;
+	 gint sw_width; /* sendmsg window */
+	 gint sw_height;
 
     /* file paths */
     gchar *attach_dir;

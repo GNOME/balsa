@@ -242,6 +242,8 @@ balsa_app_init(void)
     balsa_app.mblist_width = 100;
     balsa_app.mw_width = MW_DEFAULT_WIDTH;
     balsa_app.mw_height = MW_DEFAULT_HEIGHT;
+    balsa_app.sw_width = 0;
+    balsa_app.sw_height = 0;
     balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
     balsa_app.pwindow_option = WHILERETR;
     balsa_app.wordwrap = TRUE;

@@ -113,6 +113,8 @@ static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
 static void update_msg_identity(BalsaSendmsg*, BalsaIdentity*);
 
+static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
+
 /* Standard DnD types */
 enum {
     TARGET_URI_LIST,
@@ -638,6 +640,14 @@ update_msg_identity(BalsaSendmsg* msg, BalsaIdentity* ident)
      * the signature if path changed */
 
     /* update the current messages identity */
+}
+
+
+static void
+sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
+{
+    balsa_app.sw_height = alloc->height;
+    balsa_app.sw_width = alloc->width;
 }
 
 
@@ -1341,7 +1351,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     BalsaSendmsg *msg = NULL;
     GList *list;
     gint i;
-    gint width;
 
     msg = g_malloc(sizeof(BalsaSendmsg));
     msg->font     = NULL;
@@ -1390,6 +1399,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		       GTK_SIGNAL_FUNC(delete_event_cb), msg);
     gtk_signal_connect(GTK_OBJECT(msg->window), "destroy_event",
 		       GTK_SIGNAL_FUNC(delete_event_cb), msg);
+
+	 gtk_signal_connect(GTK_OBJECT(msg->window), "size_allocate",
+		       GTK_SIGNAL_FUNC(sw_size_alloc_cb), msg);
 
     fill_language_menu();
 
@@ -1622,23 +1634,12 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_notebook_set_page(GTK_NOTEBOOK(msg->notebook), mail_headers_page);
 
     /*
-     * Set the size of the text widget according to the user
-     * preferences (font and line_wrap).
+     * restore the SendMsg window size
      */
-    if (balsa_app.wordwrap && (balsa_app.wraplength > 0))
-	/* Text of wrap + text of gtk_text next-line character */
-	width = balsa_app.wraplength + 2;
-    else
-	width = 82;
-    gtk_widget_set_usize(msg->text,
-	    		 /* Width of the text. */
-			 (width * gdk_char_width(msg->font, 'M')) +
-			 /* Width of the borders inside/outside box */
-			 (2 * msg->text->style->klass->xthickness),
-	    		 /* Height of the text. */
-			 (20 * gdk_char_height(msg->font, 'M')) +
-			 /* Height of the borders inside/outside box */
-			 (2 * msg->text->style->klass->ythickness));
+    gtk_window_set_default_size(GTK_WINDOW(window), 
+			balsa_app.sw_width,
+			balsa_app.sw_height);
+
     gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
 
     gtk_widget_show(window);

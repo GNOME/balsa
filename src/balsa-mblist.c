@@ -1713,6 +1713,7 @@ static BalsaMBListMRUEntry *bmbl_mru_new(GList ** url_list,
                                          GCallback user_func,
                                          gpointer user_data,
                                          gchar * url);
+static void bmbl_mru_free(BalsaMBListMRUEntry * mru);
 static void bmbl_mru_activate_cb(GtkWidget * widget, gpointer data);
 static void bmbl_mru_show_tree(GtkWidget * widget, gpointer data);
 static void bmbl_mru_selected_cb(GtkTreeSelection * selection,
@@ -1781,7 +1782,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
             gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
             g_signal_connect_data(item, "activate",
                                   G_CALLBACK(bmbl_mru_activate_cb), mru,
-                                  (GClosureNotify) g_free,
+                                  (GClosureNotify) bmbl_mru_free,
                                   (GConnectFlags) 0);
         }
     }
@@ -1825,6 +1826,13 @@ bmbl_mru_new(GList ** url_list, GCallback user_func, gpointer user_data,
     mru->url = g_strdup(url);
 
     return mru;
+}
+
+static void
+bmbl_mru_free(BalsaMBListMRUEntry * mru)
+{
+    g_free(mru->url);
+    g_free(mru);
 }
 
 /*

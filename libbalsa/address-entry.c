@@ -602,8 +602,8 @@ static void
 libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
 {
     gint cursor, size = 0, prev;
-    gchar *typed = NULL;
-    GList *list = NULL;
+    gchar *typed;
+    GList *list;
     emailData *addy;
     size_t tmp;
 
@@ -650,6 +650,7 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
                 addy->cursor = tmp;
         }
     }
+    g_free(typed);
 }
 
 /*************************************************************

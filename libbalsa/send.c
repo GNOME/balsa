@@ -1633,8 +1633,9 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 	g_strfreev(pair);
     }
 
-    g_mime_message_add_header(mime_message, "X-Mailer",
-			      g_strdup_printf("Balsa %s", VERSION));
+    tmp = g_strdup_printf("Balsa %s", VERSION);
+    g_mime_message_add_header(mime_message, "X-Mailer", tmp);
+    g_free(tmp);
 
     message->mime_msg = mime_message;
 

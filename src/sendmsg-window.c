@@ -1668,6 +1668,8 @@ static void
 create_email_or_string_entry(GtkWidget * table, const gchar * label,
                              int y_pos, GtkWidget * arr[])
 {
+    PangoFontDescription *desc;
+
     arr[0] = gtk_label_new_with_mnemonic(label);
     gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), arr[1]);
     gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
@@ -1676,9 +1678,10 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
     gtk_table_attach(GTK_TABLE(table), arr[0], 0, 1, y_pos, y_pos + 1,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
-    gtk_widget_modify_font(arr[1],
-                           pango_font_description_from_string
-                           (balsa_app.message_font));
+    desc = pango_font_description_from_string(balsa_app.message_font);
+    gtk_widget_modify_font(arr[1], desc);
+    pango_font_description_free(desc);
+
     gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 }
@@ -1974,6 +1977,7 @@ static GtkWidget *
 create_text_area(BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view;
+    PangoFontDescription *desc;
     GtkTextBuffer *buffer;
     GtkWidget *table;
 
@@ -1981,10 +1985,12 @@ create_text_area(BalsaSendmsg * bsmsg)
     text_view = GTK_TEXT_VIEW(bsmsg->text);
     gtk_text_view_set_left_margin(text_view, 2);
     gtk_text_view_set_right_margin(text_view, 2);
+
     /* set the message font */
-    gtk_widget_modify_font(bsmsg->text,
-                           pango_font_description_from_string
-                           (balsa_app.message_font));
+    desc = pango_font_description_from_string(balsa_app.message_font);
+    gtk_widget_modify_font(bsmsg->text, desc);
+    pango_font_description_free(desc);
+
     buffer = gtk_text_view_get_buffer(text_view);
     bsmsg->buffer2 =
          gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
@@ -3410,7 +3416,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     LibBalsaMsgCreateResult result;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc;
-    const gchar* ctmp;
+    gchar *tmp;
     gchar *res;
     GError *err = NULL;
     gsize bytes_read, bytes_written;
@@ -3425,10 +3431,10 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     gtk_text_buffer_get_bounds(buffer, &start, &end);
-    ctmp = gtk_text_iter_get_text(&start, &end);
-    res = g_convert(ctmp, strlen(ctmp), bsmsg->charset, "UTF-8", 
+    tmp = gtk_text_iter_get_text(&start, &end);
+    res = g_convert(tmp, strlen(tmp), bsmsg->charset, "UTF-8", 
 		    &bytes_read, &bytes_written, &err);
-
+    g_free(tmp);
     g_free(res);
     if (err) {
         balsa_information_parented

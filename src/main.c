@@ -220,7 +220,6 @@ balsa_init(int argc, char **argv)
 
 
     context = poptGetContext(PACKAGE, argc, (const char **)argv, options, 0);
-
     while((opt = poptGetNextOpt(context)) > 0) {
         switch (opt) {
 	    case 'a':
@@ -229,6 +228,8 @@ balsa_init(int argc, char **argv)
 		break;
 	}
     }
+    poptFreeContext(context);
+
     /* Process remaining options,  */
     
     gnome_program_init(PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv,

@@ -80,6 +80,7 @@ static gint iso_13_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_14_cb(GtkWidget* , BalsaSendmsg *);
 static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
 static gint koi8_r_cb(GtkWidget* , BalsaSendmsg *);
+static gint koi8_u_cb(GtkWidget* , BalsaSendmsg *);
 
 /* Standard DnD types */
 enum
@@ -232,7 +233,10 @@ static GnomeUIInfo iso_charset_menu[] = {
 #define ISO_CHARSET_14_POS 8
   GNOMEUIINFO_ITEM_NONE( N_ ("Ce_ltic (ISO-8859-14)"), NULL, iso_14_cb),
 #define KOI8_R_POS 9
-  GNOMEUIINFO_ITEM_NONE( N_ ("C_yrillic (KOi8-R)"), NULL, koi8_r_cb),
+  GNOMEUIINFO_ITEM_NONE( N_ ("Ru_ssian (KOI8-R)"), NULL, koi8_r_cb),
+  GNOMEUIINFO_END
+#define KOI8_U_POS 10
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Ukrainian (KOI8-U)"), NULL, koi8_u_cb),
   GNOMEUIINFO_END
 };
 
@@ -1638,7 +1642,7 @@ set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
 }
 
 static gint 
-set_koi8_charset(BalsaSendmsg *msg, gint idx) {
+set_koi8_charset(BalsaSendmsg *msg, const gchar *code, gint idx) {
    guint point, txt_len;
    gchar* str, *koi_font_name, *iso_font_name, *font_name;
    
@@ -1647,7 +1651,7 @@ set_koi8_charset(BalsaSendmsg *msg, gint idx) {
 
    msg->charset = iso_charset_names[idx];
 
-   koi_font_name = get_koi_font_name(balsa_app.message_font);
+   koi_font_name = get_koi_font_name(balsa_app.message_font, code);
    iso_font_name = get_font_name(balsa_app.message_font,1);
    
    font_name = (gchar*)g_malloc(strlen(koi_font_name)+strlen(iso_font_name)+2);
@@ -1706,5 +1710,7 @@ static gint iso_14_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
 {return set_iso_charset(bsmsg, 15, ISO_CHARSET_15_POS); }
 static gint koi8_r_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
-{return set_koi8_charset(bsmsg, KOI8_R_POS); }
+{return set_koi8_charset(bsmsg, "r", KOI8_R_POS); }
+static gint koi8_u_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return set_koi8_charset(bsmsg, "u", KOI8_U_POS); }
 

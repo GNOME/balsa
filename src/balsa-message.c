@@ -948,7 +948,7 @@ get_font_name(const gchar* base, int code) {
    if(len<1) len = 1;
    res = (gchar*)g_malloc(len+sizeof(type)+3+(code>9?2:1));
    if(balsa_app.debug)
-      fprintf(stderr,"base font name: %s and code :%d\n"
+      fprintf(stderr,"base font name: %s and code: %d\n"
 	      "mallocating %d bytes\n", base, code,
 	      len+sizeof(type)+2+(code>9?2:1) );
 
@@ -960,13 +960,14 @@ get_font_name(const gchar* base, int code) {
 }   
 
 gchar* 
-get_koi_font_name(const gchar* base) {
+get_koi_font_name(const gchar* base, const gchar* code) {
    static gchar type[] ="koi8";
    gchar *res;
    const gchar* ptr = base;
    int dash_cnt = 0, len;
 
    g_return_val_if_fail(base != NULL, NULL);
+   g_return_val_if_fail(code != NULL, NULL);
 
    while(*ptr && dash_cnt<13) {
       if(*ptr == '-') dash_cnt++;
@@ -981,15 +982,16 @@ get_koi_font_name(const gchar* base) {
    len = ptr-base;
    /* if(dash_cnt>12) len--; */
    if(len<1) len = 1;
-   res = (gchar*)g_malloc(len+sizeof(type)+4);
+   res = (gchar*)g_malloc(len+sizeof(type)+3+strlen(code));
    if(balsa_app.debug)
-      fprintf(stderr,"base font name: koi8-r\n"
-	      "mallocating %d bytes\n", len+sizeof(type)+3 );
+      fprintf(stderr,"base font name: %s and code: %s\n"
+	      "mallocating %d bytes\n", base, code,
+	      len+sizeof(type)+3 );
 
    if(len>1) strncpy(res, base, len);
    else { strncpy(res, "*", 1); len = 1; } 
 
-   sprintf(res+len,"-%s-r", type);
+   sprintf(res+len,"-%s-%s", type, code);
    return res;
 }   
 

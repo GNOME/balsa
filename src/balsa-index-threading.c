@@ -87,6 +87,10 @@ static void threading_simple(BalsaIndex* index);
 static gboolean add_message(GtkTreeModel * model, GtkTreePath * path,
                             GtkTreeIter * iter, gpointer data);
 
+static void threading_flat(BalsaIndex * index);
+static gboolean make_move_list(GtkTreeModel * model, GtkTreePath * path,
+                               GtkTreeIter * iter, gpointer data);
+
 void
 balsa_index_threading(BalsaIndex* index, LibBalsaMailboxThreadingType th_type)
 {
@@ -98,6 +102,7 @@ balsa_index_threading(BalsaIndex* index, LibBalsaMailboxThreadingType th_type)
 	threading_jwz(index);
 	break;
     case LB_MAILBOX_THREADING_FLAT:
+        threading_flat(index);
 	break;
     default:
 	break;
@@ -538,50 +543,49 @@ node_equal(GNode *node, GNode** parent)
 /*
  * check_parent: find the paths to the messages, and if the parent isn't
  * the immediate parent of the child, move the child
+ *
+ * parent == NULL means the child should be at the top level
  */
 static void
 check_parent(struct ThreadingInfo *ti, LibBalsaMessage * parent,
              LibBalsaMessage * child)
 {
-    GtkTreeRowReference *parent_ref;
     GtkTreeRowReference *child_ref;
     GtkTreePath *parent_path;
     GtkTreePath *child_path;
     GtkTreePath *test;
 
-    if (parent == NULL)
+    if (!child)
         return;
-    g_return_if_fail(child != NULL);
-
-    parent_ref = g_hash_table_lookup(ti->ref_table, parent);
-    g_return_if_fail(parent_ref != NULL);
 
     child_ref = g_hash_table_lookup(ti->ref_table, child);
-    g_return_if_fail(child_ref != NULL);
-
-    parent_path = gtk_tree_row_reference_get_path(parent_ref);
-    g_return_if_fail(parent_path != NULL);
-
     child_path = gtk_tree_row_reference_get_path(child_ref);
-    g_return_if_fail(child_path != NULL);
+
+    if (parent) {
+        GtkTreeRowReference *parent_ref =
+            g_hash_table_lookup(ti->ref_table, parent);
+        parent_path = gtk_tree_row_reference_get_path(parent_ref);
+    } else
+        parent_path = NULL;
 
     test = gtk_tree_path_copy(child_path);
 
-    if (!gtk_tree_path_up(test) || gtk_tree_path_get_depth(test) <= 0
-        || gtk_tree_path_compare(test, parent_path)) {
+    if ((!parent_path && gtk_tree_path_get_depth(test) > 1)
+        || (parent_path && (!gtk_tree_path_up(test)
+                            || gtk_tree_path_get_depth(test) <= 0
+                            || gtk_tree_path_compare(test, parent_path))))
         balsa_index_move_subtree(ti->model, child_path, parent_path,
                                  ti->ref_table);
-    }
     gtk_tree_path_free(test);
     gtk_tree_path_free(child_path);
-    gtk_tree_path_free(parent_path);
+    if (parent_path)
+        gtk_tree_path_free(parent_path);
 }
 
 static gboolean
-construct(GNode * node, struct ThreadingInfo * ti)
+construct(GNode * node, struct ThreadingInfo *ti)
 {
-    if (node->parent)
-        check_parent(ti, node->parent->data, node->data);
+    check_parent(ti, node->parent ? node->parent->data : NULL, node->data);
 
     return FALSE;
 }
@@ -897,6 +901,59 @@ add_message(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     if (message->message_id
         && !g_hash_table_lookup(ti->id_table, message->message_id))
         g_hash_table_insert(ti->id_table, message->message_id, message);
+
+    return FALSE;
+}
+
+/* For a flat index, we just move any messages in threads to the top
+ * level. */
+
+struct FlatInfo {
+    GSList *move_list;
+    GHashTable *ref_table;
+};
+
+static void
+threading_flat(BalsaIndex * index)
+{
+    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
+    struct FlatInfo fi;
+    GSList *list;
+
+    fi.move_list = NULL;
+    fi.ref_table =
+        g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
+                              (GDestroyNotify)
+                              gtk_tree_row_reference_free);
+    gtk_tree_model_foreach(model, make_move_list, &fi);
+
+    for (list = fi.move_list; list; list = g_slist_next(list)) {
+        GtkTreeRowReference *reference =
+            g_hash_table_lookup(fi.ref_table, list->data);
+        GtkTreePath *path = gtk_tree_row_reference_get_path(reference);
+        balsa_index_move_subtree(model, path, NULL, fi.ref_table);
+        gtk_tree_path_free(path);
+    }
+
+    g_slist_free(fi.move_list);
+    g_hash_table_destroy(fi.ref_table);
+}
+
+static gboolean
+make_move_list(GtkTreeModel * model, GtkTreePath * path,
+               GtkTreeIter * iter, gpointer data)
+{
+    if (gtk_tree_path_get_depth(path) > 1) {
+        LibBalsaMessage *message = NULL;
+        gtk_tree_model_get(model, iter, BNDX_MESSAGE_COLUMN, &message, -1);
+        if (message) {
+            struct FlatInfo *fi = data;
+            GtkTreeRowReference *reference =
+                gtk_tree_row_reference_new(model, path);
+            fi->move_list = g_slist_prepend(fi->move_list, message);
+            g_hash_table_insert(fi->ref_table, message, reference);
+        }
+    }
 
     return FALSE;
 }

@@ -571,6 +571,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
     LibBalsaMailbox* mailbox;
     gchar *msg;
     gboolean successp;
+    GList *list;
 
     g_return_val_if_fail (index != NULL, TRUE);
     g_return_val_if_fail (mbnode != NULL, TRUE);
@@ -629,6 +630,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 
     /* do threading */
     bndx_set_sort_order(index, mailbox->sort_field, mailbox->sort_type);
+    for (list = mailbox->message_list; list; list = list->next)
+	balsa_index_add(index, list->data);
     balsa_index_set_threading_type(index, mailbox->threading_type);
 
     bndx_moveto(index);
@@ -2195,38 +2198,22 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     g_signal_handler_unblock(index, handler);
 }
 
-/* balsa_index_set_threading_type:
-   FIXME: balsa_index_threading() requires that the index has been freshly
-   recreated. This should not be necessary.
-*/
 void
 balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 {
-    GtkTreeSelection *selection =
-        gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
-    GList *list;
-    LibBalsaMailbox* mailbox = NULL;
-
-    g_return_if_fail (index);
+    g_return_if_fail (index != NULL);
     g_return_if_fail (index->mailbox_node != NULL);
     g_return_if_fail (index->mailbox_node->mailbox != NULL);
 
     index->mailbox_node->mailbox->threading_type = thtype;
 
-    g_signal_handler_block(selection, index->selection_changed_id);
-    gtk_tree_store_clear(GTK_TREE_STORE
-                         (gtk_tree_view_get_model(GTK_TREE_VIEW(index))));
-    
-    mailbox = index->mailbox_node->mailbox;
-    for (list = mailbox->message_list; list; list = list->next)
-	balsa_index_add(index, list->data);
     /* do threading */
     balsa_index_threading(index, thtype);
+
     /* expand tree if specified in config */
     balsa_index_update_tree(index, balsa_app.expand_tree);
 
     /* reselect current message */
-    g_signal_handler_unblock(selection, index->selection_changed_id);
     bndx_select_message(index, index->current_message);
 }
 

@@ -1,3 +1,36 @@
+2005-01-14 08:32  PeterB
+
+	* configure.in, images/Makefile.am, src/balsa-message.c,
+	src/expand-alias.c, src/expand-alias.h, src/sendmsg-window.c,
+	images/mimetypes/Makefile, images/mimetypes/Makefile.am,
+	images/mimetypes/Makefile.in,
+	images/mimetypes/gnome-mime-application-pgp-signature.png,
+	images/mimetypes/gnome-mime-application-pkcs7-mime.png,
+	images/mimetypes/gnome-mime-application-pkcs7-signature.png,
+	images/mimetypes/gnome-mime-application-x-pkcs7-signature.png,
+	images/mimetypes/gnome-mime-message-disposition-notification.png,
+	images/mimetypes/gnome-mime-message-external-body.png,
+	images/mimetypes/gnome-mime-message.png,
+	images/mimetypes/gnome-mime-multipart-alternative.png,
+	images/mimetypes/gnome-mime-multipart-encrypted.png,
+	images/mimetypes/gnome-mime-multipart-signed.png,
+	images/mimetypes/gnome-mime-multipart.png: install mime type icons;
+	simplify icon search.
+
+2005-01-13 14:56  PeterB
+
+	* configure.in, libbalsa/address-entry.c, libbalsa/address-entry.h,
+	libbalsa/files.c, libbalsa/identity.c, libbalsa/mailbox.c,
+	libbalsa/misc.c, libbalsa/misc.h, libbalsa/send.c,
+	libbalsa/source-viewer.c, libinit_balsa/helper.c, src/Makefile.am,
+	src/ab-main.c, src/ab-window.c, src/balsa-app.c, src/balsa-index.c,
+	src/balsa-mblist.c, src/filter-edit-callbacks.c,
+	src/filter-edit-dialog.c, src/filter-edit.h, src/mailbox-conf.c,
+	src/main-window.c, src/main.c, src/pref-manager.c,
+	src/sendmsg-window.c, src/sendmsg-window.h, src/store-address.c,
+	src/toolbar-factory.c: require gtk+-2.0 >= 2.4 and remove
+	GTK_CHECK_VERSION(2,4,0) tests.
+
 2005-01-12  Pawel Salek
 
 	* libbalsa/imap/imap-commands.c: work around broken dovecot indexes.

@@ -58,6 +58,7 @@ int mutt_any_key_to_continue(const char *s);
 void mutt_clear_error(void);
 
 static void libbalsa_mutt_error(const char *fmt, ...);
+static gchar *qualified_hostname(const char *name);
 
 void
 mutt_message(const char *fmt, ...)
@@ -133,10 +134,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     mutt_error = libbalsa_mutt_error;
 
-    if ( Domainname ) 
-	Fqdn = g_strdup_printf("%s.%s", Hostname, Domainname);
-    else
-	Fqdn = g_strdup(Hostname);
+    Fqdn = qualified_hostname(Hostname);
 
     Sendmail = SENDMAIL;
 

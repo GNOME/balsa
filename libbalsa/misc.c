@@ -81,7 +81,15 @@ gchar *
 libbalsa_get_domainname(void)
 {
     char domainname[SYS_NMLN];
-
+    struct utsname utsname;
+    gchar *d;
+ 
+    uname(&utsname);
+    d = strchr( utsname.nodename, '.' );
+    if(d) {
+        return g_strdup( d+1 );
+    }
+ 
     if ( getdnsdomainname(domainname, SYS_NMLN) == 0 ) {
 	return g_strdup(domainname);
     }

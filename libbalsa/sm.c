@@ -69,9 +69,11 @@ static void reset_cfg_prefix( GnomeClient *client );
 static void connect_to_sm( GnomeClient *client, gint restarted );
 static void disconnect_from_sm( GnomeClient *client );
 
+#if 0
 static gboolean do_exit_triggers( const cfg_location_t *root, gpointer user_data );
 static void do_interactions( GnomeDialogType type, GSList *ilist );
 static void interact_cb( GnomeClient *client, gint key, GnomeDialogType type, gpointer data );
+#endif
 
 static GSList *global_pairs = NULL;
 static GSList *local_pairs = NULL;
@@ -373,6 +375,7 @@ gboolean balsa_sm_exit( void )
 #endif
 }
 
+#if 0
 static gboolean do_exit_triggers( const cfg_location_t *root, gpointer user_data )
 {
 	GSList *iter;
@@ -414,9 +417,11 @@ static gboolean do_exit_triggers( const cfg_location_t *root, gpointer user_data
 
 	return FALSE;
 }
+#endif
 
 /* ************************************************************************ */
 
+#if 0
 static void do_interactions( GnomeDialogType type, GSList *ilist )
 {
 	GSList *iter;
@@ -441,6 +446,7 @@ static void interact_cb( GnomeClient *client, gint key, GnomeDialogType type, gp
 
 	gnome_interaction_key_return( key, exit_cancelled );
 }
+#endif
 
 static void reset_cfg_prefix( GnomeClient *client )
 {

@@ -128,7 +128,6 @@ add_imap_mbox_cb(const char * file, int isdir, gpointer data)
     GNode *node;
     MailboxIMAP *mailbox = NULL;
     const gchar *basename, *ptr;
-    gint n;
 
     if( strcmp(file, p->path) == 0)
 	return;

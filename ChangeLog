@@ -1,3 +1,8 @@
+2000-06-29  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in (BALSA_RELEASE): Change to balsa_config_1
+	so I can fool around with RPM's of this branch.
+
 2000-06-24  Peter Williams  <peter@beta.newton.cx>
 
 	* configure.in: Add GLIB_CFLAGS to the options

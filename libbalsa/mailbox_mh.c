@@ -908,7 +908,6 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), NULL);
     g_return_val_if_fail (MAILBOX_OPEN(mailbox), NULL);
-    g_return_val_if_fail (msgno > 0, NULL);
 
     msg_info = message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
 
@@ -935,6 +934,7 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
     }
     if(!msg_info->message)
 	msg_info->message = libbalsa_mailbox_mh_load_message(mailbox, msgno);
+    msg_info->message->mime_msg = msg_info->mime_message;
     return msg_info->message;
 }
 
@@ -983,7 +983,6 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     int fd;
     GMimeStream *out_stream;
     int msgno;
-    char *new_filename;
     int retries;
     struct message_info *msg_info;
     GMimeStream *in_stream;
@@ -1030,29 +1029,30 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     msgno = mh->messages_info->len + 1; 
     retries = 10;
     do {
-	new_filename = g_strdup_printf("%s/%d", path, msgno);
-
 	/* rename tempfile to message-number-name */
-	if (libbalsa_safe_rename(tmp, new_filename) == -1) {
-	    if (errno != EEXIST)
-	    {
-		unlink (tmp);
-		g_free(tmp);
-		g_free(new_filename);
-		UNLOCK_MAILBOX(mailbox);
-		/* FIXME: report error ... */
-		return -1;
-	    }
-	    msgno++;
-	    retries--;
-	    g_free(new_filename);
-	} else
+	char *new_filename;
+	gint rename_status;
+
+	new_filename = g_strdup_printf("%s/%d", path, msgno);
+	rename_status = libbalsa_safe_rename(tmp, new_filename);
+	g_free(new_filename);
+	if (rename_status != -1)
 	    break;
+	
+	if (errno != EEXIST)
+	{
+	    unlink (tmp);
+	    g_free(tmp);
+	    UNLOCK_MAILBOX(mailbox);
+	    /* FIXME: report error ... */
+	    return -1;
+	}
+	msgno++;
+	retries--;
     } while (retries > 0);
     g_free(tmp);
 
     if (retries == 0) {
-	g_free(new_filename);
 	UNLOCK_MAILBOX(mailbox);
 	/* FIXME: report error ... */
 	return -1;

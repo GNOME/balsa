@@ -1,3 +1,9 @@
+2000-10-13  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/.cvsignore: Ignore balsa.rtf, balsa.pdf
+	* help/C/images/.cvsignore: Ignore .eps images
+	* src/sendmsg-window.c: Fix print menu icon
+
 2000-10-13  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/files.[ch]: New function libbalsa_icon_finder, which

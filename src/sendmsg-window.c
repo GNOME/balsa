@@ -178,7 +178,7 @@ static GnomeUIInfo file_menu[] = {
 
 #define MENU_FILE_PRINT_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("Print..."), N_("Print the edited message"),
-			   print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
+			   print_message_cb, GNOME_STOCK_MENU_PRINT),
     GNOMEUIINFO_SEPARATOR,
 
 #define MENU_FILE_CLOSE_POS 7

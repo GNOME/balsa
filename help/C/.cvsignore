@@ -4,4 +4,6 @@ Makefile.in
 balsa
 balsa.junk
 balsa.html
+balsa.pdf
+balsa.rtf
 index.html

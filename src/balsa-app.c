@@ -54,6 +54,7 @@ init_balsa_app (int argc, char *argv[])
 
   load_global_settings ();
   setup_local_mailboxes ();
+  options_init();
   my_special_mailbox ();
 
   /* create main window */

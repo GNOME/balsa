@@ -36,7 +36,7 @@ static GtkWidget *email_list;
 static GtkWidget *commentstext;
 
 typedef struct _addyb_item addyb_item;
-static struct _addyb_item
+struct _addyb_item
   {
     gchar *name;
     GList *email;
@@ -74,6 +74,13 @@ addyb_email_item_new (addyb_item * ai, gchar * addy)
 		       gtk_clist_append (GTK_CLIST (email_list), list_item),
 			  ai);
   ai->email = g_list_append (ai->email, addy);
+}
+
+static void
+addyb_email_item_delete (addyb_item * ai, gchar * addy)
+{
+  gtk_clist_remove(GTK_CLIST(email_list),gtk_clist_find_row_from_data(GTK_CLIST(email_list),(gpointer)addy));
+  ai->email = g_list_remove(ai->email, (gpointer)addy);
 }
 
 static void
@@ -225,10 +232,6 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
 
   gtk_paned_add1 (GTK_PANED (hpane), vbox1);
 
-
-
-
-
   vpane = gtk_vpaned_new ();
   gtk_widget_show (vpane);
 
@@ -293,11 +296,33 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   addyb_email_item_new(addybitem,"pavlov@innerx.net");
   addyb_email_item_new(addybitem,"pavlov@pavlov.net");
   addyb_email_item_new(addybitem,"pavlov@alldolls.net");
-  addyb_item_new ("test1", "tests suck!");
-  addyb_item_new ("test2", "i like tests damnit!");
-  addyb_item_new ("test3", "weeee");
-  addyb_item_new ("test4", "i must be bored");
-  addyb_item_new ("test5", "jay painter knows what he is doing much more than pav does...");
+
+  addyb_email_item_delete(addybitem,"pavlov@alldolls.net");
+
+  addybitem = addyb_item_new ("test1", "tests suck!");
+  addyb_email_item_new(addybitem,"pavlov@innerx.net");
+  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
+  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+
+  addybitem = addyb_item_new ("test2", "i like tests damnit!");
+  addyb_email_item_new(addybitem,"pavlov@innerx.net");
+  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
+  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+
+  addybitem = addyb_item_new ("test3", "weeee");
+  addyb_email_item_new(addybitem,"pavlov@innerx.net");
+  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
+  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+
+  addybitem = addyb_item_new ("test4", "i must be bored");
+  addyb_email_item_new(addybitem,"pavlov@innerx.net");
+  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
+  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
+
+  addybitem = addyb_item_new ("test5", "jay painter knows what he is doing much more than pav does...");
+  addyb_email_item_new(addybitem,"pavlov@innerx.net");
+  addyb_email_item_new(addybitem,"pavlov@pavlov.net");
+  addyb_email_item_new(addybitem,"pavlov@alldolls.net");
 
   gnome_app_set_contents (GNOME_APP (window), hpane);
 

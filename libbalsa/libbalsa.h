@@ -57,6 +57,9 @@ typedef struct body MuttBody;
 /*
  * Initialize the library
  */
-void libbalsa_init (gchar * inbox_path,	void (*error_func) (const char *fmt,...));
+void libbalsa_init (void (*error_func) (const char *fmt,...));
+void libbalsa_set_spool (gchar *spool);
+
+gchar *libbalsa_guess_mail_spool( void );
 
 #endif /* __LIBBALSA_H__ */

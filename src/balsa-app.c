@@ -39,27 +39,19 @@
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
-static gboolean errors_are_fatal = TRUE;
 
 /* prototypes */
 static gboolean check_special_mailboxes (void);
-static void cantfind_notice( const gchar *name );
 
-static void
-error_exit_cb (GtkWidget * widget, gpointer data)
-{
-	balsa_exit ();
-}
-
-static void
+void
 balsa_error (const char *fmt,...)
 {
   GtkWidget *messagebox;
-  gchar outstr[522];
+  gchar *outstr;
   va_list ap;
 
   va_start (ap, fmt);
-  vsprintf (outstr, fmt, ap);
+  outstr = g_strdup_vprintf(fmt, ap);
   va_end (ap);
 
   g_warning (outstr);
@@ -68,18 +60,20 @@ balsa_error (const char *fmt,...)
    * calls in here. How do we handle this???
    */
   
-  messagebox = gnome_message_box_new (outstr,
-				      GNOME_MESSAGE_BOX_ERROR,
-				      GNOME_STOCK_BUTTON_OK,
-				      NULL);
-  gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
-  gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-  gtk_widget_show (messagebox);
+  messagebox = gnome_error_dialog_parented (outstr, GTK_WINDOW(balsa_app.main_window));
 
-  if( errors_are_fatal ) 
-	  gtk_signal_connect (GTK_OBJECT (messagebox), "clicked",
-			      GTK_SIGNAL_FUNC (error_exit_cb), NULL);
+  gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
+
+  g_free ( outstr );
+
+  gtk_window_set_wmclass (GTK_WINDOW (messagebox), "error", "Balsa");
+
+  gnome_dialog_run_and_close ( GNOME_DIALOG(messagebox) );
+
+  balsa_exit();
+
 }
+
 
 /*
  * Same as Balsa error, but won't abort.
@@ -88,11 +82,11 @@ void
 balsa_warning (const char *fmt,...)
 {
   GtkWidget *messagebox;
-  gchar outstr[522];
+  gchar *outstr;
   va_list ap;
 
   va_start (ap, fmt);
-  vsprintf (outstr, fmt, ap);
+  outstr = g_strdup_vprintf (fmt, ap);
   va_end (ap);
 
   g_warning (outstr);
@@ -100,15 +94,14 @@ balsa_warning (const char *fmt,...)
   /* Sometimes a different thread makes GTK+
    * calls in here. How do we handle this???
    */
-  messagebox = gnome_message_box_new (
-				      outstr,
-				      GNOME_MESSAGE_BOX_WARNING,
-				      GNOME_STOCK_BUTTON_OK,
-				      NULL);
-  gtk_window_set_wmclass (GTK_WINDOW (messagebox), "warning", "Balsa");
-  gnome_dialog_run (GNOME_DIALOG (messagebox));
-}
+  messagebox = gnome_warning_dialog_parented (outstr, GTK_WINDOW(balsa_app.main_window));
+  g_free(outstr);
 
+  gtk_window_set_wmclass (GTK_WINDOW (messagebox), "warning", "Balsa");
+
+  gnome_dialog_run_and_close (GNOME_DIALOG (messagebox));
+
+}
 
 void
 balsa_app_init (void)
@@ -209,17 +202,16 @@ balsa_app_init (void)
 gboolean
 do_load_mailboxes (void)
 {
-  gchar *spool;
   if( check_special_mailboxes () )
 	return FALSE;
 
   if ( LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox) )
   {
-    spool = g_strdup(LIBBALSA_MAILBOX_LOCAL (balsa_app.inbox)->path);
+    libbalsa_set_spool (LIBBALSA_MAILBOX_LOCAL(balsa_app.inbox)->path);
   }
   else if ( LIBBALSA_IS_MAILBOX_IMAP(balsa_app.inbox) || LIBBALSA_IS_MAILBOX_POP3(balsa_app.inbox) )
   {
-    spool = libbalsa_guess_mail_spool();
+    /* Do nothing */
   }
   else
   {
@@ -227,25 +219,9 @@ do_load_mailboxes (void)
     return FALSE;
   }
 
-  libbalsa_init (spool, balsa_error);
-
-  g_free(spool);
-
   load_local_mailboxes ();
 
   return TRUE;
-}
-
-static void cantfind_notice( const gchar *name )
-{
-	gchar *msg;
-	GtkWidget *dialog;
-
-	msg = g_strdup_printf( _("Balsa cannot open your \"%s\" mailbox."), name );
-
-	dialog = gnome_error_dialog( msg );
-	gnome_dialog_run( GNOME_DIALOG( dialog ) );
-	g_free( msg );
 }
 
 static gboolean
@@ -254,27 +230,27 @@ check_special_mailboxes (void)
 	gboolean bomb = FALSE;
 
 	if( balsa_app.inbox == NULL ) {
-		cantfind_notice( _("Inbox") );
+		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Inbox") );
 		bomb = TRUE;
 	}
 
 	if( balsa_app.outbox == NULL ) {
-		cantfind_notice( _("Outbox") );
+		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Outbox") );
 		bomb = TRUE;
 	} 
 
 	if( balsa_app.sentbox == NULL ) {
-		cantfind_notice( _("Sentbox") );
+		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Sentbox") );
 		bomb = TRUE;
 	}
 
 	if( balsa_app.draftbox == NULL ) {
-		cantfind_notice( _("Draftbox") );
+		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Draftbox") );
 		bomb = TRUE;
 	}
 
 	if( balsa_app.trash == NULL ) {
-		cantfind_notice( _("Trash") );
+		balsa_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Trash") );
 		bomb = TRUE;
 	}
 
@@ -301,11 +277,6 @@ update_timer( gboolean update, guint minutes )
       balsa_app.check_mail_timer_id = 0;
     }
 
-}
-
-void balsa_error_toggle_fatality( gboolean are_fatal )
-{
-	errors_are_fatal = are_fatal;
 }
 
 /* searching mailbox tree code, see balsa_find_mbox_by_name below */

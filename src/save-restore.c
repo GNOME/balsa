@@ -552,7 +552,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       if (path == NULL)
 	return FALSE;
       
-      mailbox = (LibBalsaMailbox*)libbalsa_mailbox_local_new(path, FALSE);
+      mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, FALSE));
       if ( mailbox == NULL ) {
 	fprintf (stderr, "config_mailbox_init: Cannot create "
 		   "local mailbox %s\n", mailbox_name);
@@ -616,23 +616,33 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     }
   else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
     {
-      LibBalsaMailboxImap *m;
+      LibBalsaMailboxImap * m;
       LibBalsaServer *s;
+      gchar *user, *passwd, *host, *path;
+      gint port;
 
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
       mailbox->name = mailbox_name;
 
 
       m = LIBBALSA_MAILBOX_IMAP(mailbox);
-      s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-
-      if( !get_raw_imap_data(mbox, &s->user, 
-			     &s->passwd, &s->host,
-			     &s->port, &m->path) ){
-	  gtk_object_destroy( GTK_OBJECT(mailbox) );
-	  return FALSE;
+      if( !get_raw_imap_data(mbox, &user, 
+			     &passwd, &host,
+			     &port, &path) ){
+	gtk_object_destroy( GTK_OBJECT(mailbox) );
+	return FALSE;
       }
-      mailbox_add_for_checking(mailbox);
+
+      s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+      libbalsa_server_set_username (s, user);
+      libbalsa_server_set_password (s, passwd);
+      libbalsa_server_set_host (s, host, port);
+      m->path = g_strdup(path);
+      
+      g_free(user);
+      g_free(passwd);
+      g_free(host);
+      g_free(path);
     }
   else if (!strcasecmp (type, "IMAPDir")) {
       ImapDir * id = imapdir_new();

@@ -166,8 +166,6 @@ threads_init( gboolean init )
 }
 #endif /* BALSA_USE_THREADS */
 
-
-
 int
 main (int argc, char *argv[])
 {
@@ -185,6 +183,9 @@ main (int argc, char *argv[])
 
   /* checking for valid config files */
   config_init ();
+
+  /* Initialize libbalsa */
+  libbalsa_init (balsa_error);
 
   /* load mailboxes */
   config_mailboxes_init ();

@@ -20,8 +20,11 @@
 
 #include "config.h"
 
-#include <string.h>
+#include <glib.h>
+#include <gnome.h>
 
+#include <string.h>
+#include <stdlib.h>
 #include <sys/utsname.h>
 
 #include "libbalsa.h"
@@ -71,14 +74,13 @@ mutt_clear_error (void)
 
 /* We're gonna set Mutt global vars here */
 void
-libbalsa_init (gchar * inbox_path,
-	       void (*error_func) (const char *fmt,...))
+libbalsa_init ( void (*error_func) (const char *fmt,...) )
 {
   struct utsname utsname;
   char *p;
   gchar *tmp;
 
-  Spoolfile = g_strdup(inbox_path);
+  Spoolfile = libbalsa_guess_mail_spool();
 
   uname (&utsname);
 
@@ -108,4 +110,57 @@ libbalsa_init (gchar * inbox_path,
   g_free (tmp);
   
   set_option(OPTSAVEEMPTY);
+}
+
+
+void
+libbalsa_set_spool (gchar *spool)
+{
+  if ( Spoolfile )
+    g_free(Spoolfile);
+
+  if ( spool ) 
+    Spoolfile = g_strdup (spool);
+  else 
+    Spoolfile = libbalsa_guess_mail_spool();
+}
+
+/* libbalsa_guess_mail_spool
+
+   Returns an allocated gchar * with our best guess of the user's
+   mail spool file.
+*/
+gchar*
+libbalsa_guess_mail_spool( void )
+{
+  int i;
+  gchar *env;
+  gchar *spool;
+  static const gchar *guesses[] = { 
+    "/var/spool/mail/", 
+    "/var/mail/", 
+    "/usr/spool/mail/", 
+    "/usr/mail/", 
+    NULL 
+  };
+  
+  if( (env = getenv( "MAIL" )) != NULL )
+    return g_strdup( env );
+  
+  if( (env = getenv( "USER" )) != NULL ) {
+    for( i = 0; guesses[i] != NULL; i++ ) {
+      spool = g_strconcat( guesses[i], env, NULL );
+      
+      if( g_file_exists( spool ) )
+	return spool;
+      
+      g_free( spool );
+    }
+  }
+  
+  /* libmutt's configure.in indicates that this 
+   * ($HOME/mailbox) exists on
+   * some systems, and it's a good enough default if we
+   * can't guess it any other way. */
+  return gnome_util_prepend_user_home( "mailbox" );
 }

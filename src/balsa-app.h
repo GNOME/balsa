@@ -219,8 +219,10 @@ balsa_app;
 void balsa_app_init (void);
 gboolean do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
+
+void balsa_error (const char *fnt,...);
 void balsa_warning (const char *fmt,...);
-void balsa_error_toggle_fatality( gboolean are_fatal );
+
 LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);
 
 #endif /* __BALSA_APP_H__ */

@@ -329,13 +329,6 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
   text[2] = "";
 #endif
       
-#ifdef BALSA_SHOW_INFO
-  if (mblist->display_content_info)
-  {
-    /* balsa_mblist_add_watched_mailbox (mblist, mailbox); */ 
-  }
-#endif
-
   ctnode = gtk_ctree_insert_node (GTK_CTREE (mblist),
 				  NULL, NULL, text, 4,
 				  balsa_icon_get_pixmap (icon),

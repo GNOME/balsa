@@ -16,6 +16,12 @@
 
 <table width="80%">
 <tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2"><hr></td>
+</tr>
+<tr>
 	<th colspan="2" align="left"><big>Source</big></th>
 </tr>
 <tr>
@@ -25,32 +31,43 @@
 	<td colspan="2"><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0.tar.gz</a></td>
 </tr>
 <tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
 	<td colspan="2"><hr></td>
 </tr>
 <tr>
 	<th colspan="2" align="left"><big>Packages</big></th>
 </tr>
 <tr>
-	<td colspan="2"><a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.src.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.src.rpm</a></td>
+	<td colspan="2">US East Coast source RPM: <a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.src.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.src.rpm</a></td>
 </tr>
 <tr>
-	<td colspan="2"><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.src.rpm</a></td>
-</tr>
-<tr>
-	<td colspan="2"><p>&nbsp;</p></td>
-</tr>
-<tr>
-	<td colspan="2"><a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.i386.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.i386.rpm</a></td>
-</tr>
-<tr>
-	<td colspan="2"><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.i386.rpm</a></td>
+	<td colspan="2">Europe source RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.src.rpm</a></td>
 </tr>
 <tr>
 	<td colspan="2"><p>&nbsp;</p></td>
 </tr>
 <tr>
-	<td><p>We are looking for someone to help us make Debian packages or provide packages for more architectures. If you're interested, 
-		email <a href="mailto:balsa-maintainers@theochem.kth.se">the Balsa maintainers</a>.</p></td>
+	<td colspan="2">US East Coast i386 binary RPM: <a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.i386.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.i386.rpm</a></td>
+</tr>
+<tr>
+	<td colspan="2">Europe i386 binary RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.i386.rpm</a></td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2"><a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Most recent version for Slackware</a>.</td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2">Daniele Cruciani's <a href="http://www.cli.di.unipi.it/~cruciani/Package/">Debian package</a>.</td>
+</tr>
+<tr>
+	<td colspan="2"><p>&nbsp;</p></td>
 </tr>
 <tr>
 	<td colspan="2"><hr></td>
@@ -59,10 +76,14 @@
 	<th colspan="2" align="left"><big>Requirements</big></th>
 </tr>
 <tr>
-	<td colspan="2"><a href="http://www.gnome.org/start/">A basic GNOME installation</a></td>
+	<td colspan="2">A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</td>
 </tr>
 <tr>
-	<td colspan="2"><a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList</a></td>
+	<td colspan="2"><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<td colspan="2">Balsa needs <a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList</a>.
+	It must be installed with a prefix of /usr if you wish to also use a Balsa RPM.</td>
 </tr>
 </table>
 

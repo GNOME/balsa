@@ -5,56 +5,91 @@
 </head>
 <body background="@website_root@/images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
 
-<div align="center">
+<table width="100%">
+<!-- one big row to offset from the background -->
+<tr>
+<td width="80">&nbsp;</td>
+<td>
 
+<!-- Our big logo -->
 <p><img src="@website_root@/images/balsa.jpg" alt="Balsa"></p>
-<p>A <a href="http://www.gnome.org/">GNOME</a> Email Client</p>
-<p>Updates:</p>
-<p>
-05/21/2000 - <a href="@website_root@/download.html">Balsa 0.8.0 is released!</a><br>
-04/18/2000 - Balsa 0.8.0-pre1 is available! And in honor thereof, <a href="@website_root@/bugs.html">bug reporting instructions</a>.<br>
-04/04/2000 - Balsa 0.8 is coming soon!<br>
-12/21/1999 - <a href="@website_root@/download.html">Balsa 0.6.0 released!</a><br>
-10/14/1999 - Updated screenshots<br>
-10/13/1999 - Balsa development resumed!
-</p>
+
+<!-- The summary and news table -->
+<div align="left">
+<table width="80%">
+<tr>
+	<td><p>
+	<b>Balsa</b> is <a href="http://www.gnome.org/">GNOME</a> email client. It supports mbox, maildir, and mh
+	local mailboxes, and IMAP4 and POP3 remote mailboxes. You can send mail via sendmail or SMTP. Optional
+	multithreading support allows for non-instrusive retrieval and sending of mail. A finished GUI similar to
+	that of <a href="http://www.eudora.com">Eudora</a> lets you view images inline, save message parts,
+	view headers, add attachments, move messages, print messages, and just about anything you would expect in
+	a robust mail client.
+	</p></td>
+</tr>
+<tr>
+	<td><p>&nbsp;</p></td>
+</tr>
+<tr>
+	<th align="left"><big>Updates</big></th>
+</tr>
+<tr>
+	<td><p>
+	06/06/2000 - We have links to <a href="http://www.slackware.com">Slackware</a> and <a href="http://www.debian.org">Debian</a> packages on the <a href="@website_root@/download.html">download page</a>.<br>
+	05/21/2000 - <a href="@website_root@/download.html">Balsa 0.8.0 is released!</a><br>
+	04/18/2000 - Balsa 0.8.0-pre1 is available! And in honor thereof, <a href="@website_root@/bugs.html">bug reporting instructions</a>.<br>
+	04/04/2000 - Balsa 0.8 is coming soon!<br>
+	12/21/1999 - <a href="@website_root@/download.html">Balsa 0.6.0 released!</a><br>
+	10/14/1999 - Updated screenshots<br>
+	10/13/1999 - Balsa development resumed!
+	</p></td>
+</tr>
+</table>
+</div>
+
+<!-- The quadrant of links -->
+<div align="center">
 <table cellpadding="10">
-   <tr>
-	   <td></td>
-	   <td></td>
-	   <td align="center" valign="middle">
-		   <img src="@website_root@/images/cube03.jpg" alt="faq">
-			<br><a href="@website_root@/faq.html">FAQ</a>
-		</td>
-	   <td></td>
-	   <td></td>
-	</tr>
-	<tr>
-	   <td></td>
-	   <td align="center" valign="middle">
-		   <img src="@website_root@/images/cube02.jpg" alt="shots">
-			<br><a href="@website_root@/screenshots.html">shots</a>
-		</td>
-	   <td><img src="@website_root@/images/bulb.jpg" alt="see the light"></td>
-	   <td align="center" valign="middle">
-		   <img src="@website_root@/images/cube04.jpg" alt="features">
-			<br><a href="@website_root@/features.html">features</a>
-		</td>
-	   <td></td>
-	</tr>
-	<tr>
-	   <td></td>
-	   <td></td>
-	   <td align="center" valign="middle">
-		   <img src="@website_root@/images/cube05.jpg" alt="download">
+<tr>
+	<td></td>
+	<td></td>
+	<td align="center" valign="middle">
+		<img src="@website_root@/images/cube03.jpg" alt="faq">
+		<br><a href="@website_root@/faq.html">FAQ</a>
+	</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td align="center" valign="middle">
+		<img src="@website_root@/images/cube02.jpg" alt="shots">
+		<br><a href="@website_root@/screenshots.html">shots</a>
+	</td>
+	<td><img src="@website_root@/images/bulb.jpg" alt="see the light"></td>
+	<td align="center" valign="middle">
+		<img src="@website_root@/images/cube04.jpg" alt="features">
+		<br><a href="@website_root@/features.html">features</a>
+	</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td align="center" valign="middle">
+		<img src="@website_root@/images/cube05.jpg" alt="download">
 			<br><a href="@website_root@/download.html">download</a>
 		</td>
-	   <td></td>
-	   <td></td>
-	</tr>
+	<td></td>
+	<td></td>
+</tr>
 </table>
-<p><small>Balsa copyright 1997-99 <a href="mailto:jpaint@balsa.net">Jay Painter</a> and <a href="mailto:pavlov@balsa.net">Stuart Parmenter</a></small></p>
 </div>
+
+<p><small>Balsa copyright 1997-2000 <a href="mailto:jpaint@balsa.net">Jay Painter</a> and <a href="mailto:pavlov@balsa.net">Stuart Parmenter</a></small></p>
+</td>
+</tr>
+</table>
 </body>
 </html>
 

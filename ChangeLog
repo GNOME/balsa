@@ -1,3 +1,8 @@
+2000-06-26  Peter Williams  <peter@beta.newton.cx>
+
+	* src/save-restore.c (config_global_save): Check for null when
+	saving balsa_app.open_mailbox. I squash bugs bad.
+
 2000-06-26  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/address-book.c: show all e-mail adresses.

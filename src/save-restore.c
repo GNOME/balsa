@@ -1242,7 +1242,8 @@ config_global_save (void)
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_upon_startup);
   pl_dict_add_str_str (globals, "CheckMailUponStartup", tmp);
 
-  pl_dict_add_str_str (globals, "OpenMailboxes", balsa_app.open_mailbox);
+  if( balsa_app.open_mailbox != NULL )
+	  pl_dict_add_str_str (globals, "OpenMailboxes", balsa_app.open_mailbox);
 
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.remember_open_mboxes);
   pl_dict_add_str_str (globals, "RememberOpenMailboxes", tmp);

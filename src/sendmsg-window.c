@@ -3268,7 +3268,7 @@ message_postpone(BalsaSendmsg * bsmsg)
 	    balsa_index_sync_backend(bsmsg->orig_message->mailbox);
 	}
     }
-    gtk_object_unref(GTK_OBJECT(message));
+    gtk_object_destroy(GTK_OBJECT(message));
     return successp;
 }
 
@@ -3287,13 +3287,9 @@ static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     gboolean thereturn;
-    LibBalsaMessage *message;
     
     if (!is_ready_to_send(bsmsg)) 
         return;
-
-    message = bsmsg2message(bsmsg);
-    gtk_object_ref(GTK_OBJECT(message));
 
     thereturn = message_postpone(bsmsg);
 

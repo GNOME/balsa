@@ -1,3 +1,11 @@
+2002-04-21 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-app.c: reliable nested mailbox_nodes locking.
+	* src/address-book-config.c, folder-conf.c, pref-manager.c:
+	The help-display improved. 
+	* src/sendmsg-window.c: fix some whining about floating
+	references, and eliminates some memory-leaking deadwood.
+
 2002-04-21  Pawel Salek <pawsa@theochem.kth.se>
 
 	* Makefile.am: omf-install is a created dir, remove from SUBDIRS.

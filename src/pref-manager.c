@@ -2813,15 +2813,15 @@ refresh_preferences_manager(void)
 static void
 balsa_help_pbox_display(GnomePropertyBox * property_box, gint page_num)
 {
-    gchar *help_path = g_strdup_printf("preferences-%d", page_num);
+    gchar *file_name = g_strdup_printf("preferences-%d.html", page_num);
     GError *err = NULL;
 
-    gnome_help_display_uri(help_path, &err);
+    gnome_help_display(file_name, NULL, &err);
     if (err) {
-        g_print(_("Error displaying %s: %s\n"), help_path, err->message);
+        g_print(_("Error displaying %s: %s\n"), file_name, err->message);
         g_error_free(err);
     }
 
-    g_free(help_path);
+    g_free(file_name);
 }
 #endif                          /* BALSA_MAJOR < 2 */

@@ -764,6 +764,7 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     /* didn't find a matching mailbox */
     return NULL;
 }
+#ifdef BALSA_USE_THREADS
 /* balsa_mailbox_nodes_(un)lock:
    locks/unlocks balsa_app.mailbox_nodes structure so we can modify it
    from a thread.
@@ -772,36 +773,88 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
 */
 static pthread_mutex_t mailbox_nodes_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t  mailbox_nodes_cond = PTHREAD_COND_INITIALIZER;
-static int nodes_lock_count = 0, nodes_exclusive = 0;
-static pthread_t nodes_last_threadid;
+
+/* a list of outstanding locks */
+static GList *nodes_lock_list;
+
+/* what we need to know about a lock */
+struct _NodesLockItem {
+    gboolean exclusive;
+    pthread_t id;
+};
+typedef struct _NodesLockItem NodesLockItem;
+
+/*
+ * balsa_mailbox_nodes_lock
+ *
+ * requests a lock
+ */
 void
 balsa_mailbox_nodes_lock(gboolean exclusive)
 {
-#ifdef BALSA_USE_THREADS
+    GList *list;
+    NodesLockItem *nli;
+    pthread_t id = pthread_self();
+    gboolean check = TRUE;
+
     pthread_mutex_lock(&mailbox_nodes_lock);
-    if(exclusive) {
-        if(nodes_lock_count>1 ||
-           (nodes_lock_count == 1 && nodes_last_threadid != pthread_self()))
-            pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
-        nodes_exclusive = 1;
-    } else { /* RO requested */
-        if (nodes_exclusive)
-            pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
+    while (check) {
+        check = FALSE;
+        /* if anyone else has a lock, and either we're asking for an
+         * exclusive lock or they hold an exclusive lock, we need to
+         * wait until someone gives up a lock, and then recheck all the
+         * outstanding locks */
+        for (list = nodes_lock_list; list; list = g_list_next(list)) {
+            nli = list->data;
+            if (nli->id != id && (exclusive || nli->exclusive)) {
+                pthread_cond_wait(&mailbox_nodes_cond, &mailbox_nodes_lock);
+                check = TRUE;
+            }
+        }
     }
-    nodes_lock_count++;
-    nodes_last_threadid = pthread_self();
+    /* we're the only thread with locks, so we'll just add this one
+     * to the list */
+    nli = g_new(NodesLockItem, 1);
+    nli->id = id;
+    nli->exclusive = exclusive;
+    nodes_lock_list = g_list_prepend(nodes_lock_list, nli);
     pthread_mutex_unlock(&mailbox_nodes_lock);
-#endif
 }
-void balsa_mailbox_nodes_unlock(gboolean exclusive)
+
+/*
+ * balsa_mailbox_nodes_unlock
+ *
+ * give up a lock
+ */
+void
+balsa_mailbox_nodes_unlock(gboolean exclusive)
 {
-#ifdef BALSA_USE_THREADS
+    GList *list;
+    NodesLockItem *nli = NULL;
+    pthread_t id = pthread_self();
+
     pthread_mutex_lock(&mailbox_nodes_lock);
-    nodes_lock_count--;
-    if(nodes_lock_count==0) {
-        nodes_exclusive = 0;
-        pthread_cond_signal(&mailbox_nodes_cond);
+    for (list = nodes_lock_list; list; list = g_list_next(list)) {
+        nli = list->data;
+        if (nli->id == id) {
+            if (nli->exclusive == exclusive)
+                break;
+            else
+                g_warning("Unlocking an incorrectly nested mailbox_nodes 
+lock");
+        }
     }
+
+    if (nli) {
+        nodes_lock_list = g_list_remove(nodes_lock_list, nli);
+        g_free(nli);
+        pthread_cond_signal(&mailbox_nodes_cond);
+    } else         g_warning("No mailbox_nodes lock to unlock");
     pthread_mutex_unlock(&mailbox_nodes_lock);
-#endif
 }
+#else
+void
+balsa_mailbox_nodes_lock(gboolean exclusive) {}
+void
+balsa_mailbox_nodes_unlock(gboolean exclusive) {}
+#endif

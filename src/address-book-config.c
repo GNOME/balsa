@@ -38,7 +38,7 @@ struct _AddressBookConfig {
     GtkWidget *name_entry;
     GtkWidget *expand_aliases_button;
 
-    gchar* help_path;
+    gchar* link_id;
     GtkType create_type;
 
     union {
@@ -309,7 +309,7 @@ create_choice_page(AddressBookConfig * abc)
     GtkWidget *vbox;
     GtkWidget *radio_button;
 
-    abc->help_path = "ab-conf.html#CHOICE";
+    abc->link_id = "CHOICE";
 
     vbox = gtk_vbox_new(FALSE, 0);
     gtk_widget_show(vbox);
@@ -394,7 +394,7 @@ create_vcard_page(AddressBookConfig * abc)
     LibBalsaAddressBookVcard* ab;
     ab = (LibBalsaAddressBookVcard*)abc->address_book; /* may be NULL */
 
-    abc->help_path = "ab-conf.html#VCARD";
+    abc->link_id = "VCARD";
     table = gtk_table_new(2, 3, FALSE);
 
     /* mailbox name */
@@ -439,7 +439,7 @@ create_externq_page(AddressBookConfig * abc)
     LibBalsaAddressBookExtern* ab;
 
     ab = (LibBalsaAddressBookExtern*)abc->address_book; /* may be NULL */
-    abc->help_path = "ab-conf.html#EXTERN";
+    abc->link_id = "EXTERN";
     table = gtk_table_new(3, 3, FALSE);
 
     /* mailbox name */
@@ -501,7 +501,7 @@ create_ldif_page(AddressBookConfig * abc)
     GtkWidget *label;
     GtkDialog* mcw = GTK_DIALOG(abc->window);
 
-    abc->help_path = "ab-conf.html#LDIF";
+    abc->link_id = "LDIF";
     table = gtk_table_new(2, 3, FALSE);
 
     /* mailbox name */
@@ -563,7 +563,7 @@ create_ldap_page(AddressBookConfig * abc)
 
     ab = (LibBalsaAddressBookLdap*)abc->address_book; /* may be NULL */
 
-    abc->help_path = "ab-conf.html#LDAP";
+    abc->link_id = "LDAP";
     /* mailbox name */
 
     label = create_label(_("_Address Book Name"), table, 0);
@@ -615,15 +615,16 @@ help_button_cb(AddressBookConfig * abc)
 #if BALSA_MAJOR < 2
     static GnomeHelpMenuEntry help_entry = { NULL, NULL };
     help_entry.name = gnome_app_id;
-    help_entry.path = abc->help_path;
+    help_entry.path = g_strconcat("ab-conf.html#", abc->link_id, NULL);
     gnome_help_display(NULL, &help_entry);
+    g_free(help_entry.path);
 #else
     GError *err = NULL;
 
-    gnome_help_display_uri(abc->help_path, &err);
+    gnome_help_display("ab-conf.html", abc->link_id, &err);
 
     if (err) {
-        g_print(_("Error displaying %s: %s\n"), abc->help_path,
+        g_print(_("Error displaying %s: %s\n"), abc->link_id,
                 err->message);
         g_error_free(err);
     }

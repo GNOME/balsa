@@ -87,6 +87,11 @@ remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
                              gtk_toggle_button_get_active(button));
 }
 
+#if BALSA_MAJOR < 2
+#else
+static const gchar file_name[] = "folder-config.html";
+#endif                          /* BALSA_MAJOR < 2 */
+
 static void
 folder_conf_clicked_cb(GtkDialog* dialog, int response, FolderDialogData* fcw)
 {
@@ -94,7 +99,6 @@ folder_conf_clicked_cb(GtkDialog* dialog, int response, FolderDialogData* fcw)
 #if BALSA_MAJOR < 2
     static GnomeHelpMenuEntry help_entry = { NULL, "folder-config.html" };
 #else
-    static const gchar help_path[] = "folder-config.html";
     GError *err = NULL;
 #endif                          /* BALSA_MAJOR < 2 */
     gboolean insert;
@@ -157,9 +161,9 @@ folder_conf_clicked_cb(GtkDialog* dialog, int response, FolderDialogData* fcw)
 #if BALSA_MAJOR < 2
         gnome_help_display(NULL, &help_entry);
 #else
-        gnome_help_display_uri(help_path, &err);
+        gnome_help_display(file_name, NULL, &err);
         if (err) {
-            g_print(_("Error displaying %s: %s\n"), help_path,
+            g_print(_("Error displaying %s: %s\n"), file_name,
                     err->message);
             g_error_free(err);
         }
@@ -380,7 +384,7 @@ subfolder_conf_clicked_cb(GtkDialog* dialog, gint response, gpointer data)
     static GnomeHelpMenuEntry help_entry =
 	{ NULL, "folder-config.html#SUBFOLDER-CONFIG" };
 #else
-    static const gchar help_path[] = "folder-config.html#SUBFOLDER-CONFIG";
+    static const gchar link_id[] = "SUBFOLDER-CONFIG";
     GError *err = NULL;
 #endif                          /* BALSA_MAJOR < 2 */
     SubfolderDialogData *fcw = (SubfolderDialogData*)data;
@@ -478,9 +482,9 @@ subfolder_conf_clicked_cb(GtkDialog* dialog, gint response, gpointer data)
 #if BALSA_MAJOR < 2
         gnome_help_display(NULL, &help_entry);
 #else
-        gnome_help_display_uri(help_path, &err);
+        gnome_help_display(file_name, link_id, &err);
         if (err) {
-            g_print(_("Error displaying %s: %s\n"), help_path,
+            g_print(_("Error displaying %s: %s\n"), file_name,
                     err->message);
             g_error_free(err);
         }

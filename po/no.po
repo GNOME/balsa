@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8.0\n"
-"POT-Creation-Date: 2000-06-02 11:22+0200\n"
-"PO-Revision-Date: 2000-06-02 11:25+02:00\n"
+"POT-Creation-Date: 2000-06-04 00:50+0200\n"
+"PO-Revision-Date: 2000-06-04 00:51+02:00\n"
 "Last-Translator: Kjartan Maraas <kmaraas@online.no>\n"
 "Language-Team: Norwegian <no@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -181,7 +181,7 @@ msgstr "Legg til ny adresse"
 msgid "E-Mail Address:"
 msgstr "E-post adresse:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1046
+#: src/address-book.c:291 src/balsa-index-page.c:1043
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -190,8 +190,8 @@ msgstr ""
 "Kunne ikke åpne ~/.gnome/GnomeCard.gcrd for lesing.\n"
 " - %s\n"
 
-#: src/address-book.c:294 src/balsa-index-page.c:1028
-#: src/balsa-index-page.c:1049 src/balsa-index-page.c:1085
+#: src/address-book.c:294 src/balsa-index-page.c:1029
+#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1083
 #: src/sendmsg-window.c:393
 msgid "OK"
 msgstr "OK"
@@ -295,19 +295,19 @@ msgstr "Slett"
 msgid "Undelete"
 msgstr "Angre slett"
 
-#: src/balsa-index-page.c:638
+#: src/balsa-index-page.c:639
 msgid "Store Address"
 msgstr "Lagre adresse"
 
-#: src/balsa-index-page.c:646
+#: src/balsa-index-page.c:647
 msgid "Transfer"
 msgstr "Overfør"
 
-#: src/balsa-index-page.c:1026
+#: src/balsa-index-page.c:1028
 msgid "You may only store one address at a time.\n"
 msgstr "Du kan kun lagre en adresse om gangen.\n"
 
-#: src/balsa-index-page.c:1082
+#: src/balsa-index-page.c:1080
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -315,26 +315,6 @@ msgid ""
 msgstr ""
 "Det finnes allerede en oppføring i adresseboken for %s.\n"
 "Kjør GnomeCard hvis du ønsker å redigere oppføringer i adresseboken.\n"
-
-#: src/balsa-index-page.c:1100
-msgid ""
-"\n"
-"BEGIN:VCARD\n"
-msgstr "\nSTART:VCARD\n"
-
-#: src/balsa-index-page.c:1101
-#, c-format
-msgid "FN:%s\n"
-msgstr "FN:%s\n"
-
-#: src/balsa-index-page.c:1102
-#, c-format
-msgid "EMAIL;INTERNET:%s\n"
-msgstr "E-POST;INTERNETT:%s\n"
-
-#: src/balsa-index-page.c:1103
-msgid "END:VCARD\n"
-msgstr "SLUTT;VCARD\n"
 
 #: src/balsa-index.c:252
 msgid "From"
@@ -347,6 +327,10 @@ msgstr "Emne"
 #: src/balsa-index.c:254
 msgid "Date"
 msgstr "Dato"
+
+#: src/balsa-index.c:362
+msgid "To"
+msgstr "Til"
 
 #: src/balsa-mblist.c:221 src/mailbox-conf.c:1186
 msgid "Mailbox"
@@ -1668,3 +1652,19 @@ msgstr "Kan ikke utføre utskriftskommando."
 #: src/sendmsg-window.c:1416
 msgid "Error executing lpr"
 msgstr "Feil under kjøring av lpr"
+
+#~ msgid ""
+#~ "\n"
+#~ "BEGIN:VCARD\n"
+#~ msgstr ""
+#~ "\n"
+#~ "START:VCARD\n"
+
+#~ msgid "FN:%s\n"
+#~ msgstr "FN:%s\n"
+
+#~ msgid "EMAIL;INTERNET:%s\n"
+#~ msgstr "E-POST;INTERNETT:%s\n"
+
+#~ msgid "END:VCARD\n"
+#~ msgstr "SLUTT;VCARD\n"

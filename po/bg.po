@@ -2557,7 +2557,7 @@ msgstr "ОК"
 #: src/main-window.c:2343
 #, c-format
 msgid "Commiting mailbox %s failed."
-msgstr "Не е избрана пощенска кутия."
+msgstr "Грешка при запис в пощенската кутия %s."
 
 ##, c-format
 #: src/main-window.c:2553

@@ -1,3 +1,8 @@
+2003-03-13 13:23  PeterB
+
+	* src/sendmsg-window.c: Use translated strings for headers when
+	using external editor; use g_string_append_printf.
+
 2003-03-13  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter-funcs.[hc]: new functions to compare conditions.

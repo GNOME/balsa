@@ -34,56 +34,54 @@
  * enumes
  */
 typedef enum
-{
-  MAILBOX_MBX,		/* fastest preformance */
-  MAILBOX_MTX,		/* good  (pine default mailbox format) */
-  MAILBOX_TENEX,	/* good */
-  MAILBOX_MBOX,		/* fair */
-  MAILBOX_MMDF,		/* fair */
-  MAILBOX_UNIX,		/* fair */
-  MAILBOX_MH,		/* very poor */
-  MAILBOX_POP3,
-  MAILBOX_IMAP,
-  MAILBOX_NNTP,
-  MAILBOX_UNKNOWN
-} MailboxType;
+  {
+    MAILBOX_MBOX,		/* fair */
+    MAILBOX_MH,			/* very poor */
+    MAILBOX_POP3,
+    MAILBOX_IMAP,
+    MAILBOX_UNKNOWN
+  }
+MailboxType;
 
 
 typedef enum
-{
-  MESSAGE_MARK_CLEAR,       /* clear all flags */
-  MESSAGE_MARK_ANSWER,      /* message has been answered */
-  MESSAGE_MARK_READ,        /* message has changed from new to read */
-  MESSAGE_MARK_DELETE,      /* message has been marked deleted */
-  MESSAGE_MARK_UNDELETE,    /* message has been marked undeleted */
-  MESSAGE_DELETE,           /* message has been deleted */
-  MESSAGE_NEW,              /* message is new to the mailbox */
-  MESSAGE_FLAGGED,          /* the message was flagged */
-  MESSAGE_ANSWERED          /* the message was answered */
-} MailboxWatcherMessageType;
+  {
+    MESSAGE_MARK_CLEAR,		/* clear all flags */
+    MESSAGE_MARK_ANSWER,	/* message has been answered */
+    MESSAGE_MARK_READ,		/* message has changed from new to read */
+    MESSAGE_MARK_DELETE,	/* message has been marked deleted */
+    MESSAGE_MARK_UNDELETE,	/* message has been marked undeleted */
+    MESSAGE_DELETE,		/* message has been deleted */
+    MESSAGE_NEW,		/* message is new to the mailbox */
+    MESSAGE_FLAGGED,		/* the message was flagged */
+    MESSAGE_ANSWERED		/* the message was answered */
+  }
+MailboxWatcherMessageType;
 
 
 typedef enum
-{
-  MESSAGE_MARK_CLEAR_MASK     = 1,
-  MESSAGE_MARK_ANSWER_MASK    = 1 << 1,
-  MESSAGE_MARK_READ_MASK      = 1 << 2,
-  MESSAGE_MARK_DELETE_MASK    = 1 << 3,
-  MESSAGE_MARK_UNDELETE_MASK  = 1 << 4,
-  MESSAGE_DELETE_MASK         = 1 << 5,
-  MESSAGE_NEW_MASK            = 1 << 6,
-  MESSAGE_FLAGGED_MASK        = 1 << 7,
-  MESSAGE_ANSWERED_MASK       = 1 << 8
-} MailboxWatcherMessageMask;
+  {
+    MESSAGE_MARK_CLEAR_MASK = 1,
+    MESSAGE_MARK_ANSWER_MASK = 1 << 1,
+    MESSAGE_MARK_READ_MASK = 1 << 2,
+    MESSAGE_MARK_DELETE_MASK = 1 << 3,
+    MESSAGE_MARK_UNDELETE_MASK = 1 << 4,
+    MESSAGE_DELETE_MASK = 1 << 5,
+    MESSAGE_NEW_MASK = 1 << 6,
+    MESSAGE_FLAGGED_MASK = 1 << 7,
+    MESSAGE_ANSWERED_MASK = 1 << 8
+  }
+MailboxWatcherMessageMask;
 
 
 typedef enum
-{
-  MESSAGE_FLAG_NEW            = 1 << 1,
-  MESSAGE_FLAG_DELETED        = 1 << 2,
-  MESSAGE_FLAG_ANSWERED       = 1 << 3,
-  MESSAGE_FLAG_FLAGGED        = 1 << 4
-} MessageFlags;
+  {
+    MESSAGE_FLAG_NEW = 1 << 1,
+    MESSAGE_FLAG_DELETED = 1 << 2,
+    MESSAGE_FLAG_ANSWERED = 1 << 3,
+    MESSAGE_FLAG_FLAGGED = 1 << 4
+  }
+MessageFlags;
 
 
 /*
@@ -103,144 +101,143 @@ typedef struct _Address Address;
 typedef struct _Body Body;
 
 struct _Mailbox
-{
-  MailboxType type;
-  gchar *name;
-  void *private;
-  guint open_ref;
+  {
+    MailboxType type;
+    gchar *name;
+    void *private;
+    guint open_ref;
 
-  glong messages;
-  glong new_messages;
-  GList *message_list;
+    glong messages;
+    glong new_messages;
+    GList *message_list;
 
-  FILE *fd;
-  time_t mtime;
-  off_t size;
-};
+    FILE *fd;
+    time_t mtime;
+    off_t size;
+  };
 
 
 struct _MailboxLocal
-{
-  Mailbox mailbox;
-  gchar *path;
-};
+  {
+    Mailbox mailbox;
+    gchar *path;
+  };
 
 
 struct _MailboxPOP3
-{
-  Mailbox mailbox;
-  gchar *user;
-  gchar *passwd;
-  gchar *server;
-};
+  {
+    Mailbox mailbox;
+    gchar *user;
+    gchar *passwd;
+    gchar *server;
+  };
 
 
 struct _MailboxIMAP
-{
-  Mailbox mailbox;
-  gchar *user;
-  gchar *passwd;
-  gchar *server;
-  gchar *path;
-};
+  {
+    Mailbox mailbox;
+    gchar *user;
+    gchar *passwd;
+    gchar *server;
+    gchar *path;
+  };
 
 
 struct _MailboxNNTP
-{
-  Mailbox mailbox;
-  gchar *user;
-  gchar *passwd;
-  gchar *server;
-  gchar *newsgroup;
-};
+  {
+    Mailbox mailbox;
+    gchar *user;
+    gchar *passwd;
+    gchar *server;
+    gchar *newsgroup;
+  };
 
 
 struct _MailboxWatcherMessage
-{
-  MailboxWatcherMessageType type;
-  Mailbox *mailbox;
-  Message *message;
-  gpointer data;
-};
+  {
+    MailboxWatcherMessageType type;
+    Mailbox *mailbox;
+    Message *message;
+    gpointer data;
+  };
 
 
 struct _MailboxWatcherMessageNew
-{
-  /* common */
-  MailboxWatcherMessageType type;
-  Mailbox *mailbox;
-  Message *message;
-  gpointer data;
-  /* end common */
+  {
+    /* common */
+    MailboxWatcherMessageType type;
+    Mailbox *mailbox;
+    Message *message;
+    gpointer data;
+    /* end common */
 
-  gint remaining;
-};
+    gint remaining;
+  };
 
 
 struct _Message
-{
-  /* the mailbox this message belongs to */
-  Mailbox *mailbox;
+  {
+    /* the mailbox this message belongs to */
+    Mailbox *mailbox;
 
-  /* flags */
-  MessageFlags flags;
+    /* flags */
+    MessageFlags flags;
 
-  /* the ordered numberic index of this message in 
-   * the mailbox beginning from 1, not 0 */
-  glong msgno;
+    /* the ordered numberic index of this message in 
+     * the mailbox beginning from 1, not 0 */
+    glong msgno;
 
-  /* remail header if any */
-  gchar *remail;
+    /* remail header if any */
+    gchar *remail;
 
-  /* message composition date string */
-  gchar *date;
+    /* message composition date string */
+    gchar *date;
 
-  /* from, sender, and reply addresses */
-  Address *from;
-  Address *sender;
-  Address *reply_to;
+    /* from, sender, and reply addresses */
+    Address *from;
+    Address *sender;
+    Address *reply_to;
 
-  /* subject line */
-  gchar *subject;
+    /* subject line */
+    gchar *subject;
 
-  /* primary, secondary, and blind recipent lists */
-  GList *to_list;
-  GList *cc_list;
-  GList *bcc_list;
+    /* primary, secondary, and blind recipent lists */
+    GList *to_list;
+    GList *cc_list;
+    GList *bcc_list;
 
-  /* replied message ID */
-  gchar *in_reply_to;
+    /* replied message ID */
+    gchar *in_reply_to;
 
-  /* message ID */
-  gchar *message_id;
+    /* message ID */
+    gchar *message_id;
 
-  /* USENET */
-  gchar *newsgroups;
-  gchar *followup_to;
-  gchar *references;
+    /* USENET */
+    gchar *newsgroups;
+    gchar *followup_to;
+    gchar *references;
 
-  /* message body */
-  guint body_ref;
-  GList *body_list;
+    /* message body */
+    guint body_ref;
+    GList *body_list;
 
-  /* offset in file */
-  glong offset;
-};
+    /* offset in file */
+    glong offset;
+  };
 
 
 struct _Address
-{
-  gchar *personal;            /* full text name */
-  gchar *user;                /* user name (mailbox name) on remote system */
-  gchar *host;                /* remote host */
-};
+  {
+    gchar *personal;		/* full text name */
+    gchar *mailbox;		/* user name and host (mailbox name) on remote system */
+  };
 
 
 struct _Body
-{
-  gchar *mime;
-  gchar *buffer;
-};
+  {
+    gchar *mime;
+    gchar *buffer;
+  };
 
 
 /*
@@ -312,7 +309,7 @@ void body_free (Body * body);
  * misc mailbox releated functions
  */
 MailboxType mailbox_type_from_description (gchar * description);
-gchar * mailbox_type_description (MailboxType type);
+gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
 
 

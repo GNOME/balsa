@@ -22,12 +22,10 @@
 #include <stdio.h>
 #include <gnome.h>
 
-#include "balsa-app.h"
-#include "mailbox.h"
-
-
 #include "mailbackend.h"
 
+#include "balsa-app.h"
+#include "mailbox.h"
 
 #define BUFFER_SIZE 1024
 
@@ -58,21 +56,21 @@ do {\
 #define UNLOCK_MAILBOX()                (client_mailbox = NULL)
 
 
-#define CLIENT_STREAM(mailbox)          (((MailboxPrivate *)((mailbox)->private))->stream)
-#define CLIENT_STREAM_OPEN(mailbox)     (CLIENT_STREAM (mailbox) != NIL)
-#define CLIENT_STREAM_CLOSED(mailbox)   (CLIENT_STREAM (mailbox) == NIL)
-#define RETURN_IF_CLIENT_STRAM_CLOSED(mailbox)\
+#define CLIENT_CONTEXT(mailbox)          (((MailboxPrivate *)((mailbox)->private))->context)
+#define CLIENT_CONTEXT_OPEN(mailbox)     (CLIENT_CONTEXT (mailbox) != NULL)
+#define CLIENT_CONTEXT_CLOSED(mailbox)   (CLIENT_CONTEXT (mailbox) == NULL)
+#define RETURN_IF_CLIENT_CONTEXT_CLOSED(mailbox)\
 do {\
-  if (CLIENT_STREAM_CLOSED (mailbox))\
+  if (CLIENT_CONTEXT_CLOSED (mailbox))\
     {\
       g_print ("*** ERROR: Mailbox Stream Closed: %s ***\n", __PRETTY_FUNCTION__);\
       UNLOCK_MAILBOX ();\
       return;\
     }\
 } while (0)
-#define RETURN_VAL_IF_CLIENT_STRAM_CLOSED(mailbox, val)\
+#define RETURN_VAL_IF_CONTEXT_CLOSED(mailbox, val)\
 do {\
-  if (CLIENT_STREAM_CLOSED (mailbox))\
+  if (CLIENT_CONTEXT_CLOSED (mailbox))\
     {\
       g_print ("*** ERROR: Mailbox Stream Closed: %s ***\n", __PRETTY_FUNCTION__);\
       UNLOCK_MAILBOX ();\
@@ -102,7 +100,7 @@ MailboxWatcher;
  */
 typedef struct
   {
-    MAILSTREAM *stream;
+    CONTEXT *context;
     GList *watcher_list;
   }
 MailboxPrivate;
@@ -133,13 +131,10 @@ static Message *translate_message (ENVELOPE * cenv);
 static Address *translate_address (ADDRESS * caddr);
 
 
-/*
- * necessary for initalizing the fucking c-client library
- */
 void
 mailbox_init ()
 {
-#include "linkage.c"
+/* put stuff here later */
 }
 
 
@@ -153,12 +148,11 @@ mailbox_new (MailboxType type)
 
   switch (type)
     {
-    case MAILBOX_MBX:
-    case MAILBOX_MTX:
-    case MAILBOX_TENEX:
     case MAILBOX_MBOX:
-    case MAILBOX_MMDF:
-    case MAILBOX_UNIX:
+      mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
+      MAILBOX_LOCAL (mailbox)->path = NULL;
+      break;
+
     case MAILBOX_MH:
       mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
       MAILBOX_LOCAL (mailbox)->path = NULL;
@@ -179,12 +173,6 @@ mailbox_new (MailboxType type)
       MAILBOX_IMAP (mailbox)->path = NULL;
       break;
 
-    case MAILBOX_NNTP:
-      mailbox = (Mailbox *) g_malloc (sizeof (MailboxNNTP));
-      MAILBOX_NNTP (mailbox)->server = NULL;
-      MAILBOX_NNTP (mailbox)->newsgroup = NULL;
-      break;
-
     default:
       return NULL;
     }
@@ -192,7 +180,7 @@ mailbox_new (MailboxType type)
   mailbox->type = type;
   mailbox->name = NULL;
   mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
-  CLIENT_STREAM (mailbox) = NIL;
+  CLIENT_CONTEXT (mailbox) = NULL;
   WATCHER_LIST (mailbox) = NULL;
   mailbox->open_ref = 0;
   mailbox->messages = 0;
@@ -211,7 +199,7 @@ mailbox_free (Mailbox * mailbox)
   if (!mailbox)
     return;
 
-  if (CLIENT_STREAM (mailbox) != NIL)
+  if (CLIENT_CONTEXT (mailbox) != NULL)
     while (mailbox->open_ref > 0)
       mailbox_open_unref (mailbox);
 
@@ -220,12 +208,10 @@ mailbox_free (Mailbox * mailbox)
 
   switch (mailbox->type)
     {
-    case MAILBOX_MBX:
-    case MAILBOX_MTX:
-    case MAILBOX_TENEX:
     case MAILBOX_MBOX:
-    case MAILBOX_MMDF:
-    case MAILBOX_UNIX:
+      g_free (MAILBOX_LOCAL (mailbox)->path);
+      break;
+
     case MAILBOX_MH:
       g_free (MAILBOX_LOCAL (mailbox)->path);
       break;
@@ -242,15 +228,10 @@ mailbox_free (Mailbox * mailbox)
       g_free (MAILBOX_IMAP (mailbox)->server);
       g_free (MAILBOX_IMAP (mailbox)->path);
       break;
-
-    case MAILBOX_NNTP:
-      g_free (MAILBOX_NNTP (mailbox)->server);
-      g_free (MAILBOX_NNTP (mailbox)->newsgroup);
-      break;
     }
 
   if (mailbox->fd)
-     fclose(mailbox->fd);
+    fclose (mailbox->fd);
 
   g_free (mailbox);
 }
@@ -259,12 +240,10 @@ mailbox_free (Mailbox * mailbox)
 gint
 mailbox_open_ref (Mailbox * mailbox)
 {
-  gchar buffer[MAILTMPLEN];
-
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
 
 
-  if (CLIENT_STREAM_OPEN (mailbox))
+  if (CLIENT_CONTEXT_OPEN (mailbox))
     {
       /* incriment the reference count */
       mailbox->open_ref++;
@@ -276,38 +255,26 @@ mailbox_open_ref (Mailbox * mailbox)
 
   switch (mailbox->type)
     {
-    case MAILBOX_MBX:
-    case MAILBOX_MTX:
-    case MAILBOX_TENEX:
+      /* add mail dir */
     case MAILBOX_MBOX:
-    case MAILBOX_MMDF:
-    case MAILBOX_UNIX:
-      CLIENT_STREAM (mailbox) = mail_open (NIL, MAILBOX_LOCAL (mailbox)->path, NIL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, M_QUIET, NULL);
       break;
 
     case MAILBOX_MH:
-      sprintf (buffer, "#mh/%s", MAILBOX_LOCAL (mailbox)->path);
-      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, M_QUIET, NULL);
       break;
 
     case MAILBOX_POP3:
-      sprintf (buffer, "{%s/pop3}INBOX", MAILBOX_POP3 (mailbox)->server);
-      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, M_QUIET, NULL);
       break;
 
     case MAILBOX_IMAP:
-      sprintf (buffer, "{%s/imap}%s", MAILBOX_IMAP (mailbox)->server, MAILBOX_IMAP (mailbox)->path);
-      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
-      break;
-
-    case MAILBOX_NNTP:
-      sprintf (buffer, "{%s/nntp}%s", MAILBOX_NNTP (mailbox)->server, MAILBOX_NNTP (mailbox)->newsgroup);
-      CLIENT_STREAM (mailbox) = mail_open (NIL, buffer, NIL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_IMAP (mailbox)->server, M_QUIET, NULL);
       break;
     }
 
 
-  if (CLIENT_STREAM_OPEN (mailbox))
+  if (CLIENT_CONTEXT_OPEN (mailbox))
     {
       load_messages (mailbox, 0);
 
@@ -346,8 +313,8 @@ mailbox_open_unref (Mailbox * mailbox)
 
       /* now close the mail stream and expunge deleted
        * messages -- the expunge may not have to be done */
-      if (CLIENT_STREAM_OPEN (mailbox))
-	CLIENT_STREAM (mailbox) = mail_close_full (CLIENT_STREAM (mailbox), CL_EXPUNGE);
+      if (CLIENT_CONTEXT_OPEN (mailbox))
+	CLIENT_CONTEXT (mailbox) = mx_close_mailbox (CLIENT_CONTEXT (mailbox));
     }
 
   UNLOCK_MAILBOX ();
@@ -360,7 +327,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
   RETURN_VAL_IF_CLIENT_STRAM_CLOSED (mailbox, FALSE);
 
-  mail_ping (CLIENT_STREAM (mailbox));
+  mx_check_mailbox (CLIENT_CONTEXT (mailbox));
 
   UNLOCK_MAILBOX ();
 
@@ -482,30 +449,28 @@ load_messages (Mailbox * mailbox, gint emit)
 {
   glong msgno;
   Message *message;
-  ENVELOPE *envelope;
-  MESSAGECACHE *elt;
+  HEADER *cur;
 
   for (msgno = mailbox->messages - mailbox->new_messages + 1;
        msgno <= mailbox->messages;
        msgno++)
     {
-      envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
-      elt = mail_elt (CLIENT_STREAM (mailbox), msgno);
+      cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
 
-      message = translate_message (envelope);
+      message = translate_message (cur->env);
       message->mailbox = mailbox;
       message->msgno = msgno;
 
-      if (!elt->seen)
+      if (!cur->read)
 	message->flags |= MESSAGE_FLAG_NEW;
 
-      if (elt->deleted)
+      if (cur->deleted)
 	message->flags |= MESSAGE_FLAG_DELETED;
 
-      if (elt->flagged)
+      if (cur->flagged)
 	message->flags |= MESSAGE_FLAG_FLAGGED;
 
-      if (elt->answered)
+      if (cur->replied)
 	message->flags |= MESSAGE_FLAG_ANSWERED;
 
       mailbox->message_list = g_list_append (mailbox->message_list, message);
@@ -735,23 +700,8 @@ send_watcher_delete_message (Mailbox * mailbox, Message * message)
 MailboxType
 mailbox_type_from_description (gchar * description)
 {
-  if (!strcmp (description, "mbx"))
-    return MAILBOX_MBX;
-
-  else if (!strcmp (description, "mtx"))
-    return MAILBOX_MTX;
-
-  else if (!strcmp (description, "tenex"))
-    return MAILBOX_TENEX;
-
-  else if (!strcmp (description, "mbox"))
+  if (!strcmp (description, "mbox"))
     return MAILBOX_MBOX;
-
-  else if (!strcmp (description, "mmdf"))
-    return MAILBOX_MMDF;
-
-  else if (!strcmp (description, "unix"))
-    return MAILBOX_UNIX;
 
   else if (!strcmp (description, "mh"))
     return MAILBOX_MH;
@@ -761,9 +711,6 @@ mailbox_type_from_description (gchar * description)
 
   else if (!strcmp (description, "imap"))
     return MAILBOX_IMAP;
-
-  else if (!strcmp (description, "nntp"))
-    return MAILBOX_NNTP;
 
   /* if no match */
   return MAILBOX_UNKNOWN;
@@ -775,26 +722,6 @@ mailbox_type_description (MailboxType type)
 {
   switch (type)
     {
-    case MAILBOX_MBX:
-      return "mbx";
-      break;
-
-    case MAILBOX_MTX:
-      return "mtx";
-      break;
-
-    case MAILBOX_TENEX:
-      return "tenex";
-      break;
-
-    case MAILBOX_MMDF:
-      return "mmdf";
-      break;
-
-    case MAILBOX_UNIX:
-      return "unix";
-      break;
-
     case MAILBOX_MBOX:
       return "mbox";
       break;
@@ -811,10 +738,6 @@ mailbox_type_description (MailboxType type)
       return "imap";
       break;
 
-    case MAILBOX_NNTP:
-      return "nntp";
-      break;
-
     default:
       return "";
     }
@@ -824,9 +747,10 @@ mailbox_type_description (MailboxType type)
 MailboxType
 mailbox_valid (gchar * filename)
 {
-  DRIVER *drv = NIL;
+#if 0
+  DRIVER *drv = NULL;
 
-  drv = mail_valid (NIL, filename, NIL);
+  drv = mail_valid (NULL, filename, NIL);
 
   if (balsa_app.debug)
     {
@@ -841,6 +765,7 @@ mailbox_valid (gchar * filename)
     return mailbox_type_from_description (drv->name);
   else
     return MAILBOX_UNKNOWN;
+#endif
 }
 
 
@@ -890,8 +815,8 @@ message_free (Message * message)
   address_free (message->reply_to);
   g_free (message->subject);
 
-  g_list_free(message->to_list);
-  g_list_free(message->cc_list);
+  g_list_free (message->to_list);
+  g_list_free (message->cc_list);
 
   g_free (message->in_reply_to);
   g_free (message->message_id);
@@ -913,15 +838,14 @@ message_move (Message * message, Mailbox * mailbox)
 }
 
 void
-message_answer (Message * message)
+message_reply (Message * message)
 {
-  char tmp[BUFFER_SIZE];
+  HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
 
-  sprintf (tmp, "%ld", message->msgno);
-  mail_setflag (CLIENT_STREAM (message->mailbox), tmp, "\\ANSWERED");
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
 
   message->flags |= MESSAGE_FLAG_ANSWERED;
   send_watcher_mark_answer_message (message->mailbox, message);
@@ -932,11 +856,13 @@ message_answer (Message * message)
 void
 message_clear_flags (Message * message)
 {
+#if 0
   char tmp[BUFFER_SIZE];
 
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
 
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
   sprintf (tmp, "%ld", message->msgno);
   mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
   mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\ANSWERED");
@@ -945,19 +871,19 @@ message_clear_flags (Message * message)
   send_watcher_mark_clear_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
+#endif
 }
 
 
 void
 message_delete (Message * message)
 {
-  char tmp[BUFFER_SIZE];
+  HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
 
-  sprintf (tmp, "%ld", message->msgno);
-  mail_setflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_REPLIED, 1);
 
   message->flags |= MESSAGE_FLAG_DELETED;
   send_watcher_mark_delete_message (message->mailbox, message);
@@ -969,15 +895,14 @@ message_delete (Message * message)
 void
 message_undelete (Message * message)
 {
-  char tmp[BUFFER_SIZE];
+  HEADER *cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
   LOCK_MAILBOX (message->mailbox);
   RETURN_IF_CLIENT_STRAM_CLOSED (message->mailbox);
 
-  sprintf (tmp, "%ld", message->msgno);
-  mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+  mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, 1);
 
-  message->flags &= !MESSAGE_FLAG_DELETED;
+  message->flags &= MESSAGE_FLAG_DELETED;
   send_watcher_mark_undelete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
@@ -996,29 +921,29 @@ translate_message (ENVELOPE * cenv)
     return NULL;
 
   message = message_new ();
-
-  message->remail = g_strdup (cenv->remail);
-  message->date = g_strdup (cenv->date);
-
+/*
+   message->remail = g_strdup (cenv->remail);
+   message->date = g_strdup (cenv->date);
+ */
   message->from = translate_address (cenv->from);
   message->sender = translate_address (cenv->sender);
   message->reply_to = translate_address (cenv->reply_to);
 
-  for (addy=cenv->to;addy;addy=addy->next)
-  {
-    addr = translate_address(addy);
-    message->to_list = g_list_append(message->to_list, addr);
-  }
-  for (addy=cenv->cc;addy;addy=addy->next)
-  {
-    addr = translate_address(addy);
-    message->cc_list = g_list_append(message->cc_list, addr);
-  }
-  for (addy=cenv->bcc;addy;addy=addy->next)
-  {
-    addr = translate_address(addy);
-    message->bcc_list = g_list_append(message->bcc_list, addr);
-  }
+  for (addy = cenv->to; addy; addy = addy->next)
+    {
+      addr = translate_address (addy);
+      message->to_list = g_list_append (message->to_list, addr);
+    }
+  for (addy = cenv->cc; addy; addy = addy->next)
+    {
+      addr = translate_address (addy);
+      message->cc_list = g_list_append (message->cc_list, addr);
+    }
+  for (addy = cenv->bcc; addy; addy = addy->next)
+    {
+      addr = translate_address (addy);
+      message->bcc_list = g_list_append (message->bcc_list, addr);
+    }
 
   message->subject = g_strdup (cenv->subject);
 
@@ -1047,12 +972,13 @@ message_body_ref (Message * message)
   /*
    * load message body -- lameness
    */
+#if 0
   body = body_new ();
   body->buffer = g_strdup (mail_fetchtext (CLIENT_STREAM (message->mailbox),
 					   message->msgno));
   message->body_list = g_list_append (message->body_list, body);
   message->body_ref++;
-
+#endif
   /*
    * emit read message
    */
@@ -1105,8 +1031,7 @@ address_new ()
   address = g_malloc (sizeof (Address));
 
   address->personal = NULL;
-  address->user = NULL;
-  address->host = NULL;
+  address->mailbox = NULL;
 
   return address;
 }
@@ -1119,8 +1044,7 @@ address_free (Address * address)
     return;
 
   g_free (address->personal);
-  g_free (address->user);
-  g_free (address->host);
+  g_free (address->mailbox);
 
   g_free (address);
 }
@@ -1137,8 +1061,8 @@ translate_address (ADDRESS * caddr)
     return NULL;
   address = address_new ();
   address->personal = g_strdup (caddr->personal);
-  address->user = g_strdup (caddr->mailbox);
-  address->host = g_strdup (caddr->host);
+  address->mailbox = g_strdup (caddr->mailbox);
+
   return address;
 }
 
@@ -1173,7 +1097,7 @@ body_free (Body * body)
 
 
 
-
+#if 0
 
 
 
@@ -1211,8 +1135,8 @@ mm_exists (MAILSTREAM * stream, unsigned long number)
     {
       g_print ("mm_exists: %s %d messages %d new_messages\n",
 	       client_mailbox->name,
-	       (gint)client_mailbox->messages,
-	       (gint)client_mailbox->new_messages);
+	       (gint) client_mailbox->messages,
+	       (gint) client_mailbox->new_messages);
     }
 }
 
@@ -1232,7 +1156,7 @@ mm_flags (MAILSTREAM * stream, unsigned long number)
     return;
 
   if (balsa_app.debug)
-    g_print ("Message %d in mailbox %s changed.\n", (gint)number, stream->mailbox);
+    g_print ("Message %d in mailbox %s changed.\n", (gint) number, stream->mailbox);
 }
 
 
@@ -1274,7 +1198,7 @@ mm_status (MAILSTREAM * stream, char *mailbox, MAILSTATUS * status)
 void
 mm_log (char *string, long errflg)
 {
-  if (!client_mailbox)
+  if (!client_ailbox)
     return;
 }
 
@@ -1345,7 +1269,7 @@ mm_diskerror (MAILSTREAM * stream, long errcode, long serious)
   if (balsa_app.debug)
     g_print ("*** C-Client Disk Error ***\n");
 
-  return NIL;
+  return NULL;
 }
 
 void
@@ -1354,3 +1278,5 @@ mm_fatal (char *string)
   if (balsa_app.debug)
     g_print ("*** C-Client Fatel Error: %s ***\n", string);
 }
+
+#endif

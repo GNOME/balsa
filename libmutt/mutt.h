@@ -27,8 +27,10 @@
 #include "rfc822.h"
 #include "hash.h"
 
+#ifndef TRUE
 #define TRUE 1
 #define FALSE 0
+#endif
 
 #define HUGE_STRING	5120
 #define LONG_STRING     1024

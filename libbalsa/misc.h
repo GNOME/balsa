@@ -33,8 +33,6 @@ gchar * get_string_set_default (const char * path,
 gint get_int_set_default (const char *path,
 			  const gint value);
 
-GtkWidget * new_icon (gchar ** xpm, GtkWidget * window);
-
 gint g_list_index (GList * list, gpointer data);
 
 

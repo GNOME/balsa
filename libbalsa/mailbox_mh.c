@@ -1028,6 +1028,7 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     }
     g_mime_stream_unref(out_stream);
+    g_mime_stream_unref(in_stream);
 
     msgno = mh->messages_info->len + 1; 
     retries = 10;

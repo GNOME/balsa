@@ -281,7 +281,7 @@ ab_load(GtkWidget * widget, gpointer data)
 	    data->name = name ? name : g_strdup( N_("No-Name") );
 	    data->addy = email;
 	    listdata[0] = name;
-	    listdata[1] = name;
+	    listdata[1] = email;
 	    rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata); 
 	    gtk_clist_set_row_data(GTK_CLIST( book_clist),
 				   rownum, (gpointer) data); 
@@ -294,6 +294,7 @@ ab_load(GtkWidget * widget, gpointer data)
       }
 
       if (!in_vcard) continue;
+      g_strchomp(string);
 
       if(strncasecmp(string, "N:", 2) == 0) {
 	 name = extract_name(string+2);

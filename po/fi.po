@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa\n"
-"POT-Creation-Date: 2001-05-20 21:40+0300\n"
+"POT-Creation-Date: 2001-05-21 18:00+0200\n"
 "PO-Revision-Date: 2001-05-17 15:07:17+0200\n"
 "Last-Translator: Antti Ahvensalmi <aahven@mbnet.fi>\n"
 "Language-Team: Finnish <fi@li.org>\n"
@@ -80,6 +80,17 @@ msgstr "Viallinen osoitetyyppi: %s"
 #, c-format
 msgid "Could not create a address book of type %s"
 msgstr "Ei voida luoda %s -tyyppist‰ osoitekirjaa."
+
+#. Non-threaded locking mechanism
+#: libbalsa/libbalsa_private.h:99 libbalsa/libbalsa_private.h:111
+#, c-format
+msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
+msgstr ""
+
+#: libbalsa/libbalsa_private.h:129 libbalsa/libbalsa_private.h:138
+#, c-format
+msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
+msgstr ""
 
 #: libbalsa/mailbox.c:301
 #, c-format
@@ -668,6 +679,7 @@ msgid "%s [%s]\n"
 msgstr "%s [%s]\n"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
+#, c-format
 msgid "Reading %s... %d (%d%%)"
 msgstr "Luetaan %s... %d (%d&&)"
 
@@ -701,6 +713,7 @@ msgstr ""
 "sync: mbox muuttunut muttei muutettuja viestej‰! (raportoi t‰st‰ virheest‰)"
 
 #: libmutt/mbox.c:788
+#, c-format
 msgid "Writing messages... %d (%d%%)"
 msgstr "Kirjoitetaan viestej‰... %d (%d%%)"
 
@@ -728,7 +741,7 @@ msgstr "Esiyhteyskomento ep‰onnistui"
 #: libmutt/mutt_socket.c:328 libmutt/mutt_socket.c:368
 #, c-format
 msgid "Looking up %s..."
-msgstr "Etsit‰‰n %s %s..."
+msgstr "Etsit‰‰n %s..."
 
 #: libmutt/mutt_socket.c:333 libmutt/mutt_socket.c:372
 #, c-format

@@ -1,5 +1,7 @@
 #include <gnome.h>
 
+#ifdef BALSA_USE_THREADS
+
 #define LOCK_MAILBOX(mailbox)\
 do {\
   pthread_mutex_lock( &mailbox_lock );\
@@ -43,6 +45,35 @@ do {\
   mailbox->lock = FALSE;\
   pthread_mutex_unlock( &mailbox_lock );\
 }  while( 0 )
+#else
+
+/* Non-threaded locking mechanism */
+#define LOCK_MAILBOX(mailbox)\
+do {\
+  if (mailbox->lock)\
+    {\
+      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
+      return;\
+    }\
+  else\
+    mailbox->lock = TRUE;\
+} while (0)
+
+
+#define LOCK_MAILBOX_RETURN_VAL(mailbox, val)\
+do {\
+  if (mailbox->lock)\
+    {\
+      g_print (_("*** ERROR: Mailbox Lock Exists: %s ***\n"), __PRETTY_FUNCTION__);\
+      return (val);\
+    }\
+  else\
+    mailbox->lock = TRUE;\
+} while (0)
+
+#define UNLOCK_MAILBOX(mailbox)          mailbox->lock = FALSE;
+
+#endif
   
   
 

@@ -20,10 +20,14 @@
  * Rather crude POP3 support.
  */
 
+#include "../config.h"
 #include "mutt.h"
 #include "mailbox.h"
 #include "mx.h"
+
+#ifdef BALSA_USE_THREADS
 #include "thread_msgs.h"
+#endif
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -85,7 +89,9 @@ void mutt_fetchPopMail (void)
   char msgbuf[SHORT_STRING];
   char uid[80], last_uid[80];
   char threadbuf[160];
+#ifdef BALSA_USE_THREADS
   MailThreadMessage *threadmsg;
+#endif
   int s, i, msgs, bytes, tmp, total, err = 0;
   int first_msg;
   CONTEXT ctx;
@@ -257,8 +263,9 @@ void mutt_fetchPopMail (void)
 
     sprintf( threadbuf, "Retrieving Message %d of %d", 
 	     i - first_msg + 1, total );
+#ifdef BALSA_USE_THREADS
     MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf );
-
+#endif
 
     if (getLine (s, buffer, sizeof (buffer)) == -1)
     {
@@ -377,13 +384,3 @@ fail:
   mutt_error ("Server closed connection!");
   close (s);
 }
-
-
-
-
-
-
-
-
-
-

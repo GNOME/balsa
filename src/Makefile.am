@@ -60,8 +60,6 @@ balsa_LDADD = \
 	$(top_builddir)/libmutt/libmutt.a \
 	$(top_builddir)/libbalsa/libbalsa.a \
 	-lPropList	\
-	-lpthread  \
-	-lgthread  \
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
 	$(top_builddir)/idl/libbalsasrv.a \

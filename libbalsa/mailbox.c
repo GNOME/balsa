@@ -28,7 +28,10 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
+
+#ifdef BALSA_USE_THREADS
 #include <pthread.h>
+#endif
 
 #include "mailbackend.h"
 
@@ -36,7 +39,10 @@
 #include "libbalsa_private.h"
 
 #include "misc.h"
+
+#ifdef BALSA_USE_THREADS
 #include "threads.h"
+#endif
 
 #define BUFFER_SIZE 1024
 
@@ -145,6 +151,7 @@ set_imap_username (Mailbox * mb)
 void
 check_all_imap_hosts (Mailbox * to, GList *mailboxes)
 {
+#ifdef BALSA_USE_THREADS
 /*  Only check if lock has been set */
   pthread_mutex_lock( &mailbox_lock);
   if( !checking_mail )
@@ -158,7 +165,10 @@ check_all_imap_hosts (Mailbox * to, GList *mailboxes)
 
 
   return;  
+#else
+/* non-thread code */
 
+#endif
 }
 
 
@@ -168,6 +178,8 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   GList *list;
   Mailbox *mailbox;
   char uid[80], msgbuf[160];
+
+#ifdef BALSA_USE_THREADS
   MailThreadMessage *threadmsg;
 
 /*  Only check if lock has been set */
@@ -178,7 +190,7 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
     return;
   }
   pthread_mutex_unlock( &mailbox_lock );
-
+#endif BALSA_USE_THREADS
 
   list = g_list_first (mailboxes);
 
@@ -198,8 +210,10 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
       PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
       PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
 
+#ifdef BALSA_USE_THREADS
       sprintf( msgbuf, "POP3: %s", MAILBOX_POP3(mailbox)->mailbox.name );
       MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
+#endif
  
       if( MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
         uid[0] = 0;
@@ -229,11 +243,15 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
         g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
         MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
 
+#ifdef BALSA_USE_THREADS
 	threadmsg = malloc( sizeof( MailThreadMessage ) );
 	threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
 	threadmsg->mailbox = mailbox;
 	/*  MAILBOX_POP3(mailbox)->mailbox.name */
         write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
+#else
+	config_mailbox_update( mailbox, MAILBOX_POP3(mailbox)->mailbox.name);
+#endif
       }
     }
     list = list->next;
@@ -482,7 +500,7 @@ mailbox_open_append (Mailbox * mailbox)
 
 static void balsa_mailbox_real_open_mailbox(Mailbox *mailbox)
 {
-  return _mailbox_open_ref(mailbox, 0);
+  _mailbox_open_ref(mailbox, 0);
 }
 
 static void balsa_mailbox_real_close_mailbox(Mailbox *mailbox)
@@ -628,6 +646,8 @@ mailbox_check_new_messages (Mailbox * mailbox)
 {
   gint i = 0;
   gint index_hint;
+
+#ifdef BALSA_USE_THREADS
   MailThreadMessage *threadmsg;
 
 /*  Only run if lock has been set */
@@ -638,6 +658,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
      return FALSE;
   }
   pthread_mutex_unlock( &mailbox_lock );
+#endif
 
   if (!mailbox)
     return FALSE;
@@ -667,12 +688,12 @@ mailbox_check_new_messages (Mailbox * mailbox)
 	     new mail in the mailbox. -bertrand */
 
           UNLOCK_MAILBOX (mailbox);
+#ifdef BALSA_USE_THREADS
 	  MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_LOAD, mailbox->name );
-       
-/*
+#else
 	  load_messages (mailbox, 1);
 	  UNLOCK_MAILBOX (mailbox);
-*/
+#endif
 	  return TRUE;
 	}
       else

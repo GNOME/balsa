@@ -22,7 +22,10 @@
 #include <gnome.h>
 #include <gdk/gdkx.h>
 #include <X11/Xutil.h>
+
+#ifdef BALSA_USE_THREADS
 #include <pthread.h>
+#endif
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -44,7 +47,10 @@
 #include "main-window.h"
 #include "print.h"
 #include "address-book.h"
+
+#ifdef BALSA_USE_THREADS
 #include "threads.h"
+#endif
 
 #define MAILBOX_DATA "mailbox_data"
 
@@ -57,14 +63,18 @@ enum {
   LAST_SIGNAL
 };
 
+#ifdef BALSA_USE_THREADS
 /* Define thread-related globals, including dialogs */
   GtkWidget *progress_dialog = NULL;
   GtkWidget *progress_dialog_source = NULL;
   GtkWidget *progress_dialog_message = NULL;
 
-
 extern void load_messages (Mailbox * mailbox, gint emit);
 
+void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
+gboolean mail_progress_notify_cb( );
+
+#endif
 
 static void balsa_window_class_init(BalsaWindowClass *klass);
 static void balsa_window_init(BalsaWindow *window);
@@ -94,8 +104,6 @@ static void show_about_box (void);
 
 /* callbacks */
 static void check_new_messages_cb (GtkWidget *, gpointer data);
-void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
-gboolean mail_progress_notify_cb( );
 
 static void new_message_cb (GtkWidget * widget, gpointer data);
 static void replyto_message_cb (GtkWidget * widget, gpointer data);
@@ -702,6 +710,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   GtkWidget *index;
   Mailbox *mbox;
 
+#ifdef BALSA_USE_THREADS
 /*  Only Run once -- If already checking mail, return.  */
   pthread_mutex_lock( &mailbox_lock );
   if( checking_mail )
@@ -712,12 +721,6 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   }
   checking_mail = 1;
   pthread_mutex_unlock( &mailbox_lock );
-
-  index = balsa_window_find_current_index(BALSA_WINDOW(data));
-  if (index)
-    mbox = BALSA_INDEX(index)->mailbox;
-  else
-    mbox = NULL;
 
   progress_dialog = gnome_dialog_new("Checking Mail...", "Hide", NULL);
   gtk_signal_connect (GTK_OBJECT (progress_dialog), "destroy",
@@ -736,18 +739,30 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
                             FALSE, FALSE, 0);
 
   gtk_widget_show_all( progress_dialog );
+#endif BALSA_USE_THREADS
 
+  index = balsa_window_find_current_index(BALSA_WINDOW(data));
+  if (index)
+    mbox = BALSA_INDEX(index)->mailbox;
+  else
+    mbox = NULL;
+
+#ifdef BALSA_USE_THREADS
 /* initiate threads */
   pthread_create( &get_mail_thread,
   		NULL,
   		(void *) &check_messages_thread,
 		mbox );
+#else
+  check_messages_thread(mbox);
+#endif
 
 }
 
 void
 check_messages_thread( Mailbox *mbox )
 {
+#ifdef BALSA_USE_THREADS
 /*  
  *  It is assumed that this will always be called as a pthread,
  *  and that the calling procedure will check for an existing lock
@@ -772,8 +787,18 @@ check_messages_thread( Mailbox *mbox )
 
   pthread_exit( 0 );
 
+#else
+  check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
+  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
+  mailbox_check_new_messages( mbox );
+  load_messages (balsa_app.inbox, 1);
+#endif
+
+
 }
 
+
+#ifdef BALSA_USE_THREADS
 gboolean
 mail_progress_notify_cb( )
 {
@@ -781,7 +806,6 @@ mail_progress_notify_cb( )
     MailThreadMessage **currentpos;
     char *msgbuffer;
     uint count;
-    char test[160];
 
     msgbuffer = malloc( 2049 );
 
@@ -854,9 +878,10 @@ mail_progress_notify_cb( )
 
 void progress_dialog_destroy_cb( GtkWidget *widget, gpointer data )
 {
-  gtk_widget_destroy( progress_dialog );
-  progress_dialog = NULL;
+  gtk_widget_destroy( widget );
+  widget = NULL;
 }
+#endif USE_BALSA_THREADS
 
 //static
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window)

@@ -26,8 +26,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <pthread.h>
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+#endif
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -36,11 +38,12 @@
 #include "libbalsa.h"
 #include "misc.h"
 #include "save-restore.h"
-
 #include "main.h"
+#include "balsa-impl.c"
+
+#ifdef BALSA_USE_THREADS
 #include "threads.h"
 
-#include "balsa-impl.c"
 
 /* Globals for Thread creation, messaging, pipe I/O */
 pthread_t			get_mail_thread;
@@ -50,11 +53,12 @@ int				mail_thread_pipes[2];
 GIOChannel 		*mail_thread_msg_send;
 GIOChannel 		*mail_thread_msg_receive;
 
+static void threads_init( gboolean init );
+#endif
 
 static void balsa_init (int argc, char **argv);
 static void config_init (void);
 static void mailboxes_init (void);
-static void threads_init( gboolean init );
 
 void Exception (CORBA_Environment *);
 
@@ -163,6 +167,8 @@ mailboxes_init (void)
     }
 }
 
+
+#ifdef BALSA_USE_THREADS
 void
 threads_init( gboolean init )
 {
@@ -187,7 +193,7 @@ threads_init( gboolean init )
     pthread_mutex_destroy( &mailbox_lock );
   }
 }
-
+#endif
 
 
 
@@ -211,9 +217,10 @@ main (int argc, char *argv[])
   config_mailboxes_init ();
   mailboxes_init ();
 
+#ifdef BALSA_USE_THREADS
   /* initiate thread mutexs, variables */
   threads_init( TRUE );
-  
+#endif  
 
   /* create all the pretty icons that balsa uses that
    * arn't part of gnome-libs */
@@ -226,7 +233,9 @@ main (int argc, char *argv[])
 
   gtk_main ();
 
+#ifdef BALSA_USE_THREADS
   threads_init( FALSE );
+#endif
 
   return 0;
 }

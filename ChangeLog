@@ -1,3 +1,15 @@
+2001-08-10  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: -with-iconv configure option (Brian Stafford)
+	* src/balsa-index-threading.c: clean-up.
+	* src/balsa-index.c: fix #57659.
+	* src/balsa-message.c: add missing mailto: protocol handler.
+	* src/main.c: move URL parsing code to src/sendmsg-window.c
+	* src/sendmsg-window.[hc]: new location of URL parsing code.
+	* src/main-window.c: set paned size when mblist is not shown
+	(Melanie Thielker).
+	
+
 2001-08-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c:

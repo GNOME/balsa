@@ -1669,6 +1669,65 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     return msg;
 }
 
+/* decode_and_strdup:
+   decodes given URL string up to the delimiter and places the
+   eos pointer in newstr if supplied (eos==NULL if end of string was reached)
+*/
+static gchar*
+decode_and_strdup(const gchar*str, int delim, gchar** newstr)
+{
+    gchar num[3];
+    GString *s = g_string_new(NULL);
+    /* eos points to the character after the last to parse */
+    gchar *eos = strchr(str, delim); 
+
+    if(!eos) eos = (gchar*)str + strlen(str);
+    while(str<eos) {
+	switch(*str) {
+	case '+':
+	    s = g_string_append_c(s, ' ');
+	    str++;
+	    break;
+	case '%':
+	    if(str+2<eos) {
+		strncpy(num, str+1, 2); num[2] = 0;
+		s = g_string_append_c(s, strtol(num,NULL,16));
+	    }
+	    str+=3;
+	    break;
+	default:
+	    s = g_string_append_c(s, *str++);
+	}
+    }
+    if(newstr) *newstr = *eos ? eos+1 : NULL;
+    eos = s->str;
+    g_string_free(s,FALSE);
+    return eos;
+}
+    
+/* process_url:
+   extracts all characters until NUL or question mark; parse later fields
+   of format 'key'='value' with ampersands as separators.
+*/ 
+void 
+sendmsg_window_process_url(const char *url, field_setter func, void *data)
+{
+    gchar * ptr, *to, *key, *val;
+
+    to = decode_and_strdup(url,'?', &ptr);
+    func(data, "to", to);
+    g_free(to);
+    while(ptr) {
+	key = decode_and_strdup(ptr,'=', &ptr);
+	if(ptr) {
+	    val = decode_and_strdup(ptr,'&', &ptr);
+	    func(data, key, val);
+	    g_free(val);
+	}
+	g_free(key);
+    }
+}
+
 /* sendmsg_window_set_field:
    sets given field of the compose window to the specified value.
 */

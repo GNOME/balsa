@@ -72,7 +72,12 @@ extern "C" {
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
 				  const gchar* val);
 
-void add_attachment(GnomeIconList * iconlist, char *filename);
+    void add_attachment(GnomeIconList * iconlist, char *filename);
+
+    typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
+
+    void sendmsg_window_process_url(const char *url, field_setter func,
+				    void *data);
 
 #ifdef __cplusplus
 }

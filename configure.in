@@ -490,11 +490,18 @@ AM_CONDITIONAL(USE_SASL, test x$need_sasl = xyes)
 
 dnl #############################################################
 dnl Link with iconv for charset translation, if not found
-dnl without library.  Needed for libmutt.
+dnl without library.  Needed for libmutt and balsa itself.
 dnl #############################################################
+AC_ARG_WITH(iconv,
+            [  --with-iconv=DIR           Where libiconv is installed ],
+           [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
+                   CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
+                   LDFLAGS="-L${with_iconv}/lib $LDFLAGS"
+            fi])
+
 AC_CHECK_LIB(iconv, iconv_open, , [
 	AC_CHECK_FUNC(iconv_open, , [
-			AC_MSG_ERROR([*** You need iconv for libmutt.])
+			AC_MSG_ERROR([*** You need iconv for balsa.])
 			])
 	])
 

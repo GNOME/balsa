@@ -272,7 +272,6 @@ balsa_index_init(BalsaIndex * bindex)
     titles[6] = _("Size");
 
     bindex->mailbox_node = NULL;
-    bindex->threading_type= balsa_app.threading_type;
     adj = gtk_adjustment_new (0.0, 0.0, 10.0, 1.0, 1.0, 1.0);
     gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (bindex), 
                                          GTK_ADJUSTMENT (adj));
@@ -649,6 +648,11 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     /* do threading */
     balsa_index_set_sort_order(bindex, mbnode->sort_field, 
 			       mbnode->sort_type);
+    /* FIXME: this is an ugly way of doing it:
+       override default mbost threading type with the global balsa
+       default setting
+    */
+    mbnode->threading_type = balsa_app.threading_type;
     balsa_index_set_threading_type(bindex, mbnode->threading_type);
     balsa_index_set_first_new_message(bindex);
 

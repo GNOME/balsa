@@ -49,6 +49,7 @@
 #endif
 
 #include "quote-color.h"
+#include "sendmsg-window.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
@@ -1135,12 +1136,12 @@ typedef enum {
     URL_MAILTO,
     URL_NNTP,
     URL_NEWS
-} url_dest_t;
+} url_proto_t;
 
 typedef struct _message_url_t {
     gint line, start, end;       /* text line and pos in the line */
     gchar *url;                  /* the link */
-    url_dest_t url_dest;         /* which service to call */
+    url_proto_t url_protocol;    /* which service to call (protocol) */
 } message_url_t;
 
 typedef struct _hotarea_t {
@@ -1296,20 +1297,20 @@ gtk_text_insert_with_url(GtkText *text, GdkFont *font, GdkColor *dflt,
 	    url_found->end = url_match.rm_eo + offset;
 	    url_found->url = buf;  /* gets freed later... */
 	    if (tolower(*buf) == 'h')
-		url_found->url_dest = URL_HTTP;
+		url_found->url_protocol = URL_HTTP;
 	    else if (tolower(*buf) == 'f')
-		url_found->url_dest = URL_FTP;
+		url_found->url_protocol = URL_FTP;
 	    else if (tolower(*buf) == 'm')
-		url_found->url_dest = URL_MAILTO;
+		url_found->url_protocol = URL_MAILTO;
 	    else if (tolower(*buf) == 'n') {
 		if (tolower(*(buf + 1)) == 'n')
-		    url_found->url_dest = URL_NNTP;
+		    url_found->url_protocol = URL_NNTP;
 		else if (tolower(*(buf + 1)) == 'e')
-		    url_found->url_dest = URL_NEWS;
+		    url_found->url_protocol = URL_NEWS;
 		else
-		    url_found->url_dest = -1;
+		    url_found->url_protocol = -1;
 	    } else
-		url_found->url_dest = -1;
+		url_found->url_protocol = -1;
 	    *url_list = g_list_append(*url_list, url_found);
 	    
 	    p += url_match.rm_eo;
@@ -1510,6 +1511,41 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
     return FALSE;
 }
 
+static void
+handle_url(const message_url_t* url)
+{
+    gchar *notice;
+    BalsaSendmsg *snd;
+
+    switch (url->url_protocol) {
+    case URL_FTP:
+    case URL_HTTP:
+	notice = g_strdup_printf(_("Calling browser with %s..."),
+				 url->url);
+	gnome_appbar_set_status(balsa_app.appbar, notice);
+	g_free(notice);
+	gnome_url_show(url->url);
+	break;
+//		    case URL_FTP: 
+    case URL_MAILTO:
+	snd = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window),
+				 NULL, SEND_NORMAL);
+	sendmsg_window_process_url(url->url + 7,
+				   sendmsg_window_set_field, snd);
+	break;
+    case URL_NNTP:
+    case URL_NEWS:
+	g_warning(__FUNCTION__ 
+		  ": URL destination code %d for %s not yet implemented...",
+		  url->url_protocol, url->url);
+	break;
+    default:
+	g_warning(__FUNCTION__ 
+		  ": unknown URL protocol code %d",
+		  url->url_protocol);
+	break;
+    }
+}
 /* if the mouse button was released over an url, try to call it */
 static gboolean 
 check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
@@ -1531,33 +1567,8 @@ check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
 
 	    if (hotarea_data->xul <= x && x <= hotarea_data->xlr &&
 		hotarea_data->yul <= y && y <= hotarea_data->ylr) {
-		gchar *notice;
 
-		switch (hotarea_data->url->url_dest)
-		    {
-		    case URL_FTP:
-		    case URL_HTTP:
-			notice = 
-			    g_strdup_printf(_("Calling browser with %s..."),
-					    hotarea_data->url->url);
-			gnome_appbar_set_status(balsa_app.appbar, notice);
-			g_free(notice);
-			gnome_url_show(hotarea_data->url->url);
-			break;
-//		    case URL_FTP: 
-		    case URL_MAILTO:
-		    case URL_NNTP:
-		    case URL_NEWS:
-			g_warning(__FUNCTION__ 
-				  ": URL destination code %d for %s not yet implemented...",
-				  hotarea_data->url->url_dest, hotarea_data->url->url);
-			break;
-		    default:
-			g_warning(__FUNCTION__ 
-				  ": unknown URL destination code %d",
-				  hotarea_data->url->url_dest);
-			break;
-		    }
+		handle_url(hotarea_data->url);
 		break;
 	    }
 	    hotarea_list = g_list_next(hotarea_list);

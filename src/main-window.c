@@ -773,6 +773,11 @@ balsa_window_new()
 				       (view_menu[MENU_VIEW_MAILBOX_LIST_POS].widget),
 				       balsa_app.show_mblist);
 
+    gtk_paned_set_position(GTK_PANED(window->hpaned), 
+			   balsa_app.show_mblist 
+			   ? balsa_app.mblist_width
+			   : 0);
+
     /*PKGW: do it this way, without the usizes. */
     if (balsa_app.previewpane)
  	gtk_paned_set_position(GTK_PANED(window->vpaned),
@@ -1017,7 +1022,8 @@ balsa_window_set_threading_menu(int option)
     balsa_app.threading_type = option;
     /* FIXME: the print below reveals that the threading is reset on
        every message preview change. It means: much too often. */
-    /* printf("Threading set to %d\n", balsa_app.threading_type); */
+    /* printf("balsa_window_set_threading_menu::Threading set to %d\n", 
+       balsa_app.threading_type); */
 }
 
 /* balsa_window_open_mbnode: 

@@ -45,7 +45,7 @@
 
 #define MESSAGE(node) ((LibBalsaMessage *)(GTK_CTREE_ROW(node)->row.data))
 
-static void threading_jwz(BalsaIndex* bindex, int type);
+static void threading_jwz(BalsaIndex* bindex);
 static gboolean is_cyclic_tree(GNode* root, GNode* child);
 static void gen_container(GtkCTree *ctree, 
 			  GtkCTreeNode *node, 
@@ -76,13 +76,12 @@ static void dump(GNode *node, int indent);
 void
 balsa_index_threading(BalsaIndex* bindex)
 {
-    int type=bindex->threading_type;
-    switch (type){
+    switch (bindex->threading_type){
     case BALSA_INDEX_THREADING_SIMPLE:
 	threading_simple(bindex);
 	break;
     case BALSA_INDEX_THREADING_JWZ:
-	threading_jwz(bindex, type);
+	threading_jwz(bindex);
 	break;
     case BALSA_INDEX_THREADING_FLAT:
 	break;
@@ -92,7 +91,7 @@ balsa_index_threading(BalsaIndex* bindex)
 }
 
 static void
-threading_jwz(BalsaIndex* bindex, int type)
+threading_jwz(BalsaIndex* bindex)
 {
     GHashTable *id_table;
     GHashTable *subject_table;

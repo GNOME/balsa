@@ -299,23 +299,26 @@ imap_scan_attach_mailbox(GNode* node, const gchar* fn)
    We do it by remembering url of the root and
    by finding the root again when phase b. is about to start.
 */
-typedef struct imap_scan_item_ {
-    gchar* fn;
-    gboolean scanned, selectable;
-    struct imap_scan_item_* next;
-} imap_scan_item;
 
-typedef struct {
-    imap_scan_item* list;
+typedef struct imap_scan_item_ imap_scan_item;
+struct imap_scan_item_ {
+    gchar *fn;
+    gboolean scanned, selectable;
+};
+
+typedef struct imap_scan_tree_ imap_scan_tree;
+struct imap_scan_tree_ {
+    GSList *list;               /* a list of imap_scan_items */
     char delim;
-} imap_scan_tree;
-static void imap_scan_destroy_tree(imap_scan_tree* tree);
+};
+
+static void imap_scan_destroy_tree(imap_scan_tree * tree);
 
 static void*
 imap_dir_cb_real(void* r)
 {
     GNode* n, *root=(GNode*)r;
-    imap_scan_item *item;
+    GSList *list;
     BalsaMailboxNode*mb = root->data;
     imap_scan_tree imap_tree = { NULL, '.' };
 
@@ -330,13 +333,17 @@ imap_dir_cb_real(void* r)
     balsa_mailbox_nodes_unlock(FALSE);
 
     /* phase b. */
+    imap_tree.list = g_slist_reverse(imap_tree.list);
     balsa_mailbox_nodes_lock(FALSE);
-    for(item=imap_tree.list; item; item = item->next) {
+    for (list = imap_tree.list; list; list = g_slist_next(list)) {
+        imap_scan_item *item = list->data;
+
 	n = imap_scan_create_mbnode(root, item->fn, 
 				    imap_tree.delim, item->scanned);
 	if(item->selectable)
 	    imap_scan_attach_mailbox(n, item->fn);
     }
+    imap_scan_destroy_tree(&imap_tree);
 
     /* register whole tree */
     if(BALSA_MAILBOX_NODE(root->data)->name)
@@ -348,7 +355,6 @@ imap_dir_cb_real(void* r)
     /* FIXME: we should just redo local subtree starting from root, but... */
     balsa_mblist_repopulate(balsa_app.mblist_tree_store);
     balsa_mailbox_nodes_unlock(FALSE);
-    imap_scan_destroy_tree(&imap_tree);
     gnome_appbar_pop(balsa_app.appbar);
     if(balsa_app.debug) printf("%d: Scanning done.\n", (int)time(NULL));
     return NULL;
@@ -1002,24 +1008,29 @@ static void
 add_imap_entry(const char* fn, char delim, gboolean scanned, 
 	       gboolean selectable, void* data)
 {
-    imap_scan_tree *tree = (imap_scan_tree*)data;
-    imap_scan_item* dt = g_new0(imap_scan_item,1);
-    dt->fn   = g_strdup(fn);
-    dt->scanned = scanned;
-    dt->selectable = selectable;
-    dt->next = tree->list;
-    tree->list = dt;
+    imap_scan_tree *tree = (imap_scan_tree *) data;
+    imap_scan_item *item = g_new0(imap_scan_item, 1);
+    item->fn = g_strdup(fn);
+    item->scanned = scanned;
+    item->selectable = selectable;
+
+    tree->list = g_slist_prepend(tree->list, item);
     tree->delim = delim;
 }
+
 static void
-imap_scan_destroy_tree(imap_scan_tree* tree)
+imap_scan_destroy_tree(imap_scan_tree * tree)
 {
-    while(tree->list) {
-	imap_scan_item* t = tree->list;
-	g_free(t->fn);
-	tree->list = t->next;
-	g_free(t);
+    GSList *list;
+
+    for (list = tree->list; list; list = g_slist_next(list)) {
+        imap_scan_item *item = list->data;
+
+        g_free(item->fn);
+        g_free(item);
     }
+
+    g_slist_free(tree->list);
 }
 
 static void

@@ -874,7 +874,7 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 	    ("The signature is valid but the key used to verify the signature has been revoked.");
     case GPG_ERR_BAD_SIGNATURE:
 	return _
-	    ("The signature is invalid (Note: might be caused by gmime bug!).");
+	    ("The signature is invalid.");
     case GPG_ERR_NO_PUBKEY:
 	return
 	    _("The signature could not be verified due to a missing key.");

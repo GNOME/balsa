@@ -2167,7 +2167,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         if (libbalsa_message_body_is_flowed(info->body)) {
             /* Parse, but don't wrap. */
-            ptr = libbalsa_wrap_rfc2646(ptr, G_MAXINT, FALSE, TRUE);
+	    gboolean delsp = libbalsa_message_body_is_delsp(info->body);
+            ptr = libbalsa_wrap_rfc2646(ptr, G_MAXINT, FALSE, TRUE, delsp);
         } else if (bm->wrap_text)
             libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 

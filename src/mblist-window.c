@@ -387,7 +387,10 @@ mblist_close_mailbox(Mailbox* mailbox)
     {
       child = gnome_mdi_find_child (mblw->mdi, mailbox->name);
       if (child)
-	gnome_mdi_remove_child (mblw->mdi, child, TRUE);
+	{
+	  mailbox_watcher_remove(mailbox, BALSA_INDEX(INDEX_CHILD(child)->index)->watcher_id);
+	  gnome_mdi_remove_child (mblw->mdi, child, TRUE);
+	}
     }
 }    
 

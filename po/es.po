@@ -226,48 +226,40 @@ msgid "IMAP server"
 msgstr "Servidor IMAP"
 
 #: src/main-window.c:93
-#, fuzzy
 msgid "_Get new mail"
-msgstr "Bajar Nuevos Mensajes"
+msgstr "_Bajar Nuevos Mensajes"
 
 #: src/main-window.c:98
-#, fuzzy
 msgid "E_xit"
-msgstr "Salir"
+msgstr "_Salir"
 
 #: src/main-window.c:108
-#, fuzzy
 msgid "_New"
-msgstr "Nuevo"
+msgstr "_Nuevo"
 
 #: src/main-window.c:113
-#, fuzzy
 msgid "_Reply"
-msgstr "Responder"
+msgstr "_Responder"
 
 #: src/main-window.c:118
-#, fuzzy
 msgid "Reply to _all"
-msgstr "Responder a todos"
+msgstr "Responder a _todos"
 
 #: src/main-window.c:123
-#, fuzzy
 msgid "_Forward"
-msgstr "Transmitir"
+msgstr "_Transmitir"
 
 #: src/main-window.c:129
-#, fuzzy
 msgid "_Delete"
-msgstr "Borrar"
+msgstr "_Borrar"
 
 #: src/main-window.c:134
-#, fuzzy
 msgid "_Undelete"
-msgstr "Recuperar"
+msgstr "_Recuperar"
 
 #: src/main-window.c:144
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 #: src/main-window.c:154
 msgid "Edit"
@@ -360,9 +352,8 @@ msgid "Delete Mailbox"
 msgstr "Borrar Casilla"
 
 #: src/message-window.c:33 src/sendmsg-window.c:83
-#, fuzzy
 msgid "_Close"
-msgstr "Cerrar"
+msgstr "_Cerrar"
 
 #. identity page
 #: src/pref-manager.c:127
@@ -395,16 +386,14 @@ msgid "Signature:"
 msgstr "Firma:"
 
 #: src/pref-manager.c:396
-#, fuzzy
 msgid "Remote Mailbox Servers"
-msgstr "Servidores de Correo"
+msgstr "Casillas de Correo Remotas"
 
 #: src/pref-manager.c:426
 msgid "Modify"
 msgstr ""
 
 #: src/pref-manager.c:436
-#, fuzzy
 msgid "Local Mail"
 msgstr "Casilla de correo local"
 
@@ -414,9 +403,8 @@ msgstr "Directorio de correo local:"
 
 #. smtp server
 #: src/pref-manager.c:448
-#, fuzzy
 msgid "Sending Mail"
-msgstr "Enviar este mensaje"
+msgstr "Enviando mensaje"
 
 #: src/pref-manager.c:453
 msgid "SMTP Server:"
@@ -464,14 +452,12 @@ msgid "Check Spelling"
 msgstr "Corrector ortográfico"
 
 #: src/sendmsg-window.c:74
-#, fuzzy
 msgid "_Send"
-msgstr "Enviar"
+msgstr "En_viar"
 
 #: src/sendmsg-window.c:78
-#, fuzzy
 msgid "_Attach file..."
-msgstr "Ligar archivo"
+msgstr "_Ligar archivo..."
 
 #: src/sendmsg-window.c:130
 msgid "Remove"

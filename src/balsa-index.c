@@ -1374,6 +1374,7 @@ unselect_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
 {
     BalsaIndex *bindex;
     LibBalsaMessage *message;
+    GList *sel;
 
     bindex = BALSA_INDEX (data);
     message =
@@ -1383,6 +1384,14 @@ unselect_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
 	gtk_signal_emit(GTK_OBJECT(bindex),
 			balsa_index_signals[UNSELECT_MESSAGE],
 			message, NULL);
+
+    if ((sel = GTK_CLIST(widget)->selection) && !g_list_next(sel)) {
+        message =
+            LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data
+                             (GTK_CTREE(widget),
+                              GTK_CTREE_NODE(sel->data)));
+        balsa_index_idle_add(bindex, message);
+    }
 }
 
 

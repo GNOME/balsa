@@ -123,6 +123,7 @@ static void update_msg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static GString *
 quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type);
+static void set_list_post_address(BalsaSendmsg * msg);
 
 /* Standard DnD types */
 enum {
@@ -422,7 +423,7 @@ struct {
 #define LOC_BRAZILIAN_POS 0
     {"pt_BR", "ISO-8859-1", N_("Brazilian")},
 #define LOC_CATALAN_POS   1
-    {"ca_ES", "ISO-8859-1", N_("Catalan")},
+    {"ca_ES", "ISO-8859-15", N_("Catalan")},
 #define LOC_CHINESE_SIMPLIFIED_POS   2
     {"zh_CN.GB2312", "gb2312", N_("Chinese Simplified")},
 #define LOC_CHINESE_TRADITIONAL_POS   3
@@ -430,9 +431,9 @@ struct {
 #define LOC_DANISH_POS    4
     {"da_DK", "ISO-8859-1", N_("Danish")},
 #define LOC_GERMAN_POS    5
-    {"de_DE", "ISO-8859-1", N_("German")},
+    {"de_DE", "ISO-8859-15", N_("German")},
 #define LOC_DUTCH_POS     6
-    {"nl_NL", "ISO-8859-1", N_("Dutch")},
+    {"nl_NL", "ISO-8859-15", N_("Dutch")},
 #define LOC_ENGLISH_POS   7
     /* English -> American English, argh... */
     {"en_US", "ISO-8859-1", N_("English")}, 
@@ -441,13 +442,13 @@ struct {
 #define LOC_FINNISH_POS   9
     {"fi_FI", "ISO-8859-15", N_("Finnish")},
 #define LOC_FRENCH_POS    10
-    {"fr_FR", "ISO-8859-1", N_("French")},
+    {"fr_FR", "ISO-8859-15", N_("French")},
 #define LOC_GREEK_POS     11 
     {"el_GR", "ISO-8859-7", N_("Greek")},
 #define LOC_HUNGARIAN_POS 12
     {"hu_HU", "ISO-8859-2", N_("Hungarian")},
 #define LOC_ITALIAN_POS   13
-    {"it_IT", "ISO-8859-1", N_("Italian")},
+    {"it_IT", "ISO-8859-15", N_("Italian")},
 #define LOC_JAPANESE_POS  14
     {"ja_JP", "euc-jp", N_("Japanese")},
 #define LOC_KOREAN_POS    15
@@ -461,7 +462,7 @@ struct {
 #define LOC_POLISH_POS    19
     {"pl_PL", "ISO-8859-2", N_("Polish")},
 #define LOC_PORTUGESE_POS 20
-    {"pt_PT", "ISO-8859-1", N_("Portugese")},
+    {"pt_PT", "ISO-8859-15", N_("Portugese")},
 #define LOC_ROMANIAN_POS 21
     {"ro_RO", "ISO-8859-2", N_("Romanian")},
 #define LOC_RUSSIAN_ISO_POS   22
@@ -471,7 +472,7 @@ struct {
 #define LOC_SLOVAK_POS    24
     {"sk_SK", "ISO-8859-2", N_("Slovak")},
 #define LOC_SPANISH_POS   25
-    {"es_ES", "ISO-8859-1", N_("Spanish")},
+    {"es_ES", "ISO-8859-15", N_("Spanish")},
 #define LOC_SWEDISH_POS   26
     {"sv_SE", "ISO-8859-1", N_("Swedish")},
 #define LOC_TURKISH_POS   27
@@ -2229,24 +2230,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
 	g_free(tmp);
     } else if ( type == SEND_REPLY_GROUP ) {
-	if ( message->mailbox->mailing_list_address ) {
-	    tmp = libbalsa_address_to_gchar
-		(message->mailbox->mailing_list_address, 0);
-	    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
-	    g_free(tmp);
-	} else {
-	    GList *lst, *p;
-	    gchar **pair;
-	    
-	    lst = libbalsa_message_user_hdrs(message);
-	    for (p = g_list_first(lst); p; p = g_list_next(p)) {
-		pair = p->data;
-		if ( libbalsa_find_word(pair[0], "x-beenthere x-mailing-list to") )
-		    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), pair[1]);
-		g_strfreev(pair);
-	    }
-	    g_list_free(lst);
-	}
+        set_list_post_address(msg);
     }
 
     /* Get the identity from the To: field of the original message */
@@ -3435,4 +3419,84 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
     }
 
     return bsmsg;
+}
+
+/* set_list_post_address:
+ * look for the address for posting messages to a list */
+static void
+set_list_post_address(BalsaSendmsg * msg)
+{
+    LibBalsaMessage *message = msg->orig_message;
+
+    if (message->mailbox->mailing_list_address) {
+        gchar *tmp =
+            libbalsa_address_to_gchar(message->mailbox->
+                                      mailing_list_address, 0);
+        gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
+        g_free(tmp);
+    } else {
+        GList *lst, *p;
+        gchar **pair;
+
+        printf("Looking for list post address:");
+        lst = libbalsa_message_user_hdrs(message);
+        /* RFC 2369: look for "list-post": */
+        for (p = g_list_first(lst); p; p = g_list_next(p)) {
+            pair = p->data;
+            if (libbalsa_find_word(pair[0], "list-post")) {
+                gchar *url = pair[1];
+                printf(" found \"%s:%s\"\n", pair[0], url);
+                if (*url != '<')
+                    /* RFC 2369: the field SHOULD be ignored */
+                    continue;
+                /* RFC 2369: should use the left-most protocol that
+                 * we support */
+                do {
+                    gchar *close = strchr(++url, '>');
+                    if (close)
+                        *close = '\0';
+                    if (g_strncasecmp(url, "mailto:", 7) == 0)
+                        /* we support mailto! */
+                        break;
+                    if (close && *++close
+                        && *(url = g_strchug(close)) == ',')
+                        /* RFC 2369: Any characters following an
+                         * angle bracket enclosed URL SHOULD be
+                         * ignored, unless a comma is the first
+                         * non-whitespace/comment character after
+                         * the closing angle bracket. */
+                        url = strchr(url, '<');
+                    else
+                        url = NULL;
+                } while (url);
+
+                if (url) {
+                    printf("Address: \"%s\"\n", url + 7);
+                    sendmsg_window_process_url(url + 7,
+                                               sendmsg_window_set_field,
+                                               msg);
+                    break;
+                }
+            }
+        }
+
+        if (!p) {
+            /* we didn't find "list-post", so try some nonstandard
+             * alternatives: */
+            printf(" no list-post, ");
+            for (p = g_list_first(lst); p; p = g_list_next(p)) {
+                pair = p->data;
+                if (libbalsa_find_word(pair[0],
+                                       "x-beenthere x-mailing-list")) {
+                    printf(" found \"%s:%s\"\n", pair[0], pair[1]);
+                    gtk_entry_set_text(GTK_ENTRY(msg->to[1]), pair[1]);
+                    break;
+                }
+            }
+            if (!p)
+                printf(" no useful x-* headers either!\n");
+        }
+        g_list_foreach(lst, (GFunc) g_strfreev, NULL);
+        g_list_free(lst);
+    }
 }

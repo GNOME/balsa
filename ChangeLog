@@ -1,3 +1,10 @@
+2001-11-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: update browsed message on narrowing the
+	selection in the index.
+	* src/sendmsg-window.c: update default charset for Euro (Albrecht D).
+	Improve considerably reply to group (Peter B).
+
 2001-11-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	After two days of struggle, get the VFS linking right(?).

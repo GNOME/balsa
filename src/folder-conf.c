@@ -786,7 +786,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     if (mn)
         sdd->mcv = mailbox_conf_view_new(mn->mailbox,
                                          GTK_WINDOW(sdd->dialog),
-                                         table, 2);
+                                         table, 3);
 
     gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
 

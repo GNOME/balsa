@@ -63,11 +63,12 @@ static GtkTargetEntry dnd_mb_target[] =
 
 
 /* callbacks */
+void mblist_open_mailbox (Mailbox * mailbox);
 void mblist_close_mailbox (Mailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
 static gint mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data);
 
-static GtkWidget *mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox);
+static GtkWidget *mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox);
 
 static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * context, gint x, gint y, GtkSelectionData * selection_data, guint info, guint32 time);
 static gboolean mblist_drag_motion (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
@@ -221,6 +222,44 @@ mblist_close_cb (GtkWidget * widget, gpointer data)
   mblist_close_mailbox (mailbox);
 }
 
+
+
+void
+mblist_open_mailbox (Mailbox * mailbox)
+{
+  IndexChild *index_child;
+
+  if (!mblw)
+    return;
+    
+  index_child = index_child_new (mblw->mdi, mailbox);
+  if (index_child)
+    {
+      gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
+      gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
+    }
+  
+  main_window_set_cursor (-1);
+  
+  if (!strcmp (mailbox->name, "Inbox") ||
+      !strcmp (mailbox->name, "Outbox") ||
+      !strcmp (mailbox->name, "Trash"))
+    return ;
+  /*
+    gtk_ctree_set_node_info (GTK_CTREE (bmbl),
+    row,
+    mailbox->name, 5,
+    NULL, NULL,
+    balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
+    balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
+    FALSE, TRUE);
+    
+    gtk_ctree_node_set_row_style (GTK_CTREE (bmbl), row, NULL);*/
+  
+  
+}
+
+
 void
 mblist_close_mailbox (Mailbox * mailbox)
 {
@@ -251,7 +290,7 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
   gint row, column;
   gint on_mailbox;
   Mailbox *mailbox;
-  IndexChild *index_child;
+  GtkCTreeNode *node;
 
   bmbl = BALSA_MBLIST (widget);
   clist = GTK_CLIST (widget);
@@ -261,39 +300,20 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
   if (on_mailbox)
     {
       mailbox = gtk_clist_get_row_data (clist, row);
-      
+      node = gtk_ctree_node_nth( ctree, row );
+      if (node) gtk_ctree_select(ctree, node);
+
       if (event->button == 1 && event->type == GDK_2BUTTON_PRESS)
 	
 	{
 	  /* double click with button left */
-	  index_child = index_child_new (mblw->mdi, mailbox);
-	  if (index_child)
-	    {
-	      gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
-	      gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
-	    }
-	  
-	  main_window_set_cursor (-1);
-	  
-	  if (!strcmp (mailbox->name, "Inbox") ||
-	      !strcmp (mailbox->name, "Outbox") ||
-	      !strcmp (mailbox->name, "Trash"))
-	    return TRUE;
-	  /*
-	  gtk_ctree_set_node_info (GTK_CTREE (bmbl),
-				   row,
-				   mailbox->name, 5,
-				   NULL, NULL,
-				   balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
-				   balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
-				   FALSE, TRUE);
-	  
-				   gtk_ctree_node_set_row_style (GTK_CTREE (bmbl), row, NULL);*/
-	  return TRUE;
+	  mblist_open_mailbox (mailbox);
 	}
+      
       if (event && event->button == 3)
 	{
-	  gtk_menu_popup (GTK_MENU (mblist_create_menu (GTK_CTREE (bmbl), mailbox)), NULL, NULL, NULL, NULL, event->button, event->time);
+	  gtk_menu_popup (GTK_MENU (mblist_create_context_menu (GTK_CTREE (bmbl), mailbox)), 
+			  NULL, NULL, NULL, NULL, event->button, event->time);
 	}
       
     } 
@@ -303,27 +323,34 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
       if (event->type == GDK_BUTTON_PRESS && event->button == 3)
 	{
 	  /* simple click on right button */
-	  gtk_menu_popup (GTK_MENU (mblist_create_menu (GTK_CTREE (bmbl), NULL)), 
+	  gtk_menu_popup (GTK_MENU (mblist_create_context_menu (GTK_CTREE (bmbl), NULL)), 
 			  NULL, NULL, NULL, NULL, event->button, event->time);
 	  return TRUE;
 	}
       
       return FALSE;
     }
-  
+
+  return FALSE; /* never reached but this avoid compiler warning */
 }
 
 
 static void
 mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event)
 {
-  IndexChild *index_child;
+  
   
   if (!mblw)
     return;
 
 
   
+}
+
+static void
+mb_open_cb (GtkWidget * widget, Mailbox * mailbox)
+{
+  mblist_open_mailbox (mailbox);
 }
 
 static void
@@ -348,20 +375,30 @@ mb_del_cb (GtkWidget * widget, Mailbox * mailbox)
 
 
 static GtkWidget *
-mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox)
+mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox)
 {
   GtkWidget *menu, *menuitem;
 
   menu = gtk_menu_new ();
-      menuitem = gtk_menu_item_new_with_label (_ ("Add Mailbox"));
+
+  if (mailbox)
+    {
+      menuitem = gtk_menu_item_new_with_label (_ ("Open Mailbox"));
       gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			  GTK_SIGNAL_FUNC (mb_add_cb), mailbox);
+			  GTK_SIGNAL_FUNC (mb_open_cb), mailbox);
       gtk_menu_append (GTK_MENU (menu), menuitem);
       gtk_widget_show (menuitem);
-      
-   if (mailbox)
+    }
+  
+  menuitem = gtk_menu_item_new_with_label (_ ("Add New Mailbox"));
+  gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+		      GTK_SIGNAL_FUNC (mb_add_cb), mailbox);
+  gtk_menu_append (GTK_MENU (menu), menuitem);
+  gtk_widget_show (menuitem);
+  
+  if (mailbox)
     {
-      menuitem = gtk_menu_item_new_with_label (_ ("Edit Mailbox"));
+      menuitem = gtk_menu_item_new_with_label (_ ("Edit Mailbox Properties"));
       gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 			  GTK_SIGNAL_FUNC (mb_conf_cb), mailbox);
       gtk_menu_append (GTK_MENU (menu), menuitem);
@@ -382,7 +419,7 @@ void
 mblist_menu_add_cb (GtkWidget * widget, gpointer data)
 {
   Mailbox *mailbox = mblist_get_selected_mailbox ();
-
+  
   mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
 }
 

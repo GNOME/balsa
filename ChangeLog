@@ -1,5 +1,10 @@
 1999-01-14  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
+	* src/mblist-window.c (mblist_create_context_menu): 
+	s/mblist_create_menu/mblist_create_context_menu
+	(mblist_create_context_menu): new context menu item (open mailbox)
+	(mb_open_cb): corresponding callback.
+	(mblist_open_mailbox): new func. Use this to open a mailbox.
 	
 	* src/mblist-window.c (mblist_button_press_cb): 
 	removed the mblist_clicked_cb function and replaced it by this new one.

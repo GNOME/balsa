@@ -33,145 +33,82 @@ typedef enum
     MAILBOX_MH,			/* very poor */
     MAILBOX_POP3,
     MAILBOX_IMAP,
-    MAILBOX_NNTP
+    MAILBOX_NNTP,
+
+    MAILBOX_UNKNOWN
   }
 MailboxType;
 
 
 typedef struct _Mailbox Mailbox;
 struct _Mailbox
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-  };
+{
+  MailboxType type;
+  gchar *name;
+  MAILSTREAM *stream;
+};
 
-typedef struct _MailboxMBX MailboxMBX;
-struct _MailboxMBX
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *path;
-  };
-
-typedef struct _MailboxMTX MailboxMTX;
-struct _MailboxMTX
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *path;
-  };
-
-typedef struct _MailboxTENEX MailboxTENEX;
-struct _MailboxTENEX
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *path;
-  };
-
-typedef struct _MailboxMBox MailboxMBox;
-struct _MailboxMBox
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *path;
-  };
-
-typedef struct _MailboxMMDF MailboxMMDF;
-struct _MailboxMMDF
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *path;
-  };
-
-typedef struct _MailboxUNIX MailboxUNIX;
-struct _MailboxUNIX
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *path;
-  };
-
-typedef struct _MailboxMH MailboxMH;
-struct _MailboxMH
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *path;
-  };
+typedef struct _MailboxLocal MailboxLocal;
+struct _MailboxLocal
+{
+  MailboxType type;
+  gchar *name;
+  MAILSTREAM *stream;
+  
+  gchar *path;
+};
 
 typedef struct _MailboxPOP3 MailboxPOP3;
 struct _MailboxPOP3
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *user;
-    gchar *passwd;
-    gchar *server;
-  };
+{
+  MailboxType type;
+  gchar *name;
+  MAILSTREAM *stream;
+  
+  gchar *user;
+  gchar *passwd;
+  gchar *server;
+};
 
 typedef struct _MailboxIMAP MailboxIMAP;
 struct _MailboxIMAP
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *user;
-    gchar *passwd;
-    gchar *server;
-    gchar *path;
-  };
+{
+  MailboxType type;
+  gchar *name;
+  MAILSTREAM *stream;
+  
+  gchar *user;
+  gchar *passwd;
+  gchar *server;
+  gchar *path;
+};
 
 typedef struct _MailboxNNTP MailboxNNTP;
 struct _MailboxNNTP
-  {
-    MailboxType type;
-    gchar *name;
-    MAILSTREAM *stream;
-
-    gchar *user;
-    gchar *passwd;
-    gchar *server;
-    gchar *newsgroup;
-  };
+{
+  MailboxType type;
+  gchar *name;
+  MAILSTREAM *stream;
+  
+  gchar *user;
+  gchar *passwd;
+  gchar *server;
+  gchar *newsgroup;
+};
 
 typedef union _MailboxUnion MailboxUnion;
 union _MailboxUnion
-  {
-    MailboxType type;
-    Mailbox mailbox;
-    MailboxMBX mbx;
-    MailboxMTX mtx;
-    MailboxTENEX tenex;
-    MailboxMBox mbox;
-    MailboxMMDF mmdf;
-    MailboxUNIX unixmb;
-    MailboxMH mh;
-    MailboxPOP3 pop3;
-    MailboxIMAP imap;
-    MailboxNNTP nntp;
-  };
+{
+  MailboxType type;
+  Mailbox mailbox;
+  MailboxLocal local;
+  MailboxPOP3 pop3;
+  MailboxIMAP imap;
+  MailboxNNTP nntp;
+};
 
 
+MailboxType mailbox_type_from_description (gchar * description);
 gchar * mailbox_type_description (MailboxType type);
 
 Mailbox *mailbox_new (MailboxType type);

@@ -57,6 +57,7 @@ add_mailbox_config (gchar * name, gchar * path, gint type)
   g_string_free (gstring, 1);
 }
 
+
 void
 delete_mailbox_config (gchar * name)
 {
@@ -90,6 +91,7 @@ delete_mailbox_config (gchar * name)
   g_string_free (gstring, 1);
 }
 
+
 void
 change_mailbox_config (gchar * name, gchar * setting, gchar * value)
 {
@@ -107,227 +109,150 @@ change_mailbox_config (gchar * name, gchar * setting, gchar * value)
   g_string_free (gstring, 1);
 }
 
+
 gint
 load_mailboxes (gchar * name)
 {
-  MailboxMBX *mbx;
-  MailboxMTX *mtx;
-  MailboxTENEX *tenex;
-  MailboxMBox *mbox;
-  MailboxMMDF *mmdf;
-  MailboxUNIX *unixmb;
-  MailboxMH *mh;
-
+  MailboxType mailbox_type;
+  MailboxLocal *local;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
-
   gint i = 0;
   gint type;
-
   GString *gstring;
-
   DRIVER *drv = NIL;
-
   gstring = g_string_new (NULL);
+
 
   g_string_truncate (gstring, 0);
   g_string_sprintf (gstring, "/balsa/%s", name);
 
   if (!gnome_config_has_section (gstring->str))
     return FALSE;
-  else
+
+
+  g_string_truncate (gstring, 0);
+  g_string_sprintf (gstring, "/balsa/%s/", name);
+  gnome_config_pop_prefix ();
+  gnome_config_push_prefix (gstring->str);
+  type = gnome_config_get_int ("Type=0");
+  
+
+  switch (type)
     {
-      g_string_truncate (gstring, 0);
-      g_string_sprintf (gstring, "/balsa/%s/", name);
-      gnome_config_pop_prefix ();
-      gnome_config_push_prefix (gstring->str);
-      type = gnome_config_get_int ("Type=0");
 
-      switch (type)
+    /* Local mailbox */
+    case 0:
+      
+      drv = NIL;
+      
+      if (drv = mail_valid (NIL, g_strdup (name), "error, cannot load. darn"))
 	{
-	case 0:		/* Local mailbox */
+	  if (balsa_app.debug)
+	    printf ("%s - %s\n", name, drv->name);
 
-	  drv = NIL;
-
-	  if (drv = mail_valid (NIL, g_strdup (name), "error, cannot load. darn"))
+	  mailbox_type = mailbox_type_from_description (drv->name);
+	  
+	  if (mailbox_type != MAILBOX_UNKNOWN)
 	    {
-	      if (balsa_app.debug)
-		printf ("%s - %s\n", name, drv->name);
-	      if (!strcmp (drv->name, "mbx"))
-		{
-		  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-		  mbx->name = g_strdup (name);
-		  mbx->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
-		}
-	      else if (!strcmp (drv->name, "mtx"))
-		{
-		  mtx = (MailboxMTX *) mailbox_new (MAILBOX_MTX);
-		  mtx->name = g_strdup (name);
-		  mtx->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mtx);
-		}
-	      else if (!strcmp (drv->name, "tenex"))
-		{
-		  tenex = (MailboxTENEX *) mailbox_new (MAILBOX_TENEX);
-		  tenex->name = g_strdup (name);
-		  tenex->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, tenex);
-		}
-	      else if (!strcmp (drv->name, "mbox"))
-		{
-		  mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-		  mbox->name = g_strdup (name);
-		  mbox->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-		}
-	      else if (!strcmp (drv->name, "mmdf"))
-		{
-		  mmdf = (MailboxMMDF *) mailbox_new (MAILBOX_MMDF);
-		  mmdf->name = g_strdup (name);
-		  mmdf->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mmdf);
-		}
-	      else if (!strcmp (drv->name, "unix"))
-		{
-		  unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
-		  unixmb->name = g_strdup (name);
-		  unixmb->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
-		}
-	      else if (!strcmp (drv->name, "mh"))
-		{
-		  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-		  mh->name = g_strdup (name);
-		  mh->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
-		}
+	      local = (MailboxLocal *) mailbox_new (mailbox_type);
+	      local->name = g_strdup (name);
+	      local->path = gnome_config_get_string ("Path");
+	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, local);
 	    }
-	  break;
-
-	case 1:		/*  POP3  */
-	  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
-	  pop3->name = g_strdup (name);
-	  pop3->user = gnome_config_get_string ("username");
-	  pop3->passwd = gnome_config_get_string ("password");
-	  pop3->server = gnome_config_get_string ("server");
-	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
-	  break;
-	case 2:		/*  IMAP  */
-	  imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
-	  imap->name = g_strdup (name);
-	  imap->user = gnome_config_get_string ("username");
-	  imap->passwd = gnome_config_get_string ("password");
-	  imap->server = gnome_config_get_string ("server");
-	  imap->path = gnome_config_get_string ("Path");
-	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
-	  break;
-	case 3:		/*  NNTP  */
-	  nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
-	  nntp->name = g_strdup (name);
-	  nntp->user = gnome_config_get_string ("username");
-	  nntp->passwd = gnome_config_get_string ("password");
-	  nntp->server = gnome_config_get_string ("server");
-	  nntp->newsgroup = gnome_config_get_string ("newsgroup");
-	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
-          break;
-
-/* old */
-	case 7:
-	  pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
-	  pop3->name = g_strdup (name);
-	  pop3->user = gnome_config_get_string ("username");
-	  pop3->passwd = gnome_config_get_string ("password");
-	  pop3->server = gnome_config_get_string ("server");
-	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
-	  gnome_config_set_int ("Type", 1);
-	  break;
-	case 8:
-	  imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
-	  imap->name = g_strdup (name);
-	  imap->user = gnome_config_get_string ("username");
-	  imap->passwd = gnome_config_get_string ("password");
-	  imap->server = gnome_config_get_string ("server");
-	  imap->path = gnome_config_get_string ("Path");
-	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
-	  gnome_config_set_int ("Type", 2);
-	  break;
-	case 9:
-	  nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
-	  nntp->name = g_strdup (name);
-	  nntp->user = gnome_config_get_string ("username");
-	  nntp->passwd = gnome_config_get_string ("password");
-	  nntp->server = gnome_config_get_string ("server");
-	  nntp->newsgroup = gnome_config_get_string ("newsgroup");
-	  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
-	  gnome_config_set_int ("Type", 3);
-	  break;
-
-
-	default:
-	  drv = NIL;
-
-	  if (drv = mail_valid (NIL, g_strdup (name), "error, cannot load. darn"))
-	    {
-	      if (balsa_app.debug)
-		printf ("%s - %s\n", name, drv->name);
-	      if (!strcmp (drv->name, "mbx"))
-		{
-		  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-		  mbx->name = g_strdup (name);
-		  mbx->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
-		}
-	      else if (!strcmp (drv->name, "mtx"))
-		{
-		  mtx = (MailboxMTX *) mailbox_new (MAILBOX_MTX);
-		  mtx->name = g_strdup (name);
-		  mtx->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mtx);
-		}
-	      else if (!strcmp (drv->name, "tenex"))
-		{
-		  tenex = (MailboxTENEX *) mailbox_new (MAILBOX_TENEX);
-		  tenex->name = g_strdup (name);
-		  tenex->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, tenex);
-		}
-	      else if (!strcmp (drv->name, "mbox"))
-		{
-		  mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-		  mbox->name = g_strdup (name);
-		  mbox->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-		}
-	      else if (!strcmp (drv->name, "mmdf"))
-		{
-		  mmdf = (MailboxMMDF *) mailbox_new (MAILBOX_MMDF);
-		  mmdf->name = g_strdup (name);
-		  mmdf->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mmdf);
-		}
-	      else if (!strcmp (drv->name, "unix"))
-		{
-		  unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
-		  unixmb->name = g_strdup (name);
-		  unixmb->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
-		}
-	      else if (!strcmp (drv->name, "mh"))
-		{
-		  mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-		  mh->name = g_strdup (name);
-		  mh->path = gnome_config_get_string ("Path");
-		  balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
-		}
-	    }
-	  gnome_config_set_int ("Type", 0);
-	  break;
-
 	}
-      gnome_config_pop_prefix ();
+      break;
+ 
+    /*  POP3  */
+    case 1:	
+      pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
+      pop3->name = g_strdup (name);
+      pop3->user = gnome_config_get_string ("username");
+      pop3->passwd = gnome_config_get_string ("password");
+      pop3->server = gnome_config_get_string ("server");
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
+      break;
+
+    /*  IMAP  */
+    case 2:
+      imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
+      imap->name = g_strdup (name);
+      imap->user = gnome_config_get_string ("username");
+      imap->passwd = gnome_config_get_string ("password");
+      imap->server = gnome_config_get_string ("server");
+      imap->path = gnome_config_get_string ("Path");
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
+      break;
+
+    /*  NNTP  */
+    case 3:
+      nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
+      nntp->name = g_strdup (name);
+      nntp->user = gnome_config_get_string ("username");
+      nntp->passwd = gnome_config_get_string ("password");
+      nntp->server = gnome_config_get_string ("server");
+      nntp->newsgroup = gnome_config_get_string ("newsgroup");
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
+      break;
+      
+    /* old */
+    case 7:
+      pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
+      pop3->name = g_strdup (name);
+      pop3->user = gnome_config_get_string ("username");
+      pop3->passwd = gnome_config_get_string ("password");
+      pop3->server = gnome_config_get_string ("server");
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
+      gnome_config_set_int ("Type", 1);
+      break;
+    case 8:
+      imap = (MailboxIMAP *) mailbox_new (MAILBOX_IMAP);
+      imap->name = g_strdup (name);
+      imap->user = gnome_config_get_string ("username");
+      imap->passwd = gnome_config_get_string ("password");
+      imap->server = gnome_config_get_string ("server");
+      imap->path = gnome_config_get_string ("Path");
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, imap);
+      gnome_config_set_int ("Type", 2);
+      break;
+    case 9:
+      nntp = (MailboxNNTP *) mailbox_new (MAILBOX_NNTP);
+      nntp->name = g_strdup (name);
+      nntp->user = gnome_config_get_string ("username");
+      nntp->passwd = gnome_config_get_string ("password");
+      nntp->server = gnome_config_get_string ("server");
+      nntp->newsgroup = gnome_config_get_string ("newsgroup");
+      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, nntp);
+      gnome_config_set_int ("Type", 3);
+      break;
+      
+      
+    default:
+      drv = NIL;
+      
+      if (drv = mail_valid (NIL, g_strdup (name), "error, cannot load. darn"))
+	{
+	  if (balsa_app.debug)
+	    printf ("%s - %s\n", name, drv->name);
+
+	  mailbox_type = mailbox_type_from_description (drv->name);
+
+	  if (mailbox_type != MAILBOX_UNKNOWN)
+	    {
+	      local = (MailboxLocal *) mailbox_new (MAILBOX_MH);
+	      local->name = g_strdup (name);
+	      local->path = gnome_config_get_string ("Path");
+	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, local);
+	    }
+	}
+
+      gnome_config_set_int ("Type", 0);
+      break;      
     }
+
+
+  gnome_config_pop_prefix ();
   gnome_config_pop_prefix ();
   gnome_config_sync ();
   g_string_free (gstring, 1);

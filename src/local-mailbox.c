@@ -39,88 +39,47 @@ load_local_mailboxes ()
   struct stat st;
   char filename[PATH_MAX + 1];
   DRIVER *drv = NIL;
-
-  MailboxMBX *mbx;
-  MailboxMTX *mtx;
-  MailboxTENEX *tenex;
-  MailboxMBox *mbox;
-  MailboxMMDF *mmdf;
-  MailboxUNIX *unixmb;
-  MailboxMH *mh;
-
+  MailboxType mailbox_type;
+  MailboxLocal *local;
   gint i = 0;
 
 
-  if (dp = opendir (balsa_app.local_mail_directory))
+  dp = opendir (balsa_app.local_mail_directory);
+  if (!dp)
+    return;
+
+
+  while ((d = readdir (dp)) != NULL)
     {
-      while ((d = readdir (dp)) != NULL)
+      sprintf (filename, "%s/%s", balsa_app.local_mail_directory, d->d_name);
+      drv = NIL;
+      
+      if (lstat (filename, &st) < 0)
+	continue;
+ 
+      if (!S_ISREG (st.st_mode))
+	continue;
+          
+      if (drv = mail_valid (NIL, g_strdup (filename), "error, cannot load. darn"))
 	{
-	  sprintf (filename, "%s/%s", balsa_app.local_mail_directory, d->d_name);
-	  drv = NIL;
-
-	  if (lstat (filename, &st) < 0)
-	    continue;
-
-	  if (S_ISREG (st.st_mode))
+	  if (balsa_app.debug)
+	    g_print ("%s - %s\n", d->d_name, drv->name);
+	  
+	  /*
+	   * create and add the mailbox to the mailbox list
+	   * XXX: does this need to do more cheking???
+	   */
+	  mailbox_type = mailbox_type_from_description (drv->name);
+	  
+	  if (mailbox_type != MAILBOX_UNKNOWN)
 	    {
-	      if (drv = mail_valid (NIL, g_strdup (filename), "error, cannot load. darn"))
-		{
-		  if (balsa_app.debug)
-		    printf ("%s - %s\n", d->d_name, drv->name);
+	      local = (MailboxLocal *) mailbox_new (mailbox_type);
+	      local->name = g_strdup (d->d_name);
+	      local->path = g_strdup (filename);
+	      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, local);
 
-		  if (!strcmp (drv->name, "mbx"))
-		    {
-		      mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
-		      mbx->name = g_strdup (d->d_name);
-		      mbx->path = g_strdup (filename);
-		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbx);
-		    }
-		  else if (!strcmp (drv->name, "mtx"))
-		    {
-		      mtx = (MailboxMTX *) mailbox_new (MAILBOX_MTX);
-		      mtx->name = g_strdup (d->d_name);
-		      mtx->path = g_strdup (filename);
-		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mtx);
-		    }
-
-		  else if (!strcmp (drv->name, "tenex"))
-		    {
-		      tenex = (MailboxTENEX *) mailbox_new (MAILBOX_TENEX);
-		      tenex->name = g_strdup (d->d_name);
-		      tenex->path = g_strdup (filename);
-		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, tenex);
-		    }
-		  else if (!strcmp (drv->name, "mbox"))
-		    {
-		      mbox = (MailboxMBox *) mailbox_new (MAILBOX_MBOX);
-		      mbox->name = g_strdup (d->d_name);
-		      mbox->path = g_strdup (filename);
-		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mbox);
-		    }
-		  else if (!strcmp (drv->name, "mmdf"))
-		    {
-		      mmdf = (MailboxMMDF *) mailbox_new (MAILBOX_MMDF);
-		      mmdf->name = g_strdup (d->d_name);
-		      mmdf->path = g_strdup (filename);
-		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mmdf);
-		    }
-		  else if (!strcmp (drv->name, "unix"))
-		    {
-		      unixmb = (MailboxUNIX *) mailbox_new (MAILBOX_UNIX);
-		      unixmb->name = g_strdup (d->d_name);
-		      unixmb->path = g_strdup (filename);
-		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, unixmb);
-		    }
-		  else if (!strcmp (drv->name, "mh"))
-		    {
-		      mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
-		      mh->name = g_strdup (d->d_name);
-		      mh->path = g_strdup (filename);
-		      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mh);
-		    }
-
-		  i++;
-		}
+	      if (balsa_app.debug)
+		g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (local->type));
 	    }
 	}
     }

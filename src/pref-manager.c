@@ -431,7 +431,7 @@ create_view_page ()
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
   gtk_widget_show (vbox);
 
-/* Toolbars */
+  /* Toolbars */
   frame = gtk_frame_new ("Toolbars");
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
   gtk_widget_show (frame);

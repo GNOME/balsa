@@ -22,6 +22,44 @@
 #include "balsa-app.h"
 
 
+MailboxType
+mailbox_type_from_description (gchar * description)
+{
+  if (!strcmp (description, "mbx"))
+    return MAILBOX_MBX;
+
+  else if (!strcmp (description, "mtx"))
+    return MAILBOX_MTX;
+
+  else if (!strcmp (description, "tenex"))
+    return MAILBOX_TENEX;
+
+  else if (!strcmp (description, "mbox"))
+    return MAILBOX_MBOX;
+
+  else if (!strcmp (description, "mmdf"))
+    return MAILBOX_MMDF;
+
+  else if (!strcmp (description, "unix"))
+    return MAILBOX_UNIX;
+
+  else if (!strcmp (description, "mh"))
+    return MAILBOX_MH;
+
+  else if (!strcmp (description, "pop3"))
+    return MAILBOX_POP3;
+
+  else if (!strcmp (description, "imap"))
+    return MAILBOX_IMAP;
+
+  else if (!strcmp (description, "nntp"))
+    return MAILBOX_NNTP;
+
+  /* if no match */
+  return MAILBOX_UNKNOWN;
+}
+
+
 gchar *
 mailbox_type_description (MailboxType type)
 {
@@ -40,11 +78,11 @@ mailbox_type_description (MailboxType type)
       break;
 
     case MAILBOX_MMDF:
-      return "MMDF";
+      return "mmdf";
       break;
 
     case MAILBOX_UNIX:
-      return "UNIX";
+      return "unix";
       break;
 
     case MAILBOX_MBOX:
@@ -56,15 +94,15 @@ mailbox_type_description (MailboxType type)
       break;
 
     case MAILBOX_POP3:
-      return "POP3";
+      return "pop3";
       break;
 
     case MAILBOX_IMAP:
-      return "IMAP";
+      return "imap";
       break;
 
     case MAILBOX_NNTP:
-      return "NNTP";
+      return "nntp";
       break;
 
     default:
@@ -77,13 +115,7 @@ Mailbox *
 mailbox_new (MailboxType type)
 {
   Mailbox *mailbox;
-  MailboxMBX *mbx;
-  MailboxMTX *mtx;
-  MailboxTENEX *tenex;
-  MailboxMBox *mbox;
-  MailboxMMDF *mmdf;
-  MailboxUNIX *mbunix;
-  MailboxMH *mh;
+  MailboxLocal *local;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
@@ -93,59 +125,17 @@ mailbox_new (MailboxType type)
   switch (type)
     {
     case MAILBOX_MBX:
-      mbx = (MailboxMBX *) mailbox;
-      mbx->type = MAILBOX_MBX;
-      mbx->name = NULL;
-      mbx->stream = NIL;
-      mbx->path = NULL;
-      break;
-
     case MAILBOX_MTX:
-      mtx = (MailboxMTX *) mailbox;
-      mtx->type = MAILBOX_MTX;
-      mtx->name = NULL;
-      mtx->stream = NIL;
-      mtx->path = NULL;
-      break;
-
     case MAILBOX_TENEX:
-      tenex = (MailboxTENEX *) mailbox;
-      tenex->type = MAILBOX_TENEX;
-      tenex->name = NULL;
-      tenex->stream = NIL;
-      tenex->path = NULL;
-      break;
-
     case MAILBOX_MBOX:
-      mbox = (MailboxMBox *) mailbox;
-      mbox->type = MAILBOX_MBOX;
-      mbox->name = NULL;
-      mbox->stream = NIL;
-      mbox->path = NULL;
-      break;
-
     case MAILBOX_MMDF:
-      mmdf = (MailboxMMDF *) mailbox;
-      mmdf->type = MAILBOX_MMDF;
-      mmdf->name = NULL;
-      mmdf->stream = NIL;
-      mmdf->path = NULL;
-      break;
-
     case MAILBOX_UNIX:
-      mbunix = (MailboxUNIX *) mailbox;
-      mbunix->type = MAILBOX_UNIX;
-      mbunix->name = NULL;
-      mbunix->stream = NIL;
-      mbunix->path = NULL;
-      break;
-
     case MAILBOX_MH:
-      mh = (MailboxMH *) mailbox;
-      mh->type = MAILBOX_MH;
-      mh->name = NULL;
-      mh->stream = NIL;
-      mh->path = NULL;
+      local = (MailboxLocal *) mailbox;
+      local->type = type;
+      local->name = NULL;
+      local->stream = NIL;
+      local->path = NULL;
       break;
 
     case MAILBOX_POP3:
@@ -188,14 +178,7 @@ mailbox_new (MailboxType type)
 void
 mailbox_free (Mailbox * mailbox)
 {
-  MailboxMBX *mbx;
-  MailboxMTX *mtx;
-  MailboxTENEX *tenex;
-  MailboxMBox *mbox;
-  MailboxMMDF *mmdf;
-  MailboxUNIX *mbunix;
-  MailboxMH *mh;
-
+  MailboxLocal *local;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
@@ -209,84 +192,41 @@ mailbox_free (Mailbox * mailbox)
   if (mailbox->name)
     g_free (mailbox->name);
 
+
   switch (mailbox->type)
     {
     case MAILBOX_MBX:
-      mbx = (MailboxMBX *) mailbox;
-      if (mbx->path)
-	g_free (mbx->path);
-      break;
-
     case MAILBOX_MTX:
-      mtx = (MailboxMTX *) mailbox;
-      if (mtx->path)
-	g_free (mtx->path);
-      break;
-
     case MAILBOX_TENEX:
-      tenex = (MailboxTENEX *) mailbox;
-      if (tenex->path)
-	g_free (tenex->path);
-      break;
-
     case MAILBOX_MBOX:
-      mbox = (MailboxMBox *) mailbox;
-      if (mbox->path)
-	g_free (mbox->path);
-      break;
-
     case MAILBOX_MMDF:
-      mmdf = (MailboxMMDF *) mailbox;
-      if (mmdf->path)
-	g_free (mmdf->path);
-      break;
-
     case MAILBOX_UNIX:
-      mbunix = (MailboxUNIX *) mailbox;
-      if (mbunix->path)
-	g_free (mbunix->path);
-      break;
-
     case MAILBOX_MH:
-      mh = (MailboxMH *) mailbox;
-      if (mh->path)
-	g_free (mh->path);
+      local = (MailboxLocal *) mailbox;
+      g_free (local->path);
       break;
 
     case MAILBOX_POP3:
       pop3 = (MailboxPOP3 *) mailbox;
-      if (pop3->user)
-	g_free (pop3->user);
-
-      if (pop3->passwd)
-	g_free (pop3->passwd);
-
-      if (pop3->server)
-	g_free (pop3->server);
+      g_free (pop3->user);
+      g_free (pop3->passwd);
+      g_free (pop3->server);
       break;
 
     case MAILBOX_IMAP:
       imap = (MailboxIMAP *) mailbox;
-      if (imap->user)
-	g_free (imap->user);
-
-      if (imap->passwd)
-	g_free (imap->passwd);
-
-      if (imap->server)
-	g_free (imap->server);
+      g_free (imap->user);
+      g_free (imap->passwd);
+      g_free (imap->server);
+      g_free (imap->path);
       break;
 
     case MAILBOX_NNTP:
       nntp = (MailboxNNTP *) mailbox;
-      if (nntp->user)
-	g_free (nntp->user);
-
-      if (nntp->passwd)
-	g_free (nntp->passwd);
-
-      if (nntp->server)
-	g_free (nntp->server);
+      g_free (nntp->user);
+      g_free (nntp->passwd);
+      g_free (nntp->server);
+      g_free (nntp->newsgroup);
       break;
     }
 
@@ -299,14 +239,7 @@ mailbox_open (Mailbox * mailbox)
 {
   gchar buffer[MAILTMPLEN];
   Mailbox *old_mailbox;
-  MailboxMBX *mbx;
-  MailboxMTX *mtx;
-  MailboxTENEX *tenex;
-  MailboxMBox *mbox;
-  MailboxMMDF *mmdf;
-  MailboxUNIX *mbunix;
-  MailboxMH *mh;
-
+  MailboxLocal *local;
   MailboxPOP3 *pop3;
   MailboxIMAP *imap;
   MailboxNNTP *nntp;
@@ -326,78 +259,28 @@ mailbox_open (Mailbox * mailbox)
   switch (mailbox->type)
     {
     case MAILBOX_MBX:
-      mbx = (MailboxMBX *) mailbox;
-
-      mbx->stream = mail_open (NIL, mbx->path, NIL);
-      if (mbx->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
     case MAILBOX_MTX:
-      mtx = (MailboxMTX *) mailbox;
-
-      mtx->stream = mail_open (NIL, mtx->path, NIL);
-      if (mtx->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
     case MAILBOX_TENEX:
-      tenex = (MailboxTENEX *) mailbox;
-
-      tenex->stream = mail_open (NIL, tenex->path, NIL);
-      if (tenex->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
     case MAILBOX_MBOX:
-      mbox = (MailboxMBox *) mailbox;
-
-      mbox->stream = mail_open (NIL, mbox->path, NIL);
-      if (mbox->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
     case MAILBOX_MMDF:
-      mmdf = (MailboxMMDF *) mailbox;
-
-      mmdf->stream = mail_open (NIL, mmdf->path, NIL);
-      if (mmdf->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
-      break;
-
     case MAILBOX_UNIX:
-      mbunix = (MailboxUNIX *) mailbox;
+      local = (MailboxLocal *) mailbox;
 
-      mbunix->stream = mail_open (NIL, mbunix->path, NIL);
-      if (mbunix->stream == NIL)
-	{
-	  balsa_app.current_mailbox = old_mailbox;
-	  return FALSE;
-	}
+      local->stream = mail_open (NIL, local->path, NIL);
+      if (local->stream == NIL)
+        {
+          balsa_app.current_mailbox = old_mailbox;
+          return FALSE;
+        }
       break;
 
     case MAILBOX_MH:
-      mh = (MailboxMH *) mailbox;
+      local = (MailboxLocal *) mailbox;
 
-      sprintf (buffer, "#mh/%s", mh->path);
+      sprintf (buffer, "#mh/%s", local->path);
 
-      mh->stream = mail_open (NIL, buffer, NIL);
-      if (mh->stream == NIL)
+      local->stream = mail_open (NIL, buffer, NIL);
+      if (local->stream == NIL)
 	{
 	  balsa_app.current_mailbox = old_mailbox;
 	  return FALSE;

@@ -2,6 +2,8 @@
 
 #include <gnome.h>
 
+#include "libmutt/mutt.h"
+
 LibBalsaAddress* libbalsa_address_new_from_libmutt(ADDRESS *caddr);
 
 #ifdef BALSA_USE_THREADS
@@ -91,7 +93,7 @@ do {\
 
 #endif
   
-#define CLIENT_CONTEXT(mailbox)          (mailbox->context)
+#define CLIENT_CONTEXT(mailbox)          ((CONTEXT*)mailbox->context)
 #define CLIENT_CONTEXT_OPEN(mailbox)     (CLIENT_CONTEXT (mailbox) != NULL)
 #define CLIENT_CONTEXT_CLOSED(mailbox)   (CLIENT_CONTEXT (mailbox) == NULL)
 #define RETURN_IF_CLIENT_CONTEXT_CLOSED(mailbox)\

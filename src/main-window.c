@@ -33,6 +33,7 @@
 #endif
 
 #include "libbalsa.h"
+/* FIXME: mutt dependency */
 #include "libbalsa_private.h"
 
 #include "balsa-app.h"
@@ -40,9 +41,7 @@
 #include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
-#include "filter.h"
 #include "balsa-index-page.h"
-#include "misc.h"
 #include "main.h"
 #include "message-window.h"
 #include "pref-manager.h"
@@ -187,7 +186,6 @@ static GnomeUIInfo file_menu[] =
   },
   GNOMEUIINFO_SEPARATOR,
 
-/*#ifdef BALSA_USE_EXPERIMENTAL_INIT*/
   #if 0
   {
       GNOME_APP_UI_ITEM, "Test new init", "Test the new initialization druid",
@@ -1047,7 +1045,7 @@ check_messages_thread( LibBalsaMailbox *mbox )
 
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail", 0,0);
 
-  if( mbox && CLIENT_CONTEXT_OPEN(mbox)) {
+  if( mbox && mbox->context != NULL ) {
     libbalsa_mailbox_check_for_new_messages( mbox );
     MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox, mbox->name, 0,0 );
   }

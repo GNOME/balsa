@@ -21,20 +21,52 @@
 #ifndef __LIBBALSA_BODY_H__
 #define __LIBBALSA_BODY_H__
 
+#include <stdio.h>
+
 #include <glib.h>
 
-#include "libmutt/mutt.h"
+typedef enum _LibBalsaMessageBodyType LibBalsaMessageBodyType;
+
+enum _LibBalsaMessageBodyType
+{
+  LIBBALSA_MESSAGE_BODY_TYPE_OTHER,
+  LIBBALSA_MESSAGE_BODY_TYPE_AUDIO,
+  LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION,
+  LIBBALSA_MESSAGE_BODY_TYPE_IMAGE,
+  LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE,
+  LIBBALSA_MESSAGE_BODY_TYPE_MODEL,
+  LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART,
+  LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+  LIBBALSA_MESSAGE_BODY_TYPE_VIDEO
+};
 
 struct _LibBalsaMessageBody
 {
+  LibBalsaMessage *message;     /* The message of which this is a part */
   gchar *buffer;		/* holds raw data of the MIME part, or NULL */
-  gchar *htmlized;		/* holds htmlrep of buffer, or NULL */
-  BODY *mutt_body;		/* pointer to BODY struct of mutt message */
+  /*  gchar *htmlized; */	/* holds htmlrep of buffer, or NULL */
+  MuttBody *mutt_body;		/* pointer to BODY struct of mutt message */
   gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
-  gchar *charset;               /* the charset, used for sending, replying. */
+  gchar *temp_filename;		/* Holds the filename of a the temporary file where this part is saved */
+  gchar *charset;	        /* the charset, used for sending, replying. */
+
+  LibBalsaMessageBody *next;    /* Next part in the message */
+  LibBalsaMessageBody *parts;   /* The parts of a multipart or message/rfc822 message */
 };
 
-LibBalsaMessageBody *libbalsa_message_body_new(void);
+LibBalsaMessageBody *libbalsa_message_body_new(LibBalsaMessage *message);
 void libbalsa_message_body_free(LibBalsaMessageBody * body);
+
+LibBalsaMessageBodyType libbalsa_message_body_type(LibBalsaMessageBody *body);
+
+void libbalsa_message_body_set_mutt_body(LibBalsaMessageBody *body, MuttBody *mutt_body);
+
+gboolean libbalsa_message_body_save (LibBalsaMessageBody *body, gchar *prefixm, gchar *filename);
+gboolean libbalsa_message_body_save_temporary ( LibBalsaMessageBody *body, gchar *prefix);
+
+gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody *body, const gchar *param);
+gchar *libbalsa_message_body_get_content_type(LibBalsaMessageBody *body);
+
+gboolean libbalsa_message_body_is_multipart (LibBalsaMessageBody *body);
 
 #endif /* __LIBBALSA_BODY_H__ */

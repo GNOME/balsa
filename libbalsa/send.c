@@ -480,28 +480,24 @@ libbalsa_message_postpone (LibBalsaMessage * message,
   HEADER *msg;
   BODY *last, *newbdy;
   gchar *tmp;
-  GList *list;
+  LibBalsaMessageBody *body;
 
   msg = mutt_new_header ();
   message2HEADER(message, msg);
 
-  list = message->body_list;
+  body = message->body_list;
 
   last = msg->content;
   while (last && last->next)
     last = last->next;
 
-  while (list)
+  while ( body )
     {
       FILE *tempfp = NULL;
-      LibBalsaMessageBody *body;
       newbdy = NULL;
 
-      body = list->data;
-
       if (body->filename)
-	newbdy = mutt_make_file_attach (body->filename);
-
+      	newbdy = mutt_make_file_attach (body->filename);
       else if (body->buffer)
 	{
 	  newbdy = add_mutt_body_plain ();
@@ -521,7 +517,7 @@ libbalsa_message_postpone (LibBalsaMessage * message,
 	  last = newbdy;
 	}
 
-      list = list->next;
+      body = body->next;
     }
 
   if (msg->content)
@@ -539,9 +535,8 @@ libbalsa_message_postpone (LibBalsaMessage * message,
      * search all mailboxes for the ID but that would not be too fast. We
      * could also add more stuff ID like path, server, ... without this
      * if you change the name of the mailbox the flag will not be set. */
-    tmp = g_strdup_printf ("%s\r%d\r%s",
+    tmp = g_strdup_printf ("%s\r%s",
                            reply_message->message_id,
-                           reply_message->mailbox->type,
                            reply_message->mailbox->name);
   else
     tmp = NULL;
@@ -898,11 +893,11 @@ static gboolean
 balsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu)
 {
   BODY *last, *newbdy;
-  GList *list;
   FILE *tempfp;
   HEADER *msg_tmp;
   MESSAGE *mensaje;
   LIST *in_reply_to;
+  LibBalsaMessageBody *body;
 
   gchar** mime_type;
 
@@ -925,18 +920,17 @@ balsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu
 
   if(message->mailbox)
       libbalsa_message_body_ref (message);
-  list = message->body_list;
+
+  body = message->body_list;
   
   last = msg->content;
   while (last && last->next)
-     last = last->next;
-
-  while (list)
+    last = last->next;
+  
+  while ( body )
     {
       FILE *tempfp = NULL;
-      LibBalsaMessageBody *body;
       newbdy = NULL;
-      body = list->data;
 
       if (body->filename) {
 	newbdy = mutt_make_file_attach (body->filename);
@@ -972,7 +966,7 @@ balsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu
 	  last = newbdy;
 	}
 
-      list = list->next;
+      body = body->next;
     }
 
   if (msg->content)

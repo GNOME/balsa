@@ -1,3 +1,45 @@
+2000-07-11  Ian Campbell  <ijc25@cam.ac.uk>
+	* libbalsa/body.c:
+	* libbalsa/body.h:
+	* libbalsa/libbalsa.c:
+	* libbalsa/libbalsa.h:
+	* libbalsa/libbalsa_private.h:
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_local.c:
+	* libbalsa/mailbox_local.h:
+	* libbalsa/mailbox_pop3.c:
+	* libbalsa/message.c:
+	* libbalsa/message.h:
+	* libbalsa/mime.c:
+	* libbalsa/misc.c:
+	* libbalsa/misc.h:
+	* libbalsa/send.c:
+	* libinit_balsa/balsa-druid-page-directory.gob:
+	* src/balsa-app.c:
+	* src/balsa-app.h:
+	* src/balsa-index-page.c:
+	* src/balsa-mblist.c:
+	* src/balsa-message.c:
+	* src/local-mailbox.c:
+	* src/mailbox-conf.c:
+	* src/main-window.c:
+	* src/mblist-window.c:
+	* src/pref-manager.c:
+	* src/save-restore.c:
+	* src/save-restore.h:
+	* src/sendmsg-window.c:
+
+	Continued API cleanup, plus partial removal of balsa's dependency
+	on libmutt. This involved many new functions to various classes,
+	and lots of small changes.
+
+	Changed several dialog boxes to use standard gnome dialogs.
+
+	Also added an experimental GtkHTML based text/html part viewer.
+	Configure with --enable-gtkhtml to use. Tested with GtkHTML 0.4.
+	
 2000-07-10  Matthew Guenther <mguenthe@attcanada.ca>
 
 	Applied IRIX compatibility patch by David Kaelbling

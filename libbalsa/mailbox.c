@@ -366,6 +366,8 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
   klass->message_new = NULL;
   klass->message_delete = NULL;
 
+  klass->get_message_stream = NULL;
+
   klass->set_username = NULL;
   klass->set_password = NULL;
   klass->set_host = NULL;
@@ -375,8 +377,11 @@ static void
 libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
 {
   mailbox->lock = FALSE;
+  mailbox->is_directory = FALSE;
+
   mailbox->name = NULL;
   CLIENT_CONTEXT (mailbox) = NULL;
+
   mailbox->open_ref = 0;
   mailbox->messages = 0;
   mailbox->new_messages = 0;
@@ -384,6 +389,7 @@ libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
   mailbox->unread_messages = 0;
   mailbox->total_messages = 0;
   mailbox->message_list = NULL;
+
 }
 
 static void 
@@ -399,7 +405,6 @@ libbalsa_mailbox_destroy (GtkObject *object)
       libbalsa_mailbox_close(mailbox);
 
   g_free(mailbox->name);
-  g_free(mailbox->private);
 
   if (GTK_OBJECT_CLASS(parent_class)->destroy)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
@@ -450,12 +455,30 @@ libbalsa_mailbox_set_host(LibBalsaMailbox *mailbox, const gchar *host, gint port
   gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_HOST], host, port);
 }
 
+FILE*
+libbalsa_mailbox_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *message)
+{
+  LibBalsaMailboxClass *klass;
+  FILE *res = NULL;
+
+  g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+  g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
+  g_return_val_if_fail(message->mailbox == mailbox, NULL);
+
+  klass = LIBBALSA_MAILBOX_CLASS(GTK_OBJECT(mailbox)->klass);
+  
+  if ( klass->get_message_stream )
+    res = klass->get_message_stream(mailbox, message);
+ 
+  return res;
+}
+
 static void 
 libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox)
 {
   int check;
 #ifdef DEBUG
-      g_print (_("LibBalsaMailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print ("LibBalsaMailbox: Closing %s Refcount: %d\n", mailbox->name, mailbox->open_ref);
 #endif
   LOCK_MAILBOX (mailbox);
 

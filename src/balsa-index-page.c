@@ -250,20 +250,11 @@ balsa_find_notebook_page(LibBalsaMailbox *mailbox)
 }
 
 static void
-set_password (GtkWidget * widget, GtkWidget * entry)
+set_password (gchar * pword, LibBalsaMailbox *mailbox)
 {
-  LibBalsaMailbox *mailbox;
-
-  mailbox = gtk_object_get_data(GTK_OBJECT(entry), "mailbox");
-
-  if (!mailbox)
-    return;
-
-  libbalsa_mailbox_set_password( mailbox, gtk_entry_get_text(GTK_ENTRY(entry)));
-
-  gtk_object_remove_data (GTK_OBJECT (entry), "mailbox");
+  libbalsa_mailbox_set_password( mailbox, pword);
+  g_free(pword);
 }
-
 
 gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox * mailbox)
 {
@@ -272,51 +263,30 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox * m
 
   page->mailbox = mailbox;
 
-#if 0
-  /* XXX */
-  cursor = gdk_cursor_new(GDK_WATCH);
-  balsa_window_set_cursor(page, cursor);
-  gdk_cursor_destroy(cursor);
-#endif
-
   /* FIXME: This is ugly... */
-  if ((mailbox->type == MAILBOX_IMAP && !LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) ||
-      (mailbox->type == MAILBOX_POP3 && !LIBBALSA_MAILBOX_POP3(mailbox)->passwd))
+  if ((LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) ||
+      (LIBBALSA_IS_MAILBOX_POP3(mailbox) && !LIBBALSA_MAILBOX_POP3(mailbox)->passwd))
   {
-    GtkWidget *hbox;
-    GtkWidget *label;
     GtkWidget *dialog;
-    GtkWidget *entry;
+    gint button;
 
-    dialog = gnome_dialog_new(_("Mailbox password:"),
-			       GNOME_STOCK_BUTTON_OK, GNOME_STOCK_BUTTON_CANCEL, NULL);
+    dialog = gnome_request_dialog (TRUE,
+				   _("Mailbox password:"),
+				   NULL,
+				   0,
+				   (GnomeStringCallback)set_password,
+				   (gpointer)mailbox,
+				   GTK_WINDOW(balsa_app.main_window));
+				   
+    button = gnome_dialog_run(GNOME_DIALOG(dialog));
 
-    gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
-			     GTK_WINDOW (balsa_app.main_window));
-    hbox = gtk_hbox_new (FALSE, 0);
-    gtk_box_pack_start (GTK_BOX(GNOME_DIALOG(dialog)->vbox), hbox, FALSE, FALSE, 10);
-
-    label = gtk_label_new(_("Password:"));
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 10);
-
-    entry = gtk_entry_new ();
-    gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
-    gtk_object_set_data(GTK_OBJECT(entry), "mailbox", mailbox);
-    gtk_box_pack_start(GTK_BOX(hbox), entry, FALSE, FALSE, 10);
-
-    gtk_widget_show_all(dialog);
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, set_password, entry);
-    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-    gnome_dialog_run(GNOME_DIALOG(dialog));
     gtk_widget_destroy(dialog);
-    dialog = NULL;
-  }
-
-  /* check to see if its still null */
-  if ((mailbox->type == MAILBOX_IMAP && !LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) ||
-      (mailbox->type == MAILBOX_POP3 && !LIBBALSA_MAILBOX_POP3(mailbox)->passwd))
-  {
-    return TRUE;
+      
+    if ( button != 0 ) /* OK */
+    {
+      return TRUE;
+    }
+    
   }
 
   libbalsa_mailbox_open(mailbox, FALSE);
@@ -1081,7 +1051,7 @@ balsa_message_delete (GtkWidget * widget, gpointer index)
   gboolean to_trash;
 
   g_return_if_fail (widget != NULL);
-  g_return_if_fail(index != NULL);
+  g_return_if_fail (index != NULL);
 
   list = GTK_CLIST(index)->selection;
 

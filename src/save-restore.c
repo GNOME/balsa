@@ -80,7 +80,7 @@ static gchar * specialNames[] = { "Inbox", "Sentbox", "Trash", "Draftbox" };
 void
 config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 {
-    LibBalsaMailbox ** special;
+    LibBalsaMailbox **special;
     GNode * node;
 
     g_return_if_fail(mailbox != NULL);
@@ -92,12 +92,13 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     case SPECIAL_DRAFT: special = &balsa_app.draftbox; break;
     default : return;
     }
-    if(*special) {
-	config_mailbox_add(*special, NULL);
-	node = g_node_new (mailbox_node_new (
-	    (*special)->name, *special, 
-	    (*special)->type == MAILBOX_MH));
-	g_node_append (balsa_app.mailbox_nodes, node);
+    if(*special) 
+    {
+      config_mailbox_add(*special, NULL);
+      node = g_node_new (mailbox_node_new (
+	(*special)->name, *special, 
+	(*special)->is_directory));
+      g_node_append (balsa_app.mailbox_nodes, node);
     }
     config_mailbox_delete (mailbox);
     config_mailbox_add (mailbox, specialNames[which]);
@@ -269,106 +270,101 @@ config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg)
   /* Each mailbox is stored as a Proplist dictionary of mailbox settings.
      First create the dictionary, then add it to the "accounts" section
      of the global configuration. */
-  switch (mailbox->type)
+  if ( LIBBALSA_IS_MAILBOX_LOCAL (mailbox) )
+  {
+    /* Create a new mailbox configuration with the following entries:
+       Type = local;
+       Name = ... ;
+       Path = ... ;
+    */
+    mbox_dict = pl_dict_add_str_str (NULL, "Type", "local");
+    pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
+    pl_dict_add_str_str (mbox_dict, "Path", LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
+  }
+  else if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) )
+  {
+    /* Create a new mailbox configuration with the following entries:
+       Type = POP3;
+       Name = ...;
+       Username = ...;
+       Password = ...;
+       Server = ...;
+       Check = 0 | 1;
+       Delete =  0 | 1;
+    */
+    mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
+    pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
+    pl_dict_add_str_str (mbox_dict, "Username",
+			 LIBBALSA_MAILBOX_POP3(mailbox)->user);
+    /* Do not save the password if the field is NULL.  This is here
+       so that asving the password to the balsarc file can be optional */
+    if (LIBBALSA_MAILBOX_POP3(mailbox)->passwd)
     {
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      /* Create a new mailbox configuration with the following entries:
-         Type = local;
-         Name = ... ;
-         Path = ... ;
-       */
-      mbox_dict = pl_dict_add_str_str (NULL, "Type", "local");
-      pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
-      pl_dict_add_str_str (mbox_dict, "Path", LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
-
-      break;
-
-    case MAILBOX_POP3:
-      /* Create a new mailbox configuration with the following entries:
-         Type = POP3;
-         Name = ...;
-         Username = ...;
-         Password = ...;
-         Server = ...;
-	 Check = 0 | 1;
-	 Delete =  0 | 1;
-       */
-      mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
-      pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
-      pl_dict_add_str_str (mbox_dict, "Username",
-			   LIBBALSA_MAILBOX_POP3(mailbox)->user);
-      /* Do not save the password if the field is NULL.  This is here
-         so that asving the password to the balsarc file can be optional */
-      if (LIBBALSA_MAILBOX_POP3(mailbox)->passwd)
-	{
-	  gchar *buff;
-	  buff = rot (LIBBALSA_MAILBOX_POP3(mailbox)->passwd);
-	  pl_dict_add_str_str (mbox_dict, "Password",
-			       buff);
-	  g_free (buff);
-	}
-      pl_dict_add_str_str (mbox_dict, "Server",
-			   LIBBALSA_MAILBOX_POP3 (mailbox)->host);
-      {
-	char tmp[32];
-
-	snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->port);
-	pl_dict_add_str_str (mbox_dict, "Port", tmp);
-
-	snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->check);
-	pl_dict_add_str_str (mbox_dict, "Check", tmp);
-
-	snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server);
-	pl_dict_add_str_str (mbox_dict, "Delete", tmp);
-      }
-
-        if ((LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid) != NULL)
-		pl_dict_add_str_str (mbox_dict, "LastUID", LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid);
-	  
-      break;
-
-    case MAILBOX_IMAP:
-      /* Create a new mailbox configuration with the following entries:
-         Type = IMAP;
-         Name = ...;
-         Server = ...;
-         Port = ...;
-         Path = ...;
-         Username = ...;
-         Password = ...;
-       */
-      mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAP");
-      pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
-      pl_dict_add_str_str (mbox_dict, "Server",
-			   LIBBALSA_MAILBOX_IMAP (mailbox)->host);
-
-      /* Add the Port entry */
-      {
-	char tmp[MAX_PROPLIST_KEY_LEN];
-	snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_IMAP(mailbox)->port);
-	pl_dict_add_str_str (mbox_dict, "Port", tmp);
-      }
-
-      pl_dict_add_str_str (mbox_dict, "Path", LIBBALSA_MAILBOX_IMAP (mailbox)->path);
-      pl_dict_add_str_str (mbox_dict, "Username",
-			   LIBBALSA_MAILBOX_IMAP (mailbox)->user);
-
-      if (LIBBALSA_MAILBOX_IMAP(mailbox)->passwd != NULL)
-      {
-	gchar *buff;
-	buff = rot (LIBBALSA_MAILBOX_IMAP(mailbox)->passwd);
-	pl_dict_add_str_str (mbox_dict, "Password", buff);
-	g_free (buff);
-      }
-      break;
-
-    default:
-      fprintf (stderr, "config_mailbox_add: Unknown mailbox type!\n");
-      return FALSE;
+      gchar *buff;
+      buff = rot (LIBBALSA_MAILBOX_POP3(mailbox)->passwd);
+      pl_dict_add_str_str (mbox_dict, "Password",
+			   buff);
+      g_free (buff);
     }
-
+    pl_dict_add_str_str (mbox_dict, "Server",
+			 LIBBALSA_MAILBOX_POP3 (mailbox)->host);
+    {
+      char tmp[32];
+      
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->port);
+      pl_dict_add_str_str (mbox_dict, "Port", tmp);
+      
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->check);
+      pl_dict_add_str_str (mbox_dict, "Check", tmp);
+      
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server);
+      pl_dict_add_str_str (mbox_dict, "Delete", tmp);
+    }
+    
+    if ((LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid) != NULL)
+      pl_dict_add_str_str (mbox_dict, "LastUID", LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid);
+  }
+  else if ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) )
+  {
+    /* Create a new mailbox configuration with the following entries:
+       Type = IMAP;
+       Name = ...;
+       Server = ...;
+       Port = ...;
+       Path = ...;
+       Username = ...;
+       Password = ...;
+    */
+    mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAP");
+    pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
+    pl_dict_add_str_str (mbox_dict, "Server",
+			 LIBBALSA_MAILBOX_IMAP (mailbox)->host);
+    
+    /* Add the Port entry */
+    {
+      char tmp[MAX_PROPLIST_KEY_LEN];
+      snprintf (tmp, sizeof (tmp), "%d", LIBBALSA_MAILBOX_IMAP(mailbox)->port);
+      pl_dict_add_str_str (mbox_dict, "Port", tmp);
+    }
+    
+    pl_dict_add_str_str (mbox_dict, "Path", LIBBALSA_MAILBOX_IMAP (mailbox)->path);
+    pl_dict_add_str_str (mbox_dict, "Username",
+			 LIBBALSA_MAILBOX_IMAP (mailbox)->user);
+    
+    if (LIBBALSA_MAILBOX_IMAP(mailbox)->passwd != NULL)
+    {
+      gchar *buff;
+      buff = rot (LIBBALSA_MAILBOX_IMAP(mailbox)->passwd);
+      pl_dict_add_str_str (mbox_dict, "Password", buff);
+      g_free (buff);
+    }
+  }
+  else
+  {
+    fprintf (stderr, "config_mailbox_add: Unknown mailbox type!\n");
+    return FALSE;
+  }
+  
   add_prop_mailbox(mbox_dict, key_arg);
 
   return config_save (BALSA_CONFIG_FILE);
@@ -555,21 +551,16 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       path = pl_dict_get_str (mbox, "Path");
       if (path == NULL)
 	return FALSE;
-
-      mailbox_type = libbalsa_mailbox_valid (path);
-      if (mailbox_type != MAILBOX_UNKNOWN)
-	{
-	  mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(mailbox_type));
-	  mailbox->name = mailbox_name;
-	  LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-	  mailbox_add_for_checking(mailbox);
-	}
-      else
-	{
-	  fprintf (stderr, "config_mailbox_init: Cannot identify type of "
+      
+      mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, FALSE));
+      if ( mailbox == NULL ) {
+	fprintf (stderr, "config_mailbox_init: Cannot create "
 		   "local mailbox %s\n", mailbox_name);
-	  return FALSE;
-	}
+	return FALSE;
+      }
+      mailbox->name = mailbox_name;
+      mailbox_add_for_checking(mailbox);
+
     }
   else if (!strcasecmp (type, "POP3"))	/* POP3 mailbox */
     {
@@ -597,7 +588,7 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       else {
 	gchar *port;
 	port = pl_dict_get_str (mbox, "Port");
-	if ( port == NULL )
+	if ( port != NULL )
 	  libbalsa_mailbox_set_host (mailbox, field, atoi(port));
 	else
 	  libbalsa_mailbox_set_host (mailbox, field, 110);
@@ -1348,20 +1339,24 @@ mailbox_get_pkey(const LibBalsaMailbox * mailbox)
 
     g_assert(mailbox != NULL);
 
-    switch(mailbox->type) {
-    case MAILBOX_POP3:
-	    pkey = g_strdup_printf( "%s %d", LIBBALSA_MAILBOX_POP3 (mailbox)->host, LIBBALSA_MAILBOX_POP3(mailbox)->port ); 
-	    break;
-    case MAILBOX_MBOX:
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MH:
-	    pkey = g_strdup( LIBBALSA_MAILBOX_LOCAL (mailbox)->path );
-	    break;
-    case MAILBOX_IMAP:
-	    pkey = g_strdup_printf( "%s %d %s", LIBBALSA_MAILBOX_IMAP (mailbox)->host, LIBBALSA_MAILBOX_IMAP (mailbox)->port, LIBBALSA_MAILBOX_IMAP (mailbox)->path );
-	    break;
-    default: /* MAILBOX_UNKNOWN */
-	    pkey = g_strdup( mailbox->name );
+    if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) )
+    {
+	    pkey = g_strdup_printf( "%s %d", LIBBALSA_MAILBOX_POP3 (mailbox)->host, 
+				    LIBBALSA_MAILBOX_POP3(mailbox)->port ); 
+    }
+    else if ( LIBBALSA_IS_MAILBOX_LOCAL(mailbox) )
+    {
+      
+      pkey = g_strdup( LIBBALSA_MAILBOX_LOCAL (mailbox)->path );
+    }
+    else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
+    {
+      pkey = g_strdup_printf( "%s %d %s", LIBBALSA_MAILBOX_IMAP (mailbox)->host, 
+			      LIBBALSA_MAILBOX_IMAP (mailbox)->port, LIBBALSA_MAILBOX_IMAP (mailbox)->path );
+    } 
+    else
+    {
+      pkey = g_strdup( mailbox->name );
     }
 
     return pkey;

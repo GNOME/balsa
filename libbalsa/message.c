@@ -31,12 +31,10 @@
 #include <pthread.h>
 #endif
 
-#include "mailbackend.h"
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
-#include "misc.h"
+#include "mailbackend.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -53,6 +51,8 @@ static void libbalsa_message_real_set_answered_flag(LibBalsaMessage *message, gb
 static void libbalsa_message_real_set_read_flag(LibBalsaMessage *message, gboolean set);
 static void libbalsa_message_real_set_deleted_flag(LibBalsaMessage *message, gboolean set);
 static void libbalsa_message_real_set_flagged(LibBalsaMessage *message, gboolean set);
+
+static gchar *ADDRESS_to_gchar (const ADDRESS * addr);
 
 #ifdef DEBUG
 static char * mime_content_type2str (int contenttype);
@@ -154,7 +154,7 @@ libbalsa_message_class_init (LibBalsaMessageClass *klass)
 
   libbalsa_message_signals[SET_DELETED] =
     gtk_signal_new ("set-deleted",
-                    GTK_RUN_FIRST,
+                    GTK_RUN_LAST,
                     object_class->type,
                     GTK_SIGNAL_OFFSET(LibBalsaMessageClass, set_deleted),
                     gtk_marshal_NONE__BOOL,
@@ -221,6 +221,9 @@ libbalsa_message_destroy(GtkObject *object)
   g_free (message->references);                  message->references = NULL;
   g_free (message->in_reply_to);                 message->in_reply_to = NULL;
   g_free (message->message_id);                  message->message_id = NULL;
+
+  libbalsa_message_body_free (message->body_list);
+  message->body_list = NULL;
 }
 
 const gchar *
@@ -234,15 +237,14 @@ libbalsa_message_charset (LibBalsaMessage *message)
 {
    gchar * charset = NULL;
 
-   GList * body_list = message->body_list;
-   while( body_list ) {
-      LibBalsaMessageBody * bd = (LibBalsaMessageBody*)body_list->data;
-      g_assert(bd != NULL && bd->mutt_body);
-      if( (charset = mutt_get_parameter("charset", bd->mutt_body->parameter) ))
-	 break;
-      body_list = g_list_next (body_list);
+   LibBalsaMessageBody *body = message->body_list;
+   while ( body ) {
+     charset = libbalsa_message_body_get_parameter(body, "charset");
+      if( charset )
+	break;
+      body = body->next;
    }
-
+   
    return charset;
 }
 
@@ -304,7 +306,7 @@ libbalsa_message_user_hdrs(LibBalsaMessage *message)
    return res;
 }
 
-/* TODO and/or FIXME look at the flags for mutt_append_message */
+/* FIXME: look at the flags for mutt_append_message */
 void
 libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest)
 {
@@ -630,9 +632,6 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
     }
   if (msg != NULL)
     {
-#if 0
-      BODY *bdy = cur->content;
-#endif
 #ifdef DEBUG
       fprintf (stderr, "After loading message\n");
       fprintf (stderr, "header->mime    = %d\n", cur->mime);
@@ -643,28 +642,12 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 	       mime_content_type2str (cur->content->type),
 	       cur->content->type);
 #endif
-      body = libbalsa_message_body_new ();
-      body->mutt_body = cur->content;
-      message->body_list = g_list_append (message->body_list, body);
-#if 0
-      if (cur->content->type == TYPEMULTIPART)
-	{
-	  bdy = cur->content->parts;
-	  while (bdy)
-	    {
-#ifdef DEBUG
-	      fprintf (stderr, "h->c->type      = %s[%d]\n", mime_content_type2str (bdy->type), bdy->type);
-	      fprintf (stderr, "h->c->subtype   = %s\n", bdy->subtype);
-	      fprintf (stderr, "======\n");
-#endif
-	      body = body_new ();
-	      body->mutt_body = bdy;
-	      message->body_list = g_list_append (message->body_list, body);
-	      bdy = bdy->next;
+      body = libbalsa_message_body_new (message);
 
-	    }
-	}
-#endif
+      libbalsa_message_body_set_mutt_body(body, cur->content);
+
+      libbalsa_message_append_part (message, body);
+
       message->body_ref++;
       mx_close_message (&msg);
     }
@@ -689,26 +672,15 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 void
 libbalsa_message_body_unref (LibBalsaMessage * message)
 {
-  GList *list;
-  LibBalsaMessageBody *body;
 
-  if (!message)
-    return;
+  g_return_if_fail ( LIBBALSA_IS_MESSAGE (message) );
 
   if (message->body_ref == 0)
     return;
 
   if (--message->body_ref == 0)
     {
-      list = message->body_list;
-      while (list)
-	{
-	  body = (LibBalsaMessageBody *) list->data;
-	  list = list->next;
-	  libbalsa_message_body_free (body);
-	}
-
-      g_list_free (message->body_list);
+      libbalsa_message_body_free(message->body_list);
       message->body_list = NULL;
     }
 }
@@ -745,4 +717,38 @@ gchar *libbalsa_message_date_to_gchar (LibBalsaMessage *message, const gchar *da
   strftime (rettime, sizeof (rettime), date_string, footime);
 
   return g_strdup (rettime);
+}
+
+static gchar *
+ADDRESS_to_gchar (const ADDRESS * addr)
+{
+  gchar buf[1024]; /* assume no single address is longer than this */
+
+  buf[0] = '\0';
+  rfc822_write_address(buf, sizeof(buf), (ADDRESS*)addr);
+  if(strlen(buf)>=sizeof(buf)-1)
+    fprintf(stderr,
+	    "ADDRESS_to_gchar: the max allowed address length exceeded.\n");
+  return g_strdup(buf);
+}
+
+void libbalsa_message_append_part (LibBalsaMessage *message, LibBalsaMessageBody *body)
+{
+  LibBalsaMessageBody *part;
+
+  g_return_if_fail (message != NULL);
+  g_return_if_fail (LIBBALSA_IS_MESSAGE(message));
+
+  if ( message->body_list == NULL )
+  {
+    message->body_list = body;
+  } 
+  else
+  {
+    part = message->body_list;
+    while ( part->next != NULL )
+      part = part->next;
+    part->next = body;
+  }
+  
 }

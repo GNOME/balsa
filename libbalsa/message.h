@@ -28,8 +28,6 @@
 
 #include "libbalsa.h"
 
-/*  #include "libmutt/mutt.h" */
-
 #define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
 #define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
 #define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, LibBalsaMessageClass))
@@ -94,7 +92,8 @@ struct _LibBalsaMessage
 
   /* message body */
   guint body_ref;
-  GList *body_list;
+  LibBalsaMessageBody *body_list;
+  /*  GList *body_list; */
 };
 
 struct _LibBalsaMessageClass
@@ -135,6 +134,8 @@ void libbalsa_message_unflag (LibBalsaMessage * message);
 
 void libbalsa_message_answer (LibBalsaMessage * message);
 void libbalsa_message_reply (LibBalsaMessage * message);
+
+void libbalsa_message_append_part (LibBalsaMessage *message, LibBalsaMessageBody *body);
 
 void libbalsa_message_body_ref (LibBalsaMessage * message);
 void libbalsa_message_body_unref (LibBalsaMessage * message);

@@ -1251,7 +1251,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
                                         NULL);
   }
   
-  body = libbalsa_message_body_new ();
+  body = libbalsa_message_body_new (message);
 
   body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
 					gtk_text_get_length (
@@ -1261,18 +1261,19 @@ bsmsg2message(BalsaSendmsg *bsmsg)
 
   body->charset = g_strdup(bsmsg->charset);
 
-  message->body_list = g_list_append (message->body_list, body);
+  libbalsa_message_append_part (message, body);
 
   {				/* handle attachments */
     gint i;
     for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments[1])->icons; i++) {
-      body = libbalsa_message_body_new ();
+      body = libbalsa_message_body_new (message);
 	/* PKGW: This used to be g_strdup'ed. However, the original pointer 
 	   was strduped and never freed, so we'll take it. */
       body->filename = (gchar *) 
 	 gnome_icon_list_get_icon_data(GNOME_ICON_LIST(bsmsg->attachments[1]),
 				      i);
-      message->body_list = g_list_append (message->body_list, body);
+
+      libbalsa_message_append_part (message, body);
     }
   }
 
@@ -1327,7 +1328,6 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   if(bsmsg->charset) balsa_app.charset = def_charset;
 
-  g_list_free (message->body_list);
   gtk_object_destroy (GTK_OBJECT(message));
   balsa_sendmsg_destroy (bsmsg);
 
@@ -1357,7 +1357,6 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
      libbalsa_mailbox_commit_changes (bsmsg->orig_message->mailbox);
    }
 
-  g_list_free (message->body_list);
   gtk_object_destroy (GTK_OBJECT(message));
   balsa_sendmsg_destroy (bsmsg);
 

@@ -29,6 +29,9 @@ typedef struct _LibBalsaAddress LibBalsaAddress;
 typedef struct _ImapDir ImapDir;
 typedef struct _LibBalsaServer LibBalsaServer;
 
+/* Opaque structures */
+typedef struct body MuttBody;
+
 #include "address.h"
 #include "message.h"
 #include "contact.h"

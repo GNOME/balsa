@@ -111,27 +111,22 @@ add_mailbox (const gchar * name, const gchar * path, LibBalsaMailboxType type,
   GNode *rnode;
   GNode *node;
 
-  if (balsa_app.inbox->type != MAILBOX_IMAP &&
-      balsa_app.inbox->type != MAILBOX_POP3)
+  if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox))
     if (strcmp (path, LIBBALSA_MAILBOX_LOCAL (balsa_app.inbox)->path) == 0)
       return;
-  if (balsa_app.outbox->type != MAILBOX_IMAP &&
-      balsa_app.outbox->type != MAILBOX_POP3)
+  if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.outbox))
     if (strcmp (path, LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path) == 0)
       return;
 
-  if (balsa_app.sentbox->type != MAILBOX_IMAP &&
-      balsa_app.sentbox->type != MAILBOX_POP3)
+  if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.sentbox))
     if (strcmp (path, LIBBALSA_MAILBOX_LOCAL (balsa_app.sentbox)->path) == 0)
       return;
 
-  if (balsa_app.draftbox->type != MAILBOX_IMAP &&
-      balsa_app.draftbox->type != MAILBOX_POP3)
+  if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.draftbox))
     if (strcmp (path, LIBBALSA_MAILBOX_LOCAL (balsa_app.draftbox)->path) == 0)
       return;
 
-  if (balsa_app.trash->type != MAILBOX_IMAP &&
-      balsa_app.trash->type != MAILBOX_POP3)
+  if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash))
     if (strcmp (path, LIBBALSA_MAILBOX_LOCAL (balsa_app.trash)->path) == 0)
       return;
   
@@ -168,20 +163,16 @@ add_mailbox (const gchar * name, const gchar * path, LibBalsaMailboxType type,
       case MAILBOX_MH:
       case MAILBOX_MBOX:
       case MAILBOX_MAILDIR:
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(type));
+	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, FALSE));
 	break;
       case MAILBOX_IMAP:
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
-	break;
       case MAILBOX_POP3:
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
-	break;
+	g_warning ("Error: can't have a local IMAP or POP mailbox\n");
       default:
 	g_warning("Unknown mailbox type\n");
 	mailbox = NULL;
       }
       mailbox->name = g_strdup (name);
-      LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
 
       if (isdir && type == MAILBOX_MH)
 	{

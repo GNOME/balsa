@@ -24,8 +24,6 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include "libmutt/mutt.h"
-
 #include "libbalsa.h"
 
 #define LIBBALSA_TYPE_MAILBOX			(libbalsa_mailbox_get_type())
@@ -66,7 +64,7 @@ typedef enum
 } LibBalsaMailboxSort;
 
 /*
- * strucutres
+ * structures
  */
 typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
@@ -74,13 +72,12 @@ struct _LibBalsaMailbox
 {
   GtkObject object;
 
-  LibBalsaMailboxType type;
   gchar *name;
-  CONTEXT *context;
-  void *private;
+  gpointer context;
   guint open_ref;
 
   gboolean lock;
+  gboolean is_directory;
 
   glong messages;
   glong new_messages;
@@ -115,6 +112,10 @@ struct _LibBalsaMailboxClass
 				    const gchar *passwd);
   void (* set_host)                (LibBalsaMailbox *mailbox,
 				    const gchar *host, gint port);
+
+  /* Virtual Functions */
+  FILE* (* get_message_stream)     (LibBalsaMailbox *mailbox,
+				    LibBalsaMessage *message);
 };
 
 GtkType libbalsa_mailbox_get_type (void);
@@ -128,6 +129,8 @@ void libbalsa_mailbox_close(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_free_messages (LibBalsaMailbox * mailbox);
+
+FILE *libbalsa_mailbox_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message);
 
 /* Parameters */
 void libbalsa_mailbox_set_username (LibBalsaMailbox *mailbox, const gchar *name);

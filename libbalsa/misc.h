@@ -21,10 +21,11 @@
 #ifndef __MISC_H__
 #define __MISC_H__
 
+#include <stdio.h>
+
 #include "libbalsa.h"
 
 gchar *make_string_from_list (GList *);
-gchar *ADDRESS_to_gchar (const ADDRESS * addr);
 
 size_t readfile (FILE * fp, char **buf);
 

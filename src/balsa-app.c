@@ -177,32 +177,29 @@ balsa_app_init (void)
       gnome_util_prepend_user_home(DEFAULT_ADDRESS_BOOK_PATH);
 }
 
-gint
+gboolean
 do_load_mailboxes (void)
 {
   gchar *spool;
   if( check_special_mailboxes () )
 	return FALSE;
 
-  switch (balsa_app.inbox->type)
+  if ( LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox) )
   {
-  case MAILBOX_MAILDIR:
-  case MAILBOX_MBOX:
-  case MAILBOX_MH: 
-      spool = g_strdup(LIBBALSA_MAILBOX_LOCAL (balsa_app.inbox)->path);
-      break;
-      
-  case MAILBOX_IMAP:
-  case MAILBOX_POP3:
-      spool = libbalsa_guess_mail_spool();
-      break;
-
-  default:
-      fprintf (stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
-      return FALSE;
+    spool = g_strdup(LIBBALSA_MAILBOX_LOCAL (balsa_app.inbox)->path);
+  }
+  else if ( LIBBALSA_IS_MAILBOX_IMAP(balsa_app.inbox) || LIBBALSA_IS_MAILBOX_POP3(balsa_app.inbox) )
+  {
+    spool = libbalsa_guess_mail_spool();
+  }
+  else
+  {
+    fprintf (stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
+    return FALSE;
   }
 
   libbalsa_init (spool, balsa_error);
+
   g_free(spool);
 
   load_local_mailboxes ();

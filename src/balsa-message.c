@@ -30,16 +30,21 @@
 #include "balsa-message.h"
 #include "mime.h"
 #include "misc.h"
+
 #ifdef USE_PIXBUF
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#endif
+
+#ifdef HAVE_GTKHTML
+#include <gtkhtml/gtkhtml.h>
 #endif
 
 #define BGLINKCOLOR "LightSteelBlue1"
 
 struct _BalsaPartInfo
   {
-    BODY *body;
     LibBalsaMessage *message;
+    LibBalsaMessageBody *body;
     
     /* The widget to add to the container */
     GtkWidget *widget;
@@ -64,14 +69,15 @@ static gint balsa_message_focus_out_part(GtkWidget *widget, GdkEventFocus *event
 
 static gint balsa_message_key_press_event(GtkWidget *widget, GdkEventKey *event, BalsaMessage *bm);
 
+static void message_destroyed_cb(LibBalsaMessage *message, BalsaMessage *bm);
+
 static void display_headers (BalsaMessage * bm);
 static void display_content (BalsaMessage *bm);
 
-static void display_part (BalsaMessage *bm, BODY * bdy);
-static void display_multipart (BalsaMessage *bm, BODY * bdy);
+static void display_part (BalsaMessage *bm, LibBalsaMessageBody * body);
+static void display_multipart (BalsaMessage *bm, LibBalsaMessageBody *body);
 
 static void save_part (BalsaPartInfo *info);
-static gchar *save_mime_part (LibBalsaMessage * message, BODY * body);
 
 static void select_icon_cb(GnomeIconList *ilist, gint num, 
 			GdkEventButton * event, BalsaMessage *bm);
@@ -88,6 +94,9 @@ static void scroll_set (GtkAdjustment* adj, gint value);
 static void scroll_change (GtkAdjustment* adj, gint diff);
 
 static void balsa_gtk_text_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data);
+#ifdef HAVE_GTKHTML
+static void balsa_gtk_html_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data);
+#endif
 static void balsa_icon_list_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data);
 
 static void part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info);
@@ -97,7 +106,11 @@ static void part_info_init_video (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_message (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_application (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_audio (BalsaMessage *bm, BalsaPartInfo *info);
+static void part_info_init_model (BalsaMessage *bm, BalsaPartInfo *info);
 static void part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info);
+#ifdef HAVE_GTKHTML
+static void part_info_init_html(BalsaMessage *bm, BalsaPartInfo *info, gchar *ptr, size_t len);
+#endif
 
 static GtkViewportClass *parent_class = NULL;
 
@@ -201,8 +214,6 @@ static void
 save_part (BalsaPartInfo *info)
 {
   gchar *filename;
-  gchar *msg_filename = NULL;
-  STATE s;
 
   GtkWidget *save_dialog;
   GtkWidget *file_entry;
@@ -237,74 +248,26 @@ save_part (BalsaPartInfo *info)
   /* button 0 == OK */
   if ( button == 0 ) {
 
-    switch (info->message->mailbox->type)
-    {
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      msg_filename = g_strdup_printf
-	("%s/%s", LIBBALSA_MAILBOX_LOCAL (info->message->mailbox)->path, 
-	 libbalsa_message_pathname (info->message));
-      break;
-    case MAILBOX_IMAP:
-    case MAILBOX_POP3:
-      msg_filename = g_strdup 
-	(LIBBALSA_MAILBOX_IMAP (info->message->mailbox)->tmp_file_path);
-      break;
-    default:
-      msg_filename = g_strdup(LIBBALSA_MAILBOX_LOCAL (info->message->mailbox)->path);
-      break;
-    }
-    
-    s.fpin = fopen (msg_filename, "r");
-    
-    if (!s.fpin || ferror (s.fpin))
-    {
-      gchar *msg;
-      GtkWidget *msgbox;
-
-      
-      msg = g_strdup_printf ( _ (" Open of %s failed:%s "),
-			      msg_filename, strerror(errno));
-
-      gtk_object_destroy(GTK_OBJECT(save_dialog));
-      
-      msgbox = gnome_message_box_new (msg, _ ("Error"), _ ("Ok"), NULL);
-
-      gnome_dialog_set_parent(GNOME_DIALOG(msgbox), GTK_WINDOW(balsa_app.main_window));
-      gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
-      gnome_dialog_run (GNOME_DIALOG (msgbox));
-      
-      g_free(msg);
-      g_free(msg_filename);
-
-      return;
-    }
     filename = gtk_entry_get_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))));
-    s.prefix = 0;
-    s.fpout = fopen (filename, "w");
-    if (!s.fpout)
+    
+    if ( ! libbalsa_message_body_save ( info->body, NULL, filename ) )
     {
       gchar *msg;
       GtkWidget *msgbox;
       
-      msg = g_strdup_printf ( _ (" Open of %s failed:%s "), filename, strerror (errno));
-
+      msg = g_strdup_printf ( _ (" Could not save %s:%s "), filename, strerror (errno));
+      
       gtk_object_destroy(GTK_OBJECT(save_dialog));
+      
+      msgbox = gnome_error_dialog_parented (msg, GTK_WINDOW(balsa_app.main_window));
 
-      msgbox = gnome_message_box_new (msg, "Error", _ ("Ok"), NULL);
-
-      gnome_dialog_set_parent(GNOME_DIALOG(msgbox), GTK_WINDOW(balsa_app.main_window));
-      gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
       gnome_dialog_run (GNOME_DIALOG (msgbox));
       
       g_free(msg);
+      gtk_object_destroy(GTK_OBJECT(msgbox));
       
       return;
     }
-    fseek (s.fpin, info->body->offset, 0);
-    mutt_decode_attachment (info->body, &s);
-    fclose (s.fpin);
-    fclose (s.fpout);
   }
 
   gtk_object_destroy(GTK_OBJECT(save_dialog));
@@ -343,6 +306,12 @@ static void select_icon_cb (GnomeIconList * ilist, gint num, GdkEventButton * ev
   }
 }
 
+static void
+message_destroyed_cb(LibBalsaMessage *message, BalsaMessage *bm)
+{
+  balsa_message_set (bm, NULL);
+}
+
 void
 balsa_message_clear (BalsaMessage * bm)
 {
@@ -368,6 +337,12 @@ balsa_message_set (BalsaMessage * bm,
   had_focus = bm->content_has_focus;
 
   select_part(bm, -1);
+  if ( bm->message != NULL ) {
+    libbalsa_message_body_unref (bm->message);
+    gtk_signal_disconnect_by_func ( GTK_OBJECT(bm->message), 
+				    GTK_SIGNAL_FUNC(message_destroyed_cb),
+				   (gpointer)bm);
+  }
   bm->message = NULL;
   bm->part_count = 0;
   gnome_icon_list_clear(GNOME_ICON_LIST(bm->part_list));
@@ -384,11 +359,15 @@ balsa_message_set (BalsaMessage * bm,
 
   bm->message = message;
 
+  gtk_signal_connect ( GTK_OBJECT(message), "destroy",
+		       GTK_SIGNAL_FUNC(message_destroyed_cb), 
+		       (gpointer)bm);
+
   display_headers (bm);
 
   libbalsa_message_body_ref (bm->message);
+
   display_content (bm);
-  libbalsa_message_body_unref (bm->message);
 
   gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
   
@@ -579,6 +558,14 @@ display_headers (BalsaMessage * bm)
 
 }
 
+
+static void
+part_info_init_model (BalsaMessage *bm, BalsaPartInfo *info)
+{
+  g_print ("TODO: part_info_init_model\n");
+  part_info_init_unknown(bm, info);
+}
+
 static void
 part_info_init_other (BalsaMessage *bm, BalsaPartInfo *info)
 {
@@ -608,17 +595,16 @@ part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info)
 #else
   GdkPixbuf *pb;
 #endif
-  gchar *filename;
 
   GdkPixmap *pixmap;
   GdkBitmap *mask;
 
   GtkWidget *image;
 
-  filename = save_mime_part (info->message, info->body);
+  libbalsa_message_body_save_temporary ( info->body, NULL );
 
 #ifndef USE_PIXBUF
-  im = gdk_imlib_load_image (filename);
+  im = gdk_imlib_load_image (info->body->temp_filename);
   
   if ( !gdk_imlib_render(im,  im->rgb_width, im->rgb_height) ) {
     g_print( _ ("Couldn't render image\n") );
@@ -629,7 +615,7 @@ part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info)
 
   gdk_imlib_destroy_image(im);
 #else
-  pb = gdk_pixbuf_new_from_file(filename);
+  pb = gdk_pixbuf_new_from_file(info->body->temp_filename);
   gdk_pixbuf_render_pixmap_and_mask(pb, &pixmap, &mask, 0);
   gdk_pixbuf_unref(pb);
 #endif
@@ -648,8 +634,6 @@ part_info_init_image (BalsaMessage *bm, BalsaPartInfo *info)
   if ( mask ) 
     gdk_bitmap_unref(mask);
 
-  unlink (filename);
-  g_free(filename);
 }
 
 static void
@@ -666,6 +650,7 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
   GtkWidget *label;
   GtkWidget *button;
   gchar *msg;
+  gchar *content_type;
 
   vbox = gtk_vbox_new ( FALSE, 1 );
   gtk_container_set_border_width ( GTK_CONTAINER(vbox), 10 );
@@ -673,11 +658,11 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
   label = gtk_label_new ( _("Balsa does not know how to display this message part") );
   gtk_box_pack_start ( GTK_BOX(vbox), label, FALSE, FALSE, 1 );
   gtk_widget_show (label);
-  
-  if ( info->body->subtype ) 
-    msg = g_strdup_printf( _("Content Type: %s/%s"), TYPE(info->body), info->body->subtype);
-  else
-    msg = g_strdup_printf( _("Content Type: %s"), TYPE(info->body));
+
+  content_type = libbalsa_message_body_get_content_type ( info->body );
+  msg = g_strdup_printf( _("Content Type: %s"), content_type);
+  g_free (content_type);
+
   label = gtk_label_new ( msg );
   gtk_box_pack_start ( GTK_BOX(vbox), label, FALSE, FALSE, 1 );
   gtk_widget_show (label);
@@ -705,13 +690,14 @@ part_info_init_unknown (BalsaMessage *bm, BalsaPartInfo *info)
 }
 
 static void
-display_multipart (BalsaMessage *bm, BODY * bdy)
+display_multipart (BalsaMessage *bm, LibBalsaMessageBody * body)
 {
-  BODY *p;
+  /* FIXME: mutt dependency */
+  LibBalsaMessageBody *part;
   
-  for (p = bdy->parts; p; p = p->next)
+  for (part = body->parts; part; part = part->next)
     {
-      display_part (bm, p);
+      display_part (bm, part);
     }
 }
 
@@ -814,13 +800,16 @@ get_koi_font_name(const gchar* base, const gchar* code) {
 
 /* HELPER FUNCTIONS ----------------------------------------------- */
 static gchar*
-find_body_font(BODY * bdy) 
+find_body_font(LibBalsaMessageBody * body) 
 {
    gchar * font_name = NULL, *charset;
 
-   if ((charset=mutt_get_parameter("charset", bdy->parameter)))
+   charset = libbalsa_message_body_get_parameter(body, "charset");
+
+   if ( charset )
    {
-      if(g_strncasecmp(charset,"iso-8859-",9) != 0 ) return NULL;
+      if ( g_strncasecmp(charset,"iso-8859-",9) != 0 ) 
+	return NULL;
       font_name = get_font_name(balsa_app.message_font, atoi(charset+9));
    } 
    return font_name;
@@ -902,34 +891,46 @@ reflow_string(gchar* str, gint mode, gint *cur_pos, int width)
 static void
 part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
 {
-  FILE *fp;
 
+  FILE *fp;
+  
   gchar *ptr = 0; 
   size_t alloced;
 
-  GtkWidget *item = NULL;
-  GdkFont *fnt = NULL;
-
-  gchar *filename = save_mime_part(info->message, info->body);
+  libbalsa_message_body_save_temporary ( info->body, NULL );
   
-  fp = fopen( filename, "r" );
+  fp = fopen( info->body->temp_filename, "r" );
   alloced = readfile( fp, &ptr );
-  
+ 
   if( ptr ) {
-    gboolean showtext;
-    
-    if( g_strcasecmp( info->body->subtype, "html" ) == 0 )
-      showtext = FALSE;
+    gboolean ishtml;
+    gchar *content_type;
+  
+    content_type = libbalsa_message_body_get_content_type (info->body);
+    if( g_strcasecmp( content_type, "text/html" ) == 0 )
+      ishtml = TRUE;
     else
-      showtext = TRUE;
-    
+      ishtml = FALSE;
+    g_free ( content_type );
+
     /* This causes a memory leak */
     /* if( info->body->filename == NULL ) */
     /*   info->body->filename = g_strdup( "textfile" ); */
     
-    if( showtext ) {
+    if( ishtml ) {
+#ifdef HAVE_GTKHTML
+      part_info_init_html(bm, info, ptr, alloced);
+#else
+      part_info_init_unknown(bm, info);
+#endif
+    } 
+    else
+    {
       gchar *font_name;
-      
+
+      GtkWidget *item = NULL;
+      GdkFont *fnt = NULL;
+
       font_name = find_body_font(info->body);
       if(bm->wrap_text) 
 	libbalsa_wrap_string(ptr, balsa_app.wraplength);
@@ -962,18 +963,47 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
       info->focus_widget = item;
       info->widget = item;
       info->can_display = TRUE;
-    } else {
-      part_info_init_unknown(bm, info);
-    }
-
+    } 
     g_free( ptr );
+
+    fclose( fp );
 
   }		
 
-  fclose( fp );
-  unlink( filename );
-  g_free( filename );
 }
+
+#ifdef HAVE_GTKHTML
+static void part_info_init_html(BalsaMessage *bm, BalsaPartInfo *info, gchar *ptr, size_t len)
+{
+  GtkHTMLStream *stream;
+  GtkWidget *html, *scroll;
+
+  scroll = gtk_scrolled_window_new ( NULL, NULL );
+  gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER, GTK_POLICY_NEVER );
+  
+  html = gtk_html_new();
+
+  stream = gtk_html_begin ( GTK_HTML(html) );
+  
+  gtk_html_write ( GTK_HTML(html), stream, ptr, len );
+
+  gtk_html_end ( GTK_HTML(html), stream, GTK_HTML_STREAM_OK );
+
+  gtk_html_set_editable ( GTK_HTML(html), FALSE );
+  
+  gtk_signal_connect(GTK_OBJECT(html), "size_request",
+  		     (GtkSignalFunc)balsa_gtk_html_size_request, (gpointer)bm);
+
+  gtk_container_add ( GTK_CONTAINER(scroll), html );
+ 
+  gtk_widget_show ( html );
+  gtk_widget_show ( scroll );
+
+  info->focus_widget = html;
+  info->widget = scroll;
+  info->can_display = TRUE;
+}
+#endif
 
 static gchar *
 find_part_icon(BalsaPartInfo *info, gchar *content_type)
@@ -1003,7 +1033,7 @@ find_part_icon(BalsaPartInfo *info, gchar *content_type)
 }
 
 static void
-display_part (BalsaMessage *bm, BODY * body)
+display_part (BalsaMessage *bm, LibBalsaMessageBody * body)
 {
   BalsaPartInfo *info = NULL;
   gchar *pix = NULL;
@@ -1013,7 +1043,7 @@ display_part (BalsaMessage *bm, BODY * body)
   GtkWidget *menu_item;
   
 
-  if ( is_multipart(body) ) {
+  if ( libbalsa_message_body_is_multipart(body) ) {
     if (balsa_app.debug)
       fprintf (stderr, "part: multipart\n");
     display_multipart (bm, body);
@@ -1030,55 +1060,56 @@ display_part (BalsaMessage *bm, BODY * body)
   info->popup_menu = gtk_menu_new();
   info->can_display = FALSE;
 
-  switch (body->type)
+  switch ( libbalsa_message_body_type(body) )
   {
-  case TYPEOTHER:
+  case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
     if (balsa_app.debug)
       fprintf (stderr, "part: other\n");
     part_info_init_other (bm, info);
     break;
-  case TYPEAUDIO:
+  case LIBBALSA_MESSAGE_BODY_TYPE_AUDIO:
     if (balsa_app.debug)
       fprintf (stderr, "part: audio\n");
     part_info_init_audio (bm, info);
     break;
-  case TYPEAPPLICATION:
+  case LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION:
     if (balsa_app.debug){
       fprintf (stderr, "part: application\n");
-      fprintf (stderr, "subtype: %s\n", body->subtype);
     }
     part_info_init_application(bm, info);
     break;
-  case TYPEIMAGE:
+  case LIBBALSA_MESSAGE_BODY_TYPE_IMAGE:
     if (balsa_app.debug)
       fprintf (stderr, "part: image\n");
     part_info_init_image (bm, info);
     break;
-  case TYPEMESSAGE:
+  case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
     if (balsa_app.debug)
       fprintf (stderr, "part: message\n");
     part_info_init_message (bm, info);
     fprintf (stderr, "part end: multipart\n");
     break;
-  case TYPEMULTIPART:
+  case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
     g_print ("Got a TYPEMULTIPART in part2canvas!\n");
     break;
-  case TYPETEXT:
+  case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
     if (balsa_app.debug)
       fprintf (stderr, "part: text\n");
     part_info_init_mimetext (bm, info);
     break;
-  case TYPEVIDEO:
+  case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
     if (balsa_app.debug)
       fprintf (stderr, "part: video\n");
     part_info_init_video (bm, info);
     break;
+  case LIBBALSA_MESSAGE_BODY_TYPE_MODEL:
+    if (balsa_app.debug)
+      fprintf (stderr, "part: model\n");
+    part_info_init_model (bm, info);
+    break;
   }
 
-  if ( body->subtype ) 
-    content_type = g_strdup_printf("%s/%s", TYPE(body), body->subtype);
-  else
-    content_type = g_strdup(TYPE(body));
+  content_type = libbalsa_message_body_get_content_type(body);
 
   if ( body->filename )
     icon_title = g_strdup_printf("%s (%s)", body->filename, content_type);
@@ -1087,24 +1118,6 @@ display_part (BalsaMessage *bm, BODY * body)
 
   if ( ! pix ) 
     pix = find_part_icon (info, content_type);
-
-  if ( balsa_app.debug ) {
-    PARAMETER *param = body->parameter;
-    
-    g_print ("content_type = %s xtype = %s subtype = %s\n", 
-	     content_type, body->xtype, body->subtype);
-    g_print ("description = %s\n", body->description);
-    g_print ("form_name = %s\n", body->form_name);
-    g_print ("filename = %s\n", body->filename);
-    g_print ("d_filename = %s\n", body->d_filename);
-    g_print ("content-paramters: \n");
-    
-    while (param) {
-      g_print ("%s = %s\n", param->attribute, param->value);
-      param = param->next;
-    }
-    g_print ("\n");
-  }
 
   menu_item = gtk_menu_item_new_with_label( _("Save") );
   gtk_menu_append(GTK_MENU(info->popup_menu), menu_item);
@@ -1132,62 +1145,14 @@ display_part (BalsaMessage *bm, BODY * body)
 static void
 display_content (BalsaMessage *bm)
 {
-  GList *body_list;
   LibBalsaMessageBody *body;
   
-  body_list = bm->message->body_list;
-  while (body_list)
+  body = bm->message->body_list;
+  while ( body )
     {
-      body = (LibBalsaMessageBody *) body_list->data;
-      display_part (bm, body->mutt_body);
-      body_list = g_list_next (body_list);
+      display_part (bm, body);
+      body = body->next;
     }
-}
-
-static gchar *
-save_mime_part (LibBalsaMessage * message, BODY * body)
-{
-  gchar msg_filename[PATH_MAX + 1];
-  STATE s;
-
-  msg_filename[0] = '\0';
-
-  switch (message->mailbox->type)
-    {
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      snprintf(msg_filename, PATH_MAX, "%s/%s", 
-	       LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, 
-	       libbalsa_message_pathname (message));
-      s.fpin = fopen(msg_filename, "r");
-      break;
-    case MAILBOX_IMAP:
-    case MAILBOX_POP3:
-      s.fpin = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
-      break;
-    default:
-      s.fpin = fopen (LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, "r");
-      break;
-    }
-
-  mutt_mktemp (msg_filename);
-
-  s.prefix = 0;
-  if( (s.fpout = fopen (msg_filename, "w")) == NULL) {
-      return NULL;
-  }
-  fseek (s.fpin, body->offset, 0);
-
-  if (!s.fpout)
-    {
-      /* error */
-    }
-
-  mutt_decode_attachment (body, &s);
-  fclose (s.fpin);
-  fclose (s.fpout);
-
-  return g_strdup(msg_filename);
 }
 
 static void free_icon_data(gpointer data)
@@ -1395,6 +1360,23 @@ balsa_gtk_text_size_request (GtkWidget *widget, GtkRequisition *requisition, gpo
   requisition->height += text->vadj->upper;
   
 }
+
+#ifdef HAVE_GTKHTML
+static void 
+balsa_gtk_html_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data)
+{
+  g_return_if_fail(widget != NULL);
+  g_return_if_fail(GTK_IS_HTML(widget));
+  g_return_if_fail(requisition != NULL);
+
+  requisition->width = ( widget->style->klass->xthickness + 1 ) * 2;
+  requisition->height = ( widget->style->klass->ythickness + 1 ) * 2;
+
+  requisition->width += GTK_LAYOUT(widget)->hadjustment->upper;
+  requisition->height += GTK_LAYOUT(widget)->vadjustment->upper;
+  
+}
+#endif
 
 static void
 balsa_icon_list_size_request (GtkWidget *widget, GtkRequisition *requisition, gpointer data)

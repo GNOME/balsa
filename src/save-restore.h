@@ -50,6 +50,7 @@ gchar* mailbox_get_pkey(const LibBalsaMailbox * mbox);
 gint config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg);
 gint config_mailbox_delete (const LibBalsaMailbox *mailbox);
 gint config_mailbox_update (LibBalsaMailbox * mailbox, const gchar * old_mbox_pkey);
+
 gint config_mailboxes_init (void);
 
 gint config_imapdir_add(ImapDir *dir);

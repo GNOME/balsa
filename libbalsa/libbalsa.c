@@ -25,6 +25,7 @@
 #include <sys/utsname.h>
 
 #include "libbalsa.h"
+#include "mailbackend.h"
 
 void mutt_message (const char *fmt,...);
 void mutt_exit (int code);
@@ -57,11 +58,11 @@ mutt_yesorno (const char *msg, int def)
   return 1;
 }
 
-int
-mutt_any_key_to_continue (const char *s)
-{
-  return 1;
-}
+/*  int */
+/*  mutt_any_key_to_continue (const char *s) */
+/*  { */
+/*    return 1; */
+/*  } */
 
 void
 mutt_clear_error (void)
@@ -77,7 +78,7 @@ libbalsa_init (gchar * inbox_path,
   char *p;
   gchar *tmp;
 
-  Spoolfile = inbox_path;
+  Spoolfile = g_strdup(inbox_path);
 
   uname (&utsname);
 

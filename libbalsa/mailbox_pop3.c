@@ -122,8 +122,6 @@ GtkObject *libbalsa_mailbox_pop3_new(void)
 
   mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_POP3);
 
-  mailbox->type = MAILBOX_POP3;
-
   return GTK_OBJECT(mailbox);
 }
 

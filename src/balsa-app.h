@@ -215,7 +215,7 @@ balsa_app;
 
 
 void balsa_app_init (void);
-gint do_load_mailboxes (void);
+gboolean do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
 void balsa_error_toggle_fatality( gboolean are_fatal );
 LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);

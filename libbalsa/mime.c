@@ -35,70 +35,58 @@
 
 #include "mime.h"
 
+/* FIXME: unnecesary global */
 GString *reply;
 
-static gchar tmp_file_name[PATH_MAX + 1];
+static void process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str);
+static void process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str);
 
-void process_mime_multipart (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
-
-void process_mime_part (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
-
-void
-process_mime_part (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
+static void
+process_mime_part (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str)
 {
+  FILE *part;
   size_t alloced;
   gchar *ptr = 0;
-  switch (bdy->type)
-    {
-    case TYPEOTHER:
-      break;
-    case TYPEAUDIO:
-      break;
-    case TYPEAPPLICATION:
-      break;
-    case TYPEIMAGE:
-      break;
-    case TYPEMESSAGE:
-      break;
-    case TYPEMULTIPART:
-      process_mime_multipart (message, bdy, msg_stream, reply_prefix_str);
-      break;
-    case TYPETEXT:
-	      {
-		STATE s;
-		fseek (msg_stream, bdy->offset, 0);
-		s.fpin = msg_stream;
-		mutt_mktemp (tmp_file_name);
-		s.prefix = reply_prefix_str;
-		s.fpout = fopen (tmp_file_name, "w+");
-		mutt_decode_attachment (bdy, &s);
-		fflush (s.fpout);
-		alloced = readfile (s.fpout, &ptr);
-		if (reply)
-		  {
-		    reply = g_string_append (reply, "\n");
-		    reply = g_string_append (reply, ptr);
-		  }
-		else
-		  reply = g_string_new (ptr);
-		fclose (s.fpout);
-		unlink (tmp_file_name);
-                break;
-	      } 
-      break;
-    case TYPEVIDEO:
-      break;
-    }
 
+  switch ( libbalsa_message_body_type (body) )
+  {
+  case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
+  case LIBBALSA_MESSAGE_BODY_TYPE_AUDIO:
+  case LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION:
+  case LIBBALSA_MESSAGE_BODY_TYPE_IMAGE:
+  case LIBBALSA_MESSAGE_BODY_TYPE_MODEL:
+  case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
+  case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
+    break;
+  case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
+    process_mime_multipart (message, body, reply_prefix_str);
+    break;
+  case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
+    libbalsa_message_body_save_temporary(body, reply_prefix_str);
+    
+    part = fopen (body->temp_filename, "r");
+    alloced = readfile (part, &ptr);
+    
+    if (reply)
+    {
+      reply = g_string_append (reply, "\n");
+      reply = g_string_append (reply, ptr);
+    }
+    else
+      reply = g_string_new (ptr);
+    
+    break;
+  }
 }
 
-void
-process_mime_multipart (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
+static void
+process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body, gchar *reply_prefix_str)
 {
-  BODY *p;
-  for (p = bdy->parts; p; p = p->next)
+  LibBalsaMessageBody *part;
+
+  for (part = body->parts; part; part = part->next)
     {
-      process_mime_part (message, p, msg_stream, reply_prefix_str);
+      process_mime_part (message, part, reply_prefix_str);
     }
 }
 
@@ -106,45 +94,16 @@ GString *
 content2reply (LibBalsaMessage * message,
 	       gchar *reply_prefix_str)    /* arp */
 {
-  GList *body_list;
   LibBalsaMessageBody *body;
-  FILE *msg_stream;
-  gchar msg_filename[PATH_MAX];
 
   reply = 0;
 
-  switch (message->mailbox->type)
+  body = message->body_list;
+  while ( body )
     {
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      {
-	snprintf (msg_filename, PATH_MAX, "%s/%s", LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, libbalsa_message_pathname (message));
-	msg_stream = fopen (msg_filename, "r");
-	if (!msg_stream || ferror (msg_stream))
-	  {
-	    fprintf (stderr, "Open of %s failed. Errno = %d, ",
-		     msg_filename, errno);
-	    perror (NULL);
-	    return 0;
-	  }
-	break;
-      }
-    case MAILBOX_IMAP:
-      msg_stream = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
-      break;
-    default:
-      msg_stream = fopen (LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, "r");
-      break;
-    }
-
-  body_list = message->body_list;
-  while (body_list)
-    {
-      body = (LibBalsaMessageBody *) body_list->data;
-      process_mime_part (message, body->mutt_body, msg_stream, reply_prefix_str);
-      body_list = g_list_next (body_list);
+      process_mime_part (message, body, reply_prefix_str);
+      body = body->next;
     }    
 
-  fclose (msg_stream);
   return reply;
 }

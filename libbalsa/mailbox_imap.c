@@ -37,6 +37,8 @@ static void libbalsa_mailbox_imap_destroy (GtkObject *object);
 static void libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass);
 static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox);
 static void libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append);
+static FILE* libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message);
+
 static void libbalsa_mailbox_imap_set_username (LibBalsaMailbox *mailbox, const gchar *username);
 static void libbalsa_mailbox_imap_set_passwd (LibBalsaMailbox *mailbox, const gchar *passwd);
 static void libbalsa_mailbox_imap_set_host (LibBalsaMailbox *mailbox, const gchar *host, gint port);
@@ -84,6 +86,7 @@ libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass)
   object_class->destroy = libbalsa_mailbox_imap_destroy;
 
   libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
+  libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_imap_get_message_stream;
 
   libbalsa_mailbox_class->set_username = libbalsa_mailbox_imap_set_username;
   libbalsa_mailbox_class->set_password = libbalsa_mailbox_imap_set_passwd;
@@ -127,7 +130,6 @@ libbalsa_mailbox_imap_new(void)
   LibBalsaMailbox *mailbox;
   mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_IMAP);
 
-  mailbox->type = MAILBOX_IMAP;
   return GTK_OBJECT(mailbox);
 }
 
@@ -141,7 +143,8 @@ set_mutt_username (LibBalsaMailboxImap * mb)
   ImapPass = LIBBALSA_MAILBOX_IMAP(mb)->passwd;
 }
 
-static void libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
+static void 
+libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 {
   LibBalsaMailboxImap *imap;
   gchar *tmp;
@@ -204,7 +207,8 @@ static void libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean appen
 
 }
 
-static void libbalsa_mailbox_imap_set_username (LibBalsaMailbox *mailbox, const gchar *username)
+static void 
+libbalsa_mailbox_imap_set_username (LibBalsaMailbox *mailbox, const gchar *username)
 {
   LibBalsaMailboxImap *imap;
   g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) );
@@ -215,7 +219,8 @@ static void libbalsa_mailbox_imap_set_username (LibBalsaMailbox *mailbox, const 
   imap->user = g_strdup(username);
 }
 
-static void libbalsa_mailbox_imap_set_passwd (LibBalsaMailbox *mailbox, const gchar *passwd)
+static void 
+libbalsa_mailbox_imap_set_passwd (LibBalsaMailbox *mailbox, const gchar *passwd)
 {
   LibBalsaMailboxImap *imap;
   g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) );
@@ -226,7 +231,8 @@ static void libbalsa_mailbox_imap_set_passwd (LibBalsaMailbox *mailbox, const gc
   imap->passwd = g_strdup(passwd);
 }
 
-static void libbalsa_mailbox_imap_set_host (LibBalsaMailbox *mailbox, const gchar *host, gint port)
+static void 
+libbalsa_mailbox_imap_set_host (LibBalsaMailbox *mailbox, const gchar *host, gint port)
 {
   LibBalsaMailboxImap *imap;
   g_return_if_fail ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) );
@@ -236,6 +242,19 @@ static void libbalsa_mailbox_imap_set_host (LibBalsaMailbox *mailbox, const gcha
   g_free(imap->host);
   imap->host = g_strdup(host);
   imap->port = port;
+}
+
+static FILE*
+libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message)
+{
+  FILE *stream;
+
+  g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
+  g_return_val_if_fail (LIBBALSA_IS_MESSAGE (message), NULL);
+
+  stream = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
+  
+  return stream;
 }
 
 #if 0

@@ -328,8 +328,8 @@ mb_add_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_del_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-  if (mailbox->type == MAILBOX_UNKNOWN)
-    return;
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+
   mailbox_conf_delete (mailbox);
 }
 
@@ -339,8 +339,8 @@ mb_del_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_inbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-  if (mailbox->type == MAILBOX_UNKNOWN)
-    return;
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+
   /* FIXME: make it clean  and move the code to a separate function */
   config_mailbox_set_as_special(mailbox, SPECIAL_INBOX);
   /* I wonder if this should not go into _idle_ function because it may be(?)
@@ -351,8 +351,8 @@ mb_inbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_sentbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-  if (mailbox->type == MAILBOX_UNKNOWN)
-    return;
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+
   config_mailbox_set_as_special(mailbox, SPECIAL_SENT);
   balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
 }
@@ -360,8 +360,8 @@ mb_sentbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_trash_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-  if (mailbox->type == MAILBOX_UNKNOWN)
-    return;
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+
   config_mailbox_set_as_special(mailbox, SPECIAL_TRASH);
   balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
 }
@@ -369,8 +369,8 @@ mb_trash_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 static void
 mb_draftbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
-  if (mailbox->type == MAILBOX_UNKNOWN)
-    return;
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+
   config_mailbox_set_as_special(mailbox, SPECIAL_DRAFT);
   balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
 }
@@ -464,11 +464,12 @@ mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
     {
       GtkWidget *err_dialog = gnome_error_dialog (_ ("No mailbox selected."));
       gnome_dialog_run (GNOME_DIALOG (err_dialog));
+      gtk_widget_destroy ( GTK_WIDGET (err_dialog) );
       return;
     }
 
-  if (mailbox->type == MAILBOX_UNKNOWN)
-    return;
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX(mailbox) );
+
   mailbox_conf_delete (mailbox);
 }
 

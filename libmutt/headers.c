@@ -18,47 +18,6 @@
 
 #include "mutt.h"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #include <sys/stat.h>
 #include <string.h>
 #include <ctype.h>
@@ -200,42 +159,6 @@ void mutt_edit_headers (const char *editor,
       }
       keep = 0;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     if (keep)
     {
       last = cur;

@@ -63,11 +63,8 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 
 static void unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error )
 {
-	struct stat sb;
 	gchar *dup;
 	gchar *index;
-	int fd;
-	LibBalsaMailboxType mt;
 	LibBalsaMailbox *box;
 
 	if( (*error) != NULL )
@@ -77,10 +74,10 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	index = g_basename( dup );
 
 	if( index == NULL ) {
-		(*error) = g_strdup_printf( _("The pathname \"%s\" must be specified"
-			" canonically -- it must start with a \'/\'."), dup );
-		g_free( dup );
-		return;
+	  (*error) = g_strdup_printf( _("The pathname \"%s\" must be specified"
+					" canonically -- it must start with a \'/\'."), dup );
+	  g_free( dup );
+	  return;
 	}
 
 	index[-1] = '\0'; /*Split off the dirs from the file.*/
@@ -92,51 +89,21 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	}
 
 	index[-1] = '/';
+	g_free ( dup );
 
-	/* I'm having cases where stat returns nonzero but
-	 * the file exists. Fortunately, errno is still zero,
-	 * so this is our acid test.
-	 */
+	/* The mailbox currently may not be IMAP or POP3 */
+	/* Due to the above test for a / at the start of the filename */
 
-	if( stat( dup, &sb ) != 0 && errno != 0 ) {
-		if( (fd = creat( dup, S_IRUSR | S_IWUSR )) < 0 ) {
-			(*error) = g_strdup_printf( _("An error occurred when attempting "
-				"to creat(2) the file \"%s\"."), dup );
-			g_free( dup );
-			return;
-		}
+	box = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(path, TRUE));
 
-		close( fd );
-	}
-
-	mt = libbalsa_mailbox_valid( dup );
-
-	if( mt == MAILBOX_UNKNOWN ) {
-		(*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
-			dup );
-		g_free( dup );
+	if( box == NULL ) {
+	  (*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
+				      path );
 		return;
 	}
 
-	switch ( mt ) {
-	case MAILBOX_MH:
-	case MAILBOX_MBOX:
-	case MAILBOX_MAILDIR:
-	  box = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(mt));
-	  break;
-	case MAILBOX_IMAP:
-	  box = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
-	  break;
-	case MAILBOX_POP3:
-	  box = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
-	break;
-	default:
-	  g_warning("Unknown mailbox type\n");
-	  box = NULL;
-	}
-
 	box->name = g_strdup( gettext( prettyname ) );
-	LIBBALSA_MAILBOX_LOCAL( box )->path = dup;
+
 	config_mailbox_add( box, (char *) prettyname );
 	mailbox_add_for_checking( box );
 	gtk_object_destroy( GTK_OBJECT( box ) );

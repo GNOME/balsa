@@ -631,24 +631,25 @@ update_pop3_servers (void)
 	
 	gtk_clist_freeze (clist);
 	while (list) {
-		mailbox = list->data;
-		if (mailbox) {
-			switch (mailbox->type) {
-			case MAILBOX_POP3:	
-				text[0] = "POP3"; 
-				break;
-			case MAILBOX_IMAP:	
-				text[0] = "IMAP"; 
-				break;
-			default:		
-				text[0] = "????"; 
-				break;
-			}
-			text[1] = mailbox->name;
-			row = gtk_clist_append (clist, text);
-			gtk_clist_set_row_data (clist, row, mailbox);
-		}
-		list = list->next;
+	  mailbox = list->data;
+	  if (mailbox) {
+	    if ( LIBBALSA_IS_MAILBOX_POP3(mailbox) ) 
+	    {
+	      text[0] = "POP3"; 
+	    } 
+	    else if ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) )
+	    {
+	      text[0] = "IMAP"; 
+	    } 
+	    else
+	    {
+	      text[0] = "????"; 
+	    }
+	    text[1] = mailbox->name;
+	    row = gtk_clist_append (clist, text);
+	    gtk_clist_set_row_data (clist, row, mailbox);
+	  }
+	  list = list->next;
 	}
 	gtk_clist_select_row(clist, 0, 0);
 	gtk_clist_thaw (clist);
@@ -1603,8 +1604,7 @@ pop3_del_cb (GtkWidget * widget, gpointer data)
 	if (!mailbox)
 		return;
 
-	if (mailbox->type != MAILBOX_POP3)
-		return;
+	g_return_if_fail ( LIBBALSA_IS_MAILBOX_POP3(mailbox) );
 
 	mailbox_conf_delete (mailbox);
 }

@@ -51,6 +51,8 @@ INCLUDES = \
 	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 
+CFLAGS += $(GTKHTML_CFLAGS)
+
 #libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a \
@@ -61,7 +63,9 @@ balsa_LDADD = \
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS)  \
-	$(INTLLIBS)
+	$(INTLLIBS) \
+	$(PTHREAD_LIB) \
+	$(GTKHTML_LIBS)	
 
 balsa_DEPENDENCIES = \
 	$(top_builddir)/libbalsa/libbalsa.a \

@@ -32,8 +32,8 @@
 #include <gnome.h>
 
 #include "libbalsa.h"
-#include "misc.h"
-#include "../libmutt/mailbox.h"
+#include "mailbackend.h"
+
 #include "../libmutt/imap.h"
 
 MailboxNode *
@@ -210,19 +210,6 @@ libbalsa_get_hostname (void)
   struct utsname utsname;
   uname (&utsname);
   return g_strdup (utsname.nodename);
-}
-
-gchar *
-ADDRESS_to_gchar (const ADDRESS * addr)
-{
-  gchar buf[1024]; /* assume no single address is longer than this */
-
-  buf[0] = '\0';
-  rfc822_write_address(buf, sizeof(buf), (ADDRESS*)addr);
-  if(strlen(buf)>=sizeof(buf)-1)
-    fprintf(stderr,
-	    "ADDRESS_to_gchar: the max allowed address length exceeded.\n");
-  return g_strdup(buf);
 }
 
 gchar *

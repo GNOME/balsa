@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1998-1999 Jay Painter and Stuart Parmenter
  *
@@ -29,8 +30,11 @@
 #include "balsa-mblist.h"
 /* mblist-window.h for mblist_open_mailbox */
 #include "mblist-window.h"
-#include "misc.h"
-#include "mailbox.h"
+
+#include "libbalsa.h"
+
+/*FIXME: must go*/
+#include "libmutt/mutt.h" 
 
 enum
 {
@@ -430,10 +434,11 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
   {
     mbnode->IsDir = FALSE;
 
-    if (mbnode->mailbox->type == MAILBOX_POP3)
+    if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
+    {
       return FALSE;
-
-    if (mbnode->mailbox->type == MAILBOX_IMAP)
+    }
+    else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
     {
       gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 			       NULL, NULL,
@@ -441,45 +446,38 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 			       FALSE,
 			       FALSE);
       gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
-
-    } else if (mbnode->mailbox && mbnode->name) {
-
-      if (mbnode->mailbox->type == MAILBOX_MH ||
-	  mbnode->mailbox->type == MAILBOX_MAILDIR)
+      
+    } 
+    else if (LIBBALSA_IS_MAILBOX_LOCAL(mbnode->mailbox)) 
+    {
+      if (libbalsa_mailbox_has_new_messages (mbnode->mailbox))
       {
-	gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
-                                 balsa_icon_get_pixmap(BALSA_ICON_TRAY_EMPTY), 
-                                 balsa_icon_get_bitmap(BALSA_ICON_TRAY_EMPTY),
+	mbnode->mailbox->has_unread_messages = TRUE;
+	
+	gtk_ctree_set_node_info (ctree, cnode,
+				 mbnode->mailbox->name, 5,
+				 balsa_icon_get_pixmap(BALSA_ICON_TRAY_FULL),
+				 balsa_icon_get_bitmap(BALSA_ICON_TRAY_FULL),
 				 NULL, NULL,
 				 G_NODE_IS_LEAF (gnode),
-				 mbnode->expanded);
-	gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
+				 FALSE);
       } else {
-	/* normal mailbox */
-	if (libbalsa_mailbox_has_new_messages (mbnode->mailbox))
-	{
-          mbnode->mailbox->has_unread_messages = TRUE;
-
-	  gtk_ctree_set_node_info (ctree, cnode,
-				   mbnode->mailbox->name, 5,
-				   balsa_icon_get_pixmap(BALSA_ICON_TRAY_FULL),
-				   balsa_icon_get_bitmap(BALSA_ICON_TRAY_FULL),
-				   NULL, NULL,
-				   G_NODE_IS_LEAF (gnode),
-				   FALSE);
-	} else {
-	  gtk_ctree_set_node_info (ctree, cnode,
-				   mbnode->mailbox->name, 5,
-				   balsa_icon_get_pixmap(BALSA_ICON_TRAY_EMPTY),
-				   balsa_icon_get_bitmap(BALSA_ICON_TRAY_EMPTY),
-				   NULL, NULL,
-				   G_NODE_IS_LEAF (gnode),
-				   FALSE);
-	}
-	
-	gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
-	
+	mbnode->mailbox->has_unread_messages = FALSE;
+	gtk_ctree_set_node_info (ctree, cnode,
+				 mbnode->mailbox->name, 5,
+				 balsa_icon_get_pixmap(BALSA_ICON_TRAY_EMPTY),
+				 balsa_icon_get_bitmap(BALSA_ICON_TRAY_EMPTY),
+				 NULL, NULL,
+				 G_NODE_IS_LEAF (gnode),
+				 FALSE);
       }
+      
+      gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
+      
+    }
+    else 
+    {
+      g_error ("Unknown mailbox type\n");
     }
   }
 

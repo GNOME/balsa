@@ -172,7 +172,7 @@ static void dump_queue(const char*msg)
    it to fcc mailbox as well.
 */
 
-static void
+void
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		      gint encoding)
 {
@@ -207,26 +207,34 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 /* libbalsa_message_send:
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
+*/
+gboolean
+libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
+		      gint encoding)
+{
+
+    if (message != NULL)
+	libbalsa_message_queue(message, outbox, encoding);
+    return libbalsa_process_queue(outbox, encoding);
+}
+
+/* libbalsa_process_queue:
+   treats given mailbox as a set of messages to send. Loads them up and
+   launches sending thread/routine.
    NOTE that we do not close outbox after reading. send_real/thread message 
    handler does that.
 */
-gboolean
-libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
-		      gint encoding)
+gboolean 
+libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding)
 {
     MessageQueueItem *mqi, *new_message;
     GList *lista;
     LibBalsaMessage *queu;
+    /* We do messages in queue now only if where are not sending them already */
+
 #ifdef BALSA_USE_THREADS
     GtkWidget *send_dialog_source = NULL;
-#endif
 
-    if (message != NULL)
-	libbalsa_message_queue(message, outbox, encoding);
-
- /* We do messages in queue now only if where are not sending them already */
-
-#ifdef BALSA_USE_THREADS
     pthread_mutex_lock(&send_messages_lock);
     if (sending_mail == FALSE) {
 	/* We create here the progress bar */

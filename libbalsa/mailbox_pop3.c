@@ -29,6 +29,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "mailbackend.h"
+#include "pop3.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -205,86 +206,74 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, gboolean append)
 
 }
 
+/* libbalsa_mailbox_pop3_check:
+   checks=downloads POP3 mail. 
+   FIXME: uses mutt's Spoolfile.
+*/
 static void
 libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 {
     gchar uid[80];
-
+    PopStatus status;
+    LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
+    LibBalsaServer *server;
 #ifdef BALSA_USE_THREADS
     gchar *msgbuf;
     MailThreadMessage *threadmsg;
 #endif				/* BALSA_USE_THREADS */
+    
+    if (!m->check) return;
 
-    if (LIBBALSA_MAILBOX_POP3(mailbox)->check) {
-	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-
-	/* Unlock GDK - this is safe since libbalsa_error is threadsafe. */
-	gdk_threads_leave();
-	libbalsa_lock_mutt();
-
-	PopHost = g_strdup(server->host);
-	PopPort = (server->port);
-	PopPass = g_strdup(server->passwd);
-	PopUser = g_strdup(server->user);
-
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(m);
+    
+    /* Unlock GDK - this is safe since libbalsa_error is threadsafe. */
+    gdk_threads_leave();
+    
 #ifdef BALSA_USE_THREADS
-	msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
-	MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_SOURCE, msgbuf);
-	g_free(msgbuf);
+    msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
+    MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_SOURCE, msgbuf);
+    g_free(msgbuf);
 #endif
+    
+    if (LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL)
+	uid[0] = 0;
+    else
+	strcpy(uid, LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid);
+    
+    status =  LIBBALSA_MAILBOX_POP3(mailbox)->filter 
+	? libbalsa_fetch_pop_mail_filter (m, progress_cb, uid)
+	: libbalsa_fetch_pop_mail_direct (m, Spoolfile, progress_cb, uid);
 
-	if (LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL)
-	    uid[0] = 0;
-	else
-	    strcpy(uid, LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid);
-
-	PopUID = uid;
-
-	/* Delete it if necessary */
-	if (LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server) {
-	    set_option(OPTPOPDELETE);
-	} else {
-	    unset_option(OPTPOPDELETE);
-	}
-
-	/* Use Apop ? */
-	if (LIBBALSA_MAILBOX_POP3(mailbox)->use_apop) {
-	    set_option(OPTPOPAPOP);
-	} else {
-	    unset_option(OPTPOPAPOP);
-	}
-
-	mutt_fetchPopMail(progress_cb);
-	g_free(PopHost);
-	g_free(PopPass);
-	g_free(PopUser);
-
-	if (LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
-	    strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid,
-		   uid) != 0) {
-
-	    g_free(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid);
-
-	    LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid =
-		g_strdup(uid);
-
+    if(status != POP_OK)
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("POP3 mailbox %s accessing error:\n%s"), 
+			     mailbox->name,
+			     pop_get_errstr(status));
+    
+    if (LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
+	strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid,
+	       uid) != 0) {
+	
+	g_free(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid);
+	
+	LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid =
+	    g_strdup(uid);
+	
 #ifdef BALSA_USE_THREADS
-	    threadmsg = g_new(MailThreadMessage, 1);
-	    threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
-	    threadmsg->mailbox = (void *) mailbox;
-	    write(mail_thread_pipes[1], (void *) &threadmsg,
-		  sizeof(void *));
+	threadmsg = g_new(MailThreadMessage, 1);
+	threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
+	threadmsg->mailbox = (void *) mailbox;
+	write(mail_thread_pipes[1], (void *) &threadmsg,
+	      sizeof(void *));
 #else
-	    config_mailbox_update(mailbox);
+	config_mailbox_update(mailbox);
 #endif
-	}
-
-	/* Regrab the gdk lock before leaving */
-	libbalsa_unlock_mutt();
-	gdk_threads_enter();
     }
-
+    
+    /* Regrab the gdk lock before leaving */
+    gdk_threads_enter();
 }
+
 
 static void
 progress_cb(char *msg, int prog, int tot)
@@ -310,9 +299,7 @@ progress_cb(char *msg, int prog, int tot)
        * blocking on the mutt_lock, andthe pipe filling up.
        * This would give us a deadlock.
      */
-    libbalsa_unlock_mutt();
     write(mail_thread_pipes[1], (void *) &message, sizeof(void *));
-    libbalsa_lock_mutt();
 #endif
 }
 
@@ -331,6 +318,7 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
     gnome_config_set_bool("Check", pop->check);
     gnome_config_set_bool("Delete", pop->delete_from_server);
     gnome_config_set_bool("Apop", pop->use_apop);
+    gnome_config_set_bool("Filter", pop->filter);
 
     gnome_config_set_string("Lastuid", pop->last_popped_uid);
 
@@ -355,6 +343,7 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
     pop->check = gnome_config_get_bool("Check=false");
     pop->delete_from_server = gnome_config_get_bool("Delete=false");
     pop->use_apop = gnome_config_get_bool("Apop=false");
+    pop->filter = gnome_config_get_bool("Filter=false");
 
     g_free(pop->last_popped_uid);
     pop->last_popped_uid = gnome_config_get_string("Lastuid");

@@ -42,6 +42,8 @@ libbalsa_a_SOURCES = 		\
 	mailbox_pop3.h		\
 	mailbox_imap.c		\
 	mailbox_imap.h		\
+	pop3.c			\
+	pop3.h			\
 	send.c			\
 	server.c		\
 	server.h		\

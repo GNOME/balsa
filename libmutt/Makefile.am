@@ -25,7 +25,6 @@ libmutt_a_SOURCES = \
 	mx.c 		\
 	parse.c 	\
 	pattern.c 	\
-	pop.c 		\
 	rfc1524.c 	\
 	rfc2047.c 	\
 	rfc822.c 	\

@@ -74,6 +74,7 @@
 static gchar *read_signature(void);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
+static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint print_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked(GtkWidget *, gpointer);
@@ -165,6 +166,7 @@ static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_ATTACH_POS 1
     GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
 			   attach_clicked, GNOME_STOCK_MENU_ATTACH),
+#define MENU_FILE_SEPARATOR1_POS 2
     GNOMEUIINFO_SEPARATOR,
 
 #define MENU_FILE_SEND_POS 3
@@ -172,16 +174,22 @@ static GnomeUIInfo file_menu[] = {
 			   N_("Send the currently edited message"),
 			   send_message_cb, GNOME_STOCK_MENU_MAIL_SND),
 
-#define MENU_FILE_POSTPONE_POS 4
+#define MENU_FILE_QUEUE_POS 4
+    GNOMEUIINFO_ITEM_STOCK(N_("_Queue"),
+			   N_("Queue this message in outbox for sending"),
+			   queue_message_cb, GNOME_STOCK_MENU_MAIL_SND),
+
+#define MENU_FILE_POSTPONE_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
 			   postpone_message_cb, GNOME_STOCK_MENU_SAVE),
 
-#define MENU_FILE_PRINT_POS 5
+#define MENU_FILE_PRINT_POS 6
     GNOMEUIINFO_ITEM_STOCK(N_("Print..."), N_("Print the edited message"),
 			   print_message_cb, GNOME_STOCK_MENU_PRINT),
+#define MENU_FILE_SEPARATOR2_POS 7
     GNOMEUIINFO_SEPARATOR,
 
-#define MENU_FILE_CLOSE_POS 7
+#define MENU_FILE_CLOSE_POS 8
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_window, NULL),
 
     GNOMEUIINFO_END
@@ -1203,7 +1211,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 				       msg);
 
     msg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
-    msg->ready_widgets[1] = main_toolbar[TOOL_SEND_POS].widget;
+    msg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
+    msg->ready_widgets[2] = main_toolbar[TOOL_SEND_POS].widget;
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* create spell checking disable widget list */
@@ -1215,7 +1224,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     }
 
     for (i = 0; i < MENU_FILE_CLOSE_POS; ++i) {
-	if (i != 2 && i != 6)
+	if (i != MENU_FILE_SEPARATOR1_POS && i != MENU_FILE_SEPARATOR2_POS)
 	    list = g_list_append(list, (gpointer) file_menu[i].widget);
     }
 
@@ -1237,10 +1246,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     if (type == SEND_REPLY || type == SEND_REPLY_ALL) {
 	LibBalsaAddress *addr = NULL;
 
-	if (message->reply_to)
-	    addr = message->reply_to;
-	else
-	    addr = message->from;
+	addr = (message->reply_to) ? message->reply_to : message->from;
 
 	tmp = libbalsa_address_to_gchar(addr);
 	gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
@@ -1262,17 +1268,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	gtk_entry_set_text(GTK_ENTRY(msg->reply_to[1]), balsa_app.replyto);
 
     /* Bcc: */
-    {
-	if (balsa_app.bcc)
-	    gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), balsa_app.bcc);
-    }
+    if (balsa_app.bcc)
+	gtk_entry_set_text(GTK_ENTRY(msg->bcc[1]), balsa_app.bcc);
 
     /* Fcc: */
-    {
-	if (type == SEND_CONTINUE && message->fcc_mailbox != NULL)
-	    gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(msg->fcc[1])->entry),
-			       message->fcc_mailbox);
-    }
+    if (type == SEND_CONTINUE && message->fcc_mailbox != NULL)
+	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(msg->fcc[1])->entry),
+			   message->fcc_mailbox);
 
     /* Subject: */
     switch (type) {
@@ -1653,8 +1655,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
 /* "send message" menu and toolbar callback */
 static gint
-send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 {
+    gboolean successful = TRUE;
     LibBalsaMessage *message;
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
@@ -1665,8 +1668,13 @@ send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     message = bsmsg2message(bsmsg);
 
-    if (libbalsa_message_send(message, balsa_app.outbox,
-			      balsa_app.encoding_style)) {
+    if(queue_only)
+	libbalsa_message_queue(message, balsa_app.outbox, 
+			       balsa_app.encoding_style);
+    else 
+	successful = libbalsa_message_send(message, balsa_app.outbox,
+					   balsa_app.encoding_style);
+    if (successful) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL) {
 	    if (bsmsg->orig_message)
 		libbalsa_message_reply(bsmsg->orig_message);
@@ -1683,6 +1691,19 @@ send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     balsa_sendmsg_destroy(bsmsg);
 
     return TRUE;
+}
+
+/* "send message" menu and toolbar callback */
+static gint
+send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    return send_message_handler(bsmsg, FALSE);
+}
+
+static gint
+queue_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    return send_message_handler(bsmsg, TRUE);
 }
 
 /* "postpone message" menu and toolbar callback */

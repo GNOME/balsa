@@ -149,6 +149,8 @@ gboolean balsa_postpone_message(LibBalsaMessage * message,
 				LibBalsaMailbox * draftbox,
 				LibBalsaMessage * reply_message,
 				gchar * fcc);
+void libbalsa_message_queue(LibBalsaMessage * message, 
+			    LibBalsaMailbox * outbox, gint encoding);
 gboolean libbalsa_message_send(LibBalsaMessage * message,
 			       LibBalsaMailbox * outbox, gint encoding);
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,

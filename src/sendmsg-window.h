@@ -56,7 +56,7 @@ extern "C" {
 	GtkWidget *current_language_menu;
 
 	/* widgets to be disabled when the address is incorrect */
-	GtkWidget *ready_widgets[2];
+	GtkWidget *ready_widgets[3];
 	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];
 	GList *spell_check_disable_list;
     };

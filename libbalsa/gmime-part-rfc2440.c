@@ -146,22 +146,19 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
     /* add the headers to encrypted ascii armor output: as there is no "insert"
      * method for the byte array, first remove the leading "BEGIN PGP MESSAGE"
      * (27 chars) and prepend it again... */
-    if (recipients) {
-	const GMimeContentType *type;
-
-	if ((type = g_mime_part_get_content_type(part))) {
-	    const gchar *charset =
-		g_mime_content_type_get_parameter(type, "charset");
-	    gchar * rfc2440header;
-
-	    rfc2440header =
-		g_strdup_printf("-----BEGIN PGP MESSAGE-----\nCharset: %s\n"
-				"Comment: created by Balsa " BALSA_VERSION
-				" (http://balsa.gnome.org)", charset);
-	    g_byte_array_remove_range(cipherdata, 0, 27);
-	    g_byte_array_prepend(cipherdata, rfc2440header, strlen(rfc2440header));
-	    g_free(rfc2440header);
-	}
+    if (recipients && g_mime_object_get_content_type(GMIME_OBJECT(part))) {
+	const gchar *charset =
+	    g_mime_object_get_content_type_parameter(GMIME_OBJECT(part),
+						     "charset");
+	gchar * rfc2440header;
+	
+	rfc2440header =
+	    g_strdup_printf("-----BEGIN PGP MESSAGE-----\nCharset: %s\n"
+			    "Comment: created by Balsa " BALSA_VERSION
+			    " (http://balsa.gnome.org)", charset);
+	g_byte_array_remove_range(cipherdata, 0, 27);
+	g_byte_array_prepend(cipherdata, rfc2440header, strlen(rfc2440header));
+	g_free(rfc2440header);
     }
 
     /* replace the content of the part */
@@ -289,7 +286,6 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 			      plainstream, err);
 
     if (result == 0) {
-	GMimeContentType *type;
 	GMimeStream *filter_stream;
 	GMimeStream *out_stream;
 	GMimeFilter *filter;
@@ -320,7 +316,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
  	 * use "some" charset, so "unknown-8bit" is a safe choice in this case
  	 * and if no other charset is given.
 	 */
-	if ((type = (GMimeContentType *)g_mime_part_get_content_type(part))) {
+	if (g_mime_object_get_content_type(GMIME_OBJECT(part))) {
  	    gchar *up_headbuf = g_ascii_strup(headbuf, -1);
  	    gchar *p;
  
@@ -332,14 +328,15 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
  		while (*line_end > ' ')
  		    line_end++;
  		*line_end = '\0';
- 		g_mime_content_type_set_parameter(type,"charset", p);
+		g_mime_object_set_content_type_parameter(GMIME_OBJECT(part),
+							 "charset", p);
  	    } else {
-		const gchar *charset =
-		    g_mime_content_type_get_parameter(type, "charset");
-
-		if (!g_ascii_strcasecmp(charset, "us-ascii"))
-		    g_mime_content_type_set_parameter(type, "charset",
-						      "unknown-8bit");
+		if (!g_ascii_strcasecmp("us-ascii",
+			 g_mime_object_get_content_type_parameter(GMIME_OBJECT(part),
+								  "charset")))
+		    g_mime_object_set_content_type_parameter(GMIME_OBJECT(part),
+							     "charset",
+							     "unknown-8bit");
 	    }
 	    g_free(up_headbuf);
 	}

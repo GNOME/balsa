@@ -93,26 +93,34 @@ Get the sources from the home page or grab the RPM built on Redhat 7.3:</p>
 
 <a name="gnome2"></a>
 <dl>
-<dt>GNOME2 release - 2.0.5 - released on 2003.01.05</dt>
-<dd>
+<dt>GNOME2 release - 2.0.6 - released on 2003.01.29</dt>
+<dd><p>This release specifically includes:</p>
+<ul>
+<li>authenticated LDAP binding. Option to use TLS for LDAP.
+<li>persistent mailbox sorting and threading.
+<li>search improvements.
+<li>multiple UI fixes.
+<li>printing font and paper selection fixed.
+</ul>
+<p>Download:</p>
 <ul>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.5.tar.bz2">balsa-2.0.5.tar.bz2</a>
+<a href="http://balsa.gnome.org/balsa-2.0.6.tar.bz2">balsa-2.0.6.tar.bz2</a>
 </li>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.5-1.i386.rpm">balsa-2.0.5-1.i386.rpm</a> built on RH 8.0</li>
+<a href="http://balsa.gnome.org/balsa-2.0.6-1.i386.rpm">balsa-2.0.6-1.i386.rpm</a> built on RH 8.0</li>
 <li>
-<a href="http://balsa.gnome.org/balsa-2.0.5-1.src.rpm">balsa-2.0.5-1.src.rpm</a></li>
+<a href="http://balsa.gnome.org/balsa-2.0.6-1.src.rpm">balsa-2.0.6-1.src.rpm</a></li>
 </dd>
 </dl>
 
-<p>Balsa-2.0.5 is a quite mature GNOME2 port of balsa and has been
+<p>Balsa-2.0.6 is a quite mature GNOME2 port of balsa and has been
 used daily by many people. You may want to recompile balsa on your
 computer if you use different distribution. Try</p>
 
- <pre>rpmbuild --recompile balsa-2.0.5-1.src.rpm</pre>
+ <pre>rpmbuild --recompile balsa-2.0.?-1.src.rpm</pre>
 
-<p><b>Please note</b> also that pspell distributed with RH makes balsa
+<p><b>Please note</b> also that pspell distributed with RH8.0 makes balsa
 hang on <tt>fork()</tt> call, i.e. when any external program is to be forked
 from balsa. The solution is to remove <tt>-lc</tt> from dependency_libs 
 in <tt>/usr/lib/libpspell.la</tt>.

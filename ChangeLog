@@ -3,10 +3,15 @@
 	* configure.in: warn on wrong return type.
 	* libbalsa/misc.c, libbalsa/address-book-ldif.c: Solaris fixes (S.Wall)
 	* libbalsa/pop3.c: quit immediately on refused connection.
-	* libinit_balsa/Makefile.am: automake-1.5 compatibility.
 	* libbalsa/address.c (rfc2822_mailbox): return a value.
 	* src/sendmsg-window.c, src/balsa-mblist.[hc]: fix return type.
 	* src/main-window.c: add missing gdk_threads_{enter,leave}. Clean up.
+	* src/pref-manager.c: double click to edit server (Peter Bloomfield).
+	* src/mailbox-conf.c: disable pop3 ssl nicely (Peter Bloomfield).
+
+	NOTE:
+	* libinit_balsa/Makefile.am: automake-1.5 compatibility changes that
+	were initially commited (see rev.1.20) actually broke things. Reverted.
 
 2001-10-05  Pawel Salek  <pawsa@theochem.kth.se>
 

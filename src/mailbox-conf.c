@@ -71,7 +71,9 @@ struct _MailboxConfWindow {
 	    GtkWidget *use_apop;
 	    GtkWidget *filter;
 #ifdef USE_SSL
+#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
 	    GtkWidget *use_ssl;
+#endif
 #endif
 	} pop3;
     } mb_data;
@@ -116,7 +118,7 @@ imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
     gtk_editable_insert_text(port, use_ssl ? "993" : "143", 3, &zero);
 }
 
-#if 0
+#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
 static void pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
 
 static void
@@ -420,8 +422,10 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password),
 			       server->passwd);
 #ifdef USE_SSL
+#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl),
 				     server->use_ssl);
+#endif
 #endif
 
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_apop),
@@ -558,7 +562,11 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 			     atoi(gtk_entry_get_text
 				  (GTK_ENTRY(mcw->mb_data.pop3.port)))
 #ifdef USE_SSL
+#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
 			     , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl))
+#else
+			     , FALSE
+#endif
 #endif
 );
     mailbox->check =
@@ -863,7 +871,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 	create_check(mcw->window, _("_Enable check for new mail"), 
 		     table, 8, TRUE);
 
-#if 0
+#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
     /*
      * chbm: we don't do pop3s. i did all the necessary config stuff 
      * and then realized libbalsa/pop3.c can't use libmutt/ stuff

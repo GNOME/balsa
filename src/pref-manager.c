@@ -171,9 +171,12 @@ void update_mail_servers(void);
 static void update_address_books(void);
 static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void font_changed(GtkWidget * widget, GtkWidget * pbox);
-static void pop3_edit_cb(GtkWidget * widget, gpointer data);
-static void pop3_add_cb(GtkWidget * widget, gpointer data);
-static void pop3_del_cb(GtkWidget * widget, gpointer data);
+static void mail_servers_cb(GtkCList * clist, gint row, gint column,
+                            GdkEventButton * event, gpointer data);
+static void server_edit_cb(GtkWidget * widget, gpointer data);
+static void pop3_add(GtkWidget * widget, gpointer data);
+static void server_add_cb(GtkWidget * widget, gpointer data);
+static void server_del_cb(GtkWidget * widget, gpointer data);
 static void address_book_edit_cb(GtkWidget * widget, gpointer data);
 static void address_book_add_cb(GtkWidget * widget, gpointer data);
 static void address_book_delete_cb(GtkWidget * widget, gpointer data);
@@ -1187,6 +1190,13 @@ color_box(GtkBox* parent, const gchar* title)
     return picker;
 }
 
+static void
+mail_servers_cb(GtkCList * clist, gint row, gint column,
+                GdkEventButton * event, gpointer data)
+{
+    if (event && event->type == GDK_2BUTTON_PRESS)
+        server_edit_cb(NULL, NULL);
+}
 
 static GtkWidget *
 create_mailserver_page(gpointer data)
@@ -1239,11 +1249,13 @@ create_mailserver_page(gpointer data)
     label15 = gtk_label_new(_("Mailbox Name"));
     gtk_clist_set_column_widget(GTK_CLIST(pui->mail_servers), 1, label15);
     gtk_label_set_justify(GTK_LABEL(label15), GTK_JUSTIFY_LEFT);
+    gtk_signal_connect(GTK_OBJECT(pui->mail_servers), "select-row",
+                       mail_servers_cb, NULL);
 
     vbox1 = vbox_in_container(hbox1);
-    add_button_to_box(_("Add"),    pop3_add_cb,  vbox1);
-    add_button_to_box(_("Modify"), pop3_edit_cb, vbox1);
-    add_button_to_box(_("Delete"), pop3_del_cb,  vbox1);
+    add_button_to_box(_("Add"),    server_add_cb,  vbox1);
+    add_button_to_box(_("Modify"), server_edit_cb, vbox1);
+    add_button_to_box(_("Delete"), server_del_cb,  vbox1);
 
     frame4 = gtk_frame_new(_("Local mail"));
     gtk_table_attach(GTK_TABLE(table3), frame4, 0, 1, 1, 2,
@@ -2182,7 +2194,7 @@ font_changed(GtkWidget * widget, GtkWidget * pbox)
 }
 
 static void
-pop3_edit_cb(GtkWidget * widget, gpointer data)
+server_edit_cb(GtkWidget * widget, gpointer data)
 {
     GtkCList *clist = GTK_CLIST(pui->mail_servers);
     gint row;
@@ -2288,7 +2300,7 @@ pop3_add(GtkWidget * widget, gpointer data)
 }
 
 static void
-pop3_add_cb(GtkWidget * widget, gpointer data)
+server_add_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget *menu;
     GtkWidget *menuitem;
@@ -2313,7 +2325,7 @@ pop3_add_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-pop3_del_cb(GtkWidget * widget, gpointer data)
+server_del_cb(GtkWidget * widget, gpointer data)
 {
     GtkCList *clist = GTK_CLIST(pui->mail_servers);
     gint row;

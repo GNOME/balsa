@@ -37,6 +37,7 @@
 
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, gpointer data);
+static void print_message_window(GtkWidget * widget, gpointer data);
 static void close_message_window(GtkWidget * widget, gpointer data);
 
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
@@ -83,8 +84,9 @@ static GnomeUIInfo shown_hdrs_menu[] = {
 };
 
 static GnomeUIInfo file_menu[] = {
+    GNOMEUIINFO_MENU_PRINT_ITEM(print_cb, NULL),
+    GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_message_window, NULL),
-
     GNOMEUIINFO_END
 };
 

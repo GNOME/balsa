@@ -1,3 +1,9 @@
+2002-07-28 Steve Wall <hitched97@myrealbox.com>
+
+	* src/balsa-message.c: fix #85728.
+	* src/main-window.c: fix menu item numbers.
+	* src/message-window.c: add message print menu entry.
+
 2002-07-24  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main-window.c: 

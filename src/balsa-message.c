@@ -1,5 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
-/* vim:set ts=4 sw=4 ai et: */
+/* vim:set ts=4 sw=4 ai: */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -1746,7 +1746,7 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
 		url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
 	    }
 	    if (!was_over_url) {
-		gdk_window_set_cursor(GTK_TEXT(widget)->text_area, 
+		gdk_window_set_cursor(GTK_TEXT(widget)->text_area,
 				      url_cursor_over_url);
 		was_over_url = TRUE;
 	    }
@@ -1789,35 +1789,66 @@ handle_url(const message_url_t* url)
     }
 }
 
-/* if the mouse button was released over an url, try to call it */
+/* store the coordinates at which the button was pressed */
+static gint stored_x=-1, stored_y=-1;
+static GdkModifierType stored_mask=-1;
+
+static gboolean
+store_button_coords(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
+       gdk_window_get_pointer(GTK_TEXT(widget)->text_area,
+                              &stored_x, &stored_y, &stored_mask);
+       /* Take this button press out of the mask, so it won't interfere
+        * with the comparison in check_call_url()
+        * FIXME Is the mask comparison necessary?  Or should it be
+        * there, but only compare shift, ctrl, and mod1-mod5?
+        */
+       stored_mask &= ~(GDK_BUTTON_PRESS_MASK);
+    }
+    return FALSE;
+}
+
+/* if the mouse button was released over an URL, and the mouse hasn't
+ * moved since the button was pressed, try to call the URL */
 static gboolean 
 check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-    GList *hotarea_list = 
-	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "hotarea-list");
+    GList *hotarea_list;
+    gint x, y;
+    GdkModifierType mask;
+
+    if ( !(event->type == GDK_BUTTON_RELEASE && event->button == 1) ) 
+        return FALSE;
+
+    hotarea_list = gtk_object_get_data(GTK_OBJECT(widget), "hotarea-list");
     
     if (!hotarea_list)
 	return FALSE;
 
-    if (event->type == GDK_BUTTON_RELEASE && event->button == 1) {
-	gint x;
-	gint y;
-	GdkModifierType mask;
-	
-	gdk_window_get_pointer(GTK_TEXT(widget)->text_area, &x, &y, &mask);
-	while (hotarea_list) {
-	    hotarea_t *hotarea_data = (hotarea_t *)hotarea_list->data;
+    gdk_window_get_pointer(GTK_TEXT(widget)->text_area, &x, &y, &mask);
+    /* FIXME Allow some slop here?
+     * Eg, if cursor has moved less than 2 pixels, follow the link:
+     *   if ((x >= stored_x-2) && (x <= stored_x+2) &&
+     *       (y >= stored_y-2) && (y <= stored_y+2) &&
+     *       (mask == stored_mask))
+     *
+     * Is there some gnome setting that can be used where the
+     * +/- 2 (or whatever) appears?
+     */
+    if (x == stored_x && y == stored_y && mask == stored_mask) {
+        while (hotarea_list) {
+            hotarea_t *hotarea_data = (hotarea_t *)hotarea_list->data;
 
-	    if (hotarea_data->xul <= x && x <= hotarea_data->xlr &&
-		hotarea_data->yul <= y && y <= hotarea_data->ylr) {
+            if (hotarea_data->xul <= x && x <= hotarea_data->xlr &&
+                hotarea_data->yul <= y && y <= hotarea_data->ylr) {
 
-		handle_url(hotarea_data->url);
-		break;
-	    }
-	    hotarea_list = g_list_next(hotarea_list);
-	}
+                handle_url(hotarea_data->url);
+                break;
+            }
+            hotarea_list = g_list_next(hotarea_list);
+        }
     }
-
     return FALSE;
 }
 
@@ -1960,7 +1991,10 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    gtk_object_set_data(GTK_OBJECT(item), "url-list", 
 				(gpointer) url_list);
 	    gtk_object_set_data(GTK_OBJECT(item), "hotarea-list", 
-				(gpointer) NULL);	    
+				(gpointer) NULL);	
+            gtk_signal_connect_after(GTK_OBJECT(item), "button_press_event",
+                                     (GtkSignalFunc)store_button_coords, 
+                                     NULL);
 	    gtk_signal_connect_after(GTK_OBJECT(item), "button_release_event",
 				     (GtkSignalFunc)check_call_url, NULL);
 	    gtk_signal_connect(GTK_OBJECT(item), "motion-notify-event",

@@ -2574,13 +2574,13 @@ setup_headers_from_message(BalsaSendmsg* bsmsg, LibBalsaMessage *message)
 static gboolean
 set_identity_from_mailbox(BalsaSendmsg* bsmsg)
 {
-    gchar *identity;
+    const gchar *identity;
     LibBalsaMessage *message = bsmsg->orig_message;
     LibBalsaIdentity* ident;
     GList *ilist;
 
     if( message && message->mailbox && balsa_app.identities) {
-        identity = message->mailbox->view->identity_name;
+        identity = libbalsa_mailbox_get_identity_name(message->mailbox);
         if(!identity) return FALSE;
         for (ilist = balsa_app.identities;
              ilist != NULL;
@@ -4396,12 +4396,13 @@ static void
 set_list_post_address(BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message = bsmsg->orig_message;
+    LibBalsaAddress *mailing_list_address;
     GList *p;
 
-    if (message->mailbox->view->mailing_list_address) {
-        gchar *tmp =
-            libbalsa_address_to_gchar(message->mailbox->view->
-                                      mailing_list_address, 0);
+    mailing_list_address =
+	libbalsa_mailbox_get_mailing_list_address(message->mailbox);
+    if (mailing_list_address) {
+        gchar *tmp = libbalsa_address_to_gchar(mailing_list_address, 0);
  	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
  			       NULL);
         gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);

@@ -356,7 +356,6 @@ balsa_app_init(void)
     balsa_app.shown_headers = HEADERS_SELECTED;
     balsa_app.show_all_headers = FALSE;
     balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
-    balsa_app.threading_type = LB_MAILBOX_THREADING_JWZ;
     balsa_app.expand_tree = FALSE;
     balsa_app.show_mblist = TRUE;
     balsa_app.show_notebook_tabs = FALSE;
@@ -458,21 +457,12 @@ balsa_app_init(void)
     /* Message filing */
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
-
-    /* Mailbox views */
-    balsa_app.mailbox_views =
-        g_hash_table_new_full(g_str_hash, g_str_equal,
-                              (GDestroyNotify) g_free,
-                              (GDestroyNotify) libbalsa_mailbox_view_free);
-    config_views_load();
 }
 
 void
 balsa_app_destroy(void)
 {
     config_views_save();
-    g_hash_table_destroy(balsa_app.mailbox_views);
-    balsa_app.mailbox_views = NULL;
     if (balsa_app.empty_trash_on_exit)
 	empty_trash(balsa_app.main_window);
 
@@ -554,13 +544,13 @@ open_mailboxes_idle_cb(gchar ** urls)
     if (!urls) {
         GString *str;
 
-        if (!balsa_app.mailbox_views) {
+        if (!libbalsa_mailbox_view_table) {
             gdk_threads_leave();
             return FALSE;
         }
 
         str = g_string_new(NULL);
-        g_hash_table_foreach(balsa_app.mailbox_views,
+        g_hash_table_foreach(libbalsa_mailbox_view_table,
                              (GHFunc) open_mailboxes_idle_func, str);
         urls = g_strsplit(str->str, ";", 0);
         g_string_free(str, TRUE);
@@ -815,42 +805,63 @@ balsa_find_iter_by_data(GtkTreeIter * iter , gpointer data)
 
 /* balsa_remove_children_mailbox_nodes:
    remove all children of given node leaving the node itself intact.
-   Applicable to balsa_app.mailbox_nodes and its children.
  */
-void
-balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
+static void
+ba_remove_children_mailbox_nodes(GtkTreeModel * model, GtkTreeIter * parent,
+				 GSList ** specials)
 {
-    GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
-    GtkTreeIter parent;
     GtkTreeIter iter;
+    BalsaMailboxNode *mbnode;
     gboolean valid;
 
-    if (balsa_app.debug)
-	printf("Destroying children of %p %s\n",
-	       mbnode, mbnode && mbnode->name ? mbnode->name : "");
-
-    if (mbnode) {
-	if (!balsa_find_iter_by_data(&parent, mbnode)
-	    || !gtk_tree_model_iter_children(model, &iter, &parent))
-	    return;
-    } else {
-	if (!gtk_tree_model_get_iter_first(model, &iter))
-	    return;
-    }
+    if (!gtk_tree_model_iter_children(model, &iter, parent))
+	return;
 
     do {
 	gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-	if (mbnode->parent)
+	if (mbnode->parent) {
+	    LibBalsaMailbox *mailbox = mbnode->mailbox;
+	    if (mailbox == balsa_app.inbox
+		|| mailbox == balsa_app.outbox
+		|| mailbox == balsa_app.sentbox
+		|| mailbox == balsa_app.draftbox
+		|| mailbox == balsa_app.trash) {
+		g_object_ref(mbnode);
+		*specials = g_slist_prepend(*specials, mbnode);
+	    }
+	    ba_remove_children_mailbox_nodes(model, &iter, specials);
 	    valid =
 		gtk_tree_store_remove(balsa_app.mblist_tree_store, &iter);
-	else {
+	} else {
 	    printf("sparing %s %s\n",
 		   mbnode->mailbox ? "mailbox" : "folder ",
 		   mbnode->mailbox ? mbnode->mailbox->name : mbnode->name);
 	    valid = gtk_tree_model_iter_next(model, &iter);
 	}
-	g_object_unref(G_OBJECT(mbnode)); 
+	g_object_unref(mbnode); 
     } while (valid);
+}
+
+void
+balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
+{
+    GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+    GtkTreeIter parent;
+    GtkTreeIter *iter = NULL;
+    GSList *specials = NULL, *l;
+
+    if (balsa_app.debug)
+	printf("Destroying children of %p %s\n",
+	       mbnode, mbnode && mbnode->name ? mbnode->name : "");
+
+    if (mbnode && balsa_find_iter_by_data(&parent, mbnode))
+	iter = &parent;
+
+    ba_remove_children_mailbox_nodes(model, iter, &specials);
+
+    for (l = specials; l; l = l->next)
+	balsa_mblist_mailbox_node_append(NULL, l->data);
+    g_slist_free(specials);
 }
 
 /* create_label:

@@ -834,9 +834,6 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 
     mcw->mailbox = g_object_new(mcw->mailbox_type, NULL);
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
-    /* Now the mailbox has a view, so we can populate it, but it's not
-     * yet in balsa_app.mailbox_views, because the mailbox url isn't set.
-     */
     mailbox_conf_view_check(mcw->view_info, mcw->mailbox);
 
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
@@ -872,6 +869,19 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 	g_assert_not_reached();
     }
 
+    if (!LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox)) {
+	/* Mailbox must have an URL by now... */
+	g_assert(mcw->mailbox->url != NULL);
+	/* ...and a view... */
+	g_assert(mcw->mailbox->view != NULL);
+	/* ...and if it's not already in the table, insert it. */
+	if (mcw->mailbox->view !=
+	    g_hash_table_lookup(libbalsa_mailbox_view_table,
+				mcw->mailbox->url))
+	    g_hash_table_insert(libbalsa_mailbox_view_table,
+				g_strdup(mcw->mailbox->url),
+				mcw->mailbox->view);
+    }
 
     if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);
@@ -884,9 +894,9 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 	 * already be in the mailbox-views, in which case inserting it
 	 * again would cause the view to be freed, so we'd better
 	 * check... */
-	if (!g_hash_table_lookup(balsa_app.mailbox_views,
+	if (!g_hash_table_lookup(libbalsa_mailbox_view_table,
 				 mcw->mailbox->url))
-	    g_hash_table_insert(balsa_app.mailbox_views,
+	    g_hash_table_insert(libbalsa_mailbox_view_table,
 				g_strdup(mcw->mailbox->url),
 				mcw->mailbox->view);
     }
@@ -1159,24 +1169,23 @@ BalsaMailboxConfView *
 mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                       GtkWindow * window, GtkWidget * table, gint row)
 {
-    LibBalsaMailboxView *view;
     BalsaMailboxConfView *view_info;
     GtkWidget *box;
     GtkWidget *button;
+    const gchar *identity_name;
 
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window),
                       (GWeakNotify) mailbox_conf_view_free, view_info);
     view_info->window = window;
 
-    view = mailbox ? mailbox->view : NULL;
-
     create_label(_("Identity:"), table, row);
     box = gtk_hbox_new(FALSE, 12);
     view_info->identity_name = NULL;
-    view_info->identity_label = gtk_label_new(view && view->identity_name
-                                              ? view->identity_name
-                                              : _("(No identity set)"));
+    identity_name = libbalsa_mailbox_get_identity_name(mailbox);
+    view_info->identity_label =
+	gtk_label_new(identity_name ? identity_name :
+		      _("(No identity set)"));
     gtk_box_pack_start(GTK_BOX(box), view_info->identity_label, TRUE, TRUE,
                        0);
 
@@ -1201,8 +1210,8 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
     gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-    button = (view && view->show == LB_MAILBOX_SHOW_FROM
-              ? view_info->show_from : view_info->show_to);
+    button = (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO ?
+	      view_info->show_to : view_info->show_from);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
     return view_info;
@@ -1216,42 +1225,38 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
  */
 void
 mailbox_conf_view_check(BalsaMailboxConfView * view_info,
-                        LibBalsaMailbox * mailbox)
+			LibBalsaMailbox * mailbox)
 {
     gboolean changed;
-    LibBalsaMailboxView *view;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    if(view_info == NULL) /* POP3 mailboxes do not have view_info */
-        return;
+    if (view_info == NULL)	/* POP3 mailboxes do not have view_info */
+	return;
 
     changed = FALSE;
-    view = mailbox->view;
+
+    if (!mailbox->view)
+	/* The mailbox may not have its URL yet, so we can't insert it
+	 * into libbalsa_mailbox_view_table yet. */
+	mailbox->view = libbalsa_mailbox_view_new();
 
     if (view_info->identity_name) {
-        changed = (!view->identity_name
-                   || strcmp(view->identity_name,
-                             view_info->identity_name));
-        g_free(view->identity_name);
-        view->identity_name = view_info->identity_name;
-        view_info->identity_name = NULL;
+	changed =
+	    libbalsa_mailbox_set_identity_name(mailbox,
+					       view_info->identity_name);
+	g_free(view_info->identity_name);
+	view_info->identity_name = NULL;
     }
 
-    if (gtk_toggle_button_get_active
-        (GTK_TOGGLE_BUTTON(view_info->show_from))) {
-        if (view->show != LB_MAILBOX_SHOW_FROM) {
-            view->show = LB_MAILBOX_SHOW_FROM;
-            changed = TRUE;
-        }
-    } else {
-        if (view->show != LB_MAILBOX_SHOW_TO) {
-            view->show = LB_MAILBOX_SHOW_TO;
-            changed = TRUE;
-        }
-    }
+    if (libbalsa_mailbox_set_show(mailbox,
+				  gtk_toggle_button_get_active
+				  (GTK_TOGGLE_BUTTON(view_info->show_from))
+				  ? LB_MAILBOX_SHOW_FROM
+				  : LB_MAILBOX_SHOW_TO))
+	changed = TRUE;
 
-    if (!changed || !view->open)
-        return;
+    if (!changed || !libbalsa_mailbox_get_open(mailbox))
+	return;
 
     balsa_mblist_close_mailbox(mailbox);
 }

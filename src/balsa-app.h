@@ -275,7 +275,6 @@ extern struct BalsaApplication {
     gboolean show_all_headers;
     gchar *selected_headers;
     gchar *message_title_format;
-    LibBalsaMailboxThreadingType threading_type;
     gboolean expand_tree;
     gboolean show_mblist;
     gboolean show_notebook_tabs;
@@ -388,8 +387,6 @@ extern struct BalsaApplication {
     GList *fcc_mru;
     gboolean delete_immediately;
     gboolean hide_deleted;
-
-    GHashTable *mailbox_views;
 
     /* use as default email client for GNOME */
     int default_client;

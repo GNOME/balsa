@@ -482,6 +482,11 @@ main(int argc, char *argv[])
 #endif
 
     balsa_app_init();
+    libbalsa_mailbox_view_table =
+	g_hash_table_new_full(g_str_hash, g_str_equal,
+			      (GDestroyNotify) g_free,
+			      (GDestroyNotify) libbalsa_mailbox_view_free);
+    config_views_load();
 
     /* Initialize libbalsa */
     libbalsa_init((LibBalsaInformationFunc) balsa_information_real);
@@ -603,6 +608,8 @@ balsa_cleanup(void)
     pthread_mutex_unlock(&mailbox_lock);
 #endif
     balsa_app_destroy();
+    g_hash_table_destroy(libbalsa_mailbox_view_table);
+    libbalsa_mailbox_view_table = NULL;
 
     gnome_sound_shutdown();
 }

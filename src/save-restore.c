@@ -43,6 +43,7 @@
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 #define IDENTITY_SECTION_PREFIX "identity-"
 #define VIEW_SECTION_PREFIX "view-"
+#define VIEW_BY_URL_SECTION_PREFIX "viewByUrl-"
 
 static gint config_section_init(const char* section_prefix, 
 				gint (*cb)(const char*));
@@ -505,11 +506,10 @@ config_mailbox_init(const gchar * prefix)
 	    g_list_append(balsa_app.inbox_input, 
 			  balsa_mailbox_node_new_from_mailbox(mailbox));
     } else {
-        LibBalsaMailbox **special;
+        LibBalsaMailbox **special = NULL;
 	BalsaMailboxNode *mbnode;
 
 	mbnode = balsa_mailbox_node_new_from_mailbox(mailbox);
-	balsa_mblist_mailbox_node_append(NULL, mbnode);
 	if (strcmp("Inbox/", key) == 0)
 	    special = &balsa_app.inbox;
 	else if (strcmp("Outbox/", key) == 0)
@@ -521,11 +521,17 @@ config_mailbox_init(const gchar * prefix)
 	else if (strcmp("Trash/", key) == 0) {
 	    special = &balsa_app.trash;
             libbalsa_filters_set_trash(balsa_app.trash);
-        } else
-	    return TRUE;
+	}
 
-	*special = mailbox;
-	g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) special);
+	if (special) {
+	    /* Designate as special before appending to the mblist, so
+	     * that view->show gets set correctly for sentbox, draftbox,
+	     * and outbox. */
+	    *special = mailbox;
+	    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) special);
+	}
+
+	balsa_mblist_mailbox_node_append(NULL, mbnode);
     }
     return TRUE;
 }				/* config_mailbox_init */
@@ -667,8 +673,6 @@ config_global_load(void)
                                 DEFAULT_MESSAGE_TITLE_FORMAT);
 
     balsa_app.expand_tree = gnome_config_get_bool("ExpandTree=false");
-    balsa_app.threading_type = d_get_gint("ThreadingType", 
-					  LB_MAILBOX_THREADING_FLAT);
 
     /* ... Quote colouring */
     g_free(balsa_app.quote_regex);
@@ -1079,7 +1083,8 @@ config_save(void)
     gnome_config_set_string("MessageTitleFormat",
                             balsa_app.message_title_format);
     gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);
-    gnome_config_set_int("ThreadingType", balsa_app.threading_type);
+    gnome_config_set_int("ThreadingType",
+			 libbalsa_mailbox_get_threading_type(NULL));
     gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
     gnome_config_set_string("MessageFont", balsa_app.message_font);
     gnome_config_set_string("SubjectFont", balsa_app.subject_font);
@@ -1481,28 +1486,34 @@ config_identities_save(void)
     }
 }
 
-void
-config_views_load(void)
+static void
+config_views_load_with_prefix(const gchar * prefix, gboolean compat)
 {
     void *iterator;
     gchar *key, *val, *tmp;
-    int pref_len = strlen(VIEW_SECTION_PREFIX);
+    int pref_len = strlen(prefix);
     int def;
 
     iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
     while ((iterator = gnome_config_iterator_next(iterator, &key, &val))) {
-	if (strncmp(key, VIEW_SECTION_PREFIX, pref_len) == 0) {
+	if (strncmp(key, prefix, pref_len) == 0) {
 	    gchar *url;
 	    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    gnome_config_push_prefix(tmp);
 	    g_free(tmp);
-	    url = gnome_config_get_string_with_default("URL", &def);
-	    if (!def) {
+	    url = compat
+		? gnome_config_get_string_with_default("URL", &def)
+		: libbalsa_urldecode(&key[pref_len]);
+	    if (!compat || !def) {
                 LibBalsaMailboxView *view;
+		gint tmp;
                 gchar *address;
 
                 view = libbalsa_mailbox_view_new();
-                g_hash_table_insert(balsa_app.mailbox_views,
+		/* In compatibility mode, mark as not in sync, to force
+		 * the view to be saved in the config file. */
+		view->in_sync = !compat;
+                g_hash_table_insert(libbalsa_mailbox_view_table,
                                     g_strdup(url), view);
 
                 address =
@@ -1514,36 +1525,33 @@ config_views_load(void)
 
                 view->identity_name = gnome_config_get_string("Identity");
 
-                view->threading_type =
-                    gnome_config_get_int_with_default("Threading", &def);
-                if (def)
-                    view->threading_type = LB_MAILBOX_THREADING_SIMPLE;
-                view->filter = gnome_config_get_int("GUIFilter");
+		tmp = gnome_config_get_int_with_default("Threading", &def);
+                if (!def)
+		    view->threading_type = tmp;
 
-                view->sort_type =
-                    gnome_config_get_int_with_default("SortType", &def);
-                if (def)
-                    view->sort_type = LB_MAILBOX_SORT_TYPE_ASC;
+		tmp = gnome_config_get_int_with_default("GUIFilter", &def);
+                if (!def)
+		    view->filter = tmp;
 
-                view->sort_field =
-                    gnome_config_get_int_with_default("SortField", &def);
-                if (def)
-                    view->sort_field = LB_MAILBOX_SORT_DATE;
+		tmp = gnome_config_get_int_with_default("SortType", &def);
+                if (!def)
+		    view->sort_type = tmp;
 
-                view->show =
-                    gnome_config_get_int_with_default("Show", &def);
-                if (def)
-                    view->show = LB_MAILBOX_SHOW_UNSET;
+		tmp = gnome_config_get_int_with_default("SortField", &def);
+                if (!def)
+		    view->sort_field = tmp;
 
-                view->exposed =
-                    gnome_config_get_bool_with_default("Exposed", &def);
-                if (def)
-                    view->exposed = FALSE;
+		tmp = gnome_config_get_int_with_default("Show", &def);
+                if (!def)
+		    view->show = tmp;
 
-                view->open =
-                    gnome_config_get_bool_with_default("Open", &def);
-                if (def)
-                    view->open = FALSE;
+		tmp = gnome_config_get_bool_with_default("Exposed", &def);
+                if (!def)
+		    view->exposed = tmp;
+
+		tmp = gnome_config_get_bool_with_default("Open", &def);
+                if (!def)
+		    view->open = tmp;
             }
             gnome_config_pop_prefix();
             g_free(url);
@@ -1553,6 +1561,21 @@ config_views_load(void)
     }
 }
 
+void
+config_views_load(void)
+{
+    gint type, def;
+
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
+    type = gnome_config_get_int_with_default("ThreadingType", &def);
+    if (!def)
+	libbalsa_mailbox_set_threading_type(NULL, type);
+    gnome_config_pop_prefix();
+    /* Load old-style config sections in compatibility mode. */
+    config_views_load_with_prefix(VIEW_SECTION_PREFIX, TRUE);
+    config_views_load_with_prefix(VIEW_BY_URL_SECTION_PREFIX, FALSE);
+}
+
 /* config_views_save:
    iterates over all mailboxes and save the views.
 */
@@ -1560,11 +1583,11 @@ static gboolean
 save_view(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
 	  gpointer user_data)
 {
-    int *cnt = user_data;
-    gchar *prefix;
+    BalsaMailboxNode *mn;
     LibBalsaMailbox *mailbox;
     LibBalsaMailboxView *view;
-    BalsaMailboxNode *mn;
+    gchar *url_enc;
+    gchar *prefix;
     
     gtk_tree_model_get(model, iter, 0, &mn, -1);
     mailbox = mn->mailbox;
@@ -1573,29 +1596,43 @@ save_view(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
 	return FALSE;
 
     view = mailbox->view;
-    prefix = g_strdup_printf("%s%d/",
-			     BALSA_CONFIG_PREFIX VIEW_SECTION_PREFIX, 
-			     ++(*cnt));
+    if (!view || view->in_sync)
+	return FALSE;
+    view->in_sync = TRUE;
+
+    url_enc = libbalsa_urlencode(mn->mailbox->url);
+    prefix = g_strconcat(BALSA_CONFIG_PREFIX VIEW_BY_URL_SECTION_PREFIX,
+			 url_enc, "/", NULL);
+    g_free(url_enc);
+
+    gnome_config_clean_section(prefix);
     gnome_config_push_prefix(prefix);
     g_free(prefix);
-    gnome_config_set_string("URL", mailbox->url);
-    if (view->mailing_list_address) {
+
+    if (view->mailing_list_address !=
+	libbalsa_mailbox_get_mailing_list_address(NULL)) {
        gchar* tmp = libbalsa_address_to_gchar(view->mailing_list_address, 0);
        gnome_config_set_string("MailingListAddress", tmp);
        g_free(tmp);
-    } else {
-       gnome_config_clean_key("MailingListAddress");
     }
-    if(view->identity_name)
-       gnome_config_set_string("Identity", view->identity_name);
-    else gnome_config_clean_key("Identity");
-    gnome_config_set_int("Threading",   view->threading_type);
-    gnome_config_set_int("GUIFilter",   view->filter);
-    gnome_config_set_int("SortType",    view->sort_type);
-    gnome_config_set_int("SortField",   view->sort_field);
-    gnome_config_set_int("Show", view->show);
-    gnome_config_set_bool("Exposed", view->exposed);
-    gnome_config_set_bool("Open", view->open);
+    if (view->identity_name  != libbalsa_mailbox_get_identity_name(NULL))
+	gnome_config_set_string("Identity", view->identity_name);
+    if (view->threading_type != libbalsa_mailbox_get_threading_type(NULL))
+	gnome_config_set_int("Threading",   view->threading_type);
+    if (view->filter         != libbalsa_mailbox_get_filter(NULL))
+	gnome_config_set_int("GUIFilter",   view->filter);
+    if (view->sort_type      != libbalsa_mailbox_get_sort_type(NULL))
+	gnome_config_set_int("SortType",    view->sort_type);
+    if (view->sort_field     != libbalsa_mailbox_get_sort_field(NULL))
+	gnome_config_set_int("SortField",   view->sort_field);
+    /* initial value for show is UNSET, but that's always replaced, 
+     * and we want it to default to FROM. */
+    if (view->show           != LB_MAILBOX_SHOW_FROM)
+	gnome_config_set_int("Show",	    view->show);
+    if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
+	gnome_config_set_bool("Exposed",    view->exposed);
+    if (view->open           != libbalsa_mailbox_get_open(NULL))
+	gnome_config_set_bool("Open",	    view->open);
 
     gnome_config_pop_prefix();
     return FALSE;
@@ -1604,12 +1641,10 @@ save_view(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
 void
 config_views_save(void)
 {
-    int cnt = 0;
-
     config_clean_sections(VIEW_SECTION_PREFIX);
     /* save current */
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   save_view, &cnt);
+			   save_view, NULL);
 }
 
 static void

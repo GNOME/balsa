@@ -1825,21 +1825,32 @@ libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
     libbalsa_unlock_mailbox(mailbox);
 }
 
+/* =================================================================== *
+ * Mailbox view methods                                                *
+ * =================================================================== */
+
+GHashTable *libbalsa_mailbox_view_table;
+static LibBalsaMailboxView libbalsa_mailbox_view_default = {
+    NULL,			/* mailing_list_address */
+    NULL,			/* identity_name        */
+    LB_MAILBOX_THREADING_JWZ,	/* threading_type       */
+    0,				/* filter               */
+    LB_MAILBOX_SORT_TYPE_ASC,	/* sort_type            */
+    LB_MAILBOX_SORT_DATE,	/* sort_field           */
+    LB_MAILBOX_SHOW_UNSET,	/* show                 */
+    0,				/* exposed              */
+    0,				/* open                 */
+    1,				/* in_sync              */
+    0				/* frozen		*/
+};
+
 LibBalsaMailboxView *
 libbalsa_mailbox_view_new(void)
 {
-    LibBalsaMailboxView *view = g_new(LibBalsaMailboxView, 1);
+    LibBalsaMailboxView *view;
 
-    view->mailing_list_address = NULL;
-    view->identity_name=NULL;
-    view->threading_type = LB_MAILBOX_THREADING_FLAT;
-    view->filter = 0; /* we should not be even setting this */
-    view->sort_type =  LB_MAILBOX_SORT_TYPE_ASC;
-    view->sort_field = LB_MAILBOX_SORT_DATE;
-    view->show = LB_MAILBOX_SHOW_UNSET;
-    view->filter  = 0;
-    view->exposed = FALSE;
-    view->open = FALSE;
+    view = g_memdup(&libbalsa_mailbox_view_default,
+		    sizeof libbalsa_mailbox_view_default);
 
     return view;
 }
@@ -1853,6 +1864,238 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
     g_free(view);
 }
 
+/* helper */
+static LibBalsaMailboxView *
+lbm_get_view(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxView *view;
+
+    if (!mailbox)
+	return &libbalsa_mailbox_view_default;
+
+    view = mailbox->view;
+    if (view)
+	return view;
+
+    g_assert(g_hash_table_lookup(libbalsa_mailbox_view_table, mailbox->url)
+	     == NULL);
+
+    view = libbalsa_mailbox_view_new();
+    mailbox->view = view;
+    g_hash_table_insert(libbalsa_mailbox_view_table, g_strdup(mailbox->url),
+			view);
+
+    return view;
+}
+
+/* Set methods; NULL mailbox is valid, and changes the default value. */
+
+gboolean
+libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
+				   const gchar * identity_name)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen
+	&& (!view->identity_name
+	    || strcmp(view->identity_name, identity_name))) {
+	g_free(view->identity_name);
+	view->identity_name = g_strdup(identity_name);
+	if (mailbox)
+	    view->in_sync = 0;
+	return TRUE;
+    } else
+	return FALSE;
+}
+
+void
+libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
+				 LibBalsaMailboxThreadingType
+				 threading_type)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->threading_type != threading_type) {
+	view->threading_type = threading_type;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
+			    LibBalsaMailboxSortType sort_type)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->sort_type != sort_type) {
+	view->sort_type = sort_type;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
+			     LibBalsaMailboxSortFields sort_field)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->sort_field != sort_field) {
+	view->sort_field = sort_field;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+gboolean
+libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox, LibBalsaMailboxShow show)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->show != show) {
+	/* Don't set not in sync if we're just replacing UNSET with the
+	 * default. */
+	if (mailbox && view->show != LB_MAILBOX_SHOW_UNSET)
+	    view->in_sync = 0;
+	view->show = show;
+	return TRUE;
+    } else
+	return FALSE;
+}
+
+void
+libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox, gboolean exposed)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->exposed != exposed) {
+	view->exposed = exposed ? 1 : 0;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->open != open) {
+	view->open = open ? 1 : 0;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->filter != filter) {
+	view->filter = filter;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+/* Freeze or unfreeze the view: no changes are made while the view is
+ * frozen;
+ * - changing the default is not allowed;
+ * - no action needed if the view is NULL. */
+void
+libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen)
+{
+    LibBalsaMailboxView *view;
+
+    g_return_if_fail(mailbox != NULL);
+
+    view = mailbox->view;
+    if (view)
+	view->frozen = frozen ? 1 : 0;
+}
+
+/* End of set methods. */
+
+/* Get methods; NULL mailbox is valid, and returns the default value. */
+
+LibBalsaAddress *
+libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->mailing_list_address :
+	libbalsa_mailbox_view_default.mailing_list_address;
+}
+
+const gchar *
+libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->identity_name :
+	libbalsa_mailbox_view_default.identity_name;
+}
+
+
+LibBalsaMailboxThreadingType
+libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->threading_type :
+	libbalsa_mailbox_view_default.threading_type;
+}
+
+LibBalsaMailboxSortType
+libbalsa_mailbox_get_sort_type(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->sort_type : libbalsa_mailbox_view_default.sort_type;
+}
+
+LibBalsaMailboxSortFields
+libbalsa_mailbox_get_sort_field(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->sort_field :
+	libbalsa_mailbox_view_default.sort_field;
+}
+
+LibBalsaMailboxShow
+libbalsa_mailbox_get_show(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->show : libbalsa_mailbox_view_default.show;
+}
+
+gboolean
+libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->exposed : libbalsa_mailbox_view_default.exposed;
+}
+
+gboolean
+libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->open : libbalsa_mailbox_view_default.open;
+}
+
+gint
+libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->filter : libbalsa_mailbox_view_default.filter;
+}
+
+gboolean
+libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->frozen : FALSE;
+}
+
+/* End of get methods. */
 
 /* =================================================================== *
  * GtkTreeModel implementation functions.                              *
@@ -2719,6 +2962,7 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
 
     view->sort_field = new_field;
     view->sort_type = new_type;
+    view->in_sync = 0;
 
     gtk_tree_sortable_sort_column_changed(sortable);
 

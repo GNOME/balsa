@@ -182,6 +182,31 @@ libbalsa_urlencode(const gchar* str)
     return retval;
 }
 
+gchar *
+libbalsa_urldecode(const gchar * str)
+{
+    gchar *retval;
+    gchar *x;
+
+    retval = g_new(char, strlen(str));
+
+    for (x = retval; *str != '\0'; str++, x++) {
+	*x = *str;
+	if (*x == '+')
+	    *x = ' ';
+	else if (*x == '%') {
+	    if (!*++str || !g_ascii_isxdigit(*str))
+		break;
+	    *x = g_ascii_xdigit_value(*str);
+	    if (!*++str || !g_ascii_isxdigit(*str))
+		break;
+	    *x = *x << 4 | g_ascii_xdigit_value(*str);
+	}
+    }
+
+    *x = '\0';
+    return retval;
+}
 
 /* FIXME: Move to address.c and change name to
  *   libbalsa_address_list_to_string or something */

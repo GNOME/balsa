@@ -509,7 +509,7 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
             gtk_tree_model_get(model, &child_iter,
                                MBNODE_COLUMN, &mbnode, -1);
             if (mbnode && mbnode->mailbox)
-                mbnode->mailbox->view->exposed = TRUE;
+		libbalsa_mailbox_set_exposed(mbnode->mailbox, TRUE);
 	    g_object_unref(mbnode);
         } while (gtk_tree_model_iter_next(model, &child_iter));
     }
@@ -527,7 +527,7 @@ bmbl_tree_collapse_helper(GtkTreeModel * model, GtkTreeIter * iter)
             gtk_tree_model_get(model, &child_iter,
                                MBNODE_COLUMN, &mbnode, -1);
             if (mbnode->mailbox)
-                mbnode->mailbox->view->exposed = FALSE;
+		libbalsa_mailbox_set_exposed(mbnode->mailbox, FALSE);
 	    g_object_unref(mbnode);
             bmbl_tree_collapse_helper(model, &child_iter);
         } while (gtk_tree_model_iter_next(model, &child_iter));
@@ -574,7 +574,11 @@ bmbl_child_toggled_cb(GtkTreeModel * model, GtkTreePath * path,
     if (gtk_tree_model_iter_has_child(model, iter)) {
 	if (mbnode->expanded
 	    && !gtk_tree_view_row_expanded(tree_view, path)) {
+#if GTK_CHECK_VERSION(2, 2, 0)
+	    gtk_tree_view_expand_to_path(tree_view, path);
+#else
 	    gtk_tree_view_expand_row(tree_view, path, FALSE);
+#endif
 	}
     } else
 	mbnode->expanded = FALSE;
@@ -1118,12 +1122,13 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 
             /* Make sure the show column is set before showing the
              * mailbox in the list. */
-            if (mailbox->view->show == LB_MAILBOX_SHOW_UNSET)
-                mailbox->view->show = ((   mailbox == balsa_app.sentbox
-                                        || mailbox == balsa_app.draftbox
-                                        || mailbox == balsa_app.outbox)
-                                       ? LB_MAILBOX_SHOW_TO
-                                       : LB_MAILBOX_SHOW_FROM);
+	    if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_UNSET)
+		libbalsa_mailbox_set_show(mailbox,
+					  (mailbox == balsa_app.sentbox
+					   || mailbox == balsa_app.draftbox
+					   || mailbox == balsa_app.outbox)
+					  ? LB_MAILBOX_SHOW_TO
+					  : LB_MAILBOX_SHOW_FROM);
 	}
     } else {
 	/* new directory, but not a mailbox */
@@ -1952,8 +1957,12 @@ bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path)
 
     if (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0
         && !gtk_tree_view_row_expanded(GTK_TREE_VIEW(mblist), tmp)) {
+#if GTK_CHECK_VERSION(2, 2, 0)
+	gtk_tree_view_expand_to_path(GTK_TREE_VIEW(mblist), tmp);
+#else
         bmbl_expand_to_row(mblist, tmp);
         gtk_tree_view_expand_row(GTK_TREE_VIEW(mblist), tmp, FALSE);
+#endif
     }
 
     gtk_tree_path_free(tmp);

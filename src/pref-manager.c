@@ -897,7 +897,7 @@ apply_prefs(GtkDialog * pbox)
 
     /* threading */
     balsa_app.expand_tree = GTK_TOGGLE_BUTTON(pui->tree_expand_check)->active;
-    balsa_app.threading_type = pui->threading_style_index;
+    libbalsa_mailbox_set_threading_type(NULL, pui->threading_style_index);
 
     /* Information dialogs */
     menu_item =
@@ -1120,9 +1120,9 @@ set_prefs(void)
     /* threading */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->tree_expand_check), 
                                  balsa_app.expand_tree);
-    pui->threading_style_index = balsa_app.threading_type;
+    pui->threading_style_index = libbalsa_mailbox_get_threading_type(NULL);
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->default_threading_style),
-                                balsa_app.threading_type);
+                                pui->threading_style_index);
 
     /* spelling */
     pui->module_index = balsa_app.module;

@@ -1198,9 +1198,11 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         gtk_widget_set_sensitive(view_menu[view_menu_entries[i]].widget, enable);
 
     if (mailbox) {
-        balsa_window_set_threading_menu(window,
-					mailbox->view->threading_type);
-        balsa_window_set_filter_menu(window, mailbox->view->filter);
+	balsa_window_set_threading_menu(window,
+					libbalsa_mailbox_get_threading_type
+					(mailbox));
+	balsa_window_set_filter_menu(window,
+				     libbalsa_mailbox_get_filter(mailbox));
     }
 }
 
@@ -1871,8 +1873,7 @@ static void register_open_mailbox(LibBalsaMailbox *m)
     balsa_app.open_mailbox_list =
         g_list_prepend(balsa_app.open_mailbox_list, m);
     UNLOCK_OPEN_LIST;
-    if (m->view)
-        m->view->open = TRUE;
+    libbalsa_mailbox_set_open(m, TRUE);
 }
 static void unregister_open_mailbox(LibBalsaMailbox *m)
 {
@@ -1880,8 +1881,7 @@ static void unregister_open_mailbox(LibBalsaMailbox *m)
     balsa_app.open_mailbox_list =
         g_list_remove(balsa_app.open_mailbox_list, m);
     UNLOCK_OPEN_LIST;
-    if (m->view)
-        m->view->open = FALSE;
+    libbalsa_mailbox_set_open(m, FALSE);
 }
 static gboolean is_open_mailbox(LibBalsaMailbox *m)
 {
@@ -3360,7 +3360,7 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
      * it - but we could just as well clone it. */
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
     /* make it persistent */
-    mailbox->view->filter = balsa_window_filter_to_int();
+    libbalsa_mailbox_set_filter(mailbox, balsa_window_filter_to_int());
 }
 
 static void

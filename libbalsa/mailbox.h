@@ -143,6 +143,8 @@ struct _LibBalsaMailboxView {
     LibBalsaMailboxShow          show;
     unsigned exposed:1;
     unsigned open:1;
+    unsigned in_sync:1;		/* view is in sync with config */
+    unsigned frozen:1;		/* don't update view if set    */
 };
 
 struct _LibBalsaMailbox {
@@ -422,8 +424,42 @@ void libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
 					 GNode * node, GNode * parent);
 
+/* Mailbox views. */
+extern GHashTable *libbalsa_mailbox_view_table;
+
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
+gboolean libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
+					    const gchar * identity_name);
+void libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
+					 LibBalsaMailboxThreadingType
+					 threading_type);
+void libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
+				    LibBalsaMailboxSortType sort_type);
+void libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
+				     LibBalsaMailboxSortFields sort_field);
+gboolean libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox,
+				   LibBalsaMailboxShow show);
+void libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox,
+				  gboolean exposed);
+void libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open);
+void libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter);
+void libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen);
+
+LibBalsaAddress *libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox
+							   * mailbox);
+const gchar *libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox);
+LibBalsaMailboxThreadingType
+libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox);
+LibBalsaMailboxSortType libbalsa_mailbox_get_sort_type(LibBalsaMailbox *
+						       mailbox);
+LibBalsaMailboxSortFields libbalsa_mailbox_get_sort_field(LibBalsaMailbox *
+							  mailbox);
+LibBalsaMailboxShow libbalsa_mailbox_get_show(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox);
+gint libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox);
 
 /** force update of given msgno */
 void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);

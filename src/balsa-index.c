@@ -807,7 +807,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
      * rename "from" column to "to" for outgoing mail
      */
     tree_view = GTK_TREE_VIEW(index);
-    if (mailbox->view->show == LB_MAILBOX_SHOW_TO) {
+    if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) {
         GtkTreeViewColumn *column =
 	    gtk_tree_view_get_column(tree_view, LB_MBOX_FROM_COL);
 
@@ -825,10 +825,11 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     gdk_flush();
     gdk_threads_leave();
     libbalsa_mailbox_set_view_filter(mailbox,
-                                     balsa_window_get_view_filter(balsa_app.main_window),
-                                     FALSE);
+                                     balsa_window_get_view_filter
+                                     (balsa_app.main_window), FALSE);
     libbalsa_mailbox_set_threading(mailbox,
-                                   mailbox->view->threading_type);
+                                   libbalsa_mailbox_get_threading_type
+                                   (mailbox));
 
     gdk_threads_enter();
 
@@ -1702,7 +1703,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     mailbox = index->mailbox_node->mailbox;
     g_return_if_fail(mailbox != NULL);
 
-    mailbox->view->threading_type = thtype;
+    libbalsa_mailbox_set_threading_type(mailbox, thtype);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     g_signal_handler_block(selection, index->selection_changed_id);

@@ -1,3 +1,7 @@
+2004-08-23  Pawel Salek
+
+	* src/address-book-config.c: fix my sloppy code in GPE config.
+
 2004-08-22  Pawel Salek
 
 	* configure.in: add --with-sqlite option.

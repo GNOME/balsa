@@ -526,23 +526,22 @@ create_gpe_page(AddressBookConfig * abc)
 {
     GtkWidget *table = gtk_table_new(2, 6, FALSE);
 
-    LibBalsaAddressBookLdap* ab;
+    LibBalsaAddressBook* ab;
     GtkDialog* mcw = GTK_DIALOG(abc->window);
     GtkWidget* label;
 
-    ab = (LibBalsaAddressBookLdap*)abc->address_book; /* may be NULL */
+    ab = (LibBalsaAddressBook*)abc->address_book; /* may be NULL */
 
     abc->link_id = "GPE";
     /* mailbox name */
 
     label = create_label(_("A_ddress Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
-				   ab ? abc->address_book->name 
-                                   : _("GPE Address Book"), 
+				   ab ? ab->name : _("GPE Address Book"), 
 				   label);
     abc->expand_aliases_button =
 	create_check(mcw, _("_Expand aliases as you type"), table, 3,
-		     ab ? abc->address_book->expand_aliases : TRUE);
+		     ab ? ab->expand_aliases : TRUE);
     gtk_widget_show_all(table);
 
     return table;

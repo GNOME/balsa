@@ -330,6 +330,7 @@ mailbox_new (MailboxType type)
       return NULL;
     }
 
+  mailbox->ismbnode = FALSE;
   mailbox->lock = FALSE;
   mailbox->type = type;
   mailbox->name = NULL;

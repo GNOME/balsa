@@ -29,6 +29,7 @@ size_t readfile (FILE * fp, char **buf);
 typedef struct _MailboxNode MailboxNode;
 struct _MailboxNode
   {
+    gboolean ismbnode;
     gchar *name;
     Mailbox *mailbox;
     gint IsDir;

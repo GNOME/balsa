@@ -1206,7 +1206,24 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
     if (on_message && 
 	(message = (LibBalsaMessage*)gtk_clist_get_row_data(clist, row))) {
 	if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
-            message_window_new (message);
+            /* double click on a message means open a message window,
+             * unless we're in the draftbox, in which case it means open
+             * a sendmsg window */
+            if (bindex->mailbox_node->mailbox == balsa_app.draftbox) {
+                /* the simplest way to get a sendmsg window would be:
+                 * balsa_message_continue(widget, (gpointer) bindex);
+                 * but it doesn't work--the selection info seems to
+                 * become invisible
+                 *
+                 * instead we'll just use the guts of
+                 * balsa_message_continue: */
+                BalsaSendmsg *sm =
+                    sendmsg_window_new(widget, message, SEND_CONTINUE);
+                gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
+                                   GTK_SIGNAL_FUNC
+                                   (sendmsg_window_destroy_cb), NULL);
+            } else
+                message_window_new (message);
         }
     }
 }

@@ -310,9 +310,9 @@ static GnomeUIInfo file_menu[] = {
     /* Ctrl-S */
     {
      GNOME_APP_UI_ITEM, N_("_Send Queued Mail"),
-     N_("Send mail from the outbox"),
+     N_("Send messages from the outbox"),
      send_outbox_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_SEND, 'A', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_MENU_SEND, 'T', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_PRINT_POS 6
     { GNOME_APP_UI_ITEM, N_("_Print..."), NULL,
@@ -565,10 +565,10 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_MARK_ALL_POS 5
     {
-        GNOME_APP_UI_ITEM, N_("Mark all"),
-        N_("Mark all messages in current mailbox"),
+        GNOME_APP_UI_ITEM, N_("Select all"),
+        N_("Select all messages in current mailbox"),
         mark_all_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        BALSA_PIXMAP_MENU_MARK_ALL, 'A',GDK_MOD1_MASK|GDK_CONTROL_MASK, NULL
+        BALSA_PIXMAP_MENU_MARK_ALL, 'A',GDK_CONTROL_MASK, NULL
     },
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EDIT_POS 7
@@ -705,8 +705,20 @@ static gboolean
 delete_cb(GtkWidget* main_window)
 {
 #ifdef BALSA_USE_THREADS
-    gtk_widget_set_sensitive(main_window, FALSE);
-    libbalsa_wait_for_sending_thread(-1);
+    /* we cannot leave main window disabled because compose windows
+     * (for example) could refuse to get deleted and we would be left
+     * with disabled main window. */
+    if(libbalsa_is_sending_mail()) {
+        GtkWidget* d = 
+            gnome_ok_cancel_dialog_parented(_("Balsa is sending a mail now.\n"
+                                              "Abort sending?"),
+                                            NULL, NULL,
+                                            GTK_WINDOW(main_window));
+        int retval = gnome_dialog_run_and_close(GNOME_DIALOG(d));
+        /* FIXME: we should terminate sending thread nicely here,
+         * but we must know their ids. */
+        return retval!=0; /* keep running unless OK */
+    }                                          
 #endif
     return FALSE; /* allow delete */
 }
@@ -1630,7 +1642,7 @@ ensure_check_mail_dialog(void)
 	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
     
     progress_dialog =
-	gnome_dialog_new("Checking Mail...", "Hide", NULL);
+	gnome_dialog_new(_("Checking Mail..."), _("Hide"), NULL);
     gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
 			   "progress_dialog", "Balsa");
         

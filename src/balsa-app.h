@@ -27,8 +27,9 @@
 #include "identity.h"
 #include "balsa-index.h"
 #include "balsa-mblist.h"
-#include "main-window.h"
 #include "information-dialog.h"
+#include "main-window.h"
+#include "toolbar-factory.h"
 
 #if ENABLE_ESMTP
 #include <libesmtp.h>			/* part of libESMTP */
@@ -147,7 +148,6 @@ enum _BalsaMDNReply {
 #endif
 
 
-
 /* global balsa application structure */
 extern struct BalsaApplication {
     /* personal information */
@@ -207,8 +207,8 @@ extern struct BalsaApplication {
     gint sw_width; /* sendmsg window */
     gint sw_height;
     int toolbar_count;
-    int *toolbar_ids;
-    char ***toolbars;
+    BalsaToolbarType *toolbar_ids; 
+    char ***toolbars;     /* toolbar_ids[i] is a type of toolbars[i] */
     int toolbar_wrap_button_text;
 
     /* file paths */

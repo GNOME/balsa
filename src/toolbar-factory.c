@@ -134,7 +134,7 @@ static char *toolbar2_legal[]={
 
 static char **toolbar_legal[]={toolbar0_legal, toolbar1_legal, toolbar2_legal};
 
-static void populate_stock_toolbar(int bar, int id);
+static void populate_stock_toolbar(int bar, BalsaToolbarType id);
 static int get_toolbar_button_slot(BalsaToolbarType toolbar, const char *id);
 static GtkToolbar *get_bar_instance(GtkWidget *window, 
 				    BalsaToolbarType toolbar);
@@ -211,12 +211,10 @@ get_tool_widget(GtkWidget *window, BalsaToolbarType toolbar, char *id)
 	return NULL;
     
     lp=children=gtk_container_children(GTK_CONTAINER(bar));
-	if(!children)
+    if(!children)
 	return(NULL);
 
-    while(position-- && lp) {
-	lp=g_list_next(lp);
-	}
+    lp = g_list_nth(lp, position);
 
     if(!lp) {
 	g_list_free(children);
@@ -317,20 +315,20 @@ static const gchar* message_toolbar[] = {
 static const gchar* null_toolbar[] = { NULL };
 
 static void
-populate_stock_toolbar(int bar, int id)
+populate_stock_toolbar(int index, BalsaToolbarType id)
 {
     const gchar** toolbar;
     int i;
 
-    switch(bar) {
-    case 0:  toolbar = main_toolbar;    break;
-    case 1:  toolbar = compose_toolbar; break; 
-    case 2:  toolbar = message_toolbar; break;
-    default: toolbar = null_toolbar;	break;
+    switch(id) {
+    case TOOLBAR_MAIN:     toolbar = main_toolbar;    break;
+    case TOOLBAR_COMPOSE:  toolbar = compose_toolbar; break; 
+    case TOOLBAR_MESSAGE:  toolbar = message_toolbar; break;
+    default:               toolbar = null_toolbar;    break;
     }
     for(i=0; toolbar[i]; i++)
-	balsa_app.toolbars[bar][i] = g_strdup(toolbar[i]);
-    balsa_app.toolbars[bar][i]= NULL;
+	balsa_app.toolbars[index][i] = g_strdup(toolbar[i]);
+    balsa_app.toolbars[index][i]= NULL;
 }
 
 /* get_toolbar_index:
@@ -347,7 +345,7 @@ populate_stock_toolbar(int bar, int id)
    	Toolbar index in config data, or -1 if error / not found
 */
 int
-get_toolbar_index(int id)
+get_toolbar_index(BalsaToolbarType id)
 {
     int i;
     
@@ -371,7 +369,7 @@ get_toolbar_index(int id)
 	0 if OK, -1 if there are too many toolbars.
 */
 int
-create_stock_toolbar(int id)
+create_stock_toolbar(BalsaToolbarType id)
 {
     int newbar;
     
@@ -387,7 +385,6 @@ create_stock_toolbar(int id)
     balsa_app.toolbars[newbar]=
 	(char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
     
-    balsa_app.toolbars[newbar][0]=NULL;
     populate_stock_toolbar(newbar, id);
     balsa_app.toolbar_ids[newbar]=id;
     

@@ -124,7 +124,8 @@ button_data toolbar_buttons[]={
      N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
 };
 
-const int toolbar_button_count=sizeof(toolbar_buttons)/sizeof(button_data);
+static const int toolbar_button_count = sizeof(toolbar_buttons)
+     /sizeof(button_data);
 
 struct toolbar_item {
     GtkWidget *widget;
@@ -143,11 +144,11 @@ struct toolbar_page {
     int selected_destination;
 };
 
-struct toolbar_page toolbar_pages[MAXTOOLBARS];
-struct toolbar_item *toolbar_items[MAXTOOLBARS];
-int toolbar_item_count[MAXTOOLBARS];
+static struct toolbar_page toolbar_pages[STOCK_TOOLBAR_COUNT];
+static struct toolbar_item *toolbar_items[STOCK_TOOLBAR_COUNT];
+int toolbar_item_count[STOCK_TOOLBAR_COUNT];
 
-static GtkWidget *create_toolbar_page(gpointer, int);
+static GtkWidget *create_toolbar_page(BalsaToolbarType);
 static void page_destroy_cb(GtkWidget *, gpointer);
 static void populate_list(GtkWidget *, int);
 static void add_button_cb(GtkWidget *, gpointer);
@@ -158,10 +159,10 @@ static void list_selected_cb(GtkCList *clist, gint row, gint column,
 			     GdkEventButton *event, gpointer user_data);
 static void destination_selected_cb(GtkCList *clist, gint row, gint column,
 				    GdkEventButton *event, gpointer user_data);
-static void recreate_preview(int toolbar, int preview_only);
-static void set_button_states(int toolbar);
-static void remove_toolbar_item(int toolbar, int item);
-static void get_toolbar_data(int toolbar);
+static void recreate_preview(BalsaToolbarType toolbar, gboolean preview_only);
+static void set_button_states(BalsaToolbarType toolbar);
+static void remove_toolbar_item(BalsaToolbarType toolbar, int item);
+static void get_toolbar_data(BalsaToolbarType toolbar);
 static void apply_toolbar_prefs(GtkWidget *widget, gpointer data);
 static void wrap_toggled_cb(GtkWidget *widget, gpointer data);
 static void page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data);
@@ -179,14 +180,12 @@ page_active_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
 static void
 wrap_toggled_cb(GtkWidget *widget, gpointer data)
 {
-    int toolbar;
-    
-    toolbar=(int)data;
+    BalsaToolbarType toolbar = GPOINTER_TO_INT(data);
     
     word_wrap=GTK_TOGGLE_BUTTON(widget)->active;
     
     gnome_property_box_changed(GNOME_PROPERTY_BOX(customize_widget));
-    recreate_preview(toolbar, 0);
+    recreate_preview(toolbar, FALSE);
 }
 
 static void
@@ -194,39 +193,38 @@ apply_toolbar_prefs(GtkWidget *widget, gpointer data)
 {
     int i, j;
     int index;
-    int pos;
     
     balsa_app.toolbar_wrap_button_text=word_wrap;
     
     for(i=0; i<STOCK_TOOLBAR_COUNT; i++) {
-	pos=0;
 	index=get_toolbar_index(i);
 	if(index == -1)
 	    continue;
 	
-		for(j=0; balsa_app.toolbars[index][j]; j++) {
-		    g_free(balsa_app.toolbars[index][j]);
-		    balsa_app.toolbars[index][j]=NULL;
-		}
-		
-		for(j=0; j<toolbar_item_count[i]; j++) {
-		    balsa_app.toolbars[index][pos++]=
-			g_strdup(toolbar_buttons[toolbar_items[i][j].id].pixmap_id);
-		}
-		balsa_app.toolbars[index][pos]=NULL;
+        for(j=0; balsa_app.toolbars[index][j]; j++) {
+            g_free(balsa_app.toolbars[index][j]);
+            balsa_app.toolbars[index][j]=NULL;
+        }
+        
+        for(j=0; j<toolbar_item_count[i]; j++) {
+            balsa_app.toolbars[index][j]=
+                g_strdup(toolbar_buttons[toolbar_items[i][j].id].pixmap_id);
+        }
+        balsa_app.toolbars[index][j]=NULL;
     }
     
     update_all_toolbars();
 }
 
 /* get_toolbar_button_index:
-   FIXME: comment needed.
+   id - button id
+   returns -1 on failure.
 */
 int
-get_toolbar_button_index(char *id)
+get_toolbar_button_index(const char *id)
 {
 #ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
-    const struct {
+    static const struct {
         gchar *new;
         gchar *old;
     } button_converter[] = {
@@ -258,7 +256,9 @@ get_toolbar_button_index(char *id)
     };
 #endif
     int i;
-    
+
+    g_return_val_if_fail(id, -1);
+
     for(i=0; i<toolbar_button_count; i++) {
 	if(!strcmp(id, toolbar_buttons[i].pixmap_id))
 	    return i;
@@ -282,16 +282,17 @@ get_toolbar_button_index(char *id)
 }
 
 static void
-get_toolbar_data(int toolbar)
+get_toolbar_data(BalsaToolbarType toolbar)
 {
     int index;
     int button;
     int i;
     
     index=get_toolbar_index(toolbar);
+    g_return_if_fail(index>=0);
     toolbar_item_count[toolbar]=0;
     
-    for(i=0; balsa_app.toolbars[toolbar][i]; i++) {
+    for(i=0; balsa_app.toolbars[index][i]; i++) {
 	button=get_toolbar_button_index(balsa_app.toolbars[index][i]);
 	if(button == -1) {
 	    printf("Warning: unknown button %s\n",
@@ -304,7 +305,7 @@ get_toolbar_data(int toolbar)
 }
 
 static void
-set_button_states(int toolbar)
+set_button_states(BalsaToolbarType toolbar)
 {
     if(toolbar_pages[toolbar].selected_destination == -1) {
 	gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, FALSE);
@@ -359,7 +360,7 @@ replace_nl_with_space(char* str)
     }
 }
 static void
-recreate_preview(int toolbar, int preview_only)
+recreate_preview(BalsaToolbarType toolbar, gboolean preview_only)
 {
     GtkToolbar *bar;
     GtkWidget *btn;
@@ -465,7 +466,7 @@ back_button_cb(GtkWidget *widget, gpointer data)
     toolbar_items[toolbar][toolbar_pages[toolbar].selected_destination-1]=tmp;
     --toolbar_pages[toolbar].selected_destination;
     
-    recreate_preview(toolbar, 1);
+    recreate_preview(toolbar, TRUE);
     gtk_clist_swap_rows(GTK_CLIST(toolbar_pages[toolbar].destination),
 			row, row-1);
     gtk_clist_moveto(GTK_CLIST(toolbar_pages[toolbar].destination),
@@ -496,7 +497,7 @@ forward_button_cb(GtkWidget *widget, gpointer data)
     toolbar_items[toolbar][toolbar_pages[toolbar].selected_destination+1]=tmp;
     ++toolbar_pages[toolbar].selected_destination;
     
-    recreate_preview(toolbar, 1);
+    recreate_preview(toolbar, TRUE);
     gtk_clist_swap_rows(GTK_CLIST(toolbar_pages[toolbar].destination),
 			row, row+1);
     gtk_clist_moveto(GTK_CLIST(toolbar_pages[toolbar].destination),
@@ -505,7 +506,7 @@ forward_button_cb(GtkWidget *widget, gpointer data)
 }
 
 static void
-remove_toolbar_item(int toolbar, int item)
+remove_toolbar_item(BalsaToolbarType toolbar, int item)
 {
     int i;
     
@@ -528,7 +529,7 @@ remove_button_cb(GtkWidget *widget, gpointer data)
     pos=toolbar_pages[toolbar].selected_destination;
     remove_toolbar_item(toolbar, pos);
     populate_list(toolbar_pages[toolbar].list, toolbar);
-    recreate_preview(toolbar, 1);
+    recreate_preview(toolbar, TRUE);
     gtk_clist_remove(list, toolbar_pages[toolbar].selected_destination);
     gnome_property_box_changed(GNOME_PROPERTY_BOX(customize_widget));
 }
@@ -539,7 +540,7 @@ list_selected_cb(GtkCList *clist, gint row, gint column,
 {
     int toolbar;
 
-    toolbar=(int)user_data;
+    toolbar=GPOINTER_TO_INT(user_data);
     toolbar_pages[toolbar].selected_source=row;
     gtk_widget_set_sensitive(toolbar_pages[toolbar].add_button, TRUE);
 }
@@ -550,7 +551,7 @@ destination_selected_cb(GtkCList *clist, gint row, gint column,
 {
     int toolbar;
     
-    toolbar=(int)user_data;
+    toolbar=GPOINTER_TO_INT(user_data);
     
     toolbar_pages[toolbar].selected_destination=row;
     gtk_widget_set_sensitive(toolbar_pages[toolbar].back_button, TRUE);
@@ -561,7 +562,7 @@ destination_selected_cb(GtkCList *clist, gint row, gint column,
 static void
 add_button_cb(GtkWidget *widget, gpointer data)
 {
-    int toolbar;
+    BalsaToolbarType toolbar;
     int add_item;
     GtkCList *list;
     int row;
@@ -570,7 +571,7 @@ add_button_cb(GtkWidget *widget, gpointer data)
     char *text, *wrap;
     int i;
 
-    toolbar=(int)data;
+    toolbar=GPOINTER_TO_INT(data);
     list_data[0]=list_data[1]=NULL;
 
     list=GTK_CLIST(toolbar_pages[toolbar].destination);
@@ -626,7 +627,7 @@ add_button_cb(GtkWidget *widget, gpointer data)
     gtk_clist_select_row(list, row, 0);
     gtk_clist_moveto(list, row, 0, 0, 0);
 
-    recreate_preview(toolbar, 1);
+    recreate_preview(toolbar, TRUE);
     set_button_states(toolbar);
     gtk_widget_show_all(toolbar_pages[toolbar].preview);
     set_button_states(toolbar);
@@ -694,7 +695,7 @@ page_destroy_cb(GtkWidget *widget, gpointer data)
 {
     int toolbar;
 
-    toolbar=(int)data;
+    toolbar=GPOINTER_TO_INT(data);
     g_free(toolbar_items[toolbar]);
     toolbar_item_count[toolbar]=0;
     customize_open=0;
@@ -731,22 +732,22 @@ customize_dialog_cb(GtkWidget *widget, gpointer data)
     word_wrap=balsa_app.toolbar_wrap_button_text;
     
     gnome_property_box_append_page(GNOME_PROPERTY_BOX(customize_widget),
-				   create_toolbar_page(customize_widget, 0),
+                                   create_toolbar_page(TOOLBAR_MAIN),
 				   gtk_label_new(_("Main window")));
     
     gnome_property_box_append_page(GNOME_PROPERTY_BOX(customize_widget),
-				   create_toolbar_page(customize_widget, 1),
+                                   create_toolbar_page(TOOLBAR_COMPOSE),
 				   gtk_label_new(_("Compose window")));
     
     gnome_property_box_append_page(GNOME_PROPERTY_BOX(customize_widget),
-				   create_toolbar_page(customize_widget, 2),
+                                   create_toolbar_page(TOOLBAR_MESSAGE),
 				   gtk_label_new(_("Message window")));
     
     gtk_widget_show_all(customize_widget);
 }
 
 static GtkWidget*
-create_toolbar_page(gpointer data, int toolbar)
+create_toolbar_page(BalsaToolbarType toolbar)
 {
     GtkWidget *outer_box;
     GtkWidget *preview_frame, *preview_scroll, *preview_box;
@@ -943,7 +944,7 @@ create_toolbar_page(gpointer data, int toolbar)
 
     populate_list(list, toolbar);
 
-    recreate_preview(toolbar, 0);
+    recreate_preview(toolbar, FALSE);
 
     return outer_box;
 }

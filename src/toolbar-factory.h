@@ -24,14 +24,15 @@
 
 
 typedef enum { 
+    TOOLBAR_INVALID = -1,
     TOOLBAR_MAIN = 0, /* main    window toolbar, main-window.c */
     TOOLBAR_COMPOSE,  /* compose window toolbar, sendmsg-window.c */
     TOOLBAR_MESSAGE,  /* message window toolbar, message-window.c */
     STOCK_TOOLBAR_COUNT
 } BalsaToolbarType;
 
-int create_stock_toolbar(int id);
-int get_toolbar_index(int id);
+int create_stock_toolbar(BalsaToolbarType id);
+int get_toolbar_index(BalsaToolbarType id);
 void set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id, 
 				 void (*callback)(GtkWidget *, gpointer), 
 				 gpointer);

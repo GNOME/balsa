@@ -123,7 +123,7 @@ load_toolbars(void)
     free_toolbars();
     
     balsa_app.toolbar_ids=
-	(int *)g_malloc(sizeof(int)*MAXTOOLBARS);
+	(BalsaToolbarType *)g_malloc(sizeof(BalsaToolbarType)*MAXTOOLBARS);
     balsa_app.toolbars=	(char ***)g_malloc(sizeof(char *)*MAXTOOLBARS);
     
     balsa_app.toolbar_count=d_get_gint("ToolbarCount", 0);
@@ -132,9 +132,9 @@ load_toolbars(void)
 	    (char **)g_malloc(sizeof(char *)*MAXTOOLBARITEMS);
 	
 	sprintf(tmpkey, "Toolbar%dID", i);
-	balsa_app.toolbar_ids[i] = d_get_gint(tmpkey, -1);
+	balsa_app.toolbar_ids[i] = d_get_gint(tmpkey, TOOLBAR_INVALID);
 	
-	if(balsa_app.toolbar_ids[i] == -1) {
+	if(balsa_app.toolbar_ids[i] == TOOLBAR_INVALID) {
 	    balsa_app.toolbars[i][0]=NULL;
 	    continue;
 	}
@@ -153,7 +153,7 @@ load_toolbars(void)
 		/* validation failed: roll the toolbar back. */
 		free_toolbar(i); 
 		balsa_app.toolbars[i] = NULL;
-		balsa_app.toolbar_ids[i] = -1;
+		balsa_app.toolbar_ids[i] = TOOLBAR_INVALID;
 		i--;
 		balsa_app.toolbar_count--;
 		g_warning("I dropped a toolbar. Are you up/downgrading?");
@@ -979,28 +979,21 @@ gint config_save(void)
     gnome_config_pop_prefix();
 
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    gnome_config_set_int("WrapButtonText", balsa_app.toolbar_wrap_button_text);
 
-	gnome_config_set_int("WrapButtonText", balsa_app.toolbar_wrap_button_text);
-
-	gnome_config_set_int("ToolbarCount", balsa_app.toolbar_count);
-
-	if(balsa_app.toolbar_count > 0)
-	{
-		for(i=0;i<balsa_app.toolbar_count;i++)
-		{
-			sprintf(tmpkey, "Toolbar%dID", i);
-			gnome_config_set_int(tmpkey, balsa_app.toolbar_ids[i]);
-
-			for(j=0;balsa_app.toolbars[i][j];j++)
-			{
-				sprintf(tmpkey, "Toolbar%dItem%d", i, j);
-				gnome_config_set_string(tmpkey, balsa_app.toolbars[i][j]);
-			}
-			sprintf(tmpkey, "Toolbar%dItemCount", i);
-			gnome_config_set_int(tmpkey, j);
-		}
-	}
-
+    gnome_config_set_int("ToolbarCount", balsa_app.toolbar_count);
+    
+    for(i=0; i<balsa_app.toolbar_count; i++) {
+        sprintf(tmpkey, "Toolbar%dID", i);
+        gnome_config_set_int(tmpkey, balsa_app.toolbar_ids[i]);
+        
+        for(j=0;balsa_app.toolbars[i][j];j++) {
+            sprintf(tmpkey, "Toolbar%dItem%d", i, j);
+            gnome_config_set_string(tmpkey, balsa_app.toolbars[i][j]);
+        }
+        sprintf(tmpkey, "Toolbar%dItemCount", i);
+        gnome_config_set_int(tmpkey, j);
+    }
     gnome_config_pop_prefix();
     
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Paths/");

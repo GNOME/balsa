@@ -60,6 +60,7 @@ static void forward_message_default_cb(GtkWidget * widget, gpointer data);
 static void next_part_cb(GtkWidget * widget, gpointer data);
 static void previous_part_cb(GtkWidget * widget, gpointer data);
 static void save_current_part_cb(GtkWidget * widget, gpointer data);
+static void view_msg_source_cb(GtkWidget * widget, gpointer data);
 
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
@@ -169,6 +170,11 @@ static GnomeUIInfo message_menu[] = {
      N_("Save current part in message"),
      save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL},
+    {
+     GNOME_APP_UI_ITEM, N_("_View Source..."),
+     N_("View source form of the message"),
+     view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     BALSA_PIXMAP_MENU_SAVE, 'v', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_END
 };
 
@@ -461,6 +467,14 @@ save_current_part_cb(GtkWidget * widget, gpointer data)
 
     balsa_message_save_current_part(BALSA_MESSAGE(mw->bmessage));
 }
+
+static void
+view_msg_source_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) data;
+    libbalsa_show_message_source(mw->message);
+}
+
 
 static void
 close_message_window(GtkWidget * widget, gpointer data)

@@ -1,3 +1,17 @@
+2001-10-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Don't mix BalsaToolbarType with ordinary indexes.
+	* src/balsa-app.h: toolbar_ids contains BalsaToolbarType elements.
+	* src/toolbar-factory.[hc]: code audited on index<->BalsaToolbarType.
+	* src/toolbar-prefs.[hc]: ditto. use GPOINTER_TO_INT() when needed.
+	Fix bug reported by RH (replace toolbar by index).
+
+	* src/main-window.c: change shortcuts to more common ones.
+	* src/balsa-index.c: continue message by double-click (Peter B.).
+	do not freeze on cancelled delete.
+	* src/message-window.c: view source menu entry (Philip Van Hoof).
+	* src/save-restore.c: use TOOLBAR_INVALID
+
 2001-10-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: update to #62737.

@@ -7,6 +7,7 @@ Fix/update/make-sure-they-work:
 - [MOSTLY] POP3
 - [PARTIAL] IMAP
 - [MOSTLY] balsa-init
+- inbox/outbox/trash should be able to be IMAP.
 
 
 New features/unfinished things:
@@ -24,19 +25,7 @@ UI:
 - Incorporate use of GNOME Docklet to indicate status of unread mail,
 status, etc.
 
-- [DONE] Remove use of GNOME MDI
-	- [DONE] Same look as now, except mailbox list in a splitter
- 	  and not a handlebox
-
-- [DONE] Mailbox list in the main window
- 	- [DONE] Allow the mailbox tree to be resized
-
 - [PARTIAL] finish move and copy
-
-- [DONE] put deleted items in the trash and remove them from the
-  current clist
-
-- [DONE] mailboxes with new mail should have bold text
 
 - [PARTIAL] DND messages into mailboxes
  	- [PARTIAL] Attachments in new mail
@@ -70,7 +59,7 @@ status, etc.
 	- [DONE] Error handling (from pspell and widget)
 	- [DONE] Destroy signal handler
 	- [DONE] configure.in magic to check for pspell 
-	- [MOSTLY] Fix language selection
+	- [DONE] Fix language selection
 	- Keep ignored words until message is sent or postponed
 	- Fix highlight colour, avoid potential theme conflict
 	- Automatically determine which modules are available
@@ -89,44 +78,5 @@ status, etc.
 ----------------------------------
 Old list.. may or may not be in above list
 
- * inbox/outbox/trash should be able to be IMAP
     this can be done by editing ~/.balsarc
-
- * digest/undigest mail.
-
- * add mutt keybindings
-
-Nat's ideas:
- * It is possible to get a context menu off a notebook page/tab thing.
-   Make it so that right clicking on a folder tab gives you a context
-   menu which gives you the option of closing the folder.
-
- * In the message composition window, hitting TAB will bring the cursor to
-   the next text entry box.  Make it so that hitting ENTER does the same thing.
-
- * The message display/composition font should be selectable,
-   including color.
-
- * An addressbook fully integrated with the message display; i.e.
-   I should be able to click on someone's email address in the message
-   and have it pop up the correspondind address book entry, or prompt me
-   to create one.  Might want to use Active Tags for this. :-)~
-
- * It would be nice if the mailboxes in the mailbox list were always
-   in some sort of consistent order.
-
-
-Jeff's ideas:
- * Scan local folders periodically for new mail delivered and sorted
-   by procmail
-
- * Auto-enable procmail features if a procmailrc is present
-
- * Export filter rules in procmail format
-
- * Various modes for folder update:  local sync with remote, local only,
-   remote only (with caching).
-
- * Auto-download and use of IMAP "folder map" instead of manually
-   creating and binding each Balsa mailbox obj to a remote box
 

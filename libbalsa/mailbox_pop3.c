@@ -259,15 +259,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     mailbox->name,
 			     pop_get_errstr(status));
     
-    if (LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
-	strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid,
-	       uid) != 0) {
-	
-	g_free(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid);
-	LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid =
-	    g_strdup(uid);
-	
-        libbalsa_mailbox_pop3_config_changed(LIBBALSA_MAILBOX_POP3(mailbox));
+    if (m->last_popped_uid == NULL || strcmp(m->last_popped_uid, uid) != 0) {
+	g_free(m->last_popped_uid);
+	m->last_popped_uid = g_strdup(uid);
+        libbalsa_mailbox_pop3_config_changed(m);
     } 
 
     tmp_mailbox = (LibBalsaMailbox*)

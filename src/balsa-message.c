@@ -17,6 +17,8 @@
  * 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <gtk-xmhtml/gtk-xmhtml.h>
 #include <stdio.h>
 #include <string.h>

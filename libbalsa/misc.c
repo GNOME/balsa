@@ -17,12 +17,13 @@
  * 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include "config.h"
 
 #include <gnome.h>
 #include "mailbox.h"

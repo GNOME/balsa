@@ -17,6 +17,8 @@
  * 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
@@ -165,11 +167,14 @@ balsa_index_init (BalsaIndex * bindex)
     "#",
     "S",
     "A",
-    _("From"),
-    _("Subject"),
-    _("Date")
+    NULL,
+    NULL,
+    NULL
   };
 
+  titles[3] = _("From");
+  titles[4] = _("Subject");
+  titles[5] = _("Date");
 
   GTK_WIDGET_SET_FLAGS (bindex, GTK_NO_WINDOW);
   bindex->mailbox = NULL;

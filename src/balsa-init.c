@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+
 #include <gnome.h>
 #include "balsa-app.h"
 #include "balsa-init.h"

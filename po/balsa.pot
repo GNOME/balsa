@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-03 22:35-0400\n"
+"POT-Creation-Date: 1998-08-03 22:43-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,131 +14,131 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#: src/balsa-index.c:168
+#: src/balsa-index.c:170
 msgid "From"
 msgstr ""
 
-#: src/balsa-index.c:169
+#: src/balsa-index.c:171
 msgid "Subject"
 msgstr ""
 
-#: src/balsa-index.c:170
+#: src/balsa-index.c:172
 msgid "Date"
 msgstr ""
 
-#: src/balsa-init.c:96
+#: src/balsa-init.c:97
 msgid "Welcome To Balsa!"
 msgstr ""
 
-#: src/balsa-init.c:150
+#: src/balsa-init.c:151
 msgid "Previous..."
 msgstr ""
 
-#: src/balsa-init.c:161
+#: src/balsa-init.c:162
 msgid "Next..."
 msgstr ""
 
-#: src/balsa-init.c:182
+#: src/balsa-init.c:183
 msgid ""
 "Welcome to Balsa!  The following steps will help you get setup to use Balsa."
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:208 src/pref-manager.c:393
+#: src/balsa-init.c:209 src/pref-manager.c:396
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:222 src/pref-manager.c:410
+#: src/balsa-init.c:223 src/pref-manager.c:413
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:237 src/pref-manager.c:442
+#: src/balsa-init.c:238 src/pref-manager.c:445
 msgid "SMTP server:"
 msgstr ""
 
-#: src/balsa-init.c:284
+#: src/balsa-init.c:285
 msgid "Balsa is now ready to run.  Click finish to save your settings"
 msgstr ""
 
-#: src/balsa-init.c:288
+#: src/balsa-init.c:289
 msgid "Finish"
 msgstr ""
 
-#: src/balsa-init.c:305
+#: src/balsa-init.c:306
 msgid "we are deleting the window, not saving, lets quit now\n"
 msgstr ""
 
-#: src/index-child.c:153
+#: src/index-child.c:156
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#: src/index-child.c:226
+#: src/index-child.c:229
 msgid "Transfer"
 msgstr ""
 
-#: src/index-child.c:244
+#: src/index-child.c:247
 msgid "Change Status"
 msgstr ""
 
-#: src/index-child.c:247
+#: src/index-child.c:250
 msgid "Unread"
 msgstr ""
 
-#: src/index-child.c:253
+#: src/index-child.c:256
 msgid "Read"
 msgstr ""
 
-#: src/index-child.c:259
+#: src/index-child.c:262
 msgid "Replied"
 msgstr ""
 
-#: src/index-child.c:265
+#: src/index-child.c:268
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:275 src/main-window.c:261
+#: src/index-child.c:278 src/main-window.c:261
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:283 src/main-window.c:247 src/main-window.c:413
+#: src/index-child.c:286 src/main-window.c:247 src/main-window.c:413
 msgid "Delete"
 msgstr ""
 
-#: src/local-mailbox.c:114
+#: src/local-mailbox.c:117
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-manager.c:61
+#: src/mailbox-manager.c:64
 msgid "Account"
 msgstr ""
 
-#: src/mailbox-manager.c:62
+#: src/mailbox-manager.c:65
 msgid "Type"
 msgstr ""
 
-#: src/mailbox-manager.c:63
+#: src/mailbox-manager.c:66
 msgid "Server"
 msgstr ""
 
-#: src/mailbox-manager.c:80
+#: src/mailbox-manager.c:83
 msgid "Mailbox Manager"
 msgstr ""
 
 #. edit account button
-#: src/mailbox-manager.c:134
+#: src/mailbox-manager.c:137
 msgid "Edit..."
 msgstr ""
 
 #. edit account button
-#: src/mailbox-manager.c:147
+#: src/mailbox-manager.c:150
 msgid "New..."
 msgstr ""
 
 #. delete account button
-#: src/mailbox-manager.c:160
+#: src/mailbox-manager.c:163
 msgid "Delete..."
 msgstr ""
 
@@ -174,12 +174,12 @@ msgstr ""
 msgid "Forward"
 msgstr ""
 
-#: src/main-window.c:274 src/sendmsg-window.c:164
+#: src/main-window.c:274 src/sendmsg-window.c:165
 msgid "Message"
 msgstr ""
 
 #. MDI page
-#: src/main-window.c:279 src/pref-manager.c:158 src/pref-manager.c:665
+#: src/main-window.c:279 src/pref-manager.c:161 src/pref-manager.c:668
 msgid "MDI"
 msgstr ""
 
@@ -187,12 +187,12 @@ msgstr ""
 msgid "Mailbox List"
 msgstr ""
 
-#: src/main-window.c:297 src/sendmsg-window.c:156
+#: src/main-window.c:297 src/sendmsg-window.c:157
 msgid "Close"
 msgstr ""
 
 #. mailboxes page
-#: src/main-window.c:312 src/pref-manager.c:146
+#: src/main-window.c:312 src/pref-manager.c:149
 msgid "Mailboxes"
 msgstr ""
 
@@ -212,7 +212,7 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: src/main-window.c:365 src/sendmsg-window.c:205
+#: src/main-window.c:365 src/sendmsg-window.c:206
 msgid "Help"
 msgstr ""
 
@@ -252,114 +252,114 @@ msgstr ""
 msgid "Balsa is a E-Mail Client"
 msgstr ""
 
-#: src/pref-manager.c:107
+#: src/pref-manager.c:110
 msgid "Preferences"
 msgstr ""
 
 #. identity page
-#: src/pref-manager.c:140
+#: src/pref-manager.c:143
 msgid "Identity"
 msgstr ""
 
 #. view page
-#: src/pref-manager.c:152
+#: src/pref-manager.c:155
 msgid "View"
 msgstr ""
 
 #. organization
-#: src/pref-manager.c:426
+#: src/pref-manager.c:429
 msgid "Organization:"
 msgstr ""
 
-#: src/pref-manager.c:480
+#: src/pref-manager.c:483
 msgid "Local mail directory:"
 msgstr ""
 
 #. inbox path
-#: src/pref-manager.c:496
+#: src/pref-manager.c:499
 msgid "Inbox Path:"
 msgstr ""
 
 #. outbox path
-#: src/pref-manager.c:513
+#: src/pref-manager.c:516
 msgid "Outbox Path:"
 msgstr ""
 
 #. trash path
-#: src/pref-manager.c:529
+#: src/pref-manager.c:532
 msgid "Trash Path:"
 msgstr ""
 
 #. Toolbars
-#: src/pref-manager.c:564
+#: src/pref-manager.c:567
 msgid "Toolbars"
 msgstr ""
 
-#: src/pref-manager.c:575
+#: src/pref-manager.c:578
 msgid "Show as Text"
 msgstr ""
 
-#: src/pref-manager.c:591
+#: src/pref-manager.c:594
 msgid "Show as Images"
 msgstr ""
 
-#: src/pref-manager.c:607
+#: src/pref-manager.c:610
 msgid "Show as Text and Images"
 msgstr ""
 
-#: src/pref-manager.c:634
+#: src/pref-manager.c:637
 msgid "Debug"
 msgstr ""
 
-#: src/pref-manager.c:676
+#: src/pref-manager.c:679
 msgid "Notebook"
 msgstr ""
 
-#: src/pref-manager.c:692
+#: src/pref-manager.c:695
 msgid "Toplevel"
 msgstr ""
 
-#: src/pref-manager.c:708
+#: src/pref-manager.c:711
 msgid "Modal"
 msgstr ""
 
-#: src/sendmsg-window.c:69 src/sendmsg-window.c:134
+#: src/sendmsg-window.c:70 src/sendmsg-window.c:135
 msgid "Send"
 msgstr ""
 
-#: src/sendmsg-window.c:145
+#: src/sendmsg-window.c:146
 msgid "Attach File"
 msgstr ""
 
-#: src/sendmsg-window.c:171
+#: src/sendmsg-window.c:172
 msgid "Cut"
 msgstr ""
 
-#: src/sendmsg-window.c:178
+#: src/sendmsg-window.c:179
 msgid "Copy"
 msgstr ""
 
-#: src/sendmsg-window.c:185
+#: src/sendmsg-window.c:186
 msgid "Paste"
 msgstr ""
 
-#: src/sendmsg-window.c:192
+#: src/sendmsg-window.c:193
 msgid "Edit"
 msgstr ""
 
-#: src/sendmsg-window.c:200
+#: src/sendmsg-window.c:201
 msgid "Contents"
 msgstr ""
 
-#: src/sendmsg-window.c:241
+#: src/sendmsg-window.c:242
 msgid "New message"
 msgstr ""
 
-#: src/sendmsg-window.c:253
+#: src/sendmsg-window.c:254
 msgid "Reply to "
 msgstr ""
 
-#: src/sendmsg-window.c:265
+#: src/sendmsg-window.c:266
 msgid "Forward message"
 msgstr ""
 

@@ -43,6 +43,18 @@ static void destroy_mblist_window (GtkWidget * widget);
 static void close_mblist_window (GtkWidget * widget);
 static void mailbox_select_cb (GtkTree * tree);
 
+/*
+static void resize_tree(GtkWidget *widget, GtkRequisition *req)
+{
+  gtk_widget_set_usize(widget,req->width,req->height);
+}
+*/
+
+static void resize_tree(GtkWidget *widget, GtkAllocation *all)
+{
+  gtk_widget_set_usize(widget,all->width,all->height);
+}
+
 void
 mblist_open_window (void)
 {
@@ -84,7 +96,13 @@ mblist_open_window (void)
 		      (gpointer) NULL);
   gtk_container_add (GTK_CONTAINER (scrolled_win), tree);
   gtk_widget_show (tree);
-
+/*
+  gtk_signal_connect(GTK_OBJECT(tree), "size_request", */
+/*
+  gtk_signal_connect(GTK_OBJECT(tree), "size_allocate",
+		  (GtkSignalFunc)resize_tree,
+		  (gpointer)NULL);
+*/
   tree_item = gtk_tree_item_new_with_label ("Balsa");
   gtk_tree_append (GTK_TREE (tree), tree_item);
   gtk_widget_show (tree_item);

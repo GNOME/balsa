@@ -67,6 +67,7 @@ create_new_index (Mailbox * mailbox)
 
   iw->window = gnome_app_new ("balsa", iw->mailbox->name);
 
+  set_index_window_data(GTK_OBJECT(iw->window),iw);
   gtk_signal_connect (GTK_OBJECT (iw->window),
 		      "destroy",
 		      (GtkSignalFunc) destroy_index_window,

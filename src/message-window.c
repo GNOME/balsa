@@ -59,7 +59,7 @@ message_window_new(Message *message)
   /* TODO check to see if already open */
 
   mw->window = gnome_app_new ("balsa", "message");
-
+  set_message_window_data(GTK_OBJECT(mw->window),mw);
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
 		      (GtkSignalFunc) destroy_message_window,

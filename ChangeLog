@@ -1,3 +1,10 @@
+2001-08-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/pop3.c:  case-insensitive handling of server answers.
+	(Brian Stafford)
+	* src/main-window.c: selective mailbox check fix (Toralf Lund).
+	* src/balsa-message.c: clean up URL handling code (Albrecht Dreﬂ).
+
 2001-08-28  Matthew Guenther  <guentherm@asme.org>
 
 	* src/sendmsg-window.h: make read_widget array bigger for postpone

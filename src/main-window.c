@@ -1470,8 +1470,8 @@ mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
     
     if(mbnode->mailbox) { /* mailbox, not a folder */
 	if (!LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox) ||
-	    imap_check_test(mbnode->dir 
-			    ? mbnode->dir : mbnode->mailbox->name)) {
+	    imap_check_test(mbnode->dir ? mbnode->dir :
+			    LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)->path)) {
 	    gdk_threads_enter();
 	    libbalsa_mailbox_check(mbnode->mailbox);
 	    gdk_threads_leave();

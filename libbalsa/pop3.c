@@ -259,7 +259,7 @@ pop_auth(int s, const gchar * pop_user,  const gchar * pop_pass,
     char buffer[2048];
     
     if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
-    if (strncmp (buffer, "+OK", 3) != 0)            return POP_COMMAND_ERR;
+    if (strncasecmp (buffer, "+OK", 3) != 0)        return POP_COMMAND_ERR;
     
     DM("pop_auth %s %s %d", pop_user, "(password hidden)", use_apop);
     /* handle apop secret transmission, if needed -kabir */
@@ -277,7 +277,7 @@ pop_auth(int s, const gchar * pop_user,  const gchar * pop_pass,
 	write (s, buffer, strlen (buffer));
 	
 	if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
-	if (strncmp (buffer, "+OK", 3) != 0)            return POP_COMMAND_ERR;
+	if (strncasecmp (buffer, "+OK", 3) != 0)        return POP_COMMAND_ERR;
 	
 	snprintf (buffer, sizeof(buffer), "pass %s\r\n", pop_pass);
 	DM("POP3 C: 'pass (password hidden)'");
@@ -285,7 +285,7 @@ pop_auth(int s, const gchar * pop_user,  const gchar * pop_pass,
     } 
   
     if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
-    if (strncmp (buffer, "+OK", 3) != 0)            return POP_AUTH_FAILED;
+    if (strncasecmp (buffer, "+OK", 3) != 0)        return POP_AUTH_FAILED;
     return POP_OK;
 }
 
@@ -302,9 +302,9 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
     write(s, "stat\r\n", 6);
     
     if (getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
-    if (strncmp (buffer, "+OK", 3) != 0)            return POP_COMMAND_ERR;
+    if (strncasecmp (buffer, "+OK", 3) != 0)        return POP_COMMAND_ERR;
     
-    if( sscanf (buffer, "+OK %d %d", msgs, &bytes) < 2 ) {
+    if( sscanf (buffer + 3, " %d %d", msgs, &bytes) < 2 ) {
 	
     }
     
@@ -326,20 +326,20 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
 	    
 	    if(getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
 	    
-	    if (strncmp (buffer, "+OK", 3) != 0) {
+	    if (strncasecmp (buffer, "+OK", 3) != 0) {
 	        /* Check if "last" cmd is supported */
 	        write (s, "last\r\n", 6);
 		if(getLine (s, buffer, sizeof (buffer)) == -1)
 		    return POP_CONN_ERR;
-		if (strncmp (buffer, "+OK", 3) == 0) {       
-		    sscanf (buffer, "+OK %d", first_msg);
+		if (strncasecmp (buffer, "+OK", 3) == 0) {       
+		    sscanf (buffer + 3, " %d", first_msg);
 		    (*first_msg)++; /* fix the off-by-one msg index  */
 		    break;
 		} 
 		/* none of uidl or last recognised, fail.. */
 		return POP_COMMAND_ERR;
 	    }
-	    sscanf( buffer, "+OK %d %s", &tmp, uid);
+	    sscanf( buffer + 3, " %d %s", &tmp, uid);
 	    
 	    if(i == *msgs) {
 		strcpy(last_uid, uid); /* save uid of the last message */
@@ -368,8 +368,9 @@ pop_get_stats(int s, gint *first_msg, gint *msgs, gint *tot_bytes,
 	DM( "POP3 C: '%s'", buffer);
 	write (s, buffer, strlen(buffer));
 	if ( getLine (s, buffer, sizeof(buffer)) == -1) return POP_CONN_ERR;
-    
-	if (sscanf (buffer,"+OK %d %d",&i,&num_bytes) != 2) {
+        if (strncasecmp (buffer, "+OK", 3) != 0)        return POP_COMMAND_ERR;
+
+	if (sscanf (buffer + 3," %d %d",&i,&num_bytes) != 2) {
 	    DM( "Error on list message %d encountered", i );
 	    *tot_bytes=-1;
 	    break;
@@ -387,7 +388,7 @@ static PopStatus send_fetch_req(int s, int msgno, char* buffer, size_t bufsz)
     DM("POP3 C: '%s'", buffer);
     if(write (s, buffer, strlen (buffer)) == -1) return POP_CONN_ERR;
     if (getLine (s, buffer, bufsz) == -1)        return POP_CONN_ERR;
-    if (strncmp (buffer, "+OK", 3) != 0)         return POP_COMMAND_ERR;
+    if (strncasecmp (buffer, "+OK", 3) != 0)     return POP_COMMAND_ERR;
     return POP_OK;
 }
 
@@ -447,7 +448,8 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	    p = buffer;
 	
 	/* fwrite(p, 1, chunk, stdout); */
-	if(fwrite (p, 1, (size_t)chunk, msg) != chunk) return POP_WRITE_ERR;
+	if(fwrite (p, 1, (size_t) chunk, msg) != (size_t) chunk)
+            return POP_WRITE_ERR;
     } /* end of while */
     
     DM("POP3: Message %d retrieved", msgno);
@@ -466,7 +468,7 @@ delete_msg(int s, int msgno)
 	    
     /* eat the server response */
     if(getLine (s, buffer, sizeof (buffer)) == -1) return POP_CONN_ERR;
-    if (strncmp (buffer, "+OK", 3) != 0)           return POP_COMMAND_ERR;
+    if (strncasecmp (buffer, "+OK", 3) != 0)       return POP_COMMAND_ERR;
     return POP_OK;
 }
 

@@ -42,8 +42,8 @@ extern "C"
   struct _BalsaSendmsg
     {
       GtkWidget *window;
-      GtkWidget *to, *from, *subject, *cc, *bcc, *fcc;
-      GtkWidget *attachments;
+      GtkWidget* to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3];
+      GtkWidget *attachments[4];
       GtkWidget *text;
       Message *orig_message;
       SendType type;

@@ -547,7 +547,7 @@ msgstr "Brevlådor"
 
 #: src/main-window.c:302
 msgid "Check Email"
-msgstr "Kolla epost"
+msgstr "Kolla e-post"
 
 #: src/main-window.c:306
 msgid "Delete Message"
@@ -612,7 +612,7 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Balsa är en epost-klient som är en del av GNOME.   Information om Balsa kan "
+"Balsa är en e-post-klient som är en del av GNOME.   Information om Balsa kan "
 "du hitta på http://www.balsa.net/\n"
 "\n"
 "Om du behöver rapportera något fel, kan du göra det på http://bugs.gnome.org/"
@@ -681,7 +681,7 @@ msgstr "Identitet"
 #. mailboxes page
 #: src/pref-manager.c:202
 msgid "Mail Servers"
-msgstr "Epostservrar"
+msgstr "E-postservrar"
 
 #. display page
 #: src/pref-manager.c:209
@@ -711,7 +711,7 @@ msgstr "Namn:"
 #. email address
 #: src/pref-manager.c:632
 msgid "E-Mail address:"
-msgstr "Epostadress:"
+msgstr "E-postadress:"
 
 #. reply-to address
 #: src/pref-manager.c:642
@@ -741,7 +741,7 @@ msgstr "Inkludera signatur när du svarar på brev"
 
 #: src/pref-manager.c:711
 msgid "Remote Mailbox Servers"
-msgstr "Icke-lokala epostservrar"
+msgstr "Icke-lokala e-postservrar"
 
 #: src/pref-manager.c:720
 msgid "Type"
@@ -774,7 +774,7 @@ msgstr "SMTP-server"
 
 #: src/pref-manager.c:788
 msgid "Local mail user agent"
-msgstr "Lokal epost-klient"
+msgstr "Lokal e-post-klient"
 
 #. Toolbars
 #: src/pref-manager.c:833
@@ -1054,7 +1054,7 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"Du har framgångrikt fixat till Balsa. Ha det så sköj!\n"
+"Du har nu lyckats ställa in Balsa. Ha det bra!\n"
 "   -- Balsautvecklingsteamet och den svenske översättaren"
 
 #: balsa-druid-page-finish.gob:56
@@ -1071,7 +1071,7 @@ msgstr "Namn:"
 
 #: balsa-druid-page-user.gob:86
 msgid "Email address:"
-msgstr "Epostadress:"
+msgstr "E-postadress:"
 
 #: balsa-druid-page-user.gob:90
 msgid "SMTP Server:"
@@ -1087,7 +1087,7 @@ msgstr "Användarinställningar"
 
 #: balsa-druid-page-user.gob:151
 msgid "Local Mail Problem"
-msgstr "Lokalt epostproblem"
+msgstr "Lokalt e-postproblem"
 
 #: balsa-druid-page-welcome.gob:47
 msgid "Welcome to Balsa!"

@@ -463,13 +463,15 @@ libbalsa_mailbox_valid (gchar * filename)
 /* libbalsa_mailbox_commit_changes:
    commits the changes to the file. note that the msg numbers are changed 
    after commit so one has to re-read messages from mutt structures.
+   Actually, re-reading is a wrong approach because it slows down balsa
+   like hell. I know, I tried it (re-reading).
 */
 gint libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
 {
 	GList *message_list;
 	GList *tmp_message_list;
 	LibBalsaMessage *current_message;
-	gint res;
+	gint res = 0;
 
 	libbalsa_mailbox_open (mailbox, FALSE);
 
@@ -486,10 +488,9 @@ gint libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
 		message_list = tmp_message_list;
       
 	}
-
+#if 0 
 	libbalsa_lock_mutt();
 	res = 0; /* FIXME: mx_sync_mailbox (CLIENT_CONTEXT(mailbox), NULL); */
-	libbalsa_mailbox_close (mailbox);
 	if(res) {
 		libbalsa_mailbox_free_messages (mailbox);
 		mailbox->messages = 0;
@@ -498,6 +499,8 @@ gint libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
 		libbalsa_mailbox_load_messages (mailbox);
 	}
 	libbalsa_unlock_mutt();
+#endif
+	libbalsa_mailbox_close (mailbox);
 	return res;
 }
 

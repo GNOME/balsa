@@ -62,7 +62,7 @@
  * Default colour for quoted text
  * oh no, I used the US spelling.
  */
-#define MAX_QUOTED_COLOR 10
+#define MAX_QUOTED_COLOR 4
 #define QUOTED_COLOR_RED 0
 #define QUOTED_COLOR_BLUE 20480
 #define QUOTED_COLOR_GREEN 20480

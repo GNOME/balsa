@@ -215,9 +215,34 @@ balsa_index_class_init (BalsaIndexClass * klass)
   klass->unselect_message = NULL;
 }
 
+/* bi_get_largest_selected:
+   helper function, finds the message with largest number among selected and
+   fails with -1, if the selection is empty.
+*/
+static gint
+bi_get_largest_selected(GtkCList * clist) {
+  GList *list;
+  gint i = 0;
+  gint h = 0;
+
+  if (!clist->selection)
+     return -1;
+  
+  list = clist->selection;
+  while (list)
+    {
+      i = GPOINTER_TO_INT (list->data);
+      if (i > h) 
+	h = i;
+      list = g_list_next(list);
+    }
+  return h;
+}
+
 static void
 clist_click_column (GtkCList * clist, gint column, gpointer data)
 {
+  gint h;
   if (column == clist->sort_column)
     {
        clist->sort_type = (clist->sort_type == GTK_SORT_ASCENDING) ?
@@ -238,7 +263,11 @@ clist_click_column (GtkCList * clist, gint column, gpointer data)
   }
 
   gtk_clist_sort (clist);
-  DO_CLIST_WORKAROUND(clist)
+  DO_CLIST_WORKAROUND(clist);
+
+  if( (h = bi_get_largest_selected(clist))>=0 &&
+      gtk_clist_row_is_visible (clist, h) != GTK_VISIBILITY_FULL)
+    gtk_clist_moveto (clist, h, 0, 1.0, 0.0);
 }
 
 static void
@@ -501,30 +530,6 @@ balsa_index_del (BalsaIndex * bindex,
   gtk_clist_remove (GTK_CLIST (bindex),  row);
 }
 
-/* bi_get_largest_selected:
-   helper function, finds the message with largest number among selected and
-   fails with -1, if the selection is empty.
-*/
-static gint
-bi_get_largest_selected(GtkCList * clist) {
-  GList *list;
-  gint i = 0;
-  gint h = 0;
-
-  if (!clist->selection)
-     return -1;
-  
-  list = clist->selection;
-  while (list)
-    {
-      i = GPOINTER_TO_INT (list->data);
-      if (i > h) 
-	h = i;
-      list = g_list_next(list);
-    }
-  return h;
-}
-
 
 void
 balsa_index_select_next (BalsaIndex * bindex)
@@ -563,7 +568,7 @@ balsa_index_select_next_unread (BalsaIndex * bindex)
   clist = GTK_CLIST (bindex);
 
   if( (h=bi_get_largest_selected(clist)+1) <= 0)
-     return;
+    h = 0;
 
   if (h >= clist->rows) 
     h = 0;

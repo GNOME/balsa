@@ -148,12 +148,27 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
     gboolean match = FALSE;
     gchar * str;
     GString * body;
+    gboolean will_ref;
 
     g_return_val_if_fail(cond, FALSE); 
     g_return_val_if_fail(message->headers != NULL, FALSE); 
 
     switch (cond->type) {
     case CONDITION_STRING:
+        will_ref =
+            (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC) ||
+             CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY));
+        if(will_ref) {
+            gboolean is_refed =
+                libbalsa_message_body_ref(message, FALSE, FALSE);
+            if (!is_refed) {
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("Unable to load message body to "
+                                       "match filter"));
+                return FALSE;  /* We don't want to match if an error occured */
+            }
+        }
+        /* do the work */
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
 	    str=libbalsa_make_string_from_list(message->headers->to_list);
 	    match=in_string_utf8(str,cond->match.string.string);
@@ -197,19 +212,9 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 	    }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
-	    gboolean is_refed;
-	    
 	    if (!message->mailbox)
 		return FALSE; /* We don't want to match if an error occured */
-	    is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
-	    if (!is_refed) {
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                     _("Unable to load message body to "
-                                       "match filter"));
-                return FALSE;  /* We don't want to match if an error occured */
-	    }
 	    body = content2reply(message,NULL,0,FALSE,FALSE);
-	    libbalsa_message_body_unref(message);
 	    if (body) {
 		if (body->str)
                     match = in_string_utf8(body->str,
@@ -217,85 +222,9 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 		g_string_free(body,TRUE);
 	    }
 	}
+        if(will_ref) libbalsa_message_body_unref(message);
 	break;
     case CONDITION_REGEX:
-#if 0
-	g_assert(cond->match.regexs); 
-	regexs=cond->match.regexs;
-	for (;regexs;regexs=g_slist_next(regexs)) {
-	    regex=(LibBalsaConditionRegex*) regexs->data;
-	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
-		str=libbalsa_make_string_from_list(message->headers->to_list);
-		if (str) {
-		    match=REGEXEC(*(regex->compiled),str)==0;
-		    g_free(str);
-		    if (match) break;
-		}
-	    }
-	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)
-                && message->headers->from) {
-		str=libbalsa_address_to_gchar(message->headers->from,0);
-		if (str) {
-		    match=REGEXEC(*(regex->compiled),str)==0;
-		    g_free(str);
-		    if (match) break;
-		}
-	    }
-	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
-		const gchar *str = LIBBALSA_MESSAGE_GET_SUBJECT(message);
-		if (str) match=REGEXEC(*(regex->compiled),str)==0;
-		if (match) break;
-	    }
-	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
-		str=libbalsa_make_string_from_list(message->headers->cc_list);
-		if (str) {
-		    match=REGEXEC(*(regex->compiled),str)==0;
-		    g_free(str);
-		    if (match) break;
-		}
-	    }
-	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
-		if (cond->user_header) {
-		    GList * header =
-			libbalsa_message_find_user_hdr(message, cond->user_header);
-		    
-		    if (header) {
-			gchar ** tmp = header->data;
-			if (tmp[1]) {
-			    match=REGEXEC(*(regex->compiled),tmp[1])==0;
-			    if (match) break;
-			}
-		    }
-		}
-	    }
-	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
-		gboolean is_refed;
-
-		if (!message->mailbox)
-		    return FALSE;
-		if (mbox_locked)
-		    UNLOCK_MAILBOX(message->mailbox);
-		is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
-		if (mbox_locked)
-		    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
-		if (!is_refed) {
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                                         _("Unable to load message body "
-                                           "to match filter"));
-		    return FALSE;
-		}
-		body=content2reply(message,NULL,0,FALSE,FALSE);
- 		if (mbox_locked)
-		    UNLOCK_MAILBOX(message->mailbox);
-		libbalsa_message_body_unref(message);
-		if (mbox_locked)
-		    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
-		if (body && body->str) 
-                    match = REGEXEC(*(regex->compiled),body->str)==0;
-		g_string_free(body,TRUE);
-	    }
-	}
-#endif
         break;
     case CONDITION_DATE:
         match = message->headers->date>=cond->match.date.date_low 

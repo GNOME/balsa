@@ -8,6 +8,7 @@
 	* libbalsa/imap/libimap.h: add missing include.
 	* libbalsa/imap/util.c (lit_conv_to_base64): fix char indexing.
 	* libbalsa/imap/auth-gssapi.c: GSSAPI authentication.
+	* libbalsa/filter.c: fix searching CC in local mailboxes.
 
 2004-07-07 23:16  PeterB
 

@@ -51,14 +51,13 @@ static void libbalsa_mailbox_real_release_message (LibBalsaMailbox * mailbox,
 						   LibBalsaMessage * message);
 static gboolean
 libbalsa_mailbox_real_messages_change_flags(LibBalsaMailbox * mailbox,
-					    guint msgcnt, guint *msgnos,
+					    GArray * msgnos,
 					    LibBalsaMessageFlag set,
 					    LibBalsaMessageFlag clr);
 static gboolean
 libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
-				    guint msgcnt, guint *msgnos,
-				    LibBalsaMailbox * dest,
-				    LibBalsaMailboxSearchIter * search_iter);
+				    GArray * msgnos,
+				    LibBalsaMailbox * dest);
 static void libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox,
                                        GArray *sort_array);
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
@@ -76,10 +75,13 @@ static gboolean libbalsa_mailbox_real_close_backend (LibBalsaMailbox *
    to or removed from the mailbox. This is used when eg the mailbox
    loads new messages (check new mails) or the mailbox is expunged.
    Also when the unread message count might have changed.
+   - MESSAGE_EXPUNGED: sent when a message is expunged.  This signal is
+   used to update lists of msgnos when messages are renumbered.
 */
 
 enum {
     CHANGED,
+    MESSAGE_EXPUNGED,
     PROGRESS_NOTIFY,
     LAST_SIGNAL
 };
@@ -179,6 +181,16 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      NULL, NULL,
                      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
+    libbalsa_mailbox_signals[MESSAGE_EXPUNGED] =
+	g_signal_new("message-expunged",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
+                                     message_expunged),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1,
+		     G_TYPE_INT);
+
     libbalsa_mailbox_signals[PROGRESS_NOTIFY] =
 	g_signal_new("progress-notify",
                      G_TYPE_FROM_CLASS(object_class),
@@ -195,6 +207,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     /* Signals */
     klass->progress_notify = NULL;
     klass->changed = NULL;
+    klass->message_expunged = NULL;
 
     /* Virtual functions */
     klass->open_mailbox = NULL;
@@ -572,11 +585,12 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
 	     msgno > 0; msgno--)
 	    if (libbalsa_mailbox_message_match(mailbox, msgno, search_iter))
 		g_array_append_val(msgnos, msgno);
-	libbalsa_filter_mailbox_messages(filter, mailbox, msgnos->len,
-					 (guint *) msgnos->data,
-					 search_iter);
-	g_array_free(msgnos, TRUE);
 	libbalsa_mailbox_search_iter_free(search_iter);
+
+	libbalsa_mailbox_register_msgnos(mailbox, msgnos);
+	libbalsa_filter_mailbox_messages(filter, mailbox, msgnos);
+	libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
+	g_array_free(msgnos, TRUE);
     }
 
     if (free_filters)
@@ -627,15 +641,15 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
 */
 static gboolean
 libbalsa_mailbox_real_messages_change_flags(LibBalsaMailbox * mailbox,
-					    guint msgcnt, guint * msgnos,
+					    GArray * msgnos,
 					    LibBalsaMessageFlag set,
 					    LibBalsaMessageFlag clr)
 {
     guint i;
     GList *list = NULL;
 
-    for (i = 0; i < msgcnt; i++) {
-	guint msgno = msgnos[i];
+    for (i = 0; i < msgnos->len; i++) {
+	guint msgno = g_array_index(msgnos, guint, i);
 	LibBalsaMessage *msg =
 	    libbalsa_mailbox_get_message(mailbox, msgno);
 
@@ -661,16 +675,16 @@ libbalsa_mailbox_real_messages_change_flags(LibBalsaMailbox * mailbox,
  * server-side copy. */
 static gboolean
 libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
-				    guint msgcnt, guint *msgnos,
-				    LibBalsaMailbox * dest, 
-				    LibBalsaMailboxSearchIter * search_iter)
+				    GArray * msgnos,
+				    LibBalsaMailbox * dest)
 {
     gboolean retval = TRUE;
     guint i;
 
-    for (i = 0; i < msgcnt; i++) {
+    for (i = 0; i < msgnos->len; i++) {
+	guint msgno = g_array_index(msgnos, guint, i);
 	LibBalsaMessage *message =
-	    libbalsa_mailbox_get_message(mailbox, msgnos[i]);
+	    libbalsa_mailbox_get_message(mailbox, msgno);
 
 	if (libbalsa_mailbox_copy_message(message, dest) < 0)
 	    retval = FALSE;
@@ -936,6 +950,9 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gboolean unlock;
     GNode *child;
     GNode *parent;
+
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGE_EXPUNGED],
+		  0, seqno);
 
     if (!mailbox->msg_tree)
 	return;
@@ -1429,49 +1446,42 @@ libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
 */
 gboolean
 libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
-				       guint msgcnt, guint *msgnos,
+				       GArray * msgnos,
 				       LibBalsaMessageFlag set,
 				       LibBalsaMessageFlag clear)
 {
-    g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
+    g_return_val_if_fail(HAVE_MAILBOX_LOCKED(mailbox), FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
-	messages_change_flags(mailbox, msgcnt, msgnos, set, clear);
+	messages_change_flags(mailbox, msgnos, set, clear);
 }
 
 /* Copy messages with msgnos in the list from mailbox to dest;
  * mailbox MUST BE LOCKED before calling. */
 gboolean
-libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox,
-			       guint msgcnt, guint * msgnos,
-			       LibBalsaMailbox * dest,
-			       LibBalsaMailboxSearchIter * search_iter)
+libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox, GArray * msgnos,
+			       LibBalsaMailbox * dest)
 {
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-    g_assert(HAVE_MAILBOX_LOCKED(mailbox));
-    g_assert(msgcnt > 0);
+    g_return_val_if_fail(HAVE_MAILBOX_LOCKED(mailbox), FALSE);
+    g_return_val_if_fail(msgnos->len > 0, TRUE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->messages_copy(mailbox,
-							      msgcnt,
 							      msgnos,
-							      dest,
-							      search_iter);
+							      dest);
 }
 
 /* Move messages with msgnos in the list from mailbox to dest;
  * mailbox MUST BE LOCKED before calling. */
 gboolean
 libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
-			       guint msgcnt, guint * msgnos,
-			       LibBalsaMailbox * dest,
-			       LibBalsaMailboxSearchIter * search_iter)
+			       GArray * msgnos,
+			       LibBalsaMailbox * dest)
 {
-    if (libbalsa_mailbox_messages_copy(mailbox, msgcnt, msgnos, dest,
-				       search_iter))
+    if (libbalsa_mailbox_messages_copy(mailbox, msgnos, dest))
 	return libbalsa_mailbox_messages_change_flags(mailbox,
-		msgcnt, msgnos, LIBBALSA_MESSAGE_FLAG_DELETED,
+		msgnos, LIBBALSA_MESSAGE_FLAG_DELETED,
 		(LibBalsaMessageFlag) 0);
     else
 	return FALSE;
@@ -2794,4 +2804,39 @@ libbalsa_mailbox_invalidate_iters(LibBalsaMailbox * mailbox)
     unlock = lbm_threads_enter();
     mailbox->stamp++;
     lbm_threads_leave(unlock);
+}
+
+/* Use "message-expunged" signal to update an array of msgnos. */
+static void
+lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno, GArray * msgnos)
+{
+    guint i, j;
+
+    for (i = j = 0; i < msgnos->len; i++) {
+	guint msgno = g_array_index(msgnos, guint, i);
+	if (msgno == seqno)
+	    continue;
+	if (msgno > seqno)
+	    --msgno;
+	g_array_index(msgnos, guint, j) = msgno;
+	++j;
+    }
+    msgnos->len = j;
+}
+
+void
+libbalsa_mailbox_register_msgnos(LibBalsaMailbox * mailbox,
+				 GArray * msgnos)
+{
+    g_signal_connect(mailbox, "message-expunged",
+		     G_CALLBACK(lbm_update_msgnos), msgnos);
+}
+
+
+void
+libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,
+				   GArray * msgnos)
+{
+    g_signal_handlers_disconnect_by_func(mailbox, lbm_update_msgnos,
+					 msgnos);
 }

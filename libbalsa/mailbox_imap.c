@@ -123,8 +123,7 @@ static void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox *
 						       LibBalsaMessageFlag
 						       clear);
 static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
-                                              unsigned msgcnt,
-                                              unsigned *seqno,
+                                               GArray * seqno,
                                               LibBalsaMessageFlag set,
                                               LibBalsaMessageFlag clear);
 
@@ -137,11 +136,11 @@ static void libbalsa_mailbox_imap_sort(LibBalsaMailbox *mailbox,
                                        GArray *array);
 static guint libbalsa_mailbox_imap_total_messages(LibBalsaMailbox *
 						  mailbox);
-static gboolean
-libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
-                                   guint msgcnt, guint * msgnos,
-                                   LibBalsaMailbox * dest,
-                                   LibBalsaMailboxSearchIter * search_iter);
+static gboolean libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox *
+						    mailbox,
+						    GArray * msgnos,
+						    LibBalsaMailbox *
+						    dest);
 
 static void server_settings_changed(LibBalsaServer * server,
 				    LibBalsaMailbox * mailbox);
@@ -1939,36 +1938,37 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 }
 
 static gboolean
-lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
-			       unsigned msgcnt,
-			       unsigned *seqno,
+lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 			       LibBalsaMessageFlag set,
 			       LibBalsaMessageFlag clear)
 {
     ImapMsgFlag flag_set, flag_clr;
     ImapResponse rc1 = IMR_OK, rc2 = IMR_OK;
 
-    qsort(seqno, msgcnt, sizeof(seqno[0]), cmp_msgno);
+    g_array_sort(seqno, cmp_msgno);
     transform_flags(set, clear, &flag_set, &flag_clr);
 
     if(flag_set)
         rc1 = imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
-                                   msgcnt, seqno, flag_set, TRUE);
+                                   seqno->len, (guint *) seqno->data,
+				   flag_set, TRUE);
     if(flag_clr)
         rc2 = imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
-                                   msgcnt, seqno, flag_clr, FALSE);
+                                   seqno->len, (guint *) seqno->data,
+				   flag_clr, FALSE);
 
     if (rc1 == IMR_OK && rc2 == IMR_OK) {
 	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	unsigned i;
 
-	for (i = 0; i < msgcnt; i++) {
+	for (i = 0; i < seqno->len; i++) {
+	    guint msgno = g_array_index(seqno, guint, i);
 	    struct message_info *msg_info =
-		message_info_from_msgno(mimap, seqno[i]);
+		message_info_from_msgno(mimap, msgno);
 
 	    if (msg_info->message) {
 		libbalsa_message_set_msg_flags(msg_info->message, set, clear);
-		libbalsa_mailbox_msgno_changed(mailbox, seqno[i]);
+		libbalsa_mailbox_msgno_changed(mailbox, msgno);
 	    }
 	}
 
@@ -2123,18 +2123,9 @@ libbalsa_mailbox_imap_total_messages(LibBalsaMailbox * mailbox)
  */
 static gboolean
 libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
-				    guint msgcnt, guint * msgnos,
-				    LibBalsaMailbox * dest,
-				    LibBalsaMailboxSearchIter *
-				    search_iter)
+				    GArray * msgnos,
+				    LibBalsaMailbox * dest)
 {
-    if (search_iter && search_iter->stamp != mailbox->stamp) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Message filtering  for IMAP mailbox %s"
-			       " failed: mailbox changed"), mailbox->url);
-	return FALSE;
-    }
-
     if (LIBBALSA_IS_MAILBOX_IMAP(dest) &&
 	LIBBALSA_MAILBOX_REMOTE(dest)->server ==
 	LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
@@ -2142,13 +2133,13 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 	g_return_val_if_fail(handle, FALSE);
 
 	/* User server-side copy. */
-	qsort(msgnos, msgcnt, sizeof(msgnos[0]), cmp_msgno);
-	return imap_mbox_handle_copy(handle, msgcnt, msgnos,
+	g_array_sort(msgnos, cmp_msgno);
+	return imap_mbox_handle_copy(handle, msgnos->len,
+				     (guint *) msgnos->data,
 				     LIBBALSA_MAILBOX_IMAP(dest)->path)
 	    == IMR_OK;
     }
 
     /* Couldn't use server-side copy, fall back to default method. */
-    return parent_class->messages_copy(mailbox, msgcnt, msgnos, dest,
-				       search_iter);
+    return parent_class->messages_copy(mailbox, msgnos, dest);
 }

@@ -243,9 +243,7 @@ gint filters_prepare_to_run(GSList * filters);
 
 gboolean libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 					  LibBalsaMailbox * mailbox,
-					  guint msgcnt, guint * msgnos,
-					  LibBalsaMailboxSearchIter *
-					  search_iter);
+					  GArray * msgnos);
 
 /*
  * libbalsa_filter_get_by_name()

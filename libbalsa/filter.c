@@ -360,13 +360,12 @@ filters_prepare_to_run(GSList * filters)
 gboolean
 libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 				 LibBalsaMailbox * mailbox,
-				 guint msgcnt, guint *msgnos,
-				 LibBalsaMailboxSearchIter * search_iter)
+				 GArray * msgnos)
 {
     gboolean result=FALSE;
     LibBalsaMailbox *mbox;
 
-    if (msgcnt == 0)
+    if (msgnos->len == 0)
 	return FALSE;
 
     if (filt->sound)
@@ -384,8 +383,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Bad mailbox name for filter: %s"),
 				 filt->name);
-	else if (!libbalsa_mailbox_messages_copy(mailbox, msgcnt, msgnos,
-						 mbox, search_iter))
+	else if (!libbalsa_mailbox_messages_copy(mailbox, msgnos, mbox))
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Error when copying messages"));
 	else if (mbox == filters_trash_mbox)
@@ -393,8 +391,8 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 	break;
     case FILTER_TRASH:
 	if (!filters_trash_mbox ||
-	    !libbalsa_mailbox_messages_move(mailbox, msgcnt, msgnos,
-					    filters_trash_mbox, search_iter))
+	    !libbalsa_mailbox_messages_move(mailbox, msgnos,
+					    filters_trash_mbox))
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Error when trashing messages"));
 	else
@@ -406,8 +404,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Bad mailbox name for filter: %s"),
 				 filt->name);
-	else if (!libbalsa_mailbox_messages_move(mailbox, msgcnt, msgnos,
-						 mbox, search_iter))
+	else if (!libbalsa_mailbox_messages_move(mailbox, msgnos, mbox))
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Error when moving messages"));
 	else if (mbox == filters_trash_mbox)

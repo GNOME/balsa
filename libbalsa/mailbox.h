@@ -196,6 +196,7 @@ struct _LibBalsaMailboxClass {
 
     /* Signals */
     void (*changed) (LibBalsaMailbox * mailbox);
+    void (*message_expunged) (LibBalsaMailbox * mailbox, guint seqno);
     void (*progress_notify) (LibBalsaMailbox * mailbox, int type,
                              int prog, int tot, const gchar* msg);
 
@@ -230,13 +231,11 @@ struct _LibBalsaMailboxClass {
                                   LibBalsaMessageFlag set,
                                   LibBalsaMessageFlag clear);
     gboolean (*messages_change_flags) (LibBalsaMailbox * mailbox,
-				       guint msgcnt, guint *msgnos,
+				       GArray *msgnos,
 				       LibBalsaMessageFlag set,
 				       LibBalsaMessageFlag clear);
-    gboolean (*messages_copy) (LibBalsaMailbox * mailbox,
-			       guint msgcnt, guint *msgnos,
-			       LibBalsaMailbox * dest,
-			       LibBalsaMailboxSearchIter * search_iter);
+    gboolean (*messages_copy) (LibBalsaMailbox * mailbox, GArray *msgnos,
+			       LibBalsaMailbox * dest);
     void (*set_threading) (LibBalsaMailbox * mailbox,
 			   LibBalsaMailboxThreadingType thread_type);
     void (*update_view_filter) (LibBalsaMailbox * mailbox,
@@ -366,19 +365,15 @@ gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 
 /* Message number-list methods */
 gboolean libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
-						guint msgcnt, guint *msgnos,
+						GArray * msgnos,
 						LibBalsaMessageFlag set,
 						LibBalsaMessageFlag clear);
 gboolean libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox,
-					guint msgcnt, guint *msgnos,
-					LibBalsaMailbox * dest,
-					LibBalsaMailboxSearchIter *
-					search_iter);
+					GArray * msgnos,
+					LibBalsaMailbox * dest);
 gboolean libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
-					guint msgcnt, guint *msgnos,
-					LibBalsaMailbox * dest,
-					LibBalsaMailboxSearchIter *
-					search_iter);
+					GArray * msgnos,
+					LibBalsaMailbox * dest);
 
                                
 /*
@@ -450,7 +445,14 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 				     const gchar * id);
 
+/* Helper */
 void libbalsa_mailbox_invalidate_iters(LibBalsaMailbox * mailbox);
+
+/* Message number arrays */
+void libbalsa_mailbox_register_msgnos(LibBalsaMailbox * mailbox,
+				      GArray * msgnos);
+void libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,
+					GArray * msgnos);
 
 /* columns ids */
 typedef enum {

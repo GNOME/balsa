@@ -119,12 +119,13 @@ run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
 	     msgno++)
 	    if (libbalsa_mailbox_message_match(mbox, msgno, search_iter))
 		g_array_append_val(messages, msgno);
-	sent_to_trash +=
-	    libbalsa_filter_mailbox_messages(filter, mbox, messages->len,
-					     (guint *) messages->data,
-					     search_iter);
-	g_array_free(messages, TRUE);
 	libbalsa_mailbox_search_iter_free(search_iter);
+
+	libbalsa_mailbox_register_msgnos(mbox, messages);
+	sent_to_trash +=
+	    libbalsa_filter_mailbox_messages(filter, mbox, messages);
+	libbalsa_mailbox_unregister_msgnos(mbox, messages);
+	g_array_free(messages, TRUE);
     }
     g_slist_free(filters);
 

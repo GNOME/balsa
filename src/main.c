@@ -64,9 +64,9 @@ static void threads_init( gboolean init );
 #endif /* BALSA_USE_THREADS */
 
 #ifdef BALSA_USE_EXPERIMENTAL_INIT
-#if 0  /*Don't use it for real init until it is "finished"*/
+#if 1  /*Don't use it for real init until it is "finished" -- it is! */
 #include "libinit_balsa/init_balsa.h"
-#define initialize_balsa balsa_init_funky_new_init_is_much_cooler
+#define initialize_balsa balsa_init_begin
 #endif
 #endif /*BALSA_USE_EXINIT*/
 

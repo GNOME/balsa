@@ -19,6 +19,8 @@
 #ifndef __SAVE_RESTORE_H__
 #define __SAVE_RESTORE_H__
 
+#include "libbalsa.h"
+
 /* FIXME XXX This should be a "configure" option.  Stuart? */
 #define BALSA_CONFIG_FILE ".balsarc"
 

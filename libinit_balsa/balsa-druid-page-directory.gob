@@ -28,12 +28,73 @@
 
 %{
 #include "balsa-app.h"
+#include "save-restore.h"
+#include "balsa-druid-page-error.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+
+static void unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error );
+
+static void unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error )
+{
+	struct stat sb;
+	gchar *dup;
+	gchar *index;
+	int fd;
+	MailboxType mt;
+	Mailbox *box;
+
+	if( (*error) != NULL )
+		return;
+
+	dup = g_strdup( path );
+	index = g_basename( dup );
+
+	if( index == NULL ) {
+		(*error) = g_strdup_printf( _("The pathname \"%s\" must be specified"
+			" canonically -- it must start with a \'/\'."), dup );
+		g_free( dup );
+		return;
+	}
+
+	index[-1] = '\0'; /*Split off the dirs from the file.*/
+
+	if( balsa_init_create_to_directory( dup, error ) ) {
+		/*TRUE->error*/
+		g_free( dup );
+		return;
+	}
+
+	index[-1] = '/';
+
+	if( stat( dup, &sb ) < 0 ) {
+		if( (fd = creat( dup, S_IRUSR | S_IWUSR )) < 0 ) {
+			(*error) = g_strdup_printf( _("An error occurred when attempting "
+				"to creat(2) the file \"%s\"."), dup );
+			g_free( dup );
+			return;
+		}
+
+		close( fd );
+	} else if( mailbox_valid( dup ) == MAILBOX_UNKNOWN ) {
+		(*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
+			dup );
+		g_free( dup );
+		return;
+	}
+
+	mt = mailbox_valid( dup );
+	box = BALSA_MAILBOX( mailbox_new( mt ) );
+	box->name = g_strdup( prettyname );
+	(MAILBOX_LOCAL( box ))->path = dup;
+	config_mailbox_add( box, (char *) prettyname );
+	add_mailboxes_for_checking( box );
+	gtk_object_destroy( GTK_OBJECT( box ) );
+}
 
 %}
 
@@ -43,6 +104,7 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 	private GtkWidget *sentbox;
 	private GtkWidget *draftbox;
 	private GtkWidget *trash;
+	private gboolean paths_locked;
 
 	/*No arrays in gob :-(*/
 	private EntryMaster emaster;
@@ -65,6 +127,8 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		GtkTable *table;
 		GtkLabel *label;
 		gchar *preset;
+
+		self->paths_locked = FALSE;
 
 		self->emaster.setbits = 0;
 		self->emaster.numentries = 0;
@@ -90,24 +154,29 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		preset = getenv( "MAIL" );
 		if( preset )
 			preset = g_strdup( preset );
-		balsa_init_add_table_entry( table, 0, _("Inbox:"), preset, &( self->ed0 ), GTK_WIDGET( self ), &( self->inbox ) );
+		balsa_init_add_table_entry( table, 0, _("Inbox:"), preset, 
+			&( self->ed0 ), GTK_WIDGET( self ), &( self->inbox ) );
 		if( preset )
 			g_free( preset );
 
 		preset = g_strconcat( balsa_app.local_mail_directory, "/outbox", NULL );
-		balsa_init_add_table_entry( table, 1, _("Outbox:"), preset, &( self->ed1 ), GTK_WIDGET( self ), &( self->outbox ) );
+		balsa_init_add_table_entry( table, 1, _("Outbox:"), preset, 
+			&( self->ed1 ), GTK_WIDGET( self ), &( self->outbox ) );
 		g_free( preset );
 
 		preset = g_strconcat( balsa_app.local_mail_directory, "/sentbox", NULL );
-		balsa_init_add_table_entry( table, 2, _("Sentbox:"), preset, &( self->ed2 ), GTK_WIDGET( self ), &( self->sentbox ) );
+		balsa_init_add_table_entry( table, 2, _("Sentbox:"), preset, 
+			&( self->ed2 ), GTK_WIDGET( self ), &( self->sentbox ) );
 		g_free( preset );
 
 		preset = g_strconcat( balsa_app.local_mail_directory, "/draftbox", NULL );
-		balsa_init_add_table_entry( table, 3, _("Draftbox:"), preset, &( self->ed3 ), GTK_WIDGET( self ), &( self->draftbox ) );
+		balsa_init_add_table_entry( table, 3, _("Draftbox:"), preset, 
+			&( self->ed3 ), GTK_WIDGET( self ), &( self->draftbox ) );
 		g_free( preset );
 
 		preset = g_strconcat( balsa_app.local_mail_directory, "/trash", NULL );
-		balsa_init_add_table_entry( table, 4, _("Trash:"), preset, &( self->ed4 ), GTK_WIDGET( self ), &( self->trash ) );
+		balsa_init_add_table_entry( table, 4, _("Trash:"), preset, 
+			&( self->ed4 ), GTK_WIDGET( self ), &( self->trash ) );
 		g_free( preset );
 
 		gtk_box_pack_start( GTK_BOX( (GNOME_DRUID_PAGE_STANDARD( self ))->vbox ),
@@ -129,10 +198,36 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 	override (Gnome:Druid:Page) void
 	prepare( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) 
 	{
+		gchar *buf;
 		BalsaDruidPageDirectory *self = BALSA_DRUID_PAGE_DIRECTORY( _self );
 
-		/* Don't let them continue unless all entries have something. */
+		/* We want a change in the local mailroot to be reflected in the directories
+		 * here, but we don't want to trash user's custom settings if needed. Hence
+		 * the paths_locked variable; it should work pretty well, because only a movement
+		 * backwards should change the mailroot; going forward should not lock the paths:
+		 * envision an error occurring; upon return to the Dir page the entries should be
+		 * the same. 
+		 */
 
+		if( !self->paths_locked ) {
+			buf = g_strconcat( balsa_app.local_mail_directory, "/outbox", NULL );
+			gtk_entry_set_text( GTK_ENTRY( self->outbox ), buf );
+			g_free( buf );
+
+			buf = g_strconcat( balsa_app.local_mail_directory, "/sentbox", NULL );
+			gtk_entry_set_text( GTK_ENTRY( self->sentbox ), buf );
+			g_free( buf );
+
+			buf = g_strconcat( balsa_app.local_mail_directory, "/draftbox", NULL );
+			gtk_entry_set_text( GTK_ENTRY( self->draftbox ), buf );
+			g_free( buf );
+
+			buf = g_strconcat( balsa_app.local_mail_directory, "/trash", NULL );
+			gtk_entry_set_text( GTK_ENTRY( self->trash ), buf );
+			g_free( buf );
+		}
+
+		/* Don't let them continue unless all entries have something. */
 		if( ENTRY_MASTER_DONE( self->emaster ) ) {
 			gnome_druid_set_buttons_sensitive( GNOME_DRUID( druid ), TRUE, TRUE, TRUE );
 		} else {
@@ -145,9 +240,44 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 	override (Gnome:Druid:Page) gboolean
 	next( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) 
 	{
+		gchar *error = NULL;
 		BalsaDruidPageDirectory *self = BALSA_DRUID_PAGE_DIRECTORY( _self );	
 
+		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->inbox ) ),
+			_("Inbox"), &error );
+		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->outbox ) ),
+			_("Outbox"), &error );
+		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->sentbox ) ),
+			_("Sentbox"), &error );
+		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->draftbox ) ),
+			_("Draftbox"), &error );
+		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->trash ) ),
+			_("Trash"), &error );
+
+		self->paths_locked = TRUE;
+
+		if( error ) {
+			BalsaDruidPageError *ep;
+
+			ep = BALSA_DRUID_PAGE_ERROR( balsa_druid_page_error_new_after( BALSA_DRUID_PAGE( self ),
+				_("Problem Creating Mailboxes"), error ) );
+			g_free( error );
+			balsa_druid_page_error_goto_me( ep );
+		} else {
+			PARENT_HANDLER( _self, druid );
+		}
+
+		return TRUE;
+	}
+
+	override (Gnome:Druid:Page) gboolean
+	back( Gnome:Druid:Page *_self, Gtk:Widget *druid (check type null) ) 
+	{
+		BalsaDruidPageDirectory *self = BALSA_DRUID_PAGE_DIRECTORY( _self );	
+		
+		self->paths_locked = FALSE;
 		PARENT_HANDLER( _self, druid );
 		return TRUE;
 	}
+
 }

@@ -151,7 +151,7 @@ static GnomeUIInfo file_menu[] =
   #ifdef BALSA_USE_EXPERIMENTAL_INIT
   {
       GNOME_APP_UI_ITEM, "Test new init", "Test the new initialization druid",
-      balsa_init_funky_new_init_is_much_cooler, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      balsa_init_begin, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GNOME_STOCK_MENU_MAIL_RCV, '\0', GDK_CONTROL_MASK, NULL
   },  
   GNOMEUIINFO_SEPARATOR,

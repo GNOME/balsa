@@ -25,6 +25,8 @@
 %}
 
 %{
+#include "save-restore.h" 
+
 #include "balsa-druid-page.h"
 #include "balsa-druid-page-welcome.h"
 #include "balsa-druid-page-user.h"
@@ -94,13 +96,19 @@ class Balsa:InitDruid from Gnome:Druid {
 	}
 
 	public void finished( self ) {
+		GtkObject *win;
+
+		win = GTK_OBJECT( self->window );
+
 		gtk_object_destroy( GTK_OBJECT( self->welcome ) );
 		gtk_object_destroy( GTK_OBJECT( self->user ) );
 		gtk_object_destroy( GTK_OBJECT( self->std_boxes ) );
 		gtk_object_destroy( GTK_OBJECT( self->finish ) );
-		gtk_object_unref( GTK_OBJECT( self->window ) );
-		gtk_object_destroy( GTK_OBJECT( self->window ) );
 		gtk_object_destroy( GTK_OBJECT( self ) );
+		/*gtk_object_unref( win );*/
+		gtk_object_destroy( win );
+
 		gtk_main_quit();
+		config_global_save();
 	}
 }

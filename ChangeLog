@@ -1,3 +1,8 @@
+1999-12-09  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/save-restore.h: Added necessary #include libbalsa.h
+	* libinit-balsa/*.gob: Finished alpha revision.
+
 1999-12-09  Lauris Kaplinski <lauris@ariman.ee>
 	* configure.in: added et to ALL_LINGUAS.
 

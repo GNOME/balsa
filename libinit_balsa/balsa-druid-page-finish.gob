@@ -67,5 +67,3 @@ class Balsa:Druid:Page:Finish from Balsa:Druid:Page {
 		balsa_initdruid_finished( BALSA_INITDRUID( druid ) );
 	}
 }
-
-

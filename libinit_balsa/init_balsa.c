@@ -25,9 +25,9 @@
 #include "balsa-druid-page.h"
 #include "balsa-druid-page-welcome.h"
 
-void balsa_init_funky_new_init_is_much_cooler( void );
+void balsa_init_begin( void );
 
-void balsa_init_funky_new_init_is_much_cooler( void )
+void balsa_init_begin( void )
 {
     GtkWidget *window;
     GtkWidget *druid;

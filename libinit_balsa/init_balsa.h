@@ -21,4 +21,4 @@
 #include "config.h"
 #include <gnome.h>
 
-extern void balsa_init_funky_new_init_is_much_cooler( void );
+extern void balsa_init_begin( void );

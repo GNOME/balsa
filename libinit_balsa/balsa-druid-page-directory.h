@@ -52,6 +52,7 @@ struct _BalsaDruidPageDirectory {
 	/* private */ GtkWidget *sentbox;
 	/* private */ GtkWidget *draftbox;
 	/* private */ GtkWidget *trash;
+	/* private */ gboolean paths_locked;
 	/* private */ EntryMaster emaster;
 	/* private */ EntryData ed0;
 	/* private */ EntryData ed1;

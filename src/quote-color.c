@@ -1,5 +1,6 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-1999 Jay Painter and Stuart Parmenter
+ * (c) 1997-2000 Stuart Parmenter and others, see AUTHORS for a list of people
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +20,9 @@
 
 #include "config.h"
 
-#include "libbalsa.h"
-
-#include <stdio.h>
-#include <string.h>
 #include <gnome.h>
-#include <ctype.h>
-
-#include <sys/stat.h>	/* for check_if_regular_file() */
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#include <errno.h>
 
 #include "balsa-app.h"
-#include "balsa-message.h"
-#include "balsa-index.h"
-#include "misc.h"
-#include "mime.h"
-#include "sendmsg-window.h"
-#include "address-book.h"
-#include "main.h"
 #include "quote-color.h"
 
 
@@ -54,7 +37,6 @@ make_gradient (GdkColor colors[], gint first, gint last)
    gint /*add,*/ i;
    double dr, dg, db;
 
-   /*g_message ("make_gradient(): Start");*/
    dr = (double) (colors[last].red - colors[first].red) / (last - first + 1);
    dg = (double) (colors[last].green - colors[first].green)/(last - first + 1);
    db = (double) (colors[last].blue - colors[first].blue) / (last - first + 1);
@@ -64,51 +46,39 @@ make_gradient (GdkColor colors[], gint first, gint last)
       colors[i].blue = colors[i - 1].blue + db;
       colors[i].green = colors[i - 1].green + dg;
    }
-   /*g_message ("make_gradient(): End");*/
 }
 
-
 /*
- * static gint is_a_quote (gchar *str)
+ * static gint is_a_quote (const gchar *str, const regex_t *rex)
  *
  * Returns how deep a quotation is nested in str.
  * It takes the same regexp as Mutt's default:
  *   ^([ \t]*[|>:}#])+
  * 
  * Input:
- *   str - string to match the regexp.
+ *   str  - string to match the regexp.
+ *   preg - the regular expression that matches the prefix. see regex(7).
  * Output:
  *   an integer saying how many levels deep.
  */
-extern gint
-is_a_quote (gchar *str)
+gint
+is_a_quote (const gchar *str, const regex_t *rex)
 {
-   gchar *s;
-   gint i = 0;
+   gint cnt = 0, off;
+   regmatch_t rm[1];
 
-   s = str;
-   while (s != NULL)
-   {
-	  switch (s[0])
-	  {
-		 case '|':
-		 case '>':
-		 case ':':
-		 case '}':
-		 case '#':
-			i++;
-			break;
+   g_return_val_if_fail(rex != NULL, 0);
 
-		 case ' ':
-		 case '\t':
-			break;
-
-		 default:
-			return i;
-	  }
-	  s++;
+   if (str == NULL)
+     return 0;
+   
+   off=0;
+   while(regexec(rex, str+off, 1, rm, 0) == 0) {
+     off += rm[0].rm_eo;
+     cnt++;
    }
-   return i;
+      
+   return cnt;
 }
 
 

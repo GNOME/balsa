@@ -942,10 +942,7 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
     gchar *content_type;
   
     content_type = libbalsa_message_body_get_content_type (info->body);
-    if( g_strcasecmp( content_type, "text/html" ) == 0 )
-      ishtml = TRUE;
-    else
-      ishtml = FALSE;
+    ishtml = ( g_strcasecmp( content_type, "text/html" ) == 0 );
     g_free ( content_type );
 
     /* This causes a memory leak */
@@ -962,10 +959,13 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
     else
     {
       gchar *font_name;
-
+      regex_t rex;
+      
       GtkWidget *item = NULL;
       GdkFont *fnt = NULL;
-
+      
+      if(regcomp(&rex, "^(([ \t]|[A-Z])*[|>:}#])+", REG_EXTENDED) != 0) 
+	g_warning("part_info_init_mimetext: quote regex compilation failed.");
       font_name = find_body_font(info->body);
       if(bm->wrap_text) 
 	libbalsa_wrap_string(ptr, balsa_app.wraplength);
@@ -991,7 +991,6 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
       gtk_signal_connect(GTK_OBJECT(item), "size_request",
 			 (GtkSignalFunc)balsa_gtk_text_size_request, (gpointer)bm);
 
-      /*gdk_color_parse ("#005050", &color);*/ /* FIXME: take it from prefs */
       allocate_quote_colors (GTK_WIDGET (bm), balsa_app.quoted_color,
 	    0, MAX_QUOTED_COLOR - 1);
       /* Grab colour from the Theme.
@@ -1003,7 +1002,7 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
       for (line = *lines; line != NULL; line = *(++lines))
       {
 	 line = g_strconcat (line, "\n", NULL);
-	 quote_level = is_a_quote (line);
+	 quote_level = is_a_quote (line, &rex);
 	 if (quote_level > MAX_QUOTED_COLOR)
 	    quote_level = MAX_QUOTED_COLOR;
 	 if (quote_level != 0)
@@ -1014,6 +1013,7 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
 	 g_free (line);
       }
       g_strfreev (l);
+      regfree(&rex);
       
       gtk_text_set_editable(GTK_TEXT(item), FALSE);
 

@@ -1,5 +1,5 @@
 /* Balsa E-Mail Client
- * Copyright (C) 1998 Jay Painter and Stuart Parmenter
+ * (c) 1997-2000 Stuart Parmenter and others, see AUTHORS for a list of people
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,13 @@ extern "C"
 {
 #endif				/* __cplusplus */
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#include <regex.h>
+
 extern void make_gradient (GdkColor colors[], gint, gint);
-extern gint is_a_quote (gchar *);
+extern gint is_a_quote (const gchar *, const regex_t *rex);
 extern void allocate_quote_colors (GtkWidget *, GdkColor color[],
       gint, gint);
 

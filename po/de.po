@@ -1,0 +1,152 @@
+# Balsa E-Mail Client 0.2.0 -- German Translation
+# Copyright (C) 1998 Free Software Foundation, Inc.
+# Jay Painter, Stuart Parmenter, Sven Neumann, 1998.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Balsa E-Mail Client 0.2.0\n"
+"POT-Creation-Date: 1998-04-29 18:34-0400\n"
+"PO-Revision-Date: 1998-04-30 17:07 MEST\n"
+"Last-Translator: Sven Neumann <sven@gimp.org>\n"
+"Language-Team: German <FILL_IN_EMAIL>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: none\n"
+
+#: src/sendmsg-window.c:129
+msgid "Send"
+msgstr "Senden"
+
+#: src/sendmsg-window.c:134
+msgid "Attach File"
+msgstr "Datei hinzufügen"
+
+#: src/addrbook-manager.c:179 src/sendmsg-window.c:143
+msgid "Close"
+msgstr "Schließen"
+
+#: src/main-window.c:453 src/sendmsg-window.c:151
+msgid "Message"
+msgstr "Nachricht"
+
+#: src/sendmsg-window.c:158
+msgid "Cut"
+msgstr "Ausschneiden"
+
+#: src/sendmsg-window.c:165
+msgid "Copy"
+msgstr "Kopieren"
+
+#: src/sendmsg-window.c:172
+msgid "Paste"
+msgstr "Einfügen"
+
+#: src/sendmsg-window.c:179
+msgid "Edit"
+msgstr "Ändern"
+
+#: src/addrbook-manager.c:194 src/sendmsg-window.c:187
+msgid "Contents"
+msgstr "Inhalt"
+
+#: src/addrbook-manager.c:199 src/main-window.c:546 src/sendmsg-window.c:192
+msgid "Help"
+msgstr "Hilfe"
+
+#: src/addrbook-manager.c:187 src/main-window.c:377
+msgid "File"
+msgstr "Datei"
+
+#: src/main-window.c:334
+msgid "Get New Mail"
+msgstr "Neue Nachrichten holen"
+
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Save mailbox..."));
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
+#. w = gtk_menu_item_new ();
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
+#. w = gtk_menu_item_new ();
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#.
+#: src/main-window.c:367
+msgid "Exit"
+msgstr "Beenden"
+
+#: src/main-window.c:385
+msgid "New"
+msgstr "Neu"
+
+#: src/main-window.c:395
+msgid "Reply"
+msgstr "Beantworten"
+
+#.
+#. w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Reply to All"));
+#. gtk_widget_show (w);
+#. gtk_menu_append (GTK_MENU (menu), w);
+#. menu_items[i++] = w;
+#.
+#: src/main-window.c:410
+msgid "Foward"
+msgstr "Weitersenden"
+
+#: src/main-window.c:433
+msgid "Delete"
+msgstr "Löschen"
+
+#: src/main-window.c:443
+msgid "Undelete"
+msgstr "Wiederherstellen"
+
+#: src/main-window.c:463
+msgid "Preferences..."
+msgstr "Einstellungen..."
+
+#: src/main-window.c:473
+msgid "Mailbox Manager..."
+msgstr "Mailbox Verwalter..."
+
+#: src/main-window.c:483
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: src/main-window.c:494
+msgid "Toolbar"
+msgstr "Menüleiste"
+
+#: src/main-window.c:500
+msgid "Icons"
+msgstr "Symbole"
+
+#: src/main-window.c:509
+msgid "Text"
+msgstr "Text"
+
+#: src/main-window.c:518
+msgid "Both"
+msgstr "Beides"
+
+#: src/main-window.c:527
+msgid "View"
+msgstr "Anschauen"
+
+#: src/main-window.c:537
+msgid "About"
+msgstr "Über"
+
+
+
+

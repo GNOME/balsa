@@ -9,7 +9,7 @@ Note: This list is not complete, but here for the authors
 
 Stuart
 ---------------------------------------------------------
- * Add text labels below icons (optional!)
+ * Save the choice of text/icons/both for the toolbar.
  * #mh/ requires a .mh_profile in ~ which looks something
    like:  "Path: Mail", telling it to get mh folders from
    ~/Mail

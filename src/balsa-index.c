@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -41,9 +42,12 @@ static gint numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer
 static void clist_click_column (GtkCList * clist, gint column, gpointer data);
 
 /* statics */
-static void clist_set_col_img_from_flag (BalsaIndex *, gint, Message *);
-static void mailbox_listener (MailboxWatcherMessage * mw_message);
+static void clist_set_col_img_from_flag (BalsaIndex *, gint, LibBalsaMessage *);
 
+/* mailbox callbacks */
+static void mailbox_message_changed_status_cb(LibBalsaMailbox *mb, LibBalsaMessage *message, BalsaIndex *bindex);
+static void mailbox_message_new_cb (LibBalsaMailbox *mb, LibBalsaMessage *message, BalsaIndex *bindex);
+static void mailbox_message_delete_cb (LibBalsaMailbox *mb, LibBalsaMessage *message, BalsaIndex *bindex);
 
 /* clist callbacks */
 static void
@@ -80,7 +84,7 @@ enum
 
 /* marshallers */
 typedef void (*BalsaIndexSignal1) (GtkObject * object,
-				   Message * message,
+				   LibBalsaMessage * message,
 				   GdkEventButton * bevent,
 				   gpointer data);
 
@@ -93,7 +97,7 @@ date_compare (GtkCList * clist,
 	      gconstpointer ptr1,
 	      gconstpointer ptr2)
 {
-  Message *m1, *m2;
+  LibBalsaMessage *m1, *m2;
   time_t t1, t2;
 
   GtkCListRow *row1 = (GtkCListRow *) ptr1;
@@ -105,8 +109,8 @@ date_compare (GtkCList * clist,
   if (!m1 || !m2)
     return 0;
 
-  t1 = m1->datet;
-  t2 = m2->datet;
+  t1 = m1->date;
+  t2 = m2->date;
 
   if (t1 < t2)
     return 1;
@@ -121,7 +125,7 @@ numeric_compare (GtkCList * clist,
 		 gconstpointer ptr1,
 		 gconstpointer ptr2)
 {
-  Message *m1, *m2;
+  LibBalsaMessage *m1, *m2;
   glong t1, t2;
 
   GtkCListRow *row1 = (GtkCListRow *) ptr1;
@@ -325,7 +329,7 @@ moveto_handler (BalsaIndex * bindex)
 }
 
 void
-balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
+balsa_index_set_mailbox (BalsaIndex * bindex, LibBalsaMailbox * mailbox)
 {
   GList *list;
   guint i = 0;
@@ -343,8 +347,11 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
    */
   if (bindex->mailbox)
     {
-      mailbox_watcher_remove (mailbox, bindex->watcher_id);
-      mailbox_open_unref (bindex->mailbox);
+      /* This will disconnect all of our signals */
+      gtk_signal_disconnect_by_data (GTK_OBJECT(mailbox), bindex);
+
+      libbalsa_mailbox_close (bindex->mailbox);
+
       gtk_clist_clear (GTK_CLIST (bindex));
     }
 
@@ -362,24 +369,17 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     gtk_clist_set_column_title (GTK_CLIST (bindex), 3, _("To") );
   
   if (mailbox->open_ref == 0)
-    mailbox_open_ref (mailbox);
+    libbalsa_mailbox_open (mailbox, FALSE);
 
-  bindex->watcher_id =
-    mailbox_watcher_set (mailbox,
-			 (MailboxWatcherFunc) mailbox_listener,
-			 MESSAGE_DELETE_MASK |
-			 MESSAGE_NEW_MASK |
-			 MESSAGE_FLAGGED_MASK |
-			 MESSAGE_MARK_READ_MASK |
-			 MESSAGE_MARK_UNREAD_MASK |
-			 MESSAGE_MARK_DELETE_MASK |
-			 MESSAGE_MARK_CLEAR_MASK |
-			 MESSAGE_MARK_UNDELETE_MASK |
-			 MESSAGE_MARK_ANSWER_MASK |
-			 MESSAGE_MARK_FLAGGED_MASK |
-			 MESSAGE_REPLIED_MASK |
-			 MESSAGE_APPEND_MASK,
-			 (gpointer) bindex);
+  gtk_signal_connect(GTK_OBJECT(mailbox), "message-status-changed", 
+		     GTK_SIGNAL_FUNC(mailbox_message_changed_status_cb),
+		     (gpointer)bindex);
+  gtk_signal_connect(GTK_OBJECT(mailbox), "message-new", 
+		     GTK_SIGNAL_FUNC(mailbox_message_new_cb),
+		     (gpointer)bindex);
+  gtk_signal_connect(GTK_OBJECT(mailbox), "message-delete",
+		     GTK_SIGNAL_FUNC(mailbox_message_delete_cb),
+		     (gpointer)bindex);
 
   gtk_clist_freeze(GTK_CLIST (bindex));
   list = mailbox->message_list;
@@ -400,13 +400,13 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 
 void
 balsa_index_add (BalsaIndex * bindex,
-		 Message * message)
+		 LibBalsaMessage * message)
 {
   gchar buff1[32];
   gchar *text[6];
   gint row;
   GList *list;
-  Address *addy = NULL;
+  LibBalsaAddress *addy = NULL;
 ;
     
   g_return_if_fail (bindex != NULL);
@@ -440,9 +440,11 @@ balsa_index_add (BalsaIndex * bindex,
       text[3] = "";
   
   text[4] = message->subject;
-  text[5] = message->date;
+  text[5] = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
 
   row = gtk_clist_append (GTK_CLIST (bindex), text);
+
+  g_free(text[5]);
 
   /* set message number */
   sprintf (buff1, "%d", row + 1);
@@ -453,13 +455,13 @@ balsa_index_add (BalsaIndex * bindex,
   clist_set_col_img_from_flag (bindex, row, message);
 
   if (bindex->first_new_message == 0)
-    if (message->flags & MESSAGE_FLAG_NEW)
+    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
       bindex->first_new_message = row + 1;
 }
 
 void
 balsa_index_del (BalsaIndex * bindex,
-		 Message * message)
+		 LibBalsaMessage * message)
 {
   gint row;
 
@@ -532,7 +534,7 @@ void
 balsa_index_select_next_unread (BalsaIndex * bindex)
 {
   GtkCList *clist;
-  Message* message;
+  LibBalsaMessage* message;
   gint h;
 
   g_return_if_fail (bindex != NULL);
@@ -547,7 +549,7 @@ balsa_index_select_next_unread (BalsaIndex * bindex)
 
   while (h < clist->rows) {
     message = LIBBALSA_MESSAGE (gtk_clist_get_row_data (clist, h));
-    if (message->flags & MESSAGE_FLAG_NEW) {
+    if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
       gtk_clist_unselect_all (clist);
       
       gtk_clist_select_row (clist, h, -1);
@@ -626,7 +628,7 @@ balsa_index_redraw_current (BalsaIndex * bindex)
 }
 
 void
-balsa_index_update_flag (BalsaIndex * bindex, Message * message)
+balsa_index_update_flag (BalsaIndex * bindex, LibBalsaMessage * message)
 {
   gint row;
 
@@ -642,36 +644,36 @@ balsa_index_update_flag (BalsaIndex * bindex, Message * message)
 
 
 static void
-clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
+clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, LibBalsaMessage * message)
 {
   guint tmp;
   /* HEADER* current; */
 
-  if (message->flags & MESSAGE_FLAG_DELETED)
+  if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
     gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1,
 			  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
 			  balsa_icon_get_bitmap (BALSA_ICON_TRASH));
-  else if (message->flags & MESSAGE_FLAG_FLAGGED)
+  else if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
     gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1,
         balsa_icon_get_pixmap (BALSA_ICON_FLAGGED),
         balsa_icon_get_bitmap (BALSA_ICON_FLAGGED));
 /*
-   if (message->flags & MESSAGE_FLAG_FLAGGED)
+   if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
    gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1, , mailbox_mask);
  */
-  else if (message->flags & MESSAGE_FLAG_REPLIED)
+  else if (message->flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
     gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1,
 			  balsa_icon_get_pixmap (BALSA_ICON_REPLIED),
 			  balsa_icon_get_bitmap (BALSA_ICON_REPLIED));
 
-  else if (message->flags & MESSAGE_FLAG_NEW)
+  else if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
     gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1,
 			  balsa_icon_get_pixmap (BALSA_ICON_ENVELOPE),
 			  balsa_icon_get_bitmap (BALSA_ICON_ENVELOPE));
   else
     gtk_clist_set_text (GTK_CLIST (bindex), row, 1, NULL);
 
-  tmp = message_has_attachment (message);
+  tmp = libbalsa_message_has_attachment (message);
   
   if ( tmp ) {
           gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 2,
@@ -687,7 +689,7 @@ static void
 button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 {
   gint row, column;
-  Message *message;
+  LibBalsaMessage *message;
   BalsaIndex *bindex;
 
   if (event->window != clist->clist_window)
@@ -726,7 +728,7 @@ select_message (GtkWidget * widget,
 		gpointer * data)
 {
   BalsaIndex *bindex;
-  Message *message;
+  LibBalsaMessage *message;
 
   bindex = BALSA_INDEX (data);
   message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (GTK_CLIST (widget), row));
@@ -748,7 +750,7 @@ unselect_message (GtkWidget * widget,
                   gpointer * data)
 {
   BalsaIndex *bindex;
-  Message *message;
+  LibBalsaMessage *message;
 
   bindex = BALSA_INDEX (data);
   message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (GTK_CLIST (widget), row));
@@ -799,37 +801,23 @@ resize_column_event_cb (GtkCList * clist,
   }
 }
 
-/*
- * listen for mailbox messages
- */
-static void
-mailbox_listener (MailboxWatcherMessage * mw_message)
+/* Mailbox Callbacks... */
+static void mailbox_message_changed_status_cb(LibBalsaMailbox *mb, LibBalsaMessage *message, BalsaIndex *bindex)
 {
-  BalsaIndex *bindex = (BalsaIndex *) mw_message->data;
+  balsa_index_update_flag (bindex, message);
 
-  switch (mw_message->type)
-    {
-    case MESSAGE_MARK_READ:
-    case MESSAGE_MARK_UNREAD:
-    case MESSAGE_MARK_DELETE:
-    case MESSAGE_MARK_UNDELETE:
-    case MESSAGE_FLAGGED:
-    case MESSAGE_REPLIED:
-      balsa_index_update_flag (bindex, mw_message->message);
-      break;
-    case MESSAGE_NEW:
-      gnome_triggers_do ("You have new mail!", "email", "newmail", NULL);
-      balsa_index_add (bindex, mw_message->message);
-      break;
-    case MESSAGE_DELETE:
-      balsa_index_del (bindex, mw_message->message);
-      break;
-    case MESSAGE_APPEND:
-      balsa_index_add (bindex, mw_message->message);
-      break;     
-    default:
-      break;
-    }
+}
+
+static void mailbox_message_new_cb (LibBalsaMailbox *mb, LibBalsaMessage *message, BalsaIndex *bindex)
+{
+  gnome_triggers_do ("You have new mail!", "email", "newmail", NULL);
+  balsa_index_add (bindex, message);
+  
+}
+
+static void mailbox_message_delete_cb (LibBalsaMailbox *mb, LibBalsaMessage *message, BalsaIndex *bindex)
+{
+  balsa_index_del (bindex, message);
 }
 
 /* 

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -18,6 +19,7 @@
  */
 
 #include "config.h"
+
 #include <glib.h>
 #include <stdarg.h>
 #include <ctype.h>
@@ -25,7 +27,6 @@
 #include <gnome.h>
 
 #include <stdio.h>
-#include <sys/utsname.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <string.h>
@@ -36,13 +37,9 @@
 #include <pthread.h>
 #endif
 
-#include "../src/balsa-app.h"
-#include "mailbackend.h"
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-
-#include "misc.h"
+#include "mailbackend.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -50,141 +47,17 @@
 #include "src/save-restore.h" /*config_mailbox_update*/
 #endif
 
-#define BUFFER_SIZE 1024
+/* Class functions */
+static void libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass);
+static void libbalsa_mailbox_init(LibBalsaMailbox *mailbox);
+static void libbalsa_mailbox_destroy (GtkObject *object);
 
-#define WATCHER_LIST(mailbox) (((MailboxPrivate *)((mailbox)->private))->watcher_list)
+static void libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox);
 
-/* update the gui (during loading messages, etc */
-void (*update_gui_func) (void);
-	
-/*
- * watcher information
- */
-typedef struct
-  {
-    guint id;
-    guint16 mask;
-    MailboxWatcherFunc func;
-    gpointer data;
-  }
-MailboxWatcher;
+/* Callbacks */
+static void message_status_changed_cb (LibBalsaMessage *message, LibBalsaMailbox *mb );
 
-static void balsa_mailbox_class_init (MailboxClass *klass);
-static void balsa_mailbox_init(Mailbox *mailbox);
-static void balsa_mailbox_destroy (GtkObject *object);
-static void balsa_mailbox_real_open_mailbox(Mailbox *mailbox);
-static void balsa_mailbox_real_close_mailbox(Mailbox *mailbox);
-
-
-/* 
- * prototypes
- */
-/* static void load_messages (Mailbox * mailbox, gint emit); */
-static void free_messages (Mailbox * mailbox);
-
-
-static gint _mailbox_open_ref (Mailbox * mailbox, gint flag);
-
-/* PKGW: These were static. Why? */
-void send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
-void send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
-void send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
-void send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
-void send_watcher_mark_flag_message (Mailbox * mailbox, Message * message);
-void send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
-void send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
-void send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
-void send_watcher_delete_message (Mailbox * mailbox, Message * message);
-void send_watcher_append_message (Mailbox * mailbox, Message * message);
-
-static Message *translate_message (HEADER * cur);
-static Address *translate_address (ADDRESS * caddr);
-
-Server *server_new(ServerType type);
-void server_free(Server *server);
-
-/* We're gonna set Mutt global vars here.
-   NOTE: we take over the inbox_path ownership! 
-*/
-void
-mailbox_init (gchar * inbox_path,
-		void (*error_func) (const char *fmt,...),
-		void (*gui_func) (void))
-{
-  struct utsname utsname;
-  char *p;
-  gchar *tmp;
-
-  update_gui_func = gui_func;
-  
-  Spoolfile = inbox_path;
-
-  uname (&utsname);
-
-  Username = g_get_user_name ();
-
-  Homedir = g_get_home_dir ();
-
-  Realname = g_get_real_name ();
-
-  Hostname = g_get_host_name ();
-
-  mutt_error = error_func;
-
-  Fqdn = g_strdup (Hostname);
-
-  Sendmail = SENDMAIL;
-
-  Shell = g_strdup ((p = getenv ("SHELL")) ? p : "/bin/sh");
-  Tempdir = g_get_tmp_dir ();
-
-  if (UserHeader)
-    UserHeader = UserHeader->next;
-  UserHeader = mutt_new_list ();
-  tmp = g_malloc (17 + strlen (VERSION));
-  snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
-  UserHeader->data = g_strdup (tmp);
-  g_free (tmp);
-
-  set_option (OPTSAVEEMPTY);
-
-}
-
-gint
-set_imap_username (Mailbox * mb)
-{
-  if (!MAILBOX_IS_IMAP(mb))
-    return 0;
-
-  ImapUser = MAILBOX_IMAP(mb)->server->user;
-  ImapPass = MAILBOX_IMAP(mb)->server->passwd;
-
-  return 1;
-}
-
-
-void
-check_all_imap_hosts (Mailbox * to, GList *mailboxes)
-{
-#ifdef BALSA_USE_THREADS
-/*  Only check if lock has been set */
-  pthread_mutex_lock( &mailbox_lock);
-  if( !checking_mail )
-  {
-    pthread_mutex_unlock( &mailbox_lock);
-    return;
-  }
-  pthread_mutex_unlock( &mailbox_lock );
-
-/*  put IMAP code here */
-
-
-  return;  
-#else
-/* non-thread code */
-
-#endif
-}
+static LibBalsaMessage *translate_message (HEADER * cur);
 
 #ifdef BALSA_USE_THREADS
 static void error_in_thread( const char *format, ... );
@@ -208,10 +81,10 @@ static void error_in_thread( const char *format, ... )
 #endif
 
 void
-check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
+check_all_pop3_hosts (LibBalsaMailbox *to, GList *mailboxes)
 {
   GList *list;
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
   char uid[80];
 
 #ifdef BALSA_USE_THREADS
@@ -233,7 +106,7 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   pthread_mutex_unlock( &mailbox_lock );
 #endif BALSA_USE_THREADS
 
-  balsa_error_toggle_fatality( FALSE );
+/*    balsa_error_toggle_fatality( FALSE ); */
 
   list = g_list_first (mailboxes);
   
@@ -246,27 +119,27 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
   while (list)
   {
     mailbox = list->data;
-    if (MAILBOX_POP3 (mailbox)->check)
+    if (LIBBALSA_MAILBOX_POP3 (mailbox)->check)
     {
-      PopHost = g_strdup (MAILBOX_POP3(mailbox)->server->host);
-      PopPort = (MAILBOX_POP3(mailbox)->server->port);
-      PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
-      PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
+      PopHost = g_strdup (LIBBALSA_MAILBOX_POP3(mailbox)->host);
+      PopPort = (LIBBALSA_MAILBOX_POP3(mailbox)->port);
+      PopPass = g_strdup (LIBBALSA_MAILBOX_POP3(mailbox)->passwd);
+      PopUser = g_strdup (LIBBALSA_MAILBOX_POP3(mailbox)->user);
 
 #ifdef BALSA_USE_THREADS
-      sprintf( msgbuf, "POP3: %s", MAILBOX_POP3(mailbox)->mailbox.name );
+      sprintf( msgbuf, "POP3: %s", LIBBALSA_MAILBOX_POP3(mailbox)->mailbox.name );
       MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf );
 #endif
  
-      if( MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
+      if( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
         uid[0] = 0;
       else
-        strcpy( uid, MAILBOX_POP3 (mailbox)->last_popped_uid );
+        strcpy( uid, LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
 
       PopUID = uid;
 
       /* Delete it if necessary */
-      if (MAILBOX_POP3 (mailbox)->delete_from_server)
+      if (LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server)
       {
         set_option(OPTPOPDELETE);
       }
@@ -280,18 +153,18 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
       g_free (PopPass);
       g_free (PopUser);
 
-      if( MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
-         strcmp(MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
+      if( LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid == NULL ||
+         strcmp(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid, uid) != 0)
       {
-	      if( MAILBOX_POP3( mailbox )->last_popped_uid )
-		      g_free ( MAILBOX_POP3 (mailbox)->last_popped_uid );
-        MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
+	      if( LIBBALSA_MAILBOX_POP3( mailbox )->last_popped_uid )
+		      g_free ( LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid );
+        LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup ( uid );
 
 #ifdef BALSA_USE_THREADS
-	threadmsg = malloc( sizeof( MailThreadMessage ) );
+	threadmsg = g_new (MailThreadMessage, 1);
 	threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
 	threadmsg->mailbox = (void *) mailbox;
-	/*  MAILBOX_POP3(mailbox)->mailbox.name */
+	/*  LIBBALSA_MAILBOX_POP3(mailbox)->mailbox.name */
         write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
 #else
 	config_mailbox_update( 
@@ -302,11 +175,11 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
     list = list->next;
   }
 
-  #ifdef BALSA_USE_THREADS
+#ifdef BALSA_USE_THREADS
   mutt_error = mutt_error_backup;
-  #endif
+#endif
 
-  balsa_error_toggle_fatality( TRUE );
+/*    balsa_error_toggle_fatality( TRUE ); */
   return;
 }
 
@@ -315,31 +188,31 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
    via mutt's buffy mechanism.
 */
 void
-mailbox_add_for_checking (Mailbox * mailbox)
+mailbox_add_for_checking (LibBalsaMailbox * mailbox)
 {
   BUFFY *tmp;
   gchar *path, *user, *passwd;
 
   g_return_if_fail(mailbox != NULL);
 
-  if (MAILBOX_IS_LOCAL(mailbox)) {
-      path = MAILBOX_LOCAL (mailbox)->path;
+  if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
+      path = LIBBALSA_MAILBOX_LOCAL (mailbox)->path;
       user = passwd = NULL;
   }
-  else if (MAILBOX_IS_IMAP(mailbox) && MAILBOX_IMAP(mailbox)->server->user 
-           && MAILBOX_IMAP(mailbox)->server->passwd) {
+  else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && LIBBALSA_MAILBOX_IMAP(mailbox)->user 
+           && LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) {
       path = g_strdup_printf("{%s:%i}%s", 
-			     MAILBOX_IMAP(mailbox)->server->host,
-			     MAILBOX_IMAP(mailbox)->server->port,
-			     MAILBOX_IMAP(mailbox)->path);
-      user   = MAILBOX_IMAP(mailbox)->server->user;
-      passwd = MAILBOX_IMAP(mailbox)->server->passwd;
+			     LIBBALSA_MAILBOX_IMAP(mailbox)->host,
+			     LIBBALSA_MAILBOX_IMAP(mailbox)->port,
+			     LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+      user   = LIBBALSA_MAILBOX_IMAP(mailbox)->user;
+      passwd = LIBBALSA_MAILBOX_IMAP(mailbox)->passwd;
   } else 
       return;
 
   tmp = buffy_add_mailbox(path, user, passwd);
   
-  if(MAILBOX_IS_IMAP(mailbox)) 
+  if(LIBBALSA_IS_MAILBOX_IMAP(mailbox)) 
       g_free(path);
 }
 
@@ -347,21 +220,19 @@ mailbox_add_for_checking (Mailbox * mailbox)
    assumes that mutt_buffy_notify() has been called - this function
    is expensive and should be called only once 
 */
-
-
 gint
-mailbox_have_new_messages (Mailbox * mailbox)
+libbalsa_mailbox_has_new_messages (LibBalsaMailbox * mailbox)
 {
   BUFFY *tmp = NULL;
   gchar * path;
 
-  if(MAILBOX_IS_LOCAL(mailbox))
-      path = g_strdup(MAILBOX_LOCAL(mailbox)->path);
-  else if(MAILBOX_IS_IMAP(mailbox))
+  if(LIBBALSA_IS_MAILBOX_LOCAL(mailbox))
+      path = g_strdup(LIBBALSA_MAILBOX_LOCAL(mailbox)->path);
+  else if(LIBBALSA_IS_MAILBOX_IMAP(mailbox))
       path = g_strdup_printf("{%s:%i}%s", 
-			     MAILBOX_IMAP(mailbox)->server->host,
-			     MAILBOX_IMAP(mailbox)->server->port,
-			     MAILBOX_IMAP(mailbox)->path);
+			     LIBBALSA_MAILBOX_IMAP(mailbox)->host,
+			     LIBBALSA_MAILBOX_IMAP(mailbox)->port,
+			     LIBBALSA_MAILBOX_IMAP(mailbox)->path);
   else return FALSE;
 
   for (tmp = Incoming; tmp; tmp = tmp->next)
@@ -377,14 +248,20 @@ mailbox_have_new_messages (Mailbox * mailbox)
 enum {
   OPEN_MAILBOX,
   CLOSE_MAILBOX,
+  MESSAGE_STATUS_CHANGED,
+  MESSAGE_NEW,
+  MESSAGE_DELETE,
+  SET_USERNAME,
+  SET_PASSWORD,
+  SET_HOST,
   LAST_SIGNAL
 };
 
 static GtkObjectClass *parent_class = NULL;
-static guint mailbox_signals[LAST_SIGNAL] = { 0 };
+static guint libbalsa_mailbox_signals[LAST_SIGNAL];
 
 GtkType
-balsa_mailbox_get_type (void)
+libbalsa_mailbox_get_type (void)
 {
   static GtkType mailbox_type = 0;
 
@@ -392,11 +269,11 @@ balsa_mailbox_get_type (void)
     {
       static const GtkTypeInfo mailbox_info =
       {
-	"Mailbox",
-	sizeof (Mailbox),
-	sizeof (MailboxClass),
-	(GtkClassInitFunc) balsa_mailbox_class_init,
-	(GtkObjectInitFunc) balsa_mailbox_init,
+	"LibBalsaMailbox",
+	sizeof (LibBalsaMailbox),
+	sizeof (LibBalsaMailboxClass),
+	(GtkClassInitFunc) libbalsa_mailbox_class_init,
+	(GtkObjectInitFunc) libbalsa_mailbox_init,
         /* reserved_1 */ NULL,
 	/* reserved_2 */ NULL,
 	(GtkClassInitFunc) NULL,
@@ -409,7 +286,7 @@ balsa_mailbox_get_type (void)
 }
 
 static void
-balsa_mailbox_class_init (MailboxClass *klass)
+libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 {
   GtkObjectClass *object_class;
 
@@ -417,38 +294,89 @@ balsa_mailbox_class_init (MailboxClass *klass)
 
   parent_class = gtk_type_class(gtk_object_get_type());
 
-  mailbox_signals[OPEN_MAILBOX] =
+  libbalsa_mailbox_signals[MESSAGE_STATUS_CHANGED] =
+    gtk_signal_new ("message-status-changed",
+		    GTK_RUN_FIRST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET(LibBalsaMailboxClass, message_status_changed),
+		    gtk_marshal_NONE__POINTER,
+		    GTK_TYPE_NONE, 1, LIBBALSA_TYPE_MESSAGE);
+
+  libbalsa_mailbox_signals[OPEN_MAILBOX] =
     gtk_signal_new ("open_mailbox",
                     GTK_RUN_FIRST,
                     object_class->type,
-                    GTK_SIGNAL_OFFSET (MailboxClass, open_mailbox),
-		    gtk_marshal_NONE__NONE,
-		    GTK_TYPE_NONE, 0);
+                    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, open_mailbox),
+		    gtk_marshal_NONE__BOOL,
+		    GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
 
-  mailbox_signals[CLOSE_MAILBOX] =
+  libbalsa_mailbox_signals[CLOSE_MAILBOX] =
     gtk_signal_new ("close_mailbox",
                     GTK_RUN_LAST,
                     object_class->type,
-                    GTK_SIGNAL_OFFSET (MailboxClass, close_mailbox),
+                    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, close_mailbox),
 		    gtk_marshal_NONE__NONE,
 		    GTK_TYPE_NONE, 0);
 
-  gtk_object_class_add_signals (object_class, mailbox_signals, LAST_SIGNAL);
+  libbalsa_mailbox_signals[MESSAGE_NEW] =
+    gtk_signal_new ("message-new",
+		    GTK_RUN_FIRST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, message_new),
+		    gtk_marshal_NONE__POINTER,
+		    GTK_TYPE_NONE, 1, LIBBALSA_TYPE_MESSAGE);
 
-  object_class->destroy = balsa_mailbox_destroy;
+  libbalsa_mailbox_signals[MESSAGE_DELETE] =
+    gtk_signal_new ("message-delete",
+		    GTK_RUN_FIRST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, message_delete),
+		    gtk_marshal_NONE__POINTER,
+		    GTK_TYPE_NONE, 1, LIBBALSA_TYPE_MESSAGE);
+  libbalsa_mailbox_signals[SET_USERNAME] =
+    gtk_signal_new ("set-username",
+		    GTK_RUN_FIRST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, set_username),
+		    gtk_marshal_NONE__STRING,
+		    GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
+  libbalsa_mailbox_signals[SET_PASSWORD] =
+    gtk_signal_new ("set-password",
+		    GTK_RUN_FIRST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, set_password),
+		    gtk_marshal_NONE__STRING,
+		    GTK_TYPE_NONE, 1, GTK_TYPE_STRING);
+  libbalsa_mailbox_signals[SET_HOST] =
+    gtk_signal_new ("set-host",
+		    GTK_RUN_FIRST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, set_host),
+		    gtk_marshal_NONE__POINTER_INT,
+		    GTK_TYPE_NONE, 2, GTK_TYPE_STRING, GTK_TYPE_INT);
+  
+  gtk_object_class_add_signals (object_class, libbalsa_mailbox_signals, LAST_SIGNAL);
 
-  klass->open_mailbox = balsa_mailbox_real_open_mailbox;
-  klass->close_mailbox = balsa_mailbox_real_close_mailbox;
+  object_class->destroy = libbalsa_mailbox_destroy;
+
+  klass->open_mailbox = NULL;
+  klass->close_mailbox = libbalsa_mailbox_real_close;
+
+  klass->message_status_changed = NULL;
+  klass->message_new = NULL;
+  klass->message_delete = NULL;
+
+  klass->set_username = NULL;
+  klass->set_password = NULL;
+  klass->set_host = NULL;
 }
 
 static void
-balsa_mailbox_init(Mailbox *mailbox)
+libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
 {
   mailbox->lock = FALSE;
   mailbox->name = NULL;
-  mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));
   CLIENT_CONTEXT (mailbox) = NULL;
-  WATCHER_LIST (mailbox) = NULL;
   mailbox->open_ref = 0;
   mailbox->messages = 0;
   mailbox->new_messages = 0;
@@ -458,45 +386,17 @@ balsa_mailbox_init(Mailbox *mailbox)
   mailbox->message_list = NULL;
 }
 
-GtkObject*
-mailbox_new(MailboxType type)
+static void 
+libbalsa_mailbox_destroy (GtkObject *object)
 {
-  Mailbox *mailbox;
-
-  switch (type)
-    {
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      mailbox = gtk_type_new(BALSA_TYPE_MAILBOX_LOCAL);
-      break;
-
-    case MAILBOX_POP3:
-      mailbox = gtk_type_new(BALSA_TYPE_MAILBOX_POP3);
-      break;
-
-    case MAILBOX_IMAP:
-      mailbox = gtk_type_new(BALSA_TYPE_MAILBOX_IMAP);
-      break;
-
-    default:
-      return NULL;
-    }
-
-  mailbox->type = type;
-  return GTK_OBJECT(mailbox);
-}
-
-static void balsa_mailbox_destroy (GtkObject *object)
-{
-  Mailbox *mailbox = BALSA_MAILBOX(object);
+  LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(object);
 
   if (!mailbox)
     return;
 
   if (CLIENT_CONTEXT (mailbox) != NULL)
     while (mailbox->open_ref > 0)
-      mailbox_open_unref (mailbox);
+      libbalsa_mailbox_close(mailbox);
 
   g_free(mailbox->name);
   g_free(mailbox->private);
@@ -505,172 +405,57 @@ static void balsa_mailbox_destroy (GtkObject *object)
     (*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
 }
 
-Server *
-server_new(ServerType type)
-{
-  Server *server;
-
-  /* we can create the same thing for now */
-  server = (Server *)g_malloc(sizeof(Server));
-  server->user = NULL;
-  server->passwd = NULL;
-  server->host = NULL;
-  server->port = -1;
-
-  return server;
-}
-
-void
-server_free(Server *server)
-{
-  g_free(server->user);
-  g_free(server->passwd);
-  g_free(server->host);
-}
-
-
-
-void balsa_mailbox_open(Mailbox *mailbox)
+void 
+libbalsa_mailbox_open(LibBalsaMailbox *mailbox, gboolean append)
 {
   g_return_if_fail(mailbox != NULL);
-  g_return_if_fail(BALSA_IS_MAILBOX(mailbox));
+  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-  gtk_signal_emit(GTK_OBJECT(mailbox), mailbox_signals[OPEN_MAILBOX], NULL);
+  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[OPEN_MAILBOX], append);
 }
 
-void balsa_mailbox_close(Mailbox *mailbox)
+void 
+libbalsa_mailbox_close(LibBalsaMailbox *mailbox)
 {
   g_return_if_fail(mailbox != NULL);
-  g_return_if_fail(BALSA_IS_MAILBOX(mailbox));
+  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-  gtk_signal_emit(GTK_OBJECT(mailbox), mailbox_signals[CLOSE_MAILBOX], NULL);
+  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[CLOSE_MAILBOX]);
 }
 
-
-
-gint
-mailbox_open_ref (Mailbox * mailbox)
+void 
+libbalsa_mailbox_set_username(LibBalsaMailbox *mailbox, const gchar *name)
 {
-  return _mailbox_open_ref (mailbox, 0);
+  g_return_if_fail(mailbox != NULL);
+  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_USERNAME], name);
 }
 
-gint
-mailbox_open_append (Mailbox * mailbox)
+void 
+libbalsa_mailbox_set_password(LibBalsaMailbox *mailbox, const gchar *passwd)
 {
-  return _mailbox_open_ref (mailbox, M_APPEND);
+  g_return_if_fail(mailbox != NULL);
+  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_PASSWORD], passwd);
 }
 
-
-
-static void balsa_mailbox_real_open_mailbox(Mailbox *mailbox)
+void 
+libbalsa_mailbox_set_host(LibBalsaMailbox *mailbox, const gchar *host, gint port)
 {
-  _mailbox_open_ref(mailbox, 0);
+  g_return_if_fail(mailbox != NULL);
+  g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SET_HOST], host, port);
 }
 
-static void balsa_mailbox_real_close_mailbox(Mailbox *mailbox)
-{
-  mailbox_open_unref(mailbox);
-}
-
-static gint
-_mailbox_open_ref (Mailbox * mailbox, gint flag)
-{
-  gchar *tmp;
-  struct stat st;
-  LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
-
-
-  if (CLIENT_CONTEXT_OPEN (mailbox))
-    {
-      if (flag == M_APPEND)
-	{
-	  
-	  /* we need the mailbox to be opened fresh i think */
-	  mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
-	  
-	} 
-      else 
-	{
-	  /* incriment the reference count */
-	  mailbox->open_ref++;
-	  
-	  UNLOCK_MAILBOX (mailbox);
-	  return TRUE;
-	}
-    }
-
-  if (MAILBOX_IS_LOCAL(mailbox))
-    {
-      if (stat (MAILBOX_LOCAL (mailbox)->path, &st) == -1)
-	{
-	  UNLOCK_MAILBOX (mailbox);
-	  return FALSE;
-	}
-    }
-
-  switch (mailbox->type)
-    {
-      /* add mail dir */
-    case MAILBOX_MBOX:
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, flag, NULL);
-      break;
-
-    case MAILBOX_POP3:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3(mailbox)->server->host, flag, NULL);
-      break;
-
-    case MAILBOX_IMAP:
-      tmp = g_strdup_printf("{%s:%i}%s", 
-			    MAILBOX_IMAP(mailbox)->server->host,
-			    MAILBOX_IMAP(mailbox)->server->port,
-			    MAILBOX_IMAP(mailbox)->path);
-      set_imap_username (mailbox);
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp, flag, NULL);
-      g_free (tmp);
-      break;
-
-    case MAILBOX_UNKNOWN:
-      break;
-    }
-
-  if (CLIENT_CONTEXT_OPEN (mailbox))
-    {
-      mailbox->messages = 0;
-      mailbox->total_messages = 0;
-      mailbox->unread_messages = 0;
-      mailbox->has_unread_messages = FALSE; /* has_unread_messages will be reset
-					       by load_messages anyway */
-      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
-      load_messages (mailbox, 0);
-
-      /* increment the reference count */
-      mailbox->open_ref++;
-
-#ifdef DEBUG
-      g_print (_("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
-#endif
-
-      /* FIXME */
-/* mailbox_sort(mailbox, MAILBOX_SORT_DATE); */
-      UNLOCK_MAILBOX (mailbox);
-      return TRUE;
-    }
-  else
-    {
-      UNLOCK_MAILBOX (mailbox);
-      return FALSE;
-    }
-}
-
-
-void
-mailbox_open_unref (Mailbox * mailbox)
+static void 
+libbalsa_mailbox_real_close(LibBalsaMailbox *mailbox)
 {
   int check;
 #ifdef DEBUG
-      g_print (_("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+      g_print (_("LibBalsaMailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
   LOCK_MAILBOX (mailbox);
 
@@ -681,7 +466,7 @@ mailbox_open_unref (Mailbox * mailbox)
 
   if (mailbox->open_ref == 0)
     {
-      free_messages (mailbox);
+      libbalsa_mailbox_free_messages (mailbox);
       mailbox->messages = 0;
       mailbox->total_messages = 0;
       mailbox->unread_messages = 0;
@@ -693,8 +478,8 @@ mailbox_open_unref (Mailbox * mailbox)
       {
 	  while( (check=mx_close_mailbox (CLIENT_CONTEXT (mailbox), NULL) )) {
 	      UNLOCK_MAILBOX (mailbox);
-	      g_print("mailbox_open_unref: close failed, retrying...\n");
-	      mailbox_check_new_messages(mailbox);
+	      g_print("libbalsa_mailbox_real_close: close failed, retrying...\n");
+	      libbalsa_mailbox_check_for_new_messages(mailbox);
 	      LOCK_MAILBOX (mailbox);
 	  }
 	  free (CLIENT_CONTEXT (mailbox));
@@ -706,13 +491,13 @@ mailbox_open_unref (Mailbox * mailbox)
 }
 
 void
-mailbox_sort (Mailbox * mailbox, MailboxSort sort)
+libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort)
 {
   mutt_sort_headers (CLIENT_CONTEXT (mailbox), sort);
 }
 
 gint
-mailbox_check_new_messages (Mailbox * mailbox)
+libbalsa_mailbox_check_for_new_messages (LibBalsaMailbox * mailbox)
 {
   gint i = 0;
   gint index_hint;
@@ -739,7 +524,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
 	{
 
 #ifndef BALSA_USE_THREADS
-	  load_messages (mailbox, 1);
+	  libbalsa_mailbox_load_messages (mailbox); /*1*/
 #endif
 	  UNLOCK_MAILBOX(mailbox);
 	  return TRUE;
@@ -754,116 +539,16 @@ mailbox_check_new_messages (Mailbox * mailbox)
   return FALSE;
 }
 
-
-guint
-mailbox_watcher_set (Mailbox * mailbox,
-		     MailboxWatcherFunc func,
-		     guint16 mask,
-		     gpointer data)
-{
-  GList *list;
-  MailboxWatcher *watcher;
-  guint id;
-  gint bumped;
-
-
-  /* find a unique id */
-  id = 0;
-  bumped = TRUE;
-  while (1)
-    {
-      list = WATCHER_LIST (mailbox);
-      while (list)
-	{
-	  watcher = list->data;
-	  list = list->next;
-
-	  if (watcher->id == id)
-	    {
-	      id++;
-	      bumped = TRUE;
-	      break;
-	    }
-	}
-
-      if (!bumped)
-	break;
-
-      bumped = FALSE;
-    }
-
-
-  /* allocate the new watcher */
-  watcher = g_malloc (sizeof (MailboxWatcher));
-  watcher->id = id;
-  watcher->mask = mask;
-  watcher->func = func;
-  watcher->data = data;
-
-
-  /* add it */
-  WATCHER_LIST (mailbox) = g_list_append (WATCHER_LIST (mailbox), watcher);
-
-  return id;
-}
-
-
-void
-mailbox_watcher_remove (Mailbox * mailbox, guint id)
-{
-  GList *list;
-  MailboxWatcher *watcher;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-
-      if (id == watcher->id)
-	{
-	  g_free (watcher);
-	  WATCHER_LIST (mailbox) = g_list_remove_link (WATCHER_LIST (mailbox), list);
-	  break;
-	}
-
-      list = list->next;
-    }
-}
-
-
-void
-mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data)
-{
-  GList *list;
-  MailboxWatcher *watcher;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-
-      if (data == watcher->data)
-	{
-	  g_free (watcher);
-	  WATCHER_LIST (mailbox) = g_list_remove_link (WATCHER_LIST (mailbox), list);
-	}
-
-      list = list->next;
-    }
-
-}
-
-
 /*
  * private 
  * PS: called by mail_progress_notify_cb:
  * loads incrementally new messages, if any.
  */
 void
-load_messages (Mailbox * mailbox, gint emit)
+libbalsa_mailbox_load_messages (LibBalsaMailbox * mailbox)
 {
   glong msgno;
-  Message *message;
+  LibBalsaMessage *message;
   HEADER *cur = 0;
 
   for (msgno = mailbox->messages;
@@ -885,32 +570,47 @@ load_messages (Mailbox * mailbox, gint emit)
       message = translate_message (cur);
       message->mailbox = mailbox;
       message->msgno = msgno;
-      mailbox->messages++;
 
+      gtk_signal_connect ( GTK_OBJECT (message), "clear-flags",
+			   GTK_SIGNAL_FUNC(message_status_changed_cb),
+			   mailbox);
+      gtk_signal_connect ( GTK_OBJECT (message), "set-answered",
+			   GTK_SIGNAL_FUNC(message_status_changed_cb),
+			   mailbox);
+      gtk_signal_connect ( GTK_OBJECT (message), "set-read",
+			   GTK_SIGNAL_FUNC(message_status_changed_cb),
+			   mailbox);
+      gtk_signal_connect ( GTK_OBJECT (message), "set-deleted",
+			   GTK_SIGNAL_FUNC(message_status_changed_cb),
+			   mailbox);
+      gtk_signal_connect ( GTK_OBJECT (message), "set-flagged",
+			   GTK_SIGNAL_FUNC(message_status_changed_cb),
+			   mailbox);
+
+      mailbox->messages++;
       mailbox->total_messages++;
 
       if (!cur->read)
       {
-	message->flags |= MESSAGE_FLAG_NEW;
+	message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
         
         mailbox->unread_messages++;
 
       }
 
       if (cur->deleted)
-	message->flags |= MESSAGE_FLAG_DELETED;
+	message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
 
       if (cur->flagged)
-	message->flags |= MESSAGE_FLAG_FLAGGED;
+	message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
 
       if (cur->replied)
-	message->flags |= MESSAGE_FLAG_REPLIED;
+	message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
 
       mailbox->message_list = g_list_append (mailbox->message_list, message);
       mailbox->new_messages--;
      
-      if (emit)
-        send_watcher_new_message (mailbox, message, mailbox->new_messages);
+      gtk_signal_emit (GTK_OBJECT(mailbox), libbalsa_mailbox_signals[MESSAGE_NEW], message);
     }
 
   if (mailbox->unread_messages > 0)
@@ -918,11 +618,11 @@ load_messages (Mailbox * mailbox, gint emit)
 }
 
 
-static void
-free_messages (Mailbox * mailbox)
+void
+libbalsa_mailbox_free_messages (LibBalsaMailbox * mailbox)
 {
   GList *list;
-  Message *message;
+  LibBalsaMessage *message;
 
   list = g_list_first (mailbox->message_list);
   while (list)
@@ -930,335 +630,15 @@ free_messages (Mailbox * mailbox)
       message = list->data;
       list = list->next;
 
-      send_watcher_delete_message (mailbox, message);
-      message_destroy (message);
+      gtk_signal_emit( GTK_OBJECT(mailbox), libbalsa_mailbox_signals[MESSAGE_DELETE], message);
+      gtk_object_destroy (GTK_OBJECT(message));
     }
   g_list_free (mailbox->message_list);
   mailbox->message_list = NULL;
 }
 
-
-/*
- * sending messages to watchers
- */
-void
-send_watcher_mark_clear_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_MARK_CLEAR;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_MARK_CLEAR_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) (&mw_message);
-	}
-    }
-}
-
-void
-send_watcher_mark_answer_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_MARK_ANSWER;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_MARK_ANSWER_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) (&mw_message);
-	}
-    }
-}
-
-void
-send_watcher_mark_read_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_MARK_READ;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_MARK_READ_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) (&mw_message);
-	}
-    }
-}
- 
-void
-send_watcher_mark_flag_message (Mailbox * mailbox, Message * message)
-{
-	GList *list;
-	MailboxWatcherMessage mw_message;
-	MailboxWatcher *watcher;
-
-	mw_message.type = MESSAGE_MARK_FLAGGED;
-	mw_message.mailbox = mailbox;
-	mw_message.message = message;
-
-	list = WATCHER_LIST (mailbox);
-	while (list)
-	{
-		watcher = list->data;
-		list = list->next;
-
-		if (watcher->mask & MESSAGE_MARK_FLAGGED_MASK)
-		{
-			mw_message.data = watcher->data;
-			(*watcher->func) (&mw_message);
-		}
-	}
-}
-
-void
-send_watcher_mark_unread_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_MARK_UNREAD;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_MARK_UNREAD_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) (&mw_message);
-	}
-    }
-}
-
-void
-send_watcher_mark_delete_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_MARK_DELETE;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_MARK_DELETE_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) (&mw_message);
-	}
-    }
-}
-
-
-void
-send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_MARK_UNDELETE;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_MARK_UNDELETE_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) (&mw_message);
-	}
-    }
-}
-
-
-void
-send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining)
-{
-  GList *list;
-  MailboxWatcherMessageNew mw_new_message;
-  MailboxWatcher *watcher;
-
-  mw_new_message.type = MESSAGE_NEW;
-  mw_new_message.mailbox = mailbox;
-  mw_new_message.message = message;
-
-  mw_new_message.remaining = remaining;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_NEW_MASK)
-	{
-	  mw_new_message.data = watcher->data;
-	  (*watcher->func) ((MailboxWatcherMessage *) & mw_new_message);
-	}
-    }
-}
-
-void
-send_watcher_append_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage  mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_APPEND;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_APPEND_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) ((MailboxWatcherMessage *) & mw_message);
-	}
-    }
-}
-
-
-void
-send_watcher_delete_message (Mailbox * mailbox, Message * message)
-{
-  GList *list;
-  MailboxWatcherMessage mw_message;
-  MailboxWatcher *watcher;
-
-  mw_message.type = MESSAGE_DELETE;
-  mw_message.mailbox = mailbox;
-  mw_message.message = message;
-
-  list = WATCHER_LIST (mailbox);
-  while (list)
-    {
-      watcher = list->data;
-      list = list->next;
-
-      if (watcher->mask & MESSAGE_DELETE_MASK)
-	{
-	  mw_message.data = watcher->data;
-	  (*watcher->func) (&mw_message);
-	}
-    }
-}
-
-
-
-/*
- * MISC
- */
-MailboxType
-mailbox_type_from_description (gchar * description)
-{
-  if (!strcmp (description, "mbox"))
-    return MAILBOX_MBOX;
-
-  else if (!strcmp (description, "mh"))
-    return MAILBOX_MH;
-
-  else if (!strcmp (description, "maildir"))
-    return MAILBOX_MAILDIR;
-
-  else if (!strcmp (description, "pop3"))
-    return MAILBOX_POP3;
-
-  else if (!strcmp (description, "imap"))
-    return MAILBOX_IMAP;
-
-  /* if no match */
-  return MAILBOX_UNKNOWN;
-}
-
-
-gchar *
-mailbox_type_description (MailboxType type)
-{
-  switch (type)
-    {
-    case MAILBOX_MBOX:
-      return "mbox";
-      break;
-
-    case MAILBOX_MH:
-      return "mh";
-      break;
-
-    case MAILBOX_MAILDIR:
-      return "maildir";
-      break;
-
-    case MAILBOX_POP3:
-      return "pop3";
-      break;
-
-    case MAILBOX_IMAP:
-      return "imap";
-      break;
-
-    case MAILBOX_UNKNOWN:
-    default:
-      return "";
-    }
-}
-
-
-MailboxType
-mailbox_valid (gchar * filename)
+LibBalsaMailboxType
+libbalsa_mailbox_valid (gchar * filename)
 {
   struct stat st;
 
@@ -1288,122 +668,73 @@ mailbox_valid (gchar * filename)
     }
 }
 
-/**
- * mailbox_gather_content_info:
- *
- * @mailbox : the mailbox to scan
- *
- * gather informations about the content of a mailbox such as the
- * total nuber of messages, the number of unread messages 
- * 
- *
- * Return value: if the mailbox could be scanned, returns true. 
- **/
-gboolean
-mailbox_gather_content_info(Mailbox *mailbox)
-{
-	/* this code is far too slow, and mutt does not provide a good way to
-	 * do this.  we will not use it for now */
-  GList *message_list;
-  Message *current_message;
-
-  mailbox_open_ref (mailbox);
-
-  mailbox->total_messages = 0;
-  mailbox->unread_messages = 0;
-
-  /* examine all the message in the mailbox */
-  message_list = mailbox->message_list;
-  while (message_list)
-    {
-      current_message = (Message *) message_list->data;
-      if ( current_message->flags & MESSAGE_FLAG_NEW ) 
-	mailbox->unread_messages++ ;
-      mailbox->total_messages++ ;
-      message_list = message_list->next;
-      
-    }
-
-  mailbox_open_unref (mailbox);
-
-  return TRUE;
-}
-
-
-void mailbox_commit_flagged_changes( Mailbox *mailbox )
+void libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox )
 {
   GList *message_list;
   GList *tmp_message_list;
-  Message *current_message;
+  LibBalsaMessage *current_message;
 
-
-  mailbox_open_ref (mailbox);
+  libbalsa_mailbox_open (mailbox, FALSE);
 
   /* examine all the message in the mailbox */
   message_list = mailbox->message_list;
   while (message_list)
     {
-      current_message = (Message *) message_list->data;
+      current_message = LIBBALSA_MESSAGE(message_list->data);
       tmp_message_list =  message_list->next;
-      if ( current_message->flags & MESSAGE_FLAG_DELETED ) 
+      if ( current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED ) 
 	{
-	   send_watcher_delete_message (mailbox, current_message);
-	   message_destroy (current_message);
-	   mailbox->message_list = g_list_remove_link( mailbox->message_list, message_list);
+	  gtk_signal_emit( GTK_OBJECT(mailbox), libbalsa_mailbox_signals[MESSAGE_DELETE], current_message);
+	  gtk_object_destroy (GTK_OBJECT(current_message));
+	  mailbox->message_list = g_list_remove_link( mailbox->message_list, message_list);
 	}
       message_list = tmp_message_list;
       
     }
 
   /* [MBG] This should prevent segfaults */
-/*   if (CLIENT_CONTEXT (mailbox) != NULL) */
-/*     mx_sync_mailbox (CLIENT_CONTEXT(mailbox)); */
+  /*   if (CLIENT_CONTEXT (mailbox) != NULL) */
+  /*     mx_sync_mailbox (CLIENT_CONTEXT(mailbox)); */
 
-  mailbox_open_unref (mailbox);
+  libbalsa_mailbox_close (mailbox);
 }
 
 /* internal c-client translation */
-static Message *
+static LibBalsaMessage *
 translate_message (HEADER * cur)
 {
-  Message *message;
+  LibBalsaMessage *message;
   ADDRESS *addy;
-  Address *addr;
+  LibBalsaAddress *addr;
   ENVELOPE *cenv;
   LIST *tmp;
-  gchar rettime[128], *p;
-  struct tm *footime;
+  gchar *p;
 
   if (!cur)
     return NULL;
 
   cenv = cur->env;
 
-  message = message_new ();
+  message = libbalsa_message_new ();
 
-  footime = localtime (&cur->date_sent);
-
-  strftime (rettime, sizeof (rettime), balsa_app.date_string, footime);
-
-  message->datet = cur->date_sent;
-  message->date = g_strdup (rettime);
-  message->from = translate_address (cenv->from);
-  message->sender = translate_address (cenv->sender);
-  message->reply_to = translate_address (cenv->reply_to);
+  message->date = cur->date_sent;
+  message->from = libbalsa_address_new_from_libmutt (cenv->from);
+  message->sender = libbalsa_address_new_from_libmutt (cenv->sender);
+  message->reply_to = libbalsa_address_new_from_libmutt (cenv->reply_to);
 
   for (addy = cenv->to; addy; addy = addy->next)
     {
-      addr = translate_address (addy);
+      addr = libbalsa_address_new_from_libmutt (addy);
       message->to_list = g_list_append (message->to_list, addr);
     }
   for (addy = cenv->cc; addy; addy = addy->next)
     {
-      addr = translate_address (addy);
+      addr = libbalsa_address_new_from_libmutt (addy);
       message->cc_list = g_list_append (message->cc_list, addr);
     }
   for (addy = cenv->bcc; addy; addy = addy->next)
     {
-      addr = translate_address (addy);
+      addr = libbalsa_address_new_from_libmutt (addy);
       message->bcc_list = g_list_append (message->bcc_list, addr);
     }
   
@@ -1415,10 +746,13 @@ translate_message (HEADER * cur)
           p = tmp->data + 11;
           SKIPWS (p);
 
-          message->fcc_mailbox = p != NULL ?
-	      balsa_find_mbox_by_name(p) : NULL;
+	  if (p)
+	    message->fcc_mailbox = g_strdup(p);
+	  else 
+	    message->fcc_mailbox = NULL;
         }
       else if (mutt_strncasecmp ("X-Mutt-Fcc:", tmp->data, 18) == 0)
+	/* Is X-Mutt-Fcc correct? */
         {
           p = tmp->data + 18;
           SKIPWS (p);
@@ -1433,232 +767,10 @@ translate_message (HEADER * cur)
 
   /* more! */
 
-
   return message;
 }
 
-
-
-
-/*
- * addresses
- */
-Address *
-address_new (void)
+static void message_status_changed_cb (LibBalsaMessage *message, LibBalsaMailbox *mb )
 {
-  Address *address;
-
-  address = g_malloc (sizeof (Address));
-
-  address->personal = NULL;
-  address->mailbox = NULL;
-
-  return address;
+  gtk_signal_emit ( GTK_OBJECT(message->mailbox), libbalsa_mailbox_signals[MESSAGE_STATUS_CHANGED], message);
 }
-
-
-void
-address_free (Address * address)
-{
-
-  if (!address)
-    return;
-
-  g_free (address->personal);
-  g_free (address->mailbox);
-
-  g_free (address);
-}
-
-void address_list_free(GList * address_list)
-{
-  GList *list;
-  for (list = g_list_first (address_list); list; list = g_list_next (list))
-    if(list->data) address_free (list->data);
-  g_list_free (address_list);
-}
-
-static Address *
-translate_address (ADDRESS * caddr)
-{
-  Address *address;
-
-  if (!caddr)
-    return NULL;
-  address = address_new ();
-  address->personal = g_strdup (caddr->personal);
-  address->mailbox = g_strdup (caddr->mailbox);
-
-  return address;
-}
-
-
-GList *
-make_list_from_string (gchar * the_str)
-{
-  ADDRESS *address = NULL;
-  Address *addr = NULL;
-  GList *list = NULL;
-  address = rfc822_parse_adrlist (address, the_str);
-
-  while (address)
-    {
-      addr = translate_address (address);
-      list = g_list_append (list, addr);
-      address = address->next;
-    }
-  rfc822_free_address( &address );
-  return list;
-}
-
-/* returns only first address on the list; ignores remaining ones */
-Address*
-make_address_from_string(gchar* str) {
-  ADDRESS *address = NULL;
-  Address *addr = NULL;
-
-  address = rfc822_parse_adrlist (address, str);
-  addr = translate_address (address);
-  rfc822_free_address (&address);
-  return addr;
-}
-
-/*
- * contacts
- */
-Contact *
-contact_new (void)
-{
-  Contact *contact;
-
-  contact = g_malloc (sizeof (Contact));
-
-  contact->card_name = NULL;
-  contact->first_name = NULL;
-  contact->last_name = NULL;
-  contact->organization = NULL;
-  contact->email_address = NULL;
-  
-  return contact;
-}
-
-
-void
-contact_free (Contact * contact)
-{
-
-  if (!contact)
-    return;
-
-  g_free(contact->card_name);
-  g_free(contact->first_name);
-  g_free(contact->last_name);  
-  g_free(contact->organization);
-  g_free(contact->email_address);
-  
-  g_free(contact);
-}
-
-void contact_list_free(GList * contact_list)
-{
-  GList *list;
-  for (list = g_list_first (contact_list); list; list = g_list_next (list))
-    if(list->data) contact_free (list->data);
-  g_list_free (contact_list);
-}
-
-gint
-contact_store(Contact *contact, const gchar *fname)
-{
-    FILE *gc; 
-    gchar string[256];
-    gint in_vcard = FALSE;
-
-    g_return_val_if_fail(fname, CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE);
-    if(strlen(contact->card_name) == 0)
-        return CONTACT_CARD_NAME_FIELD_EMPTY;
-
-    gc = fopen(fname, "r+");
-    
-    if (!gc) 
-        return CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE; 
-            
-    while (fgets(string, sizeof(string), gc)) 
-    { 
-        if ( g_strncasecmp(string, "BEGIN:VCARD", 11) == 0 ) {
-            in_vcard = TRUE;
-            continue;
-        }
-                
-        if ( g_strncasecmp(string, "END:VCARD", 9) == 0 ) {
-            in_vcard = FALSE;
-            continue;
-        }
-        
-        if (!in_vcard) continue;
-        
-        g_strchomp(string);
-                
-        if ( g_strncasecmp(string, "FN:", 3) == 0 )
-        {
-            gchar *id = g_strdup(string+3);
-            if(g_strcasecmp(id, contact->card_name) == 0)
-            {
-                g_free(id);
-                fclose(gc);
-                return CONTACT_CARD_NAME_EXISTS;
-            }
-            g_free(id);
-            continue;
-        }
-    }
-
-    fprintf(gc, "\nBEGIN:VCARD\n");
-    fprintf(gc, g_strdup_printf( "FN:%s\n", contact->card_name));
-
-    if(strlen(contact->first_name) || strlen(contact->last_name))
-        fprintf(gc, g_strdup_printf( "N:%s;%s\n", contact->last_name, contact->first_name));
-
-    if(strlen(contact->organization))
-        fprintf(gc, g_strdup_printf( "ORG:%s\n", contact->organization));
-            
-    if(strlen(contact->email_address))
-        fprintf(gc, g_strdup_printf( "EMAIL;INTERNET:%s\n", contact->email_address));
-            
-    fprintf(gc, "END:VCARD\n");
-    
-    fclose(gc);
-    return CONTACT_CARD_STORED_SUCCESSFULLY;
-}
-
-/*
- * body
- */
-Body *
-body_new ()
-{
-  Body *body;
-
-  body = g_malloc (sizeof (Body));
-  body->htmlized = NULL;
-  body->buffer = NULL;
-  body->mutt_body = NULL;
-  body->filename = NULL;
-  body->charset  = NULL;
-  return body;
-}
-
-
-void
-body_free (Body * body)
-{
-  if (!body)
-    return;
-
-  g_free (body->htmlized);
-  g_free (body->buffer);
-  g_free (body->filename);
-  g_free (body->charset);
-  g_free (body);
-}
-

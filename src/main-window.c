@@ -87,22 +87,20 @@ enum {
 //  int total_messages_left;
   GSList *list = NULL;
   
-extern void load_messages (Mailbox * mailbox, gint emit);
-
 void progress_dialog_destroy_cb ( GtkWidget *, gpointer data);
-static void check_messages_thread( Mailbox *mbox );
+static void check_messages_thread( LibBalsaMailbox *mbox );
 #endif
 
 static void balsa_window_class_init(BalsaWindowClass *klass);
 static void balsa_window_init(BalsaWindow *window);
 static void balsa_window_real_set_cursor(BalsaWindow *window, GdkCursor *cursor);
-static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox);
-static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox);
+static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox);
+static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox);
 static void balsa_window_destroy(GtkObject * object);
 
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
-void       balsa_window_open_mailbox( BalsaWindow *window, Mailbox *mailbox );
-void       balsa_window_close_mailbox( BalsaWindow *window, Mailbox *mailbox );
+void       balsa_window_open_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
+void       balsa_window_close_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
 static gchar * get_open_mailboxes_string(void);
 /*FIXME unused
 static guint pbar_timeout;
@@ -514,9 +512,7 @@ balsa_window_class_init (BalsaWindowClass *klass)
 
   gtk_object_class_add_signals (object_class, window_signals, LAST_SIGNAL);
 
-
   object_class->destroy = balsa_window_destroy;
-
 
   klass->set_cursor = balsa_window_real_set_cursor;
   klass->open_mailbox = balsa_window_real_open_mailbox;
@@ -660,7 +656,7 @@ balsa_window_real_set_cursor (BalsaWindow *window,
 
 
 
-void balsa_window_open_mailbox(BalsaWindow *window, Mailbox *mailbox)
+void balsa_window_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
   g_return_if_fail(window != NULL);
   g_return_if_fail(BALSA_IS_WINDOW(window));
@@ -669,7 +665,7 @@ void balsa_window_open_mailbox(BalsaWindow *window, Mailbox *mailbox)
 }
 
 /*void balsa_window_open_mailbox(BalsaWindow *window, Mailbox *mailbox)*/
-void balsa_window_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
+void balsa_window_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
   g_return_if_fail(window != NULL);
   g_return_if_fail(BALSA_IS_WINDOW (window));
@@ -677,7 +673,7 @@ void balsa_window_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
   gtk_signal_emit(GTK_OBJECT(window), window_signals[CLOSE_MAILBOX], mailbox);
 }
 
-static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox)
+static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
 	GtkObject *page;
 	GtkWidget *label;
@@ -729,7 +725,7 @@ get_open_mailboxes_string()
 }
 
 
-static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
+static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox *mailbox)
 {
 /*  printf("FIXME: Can't close mailboxes.\n"); 
     Sadly, we don't get the IndexPage pointer given to us. Ah well. */
@@ -965,7 +961,7 @@ static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
   GtkWidget *index = NULL;
-  Mailbox *mbox = NULL;
+  LibBalsaMailbox *mbox = NULL;
 
   if(data)
     {
@@ -997,7 +993,8 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 	gtk_widget_destroy( GTK_WIDGET(progress_dialog) );
 
       progress_dialog = gnome_dialog_new("Checking Mail...", "Hide", NULL);
-      gnome_dialog_set_parent (GNOME_DIALOG (progress_dialog), GTK_WINDOW (balsa_app.main_window));
+      if ( balsa_app.main_window ) 
+	gnome_dialog_set_parent (GNOME_DIALOG (progress_dialog), GTK_WINDOW (balsa_app.main_window));
       gtk_signal_connect (GTK_OBJECT (progress_dialog), "destroy",
 			  GTK_SIGNAL_FUNC (progress_dialog_destroy_cb), NULL);
 
@@ -1027,7 +1024,6 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 		mbox );
 #else
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
-  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 
   balsa_mblist_have_new (balsa_app.mblist);
 #endif
@@ -1037,7 +1033,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
 static void
-check_messages_thread( Mailbox *mbox )
+check_messages_thread( LibBalsaMailbox *mbox )
 {
 /*  
  *  It is assumed that this will always be called as a pthread,
@@ -1049,13 +1045,10 @@ check_messages_thread( Mailbox *mbox )
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "POP3", 0, 0);
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "IMAP", 0, 0);
-  check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
-
   MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail", 0,0);
 
   if( mbox && CLIENT_CONTEXT_OPEN(mbox)) {
-    mailbox_check_new_messages( mbox );
+    libbalsa_mailbox_check_for_new_messages( mbox );
     MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox, mbox->name, 0,0 );
   }
 
@@ -1141,7 +1134,7 @@ mail_progress_notify_cb( )
 
 	  case MSGMAILTHREAD_LOAD:
 	    LOCK_MAILBOX(threadmessage->mailbox);
-	    load_messages(threadmessage->mailbox, 1);
+	    libbalsa_mailbox_load_messages(threadmessage->mailbox); /*1*/
 	    UNLOCK_MAILBOX(threadmessage->mailbox);
 	    if(mblist_get_selected_mailbox() == threadmessage->mailbox)
 	       balsa_mblist_update_mailbox(balsa_app.mblist, 
@@ -1224,7 +1217,7 @@ send_progress_notify_cb( )
     void *msgbuffer;
     uint count;
     GSList *node;
-    Message *message;
+    LibBalsaMessage *message;
     float percent;
     
     msgbuffer = malloc( 2049 );
@@ -1257,7 +1250,7 @@ send_progress_notify_cb( )
 	    
 	  case MSGSENDTHREADLOAD:
 	    LOCK_MAILBOX (threadmessage->mbox);
-	    load_messages (threadmessage->mbox, 1);
+	    libbalsa_mailbox_load_messages (threadmessage->mbox); /*1*/
 	    UNLOCK_MAILBOX (threadmessage->mbox);
 	    if(mblist_get_selected_mailbox() == threadmessage->mbox)
 	       balsa_mblist_update_mailbox(balsa_app.mblist, 
@@ -1309,17 +1302,17 @@ send_progress_notify_cb( )
 	    if (!strcmp (threadmessage->message_string, "LAST") &&
 	                 threadmessage->msg == NULL)
             {
-                balsa_mailbox_open (balsa_app.outbox);
+                libbalsa_mailbox_open (balsa_app.outbox, FALSE);
 		node = list;
 		
                 while (node != NULL)
                 {
 			message = node->data;
-                	if(message->mailbox) message_delete ( message ); 
-			message_destroy( message );
+                	if(message->mailbox) libbalsa_message_delete ( message ); 
+			gtk_object_destroy (GTK_OBJECT(message));
 			node = node->next;
                 }
-                balsa_mailbox_close (balsa_app.outbox);
+                libbalsa_mailbox_close (balsa_app.outbox);
                 g_slist_free (list);
 		list = NULL;
             }
@@ -1585,7 +1578,7 @@ mailbox_close_cb (GtkWidget * widget, gpointer data)
 static void
 mailbox_commit_changes (GtkWidget * widget, gpointer data)
 {
-  Mailbox *current_mailbox;
+  LibBalsaMailbox *current_mailbox;
   GtkWidget *index;
 
   index = balsa_window_find_current_index(BALSA_WINDOW(data));
@@ -1593,7 +1586,7 @@ mailbox_commit_changes (GtkWidget * widget, gpointer data)
   g_return_if_fail(index != NULL);
 
   current_mailbox = BALSA_INDEX(index)->mailbox;
-  mailbox_commit_flagged_changes(current_mailbox);
+  libbalsa_mailbox_commit_changes(current_mailbox);
 }
 
 static void
@@ -1602,18 +1595,18 @@ mailbox_empty_trash(GtkWidget * widget, gpointer data)
   BalsaIndexPage *page;
   GList *message;
 
-  balsa_mailbox_open(balsa_app.trash);
+  libbalsa_mailbox_open(balsa_app.trash, FALSE);
 
   message = balsa_app.trash->message_list;
 
   while(message)
     {
-      message_delete(message->data);
+      libbalsa_message_delete(message->data);
       message = message->next;
     }
-  mailbox_commit_flagged_changes(balsa_app.trash);
+  libbalsa_mailbox_commit_changes(balsa_app.trash);
 
-  balsa_mailbox_close(balsa_app.trash);
+  libbalsa_mailbox_close(balsa_app.trash);
 
   if((page=balsa_find_notebook_page(balsa_app.trash)))
     balsa_index_page_reset( page );
@@ -1766,7 +1759,7 @@ static void notebook_switch_page_cb( GtkWidget *notebook,
 {
     GtkWidget *index_page;
     GtkWidget *window;
-    Mailbox *mailbox;
+    LibBalsaMailbox *mailbox;
     gchar *title;
 
     index_page = gtk_object_get_data (GTK_OBJECT (page->child), "indexpage");

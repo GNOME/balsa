@@ -26,7 +26,8 @@
 #include "main-window.h"
 #include "sendmsg-window.h"
 #include "message-window.h"
-#include "misc.h"
+
+#include "libbalsa.h"
 
 /* callbacks */
 static void destroy_message_window (GtkWidget * widget, gpointer data);
@@ -129,11 +130,11 @@ struct _MessageWindow
 
     GtkWidget *bmessage;
 
-    Message * message;
+    LibBalsaMessage * message;
   };
 
 void
-message_window_new (Message * message)
+message_window_new (LibBalsaMessage * message)
 {
   MessageWindow *mw;
   GtkWidget *scroll;

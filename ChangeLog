@@ -1,3 +1,11 @@
+2000-07-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	API clean up by Ian Campbell <ijc25@cam.ac.uk>:
+	- removed dependencies of libbalsa on balsa.
+	- removed all the mailbox watcher stuff and replaced it with signals
+	- made LibBalsaMailbox make better use of the hierarchy of classes.
+	Almost all the files are affected. I hope it will work :-).
+	
 2000-07-04  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/save-restore.c: renaming 'special' mboxes fixed 

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -20,6 +21,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <libgnomeui/gnome-window-icon.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -169,6 +171,7 @@ main (int argc, char *argv[])
 {
   GtkWidget *window;
   GnomeClient* client;
+  gchar *default_icon;
 
   /* Initialize the i18n stuff */
   bindtextdomain (PACKAGE, GNOMELOCALEDIR);
@@ -193,6 +196,10 @@ main (int argc, char *argv[])
   /* create all the pretty icons that balsa uses that
    * arn't part of gnome-libs */
   balsa_icons_init ();
+
+  default_icon = balsa_pixmap_finder( "balsa/balsa_icon.png" );
+  gnome_window_icon_set_default_from_file ( default_icon );
+  g_free( default_icon );
 
   gnome_triggers_do ("", "program", "balsa", "startup", NULL);
 
@@ -227,8 +234,8 @@ main (int argc, char *argv[])
   if (balsa_app.open_unread_mailbox) {
      GList * i, *gl = mblist_find_all_unread_mboxes();
      for( i=g_list_first(gl); i; i=g_list_next(i) ) {
-	printf("opening %s..\n", ((Mailbox*)(i->data))->name);
-	mblist_open_mailbox( (Mailbox*) (i->data) );
+	printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
+	mblist_open_mailbox( LIBBALSA_MAILBOX (i->data) );
      }
      g_list_free(gl);
   }
@@ -236,7 +243,7 @@ main (int argc, char *argv[])
      gint i =0;
      gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
      while(names[i]) {
-	Mailbox *mbox = balsa_find_mbox_by_name(names[i]);
+	LibBalsaMailbox *mbox = balsa_find_mbox_by_name(names[i]);
 	if(balsa_app.debug)
 	    fprintf(stderr,"opening %s => %p..\n", names[i], mbox);
 	if(mbox) {
@@ -261,12 +268,12 @@ main (int argc, char *argv[])
 }
 
 static void
-force_close_mailbox(Mailbox *mailbox) {
+force_close_mailbox(LibBalsaMailbox *mailbox) {
     if (!mailbox) return;
     if (balsa_app.debug)
 	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
     while (mailbox->open_ref > 0)
-	mailbox_open_unref (mailbox);
+      libbalsa_mailbox_close(mailbox);
 }
 
 /* Word of comment: previous definition of this function used access()
@@ -331,24 +338,24 @@ balsa_exit (void)
 static void
 empty_trash( void )
 {
-	BalsaIndexPage *page;
-	GList *message;
-
-	mailbox_open_ref(balsa_app.trash);
-
-	message = balsa_app.trash->message_list;
-
-	while(message) {
-		message_delete(message->data);
+  BalsaIndexPage *page;
+  GList *message;
+  
+  libbalsa_mailbox_open (balsa_app.trash, FALSE);
+  
+  message = balsa_app.trash->message_list;
+  
+  while(message) {
+    libbalsa_message_delete(message->data);
 		message = message->next;
-	}
-	mailbox_commit_flagged_changes(balsa_app.trash);
-
-	mailbox_open_unref(balsa_app.trash);
-
-	if ( balsa_app.notebook && 
-	     (page=balsa_find_notebook_page(balsa_app.trash)))
-		balsa_index_page_reset( page );
+  }
+  libbalsa_mailbox_commit_changes(balsa_app.trash);
+  
+  libbalsa_mailbox_close(balsa_app.trash);
+  
+  if ( balsa_app.notebook && 
+       (page=balsa_find_notebook_page(balsa_app.trash)))
+    balsa_index_page_reset( page );
 }
 
 

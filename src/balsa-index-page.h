@@ -39,7 +39,7 @@ struct _BalsaIndexPage
 {
   GtkObject object;
 
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
   GTimeVal last_use;
   GtkWidget *window; /* "real" BalsaWindow parent */
   GtkWidget *sw;
@@ -53,7 +53,7 @@ struct _BalsaIndexPageClass
 
 GtkType balsa_index_page_get_type(void);
 GtkObject *balsa_index_page_new(BalsaWindow *window);
-gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox *mailbox);
+gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox *mailbox);
 void balsa_index_page_close_and_destroy( GtkObject *obj );
 
 void balsa_message_new (GtkWidget * widget);
@@ -70,8 +70,8 @@ void balsa_message_toggle_flagged (GtkWidget * widget, gpointer index);
 void balsa_message_store_address (GtkWidget * widget, gpointer index);
 
 void balsa_index_page_reset(BalsaIndexPage *page);
-gint balsa_find_notebook_page_num(Mailbox *mailbox);
-BalsaIndexPage* balsa_find_notebook_page(Mailbox *mailbox);
+gint balsa_find_notebook_page_num(LibBalsaMailbox *mailbox);
+BalsaIndexPage* balsa_find_notebook_page(LibBalsaMailbox *mailbox);
 void balsa_index_update_message (BalsaIndexPage *index_page);
 
 #endif /* __INDEX_CHILD_H__ */

@@ -41,15 +41,15 @@ typedef enum {
     SPECIAL_DRAFT
 }  specialType;
 
-void config_mailbox_set_as_special(Mailbox * mailbox, specialType which);
+void config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which);
 
 gint config_load (gchar * user_filename);
 gint config_save (gchar * user_filename);
 
-gchar* mailbox_get_pkey(const Mailbox * mbox);
-gint config_mailbox_add (Mailbox * mailbox, const char *key_arg);
-gint config_mailbox_delete (const Mailbox *mailbox);
-gint config_mailbox_update (Mailbox * mailbox, const gchar * old_mbox_pkey);
+gchar* mailbox_get_pkey(const LibBalsaMailbox * mbox);
+gint config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg);
+gint config_mailbox_delete (const LibBalsaMailbox *mailbox);
+gint config_mailbox_update (LibBalsaMailbox * mailbox, const gchar * old_mbox_pkey);
 gint config_mailboxes_init (void);
 
 gint config_imapdir_add(ImapDir *dir);

@@ -1,4 +1,8 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
+
 #include <gnome.h>
+
+LibBalsaAddress* libbalsa_address_new_from_libmutt(ADDRESS *caddr);
 
 #ifdef BALSA_USE_THREADS
 
@@ -83,9 +87,7 @@ do {\
 
 #endif
   
-  
-
-#define CLIENT_CONTEXT(mailbox)          (((MailboxPrivate *)((mailbox)->private))->context)
+#define CLIENT_CONTEXT(mailbox)          (mailbox->context)
 #define CLIENT_CONTEXT_OPEN(mailbox)     (CLIENT_CONTEXT (mailbox) != NULL)
 #define CLIENT_CONTEXT_CLOSED(mailbox)   (CLIENT_CONTEXT (mailbox) == NULL)
 #define RETURN_IF_CLIENT_CONTEXT_CLOSED(mailbox)\
@@ -107,13 +109,3 @@ do {\
     }\
 } while (0)
 
-
-/* 
- * private mailbox data
- */
-typedef struct
-  {
-    CONTEXT *context;
-    GList *watcher_list;
-  }
-MailboxPrivate;

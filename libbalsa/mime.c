@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -38,12 +39,12 @@ GString *reply;
 
 static gchar tmp_file_name[PATH_MAX + 1];
 
-void process_mime_multipart (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
+void process_mime_multipart (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
 
-void process_mime_part (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
+void process_mime_part (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
 
 void
-process_mime_part (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
+process_mime_part (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
 {
   size_t alloced;
   gchar *ptr = 0;
@@ -92,7 +93,7 @@ process_mime_part (Message * message, BODY * bdy, FILE * msg_stream, gchar *repl
 }
 
 void
-process_mime_multipart (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
+process_mime_multipart (LibBalsaMessage * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
 {
   BODY *p;
   for (p = bdy->parts; p; p = p->next)
@@ -102,11 +103,11 @@ process_mime_multipart (Message * message, BODY * bdy, FILE * msg_stream, gchar 
 }
 
 GString *
-content2reply (Message * message,
+content2reply (LibBalsaMessage * message,
 	       gchar *reply_prefix_str)    /* arp */
 {
   GList *body_list;
-  Body *body;
+  LibBalsaMessageBody *body;
   FILE *msg_stream;
   gchar msg_filename[PATH_MAX];
 
@@ -117,7 +118,7 @@ content2reply (Message * message,
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
       {
-	snprintf (msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, message_pathname (message));
+	snprintf (msg_filename, PATH_MAX, "%s/%s", LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, libbalsa_message_pathname (message));
 	msg_stream = fopen (msg_filename, "r");
 	if (!msg_stream || ferror (msg_stream))
 	  {
@@ -129,17 +130,17 @@ content2reply (Message * message,
 	break;
       }
     case MAILBOX_IMAP:
-      msg_stream = fopen (MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
+      msg_stream = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
       break;
     default:
-      msg_stream = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
+      msg_stream = fopen (LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, "r");
       break;
     }
 
   body_list = message->body_list;
   while (body_list)
     {
-      body = (Body *) body_list->data;
+      body = (LibBalsaMessageBody *) body_list->data;
       process_mime_part (message, body->mutt_body, msg_stream, reply_prefix_str);
       body_list = g_list_next (body_list);
     }    

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -207,12 +208,13 @@ void print_message(GtkWidget *widget, gpointer data)
     GtkWidget *index;
     GtkCList *clist;
     GList *list;
-    Message *message;
-    Address *addr = NULL;
+    LibBalsaMessage *message;
+    LibBalsaAddress *addr = NULL;
     gchar *tmp;
     GString *printtext = g_string_new ("\n\n");
     FILE * fp;
     gchar tmp_file_name[PATH_MAX + 1];
+    gchar *date;
 
     g_return_if_fail (widget != NULL);
 
@@ -228,20 +230,21 @@ void print_message(GtkWidget *widget, gpointer data)
 	sprintf(tmp_file_name,"%s/.balsa-print", g_get_home_dir());
 	fp = fopen(tmp_file_name,"wra+");
 	message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
-	addr = message->from    ;
-	tmp = address_to_gchar (addr);
+	addr = message->from;
+	tmp = libbalsa_address_to_gchar (addr);
+	date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
 	fprintf(fp, "\n\n");
 	fprintf(fp, "From:    \t%s\n", tmp);
-	fprintf(fp, "Sent:    \t%s\n", message->date);
+	fprintf(fp, "Sent:    \t%s\n", date);
 	tmp = make_string_from_list (message->to_list);
 	fprintf(fp, "To:      \t%s\n", tmp);
 	tmp = make_string_from_list (message->cc_list);
 	fprintf(fp, "Cc:      \t%s\n", tmp);
 	fprintf(fp, "Subject: \t%s\n", message->subject);
 	fprintf(fp, "\n");
-	message_body_ref (message);
+	libbalsa_message_body_ref (message);
 	printtext = content2reply (message, NULL);
-
+	g_free(date);
 	if (balsa_app.PrintCommand.breakline == TRUE) {
 	    int i = 0 , j = 0;
 	    while (i <= balsa_app.PrintCommand.linesize && printtext->str[j++] != '\0') {
@@ -262,7 +265,7 @@ void print_message(GtkWidget *widget, gpointer data)
 	else
 	    fprintf(fp, "%s\n",printtext->str);
 
-	message_body_unref (message);
+	libbalsa_message_body_unref (message);
 	fflush(fp);
 	fclose (fp);
 

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -17,29 +18,31 @@
  * 02111-1307, USA.
  */
 
-#ifndef __balsa_mailbox_local_h__
-#define __balsa_mailbox_local_h__
+#ifndef __LIBBALSA_MAILBOX_LOCAL_H__
+#define __LIBBALSA_MAILBOX_LOCAL_H__
 
-#define BALSA_TYPE_MAILBOX_LOCAL	       (balsa_mailbox_local_get_type())
-#define BALSA_MAILBOX_LOCAL(obj)	       (GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX_LOCAL, MailboxLocal))
-#define BALSA_MAILBOX_LOCAL_CLASS(klass)       (GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MAILBOX_LOCAL, MailboxLocalClass))
-#define BALSA_IS_MAILBOX_LOCAL(obj)	       (GTK_CHECK_TYPE (obj, BALSA_TYPE_MAILBOX_LOCAL))
-#define BALSA_IS_MAILBOX_LOCAL_CLASS(klass)    (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_MAILBOX_LOCAL))
+#define LIBBALSA_TYPE_MAILBOX_LOCAL	       (libbalsa_mailbox_local_get_type())
+#define LIBBALSA_MAILBOX_LOCAL(obj)	       (GTK_CHECK_CAST (obj, LIBBALSA_TYPE_MAILBOX_LOCAL, LibBalsaMailboxLocal))
+#define LIBBALSA_MAILBOX_LOCAL_CLASS(klass)    (GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_MAILBOX_LOCAL, LibBalsaMailboxLocalClass))
+#define LIBBALSA_IS_MAILBOX_LOCAL(obj)	       (GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_LOCAL))
+#define LIBBALSA_IS_MAILBOX_LOCAL_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_LOCAL))
 
-GtkType balsa_mailbox_local_get_type (void);
+GtkType libbalsa_mailbox_local_get_type (void);
 
-typedef struct _MailboxLocal MailboxLocal;
-typedef struct _MailboxLocalClass MailboxLocalClass;
+typedef struct _LibBalsaMailboxLocal LibBalsaMailboxLocal;
+typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 
-struct _MailboxLocal
+struct _LibBalsaMailboxLocal
 {
-  Mailbox mailbox;
+  LibBalsaMailbox mailbox;
   gchar *path;
 };
 
-struct _MailboxLocalClass
+struct _LibBalsaMailboxLocalClass
 {
-  MailboxClass klass;
+  LibBalsaMailboxClass klass;
 };
 
-#endif /* __balsa_mailbox_local_h__ */
+GtkObject* libbalsa_mailbox_local_new(LibBalsaMailboxType type);
+
+#endif /* __LIBBALSA_MAILBOX_LOCAL_H__ */

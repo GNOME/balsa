@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client  
  * Copyright (C) 1997-1999 Stuart Parmenter
  *
@@ -21,20 +22,18 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <gnome.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif
 
+/* This must go... */
 #include "../src/balsa-app.h"
-#include "mailbox.h"
-#include "misc.h"
-#include "mailbackend.h"
-#include "send.h"
+
+#include "libbalsa.h"
 #include "libbalsa_private.h"
 
-#include "mime.h"
+#include "mailbackend.h"
 
 /* This is temporary */
 #include <sys/types.h>
@@ -55,10 +54,10 @@ typedef struct _MessageQueueItem        MessageQueueItem;
 
 struct _MessageQueueItem
 {
-  Message *orig;
+  LibBalsaMessage *orig;
   HEADER *message;
   MessageQueueItem *next_message;
-  Mailbox *fcc;
+  gchar *fcc;
   char tempfile[_POSIX_PATH_MAX];
   int delete;
 } ;
@@ -75,7 +74,7 @@ guint balsa_send_message_real(MessageQueueItem *first_message);
 static void encode_descriptions (BODY * b);
 int balsa_smtp_send  (MessageQueueItem *first_message, char *server);
 int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg);
-static gboolean balsa_create_msg (Message * message, HEADER *msg, 
+static gboolean balsa_create_msg (LibBalsaMessage * message, HEADER *msg, 
 				  char *tempfile, int queu);
 gchar** balsa_lookup_mime_type (const gchar* path);
 
@@ -132,33 +131,27 @@ add_mutt_body_plain (void)
   return body;
 }
 
-//  GtkWidget *send_dialog = NULL;
-
 gboolean
-balsa_send_message (Message * message)
+libbalsa_message_send (LibBalsaMessage * message)
 {
   MessageQueueItem *first_message, *current_message , *new_message;
   GList *lista;
-  Message *queu;
+  LibBalsaMessage *queu;
   int message_number = 0;
 #ifdef BALSA_USE_THREADS
   GtkWidget *send_dialog_source = NULL;
 #endif  
-//  GtkWidget *send_dialog_message = NULL;
-
-  /*fprintf(stderr,"Comienzo la funcion\n");
-   */
 
   if (message != NULL )
   {
-      first_message = malloc( sizeof( MessageQueueItem ) );
+      first_message = g_new(MessageQueueItem,1);
       first_message->orig = message;
       first_message->next_message = NULL;
       first_message->delete = 0;
       first_message->message = mutt_new_header ();
       balsa_create_msg (message,first_message->message,
 		            first_message->tempfile,0);
-      first_message->fcc = message->fcc_mailbox;
+      first_message->fcc = g_strdup(message->fcc_mailbox);
       
       message_number++;
   }
@@ -205,7 +198,7 @@ balsa_send_message (Message * message)
 #endif
 
 	last_message = first_message;
-	balsa_mailbox_open (balsa_app.outbox);
+	libbalsa_mailbox_open (balsa_app.outbox, FALSE);
 	
 	lista = balsa_app.outbox->message_list;
 	
@@ -213,14 +206,14 @@ balsa_send_message (Message * message)
 	{
                 queu = LIBBALSA_MESSAGE(lista->data);
 
-                new_message = malloc( sizeof( MessageQueueItem ) );
+                new_message = g_new(MessageQueueItem, 1);
                 new_message->message = mutt_new_header ();
 	        new_message->delete = 0;
 	 
 	        balsa_create_msg (queu,new_message->message,
 				      new_message->tempfile,1);
 
-	        new_message->fcc = queu->fcc_mailbox;
+	        new_message->fcc = g_strdup(queu->fcc_mailbox);
 	        new_message->orig = queu;
 	        new_message->next_message = NULL ;
 
@@ -236,7 +229,7 @@ balsa_send_message (Message * message)
 		message_number++;
 	 }
 	 
-	 balsa_mailbox_close (balsa_app.outbox);
+	 libbalsa_mailbox_close (balsa_app.outbox);
 	 
 #ifdef BALSA_USE_THREADS	
   }
@@ -303,12 +296,12 @@ balsa_send_message_real(MessageQueueItem *first_message)
  
      if (i != 0 )
      {
-            mutt_write_fcc (MAILBOX_LOCAL (balsa_app.outbox)->path, 
+            mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path, 
 			    first_message->message, NULL, 1, NULL);
 
             if (balsa_app.outbox->open_ref > 0)
             {
-	          mailbox_check_new_messages(balsa_app.outbox);
+	          libbalsa_mailbox_check_for_new_messages(balsa_app.outbox);
 #ifdef BALSA_USE_THREADS
 	          MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
 				  "Load Sent/Outbox", NULL, 
@@ -319,22 +312,26 @@ balsa_send_message_real(MessageQueueItem *first_message)
      }
      else
      {	     
-     	if (first_message->fcc!=NULL && MAILBOX_IS_LOCAL(first_message->fcc) )
-     	{
-            mutt_write_fcc (MAILBOX_LOCAL (first_message->fcc)->path, 
+     	if (first_message->fcc!=NULL) 
+	{
+	  LibBalsaMailbox *fcc_box = balsa_find_mbox_by_name(first_message->fcc);
+	  
+	  if ( LIBBALSA_IS_MAILBOX_LOCAL(fcc_box) )
+	  {
+            mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (fcc_box)->path, 
 			    first_message->message, NULL, 0, NULL);
-
-            if (first_message->fcc->open_ref > 0)
+	    
+            if (fcc_box->open_ref > 0)
 	    {
-	          mailbox_check_new_messages( first_message->fcc );
+	      libbalsa_mailbox_check_for_new_messages( fcc_box );
 #ifdef BALSA_USE_THREADS
-	          MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
-			  "Load Sent/Outbox", NULL, first_message->fcc,0 );
+	      MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, 
+			    "Load Sent/Outbox", NULL, fcc_box,0 );
 #endif
 	    }
-
-         }
-
+	    
+	  }
+	}
      }
      
      unlink (first_message->tempfile);
@@ -375,7 +372,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
   /* We give back all the resources used and delete the messages send*/
 
 #ifndef BALSA_USE_THREADS
-  balsa_mailbox_open(balsa_app.outbox);
+  libbalsa_mailbox_open(balsa_app.outbox, FALSE);
 #endif
     current_message = first_message;
     
@@ -384,9 +381,9 @@ balsa_send_message_real(MessageQueueItem *first_message)
 	
 	if (current_message->delete == 1)
 	{
-	    if ( current_message->fcc&&MAILBOX_IS_LOCAL(current_message->fcc) )
+	    if ( current_message->fcc && LIBBALSA_IS_MAILBOX_LOCAL(current_message->fcc) )
 		mutt_write_fcc (
-		    MAILBOX_LOCAL (current_message->fcc)->path,
+		    LIBBALSA_MAILBOX_LOCAL (current_message->fcc)->path,
 		    current_message->message, NULL, 0, NULL);
 	    
 #ifdef BALSA_USE_THREADS
@@ -394,21 +391,22 @@ balsa_send_message_real(MessageQueueItem *first_message)
 		                         current_message->orig, NULL, 0);
 #else
 		 if(current_message->orig->mailbox)
-		     message_delete (current_message->orig);
+		     libbalsa_message_delete (current_message->orig);
 #endif
 	 }
 	 else
          {
 		 if(current_message->orig->mailbox == NULL)
 	               mutt_write_fcc (
-			       MAILBOX_LOCAL (balsa_app.outbox)->path,
+			       LIBBALSA_MAILBOX_LOCAL (balsa_app.outbox)->path,
 			       current_message->message, NULL, 0, NULL);
 	 }
 	
 	unlink (current_message->tempfile); 
         next_message = current_message->next_message;
         mutt_free_header (&current_message->message);
-        
+        g_free(current_message->fcc);
+
 	current_message = next_message;
     }
     
@@ -418,14 +416,14 @@ balsa_send_message_real(MessageQueueItem *first_message)
     
     pthread_exit(0); 
 #else
-  balsa_mailbox_close(balsa_app.outbox);
+  libbalsa_mailbox_close(balsa_app.outbox);
 #endif
 
    return TRUE;
 }
 
 static void
-message2HEADER(Message * message, HEADER * hdr)
+message2HEADER(LibBalsaMessage * message, HEADER * hdr)
 {
     gchar * tmp;
 
@@ -449,12 +447,12 @@ message2HEADER(Message * message, HEADER * hdr)
 	delptr->next = 0;
     }
     
-    tmp = address_to_gchar (message->from);
+    tmp = libbalsa_address_to_gchar (message->from);
     hdr->env->from = rfc822_parse_adrlist (hdr->env->from, tmp);
     g_free (tmp);
     
     if(message->reply_to) {
-	tmp = address_to_gchar (message->reply_to);
+	tmp = libbalsa_address_to_gchar (message->reply_to);
 	hdr->env->reply_to = rfc822_parse_adrlist (hdr->env->reply_to, tmp);
 	g_free (tmp);
     }
@@ -473,8 +471,8 @@ message2HEADER(Message * message, HEADER * hdr)
 }
 
 gboolean
-balsa_postpone_message (Message * message, Message * reply_message, 
-                        gchar * fcc)
+libbalsa_message_postpone (LibBalsaMessage * message, LibBalsaMessage * reply_message, 
+				   gchar * fcc)
 {
   HEADER *msg;
   BODY *last, *newbdy;
@@ -493,7 +491,7 @@ balsa_postpone_message (Message * message, Message * reply_message,
   while (list)
     {
       FILE *tempfp = NULL;
-      Body *body;
+      LibBalsaMessageBody *body;
       newbdy = NULL;
 
       body = list->data;
@@ -544,11 +542,11 @@ balsa_postpone_message (Message * message, Message * reply_message,
                            reply_message->mailbox->name);
   else
     tmp = NULL;
-  mutt_write_fcc (MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, tmp, 1, fcc);
+  mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, tmp, 1, fcc);
   g_free(tmp);
 
   if (balsa_app.draftbox->open_ref > 0)
-    mailbox_check_new_messages (balsa_app.draftbox);
+    libbalsa_mailbox_check_for_new_messages (balsa_app.draftbox);
   mutt_free_header (&msg);
 
   return TRUE;
@@ -894,7 +892,7 @@ gchar** balsa_lookup_mime_type (const gchar* path)
    mutt_free_header(mgs) leads to crash.
 */
 static gboolean 
-balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
+balsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu)
 {
   BODY *last, *newbdy;
   GList *list;
@@ -923,7 +921,7 @@ balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
   
 
   if(message->mailbox)
-      message_body_ref (message);
+      libbalsa_message_body_ref (message);
   list = message->body_list;
   
   last = msg->content;
@@ -933,7 +931,7 @@ balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
   while (list)
     {
       FILE *tempfp = NULL;
-      Body *body;
+      LibBalsaMessageBody *body;
       newbdy = NULL;
       body = list->data;
 
@@ -1030,14 +1028,14 @@ balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int queu)
            mutt_perror (tmpfile);
            unlink (tmpfile);
 	   if(message->mailbox)
-	       message_body_unref (message);
+	       libbalsa_message_body_unref (message);
            return FALSE;
        }
 
   }	 
 
   if(message->mailbox)
-      message_body_unref (message);
+      libbalsa_message_body_unref (message);
  return TRUE;
 }
 

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -36,10 +37,10 @@
 #include "../libmutt/imap.h"
 
 MailboxNode *
-mailbox_node_new (const gchar * name, Mailbox * mb, gint i)
+mailbox_node_new (const gchar * name, LibBalsaMailbox * mb, gint i)
 {
   MailboxNode *mbn;
-  mbn = g_malloc (sizeof (MailboxNode));
+  mbn = g_new (MailboxNode, 1);
   mbn->name = g_strdup (name);
   if (mb)
     mbn->mailbox = mb;
@@ -126,9 +127,8 @@ add_imap_mbox_cb(const char * file, int isdir, gpointer data)
     ImapDir *p = (ImapDir*) data;
     GNode *rnode;
     GNode *node;
-    MailboxIMAP *mailbox = NULL;
+    LibBalsaMailboxImap *mailbox = NULL;
     const gchar *basename, *ptr;
-    gint n;
 
     if( strcmp(file, p->path) == 0)
 	return;
@@ -156,17 +156,18 @@ add_imap_mbox_cb(const char * file, int isdir, gpointer data)
 	node = g_node_new (mbnode);
     }
     else {
-	mailbox = BALSA_MAILBOX_IMAP(mailbox_new(MAILBOX_IMAP));
-	BALSA_MAILBOX(mailbox)->name = g_strdup(basename);
-	mailbox->server->user   = g_strdup(p->user);
-	mailbox->server->passwd = g_strdup(p->passwd);
-	mailbox->server->host   = g_strdup(p->host);
-	mailbox->server->port   = p->port;
-	mailbox->path	        = g_strdup(file);
-	/* printf("Adding mailbox %s\n", file); */
-	mailbox_add_for_checking ( BALSA_MAILBOX(mailbox) );
+	mailbox = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
+	LIBBALSA_MAILBOX(mailbox)->name = g_strdup(basename);
+	
+	mailbox->user   = g_strdup(p->user);
+	mailbox->passwd = g_strdup(p->passwd);
+	mailbox->host   = g_strdup(p->host);
+	mailbox->port   = p->port;
+	mailbox->path	= g_strdup(file);
+
+	mailbox_add_for_checking ( LIBBALSA_MAILBOX(mailbox) );
 	node = g_node_new (mailbox_node_new (
-	    basename, BALSA_MAILBOX(mailbox), FALSE));
+	    basename, LIBBALSA_MAILBOX(mailbox), FALSE));
     }
     
     g_node_append (rnode, node);
@@ -204,28 +205,11 @@ imapdir_scan(ImapDir * id)
 /* ------------------------------------------ */
 
 gchar *
-g_get_host_name (void)
+libbalsa_get_hostname (void)
 {
   struct utsname utsname;
   uname (&utsname);
   return g_strdup (utsname.nodename);
-}
-
-
-gchar *
-address_to_gchar (const Address * addr)
-{
-  gchar *retc = NULL;
-
-  if (addr->personal) {
-     if(addr->mailbox)
-	retc= g_strdup_printf("%s <%s>", addr->personal, addr->mailbox);
-     else retc = g_strdup(addr->personal);
-  } else
-     if(addr->mailbox)
-	retc = g_strdup(addr->mailbox);
-  
-  return retc;
 }
 
 gchar *
@@ -247,14 +231,14 @@ make_string_from_list (GList * the_list)
   gchar *retc, *str;
   GList *list;
   GString *gs = g_string_new (NULL);
-  Address *addy;
+  LibBalsaAddress *addy;
 
   list = g_list_first (the_list);
 
   while (list)
     {
       addy = list->data;
-      str = address_to_gchar (addy);
+      str = libbalsa_address_to_gchar (addy);
       if(str) gs = g_string_append (gs, str);
       g_free (str);
 
@@ -320,13 +304,13 @@ readfile (FILE * fp, char **buf)
   return size;
 }
 
-/* find_word:
+/* libbalsa_find_word:
    searches given word delimited by blanks or string boundaries in given
    string. IS NOT case-sensitive.
    Returns TRUE if the word is found.
 */
 gboolean
-find_word(const gchar * word, const gchar* str) {
+libbalsa_find_word(const gchar * word, const gchar* str) {
     const gchar *ptr = str;
     int  len = strlen(word);
     
@@ -342,13 +326,13 @@ find_word(const gchar * word, const gchar* str) {
     return FALSE;
 }
 
-/* wrap_string
+/* libbalsa_wrap_string
    wraps given string replacing spaces with '\n'.  do changes in place.
    lnbeg - line beginning position, sppos - space position, 
    te - tab's extra space.
 */
 void
-wrap_string(gchar* str, int width)
+libbalsa_wrap_string(gchar* str, int width)
 {
    const int minl = width/2;
    gchar *lnbeg, *sppos, *ptr;
@@ -371,13 +355,13 @@ wrap_string(gchar* str, int width)
    }
 }
 
-/* balsa_guess_mail_spool
+/* libbalsa_guess_mail_spool
 
    Returns an allocated gchar * with our best guess of the user's
    mail spool file.
 */
 
-gchar *balsa_guess_mail_spool( void )
+gchar *libbalsa_guess_mail_spool( void )
 {
 	int i;
 	gchar *env;

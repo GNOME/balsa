@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -20,22 +21,31 @@
 #ifndef __LIBBALSA_H__
 #define __LIBBALSA_H__
 
-typedef struct _Mailbox Mailbox;
-typedef struct _Message Message;
-typedef struct _Address Address;
-typedef struct _Contact Contact;
+typedef struct _LibBalsaMailbox LibBalsaMailbox;
+typedef struct _LibBalsaMessage LibBalsaMessage;
+typedef struct _LibBalsaContact LibBalsaContact;
+typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
+typedef struct _LibBalsaAddress LibBalsaAddress;
 typedef struct _ImapDir ImapDir;
-typedef struct _Body Body;
-typedef struct _Server Server;
+typedef struct _LibBalsaServer LibBalsaServer;
 
-#include "mailbox.h"
-#include "message.h"
 #include "address.h"
+#include "message.h"
 #include "contact.h"
 #include "imapdir.h"
 #include "body.h"
 #include "files.h"
+#include "misc.h"
+#include "mime.h"
 
-void load_messages (Mailbox * mailbox, gint emit);
+#include "mailbox.h"
+#include "mailbox_local.h"
+#include "mailbox_pop3.h"
+#include "mailbox_imap.h"
+
+/*
+ * Initialize the library
+ */
+void libbalsa_init (gchar * inbox_path,	void (*error_func) (const char *fmt,...));
 
 #endif /* __LIBBALSA_H__ */

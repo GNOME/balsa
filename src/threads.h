@@ -39,7 +39,7 @@ typedef struct
 {
   int message_type;
   char message_string[160];
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
   int num_bytes;
   int tot_bytes;
 } MailThreadMessage;
@@ -74,8 +74,8 @@ typedef struct
 {
   int message_type;
   char message_string[256];
-  Message *msg;
-  Mailbox *mbox;
+  LibBalsaMessage *msg;
+  LibBalsaMailbox *mbox;
   float of_total;
 } SendThreadMessage;
 

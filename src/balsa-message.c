@@ -39,7 +39,7 @@
 struct _BalsaPartInfo
   {
     BODY *body;
-    Message *message;
+    LibBalsaMessage *message;
     
     /* The widget to add to the container */
     GtkWidget *widget;
@@ -71,7 +71,7 @@ static void display_part (BalsaMessage *bm, BODY * bdy);
 static void display_multipart (BalsaMessage *bm, BODY * bdy);
 
 static void save_part (BalsaPartInfo *info);
-static gchar *save_mime_part (Message * message, BODY * body);
+static gchar *save_mime_part (LibBalsaMessage * message, BODY * body);
 
 static void select_icon_cb(GnomeIconList *ilist, gint num, 
 			GdkEventButton * event, BalsaMessage *bm);
@@ -242,16 +242,16 @@ save_part (BalsaPartInfo *info)
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
       msg_filename = g_strdup_printf
-	("%s/%s", MAILBOX_LOCAL (info->message->mailbox)->path, 
-	 message_pathname (info->message));
+	("%s/%s", LIBBALSA_MAILBOX_LOCAL (info->message->mailbox)->path, 
+	 libbalsa_message_pathname (info->message));
       break;
     case MAILBOX_IMAP:
     case MAILBOX_POP3:
       msg_filename = g_strdup 
-	(MAILBOX_IMAP (info->message->mailbox)->tmp_file_path);
+	(LIBBALSA_MAILBOX_IMAP (info->message->mailbox)->tmp_file_path);
       break;
     default:
-      msg_filename = g_strdup(MAILBOX_LOCAL (info->message->mailbox)->path);
+      msg_filename = g_strdup(LIBBALSA_MAILBOX_LOCAL (info->message->mailbox)->path);
       break;
     }
     
@@ -354,7 +354,7 @@ balsa_message_clear (BalsaMessage * bm)
 
 void
 balsa_message_set (BalsaMessage * bm,
-		   Message * message)
+		   LibBalsaMessage * message)
 {
   gboolean had_focus;
 
@@ -380,15 +380,15 @@ balsa_message_set (BalsaMessage * bm,
   /* mark message as read; no-op if it was read so don't worry.
      and this is the right place to do the marking.
   */
-  message_read(message);
+  libbalsa_message_read(message);
 
   bm->message = message;
 
   display_headers (bm);
 
-  message_body_ref (bm->message);
+  libbalsa_message_body_ref (bm->message);
   display_content (bm);
-  message_body_unref (bm->message);
+  libbalsa_message_body_unref (bm->message);
 
   gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
   
@@ -445,7 +445,7 @@ balsa_message_set_wrap(BalsaMessage *bm, gboolean wrap)
 
   /* This is easier than reformating all the widgets... */
   if ( bm->message ) {
-    Message *msg = bm->message;
+    LibBalsaMessage *msg = bm->message;
     balsa_message_set(bm, msg);
   }
 }
@@ -462,7 +462,7 @@ add_header_gchar(BalsaMessage *bm, gchar *header, gchar * label, gchar * value)
   gchar *wrapped_value;
 
   if ( ! ( bm->shown_headers == HEADERS_ALL ||
-	   find_word(header, balsa_app.selected_headers) ) )
+	   libbalsa_find_word(header, balsa_app.selected_headers) ) )
     return;
 
   fnt = gdk_font_load(balsa_app.message_font);
@@ -477,7 +477,7 @@ add_header_gchar(BalsaMessage *bm, gchar *header, gchar * label, gchar * value)
       gtk_text_insert(GTK_TEXT(bm->header_text), fnt, NULL, NULL, pad, 1);
     
     wrapped_value = g_strdup(value);
-    wrap_string(wrapped_value, balsa_app.wraplength-15);
+    libbalsa_wrap_string(wrapped_value, balsa_app.wraplength-15);
     
     /* We must insert the first line. Each subsequent line must be indented 
        by 15 spaces. So we need to rewrap lines 2+
@@ -513,7 +513,7 @@ add_header_glist(BalsaMessage *bm, gchar *header, gchar* label, GList * list)
     return;
 
   if ( ! ( bm->shown_headers == HEADERS_ALL ||
-	   find_word(header, balsa_app.selected_headers) ) )
+	   libbalsa_find_word(header, balsa_app.selected_headers) ) )
     return;
   
   value = make_string_from_list (list);
@@ -527,9 +527,10 @@ static void
 display_headers (BalsaMessage * bm)
 {
 
-  Message *message = bm->message;
+  LibBalsaMessage *message = bm->message;
   GList *p, *lst;
   gchar **pair, *hdr;
+  gchar *date;
 
   gtk_editable_delete_text(GTK_EDITABLE(bm->header_text), 0, -1);
 
@@ -542,10 +543,12 @@ display_headers (BalsaMessage * bm)
 
   gtk_text_freeze(GTK_TEXT(bm->header_text));
 
-  add_header_gchar(bm, "date", _("Date:"), message->date); 
+  date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
+  add_header_gchar(bm, "date", _("Date:"), date);
+  g_free(date);
 
   if (message->from) {
-     gchar *from = address_to_gchar(message->from);
+     gchar *from = libbalsa_address_to_gchar (message->from);
      add_header_gchar(bm, "from", _("From:"), from);
      g_free (from);
   }
@@ -555,11 +558,12 @@ display_headers (BalsaMessage * bm)
   add_header_glist( bm, "bcc", _("Bcc:"), message->bcc_list);
 
   if(message->fcc_mailbox)
-    add_header_gchar( bm, "fcc", _("Fcc:"), message->fcc_mailbox->name);
+    add_header_gchar( bm, "fcc", _("Fcc:"), message->fcc_mailbox);
+
   add_header_gchar( bm, "subject", _("Subject:"), message->subject);
 
   /* remaining headers */
-  lst = message_user_hdrs(message);
+  lst = libbalsa_message_user_hdrs(message);
   for(p = g_list_first(lst); p; p = g_list_next(p)) {
     pair = p->data;
     hdr = g_strconcat(pair[0], ":", NULL);
@@ -928,7 +932,7 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
       
       font_name = find_body_font(info->body);
       if(bm->wrap_text) 
-	wrap_string(ptr, balsa_app.wraplength);
+	libbalsa_wrap_string(ptr, balsa_app.wraplength);
 
       if(font_name) {
 	fnt = gdk_font_load(font_name);
@@ -1129,19 +1133,19 @@ static void
 display_content (BalsaMessage *bm)
 {
   GList *body_list;
-  Body *body;
+  LibBalsaMessageBody *body;
   
   body_list = bm->message->body_list;
   while (body_list)
     {
-      body = (Body *) body_list->data;
+      body = (LibBalsaMessageBody *) body_list->data;
       display_part (bm, body->mutt_body);
       body_list = g_list_next (body_list);
     }
 }
 
 static gchar *
-save_mime_part (Message * message, BODY * body)
+save_mime_part (LibBalsaMessage * message, BODY * body)
 {
   gchar msg_filename[PATH_MAX + 1];
   STATE s;
@@ -1153,16 +1157,16 @@ save_mime_part (Message * message, BODY * body)
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
       snprintf(msg_filename, PATH_MAX, "%s/%s", 
-	       MAILBOX_LOCAL (message->mailbox)->path, 
-	       message_pathname (message));
+	       LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, 
+	       libbalsa_message_pathname (message));
       s.fpin = fopen(msg_filename, "r");
       break;
     case MAILBOX_IMAP:
     case MAILBOX_POP3:
-      s.fpin = fopen (MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
+      s.fpin = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
       break;
     default:
-      s.fpin = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
+      s.fpin = fopen (LIBBALSA_MAILBOX_LOCAL (message->mailbox)->path, "r");
       break;
     }
 

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -31,6 +32,8 @@
 #include "pref-manager.h"
 #include "save-restore.h"
 
+#include "libbalsa.h"
+
 /* we'll create the notebook pages in the
  * order of these enumerated types so they 
  * can be refered to easily
@@ -50,8 +53,8 @@ MailboxConfPageType;
 typedef struct _MailboxConfWindow MailboxConfWindow;
 struct _MailboxConfWindow
   {
-    Mailbox *mailbox;
-    Mailbox *current;
+    LibBalsaMailbox *mailbox;
+    LibBalsaMailbox *current;
 
     GtkWidget *ok;
     GtkWidget *cancel;
@@ -92,7 +95,7 @@ static void mailbox_conf_close (GtkWidget * widget, gboolean save);
 static void next_cb (GtkWidget * widget);
 
 /* misc functions */
-static void mailbox_conf_set_values (Mailbox * mailbox);
+static void mailbox_conf_set_values (LibBalsaMailbox * mailbox);
 static void mailbox_remove_files (gchar * name);
 /* notebook pages */
 static GtkWidget *create_new_page (void);
@@ -113,7 +116,7 @@ find_mailbox_func (GNode * g1, gpointer data)
 {
   MailboxNode *n1 = (MailboxNode *) g1->data;
   gpointer *d = data;
-  Mailbox *mb = *(Mailbox**) data;
+  LibBalsaMailbox *mb = *(LibBalsaMailbox**) data;
 
   if (!n1 || n1->mailbox != mb)
      return FALSE;
@@ -127,7 +130,7 @@ find_mailbox_func (GNode * g1, gpointer data)
    balsa_app.mailox_nodes
 */
 GNode *
-find_gnode_in_mbox_list (GNode * gnode_list, Mailbox * mailbox)
+find_gnode_in_mbox_list (GNode * gnode_list, LibBalsaMailbox * mailbox)
 {
   gpointer d[2];
   GNode *retval;
@@ -149,7 +152,7 @@ mailbox_remove_files (gchar * mbox_path)
 }
 
 void
-mailbox_conf_delete (Mailbox * mailbox)
+mailbox_conf_delete (LibBalsaMailbox * mailbox)
 {
   GNode *gnode;
   gchar *msg, *msg1;
@@ -213,7 +216,7 @@ mailbox_conf_delete (Mailbox * mailbox)
   if (mailbox->type == MAILBOX_MBOX
       || mailbox->type == MAILBOX_MAILDIR
       || mailbox->type == MAILBOX_MH)
-    mailbox_remove_files (MAILBOX_LOCAL (mailbox)->path);
+    mailbox_remove_files (LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
 
   if (mailbox->type == MAILBOX_POP3)
     update_pop3_servers ();
@@ -221,9 +224,8 @@ mailbox_conf_delete (Mailbox * mailbox)
     balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
 }
 
-
 void
-mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
+mailbox_conf_new (LibBalsaMailbox * mailbox, gint add_mbox, LibBalsaMailboxType type)
 {
   GtkWidget *bbox;
 
@@ -343,78 +345,68 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
 
 
 static void
-mailbox_conf_set_values (Mailbox * mailbox)
+mailbox_conf_set_values (LibBalsaMailbox * mailbox)
 {
-    char port[10]; /* Max size of the number is 65536... we're okay */
+  LibBalsaMailboxPop3 *pop3;
+  LibBalsaMailboxImap *imap;
+
+  char port[10]; /* Max size of the number is 65536... we're okay */
+  
+  g_return_if_fail ( LIBBALSA_IS_MAILBOX (mailbox) );
+  
+  switch (mailbox->type)
+  {
+  case MAILBOX_MH:
+  case MAILBOX_MAILDIR:
+  case MAILBOX_MBOX:
+    gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), 
+			   MC_PAGE_LOCAL);
+    gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_name), 
+			mailbox->name);
+    gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_path), 
+			LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
+    break;
+  case MAILBOX_POP3:
+    pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
+
+    sprintf( port, "%d", pop3->port );
     
-    if (!mailbox)
-	return;
-    
-    switch (mailbox->type)
-    {
-    case MAILBOX_MH:
-    case MAILBOX_MAILDIR:
-    case MAILBOX_MBOX:
-	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), 
-			       MC_PAGE_LOCAL);
-	if (mailbox) {
-	    gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_name), 
-				mailbox->name);
-	    gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_path), 
-				MAILBOX_LOCAL (mailbox)->path);
-	}
-	break;
-    case MAILBOX_POP3:
-	if (mailbox)
-	{
-	    sprintf( port, "%d", MAILBOX_POP3( mailbox )->server->port );
-	    
-	    gtk_entry_set_text (GTK_ENTRY (mcw->pop_mailbox_name),
-				mailbox->name);
-	    gtk_entry_set_text (
-		GTK_ENTRY (mcw->pop_server),
-		MAILBOX_POP3 (mailbox)->server->host);
-	    gtk_entry_set_text (GTK_ENTRY (mcw->pop_port), port);
-	    gtk_entry_set_text (
-		GTK_ENTRY (mcw->pop_username), 
-		MAILBOX_POP3 (mailbox)->server->user);
-	    gtk_entry_set_text (
-		GTK_ENTRY (mcw->pop_password), 
-		MAILBOX_POP3 (mailbox)->server->passwd);
-	    gtk_toggle_button_set_active (
-		GTK_TOGGLE_BUTTON (mcw->pop_check), 
-		MAILBOX_POP3 (mailbox)->check);
-	    gtk_toggle_button_set_active (
-		GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server), 
-		MAILBOX_POP3 (mailbox)->delete_from_server);
-	}
-	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
-	break;
+    gtk_entry_set_text (GTK_ENTRY (mcw->pop_mailbox_name),
+			mailbox->name);
+    gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), pop3->host);
+
+    gtk_entry_set_text (GTK_ENTRY (mcw->pop_port), port);
+    gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), pop3->user);
+    gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), pop3->passwd);
+
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), 
+				  pop3->check);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server), 
+				  pop3->delete_from_server);
+
+    gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
+    break;
     case MAILBOX_IMAP:
-	if (mailbox)
-	{
-	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_mailbox_name), 
-				mailbox->name);
-	    sprintf( port, "%d", MAILBOX_IMAP( mailbox )->server->port );
-	    
-	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_server), 
-				MAILBOX_IMAP(mailbox)->server->host);
-	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_username), 
-				MAILBOX_IMAP(mailbox)->server->user);
-	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_password), 
-				MAILBOX_IMAP(mailbox)->server->passwd);
-	    gtk_entry_set_text (GTK_ENTRY (mcw->imap_port), port );
-	    gtk_entry_set_text (GTK_ENTRY(
-		gnome_entry_gtk_entry(GNOME_ENTRY (mcw->imap_folderpath))),
-				MAILBOX_IMAP(mailbox)->path );
-	}
-	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), 
-			       MC_PAGE_IMAP);
-	break;
-    case MAILBOX_UNKNOWN:
-	/* do nothing for now */
-	break;
-    }
+      imap = LIBBALSA_MAILBOX_IMAP(mailbox);
+
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_mailbox_name), 
+			  mailbox->name);
+      sprintf( port, "%d", imap->port );
+      
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_server), imap->host);
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_username), imap->user);
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_password), imap->passwd);
+      gtk_entry_set_text (GTK_ENTRY (mcw->imap_port), port );
+      gtk_entry_set_text (GTK_ENTRY(
+	gnome_entry_gtk_entry(GNOME_ENTRY (mcw->imap_folderpath))),
+			  imap->path );
+      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), 
+			     MC_PAGE_IMAP);
+      break;
+  case MAILBOX_UNKNOWN:
+    /* do nothing for now */
+    break;
+  }
 }
 
 
@@ -511,8 +503,17 @@ check_for_blank_fields(MailboxConfPageType mbox_type)
 }
 
 static int
-conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_pkey)
+conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
 {
+  LibBalsaMailboxImap *mb_imap;
+  LibBalsaMailboxPop3 *mb_pop3;
+
+  gchar *username = NULL;
+  gchar *password = NULL;
+
+  gchar *host = NULL;
+  gint port = -1;
+
   int field_check;
 
   if (!mailbox)
@@ -533,83 +534,59 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_pkey)
 	filename =
 	  gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
 	g_free (mailbox->name);
-	g_free (MAILBOX_LOCAL (mailbox)->path);
+	g_free (LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
 	mailbox->name = g_strdup (gtk_entry_get_text (
 	    GTK_ENTRY (mcw->local_mailbox_name)));
-	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
+	LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
 	config_mailbox_update (mailbox, old_mbox_pkey);
       }
       break;
 
     case MAILBOX_POP3:
+      mb_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
+
       g_free (mailbox->name);
-      g_free (MAILBOX_POP3 (mailbox)->server->user);
-      g_free (MAILBOX_POP3 (mailbox)->server->passwd);
-      g_free (MAILBOX_POP3 (mailbox)->server->host);
 
       mailbox->name = g_strdup (gtk_entry_get_text (
-	  GTK_ENTRY (mcw->pop_mailbox_name)));
-      MAILBOX_POP3 (mailbox)->server->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
-      MAILBOX_POP3 (mailbox)->server->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
-      MAILBOX_POP3 (mailbox)->server->host = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
-      MAILBOX_POP3 (mailbox)->server->port= atoi( gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)));
-      MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
-      MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
+	GTK_ENTRY (mcw->pop_mailbox_name)));
+
+      username = gtk_entry_get_text (GTK_ENTRY (mcw->pop_username));
+      password = gtk_entry_get_text (GTK_ENTRY (mcw->pop_password));
+      host = gtk_entry_get_text (GTK_ENTRY (mcw->pop_server));
+      port = atoi (gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)));
+     
+      mb_pop3->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
+      mb_pop3->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
       config_mailbox_update (mailbox, old_mbox_pkey);
       break;
 
     case MAILBOX_IMAP:
-      if( mailbox->name ) {
-	      g_free (mailbox->name);
-	      mailbox->name = NULL;
-      }
 
-      if( MAILBOX_IMAP (mailbox)->server->user ) {
-	      g_free (MAILBOX_IMAP (mailbox)->server->user);
-	      MAILBOX_IMAP (mailbox)->server->user = NULL;
-      }
+      mb_imap = LIBBALSA_MAILBOX_IMAP(mailbox);
 
-      if( MAILBOX_IMAP (mailbox)->server->passwd ) {
-	      g_free (MAILBOX_IMAP (mailbox)->server->passwd);
-	      MAILBOX_IMAP (mailbox)->server->passwd = NULL;
-      }
-
-      if( MAILBOX_IMAP (mailbox)->path ) {
-	      g_free (MAILBOX_IMAP (mailbox)->path);
-	      MAILBOX_IMAP (mailbox)->path = NULL;
-      }
-
-      if( MAILBOX_IMAP (mailbox)->server->host ) {
-	      g_free (MAILBOX_IMAP (mailbox)->server->host);
-	      MAILBOX_IMAP (mailbox)->server->host = NULL;
-      }
+      g_free (mailbox->name);
+      g_free (mb_imap->path);
 
       mailbox->name = g_strdup (gtk_entry_get_text (
-	  GTK_ENTRY (mcw->imap_mailbox_name)));
+	GTK_ENTRY (mcw->imap_mailbox_name)));
 
-      MAILBOX_IMAP (mailbox)->server->user = g_strdup (
-	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
+      username = gtk_entry_get_text (GTK_ENTRY (mcw->imap_username));
+      password = gtk_entry_get_text (GTK_ENTRY (mcw->imap_password));
+      host = gtk_entry_get_text (GTK_ENTRY (mcw->imap_server));
+      port = atoi (gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)));
 
-      MAILBOX_IMAP (mailbox)->server->passwd = g_strdup (
-	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
-
-      MAILBOX_IMAP (mailbox)->path =  g_strdup ( gtk_entry_get_text (
+      mb_imap->path =  g_strdup ( gtk_entry_get_text (
 	  GTK_ENTRY(gnome_entry_gtk_entry(
 	      GNOME_ENTRY (mcw->imap_folderpath)))));
 	  
-      if ( MAILBOX_IMAP( mailbox )->path == NULL ) 
-	  MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
+      if ( mb_imap->path == NULL ) 
+	  mb_imap->path = g_strdup ("INBOX");
       /* FIXME: IMAPDir will not like it */
-      else if( MAILBOX_IMAP (mailbox)->path[0] == '\0' ) {
-	  g_free (MAILBOX_IMAP (mailbox)->path);
-	  MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
+      else if( mb_imap->path[0] == '\0' ) {
+	  g_free (mb_imap->path);
+	  mb_imap->path = g_strdup ("INBOX");
       }
-
-      MAILBOX_IMAP (mailbox)->server->host = g_strdup (
-	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
-      MAILBOX_IMAP (mailbox)->server->port = strtol (
-	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
       config_mailbox_update (mailbox, old_mbox_pkey);
       break;
@@ -618,12 +595,16 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_pkey)
       /* Do nothing for now */
       break;
     }
+
+  libbalsa_mailbox_set_username (mailbox, username);
+  libbalsa_mailbox_set_password (mailbox, password);
+  libbalsa_mailbox_set_host (mailbox, host, port);
+  
   return 1;
 }
 
 static void
-fill_in_imap_data(gchar **name, gchar **path, gchar **user, gchar **passwd,
-		  gchar **host, gint *port)
+fill_in_imap_data(gchar **name, gchar **path)
 {
     gchar * fos;
     fos= gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(
@@ -639,17 +620,13 @@ fill_in_imap_data(gchar **name, gchar **path, gchar **user, gchar **passwd,
 	    gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)));
     }
     *path   = g_strdup ( fos);
-    *user   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
-    *passwd = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
-    *host   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
-    *port   = atol     ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)) );
 }
 
 static gboolean
-conf_add_mailbox (Mailbox **mbox)
+conf_add_mailbox (LibBalsaMailbox **mbox)
 {
-  Mailbox *mailbox = NULL;
-  MailboxType type;
+  LibBalsaMailbox *mailbox = NULL;
+  LibBalsaMailboxType type;
   GNode *node;
   int field_check;
 
@@ -667,7 +644,7 @@ conf_add_mailbox (Mailbox **mbox)
       {
 	gchar *filename = gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
 
-	type = mailbox_valid (filename);
+	type = libbalsa_mailbox_valid (filename);
 	if (type == MAILBOX_UNKNOWN)
 	  {
 	    int fd = creat (filename, S_IRUSR | S_IWUSR);
@@ -685,11 +662,11 @@ conf_add_mailbox (Mailbox **mbox)
 	    close (fd);
 	    type = MAILBOX_MBOX;
 	  }
-	mailbox = BALSA_MAILBOX(mailbox_new (type));
+	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new (type));
 
 	mailbox->name = g_strdup (gtk_entry_get_text (
 	    GTK_ENTRY (mcw->local_mailbox_name)));
-	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
+	LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
 					     mailbox->type != MAILBOX_MBOX));
 	g_node_append (balsa_app.mailbox_nodes, node);
@@ -698,28 +675,33 @@ conf_add_mailbox (Mailbox **mbox)
 
 /* POP3 Mailboxes */
     case MC_PAGE_POP3:
-      mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_POP3));
+      mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
 
       mailbox->name = g_strdup (gtk_entry_get_text (
 	  GTK_ENTRY (mcw->pop_mailbox_name)));
-      MAILBOX_POP3 (mailbox)->server->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
-      MAILBOX_POP3 (mailbox)->server->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
-      MAILBOX_POP3 (mailbox)->server->host = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
-      MAILBOX_POP3 (mailbox)->server->port = atoi (gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)));
-      MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
-      MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
+
+      libbalsa_mailbox_set_username (mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
+      libbalsa_mailbox_set_password (mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
+      libbalsa_mailbox_set_host (mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), atoi (gtk_entry_get_text (GTK_ENTRY (mcw->pop_port))));
+
+      LIBBALSA_MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
+      LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
       break;
-
 
 /* IMAP Mailboxes */
     case MC_PAGE_IMAP_DIR: 
     {
 	ImapDir *dir = imapdir_new();
 	g_print("Creating MC_PAGE_IMAP_DIR\n");
-	fill_in_imap_data(&dir->name, &dir->path, &dir->user, &dir->passwd,
-			  &dir->host, &dir->port);
+	fill_in_imap_data(&dir->name, &dir->path);
+
+	dir->user   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
+	dir->passwd = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
+	dir->host   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
+	dir->port   = atol     ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)) );
+
 	imapdir_scan(dir);
 	if(!G_NODE_IS_LEAF(dir->file_tree)) {
 	    config_imapdir_add(dir);
@@ -733,19 +715,23 @@ conf_add_mailbox (Mailbox **mbox)
     }
     case MC_PAGE_IMAP:
     {
-	MailboxIMAP * m;
+	LibBalsaMailboxImap * m;
 	g_print("Creating MC_PAGE_IMAP\n");
-	mailbox = BALSA_MAILBOX(mailbox_new (MAILBOX_IMAP));
-	m = BALSA_MAILBOX_IMAP(mailbox);
-	fill_in_imap_data(&mailbox->name, &m->path, &m->server->user, 
-			  &m->server->passwd, &m->server->host, 
-			  &m->server->port);
-      
-	if (!MAILBOX_IMAP (mailbox)->path[0]) 
+	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
+	m = LIBBALSA_MAILBOX_IMAP(mailbox);
+
+	fill_in_imap_data(&mailbox->name, &m->path);
+
+	libbalsa_mailbox_set_username(mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
+	libbalsa_mailbox_set_password(mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
+	libbalsa_mailbox_set_host(mailbox, gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)),
+				  atol ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)) ) );
+
+	if (!LIBBALSA_MAILBOX_IMAP (mailbox)->path[0]) 
 	    /* FIXME: disable when IMAPDir stuff becomes functional */
 	{
-	    g_free (MAILBOX_IMAP (mailbox)->path);
-	    MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
+	    g_free (LIBBALSA_MAILBOX_IMAP (mailbox)->path);
+	    LIBBALSA_MAILBOX_IMAP (mailbox)->path = g_strdup ("INBOX");
 	}
 	
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
@@ -769,7 +755,7 @@ conf_add_mailbox (Mailbox **mbox)
 static void
 mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
   int return_value;
 
   mailbox = mcw->mailbox;

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -17,14 +18,14 @@
  * 02111-1307, USA.
  */
 
-#ifndef __BODY_H__
-#define __BODY_H__
+#ifndef __LIBBALSA_BODY_H__
+#define __LIBBALSA_BODY_H__
 
 #include <glib.h>
 
 #include "libmutt/mutt.h"
 
-struct _Body
+struct _LibBalsaMessageBody
 {
   gchar *buffer;		/* holds raw data of the MIME part, or NULL */
   gchar *htmlized;		/* holds htmlrep of buffer, or NULL */
@@ -33,7 +34,7 @@ struct _Body
   gchar *charset;               /* the charset, used for sending, replying. */
 };
 
-Body *body_new(void);
-void body_free(Body * body);
+LibBalsaMessageBody *libbalsa_message_body_new(void);
+void libbalsa_message_body_free(LibBalsaMessageBody * body);
 
-#endif /* __BODY_H__ */
+#endif /* __LIBBALSA_BODY_H__ */

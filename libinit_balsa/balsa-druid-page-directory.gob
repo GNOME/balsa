@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 requires 1.0.0
 
 %h{
@@ -66,8 +67,8 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	gchar *dup;
 	gchar *index;
 	int fd;
-	MailboxType mt;
-	Mailbox *box;
+	LibBalsaMailboxType mt;
+	LibBalsaMailbox *box;
 
 	if( (*error) != NULL )
 		return;
@@ -108,7 +109,7 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 		close( fd );
 	}
 
-	mt = mailbox_valid( dup );
+	mt = libbalsa_mailbox_valid( dup );
 
 	if( mt == MAILBOX_UNKNOWN ) {
 		(*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
@@ -117,9 +118,25 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 		return;
 	}
 
-	box = BALSA_MAILBOX( mailbox_new( mt ) );
+	switch ( mt ) {
+	case MAILBOX_MH:
+	case MAILBOX_MBOX:
+	case MAILBOX_MAILDIR:
+	  box = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new(mt));
+	  break;
+	case MAILBOX_IMAP:
+	  box = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
+	  break;
+	case MAILBOX_POP3:
+	  box = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
+	break;
+	default:
+	  g_warning("Unknown mailbox type\n");
+	  box = NULL;
+	}
+
 	box->name = g_strdup( gettext( prettyname ) );
-	(MAILBOX_LOCAL( box ))->path = dup;
+	LIBBALSA_MAILBOX_LOCAL( box )->path = dup;
 	config_mailbox_add( box, (char *) prettyname );
 	mailbox_add_for_checking( box );
 	gtk_object_destroy( GTK_OBJECT( box ) );
@@ -174,7 +191,7 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 			GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL,
 			8, 4 );
 
-		init_presets[INBOX] = balsa_guess_mail_spool();
+		init_presets[INBOX] = libbalsa_guess_mail_spool();
 
 		init_widgets[INBOX] = &( self->_priv->inbox );
 		init_widgets[OUTBOX] = &( self->_priv->outbox );

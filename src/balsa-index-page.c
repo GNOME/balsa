@@ -61,8 +61,8 @@ index_child_setup_dnd ( GnomeMDIChild * child );
 
 
 /* callbacks */
-static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
-static void index_unselect_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
+static void index_select_cb (GtkWidget * widget, LibBalsaMessage * message, GdkEventButton *, gpointer data);
+static void index_unselect_cb (GtkWidget * widget, LibBalsaMessage * message, GdkEventButton *, gpointer data);
 static GtkWidget *create_menu (BalsaIndex * bindex);
 static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data);
 
@@ -70,12 +70,12 @@ static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpo
 
 /*#define MSG_STATUS_USED*/
 #ifdef MSG_STATUS_USED
-static void message_status_set_new_cb (GtkWidget *, Message *);
-static void message_status_set_read_cb (GtkWidget *, Message *);
-static void message_status_set_answered_cb (GtkWidget *, Message *);
+static void message_status_set_new_cb (GtkWidget *, LibBalsaMessage *);
+static void message_status_set_read_cb (GtkWidget *, LibBalsaMessage *);
+static void message_status_set_answered_cb (GtkWidget *, LibBalsaMessage *);
 #endif
 
-static void transfer_messages_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
+static void transfer_messages_cb (BalsaMBList *, LibBalsaMailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
 
 static void
 store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget **entries);
@@ -194,7 +194,7 @@ void
 balsa_index_page_reset(BalsaIndexPage *page)
 {
   GtkWidget *current_page, *window;
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
   gint i;
 
   if( !page )
@@ -216,7 +216,7 @@ balsa_index_page_reset(BalsaIndexPage *page)
 }
 
 gint
-balsa_find_notebook_page_num(Mailbox *mailbox)
+balsa_find_notebook_page_num(LibBalsaMailbox *mailbox)
 {
   GtkWidget *cur_page;
   guint i;
@@ -233,7 +233,7 @@ balsa_find_notebook_page_num(Mailbox *mailbox)
 }
 
 BalsaIndexPage *
-balsa_find_notebook_page(Mailbox *mailbox)
+balsa_find_notebook_page(LibBalsaMailbox *mailbox)
 {
     GtkWidget *page;
     guint i;
@@ -252,24 +252,20 @@ balsa_find_notebook_page(Mailbox *mailbox)
 static void
 set_password (GtkWidget * widget, GtkWidget * entry)
 {
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
 
   mailbox = gtk_object_get_data(GTK_OBJECT(entry), "mailbox");
 
   if (!mailbox)
     return;
 
-  if (MAILBOX_IS_IMAP(mailbox))
-    MAILBOX_IMAP(mailbox)->server->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
-
-  if (MAILBOX_IS_POP3(mailbox))
-    MAILBOX_POP3(mailbox)->server->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+  libbalsa_mailbox_set_password( mailbox, gtk_entry_get_text(GTK_ENTRY(entry)));
 
   gtk_object_remove_data (GTK_OBJECT (entry), "mailbox");
 }
 
 
-gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
+gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, LibBalsaMailbox * mailbox)
 {
   GtkWidget *messagebox;
   /*GdkCursor *cursor;*/
@@ -283,8 +279,9 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
   gdk_cursor_destroy(cursor);
 #endif
 
-  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->server->passwd) ||
-      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->server->passwd))
+  /* FIXME: This is ugly... */
+  if ((mailbox->type == MAILBOX_IMAP && !LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) ||
+      (mailbox->type == MAILBOX_POP3 && !LIBBALSA_MAILBOX_POP3(mailbox)->passwd))
   {
     GtkWidget *hbox;
     GtkWidget *label;
@@ -316,13 +313,15 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
   }
 
   /* check to see if its still null */
-  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->server->passwd) ||
-      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->server->passwd))
+  if ((mailbox->type == MAILBOX_IMAP && !LIBBALSA_MAILBOX_IMAP(mailbox)->passwd) ||
+      (mailbox->type == MAILBOX_POP3 && !LIBBALSA_MAILBOX_POP3(mailbox)->passwd))
   {
     return TRUE;
   }
 
-  if (!mailbox_open_ref(mailbox))
+  libbalsa_mailbox_open(mailbox, FALSE);
+  
+  if ( mailbox->open_ref == 0 )
   {
       messagebox = gnome_message_box_new(
 	  _("Unable to Open Mailbox!\nPlease check the mailbox settings."),
@@ -365,7 +364,8 @@ void balsa_index_page_close_and_destroy( GtkObject *obj )
   /*page->window references our owner*/
 	
   if( page->mailbox ) {
-    mailbox_open_unref( page->mailbox );
+    libbalsa_mailbox_close (page->mailbox);
+
     page->mailbox = NULL;
   }
 
@@ -382,7 +382,7 @@ idle_handler_cb(GtkWidget * widget)
 {
   GdkEventButton *bevent;
   BalsaMessage *bmsg;
-  Message *message;
+  LibBalsaMessage *message;
   gpointer data;
 
   bevent = gtk_object_get_data(GTK_OBJECT (widget), "bevent");
@@ -399,12 +399,13 @@ idle_handler_cb(GtkWidget * widget)
 		    bevent->button, bevent->time);
   }
 
-  if (bmsg && BALSA_MESSAGE(bmsg))
+  if (bmsg && BALSA_MESSAGE(bmsg)) {
     if (message)
       balsa_message_set(BALSA_MESSAGE(bmsg), message);
     else
       balsa_message_clear (BALSA_MESSAGE (bmsg));
-  
+  }
+
   handler = 0;
 
   /* Update the style and message counts in the mailbox list */
@@ -420,7 +421,7 @@ idle_handler_cb(GtkWidget * widget)
 void
 balsa_index_update_message (BalsaIndexPage *index_page)
 {
-    Message *message;
+    LibBalsaMessage *message;
     BalsaIndex *index;
     GtkCList *list;
     
@@ -429,7 +430,7 @@ balsa_index_update_message (BalsaIndexPage *index_page)
     if (g_list_find (list->selection, (gpointer) list->focus_row) == NULL)
         message = NULL;
     else
-        message = (Message *) gtk_clist_get_row_data (list, list->focus_row);
+        message = LIBBALSA_MESSAGE (gtk_clist_get_row_data (list, list->focus_row));
     gtk_object_set_data (GTK_OBJECT (index), "message", message);
     gtk_object_set_data (GTK_OBJECT (index), "bevent", NULL);
     gtk_object_set_data (GTK_OBJECT (index), "data", index_page);
@@ -442,7 +443,7 @@ balsa_index_update_message (BalsaIndexPage *index_page)
 
 static void
 index_select_cb (GtkWidget * widget,
-		 Message * message,
+		 LibBalsaMessage * message,
 		 GdkEventButton * bevent,
 		 gpointer data)
 {
@@ -450,7 +451,10 @@ index_select_cb (GtkWidget * widget,
     g_return_if_fail (BALSA_IS_INDEX (widget));
     g_return_if_fail (message != NULL);
     
-    set_imap_username (message->mailbox);
+    /* Is this needed? I can't see why - ijc */
+    /* removed since this should be encapsulated in the class */
+/*      if ( LIBBALSA_IS_MAILBOX_IMAP(message->mailbox) ) */
+/*        libbalsa_mailbox_imap_set_username (LIBBALSA_MAILBOX_IMAP(message->mailbox)); */
 
     gtk_object_set_data (GTK_OBJECT (widget), "message", message);
     gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
@@ -464,7 +468,7 @@ index_select_cb (GtkWidget * widget,
 
 static void
 index_unselect_cb (GtkWidget * widget,
-                   Message * message,
+                   LibBalsaMessage * message,
                    GdkEventButton * bevent,
                    gpointer data)
 {
@@ -492,9 +496,9 @@ index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
   gint on_message;
   guint row, column;
-  Message *current_message;
+  LibBalsaMessage *current_message;
   GtkCList *clist;
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
 
   clist = GTK_CLIST(widget);
   on_message=gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
@@ -502,7 +506,7 @@ index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
   if (on_message)
   {
     mailbox = gtk_clist_get_row_data (clist, row);
-    current_message = (Message *) gtk_clist_get_row_data (clist, row);
+    current_message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (clist, row));
     if (event && event->type == GDK_2BUTTON_PRESS)
     {
       message_window_new (current_message);
@@ -520,7 +524,7 @@ static void
 message_status_set_new_cb (GtkWidget * widget, BalsaIndex *bindex)
 {
   GList *list;
-  Message *message;
+  LibBalsaMessage *message;
 
   g_return_if_fail (widget != NULL);
  
@@ -541,7 +545,7 @@ static void
 message_status_set_read_cb (GtkWidget * widget, BalsaIndex *bindex)
 {
   GList *list;
-  Message *message;
+  LibBalsaMessage *message;
 
   g_return_if_fail (widget != NULL);
  
@@ -565,7 +569,7 @@ static void
 message_status_set_answered_cb (GtkWidget * widget, BalsaIndex *bindex)
 {
   GList *list;
-  Message *message;
+  LibBalsaMessage *message;
 
   g_return_if_fail (widget != NULL);
  
@@ -683,12 +687,12 @@ create_menu (BalsaIndex * bindex)
 
 
 static void
-transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
+transfer_messages_cb (BalsaMBList * bmbl, LibBalsaMailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
 {
 	GtkCList *clist;
 	BalsaIndexPage *page=NULL;
 	GList *list;
-	Message *message;
+	LibBalsaMessage *message;
 
 	g_return_if_fail (bmbl != NULL);
 	g_return_if_fail (bindex != NULL);
@@ -709,10 +713,10 @@ transfer_messages_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row,
 	while (list)
 	{
 		message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
-		message_move (message, mailbox);
+		libbalsa_message_move (message, mailbox);
 		list = list->next;
 	}
-	mailbox_commit_flagged_changes(bindex->mailbox);
+	libbalsa_mailbox_commit_changes(bindex->mailbox);
 	
 	if((page=balsa_find_notebook_page(mailbox)))
     balsa_index_page_reset(page);
@@ -784,8 +788,8 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   GtkCList *clist;
   BalsaIndex *bindex;
 
-  Message **message_list;
-  Message *current_message;
+  LibBalsaMessage **message_list;
+  LibBalsaMessage *current_message;
   guint message_count;
   /*--*/
   
@@ -796,17 +800,17 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   balsa_index_get_selected_rows (bindex, &selected_rows, &nb_selected_rows);
   
   /* retrieve the corresponding messages */
-  message_list = (Message **) g_malloc (nb_selected_rows * sizeof (Message *));
+  message_list = (Message **) g_new (LibBalsaMessage, nb_selected_rows);
   for (message_count=0; message_count<nb_selected_rows; message_count++)
     {
-      current_message = (Message *) gtk_clist_get_row_data (clist, selected_rows[message_count]);
+      current_message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (clist, selected_rows[message_count]));
       message_list[message_count] = current_message;
    }
   
   /* pass the message list to the selection mechanism */
   gtk_selection_data_set (selection_data,
 			  selection_data->target,
-			  8 * sizeof(Message *), (gchar *)message_list, nb_selected_rows * sizeof(Message *));
+			  8 * sizeof(LibBalsaMessage *), (gchar *)message_list, nb_selected_rows * sizeof(LibBalsaMessage *));
   g_free( message_list );
   
 }
@@ -817,7 +821,7 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
 {
     if(which == 0)
     {
-        Contact *card = NULL;
+        LibBalsaContact *card = NULL;
         gint error_check = 0;
         GtkWidget *box = NULL;
         gchar * msg = NULL;
@@ -850,7 +854,7 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
             g_free(entry_str);
         }
         
-        card = contact_new();
+        card = libbalsa_contact_new();
         card->card_name = g_strstrip(gtk_editable_get_chars(
 	    GTK_EDITABLE(entries[CARD_NAME]), 0, -1));
         card->first_name = g_strstrip(gtk_editable_get_chars(
@@ -862,20 +866,20 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
         card->email_address = g_strstrip(gtk_editable_get_chars(
 	    GTK_EDITABLE(entries[EMAIL_ADDRESS]), 0, -1));
 
-        error_check = contact_store(card, balsa_app.ab_location);
+        error_check = libbalsa_contact_store(card, balsa_app.ab_location);
 
-        if(error_check == CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE)
+        if(error_check == LIBBALSA_CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE)
         {
             msg  = g_strdup_printf(
                 _("Unable to open %s for read.\n - %s\n"),
 		balsa_app.ab_location, g_unix_error_string(errno)); 
         }
-        else if(error_check == CONTACT_CARD_NAME_FIELD_EMPTY)
+        else if(error_check == LIBBALSA_CONTACT_CARD_NAME_FIELD_EMPTY)
         {
             msg = g_strdup( _("The Card Name field must be non-empty.\n"));
             gtk_widget_grab_focus(GTK_WIDGET(entries[CARD_NAME]));
         }
-        else if(error_check == CONTACT_CARD_NAME_EXISTS)
+        else if(error_check == LIBBALSA_CONTACT_CARD_NAME_EXISTS)
         {
             msg = g_strdup_printf(
                 _("There is already an address book entry for %s.\nRun GnomeCard if you would like to edit your address book entries.\n"),
@@ -886,7 +890,7 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
         else
         {
                 /* storing was successful */
-            contact_free(card);
+            libbalsa_contact_free(card);
             gnome_dialog_close(GNOME_DIALOG(widget));
             return;
         }
@@ -896,7 +900,7 @@ store_address_dialog_button_clicked_cb(GtkWidget *widget, gint which, GtkWidget 
                                     GNOME_STOCK_BUTTON_OK, NULL );
         gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
         gnome_dialog_run_and_close( GNOME_DIALOG( box ) );
-        contact_free(card);
+        libbalsa_contact_free(card);
         g_free(msg);
         return;
     }
@@ -928,7 +932,7 @@ void
 balsa_message_reply (GtkWidget * widget, gpointer index)
 {
   GList     *list;
-  Message   *message;
+  LibBalsaMessage   *message;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -946,7 +950,7 @@ void
 balsa_message_replytoall (GtkWidget * widget, gpointer index)
 {
   GList     *list;
-  Message   *message;
+  LibBalsaMessage   *message;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -964,7 +968,7 @@ void
 balsa_message_forward (GtkWidget * widget, gpointer index)
 {
   GList     *list;
-  Message   *message;
+  LibBalsaMessage   *message;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -983,7 +987,7 @@ void
 balsa_message_continue (GtkWidget * widget, gpointer index)
 {
   GList   *list;
-  Message *message;
+  LibBalsaMessage *message;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -1026,7 +1030,7 @@ void
 balsa_message_toggle_flagged (GtkWidget * widget, gpointer index)
 {
 	GList   *list;
-	Message *message;
+	LibBalsaMessage *message;
 	int      is_all_flagged = TRUE;
  
 	g_return_if_fail (widget != NULL);
@@ -1040,7 +1044,7 @@ balsa_message_toggle_flagged (GtkWidget * widget, gpointer index)
 		message = gtk_clist_get_row_data(GTK_CLIST(index), 
 			GPOINTER_TO_INT(list->data));
 
-		if (!(message->flags & MESSAGE_FLAG_FLAGGED))
+		if (!(message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED))
 		{
 			is_all_flagged = FALSE;
 			break;
@@ -1058,14 +1062,14 @@ balsa_message_toggle_flagged (GtkWidget * widget, gpointer index)
 
 		if (is_all_flagged)
 		{
-			message_unflag(message);
+			libbalsa_message_unflag(message);
 		} else {
-			message_flag(message);
+			libbalsa_message_flag(message);
 		}
  
 		list = list->next;
 	}
-	mailbox_commit_flagged_changes(BALSA_INDEX(index)->mailbox);
+	libbalsa_mailbox_commit_changes(BALSA_INDEX(index)->mailbox);
 }
 
 void
@@ -1073,7 +1077,7 @@ balsa_message_delete (GtkWidget * widget, gpointer index)
 {
   GList   *list;
   BalsaIndexPage *page = NULL;
-  Message *message;
+  LibBalsaMessage *message;
   gboolean to_trash;
 
   g_return_if_fail (widget != NULL);
@@ -1091,15 +1095,15 @@ balsa_message_delete (GtkWidget * widget, gpointer index)
     message = gtk_clist_get_row_data(GTK_CLIST(index), 
 				     GPOINTER_TO_INT(list->data));
     if(to_trash)
-      message_move(message, balsa_app.trash);
+      libbalsa_message_move(message, balsa_app.trash);
     else
-      message_delete(message);
+      libbalsa_message_delete(message);
 
     list = list->next;
   }
   balsa_index_select_next (index);
 
-  mailbox_commit_flagged_changes(BALSA_INDEX(index)->mailbox);
+  libbalsa_mailbox_commit_changes(BALSA_INDEX(index)->mailbox);
 
   /*
    * If messages moved to trash mailbox and it's open in the
@@ -1116,7 +1120,7 @@ void
 balsa_message_undelete (GtkWidget * widget, gpointer index)
 {
   GList   *list;
-  Message *message;
+  LibBalsaMessage *message;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail(index != NULL);
@@ -1125,7 +1129,7 @@ balsa_message_undelete (GtkWidget * widget, gpointer index)
   while (list)
   {
     message = gtk_clist_get_row_data(GTK_CLIST(index), GPOINTER_TO_INT(list->data));
-    message_undelete(message);
+    libbalsa_message_undelete(message);
     list = list->next;
   }
   balsa_index_select_next (index);
@@ -1135,7 +1139,7 @@ void
 balsa_message_store_address (GtkWidget * widget, gpointer index)
 {
   GList   *list = NULL;
-  Message *message = NULL;
+  LibBalsaMessage *message = NULL;
   GtkWidget *dialog = NULL;
   GtkWidget *frame = NULL;
   GtkWidget *table = NULL;

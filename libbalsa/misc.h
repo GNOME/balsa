@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -22,7 +23,6 @@
 
 #include "libbalsa.h"
 
-gchar *address_to_gchar (const Address * addr);
 gchar *make_string_from_list (GList *);
 gchar *ADDRESS_to_gchar (const ADDRESS * addr);
 
@@ -55,19 +55,19 @@ struct _MailboxNode
 {
   GtkObject object;
   gchar *name;
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
   gint IsDir;
   gint expanded;
   MailboxNodeStyle style;
 };
 
-MailboxNode *mailbox_node_new (const gchar * name, Mailbox * mb, gint i);
+MailboxNode *mailbox_node_new (const gchar * name, LibBalsaMailbox * mb, gint i);
 void mailbox_node_destroy(MailboxNode *mbn);
 
-gchar *g_get_host_name (void);
+gchar *libbalsa_get_hostname (void);
 
-gboolean find_word(const gchar * word, const gchar* str);
-void wrap_string(gchar* str, int width);
-gchar *balsa_guess_mail_spool( void );
+gboolean libbalsa_find_word(const gchar * word, const gchar* str);
+void libbalsa_wrap_string(gchar* str, int width);
+gchar *libbalsa_guess_mail_spool( void );
 
 #endif /* __MISC_H__ */

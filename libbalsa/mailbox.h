@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -25,15 +26,16 @@
 
 #include "libmutt/mutt.h"
 
+#include "libbalsa.h"
 
-#define BALSA_TYPE_MAILBOX			(balsa_mailbox_get_type())
-#define BALSA_MAILBOX(obj)			(GTK_CHECK_CAST ((obj), BALSA_TYPE_MAILBOX, Mailbox))
-#define BALSA_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_MAILBOX, MailboxClass))
-#define BALSA_IS_MAILBOX(obj)			(GTK_CHECK_TYPE ((obj), BALSA_TYPE_MAILBOX))
-#define BALSA_IS_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_MAILBOX))
+#define LIBBALSA_TYPE_MAILBOX			(libbalsa_mailbox_get_type())
+#define LIBBALSA_MAILBOX(obj)			(GTK_CHECK_CAST ((obj), LIBBALSA_TYPE_MAILBOX, LibBalsaMailbox))
+#define LIBBALSA_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, LibBalsaMailboxClass))
+#define LIBBALSA_IS_MAILBOX(obj)			(GTK_CHECK_TYPE ((obj), LIBBALSA_TYPE_MAILBOX))
+#define LIBBALSA_IS_MAILBOX_CLASS(klass)		(GTK_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX))
 
 /*
- * enumes
+ * enums
  */
 typedef enum
 {
@@ -43,16 +45,7 @@ typedef enum
   MAILBOX_POP3,
   MAILBOX_IMAP,
   MAILBOX_UNKNOWN
-} MailboxType;
-
-typedef enum
-{
-  SERVER_POP3,
-  SERVER_IMAP,
-  SERVER_UNKNOWN
-}
-ServerType;
-
+} LibBalsaMailboxType;
 
 typedef enum
 {
@@ -70,62 +63,20 @@ typedef enum
   MAILBOX_SORT_MASK = 0xf,
   MAILBOX_SORT_REVERSE = (1 << 4),
   MAILBOX_SORT_LAST = (1 << 5)
-} MailboxSort;
-
-typedef enum
-{
-  MESSAGE_MARK_CLEAR,		/* clear all flags */
-  MESSAGE_MARK_ANSWER,		/* message has been answered */
-  MESSAGE_MARK_READ,		/* message has changed from new to read */
-  MESSAGE_MARK_UNREAD,		/* message has changed from read to new */
-	MESSAGE_MARK_FLAGGED,		/* message has been flagged/unflagged */
-  MESSAGE_MARK_DELETE,		/* message has been marked deleted */
-  MESSAGE_MARK_UNDELETE,	/* message has been marked undeleted */
-  MESSAGE_DELETE,		/* message has been deleted */
-  MESSAGE_NEW,			/* message is new to the mailbox */
-  MESSAGE_FLAGGED,		/* the message was flagged */
-  MESSAGE_REPLIED,		/* the message was answered */
-  MESSAGE_APPEND		/* message has been appended */
-} MailboxWatcherMessageType;
-
-
-typedef enum
-{
-  MESSAGE_MARK_CLEAR_MASK = 1,
-  MESSAGE_MARK_ANSWER_MASK = 1 << 1,
-  MESSAGE_MARK_READ_MASK = 1 << 2,
-  MESSAGE_MARK_UNREAD_MASK = 1 << 3,
-  MESSAGE_MARK_DELETE_MASK = 1 << 4,
-  MESSAGE_MARK_UNDELETE_MASK = 1 << 5,
-  MESSAGE_MARK_FLAGGED_MASK = 1 << 6,
-  MESSAGE_DELETE_MASK = 1 << 7,
-  MESSAGE_NEW_MASK = 1 << 8,
-  MESSAGE_FLAGGED_MASK = 1 << 9,
-  MESSAGE_REPLIED_MASK = 1 << 10,
-  MESSAGE_APPEND_MASK = 1 << 11
-} MailboxWatcherMessageMask;
-
+} LibBalsaMailboxSort;
 
 /*
  * strucutres
  */
-typedef struct _MailboxClass MailboxClass;
-typedef struct _ServerClass ServerClass;
-typedef struct _MailboxRemote MailboxRemote;
+typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
-
-
-typedef struct _MailboxWatcherMessage MailboxWatcherMessage;
-typedef struct _MailboxWatcherMessageNew MailboxWatcherMessageNew;
-
-GtkType balsa_mailbox_get_type (void);
-
-struct _Mailbox
+struct _LibBalsaMailbox
 {
   GtkObject object;
 
-  MailboxType type;
+  LibBalsaMailboxType type;
   gchar *name;
+  CONTEXT *context;
   void *private;
   guint open_ref;
 
@@ -141,175 +92,64 @@ struct _Mailbox
   glong total_messages;  /* total number of messages in the mailbox  */
 };
 
-
-struct _MailboxClass
+struct _LibBalsaMailboxClass
 {
   GtkObjectClass parent_class;
 
-  void (* open_mailbox)    (Mailbox *mailbox);
-  void (* close_mailbox)   (Mailbox *mailbox);
+  /* Signals */
+  void (* open_mailbox)            (LibBalsaMailbox *mailbox, gboolean append);
+  void (* close_mailbox)           (LibBalsaMailbox *mailbox);
 
-  void (* message_new)     (Mailbox *mailbox,
-			    Message *message);
+  void (* message_new)             (LibBalsaMailbox *mailbox,
+				    LibBalsaMessage *message);
+  void (* message_delete)          (LibBalsaMailbox *mailbox,
+				    LibBalsaMessage *message);
+  void (* message_append)          (LibBalsaMailbox *mailbox,
+				    LibBalsaMessage *message);
+  void (* message_status_changed)  (LibBalsaMailbox *mailbox,
+				    LibBalsaMessage *message);
 
-  void (* message_delete)  (Mailbox *mailbox,
-			    Message *message);
-
-  void (* message_append)  (Mailbox *mailbox,
-			    Message *message);
-
-  /* message's flags changed */
-  void (* message_flagged) (Mailbox *mailbox,
-			    Message *message);
+  void (* set_username)            (LibBalsaMailbox *mailbox,
+				    const gchar *name);
+  void (* set_password)            (LibBalsaMailbox *mailbox,
+				    const gchar *passwd);
+  void (* set_host)                (LibBalsaMailbox *mailbox,
+				    const gchar *host, gint port);
 };
 
-struct _Server
-{
-  GtkObject object;
-
-  ServerType type;
-
-  gchar *host;
-  gint port;
-
-  gchar *user;
-  gchar *passwd;
-};
-
-struct _ServerClass
-{
-  GtkObjectClass parent_class;
-
-  void (* message_new)     (Mailbox *mailbox,
-			    Message *message);
-
-  void (* message_delete)  (Mailbox *mailbox,
-			    Message *message);
-
-  void (* message_append)  (Mailbox *mailbox,
-			    Message *message);
-
-  /* message's flags changed */
-  void (* message_flagged) (Mailbox *mailbox,
-			    Message *message);
-
-};
-
-struct _MailboxWatcherMessage
-{
-  MailboxWatcherMessageType type;
-  Mailbox *mailbox;
-  Message *message;
-  gpointer data;
-};
-
-
-struct _MailboxWatcherMessageNew
-{
-  /* common */
-  MailboxWatcherMessageType type;
-  Mailbox *mailbox;
-  Message *message;
-  gpointer data;
-  /* end common */
-  
-  gint remaining;
-};
-
-
-/*
- * function typedefs
- */
-typedef void (*MailboxWatcherFunc) (MailboxWatcherMessage * arg1);
-
-
-/*
- * call before using any mailbox functions
- */
-void mailbox_init (gchar * inbox_path,
-		   void (*error_func) (const char *fmt,...),
-		   void (*gui_func) (void));
-
-gint set_imap_username (Mailbox * mb);
-void check_all_pop3_hosts (Mailbox *, GList *);
-void check_all_imap_hosts (Mailbox *, GList *);
-void mailbox_add_for_checking (Mailbox *);
-gint mailbox_have_new_messages (Mailbox *);
-GList *make_list_from_string (gchar *);
-Address *make_address_from_string (gchar *);
+GtkType libbalsa_mailbox_get_type (void);
 
 /* 
  * open and close a mailbox 
  */
 /* XXX these need to return a value if they failed */
-void balsa_mailbox_open(Mailbox *mailbox);
-void balsa_mailbox_close(Mailbox *mailbox);
+void libbalsa_mailbox_open(LibBalsaMailbox *mailbox, gboolean append);
+void libbalsa_mailbox_close(LibBalsaMailbox *mailbox);
+void libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox);
 
-int mailbox_open_ref (Mailbox * mailbox);
-int mailbox_open_append (Mailbox * mailbox);
-void mailbox_open_unref (Mailbox * mailbox);
+void libbalsa_mailbox_free_messages (LibBalsaMailbox * mailbox);
+
+/* Parameters */
+void libbalsa_mailbox_set_username (LibBalsaMailbox *mailbox, const gchar *name);
+void libbalsa_mailbox_set_password (LibBalsaMailbox *mailbox, const gchar *passwd);
+void libbalsa_mailbox_set_host (LibBalsaMailbox *mailbox, const gchar *host, gint port);
 
 /*
  * sorting mailbox
  */
-void mailbox_sort (Mailbox * mailbox, MailboxSort sort);
+void libbalsa_mailbox_sort (LibBalsaMailbox * mailbox, LibBalsaMailboxSort sort);
 
-/*
- * create and destroy a mailbox structure
- */
-GtkObject *mailbox_new (MailboxType type);
-gint mailbox_check_new_messages (Mailbox * mailbox);
+void libbalsa_mailbox_commit_changes( LibBalsaMailbox *mailbox );
 
-/*
- * watchers
- */
-extern guint mailbox_watcher_set (Mailbox * mailbox, MailboxWatcherFunc func, guint16 mask, gpointer data);
-extern void  mailbox_watcher_remove (Mailbox * mailbox, guint id);
-extern void  mailbox_watcher_remove_by_data (Mailbox * mailbox, gpointer data);
-extern void  send_watcher_mark_clear_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_mark_answer_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_mark_read_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_mark_unread_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_mark_delete_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_mark_undelete_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_new_message (Mailbox * mailbox, Message * message, gint remaining);
-extern void  send_watcher_delete_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_append_message (Mailbox * mailbox, Message * message);
-extern void  send_watcher_mark_flagged_message(Mailbox * mailbox, Message *message);
+void check_all_pop3_hosts (LibBalsaMailbox *, GList *);
+void mailbox_add_for_checking (LibBalsaMailbox *);
 
+gint libbalsa_mailbox_has_new_messages (LibBalsaMailbox * mailbox);
+gint libbalsa_mailbox_check_for_new_messages (LibBalsaMailbox *);
 
 /*
  * misc mailbox releated functions
  */
-MailboxType mailbox_type_from_description (gchar * description);
-gchar *mailbox_type_description (MailboxType type);
-MailboxType mailbox_valid (gchar * filename);
-gboolean mailbox_gather_content_info( Mailbox *mailbox );
-void mailbox_commit_flagged_changes( Mailbox *mailbox );
-
-
-/*
- * Servers
- */
-
-Server *server_new(ServerType type);
-void server_free(Server *server);
-
-#include "mailbox_local.h"
-#include "mailbox_pop3.h"
-#include "mailbox_imap.h"
-
-/*
- * public macros
- */
-#define MAILBOX(mailbox)        BALSA_MAILBOX(mailbox)
-#define MAILBOX_LOCAL(mailbox)  BALSA_MAILBOX_LOCAL(mailbox)
-#define MAILBOX_POP3(mailbox)   BALSA_MAILBOX_POP3(mailbox)
-#define MAILBOX_IMAP(mailbox)   BALSA_MAILBOX_IMAP(mailbox)
-
-#define MAILBOX_IS_LOCAL(mailbox) BALSA_IS_MAILBOX_LOCAL(mailbox)
-#define MAILBOX_IS_POP3(mailbox)  BALSA_IS_MAILBOX_POP3(mailbox)
-#define MAILBOX_IS_IMAP(mailbox)  BALSA_IS_MAILBOX_IMAP(mailbox)
-
+LibBalsaMailboxType libbalsa_mailbox_valid (gchar * filename);
 
 #endif /* __MAILBOX_H__ */

@@ -41,7 +41,7 @@ extern "C"
     {
       GtkCList clist;
 
-      Mailbox *mailbox;
+      LibBalsaMailbox *mailbox;
       guint watcher_id;
       guint first_new_message;
     };
@@ -50,8 +50,8 @@ extern "C"
     {
       GtkCListClass parent_class;
 
-      void (*select_message) (BalsaIndex * bindex, Message * message);
-      void (*unselect_message) (BalsaIndex * bindex, Message * message);
+      void (*select_message) (BalsaIndex * bindex, LibBalsaMessage * message);
+      void (*unselect_message) (BalsaIndex * bindex, LibBalsaMessage * message);
     };
 
 
@@ -61,14 +61,14 @@ extern "C"
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
-  void balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox);
+  void balsa_index_set_mailbox (BalsaIndex * bindex, LibBalsaMailbox * mailbox);
 
 
 /* adds a new message */
-  void balsa_index_add (BalsaIndex * bindex, Message * message);
+  void balsa_index_add (BalsaIndex * bindex, LibBalsaMessage * message);
 /* del a message */
-  void balsa_index_del (BalsaIndex * bindex, Message * message);
-  void balsa_index_update_flag (BalsaIndex * bindex, Message * message);
+  void balsa_index_del (BalsaIndex * bindex, LibBalsaMessage * message);
+  void balsa_index_update_flag (BalsaIndex * bindex, LibBalsaMessage * message);
 
 
 /* select up/down the index */

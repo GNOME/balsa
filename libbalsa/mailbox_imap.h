@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -17,35 +18,40 @@
  * 02111-1307, USA.
  */
 
-#ifndef __balsa_mailbox_imap_h__
-#define __balsa_mailbox_imap_h__
+#ifndef __LIBBALSA_MAILBOX_IMAP_H__
+#define __LIBBALSA_MAILBOX_IMAP_H__
 
-#define BALSA_TYPE_MAILBOX_IMAP			(balsa_mailbox_imap_get_type())
-#define BALSA_MAILBOX_IMAP(obj)			(GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX_IMAP, MailboxIMAP))
-#define BALSA_MAILBOX_IMAP_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MAILBOX_IMAP, MailboxIMAPClass))
-#define BALSA_IS_MAILBOX_IMAP(obj)		(GTK_CHECK_TYPE (obj, BALSA_TYPE_MAILBOX_IMAP))
-#define BALSA_IS_MAILBOX_IMAP_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_MAILBOX_IMAP))
+#define LIBBALSA_TYPE_MAILBOX_IMAP			(libbalsa_mailbox_imap_get_type())
+#define LIBBALSA_MAILBOX_IMAP(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_MAILBOX_IMAP, LibBalsaMailboxImap))
+#define LIBBALSA_MAILBOX_IMAP_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_MAILBOX_IMAP, LibBalsaMailboxImapClass))
+#define LIBBALSA_IS_MAILBOX_IMAP(obj)		(GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_IMAP))
+#define LIBBALSA_IS_MAILBOX_IMAP_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_IMAP))
 
-GtkType balsa_mailbox_imap_get_type (void);
+GtkType libbalsa_mailbox_imap_get_type (void);
 
-typedef struct _MailboxIMAP MailboxIMAP;
-typedef struct _MailboxIMAPClass MailboxIMAPClass;
+typedef struct _LibBalsaMailboxImap LibBalsaMailboxImap;
+typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
 
-struct _MailboxIMAP
+struct _LibBalsaMailboxImap
 {
-  Mailbox mailbox;
+  LibBalsaMailbox mailbox;
 
-  Server *server;
+  gchar *host;
+  gint port;
+
+  gchar *user;
+  gchar *passwd;
 
   gchar *path;
   gchar *tmp_file_path;
+
 };
 
-struct _MailboxIMAPClass
+struct _LibBalsaMailboxImapClass
 {
-  MailboxClass klass;
+  LibBalsaMailboxClass klass;
 };
 
-/* deprecated: gint mailbox_imap_has_new_messages(MailboxIMAP *mailbox); */
+GtkObject *libbalsa_mailbox_imap_new(void);
 
-#endif /* __balsa_mailbox_imap_h__ */
+#endif /* __LIBBALSA_MAILBOX_IMAP_H__ */

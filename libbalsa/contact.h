@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -17,10 +18,12 @@
  * 02111-1307, USA.
  */
 
-#ifndef __CONTACT_H__
-#define __CONTACT_H__
+#ifndef __LIBBALSA_CONTACT_H__
+#define __LIBBALSA_CONTACT_H__
 
 #include <glib.h>
+
+#include "libbalsa.h"
 
 enum
 {
@@ -35,13 +38,13 @@ enum
     /* possible error values obtained while trying to store a contact vCard */
 enum
 {
-    CONTACT_CARD_STORED_SUCCESSFULLY,
-    CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE,
-    CONTACT_CARD_NAME_FIELD_EMPTY,
-    CONTACT_CARD_NAME_EXISTS
+    LIBBALSA_CONTACT_CARD_STORED_SUCCESSFULLY,
+    LIBBALSA_CONTACT_UNABLE_TO_OPEN_GNOMECARD_FILE,
+    LIBBALSA_CONTACT_CARD_NAME_FIELD_EMPTY,
+    LIBBALSA_CONTACT_CARD_NAME_EXISTS
 };
 
-struct _Contact
+struct _LibBalsaContact
 {
     gchar *card_name;
     gchar *first_name;
@@ -50,9 +53,9 @@ struct _Contact
     gchar *email_address;
 };
 
-Contact *contact_new(void);
-void contact_free(Contact *contact);
-void contact_list_free(GList *contact_list);
-gint contact_store(Contact *contact, const gchar *fname);
+LibBalsaContact *libbalsa_contact_new(void);
+void libbalsa_contact_free(LibBalsaContact *contact);
+void libbalsa_contact_list_free(GList *contact_list);
+gint libbalsa_contact_store(LibBalsaContact *contact, const gchar *fname);
 
-#endif /* __CONTACT_H__ */
+#endif /* __LIBBALSA_CONTACT_H__ */

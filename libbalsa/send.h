@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+#error "This file is deprecated"
 
 #ifndef __SEND_H__
 #define __SEND_H__
@@ -25,8 +27,8 @@ extern "C"
 {
 #endif				/* __cplusplus */
 
-  gboolean balsa_send_message (Message * message);
-  gboolean balsa_postpone_message (Message * message, Message *reply_message,
+  gboolean balsa_send_message (LibBalsaMessage * message);
+  gboolean balsa_postpone_message (LibBalsaMessage * message, LibBalsaMessage *reply_message,
                                    gchar * fcc);
 
 

@@ -45,10 +45,10 @@ struct _BalsaWindowClass
   GnomeAppClass parent_class;
 
   void (* open_mailbox)  (BalsaWindow *window,
-			  Mailbox     *mailbox);
+			  LibBalsaMailbox     *mailbox);
 
   void (* close_mailbox) (BalsaWindow *window,
-			  Mailbox     *mailbox);
+			  LibBalsaMailbox     *mailbox);
 
   void (* set_cursor)  (BalsaWindow *window,
 			GdkCursor   *cursor);
@@ -65,7 +65,7 @@ void       balsa_window_close_mailbox();
 gboolean   mail_progress_notify_cb(void);
 gboolean   send_progress_notify_cb(void);
 gint       check_new_messages_auto_cb( gpointer data );
-void       mblist_close_mailbox (Mailbox * mailbox);
+void       mblist_close_mailbox (LibBalsaMailbox * mailbox);
 
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__

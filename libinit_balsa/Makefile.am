@@ -46,6 +46,8 @@ GOBFILES =				\
 
 EXTRA_DIST = $(GOBFILES)
 
+CLEANFILES = $(BUILD_SOURCES)
+
 INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_builddir)/libmutt \
 	-I$(top_srcdir)/libmutt \

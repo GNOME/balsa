@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -63,14 +64,14 @@ static GtkTargetEntry dnd_mb_target[] =
 
 
 /* callbacks */
-void mblist_open_mailbox (Mailbox * mailbox);
-void mblist_close_mailbox (Mailbox * mailbox);
-static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
+void mblist_open_mailbox (LibBalsaMailbox * mailbox);
+void mblist_close_mailbox (LibBalsaMailbox * mailbox);
+static void mailbox_select_cb (BalsaMBList *, LibBalsaMailbox *, GtkCTreeNode *, GdkEventButton *);
 static gboolean mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 /*PKGW*/
 static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc );
 
-static GtkWidget *mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox);
+static GtkWidget *mblist_create_context_menu (GtkCTree * ctree, LibBalsaMailbox * mailbox);
 
 static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * context, gint x, gint y, GtkSelectionData * selection_data, guint info, guint32 time);
 static gboolean mblist_drag_motion (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
@@ -150,7 +151,7 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
  * created and the mailbox parsed.
  * */
 void
-mblist_open_mailbox (Mailbox * mailbox)
+mblist_open_mailbox (LibBalsaMailbox * mailbox)
 {
   GtkWidget *page = NULL;
   int i, c;
@@ -208,7 +209,7 @@ mblist_open_mailbox (Mailbox * mailbox)
 
 
 void
-mblist_close_mailbox (Mailbox * mailbox)
+mblist_close_mailbox (LibBalsaMailbox * mailbox)
 {
   if (!mblw)
     return;
@@ -227,7 +228,7 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
   gint row, column;
   gint on_mailbox;
   MailboxNode *mbnode;
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
   GtkCTreeNode *node;
 
   bmbl = BALSA_MBLIST (widget);
@@ -248,7 +249,7 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
       if (mbnode->IsDir)
         return FALSE;
       
-      g_return_val_if_fail (BALSA_IS_MAILBOX(mailbox), FALSE);
+      g_return_val_if_fail (LIBBALSA_IS_MAILBOX(mailbox), FALSE);
             
       if (event->button == 1) // && event->type == GDK_2BUTTON_PRESS)
 	
@@ -293,7 +294,7 @@ static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc )
 }
 
 static void
-mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event)
+mailbox_select_cb (BalsaMBList * bmbl, LibBalsaMailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event)
 {
   if (!mblw)
     return;
@@ -301,31 +302,31 @@ mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, Gd
 
 
 static void
-mb_open_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_open_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   mblist_open_mailbox (mailbox);
 }
 
 static void
-mb_close_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_close_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   mblist_close_mailbox (mailbox);
 }
 
 static void
-mb_conf_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_conf_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
 }
 
 static void
-mb_add_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_add_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
 }
 
 static void
-mb_del_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_del_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -336,7 +337,7 @@ mb_del_cb (GtkWidget * widget, Mailbox * mailbox)
    sets the given mailbox as inbox.
 */
 static void
-mb_inbox_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_inbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -348,7 +349,7 @@ mb_inbox_cb (GtkWidget * widget, Mailbox * mailbox)
 }
 
 static void
-mb_sentbox_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_sentbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -357,7 +358,7 @@ mb_sentbox_cb (GtkWidget * widget, Mailbox * mailbox)
 }
 
 static void
-mb_trash_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_trash_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -366,7 +367,7 @@ mb_trash_cb (GtkWidget * widget, Mailbox * mailbox)
 }
 
 static void
-mb_draftbox_cb (GtkWidget * widget, Mailbox * mailbox)
+mb_draftbox_cb (GtkWidget * widget, LibBalsaMailbox * mailbox)
 {
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;
@@ -389,7 +390,7 @@ static GnomeUIInfo mailbox_menu[] =
 
 static void
 add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
-	       Mailbox * mailbox)
+	       LibBalsaMailbox * mailbox)
 {
     GtkWidget *menuitem;
     
@@ -401,7 +402,7 @@ add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
 }
 
 static GtkWidget *
-mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox)
+mblist_create_context_menu (GtkCTree * ctree, LibBalsaMailbox * mailbox)
 {
   GtkWidget *menu;
 
@@ -432,7 +433,7 @@ mblist_create_context_menu (GtkCTree * ctree, Mailbox * mailbox)
 void
 mblist_menu_add_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox ();
+  LibBalsaMailbox *mailbox = mblist_get_selected_mailbox ();
   
   mailbox_conf_new (mailbox, TRUE, MAILBOX_UNKNOWN);
 }
@@ -441,7 +442,7 @@ mblist_menu_add_cb (GtkWidget * widget, gpointer data)
 void
 mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox ();
+  LibBalsaMailbox *mailbox = mblist_get_selected_mailbox ();
 
   if (mailbox == NULL)
     {
@@ -457,7 +458,7 @@ mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
 void
 mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox ();
+  LibBalsaMailbox *mailbox = mblist_get_selected_mailbox ();
 
   if (mailbox == NULL)
     {
@@ -475,7 +476,7 @@ mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
 void
 mblist_menu_open_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox ();
+  LibBalsaMailbox *mailbox = mblist_get_selected_mailbox ();
 
   if (mailbox == NULL)
     {
@@ -490,7 +491,7 @@ mblist_menu_open_cb (GtkWidget * widget, gpointer data)
 void
 mblist_menu_close_cb (GtkWidget * widget, gpointer data)
 {
-  Mailbox *mailbox = mblist_get_selected_mailbox ();
+  LibBalsaMailbox *mailbox = mblist_get_selected_mailbox ();
 
   if (mailbox == NULL)
     {
@@ -502,7 +503,7 @@ mblist_menu_close_cb (GtkWidget * widget, gpointer data)
 }
 
 
-Mailbox *
+LibBalsaMailbox *
 mblist_get_selected_mailbox (void)
 {
   GtkCTreeNode *node;
@@ -570,12 +571,12 @@ mblist_drag_data_received (GtkWidget * widget,
   /*--*/
   GtkCList *clist = GTK_CLIST (widget);
   
-  Mailbox *target_mailbox;
+  LibBalsaMailbox *target_mailbox;
   
-  Message **received_message_list;
+  LibBalsaMessage **received_message_list;
   guint nb_received_messages;
   guint received_message_count;
-  Message *current_message;
+  LibBalsaMessage *current_message;
 
   gint row;
   /*--*/
@@ -590,14 +591,14 @@ mblist_drag_data_received (GtkWidget * widget,
 
   if ((selection_data->length >= 0) )
     {
-      nb_received_messages = (guint)(selection_data->length)/sizeof( Message *);
-      received_message_list =  (Message **)(selection_data->data);
+      nb_received_messages = (guint)(selection_data->length)/sizeof( LibBalsaMessage *);
+      received_message_list =  (LibBalsaMessage **)(selection_data->data);
       
       for (received_message_count=0; received_message_count<nb_received_messages; received_message_count++)
 	{
 	  current_message = received_message_list[received_message_count];
 	  if (current_message->mailbox != target_mailbox)
-	    message_move (current_message, target_mailbox);
+	    libbalsa_message_move (current_message, target_mailbox);
 	}
       gtk_drag_finish (context, TRUE, FALSE, time);
       return;

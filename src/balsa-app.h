@@ -99,7 +99,7 @@ extern struct BalsaApplication
 {
   proplist_t proplist;
   /* personal information */
-  Address *address;
+  LibBalsaAddress *address;
   gchar *replyto;
   gchar *bcc;
   
@@ -116,12 +116,12 @@ extern struct BalsaApplication
   BalsaWindow* main_window;
   BalsaMBList *mblist;
   
-  Mailbox *inbox;
+  LibBalsaMailbox *inbox;
   GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
-  Mailbox *sentbox;
-  Mailbox *draftbox;
-  Mailbox *outbox;
-  Mailbox *trash;
+  LibBalsaMailbox *sentbox;
+  LibBalsaMailbox *draftbox;
+  LibBalsaMailbox *outbox;
+  LibBalsaMailbox *trash;
   
   GNode *mailbox_nodes;
   
@@ -218,6 +218,6 @@ void balsa_app_init (void);
 gint do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
 void balsa_error_toggle_fatality( gboolean are_fatal );
-Mailbox *balsa_find_mbox_by_name (const gchar *name);
+LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);
 
 #endif /* __BALSA_APP_H__ */

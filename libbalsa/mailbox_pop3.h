@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Stuart Parmenter and Jay Painter
  *
@@ -17,34 +18,40 @@
  * 02111-1307, USA.
  */
 
-#ifndef __balsa_mailbox_pop3_h__
-#define __balsa_mailbox_pop3_h__
+#ifndef __LIBBALSA_MAILBOX_POP3_H__
+#define __LIBBALSA_MAILBOX_POP3_H__
 
-#define BALSA_TYPE_MAILBOX_POP3			(balsa_mailbox_pop3_get_type())
-#define BALSA_MAILBOX_POP3(obj)			(GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX_POP3, MailboxPOP3))
-#define BALSA_MAILBOX_POP3_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MAILBOX_POP3, MailboxPOP3Class))
-#define BALSA_IS_MAILBOX_POP3(obj)		(GTK_CHECK_TYPE (obj, BALSA_TYPE_MAILBOX_POP3))
-#define BALSA_IS_MAILBOX_POP3_CLASS(klass)	(GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_MAILBOX_POP3))
+#define LIBBALSA_TYPE_MAILBOX_POP3			(libbalsa_mailbox_pop3_get_type())
+#define LIBBALSA_MAILBOX_POP3(obj)			(GTK_CHECK_CAST (obj, LIBBALSA_TYPE_MAILBOX_POP3, LibBalsaMailboxPop3))
+#define LIBBALSA_MAILBOX_POP3_CLASS(klass)		(GTK_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_MAILBOX_POP3, LibBalsaMailboxPop3Class))
+#define LIBBALSA_IS_MAILBOX_POP3(obj)		        (GTK_CHECK_TYPE (obj, LIBBALSA_TYPE_MAILBOX_POP3))
+#define LIBBALSA_IS_MAILBOX_POP3_CLASS(klass)	        (GTK_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_MAILBOX_POP3))
 
-GtkType balsa_mailbox_pop3_get_type (void);
+GtkType libbalsa_mailbox_pop3_get_type (void);
 
-typedef struct _MailboxPOP3 MailboxPOP3;
-typedef struct _MailboxPOP3Class MailboxPOP3Class;
+typedef struct _LibBalsaMailboxPop3 LibBalsaMailboxPop3;
+typedef struct _LibBalsaMailboxPop3Class LibBalsaMailboxPop3Class;
 
-struct _MailboxPOP3
+struct _LibBalsaMailboxPop3
 {
-  Mailbox mailbox;
+  LibBalsaMailbox mailbox;
 
-  Server *server;
+  gchar *host;
+  gint port;
+
+  gchar *user;
+  gchar *passwd;
 
   gboolean check;
   gboolean delete_from_server;
   gchar *last_popped_uid;
 };
 
-struct _MailboxPOP3Class
+struct _LibBalsaMailboxPop3Class
 {
-  MailboxClass klass;
+  LibBalsaMailboxClass klass;
 };
 
-#endif /* __balsa_mailbox_pop3_h__ */
+GtkObject *libbalsa_mailbox_pop3_new(void);
+
+#endif /* __LIBBALSA_MAILBOX_POP3_H__ */

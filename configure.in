@@ -294,6 +294,23 @@ if test x"$BALSA_FROM_CVS" = xyes ; then
 	fi
 fi
 
+dnl #############################################################
+dnl turn warnings into errors to enforce clean code
+dnl #############################################################
+
+AC_ARG_ENABLE(more-warnings,
+[  --enable-more-warnings  Maximum compiler warnings],
+set_more_warnings="$enableval", set_more_warnings=no)
+
+if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+        CFLAGS="$CFLAGS \
+        -Wall -Wno-uninitialized \
+        -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
+        -Wnested-externs -Wpointer-arith \
+        -Wno-sign-compare -Wsign-promo \
+        -Werror"
+fi
+
 dnl ######################################################################################
 dnl Create files.
 dnl ######################################################################################
@@ -326,6 +343,7 @@ echo " Using incomplete features: $use_all"
 echo "        Using mailbox info: $use_info"
 echo "Installing some files into  "
 echo "            Gnome's prefix: $use_system_install (may require root privileges)"
+echo "   Enable compile warnings: $set_more_warnings"
 echo ""
 
 if test x"$BALSA_FROM_CVS" = xyes ; then

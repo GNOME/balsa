@@ -64,7 +64,7 @@ extern "C"
 
       BalsaPartInfo *current_part;
       
-      Message *message;
+      LibBalsaMessage *message;
     };
 
   struct _BalsaMessageClass
@@ -76,7 +76,7 @@ extern "C"
   GtkWidget *balsa_message_create (void);
 
   void balsa_message_clear (BalsaMessage * bmessage);
-  void balsa_message_set (BalsaMessage * bmessage, Message * message);
+  void balsa_message_set (BalsaMessage * bmessage, LibBalsaMessage * message);
 
   void balsa_message_next_part (BalsaMessage *bmessage);
   void balsa_message_previous_part (BalsaMessage *bmessage);

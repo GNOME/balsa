@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -51,13 +52,6 @@ error_exit_cb (GtkWidget * widget, gpointer data)
 }
 
 static void
-update_gui(void)
-{
-    while (gtk_events_pending ())
-         gtk_main_iteration ();
-}
-
-static void
 balsa_error (const char *fmt,...)
 {
   GtkWidget *messagebox;
@@ -95,7 +89,7 @@ balsa_app_init (void)
    * initalize application structure before ALL ELSE 
    * to some reasonable defaults
    */
-  balsa_app.address = address_new ();
+  balsa_app.address = libbalsa_address_new ();
   balsa_app.replyto = NULL;
   balsa_app.bcc = NULL;
 
@@ -195,12 +189,12 @@ do_load_mailboxes (void)
   case MAILBOX_MAILDIR:
   case MAILBOX_MBOX:
   case MAILBOX_MH: 
-      spool = g_strdup(MAILBOX_LOCAL (balsa_app.inbox)->path);
+      spool = g_strdup(LIBBALSA_MAILBOX_LOCAL (balsa_app.inbox)->path);
       break;
       
   case MAILBOX_IMAP:
   case MAILBOX_POP3:
-      spool = balsa_guess_mail_spool();
+      spool = libbalsa_guess_mail_spool();
       break;
 
   default:
@@ -208,7 +202,8 @@ do_load_mailboxes (void)
       return FALSE;
   }
 
-  mailbox_init (spool, balsa_error, update_gui);
+  libbalsa_init (spool, balsa_error);
+  g_free(spool);
 
   load_local_mailboxes ();
 
@@ -303,10 +298,10 @@ mbox_by_name (gconstpointer a, gconstpointer b)
 /* mblist_find_mbox_by_name:
    search the mailboxes tree for given name.
 */
-Mailbox *
+LibBalsaMailbox *
 balsa_find_mbox_by_name (const gchar *name) {
   GtkCTreeNode *node;
-  Mailbox *res = NULL;
+  LibBalsaMailbox *res = NULL;
 
   
   if (balsa_app.mailbox_nodes && name) {

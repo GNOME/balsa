@@ -305,7 +305,7 @@ balsa_mblist_init (BalsaMBList * tree)
  * */
 static void
 balsa_mblist_insert_mailbox (BalsaMBList * mblist,
-			     Mailbox * mailbox,
+			     LibBalsaMailbox * mailbox,
 			     BalsaIconName icon)
 {
   GtkCTreeNode *ctnode;
@@ -456,7 +456,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	gtk_ctree_node_set_row_data (ctree, cnode, mbnode);
       } else {
 	/* normal mailbox */
-	if (mailbox_have_new_messages (mbnode->mailbox))
+	if (libbalsa_mailbox_has_new_messages (mbnode->mailbox))
 	{
           mbnode->mailbox->has_unread_messages = TRUE;
 
@@ -520,7 +520,7 @@ button_event_press_cb (GtkCTree * ctree, GdkEventButton * event, gpointer user_d
     
     gtk_ctree_select (ctree, ctrow);
     
-    if (mbnode->IsDir || !BALSA_IS_MAILBOX (mbnode->mailbox))
+    if (mbnode->IsDir || !LIBBALSA_IS_MAILBOX (mbnode->mailbox))
       return;
     
     if (mbnode->mailbox)
@@ -549,7 +549,7 @@ select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column)
   mbnode = gtk_ctree_node_get_row_data (ctree, row);
 
   g_return_if_fail(mbnode != NULL);
-  if (mbnode->IsDir || !BALSA_IS_MAILBOX(mbnode->mailbox))
+  if (mbnode->IsDir || !LIBBALSA_IS_MAILBOX(mbnode->mailbox))
     return;
 
   if (bevent && bevent->button == 1)
@@ -738,25 +738,25 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
 {
 
   MailboxNode *cnode_data;
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
 
 /* Get the mailbox */
   cnode_data = gtk_ctree_node_get_row_data (ctree, node);
 
   /* If it's a directory or not a mailbox, we don't want to go any
    * further */
-  if (cnode_data->IsDir || !BALSA_IS_MAILBOX (cnode_data->mailbox))
+  if (cnode_data->IsDir || !LIBBALSA_IS_MAILBOX (cnode_data->mailbox))
     return;
 
-  mailbox = BALSA_MAILBOX (cnode_data->mailbox);
+  mailbox = LIBBALSA_MAILBOX (cnode_data->mailbox);
 
   /* If it's not local the mail-check function won't work, and if it's
    * already open we can get conflicting results since we're checking
    * the file on disk as opposed to the mailbox in memory */
   if (mailbox->open_ref == 0)
-      mailbox_have_new_messages (mailbox);
+      libbalsa_mailbox_has_new_messages (mailbox);
   else
-      mailbox_check_new_messages(mailbox); 
+      libbalsa_mailbox_check_for_new_messages(mailbox); 
 
   balsa_mblist_mailbox_style (ctree, node, cnode_data
 #ifdef BALSA_SHOW_INFO
@@ -777,7 +777,7 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
  * was closed).
  * */
 void 
-balsa_mblist_update_mailbox (BalsaMBList * mblist, Mailbox * mailbox)
+balsa_mblist_update_mailbox (BalsaMBList * mblist, LibBalsaMailbox * mailbox)
 {
   GtkCTreeNode *node;
   gchar * desc;
@@ -847,7 +847,7 @@ balsa_mblist_mailbox_style (GtkCTree * ctree, GtkCTreeNode *node, MailboxNode *m
                                         )
 {
   BalsaMBList* mblist;
-  Mailbox* mailbox;
+  LibBalsaMailbox* mailbox;
   GtkStyle* style;
   BalsaIconName icon;
   gboolean tmp_is_leaf, tmp_expanded;
@@ -1033,8 +1033,8 @@ numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
 {
   MailboxNode* mb1;
   MailboxNode* mb2;
-  Mailbox* m1;
-  Mailbox* m2;
+  LibBalsaMailbox* m1;
+  LibBalsaMailbox* m2;
   glong t1, t2;
   
   GtkCListRow *row1 = (GtkCListRow *) ptr1;
@@ -1078,7 +1078,7 @@ static gint
 mblist_mbnode_compare (gconstpointer a, gconstpointer b)
 {
   MailboxNode *mbnode = (MailboxNode *) a;
-  Mailbox *mailbox = (Mailbox *) b;
+  LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(b);
   
   if (mailbox == mbnode->mailbox)
     return 0;

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -18,7 +19,12 @@
  */
 
 #include "config.h"
+
 #include <string.h>
+
+#include <sys/utsname.h>
+
+#include "libbalsa.h"
 
 void mutt_message (const char *fmt,...);
 void mutt_exit (int code);
@@ -62,3 +68,43 @@ mutt_clear_error (void)
 {
 }
 
+/* We're gonna set Mutt global vars here */
+void
+libbalsa_init (gchar * inbox_path,
+	       void (*error_func) (const char *fmt,...))
+{
+  struct utsname utsname;
+  char *p;
+  gchar *tmp;
+
+  Spoolfile = inbox_path;
+
+  uname (&utsname);
+
+  Username = g_get_user_name ();
+
+  Homedir = g_get_home_dir ();
+
+  Realname = g_get_real_name ();
+
+  Hostname = libbalsa_get_hostname ();
+
+  mutt_error = error_func;
+
+  Fqdn = g_strdup (Hostname);
+
+  Sendmail = SENDMAIL;
+
+  Shell = g_strdup ((p = g_getenv ("SHELL")) ? p : "/bin/sh");
+  Tempdir = g_get_tmp_dir ();
+
+  if (UserHeader)
+    UserHeader = UserHeader->next;
+  UserHeader = mutt_new_list ();
+  tmp = g_malloc (17 + strlen (VERSION));
+  snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
+  UserHeader->data = g_strdup (tmp);
+  g_free (tmp);
+  
+  set_option(OPTSAVEEMPTY);
+}

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -17,20 +18,24 @@
  * 02111-1307, USA.
  */
 
-#ifndef __ADDRESS_H__
-#define __ADDRESS_H__
+#ifndef __LIBBALSA_ADDRESS_H__
+#define __LIBBALSA_ADDRESS_H__
 
 #include <glib.h>
-#include "libmutt/mutt.h"
 
-struct _Address
+struct _LibBalsaAddress
 {
   gchar *personal;		/* full text name */
   gchar *mailbox;		/* user name and host (mailbox name) on remote system */
 };
 
-Address *address_new(void);
-void address_free(Address *address);
-void address_list_free(GList *address_list);
+LibBalsaAddress *libbalsa_address_new(void);
+LibBalsaAddress *libbalsa_address_new_from_string (gchar *address);
+GList *libbalsa_address_new_list_from_string (gchar *address);
 
-#endif /* __ADDRESS_H__ */
+gchar *libbalsa_address_to_gchar (LibBalsaAddress * addr);
+
+void libbalsa_address_free(LibBalsaAddress *address);
+void libbalsa_address_list_free(GList *address_list);
+
+#endif /* __LIBBALSA_ADDRESS_H__ */

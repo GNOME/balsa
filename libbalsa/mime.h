@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -17,14 +18,14 @@
  * 02111-1307, USA.
  */
 
-#ifndef __MIME_H__
-#define __MIME_H__
+#ifndef __LIBBALSA_MIME_H__
+#define __LIBBALSA_MIME_H__
 
 #include <stdio.h>
 
-#include "mailbox.h"
+#include "libbalsa.h"
 
-GString * content2reply (Message * message,
+GString * content2reply (LibBalsaMessage * message,
 			 gchar *reply_prefix_str);  /* arp */
 
 #endif /* __MIME_H__ */

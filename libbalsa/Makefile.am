@@ -11,11 +11,13 @@ libbalsa_a_SOURCES = 		\
 	message.c		\
 	message.h		\
 	body.h			\
+	body.c			\
 	address.h		\
+	address.c		\
 	contact.h		\
+	contact.c		\
 	mime.h			\
 	misc.h			\
-	send.h			\
 	files.c			\
 	files.h			\
 	filter-error.c		\

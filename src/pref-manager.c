@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -619,7 +620,7 @@ update_pop3_servers (void)
 	gchar *text[2];
 	gint row;
 
-	Mailbox *mailbox;
+	LibBalsaMailbox *mailbox;
 
 	if (!pui)
 		return;
@@ -1565,7 +1566,7 @@ pop3_edit_cb (GtkWidget * widget, gpointer data)
 	GtkCList *clist = GTK_CLIST (pui->pop3servers);
 	gint row;
   
-	Mailbox *mailbox = NULL;
+	LibBalsaMailbox *mailbox = NULL;
 
 	if (!clist->selection)
 		return;
@@ -1591,7 +1592,7 @@ pop3_del_cb (GtkWidget * widget, gpointer data)
 	GtkCList *clist = GTK_CLIST (pui->pop3servers);
 	gint row;
 
-	Mailbox *mailbox = NULL;
+	LibBalsaMailbox *mailbox = NULL;
 
 	if (!clist->selection)
 		return;

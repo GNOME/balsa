@@ -48,14 +48,14 @@ extern "C"
 	 GtkWidget *attachments[4];
 	 GtkWidget *text;
 	 GdkFont   *font;
-	 Message *orig_message;
+	 LibBalsaMessage *orig_message;
 	 SendType type;
 	 const gchar * charset;
 	 GtkWidget * ready_widgets[2];
 	 GtkWidget * view_checkitems[VIEW_MENU_LENGTH];
    };
 
-  BalsaSendmsg * sendmsg_window_new (GtkWidget *, Message *, SendType);
+  BalsaSendmsg * sendmsg_window_new (GtkWidget *, LibBalsaMessage *, SendType);
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1999 Stuart Parmenter
  *
@@ -17,42 +18,44 @@
  * 02111-1307, USA.
  */
 
-#ifndef __MESSAGE_H__
-#define __MESSAGE_H__
+#ifndef __LIBBALSA_MESSAGE_H__
+#define __LIBBALSA_MESSAGE_H__
 
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include "mailbox.h"
-#include "address.h"
+#include <time.h>
 
-#include "libmutt/mutt.h"
+#include "libbalsa.h"
 
-typedef enum
-{
-  MESSAGE_FLAG_NEW = 1 << 1,
-  MESSAGE_FLAG_DELETED = 1 << 2,
-  MESSAGE_FLAG_REPLIED = 1 << 3,
-  MESSAGE_FLAG_FLAGGED = 1 << 4
-} MessageFlags;
+/*  #include "libmutt/mutt.h" */
 
 #define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
-#define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, Message))
-#define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, MessageClass))
+#define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
+#define LIBBALSA_MESSAGE_CLASS(klass)              (GTK_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_MESSAGE, LibBalsaMessageClass))
 #define LIBBALSA_IS_MESSAGE(obj)                   (GTK_CHECK_TYPE(obj, LIBBALSA_TYPE_MESSAGE))
 #define LIBBALSA_IS_MESSAGE_CLASS(klass)           (GTK_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_MESSAGE))
 
-struct _Message
+typedef struct _LibBalsaMessageClass LibBalsaMessageClass;
+typedef enum _LibBalsaMessageFlag LibBalsaMessageFlag;
+
+enum _LibBalsaMessageFlag
+{
+  LIBBALSA_MESSAGE_FLAG_NEW     = 1 << 1,
+  LIBBALSA_MESSAGE_FLAG_DELETED = 1 << 2,
+  LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 3,
+  LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 4
+};
+
+struct _LibBalsaMessage
 {
   GtkObject object;
 
-
-
   /* the mailbox this message belongs to */
-  Mailbox *mailbox;
+  LibBalsaMailbox *mailbox;
 
   /* flags */
-  MessageFlags flags;
+  LibBalsaMessageFlag flags;
 
   /* the ordered numberic index of this message in 
    * the mailbox beginning from 1, not 0 */
@@ -62,13 +65,12 @@ struct _Message
   gchar *remail;
 
   /* message composition date string */
-  gchar *date;
-  time_t datet;
+  time_t date;
 
   /* from, sender, and reply addresses */
-  Address *from;
-  Address *sender;
-  Address *reply_to;
+  LibBalsaAddress *from;
+  LibBalsaAddress *sender;
+  LibBalsaAddress *reply_to;
 
   /* subject line */
   gchar *subject;
@@ -79,7 +81,7 @@ struct _Message
   GList *bcc_list;
 
   /* File Carbon Copy Mailbox */
-  Mailbox *fcc_mailbox;
+  gchar *fcc_mailbox;
 
   /* replied message ID */
   gchar *references;
@@ -95,18 +97,20 @@ struct _Message
   GList *body_list;
 };
 
-typedef struct _MessageClass MessageClass;
-
-struct _MessageClass
+struct _LibBalsaMessageClass
 {
   GtkObjectClass parent_class;
 
   /* deal with flags being set/unset */
-  void (* clear_flags)    (Message *message);
-  void (* set_answered)   (Message *message, gboolean set);
-  void (* set_read)       (Message *message, gboolean set);
-  void (* set_deleted)    (Message *message, gboolean set);
-  void (* set_flagged)		(Message *message, gboolean set);
+  /* Signal: */
+  void (* status_changed) (LibBalsaMessage *message, LibBalsaMessageFlag flag, gboolean);
+
+  /* Virtual Functions: */
+  void (* clear_flags)    (LibBalsaMessage *message);
+  void (* set_answered)   (LibBalsaMessage *message, gboolean set);
+  void (* set_read)       (LibBalsaMessage *message, gboolean set);
+  void (* set_deleted)    (LibBalsaMessage *message, gboolean set);
+  void (* set_flagged)	  (LibBalsaMessage *message, gboolean set);
 };
 
 
@@ -115,34 +119,39 @@ GtkType libbalsa_message_get_type(void);
 /*
  * messages
  */
-Message *message_new(void);
-void message_destroy(Message *message);
+LibBalsaMessage *libbalsa_message_new(void);
 
-void message_copy (Message * message, Mailbox * dest);
-void message_move (Message * message, Mailbox * mailbox);
-void message_clear_flags (Message * message);
+void libbalsa_message_copy (LibBalsaMessage * message, LibBalsaMailbox * dest);
+void libbalsa_message_move (LibBalsaMessage * message, LibBalsaMailbox * mailbox);
+void libbalsa_message_clear_flags (LibBalsaMessage * message);
 
-void message_read (Message * message);
-void message_unread (Message * message);
-void message_delete (Message * message);
-void message_undelete (Message * message);
+void libbalsa_message_read (LibBalsaMessage * message);
+void libbalsa_message_unread (LibBalsaMessage * message);
+void libbalsa_message_delete (LibBalsaMessage * message);
+void libbalsa_message_undelete (LibBalsaMessage * message);
 
-void message_flag (Message * message);
-void message_unflag (Message * message);
+void libbalsa_message_flag (LibBalsaMessage * message);
+void libbalsa_message_unflag (LibBalsaMessage * message);
 
-void message_answer (Message * message);
-void message_reply (Message * message);
+void libbalsa_message_answer (LibBalsaMessage * message);
+void libbalsa_message_reply (LibBalsaMessage * message);
 
-void message_body_ref (Message * message);
-void message_body_unref (Message * message);
+void libbalsa_message_body_ref (LibBalsaMessage * message);
+void libbalsa_message_body_unref (LibBalsaMessage * message);
 
+gboolean libbalsa_message_send(LibBalsaMessage *message);
+gboolean libbalsa_message_postpone (LibBalsaMessage * message, 
+				    LibBalsaMessage * reply_message, 
+				    gchar * fcc);
 
 /*
  * misc message releated functions
  */
-const gchar *message_pathname (Message * message);
-const gchar *message_charset  (Message *message);
-gint message_has_attachment (Message* message);
+gchar *libbalsa_message_date_to_gchar (LibBalsaMessage * message, const gchar *date_string);
+const gchar *libbalsa_message_pathname (LibBalsaMessage * message);
+const gchar *libbalsa_message_charset  (LibBalsaMessage *message);
+gint libbalsa_message_has_attachment (LibBalsaMessage* message);
 
-GList *message_user_hdrs(Message *message);
-#endif /* __MESSAGE_H__ */
+GList *libbalsa_message_user_hdrs(LibBalsaMessage *message);
+
+#endif /* __LIBBALSA_MESSAGE_H__ */

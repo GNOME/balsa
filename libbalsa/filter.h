@@ -106,13 +106,13 @@ gint filter_load (GList * filter_list,
 gint filter_save (GList * filter_list,
                   gchar * filter_file);
 gint filter_run_all (GList * filter_list,
-                     Message * message);
+                     LibBalsaMessage * message);
 gint filter_run_group (GList * filter_list,
-                       Message * message, gint group);
+                       LibBalsaMessage * message, gint group);
 gint filter_run_nth (GList * filter_list,
-                     Message * message, gint n);
+                     LibBalsaMessage * message, gint n);
 gint filter_run_single (filter * filt,
-                        Message * message);
+                        LibBalsaMessage * message);
 void filter_free (filter * fil,
                   gpointer throwaway);
 /*

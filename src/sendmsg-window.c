@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:2; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1998-1999 Jay Painter and Stuart Parmenter
  *
@@ -32,12 +33,12 @@
 #endif
 #include <errno.h>
 
+#include "libbalsa.h"
+
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-index.h"
-#include "misc.h"
-#include "mime.h"
-#include "send.h"
+
 #include "sendmsg-window.h"
 #include "address-book.h"
 #include "main.h"
@@ -326,7 +327,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 
    if(bsm->orig_message) {
        if(bsm->orig_message->mailbox) 
-	   mailbox_open_unref(bsm->orig_message->mailbox);
+	 libbalsa_mailbox_close(bsm->orig_message->mailbox);
        gtk_object_unref( GTK_OBJECT(bsm->orig_message) );
    }
 
@@ -746,11 +747,11 @@ create_text_area (BalsaSendmsg * msg)
    NOTE that rbdy == NULL if message has no text parts.
 */
 static void
-continueBody(BalsaSendmsg *msg, Message * message)
+continueBody(BalsaSendmsg *msg, LibBalsaMessage * message)
 {
    GString *rbdy;
 
-   message_body_ref (message);
+   libbalsa_message_body_ref (message);
    rbdy = content2reply (message, NULL); 
    if(rbdy) {
       gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
@@ -758,20 +759,21 @@ continueBody(BalsaSendmsg *msg, Message * message)
       g_string_free (rbdy, TRUE);
    }
 
-   if(!msg->charset) msg->charset = message_charset(message);
-   message_body_unref (message);
+   if(!msg->charset) msg->charset = libbalsa_message_charset(message);
+   libbalsa_message_body_unref (message);
 }
 
 /* quoteBody ------------------------------------------------------------
    quotes properly the body of the message
 */
 static void 
-quoteBody(BalsaSendmsg *msg, Message * message, SendType type)
+quoteBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
 {
    GString *rbdy;
    gchar *str, *personStr;
+   gchar *date;
 
-   message_body_ref (message);
+   libbalsa_message_body_ref (message);
    
    personStr = (message->from && message->from->personal) ?
       message->from->personal : _("you");
@@ -782,9 +784,11 @@ quoteBody(BalsaSendmsg *msg, Message * message, SendType type)
        * 	tmp = g_strdup_printf (buf);
        * so the date attribution can fully (and properly) translated.
        */
-   if(message->date)
-      str = g_strdup_printf (_("On %s %s wrote:\n"), message->date, personStr);
-   else
+   if(message->date) {
+     date = libbalsa_message_date_to_gchar (message, balsa_app.date_string);
+     str = g_strdup_printf (_("On %s %s wrote:\n"), date, personStr);
+     g_free(date);
+   } else
       str = g_strdup_printf (_("%s wrote:\n"), personStr);
 
 
@@ -801,8 +805,8 @@ quoteBody(BalsaSendmsg *msg, Message * message, SendType type)
       g_string_free (rbdy, TRUE);
    }
 
-   if(!msg->charset) msg->charset = message_charset(message);
-   message_body_unref (message);
+   if(!msg->charset) msg->charset = libbalsa_message_charset(message);
+   libbalsa_message_body_unref (message);
 }
 
 /* fillBody --------------------------------------------------------------
@@ -810,7 +814,7 @@ quoteBody(BalsaSendmsg *msg, Message * message, SendType type)
    First quotes the original one and then adds the signature
 */
 static void
-fillBody(BalsaSendmsg *msg, Message * message, SendType type)
+fillBody(BalsaSendmsg *msg, LibBalsaMessage * message, SendType type)
 {
    gchar *signature;
    gint pos = 0;
@@ -840,7 +844,7 @@ fillBody(BalsaSendmsg *msg, Message * message, SendType type)
 
 
 BalsaSendmsg *
-sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
+sendmsg_window_new (GtkWidget * widget, LibBalsaMessage * message, SendType type)
 {
   GtkWidget *window;
   GtkWidget *paned = gtk_vpaned_new ();
@@ -879,7 +883,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
                 /* reference the original mailbox so we don't loose the
 		   mail even if the mailbox is closed */
       if(message->mailbox)
-	  mailbox_open_ref(message->mailbox);
+	libbalsa_mailbox_open(message->mailbox, FALSE);
   }
   msg->window  = window;
   msg->type    = type;
@@ -902,14 +906,14 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   /* To: */
   if (type == SEND_REPLY || type == SEND_REPLY_ALL)
     {
-      Address *addr = NULL;
+      LibBalsaAddress *addr = NULL;
 
       if (message->reply_to)
 	addr = message->reply_to;
       else
 	addr = message->from;
 
-      tmp = address_to_gchar (addr);
+      tmp = libbalsa_address_to_gchar (addr);
       gtk_entry_set_text (GTK_ENTRY (msg->to[1]), tmp);
       g_free (tmp);
     }
@@ -937,7 +941,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   {
     if (type == SEND_CONTINUE && message->fcc_mailbox != NULL)
       gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(msg->fcc[1])->entry),
-                          message->fcc_mailbox->name);
+                          message->fcc_mailbox);
   }
 
   /* Subject: */
@@ -1203,41 +1207,41 @@ strip_chars(gchar *str, const gchar * char2strip)
    contain them. Such characters might screw up message formatting
    (consider moving this code to mutt part).
 */
-static Message *
+static LibBalsaMessage *
 bsmsg2message(BalsaSendmsg *bsmsg)
 {
-  Message * message;
-  Body * body;
+  LibBalsaMessage * message;
+  LibBalsaMessageBody * body;
   gchar * tmp;
   gchar recvtime[50];
   struct tm *footime;
 
   g_assert(bsmsg != NULL);
-  message = message_new ();
+  message = libbalsa_message_new ();
 
-  message->from = make_address_from_string(gtk_entry_get_text 
+  message->from = libbalsa_address_new_from_string(gtk_entry_get_text 
 					   (GTK_ENTRY (bsmsg->from[1])));
 
   message->subject = g_strdup (gtk_entry_get_text 
 			       (GTK_ENTRY (bsmsg->subject[1])));
   strip_chars(message->subject,"\r\n");
 
-  message->to_list = make_list_from_string (
+  message->to_list = libbalsa_address_new_list_from_string (
      gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1])));
-  message->cc_list = make_list_from_string (
+  message->cc_list = libbalsa_address_new_list_from_string (
      gtk_entry_get_text (GTK_ENTRY (bsmsg->cc[1])));
-  message->bcc_list = make_list_from_string (
+  message->bcc_list = libbalsa_address_new_list_from_string (
      gtk_entry_get_text (GTK_ENTRY (bsmsg->bcc[1])));
   
   if( (tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->reply_to[1]))) != NULL &&
       strlen(tmp)>0) 
-     message->reply_to = make_address_from_string(tmp);
+     message->reply_to = libbalsa_address_new_from_string(tmp);
 
   if (bsmsg->orig_message != NULL && 
       !GTK_OBJECT_DESTROYED(bsmsg->orig_message) ) {
     message->references = g_strdup (bsmsg->orig_message->message_id);
     
-    footime = localtime (&bsmsg->orig_message->datet);
+    footime = localtime (&bsmsg->orig_message->date);
     strftime (recvtime, sizeof (recvtime), "%a, %b %d, %Y at %H:%M:%S %z", footime);
     message->in_reply_to = g_strconcat (bsmsg->orig_message->message_id, 
                                         "; from ", 
@@ -1247,13 +1251,13 @@ bsmsg2message(BalsaSendmsg *bsmsg)
                                         NULL);
   }
   
-  body = body_new ();
+  body = libbalsa_message_body_new ();
 
   body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
 					gtk_text_get_length (
 					   GTK_TEXT (bsmsg->text)));
   if(balsa_app.wordwrap)
-     wrap_string (body->buffer, balsa_app.wraplength);
+     libbalsa_wrap_string (body->buffer, balsa_app.wraplength);
 
   body->charset = g_strdup(bsmsg->charset);
 
@@ -1262,7 +1266,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
   {				/* handle attachments */
     gint i;
     for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments[1])->icons; i++) {
-      body = body_new ();
+      body = libbalsa_message_body_new ();
 	/* PKGW: This used to be g_strdup'ed. However, the original pointer 
 	   was strduped and never freed, so we'll take it. */
       body->filename = (gchar *) 
@@ -1279,7 +1283,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
 static gint
 send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-  Message *message;
+  LibBalsaMessage *message;
   gchar *tmp;
   gchar *def_charset;
 
@@ -1288,9 +1292,10 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message = bsmsg2message (bsmsg);
 
   tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
-  message->fcc_mailbox = tmp != NULL ? 
-      balsa_find_mbox_by_name(tmp) : NULL;
-  
+  if ( tmp )
+    message->fcc_mailbox = g_strdup(tmp);
+  else
+    message->fcc_mailbox = NULL;
 
   /* not a really nice way of setting and restoring charset..  */
   def_charset =  balsa_app.charset;
@@ -1298,18 +1303,18 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   if(balsa_app.debug) 
      fprintf(stderr, "sending with charset: %s\n", balsa_app.charset);
 
-  if (balsa_send_message (message)) {
+  if (libbalsa_message_send (message)) {
     if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
       {
       if (bsmsg->orig_message)
-	    message_reply (bsmsg->orig_message);
+	    libbalsa_message_reply (bsmsg->orig_message);
       }
     else if (bsmsg->type == SEND_CONTINUE)
       {
         if (bsmsg->orig_message)
           {
-            message_delete (bsmsg->orig_message);
-            mailbox_commit_flagged_changes (bsmsg->orig_message->mailbox);
+            libbalsa_message_delete (bsmsg->orig_message);
+            libbalsa_mailbox_commit_changes (bsmsg->orig_message->mailbox);
           }
         if (message->in_reply_to)
           {
@@ -1323,7 +1328,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   if(bsmsg->charset) balsa_app.charset = def_charset;
 
   g_list_free (message->body_list);
-  message_destroy (message);
+  gtk_object_destroy (GTK_OBJECT(message));
   balsa_sendmsg_destroy (bsmsg);
 
   return TRUE;
@@ -1333,27 +1338,27 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 static gint
 postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-  Message *message;
+  LibBalsaMessage *message;
 
   message = bsmsg2message(bsmsg);
 
   if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
       && bsmsg->orig_message)
-     balsa_postpone_message (message, bsmsg->orig_message, 
-			     gtk_entry_get_text (
-				GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
+     libbalsa_message_postpone (message, bsmsg->orig_message, 
+				gtk_entry_get_text (
+					GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
   else
-     balsa_postpone_message (message, NULL, gtk_entry_get_text (
+     libbalsa_message_postpone (message, NULL, gtk_entry_get_text (
 	GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
 
  if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message)
    {
-     message_delete (bsmsg->orig_message);
-     mailbox_commit_flagged_changes (bsmsg->orig_message->mailbox);
+     libbalsa_message_delete (bsmsg->orig_message);
+     libbalsa_mailbox_commit_changes (bsmsg->orig_message->mailbox);
    }
 
   g_list_free (message->body_list);
-  message_destroy (message);
+  gtk_object_destroy (GTK_OBJECT(message));
   balsa_sendmsg_destroy (bsmsg);
 
   return TRUE;
@@ -1431,7 +1436,7 @@ wrap_body_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
    pos = gtk_editable_get_position(GTK_EDITABLE(bsmsg->text));
 
    the_text = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text),0,-1);
-   wrap_string(the_text, balsa_app.wraplength);
+   libbalsa_wrap_string(the_text, balsa_app.wraplength);
 
    gtk_text_freeze(GTK_TEXT(bsmsg->text));
    gtk_editable_delete_text(GTK_EDITABLE(bsmsg->text),0,-1);
@@ -1550,7 +1555,7 @@ set_menus(BalsaSendmsg *msg)
 
    for(i=0; i<ELEMENTS(headerDescs); i++) {
       msg->view_checkitems[i] = view_menu[i].widget;
-      if(find_word(headerDescs[i].name, balsa_app.compose_headers) ) {
+      if(libbalsa_find_word(headerDescs[i].name, balsa_app.compose_headers) ) {
 	 /* show... (well, it has already been shown). */
 	 gtk_check_menu_item_set_active(
 	    GTK_CHECK_MENU_ITEM(view_menu[i].widget), TRUE );

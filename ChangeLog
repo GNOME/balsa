@@ -1,4 +1,10 @@
 1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
+	* src/index-child.c (index_child_setup_dnd): changed the drag icon
+	(index_child_create_view): unset "use_drag_icons" & "reorderable"
+	clist flags. 
+
+	* src/pref-manager.c (apply_prefs): replyto field chages were
+	not saved. fixed.
 
 	* src/index-child.c src/mblist-window.c : add some dnd trace code
 	cause dnd does not work anymore.

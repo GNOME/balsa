@@ -215,6 +215,9 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   g_free (balsa_app.address->mailbox);
   balsa_app.address->mailbox = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email)));
 
+  g_free (balsa_app.replyto);
+  balsa_app.replyto = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->replyto)));
+
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->smtp_server)));
 

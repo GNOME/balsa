@@ -285,6 +285,8 @@ index_child_create_view (GnomeMDIChild * child, gpointer data)
 		      (GtkSignalFunc) index_select_cb, ic);
 
   /* setup the dnd stuff for the messages */
+  gtk_object_set( GTK_OBJECT(ic->index), "use_drag_icons", FALSE, NULL);
+  gtk_object_set( GTK_OBJECT(ic->index), "reorderable", FALSE, NULL);
   index_child_setup_dnd ( child );
 
   if (balsa_app.previewpane)
@@ -569,15 +571,25 @@ static void
 index_child_setup_dnd ( GnomeMDIChild * child )
 {
   IndexChild *ic;
+  GdkPixmap *drag_pixmap;
+  GdkPixmap *drag_mask;
+  GdkColormap *cmap;
 
   ic = INDEX_CHILD(child);
-   
+
+  cmap = gtk_widget_get_colormap (GTK_WIDGET (ic->index));
+  gnome_stock_pixmap_gdk ("Mail", "regular", &drag_pixmap, &drag_mask);
+  
   gtk_drag_source_set (GTK_WIDGET (ic->index), GDK_BUTTON1_MASK | GDK_BUTTON3_MASK,
 		       drag_types, ELEMENTS (drag_types),
 		       GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-  
+  gtk_drag_source_set_icon(GTK_WIDGET (ic->index), cmap, drag_pixmap, drag_mask);
+
   gtk_signal_connect (GTK_OBJECT (ic->index), "drag_data_get",
       GTK_SIGNAL_FUNC (index_child_drag_data_get), NULL);
+  
+  gdk_pixmap_unref (drag_pixmap);
+  gdk_pixmap_unref (drag_mask);
 
 
 }
@@ -631,4 +643,3 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   g_free( message_list );
   
 }
-

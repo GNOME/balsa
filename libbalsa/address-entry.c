@@ -2225,7 +2225,7 @@ lbae_name_in_model(const gchar * name, GtkTreeModel * model,
         gtk_tree_model_get(model, &iter,
                            NAME_COL, &this_name,
                            ADDRESS_COL, &this_address, -1);
-        if (strcmp(name, this_name) == 0) {
+        if (this_name && strcmp(name, this_name) == 0) {
             if (address)
                 *address = this_address;
             else if (this_address)
@@ -2377,16 +2377,13 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
     GtkTreeModel *model;
     GtkListStore *store;
     GtkTreeIter iter;
-#if WE_CAN_REMOVE_ROWS
     gboolean valid;
-#endif                          /* WE_CAN_REMOVE_ROWS */
 
     info = g_object_get_data(G_OBJECT(completion),
                              LIBBALSA_ADDRESS_ENTRY_INFO);
     model = gtk_entry_completion_get_model(completion);
     store = GTK_LIST_STORE(model);
 
-#if WE_CAN_REMOVE_ROWS
     /* Remove any previous autocompletion row; it has a NULL address. */
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;) {
         LibBalsaAddress *address;
@@ -2395,8 +2392,9 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
         valid = address ? gtk_tree_model_iter_next(model, &iter) :
             gtk_list_store_remove(store, &iter);
     }
+    /* Synchronize the filtered model. */
+    gtk_entry_completion_complete(completion);
 
-#endif                          /* WE_CAN_REMOVE_ROWS */
     for (; match; match = match->next) {
         gchar *name;
 

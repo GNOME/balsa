@@ -53,6 +53,11 @@ static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 
+static gboolean libbalsa_mailbox_local_message_match(LibBalsaMailbox *
+						     mailbox, guint msgno,
+						     LibBalsaMailboxSearchIter
+						     * iter);
+
 static void libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox *mbox,
                                                    GSList * filter_list);
 
@@ -131,6 +136,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     libbalsa_mailbox_class->load_config =
 	libbalsa_mailbox_local_load_config;
 
+    libbalsa_mailbox_class->message_match = 
+        libbalsa_mailbox_local_message_match;
     libbalsa_mailbox_class->mailbox_match = 
         libbalsa_mailbox_local_real_mbox_match;
     libbalsa_mailbox_class->set_threading =
@@ -307,6 +314,18 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
     libbalsa_notify_register_mailbox(mailbox);
 }
 
+/* Search iters */
+static gboolean
+libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
+				     guint msgno,
+				     LibBalsaMailboxSearchIter * iter)
+{
+    LibBalsaMessage *message =
+	libbalsa_mailbox_get_message(mailbox, msgno);
+
+    return match_condition(iter->condition, message, TRUE);
+}
+
 static void
 libbalsa_mailbox_local_real_mbox_match(LibBalsaMailbox * mbox,
 				       GSList * filter_list)
@@ -364,7 +383,8 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
     guint new_messages = 0;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
-    if (MAILBOX_CLOSED(mailbox))
+    if (!mailbox->msg_tree)
+	/* Mailbox is closed, or no view has been created. */
 	return;
 
     while (++msgno <= libbalsa_mailbox_total_messages(mailbox))

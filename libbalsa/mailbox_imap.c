@@ -90,9 +90,13 @@ static GMimeStream *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 							     LibBalsaMessage *
 							     message);
 static void libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox);
+
+static void
+libbalsa_mailbox_imap_search_iter_free(LibBalsaMailboxSearchIter * iter);
 static gboolean libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox,
-						    LibBalsaMessage * msg,
-						    LibBalsaCondition *ct);
+						    guint msgno,
+						    LibBalsaMailboxSearchIter
+						    * search_iter);
 static void hash_table_to_list_func(gpointer key,
 				    gpointer value,
 				    gpointer data);
@@ -218,6 +222,9 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     libbalsa_mailbox_class->close_mailbox = libbalsa_mailbox_imap_close;
 
     libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
+    
+    libbalsa_mailbox_class->search_iter_free =
+	libbalsa_mailbox_imap_search_iter_free;
     libbalsa_mailbox_class->message_match =
 	libbalsa_mailbox_imap_message_match;
     libbalsa_mailbox_class->mailbox_match =
@@ -864,6 +871,58 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
     run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));
 }
 
+/* Search iters */
+
+static ImapSearchKey *lbmi_build_imap_query(LibBalsaCondition * cond,
+					    ImapSearchKey * last);
+static gboolean
+libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
+				    LibBalsaMailboxSearchIter * search_iter)
+{
+    LibBalsaMailboxImap *mimap;
+    struct message_info *msg_info;
+    GHashTable *matchings;
+
+    mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    msg_info = message_info_from_msgno(mimap, msgno);
+
+    if (!msg_info->message && 
+	imap_mbox_handle_get_msg(mimap->handle, msgno)) 
+	libbalsa_mailbox_imap_get_message(mailbox, msgno);
+
+    if (msg_info->message)
+	return match_condition(search_iter->condition, msg_info->message,
+			       TRUE);
+
+    matchings = search_iter->user_data;
+    if (!matchings) {
+	ImapSearchKey* query;
+	ImapResult rc;
+
+	search_iter->user_data = matchings = g_hash_table_new(NULL, NULL);
+	query = lbmi_build_imap_query(search_iter->condition, NULL);
+	rc = imap_mbox_filter_msgnos(mimap->handle, query, matchings);
+	imap_search_key_free(query);
+	if (rc != IMR_OK) {
+	    g_hash_table_destroy(matchings);
+	    search_iter->user_data = NULL;
+	    return FALSE;
+	}
+    }
+
+    return g_hash_table_lookup(matchings, GUINT_TO_POINTER(msgno)) != NULL;
+}
+
+static void
+libbalsa_mailbox_imap_search_iter_free(LibBalsaMailboxSearchIter * iter)
+{
+    GHashTable *matchings = iter->user_data;
+
+    if (matchings)
+	g_hash_table_destroy(matchings);
+    /* iter->condition and iter are freed in the LibBalsaMailbox method. */
+}
+
 static ImapSearchKey*
 lbmi_build_imap_query(LibBalsaCondition* cond, ImapSearchKey *last)
 {
@@ -1028,54 +1087,6 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 			     LIBBALSA_MAILBOX(mbox)->url);
     };
     return cbdata->res;
-}
-
-/* This function download the UID via the SEARCH command if necessary
-   ie if the search has not already been done (eg "search" will 
-   firstly download the matching messages, and "search again" will
-   only look in the already dowloaded hash table) and once this is done
-   it will lookup the given message (falling back to filter methods if
-   the IMAP command has failed).
- */
-
-static gboolean
-libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mbox,
-				    LibBalsaMessage * message,
-				    LibBalsaCondition *condition)
-{
-#if 0
-    /* FIXME: whole searching code needs to be fixed */
-    LibBalsaMailboxImap * mailbox = LIBBALSA_MAILBOX_IMAP(mbox);
-    gboolean error;
-    GSList * cnds;
-
-    if (!mailbox->matching_messages || op!=mailbox->op
-	|| !mailbox->conditions
-	|| !libbalsa_conditions_compare(conditions, mailbox->conditions)) {
-	/* New search, build the matching messages hash table */
-	mailbox->op = op;
-	libbalsa_conditions_free(mailbox->conditions);
-	mailbox->conditions = NULL;
-	/* We copy the conditions */
-	for (cnds = conditions;cnds;cnds = g_slist_next(cnds))
-	    mailbox->conditions =
-		g_slist_prepend(mailbox->conditions,
-				libbalsa_condition_clone(cnds->data));
- 	if (mailbox->matching_messages)
- 	    g_hash_table_destroy(mailbox->matching_messages);
- 	mailbox->matching_messages =
- 	    libbalsa_mailbox_imap_get_matchings(mailbox, op, conditions,
- 						FALSE, &error);
-     }
-
-    if (!error)
-	return g_hash_table_lookup(mailbox->matching_messages, message)!=NULL;
-    /* On error fall back to the default match_conditions function 
-       BE CAREFUL HERE : the mailbox must NOT BE LOCKED here
-    */
-    else return match_conditions(op, conditions, message, FALSE);
-#endif
-    return FALSE;
 }
 
 static void hash_table_to_list_func(gpointer key,

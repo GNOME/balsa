@@ -23,6 +23,31 @@
 #include "misc.h"
 
 
+void
+add_mailbox_config (gint num, gchar * name, gchar * path, gint type)
+{
+  GString *gstring;
+
+  gstring = g_string_new (NULL);
+
+  gnome_config_push_prefix ("/balsa/Accounts/");
+  g_string_truncate (gstring, 0);
+  g_string_sprintf (gstring, "%i", num);
+  gnome_config_set_string (gstring->str, name);
+  gnome_config_pop_prefix ();
+
+  g_string_truncate (gstring, 0);
+  g_string_sprintf (gstring, "/balsa/%s/", name);
+  gnome_config_push_prefix (gstring->str);
+  gnome_config_set_string ("Name", name);
+  gnome_config_set_string ("Path", path);
+  gnome_config_set_int ("Type", type);
+  gnome_config_pop_prefix ();
+
+  gnome_config_sync ();
+  g_string_free (gstring, 1);
+}
+
 
 void
 restore_global_settings ()

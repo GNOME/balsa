@@ -1,3 +1,12 @@
+2000-12-16  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-mblist.c (mblist_drag_cb): Refresh destination index
+	page after transferring to fix segfault bug.
+	* src/main-window.c: Add drag and drop to notebook tabs of other
+	mailboxes.
+	* src/sendmsg-window.c: Set locale font for other fields than To:
+	and Subject:
+	
 2000-12-15  Matthew Guenther  <guentherm@asme.org>
 
 	* libbalsa/messages.[ch]: Add function libbalsa_messages_copy.

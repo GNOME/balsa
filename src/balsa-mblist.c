@@ -1542,6 +1542,7 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
                 guint info, guint32 time, gpointer data)
 {
     BalsaMBList* bmbl;
+    BalsaIndexPage* page;
     GtkCTree* ctree;
     GtkCTreeNode* node;
     LibBalsaMailbox* mailbox;
@@ -1596,6 +1597,9 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
             }
             
             libbalsa_mailbox_commit_changes (orig_mailbox);
+
+            if ((page = balsa_find_notebook_page (mailbox)))
+                balsa_index_page_reset (page);
         }
     }
 

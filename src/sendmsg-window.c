@@ -2090,9 +2090,17 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 	/* Set the new message style */
 	style = gtk_style_copy(gtk_widget_get_style(msg->text));
 	style->font = msg->font;
-	gtk_widget_set_style(msg->text,       style);
-	gtk_widget_set_style(msg->to[1],      style);
-	gtk_widget_set_style(msg->subject[1], style);
+	gtk_widget_set_style (msg->text, style);
+	gtk_widget_set_style (msg->to[1], style);
+        gtk_widget_set_style (msg->from[1], style);
+	gtk_widget_set_style (msg->subject[1], style);
+        gtk_widget_set_style (msg->cc[1], style);
+        gtk_widget_set_style (msg->bcc[1], style);
+        gtk_widget_set_style (msg->fcc[1], style);
+        gtk_widget_set_style (msg->reply_to[1], style);
+        gtk_widget_set_style (msg->comments[1], style);
+        gtk_widget_set_style (msg->keywords[1], style);
+
 	gtk_style_unref(style);
     }				/* endif: font found */
     return FALSE;

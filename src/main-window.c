@@ -68,6 +68,15 @@ enum {
     LAST_SIGNAL
 };
 
+enum {
+    TARGET_MESSAGES
+};
+
+#define NUM_DROP_TYPES 1
+static GtkTargetEntry notebook_drop_types[NUM_DROP_TYPES] = {
+    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
+};
+
 #ifdef BALSA_USE_THREADS
 /* Define thread-related globals, including dialogs */
 GtkWidget *progress_dialog = NULL;
@@ -176,6 +185,14 @@ static void notebook_switch_page_cb(GtkWidget * notebook,
 				    GtkNotebookPage * page,
 				    guint page_num);
 static void send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
+static BalsaIndexPage* notebook_find_page (GtkNotebook* notebook, 
+                                           gint x, gint y);
+static void notebook_drag_received_cb (GtkWidget* widget, 
+                                            GdkDragContext* context, 
+                                            gint x, gint y, 
+                                            GtkSelectionData* selection_data, 
+                                            guint info, guint32 time, 
+                                            gpointer data);
 
 static GnomeUIInfo file_new_menu[] = {
 #define MENU_FILE_NEW_MESSAGE_POS 0
@@ -606,11 +623,17 @@ balsa_window_new()
     window->notebook = gtk_notebook_new();
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook),
 			       balsa_app.show_notebook_tabs);
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
+    gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
+    gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
     gtk_signal_connect(GTK_OBJECT(window->notebook), "size_allocate",
 		       GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL);
     gtk_signal_connect(GTK_OBJECT(window->notebook), "switch_page",
 		       GTK_SIGNAL_FUNC(notebook_switch_page_cb), NULL);
+    gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
+                       notebook_drop_types, NUM_DROP_TYPES,
+                       GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
+    gtk_signal_connect (GTK_OBJECT (window->notebook), "drag-data-received",
+                        GTK_SIGNAL_FUNC (notebook_drag_received_cb), NULL);
     balsa_app.notebook = window->notebook;
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -2121,4 +2144,105 @@ static void
 send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
 {
     balsa_window_enable_continue();
+}
+
+
+/* notebook_find_page
+ * 
+ * Description: Finds the page from which notebook page tab the
+ * coordinates are over.
+ **/
+static BalsaIndexPage*
+notebook_find_page (GtkNotebook* notebook, gint x, gint y)
+{
+    GtkWidget* page;
+    GtkWidget* label;
+    gint page_num = 0;
+    gint label_x;
+    gint label_y;
+    gint label_width;
+    gint label_height;
+    
+
+    while ((page = gtk_notebook_get_nth_page (notebook, page_num)) != NULL) {
+        label = gtk_notebook_get_tab_label (notebook, page);
+        
+        label_x = label->allocation.x;
+        label_width = label->allocation.width;
+        
+        if (x > label_x && x < label_x + label_width) {
+            label_y = label->allocation.y;
+            label_height = label->allocation.height;
+            
+            if (y > label_y && y < label_y + label_height) {
+                page = gtk_object_get_data(GTK_OBJECT(page), "indexpage");
+                return BALSA_INDEX_PAGE (page);
+            }
+        }
+        ++page_num;
+    }
+
+    return NULL;
+}
+
+
+/* notebook_drag_received_cb
+ * 
+ * Description: Signal handler for the drag-data-received signal from
+ * the GtkNotebook widget.  Finds the tab the messages were dragged
+ * over, then transfers them.
+ **/
+static void
+notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context, 
+                           gint x, gint y, 
+                           GtkSelectionData* selection_data, 
+                           guint info, guint32 time, gpointer data)
+{
+    BalsaIndexPage* page;
+    LibBalsaMailbox* mailbox;
+    LibBalsaMailbox* orig_mailbox;
+    GList* messages = NULL;
+    LibBalsaMessage** message_array;
+    gint i = 0;
+
+
+    page = notebook_find_page (GTK_NOTEBOOK (widget), x, y);
+    
+    if (page == NULL)
+        return;
+    
+    mailbox = BALSA_INDEX (page->index)->mailbox;
+    message_array = (LibBalsaMessage**) selection_data->data;
+
+    if (message_array[i] != NULL) {
+        while (message_array[i] != NULL) {
+            messages = g_list_append (messages, message_array[i]);
+            ++i;
+        }
+    } else {
+        return;
+    }
+        
+    orig_mailbox = ((LibBalsaMessage*) messages->data)->mailbox;
+    
+    if (mailbox != NULL && mailbox != orig_mailbox) {
+        switch (context->suggested_action) {
+        case GDK_ACTION_MOVE:
+            libbalsa_messages_move (messages, mailbox);
+            context->action = context->suggested_action;
+            break;
+            
+        case GDK_ACTION_DEFAULT:
+        case GDK_ACTION_COPY:
+        default:
+            libbalsa_messages_copy (messages, mailbox);
+            context->action = context->suggested_action;
+            break;
+        }
+        
+        libbalsa_mailbox_commit_changes (orig_mailbox);
+        balsa_index_page_reset (page);
+    }
+
+    g_list_free (messages);
 }

@@ -1,3 +1,8 @@
+2000-08-21  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox.c(libbalsa_mailbox_load_messages):
+	Clear the unread messages flag if there are no unread messages.
+
 2000-08-21  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libmutt/pop.c: fix the scary POP bug by closing spool mailbox.

@@ -408,6 +408,8 @@ libbalsa_mailbox_load_messages (LibBalsaMailbox * mailbox)
 
 	if (mailbox->unread_messages > 0)
 		libbalsa_mailbox_set_unread_messages_flag(mailbox,TRUE);
+	else
+		libbalsa_mailbox_set_unread_messages_flag(mailbox,FALSE);
 }
 
 

@@ -50,7 +50,6 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     const GMimeContentType *type;
     GMimeStream *stream, *filter_stream;
     const char *charset;
-    GMimeFilter *filter;
 
     switch (libbalsa_message_body_type(body)) {
     case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -75,8 +74,13 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	charset = libbalsa_message_body_charset(body);
 	if (!charset)
 	    charset="us-ascii";
-	filter = g_mime_filter_charset_new(charset, "UTF-8");
-	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+	if (g_ascii_strcasecmp(charset, "unknown-8bit")) {
+	    GMimeFilter *filter =
+		g_mime_filter_charset_new(charset, "UTF-8");
+	    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
+				     filter);
+	    g_object_unref(filter);
+	}
 	const_res=g_mime_part_get_content(GMIME_PART(body->mime_part),
 					  &allocated);
 	if (!allocated || g_mime_stream_write(filter_stream, (char*)const_res,
@@ -90,7 +94,6 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	}
 	g_mime_stream_unref(filter_stream);
 	g_mime_stream_unref(stream);
-	g_object_unref(G_OBJECT(filter));
 
 #ifdef HAVE_GPGME
 	/* if this is a RFC 2440 signed part, strip the signature status */

@@ -300,9 +300,8 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     const char *buf;
     ssize_t len;
     GMimeStream *stream, *filter_stream;
-    gchar *mime_type=NULL;
+    gchar *mime_type;
     const char *charset;
-    GMimeFilter *filter;
 
     stream = g_mime_stream_fs_new(fd);
     filter_stream = g_mime_stream_filter_new_with_stream(stream);
@@ -314,11 +313,15 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
 	charset = libbalsa_message_body_charset(body);
 	if (!charset)
 	    charset="us-ascii";
-	filter = g_mime_filter_charset_new(charset, "UTF-8");
-	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
-	g_object_unref(G_OBJECT(filter));
+	if (g_ascii_strcasecmp(charset, "unknown-8bit")) {
+	    GMimeFilter *filter =
+		g_mime_filter_charset_new(charset, "UTF-8");
+	    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
+				     filter);
+	    g_object_unref(G_OBJECT(filter));
+	}
+	g_free(mime_type);
     }
-    g_free(mime_type);
 
     buf = libbalsa_mailbox_get_message_part(body->message, body, &len);
     if (len && g_mime_stream_write(filter_stream, (char*)buf, len) == -1) {

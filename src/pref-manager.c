@@ -1180,6 +1180,10 @@ incoming_page()
 	GtkWidget *table7;
 	GtkWidget *label33;
 	GtkObject *spinbutton4_adj;
+        GtkWidget* regex_frame;
+        GtkWidget* regex_hbox;
+        GtkWidget* regex_label;
+        GtkWidget* regex_entry;
 
 	vbox1 = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show(vbox1);
@@ -1213,6 +1217,24 @@ incoming_page()
 	gtk_table_attach (GTK_TABLE (table7),   pui->check_mail_auto, 0, 1, 0, 1,
 			  (GtkAttachOptions) (GTK_FILL),
 			  (GtkAttachOptions) (0), 0, 0);
+
+        /* Quoted text regular expression */
+        regex_frame = gtk_frame_new (_ ("Quoted Text"));
+        gtk_container_set_border_width (GTK_CONTAINER (regex_frame), 2);
+        gtk_box_pack_start (GTK_BOX (vbox1), regex_frame, FALSE, FALSE, 0);
+        
+        regex_hbox = gtk_hbox_new (FALSE, 0);
+        gtk_container_add (GTK_CONTAINER (regex_frame), regex_hbox);
+        gtk_container_set_border_width (GTK_CONTAINER (regex_hbox), 5);
+        
+        regex_label = gtk_label_new (_ ("Quoted Text Regular Expression"));
+        gtk_box_pack_start(GTK_BOX (regex_hbox), regex_label, FALSE, FALSE, 5);
+        
+        regex_entry = gnome_entry_new ("quote-regex-history");
+        gtk_box_pack_start(GTK_BOX (regex_hbox), regex_entry, FALSE, FALSE, 0);
+        pui->quote_pattern = regex_entry;
+
+        
 	
 	return vbox1;
 }
@@ -1669,7 +1691,6 @@ create_encondig_page ( )
 static GtkWidget*
 create_misc_page ( )
 {
-
 	/*
 	 * done encoding, starting misc
 	 */
@@ -1690,11 +1711,7 @@ create_misc_page ( )
         GtkWidget *quoted_color_label_end;
 	GtkWidget *vbox12;
         GtkWidget *ab_frame, *ab_box, *fileentry1;
-        GtkWidget* regex_frame;
-        GtkWidget* regex_hbox;
-        GtkWidget* regex_label;
-        GtkWidget* regex_entry;
-        
+
 
 	vbox9 = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show (vbox9);
@@ -1840,21 +1857,6 @@ create_misc_page ( )
 	gtk_label_set_justify (GTK_LABEL (quoted_color_label_end),
                                GTK_JUSTIFY_LEFT);
 
-        /* Quoted text regular expression */
-        regex_frame = gtk_frame_new (_ ("Quoted Text"));
-        gtk_container_set_border_width (GTK_CONTAINER (regex_frame), 2);
-        gtk_box_pack_start (GTK_BOX (vbox9), regex_frame, FALSE, FALSE, 0);
-        
-        regex_hbox = gtk_hbox_new (FALSE, 0);
-        gtk_container_add (GTK_CONTAINER (regex_frame), regex_hbox);
-        gtk_container_set_border_width (GTK_CONTAINER (regex_hbox), 5);
-        
-        regex_label = gtk_label_new (_ ("Quoted Text Regular Expression"));
-        gtk_box_pack_start(GTK_BOX (regex_hbox), regex_label, FALSE, FALSE, 5);
-        
-        regex_entry = gnome_entry_new ("quote-regex-history");
-        gtk_box_pack_start(GTK_BOX (regex_hbox), regex_entry, FALSE, FALSE, 0);
-        pui->quote_pattern = regex_entry;
 
 	/* address book */
         ab_frame = gtk_frame_new (_("Address Book"));

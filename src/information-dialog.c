@@ -128,7 +128,8 @@ static void
 balsa_information_list (LibBalsaInformationType type, char *msg)
 {
 	gchar *outstr[1];
-
+        gint new_row;
+        
 	outstr[0] = msg;
 
 	if ( information_list == NULL ) {
@@ -166,7 +167,8 @@ balsa_information_list (LibBalsaInformationType type, char *msg)
 		gtk_widget_show ( information_dialog );
 	}
 
-	gtk_clist_append ( GTK_CLIST(information_list), outstr );
+	new_row = gtk_clist_append ( GTK_CLIST(information_list), outstr );
+        gtk_clist_moveto (GTK_CLIST (information_list), new_row, 0, 0.0, 0.0);
 
 	/* FIXME: Colour hilight the list */
 

@@ -1,3 +1,12 @@
+2000-09-09  Matthew Guenther <guentherm@asme.org>
+
+	* src/spell-check.c (next_word): Fix next word heuristics, switch
+	all debug and informational messages to balsa_information calls.
+	* src/information-dialog.c (balsa_information_list): Make list of
+	messages scroll as new messages are appended.
+	* src/pref-manager.c: Moved quoted text regex to incoming mail
+	options pane.
+
 2000-09-09  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/mailbox_*.c: Use gnome_config_set_bool instead of

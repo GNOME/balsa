@@ -44,13 +44,7 @@ void libbalsa_conf_foreach_group(const gchar * prefix,
                                  LibBalsaConfForeachFunc func,
                                  gpointer data);
 
-#if GTK_CHECK_VERSION(2, 6, 0) && (!defined(HAVE_GNOME) || defined(GNOME_DISABLE_DEPRECATED))
-# define BALSA_USE_G_KEY_FILE TRUE
-#else
-# undef BALSA_USE_G_KEY_FILE
-#endif
-
-#if !BALSA_USE_G_KEY_FILE
+#if !GLIB_CHECK_VERSION(2, 6, 0)
 
 #define libbalsa_conf_pop_group               gnome_config_pop_prefix
 #define libbalsa_conf_set_string              gnome_config_set_string
@@ -75,7 +69,7 @@ void libbalsa_conf_foreach_group(const gchar * prefix,
 #define libbalsa_conf_sync                    gnome_config_sync
 #include <libgnome/gnome-config.h>
 
-#else                           /* BALSA_USE_G_KEY_FILE */
+#else                           /* !GLIB_CHECK_VERSION(2, 6, 0) */
 
 void libbalsa_conf_pop_group                 (void);
 void libbalsa_conf_clean_key                 (const char *key);
@@ -142,6 +136,6 @@ void libbalsa_conf_get_vector_with_default_  (const char *path,
 void libbalsa_conf_drop_all                  (void);
 void libbalsa_conf_sync                      (void);
 
-#endif                          /* BALSA_USE_G_KEY_FILE */
+#endif                          /* !GLIB_CHECK_VERSION(2, 6, 0) */
 
 #endif                          /* __LIBCONFIG_H__ */

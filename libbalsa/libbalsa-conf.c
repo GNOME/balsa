@@ -116,13 +116,15 @@ static GSList *lbc_groups;
 static gchar *
 lbc_readfile(const gchar * filename)
 {
-    FILE *fp;
     gchar *buf;
     gchar **split;
 
-    fp = fopen(filename, "r");
-    libbalsa_readfile(fp, &buf);
-    fclose(fp);
+    if (!g_file_get_contents(filename, &buf, NULL, NULL)) {
+#if DEBUG
+        g_message("Failed to read \"%s\"\n", filename);
+#endif                          /* DEBUG */
+        return NULL;
+    }
 
     split = g_strsplit(buf, "\\\\ ", 0);
     g_free(buf);
@@ -152,7 +154,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
         (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
         gchar *old_path;
         gchar *buf;
-        static guint warned = 0;
+        static gboolean warn = TRUE;
 
         old_path =
             g_build_filename(g_get_home_dir(), old_dir, "balsa", NULL);
@@ -164,24 +166,30 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
         error = NULL;
 
         buf = lbc_readfile(old_path);
-        g_key_file_load_from_data(conf->key_file, buf, -1, G_KEY_FILE_NONE,
-                                  &error);
-        g_free(buf);
-        if (error) {
+        if (buf) {
+            g_key_file_load_from_data(conf->key_file, buf, -1,
+                                      G_KEY_FILE_NONE, &error);
+            g_free(buf);
+        }
+        if (!buf || error) {
 #if DEBUG
             g_message("Could not load key file from file \"%s\": %s",
-                      old_path, error->message);
+                      old_path,
+                      error ? error->message : g_strerror(errno));
 #endif                          /* DEBUG */
-            g_error_free(error);
-            error = NULL;
+            if (error) {
+                g_error_free(error);
+                error = NULL;
+            }
+            warn = FALSE;
         }
         g_free(old_path);
-        if (!warned) {
+        if (warn) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Your Balsa configuration "
                                    "is now stored in "
                                    "\"~/.balsa/config\"."));
-            ++warned;
+            warn = FALSE;
         }
     }
 }
@@ -380,7 +388,7 @@ libbalsa_conf_set_string_(const char *path, const char *value,
                           gboolean priv)
 {
     g_key_file_set_string(LBC_KEY_FILE(priv), lbc_groups->data, path,
-                          value);
+                          value ? value : "");
     LBC_CHANGED(priv);
 }
 

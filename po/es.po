@@ -112,7 +112,7 @@ msgstr "Ok"
 
 #: src/index-child.c:127
 msgid "Mailbox password:"
-msgstr "Clave de la casilla de correo:"
+msgstr "Contraseña de la casilla de correo:"
 
 #: src/index-child.c:159
 msgid "Unable to Open Mailbox!"

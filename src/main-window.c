@@ -589,7 +589,7 @@ static GnomeUIInfo mailbox_menu[] = {
         mailbox_commit_changes,
         GNOME_STOCK_MENU_REFRESH),
     GNOMEUIINFO_ITEM_STOCK(
-        N_("Commit All"),
+        N_("Commit _All"),
         N_("Commit the changes in all mailboxes"),
         mailbox_commit_all,
         GNOME_STOCK_MENU_REFRESH),
@@ -2546,18 +2546,19 @@ static gboolean
 mailbox_commit_each(GNode *node, gpointer data) 
 {
     LibBalsaMailbox *box;
-    box = BALSA_MAILBOX_NODE(node->data)->mailbox;
+    if ( (box = BALSA_MAILBOX_NODE(node->data)->mailbox) == NULL)
+        return FALSE; /* mailbox_node->mailbox == NULL is legal */
     
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(box), FALSE);
 
     if(box->open_ref == 0)
-	return(FALSE);
+	return FALSE;
 
     if (!libbalsa_mailbox_commit(box))
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Commiting mailbox %s failed."),
                           box->name);
-    return(FALSE);
+    return FALSE;
 }
 
 

@@ -1,3 +1,11 @@
+2001-10-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c: add hot letter to commit _all. ignore legal NULLs
+	Peter Bloomfield's "always show INBOX" patch (amended)
+	* libbalsa/folder-scanners.[hc]: add INBOX if requested.
+	* src/folder-conf.c: add option to configure "always show Inbox"
+	* src/mailbox-node.[hc]: read & save "ListInbox".
+
 2001-10-24  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main-window.c: Commit All menu entry

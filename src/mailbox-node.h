@@ -72,6 +72,7 @@ struct _BalsaMailboxNode {
     GtkSortType sort_type;
     LibBalsaServer * server; /* Used only by remote; is referenced */
     gboolean subscribed;     /* Used only by remote */
+    gboolean list_inbox;     /* Used only by remote */
 };
 
 struct _BalsaMailboxNodeClass {

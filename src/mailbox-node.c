@@ -172,6 +172,7 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
     gnome_config_set_string("Name",      mn->name);
     gnome_config_set_string("Directory", mn->dir);
     gnome_config_set_bool("Subscribed",  mn->subscribed);
+    gnome_config_set_bool("ListInbox",   mn->list_inbox);
     gnome_config_set_int("Threading",    mn->threading_type);
     gnome_config_set_int("SortType",     mn->sort_type);
     gnome_config_set_int("SortField",    mn->sort_field);
@@ -228,7 +229,8 @@ static void
 imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     g_return_if_fail(mb->server);
-    libbalsa_scanner_imap_dir(r, mb->server, mb->dir, mb->subscribed, 7,
+    libbalsa_scanner_imap_dir(r, mb->server, mb->dir, mb->subscribed,
+                              mb->list_inbox, 7,
 			      add_imap_folder, add_imap_mailbox);
     /* register whole tree */
     printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
@@ -307,6 +309,8 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     folder->dir = gnome_config_get_string("Directory");
     folder->subscribed =
 	gnome_config_get_bool("Subscribed"); 
+    folder->list_inbox =
+	gnome_config_get_bool("ListInbox=true"); 
     folder->threading_type = gnome_config_get_int_with_default("Threading", &def);
     if(def) folder->threading_type = BALSA_INDEX_THREADING_SIMPLE;
     folder->sort_type = gnome_config_get_int_with_default("SortType", &def);

@@ -31,7 +31,7 @@
 typedef struct {
     GnomeDialog *dialog;
     GtkWidget * folder_name, *server, *port, *username, *password, 
-	*subscribed, *prefix;
+	*subscribed, *list_inbox, *prefix;
 #ifdef USE_SSL
     GtkWidget *use_ssl;
 #endif
@@ -54,14 +54,20 @@ validate_folder(GtkWidget *w, FolderDialogData * fcw)
 }
 
 #ifdef USE_SSL
-static void imap_use_ssl_cb(GtkWidget * w, FolderDialogData * fcw);
+static void imap_use_ssl_cb(GtkToggleButton * button,
+                            FolderDialogData * fcw);
 
+/* imap_use_ssl_cb:
+ * set default text in the `port' entry box according to the state of
+ * the `Use SSL' checkbox
+ *
+ * callback on toggling fcw->use_ssl
+ * */
 static void
-imap_use_ssl_cb(GtkWidget * w, FolderDialogData * fcw)
+imap_use_ssl_cb(GtkToggleButton * button, FolderDialogData * fcw)
 {
     gint zero = 0;
     GtkEditable *port = GTK_EDITABLE(fcw->port);
-    GtkToggleButton *button = GTK_TOGGLE_BUTTON(fcw->use_ssl);
     gboolean use_ssl = gtk_toggle_button_get_active(button);
     gtk_editable_delete_text(port, 0, -1);
     gtk_editable_insert_text(port, use_ssl ? "993" : "143", 3, &zero);
@@ -98,7 +104,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     frame = gtk_frame_new(_("Remote IMAP folder set"));
     gtk_box_pack_start(GTK_BOX(fcw.dialog->vbox),
                        frame, TRUE, TRUE, 0);
-    table = gtk_table_new(7, 2, FALSE);
+    table = gtk_table_new(8, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
@@ -133,32 +139,34 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
 
     fcw.subscribed = create_check(fcw.dialog, _("_Subscribed folders only"), 
-				  table, 5, FALSE);
+                                  table, 5, mn ? mn->subscribed : FALSE);
+    fcw.list_inbox = create_check(fcw.dialog, _("_Always show INBOX"), 
+                                  table, 6, mn ? mn->list_inbox : TRUE); 
 
-    create_label(_("_Prefix"), table, 6, &keyval);
-    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
+    create_label(_("_Prefix"), table, 7, &keyval);
+    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 7, 
 			      mn ? mn->dir : NULL, keyval);
     
 #ifdef USE_SSL
     fcw.use_ssl = create_check(fcw.dialog,
 			       _("Use SSL (IMAPS)"),
-			       table, 7, s ? s->use_ssl : FALSE);
+			       table, 8, s ? s->use_ssl : FALSE);
     gtk_signal_connect(GTK_OBJECT(fcw.use_ssl), "toggled", imap_use_ssl_cb, &fcw);
 #endif
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
-    gnome_dialog_close_hides(fcw.dialog, TRUE);
 
     /* all the widgets are ready, set the values */
-    if(mn && mn->subscribed)
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw.subscribed), TRUE);
     validate_folder(NULL, &fcw);
     gtk_widget_grab_focus(fcw.folder_name);
 
-    /* FIXME: I don't like this loop. */
-    while( (button = gnome_dialog_run(fcw.dialog)) == 2) 
-	gnome_help_display(NULL, &help_entry);
-    
+    /* FIXME: I don't like this loop.
+     * but gnome_dialog_set_close(fcw.dialog, FALSE) appears to be broken
+     */
+    gnome_dialog_close_hides(fcw.dialog, TRUE);
+    while( (button=gnome_dialog_run(fcw.dialog)) == 2)
+        gnome_help_display(NULL, &help_entry); 
+
     if(button == 0) { /* do create/update */
 	if(!mn) { 
 	    insert = TRUE; 
@@ -187,6 +195,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	mn->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw.folder_name)));
 	mn->subscribed = 
 	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw.subscribed));
+	mn->list_inbox = 
+	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw.list_inbox));
 	
 	if(insert) {
 	    g_node_append(balsa_app.mailbox_nodes, gnode = g_node_new(mn));

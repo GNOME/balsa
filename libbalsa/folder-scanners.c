@@ -141,7 +141,8 @@ void imap_add_folder (char delim, char *folder, int noselect, int noinferiors,
 		      struct browser_state *state, short isparent);
 void
 libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
-			  const gchar* path, gboolean subscribed, int depth,
+			  const gchar* path, gboolean subscribed, 
+                          gboolean list_inbox, int depth,
 			  ImapHandler folder_handler, 
 			  ImapHandler mailbox_handler)
 {
@@ -175,6 +176,12 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 	set_option(OPTIMAPLSUB);
     else
 	unset_option(OPTIMAPLSUB);
+
+    if (list_inbox)
+        /* force INBOX into the mailbox list
+         * delim doesn't matter, so we'll give it '/' */
+        mailbox_handler(rnode, "INBOX", '/');
+
     state.subfolders = g_list_append(NULL, g_strdup(path));
     state.folder = NULL;
 

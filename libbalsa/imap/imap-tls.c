@@ -5,13 +5,13 @@
    Rules (for client)                                    Section
    -----                                                 -------
    Mandatory-to-implement Cipher Suite                      2.1   OK
-   SHOULD have mode where encryption required               2.2
-   client MUST check server identity                        2.4
-   client MUST use hostname used to open connection         2.4
+   SHOULD have mode where encryption required               2.2   OK
+   client MUST check server identity                        2.4   
+   client MUST use hostname used to open connection         2.4   OK
    client MUST NOT use hostname from insecure remote lookup 2.4   OK
-   client SHOULD support subjectAltName of dNSName type     2.4
-   client SHOULD ask for confirmation or terminate on fail  2.4
-   MUST check result of STARTTLS for acceptable privacy     2.5
+   client SHOULD support subjectAltName of dNSName type     2.4   OK
+   client SHOULD ask for confirmation or terminate on fail  2.4   OK
+   MUST check result of STARTTLS for acceptable privacy     2.5   OK
    client MUST NOT issue commands after STARTTLS
       until server response and negotiation done        3.1,4,5.1 OK
    client MUST discard cached information             3.1,4,5.1,9 OK
@@ -188,9 +188,21 @@ create_ssl(void)
 
 /* check_server_identity() follows example 5-8 in the OpenSSL book. */
 static int
-host_matches_domain(const char* host, const char*domain)
-{ /* domain can contain wildcards but for the moment, we do not care */
-  return g_ascii_strcasecmp(host, domain) == 0;
+host_matches_domain(const char* host, const char*domain, int host_len)
+{ 
+  printf("host: %s domain: %s\n", host, domain);
+  if(!domain || !host)
+    return 0;
+  if(domain[0] == '*') { /* RFC2595, section 2.4 */
+    int domain_len = strlen(domain);
+    if(domain_len<2 || domain[1] != '.') /* wrong wildcard format! */
+      return 0;
+    if(host_len - domain_len + 2<= 0) /* host much shorter than wildcard */
+      return 0;
+    return g_ascii_strcasecmp(host + host_len - domain_len+2, 
+                              domain+2) == 0;
+  } else 
+    return g_ascii_strcasecmp(host, domain) == 0;
 }
 
 static int
@@ -199,8 +211,9 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
   long vfy_result;
   X509 *cert;
   X509_NAME *subj;
-  int ok, extcount, i, j, stack_len;
-
+  int ok, extcount, i, j, stack_len, host_len;
+  gchar *colon;
+  
   if(!handle->host)
     return 0;
   /* Check whether the certificate matches the server. */
@@ -208,6 +221,8 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
   if(!cert)
     return 0;
 
+  colon = strchr(handle->host, ':');
+  host_len = colon ? colon - handle->host : (int)strlen(handle->host);
   ok = 0;
   extcount = X509_get_ext_count(cert);
   for(i=0; i<extcount; i++) {
@@ -234,7 +249,7 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
       for(j=0; j<stack_len; j++) {
         nval = sk_CONF_VALUE_value(val, j);
         if(strcmp(nval->name, "DNS") == 0 &&
-           host_matches_domain(handle->host, nval->value)) {
+           host_matches_domain(handle->host, nval->value, host_len)) {
           ok = 1;
           break;
         }
@@ -248,7 +263,7 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
     if( (subj = X509_get_subject_name(cert)) &&
         X509_NAME_get_text_by_NID(subj, NID_commonName, data, sizeof(data))>0){
       data[sizeof(data)-1] = 0;
-      if(g_ascii_strcasecmp(data, handle->host) == 0)
+      if(g_ascii_strncasecmp(handle->host, data, host_len) == 0)
         ok =1;
     }
   }
@@ -311,12 +326,14 @@ imap_handle_starttls(ImapMboxHandle *handle)
     handle->has_capabilities = 0;
     if(!check_server_identity(handle, ssl)) {
       printf("Server identity not confirmed\n");
-      /* close connection here is the best behavior */
+      sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
+      handle->state = IMHS_DISCONNECTED;
       return IMR_NO;
     }
     if(!check_cipher_strength(handle, ssl)) {
       printf("Cipher too weak\n");
-      /* close connection here is the best behavior */
+      sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
+      handle->state = IMHS_DISCONNECTED;
       return IMR_NO;
     }
 

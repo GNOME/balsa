@@ -252,6 +252,58 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
     libbalsa_information(it, fmt, is->host, str);
 }
 
+#ifdef USE_TLS
+/* compare Example 10-7 in the OpenSSL book */
+static gboolean
+libbalsa_is_cert_known(X509* cert)
+{
+    X509_STORE     *store;
+    X509_STORE_CTX  verify_ctx;
+    gchar *cert_name;
+    gboolean res = FALSE;
+
+    cert_name = gnome_util_prepend_user_home(".balsa/certificates");
+    if (access (cert_name, F_OK) != 0) {
+        g_free(cert_name);
+        return FALSE;
+    }
+
+    if( !(store = X509_STORE_new())) {
+        g_free(cert_name);
+        return FALSE;
+    }
+    res = X509_STORE_load_locations(store, cert_name, NULL);
+    g_free(cert_name);
+    if(!res) {
+        X509_STORE_free(store);
+        return FALSE;
+    }
+    X509_STORE_CTX_init(&verify_ctx, store, cert, NULL);
+
+    res = X509_verify_cert(&verify_ctx);
+    X509_STORE_CTX_cleanup(&verify_ctx);
+    X509_STORE_free(store);
+    printf("%s returns %d\n", __func__, res);
+    return res;
+}
+
+static gboolean
+libbalsa_save_cert(X509 *cert)
+{
+    gboolean res = FALSE;
+    FILE *cert_file;
+    gchar *cert_name = gnome_util_prepend_user_home(".balsa/certificates");
+    cert_file = fopen(cert_name, "a");
+     if (cert_file) {
+        if(PEM_write_X509 (cert_file, cert))
+            res = TRUE;
+        fclose(cert_file);
+     }
+     g_free(cert_name);
+     return res;
+}
+#endif
+
 static void
 is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
 {
@@ -266,10 +318,15 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
         gchar **user = va_arg(alist, gchar**);
         gchar **pass = va_arg(alist, gchar**);
         ok = va_arg(alist, int*);
-        *ok = 1; /* consider popping up a dialog window here */
-        g_free(*user); *user = g_strdup(is->user);
-        g_free(*pass); *pass = g_strdup(is->passwd);
-        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, method);
+        if(!is->passwd) {
+            is->passwd = libbalsa_server_get_password(is, NULL);
+        }
+        *ok = is->passwd != NULL;
+        if(*ok) {
+            g_free(*user); *user = g_strdup(is->user);
+            g_free(*pass); *pass = g_strdup(is->passwd);
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, method);
+        }
         break;
     }
     case IME_GET_USER:  { /* for eg kerberos */
@@ -280,23 +337,32 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
         break;
     }
     case IME_TLS_VERIFY_ERROR:  {
+#ifdef USE_TLS
         long vfy_result;
         SSL *ssl;
         X509 *cert;
         ok = va_arg(alist, int*);
         vfy_result = va_arg(alist, long);
-        ssl = va_arg(alist, SSL*);
-        cert = SSL_get_peer_certificate(ssl);
-        *ok  = libbalsa_ask_for_cert_acceptance(cert);
-        X509_free(cert);
-        g_warning("IMAP:TLS: continues despite failed cert verification:\n"
+        g_warning("IMAP:TLS: failed cert verification:\n"
                   "%ld : %s.", vfy_result,
                   X509_verify_cert_error_string(vfy_result));
+        ssl = va_arg(alist, SSL*);
+        cert = SSL_get_peer_certificate(ssl);
+        *ok = libbalsa_is_cert_known(cert);
+        if(!*ok) {
+            *ok = libbalsa_ask_for_cert_acceptance(cert);
+            if(*ok == 2)
+                libbalsa_save_cert(cert);
+        }
+        X509_free(cert);
+#else
+        g_warning("TLS error with TLS disabled!?");
+#endif
         break;
     }
     case IME_TLS_NO_PEER_CERT: {
-        ok = va_arg(alist, int*); *ok = 1;
-        g_warning("IMAP:TLS: 'No peer cert' accepted.");
+        ok = va_arg(alist, int*); *ok = 0;
+        g_warning("IMAP:TLS: Server presented no cert!");
         break;
     }
     case IME_TLS_WEAK_CIPHER: {
@@ -315,12 +381,9 @@ lb_imap_server_info_new(LibBalsaServer *server)
     ImapMboxHandle *handle;
     struct handle_info *info;
 
-    /* try getting password, quit on cancel */
-    if (!server->passwd) {
-	server->passwd = libbalsa_server_get_password(server, NULL);
-	if(!server->passwd)
-	    return NULL;
-    }
+    /* We do not ask for password now since the authentication might
+     * not require it. Instead, we handle authentication requiests in
+     * is_user_cb(). */
 
     handle = imap_mbox_handle_new();
     info = g_new0(struct handle_info, 1);

@@ -348,40 +348,6 @@ static void dump_queue(const char*msg)
 }
 #endif
 
-/* write_remote_fcc:
-   return -1 on failure, 0 on success.
-*/
-#if NOT_USED
-static int
-write_remote_fcc(LibBalsaMailbox* fccbox, HEADER* m_msg)
-{
-    LibBalsaServer* server = LIBBALSA_MAILBOX_REMOTE(fccbox)->server;
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(fccbox), -1);
-    if(MAILBOX_CLOSED(fccbox)) {
-        /* We cannot use LIBBALSA_REMOTE_MAILBOX_SERVER() here because */
-        /* it will lock up when NO IMAP mailbox has been accessed since */
-        /* balsa was started. This should be safe because we have already */
-        /* established that fccbox is in fact an IMAP mailbox */
-        if(server == (LibBalsaServer *)NULL) {
-            libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
-                                 _("Unable to open sentbox - could not get IMAP server information"));
-            return -1;
-        }
-        if (!(server->passwd && *server->passwd) &&
-            !(server->passwd = libbalsa_server_get_password(server, fccbox))) {
-            libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
-                                 "Unable to open sentbox - could not get passwords for server");
-            return -1;
-        }
-    }
-  
-    /* Passwords are guaranteed to be set now */
-    
-    return mutt_write_fcc(LIBBALSA_MAILBOX(fccbox)->url,
-                          m_msg, NULL, 0, NULL);
-}
-#endif
-
 /* libbalsa_message_queue:
    places given message in the outbox. If fcc message field is set, saves
    it to fcc mailbox as well.

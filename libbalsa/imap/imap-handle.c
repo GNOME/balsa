@@ -124,6 +124,10 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->recent = 0;
   handle->msg_cache = NULL;
   handle->doing_logout = FALSE;
+#ifdef USE_TLS
+  handle->using_tls = 0;
+#endif
+  handle->require_tls = 0;
   handle->cmd_queue = g_hash_table_new(NULL, NULL);
 
   handle->info_cb  = NULL;
@@ -231,6 +235,7 @@ ImapResult
 imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host)
 {
   ImapResult rc;
+  ImapResponse resp;
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
 
@@ -240,9 +245,18 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host)
     return rc;
 
 #if defined(USE_TLS)
-  imap_handle_starttls(ret); /* one can always try! */
+  if(imap_mbox_handle_can_do(ret, IMCAP_STARTTLS)) {
+    if( imap_handle_starttls(ret) != IMR_OK)
+      return IMAP_UNSECURE; /* TLS negotiation error */
+    resp = IMR_OK;
+  } else
+    resp = IMR_NO;
+#else
+  resp = IMR_NO;
 #endif
-
+  if(ret->require_tls && resp != IMR_OK)
+    return IMAP_UNSECURE;
+  
   rc = imap_authenticate(ret);
 
   return rc;
@@ -289,6 +303,15 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
     }
   }
   return rc;
+}
+
+unsigned
+imap_mbox_handle_require_tls(ImapMboxHandle* r, unsigned state)
+{
+  g_return_val_if_fail(r,0);
+  unsigned res = r->require_tls;
+  r->require_tls = state;
+  return res;
 }
 
 const char* msg_flags[6] = { 
@@ -356,6 +379,9 @@ imap_mbox_connect(ImapMboxHandle* handle)
 {
   static const int SIO_BUFSZ=8192;
 
+#ifdef USE_TLS
+  handle->using_tls = 0;
+#endif
   handle->sd = socket_open(handle->host, "imap");
   if(handle->sd<0) return IMAP_CONNECT_FAILED;
   
@@ -377,10 +403,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     return IMAP_PROTOCOL_ERROR;
   }
 
-  /* 
-  if (imap_mbox_handle_can_do(handle, IMCAP_STARTTLS))
-    printf("Server is TLS capable.\n");
-  */
   return IMAP_SUCCESS;
 }
 
@@ -1085,6 +1107,8 @@ lbi_strerror(ImapResult rc)
   case IMAP_PROTOCOL_ERROR: return "unexpected server response";
   case IMAP_AUTH_FAILURE:   return "authentication failure";
   case IMAP_AUTH_UNAVAIL:   return "no supported authentication method available ";
+  case IMAP_UNSECURE:       return "secure connection requested but "
+                              "could not be established.";
   case IMAP_SELECT_FAILED: return "SELECT command failed";
   default: return "Unknown error";
   }

@@ -434,13 +434,13 @@ ask_cert_real(X509 *cert)
     gtk_widget_show(label);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
-    case 0: /* FIXME: OK  */; break;
-    case 1: /* FIXME: SAVE; libbalsa_assure_balsa_dir(); */ break;
+    case 0: i = 1; break;
+    case 1: i = 2; break;
     case GTK_RESPONSE_CANCEL:
-    default: /* FIXME: cancel;*/ break;
+    default: i=0; break;
     }
     gtk_widget_destroy(dialog);
-    return 0 /* FIXME: some response */;
+    return i;
 }
 
 #ifdef BALSA_USE_THREADS

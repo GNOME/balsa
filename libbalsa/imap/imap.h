@@ -10,6 +10,8 @@ typedef enum {
   IMAP_PROTOCOL_ERROR, /* usually unexpected server response */
   IMAP_AUTH_FAILURE, /* authentication failure */
   IMAP_AUTH_UNAVAIL, /* no supported authentication method available */
+  IMAP_UNSECURE,     /* secure connection was requested but could not
+                      * be established. */
   IMAP_SELECT_FAILED /* SELECT command failed */
 } ImapResult;
 

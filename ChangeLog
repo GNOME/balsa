@@ -1,3 +1,13 @@
+2004-02-03  Pawel Salek
+
+	* libbalsa/imap-server.c: store accepted certificates.
+	* libbalsa/libbalsa.c: small fixes to the verification dialog.
+	* libbalsa/send.c: cleanup.
+	* libbalsa/imap/imap-handle.c: improve RFC2595 conformance.
+	* libbalsa/imap/imap-tls.c: ditto.
+	* libbalsa/imap/imap-handle.h: add using_tls field.
+	* libbalsa/imap/imap.h: add IMAP_UNSECURE result.
+
 2004-02-03 00:07  PeterB
 
 	* libbalsa/mailbox_imap.c: update unread_messages when server

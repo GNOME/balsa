@@ -58,6 +58,7 @@ struct _ImapMboxHandle {
 #ifdef USE_TLS
   unsigned using_tls:1;
 #endif
+  unsigned require_tls:1;
 };
 
 extern const char* msg_flags[6];

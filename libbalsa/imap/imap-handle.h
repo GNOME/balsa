@@ -119,6 +119,7 @@ void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
 ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst);
 ImapResponse imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                         gboolean *readonly);
+unsigned imap_mbox_handle_require_tls(ImapMboxHandle* r, unsigned state);
 
 /* int below is a boolean */
 int      imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);

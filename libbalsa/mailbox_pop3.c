@@ -138,13 +138,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
 static void
 libbalsa_mailbox_pop3_finalize(GObject * object)
 {
-    LibBalsaMailboxPop3 *mailbox = LIBBALSA_MAILBOX_POP3(object);
     LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(object);
-
-    if (!mailbox)
-	return;
-
-    g_free(mailbox->last_popped_uid);
 
     g_object_unref(G_OBJECT(remote->server));
 
@@ -663,8 +657,6 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
     gnome_config_set_bool("Filter", pop->filter);
     if(pop->filter_cmd)
         gnome_config_set_string("FilterCmd", pop->filter_cmd);
-    if(pop->last_popped_uid)
-        gnome_config_set_string("Lastuid", pop->last_popped_uid);
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
@@ -691,9 +683,6 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
     if(pop->filter_cmd && *pop->filter_cmd == '\0') {
 	g_free(pop->filter_cmd); pop->filter_cmd = NULL;
     }
-
-    g_free(pop->last_popped_uid);
-    pop->last_popped_uid = gnome_config_get_string("Lastuid");
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);

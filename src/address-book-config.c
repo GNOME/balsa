@@ -286,7 +286,7 @@ create_vcard_page(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("Address _Book Name"), table, 0);
+    label = create_label(_("A_ddress Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : NULL, 
 				   label);
@@ -331,7 +331,7 @@ create_externq_page(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("Address _Book Name"), table, 0);
+    label = create_label(_("A_ddress Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : NULL, 
 				   label);
@@ -393,7 +393,7 @@ create_ldif_page(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("Address _Book Name"), table, 0);
+    label = create_label(_("A_ddress Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   abc->address_book 
 				   ? abc->address_book->name : NULL, 
@@ -453,7 +453,7 @@ create_ldap_page(AddressBookConfig * abc)
     abc->link_id = "LDAP";
     /* mailbox name */
 
-    label = create_label(_("Address _Book Name"), table, 0);
+    label = create_label(_("A_ddress Book Name"), table, 0);
     abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : name, 
 				   label);

@@ -1484,7 +1484,7 @@ remote_mailbox_servers_group(GtkWidget * page)
     pm_group_add(group, hbox);
 
     scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
-    gtk_box_pack_start(GTK_BOX(hbox), scrolledwindow, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), scrolledwindow, TRUE, TRUE, 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_size_request(scrolledwindow, -1, 150);
@@ -2568,7 +2568,7 @@ address_books_group(GtkWidget * page)
     scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_box_pack_start(GTK_BOX(hbox), scrolledwindow, TRUE, TRUE, 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
-				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_size_request(scrolledwindow, -1, 150);
 
     store = gtk_list_store_new(AB_N_COLUMNS,

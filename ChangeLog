@@ -2,7 +2,9 @@
 
 	* README: info about libesmtp cert location (bug 102566).
 	* balsa.desktop: correct category (bug 104964).
-
+	* src/address-book-config.c: resolve shortcut conflicts.
+	* src/pref-manager.c: scrollbar for address books (Bug 104984).
+	
 2003-01-30  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c: remove misspelling in the message

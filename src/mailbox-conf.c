@@ -331,6 +331,7 @@ mailbox_conf_new (LibBalsaMailbox * mailbox, gint add_mbox, LibBalsaMailboxType 
 	break;
       case MAILBOX_POP3:
 	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
+	mcw->the_page = MC_PAGE_POP3;
 	break;
       case MAILBOX_IMAP:
 	gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);

@@ -1,3 +1,9 @@
+2000-07-08  Peter Williams  <peter@beta.newton.cx>
+
+	* src/mailbox-conf.c: Set the page manually for new
+	POP3 boxes as this cannot use the set_the_page "clicked"
+	signal thingie.
+
 2000-07-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	API clean up by Ian Campbell <ijc25@cam.ac.uk>:

@@ -1329,9 +1329,9 @@ update_mail_servers(void)
     g_node_children_foreach(balsa_app.mailbox_nodes, G_TRAVERSE_ALL,
 			    (GNodeForeachFunc) add_other_server, tree_view);
     balsa_mailbox_nodes_unlock(FALSE);
-    gtk_tree_model_get_iter_first(model, &iter);
-    gtk_tree_selection_select_iter(gtk_tree_view_get_selection(tree_view),
-                                   &iter);
+    if (gtk_tree_model_get_iter_first(model, &iter))
+        gtk_tree_selection_select_iter(gtk_tree_view_get_selection(tree_view),
+                                       &iter);
 }
 
 /* helper functions that simplify often performed actions */

@@ -503,10 +503,6 @@ balsa_window_new ()
   gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
   gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar, window);
 
-
-  /* set the toolbar style */
-  balsa_window_refresh(window);
-
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
 		      GTK_SIGNAL_FUNC (set_icon), NULL);
@@ -550,13 +546,21 @@ balsa_window_new ()
   
   gtk_paned_pack1(GTK_PANED(vpaned), window->notebook, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned), preview, TRUE, TRUE);
+
   /*PKGW: do it this way, without the usizes.*/
-  gtk_paned_set_position( GTK_PANED(vpaned), balsa_app.notebook_height );
+  if (balsa_app.previewpane)
+    gtk_paned_set_position( GTK_PANED(vpaned), balsa_app.notebook_height );
+  else
+    /* Set it to something really high */
+    gtk_paned_set_position ( GTK_PANED (vpaned), G_MAXINT);  
 
   gtk_widget_show(vpaned);
   gtk_widget_show(hpaned);
   gtk_widget_show(window->notebook);
   gtk_widget_show(preview);
+
+  /* set the toolbar style */
+  balsa_window_refresh(window);
 
   if (balsa_app.check_mail_upon_startup)
     check_new_messages_cb(NULL, NULL);
@@ -642,6 +646,7 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox
 	/* change the page to the newly selected notebook item */
 	gtk_notebook_set_page(GTK_NOTEBOOK(window->notebook),
 			      gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
+
 }
 
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
@@ -790,10 +795,14 @@ progress_timeout (gpointer data)
  * refresh data in the main window
  */
 void
-balsa_window_refresh(BalsaWindow *window)
+balsa_window_refresh (BalsaWindow *window)
 {
   GnomeDockItem *item;
   GtkWidget *toolbar;
+  GtkWidget *index;
+  BalsaMessage *bmsg;
+  GtkWidget *paned;
+  
   static BalsaWindow *balsa_window = NULL;
 
   if (window == NULL)
@@ -804,14 +813,35 @@ balsa_window_refresh(BalsaWindow *window)
   else
     balsa_window = window;
   
+  index = balsa_window_find_current_index (balsa_window);
+  if (index) {
+    paned = GTK_WIDGET (balsa_app.notebook)->parent;
+
+    if (balsa_app.previewpane) {
+      balsa_index_redraw_current (BALSA_INDEX (index));
+      gtk_paned_set_position (GTK_PANED (paned), balsa_app.notebook_height);
+    } else {
+      bmsg = BALSA_MESSAGE (BALSA_WINDOW (balsa_window)->preview);
+      if (bmsg)
+        balsa_message_clear (bmsg);
+      /* Set the height to something really big (those new hi-res
+         screens and all :) */
+      gtk_paned_set_position (GTK_PANED (paned), G_MAXINT);
+    }
+  }
+  
+  index = balsa_window_find_current_index (balsa_window);
+  if (index)
+    balsa_index_redraw_current (BALSA_INDEX (index));
+
   /*
    * set the toolbar style
    */
-  item = gnome_app_get_dock_item_by_name(GNOME_APP(balsa_window),
-					 GNOME_APP_TOOLBAR_NAME);
-  toolbar = gnome_dock_item_get_child(item);
+  item = gnome_app_get_dock_item_by_name (GNOME_APP(balsa_window),
+                                          GNOME_APP_TOOLBAR_NAME);
+  toolbar = gnome_dock_item_get_child (item);
 
-  gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), balsa_app.toolbar_style);
+  gtk_toolbar_set_style (GTK_TOOLBAR(toolbar), balsa_app.toolbar_style);
 
   /* I don't know if this is a bug of gtk or not but if this is not here
      it doesn't properly resize after a toolbar style change */
@@ -845,7 +875,7 @@ show_about_box (void)
 
   about = gnome_about_new ("Balsa",
 			   BALSA_VERSION,
-			   _ ("Copyright (C) 1997-1999"),
+			   _ ("Copyright (C) 1997-2000"),
 			   authors,
 			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://bugs.gnome.org/"),
 			   "balsa/balsa_logo.png");
@@ -867,14 +897,15 @@ gint
 check_new_messages_auto_cb (gpointer data)
 {
   check_new_messages_cb( (GtkWidget *) NULL, data);
-
+  if(balsa_app.debug)
+     fprintf(stderr,"Auto-checked for new messages...\n");
   /*  preserver timer */
   return TRUE;
 }
 
 /* check_new_messages_cb:
-   check new messages in inbox, or in the Mailbox given as extra data,
-   if not NULL
+   check new messages the data argument is the BalsaWindow pointer
+   or NULL.
 */
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
@@ -890,7 +921,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
       else
 	mbox = balsa_app.inbox;
     }
-
+  else mbox = balsa_app.inbox;
 
 #ifdef BALSA_USE_THREADS
 /*  Only Run once -- If already checking mail, return.  */
@@ -943,14 +974,11 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input); 
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
 
-  if( mbox )
-     mailbox_check_new_messages( mbox );
-  /* if(mbox != balsa_app.inbox)
-     load_messages (balsa_app.inbox, 1); */
-  /* "There can be only one" - can one of them be removed? */
+  /* if open, load up the messages */
+   if( mbox && CLIENT_CONTEXT_OPEN( mbox) )
+     mailbox_check_new_messages( mbox ); 
+
   balsa_mblist_have_new (balsa_app.mblist);
-  if(mbox && mblist_get_selected_mailbox() == mbox)
-     balsa_mblist_update_mailbox(balsa_app.mblist, mbox); 
 #endif
 }
 
@@ -980,7 +1008,7 @@ check_messages_thread( Mailbox *mbox )
     MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_LOAD, mbox, mbox->name, 0,0 );
   }
 
-  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished", 0,0);
+  MSGMAILTHREAD( threadmessage, MSGMAILTHREAD_FINISHED, mbox, "Finished", 0,0);
 
   pthread_mutex_lock( &mailbox_lock );
   checking_mail = 0;
@@ -989,6 +1017,10 @@ check_messages_thread( Mailbox *mbox )
   pthread_exit( 0 );
 }
 
+/* mail_progress_notify_cb:
+   called from the thread checking the new mail. Basically does the GUI
+   interaction because checking thread cannot do it.
+*/
 gboolean
 mail_progress_notify_cb( )
 {
@@ -1095,6 +1127,9 @@ mail_progress_notify_cb( )
 		gnome_appbar_refresh(balsa_app.appbar);
 		gnome_appbar_set_progress(balsa_app.appbar,0.0);
 	      }
+	    /* messages were loaded by the thread, we only check them here */
+	    balsa_mblist_have_new (balsa_app.mblist);
+
 	    break;
 	  default:
 	    fprintf ( stderr, " Unknown: %s \n", 
@@ -1306,10 +1341,10 @@ forward_message_cb (GtkWidget * widget, gpointer data)
 static void
 continue_message_cb (GtkWidget * widget, gpointer data)
 {
-  BalsaIndex *index;
+  GtkWidget *index;
 
-  index = (BalsaIndex*) balsa_window_find_current_index (BALSA_WINDOW (data));
-  if (index && index->mailbox == balsa_app.draftbox)
+  index = balsa_window_find_current_index (BALSA_WINDOW (data));
+  if (index && BALSA_INDEX(index)->mailbox == balsa_app.draftbox)
      balsa_message_continue (widget, BALSA_INDEX(index) );
   else 
      balsa_window_open_mailbox( BALSA_WINDOW(data), balsa_app.draftbox );
@@ -1351,44 +1386,44 @@ undelete_message_cb (GtkWidget * widget, gpointer data)
 static void
 wrap_message_cb (GtkWidget * widget, gpointer data) 
 {
-   BalsaIndex *index;
+   GtkWidget *index;
 
    balsa_app.browse_wrap = GTK_CHECK_MENU_ITEM(widget)->active;
 
    /* redisplay current message? */
-   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   index = balsa_window_find_current_index(BALSA_WINDOW (data));
    if(index) 
-      balsa_index_redraw_current (index);
+      balsa_index_redraw_current ( BALSA_INDEX(index) );
 }
 
 static void 
 show_no_headers_cb(GtkWidget * widget, gpointer data) {
-   BalsaIndex *index;
+   GtkWidget *index;
    
    balsa_app.shown_headers = HEADERS_NONE;
-   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   index = balsa_window_find_current_index(BALSA_WINDOW (data));
    if(index) 
-      balsa_index_redraw_current (index);
+      balsa_index_redraw_current ( BALSA_INDEX(index) );
 }
 
 static void 
 show_selected_cb(GtkWidget * widget, gpointer data) {
-   BalsaIndex *index;
+   GtkWidget *index;
    
    balsa_app.shown_headers = HEADERS_SELECTED;
-   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   index = balsa_window_find_current_index(BALSA_WINDOW (data));
    if(index) 
-      balsa_index_redraw_current (index);
+      balsa_index_redraw_current ( BALSA_INDEX(index) );
 }
 
 static void
 show_all_headers_cb(GtkWidget * widget, gpointer data) {
-   BalsaIndex *index;
+   GtkWidget *index;
    
    balsa_app.shown_headers = HEADERS_ALL;
-   index =(BalsaIndex*)balsa_window_find_current_index(BALSA_WINDOW (data));
+   index = balsa_window_find_current_index(BALSA_WINDOW (data));
    if(index) 
-      balsa_index_redraw_current (index);
+      balsa_index_redraw_current ( BALSA_INDEX(index) );
 }
 
 
@@ -1581,6 +1616,7 @@ set_icon (GnomeApp * app)
 /* PKGW: remember when they change the position of the vpaned. */
 static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc )
 {
+  if (balsa_app.previewpane)
     balsa_app.notebook_height = alloc->height;
 }
 
@@ -1597,7 +1633,22 @@ static void notebook_switch_page_cb( GtkWidget *notebook,
                                      GtkNotebookPage *page, guint page_num )
 {
     GtkWidget *index_page;
+    GtkWidget *window;
+    Mailbox *mailbox;
+    gchar *title;
 
     index_page = gtk_object_get_data (GTK_OBJECT (page->child), "indexpage");
+
+    mailbox = BALSA_INDEX_PAGE(index_page)->mailbox;
+    window = BALSA_INDEX_PAGE(index_page)->window;
+
+    if ( mailbox->name ) {
+        title = g_strdup_printf("Balsa: %s", mailbox->name);
+        gtk_window_set_title(GTK_WINDOW(window), title);
+        g_free(title);
+    } else {
+        gtk_window_set_title(GTK_WINDOW(window), "Balsa");
+    }
+
     balsa_index_update_message (BALSA_INDEX_PAGE (index_page));
 }

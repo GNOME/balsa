@@ -1042,7 +1042,7 @@ config_global_save (void)
 /* We need to add 18 to the mailbox list width to prevent it from changing
    after the exit (not sure why but possibly because of difference between
    paned width and the ctree width. */
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width + 18);
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
     pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.notebook_height);

@@ -1,3 +1,12 @@
+2000-03-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c: auto-check explicitly checks Inbox.
+	* src/balsa-index-page.c: bug #4805 fix
+	* src/balsa-mblist.c: mail check bug fix.
+	* src/main-window.c: bug #4805, #4806 fix, mail check bug fix,
+	title bar.
+	* src/mblist-window.c: resize mblist rehashed
+
 2000-03-26 Pawel Salek <pawsa@theochem.kth.se>
 
 	* main.c: reorganized the initial mailbox opening code.

@@ -483,6 +483,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	 */
 	config_global_save ();
         balsa_mblist_redraw (balsa_app.mblist);
+        balsa_window_refresh (BALSA_WINDOW (GTK_WIDGET (pbox)->parent));
 }
 
 
@@ -1434,6 +1435,7 @@ create_misc_page ( )
         /* mblist unread colour  */
         color_frame = gtk_frame_new (_("Colours"));
         gtk_widget_show (GTK_WIDGET (color_frame));
+        gtk_container_set_border_width (GTK_CONTAINER (color_frame), 5);
 	gtk_box_pack_start (GTK_BOX (vbox9), color_frame, FALSE, FALSE, 0);
 
         unread_color_table = gtk_table_new (2, 1, FALSE);

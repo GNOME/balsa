@@ -738,16 +738,11 @@ balsa_mblist_check_new (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
   /* If it's not local the mail-check function won't work, and if it's
    * already open we can get conflicting results since we're checking
    * the file on disk as opposed to the mailbox in memory */
-  if (!BALSA_IS_MAILBOX_LOCAL (mailbox) || mailbox->open_ref > 0)
-    return;
-
+  if (BALSA_IS_MAILBOX_LOCAL (mailbox) && mailbox->open_ref == 0)
   /* Call the actual function to determine the presence of new unread
    * messages */
-  if (mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path)){
-    mailbox->has_unread_messages = TRUE;
-  } else {
-    mailbox->has_unread_messages = FALSE;
-  }
+     mailbox->has_unread_messages = 
+	mailbox_have_new_messages (MAILBOX_LOCAL (mailbox)->path);
 
   balsa_mblist_mailbox_style (ctree, node, cnode_data
 #ifdef BALSA_SHOW_INFO
@@ -976,7 +971,7 @@ balsa_mblist_folder_style (GtkCTree* ctree, GtkCTreeNode* node, gpointer data)
       return;
 
     /* We're on a folder here, see if any of the leaves were displayed
-     * as having unread messages, change the syle accordingly */
+     * as having unread messages, change the style accordingly */
     if (has_unread & (1 << (GTK_CTREE_ROW (node)->level + 1))) {
       
       gtk_ctree_node_set_row_style (ctree, node, mblist->unread_mailbox_style);

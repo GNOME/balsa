@@ -330,8 +330,8 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
 }
 
 /* PKGW: you'd think this function would be a good idea. 
-We assume that we've been detached from the notebook.
-*/
+ * We assume that we've been detached from the notebook.
+ */
 void balsa_index_page_close_and_destroy( GtkObject *obj )
 {
   BalsaIndexPage *page;
@@ -385,10 +385,12 @@ idle_handler_cb(GtkWidget * widget)
   }
   if (bmsg) {
     if (BALSA_MESSAGE(bmsg)) {
-      if (message) 
-        balsa_message_set(BALSA_MESSAGE(bmsg), message);
-      else
-        balsa_message_clear (BALSA_MESSAGE (bmsg));
+      if(balsa_app.previewpane) {
+        if (message) 
+          balsa_message_set(BALSA_MESSAGE(bmsg), message);
+        else
+          balsa_message_clear (BALSA_MESSAGE (bmsg));
+      }
     }
   }
   

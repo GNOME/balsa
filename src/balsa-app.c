@@ -224,7 +224,7 @@ update_timer( gboolean update, guint minutes )
       if( balsa_app.check_mail_timer_id )
 	gtk_timeout_remove( balsa_app.check_mail_timer_id );
       balsa_app.check_mail_timer_id = gtk_timeout_add( timeout, 
-	       (GtkFunction) check_new_messages_auto_cb, NULL);
+	       (GtkFunction) check_new_messages_auto_cb, balsa_app.inbox);
     }
   else
     {

@@ -1,5 +1,9 @@
-2003-11-18 08:28  PeterB
+2003-11-18 18:22  PeterB
 
+	* libbalsa/send.c: Simplify call to
+	libbalsa_message_create_mime_message(); call it when postponing,
+	and save fcc in X-Balsa-Fcc header.
+	* libbalsa/message.c: Get fcc_url from X-Balsa-Fcc header.
 	* src/balsa-index.c: Clear index->current_message when destroying
 	the index, as the destroy method seems to be called more than once.
 

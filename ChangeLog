@@ -1,3 +1,13 @@
+2004-08-05 17:05  PeterB
+
+	* src/mailbox-conf.c: redraw fewer display elements and rescan less
+	of the tree; keep mailbox open in the backend if possible.
+	* libbalsa/: folder-scanners.c, folder-scanners.h: add GType
+	parent_type to libbalsa_scanner_local_dir api, and use it to start
+	the scanning using the appropriate helper.
+	* src/mailbox-node.c: use new api for libbalsa_scanner_local_dir;
+	add "append-subtree" support to MH and Maildir mailboxes.
+
 2004-08-05 10:01  PeterB
 
 	* libbalsa/: mailbox_local.c, mailbox_maildir.c, mailbox_maildir.h:

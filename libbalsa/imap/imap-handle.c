@@ -1159,8 +1159,10 @@ ir_capability(ImapMboxHandle *handle)
 static ImapResponse
 ir_list(ImapMboxHandle *h)
 {
-  const char* mbx_flags[] = 
-    { "Noinferiors", "Noselect", "Marked", "Unmarked" };
+  const char* mbx_flags[] = {
+    "Marked", "Unmarked", "Noselect", "Noinferiors",
+    "HasChildren", "HasNoChildren"
+  };
   int flags = 0;
   char buf[LONG_STRING], *s;
   int c, delim;

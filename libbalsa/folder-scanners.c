@@ -155,7 +155,7 @@ libbalsa_imap_add_folder (ImapMboxHandle* handle,
     int isFolder = 0;
     int isMailbox = 0;
 
-    printf("delim: %c folder: %s \n", delim, folder);
+    g_return_if_fail(folder && *folder);
     if (folder[strlen(folder)-1] == delim)
 	return;
 
@@ -170,7 +170,8 @@ libbalsa_imap_add_folder (ImapMboxHandle* handle,
      * Read RFC when in doubt. */
     if(!g_list_find_custom(state->subfolders, folder,
 			   (GCompareFunc)strcmp) && 
-       !IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS)) {
+       !IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS) &&
+       !IMAP_MBOX_HAS_FLAG(*flags,IMLIST_HASNOCHILDREN)) {
 	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              "ADDING FOLDER  %s %x\n", folder, *flags);
 	    
@@ -184,7 +185,7 @@ libbalsa_imap_add_folder (ImapMboxHandle* handle,
     else if (isFolder)
 	state->folder_handler(folder, delim, state->cb_data);
 
-    if ( IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS))
+    if (IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS))
         state->mark_imap_path(folder, state->cb_data);
 }
 
@@ -213,10 +214,10 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
 
     state->subfolders = NULL;
 
-    imap_path =
-	path[strlen(path) - 1] != state->delim
-	? g_strdup_printf("%s%c", path, state->delim)
-	: g_strdup(path);
+    if(*path && path[strlen(path) - 1] != state->delim)
+        imap_path = g_strdup_printf("%s%c", path, state->delim);
+    else 
+        imap_path = g_strdup(path);
 
     if (state->subscribed) 
 	imap_mbox_lsub(handle, imap_path);

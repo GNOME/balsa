@@ -1,3 +1,11 @@
+2003-09-20  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-entry.c: initalize emailData::address and fix
+	dangling references introduced yesterday.
+	* src/expand-alias.c: ditto.
+	* libbalsa/imap/imap-handle.[hc]: RFC3348 (children) support.
+	* libbalsa/folder-scanners.c: use it. Support empty prefix.
+
 2003-09-19  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-entry.[hc]: add libbalsa_address_entry_get_list().

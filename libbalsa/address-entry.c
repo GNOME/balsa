@@ -351,6 +351,7 @@ libbalsa_emailData_new(const gchar * str, gint n)
 
     tmp = g_malloc(sizeof(emailData));
     tmp->user = g_strndup(str, n);
+    tmp->address = NULL;
     tmp->match = NULL;
     tmp->cursor = -1;
     tmp->tabs = 0;
@@ -376,6 +377,7 @@ libbalsa_emailData_set_user(emailData * addy, gchar * str)
 
     g_free(addy->user);
     addy->user = str;
+    /* we DO NOT reset addy->address here. */
 }
 
 
@@ -395,6 +397,9 @@ libbalsa_emailData_free(emailData *addy)
     g_return_if_fail(addy != NULL);
 
     g_free(addy->user);
+    if(addy->address) {
+        g_object_unref(addy->address); addy->address = NULL;
+    }
     g_free(addy->match);
     g_free(addy);
 }
@@ -414,9 +419,7 @@ libbalsa_inputData_free(LibBalsaAddressEntry * address_entry)
 {
     GList *list;
 
-    if (!address_entry)
-        return;
-
+    g_return_if_fail(address_entry);
     list = g_list_first(address_entry->active);
     g_list_foreach(list, (GFunc) libbalsa_emailData_free, NULL);
     g_list_free(list);
@@ -2065,6 +2068,12 @@ GList*
 libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry)
 {
     GList *l, *res = NULL;
+    
+    /* FIXME: this should not be necessary but is to parse address list
+     * set by eg. gtk_entry_set_text(). We should do it earlier, though. */
+    if(!address_entry->active) 
+        libbalsa_fill_input(address_entry);
+
     for(l = g_list_first(address_entry->active); l;  l = l->next) {
         emailData *ed = l->data;
         if(!ed->user || !*ed->user)

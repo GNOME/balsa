@@ -169,6 +169,10 @@ expand_alias_find_match(emailData *addy, gboolean fastp)
     if (prefix) g_free(prefix);
 
     addy->match = output;
+    if(addy->address)
+        g_object_unref(addy->address);
     addy->address = addr;
+    if(addy->address)
+        g_object_ref(addy->address);
 }
 

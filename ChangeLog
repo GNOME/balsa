@@ -1,3 +1,10 @@
+1998-12-27  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/main-window.c (destroy_window_cb): only save window size.
+	attached to destroy signal of each app in app_create().
+	(destroy_mdi_cb): call balsa_exit(). attached to mdi destroy signal.
+	this was necessary, as mdi might not have an active_window on
+	destruction!
 
 1998-12-26  bertrand <bertrand.guiheneuf@inria.fr>
 

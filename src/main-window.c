@@ -77,7 +77,8 @@ static void mailbox_close_child (GtkWidget * widget, gpointer data);
 
 static void about_box_destroy_cb (void);
 
-static void destroy_window_cb (GnomeMDI * mdi, gpointer data);
+static void destroy_mdi_cb (GnomeMDI * mdi, gpointer data);
+static void destroy_window_cb (GtkObject * object);
 
 static void set_icon (GnomeApp * app);
 
@@ -223,11 +224,16 @@ main_window_set_cursor (gint type)
 }
 
 static void
-destroy_window_cb (GnomeMDI * mdi, gpointer data)
+destroy_mdi_cb (GnomeMDI * mdi, gpointer data)
 {
-  balsa_app.mw_width = GTK_WIDGET (mdi->active_window)->allocation.width;
-  balsa_app.mw_height = GTK_WIDGET (mdi->active_window)->allocation.height;
   balsa_exit ();
+}
+
+static void
+destroy_window_cb (GtkObject *object)
+{
+  balsa_app.mw_width = GTK_WIDGET (object)->allocation.width;
+  balsa_app.mw_height = GTK_WIDGET (object)->allocation.height;  
 }
 
 void
@@ -238,13 +244,13 @@ main_window_init (void)
 
   gtk_signal_connect (GTK_OBJECT (mdi),
 		      "destroy",
-		      (GtkSignalFunc) destroy_window_cb,
+		      (GtkSignalFunc) destroy_mdi_cb,
 		      NULL);
 
   /* meubar and toolbar */
   gtk_signal_connect (GTK_OBJECT (mdi), "child_changed", GTK_SIGNAL_FUNC (index_child_changed), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "app_created", GTK_SIGNAL_FUNC (app_created), NULL);
-  gnome_mdi_set_child_list_path (mdi, _ ("Mail_boxes/<Separator>"));
+  gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
 
   gnome_mdi_set_menubar_template (mdi, main_menu);
   gnome_mdi_set_toolbar_template (mdi, main_toolbar);
@@ -280,6 +286,8 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (app), "realize",
 		      GTK_SIGNAL_FUNC (set_icon), NULL);
+  gtk_signal_connect (GTK_OBJECT (app), "destroy",
+		      GTK_SIGNAL_FUNC (destroy_window_cb), NULL);
 
   statusbar = gtk_statusbar_new ();
   pbar = gtk_progress_bar_new ();

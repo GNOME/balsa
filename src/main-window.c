@@ -946,6 +946,9 @@ mblist_menu_edit_cb (GtkWidget * widget, gpointer data)
 {
   Mailbox *mailbox = mblist_get_selected_mailbox();
 
+  if (mailbox == NULL)
+    return;
+
   mailbox_conf_new (mailbox, FALSE, MAILBOX_UNKNOWN);
 }
 
@@ -954,6 +957,9 @@ static void
 mblist_menu_delete_cb (GtkWidget * widget, gpointer data)
 {
   Mailbox *mailbox = mblist_get_selected_mailbox();
+
+  if (mailbox == NULL)
+    return;
 
   if (mailbox->type == MAILBOX_UNKNOWN)
     return;

@@ -840,8 +840,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
     /*
      * rename "from" column to "to" for outgoing mail
      */
-    if (mailbox == balsa_app.sentbox ||
-	mailbox == balsa_app.draftbox || mailbox == balsa_app.outbox) {
+    if (mailbox->show == LB_MAILBOX_SHOW_TO) {
         GtkTreeViewColumn *column = gtk_tree_view_get_column(tree_view, 3);
 
         gtk_tree_view_column_set_title(column, _("To"));
@@ -2431,9 +2430,7 @@ bndx_add_message(BalsaIndex * index, LibBalsaMessage * message)
     num = g_strdup_printf("%ld", LIBBALSA_MESSAGE_GET_NO(message) + 1);
 
     append_dots = FALSE;
-    if (mailbox == balsa_app.sentbox ||
-	mailbox == balsa_app.draftbox ||
-	mailbox == balsa_app.outbox) {
+    if (mailbox->show == LB_MAILBOX_SHOW_TO) {
 	if (message->to_list) {
 	    list = g_list_first(message->to_list);
 	    addy = list->data;

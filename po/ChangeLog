@@ -1,3 +1,7 @@
+2002-08-08  Pawel Salek <pawsa@theochem.kth.se>
+
+	* fi.po, ms.po: fix printf() formats.
+
 2002-08-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makevars: added for compatibility with gettext-0.11

@@ -1,3 +1,14 @@
+2003-11-04 00:08  PeterB
+
+	* libbalsa/mailbox_maildir.c: Close the mailbox with a
+	close_mailbox method instead of close_backend; implement
+	parse_mailbox_subdirs() helper; build list of removed messages when
+	syncing, renumber higher-numbered messages, and notify the
+	tree-model.
+	* libbalsa/mailbox_local.c: Populate the msg_tree only with
+	messages in the msg_list; allocate the msg_array enough space to
+	store the highest numbered message.
+
 2003-11-02 20:29  PeterB
 
 	* libbalsa/mailbox_mbox.c: Remove close_backend method and

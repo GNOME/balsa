@@ -58,8 +58,6 @@ static gboolean bndx_popup_menu(GtkWidget * widget);
 /* statics */
 
 /* Setting style */
-static void bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
-                                LibBalsaMessage * message);
 static void bndx_set_style(BalsaIndex * index, GtkTreePath * path,
                            GtkTreeIter * iter);
 static void bndx_set_parent_style(BalsaIndex * index, GtkTreeIter * iter);
@@ -300,38 +298,7 @@ bndx_instance_init(BalsaIndex * index)
                      G_CALLBACK(bndx_column_click), index);
     gtk_tree_view_append_column(tree_view, column);
 
-    /* marked column */
-    column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, "S");
-    gtk_tree_view_column_set_alignment(column, 0.5);
-    renderer = gtk_cell_renderer_text_new();
-    g_object_set(renderer, "xalign", 1.0, NULL);
-    gtk_tree_view_column_pack_start(column, renderer, FALSE);
-    gtk_tree_view_column_set_attributes(column, renderer,
-                                        "text", LB_MBOX_MARKED_COL,
-                                        NULL);
-    gtk_tree_view_column_set_sort_column_id(column, LB_MBOX_MARKED_COL);
-    g_signal_connect(G_OBJECT(column), "clicked",
-                     G_CALLBACK(bndx_column_click), index);
-    gtk_tree_view_append_column(tree_view, column);
-
-    /* Attached column */
-    column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, "A");
-    gtk_tree_view_column_set_alignment(column, 0.5);
-    renderer = gtk_cell_renderer_text_new();
-    g_object_set(renderer, "xalign", 1.0, NULL);
-    gtk_tree_view_column_pack_start(column, renderer, FALSE);
-    gtk_tree_view_column_set_attributes(column, renderer,
-                                        "text", LB_MBOX_ATTACH_COL,
-                                        NULL);
-    gtk_tree_view_column_set_sort_column_id(column, LB_MBOX_ATTACH_COL);
-    g_signal_connect(G_OBJECT(column), "clicked",
-                     G_CALLBACK(bndx_column_click), index);
-    gtk_tree_view_append_column(tree_view, column);
-
     /* Status icon column */
-#if 0
     renderer = gtk_cell_renderer_pixbuf_new();
     column =
         gtk_tree_view_column_new_with_attributes("S", renderer,
@@ -348,7 +315,6 @@ bndx_instance_init(BalsaIndex * index)
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_append_column(tree_view, column);
-#endif    
     /* From/To column */
     renderer = gtk_cell_renderer_text_new();
     column = 
@@ -792,6 +758,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
     gboolean successp;
 
     g_return_val_if_fail (index != NULL, TRUE);
+    g_return_val_if_fail (index->mailbox_node == NULL, TRUE);
     g_return_val_if_fail (mbnode != NULL, TRUE);
     g_return_val_if_fail (mbnode->mailbox != NULL, TRUE);
 
@@ -807,22 +774,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 
     if (!successp)
 	return TRUE;
-
-    /*
-     * release the old mailbox
-     */
-    if (index->mailbox_node && index->mailbox_node->mailbox) {
-        mailbox = index->mailbox_node->mailbox;
-
-	/* This will disconnect all of our signals */
-        g_signal_handlers_disconnect_matched(G_OBJECT(mailbox),
-                                             G_SIGNAL_MATCH_DATA,
-                                             0, 0, NULL, NULL,
-                                             index);
-	libbalsa_mailbox_close(mailbox);
-        g_hash_table_foreach_remove(index->ref_table, (GHRFunc) gtk_true,
-                                    NULL);
-    }
 
     /*
      * set the new mailbox
@@ -1171,91 +1122,6 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter,
 
 /* End of select message interfaces. */
 
-static void
-balsa_index_update_flag(BalsaIndex * index, LibBalsaMessage * message)
-{
-    GtkTreeIter iter;
-
-    g_return_if_fail(index != NULL);
-    g_return_if_fail(message != NULL);
-
-    if (bndx_find_message(index, NULL, &iter, message))
-	bndx_set_col_images(index, &iter, message);
-}
-
-static void
-bndx_set_col_images(BalsaIndex * index, GtkTreeIter * iter,
-		    LibBalsaMessage * message)
-{
-    GdkPixbuf *status_pixbuf = NULL;
-    GdkPixbuf *attach_pixbuf = NULL;
-    guint tmp;
-    /* only ony status icon is shown; they are ordered from most important. */
-    const static struct {
-        int mask;
-        const gchar *icon_name;
-    } flags[] = {
-        { LIBBALSA_MESSAGE_FLAG_DELETED, BALSA_PIXMAP_TRASH   },
-        { LIBBALSA_MESSAGE_FLAG_FLAGGED, BALSA_PIXMAP_INFO_FLAGGED },
-        { LIBBALSA_MESSAGE_FLAG_REPLIED, BALSA_PIXMAP_INFO_REPLIED }};
-
-    for (tmp = 0; tmp < ELEMENTS(flags)
-         && !LIBBALSA_MESSAGE_HAS_FLAG(message, flags[tmp].mask);
-         tmp++);
-
-    if (tmp < ELEMENTS(flags))
-        status_pixbuf =
-            gtk_widget_render_icon(GTK_WIDGET(index->window),
-                                   flags[tmp].icon_name,
-                                   GTK_ICON_SIZE_MENU, NULL);
-    /* Alternatively, we could show an READ icon:
-     * gtk_ctree_node_set_pixmap(ctree, node, 1,
-     * balsa_icon_get_pixmap(BALSA_PIXMAP_INFO_READ),
-     * balsa_icon_get_bitmap(BALSA_PIXMAP_INFO_READ)); 
-     */
-
-    if (libbalsa_message_has_attachment(message))
-        attach_pixbuf =
-            gtk_widget_render_icon(GTK_WIDGET(index->window),
-                                   BALSA_PIXMAP_INFO_ATTACHMENT,
-                                   GTK_ICON_SIZE_MENU, NULL);
-#ifdef HAVE_GPGME
-    else if (libbalsa_message_is_pgp_signed(message)) {
-	switch (message->sig_state)
-	    {
-	    case LIBBALSA_MESSAGE_SIGNATURE_GOOD:
-		attach_pixbuf =
-		    gtk_widget_render_icon(GTK_WIDGET(index->window),
-					   BALSA_PIXMAP_INFO_SIGN_GOOD,
-					   GTK_ICON_SIZE_MENU, NULL);
-		break;
-	    case LIBBALSA_MESSAGE_SIGNATURE_NOTRUST:
-		attach_pixbuf =
-		    gtk_widget_render_icon(GTK_WIDGET(index->window),
-					   BALSA_PIXMAP_INFO_SIGN_NOTRUST,
-					   GTK_ICON_SIZE_MENU, NULL);
-		break;
-	    case LIBBALSA_MESSAGE_SIGNATURE_BAD:
-		attach_pixbuf =
-		    gtk_widget_render_icon(GTK_WIDGET(index->window),
-					   BALSA_PIXMAP_INFO_SIGN_BAD,
-					   GTK_ICON_SIZE_MENU, NULL);
-		break;
-	    default:
-		attach_pixbuf =
-		    gtk_widget_render_icon(GTK_WIDGET(index->window),
-					   BALSA_PIXMAP_INFO_SIGN,
-					   GTK_ICON_SIZE_MENU, NULL);
-	    }
-    } else if (libbalsa_message_is_pgp_encrypted(message))
-        attach_pixbuf =
-            gtk_widget_render_icon(GTK_WIDGET(index->window),
-                                   BALSA_PIXMAP_INFO_ENCR,
-                                   GTK_ICON_SIZE_MENU, NULL);
-#endif
-
-}
-
 static gboolean
 thread_has_unread(BalsaIndex * index, GtkTreeIter * iter)
 {
@@ -1344,8 +1210,6 @@ mailbox_messages_changed_status(LibBalsaMailbox * mb,
 				gint flag,
 				BalsaIndex * bindex)
 {
-    GList *list;
-
     if (!libbalsa_mailbox_is_valid(mb)) return;
 
     if (flag == LIBBALSA_MESSAGE_FLAG_DELETED &&
@@ -1360,12 +1224,6 @@ mailbox_messages_changed_status(LibBalsaMailbox * mb,
 	bndx_messages_remove(bindex,messages);
 #endif
         return;
-    }
-
-    for (list = messages; list; list = g_list_next(list)) {
-        LibBalsaMessage *msg = LIBBALSA_MESSAGE(list->data);
-        if(msg->mailbox)
-            balsa_index_update_flag(bindex, msg);
     }
 
     if (flag == LIBBALSA_MESSAGE_FLAG_DELETED

@@ -587,7 +587,7 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     if (pthread_self() == libbalsa_get_main_thread()) 
         return ask_cert_real(cert);
 
-    libbalsa_unlock_mutt(); 
+    libbalsa_unlock_mutt(); gdk_threads_leave();
     pthread_mutex_lock(&ask_cert_lock);
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;
@@ -597,7 +597,7 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     pthread_cond_destroy(&acd.cond);
     pthread_mutex_unlock(&ask_cert_lock);
     pthread_mutex_destroy(&ask_cert_lock);
-    libbalsa_lock_mutt();
+    gdk_threads_enter(); libbalsa_lock_mutt();
     return acd.res;
 }
 #else /* BALSA_USE_THREADS */

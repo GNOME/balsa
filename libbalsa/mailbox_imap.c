@@ -1371,6 +1371,13 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 
     g_free(mimap->path);
     mimap->path = gnome_config_get_string("Path");
+    if (!mimap->path) {
+	mimap->path = g_strdup("INBOX");
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("No path found for mailbox \"%s\", "
+			       "using \"%s\""),
+			     mailbox->name, mimap->path);
+    }
 
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());

@@ -343,15 +343,12 @@ message_window_idle_handler(MessageWindow* mw)
     gtk_window_set_title(GTK_WINDOW(mw->window), title);
     g_free(title);
 
-    balsa_message_set(msg, message);
-    balsa_message_grab_focus(BALSA_MESSAGE(mw->bmessage));
-    /* We may have triggered a mailbox-check, so we need to verify that
-     * the message is still good. */
-    if (!message->mailbox) {
+    if (!balsa_message_set(msg, message)) {
 	gtk_widget_destroy(mw->window);
 	gdk_threads_leave();
 	return FALSE;
     }
+    balsa_message_grab_focus(BALSA_MESSAGE(mw->bmessage));
 
     balsa_message_set_close(msg, TRUE);
     mw_set_part_buttons_sensitive(mw);

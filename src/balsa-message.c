@@ -1196,9 +1196,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	LibBalsaMailbox *mailbox = message->mailbox;
 	libbalsa_mailbox_check(mailbox);
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Could not access message; "
-                            "mailbox \"%s\" was changed."),
-			  mailbox->name);
+                          _("Could not access message %ld "
+                            "in mailbox \"%s\"."),
+			  message->msgno, mailbox->name);
         return FALSE;
     }
 

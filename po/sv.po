@@ -11,8 +11,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-10-23 01:08+0200\n"
-"PO-Revision-Date: 2002-10-23 01:12+0200\n"
+"POT-Creation-Date: 2002-10-24 23:57+0200\n"
+"PO-Revision-Date: 2002-10-25 00:01+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -29,12 +29,12 @@ msgstr ""
 "från: %s"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:243 libbalsa/address-book-ldap.c:384
+#: libbalsa/address-book-extern.c:243 libbalsa/address-book-ldap.c:385
 #: libbalsa/address-book-ldif.c:271 libbalsa/address-book-vcard.c:270
 msgid "No-Id"
 msgstr "Inget-Id"
 
-#: libbalsa/address-book-extern.c:247 libbalsa/address-book-ldap.c:388
+#: libbalsa/address-book-extern.c:247 libbalsa/address-book-ldap.c:389
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-ldif.c:548
 #: libbalsa/address-book-ldif.c:552 libbalsa/address-book-vcard.c:288
 msgid "No-Name"
@@ -46,7 +46,7 @@ msgid "Could not add address to address book %s while trying to execute: %s"
 msgstr ""
 "Kunde inte lägga till adress till adressboken %s vid försök att köra: %s"
 
-#: libbalsa/address-book-ldap.c:214
+#: libbalsa/address-book-ldap.c:215
 msgid ""
 "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
@@ -54,7 +54,7 @@ msgstr ""
 "Misslyckades med att initiera LDAP-servern.\n"
 "Kontrollera att servernamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:224
+#: libbalsa/address-book-ldap.c:225
 #, c-format
 msgid ""
 "Failed to bind to server: %s\n"
@@ -63,7 +63,7 @@ msgstr ""
 "Misslyckades med att binda till servern: %s\n"
 "Kontrollera att servernamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:273 libbalsa/address-book-ldap.c:589
+#: libbalsa/address-book-ldap.c:274 libbalsa/address-book-ldap.c:598
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Misslyckades med att söka: %s.Kontrollera att basnamnet är giltigt."
@@ -1584,26 +1584,29 @@ msgstr "_Basdomännamn"
 msgid "Add"
 msgstr "Lägg till"
 
-#: src/address-book-config.c:578 src/address-book-config.c:582
-msgid "address book file"
-msgstr "adressboksfil"
-
-#: src/address-book-config.c:586
-msgid "load program"
-msgstr "läs in program"
-
-#: src/address-book-config.c:589
-msgid "save program"
-msgstr "spara program"
-
-#: src/address-book-config.c:621
+#: src/address-book-config.c:632
 #, c-format
-msgid ""
-"The %s path '%s' is not correct.\n"
-"Do you want to correct the path?"
-msgstr ""
-"Sökvägen \"%s\" till %s är inte korrekt.\n"
-"Vill du rätta till sökvägen?"
+msgid "The address book file path \"%s\" is not correct. %s"
+msgstr "Sökvägen \"%s\" till adressoksfilen är inte korrekt. %s"
+
+#: src/address-book-config.c:635
+#, c-format
+msgid "The load program path \"%s\" is not correct. %s"
+msgstr "Sökvägen \"%s\" till inläsning av program är inte korrekt. %s"
+
+#: src/address-book-config.c:638
+#, c-format
+msgid "The save program path \"%s\" is not correct. %s"
+msgstr "Sökvägen \"%s\" för programsparande är inte korrekt. %s"
+
+#: src/address-book-config.c:641
+#, c-format
+msgid "The path \"%s\" is not correct. %s"
+msgstr "Sökvägen \"%s\" är inte korrekt. %s"
+
+#: src/address-book-config.c:644
+msgid "Do you want to correct the path?"
+msgstr "Vill du rätta till sökvägen?"
 
 #: src/address-book.c:164 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
@@ -1697,60 +1700,60 @@ msgstr "Öppnar brevlådan %s. Var vänlig vänta..."
 msgid "To"
 msgstr "Till"
 
-#: src/balsa-index.c:2069
+#: src/balsa-index.c:2071
 msgid "_View Source"
 msgstr "_Visa källa"
 
-#: src/balsa-index.c:2071 src/main-window.c:453 src/message-window.c:126
+#: src/balsa-index.c:2073 src/main-window.c:453 src/message-window.c:126
 msgid "_Reply..."
 msgstr "_Svara..."
 
-#: src/balsa-index.c:2073
+#: src/balsa-index.c:2075
 msgid "Reply To _All..."
 msgstr "Svara till _alla..."
 
-#: src/balsa-index.c:2075
+#: src/balsa-index.c:2077
 msgid "Reply To _Group..."
 msgstr "Svara till _grupp..."
 
-#: src/balsa-index.c:2077
+#: src/balsa-index.c:2079
 msgid "_Forward Attached..."
 msgstr "_Vidarebefordra bifogad..."
 
-#: src/balsa-index.c:2079
+#: src/balsa-index.c:2081
 msgid "Forward _Inline..."
 msgstr "Vidarebefordra _inuti..."
 
-#: src/balsa-index.c:2081 src/main-window.c:555
+#: src/balsa-index.c:2083 src/main-window.c:555
 msgid "_Store Address..."
 msgstr "_Lagra adress..."
 
-#: src/balsa-index.c:2094 src/mailbox-node.c:773 src/main-window.c:537
+#: src/balsa-index.c:2096 src/mailbox-node.c:773 src/main-window.c:537
 #: src/pref-manager.c:1424 src/pref-manager.c:2438
 msgid "_Delete"
 msgstr "_Ta bort"
 
-#: src/balsa-index.c:2099 src/main-window.c:544
+#: src/balsa-index.c:2101 src/main-window.c:544
 msgid "_Undelete"
 msgstr "_Återskapa"
 
-#: src/balsa-index.c:2104
+#: src/balsa-index.c:2106
 msgid "Move To _Trash"
 msgstr "Flytta till _papperskorgen"
 
-#: src/balsa-index.c:2108
+#: src/balsa-index.c:2110
 msgid "T_oggle"
 msgstr "Vä_xla"
 
-#: src/balsa-index.c:2111
+#: src/balsa-index.c:2113
 msgid "_Flagged"
 msgstr "_Flaggad"
 
-#: src/balsa-index.c:2114
+#: src/balsa-index.c:2116
 msgid "_Unread"
 msgstr "_Olästa"
 
-#: src/balsa-index.c:2122
+#: src/balsa-index.c:2124
 msgid "_Move to"
 msgstr "_Flytta till"
 
@@ -2293,11 +2296,11 @@ msgstr ""
 msgid "Remote IMAP folder"
 msgstr "IMAP-fjärrmapp"
 
-#: src/folder-conf.c:194 src/folder-conf.c:563 src/mailbox-conf.c:445
+#: src/folder-conf.c:194 src/folder-conf.c:564 src/mailbox-conf.c:445
 msgid "_Update"
 msgstr "_Uppdatera"
 
-#: src/folder-conf.c:194 src/folder-conf.c:563
+#: src/folder-conf.c:194 src/folder-conf.c:564
 msgid "_Create"
 msgstr "_Skapa"
 
@@ -2348,7 +2351,7 @@ msgstr "Använd SS_L (IMAPS)"
 msgid "Select parent folder"
 msgstr "Välj föräldermapp"
 
-#: src/folder-conf.c:440
+#: src/folder-conf.c:441
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2363,19 +2366,19 @@ msgstr ""
 "INBOX och dess undermappar kommer att\n"
 "finnas kvar. Vad vill du göra?"
 
-#: src/folder-conf.c:447
+#: src/folder-conf.c:448
 msgid "Question"
 msgstr "Fråga"
 
-#: src/folder-conf.c:450
+#: src/folder-conf.c:451
 msgid "Rename INBOX"
 msgstr "Byt namn på INBOX"
 
-#: src/folder-conf.c:451 src/toolbar-factory.c:169
+#: src/folder-conf.c:452 src/toolbar-factory.c:169
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: src/folder-conf.c:536
+#: src/folder-conf.c:537
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -2383,32 +2386,32 @@ msgstr ""
 "En IMAP-mapp som inte är en brevlåda\n"
 "har inga egenskaper som kan ändras."
 
-#: src/folder-conf.c:560
+#: src/folder-conf.c:561
 msgid "Remote IMAP subfolder"
 msgstr "IMAP-fjärrundermapp"
 
-#: src/folder-conf.c:572
+#: src/folder-conf.c:573
 msgid "Rename or move subfolder"
 msgstr "Byt namn på eller flytta undermapp"
 
-#: src/folder-conf.c:573
+#: src/folder-conf.c:574
 msgid "Create subfolder"
 msgstr "Skapa undermapp"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:580
+#: src/folder-conf.c:581
 msgid "_Folder name:"
 msgstr "_Mappnamn:"
 
-#: src/folder-conf.c:586
+#: src/folder-conf.c:587
 msgid "_Subfolder of:"
 msgstr "_Undermapp till:"
 
-#: src/folder-conf.c:591
+#: src/folder-conf.c:592
 msgid "Browse..."
 msgstr "Bläddra..."
 
-#: src/folder-conf.c:620
+#: src/folder-conf.c:621
 msgid ""
 "This folder is not stored in configuration.I do not yet know how to remove "
 "it from remote server."
@@ -2416,7 +2419,7 @@ msgstr ""
 "Denna mapp finns inte lagrad i konfigurationen. Jag vet ännu inte om hur jag "
 "ska ta bort den från fjärrservern."
 
-#: src/folder-conf.c:630
+#: src/folder-conf.c:631
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2426,7 +2429,7 @@ msgstr ""
 "Du kan använda \"Ny IMAP-mapp\" senare för att lägga till denna\n"
 "mapp igen.\n"
 
-#: src/folder-conf.c:635
+#: src/folder-conf.c:636
 msgid "Confirm"
 msgstr "Bekräfta"
 
@@ -4758,6 +4761,15 @@ msgstr "Tillgängliga knappar"
 #: src/toolbar-prefs.c:765
 msgid "Current toolbar"
 msgstr "Anpassa verktygsrad"
+
+#~ msgid "address book file"
+#~ msgstr "adressboksfil"
+
+#~ msgid "load program"
+#~ msgstr "läs in program"
+
+#~ msgid "save program"
+#~ msgstr "spara program"
 
 #~ msgid "Hide"
 #~ msgstr "Dölj"

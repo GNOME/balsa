@@ -351,8 +351,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 {
   GList *list;
   guint i = 0;
-  GdkCursor *cursor;
-  GdkWindow *window;
 
   g_return_if_fail (bindex != NULL);
 
@@ -362,10 +360,8 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (mailbox == NULL)
     return;
 
-  cursor = gdk_cursor_new (GDK_WATCH);
-  window = gtk_widget_get_parent_window (GTK_WIDGET (bindex));
-  gdk_window_set_cursor (window, cursor);
-
+ main_window_set_cursor(GDK_WATCH);
+  
   /*
    * release the old mailbox
    */
@@ -422,9 +418,9 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 
-  gdk_cursor_destroy (cursor);
+ main_window_set_cursor(NULL);
 
-  gtk_idle_add ((GtkFunction) moveto_handler, bindex);
+ gtk_idle_add ((GtkFunction) moveto_handler, bindex);
 }
 
 void

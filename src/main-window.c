@@ -37,7 +37,6 @@
 #include "pref-manager.h"
 #include "sendmsg-window.h"
 
-
 #define MAILBOX_DATA "mailbox_data"
 
 static GnomeMDI *mdi = NULL;
@@ -75,6 +74,23 @@ static void mailbox_close_child (GtkWidget * widget, gpointer data);
 static void about_box_destroy_cb (void);
 
 static void destroy_window_cb (GnomeMDI * mdi, gpointer data);
+
+
+void
+main_window_set_cursor (gint type)
+{
+  GdkCursor *cursor;
+
+  if (type == -1)
+    {
+      gdk_window_set_cursor (GTK_WIDGET(mdi->active_window)->window, NULL);
+      return;
+    }
+
+  cursor = gdk_cursor_new (type);
+  gdk_window_set_cursor (GTK_WIDGET(mdi->active_window)->window, cursor);
+  gdk_cursor_destroy (cursor);
+}
 
 static void
 destroy_window_cb (GnomeMDI * mdi, gpointer data)

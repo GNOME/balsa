@@ -941,6 +941,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->charset);
+    g_slist_foreach(bsmsg->charsets, (GFunc) g_free, NULL);
+    g_slist_free(bsmsg->charsets);
 
     if (bsmsg->spell_checker)
         gtk_widget_destroy(bsmsg->spell_checker);
@@ -2159,6 +2161,7 @@ attach_clicked(GtkWidget * widget, gpointer data)
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    gtk_window_set_destroy_with_parent(GTK_WINDOW(fsw), TRUE);
 
     fc = GTK_FILE_CHOOSER(fsw);
     gtk_file_chooser_set_select_multiple(fc, TRUE);
@@ -2988,56 +2991,6 @@ create_text_area(BalsaSendmsg * bsmsg)
     return table;
 }
 
-/* Change message charset based on current charset and the new one. */
-static void
-sw_set_charset_from_charset(BalsaSendmsg * bsmsg, const gchar * charset)
-{
-    const gchar *charset_iconv;
-    const gchar *bsmsg_iconv;
-    const gchar *new_iconv;
-    const gchar *charset_win;
-    const gchar *bsmsg_win;
-
-    /* First check for a NULL or ascii charset. */
-    if (!charset || g_ascii_strcasecmp(charset, "us-ascii") == 0) 
-        return;
-
-    /* If the message charset is NULL or ascii, use the new charset. */
-    if (!bsmsg->charset) {
-        bsmsg->charset = g_strdup(charset);
-        return;
-    }
-
-    if (g_ascii_strcasecmp(bsmsg->charset, "us-ascii") == 0) {
-	g_free(bsmsg->charset);
-        bsmsg->charset = g_strdup(charset);
-        return;
-    }
-
-    /* Both non-ascii: compare iconv-friendly names. */
-    charset_iconv = g_mime_charset_iconv_name(charset);
-    bsmsg_iconv   = g_mime_charset_iconv_name(bsmsg->charset);
-
-    if (strcmp(bsmsg_iconv, charset_iconv) == 0)
-        return;
-
-    new_iconv = g_mime_charset_iconv_name("UTF-8");
-
-    /* If the message charset is already utf-8, there's nowhere to go. */
-    if (strcmp(bsmsg_iconv, new_iconv) == 0)
-	return;
-
-    /* If they're both in the same iso/windows pair, use the windows
-     * charset. */
-    bsmsg_win = g_mime_charset_iso_to_windows(bsmsg_iconv);
-    charset_win = g_mime_charset_iso_to_windows(charset_iconv);
-    if (strcmp(bsmsg_win, charset_win) == 0)
-	new_iconv = g_mime_charset_iconv_name(bsmsg_win);
-
-    g_free(bsmsg->charset);
-    bsmsg->charset = g_strdup(new_iconv);
-}
-
 /* Check whether the string can be converted. */
 static gboolean
 sw_can_convert(const gchar * string, gssize len,
@@ -3064,6 +3017,34 @@ sw_can_convert(const gchar * string, gssize len,
     return !err;
 }
 
+/*
+ * bsmsg->charsets is a list of charsets associated with quoted or
+ * included messages, and included files; we use GMime's
+ * "iconv-friendly" name and try to avoid duplicates; the first charset
+ * that works is used, and we prepend new choices, so the priority is:
+ * - the user's new language choice;
+ * - the charsets of quoted and included text;
+ * - the user's default language.
+ */
+static void
+sw_prepend_charset(BalsaSendmsg * bsmsg, const gchar * charset)
+{
+    const gchar *charset_iconv;
+
+    charset_iconv = g_mime_charset_iconv_name(charset);
+    if (g_ascii_strcasecmp(charset, "UTF-8") != 0
+        && !g_slist_find_custom(bsmsg->charsets, charset_iconv,
+                                (GCompareFunc) strcmp))
+        bsmsg->charsets =
+            g_slist_prepend(bsmsg->charsets, g_strdup(charset_iconv));
+}
+
+static void
+sw_charset_cb(const gchar * charset, gpointer data)
+{
+    sw_prepend_charset((BalsaSendmsg *) data, charset);
+}
+
 /* continueBody ---------------------------------------------------------
    a short-circuit procedure for the 'Continue action'
    basically copies the first text/plain part over to the entry field.
@@ -3086,7 +3067,6 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	    GString *rbdy;
 	    gchar *body_type = libbalsa_message_body_get_mime_type(body);
             gint llen = -1;
-	    const gchar *charset = NULL;
             GtkTextBuffer *buffer =
                 gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
@@ -3094,11 +3074,9 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
                 llen = balsa_app.wraplength;
 	    if (!strcmp(body_type, "text/plain") &&
 		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
-                                          bsmsg->flow, &charset))) {
+                                          bsmsg->flow, sw_charset_cb,
+					  bsmsg))) {
                 libbalsa_insert_with_url(buffer, rbdy->str, NULL, NULL, NULL);
-                if (!sw_can_convert(rbdy->str, rbdy->len,
-                                    bsmsg->charset, "UTF-8", NULL))
-                    sw_set_charset_from_charset(bsmsg, charset);
 		g_string_free(rbdy, TRUE);
 	    }
 	    g_free(body_type);
@@ -3212,8 +3190,6 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 	    g_string_append_c(body, '\n');
 	}
     } else {
-	const gchar *charset = NULL;
-
 	if (date)
 	    str = g_strdup_printf(_("On %s, %s wrote:\n"), date, personStr);
 	else
@@ -3224,7 +3200,7 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 			     balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, bsmsg->flow,
-			     &charset);
+			     sw_charset_cb, bsmsg);
 	if (body) {
 	    gchar *buf;
 
@@ -3234,10 +3210,6 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 	    body = g_string_new(buf);
 	    g_free(buf);
 	    g_string_prepend(body, str);
-
-            if (!sw_can_convert(body->str, body->len, bsmsg->charset,
-                                "UTF-8", NULL))
-                sw_set_charset_from_charset(bsmsg, charset);
 	} else
 	    body = g_string_new(str);
 	g_free(str);
@@ -3821,6 +3793,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
     bsmsg->charset  = NULL;
+    bsmsg->charsets  = NULL;
     bsmsg->locale   = NULL;
     bsmsg->fcc_url  = NULL;
     bsmsg->ident = balsa_app.current_ident;
@@ -4190,7 +4163,7 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
         g_print("Trying charset: %s\n", charset);
         if (sw_can_convert(string, len, "UTF-8", charset, &s)) {
             libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
-	    sw_set_charset_from_charset(bsmsg, charset);
+	    sw_prepend_charset(bsmsg, charset);
             g_free(s);
             break;
         }
@@ -4208,7 +4181,7 @@ insert_file_response(GtkWidget * selector, gint response,
     gchar * string;
     size_t len;
     LibBalsaTextAttribute attr;
-    gchar *s;
+    GSList *list;
 
     if (response != GTK_RESPONSE_OK) {
 	gtk_widget_destroy(selector);
@@ -4233,22 +4206,28 @@ insert_file_response(GtkWidget * selector, gint response,
     fclose(fl);
     
     attr = libbalsa_text_attr_string(string);
-    if (!attr || attr & LIBBALSA_TEXT_HI_UTF8) {
+    if (!attr || attr & LIBBALSA_TEXT_HI_UTF8)
 	/* Ascii or utf-8 */
         libbalsa_insert_with_url(buffer, string, NULL, NULL, NULL);
-        if (attr
-	    && !sw_can_convert(string, -1, bsmsg->charset, "UTF-8", NULL))
-	    /* Not ascii and can't be encoded in the current charset. */
-	    sw_set_charset_from_charset(bsmsg, "UTF-8");
-    } else {
+    else {
 	/* Neither ascii nor utf-8... */
-        if (sw_can_convert(string, -1, "UTF-8", bsmsg->charset, &s))
-	    /* but seems to be in the current charset. */
+	gchar *s = NULL;
+
+        for (list = bsmsg->charsets; list; list = list->next) {
+            if (sw_can_convert
+                (string, -1, "UTF-8", (const gchar *) list->data, &s))
+                break;
+            g_free(s);
+	    s = NULL;
+        }
+
+	if (s) {
+	    /* ...but seems to be in a current charset. */
             libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
-        else
-	    /* and can't be decoded from the current charset. */
+	    g_free(s);
+	} else
+	    /* ...and can't be decoded from any current charset. */
             do_insert_string_select_ch(bsmsg, buffer, string, len);
-        g_free(s);
     }
     g_free(string);
 
@@ -4270,6 +4249,7 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    gtk_window_set_destroy_with_parent(GTK_WINDOW(file_selector), TRUE);
     /* Use the same folder as for attachments. */
     if (balsa_app.attach_dir)
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
@@ -4535,50 +4515,58 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 static gboolean
 is_charset_ok(BalsaSendmsg *bsmsg)
 {
-    gchar *tmp;
-    GtkTextIter start, end;
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    gboolean ok;
+    GtkTextIter start, end;
+    gchar *tmp;
+    GSList *list;
+
+    g_free(bsmsg->charset);
+    bsmsg->charset = NULL;
 
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     tmp = gtk_text_iter_get_text(&start, &end);
-    ok = sw_can_convert(tmp, -1,  bsmsg->charset, "UTF-8", NULL);
 
-    if (!ok) {
+    if (!libbalsa_text_attr_string(tmp)) {
+	g_free(tmp);
+	return TRUE;
+    }
+
+    for (list = bsmsg->charsets; list; list = list->next) {
+	const gchar *charset = list->data;
+
+	if (sw_can_convert(tmp, -1, charset, "UTF-8", NULL)) {
+	    bsmsg->charset = g_strdup(charset);
+	    g_free(tmp);
+	    return TRUE;
+	}
+    }
+
+    for (list = bsmsg->charsets; list; list = list->next) {
+	const gchar *charset = list->data;
 	/* Try the corresponding CP125x charset, if any. */
         const gchar *windows_charset =
-            g_mime_charset_iso_to_windows(bsmsg->charset);
+	    g_mime_charset_iso_to_windows(charset);
 
-        if (strcmp(windows_charset,
-                   g_mime_charset_canon_name(bsmsg->charset))) {
+        if (strcmp(windows_charset, g_mime_charset_canon_name(charset))) {
 	    /* Yes, there is one. */
             const gchar *iconv_charset =
                 g_mime_charset_iconv_name(windows_charset);
 
-            ok = sw_can_convert(tmp, -1, iconv_charset, "UTF-8", NULL);
-            if (ok) {
+            if (sw_can_convert(tmp, -1, iconv_charset, "UTF-8", NULL)) {
 		/* Change the message charset. */
-                g_free(bsmsg->charset);
                 bsmsg->charset = g_strdup(iconv_charset);
+		g_free(tmp);
+		return TRUE;
             }
         }
     }
 
+    bsmsg->charset = g_strdup("UTF-8");
     g_free(tmp);
-
-    if (!ok) {
-        balsa_information_parented
-            (GTK_WINDOW(bsmsg->window),
-             LIBBALSA_INFORMATION_ERROR,
-             _("The message cannot be encoded in charset %s.\n"
-               "Please choose a language for this message.\n"
-               "For multi-language messages, choose UTF-8."),
-             bsmsg->charset);
-    }
-
-    return ok;
+    return TRUE;
 }
+
 /* "send message" menu and toolbar callback.
  */
 static gint
@@ -5222,6 +5210,7 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
 {
     g_free(bsmsg->charset);
     bsmsg->charset = g_strdup(locales[idx].charset);
+    sw_prepend_charset(bsmsg, bsmsg->charset);
     bsmsg->locale = locales[idx].locale;
     return FALSE;
 }

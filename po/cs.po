@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-07-09 11:53+0200\n"
-"PO-Revision-Date: 2003-07-09 19:15+0200\n"
+"POT-Creation-Date: 2003-07-10 11:59+0200\n"
+"PO-Revision-Date: 2003-07-10 19:22+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2835,11 +2835,11 @@ msgstr "Chyba při aplikaci filtrů"
 #: src/filter-run-callbacks.c:193
 #, c-format
 msgid ""
-"The destination mailbox of the filter \"%s\" is \"%s\"\n"
-".You can't associate it with the same mailbox (that causes recursion)."
+"The destination mailbox of the filter \"%s\" is \"%s\".\n"
+"You can't associate it with the same mailbox (that causes recursion)."
 msgstr ""
-"Cílová poštovní schránka filtru \"%s\" je \"%s\"\n"
-".Nemůžete jej přiřadit ke stejné schránce (způsobilo by to rekurzi)."
+"Cílová poštovní schránka filtru \"%s\" je \"%s\".\n"
+"Nemůžete jej přiřadit ke stejné schránce (způsobilo by to rekurzi)."
 
 #: src/filter-run-callbacks.c:201
 #, c-format

@@ -1,3 +1,9 @@
+2003-04-26  Kang Jeong-Hee  <Keizi@mail.co.kr>
+
+	* src/balsa-index.c, src/balsa-message.c: replace (FALSE, 0)
+	of libbalsa_utf8_sanitize() with (balsa_app.covert_unknown_8bit,
+	balsa_app.convert_unknown_8bit_codeset).
+
 2003-04-24 11:26  PeterB
 
 	* libbalsa/misc.c: Fix a corner case.

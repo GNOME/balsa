@@ -803,7 +803,7 @@ add_header_gchar(BalsaMessage * bm, const gchar * header,
         wrapped_value = g_strdup(value);
         libbalsa_wrap_string(wrapped_value,
                              balsa_app.wraplength - BALSA_INDENT_CHARS);
-        libbalsa_utf8_sanitize(&wrapped_value, FALSE, 0, NULL);
+        libbalsa_utf8_sanitize(&wrapped_value, balsa_app.convert_unknown_8bit, balsa_app.convert_unknown_8bit_codeset, NULL);
         gtk_text_buffer_insert_with_tags(buffer, &insert,
                                          wrapped_value, -1,
                                          indent_tag, font_tag, NULL);

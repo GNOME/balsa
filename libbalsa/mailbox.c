@@ -310,6 +310,7 @@ mailbox_new (MailboxType type)
       return NULL;
     }
 
+  mailbox->lock = FALSE;
   mailbox->type = type;
   mailbox->name = NULL;
   mailbox->private = (void *) g_malloc (sizeof (MailboxPrivate));

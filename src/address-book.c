@@ -687,7 +687,7 @@ balsa_address_book_dist_mode_toggled(GtkWidget * w, BalsaAddressBook *ab)
     gboolean active;
 
     g_return_if_fail(BALSA_IS_ADDRESS_BOOK(ab));
-    if(ab->current_address_book) return;
+    if(ab->current_address_book == NULL) return;
 
     active = gtk_toggle_button_get_active
 	(GTK_TOGGLE_BUTTON(ab->single_address_mode_radio));

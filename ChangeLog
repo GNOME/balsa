@@ -1,3 +1,8 @@
+2001-07-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/address-book.c: do not crash on changing distribution mode
+	when there is no address book.
+
 2001-07-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Make balsa compile with --disable-threads and --disable-nls

@@ -53,7 +53,7 @@ error_exit_cb (GtkWidget * widget, gpointer data)
 }
 
 static void
-balsa_error (char *fmt,...)
+balsa_error (const char *fmt,...)
 {
   GtkWidget *messagebox;
   gchar outstr[522];

@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <pwd.h>
+#include <ctype.h>
 
 #include "balsa-app.h"
 #include "local-mailbox.h"

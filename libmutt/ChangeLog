@@ -1,3 +1,7 @@
+1998-11-25  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* socket.c: added #include <string.h>
+
 Fri Sep  4 15:53:27 1998  Thomas Roessler  <roessler@guug.de>
 
 	* sendlib.c: Catch MIME parameters with p->value

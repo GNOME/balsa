@@ -35,7 +35,7 @@
 #include "balsa-impl.c"
 
 
-static void balsa_init (int argc, char ***argv);
+static void balsa_init (int argc, char **argv);
 static void config_init (void);
 static void mailboxes_init (void);
 
@@ -61,7 +61,7 @@ Exception (CORBA_Environment * ev)
 
 
 static void
-balsa_init (int argc, char ***argv)
+balsa_init (int argc, char **argv)
 {
   CORBA_ORB orb;
   CORBA_Environment ev;

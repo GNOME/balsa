@@ -304,7 +304,9 @@ balsa_index_init (BalsaIndex * bindex)
   GTK_BIN (bindex)->child = sw = gtk_scrolled_window_new(NULL,NULL);
   gtk_widget_set_parent (sw, GTK_WIDGET (bindex));
 
-  bindex->clist = clist = gtk_clist_new_with_titles (6, titles);
+  bindex->clist = gtk_clist_new_with_titles (6, titles);
+  clist = GTK_CLIST(bindex->clist);
+
   gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(clist));
 
   gtk_widget_pop_colormap ();
@@ -559,7 +561,7 @@ balsa_index_select_next (BalsaIndex * bindex)
   list = clist->selection;
   while (list)
     {
-      i = (gint) list->data;
+      i = GPOINTER_TO_INT (list->data);
       if (i > h)
 	h = i;
       list = list->next;
@@ -597,7 +599,7 @@ balsa_index_select_previous (BalsaIndex * bindex)
   list = clist->selection;
   while (list)			/* look for the selected row with the lowest number */
     {
-      i = (gint) list->data;
+      i = GPOINTER_TO_INT (list->data);
       if (i < h)
 	h = i;
       list = list->next;

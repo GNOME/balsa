@@ -53,7 +53,7 @@ build_option_menu (option_list options[],
 	  gtk_signal_connect (GTK_OBJECT (options[i].widget),
 			      "toggled",
 			      func,
-			      (gpointer) i);
+			      GINT_TO_POINTER (i));
 	}
       gtk_widget_show (options[i].widget);
     }

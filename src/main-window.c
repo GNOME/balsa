@@ -501,7 +501,7 @@ replyto_message_cb (GtkWidget * widget, gpointer data)
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
       sendmsg_window_new (widget, message, SEND_REPLY);
       list = list->next;
     }
@@ -523,7 +523,7 @@ replytoall_message_cb (GtkWidget * widget, gpointer data)
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
       sendmsg_window_new (widget, message, SEND_REPLY_ALL);
       list = list->next;
     }
@@ -546,7 +546,7 @@ forward_message_cb (GtkWidget * widget, gpointer data)
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
       sendmsg_window_new (widget, message, SEND_FORWARD);
       list = list->next;
     }
@@ -591,7 +591,7 @@ delete_message_cb (GtkWidget * widget, gpointer data)
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
       message_delete (message);
       list = list->next;
     }
@@ -614,7 +614,7 @@ undelete_message_cb (GtkWidget * widget, gpointer data)
   list = clist->selection;
   while (list)
     {
-      message = gtk_clist_get_row_data (clist, (gint) list->data);
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT(list->data));
       message_undelete (message);
       list = list->next;
     }

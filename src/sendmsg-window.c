@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <gnome.h>
+#include <ctype.h>
 
 #include "balsa-app.h"
 #include "balsa-message.h"
@@ -134,7 +135,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 static void
 remove_attachment (GtkWidget * widget, GnomeIconList * ilist)
 {
-  gint num = (gint) gtk_object_get_data (GTK_OBJECT (ilist), "selectednumbertoremove");
+  gint num = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (ilist), "selectednumbertoremove"));
   gnome_icon_list_remove (ilist, num);
   gtk_object_remove_data (GTK_OBJECT (ilist), "selectednumbertoremove");
 }
@@ -145,7 +146,7 @@ create_popup_menu (GnomeIconList * ilist, gint num)
   GtkWidget *menu, *menuitem;
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label (_ ("Remove"));
-  gtk_object_set_data (GTK_OBJECT (ilist), "selectednumbertoremove", (gpointer) num);
+  gtk_object_set_data (GTK_OBJECT (ilist), "selectednumbertoremove", GINT_TO_POINTER (num));
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 		      GTK_SIGNAL_FUNC (remove_attachment), ilist);
   gtk_menu_append (GTK_MENU (menu), menuitem);

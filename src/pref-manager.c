@@ -614,7 +614,7 @@ pop3_edit_cb (GtkWidget * widget, gpointer data)
   if (!clist->selection)
     return;
 
-  row = (gint) clist->selection->data;
+  row = GPOINTER_TO_INT (clist->selection->data);
 
   mailbox = gtk_clist_get_row_data (clist, row);
   if (!mailbox)
@@ -640,7 +640,7 @@ pop3_del_cb (GtkWidget * widget, gpointer data)
   if (!clist->selection)
     return;
 
-  row = (gint) clist->selection->data;
+  row = GPOINTER_TO_INT (clist->selection->data);
 
   mailbox = gtk_clist_get_row_data (clist, row);
   if (!mailbox)

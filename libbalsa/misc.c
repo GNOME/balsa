@@ -151,7 +151,7 @@ readfile (FILE * fp, char **buf)
   lseek (fd, 0, SEEK_SET);
 
   *buf = (char *) malloc (size);
-  if ((int) *buf == -1)
+  if (*buf == NULL)
     {
       return -1;
     }

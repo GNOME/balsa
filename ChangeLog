@@ -1,3 +1,25 @@
+1998-11-25  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* src/sendmsg-window.c: add #include <ctype.h> and cast-macros
+
+	* src/pref-manager.c: added cast-macros
+
+	* src/main.c: fixed declaration of balsa_init()
+
+	* src/main-window.c: added cast-macros
+
+	* src/local-mailbox.c: added #include <ctype.h>
+
+	* src/index-child.c: see next
+
+	* src/filter-edit-dialog.c: see next
+
+	* src/balsa-index.c: added cast-macros
+
+	* src/balsa-app.c: added const modifier to balsa_error()
+
+	* libbalsa/misc.c: fixed return value checking of malloc in readfile()
+
 1998-11-18  Richard Hestilow  <hestgray@ionet.net>
 
 	* src/main-window.c: Added underscore accelerators, no longer right

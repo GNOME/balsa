@@ -1,7 +1,8 @@
-2003-12-10 13:01  PeterB
+2003-12-10 15:45  PeterB
 
-	* src/message-window.c: Manage sensitivity of next-flagged button,
-	too.
+	* src/message-window.c: Idle handler must return FALSE (Nuno
+	Monteiro <nuno@itsari.org>); manage sensitivity of next-flagged
+	button, too.
 
 2003-12-09 10:37  PeterB
 

@@ -93,9 +93,7 @@ extern "C" {
     void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 
 /* a helper functions; FIXME: find more proper location for them.  */
-    gchar *get_font_name(const gchar * base, const gchar * charset, 
-			 gboolean*use_fontset);
-    gchar *get_koi_font_name(const gchar * base, const gchar * code);
+    GdkFont* balsa_get_font_by_charset(const gchar* base, const gchar*charset);
 
 #ifdef __cplusplus
 }

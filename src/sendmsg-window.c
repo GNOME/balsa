@@ -1992,8 +1992,8 @@ init_menus(BalsaSendmsg * msg)
 static gint
 set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
 {
-    gchar *font_name, *tmp;
-    gboolean use_fontset;
+    GtkStyle *style;
+    gchar *tmp;
 
     if (msg->font)
 	gdk_font_unref(msg->font);
@@ -2004,55 +2004,19 @@ set_locale(GtkWidget * w, BalsaSendmsg * msg, gint idx)
     gtk_label_set_text(GTK_LABEL
 		       (GTK_BIN(msg->current_language_menu)->child), tmp);
     g_free(tmp);
+    
+    msg->font = balsa_get_font_by_charset(balsa_app.message_font,msg->charset);
 
-    font_name = get_font_name(balsa_app.message_font, msg->charset, 
-			      &use_fontset);
-    msg->font = use_fontset ?
-	gdk_fontset_load(font_name) : gdk_font_load(font_name);
-    if(balsa_app.debug)
-	printf("find font: %s for locale %s (%d)\n", font_name, msg->locale,
-	       use_fontset);
-    if (!msg->font) {
-	printf("Cannot find font: %s for locale %s\n", font_name,
-	       msg->locale);
-    } else {
+    if (msg->font) {
 	gdk_font_ref(msg->font);
 	/* Set the new message style */
-#if 0
-	{
-	    GtkStyle *style;
-	    style =
-		gtk_style_copy(gtk_widget_get_style
-			       (GTK_WIDGET(msg->text)));
-	    /* gdk_font_unref(style->font); */
-	    style->font = msg->font;
-	    gtk_widget_set_style(GTK_WIDGET(msg->text), style);
-	    gtk_style_unref(style);
-	}
-#else
-	{
-	    gchar *str;
-	    gint txt_len, point;
-	    gtk_text_freeze(GTK_TEXT(msg->text));
-	    point = gtk_editable_get_position(GTK_EDITABLE(msg->text));
-	    txt_len = gtk_text_get_length(GTK_TEXT(msg->text));
-	    str =
-		gtk_editable_get_chars(GTK_EDITABLE(msg->text), 0,
-				       txt_len);
-
-	    if (str) {
-		gtk_text_set_point(GTK_TEXT(msg->text), 0);
-		gtk_text_forward_delete(GTK_TEXT(msg->text), txt_len);
-		gtk_text_insert(GTK_TEXT(msg->text), msg->font, NULL, NULL,
-				str, txt_len);
-		g_free(str);
-	    }
-	    gtk_text_thaw(GTK_TEXT(msg->text));
-	}
-#endif
+	style = gtk_style_copy(gtk_widget_get_style(msg->text));
+	style->font = msg->font;
+	gtk_widget_set_style(msg->text,       style);
+	gtk_widget_set_style(msg->to[1],      style);
+	gtk_widget_set_style(msg->subject[1], style);
+	gtk_style_unref(style);
     }				/* endif: font found */
-    g_free(font_name);
-
     return FALSE;
 }
 

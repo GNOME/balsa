@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+/*  gdkx needed for GDK_FONT_XFONT */
+#include <gdk/gdkx.h>
 
 #include "balsa-app.h"
 #include "mailbackend.h"
@@ -866,7 +868,7 @@ static struct {
    If use_fontset is provided, it will pass the information if fontset is
    recommended.
 */
-gchar *
+static gchar *
 get_font_name(const gchar * base, const gchar * charset, 
 	      gboolean * use_fontset)
 {
@@ -922,62 +924,51 @@ get_font_name(const gchar * base, const gchar * charset,
     return res;
 }
 
-gchar *
-get_koi_font_name(const gchar * base, const gchar * code)
+/* balsa_get_font_by_charset:
+   returns font or fontset as specified by general base and charset.
+   Follows code from gfontsel.
+*/
+GdkFont*
+balsa_get_font_by_charset(const gchar * base, const gchar * charset)
 {
-    static gchar type[] = "koi8";
-    gchar *res;
-    const gchar *ptr = base;
-    int dash_cnt = 0, len;
+    gchar * fontname;
+    GdkFont *result;
+    gboolean fs;
+    XFontStruct *xfs;
 
-    g_return_val_if_fail(base != NULL, NULL);
-    g_return_val_if_fail(code != NULL, NULL);
-
-    while (*ptr && dash_cnt < 13) {
-	if (*ptr == '-')
-	    dash_cnt++;
-
-	if (two_const_fields_to_end(ptr))
-	    break;
-	ptr++;
+    fontname = get_font_name(base, charset, &fs);
+    result   = gdk_font_load (fontname);
+    xfs = result ? GDK_FONT_XFONT (result) : NULL;
+    if (xfs && (xfs->min_byte1 != 0 || xfs->max_byte1 != 0))
+    {
+	gchar *tmp_name;
+	g_print("balsa_get_font_by_charset: using fontset\n");
+	gdk_font_unref (result);
+	tmp_name = g_strconcat (fontname, ",*", NULL);
+	result = gdk_fontset_load (tmp_name);
+	g_free (tmp_name);
     }
+    if(!result)
+	g_print("Cannot find font: %s for charset %s\n", fontname, charset);
 
-    /* defense against a patologically short base font wildcard implemented
-     * in the chunk below
-     * extra space for dwo dashes and '\0' */
-    len = ptr - base;
-    /* if(dash_cnt>12) len--; */
-    if (len < 1)
-	len = 1;
-    res = (gchar *) g_malloc(len + sizeof(type) + 3 + strlen(code));
-    if (balsa_app.debug)
-	fprintf(stderr, "base font name: %s and code: %s\n"
-		"mallocating %d bytes\n", base, code,
-		len + sizeof(type) + 3);
-
-    if (len > 1)
-	strncpy(res, base, len);
-    else {
-	strncpy(res, "*", 1);
-	len = 1;
-    }
-
-    sprintf(res + len, "-%s-%s", type, code);
-    return res;
+    return result;
 }
 
+
 /* HELPER FUNCTIONS ----------------------------------------------- */
-static void
-find_body_font(LibBalsaMessageBody * body, gchar **font_name, gboolean*fontset)
+static GdkFont*
+find_body_font(LibBalsaMessageBody * body)
 {
     gchar *charset;
+    GdkFont * font = NULL;
 
     charset = libbalsa_message_body_get_parameter(body, "charset");
 
-    *font_name = NULL;
-    if (charset)
-	*font_name = get_font_name(balsa_app.message_font, charset, fontset);
-    g_free(charset);
+    if (charset) {
+	font = balsa_get_font_by_charset(balsa_app.message_font, charset);
+	g_free(charset);
+    }
+    return font;
 }
 
 
@@ -1111,8 +1102,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    part_info_init_unknown(bm, info);
 #endif
 	} else {
-	    gchar *font_name;
-	    gboolean use_fontset;
 	    regex_t rex;
 
 	    GtkWidget *item = NULL;
@@ -1121,18 +1110,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0)
 		g_warning
 		    ("part_info_init_mimetext: quote regex compilation failed.");
-	    find_body_font(info->body, &font_name, &use_fontset);
+	    fnt = find_body_font(info->body);
 	    if (bm->wrap_text)
 		libbalsa_wrap_string(ptr, balsa_app.wraplength);
-
-	    if (font_name) {
-		fnt = use_fontset ? gdk_fontset_load(font_name) 
-		    : gdk_font_load(font_name);
-		if (!fnt)
-		    fprintf(stderr, "message/text:: font not found: %s\n",
-			    font_name);
-		g_free(font_name);
-	    }
 
 	    if (!fnt)
 		fnt = gdk_fontset_load(balsa_app.message_font);

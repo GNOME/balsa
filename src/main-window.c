@@ -1087,16 +1087,12 @@ show_about_box(void)
 {
     GtkWidget *about;
     const gchar *authors[] = {
-	"Héctor García Álvarez <hector@scouts-es.org>",
 	"Ian Campbell <ijc25@cam.ac.uk>",
-	"Bruno Pires Marinho <bapm@camoes.rnl.ist.utl.pt>",
-	"Jay Painter <jpaint@gimp.org>",
+	"Matthew Guenther <guentherm@asme.org>",
 	"Stuart Parmenter <pavlov@pavlov.net>",
-	"David Pickens <dpickens@iaesthetic.com>",
 	"Pawel Salek <pawsa@theochem.kth.se>",
 	"Peter Williams <peter@newton.cx>",
-	"Matthew Guenther <guentherm@asme.org>",
-	"All the folks on Balsa-List <balsa-list-request@gnome.org>",
+	"and many others (see AUTHORS file)",
 	NULL
     };
 

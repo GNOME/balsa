@@ -353,6 +353,7 @@ bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
 	    GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL];
 	gtk_widget_set_style(GTK_WIDGET(bm_header_widget_att_button(widget)),
 			     new_style);
+	g_object_unref(new_style);
     }
 }
 
@@ -656,12 +657,19 @@ balsa_message_destroy(GtkObject * object)
         gtk_widget_destroy(bm->treeview);
         bm->treeview = NULL;
     }
-    g_list_free(bm->save_all_list);
-    if (bm->save_all_popup)
-        gtk_widget_destroy(bm->save_all_popup);
 
-    if (bm->parts_popup)
-	gtk_widget_destroy(bm->parts_popup);
+    g_list_free(bm->save_all_list);
+    bm->save_all_list = NULL;
+
+    if (bm->save_all_popup) {
+        g_object_unref(bm->save_all_popup);
+	bm->save_all_popup = NULL;
+    }
+
+    if (bm->parts_popup) {
+	g_object_unref(bm->parts_popup);
+	bm->parts_popup = NULL;
+    }
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
@@ -875,7 +883,7 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
     g_list_free(bm->save_all_list);
     bm->save_all_list = NULL;
     if (bm->save_all_popup) {
-        gtk_widget_destroy(bm->save_all_popup);
+        g_object_unref(bm->save_all_popup);
         bm->save_all_popup = NULL;
     }
 
@@ -902,7 +910,11 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
     } else if (selected > 1) {
         GtkWidget *menu_item;
         
+	if (bm->save_all_popup)
+	    g_object_unref(bm->save_all_popup);
         bm->save_all_popup = gtk_menu_new ();
+	g_object_ref(bm->save_all_popup);
+	gtk_object_sink(GTK_OBJECT(bm->save_all_popup));
         menu_item = 
             gtk_menu_item_new_with_label (_("Save selected..."));
         gtk_widget_show(menu_item);
@@ -2748,7 +2760,11 @@ static void
 display_content(BalsaMessage * bm)
 {
     balsa_message_clear_tree(bm);
+    if (bm->parts_popup)
+	g_object_unref(bm->parts_popup);
     bm->parts_popup = gtk_menu_new();
+    g_object_ref(bm->parts_popup);
+    gtk_object_sink(GTK_OBJECT(bm->parts_popup));
     display_parts(bm, bm->message->body_list, NULL, NULL);
     if (bm->info_count > 1) {
  	gtk_widget_show_all(bm->parts_popup);

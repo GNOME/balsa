@@ -65,7 +65,6 @@ pthread_t get_mail_thread;
 pthread_t send_mail;
 pthread_mutex_t mailbox_lock;
 pthread_mutex_t send_messages_lock;
-pthread_mutex_t appbar_lock;
 int checking_mail;
 int sending_mail;
 int mail_thread_pipes[2];
@@ -197,7 +196,6 @@ threads_init(void)
     g_thread_init(NULL);
     pthread_mutex_init(&mailbox_lock, NULL);
     pthread_mutex_init(&send_messages_lock, NULL);
-    pthread_mutex_init(&appbar_lock, NULL);
     checking_mail = 0;
     updating_mblist = 0;
     sending_mail = 0;
@@ -228,7 +226,6 @@ threads_destroy(void)
 {
     pthread_mutex_destroy(&mailbox_lock);
     pthread_mutex_destroy(&send_messages_lock);
-    pthread_mutex_destroy(&appbar_lock);
 }
 
 #endif				/* BALSA_USE_THREADS */

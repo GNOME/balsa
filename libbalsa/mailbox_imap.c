@@ -526,7 +526,6 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
     /* Some IMAP servers (UW2000) do not like removing subscribed mailboxes:
      * they do not remove the mailbox from the subscription list. */
     imap_subscribe(LIBBALSA_MAILBOX(mailbox)->url, FALSE);
-
     /*
 	should be able to do this using the existing public method
 	from libmutt/imap/imap.h:
@@ -536,7 +535,10 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
 	instead of being a pointer to an IMAP_DATA structure!
 
 	instead we'll use our own new method:
+	FIXME: this is one, big, ugly HACK.
     */
+    libbalsa_mailbox_imap_open(LIBBALSA_MAILBOX(mailbox));
     imap_mailbox_delete(LIBBALSA_MAILBOX(mailbox)->url);
+    libbalsa_mailbox_imap_close(LIBBALSA_MAILBOX(mailbox));
 }
 

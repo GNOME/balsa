@@ -2,6 +2,9 @@
 
 	* src/balsa-index.c: do not crash when there is an index without 
 	associated mailbox_node.
+	* src/main.c, src/threads.h: remove not used appbar_lock mutex.
+	* libbalsa/mailbox_imap.c: fix crash on multiple deletion of 
+	IMAP mailboxes.
 
 2001-08-22  Carlos Morgado  <chbm@chbm.nu>
 

@@ -1,3 +1,11 @@
+2004-02-14  Pawel Salek
+
+	* libbalsa/imap-server.c: store certificated accepted for the session.
+	* libbalsa/mailbox_imap.c: use proper hierarchy delimiter.
+	* libbalsa/server.c: handle NULL passwords.
+	* src/balsa-index.c: do not try scrolling when no messages are present.
+	* src/folder-conf.c: connect ask_password.
+
 2004-02-14 07:17  PeterB
 
 	* libbalsa/mailbox.c: lock mailbox while changing message flags.

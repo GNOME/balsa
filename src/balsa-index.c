@@ -670,7 +670,8 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     msgno = mailbox->first_unread 
         ? mailbox->first_unread 
         : libbalsa_mailbox_total_messages(mailbox);
-    if(libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
+    if(msgno>0 &&
+       libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
         bndx_expand_to_row(index, path);
 	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
 				     FALSE, 0, 0);

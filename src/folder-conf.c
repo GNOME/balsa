@@ -186,6 +186,8 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     } else {
         insert = TRUE;
 	s = LIBBALSA_SERVER(libbalsa_imap_server_new(username, host));
+        g_signal_connect(G_OBJECT(s), "get-password",
+                         G_CALLBACK(ask_password), NULL);
     }
 
     libbalsa_server_set_host(s, host

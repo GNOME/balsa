@@ -264,7 +264,7 @@ libbalsa_server_real_set_password(LibBalsaServer * server,
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_free(server->passwd);
-    if(passwd[0])
+    if(passwd && passwd[0])
 	server->passwd = g_strdup(passwd);
     else server->passwd = NULL;
 }

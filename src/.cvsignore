@@ -4,3 +4,7 @@ Makefile.in
 .libs
 balsa
 balsa-ab
+Balsa-common.c
+Balsa-skels.c
+Balsa-stubs.c
+Balsa.h

@@ -30,6 +30,9 @@ struct LibBalsaImapServer_ {
 	guint used_connections;
 	GList *used_handles;
 	GList *free_handles;
+#ifdef USE_TLS
+    GList *accepted_certs; /* certs accepted for this session */
+#endif
 };
 
 typedef struct LibBalsaImapServerClass_ {
@@ -161,6 +164,9 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
     imap_server->connection_cleanup_id = 
 	g_timeout_add(CONNECTION_CLEANUP_POLL_PERIOD*1000,
 		      connection_cleanup, imap_server);
+#ifdef USE_TLS
+    imap_server->accepted_certs = NULL;
+#endif
 }
 
 /* leave object in sane state (NULLified fields) */
@@ -187,6 +193,11 @@ libbalsa_imap_server_finalize(GObject * object)
     libbalsa_imap_server_force_disconnect(imap_server);
     g_mutex_free(imap_server->lock);
     g_free(imap_server->key); imap_server->key = NULL;
+#ifdef USE_TLS
+    g_list_foreach(imap_server->accepted_certs, (GFunc)X509_free, NULL);
+    g_list_free(imap_server->accepted_certs);
+    imap_server->accepted_certs = NULL;
+#endif
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -264,15 +275,15 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
     const gchar *fmt;
 
     switch(rc) {
-    case IMR_ALERT: 
+    case IMR_ALERT: /* IMAP host name + message */
         fmt = _("IMAP server %s alert:\n%s");
         it = LIBBALSA_INFORMATION_ERROR; 
         break;
-    case IMR_BAD:   
+    case IMR_BAD: /* IMAP host name + message */
         fmt = _("IMAP server %s error: %s");
         it = LIBBALSA_INFORMATION_ERROR;
         break;
-    default:
+    default: /* IMAP host name + message */
         fmt = _("%s: %s");
         it = LIBBALSA_INFORMATION_MESSAGE; break;
     }
@@ -282,13 +293,21 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
 #ifdef USE_TLS
 /* compare Example 10-7 in the OpenSSL book */
 static gboolean
-libbalsa_is_cert_known(X509* cert)
+libbalsa_is_cert_known(LibBalsaImapServer *is, X509* cert)
 {
     X509_STORE     *store;
     X509_STORE_CTX  verify_ctx;
     gchar *cert_name;
     gboolean res = FALSE;
+    GList *lst;
 
+    for(lst = is->accepted_certs; lst; lst = lst->next) {
+        int res = X509_cmp(cert, lst->data);
+        printf("res=%d\n", res);
+        if(res == 0)
+            return TRUE;
+    }
+    
     cert_name = gnome_util_prepend_user_home(".balsa/certificates");
     if (access (cert_name, F_OK) != 0) {
         g_free(cert_name);
@@ -368,6 +387,7 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
         SSL *ssl;
         X509 *cert;
         const char *reason;
+        LibBalsaImapServer *ims = LIBBALSA_IMAP_SERVER(is);
         ok = va_arg(alist, int*);
         vfy_result = va_arg(alist, long);
         reason =  X509_verify_cert_error_string(vfy_result);
@@ -375,16 +395,20 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
                "%ld : %s.\n", vfy_result, reason);
         ssl = va_arg(alist, SSL*);
         cert = SSL_get_peer_certificate(ssl);
-        *ok = libbalsa_is_cert_known(cert);
+        *ok = libbalsa_is_cert_known(ims, cert);
         if(!*ok) {
             *ok = libbalsa_ask_for_cert_acceptance(cert, reason);
             if(*ok == 2)
                 libbalsa_save_cert(cert);
+            if(*ok == 1)
+                ims->accepted_certs = g_list_prepend(ims->accepted_certs,
+                                                     X509_dup(cert));
         }
         X509_free(cert);
 #else
         g_warning("TLS error with TLS disabled!?");
 #endif
+        printf("OK in %s is %d\n", __FUNCTION__, *ok);
         break;
     }
     case IME_TLS_NO_PEER_CERT: {
@@ -601,9 +625,9 @@ LibBalsaImapServer* libbalsa_imap_server_new_from_config(void)
  *
  * Returns a connected handle to the IMAP server, if needed it
  * connects.  If there is no password set, the user is asked to supply
- * one.  Sometimes (like for LIST, SUBSCRIBE, UNSUBSCRIBE, CREATE,
- * DELETE, APPEND commands) it is sufficient to provide any open
- * handle, also one in a SELECTed state.
+ * one.  Handle is apriopriate for all commands that work in AUTHENTICATED
+ * state (LIST, SUBSCRIBE, CREATE, APPEND) but it MUST not be used for
+ * select -- use libbalsa_imap_server_get_handle_with_user for that purpose. 
  *
  * Return value: a handle to the server, or %NULL when there are no
  * free connections.
@@ -650,6 +674,8 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
         if(imap_mbox_is_disconnected(info->handle)) {
             rc=imap_mbox_handle_connect(info->handle, server->host);
             if(rc != IMAP_SUCCESS) {
+                if(rc == IMAP_AUTH_FAILURE)
+                    libbalsa_server_set_password(server, NULL);
                 lb_imap_server_info_free(info);
                 g_mutex_unlock(imap_server->lock);
                 return NULL;
@@ -734,6 +760,8 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
     if (info && imap_mbox_is_disconnected(info->handle)) {
 	rc=imap_mbox_handle_connect(info->handle, server->host);
 	if(rc != IMAP_SUCCESS) {
+            if(rc == IMAP_AUTH_FAILURE)
+                libbalsa_server_set_password(server, NULL);
 	    lb_imap_server_info_free(info);
 	    g_mutex_unlock(imap_server->lock);
 	    return NULL;

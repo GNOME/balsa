@@ -395,7 +395,7 @@ ask_cert_real(X509 *cert, const char *explanation)
 
     g_string_printf(str, _("Authenticity of this certificate "
                            "could not be verified.\n"
-                           "Reason: %s\n"
+                           "<b>Reason:</b> %s\n"
                            "<b>This certificate belongs to:</b>\n"),
                     explanation);
 
@@ -446,6 +446,10 @@ ask_cert_real(X509 *cert, const char *explanation)
     default: i=0; break;
     }
     gtk_widget_destroy(dialog);
+    /* Process some events to let the window disappear:
+     * not really necessary but helps with debugging. */
+   while(gtk_events_pending()) 
+        gtk_main_iteration_do(FALSE);
     printf("%s returns %d\n", __FUNCTION__, i);
     return i;
 }

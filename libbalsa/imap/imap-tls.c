@@ -282,7 +282,7 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
   if(handle->user_cb)
     handle->user_cb(handle, IME_TLS_VERIFY_ERROR, handle->user_arg, &ok, 
                     vfy_result, ssl);
-
+  printf("%s returns %d\n", __FUNCTION__, ok);
   return ok;
 }
 
@@ -338,6 +338,7 @@ imap_handle_starttls(ImapMboxHandle *handle)
     }
 
   }
+  printf("%s returning %d\n", __FUNCTION__, rc);
   return rc;
 }
 #endif /* USE_TLS */

@@ -1221,15 +1221,15 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
     ImapResult rc;
     ImapMboxHandle* handle;
     gchar *new_path;
-
+    char delim[2];
     if (!LIBBALSA_IS_IMAP_SERVER(server))
 	return;
     handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server));
     if (!handle)
 	return;
-
-    /* FIXME: should use imap server folder separator */ 
-    new_path = g_strjoin("/", parent, folder, NULL);
+    delim[0] = imap_mbox_handle_get_delim(handle, parent);
+    delim[1] = '\0';
+    new_path = g_strjoin(delim, parent, folder, NULL);
     rc = imap_mbox_create(handle, new_path);
     if (subscribe && rc == IMR_OK)
 	rc = imap_mbox_subscribe(handle, new_path, TRUE);

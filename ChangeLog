@@ -1,3 +1,23 @@
+2003-12-31 08:30  PeterB
+
+	* libbalsa/: html.c, html.h: Provide wrappers to insulate the rest
+	of Balsa from the differences between the gtkhtml[23] APIs.
+	* src/print.c: Use new html api for printing; use only
+	libbalsa_message_body_get_content_type() to get content-type.
+	* src/main-window.c: Use copy-text capability of gtkhtml3, when
+	installed; compile without gtkhtml.
+	* src/: balsa-message.c, balsa-message.h: Use new html api; support
+	text/enriched and text/richtext.
+	* libbalsa/misc.c: Use select-all capability of gtkhtml3 when
+	installed.
+	* libbalsa/mime.c: Support text/enriched and text/richtext;
+	include text of html parts when replying; plug a memory leak.
+	* libbalsa/mailbox_mbox.c: g_mime_content_type_is_type() doesn't
+	match "*" in main part of type.
+	* libbalsa/Makefile.am: Add html.[ch] to dependencies.
+	* configure.in: Detect gtkhtml3 if installed in preference to
+	gtkhtml2, when --enable-gtkhtml is used.
+
 2003-12-26 15:52  PeterB
 
 	* src/balsa-index.c: More care needed with new threading and sync.

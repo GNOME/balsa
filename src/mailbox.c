@@ -787,26 +787,18 @@ message_new ()
 void
 message_free (Message * message)
 {
-  if (message->remail)
-    g_free (message->remail);
-  if (message->date)
-    g_free (message->date);
+  g_free (message->remail);
+  g_free (message->date);
   address_free (message->from);
   address_free (message->sender);
   address_free (message->reply_to);
-  if (message->subject)
-    g_free (message->subject);
+  g_free (message->subject);
 
-  if (message->in_reply_to)
-    g_free (message->in_reply_to);
-  if (message->message_id)
-    g_free (message->message_id);
-  if (message->newsgroups)
-    g_free (message->newsgroups);
-  if (message->followup_to)
-    g_free (message->followup_to);
-  if (message->references)
-    g_free (message->references);
+  g_free (message->in_reply_to);
+  g_free (message->message_id);
+  g_free (message->newsgroups);
+  g_free (message->followup_to);
+  g_free (message->references);
 
   /* finally free the message */
   g_free (message);
@@ -904,12 +896,9 @@ address_free (Address * address)
   if (!address)
     return;
 
-  if (address->personal)
-    g_free (address->personal);
-  if (address->user)
-    g_free (address->user);
-  if (address->host)
-    g_free (address->host);
+  g_free (address->personal);
+  g_free (address->user);
+  g_free (address->host);
 
   g_free (address);
 }
@@ -953,10 +942,8 @@ body_free (Body * body)
   if (!body)
     return;
 
-  if (body->mime)
-    g_free (body->mime);
-  if (body->buffer)
-    g_free (body->buffer);
+  g_free (body->mime);
+  g_free (body->buffer);
   g_free (body);
 }
 

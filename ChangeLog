@@ -1,3 +1,10 @@
+2005-03-14 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/message.h, libbalsa/send.c, libbalsa/send.h,
+	src/balsa-app.c, src/balsa-app.h, src/balsa-message.c,
+	src/pref-manager.c, src/save-restore.c, src/sendmsg-window.c: use
+	only quoted-printable encoding.
+
 2005-03-14 19:42  PeterB
 
 	* libbalsa/body.c: use string returned by

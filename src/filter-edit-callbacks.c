@@ -275,7 +275,8 @@ fe_new_pressed (GtkWidget * widget,
   gtk_clist_set_pixmap (GTK_CLIST (fe_clist),
 			new_row,
 			0,
-			pixmap, mask);
+			pixmap,
+			mask);
 
   gdk_pixmap_unref (pixmap);
   gdk_bitmap_unref (mask);
@@ -296,9 +297,9 @@ fe_clist_button_event_press (GtkWidget * widget,
 			     gpointer data)
 {
   gint row, column, res;
+  GdkImlibImage *im;
   GdkPixmap *pixmap;
   GdkBitmap *mask;
-  GtkStyle *style;
   GtkCellType type;
 
 
@@ -316,26 +317,30 @@ fe_clist_button_event_press (GtkWidget * widget,
 				  column);
 
   if (type == GTK_CELL_PIXMAP)
-    {
+  {
       gtk_clist_set_text (GTK_CLIST (fe_clist),
 			  row,
 			  column,
 			  "");
-    }
+  }
   else
-    {
+  {
       /* now for the pixmap from gdk */
-      style = gtk_widget_get_style (fe_clist);
-      pixmap = gdk_pixmap_create_from_xpm_d (fe_clist->window, &mask,
-					     &style->bg[GTK_STATE_NORMAL],
-					     (gchar **) enabled_xpm);
+      im = gdk_imlib_create_image_from_xpm_data (enabled_xpm);
+      gdk_imlib_render (im, im->rgb_width, im->rgb_height);
+      pixmap = gdk_imlib_copy_image (im);
+      mask = gdk_imlib_copy_mask (im);
+      gdk_imlib_destroy_image (im);
+
       gtk_clist_set_pixmap (GTK_CLIST (fe_clist),
 			    row,
-			    column,
+			    0,
 			    pixmap,
 			    mask);
+
       gdk_pixmap_unref (pixmap);
-    }
+      gdk_bitmap_unref (mask);
+  }
 
   gtk_signal_emit_stop_by_name (GTK_OBJECT (fe_clist),
 				"button_press_event");

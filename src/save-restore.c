@@ -1169,14 +1169,10 @@ mailbox_list_to_vector(GList * mailbox_list)
     i = g_list_length(mailbox_list) + 1;
     res = g_new0(gchar *, i);
 
-    i = 0;
-    list = mailbox_list;
-    while (list) {
-	res[i] = g_strdup(LIBBALSA_MAILBOX(list->data)->name);
-	i++;
-	list = g_list_next(list);
-    }
-    res[i] = NULL;
+    res[--i] = NULL;
+    for(list = mailbox_list; list; list = g_list_next(list))
+	res[--i] = g_strdup(LIBBALSA_MAILBOX(list->data)->name);
+
     return res;
 }
 

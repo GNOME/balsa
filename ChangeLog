@@ -1,3 +1,7 @@
+2001-09-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/save-restore.c: fix #60293: preserve mailbox order.
+	
 2001-09-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/pref-manager.c: it is legal to call update_mail_servers() 

@@ -1,3 +1,7 @@
+2003-02-10  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in: remove the autoconf-2.52 dependency
+
 2003-01-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in: compile against openssl-0.9.7

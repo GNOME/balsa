@@ -1,0 +1,6 @@
+[__section_info__]
+_description=Balsa E-mail reader
+
+[startup]
+file=balsa/startup.wav
+_description=Program startup

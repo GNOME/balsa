@@ -1,10 +1,11 @@
 balsa_SOUNDS = startup.wav newmail.wav
-balsa_SOUNDLISTS = balsa.soundlist email.soundlist
-
-EXTRA_DIST = $(balsa_SOUNDS) $(balsa_SOUNDLISTS)
 
 balsasoundsdir = $(datadir)/sounds/balsa
 balsasounds_DATA = $(balsa_SOUNDS)
 
 soundlistdir = $(sysconfdir)/sound/events
-soundlist_DATA = $(balsa_SOUNDLISTS)
+soundlist_in_files = balsa.soundlist.in email.soundlist.in
+soundlist_DATA = $(soundlist_in_files:.soundlist.in=.soundlist)
+@INTLTOOL_SOUNDLIST_RULE@
+
+EXTRA_DIST = $(balsa_SOUNDS) $(soundlist_in_files)

@@ -1,0 +1,6 @@
+[__section_info__]
+_description=E-mail
+
+[newmail]
+file=balsa/newmail.wav
+_description=New mail notification

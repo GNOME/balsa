@@ -1633,41 +1633,39 @@ void
 balsa_mblist_scan_mailbox_node(BalsaMailboxNode * mbnode)
 {
     GNode *gnode;
-    GList *list = NULL;
+    GSList *list = NULL, *l;
 
     balsa_mailbox_nodes_lock(FALSE);
 
     gnode = g_node_find(balsa_app.mailbox_nodes, G_IN_ORDER,
                         G_TRAVERSE_ALL, mbnode);
-    if (gnode)
+    if (gnode) {
         for (gnode = gnode->children; gnode; gnode = gnode->next) {
             mbnode = BALSA_MAILBOX_NODE(gnode->data);
             if ((LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)
                  || (!mbnode->mailbox && mbnode->server
                      && mbnode->server->type == LIBBALSA_SERVER_IMAP))
                 && !mbnode->scanned) {
-                list = g_list_prepend(list, mbnode);
+                list = g_slist_prepend(list, mbnode);
             }
+        }
     } else
         g_print("mblist_scan_mailbox_node: didn't find mbnode.\n");
 
     balsa_mailbox_nodes_unlock(FALSE);
 
-    if (list) {
-        GList *l = list;
-
-        while (list) {
-            mbnode = list->data;
-            balsa_mailbox_node_rescan(mbnode);
-            mbnode->scanned = TRUE;
-            list = g_list_next(list);
-        }
-
-        g_list_free(l);
-        /* to restore the folder styles for unread messages, we need to
-         * do a full check; perhaps after a few seconds' delay? */
-        check_new_messages_real(NULL, NULL, TYPE_BACKGROUND);
+    for (l = list; l; l = g_slist_next(l)) {
+        gboolean has_unread_messages = FALSE;
+        mbnode = l->data;
+        if (mbnode->mailbox)
+            has_unread_messages = mbnode->mailbox->has_unread_messages;
+        balsa_mailbox_node_rescan(mbnode);
+        if (mbnode->mailbox)
+            mbnode->mailbox->has_unread_messages = has_unread_messages;
+        mbnode->scanned = TRUE;
     }
+
+    g_slist_free(list);
 }
 
 /* balsa_mblist_mru_menu:

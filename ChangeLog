@@ -1,3 +1,7 @@
+2003-11-21 10:25  PeterB
+
+	* src/balsa-mblist.c: Fix bug 127422.
+
 2003-10-02  Emmanuel <e.allaud@wanadoo.fr>
 
 	* libbalsa/filter.c: support for setting message flags by filters.

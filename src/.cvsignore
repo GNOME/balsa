@@ -3,3 +3,6 @@ Makefile.in
 .deps
 balsa
 cfg-offsets.h
+balsa-mblist.c
+balsa-mblist.h
+balsa-mblist-private.h

@@ -2248,8 +2248,8 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
 {
     unsigned *msgno_arr, *msgno_map, len, i, no_max;
     GArray *tmp;
-    len = array->len;
     ImapResponse rc;
+    len = array->len;
 
     if(mbox->view->sort_field == LB_MAILBOX_SORT_NO) {
         g_array_sort_with_data(array, (GCompareDataFunc)lbmi_compare_func,

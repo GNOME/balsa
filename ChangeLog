@@ -1,3 +1,17 @@
+2004-03-14 09:15  PeterB
+
+	* src/balsa-mblist.c: connect to mailbox's "changed" signal instead
+	of "set-unread-messages-flag" and "messages-status-changed".
+	* libbalsa/message.c: libbalsa_mailbox_copy_message returns +/-1,
+	not TRUE/FALSE.
+	* libbalsa/mailbox_imap.c: check for mailbox lock in flags- and
+	exists- callbacks; sort msgnos when copying.
+	* libbalsa/: mailbox.c, mailbox.h: scrap "messages-status-changed"
+	and "set-unread-messages-flag" signals; emit "changed" when we
+	might need to inform the front-end; streamline counting unread
+	messages.
+	* libbalsa/filter-funcs.c: Manu: use macro.
+
 2004-03-13 13:06  PeterB
 
 	* libbalsa/body.c: empty GMimePart is OK.

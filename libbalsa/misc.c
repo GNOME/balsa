@@ -1579,11 +1579,12 @@ libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
     while (fcntl (fd, F_SETLK, &lck) == -1)
 	{
 	    struct stat sb;
-	    g_warning("mx_lock_file(): fcntl errno %d.\n", errno);
+	    g_print("%s(): fcntl errno %d.\n", __FUNCTION__, errno);
     if (errno != EAGAIN && errno != EACCES)
 	{
-	    mutt_perror ("fcntl");
-	    return (-1);
+	    libbalsa_information
+		(LIBBALSA_INFORMATION_DEBUG, "fcntl failed, errno=%d.", errno);
+	    return -1;
 	}
  
     if (fstat (fd, &sb) != 0)
@@ -1596,13 +1597,16 @@ libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
     if (prev_sb.st_size == sb.st_size && ++count >= (timeout?MAXLOCKATTEMPT:0))
 	{
 	    if (timeout)
-		mutt_error _("Timeout exceeded while attempting fcntl lock!");
+		libbalsa_information
+		    (LIBBALSA_INFORMATION_WARNING,
+		     _("Timeout exceeded while attempting fcntl lock!"));
 	    return (-1);
 	}
  
     prev_sb = sb;
  
-    mutt_message (_("Waiting for fcntl lock... %d"), ++attempt);
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+			 _("Waiting for fcntl lock... %d"), ++attempt);
     sleep (1);
 }
 #endif /* USE_FCNTL */

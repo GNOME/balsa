@@ -87,6 +87,7 @@
 #define BALSA_PIXMAP_INFO_REPLIED               "balsa_info_replied"
 #define BALSA_PIXMAP_INFO_NEW                   "balsa_info_new"
 #define BALSA_PIXMAP_INFO_ATTACHMENT            "balsa_info_attachment"
+#define BALSA_PIXMAP_INFO_DELETED               "balsa_info_deleted"
 #ifdef HAVE_GPGME
 #  define BALSA_PIXMAP_GPG_SIGN                 "balsa_gpg_sign"
 #  define BALSA_PIXMAP_GPG_ENCRYPT              "balsa_gpg_encrypt"

@@ -202,6 +202,7 @@ register_balsa_pixmaps(void)
         { BALSA_PIXMAP_INFO_REPLIED,    info_replied_xpm },
         { BALSA_PIXMAP_INFO_NEW,        info_new_xpm },
         { BALSA_PIXMAP_INFO_ATTACHMENT, info_attachment_xpm },
+	{ BALSA_PIXMAP_INFO_DELETED,	mbox_trash_xpm}, /* share the icon */
 #ifdef HAVE_GPGME
         { BALSA_PIXMAP_INFO_SIGN,       info_sign_xpm },
         { BALSA_PIXMAP_INFO_SIGN_GOOD,  info_sign_good_xpm },
@@ -229,8 +230,8 @@ register_balsa_pixbufs(GtkWidget * widget)
 	const gchar *icon;
     } icons[] = {
 	{
-	libbalsa_mailbox_set_unread_icon, BALSA_PIXMAP_INFO_NEW}, {
-	libbalsa_mailbox_set_trash_icon, BALSA_PIXMAP_TRASH}, {
+	libbalsa_mailbox_set_unread_icon,  BALSA_PIXMAP_INFO_NEW}, {
+	libbalsa_mailbox_set_trash_icon,   BALSA_PIXMAP_INFO_DELETED}, {
 	libbalsa_mailbox_set_flagged_icon, BALSA_PIXMAP_INFO_FLAGGED}, {
 	libbalsa_mailbox_set_replied_icon, BALSA_PIXMAP_INFO_REPLIED}, {
 	libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT},

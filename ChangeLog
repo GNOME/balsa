@@ -1,5 +1,10 @@
 2004-04-12  Pawel Salek
 
+	* libbalsa/misc.c: fix fcntl() locking.
+	* src/balsa-icons.[hc]: make "deleted" icon size match other icons.
+
+2004-04-12  Pawel Salek
+
 	* libbalsa/mailbox.[hc]: fetch headers smarter.
 	* libbalsa/mailbox_imap.c: provide subclasses for _fetch_headers.
 	* libbalsa/mailbox_local.c: ditto.

@@ -12,3 +12,5 @@ libmutt/pattern.c
 #libmutt/recvattach.c: only mutt_is_message_type used. no translation there.
 libmutt/recvattach.c
 src/orbit-glue.c
+# libmutt/mutt_ssl_nss.c: not compiled.
+libmutt/mutt_ssl_nss.c

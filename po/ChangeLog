@@ -1,3 +1,7 @@
+2002-03-31  Pawel Salek <pawsa@theochem.kth.se>
+
+	* POTFILES.skip: skip not compiled libmutt/mutt_ssl_nss.c
+
 2003-01-24  Marcel Telka  <marcel@telka.sk>
 
 	* sk.po: Updated Slovak translation.

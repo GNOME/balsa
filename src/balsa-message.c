@@ -133,6 +133,7 @@ balsa_message_size_request (GtkWidget * widget, GtkRequisition * requisition)
 static void
 balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
 {
+  double x1, x2, y1, y2;
   g_return_if_fail (widget != NULL);
   g_return_if_fail (BALSA_IS_MESSAGE (widget));
   g_return_if_fail (allocation != NULL);
@@ -140,7 +141,12 @@ balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
   if (GTK_WIDGET_CLASS (parent_class)->size_allocate)
     (*GTK_WIDGET_CLASS (parent_class)->size_allocate) (widget, allocation);
 
+#if 0
   gnome_canvas_set_scroll_region (GNOME_CANVAS (widget), 0, 0, allocation->width, allocation->height);
+#endif
+  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (GNOME_CANVAS_GROUP (GNOME_CANVAS (widget)->root)),
+		  &x1, &y1, &x2, &y2);
+  gnome_canvas_set_scroll_region (GNOME_CANVAS (widget), x1 - 10, y1 - 10, x2 + 10, y2 + 10);
 
 }
 
@@ -283,7 +289,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
     }
 
   gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (row[0]), &x1, &y1, &x2, &y2);
-  gnome_canvas_item_move (GNOME_CANVAS_ITEM (row[1]), x2 - x1 + 30, 0.0);
+  gnome_canvas_item_move (GNOME_CANVAS_ITEM (row[1]), x2 - x1 + 50, 0.0);
 }
 
 
@@ -292,8 +298,6 @@ body2canvas (BalsaMessage * bmessage, Message * message)
 {
   GnomeCanvasGroup *bm_root;
   double x1, x2, y1, y2;
-  GString *str;
-  gchar *text;
 
   bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
 
@@ -346,9 +350,10 @@ audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 void
 application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
+#if 0
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
-
+#endif
   balsa_message_text_item ("--APPLICATION--", group, 0.0, 0.0);
 #if 0
   obstack_append_string (canvas_bfr,
@@ -550,8 +555,6 @@ content2canvas (Message * message, GnomeCanvasGroup * group)
   Body *body;
   FILE *msg_stream;
   gchar msg_filename[PATH_MAX];
-  static gchar *canvas_buffer_content = (gchar *) - 1;
-
 
   part_idx = 0;
   part_nesting_depth = 0;

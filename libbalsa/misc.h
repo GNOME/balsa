@@ -86,6 +86,7 @@ void libbalsa_marshal_NONE__INT_INT_INT_STRING(GtkObject *object,
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
-
+gchar *libbalsa_expand_path(const gchar *path);
+void libbalsa_contract_path(gchar *path);
 
 #endif				/* __LIBBALSA_MISC_H__ */

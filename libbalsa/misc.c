@@ -886,3 +886,29 @@ libbalsa_truncate_string(const gchar *str, gint length, gint dots)
     return res;
 }
 
+/* libbalsa_expand_path:
+   do different kind of filename expansions, e.g. ~ -> $HOME, etc.
+*/
+gchar*
+libbalsa_expand_path(const gchar * path)
+{
+    char buf[_POSIX_PATH_MAX];
+    char* res;
+    strcpy(buf, path);
+    libbalsa_lock_mutt();
+    res = mutt_expand_path(buf, sizeof(buf));
+    libbalsa_unlock_mutt();
+    return g_strdup(res);
+}
+
+/* libbalsa_contract_path:
+   do a reverse transformation.
+*/
+void
+libbalsa_contract_path(gchar *path)
+{
+    libbalsa_lock_mutt();
+    mutt_pretty_mailbox(path);
+    libbalsa_unlock_mutt();
+}
+

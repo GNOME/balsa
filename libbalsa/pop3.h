@@ -45,7 +45,7 @@ PopStatus libbalsa_fetch_pop_mail_direct (LibBalsaMailboxPop3 * mailbox,
 					  ProgressCallback prog_cb, void*data);
 
 PopStatus libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3 * mailbox, 
-					  gchar* uid,
+					  gchar* uid, const gchar* cmd,
 					  ProgressCallback prog_cb, void*data);
 
 const gchar *pop_get_errstr(PopStatus status);

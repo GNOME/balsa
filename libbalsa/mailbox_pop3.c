@@ -134,6 +134,8 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     mailbox->delete_from_server = FALSE;
     mailbox->inbox = NULL;
 
+    mailbox->filter = FALSE;
+    mailbox->filter_cmd = NULL;
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server =
 	LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
@@ -279,8 +281,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }
     close(tmp_file);
 
-    status =  LIBBALSA_MAILBOX_POP3(mailbox)->filter 
-	? libbalsa_fetch_pop_mail_filter (m, uid, progress_cb, mailbox)
+    status =  m->filter 
+	? libbalsa_fetch_pop_mail_filter (m, uid, m->filter_cmd,
+                                          progress_cb, mailbox)
 	: libbalsa_fetch_pop_mail_direct (m, tmp_path, uid, 
                                           progress_cb, mailbox);
 
@@ -380,6 +383,7 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
     gnome_config_set_bool("Delete", pop->delete_from_server);
     gnome_config_set_bool("Apop", pop->use_apop);
     gnome_config_set_bool("Filter", pop->filter);
+    gnome_config_set_string("FilterCmd", pop->filter_cmd);
 
     gnome_config_set_string("Lastuid", pop->last_popped_uid);
 
@@ -404,6 +408,10 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
     pop->delete_from_server = gnome_config_get_bool("Delete=false");
     pop->use_apop = gnome_config_get_bool("Apop=false");
     pop->filter = gnome_config_get_bool("Filter=false");
+    pop->filter_cmd = gnome_config_get_string("FilterCmd");
+    if(pop->filter_cmd && *pop->filter_cmd == '\0') {
+	g_free(pop->filter_cmd); pop->filter_cmd = NULL;
+    }
 
     g_free(pop->last_popped_uid);
     pop->last_popped_uid = gnome_config_get_string("Lastuid");

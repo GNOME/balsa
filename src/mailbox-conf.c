@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -92,6 +92,7 @@ struct _MailboxConfWindow {
 	    GtkWidget *delete_from_server;
 	    GtkWidget *use_apop;
 	    GtkWidget *filter;
+	    GtkWidget *filter_cmd;
 #ifdef USE_SSL
 #ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
 	    GtkWidget *use_ssl;
@@ -164,6 +165,14 @@ pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
 }
 #endif
 #endif
+
+static void
+pop3_enable_filter_cb(GtkWidget * w, MailboxConfWindow * mcw)
+{
+    GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter);
+    gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd,
+			     gtk_toggle_button_get_active(button));
+}
 
 /* BEGIN OF COMMONLY USED CALLBACKS SECTION ---------------------- */
 
@@ -479,6 +488,11 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	    (GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter),
 	     pop3->filter);
 
+        gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, pop3->filter);
+	if (pop3->filter_cmd)
+	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd),
+			       pop3->filter_cmd);
+
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	LibBalsaMailboxImap *imap;
 	LibBalsaServer *server;
@@ -577,7 +591,8 @@ static void
 update_pop_mailbox(MailboxConfWindow *mcw)
 {
     LibBalsaMailboxPop3 * mailbox;
-
+    char *cmd;
+    
     mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
 
     g_free(LIBBALSA_MAILBOX(mailbox)->name);
@@ -610,6 +625,9 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 				     (mcw->mb_data.pop3.delete_from_server));
     mailbox->filter =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
+    cmd = gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd));
+    g_free(mailbox->filter_cmd);
+    mailbox->filter_cmd = cmd ? g_strdup(cmd) : NULL;
 }
 
 /*
@@ -846,7 +864,7 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     gtk_table_attach(GTK_TABLE(table), file, 1, 2, 1, 2,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-    create_label(_("Identity:"), table, 2, &keyval);
+    create_label(_("_Identity:"), table, 2, &keyval);
     mcw->identity = create_entry(mcw->window, table,
 				 NULL, mcw, 2, NULL, keyval);
 
@@ -904,11 +922,18 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.filter = 
 	create_check(mcw->window, _("_Filter messages through procmail"),
 		     table, 7, FALSE);
+    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.pop3.filter), "toggled", 
+                       pop3_enable_filter_cb, mcw);
+    create_label(_("Fi_lter Command:"), table, 8, &keyval);
+    mcw->mb_data.pop3.filter_cmd = 
+	create_entry(mcw->window, table,
+		     GTK_SIGNAL_FUNC(check_for_blank_fields),
+		     mcw, 8, "procmail -f -", keyval);
 
     /* toggle for check */
     mcw->mb_data.pop3.check = 
 	create_check(mcw->window, _("_Enable check for new mail"), 
-		     table, 8, TRUE);
+		     table, 9, TRUE);
 
 #ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
     /*
@@ -1010,7 +1035,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
                        imap_use_ssl_cb, mcw);
 #endif
 
-    create_label(_("_Identity:"), table, 0, &keyval);
+    create_label(_("_Identity:"), table, 8, &keyval);
     mcw->identity = create_entry(mcw->window, table,
 				 NULL, mcw, 8, NULL, keyval);
 

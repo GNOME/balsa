@@ -41,7 +41,8 @@ struct _LibBalsaMailboxPop3 {
     gboolean delete_from_server;
     gchar *last_popped_uid;
     gboolean use_apop;
-    gboolean filter; /* filter through procmail? */
+    gboolean filter; /* filter through procmail/filter_cmd? */
+    gchar *filter_cmd;
     LibBalsaMailbox *inbox;
 };
 

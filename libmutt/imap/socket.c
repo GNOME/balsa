@@ -212,7 +212,7 @@ int raw_socket_open (CONNECTION *conn)
   }
   memcpy (&sin.sin_addr, he->h_addr_list[0], he->h_length);
 
-  mutt_message (_("Connecting to %s..."), conn->mx.host); 
+  /* BALSA: mutt_message (_("Connecting to %s..."), conn->mx.host);  */
 
   if (do_preconnect && first_try_without_preconnect)
   {

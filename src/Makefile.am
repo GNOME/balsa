@@ -59,8 +59,11 @@ CFLAGS += $(GTKHTML_CFLAGS)
 
 #libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt
 balsa_LDADD = \
-	$(top_builddir)/libbalsa/libbalsa.a \
-	$(top_builddir)/libmutt/libmutt.a \
+	$(top_builddir)/libbalsa/libbalsa.a	\
+	$(top_builddir)/libmutt/imap/libimap.a	\
+	$(top_builddir)/libmutt/libmutt.a	\
+	$(top_builddir)/libmutt/imap/libimap.a	\
+	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	-lPropList	\
 	@LIBESD_LIB@	\
@@ -71,8 +74,11 @@ balsa_LDADD = \
 	$(GTKHTML_LIBS)	
 
 balsa_DEPENDENCIES = \
-	$(top_builddir)/libbalsa/libbalsa.a \
-	$(top_builddir)/libmutt/libmutt.a \
+	$(top_builddir)/libbalsa/libbalsa.a	\
+	$(top_builddir)/libmutt/imap/libimap.a	\
+	$(top_builddir)/libmutt/libmutt.a	\
+        $(top_builddir)/libmutt/imap/libimap.a	\
+	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a
 
 dist-hook:

@@ -640,9 +640,7 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 			 cur->content->type);
 #endif
 		body = libbalsa_message_body_new (message);
-
 		libbalsa_message_body_set_mutt_body(body, cur->content);
-
 		libbalsa_message_append_part (message, body);
 
 		message->body_ref++;
@@ -655,14 +653,11 @@ libbalsa_message_body_ref (LibBalsaMessage * message)
 	/*
 	 * emit read message
 	 */
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
+	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 		libbalsa_message_read (message);
-	}
 
 	if (LIBBALSA_IS_MAILBOX_IMAP(message->mailbox))	{
-
 		g_free (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path);
-
 		LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path =
 			g_strdup (cur->content->filename);
 	}
@@ -751,5 +746,4 @@ void libbalsa_message_append_part (LibBalsaMessage *message, LibBalsaMessageBody
 			part = part->next;
 		part->next = body;
 	}
-  
 }

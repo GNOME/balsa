@@ -55,7 +55,6 @@ libbalsa_message_body_free (LibBalsaMessageBody * body)
 		return;
 
 	g_free (body->buffer);
-
 	g_free (body->filename);
 
 	if ( body->temp_filename )
@@ -77,21 +76,17 @@ void libbalsa_message_body_set_mutt_body(LibBalsaMessageBody *body, MuttBody *mu
 	g_return_if_fail (body->mutt_body == NULL);
 
 	body->mutt_body = mutt_body;
-
 	body->filename = g_strdup(mutt_body->filename);
 
 	if ( mutt_body->next ) {
 		body->next = libbalsa_message_body_new(body->message);
-
 		libbalsa_message_body_set_mutt_body (body->next, mutt_body->next);
 	}
   
 	if ( mutt_body->parts ) {
 		body->parts = libbalsa_message_body_new(body->message);
-    
 		libbalsa_message_body_set_mutt_body (body->parts, mutt_body->parts);
 	}
-    
 }
 
 LibBalsaMessageBodyType

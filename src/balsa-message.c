@@ -932,10 +932,15 @@ part_info_init_mimetext (BalsaMessage *bm, BalsaPartInfo *info)
   gint quote_level = 0;
 
 
-  libbalsa_message_body_save_temporary ( info->body, NULL );
+  if(!libbalsa_message_body_save_temporary ( info->body, NULL )) {
+    balsa_warning("Error writing to temporary file %s.\nCheck the directory permissions.", info->body->temp_filename);
+    return;
+  }
   
-  if( (fp = fopen( info->body->temp_filename, "r")) == NULL) 
-    balsa_warning("Cannot create temporary file.");
+  if( (fp = fopen( info->body->temp_filename, "r")) == NULL) {
+    balsa_warning("Cannot open temporary file %s.", info->body->temp_filename);
+    return;
+  }
 
   alloced = libbalsa_readfile( fp, &ptr );
  

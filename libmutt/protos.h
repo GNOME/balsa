@@ -317,6 +317,10 @@ ADDRESS *alias_reverse_lookup (ADDRESS *);
    on some systems */
 #define SKIPWS(c) while (*(c) && isspace ((unsigned char) *(c))) c++;
 
+/* base64.c */
+void mutt_to_base64 (unsigned char*, const unsigned char*, int);
+int mutt_from_base64 (char*, const char*);
+
 #ifdef LOCALES_HACK
 #define IsPrint(c) (isprint((unsigned char)(c)) || \
 	((unsigned char)(c) >= 0xa0))

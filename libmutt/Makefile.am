@@ -4,6 +4,7 @@ noinst_LIBRARIES = libmutt.a
 
 libmutt_a_SOURCES = \
 	attach.c 	\
+	base64.c	\
 	buffy.c 	\
 	charset.c 	\
 	copy.c 		\
@@ -16,7 +17,6 @@ libmutt_a_SOURCES = \
 	globals.c 	\
 	handler.c 	\
 	hash.c 		\
-	imap.c 		\
 	init.c 		\
 	lib.c 		\
 	mbox.c		\
@@ -46,7 +46,6 @@ libmutt_a_SOURCES = \
 	globals.h	\
 	hash.h		\
 	history.h	\
-	imap.h		\
 	init.h		\
 	keymap.h	\
 	mailbox.h	\
@@ -72,4 +71,4 @@ SUBDIRS = imap
 
 #CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT -DVERSION=\"$(VERSION)\"
 CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
-INCLUDES=-I.
+INCLUDES=-I. -I./imap

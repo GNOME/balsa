@@ -393,7 +393,7 @@ int mutt_buffy_check (int force)
 	  
 	  ImapUser = tmp->user;
 	  ImapPass = tmp->passwd;
-          if ( (res=imap_buffy_check (tmp->path))>0 )
+          if ( (res=imap_mailbox_check (tmp->path, 1))>0 )
           {
             BuffyCount++;
             tmp->new = 1;

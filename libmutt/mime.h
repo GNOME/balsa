@@ -53,7 +53,7 @@ enum
 /* MIME encoding/decoding global vars */
 extern int Index_hex[];
 extern int Index_64[];
-extern char Base64_chars[];
+extern char B64Chars[];
 
 #define hexval(c) Index_hex[(unsigned int)(c)]
 #define base64val(c) Index_64[(unsigned int)(c)]

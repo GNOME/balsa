@@ -1,3 +1,23 @@
+2000-08-29  Pawel Salek <pawsa@theochem.kth.se>
+
+	Plugged in new IMAP code. Basic testing done. IMAP folders broken,
+	require code rewrite.
+	* libbalsa/mailbox_imap.c(libbalsa_mailbox_imap_get_message_stream):
+	new imap has caching encasulated, ask it to provide cached or fresh
+	message stream. 
+	* libmutt/base64.c: added.
+	* libbalsa/misc.c: store temporarily not used imap folder stuff.
+	* libmutt/Makefile.am: added base64.c,removed old imap.[hc]
+	* libmutt/buffy.c:imap_buffy_check->imap_mailbox_check
+	* libmutt/mime.h: Base64_chars->B64Chars
+	* libmutt/protos.h: base64 decls.
+	* libmutt/imap/Makefile.am: fixed file list for distribution.
+	* libmutt/imap/auth.c: removed localization translations..
+	* libmutt/imap/socket.c: commented out mutt_message
+	* src/Makefile.am: linking with libimap.a - FIXME!
+	* src/balsa-message.c: more sensible IO tests.
+	* balsa.spec.in: apply rpm-po.patch in a better way.
+
 2000-08-28 Pawel Salek <pawsa@theochem.kth.se>
         Importing IMAP from mutt-1.2.5i
 	* docs/README.SSL, libmutt/imap/*: added (see libmutt/ChangeLog 

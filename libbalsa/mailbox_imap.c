@@ -33,6 +33,8 @@
 #include "threads.h"
 #endif
 
+#include "imap/imap.h"
+
 static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_imap_destroy (GtkObject *object);
@@ -232,21 +234,27 @@ libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append)
 #endif
 
 	}
-
 	UNLOCK_MAILBOX (mailbox);
-
 }
 
+/* libbalsa_mailbox_imap_get_message_stream:
+   we make use of fact that imap_fetch_message doesn't set msg->path field. 
+*/
 static FILE*
-libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message)
+libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, 
+					  LibBalsaMessage *message)
 {
-	FILE *stream;
+	FILE * stream = NULL;
+	MESSAGE *msg;
 
 	g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
 	g_return_val_if_fail (LIBBALSA_IS_MESSAGE (message), NULL);
-
-	stream = fopen (LIBBALSA_MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
   
+	msg = safe_calloc (1, sizeof (MESSAGE));
+	msg->magic = CLIENT_CONTEXT(mailbox)->magic;
+	if (!imap_fetch_message (msg, CLIENT_CONTEXT(mailbox),message->msgno)) 
+		stream = msg->fp;
+	FREE (&msg);
 	return stream;
 }
 

@@ -315,7 +315,7 @@ int imap_authenticate (IMAP_DATA *idata, CONNECTION *conn)
       {
 	if ((r = imap_auth_cram_md5 (idata, user, ckey)))
 	{
-	  mutt_error (_("CRAM-MD5 authentication failed."));
+	  mutt_error ("CRAM-MD5 authentication failed.");
 	  sleep (1);
 	  if (!(conn->mx.flags & M_IMAP_CRAM))
 	    FREE (&ImapCRAMKey);

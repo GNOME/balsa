@@ -120,6 +120,13 @@ gboolean libbalsa_is_cert_known(X509* cert, long vfy_result);
 void libbalsa_certs_destroy(void);
 #endif
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+pthread_t libbalsa_get_main_thread(void);
+gboolean libbalsa_am_i_subthread(void);
+#else
+#define libbalsa_am_i_subthread() FALSE
+#endif /* BALSA_USE_THREADS */
 void libbalsa_message(const char *fmt, ...);
 gchar * libbalsa_rot(const gchar * pass);
 

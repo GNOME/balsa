@@ -102,6 +102,9 @@ folder_conf_response(GtkDialog * dialog, int response,
         cdd->ok(cdd);
         /* Fall over */
     default:
+#ifdef FIXME
+        /* We cannot destroy widget in response handler!  This may way
+        * work with one version of GTK and won't with other. */
         gtk_widget_destroy(GTK_WIDGET(cdd->dialog));
         cdd->dialog = NULL;
         if (cdd->mbnode)
@@ -114,6 +117,7 @@ folder_conf_response(GtkDialog * dialog, int response,
             /* Cancelling, without creating a mailbox node. Nobody owns
              * the xDialogData, so we'll free it here. */
             g_free(cdd);
+#endif
         break;
     }
 }
@@ -552,7 +556,8 @@ folder, parent);
                 if (sdd->old_parent
                     && !strncmp(parent, sdd->old_parent, strlen(parent))) {
                     /* moved it up the tree */
-		    BalsaMailboxNode *mbnode = balsa_find_dir(parent);
+		    BalsaMailboxNode *mbnode =
+                        balsa_find_dir(sdd->parent->server, parent);
                     if (mbnode) {
                         balsa_mailbox_node_rescan(mbnode);
 			g_object_unref(mbnode);
@@ -563,7 +568,7 @@ folder, parent);
                                        strlen(sdd->old_parent))) {
                     /* moved it down the tree */
 		    BalsaMailboxNode *mbnode =
-			balsa_find_dir(sdd->old_parent);
+			balsa_find_dir(sdd->parent->server, sdd->old_parent);
                     if (mbnode) {
                         balsa_mailbox_node_rescan(mbnode);
 			g_object_unref(mbnode);

@@ -476,8 +476,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 	/* libbalsa_mailbox_local_load_messages may result in applying
 	 * filters, and related code assumes that the gdk lock isn't
 	 * held in subthreads. */
-	gboolean is_sub_thread =
-	    (pthread_self() != libbalsa_get_main_thread());
+	gboolean is_sub_thread = libbalsa_am_i_subthread();
 	if (is_sub_thread)
 	    gdk_threads_leave();
         mailbox->msg_tree = g_node_new(NULL);

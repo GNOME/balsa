@@ -23,11 +23,6 @@
 #ifndef __LIBBALSA_MISC_H__
 #define __LIBBALSA_MISC_H__
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-pthread_t libbalsa_get_main_thread(void);
-#endif /* BALSA_USE_THREADS */
-
 #include <stdio.h>
 #include <gtk/gtk.h>
 

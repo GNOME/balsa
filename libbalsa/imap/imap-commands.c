@@ -295,7 +295,7 @@ imap_mbox_rename(ImapMboxHandle* handle,
 		 const char* new_mbox)
 {
   gchar *mbx7o = imap_utf8_to_mailbox(old_mbox);
-  gchar *mbx7n = imap_utf8_to_mailbox(old_mbox);
+  gchar *mbx7n = imap_utf8_to_mailbox(new_mbox);
 
   gchar* cmd = g_strdup_printf("RENAME \"%s\" \"%s\"", mbx7o, mbx7n);
   ImapResponse rc = imap_cmd_exec(handle, cmd);

@@ -4104,7 +4104,8 @@ show_preview_pane_cb(GtkWidget * widget, gpointer data)
 
     balsa_app.previewpane =
         balsa_toolbar_get_button_active(toolbar, BALSA_PIXMAP_SHOW_PREVIEW);
-    balsa_window_refresh(balsa_app.main_window);
+    if(balsa_app.main_window)
+        balsa_window_refresh(balsa_app.main_window);
 }
 
 /* browse_wrap can also be changed in the preferences window

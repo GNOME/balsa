@@ -1966,7 +1966,7 @@ void
 balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
 				 BalsaMailboxNode * mbnode)
 {
-    gboolean is_sub_thread = (pthread_self() != libbalsa_get_main_thread());
+    gboolean is_sub_thread = libbalsa_am_i_subthread();
     GtkTreeModel *model;
     GtkTreeIter parent;
     GtkTreeIter *parent_iter = NULL;

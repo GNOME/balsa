@@ -1804,7 +1804,7 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
 #endif
 
 #ifdef BALSA_USE_THREADS
-    if (pthread_self() == libbalsa_get_main_thread())
+    if (!libbalsa_am_i_subthread())
 #ifdef ENABLE_PCACHE
 	passwd =
 	    get_passphrase_real(context, uid_hint, prev_was_bad, pcache);
@@ -1830,7 +1830,6 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
 
 	pthread_cond_destroy(&apd.cond);
 	pthread_mutex_unlock(&get_passphrase_lock);
-	pthread_mutex_destroy(&get_passphrase_lock);
 	passwd = apd.res;
     }
 #else

@@ -150,7 +150,6 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     
     pthread_cond_destroy(&apd.cond);
     pthread_mutex_unlock(&ask_passwd_lock);
-    pthread_mutex_destroy(&ask_passwd_lock);
     return apd.res;
 }
 #endif
@@ -214,8 +213,7 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     
     password = NULL;
     if (mbox) {
-	gboolean is_sub_thread =
-	    (pthread_self() != libbalsa_get_main_thread());
+	gboolean is_sub_thread = libbalsa_am_i_subthread();
 
 	if (is_sub_thread)
 	    gdk_threads_enter();
@@ -626,6 +624,7 @@ balsa_stock_button_with_label(const char *icon, const char *text)
  */
 struct _BalsaFind {
     gconstpointer data;
+    LibBalsaServer   *server;
     BalsaMailboxNode *mbnode;
 };
 typedef struct _BalsaFind BalsaFind;
@@ -655,9 +654,11 @@ BalsaMailboxNode *
 balsa_find_mailbox(LibBalsaMailbox * mailbox)
 {
     BalsaFind bf;
-    gboolean is_sub_thread = (pthread_self() != libbalsa_get_main_thread());
+    gboolean is_sub_thread = libbalsa_am_i_subthread();
 
-g_assert(!g_mutex_trylock(gdk_threads_mutex));
+#ifdef BALSA_USE_THREADS
+    g_assert(!g_mutex_trylock(gdk_threads_mutex));
+#endif
 
     if (is_sub_thread)
 	gdk_threads_enter();
@@ -684,7 +685,8 @@ find_path(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if (mbnode->dir && !strcmp(mbnode->dir, bf->data)) {
+    if (mbnode->server == bf->server &&
+        mbnode->dir && !strcmp(mbnode->dir, bf->data)) {
 	bf->mbnode = mbnode;
 	return TRUE;
     }
@@ -694,15 +696,16 @@ find_path(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
 }
 
 BalsaMailboxNode *
-balsa_find_dir(const gchar * path)
+balsa_find_dir(LibBalsaServer *server, const gchar * path)
 {
     BalsaFind bf;
-    gboolean is_sub_thread = (pthread_self() != libbalsa_get_main_thread());
+    gboolean is_sub_thread = libbalsa_am_i_subthread();
 
     if (is_sub_thread)
 	gdk_threads_enter();
 
     bf.data = path;
+    bf.server = server;
     bf.mbnode = NULL;
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) find_path, &bf);
@@ -734,15 +737,23 @@ find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
  * looks for a mailbox node with the given url.
  * returns NULL on failure; caller must unref mbnode when non-NULL.
  */
-static BalsaMailboxNode *
+BalsaMailboxNode *
 balsa_find_url(const gchar * url)
 {
     BalsaFind bf;
+
+    gboolean is_sub_thread = libbalsa_am_i_subthread();
+
+    if (is_sub_thread)
+	gdk_threads_enter();
 
     bf.data = url;
     bf.mbnode = NULL;
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) find_url, &bf);
+    if (is_sub_thread)
+	gdk_threads_leave();
+
     return bf.mbnode;
 }
 
@@ -755,19 +766,11 @@ balsa_find_mailbox_by_url(const gchar * url)
 {
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox = NULL;
-    gboolean is_sub_thread = (pthread_self() != libbalsa_get_main_thread());
-
-    if (is_sub_thread)
-	gdk_threads_enter();
 
     if ((mbnode = balsa_find_url(url))) {
 	mailbox = mbnode->mailbox;
 	g_object_unref(mbnode);
     }
-
-    if (is_sub_thread)
-	gdk_threads_leave();
-
     return mailbox;
 }
 

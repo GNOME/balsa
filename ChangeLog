@@ -1,3 +1,17 @@
+2004-05-31  Pawel Salek
+
+	* libbalsa/libbalsa.[ch]: simplify thread recognition, do not
+	destroy static mutexes.
+	* libbalsa/{mailbox_local,rfc3156.c}.c: use
+	libbalsa_am_i_subthread().
+	* libbalsa/imap/imap-commands.c: actually do rename.
+	* src/balsa-app.c: do not destroy static mutexes. Use
+	libbalsa_am_i_subthread(). Fix multiple IMAP server tree scanning.
+	* src/balsa-mblist.c: use fixed balsa_find_dir().
+	* src/mailbox-node.c: ditto.
+	* src/main-window.c: check for main window existence before
+	refreshing.
+	
 2004-05-28 14:21  PeterB
 
 	* libbalsa/source-viewer.c, src/sendmsg-window.c: allow GtkTextView

@@ -605,7 +605,7 @@ libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
     static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
     AskCertData acd;
 
-    if (pthread_self() == libbalsa_get_main_thread())
+    if (pthread_self() == main_thread_id)
 	return ask_cert_real(cert, explanation);
 
     pthread_mutex_lock(&ask_cert_lock);
@@ -617,7 +617,6 @@ libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
     
     pthread_cond_destroy(&acd.cond);
     pthread_mutex_unlock(&ask_cert_lock);
-    pthread_mutex_destroy(&ask_cert_lock);
     return acd.res;
 }
 #else /* BALSA_USE_THREADS */
@@ -637,7 +636,13 @@ libbalsa_get_main_thread(void)
 {
     return main_thread_id;
 }
-#endif
+
+gboolean
+libbalsa_am_i_subthread(void)
+{
+    return pthread_self() != main_thread_id;
+}
+#endif /* BALSA_USE_THREADS */
 
 #ifdef BALSA_USE_THREADS
 #include "libbalsa_private.h"	/* for prototypes */
@@ -655,7 +660,7 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {
     pthread_t thread_id = pthread_self();
     gboolean is_main_thread =
-	(thread_id == libbalsa_get_main_thread());
+	(thread_id == main_thread_id);
 
     pthread_mutex_lock(&mailbox_lock);
     while (mailbox->lock && mailbox->thread_id != thread_id) {

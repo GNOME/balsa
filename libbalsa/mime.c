@@ -28,7 +28,6 @@
 
 #include "mailbackend.h"
 
-#include "balsa-app.h"
 #include "mailbox.h"
 #include "misc.h"
 

@@ -23,7 +23,6 @@
 #include <string.h>
 #include <gnome.h>
 
-#include "balsa-app.h"
 #include "mailbox.h"
 #include "misc.h"
 #include "mailbackend.h"
@@ -172,8 +171,9 @@ balsa_send_message (Message * message)
 
   encode_descriptions (msg->content);
 
-
-
+/* FIXME */
+  mutt_send_message (msg);
+#if 0
   switch (balsa_app.outbox->type)
     {
     case MAILBOX_MAILDIR:
@@ -190,6 +190,7 @@ balsa_send_message (Message * message)
     default:
       break;
     }
+#endif
 
   mutt_free_header (&msg);
 

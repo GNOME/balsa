@@ -1,4 +1,4 @@
-Balsa E-Mail Client 0.4.7
+Balsa E-Mail Client 0.4.8
 
 Copyright (C) 1997-1998 Jay Painter and Stuart Parmenter
 See 'COPYING' for licence information.
@@ -6,10 +6,10 @@ See 'COPYING' for licence information.
 
 Please make sure you have the following things:
 
-Glib       >= 1.1.2
-GTK        >= 1.1.1
-Imlib      >= 1.7
-gnome-libs >= 0.27
+Glib       >= 1.1.7
+GTK        >= 1.1.7
+Imlib      >= 1.8.1
+gnome-libs >= 0.99
 
 If you do not have these, please check http://www.balsa.net/download.html for
 links to these packages.

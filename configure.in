@@ -6,7 +6,7 @@ dnl take care of version
 dnl
 BALSA_MAJOR=0
 BALSA_REVISION=4
-BALSA_PATCHLEVEL=7
+BALSA_PATCHLEVEL=8
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.$BALSA_PATCHLEVEL"
 VERSION="$BALSA_MAJOR.$BALSA_REVISION.$BALSA_PATCHLEVEL"
 
@@ -44,7 +44,7 @@ AC_MSG_ERROR([*** libPropList not found.  Please check http://www.balsa.net for 
 LDFLAGS="$balsa_save_LDFLAGS"
 LIBS="$balsa_save_LIBS"
 
-ALL_LINGUAS="de es fi fr ga ko no"
+ALL_LINGUAS="de es fi fr ga ko no it"
 AM_GNU_GETTEXT
 
 

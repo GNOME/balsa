@@ -23,6 +23,7 @@ balsa_SOURCES =	\
 	balsa-app.h		\
 	balsa-icons.h		\
 	balsa-index.h		\
+	balsa-mblist.h		\
 	balsa-init.h		\
 	balsa-message.h		\
 	filter-edit.h		\

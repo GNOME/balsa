@@ -21,21 +21,19 @@
 
 #include <string.h>
 #include <gnome.h>
-#include "balsa-app.h"
 
 void
 mutt_message (const char *fmt,...)
 {
-  if (balsa_app.debug)
-    {
-      va_list ap;
-      char outstr[522];
+#ifdef DEBUG
+  va_list ap;
+  char outstr[522];
 
-      va_start (ap, fmt);
-      vsprintf (outstr, fmt, ap);
-      va_end (ap);
-      g_print ("mutt_message: %s\n", outstr);
-    }
+  va_start (ap, fmt);
+  vsprintf (outstr, fmt, ap);
+  va_end (ap);
+  g_print ("mutt_message: %s\n", outstr);
+#endif
 }
 
 void

@@ -13,8 +13,9 @@ BUILT_SOURCES = balsa-skels.c \
 INCLUDES=$(GNOME_INCLUDEDIR)
 
 libbalsasrv_a_SOURCES = \
+	balsa.idl \
 	balsa-skels.c \
-	balsa-common.c     \
+	balsa-common.c \
 	balsa-impl.c \
 	balsa.h
 

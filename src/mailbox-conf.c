@@ -234,7 +234,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     if(BALSA_IS_MAILBOX_SPECIAL(mailbox)) {
 	balsa_information(
 	    LIBBALSA_INFORMATION_ERROR,
-	    _("Mailbox \"%s\" is used by balsa and I cannot remove it.\n"
+	    _("Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
 	      "If you really want to remove it, assign its function\n"
 	      "to some other mailbox."), mailbox->name);
 	return;

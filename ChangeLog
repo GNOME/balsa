@@ -59,7 +59,7 @@
 	* src/balsa-index.c: a View Source right mouse button menu entry.
 	* libbalsa/source-viewer.c: Edit/Copy+Select 
 
-2001-10-18  Carlos Morgado  <chbm@cprm.net>
+2001-10-18  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c: 
 	* src/balsa-message.c: 

@@ -3745,19 +3745,6 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     hide_all_parts(bm);
 
-    if (info) {
-	LibBalsaMailbox *mailbox = bm->message->mailbox;
-	/* Make sure message still exists. */
-	libbalsa_mailbox_check(mailbox);
-	if (!bm->message || !bm->message->mailbox) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Could not access message; "
-                                "mailbox \"%s\" was changed."),
-                              mailbox->name);
-	    return;
-	}
-    }
-
     bm->current_part = part_info_from_body(bm, add_part(bm, info));
 
     if(bm->current_part)

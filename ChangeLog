@@ -1,3 +1,10 @@
+Tue Jul 28 21:43:58 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* src/balsa-init.c
+	More work, should save your settings now.  Mailbox addition inside the
+	balsa-init still not there.  Balsa-app now uses balsa-init.c since its
+	pretty:)
+
 Tue Jul 28 21:19:38 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
 
 	* src/balsa-init.c

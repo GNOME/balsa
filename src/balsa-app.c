@@ -77,24 +77,22 @@ init_balsa_app (int argc, char *argv[])
   /* initalize our mailbox access crap */
   mailbox_init ();
 
-  read_signature();
+  read_signature ();
 
   restore_global_settings ();
 
   /* Check to see if this is the first time we've run balsa */
-/*
- * if (!gnome_config_get_string ("/balsa/Global/Accounts"))
-*/
-  /*
-  initialize_balsa(argc, argv);
-  return;
-*/
-  do_load_mailboxes();
+
+  if (!gnome_config_get_string ("/balsa/Global/Accounts"))
+    {
+      initialize_balsa (argc, argv);
+      return;
+    }
+
+  do_load_mailboxes ();
 
   open_main_window ();
-  /*
-  addressbook_read_pine("/home/pavlov/.addressbook");
-*/
+
   /* start timers */
 #if 0
   balsa_app.new_messages_timer = gtk_timeout_add (5, check_for_new_messages, NULL);
@@ -102,7 +100,8 @@ init_balsa_app (int argc, char *argv[])
 #endif
 }
 
-void do_load_mailboxes()
+void
+do_load_mailboxes ()
 {
   mailboxes_init ();
   load_local_mailboxes ();
@@ -115,7 +114,7 @@ read_signature ()
   int fd, ret;
   struct stat stats;
   gchar path[PATH_MAX];
-  sprintf (path, "%s/.signature", g_get_home_dir());
+  sprintf (path, "%s/.signature", g_get_home_dir ());
   fd = open (path, O_RDONLY);
   if (fd == -1)
     {

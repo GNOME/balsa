@@ -22,6 +22,7 @@
 #include "balsa-app.h"
 #include "balsa-init.h"
 #include "balsa.xpm"
+#include "save-restore.h"
 
 typedef enum
   {
@@ -186,6 +187,8 @@ create_general_page ()
   GtkWidget *table;
   GtkWidget *label;
 
+  GString *str;
+
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
   gtk_widget_show (vbox);
@@ -239,6 +242,14 @@ create_general_page ()
 		    0, 10);
   gtk_widget_show (prefs->smtp_server);
 
+  str = g_string_new (balsa_app.username);
+  g_string_append_c (str, '@');
+  g_string_append (str, balsa_app.hostname);
+  gtk_entry_set_text (GTK_ENTRY (prefs->email), str->str);
+  g_string_free (str, TRUE);
+
+  gtk_entry_set_text (GTK_ENTRY (prefs->real_name), balsa_app.real_name);
+  gtk_entry_set_text (GTK_ENTRY (prefs->smtp_server), balsa_app.smtp_server);
 
   return vbox;
 }
@@ -312,16 +323,49 @@ prev_cb (GtkWidget * widget)
 static void
 complete_cb (GtkWidget * widget)
 {
-  gtk_widget_destroy (iw->next);
-  gtk_widget_destroy (iw->prev);
-  gtk_widget_destroy (iw->notebook);
-  gtk_widget_destroy (iw->window);
-  g_free (iw);
+  gchar *email, *c;
+
+  g_free (balsa_app.real_name);
+  balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->real_name)));
+
+  email = c = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->email)));
+
+  while (*c != '\0' && *c != '@')
+    c++;
+
+  if (*c == '\0')
+    {
+      g_free (balsa_app.username);
+      balsa_app.username = g_strdup (email);
+    }
+  else
+    {
+      *c = '\0';
+      c++;
+
+      g_free (balsa_app.username);
+      balsa_app.username = g_strdup (email);
+
+      g_free (balsa_app.hostname);
+      balsa_app.hostname = g_strdup (c);
+    }
+  g_free (email);
+
+  g_free (balsa_app.smtp_server);
+  balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->smtp_server)));
+
+  save_global_settings ();
 
   gtk_widget_destroy (prefs->real_name);
   gtk_widget_destroy (prefs->email);
   gtk_widget_destroy (prefs->smtp_server);
   g_free (prefs);
+
+  gtk_widget_destroy (iw->next);
+  gtk_widget_destroy (iw->prev);
+  gtk_widget_destroy (iw->notebook);
+  gtk_widget_destroy (iw->window);
+  g_free (iw);
 
   do_load_mailboxes ();
   open_main_window ();

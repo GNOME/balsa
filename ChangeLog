@@ -1,3 +1,12 @@
+2004-07-29 09:40  PeterB
+
+	* libbalsa/: message.c, send.c: remove calls to
+	libbalsa_mailbox_check--now handled by mailbox.c
+	* libbalsa/mailbox.c: signal mailbox changed only when
+	unread-messages flag changes; check mailbox in an idle callback
+	after copying in a message; signal mailbox changed when setting
+	LIBBALSA_MESSAGE_FLAG_DELETED.
+
 2004-07-28  21:20 Pawel Salek
 
 	* libbalsa/imap-server.[hc]: add "persistent_cache" flag.

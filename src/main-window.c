@@ -2660,7 +2660,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
     g_signal_connect(G_OBJECT(progress_dialog), "response",
 		     G_CALLBACK(progress_dialog_response_cb), NULL);
     
-    progress_dialog_source = gtk_label_new("Checking Mail....");
+    progress_dialog_source = gtk_label_new(_("Checking Mail..."));
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
 		       progress_dialog_source, FALSE, FALSE, 0);
     

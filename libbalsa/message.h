@@ -273,10 +273,6 @@ LibBalsaMessage *libbalsa_message_new(void);
 
 gboolean libbalsa_message_save(LibBalsaMessage * message,
 			       const gchar *filename);
-gboolean libbalsa_messages_move(GList * messages,
-				LibBalsaMailbox * dest);
-gboolean libbalsa_messages_copy(GList * messages,
-                                LibBalsaMailbox * dest);
 
 void libbalsa_messages_change_flag(GList * messages,
                                    LibBalsaMessageFlag flag,

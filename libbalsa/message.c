@@ -466,53 +466,6 @@ libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
     return libbalsa_message_body_get_stream(body);
 }
 
-
-gboolean
-libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
-{
-    gboolean r = TRUE;
-    LibBalsaMessage *message;
-    LibBalsaMailbox *mailbox = NULL;
-    GList *p;
-    GArray *msgnos;
-
-    g_return_val_if_fail(messages, FALSE);
-    g_return_val_if_fail(dest != NULL, FALSE);
-
-    if (LIBBALSA_MESSAGE(messages->data)->mailbox->readonly) {
-	libbalsa_information(
-	    LIBBALSA_INFORMATION_ERROR,
-	    _("Source mailbox (%s) is readonly. Cannot move messages"),
-	    LIBBALSA_MESSAGE(messages->data)->mailbox->name);
-	return FALSE;
-    }
-
-    for (p = messages; p; p = p->next) {
-	message = p->data;
-	if (message->mailbox) {
-	    mailbox = message->mailbox;
-	    break;
-	}
-    }
-    g_return_val_if_fail(mailbox != NULL, FALSE);
-    libbalsa_lock_mailbox(mailbox);
-    
-    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
-    for(p=messages; p; 	p=g_list_next(p)) {
-	message=LIBBALSA_MESSAGE(p->data);
-	if(message->mailbox==NULL) continue;
-	g_array_append_val(msgnos, message->msgno);
-    }
-    libbalsa_mailbox_register_msgnos(mailbox, msgnos);
-    r = libbalsa_mailbox_messages_move(mailbox, msgnos, dest);
-    libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
-    g_array_free(msgnos, TRUE);
-
-    libbalsa_unlock_mailbox(mailbox);
-
-    return r;
-}
-
 /* libbalsa_message_save:
    return TRUE on success and FALSE on failure.
 */
@@ -539,40 +492,6 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
     g_mime_stream_unref(out_stream);
 
     return res >= 0;
-}
-
-/* libbalsa_messages_copy:
-   makes an assumption that all the messages come from the same mailbox.
-*/
-gboolean
-libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
-{
-    LibBalsaMessage *message;
-    LibBalsaMailbox *mailbox;
-    GList *p;
-    GArray *msgnos;
-    gboolean retval;
-
-    g_return_val_if_fail(messages != NULL, FALSE);
-    g_return_val_if_fail(dest != NULL, FALSE);
-
-    mailbox = LIBBALSA_MESSAGE(messages->data)->mailbox;
-    libbalsa_lock_mailbox(mailbox);
-
-    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
-    for(p=messages; p; 	p=g_list_next(p)) {
-	message=LIBBALSA_MESSAGE(p->data);
-	if(message->mailbox==NULL) continue;
-	g_array_append_val(msgnos, message->msgno);
-    }
-    libbalsa_mailbox_register_msgnos(mailbox, msgnos);
-    retval = libbalsa_mailbox_messages_copy(mailbox, msgnos, dest) != -1;
-    libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
-    g_array_free(msgnos, TRUE);
-
-    libbalsa_unlock_mailbox(mailbox);
-
-    return retval;
 }
 
 LibBalsaMessageAttach

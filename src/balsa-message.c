@@ -415,7 +415,7 @@ balsa_message_init(BalsaMessage * bm)
     /* Make background of the view-port the same as the base color of the
      * text. */
     text_view = bm_header_widget_get_text_view(bm->header_container);
-    border_style = gtk_style_copy(gtk_rc_get_style(text_view));
+    border_style = gtk_style_copy(gtk_widget_get_style(text_view));
     border_style->bg[GTK_STATE_NORMAL] = border_style->base[GTK_STATE_NORMAL];
     gtk_widget_set_style(bm->cont_viewport, border_style);
     g_object_unref(border_style);

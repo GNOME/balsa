@@ -1,3 +1,7 @@
+2001-07-25  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* sk.po: Updated Slovak translation from Marcel Telka <marcel@telka.sk>. 
+
 2001-07-24  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* .potignore: ignore libmutt/commands.c.

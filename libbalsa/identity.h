@@ -113,7 +113,8 @@ extern "C"
 
     void libbalsa_identity_config_dialog(GtkWindow * parent,
                                          GList ** identities,
-                                         LibBalsaIdentity ** current);
+                                         LibBalsaIdentity ** current,
+                                         void (*changed_cb)(gpointer));
 
     typedef void (*LibBalsaIdentityCallback) (gpointer data,
                                               LibBalsaIdentity * identity);

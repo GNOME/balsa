@@ -225,7 +225,7 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
 {
     if(mn->name)
 	printf("Saving mailbox node %s with prefix %s\n", mn->name, prefix);
-    libbalsa_server_save_config(mn->server);
+    libbalsa_imap_server_save_config(LIBBALSA_IMAP_SERVER(mn->server));
     gnome_config_set_string("Name",      mn->name);
     gnome_config_set_string("Directory", mn->dir);
     gnome_config_set_bool("Subscribed",  mn->subscribed);

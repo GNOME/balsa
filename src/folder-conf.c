@@ -54,6 +54,7 @@ struct _FolderDialogData {
     GtkWidget *folder_name, *server, *port, *username, *remember,
         *password, *subscribed, *list_inbox, *prefix;
     GtkWidget *use_ssl, *tls_mode;
+    GtkWidget *connection_limit;
 };
 
 /* FIXME: identity_name will leak on cancelled folder edition */
@@ -168,6 +169,11 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     libbalsa_server_set_host(s, host, 
                              balsa_server_conf_get_use_ssl(&fcw->bsc));
     s->tls_mode = balsa_server_conf_get_tls_mode(&fcw->bsc);
+    libbalsa_imap_server_set_max_connections
+        (LIBBALSA_IMAP_SERVER(s),
+         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
+                                          (fcw->connection_limit)));
+
     libbalsa_server_set_username(s, username);
     s->remember_passwd =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
@@ -263,7 +269,14 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     table = gtk_table_new(9, 2, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
                              gtk_label_new_with_mnemonic(_("_Basic")));
-    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 0);
+    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 1);
+    /* Limit number of connections */
+    fcw->connection_limit = 
+        balsa_server_conf_add_spinner
+        (&fcw->bsc, _("_Max number of connections"), 1, 40, 1,
+         s 
+         ? libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(s))
+         : 20);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 
@@ -300,7 +313,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     fcw->subscribed = create_check(fcw->dialog, _("Subscribed _folders only"), 
                                   table, 6, mn ? mn->subscribed : FALSE);
-    fcw->list_inbox = create_check(fcw->dialog, _("_Always show INBOX"), 
+    fcw->list_inbox = create_check(fcw->dialog, _("Always show _INBOX"), 
                                   table, 7, mn ? mn->list_inbox : TRUE); 
 
     label = create_label(_("Pr_efix"), table, 8);

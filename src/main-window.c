@@ -72,6 +72,7 @@
 enum {
     OPEN_MAILBOX_NODE,
     CLOSE_MAILBOX_NODE,
+    IDENTITIES_CHANGED,
     LAST_SIGNAL
 };
 
@@ -479,7 +480,7 @@ static GnomeUIInfo view_sort_menu[] = {
 
 static GnomeUIInfo view_menu[] = {
 #if defined(ENABLE_TOUCH_UI)
-    GNOMEUIINFO_SUBTREE(N_("_Mailbox"), view_mailbox_menu),
+    GNOMEUIINFO_SUBTREE(N_("Mail_box"), view_mailbox_menu),
     GNOMEUIINFO_SUBTREE(N_("S_ort"), view_sort_menu),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_VIEW_MAILBOX_LIST_POS 3
@@ -889,11 +890,21 @@ balsa_window_class_init(BalsaWindowClass * klass)
                      NULL, NULL,
                      g_cclosure_marshal_VOID__OBJECT,
                      G_TYPE_NONE, 1, G_TYPE_OBJECT);
+    window_signals[IDENTITIES_CHANGED] =
+        g_signal_new("identities-changed",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(BalsaWindowClass, identities_changed),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     object_class->destroy = balsa_window_destroy;
 
-    klass->open_mbnode = balsa_window_real_open_mbnode;
+    klass->open_mbnode  = balsa_window_real_open_mbnode;
     klass->close_mbnode = balsa_window_real_close_mbnode;
+
+    /* Signals */
+    klass->identities_changed = NULL;
 
     g_timeout_add(30000, (GSourceFunc) balsa_close_commit_mailbox_on_timer, NULL);
 
@@ -1029,10 +1040,75 @@ bw_frame(GtkWidget * widget)
     gtk_widget_show(frame);
     return frame;
 }
+/* Filter entry widget creation code. We must carefully pass the typed
+   characters FIRST to the entry widget and only if the widget did not
+   process them, pass them further to main window, menu etc.
+   Otherwise, typing eg. 'c' would open the draftbox instead of
+   actually insert the 'c' character in the entry. */
+static gboolean
+bw_pass_to_filter(BalsaWindow *bw, GdkEventKey *event, gpointer data)
+{
+    gboolean res = FALSE;
+    g_signal_emit_by_name(bw->sos_entry, "key_press_event", event, &res, data);
+    return res;
+}
+static gboolean
+bw_enable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
+{
+    g_signal_connect(G_OBJECT(data), "key_press_event",
+                     G_CALLBACK(bw_pass_to_filter), NULL);
+    return FALSE;
+}
+static gboolean
+bw_disable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
+{
+    g_signal_handlers_disconnect_by_func(G_OBJECT(data),
+                                         G_CALLBACK(bw_pass_to_filter),
+                                         NULL);
+    return FALSE;
+}
+
+static void
+bw_filter_entry_activate(GtkWidget *entry)
+{
+    BalsaWindow *bw = balsa_app.main_window;
+    GtkWidget *bindex = balsa_window_find_current_index(bw);
+
+    if(bindex)
+        balsa_index_set_sos_filter(BALSA_INDEX(bindex),
+                                   gtk_entry_get_text(GTK_ENTRY(entry)),
+                                   balsa_window_get_view_filter(bw));
+}
+
+static GtkWidget*
+bw_create_index_widget(BalsaWindow *bw)
+{
+    GtkWidget *vbox, *label;
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+     gtk_box_pack_start(GTK_BOX(hbox),
+                        label = gtk_label_new_with_mnemonic
+                        (_("Subject or Sender _Contains:")),
+                        FALSE, FALSE, 0);
+    bw->sos_entry = gtk_entry_new();
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), bw->sos_entry);
+    g_signal_connect(G_OBJECT(bw->sos_entry), "focus_in_event",
+                     G_CALLBACK(bw_enable_filter), bw);
+    g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
+                     G_CALLBACK(bw_disable_filter), bw);
+    g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
+                     G_CALLBACK(bw_filter_entry_activate), NULL);
+    gtk_box_pack_start(GTK_BOX(hbox), bw->sos_entry, TRUE, TRUE, 0);
+    vbox = gtk_vbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), bw->notebook, TRUE, TRUE, 0);
+    gtk_widget_show_all(vbox);
+    return vbox;
+}
 
 static void
 bw_set_panes(BalsaWindow * window)
 {
+    GtkWidget *index_widget = bw_create_index_widget(window);
     window->vpaned = gtk_vpaned_new();
     window->hpaned = gtk_hpaned_new();
     gtk_paned_pack1(GTK_PANED(window->hpaned), bw_frame(window->mblist),
@@ -1041,13 +1117,13 @@ bw_set_panes(BalsaWindow * window)
 		    TRUE, TRUE);
     if  (balsa_app.alternative_layout){
         gnome_app_set_contents(GNOME_APP(window), window->vpaned);
-        gtk_paned_pack2(GTK_PANED(window->hpaned), bw_frame(window->notebook),
+        gtk_paned_pack2(GTK_PANED(window->hpaned), bw_frame(index_widget),
 			TRUE, TRUE);
         gtk_paned_pack1(GTK_PANED(window->vpaned), window->hpaned,  TRUE,TRUE);
     } else {
         gnome_app_set_contents(GNOME_APP(window), window->hpaned);
         gtk_paned_pack2(GTK_PANED(window->hpaned), window->vpaned,  TRUE,TRUE);
-        gtk_paned_pack1(GTK_PANED(window->vpaned), bw_frame(window->notebook),
+        gtk_paned_pack1(GTK_PANED(window->vpaned), bw_frame(index_widget),
 			TRUE, TRUE);
     }
 }
@@ -1856,6 +1932,17 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
     } else
 	*mailbox = NULL;
     g_idle_add((GSourceFunc) bw_focus_idle, mailbox);
+}
+
+/* balsa_identities_changed is used to notify the listener list that
+   the identities list has changed. */
+void
+balsa_identities_changed(BalsaWindow *bw)
+{
+    g_return_if_fail(bw != NULL);
+    g_return_if_fail(BALSA_IS_WINDOW(bw));
+
+    g_signal_emit(G_OBJECT(bw), window_signals[IDENTITIES_CHANGED], 0);
 }
 
 static gboolean
@@ -3772,6 +3859,8 @@ notebook_switch_page_cb(GtkWidget * notebook,
     enable_message_menus(window, index->current_message);
     balsa_window_enable_mailbox_menus(window, index);
 
+    gtk_entry_set_text(GTK_ENTRY(window->sos_entry),
+                       index->sos_filter ? index->sos_filter : "");
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
     balsa_mblist_set_status_bar(mailbox);
 
@@ -4205,7 +4294,9 @@ ident_manage_dialog_cb(GtkWidget * widget, gpointer user_data)
 {
     libbalsa_identity_config_dialog(GTK_WINDOW(user_data),
                                     &balsa_app.identities,
-                                    &balsa_app.current_ident);
+                                    &balsa_app.current_ident,
+                                    (void(*)(gpointer))
+                                    balsa_identities_changed);
 }
 
 

@@ -407,12 +407,14 @@ LibBalsaImapServer* libbalsa_imap_server_new(const gchar *username,
     return get_or_create(username, host);
 }
 
-LibBalsaImapServer* libbalsa_imap_server_new_from_config(void)
+LibBalsaImapServer*
+libbalsa_imap_server_new_from_config(void)
 {
     LibBalsaServer tmp_server;
     LibBalsaImapServer *imap_server;
     LibBalsaServer *server;
     gboolean d;
+    gint conn_limit;
 
     tmp_server.host = gnome_config_get_string("Server");
     if(strrchr(tmp_server.host, ':') == NULL) {
@@ -439,7 +441,10 @@ LibBalsaImapServer* libbalsa_imap_server_new_from_config(void)
     }
     server->use_ssl |= gnome_config_get_bool("SSL=false");
     server->tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
-    if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
+    if(!d) server->tls_mode = LIBBALSA_TLS_ENABLED;
+    conn_limit = gnome_config_get_int_with_default("ConnectionLimit", &d);
+    if(!d)
+        imap_server->max_connections = conn_limit;
     if (!server->passwd) {
         server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
         if(server->remember_passwd)
@@ -456,6 +461,13 @@ LibBalsaImapServer* libbalsa_imap_server_new_from_config(void)
         }
     }
     return imap_server;
+}
+
+void
+libbalsa_imap_server_save_config(LibBalsaImapServer *server)
+{
+    libbalsa_server_save_config(LIBBALSA_SERVER(server));
+    gnome_config_set_int("ConnectionLimit", server->max_connections);
 }
 
 /**
@@ -684,10 +696,18 @@ void libbalsa_imap_server_release_handle(LibBalsaImapServer *imap_server,
  * Sets the maximal open connections allowed, already open connections will
  * be disconnected on release.
  **/
-void libbalsa_imap_server_set_max_connections(LibBalsaImapServer *server,
-                                              int max)
+void
+libbalsa_imap_server_set_max_connections(LibBalsaImapServer *server,
+                                         int max)
 {
     server->max_connections = max;
+    printf("set_max_connections: set to %d\n", max);
+}
+
+int
+libbalsa_imap_server_get_max_connections(LibBalsaImapServer *server)
+{
+    return server->max_connections;
 }
 
 /**

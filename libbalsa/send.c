@@ -369,19 +369,22 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 
     if ((result = libbalsa_create_msg(message, encoding, flow)) ==
 	LIBBALSA_MESSAGE_CREATE_OK) {
-        libbalsa_mailbox_copy_message( message, outbox );
+        if(libbalsa_mailbox_copy_message( message, outbox ) < 0)
+            return LIBBALSA_MESSAGE_QUEUE_ERROR;
+        
 	if (fccbox) {
-		if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox) ||
-		    LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
-		    libbalsa_mailbox_copy_message( message, fccbox );
+            if (LIBBALSA_IS_MAILBOX_LOCAL(fccbox) ||
+                LIBBALSA_IS_MAILBOX_IMAP(fccbox)) {
+                if(libbalsa_mailbox_copy_message(message, fccbox)<0)
+                    return LIBBALSA_MESSAGE_SAVE_ERROR;
                     /* fcc perhaps does not know about this message yet! 
                      * later check will discover it and thread. 
 		    libbalsa_mailbox_set_threading(fccbox,
 						   fccbox->view->
 						   threading_type);
                     */
-		}
-		libbalsa_mailbox_check(fccbox);
+            }
+            libbalsa_mailbox_check(fccbox);
 	}
 	libbalsa_mailbox_check(outbox);
     } 

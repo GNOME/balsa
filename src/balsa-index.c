@@ -23,7 +23,7 @@
    auto_sort() is NOT used to sort the messages since the compare methods 
    (numeric_compare, date_compare) use information from attached mailbox
    which is unavailable at the insertion time. We have to sort after every
-   insertion which is not a big loose: NlnN process against sorted 
+   insertion which is not a big lost: NlnN process against sorted 
    insersion N (though the prefactor is much bigger in the former case).
 
    The alternative is to create a hidden column containing the sorting
@@ -54,7 +54,8 @@
 #include "sendmsg-window.h"
 #include "store-address.h"
 
-#include "libbalsa/misc.h"
+#include "filter-funcs.h"
+#include "misc.h"
 
 /* gtk widget */
 static void bndx_class_init(BalsaIndexClass * klass);
@@ -242,6 +243,8 @@ bndx_destroy(GtkObject * obj)
 	g_slist_free(index->selected);
 	index->selected = NULL;
     }
+
+    g_free(index->sos_filter); index->sos_filter = NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);
@@ -1803,6 +1806,38 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     libbalsa_mailbox_set_threading(mailbox, thtype);
     balsa_index_update_tree(index, balsa_app.expand_tree);
     g_signal_handler_unblock(selection, index->selection_changed_id);
+}
+
+void
+balsa_index_set_sos_filter(BalsaIndex *bindex, const gchar *sos_filter,
+                           LibBalsaCondition *flag_filter)
+{
+    LibBalsaMailbox * mailbox;
+
+    g_return_if_fail(BALSA_IS_INDEX(bindex));
+    mailbox = bindex->mailbox_node->mailbox;
+
+    g_free(bindex->sos_filter);
+    bindex->sos_filter = g_strdup(sos_filter);
+
+    if(sos_filter && sos_filter[0] != '\0') {
+        LibBalsaCondition *name = 
+            libbalsa_condition_new_bool_ptr
+            (FALSE, CONDITION_OR,
+             libbalsa_condition_new_string
+             (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(sos_filter), NULL),
+             libbalsa_condition_new_string
+             (FALSE, CONDITION_MATCH_FROM, g_strdup(sos_filter), NULL));
+        
+        if(flag_filter)
+            flag_filter = libbalsa_condition_new_bool_ptr
+                (FALSE, CONDITION_AND, name, flag_filter);
+        else 
+            flag_filter = name;
+    }
+
+    libbalsa_mailbox_set_view_filter(mailbox, flag_filter, TRUE);
+
 }
 
 /* Find messages with the same ID, and remove all but one of them; if

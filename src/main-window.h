@@ -44,6 +44,7 @@ struct _BalsaWindow {
 
     GtkWidget *progress_bar;
     GtkWidget *mblist;
+    GtkWidget *sos_entry;       /* SenderOrSubject filter entry */
     GtkWidget *notebook;
     GtkWidget *preview;		/* message is child */
     GtkWidget *hpaned;
@@ -57,6 +58,7 @@ struct _BalsaWindowClass {
 
     void (*open_mbnode)  (BalsaWindow * window, BalsaMailboxNode * mbnode);
     void (*close_mbnode) (BalsaWindow * window, BalsaMailboxNode * mbnode);
+    void (*identities_changed) (BalsaWindow * window);
 };
 
 /*
@@ -78,6 +80,8 @@ LibBalsaCondition* balsa_window_get_view_filter(BalsaWindow *window);
 void balsa_window_refresh(BalsaWindow * window);
 void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
+void balsa_identities_changed(BalsaWindow *bw);
+
 void balsa_window_update_tab(BalsaMailboxNode * mbnode);
 void enable_empty_trash(BalsaWindow * window, TrashState status);
 void balsa_window_enable_continue(BalsaWindow * window);

@@ -1,3 +1,25 @@
+2004-07-28  Pawel Salek
+
+	* libbalsa/identity.[hc]: add a callback routine to notify when
+	the identity list is actually changed.
+	* libbalsa/imap-server.[hc]: save and restore configurable
+	connection limit.
+	* libbalsa/message.c: try harder to determine whether the message
+	has attachments or not.
+	* libbalsa/send.c: check libbalsa_mailbox_copy_message() result.
+	* src/balsa-index.[hc]: implement SubjectOrSender filter.
+	* src/balsa-message.c: attachment button accepts keyboard input.
+	* src/folder-conf.c: configure IMAP connection limit (115023).
+	* src/mailbox-conf.[hc]: implement balsa_server_conf_add_spinner().
+	* src/mailbox-node.c: use libbalsa_imap_server_save_config().
+	* src/main-window.[hc]: add "identities-changed" signal. Create SoS
+	filter entry.
+	* src/save-restore.c: emit this signal.
+	* src/sendmsg-window.c: listen to it. use GtkBox instead of
+	GtkPaned. Provide more info on sending failures.
+	* src/toolbar-factory.c: change "Cancel" to "Close" compose
+	window.
+
 2004-07-27 20:04  PeterB
 
 	* src/: main-window.c, main-window.h: add `notify' to api for

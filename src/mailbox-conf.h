@@ -59,6 +59,10 @@ GtkWidget* balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc,
                                                  int extra_rows);
 GtkWidget*      balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
                                                const char *label);
+GtkWidget*      balsa_server_conf_add_spinner(BalsaServerConf *bsc,
+                                              const char *label,
+                                              gint lo, gint hi, gint step,
+                                              gint initial_value);
 void            balsa_server_conf_set_values(BalsaServerConf *bsc,
                                              LibBalsaServer *server);
 gboolean        balsa_server_conf_get_use_ssl(BalsaServerConf *bsc);

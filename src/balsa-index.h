@@ -62,6 +62,7 @@ extern "C" {
         gboolean prev_message;
         gboolean next_message;
 	GSList *selected;
+        gchar *sos_filter; /* SenderOrSubject filter string, if any */
 
 	gboolean line_length;
 
@@ -106,6 +107,9 @@ extern "C" {
     void balsa_index_scroll_on_open(BalsaIndex *index);
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
+    void balsa_index_set_sos_filter(BalsaIndex *bindex,
+                                    const gchar *sos_filter,
+                                    LibBalsaCondition *flag_filter);
 
 /* move or copy a list of messages */
     void balsa_index_transfer(BalsaIndex * index, GList * messages,
@@ -148,10 +152,6 @@ extern "C" {
     /* Updating index columns when preferences change */
     void balsa_index_refresh_date (BalsaIndex * index);
     void balsa_index_refresh_size (BalsaIndex * index);
-
-    /* Threading Stuff, implementation is in balsa-index-threading.c */
-    void balsa_index_threading(BalsaIndex* bindex,
-			       LibBalsaMailboxThreadingType th_type);
 
     /* Remove duplicate messages. */
     void balsa_index_remove_duplicates(BalsaIndex * index);

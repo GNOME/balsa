@@ -781,19 +781,49 @@ libbalsa_message_is_partial(LibBalsaMessage * message, gchar ** id)
     return TRUE;
 }
 
+/* Go through all parts and try to figure out whether it is a message
+   with attachments or not. It still yields insatsfactory
+   results... */
+static gboolean
+has_attached_part(LibBalsaMessageBody *body)
+{
+    LibBalsaMessageBody *lbbody;
+    /* the condition matches the one used in add_multipart_mixed() */
+    for(lbbody=body; lbbody; lbbody = lbbody->next) {
+        /* printf("part %s has disposition %s\n",
+               lbbody->content_type, lbbody->content_dsp); */
+        if(!libbalsa_message_body_is_multipart(lbbody) &&
+           !libbalsa_message_body_is_inline(lbbody) ) {
+            /* puts("Attachment found!"); */
+            return TRUE;
+        }
+        if(lbbody->parts && has_attached_part(lbbody->parts))
+            return TRUE;
+    }
+    /* no part was an  attachment */
+    return FALSE;
+}
+
 gboolean
 libbalsa_message_has_attachment(LibBalsaMessage * message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    /* FIXME: This is wrong, but less so than earlier versions; a message
-       has attachments if main message or one of the parts has 
-       Content-type: multipart/mixed AND members with
+    /* A message has attachments if main message or one of the parts
+       has Content-type: multipart/mixed AND members with
        Content-disposition: attachment. Unfortunately, part list may
        not be available at this stage. */
-    return message->headers->content_type ?
-	g_mime_content_type_is_type(message->headers->content_type,
-				    "multipart", "mixed") : FALSE;
+    if( !message->headers->content_type ||
+        !g_mime_content_type_is_type(message->headers->content_type,
+                                     "multipart", "mixed"))
+        return FALSE;
+    if(!message->body_list)
+        /* We have no body list but the content type says it may have
+         * the attachment so we set the icon anyway. */
+        return TRUE;
+
+    /* use "exact" algorithm */
+    return has_attached_part(message->body_list);
  }
 
 #ifdef HAVE_GPGME

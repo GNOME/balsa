@@ -115,6 +115,7 @@ static void toggle_sign_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
 static void toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_encrypt_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
 static void toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg);
 #endif
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
@@ -158,7 +159,6 @@ static void select_attachment(GnomeIconList * ilist, gint num,
 static gboolean sw_popup_menu_cb(GtkWidget * widget, gpointer data);
 /* helpers */
 static gboolean sw_do_popup(GnomeIconList * ilist, GdkEventButton * event);
-static gint sw_header_height(BalsaSendmsg * bsmsg);
 
 /* Undo/Redo buffer helpers. */
 static void sw_buffer_save(BalsaSendmsg * bsmsg);
@@ -221,7 +221,7 @@ static GnomeUIInfo file_menu[] = {
     { GNOME_APP_UI_ITEM, N_("_Send"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, 'S', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL },
+      BALSA_PIXMAP_MENU_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 6
     { GNOME_APP_UI_ITEM, N_("_Queue"),
       N_("Queue this message in Outbox for sending"),
@@ -1121,26 +1121,9 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     }
     
 #ifdef HAVE_GPGME
-    if (balsa_app.has_openpgp || balsa_app.has_smime) {
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-                                       ident->gpg_sign);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-                                       ident->gpg_encrypt);
-    } else {
-        GtkWidget *toolbar =
-            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-                                       FALSE);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-                                       FALSE);
-        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_SIGN_POS].widget, FALSE);
-        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_ENCRYPT_POS].widget, FALSE);
-        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_SIGN, FALSE);
-        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_ENCRYPT, FALSE);
-    }
+    bsmsg_update_gpg_ui_on_ident_change(bsmsg);
 #endif
-    
+
     g_free(old_sig);
     g_free(new_sig);
     g_free(message_text);
@@ -1931,7 +1914,6 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     GtkWidget *table;
     GtkWidget *frame;
     GtkWidget *align;
-    GtkWidget *scroll;
 
     bsmsg->header_table = table = gtk_table_new(11, 3, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table), 2);
@@ -2001,8 +1983,6 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
                        bsmsg, bsmsg->reply_to,
                        &bsmsg->reply_to_info, 0, -1);
 
-
-
     /* Attachment list */
     bsmsg->attachments[0] = gtk_label_new_with_mnemonic(_("_Attachments:"));
     gtk_misc_set_alignment(GTK_MISC(bsmsg->attachments[0]), 0.0, 0.5);
@@ -2056,16 +2036,8 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     /* Keywords: */
     create_string_entry(table, _("Keywords:"), 9, bsmsg->keywords);
 
-    /* Scrolled window to hold the header table. */
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-                                   GTK_POLICY_NEVER,
-                                   GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scroll),
-                                          table);
-    gtk_widget_show_all(scroll);
-
-    return scroll;
+    gtk_widget_show_all(table);
+    return table;
 }
 
 /* drag_data_quote - text area D&D callback */
@@ -2836,6 +2808,14 @@ sendmsg_window_get_toolbar_model(void)
     return model;
 }
 
+static void
+bsmsg_identites_changed_cb(BalsaSendmsg *bsmsg)
+{
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_IDENTITY,
+                                       g_list_length(balsa_app.identities)>1);
+}
 BalsaSendmsg *
 sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 		   SendType type)
@@ -2843,7 +2823,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     BalsaToolbarModel *model;
     GtkWidget *toolbar;
     GtkWidget *window;
-    GtkWidget *paned = gtk_vpaned_new();
+    GtkWidget *main_box = gtk_vbox_new(FALSE, 0);
     BalsaSendmsg *bsmsg = NULL;
     unsigned i;
     gchar* tmp;
@@ -2913,6 +2893,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                                    bsmsg);
 
     gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_IDENTITY,
+                                       g_list_length(balsa_app.identities)>1);
+    g_signal_connect_swapped(balsa_app.main_window, "identities-changed",
+                             (GCallback)bsmsg_identites_changed_cb, bsmsg);
     sw_buffer_set_undo(bsmsg, TRUE, FALSE);
 
     bsmsg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
@@ -2933,74 +2917,16 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         /* Get the identity from the To: field of the original message */
         guess_identity(bsmsg);
 #ifdef HAVE_GPGME
-    bsmsg->gpg_sign_menu_item = opts_menu[OPTS_MENU_SIGN_POS].widget;
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "toolbar", toolbar);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-1", 
-		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-2", 
-		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
-    bsmsg->gpg_encrypt_menu_item = opts_menu[OPTS_MENU_ENCRYPT_POS].widget;
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "toolbar", 
-                      toolbar);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-1", 
-		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-2", 
-		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget,
-			     FALSE);
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget,
-			     FALSE);
-#ifdef HAVE_SMIME
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-3", 
-                      gpg_mode_list[OPTS_MENU_SMIME_POS].widget);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-3", 
-                      gpg_mode_list[OPTS_MENU_SMIME_POS].widget);
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_SMIME_POS].widget,
-                             FALSE);
-#endif
-    /* preset sign/encrypt according to current identity */
-    if (balsa_app.has_openpgp || balsa_app.has_smime) {
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-                                       bsmsg->ident->gpg_sign);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-                                       bsmsg->ident->gpg_encrypt);
-        switch (bsmsg->ident->crypt_protocol)
-            {
-            case LIBBALSA_PROTECT_OPENPGP:
-                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget),
-                                               TRUE);
-                break;
-#ifdef HAVE_SMIME
-            case LIBBALSA_PROTECT_SMIMEV3:
-                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_SMIME_POS].widget),
-                                               TRUE);
-                break;
-#endif
-            case LIBBALSA_PROTECT_RFC3156:
-            default:
-                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget),
-                                               TRUE);
-            }
-    } else {
-        GtkWidget *toolbar =
-            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-                                       FALSE);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-                                       FALSE);
-        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_SIGN_POS].widget, FALSE);
-        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_ENCRYPT_POS].widget, FALSE);
-        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_SIGN, FALSE);
-        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_ENCRYPT, FALSE);
-    }
+    bsmsg_setup_gpg_ui(bsmsg);
 #endif
 
     /* create the top portion with the to, from, etc in it */
-    gtk_paned_add1(GTK_PANED(paned), create_info_pane(bsmsg, type));
+    gtk_box_pack_start(GTK_BOX(main_box), create_info_pane(bsmsg, type),
+                       FALSE, FALSE, 0);
 
     /* create text area for the message */
-    gtk_paned_add2(GTK_PANED(paned), create_text_area(bsmsg));
+    gtk_box_pack_start(GTK_BOX(main_box), create_text_area(bsmsg),
+                       TRUE, TRUE, 0);
 
     /* fill in that info:
      * ref the message so that we have all needed headers */
@@ -3059,10 +2985,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    g_free(tmp);
 	}
     }
-    gtk_paned_set_position(GTK_PANED(paned),
-                           sw_header_height(bsmsg) +
-                           2 * paned->style->ythickness);
-    gnome_app_set_contents(GNOME_APP(window), paned);
+    gnome_app_set_contents(GNOME_APP(window), main_box);
 
     /* set the menus - and language index */
     if (message && !bsmsg->charset)
@@ -3676,11 +3599,15 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	GtkWidget *dialog;
 	gint choice;
 
-	dialog = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
-					GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
-					GTK_MESSAGE_QUESTION,
-					GTK_BUTTONS_OK_CANCEL,
-					_("You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"));
+	dialog = gtk_message_dialog_new
+            (GTK_WINDOW(bsmsg->window),
+             GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+             GTK_MESSAGE_QUESTION,
+             GTK_BUTTONS_OK_CANCEL,
+             _("You selected OpenPGP mode for a message with attachments. "
+               "In this mode, only the first part will be signed and/or "
+               "encrypted. You should select MIME mode if the complete "
+               "message shall be protected. Do you really want to proceed?"));
 	choice = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
 	if (choice != GTK_RESPONSE_OK)
@@ -3733,9 +3660,21 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     g_object_unref(G_OBJECT(message));
 
     if (result != LIBBALSA_MESSAGE_CREATE_OK) {
+        const char *msg;
+        switch(result) {
+        default:
+        case LIBBALSA_MESSAGE_CREATE_ERROR: 
+            msg = _("Message could not be created"); break;
+        case LIBBALSA_MESSAGE_QUEUE_ERROR:
+            msg = _("Message could not be queued in outbox"); break;
+        case LIBBALSA_MESSAGE_SAVE_ERROR:
+            msg = _("Message could not be saved in senbox"); break;
+        case LIBBALSA_MESSAGE_SEND_ERROR:
+            msg = _("Message could not be sent"); break;
+        }
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
-				   _("Send failed"));
+				   _("Send failed: %s"), msg);
 	return FALSE;
     }
 
@@ -4065,22 +4004,14 @@ static gint
 toggle_entry(BalsaSendmsg * bbsmsg, GtkWidget * entry[], int pos, int cnt)
 {
     unsigned i;
-    GtkWidget *parent;
 
     if (GTK_CHECK_MENU_ITEM(bbsmsg->view_checkitems[pos])->active) {
 	while (cnt--)
-	    gtk_widget_show(GTK_WIDGET(entry[cnt]));
+	    gtk_widget_show_all(GTK_WIDGET(entry[cnt]));
     } else {
 	while (cnt--)
 	    gtk_widget_hide(GTK_WIDGET(entry[cnt]));
     }
-
-    /* force size recomputation if embedded in paned */
-    parent = gtk_widget_get_ancestor(entry[0], GTK_TYPE_PANED);
-    if (parent)
-        gtk_paned_set_position(GTK_PANED(parent),
-                               sw_header_height(bbsmsg) +
-                               2 * parent->style->ythickness);
 
     if(bbsmsg->update_config) { /* then save the config */
         GString *str = g_string_new(NULL);
@@ -4572,12 +4503,94 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     g_free(title);
 }
 
-static gint
-sw_header_height(BalsaSendmsg * bsmsg)
+#ifdef HAVE_GPGME
+static void
+bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg)
 {
-    GtkRequisition requisition;
+    if (balsa_app.has_openpgp || balsa_app.has_smime) {
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
+                                       ident->gpg_sign);
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
+                                       ident->gpg_encrypt);
+    } else {
+        GtkWidget *toolbar =
+            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
 
-    gtk_widget_size_request(bsmsg->header_table, &requisition);
-
-    return requisition.height;
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
+                                       FALSE);
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
+                                       FALSE);
+        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_SIGN_POS].widget, FALSE);
+        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_ENCRYPT_POS].widget, FALSE);
+        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_SIGN, FALSE);
+        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_ENCRYPT, FALSE);
+    }
 }
+
+static void
+bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg)
+{
+    bsmsg->gpg_sign_menu_item = opts_menu[OPTS_MENU_SIGN_POS].widget;
+    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "toolbar", toolbar);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-1", 
+		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-2", 
+		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
+    bsmsg->gpg_encrypt_menu_item = opts_menu[OPTS_MENU_ENCRYPT_POS].widget;
+    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "toolbar", 
+                      toolbar);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-1", 
+		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-2", 
+		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
+    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget,
+			     FALSE);
+    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget,
+			     FALSE);
+#ifdef HAVE_SMIME
+    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-3", 
+                      gpg_mode_list[OPTS_MENU_SMIME_POS].widget);
+    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-3", 
+                      gpg_mode_list[OPTS_MENU_SMIME_POS].widget);
+    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_SMIME_POS].widget,
+                             FALSE);
+#endif
+    /* preset sign/encrypt according to current identity */
+    if (balsa_app.has_openpgp || balsa_app.has_smime) {
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
+                                       bsmsg->ident->gpg_sign);
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
+                                       bsmsg->ident->gpg_encrypt);
+        switch (bsmsg->ident->crypt_protocol)
+            {
+            case LIBBALSA_PROTECT_OPENPGP:
+                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget),
+                                               TRUE);
+                break;
+#ifdef HAVE_SMIME
+            case LIBBALSA_PROTECT_SMIMEV3:
+                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_SMIME_POS].widget),
+                                               TRUE);
+                break;
+#endif
+            case LIBBALSA_PROTECT_RFC3156:
+            default:
+                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget),
+                                               TRUE);
+            }
+    } else {
+        GtkWidget *toolbar =
+            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
+
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
+                                       FALSE);
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
+                                       FALSE);
+        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_SIGN_POS].widget, FALSE);
+        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_ENCRYPT_POS].widget, FALSE);
+        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_SIGN, FALSE);
+        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_ENCRYPT, FALSE);
+        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_IDENTITY, g_list_length(balsa_app.identities)>1); 
+   }
+}
+#endif /* HAVE_GPGME */

@@ -450,8 +450,10 @@ bm_header_widget_new(BalsaMessage * bm, gboolean add_attachments_btn)
 			  gtk_image_new_from_stock("gnome-stock-attach", 
 						   GTK_ICON_SIZE_LARGE_TOOLBAR));
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
-	g_signal_connect(button, "pressed", 
+	g_signal_connect(button, "clicked",
 			 G_CALLBACK(balsa_headers_attachments_popup), bm);
+        g_signal_connect(button, "key_press_event",
+                         G_CALLBACK(balsa_message_key_press_event), bm);
 	g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_ATTACHMENTS,
 			  ebox);
     }
@@ -565,7 +567,7 @@ balsa_message_init(BalsaMessage * bm)
     GtkTreeSelection *selection;
 
     gtk_notebook_set_show_border(GTK_NOTEBOOK(bm), FALSE);
-    gtk_widget_show(GTK_WIDGET(bm));
+    /* gtk_widget_show(GTK_WIDGET(bm)); */
 
     /* scrolled window for the contents */
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -661,6 +663,7 @@ balsa_message_init(BalsaMessage * bm)
     gtk_widget_show(scroll);
     gtk_widget_show(bm->treeview);
     gtk_container_add(GTK_CONTAINER(scroll), bm->treeview);
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
 
     bm->current_part = NULL;
     bm->message = NULL;
@@ -1167,11 +1170,19 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 #ifdef HAVE_GPGME
     balsa_message_set_crypto(message);
 #endif
+    libbalsa_mailbox_msgno_update_attach(bm->message->mailbox,
+    /* may update the icon */            bm->message->msgno, bm->message);
 
     display_headers(bm);
     display_content(bm);
 
+#if defined(ENABLE_TOUCH_UI)
+    /* hide tabs so that they do not confuse keyboard navigation.
+     * This could probably be a configuration option. */
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
+#else
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), bm->info_count > 1);
+#endif /* ENABLE_TOUCH_UI */
     gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
 
     /*
@@ -4349,6 +4360,7 @@ balsa_message_set_crypto(LibBalsaMessage * message)
     static const LibBalsaInformationType info_level =
         AUTOMATIC_CRYPTO_CHECK 
         ? LIBBALSA_INFORMATION_MESSAGE : LIBBALSA_INFORMATION_WARNING;
+    LibBalsaMsgProtectState prot_state;
     /* FIXME: not checking for body_ref == 1 leads to a crash if we have both
      * the encrypted and the unencrypted version open as the body chain of the
      * first one will be unref'd. */
@@ -4399,12 +4411,14 @@ balsa_message_set_crypto(LibBalsaMessage * message)
     }
     
     /* scan the message for signatures */
-    message->prot_state = 
+    prot_state = 
         balsa_message_scan_signatures(message->body_list, message);
     /* update the icon if necessary */
-    if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE)
+    if (message->prot_state != prot_state) {
+        message->prot_state = prot_state;
 	libbalsa_mailbox_msgno_update_attach(message->mailbox,
 					     message->msgno, message);
+    }
 }
 
 

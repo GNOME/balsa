@@ -979,8 +979,13 @@ config_global_load(void)
         balsa_mailbox_node_new_from_dir(balsa_app.local_mail_directory);
     balsa_app.root_node->expanded = TRUE;
 
-    balsa_app.open_inbox_upon_startup =
+#if defined(ENABLE_TOUCH_UI)
+     balsa_app.open_inbox_upon_startup =
+	gnome_config_get_bool("OpenInboxOnStartup=true");
+#else
+     balsa_app.open_inbox_upon_startup =
 	gnome_config_get_bool("OpenInboxOnStartup=false");
+#endif /* ENABLE_TOUCH_UI */
     /* debugging enabled */
     balsa_app.debug = gnome_config_get_bool("Debug=false");
 
@@ -1469,6 +1474,8 @@ config_identities_load()
 	    LIBBALSA_IDENTITY(balsa_app.identities->data);
 
     g_free(default_ident);
+    if(balsa_app.main_window)
+        balsa_identities_changed(balsa_app.main_window);
 }
 
 /* config_identities_save:

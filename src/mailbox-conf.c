@@ -215,6 +215,28 @@ balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
     return checkbox;
 }
 
+GtkWidget*
+balsa_server_conf_add_spinner(BalsaServerConf *bsc,
+                              const char *label, gint lo, gint hi, gint step,
+                              gint initial_value)
+{
+    GtkWidget *spin_button;
+    GtkWidget *lbl = gtk_label_new_with_mnemonic(label);
+    gtk_misc_set_alignment(GTK_MISC(lbl), 1.0, 0.5);
+    gtk_table_attach(bsc->table, lbl, 0, 1,
+                     bsc->used_rows, bsc->used_rows+1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+    spin_button = gtk_spin_button_new_with_range(lo, hi, step);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin_button),
+			      (float) initial_value);
+
+    gtk_table_attach(bsc->table, spin_button, 1, 2,
+                     bsc->used_rows, bsc->used_rows+1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), spin_button);
+    return spin_button;
+}
+
 void
 balsa_server_conf_set_values(BalsaServerConf *bsc, LibBalsaServer *server)
 {

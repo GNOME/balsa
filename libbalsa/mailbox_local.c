@@ -531,7 +531,6 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
 	libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view);
     libbalsa_mailbox_search_iter_free(iter_view);
 
-    printf("%s finished\n", __func__);
     if(mailbox->view_filter)
         libbalsa_condition_free(mailbox->view_filter);
     mailbox->view_filter = view_filter;

@@ -583,7 +583,8 @@ libbalsa_identity_tree(GCallback toggled_cb, gpointer toggled_data,
  */
 static GtkWidget* 
 libbalsa_identity_config_frame(GList** identities,
-			       LibBalsaIdentity** defid, GtkWidget * dialog)
+			       LibBalsaIdentity** defid, GtkWidget * dialog,
+                               void (*cb)(gpointer), gpointer data)
 {
     GtkWidget* config_frame = gtk_frame_new(NULL);
     GtkWidget *tree;
@@ -596,6 +597,8 @@ libbalsa_identity_config_frame(GList** identities,
                      G_CALLBACK(set_default_ident_cb), NULL);
     g_object_set_data(G_OBJECT(tree), "identities", identities);
     g_object_set_data(G_OBJECT(tree), "default-id", defid);
+    g_object_set_data(G_OBJECT(tree), "callback", cb);
+    g_object_set_data(G_OBJECT(tree), "cb-data",  data);
 
     gtk_container_add(GTK_CONTAINER(config_frame), tree);
 
@@ -731,6 +734,8 @@ new_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
     LibBalsaIdentity *ident;
     GList **identities;
     GtkWidget *name_entry;
+    void (*cb)(gpointer) = g_object_get_data(G_OBJECT(tree), "callback");
+    gpointer data        = g_object_get_data(G_OBJECT(tree), "cb-data");
 
     /* Save any changes to current identity; if it's not valid, just
      * return. */
@@ -746,6 +751,7 @@ new_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
 
     name_entry = g_object_get_data(G_OBJECT(dialog), "identity-name");
     gtk_widget_grab_focus(name_entry);
+    cb(data);
 }
 
 
@@ -1096,6 +1102,8 @@ identity_delete_selected(GtkTreeView * tree, GtkWidget * dialog)
     GtkTreePath *path;
     LibBalsaIdentity *ident;
     GList **identities;
+    void (*cb)(gpointer) = g_object_get_data(G_OBJECT(tree), "callback");
+    gpointer data        = g_object_get_data(G_OBJECT(tree), "cb-data");
 
     /* Save the path to the current row. */
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
@@ -1118,6 +1126,7 @@ identity_delete_selected(GtkTreeView * tree, GtkWidget * dialog)
     }
     gtk_tree_path_free(path);
     gtk_widget_grab_focus(GTK_WIDGET(tree));
+    cb(data);
 }
 
 /* 
@@ -1180,9 +1189,15 @@ help_ident_cb(void)
     }
 }
 
+/* libbalsa_identity_config_dialog displays an identity management
+   dialog. The dialog has a specified parent, existing list of
+   identites, the default one. Additionally, a callback is passed that
+   will be executed when the identity list is modified: new entries
+   are added or other entries are removed. */
 void
 libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
-				LibBalsaIdentity **default_id)
+				LibBalsaIdentity **default_id,
+                                void (*changed_cb)(gpointer))
 {
     static GtkWidget *dialog = NULL;
     GtkWidget* frame;
@@ -1207,7 +1222,8 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     GTK_STOCK_CLOSE, IDENTITY_RESPONSE_CLOSE,
                                     NULL);
 
-    frame = libbalsa_identity_config_frame(identities, default_id, dialog);
+    frame = libbalsa_identity_config_frame(identities, default_id, dialog,
+                                           changed_cb, parent);
     tree = GTK_TREE_VIEW(gtk_bin_get_child(GTK_BIN(frame)));
 
     g_signal_connect(G_OBJECT(dialog), "response",

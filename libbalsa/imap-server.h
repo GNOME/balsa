@@ -41,6 +41,7 @@ typedef struct LibBalsaImapServer_ LibBalsaImapServer;
 LibBalsaImapServer* libbalsa_imap_server_new(const gchar *username,
                                              const gchar *host);
 LibBalsaImapServer* libbalsa_imap_server_new_from_config(void);
+void libbalsa_imap_server_save_config(LibBalsaImapServer *server);
 ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *server,
                                                 GError **err);
 ImapMboxHandle* libbalsa_imap_server_get_handle_with_user(
@@ -50,6 +51,7 @@ void libbalsa_imap_server_release_handle(LibBalsaImapServer *server,
                                          ImapMboxHandle* handle);
 void libbalsa_imap_server_set_max_connections(LibBalsaImapServer *server,
                                               int max);
+int  libbalsa_imap_server_get_max_connections(LibBalsaImapServer *server);
 void libbalsa_imap_server_force_disconnect(LibBalsaImapServer *server);
 void libbalsa_imap_server_close_all_connections(void);
 gboolean libbalsa_imap_server_has_free_handles(LibBalsaImapServer *server);

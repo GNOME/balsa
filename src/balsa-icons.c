@@ -37,7 +37,9 @@
 #include "pixmaps/balsa_reply_group.xpm"
 #include "pixmaps/balsa_forward.xpm"
 #include "pixmaps/balsa_next.xpm"
+#include "pixmaps/balsa_next_part.xpm"
 #include "pixmaps/balsa_previous.xpm"
+#include "pixmaps/balsa_previous_part.xpm"
 #include "pixmaps/balsa_postpone.xpm"
 #include "pixmaps/balsa_print.xpm"
 #include "pixmaps/balsa_save.xpm"
@@ -91,7 +93,9 @@
 #include "pixmaps/menu_postpone.xpm"
 #include "pixmaps/menu_print.xpm"
 #include "pixmaps/menu_next.xpm"
+#include "pixmaps/menu_next_part.xpm"
 #include "pixmaps/menu_previous.xpm"
+#include "pixmaps/menu_previous_part.xpm"
 #include "pixmaps/menu_save.xpm"
 #include "pixmaps/menu_send.xpm"
 #include "pixmaps/menu_send_receive.xpm"
@@ -141,7 +145,9 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_REPLY_GROUP,	    balsa_reply_group_xpm},
 	{ BALSA_PIXMAP_FORWARD,		    balsa_forward_xpm},
 	{ BALSA_PIXMAP_NEXT,		    balsa_next_xpm},
+	{ BALSA_PIXMAP_NEXT_PART,		    balsa_next_part_xpm},
 	{ BALSA_PIXMAP_PREVIOUS,	    balsa_previous_xpm},
+	{ BALSA_PIXMAP_PREVIOUS_PART,	    balsa_previous_part_xpm},
 	{ BALSA_PIXMAP_POSTPONE,	    balsa_postpone_xpm},
 	{ BALSA_PIXMAP_PRINT,		    balsa_print_xpm},
 	{ BALSA_PIXMAP_SAVE,		    balsa_save_xpm},
@@ -174,7 +180,9 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_MENU_POSTPONE,	    menu_postpone_xpm},
 	{ BALSA_PIXMAP_MENU_PRINT,	    menu_print_xpm},
 	{ BALSA_PIXMAP_MENU_NEXT,	    menu_next_xpm},
+	{ BALSA_PIXMAP_MENU_NEXT_PART,	    menu_next_part_xpm},
 	{ BALSA_PIXMAP_MENU_PREVIOUS,	    menu_previous_xpm},
+	{ BALSA_PIXMAP_MENU_PREVIOUS_PART,	    menu_previous_part_xpm},
 	{ BALSA_PIXMAP_MENU_SAVE,	    menu_save_xpm},
 	{ BALSA_PIXMAP_MENU_SEND,	    menu_send_xpm},
 	{ BALSA_PIXMAP_MENU_SEND_RECEIVE,   menu_send_receive_xpm},

@@ -64,6 +64,8 @@ static void mw_set_buttons_sensitive(MessageWindow * mw);
 static void copy_cb(GtkWidget * widget, MessageWindow * mw);
 static void select_all_cb(GtkWidget * widget, gpointer);
 
+static void next_message_cb(GtkWidget * widget, gpointer data);
+static void previous_message_cb(GtkWidget * widget, gpointer data);
 static void next_unread_cb(GtkWidget * widget, gpointer);
 static void next_flagged_cb(GtkWidget * widget, gpointer);
 static void print_cb(GtkWidget * widget, gpointer);
@@ -167,15 +169,17 @@ static GnomeUIInfo message_menu[] = {
      forward_message_inline_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_MENU_FORWARD, 'F', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
+#define MENU_MESSAGE_NEXT_PART_POS 6
     {
      GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in message"),
      next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_NEXT, '.', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_MENU_NEXT_PART, '.', GDK_CONTROL_MASK, NULL},
+#define MENU_MESSAGE_PREVIOUS_PART_POS 7
     {
      GNOME_APP_UI_ITEM, N_("Previous Part"),
      N_("Previous part in message"),
      previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_PREVIOUS, ',', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_MENU_PREVIOUS_PART, ',', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Save Current Part..."),
      N_("Save current part in message"),
@@ -187,12 +191,41 @@ static GnomeUIInfo message_menu[] = {
      view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_MENU_SAVE, 'v', GDK_CONTROL_MASK, NULL},
      GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_NEXT_UNREAD_POS 11
+    /* N */
+#define MENU_MESSAGE_NEXT_POS 11
+    {
+     GNOME_APP_UI_ITEM, N_("_Next Message"), N_("Next message"),
+     next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     BALSA_PIXMAP_MENU_NEXT, 'N', 0, NULL},
+    /* P */
+#define MENU_MESSAGE_PREVIOUS_POS 12
+    {
+     GNOME_APP_UI_ITEM, N_("_Previous Message"),
+     N_("Previous Message"),
+     previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     BALSA_PIXMAP_MENU_PREVIOUS, 'P', 0, NULL},
+    /* Ctrl + N */
+#define MENU_MESSAGE_NEXT_UNREAD_POS 13
     {
      GNOME_APP_UI_ITEM, N_("Next Unread Message"),
      N_("Next Unread Message"), next_unread_cb, NULL, NULL,
      GNOME_APP_PIXMAP_STOCK, BALSA_PIXMAP_MENU_NEXT_UNREAD, 'N',
      GDK_CONTROL_MASK, NULL},
+    /* Ctrl + Alt + F */
+#define MENU_MESSAGE_NEXT_FLAGGED_POS 14
+    {
+     GNOME_APP_UI_ITEM, N_("Next Flagged Message"),
+     N_("Next Flagged Message"), next_flagged_cb, NULL, NULL,
+     GNOME_APP_PIXMAP_STOCK, BALSA_PIXMAP_MENU_NEXT_FLAGGED, 'F',
+     GDK_MOD1_MASK|GDK_CONTROL_MASK, NULL},
+     GNOMEUIINFO_SEPARATOR,
+     /* D */
+#define MENU_MESSAGE_TRASH_POS 16
+    {
+     GNOME_APP_UI_ITEM, N_("_Move to Trash"),
+     N_("Move the current message to Trash mailbox"),
+     trash_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     GNOME_STOCK_TRASH, 'D', 0, NULL},
     GNOMEUIINFO_END
 };
 
@@ -223,6 +256,7 @@ struct _MessageWindow {
 
     /* Pointers to our copies of widgets. */
     GtkWidget *next_unread;
+    GtkWidget *next_flagged;
 #ifdef HAVE_GTKHTML
     GtkWidget *zoom_in;
     GtkWidget *zoom_out;
@@ -295,15 +329,22 @@ message_window_idle_handler(MessageWindow* mw)
 
     balsa_message_set_close(msg, TRUE);
 
-    if(msg && msg->treeview) {
-	if (msg->info_count > 1) {
-            GtkWidget *toolbar =
-                balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
-	    balsa_toolbar_set_button_sensitive(toolbar,
-                                               BALSA_PIXMAP_PREVIOUS, TRUE);
-	    balsa_toolbar_set_button_sensitive(toolbar,
-                                               BALSA_PIXMAP_NEXT, TRUE);
-	}
+    if (msg && msg->treeview) {
+        GtkWidget *toolbar =
+            balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
+        gboolean enable = msg->info_count > 1;
+
+        balsa_toolbar_set_button_sensitive(toolbar,
+                                           BALSA_PIXMAP_PREVIOUS_PART,
+                                           enable);
+        balsa_toolbar_set_button_sensitive(toolbar,
+                                           BALSA_PIXMAP_NEXT_PART, enable);
+        gtk_widget_set_sensitive(message_menu
+                                 [MENU_MESSAGE_NEXT_PART_POS].widget,
+                                 enable);
+        gtk_widget_set_sensitive(message_menu
+                                 [MENU_MESSAGE_PREVIOUS_PART_POS].widget,
+                                 enable);
     }
 
     /* Update the style and message counts in the mailbox list */
@@ -323,8 +364,10 @@ static const struct callback_item {
     { BALSA_PIXMAP_REPLY_ALL,    replytoall_message_cb },
     { BALSA_PIXMAP_REPLY_GROUP,  replytogroup_message_cb },
     { BALSA_PIXMAP_FORWARD,      forward_message_default_cb },
-    { BALSA_PIXMAP_PREVIOUS,     previous_part_cb },
-    { BALSA_PIXMAP_NEXT,         next_part_cb },
+    { BALSA_PIXMAP_PREVIOUS,     previous_message_cb },
+    { BALSA_PIXMAP_PREVIOUS_PART,previous_part_cb },
+    { BALSA_PIXMAP_NEXT,         next_message_cb },
+    { BALSA_PIXMAP_NEXT_PART,    next_part_cb },
     { BALSA_PIXMAP_NEXT_UNREAD,  next_unread_cb },
     { BALSA_PIXMAP_NEXT_FLAGGED, next_flagged_cb },
     { BALSA_PIXMAP_TRASH,        trash_cb },
@@ -356,8 +399,8 @@ static const gchar* message_toolbar[] = {
     BALSA_PIXMAP_REPLY_GROUP,
     BALSA_PIXMAP_FORWARD,
     "",
-    BALSA_PIXMAP_PREVIOUS,
-    BALSA_PIXMAP_NEXT,
+    BALSA_PIXMAP_PREVIOUS_PART,
+    BALSA_PIXMAP_NEXT_PART,
     BALSA_PIXMAP_SAVE,
     "",
     BALSA_PIXMAP_PRINT,
@@ -401,12 +444,13 @@ static void
 mw_set_message(MessageWindow *mw, LibBalsaMessage * message)
 {
     mw->message = message;
-    mw_set_buttons_sensitive(mw);
     g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw);
 
     g_object_ref(message); /* protect from destroying */
     mw->idle_handler_id =
         g_idle_add((GSourceFunc) message_window_idle_handler, mw);
+
+    mw_set_buttons_sensitive(mw);
 }
 
 static void
@@ -457,8 +501,8 @@ message_window_new(LibBalsaMessage * message)
                                    mw);
     gnome_app_set_toolbar(GNOME_APP(mw->window), GTK_TOOLBAR(toolbar));
 
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS, FALSE);
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT, FALSE);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS_PART, FALSE);
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_PART, FALSE);
 
     gtk_window_set_wmclass(GTK_WINDOW(mw->window), "message", "Balsa");
 
@@ -476,7 +520,8 @@ message_window_new(LibBalsaMessage * message)
 
     /* Save the widgets that we need to change--they'll be overwritten
      * if another message window is opened. */
-    mw->next_unread = message_menu[MENU_MESSAGE_NEXT_UNREAD_POS].widget;
+    mw->next_unread  = message_menu[MENU_MESSAGE_NEXT_UNREAD_POS].widget;
+    mw->next_flagged = message_menu[MENU_MESSAGE_NEXT_FLAGGED_POS].widget;
 #ifdef HAVE_GTKHTML
     mw->zoom_in  = view_menu[MENU_VIEW_ZOOM_IN].widget;
     mw->zoom_out = view_menu[MENU_VIEW_ZOOM_OUT].widget;
@@ -722,22 +767,39 @@ static void
 mw_set_buttons_sensitive(MessageWindow * mw)
 {
     GtkWidget *toolbar =
-	balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(mw->window));
     LibBalsaMailbox *mailbox = mw->message->mailbox;
-    gint other_unread;
+    guint current_msgno = mw->message->msgno;
+    BalsaIndex *index = mw->bindex;
+    gboolean enable;
 
-    if (!mailbox)
-	gtk_widget_destroy(mw->window);
+    if (!mailbox) {
+        gtk_widget_destroy(mw->window);
+        return;
+    }
 
-    other_unread =
-	mailbox->unread_messages - LIBBALSA_MESSAGE_IS_UNREAD(mw->message);
-    gtk_widget_set_sensitive(mw->next_unread, other_unread > 0);
+    enable = index && balsa_index_next_msgno(index, current_msgno) > 0;
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_POS].widget,
+                             enable);
+
+    enable = index && balsa_index_previous_msgno(index, current_msgno) > 0;
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_PREVIOUS,
+                                       enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_PREVIOUS_POS].
+                             widget, enable);
+
+    enable = index
+        && balsa_index_next_unread_msgno(index, current_msgno) > 0;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD,
-				       other_unread > 0);
+                                       enable);
+    gtk_widget_set_sensitive(mw->next_unread, enable);
+
+    enable = index
+        && balsa_index_next_flagged_msgno(index, current_msgno) > 0;
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED,
-				       mailbox
-				       && libbalsa_mailbox_total_messages
-				       (mailbox) > 0);
+                                       enable);
+    gtk_widget_set_sensitive(mw->next_flagged, enable);
 }
 
 static void
@@ -761,9 +823,24 @@ select_all_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-mw_set_selected(MessageWindow * mw)
+mw_set_msgno(MessageWindow * mw, guint msgno)
 {
-    GList *list;
+    LibBalsaMessage *message;
+    MessageWindow *tmp;
+
+    message =
+        libbalsa_mailbox_get_message(mw->bindex->mailbox_node->mailbox,
+                                     msgno);
+    tmp = g_object_get_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY);
+    if (tmp) {
+        /*
+         * The message is already displayed in a window, so just use
+         * that one.
+         */
+        g_object_unref(message);
+        gdk_window_raise(tmp->window->window);
+        return;
+    }
 
     /* Temporarily tell the BalsaMessage not to close when its message
      * is finalized, so we can safely unref it in mw_clear_message.
@@ -771,12 +848,27 @@ mw_set_selected(MessageWindow * mw)
      * the new message. */
     balsa_message_set_close(BALSA_MESSAGE(mw->bmessage), FALSE);
     mw_clear_message(mw);
+    mw_set_message(mw, message);
+    g_object_unref(message);
+}
 
-    list = balsa_index_selected_list(mw->bindex);
-    if (g_list_length(list) == 1)
-	mw_set_message(mw, LIBBALSA_MESSAGE(list->data));
-    g_list_foreach(list, (GFunc) g_object_unref, NULL);
-    g_list_free(list);
+static void
+next_message_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) (data);
+
+    mw_set_msgno(mw,
+                 balsa_index_next_msgno(mw->bindex, mw->message->msgno));
+}
+
+static void
+previous_message_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) (data);
+
+    mw_set_msgno(mw,
+                 balsa_index_previous_msgno(mw->bindex,
+                                            mw->message->msgno));
 }
 
 static void
@@ -784,16 +876,18 @@ next_unread_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
 
-    balsa_index_select_next_unread(mw->bindex);
-    mw_set_selected(mw);
+    mw_set_msgno(mw,
+                 balsa_index_next_unread_msgno(mw->bindex,
+                                               mw->message->msgno));
 }
 
 static void next_flagged_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
 
-    balsa_index_select_next_flagged(mw->bindex);
-    mw_set_selected(mw);
+    mw_set_msgno(mw,
+                 balsa_index_next_flagged_msgno(mw->bindex,
+                                                mw->message->msgno));
 }
 
 

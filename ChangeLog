@@ -1,3 +1,8 @@
+2001-10-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: try harder to commit the mailbox.
+	* src/balsa-index.c: attempt to address #62890.
+
 2001-10-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Don't mix BalsaToolbarType with ordinary indexes.

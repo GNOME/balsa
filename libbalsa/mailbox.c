@@ -494,7 +494,7 @@ libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
 	    UNLOCK_MAILBOX(mailbox);
 	    g_print
 		("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
-	    usleep(1000);
+	    usleep(100000); /* wait tenth second */
 	    libbalsa_mailbox_check(mailbox);
 	    LOCK_MAILBOX(mailbox);
 	    libbalsa_lock_mutt();

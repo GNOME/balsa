@@ -570,7 +570,6 @@ moveto_handler(BalsaIndex * bindex)
                                           GTK_CLIST(bindex->ctree)->rows - 1);
     }
         
-        
     if (row_data) {
         row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree),
                                             row_data);
@@ -595,7 +594,7 @@ moveto_handler(BalsaIndex * bindex)
    solution. When the backend is changed, feel free to introduce these
    changes.
    Also, the waiting list is not a top hack. I mean it is perfectly 
-   functional (and that's MOST important; think long before modyfying it)
+   functional (and that's MOST important; think long before modifying it)
    but perhaps we could write it nicer?
 */
 
@@ -1175,23 +1174,19 @@ static void balsa_index_set_parent_style(BalsaIndex * bindex,
 /* CLIST callbacks */
 
 static void
-button_event_press_cb(GtkWidget * widget, GdkEventButton * event, 
+button_event_press_cb(GtkWidget * ctree, GdkEventButton * event, 
                       gpointer data)
 {
     gint row, column;
     gint on_message;
     LibBalsaMessage *message;
     BalsaIndex *bindex;
-    GtkCList* clist;
+    GtkCList* clist = GTK_CLIST (ctree);
 
     g_return_if_fail(event);
 
     bindex = BALSA_INDEX(data);
-    clist = GTK_CLIST (bindex->ctree);
-    on_message = gtk_clist_get_selection_info(clist, event->x, event->y, 
-                                              &row, &column);
-
-    if (event && event->button == 3) {
+    if (event->button == 3) {
         if (handler != 0)
             gtk_idle_remove(handler);
 	handler = 0;
@@ -1202,10 +1197,14 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
         return;
     } 
 
+    on_message = gtk_clist_get_selection_info(clist, event->x, event->y, 
+                                              &row, &column);
+
+    g_return_if_fail(on_message == 0 || on_message == 1);
     /* Keep the cast: I have got a strange crash here */
     if (on_message && 
 	(message = (LibBalsaMessage*)gtk_clist_get_row_data(clist, row))) {
-	if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
+	if (event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
             /* double click on a message means open a message window,
              * unless we're in the draftbox, in which case it means open
              * a sendmsg window */
@@ -1218,7 +1217,8 @@ button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
                  * instead we'll just use the guts of
                  * balsa_message_continue: */
                 BalsaSendmsg *sm =
-                    sendmsg_window_new(widget, message, SEND_CONTINUE);
+                    sendmsg_window_new(GTK_WIDGET(balsa_app.main_window), 
+                                       message, SEND_CONTINUE);
                 gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
                                    GTK_SIGNAL_FUNC
                                    (sendmsg_window_destroy_cb), NULL);
@@ -1266,6 +1266,8 @@ select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
     if(balsa_app.previewpane) {
 	replace_attached_data (GTK_OBJECT(bindex), "message", 
 			       GTK_OBJECT(message));
+        if(handler) 
+            gtk_idle_remove(handler);
 	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, bindex);
     }
 }

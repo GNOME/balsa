@@ -687,11 +687,13 @@ libbalsa_filter_get_by_name(const gchar * fname)
     g_return_val_if_fail(filter_list, NULL);
     if (!fname || fname[0]=='\0') return NULL;
 
-    fnamelen=strlen(fname);
-    for (list= *filter_list;
-         list && 
-             strncmp(fname,((LibBalsaFilter*)list->data)->name,fnamelen)!=0;
-         list=g_slist_next(list))
-        ;
-    return list ? (LibBalsaFilter*)list->data : NULL;
+    fnamelen = strlen(fname);
+    for (list = *filter_list;list;list = g_slist_next(list)) {
+	gint len = strlen(((LibBalsaFilter*)list->data)->name);
+
+	if (strncmp(fname,((LibBalsaFilter*)list->data)->name,
+		    MAX(len,fnamelen))==0)
+	    return (LibBalsaFilter*)list->data;
+    }
+    return NULL;
 }

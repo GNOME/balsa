@@ -208,24 +208,19 @@ gchar *
 libbalsa_make_string_from_list_p(const GList * the_list)
 {
     gchar *str;
-    GList *list;
+    const GList *list;
     GString *gs = g_string_new(NULL);
     LibBalsaAddress *addy;
 
-    list = g_list_first((GList *) the_list);
-
-    while (list) {
+    for (list = the_list; list; list = list->next) {
 	addy = list->data;
 	str = libbalsa_address_to_gchar_p(addy, 0);
-	if (str)
+	if (str) {
+            if (gs->len > 0)
+	        g_string_append(gs, ", ");
 	    g_string_append(gs, str);
-
-	g_free(str);
-
-	if (list->next)
-	    g_string_append(gs, ", ");
-
-	list = list->next;
+	    g_free(str);
+        }
     }
 
     return g_string_free(gs, FALSE);

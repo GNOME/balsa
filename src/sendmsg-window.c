@@ -131,7 +131,8 @@ static GnomeUIInfo main_toolbar[] =
 			  postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
   GNOMEUIINFO_SEPARATOR,
 #define TOOL_SPELLING_POS 6
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Spelling"), N_ ("Check Spelling"), 
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Check Spelling"), 
+                          N_ ("Run a spelling check on the current message"), 
 			  spell_check_cb, GNOME_STOCK_PIXMAP_SPELLCHECK),
   GNOMEUIINFO_SEPARATOR,
 #define TOOL_PRINT_POS 8
@@ -199,9 +200,10 @@ static GnomeUIInfo edit_menu[] =
      GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL },
    GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SPELL_CHECK 10
-   GNOMEUIINFO_ITEM_STOCK (N_("Check Spelling"), 
-                           N_("Spell check the current message"), 
-                           spell_check_cb, GNOME_STOCK_MENU_SPELLCHECK),
+   { GNOME_APP_UI_ITEM, N_("Check Spelling"), NULL, 
+     (gpointer) spell_check_cb, NULL, NULL, 
+     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_PIXMAP_SPELLCHECK, 
+     GDK_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
    GNOMEUIINFO_END
 };
 
@@ -1393,6 +1395,7 @@ bsmsg2message(BalsaSendmsg *bsmsg)
 {
   LibBalsaMessage * message;
   LibBalsaMessageBody * body;
+  GList* list;
   gchar * tmp;
   gchar recvtime[50];
   struct tm *footime;
@@ -1420,10 +1423,20 @@ bsmsg2message(BalsaSendmsg *bsmsg)
 
   if (bsmsg->orig_message != NULL && 
       !GTK_OBJECT_DESTROYED(bsmsg->orig_message) ) {
-    message->references = g_strdup (bsmsg->orig_message->message_id);
+
+    if (bsmsg->orig_message->references != NULL) {
+      for (list = bsmsg->orig_message->references; list; list = list->next) {
+        message->references = g_list_append (message->references, 
+                                              g_strdup (list->data));
+      }
+    } 
+
+    message->references = g_list_prepend (message->references, 
+                                          g_strdup (bsmsg->orig_message->message_id));
     
     footime = localtime (&bsmsg->orig_message->date);
-    strftime (recvtime, sizeof (recvtime), "%a, %b %d, %Y at %H:%M:%S %z", footime);
+    strftime (recvtime, sizeof (recvtime), 
+              "%a, %b %d, %Y at %H:%M:%S %z", footime);
     message->in_reply_to = g_strconcat (bsmsg->orig_message->message_id, 
                                         "; from ", 
                                         (gchar*)bsmsg->orig_message->from->address_list->data, 

@@ -476,31 +476,38 @@ balsa_spell_check_init (BalsaSpellCheck* spell_check)
         /* setup buttons to perform actions */
         change = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_REDO, 
                                                 "Change");
+        set_tooltip (change, _("Replace the current word with the selected suggestion"));
         gtk_box_pack_start (GTK_BOX (vbox1), change, FALSE, FALSE, 0);
 
         change_all = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_REFRESH,
                                                     "Change All");
+        set_tooltip (change_all, _ ("Replace all occurances of the current word with the selected suggestion"));
         gtk_box_pack_start (GTK_BOX (vbox2), change_all, 
                             FALSE, FALSE, 0);
         
         ignore = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_FORWARD,
                                                 "Ignore");
+        set_tooltip (ignore, _ ("Skip the current word"));
         gtk_box_pack_start (GTK_BOX (vbox1), ignore, FALSE, FALSE, 0);
         
         ignore_all = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_LAST,
                                                     "Ignore All");
+        set_tooltip (ignore_all, _ ("Skip all occurances of the current word"));
         gtk_box_pack_start (GTK_BOX (vbox2), ignore_all, 
                             FALSE, FALSE, 0);
 
         learn = gnome_stock_button_with_label (GNOME_STOCK_PIXMAP_BOOK_OPEN,
                                                "Learn");
+        set_tooltip (learn, _ ("Add the current word to your personal dictionar"));
         gtk_box_pack_start (GTK_BOX (vbox1), learn, FALSE, FALSE, 0);
         
         done = gnome_stock_button_with_label (GNOME_STOCK_BUTTON_OK, 
                                               "Done");
+        set_tooltip (done, _ ("Finish spell checking"));
         gtk_box_pack_end (GTK_BOX (vbox1), done, FALSE, FALSE, 0);
 
         cancel = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
+        set_tooltip (cancel, _ ("Revert all changes and finish spell checking"));
         gtk_box_pack_end (GTK_BOX (vbox2), cancel, FALSE, FALSE, 0);
         
         /* connect signal handlers */
@@ -661,25 +668,13 @@ learn_cb (GtkButton* button, gpointer data)
 static void 
 cancel_cb (GtkButton* button, gpointer data)
 {
-        gint length;
         BalsaSpellCheck* spell_check;
 
         g_return_if_fail (data != NULL);
         g_return_if_fail (BALSA_IS_SPELL_CHECK (data));
         
         spell_check = BALSA_SPELL_CHECK (data);
-
-        /* replace corrected text with original text */
-        gtk_text_freeze (spell_check->text);
-        length = gtk_text_get_length (spell_check->text);
-        gtk_text_set_point (spell_check->text, 0);
-        gtk_text_forward_delete (spell_check->text, length);
-        gtk_text_insert (spell_check->text, spell_check->font, NULL, NULL, 
-                         spell_check->original_text, 
-                         strlen (spell_check->original_text));
-        gtk_text_thaw (spell_check->text);
-
-        balsa_spell_check_finish (spell_check);
+        balsa_spell_check_finish (spell_check, FALSE);
 }
 
 
@@ -697,7 +692,7 @@ done_cb (GtkButton* button, gpointer data)
         g_return_if_fail (BALSA_IS_SPELL_CHECK (data));
         spell_check = BALSA_SPELL_CHECK (data);
         
-        balsa_spell_check_finish (spell_check);
+        balsa_spell_check_finish (spell_check, TRUE);
 }
 
 
@@ -772,13 +767,13 @@ balsa_spell_check_next (BalsaSpellCheck* spell_check)
         
 
         if (!next_word (spell_check)) {
-                balsa_spell_check_finish (spell_check);
+                balsa_spell_check_finish (spell_check, TRUE);
                 return;
         }
 
         while (check_word (spell_check)) {
                 if (!next_word (spell_check)) {
-                        balsa_spell_check_finish (spell_check);
+                        balsa_spell_check_finish (spell_check, TRUE);
                         return;
                 }
         }
@@ -884,7 +879,7 @@ balsa_spell_check_fix (BalsaSpellCheck* spell_check, gboolean fix_all)
         if (check_pspell_errors (spell_check->spell_manager)) {
                 g_free (new_word);
                 g_free (old_word);
-                balsa_spell_check_finish (spell_check);
+                balsa_spell_check_finish (spell_check, TRUE);
                 return;
         }
                 
@@ -937,7 +932,7 @@ static void balsa_spell_check_destroy (GtkObject* object)
                 finish_check (spell_check);
         
         if (spell_check->spell_manager) 
-                balsa_spell_check_finish (spell_check);
+                balsa_spell_check_finish (spell_check, TRUE);
         
         if (GTK_OBJECT_CLASS (parent_class)->destroy)
                 (* GTK_OBJECT_CLASS (parent_class)->destroy) (object);
@@ -950,12 +945,29 @@ static void balsa_spell_check_destroy (GtkObject* object)
  * signal so that the main program knows to resume normal operation.
  * */
 void 
-balsa_spell_check_finish (BalsaSpellCheck* spell_check)
+balsa_spell_check_finish (BalsaSpellCheck* spell_check, gboolean keep_changes)
 {
+        gint length;
+        
+
         finish_check (spell_check);
         g_free (spell_check->original_text);
 
-        pspell_manager_save_all_word_lists (spell_check->spell_manager);
+        if (keep_changes) {
+                pspell_manager_save_all_word_lists(spell_check->spell_manager);
+        } else {
+                /* replace corrected text with original text */
+                gtk_text_freeze (spell_check->text);
+                length = gtk_text_get_length (spell_check->text);
+                gtk_text_set_point (spell_check->text, 0);
+                gtk_text_forward_delete (spell_check->text, length);
+                gtk_text_insert (spell_check->text, spell_check->font, 
+                                 NULL, NULL, 
+                                 spell_check->original_text, 
+                                 strlen (spell_check->original_text));
+                gtk_text_thaw (spell_check->text);
+        }
+        
         check_pspell_errors (spell_check->spell_manager);
         
         delete_pspell_manager (spell_check->spell_manager);

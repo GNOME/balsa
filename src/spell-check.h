@@ -90,11 +90,11 @@ void balsa_spell_check_set_character_set (BalsaSpellCheck*, const gchar*);
 
 /* function prototypes */
 GtkWidget* balsa_spell_check_new (void);
-GtkWidget* balsa_spell_check_new_with_text (GtkText*);
-void balsa_spell_check_set_text (BalsaSpellCheck*, GtkText*);
-void balsa_spell_check_set_font (BalsaSpellCheck*, GdkFont*);
-void balsa_spell_check_start (BalsaSpellCheck*);
-void balsa_spell_check_finish (BalsaSpellCheck*);
+GtkWidget* balsa_spell_check_new_with_text (GtkText* text);
+void balsa_spell_check_set_text (BalsaSpellCheck* spell_check, GtkText* text);
+void balsa_spell_check_set_font (BalsaSpellCheck* spell_check, GdkFont* font);
+void balsa_spell_check_start (BalsaSpellCheck* spell_check);
+void balsa_spell_check_finish (BalsaSpellCheck* spell_check, gboolean keep_changes);
 
 
 #ifdef __cplusplus

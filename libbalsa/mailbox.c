@@ -684,7 +684,12 @@ translate_message (HEADER * cur)
 	
 	message->subject = g_strdup (cenv->subject);
 	message->message_id = g_strdup (cenv->message_id);
-	
+
+        for (tmp = cenv->references; tmp != NULL; tmp = tmp->next) {
+                message->references = g_list_append (message->references,
+                                                     tmp->data);
+        }
+        
 	/* more! */
 
 	return message;

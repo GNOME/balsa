@@ -99,7 +99,7 @@
   <sect1 id="introduction">
     <title>Introduction</title>
     
-    <graphic fileref="images/balsa_logo.png" format="png" srccredit="tigert"></graphic>
+    <graphic fileref="images/balsa_logo" format="png" srccredit="tigert"></graphic>
 
     <para><application>Balsa</application> is a graphical mail client
       similar to Eudora on Windows. It supports the standard features of
@@ -122,24 +122,34 @@
 
   <sect1 id="getting-started">
     <title>Getting Started with
-      <application>Balsa</application></title>
+    <application>Balsa</application></title>
 
     <para>If you're starting <application>Balsa</application> for the
-      first time, the first thing you'll see is a <link linkend="glossary-druid">druid</link> that will set up
-      <application>Balsa</application>'s basic
-      settings. <application>Balsa</application> can guess most of what
-      it needs to know about you. It will also create five standard
-      local mailboxes: the Inbox, Outbox, Sentbox, Draftbox, and
-      Trash. (These can be changed to be <acronym>IMAP</acronym> or
-      <acronym>POP3</acronym> mailboxes later.)</para>
+    first time, the first thing you'll see is a <link
+    linkend="glossary-druid">druid</link> that will set up
+    <application>Balsa</application>'s basic
+    settings. <application>Balsa</application> can guess most of what
+    it needs to know about you. It will also create five standard
+    local mailboxes: the Inbox, Outbox, Sentbox, Draftbox, and
+    Trash. (These can be changed to be <acronym>IMAP</acronym> or
+    <acronym>POP3</acronym> mailboxes later.)</para>
+
+    <figure>
+      <title><application>Balsa</application> Start Druid</title>
+      <screenshot>
+	<graphic fileref="images/druid-start" format="png"
+	srccredit="Matthew Guenther" align="center"></graphic>
+      </screenshot>
+    </figure>
 
     <para>Don't worry. <application>Balsa</application> cooperates
-      with other <acronym>MUA</acronym>'s very well.  They share the same
-      locking semantics for mailboxes. If
-      <application>Balsa</application> shares the same mail directory as
-      <application>Pine</application> or <application>Mutt</application>, it will detect new
-      folders as they are created. So if you have to telnet in to your
-      mail machine, you won't be stuck.</para>
+    with other <acronym>MUA</acronym>'s very well.  They share the
+    same locking semantics for mailboxes. If
+    <application>Balsa</application> shares the same mail directory as
+    <application>Pine</application> or
+    <application>Mutt</application>, it will detect new folders as
+    they are created. So if you have to telnet in to your mail
+    machine, you won't be stuck.</para>
 
     <para>There are many more settings in
       <application>Balsa</application>'s <link linkend="win-config">preferences window</link>, but most of them do
@@ -157,7 +167,7 @@
       <title>Main Window</title>
       <screenshot>
 	<screeninfo>Main Window</screeninfo>
-	<graphic fileref="images/main-window.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	<graphic fileref="images/main-window" format="png" srccredit="Matthew Guenther" align="center"></graphic>
       </screenshot>
     </figure>
 
@@ -192,7 +202,7 @@
 	<title>Main Window Toolbar</title>
 	<screenshot>
 	  <screeninfo>Main Window Toolbar</screeninfo>
-	  <graphic fileref="images/main-window-toolbar.png" format="png" srccredit="Matthew Guenther"></graphic>
+	  <graphic fileref="images/main-window-toolbar" format="png" srccredit="Matthew Guenther"></graphic>
 	</screenshot>
       </figure>
 
@@ -586,23 +596,28 @@
 	  <listitem><para>Compose a new message.</para>
 	  </listitem></varlistentry>
 
-        <varlistentry><term><menuchoice> 
-	      <guimenuitem>Reply</guimenuitem></menuchoice></term>
-	  <listitem><para>Replies to the currently selected message(s).</para>
-	  </listitem></varlistentry>
-
         <varlistentry>
-	  <term><menuchoice> <guimenuitem>Reply to
-		All</guimenuitem></menuchoice></term>
+	  <term>
+	    <menuchoice><guimenuitem>Reply</guimenuitem></menuchoice>
+	  </term>
 	  <listitem>
-	    <para>Replies-to-all the currently selected
-	      message(s).</para>
+	    <para>Replies to the currently selected message(s).</para>
 	  </listitem>
 	</varlistentry>
 
         <varlistentry>
-	  <term><menuchoice>
-	      <guimenuitem>Forward</guimenuitem></menuchoice></term>
+	  <term>
+	    <menuchoice><guimenuitem>Reply to All</guimenuitem></menuchoice>
+	  </term>
+	  <listitem>
+	    <para>Replies-to-all the currently selected message(s).</para>
+	  </listitem>
+	</varlistentry>
+
+        <varlistentry>
+	  <term>
+	    <menuchoice><guimenuitem>Forward</guimenuitem></menuchoice>
+	  </term>
 	  <listitem>
 	    <para>Forwards the currently selected message(s).</para>
 	  </listitem>
@@ -640,21 +655,26 @@
       <title>The Message View</title>
 
       <para>The message view displays the message that is selected in
-	message list. It will attempt to display images in the
-	message. <application>Balsa</application> does not understand
-	HTML. (Someday, maybe.)  Attachments will be shown as blue links
-	that look like &quot;--APPLICATION--&quot;.  Clicking on the
-	link will let you save (but not view) it. Right-click on a body 
-	of text to save it.</para>
+      mailbox index.  Message headers are displayed above the main
+      text of the message, unless they have been disabled.  The text
+      of the message is shown below the headers.</para>
+
+      <para>If the message is multipart the different sections will be
+      shown below the main message text.  Each part can be selected
+      and <application>Balsa</application> will attempt to display it.
+      If it is unable to it will display a screen allowing you to save
+      the attachment to a file.</para>
+
+      <note>
+	<para>Currently <application>Balsa</application> only supports
+	viewing <acronym>HTML</acronym> messages when compiled with
+	<application>gtkhtml</application> support, but this is an
+	experimental feature and not fully stable.</para>
+      </note>
 
       <para>You are not restricted to that pane. Double-click on a
-	message in the message index to open it in a separate
-	window.</para>
-
-      <para><application>Balsa</application>'s message view is a
-	little deficient. It will not allow the message text to be
-	selected, and cannot handle MIME data other than
-	images. Hopefully this will be fixed one day.</para>
+      message in the message index to open it in a separate
+      window.</para>
     </sect2>
   </sect1>
 
@@ -665,19 +685,20 @@
       <title>Message Composition Window</title>
       <screenshot>
 	<screeninfo>Message Composition Window</screeninfo>
-	<graphic fileref="images/newmsg-window.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	<graphic fileref="images/newmsg-window" format="png" srccredit="Matthew Guenther" align="center"></graphic>
       </screenshot>
     </figure>
     
     <para>When the <guibutton>New Message</guibutton> or
-      <guibutton>Reply</guibutton> or <guibutton>Forward</guibutton>
-      action is selected, the message to be sent is brought up in the
-      <interface>Message Composer</interface>.  This window is where you
-      can type the text of the message, attach files, and specify
-      recipients.  In the near future, it will also be possible to spell
-      check the message, as well as perform signing and encryption of
-      messages using <application>GnuPG</application> or
-      <application><acronym>PGP</acronym></application>.</para>
+    <guibutton>Reply</guibutton> or <guibutton>Forward</guibutton>
+    action is selected, the message to be sent is brought up in the
+    <interface>Message Composer</interface>.  This window is where you
+    can type the text of the message, attach files, and specify
+    recipients.  The window also provides an interface to spell check
+    the message.  In the near future, it will be possible to perform
+    signing and encryption of messages using
+    <application>GnuPG</application> or
+    <application><acronym>PGP</acronym></application>.</para>
 
     <para>When the message window first opens, you will see the
       several main sections:</para>
@@ -834,6 +855,19 @@
 		  wrapped to the specified outgoing mail wrap
 		  column.</para>
 	      </listitem>
+
+	      <listitem>
+		<para>
+		  <menuchoice>
+		    <shortcut>
+		      <keysym>Ctrl-Shift-S</keysym>
+		    </shortcut>
+		    <guimenu>Edit</guimenu>
+		    <guimenuitem>Check Spelling</guimenuitem>
+		  </menuchoice>
+		  &mdash; Start spell checking the current message.
+		</para>
+	      </listitem>
 	    </itemizedlist>
 	  </listitem>
 	</varlistentry>
@@ -943,10 +977,56 @@
 	  <term><guimenu>ISO Charset</guimenu></term>
 	  <listitem>
 	    <para>This menu provides a number of available character
-	      sets to use when composing and sending the message.
-	      Currently <application>Balsa</application> does not
-	      support multiple character sets in a single
-	      message.</para>
+	    sets to use when composing and sending the message.
+	    Currently <application>Balsa</application> does not
+	    support multiple character sets in a single message. The
+	    available character sets consist of:</para>
+
+	    <itemizedlist>
+	      <listitem>
+		<para>Western (ISO-8859-1)</para>
+	      </listitem>
+
+	      <listitem>
+		<para>Western (ISO-8859-15)</para>
+	      </listitem>
+
+	      <listitem>
+		<para>Central European (ISO-8859-2)</para>
+	      </listitem>
+
+	      <listitem>
+		<para>South European (ISO-8859-3)</para>
+	      </listitem>
+
+	      <listitem>
+		<para>Baltic (ISO-8859-13) </para>
+	      </listitem>
+
+	      <listitem>
+		<para>Cyrillic (ISO-8859-5) </para>
+	      </listitem>
+
+	      <listitem>
+		<para>Hebrew (ISO-8859-5) </para>
+	      </listitem>
+
+	      <listitem>
+		<para>Turkish (ISO-8859-9) </para>
+	      </listitem>
+
+	      <listitem>
+		<para>Celtic (ISO-8859-14) </para>
+	      </listitem>
+
+	      <listitem>
+		<para>Russian (KOI8-R) </para>
+	      </listitem>
+
+	      <listitem>
+		<para>Ukranian (KOI8-U) </para>
+	      </listitem>
+	    </itemizedlist>
 	  </listitem>
 	</varlistentry>
 
@@ -965,7 +1045,7 @@
 	<title>Toolbar</title>
 	<screenshot>
 	  <screeninfo>Balsa Message Composer Toolbar</screeninfo>
-	  <graphic fileref="images/newmsg-window-toolbar.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	  <graphic fileref="images/newmsg-window-toolbar" format="png" srccredit="Matthew Guenther" align="center"></graphic>
 	</screenshot>
       </figure>
 
@@ -996,10 +1076,13 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term><guibutton>Spelling</guibutton></term>
+	  <term><guibutton>Check Spelling</guibutton></term>
 	  <listitem>
-	    <para>Run the message through a spell-checker, not
-	      implemented in the current version (0.8.0)</para>
+	    <para>Start a spell check on the current message.  Balsa
+	    can currently use either the standard ispell or the newer
+	    aspell to do the spell checking.  Settings for this can be
+	    found in the<link linkend="win-config-6">
+	    Preferences</link> dialog.</para>
 	  </listitem>
 	</varlistentry>
 	
@@ -1007,8 +1090,8 @@
 	  <term><guibutton>Print</guibutton></term>
 	  <listitem>
 	    <para>Print out the draft of the message, using the print
-	      command specified in the <link linkend="win-config-5">Preferences</link>
-	      dialog.</para>
+	    command specified in the <link linkend="win-config-5">
+	    Preferences</link> dialog.</para>
 	  </listitem>
 	</varlistentry>
 	
@@ -1166,7 +1249,7 @@
 	<title>List of Attachments</title>
 	<screenshot>
 	  <screeninfo>List of Attachments</screeninfo>
-	  <graphic fileref="images/newmsg-window-attachments.png" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	  <graphic fileref="images/newmsg-window-attachments" format="png" srccredit="Matthew Guenther" align="center"></graphic>
 	</screenshot>
       </figure>
 
@@ -1192,11 +1275,145 @@
 	editor and simply paste it in.</para>
 
       <para>If the message is a reply or forward, the referenced
-	message will be displayed in the body text widget, with the
-	prefix specified in the <link linkend="win-config-1">Preferences</link> dialog.
+      message will be displayed in the body text widget, with the
+      prefix specified in the <link
+      linkend="win-config-1">Preferences</link> dialog.
       </para>
     </sect2>
+
+    <sect2 id="win-composer-spellcheck">
+      <title>Spell Checker</title>
+
+      <para>Once the spell check has been started, it will take a
+      moment to load the text and spell checking module, and then it
+      will automatically begin checking the message.  If it finds any
+      words that are incorrect, the word will be highlighted and a
+      panel will be shown that offers a number of suggestions and
+      available courses of action. </para>
+
+      <figure>
+	<title>Spell Checking Panel</title>
+	<screenshot>
+	  <screeninfo>Spell Checking Panel</screeninfo>
+	  <graphic fileref="images/spell-check" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	</screenshot>
+      </figure>
+
+      <para>As shown above, the panel consists of a list of two panes,
+      one the left containing a list of suggestions and an entry box,
+      while the right contains several buttons to choose your action.
+      The list on the left is re-generated for each incorrect word,
+      with all the suggestions the spell check program comes up with.
+      You can choose what program you want to use through loadable
+      modules, selectable in the <link
+      linkend="win-config-6">Preferences</link> dialog.  The entry box
+      above the list is what will be used to replace the current word,
+      and usually reflects the current selection in the list, but can
+      be edited by hand if you wish to make manual changes.</para>
+
+      <para>The buttons on the left control the actions to take for
+      each incorrect word.  The buttons include:</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term><guibutton>Change</guibutton></term>
+	  <listitem>
+	    <para>Change the incorrect word with the currently
+	    selected suggested word or the user's edited word.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guibutton>Change All</guibutton></term>
+	  <listitem>
+	    <para>Change all occurances of the current incorrect word
+	    with the currently selected suggestion.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guibutton>Ignore</guibutton></term>
+	  <listitem>
+	    <para>Ignore the current incorrect word and continue to
+	    the next one.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guibutton>Ignore All</guibutton></term>
+	  <listitem>
+	    <para>Ignore all occurrances of the current word, and
+	    continue to the next incorrect word.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guibutton>Learn</guibutton></term>
+	  <listitem>
+	    <para>Add the current incorrect word to your personal
+	    dictionary.  This will cause it to be considered correct
+	    for all future spell checks.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guibutton>Done</guibutton></term>
+	  <listitem>
+	    <para>Stop the spell check at the current point, keeping
+	    all changes so far and returning to the normal message
+	    window interface.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guibutton>Cancel</guibutton></term>
+	  <listitem>
+	    <para>Stop the spell check at the current point, reverting
+	    all changes so far, including any words added to your
+	    personal dictionary.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+    </sect2>
     
+    <sect2>
+      <title>Address Book</title>
+
+      <para>When composing a message, clicking on any of the coloured
+      book icons next to a destination field (To, Cc, Bcc) will bring
+      up the <application>Balsa</application> address book.  It helps
+      you to select recipients for your messages quickly and
+      easily.</para>
+
+      <figure>
+	<title>Address Book Window</title>
+	<screenshot>
+	  <graphic fileref="images/address-book" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+	</screenshot>
+      </figure>
+
+      <para>The address book provides two panes, the one on the left
+      consisting of all available addresses, while the one on the
+      right contains the intended recipients of your message.
+      Addresses are added to the recipient list by selecting them in
+      the left pane and clicking the arrow button pointing to the
+      right.  This will remove the address from the left pane, so they
+      cannot be added more than once.  If you decide that you no
+      longer want to send the message to a particular address, simply
+      select it in the right-hand pane and click the left-arrow button
+      to move it back.</para>
+
+      <para>If, while selecting people to send your message to, you
+      decide to add someone new to the address book, it is a simple
+      matter to click on the <guibutton>Run GnomeCard</guibutton>
+      button.  This will bring up the
+      <application>GnomeCard</application> application, allowing you
+      to easily manipulate your contact list.  After any changes have
+      been made using the address book, they can be forced to show up
+      in the left hand pane by clicking on the
+      <application>Re-Import</application> button.</para>
+    </sect2>
   </sect1>
 
   <sect1 id="win-config">
@@ -1209,176 +1426,182 @@
 	<guimenuitem>Preferences</guimenuitem></menuchoice>. You will see
       a notebook. The tabs and options are explained below.
     </para>
-  </sect1>
 
-  <sect1 id="win-config-0">
-    <title>Identity</title>
+    <figure>
+      <title>Preferences Window</title>
+      <screenshot>
+	<graphic fileref="images/preferences-window" format="png" srccredit="Matthew Guenther" align="center"></graphic>
+      </screenshot>
+    </figure>
 
-    <para>This page lets you specify how you present yourself to the
-      rest of the world.</para>
+    <sect2 id="win-config-0">
+      <title>Identity</title>
 
-    <variablelist>
-      <varlistentry><term><guilabel>Your
-      Name</guilabel></term>
-	<listitem><para>This doesn't
-	    <emphasis>have</emphasis> to be your name, I guess. But
-	    it's the word prefixing your email address in mail you
-	    send.</para></listitem></varlistentry>
-      
-      <varlistentry><term><guilabel>E-Mail
-	    address</guilabel></term><listitem><para>As you wish it to appear
-	    in your &quot;From&quot; header.</para></listitem></varlistentry>
+      <para>This page lets you specify how you present yourself to the
+	rest of the world through your email.</para>
 
-      <varlistentry><term><guilabel>Reply-To
-	    address</guilabel></term><listitem><para>The address that you wish
-	    people to reply to your email with (if you have a home and a
-	    work address, for instance).</para></listitem></varlistentry>
+      <variablelist>
+	<varlistentry><term><guilabel>Your
+	      Name</guilabel></term>
+	  <listitem><para>This doesn't
+	      <emphasis>have</emphasis> to be your name, I guess. But
+	      it's the word prefixing your email address in mail you
+	      send.</para></listitem></varlistentry>
+	
+	<varlistentry><term><guilabel>E-Mail
+	      address</guilabel></term><listitem><para>As you wish it to appear
+	      in your &quot;From&quot; header.</para></listitem></varlistentry>
 
-      <varlistentry><term><guilabel>Default
-	    domain</guilabel></term><listitem><para>The domain that you
-	    wish to append to all e-mail entries where you did not
-	    specify the domain.  Normally you would use your local
-	    domain.  You need to enable <link linkend="win-config-7">Alias Expansion</link> for this to work.
+	<varlistentry><term><guilabel>Reply-To
+	      address</guilabel></term><listitem><para>The address that you wish
+	      people to reply to your email with (if you have a home and a
+	      work address, for instance).</para></listitem></varlistentry>
+
+	<varlistentry><term><guilabel>Default
+	      domain</guilabel></term><listitem><para>The domain that you
+	      wish to append to all e-mail entries where you did not
+	      specify the domain.  Normally you would use your local
+	      domain.  You need to enable <link linkend="win-config-7">Alias Expansion</link> for this to work.
 	    </para></listitem></varlistentry>
-    </variablelist>
-  </sect1>
+      </variablelist>
+    </sect2>
 
-  <sect1 id="win-config-1">
-    <title>Signature</title>
-    
-    <para>Use this page to set up signature files and how
-      <application>Balsa</application> will use them in your
-      messages</para>
-
-    <variablelist>
-      <varlistentry>
-	<term><guilabel>Use Signature File When</guilabel></term>
-	<listitem>
-	  <variablelist>
-	    <varlistentry>
-	      <term><guilabel>Sending Mail</guilabel></term>
-	      <listitem>
-		<para>Include the signature file when sending
-		  email.</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term><guilabel>Replying to Mail</guilabel></term>
-	      <listitem>
-		<para>Include the signature file when replying to
-		  mail</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term><guilabel>Forwarding Mail</guilabel></term>
-	      <listitem>
-		<para>Include the signature file when forwarding
-		  mail</para>
-	      </listitem>
-	    </varlistentry>
-	  </variablelist>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Signature file</guilabel></term>
-	<listitem>
-	  <para>The file to append to all your messages.  You also
-	    get to control when the signature is appended.</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Reply Prefix</guilabel></term>
-	<listitem>
-	  <para>The character sequence to prefix quoted lines in a
-	    reply with</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Enable Signature Separator</guilabel></term>
-	<listitem>
-	  <para>When checked, this has
-	    <application>Balsa</application> insert the standard
-	    signature separator before your signature.</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-  </sect1>
-
-  <sect1 id="win-config-2">
-    <title>Mail Servers</title>
-
-    <para>This page lets you specify how you get POP3 mail,
-      send mail, etc.</para>
-
-    <variablelist>
-      <varlistentry><term><guilabel>Remote Mailbox
-	    Servers</guilabel></term><listitem><para>These are
-	    <acronym>POP3</acronym> servers that you receive email
-	    from. The three buttons let you create, modify, and remove
-	    records. <acronym>POP3</acronym> mailboxes will not show up in
-	    the mailbox list.  You can specify multiple servers, when adding a server you will be asked to give:
-<itemizedlist>
-      <listitem><para>mailbox name that will identify the mailbox
-	</para></listitem>
-
-      <listitem><para>The server you have the POP mailbox on.
-	</para></listitem>
-
-      <listitem><para>The port that will be used to connect to the
-	  server.  The port number is usually 110 but you may change it if
-	  you for example use some kind of connection tunneling,
-	</para></listitem>
-
-      <listitem><para>The user name on the mailbox server.
-	</para></listitem>
-
-      <listitem><para>Corresponding password.
-	</para></listitem>
+    <sect2 id="win-config-1">
+      <title>Signature</title>
       
-      <listitem><para>What does the check check box mean?</para>
-      </listitem>
+      <para>Use this page to set up signature files and how
+	<application>Balsa</application> will use them in your
+	messages</para>
 
-      <listitem><para>You can select the 'delete from server' button to
-	  remove the downoladed messages from the server.</para></listitem>
-    </itemizedlist>
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Use Signature File When</guilabel></term>
+	  <listitem>
+	    <variablelist>
+	      <varlistentry>
+		<term><guilabel>Sending Mail</guilabel></term>
+		<listitem>
+		  <para>Include the signature file when sending
+		    email.</para>
+		</listitem>
+	      </varlistentry>
 
-	    
-</para>
+	      <varlistentry>
+		<term><guilabel>Replying to Mail</guilabel></term>
+		<listitem>
+		  <para>Include the signature file when replying to
+		    mail</para>
+		</listitem>
+	      </varlistentry>
+
+	      <varlistentry>
+		<term><guilabel>Forwarding Mail</guilabel></term>
+		<listitem>
+		  <para>Include the signature file when forwarding
+		    mail</para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Signature file</guilabel></term>
+	  <listitem>
+	    <para>The file to append to all your messages.  You also
+	      get to control when the signature is appended.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Reply Prefix</guilabel></term>
+	  <listitem>
+	    <para>The character sequence to prefix quoted lines in a
+	      reply with</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Enable Signature Separator</guilabel></term>
+	  <listitem>
+	    <para>When checked, this has
+	      <application>Balsa</application> insert the standard
+	      signature separator before your signature.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="win-config-2">
+      <title>Mail Servers</title>
+
+      <para>This page lets you specify how you get POP3 mail,
+	send mail, etc.</para>
+
+      <variablelist>
+	<varlistentry><term><guilabel>Remote Mailbox
+	      Servers</guilabel></term><listitem><para>These are
+	      <acronym>POP3</acronym> servers that you receive email
+	      from. The three buttons let you create, modify, and remove
+	      records. <acronym>POP3</acronym> mailboxes will not show up in
+	      the mailbox list.  You can specify multiple servers, when adding a server you will be asked to give:
+	      <itemizedlist>
+		<listitem><para>mailbox name that will identify the mailbox
+		  </para></listitem>
+
+		<listitem><para>The server you have the POP mailbox on.
+		  </para></listitem>
+
+		<listitem><para>The port that will be used to connect to the
+		    server.  The port number is usually 110 but you may change it if
+		    you for example use some kind of connection tunneling,
+		  </para></listitem>
+
+		<listitem><para>The user name on the mailbox server.
+		  </para></listitem>
+
+		<listitem><para>Corresponding password.
+		  </para></listitem>
+		
+		<listitem><para>What does the check check box mean?</para>
+		</listitem>
+
+		<listitem><para>You can select the 'delete from server' button to
+		    remove the downoladed messages from the server.</para></listitem>
+	      </itemizedlist>
+
+	      
+	    </para>
 
 
-</listitem></varlistentry>
+	  </listitem></varlistentry>
 
-      <varlistentry><term><guilabel>Local Mail
-	    Directory</guilabel></term><listitem><para>This is the directory
-	    that <application>Balsa</application> will scan looking for
-	    mail folders.</para></listitem></varlistentry>
+	<varlistentry><term><guilabel>Local Mail
+	      Directory</guilabel></term><listitem><para>This is the directory
+	      that <application>Balsa</application> will scan looking for
+	      mail folders.</para></listitem></varlistentry>
 
-      <varlistentry><term><guilabel>Remote SMTP
-	    Server</guilabel></term><listitem><para>If your computer is not
-	    equipped with sendmail or you do not wish to use it, select
-	    this radio button and enter a host name to contact via
-	    SMTP.  </para></listitem></varlistentry>
+	<varlistentry><term><guilabel>Remote SMTP
+	      Server</guilabel></term><listitem><para>If your computer is not
+	      equipped with sendmail or you do not wish to use it, select
+	      this radio button and enter a host name to contact via
+	      SMTP.  </para></listitem></varlistentry>
 
-      <varlistentry><term><guilabel>Local Mail User
-	    Agent</guilabel></term><listitem><para><application>Balsa</application>
-	    will attempt to use sendmail to send mail. Unfortunately, you
-	    cannot specify the command to execute right now.</para></listitem></varlistentry>
-    </variablelist>
-  </sect1>
-  
-  <sect1 id="win-config-3">
-    <title>Mail Options</title>
+	<varlistentry><term><guilabel>Local Mail User
+	      Agent</guilabel></term><listitem><para><application>Balsa</application>
+	      will attempt to use sendmail to send mail. Unfortunately, you
+	      cannot specify the command to execute right now.</para></listitem></varlistentry>
+      </variablelist>
+    </sect2>
+    
+    <sect2 id="win-config-3">
+      <title>Mail Options</title>
 
-    <para>Use this page to set the
-      <application>Balsa</application>'s behaviour regarding incoming
-      and outgoing messages.</para>
+      <para>Use this page to set the
+	<application>Balsa</application>'s behaviour regarding incoming
+	and outgoing messages.</para>
 
-    <sect2>
+    <sect3>
       <title>Incoming</title>
       
       <variablelist>
@@ -1395,10 +1618,34 @@
 	    </warning>
 	  </listitem>
 	</varlistentry>
-      </variablelist>
-    </sect2>
 
-    <sect2>
+	<varlistentry>
+	  <term>
+	    <guilabel>Quoted Text Regular Expression</guilabel>
+	  </term>
+
+	  <listitem>
+	    <para>The entry box allows you to set a <link
+							  linkend="glossary-regular-expression">regular
+		expression</link> you would like to use to identify text
+	      that should be considered quoted for incoming messages.
+	      The regular expression should match the beginning of line
+	      of quoted text a single level deep, the program will then
+	      use this to calculate the depth of quoting and alter the
+	      quoted text colours appropriately.  A default
+	      <abbrev>regex</abbrev> is provided that should work in
+	      most situations.  </para>
+
+	    <para>This regex affects both highlighting and spell
+	      checking, and uses the extended regular expression set.
+	      For more information see the <command>grep</command>(1)
+	      manual or info page.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect3>
+
+    <sect3>
       <title>Outgoing</title>
       
       <variablelist>
@@ -1418,258 +1665,347 @@
 	  </listitem>
 	</varlistentry>
       </variablelist>
+    </sect3>
+  </sect2>
+
+    <sect2 id="win-config-4">
+      <title>Display</title>
+      
+      <para>This page controls how <application>Balsa</application>
+	appears to you.</para>
+      
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Use Preview Pane</guilabel></term>
+	  <listitem>
+	    <para>Set whether to use the preview pane to display
+	      messages, or rely on the separate mail viewing
+	      window.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Show Mailbox Info</guilabel></term>
+	  <listitem>
+	    <para>If <application>Balsa</application> was compiled
+	      with <command>--enable-info</command>, this will allow the
+	      number of total and unread messages for each mailbox to be
+	      shown in the left pane of the
+	      <application>Balsa</application> main window.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Toolbars</guilabel></term>
+	  <listitem>
+	    <para>Use this to determine whether
+	      <application>Balsa</application>'s toolbars display only
+	      text, only icons, or both text and icons.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Display Progress</guilabel></term>
+	  <listitem>
+	    <para>This sets the behaviour of the dialog that is shown
+	      when <application>Balsa</application> retrieves messages
+	      from it's specified <acronym>POP3</acronym> servers.  The
+	      dialog can be shown only while the messages are being
+	      retrieved, automatically closing after
+	      <application>Balsa</application> is finished.  Or it can
+	      be set to stay active until manually closed.  Finally, the
+	      dialog can not be displayed at all.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Date Encoding</guilabel></term> 
+	  <listitem>
+	    <para>Set the format used to display dates in
+	      <application>Balsa</application>.  This uses the same
+	      format string as <function>strftime</function>, a summary
+	      which is provided below:
+
+	      <itemizedlist>
+
+		<listitem>
+		  <para><literal>%a</literal> &mdash; The abbreviated
+		    weekday name.</para>
+		</listitem>
+
+		<listitem>
+		  <para><literal>%A</literal> &mdash; The full weekday
+		    name.</para>
+		</listitem>
+
+		<listitem>
+		  <para><literal>%b</literal> &mdash; The abbreviated
+		    month name.</para>
+		</listitem>
+
+		<listitem>
+		  <para><literal>%B</literal> &mdash; The full month
+		    name.</para>
+		</listitem>
+
+		<listitem>
+		  <para><literal>%d</literal> &mdash; The day of the
+		    month.</para>
+		</listitem>
+
+		<listitem>
+		  <para><literal>%R</literal> &mdash; The time using a
+		    24-hour clock. (HH:MM)</para>
+		</listitem>
+
+		<listitem>
+		  <para><literal>%r</literal> &mdash; The time using a
+		    12-hour clock (HH:MM AM/PM).</para>
+		</listitem>
+
+		<listitem>
+		  <para><literal>%T</literal> &mdash; The time using a
+		    24-hour clock, with seconds (HH:MM:SS).</para>
+		</listitem>
+
+	      </itemizedlist>
+
+	      <tip>
+		<para>See the <function>strftime</function> manual
+		  page for a full listing of conversion
+		  specifiers.</para>
+	      </tip>
+
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term><guilabel>Displayed Headers</guilabel></term>
+	  <listitem>
+	    <para>A space-separated list of the headers to display in
+	      the message window.</para>
+	  </listitem>
+	</varlistentry>
+	
+      </variablelist>
     </sect2>
-  </sect1>
 
-  <sect1 id="win-config-4">
-    <title>Display</title>
-    
-    <para>This page controls how <application>Balsa</application>
-      appears to you.</para>
-    
-    <variablelist>
-      <varlistentry>
-	<term><guilabel>Use Preview Pane</guilabel></term>
-	<listitem>
-	  <para>Set whether to use the preview pane to display
-	    messages, or rely on the separate mail viewing
-	    window.</para>
-	</listitem>
-      </varlistentry>
+    <sect2 id="win-config-5">
+      <title>Printing</title>
 
-      <varlistentry>
-	<term><guilabel>Show Mailbox Info</guilabel></term>
-	<listitem>
-	  <para>If <application>Balsa</application> was compiled
-	    with <command>--enable-info</command>, this will allow the
-	    number of total and unread messages for each mailbox to be
-	    shown in the left pane of the
-	    <application>Balsa</application> main window.</para>
-	</listitem>
-      </varlistentry>
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Print Command</guilabel></term>
+	  <listitem>
+	    <para>The command executed when the print button is
+	      pressed.  The message text in the command is signified by
+	      &quot;%s&quot;.</para>
+	  </listitem>
+	</varlistentry>
 
-      <varlistentry>
-	<term><guilabel>Toolbars</guilabel></term>
-	<listitem>
-	  <para>Use this to determine whether
-	    <application>Balsa</application>'s toolbars display only
-	    text, only icons, or both text and icons.</para>
-	</listitem>
-      </varlistentry>
+	<varlistentry>
+	  <term><guilabel>Break Line</guilabel></term>
+	  <listitem>
+	    <para>Whether to break the output line at a specified
+	      column, or to let the printing program do the wrapping to
+	      the page.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
 
-      <varlistentry>
-	<term><guilabel>Display Progress</guilabel></term>
-	<listitem>
-	  <para>This sets the behaviour of the dialog that is shown
-	    when <application>Balsa</application> retrieves messages
-	    from it's specified <acronym>POP3</acronym> servers.  The
-	    dialog can be shown only while the messages are being
-	    retrieved, automatically closing after
-	    <application>Balsa</application> is finished.  Or it can
-	    be set to stay active until manually closed.  Finally, the
-	    dialog can not be displayed at all.
-	  </para>
-	</listitem>
-      </varlistentry>
+    <sect2 id="win-config-6">
+      <title>Spelling</title>
 
-      <varlistentry>
-	<term><guilabel>Date Encoding</guilabel></term> 
-	<listitem>
-	  <para>Set the format used to display dates in
-	    <application>Balsa</application>.  This uses the same
-	    format string as <function>strftime</function>, a summary
-	    which is provided below:
+      <para>The pane to setup Balsa spell check options.  Balsa uses the
+	Portable Spell Checking library (<ulink
+						url="http://pspell.sourceforge.net">pspell</ulink>) to do provide
+	an interface to the spell checking program of your choice.
+	Currently there are modules for ispell or aspell, both of which
+	can be found at the pspell website.  For more information visit
+	the Balsa homepage.</para>
 
-	    <itemizedlist>
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Pspell Module</guilabel></term>
 
-	      <listitem>
-		<para><literal>%a</literal> &mdash; The abbreviated
-		  weekday name.</para>
-	      </listitem>
+	  <listitem>
+	    <para>The Pspell library allows you to use whatever spell
+	      checking engine you prefer, though the use of loadable
+	      modules.  Currently Pspell has support for two modules, the
+	      traditional ispell, and the newer and more advanced
+	      aspell.</para>
 
-	      <listitem>
-		<para><literal>%A</literal> &mdash; The full weekday
-		  name.</para>
-	      </listitem>
+	    <para>Ispell is most likely available on your system as it
+	      is a Unix standard, however Aspell is more advanced as it
+	      uses an advanced phonetics engine and adaptive techniques to
+	      learn how you tend to misspell words.  More information is
+	      available at the <ulink
+				      url="http://aspell.sourceforge.net">Aspell
+		website</ulink>.</para>
 
-	      <listitem>
-		<para><literal>%b</literal> &mdash; The abbreviated
-		  month name.</para>
-	      </listitem>
+	    <para>Balsa will attempt to use whatever module you specify
+	      here, however if the module is not installed it will not
+	      work and generate an error.</para>
+	  </listitem>
+	</varlistentry>
 
-	      <listitem>
-		<para><literal>%B</literal> &mdash; The full month
-		  name.</para>
-	      </listitem>
+	<varlistentry>
+	  <term><guilabel>Suggestion Mode</guilabel></term>
 
-	      <listitem>
-		<para><literal>%d</literal> &mdash; The day of the
-		  month.</para>
-	      </listitem>
+	  <listitem>
+	    <para>The suggestion mode determines how hard the computer
+	      will search for suggestions for misspelled words.  There are
+	      three options:</para>
 
-	      <listitem>
-		<para><literal>%R</literal> &mdash; The time using a
-		  24-hour clock. (HH:MM)</para>
-	      </listitem>
+	    <variablelist>
+	      <varlistentry>
+		<term><guilabel>Fast</guilabel></term>
 
-	      <listitem>
-		<para><literal>%r</literal> &mdash; The time using a
-		  12-hour clock (HH:MM AM/PM).</para>
-	      </listitem>
+		<listitem>
+		  <para>This mode quickly scans for replacements, which
+		    means it might be used by a good speller who
+		    occaisonally makes typographical errors.</para>
+		</listitem>
+	      </varlistentry>
 
-	      <listitem>
-		<para><literal>%T</literal> &mdash; The time using a
-		  24-hour clock, with seconds (HH:MM:SS).</para>
-	      </listitem>
+	      <varlistentry>
+		<term><guilabel>Normal</guilabel></term>
 
-	    </itemizedlist>
+		<listitem>
+		  <para>The Normal mode is probably good enough for most
+		    people, it should produce the correct suggestion in
+		    the majority of cases.</para>
+		</listitem>
+	      </varlistentry>
 
-	    <tip>
-	      <para>See the <function>strftime</function> manual
-		page for a full listing of conversion
-		specifiers.</para>
-	    </tip>
+	      <varlistentry>
+		<term><guilabel>Bad Spellers</guilabel></term>
 
-	  </para>
-	</listitem>
-      </varlistentry>
+		<listitem>
+		  <para>The Bad Spellers mode is the most thourough and
+		    accurate mode, however it also takes the longest to
+		    find a list of suggestions.</para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Ignore Length</guilabel></term>
+
+	  <listitem>
+	    <para>This provides the ability to ignore words shorter than
+	      a certain length.  It may be useful to automatically skip
+	      short acronyms that are normally flagged as incorrect.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="win-config-7">
+      <title>Encoding</title>
+
+      <para>Set <application>Balsa</application>'s character set
+	encoding.</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Charset</guilabel></term>
+	  <listitem>
+	    <para>A string representing the character set for
+	      <application>Balsa</application> to use to use by
+	      default.</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guilabel>Encoding</guilabel></term>
+	  <listitem>
+	    <para>Set the character encoding method to either 7 bit, 8
+	      bit, or what the quoted message is using.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="win-config-8">
+      <title>Misc</title>
       
-      <varlistentry>
-	<term><guilabel>Displayed Headers</guilabel></term>
-	<listitem>
-	  <para>A space-separated list of the headers to display in
-	    the message window.</para>
-	</listitem>
-      </varlistentry>
-      
-    </variablelist>
-  </sect1>
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Debug</guilabel></term>
+	  <listitem>
+	    <para>Toggle the output of debugging information.  Depending
+	      on what notification priority set for it in the <link
+								    linkend="win-config-4">Display</link> page, it can show up
+	      in list or dialog as the program runs.
+	  </listitem>
+	</varlistentry>
 
-  <sect1 id="win-config-5">
-    <title>Printing</title>
+	<varlistentry>
+	  <term><guilabel>Empty Trash on Exit</guilabel></term>
+	  <listitem>
+	    <para>Set Balsa to delete all messages in the
+	      <symbol>Trash</symbol> mailbox when Balsa exits.</para>
+	  </listitem>
+	</varlistentry>
 
-    <variablelist>
-      <varlistentry>
-	<term><guilabel>Print Command</guilabel></term>
-	<listitem>
-	  <para>The command executed when the print button is
-	    pressed.  The message text in the command is signified by
-	    &quot;%s&quot;.</para>
-	</listitem>
-      </varlistentry>
+	<varlistentry>
+	  <term><guilabel>Preview Pane Font</guilabel></term>
+	  <listitem>
+	    <para>The font used to display the text of the message in
+	      the preview pane.</para>
+	  </listitem>
+	</varlistentry>
 
-      <varlistentry>
-	<term><guilabel>Break Line</guilabel></term>
-	<listitem>
-	  <para>Whether to break the output line at a specified
-	    column, or to let the printing program do the wrapping to
-	    the page.</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-  </sect1>
+	<varlistentry>
+	  <term><guilabel>Unread Mailbox Colour</guilabel></term>
+	  <listitem>
+	    <para>Set the colour of mailboxes that contain unread
+	      messages.</para>
+	  </listitem>
+	</varlistentry>
 
-  <sect1 id="win-config-6">
-    <title>Encoding</title>
-
-    <para>Set <application>Balsa</application>'s character set
-      encoding.</para>
-
-    <variablelist>
-      <varlistentry>
-	<term><guilabel>Charset</guilabel></term>
-	<listitem>
-	  <para>A string representing the character set for
-	    <application>Balsa</application> to use to use by
-	    default.</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Encoding</guilabel></term>
-	<listitem>
-	  <para>Set the character encoding method to either 7 bit, 8
-	    bit, or what the quoted message is using.</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-  </sect1>
-
-  <sect1 id="win-config-7">
-    <title>Misc</title>
-    
-    <variablelist>
-      <varlistentry>
-	<term><guilabel>Debug</guilabel></term>
-	<listitem>
-	  <para>Set the display of debugging output to the
-	    console.</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Empty Trash on Exit</guilabel></term>
-	<listitem>
-	  <para>Set
-	    <productname><application>Balsa</application></productname>
-	    to delete all messages in the <symbol>Trash</symbol>
-	    mailbox when
-	    <productname><application>Balsa</application></productname>
-	    exits.</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Preview Pane Font</guilabel></term>
-	<listitem>
-	  <para>The font used to display the text of the message in
-	    the preview pane.</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Unread Mailbox Colour</guilabel></term>
-	<listitem>
-	  <para>Set the colour of mailboxes that contain unread
-	    messages.</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><guilabel>Expand aliases as you type</guilabel></term>
-	<listitem>
-	  <para>This will expand aliases as you type them.  Read
-	    more about this feature in the <link linkend="ct-alias-expansion">
-	    Alias Expansion</link>
+	<varlistentry>
+	  <term><guilabel>Expand aliases as you type</guilabel></term>
+	  <listitem>
+	    <para>This will expand aliases as you type them.  Read
+	    more about this feature in the <link
+	    linkend="ct-alias-expansion"> Alias Expansion</link>
 	    section.</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-  </sect1>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
 
-  <sect1 id="win-config-8">
-    <title>Startup</title>
+    <sect2 id="win-config-9">
+      <title>Startup</title>
 
-    <variablelist>
-      <varlistentry>
-	<term><guilabel>Check Mail at Startup</guilabel></term>
-	<listitem>
-	  <para>If set, <application>Balsa</application> will
-	    automatically attempt to download mail from the
-	    <acronym>POP3</acronym> mail server upon startup.</para>
-	</listitem>
-      </varlistentry>
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Check Mail at Startup</guilabel></term>
+	  <listitem>
+	    <para>If set, <application>Balsa</application> will
+	      automatically attempt to download mail from the
+	      <acronym>POP3</acronym> mail server upon startup.</para>
+	  </listitem>
+	</varlistentry>
 
-      <varlistentry>
-	<term><guilabel>Remember Open Mailboxes Between
-	Sessions</guilabel></term>
-	<listitem>
-	  <para>When marked, <application>Balsa</application> will
-	  remember and reopen mailboxes that were open when
-	  <application>Balsa</application> was last quit.</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
+	<varlistentry>
+	  <term><guilabel>Remember Open Mailboxes Between
+	      Sessions</guilabel></term>
+	  <listitem>
+	    <para>When marked, <application>Balsa</application> will
+	      remember and reopen mailboxes that were open when
+	      <application>Balsa</application> was last quit.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
   </sect1>
 
   <sect1 id="common-tasks">
@@ -1773,7 +2109,7 @@
 	it will do a case insensitive search in the addressbook for
 	a matching username, and fill in the best match.  This is best
 	demonstrated with the following picture:
-	<graphic fileref="images/example-alias.png" format="png" srccredit="Berend De Schouwer" align="center"></graphic>
+	<graphic fileref="images/example-alias" format="png" srccredit="Berend De Schouwer" align="center"></graphic>
 	The example shows what it looks like if
 	<quote>Balsa Mailing List</quote> is in your addressbook, and you
 	have typed &quot;ba&quot;
@@ -1795,7 +2131,7 @@
 	have to type the local domain in again.</para>
 
       <para>
-        To enable this feature, tag it in the <link linkend="win-config-7">
+        To enable this feature, tag it in the <link linkend="win-config-8">
 	Preferences</link> dialog.
       </para>
     </sect2>
@@ -2012,6 +2348,18 @@
 	  pane.</para></glossdef>
     </glossentry>
 
+    <glossentry id="glossary-regular-expression">
+      <glossterm>regular expression</glossterm>
+      <glossdef>
+	<para>Often abbreviated as a <abbrev>regex</abbrev>, this is a
+	method of specifing a pattern to match in text.  Both very
+	simple and very complex patterns can be easily matched using
+	this method.  For information on how to understand and
+	construct regular expressions the best source is the grep
+	manual or info page.</para>
+      </glossdef>
+    </glossentry>
+    
   </glossary>
 </article>
 

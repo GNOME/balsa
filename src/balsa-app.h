@@ -281,6 +281,7 @@ void update_timer( gboolean update, guint minutes );
 
 gchar* ask_password(LibBalsaServer* server, LibBalsaMailbox *mbox);
 GtkWidget* gnome_stock_button_with_label (const char* icon, const char* label);
+void set_tooltip (GtkWidget* widget, const gchar* tip);
 LibBalsaMailbox *balsa_find_mbox_by_name (const gchar *name);
 
 #endif /* __BALSA_APP_H__ */

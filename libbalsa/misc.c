@@ -443,6 +443,7 @@ libbalsa_make_string_from_list (GList * the_list)
 	return retc;
 }
 
+
 /* readfile allocates enough space for the ending '\0' characeter as well.
    returns the number of read characters.
 */

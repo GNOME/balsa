@@ -181,7 +181,7 @@ libbalsa_message_send (LibBalsaMessage * message)
 
 	pthread_mutex_lock( &send_messages_lock );
 	if (sending_mail == FALSE ) {
-/* We create here the progress bar */
+                /* We create here the progress bar */
 		send_dialog = gnome_dialog_new("Sending Mail...", "Hide", NULL);
 
 		gnome_dialog_set_close(GNOME_DIALOG(send_dialog), TRUE);
@@ -198,7 +198,7 @@ libbalsa_message_send (LibBalsaMessage * message)
 				   send_dialog_bar, FALSE, FALSE, 0);
 							      
 		gtk_widget_show_all( send_dialog );
-/* Progress bar done */
+                /* Progress bar done */
 #endif
 
 		last_message = first_message;
@@ -897,20 +897,32 @@ libbalsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int q
 	HEADER *msg_tmp;
 	MESSAGE *mensaje;
 	LIST *in_reply_to;
+        LIST *references;
 	LibBalsaMessageBody *body;
-
+        GList* list;
 	gchar** mime_type;
+
 	
 	message2HEADER(message, msg);
 
 	/* If the message has references set, add them to he envelope */
-	if (message->references != NULL) {        
-		msg->env->references = mutt_new_list ();
-		msg->env->references->next = NULL;
-		msg->env->references->data =  g_strdup (message->references);
+	if (message->references != NULL) {
+                list = message->references;
+                msg->env->references = mutt_new_list ();
+                references = msg->env->references;
+                references->data = g_strdup (list->data);
+                list = list->next;
 
-		/* There's no specific header for In-Reply-To, just add it to the user
-		 * headers */
+                while (list != NULL) {
+                        references->next = mutt_new_list ();
+                        references = references->next;
+                        references->data = g_strdup(list->data);
+                        references->next = NULL;
+                        list = list->next;
+                }
+
+		/* There's no specific header for In-Reply-To, just
+		 * add it to the user headers */
 		in_reply_to = mutt_new_list ();
 		in_reply_to->next = msg->env->userhdrs;
 		in_reply_to->data = g_strconcat("In-Reply-To: ", message->in_reply_to, NULL);
@@ -937,8 +949,8 @@ libbalsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int q
 					  body->filename);
 			} else {
 
-				/* Do this here because we don't want to use libmutt's mime
-				 * types */
+				/* Do this here because we don't want
+				 * to use libmutt's mime types */
 				mime_type = libbalsa_lookup_mime_type ((const gchar*)body->filename);
 				newbdy->type = mutt_check_mime_type (mime_type[0]);
 				g_free (newbdy->subtype);

@@ -1,0 +1,43 @@
+===================
+Balsa Documentation
+===================
+
+September 10, 2000
+
+by Matthew Guenther
+
+
+Building SGML:
+=============
+
+In order to properly build the balsa.sgml into the html, ps, or pdf
+files, the GNOME Documentation Project DTD and stylesheets must be
+available and properly set up.  If they are not there the images will
+not work correctly. For instructions on doing this, see the GDP
+handbook:
+
+http://developer.gnome.org/projects/gdp/handbook.html
+
+Also, in order to succesfully build the postscript or pdf versions of
+the manual, the images must be converted into Encapsulated Post Script
+(eps) files.  The makefile expects a script, img2eps to be present to
+do this conversion.  It uses the ImageMagick library and is also
+available from the GDP website:
+
+http://people.redhat.com/dcm/img2eps
+
+
+Writing SGML:
+============
+
+Before contributing to the manual it is a genuinely good idea to read
+the GDP handbook mentioned above, it details the standards and
+procedures by which all GNOME documentation is governed.  
+
+Of particular importance is how to mark up images, the filename(s)
+should not be given extentions in the tag.  This is because the
+stylesheet will add the appropriate extension depending on whether it
+is being built for html or postscript.  
+
+Also, if you need help you can try the GDP mailing list,
+gnome-doc-list@gnome.org, or on IRC at irc.gnome.org, in #docs.

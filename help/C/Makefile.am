@@ -11,14 +11,16 @@ balsa_help_DATA = \
 	topic.dat \
 	index.html
 
+NUM_PREF_PAGES = 9
+
 # Only build html by default
 all: index.html
 
 # This is where the SGML bit is cool
-
 index.html: $(SGML_FILES)
 	-db2html $<
 	-cp balsa/index.html index.html
+	-cd balsa && ../win-config-gen $(NUM_PREF_PAGES)
 
 balsa.ps: $(SGML_FILES)
 	-db2ps $<
@@ -27,7 +29,6 @@ balsa.rtf: $(SGML_FILES)
 	-db2rtf $<
 
 # Dist / install hook thingies
-
 dist-hook:
 	mkdir $(distdir)/balsa
 	-cp balsa/*.html $(distdir)/balsa

@@ -83,8 +83,8 @@ struct _LibBalsaMessage
 	/* File Carbon Copy Mailbox */
 	gchar *fcc_mailbox;
 
-	/* replied message ID */
-	gchar *references;
+	/* replied message ID's */
+	GList *references;
 
 	/* replied message ID; from address on date*/
 	gchar *in_reply_to;

@@ -195,13 +195,15 @@ static void
 libbalsa_message_destroy(GtkObject *object)
 {
 	LibBalsaMessage *message;
-  
+        GList* list;
+        
 	g_return_if_fail(object != NULL);
 	g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
   
 	message = LIBBALSA_MESSAGE(object);
 
-	g_free (message->remail);                      		message->remail = NULL;
+	g_free (message->remail);                      		
+        message->remail = NULL;
 
 	if ( message->from ) {
 		gtk_object_destroy (GTK_OBJECT(message->from));         
@@ -228,10 +230,19 @@ libbalsa_message_destroy(GtkObject *object)
 	g_list_free(message->bcc_list);
 	message->bcc_list = NULL;
 
-	g_free (message->subject);                     		message->subject = NULL;
-	g_free (message->references);                  		message->references = NULL;
+	g_free (message->subject); 
+        message->subject = NULL;
+
+        for (list = message->references; list; list = list->next) {
+                if (list->data)
+                        g_free (list->data);
+        }
+        
+        message->references = NULL;
+
 	g_free (message->in_reply_to);                 		message->in_reply_to = NULL;
 	g_free (message->message_id);                  		message->message_id = NULL;
+
 
 	libbalsa_message_body_free (message->body_list);
 	message->body_list = NULL;

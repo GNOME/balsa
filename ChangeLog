@@ -1,3 +1,32 @@
+2000-09-14  Matthew Guenther  <guentherm@asme.org>
+	
+	* help/C/balsa.sgml: Some updates to reflect changed features.
+	Fixed screenshot graphic tags, they should _not_ include the .png
+	extension.  It gets taken care of by the stylesheet and is
+	essential for portability to postscript.  The stylesheet to use is
+	not the default cygnus one, but the Gnome Documentation Project
+	one, gdp-both.dsl.
+	* help/C/win-config-gen: Shell script to generate HTML redirect
+	files to get around GNOME's broken context sensitive help.
+	* help/C/Makefile.am: Add call to win-config-gen
+	* help/C/README: Instructions for properly building the
+	documentation from SGML and recommendations for modifying the
+	manual.
+	* help/C/images/*: Updated and new images for manual.  Screenshots
+	fixed to conform with GDP standards (Sawfish, microGUI, Default
+	Gtk+ theme).
+	* libbalsa/mailbox.c: Load references header properly.
+	* libbalsa/message.[ch]: Changed References header to be a list of
+	message id's, not just one.  
+	* libbalsa/send.c: Use list of references instead of single entry.
+	* src/balsa-app.[ch]: Added function set_tooltip, should be used
+	everywhere to add easy tooltips to most widgets.
+	* src/sendmsg-window.c: Changed toolbar button from "Spelling" to
+	"Check Spelling", for clarity.  Fixed References: header
+	implementation.
+	* src/spell-check.c (balsa_spell_check_init): Added tooltips to
+	the control buttons.
+
 2000-09-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/address-book.c: set parent properly when called from

@@ -134,7 +134,9 @@ void fr_dialog_response(GtkWidget * widget, gint response,
     switch (response) {
     case GTK_RESPONSE_APPLY:    /* Apply button */
 	if (!run_filters_on_mailbox(p->selected_filters,p->mbox))
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when applying filters"));
+	    balsa_information_parented(GTK_WINDOW(widget),
+		    LIBBALSA_INFORMATION_ERROR,
+		    _("Error when applying filters"));
 	return;
     case GTK_RESPONSE_OK:       /* OK button */
 	save_filters(p);
@@ -150,7 +152,8 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 	err = NULL;
 	gnome_help_display("balsa", "win-run-filters", &err);
 	if (err) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
+	    balsa_information_parented(GTK_WINDOW(widget),
+		    LIBBALSA_INFORMATION_WARNING,
 		    _("Error displaying run filters help: %s\n"),
 		    err->message);
 	    g_error_free(err);

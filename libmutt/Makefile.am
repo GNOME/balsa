@@ -5,11 +5,12 @@ noinst_LIBRARIES = libmutt.a
 libmutt_a_SOURCES = \
 	attach.c 	\
 	buffy.c 	\
+	charset.c 	\
 	copy.c 		\
 	date.c 		\
 	dotlock.c	\
 	filter.c 	\
-	flaglib.c 	\
+	flags.c 	\
 	from.c 		\
 	getdomain.c	\
 	globals.c 	\
@@ -29,7 +30,7 @@ libmutt_a_SOURCES = \
 	rfc822.c 	\
 	score.c 	\
 	sendlib.c 	\
-	sigblock.c 	\
+	signal.c 	\
 	socket.c	\
 	sort.c 		\
 	system.c 	\
@@ -37,6 +38,7 @@ libmutt_a_SOURCES = \
 	acconfig.h	\
 	attach.h	\
 	buffy.h		\
+	charset.h 	\
 	copy.h		\
 	dotlock.h	\
 	functions.h	\
@@ -66,5 +68,5 @@ libmutt_a_SOURCES = \
 	thread_msgs.h
 
 #CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT -DVERSION=\"$(VERSION)\"
-CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DLIBMUTT
+CPPFLAGS=-DSHAREDIR=\"$(sharedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DLIBMUTT
 INCLUDES=-I.

@@ -1,5 +1,8 @@
-2004-08-26 11:59  PeterB
+2004-08-26 16:48  PeterB
 
+	* libbalsa/body.c, src/balsa-message.c: default content-disposition
+	for text/plain is in-line; implement add_multipart_digest; both
+	changes needed to display complete digests.
 	* libbalsa/: mailbox_imap.c, mailbox_imap.h: use "imap://..." url
 	even when server->use_ssl is set.
 	* libbalsa/mailbox_mbox.c: be a little more careful when parsing.

@@ -1,5 +1,6 @@
-2005-03-22 06:09  PeterB
+2005-03-22 09:56  PeterB
 
+	* src/sendmsg-window.c: more appropriate version checks.
 	* libbalsa/libbalsa-conf.c: organize key-file info into structures.
 
 2005-03-21 08:08  PeterB

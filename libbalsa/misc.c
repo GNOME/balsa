@@ -1591,8 +1591,10 @@ libbalsa_window_select_all(GtkWindow * window)
         GtkTreeSelection *selection =
             gtk_tree_view_get_selection(GTK_TREE_VIEW(focus_widget));
         if (gtk_tree_selection_get_mode(selection) ==
-            GTK_SELECTION_MULTIPLE)
+            GTK_SELECTION_MULTIPLE) {
+            gtk_tree_view_expand_all(GTK_TREE_VIEW(focus_widget));
             gtk_tree_selection_select_all(selection);
+	}
 #ifdef    HAVE_GTKHTML
     } else if (libbalsa_html_can_select(focus_widget)) {
 	libbalsa_html_select_all(focus_widget);

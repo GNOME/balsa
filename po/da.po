@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 2000-02-14 13:53+0100\n"
+"POT-Creation-Date: 2000-02-16 22:06+0100\n"
 "PO-Revision-Date: 2000-02-14 14:05+01:00\n"
 "Last-Translator: Birger Langkjer <birger.langkjer@image.dk>\n"
 "Language-Team: Danish <sslug-locale@sslug.dk>\n"
@@ -132,8 +132,8 @@ msgid "Save"
 msgstr "Gem"
 
 #: src/balsa-message.c:164 src/mailbox-conf.c:632 src/sendmsg-window.c:113
-#: src/sendmsg-window.c:325 src/sendmsg-window.c:1002
-#: src/sendmsg-window.c:1321 src/sendmsg-window.c:1344
+#: src/sendmsg-window.c:327 src/sendmsg-window.c:1004
+#: src/sendmsg-window.c:1323 src/sendmsg-window.c:1346
 msgid "Cancel"
 msgstr "Annullér"
 
@@ -153,13 +153,13 @@ msgstr "Dato:"
 
 #. From:
 #: src/balsa-message.c:530 src/filter-edit-dialog.c:339
-#: src/sendmsg-window.c:461
+#: src/sendmsg-window.c:463
 msgid "From:"
 msgstr "Fra:"
 
 #. To:
 #: src/balsa-message.c:544 src/filter-edit-dialog.c:327
-#: src/sendmsg-window.c:435
+#: src/sendmsg-window.c:437
 msgid "To:"
 msgstr "Til:"
 
@@ -176,7 +176,7 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:576 src/sendmsg-window.c:481
+#: src/balsa-message.c:576 src/sendmsg-window.c:483
 msgid "Subject:"
 msgstr "Emne:"
 
@@ -237,7 +237,7 @@ msgstr "Find tekst:"
 msgid "Add"
 msgstr "Tilføj"
 
-#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:246
+#: src/filter-edit-dialog.c:427 src/sendmsg-window.c:248
 msgid "Remove"
 msgstr "Fjern"
 
@@ -1104,15 +1104,15 @@ msgstr "_Hebraisk (ISO-8859-8)"
 msgid "_Turkish (ISO-8859-9)"
 msgstr "_Tyrkisk (ISO-8859-9)"
 
-#: src/sendmsg-window.c:199
+#: src/sendmsg-window.c:201
 msgid "_Show"
 msgstr "_Vis"
 
-#: src/sendmsg-window.c:200
+#: src/sendmsg-window.c:202
 msgid "_ISO Charset"
 msgstr "_ISO tegnsæt"
 
-#: src/sendmsg-window.c:297
+#: src/sendmsg-window.c:299
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -1120,91 +1120,91 @@ msgstr ""
 "Vedhæftningsikonen (balsa/attachment.png) kunne ikke findes.\n"
 "Det betyder desværre at du ikke kan vedhæfte filer.\n"
 
-#: src/sendmsg-window.c:299
+#: src/sendmsg-window.c:301
 msgid "OK"
 msgstr "OK"
 
-#: src/sendmsg-window.c:315
+#: src/sendmsg-window.c:317
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Kan ikke skaffe information om filen '%s': %s\n"
 
-#: src/sendmsg-window.c:319
+#: src/sendmsg-window.c:321
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Bilaget er ikke en almindelig fil: '%s'\n"
 
-#: src/sendmsg-window.c:363
+#: src/sendmsg-window.c:365
 msgid "Attach file"
 msgstr "Vedhæft bilag"
 
 #. cc:
-#: src/sendmsg-window.c:491
+#: src/sendmsg-window.c:493
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:517
+#: src/sendmsg-window.c:519
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:543
+#: src/sendmsg-window.c:545
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Attachment list
-#: src/sendmsg-window.c:571
+#: src/sendmsg-window.c:573
 msgid "Attachments:"
 msgstr "Bilag:"
 
-#: src/sendmsg-window.c:683
+#: src/sendmsg-window.c:685
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:692
+#: src/sendmsg-window.c:694
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "Den %s skrev %s:\n"
 
-#: src/sendmsg-window.c:694
+#: src/sendmsg-window.c:696
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:756
+#: src/sendmsg-window.c:758
 msgid "Reply to "
 msgstr "Svar til "
 
-#: src/sendmsg-window.c:761
+#: src/sendmsg-window.c:763
 msgid "Forward message"
 msgstr "Videresend brev"
 
-#: src/sendmsg-window.c:766
+#: src/sendmsg-window.c:768
 msgid "Continue message"
 msgstr "Fortsæt brev"
 
-#: src/sendmsg-window.c:771
+#: src/sendmsg-window.c:773
 msgid "New message"
 msgstr "Nyt brev"
 
-#: src/sendmsg-window.c:1001
+#: src/sendmsg-window.c:1003
 msgid "Could not open the file.\n"
 msgstr "Kunne ikke åbne filen.\n"
 
-#: src/sendmsg-window.c:1007
+#: src/sendmsg-window.c:1009
 msgid "Loading..."
 msgstr "Indlæser..."
 
-#: src/sendmsg-window.c:1032
+#: src/sendmsg-window.c:1034
 msgid "Include file"
 msgstr "Inkludér fil"
 
-#: src/sendmsg-window.c:1319
+#: src/sendmsg-window.c:1321
 msgid "Cannot execute print command."
 msgstr "Kan ikke udføre printerkommando."
 
-#: src/sendmsg-window.c:1343
+#: src/sendmsg-window.c:1345
 msgid "Error executing lpr"
 msgstr "Fejl under køring af lpr"
 

@@ -1,3 +1,7 @@
+2002-04-11 Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/spell-check.[hc]: make spell checking work.
+
 2002-04-11  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/print.c: compile with new 2.0 API.

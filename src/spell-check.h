@@ -48,9 +48,6 @@ extern "C" {
 	GtkFrame frame;
 
 	GtkTextView *view;
-        /* GtkTextBuffer doesn't seem to know about fonts!
-	GdkFont *font;
-        */
 	GtkCList *list;
 	GtkEntry *entry;
 
@@ -99,8 +96,6 @@ extern "C" {
     GtkWidget *balsa_spell_check_new_with_text(GtkTextView * view);
     void balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
 				    GtkTextView * view);
-    void balsa_spell_check_set_font(BalsaSpellCheck * spell_check,
-				    GdkFont * font);
     void balsa_spell_check_start(BalsaSpellCheck * spell_check);
     void balsa_spell_check_finish(BalsaSpellCheck * spell_check,
 				  gboolean keep_changes);

@@ -512,31 +512,14 @@ node_equal(GNode *node, GNode** parent)
 static gboolean 
 construct(GNode *node, GtkCTree *ctree)
 {
-    GtkCTreeNode *ctreenode=NULL;
-    GtkCTreeNode *ctreeparent=NULL;
-    GtkCTreeNode *sibling=NULL;
+    GtkCTreeNode *ctreenode;
+    GtkCTreeNode *ctreeparent;
 
-    if(node->parent!=NULL && node->parent->data!=NULL) {
+    if (node->parent != NULL && node->parent->data != NULL
+        && node->data != NULL) {
 	ctreeparent=GTK_CTREE_NODE(node->parent->data);
-    }
-
-    if(node->data!=NULL) {
         ctreenode = GTK_CTREE_NODE(node->data);
 	gtk_ctree_move(ctree, ctreenode, ctreeparent, NULL);
-    }
-
-    if(node->next!=NULL) {
-        sibling = GTK_CTREE_NODE(node->next->data);
-	gtk_ctree_move(ctree, sibling, ctreeparent, ctreenode);
-    }
-
-    if(node->children!=NULL) {
-	GNode *children;
-	for(children=node->children; children; children=children->next) {
-            GtkCTreeNode *foo = GTK_CTREE_NODE(children->data);
-	    if(foo)
-		gtk_ctree_move(ctree, foo, ctreenode, NULL);
-	}
     }
 
     return FALSE;

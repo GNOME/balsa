@@ -1,3 +1,11 @@
+2002-07-24  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c: 
+	* src/balsa-index-threading.c: 
+	* libbalsa/message.c: 
+	from Peter, use in reply-to when nothing else is 
+	available to thread, clean up the threading code a bit
+
 2002-07-21  Pablo Saratxaga  <pablo@mandrakesoft.com>
 
 	* configure.in: Added Vietnamese (vi) to ALL_LINGUAS

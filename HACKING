@@ -1,0 +1,47 @@
+The following are some general guidelines for adding code to Balsa:
+-------------------------------------------------------------------
+
+Use FIXME in comments to make a note of things which need looking at.
+
+All GtkObject derivatives should live in there own .c and .h files. In
+general functionality should be split in a sensible way amoung files.
+
+respect the libbalsa_ namespace.
+
+commited code should compile with --enable-more-warnings - this
+enables some extra warnings and -Werror which makes warnings into
+errors.
+
+libmutt
+-------
+
+All changes to libmutt/* should be marked with a comment beginning
+BALSA: and describing the change and the reason for it.
+
+Source files
+------------
+
+All files should have a magic emacs mode line at the top (note older
+files will have c-basic-offset as 2):
+
+/* -*-mode:c; c-style:k&r; c-basic-offset:8; -*- */
+
+following this a GPL copyright header. Copyright should be attributed as:
+
+(c) 1997-2000 Stuart Parmenter and others, see AUTHORS for a list of people
+
+Following this should be a brief description of what the file
+contains.
+
+See existing source for a general idea.
+
+Coding Style
+------------
+
+The coding style used in Balsa currently is a bit of a mess. When
+adding a new file to Balsa, please use the standard GNOME indentation
+style, rather than the one used in the rest of Balsa. A good place to
+read is the file HACKING included with Gnumeric. Maybe at some point
+someone will update the existing source.
+
+

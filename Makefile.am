@@ -13,7 +13,8 @@ EXTRA_DIST = \
 	balsa.spec.in \
 	rpm-po.patch  \
 	balsa.desktop \
-	gnome-balsa2.png
+	gnome-balsa2.png \
+	HACKING
 
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)

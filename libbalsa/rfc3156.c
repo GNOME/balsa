@@ -30,6 +30,10 @@
 #include "rfc3156.h"
 
 #include <gpgme.h>
+#include <pwd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #ifdef BALSA_USE_THREADS
 #  include <pthread.h>
@@ -130,6 +134,7 @@ static gpgme_key_t *gpgme_build_recipients(gpgme_ctx_t ctx, GList *rcpt_list);
 static void get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx);
 static void release_keylist(gpgme_key_t *keylist);
 static void cb_data_release(void * handle);
+static gboolean gpg_updates_trustdb(gboolean show_err);
 
 
 /* ==== public functions =================================================== */
@@ -385,6 +390,11 @@ libbalsa_body_check_signature(LibBalsaMessageBody* body)
     body->next->sig_info = sig_status = g_new0(LibBalsaSignatureInfo, 1);
     sig_status->status = GPG_ERR_GENERAL;
     
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(FALSE)) {
+	sig_status->status = GPG_ERR_TRY_AGAIN;
+	return FALSE;
+    }
 
     /* try to create a gpgme context */
     if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
@@ -492,6 +502,10 @@ libbalsa_sign_mutt_body(MuttBody **sign_body, const gchar *rfc822_for,
     g_return_val_if_fail(sign_body != NULL, FALSE);
     g_return_val_if_fail(micalg != NULL, FALSE);
 
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(TRUE))
+	return FALSE;
+
     /* save the header and body(s) to sign in a file */
     mutt_mktemp(fname);
     mailData.mailboxFile = safe_fopen(fname, "w+");
@@ -566,6 +580,10 @@ libbalsa_sign_encrypt_mutt_body(MuttBody **se_body, const gchar *rfc822_signer,
 
     sign_multipart = *se_body && (*se_body)->next;
 
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(TRUE))
+	return FALSE;
+
     /* according to rfc3156, we try to sign first... */
     if (!libbalsa_sign_mutt_body(se_body, rfc822_signer, &micalg, parent))
 	return FALSE;
@@ -620,6 +638,10 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, GtkWindow *parent)
     g_return_val_if_fail(body != NULL, NULL);
     g_return_val_if_fail(body->message != NULL, NULL);
     message = body->message;
+
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(TRUE))
+	return body;
 
     /* get the encrypted message stream */
     if (body->decrypt_file)
@@ -739,6 +761,10 @@ libbalsa_encrypt_mutt_body(MuttBody **encrypt_body, GList *rfc822_for)
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(encrypt_body != NULL, FALSE);
 
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(TRUE))
+	return FALSE;
+
     /* save the header and body(s) to encrypt in a file */
     mutt_mktemp(fname);
     mailData.mailboxFile = safe_fopen(fname, "w+");
@@ -828,7 +854,9 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 	case GPG_ERR_NO_DATA:
 	    return _("This part is not a real PGP signature.");
 	case GPG_ERR_INV_ENGINE:
-	    return _("The signature could not be verified due to an invalid crypto engine");
+	    return _("The signature could not be verified due to an invalid crypto engine.");
+	case GPG_ERR_TRY_AGAIN:
+	    return _("GnuPG is rebuilding the trust database and is currently unavailable.");
 	default:
 	    return _("An error prevented the signature verification.");
 	}
@@ -902,6 +930,10 @@ libbalsa_rfc2440_sign_buffer(const gchar *buffer, const gchar *sign_for,
     /* paranoia checks */
     g_return_val_if_fail(sign_for != NULL, NULL);
     g_return_val_if_fail(buffer != NULL, NULL);
+
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(TRUE))
+	return NULL;
 
     /* try to create a gpgme context */
     if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
@@ -1007,6 +1039,10 @@ libbalsa_rfc2440_check_signature(gchar **buffer, const gchar *charset,
     /* paranoia checks */
     g_return_val_if_fail(buffer != NULL, GPG_ERR_GENERAL);
     g_return_val_if_fail(*buffer != NULL, GPG_ERR_GENERAL);
+
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(FALSE))
+	return GPG_ERR_TRY_AGAIN;
 
     /* try to create a gpgme context */
     if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
@@ -1129,6 +1165,10 @@ libbalsa_rfc2440_encrypt_buffer(const gchar *buffer, const gchar *sign_for,
     g_return_val_if_fail(buffer != NULL, NULL);
     g_return_val_if_fail(encrypt_for != NULL, NULL);
 
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(TRUE))
+	return NULL;
+
     /* try to create a gpgme context */
     if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -1248,6 +1288,10 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
     g_return_val_if_fail(buffer != NULL, GPG_ERR_GENERAL);
     g_return_val_if_fail(*buffer != NULL, GPG_ERR_GENERAL);
 
+    /* check if gpg is currently available */
+    if (gpg_updates_trustdb(FALSE))
+	return GPG_ERR_TRY_AGAIN;
+
     /* try to create a gpgme context */
     if ((err = gpgme_new(&ctx)) != GPG_ERR_NO_ERROR) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -1302,7 +1346,7 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
 	
     get_sig_info_from_ctx(tmp_siginfo, ctx);
     retval = tmp_siginfo->status;
-    if (tmp_siginfo->status == GPG_ERR_USER_16) {
+    if (tmp_siginfo->status == GPG_ERR_NOT_SIGNED) {
 	libbalsa_signature_info_destroy(tmp_siginfo);
 	tmp_siginfo = NULL;
     }
@@ -1546,7 +1590,7 @@ get_sig_info_from_ctx(LibBalsaSignatureInfo* info, gpgme_ctx_t ctx)
     gpgme_key_t key;
     gpgme_user_id_t uid;
 	
-    info->status = GPG_ERR_USER_16; /* no signature available */
+    info->status = GPG_ERR_NOT_SIGNED; /* no signature available */
 
     if (!(result = gpgme_op_verify_result(ctx)) || result->signatures == NULL)
 	return;
@@ -2645,6 +2689,33 @@ static void
 cb_data_release(void * handle)
 {
     /* must just be present... */
+}
+
+
+/*
+ * return TRUE is gpg is currently updating the trust database (indicated by
+ * the file ~/.gnupg/trustdb.gpg.lock)
+ */
+static gboolean
+gpg_updates_trustdb(gboolean show_err)
+{
+    static gchar * lockname = NULL;
+    struct passwd * pwent;
+    struct stat stat_buf;
+
+    if (!lockname)
+	if ((pwent = getpwuid(getuid())))
+	    lockname = 
+		g_strdup_printf("%s/.gnupg/trustdb.gpg.lock", pwent->pw_dir);
+
+    if (!stat(lockname, &stat_buf)) {
+	if (show_err)
+	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				 _("GnuPG is rebuilding the trust database and is currently unavailable."),
+				 _("Try again later."));
+	return TRUE;
+    } else
+	return FALSE;
 }
 
 

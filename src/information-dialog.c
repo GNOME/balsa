@@ -136,6 +136,10 @@ balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
 {
     GtkMessageType message_type;
     GtkWidget *messagebox;
+    gchar * real_msg = g_strdup(msg);
+
+    libbalsa_utf8_sanitize(&real_msg, balsa_app.convert_unknown_8bit,
+			   balsa_app.convert_unknown_8bit_codeset, NULL);
 
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:
@@ -161,7 +165,8 @@ balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
     messagebox =
         gtk_message_dialog_new(GTK_WINDOW(parent),
                                GTK_DIALOG_DESTROY_WITH_PARENT,
-                               message_type, GTK_BUTTONS_CLOSE, msg);
+                               message_type, GTK_BUTTONS_CLOSE, real_msg);
+    g_free(real_msg);
 
     gtk_dialog_run(GTK_DIALOG(messagebox));
     gtk_widget_destroy(messagebox);
@@ -198,6 +203,10 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
     static GtkWidget *information_list = NULL;
     GtkTextBuffer *buffer;
     GtkTextIter iter;
+    gchar * real_msg = g_strdup(msg);
+
+    libbalsa_utf8_sanitize(&real_msg, balsa_app.convert_unknown_8bit,
+			   balsa_app.convert_unknown_8bit_codeset, NULL);
 
     if (information_list == NULL) {
 	GtkWidget *information_dialog;
@@ -250,7 +259,8 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
     gtk_text_buffer_place_cursor(buffer, &iter);
     if (gtk_text_buffer_get_char_count(buffer))
         gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
-    gtk_text_buffer_insert_at_cursor(buffer, msg, -1);
+    gtk_text_buffer_insert_at_cursor(buffer, real_msg, -1);
+    g_free(real_msg);
     gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(information_list),
                                  gtk_text_buffer_get_insert(buffer),
                                  0, FALSE, 0, 0);

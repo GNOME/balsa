@@ -47,6 +47,11 @@
 #define LIBBALSA_PROTECT_ERROR     (1 << 5)
 
 
+/* some custom error messages */
+#define GPG_ERR_TRY_AGAIN          GPG_ERR_USER_15
+#define GPG_ERR_NOT_SIGNED         GPG_ERR_USER_16
+
+
 typedef struct _LibBalsaSignatureInfo LibBalsaSignatureInfo;
 
 struct _LibBalsaSignatureInfo {

@@ -3972,7 +3972,7 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info,
 	    if (bm->message->prot_state < LIBBALSA_MSG_PROTECT_SIGN_NOTRUST)
 		bm->message->prot_state = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
         }
-    } else if (sig_res != GPG_ERR_USER_16 && sig_res != GPG_ERR_CANCELED) {
+    } else if (sig_res != GPG_ERR_NOT_SIGNED && sig_res != GPG_ERR_CANCELED) {
         gchar *sender = bm_sender_to_gchar(bm->message->headers->from, -1);
         gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
         

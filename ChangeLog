@@ -1,3 +1,13 @@
+2004-02-24  Albrecht Dreß
+
+	* libbalsa/rfc3156.c: 
+	* libbalsa/rfc3156.h: 
+	* src/balsa-message.c:
+	check if gpg is available before doing ops to avoid hangs
+	
+	* src/information-dialog.c:
+	sanitize UTF-8 on error messages to avoid pango errors
+	
 2004-02-23  Adam Weinberger  <adamw@FreeBSD.org>
 
 	* configure.in: Added "en_CA" (Canadian English) to ALL_LINGUAS.

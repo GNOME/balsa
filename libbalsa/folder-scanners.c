@@ -218,6 +218,9 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 void imap_add_folder (char delim, char *folder, int noselect,
   int noinferiors, struct browser_state *state, short isparent)
 {
+    int isFolder = 0;
+    int isMailbox = 0;
+
     imap_unmunge_mbox_name (folder);
     printf("imap_add_folder. delim: '%c', folder: '%s', noselect: %d\n"
 	   "noinferiors: %d, isparent: %d\n", delim, folder, noselect,
@@ -225,17 +228,20 @@ void imap_add_folder (char delim, char *folder, int noselect,
     if(isparent) return;
     if(!noselect) {
 	printf("ADDING MAILBOX %s\n", folder);
-	state->mailbox_handler(state->rnode, folder, delim);
-    } else {
-	/* this extra check is needed for subscribed folder handling. 
-	   Read RFC when iin doubt. */
-	if(!g_list_find_custom(state->subfolders, folder,
-			       (GCompareFunc)strcmp)) {
-	    printf("ADDING FOLDER %s\n", folder);
-	    
-	    state->subfolders = g_list_append(state->subfolders, 
-					      g_strdup(folder));
-	    state->folder_handler(state->rnode, folder, delim);
-	}
+	++isMailbox;
     }
+    /* this extra check is needed for subscribed folder handling. 
+	   Read RFC when iin doubt. */
+    if(!g_list_find_custom(state->subfolders, folder,
+			   (GCompareFunc)strcmp)) {
+	printf("ADDING FOLDER %s\n", folder);
+	    
+	state->subfolders = g_list_append(state->subfolders,
+					  g_strdup(folder));
+	++isFolder;
+    }
+    if (isMailbox)
+	state->mailbox_handler(state->rnode, folder, delim);
+    else if (isFolder)
+	state->folder_handler(state->rnode, folder, delim);
 }

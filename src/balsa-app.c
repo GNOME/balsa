@@ -345,7 +345,7 @@ do_load_mailboxes(void)
        directory, later: all other folders.  
     */
     append_subtree_f(balsa_app.mailbox_nodes, NULL); 
-    g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+    g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL, -1,
                     append_subtree_f, NULL);
     
     return TRUE;
@@ -440,7 +440,7 @@ find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox)
     d[0] = mailbox;
     d[1] = NULL;
 
-    g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+    g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_ALL, -1,
                     find_mailbox, d);
     retval = d[1];
     return retval;

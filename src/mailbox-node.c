@@ -234,7 +234,7 @@ imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
     printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
 	   BALSA_MAILBOX_NODE(r->data)->name, 
 	   BALSA_MAILBOX_NODE(r->data)->mailbox);
-    g_node_traverse(r, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+    g_node_traverse(r, G_IN_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) register_mailbox, NULL);
 }
 
@@ -750,6 +750,7 @@ static GNode* add_imap_entry(GNode*root, const char* fn,
     GNode* parent;
     BalsaMailboxNode* mbnode;
     gchar * parent_name = get_parent_folder_name(fn, delim);
+    const gchar *basename = strrchr(fn, delim);
 
     parent = get_parent_by_name(root, parent_name);
     g_free(parent_name);
@@ -759,12 +760,14 @@ static GNode* add_imap_entry(GNode*root, const char* fn,
 	mbnode = 
 	    balsa_mailbox_node_new_from_mailbox(LIBBALSA_MAILBOX(mailbox));
     else {
-	const gchar *basename = strrchr(fn, delim);
-	if(!basename) basename = fn;
-	else basename++;
 	mbnode = balsa_mailbox_node_new();
-	mbnode->name = g_strdup(basename);
     }
+    /* mbnode->name used to be set only for folders, 
+       but it seems to be OK to do it also for mailboxes. */
+    if(!basename) basename = fn;
+    else basename++;
+    mbnode->name = g_strdup(basename);
+
     mbnode->dir = g_strdup(fn);
     return g_node_append(parent, g_node_new(mbnode));
 }

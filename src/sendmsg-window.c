@@ -72,6 +72,8 @@
 #include "print.h"
 #include "spell-check.h"
 
+#define GNOME_MIME_BUG_WORKAROUND 1
+
 static gchar *read_signature(void);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
@@ -626,7 +628,19 @@ add_attachment(GnomeIconList * iconlist, char *filename)
     gchar *pix, *err_msg;
 
     /* FIXME: What is the default type? */
-    content_type = gnome_mime_type_or_default_of_file(filename, "application/octet-stream");
+    content_type = 
+	gnome_mime_type_or_default_of_file(filename, 
+					   "application/octet-stream");
+#ifdef GNOME_MIME_BUG_WORKAROUND
+    /* the function above returns for certains files a string which is
+       not a proper MIME type, e.g. "PDF document". Surprizingly, 
+       gnome_mime_type() does not fail in this case. This bug has been 
+       filed in bugzilla.
+    */
+    if(strchr(content_type, '/') == NULL)
+	content_type = 
+	    gnome_mime_type_or_default(filename, "application/octet-stream");
+#endif
     pix = libbalsa_icon_finder(content_type, filename);
 
     if (balsa_app.debug)

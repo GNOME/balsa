@@ -1,3 +1,16 @@
+2001-06-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: work around gnome-mime bug.
+	
+	Patch from Peter Bloomfield <bloomfld@eos.ncsu.edu> for 
+	browsing IMAP folders that can contain both messages and subfolders
+	(so far, only leaves could contain messages).
+
+	* libbalsa/folder-scanners.c: modify the scanning scheme.
+	* src/balsa-app.c: traverse all nodes, not only leaves, for mailboxes.
+	* src/balsa-mblist.c: modify mailbox node unread status computing code.
+	* src/mailbox-node.c: traverse all.
+	
 2001-06-12  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/send.c (libbalsa_message_cb): update to libesmtp-0.8 

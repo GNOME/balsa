@@ -2504,7 +2504,7 @@ show_about_box(void)
                           "name", "Balsa",
                           "version", BALSA_VERSION,
                           "copyright",
-                          "Copyright \xc2\xa9 1997-2003 The Balsa Developers",
+                          "Copyright \xc2\xa9 1997-2005 The Balsa Developers",
                           "comments",
                           _("The Balsa email client is part of "
                             "the GNOME desktop environment.  "

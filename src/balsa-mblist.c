@@ -435,6 +435,9 @@ button_event_press_cb (GtkCTree * ctree, GdkEventButton * event, gpointer data)
 
       gtk_ctree_select (ctree, ctrow);
 
+      if (mailbox->ismbnode)
+	return;
+
       if (mailbox)
 	gtk_signal_emit (GTK_OBJECT (BALSA_MBLIST (ctree)),
 			 balsa_mblist_signals[SELECT_MAILBOX],
@@ -456,6 +459,9 @@ select_mailbox (GtkCTree * ctree, GtkCTreeNode * row, gint column)
   bmbl = BALSA_MBLIST (ctree);
 
   mailbox = gtk_ctree_node_get_row_data (ctree, row);
+
+  if (mailbox->ismbnode)
+    return;
 
   if (bevent && bevent->button == 1)
     {

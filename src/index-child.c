@@ -396,7 +396,7 @@ create_menu (BalsaIndex * bindex)
   GtkWidget *bmbl;
 
   menu = gtk_menu_new ();
-  menuitem = gtk_menu_item_new_with_label (_ ("Transfer"));
+  menuitem = gnome_stock_menu_item (GNOME_STOCK_MENU_JUMP_TO, _ ("Transfer"));
 
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();

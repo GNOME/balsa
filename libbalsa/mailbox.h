@@ -214,6 +214,7 @@ struct _LibBalsaMailbox {
                             */
     /* Associated filters (struct mailbox_filter) */
     GSList * filters;
+    gboolean filters_loaded;
 
     LibBalsaMailboxView *view;
     LibBalsaMailboxState state;

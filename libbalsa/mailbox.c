@@ -246,6 +246,7 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     mailbox->disconnected = FALSE;
 
     mailbox->filters=NULL;
+    mailbox->filters_loaded = FALSE;
     mailbox->view=NULL;
     /* mailbox->stamp is incremented before we use it, so it won't be
      * zero for a long, long time... */
@@ -364,6 +365,7 @@ libbalsa_mailbox_finalize(GObject * object)
     g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
     g_slist_free(mailbox->filters);
     mailbox->filters = NULL;
+    mailbox->filters_loaded = FALSE;
 
     /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
     mailbox->view = NULL;
@@ -653,8 +655,10 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    if (!mailbox->filters)
+    if (!mailbox->filters_loaded) {
         config_mailbox_filters_load(mailbox);
+        mailbox->filters_loaded = TRUE;
+    }
         
     filters = libbalsa_mailbox_filters_when(mailbox->filters,
                                             FILTER_WHEN_INCOMING);

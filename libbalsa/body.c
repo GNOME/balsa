@@ -249,6 +249,28 @@ libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
     return res;
 }
 
+/* libbalsa_message_body_is_flowed:
+ * test whether a message body is format=flowed */
+gboolean
+libbalsa_message_body_is_flowed(LibBalsaMessageBody * body)
+{
+    gchar *content_type;
+    gchar *format;
+    gboolean flowed;
+
+    content_type = libbalsa_message_body_get_content_type(body);
+    if (g_ascii_strcasecmp(content_type, "text/plain"))
+        flowed = FALSE;
+    else {
+        format = libbalsa_message_body_get_parameter(body, "format");
+        flowed = format && (g_ascii_strcasecmp(format, "flowed") == 0);
+        g_free(format);
+    }
+    g_free(content_type);
+
+    return flowed;
+}
+
 LibBalsaMessageBody*
 libbalsa_message_body_get_by_id(LibBalsaMessageBody* body, const gchar* id)
 {

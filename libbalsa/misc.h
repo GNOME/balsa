@@ -56,7 +56,6 @@ GString *libbalsa_process_text_rfc2646(gchar * par, gint width,
                                        gboolean quote);
 gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
                              gboolean from_screen, gboolean to_screen);
-gboolean libbalsa_flowed_rfc2646(LibBalsaMessageBody * body);
 
 const char* libbalsa_set_charset(const gchar * charset);
 const char* libbalsa_set_send_charset(const gchar * charset);

@@ -574,7 +574,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
         libbalsa_message_body_ref(msg, TRUE);
 	new_message = msg_queue_item_new(msg);
         encoding = msg->body_list->mutt_body->encoding;
-        flow = libbalsa_flowed_rfc2646(msg->body_list);
+        flow = libbalsa_message_body_is_flowed(msg->body_list);
         created =
             libbalsa_create_msg(msg, new_message->message,
                                 new_message->tempfile, encoding, flow, 1);
@@ -942,7 +942,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox)
 
         libbalsa_message_body_ref(queu, TRUE);
 	new_message = msg_queue_item_new(queu);
-        flow = libbalsa_flowed_rfc2646(queu->body_list);
+        flow = libbalsa_message_body_is_flowed(queu->body_list);
         encoding = queu->body_list->mutt_body->encoding;
         created =
             libbalsa_create_msg(queu, new_message->message,

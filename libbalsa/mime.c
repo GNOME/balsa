@@ -79,7 +79,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    break;
 
 	if (llen > 0) {
-            if (flow && libbalsa_flowed_rfc2646(body)) {
+            if (flow && libbalsa_message_body_is_flowed(body)) {
                 /* we're making a `format=flowed' message, and the
                  * message we're quoting was flowed
                  *

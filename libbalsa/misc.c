@@ -641,29 +641,6 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
     return g_string_free(result, FALSE);
 }
 
-/* libbalsa_flowed_rfc2646:
- * test whether a message body is format=flowed
- * */
-gboolean
-libbalsa_flowed_rfc2646(LibBalsaMessageBody * body)
-{
-    gchar *content_type;
-    gchar *format;
-    gboolean flowed;
-
-    content_type = libbalsa_message_body_get_content_type(body);
-    if (g_ascii_strcasecmp(content_type, "text/plain"))
-        flowed = FALSE;
-    else {
-        format = libbalsa_message_body_get_parameter(body, "format");
-        flowed = format && (g_ascii_strcasecmp(format, "flowed") == 0);
-        g_free(format);
-    }
-    g_free(content_type);
-
-    return flowed;
-}
-
 /* Delete the contents of a directory (not the directory itself).
    Return TRUE if everything was OK.
    If FALSE is returned then errno will be set to some useful value.

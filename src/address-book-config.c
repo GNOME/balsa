@@ -529,18 +529,16 @@ static gboolean
 bad_path(gchar * path, GtkWindow * window, gint type)
 {
 #if !GTK_CHECK_VERSION(2, 6, 0)
-    const gchar *name;
     gchar *message, *question;
 #endif /* GTK_CHECK_VERSION(2, 6, 0) */
     GtkWidget *ask;
     gint clicked_button;
 
+#if GTK_CHECK_VERSION(2, 6, 0)
     if (path) {
         g_free(path);
         return FALSE;
     }
-
-#if GTK_CHECK_VERSION(2, 6, 0)
     ask = gtk_message_dialog_new(window,
 				 GTK_DIALOG_MODAL|
 				 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -564,13 +562,14 @@ bad_path(gchar * path, GtkWindow * window, gint type)
             break;
     }
     question = _("Do you want to correct the path?");
-    name = gtk_entry_get_text(GTK_ENTRY(gnome_file_entry_gtk_entry(entry)));
     ask = gtk_message_dialog_new(window,
 				 GTK_DIALOG_MODAL|
 				 GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-                                 message, name, question);
+                                 message, path, question);
+    g_free(path);
 #endif /* GTK_CHECK_VERSION(2, 6, 0) */
+
     gtk_dialog_set_default_response(GTK_DIALOG(ask), GTK_RESPONSE_YES);
     clicked_button = gtk_dialog_run(GTK_DIALOG(ask));
     gtk_widget_destroy(ask);

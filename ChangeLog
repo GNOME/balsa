@@ -1,3 +1,7 @@
+2005-02-07  Pawel Salek
+
+	* src/address-book-config.c: compile with gtk-2.4
+
 2005-02-06 20:43  PeterB
 
 	* configure.in, images/16x16/Makefile, images/16x16/Makefile.in,

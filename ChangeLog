@@ -1,3 +1,7 @@
+2004-11-04 08:12  PeterB
+
+	* libbalsa/address-entry.c: do not dequote address phrase.
+
 2004-11-03 21:46  PeterB
 
 	* libbalsa/address-entry.c: pop down completions on receiving

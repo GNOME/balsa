@@ -93,7 +93,7 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
   static char *titles[1];
 
   window = gnome_app_new ("balsa_addressbook_window","Address book");
-  gtk_widget_set_usize (window, 560, 270);
+  gtk_widget_set_usize (window, 680, 435);
   gtk_window_set_wmclass (GTK_WINDOW (window), "balsa_app",
 			  "Balsa");
 
@@ -109,14 +109,12 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
 /* address book list (show nicknames in this list) */
   titles[0] =  "Names";
 
-  vbox1 = gtk_vbox_new (FALSE, 3);
+  vbox1 = gtk_vbox_new (FALSE, 10);
   gtk_widget_show (vbox1);
 
   addyb_list = gtk_clist_new_with_titles (1, titles);
   gtk_clist_column_titles_passive (GTK_CLIST (addyb_list));
   gtk_clist_set_selection_mode (GTK_CLIST (addyb_list), GTK_SELECTION_BROWSE);
-  
-  gtk_clist_set_column_width (GTK_CLIST (addyb_list), 0, 200);
   
   gtk_clist_set_policy (GTK_CLIST (addyb_list),
                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -129,17 +127,17 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
 
   button=gtk_button_new_with_label("Add");
   gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_box_pack_start(GTK_BOX(hbox1), button, TRUE, FALSE, 0 );
   gtk_widget_show(button);
 
   button=gtk_button_new_with_label("Modify");
   gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_box_pack_start(GTK_BOX(hbox1), button, TRUE, FALSE, 0 );
   gtk_widget_show(button);
 
   button=gtk_button_new_with_label("Remove");
   gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_box_pack_start(GTK_BOX(hbox1), button, TRUE, FALSE, 0 );
   gtk_widget_show(button);
 
   gtk_paned_add1 (GTK_PANED (hpane), vbox1);
@@ -160,9 +158,7 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
   email_list = gtk_clist_new_with_titles (1, titles);
   gtk_clist_column_titles_passive (GTK_CLIST (email_list));
   gtk_clist_set_selection_mode (GTK_CLIST (email_list), GTK_SELECTION_BROWSE);
-  
-  gtk_clist_set_column_width (GTK_CLIST (email_list), 0, 200);
-  
+    
   gtk_clist_set_policy (GTK_CLIST (email_list),
                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (vbox1), email_list, TRUE, TRUE, 3);
@@ -174,17 +170,17 @@ void addressbook_window_new(GtkWidget *widget, gpointer data)
 
   button=gtk_button_new_with_label("Add");
   gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_box_pack_start(GTK_BOX(hbox1), button, TRUE, FALSE, 0 );
   gtk_widget_show(button);
 
   button=gtk_button_new_with_label("Modify");
   gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_box_pack_start(GTK_BOX(hbox1), button, TRUE, FALSE, 0 );
   gtk_widget_show(button);
 
   button=gtk_button_new_with_label("Remove");
   gtk_widget_set_usize (button, 60, 25);
-  gtk_box_pack_start(GTK_BOX(hbox1), button, FALSE, FALSE, 0 );
+  gtk_box_pack_start(GTK_BOX(hbox1), button, TRUE, FALSE, 0 );
   gtk_widget_show(button);
 
   gtk_paned_add1 (GTK_PANED (vpane), vbox1);

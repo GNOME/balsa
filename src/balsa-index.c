@@ -60,11 +60,17 @@ static void select_message (GtkWidget * widget,
 			    gint column,
 			    GdkEventButton * bevent,
 			    gpointer * data);
+static void unselect_message (GtkWidget * widget,
+                              gint row,
+                              gint column,
+                              GdkEventButton * bevent,
+                              gpointer * data);
 
 /* signals */
 enum
   {
     SELECT_MESSAGE,
+    UNSELECT_MESSAGE,
     LAST_SIGNAL
   };
 
@@ -181,9 +187,19 @@ balsa_index_class_init (BalsaIndexClass * klass)
 		    gtk_marshal_NONE__POINTER_POINTER,
 		    GTK_TYPE_NONE, 2, GTK_TYPE_POINTER,
 		    GTK_TYPE_GDK_EVENT);
-  gtk_object_class_add_signals (object_class, balsa_index_signals, LAST_SIGNAL);
+  balsa_index_signals[UNSELECT_MESSAGE] =
+    gtk_signal_new ("unselect_message",
+		    GTK_RUN_LAST,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (BalsaIndexClass, unselect_message),
+		    gtk_marshal_NONE__POINTER_POINTER,
+		    GTK_TYPE_NONE, 2, GTK_TYPE_POINTER,
+		    GTK_TYPE_GDK_EVENT);
+  gtk_object_class_add_signals (object_class, balsa_index_signals,
+                                LAST_SIGNAL);
 
   klass->select_message = NULL;
+  klass->unselect_message = NULL;
 }
 
 static void
@@ -263,6 +279,11 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "select_row",
 		      (GtkSignalFunc) select_message,
+		      (gpointer) bindex);
+
+  gtk_signal_connect (GTK_OBJECT (clist),
+		      "unselect_row",
+		      (GtkSignalFunc) unselect_message,
 		      (gpointer) bindex);
 
   gtk_signal_connect (GTK_OBJECT (clist),
@@ -590,15 +611,12 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
 }
 
 static void
-button_event_release_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
+button_event_release_cb (GtkCList * clist, GdkEventButton * event,
+                         gpointer data)
 {
   gtk_grab_remove (GTK_WIDGET(clist));
   gdk_pointer_ungrab (event->time);
 }
-
-
-
-
 
 static void
 select_message (GtkWidget * widget,
@@ -616,6 +634,26 @@ select_message (GtkWidget * widget,
   if (message)
     gtk_signal_emit (GTK_OBJECT (bindex),
 		     balsa_index_signals[SELECT_MESSAGE],
+		     message,
+		     bevent);
+}
+
+static void
+unselect_message (GtkWidget * widget,
+                  gint row,
+                  gint column,
+                  GdkEventButton * bevent,
+                  gpointer * data)
+{
+  BalsaIndex *bindex;
+  Message *message;
+
+  bindex = BALSA_INDEX (data);
+  message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (GTK_CLIST (widget), row));
+
+  if (message)
+    gtk_signal_emit (GTK_OBJECT (bindex),
+		     balsa_index_signals[UNSELECT_MESSAGE],
 		     message,
 		     bevent);
 }

@@ -286,9 +286,9 @@ void mutt_fetchPopMail (void)
     snprintf (buffer, sizeof(buffer), "retr %d\r\n", i);
     write (s, buffer, strlen (buffer));
 
+#ifdef BALSA_USE_THREADS
     sprintf( threadbuf, "Retrieving Message %d of %d", 
 	     i - first_msg + 1, total );
-#ifdef BALSA_USE_THREADS
     MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf,0,0 );
 #endif
 
@@ -324,8 +324,8 @@ void mutt_fetchPopMail (void)
 	break;
       }
       
-      sprintf( threadbuf,"Received %d bytes of %d",num_bytes,tot_bytes);
 #ifdef BALSA_USE_THREADS
+      sprintf( threadbuf,"Received %d bytes of %d",num_bytes,tot_bytes);
       MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, threadbuf, num_bytes,tot_bytes); 
 #endif
       /* check to see if we got a full line */

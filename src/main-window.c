@@ -134,6 +134,9 @@ static void set_icon (GnomeApp * app);
 static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc );
 static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc );
 
+static void notebook_switch_page_cb( GtkWidget *notebook,
+                                     GtkNotebookPage *page, guint page_num );
+
 static GnomeUIInfo file_menu[] =
 {
     /* Ctrl-M */
@@ -465,6 +468,8 @@ balsa_window_new ()
   gtk_notebook_set_show_border(GTK_NOTEBOOK(window->notebook), FALSE);
   gtk_signal_connect( GTK_OBJECT(window->notebook), "size_allocate", 
 		      GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL );
+  gtk_signal_connect( GTK_OBJECT(window->notebook), "switch_page", 
+		      GTK_SIGNAL_FUNC(notebook_switch_page_cb), NULL );
   balsa_app.notebook=window->notebook;
 
   /* this call will set window->preview */
@@ -572,6 +577,11 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
 	gtk_notebook_remove_page( GTK_NOTEBOOK( window->notebook ), i );
 	(BALSA_INDEX_PAGE( page ))->sw = NULL; /* This was just toasted */
 	gtk_object_destroy( GTK_OBJECT( page ) );
+
+        /* If this is the last notebook page clear the message preview */
+        page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
+        if (page == NULL)
+            balsa_message_clear (window->preview);
       }
 }
 
@@ -1263,3 +1273,12 @@ static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc )
     balsa_app.mw_width = alloc->width;
 }
 
+/* When page switches we change whe preview window */
+static void notebook_switch_page_cb( GtkWidget *notebook,
+                                     GtkNotebookPage *page, guint page_num )
+{
+    GtkWidget *index_page;
+    
+    index_page = gtk_object_get_data (GTK_OBJECT (page->child), "indexpage");
+    balsa_index_update_message (BALSA_INDEX_PAGE (index_page));
+}

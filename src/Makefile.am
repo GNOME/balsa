@@ -45,8 +45,6 @@ balsa_SOURCES =	\
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
-	-I. \
-	-I${top_srcdir} \
 	-I${top_srcdir}/libbalsa \
 	-I$(top_builddir)/idl \
 	-I${top_builddir}/libmutt \

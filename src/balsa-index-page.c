@@ -59,6 +59,7 @@ static void index_child_setup_dnd ( GnomeMDIChild * child );
 
 /* callbacks */
 static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
+static void index_unselect_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
 static GtkWidget *create_menu (BalsaIndex * bindex);
 static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data);
 
@@ -163,6 +164,9 @@ balsa_index_page_window_init(BalsaIndexPage *bip)
 
   gtk_signal_connect(GTK_OBJECT(index), "select_message",
 		     (GtkSignalFunc) index_select_cb, bip);
+  
+  gtk_signal_connect(GTK_OBJECT(index), "unselect_message",
+		     (GtkSignalFunc) index_unselect_cb, bip);
   
   gtk_signal_connect(GTK_OBJECT (index), "button_press_event",
 		     (GtkSignalFunc) index_button_press_cb, bip);
@@ -375,10 +379,14 @@ idle_handler_cb(GtkWidget * widget)
     gtk_menu_popup (GTK_MENU(create_menu(BALSA_INDEX(widget))),
 		    NULL, NULL, NULL, NULL,
 		    bevent->button, bevent->time);
-  } else if (bmsg) {
+  }
+  if (bmsg) {
       if (BALSA_MESSAGE(bmsg)) {
-	  balsa_message_set(BALSA_MESSAGE(bmsg), message);
-	  message_read( message );
+          if (message) {
+              balsa_message_set(BALSA_MESSAGE(bmsg), message);
+              message_read( message );
+          } else
+              balsa_message_clear (BALSA_MESSAGE (bmsg));
       }
   }
 
@@ -388,6 +396,29 @@ idle_handler_cb(GtkWidget * widget)
   gtk_object_remove_data (GTK_OBJECT (widget), "message");
   gtk_object_remove_data (GTK_OBJECT (widget), "data");
   return FALSE;
+}
+
+void
+balsa_index_update_message (BalsaIndexPage *index_page)
+{
+    Message *message;
+    BalsaIndex *index;
+    GtkCList *list;
+    
+    index = BALSA_INDEX (index_page->index);
+    list = GTK_CLIST (index);
+    if (g_list_find (list->selection, (gpointer) list->focus_row) == NULL)
+        message = NULL;
+    else
+        message = (Message *) gtk_clist_get_row_data (list, list->focus_row);
+    gtk_object_set_data (GTK_OBJECT (index), "message", message);
+    gtk_object_set_data (GTK_OBJECT (index), "bevent", NULL);
+    gtk_object_set_data (GTK_OBJECT (index), "data", index_page);
+
+    /* this way we only display one message, not lots and lots, and
+       we also avoid flicker due to consecutive unselect/select */
+    if (!handler)
+	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
 }
 
 static void
@@ -406,10 +437,34 @@ index_select_cb (GtkWidget * widget,
     gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
     gtk_object_set_data (GTK_OBJECT (widget), "data", data);
 
-    /* this way we only display one message, not lots and lots */
-    if (!handler) {
+    /* this way we only display one message, not lots and lots, and
+       we also avoid flicker due to consecutive unselect/select */
+    if (!handler)
 	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
-    }
+}
+
+static void
+index_unselect_cb (GtkWidget * widget,
+                   Message * message,
+                   GdkEventButton * bevent,
+                   gpointer data)
+{
+    g_return_if_fail (widget != NULL);
+    g_return_if_fail (BALSA_IS_INDEX (widget));
+    g_return_if_fail (message != NULL);
+    
+    if (g_list_find (GTK_CLIST (widget)->selection,
+                     (gpointer) GTK_CLIST (widget)->focus_row) != NULL)
+        return;
+
+    gtk_object_set_data (GTK_OBJECT (widget), "message", NULL);
+    gtk_object_set_data (GTK_OBJECT (widget), "bevent", bevent);
+    gtk_object_set_data (GTK_OBJECT (widget), "data", data);
+
+    /* this way we only display one message, not lots and lots, and
+       we also avoid flicker due to consecutive unselect/select */
+    if (!handler)
+	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, widget);
 }
 
 

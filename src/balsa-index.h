@@ -51,6 +51,7 @@ extern "C"
       GtkCListClass parent_class;
 
       void (*select_message) (BalsaIndex * bindex, Message * message);
+      void (*unselect_message) (BalsaIndex * bindex, Message * message);
     };
 
 

@@ -64,6 +64,9 @@ static emailData *libbalsa_emailData_new(void);
 static void libbalsa_emailData_free(emailData * addy);
 static gint libbalsa_address_entry_button_press(GtkWidget *,
                                                 GdkEventButton *);
+static void libbalsa_address_entry_received(GtkWidget * widget,
+                                            GtkSelectionData * data,
+                                            guint time);
 static gint libbalsa_address_entry_key_press(GtkWidget *, GdkEventKey *);
 static void libbalsa_address_entry_show(LibBalsaAddressEntry * entry);
 static void libbalsa_force_no_match(emailData *);
@@ -207,6 +210,7 @@ libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass)
     gtk_widget_class->button_press_event = libbalsa_address_entry_button_press;
     gtk_widget_class->key_press_event = libbalsa_address_entry_key_press;
     gtk_widget_class->focus_out_event = libbalsa_address_entry_focus_out;
+    gtk_widget_class->selection_received = libbalsa_address_entry_received;
 }
 
 static void
@@ -986,26 +990,12 @@ libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
 static gint
 libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
 {
-    GtkEntry *entry;
-    GtkEditable *editable;
     LibBalsaAddressEntry *address_entry;
-    gint return_val;
 
     g_return_val_if_fail(widget != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(widget), FALSE);
-    g_return_val_if_fail(event != NULL, FALSE);
 
     address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
-    entry = GTK_ENTRY(widget);
-    editable = GTK_EDITABLE(widget);
-
-    /*
-     * Defaults from gtkentry.
-     */
-    if (entry->button && (event->button != entry->button))
-	return FALSE;
-    if (!GTK_WIDGET_HAS_FOCUS (widget))
-	gtk_widget_grab_focus (widget);
 
     /*
      * We need to mark the widget as tainted.
@@ -1016,24 +1006,40 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
      * Now that we have done the ONE LINE that we needed to do,
      * let's hand over to the parent method.
      */
-    return_val =
+    return
         GTK_WIDGET_CLASS(parent_class)->button_press_event(widget, event);
+}
 
-    /*
-     * Check if it is mouse button 2 (paste text)
-     */
-    if ( (event->button == 2) && (event->type == GDK_BUTTON_PRESS) &&
-	 editable->editable )
-    {
-	if (address_entry->input != NULL)
-	    libbalsa_inputData_free(address_entry->input);
-	address_entry->input = libbalsa_fill_input(address_entry);
-	address_entry->focus = FOCUS_CACHED;
-	libbalsa_address_entry_show(address_entry);
-    }
+/*************************************************************
+ * libbalsa_address_entry_received:
+ *     This gets called when a selection is received.
+ *
+ *   arguments:
+ *     widget: the widget.
+ *     data:   just passed to the parent method.
+ *     time:   ditto.
+ *
+ *   results:
+ *     Accepts and processes the pasted text.
+ *************************************************************/
+static void
+libbalsa_address_entry_received(GtkWidget * widget,
+                                GtkSelectionData * data, guint time)
+{
+    LibBalsaAddressEntry *address_entry;
 
-    /* libbalsa_sanitize(address_entry); */
-    return return_val;
+    g_return_if_fail(widget != NULL);
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(widget));
+
+    address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
+
+    GTK_WIDGET_CLASS(parent_class)->selection_received(widget, data, time);
+
+    if (address_entry->input != NULL)
+        libbalsa_inputData_free(address_entry->input);
+    address_entry->input = libbalsa_fill_input(address_entry);
+    address_entry->focus = FOCUS_CACHED;
+    libbalsa_address_entry_show(address_entry);
 }
 
 

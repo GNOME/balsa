@@ -1,3 +1,7 @@
+2002-02-08  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/address-entry.c: fix recently broken pasting in.
+
 2002-02-08  Pawel Salek <pawsa@theochem.kth.se>
 
 	* help/C/balsa.sgml: update POP account creation directions.

@@ -27,6 +27,7 @@
 #include "balsa-app.h"
 #include "pref-manager.h"
 #include "mailbox-conf.h"
+#include "folder-conf.h"
 #include "main-window.h"
 #include "save-restore.h"
 #include "spell-check.h"
@@ -45,7 +46,7 @@ typedef struct _PropertyUI {
 
     GtkWidget *address_books;
 
-    GtkWidget *pop3servers;
+    GtkWidget *mail_servers;
 #if ENABLE_ESMTP
     GtkWidget *smtp_server, *smtp_user, *smtp_passphrase;
 #endif
@@ -145,7 +146,7 @@ static GtkWidget *outgoing_page(gpointer);
 static void destroy_pref_window_cb(GtkWidget * pbox, gpointer data);
 static void set_prefs(void);
 static void apply_prefs(GnomePropertyBox * pbox, gint page_num);
-void update_pop3_servers(void);
+void update_mail_servers(void);
 static void update_address_books(void);
 static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void font_changed(GtkWidget * widget, GtkWidget * pbox);
@@ -908,8 +909,38 @@ update_address_books(void)
     gtk_clist_thaw(clist);
 }
 
+static void
+add_other_server(GNode * node, gpointer data)
+{
+    GtkCList *clist = GTK_CLIST(data);
+    gchar *text[2];
+    gboolean append = FALSE;
+    BalsaMailboxNode *mbnode = node->data;
+
+    if (mbnode) {
+	LibBalsaMailbox *mailbox = mbnode->mailbox;
+	if (mailbox) {
+	    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+		text[0] = "IMAP";
+		text[1] = mailbox->name;
+		append = TRUE;
+	    }
+	} else
+	    if (mbnode->server
+		&& mbnode->server->type == LIBBALSA_SERVER_IMAP) {
+	    text[0] = "IMAP";
+	    text[1] = mbnode->name;
+	    append = TRUE;
+	}
+	if (append) {
+	    gint row = gtk_clist_append(clist, text);
+	    gtk_clist_set_row_data(clist, row, mbnode);
+	}
+    }
+}
+
 void
-update_pop3_servers(void)
+update_mail_servers(void)
 {
     GtkCList *clist;
     GList *list = balsa_app.inbox_input;
@@ -920,7 +951,7 @@ update_pop3_servers(void)
 
     g_return_if_fail(pui);
 
-    clist = GTK_CLIST(pui->pop3servers);
+    clist = GTK_CLIST(pui->mail_servers);
 
     gtk_clist_clear(clist);
 
@@ -941,6 +972,14 @@ update_pop3_servers(void)
 	}
 	list = list->next;
     }
+    /*
+     * add other remote servers
+     *
+     * we'll check everything at the top level in the mailbox_nodes
+     * list:
+     */
+    g_node_children_foreach(balsa_app.mailbox_nodes, G_TRAVERSE_ALL,
+			    (GNodeForeachFunc) add_other_server, clist);
     gtk_clist_select_row(clist, 0, 0);
     gtk_clist_thaw(clist);
 }
@@ -1075,17 +1114,17 @@ create_mailserver_page(gpointer data)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow3),
 				   GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 
-    pui->pop3servers = gtk_clist_new(2);
-    gtk_container_add(GTK_CONTAINER(scrolledwindow3), pui->pop3servers);
-    gtk_clist_set_column_width(GTK_CLIST(pui->pop3servers), 0, 40);
-    gtk_clist_set_column_width(GTK_CLIST(pui->pop3servers), 1, 80);
-    gtk_clist_column_titles_show(GTK_CLIST(pui->pop3servers));
+    pui->mail_servers = gtk_clist_new(2);
+    gtk_container_add(GTK_CONTAINER(scrolledwindow3), pui->mail_servers);
+    gtk_clist_set_column_width(GTK_CLIST(pui->mail_servers), 0, 40);
+    gtk_clist_set_column_width(GTK_CLIST(pui->mail_servers), 1, 80);
+    gtk_clist_column_titles_show(GTK_CLIST(pui->mail_servers));
 
     label14 = gtk_label_new(_("Type"));
-    gtk_clist_set_column_widget(GTK_CLIST(pui->pop3servers), 0, label14);
+    gtk_clist_set_column_widget(GTK_CLIST(pui->mail_servers), 0, label14);
 
     label15 = gtk_label_new(_("Mailbox Name"));
-    gtk_clist_set_column_widget(GTK_CLIST(pui->pop3servers), 1, label15);
+    gtk_clist_set_column_widget(GTK_CLIST(pui->mail_servers), 1, label15);
     gtk_label_set_justify(GTK_LABEL(label15), GTK_JUSTIFY_LEFT);
 
     vbox1 = vbox_in_container(hbox1);
@@ -1155,7 +1194,7 @@ create_mailserver_page(gpointer data)
 		     (GtkAttachOptions) (0), 0, 0);
 #endif
     /* fill in data */
-    update_pop3_servers();
+    update_mail_servers();
 
     return table3;
 }
@@ -1940,7 +1979,7 @@ font_changed(GtkWidget * widget, GtkWidget * pbox)
 static void
 pop3_edit_cb(GtkWidget * widget, gpointer data)
 {
-    GtkCList *clist = GTK_CLIST(pui->pop3servers);
+    GtkCList *clist = GTK_CLIST(pui->mail_servers);
     gint row;
     BalsaMailboxNode *mbnode;
 
@@ -1951,7 +1990,7 @@ pop3_edit_cb(GtkWidget * widget, gpointer data)
 
     mbnode = gtk_clist_get_row_data(clist, row);
     g_return_if_fail(mbnode);
-    mailbox_conf_edit(mbnode);
+    balsa_mailbox_node_show_prop_dialog(mbnode);
 }
 
 static void
@@ -2037,17 +2076,41 @@ address_book_delete_cb(GtkWidget * widget, gpointer data)
     update_address_books();
 }
 
-
 static void
-pop3_add_cb(GtkWidget * widget, gpointer data)
+pop3_add(GtkWidget * widget, gpointer data)
 {
     mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_POP3);
 }
 
 static void
+pop3_add_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *menu;
+    GtkWidget *menuitem;
+
+    menu = gtk_menu_new();
+    menuitem = gtk_menu_item_new_with_label(_("Remote POP3 mailbox..."));
+    gtk_signal_connect(GTK_OBJECT(menuitem), "activate", pop3_add, NULL);
+    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_widget_show(menuitem);
+    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP mailbox..."));
+    gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
+		       mailbox_conf_add_imap_cb, NULL);
+    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_widget_show(menuitem);
+    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder..."));
+    gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
+		       folder_conf_add_imap_cb, NULL);
+    gtk_menu_append(GTK_MENU(menu), menuitem);
+    gtk_widget_show(menuitem);
+    gtk_widget_show(menu);
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
+}
+
+static void
 pop3_del_cb(GtkWidget * widget, gpointer data)
 {
-    GtkCList *clist = GTK_CLIST(pui->pop3servers);
+    GtkCList *clist = GTK_CLIST(pui->mail_servers);
     gint row;
     BalsaMailboxNode *mbnode;
 
@@ -2058,7 +2121,10 @@ pop3_del_cb(GtkWidget * widget, gpointer data)
     mbnode = gtk_clist_get_row_data(clist, row);
     g_return_if_fail(mbnode);
 
-    mailbox_conf_delete(mbnode);
+    if (mbnode->mailbox)
+	mailbox_conf_delete(mbnode);
+    else
+	folder_conf_delete(mbnode);
 }
 
 void

@@ -237,7 +237,6 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mbnode);
-	update_pop3_servers();
     } else {
 	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
 	if (!gnode) {
@@ -251,6 +250,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	    g_node_destroy(gnode); /* this will remove mbnode */
  	}
     }
+    update_mail_servers();
     gtk_object_destroy(GTK_OBJECT(mbnode));
 }
 
@@ -621,7 +621,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */
-	update_pop3_servers();
+	update_mail_servers();
     else /* redraw the main mailbox list */
 	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
 }
@@ -669,6 +669,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 
 	node = g_node_new(mbnode);
 	g_node_append(balsa_app.mailbox_nodes, node);
+	update_mail_servers();
     } else {
 	g_assert_not_reached();
     }
@@ -684,7 +685,7 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */
-	update_pop3_servers();
+	update_mail_servers();
     else /* redraw the main mailbox list */
 	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
 }

@@ -1,3 +1,15 @@
+2001-08-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: fix #58642: closing mailbox after idle
+	callback has been registered but before the mailbox preview had
+	time to update.
+
+	Peter Bloomfield <PeterBloomfield@MindSpring.com> "imap servers
+	in preferences" patch:
+	* src/folder-conf.c: update_mail_servers() when needed.
+	* src/mailbox-conf.c: same.
+	* src/pref-manager.c: the server enumeration and edition support.
+	
 2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* Makefile.am: tar's I option is obsolete, use j.

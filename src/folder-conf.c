@@ -26,6 +26,7 @@
 #include "folder-conf.h"
 #include "mailbox-node.h"
 #include "save-restore.h"
+#include "pref-manager.h"
 
 typedef struct {
     GnomeDialog *dialog;
@@ -162,6 +163,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	    balsa_mailbox_node_append_subtree(mn, gnode);
 	    balsa_mblist_repopulate(balsa_app.mblist);
 	    config_folder_add(mn, NULL);
+	    update_mail_servers();
 	} else {
 	    balsa_mailbox_node_rescan(mn);
 	    config_folder_update(mn);
@@ -545,6 +547,7 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
 	g_node_unlink(gnode);
 	g_node_destroy(gnode);
 	gtk_object_destroy(GTK_OBJECT(mbnode));
+	update_mail_servers();
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mbnode->name, mbnode);
 }

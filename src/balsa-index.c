@@ -1359,16 +1359,27 @@ balsa_index_refresh(BalsaIndex * bindex)
     gtk_clist_thaw(clist);
 }
 
+/* balsa_index_close_and_destroy:
+ */
 
 static void
 balsa_index_close_and_destroy(GtkObject * obj)
 {
     BalsaIndex *bindex;
     LibBalsaMailbox* mailbox;
-
+    GtkObject* message;
 
     g_return_if_fail(obj != NULL);
     bindex = BALSA_INDEX(obj);
+
+    /* remove idle callbacks and attached data */
+    if(handler) 
+        gtk_idle_remove(handler);
+    message = gtk_object_get_data(obj, "message");
+    if (message != NULL) {
+        gtk_object_remove_data (obj, "message");
+        gtk_object_unref (message);
+    }
 
     /*page->window references our owner */
     if (bindex->mailbox_node && (mailbox = bindex->mailbox_node->mailbox) ) {
@@ -1735,7 +1746,6 @@ balsa_index_reset(BalsaIndex * index)
 }
 
 
-
 void
 balsa_index_update_message(BalsaIndex * index)
 {
@@ -1802,8 +1812,9 @@ balsa_index_drag_cb (GtkWidget* widget, GdkDragContext* drag_context,
 }
 
 
-/*
+/* idle_handler_cb:
  * This is an idle handler, be sure to call use gdk_threads_{enter/leave}
+ * No assumptions should be made about validity of the attached_data.
  */
 static gboolean
 idle_handler_cb(GtkWidget * widget)

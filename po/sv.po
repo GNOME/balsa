@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.6.0\n"
-"POT-Creation-Date: 2000-04-21 22:34+0200\n"
+"POT-Creation-Date: 2000-04-23 17:41+0200\n"
 "PO-Revision-Date: 1999-12-28 14:03+0100\n"
 "Last-Translator: Andreas Hyden <a.hyden@cyberpoint.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -1060,8 +1060,8 @@ msgid "enable signature separator"
 msgstr "aktivera signaturseparator"
 
 #: src/pref-manager.c:822
-msgid "Remote Malibox Servers"
-msgstr ""
+msgid "Remote Mailbox Servers"
+msgstr "Icke-lokal brevlådsserver"
 
 #: src/pref-manager.c:847
 msgid "Type"
@@ -1173,7 +1173,7 @@ msgstr "Utseendeformat"
 
 #: src/pref-manager.c:1178
 msgid "Date encoding (for strftime):"
-msgstr ""
+msgstr "Datumformat (för strftime):"
 
 #: src/pref-manager.c:1190
 msgid "Selected headers:"
@@ -1307,7 +1307,7 @@ msgstr "Skriv ut redigerade meddelandet"
 
 #: src/sendmsg-window.c:168
 msgid "_Wrap body"
-msgstr ""
+msgstr "_Radbryt"
 
 #: src/sendmsg-window.c:168
 msgid "Wrap message lines"
@@ -1315,11 +1315,11 @@ msgstr "Bryt meddelandelinjer"
 
 #: src/sendmsg-window.c:172
 msgid "_Reflow paragraph"
-msgstr ""
+msgstr "Justera pa_ragraf"
 
 #: src/sendmsg-window.c:175
 msgid "R_eflow message"
-msgstr ""
+msgstr "Just_era meddelande"
 
 #: src/sendmsg-window.c:184
 msgid "Fr_om"
@@ -1343,7 +1343,7 @@ msgstr "Osynlig kopia"
 
 #: src/sendmsg-window.c:194
 msgid "_Fcc"
-msgstr ""
+msgstr "_Mappkopia"
 
 #: src/sendmsg-window.c:196
 msgid "_Reply To"
@@ -1371,19 +1371,19 @@ msgstr "V_ästern (ISO-8859-15)"
 
 #: src/sendmsg-window.c:217
 msgid "_Central European (ISO-8859-2)"
-msgstr ""
+msgstr "_Central europeisk (ISO-8859-2)"
 
 #: src/sendmsg-window.c:219
 msgid "_South European (ISO-8859-3)"
-msgstr ""
+msgstr "_Syd europeisk (ISO-8859-3)"
 
 #: src/sendmsg-window.c:221
 msgid "Cy_rillic (ISO-8859-5)"
-msgstr ""
+msgstr "Kyrillisk (ISO-8859-5)"
 
 #: src/sendmsg-window.c:223
 msgid "_Hebrew (ISO-8859-8)"
-msgstr ""
+msgstr "_Hebreisk (ISO-8859-8)"
 
 #: src/sendmsg-window.c:225
 msgid "_Turkish (ISO-8859-9)"
@@ -1459,10 +1459,12 @@ msgid "you"
 msgstr "du"
 
 #: src/sendmsg-window.c:759
+#, c-format
 msgid "On %s %s wrote:\n"
 msgstr "På %s skrev %s:\n"
 
 #: src/sendmsg-window.c:761
+#, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
@@ -1484,11 +1486,11 @@ msgstr "Nytt meddelande"
 
 #: src/sendmsg-window.c:1073
 msgid "Could not open the file.\n"
-msgstr ""
+msgstr "Kunde inte öppna filen.\n"
 
 #: src/sendmsg-window.c:1079
 msgid "Loading..."
-msgstr ""
+msgstr "Laddar..."
 
 #: src/sendmsg-window.c:1104
 msgid "Include file"

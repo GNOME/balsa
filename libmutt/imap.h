@@ -16,8 +16,15 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
-void rfc2047_encode_string (char *, size_t, const unsigned char *);
-void rfc2047_encode_adrlist (ADDRESS *);
+#ifndef _IMAP_H
+#define _IMAP_H
 
-void rfc2047_decode (char *, const char *, size_t);
-void rfc2047_decode_adrlist (ADDRESS *);
+extern int imap_append_message (CONTEXT *ctx, MESSAGE *msg);
+extern int imap_check_mailbox (CONTEXT *ctx, int *index_hint);
+extern int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno);
+extern int imap_open_mailbox (CONTEXT *ctx);
+extern int imap_open_mailbox_append (CONTEXT *ctx);
+extern int imap_sync_mailbox (CONTEXT *ctx);
+extern void imap_fastclose_mailbox (CONTEXT *ctx);
+
+#endif

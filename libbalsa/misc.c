@@ -422,10 +422,11 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
 
     while (*lines) {
         gint quote_level;
-        gboolean flowed;
+        gboolean flowed = FALSE;
         gchar *pending = NULL;
         gboolean tagged = FALSE;
         gint tmp;
+        gboolean is_sig;
 
         if (!str) {
             str = *lines++;
@@ -439,7 +440,10 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
 
         do {
             gchar *dq = &str[ql];
-            flowed = strcmp(dq, "-- ");
+
+            is_sig = (strcmp(dq, "-- ") == 0);
+            if (is_sig && pending)
+                break;
             /* destuff if coming off the wire or quoted: */
             if (*dq == ' ' && (!from_screen || quote_level > 0))
                 ++dq;
@@ -463,7 +467,7 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
             }
             /* hold this line as pending */
             pending = dq;
-            flowed = flowed && *dq && dq[strlen(dq) - 1] == ' ';
+            flowed = (!is_sig) && *dq && dq[strlen(dq) - 1] == ' ';
             if (!flowed || !*lines) {
                 str = NULL;
                 break;
@@ -473,6 +477,7 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
         } while (ql == quote_level);
         /* 
          * end of paragraph; either:
+         * - str is a sig-separator; or
          * - str has a new quote level; or
          * - the last line was fixed, not flowed; or
          * - we ran out of data.
@@ -480,7 +485,7 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
          * if it's a new quote level, we must trim trailing spaces from
          * any pending line
          * */
-        if (flowed && ql != quote_level) {
+        if (flowed && (is_sig || ql != quote_level)) {
             gchar *p = pending;
             while (*p)
                 p++;

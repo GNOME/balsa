@@ -1,3 +1,7 @@
+2002-08-22  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/misc.c: format=flowed mistreated signatures. Fix it.
+
 2002-08-19  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, Makefile.am, NEWS: release 1.4.0.

@@ -6,4 +6,4 @@ libbalsa_a_SOURCES = \
 	mailbox.c	\
 	send.c
 
-INCLUDES=-I. -I../src -I../libmutt $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I../src -I../libmutt -I../libmutt/rx $(GNOME_INCLUDEDIR)

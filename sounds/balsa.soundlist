@@ -10,6 +10,7 @@ description[lt]=Balsa el. paПto programa
 description[no]=Balsa e-post leser
 description[sv]=Balsa epostprogram
 description[tr]=Balsa ePosta uygulamasЩ
+description[uk]=Зчитувач електронно╖ пошти Balsa
 description[wa]=Manaedjeu d' emilaedjes Balsa
 
 [startup]
@@ -25,4 +26,5 @@ description[lt]=Programos paleidimas
 description[no]=Programmoppstart
 description[sv]=Programstart
 description[tr]=Uygulama baЧlangЩГЩ
+description[uk]=Запуск програми
 description[wa]=Enondaedje do programe

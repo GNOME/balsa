@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
-"POT-Creation-Date: 2000-06-01 20:26-0400\n"
+"POT-Creation-Date: 2000-06-02 20:40+0300\n"
 "PO-Revision-Date: 1999-12-27 11:14+0200\n"
 "Last-Translator: Yuri Syrota <rasta@renome.rovno.ua>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -369,7 +369,7 @@ msgstr "Показано скриньку: %s, пов╕домлень: %ld, нових: %ld"
 
 #: src/balsa-message.c:165 src/balsa-message.c:170
 msgid "Save MIME Part"
-msgstr "Зберегти MIME-закодовану частину"
+msgstr "Зберегти закодовану MIME частину"
 
 #: src/balsa-message.c:166 src/balsa-message.c:226
 msgid "Save"
@@ -434,7 +434,7 @@ msgstr "Тема:"
 #: src/balsa-message.c:734
 #, c-format
 msgid "other part: error writing to temporary file %s: %s"
-msgstr ""
+msgstr "╕нша частина: помилка запису в тимчасовий файл %s: %s"
 
 #: src/balsa-message.c:788
 msgid ""
@@ -453,12 +453,12 @@ msgstr "<table border=0><tr><th>Атрибут</th><th>Value</th></tr>\n"
 #: src/balsa-message.c:827
 #, c-format
 msgid "image: error writing to temporary file: %s"
-msgstr ""
+msgstr "зображення: помилка запису в тимчасовий файл: %s"
 
 #: src/balsa-message.c:1068
 #, c-format
 msgid "text part: error writing to temporary file %s: %s"
-msgstr ""
+msgstr "текстова частина: помилка запису в тимчасовий файл %s: %s"
 
 #: src/balsa-message.c:1214
 #, c-format

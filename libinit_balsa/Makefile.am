@@ -43,5 +43,9 @@ endif
 
 EXTRA_DIST = $(GOBFILES)
 
-INCLUDES=-I. -I${top_srcdir} -I${top_srcdir}/libmutt -I${top_srcdir}/libbalsa -I${top_srcdir}/src\
-	$(GNOME_INCLUDEDIR)
+INCLUDES=	-I. -I$(top_srcdir) \
+		-I$(top_srcdir)/libmutt \
+		-I$(top_srcdir)/libbalsa \
+		-I$(top_srcdir)/src \
+		$(GNOME_INCLUDEDIR)
+

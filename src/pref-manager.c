@@ -283,6 +283,7 @@ set_prefs (void)
   gtk_entry_set_text (GTK_ENTRY (pui->real_name), balsa_app.real_name);
 
   gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.email);
+  gtk_entry_set_text (GTK_ENTRY (pui->replyto), balsa_app.replyto);
 
   gtk_entry_set_text (GTK_ENTRY (pui->signature), balsa_app.signature_path);
   if (balsa_app.smtp_server)

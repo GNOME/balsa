@@ -56,32 +56,34 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
 
   msg->env->userhdrs = mutt_new_list ();
   {
-    LIST* sptr = UserHeader;
-    LIST* dptr = msg->env->userhdrs;
-    LIST* delptr = 0;
+    LIST *sptr = UserHeader;
+    LIST *dptr = msg->env->userhdrs;
+    LIST *delptr = 0;
     while (sptr)
       {
-	dptr->data = g_strdup(sptr->data);
-	sptr       = sptr->next;
-	delptr     = dptr;
-	dptr->next = mutt_new_list();
-	dptr       = dptr->next;
+	dptr->data = g_strdup (sptr->data);
+	sptr = sptr->next;
+	delptr = dptr;
+	dptr->next = mutt_new_list ();
+	dptr = dptr->next;
       }
-    g_free(delptr->next);
+    g_free (delptr->next);
     delptr->next = 0;
   }
-#if 0  
-  msg->env->userhdrs = UserHeader;
-#endif
+
   tmp = address_to_gchar (message->from);
   msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
   g_free (tmp);
+
+  tmp = address_to_gchar (message->reply_to);
+  msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
+  g_free (tmp);
+
   msg->env->subject = g_strdup (message->subject);
 
   msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list (message->to_list));
   msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list (message->cc_list));
   msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
-
 
   text = ((Body *) (g_list_first (message->body_list)->data))->buffer;
   fputs (text, tempfp);
@@ -95,9 +97,9 @@ balsa_send_message (Message * message, gchar * smtp_server, glong debug)
     case MAILBOX_MAILDIR:
     case MAILBOX_MH:
     case MAILBOX_MBOX:
-	    /*
-      send_message (msg, MAILBOX_LOCAL(balsa_app.outbox)->path);
-      */
+      /*
+         send_message (msg, MAILBOX_LOCAL(balsa_app.outbox)->path);
+       */
       mutt_send_message (msg);
       break;
     case MAILBOX_IMAP:

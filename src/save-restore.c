@@ -533,6 +533,12 @@ config_global_load (void)
     return FALSE;
   balsa_app.email = g_strdup (field);
 
+  /* users's replyto address */
+  if ((field = pl_dict_get_str (globals, "ReplyTo")) == NULL)
+    balsa_app.replyto = g_strdup (balsa_app.email);
+  else
+    balsa_app.replyto = g_strdup (field);
+
   /* directory */
   if ((field = pl_dict_get_str (globals, "LocalMailDir")) == NULL)
     return FALSE;
@@ -540,10 +546,10 @@ config_global_load (void)
 
   /* signature file path */
   if ((field = pl_dict_get_str (globals, "SignaturePath")) == NULL)
-  {
-    balsa_app.signature_path = g_malloc(strlen(g_get_home_dir()) + 12);
-    sprintf (balsa_app.signature_path, "%s/.signature", g_get_home_dir ());
-  }
+    {
+      balsa_app.signature_path = g_malloc (strlen (g_get_home_dir ()) + 12);
+      sprintf (balsa_app.signature_path, "%s/.signature", g_get_home_dir ());
+    }
   else
     balsa_app.signature_path = g_strdup (field);
 
@@ -621,14 +627,18 @@ config_global_save (void)
     globals = pl_dict_add_str_str (NULL, "RealName", balsa_app.real_name);
   if (balsa_app.email != NULL)
     pl_dict_add_str_str (globals, "Email", balsa_app.email);
+  if (balsa_app.replyto != NULL)
+    pl_dict_add_str_str (globals, "ReplyTo", balsa_app.replyto);
+
   if (balsa_app.local_mail_directory != NULL)
     pl_dict_add_str_str (globals, "LocalMailDir",
 			 balsa_app.local_mail_directory);
+  if (balsa_app.smtp_server != NULL)
+    pl_dict_add_str_str (globals, "SMTPServer", balsa_app.smtp_server);
+
   if (balsa_app.signature_path != NULL)
     pl_dict_add_str_str (globals, "SignaturePath",
 			 balsa_app.signature_path);
-  if (balsa_app.smtp_server != NULL)
-    pl_dict_add_str_str (globals, "SMTPServer", balsa_app.smtp_server);
 
   {
     char tmp[32];

@@ -506,11 +506,17 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->from = address_new ();
   message->from->personal = g_strdup (balsa_app.real_name);
-  message->from->mailbox = g_strdup(balsa_app.email);
+  message->from->mailbox = g_strdup (balsa_app.email);
   message->subject = g_strdup (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
 
   message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));
   message->cc_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)));
+
+  message->reply_to = address_new ();
+  /* FIXME: include personal here? */
+  message->reply_to->personal = g_strdup (balsa_app.real_name);
+  message->reply_to->mailbox = g_strdup (balsa_app.replyto);
+
 
   body = body_new ();
 

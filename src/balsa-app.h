@@ -46,6 +46,8 @@ extern struct BalsaApplication
   /* personal information */
   gchar *real_name;
   gchar *email;
+  gchar *replyto;
+
   gchar *local_mail_directory;
   gchar *smtp_server;
 

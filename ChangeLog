@@ -1,3 +1,8 @@
+2002-02-20  Matthew Guenther  <guentherm@asme.org>
+
+	* src/sendmsg-window.c: handle situation of starting a message
+	with a signature
+
 2002-02-17  Matthew Guenther  <guentherm@asme.org>
 
 	* src/sendmsg-window.c: when changing identities change the

@@ -870,22 +870,19 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
     gboolean forward_type = (msg->type == SEND_FORWARD_ATTACH || 
                              msg->type == SEND_FORWARD_INLINE);
     
-    gtk_text_freeze(GTK_TEXT(msg->text));
     gtk_editable_delete_text(GTK_EDITABLE(msg->text), *replace_offset,
                              *replace_offset + siglen);
 
-    if (!new_sig) {
-        gtk_text_thaw(GTK_TEXT(msg->text));
+    if (!new_sig) 
         return;
-    } else {
+    else 
         newsiglen = strlen(new_sig);
-    }
+    
     
     /* check to see if this is a reply or forward and compare identity
      * settings to determine whether to add signature */
     if ((reply_type && !new_ident->sig_whenreply) ||
         (forward_type && !new_ident->sig_whenforward)) {
-        gtk_text_thaw(GTK_TEXT(msg->text));
         return;
     } 
 
@@ -910,8 +907,11 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
         gtk_editable_insert_text(GTK_EDITABLE(msg->text),
                                  new_sig, newsiglen, &ins_pos);
     }
+
+    if (*replace_offset < 0) {
+        *replace_offset = 0;
+    }
     
-    gtk_text_thaw(GTK_TEXT(msg->text));
 }
 
 
@@ -949,7 +949,7 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     gint siglen;
     gint ins_pos;
     gint i = 0;
-    
+    gboolean changed_sig = FALSE;
     gchar* old_sig;
     gchar* new_sig;
     gchar* message_text;
@@ -983,6 +983,16 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     /* reconstruct the old signature to search with */
     old_ident = msg->ident;
     old_sig = read_signature(msg);
+
+    /* switch identities in msg here so we can use read_signature
+     * again */
+    msg->ident = ident;
+    new_sig = read_signature(msg);
+
+    /* check the simplest case of the message starting with the
+     * signature */
+
+    new_sig = prep_signature(ident, new_sig);
     old_sig = prep_signature(old_ident, old_sig);
 
     if (old_sig)
@@ -990,16 +1000,11 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
     else 
         siglen = 0;
 
-    /* switch identities in msg here so we can use read_signature
-     * again */
-    msg->ident = ident;
-    new_sig = read_signature(msg);
-    new_sig = prep_signature(ident, new_sig);
-
     /* split on sig separator */
     message_text = gtk_editable_get_chars(GTK_EDITABLE(msg->text), 0, -1);
     message_split = g_strsplit(message_text, "\n-- \n", 0);
-    
+    gtk_text_freeze(GTK_TEXT(msg->text));
+
     while (message_split[i]) {
         /* put sig separator back to search */
         compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
@@ -1008,6 +1013,18 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
         if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
             repl_identity_signature(msg, ident, old_ident, &replace_offset, 
                                     siglen, new_sig);
+            changed_sig = TRUE;
+        } else if (i == 0) {
+            /* check the special case of starting a message with a
+             * sig */
+            g_free(compare_str);
+            compare_str = g_strconcat("\n", message_split[i], NULL);
+            
+            if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
+                repl_identity_signature(msg, ident, old_ident, &replace_offset,
+                                        siglen - 1, new_sig);
+                changed_sig = TRUE;
+            }
         }
 
         if (i == 0) {
@@ -1017,12 +1034,13 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
         }
 
         g_free(compare_str);
-        i++;
+        ++i;
     }
 
 
-    /* if no sig seperators found, do a slower brute force approach */
-    if (!message_split[0] || !message_split[1]) {
+    /* if we haven't found/switched the signature yet, do a slower
+     * brute force approach */
+    if (!changed_sig) {
         compare_str = message_text;
         replace_offset = 0;
         
@@ -1030,13 +1048,25 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
             if (g_strncasecmp(old_sig, compare_str, siglen) == 0) {
                 repl_identity_signature(msg, ident, old_ident, &replace_offset,
                                         siglen, new_sig);
+            } else if (compare_str == message_text) {
+                /* check for a signature starting the message */
+                tmpstr = g_strconcat("\n", message_text, NULL);
+                
+                if (g_strncasecmp(old_sig, tmpstr, siglen) == 0) {
+                    repl_identity_signature(msg, ident, old_ident, 
+                                            &replace_offset, siglen - 1, 
+                                            new_sig);
+                }
+                
+                g_free(tmpstr);
             }
-
-            replace_offset++;
-            compare_str++;
+            
+            ++replace_offset;
+            ++compare_str;
         }
     }
 
+    gtk_text_thaw(GTK_TEXT(msg->text));
     g_strfreev(message_split);
     g_free(old_sig);
     g_free(new_sig);

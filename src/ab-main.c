@@ -19,10 +19,6 @@
  * 02111-1307, USA.
  */
 
-#undef GTK_DISABLE_DEPRECATED
-#undef GNOME_DISABLE_DEPRECATED
-#undef GNOME_DISABLE_DEPRECATED_SOURCE
-
 #include "config.h"
 
 #include <string.h>
@@ -632,10 +628,7 @@ main(int argc, char *argv[])
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
     bind_textdomain_codeset(PACKAGE, "UTF-8");
     textdomain(PACKAGE);
-    /* FIXME: gnome_i18n_get_language seems to have gone away; 
-     * is this a reasonable replacement? */
-    setlocale(LC_CTYPE,
-              (const char *) gnome_i18n_get_language_list("LC_CTYPE")->data);
+    setlocale(LC_ALL, "");
 #endif
 
     /* FIXME: do we need to allow a non-GUI mode? */

@@ -722,8 +722,7 @@ libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap,
 	imap_handle_set_infocb(handle,    set_status, NULL);
 	imap_handle_set_alertcb(handle,   set_status, NULL);
 	imap_handle_set_flagscb(handle,   flags_cb, handle);
-	rc=imap_mbox_handle_connect(handle,
-				    server->host, 143,
+	rc=imap_mbox_handle_connect(handle, server->host,
 				    server->user, server->passwd);
 	if(rc != IMAP_SUCCESS) {
 	    g_object_unref(handle);
@@ -972,7 +971,9 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 	
 	handle = libbalsa_mailbox_imap_get_handle(mbox, NULL);
 	if (handle) {
-	    rc = imap_mbox_uid_search(handle, query, imap_matched, cbdata);
+	    rc = imap_mbox_uid_search(handle, query, 
+                                      (void(*)(unsigned,void*))imap_matched,
+                                      cbdata);
 	    g_object_unref(handle);
 	    g_free(query);
 	}

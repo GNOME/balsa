@@ -110,7 +110,6 @@ static void
 imap_mbox_handle_init(ImapMboxHandle *handle)
 {
   handle->host   = NULL;
-  handle->port   = 143;
   handle->user   = NULL;
   handle->passwd = NULL;
   handle->mbox   = NULL;
@@ -212,7 +211,7 @@ int imap_mbox_is_selected     (ImapMboxHandle *h)
 { return IMAP_MBOX_IS_SELECTED(h); }
 
 ImapResult
-imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int port, 
+imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host,
                          const char* user, const char* passwd)
 {
   ImapResult rc;
@@ -283,18 +282,14 @@ struct ListData {
 };
 
 static int
-socket_open(const char* host, int iport)
+socket_open(const char* host, const char *def_port)
 {
   static const int USEIPV6 = 0;
   int rc, fd = -1;
   
   /* --- IPv4/6 --- */
   /* "65536\0" */
-#ifdef HOST_DOES_NOT_INCLUDE_PORT
-  char port[6];
-#else
-  char *port;
-#endif
+  const char *port;
   struct addrinfo hints;
   struct addrinfo* res;
   struct addrinfo* cur;
@@ -305,13 +300,11 @@ socket_open(const char* host, int iport)
   hints.ai_family = USEIPV6 ? AF_UNSPEC : AF_INET;
   hints.ai_socktype = SOCK_STREAM;
 
-#ifdef HOST_DOES_NOT_INCLUDE_PORT
-  snprintf (port, sizeof (port), "%d", iport);
-#else
   port = strrchr(host, ':');
   if (port)
     *port++ = '\0';
-#endif
+  else 
+    port = def_port;
 
   rc = getaddrinfo(host, port, &hints, &res);
   if(rc)
@@ -340,7 +333,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
 {
   static const int SIO_BUFSZ=8192;
 
-  handle->sd = socket_open(handle->host, handle->port);
+  handle->sd = socket_open(handle->host, "imap");
   if(handle->sd<0) return IMAP_CONNECT_FAILED;
   
   /* Add buffering to the socket */

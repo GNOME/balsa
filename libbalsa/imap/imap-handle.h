@@ -94,8 +94,7 @@ void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
 void imap_handle_set_alertcb(ImapMboxHandle* h, ImapInfoCb cb, void*);
 void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
 
-ImapResult imap_mbox_handle_connect(ImapMboxHandle* r,
-                                    const char *hst, int prt, 
+ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst,
                                     const char* user, const char* passwd);
 ImapResponse imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                         gboolean *readonly);

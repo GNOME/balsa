@@ -8,6 +8,10 @@
 	* libbalsa/send.c: factor out common code.
 	* libbalsa/expand-alias.c : store pointer to LibBalsaAddress.
 	* src/sendmsg-window.c: use libbalsa_address_entry_get_list()
+	* libbalsa/imap/imap_private.h: remove integer port number parameter.
+	* libbalsa/imap/imap-handle.c: fix case when no port is specified
+	after ':'.
+	* libbalsa/mailbox_imap.c: adjust to changed API.
 
 2003-09-19 07:16  PeterB
 

@@ -15,10 +15,9 @@ struct _ImapMboxHandle {
   int sd; /* socket descriptor */
   struct siobuf * sio;
   char *host;
-  int  port;
   char *user;
   char *passwd;
-  char* mbox;
+  char* mbox; /* currently selected mailbox, if any */
 
   ImapMboxHandleState state;
   gboolean has_capabilities;

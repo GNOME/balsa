@@ -1701,9 +1701,10 @@ msgstr "Subjekti:"
 msgid "Date:"
 msgstr "Data:"
 
+#. GRUT modified this item
 #: src/balsa-message.c:1253 src/sendmsg-window.c:675
 msgid "Reply-To:"
-msgstr ""
+msgstr "Përgjigju-Tek:"
 
 #. GRUT modified this item
 #. cc:
@@ -1712,11 +1713,12 @@ msgstr ""
 msgid "Cc:"
 msgstr "Cc:"
 
+#. GRUT modified this item
 #. bcc:
 #: src/balsa-message.c:1258 src/print.c:373 src/sendmsg-window.c:676
 #: src/sendmsg-window.c:1963 src/store-address.c:306
 msgid "Bcc:"
-msgstr ""
+msgstr "Bcc:"
 
 #: src/balsa-message.c:1261 src/print.c:374
 msgid "Fcc:"
@@ -4266,9 +4268,10 @@ msgstr ""
 msgid "_Send"
 msgstr "_Dërgo"
 
+#. GRUT modified this item
 #: src/sendmsg-window.c:220 src/toolbar-factory.c:121
 msgid "Send this message"
-msgstr ""
+msgstr "Nise këtë mesazh"
 
 #: src/sendmsg-window.c:224
 msgid "_Queue"
@@ -4876,9 +4879,10 @@ msgstr "Vazhdo"
 msgid "Continue message"
 msgstr ""
 
+#. GRUT modified this item
 #: src/toolbar-factory.c:98
 msgid "Reply"
-msgstr ""
+msgstr "Përgjigju"
 
 #: src/toolbar-factory.c:100
 msgid ""
@@ -4975,9 +4979,10 @@ msgstr "Dërgo"
 msgid "Exchange"
 msgstr "Exchange"
 
+#. GRUT modified this item
 #: src/toolbar-factory.c:124
 msgid "Attach"
-msgstr ""
+msgstr "Bashkangjit"
 
 #: src/toolbar-factory.c:125
 msgid "Add attachments to this message"

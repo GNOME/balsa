@@ -57,8 +57,8 @@ extern "C" {
         BalsaMailboxNode* mailbox_node;
         LibBalsaMessage* first_new_message;
         LibBalsaMessage* current_message;
-        LibBalsaMessage* previous_message;
-        LibBalsaMessage* next_message;
+        gboolean prev_message;
+        gboolean next_message;
 
         int threading_type;
         GTimeVal last_use;
@@ -66,11 +66,11 @@ extern "C" {
 	gchar *date_string;
 	gboolean line_length;
 
+        /* work around an unimplemented GtkTreeView feature */
+        gboolean scroll_use_align;
+
         /* idle handler data */
-        guint changed_idle_id;
-        guint sync_backend_idle_id;
-        guint preview_idle_id;
-        LibBalsaMessage *preview_message;
+        guint idle_handler_id;
         GSList *update_flag_list;
     };
 
@@ -107,8 +107,6 @@ extern "C" {
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
 
-    void balsa_index_redraw_current(BalsaIndex *);
-
 /* move or copy a list of messages */
     void balsa_index_transfer(BalsaIndex * index, GList * messages,
                               LibBalsaMailbox * to_mailbox, gboolean copy);
@@ -141,7 +139,6 @@ extern "C" {
 
     void balsa_index_reset(BalsaIndex * index);
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
-    void balsa_index_update_message(BalsaIndex * index);
     void balsa_index_set_column_widths(BalsaIndex * index);
     GList * balsa_index_selected_list(BalsaIndex * index);
     void balsa_index_move_subtree(GtkTreeModel * model, GtkTreePath * root,

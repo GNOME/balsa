@@ -1,3 +1,12 @@
+2002-09-17  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.[ch]: allow keyboard access and multiple 
+	selection; move preview management to main-window.c; improve 
+	scrolling.	
+	* src/balsa-message.c: don't grab focus to the message.
+	* src/main-window.[ch]: idle handler for setting the preview 
+	message.
+
 2002-09-16  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_imap.c (get_cache_name):  add username to 

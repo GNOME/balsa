@@ -461,7 +461,6 @@ balsa_message_clear(BalsaMessage * bm)
 gboolean
 balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 {
-    gboolean had_focus;
     gboolean is_new;
     gint part_count;
 
@@ -472,7 +471,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     /*    if (bm->message == message) */
     /*      return; */
 
-    had_focus = bm->content_has_focus;
 
     select_part(bm, -1);
     if (bm->message != NULL) {
@@ -534,9 +532,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     gnome_icon_list_select_icon(GNOME_ICON_LIST(bm->part_list), 0);
 
     select_part(bm, 0);
-    if ( /*had_focus&& */ bm->current_part
-	&& bm->current_part->focus_widget)
-	gtk_widget_grab_focus(bm->current_part->focus_widget);
 
     /* We show the part list if:
      *    there is > 1 part

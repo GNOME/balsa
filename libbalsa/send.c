@@ -697,6 +697,7 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
     tmpbuffer = message;
     while ((tmp = strstr(tmpbuffer,"\n"))!=NULL)
     {
+	    if(*tmpbuffer=='.') write(s,".",1); /* make sure dots won't hurt */
 	    len = (int)strcspn(tmpbuffer,"\n");
 	    
 	    if (*(tmp-1)!='\r')
@@ -707,8 +708,6 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 		send = send + len + 2 ;
 	    
 		percent = (float)send/total ;
-/*	        MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",	                         NULL, NULL, percent);
-*/			
 #endif
 	    }
 	    else
@@ -719,8 +718,6 @@ int balsa_smtp_protocol (int s, char *tempfile, HEADER *msg)
 		send = send + len + 1;
 
 		percent = (float)send/total ;
-/*		MSGSENDTHREAD(progress_message, MSGSENDTHREADPROGRESS, "",	                         NULL, NULL, percent);
-*/			
 #endif		
 	    }
 	    tmpbuffer=tmp+1;
@@ -771,12 +768,6 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
 #ifdef BALSA_USE_THREADS
   SendThreadMessage *error_message, *finish_message;
   char error_msg[256];
-/*    char msgbuf[160]; */
-/*    MailThreadMessage *threadmsg; */
-
-/*    sprintf( msgbuf, "SMTP: Hola cara de bola"); */
-/*    MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_SOURCE, msgbuf ); */
-
 #endif
  
 

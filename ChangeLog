@@ -10,6 +10,8 @@
 	* libbalsa/mailbox.c: redundant resetting of Spoolfile removed.
 	* src/balsa-app.c: use balsa_guess_mail_spool for setting Spoolfile.
 	* src/address-book.c: armoured the code against the unexpected.
+	* libbalsa/send.c, libmutt/sendlib.c: #13708 bug fix (sending
+	messages that contain a single dot in a line).
 	
 2000-06-11  Peter Williams  <peter@beta.newton.cx>
 

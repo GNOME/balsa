@@ -286,6 +286,7 @@ config_init(void)
 {
     while(!config_load() || check_special_mailboxes()) {
 	balsa_init_begin();
+        config_defclient_save();
     }
 }
 
@@ -295,6 +296,7 @@ mailboxes_init(void)
     if (!do_load_mailboxes()) {
 	g_warning("*** error loading mailboxes\n");
 	balsa_init_begin();
+        config_defclient_save();
 	return;
     }
 }

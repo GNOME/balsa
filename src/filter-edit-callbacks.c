@@ -1716,10 +1716,7 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
         gtk_entry_set_text(GTK_ENTRY(fe_name_entry),"");
         gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),"");
         /*gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0); */
-#if GTK_CHECK_VERSION(2, 6, 0)
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(fe_sound_entry),
-                                      "");
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
+#if !GTK_CHECK_VERSION(2, 6, 0)
         gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),"");
 #endif /* GTK_CHECK_VERSION(2, 6, 0) */
         gtk_list_store_clear(GTK_LIST_STORE
@@ -1842,20 +1839,27 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
                                       '\0')) ? _(defstring) : tmpstr);
     }
 
-#ifdef HAVE_LIBESD
+/* FIXME never defined?? #ifdef HAVE_LIBESD */
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_sound_button))) {
         gchar *tmpstr;
         
-        tmpstr = gtk_entry_get_text(GTK_ENTRY(fe_sound_entry));
+#if GTK_CHECK_VERSION(2, 6, 0)
+        tmpstr = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+                                               (fe_sound_entry));
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
+        tmpstr =
+            gtk_editable_get_chars(GTK_EDITABLE(fe_sound_entry), 0, -1);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
         if ((!tmpstr) || (tmpstr[0] == '\0')) {
+            g_free(tmpstr);
             libbalsa_filter_free(fil, GINT_TO_POINTER(TRUE));
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("You must provide a sound to play"));
             return;
         }
-        fil->sound=g_strdup(tmpstr);
+        fil->sound = tmpstr;
     }
-#endif
+/* #endif *//* HAVE_LIBESD */
     /* New filter is OK, we replace the old one */
     gtk_tree_model_get(model, &iter, 1, &old, -1);
     change_filter_name(old->name, fil->name);
@@ -1946,8 +1950,9 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),
                                  fil->sound!=NULL);
 #if GTK_CHECK_VERSION(2, 6, 0)
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(fe_sound_entry),
-                                  fil->sound != NULL ? fil->sound : "");
+    if (fil->sound)
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(fe_sound_entry),
+                                      fil->sound);
 #else /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),
                        fil->sound!=NULL ? fil->sound : "");

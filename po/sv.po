@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-09-30 09:57+0200\n"
-"PO-Revision-Date: 2001-09-30 10:34+0200\n"
+"POT-Creation-Date: 2001-10-03 14:09+0200\n"
+"PO-Revision-Date: 2001-10-03 14:11+0200\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -101,17 +101,6 @@ msgstr "Det finns ingen sådan adressbokstyp: %s"
 msgid "Could not create a address book of type %s"
 msgstr "Kunde inte skapa en adressbok av typen %s"
 
-#. Non-threaded locking mechanism
-#: libbalsa/libbalsa_private.h:99 libbalsa/libbalsa_private.h:111
-#, c-format
-msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
-msgstr "*** FEL: Brevlådelås finns: %s ***\n"
-
-#: libbalsa/libbalsa_private.h:129 libbalsa/libbalsa_private.h:138
-#, c-format
-msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
-msgstr "*** FEL: Brevlådeström stängd: %s ***\n"
-
 #: libbalsa/identity.c:30
 msgid "Default"
 msgstr "Standard"
@@ -127,117 +116,117 @@ msgstr "Sv:"
 msgid "Fwd:"
 msgstr "Vb:"
 
-#: libbalsa/identity.c:434 libbalsa/identity.c:1037
+#: libbalsa/identity.c:442 libbalsa/identity.c:1045
 msgid "Edit"
 msgstr "Redigera"
 
-#: libbalsa/identity.c:439 libbalsa/identity.c:1038
+#: libbalsa/identity.c:447 libbalsa/identity.c:1046
 msgid "Set Default"
 msgstr "Ställ in standardalternativ"
 
-#: libbalsa/identity.c:602
+#: libbalsa/identity.c:610
 msgid "Create Identity"
 msgstr "Skapa identitet"
 
-#: libbalsa/identity.c:603
+#: libbalsa/identity.c:611
 msgid "Edit Identity"
 msgstr "Redigera identitet"
 
-#: libbalsa/identity.c:637 libbalsa/identity.c:1145
+#: libbalsa/identity.c:645 libbalsa/identity.c:1153
 msgid "Identity Name:"
 msgstr "Identitetsnamn:"
 
-#: libbalsa/identity.c:642 libbalsa/identity.c:1147
+#: libbalsa/identity.c:650 libbalsa/identity.c:1155
 msgid "Full Name:"
 msgstr "Fullständigt namn:"
 
-#: libbalsa/identity.c:647 libbalsa/identity.c:651 libbalsa/identity.c:1149
+#: libbalsa/identity.c:655 libbalsa/identity.c:659 libbalsa/identity.c:1157
 msgid "Mailing Address:"
 msgstr "E-postadress:"
 
 #. Reply To:
-#: libbalsa/identity.c:656 libbalsa/identity.c:1151 src/sendmsg-window.c:1141
+#: libbalsa/identity.c:664 libbalsa/identity.c:1159 src/sendmsg-window.c:1141
 msgid "Reply To:"
 msgstr "Svara till:"
 
-#: libbalsa/identity.c:659 libbalsa/identity.c:1153
+#: libbalsa/identity.c:667 libbalsa/identity.c:1161
 msgid "Domain:"
 msgstr "Domän:"
 
 #. bcc:
-#: libbalsa/identity.c:662 libbalsa/identity.c:1155 src/balsa-message.c:718
+#: libbalsa/identity.c:670 libbalsa/identity.c:1163 src/balsa-message.c:718
 #: src/print.c:393 src/sendmsg-window.c:1114
 msgid "Bcc:"
 msgstr "Osynlig kopia:"
 
-#: libbalsa/identity.c:665 libbalsa/identity.c:1157
+#: libbalsa/identity.c:673 libbalsa/identity.c:1165
 msgid "Reply String:"
 msgstr "Svarssträng:"
 
-#: libbalsa/identity.c:668 libbalsa/identity.c:1159
+#: libbalsa/identity.c:676 libbalsa/identity.c:1167
 msgid "Forward String:"
 msgstr "Vidarefordranssträng:"
 
-#: libbalsa/identity.c:671 libbalsa/identity.c:1161
+#: libbalsa/identity.c:679 libbalsa/identity.c:1169
 msgid "Signature Path:"
 msgstr "Signatursökväg:"
 
-#: libbalsa/identity.c:675 libbalsa/identity.c:1164
+#: libbalsa/identity.c:683 libbalsa/identity.c:1172
 msgid "Append Signature"
 msgstr "Lägg till signatur på slutet"
 
-#: libbalsa/identity.c:679 libbalsa/identity.c:1166
+#: libbalsa/identity.c:687 libbalsa/identity.c:1174
 msgid "Append Signature When Forwarding"
 msgstr "Lägg till signatur på slutet vid vidarebefordran"
 
-#: libbalsa/identity.c:682 libbalsa/identity.c:1169
+#: libbalsa/identity.c:690 libbalsa/identity.c:1177
 msgid "Append Signature When Replying"
 msgstr "Lägg till signatur på slutet vid svar"
 
-#: libbalsa/identity.c:685 libbalsa/identity.c:1172
+#: libbalsa/identity.c:693 libbalsa/identity.c:1180
 msgid "Include Signature Separator"
 msgstr "Inkludera signaturavskiljare"
 
-#: libbalsa/identity.c:688 libbalsa/identity.c:1175
+#: libbalsa/identity.c:696 libbalsa/identity.c:1183
 msgid "Prepend Signature"
 msgstr "Lägg till signatur i början"
 
-#: libbalsa/identity.c:862
+#: libbalsa/identity.c:870
 msgid "Error: The identity does not have a name"
 msgstr "Fel: Identiteten har inget namn"
 
-#: libbalsa/identity.c:872
+#: libbalsa/identity.c:880
 msgid "Error: An identity with that name already exists"
 msgstr "Fel: En identitet med det namnet finns redan"
 
-#: libbalsa/identity.c:988
+#: libbalsa/identity.c:996
 msgid "Cannot delete default profile, please make another default first."
 msgstr "Kan inte ta bort standardprofil, skapa en annan standardprofil först."
 
-#: libbalsa/identity.c:995
+#: libbalsa/identity.c:1003
 msgid "Do you really want to delete the selected identity?"
 msgstr "Vill du verkligen ta bort den valda identiteten?"
 
-#: libbalsa/identity.c:1036 src/filter-edit-dialog.c:226
+#: libbalsa/identity.c:1044 src/filter-edit-dialog.c:226
 #: src/mailbox-node.c:564 src/main-window.c:425
 msgid "New"
 msgstr "Ny"
 
-#: libbalsa/identity.c:1039 src/balsa-index.c:2099
+#: libbalsa/identity.c:1047 src/balsa-index.c:2099
 #: src/filter-edit-dialog.c:232 src/mailbox-node.c:587 src/pref-manager.c:1246
 #: src/pref-manager.c:2148
 msgid "Delete"
 msgstr "Ta bort"
 
-#: libbalsa/identity.c:1050
+#: libbalsa/identity.c:1058
 msgid "Manage Identities"
 msgstr "Hantera identiteter"
 
-#: libbalsa/identity.c:1259
+#: libbalsa/identity.c:1267
 msgid "Do"
 msgstr "Gör"
 
-#: libbalsa/identity.c:1259
+#: libbalsa/identity.c:1267
 msgid "Do Not"
 msgstr "Gör inte"
 
@@ -437,7 +426,7 @@ msgstr "Skickar brev..."
 msgid "Hide"
 msgstr "Göm"
 
-#: libbalsa/send.c:707
+#: libbalsa/send.c:696
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -446,38 +435,43 @@ msgstr ""
 "Systemet kommer att försöka skicka om meddelandet igen tills\n"
 "du tar bort det."
 
-#: libbalsa/send.c:734
+#: libbalsa/send.c:723
 msgid "Connected to MTA"
 msgstr "Ansluten till MTA"
 
-#: libbalsa/send.c:741
+#: libbalsa/send.c:730
 #, c-format
 msgid "From: %d <%s>"
 msgstr "Från: %d <%s>"
 
-#: libbalsa/send.c:744
+#: libbalsa/send.c:733
 #, c-format
 msgid "From %s: %d %s"
 msgstr "Från %s: %d %s"
 
-#: libbalsa/send.c:752
+#: libbalsa/send.c:741
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Till: %d <%s>"
 
-#: libbalsa/send.c:755
+#: libbalsa/send.c:744
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Till %s: %d %s"
 
-#: libbalsa/send.c:779
+#: libbalsa/send.c:768
 #, c-format
 msgid "%d %s"
 msgstr "%d %s"
 
-#: libbalsa/send.c:792
+#: libbalsa/send.c:781
 msgid "Disconnected"
 msgstr "Frånkopplad"
+
+#: libbalsa/send.c:951
+#, c-format
+msgid "SMTP server problem: %s"
+msgstr "SMTP-serverproblem: %s"
 
 #: libbalsa/source-viewer.c:60
 msgid "Message Source"
@@ -957,7 +951,6 @@ msgid "%s [%s]\n"
 msgstr "%s [%s]\n"
 
 #: libmutt/mbox.c:134 libmutt/mbox.c:292
-#, c-format
 msgid "Reading %s... %d (%d%%)"
 msgstr "Läser %s... %d (%d%%)"
 
@@ -990,7 +983,6 @@ msgid "sync: mbox modified, but no modified messages! (report this bug)"
 msgstr "sync: mbox modified, but no modified messages! (rapportera detta fel)"
 
 #: libmutt/mbox.c:788
-#, c-format
 msgid "Writing messages... %d (%d%%)"
 msgstr "Skriver meddelanden... %d (%d%%)"
 
@@ -3994,6 +3986,12 @@ msgstr "-"
 #: src/toolbar-prefs.c:835
 msgid "+"
 msgstr "+"
+
+#~ msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
+#~ msgstr "*** FEL: Brevlådelås finns: %s ***\n"
+
+#~ msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
+#~ msgstr "*** FEL: Brevlådeström stängd: %s ***\n"
 
 #~ msgid "Unknown POP socket family: %d"
 #~ msgstr "Okänd POP-uttagsfamilj: %d"

@@ -184,7 +184,7 @@ static void part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_context_menu_vfs_cb(GtkWidget * menu_item, BalsaPartInfo * info);
 static void part_create_menu (BalsaPartInfo* info);
 
-static GtkViewportClass *parent_class = NULL;
+static GtkVBoxClass *parent_class = NULL;
 
 /* stuff needed for sending Message Disposition Notifications */
 static gboolean rfc2298_address_equal(LibBalsaAddress *a, LibBalsaAddress *b);
@@ -255,7 +255,7 @@ balsa_message_get_type()
         };
 
         balsa_message_type =
-            g_type_register_static(GTK_TYPE_VIEWPORT, "BalsaMessage",
+            g_type_register_static(GTK_TYPE_VBOX, "BalsaMessage",
                                    &balsa_message_info, 0);
     }
 

@@ -42,7 +42,7 @@ typedef struct _BalsaMessageClass BalsaMessageClass;
 typedef struct _BalsaPartInfo BalsaPartInfo;
 
 struct _BalsaMessage {
-	GtkViewport parent;
+	GtkVBox parent;
 
 	/* Widget to hold headers */
 	GtkWidget *header_container;
@@ -71,7 +71,7 @@ struct _BalsaMessage {
 };
 
 struct _BalsaMessageClass {
-	GtkViewportClass parent_class;
+	GtkVBoxClass parent_class;
 
 	void (*select_part) (BalsaMessage * message);
 };

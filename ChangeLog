@@ -1,3 +1,7 @@
+2003-09-05  Carlos Morgado  <chbm chbm.net>
+
+	* Changelog: Branched balsa-2-0. HEAD is devel
+
 2003-09-05 11:19  PeterB
 
 	* src/: filter-edit-callbacks.c, filter-run-callbacks.c: Use

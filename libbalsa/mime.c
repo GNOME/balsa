@@ -89,6 +89,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    return NULL;
 	}
 	allocated = libbalsa_readfile(fp, &res);
+	fclose(fp);
 	if (!res)
 	    return NULL;
 

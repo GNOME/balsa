@@ -2,6 +2,7 @@
 
 	* libbalsa/source-viewer.c: missing negation.
 	* configure.in: add explicit library list for pspell.
+	* libbalsa/mailbox.c: extra safety checks (Peter Bloomfield).
 
 2001-10-08  Pawel Salek  <pawsa@theochem.kth.se>
 

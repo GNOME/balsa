@@ -68,6 +68,8 @@ static void index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpo
 
 /* menu item callbacks */
 
+static gint
+close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent *event, BalsaIndex * bi);
 static void transfer_messages_cb (BalsaMBList *, LibBalsaMailbox *, GtkCTreeNode *, GdkEventButton *, BalsaIndex *);
 
 static void
@@ -525,6 +527,9 @@ create_menu (BalsaIndex * bindex)
   menuitem = gtk_menu_item_new_with_label (_("Transfer"));
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();
+  gtk_signal_connect (GTK_OBJECT (smenuitem), "button_release_event",
+		      (GtkSignalFunc) close_if_transferred_cb,
+		      (gpointer) bindex); 
   bmbl = balsa_mblist_new ();
   gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
 		      (GtkSignalFunc) transfer_messages_cb,
@@ -542,9 +547,16 @@ create_menu (BalsaIndex * bindex)
   return menu;
 }
 
+static gint
+close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent *event, BalsaIndex * bi)
+{
+  return gtk_object_get_data(GTK_OBJECT(bi), "transferredp") == NULL;
+}
 
 static void
-transfer_messages_cb (BalsaMBList * bmbl, LibBalsaMailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event, BalsaIndex * bindex)
+transfer_messages_cb (BalsaMBList * bmbl, LibBalsaMailbox * mailbox, 
+		      GtkCTreeNode * row, GdkEventButton * event, 
+		      BalsaIndex * bindex)
 {
 	GtkCList *clist;
 	BalsaIndexPage *page=NULL;
@@ -576,8 +588,8 @@ transfer_messages_cb (BalsaMBList * bmbl, LibBalsaMailbox * mailbox, GtkCTreeNod
 	libbalsa_mailbox_commit_changes(bindex->mailbox);
 	
 	if((page=balsa_find_notebook_page(mailbox)))
-    balsa_index_page_reset(page);
-	
+	  balsa_index_page_reset(page);
+	gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer)1);
 }
 
 #ifdef DND_USED

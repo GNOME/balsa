@@ -1,11 +1,16 @@
-2000-09-04  Pawel Salek  <pawsa@theochem.kth.se>
+2000-09-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/Makefile.am: include libimap.a only once - and it still works!
+	* src/balsa-index-page.c: allow expanding mailbox tree in transfer menu
+	
+2000-09-05  Pawel Salek  <pawsa@theochem.kth.se>
         (post-0.9.4, it's pity)
 	* libbalsa/mailbox.c: drop dead rereading on commit, too slow.
 	* src/balsa-app.h: MAX_QUOTE_LEVEL to 4, who reads older quotes anyway?
 	* src/balsa-index.c: next_unread and sort function don't hide selected
 	* src/balsa-message.c: fix regexp (thanks to Berend De Schouwer
 	<bds@jhb.ucs.co.za>).
-	* src/expand-alias.c: fix misbehavior when NumLock is on.
+	* src/expand-alias.c: fix misbehavior when NumLock is on (BDS, too).
 	* src/sendmsg-window.c: connect copy, cut&paste shortcuts.
 
 2000-09-04  Pawel Salek  <pawsa@theochem.kth.se>

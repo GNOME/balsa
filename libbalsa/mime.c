@@ -33,9 +33,74 @@
 
 #include "mime.h"
 
+  GString *reply;
 
 static gchar tmp_file_name[PATH_MAX + 1];
 
+void process_mime_multipart (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
+
+void process_mime_part (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str);
+
+void
+process_mime_part (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
+{
+  size_t alloced;
+  gchar *ptr = 0;
+  switch (bdy->type)
+    {
+    case TYPEOTHER:
+      break;
+    case TYPEAUDIO:
+      break;
+    case TYPEAPPLICATION:
+      break;
+    case TYPEIMAGE:
+      break;
+    case TYPEMESSAGE:
+      break;
+    case TYPEMULTIPART:
+      process_mime_multipart (message, bdy, msg_stream, reply_prefix_str);
+      break;
+    case TYPETEXT:
+	      {
+		STATE s;
+		fseek (msg_stream, bdy->offset, 0);
+		s.fpin = msg_stream;
+		mutt_mktemp (tmp_file_name);
+		s.prefix = reply_prefix_str;
+		s.fpout = fopen (tmp_file_name, "w+");
+		mutt_decode_attachment (bdy, &s);
+		fflush (s.fpout);
+		alloced = readfile (s.fpout, &ptr);
+		if (ptr)
+		  ptr[alloced - 1] = '\0';
+		if (reply)
+		  {
+		    reply = g_string_append (reply, "\n");
+		    reply = g_string_append (reply, ptr);
+		  }
+		else
+		  reply = g_string_new (ptr);
+		fclose (s.fpout);
+		unlink (tmp_file_name);
+                break;
+	      } 
+      break;
+    case TYPEVIDEO:
+      break;
+    }
+
+}
+
+void
+process_mime_multipart (Message * message, BODY * bdy, FILE * msg_stream, gchar *reply_prefix_str)
+{
+  BODY *p;
+  for (p = bdy->parts; p; p = p->next)
+    {
+      process_mime_part (message, p, msg_stream, reply_prefix_str);
+    }
+}
 
 GString *
 content2reply (Message * message,
@@ -45,9 +110,8 @@ content2reply (Message * message,
   Body *body;
   FILE *msg_stream;
   gchar msg_filename[PATH_MAX];
-  size_t alloced;
-  gchar *ptr = 0;
-  GString *reply = 0;
+
+  reply = 0;
 
   switch (message->mailbox->type)
     {
@@ -76,47 +140,11 @@ content2reply (Message * message,
   body_list = message->body_list;
   while (body_list)
     {
-      BODY *b;
       body = (Body *) body_list->data;
-
-      b = body->mutt_body;
-      while (b)
-	{
-	  switch (body->mutt_body->type)
-	    {
-	    case TYPEMULTIPART:
-	      {
-		b = b->parts;
-		continue;
-	      }
-	    case TYPETEXT:
-	      {
-		STATE s;
-		fseek (msg_stream, body->mutt_body->offset, 0);
-		s.fpin = msg_stream;
-		mutt_mktemp (tmp_file_name);
-		s.prefix = reply_prefix_str; /* arp */
-		s.fpout = fopen (tmp_file_name, "w+");
-		mutt_decode_attachment (body->mutt_body, &s);
-		fflush (s.fpout);
-		alloced = readfile (s.fpout, &ptr);
-		if (ptr)
-		  ptr[alloced - 1] = '\0';
-		if (reply)
-		  {
-		    reply = g_string_append (reply, "\n");
-		    reply = g_string_append (reply, ptr);
-		  }
-		else
-		  reply = g_string_new (ptr);
-		fclose (s.fpout);
-		unlink (tmp_file_name);
-	      }
-	    }
-	  b = b->next;
-	}
+      process_mime_part (message, body->mutt_body, msg_stream, reply_prefix_str);
       body_list = g_list_next (body_list);
-    }
+    }    
+
   fclose (msg_stream);
   return reply;
 }

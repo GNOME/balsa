@@ -2776,9 +2776,11 @@ check_messages_thread(gpointer data)
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL,
                   "Local Mail", 0, 0);
 
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) mailbox_check_func,
-			   NULL);
+    if (GTK_IS_TREE_MODEL(balsa_app.mblist_tree_store))
+        gtk_tree_model_foreach((GtkTreeModel *)
+                               balsa_app.mblist_tree_store,
+                               (GtkTreeModelForeachFunc)
+                               mailbox_check_func, NULL);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
                   0, 0);

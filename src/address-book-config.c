@@ -189,12 +189,14 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 					       (abc->ab_specific.vcard.path), FALSE);
 	    if (path != NULL) 
 		address_book = libbalsa_address_book_vcard_new(name, path);
+            g_free(path);
 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
 	    gchar *path =
 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
 					       (abc->ab_specific.ldif.path), FALSE);
 	    if (path != NULL)
 		address_book = libbalsa_address_book_ldif_new(name, path);
+            g_free(path);
 #ifdef ENABLE_LDAP
 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
 	    gchar *host_name =
@@ -226,7 +228,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	    vcard = LIBBALSA_ADDRESS_BOOK_VCARD(address_book);
 	    if (path) {
 		g_free(vcard->path);
-		vcard->path = g_strdup(path);
+		vcard->path = path;
 	    }
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book)) {
 	    LibBalsaAddressBookLdif *ldif;
@@ -238,7 +240,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	    ldif = LIBBALSA_ADDRESS_BOOK_LDIF(address_book);
 	    if (path) {
 		g_free(ldif->path);
-		ldif->path = g_strdup(path);
+		ldif->path = path;
 	    }
 #ifdef ENABLE_LDAP
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book)) {

@@ -13,6 +13,9 @@
 	alternative solution would be to ask the user if he/she wants to
 	proceed).
 	* src/{main.c,threads.h}: remove globals sending_mail variable.
+
+	* src/address-book-config.c: plug memory leaks (Peter Bloomfield +
+	Ali Akcaagac).
 	
 2001-10-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 

@@ -183,4 +183,5 @@ void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 GtkType libbalsa_mailbox_type_from_path(const gchar * filename);
 gboolean libbalsa_mailbox_commit(LibBalsaMailbox* mailbox);
 
+
 #endif				/* __LIBBALSA_MAILBOX_H__ */

@@ -951,3 +951,5 @@ message_status_changed_cb(LibBalsaMessage * message, gboolean set,
 		    libbalsa_mailbox_signals[MESSAGE_STATUS_CHANGED],
 		    message);
 }
+
+

@@ -90,6 +90,10 @@ static void send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
 static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint message_postpone(BalsaSendmsg * bsmsg);
 static void postpone_message_cb(GtkWidget *, BalsaSendmsg *);
+static SendType find_orig_type(BalsaSendmsg* bsmsg);
+static gboolean is_reply(SendType type);
+
+static void reply_postponed_message(BalsaSendmsg* bsmsg);
 static void save_message_cb(GtkWidget *, BalsaSendmsg *);
 static void print_message_cb(GtkWidget *, BalsaSendmsg *);
 static void attach_clicked(GtkWidget *, gpointer);
@@ -876,9 +880,7 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
     gint ins_pos;
     gint length_delta = 0;
     gint newsiglen;
-    gboolean reply_type = (msg->type == SEND_REPLY || 
-                           msg->type == SEND_REPLY_ALL ||
-                           msg->type == SEND_REPLY_GROUP);
+    gboolean reply_type = is_reply(msg->type);
     gboolean forward_type = (msg->type == SEND_FORWARD_ATTACH || 
                              msg->type == SEND_FORWARD_INLINE);
     
@@ -1017,9 +1019,7 @@ update_msg_identity(BalsaSendmsg* msg, LibBalsaIdentity* ident)
 	tmpstr = g_strconcat(ident->forward_string, &(subject[fwdlen]), NULL);
 	gtk_entry_set_text(GTK_ENTRY(msg->subject[1]), tmpstr);
 	g_free(tmpstr);
-    } else if (((replen == 0) && (msg->type == SEND_REPLY ||
-				  msg->type == SEND_REPLY_ALL ||
-				  msg->type == SEND_REPLY_GROUP)) ||
+    } else if (((replen == 0) && (is_reply(msg->type))) ||
 	       ((fwdlen == 0) && (msg->type == SEND_FORWARD_ATTACH ||
 				  msg->type == SEND_FORWARD_INLINE))) {
 	set_entry_to_subject(GTK_ENTRY(msg->subject[1]), msg->orig_message,
@@ -2297,8 +2297,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	else
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
 	body = content2reply(message,
-			     (type == SEND_REPLY || type == SEND_REPLY_ALL ||
-			      type == SEND_REPLY_GROUP) ?
+			     (is_reply(type)) ?
 			     balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, msg->flow);
@@ -2329,8 +2328,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     GString *body = NULL;
     gchar *signature;
     gint pos = 0;
-    gboolean reply_any = (type == SEND_REPLY || type == SEND_REPLY_ALL
-                          || type == SEND_REPLY_GROUP);
+    gboolean reply_any = is_reply(type);
     gboolean forwd_any = (type == SEND_FORWARD_ATTACH
                           || type == SEND_FORWARD_INLINE);
 
@@ -3246,8 +3244,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
             message->in_reply_to = g_strdup(bsmsg->orig_message->in_reply_to);
         } 
 
-        if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_GROUP || 
-            bsmsg->type == SEND_REPLY_ALL) &&
+        if (is_reply(bsmsg->type) &&
             bsmsg->orig_message->message_id) {
             message->references = 
                 g_list_prepend(message->references, 
@@ -3308,6 +3305,80 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     return message;
 }
 
+
+/*
+ * is_reply
+ * 
+ * Simple function that returns true if the SendType is any kind of
+ * reply.
+ */
+static gboolean
+is_reply(SendType type) 
+{
+    return type == SEND_REPLY || type == SEND_REPLY_ALL || type == SEND_REPLY_GROUP;
+}
+
+
+/* 
+ * find_orig_type
+ * 
+ * Find the original type of message for a continued message
+ * (i.e. other than SEND_CONTINUE).
+ */
+static SendType
+find_orig_type(BalsaSendmsg* bsmsg) 
+{
+    GList* list;
+    SendType orig_type;
+    gchar** tmp;
+
+    
+    list = libbalsa_message_find_user_hdr(bsmsg->orig_message,
+                                          "X-Balsa-SendType");
+
+    if (list) {
+        tmp = list->data;
+        orig_type = atoi(tmp[1]);
+    } else {
+        orig_type = SEND_CONTINUE;
+    }
+
+    return orig_type;
+}
+
+
+/*
+ * reply_postponed_message
+ * 
+ * Find the original message of a reply and call
+ * libbalsa_message_reply on it to mark it as replied.  This should
+ * only be used on continued messages where we don't have the original
+ * message directly, and will only work if the X-Balsa-OrigMailboxName
+ * header has been set (i.e. postponed by Balsa not another MUA).
+ */
+static void
+reply_postponed_message(BalsaSendmsg* bsmsg) 
+{
+    LibBalsaMailbox *orig_mailbox = NULL;
+    LibBalsaMessage *replied_message;
+    GList* list;
+    gchar** tmp;
+    gchar* mbname;    
+
+    list = libbalsa_message_find_user_hdr(bsmsg->orig_message, 
+                                          "X-Balsa-OrigMailboxName");
+    tmp = list->data;
+    mbname = tmp[1];
+    orig_mailbox = mblist_find_mbox_by_name(balsa_app.mblist, mbname);
+                    
+    libbalsa_mailbox_open(orig_mailbox);
+    replied_message = libbalsa_message_find_by_message_id(orig_mailbox, bsmsg->orig_message->in_reply_to);
+
+    if (replied_message) 
+        libbalsa_message_reply(replied_message);
+}
+
+
 /* "send message" menu and toolbar callback */
 static gint
 send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
@@ -3315,6 +3386,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     gboolean successful = TRUE;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc = NULL;
+    SendType orig_type;
+
 
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
@@ -3345,12 +3418,20 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					   bsmsg->flow); 
 #endif
     if (successful) {
-	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
-	    bsmsg->type == SEND_REPLY_GROUP) {
+	if (is_reply(bsmsg->type)) {
 	    if (bsmsg->orig_message)
 		libbalsa_message_reply(bsmsg->orig_message);
 	} else if (bsmsg->type == SEND_CONTINUE) {
 	    if (bsmsg->orig_message) {
+                /* use user header info to find if the continued
+                 * message is a reply, then search for the original
+                 * message to set the replied icon 
+                 */
+                orig_type = find_orig_type(bsmsg);
+
+                if (is_reply(orig_type)) 
+                    reply_postponed_message(bsmsg);
+
 		libbalsa_message_delete(bsmsg->orig_message, TRUE);
 		balsa_index_sync_backend(bsmsg->orig_message->mailbox);
 	    }
@@ -3406,10 +3487,39 @@ message_postpone(BalsaSendmsg * bsmsg)
 {
     gboolean successp;
     LibBalsaMessage *message;
+    gchar* tmp = NULL;
+
+
     message = bsmsg2message(bsmsg);
 
-    if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
-        bsmsg->type == SEND_REPLY_GROUP))
+    /* set some balsa-specific headers to hold data (mainly for
+     * replies) through the postponement: sendtype, orig_mailbox_name
+     */
+    if (bsmsg->type != SEND_CONTINUE) {
+        tmp = g_malloc(sizeof(gchar)*2);
+        snprintf(tmp, 2, "%i", bsmsg->type);
+        message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-SendType", tmp));
+        message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-OrigMailboxName", g_strdup(bsmsg->orig_message->mailbox->name)));
+    } else {
+        /* We want to copy these from the original message because
+         * it's the postponed message we continued from 
+         */
+        GList* list;
+        gchar** usrhdr;
+
+        list = libbalsa_message_find_user_hdr(bsmsg->orig_message,
+                                              "X-Balsa-SendType");
+        usrhdr = list->data;
+        message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-SendType", g_strdup(usrhdr[1])));
+
+        list = libbalsa_message_find_user_hdr(bsmsg->orig_message, 
+                                              "X-Balsa-OrigMailboxName");
+        usrhdr = list->data;
+        message->user_headers = g_list_prepend(message->user_headers, libbalsa_create_hdr_pair("X-Balsa-OrigMailboxName", g_strdup(usrhdr[1])));
+    }
+    
+    
+    if (is_reply(bsmsg->type))
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
                                              bsmsg->orig_message,
                                              message->fcc_mailbox,

@@ -99,6 +99,9 @@ struct _LibBalsaMessage {
     /* replied message ID; from address on date */
     gchar *in_reply_to;
 
+    /* miscellaneous headers */
+    GList *user_headers;
+    
     /* message ID */
     gchar *message_id;
 
@@ -211,6 +214,7 @@ gchar *libbalsa_message_size_to_gchar(LibBalsaMessage * message,
                                       gboolean lines);
 gchar *libbalsa_message_title(LibBalsaMessage * message,
                               const gchar * format);
+gchar **libbalsa_create_hdr_pair(const gchar * name, gchar * value);
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 const gchar *libbalsa_message_charset(LibBalsaMessage * message);
@@ -219,6 +223,10 @@ gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 
 GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
+GList *libbalsa_message_find_user_hdr(LibBalsaMessage * message, 
+                                      const gchar * find);
+LibBalsaMessage *libbalsa_message_find_by_message_id(LibBalsaMailbox * mailbox,
+                                                     gchar * msgid);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     LibBalsaAddress *address);

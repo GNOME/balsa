@@ -1,3 +1,15 @@
+2002-04-21  Matthew Guenther <guentherm@asme.org>
+
+	* libbalsa/send.c (message2HEADER): Send custom user headers along
+	with regular headers when sending messages.
+	* libbalsa/message.[hc]: Add user_headers to message struct to
+	support adding arbitrary custom headers to messages.  Add
+	libbalsa_message_find_by_message_id function to search for
+	particular message within a mailbox.
+	* src/sendmsg-window.c: Write X-Balsa-SendType and
+	X-Balsa-OrigMailboxName to postponed messages to allow for message
+	status updating when continuing messages.
+
 2002-04-15  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/folder-scanners.c:

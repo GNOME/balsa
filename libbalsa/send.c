@@ -1135,6 +1135,8 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 
 static void
 message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
+    LIST *tmp_hdr;
+    GList *list;
     gchar *tmp;
 
     libbalsa_lock_mutt();
@@ -1193,9 +1195,16 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 
     tmp = libbalsa_make_string_from_list_p(message->bcc_list);
     hdr->env->bcc = rfc822_parse_adrlist(hdr->env->bcc, tmp);
-    libbalsa_unlock_mutt();
     g_free(tmp);
 
+    for (list = message->user_headers; list; list = g_list_next(list)) {
+        tmp_hdr = mutt_new_list();
+        tmp_hdr->next = hdr->env->userhdrs;
+        tmp_hdr->data = g_strjoinv(": ", list->data);
+        hdr->env->userhdrs = tmp_hdr;
+    }
+
+    libbalsa_unlock_mutt();
 }
 
 static void

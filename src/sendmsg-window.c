@@ -1095,9 +1095,9 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     }
     
 #ifdef HAVE_GPGME
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_sign_menu_item),
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
 				   ident->gpg_sign);
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_encrypt_menu_item),
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
 				   ident->gpg_encrypt);
 #endif
     
@@ -2774,13 +2774,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         /* Get the identity from the To: field of the original message */
         guess_identity(bsmsg);
 #ifdef HAVE_GPGME
-    msg->gpg_sign_menu_item = opts_menu[OPTS_MENU_SIGN_POS].widget;
+    bsmsg->gpg_sign_menu_item = opts_menu[OPTS_MENU_SIGN_POS].widget;
     g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "toolbar", toolbar);
     g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-1", 
 		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
     g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-2", 
 		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
-    msg->gpg_encrypt_menu_item = opts_menu[OPTS_MENU_ENCRYPT_POS].widget;
+    bsmsg->gpg_encrypt_menu_item = opts_menu[OPTS_MENU_ENCRYPT_POS].widget;
     g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "toolbar", 
                       toolbar);
     g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-1", 
@@ -2792,9 +2792,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget,
 			     FALSE);
     /* preset sign/encrypt according to current identity */
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_sign_menu_item),
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
 				   bsmsg->ident->gpg_sign);
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(msg->gpg_encrypt_menu_item),
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
 				   bsmsg->ident->gpg_encrypt);
 #endif
 

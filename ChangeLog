@@ -1,5 +1,9 @@
-2003-06-17 07:02  PeterB
+2003-06-17 07:41  PeterB
 
+	* libbalsa/mailbox.c: Check for error return from
+	libbalsa_mailbox_type_from_path().
+	* src/information-dialog.c: Dialog may be called when
+	balsa_app.appbar is NULL.
 	* src/sendmsg-window.c: When type == SEND_CONTINUE, remember the
 	correct draft message.
 	* src/balsa-index.c: Be more careful when adding messages in an

@@ -75,7 +75,7 @@ static void previous_message_cb (GtkWidget * widget);
 static void delete_message_cb (GtkWidget * widget);
 static void undelete_message_cb (GtkWidget * widget);
 
-static void mailbox_select_cb (GtkWidget * widget);
+static void mailbox_select_cb (GtkWidget * widget, gpointer data);
 
 
 
@@ -153,6 +153,8 @@ open_main_window ()
   gtk_container_border_width (GTK_CONTAINER (mw->index), 2);
   gtk_box_pack_start (GTK_BOX (hbox), mw->index, TRUE, TRUE, 2);
 
+  gtk_object_set_user_data (GTK_OBJECT (mw->index), (gpointer) mw);
+
   gtk_signal_connect (GTK_OBJECT (mw->index),
 		      "select_message",
 		      (GtkSignalFunc) index_select_cb,
@@ -224,6 +226,14 @@ refresh_main_window ()
 
 
   /*
+   * set the toolbar style
+   */
+   gtk_toolbar_set_style (GTK_TOOLBAR (mw->toolbar), balsa_app.toolbar_style);
+
+
+
+
+  /*
    * remove old menu from the mailbox-selection option menu,
    * and replace it with a new current one 
    */
@@ -238,12 +248,13 @@ refresh_main_window ()
       list = list->next;
 
       menuitem = gtk_menu_item_new_with_label (mailbox->name);
-      gtk_object_set_user_data (GTK_OBJECT (menuitem), mailbox);
+
+      gtk_object_set_user_data (GTK_OBJECT (menuitem), (gpointer) mw);
 
       gtk_signal_connect (GTK_OBJECT (menuitem),
 			  "activate",
 			  (GtkSignalFunc) mailbox_select_cb,
-			  menuitem);
+			  mailbox);
 
       gtk_menu_append (GTK_MENU (mw->mailbox_menu), menuitem);
       gtk_widget_show (menuitem);
@@ -412,6 +423,8 @@ create_menu ()
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
   gtk_widget_show (w);
 
+  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
+
   gtk_signal_connect_object (GTK_OBJECT (w),
 			     "activate",
 			     (GtkSignalFunc) delete_message_cb,
@@ -425,6 +438,8 @@ create_menu ()
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Undelete"));
   gtk_widget_show (w);
+
+  gtk_object_set_user_data (GTK_OBJECT (w), (gpointer) mw);
 
   gtk_signal_connect_object (GTK_OBJECT (w),
 			     "activate",
@@ -568,6 +583,9 @@ create_toolbar ()
 			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
 			     (GtkSignalFunc) delete_message_cb,
 			     mw);
+
+  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
+
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -633,6 +651,9 @@ create_toolbar ()
 			     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BACK),
 			     (GtkSignalFunc) previous_message_cb,
 			     "Open Previous Message");
+  
+  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
+
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -644,6 +665,9 @@ create_toolbar ()
 	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
 			     (GtkSignalFunc) next_message_cb,
 			     "Open Next Message");
+
+  gtk_object_set_user_data (GTK_OBJECT (toolbarbutton), (gpointer) mw);
+
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -697,95 +721,84 @@ show_about_box ()
  * callbacks
  */
 static void
-set_toolbar_icons_cb (GtkWidget * widget,
-		      GtkWidget * data)
-{
-  gtk_toolbar_set_style (GTK_TOOLBAR (data), GTK_TOOLBAR_ICONS);
-}
-
-
-
-static void
-set_toolbar_text_cb (GtkWidget * widget,
-		     GtkWidget * data)
-{
-  gtk_toolbar_set_style (GTK_TOOLBAR (data), GTK_TOOLBAR_TEXT);
-}
-
-
-
-static void
-set_toolbar_both_cb (GtkWidget * widget,
-		     GtkWidget * data)
-{
-  gtk_toolbar_set_style (GTK_TOOLBAR (data), GTK_TOOLBAR_BOTH);
-}
-
-
-
-
-static void
 index_select_cb (GtkWidget * widget, 
 		 MAILSTREAM * stream,
 		 glong mesgno)
 {
+  MainWindow *mainwindow;
+
   g_return_if_fail (widget != NULL);
   g_return_if_fail (BALSA_IS_INDEX (widget));
 
-  balsa_message_set (BALSA_MESSAGE (widget), stream, mesgno);
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  balsa_message_set (BALSA_MESSAGE (mainwindow->message_area), stream, mesgno);
 }
 
 
 static void 
 next_message_cb (GtkWidget * widget)
 {
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
+  MainWindow *mainwindow;
 
-  balsa_index_select_next (BALSA_INDEX (widget));
+  g_return_if_fail (widget != NULL);
+
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
 }
 
 
 static void
 previous_message_cb (GtkWidget * widget)
 {
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
+  MainWindow *mainwindow;
 
-  balsa_index_select_previous (BALSA_INDEX (widget));
+  g_return_if_fail (widget != NULL);
+
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  balsa_index_select_previous (BALSA_INDEX (mainwindow->index));
 }
 
 
 static void
 delete_message_cb (GtkWidget * widget)
 {
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
+  MainWindow *mainwindow;
 
-  balsa_index_delete_message (BALSA_INDEX (widget));
+  g_return_if_fail (widget != NULL);
+
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  balsa_index_delete_message (BALSA_INDEX (mainwindow->index));
 }
 
 
 static void
 undelete_message_cb (GtkWidget * widget)
 {
-  g_return_if_fail (widget != NULL);
-  g_return_if_fail (BALSA_IS_INDEX (widget));
+  MainWindow *mainwindow;
 
-  balsa_index_undelete_message (BALSA_INDEX (widget));
+  g_return_if_fail (widget != NULL);
+
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+
+  balsa_index_undelete_message (BALSA_INDEX (mainwindow->index));
 }
 
 
 static void
-mailbox_select_cb (GtkWidget * widget)
+mailbox_select_cb (GtkWidget * widget, gpointer data)
 {
+  MainWindow *mainwindow;
   Mailbox *mailbox;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_MENU_ITEM (widget));
 
-
-  mailbox = (Mailbox *) gtk_object_get_user_data (GTK_OBJECT (widget));
+  mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+  mailbox = (Mailbox *) data;
 
 
   /* return if the mailbox is already the currently open mailbox */
@@ -795,7 +808,7 @@ mailbox_select_cb (GtkWidget * widget)
 
   if (mailbox_open (mailbox))
     {
-      balsa_index_set_stream (BALSA_INDEX (mw->index), mailbox->stream);
-      balsa_app.current_index = mw->index;
+      balsa_index_set_stream (BALSA_INDEX (mainwindow->index), mailbox->stream);
+      balsa_app.current_index = mainwindow->index;
     }
 }

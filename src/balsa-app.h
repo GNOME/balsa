@@ -22,7 +22,6 @@
 #include <gnome.h>
 #include "c-client.h"
 #include "mailbox.h"
-#include "main-window.h"
 
 
 /* global definitions */
@@ -61,6 +60,10 @@ extern struct BalsaApplication
 
   /* timer for periodic mail checking */
   gint timer;
+
+
+  /* GUI settings */
+  GtkToolbarStyle toolbar_style;
 
 }
 balsa_app;

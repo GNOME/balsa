@@ -41,6 +41,8 @@ static int mailboxes_init ();
 static void setup_local_mailboxes ();
 static void my_special_mailbox ();
 
+
+
 void
 init_balsa_app (int argc, char *argv[])
 {
@@ -61,6 +63,10 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.current_index = NULL;
   balsa_app.addressbook_list = NULL;
   balsa_app.timer = 0;
+
+  /* GUI settings */
+  balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
+
 
 
   restore_global_settings ();

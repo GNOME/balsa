@@ -6,4 +6,5 @@
 #include "libmutt/sort.h"
 #include "libmutt/mailbox.h"
 #include "libmutt/copy.h"
+#include "libmutt/mime.h"
 #endif

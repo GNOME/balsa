@@ -978,13 +978,17 @@ translate_message (HEADER * cur)
   return message;
 }
 
-
 void
 message_body_ref (Message * message)
 {
   Body *body;
   HEADER *cur;
   MESSAGE *msg;
+  BODY *b;
+  FILE *fp;
+  STATE s;
+  char buf[101];
+  gchar tmpfile[PATH_MAX];
 
   if (!message)
     return;
@@ -1004,9 +1008,23 @@ message_body_ref (Message * message)
     {
       /*     mutt_view_attachment (msg->fp, cur->content, M_REGULAR);
        */
-      message->body_list = g_list_append (message->body_list,
-					  g_strdup (cur->content));
-      message->body_ref++;
+      b = cur->content;
+      g_print ("%s/%s", TYPE (b->type), b->subtype);
+/*
+      memset (&s, 0, sizeof (s));
+      mutt_mktemp (tmpfile);
+
+      fp = fopen(cur->filename,"r");
+      s.fpout = fopen (tmpfile, "w");
+      fseek ((s.fpin = fp), b->offset, 0);
+      mutt_decode_attachment (b, &s);
+      fclose (s.fpout);
+*/
+/*
+   message->body_list = g_list_append (message->body_list,
+   g_strdup (cur->content));
+   message->body_ref++;
+ */
       mx_close_message (&msg);
     }
 

@@ -4,11 +4,12 @@
  * GTK code for balsa's filter edit dialog
  */
 
+#include "config.h"
+
+#include <gnome.h>
 
 #include "filter.h"
 #include "filter-edit.h"
-#include <gnome.h>
-
 
 /*
  * build_option_menu()

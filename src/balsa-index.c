@@ -331,11 +331,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   bindex->watcher_id =
     mailbox_watcher_set (mailbox,
 			 (MailboxWatcherFunc) mailbox_listener,
-			 MESSAGE_MARK_ANSWER_MASK |
-			 MESSAGE_MARK_READ_MASK |
-			 MESSAGE_MARK_UNREAD_MASK |
-			 MESSAGE_MARK_DELETE_MASK |
-			 MESSAGE_MARK_UNDELETE_MASK |
 			 MESSAGE_DELETE_MASK |
 			 MESSAGE_NEW_MASK |
 			 MESSAGE_FLAGGED_MASK |
@@ -354,11 +349,11 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 
   list = mailbox->message_list;
   while (list)
-    {
-      balsa_index_add (bindex, (Message *) list->data);
-      list = list->next;
-      i++;
-    }
+  {
+    balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
+    list = list->next;
+    i++;
+  }
 
   gtk_clist_set_selection_mode (GTK_CLIST (bindex),
 				GTK_SELECTION_EXTENDED);
@@ -576,7 +571,7 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
   
   gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   bindex = BALSA_INDEX (data);
-  message = (Message *) gtk_clist_get_row_data (clist, row);
+  message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (clist, row));
 
   gtk_clist_select_row (clist, row, -1);
 
@@ -610,7 +605,7 @@ select_message (GtkWidget * widget,
   Message *message;
 
   bindex = BALSA_INDEX (data);
-  message = (Message *) gtk_clist_get_row_data (GTK_CLIST (widget), row);
+  message = LIBBALSA_MESSAGE(gtk_clist_get_row_data (GTK_CLIST (widget), row));
 
   if (message)
     gtk_signal_emit (GTK_OBJECT (bindex),

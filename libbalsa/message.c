@@ -340,13 +340,13 @@ libbalsa_message_real_set_deleted_flag(Message *message, gboolean set)
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, TRUE);
 
     message->flags |= MESSAGE_FLAG_DELETED;
-    if (message->flags & MESSAGE_FLAG_NEW ) message->mailbox->unread_messages--;
+    if (message->flags & MESSAGE_FLAG_NEW) message->mailbox->unread_messages--;
     message->mailbox->total_messages--;
   } else {
     mutt_set_flag (CLIENT_CONTEXT (message->mailbox), cur, M_DELETE, FALSE);
 
     message->flags &= ~MESSAGE_FLAG_DELETED;
-    if (message->flags & MESSAGE_FLAG_NEW ) message->mailbox->unread_messages++;
+    if (message->flags & MESSAGE_FLAG_NEW) message->mailbox->unread_messages++;
     message->mailbox->total_messages++;
   }
 

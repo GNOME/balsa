@@ -238,7 +238,7 @@ check_all_pop3_hosts (Mailbox * to)
 gint
 mailbox_have_new_messages (gchar * path)
 {
-  return 1;
+  return TRUE;
   /*
   return test_new_folder(path);
 */

@@ -248,12 +248,12 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      if (mailbox_have_new_messages (MAILBOX_LOCAL (mbnode->mailbox)->path))
 		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					 NULL, NULL,
-					 tray_empty, tray_empty_mask,
+					 tray_full, tray_full_mask,
 					 FALSE, TRUE);
 	      else
 		gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					 NULL, NULL,
-					 tray_full, tray_full_mask,
+					 tray_empty, tray_empty_mask,
 					 FALSE, TRUE);
 
 	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);

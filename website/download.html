@@ -16,21 +16,13 @@ body {margin-left: 50pt;}
 <ol>
 <li>A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</li>
 
-<li>Balsa needs <b>not</b> <samp>libPropList</samp> any more (true for 0.9.5
- and higher). If you needed it for an older version, check if you don't have it
-already on your system, subsequently try to download suitable rpm. If
-you cannot do it for some reason, grab <a
-href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList.tar.gz</a>,
-It must be installed with a prefix of <samp>/usr</samp> if you wish to
-also use a Balsa RPM. Note, that in this last case you might need to
-ignore dependices warnings when installing rpm.</li>
-
-<li>Balsa 0.9.5 and greater also uses the <samp>libpspell</samp>
+<li>Balsa 0.9.5 and greater uses the <b><samp>libpspell</samp></b>
 library for spell checking, which is available in both rpm and deb
 format as well as plain source.  You can find the library and modules at the
-pspell <a href="http://pspell.sourceforge.net">website.</a> The same
-comment above about using Balsa rpms with self-compliled libraries
-applies here as well.</li>
+pspell <a href="http://pspell.sourceforge.net/">website</a>.</li>
+
+<li>Make sure you have <b><samp>libtool</samp></b> package
+installed. It usually comes with your distribution. </li>
 
 <li>You may want to recompile balsa to get: HTML support 
 (<samp>--enable-gtkhtml), GSS support (<samp>--with-gss</samp>) or 
@@ -39,36 +31,47 @@ LDAP support (<samp>--enable-ldap</samp>).</li>
 
 <h2>Download</h2>
 
-<p><samp>balsa-1.0.pre5</samp> released on 2000-11-03 is the
-<em>last</em> in the prerelease series - it is string-frozen. If you
-have <em>any</em> problems with earlier versions, <em>upgrade</em>. If
-you don't have any problems with earlier versions, <em>upgrade</em>,
-too.</p>
+<p><samp>balsa-1.0.0</samp> released on 2000-11-11 is the last
+release. It has passed long testing period and should be quite
+solid.</p>
 
-<p>balsa-1.0.pre5 binary rpm is compiled on RH-6.2 with update
+<p>The binary rpm is compiled on RH-6.2 with update
 packages installed with <samp>gnome-print-0.20</samp> (available from
 <a href="http://www.helixcode.com/">HelixCode</a>). You can get rid of
 this dependency by recompiling balsa. You may want to recompile balsa
-to enable LDAP support or HTML support, which are disabled by default.</p>
+to enable LDAP, GSS or HTML support, which are disabled by default.</p>
 
+<p>There have been many improvements over the last stable release, including:</p>
+<ul>
+<li>Improved message viewer</li>
+<li>Updated backend for handling mailbox operations, now much more robust and faster.</li>
+<li>Multiple address book support, both local vCard and remote LDAP books are supported</li>
+<li>Alias-expansion</li>
+<li>CRAM and GSSAPI Kerberos authentication support</li>
+<li>Spell checking</li>
+<li>New charset support</li>
+<li>Nifty quoted text colouration</li>
+<li>Menu reorganization</li>
+<li>Better threading (the multiple process-kind)</li>
+<li>Use gnome-print for printing</li>
+<li>Use gnome-config now instead of libProplist</li>
+<li>A metric shwack of bug fixes</li>
+<li>Y2K compliant :-)</li>
+</ul>
 
 <h3>Source</h3>
 <ul type=square>
-<!-- 
-<li>US East Coast: <a href="http://www.newton.cx/balsa/balsa-1.0.0-pre1.tar.gz">http://www.newton.cx/balsa/balsa-1.0.0-pre5.tar.gz</a></li> -->
-
-<li>Europe (Sweden): <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.pre5.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.pre5.tar.gz</a>
-(1.79MB)</li>
+<li>Europe (Sweden): <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.0.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.0.tar.gz</a>
+(1.96MB)</li>
 </ul>
 
 <h3>Packages</h3> 
 <ul>
 <!-- <li>US East Coast source RPM: <a href="http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm">http://www.newton.cx/balsa/balsa-0.8.1-1.src.rpm</a></li> -->
-<li>Europe source RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.pre5-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.pre5-1.src.rpm</a> (1.32MB)</li>
+<li>Europe source RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.0-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.0-1.src.rpm</a> (1.40MB)</li>
 </ul>
 <ul>
-<!-- <li>US East Coast i386 binary RPM: <a href="http://www.newton.cx/balsa/balsa-0.8.1-1.i386.rpm">http://www.newton.cx/balsa/balsa-0.8.1-1.i386.rpm</a></li> -->
-<li>Europe i386 binary RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.pre5-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.pre5-1.i386.rpm</a> (0.91MB)</li>
+<li>Europe i386 binary RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.0-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.0.0-1.i386.rpm</a> (1.01MB)</li>
 </ul>
 <p><i>Independent</i> packagers:</p>
 <ul type=square>

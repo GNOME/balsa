@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 1999-12-21 00:21-0500\n"
+"POT-Creation-Date: 1999-12-21 11:14-0800\n"
 "PO-Revision-Date: 1999-12-09 21:44+0200\n"
 "Last-Translator: Lemmit Toomet <leone@cafe.ee>>\n"
 "Language-Team: Estonian <linux-l@eenet.ee>\n"

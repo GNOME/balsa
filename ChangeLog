@@ -1,3 +1,8 @@
+1999-12-21  Stuart Parmenter  <pavlov@netscape.com>
+
+	* TODO, INSTALL, AUTHORS, configure.in: Add people to AUTHORS, etc
+	bump version to 0.6.0
+
 1999-12-21  Héctor García Álvarez <hector@scouts-es.org>
 	* libbalsa/send.c: Made some changes to make balsa send queued 
 	messages. Still have the bug when trying to send queued messages 

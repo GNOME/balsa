@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 1999-12-21 00:21-0500\n"
+"POT-Creation-Date: 1999-12-21 11:14-0800\n"
 "PO-Revision-Date: 1999-09-09 11:12+02:00\n"
 "Last-Translator: Vincent Renardias <vincent@ldsol.com>\n"
 "Language-Team: GNOME French Team <gnomefr@gnomefr.traduc.org>\n"

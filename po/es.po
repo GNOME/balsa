@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.4.9\n"
-"POT-Creation-Date: 1999-12-21 00:21-0500\n"
+"POT-Creation-Date: 1999-12-21 11:14-0800\n"
 "PO-Revision-Date: 1998-11-18 00:21+0100\n"
 "Last-Translator: Pablo Saratxaga <srtxg@chanae.alphanet.ch>\n"
 "Language-Team: \n"

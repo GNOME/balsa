@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 1999-12-21 00:21-0500\n"
+"POT-Creation-Date: 1999-12-21 11:14-0800\n"
 "PO-Revision-Date: 1999-02-24 08:40-0500\n"
 "Last-Translator: Alexander Kirillov <kirillov@math.ias.edu>\n"
 "Language-Team: Russian <ru@li.org>\n"

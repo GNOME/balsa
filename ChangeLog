@@ -1,10 +1,10 @@
-2002-12-04 19:13  PeterB
+2002-12-04 19:02  PeterB
 
-        * src/balsa-app.h, src/main-window.[ch],
-        src/message-window.[ch], src/save-restore.c,
-        src/sendmsg-window.[ch], src/toolbar-factory.[ch],
-        src/toolbar-prefs.c: rewrite and deprecation cleanup of
-        toolbar code.
+	* src/: balsa-app.h, main-window.c, main-window.h,
+	message-window.c, message-window.h, save-restore.c,
+	sendmsg-window.c, sendmsg-window.h, toolbar-factory.c,
+	toolbar-factory.h, toolbar-prefs.c: Rewrite and deprecation cleanup
+	of toolbar code.
 
 2002-12-02 17:37  pawels
 

@@ -1,3 +1,7 @@
+2000-09-11  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/contact.c: Missing #include <string.h>
+
 2000-09-11  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/server.c: host and port made not private on server_load

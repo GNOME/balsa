@@ -7,7 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-02-07 11:10+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-08-19 00:02+0100\n"
 "PO-Revision-Date: 2003-02-07 17:46+EDT\n"
 "Last-Translator: Ge'ez Frontier Foundation <locales@geez.org>\n"
 "Language-Team: Amharic <locales@geez.org>\n"
@@ -15,77 +16,93 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: balsa.desktop.in.h:1
+#, fuzzy
+msgid "Balsa"
+msgstr "ባልሳ፦ %s"
+
+#: balsa.desktop.in.h:2
+msgid "E-Mail utility"
+msgstr ""
+
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:242 libbalsa/address-book-ldap.c:423
-#: libbalsa/address-book-ldif.c:405 libbalsa/address-book-vcard.c:272
+#: libbalsa/address-book-extern.c:256 libbalsa/address-book-ldap.c:408
+#: libbalsa/address-book-ldif.c:462 libbalsa/address-book-vcard.c:307
 msgid "No-Id"
 msgstr "Id-የለም"
 
-#: libbalsa/address-book-extern.c:246 libbalsa/address-book-ldap.c:427
-#: libbalsa/address-book-ldif.c:408 libbalsa/address-book-ldif.c:637
-#: libbalsa/address-book-ldif.c:674 libbalsa/address-book-ldif.c:678
-#: libbalsa/address-book-vcard.c:290
+#: libbalsa/address-book-extern.c:260 libbalsa/address-book-ldap.c:414
+#: libbalsa/address-book-ldif.c:465 libbalsa/address-book-ldif.c:635
+#: libbalsa/address-book-ldif.c:673 libbalsa/address-book-ldif.c:677
+#: libbalsa/address-book-vcard.c:325
 msgid "No-Name"
 msgstr "ስም-የለም"
 
-#: libbalsa/address-book-ldap.c:224
-msgid ""
-"Failed to initialise LDAP server.\n"
-"Check that the servername is valid."
+#: libbalsa/address-book-ldap.c:261
+msgid "TLS requested but not compiled in"
 msgstr ""
 
-#: libbalsa/address-book-ldap.c:237
-msgid "Couldn't set protocol version to LDAPv3."
-msgstr ""
-
-#: libbalsa/address-book-ldap.c:245
-#, c-format
-msgid "Couldn't enable TLS on the LDAP connection: %s"
-msgstr ""
-
-#: libbalsa/address-book-ldap.c:254
-msgid "TLS requested but TLS support not compiled in."
-msgstr ""
-
-#: libbalsa/address-book-ldap.c:265
-#, c-format
-msgid ""
-"Failed to bind to server: %s\n"
-"Check that the server name is valid."
-msgstr ""
-
-#: libbalsa/address-book-ldap.c:650
-#, c-format
-msgid "Failed to do a search: %s.Check that the base name is valid."
-msgstr ""
-
-#: libbalsa/address-book.c:332 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:399 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "ስህተት የለም"
 
-#: libbalsa/address-book.c:333
+#: libbalsa/address-book.c:400
 msgid "Cannot read from address book"
 msgstr ""
 
-#: libbalsa/address-book.c:334
+#: libbalsa/address-book.c:401
 msgid "Cannot write to address book"
 msgstr ""
 
-#: libbalsa/address-book.c:335
+#: libbalsa/address-book.c:402
 msgid "Cannot connect to server"
 msgstr ""
 
-#: libbalsa/address-book.c:336
+#: libbalsa/address-book.c:403
 msgid "Cannot search in the address book"
 msgstr ""
 
-#: libbalsa/address-book.c:338
+#: libbalsa/address-book.c:405
 msgid "Cannot add duplicate entry"
 msgstr ""
 
-#: libbalsa/address-book.c:339
+#: libbalsa/address-book.c:406 src/main-window.c:2155
+#: src/sendmsg-window.c:4038
 msgid "Unknown error"
 msgstr "ያልታወቀ ስህተት"
+
+#: libbalsa/address.c:399
+msgid "_Displayed Name:"
+msgstr ""
+
+#: libbalsa/address.c:400
+msgid "_First Name:"
+msgstr "ስም፦ (_F)"
+
+#: libbalsa/address.c:401
+msgid "_Middle Name:"
+msgstr "የአባት ስም፦ (_M)"
+
+#: libbalsa/address.c:402
+msgid "_Last Name:"
+msgstr "የአያት ስም፦ (_L)"
+
+#: libbalsa/address.c:403
+msgid "_Nickname:"
+msgstr "ቅጽል ስም፦ (_N)"
+
+#: libbalsa/address.c:404
+msgid "O_rganization:"
+msgstr ""
+
+#: libbalsa/address.c:405 libinit_balsa/balsa-druid-page-user.c:79
+msgid "_Email Address:"
+msgstr "ኢሜያል አድራሻ፦ (_E)"
+
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:986 libbalsa/message.c:909
+#, fuzzy
+msgid "(No subject)"
+msgstr "ጉዳዩ"
 
 #: libbalsa/filter-error.c:46
 msgid "Syntax error in the filter configuration file"
@@ -103,161 +120,314 @@ msgstr ""
 msgid "Attempt to apply an invalid filter"
 msgstr ""
 
-#: libbalsa/filter-file.c:434
+#: libbalsa/filter-file.c:139
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
 msgstr ""
 
-#: libbalsa/filter.c:172 libbalsa/filter.c:248
+#: libbalsa/filter.c:166
 msgid "Unable to load message body to match filter"
 msgstr ""
 
-#: libbalsa/filter.c:426
+#: libbalsa/filter.c:266
 #, c-format
 msgid "Invalid filter: %s"
 msgstr ""
 
-#: libbalsa/filter.c:509 libbalsa/filter.c:528
+#: libbalsa/filter.c:303 libbalsa/filter.c:324
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr ""
 
-#: libbalsa/filter.c:513
+#: libbalsa/filter.c:307
 msgid "Error when copying messages"
 msgstr ""
 
-#: libbalsa/filter.c:521
+#: libbalsa/filter.c:316
 msgid "Error when trashing messages"
 msgstr ""
 
-#: libbalsa/filter.c:532
+#: libbalsa/filter.c:328
 msgid "Error when moving messages"
 msgstr ""
 
+#: libbalsa/gmime-gpgme-context.c:287 libbalsa/rfc3156.c:1383
+#, c-format
+msgid ""
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:292 libbalsa/rfc3156.c:1388
+#, c-format
+msgid ""
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:410 libbalsa/gmime-gpgme-context.c:492
+#: libbalsa/gmime-gpgme-context.c:503 libbalsa/gmime-gpgme-context.c:618
+#: libbalsa/gmime-gpgme-context.c:708
+#, c-format
+msgid "%s: could not get data from stream: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:418 libbalsa/gmime-gpgme-context.c:627
+#: libbalsa/gmime-gpgme-context.c:716
+#, c-format
+msgid "%s: could not create new data object: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:428
+#, c-format
+msgid "%s: signing failed: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:517
+#, c-format
+msgid "%s: signature verification failed: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:582
+msgid "combined signing and encryption is only defined for RFC 2440"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:652
+#, c-format
+msgid "%s: signing and encryption failed: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:656
+#, c-format
+msgid "%s: encryption failed: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:728
+#, c-format
+msgid "%s: decryption failed: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:763
+#, c-format
+msgid "%s: could not create context: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:819
+msgid "the crypto engine for protocol OpenPGP is not available"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:829
+msgid "the crypto engine for protocol CMS is not available"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:836
+#, c-format
+msgid "invalid crypto engine %d"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:865 libbalsa/gmime-gpgme-context.c:876
+#, c-format
+msgid "%s: could not list keys for %s: %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:888
+#, c-format
+msgid "%s: could not find a key for %s"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:900
+#, c-format
+msgid "%s: multiple keys for %s"
+msgstr ""
+
 #. should "re" be localized ?
-#: libbalsa/identity.c:87 src/balsa-index-threading.c:804
-#: src/balsa-index-threading.c:806 src/sendmsg-window.c:2312
-#: src/sendmsg-window.c:2313
+#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1122
+#: libbalsa/mailbox_local.c:1124 src/sendmsg-window.c:2632
+#: src/sendmsg-window.c:2633
 msgid "Re:"
 msgstr "ስለ፦"
 
-#: libbalsa/identity.c:88 src/sendmsg-window.c:2341 src/sendmsg-window.c:2342
+#: libbalsa/identity.c:92 src/sendmsg-window.c:2662 src/sendmsg-window.c:2663
 msgid "Fwd:"
 msgstr "ወደፊት፦"
 
-#: libbalsa/identity.c:129
+#: libbalsa/identity.c:138
 msgid "New Identity"
 msgstr ""
 
-#: libbalsa/identity.c:364
+#: libbalsa/identity.c:374
 msgid "Current"
 msgstr "የአሁኑን"
 
-#: libbalsa/identity.c:564
+#: libbalsa/identity.c:595
 msgid "Default"
 msgstr "የነበረው"
 
-#: libbalsa/identity.c:737
+#: libbalsa/identity.c:783
 msgid "_Identity Name:"
 msgstr ""
 
-#: libbalsa/identity.c:739
+#: libbalsa/identity.c:785
 msgid "_Full Name:"
 msgstr "ሙሉ ስም፦ (_F)"
 
-#: libbalsa/identity.c:741
+#: libbalsa/identity.c:787
 msgid "_Mailing Address:"
 msgstr ""
 
-#: libbalsa/identity.c:743
+#: libbalsa/identity.c:789
 msgid "Reply _To:"
 msgstr ""
 
-#: libbalsa/identity.c:745
+#: libbalsa/identity.c:791
 msgid "_Domain:"
 msgstr "ዶሜን፦"
 
-#: libbalsa/identity.c:747
+#: libbalsa/identity.c:793
 msgid "_Bcc:"
 msgstr "_Bcc፦"
 
-#: libbalsa/identity.c:749
+#: libbalsa/identity.c:795
 msgid "Reply _String:"
 msgstr ""
 
-#: libbalsa/identity.c:751
+#: libbalsa/identity.c:797
 msgid "F_orward String:"
 msgstr ""
 
-#: libbalsa/identity.c:753
+#: libbalsa/identity.c:799
 msgid "Signature _Path:"
 msgstr ""
 
-#: libbalsa/identity.c:757
+#: libbalsa/identity.c:803
 msgid "_Execute Signature"
 msgstr ""
 
-#: libbalsa/identity.c:760
+#: libbalsa/identity.c:806
 msgid "Incl_ude Signature"
 msgstr ""
 
-#: libbalsa/identity.c:763
+#: libbalsa/identity.c:809
 msgid "Include Signature When For_warding"
 msgstr ""
 
-#: libbalsa/identity.c:766
+#: libbalsa/identity.c:812
 msgid "Include Signature When Rep_lying"
 msgstr ""
 
-#: libbalsa/identity.c:769
+#: libbalsa/identity.c:815
 msgid "_Add Signature Separator"
 msgstr ""
 
-#: libbalsa/identity.c:772
+#: libbalsa/identity.c:818
 msgid "Prepend Si_gnature"
 msgstr ""
 
-#: libbalsa/identity.c:907
+#: libbalsa/identity.c:823
+msgid "sign messages by default"
+msgstr ""
+
+#: libbalsa/identity.c:829
+msgid "encrypt messages by default"
+msgstr ""
+
+#: libbalsa/identity.c:835
+msgid "default crypto protocol"
+msgstr ""
+
+#: libbalsa/identity.c:982
 msgid "Error: The identity does not have a name"
 msgstr ""
 
-#: libbalsa/identity.c:924
+#: libbalsa/identity.c:992
 msgid "Error: An identity with that name already exists"
 msgstr ""
 
-#: libbalsa/identity.c:1075
+#: libbalsa/identity.c:1153
 msgid "Do you really want to delete the selected identity?"
 msgstr ""
 
-#: libbalsa/identity.c:1094
+#: libbalsa/identity.c:1186
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr ""
 
-#: libbalsa/identity.c:1121
+#: libbalsa/identity.c:1216
 msgid "Manage Identities"
 msgstr ""
 
-#: libbalsa/libbalsa.c:84 libmutt/mutt_socket.c:489
-msgid "unknown error"
-msgstr "ያልታወቀ ስህተት"
+#: libbalsa/identity.c:1521
+msgid "GnuPG using MIME mode"
+msgstr ""
 
-#: libbalsa/libbalsa.c:400
+#: libbalsa/identity.c:1522
+msgid "GnuPG using OpenPGP mode"
+msgstr ""
+
+#: libbalsa/identity.c:1524
+msgid "S/MIME mode"
+msgstr ""
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:255
+#, c-format
+msgid ""
+"IMAP server %s alert:\n"
+"%s"
+msgstr ""
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:259
+#, c-format
+msgid "IMAP server %s error: %s"
+msgstr ""
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:265
+#, fuzzy, c-format
+msgid "%s: %s"
+msgstr "%d %s"
+
+#: libbalsa/imap-server.c:550 libbalsa/imap-server.c:653
+#, c-format
+msgid "Cannot connect to the server: %s"
+msgstr ""
+
+#: libbalsa/imap-server.c:638
+#, c-format
+msgid "Exceeded the number of connections per server %s"
+msgstr ""
+
+#: libbalsa/libbalsa.c:279
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:507
-msgid "<b>This certificate belongs to:</b>\n"
+#: libbalsa/libbalsa.c:384
+msgid "Invalid date"
 msgstr ""
 
-#: libbalsa/libbalsa.c:515
+#: libbalsa/libbalsa.c:400 src/pref-manager.c:1226 src/pref-manager.c:1323
+msgid "Unknown"
+msgstr "ያልታወቀ"
+
+#: libbalsa/libbalsa.c:539
+#, c-format
+msgid ""
+"Authenticity of this certificate could not be verified.\n"
+"<b>Reason:</b> %s\n"
+"<b>This certificate belongs to:</b>\n"
+msgstr ""
+
+#: libbalsa/libbalsa.c:551
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
 msgstr ""
 
-#: libbalsa/libbalsa.c:524
+#: libbalsa/libbalsa.c:562
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -266,258 +436,709 @@ msgid ""
 "<b>Fingerprint:</b> %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:533
-msgid "IMAP TLS certificate"
+#: libbalsa/libbalsa.c:571
+msgid "SSL/TLS certificate"
 msgstr ""
 
-#: libbalsa/libbalsa.c:535
+#: libbalsa/libbalsa.c:573
 msgid "_Accept Once"
 msgstr ""
 
-#: libbalsa/libbalsa.c:536
+#: libbalsa/libbalsa.c:574
 msgid "Accept&_Save"
 msgstr ""
 
-#: libbalsa/libbalsa.c:537
+#: libbalsa/libbalsa.c:575
 msgid "_Reject"
 msgstr ""
 
-#. Non-threaded locking mechanism
-#: libbalsa/libbalsa_private.h:105 libbalsa/libbalsa_private.h:117
-#, c-format
-msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
-msgstr ""
-
-#: libbalsa/libbalsa_private.h:135 libbalsa/libbalsa_private.h:144
-#, c-format
-msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
-msgstr ""
-
-#: libbalsa/mailbox.c:381
+#: libbalsa/mailbox.c:412
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr ""
 
-#: libbalsa/mailbox.c:388
+#: libbalsa/mailbox.c:419
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr ""
 
-#: libbalsa/mailbox.c:405
+#: libbalsa/mailbox.c:436
+#, c-format
+msgid "Bad local mailbox path \"%s\""
+msgstr ""
+
+#: libbalsa/mailbox.c:441
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:653
-#, c-format
-msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+#. ImapIssue macro handles reconnecting. We might issue a
+#. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
+#. login information...
+#: libbalsa/mailbox_imap.c:481
+msgid "IMAP connection has been severed. Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_local.c:282
+#: libbalsa/mailbox_imap.c:484
 #, c-format
-msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_maildir.c:115
+#: libbalsa/mailbox_imap.c:825
 #, c-format
-msgid "Mailbox %s does not appear to be a Maildir mailbox."
+msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
 msgstr ""
 
-#: libbalsa/mailbox_maildir.c:124
+#: libbalsa/mailbox_imap.c:888 libbalsa/mailbox_maildir.c:482
+#: libbalsa/mailbox_mbox.c:435 libbalsa/mailbox_mh.c:502
 #, c-format
-msgid "Could not create a MailDir directory at %s (%s)"
+msgid "%s: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox_maildir.c:131 libbalsa/mailbox_maildir.c:139
-#: libbalsa/mailbox_maildir.c:149
+#: libbalsa/mailbox_imap.c:1316
 #, c-format
-msgid "Could not create a MailDir at %s (%s)"
+msgid ""
+"IMAP SEARCH command failed for mailbox %s\n"
+"falling back to default searching method"
 msgstr ""
 
-#: libbalsa/mailbox_maildir.c:210 libbalsa/mailbox_mh.c:189
+#: libbalsa/mailbox_imap.c:2186
+msgid "Server-side threading not supported."
+msgstr ""
+
+#: libbalsa/mailbox_local.c:1267
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr ""
 
-#: libbalsa/mailbox_maildir.c:229 libbalsa/mailbox_mh.c:208
+#: libbalsa/mailbox_local.c:1289
+#, c-format
+msgid "Failed to sync mailbox \"%s\""
+msgstr ""
+
+#: libbalsa/mailbox_maildir.c:189
+#, c-format
+msgid "Mailbox %s does not appear to be a Maildir mailbox."
+msgstr ""
+
+#: libbalsa/mailbox_maildir.c:198
+#, c-format
+msgid "Could not create a MailDir directory at %s (%s)"
+msgstr ""
+
+#: libbalsa/mailbox_maildir.c:205 libbalsa/mailbox_maildir.c:213
+#: libbalsa/mailbox_maildir.c:223
+#, c-format
+msgid "Could not create a MailDir at %s (%s)"
+msgstr ""
+
+#: libbalsa/mailbox_maildir.c:324 libbalsa/mailbox_mh.c:266
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
 msgstr ""
 
-#: libbalsa/mailbox_maildir.c:235 libbalsa/mailbox_mbox.c:178
-#: libbalsa/mailbox_mh.c:214
+#: libbalsa/mailbox_maildir.c:330 libbalsa/mailbox_mbox.c:247
+#: libbalsa/mailbox_mh.c:272
 #, c-format
 msgid ""
 "Could not remove %s:\n"
 "%s"
 msgstr ""
 
-#: libbalsa/mailbox_mbox.c:113
+#: libbalsa/mailbox_maildir.c:454 libbalsa/mailbox_mbox.c:399
+#: libbalsa/mailbox_mh.c:483
+msgid "Mailbox does not exist."
+msgstr ""
+
+#: libbalsa/mailbox_mbox.c:181
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr ""
 
-#: libbalsa/mailbox_mh.c:114
+#: libbalsa/mailbox_mbox.c:407
+#, fuzzy
+msgid "Cannot open mailbox."
+msgstr "የፖስታ ሳጥንን ዝጋ"
+
+#: libbalsa/mailbox_mbox.c:415
+#, fuzzy
+msgid "Cannot lock mailbox."
+msgstr "የፖስታ ሳጥንን ዝጋ"
+
+#: libbalsa/mailbox_mbox.c:1488
+#, fuzzy, c-format
+msgid "%s: could not open %s."
+msgstr "%sን መክፈት አልተቻለም"
+
+#: libbalsa/mailbox_mbox.c:1496
+#, c-format
+msgid "%s: could not get new mime stream."
+msgstr ""
+
+#: libbalsa/mailbox_mbox.c:1506
+#, c-format
+msgid "%s: could not get message stream."
+msgstr ""
+
+#: libbalsa/mailbox_mbox.c:1521
+#, c-format
+msgid ""
+"Error copying message to mailbox %s!\n"
+"Mailbox might have been corrupted!"
+msgstr ""
+
+#: libbalsa/mailbox_mh.c:172
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr ""
 
-#: libbalsa/mailbox_mh.c:124
+#: libbalsa/mailbox_mh.c:182
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr ""
 
-#: libbalsa/mailbox_mh.c:131
+#: libbalsa/mailbox_mh.c:189
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:213
+#: libbalsa/mailbox_pop3.c:338
 #, c-format
-msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+msgid "Retrieving Message %d of %d"
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:268
+#: libbalsa/mailbox_pop3.c:361
+#, c-format
+msgid "Received %ld kB of %ld"
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:375
+#, c-format
+msgid "Saving POP message to %s failed."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:385
+#, c-format
+msgid "Transfering POP message to %s failed."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:463 libbalsa/mailbox_pop3.c:474
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
 "%s"
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:285
+#: libbalsa/mailbox_pop3.c:502
 #, c-format
-msgid ""
-"POP3 mailbox %s accessing error:\n"
-"%s"
+msgid "POP3 mailbox %s error: %s\n"
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:307
+#: libbalsa/mailbox_pop3.c:535
+#, c-format
+msgid "POP3 message %d oversized: %d kB - skipped."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:546
+#, c-format
+msgid "POP3 error: cannot open %s for writing."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:554
+#, c-format
+msgid "POP3 error: cannot close %s."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:580
+#, c-format
+msgid "POP3 error: %s."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:603
 #, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr ""
 
-#: libbalsa/mailbox_pop3.c:332
+#: libbalsa/mailbox_pop3.c:626
 #, c-format
 msgid ""
 "Error placing messages from %s on %s\n"
 "Messages are left in %s\n"
 msgstr ""
 
-#: libbalsa/message.c:429
+#: libbalsa/mailbox_pop3.c:645
+#, c-format
+msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
+msgstr ""
+
+#: libbalsa/message.c:481
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr ""
 
-#: libbalsa/message.c:438 libbalsa/message.c:550
+#: libbalsa/message.c:633 libbalsa/message.c:673
 #, c-format
-msgid "Couldn't open destination mailbox (%s) for writing"
+msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
 
-#: libbalsa/message.c:489
+#: libbalsa/mime.c:80 src/balsa-message.c:2296 src/print.c:680
 #, c-format
-msgid "Couldn't open destination mailbox (%s) for copying"
+msgid ""
+"Error writing to temporary file %s.\n"
+"Check the directory permissions."
 msgstr ""
 
-#: libbalsa/pop3.c:57
-msgid "connection error"
-msgstr ""
-
-#: libbalsa/pop3.c:58
-msgid "POP command execution failed"
-msgstr ""
-
-#: libbalsa/pop3.c:59
-msgid "Could not write the message"
-msgstr ""
-
-#: libbalsa/pop3.c:60
-msgid "Could not run the delivery program (procmail)"
-msgstr ""
-
-#: libbalsa/pop3.c:61
-msgid "Could not open mailbox for spooling"
-msgstr ""
-
-#: libbalsa/pop3.c:62
-msgid "Could not append message"
-msgstr ""
-
-#: libbalsa/pop3.c:63
-msgid "Host not found"
-msgstr ""
-
-#: libbalsa/pop3.c:64
-msgid "Connection refused"
-msgstr ""
-
-#: libbalsa/pop3.c:65
-msgid "Authentication failed"
-msgstr ""
-
-#: libbalsa/pop3.c:421
+#: libbalsa/mime.c:87 src/balsa-message.c:2304 src/print.c:687
 #, c-format
-msgid "Retrieving Message %d of %d"
+msgid "Cannot open temporary file %s."
 msgstr ""
 
-#: libbalsa/pop3.c:433
+#: libbalsa/mime.c:107
+msgid ""
+"\n"
+"--\n"
+"This is an OpenPGP signed message part:\n"
+msgstr ""
+
+#: libbalsa/misc.c:1627
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr ""
+
+#: libbalsa/misc.c:1634
 #, c-format
-msgid "Received %d bytes of %d"
+msgid "Waiting for fcntl lock... %d"
 msgstr ""
 
-#: libbalsa/send.c:218 libbalsa/send.c:225
+#: libbalsa/misc.c:1662
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr ""
+
+#: libbalsa/misc.c:1669
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr ""
+
+#: libbalsa/rfc3156.c:76
+#, c-format
+msgid "Gpgme has been compiled without support for protocol %s."
+msgstr ""
+
+#: libbalsa/rfc3156.c:81
+#, c-format
+msgid "Crypto engine %s is not installed properly."
+msgstr ""
+
+#: libbalsa/rfc3156.c:86
+#, c-format
+msgid ""
+"Crypto engine %s version %s is installed, but at least version %s is "
+"required."
+msgstr ""
+
+#: libbalsa/rfc3156.c:93
+#, c-format
+msgid "Unknown problem with engine for protocol %s."
+msgstr ""
+
+#: libbalsa/rfc3156.c:98
+#, c-format
+msgid "%s: could not retreive crypto engine information: %s."
+msgstr ""
+
+#: libbalsa/rfc3156.c:102
+#, c-format
+msgid ""
+"\n"
+"Disable support for protocol %s."
+msgstr ""
+
+#: libbalsa/rfc3156.c:235 libbalsa/rfc3156.c:240 libbalsa/rfc3156.c:322
+#: libbalsa/rfc3156.c:327 libbalsa/rfc3156.c:461 libbalsa/rfc3156.c:466
+#: libbalsa/rfc3156.c:529 libbalsa/rfc3156.c:534 libbalsa/rfc3156.c:613
+#: libbalsa/rfc3156.c:618 libbalsa/rfc3156.c:723 libbalsa/rfc3156.c:728
+#: libbalsa/rfc3156.c:803 libbalsa/rfc3156.c:808
+msgid "creating a gpgme context failed"
+msgstr ""
+
+#: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
+msgid "Enter passphrase to unlock the secret key for signing"
+msgstr ""
+
+#: libbalsa/rfc3156.c:274 libbalsa/rfc3156.c:278 libbalsa/rfc3156.c:660
+msgid "signing failed"
+msgstr ""
+
+#: libbalsa/rfc3156.c:351 libbalsa/rfc3156.c:356 libbalsa/rfc3156.c:663
+msgid "encryption failed"
+msgstr ""
+
+#: libbalsa/rfc3156.c:479 libbalsa/rfc3156.c:484 libbalsa/rfc3156.c:739
+#: libbalsa/rfc3156.c:745
+msgid "signature verification failed"
+msgstr ""
+
+#: libbalsa/rfc3156.c:546 libbalsa/rfc3156.c:819
+msgid "Enter passphrase to decrypt message"
+msgstr ""
+
+#: libbalsa/rfc3156.c:558 libbalsa/rfc3156.c:563
+msgid "decryption failed"
+msgstr ""
+
+#: libbalsa/rfc3156.c:656 libbalsa/rfc3156.c:670
+msgid "signing and encryption failed"
+msgstr ""
+
+#: libbalsa/rfc3156.c:673
+#, c-format
+msgid "signing failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:676
+#, c-format
+msgid "encryption failed: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:828 libbalsa/rfc3156.c:835
+msgid "decryption and signature verification failed"
+msgstr ""
+
+#: libbalsa/rfc3156.c:866
+msgid "The signature is valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:868
+msgid "The signature is valid but expired."
+msgstr ""
+
+#: libbalsa/rfc3156.c:871
+msgid ""
+"The signature is valid but the key used to verify the signature has expired."
+msgstr ""
+
+#: libbalsa/rfc3156.c:874
+msgid ""
+"The signature is valid but the key used to verify the signature has been "
+"revoked."
+msgstr ""
+
+#: libbalsa/rfc3156.c:877
+msgid "The signature is invalid (Note: might be caused by gmime bug!)."
+msgstr ""
+
+#: libbalsa/rfc3156.c:880
+msgid "The signature could not be verified due to a missing key."
+msgstr ""
+
+#: libbalsa/rfc3156.c:882
+msgid "This part is not a real PGP signature."
+msgstr ""
+
+#: libbalsa/rfc3156.c:885
+msgid "The signature could not be verified due to an invalid crypto engine."
+msgstr ""
+
+#: libbalsa/rfc3156.c:888 libbalsa/rfc3156.c:1543
+msgid "GnuPG is rebuilding the trust database and is currently unavailable."
+msgstr ""
+
+#: libbalsa/rfc3156.c:891
+msgid "An error prevented the signature verification."
+msgstr ""
+
+#: libbalsa/rfc3156.c:899
+msgid "The user ID is of unknown validity."
+msgstr ""
+
+#: libbalsa/rfc3156.c:901
+msgid "The validity of the user ID is undefined."
+msgstr ""
+
+#: libbalsa/rfc3156.c:903
+msgid "The user ID is never valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:905
+msgid "The user ID is marginally valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:907
+msgid "The user ID is fully valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:909
+msgid "The user ID is ultimately valid."
+msgstr ""
+
+#: libbalsa/rfc3156.c:911 libbalsa/rfc3156.c:1147
+msgid "bad validity"
+msgstr ""
+
+#: libbalsa/rfc3156.c:919
+msgid "PGP signature: "
+msgstr ""
+
+#: libbalsa/rfc3156.c:921
+msgid "S/MIME signature: "
+msgstr ""
+
+#: libbalsa/rfc3156.c:923
+#, fuzzy
+msgid "(unknown protocol) "
+msgstr "ያልታወቀ ስህተት"
+
+#: libbalsa/rfc3156.c:942
+#, c-format
+msgid ""
+"\n"
+"User ID: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:945
+#, c-format
+msgid ""
+"\n"
+"Signed by: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:949
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Mail address: %s"
+msgstr "ኢሜያል አድራሻ፦ (_E)"
+
+#: libbalsa/rfc3156.c:954
+#, c-format
+msgid ""
+"\n"
+"Signed on: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:956
+#, c-format
+msgid ""
+"\n"
+"Validity: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:960
+#, c-format
+msgid ""
+"\n"
+"Owner trust: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:964
+#, c-format
+msgid ""
+"\n"
+"Key fingerprint: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:969
+#, c-format
+msgid ""
+"\n"
+"Key created on: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:978
+msgid " revoked"
+msgstr ""
+
+#: libbalsa/rfc3156.c:983
+msgid " expired"
+msgstr ""
+
+#: libbalsa/rfc3156.c:988
+msgid " disabled"
+msgstr ""
+
+#: libbalsa/rfc3156.c:993
+msgid " invalid"
+msgstr ""
+
+#: libbalsa/rfc3156.c:996
+#, c-format
+msgid ""
+"\n"
+"Key attributes:%s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:998
+#, c-format
+msgid ""
+"\n"
+"Key attribute:%s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1002
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Issuer name: %s"
+msgstr "የፋይል ስም፦ %s"
+
+#: libbalsa/rfc3156.c:1005
+#, c-format
+msgid ""
+"\n"
+"Issuer serial number: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1008
+#, c-format
+msgid ""
+"\n"
+"Chain ID: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1055
+#, fuzzy, c-format
+msgid "Could not launch %s to get the public key %s."
+msgstr "ፋይሉ %sን መክፈት አልተቻለም።\n"
+
+#: libbalsa/rfc3156.c:1104
+#, c-format
+msgid ""
+"Running gpg failed with return value %d:\n"
+"%s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1111
+#, c-format
+msgid ""
+"Running gpg successful:\n"
+"%s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1135
+#, fuzzy
+msgid "unknown"
+msgstr "ያልታወቀ"
+
+#: libbalsa/rfc3156.c:1137
+msgid "undefined"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1139
+#, fuzzy
+msgid "never"
+msgstr "በፍጹም"
+
+#: libbalsa/rfc3156.c:1141
+msgid "marginal"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1143
+msgid "full"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1145
+msgid "ultimate"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1205
+#, fuzzy
+msgid "User ID"
+msgstr "ተጠቃሚ"
+
+#: libbalsa/rfc3156.c:1205
+msgid "Key ID"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1205
+msgid "Length"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1205
+msgid "Validity"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1206
+msgid "Owner trust"
+msgstr ""
+
+#. FIXME: create dialog according to the Gnome HIG
+#: libbalsa/rfc3156.c:1250
+#, fuzzy
+msgid "Select key"
+msgstr "ሁሉንም ምረጡ"
+
+#: libbalsa/rfc3156.c:1261
+#, c-format
+msgid "Select the private key for the signer %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1265
+#, c-format
+msgid "Select the public key for the recipient %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:1544
+msgid "Try again later."
+msgstr ""
+
+#: libbalsa/send.c:233 libbalsa/send.c:240
 msgid "Sending Mail..."
 msgstr ""
 
-#: libbalsa/send.c:221 src/main-window.c:1780
+#: libbalsa/send.c:236 src/main-window.c:2591
 msgid "_Hide"
 msgstr "ደብቅ (_H)"
 
-#: libbalsa/send.c:369
-msgid "Unable to open sentbox - could not get IMAP server information"
+#: libbalsa/send.c:765
+#, c-format
+msgid ""
+"Could not send the message to %s:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
 msgstr ""
 
-#: libbalsa/send.c:788
+#: libbalsa/send.c:810
+#, c-format
+msgid ""
+"Relaying refused:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+
+#: libbalsa/send.c:820
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr ""
 
-#: libbalsa/send.c:815
+#: libbalsa/send.c:850
 msgid "Connected to MTA"
 msgstr ""
 
-#: libbalsa/send.c:822
-#, c-format
-msgid "From: %d <%s>"
-msgstr "ከ፦ %d <%s>"
+#: libbalsa/send.c:857 src/balsa-message.c:1415 src/print.c:369
+#: src/sendmsg-window.c:855 src/sendmsg-window.c:2459 src/store-address.c:303
+msgid "From:"
+msgstr "ከ፦"
 
-#: libbalsa/send.c:825
-#, c-format
-msgid "From %s: %d %s"
-msgstr "ከ %s፦ %d %s"
+#: libbalsa/send.c:860 src/balsa-index.c:335
+msgid "From"
+msgstr "ከ"
 
-#: libbalsa/send.c:833
-#, c-format
-msgid "To: %d <%s>"
-msgstr "ወደ፦ %d <%s>"
+#: libbalsa/send.c:869 src/balsa-message.c:1424 src/print.c:373
+#: src/sendmsg-window.c:854 src/sendmsg-window.c:2466 src/store-address.c:304
+msgid "To:"
+msgstr "ወደ፦"
 
-#: libbalsa/send.c:836
-#, c-format
-msgid "To %s: %d %s"
-msgstr "ወደ %s፦ %d %s"
+#: libbalsa/send.c:872 src/balsa-index.c:906
+msgid "To"
+msgstr "ወደ"
 
-#: libbalsa/send.c:860
-#, c-format
-msgid "%d %s"
-msgstr "%d %s"
-
-#: libbalsa/send.c:873
+#: libbalsa/send.c:910
 msgid "Disconnected"
 msgstr ""
 
-#: libbalsa/send.c:1048
+#: libbalsa/send.c:1128
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -526,98 +1147,137 @@ msgid ""
 "Message is left in outbox."
 msgstr ""
 
-#: libbalsa/send.c:1058
+#: libbalsa/send.c:1138
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 msgstr ""
 
-#: libbalsa/source-viewer.c:46 src/main-window.c:513
+#: libbalsa/send.c:1466
+#, c-format
+msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
+msgstr ""
+
+#: libbalsa/send.c:1759 libbalsa/send.c:1835
+msgid "This message will not be encrpyted for the BCC: recipient(s)."
+msgstr ""
+
+#. host, authentication method
+#: libbalsa/server.c:370
+#, c-format
+msgid "Logging in to %s using %s"
+msgstr ""
+
+#: libbalsa/source-viewer.c:52 src/main-window.c:645
 msgid "_Select Text"
 msgstr ""
 
-#: libbalsa/source-viewer.c:47 src/main-window.c:514
+#: libbalsa/source-viewer.c:53 src/main-window.c:646
 msgid "Select entire mail"
 msgstr ""
 
-#: libbalsa/source-viewer.c:100
+#: libbalsa/source-viewer.c:62
+msgid "_Escape Special Characters"
+msgstr ""
+
+#: libbalsa/source-viewer.c:63
+msgid "Escape special and non-ASCII characters"
+msgstr ""
+
+#: libbalsa/source-viewer.c:152
+msgid "Mailbox closed"
+msgstr ""
+
+#: libbalsa/source-viewer.c:213
 msgid "Message Source"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:38
+#: libinit_balsa/balsa-druid-page-defclient.c:57
+msgid "Use balsa as default email client?"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-defclient.c:61
+msgid "_Yes"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-defclient.c:63
+#, fuzzy
+msgid "_No"
+msgstr "ወደ (_T)"
+
+#: libinit_balsa/balsa-druid-page-defclient.c:99
+#, fuzzy
+msgid "Default Client"
+msgstr "የነበረው"
+
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Inbox:"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:38
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Outbox:"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:38
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Sentbox:"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:38
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Draftbox:"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:39
+#: libinit_balsa/balsa-druid-page-directory.c:43
 msgid "_Trash:"
 msgstr "የማይፈለግ፦ (_T)"
 
-#: libinit_balsa/balsa-druid-page-directory.c:64
+#: libinit_balsa/balsa-druid-page-directory.c:70
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:121
-#, c-format
-msgid ""
-"The mailbox \"%s\" does not appear to be valid.\n"
-"Your system does not allow for creation of mailboxes\n"
-"in /var/spool/mail. Balsa wouldn't function properly\n"
-"until the system created the mailboxes. Please change\n"
-"the mailbox path or check your system configuration."
-msgstr ""
-
-#: libinit_balsa/balsa-druid-page-directory.c:130
+#: libinit_balsa/balsa-druid-page-directory.c:134
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:181
+#: libinit_balsa/balsa-druid-page-directory.c:184
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:242
+#: libinit_balsa/balsa-druid-page-directory.c:239
 msgid "Mail Files"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.c:351
+#: libinit_balsa/balsa-druid-page-directory.c:341
 #, c-format
 msgid ""
 "Problem Creating Mailboxes\n"
 "%s"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-finish.c:42
+#: libinit_balsa/balsa-druid-page-finish.c:37
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-finish.c:49
-#: libinit_balsa/balsa-druid-page-finish.c:68
+#: libinit_balsa/balsa-druid-page-finish.c:43
 msgid "All Done!"
 msgstr "ጨርሷል!"
 
-#: libinit_balsa/balsa-druid-page-finish.c:100
+#: libinit_balsa/balsa-druid-page-finish.c:70
 msgid "GnomeCard Address Book"
 msgstr "የGnomeCard አድራሻ መጽሐፍ"
+
+#: libinit_balsa/balsa-druid-page-finish.c:77
+#: libinit_balsa/balsa-druid-page-finish.c:85 src/ab-window.c:207
+msgid "Address Book"
+msgstr "የአድራሻ መጽሐፍ"
 
 #: libinit_balsa/balsa-druid-page-user.c:67
 msgid "Please enter information about yourself."
@@ -627,10 +1287,6 @@ msgstr ""
 msgid "_Name:"
 msgstr "ስም፦ (_N)"
 
-#: libinit_balsa/balsa-druid-page-user.c:79
-msgid "_Email address:"
-msgstr "ኢሜያል አድራሻ፦ (_E)"
-
 #: libinit_balsa/balsa-druid-page-user.c:84
 msgid "_Local Mail Directory:"
 msgstr ""
@@ -639,22 +1295,22 @@ msgstr ""
 msgid "_SMTP Server:"
 msgstr "_SMTP ሰርቨር፦"
 
-#: libinit_balsa/balsa-druid-page-user.c:113
+#: libinit_balsa/balsa-druid-page-user.c:109
 msgid "User Settings"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-user.c:197
+#: libinit_balsa/balsa-druid-page-user.c:177
 #, c-format
 msgid ""
 "Local Mail Problem\n"
 "%s"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-welcome.c:37
+#: libinit_balsa/balsa-druid-page-welcome.c:31
 msgid "Welcome to Balsa!"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-welcome.c:40
+#: libinit_balsa/balsa-druid-page-welcome.c:34
 msgid ""
 "You seem to be running Balsa for the first time. The following steps will "
 "set up Balsa by asking a few simple questions. Once you have completed these "
@@ -664,28 +1320,28 @@ msgid ""
 "about contacting the authors or reporting bugs."
 msgstr ""
 
-#: libinit_balsa/balsa-initdruid.c:83
+#: libinit_balsa/balsa-initdruid.c:75
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
 msgstr ""
 
-#: libinit_balsa/helper.c:76
+#: libinit_balsa/helper.c:65
 #, c-format
 msgid "Error loading %s: %s\n"
 msgstr ""
 
-#: libinit_balsa/helper.c:178
+#: libinit_balsa/helper.c:152
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
 
-#: libinit_balsa/helper.c:191 libinit_balsa/helper.c:215
+#: libinit_balsa/helper.c:165 libinit_balsa/helper.c:189
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr ""
 
-#: libinit_balsa/helper.c:201 libinit_balsa/helper.c:224
+#: libinit_balsa/helper.c:175 libinit_balsa/helper.c:198
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr ""
@@ -694,1197 +1350,604 @@ msgstr ""
 msgid "Configure Balsa"
 msgstr ""
 
-#: libmutt/handler.c:1333
-msgid "[-- Error:  Could not display any parts of Multipart/Alternative! --]\n"
+#: sounds/balsa.soundlist.in.h:1
+msgid "Balsa E-mail reader"
 msgstr ""
 
-#: libmutt/handler.c:1453
-#, c-format
-msgid "[-- Attachment #%d"
+#: sounds/balsa.soundlist.in.h:2
+msgid "Program startup"
 msgstr ""
 
-#: libmutt/handler.c:1464
-#, c-format
-msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
+#: sounds/email.soundlist.in.h:1
+msgid "E-mail"
 msgstr ""
 
-#: libmutt/handler.c:1523
-#, c-format
-msgid "[-- Autoview using %s --]\n"
+#: sounds/email.soundlist.in.h:2
+msgid "New mail notification"
 msgstr ""
 
-#: libmutt/handler.c:1524
-#, c-format
-msgid "Invoking autoview command: %s"
+#: src/ab-main.c:337 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
+#: src/filter-run-dialog.c:292
+msgid "Name"
+msgstr "ስም"
+
+#: src/ab-main.c:457
+#, fuzzy
+msgid "F_ilter:"
+msgstr "አጣራዎች... (_I)"
+
+#: src/ab-window.c:175
+msgid "E-Mail Address"
+msgstr "የኢሜይል አድራሻ"
+
+#. Entry widget for finding an address
+#: src/ab-window.c:264
+msgid "_Search for Name:"
 msgstr ""
 
-#: libmutt/handler.c:1552
-msgid "Can't create filter"
+#: src/ab-window.c:324
+msgid "Send-To"
+msgstr "ለ... ላክ"
+
+#: src/ab-window.c:344
+msgid "Run GnomeCard"
 msgstr ""
 
-#: libmutt/handler.c:1554
-#, c-format
-msgid "[-- Can't run %s. --]\n"
+#: src/ab-window.c:352
+msgid "_Re-Import"
 msgstr ""
 
-#: libmutt/handler.c:1570 libmutt/handler.c:1590
-#, c-format
-msgid "[-- Autoview stderr of %s --]\n"
+#. mode switching stuff
+#: src/ab-window.c:362
+msgid "Treat multiple addresses as:"
 msgstr ""
 
-#: libmutt/handler.c:1632
-msgid "[-- Error: message/external-body has no access-type parameter --]\n"
+#: src/ab-window.c:366
+msgid "alternative addresses for the same person"
 msgstr ""
 
-#: libmutt/handler.c:1651
-#, c-format
-msgid "[-- This %s/%s attachment "
+#: src/ab-window.c:371
+msgid "a distribution list"
 msgstr ""
 
-#: libmutt/handler.c:1658
-#, c-format
-msgid "(size %s bytes) "
-msgstr ""
-
-#: libmutt/handler.c:1660
-msgid "has been deleted --]\n"
-msgstr ""
-
-#: libmutt/handler.c:1665 libmutt/handler.c:1670
-#, c-format
-msgid "[-- on %s --]\n"
-msgstr "[-- አብራ %s --]\n"
-
-#: libmutt/handler.c:1682
+#: src/ab-window.c:677
 #, c-format
 msgid ""
-"[-- This %s/%s attachment is not included, --]\n"
-"[-- and the indicated external source has --]\n"
-"[-- expired. --]\n"
+"Error opening address book '%s':\n"
+"%s"
 msgstr ""
 
-#: libmutt/handler.c:1696
-#, c-format
-msgid "[-- This %s/%s attachment is not included, --]\n"
-msgstr ""
-
-#: libmutt/handler.c:1700
-#, c-format
-msgid "[-- and the indicated access-type %s is unsupported --]\n"
-msgstr ""
-
-#: libmutt/handler.c:1828
-msgid "Error: multipart/signed has no protocol."
-msgstr ""
-
-#: libmutt/handler.c:1841
-msgid "Error: multipart/encrypted has no protocol parameter!"
-msgstr ""
-
-#: libmutt/handler.c:1888
-msgid "Unable to open temporary file!"
-msgstr ""
-
-#: libmutt/handler.c:1949
-#, c-format
-msgid "[-- %s/%s is unsupported "
-msgstr ""
-
-#: libmutt/handler.c:1954
-#, c-format
-msgid "(use '%s' to view this part)"
-msgstr ""
-
-#: libmutt/handler.c:1956
-msgid "(need 'view-attachments' bound to key!)"
-msgstr ""
-
-#: libmutt/imap/auth.c:104
-msgid "No authenticators available"
-msgstr ""
-
-#: libmutt/imap/auth_anon.c:39
-msgid "Authenticating (anonymous)..."
-msgstr ""
-
-#: libmutt/imap/auth_anon.c:69
-msgid "Anonymous authentication failed."
-msgstr ""
-
-#: libmutt/imap/auth_cram.c:44
-msgid "Authenticating (CRAM-MD5)..."
-msgstr ""
-
-#: libmutt/imap/auth_cram.c:124
-msgid "CRAM-MD5 authentication failed."
-msgstr ""
-
-#. now begin login
-#: libmutt/imap/auth_gss.c:112
-msgid "Authenticating (GSSAPI)..."
-msgstr ""
-
-#: libmutt/imap/auth_gss.c:275
-msgid "GSSAPI authentication failed."
-msgstr ""
-
-#: libmutt/imap/auth_login.c:34
-msgid "LOGIN disabled on this server."
-msgstr ""
-
-#: libmutt/imap/auth_login.c:43
-msgid "Logging in..."
-msgstr ""
-
-#: libmutt/imap/auth_login.c:63
-msgid "Login failed."
-msgstr ""
-
-#: libmutt/imap/auth_sasl.c:93
-msgid "Authenticating (SASL)..."
-msgstr ""
-
-#: libmutt/imap/auth_sasl.c:174
-msgid "SASL authentication failed."
-msgstr ""
-
-#: libmutt/imap/browse.c:85 libmutt/imap/imap.c:537
-#, c-format
-msgid "%s is an invalid IMAP path"
-msgstr ""
-
-#: libmutt/imap/browse.c:102
-msgid "Getting namespaces..."
-msgstr ""
-
-#: libmutt/imap/browse.c:111
-msgid "Getting folder list..."
-msgstr ""
-
-#: libmutt/imap/browse.c:229
-msgid "No such folder"
-msgstr ""
-
-#: libmutt/imap/browse.c:314
-msgid "Create mailbox: "
-msgstr ""
-
-#: libmutt/imap/browse.c:319
-msgid "Mailbox must have a name."
-msgstr ""
-
-#: libmutt/imap/browse.c:332
-msgid "Mailbox created."
-msgstr ""
-
-#: libmutt/imap/command.c:288
-msgid "Mailbox closed"
-msgstr ""
-
-#. something is wrong because the server reported fewer messages
-#. * than we previously saw
-#.
-#: libmutt/imap/command.c:325
-msgid "Fatal error.  Message count is out of sync!"
-msgstr ""
-
-#: libmutt/imap/imap.c:163
-#, c-format
-msgid "Closing connection to %s..."
-msgstr ""
-
-#: libmutt/imap/imap.c:324
-msgid "This IMAP server is ancient. Mutt does not work with it."
-msgstr ""
-
-#: libmutt/imap/imap.c:410
-msgid "Secure connection with TLS?"
-msgstr ""
-
-#: libmutt/imap/imap.c:413
-#, c-format
-msgid "Connecting to %s ..."
-msgstr ""
-
-#: libmutt/imap/imap.c:423
-msgid "Could not negotiate TLS connection"
-msgstr ""
-
-#: libmutt/imap/imap.c:568
-#, c-format
-msgid "Selecting %s..."
-msgstr ""
-
-#: libmutt/imap/imap.c:696
-msgid "Error opening mailbox"
-msgstr ""
-
-#. STATUS not supported
-#: libmutt/imap/imap.c:749
-msgid "Unable to append to IMAP mailboxes at this server"
-msgstr ""
-
-#. command failed cause folder doesn't exist
-#: libmutt/imap/imap.c:758 libmutt/imap/message.c:683
-#, c-format
-msgid "Create %s?"
-msgstr "%sን ፍጠር?"
-
-#: libmutt/imap/imap.c:794
-msgid "Closing connection to IMAP server..."
-msgstr ""
-
-#: libmutt/imap/imap.c:957
-#, c-format
-msgid "Marking %d messages deleted..."
-msgstr ""
-
-#: libmutt/imap/imap.c:966
-msgid "Expunge failed"
-msgstr ""
-
-#: libmutt/imap/imap.c:981
-#, c-format
-msgid "Saving message status flags... [%d/%d]"
-msgstr ""
-
-#: libmutt/imap/imap.c:1068
-msgid "Expunging messages from server..."
-msgstr ""
-
-#: libmutt/imap/imap.c:1107
-msgid "CLOSE failed"
-msgstr ""
-
-#: libmutt/imap/imap.c:1372
-msgid "Bad mailbox name"
-msgstr ""
-
-#: libmutt/imap/imap.c:1384
-#, c-format
-msgid "Subscribing to %s..."
-msgstr ""
-
-#: libmutt/imap/imap.c:1386
-#, c-format
-msgid "Unsubscribing to %s..."
-msgstr ""
-
-#. Unable to fetch headers for lower versions
-#: libmutt/imap/message.c:79
-msgid "Unable to fetch headers from this IMAP server version."
-msgstr ""
-
-#: libmutt/imap/message.c:89
-#, c-format
-msgid "Could not create temporary file %s"
-msgstr ""
-
-#: libmutt/imap/message.c:106
-#, c-format
-msgid "Fetching message headers... [%d/%d]"
-msgstr ""
-
-#: libmutt/imap/message.c:255
-msgid "Fetching message..."
-msgstr ""
-
-#: libmutt/imap/message.c:299
-msgid "The message index is incorrect. Try reopening the mailbox."
-msgstr ""
-
-#: libmutt/imap/message.c:545
-msgid "Uploading message ..."
-msgstr ""
-
-#: libmutt/imap/message.c:658
-#, c-format
-msgid "Copying %d messages to %s..."
-msgstr ""
-
-#: libmutt/imap/message.c:662
-#, c-format
-msgid "Copying message %d to %s..."
-msgstr ""
-
-#: libmutt/imap/util.c:239
-msgid "Continue?"
-msgstr "ቀጥል?"
-
-#: libmutt/imap/util.c:245
-#, c-format
-msgid "%s [%s]\n"
-msgstr "%s [%s]\n"
-
-#: libmutt/lib.c:59 libmutt/lib.c:74 libmutt/lib.c:105
-msgid "Out of memory!"
-msgstr ""
-
-#: libmutt/mbox.c:134 libmutt/mbox.c:295
-#, c-format
-msgid "Reading %s... %d (%d%%)"
-msgstr ""
-
-#: libmutt/mbox.c:158 libmutt/mbox.c:217
-msgid "Mailbox is corrupt!"
-msgstr ""
-
-#: libmutt/mbox.c:675
-msgid "Mailbox was corrupted!"
-msgstr ""
-
-#: libmutt/mbox.c:712 libmutt/mbox.c:988
-msgid "Fatal error!  Could not reopen mailbox!"
-msgstr ""
-
-#: libmutt/mbox.c:721
-msgid "Unable to lock mailbox!"
-msgstr ""
-
-#: libmutt/mbox.c:750
-msgid "Could not create temporary file!"
-msgstr ""
-
-#. this means ctx->changed or ctx->deleted was set, but no
-#. * messages were found to be changed or deleted.  This should
-#. * never happen, is we presume it is a bug in mutt.
-#.
-#: libmutt/mbox.c:767
-msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr ""
-
-#: libmutt/mbox.c:808
-#, c-format
-msgid "Writing messages... %d (%d%%)"
-msgstr ""
-
-#. copy the temp mailbox back into place starting at the first
-#. * change/deleted message
-#.
-#: libmutt/mbox.c:941
-msgid "Committing changes..."
-msgstr ""
-
-#: libmutt/mbox.c:972
-#, c-format
-msgid "Write failed!  Saved partial mailbox to %s"
-msgstr ""
-
-#: libmutt/mbox.c:1038
-msgid "Could not reopen mailbox!"
-msgstr ""
-
-#: libmutt/mbox.c:1076
-msgid "Reopening mailbox..."
-msgstr ""
-
-#: libmutt/mutt_socket.c:85 libmutt/mutt_socket.c:141
-#, c-format
-msgid "Connection to %s closed"
-msgstr ""
-
-#: libmutt/mutt_socket.c:264
-msgid "SSL is unavailable."
-msgstr ""
-
-#: libmutt/mutt_socket.c:296
-msgid "Preconnect command failed."
-msgstr ""
-
-#: libmutt/mutt_socket.c:367 libmutt/mutt_socket.c:381
-#, c-format
-msgid "Error talking to %s (%s)"
-msgstr ""
-
-#: libmutt/mutt_socket.c:415 libmutt/mutt_socket.c:456
-#, c-format
-msgid "Looking up %s..."
-msgstr ""
-
-#: libmutt/mutt_socket.c:420 libmutt/mutt_socket.c:460
-#, c-format
-msgid "Could not find the host \"%s\""
-msgstr ""
-
-#: libmutt/mutt_socket.c:424 libmutt/mutt_socket.c:465
-#, c-format
-msgid "Connecting to %s..."
-msgstr ""
-
-#: libmutt/mutt_socket.c:488
-#, c-format
-msgid "Could not connect to %s (%s)."
-msgstr ""
-
-#: libmutt/mutt_ssl.c:170
-msgid "Failed to find enough entropy on your system"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:194
-#, c-format
-msgid "Filling entropy pool: %s...\n"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:202
-#, c-format
-msgid "%s has insecure permissions!"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:221
-msgid "SSL disabled due the lack of entropy"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:369
-msgid "I/O error"
-msgstr "I/O ስህተት"
-
-#: libmutt/mutt_ssl.c:372
-msgid "unspecified protocol error"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:378
-#, c-format
-msgid "SSL failed: %s"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:387
-msgid "Unable to get certificate from peer"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:395
-#, c-format
-msgid "SSL connection using %s (%s)"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:440 src/pref-manager.c:1227 src/pref-manager.c:1326
-msgid "Unknown"
-msgstr "ያልታወቀ"
-
-#: libmutt/mutt_ssl.c:468
-msgid "[unable to calculate]"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:489
-msgid "[invalid date]"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:564
-msgid "Server certificate is not yet valid"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:571
-msgid "Server certificate has expired"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:649 libmutt/mutt_ssl.c:739
-msgid "Warning: Couldn't save certificate"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:651 libmutt/mutt_ssl.c:744
-msgid "Certificate saved"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:667
-msgid "This certificate belongs to:"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:678
-msgid "This certificate was issued by:"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:689
-msgid "This certificate is valid"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:690
-#, c-format
-msgid "   from %s"
-msgstr "   ከ %s"
-
-#: libmutt/mutt_ssl.c:692
-#, c-format
-msgid "     to %s"
-msgstr "     ወደ %s"
-
-#: libmutt/mutt_ssl.c:698
-#, c-format
-msgid "Fingerprint: %s"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:700
-msgid "SSL Certificate check"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:703
-msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:704
-msgid "roa"
-msgstr "roa"
-
-#: libmutt/mutt_ssl.c:708
-msgid "(r)eject, accept (o)nce"
-msgstr ""
-
-#: libmutt/mutt_ssl.c:709
-msgid "ro"
-msgstr "ro"
-
-#: libmutt/mutt_ssl.c:713
-msgid "Exit  "
-msgstr "ውጣ"
-
-#: libmutt/mutt_ssl.c:715
-msgid "Help"
-msgstr "መረጃ"
-
-#: libmutt/mh.c:608
-#, c-format
-msgid "Reading %s... %d"
-msgstr ""
-
-#: libmutt/mx.c:119
-#, c-format
-msgid "Lock count exceeded, remove lock for %s?"
-msgstr ""
-
-#: libmutt/mx.c:131
-#, c-format
-msgid "Can't dotlock %s.\n"
-msgstr ""
-
-#: libmutt/mx.c:189
-msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr ""
-
-#: libmutt/mx.c:195
-#, c-format
-msgid "Waiting for fcntl lock... %d"
-msgstr ""
-
-#: libmutt/mx.c:223
-msgid "Timeout exceeded while attempting flock lock!"
-msgstr ""
-
-#: libmutt/mx.c:230
-#, c-format
-msgid "Waiting for flock attempt... %d"
-msgstr ""
-
-#: libmutt/mx.c:504 libmutt/mx.c:650
-#, c-format
-msgid "%s is not a mailbox."
-msgstr ""
-
-#: libmutt/mx.c:587
-#, c-format
-msgid "Couldn't lock %s\n"
-msgstr ""
-
-#: libmutt/mx.c:671
-#, c-format
-msgid "Reading %s..."
-msgstr ""
-
-#: libmutt/mx.c:761
-#, c-format
-msgid "Writing %s..."
-msgstr ""
-
-#: libmutt/mx.c:788
-#, c-format
-msgid "Could not synchronize mailbox %s!"
-msgstr ""
-
-#: libmutt/mx.c:894
-#, c-format
-msgid "Moving read messages to %s..."
-msgstr ""
-
-#: libmutt/mx.c:953 libmutt/mx.c:1116
-msgid "Mailbox is unchanged."
-msgstr ""
-
-#: libmutt/mx.c:989
-#, c-format
-msgid "%d kept, %d moved, %d deleted."
-msgstr ""
-
-#: libmutt/mx.c:992 libmutt/mx.c:1161
-#, c-format
-msgid "%d kept, %d deleted."
-msgstr ""
-
-#: libmutt/mx.c:1100
-#, c-format
-msgid " Press '%s' to toggle write"
-msgstr ""
-
-#: libmutt/mx.c:1103
-msgid "Use 'toggle-write' to re-enable write!"
-msgstr ""
-
-#: libmutt/mx.c:1105
-#, c-format
-msgid "Mailbox is marked unwritable. %s"
-msgstr ""
-
-#: libmutt/mx.c:1110
-msgid "Mailbox is read-only."
-msgstr ""
-
-#: libmutt/mx.c:1127
-#, c-format
-msgid "Purge %d deleted message?"
-msgstr ""
-
-#: libmutt/mx.c:1127
-#, c-format
-msgid "Purge %d deleted messages?"
-msgstr ""
-
-#: libmutt/mx.c:1158
-#, c-format
-msgid "%d kept."
-msgstr ""
-
-#: libmutt/mx.c:1458
-msgid "Can't write message"
-msgstr ""
-
-#: libmutt/parse.c:619
-msgid "multipart message has no boundary parameter!"
-msgstr ""
-
-#: libmutt/sendlib.c:462
-msgid "No boundary parameter found! [report this error]"
-msgstr ""
-
-#: libmutt/sendlib.c:496
-#, c-format
-msgid "%s no longer exists!"
-msgstr ""
-
-#. pipe down kid, this isn't really important. otoh balsa
-#. * might be using the wrong code path here.
-#. * add_mutt_body_plain is calling mutt_update_encoding which
-#. * might be wrong
-#.
-#: libmutt/sendlib.c:930
-#, c-format
-msgid "Can't stat %s: %s"
-msgstr ""
-
-#: libmutt/sendlib.c:937
-#, c-format
-msgid "%s isn't a regular file."
-msgstr ""
-
-#: libmutt/sendlib.c:1113
-#, c-format
-msgid "Could not open %s"
-msgstr "%sን መክፈት አልተቻለም"
-
-#: libmutt/sendlib.c:2115
-#, c-format
-msgid "Error sending message, child exited %d (%s)."
-msgstr ""
-
-#: libmutt/sendlib.c:2122
-msgid "Output of the delivery process"
-msgstr ""
-
-#: src/address-book-config.c:145
+#: src/address-book-config.c:147
 msgid "Add Address Book"
 msgstr "የአድራሻ መጽሐፍ ጨምር"
 
-#: src/address-book-config.c:153
+#: src/address-book-config.c:155
 msgid "Modify Address Book"
 msgstr ""
 
-#: src/address-book-config.c:188
+#: src/address-book-config.c:190
 msgid "New Address Book type:"
 msgstr "የአዲስ አድራሻ መጽሐፍ ዓይነት፦"
 
-#: src/address-book-config.c:197
+#: src/address-book-config.c:199
 msgid "VCard Address Book (GnomeCard)"
 msgstr "የVCard አድራሻ መጽሐፍ (GnomeCard)"
 
-#: src/address-book-config.c:210
+#: src/address-book-config.c:212
 msgid "External query (a program)"
 msgstr ""
 
-#: src/address-book-config.c:222
+#: src/address-book-config.c:224
 msgid "LDIF Address Book"
 msgstr "የLDIF አድራሻ መጽሐፍ"
 
-#: src/address-book-config.c:237
+#: src/address-book-config.c:239
 msgid "LDAP Address Book"
 msgstr "የLDAP አድራሻ መጽሐፍ"
 
-#: src/address-book-config.c:245
+#: src/address-book-config.c:247
 msgid "Balsa is not compiled with LDAP support"
 msgstr ""
 
 #. mailbox name
-#: src/address-book-config.c:289 src/address-book-config.c:334
-#: src/address-book-config.c:396 src/address-book-config.c:456
+#: src/address-book-config.c:291 src/address-book-config.c:336
+#: src/address-book-config.c:398 src/address-book-config.c:458
 msgid "A_ddress Book Name"
 msgstr "የአድራሻ መጽሐፍ ስም (_D)"
 
-#: src/address-book-config.c:294
+#: src/address-book-config.c:296 src/address-book-config.c:404
 msgid "_File Name"
 msgstr "የፋይል ስም (_F)"
 
-#: src/address-book-config.c:301
+#: src/address-book-config.c:303
 msgid "Select path for VCARD address book"
 msgstr ""
 
-#: src/address-book-config.c:306 src/address-book-config.c:365
-#: src/address-book-config.c:415 src/address-book-config.c:487
+#: src/address-book-config.c:308 src/address-book-config.c:367
+#: src/address-book-config.c:417 src/address-book-config.c:489
 msgid "_Expand aliases as you type"
 msgstr ""
 
-#: src/address-book-config.c:339
+#: src/address-book-config.c:341
 msgid "Load program location"
 msgstr ""
 
-#: src/address-book-config.c:346
+#: src/address-book-config.c:348
 msgid "Select load program for address book"
 msgstr ""
 
-#: src/address-book-config.c:352
+#: src/address-book-config.c:354
 msgid "Save program location"
 msgstr ""
 
-#: src/address-book-config.c:358
+#: src/address-book-config.c:360
 msgid "Select save program for address book"
 msgstr ""
 
-#: src/address-book-config.c:402
-msgid "_File name"
-msgstr "የፋይል ስም (_F)"
-
-#: src/address-book-config.c:409
+#: src/address-book-config.c:411
 msgid "Select path for LDIF address book"
 msgstr ""
 
-#: src/address-book-config.c:461
+#: src/address-book-config.c:463
 msgid "_Host Name"
 msgstr "የእንግዳ ተቀባይ ስም (_H)"
 
-#: src/address-book-config.c:466
+#: src/address-book-config.c:468
 msgid "Base Domain _Name"
 msgstr ""
 
-#: src/address-book-config.c:471
+#: src/address-book-config.c:473
 msgid "_User Name (Bind DN)"
 msgstr "የተጠቃሚ ስም (Bind DN) (_U)"
 
-#: src/address-book-config.c:476
+#: src/address-book-config.c:478
 msgid "_Password"
 msgstr "ሚስጢራዊ ቃል"
 
-#: src/address-book-config.c:483
+#: src/address-book-config.c:485
 msgid "Enable _TLS"
 msgstr "_TLSን አስችል"
 
-#: src/address-book-config.c:553 src/folder-conf.c:93
+#: src/address-book-config.c:556 src/folder-conf.c:103
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr ""
 
-#: src/address-book-config.c:571 src/mailbox-conf.c:478
-#: src/pref-manager.c:1523 src/pref-manager.c:2614
+#: src/address-book-config.c:574 src/mailbox-conf.c:550
+#: src/pref-manager.c:1519 src/pref-manager.c:2665
 msgid "_Add"
 msgstr "ጨምር (_A)"
 
-#: src/address-book-config.c:650
+#: src/address-book-config.c:653
 #, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr ""
 
-#: src/address-book-config.c:653
+#: src/address-book-config.c:656
 #, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr ""
 
-#: src/address-book-config.c:656
+#: src/address-book-config.c:659
 #, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr ""
 
-#: src/address-book-config.c:659
+#: src/address-book-config.c:662
 #, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr ""
 
-#: src/address-book-config.c:662
+#: src/address-book-config.c:665
 msgid "Do you want to correct the path?"
 msgstr ""
 
-#: src/ab-main.c:134 src/ab-window.c:165 src/filter-edit-dialog.c:193
-#: src/filter-export-dialog.c:88 src/filter-run-dialog.c:219
-#: src/filter-run-dialog.c:291
-msgid "Name"
-msgstr "ስም"
-
-#: src/ab-main.c:142 src/ab-window.c:173
-msgid "E-Mail Address"
-msgstr "የኢሜይል አድራሻ"
-
-#: src/ab-main.c:275
-msgid "_Search for Name:"
-msgstr ""
-
-#: src/ab-window.c:206
-msgid "Address Book"
-msgstr "የአድራሻ መጽሐፍ"
-
-#. Entry widget for finding an address
-#: src/ab-window.c:263
-msgid "Search for Name:"
-msgstr ""
-
-#: src/ab-window.c:322
-msgid "Send-To"
-msgstr "ለ... ላክ"
-
-#: src/ab-window.c:342
-msgid "Run GnomeCard"
-msgstr ""
-
-#: src/ab-window.c:350
-msgid "Re-Import"
-msgstr ""
-
-#. mode switching stuff
-#: src/ab-window.c:360
-msgid "Treat multiple addresses as:"
-msgstr ""
-
-#: src/ab-window.c:364
-msgid "alternative addresses for the same person"
-msgstr ""
-
-#: src/ab-window.c:369
-msgid "a distribution list"
-msgstr ""
-
-#: src/ab-window.c:669
-#, c-format
-msgid ""
-"Error opening address book '%s'\n"
-"%s"
-msgstr ""
-
-#: src/balsa-app.c:66
-#, c-format
+#: src/balsa-app.c:73
+#, fuzzy, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
-"The password for %s@%s:"
-msgstr ""
-
-#: src/balsa-app.c:71
-#, c-format
-msgid "Mailbox password for %s@%s:"
+"The _password for %s@%s:"
 msgstr "የፖስታ ሳጥን ሚስጢራዊ ቃል ለ %s@%s፦"
 
-#: src/balsa-app.c:74
+#: src/balsa-app.c:78
+#, fuzzy, c-format
+msgid "Mailbox _password for %s@%s:"
+msgstr "የፖስታ ሳጥን ሚስጢራዊ ቃል ለ %s@%s፦"
+
+#: src/balsa-app.c:81
 msgid "Password needed"
 msgstr ""
 
-#: src/balsa-app.c:837
-#, c-format
-msgid "Multiple mailboxes named \"%s\""
-msgstr ""
+#: src/balsa-app.c:95 src/folder-conf.c:324
+msgid "_Remember password"
+msgstr "ሚስጢራዊ ቃልን አስታውስ (_R)"
 
-#: src/balsa-index.c:368
-msgid "From"
-msgstr "ከ"
+#: src/balsa-app.c:579
+#, fuzzy, c-format
+msgid "Couldn't open mailbox \"%s\""
+msgstr "%sን መክፈት አልተቻለም"
 
-#: src/balsa-index.c:383
+#: src/balsa-index.c:348
 msgid "Subject"
 msgstr "ጉዳዩ"
 
-#: src/balsa-index.c:404
+#: src/balsa-index.c:362
 msgid "Date"
 msgstr "ቀን"
 
-#: src/balsa-index.c:417
+#: src/balsa-index.c:374
 msgid "Size"
 msgstr "መጠን"
 
-#: src/balsa-index.c:810
+#: src/balsa-index.c:870
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr ""
 
-#: src/balsa-index.c:849
-msgid "To"
-msgstr "ወደ"
-
-#: src/balsa-index.c:1839
-msgid "_View Source"
-msgstr ""
-
-#: src/balsa-index.c:1841 src/main-window.c:444 src/message-window.c:126
+#. R
+#: src/balsa-index.c:1611 src/main-window.c:576 src/main-window.c:1021
+#: src/message-window.c:143
 msgid "_Reply..."
 msgstr ""
 
-#: src/balsa-index.c:1843
+#: src/balsa-index.c:1613
 msgid "Reply To _All..."
 msgstr ""
 
-#: src/balsa-index.c:1845
+#: src/balsa-index.c:1615
 msgid "Reply To _Group..."
 msgstr ""
 
-#: src/balsa-index.c:1847
+#: src/balsa-index.c:1617
 msgid "_Forward Attached..."
 msgstr ""
 
-#: src/balsa-index.c:1849
+#: src/balsa-index.c:1619
 msgid "Forward _Inline..."
 msgstr ""
 
-#: src/balsa-index.c:1851 src/main-window.c:546
+#: src/balsa-index.c:1621 src/main-window.c:666 src/main-window.c:1005
 msgid "_Store Address..."
 msgstr ""
 
-#: src/balsa-index.c:1864 src/filter-edit-dialog.c:216 src/mailbox-node.c:866
-#: src/main-window.c:528 src/pref-manager.c:1525 src/pref-manager.c:2618
+#: src/balsa-index.c:1636 src/filter-edit-dialog.c:216 src/mailbox-node.c:957
+#: src/pref-manager.c:1521 src/pref-manager.c:2669
 msgid "_Delete"
 msgstr "አጥፉ (_D)"
 
-#: src/balsa-index.c:1869 src/main-window.c:535
+#: src/balsa-index.c:1641
 msgid "_Undelete"
 msgstr "አታጥፋ (_U)"
 
-#: src/balsa-index.c:1874
+#: src/balsa-index.c:1646
 msgid "Move To _Trash"
 msgstr "ወደማይፈለገው ማድረጊያ ተሸጋገር"
 
-#: src/balsa-index.c:1878
+#: src/balsa-index.c:1650
 msgid "T_oggle"
 msgstr "ቀያያር (_O)"
 
-#: src/balsa-index.c:1881
+#: src/balsa-index.c:1654 src/main-window.c:325 src/main-window.c:354
 msgid "_Flagged"
 msgstr ""
 
-#: src/balsa-index.c:1884
+#: src/balsa-index.c:1657
 msgid "_Unread"
 msgstr ""
 
-#: src/balsa-index.c:1892
+#: src/balsa-index.c:1665
 msgid "_Move to"
 msgstr "ወደ አንቀሳቅስ (_M)"
 
-#: src/balsa-mblist.c:326
+#: src/balsa-index.c:1673
+msgid "_View Source"
+msgstr ""
+
+#: src/balsa-index.c:1942
+#, c-format
+msgid "Failed to copy messages to mailbox \"%s\"."
+msgstr ""
+
+#: src/balsa-index.c:1943
+#, c-format
+msgid "Failed to copy message to mailbox \"%s\"."
+msgstr ""
+
+#: src/balsa-index.c:1956
+#, c-format
+msgid "Copied to \"%s\"."
+msgstr ""
+
+#: src/balsa-index.c:1957
+#, fuzzy, c-format
+msgid "Moved to \"%s\"."
+msgstr "ወደማይፈለገው ማድረጊያ ተሸጋገር"
+
+#: src/balsa-index.c:2073
+#, c-format
+msgid "Committing mailbox %s failed."
+msgstr ""
+
+#: src/balsa-mblist.c:278
 msgid "Mailbox"
 msgstr "የፖስታ ሳጥን"
 
-#: src/balsa-mblist.c:349 src/filter-edit-callbacks.c:783
+#: src/balsa-mblist.c:306 src/filter-edit-callbacks.c:802
 msgid "Unread"
 msgstr ""
 
-#: src/balsa-mblist.c:369
+#: src/balsa-mblist.c:331
 msgid "Total"
 msgstr "አጠቃላይ"
 
-#: src/balsa-mblist.c:983 src/balsa-mblist.c:1028
+#: src/balsa-mblist.c:1011 src/balsa-mblist.c:1047
 msgid "Failed to find mailbox"
 msgstr ""
 
-#: src/balsa-mblist.c:1765
+#: src/balsa-mblist.c:1630
 msgid "_Other..."
 msgstr "ሌላ... (_O)"
 
-#: src/balsa-mblist.c:1826
+#: src/balsa-mblist.c:1698
 msgid "Choose destination folder"
 msgstr ""
 
-#: src/balsa-mblist.c:2138
+#: src/balsa-mblist.c:2033
 #, c-format
-msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr ""
+msgid "Shown mailbox: %s with %d message, "
+msgid_plural "Shown mailbox: %s with %d messages, "
+msgstr[0] ""
+msgstr[1] ""
 
-#: src/balsa-message.c:348
+#. xgettext: this is the second part of the message
+#. * "Shown mailbox: %s with %d messages, %ld new".
+#: src/balsa-mblist.c:2039
+#, c-format
+msgid "%ld new"
+msgid_plural "%ld new"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/balsa-message.c:578
+#, fuzzy
+msgid "Content"
+msgstr "ቀጥል"
+
+#: src/balsa-message.c:661
+#, fuzzy
+msgid "Message parts"
+msgstr "የመልእክት ቀለሞች"
+
+#: src/balsa-message.c:776
 msgid "File already exists. Overwrite?"
 msgstr ""
 
-#: src/balsa-message.c:362
+#: src/balsa-message.c:788
+#, fuzzy, c-format
+msgid "Could not save %s: %s"
+msgstr "%sን መክፈት አልተቻለም"
+
+#: src/balsa-message.c:802
 #, c-format
-msgid " Could not save %s: %s"
+msgid "Save %s MIME Part"
 msgstr ""
 
-#: src/balsa-message.c:384
-msgid "Save MIME Part"
-msgstr ""
+#: src/balsa-message.c:969
+#, fuzzy
+msgid "Save selected..."
+msgstr "ምርጡ..."
 
-#: src/balsa-message.c:767 src/print.c:328
+#: src/balsa-message.c:1108
+#, fuzzy
+msgid "(No sender)"
+msgstr "ያለ የገጽ አናቶች (_O)"
+
+#: src/balsa-message.c:1406 src/print.c:358 src/sendmsg-window.c:859
+#: src/sendmsg-window.c:2454
 msgid "Subject:"
 msgstr "ጉዳዩ፦"
 
-#: src/balsa-message.c:771 src/print.c:334
+#: src/balsa-message.c:1410 src/print.c:364 src/sendmsg-window.c:2448
 msgid "Date:"
 msgstr "ቀን፦"
 
-#: src/balsa-message.c:776 src/print.c:345 src/store-address.c:275
-msgid "From:"
-msgstr "ከ፦"
-
-#: src/balsa-message.c:782
+#: src/balsa-message.c:1421 src/sendmsg-window.c:856
 msgid "Reply-To:"
 msgstr ""
 
-#: src/balsa-message.c:785 src/print.c:355 src/store-address.c:276
-msgid "To:"
-msgstr "ወደ፦"
-
 #. cc:
-#: src/balsa-message.c:786 src/print.c:356 src/sendmsg-window.c:1831
-#: src/store-address.c:277
+#: src/balsa-message.c:1425 src/print.c:374 src/sendmsg-window.c:858
+#: src/sendmsg-window.c:2146 src/sendmsg-window.c:2473 src/store-address.c:305
 msgid "Cc:"
 msgstr "Cc፦"
 
 #. bcc:
-#: src/balsa-message.c:787 src/print.c:357 src/sendmsg-window.c:1836
-#: src/store-address.c:278
+#: src/balsa-message.c:1426 src/print.c:375 src/sendmsg-window.c:857
+#: src/sendmsg-window.c:2151 src/store-address.c:306
 msgid "Bcc:"
 msgstr "Bcc፦"
 
-#: src/balsa-message.c:790 src/print.c:358
+#: src/balsa-message.c:1429 src/print.c:376
 msgid "Fcc:"
 msgstr "Fcc፦"
 
-#: src/balsa-message.c:795 src/print.c:364
+#: src/balsa-message.c:1434 src/print.c:381
 msgid "Disposition-Notification-To:"
-msgstr ""
-
-#: src/balsa-message.c:900 src/balsa-message.c:916 src/balsa-message.c:946
-#: src/balsa-message.c:999
-msgid "Content Type: external-body\n"
-msgstr ""
-
-#: src/balsa-message.c:901
-msgid "Access type: local-file\n"
-msgstr ""
-
-#: src/balsa-message.c:902 src/balsa-message.c:953
-#, c-format
-msgid "File name: %s"
-msgstr "የፋይል ስም፦ %s"
-
-#: src/balsa-message.c:917
-msgid "Access type: URL\n"
-msgstr ""
-
-#: src/balsa-message.c:918
-#, c-format
-msgid "URL: %s"
-msgstr "URL፦ %s"
-
-#: src/balsa-message.c:947
-#, c-format
-msgid "Access type: %s\n"
-msgstr ""
-
-#: src/balsa-message.c:950
-#, c-format
-msgid "FTP site: %s\n"
-msgstr ""
-
-#: src/balsa-message.c:952
-#, c-format
-msgid "Directory: %s\n"
-msgstr "ዶሴ፦ %s\n"
-
-#: src/balsa-message.c:1000
-msgid "Access type: mail-server\n"
-msgstr ""
-
-#: src/balsa-message.c:1001
-#, c-format
-msgid "Mail server: %s\n"
-msgstr ""
-
-#: src/balsa-message.c:1003 src/sendmsg-window.c:2122
-#, c-format
-msgid "Subject: %s\n"
-msgstr "ጉዳዩ፦ %s\n"
-
-#: src/balsa-message.c:1014
-msgid "Send message to obtain this part"
-msgstr ""
-
-#: src/balsa-message.c:1086
-#, c-format
-msgid "Filename: %s"
-msgstr "የፋይል ስም፦ %s"
-
-#: src/balsa-message.c:1094
-#, c-format
-msgid "Type: %s (%s)"
-msgstr "ዓይነት፦ %s (%s)"
-
-#: src/balsa-message.c:1097
-#, c-format
-msgid "Content Type: %s"
-msgstr ""
-
-#: src/balsa-message.c:1108
-msgid "No open or view action defined in GNOME MIME for this content type"
-msgstr ""
-
-#: src/balsa-message.c:1114
-msgid "Save part"
-msgstr ""
-
-#: src/balsa-message.c:1138 src/balsa-message.c:1163
-#, c-format
-msgid "View part with %s"
-msgstr ""
-
-#: src/balsa-message.c:1551
-#, c-format
-msgid "Calling URL %s..."
-msgstr ""
-
-#: src/balsa-message.c:1560 src/balsa-message.c:2072 src/balsa-message.c:2611
-#, c-format
-msgid "Error showing %s: %s\n"
 msgstr ""
 
 #: src/balsa-message.c:1591
 #, c-format
-msgid ""
-"Error writing to temporary file %s.\n"
-"Check the directory permissions."
+msgid "Error loading attached image: %s\n"
 msgstr ""
 
-#: src/balsa-message.c:1599
+#: src/balsa-message.c:1661 src/balsa-message.c:1677 src/balsa-message.c:1709
+#: src/balsa-message.c:1762
+msgid "Content Type: external-body\n"
+msgstr ""
+
+#: src/balsa-message.c:1662
+msgid "Access type: local-file\n"
+msgstr ""
+
+#: src/balsa-message.c:1663 src/balsa-message.c:1716 src/balsa-message.c:1875
 #, c-format
-msgid "Cannot open temporary file %s."
+msgid "File name: %s"
+msgstr "የፋይል ስም፦ %s"
+
+#: src/balsa-message.c:1678
+msgid "Access type: URL\n"
 msgstr ""
 
-#: src/balsa-message.c:1875
+#: src/balsa-message.c:1679
+#, c-format
+msgid "URL: %s"
+msgstr "URL፦ %s"
+
+#: src/balsa-message.c:1710
+#, c-format
+msgid "Access type: %s\n"
+msgstr ""
+
+#: src/balsa-message.c:1713
+#, c-format
+msgid "FTP site: %s\n"
+msgstr ""
+
+#: src/balsa-message.c:1715
+#, c-format
+msgid "Directory: %s\n"
+msgstr "ዶሴ፦ %s\n"
+
+#: src/balsa-message.c:1763
+msgid "Access type: mail-server\n"
+msgstr ""
+
+#: src/balsa-message.c:1764
+#, c-format
+msgid "Mail server: %s\n"
+msgstr ""
+
+#: src/balsa-message.c:1766
+#, c-format
+msgid "Subject: %s\n"
+msgstr "ጉዳዩ፦ %s\n"
+
+#: src/balsa-message.c:1778
+msgid "Se_nd message to obtain this part"
+msgstr ""
+
+#: src/balsa-message.c:1883
+#, c-format
+msgid "Type: %s (%s)"
+msgstr "ዓይነት፦ %s (%s)"
+
+#: src/balsa-message.c:1886
+#, c-format
+msgid "Content Type: %s"
+msgstr ""
+
+#: src/balsa-message.c:1897
+msgid "No open or view action defined in GNOME MIME for this content type"
+msgstr ""
+
+#: src/balsa-message.c:1903
+#, fuzzy
+msgid "S_ave part"
+msgstr "መለያ"
+
+#: src/balsa-message.c:1927 src/balsa-message.c:1952
+#, fuzzy, c-format
+msgid "View _part with %s"
+msgstr "በ%s ክፈት"
+
+#: src/balsa-message.c:2231
+#, c-format
+msgid "Calling URL %s..."
+msgstr ""
+
+#: src/balsa-message.c:2241 src/balsa-message.c:3093 src/balsa-message.c:3776
+#, c-format
+msgid "Error showing %s: %s\n"
+msgstr ""
+
+#: src/balsa-message.c:2345
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
+"header describing the used codeset (converted to %s)"
+msgstr ""
+
+#: src/balsa-message.c:2444
+msgid "This is an OpenPGP signed message part:\n"
+msgstr ""
+
+#: src/balsa-message.c:2664
+msgid "mixed parts"
+msgstr ""
+
+#: src/balsa-message.c:2666
+msgid "alternative parts"
+msgstr ""
+
+#: src/balsa-message.c:2668
+msgid "signed parts"
+msgstr ""
+
+#: src/balsa-message.c:2670
+msgid "encrypted parts"
+msgstr ""
+
+#: src/balsa-message.c:2672
+#, fuzzy
+msgid "rfc822 message"
+msgstr "መልእክት አትም"
+
+#: src/balsa-message.c:2674
+#, c-format
+msgid "\"%s\" parts"
+msgstr ""
+
+#: src/balsa-message.c:2730
+#, c-format
+msgid "rfc822 message (from %s, subject \"%s\")"
+msgstr ""
+
+#: src/balsa-message.c:2737
+#, fuzzy
+msgid "complete message"
+msgstr "መልእክትን አታጥፋ"
+
+#: src/balsa-message.c:2754
+#, c-format
+msgid "part %s: %s (file %s)"
+msgstr ""
+
+#: src/balsa-message.c:2765
+#, fuzzy, c-format
+msgid "part %s: %s"
+msgstr "ከ %s፦ %d %s"
+
+#: src/balsa-message.c:2855
 #, c-format
 msgid "Open with %s"
 msgstr "በ%s ክፈት"
 
-#: src/balsa-message.c:2013
+#: src/balsa-message.c:2986
 msgid "Save..."
 msgstr "አስቀምጥ..."
 
-#: src/balsa-message.c:2153 src/balsa-message.c:2198
+#: src/balsa-message.c:3175
+#, c-format
+msgid "Could not create temporary file %s"
+msgstr ""
+
+#: src/balsa-message.c:3220
 #, c-format
 msgid "could not create temporary file %s"
 msgstr ""
 
-#: src/balsa-message.c:2896
+#: src/balsa-message.c:4050
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1892,198 +1955,270 @@ msgid ""
 "Do you want to send this notification?"
 msgstr ""
 
-#: src/balsa-message.c:2903
-msgid "reply to MDN?"
+#: src/balsa-message.c:4057
+msgid "Reply to MDN?"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:284
+#: src/balsa-message.c:4260
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a %s signed part, but "
+"this crypto protocol is not available."
+msgstr ""
+
+#: src/balsa-message.c:4263
+msgid "PGP"
+msgstr ""
+
+#: src/balsa-message.c:4263
+msgid "S/MIME"
+msgstr ""
+
+#: src/balsa-message.c:4298 src/balsa-message.c:4615
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" "
+"returned:\n"
+"%s"
+msgstr ""
+
+#: src/balsa-message.c:4305
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" failed "
+"with an error!"
+msgstr ""
+
+#: src/balsa-message.c:4337
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a signed part, but it's "
+"structure is invalid. The signature, if there is any, can not be checked."
+msgstr ""
+
+#: src/balsa-message.c:4401
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains an encrypted part, but "
+"it's structure is invalid."
+msgstr ""
+
+#: src/balsa-message.c:4408
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: src/balsa-message.c:4420
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: src/balsa-message.c:4513 src/balsa-message.c:4730
+msgid "_Run gpg to import this key"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:286
 msgid "One of the specified fields contains:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:285
+#: src/filter-edit-callbacks.c:287
 msgid "None of the specified fields contains:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:287
+#: src/filter-edit-callbacks.c:289
 msgid "One of the regular expressions matches"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:288
+#: src/filter-edit-callbacks.c:290
 msgid "None of the regular expressions matches"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:290 src/filter-edit-callbacks.c:878
+#: src/filter-edit-callbacks.c:292 src/filter-edit-callbacks.c:897
 msgid "Match when date is in the interval:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:291
+#: src/filter-edit-callbacks.c:293
 msgid "Match when date is outside the interval:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:293 src/filter-edit-callbacks.c:916
+#: src/filter-edit-callbacks.c:295 src/filter-edit-callbacks.c:935
 msgid "Match when one of these flags is set:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:294
+#: src/filter-edit-callbacks.c:296
 msgid "Match when none of these flags is set:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:446
+#: src/filter-edit-callbacks.c:449
 msgid "You must specify the name of the user header to match on"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:461
+#: src/filter-edit-callbacks.c:464
 msgid "You must specify at least one field for matching"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:471
+#: src/filter-edit-callbacks.c:474
 msgid "You must provide a string"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:478
+#: src/filter-edit-callbacks.c:481
 msgid "You must provide at least one regular expression"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:490
+#: src/filter-edit-callbacks.c:493
 msgid "Low date is incorrect"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:501
+#: src/filter-edit-callbacks.c:504
 msgid "High date is incorrect"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:509
+#: src/filter-edit-callbacks.c:512
 msgid "Low date is greater than high date"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:783
+#: src/filter-edit-callbacks.c:782
+#, c-format
+msgid "Error displaying condition help: %s\n"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:802
 msgid "Deleted"
 msgstr "የጠፋ"
 
-#: src/filter-edit-callbacks.c:783
+#: src/filter-edit-callbacks.c:802
 msgid "Replied"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:783 src/main-window.c:426
+#: src/filter-edit-callbacks.c:802
 msgid "Flagged"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:797
+#: src/filter-edit-callbacks.c:816
 msgid "One of the specified f_ields contains"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:812
+#: src/filter-edit-callbacks.c:831
 msgid "Contain/Does _Not Contain"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:826
+#: src/filter-edit-callbacks.c:845
 msgid "_One of the regular expressions matches"
 msgstr ""
 
 #. FIXME : I saw a lot of different ways to create button with
 #. pixmaps, hope this one is correct
 #. Right/Add button
-#: src/filter-edit-callbacks.c:853 src/filter-run-dialog.c:312
+#: src/filter-edit-callbacks.c:872 src/filter-run-dialog.c:313
 msgid "A_dd"
 msgstr "ጨምር (_D)"
 
 #. Left/Remove button
-#: src/filter-edit-callbacks.c:857 src/filter-edit-dialog.c:310
-#: src/filter-run-dialog.c:317
+#: src/filter-edit-callbacks.c:876 src/filter-edit-dialog.c:310
+#: src/filter-run-dialog.c:318
 msgid "_Remove"
 msgstr "አስወግድ (_R)"
 
-#: src/filter-edit-callbacks.c:861
+#: src/filter-edit-callbacks.c:880
 msgid "One _Matches/None Matches"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:898
+#: src/filter-edit-callbacks.c:917
 msgid "Inside/outside the date interval"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:945
+#: src/filter-edit-callbacks.c:964
 msgid "Match when one flag is set/when no flag is set"
 msgstr ""
 
 #. builds the toggle buttons to specify fields concerned by the conditions of
 #. * the filter
-#: src/filter-edit-callbacks.c:963
+#: src/filter-edit-callbacks.c:982
 msgid "Match In"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:975
+#: src/filter-edit-callbacks.c:994
 msgid "_All"
 msgstr "_ሁሉም (_A)"
 
-#: src/filter-edit-callbacks.c:983
+#: src/filter-edit-callbacks.c:1002
 msgid "C_lear"
 msgstr "ሰርዝ (_L)"
 
-#: src/filter-edit-callbacks.c:992 src/main-window.c:2692
+#: src/filter-edit-callbacks.c:1011 src/main-window.c:3647
 msgid "_Body"
 msgstr ""
 
 #. To:
-#: src/filter-edit-callbacks.c:999 src/main-window.c:2693
-#: src/sendmsg-window.c:1820
+#: src/filter-edit-callbacks.c:1018 src/main-window.c:3648
+#: src/sendmsg-window.c:2135
 msgid "_To:"
 msgstr "ወደ፦ (_T)"
 
-#: src/filter-edit-callbacks.c:1006 src/main-window.c:2694
+#: src/filter-edit-callbacks.c:1025 src/main-window.c:3649
 msgid "_From:"
 msgstr "ከ፦ (_F)"
 
-#: src/filter-edit-callbacks.c:1014 src/sendmsg-window.c:285
+#: src/filter-edit-callbacks.c:1033
 msgid "_Subject"
 msgstr "ጉዳዩ (_S)"
 
-#: src/filter-edit-callbacks.c:1021 src/main-window.c:2696
+#: src/filter-edit-callbacks.c:1040 src/main-window.c:3651
 msgid "_Cc:"
 msgstr "_Cc፦"
 
-#: src/filter-edit-callbacks.c:1028
+#: src/filter-edit-callbacks.c:1047
 msgid "_User header:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1052
+#: src/filter-edit-callbacks.c:1071
 msgid "Search T_ype:"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1129
+#: src/filter-edit-callbacks.c:1145
 msgid "Edit condition for filter: "
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1540
+#: src/filter-edit-callbacks.c:1384
+#, c-format
+msgid "Error displaying filter help: %s\n"
+msgstr ""
+
+#: src/filter-edit-callbacks.c:1572
 msgid "New filter"
 msgstr "አዲስ አጣራ"
 
-#: src/filter-edit-callbacks.c:1669
+#: src/filter-edit-callbacks.c:1701
 msgid "No filter name specified."
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1674
+#: src/filter-edit-callbacks.c:1706
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1687
+#: src/filter-edit-callbacks.c:1719
 msgid "Filter must have conditions."
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1746
+#: src/filter-edit-callbacks.c:1781
 msgid "Filter has matched"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1764
+#: src/filter-edit-callbacks.c:1799
 msgid "You must provide a sound to play"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1895
+#: src/filter-edit-callbacks.c:1948
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr ""
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:340
+#: src/filter-edit-dialog.c:88 src/pref-manager.c:346
 msgid "Simple"
 msgstr "ቀላል"
 
@@ -2128,7 +2263,9 @@ msgid "AND"
 msgstr "እና"
 
 #. new button
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:838 src/main-window.c:284
+#. #define MENU_FILE_NEW_POS 0
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:929 src/main-window.c:365
+#: src/main-window.c:424
 msgid "_New"
 msgstr "አዲስ (_N)"
 
@@ -2193,6 +2330,11 @@ msgstr ""
 msgid "Balsa Filters"
 msgstr ""
 
+#: src/filter-edit-dialog.c:560
+#, c-format
+msgid "Filter \"%s\" has no condition."
+msgstr ""
+
 #: src/filter-export-callbacks.c:55
 #, c-format
 msgid "Unable to export filter %s, an error occured."
@@ -2208,109 +2350,128 @@ msgstr ""
 msgid "Balsa Filters Export"
 msgstr ""
 
-#: src/filter-run-callbacks.c:137
+#: src/filter-run-callbacks.c:173
 msgid "Error when applying filters"
 msgstr ""
 
-#: src/filter-run-callbacks.c:194
+#: src/filter-run-callbacks.c:191
+#, c-format
+msgid "Error displaying run filters help: %s\n"
+msgstr ""
+
+#: src/filter-run-callbacks.c:238
 #, c-format
 msgid ""
-"The destination mailbox of the filter \"%s\" is \"%s\"\n"
+"The destination mailbox of the filter \"%s\" is \"%s\".\n"
 "You can't associate it with the same mailbox (that causes recursion)."
 msgstr ""
 
-#: src/filter-run-dialog.c:187
+#: src/filter-run-callbacks.c:246
+#, c-format
+msgid ""
+"The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
+"This happens for example when you use regular expressions match with IMAP "
+"mailboxes, it is done by a very slow method; if possible, use substring "
+"match instead."
+msgstr ""
+
+#: src/filter-run-dialog.c:188
 msgid "Balsa Filters of Mailbox: "
 msgstr ""
 
-#: src/filter-run-dialog.c:228
+#: src/filter-run-dialog.c:229
 msgid "On reception"
 msgstr ""
 
-#: src/filter-run-dialog.c:240
+#: src/filter-run-dialog.c:241
 msgid "On exit"
 msgstr ""
 
 #. up button
-#: src/filter-run-dialog.c:349
+#: src/filter-run-dialog.c:350
 msgid "_Up"
 msgstr "ወደ ላይ (_U)"
 
 #. down button
-#: src/filter-run-dialog.c:354
+#: src/filter-run-dialog.c:355
 msgid "Do_wn"
 msgstr "ወደ ታች (_W)"
 
-#: src/filter-run-dialog.c:397
+#: src/filter-run-dialog.c:399
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
 
-#: src/folder-conf.c:263
+#: src/folder-conf.c:259
 msgid "Remote IMAP folder"
 msgstr ""
 
-#: src/folder-conf.c:266 src/folder-conf.c:705 src/mailbox-conf.c:489
+#. must NOT be modal
+#: src/folder-conf.c:262 src/folder-conf.c:684 src/mailbox-conf.c:561
 msgid "_Update"
 msgstr "አሻሽል (_U)"
 
-#: src/folder-conf.c:266 src/folder-conf.c:705
+#: src/folder-conf.c:262 src/folder-conf.c:684
 msgid "_Create"
 msgstr "ፍጠር (_C)"
 
-#: src/folder-conf.c:281
-msgid "Remote IMAP folder set"
+#: src/folder-conf.c:282 src/mailbox-conf.c:1042 src/mailbox-conf.c:1132
+#, fuzzy
+msgid "_Basic"
+msgstr "_Bcc"
+
+#: src/folder-conf.c:287
+msgid "_Max number of connections"
 msgstr ""
 
+#: src/folder-conf.c:294 src/mailbox-conf.c:1201
+msgid "Enable _persistent cache"
+msgstr ""
+
+#: src/folder-conf.c:301 src/mailbox-conf.c:1095 src/mailbox-conf.c:1204
+#, fuzzy
+msgid "_Advanced"
+msgstr "ተወው (_C)"
+
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:288
+#: src/folder-conf.c:304
 msgid "Descriptive _Name:"
 msgstr ""
 
 #. pop server
-#: src/folder-conf.c:294 src/mailbox-conf.c:956 src/mailbox-conf.c:1051
+#. imap server
+#: src/folder-conf.c:311 src/mailbox-conf.c:1050 src/mailbox-conf.c:1141
 msgid "_Server:"
 msgstr "ሰርቨር፦ (_S)"
 
 #. username
-#: src/folder-conf.c:300 src/mailbox-conf.c:963
+#: src/folder-conf.c:318 src/mailbox-conf.c:1057
 msgid "Use_r name:"
 msgstr "የተጠቃሚ ስም፦ (_R)"
 
-#: src/folder-conf.c:306
-msgid "_Remember password"
-msgstr "ሚስጢራዊ ቃልን አስታውስ (_R)"
-
-#: src/folder-conf.c:311
+#: src/folder-conf.c:329
 msgid "_Password:"
 msgstr "ሚስጢራዊ ቃል፦ (_P)"
 
-#: src/folder-conf.c:316
+#: src/folder-conf.c:334
 msgid "Subscribed _folders only"
 msgstr ""
 
-#: src/folder-conf.c:318
-msgid "_Always show INBOX"
+#: src/folder-conf.c:336
+#, fuzzy
+msgid "Always show _INBOX"
 msgstr "ሁል ጊዜ INBOX አሳይ (_A)"
 
-#: src/folder-conf.c:321
+#: src/folder-conf.c:339
 msgid "Pr_efix"
 msgstr "ባዕድ መነሻ (_E)"
 
-#: src/folder-conf.c:327
-msgid "Use SS_L (IMAPS)"
-msgstr "SS_Lን (IMAPS) ተጠቀም"
-
-#: src/folder-conf.c:459
+#: src/folder-conf.c:484
 msgid "Select parent folder"
 msgstr ""
 
-#: src/folder-conf.c:530 src/mailbox-conf.c:412 src/sendmsg-window.c:849
-msgid "Select Identity"
-msgstr ""
-
-#: src/folder-conf.c:558
+#: src/folder-conf.c:557
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2320,103 +2481,121 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/folder-conf.c:564
+#: src/folder-conf.c:563
 msgid "Question"
 msgstr "ጥያቄ"
 
-#: src/folder-conf.c:569
+#: src/folder-conf.c:568
 msgid "Rename INBOX"
 msgstr "INBOXን እንደገና ሰይም"
 
-#: src/folder-conf.c:571 src/toolbar-factory.c:132
+#: src/folder-conf.c:570
 msgid "Cancel"
 msgstr "ተወው"
 
-#: src/folder-conf.c:676
+#: src/folder-conf.c:666
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr ""
 
-#: src/folder-conf.c:702
+#: src/folder-conf.c:681
 msgid "Remote IMAP subfolder"
 msgstr ""
 
-#: src/folder-conf.c:724
+#: src/folder-conf.c:703
 msgid "Rename or move subfolder"
 msgstr ""
 
-#: src/folder-conf.c:725
+#: src/folder-conf.c:704
 msgid "Create subfolder"
 msgstr ""
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:732
+#: src/folder-conf.c:711
 msgid "_Folder name:"
 msgstr "የዶሴ ስም፦ (_F)"
 
-#: src/folder-conf.c:738
+#: src/folder-conf.c:717
 msgid "_Subfolder of:"
 msgstr ""
 
-#: src/folder-conf.c:743
+#: src/folder-conf.c:722
 msgid "_Browse..."
 msgstr "ቃኝ... (_B)"
 
-#: src/folder-conf.c:751 src/mailbox-conf.c:924
-msgid "Identity:"
-msgstr ""
-
-#: src/folder-conf.c:757 src/mailbox-conf.c:929 src/mailbox-conf.c:1110
-msgid "C_hange..."
-msgstr "ለውጥ... (_H)"
-
-#: src/folder-conf.c:788
+#: src/folder-conf.c:753
 msgid ""
-"This folder is not stored in configuration.I do not yet know how to remove "
+"This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
 msgstr ""
 
-#: src/folder-conf.c:798
+#: src/folder-conf.c:762
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr ""
 
-#: src/folder-conf.c:803
+#: src/folder-conf.c:767
 msgid "Confirm"
 msgstr ""
 
-#: src/information-dialog.c:182
-msgid "Balsa Information"
+#: src/information-dialog.c:220
+msgid "Information - Balsa"
 msgstr ""
 
-#: src/information-dialog.c:244
+#: src/information-dialog.c:309
+#, c-format
 msgid "WARNING: "
 msgstr "ማስጠንቀቂያ፦"
 
-#: src/information-dialog.c:247
+#: src/information-dialog.c:312
+#, c-format
 msgid "ERROR: "
 msgstr "ስህተት፦"
 
-#: src/information-dialog.c:250
+#: src/information-dialog.c:315
+#, c-format
 msgid "FATAL: "
 msgstr ""
 
-#: src/mailbox-conf.c:214
+#: src/mailbox-conf.c:164 src/pref-manager.c:335 src/pref-manager.c:2999
+#: src/pref-manager.c:3078
+msgid "Never"
+msgstr "በፍጹም"
+
+#: src/mailbox-conf.c:165 src/pref-manager.c:3079
+msgid "If Possible"
+msgstr ""
+
+#: src/mailbox-conf.c:166 src/pref-manager.c:3080
+msgid "Required"
+msgstr ""
+
+#: src/mailbox-conf.c:174
+#, fuzzy
+msgid "Use _SSL"
+msgstr "TLSን ተጠቀም"
+
+#: src/mailbox-conf.c:178
+#, fuzzy
+msgid "Use _TLS"
+msgstr "TLSን ተጠቀም"
+
+#: src/mailbox-conf.c:315
 msgid "No mailbox selected."
 msgstr ""
 
-#: src/mailbox-conf.c:242
+#: src/mailbox-conf.c:342
 #, c-format
 msgid ""
-"Mailbox \"%s\" is used by balsa and I cannot remove it.\n"
+"Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
 "If you really want to remove it, assign its function\n"
 "to some other mailbox."
 msgstr ""
 
-#: src/mailbox-conf.c:252
+#: src/mailbox-conf.c:352
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2426,15 +2605,15 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:264
+#: src/mailbox-conf.c:364
 msgid "Remove from _list"
 msgstr "ከዝርዝር አስወግድ (_L)"
 
-#: src/mailbox-conf.c:265
+#: src/mailbox-conf.c:365
 msgid "Remove from list and _disk"
 msgstr ""
 
-#: src/mailbox-conf.c:273
+#: src/mailbox-conf.c:373
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2444,11 +2623,11 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:286
+#: src/mailbox-conf.c:386
 msgid "_Remove from server"
 msgstr "ከሰርቨርን አስወግድ (_R)"
 
-#: src/mailbox-conf.c:293
+#: src/mailbox-conf.c:393
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2456,24 +2635,24 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:302
+#: src/mailbox-conf.c:402
 msgid "_Remove from list"
 msgstr "ከዝርዝር አጥፋ (_R)"
 
-#: src/mailbox-conf.c:353
-msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
+#: src/mailbox-conf.c:490 src/sendmsg-window.c:1036
+msgid "Select Identity"
 msgstr ""
 
-#: src/mailbox-conf.c:440
+#: src/mailbox-conf.c:517
 msgid "Mailbox Configurator"
 msgstr ""
 
-#: src/mailbox-conf.c:645
+#: src/mailbox-conf.c:707
 #, c-format
 msgid "%s on %s"
 msgstr "%s በ %s ላይ"
 
-#: src/mailbox-conf.c:761
+#: src/mailbox-conf.c:836
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2481,588 +2660,843 @@ msgid ""
 msgstr ""
 
 #. mailbox name
-#: src/mailbox-conf.c:893 src/mailbox-conf.c:949 src/mailbox-conf.c:1045
+#: src/mailbox-conf.c:998 src/mailbox-conf.c:1045 src/mailbox-conf.c:1135
 msgid "Mailbox _Name:"
 msgstr "የፖስታ ሳጥን ስም፦ (_N)"
 
 #. path to file
-#: src/mailbox-conf.c:901
+#: src/mailbox-conf.c:1006
 msgid "Mailbox _Path:"
 msgstr "የፖስታ ሳጥን መተላለፊያ፦(_P)"
 
-#: src/mailbox-conf.c:903
+#: src/mailbox-conf.c:1008
 msgid "Mailbox Path"
 msgstr "የፖስታ ሳጥን መተላለፊያ"
 
 #. password field
-#: src/mailbox-conf.c:969 src/mailbox-conf.c:1072
+#: src/mailbox-conf.c:1063 src/mailbox-conf.c:1162
 msgid "Pass_word:"
 msgstr "ሚስጢራዊ ቃል፦ (_W)"
 
-#: src/mailbox-conf.c:976
-msgid "Use _APOP Authentication"
-msgstr ""
-
-#: src/mailbox-conf.c:982
+#: src/mailbox-conf.c:1071
 msgid "_Delete messages from server after download"
 msgstr ""
 
-#: src/mailbox-conf.c:987
+#: src/mailbox-conf.c:1076
 msgid "_Filter messages through procmail"
 msgstr ""
 
-#: src/mailbox-conf.c:991
+#: src/mailbox-conf.c:1080
 msgid "Fi_lter Command:"
 msgstr "የአጣራ ትእዛዝ፦ (_L)"
 
-#: src/mailbox-conf.c:999
+#: src/mailbox-conf.c:1088
 msgid "_Enable check for new mail"
 msgstr ""
 
-#: src/mailbox-conf.c:1009
-msgid "Use SS_L (pop3s)"
-msgstr "SS_Lን (pop3s) ተጠቀም"
+#: src/mailbox-conf.c:1099
+msgid "Disable _APOP"
+msgstr ""
 
 #. username
-#: src/mailbox-conf.c:1058
+#: src/mailbox-conf.c:1148
 msgid "_Username:"
 msgstr "የተጠቃሚ ስም፦ (_U)"
 
-#: src/mailbox-conf.c:1066
+#: src/mailbox-conf.c:1156
 msgid "_Remember Password"
 msgstr "ሚስጢራዊ ቃልን አስታውስ (_R)"
 
-#: src/mailbox-conf.c:1077
+#: src/mailbox-conf.c:1167
 msgid "F_older Path:"
 msgstr "የዶሴ መተላለፊያ፦ (_O)"
 
-#: src/mailbox-conf.c:1100
-msgid "Use SS_L (imaps)"
-msgstr "SS_Lን (imaps) ተጠቀም"
-
-#: src/mailbox-conf.c:1105
-msgid "_Identity:"
+#: src/mailbox-conf.c:1252
+msgid "Identity:"
 msgstr ""
 
-#: src/mailbox-node.c:239
+#: src/mailbox-conf.c:1258
+msgid "(No identity set)"
+msgstr ""
+
+#: src/mailbox-conf.c:1262
+msgid "C_hange..."
+msgstr "ለውጥ... (_H)"
+
+#: src/mailbox-conf.c:1269
+#, fuzzy
+msgid "Show address:"
+msgstr "ኢሜያል አድራሻ፦ (_E)"
+
+#: src/mailbox-conf.c:1272
+#, fuzzy
+msgid "_From"
+msgstr "ከ፦ (_F)"
+
+#: src/mailbox-conf.c:1278
+msgid "_To"
+msgstr "ወደ (_T)"
+
+#: src/mailbox-node.c:259
 msgid "The folder edition to be written."
 msgstr ""
 
-#: src/mailbox-node.c:372
+#: src/mailbox-node.c:420
+#, c-format
+msgid ""
+"Scanning of %s failed: %s\n"
+"Check network connectivity."
+msgstr ""
+
+#: src/mailbox-node.c:422
+#, c-format
+msgid "Scanning of %s failed: %s"
+msgstr ""
+
+#: src/mailbox-node.c:471
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr ""
 
-#: src/mailbox-node.c:823
+#: src/mailbox-node.c:914
 msgid "Local _mbox mailbox..."
 msgstr ""
 
-#: src/mailbox-node.c:825
+#: src/mailbox-node.c:916
 msgid "Local Mail_dir mailbox..."
 msgstr ""
 
-#: src/mailbox-node.c:827
+#: src/mailbox-node.c:918
 msgid "Local M_H mailbox..."
 msgstr ""
 
-#: src/mailbox-node.c:829
+#: src/mailbox-node.c:920
 msgid "Remote _IMAP mailbox..."
 msgstr ""
 
-#: src/mailbox-node.c:832
+#: src/mailbox-node.c:923
 msgid "Remote IMAP _folder..."
 msgstr ""
 
-#: src/mailbox-node.c:834
+#: src/mailbox-node.c:925
 msgid "Remote IMAP _subfolder..."
 msgstr ""
 
 #. clicked on the empty space
-#: src/mailbox-node.c:845 src/mailbox-node.c:877 src/mailbox-node.c:898
+#: src/mailbox-node.c:936 src/mailbox-node.c:962
 msgid "_Rescan"
 msgstr ""
 
-#: src/mailbox-node.c:854
+#: src/mailbox-node.c:945
 msgid "_Open"
 msgstr "ክፈት"
 
-#: src/mailbox-node.c:857 src/main-window.c:612
+#: src/mailbox-node.c:948 src/main-window.c:737 src/main-window.c:834
 msgid "_Close"
 msgstr "ዝጋ"
 
-#: src/mailbox-node.c:863
+#: src/mailbox-node.c:954
 msgid "_Properties..."
 msgstr "ምርጫዎች"
 
-#: src/mailbox-node.c:873
+#: src/mailbox-node.c:969
 msgid "_Subscribe"
 msgstr ""
 
-#: src/mailbox-node.c:875
+#: src/mailbox-node.c:971
 msgid "_Unsubscribe"
 msgstr ""
 
-#: src/mailbox-node.c:883
+#: src/mailbox-node.c:976
 msgid "Mark as _Inbox"
 msgstr ""
 
-#: src/mailbox-node.c:886
+#: src/mailbox-node.c:979
 msgid "_Mark as Sentbox"
 msgstr ""
 
-#: src/mailbox-node.c:889
+#: src/mailbox-node.c:982
 msgid "Mark as _Trash"
 msgstr ""
 
-#: src/mailbox-node.c:892
+#: src/mailbox-node.c:985
 msgid "Mark as D_raftbox"
 msgstr ""
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:895
+#: src/mailbox-node.c:988
 msgid "_Edit/Apply filters"
 msgstr ""
 
-#: src/mailbox-node.c:992
+#: src/mailbox-node.c:1069
+#, c-format
+msgid "The path \"%s\" does not lead to a mailbox."
+msgstr ""
+
+#: src/mailbox-node.c:1082
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-node.c:1017
+#: src/mailbox-node.c:1109
 #, c-format
 msgid "Local folder %s\n"
 msgstr "ቅርብ ዶሴ %s\n"
 
-#: src/main-window.c:243
-msgid "_Message..."
-msgstr "መልእክት... (_M)"
-
-#: src/main-window.c:243
-msgid "Compose a new message"
+#: src/main-window.c:274
+msgid "Balsa closes files and connections. Please wait..."
 msgstr ""
 
-#: src/main-window.c:249
-msgid "Local mbox mailbox..."
-msgstr ""
+#: src/main-window.c:313 src/main-window.c:359
+#, fuzzy
+msgid "_Deleted"
+msgstr "አጥፉ (_D)"
 
-#: src/main-window.c:250
-msgid "Add a new mbox style mailbox"
-msgstr ""
+#: src/main-window.c:316
+#, fuzzy
+msgid "Un_Deleted"
+msgstr "የጠፋ"
 
-#: src/main-window.c:254
-msgid "Local Maildir mailbox..."
-msgstr ""
-
-#: src/main-window.c:255
-msgid "Add a new Maildir style mailbox"
-msgstr ""
-
-#: src/main-window.c:259
-msgid "Local MH mailbox..."
-msgstr ""
-
-#: src/main-window.c:260
-msgid "Add a new MH style mailbox"
-msgstr ""
-
-#: src/main-window.c:264 src/pref-manager.c:2781
-msgid "Remote IMAP mailbox..."
-msgstr ""
-
-#: src/main-window.c:265
-msgid "Add a new IMAP mailbox"
-msgstr ""
-
-#: src/main-window.c:270 src/pref-manager.c:2786
-msgid "Remote IMAP folder..."
-msgstr ""
-
-#: src/main-window.c:271
-msgid "Add a new IMAP folder"
-msgstr ""
-
-#: src/main-window.c:275
-msgid "Remote IMAP subfolder..."
-msgstr ""
-
-#: src/main-window.c:276
-msgid "Add new IMAP subfolder"
-msgstr ""
-
-#: src/main-window.c:288
-msgid "_Continue"
-msgstr "ቀጥል (_C)"
-
-#: src/main-window.c:289
-msgid "Continue editing current message"
-msgstr ""
-
-#: src/main-window.c:296
-msgid "_Get New Mail"
-msgstr ""
-
-#: src/main-window.c:296
-msgid "Fetch new incoming mail"
-msgstr ""
-
-#: src/main-window.c:302
-msgid "_Send Queued Mail"
-msgstr ""
-
-#: src/main-window.c:303
-msgid "Send messages from the outbox"
-msgstr ""
-
-#: src/main-window.c:309
-msgid "Send and _Receive Mail"
-msgstr ""
-
-#: src/main-window.c:310 src/toolbar-factory.c:123
-msgid "Send and Receive messages"
-msgstr ""
-
-#: src/main-window.c:315
-msgid "_Print..."
-msgstr "አትም... (_P)"
-
-#: src/main-window.c:316 src/toolbar-factory.c:119
-msgid "Print current message"
-msgstr "የአሁኑን መልእክት አትም"
+#: src/main-window.c:319
+#, fuzzy
+msgid "_Read"
+msgstr "ላክ (_S)"
 
 #: src/main-window.c:322
-msgid "_Address Book..."
-msgstr "የአድራሻ መጽሐፍ... (_A)"
-
-#: src/main-window.c:323
-msgid "Open the address book"
-msgstr "የአድራሻ መጽሐፍን ክፈት"
-
-#: src/main-window.c:350
-msgid "F_ilters..."
-msgstr "አጣራዎች... (_I)"
-
-#: src/main-window.c:350
-msgid "Manage filters"
-msgstr "አጣራዎችን ተቆጣጠሩ"
-
-#: src/main-window.c:352
-msgid "_Export Filters"
-msgstr "አጣራዎችን ላክ (_E)"
-
-#: src/main-window.c:352
-msgid "Export filters as Sieve scripts"
+msgid "Un_read"
 msgstr ""
 
-#: src/main-window.c:358 src/message-window.c:83
-msgid "N_o Headers"
+#: src/main-window.c:328
+msgid "Un_flagged"
+msgstr ""
+
+#: src/main-window.c:331 src/main-window.c:371
+msgid "_Answered"
+msgstr ""
+
+#: src/main-window.c:334
+#, fuzzy
+msgid "Un_answered"
+msgstr "ሚስጢራዊ ቃል"
+
+#: src/main-window.c:340
+#, fuzzy
+msgid "_No Headers"
 msgstr "ያለ የገጽ አናቶች (_O)"
 
-#: src/main-window.c:358
+#: src/main-window.c:340
 msgid "Display no headers"
 msgstr ""
 
-#: src/main-window.c:360
+#: src/main-window.c:342
 msgid "S_elected Headers"
 msgstr "የተመረጠው የገጽ አናቶች (_E)"
 
-#: src/main-window.c:361
+#: src/main-window.c:343
 msgid "Display selected headers"
 msgstr "ሁሉንም የገጽ አናቶች አሳይ"
 
-#: src/main-window.c:363 src/message-window.c:87
+#: src/main-window.c:345 src/message-window.c:85
 msgid "All _Headers"
 msgstr "ሁሉንም የገጽ አናቶች (_H)"
 
-#: src/main-window.c:363
+#: src/main-window.c:345
 msgid "Display all headers"
 msgstr "ሁሉንም የገጽ አናቶች አሳይ"
 
-#: src/main-window.c:370
-msgid "_Flat index"
-msgstr ""
-
-#: src/main-window.c:371
-msgid "No threading at all"
-msgstr ""
-
-#: src/main-window.c:376
-msgid "S_imple threading"
-msgstr ""
-
-#: src/main-window.c:377
-msgid "Simple threading algorithm"
-msgstr ""
-
-#: src/main-window.c:382
-msgid "_JWZ threading"
-msgstr ""
-
-#: src/main-window.c:383
-msgid "Elaborate JWZ threading"
-msgstr ""
-
-#: src/main-window.c:393
-msgid "_Show Mailbox Tree"
-msgstr ""
-
-#: src/main-window.c:394
-msgid "Toggle display of mailbox and folder tree"
-msgstr ""
-
-#: src/main-window.c:397
-msgid "Show Mailbox _Tabs"
-msgstr ""
-
-#: src/main-window.c:398
-msgid "Toggle display of mailbox notebook tabs"
-msgstr ""
-
-#: src/main-window.c:402 src/message-window.c:117
-msgid "_Wrap"
-msgstr ""
-
-#: src/main-window.c:402 src/sendmsg-window.c:233
-msgid "Wrap message lines"
-msgstr ""
-
-#: src/main-window.c:410
-msgid "_Expand All"
-msgstr ""
-
-#: src/main-window.c:411
-msgid "Expand all threads"
-msgstr ""
-
-#: src/main-window.c:415
-msgid "_Collapse All"
-msgstr ""
-
-#: src/main-window.c:416
-msgid "Collapse all expanded threads"
-msgstr ""
-
-#: src/main-window.c:426
+#: src/main-window.c:354
 msgid "Toggle flagged"
 msgstr ""
 
-#: src/main-window.c:433
-msgid "New"
-msgstr "አዲስ"
+#: src/main-window.c:360
+msgid "Toggle deleted flag"
+msgstr ""
 
-#: src/main-window.c:433
+#: src/main-window.c:365
 msgid "Toggle New"
 msgstr "አዲሱን ቀያያር"
 
-#: src/main-window.c:445 src/toolbar-factory.c:99
+#: src/main-window.c:371
+#, fuzzy
+msgid "Toggle Answered"
+msgstr "አዲሱን ቀያያር"
+
+#: src/main-window.c:386
+msgid "_Message..."
+msgstr "መልእክት... (_M)"
+
+#: src/main-window.c:386 src/main-window.c:1015
+msgid "Compose a new message"
+msgstr ""
+
+#. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
+#. of including at specified position
+#: src/main-window.c:393
+msgid "Local mbox mailbox..."
+msgstr ""
+
+#: src/main-window.c:394 src/main-window.c:790
+msgid "Add a new mbox style mailbox"
+msgstr ""
+
+#: src/main-window.c:397
+msgid "Local Maildir mailbox..."
+msgstr ""
+
+#: src/main-window.c:398 src/main-window.c:795
+msgid "Add a new Maildir style mailbox"
+msgstr ""
+
+#: src/main-window.c:401
+msgid "Local MH mailbox..."
+msgstr ""
+
+#: src/main-window.c:402 src/main-window.c:799
+msgid "Add a new MH style mailbox"
+msgstr ""
+
+#: src/main-window.c:405 src/main-window.c:802 src/pref-manager.c:2832
+msgid "Remote IMAP mailbox..."
+msgstr ""
+
+#: src/main-window.c:406 src/main-window.c:803
+msgid "Add a new IMAP mailbox"
+msgstr ""
+
+#: src/main-window.c:410 src/main-window.c:807 src/pref-manager.c:2837
+msgid "Remote IMAP folder..."
+msgstr ""
+
+#: src/main-window.c:411 src/main-window.c:808
+msgid "Add a new IMAP folder"
+msgstr ""
+
+#: src/main-window.c:414 src/main-window.c:811
+msgid "Remote IMAP subfolder..."
+msgstr ""
+
+#: src/main-window.c:415 src/main-window.c:812
+msgid "Add a new IMAP subfolder"
+msgstr ""
+
+#: src/main-window.c:428
+msgid "_Continue"
+msgstr "ቀጥል (_C)"
+
+#: src/main-window.c:429
+msgid "Continue editing current message"
+msgstr ""
+
+#. Ctrl-M
+#: src/main-window.c:436 src/main-window.c:854
+msgid "_Get New Mail"
+msgstr ""
+
+#: src/main-window.c:436 src/main-window.c:854
+msgid "Fetch new incoming mail"
+msgstr ""
+
+#. Ctrl-S
+#: src/main-window.c:442 src/main-window.c:849
+msgid "_Send Queued Mail"
+msgstr ""
+
+#: src/main-window.c:443 src/main-window.c:850
+msgid "Send messages from the outbox"
+msgstr ""
+
+#. Ctrl-B
+#: src/main-window.c:449 src/main-window.c:844
+msgid "Send and _Receive Mail"
+msgstr ""
+
+#: src/main-window.c:450 src/main-window.c:845 src/toolbar-factory.c:123
+msgid "Send and Receive messages"
+msgstr ""
+
+#: src/main-window.c:455 src/main-window.c:859 src/sendmsg-window.c:338
+#: src/sendmsg-window.c:499
+msgid "_Print..."
+msgstr "አትም... (_P)"
+
+#: src/main-window.c:456 src/main-window.c:860 src/toolbar-factory.c:119
+msgid "Print current message"
+msgstr "የአሁኑን መልእክት አትም"
+
+#: src/main-window.c:462 src/main-window.c:1074
+msgid "_Address Book..."
+msgstr "የአድራሻ መጽሐፍ... (_A)"
+
+#: src/main-window.c:463 src/main-window.c:1075
+msgid "Open the address book"
+msgstr "የአድራሻ መጽሐፍን ክፈት"
+
+#: src/main-window.c:487
+msgid "F_ilters..."
+msgstr "አጣራዎች... (_I)"
+
+#: src/main-window.c:487 src/main-window.c:1061
+msgid "Manage filters"
+msgstr "አጣራዎችን ተቆጣጠሩ"
+
+#: src/main-window.c:489 src/main-window.c:1067
+msgid "_Export Filters"
+msgstr "አጣራዎችን ላክ (_E)"
+
+#: src/main-window.c:489 src/main-window.c:1068
+msgid "Export filters as Sieve scripts"
+msgstr ""
+
+#: src/main-window.c:497
+msgid "_Flat index"
+msgstr ""
+
+#: src/main-window.c:498
+msgid "No threading at all"
+msgstr ""
+
+#: src/main-window.c:503
+msgid "Si_mple threading"
+msgstr ""
+
+#: src/main-window.c:504
+msgid "Simple threading algorithm"
+msgstr ""
+
+#: src/main-window.c:509
+msgid "_JWZ threading"
+msgstr ""
+
+#: src/main-window.c:510
+msgid "Elaborate JWZ threading"
+msgstr ""
+
+#: src/main-window.c:520
+msgid "_Show Mailbox Tree"
+msgstr ""
+
+#: src/main-window.c:521
+msgid "Toggle display of mailbox and folder tree"
+msgstr ""
+
+#: src/main-window.c:525
+msgid "Show Mailbox _Tabs"
+msgstr ""
+
+#: src/main-window.c:526
+msgid "Toggle display of mailbox notebook tabs"
+msgstr ""
+
+#: src/main-window.c:530 src/main-window.c:928 src/message-window.c:116
+msgid "_Wrap"
+msgstr ""
+
+#: src/main-window.c:530 src/main-window.c:928 src/sendmsg-window.c:367
+#: src/sendmsg-window.c:524
+msgid "Wrap message lines"
+msgstr ""
+
+#: src/main-window.c:539 src/main-window.c:934
+msgid "E_xpand All"
+msgstr ""
+
+#: src/main-window.c:540 src/main-window.c:935
+msgid "Expand all threads"
+msgstr ""
+
+#: src/main-window.c:544 src/main-window.c:939
+msgid "_Collapse All"
+msgstr ""
+
+#: src/main-window.c:545 src/main-window.c:940
+msgid "Collapse all expanded threads"
+msgstr ""
+
+#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
+msgid "Zoom _In"
+msgstr ""
+
+#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
+msgid "Increase magnification"
+msgstr ""
+
+#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
+msgid "Zoom _Out"
+msgstr ""
+
+#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
+msgid "Decrease magnification"
+msgstr ""
+
+#. To warn msgfmt that the % sign isn't a format specifier:
+#. To warn msgfmt that the % sign isn't a
+#. * format specifier:
+#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
+#, no-c-format
+msgid "Zoom _100%"
+msgstr ""
+
+#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
+msgid "No magnification"
+msgstr ""
+
+#: src/main-window.c:577 src/main-window.c:1022 src/toolbar-factory.c:99
 msgid "Reply to the current message"
 msgstr ""
 
-#: src/main-window.c:452 src/message-window.c:131
+#. A
+#: src/main-window.c:584 src/main-window.c:1028 src/message-window.c:148
 msgid "Reply to _All..."
 msgstr ""
 
-#: src/main-window.c:453
+#: src/main-window.c:585 src/main-window.c:1029
 msgid "Reply to all recipients of the current message"
 msgstr ""
 
-#: src/main-window.c:460 src/message-window.c:137
+#: src/main-window.c:592 src/message-window.c:154
 msgid "Reply to _Group..."
 msgstr ""
 
-#: src/main-window.c:461 src/message-window.c:138 src/toolbar-factory.c:103
+#: src/main-window.c:593 src/message-window.c:155 src/toolbar-factory.c:103
 msgid "Reply to mailing list"
 msgstr ""
 
-#: src/main-window.c:468 src/message-window.c:143
+#: src/main-window.c:600 src/message-window.c:160
 msgid "_Forward attached..."
 msgstr ""
 
-#: src/main-window.c:469
+#: src/main-window.c:601
 msgid "Forward the current message as attachment"
 msgstr ""
 
-#: src/main-window.c:475
+#: src/main-window.c:607
 msgid "Forward _inline..."
 msgstr ""
 
-#: src/main-window.c:476
+#: src/main-window.c:608
 msgid "Forward the current message inline"
 msgstr ""
 
-#: src/main-window.c:483 src/message-window.c:154
+#: src/main-window.c:615 src/message-window.c:171
 msgid "Next Part"
 msgstr ""
 
-#: src/main-window.c:483
+#: src/main-window.c:615 src/message-window.c:171
 msgid "Next part in message"
 msgstr ""
 
-#: src/main-window.c:489 src/message-window.c:158
+#: src/main-window.c:621 src/message-window.c:175
 msgid "Previous Part"
 msgstr ""
 
-#: src/main-window.c:490
+#: src/main-window.c:622 src/message-window.c:176
 msgid "Previous part in message"
 msgstr ""
 
-#: src/main-window.c:496 src/message-window.c:163
+#: src/main-window.c:628 src/main-window.c:1042 src/message-window.c:180
 msgid "Save Current Part..."
 msgstr ""
 
-#: src/main-window.c:497 src/message-window.c:164
-msgid "Save current part in message"
+#: src/main-window.c:629 src/main-window.c:1043
+msgid "Save currently displayed part of message"
 msgstr ""
 
-#: src/main-window.c:503 src/message-window.c:168
+#: src/main-window.c:635 src/main-window.c:995 src/message-window.c:185
 msgid "_View Source..."
 msgstr ""
 
-#: src/main-window.c:504 src/message-window.c:169
+#: src/main-window.c:636 src/main-window.c:996 src/message-window.c:186
 msgid "View source form of the message"
 msgstr ""
 
-#: src/main-window.c:522
+#: src/main-window.c:654
 msgid "_Move to Trash"
 msgstr "ወደማይፈለገው ማድረጊያ ተሸጋገር"
 
-#: src/main-window.c:523
+#: src/main-window.c:655 src/main-window.c:1050
 msgid "Move the current message to Trash mailbox"
 msgstr ""
 
-#: src/main-window.c:529
-msgid "Delete the current message"
-msgstr ""
-
-#: src/main-window.c:535
-msgid "Undelete the message"
-msgstr "መልእክትን አታጥፋ"
-
 #. !
-#: src/main-window.c:541
-msgid "_Toggle"
+#: src/main-window.c:661 src/main-window.c:1001
+#, fuzzy
+msgid "_Toggle flag"
 msgstr "ቀያያር (_T)"
 
-#: src/main-window.c:547
+#: src/main-window.c:667 src/main-window.c:1006
 msgid "Store address of sender in addressbook"
 msgstr ""
 
-#: src/main-window.c:557
+#: src/main-window.c:678 src/main-window.c:959
 msgid "Next Message"
 msgstr "የሚቀጥለው መልእክት"
 
-#: src/main-window.c:563
+#: src/main-window.c:684 src/main-window.c:963
 msgid "Previous Message"
 msgstr "ያለፈው መልእክት"
 
-#: src/main-window.c:569 src/main-window.c:570
+#: src/main-window.c:690 src/main-window.c:691 src/main-window.c:953
+#: src/main-window.c:954 src/message-window.c:192 src/message-window.c:193
 msgid "Next Unread Message"
 msgstr ""
 
-#: src/main-window.c:576 src/main-window.c:577
+#: src/main-window.c:697 src/main-window.c:698 src/main-window.c:920
+#: src/main-window.c:921
 msgid "Next Flagged Message"
 msgstr ""
 
-#: src/main-window.c:584
+#: src/main-window.c:705 src/main-window.c:931
+#, fuzzy
+msgid "_Hide messages"
+msgstr "መልእክት አትም"
+
+#: src/main-window.c:708
+#, fuzzy
+msgid "Reset _Filter"
+msgstr "አዲስ አጣራ"
+
+#: src/main-window.c:713
 msgid "Select all"
 msgstr "ሁሉንም ምረጡ"
 
-#: src/main-window.c:585
+#: src/main-window.c:714
 msgid "Select all messages in current mailbox"
 msgstr ""
 
-#: src/main-window.c:591
+#: src/main-window.c:720 src/main-window.c:822
 msgid "_Edit..."
 msgstr "አስተካክል... (_E)"
 
-#: src/main-window.c:591
+#: src/main-window.c:720 src/main-window.c:822
 msgid "Edit the selected mailbox"
 msgstr ""
 
-#: src/main-window.c:595
+#: src/main-window.c:724 src/main-window.c:817
 msgid "_Delete..."
 msgstr "አጥፉ... (_D)"
 
-#: src/main-window.c:596
+#: src/main-window.c:725 src/main-window.c:818
 msgid "Delete the selected mailbox"
 msgstr ""
 
-#: src/main-window.c:602
-msgid "Co_mmit Current"
+#: src/main-window.c:731
+msgid "E_xpunge Deleted Messages"
 msgstr ""
 
-#: src/main-window.c:603
-msgid "Commit the changes in the currently opened mailbox"
+#: src/main-window.c:732 src/main-window.c:829
+msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr ""
 
-#: src/main-window.c:607
-msgid "Commit _All"
-msgstr ""
-
-#: src/main-window.c:608
-msgid "Commit the changes in all mailboxes"
-msgstr ""
-
-#: src/main-window.c:612
+#: src/main-window.c:737 src/main-window.c:835
 msgid "Close mailbox"
 msgstr "የፖስታ ሳጥንን ዝጋ"
 
-#: src/main-window.c:616
+#: src/main-window.c:741 src/main-window.c:1079
 msgid "Empty _Trash"
 msgstr "የማይፈለግ ማድረጊያውን ባዶ አድርግ (_T)"
 
-#: src/main-window.c:617
+#: src/main-window.c:742 src/main-window.c:1080 src/toolbar-factory.c:141
 msgid "Delete messages from the Trash mailbox"
 msgstr ""
 
-#: src/main-window.c:621
-msgid "Edit/Apply _Filters"
+#: src/main-window.c:746
+#, fuzzy
+msgid "Select _Filters"
+msgstr "የፊደል ቅርጽ ምረጡ"
+
+#: src/main-window.c:747 src/main-window.c:1065
+msgid "Select filters to be applied automatically to current mailbox"
 msgstr ""
 
-#: src/main-window.c:622
-msgid "Filter the content of the selected mailbox"
-msgstr ""
-
-#: src/main-window.c:630
+#: src/main-window.c:760
 msgid "_Toolbars..."
 msgstr "ቱልባሮች... (_T)"
 
-#: src/main-window.c:631
+#: src/main-window.c:761
 msgid "Customize toolbars"
 msgstr "ቱልባሮቹን አስተካክል"
 
-#: src/main-window.c:634
+#: src/main-window.c:764 src/main-window.c:1083
 msgid "_Identities..."
 msgstr ""
 
-#: src/main-window.c:635
+#: src/main-window.c:765 src/main-window.c:1084
 msgid "Create and set current identities"
 msgstr ""
 
-#: src/main-window.c:652
-msgid "_Message"
-msgstr "መልእክት (_M)"
-
-#: src/main-window.c:653
+#: src/main-window.c:776
 msgid "Mail_box"
 msgstr "የፖስታ ሳጥን (_B)"
 
-#: src/main-window.c:745
+#: src/main-window.c:777 src/main-window.c:1097 src/message-window.c:209
+msgid "_Message"
+msgstr "መልእክት (_M)"
+
+#: src/main-window.c:789
+#, fuzzy
+msgid "New mailbox..."
+msgstr "የፖስታ ሳጥንን ዝጋ"
+
+#: src/main-window.c:794
+msgid "New \"Maildir\" mailbox..."
+msgstr ""
+
+#: src/main-window.c:798
+msgid "New \"MH\" mailbox..."
+msgstr ""
+
+#: src/main-window.c:828
+#, fuzzy
+msgid "_Compress Mailbox"
+msgstr "የፖስታ ሳጥንን ዝጋ"
+
+#: src/main-window.c:858
+#, fuzzy
+msgid "Mail_boxes"
+msgstr "የፖስታ ሳጥን (_B)"
+
+#: src/main-window.c:883
+msgid "By _Arrival"
+msgstr ""
+
+#: src/main-window.c:883
+msgid "Arrival order"
+msgstr ""
+
+#: src/main-window.c:887
+#, fuzzy
+msgid "By _Sender"
+msgstr "ላክ (_S)"
+
+#: src/main-window.c:887
+msgid "Sender order"
+msgstr ""
+
+#: src/main-window.c:891
+#, fuzzy
+msgid "By S_ubject"
+msgstr "ጉዳዩ፦ (_U)"
+
+#: src/main-window.c:891
+#, fuzzy
+msgid "Subject order"
+msgstr "ጉዳዩ"
+
+#: src/main-window.c:895
+#, fuzzy
+msgid "By _Date"
+msgstr "ቀን"
+
+#: src/main-window.c:895
+msgid "By sending date"
+msgstr ""
+
+#: src/main-window.c:899
+#, fuzzy
+msgid "By Si_ze"
+msgstr "መጠን"
+
+#: src/main-window.c:899
+msgid "By message size"
+msgstr ""
+
+#: src/main-window.c:903
+#, fuzzy
+msgid "_Threaded"
+msgstr "ፍጠር (_C)"
+
+#: src/main-window.c:903
+msgid "Use message threading"
+msgstr ""
+
+#: src/main-window.c:927
+#, fuzzy
+msgid "_Headers"
+msgstr "ያለ የገጽ አናቶች (_O)"
+
+#: src/main-window.c:930
+#, fuzzy
+msgid "_Sort Mailbox"
+msgstr "የፖስታ ሳጥን"
+
+#: src/main-window.c:945
+#, fuzzy
+msgid "_View filter"
+msgstr "አዲስ አጣራ"
+
+#: src/main-window.c:946
+msgid "Enable quick message index filter"
+msgstr ""
+
+#: src/main-window.c:982 src/main-window.c:1056 src/sendmsg-window.c:501
+#: src/sendmsg-window.c:559 src/sendmsg-window.c:619
+#, fuzzy
+msgid "_More"
+msgstr "ወደ አንቀሳቅስ (_M)"
+
+#: src/main-window.c:1015
+#, fuzzy
+msgid "_New..."
+msgstr "አዲስ (_N)"
+
+#. F
+#: src/main-window.c:1035
+#, fuzzy
+msgid "_Forward..."
+msgstr "ወደፊት"
+
+#: src/main-window.c:1036 src/toolbar-factory.c:105
+msgid "Forward the current message"
+msgstr ""
+
+#. D
+#: src/main-window.c:1049
+#, fuzzy
+msgid "_Delete to Trash"
+msgstr "ወደማይፈለገው ማድረጊያ ተሸጋገር"
+
+#: src/main-window.c:1061
+#, fuzzy
+msgid "_Manage..."
+msgstr "ለውጥ... (_H)"
+
+#: src/main-window.c:1064
+#, fuzzy
+msgid "_Select _Filters"
+msgstr "ሁሉንም ምረጡ (_S)"
+
+#: src/main-window.c:1082
+#, fuzzy
+msgid "_Filters"
+msgstr "አጣራዎች... (_I)"
+
+#: src/main-window.c:1098 src/sendmsg-window.c:635
+#, fuzzy
+msgid "_Tools"
+msgstr "ወደ (_T)"
+
+#: src/main-window.c:1202
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr ""
 
-#: src/main-window.c:1373
+#: src/main-window.c:1372
+msgid "Subject or Sender _Contains:"
+msgstr ""
+
+#: src/main-window.c:2154
+#, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
-"Please check the mailbox settings."
+"%s."
 msgstr ""
 
-#: src/main-window.c:1646
-msgid "Copyright (C) 1997-2002"
+#: src/main-window.c:2470
+msgid "translator_credits"
 msgstr ""
 
-#: src/main-window.c:1650
+#: src/main-window.c:2486
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3070,1109 +3504,1331 @@ msgid ""
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
 
-#: src/main-window.c:1777
+#: src/main-window.c:2588
 msgid "Checking Mail..."
 msgstr ""
 
-#: src/main-window.c:2086
+#: src/main-window.c:2897
 msgid "Finished Checking."
 msgstr ""
 
-#: src/main-window.c:2156
+#: src/main-window.c:2959
 #, c-format
 msgid "Sending error: %s"
 msgstr ""
 
-#: src/main-window.c:2251
+#: src/main-window.c:3044
 msgid "Balsa: New mail"
 msgstr "ባልሳ፦ አዲስ ኢሜይል"
 
-#: src/main-window.c:2261
+#: src/main-window.c:3056
 #, c-format
-msgid "You have received %d new messages."
+msgid "You have received %d new message."
+msgid_plural "You have received %d new messages."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/main-window.c:3059
+msgid "You have new mail."
 msgstr ""
 
-#: src/main-window.c:2262
-msgid "You have received 1 new message."
-msgstr ""
-
-#: src/main-window.c:2652
+#: src/main-window.c:3609
 msgid "Search mailbox"
 msgstr ""
 
-#: src/main-window.c:2665
-msgid "_Reverse search"
-msgstr ""
-
-#: src/main-window.c:2668
+#: src/main-window.c:3626
 msgid "_Search for:"
 msgstr "ፈልግ፦ (_S)"
 
-#: src/main-window.c:2681
+#. builds the toggle buttons to specify fields concerned by
+#. * the search.
+#: src/main-window.c:3639
 msgid "In:"
 msgstr "ቅርበት፦"
 
-#: src/main-window.c:2695
+#: src/main-window.c:3650
 msgid "S_ubject"
 msgstr "ጉዳዩ፦ (_U)"
 
-#: src/main-window.c:2810
+#. Frame with Apply and Clear buttons
+#: src/main-window.c:3655
+#, fuzzy
+msgid "Show only matching messages"
+msgstr "ይህን መልእክት ላክ"
+
+#. Frame with OK button
+#: src/main-window.c:3676
+#, fuzzy
+msgid "Open next matching message"
+msgstr "ይህን መልእክት ላክ"
+
+#: src/main-window.c:3687
+msgid "_Reverse search"
+msgstr ""
+
+#: src/main-window.c:3692
+msgid "_Wrap around"
+msgstr ""
+
+#: src/main-window.c:3768
+#, c-format
+msgid "Error displaying help: %s\n"
+msgstr ""
+
+#: src/main-window.c:3853
 msgid "You can apply filters only on mailbox\n"
 msgstr ""
 
-#: src/main-window.c:2845 src/main-window.c:2864
-#, c-format
-msgid "Commiting mailbox %s failed."
-msgstr ""
-
-#: src/main-window.c:3057
+#: src/main-window.c:4166
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr ""
 
-#: src/main-window.c:3059
+#: src/main-window.c:4168
 #, c-format
 msgid "Balsa: %s"
 msgstr "ባልሳ፦ %s"
 
-#: src/main-window.c:3150
+#: src/main-window.c:4272
 msgid "Cannot access the message's body\n"
 msgstr ""
 
-#: src/main.c:115
+#: src/main.c:203
 msgid "Get new mail on startup"
 msgstr ""
 
-#: src/main.c:117
+#: src/main.c:205
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr ""
 
-#: src/main.c:119
+#: src/main.c:207
 msgid "Attach file at PATH"
 msgstr ""
 
-#: src/main.c:121
+#: src/main.c:209
 msgid "Opens MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:121
+#: src/main.c:209
 msgid "MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:124
+#: src/main.c:212
 msgid "Opens first unread mailbox"
 msgstr ""
 
-#: src/main.c:127
+#: src/main.c:215
 msgid "Opens default Inbox on startup"
 msgstr ""
 
-#: src/main.c:129
+#: src/main.c:217
 msgid "Debug POP3 connection"
 msgstr ""
 
-#: src/main.c:165 src/main.c:170 src/main.c:176 src/main.c:182 src/main.c:188
+#: src/main.c:219
+msgid "Debug IMAP connection"
+msgstr ""
+
+#: src/main.c:241
+msgid "The Balsa E-Mail Client"
+msgstr ""
+
+#: src/main.c:258 src/main.c:263 src/main.c:269 src/main.c:275 src/main.c:281
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr ""
 
-#: src/main.c:165
+#: src/main.c:258
 msgid "Inbox"
 msgstr ""
 
-#: src/main.c:171
+#: src/main.c:264
 msgid "Outbox"
 msgstr ""
 
-#: src/main.c:177
+#: src/main.c:270
 msgid "Sentbox"
 msgstr ""
 
-#: src/main.c:183
+#: src/main.c:276
 msgid "Draftbox"
 msgstr ""
 
-#: src/main.c:188
+#: src/main.c:281
 msgid "Trash"
 msgstr "የማይፈለግ"
 
-#: src/message-window.c:85
+#: src/main.c:470
+msgid "Compressing mail folders..."
+msgstr ""
+
+#: src/message-window.c:81
+msgid "N_o Headers"
+msgstr "ያለ የገጽ አናቶች (_O)"
+
+#: src/message-window.c:83
 msgid "_Selected Headers"
 msgstr ""
 
-#: src/message-window.c:126
+#: src/message-window.c:143
 msgid "Reply to this message"
 msgstr ""
 
-#: src/message-window.c:132
+#: src/message-window.c:149
 msgid "Reply to all recipients of this message"
 msgstr ""
 
-#: src/message-window.c:144
+#: src/message-window.c:161
 msgid "Forward this message as attachment"
 msgstr ""
 
-#: src/message-window.c:148
+#: src/message-window.c:165
 msgid "Forward inline..."
 msgstr ""
 
-#: src/message-window.c:149
+#: src/message-window.c:166
 msgid "Forward this message inline"
 msgstr ""
 
-#: src/message-window.c:154
-msgid "Next part in Message"
+#: src/message-window.c:181
+msgid "Save current part in message"
 msgstr ""
 
-#: src/message-window.c:159
-msgid "Previous part in Message"
-msgstr ""
+#: src/message-window.c:208
+#, fuzzy
+msgid "M_ove"
+msgstr "አስወግድ (_R)"
 
-#: src/pref-manager.c:315
+#: src/message-window.c:274
+#, fuzzy, c-format
+msgid "Message from %s: %s"
+msgstr "የመልእክት-ID፦ %s\n"
+
+#: src/pref-manager.c:321
 msgid "7 Bits"
 msgstr "7 ቢቶች"
 
-#: src/pref-manager.c:316
+#: src/pref-manager.c:322
 msgid "8 Bits"
 msgstr "8 ቢቶች"
 
-#: src/pref-manager.c:317
+#: src/pref-manager.c:323
 msgid "Quoted"
 msgstr ""
 
-#: src/pref-manager.c:327
+#: src/pref-manager.c:333
 msgid "While Retrieving Messages"
 msgstr ""
 
-#: src/pref-manager.c:328
+#: src/pref-manager.c:334
 msgid "Until Closed"
 msgstr ""
 
-#: src/pref-manager.c:329 src/pref-manager.c:2948 src/pref-manager.c:2984
-msgid "Never"
-msgstr "በፍጹም"
-
-#: src/pref-manager.c:333
+#: src/pref-manager.c:339
 msgid "Fast"
 msgstr "ቶሎ"
 
-#: src/pref-manager.c:334
+#: src/pref-manager.c:340
 msgid "Normal"
 msgstr "የተለመደ"
 
-#: src/pref-manager.c:335
+#: src/pref-manager.c:341
 msgid "Bad Spellers"
 msgstr ""
 
-#: src/pref-manager.c:339
+#: src/pref-manager.c:345
 msgid "Flat"
 msgstr ""
 
-#: src/pref-manager.c:341
+#: src/pref-manager.c:347
 msgid "JWZ"
 msgstr "JWZ"
 
+#: src/pref-manager.c:351
+#, fuzzy
+msgid "west european (traditional)"
+msgstr "የባሕላዊው ቻይንኛ"
+
+#: src/pref-manager.c:352
+msgid "east european"
+msgstr ""
+
+#: src/pref-manager.c:353
+msgid "south european"
+msgstr ""
+
+#: src/pref-manager.c:354
+msgid "north european"
+msgstr ""
+
+#: src/pref-manager.c:355
+msgid "cyrillic (iso/windows)"
+msgstr ""
+
+#: src/pref-manager.c:356
+msgid "arabic"
+msgstr ""
+
+#: src/pref-manager.c:357
+#, fuzzy
+msgid "greek"
+msgstr "ግሪክኛ"
+
+#: src/pref-manager.c:358
+#, fuzzy
+msgid "hebrew"
+msgstr "ዕብራስጥ"
+
+#: src/pref-manager.c:359
+#, fuzzy
+msgid "turkish"
+msgstr "ቱርክኛ"
+
+#: src/pref-manager.c:360
+msgid "nordic"
+msgstr ""
+
+#: src/pref-manager.c:361
+msgid "thai"
+msgstr ""
+
+#: src/pref-manager.c:362
+msgid "baltic"
+msgstr ""
+
+#: src/pref-manager.c:363
+msgid "celtic"
+msgstr ""
+
+#: src/pref-manager.c:364
+msgid "west european (euro)"
+msgstr ""
+
+#: src/pref-manager.c:365
+#, fuzzy
+msgid "russian (koi)"
+msgstr "ራሽኛ (KOI)"
+
 #: src/pref-manager.c:366
+#, fuzzy
+msgid "ukranian (koi)"
+msgstr "ዩክረኒኛ"
+
+#: src/pref-manager.c:367
+#, fuzzy
+msgid "japanese"
+msgstr "ጃፓንኛ"
+
+#: src/pref-manager.c:368
+#, fuzzy
+msgid "korean"
+msgstr "ኮሪያኛ"
+
+#. must NOT be modal
+#: src/pref-manager.c:388
 msgid "Balsa Preferences"
 msgstr "የባልሳ ምርጫዎች"
 
-#: src/pref-manager.c:392
+#: src/pref-manager.c:414
 msgid "Mail Servers"
 msgstr "የኢሜይል ሰርቨሮች"
 
-#: src/pref-manager.c:396 src/pref-manager.c:2564
+#: src/pref-manager.c:418 src/pref-manager.c:2615
 msgid "Address Books"
 msgstr "የአድራሻ መጽሐፋት"
 
-#: src/pref-manager.c:400
+#: src/pref-manager.c:422
 msgid "Mail Options"
 msgstr "የኢሜይል ምርጫዎች"
 
-#: src/pref-manager.c:404 src/pref-manager.c:1942
+#: src/pref-manager.c:426 src/pref-manager.c:1978
 msgid "Display"
 msgstr "አሳይ"
 
-#: src/pref-manager.c:408 src/toolbar-factory.c:130
+#: src/pref-manager.c:430 src/toolbar-factory.c:130
 msgid "Spelling"
 msgstr "የቃላት አፃፃፍ"
 
-#: src/pref-manager.c:412
+#: src/pref-manager.c:434
 msgid "Misc"
 msgstr "የተለያየ"
 
-#: src/pref-manager.c:416
+#: src/pref-manager.c:438
 msgid "Startup"
 msgstr ""
 
-#: src/pref-manager.c:1230
+#: src/pref-manager.c:1229
 #, c-format
 msgid "%s (default)"
 msgstr "%s (የነበረው)"
 
-#: src/pref-manager.c:1482
+#: src/pref-manager.c:1478
 msgid "Remote Mailbox Servers"
 msgstr "የራቀ ፖስታ ሳጥን ሰርቨሮች"
 
-#: src/pref-manager.c:1503 src/pref-manager.c:2585
+#: src/pref-manager.c:1499 src/pref-manager.c:2636
 msgid "Type"
 msgstr "ዓይነት"
 
-#: src/pref-manager.c:1511
+#: src/pref-manager.c:1507
 msgid "Mailbox Name"
 msgstr "የፖስታ ሳጥን ስም"
 
-#: src/pref-manager.c:1524 src/pref-manager.c:2616
+#: src/pref-manager.c:1520 src/pref-manager.c:2667
 msgid "_Modify"
 msgstr "ለውጡ (_M)"
 
-#: src/pref-manager.c:1539
+#: src/pref-manager.c:1535
 msgid "Local Mail"
 msgstr ""
 
-#: src/pref-manager.c:1541
+#: src/pref-manager.c:1537
 msgid "Select your local mail directory"
 msgstr ""
 
-#: src/pref-manager.c:1561
+#: src/pref-manager.c:1557
 msgid "Outgoing Mail"
 msgstr ""
 
-#: src/pref-manager.c:1566
+#: src/pref-manager.c:1562
 msgid "Remote SMTP Server"
 msgstr ""
 
-#: src/pref-manager.c:1568
+#: src/pref-manager.c:1564
 msgid "User"
 msgstr "ተጠቃሚ"
 
-#: src/pref-manager.c:1571
+#: src/pref-manager.c:1567
 msgid "Pass Phrase"
 msgstr ""
 
 #. STARTTLS
-#: src/pref-manager.c:1575
+#: src/pref-manager.c:1571
 msgid "Use TLS"
 msgstr "TLSን ተጠቀም"
 
-#: src/pref-manager.c:1593
+#: src/pref-manager.c:1589
 msgid "Certificate Pass Phrase"
 msgstr ""
 
-#: src/pref-manager.c:1611
+#: src/pref-manager.c:1607
 msgid "Incoming"
 msgstr ""
 
-#: src/pref-manager.c:1613
+#: src/pref-manager.c:1609
 msgid "Outgoing"
 msgstr ""
 
-#: src/pref-manager.c:1638
+#: src/pref-manager.c:1633
 msgid "Checking"
 msgstr ""
 
-#: src/pref-manager.c:1643
+#: src/pref-manager.c:1638
 msgid "_Check mail automatically every:"
 msgstr ""
 
-#: src/pref-manager.c:1654 src/pref-manager.c:2455
+#: src/pref-manager.c:1649 src/pref-manager.c:2460
 msgid "minutes"
 msgstr "ደቂቃዎች"
 
-#: src/pref-manager.c:1660
+#: src/pref-manager.c:1655
 msgid "Check _IMAP mailboxes"
 msgstr ""
 
-#: src/pref-manager.c:1666
+#: src/pref-manager.c:1661
 msgid "Check INBOX _only"
 msgstr ""
 
-#: src/pref-manager.c:1671
+#: src/pref-manager.c:1666
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr ""
 
-#: src/pref-manager.c:1676
+#: src/pref-manager.c:1671
 msgid "Do background check quietly (no messages in status bar)"
+msgstr ""
+
+#: src/pref-manager.c:1675
+msgid "_POP message size limit:"
+msgstr ""
+
+#: src/pref-manager.c:1682
+msgid "MB"
 msgstr ""
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1695
+#: src/pref-manager.c:1701
 msgid "Quoted and Flowed Text"
 msgstr ""
 
-#: src/pref-manager.c:1699
+#: src/pref-manager.c:1705 src/sendmsg-window.c:4222
 msgid "Quoted Text Regular Expression"
 msgstr ""
 
-#: src/pref-manager.c:1710
+#: src/pref-manager.c:1716
 msgid "Wrap Incoming Text at:"
 msgstr ""
 
-#: src/pref-manager.c:1721 src/pref-manager.c:1856
+#: src/pref-manager.c:1727 src/pref-manager.c:1902
 msgid "characters"
 msgstr "ፊደሎች"
 
-#: src/pref-manager.c:1727
-msgid "Reflow messages of type `text/plain; format=flowed'"
-msgstr ""
-
 #. handling of multipart/alternative
-#: src/pref-manager.c:1743
+#: src/pref-manager.c:1742
 msgid "Display of Multipart/Alternative Parts"
 msgstr ""
 
-#: src/pref-manager.c:1746
+#: src/pref-manager.c:1745
 msgid "prefer text/plain over html"
 msgstr ""
 
-#. How to handle received MDN requests
+#. treatment of messages with 8-bit chars, but without proper MIME encoding
 #: src/pref-manager.c:1763
+msgid "National (8-bit) characters in broken messages without codeset header"
+msgstr ""
+
+#: src/pref-manager.c:1769
+msgid "display as \"?\""
+msgstr ""
+
+#: src/pref-manager.c:1778
+msgid "display using codeset"
+msgstr ""
+
+#. How to handle received MDN requests
+#: src/pref-manager.c:1813
 msgid "Message Disposition Notification Requests"
 msgstr ""
 
-#: src/pref-manager.c:1765
+#: src/pref-manager.c:1815
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
 
-#: src/pref-manager.c:1776
+#: src/pref-manager.c:1826
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
 "I am in the \"To:\" or \"Cc:\" list)."
 msgstr ""
 
-#: src/pref-manager.c:1794
+#: src/pref-manager.c:1844
 msgid "The message header looks suspicious."
 msgstr ""
 
-#: src/pref-manager.c:1834
+#: src/pref-manager.c:1883
 msgid "Word Wrap"
 msgstr ""
 
-#: src/pref-manager.c:1839
+#: src/pref-manager.c:1888
 msgid "Wrap Outgoing Text at:"
 msgstr ""
 
-#: src/pref-manager.c:1862
-msgid "Send message as type `text/plain; format=flowed'"
-msgstr ""
-
-#: src/pref-manager.c:1878
+#: src/pref-manager.c:1916
 msgid "Other Options"
 msgstr "ሌላ ምርጫዎች"
 
-#: src/pref-manager.c:1884
-msgid "External editor command:"
-msgstr ""
-
-#: src/pref-manager.c:1885
+#: src/pref-manager.c:1921
 msgid "Reply Prefix:"
 msgstr ""
 
-#: src/pref-manager.c:1888
+#: src/pref-manager.c:1924
 msgid "Edit headers in external editor"
 msgstr ""
 
-#: src/pref-manager.c:1890
+#: src/pref-manager.c:1926
 msgid "Automatically quote original when replying"
 msgstr ""
 
-#: src/pref-manager.c:1893
+#: src/pref-manager.c:1929
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr ""
 
-#: src/pref-manager.c:1896
+#: src/pref-manager.c:1932
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr ""
 
-#: src/pref-manager.c:1899
+#: src/pref-manager.c:1935
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
 
-#: src/pref-manager.c:1902
+#: src/pref-manager.c:1938
 msgid "Copy outgoing messages to sentbox"
 msgstr ""
 
-#: src/pref-manager.c:1915 src/pref-manager.c:2039
+#: src/pref-manager.c:1951 src/pref-manager.c:2075
 msgid "Encoding"
 msgstr "የሆሄያት ኮድ"
 
-#: src/pref-manager.c:1945
+#: src/pref-manager.c:1981
 msgid "Status Messages"
 msgstr "የሁኔታ መልእክት"
 
-#: src/pref-manager.c:1947
+#: src/pref-manager.c:1983
 msgid "Colors"
 msgstr "ቀለሞች"
 
-#: src/pref-manager.c:1949
+#: src/pref-manager.c:1985
 msgid "Message"
 msgstr "መልእክት"
 
-#: src/pref-manager.c:1951 src/pref-manager.c:2278
+#: src/pref-manager.c:1987 src/pref-manager.c:2284
 msgid "Threading"
 msgstr ""
 
-#: src/pref-manager.c:1976
+#: src/pref-manager.c:2012
 msgid "Main Window"
 msgstr "የዋና መስኮት"
 
-#: src/pref-manager.c:1979
+#: src/pref-manager.c:2015
 msgid "Use preview pane"
 msgstr ""
 
-#: src/pref-manager.c:1981
+#: src/pref-manager.c:2017
 msgid "Show mailbox statistics in left pane"
 msgstr ""
 
-#: src/pref-manager.c:1983
+#: src/pref-manager.c:2019
 msgid "Use alternative main window layout"
 msgstr ""
 
-#: src/pref-manager.c:1985
+#: src/pref-manager.c:2021
 msgid "Automatically view message when mailbox opened"
 msgstr ""
 
-#: src/pref-manager.c:1988
+#: src/pref-manager.c:2024
 msgid "Display message size as number of lines"
 msgstr ""
 
-#: src/pref-manager.c:1993
+#: src/pref-manager.c:2029
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr ""
 
-#: src/pref-manager.c:2004
+#: src/pref-manager.c:2040
 msgid "percent"
 msgstr "መቶኛ"
 
-#: src/pref-manager.c:2019
+#: src/pref-manager.c:2055
 msgid "Display Progress Dialog"
 msgstr ""
 
-#: src/pref-manager.c:2044
+#: src/pref-manager.c:2080
 msgid "Date encoding (for strftime):"
 msgstr ""
 
-#: src/pref-manager.c:2046
+#: src/pref-manager.c:2082
 msgid "Selected headers:"
 msgstr ""
 
-#: src/pref-manager.c:2048
-msgid "Message window title format:"
-msgstr ""
-
-#: src/pref-manager.c:2069 src/pref-manager.c:2074
+#: src/pref-manager.c:2103 src/pref-manager.c:2108
 msgid "Information Messages"
 msgstr ""
 
-#: src/pref-manager.c:2078
+#: src/pref-manager.c:2112
 msgid "Warning Messages"
 msgstr "ማስጠንቀቂያ መልዕክቶች"
 
-#: src/pref-manager.c:2082
+#: src/pref-manager.c:2116
 msgid "Error Messages"
 msgstr "የስህተት መልዕክቶች"
 
-#: src/pref-manager.c:2086
+#: src/pref-manager.c:2120
 msgid "Fatal Error Messages"
 msgstr ""
 
-#: src/pref-manager.c:2090
+#: src/pref-manager.c:2124
 msgid "Debug Messages"
 msgstr ""
 
-#: src/pref-manager.c:2115
-msgid "Mailbox Colors"
-msgstr "የፖስታ ሳጥን ቀለሞች"
-
-#: src/pref-manager.c:2118
-msgid "Mailbox with unread messages color"
-msgstr ""
-
-#: src/pref-manager.c:2132
+#: src/pref-manager.c:2150
 msgid "Message Colors"
 msgstr "የመልእክት ቀለሞች"
 
-#: src/pref-manager.c:2143
+#: src/pref-manager.c:2155
 #, c-format
 msgid "Quote level %d color"
 msgstr ""
 
-#: src/pref-manager.c:2163
+#: src/pref-manager.c:2168
 msgid "Link Color"
 msgstr "ቀለሙን አያይዝ"
 
-#: src/pref-manager.c:2165
+#: src/pref-manager.c:2170
 msgid "Hyperlink color"
 msgstr ""
 
-#: src/pref-manager.c:2176
+#: src/pref-manager.c:2181
 msgid "Composition Window"
 msgstr ""
 
-#: src/pref-manager.c:2180
+#: src/pref-manager.c:2185
 msgid "Invalid or incomplete address label color"
 msgstr ""
 
-#. create a 2nd notebook page for the fonts
-#: src/pref-manager.c:2204 src/print.c:1249
+#: src/pref-manager.c:2210
 msgid "Fonts"
 msgstr "የፊደል ቅርጾች"
 
-#: src/pref-manager.c:2219 src/pref-manager.c:2244
+#: src/pref-manager.c:2225 src/pref-manager.c:2250
 msgid "Select a font to use"
 msgstr ""
 
-#: src/pref-manager.c:2222 src/pref-manager.c:2247
+#: src/pref-manager.c:2228 src/pref-manager.c:2253
 msgid "Select..."
 msgstr "ምርጡ..."
 
-#: src/pref-manager.c:2229
+#: src/pref-manager.c:2235
 msgid "Message Font"
 msgstr ""
 
-#: src/pref-manager.c:2255
+#: src/pref-manager.c:2261
 msgid "Message Subject Font"
 msgstr ""
 
-#: src/pref-manager.c:2281
+#: src/pref-manager.c:2287
 msgid "Expand mailbox tree on open"
 msgstr ""
 
-#: src/pref-manager.c:2285
+#: src/pref-manager.c:2291
 msgid "Default threading style"
 msgstr ""
 
-#: src/pref-manager.c:2366
+#: src/pref-manager.c:2370
 msgid "Pspell Settings"
 msgstr ""
 
-#: src/pref-manager.c:2372
+#: src/pref-manager.c:2376
 msgid "Spell Check Module"
 msgstr ""
 
-#: src/pref-manager.c:2379
+#: src/pref-manager.c:2383
 msgid "Suggestion Level"
 msgstr ""
 
 #. do the ignore length
-#: src/pref-manager.c:2385
+#: src/pref-manager.c:2389
 msgid "Ignore words shorter than"
 msgstr ""
 
-#: src/pref-manager.c:2406
+#: src/pref-manager.c:2410
 msgid "Miscellaneous Spelling Settings"
 msgstr ""
 
-#: src/pref-manager.c:2408
+#: src/pref-manager.c:2412
 msgid "Check signature"
 msgstr ""
 
-#: src/pref-manager.c:2409
+#: src/pref-manager.c:2413
 msgid "Check quoted"
 msgstr ""
 
-#: src/pref-manager.c:2433
+#: src/pref-manager.c:2437
 msgid "Miscellaneous"
 msgstr "የተለያየ"
 
-#: src/pref-manager.c:2435
+#: src/pref-manager.c:2439
 msgid "Debug"
 msgstr "አስተካክል"
 
-#: src/pref-manager.c:2436
+#: src/pref-manager.c:2440
 msgid "Empty Trash on exit"
 msgstr ""
 
-#: src/pref-manager.c:2442
+#: src/pref-manager.c:2446
 msgid "Automatically close mailbox if unused more than"
 msgstr ""
 
-#: src/pref-manager.c:2459
-msgid "Drag-and-drop moves messages by default"
-msgstr ""
-
-#: src/pref-manager.c:2470
+#: src/pref-manager.c:2474
 msgid "Deleting Messages"
 msgstr ""
 
-#: src/pref-manager.c:2473
-msgid "Delete immediately and irretrievably"
-msgstr ""
-
 #: src/pref-manager.c:2476
-msgid "Hide deleted messages"
+msgid ""
+"The following setting is global, but may be overridden\n"
+"for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
 
-#: src/pref-manager.c:2497
+#: src/pref-manager.c:2484
+msgid "Hide messages marked as deleted"
+msgstr ""
+
+#: src/pref-manager.c:2486
+msgid "The following settings are global."
+msgstr ""
+
+#: src/pref-manager.c:2491
+msgid "Expunge deleted messages when mailbox is closed"
+msgstr ""
+
+#: src/pref-manager.c:2498
+msgid " ...and if mailbox is unused more than"
+msgstr ""
+
+#: src/pref-manager.c:2511
+msgid "hours"
+msgstr ""
+
+#: src/pref-manager.c:2533
 msgid "Options"
 msgstr "ምርጫዎች"
 
-#: src/pref-manager.c:2500
+#: src/pref-manager.c:2536
 msgid "Open Inbox upon startup"
 msgstr ""
 
-#: src/pref-manager.c:2502
+#: src/pref-manager.c:2538
 msgid "Check mail upon startup"
 msgstr ""
 
-#: src/pref-manager.c:2504
+#: src/pref-manager.c:2540
 msgid "Remember open mailboxes between sessions"
 msgstr ""
 
-#: src/pref-manager.c:2518
-msgid "IMAP Folder Scanning"
+#: src/pref-manager.c:2554
+msgid "Folder Scanning"
 msgstr ""
 
-#: src/pref-manager.c:2520
+#: src/pref-manager.c:2556
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
 msgstr ""
 
-#: src/pref-manager.c:2531
-msgid "Scan tree to depth"
+#: src/pref-manager.c:2566
+msgid "Scan local folders to depth"
 msgstr ""
 
-#: src/pref-manager.c:2593
+#: src/pref-manager.c:2579
+msgid "Scan IMAP folders to depth"
+msgstr ""
+
+#: src/pref-manager.c:2644
 msgid "Address Book Name"
 msgstr ""
 
-#: src/pref-manager.c:2601
+#: src/pref-manager.c:2652
 msgid "Expand aliases"
 msgstr ""
 
-#: src/pref-manager.c:2620
+#: src/pref-manager.c:2671
 msgid "_Set as default"
 msgstr ""
 
-#: src/pref-manager.c:2776
+#: src/pref-manager.c:2827
 msgid "Remote POP3 mailbox..."
 msgstr ""
 
-#: src/pref-manager.c:2926
+#: src/pref-manager.c:2976
 msgid "Show nothing"
 msgstr ""
 
-#: src/pref-manager.c:2927
+#: src/pref-manager.c:2977
 msgid "Show dialog"
 msgstr ""
 
-#: src/pref-manager.c:2928
+#: src/pref-manager.c:2978
 msgid "Show in list"
 msgstr ""
 
-#: src/pref-manager.c:2929
+#: src/pref-manager.c:2979
+msgid "Show in status bar"
+msgstr ""
+
+#: src/pref-manager.c:2980
 msgid "Print to console"
 msgstr ""
 
-#: src/pref-manager.c:2949
+#: src/pref-manager.c:3000
 msgid "Ask me"
 msgstr ""
 
-#: src/pref-manager.c:2950
+#: src/pref-manager.c:3001
 msgid "Always"
 msgstr "ሁል ጊዜ"
 
-#: src/pref-manager.c:2985
-msgid "If Possible"
-msgstr ""
-
-#: src/pref-manager.c:2986
-msgid "Required"
-msgstr ""
-
-#: src/pref-manager.c:3010
+#: src/pref-manager.c:3105
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr ""
 
-#: src/print.c:247
+#: src/print.c:258 src/print.c:741
 #, c-format
 msgid "Page: %i/%i"
 msgstr "ገጽ፦ %i/%i"
 
+#: src/print.c:667
+msgid ""
+"Preparing an HTML part, which must start on a new page.\n"
+"Print this part?"
+msgstr ""
+
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:755
+#: src/print.c:1007
 msgid "Type:"
 msgstr "ዓይነት፦"
 
-#: src/print.c:758
-msgid "Filename:"
+#: src/print.c:1010
+#, fuzzy
+msgid "File name:"
 msgstr "የፋይል ስም፦"
 
-#: src/print.c:1155
+#: src/print.c:1553
 msgid "Font available for printing"
 msgstr ""
 
-#: src/print.c:1161
+#: src/print.c:1559
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr ""
 
-#: src/print.c:1174
+#: src/print.c:1572
 msgid "Select Font"
 msgstr "የፊደል ቅርጽ ምረጡ"
 
-#: src/print.c:1207
+#: src/print.c:1605
 msgid "Change..."
 msgstr "ለውጥ..."
 
-#: src/print.c:1240
+#: src/print.c:1638
 msgid "Print message"
 msgstr "መልእክት አትም"
 
-#: src/print.c:1252
+#. create a 2nd notebook page for the fonts
+#: src/print.c:1647
+#, fuzzy
+msgid "_Fonts"
+msgstr "የፊደል ቅርጾች"
+
+#: src/print.c:1650
 msgid "Header font"
 msgstr "የገጽ አናትየገጽ ግርጌ የፊደል ቅርጽ"
 
-#: src/print.c:1254
+#: src/print.c:1652
 msgid "Body font"
 msgstr ""
 
-#: src/print.c:1256
+#: src/print.c:1654
 msgid "Footer font"
 msgstr "የገጽ ግርጌ የፊደል ቅርጽ"
 
 #. highlight cited stuff
-#: src/print.c:1260
+#: src/print.c:1658
 msgid "Highlight cited text"
 msgstr ""
 
-#: src/print.c:1289
+#: src/print.c:1662
+msgid "_Enable highlighting of cited text"
+msgstr ""
+
+#: src/print.c:1687
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr ""
 
-#: src/print.c:1384
+#: src/print.c:1792
 msgid "Balsa: message print preview"
 msgstr ""
 
-#: src/save-restore.c:554
+#: src/save-restore.c:591
 msgid "Error during filters loading: "
 msgstr ""
 
-#: src/save-restore.c:556
+#: src/save-restore.c:593
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
 "Filters may not be correct."
 msgstr ""
 
-#: src/sendmsg-window.c:178
+#: src/save-restore.c:703
+msgid "The option not to recognize \"format=flowed\" text has been removed."
+msgstr ""
+
+#: src/save-restore.c:956
+msgid ""
+"The option not to send \"format=flowed\" is now on the Options menu of the "
+"compose window."
+msgstr ""
+
+#: src/save-restore.c:988
+msgid ""
+"The option to request a MDN is now on the Options menu of the compose window."
+msgstr ""
+
+#: src/save-restore.c:1724
+msgid "Filter with no condition was ignored"
+msgstr ""
+
+#: src/save-restore.c:1902
+msgid "Error opening GConf database\n"
+msgstr ""
+
+#: src/save-restore.c:1910 src/save-restore.c:1921
+#, c-format
+msgid "Error setting GConf field: %s\n"
+msgstr ""
+
+#: src/sendmsg-window.c:218
+#, fuzzy
+msgid "_Brazilian"
+msgstr "ፖርቱጋልኛ (የብራዚል)"
+
+#: src/sendmsg-window.c:219
+#, fuzzy
+msgid "_Catalan"
+msgstr "ካታላን"
+
+#: src/sendmsg-window.c:220
+#, fuzzy
+msgid "_Chinese Simplified"
+msgstr "ቀላል ቻይንኛ"
+
+#: src/sendmsg-window.c:221
+#, fuzzy
+msgid "_Chinese Traditional"
+msgstr "የባሕላዊው ቻይንኛ"
+
+#: src/sendmsg-window.c:222
+#, fuzzy
+msgid "_Czech"
+msgstr "ቼክኛ"
+
+#: src/sendmsg-window.c:223
+#, fuzzy
+msgid "_Danish"
+msgstr "ዴኒሽ"
+
+#: src/sendmsg-window.c:224
+#, fuzzy
+msgid "_Dutch"
+msgstr "ደች"
+
+#: src/sendmsg-window.c:225
+msgid "_English (American)"
+msgstr ""
+
+#: src/sendmsg-window.c:226
+msgid "_English (British)"
+msgstr ""
+
+#: src/sendmsg-window.c:227
+#, fuzzy
+msgid "_Esperanto"
+msgstr "ኤስፐራንቶ"
+
+#: src/sendmsg-window.c:228
+#, fuzzy
+msgid "_Estonian"
+msgstr "ኤስቶኒአን"
+
+#: src/sendmsg-window.c:229
+#, fuzzy
+msgid "_Finnish"
+msgstr "ፊኒሽ"
+
+#: src/sendmsg-window.c:230
+#, fuzzy
+msgid "_French"
+msgstr "ፈረንሳይኛ"
+
+#: src/sendmsg-window.c:231
+#, fuzzy
+msgid "_German"
+msgstr "ጀርመን"
+
+#: src/sendmsg-window.c:232
+#, fuzzy
+msgid "_Greek"
+msgstr "ግሪክኛ"
+
+#: src/sendmsg-window.c:233
+#, fuzzy
+msgid "_Hebrew"
+msgstr "ዕብራስጥ"
+
+#: src/sendmsg-window.c:234
+#, fuzzy
+msgid "_Hungarian"
+msgstr "ሀንጋሪኛ"
+
+#: src/sendmsg-window.c:235
+#, fuzzy
+msgid "_Italian"
+msgstr "ጣሊያንኛ"
+
+#: src/sendmsg-window.c:236
+#, fuzzy
+msgid "_Japanese"
+msgstr "ጃፓንኛ"
+
+#: src/sendmsg-window.c:237
+#, fuzzy
+msgid "_Korean"
+msgstr "ኮሪያኛ"
+
+#: src/sendmsg-window.c:238
+#, fuzzy
+msgid "_Latvian"
+msgstr "ላትቪያን"
+
+#: src/sendmsg-window.c:239
+#, fuzzy
+msgid "_Lithuanian"
+msgstr "ሊቱአኒያን"
+
+#: src/sendmsg-window.c:240
+#, fuzzy
+msgid "_Norwegian"
+msgstr "ኖርዌጂያን"
+
+#: src/sendmsg-window.c:241
+#, fuzzy
+msgid "_Polish"
+msgstr "ፖሊሽ"
+
+#: src/sendmsg-window.c:242
+#, fuzzy
+msgid "_Portugese"
+msgstr "ፖርቱጋልኛ"
+
+#: src/sendmsg-window.c:243
+#, fuzzy
+msgid "_Romanian"
+msgstr "ሮማኒያን"
+
+#: src/sendmsg-window.c:244
+#, fuzzy
+msgid "_Russian (ISO)"
+msgstr "ራሽኛ (ISO)"
+
+#: src/sendmsg-window.c:245
+#, fuzzy
+msgid "_Russian (KOI)"
+msgstr "ራሽኛ (KOI)"
+
+#: src/sendmsg-window.c:246
+#, fuzzy
+msgid "_Serbian"
+msgstr "ላክ (_S)"
+
+#: src/sendmsg-window.c:247
+msgid "_Serbian (Latin)"
+msgstr ""
+
+#: src/sendmsg-window.c:248
+#, fuzzy
+msgid "_Slovak"
+msgstr "ስሎቫክኛ"
+
+#: src/sendmsg-window.c:249
+#, fuzzy
+msgid "_Spanish"
+msgstr "ስፓኒሽ"
+
+#: src/sendmsg-window.c:250
+#, fuzzy
+msgid "_Swedish"
+msgstr "ስዊድንኛ"
+
+#: src/sendmsg-window.c:251
+#, fuzzy
+msgid "_Turkish"
+msgstr "ቱርክኛ"
+
+#: src/sendmsg-window.c:252
+#, fuzzy
+msgid "_Ukrainian"
+msgstr "ዩክረኒኛ"
+
+#: src/sendmsg-window.c:253
+#, fuzzy
+msgid "_Generic UTF-8"
+msgstr "አጠቃላይ UTF-8"
+
+#: src/sendmsg-window.c:277
+msgid "_GnuPG uses MIME mode"
+msgstr ""
+
+#: src/sendmsg-window.c:283
+msgid "_GnuPG uses old OpenPGP mode"
+msgstr ""
+
+#: src/sendmsg-window.c:290
+msgid "_S/MIME mode (GpgSM)"
+msgstr ""
+
+#: src/sendmsg-window.c:305 src/sendmsg-window.c:477
 msgid "_Include File..."
 msgstr ""
 
-#: src/sendmsg-window.c:181
+#: src/sendmsg-window.c:308 src/sendmsg-window.c:490
 msgid "_Attach File..."
 msgstr "ፋይል አያያዝ... (_A)"
 
-#: src/sendmsg-window.c:184
-msgid "_Include Message(s)"
-msgstr ""
+#: src/sendmsg-window.c:311 src/sendmsg-window.c:479
+#, fuzzy
+msgid "I_nclude Message(s)"
+msgstr "መልእክት(ቶች) አያያዝ... (_M)"
 
-#: src/sendmsg-window.c:187
+#: src/sendmsg-window.c:314 src/sendmsg-window.c:482
 msgid "Attach _Message(s)"
 msgstr "መልእክት(ቶች) አያያዝ... (_M)"
 
-#: src/sendmsg-window.c:193
-msgid "_Send"
-msgstr "ላክ (_S)"
+#: src/sendmsg-window.c:320 src/sendmsg-window.c:507
+#, fuzzy
+msgid "Sen_d"
+msgstr "ላክ"
 
-#: src/sendmsg-window.c:194 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:321 src/sendmsg-window.c:508 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "ይህን መልእክት ላክ"
 
-#: src/sendmsg-window.c:198
+#: src/sendmsg-window.c:325
 msgid "_Queue"
 msgstr ""
 
-#: src/sendmsg-window.c:199
+#: src/sendmsg-window.c:326 src/sendmsg-window.c:513
 msgid "Queue this message in Outbox for sending"
 msgstr ""
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:330
 msgid "_Postpone"
 msgstr ""
 
-#: src/sendmsg-window.c:206 src/store-address.c:114
+#: src/sendmsg-window.c:333 src/sendmsg-window.c:494
 msgid "_Save"
 msgstr "አስቀምጥ (_S)"
 
-#: src/sendmsg-window.c:207
+#: src/sendmsg-window.c:334 src/sendmsg-window.c:495
 msgid "Save this message"
 msgstr "ይህን መልእክት አስቀምጥ"
 
-#: src/sendmsg-window.c:211
-msgid "Print..."
-msgstr "አትም..."
-
-#: src/sendmsg-window.c:211
+#: src/sendmsg-window.c:338 src/sendmsg-window.c:499
 msgid "Print the edited message"
 msgstr ""
 
-#: src/sendmsg-window.c:228
-msgid "_Select All"
-msgstr "ሁሉንም ምረጡ (_S)"
-
-#: src/sendmsg-window.c:233
+#: src/sendmsg-window.c:367 src/sendmsg-window.c:524
 msgid "_Wrap Body"
 msgstr ""
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:371 src/sendmsg-window.c:528
+msgid "_Reflow Selected Text"
+msgstr ""
+
+#: src/sendmsg-window.c:376 src/sendmsg-window.c:556
 msgid "Insert Si_gnature"
 msgstr ""
 
-#: src/sendmsg-window.c:242
+#: src/sendmsg-window.c:380 src/sendmsg-window.c:532
 msgid "_Quote Message(s)"
 msgstr ""
 
-#: src/sendmsg-window.c:247
-msgid "_Reflow Paragraph"
-msgstr ""
-
-#: src/sendmsg-window.c:251
-msgid "R_eflow Message"
-msgstr ""
-
-#: src/sendmsg-window.c:256
+#: src/sendmsg-window.c:385 src/sendmsg-window.c:605
 msgid "C_heck Spelling"
 msgstr "የቃላት አጻጻፉን አጣራ (_H)"
 
-#: src/sendmsg-window.c:257
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:606
 msgid "Check the spelling of the message"
 msgstr ""
 
-#: src/sendmsg-window.c:262
+#: src/sendmsg-window.c:391 src/sendmsg-window.c:612
 msgid "Select _Identity..."
 msgstr ""
 
-#: src/sendmsg-window.c:263
+#: src/sendmsg-window.c:392 src/sendmsg-window.c:613
 msgid "Select the Identity to use for the message"
 msgstr ""
 
-#: src/sendmsg-window.c:268
+#: src/sendmsg-window.c:397
 msgid "_Edit with Gnome-Editor"
 msgstr ""
 
-#: src/sendmsg-window.c:269
+#: src/sendmsg-window.c:398
 msgid "Edit the current message with the default Gnome editor"
 msgstr ""
 
-#: src/sendmsg-window.c:281
+#: src/sendmsg-window.c:410 src/sendmsg-window.c:569
 msgid "Fr_om"
 msgstr "ከ (_O)"
 
-#: src/sendmsg-window.c:283
-msgid "_To"
-msgstr "ወደ (_T)"
-
-#: src/sendmsg-window.c:287
+#: src/sendmsg-window.c:412 src/sendmsg-window.c:571
 msgid "_Cc"
 msgstr "_Cc"
 
-#: src/sendmsg-window.c:289
+#: src/sendmsg-window.c:414 src/sendmsg-window.c:573
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: src/sendmsg-window.c:291
+#: src/sendmsg-window.c:416 src/sendmsg-window.c:575
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:293
+#: src/sendmsg-window.c:418
 msgid "_Reply To"
 msgstr ""
 
-#: src/sendmsg-window.c:295
-msgid "_Attachments"
-msgstr ""
-
-#: src/sendmsg-window.c:298
-msgid "_Comments"
-msgstr "አስተያየቶች"
-
-#: src/sendmsg-window.c:301
-msgid "_Keywords"
-msgstr "ቁልፍ ቃላት"
-
-#: src/sendmsg-window.c:318 src/sendmsg-window.c:389
-msgid "Brazilian"
-msgstr "ፖርቱጋልኛ (የብራዚል)"
-
-#: src/sendmsg-window.c:320 src/sendmsg-window.c:391
-msgid "Catalan"
-msgstr "ካታላን"
-
-#: src/sendmsg-window.c:322 src/sendmsg-window.c:393
-msgid "Chinese Simplified"
-msgstr "ቀላል ቻይንኛ"
-
-#: src/sendmsg-window.c:324 src/sendmsg-window.c:395
-msgid "Chinese Traditional"
-msgstr "የባሕላዊው ቻይንኛ"
-
-#: src/sendmsg-window.c:326 src/sendmsg-window.c:397
-msgid "Czech"
-msgstr "ቼክኛ"
-
-#: src/sendmsg-window.c:328 src/sendmsg-window.c:399
-msgid "Danish"
-msgstr "ዴኒሽ"
-
-#: src/sendmsg-window.c:330 src/sendmsg-window.c:411
-msgid "German"
-msgstr "ጀርመን"
-
-#: src/sendmsg-window.c:332 src/sendmsg-window.c:401
-msgid "Dutch"
-msgstr "ደች"
-
-#. English -> American English, argh...
-#: src/sendmsg-window.c:335 src/sendmsg-window.c:403
-msgid "English"
-msgstr "እንግሊዝኛ"
-
-#: src/sendmsg-window.c:337 src/sendmsg-window.c:405
-msgid "Esperanto"
-msgstr "ኤስፐራንቶ"
-
-#: src/sendmsg-window.c:339
-msgid "Estonian"
-msgstr "ኤስቶኒአን"
-
-#: src/sendmsg-window.c:341 src/sendmsg-window.c:407
-msgid "Finnish"
-msgstr "ፊኒሽ"
-
-#: src/sendmsg-window.c:343 src/sendmsg-window.c:409
-msgid "French"
-msgstr "ፈረንሳይኛ"
-
-#: src/sendmsg-window.c:345 src/sendmsg-window.c:413
-msgid "Greek"
-msgstr "ግሪክኛ"
-
-#: src/sendmsg-window.c:347 src/sendmsg-window.c:415
-msgid "Hebrew"
-msgstr "ዕብራስጥ"
-
-#: src/sendmsg-window.c:349 src/sendmsg-window.c:417
-msgid "Hungarian"
-msgstr "ሀንጋሪኛ"
-
-#: src/sendmsg-window.c:351 src/sendmsg-window.c:419
-msgid "Italian"
-msgstr "ጣሊያንኛ"
-
-#: src/sendmsg-window.c:353 src/sendmsg-window.c:421
-msgid "Japanese"
-msgstr "ጃፓንኛ"
-
-#: src/sendmsg-window.c:355 src/sendmsg-window.c:427
-msgid "Korean"
-msgstr "ኮሪያኛ"
-
-#: src/sendmsg-window.c:357 src/sendmsg-window.c:429
-msgid "Latvian"
-msgstr "ላትቪያን"
-
-#: src/sendmsg-window.c:359 src/sendmsg-window.c:431
-msgid "Lithuanian"
-msgstr "ሊቱአኒያን"
-
-#: src/sendmsg-window.c:361 src/sendmsg-window.c:433
-msgid "Norwegian"
-msgstr "ኖርዌጂያን"
-
-#: src/sendmsg-window.c:363 src/sendmsg-window.c:435
-msgid "Polish"
-msgstr "ፖሊሽ"
-
-#: src/sendmsg-window.c:365 src/sendmsg-window.c:437
-msgid "Portugese"
-msgstr "ፖርቱጋልኛ"
-
-#: src/sendmsg-window.c:367 src/sendmsg-window.c:439
-msgid "Romanian"
-msgstr "ሮማኒያን"
-
-#: src/sendmsg-window.c:369 src/sendmsg-window.c:441
-msgid "Russian (ISO)"
-msgstr "ራሽኛ (ISO)"
-
-#: src/sendmsg-window.c:371 src/sendmsg-window.c:443
-msgid "Russian (KOI)"
-msgstr "ራሽኛ (KOI)"
-
-#: src/sendmsg-window.c:373 src/sendmsg-window.c:445
-msgid "Slovak"
-msgstr "ስሎቫክኛ"
-
-#: src/sendmsg-window.c:375 src/sendmsg-window.c:447
-msgid "Spanish"
-msgstr "ስፓኒሽ"
-
-#: src/sendmsg-window.c:377 src/sendmsg-window.c:449
-msgid "Swedish"
-msgstr "ስዊድንኛ"
-
-#: src/sendmsg-window.c:379 src/sendmsg-window.c:451
-msgid "Turkish"
-msgstr "ቱርክኛ"
-
-#: src/sendmsg-window.c:381 src/sendmsg-window.c:453
-msgid "Ukrainian"
-msgstr "ዩክረኒኛ"
-
-#: src/sendmsg-window.c:383
-msgid "Generic UTF-8"
-msgstr "አጠቃላይ UTF-8"
-
-#: src/sendmsg-window.c:455
-msgid "UTF-8"
-msgstr "UTF-8"
-
-#: src/sendmsg-window.c:463
-msgid "_A-J"
-msgstr "_A-J"
-
-#: src/sendmsg-window.c:464
-msgid "_K-Z"
-msgstr "_K-Z"
-
-#: src/sendmsg-window.c:475
+#: src/sendmsg-window.c:424 src/sendmsg-window.c:617
 msgid "_Request Disposition Notification"
 msgstr ""
 
-#: src/sendmsg-window.c:477
-msgid "_Always Queue Sent Mail"
+#: src/sendmsg-window.c:427 src/sendmsg-window.c:587
+msgid "_Format = Flowed"
 msgstr ""
 
-#: src/sendmsg-window.c:520
+#: src/sendmsg-window.c:432 src/sendmsg-window.c:592
+#, fuzzy
+msgid "_Sign Message"
+msgstr "መልእክት (_M)"
+
+#: src/sendmsg-window.c:433 src/sendmsg-window.c:593
+msgid "signs the message using GnuPG"
+msgstr ""
+
+#: src/sendmsg-window.c:436 src/sendmsg-window.c:596
+#, fuzzy
+msgid "_Encrypt Message"
+msgstr "የስህተት መልዕክቶች"
+
+#: src/sendmsg-window.c:437 src/sendmsg-window.c:597
+msgid "signs the message using GnuPG for all To: and CC: recipients"
+msgstr ""
+
+#: src/sendmsg-window.c:457 src/sendmsg-window.c:633
 msgid "_Show"
 msgstr "አሳይ (_S)"
 
-#: src/sendmsg-window.c:522
+#: src/sendmsg-window.c:459 src/sendmsg-window.c:610
 msgid "_Language"
 msgstr "ቋንቋ (_L)"
 
-#: src/sendmsg-window.c:524
+#: src/sendmsg-window.c:461
 msgid "_Options"
 msgstr "ምርጫዎች (_O)"
 
-#: src/sendmsg-window.c:582
+#: src/sendmsg-window.c:503
+msgid "Sa_ve and Close"
+msgstr ""
+
+#: src/sendmsg-window.c:512
+msgid "Send _Later"
+msgstr ""
+
+#: src/sendmsg-window.c:733
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr ""
 
-#: src/sendmsg-window.c:1148
+#: src/sendmsg-window.c:985
+msgid "Gnome editor is not defined in your preferred applications."
+msgstr ""
+
+#: src/sendmsg-window.c:1434
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4182,265 +4838,285 @@ msgid ""
 "Do you really want to attach this file as reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1159
+#: src/sendmsg-window.c:1445
 msgid "Attach as Reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1250
+#: src/sendmsg-window.c:1535
 msgid "Remove"
 msgstr "አስወግድ"
 
-#: src/sendmsg-window.c:1261
+#: src/sendmsg-window.c:1546
 msgid "attach as reference"
 msgstr ""
 
-#: src/sendmsg-window.c:1267
+#: src/sendmsg-window.c:1552
 msgid "attach as file"
 msgstr ""
 
-#: src/sendmsg-window.c:1422
+#: src/sendmsg-window.c:1686
+#, c-format
+msgid "Error converting \"%s\" to UTF-8: %s\n"
+msgstr ""
+
+#: src/sendmsg-window.c:1723
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr ""
 
-#: src/sendmsg-window.c:1427
+#: src/sendmsg-window.c:1728
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr ""
 
-#: src/sendmsg-window.c:1430
+#: src/sendmsg-window.c:1731
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr ""
 
-#: src/sendmsg-window.c:1484
+#: src/sendmsg-window.c:1775
 msgid "Attach file"
 msgstr ""
 
-#: src/sendmsg-window.c:1578 src/sendmsg-window.c:1615
-#: src/sendmsg-window.c:2721
+#: src/sendmsg-window.c:1872 src/sendmsg-window.c:1935
+#: src/sendmsg-window.c:3264
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr ""
 
 #. From:
-#: src/sendmsg-window.c:1815
+#: src/sendmsg-window.c:2130
 msgid "F_rom:"
 msgstr "ከ፦ (_R)"
 
 #. Subject:
-#: src/sendmsg-window.c:1827
+#: src/sendmsg-window.c:2142
 msgid "S_ubject:"
 msgstr "ጉዳዩ፦ (_U)"
 
-#. fcc:
-#: src/sendmsg-window.c:1841
+#. fcc: mailbox folder where the message copy will be written to
+#: src/sendmsg-window.c:2156
 msgid "F_cc:"
 msgstr "F_cc፦"
 
 #. Reply To:
-#: src/sendmsg-window.c:1870
+#: src/sendmsg-window.c:2187
 msgid "_Reply To:"
 msgstr ""
 
 #. Attachment list
-#: src/sendmsg-window.c:1877
+#: src/sendmsg-window.c:2192
 msgid "_Attachments:"
 msgstr ""
 
-#. Comments:
-#: src/sendmsg-window.c:1924
-msgid "Comments:"
-msgstr "አስተያየቶች፦"
-
-#. Keywords:
-#: src/sendmsg-window.c:1927
-msgid "Keywords:"
-msgstr "ቁልፍ ቃላት፦"
-
-#: src/sendmsg-window.c:2102
+#: src/sendmsg-window.c:2433
 msgid "you"
 msgstr "እርሶ"
 
-#: src/sendmsg-window.c:2109
+#: src/sendmsg-window.c:2442
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr ""
 
-#: src/sendmsg-window.c:2115
-#, c-format
-msgid "Date: %s\n"
-msgstr "ቀን፦ %s\n"
-
-#: src/sendmsg-window.c:2129
-#, c-format
-msgid "From: %s\n"
-msgstr "ከ፦ %s\n"
-
-#: src/sendmsg-window.c:2137
-#, c-format
-msgid "To: %s\n"
-msgstr "ወደ፦ %s\n"
-
-#: src/sendmsg-window.c:2145
-#, c-format
-msgid "CC: %s\n"
-msgstr "CC፦ %s\n"
-
-#: src/sendmsg-window.c:2151
+#: src/sendmsg-window.c:2477
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "የመልእክት-ID፦ %s\n"
 
-#: src/sendmsg-window.c:2158
-#, c-format
-msgid "References: %s"
-msgstr ""
+#: src/sendmsg-window.c:2483
+#, fuzzy
+msgid "References:"
+msgstr "የባልሳ ምርጫዎች"
 
-#: src/sendmsg-window.c:2175
-#, c-format
-msgid "On %s %s wrote:\n"
-msgstr ""
+#: src/sendmsg-window.c:2494
+#, fuzzy, c-format
+msgid "On %s, %s wrote:\n"
+msgstr "%sን የተፃፈ፦\n"
 
-#: src/sendmsg-window.c:2177
+#: src/sendmsg-window.c:2496
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%sን የተፃፈ፦\n"
 
-#: src/sendmsg-window.c:2886
+#: src/sendmsg-window.c:3420
 msgid "Choose charset"
 msgstr ""
 
-#: src/sendmsg-window.c:2893
+#: src/sendmsg-window.c:3427
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
-"Please choose the charset used to encode the file."
+"Please choose the charset used to encode the file.\n"
+"(choose Generic UTF-8 if unsure)."
 msgstr ""
 
-#: src/sendmsg-window.c:2959
+#: src/sendmsg-window.c:3494
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "ፋይሉ %sን መክፈት አልተቻለም።\n"
 
-#: src/sendmsg-window.c:2980
+#: src/sendmsg-window.c:3516
 msgid "Include file"
 msgstr ""
 
-#: src/sendmsg-window.c:3233
+#: src/sendmsg-window.c:3811
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
-"Please choose a language for this message."
+"Please choose a language for this message.\n"
+"For multi-language messages, choose UTF-8."
 msgstr ""
 
-#: src/sendmsg-window.c:3925
+#: src/sendmsg-window.c:3852
+msgid ""
+"You selected OpenPGP mode for a message with attachments. In this mode, only "
+"the first part will be signed and/or encrypted. You should select MIME mode "
+"if the complete message shall be protected. Do you really want to proceed?"
+msgstr ""
+
+#: src/sendmsg-window.c:3868
+#, c-format
+msgid "sending message with gpg mode %d"
+msgstr ""
+
+#: src/sendmsg-window.c:3913
+msgid "Message could not be created"
+msgstr ""
+
+#: src/sendmsg-window.c:3915
+msgid "Message could not be queued in outbox"
+msgstr ""
+
+#: src/sendmsg-window.c:3917
+msgid "Message could not be saved in senbox"
+msgstr ""
+
+#: src/sendmsg-window.c:3919
+#, fuzzy
+msgid "Message could not be sent"
+msgstr "የመልእክት ቀለሞች"
+
+#: src/sendmsg-window.c:3923
+#, c-format
+msgid "Send failed: %s"
+msgstr ""
+
+#: src/sendmsg-window.c:4007
+#, fuzzy
+msgid "Could not postpone message."
+msgstr "%sን መክፈት አልተቻለም"
+
+#: src/sendmsg-window.c:4021
+#, fuzzy
+msgid "Message postponed."
+msgstr "የመልእክት ቀለሞች"
+
+#: src/sendmsg-window.c:4037
+#, fuzzy, c-format
+msgid "Could not open draftbox: %s"
+msgstr "%sን መክፈት አልተቻለም"
+
+#: src/sendmsg-window.c:4059
+#, fuzzy
+msgid "Message saved."
+msgstr "መልእክት"
+
+#: src/sendmsg-window.c:4221
+#, fuzzy, c-format
+msgid "Could not compile %s"
+msgstr "%sን መክፈት አልተቻለም"
+
+#: src/sendmsg-window.c:4709
 #, c-format
 msgid "Reply to %s: %s"
 msgstr ""
 
-#: src/sendmsg-window.c:3930
+#: src/sendmsg-window.c:4714
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr ""
 
-#: src/sendmsg-window.c:3934
+#: src/sendmsg-window.c:4718
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr ""
 
-#: src/sendmsg-window.c:3938
+#: src/sendmsg-window.c:4722
 #, c-format
 msgid "New message to %s: %s"
 msgstr ""
 
-#: src/spell-check.c:497
+#: src/spell-check.c:509
 msgid "Replace the current word with the selected suggestion"
 msgstr ""
 
-#: src/spell-check.c:505
+#: src/spell-check.c:517
 msgid "Replace all occurences of the current word with the selected suggestion"
 msgstr ""
 
-#: src/spell-check.c:517
+#: src/spell-check.c:529
 msgid "Skip the current word"
 msgstr ""
 
-#: src/spell-check.c:523
+#: src/spell-check.c:535
 msgid "Skip all occurrences of the current word"
 msgstr ""
 
-#: src/spell-check.c:533
+#: src/spell-check.c:545
 msgid "Add the current word to your personal dictionary"
 msgstr ""
 
-#: src/spell-check.c:542
+#: src/spell-check.c:554
 msgid "Finish spell checking"
 msgstr ""
 
-#: src/spell-check.c:547
+#: src/spell-check.c:559
 msgid "Revert all changes and finish spell checking"
 msgstr ""
 
-#: src/spell-check.c:578
+#: src/spell-check.c:590
 msgid "Spell check"
 msgstr ""
 
-#: src/store-address.c:99
+#: src/store-address.c:101
 msgid "Store address: no addresses"
 msgstr ""
 
-#: src/store-address.c:110
+#: src/store-address.c:178
 msgid "Store Address"
 msgstr ""
 
-#: src/store-address.c:125
+#: src/store-address.c:193
 msgid "Save this address and close the dialog?"
 msgstr ""
 
-#: src/store-address.c:148
+#: src/store-address.c:210
 msgid "No address book selected...."
 msgstr ""
 
-#: src/store-address.c:160
-msgid "Sorry, no semicolons are allowed in the name!\n"
+#: src/store-address.c:223
+msgid "Address could not be written to this address book."
 msgstr ""
 
-#: src/store-address.c:219
+#: src/store-address.c:226
+msgid "Address book could not be accessed."
+msgstr ""
+
+#: src/store-address.c:228
+msgid "This mail address is already in this address book."
+msgstr ""
+
+#: src/store-address.c:231
+msgid "Unexpected address book error. Report it."
+msgstr ""
+
+#: src/store-address.c:247
 msgid "Choose Address Book"
 msgstr ""
 
-#: src/store-address.c:263
+#: src/store-address.c:290
 msgid "Choose Address"
 msgstr ""
-
-#: src/store-address.c:309
-msgid "_Displayed Name:"
-msgstr ""
-
-#: src/store-address.c:310
-msgid "_First Name:"
-msgstr "ስም፦ (_F)"
-
-#: src/store-address.c:311
-msgid "_Middle Name:"
-msgstr "የአባት ስም፦ (_M)"
-
-#: src/store-address.c:312
-msgid "_Last Name:"
-msgstr "የአያት ስም፦ (_L)"
-
-#: src/store-address.c:313
-msgid "_Nickname:"
-msgstr "ቅጽል ስም፦ (_N)"
-
-#: src/store-address.c:314
-msgid "O_rganization:"
-msgstr ""
-
-#: src/store-address.c:315
-msgid "_Email Address:"
-msgstr "ኢሜያል አድራሻ፦ (_E)"
 
 #: src/toolbar-factory.c:91
 msgid "Separator"
@@ -4493,10 +5169,6 @@ msgstr ""
 #: src/toolbar-factory.c:104
 msgid "Forward"
 msgstr "ወደፊት"
-
-#: src/toolbar-factory.c:105
-msgid "Forward the current message"
-msgstr ""
 
 #: src/toolbar-factory.c:106
 msgid "Previous"
@@ -4592,8 +5264,12 @@ msgstr ""
 msgid "Run a spell check"
 msgstr ""
 
+#: src/toolbar-factory.c:132 src/toolbar-factory.c:142
+msgid "Close"
+msgstr "ዝጋ"
+
 #: src/toolbar-factory.c:133
-msgid "Cancel this message"
+msgid "Close the compose window"
 msgstr ""
 
 #: src/toolbar-factory.c:134
@@ -4632,14 +5308,6 @@ msgstr "ሁሉንም የገጽ አናቶች አሳይ"
 msgid "Empty Trash"
 msgstr "የማይፈለግ ማድረጊያውን ባዶ አድርግ"
 
-#: src/toolbar-factory.c:141
-msgid "Delete messages from the trash mailbox"
-msgstr ""
-
-#: src/toolbar-factory.c:142
-msgid "Close"
-msgstr "ዝጋ"
-
 #: src/toolbar-factory.c:143
 msgid "Close current mailbox"
 msgstr ""
@@ -4652,14 +5320,48 @@ msgstr "የምርጫዎች ቅድመ ዕይታ"
 msgid "Show preview pane"
 msgstr ""
 
-#: src/toolbar-factory.c:227
+#: src/toolbar-factory.c:147
+msgid "Sign"
+msgstr ""
+
+#: src/toolbar-factory.c:148
+msgid "Sign message using GPG"
+msgstr ""
+
+#: src/toolbar-factory.c:149
+msgid "Encrypt"
+msgstr ""
+
+#: src/toolbar-factory.c:150
+msgid "Encrypt message using GPG"
+msgstr ""
+
+#: src/toolbar-factory.c:152
+msgid "Undo"
+msgstr ""
+
+#: src/toolbar-factory.c:153
+msgid "Undo most recent change"
+msgstr ""
+
+#: src/toolbar-factory.c:154
+#, fuzzy
+msgid "Redo"
+msgstr "አስወግድ"
+
+#: src/toolbar-factory.c:155
+msgid "Redo most recent change"
+msgstr ""
+
+#: src/toolbar-factory.c:237
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr ""
 
 #: src/toolbar-prefs.c:136
-msgid "Customize"
-msgstr "አስተካክል"
+#, fuzzy
+msgid "Customize Toolbars"
+msgstr "ቱልባሮቹን አስተካክል"
 
 #: src/toolbar-prefs.c:157
 msgid "Main window"
@@ -4681,35 +5383,137 @@ msgstr "የቱልባር ምርጫዎች"
 msgid "_Wrap button labels"
 msgstr ""
 
-#: src/toolbar-prefs.c:376
+#: src/toolbar-prefs.c:377
 #, c-format
 msgid "Error displaying toolbar help: %s\n"
 msgstr ""
 
 #. Preview display
-#: src/toolbar-prefs.c:410
+#: src/toolbar-prefs.c:412
 msgid "Preview"
 msgstr "ቅድመ ዕይታ"
 
-#: src/toolbar-prefs.c:438
+#: src/toolbar-prefs.c:440
 msgid "_Restore toolbar to standard buttons"
 msgstr ""
 
-#: src/toolbar-prefs.c:457
+#: src/toolbar-prefs.c:459
 msgid "Available buttons"
 msgstr ""
 
-#: src/toolbar-prefs.c:473
+#: src/toolbar-prefs.c:475
 msgid "Current toolbar"
 msgstr "የአሁኑን ቱልባር"
 
-#: src/toolbar-prefs.c:490
+#: src/toolbar-prefs.c:492
 msgid "Up"
 msgstr "ወደ ላይ"
 
-#: src/toolbar-prefs.c:506
+#: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "ወደ ታች"
 
-#~ msgid "_Cancel"
-#~ msgstr "ተወው (_C)"
+#~ msgid "From: %d <%s>"
+#~ msgstr "ከ፦ %d <%s>"
+
+#~ msgid "To: %d <%s>"
+#~ msgstr "ወደ፦ %d <%s>"
+
+#~ msgid "To %s: %d %s"
+#~ msgstr "ወደ %s፦ %d %s"
+
+#~ msgid "[-- on %s --]\n"
+#~ msgstr "[-- አብራ %s --]\n"
+
+#~ msgid "Create %s?"
+#~ msgstr "%sን ፍጠር?"
+
+#~ msgid "Continue?"
+#~ msgstr "ቀጥል?"
+
+#~ msgid "%s [%s]\n"
+#~ msgstr "%s [%s]\n"
+
+#~ msgid "I/O error"
+#~ msgstr "I/O ስህተት"
+
+#~ msgid "   from %s"
+#~ msgstr "   ከ %s"
+
+#~ msgid "     to %s"
+#~ msgstr "     ወደ %s"
+
+#~ msgid "roa"
+#~ msgstr "roa"
+
+#~ msgid "ro"
+#~ msgstr "ro"
+
+#~ msgid "Exit  "
+#~ msgstr "ውጣ"
+
+#~ msgid "Help"
+#~ msgstr "መረጃ"
+
+#~ msgid "_File name"
+#~ msgstr "የፋይል ስም (_F)"
+
+#~ msgid "Filename: %s"
+#~ msgstr "የፋይል ስም፦ %s"
+
+#~ msgid "Use SS_L (IMAPS)"
+#~ msgstr "SS_Lን (IMAPS) ተጠቀም"
+
+#~ msgid "Use SS_L (pop3s)"
+#~ msgstr "SS_Lን (pop3s) ተጠቀም"
+
+#~ msgid "Use SS_L (imaps)"
+#~ msgstr "SS_Lን (imaps) ተጠቀም"
+
+#~ msgid "New"
+#~ msgstr "አዲስ"
+
+#~ msgid "Mailbox Colors"
+#~ msgstr "የፖስታ ሳጥን ቀለሞች"
+
+#~ msgid "Print..."
+#~ msgstr "አትም..."
+
+#~ msgid "_Comments"
+#~ msgstr "አስተያየቶች"
+
+#~ msgid "_Keywords"
+#~ msgstr "ቁልፍ ቃላት"
+
+#~ msgid "English"
+#~ msgstr "እንግሊዝኛ"
+
+#~ msgid "UTF-8"
+#~ msgstr "UTF-8"
+
+#~ msgid "_A-J"
+#~ msgstr "_A-J"
+
+#~ msgid "_K-Z"
+#~ msgstr "_K-Z"
+
+#~ msgid "Comments:"
+#~ msgstr "አስተያየቶች፦"
+
+#~ msgid "Keywords:"
+#~ msgstr "ቁልፍ ቃላት፦"
+
+#~ msgid "Date: %s\n"
+#~ msgstr "ቀን፦ %s\n"
+
+#~ msgid "From: %s\n"
+#~ msgstr "ከ፦ %s\n"
+
+#~ msgid "To: %s\n"
+#~ msgstr "ወደ፦ %s\n"
+
+#~ msgid "CC: %s\n"
+#~ msgstr "CC፦ %s\n"
+
+#~ msgid "Customize"
+#~ msgstr "አስተካክል"

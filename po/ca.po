@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.9.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-02-11 12:24+0100\n"
+"POT-Creation-Date: 2004-08-19 00:02+0100\n"
 "PO-Revision-Date: 2004-01-21 14:30+0200\n"
 "Last-Translator: Aleix Badia i Bosch <abadia@ica.es>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
@@ -20,76 +20,90 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: balsa.desktop.in.h:1
+#, fuzzy
+msgid "Balsa"
+msgstr "Balsa: %s"
+
+#: balsa.desktop.in.h:2
+msgid "E-Mail utility"
+msgstr ""
+
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:255 libbalsa/address-book-ldap.c:401
-#: libbalsa/address-book-ldif.c:439 libbalsa/address-book-vcard.c:283
+#: libbalsa/address-book-extern.c:256 libbalsa/address-book-ldap.c:408
+#: libbalsa/address-book-ldif.c:462 libbalsa/address-book-vcard.c:307
 msgid "No-Id"
 msgstr "Sense ID"
 
-#: libbalsa/address-book-extern.c:259 libbalsa/address-book-ldap.c:407
-#: libbalsa/address-book-ldif.c:442 libbalsa/address-book-ldif.c:612
-#: libbalsa/address-book-ldif.c:649 libbalsa/address-book-ldif.c:653
-#: libbalsa/address-book-vcard.c:301
+#: libbalsa/address-book-extern.c:260 libbalsa/address-book-ldap.c:414
+#: libbalsa/address-book-ldif.c:465 libbalsa/address-book-ldif.c:635
+#: libbalsa/address-book-ldif.c:673 libbalsa/address-book-ldif.c:677
+#: libbalsa/address-book-vcard.c:325
 msgid "No-Name"
 msgstr "Sense nom"
 
-#: libbalsa/address-book.c:397 libbalsa/filter-error.c:45
+#: libbalsa/address-book-ldap.c:261
+msgid "TLS requested but not compiled in"
+msgstr ""
+
+#: libbalsa/address-book.c:399 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Cap error"
 
-#: libbalsa/address-book.c:398
+#: libbalsa/address-book.c:400
 msgid "Cannot read from address book"
 msgstr "No s'ha pogut llegir de la llibreta d'adreces"
 
-#: libbalsa/address-book.c:399
+#: libbalsa/address-book.c:401
 msgid "Cannot write to address book"
 msgstr "No s'ha pogut escriure a la llibreta d'adreces"
 
-#: libbalsa/address-book.c:400
+#: libbalsa/address-book.c:402
 msgid "Cannot connect to server"
 msgstr "No s'ha pogut connectar amb el servidor"
 
-#: libbalsa/address-book.c:401
+#: libbalsa/address-book.c:403
 msgid "Cannot search in the address book"
 msgstr "No s'ha pogut cercar una cerca en la llibreta d'adreces"
 
-#: libbalsa/address-book.c:403
+#: libbalsa/address-book.c:405
 msgid "Cannot add duplicate entry"
 msgstr "No s'ha pogut afegir una entrada duplicada"
 
-#: libbalsa/address-book.c:404
+#: libbalsa/address-book.c:406 src/main-window.c:2155
+#: src/sendmsg-window.c:4038
 msgid "Unknown error"
 msgstr "Error desconegut"
 
-#: libbalsa/address.c:375
+#: libbalsa/address.c:399
 msgid "_Displayed Name:"
 msgstr "Nom visuali_tzat:"
 
-#: libbalsa/address.c:376
+#: libbalsa/address.c:400
 msgid "_First Name:"
 msgstr "No_m:"
 
-#: libbalsa/address.c:377
+#: libbalsa/address.c:401
 msgid "_Middle Name:"
 msgstr "_Primer cognom:"
 
-#: libbalsa/address.c:378
+#: libbalsa/address.c:402
 msgid "_Last Name:"
 msgstr "_Segon cognom:"
 
-#: libbalsa/address.c:379
+#: libbalsa/address.c:403
 msgid "_Nickname:"
 msgstr "Sobre_nom:"
 
-#: libbalsa/address.c:380
+#: libbalsa/address.c:404
 msgid "O_rganization:"
 msgstr "O_rganització:"
 
-#: libbalsa/address.c:381 libinit_balsa/balsa-druid-page-user.c:79
+#: libbalsa/address.c:405 libinit_balsa/balsa-druid-page-user.c:79
 msgid "_Email Address:"
 msgstr "Adr_eça de correu electrònic:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:869 libbalsa/message.c:1087
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:986 libbalsa/message.c:909
 msgid "(No subject)"
 msgstr "(Sense assumpte)"
 
@@ -115,145 +129,146 @@ msgstr "S'ha intentat aplicar un filtre invàlid"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Filtres invàlids %s per a la bústia %s"
 
-#: libbalsa/filter.c:211 libbalsa/filter.c:291
+#: libbalsa/filter.c:166
 msgid "Unable to load message body to match filter"
 msgstr "No s'ha pogut carregar el cos del missatge per coincidir amb el filtre"
 
-#: libbalsa/filter.c:450
+#: libbalsa/filter.c:266
 #, c-format
 msgid "Invalid filter: %s"
 msgstr "El filtre és invàlid: %s"
 
-#: libbalsa/filter.c:565 libbalsa/filter.c:584
+#: libbalsa/filter.c:303 libbalsa/filter.c:324
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "El nom de la bústia per al filtre no és correcte: %s"
 
-#: libbalsa/filter.c:569
+#: libbalsa/filter.c:307
 msgid "Error when copying messages"
 msgstr "S'ha produït un error en copiar els missatges"
 
-#: libbalsa/filter.c:577
+#: libbalsa/filter.c:316
 msgid "Error when trashing messages"
 msgstr "S'ha produït un error en eliminar els missatges"
 
-#: libbalsa/filter.c:588
+#: libbalsa/filter.c:328
 msgid "Error when moving messages"
 msgstr "S'ha produït un error en moure els missatges"
 
-#: libbalsa/gmime-gpgme-context.c:156
-#, fuzzy, c-format
-msgid "Cannot sign message: could not create gpgme context: %s"
-msgstr "%s: no s'ha pogut crear el context: %s"
+#: libbalsa/gmime-gpgme-context.c:287 libbalsa/rfc3156.c:1383
+#, c-format
+msgid ""
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"La contrasenya per a aquesta clau és incorrecta, torneu-ho a intentar.\n"
+"\n"
+"Clau: %s"
 
-#: libbalsa/gmime-gpgme-context.c:307
-#, fuzzy, c-format
-msgid "Cannot sign message: could not get gpgme data from istream: %s"
-msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
+#: libbalsa/gmime-gpgme-context.c:292 libbalsa/rfc3156.c:1388
+#, c-format
+msgid ""
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"Introduïu la contrasenya per a la clau secreta.\n"
+"\n"
+"Clau: %s"
 
-#: libbalsa/gmime-gpgme-context.c:315
+#: libbalsa/gmime-gpgme-context.c:410 libbalsa/gmime-gpgme-context.c:492
+#: libbalsa/gmime-gpgme-context.c:503 libbalsa/gmime-gpgme-context.c:618
+#: libbalsa/gmime-gpgme-context.c:708
 #, fuzzy, c-format
-msgid "Cannot sign message: gpgme could not create new data: %s"
-msgstr "%s: no s'han pogut crear noves dades: %s"
+msgid "%s: could not get data from stream: %s"
+msgstr "%s: no s'han pogut obtenir les dades del fitxer de la bústia: %s"
 
-#: libbalsa/gmime-gpgme-context.c:325
+#: libbalsa/gmime-gpgme-context.c:418 libbalsa/gmime-gpgme-context.c:627
+#: libbalsa/gmime-gpgme-context.c:716
 #, fuzzy, c-format
-msgid "Cannot sign message: gpgme signing failed: %s"
+msgid "%s: could not create new data object: %s"
+msgstr "%s: no s'ha pogut crear un nou objecte de dades: %s"
+
+#: libbalsa/gmime-gpgme-context.c:428
+#, fuzzy, c-format
+msgid "%s: signing failed: %s"
 msgstr "%s: s'ha produït un error en la signatura: %s"
 
-#: libbalsa/gmime-gpgme-context.c:344
+#: libbalsa/gmime-gpgme-context.c:517
 #, fuzzy, c-format
-msgid "Cannot sign message: could not get gpgme data: %s"
-msgstr "%s: no s'han pogut obtenir les dades: %s"
-
-#: libbalsa/gmime-gpgme-context.c:374
-#, fuzzy, c-format
-msgid ""
-"Cannot verify message signature: could not get gpgme data from istream: %s"
-msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
-
-#: libbalsa/gmime-gpgme-context.c:383
-#, c-format
-msgid ""
-"Cannot verify message signature: could not get gpgme data from sigstream: %s"
-msgstr ""
-
-#: libbalsa/gmime-gpgme-context.c:392 libbalsa/rfc3156.c:774
-#, fuzzy, c-format
-msgid "gpgme signature verification failed: %s"
+msgid "%s: signature verification failed: %s"
 msgstr "%s: s'ha produït un error en la verificació de la signatura: %s"
 
-#: libbalsa/gmime-gpgme-context.c:441
-#, c-format
-msgid "Cannot encrypt message: could not create gpgme recipients set: %s"
-msgstr ""
+#: libbalsa/gmime-gpgme-context.c:582
+#, fuzzy
+msgid "combined signing and encryption is only defined for RFC 2440"
+msgstr "%s: s'ha produït un error en la signatura i l'encriptació: %s"
 
-#: libbalsa/gmime-gpgme-context.c:467
+#: libbalsa/gmime-gpgme-context.c:652
 #, fuzzy, c-format
-msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
-msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
+msgid "%s: signing and encryption failed: %s"
+msgstr "%s: s'ha produït un error en la signatura i l'encriptació: %s"
 
-#: libbalsa/gmime-gpgme-context.c:476
+#: libbalsa/gmime-gpgme-context.c:656
 #, fuzzy, c-format
-msgid "Cannot encrypt message: gpgme could not create new data: %s"
-msgstr "%s: no s'han pogut crear noves dades: %s"
-
-#: libbalsa/gmime-gpgme-context.c:487
-#, fuzzy, c-format
-msgid "Cannot encrypt message: gpgme encryption failed: %s"
+msgid "%s: encryption failed: %s"
 msgstr "%s: s'ha produït un error en l'encriptació: %s"
 
-#: libbalsa/gmime-gpgme-context.c:502
+#: libbalsa/gmime-gpgme-context.c:728
 #, fuzzy, c-format
-msgid "Cannot encrypt message: could not get gpgme data: %s"
-msgstr "%s: no s'han pogut obtenir les dades: %s"
+msgid "%s: decryption failed: %s"
+msgstr "%s: s'ha produït un error en l'encriptació: %s"
 
-#: libbalsa/gmime-gpgme-context.c:533
+#: libbalsa/gmime-gpgme-context.c:763
 #, fuzzy, c-format
-msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
-msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
+msgid "%s: could not create context: %s"
+msgstr "%s: no s'ha pogut crear el context: %s"
 
-#: libbalsa/gmime-gpgme-context.c:541
-#, fuzzy, c-format
-msgid "Cannot decrypt message: gpgme could not create new data: %s"
-msgstr "%s: no s'han pogut crear noves dades: %s"
-
-#: libbalsa/gmime-gpgme-context.c:551
-#, fuzzy, c-format
-msgid "Cannot decrypt message: gpgme decrypting failed: %s"
-msgstr "%s: s'ha produït un error en la desencriptació: %s"
-
-#: libbalsa/gmime-gpgme-context.c:562
-#, fuzzy, c-format
-msgid "Cannot decrypt message: could not get gpgme data: %s"
-msgstr "%s: no s'han pogut obtenir les dades: %s"
-
-#: libbalsa/gmime-gpgme-context.c:590 libbalsa/gmime-gpgme-context.c:645
-#, c-format
-msgid "Failed to execute gpgme: %s"
+#: libbalsa/gmime-gpgme-context.c:819
+msgid "the crypto engine for protocol OpenPGP is not available"
 msgstr ""
 
-#: libbalsa/gmime-gpgme-context.c:591 libbalsa/gmime-gpgme-context.c:646
-#: libbalsa/libbalsa.c:353 src/pref-manager.c:1223 src/pref-manager.c:1322
-msgid "Unknown"
-msgstr "Desconegut"
+#: libbalsa/gmime-gpgme-context.c:829
+msgid "the crypto engine for protocol CMS is not available"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:836
+#, c-format
+msgid "invalid crypto engine %d"
+msgstr ""
+
+#: libbalsa/gmime-gpgme-context.c:865 libbalsa/gmime-gpgme-context.c:876
+#, fuzzy, c-format
+msgid "%s: could not list keys for %s: %s"
+msgstr "%s: no s'han pogut llistar les claus pel %s: %s"
+
+#: libbalsa/gmime-gpgme-context.c:888
+#, fuzzy, c-format
+msgid "%s: could not find a key for %s"
+msgstr "no s'ha pogut obtenir una clau pública pel %s"
+
+#: libbalsa/gmime-gpgme-context.c:900
+#, fuzzy, c-format
+msgid "%s: multiple keys for %s"
+msgstr "no s'ha pogut obtenir una clau pública pel %s"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:88 libbalsa/mailbox_local.c:1014
-#: libbalsa/mailbox_local.c:1016 src/sendmsg-window.c:2373
-#: src/sendmsg-window.c:2374
+#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1122
+#: libbalsa/mailbox_local.c:1124 src/sendmsg-window.c:2632
+#: src/sendmsg-window.c:2633
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2403 src/sendmsg-window.c:2404
+#: libbalsa/identity.c:92 src/sendmsg-window.c:2662 src/sendmsg-window.c:2663
 msgid "Fwd:"
 msgstr "Fwd:"
 
-#: libbalsa/identity.c:134
+#: libbalsa/identity.c:138
 msgid "New Identity"
 msgstr "Nova identitat"
 
-#: libbalsa/identity.c:387
+#: libbalsa/identity.c:374
 msgid "Current"
 msgstr "Actual"
 
@@ -261,109 +276,168 @@ msgstr "Actual"
 msgid "Default"
 msgstr "Per defecte"
 
-#: libbalsa/identity.c:774
+#: libbalsa/identity.c:783
 msgid "_Identity Name:"
 msgstr "Nom de la _identitat:"
 
-#: libbalsa/identity.c:776
+#: libbalsa/identity.c:785
 msgid "_Full Name:"
 msgstr "Nom com_plet:"
 
-#: libbalsa/identity.c:778
+#: libbalsa/identity.c:787
 msgid "_Mailing Address:"
 msgstr "Adreça de corre_u electrònic:"
 
-#: libbalsa/identity.c:780
+#: libbalsa/identity.c:789
 msgid "Reply _To:"
 msgstr "Res_pon a:"
 
-#: libbalsa/identity.c:782
+#: libbalsa/identity.c:791
 msgid "_Domain:"
 msgstr "_Domini:"
 
-#: libbalsa/identity.c:784
+#: libbalsa/identity.c:793
 msgid "_Bcc:"
 msgstr "_Bcc:"
 
-#: libbalsa/identity.c:786
+#: libbalsa/identity.c:795
 msgid "Reply _String:"
 msgstr "Cadena de text de re_sposta predeterminada:"
 
-#: libbalsa/identity.c:788
+#: libbalsa/identity.c:797
 msgid "F_orward String:"
 msgstr "Cadena de r_eenviament predeterminada:"
 
-#: libbalsa/identity.c:790
+#: libbalsa/identity.c:799
 msgid "Signature _Path:"
 msgstr "Ca_mí de la signatura:"
 
-#: libbalsa/identity.c:794
+#: libbalsa/identity.c:803
 msgid "_Execute Signature"
 msgstr "_Executa la signatura"
 
-#: libbalsa/identity.c:797
+#: libbalsa/identity.c:806
 msgid "Incl_ude Signature"
 msgstr "Inclo_u la signatura"
 
-#: libbalsa/identity.c:800
+#: libbalsa/identity.c:809
 msgid "Include Signature When For_warding"
 msgstr "Inclou la signatura en el reen_viament"
 
-#: libbalsa/identity.c:803
+#: libbalsa/identity.c:812
 msgid "Include Signature When Rep_lying"
 msgstr "Inc_lou la signatura en les respostes"
 
-#: libbalsa/identity.c:806
+#: libbalsa/identity.c:815
 msgid "_Add Signature Separator"
 msgstr "_Afegeix el separador de la signatura"
 
-#: libbalsa/identity.c:809
+#: libbalsa/identity.c:818
 msgid "Prepend Si_gnature"
 msgstr "Anteposa la si_gnatura"
 
-#: libbalsa/identity.c:814
-msgid "GPG sign by default"
+#: libbalsa/identity.c:823
+#, fuzzy
+msgid "sign messages by default"
 msgstr "Signatura del GPG predeterminada"
 
-#: libbalsa/identity.c:820
-msgid "GPG encrypt by default"
+#: libbalsa/identity.c:829
+#, fuzzy
+msgid "encrypt messages by default"
 msgstr "Encriptació del GPG predeterminada"
 
-#: libbalsa/identity.c:967
+#: libbalsa/identity.c:835
+msgid "default crypto protocol"
+msgstr ""
+
+#: libbalsa/identity.c:982
 msgid "Error: The identity does not have a name"
 msgstr "S'ha produït un error: la identitat no té un nom"
 
-#: libbalsa/identity.c:977
+#: libbalsa/identity.c:992
 msgid "Error: An identity with that name already exists"
 msgstr "S'ha produït un error: ja existeix una identitat amb aquest nom"
 
-#: libbalsa/identity.c:1134
+#: libbalsa/identity.c:1153
 msgid "Do you really want to delete the selected identity?"
 msgstr "Esteu segur de voler suprimir la identitat seleccionada?"
 
-#: libbalsa/identity.c:1167
+#: libbalsa/identity.c:1186
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "S'ha produït un error en mostrar l'ajuda per a les identitats: %s\n"
 
-#: libbalsa/identity.c:1191
+#: libbalsa/identity.c:1216
 msgid "Manage Identities"
 msgstr "Gestiona les identitats"
 
-#: libbalsa/libbalsa.c:277
+#: libbalsa/identity.c:1521
+#, fuzzy
+msgid "GnuPG using MIME mode"
+msgstr "El _GnuPG utilitza el mode MIME"
+
+#: libbalsa/identity.c:1522
+#, fuzzy
+msgid "GnuPG using OpenPGP mode"
+msgstr "El _GnuPG utilitza el mode OpenPGP antic"
+
+#: libbalsa/identity.c:1524
+msgid "S/MIME mode"
+msgstr ""
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:255
+#, fuzzy, c-format
+msgid ""
+"IMAP server %s alert:\n"
+"%s"
+msgstr "Servidor de correu: %s\n"
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:259
+#, fuzzy, c-format
+msgid "IMAP server %s error: %s"
+msgstr "Servidor de correu: %s\n"
+
+#. IMAP host name + message
+#: libbalsa/imap-server.c:265
+#, fuzzy, c-format
+msgid "%s: %s"
+msgstr "%d %s"
+
+#: libbalsa/imap-server.c:550 libbalsa/imap-server.c:653
+#, fuzzy, c-format
+msgid "Cannot connect to the server: %s"
+msgstr "No s'ha pogut connectar amb el servidor"
+
+#: libbalsa/imap-server.c:638
+#, c-format
+msgid "Exceeded the number of connections per server %s"
+msgstr ""
+
+#: libbalsa/libbalsa.c:279
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Directori de LDAP per a %s"
 
-#: libbalsa/libbalsa.c:396
+#: libbalsa/libbalsa.c:384
+#, fuzzy
+msgid "Invalid date"
+msgstr "[data incorrecta]"
+
+#: libbalsa/libbalsa.c:400 src/pref-manager.c:1226 src/pref-manager.c:1323
+msgid "Unknown"
+msgstr "Desconegut"
+
+#: libbalsa/libbalsa.c:539
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
-"Reason: %s\n"
+"<b>Reason:</b> %s\n"
 "<b>This certificate belongs to:</b>\n"
 msgstr ""
 
-#: libbalsa/libbalsa.c:408
+#: libbalsa/libbalsa.c:551
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -371,7 +445,7 @@ msgstr ""
 "\n"
 "<b>Aquest certificat va ser emès per:</b>\n"
 
-#: libbalsa/libbalsa.c:418
+#: libbalsa/libbalsa.c:562
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -384,72 +458,68 @@ msgstr ""
 "per a %s\n"
 "<b>Empremta:</b> %s"
 
-#: libbalsa/libbalsa.c:428
-msgid "IMAP TLS certificate"
+#: libbalsa/libbalsa.c:571
+#, fuzzy
+msgid "SSL/TLS certificate"
 msgstr "Certificat TLS de l'IMAP"
 
-#: libbalsa/libbalsa.c:430
+#: libbalsa/libbalsa.c:573
 msgid "_Accept Once"
 msgstr "_Accepta una vegada"
 
-#: libbalsa/libbalsa.c:431
+#: libbalsa/libbalsa.c:574
 msgid "Accept&_Save"
 msgstr "Accepta i de_sa"
 
-#: libbalsa/libbalsa.c:432
+#: libbalsa/libbalsa.c:575
 msgid "_Reject"
 msgstr "_Rebutja"
 
-#. Non-threaded locking mechanism
-#: libbalsa/libbalsa_private.h:53 libbalsa/libbalsa_private.h:65
-#, c-format
-msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
-msgstr "*** Error: La bústia està bloquejada: %s ***\n"
-
-#: libbalsa/mailbox.c:334
+#: libbalsa/mailbox.c:412
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "No s'ha pogut carregar la bústia %s"
 
-#: libbalsa/mailbox.c:341
+#: libbalsa/mailbox.c:419
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "No hi ha el tipus de bústia: %s"
 
-#: libbalsa/mailbox.c:358
+#: libbalsa/mailbox.c:436
 #, c-format
 msgid "Bad local mailbox path \"%s\""
 msgstr "El camí de la bústia local \"%s\" és erroni"
 
-#: libbalsa/mailbox.c:363
+#: libbalsa/mailbox.c:441
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "No s'ha pogut crear una bústia del tipus %s"
 
-#: libbalsa/mailbox_imap.c:486
-#, c-format
-msgid ""
-"IMAP SEARCH command failed for mailbox %s\n"
-"or query was incompatible with IMAP (perhaps you use regular expressions)\n"
-"falling back to default searching method"
-msgstr ""
-"L'ordre SEARCH per cercar a IMAP ha fallat per a la bústia %s\n"
-"o la consulta era incompatible amb l'IMAP (potser utilitzeu expressions "
-"regulars).\n"
-"S'utilitzarà el mètode de cerca predeterminat"
+#. ImapIssue macro handles reconnecting. We might issue a
+#. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
+#. login information...
+#: libbalsa/mailbox_imap.c:481
+#, fuzzy
+msgid "IMAP connection has been severed. Reconnecting..."
+msgstr "Una de les connexions IMAP s'ha tancat: %s"
 
-#: libbalsa/mailbox_imap.c:685
+#: libbalsa/mailbox_imap.c:484
+#, c-format
+msgid "IMAP server has shut the connection: %s Reconnecting..."
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:825
 #, c-format
 msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:736 libbalsa/mailbox_maildir.c:467
-#: libbalsa/mailbox_mbox.c:368 libbalsa/mailbox_mh.c:476
+#: libbalsa/mailbox_imap.c:888 libbalsa/mailbox_maildir.c:482
+#: libbalsa/mailbox_mbox.c:435 libbalsa/mailbox_mh.c:502
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: s'està obrint %s Comptatge de referències: %d\n"
 
-#: libbalsa/mailbox_imap.c:923
+#: libbalsa/mailbox_imap.c:1316
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -458,40 +528,38 @@ msgstr ""
 "L'ordre de cerca de l'IMAP ha fallat per a la bústia %s.\n"
 "S'utilitzarà el mètode de cerca predeterminat"
 
-#: libbalsa/mailbox_imap.c:1059
-#, fuzzy, c-format
-msgid "IMAP SEARCH command failed for mailbox %s\n"
-msgstr ""
-"L'ordre de cerca de l'IMAP ha fallat per a la bústia %s.\n"
-"S'utilitzarà el mètode de cerca predeterminat"
+#: libbalsa/mailbox_imap.c:2186
+#, fuzzy
+msgid "Server-side threading not supported."
+msgstr "No ha suportat l'autentificació anònima."
 
-#: libbalsa/mailbox_local.c:1159
+#: libbalsa/mailbox_local.c:1267
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "No es pot obrir %s. Errno = %d, "
 
-#: libbalsa/mailbox_local.c:1175
+#: libbalsa/mailbox_local.c:1289
 #, fuzzy, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "No s'ha pogut trobar la bústia"
 
-#: libbalsa/mailbox_maildir.c:184
+#: libbalsa/mailbox_maildir.c:189
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "La bústia %s no sembla una bústia Maildir."
 
-#: libbalsa/mailbox_maildir.c:193
+#: libbalsa/mailbox_maildir.c:198
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "No s'ha pogut crear un directori MailDir a %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:200 libbalsa/mailbox_maildir.c:208
-#: libbalsa/mailbox_maildir.c:218
+#: libbalsa/mailbox_maildir.c:205 libbalsa/mailbox_maildir.c:213
+#: libbalsa/mailbox_maildir.c:223
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "No s'ha pogut crear un MailDir a %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:319 libbalsa/mailbox_mh.c:253
+#: libbalsa/mailbox_maildir.c:324 libbalsa/mailbox_mh.c:266
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -500,8 +568,8 @@ msgstr ""
 "No s'han pogut suprimir els continguts de %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:325 libbalsa/mailbox_mbox.c:243
-#: libbalsa/mailbox_mh.c:259
+#: libbalsa/mailbox_maildir.c:330 libbalsa/mailbox_mbox.c:247
+#: libbalsa/mailbox_mh.c:272
 #, c-format
 msgid ""
 "Could not remove %s:\n"
@@ -510,49 +578,85 @@ msgstr ""
 "No s'ha pogut suprimir %s:\n"
 "%s"
 
-#: libbalsa/mailbox_mbox.c:173
+#: libbalsa/mailbox_maildir.c:454 libbalsa/mailbox_mbox.c:399
+#: libbalsa/mailbox_mh.c:483
+#, fuzzy
+msgid "Mailbox does not exist."
+msgstr "La bústia s'ha creat."
+
+#: libbalsa/mailbox_mbox.c:181
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "La bústia %s no sembla una bústia Mbox."
 
-#: libbalsa/mailbox_mbox.c:1063
+#: libbalsa/mailbox_mbox.c:407
+#, fuzzy
+msgid "Cannot open mailbox."
+msgstr "No s'ha pogut carregar la bústia %s"
+
+#: libbalsa/mailbox_mbox.c:415
+#, fuzzy
+msgid "Cannot lock mailbox."
+msgstr "No s'ha pogut carregar la bústia %s"
+
+#: libbalsa/mailbox_mbox.c:1488
 #, fuzzy, c-format
 msgid "%s: could not open %s."
 msgstr "No s'ha pogut obrir el %s"
 
-#: libbalsa/mailbox_mbox.c:1071
+#: libbalsa/mailbox_mbox.c:1496
 #, fuzzy, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: no s'han pogut crear noves dades: %s"
 
-#: libbalsa/mailbox_mbox.c:1081
+#: libbalsa/mailbox_mbox.c:1506
 #, fuzzy, c-format
 msgid "%s: could not get message stream."
 msgstr "%s: no s'han pogut obtenir les dades: %s"
 
-#: libbalsa/mailbox_mbox.c:1095
+#: libbalsa/mailbox_mbox.c:1521
 #, c-format
 msgid ""
 "Error copying message to mailbox %s!\n"
 "Mailbox might have been corrupted!"
 msgstr ""
 
-#: libbalsa/mailbox_mh.c:170
+#: libbalsa/mailbox_mh.c:172
 #, c-format
 msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgstr "La bústia %s no sembla una bústia Mh."
 
-#: libbalsa/mailbox_mh.c:180
+#: libbalsa/mailbox_mh.c:182
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr "No s'ha pogut crear un directori MH a %s (%s)"
 
-#: libbalsa/mailbox_mh.c:187
+#: libbalsa/mailbox_mh.c:189
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "No s'ha pogut crear una estructura MH a %s (%s)"
 
-#: libbalsa/mailbox_pop3.c:227 libbalsa/mailbox_pop3.c:238
+#: libbalsa/mailbox_pop3.c:338
+#, c-format
+msgid "Retrieving Message %d of %d"
+msgstr "S'està recuperant el missatge %d de %d"
+
+#: libbalsa/mailbox_pop3.c:361
+#, fuzzy, c-format
+msgid "Received %ld kB of %ld"
+msgstr "S'han rebut %d bytes de %d"
+
+#: libbalsa/mailbox_pop3.c:375
+#, fuzzy, c-format
+msgid "Saving POP message to %s failed."
+msgstr "S'estan movent els missatges de lectura a %s..."
+
+#: libbalsa/mailbox_pop3.c:385
+#, c-format
+msgid "Transfering POP message to %s failed."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:463 libbalsa/mailbox_pop3.c:474
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
@@ -561,21 +665,39 @@ msgstr ""
 "S'ha produït un error en accedir al fitxer temporal de la bústia POP3 %s:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:258
-#, c-format
-msgid ""
-"POP3 mailbox %s accessing error:\n"
-"%s"
+#: libbalsa/mailbox_pop3.c:502
+#, fuzzy, c-format
+msgid "POP3 mailbox %s error: %s\n"
 msgstr ""
 "S'ha produït un error en accedir a la bústia POP3 %s:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:272
+#: libbalsa/mailbox_pop3.c:535
+#, c-format
+msgid "POP3 message %d oversized: %d kB - skipped."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:546
+#, c-format
+msgid "POP3 error: cannot open %s for writing."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:554
+#, c-format
+msgid "POP3 error: cannot close %s."
+msgstr ""
+
+#: libbalsa/mailbox_pop3.c:580
+#, fuzzy, c-format
+msgid "POP3 error: %s."
+msgstr "S'està enviant l'error: %s"
+
+#: libbalsa/mailbox_pop3.c:603
 #, c-format
 msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr "S'ha produït un error en accedir a la bústia temporal del POP3 %s:\n"
 
-#: libbalsa/mailbox_pop3.c:288
+#: libbalsa/mailbox_pop3.c:626
 #, c-format
 msgid ""
 "Error placing messages from %s on %s\n"
@@ -584,21 +706,28 @@ msgstr ""
 "S'ha produït un error en moure els missatges de %s a %s\n"
 "Els missatges s'han deixat a %s\n"
 
-#: libbalsa/mailbox_pop3.c:304
+#: libbalsa/mailbox_pop3.c:645
 #, fuzzy, c-format
 msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
 msgstr ""
 "S'ha produït un error en accedir al fitxer temporal de la bústia POP3 %s:\n"
 "%s"
 
-#: libbalsa/message.c:552
+#: libbalsa/message.c:481
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr ""
 "No s'han pogut moure els missatges. La bústia d'orígen (%s) només es pot "
 "llegir."
 
-#: libbalsa/mime.c:80 src/balsa-message.c:2119 src/print.c:668
+#: libbalsa/message.c:633 libbalsa/message.c:673
+#, fuzzy, c-format
+msgid "Mailbox (%s) is readonly: cannot change flags."
+msgstr ""
+"No s'han pogut moure els missatges. La bústia d'orígen (%s) només es pot "
+"llegir."
+
+#: libbalsa/mime.c:80 src/balsa-message.c:2296 src/print.c:680
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -607,12 +736,12 @@ msgstr ""
 "S'ha produït un error en escriure el fitxer temporal %s.\n"
 "Comproveu el directori de permisos. "
 
-#: libbalsa/mime.c:87 src/balsa-message.c:2127 src/print.c:675
+#: libbalsa/mime.c:87 src/balsa-message.c:2304 src/print.c:687
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "No s'ha pogut obrir el fitxer temporal %s."
 
-#: libbalsa/mime.c:106 libbalsa/rfc3156.c:64
+#: libbalsa/mime.c:107
 msgid ""
 "\n"
 "--\n"
@@ -622,53 +751,224 @@ msgstr ""
 "--\n"
 "Aquesta és una part del missatge signada per l'OpenPGP:\n"
 
-#: libbalsa/pop3.c:59
-msgid "connection error"
-msgstr "error de connexió"
+#: libbalsa/misc.c:1627
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr "S'ha excedit el temps en intentar fer un bloqueig fcntl"
 
-#: libbalsa/pop3.c:60
-msgid "POP command execution failed"
-msgstr "S'ha produït un error en l'execució de la comanda POP"
-
-#: libbalsa/pop3.c:61
-msgid "Could not write the message"
-msgstr "No s'ha pogut escriure el missatge"
-
-#: libbalsa/pop3.c:62
-msgid "Could not run the delivery program (procmail)"
-msgstr "No s'ha pogut executar el programa per entregar el correu (procmail)"
-
-#: libbalsa/pop3.c:63
-msgid "Could not open mailbox for spooling"
-msgstr "No s'ha pogut obrir la bústia per a encuament"
-
-#: libbalsa/pop3.c:64
-msgid "Could not append message"
-msgstr "No s'ha pogut afegir el missatge"
-
-#: libbalsa/pop3.c:65
-msgid "Host not found"
-msgstr "No s'ha trobat la màquina remota"
-
-#: libbalsa/pop3.c:66
-msgid "Connection refused"
-msgstr "S'ha rebutjat la connexió"
-
-#: libbalsa/pop3.c:67
-msgid "Authentication failed"
-msgstr "S'ha produït un error en l'autenticació"
-
-#: libbalsa/pop3.c:427
+#: libbalsa/misc.c:1634
 #, c-format
-msgid "Retrieving Message %d of %d"
-msgstr "S'està recuperant el missatge %d de %d"
+msgid "Waiting for fcntl lock... %d"
+msgstr "S'està esperant per fer un bloqueig fcntl... %d"
 
-#: libbalsa/pop3.c:439
+#: libbalsa/misc.c:1662
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr "S'ha excedit el temps en intentar fer un bloqueig flock"
+
+#: libbalsa/misc.c:1669
 #, c-format
-msgid "Received %d bytes of %d"
-msgstr "S'han rebut %d bytes de %d"
+msgid "Waiting for flock attempt... %d"
+msgstr "S'està esperant per intentar un flock... %d"
 
-#: libbalsa/rfc3156.c:177
+#: libbalsa/rfc3156.c:76
+#, c-format
+msgid "Gpgme has been compiled without support for protocol %s."
+msgstr "El Gpgme s'ha compilat sense el suport per al protocol %s."
+
+#: libbalsa/rfc3156.c:81
+#, c-format
+msgid "Crypto engine %s is not installed properly."
+msgstr "L'eina d'encriptació %s no està instal·lada correctament."
+
+#: libbalsa/rfc3156.c:86
+#, c-format
+msgid ""
+"Crypto engine %s version %s is installed, but at least version %s is "
+"required."
+msgstr ""
+"L'eina d'encriptació %s versió %s està instal·lada, però la versió mínima "
+"pel correcte funcionament és %s."
+
+#: libbalsa/rfc3156.c:93
+#, c-format
+msgid "Unknown problem with engine for protocol %s."
+msgstr "S'ha produït un problema desconegut amb l'eina pel protocol %s."
+
+#: libbalsa/rfc3156.c:98
+#, c-format
+msgid "%s: could not retreive crypto engine information: %s."
+msgstr "%s: no s'ha pogut obtenir la informació de l'eina d'encriptació: %s."
+
+#: libbalsa/rfc3156.c:102
+#, c-format
+msgid ""
+"\n"
+"Disable support for protocol %s."
+msgstr ""
+"\n"
+"Inhabilita el suport pel protocol %s."
+
+#: libbalsa/rfc3156.c:235 libbalsa/rfc3156.c:240 libbalsa/rfc3156.c:322
+#: libbalsa/rfc3156.c:327 libbalsa/rfc3156.c:461 libbalsa/rfc3156.c:466
+#: libbalsa/rfc3156.c:529 libbalsa/rfc3156.c:534 libbalsa/rfc3156.c:613
+#: libbalsa/rfc3156.c:618 libbalsa/rfc3156.c:723 libbalsa/rfc3156.c:728
+#: libbalsa/rfc3156.c:803 libbalsa/rfc3156.c:808
+#, fuzzy
+msgid "creating a gpgme context failed"
+msgstr "%s: no s'ha pogut crear el context: %s"
+
+#: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
+#, fuzzy
+msgid "Enter passphrase to unlock the secret key for signing"
+msgstr "Introduïu la contrasenya per desencriptar el missatge"
+
+#: libbalsa/rfc3156.c:274 libbalsa/rfc3156.c:278 libbalsa/rfc3156.c:660
+#, fuzzy
+msgid "signing failed"
+msgstr "S'ha produït un error en entrar."
+
+#: libbalsa/rfc3156.c:351 libbalsa/rfc3156.c:356 libbalsa/rfc3156.c:663
+#, fuzzy
+msgid "encryption failed"
+msgstr "%s: s'ha produït un error en l'encriptació: %s"
+
+#: libbalsa/rfc3156.c:479 libbalsa/rfc3156.c:484 libbalsa/rfc3156.c:739
+#: libbalsa/rfc3156.c:745
+#, fuzzy
+msgid "signature verification failed"
+msgstr "%s: s'ha produït un error en la verificació de la signatura: %s"
+
+#: libbalsa/rfc3156.c:546 libbalsa/rfc3156.c:819
+msgid "Enter passphrase to decrypt message"
+msgstr "Introduïu la contrasenya per desencriptar el missatge"
+
+#: libbalsa/rfc3156.c:558 libbalsa/rfc3156.c:563
+#, fuzzy
+msgid "decryption failed"
+msgstr "%s: s'ha produït un error en l'encriptació: %s"
+
+#: libbalsa/rfc3156.c:656 libbalsa/rfc3156.c:670
+#, fuzzy
+msgid "signing and encryption failed"
+msgstr "%s: s'ha produït un error en la signatura i l'encriptació: %s"
+
+#: libbalsa/rfc3156.c:673
+#, fuzzy, c-format
+msgid "signing failed: %s"
+msgstr "%s: s'ha produït un error en la signatura: %s"
+
+#: libbalsa/rfc3156.c:676
+#, fuzzy, c-format
+msgid "encryption failed: %s"
+msgstr "%s: s'ha produït un error en l'encriptació: %s"
+
+#: libbalsa/rfc3156.c:828 libbalsa/rfc3156.c:835
+#, fuzzy
+msgid "decryption and signature verification failed"
+msgstr ""
+"%s: s'ha produït un error en la desencriptació i la verificació de "
+"signatura: %s"
+
+#: libbalsa/rfc3156.c:866
+msgid "The signature is valid."
+msgstr "Aquesta signatura és vàlida."
+
+#: libbalsa/rfc3156.c:868
+msgid "The signature is valid but expired."
+msgstr "La signatura és vàlida però ha caducat."
+
+#: libbalsa/rfc3156.c:871
+msgid ""
+"The signature is valid but the key used to verify the signature has expired."
+msgstr ""
+"La signatura és vàlida, però la clau utilitzada per verificar la signatura "
+"ha caducat."
+
+#: libbalsa/rfc3156.c:874
+#, fuzzy
+msgid ""
+"The signature is valid but the key used to verify the signature has been "
+"revoked."
+msgstr ""
+"La signatura és vàlida, però la clau utilitzada per verificar la signatura "
+"ha caducat."
+
+#: libbalsa/rfc3156.c:877
+msgid "The signature is invalid (Note: might be caused by gmime bug!)."
+msgstr ""
+
+#: libbalsa/rfc3156.c:880
+msgid "The signature could not be verified due to a missing key."
+msgstr "No s'ha pogut verificar la signatura per falta d'una clau."
+
+#: libbalsa/rfc3156.c:882
+msgid "This part is not a real PGP signature."
+msgstr "Aquesta part no és una signatura real del PGP."
+
+#: libbalsa/rfc3156.c:885
+#, fuzzy
+msgid "The signature could not be verified due to an invalid crypto engine."
+msgstr ""
+"No s'ha pogut verificar la signatura ja que l'eina d'encriptació és invàlida"
+
+#: libbalsa/rfc3156.c:888 libbalsa/rfc3156.c:1543
+msgid "GnuPG is rebuilding the trust database and is currently unavailable."
+msgstr ""
+
+#: libbalsa/rfc3156.c:891
+msgid "An error prevented the signature verification."
+msgstr "No s'ha pogut verificar la signatura degut a un error."
+
+#: libbalsa/rfc3156.c:899
+msgid "The user ID is of unknown validity."
+msgstr "Es desconeix la validesa de l'ID de l'usuari."
+
+#: libbalsa/rfc3156.c:901
+msgid "The validity of the user ID is undefined."
+msgstr "La validesa de l'ID de l'usuari no està definia."
+
+#: libbalsa/rfc3156.c:903
+msgid "The user ID is never valid."
+msgstr "L'ID de l'usuari no és vàlid."
+
+#: libbalsa/rfc3156.c:905
+msgid "The user ID is marginally valid."
+msgstr "L'ID de l'usuari és marginalment vàlid."
+
+#: libbalsa/rfc3156.c:907
+msgid "The user ID is fully valid."
+msgstr "L'ID de l'usuari és completament vàlid."
+
+#: libbalsa/rfc3156.c:909
+msgid "The user ID is ultimately valid."
+msgstr "L'ID de l'usuari és com a últim recurs vàlid."
+
+#: libbalsa/rfc3156.c:911 libbalsa/rfc3156.c:1147
+msgid "bad validity"
+msgstr "la validesa és errònia"
+
+#: libbalsa/rfc3156.c:919
+#, fuzzy
+msgid "PGP signature: "
+msgstr "Signatura del PGP: %s"
+
+#: libbalsa/rfc3156.c:921
+#, fuzzy
+msgid "S/MIME signature: "
+msgstr "Signatura del PGP: %s"
+
+#: libbalsa/rfc3156.c:923
+#, fuzzy
+msgid "(unknown protocol) "
+msgstr "error desconegut"
+
+#: libbalsa/rfc3156.c:942
+#, c-format
+msgid ""
+"\n"
+"User ID: %s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:945
 #, c-format
 msgid ""
 "\n"
@@ -677,48 +977,14 @@ msgstr ""
 "\n"
 "Signat per: %s"
 
-#: libbalsa/rfc3156.c:181
-#, c-format
-msgid "Mail address: %s"
+#: libbalsa/rfc3156.c:949
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Mail address: %s"
 msgstr "Adreça de correu electrònic: %s"
 
-#: libbalsa/rfc3156.c:183
-#, c-format
-msgid ""
-"\n"
-"Validity: %s"
-msgstr ""
-"\n"
-"Validesa: %s"
-
-#: libbalsa/rfc3156.c:185
-#, c-format
-msgid ""
-"\n"
-"Owner trust: %s"
-msgstr ""
-"\n"
-"Nivell de confiança del propietari: %s"
-
-#: libbalsa/rfc3156.c:188
-#, c-format
-msgid ""
-"\n"
-"Key fingerprint: %s"
-msgstr ""
-"\n"
-"Empremta de la clau: %s"
-
-#: libbalsa/rfc3156.c:193
-#, c-format
-msgid ""
-"\n"
-"Key created on: %s"
-msgstr ""
-"\n"
-"Clau creada el: %s"
-
-#: libbalsa/rfc3156.c:198
+#: libbalsa/rfc3156.c:954
 #, c-format
 msgid ""
 "\n"
@@ -727,166 +993,103 @@ msgstr ""
 "\n"
 "Signat el: %s"
 
-#: libbalsa/rfc3156.c:346
-#, fuzzy, c-format
-msgid "GMimeGPG signature verification failed: %s"
-msgstr "%s: s'ha produït un error en la verificació de la signatura: %s"
-
-#: libbalsa/rfc3156.c:453
-msgid "Enter passphrase to decrypt message"
-msgstr "Introduïu la contrasenya per desencriptar el missatge"
-
-#: libbalsa/rfc3156.c:514 libbalsa/rfc3156.c:1515
-#, fuzzy, c-format
-msgid "could not get a key for %s"
-msgstr "no s'ha pogut obtenir una clau pública pel %s"
-
-#: libbalsa/rfc3156.c:547
-msgid "The signature is valid."
-msgstr "Aquesta signatura és vàlida."
-
-#: libbalsa/rfc3156.c:549
-msgid "The signature is valid but expired."
-msgstr "La signatura és vàlida però ha caducat."
-
-#: libbalsa/rfc3156.c:551
+#: libbalsa/rfc3156.c:956
+#, c-format
 msgid ""
-"The signature is valid but the key used to verify the signature has expired."
+"\n"
+"Validity: %s"
 msgstr ""
-"La signatura és vàlida, però la clau utilitzada per verificar la signatura "
-"ha caducat."
+"\n"
+"Validesa: %s"
 
-#: libbalsa/rfc3156.c:553
-msgid "The signature is invalid."
-msgstr "La signatura no és vàlida."
+#: libbalsa/rfc3156.c:960
+#, c-format
+msgid ""
+"\n"
+"Owner trust: %s"
+msgstr ""
+"\n"
+"Nivell de confiança del propietari: %s"
 
-#: libbalsa/rfc3156.c:555
-msgid "The signature could not be verified due to a missing key."
-msgstr "No s'ha pogut verificar la signatura per falta d'una clau."
+#: libbalsa/rfc3156.c:964
+#, c-format
+msgid ""
+"\n"
+"Key fingerprint: %s"
+msgstr ""
+"\n"
+"Empremta de la clau: %s"
 
-#: libbalsa/rfc3156.c:557
-msgid "This part is not a real PGP signature."
-msgstr "Aquesta part no és una signatura real del PGP."
+#: libbalsa/rfc3156.c:969
+#, c-format
+msgid ""
+"\n"
+"Key created on: %s"
+msgstr ""
+"\n"
+"Clau creada el: %s"
 
-#: libbalsa/rfc3156.c:559
-msgid "An error prevented the signature verification."
-msgstr "No s'ha pogut verificar la signatura degut a un error."
-
-#: libbalsa/rfc3156.c:561
-msgid "This part contains at least two signatures with different status."
+#: libbalsa/rfc3156.c:978
+msgid " revoked"
 msgstr ""
 
-#: libbalsa/rfc3156.c:564
-msgid "bad status"
+#: libbalsa/rfc3156.c:983
+#, fuzzy
+msgid " expired"
+msgstr "Contestat"
+
+#: libbalsa/rfc3156.c:988
+msgid " disabled"
 msgstr ""
 
-#: libbalsa/rfc3156.c:574
-msgid "The user ID is of unknown validity."
-msgstr "Es desconeix la validesa de l'ID de l'usuari."
-
-#: libbalsa/rfc3156.c:576
-msgid "The validity of the user ID is undefined."
-msgstr "La validesa de l'ID de l'usuari no està definia."
-
-#: libbalsa/rfc3156.c:578
-msgid "The user ID is never valid."
-msgstr "L'ID de l'usuari no és vàlid."
-
-#: libbalsa/rfc3156.c:580
-msgid "The user ID is marginally valid."
-msgstr "L'ID de l'usuari és marginalment vàlid."
-
-#: libbalsa/rfc3156.c:582
-msgid "The user ID is fully valid."
-msgstr "L'ID de l'usuari és completament vàlid."
-
-#: libbalsa/rfc3156.c:584
-msgid "The user ID is ultimately valid."
-msgstr "L'ID de l'usuari és com a últim recurs vàlid."
-
-#: libbalsa/rfc3156.c:586 libbalsa/rfc3156.c:1230
-msgid "bad validity"
-msgstr "la validesa és errònia"
-
-#: libbalsa/rfc3156.c:635 libbalsa/rfc3156.c:737 libbalsa/rfc3156.c:857
-#: libbalsa/rfc3156.c:971
-#, fuzzy, c-format
-msgid "could not create gpgme context: %s"
-msgstr "%s: no s'ha pogut crear el context: %s"
-
-#: libbalsa/rfc3156.c:650 libbalsa/rfc3156.c:877
-msgid "Enter passsphrase to OpenPGP sign the first message part"
-msgstr ""
-"Introduïu la contrasenya perquè el OpenPGP signi la primera part del "
-"missatge."
-
-#: libbalsa/rfc3156.c:658 libbalsa/rfc3156.c:754 libbalsa/rfc3156.c:889
-#: libbalsa/rfc3156.c:980
-#, fuzzy, c-format
-msgid "gpgme could not get data from buffer: %s"
-msgstr "%s: no s'han pogut obtenir les dades de la memòria intermitja: %s"
-
-#: libbalsa/rfc3156.c:665 libbalsa/rfc3156.c:764 libbalsa/rfc3156.c:897
-#: libbalsa/rfc3156.c:989
-#, fuzzy, c-format
-msgid "gpgme could not create new data object: %s"
-msgstr "%s: no s'ha pogut crear un nou objecte de dades: %s"
-
-#: libbalsa/rfc3156.c:674
-#, fuzzy, c-format
-msgid "gpgme signing failed: %s"
-msgstr "%s: s'ha produït un error en la signatura: %s"
-
-#: libbalsa/rfc3156.c:686 libbalsa/rfc3156.c:804 libbalsa/rfc3156.c:929
-#: libbalsa/rfc3156.c:1030
-#, fuzzy, c-format
-msgid "could not get gpgme data: %s"
-msgstr "%s: no s'han pogut obtenir les dades: %s"
-
-#: libbalsa/rfc3156.c:911
-#, fuzzy, c-format
-msgid "gpgme signing and encryption failed: %s"
-msgstr "%s: s'ha produït un error en la signatura i l'encriptació: %s"
-
-#: libbalsa/rfc3156.c:915
-#, fuzzy, c-format
-msgid "gpgme encryption failed: %s"
-msgstr "%s: s'ha produït un error en l'encriptació: %s"
+#: libbalsa/rfc3156.c:993
+#, fuzzy
+msgid " invalid"
+msgstr "[data incorrecta]"
 
 #: libbalsa/rfc3156.c:996
-msgid "Enter passsphrase to decrypt message part"
-msgstr "Introduïu la contrasenya per desencriptar la part del missatge"
+#, c-format
+msgid ""
+"\n"
+"Key attributes:%s"
+msgstr ""
+
+#: libbalsa/rfc3156.c:998
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Key attribute:%s"
+msgstr ""
+"\n"
+"Clau creada el: %s"
 
 #: libbalsa/rfc3156.c:1002
 #, fuzzy, c-format
-msgid "gpgme decryption and signature verification failed: %s"
-msgstr ""
-"%s: s'ha produït un error en la desencriptació i la verificació de "
-"signatura: %s"
+msgid ""
+"\n"
+"Issuer name: %s"
+msgstr "Nom del fitxer: %s"
 
-#: libbalsa/rfc3156.c:1047
+#: libbalsa/rfc3156.c:1005
 #, c-format
 msgid ""
-"The OpenPGP encrypted message part contains 8-bit characters, but no header "
-"describing the used codeset (converted to %s)"
+"\n"
+"Issuer serial number: %s"
 msgstr ""
-"La part del missatge encriptada pel OpenPGP conté caràcters de 8 bits, però "
-"no disposa de cap capçalera que descrigui el joc de caràcters (s'ha "
-"convertit a %s)"
 
-#: libbalsa/rfc3156.c:1113
+#: libbalsa/rfc3156.c:1008
 #, c-format
 msgid ""
-"%s\n"
-"Do you want to run gpg to import the public key with fingerprint %s?"
+"\n"
+"Chain ID: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:1138
+#: libbalsa/rfc3156.c:1055
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "No s'ha pogut executar el %s per obtenir la clau pública %s."
 
-#: libbalsa/rfc3156.c:1186
+#: libbalsa/rfc3156.c:1104
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -896,7 +1099,7 @@ msgstr ""
 "retorn %d:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1193
+#: libbalsa/rfc3156.c:1111
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -905,134 +1108,79 @@ msgstr ""
 "El gpg s'ha executat correctament:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1218
+#: libbalsa/rfc3156.c:1135
 msgid "unknown"
 msgstr "desconegut"
 
-#: libbalsa/rfc3156.c:1220
+#: libbalsa/rfc3156.c:1137
 msgid "undefined"
 msgstr "no definit"
 
-#: libbalsa/rfc3156.c:1222
+#: libbalsa/rfc3156.c:1139
 msgid "never"
 msgstr "mai"
 
-#: libbalsa/rfc3156.c:1224
+#: libbalsa/rfc3156.c:1141
 msgid "marginal"
 msgstr "marginal"
 
-#: libbalsa/rfc3156.c:1226
+#: libbalsa/rfc3156.c:1143
 msgid "full"
 msgstr "complet"
 
-#: libbalsa/rfc3156.c:1228
+#: libbalsa/rfc3156.c:1145
 msgid "ultimate"
 msgstr "com a última opció"
 
-#: libbalsa/rfc3156.c:1293
-msgid "Fingerprint"
-msgstr "Empremta"
+#: libbalsa/rfc3156.c:1205
+#, fuzzy
+msgid "User ID"
+msgstr "Usuari"
 
-#: libbalsa/rfc3156.c:1293
+#: libbalsa/rfc3156.c:1205
 msgid "Key ID"
 msgstr "ID de la clau"
 
-#: libbalsa/rfc3156.c:1293
-msgid "Validity"
-msgstr "Validesa"
-
-#: libbalsa/rfc3156.c:1293
-msgid "Owner trust"
-msgstr "Confiança del propietari"
-
-#: libbalsa/rfc3156.c:1294
+#: libbalsa/rfc3156.c:1205
 msgid "Length"
 msgstr "Longitud"
 
+#: libbalsa/rfc3156.c:1205
+msgid "Validity"
+msgstr "Validesa"
+
+#: libbalsa/rfc3156.c:1206
+msgid "Owner trust"
+msgstr "Confiança del propietari"
+
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1331
+#: libbalsa/rfc3156.c:1250
 msgid "Select key"
 msgstr "Selecciona una clau"
 
-#: libbalsa/rfc3156.c:1339
+#: libbalsa/rfc3156.c:1261
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Selecciona la clau privada pel signant %s"
 
-#: libbalsa/rfc3156.c:1342
+#: libbalsa/rfc3156.c:1265
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Selecciona la clau públic pel destinatari %s"
 
-#: libbalsa/rfc3156.c:1432
-#, fuzzy, c-format
-msgid "could not list keys for %s: %s"
-msgstr "%s: no s'han pogut llistar les claus pel %s: %s"
-
-#: libbalsa/rfc3156.c:1440
-#, fuzzy, c-format
-msgid "could not retrieve key for %s: %s"
-msgstr "%s: no s'han pogut obtenir les claus pel %s: %s"
-
-#: libbalsa/rfc3156.c:1477
-#, c-format
-msgid "could not get a private key for %s"
-msgstr "no s'ha pogut obtenir un clau privada pel %s"
-
-#: libbalsa/rfc3156.c:1503
-#, fuzzy, c-format
-msgid "could not create gpgme recipients set: %s"
-msgstr "%s: no s'ha pogut crear el context: %s"
-
-#: libbalsa/rfc3156.c:1527
-#, fuzzy, c-format
-msgid "could not add recipient %s: %s"
-msgstr "No s'ha pogut desar el %s: %s"
-
-#: libbalsa/rfc3156.c:1869
-#, c-format
-msgid ""
-"The passphrase for this key was bad, please try again!\n"
-"\n"
-"Key: %s"
+#: libbalsa/rfc3156.c:1544
+msgid "Try again later."
 msgstr ""
-"La contrasenya per a aquesta clau és incorrecta, torneu-ho a intentar.\n"
-"\n"
-"Clau: %s"
 
-#: libbalsa/rfc3156.c:1873
-#, c-format
-msgid ""
-"Please enter the passphrase for the secret key!\n"
-"\n"
-"Key: %s"
-msgstr ""
-"Introduïu la contrasenya per a la clau secreta.\n"
-"\n"
-"Clau: %s"
-
-#: libbalsa/rfc3156.c:1888
-msgid "remember passphrase for"
-msgstr "manté la contrasenya durant"
-
-#: libbalsa/rfc3156.c:1893 src/pref-manager.c:1647 src/pref-manager.c:2446
-#: src/pref-manager.c:2467
-msgid "minutes"
-msgstr "minuts"
-
-#: libbalsa/rfc3156.c:2077
-msgid "Enter passsphrase to sign message"
-msgstr "Introduïu la contrasenya per signar el missatge"
-
-#: libbalsa/send.c:229 libbalsa/send.c:236
+#: libbalsa/send.c:233 libbalsa/send.c:240
 msgid "Sending Mail..."
 msgstr "S'està enviant el correu..."
 
-#: libbalsa/send.c:232 src/main-window.c:1920
+#: libbalsa/send.c:236 src/main-window.c:2591
 msgid "_Hide"
 msgstr "Ama_ga"
 
-#: libbalsa/send.c:752
+#: libbalsa/send.c:765
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1043,7 +1191,7 @@ msgstr ""
 "%d: %s\n"
 "El missatge s'ha deixat a la bústia de sortida.\n"
 
-#: libbalsa/send.c:797
+#: libbalsa/send.c:810
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1054,7 +1202,7 @@ msgstr ""
 "%d: %s\n"
 "El missatge s'ha deixat a la bústia de sortida.\n"
 
-#: libbalsa/send.c:807
+#: libbalsa/send.c:820
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1063,33 +1211,33 @@ msgstr ""
 "de sortida.\n"
 "El sistema no provarà de reenviar-lo si el suprimiu."
 
-#: libbalsa/send.c:837
+#: libbalsa/send.c:850
 msgid "Connected to MTA"
 msgstr "Està connectat amb l'MTA"
 
-#: libbalsa/send.c:844 src/balsa-message.c:1344 src/print.c:367
-#: src/sendmsg-window.c:665 src/sendmsg-window.c:2197 src/store-address.c:303
+#: libbalsa/send.c:857 src/balsa-message.c:1415 src/print.c:369
+#: src/sendmsg-window.c:855 src/sendmsg-window.c:2459 src/store-address.c:303
 msgid "From:"
 msgstr "De:"
 
-#: libbalsa/send.c:847 src/balsa-index.c:308
+#: libbalsa/send.c:860 src/balsa-index.c:335
 msgid "From"
 msgstr "De"
 
-#: libbalsa/send.c:855 src/balsa-message.c:1353 src/print.c:371
-#: src/sendmsg-window.c:664 src/sendmsg-window.c:2204 src/store-address.c:304
+#: libbalsa/send.c:869 src/balsa-message.c:1424 src/print.c:373
+#: src/sendmsg-window.c:854 src/sendmsg-window.c:2466 src/store-address.c:304
 msgid "To:"
 msgstr "Per a:"
 
-#: libbalsa/send.c:858 src/balsa-index.c:736
+#: libbalsa/send.c:872 src/balsa-index.c:906
 msgid "To"
 msgstr "Per a"
 
-#: libbalsa/send.c:894
+#: libbalsa/send.c:910
 msgid "Disconnected"
 msgstr "Desconnectat"
 
-#: libbalsa/send.c:1077
+#: libbalsa/send.c:1128
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1103,7 +1251,7 @@ msgstr ""
 "mitjançant: \"host:smtp\".\n"
 "El missatge es deixarà a la bústia de sortida."
 
-#: libbalsa/send.c:1087
+#: libbalsa/send.c:1138
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1112,21 +1260,27 @@ msgstr ""
 "S'ha produït un error en el servidor de SMTP (%d): %s\n"
 "El vostre missatge es manté a la bústia de sortida."
 
-#: libbalsa/send.c:1402
+#: libbalsa/send.c:1466
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 
-#: libbalsa/send.c:1515 libbalsa/send.c:1693
+#: libbalsa/send.c:1759 libbalsa/send.c:1835
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr ""
 "Els destinataris en el camp BCC rebran aquest missatge sense encriptar."
 
-#: libbalsa/source-viewer.c:52 src/main-window.c:546
+#. host, authentication method
+#: libbalsa/server.c:370
+#, c-format
+msgid "Logging in to %s using %s"
+msgstr ""
+
+#: libbalsa/source-viewer.c:52 src/main-window.c:645
 msgid "_Select Text"
 msgstr "_Selecciona el text"
 
-#: libbalsa/source-viewer.c:53 src/main-window.c:547
+#: libbalsa/source-viewer.c:53 src/main-window.c:646
 msgid "Select entire mail"
 msgstr "Selecciona el correu sencer"
 
@@ -1138,7 +1292,11 @@ msgstr "Caràcters especials d'_escapada"
 msgid "Escape special and non-ASCII characters"
 msgstr "Caràcters especials i no ASCII d'escapada"
 
-#: libbalsa/source-viewer.c:212
+#: libbalsa/source-viewer.c:152
+msgid "Mailbox closed"
+msgstr "S'ha tancat la bústia"
+
+#: libbalsa/source-viewer.c:213
 msgid "Message Source"
 msgstr "Codi font del missatge"
 
@@ -1161,54 +1319,39 @@ msgstr "_Per a"
 msgid "Default Client"
 msgstr "Domini per defecte:"
 
-#: libinit_balsa/balsa-druid-page-directory.c:37
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Inbox:"
 msgstr "Búst_ia d'entrada:"
 
-#: libinit_balsa/balsa-druid-page-directory.c:37
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Outbox:"
 msgstr "Bústia de s_ortida:"
 
-#: libinit_balsa/balsa-druid-page-directory.c:37
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Sentbox:"
 msgstr "Bústia d'enviat_s:"
 
-#: libinit_balsa/balsa-druid-page-directory.c:37
+#: libinit_balsa/balsa-druid-page-directory.c:42
 msgid "_Draftbox:"
 msgstr "Bústia _d'esborranys:"
 
-#: libinit_balsa/balsa-druid-page-directory.c:38
+#: libinit_balsa/balsa-druid-page-directory.c:43
 msgid "_Trash:"
 msgstr "Pape_rera:"
 
-#: libinit_balsa/balsa-druid-page-directory.c:63
+#: libinit_balsa/balsa-druid-page-directory.c:70
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
 msgstr "El camí \\\"%s\\\" ha de començar amb barra invertida ('/')."
 
-#: libinit_balsa/balsa-druid-page-directory.c:120
-#, c-format
-msgid ""
-"The mailbox \"%s\" does not appear to be valid.\n"
-"Your system does not allow for creation of mailboxes\n"
-"in /var/spool/mail. Balsa wouldn't function properly\n"
-"until the system created the mailboxes. Please change\n"
-"the mailbox path or check your system configuration."
-msgstr ""
-"La bústia \"%s\" no és vàlida.\n"
-"El sistema no permet crear bústies al /var/spool/mail.\n"
-"El Balsa no funcionarà correctament fins que no es creïn\n"
-"aquestes bústies. Canvieu el camí de la bústia o comproveu\n"
-"la configuració del sistema."
-
-#: libinit_balsa/balsa-druid-page-directory.c:129
+#: libinit_balsa/balsa-druid-page-directory.c:134
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "La bústia %s no sembla vàlida."
 
-#: libinit_balsa/balsa-druid-page-directory.c:180
+#: libinit_balsa/balsa-druid-page-directory.c:184
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -1216,11 +1359,11 @@ msgstr ""
 "Verifiqueu les ubicacions dels fitxers de correu predeterminats.\n"
 "En cas que sigui necessari es crearan."
 
-#: libinit_balsa/balsa-druid-page-directory.c:235
+#: libinit_balsa/balsa-druid-page-directory.c:239
 msgid "Mail Files"
 msgstr "Fitxers de correu"
 
-#: libinit_balsa/balsa-druid-page-directory.c:324
+#: libinit_balsa/balsa-druid-page-directory.c:341
 #, c-format
 msgid ""
 "Problem Creating Mailboxes\n"
@@ -1244,6 +1387,11 @@ msgstr "Això és tot"
 #: libinit_balsa/balsa-druid-page-finish.c:70
 msgid "GnomeCard Address Book"
 msgstr "Llibreta d'adreces GnomeCard"
+
+#: libinit_balsa/balsa-druid-page-finish.c:77
+#: libinit_balsa/balsa-druid-page-finish.c:85 src/ab-window.c:207
+msgid "Address Book"
+msgstr "Llibreta d'adreces"
 
 #: libinit_balsa/balsa-druid-page-user.c:67
 msgid "Please enter information about yourself."
@@ -1329,23 +1477,35 @@ msgstr "El fitxer amb el camí \"%s\" no és un directori."
 msgid "Configure Balsa"
 msgstr "Configura el Balsa"
 
-#: src/ab-main.c:304 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: sounds/balsa.soundlist.in.h:1
+msgid "Balsa E-mail reader"
+msgstr "Lector de correu Balsa"
+
+#: sounds/balsa.soundlist.in.h:2
+msgid "Program startup"
+msgstr "Inici del programa"
+
+#: sounds/email.soundlist.in.h:1
+msgid "E-mail"
+msgstr "Correu electrònic"
+
+#: sounds/email.soundlist.in.h:2
+msgid "New mail notification"
+msgstr "Notificació de nous missatges"
+
+#: src/ab-main.c:337 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Nom"
 
-#: src/ab-main.c:389
+#: src/ab-main.c:457
 msgid "F_ilter:"
 msgstr "F_iltre:"
 
 #: src/ab-window.c:175
 msgid "E-Mail Address"
 msgstr "Adreça de correu electrònic"
-
-#: src/ab-window.c:207
-msgid "Address Book"
-msgstr "Llibreta d'adreces"
 
 #. Entry widget for finding an address
 #: src/ab-window.c:264
@@ -1477,13 +1637,13 @@ msgstr "_Contrasenya:"
 msgid "Enable _TLS"
 msgstr "Habilita el _TLS"
 
-#: src/address-book-config.c:556 src/folder-conf.c:97
+#: src/address-book-config.c:556 src/folder-conf.c:103
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "S'ha produït un error en mostrar %s: %s\n"
 
-#: src/address-book-config.c:574 src/mailbox-conf.c:466
-#: src/pref-manager.c:1517 src/pref-manager.c:2619
+#: src/address-book-config.c:574 src/mailbox-conf.c:550
+#: src/pref-manager.c:1519 src/pref-manager.c:2665
 msgid "_Add"
 msgstr "_Afegeix"
 
@@ -1529,323 +1689,318 @@ msgstr "Contrasenya de la bústia _per a %s@%s:"
 msgid "Password needed"
 msgstr "Cal una contrasenya"
 
-#: src/balsa-app.c:95 src/folder-conf.c:313
+#: src/balsa-app.c:95 src/folder-conf.c:324
 msgid "_Remember password"
 msgstr "_Recorda la contrasenya"
 
-#: src/balsa-app.c:607
+#: src/balsa-app.c:579
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "No s'ha pogut obrir la bústia \"%s\""
 
-#: src/balsa-index.c:323
+#: src/balsa-index.c:348
 msgid "Subject"
 msgstr "Assumpte"
 
-#: src/balsa-index.c:339
+#: src/balsa-index.c:362
 msgid "Date"
 msgstr "Data"
 
-#: src/balsa-index.c:353
+#: src/balsa-index.c:374
 msgid "Size"
 msgstr "Mida"
 
-#: src/balsa-index.c:711
+#: src/balsa-index.c:870
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "S'està obrint la bústia %s. Espereu..."
 
-#: src/balsa-index.c:1526 src/main-window.c:477 src/message-window.c:143
+#. R
+#: src/balsa-index.c:1611 src/main-window.c:576 src/main-window.c:1021
+#: src/message-window.c:143
 msgid "_Reply..."
 msgstr "_Respon..."
 
-#: src/balsa-index.c:1528
+#: src/balsa-index.c:1613
 msgid "Reply To _All..."
 msgstr "Respon _a tots..."
 
-#: src/balsa-index.c:1530
+#: src/balsa-index.c:1615
 msgid "Reply To _Group..."
 msgstr "Respon al _grup..."
 
-#: src/balsa-index.c:1532
+#: src/balsa-index.c:1617
 msgid "_Forward Attached..."
 msgstr "R_eenvia'l adjuntat..."
 
-#: src/balsa-index.c:1534
+#: src/balsa-index.c:1619
 msgid "Forward _Inline..."
 msgstr "Reenvia'l _insertat..."
 
-#: src/balsa-index.c:1536 src/main-window.c:567
+#: src/balsa-index.c:1621 src/main-window.c:666 src/main-window.c:1005
 msgid "_Store Address..."
 msgstr "_Emmagatzema l'adreça..."
 
-#: src/balsa-index.c:1551 src/filter-edit-dialog.c:216 src/mailbox-node.c:965
-#: src/pref-manager.c:1519 src/pref-manager.c:2623
+#: src/balsa-index.c:1636 src/filter-edit-dialog.c:216 src/mailbox-node.c:957
+#: src/pref-manager.c:1521 src/pref-manager.c:2669
 msgid "_Delete"
 msgstr "_Suprimeix"
 
-#: src/balsa-index.c:1556
+#: src/balsa-index.c:1641
 msgid "_Undelete"
 msgstr "Desfés la s_upressió"
 
-#: src/balsa-index.c:1561
+#: src/balsa-index.c:1646
 msgid "Move To _Trash"
 msgstr "Mou a la _paperera"
 
-#: src/balsa-index.c:1565
+#: src/balsa-index.c:1650
 msgid "T_oggle"
 msgstr "C_ommuta"
 
-#: src/balsa-index.c:1568 src/main-window.c:449 src/main-window.c:606
+#: src/balsa-index.c:1654 src/main-window.c:325 src/main-window.c:354
 msgid "_Flagged"
 msgstr "M_arcat"
 
-#: src/balsa-index.c:1571
+#: src/balsa-index.c:1657
 msgid "_Unread"
 msgstr "S_ense llegir"
 
-#: src/balsa-index.c:1579
+#: src/balsa-index.c:1665
 msgid "_Move to"
 msgstr "_Mou a"
 
-#: src/balsa-index.c:1587
+#: src/balsa-index.c:1673
 msgid "_View Source"
 msgstr "_Visualitza el codi font"
 
-#: src/balsa-mblist.c:332
+#: src/balsa-index.c:1942
+#, fuzzy, c-format
+msgid "Failed to copy messages to mailbox \"%s\"."
+msgstr "No s'ha pogut trobar la bústia"
+
+#: src/balsa-index.c:1943
+#, fuzzy, c-format
+msgid "Failed to copy message to mailbox \"%s\"."
+msgstr "No s'ha pogut trobar la bústia"
+
+#: src/balsa-index.c:1956
+#, fuzzy, c-format
+msgid "Copied to \"%s\"."
+msgstr "S'està copiant el missatge %d a %s..."
+
+#: src/balsa-index.c:1957
+#, fuzzy, c-format
+msgid "Moved to \"%s\"."
+msgstr "_Mou a la paperera"
+
+#: src/balsa-index.c:2073
+#, fuzzy, c-format
+msgid "Committing mailbox %s failed."
+msgstr "Ha fallat la confirmació de la bústia %s."
+
+#: src/balsa-mblist.c:278
 msgid "Mailbox"
 msgstr "Bústia"
 
-#: src/balsa-mblist.c:359 src/filter-edit-callbacks.c:802
+#: src/balsa-mblist.c:306 src/filter-edit-callbacks.c:802
 msgid "Unread"
 msgstr "Sense llegir"
 
-#: src/balsa-mblist.c:383
+#: src/balsa-mblist.c:331
 msgid "Total"
 msgstr "Total"
 
-#: src/balsa-mblist.c:1022 src/balsa-mblist.c:1067
+#: src/balsa-mblist.c:1011 src/balsa-mblist.c:1047
 msgid "Failed to find mailbox"
 msgstr "No s'ha pogut trobar la bústia"
 
-#: src/balsa-mblist.c:1796
+#: src/balsa-mblist.c:1630
 msgid "_Other..."
 msgstr "_Altres..."
 
-#: src/balsa-mblist.c:1864
+#: src/balsa-mblist.c:1698
 msgid "Choose destination folder"
 msgstr "Escolliu la carpeta destí"
 
-#: src/balsa-mblist.c:2194
+#: src/balsa-mblist.c:2033
 #, fuzzy, c-format
-msgid "Shown mailbox: %s with %d messages, %ld new"
-msgstr "Mostra la bústia: %s amb %ld missatges, %ld nous"
+msgid "Shown mailbox: %s with %d message, "
+msgid_plural "Shown mailbox: %s with %d messages, "
+msgstr[0] "Mostra la bústia: %s amb %ld missatges, %ld nous"
+msgstr[1] "Mostra la bústia: %s amb %ld missatges, %ld nous"
 
-#: src/balsa-message.c:442
+#. xgettext: this is the second part of the message
+#. * "Shown mailbox: %s with %d messages, %ld new".
+#: src/balsa-mblist.c:2039
+#, c-format
+msgid "%ld new"
+msgid_plural "%ld new"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/balsa-message.c:578
 msgid "Content"
 msgstr "Continguts"
 
-#: src/balsa-message.c:502
+#: src/balsa-message.c:661
 msgid "Message parts"
 msgstr "Parts del missatge"
 
-#: src/balsa-message.c:586
+#: src/balsa-message.c:776
 msgid "File already exists. Overwrite?"
 msgstr "El fitxer ja existeix. El voleu sobreescriure?"
 
-#: src/balsa-message.c:598
+#: src/balsa-message.c:788
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "No s'ha pogut desar el %s: %s"
 
-#: src/balsa-message.c:612
+#: src/balsa-message.c:802
 #, c-format
 msgid "Save %s MIME Part"
 msgstr "Desa la part MIME de %s"
 
-#: src/balsa-message.c:769
+#: src/balsa-message.c:969
 msgid "Save selected..."
 msgstr "Desa els seleccionats..."
 
-#: src/balsa-message.c:905
+#: src/balsa-message.c:1108
 msgid "(No sender)"
 msgstr "(Sense remitent)"
 
-#: src/balsa-message.c:941 src/balsa-message.c:951 src/balsa-message.c:2206
-msgid "detected a good signature"
-msgstr "s'ha detectat una signatura correcta"
-
-#: src/balsa-message.c:946 src/balsa-message.c:2213
-msgid "detected a good signature with insufficient validity/trust"
-msgstr ""
-"s'ha detectat una signatura correcta amb una validesa/confiança insuficient"
-
-#: src/balsa-message.c:955 src/balsa-message.c:965 src/balsa-message.c:2225
-#: src/balsa-message.c:2234
-#, c-format
-msgid ""
-"Checking the signature of the message sent by %s with subject \"%s\" "
-"returned:\n"
-"%s"
-msgstr ""
-"S'ha produït un error en comprovar la signatura del missatge enviat per en %"
-"s amb l'assumpte \"%s\", s'ha retornat el següent missatge:\n"
-"%s"
-
-#: src/balsa-message.c:974
-#, c-format
-msgid ""
-"Checking the signature of the message sent by %s with subject \"%s\" failed "
-"with an error!"
-msgstr ""
-"S'ha produït un error en la comprovació de la signatura del missatge enviat "
-"per en %s amb l'assumpte \"%s\""
-
-#: src/balsa-message.c:979
-#, fuzzy, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a \"multipart/signed\" "
-"part, but it's structure is invalid. The signature, if there is any, can not "
-"be checked."
-msgstr ""
-"El missatge enviat per en %s amb l'assumpte \"%s\" conté una part signada, "
-"però la seva estructura és invàlida. La signatura, si n'hi ha alguna no es "
-"pot comprovar."
-
-#: src/balsa-message.c:1076
-#, fuzzy, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a \"multipart/encrypted"
-"\" part, but it's structure is invalid."
-msgstr ""
-"El missatge enviat per en %s amb l'assumpte \"%s\" conté una part "
-"encriptada, però la seva estructura és invàlida."
-
-#: src/balsa-message.c:1336 src/print.c:356 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:2192
+#: src/balsa-message.c:1406 src/print.c:358 src/sendmsg-window.c:859
+#: src/sendmsg-window.c:2454
 msgid "Subject:"
 msgstr "Assumpte:"
 
-#: src/balsa-message.c:1339 src/print.c:362 src/sendmsg-window.c:2186
+#: src/balsa-message.c:1410 src/print.c:364 src/sendmsg-window.c:2448
 msgid "Date:"
 msgstr "Data:"
 
-#: src/balsa-message.c:1350 src/sendmsg-window.c:666
+#: src/balsa-message.c:1421 src/sendmsg-window.c:856
 msgid "Reply-To:"
 msgstr "Respon a:"
 
 #. cc:
-#: src/balsa-message.c:1354 src/print.c:372 src/sendmsg-window.c:668
-#: src/sendmsg-window.c:1906 src/sendmsg-window.c:2211 src/store-address.c:305
+#: src/balsa-message.c:1425 src/print.c:374 src/sendmsg-window.c:858
+#: src/sendmsg-window.c:2146 src/sendmsg-window.c:2473 src/store-address.c:305
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:1355 src/print.c:373 src/sendmsg-window.c:667
-#: src/sendmsg-window.c:1911 src/store-address.c:306
+#: src/balsa-message.c:1426 src/print.c:375 src/sendmsg-window.c:857
+#: src/sendmsg-window.c:2151 src/store-address.c:306
 msgid "Bcc:"
 msgstr "Bcc"
 
-#: src/balsa-message.c:1358 src/print.c:374
+#: src/balsa-message.c:1429 src/print.c:376
 msgid "Fcc:"
 msgstr "Fcc"
 
-#: src/balsa-message.c:1363 src/print.c:379
+#: src/balsa-message.c:1434 src/print.c:381
 msgid "Disposition-Notification-To:"
 msgstr "Entrega-Notificació-A:"
 
-#: src/balsa-message.c:1518 src/balsa-message.c:1534 src/balsa-message.c:1564
-#: src/balsa-message.c:1617
+#: src/balsa-message.c:1591
+#, fuzzy, c-format
+msgid "Error loading attached image: %s\n"
+msgstr "S'ha produït un error en carregar %s: %s\n"
+
+#: src/balsa-message.c:1661 src/balsa-message.c:1677 src/balsa-message.c:1709
+#: src/balsa-message.c:1762
 msgid "Content Type: external-body\n"
 msgstr "Tipus de continguts: cos extern\n"
 
-#: src/balsa-message.c:1519
+#: src/balsa-message.c:1662
 msgid "Access type: local-file\n"
 msgstr "Tipus d'accés: fitxer local\n"
 
-#: src/balsa-message.c:1520 src/balsa-message.c:1571 src/balsa-message.c:1729
+#: src/balsa-message.c:1663 src/balsa-message.c:1716 src/balsa-message.c:1875
 #, c-format
 msgid "File name: %s"
 msgstr "Nom del fitxer: %s"
 
-#: src/balsa-message.c:1535
+#: src/balsa-message.c:1678
 msgid "Access type: URL\n"
 msgstr "Tipus d'accés: URL\n"
 
-#: src/balsa-message.c:1536
+#: src/balsa-message.c:1679
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:1565
+#: src/balsa-message.c:1710
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Tipus d'accés: %s\n"
 
-#: src/balsa-message.c:1568
+#: src/balsa-message.c:1713
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "Lloc FTP: %s\n"
 
-#: src/balsa-message.c:1570
+#: src/balsa-message.c:1715
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Directori: %s\n"
 
-#: src/balsa-message.c:1618
+#: src/balsa-message.c:1763
 msgid "Access type: mail-server\n"
 msgstr "Tipus d'accés: servidor de correu\n"
 
-#: src/balsa-message.c:1619
+#: src/balsa-message.c:1764
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Servidor de correu: %s\n"
 
-#: src/balsa-message.c:1621
+#: src/balsa-message.c:1766
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Assumpte: %s\n"
 
-#: src/balsa-message.c:1632
-msgid "Send message to obtain this part"
+#: src/balsa-message.c:1778
+#, fuzzy
+msgid "Se_nd message to obtain this part"
 msgstr "Envia un missatge per obtenir aquest part"
 
-#: src/balsa-message.c:1737
+#: src/balsa-message.c:1883
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Tipus: %s (%s)"
 
-#: src/balsa-message.c:1740
+#: src/balsa-message.c:1886
 #, c-format
 msgid "Content Type: %s"
 msgstr "Tipus de contingut: %s"
 
-#: src/balsa-message.c:1751
+#: src/balsa-message.c:1897
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "No s'ha definit cap acció definida al MIME del GNOME per obrir o visualitzar "
 "aquest tipus de contingut"
 
-#: src/balsa-message.c:1757
-msgid "Save part"
+#: src/balsa-message.c:1903
+#, fuzzy
+msgid "S_ave part"
 msgstr "Desa la part"
 
-#: src/balsa-message.c:1781 src/balsa-message.c:1806
-#, c-format
-msgid "View part with %s"
+#: src/balsa-message.c:1927 src/balsa-message.c:1952
+#, fuzzy, c-format
+msgid "View _part with %s"
 msgstr "Visualitza la part amb %s"
 
-#: src/balsa-message.c:2085
+#: src/balsa-message.c:2231
 #, c-format
 msgid "Calling URL %s..."
 msgstr "S'està intentant accedir a l'URL %s..."
 
-#: src/balsa-message.c:2095 src/balsa-message.c:2898 src/balsa-message.c:3565
+#: src/balsa-message.c:2241 src/balsa-message.c:3093 src/balsa-message.c:3776
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "S'ha produït un error en mostrar %s: %s\n"
 
-#: src/balsa-message.c:2169
+#: src/balsa-message.c:2345
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -1855,56 +2010,79 @@ msgstr ""
 "bits, però no disposa de cap capçalera que descrigui el joc de caràcters "
 "(convertit a %s)"
 
-#: src/balsa-message.c:2533
+#: src/balsa-message.c:2444
+#, fuzzy
+msgid "This is an OpenPGP signed message part:\n"
+msgstr ""
+"\n"
+"--\n"
+"Aquesta és una part del missatge signada per l'OpenPGP:\n"
+
+#: src/balsa-message.c:2664
 msgid "mixed parts"
 msgstr "parts barrejades"
 
-#: src/balsa-message.c:2535
+#: src/balsa-message.c:2666
 msgid "alternative parts"
 msgstr "parts alternatives"
 
-#: src/balsa-message.c:2537
+#: src/balsa-message.c:2668
 msgid "signed parts"
 msgstr "parts signades"
 
-#: src/balsa-message.c:2539
+#: src/balsa-message.c:2670
 msgid "encrypted parts"
 msgstr "parts encriptades"
 
-#: src/balsa-message.c:2541
+#: src/balsa-message.c:2672
 msgid "rfc822 message"
 msgstr "missatge rfc822"
 
-#: src/balsa-message.c:2543
+#: src/balsa-message.c:2674
 #, c-format
 msgid "\"%s\" parts"
 msgstr "parts de \"%s\""
 
-#: src/balsa-message.c:2574
+#: src/balsa-message.c:2730
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "missatge rfc822 (de %s, assumpte \"%s\")"
 
-#: src/balsa-message.c:2670
+#: src/balsa-message.c:2737
+#, fuzzy
+msgid "complete message"
+msgstr "Redacta el missatge"
+
+#: src/balsa-message.c:2754
+#, c-format
+msgid "part %s: %s (file %s)"
+msgstr ""
+
+#: src/balsa-message.c:2765
+#, fuzzy, c-format
+msgid "part %s: %s"
+msgstr "Respon a %s: %s"
+
+#: src/balsa-message.c:2855
 #, c-format
 msgid "Open with %s"
 msgstr "Obre amb el %s"
 
-#: src/balsa-message.c:2810
+#: src/balsa-message.c:2986
 msgid "Save..."
 msgstr "Desa..."
 
-#: src/balsa-message.c:2979
+#: src/balsa-message.c:3175
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "No s'ha pogut crear el fitxer temporal %s"
 
-#: src/balsa-message.c:3024
+#: src/balsa-message.c:3220
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "no s'ha pogut crear el fitxer temporal %s"
 
-#: src/balsa-message.c:3810
+#: src/balsa-message.c:4050
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -1915,9 +2093,88 @@ msgstr ""
 "a \"%s\" d'una notificació d'entrega del missatge (MDN).\n"
 "Voleu enviar aquesta notificació?"
 
-#: src/balsa-message.c:3817
+#: src/balsa-message.c:4057
 msgid "Reply to MDN?"
 msgstr "Voleu respondre al MDN (notificació d'entrega del missatge)?"
+
+#: src/balsa-message.c:4260
+#, fuzzy, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a %s signed part, but "
+"this crypto protocol is not available."
+msgstr ""
+"El missatge enviat per en %s amb l'assumpte \"%s\" conté una part "
+"encriptada, però la seva estructura és invàlida."
+
+#: src/balsa-message.c:4263
+msgid "PGP"
+msgstr ""
+
+#: src/balsa-message.c:4263
+msgid "S/MIME"
+msgstr ""
+
+#: src/balsa-message.c:4298 src/balsa-message.c:4615
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" "
+"returned:\n"
+"%s"
+msgstr ""
+"S'ha produït un error en comprovar la signatura del missatge enviat per en %"
+"s amb l'assumpte \"%s\", s'ha retornat el següent missatge:\n"
+"%s"
+
+#: src/balsa-message.c:4305
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" failed "
+"with an error!"
+msgstr ""
+"S'ha produït un error en la comprovació de la signatura del missatge enviat "
+"per en %s amb l'assumpte \"%s\""
+
+#: src/balsa-message.c:4337
+#, fuzzy, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a signed part, but it's "
+"structure is invalid. The signature, if there is any, can not be checked."
+msgstr ""
+"El missatge enviat per en %s amb l'assumpte \"%s\" conté una part signada, "
+"però la seva estructura és invàlida. La signatura, si n'hi ha alguna no es "
+"pot comprovar."
+
+#: src/balsa-message.c:4401
+#, fuzzy, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains an encrypted part, but "
+"it's structure is invalid."
+msgstr ""
+"El missatge enviat per en %s amb l'assumpte \"%s\" conté una part "
+"encriptada, però la seva estructura és invàlida."
+
+#: src/balsa-message.c:4408
+#, fuzzy, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+"El missatge enviat per en %s amb l'assumpte \"%s\" conté una part "
+"encriptada, però la seva estructura és invàlida."
+
+#: src/balsa-message.c:4420
+#, fuzzy, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+"El missatge enviat per en %s amb l'assumpte \"%s\" conté una part encriptada "
+"S/MIME, però el balsa encara no està capacitat per gestionar aquest format."
+
+#: src/balsa-message.c:4513 src/balsa-message.c:4730
+#, fuzzy
+msgid "_Run gpg to import this key"
+msgstr "executa el gpg per importar aquest clau"
 
 #: src/filter-edit-callbacks.c:286
 msgid "One of the specified fields contains:"
@@ -2047,25 +2304,25 @@ msgstr "T_ot"
 msgid "C_lear"
 msgstr "Ne_teja"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:2850
+#: src/filter-edit-callbacks.c:1011 src/main-window.c:3647
 msgid "_Body"
 msgstr "_Cos"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:2851
-#: src/sendmsg-window.c:1895
+#: src/filter-edit-callbacks.c:1018 src/main-window.c:3648
+#: src/sendmsg-window.c:2135
 msgid "_To:"
 msgstr "_A:"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:2852
+#: src/filter-edit-callbacks.c:1025 src/main-window.c:3649
 msgid "_From:"
 msgstr "_De:"
 
-#: src/filter-edit-callbacks.c:1033 src/sendmsg-window.c:313
+#: src/filter-edit-callbacks.c:1033
 msgid "_Subject"
 msgstr "A_ssumpte"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:2854
+#: src/filter-edit-callbacks.c:1040 src/main-window.c:3651
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -2081,42 +2338,42 @@ msgstr "T_ipus de cerca:"
 msgid "Edit condition for filter: "
 msgstr "Edita la condició pel filtre: "
 
-#: src/filter-edit-callbacks.c:1374
+#: src/filter-edit-callbacks.c:1384
 #, c-format
 msgid "Error displaying filter help: %s\n"
 msgstr "S'ha produït un error en mostrar l'ajuda del filtre: %s\n"
 
-#: src/filter-edit-callbacks.c:1562
+#: src/filter-edit-callbacks.c:1572
 msgid "New filter"
 msgstr "Nou filtre"
 
-#: src/filter-edit-callbacks.c:1691
+#: src/filter-edit-callbacks.c:1701
 msgid "No filter name specified."
 msgstr "No s'ha especificat cap nom del filtre."
 
-#: src/filter-edit-callbacks.c:1696
+#: src/filter-edit-callbacks.c:1706
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "El filtre \"%s\" ja existeix."
 
-#: src/filter-edit-callbacks.c:1709
+#: src/filter-edit-callbacks.c:1719
 msgid "Filter must have conditions."
 msgstr "El filtre ha de tenir condicions."
 
-#: src/filter-edit-callbacks.c:1771
+#: src/filter-edit-callbacks.c:1781
 msgid "Filter has matched"
 msgstr "El filtre coincideix"
 
-#: src/filter-edit-callbacks.c:1789
+#: src/filter-edit-callbacks.c:1799
 msgid "You must provide a sound to play"
 msgstr "Heu de definir un so a reproduir"
 
-#: src/filter-edit-callbacks.c:1924
+#: src/filter-edit-callbacks.c:1948
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Exemple: escriviu desembre 31, 2000, com %s)"
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:343
+#: src/filter-edit-dialog.c:88 src/pref-manager.c:346
 msgid "Simple"
 msgstr "Senzill"
 
@@ -2161,8 +2418,9 @@ msgid "AND"
 msgstr "I"
 
 #. new button
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:937 src/main-window.c:290
-#: src/main-window.c:460
+#. #define MENU_FILE_NEW_POS 0
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:929 src/main-window.c:365
+#: src/main-window.c:424
 msgid "_New"
 msgstr "_Nou"
 
@@ -2251,17 +2509,17 @@ msgstr ""
 msgid "Balsa Filters Export"
 msgstr "Exporta el filtres del Balsa"
 
-#: src/filter-run-callbacks.c:139
+#: src/filter-run-callbacks.c:173
 msgid "Error when applying filters"
 msgstr "S'ha produït un error en aplicar les filtres"
 
-#: src/filter-run-callbacks.c:157
+#: src/filter-run-callbacks.c:191
 #, c-format
 msgid "Error displaying run filters help: %s\n"
 msgstr ""
 "S'ha produït un error en mostrar l'ajuda de l'execució de filtres: %s\n"
 
-#: src/filter-run-callbacks.c:204
+#: src/filter-run-callbacks.c:238
 #, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
@@ -2270,7 +2528,7 @@ msgstr ""
 "La bústia destí del filtre \"%s\" és la \"%s\".\n"
 "No la podeu associar a la mateixa bústia (provoca recursivitat)."
 
-#: src/filter-run-callbacks.c:212
+#: src/filter-run-callbacks.c:246
 #, c-format
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
@@ -2306,7 +2564,7 @@ msgstr "Am_unt"
 msgid "Do_wn"
 msgstr "A_vall"
 
-#: src/filter-run-dialog.c:398
+#: src/filter-run-dialog.c:399
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
@@ -2314,63 +2572,75 @@ msgstr ""
 "El diàleg dels filtres està obert, tanqueu-lo abans d'executar els filtres a "
 "cap bústia"
 
-#: src/folder-conf.c:270
+#: src/folder-conf.c:259
 msgid "Remote IMAP folder"
 msgstr "Carpeta d'IMAP remota"
 
-#: src/folder-conf.c:273 src/folder-conf.c:663 src/mailbox-conf.c:477
+#. must NOT be modal
+#: src/folder-conf.c:262 src/folder-conf.c:684 src/mailbox-conf.c:561
 msgid "_Update"
 msgstr "Act_ualitza"
 
-#: src/folder-conf.c:273 src/folder-conf.c:663
+#: src/folder-conf.c:262 src/folder-conf.c:684
 msgid "_Create"
 msgstr "_Crea"
 
-#: src/folder-conf.c:288
-msgid "Remote IMAP folder set"
-msgstr "Conjunt de carpetes remotes d'IMAP"
+#: src/folder-conf.c:282 src/mailbox-conf.c:1042 src/mailbox-conf.c:1132
+#, fuzzy
+msgid "_Basic"
+msgstr "_Bcc"
+
+#: src/folder-conf.c:287
+msgid "_Max number of connections"
+msgstr ""
+
+#: src/folder-conf.c:294 src/mailbox-conf.c:1201
+msgid "Enable _persistent cache"
+msgstr ""
+
+#: src/folder-conf.c:301 src/mailbox-conf.c:1095 src/mailbox-conf.c:1204
+#, fuzzy
+msgid "_Advanced"
+msgstr "_Afegeix"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:295
+#: src/folder-conf.c:304
 msgid "Descriptive _Name:"
 msgstr "_Nom descriptiu:"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:301 src/mailbox-conf.c:934 src/mailbox-conf.c:1028
+#: src/folder-conf.c:311 src/mailbox-conf.c:1050 src/mailbox-conf.c:1141
 msgid "_Server:"
 msgstr "_Servidor:"
 
 #. username
-#: src/folder-conf.c:307 src/mailbox-conf.c:941
+#: src/folder-conf.c:318 src/mailbox-conf.c:1057
 msgid "Use_r name:"
 msgstr "Nom d'usua_ri:"
 
-#: src/folder-conf.c:318
+#: src/folder-conf.c:329
 msgid "_Password:"
 msgstr "_Contrasenya:"
 
-#: src/folder-conf.c:323
+#: src/folder-conf.c:334
 msgid "Subscribed _folders only"
 msgstr "Només _carpetes subscrites"
 
-#: src/folder-conf.c:325
-msgid "_Always show INBOX"
+#: src/folder-conf.c:336
+#, fuzzy
+msgid "Always show _INBOX"
 msgstr "Mostra perm_anentment la bústia d'entrada"
 
-#: src/folder-conf.c:328
+#: src/folder-conf.c:339
 msgid "Pr_efix"
 msgstr "Pr_efix"
 
-#: src/folder-conf.c:334 src/mailbox-conf.c:1077
-msgid "Use SS_L (IMAPS)"
-msgstr "Utilitza el SS_L (IMAPS)"
-
-#: src/folder-conf.c:466
+#: src/folder-conf.c:484
 msgid "Select parent folder"
 msgstr "Selecciona la carpeta pare"
 
-#: src/folder-conf.c:537
+#: src/folder-conf.c:557
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2386,19 +2656,19 @@ msgstr ""
 "subcarpetes.\n"
 "Què voleu fer?"
 
-#: src/folder-conf.c:543
+#: src/folder-conf.c:563
 msgid "Question"
 msgstr "Qüestió"
 
-#: src/folder-conf.c:548
+#: src/folder-conf.c:568
 msgid "Rename INBOX"
 msgstr "Canvia el nom de la bústia d'entrada"
 
-#: src/folder-conf.c:550 src/toolbar-factory.c:132
+#: src/folder-conf.c:570
 msgid "Cancel"
 msgstr "Cancel·la"
 
-#: src/folder-conf.c:645
+#: src/folder-conf.c:666
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -2406,32 +2676,32 @@ msgstr ""
 "Una carpeta d'IMAP que no sigui una bústia\n"
 "no té cap propietat que sigui modificable."
 
-#: src/folder-conf.c:660
+#: src/folder-conf.c:681
 msgid "Remote IMAP subfolder"
 msgstr "Subcarpeta remota de l'IMAP"
 
-#: src/folder-conf.c:682
+#: src/folder-conf.c:703
 msgid "Rename or move subfolder"
 msgstr "Canvia el nom o mou la subcarpeta"
 
-#: src/folder-conf.c:683
+#: src/folder-conf.c:704
 msgid "Create subfolder"
 msgstr "Crea una subcarpeta"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:690
+#: src/folder-conf.c:711
 msgid "_Folder name:"
 msgstr "Nom de la _carpeta:"
 
-#: src/folder-conf.c:696
+#: src/folder-conf.c:717
 msgid "_Subfolder of:"
 msgstr "_Subcarpeta de:"
 
-#: src/folder-conf.c:701
+#: src/folder-conf.c:722
 msgid "_Browse..."
 msgstr "_Explora..."
 
-#: src/folder-conf.c:733
+#: src/folder-conf.c:753
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -2439,7 +2709,7 @@ msgstr ""
 "Aquesta carpeta no està emmagatzemada a la configuració. Encara es desconeix "
 "com suprimir-la del servidor remot. "
 
-#: src/folder-conf.c:742
+#: src/folder-conf.c:762
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2449,34 +2719,57 @@ msgstr ""
 "Posteriorment podeu utilitzar l'opció \"Nova carpeta de l'IMAP\" per afegir-"
 "la de nou.\n"
 
-#: src/folder-conf.c:747
+#: src/folder-conf.c:767
 msgid "Confirm"
 msgstr "Confirma"
 
-#: src/information-dialog.c:213
+#: src/information-dialog.c:220
 msgid "Information - Balsa"
 msgstr "Informació - Balsa"
 
-#: src/information-dialog.c:297
+#: src/information-dialog.c:309
 #, c-format
 msgid "WARNING: "
 msgstr "Atenció: "
 
-#: src/information-dialog.c:300
+#: src/information-dialog.c:312
 #, c-format
 msgid "ERROR: "
 msgstr "Error: "
 
-#: src/information-dialog.c:303
+#: src/information-dialog.c:315
 #, c-format
 msgid "FATAL: "
 msgstr "Greu: "
 
-#: src/mailbox-conf.c:218
+#: src/mailbox-conf.c:164 src/pref-manager.c:335 src/pref-manager.c:2999
+#: src/pref-manager.c:3078
+msgid "Never"
+msgstr "Mai"
+
+#: src/mailbox-conf.c:165 src/pref-manager.c:3079
+msgid "If Possible"
+msgstr "Si és possible"
+
+#: src/mailbox-conf.c:166 src/pref-manager.c:3080
+msgid "Required"
+msgstr "Necessari"
+
+#: src/mailbox-conf.c:174
+#, fuzzy
+msgid "Use _SSL"
+msgstr "Utilitza el TLS"
+
+#: src/mailbox-conf.c:178
+#, fuzzy
+msgid "Use _TLS"
+msgstr "Utilitza el TLS"
+
+#: src/mailbox-conf.c:315
 msgid "No mailbox selected."
 msgstr "No s'ha seleccionat cap bústia."
 
-#: src/mailbox-conf.c:244
+#: src/mailbox-conf.c:342
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2487,7 +2780,7 @@ msgstr ""
 "Si esteu segur de voler-la suprimir, assigneu-ne la seva\n"
 "funció a una altra bústia."
 
-#: src/mailbox-conf.c:254
+#: src/mailbox-conf.c:352
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2502,15 +2795,15 @@ msgstr ""
 "bústia\" per accedir-hi de nou\n"
 "Què voleu fer?"
 
-#: src/mailbox-conf.c:266
+#: src/mailbox-conf.c:364
 msgid "Remove from _list"
 msgstr "Suprimeix de la _llista"
 
-#: src/mailbox-conf.c:267
+#: src/mailbox-conf.c:365
 msgid "Remove from list and _disk"
 msgstr "Suprimeix de la llista i del _disc"
 
-#: src/mailbox-conf.c:275
+#: src/mailbox-conf.c:373
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2526,11 +2819,11 @@ msgstr ""
 "afegir una bústia amb aquest nom,\n"
 "Què voleu fer?"
 
-#: src/mailbox-conf.c:288
+#: src/mailbox-conf.c:386
 msgid "_Remove from server"
 msgstr "Sup_rimeix del servidor"
 
-#: src/mailbox-conf.c:295
+#: src/mailbox-conf.c:393
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2542,29 +2835,24 @@ msgstr ""
 "accedir-hi.\n"
 "Què voleu fer?"
 
-#: src/mailbox-conf.c:304
+#: src/mailbox-conf.c:402
 msgid "_Remove from list"
 msgstr "Sup_rimeix de la llista"
 
-#: src/mailbox-conf.c:355
-#, c-format
-msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr "No s'ha trobat la bústia en els nodes del balsa_app.mailbox?\n"
-
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:845
+#: src/mailbox-conf.c:490 src/sendmsg-window.c:1036
 msgid "Select Identity"
 msgstr "Selecciona una identitat"
 
-#: src/mailbox-conf.c:433
+#: src/mailbox-conf.c:517
 msgid "Mailbox Configurator"
 msgstr "Configurador de bústies"
 
-#: src/mailbox-conf.c:626
+#: src/mailbox-conf.c:707
 #, c-format
 msgid "%s on %s"
 msgstr "%s a %s"
 
-#: src/mailbox-conf.c:742
+#: src/mailbox-conf.c:836
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2574,669 +2862,831 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:885 src/mailbox-conf.c:929 src/mailbox-conf.c:1022
+#: src/mailbox-conf.c:998 src/mailbox-conf.c:1045 src/mailbox-conf.c:1135
 msgid "Mailbox _Name:"
 msgstr "_Nom de la bústia:"
 
 #. path to file
-#: src/mailbox-conf.c:893
+#: src/mailbox-conf.c:1006
 msgid "Mailbox _Path:"
 msgstr "_Camí de la bústia:"
 
-#: src/mailbox-conf.c:895
+#: src/mailbox-conf.c:1008
 msgid "Mailbox Path"
 msgstr "Camí de la bústia"
 
 #. password field
-#: src/mailbox-conf.c:947 src/mailbox-conf.c:1049
+#: src/mailbox-conf.c:1063 src/mailbox-conf.c:1162
 msgid "Pass_word:"
 msgstr "Contrasen_ya:"
 
-#: src/mailbox-conf.c:954
-msgid "Use _APOP Authentication"
-msgstr "Utilitza l'autentificació _APOP"
-
-#: src/mailbox-conf.c:960
+#: src/mailbox-conf.c:1071
 msgid "_Delete messages from server after download"
 msgstr "_Suprimeix els missatges del servidor després de la descàrrega"
 
-#: src/mailbox-conf.c:965
+#: src/mailbox-conf.c:1076
 msgid "_Filter messages through procmail"
 msgstr "_Filtra els missatges a través del procmail"
 
-#: src/mailbox-conf.c:969
+#: src/mailbox-conf.c:1080
 msgid "Fi_lter Command:"
 msgstr "Ordre del fi_ltre:"
 
-#: src/mailbox-conf.c:977
+#: src/mailbox-conf.c:1088
 msgid "_Enable check for new mail"
 msgstr "Habilita la comprovació de nou corr_eu"
 
-#: src/mailbox-conf.c:987
-msgid "Use SS_L (pop3s)"
-msgstr "Utilitza el SS_L (pop3s)"
+#: src/mailbox-conf.c:1099
+msgid "Disable _APOP"
+msgstr ""
 
 #. username
-#: src/mailbox-conf.c:1035
+#: src/mailbox-conf.c:1148
 msgid "_Username:"
 msgstr "Nom d'_usuari:"
 
-#: src/mailbox-conf.c:1043
+#: src/mailbox-conf.c:1156
 msgid "_Remember Password"
 msgstr "_Recorda la contrasenya"
 
-#: src/mailbox-conf.c:1054
+#: src/mailbox-conf.c:1167
 msgid "F_older Path:"
 msgstr "_Camí de la carpeta:"
 
-#: src/mailbox-conf.c:1132
+#: src/mailbox-conf.c:1252
 msgid "Identity:"
 msgstr "Identitat:"
 
-#: src/mailbox-conf.c:1137
+#: src/mailbox-conf.c:1258
 msgid "(No identity set)"
 msgstr "(No s'ha definit cap entitat)"
 
-#: src/mailbox-conf.c:1141
+#: src/mailbox-conf.c:1262
 msgid "C_hange..."
 msgstr "Canv_ia..."
 
-#: src/mailbox-conf.c:1148
+#: src/mailbox-conf.c:1269
 msgid "Show address:"
 msgstr "Mostra les adreces:"
 
-#: src/mailbox-conf.c:1151
+#: src/mailbox-conf.c:1272
 msgid "_From"
 msgstr "_De"
 
-#: src/mailbox-conf.c:1157 src/sendmsg-window.c:311
+#: src/mailbox-conf.c:1278
 msgid "_To"
 msgstr "_Per a"
 
-#: src/mailbox-node.c:239
+#: src/mailbox-node.c:259
 msgid "The folder edition to be written."
 msgstr "L'edició de la carpeta per ser escrita."
 
-#: src/mailbox-node.c:359
+#: src/mailbox-node.c:420
+#, fuzzy, c-format
+msgid ""
+"Scanning of %s failed: %s\n"
+"Check network connectivity."
+msgstr "%s: s'ha produït un error en la signatura: %s"
+
+#: src/mailbox-node.c:422
 #, fuzzy, c-format
 msgid "Scanning of %s failed: %s"
 msgstr "%s: s'ha produït un error en la signatura: %s"
 
-#: src/mailbox-node.c:410
+#: src/mailbox-node.c:471
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr "S'està escanejant el %s. Espereu..."
 
-#: src/mailbox-node.c:922
+#: src/mailbox-node.c:914
 msgid "Local _mbox mailbox..."
 msgstr "Bústia _mbox local..."
 
-#: src/mailbox-node.c:924
+#: src/mailbox-node.c:916
 msgid "Local Mail_dir mailbox..."
 msgstr "Bústia Mail_dir local..."
 
-#: src/mailbox-node.c:926
+#: src/mailbox-node.c:918
 msgid "Local M_H mailbox..."
 msgstr "Bústia M_H local..."
 
-#: src/mailbox-node.c:928
+#: src/mailbox-node.c:920
 msgid "Remote _IMAP mailbox..."
 msgstr "Bústia remota de l'_IMAP..."
 
-#: src/mailbox-node.c:931
+#: src/mailbox-node.c:923
 msgid "Remote IMAP _folder..."
 msgstr "Carp_eta remota de l'IMAP..."
 
-#: src/mailbox-node.c:933
+#: src/mailbox-node.c:925
 msgid "Remote IMAP _subfolder..."
 msgstr "_Subcarpeta de l'IMAP remot..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:944 src/mailbox-node.c:976 src/mailbox-node.c:997
+#: src/mailbox-node.c:936 src/mailbox-node.c:962
 msgid "_Rescan"
 msgstr "To_rna a escanejar"
 
-#: src/mailbox-node.c:953
+#: src/mailbox-node.c:945
 msgid "_Open"
 msgstr "_Obre"
 
-#: src/mailbox-node.c:956 src/main-window.c:682
+#: src/mailbox-node.c:948 src/main-window.c:737 src/main-window.c:834
 msgid "_Close"
 msgstr "Tan_ca"
 
-#: src/mailbox-node.c:962
+#: src/mailbox-node.c:954
 msgid "_Properties..."
 msgstr "_Propietats..."
 
-#: src/mailbox-node.c:972
+#: src/mailbox-node.c:969
 msgid "_Subscribe"
 msgstr "_Subscriu"
 
-#: src/mailbox-node.c:974
+#: src/mailbox-node.c:971
 msgid "_Unsubscribe"
 msgstr "Cancel·la la s_ubscripció"
 
-#: src/mailbox-node.c:982
+#: src/mailbox-node.c:976
 msgid "Mark as _Inbox"
 msgstr "Marca-la com a búst_ia d'entrada"
 
-#: src/mailbox-node.c:985
+#: src/mailbox-node.c:979
 msgid "_Mark as Sentbox"
 msgstr "_Marca-la com a bústia d'enviats"
 
-#: src/mailbox-node.c:988
+#: src/mailbox-node.c:982
 msgid "Mark as _Trash"
 msgstr "Marca-la com a _paperera"
 
-#: src/mailbox-node.c:991
+#: src/mailbox-node.c:985
 msgid "Mark as D_raftbox"
 msgstr "Marca-la com a bústia d'esbo_rranys"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:994
+#: src/mailbox-node.c:988
 msgid "_Edit/Apply filters"
 msgstr "_Edita/aplica filtres"
 
-#: src/mailbox-node.c:1095
+#: src/mailbox-node.c:1069
+#, fuzzy, c-format
+msgid "The path \"%s\" does not lead to a mailbox."
+msgstr "La bústia %s no sembla vàlida."
+
+#: src/mailbox-node.c:1082
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "S'ha carregat la bústia local %s com a: %s\n"
 
-#: src/mailbox-node.c:1121
+#: src/mailbox-node.c:1109
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Carpeta local %s\n"
 
-#: src/main-window.c:249
-msgid "_Message..."
-msgstr "_Missatge..."
+#: src/main-window.c:274
+msgid "Balsa closes files and connections. Please wait..."
+msgstr ""
 
-#: src/main-window.c:249
-msgid "Compose a new message"
-msgstr "Redacta un missatge nou"
+#: src/main-window.c:313 src/main-window.c:359
+#, fuzzy
+msgid "_Deleted"
+msgstr "_Suprimeix"
 
-#: src/main-window.c:255
-msgid "Local mbox mailbox..."
-msgstr "Bústia local mbox..."
+#: src/main-window.c:316
+#, fuzzy
+msgid "Un_Deleted"
+msgstr "Suprimit"
 
-#: src/main-window.c:256
-msgid "Add a new mbox style mailbox"
-msgstr "Afegeix una bústia nova de tipus mbox"
+#: src/main-window.c:319
+#, fuzzy
+msgid "_Read"
+msgstr "Refés"
 
-#: src/main-window.c:260
-msgid "Local Maildir mailbox..."
-msgstr "Bústia local Maildir..."
-
-#: src/main-window.c:261
-msgid "Add a new Maildir style mailbox"
-msgstr "Afegeix una nova bústia de tipus Maildir"
-
-#: src/main-window.c:265
-msgid "Local MH mailbox..."
-msgstr "Bústia local MH..."
-
-#: src/main-window.c:266
-msgid "Add a new MH style mailbox"
-msgstr "Afegeix una bústia nova de tipus MH"
-
-#: src/main-window.c:270 src/pref-manager.c:2786
-msgid "Remote IMAP mailbox..."
-msgstr "Bústia IMAP remota..."
-
-#: src/main-window.c:271
-msgid "Add a new IMAP mailbox"
-msgstr "Afegeix una bústia IMAP nova"
-
-#: src/main-window.c:276 src/pref-manager.c:2791
-msgid "Remote IMAP folder..."
-msgstr "Carpeta IMAP remota..."
-
-#: src/main-window.c:277
-msgid "Add a new IMAP folder"
-msgstr "Afegeix una carpeta IMAP nova"
-
-#: src/main-window.c:281
-msgid "Remote IMAP subfolder..."
-msgstr "Subcarpeta de l'IMAP remot..."
-
-#: src/main-window.c:282
-msgid "Add a new IMAP subfolder"
-msgstr "Afegeix una subcarpeta de l'IMAP"
-
-#: src/main-window.c:294
-msgid "_Continue"
-msgstr "_Continua"
-
-#: src/main-window.c:295
-msgid "Continue editing current message"
-msgstr "Continua l'edició del missatge actual"
-
-#: src/main-window.c:302
-msgid "_Get New Mail"
-msgstr "O_bté el correu nou"
-
-#: src/main-window.c:302
-msgid "Fetch new incoming mail"
-msgstr "Recull el correu nou d'entrada"
-
-#: src/main-window.c:308
-msgid "_Send Queued Mail"
-msgstr "_Envia el correu de la cua"
-
-#: src/main-window.c:309
-msgid "Send messages from the outbox"
-msgstr "Envia els missatges de la bústia de sortida"
-
-#: src/main-window.c:315
-msgid "Send and _Receive Mail"
-msgstr "Envia i _rep el correu"
-
-#: src/main-window.c:316 src/toolbar-factory.c:123
-msgid "Send and Receive messages"
-msgstr "Envia i rep els missatges"
-
-#: src/main-window.c:321 src/sendmsg-window.c:237
-msgid "_Print..."
-msgstr "Im_primeix..."
-
-#: src/main-window.c:322 src/toolbar-factory.c:119
-msgid "Print current message"
-msgstr "Imprimeix el missatge actual"
+#: src/main-window.c:322
+#, fuzzy
+msgid "Un_read"
+msgstr "Sense llegir"
 
 #: src/main-window.c:328
-msgid "_Address Book..."
-msgstr "_Llibreta d'adreces..."
+#, fuzzy
+msgid "Un_flagged"
+msgstr "M_arcat"
 
-#: src/main-window.c:329
-msgid "Open the address book"
-msgstr "Obre la llibreta d'adreces"
+#: src/main-window.c:331 src/main-window.c:371
+#, fuzzy
+msgid "_Answered"
+msgstr "S_ense llegir"
 
-#: src/main-window.c:356
-msgid "F_ilters..."
-msgstr "F_iltres..."
+#: src/main-window.c:334
+#, fuzzy
+msgid "Un_answered"
+msgstr "_Contrasenya:"
 
-#: src/main-window.c:356
-msgid "Manage filters"
-msgstr "Gestiona els filtres"
-
-#: src/main-window.c:358
-msgid "_Export Filters"
-msgstr "_Exporta els filtres"
-
-#: src/main-window.c:358
-msgid "Export filters as Sieve scripts"
-msgstr "Exporta els filtres com a seqüències Sieve"
-
-#: src/main-window.c:364
+#: src/main-window.c:340
 msgid "_No Headers"
 msgstr "Se_nse capçaleres"
 
-#: src/main-window.c:364
+#: src/main-window.c:340
 msgid "Display no headers"
 msgstr "No mostris les capçaleres"
 
-#: src/main-window.c:366
+#: src/main-window.c:342
 msgid "S_elected Headers"
 msgstr "Capçaleres s_eleccionades"
 
-#: src/main-window.c:367
+#: src/main-window.c:343
 msgid "Display selected headers"
 msgstr "Mostra les capçaleres seleccionades"
 
-#: src/main-window.c:369 src/message-window.c:86
+#: src/main-window.c:345 src/message-window.c:85
 msgid "All _Headers"
 msgstr "Totes les _capçaleres"
 
-#: src/main-window.c:369
+#: src/main-window.c:345
 msgid "Display all headers"
 msgstr "Mostra totes les capçaleres"
 
-#: src/main-window.c:376
+#: src/main-window.c:354
+msgid "Toggle flagged"
+msgstr "Commuta els assenyalats"
+
+#: src/main-window.c:360
+#, fuzzy
+msgid "Toggle deleted flag"
+msgstr "Commuta el senyal del nou missatge"
+
+#: src/main-window.c:365
+msgid "Toggle New"
+msgstr "Commuta els nous"
+
+#: src/main-window.c:371
+#, fuzzy
+msgid "Toggle Answered"
+msgstr "Commuta els nous"
+
+#: src/main-window.c:386
+msgid "_Message..."
+msgstr "_Missatge..."
+
+#: src/main-window.c:386 src/main-window.c:1015
+msgid "Compose a new message"
+msgstr "Redacta un missatge nou"
+
+#. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
+#. of including at specified position
+#: src/main-window.c:393
+msgid "Local mbox mailbox..."
+msgstr "Bústia local mbox..."
+
+#: src/main-window.c:394 src/main-window.c:790
+msgid "Add a new mbox style mailbox"
+msgstr "Afegeix una bústia nova de tipus mbox"
+
+#: src/main-window.c:397
+msgid "Local Maildir mailbox..."
+msgstr "Bústia local Maildir..."
+
+#: src/main-window.c:398 src/main-window.c:795
+msgid "Add a new Maildir style mailbox"
+msgstr "Afegeix una nova bústia de tipus Maildir"
+
+#: src/main-window.c:401
+msgid "Local MH mailbox..."
+msgstr "Bústia local MH..."
+
+#: src/main-window.c:402 src/main-window.c:799
+msgid "Add a new MH style mailbox"
+msgstr "Afegeix una bústia nova de tipus MH"
+
+#: src/main-window.c:405 src/main-window.c:802 src/pref-manager.c:2832
+msgid "Remote IMAP mailbox..."
+msgstr "Bústia IMAP remota..."
+
+#: src/main-window.c:406 src/main-window.c:803
+msgid "Add a new IMAP mailbox"
+msgstr "Afegeix una bústia IMAP nova"
+
+#: src/main-window.c:410 src/main-window.c:807 src/pref-manager.c:2837
+msgid "Remote IMAP folder..."
+msgstr "Carpeta IMAP remota..."
+
+#: src/main-window.c:411 src/main-window.c:808
+msgid "Add a new IMAP folder"
+msgstr "Afegeix una carpeta IMAP nova"
+
+#: src/main-window.c:414 src/main-window.c:811
+msgid "Remote IMAP subfolder..."
+msgstr "Subcarpeta de l'IMAP remot..."
+
+#: src/main-window.c:415 src/main-window.c:812
+msgid "Add a new IMAP subfolder"
+msgstr "Afegeix una subcarpeta de l'IMAP"
+
+#: src/main-window.c:428
+msgid "_Continue"
+msgstr "_Continua"
+
+#: src/main-window.c:429
+msgid "Continue editing current message"
+msgstr "Continua l'edició del missatge actual"
+
+#. Ctrl-M
+#: src/main-window.c:436 src/main-window.c:854
+msgid "_Get New Mail"
+msgstr "O_bté el correu nou"
+
+#: src/main-window.c:436 src/main-window.c:854
+msgid "Fetch new incoming mail"
+msgstr "Recull el correu nou d'entrada"
+
+#. Ctrl-S
+#: src/main-window.c:442 src/main-window.c:849
+msgid "_Send Queued Mail"
+msgstr "_Envia el correu de la cua"
+
+#: src/main-window.c:443 src/main-window.c:850
+msgid "Send messages from the outbox"
+msgstr "Envia els missatges de la bústia de sortida"
+
+#. Ctrl-B
+#: src/main-window.c:449 src/main-window.c:844
+msgid "Send and _Receive Mail"
+msgstr "Envia i _rep el correu"
+
+#: src/main-window.c:450 src/main-window.c:845 src/toolbar-factory.c:123
+msgid "Send and Receive messages"
+msgstr "Envia i rep els missatges"
+
+#: src/main-window.c:455 src/main-window.c:859 src/sendmsg-window.c:338
+#: src/sendmsg-window.c:499
+msgid "_Print..."
+msgstr "Im_primeix..."
+
+#: src/main-window.c:456 src/main-window.c:860 src/toolbar-factory.c:119
+msgid "Print current message"
+msgstr "Imprimeix el missatge actual"
+
+#: src/main-window.c:462 src/main-window.c:1074
+msgid "_Address Book..."
+msgstr "_Llibreta d'adreces..."
+
+#: src/main-window.c:463 src/main-window.c:1075
+msgid "Open the address book"
+msgstr "Obre la llibreta d'adreces"
+
+#: src/main-window.c:487
+msgid "F_ilters..."
+msgstr "F_iltres..."
+
+#: src/main-window.c:487 src/main-window.c:1061
+msgid "Manage filters"
+msgstr "Gestiona els filtres"
+
+#: src/main-window.c:489 src/main-window.c:1067
+msgid "_Export Filters"
+msgstr "_Exporta els filtres"
+
+#: src/main-window.c:489 src/main-window.c:1068
+msgid "Export filters as Sieve scripts"
+msgstr "Exporta els filtres com a seqüències Sieve"
+
+#: src/main-window.c:497
 msgid "_Flat index"
 msgstr "Índex _Pla"
 
-#: src/main-window.c:377
+#: src/main-window.c:498
 msgid "No threading at all"
 msgstr ""
 
-#: src/main-window.c:382
+#: src/main-window.c:503
 msgid "Si_mple threading"
 msgstr ""
 
-#: src/main-window.c:383
+#: src/main-window.c:504
 msgid "Simple threading algorithm"
 msgstr ""
 
-#: src/main-window.c:388
+#: src/main-window.c:509
 msgid "_JWZ threading"
 msgstr ""
 
-#: src/main-window.c:389
+#: src/main-window.c:510
 msgid "Elaborate JWZ threading"
 msgstr ""
 
-#: src/main-window.c:399
+#: src/main-window.c:520
 msgid "_Show Mailbox Tree"
 msgstr "Mo_stra l'arbre de bústies"
 
-#: src/main-window.c:400
+#: src/main-window.c:521
 msgid "Toggle display of mailbox and folder tree"
 msgstr "Commuta la visualització de la bústia i carpetes en arbre"
 
-#: src/main-window.c:403
+#: src/main-window.c:525
 msgid "Show Mailbox _Tabs"
 msgstr "Mostre les pes_tanyes de la bústia"
 
-#: src/main-window.c:404
+#: src/main-window.c:526
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "Commuta la visualització de la bústia en tabuladors de quadern"
 
-#: src/main-window.c:408 src/message-window.c:116
+#: src/main-window.c:530 src/main-window.c:928 src/message-window.c:116
 msgid "_Wrap"
 msgstr "_Ajusta"
 
-#: src/main-window.c:408 src/sendmsg-window.c:266
+#: src/main-window.c:530 src/main-window.c:928 src/sendmsg-window.c:367
+#: src/sendmsg-window.c:524
 msgid "Wrap message lines"
 msgstr "Ajusta les línies del missatge"
 
-#: src/main-window.c:416
+#: src/main-window.c:539 src/main-window.c:934
 msgid "E_xpand All"
 msgstr "E_xpandeix-ho tot"
 
-#: src/main-window.c:417
+#: src/main-window.c:540 src/main-window.c:935
 msgid "Expand all threads"
 msgstr "Expandeix tots els fils"
 
-#: src/main-window.c:421
+#: src/main-window.c:544 src/main-window.c:939
 msgid "_Collapse All"
 msgstr "_Contrau-ho tot"
 
-#: src/main-window.c:422
+#: src/main-window.c:545 src/main-window.c:940
 msgid "Collapse all expanded threads"
 msgstr "Contrau tots els fils expandits"
 
-#: src/main-window.c:428 src/message-window.c:122
+#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
 msgid "Zoom _In"
 msgstr "Apro_pa"
 
-#: src/main-window.c:428 src/message-window.c:122
+#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
 msgid "Increase magnification"
 msgstr "Incrementa l'augment"
 
-#: src/main-window.c:432 src/message-window.c:126
+#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
 msgid "Zoom _Out"
 msgstr "All_unya"
 
-#: src/main-window.c:432 src/message-window.c:126
+#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
 msgid "Decrease magnification"
 msgstr "Disminueix l'augment"
 
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
 #. * format specifier:
-#: src/main-window.c:438 src/message-window.c:133
+#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
 #, no-c-format
 msgid "Zoom _100%"
 msgstr "Ampliació al _100%"
 
-#: src/main-window.c:438 src/message-window.c:133
+#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
 msgid "No magnification"
 msgstr "Sense augment"
 
-#: src/main-window.c:449
-msgid "Toggle flagged"
-msgstr "Commuta els assenyalats"
-
-#: src/main-window.c:454 src/main-window.c:594
-#, fuzzy
-msgid "_Deleted"
-msgstr "_Suprimeix"
-
-#: src/main-window.c:455
-#, fuzzy
-msgid "Toggle deleted flag"
-msgstr "Commuta el senyal del nou missatge"
-
-#: src/main-window.c:460
-msgid "Toggle New"
-msgstr "Commuta els nous"
-
-#: src/main-window.c:466 src/main-window.c:612
-#, fuzzy
-msgid "_Answered"
-msgstr "S_ense llegir"
-
-#: src/main-window.c:466
-#, fuzzy
-msgid "Toggle Answered"
-msgstr "Commuta els nous"
-
-#: src/main-window.c:478 src/toolbar-factory.c:99
+#: src/main-window.c:577 src/main-window.c:1022 src/toolbar-factory.c:99
 msgid "Reply to the current message"
 msgstr "Respon al missatge actual"
 
-#: src/main-window.c:485 src/message-window.c:148
+#. A
+#: src/main-window.c:584 src/main-window.c:1028 src/message-window.c:148
 msgid "Reply to _All..."
 msgstr "Respon a _tots..."
 
-#: src/main-window.c:486
+#: src/main-window.c:585 src/main-window.c:1029
 msgid "Reply to all recipients of the current message"
 msgstr "Respon a tots els destinataris del missatge actual"
 
-#: src/main-window.c:493 src/message-window.c:154
+#: src/main-window.c:592 src/message-window.c:154
 msgid "Reply to _Group..."
 msgstr "Respon al _grup..."
 
-#: src/main-window.c:494 src/message-window.c:155 src/toolbar-factory.c:103
+#: src/main-window.c:593 src/message-window.c:155 src/toolbar-factory.c:103
 msgid "Reply to mailing list"
 msgstr "Respon a la llista de correu"
 
-#: src/main-window.c:501 src/message-window.c:160
+#: src/main-window.c:600 src/message-window.c:160
 msgid "_Forward attached..."
 msgstr "Reenvia'l ad_junt..."
 
-#: src/main-window.c:502
+#: src/main-window.c:601
 msgid "Forward the current message as attachment"
 msgstr "Reenvia el missatge actual com a fitxer adjunt"
 
-#: src/main-window.c:508
+#: src/main-window.c:607
 msgid "Forward _inline..."
 msgstr "Reenvia'l _inserit..."
 
-#: src/main-window.c:509
+#: src/main-window.c:608
 msgid "Forward the current message inline"
 msgstr "Reenvia el missatge actual inserit"
 
-#: src/main-window.c:516 src/message-window.c:171
+#: src/main-window.c:615 src/message-window.c:171
 msgid "Next Part"
 msgstr "Part següent"
 
-#: src/main-window.c:516 src/message-window.c:171
+#: src/main-window.c:615 src/message-window.c:171
 msgid "Next part in message"
 msgstr "La part següent del missatge"
 
-#: src/main-window.c:522 src/message-window.c:175
+#: src/main-window.c:621 src/message-window.c:175
 msgid "Previous Part"
 msgstr "Part anterior"
 
-#: src/main-window.c:523 src/message-window.c:176
+#: src/main-window.c:622 src/message-window.c:176
 msgid "Previous part in message"
 msgstr "La part anterior del missatge"
 
-#: src/main-window.c:529 src/message-window.c:180
+#: src/main-window.c:628 src/main-window.c:1042 src/message-window.c:180
 msgid "Save Current Part..."
 msgstr "Desa la part actual..."
 
-#: src/main-window.c:530 src/message-window.c:181
-msgid "Save current part in message"
+#: src/main-window.c:629 src/main-window.c:1043
+#, fuzzy
+msgid "Save currently displayed part of message"
 msgstr "Desa la part actual del missatge"
 
-#: src/main-window.c:536 src/message-window.c:185
+#: src/main-window.c:635 src/main-window.c:995 src/message-window.c:185
 msgid "_View Source..."
 msgstr "_Visualitza el codi font..."
 
-#: src/main-window.c:537 src/message-window.c:186
+#: src/main-window.c:636 src/main-window.c:996 src/message-window.c:186
 msgid "View source form of the message"
 msgstr "Visualitza el codi font del missatge"
 
-#: src/main-window.c:555
+#: src/main-window.c:654
 msgid "_Move to Trash"
 msgstr "_Mou a la paperera"
 
-#: src/main-window.c:556
+#: src/main-window.c:655 src/main-window.c:1050
 msgid "Move the current message to Trash mailbox"
 msgstr "Mou el missatge actual a la paperera"
 
 #. !
-#: src/main-window.c:562
+#: src/main-window.c:661 src/main-window.c:1001
 #, fuzzy
 msgid "_Toggle flag"
 msgstr "Commuta els assenyalats"
 
-#: src/main-window.c:568
+#: src/main-window.c:667 src/main-window.c:1006
 msgid "Store address of sender in addressbook"
 msgstr "Emmagatzema l'adreça del remitent a la llibreta d'adreces"
 
-#: src/main-window.c:597
-#, fuzzy
-msgid "Un_Deleted"
-msgstr "Suprimit"
-
-#: src/main-window.c:600
-#, fuzzy
-msgid "_Read"
-msgstr "Refés"
-
-#: src/main-window.c:603
-#, fuzzy
-msgid "Un_read"
-msgstr "Sense llegir"
-
-#: src/main-window.c:609
-#, fuzzy
-msgid "Un_flagged"
-msgstr "M_arcat"
-
-#: src/main-window.c:615
-#, fuzzy
-msgid "Un_answered"
-msgstr "_Contrasenya:"
-
-#: src/main-window.c:623
+#: src/main-window.c:678 src/main-window.c:959
 msgid "Next Message"
 msgstr "Missatge següent"
 
-#: src/main-window.c:629
+#: src/main-window.c:684 src/main-window.c:963
 msgid "Previous Message"
 msgstr "Missatge anterior"
 
-#: src/main-window.c:635 src/main-window.c:636 src/message-window.c:192
-#: src/message-window.c:193
+#: src/main-window.c:690 src/main-window.c:691 src/main-window.c:953
+#: src/main-window.c:954 src/message-window.c:192 src/message-window.c:193
 msgid "Next Unread Message"
 msgstr "Següent missatge sense llegir"
 
-#: src/main-window.c:642 src/main-window.c:643
+#: src/main-window.c:697 src/main-window.c:698 src/main-window.c:920
+#: src/main-window.c:921
 msgid "Next Flagged Message"
 msgstr "Següent missatge assenyalat"
 
-#: src/main-window.c:650
+#: src/main-window.c:705 src/main-window.c:931
 #, fuzzy
 msgid "_Hide messages"
 msgstr "Amaga els missatges suprimits"
 
-#: src/main-window.c:654
+#: src/main-window.c:708
+#, fuzzy
+msgid "Reset _Filter"
+msgstr "Filtres del Balsa"
+
+#: src/main-window.c:713
 msgid "Select all"
 msgstr "Selecciona-ho tot"
 
-#: src/main-window.c:655
+#: src/main-window.c:714
 msgid "Select all messages in current mailbox"
 msgstr "Selecciona tots els missatge de la bústia actual"
 
-#: src/main-window.c:661
+#: src/main-window.c:720 src/main-window.c:822
 msgid "_Edit..."
 msgstr "_Edita..."
 
-#: src/main-window.c:661
+#: src/main-window.c:720 src/main-window.c:822
 msgid "Edit the selected mailbox"
 msgstr "Edita la bústia seleccionada"
 
-#: src/main-window.c:665
+#: src/main-window.c:724 src/main-window.c:817
 msgid "_Delete..."
 msgstr "_Suprimeix..."
 
-#: src/main-window.c:666
+#: src/main-window.c:725 src/main-window.c:818
 msgid "Delete the selected mailbox"
 msgstr "Suprimeix la bústia seleccionada"
 
-#: src/main-window.c:672
-msgid "Co_mmit Current"
-msgstr "Confir_ma l'actual"
+#: src/main-window.c:731
+#, fuzzy
+msgid "E_xpunge Deleted Messages"
+msgstr "Voleu desfer-vos de %d missatges suprimits?"
 
-#: src/main-window.c:673
-msgid "Commit the changes in the currently opened mailbox"
+#: src/main-window.c:732 src/main-window.c:829
+#, fuzzy
+msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr "Confirma els canvis de la bústia oberta actualment"
 
-#: src/main-window.c:677
-msgid "Commit _All"
-msgstr "Confirm_a-ho tot"
-
-#: src/main-window.c:678
-msgid "Commit the changes in all mailboxes"
-msgstr "Confirma tots els canvis a totes les bústies"
-
-#: src/main-window.c:682
+#: src/main-window.c:737 src/main-window.c:835
 msgid "Close mailbox"
 msgstr "Tanca la bústia"
 
-#: src/main-window.c:686
+#: src/main-window.c:741 src/main-window.c:1079
 msgid "Empty _Trash"
 msgstr "Buida la _Paperera"
 
-#: src/main-window.c:687 src/toolbar-factory.c:141
+#: src/main-window.c:742 src/main-window.c:1080 src/toolbar-factory.c:141
 msgid "Delete messages from the Trash mailbox"
 msgstr "Suprimeix els missatges de la Paperera"
 
-#: src/main-window.c:691
-msgid "Edit/Apply _Filters"
-msgstr "Edita/aplica _filtres"
+#: src/main-window.c:746
+#, fuzzy
+msgid "Select _Filters"
+msgstr "Selecciona el tipus de lletra"
 
-#: src/main-window.c:692
-msgid "Filter the content of the selected mailbox"
-msgstr "Filtra els continguts de la bústia seleccionada"
+#: src/main-window.c:747 src/main-window.c:1065
+#, fuzzy
+msgid "Select filters to be applied automatically to current mailbox"
+msgstr "Selecciona tots els missatge de la bústia actual"
 
-#: src/main-window.c:696
-msgid "_Remove Duplicates"
-msgstr "Sup_rimeix els duplicats"
-
-#: src/main-window.c:697
-msgid "Remove duplicated messages from the selected mailbox"
-msgstr "Suprimeix els missatges duplicats de la bústia seleccionada"
-
-#: src/main-window.c:706
+#: src/main-window.c:760
 msgid "_Toolbars..."
 msgstr "Ba_rra d'eines..."
 
-#: src/main-window.c:707
+#: src/main-window.c:761
 msgid "Customize toolbars"
 msgstr "Personalitza les barres d'eines"
 
-#: src/main-window.c:710
+#: src/main-window.c:764 src/main-window.c:1083
 msgid "_Identities..."
 msgstr "_Identitats..."
 
-#: src/main-window.c:711
+#: src/main-window.c:765 src/main-window.c:1084
 msgid "Create and set current identities"
 msgstr "Crea i defineix les identitats actuals"
 
-#: src/main-window.c:727 src/message-window.c:209
-msgid "_Message"
-msgstr "_Missatge"
-
-#: src/main-window.c:728
+#: src/main-window.c:776
 msgid "Mail_box"
 msgstr "_Bústia"
 
-#: src/main-window.c:819
+#: src/main-window.c:777 src/main-window.c:1097 src/message-window.c:209
+msgid "_Message"
+msgstr "_Missatge"
+
+#: src/main-window.c:789
+#, fuzzy
+msgid "New mailbox..."
+msgstr "S'està tornant a obrir la bústia..."
+
+#: src/main-window.c:794
+#, fuzzy
+msgid "New \"Maildir\" mailbox..."
+msgstr "Bústia local Maildir..."
+
+#: src/main-window.c:798
+#, fuzzy
+msgid "New \"MH\" mailbox..."
+msgstr "Bústia local MH..."
+
+#: src/main-window.c:828
+#, fuzzy
+msgid "_Compress Mailbox"
+msgstr "Tanca la bústia"
+
+#: src/main-window.c:858
+msgid "Mail_boxes"
+msgstr "_Bústies"
+
+#: src/main-window.c:883
+msgid "By _Arrival"
+msgstr ""
+
+#: src/main-window.c:883
+msgid "Arrival order"
+msgstr ""
+
+#: src/main-window.c:887
+#, fuzzy
+msgid "By _Sender"
+msgstr "_Envia"
+
+#: src/main-window.c:887
+msgid "Sender order"
+msgstr ""
+
+#: src/main-window.c:891
+#, fuzzy
+msgid "By S_ubject"
+msgstr "Ass_umpte"
+
+#: src/main-window.c:891
+#, fuzzy
+msgid "Subject order"
+msgstr "Assumpte"
+
+#: src/main-window.c:895
+#, fuzzy
+msgid "By _Date"
+msgstr "Data"
+
+#: src/main-window.c:895
+#, fuzzy
+msgid "By sending date"
+msgstr "S'està enviant el correu"
+
+#: src/main-window.c:899
+#, fuzzy
+msgid "By Si_ze"
+msgstr "Mida"
+
+#: src/main-window.c:899
+#, fuzzy
+msgid "By message size"
+msgstr "Ajusta les línies del missatge"
+
+#: src/main-window.c:903
+#, fuzzy
+msgid "_Threaded"
+msgstr "Converses"
+
+#: src/main-window.c:903
+msgid "Use message threading"
+msgstr ""
+
+#: src/main-window.c:927
+#, fuzzy
+msgid "_Headers"
+msgstr "S_ense capçaleres"
+
+#: src/main-window.c:930
+#, fuzzy
+msgid "_Sort Mailbox"
+msgstr "Mo_stra l'arbre de bústies"
+
+#: src/main-window.c:945
+#, fuzzy
+msgid "_View filter"
+msgstr "Nou filtre"
+
+#: src/main-window.c:946
+#, fuzzy
+msgid "Enable quick message index filter"
+msgstr "No s'ha pogut carregar el cos del missatge per coincidir amb el filtre"
+
+#: src/main-window.c:982 src/main-window.c:1056 src/sendmsg-window.c:501
+#: src/sendmsg-window.c:559 src/sendmsg-window.c:619
+#, fuzzy
+msgid "_More"
+msgstr "_Coreà"
+
+#: src/main-window.c:1015
+#, fuzzy
+msgid "_New..."
+msgstr "_Nou"
+
+#. F
+#: src/main-window.c:1035
+#, fuzzy
+msgid "_Forward..."
+msgstr "Reenvia'l"
+
+#: src/main-window.c:1036 src/toolbar-factory.c:105
+msgid "Forward the current message"
+msgstr "Reenvia el missatge actual"
+
+#. D
+#: src/main-window.c:1049
+#, fuzzy
+msgid "_Delete to Trash"
+msgstr "_Mou a la paperera"
+
+#: src/main-window.c:1061
+#, fuzzy
+msgid "_Manage..."
+msgstr "Canv_ia..."
+
+#: src/main-window.c:1064
+#, fuzzy
+msgid "_Select _Filters"
+msgstr "Capçaleres _seleccionades"
+
+#: src/main-window.c:1082
+#, fuzzy
+msgid "_Filters"
+msgstr "F_iltre:"
+
+#: src/main-window.c:1098 src/sendmsg-window.c:635
+#, fuzzy
+msgid "_Tools"
+msgstr "Ba_rra d'eines..."
+
+#: src/main-window.c:1202
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -3244,15 +3694,18 @@ msgstr ""
 "El Balsa està enviant un correu.\n"
 "Voleu aturar l'enviament?"
 
-#: src/main-window.c:1519
+#: src/main-window.c:1372
+msgid "Subject or Sender _Contains:"
+msgstr ""
+
+#: src/main-window.c:2154
+#, fuzzy, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
-"Please check the mailbox settings."
-msgstr ""
-"No s'ha pogut obrir la bústia.\n"
-"Comproveu-ne els paràmetres."
+"%s."
+msgstr "No s'ha pogut bloquejar la bústia"
 
-#: src/main-window.c:1805
+#: src/main-window.c:2470
 msgid "translator_credits"
 msgstr ""
 "Softcatalà <info@softcatala.org>\n"
@@ -3260,7 +3713,7 @@ msgstr ""
 "Jordi Mas <jmas@softcatala.org>\n"
 "Xavier Conde Rueda <xaviconde@eresmas.com>"
 
-#: src/main-window.c:1821
+#: src/main-window.c:2486
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3272,146 +3725,173 @@ msgstr ""
 "\n"
 "Si us cal informar d'errors, si us plau feu-ho a http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1917
+#: src/main-window.c:2588
 msgid "Checking Mail..."
 msgstr "S'està comprovant el correu..."
 
-#: src/main-window.c:2215
+#: src/main-window.c:2897
 msgid "Finished Checking."
 msgstr "Ha finalitzat la comprovació."
 
-#: src/main-window.c:2279
+#: src/main-window.c:2959
 #, c-format
 msgid "Sending error: %s"
 msgstr "S'està enviant l'error: %s"
 
-#: src/main-window.c:2375
+#: src/main-window.c:3044
 msgid "Balsa: New mail"
 msgstr "Balsa: correu nou"
 
-#: src/main-window.c:2387
-#, c-format
-msgid "You have received %d new messages."
-msgstr "Heu rebut %d missatges nous."
+#: src/main-window.c:3056
+#, fuzzy, c-format
+msgid "You have received %d new message."
+msgid_plural "You have received %d new messages."
+msgstr[0] "Heu rebut %d missatges nous."
+msgstr[1] "Heu rebut %d missatges nous."
 
-#: src/main-window.c:2388
-msgid "You have received 1 new message."
+#: src/main-window.c:3059
+#, fuzzy
+msgid "You have new mail."
 msgstr "Heu rebut un missatge nou."
 
-#: src/main-window.c:2810
+#: src/main-window.c:3609
 msgid "Search mailbox"
 msgstr "Cerca la bústia"
 
-#: src/main-window.c:2823
-msgid "_Reverse search"
-msgstr "Cerca inve_rtida"
-
-#: src/main-window.c:2826
+#: src/main-window.c:3626
 msgid "_Search for:"
 msgstr "_Cerca per:"
 
-#: src/main-window.c:2839
+#. builds the toggle buttons to specify fields concerned by
+#. * the search.
+#: src/main-window.c:3639
 msgid "In:"
 msgstr "Bústia d'entrada:"
 
-#: src/main-window.c:2853
+#: src/main-window.c:3650
 msgid "S_ubject"
 msgstr "Ass_umpte"
 
-#: src/main-window.c:2969
+#. Frame with Apply and Clear buttons
+#: src/main-window.c:3655
+#, fuzzy
+msgid "Show only matching messages"
+msgstr "S'ha produït un error en eliminar els missatges"
+
+#. Frame with OK button
+#: src/main-window.c:3676
+#, fuzzy
+msgid "Open next matching message"
+msgstr "Obre el següent missatge assenyalat"
+
+#: src/main-window.c:3687
+msgid "_Reverse search"
+msgstr "Cerca inve_rtida"
+
+#: src/main-window.c:3692
+#, fuzzy
+msgid "_Wrap around"
+msgstr "A_justa el cos"
+
+#: src/main-window.c:3768
+#, fuzzy, c-format
+msgid "Error displaying help: %s\n"
+msgstr "S'ha produït un error en mostrar l'ajuda del filtre: %s\n"
+
+#: src/main-window.c:3853
 msgid "You can apply filters only on mailbox\n"
 msgstr "Només podeu aplicar els filtres a una bústia\n"
 
-#: src/main-window.c:3145 src/main-window.c:3164
-#, c-format
-msgid "Commiting mailbox %s failed."
-msgstr "Ha fallat la confirmació de la bústia %s."
-
-#: src/main-window.c:3291
+#: src/main-window.c:4166
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (només de lectura)"
 
-#: src/main-window.c:3293
+#: src/main-window.c:4168
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3397
+#: src/main-window.c:4272
 msgid "Cannot access the message's body\n"
 msgstr "No es pot accedir al cos del missatge\n"
 
-#: src/main.c:204
+#: src/main.c:203
 msgid "Get new mail on startup"
 msgstr "Recull el correu nou a l'inici"
 
-#: src/main.c:206
+#: src/main.c:205
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Redacta un nou correu electrònic a correu_electrònic@adreça"
 
-#: src/main.c:208
+#: src/main.c:207
 msgid "Attach file at PATH"
 msgstr "Adjunta el fitxer al camí"
 
-#: src/main.c:210
+#: src/main.c:209
 msgid "Opens MAILBOXNAME"
 msgstr "Obre MAILBOXNAME"
 
-#: src/main.c:210
+#: src/main.c:209
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:213
+#: src/main.c:212
 msgid "Opens first unread mailbox"
 msgstr "Obre la primera bústia sense llegir"
 
-#: src/main.c:216
+#: src/main.c:215
 msgid "Opens default Inbox on startup"
 msgstr "Obre la bústia d'entrada predeterminada a l'inici"
 
-#: src/main.c:218
+#: src/main.c:217
 msgid "Debug POP3 connection"
 msgstr "Depura la connexió POP3"
 
-#: src/main.c:220
+#: src/main.c:219
 #, fuzzy
 msgid "Debug IMAP connection"
 msgstr "Depura la connexió POP3"
 
-#: src/main.c:242
+#: src/main.c:241
 msgid "The Balsa E-Mail Client"
 msgstr ""
 
-#: src/main.c:259 src/main.c:264 src/main.c:270 src/main.c:276 src/main.c:282
+#: src/main.c:258 src/main.c:263 src/main.c:269 src/main.c:275 src/main.c:281
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "El Balsa no pot obrir la vostra bústia \"%s\""
 
-#: src/main.c:259
+#: src/main.c:258
 msgid "Inbox"
 msgstr "Bústia d'entrada"
 
-#: src/main.c:265
+#: src/main.c:264
 msgid "Outbox"
 msgstr "Bústia de sortida"
 
-#: src/main.c:271
+#: src/main.c:270
 msgid "Sentbox"
 msgstr "Bústia de missatges enviats"
 
-#: src/main.c:277
+#: src/main.c:276
 msgid "Draftbox"
 msgstr "Bústia d'esborranys"
 
-#: src/main.c:282
+#: src/main.c:281
 msgid "Trash"
 msgstr "Paperera"
 
-#: src/message-window.c:82
+#: src/main.c:470
+#, fuzzy
+msgid "Compressing mail folders..."
+msgstr "S'està tornant a obrir la bústia..."
+
+#: src/message-window.c:81
 msgid "N_o Headers"
 msgstr "S_ense capçaleres"
 
-#: src/message-window.c:84
+#: src/message-window.c:83
 msgid "_Selected Headers"
 msgstr "Capçaleres _seleccionades"
 
@@ -3435,294 +3915,312 @@ msgstr "Reenvia'l insertat..."
 msgid "Forward this message inline"
 msgstr "Reenvia aquest missatge insertat"
 
+#: src/message-window.c:181
+msgid "Save current part in message"
+msgstr "Desa la part actual del missatge"
+
 #: src/message-window.c:208
 msgid "M_ove"
 msgstr "M_ou"
 
-#: src/pref-manager.c:318
+#: src/message-window.c:274
+#, fuzzy, c-format
+msgid "Message from %s: %s"
+msgstr "Nou missatge a %s: %s"
+
+#: src/pref-manager.c:321
 msgid "7 Bits"
 msgstr "7 bits"
 
-#: src/pref-manager.c:319
+#: src/pref-manager.c:322
 msgid "8 Bits"
 msgstr "8 bits"
 
-#: src/pref-manager.c:320
+#: src/pref-manager.c:323
 msgid "Quoted"
 msgstr "Citat"
 
-#: src/pref-manager.c:330
+#: src/pref-manager.c:333
 msgid "While Retrieving Messages"
 msgstr "Mentre es recuperen els missatges"
 
-#: src/pref-manager.c:331
+#: src/pref-manager.c:334
 msgid "Until Closed"
 msgstr "Fins que es tanqui"
 
-#: src/pref-manager.c:332 src/pref-manager.c:2950 src/pref-manager.c:3018
-msgid "Never"
-msgstr "Mai"
-
-#: src/pref-manager.c:336
+#: src/pref-manager.c:339
 msgid "Fast"
 msgstr "Ràpid"
 
-#: src/pref-manager.c:337
+#: src/pref-manager.c:340
 msgid "Normal"
 msgstr "Normal"
 
-#: src/pref-manager.c:338
+#: src/pref-manager.c:341
 msgid "Bad Spellers"
 msgstr "Moltes errades ortogràfiques"
 
-#: src/pref-manager.c:342
+#: src/pref-manager.c:345
 msgid "Flat"
 msgstr "Pla"
 
-#: src/pref-manager.c:344
+#: src/pref-manager.c:347
 msgid "JWZ"
 msgstr "JWZ"
 
-#: src/pref-manager.c:348
+#: src/pref-manager.c:351
 msgid "west european (traditional)"
 msgstr "europeu occidental (tradicional)"
 
-#: src/pref-manager.c:349
+#: src/pref-manager.c:352
 msgid "east european"
 msgstr "europeu oriental"
 
-#: src/pref-manager.c:350
+#: src/pref-manager.c:353
 msgid "south european"
 msgstr "del sud d'europa"
 
-#: src/pref-manager.c:351
+#: src/pref-manager.c:354
 msgid "north european"
 msgstr "del nord d'europa"
 
-#: src/pref-manager.c:352
+#: src/pref-manager.c:355
 msgid "cyrillic (iso/windows)"
 msgstr "ciríl·lic (iso/windows)"
 
-#: src/pref-manager.c:353
+#: src/pref-manager.c:356
 msgid "arabic"
 msgstr "àrab"
 
-#: src/pref-manager.c:354
+#: src/pref-manager.c:357
 msgid "greek"
 msgstr "grec"
 
-#: src/pref-manager.c:355
+#: src/pref-manager.c:358
 msgid "hebrew"
 msgstr "hebreu"
 
-#: src/pref-manager.c:356
+#: src/pref-manager.c:359
 msgid "turkish"
 msgstr "turc"
 
-#: src/pref-manager.c:357
+#: src/pref-manager.c:360
 msgid "nordic"
 msgstr "nòrdic"
 
-#: src/pref-manager.c:358
+#: src/pref-manager.c:361
 msgid "thai"
 msgstr "tailandès"
 
-#: src/pref-manager.c:359
+#: src/pref-manager.c:362
 msgid "baltic"
 msgstr "bàltic"
 
-#: src/pref-manager.c:360
+#: src/pref-manager.c:363
 msgid "celtic"
 msgstr "cèltic"
 
-#: src/pref-manager.c:361
+#: src/pref-manager.c:364
 msgid "west european (euro)"
 msgstr "europeu occidental (euro)"
 
-#: src/pref-manager.c:362
+#: src/pref-manager.c:365
 msgid "russian (koi)"
 msgstr "rus (koi)"
 
-#: src/pref-manager.c:363
+#: src/pref-manager.c:366
 msgid "ukranian (koi)"
 msgstr "ucranià (koi)"
 
-#: src/pref-manager.c:364
+#: src/pref-manager.c:367
 msgid "japanese"
 msgstr "japonès"
 
-#: src/pref-manager.c:365
+#: src/pref-manager.c:368
 msgid "korean"
 msgstr "coreà"
 
-#: src/pref-manager.c:389
+#. must NOT be modal
+#: src/pref-manager.c:388
 msgid "Balsa Preferences"
 msgstr "Preferències del Balsa"
 
-#: src/pref-manager.c:415
+#: src/pref-manager.c:414
 msgid "Mail Servers"
 msgstr "Servidors de correu"
 
-#: src/pref-manager.c:419 src/pref-manager.c:2569
+#: src/pref-manager.c:418 src/pref-manager.c:2615
 msgid "Address Books"
 msgstr "Llibretes d'adreces"
 
-#: src/pref-manager.c:423
+#: src/pref-manager.c:422
 msgid "Mail Options"
 msgstr "Opcions del correu"
 
-#: src/pref-manager.c:427 src/pref-manager.c:1961
+#: src/pref-manager.c:426 src/pref-manager.c:1978
 msgid "Display"
 msgstr "Visualitza"
 
-#: src/pref-manager.c:431 src/toolbar-factory.c:130
+#: src/pref-manager.c:430 src/toolbar-factory.c:130
 msgid "Spelling"
 msgstr "Ortografia"
 
-#: src/pref-manager.c:435
+#: src/pref-manager.c:434
 msgid "Misc"
 msgstr "Miscel·lània"
 
-#: src/pref-manager.c:439
+#: src/pref-manager.c:438
 msgid "Startup"
 msgstr "Inici"
 
-#: src/pref-manager.c:1226
+#: src/pref-manager.c:1229
 #, c-format
 msgid "%s (default)"
 msgstr "%s (predeterminat)"
 
-#: src/pref-manager.c:1476
+#: src/pref-manager.c:1478
 msgid "Remote Mailbox Servers"
 msgstr "Servidors remots de bústies"
 
-#: src/pref-manager.c:1497 src/pref-manager.c:2590
+#: src/pref-manager.c:1499 src/pref-manager.c:2636
 msgid "Type"
 msgstr "Tipus"
 
-#: src/pref-manager.c:1505
+#: src/pref-manager.c:1507
 msgid "Mailbox Name"
 msgstr "Nom de la bústia"
 
-#: src/pref-manager.c:1518 src/pref-manager.c:2621
+#: src/pref-manager.c:1520 src/pref-manager.c:2667
 msgid "_Modify"
 msgstr "_Modifica"
 
-#: src/pref-manager.c:1533
+#: src/pref-manager.c:1535
 msgid "Local Mail"
 msgstr "Correu local"
 
-#: src/pref-manager.c:1535
+#: src/pref-manager.c:1537
 msgid "Select your local mail directory"
 msgstr "Seleccioneu el vostre directori de correu local"
 
-#: src/pref-manager.c:1555
+#: src/pref-manager.c:1557
 msgid "Outgoing Mail"
 msgstr "Correu de sortida"
 
-#: src/pref-manager.c:1560
+#: src/pref-manager.c:1562
 msgid "Remote SMTP Server"
 msgstr "Servidor remot d'SMTP"
 
-#: src/pref-manager.c:1562
+#: src/pref-manager.c:1564
 msgid "User"
 msgstr "Usuari"
 
-#: src/pref-manager.c:1565
+#: src/pref-manager.c:1567
 msgid "Pass Phrase"
 msgstr "Contrasenya"
 
 #. STARTTLS
-#: src/pref-manager.c:1569
+#: src/pref-manager.c:1571
 msgid "Use TLS"
 msgstr "Utilitza el TLS"
 
-#: src/pref-manager.c:1587
+#: src/pref-manager.c:1589
 msgid "Certificate Pass Phrase"
 msgstr "Contrasenya del certificat"
 
-#: src/pref-manager.c:1605
+#: src/pref-manager.c:1607
 msgid "Incoming"
 msgstr "S'està rebent"
 
-#: src/pref-manager.c:1607
+#: src/pref-manager.c:1609
 msgid "Outgoing"
 msgstr "S'està enviant"
 
-#: src/pref-manager.c:1631
+#: src/pref-manager.c:1633
 msgid "Checking"
 msgstr "S'està verificant"
 
-#: src/pref-manager.c:1636
+#: src/pref-manager.c:1638
 msgid "_Check mail automatically every:"
 msgstr "_Comprova el correu automàticament cada:"
 
-#: src/pref-manager.c:1653
+#: src/pref-manager.c:1649 src/pref-manager.c:2460
+msgid "minutes"
+msgstr "minuts"
+
+#: src/pref-manager.c:1655
 msgid "Check _IMAP mailboxes"
 msgstr "Comprova les bústies _IMAP"
 
-#: src/pref-manager.c:1659
+#: src/pref-manager.c:1661
 msgid "Check INBOX _only"
 msgstr "Compr_ova únicament la bústia d'entrada"
 
-#: src/pref-manager.c:1664
+#: src/pref-manager.c:1666
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr "Mostra el missatge si n'arriba un nou a una bústia oberta"
 
-#: src/pref-manager.c:1669
+#: src/pref-manager.c:1671
 msgid "Do background check quietly (no messages in status bar)"
 msgstr ""
 "Realitza les comprovacions en segon pla discretament (sense missatge a la "
 "barra d'estat)"
 
+#: src/pref-manager.c:1675
+msgid "_POP message size limit:"
+msgstr ""
+
+#: src/pref-manager.c:1682
+msgid "MB"
+msgstr ""
+
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1687
+#: src/pref-manager.c:1701
 msgid "Quoted and Flowed Text"
 msgstr ""
 
-#: src/pref-manager.c:1691 src/sendmsg-window.c:3898
+#: src/pref-manager.c:1705 src/sendmsg-window.c:4222
 msgid "Quoted Text Regular Expression"
 msgstr "Expressió regular del text citat"
 
-#: src/pref-manager.c:1702
+#: src/pref-manager.c:1716
 msgid "Wrap Incoming Text at:"
 msgstr "Ajusteu el text d'entrada a:"
 
-#: src/pref-manager.c:1713 src/pref-manager.c:1885
+#: src/pref-manager.c:1727 src/pref-manager.c:1902
 msgid "characters"
 msgstr "caràcters"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:1728
+#: src/pref-manager.c:1742
 msgid "Display of Multipart/Alternative Parts"
 msgstr "Mostra les parts Mulitpart/Alternative"
 
-#: src/pref-manager.c:1731
+#: src/pref-manager.c:1745
 msgid "prefer text/plain over html"
 msgstr "es prefereix text/plain abans que d'html"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:1749
+#: src/pref-manager.c:1763
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 "Caràcters nacionals (8-bits) en missatges incomplets sense capçalera de joc "
 "de caràcters"
 
-#: src/pref-manager.c:1755
+#: src/pref-manager.c:1769
 msgid "display as \"?\""
 msgstr "mostra com a \"?\""
 
-#: src/pref-manager.c:1764
+#: src/pref-manager.c:1778
 msgid "display using codeset"
 msgstr "Fes servir el codi de caràcters"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1796
+#: src/pref-manager.c:1813
 msgid "Message Disposition Notification Requests"
 msgstr "Peticions de notificació d'entrega del missatge"
 
-#: src/pref-manager.c:1798
+#: src/pref-manager.c:1815
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
@@ -3730,7 +4228,7 @@ msgstr ""
 "En rebre un missatge i el seu remitent sol·liciti retornar una\n"
 "notificació d'entrega del missatge (MDN), envia'l en els casos següents:"
 
-#: src/pref-manager.c:1809
+#: src/pref-manager.c:1826
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
@@ -3740,275 +4238,293 @@ msgstr ""
 "(l'adreça notifica-a és la mateixa que el camí de retorn,\n"
 "esteu a la llista \"A:\" o \"Cc:\")."
 
-#: src/pref-manager.c:1827
+#: src/pref-manager.c:1844
 msgid "The message header looks suspicious."
 msgstr "La capçalera del missatge és sospitosa."
 
-#: src/pref-manager.c:1866
+#: src/pref-manager.c:1883
 msgid "Word Wrap"
 msgstr "Ajusta la paraula"
 
-#: src/pref-manager.c:1871
+#: src/pref-manager.c:1888
 msgid "Wrap Outgoing Text at:"
 msgstr "Ajusta el text de sortida a:"
 
-#: src/pref-manager.c:1899
+#: src/pref-manager.c:1916
 msgid "Other Options"
 msgstr "Altres opcions"
 
-#: src/pref-manager.c:1904
+#: src/pref-manager.c:1921
 msgid "Reply Prefix:"
 msgstr "Prefix de la resposta:"
 
-#: src/pref-manager.c:1907
+#: src/pref-manager.c:1924
 msgid "Edit headers in external editor"
 msgstr "Edita les capçaleres en un editor extern"
 
-#: src/pref-manager.c:1909
+#: src/pref-manager.c:1926
 msgid "Automatically quote original when replying"
 msgstr "Cita automàticament l'original en la resposta"
 
-#: src/pref-manager.c:1912
+#: src/pref-manager.c:1929
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr ""
 "No incloguis parts HTML com a text en els correus de resposta o reenviats"
 
-#: src/pref-manager.c:1915
+#: src/pref-manager.c:1932
 #, fuzzy
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "El botó de reenviament adjunta el correu en compte de citar-lo"
 
-#: src/pref-manager.c:1918
+#: src/pref-manager.c:1935
 #, fuzzy
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
 "El botó d'enviament encua el correu de sortida a la bústia de sortida en "
 "comptes d'enviar-lo"
 
-#: src/pref-manager.c:1921
+#: src/pref-manager.c:1938
 #, fuzzy
 msgid "Copy outgoing messages to sentbox"
 msgstr "Copia el correu de sortida a la bústia d'enviats"
 
-#: src/pref-manager.c:1934 src/pref-manager.c:2058
+#: src/pref-manager.c:1951 src/pref-manager.c:2075
 msgid "Encoding"
 msgstr "Codificació"
 
-#: src/pref-manager.c:1964
+#: src/pref-manager.c:1981
 msgid "Status Messages"
 msgstr "Missatges d'estat"
 
-#: src/pref-manager.c:1966
+#: src/pref-manager.c:1983
 msgid "Colors"
 msgstr "Colors"
 
-#: src/pref-manager.c:1968
+#: src/pref-manager.c:1985
 msgid "Message"
 msgstr "Missatge"
 
-#: src/pref-manager.c:1970 src/pref-manager.c:2269
+#: src/pref-manager.c:1987 src/pref-manager.c:2284
 msgid "Threading"
 msgstr "Converses"
 
-#: src/pref-manager.c:1995
+#: src/pref-manager.c:2012
 msgid "Main Window"
 msgstr "Finestra principal"
 
-#: src/pref-manager.c:1998
+#: src/pref-manager.c:2015
 msgid "Use preview pane"
 msgstr "Utilitza la subfinestra de previsualització"
 
-#: src/pref-manager.c:2000
+#: src/pref-manager.c:2017
 msgid "Show mailbox statistics in left pane"
 msgstr "Mostra les estadístiques de la bústia a la subfinestra esquerra"
 
-#: src/pref-manager.c:2002
+#: src/pref-manager.c:2019
 msgid "Use alternative main window layout"
 msgstr "Utilitza la disposició alternativa la finestra principal"
 
-#: src/pref-manager.c:2004
+#: src/pref-manager.c:2021
 msgid "Automatically view message when mailbox opened"
 msgstr "Visualitza automàticament el missatge en obrir la bústia"
 
-#: src/pref-manager.c:2007
+#: src/pref-manager.c:2024
 msgid "Display message size as number of lines"
 msgstr "Quan mostris la mida del missatge, usa el nombre de línies"
 
-#: src/pref-manager.c:2012
+#: src/pref-manager.c:2029
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr "Les tecles d'avançar/retrocedir desplacen el missatge per:"
 
-#: src/pref-manager.c:2023
+#: src/pref-manager.c:2040
 msgid "percent"
 msgstr "tant per cent"
 
-#: src/pref-manager.c:2038
+#: src/pref-manager.c:2055
 msgid "Display Progress Dialog"
 msgstr "Mostra el diàleg de progrés"
 
-#: src/pref-manager.c:2063
+#: src/pref-manager.c:2080
 msgid "Date encoding (for strftime):"
 msgstr "Codificació de la data (per a strftime):"
 
-#: src/pref-manager.c:2065
+#: src/pref-manager.c:2082
 msgid "Selected headers:"
 msgstr "Capçaleres seleccionades:"
 
-#: src/pref-manager.c:2067
-msgid "Message window title format:"
-msgstr "Format del títol de la finestra del missatge:"
-
-#: src/pref-manager.c:2088 src/pref-manager.c:2093
+#: src/pref-manager.c:2103 src/pref-manager.c:2108
 msgid "Information Messages"
 msgstr "Missatges d'informació"
 
-#: src/pref-manager.c:2097
+#: src/pref-manager.c:2112
 msgid "Warning Messages"
 msgstr "Missatges d'avís"
 
-#: src/pref-manager.c:2101
+#: src/pref-manager.c:2116
 msgid "Error Messages"
 msgstr "Missatges d'error"
 
-#: src/pref-manager.c:2105
+#: src/pref-manager.c:2120
 msgid "Fatal Error Messages"
 msgstr "Missatges d'errors greus"
 
-#: src/pref-manager.c:2109
+#: src/pref-manager.c:2124
 msgid "Debug Messages"
 msgstr "Depura els missatges"
 
-#: src/pref-manager.c:2135
+#: src/pref-manager.c:2150
 msgid "Message Colors"
 msgstr "Colors dels missatges"
 
-#: src/pref-manager.c:2140
+#: src/pref-manager.c:2155
 #, c-format
 msgid "Quote level %d color"
 msgstr "Color del nivell citat número %d"
 
-#: src/pref-manager.c:2153
+#: src/pref-manager.c:2168
 msgid "Link Color"
 msgstr "Color de l'enllaç"
 
-#: src/pref-manager.c:2155
+#: src/pref-manager.c:2170
 msgid "Hyperlink color"
 msgstr "Color de l'hiperenllaç"
 
-#: src/pref-manager.c:2166
+#: src/pref-manager.c:2181
 msgid "Composition Window"
 msgstr "Finestra de redacció"
 
-#: src/pref-manager.c:2170
+#: src/pref-manager.c:2185
 msgid "Invalid or incomplete address label color"
 msgstr "El color de l'etiqueta de l'adreça és invàlid o està incomplet"
 
-#: src/pref-manager.c:2195
+#: src/pref-manager.c:2210
 msgid "Fonts"
 msgstr "Tipus de lletra"
 
-#: src/pref-manager.c:2210 src/pref-manager.c:2235
+#: src/pref-manager.c:2225 src/pref-manager.c:2250
 msgid "Select a font to use"
 msgstr "Selecciona el tipus de lletra a utilitzar"
 
-#: src/pref-manager.c:2213 src/pref-manager.c:2238
+#: src/pref-manager.c:2228 src/pref-manager.c:2253
 msgid "Select..."
 msgstr "Selecciona..."
 
-#: src/pref-manager.c:2220
+#: src/pref-manager.c:2235
 msgid "Message Font"
 msgstr "Tipus de lletra del missatge"
 
-#: src/pref-manager.c:2246
+#: src/pref-manager.c:2261
 msgid "Message Subject Font"
 msgstr "Tipus de lletra de l'assumpte del missatge"
 
-#: src/pref-manager.c:2272
+#: src/pref-manager.c:2287
 msgid "Expand mailbox tree on open"
 msgstr "Expandeix l'arbre de la bústia d'entrada en obrir-la"
 
-#: src/pref-manager.c:2276
+#: src/pref-manager.c:2291
 msgid "Default threading style"
 msgstr "Estil del fil de les converses predeterminat"
 
-#: src/pref-manager.c:2355
+#: src/pref-manager.c:2370
 msgid "Pspell Settings"
 msgstr "Paràmetres del Pspell"
 
-#: src/pref-manager.c:2361
+#: src/pref-manager.c:2376
 msgid "Spell Check Module"
 msgstr "Mòdul de revisió de l'ortografia"
 
-#: src/pref-manager.c:2368
+#: src/pref-manager.c:2383
 msgid "Suggestion Level"
 msgstr "Nivell suggerit"
 
 #. do the ignore length
-#: src/pref-manager.c:2374
+#: src/pref-manager.c:2389
 msgid "Ignore words shorter than"
 msgstr "Ignora paraules més curtes que"
 
-#: src/pref-manager.c:2395
+#: src/pref-manager.c:2410
 msgid "Miscellaneous Spelling Settings"
 msgstr "Paràmetres d'ortografia variats"
 
-#: src/pref-manager.c:2397
+#: src/pref-manager.c:2412
 msgid "Check signature"
 msgstr "Revisa la signatura"
 
-#: src/pref-manager.c:2398
+#: src/pref-manager.c:2413
 msgid "Check quoted"
 msgstr "Revisa el text citat"
 
-#: src/pref-manager.c:2423
+#: src/pref-manager.c:2437
 msgid "Miscellaneous"
 msgstr "Variat"
 
-#: src/pref-manager.c:2425
+#: src/pref-manager.c:2439
 msgid "Debug"
 msgstr "Depura"
 
-#: src/pref-manager.c:2426
+#: src/pref-manager.c:2440
 msgid "Empty Trash on exit"
 msgstr "Buida la paperera en sortir"
 
-#: src/pref-manager.c:2432
+#: src/pref-manager.c:2446
 msgid "Automatically close mailbox if unused more than"
 msgstr "Tanca automàticament la bustia si no s'usa més de"
 
-#: src/pref-manager.c:2454
-msgid "Automatically commit mailbox if unused more than"
-msgstr "Confirma la bústia automàticament si no s'ha utilitzat més de"
-
-#: src/pref-manager.c:2478
+#: src/pref-manager.c:2474
 msgid "Deleting Messages"
 msgstr "S'estan suprimint els missatges"
 
-#: src/pref-manager.c:2481
-msgid "Delete immediately and irretrievably"
-msgstr "Suprimeix immediatament i de forma irreversible"
+#: src/pref-manager.c:2476
+msgid ""
+"The following setting is global, but may be overridden\n"
+"for the selected mailbox using Mailbox -> Hide messages:"
+msgstr ""
 
-#: src/pref-manager.c:2502
+#: src/pref-manager.c:2484
+#, fuzzy
+msgid "Hide messages marked as deleted"
+msgstr "S'estan marcant com a esborrats %d missatges..."
+
+#: src/pref-manager.c:2486
+msgid "The following settings are global."
+msgstr ""
+
+#: src/pref-manager.c:2491
+#, fuzzy
+msgid "Expunge deleted messages when mailbox is closed"
+msgstr "Visualitza automàticament el missatge en obrir la bústia"
+
+#: src/pref-manager.c:2498
+#, fuzzy
+msgid " ...and if mailbox is unused more than"
+msgstr "Confirma la bústia automàticament si no s'ha utilitzat més de"
+
+#: src/pref-manager.c:2511
+msgid "hours"
+msgstr ""
+
+#: src/pref-manager.c:2533
 msgid "Options"
 msgstr "Opcions"
 
-#: src/pref-manager.c:2505
+#: src/pref-manager.c:2536
 msgid "Open Inbox upon startup"
 msgstr "Obre la bústia d'entrada a l'inici"
 
-#: src/pref-manager.c:2507
+#: src/pref-manager.c:2538
 msgid "Check mail upon startup"
 msgstr "Comprova el correu a l'inici"
 
-#: src/pref-manager.c:2509
+#: src/pref-manager.c:2540
 msgid "Remember open mailboxes between sessions"
 msgstr "Recorda les bústies obertes entre sessions"
 
-#: src/pref-manager.c:2523
-msgid "IMAP Folder Scanning"
+#: src/pref-manager.c:2554
+#, fuzzy
+msgid "Folder Scanning"
 msgstr "Escaneig de les carpetes de l'IMAP"
 
-#: src/pref-manager.c:2525
+#: src/pref-manager.c:2556
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
@@ -4018,74 +4534,72 @@ msgstr ""
 "Per visualitzar més parts de l'arbre a l'inici, seleccioneu un nivell de "
 "profunditat més gran."
 
-#: src/pref-manager.c:2536
-msgid "Scan tree to depth"
+#: src/pref-manager.c:2566
+#, fuzzy
+msgid "Scan local folders to depth"
 msgstr "Escaneja l'arbre fins el nivell de profunditat"
 
-#: src/pref-manager.c:2598
+#: src/pref-manager.c:2579
+#, fuzzy
+msgid "Scan IMAP folders to depth"
+msgstr "Escaneja l'arbre fins el nivell de profunditat"
+
+#: src/pref-manager.c:2644
 msgid "Address Book Name"
 msgstr "Nom de la llibreta d'adreces"
 
-#: src/pref-manager.c:2606
+#: src/pref-manager.c:2652
 msgid "Expand aliases"
 msgstr "Expandeix els àlies"
 
-#: src/pref-manager.c:2625
+#: src/pref-manager.c:2671
 msgid "_Set as default"
 msgstr "Defineix com a p_redeterminat"
 
-#: src/pref-manager.c:2781
+#: src/pref-manager.c:2827
 msgid "Remote POP3 mailbox..."
 msgstr "Bústia de POP3 remot..."
 
-#: src/pref-manager.c:2927
+#: src/pref-manager.c:2976
 msgid "Show nothing"
 msgstr "No mostris res"
 
-#: src/pref-manager.c:2928
+#: src/pref-manager.c:2977
 msgid "Show dialog"
 msgstr "Mostra el diàleg"
 
-#: src/pref-manager.c:2929
+#: src/pref-manager.c:2978
 msgid "Show in list"
 msgstr "Mostra a la llista"
 
-#: src/pref-manager.c:2930
+#: src/pref-manager.c:2979
 #, fuzzy
 msgid "Show in status bar"
 msgstr "Mostra a la llista"
 
-#: src/pref-manager.c:2931
+#: src/pref-manager.c:2980
 msgid "Print to console"
 msgstr "Imprimeix a la consola"
 
-#: src/pref-manager.c:2951
+#: src/pref-manager.c:3000
 msgid "Ask me"
 msgstr "Pregunta'm"
 
-#: src/pref-manager.c:2952
+#: src/pref-manager.c:3001
 msgid "Always"
 msgstr "Sempre"
 
-#: src/pref-manager.c:3019
-msgid "If Possible"
-msgstr "Si és possible"
-
-#: src/pref-manager.c:3020
-msgid "Required"
-msgstr "Necessari"
-
-#: src/pref-manager.c:3045
+#: src/pref-manager.c:3105
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "S'ha produït un error en mostrar el link_id %s: %s\n"
 
-#: src/print.c:256 src/print.c:729
+#: src/print.c:258 src/print.c:741
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Pàgina: %i/%i"
 
-#: src/print.c:655
+#: src/print.c:667
 #, fuzzy
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
@@ -4097,64 +4611,64 @@ msgstr ""
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:995
+#: src/print.c:1007
 msgid "Type:"
 msgstr "Tipus:"
 
-#: src/print.c:998
+#: src/print.c:1010
 msgid "File name:"
 msgstr "Nom del fitxer:"
 
-#: src/print.c:1536
+#: src/print.c:1553
 msgid "Font available for printing"
 msgstr "Tipus de lletra disponible per a la impressió"
 
-#: src/print.c:1542
+#: src/print.c:1559
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr ""
 "El tipus de lletra <b>no</b> es pot fer servir per imprimir. La més similar "
 "és: %s"
 
-#: src/print.c:1555
+#: src/print.c:1572
 msgid "Select Font"
 msgstr "Selecciona el tipus de lletra"
 
-#: src/print.c:1588
+#: src/print.c:1605
 msgid "Change..."
 msgstr "Canvia..."
 
-#: src/print.c:1621
+#: src/print.c:1638
 msgid "Print message"
 msgstr "Imprimeix el missatge"
 
 #. create a 2nd notebook page for the fonts
-#: src/print.c:1630
+#: src/print.c:1647
 msgid "_Fonts"
 msgstr "_Tipus de lletres"
 
-#: src/print.c:1633
+#: src/print.c:1650
 msgid "Header font"
 msgstr "Tipus de lletra de la capçalera"
 
-#: src/print.c:1635
+#: src/print.c:1652
 msgid "Body font"
 msgstr "Tipus de lletra del cos"
 
-#: src/print.c:1637
+#: src/print.c:1654
 msgid "Footer font"
 msgstr "Tipus de lletra del peu"
 
 #. highlight cited stuff
-#: src/print.c:1641
+#: src/print.c:1658
 msgid "Highlight cited text"
 msgstr "Ressalta el text citat"
 
-#: src/print.c:1645
+#: src/print.c:1662
 msgid "_Enable highlighting of cited text"
 msgstr "Habilitat el r_essaltat del text citat"
 
-#: src/print.c:1670
+#: src/print.c:1687
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -4164,15 +4678,15 @@ msgstr ""
 "Per canviar-la utilitzeu la pàgina \"Tipus de lletres\" del diàleg "
 "\"Imprimeix el missatge\"."
 
-#: src/print.c:1775
+#: src/print.c:1792
 msgid "Balsa: message print preview"
 msgstr "Balsa: previsualitza impressió del missatge"
 
-#: src/save-restore.c:564
+#: src/save-restore.c:591
 msgid "Error during filters loading: "
 msgstr "S'ha produït un error en carregar els filtres: "
 
-#: src/save-restore.c:566
+#: src/save-restore.c:593
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
@@ -4181,11 +4695,11 @@ msgstr ""
 "S'ha produït un error en carregar els filtres: %s\n"
 "Els filtres no deuen ser correctes."
 
-#: src/save-restore.c:677
+#: src/save-restore.c:703
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "S'ha eliminat l'opció per no reconèixer el text \"format=flowed\"."
 
-#: src/save-restore.c:915
+#: src/save-restore.c:956
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
@@ -4193,334 +4707,342 @@ msgstr ""
 "L'opció per no enviar \"format=flowed\" està al menú opcions de la finestra "
 "de redacció."
 
-#: src/save-restore.c:947
+#: src/save-restore.c:988
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "L'opció per fer la petició d'una MDN (notificació d'entrega del missatge) "
 "està al menú opcions de la finestra de redacció."
 
-#: src/save-restore.c:1811
+#: src/save-restore.c:1724
+#, fuzzy
+msgid "Filter with no condition was ignored"
+msgstr "El filtre ha de tenir condicions."
+
+#: src/save-restore.c:1902
 #, fuzzy
 msgid "Error opening GConf database\n"
 msgstr "S'ha produït un error en obrir la bústia"
 
-#: src/save-restore.c:1819 src/save-restore.c:1830
+#: src/save-restore.c:1910 src/save-restore.c:1921
 #, fuzzy, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr ""
 "S'ha produït un error en mostrar l'ajuda de l'execució de filtres: %s\n"
 
-#: src/sendmsg-window.c:204
-msgid "_Include File..."
-msgstr "_Inclou el fitxer..."
-
-#: src/sendmsg-window.c:207
-msgid "_Attach File..."
-msgstr "_Adjunta el fitxer..."
-
-#: src/sendmsg-window.c:210
-msgid "I_nclude Message(s)"
-msgstr "I_nclou el(s) missatge(s)"
-
-#: src/sendmsg-window.c:213
-msgid "Attach _Message(s)"
-msgstr "Adjunta el(s) _missatge(s)"
-
-#: src/sendmsg-window.c:219
-msgid "_Send"
-msgstr "_Envia"
-
-#: src/sendmsg-window.c:220 src/toolbar-factory.c:121
-msgid "Send this message"
-msgstr "Envia aquest missatge"
-
-#: src/sendmsg-window.c:224
-msgid "_Queue"
-msgstr "En_cua"
-
-#: src/sendmsg-window.c:225
-msgid "Queue this message in Outbox for sending"
-msgstr "Encua aquest missatge a la bústia de sortida per enviar-lo"
-
-#: src/sendmsg-window.c:229
-msgid "_Postpone"
-msgstr "_Posposa"
-
-#: src/sendmsg-window.c:232
-msgid "Sa_ve"
-msgstr "_Desa"
-
-#: src/sendmsg-window.c:233
-msgid "Save this message"
-msgstr "Desa aquest missatge"
-
-#: src/sendmsg-window.c:237
-msgid "Print the edited message"
-msgstr "Imprimeix el missatge editat"
-
-#: src/sendmsg-window.c:266
-msgid "_Wrap Body"
-msgstr "A_justa el cos"
-
-#: src/sendmsg-window.c:270
-msgid "_Reflow Selected Text"
-msgstr ""
-
-#: src/sendmsg-window.c:275
-msgid "Insert Si_gnature"
-msgstr "Insereix la si_gnatura"
-
-#: src/sendmsg-window.c:279
-msgid "_Quote Message(s)"
-msgstr "_Cita el(s) missatge(s)"
-
-#: src/sendmsg-window.c:284
-msgid "C_heck Spelling"
-msgstr "Comprova l'ortogra_fia"
-
-#: src/sendmsg-window.c:285
-msgid "Check the spelling of the message"
-msgstr "Comprova l'ortografia del missatge"
-
-#: src/sendmsg-window.c:290
-msgid "Select _Identity..."
-msgstr "Seleccioneu una _identitat..."
-
-#: src/sendmsg-window.c:291
-msgid "Select the Identity to use for the message"
-msgstr "Seleccioneu la identitat a utilitzar en aquest missatge"
-
-#: src/sendmsg-window.c:296
-msgid "_Edit with Gnome-Editor"
-msgstr "_Edita amb l'editor del Gnome"
-
-#: src/sendmsg-window.c:297
-msgid "Edit the current message with the default Gnome editor"
-msgstr "Edita el missatge actual amb l'editor per defecte del Gnome"
-
-#: src/sendmsg-window.c:309
-msgid "Fr_om"
-msgstr "D_e"
-
-#: src/sendmsg-window.c:315
-msgid "_Cc"
-msgstr "_Cc"
-
-#: src/sendmsg-window.c:317
-msgid "_Bcc"
-msgstr "_Bcc"
-
-#: src/sendmsg-window.c:319
-msgid "_Fcc"
-msgstr "_Fcc"
-
-#: src/sendmsg-window.c:321
-msgid "_Reply To"
-msgstr "_Respon a"
-
-#: src/sendmsg-window.c:323
-msgid "_Attachments"
-msgstr "_Fitxers adjunts"
-
-#: src/sendmsg-window.c:326
-msgid "Co_mments"
-msgstr "Co_mentaris"
-
-#: src/sendmsg-window.c:329
-msgid "_Keywords"
-msgstr "_Paraules clau"
-
-#: src/sendmsg-window.c:345
+#: src/sendmsg-window.c:218
 msgid "_Brazilian"
 msgstr "_Brasiler"
 
-#: src/sendmsg-window.c:346
+#: src/sendmsg-window.c:219
 msgid "_Catalan"
 msgstr "_Català"
 
-#: src/sendmsg-window.c:347
+#: src/sendmsg-window.c:220
 msgid "_Chinese Simplified"
 msgstr "_Xinès simplificat"
 
-#: src/sendmsg-window.c:348
+#: src/sendmsg-window.c:221
 msgid "_Chinese Traditional"
 msgstr "_Xinès tradicional"
 
-#: src/sendmsg-window.c:349
+#: src/sendmsg-window.c:222
 msgid "_Czech"
 msgstr "Txe_c"
 
-#: src/sendmsg-window.c:350
+#: src/sendmsg-window.c:223
 msgid "_Danish"
 msgstr "_Danès"
 
-#: src/sendmsg-window.c:351
+#: src/sendmsg-window.c:224
 msgid "_Dutch"
 msgstr "Holan_dès"
 
-#: src/sendmsg-window.c:352
+#: src/sendmsg-window.c:225
 msgid "_English (American)"
 msgstr "Angl_es (americà)"
 
-#: src/sendmsg-window.c:353
+#: src/sendmsg-window.c:226
 msgid "_English (British)"
 msgstr "Angl_es (britànic)"
 
-#: src/sendmsg-window.c:354
+#: src/sendmsg-window.c:227
 msgid "_Esperanto"
 msgstr "_Esperanto"
 
-#: src/sendmsg-window.c:355
+#: src/sendmsg-window.c:228
 msgid "_Estonian"
 msgstr "_Estonià"
 
-#: src/sendmsg-window.c:356
+#: src/sendmsg-window.c:229
 msgid "_Finnish"
 msgstr "_Finès"
 
-#: src/sendmsg-window.c:357
+#: src/sendmsg-window.c:230
 msgid "_French"
 msgstr "_Francès"
 
-#: src/sendmsg-window.c:358
+#: src/sendmsg-window.c:231
 msgid "_German"
 msgstr "Ale_many"
 
-#: src/sendmsg-window.c:359
+#: src/sendmsg-window.c:232
 msgid "_Greek"
 msgstr "_Grec"
 
-#: src/sendmsg-window.c:360
+#: src/sendmsg-window.c:233
 msgid "_Hebrew"
 msgstr "_Hebreu"
 
-#: src/sendmsg-window.c:361
+#: src/sendmsg-window.c:234
 msgid "_Hungarian"
 msgstr "_Hungarès"
 
-#: src/sendmsg-window.c:362
+#: src/sendmsg-window.c:235
 msgid "_Italian"
 msgstr "_Italià"
 
-#: src/sendmsg-window.c:363
+#: src/sendmsg-window.c:236
 msgid "_Japanese"
 msgstr "_Japonès"
 
-#: src/sendmsg-window.c:364
+#: src/sendmsg-window.c:237
 msgid "_Korean"
 msgstr "_Coreà"
 
-#: src/sendmsg-window.c:365
+#: src/sendmsg-window.c:238
 msgid "_Latvian"
 msgstr "_Letó"
 
-#: src/sendmsg-window.c:366
+#: src/sendmsg-window.c:239
 msgid "_Lithuanian"
 msgstr "_Lituà"
 
-#: src/sendmsg-window.c:367
+#: src/sendmsg-window.c:240
 msgid "_Norwegian"
 msgstr "_Noruec"
 
-#: src/sendmsg-window.c:368
+#: src/sendmsg-window.c:241
 msgid "_Polish"
 msgstr "_Polonès"
 
-#: src/sendmsg-window.c:369
+#: src/sendmsg-window.c:242
 msgid "_Portugese"
 msgstr "_Portuguès"
 
-#: src/sendmsg-window.c:370
+#: src/sendmsg-window.c:243
 msgid "_Romanian"
 msgstr "_Rumanès"
 
-#: src/sendmsg-window.c:371
+#: src/sendmsg-window.c:244
 msgid "_Russian (ISO)"
 msgstr "_Rus (ISO)"
 
-#: src/sendmsg-window.c:372
+#: src/sendmsg-window.c:245
 msgid "_Russian (KOI)"
 msgstr "_Rus (KOI)"
 
-#: src/sendmsg-window.c:373
+#: src/sendmsg-window.c:246
 msgid "_Serbian"
 msgstr "_Serbi"
 
-#: src/sendmsg-window.c:374
+#: src/sendmsg-window.c:247
 msgid "_Serbian (Latin)"
 msgstr "_Serbi (llatí)"
 
-#: src/sendmsg-window.c:375
+#: src/sendmsg-window.c:248
 msgid "_Slovak"
 msgstr "E_slovac"
 
-#: src/sendmsg-window.c:376
+#: src/sendmsg-window.c:249
 msgid "_Spanish"
 msgstr "E_spanyol"
 
-#: src/sendmsg-window.c:377
+#: src/sendmsg-window.c:250
 msgid "_Swedish"
 msgstr "_Suec"
 
-#: src/sendmsg-window.c:378
+#: src/sendmsg-window.c:251
 msgid "_Turkish"
 msgstr "_Turc"
 
-#: src/sendmsg-window.c:379
+#: src/sendmsg-window.c:252
 msgid "_Ukrainian"
 msgstr "_Ucraïnès"
 
-#: src/sendmsg-window.c:380
+#: src/sendmsg-window.c:253
 msgid "_Generic UTF-8"
 msgstr "UTF-8 _genèric"
 
-#: src/sendmsg-window.c:392
+#: src/sendmsg-window.c:277
 msgid "_GnuPG uses MIME mode"
 msgstr "El _GnuPG utilitza el mode MIME"
 
-#: src/sendmsg-window.c:398
+#: src/sendmsg-window.c:283
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "El _GnuPG utilitza el mode OpenPGP antic"
 
-#: src/sendmsg-window.c:409
+#: src/sendmsg-window.c:290
+msgid "_S/MIME mode (GpgSM)"
+msgstr ""
+
+#: src/sendmsg-window.c:305 src/sendmsg-window.c:477
+msgid "_Include File..."
+msgstr "_Inclou el fitxer..."
+
+#: src/sendmsg-window.c:308 src/sendmsg-window.c:490
+msgid "_Attach File..."
+msgstr "_Adjunta el fitxer..."
+
+#: src/sendmsg-window.c:311 src/sendmsg-window.c:479
+msgid "I_nclude Message(s)"
+msgstr "I_nclou el(s) missatge(s)"
+
+#: src/sendmsg-window.c:314 src/sendmsg-window.c:482
+msgid "Attach _Message(s)"
+msgstr "Adjunta el(s) _missatge(s)"
+
+#: src/sendmsg-window.c:320 src/sendmsg-window.c:507
+#, fuzzy
+msgid "Sen_d"
+msgstr "Envia"
+
+#: src/sendmsg-window.c:321 src/sendmsg-window.c:508 src/toolbar-factory.c:121
+msgid "Send this message"
+msgstr "Envia aquest missatge"
+
+#: src/sendmsg-window.c:325
+msgid "_Queue"
+msgstr "En_cua"
+
+#: src/sendmsg-window.c:326 src/sendmsg-window.c:513
+msgid "Queue this message in Outbox for sending"
+msgstr "Encua aquest missatge a la bústia de sortida per enviar-lo"
+
+#: src/sendmsg-window.c:330
+msgid "_Postpone"
+msgstr "_Posposa"
+
+#: src/sendmsg-window.c:333 src/sendmsg-window.c:494
+#, fuzzy
+msgid "_Save"
+msgstr "Desa"
+
+#: src/sendmsg-window.c:334 src/sendmsg-window.c:495
+msgid "Save this message"
+msgstr "Desa aquest missatge"
+
+#: src/sendmsg-window.c:338 src/sendmsg-window.c:499
+msgid "Print the edited message"
+msgstr "Imprimeix el missatge editat"
+
+#: src/sendmsg-window.c:367 src/sendmsg-window.c:524
+msgid "_Wrap Body"
+msgstr "A_justa el cos"
+
+#: src/sendmsg-window.c:371 src/sendmsg-window.c:528
+msgid "_Reflow Selected Text"
+msgstr ""
+
+#: src/sendmsg-window.c:376 src/sendmsg-window.c:556
+msgid "Insert Si_gnature"
+msgstr "Insereix la si_gnatura"
+
+#: src/sendmsg-window.c:380 src/sendmsg-window.c:532
+msgid "_Quote Message(s)"
+msgstr "_Cita el(s) missatge(s)"
+
+#: src/sendmsg-window.c:385 src/sendmsg-window.c:605
+msgid "C_heck Spelling"
+msgstr "Comprova l'ortogra_fia"
+
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:606
+msgid "Check the spelling of the message"
+msgstr "Comprova l'ortografia del missatge"
+
+#: src/sendmsg-window.c:391 src/sendmsg-window.c:612
+msgid "Select _Identity..."
+msgstr "Seleccioneu una _identitat..."
+
+#: src/sendmsg-window.c:392 src/sendmsg-window.c:613
+msgid "Select the Identity to use for the message"
+msgstr "Seleccioneu la identitat a utilitzar en aquest missatge"
+
+#: src/sendmsg-window.c:397
+msgid "_Edit with Gnome-Editor"
+msgstr "_Edita amb l'editor del Gnome"
+
+#: src/sendmsg-window.c:398
+msgid "Edit the current message with the default Gnome editor"
+msgstr "Edita el missatge actual amb l'editor per defecte del Gnome"
+
+#: src/sendmsg-window.c:410 src/sendmsg-window.c:569
+msgid "Fr_om"
+msgstr "D_e"
+
+#: src/sendmsg-window.c:412 src/sendmsg-window.c:571
+msgid "_Cc"
+msgstr "_Cc"
+
+#: src/sendmsg-window.c:414 src/sendmsg-window.c:573
+msgid "_Bcc"
+msgstr "_Bcc"
+
+#: src/sendmsg-window.c:416 src/sendmsg-window.c:575
+msgid "_Fcc"
+msgstr "_Fcc"
+
+#: src/sendmsg-window.c:418
+msgid "_Reply To"
+msgstr "_Respon a"
+
+#: src/sendmsg-window.c:424 src/sendmsg-window.c:617
 msgid "_Request Disposition Notification"
 msgstr "_Sol·licita la notificació d'entrega"
 
-#: src/sendmsg-window.c:412
+#: src/sendmsg-window.c:427 src/sendmsg-window.c:587
 msgid "_Format = Flowed"
 msgstr "_Format = Flowed"
 
-#: src/sendmsg-window.c:417
+#: src/sendmsg-window.c:432 src/sendmsg-window.c:592
 msgid "_Sign Message"
 msgstr "_Signa el missatge"
 
-#: src/sendmsg-window.c:418
+#: src/sendmsg-window.c:433 src/sendmsg-window.c:593
 msgid "signs the message using GnuPG"
 msgstr "signa el missatge utilitzant el GnuPG"
 
-#: src/sendmsg-window.c:421
+#: src/sendmsg-window.c:436 src/sendmsg-window.c:596
 msgid "_Encrypt Message"
 msgstr "_Encripta el missatge"
 
-#: src/sendmsg-window.c:422
+#: src/sendmsg-window.c:437 src/sendmsg-window.c:597
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr ""
 "signa el missatge utilitzant el GnuPG per a tots els destinataris A: i Cc:"
 
-#: src/sendmsg-window.c:459
+#: src/sendmsg-window.c:457 src/sendmsg-window.c:633
 msgid "_Show"
 msgstr "_Mostra"
 
-#: src/sendmsg-window.c:461
+#: src/sendmsg-window.c:459 src/sendmsg-window.c:610
 msgid "_Language"
 msgstr "_Idioma"
 
-#: src/sendmsg-window.c:463
+#: src/sendmsg-window.c:461
 msgid "_Options"
 msgstr "_Opcions"
 
-#: src/sendmsg-window.c:547
+#: src/sendmsg-window.c:503
+msgid "Sa_ve and Close"
+msgstr ""
+
+#: src/sendmsg-window.c:512
+#, fuzzy
+msgid "Send _Later"
+msgstr "S'ha produït un error en el tancament"
+
+#: src/sendmsg-window.c:733
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4529,17 +5051,12 @@ msgstr ""
 "S'ha modificat el missatge per a \"%s\".\n"
 "Voleu desar el missatge a la bústia d'esborranys?"
 
-#. Comments:
-#: src/sendmsg-window.c:669 src/sendmsg-window.c:2000
-msgid "Comments:"
-msgstr "Comentaris:"
-
-#: src/sendmsg-window.c:796
+#: src/sendmsg-window.c:985
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr ""
 "L'editor del Gnome no està definit en les vostres aplicacions preferides."
 
-#: src/sendmsg-window.c:1217
+#: src/sendmsg-window.c:1434
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4549,48 +5066,48 @@ msgid ""
 "Do you really want to attach this file as reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1228
+#: src/sendmsg-window.c:1445
 msgid "Attach as Reference?"
 msgstr "Ho voleu adjuntar com a referència?"
 
-#: src/sendmsg-window.c:1318
+#: src/sendmsg-window.c:1535
 msgid "Remove"
 msgstr "Suprimeix"
 
-#: src/sendmsg-window.c:1329
+#: src/sendmsg-window.c:1546
 msgid "attach as reference"
 msgstr "adjunta com a una referència"
 
-#: src/sendmsg-window.c:1335
+#: src/sendmsg-window.c:1552
 msgid "attach as file"
 msgstr "adjunta com a un fitxer"
 
-#: src/sendmsg-window.c:1445
+#: src/sendmsg-window.c:1686
 #, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "S'ha produït un error en convertir \"%s\" a UTF-8: %s\n"
 
-#: src/sendmsg-window.c:1486
+#: src/sendmsg-window.c:1723
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "No s'ha pogut obtenir informació del fitxer '%s': %s"
 
-#: src/sendmsg-window.c:1491
+#: src/sendmsg-window.c:1728
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "El fitxer adjunt %s no és un fitxer habitual."
 
-#: src/sendmsg-window.c:1494
+#: src/sendmsg-window.c:1731
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "No s'ha pogut llegir el fitxer %s\n"
 
-#: src/sendmsg-window.c:1538
+#: src/sendmsg-window.c:1775
 msgid "Attach file"
 msgstr "Adjunta el fitxer"
 
-#: src/sendmsg-window.c:1634 src/sendmsg-window.c:1696
-#: src/sendmsg-window.c:2989
+#: src/sendmsg-window.c:1872 src/sendmsg-window.c:1935
+#: src/sendmsg-window.c:3264
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4599,87 +5116,83 @@ msgstr ""
 "Causa possible: no hi ha espai temporal suficient"
 
 #. From:
-#: src/sendmsg-window.c:1890
+#: src/sendmsg-window.c:2130
 msgid "F_rom:"
 msgstr "_De:"
 
 #. Subject:
-#: src/sendmsg-window.c:1902
+#: src/sendmsg-window.c:2142
 msgid "S_ubject:"
 msgstr "A_ssumpte:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:1916
+#: src/sendmsg-window.c:2156
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1946
+#: src/sendmsg-window.c:2187
 msgid "_Reply To:"
 msgstr "_Respon a:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1953
+#: src/sendmsg-window.c:2192
 msgid "_Attachments:"
 msgstr "Fitxers _adjunts:"
 
-#. Keywords:
-#: src/sendmsg-window.c:2003
-msgid "Keywords:"
-msgstr "Paraules clau:"
-
-#: src/sendmsg-window.c:2171
+#: src/sendmsg-window.c:2433
 msgid "you"
 msgstr "vostè"
 
-#: src/sendmsg-window.c:2180
+#: src/sendmsg-window.c:2442
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------missatge reenviat de %s------\n"
 
-#: src/sendmsg-window.c:2215
+#: src/sendmsg-window.c:2477
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID del missatge: %s\n"
 
-#: src/sendmsg-window.c:2221
+#: src/sendmsg-window.c:2483
 msgid "References:"
 msgstr "Referències:"
 
-#: src/sendmsg-window.c:2232
+#: src/sendmsg-window.c:2494
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "El %s, en/na %s va escriure:\n"
 
-#: src/sendmsg-window.c:2234
+#: src/sendmsg-window.c:2496
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s ha escrit:\n"
 
-#: src/sendmsg-window.c:3151
+#: src/sendmsg-window.c:3420
 msgid "Choose charset"
 msgstr "Escolliu el joc de caràcters"
 
-#: src/sendmsg-window.c:3158
+#: src/sendmsg-window.c:3427
+#, fuzzy
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file.\n"
-"(if unsure chose Generic UTF-8)"
+"(choose Generic UTF-8 if unsure)."
 msgstr ""
 "Aquest fitxer no està codificat en US-ASCII o UTF-8.\n"
 "Escolliu el joc de caràcters utilitzat per codificar aquest fitxer.\n"
 "(si no n'esteu segur utilitzeu el UTF-8 genèric)"
 
-#: src/sendmsg-window.c:3225
+#: src/sendmsg-window.c:3494
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "No s'ha pogut obrir el fitxer %s.\n"
 
-#: src/sendmsg-window.c:3247
+#: src/sendmsg-window.c:3516
 msgid "Include file"
 msgstr "Inclou el fitxer"
 
-#: src/sendmsg-window.c:3549
+#: src/sendmsg-window.c:3811
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -4690,7 +5203,7 @@ msgstr ""
 "Escolliu un idioma per a aquest missatge.\n"
 "Pels missatge mulit-idioma escolliu el UTF-8."
 
-#: src/sendmsg-window.c:3569
+#: src/sendmsg-window.c:3852
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -4701,37 +5214,75 @@ msgstr ""
 "seleccionar el mode MIME i/o voleu protegir tot el missatge. Esteu segur de "
 "voler continuar?"
 
-#: src/sendmsg-window.c:3582
+#: src/sendmsg-window.c:3868
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "el missatge s'està enviant amb el mode gpg %d"
 
-#: src/sendmsg-window.c:3623
+#: src/sendmsg-window.c:3913
 #, fuzzy
-msgid "Send failed"
+msgid "Message could not be created"
+msgstr "No s'ha pogut accedir a la llibreta d'adreces."
+
+#: src/sendmsg-window.c:3915
+msgid "Message could not be queued in outbox"
+msgstr ""
+
+#: src/sendmsg-window.c:3917
+msgid "Message could not be saved in senbox"
+msgstr ""
+
+#: src/sendmsg-window.c:3919
+#, fuzzy
+msgid "Message could not be sent"
+msgstr "No s'ha pogut obrir el %s"
+
+#: src/sendmsg-window.c:3923
+#, fuzzy, c-format
+msgid "Send failed: %s"
 msgstr "S'ha produït un error en el tancament"
 
-#: src/sendmsg-window.c:3897
+#: src/sendmsg-window.c:4007
+#, fuzzy
+msgid "Could not postpone message."
+msgstr "No s'ha pogut afegir el missatge"
+
+#: src/sendmsg-window.c:4021
+#, fuzzy
+msgid "Message postponed."
+msgstr "Tipus de lletra del missatge"
+
+#: src/sendmsg-window.c:4037
+#, fuzzy, c-format
+msgid "Could not open draftbox: %s"
+msgstr "No s'ha pogut obrir la bústia \"%s\""
+
+#: src/sendmsg-window.c:4059
+#, fuzzy
+msgid "Message saved."
+msgstr "Missatge"
+
+#: src/sendmsg-window.c:4221
 #, c-format
 msgid "Could not compile %s"
 msgstr "No s'ha pogut compilar el %s"
 
-#: src/sendmsg-window.c:4415
+#: src/sendmsg-window.c:4709
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Respon a %s: %s"
 
-#: src/sendmsg-window.c:4420
+#: src/sendmsg-window.c:4714
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Reenvia el missatge a %s: %s"
 
-#: src/sendmsg-window.c:4424
+#: src/sendmsg-window.c:4718
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Continua el missatge a %s: %s"
 
-#: src/sendmsg-window.c:4428
+#: src/sendmsg-window.c:4722
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nou missatge a %s: %s"
@@ -4866,10 +5417,6 @@ msgstr ""
 msgid "Forward"
 msgstr "Reenvia'l"
 
-#: src/toolbar-factory.c:105
-msgid "Forward the current message"
-msgstr "Reenvia el missatge actual"
-
 #: src/toolbar-factory.c:106
 msgid "Previous"
 msgstr "Anterior"
@@ -4970,9 +5517,14 @@ msgstr "Defineix la identitat a utilitzar en aquest missatge"
 msgid "Run a spell check"
 msgstr "Executa la comprovació ortogràfica"
 
+#: src/toolbar-factory.c:132 src/toolbar-factory.c:142
+msgid "Close"
+msgstr "Tanca"
+
 #: src/toolbar-factory.c:133
-msgid "Cancel this message"
-msgstr "Cancel·la aquest missatge"
+#, fuzzy
+msgid "Close the compose window"
+msgstr "Finestra de redacció"
 
 #: src/toolbar-factory.c:134
 msgid ""
@@ -5009,10 +5561,6 @@ msgstr "Mostra totes les capçaleres"
 #: src/toolbar-factory.c:140
 msgid "Empty Trash"
 msgstr "Buida la paperera"
-
-#: src/toolbar-factory.c:142
-msgid "Close"
-msgstr "Tanca"
 
 #: src/toolbar-factory.c:143
 msgid "Close current mailbox"
@@ -5117,26 +5665,253 @@ msgstr "Amunt"
 msgid "Down"
 msgstr "Avall"
 
-#: libbalsa/misc.c:1600
-msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "S'ha excedit el temps en intentar fer un bloqueig fcntl"
+#, fuzzy
+#~ msgid "Cannot sign message: could not create gpgme context: %s"
+#~ msgstr "%s: no s'ha pogut crear el context: %s"
 
-#: libbalsa/misc.c:1606
-#, c-format
-msgid "Waiting for fcntl lock... %d"
-msgstr "S'està esperant per fer un bloqueig fcntl... %d"
+#, fuzzy
+#~ msgid "Cannot sign message: could not get gpgme data from istream: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
 
-#: libbalsa/misc.c:1634
-msgid "Timeout exceeded while attempting flock lock!"
-msgstr "S'ha excedit el temps en intentar fer un bloqueig flock"
+#, fuzzy
+#~ msgid "Cannot sign message: gpgme could not create new data: %s"
+#~ msgstr "%s: no s'han pogut crear noves dades: %s"
 
-#: libbalsa/misc.c:1641
-#, c-format
-msgid "Waiting for flock attempt... %d"
-msgstr "S'està esperant per intentar un flock... %d"
+#, fuzzy
+#~ msgid "Cannot sign message: gpgme signing failed: %s"
+#~ msgstr "%s: s'ha produït un error en la signatura: %s"
 
-#~ msgid "unknown error"
-#~ msgstr "error desconegut"
+#, fuzzy
+#~ msgid "Cannot sign message: could not get gpgme data: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades: %s"
+
+#, fuzzy
+#~ msgid ""
+#~ "Cannot verify message signature: could not get gpgme data from istream: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
+
+#, fuzzy
+#~ msgid "Cannot encrypt message: could not get gpgme data from istream: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
+
+#, fuzzy
+#~ msgid "Cannot encrypt message: gpgme could not create new data: %s"
+#~ msgstr "%s: no s'han pogut crear noves dades: %s"
+
+#, fuzzy
+#~ msgid "Cannot encrypt message: gpgme encryption failed: %s"
+#~ msgstr "%s: s'ha produït un error en l'encriptació: %s"
+
+#, fuzzy
+#~ msgid "Cannot encrypt message: could not get gpgme data: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades: %s"
+
+#, fuzzy
+#~ msgid "Cannot decrypt message: could not get gpgme data from istream: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades del fitxer: %s"
+
+#, fuzzy
+#~ msgid "Cannot decrypt message: gpgme could not create new data: %s"
+#~ msgstr "%s: no s'han pogut crear noves dades: %s"
+
+#, fuzzy
+#~ msgid "Cannot decrypt message: gpgme decrypting failed: %s"
+#~ msgstr "%s: s'ha produït un error en la desencriptació: %s"
+
+#, fuzzy
+#~ msgid "Cannot decrypt message: could not get gpgme data: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades: %s"
+
+#~ msgid "*** ERROR: Mailbox Lock Exists: %s ***\n"
+#~ msgstr "*** Error: La bústia està bloquejada: %s ***\n"
+
+#~ msgid ""
+#~ "IMAP SEARCH command failed for mailbox %s\n"
+#~ "or query was incompatible with IMAP (perhaps you use regular "
+#~ "expressions)\n"
+#~ "falling back to default searching method"
+#~ msgstr ""
+#~ "L'ordre SEARCH per cercar a IMAP ha fallat per a la bústia %s\n"
+#~ "o la consulta era incompatible amb l'IMAP (potser utilitzeu expressions "
+#~ "regulars).\n"
+#~ "S'utilitzarà el mètode de cerca predeterminat"
+
+#, fuzzy
+#~ msgid "IMAP SEARCH command failed for mailbox %s\n"
+#~ msgstr ""
+#~ "L'ordre de cerca de l'IMAP ha fallat per a la bústia %s.\n"
+#~ "S'utilitzarà el mètode de cerca predeterminat"
+
+#~ msgid "connection error"
+#~ msgstr "error de connexió"
+
+#~ msgid "POP command execution failed"
+#~ msgstr "S'ha produït un error en l'execució de la comanda POP"
+
+#~ msgid "Could not write the message"
+#~ msgstr "No s'ha pogut escriure el missatge"
+
+#~ msgid "Could not run the delivery program (procmail)"
+#~ msgstr ""
+#~ "No s'ha pogut executar el programa per entregar el correu (procmail)"
+
+#~ msgid "Could not open mailbox for spooling"
+#~ msgstr "No s'ha pogut obrir la bústia per a encuament"
+
+#~ msgid "Host not found"
+#~ msgstr "No s'ha trobat la màquina remota"
+
+#~ msgid "Connection refused"
+#~ msgstr "S'ha rebutjat la connexió"
+
+#~ msgid "Authentication failed"
+#~ msgstr "S'ha produït un error en l'autenticació"
+
+#, fuzzy
+#~ msgid "GMimeGPG signature verification failed: %s"
+#~ msgstr "%s: s'ha produït un error en la verificació de la signatura: %s"
+
+#~ msgid "The signature is invalid."
+#~ msgstr "La signatura no és vàlida."
+
+#~ msgid "Enter passsphrase to OpenPGP sign the first message part"
+#~ msgstr ""
+#~ "Introduïu la contrasenya perquè el OpenPGP signi la primera part del "
+#~ "missatge."
+
+#, fuzzy
+#~ msgid "gpgme could not get data from buffer: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades de la memòria intermitja: %s"
+
+#, fuzzy
+#~ msgid "could not get gpgme data: %s"
+#~ msgstr "%s: no s'han pogut obtenir les dades: %s"
+
+#~ msgid "Enter passsphrase to decrypt message part"
+#~ msgstr "Introduïu la contrasenya per desencriptar la part del missatge"
+
+#~ msgid ""
+#~ "The OpenPGP encrypted message part contains 8-bit characters, but no "
+#~ "header describing the used codeset (converted to %s)"
+#~ msgstr ""
+#~ "La part del missatge encriptada pel OpenPGP conté caràcters de 8 bits, "
+#~ "però no disposa de cap capçalera que descrigui el joc de caràcters (s'ha "
+#~ "convertit a %s)"
+
+#~ msgid "Fingerprint"
+#~ msgstr "Empremta"
+
+#, fuzzy
+#~ msgid "could not retrieve key for %s: %s"
+#~ msgstr "%s: no s'han pogut obtenir les claus pel %s: %s"
+
+#~ msgid "could not get a private key for %s"
+#~ msgstr "no s'ha pogut obtenir un clau privada pel %s"
+
+#, fuzzy
+#~ msgid "could not create gpgme recipients set: %s"
+#~ msgstr "%s: no s'ha pogut crear el context: %s"
+
+#, fuzzy
+#~ msgid "could not add recipient %s: %s"
+#~ msgstr "No s'ha pogut desar el %s: %s"
+
+#~ msgid "remember passphrase for"
+#~ msgstr "manté la contrasenya durant"
+
+#~ msgid "Enter passsphrase to sign message"
+#~ msgstr "Introduïu la contrasenya per signar el missatge"
+
+#~ msgid ""
+#~ "The mailbox \"%s\" does not appear to be valid.\n"
+#~ "Your system does not allow for creation of mailboxes\n"
+#~ "in /var/spool/mail. Balsa wouldn't function properly\n"
+#~ "until the system created the mailboxes. Please change\n"
+#~ "the mailbox path or check your system configuration."
+#~ msgstr ""
+#~ "La bústia \"%s\" no és vàlida.\n"
+#~ "El sistema no permet crear bústies al /var/spool/mail.\n"
+#~ "El Balsa no funcionarà correctament fins que no es creïn\n"
+#~ "aquestes bústies. Canvieu el camí de la bústia o comproveu\n"
+#~ "la configuració del sistema."
+
+#~ msgid "detected a good signature"
+#~ msgstr "s'ha detectat una signatura correcta"
+
+#~ msgid "detected a good signature with insufficient validity/trust"
+#~ msgstr ""
+#~ "s'ha detectat una signatura correcta amb una validesa/confiança "
+#~ "insuficient"
+
+#~ msgid "Remote IMAP folder set"
+#~ msgstr "Conjunt de carpetes remotes d'IMAP"
+
+#~ msgid "Use SS_L (IMAPS)"
+#~ msgstr "Utilitza el SS_L (IMAPS)"
+
+#~ msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
+#~ msgstr "No s'ha trobat la bústia en els nodes del balsa_app.mailbox?\n"
+
+#~ msgid "Use _APOP Authentication"
+#~ msgstr "Utilitza l'autentificació _APOP"
+
+#~ msgid "Use SS_L (pop3s)"
+#~ msgstr "Utilitza el SS_L (pop3s)"
+
+#~ msgid "Co_mmit Current"
+#~ msgstr "Confir_ma l'actual"
+
+#~ msgid "Commit _All"
+#~ msgstr "Confirm_a-ho tot"
+
+#~ msgid "Commit the changes in all mailboxes"
+#~ msgstr "Confirma tots els canvis a totes les bústies"
+
+#~ msgid "Edit/Apply _Filters"
+#~ msgstr "Edita/aplica _filtres"
+
+#~ msgid "Filter the content of the selected mailbox"
+#~ msgstr "Filtra els continguts de la bústia seleccionada"
+
+#~ msgid "_Remove Duplicates"
+#~ msgstr "Sup_rimeix els duplicats"
+
+#~ msgid "Remove duplicated messages from the selected mailbox"
+#~ msgstr "Suprimeix els missatges duplicats de la bústia seleccionada"
+
+#~ msgid ""
+#~ "Unable to Open Mailbox!\n"
+#~ "Please check the mailbox settings."
+#~ msgstr ""
+#~ "No s'ha pogut obrir la bústia.\n"
+#~ "Comproveu-ne els paràmetres."
+
+#~ msgid "Message window title format:"
+#~ msgstr "Format del títol de la finestra del missatge:"
+
+#~ msgid "Delete immediately and irretrievably"
+#~ msgstr "Suprimeix immediatament i de forma irreversible"
+
+#~ msgid "Sa_ve"
+#~ msgstr "_Desa"
+
+#~ msgid "_Attachments"
+#~ msgstr "_Fitxers adjunts"
+
+#~ msgid "Co_mments"
+#~ msgstr "Co_mentaris"
+
+#~ msgid "_Keywords"
+#~ msgstr "_Paraules clau"
+
+#~ msgid "Comments:"
+#~ msgstr "Comentaris:"
+
+#~ msgid "Keywords:"
+#~ msgstr "Paraules clau:"
+
+#~ msgid "Cancel this message"
+#~ msgstr "Cancel·la aquest missatge"
 
 #~ msgid "<b>This certificate belongs to:</b>\n"
 #~ msgstr "<b>Aquest certificat pertany a:</b>\n"
@@ -5150,43 +5925,8 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Couldn't open destination mailbox (%s) for copying"
 #~ msgstr "No s'ha pogut obrir la bústia destí (%s) per copiar"
 
-#~ msgid "Gpgme has been compiled without support for protocol %s."
-#~ msgstr "El Gpgme s'ha compilat sense el suport per al protocol %s."
-
-#~ msgid "Crypto engine %s is not installed properly."
-#~ msgstr "L'eina d'encriptació %s no està instal·lada correctament."
-
-#~ msgid ""
-#~ "Crypto engine %s version %s is installed, but at least version %s is "
-#~ "required."
-#~ msgstr ""
-#~ "L'eina d'encriptació %s versió %s està instal·lada, però la versió mínima "
-#~ "pel correcte funcionament és %s."
-
-#~ msgid "Unknown problem with engine for protocol %s."
-#~ msgstr "S'ha produït un problema desconegut amb l'eina pel protocol %s."
-
-#~ msgid "%s: could not retreive crypto engine information: %s."
-#~ msgstr ""
-#~ "%s: no s'ha pogut obtenir la informació de l'eina d'encriptació: %s."
-
-#~ msgid ""
-#~ "\n"
-#~ "Disable support for protocol %s."
-#~ msgstr ""
-#~ "\n"
-#~ "Inhabilita el suport pel protocol %s."
-
-#~ msgid "%s: could not get data from mailbox file: %s"
-#~ msgstr "%s: no s'han pogut obtenir les dades del fitxer de la bústia: %s"
-
 #~ msgid "%s: could not get decrypted data: %s"
 #~ msgstr "%s: no s'han pogut obtenir les dades desencriptades: %s"
-
-#~ msgid "The signature could not be verified due to an invalid crypto engine"
-#~ msgstr ""
-#~ "No s'ha pogut verificar la signatura ja que l'eina d'encriptació és "
-#~ "invàlida"
 
 #~ msgid "Unable to open sentbox - could not get IMAP server information"
 #~ msgstr ""
@@ -5294,9 +6034,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Logging in..."
 #~ msgstr "S'està entrant..."
 
-#~ msgid "Login failed."
-#~ msgstr "S'ha produït un error en entrar."
-
 #~ msgid "Authenticating (SASL)..."
 #~ msgstr "S'està autenticant (SASL)..."
 
@@ -5320,12 +6057,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "Mailbox must have a name."
 #~ msgstr "La bústia ha de tenir un nom."
-
-#~ msgid "Mailbox created."
-#~ msgstr "La bústia s'ha creat."
-
-#~ msgid "Mailbox closed"
-#~ msgstr "S'ha tancat la bústia"
 
 #~ msgid "Fatal error.  Message count is out of sync!"
 #~ msgstr "Error greu. El recompte de missatges està fora de sincronització"
@@ -5358,9 +6089,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "Closing connection to IMAP server..."
 #~ msgstr "S'està tancant la connexió al servidor d'IMAP..."
-
-#~ msgid "Marking %d messages deleted..."
-#~ msgstr "S'estan marcant com a esborrats %d missatges..."
 
 #~ msgid "Expunge failed"
 #~ msgstr "S'ha produït un error en la compactació"
@@ -5402,9 +6130,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Copying %d messages to %s..."
 #~ msgstr "S'estan copiant %d missatges a %s..."
 
-#~ msgid "Copying message %d to %s..."
-#~ msgstr "S'està copiant el missatge %d a %s..."
-
 #~ msgid "Continue?"
 #~ msgstr "Voleu continuar?"
 
@@ -5425,9 +6150,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "Fatal error!  Could not reopen mailbox!"
 #~ msgstr "Error fatal. No s'ha pogut tornar a obrir la bústia"
-
-#~ msgid "Unable to lock mailbox!"
-#~ msgstr "No s'ha pogut bloquejar la bústia"
 
 #~ msgid "Could not create temporary file!"
 #~ msgstr "No s'ha pogut crear el fitxer temporal"
@@ -5450,9 +6172,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "Could not reopen mailbox!"
 #~ msgstr "No s'ha pogut tornar a obrir la bústia"
-
-#~ msgid "Reopening mailbox..."
-#~ msgstr "S'està tornant a obrir la bústia..."
 
 #~ msgid "Connection to %s closed"
 #~ msgstr "S'ha tancat la connexió a %s"
@@ -5508,9 +6227,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "[unable to calculate]"
 #~ msgstr "[no es pot calcular]"
-
-#~ msgid "[invalid date]"
-#~ msgstr "[data incorrecta]"
 
 #~ msgid "Server certificate is not yet valid"
 #~ msgstr "El certificat del servidor encara no és vàlid"
@@ -5589,9 +6305,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Could not synchronize mailbox %s!"
 #~ msgstr "No s'ha pogut sincronitzar la bústia %s"
 
-#~ msgid "Moving read messages to %s..."
-#~ msgstr "S'estan movent els missatges de lectura a %s..."
-
 #~ msgid "Mailbox is unchanged."
 #~ msgstr "La bústia no ha canviat."
 
@@ -5616,9 +6329,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "Purge %d deleted message?"
 #~ msgstr "Voleu desfer-vos d'%d missatge suprimit?"
-
-#~ msgid "Purge %d deleted messages?"
-#~ msgstr "Voleu desfer-vos de %d missatges suprimits?"
 
 #~ msgid "%d kept."
 #~ msgstr "%d s'ha/n conservat."
@@ -5658,20 +6368,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgstr ""
 #~ "El missatge enviat per en %s amb l'assumpte \"%s\" conté un part signada "
 #~ "S/MIME, però el balsa encara no pot gestionar aquest format."
-
-#~ msgid ""
-#~ "The message sent by %s with subject \"%s\" contains a S/MIME encrypted "
-#~ "part, but balsa can not (yet) handle this format."
-#~ msgstr ""
-#~ "El missatge enviat per en %s amb l'assumpte \"%s\" conté una part "
-#~ "encriptada S/MIME, però el balsa encara no està capacitat per gestionar "
-#~ "aquest format."
-
-#~ msgid "run gpg to import this key"
-#~ msgstr "executa el gpg per importar aquest clau"
-
-#~ msgid "PGP signature: %s"
-#~ msgstr "Signatura del PGP: %s"
 
 #~ msgid "New"
 #~ msgstr "Nou"
@@ -5737,9 +6433,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #, fuzzy
 #~ msgid "To %s: %d %s"
 #~ msgstr "%s a %s"
-
-#~ msgid "%d %s"
-#~ msgstr "%d %s"
 
 #~ msgid "[-- name: %s --]\n"
 #~ msgstr "[-- nom: %s --]\n"
@@ -5876,9 +6569,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Use signature file when:"
 #~ msgstr "Utilitza el fitxer de la signatura quan:"
 
-#~ msgid "sending mail"
-#~ msgstr "S'està enviant el correu"
-
 #~ msgid "replying to mail"
 #~ msgstr "S'està responent al correu"
 
@@ -5960,9 +6650,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Sorry, no semicolons are allowed in the name!\n"
 #~ msgstr "No està permès incloure punt i coma al nom.\n"
 
-#~ msgid "One of IMAP connections has been closed: %s"
-#~ msgstr "Una de les connexions IMAP s'ha tancat: %s"
-
 #~ msgid "Please choose a filename to save this part of the message as:"
 #~ msgstr ""
 #~ "Si us plau, escolliu un nom de fitxer per anomenar i desar aquesta part "
@@ -5980,14 +6667,8 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
 #~ msgstr "Ho sento. Balsa encara no sap com crear una bústia Mh"
 
-#~ msgid "Anonymous authentication not supported."
-#~ msgstr "No ha suportat l'autentificació anònima."
-
 #~ msgid "Skipping CRAM-MD5 authentication."
 #~ msgstr "S'omet l'autentificació CRAM-MD5"
-
-#~ msgid "_Selected headers"
-#~ msgstr "Capçaleres _seleccionades"
 
 #~ msgid "Reply to _all..."
 #~ msgstr "Respon a _tots..."
@@ -6111,9 +6792,6 @@ msgstr "S'està esperant per intentar un flock... %d"
 #~ msgid "Open Mailbox"
 #~ msgstr "Obre la bústia"
 
-#~ msgid "Close Mailbox"
-#~ msgstr "Tanca la bústia"
-
 #~ msgid "Add New Mailbox"
 #~ msgstr "Afegeix una nova bústia"
 
@@ -6201,18 +6879,3 @@ msgstr "S'està esperant per intentar un flock... %d"
 
 #~ msgid "All of the fields must be filled in"
 #~ msgstr "Tots els camps s'han d'omplir."
-
-#~ msgid "Mail_boxes"
-#~ msgstr "_Bústies"
-
-msgid "Balsa E-mail reader"
-msgstr "Lector de correu Balsa"
-
-msgid "Program startup"
-msgstr "Inici del programa"
-
-msgid "E-mail"
-msgstr "Correu electrònic"
-
-msgid "New mail notification"
-msgstr "Notificació de nous missatges"

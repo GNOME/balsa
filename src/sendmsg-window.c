@@ -27,10 +27,8 @@
 #include "balsa-index.h"
 #include "mailbox.h"
 #include "sendmsg-window.h"
-
-/* c-client shit back for now */
-#include "c-client.h"
-
+#include "mail.h"
+#include "smtp.h"
 
 
 gint delete_event (GtkWidget *, gpointer);

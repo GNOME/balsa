@@ -133,7 +133,6 @@ static gboolean condition_has_changed;
 
 static gboolean condition_not;
 
-static GtkWidget * condition_dialog = NULL;
 
 static gboolean is_new_condition;
 
@@ -761,13 +760,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         /* FIXME */
 	break;
     }
-}
-
-static void
-condition_dialog_destroy(GtkWidget * dialog, gint response,
-			 gpointer throwaway)
-{
-    condition_dialog = NULL;
+    gtk_widget_set_sensitive(fe_window, TRUE);
 }
 
 /* build_type_notebook
@@ -953,7 +946,7 @@ static void build_type_notebook()
 }                               /* end build_type_notebook() */
 
 static
-void build_condition_dialog()
+void build_condition_dialog(GtkWidget * condition_dialog)
 {
     GtkWidget * table,* label,* button,* page,* box;
 
@@ -1069,13 +1062,14 @@ void build_condition_dialog()
 
 /*
  * fe_edit_condition is the callback to edit command for conditions
- * this is done popping a modal dialog
+ * this is done popping a dialog
  * is_new_cnd is 1 if user is creating a new condition, else it is 0
  */
 
 void
 fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
 {
+    static GtkWidget * condition_dialog;
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection =
@@ -1108,29 +1102,26 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
     if (!condition_dialog) {
         condition_dialog=
             gtk_dialog_new_with_buttons("",
-                                        NULL, 0, /* FIXME */
+                                        GTK_WINDOW(fe_window),
+                                        GTK_DIALOG_DESTROY_WITH_PARENT,
                                         GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                        GTK_STOCK_CANCEL,
-                                        GTK_RESPONSE_CANCEL,
+                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         GTK_STOCK_HELP, GTK_RESPONSE_HELP,
                                         NULL);
+        g_object_add_weak_pointer(G_OBJECT(condition_dialog),
+                                  (gpointer) &condition_dialog);
 
         g_signal_connect(G_OBJECT(condition_dialog), "response",
                          G_CALLBACK(condition_dialog_response), NULL);
-        g_signal_connect(G_OBJECT(condition_dialog), "destroy",
-                         G_CALLBACK(condition_dialog_destroy), NULL);
         /* Now we build the dialog*/
-        build_condition_dialog();
-        /* For now this box is modal */
-        gtk_window_set_modal(GTK_WINDOW(condition_dialog),TRUE);
-        gtk_window_set_wmclass(GTK_WINDOW(condition_dialog),
-                               "filter-edit-condition", "Balsa");
+        build_condition_dialog(condition_dialog);
     }
     gtk_tree_model_get(model, &iter, 1, &fil, -1);
     title = g_strconcat(_("Edit condition for filter: "), fil->name, NULL);
     gtk_window_set_title(GTK_WINDOW(condition_dialog),title);
     g_free(title);
     /* We fire the dialog box */
+    gtk_widget_set_sensitive(fe_window, FALSE);
     gtk_widget_show_all(condition_dialog);
     if (cnd) fill_condition_widgets(cnd);
     else clear_condition_widgets();
@@ -1267,11 +1258,6 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
     
     /* We clear the current edited conditions list */
     fe_free_associated_conditions();
-    /* Destroy the condition dialog */
-    if (condition_dialog) {
-        gtk_widget_destroy(condition_dialog);
-        condition_dialog=NULL;
-    }
 
     /* On OK button press we have set "balsa-ok-button"
      * thus we don't free filters in this case */

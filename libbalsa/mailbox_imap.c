@@ -135,17 +135,16 @@ static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 					     LibBalsaMessage * message );
 
-static void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox *
-						       mailbox,
-						       guint msgno,
-						       LibBalsaMessageFlag
-						       set,
-						       LibBalsaMessageFlag
-						       clear);
 static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
                                                GArray * seqno,
                                               LibBalsaMessageFlag set,
                                               LibBalsaMessageFlag clear);
+static gboolean libbalsa_mailbox_imap_msgno_has_flags(LibBalsaMailbox *
+                                                      mailbox, guint seqno,
+                                                      LibBalsaMessageFlag
+                                                      set,
+                                                      LibBalsaMessageFlag
+                                                      unset);
 static gboolean libbalsa_mailbox_imap_can_do(LibBalsaMailbox* mbox,
                                              enum LibBalsaMailboxCapability c);
 
@@ -255,10 +254,10 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_imap_get_message_stream;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_imap_add_message;
-    libbalsa_mailbox_class->change_message_flags =
-	libbalsa_mailbox_imap_change_message_flags;
     libbalsa_mailbox_class->messages_change_flags =
 	lbm_imap_messages_change_flags;
+    libbalsa_mailbox_class->msgno_has_flags =
+	libbalsa_mailbox_imap_msgno_has_flags;
     libbalsa_mailbox_class->can_do =
 	libbalsa_mailbox_imap_can_do;
     libbalsa_mailbox_class->set_threading =
@@ -644,36 +643,52 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
 {
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     unsigned i;
+    gboolean changed = FALSE;
 
     libbalsa_lock_mailbox(mailbox);
     for(i=0; i<cnt; i++) {
         struct message_info *msg_info = 
             message_info_from_msgno(mimap, seqno[i]);
+	/* FIXME: We must update mailbox->unread_messages even when we
+	 * don't have msg_info->message. It's not easy, as we have no
+	 * record of what the flags were before this change.  */
         if(msg_info->message) {
+            LibBalsaMessageFlag flags;
+            gboolean was_unread_undeleted, is_unread_undeleted;
             /* since we are talking here about updating just received,
                usually unsolicited flags from the server, we do not
                need to go to great lengths to assure that the
                connection is up. */
             ImapMessage *imsg = 
                 imap_mbox_handle_get_msg(mimap->handle, seqno[i]);
-            LibBalsaMessageFlag old_flags = msg_info->message->flags;
-            GList *list;
             if(!imsg) continue;
+
+            flags = msg_info->message->flags;
             lbimap_update_flags(msg_info->message, imsg);
+            if (flags == msg_info->message->flags)
+                continue;
+
 	    libbalsa_mailbox_index_set_flags(mailbox, seqno[i],
 					     msg_info->message->flags);
             libbalsa_mailbox_msgno_changed(mailbox, seqno[i]);
 	    ++mimap->search_stamp;
-            
-            list = g_list_prepend(NULL, msg_info->message);
-            libbalsa_mailbox_messages_status_changed
-                (mailbox, list,
-                 (old_flags ^
-                  msg_info->message->flags));
-            g_list_free_1(list);
+
+            was_unread_undeleted = (flags & LIBBALSA_MESSAGE_FLAG_NEW)
+                && !(flags & LIBBALSA_MESSAGE_FLAG_DELETED);
+            flags = msg_info->message->flags;
+            is_unread_undeleted = (flags & LIBBALSA_MESSAGE_FLAG_NEW)
+                && !(flags & LIBBALSA_MESSAGE_FLAG_DELETED);
+            mailbox->unread_messages +=
+                is_unread_undeleted - was_unread_undeleted;
+            if (is_unread_undeleted - was_unread_undeleted)
+                changed = TRUE;
         }
     }
     libbalsa_unlock_mailbox(mailbox);
+    if (changed)
+	libbalsa_mailbox_set_unread_messages_flag(mailbox,
+                                                  mailbox->unread_messages
+						  > 0);
 }
 
 /* Forward reference. */
@@ -2224,82 +2239,34 @@ transform_flags(LibBalsaMessageFlag set, LibBalsaMessageFlag clr,
 	*flg_clr |= IMSGF_DELETED;
 }
 
-static void
-libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
-                                           guint msgno,
-					   LibBalsaMessageFlag set,
-					   LibBalsaMessageFlag clear)
-{
-#if 0
-    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    ImapMboxHandle *handle = mimap->handle;
-    ImapMsgFlag flag_set, flag_clr;
-
-    transform_flags(set, clear, &flag_set, &flag_clr);
-    if(flag_set)
-        imap_mbox_store_flag(handle, 1, &msgno, flag_set, 1);
-    if(flag_clr)
-        imap_mbox_store_flag(handle, 1, &msgno, flag_clr, 0);
-#else
-    g_assert_not_reached();
-#endif
-}
-
 static gboolean
 lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 			       LibBalsaMessageFlag set,
 			       LibBalsaMessageFlag clear)
 {
     ImapMsgFlag flag_set, flag_clr;
-    ImapResponse rc1 = IMR_OK, rc2 = IMR_OK;
+    ImapResponse rc = IMR_OK;
     ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
 
     g_array_sort(seqno, cmp_msgno);
     transform_flags(set, clear, &flag_set, &flag_clr);
-
-    if(flag_set)
-        II(rc1,handle,
+    if (flag_set)
+        II(rc, handle,
            imap_mbox_store_flag(handle,
                                 seqno->len, (guint *) seqno->data,
                                 flag_set, TRUE));
-    if(flag_clr)
-        II(rc2,handle,
-           imap_mbox_store_flag(LIBBALSA_MAILBOX_IMAP(mailbox)->handle,
+    if (rc == IMR_OK && flag_clr)
+        II(rc, handle,
+           imap_mbox_store_flag(handle,
                                 seqno->len, (guint *) seqno->data,
                                 flag_clr, FALSE));
-
-    if (rc1 == IMR_OK && rc2 == IMR_OK) {
-	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-	unsigned i;
-
-	++mimap->search_stamp;
-
-	for (i = 0; i < seqno->len; i++) {
-	    guint msgno = g_array_index(seqno, guint, i);
-	    struct message_info *msg_info =
-		message_info_from_msgno(mimap, msgno);
-
-	    if (msg_info->message) {
-		libbalsa_message_set_msg_flags(msg_info->message, set, clear);
-		libbalsa_mailbox_index_set_flags(mailbox, msgno,
-						 msg_info->message->flags);
-		libbalsa_mailbox_msgno_changed(mailbox, msgno);
-	    }
-	}
-
-	return TRUE;
-    } else
-	return FALSE;
+    return rc == IMR_OK;
 }
 
-gboolean
-libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox *m, unsigned msgno,
-                                 LibBalsaMessageFlag set,
-                                 LibBalsaMessageFlag unset);
-gboolean
-libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox *m, unsigned msgno,
-                                 LibBalsaMessageFlag set,
-                                 LibBalsaMessageFlag unset)
+static gboolean
+libbalsa_mailbox_imap_msgno_has_flags(LibBalsaMailbox * m, unsigned msgno,
+                                      LibBalsaMessageFlag set,
+                                      LibBalsaMessageFlag unset)
 {
     ImapMsgFlag flag_set, flag_unset;
     ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(m)->handle;

@@ -1,3 +1,8 @@
+2003-11-07 00:23  PeterB
+
+	* libbalsa/mailbox_mh.c: Find last_fileno when adding a message to
+	a closed mailbox; save last_fileno after adding.
+
 2003-11-06 23:45  PeterB
 
 	* libbalsa/: mailbox_mh.c, mailbox_mh.h: Rework with a message hash

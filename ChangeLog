@@ -1,3 +1,8 @@
+2003-08-13 19:26  PeterB
+
+	* libbalsa/body.c: Don't include G_DIR_SEPARATORs in temp_filenames
+	(libbalsa_message_body_save_temporary).
+
 2003-08-13  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: provide more accurate information

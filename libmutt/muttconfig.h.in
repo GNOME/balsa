@@ -57,9 +57,6 @@
 /* Where to find ispell on your system? */
 #undef ISPELL
 
-/* Should Mutt run setgid "mail" ? */
-#undef USE_SETGID
-
 /* Are we using GNU rx? */
 #undef USE_GNU_RX
 

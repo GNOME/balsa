@@ -159,11 +159,11 @@ int main (int argc, char **argv)
 	exit (1);
 }], [mutt_cv_groupwrite=yes], [mutt_cv_groupwrite=no]))
 
-		if test $mutt_cv_groupwrite = yes; then
-			AC_DEFINE(USE_DOTLOCK)
-			AC_DEFINE(USE_SETGID)
-			mutt_cv_setgid=yes
-		fi
+dnl		if test $mutt_cv_groupwrite = yes; then
+dnl			AC_DEFINE(USE_DOTLOCK)
+dnl			AC_DEFINE(USE_SETGID)
+dnl			mutt_cv_setgid=yes
+dnl		fi
 	fi
 fi
 

@@ -265,7 +265,7 @@ static void parse_content_type (char *s, BODY *ct)
   if ((pc = strchr(s, '/')))
   {
     *pc++ = 0;
-    while (*pc && !ISSPACE (*pc) && *pc != ';')
+    while (*pc && !ISSPACE (*pc) && *pc != ';' && i < (SHORT_STRING - 1))
     {
       buffer[i++] = *pc;
       pc++;

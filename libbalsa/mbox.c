@@ -32,16 +32,18 @@
 #include <fcntl.h>
 
 #if 0
-static GList *mbox_parse_mailbox(Mailbox *);
+static GList *mbox_parse_mailbox (Mailbox *);
 
-void mbox_open_mailbox(Mailbox *mb)
+void 
+mbox_open_mailbox (Mailbox * mb)
 {
-  printf("opening mailbox\n");
-  mb->fd = fopen(MAILBOX_LOCAL(mb)->path, "r+");
-  mbox_parse_mailbox(mb);
+  printf ("opening mailbox\n");
+  mb->fd = fopen (MAILBOX_LOCAL (mb)->path, "r+");
+  mbox_parse_mailbox (mb);
 }
 
-static GList *mbox_parse_mailbox (Mailbox *mb)
+static GList *
+mbox_parse_mailbox (Mailbox * mb)
 {
   struct stat sb;
   char buf[1024];
@@ -52,21 +54,22 @@ static GList *mbox_parse_mailbox (Mailbox *mb)
   GList *list;
 
   /* Save information about the folder at the time we opened it. */
-  if (stat (MAILBOX_LOCAL(mb)->path, &sb) == -1)
-  {
-    perror (MAILBOX_LOCAL(mb)->path);
-    return NULL;
-  }
+  if (stat (MAILBOX_LOCAL (mb)->path, &sb) == -1)
+    {
+      perror (MAILBOX_LOCAL (mb)->path);
+      return NULL;
+    }
 
   mb->size = sb.st_size;
   mb->mtime = sb.st_mtime;
 
   loc = ftell (mb->fd);
   while (fgets (buf, sizeof (buf), mb->fd) != NULL)
-  {
-	  fprintf(stderr,"%s\n", buf);
-  }
-  
+    {
+      if (!strncmp ("From ", buf, 5))
+	fprintf (stderr, "%s\n", buf);
+    }
+
   return list;
 }
 #endif

@@ -148,7 +148,6 @@ mailbox_select_cb (GtkTree * tree)
 
   selected = tree->selection;
   nb_selected = g_list_length (selected);
-  g_print ("should be opening new mailbox index\n");
   if (nb_selected != 1)
     return;
 
@@ -162,7 +161,9 @@ mailbox_select_cb (GtkTree * tree)
     return;
 
   index_child = index_child_new(mailbox);
-  gnome_mdi_add_child(mblw->mdi, GNOME_MDI_CHILD(index_child));
-  gnome_mdi_add_view(mblw->mdi, GNOME_MDI_CHILD(index_child));
-
+  if (index_child)
+  {
+    gnome_mdi_add_child(mblw->mdi, GNOME_MDI_CHILD(index_child));
+    gnome_mdi_add_view(mblw->mdi, GNOME_MDI_CHILD(index_child));
+  }
 }

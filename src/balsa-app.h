@@ -21,7 +21,7 @@
 
 #include <gnome.h>
 #include "mailbox.h"
-
+#include "index-child.h"
 
 /* global definitions */
 #define BALSA_BUTTON_HEIGHT  30
@@ -51,7 +51,7 @@ extern struct BalsaApplication
   gchar *smtp_server;
   gchar *signature;
 
-  GtkWidget *current_index;
+  IndexChild *current_index_child;
 
   GList *mailbox_list;
   GList *addressbook_list;

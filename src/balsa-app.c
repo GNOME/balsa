@@ -29,7 +29,7 @@
 #include "misc.h"
 #include "mailbox.h"
 #include "save-restore.h"
-
+#include "index-child.h"
 
 
 /* Global application structure */
@@ -62,7 +62,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.smtp_server = NULL;
 
   balsa_app.mailbox_list = NULL;
-  balsa_app.current_index = NULL;
+  balsa_app.current_index_child = NULL;
   balsa_app.addressbook_list = NULL;
 
   balsa_app.new_messages_timer = 0;
@@ -138,9 +138,9 @@ check_for_new_messages ()
       if (balsa_app.debug)
 	fprintf (stderr, "Lock exists, waiting\n");
     }
-  else if (balsa_app.new_messages > 0 && balsa_app.current_index)
+  else if (balsa_app.new_messages > 0 && balsa_app.current_index_child)
     {
-      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index));
+      balsa_index_append_new_messages (BALSA_INDEX (balsa_app.current_index_child->index));
       balsa_app.new_messages = 0;
     }
 

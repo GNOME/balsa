@@ -66,10 +66,6 @@ static IndexChild *get_index_window_data (GtkObject * object);
 
 static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
 
-/* index callbacks */
-static void next_message_cb (GtkWidget * widget);
-static void previous_message_cb (GtkWidget * widget);
-
 /* menu item callbacks */
 static void message_status_set_new_cb (GtkWidget *, Message *);
 static void message_status_set_read_cb (GtkWidget *, Message *);
@@ -94,11 +90,11 @@ index_child_changed (GnomeMDI * mdi, GnomeMDIChild * gmdic)
       if (child)
 	if (!strcmp (child->mailbox->name, gmdic->name))
 	  {
-	    balsa_app.current_index = child->index;
+	    balsa_app.current_index_child = child;
 	    return;
 	  }
     }
-  balsa_app.current_index = NULL;
+  balsa_app.current_index_child = NULL;
 }
 
 IndexChild *
@@ -181,6 +177,11 @@ index_child_create_view (GnomeMDIChild * child)
       gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
       gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
       gtk_widget_show (messagebox);
+      gtk_widget_destroy(iw->index);
+      gtk_widget_destroy(vbox);
+      g_free(iw);
+      iw = NULL;
+      return NULL;
     }
 
   return (vbox);
@@ -230,7 +231,7 @@ index_select_cb (GtkWidget * widget,
   g_return_if_fail (widget != NULL);
   g_return_if_fail (BALSA_IS_INDEX (widget));
   g_return_if_fail (message != NULL);
-printf("selected\n");
+
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
   else if (bevent && bevent->button == 3)
@@ -339,8 +340,9 @@ static void
 message_status_set_answered_cb (GtkWidget * widget, Message * message)
 {
   g_return_if_fail (widget != NULL);
-
+#if 0
   message_answer (message);
+#endif
   /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
 }
 
@@ -351,7 +353,7 @@ delete_message_cb (GtkWidget * widget, Message * message)
   g_return_if_fail (widget != NULL);
 
   message_delete (message);
-  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
+  balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
 }
 
 static void
@@ -360,23 +362,7 @@ undelete_message_cb (GtkWidget * widget, Message * message)
   g_return_if_fail (widget != NULL);
 
   message_undelete (message);
-  /* balsa_index_select_next (BALSA_INDEX (mainwindow->index)); */
-}
-
-static void
-next_message_cb (GtkWidget * widget)
-{
-  IndexChild *iw = get_index_window_data (GTK_OBJECT (widget));
-  g_return_if_fail (widget != NULL);
-  balsa_index_select_next (BALSA_INDEX (iw->index));
-}
-
-static void
-previous_message_cb (GtkWidget * widget)
-{
-  IndexChild *iw = get_index_window_data (GTK_OBJECT (widget));
-  g_return_if_fail (widget != NULL);
-  balsa_index_select_previous (BALSA_INDEX (iw->index));
+  balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
 }
 
 static void

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-01-14 18:55+0100\n"
-"PO-Revision-Date: 2003-01-15 02:04+0200\n"
+"POT-Creation-Date: 2003-01-17 02:55+0100\n"
+"PO-Revision-Date: 2003-01-17 10:49+0200\n"
 "Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
@@ -16,14 +16,14 @@ msgstr ""
 
 #. The externq database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:242
-#: libbalsa/address-book-ldap.c:382
+#: libbalsa/address-book-ldap.c:423
 #: libbalsa/address-book-ldif.c:405
 #: libbalsa/address-book-vcard.c:272
 msgid "No-Id"
 msgstr "Nav-Id"
 
 #: libbalsa/address-book-extern.c:246
-#: libbalsa/address-book-ldap.c:386
+#: libbalsa/address-book-ldap.c:427
 #: libbalsa/address-book-ldif.c:408
 #: libbalsa/address-book-ldif.c:637
 #: libbalsa/address-book-ldif.c:674
@@ -32,50 +32,63 @@ msgstr "Nav-Id"
 msgid "No-Name"
 msgstr "Nav-Nosaukuma"
 
-#: libbalsa/address-book-ldap.c:215
+#: libbalsa/address-book-ldap.c:224
 msgid "Failed to initialise LDAP server.\n"
 "Check that the servername is valid."
 msgstr "Nevarēju inicializēt LDAP serveri.\n"
 "Pārbaudi, vai servera nosaukums ir derīgs."
 
-#: libbalsa/address-book-ldap.c:225
+#: libbalsa/address-book-ldap.c:237
+msgid "Couldn't set protocol version to LDAPv3."
+msgstr "Nevarēju iestatīt protokola versiju uz LDAPv3."
+
+#: libbalsa/address-book-ldap.c:245
+#, c-format
+msgid "Couldn't enable TLS on the LDAP connection: %s"
+msgstr "Nevarēju nodibināt TLS uz LDAP savienojumu: %s"
+
+#: libbalsa/address-book-ldap.c:254
+msgid "TLS requested but TLS support not compiled in."
+msgstr "TLS nepieciešams, bet TLS atbalsts nav iekompilēts."
+
+#: libbalsa/address-book-ldap.c:265
 #, c-format
 msgid "Failed to bind to server: %s\n"
-"Check that the servername is valid."
+"Check that the server name is valid."
 msgstr "Neizdevās saistīties ar serveri: %s\n"
 "Pārbaudiet, vai servera nosaukums ir derīgs."
 
-#: libbalsa/address-book-ldap.c:595
+#: libbalsa/address-book-ldap.c:648
 #, c-format
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Neizdevās izpildīt meklēšanu: %s.Pārbaudiet, vai bāzes vārds ir derīgs."
 
-#: libbalsa/address-book.c:329
+#: libbalsa/address-book.c:332
 #: libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Nav kļūda"
 
-#: libbalsa/address-book.c:330
+#: libbalsa/address-book.c:333
 msgid "Cannot read from address book"
 msgstr "Nevaru nolasīt no adrešu grāmatiņas"
 
-#: libbalsa/address-book.c:331
+#: libbalsa/address-book.c:334
 msgid "Cannot write to address book"
 msgstr "Nevaru ierakstīt adrešu grāmatiņā"
 
-#: libbalsa/address-book.c:332
+#: libbalsa/address-book.c:335
 msgid "Cannot connect to server"
 msgstr "Nevaru pieslēgties serverim"
 
-#: libbalsa/address-book.c:333
+#: libbalsa/address-book.c:336
 msgid "Cannot search in the address book"
 msgstr "Nevaru meklēt šajā adrešu grāmatiņā"
 
-#: libbalsa/address-book.c:335
+#: libbalsa/address-book.c:338
 msgid "Cannot add duplicate entry"
 msgstr "Nevaru pievienot dublikāta ierakstu"
 
-#: libbalsa/address-book.c:336
+#: libbalsa/address-book.c:339
 msgid "Unknown error"
 msgstr "Nezināma kļūda"
 
@@ -1448,128 +1461,140 @@ msgstr "Kļūda sūtot vēstuli, bērns izgāja %d (%s)."
 msgid "Output of the delivery process"
 msgstr "Piegādes procesa izvade"
 
-#: src/address-book-config.c:142
+#: src/address-book-config.c:145
 msgid "Add Address Book"
 msgstr "Pievienot Adrešu Grāmatiņu"
 
-#: src/address-book-config.c:150
+#: src/address-book-config.c:153
 msgid "Modify Address Book"
 msgstr "Modificēt Adrešu Grāmatiņu"
 
-#: src/address-book-config.c:185
+#: src/address-book-config.c:188
 msgid "New Address Book type:"
 msgstr "Jaun Adrešu Grāmatiņas tips:"
 
-#: src/address-book-config.c:194
+#: src/address-book-config.c:197
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard Adrešu Grāmatiņa (GnomeCard)"
 
-#: src/address-book-config.c:207
+#: src/address-book-config.c:210
 msgid "External query (a program)"
 msgstr "Ārējais pieprasījums (programma)"
 
-#: src/address-book-config.c:219
+#: src/address-book-config.c:222
 msgid "LDIF Address Book"
 msgstr "LDIF Adrešu Grāmatiņa"
 
-#: src/address-book-config.c:234
+#: src/address-book-config.c:237
 msgid "LDAP Address Book"
 msgstr "LDAP Adrešu Grāmatiņa"
 
-#: src/address-book-config.c:242
+#: src/address-book-config.c:245
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa nav kompilēta ar LDAP atbalstu"
 
 #. mailbox name
-#: src/address-book-config.c:286
-#: src/address-book-config.c:331
-#: src/address-book-config.c:393
-#: src/address-book-config.c:453
+#: src/address-book-config.c:289
+#: src/address-book-config.c:334
+#: src/address-book-config.c:396
+#: src/address-book-config.c:456
 msgid "Address _Book Name"
 msgstr "Adrešu _Grāmatiņas Nosaukums"
 
-#: src/address-book-config.c:291
+#: src/address-book-config.c:294
 msgid "_File Name"
 msgstr "_Faila Nosaukums"
 
-#: src/address-book-config.c:298
+#: src/address-book-config.c:301
 msgid "Select path for VCARD address book"
 msgstr "Izvēlies ceļu priekš VCARD adrešu grāmatiņas"
 
-#: src/address-book-config.c:303
-#: src/address-book-config.c:362
-#: src/address-book-config.c:412
-#: src/address-book-config.c:469
+#: src/address-book-config.c:306
+#: src/address-book-config.c:365
+#: src/address-book-config.c:415
+#: src/address-book-config.c:487
 msgid "_Expand aliases as you type"
 msgstr "_Paplašināt aizstājvārdus, kad jūs rakstāt"
 
-#: src/address-book-config.c:336
+#: src/address-book-config.c:339
 msgid "Load program location"
 msgstr "Ielādes programmas lokācija"
 
-#: src/address-book-config.c:343
+#: src/address-book-config.c:346
 msgid "Select load program for address book"
 msgstr "Izvēlieties adrešu grāmatiņas ielādes programmu"
 
-#: src/address-book-config.c:349
+#: src/address-book-config.c:352
 msgid "Save program location"
 msgstr "Saglabāšanas programmas lokācija"
 
-#: src/address-book-config.c:355
+#: src/address-book-config.c:358
 msgid "Select save program for address book"
 msgstr "Izvēlieties adrešu grāmatiņas saglabāšanas programmu"
 
-#: src/address-book-config.c:399
+#: src/address-book-config.c:402
 msgid "_File name"
 msgstr "_Faila nosaukums"
 
-#: src/address-book-config.c:406
+#: src/address-book-config.c:409
 msgid "Select path for LDIF address book"
 msgstr "Izvēlies ceļu priekš LDIF adrešu grāmatiņas"
 
-#: src/address-book-config.c:458
+#: src/address-book-config.c:461
 msgid "_Host Name"
 msgstr "_Hostdatora Nosaukums"
 
-#: src/address-book-config.c:463
-msgid "_Base Domain Name"
-msgstr "_Bāzes Domēna Vārds"
+#: src/address-book-config.c:466
+msgid "Base Domain _Name"
+msgstr "Bāzes _Domēna Vārds"
 
-#: src/address-book-config.c:535
+#: src/address-book-config.c:471
+msgid "_User Name (Bind DN)"
+msgstr "_Lietotāja Vārds (Bind DN)"
+
+#: src/address-book-config.c:476
+msgid "_Password"
+msgstr "Pa_role"
+
+#: src/address-book-config.c:483
+msgid "Enable _TLS"
+msgstr "Aktivizēt _TLS"
+
+#: src/address-book-config.c:553
 #: src/folder-conf.c:167
 #: src/folder-conf.c:419
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Kļūda parādot %s: %s\n"
 
-#: src/address-book-config.c:553
+#: src/address-book-config.c:571
 #: src/mailbox-conf.c:435
 #: src/pref-manager.c:1523
 #: src/pref-manager.c:2614
 msgid "_Add"
 msgstr "_Pievienot"
 
-#: src/address-book-config.c:632
+#: src/address-book-config.c:650
 #, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr "Adrešu grāmatiņas ceļš \"%s\" nav pareizs. %s"
 
-#: src/address-book-config.c:635
+#: src/address-book-config.c:653
 #, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "Ielādēšanas programmas ceļš \"%s\" nav pareizs. %s"
 
-#: src/address-book-config.c:638
+#: src/address-book-config.c:656
 #, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "Saglabāšanas programmas ceļš \"%s\" nav pareizs. %s"
 
-#: src/address-book-config.c:641
+#: src/address-book-config.c:659
 #, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "Ceļš \"%s\" nav pareizs. %s"
 
-#: src/address-book-config.c:644
+#: src/address-book-config.c:662
 msgid "Do you want to correct the path?"
 msgstr "Vai vēlaties izlabot ceļu?"
 
@@ -1711,7 +1736,7 @@ msgstr "_Noglabāt Adresi..."
 
 #: src/balsa-index.c:2040
 #: src/filter-edit-dialog.c:216
-#: src/mailbox-node.c:764
+#: src/mailbox-node.c:839
 #: src/main-window.c:528
 #: src/pref-manager.c:1525
 #: src/pref-manager.c:2618
@@ -1761,15 +1786,15 @@ msgstr "Kopā"
 msgid "Failed to find mailbox"
 msgstr "Neizdevās atrast pastkastīti"
 
-#: src/balsa-mblist.c:1810
+#: src/balsa-mblist.c:1765
 msgid "_Other..."
 msgstr "_Cits..."
 
-#: src/balsa-mblist.c:1871
+#: src/balsa-mblist.c:1826
 msgid "Choose destination folder"
 msgstr "Izvēlaties mērķa mapi"
 
-#: src/balsa-mblist.c:2183
+#: src/balsa-mblist.c:2138
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Parādītā pastkastīte: %s ar %ld vēstulēm, %ld jaunas"
@@ -2227,7 +2252,7 @@ msgstr "UN"
 
 #. new button
 #: src/filter-edit-dialog.c:210
-#: src/mailbox-node.c:736
+#: src/mailbox-node.c:811
 #: src/main-window.c:284
 msgid "_New"
 msgstr "_Jauns"
@@ -2369,14 +2394,14 @@ msgstr "Aprakstošais _Nosaukums:"
 
 #. pop server
 #: src/folder-conf.c:214
-#: src/mailbox-conf.c:892
-#: src/mailbox-conf.c:980
+#: src/mailbox-conf.c:895
+#: src/mailbox-conf.c:983
 msgid "_Server:"
 msgstr "_Serveris:"
 
 #. username
 #: src/folder-conf.c:220
-#: src/mailbox-conf.c:899
+#: src/mailbox-conf.c:902
 msgid "Use_r name:"
 msgstr "Lietotāj_a vārds:"
 
@@ -2468,8 +2493,8 @@ msgid "Browse..."
 msgstr "Lūkoties..."
 
 #: src/folder-conf.c:609
-#: src/mailbox-conf.c:869
-#: src/mailbox-conf.c:1034
+#: src/mailbox-conf.c:872
+#: src/mailbox-conf.c:1037
 msgid "_Identity:"
 msgstr "_Identitāte:"
 
@@ -2595,152 +2620,152 @@ msgstr "Pārsaukšana %s par %s neizdevās:\n"
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:838
-#: src/mailbox-conf.c:886
-#: src/mailbox-conf.c:974
+#: src/mailbox-conf.c:841
+#: src/mailbox-conf.c:889
+#: src/mailbox-conf.c:977
 msgid "Mailbox _Name:"
 msgstr "Pastkastītes _Nosaukums:"
 
 #. path to file
-#: src/mailbox-conf.c:846
+#: src/mailbox-conf.c:849
 msgid "Mailbox _Path:"
 msgstr "Pastkastītes _Ceļš:"
 
-#: src/mailbox-conf.c:848
+#: src/mailbox-conf.c:851
 msgid "Mailbox Path"
 msgstr "Pastkastītes Ceļš"
 
 #. password field
-#: src/mailbox-conf.c:905
-#: src/mailbox-conf.c:1001
+#: src/mailbox-conf.c:908
+#: src/mailbox-conf.c:1004
 msgid "Pass_word:"
 msgstr "Pa_role"
 
-#: src/mailbox-conf.c:912
+#: src/mailbox-conf.c:915
 msgid "Use _APOP Authentication"
 msgstr "Lietot _APOP Autentifikāciju"
 
-#: src/mailbox-conf.c:918
+#: src/mailbox-conf.c:921
 msgid "_Delete messages from server after download"
 msgstr "_Dzēst vēstules no servera pēc lejuplādes"
 
-#: src/mailbox-conf.c:923
+#: src/mailbox-conf.c:926
 msgid "_Filter messages through procmail"
 msgstr "_Filtrēt vēstules caur procmail"
 
-#: src/mailbox-conf.c:928
+#: src/mailbox-conf.c:931
 msgid "_Enable check for new mail"
 msgstr "_Aktivizēt jauna pasta pārbaudi"
 
-#: src/mailbox-conf.c:938
+#: src/mailbox-conf.c:941
 msgid "Use SS_L (pop3s)"
 msgstr "Lietot SS_L (pop3)"
 
 #. username
-#: src/mailbox-conf.c:987
+#: src/mailbox-conf.c:990
 msgid "_Username:"
 msgstr "_Lietotājvārds:"
 
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:998
 msgid "_Remember Password"
 msgstr "_Atcerēties Paroli"
 
-#: src/mailbox-conf.c:1006
+#: src/mailbox-conf.c:1009
 msgid "F_older Path:"
 msgstr "_Mapes Ceļš:"
 
-#: src/mailbox-conf.c:1029
+#: src/mailbox-conf.c:1032
 msgid "Use SS_L (imaps)"
 msgstr "Lietot SS_L (imaps)"
 
-#: src/mailbox-node.c:230
+#: src/mailbox-node.c:239
 msgid "The folder edition to be written."
 msgstr "Mapes rediģējums, kas jāraksta"
 
-#: src/mailbox-node.c:366
+#: src/mailbox-node.c:372
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr "Skanēju %s. Lūdzu uzgaidiet..."
 
-#: src/mailbox-node.c:721
+#: src/mailbox-node.c:796
 msgid "Local _mbox mailbox..."
 msgstr "Lokālā _mbox pastkastīte..."
 
-#: src/mailbox-node.c:723
+#: src/mailbox-node.c:798
 msgid "Local Mail_dir mailbox..."
 msgstr "Lokālā Mail_dir pastkastīte..."
 
-#: src/mailbox-node.c:725
+#: src/mailbox-node.c:800
 msgid "Local M_H mailbox..."
 msgstr "Lokālā M_H pastkastīte..."
 
-#: src/mailbox-node.c:727
+#: src/mailbox-node.c:802
 msgid "Remote _IMAP mailbox..."
 msgstr "Attālinātā _IMAP pastkastīte..."
 
-#: src/mailbox-node.c:730
+#: src/mailbox-node.c:805
 msgid "Remote IMAP _folder..."
 msgstr "Attālinātā IMAP _mape..."
 
-#: src/mailbox-node.c:732
+#: src/mailbox-node.c:807
 msgid "Remote IMAP _subfolder..."
 msgstr "Attālinātā IMAP _apakšmape..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:743
-#: src/mailbox-node.c:775
-#: src/mailbox-node.c:796
+#: src/mailbox-node.c:818
+#: src/mailbox-node.c:850
+#: src/mailbox-node.c:871
 msgid "_Rescan"
 msgstr "_Pārskanēt"
 
-#: src/mailbox-node.c:752
+#: src/mailbox-node.c:827
 msgid "_Open"
 msgstr "_Atvērt"
 
-#: src/mailbox-node.c:755
+#: src/mailbox-node.c:830
 #: src/main-window.c:612
 msgid "_Close"
 msgstr "_Aizvērt"
 
-#: src/mailbox-node.c:761
+#: src/mailbox-node.c:836
 msgid "_Properties..."
 msgstr "_Rekvizīti..."
 
-#: src/mailbox-node.c:771
+#: src/mailbox-node.c:846
 msgid "_Subscribe"
 msgstr "_Pierakstīties"
 
-#: src/mailbox-node.c:773
+#: src/mailbox-node.c:848
 msgid "_Unsubscribe"
 msgstr "_Atrakstīties"
 
-#: src/mailbox-node.c:781
+#: src/mailbox-node.c:856
 msgid "Mark as _Inbox"
 msgstr "Marķēt kā _Iesūtni"
 
-#: src/mailbox-node.c:784
+#: src/mailbox-node.c:859
 msgid "_Mark as Sentbox"
 msgstr "_Marķēt kā Nosūtītās"
 
-#: src/mailbox-node.c:787
+#: src/mailbox-node.c:862
 msgid "Mark as _Trash"
 msgstr "Marķēt kā _Atkritumkasti"
 
-#: src/mailbox-node.c:790
+#: src/mailbox-node.c:865
 msgid "Mark as D_raftbox"
 msgstr "Marķēt kā Sa_gataves"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:793
+#: src/mailbox-node.c:868
 msgid "_Edit/Apply filters"
 msgstr "_Rediģēt/Pielietot filtrus"
 
-#: src/mailbox-node.c:882
+#: src/mailbox-node.c:965
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Lokālā pastkastīte %s ielādēta kā: %s\n"
 
-#: src/mailbox-node.c:914
+#: src/mailbox-node.c:990
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Lokālā mape %s\n"

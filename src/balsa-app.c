@@ -102,10 +102,11 @@ static gint
 mailboxes_init (void)
 {
   gchar **mailboxes;
-  gint num;
-  gint i;
+  gint num = 0;
+  gint i = 0;
 
-  gnome_config_get_vector ("/balsa/Global/Accounts", &num, &mailboxes);
+  if (gnome_config_get_string ("/balsa/Global/Accounts"))
+    gnome_config_get_vector ("/balsa/Global/Accounts", &num, &mailboxes);
 
   for (i = 0; num > i; i++)
     {

@@ -124,7 +124,8 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     set_option(OPTSAVEEMPTY);
     set_option(OPTCHECKNEW);
-
+    set_option(OPTMHPURGE);
+ 
     libbalsa_notify_init();
 
     /* Register our types */

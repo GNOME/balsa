@@ -77,6 +77,7 @@ extern "C" {
 	                        /* the config */
 	gulong delete_sig_id;
         gulong changed_sig_id;
+        gulong delete_range_sig_id;
         guint wrap_timeout_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
@@ -92,6 +93,10 @@ extern "C" {
 	GtkWidget *gpg_encrypt_menu_item;
 #endif
         GtkWidget *header_table;
+
+        GtkTextBuffer *buffer2;       /* Undo buffer. */
+        GtkWidget *undo_widget;
+        GtkWidget *redo_widget;
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

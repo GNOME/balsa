@@ -149,6 +149,10 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_GPG_ENCRYPT, N_("Encrypt"),
      N_("Encrypt message using GPG"), TOOLBAR_BUTTON_TYPE_TOGGLE},
 #endif
+    {GTK_STOCK_UNDO, N_("Undo"),
+    N_("Undo most recent change"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {GTK_STOCK_REDO, N_("Redo"),
+    N_("Redo most recent change"), TOOLBAR_BUTTON_TYPE_BUTTON},
 };
 
 const int toolbar_button_count =

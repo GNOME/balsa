@@ -1,3 +1,16 @@
+2003-10-03  Pawel Salek <pawsa theochem.kth.se>
+
+	Merge gtk-tree-model branch. For good.
+	* libbalsa/mailbox.[hc]: GtkTreeModel implementation.
+	* libbalsa/mailbox_{imap,local,maildir,mbox,mh,pop3}.[hc]: changed API.
+	* libalsa/{message,send}.c: adapt to changed api.
+	* libbalsa/imap/imap-handle.c: threading, message decoding improvements
+	* libbalsa/imap/imap.h: added comments.
+	* src/balsa-index.c: use GtkTreeModel interface to LibBalsaMailbox.
+	* src/main-window.c: trash can be only local now.
+	* src/sendmsg-window.c: merge draftbox code.
+	* src/Makefile.am: remove balsa-index-threading.c: not used any more.
+
 2003-09-30 18:09  PeterB
 
 	* libbalsa/mailbox_mbox.c: Use const variables for the result

@@ -62,7 +62,7 @@ static gboolean libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox);
 static struct message_info *message_info_from_msgno(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
-static GMimeMessage *libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
+static LibBalsaMessage *libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
 						     guint msgno);
 static LibBalsaMessage *libbalsa_mailbox_maildir_load_message(
 				    LibBalsaMailbox * mailbox, guint msgno);
@@ -455,7 +455,7 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     parse_mailbox(mailbox, "new");
     mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
-    libbalsa_mailbox_load_messages(mailbox);
+    libbalsa_mailbox_local_load_messages(mailbox);
 
     /* We run the filters here also because new could have been put
        in the mailbox with another mechanism than Balsa */
@@ -523,7 +523,7 @@ static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 	parse_mailbox(mailbox, "new");
 
 	UNLOCK_MAILBOX(mailbox);
-	libbalsa_mailbox_load_messages(mailbox);
+	libbalsa_mailbox_local_load_messages(mailbox);
 	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
     }
 }
@@ -655,9 +655,8 @@ static struct message_info *message_info_from_msgno(
     return msg_info;
 }
 
-static GMimeMessage *libbalsa_mailbox_maildir_get_message(
-						  LibBalsaMailbox * mailbox,
-						  guint msgno)
+static LibBalsaMessage*
+libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
 
@@ -688,12 +687,15 @@ static GMimeMessage *libbalsa_mailbox_maildir_get_message(
 	g_mime_stream_unref(gmime_stream);
 	g_free(filename);
     }
-    return msg_info->mime_message;
+    
+    if (!msg_info->message)
+	msg_info->message =
+	    libbalsa_mailbox_maildir_load_message(mailbox, msgno);
+    return msg_info->message;
 }
 
-static LibBalsaMessage *libbalsa_mailbox_maildir_load_message(
-						  LibBalsaMailbox * mailbox,
-						  guint msgno)
+static LibBalsaMessage*
+libbalsa_mailbox_maildir_load_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message;
     struct message_info *msg_info;

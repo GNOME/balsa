@@ -19,6 +19,8 @@
 #include <strings.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <gmime/gmime-utils.h>
+
 #include "libimap-marshal.h"
 #include "imap-auth.h"
 #include "imap-handle.h"
@@ -1428,8 +1430,10 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
 
   if( (c=sio_getc(sio)) != '(') return IMR_PROTOCOL;
   date = imap_get_nstring(sio);
-  if(date) g_free(date);
-  if(env) env->date = 0;
+  if(date) {
+    env->date = g_mime_utils_header_decode_date(date, NULL);
+    g_free(date);
+  }
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   str = imap_get_nstring(sio);
   if(env) env->subject = str; else g_free(str);
@@ -1907,16 +1911,9 @@ ir_thread_sub(ImapMboxHandle *h, GNode *parent, int last)
       return rc;
   }
   if(seqno == 0) return IMAP_PROTOCOL_ERROR;
-  printf("%d ", seqno);
   item = g_node_append_data(parent, GUINT_TO_POINTER(seqno));
   if (c == ' ') {
-#if DEBUG
-      printf(">");
-#endif
       rc = ir_thread_sub(h, item, c);
-#if DEBUG
-      printf("<");
-#endif
   }
 
   return rc;
@@ -1930,7 +1927,8 @@ ir_thread(ImapMboxHandle *h)
   ImapResponse rc = IMR_OK;
   
   c=sio_getc(h->sio);
-  g_node_destroy(h->thread_root);
+  if(h->thread_root)
+    g_node_destroy(h->thread_root);
   h->thread_root = NULL;
   root = g_node_new(NULL);
   while (c == '(') {
@@ -1938,7 +1936,6 @@ ir_thread(ImapMboxHandle *h)
       if (rc!=IMR_OK) {
 	  return rc;
       }
-      printf("\n");
       c=sio_getc(h->sio);
   }
   if( c != 0x0d) {printf("CR:%d\n",c); rc = IMR_PROTOCOL;}

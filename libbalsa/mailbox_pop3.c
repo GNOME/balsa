@@ -175,44 +175,12 @@ libbalsa_mailbox_pop3_config_changed(LibBalsaMailboxPop3* mailbox)
 static gboolean
 libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox)
 {
-    LibBalsaMailboxPop3 *pop;
-
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox), FALSE);
 
-    /* FIXME: I wonder whether this function is ever called... */
+    /* FIXME: it should never be called. */
 
     g_print("Opened a POP3 mailbox!\n");
 
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
-
-    if (MAILBOX_OPEN(mailbox)) {
-	/* increment the reference count */
-	mailbox->open_ref++;
-	UNLOCK_MAILBOX(mailbox);
-	return TRUE;
-    }
-
-    pop = LIBBALSA_MAILBOX_POP3(mailbox);
-
-
-    if (MAILBOX_OPEN(mailbox)) {
-	mailbox->messages = 0;
-	mailbox->total_messages = 0;
-	mailbox->unread_messages = 0;
-	mailbox->new_messages = 0;
-	libbalsa_mailbox_load_messages(mailbox);
-
-	/* increment the reference count */
-	mailbox->open_ref++;
-
-#ifdef DEBUG
-	g_print(_("%s: Opening %s Refcount: %d\n"),
-		"LibBalsaMailboxPop3", mailbox->name, mailbox->open_ref);
-#endif
-
-    }
-
-    UNLOCK_MAILBOX(mailbox);
     return TRUE;
 }
 
@@ -313,13 +281,14 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     }	
     libbalsa_mailbox_open(tmp_mailbox);
     if ((m->inbox) && (tmp_mailbox->messages)) {
+        LibBalsaMailboxLocal *mbox = LIBBALSA_MAILBOX_LOCAL(tmp_mailbox);
 	GList *list;
 
-	for (list = tmp_mailbox->message_list; list; list = list->next)
+	for (list = mbox->msg_list; list; list = list->next)
 	    ((LibBalsaMessage *) list->data)->flags |=
 		LIBBALSA_MESSAGE_FLAG_NEW;
 
-	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
+	if (!libbalsa_messages_move(mbox->msg_list, m->inbox)) {    
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				 _("Error placing messages from %s on %s\n"
 				   "Messages are left in %s\n"),

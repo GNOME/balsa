@@ -3623,9 +3623,13 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     bsmsg->type = SEND_CONTINUE;
     bsmsg->modified = FALSE;
 
-    libbalsa_mailbox_open(balsa_app.draftbox);
+#if 1
+    g_warning("save_message_cb disabled due to lack of error checking");
+#else
+    libbalsa_mailbox_open(balsa_app.draftbox); /* Error checking here? */
     bsmsg->orig_message = balsa_app.draftbox->message_list->data;
     g_object_ref(G_OBJECT(bsmsg->orig_message));
+#endif
 }
 
 static void

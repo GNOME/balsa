@@ -831,8 +831,8 @@ mailbox_conf_add(MailboxConfWindow *mcw)
     }
 
     /* The mailbox url is now set. */
-    g_hash_table_insert(balsa_app.mailbox_views, mcw->mailbox->url,
-                        mcw->mailbox->view);
+    g_hash_table_insert(balsa_app.mailbox_views,
+                        g_strdup(mcw->mailbox->url), mcw->mailbox->view);
 
     if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);

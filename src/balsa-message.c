@@ -159,17 +159,31 @@ balsa_message_set (BalsaMessage * bmessage,
     return;
 
   if (bmessage->headers)
-  {
-    gtk_object_destroy (GTK_OBJECT (bmessage->headers));
-    gtk_object_destroy (GTK_OBJECT (bmessage->body));
-  }
-    
+    {
+      gtk_object_destroy (GTK_OBJECT (bmessage->headers));
+      gtk_object_destroy (GTK_OBJECT (bmessage->body));
+    }
+
   headers2canvas (bmessage, message);
   body2canvas (bmessage, message);
   bm_group = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
-  
-  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM(bm_group), &x1, &y1, &x2, &y2);
-  gnome_canvas_set_scroll_region(GNOME_CANVAS(bmessage),0.0,0.0,x2-x1, y2-y1);
+
+  gnome_canvas_item_get_bounds (GNOME_CANVAS_ITEM (bm_group), &x1, &y1, &x2, &y2);
+  gnome_canvas_set_scroll_region (GNOME_CANVAS (bmessage), x1 - 10, y1 - 10, x2 + 10, y2 + 10);
+}
+
+static GnomeCanvasItem *
+balsa_message_text_item (gchar * text, GnomeCanvasGroup * group, double x, double y)
+{
+  GnomeCanvasItem *new;
+  new = gnome_canvas_item_new (group,
+			       GNOME_TYPE_CANVAS_TEXT,
+			       "x", x,
+			       "y", y,
+			       "anchor", GTK_ANCHOR_NW,
+       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
+			       "text", text, NULL);
+  return new;
 }
 
 static void
@@ -198,13 +212,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (message->date)
     {
-      date_item = gnome_canvas_item_new (bmessage->headers,
-					 GNOME_TYPE_CANVAS_TEXT,
-					 "x", (double) 0.0,
-					 "y", (double) 0.0,
-					 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-					 "text", "Date:", NULL);
+      date_item = balsa_message_text_item ("Date:", bmessage->headers, 0.0, 0.0);
 
       gnome_canvas_item_get_bounds (date_item, &x1, &y1, &x2, &y2);
 
@@ -218,13 +226,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (message->to_list)
     {
-      to_item = gnome_canvas_item_new (bmessage->headers,
-				       GNOME_TYPE_CANVAS_TEXT,
-				       "x", (double) 0.0,
-				       "y", (double) next_height,
-				       "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-				       "text", "To:", NULL);
+      to_item = balsa_message_text_item ("To:", bmessage->headers, 0.0, next_height);
 
       gnome_canvas_item_get_bounds (to_item, &x1, &y1, &x2, &y2);
 
@@ -240,13 +242,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (message->cc_list)
     {
-      cc_item = gnome_canvas_item_new (bmessage->headers,
-				       GNOME_TYPE_CANVAS_TEXT,
-				       "x", (double) 0.0,
-				       "y", (double) next_height,
-				       "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-				       "text", "Cc:", NULL);
+      cc_item = balsa_message_text_item ("Cc:", bmessage->headers, 0.0, next_height);
 
       gnome_canvas_item_get_bounds (cc_item, &x1, &y1, &x2, &y2);
 
@@ -261,13 +257,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (message->from)
     {
-      from_item = gnome_canvas_item_new (bmessage->headers,
-					 GNOME_TYPE_CANVAS_TEXT,
-					 "x", (double) 0.0,
-					 "y", (double) next_height,
-					 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-					 "text", "From:", NULL);
+      from_item = balsa_message_text_item ("From:", bmessage->headers, 0.0, next_height);
 
       gnome_canvas_item_get_bounds (from_item, &x1, &y1, &x2, &y2);
 
@@ -282,13 +272,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (message->subject)
     {
-      subject_item = gnome_canvas_item_new (bmessage->headers,
-					    GNOME_TYPE_CANVAS_TEXT,
-					    "x", (double) 0.0,
-					    "y", (double) next_height,
-					    "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-					    "text", "Subject:", NULL);
+      subject_item = balsa_message_text_item ("Subject:", bmessage->headers, 0.0, next_height);
 
       gnome_canvas_item_get_bounds (subject_item, &x1, &y1, &x2, &y2);
 
@@ -306,14 +290,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (date_item)
     {
-      date_data = gnome_canvas_item_new (bmessage->headers,
-					 GNOME_TYPE_CANVAS_TEXT,
-					 "x", max_width,
-					 "y", next_height,
-					 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-					 "text", message->date,
-					 NULL);
+      date_data = balsa_message_text_item (message->date, bmessage->headers, max_width, next_height);
 
       gnome_canvas_item_get_bounds (date_item, &x1, &y1, &x2, &y2);
 
@@ -328,15 +305,8 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (to_item)
     {
-      to_data = gnome_canvas_item_new (bmessage->headers,
-				       GNOME_TYPE_CANVAS_TEXT,
-				       "x", (double) max_width,
-				       "y", (double) next_height,
-				       "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-				       "text",
-				   make_string_from_list (message->to_list),
-				       NULL);
+      to_data = balsa_message_text_item (make_string_from_list (message->to_list),
+				 bmessage->headers, max_width, next_height);
 
       gnome_canvas_item_get_bounds (to_item, &x1, &y1, &x2, &y2);
 
@@ -351,15 +321,8 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (cc_item)
     {
-      cc_data = gnome_canvas_item_new (bmessage->headers,
-				       GNOME_TYPE_CANVAS_TEXT,
-				       "x", max_width,
-				       "y", next_height,
-				       "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-				       "text",
-				   make_string_from_list (message->cc_list),
-				       NULL);
+      cc_data = balsa_message_text_item (make_string_from_list (message->cc_list),
+				 bmessage->headers, max_width, next_height);
 
       gnome_canvas_item_get_bounds (cc_item, &x1, &y1, &x2, &y2);
 
@@ -383,13 +346,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
       else
 	snprintf (tbuff, 1024, "%s", message->from->mailbox);
 
-      from_data = gnome_canvas_item_new (bmessage->headers,
-					 GNOME_TYPE_CANVAS_TEXT,
-					 "x", max_width,
-					 "y", next_height,
-					 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-					 "text", tbuff, NULL);
+      from_data = balsa_message_text_item (tbuff, bmessage->headers, max_width, next_height);
 
       gnome_canvas_item_get_bounds (from_item, &x1, &y1, &x2, &y2);
 
@@ -404,14 +361,7 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 
   if (subject_item)
     {
-      subject_data = gnome_canvas_item_new (bmessage->headers,
-					    GNOME_TYPE_CANVAS_TEXT,
-					    "x", max_width,
-					    "y", next_height,
-					    "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-					    "text", message->subject,
-					    NULL);
+      subject_data = balsa_message_text_item (message->subject, bmessage->headers, max_width, next_height);
 
       gnome_canvas_item_get_bounds (subject_item, &x1, &y1, &x2, &y2);
 
@@ -443,17 +393,10 @@ body2canvas (BalsaMessage * bmessage, Message * message)
     GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
 					       GNOME_TYPE_CANVAS_GROUP,
 					       "x", (double) 10.0,
-					       "y", (double) (y2 - y1)+20,
+					       "y", (double) (y2 - y1) + 20,
 					       NULL));
-/*
-  gnome_canvas_item_new (bmessage->body,
-			  GNOME_TYPE_CANVAS_RECT,
-			  "x1", 0.0, "y1", 0.0,
-			  "x2", 100.0, "y2", 100.0,
-			  "fill_color", "black", NULL);
-*/
   message_body_ref (message);
-  content2canvas(message, bmessage->body);
+  content2canvas (message, bmessage->body);
   message_body_unref (message);
 }
 
@@ -476,15 +419,7 @@ other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
   if (text)
     text[alloced - 1] = '\0';
 
-  gnome_canvas_item_new (group,
-			 GNOME_TYPE_CANVAS_TEXT,
-			 "x", 0.0,
-			 "y", 0.0,
-			 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			 "text", text,
-			 NULL);
-
+  balsa_message_text_item (text, group, 0.0, 0.0);
 
   g_free (text);
   fclose (s.fpout);
@@ -494,14 +429,7 @@ other2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 void
 audio2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
-  gnome_canvas_item_new (group,
-			 GNOME_TYPE_CANVAS_TEXT,
-			 "x", 0.0,
-			 "y", 0.0,
-			 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			 "text", "--AUDIO--",
-			 NULL);
+  balsa_message_text_item ("--AUDIO--", group, 0.0, 0.0);
 }
 
 
@@ -511,14 +439,7 @@ application2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
 
-  gnome_canvas_item_new (group,
-			 GNOME_TYPE_CANVAS_TEXT,
-			 "x", 0.0,
-			 "y", 0.0,
-			 "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			 "text", "--AUDIO--",
-			 NULL);
+  balsa_message_text_item ("--APPLICATION--", group, 0.0, 0.0);
 #if 0
   obstack_append_string (canvas_bfr,
 			 "<tr><td bgcolor=\"#f0f0f0\"> "
@@ -558,7 +479,7 @@ image2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 }
 
 void
-message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *group)
+message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   gnome_canvas_item_new (group,
 			 GNOME_TYPE_CANVAS_TEXT,
@@ -571,7 +492,7 @@ message2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *grou
 }
 
 void
-multipart2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *group)
+multipart2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
 #if 0
   BODY *p;
@@ -602,7 +523,7 @@ multipart2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *gr
 
 
 void
-video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *group)
+video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   gnome_canvas_item_new (group,
 			 GNOME_TYPE_CANVAS_TEXT,
@@ -615,7 +536,7 @@ video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *group)
 }
 
 void
-mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *group)
+mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
   STATE s;
   gchar *ptr = 0;
@@ -643,14 +564,14 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *gro
 #endif
 	  return;
 	}
-  gnome_canvas_item_new (group,
-			 GNOME_TYPE_CANVAS_TEXT,
-			 "x", 0.0,
-			 "y", 0.0,
-			 "anchor", GTK_ANCHOR_NW,
+      gnome_canvas_item_new (group,
+			     GNOME_TYPE_CANVAS_TEXT,
+			     "x", 0.0,
+			     "y", 0.0,
+			     "anchor", GTK_ANCHOR_NW,
        "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
-			 "text", ptr,
-			 NULL);
+			     "text", ptr,
+			     NULL);
       g_free (ptr);
     }
   fclose (s.fpout);
@@ -660,7 +581,7 @@ mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *gro
 
 
 void
-part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *group)
+part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
 
   switch (bdy->type)
@@ -713,7 +634,7 @@ part2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup *group)
 }
 
 gboolean
-content2canvas (Message * message, GnomeCanvasGroup *group)
+content2canvas (Message * message, GnomeCanvasGroup * group)
 {
   GList *body_list;
   Body *body;
@@ -721,7 +642,7 @@ content2canvas (Message * message, GnomeCanvasGroup *group)
   gchar msg_filename[PATH_MAX];
   static gchar *canvas_buffer_content = (gchar *) - 1;
 
-  
+
   part_idx = 0;
   part_nesting_depth = 0;
 

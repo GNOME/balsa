@@ -80,17 +80,25 @@ static void set_icon (GdkWindow * window);
 void
 main_window_set_cursor (gint type)
 {
+  GList *list;
+  GtkWidget *widget;
   GdkCursor *cursor;
 
-  if (type == -1)
-    {
-      gdk_window_set_cursor (GDK_ROOT_PARENT (), NULL);
-      return;
-    }
+  if (mdi->windows == NULL)
+	  return;
 
-  cursor = gdk_cursor_new (type);
-  gdk_window_set_cursor (GDK_ROOT_PARENT (), cursor);
-  gdk_cursor_destroy (cursor);
+  for (list = mdi->windows; list; list = list->next)
+    {
+      widget = GTK_WIDGET (GNOME_APP (list->data));
+      if (type == -1)
+	gdk_window_set_cursor (widget->window, NULL);
+      else
+	{
+	  cursor = gdk_cursor_new (type);
+	  gdk_window_set_cursor (widget->window, cursor);
+	  gdk_cursor_destroy (cursor);
+	}
+    }
 }
 
 static void

@@ -18,9 +18,9 @@
  */
 
 #include "config.h"
+
 #ifdef HAVE_LIBESD
 #include <esd.h>
-#endif
 #include <gnome.h>
 
 #include "balsa-app.h"
@@ -74,7 +74,6 @@ LoadWav (char *file)
 
   /* int                 count; */
 
-#ifdef HAVE_LIBESD
   f = fopen (file, "r");
   if (!f)
     return NULL;
@@ -263,7 +262,7 @@ LoadWav (char *file)
   g_free (s);
   if (s->data)
     g_free (s->data);
-#endif
+
   return NULL;
 }
 
@@ -274,7 +273,6 @@ SoundPlay (Sample * s)
 
   int confirm = 0;
 
-#ifdef HAVE_LIBESD
   if (!s)
     return;
 
@@ -308,14 +306,11 @@ SoundPlay (Sample * s)
     esd_sample_play (balsa_app.esound, s->id);
 
   fsync (balsa_app.esound);
-
-#endif
 }
 
 void
 DestroySample (Sample * s)
 {
-#ifdef HAVE_LIBESD
   if (s->id)
     {
       /*      Why the hell is this symbol not in esd? */
@@ -323,7 +318,6 @@ DestroySample (Sample * s)
 /*      esd_sample_kill(sound_fd,s->id); */
       esd_sample_free (balsa_app.esound, s->id);
     }
-#endif
   if (s->data)
     g_free (s->data);
   g_free (s);
@@ -338,3 +332,4 @@ play_sound (gchar * file)
   SoundPlay (sample);
   DestroySample (sample);
 }
+#endif

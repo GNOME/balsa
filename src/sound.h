@@ -17,4 +17,6 @@
  * 02111-1307, USA.
  */
 
+#ifdef HAVE_LIBESD
 void play_sound (gchar * file);
+#endif

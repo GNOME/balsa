@@ -1,1 +1,25 @@
-* look at gtk_text crashing if its empty in the sendmessage window
+TODO LIST:
+
+---------------------------------------------------------
+Note: This list is not complete, but here for the authors
+      to remember what they are supposed to be doing.
+---------------------------------------------------------
+
+
+
+Stuart
+---------------------------------------------------------
+ * gnomize sendmsg-window
+ * bug tigert about getting new icons for toolbar
+ * remove old toolbar
+ * add choice for POP3/IMAP/MBOX to new account box.
+ * fix deleting accounts
+ * look at smtp code crashing if gtk_text is empty
+
+
+
+Jay
+---------------------------------------------------------
+ * do wonderful things that make people send millions
+   of dollars in donations to pav <g>
+ * more stuff goes here...

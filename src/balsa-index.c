@@ -1001,6 +1001,9 @@ bndx_find_row_func(GtkTreeModel *model, GtkTreePath *path,
         return FALSE;
     }
 
+    if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        return FALSE;
+
     if (b->flag) {
         /* looking for flagged messages */
         if (!(b->flag & message->flags))
@@ -1305,16 +1308,26 @@ bndx_set_parent_style(BalsaIndex * index, GtkTreePath * path)
  *
  * Callback for the selection "changed" signal.
  *
- * Display the last (in tree order) selected message.
+ * Do nothing if index->current_message is still selected;
+ * otherwise, display the last (in tree order) selected message.
  */
+
+struct BndxSelectionChangedInfo {
+    LibBalsaMessage *message;
+    LibBalsaMessage *current_message;
+    gboolean current_message_selected;
+};
 
 static void
 bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
                             GtkTreeIter * iter, gpointer data)
 {
-    LibBalsaMessage **message = data;
+    struct BndxSelectionChangedInfo *sci = data;
 
-    gtk_tree_model_get(model, iter, BNDX_MESSAGE_COLUMN, message, -1);
+    gtk_tree_model_get(model, iter, BNDX_MESSAGE_COLUMN, &sci->message,
+                       -1);
+    if (sci->message == sci->current_message)
+        sci->current_message_selected = TRUE;
 }
 
 static void
@@ -1322,17 +1335,22 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 {
     BalsaIndex *index = BALSA_INDEX(data);
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    LibBalsaMessage *message = NULL;
+    struct BndxSelectionChangedInfo sci;
 
+    sci.message = NULL;
+    sci.current_message = index->current_message;
+    sci.current_message_selected = FALSE;
     gtk_tree_selection_selected_foreach(selection,
                                         bndx_selection_changed_func,
-                                        &message);
+                                        &sci);
+    if (sci.current_message_selected)
+        return;
 
     /* we don't clear the current message if the tree contains any
      * messages */
-    if ((message || gtk_tree_model_iter_n_children(model, NULL) == 0)
-        && message != index->current_message) {
-        index->current_message = message;
+    if ((sci.message || gtk_tree_model_iter_n_children(model, NULL) == 0)
+        && sci.message != index->current_message) {
+        index->current_message = sci.message;
         bndx_changed_find_row(index);
     }
 }
@@ -1525,18 +1543,36 @@ mailbox_messages_changed_status_cb(LibBalsaMailbox * mb,
 				   gint flag,
 				   BalsaIndex * bindex)
 {
+    GList *list;
+
     if (!libbalsa_mailbox_is_valid(mb)) return;
 
     if (flag == LIBBALSA_MESSAGE_FLAG_DELETED &&
+        (LIBBALSA_MESSAGE(messages->data)->flags
+         & LIBBALSA_MESSAGE_FLAG_DELETED) &&
 	(balsa_app.hide_deleted || balsa_app.delete_immediately)) {
 	/* These messages are flagged as deleted, but we must remove them from
 	   the index because of the prefs
 	 */
 	bndx_messages_remove(bindex,messages);
+        return;
     }
-    else 
-	for(;messages;messages = g_list_next(messages))
-	    balsa_index_update_flag(bindex, LIBBALSA_MESSAGE(messages->data));
+
+    for (list = messages; list; list = g_list_next(list))
+        balsa_index_update_flag(bindex, LIBBALSA_MESSAGE(list->data));
+
+    if (flag == LIBBALSA_MESSAGE_FLAG_DELETED
+        && (LIBBALSA_MESSAGE(bindex->current_message)->flags
+            & LIBBALSA_MESSAGE_FLAG_DELETED)) {
+        GtkTreeIter iter;
+
+        bndx_find_row(bindex, NULL, &iter, (LibBalsaMessageFlag) 0,
+                      FILTER_NOOP, NULL, messages);
+        bndx_expand_to_row_and_select(bindex, &iter);
+        return;
+    }
+
+    bndx_changed_find_row(bindex);
 }
 
 /* mailbox_messages_added_cb : callback for sync with backend; the signal

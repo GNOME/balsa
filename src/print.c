@@ -681,6 +681,10 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body)
     /* fake an empty buffer if textbuf is NULL */
     if (!textbuf)
 	textbuf = g_strdup("");
+
+    /* be sure the we have correct utf-8 stuff here... */
+    libbalsa_utf8_sanitize(&textbuf, balsa_app.convert_unknown_8bit,
+			   balsa_app.convert_unknown_8bit_codeset, NULL);
     
     /* wrap lines (if necessary) */
     pdata->textlines = 

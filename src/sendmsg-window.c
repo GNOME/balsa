@@ -2170,9 +2170,16 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 			     balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, msg->flow);
-	if (body)
+	if (body) {
+	    gchar *buf = body->str;
+
+	    g_string_free(body, FALSE);
+	    libbalsa_utf8_sanitize(&buf, balsa_app.convert_unknown_8bit,
+				   balsa_app.convert_unknown_8bit_codeset, NULL);
+	    body = g_string_new(buf);
+	    g_free(buf);
 	    g_string_prepend(body, str);
-	else
+	} else
 	    body = g_string_new(str);
 	g_free(str);
     }

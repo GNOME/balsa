@@ -398,7 +398,6 @@ libbalsa_sign_encrypt_mutt_body(MuttBody **se_body, const gchar *rfc822_signer,
     g_return_val_if_fail(rfc822_signer != NULL, FALSE);
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(se_body != NULL, FALSE);
-    g_return_val_if_fail(micalg != NULL, FALSE);
 
     sign_multipart = *se_body && (*se_body)->next;
 

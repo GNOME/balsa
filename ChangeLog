@@ -1,3 +1,9 @@
+2003-04-04  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
+	* libbalsa/rfc3156.c: remove paranoia test.
+	* src/print.c: sanitize before printing.
+	* src/sendmsg-window.c: sanitize before displaying.
+
 2003-04-03 12:14  PeterB
 
 	* src/sendmsg-window.c: Wrap initial text.

@@ -509,8 +509,7 @@ conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
 
 static void
 run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type, 
-		 void (*ok_handler)(MailboxConfWindow*), 
-		 const char* ok_button_name)
+		 gboolean update)
 {
     MailboxConfWindow* mcw;
 
@@ -518,10 +517,14 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
 
     mcw = g_new0(MailboxConfWindow, 1);
 
-    mcw->ok_handler = ok_handler;
-    mcw->ok_button_name = ok_button_name;
-    if (mbnode)
+    if (update) {
+        mcw->ok_handler = mailbox_conf_update;
+        mcw->ok_button_name = _("_Update");
         mcw->mailbox = mbnode->mailbox;
+    } else {
+        mcw->ok_handler = mailbox_conf_add;
+        mcw->ok_button_name = _("_Add");
+    }
     mcw->mailbox_type = mailbox_type;
 
     mcw->window = GTK_DIALOG(create_dialog(mcw));
@@ -529,7 +532,9 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
     
     gtk_dialog_set_response_sensitive(mcw->window, MCW_RESPONSE, FALSE);
     mcw->ok_sensitive = FALSE;
-    gtk_dialog_set_default_response(mcw->window, GTK_RESPONSE_CLOSE);
+    gtk_dialog_set_default_response(mcw->window,
+                                    update ? GTK_RESPONSE_CLOSE :
+                                    MCW_RESPONSE);
 
     if(mbnode)
         mailbox_conf_set_values(mcw);
@@ -545,7 +550,7 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
 void
 mailbox_conf_new(GtkType mailbox_type)
 {
-    run_mailbox_conf(NULL, mailbox_type, mailbox_conf_add, _("_Add"));
+    run_mailbox_conf(NULL, mailbox_type, FALSE);
 }
 
 /*
@@ -556,7 +561,7 @@ mailbox_conf_edit(BalsaMailboxNode *mbnode)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
     run_mailbox_conf(mbnode, G_OBJECT_TYPE(G_OBJECT(mbnode->mailbox)),
-		     mailbox_conf_update, _("_Update"));
+                     TRUE);
 }
 
 /*
@@ -1014,6 +1019,16 @@ create_dialog(MailboxConfWindow *mcw)
     }
 }
 
+static void
+balsa_get_entry(GtkWidget * widget, GtkWidget ** entry)
+{
+    if (GTK_IS_ENTRY(widget))
+        *entry = widget;
+    else if (GTK_IS_CONTAINER(widget))
+        gtk_container_foreach((GtkContainer *) widget,
+                              (GtkCallback) balsa_get_entry, entry);
+}
+
 static GtkWidget *
 create_local_mailbox_dialog(MailboxConfWindow *mcw)
 {
@@ -1022,6 +1037,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
     GtkWidget *label;
     gint row = -1;
     GtkFileChooserAction action;
+    GtkWidget *entry = NULL;
 
     table = gtk_table_new(3, 2, FALSE);
 
@@ -1049,6 +1065,10 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 	                                balsa_app.local_mail_directory);
     g_signal_connect(G_OBJECT(dialog), "selection-changed",
                      G_CALLBACK(check_for_blank_fields), mcw);
+    balsa_get_entry(dialog, &entry);
+    if (entry)
+	g_signal_connect(G_OBJECT(entry), "changed",
+                         G_CALLBACK(check_for_blank_fields), mcw);
 
     mcw->view_info =
         mailbox_conf_view_new(mcw->mailbox, GTK_WINDOW(dialog), table,

@@ -1,3 +1,7 @@
+2004-09-16  Pawel Salek
+
+	* libbalsa/imap/imap-commands.c: Improve heuristics in fetching HEADER.
+
 2004-09-15  Pawel Salek
 
 	* libbalsa/imap-server.c: do not call g_strdup_printf() with null arg.

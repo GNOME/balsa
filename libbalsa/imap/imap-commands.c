@@ -773,14 +773,21 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                             ImapFetchBodyCb body_cb, void *arg)
 {
   char cmd[80];
+  ImapMessage *msg;
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
   /* We should use .MIME only for non-message parts but it tends to
-     work also for messages. */
-  if(strcmp(section, "1") == 0)
+     work also for messages. Let's be clear: this is a stop gap
+     solution. The proper way to fix it is to provide extra arguments
+     to this function so that it clearly knows what is is supposed to
+     do instead of guessing. */
+  msg = imap_mbox_handle_get_msg(handle, seqno);
+  if(strcmp(section, "1") == 0 && msg &&
+     msg->body && msg->body->media_basic != IMBMEDIA_MESSAGE_RFC822 &&
+     msg->body->media_basic != IMBMEDIA_MULTIPART)
     snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[HEADER] BODY[%s])",
-           seqno, section);
+             seqno, section);
   else
     snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s.MIME] BODY[%s])",
              seqno, section, section);

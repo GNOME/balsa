@@ -1,3 +1,9 @@
+2004-03-04 09:59  PeterB
+
+	* libbalsa/filter-funcs.c: step over closing '"'.
+	* configure.in, libbalsa/html.c: require gmime-2.0 >= 2.1.2; drop
+	HAVE_GMIME21.
+
 2004-02-03  Pawel Salek
 
 	* libbalsa/imap/imap-auth.c: cleanup.

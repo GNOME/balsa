@@ -1,6 +1,3 @@
-<<<<<<< balsa-app.h
-:pserver:pablo@cvs.gnome.org:/cvs/gnome
-=======
 /* Balsa E-Mail Client
  * Copyright (C) 1997-1999 Jay Painter and Stuart Parmenter
  *
@@ -114,7 +111,8 @@ extern struct BalsaApplication
   gboolean sig_whenreply;
   gboolean sig_separator;
   gchar *signature_path;
-  
+
+  BalsaWindow* main_window;
   BalsaMBList *mblist;
   
   Mailbox *inbox;
@@ -217,4 +215,3 @@ gint do_load_mailboxes (void);
 void update_timer( gboolean update, guint minutes );
 
 #endif /* __BALSA_APP_H__ */
->>>>>>> 1.54

@@ -1,6 +1,3 @@
-<<<<<<< balsa-icons.c
-/cvs/gnome/gtk+/examples/progressbar
-=======
 /* Balsa E-Mail Client
  * Copyright (C) 1998-1999 Stuart Parmenter
  *
@@ -41,6 +38,7 @@
 #include "pixmaps/envelope.xpm"
 
 #include "pixmaps/arrow.xpm"
+#include "pixmaps/multipart.xpm"
 
 typedef struct _BalsaIcon BalsaIcon;
 struct _BalsaIcon
@@ -65,6 +63,7 @@ static BalsaIcon forwarded;
 static BalsaIcon envelope;
 
 static BalsaIcon arrow;
+static BalsaIcon multipart;
 
 static void
 create_icon (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
@@ -95,6 +94,7 @@ balsa_icons_init (void)
   create_icon (envelope_xpm, &envelope.p, &envelope.b);
 
   create_icon (arrow_xpm, &arrow.p, &arrow.b);
+  create_icon (multipart_xpm, &multipart.p, &multipart.b);
 }
 
 GdkPixmap *
@@ -128,7 +128,9 @@ balsa_icon_get_pixmap (BalsaIconName name)
       return envelope.p;
 
     case BALSA_ICON_ARROW:
-	    return arrow.p;
+      return arrow.p;
+    case BALSA_ICON_MULTIPART:
+      return multipart.p;
     }
   return NULL;
 }
@@ -164,8 +166,9 @@ balsa_icon_get_bitmap (BalsaIconName name)
       return envelope.b;
 
     case BALSA_ICON_ARROW:
-	    return arrow.b;
+      return arrow.b;
+    case BALSA_ICON_MULTIPART:
+      return multipart.b;
     }
   return NULL;
 }
->>>>>>> 1.6

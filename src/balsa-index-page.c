@@ -287,6 +287,7 @@ gboolean balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
     dialog = gnome_dialog_new(_("Mailbox password:"),
 			       GNOME_STOCK_BUTTON_OK, GNOME_STOCK_BUTTON_CANCEL, NULL);
 
+    gnome_dialog_set_parent (GNOME_DIALOG (dialog), GTK_WINDOW (GTK_WIDGET (page)->parent->parent));
     hbox = gtk_hbox_new (FALSE, 0);
     gtk_box_pack_start (GTK_BOX(GNOME_DIALOG(dialog)->vbox), hbox, FALSE, FALSE, 10);
 

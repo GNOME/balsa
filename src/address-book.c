@@ -175,6 +175,8 @@ ab_add_cb(GtkWidget * widget, gpointer data)
 	dialog = gnome_dialog_new( N_("Add New Address"), 
 				   GNOME_STOCK_BUTTON_CANCEL, 
 				   GNOME_STOCK_BUTTON_OK, NULL);
+        gnome_dialog_set_parent (dialog, GTK_WINDOW (balsa_app.main_window));
+
 	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, 
 				    GTK_SIGNAL_FUNC(ab_cancel_cb), 
 				    (gpointer) dialog);
@@ -390,6 +392,16 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	static gchar *titles[2] = {N_("Name"), N_("E-Mail Address")}; 
 	
 	dialog = gnome_dialog_new(N_("Address Book"), GNOME_STOCK_BUTTON_CANCEL, GNOME_STOCK_BUTTON_OK, NULL); 
+
+        /* If we have something in the data, then the addressbook was opened
+         * from a message window */
+        if (GTK_IS_BUTTON (widget))
+                gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
+                                         GTK_WINDOW (widget->parent->parent->parent->parent->parent));
+        else
+                gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
+                                         GTK_WINDOW (widget->parent->parent) );
+
 	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, GTK_SIGNAL_FUNC(ab_cancel_cb), (gpointer) dialog); 
 	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 1, GTK_SIGNAL_FUNC(ab_okay_cb), (gpointer) dialog); 
 	vbox = GNOME_DIALOG(dialog)->vbox; 

@@ -953,6 +953,7 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
 	gtk_widget_destroy( GTK_WIDGET(progress_dialog) );
 
       progress_dialog = gnome_dialog_new("Checking Mail...", "Hide", NULL);
+      gnome_dialog_set_parent (GNOME_DIALOG (progress_dialog), GTK_WINDOW (balsa_app.main_window));
       gtk_signal_connect (GTK_OBJECT (progress_dialog), "destroy",
 			  GTK_SIGNAL_FUNC (progress_dialog_destroy_cb), NULL);
 

@@ -623,6 +623,9 @@ balsa_index_update_flag (BalsaIndex * bindex, Message * message)
 static void
 clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
 {
+  guint tmp;
+  /* HEADER* current; */
+
   if (message->flags & MESSAGE_FLAG_DELETED)
     gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 1,
 			  balsa_icon_get_pixmap (BALSA_ICON_TRASH),
@@ -642,6 +645,14 @@ clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
 			  balsa_icon_get_bitmap (BALSA_ICON_ENVELOPE));
   else
     gtk_clist_set_text (GTK_CLIST (bindex), row, 1, NULL);
+
+  tmp = message_is_multipart (message);
+  
+  if ( tmp ) {
+          gtk_clist_set_pixmap (GTK_CLIST (bindex), row, 2,
+                                balsa_icon_get_pixmap (BALSA_ICON_MULTIPART),
+                                balsa_icon_get_bitmap (BALSA_ICON_MULTIPART));
+  }
 }
 
 

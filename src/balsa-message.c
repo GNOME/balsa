@@ -164,6 +164,7 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
     case GDK_BUTTON_PRESS:
       save_dialog = gnome_dialog_new (_ ("Save MIME Part"),
 				      _ ("Save"), _ ("Cancel"), NULL);
+      gnome_dialog_set_parent (GNOME_DIALOG (save_dialog), GTK_WINDOW (balsa_app.main_window));
       label = gtk_label_new( _("Please choose a filename to save this part of the message as:") );
       file_entry = gnome_file_entry_new ("Balsa_MIME_Saver",
 					 _ ("Save MIME Part"));
@@ -222,6 +223,7 @@ text_event( GnomeCanvasItem * item, GdkEvent * event, gpointer data )
 	case GDK_BUTTON_PRESS:
 		save_dialog = gnome_dialog_new( _("Save Text"),
 						_("Save"), _("Cancel"), NULL );
+                gnome_dialog_set_parent (GNOME_DIALOG (save_dialog), GTK_WINDOW (balsa_app.main_window));
 		label = gtk_label_new( _("Please choose a filename to save this part of the message as:") );
 		file_entry = gnome_file_entry_new( "Balsa_MIME_Saver",
 					 _("Save Text") );

@@ -254,6 +254,7 @@ main (int argc, char *argv[])
   gnome_triggers_do ("", "program", "balsa", "startup", NULL);
 
   window = balsa_window_new();
+  balsa_app.main_window = BALSA_WINDOW (window);
   gtk_widget_show(window);
 
 

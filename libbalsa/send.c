@@ -892,14 +892,13 @@ int balsa_smtp_send (MessageQueueItem *first_message, char *server)
  * */
 gchar** balsa_lookup_mime_type (const gchar* path)
 {
-        gchar* mime_type;
         gchar** tmp;
 
-        mime_type = gnome_mime_type_or_default (path, "");
+        const gchar* mime_type = gnome_mime_type_or_default (path, "");
 
         if (mime_type != "") {
                 tmp = g_strsplit (mime_type , "/", 2 );
-                g_free (mime_type);
+                g_free ((gchar*)mime_type);
         } else {
                 tmp = g_strsplit ("application/octet-stream", "/", 2);
         }                

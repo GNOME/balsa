@@ -648,3 +648,22 @@ message_body_unref (Message * message)
       message->body_list = NULL;
     }
 }
+
+
+gint message_is_multipart (Message* message)
+{
+  gint tmp;
+  HEADER* msg_header;
+  
+  msg_header = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
+  if (msg_header->content->type == TYPEMULTIPART)
+  {
+    tmp = 1;
+  } else {
+    tmp = 0;
+  }
+
+  return tmp;
+}
+
+  

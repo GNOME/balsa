@@ -234,6 +234,7 @@ mailbox_conf_new (Mailbox * mailbox, gint add_mbox, MailboxType type)
     mcw->mailbox = mailbox;
 
   mcw->window = gnome_dialog_new (_("Mailbox Configurator"), NULL);
+  gnome_dialog_set_parent (GNOME_DIALOG (mcw->window), GTK_WINDOW (balsa_app.main_window));
 
   gtk_signal_connect (GTK_OBJECT (mcw->window),
 		      "delete_event",
@@ -1184,6 +1185,7 @@ mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data)
   gint clicked_button;
 
   window = gnome_dialog_new ("IMAP", GNOME_STOCK_BUTTON_CLOSE, NULL);
+  gnome_dialog_set_parent (GNOME_DIALOG (window), GTK_WINDOW (balsa_app.main_window));
 
 #ifdef ENABLE_NLS
   titles[1]=_(titles[1]);

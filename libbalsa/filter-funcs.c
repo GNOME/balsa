@@ -151,10 +151,8 @@ filter_new (void)
     newfil->match.string[0] = '\0';
     newfil->sound[0] = '\0';
     newfil->popup_text[0] = '\0';
-/*
     newfil->action = FILTER_NOTHING;
     newfil->action_string[0] = '\0';
- */
     newfil->regex = NULL;
 
   return (newfil);

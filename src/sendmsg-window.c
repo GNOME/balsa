@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-2001 Stuart Parmenter and others, see AUTHORS file.
+ * Copyright (C) 1998-2002 Stuart Parmenter and others, see AUTHORS file.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -746,7 +746,7 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
     gchar **cmdline;
     balsa_edit_with_gnome_data *data = 
         g_malloc(sizeof(balsa_edit_with_gnome_data));
-    pid_t pid, pid_ext;
+    pid_t pid;
     FILE *tmp;
     int tmpfd;
 
@@ -785,7 +785,7 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* msg)
         return; 
     } 
     if (pid == 0) {
-        setpgrp();
+        setpgid(0, 0);
         
         command = g_strdup_printf(balsa_app.extern_editor_command, filename); 
         cmdline = g_strsplit(command, " ", 1024); 

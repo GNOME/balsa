@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -143,6 +143,7 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
  */
 /* XXX these need to return a value if they failed */
 gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox);
 LibBalsaMailboxAppendHandle* 
 libbalsa_mailbox_open_append(LibBalsaMailbox * mailbox);
 int libbalsa_mailbox_close_append(LibBalsaMailboxAppendHandle* handle);

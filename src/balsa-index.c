@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1213,7 +1213,7 @@ balsa_index_redraw_current(BalsaIndex * bindex)
     gtk_clist_select_row(clist, h, -1);
 }
 
-void
+static void
 balsa_index_update_flag(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     GtkCTreeNode* node;
@@ -1550,12 +1550,19 @@ resize_column_event_cb(GtkCList * clist, gint column, gint width,
 }
 
 /* Mailbox Callbacks... */
+/* mailbox_message_changed_status_cb:
+   We must be *extremely* careful here - message might have changed 
+   its status because the mailbox was forcibly closed and message
+   became invalid. See for example #70807.
+
+*/
 static void
 mailbox_message_changed_status_cb(LibBalsaMailbox * mb,
 				  LibBalsaMessage * message,
 				  BalsaIndex * bindex)
 {
-    balsa_index_update_flag(bindex, message);
+    if(libbalsa_mailbox_is_valid(mb))
+        balsa_index_update_flag(bindex, message);
 }
 
 static void
@@ -1819,7 +1826,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
         balsa_index_sync_backend(index->mailbox_node->mailbox);
         balsa_mblist_update_mailbox(balsa_app.mblist,
                                     index->mailbox_node->mailbox);
-        // balsa_index_redraw_current(index);
+        /* balsa_index_redraw_current(index); */
     }
 }
 

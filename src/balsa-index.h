@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -87,10 +87,6 @@ extern "C" {
 
 /* adds a new message */
     void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
-
-    void balsa_index_update_flag(BalsaIndex * bindex,
-				 LibBalsaMessage * message);
-
     void balsa_index_redraw_current(BalsaIndex *);
 
 /* move or copy a list of messages */

@@ -3205,9 +3205,11 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   </para>
 
   <para>
-    To create a new &POP3; mailbox, go to the configuration dialog,
-    select the Mailboxes section, and click Add in the POP3 area. A
-    dialog will be displayed that will let you set up the new mailbox.
+    To create a new &POP3; mailbox, open the
+    <guimenu>Settings</guimenu>/<guimenuitem>Preferences</guimenuitem>
+    dialog, select the Remote Servers tab, and click Add in the Remote
+    Mail Servers area. A dialog will be displayed that will let you
+    set up the new mailbox.
   </para>
 
   <note>

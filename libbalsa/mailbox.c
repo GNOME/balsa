@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -365,6 +365,20 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox)
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[OPEN_MAILBOX], &res);
     return res;
+}
+
+/* libbalsa_mailbox_is_valid:
+   mailbox is valid when:
+   a). it is closed, b). it is open and has proper client context.
+*/
+gboolean
+libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
+{
+    if(mailbox->open_ref == 0) return TRUE;
+    if(CLIENT_CONTEXT_CLOSED(mailbox)) return FALSE;
+    /* be cautious: implement second line of defence */
+    g_return_val_if_fail(CLIENT_CONTEXT(mailbox)->hdrs == NULL, FALSE);
+    return TRUE;
 }
 
 void

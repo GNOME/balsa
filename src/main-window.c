@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* vim:set ts=4 sw=4 ai et: */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1562,9 +1562,9 @@ show_about_box(void)
     GtkWidget *about;
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
-        "Carlos Mongado <chbm@chbm.nu>",
-        "Pawel Salek <pawsa@theochem.kth.se>",
         "Peter Bloomfield <PeterBloomfield@mindspring.com>",
+        "Carlos Morgado <chbm@chbm.nu>",
+        "Pawel Salek <pawsa@theochem.kth.se>",
         "and many others (see AUTHORS file)",
         NULL
     };
@@ -1578,7 +1578,7 @@ show_about_box(void)
 
     about = gnome_about_new("Balsa",
                             BALSA_VERSION,
-                            _("Copyright (C) 1997-2001"),
+                            _("Copyright (C) 1997-2002"),
                             authors,
                             _
                             ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://bugzilla.gnome.org/"),

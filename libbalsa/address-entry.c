@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -195,12 +195,10 @@ static void
 libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass)
 {
     GtkWidgetClass *gtk_widget_class;
-    GtkEntryClass *gtk_entry_class;
     GtkObjectClass *object_class;
 
     object_class = GTK_OBJECT_CLASS(klass);
     gtk_widget_class = GTK_WIDGET_CLASS(klass);
-    gtk_entry_class = GTK_ENTRY_CLASS(klass);
     parent_class = gtk_type_class(GTK_TYPE_ENTRY);
 
     object_class->destroy = libbalsa_address_entry_destroy;
@@ -965,7 +963,7 @@ libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
 
         /* now draw the cursor (there's no method specifically for that,
          * but draw_focus includes the cursor) */
-        GTK_WIDGET_CLASS(parent_class)->draw_focus(widget);
+        gtk_widget_draw_focus(widget);
     }
 }
 
@@ -1024,7 +1022,7 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
     /*
      * Check if it is mouse button 2 (paste text)
      */
-    if ( (event->button == 2) && (event->type != GDK_BUTTON_PRESS) &&
+    if ( (event->button == 2) && (event->type == GDK_BUTTON_PRESS) &&
 	 editable->editable )
     {
 	if (address_entry->input != NULL)
@@ -1463,7 +1461,6 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
 {
     inputData *input;
     emailData *addy, *extra;
-    GList *list;
     gchar *left, *right, *str;
     
     g_return_if_fail(address_entry != NULL);
@@ -1496,11 +1493,7 @@ libbalsa_keystroke_comma(LibBalsaAddressEntry *address_entry)
      * Now we add a new entry.
      */
     extra = libbalsa_emailData_new();
-    list = g_list_next(input->active);
-    if (list == NULL)
-	g_list_append(input->list, extra);
-    else
-	g_list_insert(input->list, extra, g_list_position(input->list, list));
+    g_list_insert(input->active, extra, 1);
     if (right != NULL) {
 	extra->user = g_strdup(right);
 	str = g_strndup(left, addy->cursor);
@@ -2042,7 +2035,6 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     gint cursor, start, end;
     gboolean found;
     inputData *input;
-    gint tmp_pos;
 
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
@@ -2103,9 +2095,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     address_entry->alias_end_pos = end;
     start = editable->selection_start_pos;
     end = editable->selection_end_pos;
-    tmp_pos = 0;
-    gtk_editable_delete_text(editable, 0, -1);
-    gtk_editable_insert_text(editable, show->str, show->len, &tmp_pos);
+    gtk_entry_set_text(GTK_ENTRY(address_entry), show->str);
     gtk_editable_set_position(editable, cursor);
     g_string_free(show, TRUE);
     editable->selection_start_pos = start;

@@ -40,8 +40,8 @@
 
 static gchar tmp_file_name[PATH_MAX + 1];
 
-static void        header2row    (gchar * name, gchar * data, struct obstack *html_bfr);
-static void        headers2html  (Message * message, struct obstack *html_bfr);
+static void header2row (gchar * name, gchar * data, struct obstack *html_bfr);
+static void headers2html (Message * message, struct obstack *html_bfr);
 
 
 #define obstack_append_string(o, s)   obstack_grow(o, s, strlen(s))
@@ -280,7 +280,7 @@ audio2html (BODY * bdy, FILE * fp, struct obstack *bfr)
 
 
 void
-application2html (Message* message, BODY * bdy, FILE * fp, struct obstack *bfr)
+application2html (Message * message, BODY * bdy, FILE * fp, struct obstack *bfr)
 {
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
@@ -364,7 +364,7 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
 
 
 void
-part2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
+part2html (Message * message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
 
   switch (bdy->type)
@@ -456,7 +456,7 @@ content2html (Message * message)
   gchar msg_filename[PATH_MAX];
   static struct obstack *html_buffer = 0;
   static gchar *html_buffer_content = (gchar *) - 1;
-    
+
   if (!html_buffer)
     {
       html_buffer = g_malloc (sizeof (struct obstack));

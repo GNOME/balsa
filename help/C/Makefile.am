@@ -18,11 +18,9 @@ all: index.html
 
 # This is where the SGML bit is cool
 
-index.html: balsa/index.html
-	-cp balsa/index.html index.html
-
-balsa/index.html: $(SGML_FILES)
+index.html: $(SGML_FILES)
 	-db2html $<
+	-cp balsa/index.html index.html
 
 balsa.ps: $(SGML_FILES)
 	-db2ps $<
@@ -34,22 +32,22 @@ balsa.rtf: $(SGML_FILES)
 
 dist-hook:
 	mkdir $(distdir)/balsa
-	-cp $(srcdir)/balsa/*.html $(distdir)/balsa
+	-cp balsa/*.html $(distdir)/balsa
 	mkdir $(distdir)/images
 	-cp $(srcdir)/images/*.png $(distdir)/images
 	mkdir $(distdir)/stylesheet-images
-	-cp $(srcdir)/balsa/stylesheet-images/*.gif $(distdir)/stylesheet-images
+	-cp balsa/stylesheet-images/*.gif $(distdir)/stylesheet-images
 
 install-data-local: index.html
 	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/images
 	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/stylesheet-images
-	-for file in $(srcdir)/balsa/*.html; do \
+	-for file in balsa/*.html; do \
 	basefile=`basename $$file`; \
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/$$basefile; \
 	done
 	-for file in $(srcdir)/images/*.png ; do \
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images;\
 	done
-	-for file in $(srcdir)/balsa/stylesheet-images/*.gif ; do \
+	-for file in balsa/stylesheet-images/*.gif ; do \
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images;\
 	done

@@ -85,7 +85,7 @@ imap_auth_gssapi(ImapMboxHandle* handle)
     
     if( !ag_get_target(handle->host, &target_name)) {
         imap_mbox_handle_set_msg(handle, "Could not get service name");
-        return IMAP_AUTH_FAILURE;
+        return IMAP_AUTH_UNAVAIL;
     }
 
     state = ag_get_token(&context, target_name, sec_token,
@@ -285,11 +285,11 @@ ag_negotiate_parameters(ImapMboxHandle *handle, const char * user,
     t = send_token.value;
     buf_size = (t[1] << 16) | (t[2]<<8) | t[3];
     gss_release_buffer (&min_stat, &send_token);
-    printf("Security level flags: %c%c%c\n",
+    printf("GSSAPI: Security level flags: %c%c%c\n",
            server_conf_flags & GSSAPI_P_NONE      ? 'N' : '-',
            server_conf_flags & GSSAPI_P_INTEGRITY ? 'I' : '-',
            server_conf_flags & GSSAPI_P_PRIVACY   ? 'P' : '-');
-    printf("Maximum GSS token size is %ld\n", buf_size);
+    printf("GSSAPI: Maximum GSS token size is %lu\n", buf_size);
     
     /* Set P_NONE and accept the buf_size. */
     buf[0] = GSSAPI_P_NONE;

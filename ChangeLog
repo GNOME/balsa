@@ -7,6 +7,7 @@
 	* libbalsa/imap/imap-handle.[hc]: recognize SASL-IR extension.
 	* libbalsa/imap/libimap.h: add missing include.
 	* libbalsa/imap/util.c (lit_conv_to_base64): fix char indexing.
+	* libbalsa/imap/auth-gssapi.c: GSSAPI authentication.
 
 2004-07-07 23:16  PeterB
 
@@ -22,7 +23,7 @@
 
 2004-07-07  Pawel Salek
 
-	* libbalsa/send.c: fix sendmail build.
+	* libbalsa/send.c: fix sendmail build (143322).
 	* libbalsa/address-book-{vcard,ldif}.c: correct error checking.
 
 2004-07-06  Pawel Salek

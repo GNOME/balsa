@@ -1,3 +1,14 @@
+2003-09-19  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address-entry.[hc]: add libbalsa_address_entry_get_list().
+	* libbalsa/address.[hc]: format RFC822 groups correctly.
+	* libbalsa/message.c: factor out common code (not used any more).
+	* libbalsa/misc.c (libbalsa_make_string_from_list_p): get whole
+	address.
+	* libbalsa/send.c: factor out common code.
+	* libbalsa/expand-alias.c : store pointer to LibBalsaAddress.
+	* src/sendmsg-window.c: use libbalsa_address_entry_get_list()
+
 2003-09-19 07:16  PeterB
 
 	* src/main-window.c: Desensitize `Mailbox -> Remove Duplicates'

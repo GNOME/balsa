@@ -3308,14 +3308,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     strip_chars(tmp, "\r\n");
     LIBBALSA_MESSAGE_SET_SUBJECT(message, tmp);
 
-    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
-    message->headers->to_list = libbalsa_address_new_list_from_string(ctmp);
+    message->headers->to_list =
+        libbalsa_address_entry_get_list(LIBBALSA_ADDRESS_ENTRY(bsmsg->to[1]));
 
-    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->cc[1]));
-    message->headers->cc_list = libbalsa_address_new_list_from_string(ctmp);
+    message->headers->cc_list =
+        libbalsa_address_entry_get_list(LIBBALSA_ADDRESS_ENTRY(bsmsg->cc[1]));
+    
+    message->headers->bcc_list =
+        libbalsa_address_entry_get_list(LIBBALSA_ADDRESS_ENTRY(bsmsg->bcc[1]));
 
-    ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->bcc[1]));
-    message->headers->bcc_list = libbalsa_address_new_list_from_string(ctmp);
 
     /* get the fcc-box from the option menu widget */
     bsmsg->fcc_url =

@@ -602,7 +602,7 @@ rfc2822_mailbox(const gchar *full_name, gchar *address)
 }
 
 
-#if 0
+#if 1
 static gchar*
 rfc2822_group(const gchar *full_name, GList *addr_list)
 {
@@ -635,6 +635,7 @@ rfc2822_group(const gchar *full_name, GList *addr_list)
 }
 #endif
 
+#if 0
 static gchar*
 rfc2822_list(GList *list)
 {
@@ -655,6 +656,7 @@ rfc2822_list(GList *list)
 
     return retc;
 }
+#endif
 
 /* private version */
 gchar *
@@ -669,15 +671,21 @@ libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
     /* FIXME: for n==-1, we should be returning nice rfc822_group but
      * the entry widgets have not proper support for group string format
      * so we drop this idea for a while. */
-    if(n==-1)
-	retc = rfc2822_list(address->address_list);
-    else {
+    if(!address->address_list)
+        return NULL;
+    if(n==-1) {
+        if(address->address_list->next)
+            retc = rfc2822_group(address->full_name, address->address_list);
+        else
+            retc = rfc2822_mailbox(address->full_name,
+                                   address->address_list->data);
+    } else {
 	GList *nth_address = g_list_nth(address->address_list, n);
 	g_return_val_if_fail(nth_address != NULL, NULL);
 
 	retc = rfc2822_mailbox(address->full_name, nth_address->data);
     }
-    
+
     return retc;
 }
 
@@ -730,7 +738,7 @@ libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
     nth_address = g_list_nth(address->address_list, n);
-    g_return_val_if_fail(nth_address != NULL, NULL);
+    if(nth_address == NULL) return NULL;
     return (const gchar*)nth_address->data;
 }
 

@@ -57,6 +57,7 @@
 typedef struct {
     gchar *user;
     gchar *match;
+    LibBalsaAddress *address;
     unsigned cursor; /* position in terms of bytes, not UTF-8 characters */
     gint tabs;
 } emailData;
@@ -104,4 +105,5 @@ void libbalsa_address_entry_clear_to_send(LibBalsaAddressEntry *
 gboolean libbalsa_address_entry_matching(LibBalsaAddressEntry *
                                          address_entry);
 
+GList *libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry);
 #endif

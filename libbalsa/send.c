@@ -480,6 +480,32 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
     return ptr;
 }
 
+static void
+add_recipients(smtp_message_t message, smtp_message_t bcc_message, 
+               GList *recipient_list, const char *header)
+{
+    for(;recipient_list; recipient_list = recipient_list->next) {
+        LibBalsaAddress *addy = recipient_list->data;
+        const gchar *mailbox;
+        int i;
+#ifdef LIBESMTP_ADDS_HEADERS
+        const gchar *phrase = libbalsa_address_get_phrase(addy);
+#endif
+
+        for(i=0; (mailbox = libbalsa_address_get_mailbox(addy, i)); i++) {
+            smtp_add_recipient (message, mailbox);
+            /* XXX  - this is where to add DSN requests.  It would be
+               cool if LibBalsaAddress could contain DSN options
+               for a particular recipient. */
+#ifdef LIBESMTP_ADDS_HEADERS
+            smtp_set_header (message, "To", phrase, mailbox);
+            if (bcc_message)
+                smtp_set_header (bcc_message, "To", phrase, mailbox);
+#endif
+        }
+    }
+}
+
 /* libbalsa_process_queue:
    treats given mailbox as a set of messages to send. Loads them up and
    launches sending thread/routine.
@@ -497,10 +523,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
     SendMessageInfo *send_message_info;
     GList *lista, *recip, *bcc_recip;
     LibBalsaMessage *msg;
-    LibBalsaAddress *addy; 
     smtp_session_t session;
     smtp_message_t message, bcc_message;
-    smtp_recipient_t recipient;
     const gchar *phrase, *mailbox, *subject;
     long estimate;
 
@@ -674,49 +698,13 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	       copy of the message gets the To and Cc recipient list.
 	       The bcc copy gets the Bcc recipients.  */
 
-	    recip = g_list_first((GList *) msg->headers->to_list);
-	    while (recip) {
-        	addy = recip->data;
-		phrase = libbalsa_address_get_phrase(addy);
-		mailbox = libbalsa_address_get_mailbox(addy, 0);
-		recipient = smtp_add_recipient (message, mailbox);
-		/* XXX  - this is where to add DSN requests.  It would be
-			  cool if LibBalsaAddress could contain DSN options
-			  for a particular recipient. */
-#ifdef LIBESMTP_ADDS_HEADERS
-		smtp_set_header (message, "To", phrase, mailbox);
-		if (bcc_message)
-		    smtp_set_header (bcc_message, "To", phrase, mailbox);
-#endif
-	    	recip = recip->next;
-	    }
+	    recip = g_list_first(msg->headers->to_list);
+            add_recipients(message, bcc_message, recip, "To");
+	    recip = g_list_first(msg->headers->cc_list);
+            add_recipients(message, bcc_message, recip, "Cc");
 
-	    recip = g_list_first((GList *) msg->headers->cc_list);
-	    while (recip) {
-        	addy = recip->data;
-		phrase = libbalsa_address_get_phrase(addy);
-		mailbox = libbalsa_address_get_mailbox(addy, 0);
-		recipient = smtp_add_recipient (message, mailbox);
-		/* XXX  -  DSN */
-#ifdef LIBESMTP_ADDS_HEADERS
-		smtp_set_header (message, "Cc", phrase, mailbox);
-		if (bcc_message)
-		    smtp_set_header (bcc_message, "Cc", phrase, mailbox);
-#endif
-	    	recip = recip->next;
-	    }
+            add_recipients(bcc_message, NULL, bcc_recip, "Cc");
 
-	    while (bcc_recip) {
-        	addy = bcc_recip->data;
-		phrase = libbalsa_address_get_phrase(addy);
-		mailbox = libbalsa_address_get_mailbox(addy, 0);
-		recipient = smtp_add_recipient (bcc_message, mailbox);
-		/* XXX  -  DSN */
-#ifdef LIBESMTP_ADDS_HEADERS
-		smtp_set_header (message, "Bcc", phrase, mailbox);
-#endif
-	    	bcc_recip = bcc_recip->next;
-	    }
 
 	    /* Estimate the size of the message.  This need not be exact
 	       but it's better to err on the large side since some message

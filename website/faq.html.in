@@ -55,7 +55,7 @@ they will not appear in the mailbox list.
 
 <p><br>5.&nbsp; Does it have an address book?
 <br>&nbsp;<blockquote>
-Balsa will use your GnomeCard address book,&nbsp; if you have one,&nsbp;
+Balsa will use your GnomeCard address book,&nbsp; if you have one,&nbsp;
 to read contacts.&nbsp; This may not work if your GnomeCard is too old or too
 new.&nbsp; Hopefully a more robust implementation will come soon,&nbsp; but Balsa
 will never implement its own address book.
@@ -84,20 +84,21 @@ the keyboard.
 
 <p><br>9.&nbsp; What's with the bug list?
 <br>&nbsp;<blockquote>
-The buglist currently is misconfigured,&nsbp; so the authors will not recieve
+The buglist currently is misconfigured,&nbsp; so the authors will not recieve
 bug reports.&nbsp; Please send reports to <a href="mailto:balsa-list@gnome.org">the
 Balsa mailing list</a>.
 </blockquote>
 
 </td>
 </tr>
-</table>
 
 <br>
 
 <p align="center">Thanks to <a href="mailto:jsight@pair.com">Jesse D. Sightler</a> for putting 
 this page together.&nbsp; If you find this page out of date or something is missing, email
-<a href="mailto:balsa-list@gnome.org>the Balsa mailing list</a>.</p>
+<a href="mailto:balsa-list@gnome.org">the Balsa mailing list</a>.</p>
+
+</table>
 
 </body>
 </html>

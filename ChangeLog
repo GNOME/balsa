@@ -1,6 +1,6 @@
 2003-02-23  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* src/main-window.c: fix deadlock on filtering.
+	* src/balsa-app.c: fix deadlock on filtering.
 	* libbalsa/filter.c: applying filters in presence of deleted messages
 	fixed (Emmanuel).
 

@@ -760,15 +760,10 @@ balsa_find_mailbox_by_url(const gchar * url)
     GNode *gnode;
     LibBalsaMailbox *mailbox;
 
-    /* drop the gdk lock, to avoid threadlock (another thread may be
-     * holding the mailbox_nodes lock, and have a pending request for
-     * the gdk lock) */
-    gdk_threads_leave();
     balsa_mailbox_nodes_lock(FALSE);
     gnode = balsa_find_url(balsa_app.mailbox_nodes, url);
     mailbox = gnode ? ((BalsaMailboxNode *) gnode->data)->mailbox : NULL;
     balsa_mailbox_nodes_unlock(FALSE);
-    gdk_threads_enter();
 
     return mailbox;
 }

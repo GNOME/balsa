@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa VERSION\n"
-"POT-Creation-Date: 2000-05-23 13:20+0200\n"
+"POT-Creation-Date: 2000-06-01 20:26-0400\n"
 "PO-Revision-Date: 2000-05-24 10:15+0100\n"
 "Last-Translator: Sebi <jaques@freemail.hu>, Gab <h9gab@freemail.hu>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -27,24 +27,47 @@ msgstr "Postafiók: nyitás %s refcount: %d\n"
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postafiók: zárás %s refcount: %d\n"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#.
+#. ISPRIME(9)
+#.
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Inbox:"
+msgstr "Érkezett:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Outbox:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Sentbox:"
+msgstr "Elküldött:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Draftbox:"
+msgstr "Piszkozat:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Trash:"
+msgstr "Kuka:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:77
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:76
+#: libinit_balsa/balsa-druid-page-directory.gob:95
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "Hiba történt a \"%s\" fájl létrehozása közben."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:84
+#: libinit_balsa/balsa-druid-page-directory.gob:103
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "A \"%s\" postafiók nem érvényes."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:146
+#: libinit_balsa/balsa-druid-page-directory.gob:158
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -52,39 +75,15 @@ msgstr ""
 "Ellenõrizd a levelezõ fájlok helyét.\n"
 "Ezek szükség esetén kialakításra kerülnek."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:163
-msgid "Inbox:"
-msgstr "Érkezett:"
-
-#. This used to set all the mail directories to their proper values
-#. * as in the prepare code. But at this point balsa_app.local_mail_directory
-#. * is NULL, so we use a dummy value.
-#.
-#: libinit_balsa/balsa-druid-page-directory.gob:172
-msgid "Outbox:"
-msgstr ""
-
-#: libinit_balsa/balsa-druid-page-directory.gob:175
-msgid "Sentbox:"
-msgstr "Elküldött:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:178
-msgid "Draftbox:"
-msgstr "Piszkozat:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:181
-msgid "Trash:"
-msgstr "Kuka:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:192
+#: libinit_balsa/balsa-druid-page-directory.gob:209
 msgid "Mail Files"
 msgstr "Levelzõ fajlok"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:265
+#: libinit_balsa/balsa-druid-page-directory.gob:282
 msgid "Problem Creating Mailboxes"
 msgstr "Hiba a postafiók kialakításánál"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:44
+#: libinit_balsa/balsa-druid-page-finish.gob:45
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -92,36 +91,36 @@ msgstr ""
 "Sikeresen telepítetted a Balsat. Jó szórakozást!\n"
 "   -- The Balsa development team"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:56
+#: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
 msgstr "Elkészült!"
 
-#: libinit_balsa/balsa-druid-page-user.gob:74
+#: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
 msgstr "Kérlek add meg a személyes adataidat."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
-#: src/address-book.c:451
+#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
+#: src/address-book.c:450
 msgid "Name:"
 msgstr "Név:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:86
+#: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
 msgstr "Email cím:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:90
+#: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
 msgstr "SMTP Szerver:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:93
+#: libinit_balsa/balsa-druid-page-user.gob:94
 msgid "Local Mail Directory:"
 msgstr "Helyi postafiók könyvtára:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:103
+#: libinit_balsa/balsa-druid-page-user.gob:104
 msgid "User Settings"
 msgstr "Felhasználó beállításai"
 
-#: libinit_balsa/balsa-druid-page-user.gob:151
+#: libinit_balsa/balsa-druid-page-user.gob:152
 msgid "Local Mail Problem"
 msgstr "Hiba a helyi postafióknál"
 
@@ -143,28 +142,33 @@ msgstr ""
 "kérdések  segítségével beállíthatod a Balsa-t.\n"
 "Ezeket a késõbbiekben a Balsa beállításainál változtathatod meg.\n"
 "Ha szükség van új fajlra vagy könyvtárra, akkor azt a Balsa automatikusan\n"
-"létrehozza. Ha fel akarod venni a kapcsolatot a szerzõkkel , vagy hibat találtál\n"
-"akkor nézd meg a Balsa névjegyét." 
-  
+"létrehozza. Ha fel akarod venni a kapcsolatot a szerzõkkel , vagy hibat "
+"találtál\n"
+"akkor nézd meg a Balsa névjegyét."
+
 #: libinit_balsa/balsa-initdruid.gob:91
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
 "Így kilépsz a Balsa-ból.\n"
-"Valóban akarod?" 
+"Valóban akarod?"
 
 #: libinit_balsa/helper.c:142
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr "A \"%s\" elérési útat a rendszerfájl gyökerének megfelelõen kell megadni (/ -el kezdõdik)."
+msgstr ""
+"A \"%s\" elérési útat a rendszerfájl gyökerének megfelelõen kell megadni (/ "
+"-el kezdõdik)."
 
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Nem tudtam a könyvtárat létrehozni, mert az mkdir()-nél hibás volt az elérési út \"%s\"."
+msgstr ""
+"Nem tudtam a könyvtárat létrehozni, mert az mkdir()-nél hibás volt az "
+"elérési út \"%s\"."
 
-#: libinit_balsa/helper.c:159 libinit_balsa/helperc:176
+#: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "A fájl az elérési útban \"%s\" nem könyvtár."
@@ -181,47 +185,48 @@ msgstr "Cím hozzáadása"
 msgid "E-Mail Address:"
 msgstr "E-Mail cím:"
 
-#: src/address-book.c:291
+#: src/address-book.c:291 src/balsa-index-page.c:1046
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
 " - %s\n"
-msgstr ""
-"Nem tudom olvasáshoz megnyitni a ~/.gnome/GnomeCard.gcrd -ot.\n"
+msgstr "Nem tudom olvasáshoz megnyitni a ~/.gnome/GnomeCard.gcrd -ot.\n"
 
-#: src/address-book.c:294 src/sendmsg-windowc:393
+#: src/address-book.c:294 src/balsa-index-page.c:1028
+#: src/balsa-index-page.c:1049 src/balsa-index-page.c:1085
+#: src/sendmsg-window.c:393
 msgid "OK"
 msgstr "OK"
 
-#: src/address-book.c:313
+#: src/address-book.c:312
 msgid "No-Id"
 msgstr "Nincs Id"
 
-#: src/address-book.c:321
+#: src/address-book.c:320
 msgid "No-Name"
 msgstr "Nincs név"
 
-#: src/address-book.c:416 src/filter-edit-dialog.c:135
+#: src/address-book.c:415 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Név"
 
-#: src/address-book.c:416
+#: src/address-book.c:415
 msgid "E-Mail Address"
 msgstr "E-Mail cím"
 
-#: src/address-book.c:423 src/address-book.c:461 src/main-window.c:173
+#: src/address-book.c:422 src/address-book.c:460 src/main-window.c:173
 msgid "Address Book"
 msgstr "Címtár"
 
-#: src/address-book.c:493
+#: src/address-book.c:492
 msgid "Send-To"
 msgstr "Küld"
 
-#: src/address-book.c:507
+#: src/address-book.c:506
 msgid "Run GnomeCard"
 msgstr "Futtasd a GnomeCard-ot"
 
-#: src/address-book.c:513
+#: src/address-book.c:512
 msgid "Re-Import"
 msgstr "Ismét importál"
 
@@ -250,51 +255,87 @@ msgstr "Piszkozat"
 msgid "Trash"
 msgstr "Kuka"
 
-#: src/balsa-index-page.c:289
+#: src/balsa-index-page.c:290
 msgid "Mailbox password:"
 msgstr "Postafiók jelszava:"
 
 #. password field
-#: src/balsa-index-page.c:297 src/mailbox-conf.c:990 src/mailbox-conf.c:1089
+#: src/balsa-index-page.c:298 src/mailbox-conf.c:992 src/mailbox-conf.c:1091
 msgid "Password:"
 msgstr "Jelszó:"
 
-#: src/balsa-index-page.c:323
+#: src/balsa-index-page.c:324
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
 "Nem tudom megnyitnia postafiókot!\n"
-"Kérlek ellenõrizd a postafiók beállításait." 
+"Kérlek ellenõrizd a postafiók beállításait."
 
-#: src/balsa-index-page.c:586 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:590 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Új"
 
-#: src/balsa-index-page.c:594 src/main-windowc:373
+#: src/balsa-index-page.c:598 src/main-window.c:373
 msgid "Reply"
 msgstr "Válasz"
 
-#: src/balsa-index-page.c:602 src/main-window.c:376
+#: src/balsa-index-page.c:606 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Válasz mindenkinek"
 
-#: src/balsa-index-page.c:610 src/main-window.c:379
+#: src/balsa-index-page.c:614 src/main-window.c:379
 msgid "Forward"
 msgstr "Tovább"
 
-#: src/balsa-index-page.c:618 src/filter-edit-dialog.c:228
+#: src/balsa-index-page.c:622 src/filter-edit-dialog.c:228
 #: src/main-window.c:366 src/pref-manager.c:886
 msgid "Delete"
 msgstr "Töröl"
 
-#: src/balsa-index-page.c:626
+#: src/balsa-index-page.c:630
 msgid "Undelete"
 msgstr "Törlés visszavonása"
 
-#: src/balsa-index-page.c:634
+#: src/balsa-index-page.c:638
+#, fuzzy
+msgid "Store Address"
+msgstr "Cím hozzáadása"
+
+#: src/balsa-index-page.c:646
 msgid "Transfer"
 msgstr "Áthelyez"
+
+#: src/balsa-index-page.c:1026
+msgid "You may only store one address at a time.\n"
+msgstr ""
+
+#: src/balsa-index-page.c:1082
+#, c-format
+msgid ""
+"There is already an address book entry for %s.\n"
+"Run GnomeCard if you would like to edit your address book entries.\n"
+msgstr ""
+
+#: src/balsa-index-page.c:1100
+msgid ""
+"\n"
+"BEGIN:VCARD\n"
+msgstr ""
+
+#: src/balsa-index-page.c:1101
+#, c-format
+msgid "FN:%s\n"
+msgstr ""
+
+#: src/balsa-index-page.c:1102
+#, c-format
+msgid "EMAIL;INTERNET:%s\n"
+msgstr ""
+
+#: src/balsa-index-page.c:1103
+msgid "END:VCARD\n"
+msgstr ""
 
 #: src/balsa-index.c:252
 msgid "From"
@@ -308,7 +349,7 @@ msgstr "Tárgy"
 msgid "Date"
 msgstr "Dátum"
 
-#: src/balsa-mblist.c:221 src/mailbox-conf.c:1184
+#: src/balsa-mblist.c:221 src/mailbox-conf.c:1186
 msgid "Mailbox"
 msgstr "Postafiók"
 
@@ -347,7 +388,7 @@ msgstr "Kérem válasszon fájlnevet az üzenet ezen részének elmentéséhez:"
 msgid "Save Text"
 msgstr "Szöveg mentése"
 
-#: src/balsa-message.c:301 src/balsa-message.c:316
+#: src/balsa-message.c:301 src/balsa-message.c:315
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr "%s nyitásakor \"%s\" hibát találtam"
@@ -356,56 +397,74 @@ msgstr "%s nyitásakor \"%s\" hibát találtam"
 msgid "Ok"
 msgstr "Ok"
 
-#: src/balsa-message.c:643
+#: src/balsa-message.c:644
 msgid "Date:"
 msgstr "Dátum:"
 
 #. From:
-#: src/balsa-message.c:647 src/filter-edit-dialog.c:337
+#: src/balsa-message.c:648 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:591
 msgid "From:"
 msgstr "Feladó:"
 
 # To:
-#: src/balsa-message.c:651 src/filter-edit-dialog.c:325
+#. To:
+#: src/balsa-message.c:652 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:593
 msgid "To:"
 msgstr "Címzett:"
 
-#: src/balsa-message.c:652
+#: src/balsa-message.c:653
 msgid "Cc:"
 msgstr "Másolatot kap"
 
-#: src/balsa-message.c:653
+#: src/balsa-message.c:654
 msgid "Bcc:"
 msgstr "Titkos másolatot kap"
 
-#: src/balsa-message.c:656
+#: src/balsa-message.c:657
 msgid "Fcc:"
 msgstr ""
 
 #. Subject:
-#: src/balsa-message.c:657 src/sendmsg-window.c:599
+#: src/balsa-message.c:658 src/sendmsg-window.c:599
 msgid "Subject:"
 msgstr "Tárgy"
 
-#: src/balsa-message.c:766
+#: src/balsa-message.c:734
+#, c-format
+msgid "other part: error writing to temporary file %s: %s"
+msgstr ""
+
+#: src/balsa-message.c:788
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr ""
-"<tr><td bgcolor=\"#f0f0f0\"> ilyen t&iacute;pusu k&oacute;dolt f&aacute;jlt kapt&aacute;l"
-"application/"
+"<tr><td bgcolor=\"#f0f0f0\"> ilyen t&iacute;pusu k&oacute;dolt f&aacute;jlt "
+"kapt&aacute;lapplication/"
 
-#: src/balsa-message.c:770
+#: src/balsa-message.c:792
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>az &uuml;zenet param&eacute;terei:<BR>"
 
-#: src/balsa-message.c:771
+#: src/balsa-message.c:793
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
-msgstr "<table border=0><tr><th>Tulajdons&aacute;g</th><th>&Egrave;rt&egrave;k</th></tr>\n"
+msgstr ""
+"<table "
+"border=0><tr><th>Tulajdons&aacute;g</th><th>&Egrave;rt&egrave;k</th></tr>\n"
 
-#: src/balsa-message.c:1179
+#: src/balsa-message.c:827
+#, c-format
+msgid "image: error writing to temporary file: %s"
+msgstr ""
+
+#: src/balsa-message.c:1068
+#, c-format
+msgid "text part: error writing to temporary file %s: %s"
+msgstr ""
+
+#: src/balsa-message.c:1214
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "%s megnyitása sikertelen volt. Errno = %d, "
@@ -502,7 +561,7 @@ msgstr ""
 msgid "Match string:"
 msgstr ""
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:282 src/mailbox-conf.c:1149
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:282 src/mailbox-conf.c:1151
 #: src/pref-manager.c:873
 msgid "Add"
 msgstr ""
@@ -615,7 +674,7 @@ msgstr ""
 msgid "Mailbox Configurator"
 msgstr ""
 
-#: src/mailbox-conf.c:292 src/mailbox-conf.c:1143
+#: src/mailbox-conf.c:292 src/mailbox-conf.c:1145
 msgid "Update"
 msgstr ""
 
@@ -669,60 +728,60 @@ msgid "Cannot create mailbox '%s': %s\n"
 msgstr ""
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:733
+#: src/mailbox-conf.c:735
 msgid " on "
 msgstr ""
 
-#: src/mailbox-conf.c:846
+#: src/mailbox-conf.c:848
 msgid "New mailbox type:"
 msgstr ""
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:852
+#: src/mailbox-conf.c:854
 msgid "Local mailbox"
 msgstr ""
 
-#: src/mailbox-conf.c:860
+#: src/mailbox-conf.c:862
 msgid "IMAP server"
 msgstr ""
 
 #. mailbox name
-#: src/mailbox-conf.c:883 src/mailbox-conf.c:918 src/mailbox-conf.c:1035
+#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
 msgid "Mailbox Name:"
 msgstr ""
 
 #. path to file
-#: src/mailbox-conf.c:893
+#: src/mailbox-conf.c:895
 msgid "Mailbox path:"
 msgstr ""
 
 #. pop server
-#: src/mailbox-conf.c:935 src/mailbox-conf.c:1045
+#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
 msgid "Server:"
 msgstr ""
 
 #. pop port
-#: src/mailbox-conf.c:954 src/mailbox-conf.c:1059
+#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
 msgid "Port:"
 msgstr ""
 
 #. username
-#: src/mailbox-conf.c:973 src/mailbox-conf.c:1074
+#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
 msgid "Username:"
 msgstr ""
 
 #. toggle for check
-#: src/mailbox-conf.c:1005 src/main-window.c:362
+#: src/mailbox-conf.c:1007 src/main-window.c:362
 msgid "Check"
 msgstr ""
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1013
+#: src/mailbox-conf.c:1015
 msgid "Delete from server"
 msgstr ""
 
-#: src/mailbox-conf.c:1102
+#: src/mailbox-conf.c:1104
 msgid "Folder path:"
 msgstr ""
 
@@ -962,28 +1021,28 @@ msgstr ""
 #: src/main-window.c:890
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://wwwbalsa.net/\n"
+"Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
 
-#: src/main.c:108
+#: src/main.c:78
 msgid "Get new mail on startup"
 msgstr ""
 
-#: src/main.c:110
+#: src/main.c:80
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr ""
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "Opens MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:113
+#: src/main.c:83
 msgid "Opens first unread mailbox"
 msgstr ""
 
@@ -1256,7 +1315,7 @@ msgstr ""
 msgid "Display progress dialog"
 msgstr ""
 
-#: src/pref-managerc:1181
+#: src/pref-manager.c:1181
 msgid "Display Formats"
 msgstr ""
 
@@ -1304,7 +1363,7 @@ msgstr ""
 msgid "Browse..."
 msgstr ""
 
-#: src/pref-managerc:1434
+#: src/pref-manager.c:1434
 msgid "Preview pane"
 msgstr ""
 
@@ -1377,7 +1436,7 @@ msgid "_Include File..."
 msgstr ""
 
 #: src/sendmsg-window.c:140
-msgid "_Attach file.."
+msgid "_Attach file..."
 msgstr ""
 
 #: src/sendmsg-window.c:145
@@ -1468,7 +1527,7 @@ msgstr ""
 msgid "_South European (ISO-8859-3)"
 msgstr ""
 
-#: src/sendmsg-windowc:224
+#: src/sendmsg-window.c:224
 msgid "_Baltic (ISO-8859-13)"
 msgstr ""
 
@@ -1517,7 +1576,7 @@ msgid "Attach file"
 msgstr ""
 
 #. cc:
-#: src/sendmsg-windowc:602
+#: src/sendmsg-window.c:602
 msgid "cc:"
 msgstr ""
 
@@ -1537,7 +1596,7 @@ msgid "Reply To:"
 msgstr ""
 
 #. Attachment list
-#: src/sendmsg-windowc:641
+#: src/sendmsg-window.c:641
 msgid "Attachments:"
 msgstr ""
 

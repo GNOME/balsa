@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
-"POT-Creation-Date: 2000-05-31 12:12+0300\n"
+"POT-Creation-Date: 2000-06-01 20:26-0400\n"
 "PO-Revision-Date: 1999-12-27 11:14+0200\n"
 "Last-Translator: Yuri Syrota <rasta@renome.rovno.ua>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -27,7 +27,30 @@ msgstr "Скринька: В╕дкриття %s Посилань: %d\n"
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Скринька: Закриття %s Посилань: %d\n"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#.
+#. ISPRIME(9)
+#.
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Inbox:"
+msgstr "Вх╕дн╕:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Outbox:"
+msgstr "Вих╕дн╕:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Sentbox:"
+msgstr "В╕д╕слан╕:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Draftbox:"
+msgstr "Чорновики:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Trash:"
+msgstr "См╕тник:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:77
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -36,17 +59,17 @@ msgstr ""
 "Шлях \"%s\" необх╕дно вказати в канон╕чн╕й форм╕ --в╕н мусить посинатися з "
 "\"/\"."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:76
+#: libinit_balsa/balsa-druid-page-directory.gob:95
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "Помилка на спроб╕ створення файлу \"%s\"."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:84
+#: libinit_balsa/balsa-druid-page-directory.gob:103
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Поштова скринька \"%s\" -- нев╕рна."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:146
+#: libinit_balsa/balsa-druid-page-directory.gob:158
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -54,39 +77,15 @@ msgstr ""
 "Перев╕рте розм╕щення ваших типових поштових файл╕в.\n"
 "Вони будуть створен╕ при необх╕дност╕."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:163
-msgid "Inbox:"
-msgstr "Вх╕дн╕:"
-
-#. This used to set all the mail directories to their proper values
-#. * as in the prepare code. But at this point balsa_app.local_mail_directory
-#. * is NULL, so we use a dummy value.
-#.
-#: libinit_balsa/balsa-druid-page-directory.gob:172
-msgid "Outbox:"
-msgstr "Вих╕дн╕:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:175
-msgid "Sentbox:"
-msgstr "В╕д╕слан╕:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:178
-msgid "Draftbox:"
-msgstr "Чорновики:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:181
-msgid "Trash:"
-msgstr "См╕тник:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:192
+#: libinit_balsa/balsa-druid-page-directory.gob:209
 msgid "Mail Files"
 msgstr "Поштов╕ файли"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:265
+#: libinit_balsa/balsa-druid-page-directory.gob:282
 msgid "Problem Creating Mailboxes"
 msgstr "Проблема створення поштових скриньок"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:44
+#: libinit_balsa/balsa-druid-page-finish.gob:45
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -94,36 +93,36 @@ msgstr ""
 "Ви усп╕шно наладнали Balsa. Щасливо!\n"
 "   -- Команда розробник╕в Balsa"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:56
+#: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
 msgstr "Завершено!"
 
-#: libinit_balsa/balsa-druid-page-user.gob:74
+#: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
 msgstr "Будь ласка, введ╕ть ╕нформац╕ю про себе."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
-#: src/address-book.c:451
+#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
+#: src/address-book.c:450
 msgid "Name:"
 msgstr "╤м'я:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:86
+#: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
 msgstr "Адреса ел.пошти:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:90
+#: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
 msgstr "Сервер SMTP:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:93
+#: libinit_balsa/balsa-druid-page-user.gob:94
 msgid "Local Mail Directory:"
 msgstr "Локальний поштовий каталог:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:103
+#: libinit_balsa/balsa-druid-page-user.gob:104
 msgid "User Settings"
 msgstr "Установки користувача"
 
-#: libinit_balsa/balsa-druid-page-user.gob:151
+#: libinit_balsa/balsa-druid-page-user.gob:152
 msgid "Local Mail Problem"
 msgstr "Проблема з локальною поштою"
 
@@ -182,7 +181,7 @@ msgstr "Додати нову адресу"
 msgid "E-Mail Address:"
 msgstr "Адреса е-пошти:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1043
+#: src/address-book.c:291 src/balsa-index-page.c:1046
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -191,41 +190,41 @@ msgstr ""
 "Не вдалося в╕дкрити ~/.gnome/GnomeCard.gcrd для зчитування.\n"
 " - %s\n"
 
-#: src/address-book.c:294 src/balsa-index-page.c:1025
-#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1082
+#: src/address-book.c:294 src/balsa-index-page.c:1028
+#: src/balsa-index-page.c:1049 src/balsa-index-page.c:1085
 #: src/sendmsg-window.c:393
 msgid "OK"
 msgstr "Гаразд"
 
-#: src/address-book.c:313
+#: src/address-book.c:312
 msgid "No-Id"
 msgstr "Без-╕дентиф╕катора"
 
-#: src/address-book.c:321
+#: src/address-book.c:320
 msgid "No-Name"
 msgstr "Без назви"
 
-#: src/address-book.c:416 src/filter-edit-dialog.c:135
+#: src/address-book.c:415 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Назва"
 
-#: src/address-book.c:416
+#: src/address-book.c:415
 msgid "E-Mail Address"
 msgstr "Адреса е-пошти:"
 
-#: src/address-book.c:423 src/address-book.c:461 src/main-window.c:173
+#: src/address-book.c:422 src/address-book.c:460 src/main-window.c:173
 msgid "Address Book"
 msgstr "Адресна книга"
 
-#: src/address-book.c:493
+#: src/address-book.c:492
 msgid "Send-To"
 msgstr "В╕д╕слати до"
 
-#: src/address-book.c:507
+#: src/address-book.c:506
 msgid "Run GnomeCard"
 msgstr "Запустити GnomeCard"
 
-#: src/address-book.c:513
+#: src/address-book.c:512
 msgid "Re-Import"
 msgstr "Пере╕мпортувати"
 
@@ -271,44 +270,44 @@ msgstr ""
 "Не вдалося в╕дкрити поштову скриню!\n"
 "Перев╕рте установки поштово╖ скрин╕."
 
-#: src/balsa-index-page.c:587 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:590 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Новий"
 
-#: src/balsa-index-page.c:595 src/main-window.c:373
+#: src/balsa-index-page.c:598 src/main-window.c:373
 msgid "Reply"
 msgstr "В╕дпов╕сти"
 
-#: src/balsa-index-page.c:603 src/main-window.c:376
+#: src/balsa-index-page.c:606 src/main-window.c:376
 msgid "Reply to all"
 msgstr "В╕дпов╕сти ус╕м"
 
-#: src/balsa-index-page.c:611 src/main-window.c:379
+#: src/balsa-index-page.c:614 src/main-window.c:379
 msgid "Forward"
 msgstr "Переслати"
 
-#: src/balsa-index-page.c:619 src/filter-edit-dialog.c:228
+#: src/balsa-index-page.c:622 src/filter-edit-dialog.c:228
 #: src/main-window.c:366 src/pref-manager.c:886
 msgid "Delete"
 msgstr "Видалити"
 
-#: src/balsa-index-page.c:627
+#: src/balsa-index-page.c:630
 msgid "Undelete"
 msgstr "В╕дновити"
 
-#: src/balsa-index-page.c:635
+#: src/balsa-index-page.c:638
 msgid "Store Address"
 msgstr "Зберегти адресу"
 
-#: src/balsa-index-page.c:643
+#: src/balsa-index-page.c:646
 msgid "Transfer"
 msgstr "Передача"
 
-#: src/balsa-index-page.c:1023
+#: src/balsa-index-page.c:1026
 msgid "You may only store one address at a time.\n"
 msgstr "Ви можете зберегти лише одну адресу за раз.\n"
 
-#: src/balsa-index-page.c:1079
+#: src/balsa-index-page.c:1082
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -317,7 +316,7 @@ msgstr ""
 "Для %s вже ╓ запис в адресн╕й книз╕.\n"
 "Запуст╕ть GnomeCard якщо хочете в╕дредагувати записи в адресн╕й книз╕.\n"
 
-#: src/balsa-index-page.c:1097
+#: src/balsa-index-page.c:1100
 msgid ""
 "\n"
 "BEGIN:VCARD\n"
@@ -325,17 +324,17 @@ msgstr ""
 "\n"
 "BEGIN:VCARD\n"
 
-#: src/balsa-index-page.c:1098
+#: src/balsa-index-page.c:1101
 #, c-format
 msgid "FN:%s\n"
 msgstr "FN:%s\n"
 
-#: src/balsa-index-page.c:1099
+#: src/balsa-index-page.c:1102
 #, c-format
 msgid "EMAIL;INTERNET:%s\n"
 msgstr "EMAIL;INTERNET:%s\n"
 
-#: src/balsa-index-page.c:1100
+#: src/balsa-index-page.c:1103
 msgid "END:VCARD\n"
 msgstr "END:VCARD\n"
 
@@ -390,7 +389,7 @@ msgstr "Введ╕ть назву фалу щоб зберегти цю частину пов╕домлення:"
 msgid "Save Text"
 msgstr "Зберегти текст"
 
-#: src/balsa-message.c:301 src/balsa-message.c:316
+#: src/balsa-message.c:301 src/balsa-message.c:315
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr " Не вдалося в╕дкрити %s:%s"
@@ -399,54 +398,69 @@ msgstr " Не вдалося в╕дкрити %s:%s"
 msgid "Ok"
 msgstr "Гаразд"
 
-#: src/balsa-message.c:643
+#: src/balsa-message.c:644
 msgid "Date:"
 msgstr "Дата:"
 
 #. From:
-#: src/balsa-message.c:647 src/filter-edit-dialog.c:337
+#: src/balsa-message.c:648 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:591
 msgid "From:"
 msgstr "В╕д:"
 
 #. To:
-#: src/balsa-message.c:651 src/filter-edit-dialog.c:325
+#: src/balsa-message.c:652 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:593
 msgid "To:"
 msgstr "До:"
 
-#: src/balsa-message.c:652
+#: src/balsa-message.c:653
 msgid "Cc:"
 msgstr "Cc:"
 
-#: src/balsa-message.c:653
+#: src/balsa-message.c:654
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:656
+#: src/balsa-message.c:657
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:657 src/sendmsg-window.c:599
+#: src/balsa-message.c:658 src/sendmsg-window.c:599
 msgid "Subject:"
 msgstr "Тема:"
 
-#: src/balsa-message.c:766
+#: src/balsa-message.c:734
+#, c-format
+msgid "other part: error writing to temporary file %s: %s"
+msgstr ""
+
+#: src/balsa-message.c:788
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
 msgstr "<tr><td bgcolor=\"#f0f0f0\"> Отримано закодований файл типу додаток/"
 
-#: src/balsa-message.c:770
+#: src/balsa-message.c:792
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Параметри цього пов╕домлення:<BR>"
 
-#: src/balsa-message.c:771
+#: src/balsa-message.c:793
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Атрибут</th><th>Value</th></tr>\n"
 
-#: src/balsa-message.c:1179
+#: src/balsa-message.c:827
+#, c-format
+msgid "image: error writing to temporary file: %s"
+msgstr ""
+
+#: src/balsa-message.c:1068
+#, c-format
+msgid "text part: error writing to temporary file %s: %s"
+msgstr ""
+
+#: src/balsa-message.c:1214
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Не вдалося в╕дкрити %s. Код помилки - %d, "
@@ -1018,23 +1032,23 @@ msgstr ""
 "\n"
 "В╕дсилайте пов╕домлення про помилки на: http://bugs.gnome.org/"
 
-#: src/main.c:108
+#: src/main.c:78
 msgid "Get new mail on startup"
 msgstr "Отримати нову кореспонденц╕ю на початку"
 
-#: src/main.c:110
+#: src/main.c:80
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "П╕дготувати нове пов╕домлення до ЕПОШТА@АДРЕСА"
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "Opens MAILBOXNAME"
 msgstr "В╕дкрива╓ НАЗВА_ПОШТОВО╥_СКРИНЬКИ"
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "MAILBOXNAME"
 msgstr "НАЗВА_ПОШТОВО╥_СКРИНЬКИ"
 
-#: src/main.c:113
+#: src/main.c:83
 msgid "Opens first unread mailbox"
 msgstr "В╕дкрити вибрану поштову скриньку"
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-06-01 21:56+0000\n"
+"POT-Creation-Date: 2000-06-01 20:26-0400\n"
 "PO-Revision-Date: 2000-06-01 21:58+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -27,7 +27,30 @@ msgstr ""
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#.
+#. ISPRIME(9)
+#.
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Inbox:"
+msgstr "Входящие:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Outbox:"
+msgstr "Исходящие:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Sentbox:"
+msgstr "Отправленные:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Draftbox:"
+msgstr "Черновики:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Trash:"
+msgstr "Мусорная корзина:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:77
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -35,17 +58,17 @@ msgid ""
 msgstr ""
 "Путь \"%s\" должен быть указан канонически -- он должен начинаться с '/'"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:76
+#: libinit_balsa/balsa-druid-page-directory.gob:95
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "При попытке создать файл \"%s\" возникла ошибка."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:84
+#: libinit_balsa/balsa-druid-page-directory.gob:103
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Вероятно почтовый ящик \"%s\" испорчен."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:146
+#: libinit_balsa/balsa-druid-page-directory.gob:158
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -53,39 +76,15 @@ msgstr ""
 "Пожалуйста подтвердите расположение ваших почтовых файлов.\n"
 "Они будут созданы если необходимо."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:163
-msgid "Inbox:"
-msgstr "Входящие:"
-
-#. This used to set all the mail directories to their proper values
-#. * as in the prepare code. But at this point balsa_app.local_mail_directory
-#. * is NULL, so we use a dummy value.
-#.
-#: libinit_balsa/balsa-druid-page-directory.gob:172
-msgid "Outbox:"
-msgstr "Исходящие:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:175
-msgid "Sentbox:"
-msgstr "Отправленные:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:178
-msgid "Draftbox:"
-msgstr "Черновики:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:181
-msgid "Trash:"
-msgstr "Мусорная корзина:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:192
+#: libinit_balsa/balsa-druid-page-directory.gob:209
 msgid "Mail Files"
 msgstr "Файлы с почтой"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:265
+#: libinit_balsa/balsa-druid-page-directory.gob:282
 msgid "Problem Creating Mailboxes"
 msgstr "Проблема при создании почтового ящика"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:44
+#: libinit_balsa/balsa-druid-page-finish.gob:45
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -93,36 +92,36 @@ msgstr ""
 "Вы успешно установили Balsa. Наслаждайтесь!\n"
 "  -- Команда разработки Balsa"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:56
+#: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
 msgstr "Все сделано!"
 
-#: libinit_balsa/balsa-druid-page-user.gob:74
+#: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
 msgstr "Пожалуйста введите информацию о себе."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
+#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
 #: src/address-book.c:450
 msgid "Name:"
 msgstr "Имя:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:86
+#: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
 msgstr "E-mail адрес:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:90
+#: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
 msgstr "SMTP сервер:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:93
+#: libinit_balsa/balsa-druid-page-user.gob:94
 msgid "Local Mail Directory:"
 msgstr "Каталог местной почты:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:103
+#: libinit_balsa/balsa-druid-page-user.gob:104
 msgid "User Settings"
 msgstr "Настройки пользователя"
 
-#: libinit_balsa/balsa-druid-page-user.gob:151
+#: libinit_balsa/balsa-druid-page-user.gob:152
 msgid "Local Mail Problem"
 msgstr "Локальная почтовая проблема"
 
@@ -1038,23 +1037,23 @@ msgstr ""
 "Сообщить об обнаруженных ошибках можно по адресу "
 "http://www.gnome.org/cgi-bin/bugs"
 
-#: src/main.c:108
+#: src/main.c:78
 msgid "Get new mail on startup"
 msgstr "Проверить почту при запуске"
 
-#: src/main.c:110
+#: src/main.c:80
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Cоставить новое письмо для EMAIL@ADRESS"
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "Opens MAILBOXNAME"
 msgstr "Открывается MAILBOXNAME"
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:113
+#: src/main.c:83
 msgid "Opens first unread mailbox"
 msgstr "Открыть первый почтовый ящик с непрочитанными письмами"
 

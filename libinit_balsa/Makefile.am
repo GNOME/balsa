@@ -2,8 +2,18 @@ CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
 
 noinst_LIBRARIES = libinit_balsa.a
 
+noinst_HEADERS = 				\
+	balsa-initdruid-private.h		\
+	balsa-druid-page-private.h		\
+	balsa-druid-page-error-private.h	\
+	balsa-druid-page-welcome-private.h	\
+	balsa-druid-page-user-private.h		\
+	balsa-druid-page-directory-private.h	\
+	balsa-druid-page-finish-private.h	
+
 libinit_balsa_a_SOURCES = 		\
 	$(BUILT_SOURCES)		\
+	$(noinst_HEADERS)		\
 	helper.c			\
 	helper.h			\
 	init_balsa.c			\
@@ -43,9 +53,10 @@ INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_srcdir)/src \
 	$(GNOME_INCLUDEDIR)
 
-dist-hook:
-	test -n "$(BUILT_SOURCES)" \
-		&& cp -f $(BUILT_SOURCES) $(distdir)
+# dist-hook:
+#	test -n "$(BUILT_SOURCES)" \
+#		&& cp -f $(BUILT_SOURCES) $(distdir)
 
 @MAINT@%.c %.h: %.gob
-@MAINT@	gob --no-private-header $<
+@MAINT@	(cd $(srcdir) && gob --no-private-header $<)
+

@@ -18,6 +18,7 @@ BuildRoot: /tmp/balsa-%{PACKAGE_VERSION}-root
 Packager: Michael Fulbright <msf@redhat.com>
 Requires: gtk+ >= 1.2.0
 Requires: gnome-libs >= 1.0.0
+Provides: balsa
 Docdir: %{prefix}/doc
 
 %description
@@ -66,16 +67,18 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/balsa
 /usr/share/gnome/apps/Internet/balsa.desktop
 %{prefix}/share/gnome/help/balsa/*
-%{prefix}/share/idl/balsa.idl
 /usr/share/locale/*
 /usr/share/pixmaps/*
 /usr/share/sounds/balsa/*
 %{prefix}/man/*
-%config /etc/CORBA/servers/balsa.gnorba
 %config /etc/sound/events/*
 
 
 %changelog
+* Thu Jun  1 2000 Peter Williams <oeter@newton.cx>
+
+- Don't try to install IDL stuff as we have deleted it :-)
+
 * Thu Dec 30 1999 Bruno Pires Marinho <bapm@camoes.rnl.ist.utl.pt>
 
 - Improved the spec file by adding a sysconfdir=/etc, removing the man

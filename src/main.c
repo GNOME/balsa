@@ -20,8 +20,6 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <libgnorba/gnorba.h>
-#include <orb/orbit.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -39,7 +37,6 @@
 #include "misc.h"
 #include "save-restore.h"
 #include "main.h"
-#include "balsa-impl.c"
 
 #include "libinit_balsa/init_balsa.h"
 
@@ -60,7 +57,6 @@ GIOChannel 		*mail_thread_msg_receive;
 GIOChannel              *send_thread_msg_send;
 GIOChannel              *send_thread_msg_receive;
 
-
 static void threads_init( gboolean init );
 #endif /* BALSA_USE_THREADS */
 
@@ -75,35 +71,9 @@ static gint balsa_save_session (GnomeClient* client, gint phase,
                                 gint is_fast, gpointer client_data);
 
 
-void Exception (CORBA_Environment *);
-
-void
-Exception (CORBA_Environment * ev)
-{
-  switch (ev->_major)
-    {
-    case CORBA_SYSTEM_EXCEPTION:
-      g_log ("BALSA Server", G_LOG_LEVEL_DEBUG, "CORBA system exception %s.\n",
-	     CORBA_exception_id (ev));
-      exit (1);
-    case CORBA_USER_EXCEPTION:
-      g_log ("BALSA Server", G_LOG_LEVEL_DEBUG, "CORBA user exception: %s.\n",
-	     CORBA_exception_id (ev));
-      exit (1);
-    default:
-      break;
-    }
-}
-
-
 static void
 balsa_init (int argc, char **argv)
 {
-  CORBA_ORB orb;
-  CORBA_Environment ev;
-  balsa_mail_send balsa_servant;
-  PortableServer_POA root_poa;
-  PortableServer_POAManager pm;
   static struct poptOption options[] = {
          {"checkmail", 'c', POPT_ARG_NONE, &(balsa_app.check_mail_upon_startup), 0, N_("Get new mail on startup"), NULL},
          {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 
@@ -114,30 +84,7 @@ balsa_init (int argc, char **argv)
          {NULL, '\0', 0, NULL, 0} /* end the list */
   };
 
-  CORBA_exception_init (&ev);
-
-  orb = gnome_CORBA_init_with_popt_table ("balsa", VERSION,
-			  &argc, argv, options, 0, NULL,
-			  GNORBA_INIT_SERVER_FUNC,
-			  &ev);
-
-  Exception (&ev);
-
-  root_poa = (PortableServer_POA) CORBA_ORB_resolve_initial_references (orb,
-							    "RootPOA", &ev);
-  Exception (&ev);
-
-  balsa_servant = impl_balsa_mail_send__create (root_poa, &ev);
-  Exception (&ev);
-
-  pm = PortableServer_POA__get_the_POAManager (root_poa, &ev);
-  Exception (&ev);
-
-  PortableServer_POAManager_activate (pm, &ev);
-  Exception (&ev);
-
-  goad_server_register (CORBA_OBJECT_NIL,
-			balsa_servant, "balsa_mail_send", "server", &ev);
+  gnome_init_with_popt_table (PACKAGE, VERSION, argc, argv, options, 0, NULL);
 }
 
 static void
@@ -423,20 +370,6 @@ empty_trash( void )
 	if ( balsa_app.notebook && 
 	     (page=balsa_find_notebook_page(balsa_app.trash)))
 		balsa_index_page_reset( page );
-}
-
-
-/* Eeew. But I'm tired of ifdefs. -- PGKW */
-/* Don't EVER EVER EVER call this even for a joke -- it recurses. */
-static void __lame_hack_to_avoid_unused_warnings( void );
-typedef void (*__lame_funcptr)( void );
-static void __lame_hack_to_avoid_unused_warnings( void ) 
-{
-	__lame_funcptr i_b_m_i__c = (__lame_funcptr) impl_balsa_mailbox_info__create;
-	__lame_funcptr self = (__lame_funcptr) __lame_hack_to_avoid_unused_warnings;
-
-	i_b_m_i__c();
-	self();
 }
 
 

@@ -49,9 +49,7 @@ INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
-	-I$(top_srcdir)/idl \
 	-I$(top_builddir)/libmutt \
-	-I$(top_builddir)/idl \
 	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 
@@ -64,7 +62,6 @@ balsa_LDADD = \
 	-lPropList	\
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
-	$(top_builddir)/idl/libbalsasrv.a \
 	$(GNOMEGNORBA_LIBS)  \
 	$(INTLLIBS)
 

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
-"POT-Creation-Date: 2000-05-13 04:18+0200\n"
+"POT-Creation-Date: 2000-06-01 20:26-0400\n"
 "PO-Revision-Date: 2000-05-30 15:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
@@ -29,7 +29,30 @@ msgstr "Postkasse: Åbning af %s referencetal: %d\n"
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Postkasse: Lukker %s referencetal: %d\n"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:58
+#.
+#. ISPRIME(9)
+#.
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Inbox:"
+msgstr "Indbakke:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Outbox:"
+msgstr "Udbakke:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Sentbox:"
+msgstr "Sendt_post:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Draftbox:"
+msgstr "Kladder:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:57
+msgid "Trash:"
+msgstr "Affald:"
+
+#: libinit_balsa/balsa-druid-page-directory.gob:77
 #, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
@@ -37,17 +60,17 @@ msgid ""
 msgstr ""
 "Stinavnet \"%s\" skal angives kanonisk -- dvs. det skal starte med '/'."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:76
+#: libinit_balsa/balsa-druid-page-directory.gob:95
 #, c-format
 msgid "An error occurred when attempting to creat(2) the file \"%s\"."
 msgstr "En fejl opstod under forsøget på at oprette filen \"%s\"."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:84
+#: libinit_balsa/balsa-druid-page-directory.gob:103
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Postkassen \"%s\" ser ikke ud til at være gyldig."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:146
+#: libinit_balsa/balsa-druid-page-directory.gob:158
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -55,39 +78,15 @@ msgstr ""
 "Bekræft venligst placeringen af dine standard postfiler.\n"
 "Disse vil blive oprettet om nødvendigt."
 
-#: libinit_balsa/balsa-druid-page-directory.gob:163
-msgid "Inbox:"
-msgstr "Indbakke:"
-
-#. This used to set all the mail directories to their proper values
-#. * as in the prepare code. But at this point balsa_app.local_mail_directory
-#. * is NULL, so we use a dummy value.
-#.
-#: libinit_balsa/balsa-druid-page-directory.gob:172
-msgid "Outbox:"
-msgstr "Udbakke:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:175
-msgid "Sentbox:"
-msgstr "Sendt_post:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:178
-msgid "Draftbox:"
-msgstr "Kladder:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:181
-msgid "Trash:"
-msgstr "Affald:"
-
-#: libinit_balsa/balsa-druid-page-directory.gob:192
+#: libinit_balsa/balsa-druid-page-directory.gob:209
 msgid "Mail Files"
 msgstr "Postfiler"
 
-#: libinit_balsa/balsa-druid-page-directory.gob:265
+#: libinit_balsa/balsa-druid-page-directory.gob:282
 msgid "Problem Creating Mailboxes"
 msgstr "Problem ved oprettelse af postkasser"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:44
+#: libinit_balsa/balsa-druid-page-finish.gob:45
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -95,36 +94,36 @@ msgstr ""
 "Du har nu færdig med at opsætte Balsa. Hyg dig!\n"
 "   -- Balsaudviklingsholdet"
 
-#: libinit_balsa/balsa-druid-page-finish.gob:56
+#: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
 msgstr "Færdig!"
 
-#: libinit_balsa/balsa-druid-page-user.gob:74
+#: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
 msgstr "Indtast venligst information om dig selv."
 
-#: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
+#: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
 #: src/address-book.c:450
 msgid "Name:"
 msgstr "Navn:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:86
+#: libinit_balsa/balsa-druid-page-user.gob:87
 msgid "Email address:"
 msgstr "Epostadresse:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:90
+#: libinit_balsa/balsa-druid-page-user.gob:91
 msgid "SMTP Server:"
 msgstr "SMTP-server:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:93
+#: libinit_balsa/balsa-druid-page-user.gob:94
 msgid "Local Mail Directory:"
 msgstr "Lokal epostmappe:"
 
-#: libinit_balsa/balsa-druid-page-user.gob:103
+#: libinit_balsa/balsa-druid-page-user.gob:104
 msgid "User Settings"
 msgstr "Brugerindstillinger"
 
-#: libinit_balsa/balsa-druid-page-user.gob:151
+#: libinit_balsa/balsa-druid-page-user.gob:152
 msgid "Local Mail Problem"
 msgstr "Lokal post-problem"
 
@@ -1036,23 +1035,23 @@ msgstr ""
 "\n"
 "Rapportér venligst om fejl på: http://bugs.gnome.org/"
 
-#: src/main.c:108
+#: src/main.c:78
 msgid "Get new mail on startup"
 msgstr "Hent ny post ved opstart"
 
-#: src/main.c:110
+#: src/main.c:80
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Skrev et nyt ebrev til EMAIL@ADDRESS"
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "Opens MAILBOXNAME"
 msgstr "Åbner MAILBOXNAME"
 
-#: src/main.c:112
+#: src/main.c:82
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:113
+#: src/main.c:83
 msgid "Opens first unread mailbox"
 msgstr "Åbner første ulæste postkasse"
 

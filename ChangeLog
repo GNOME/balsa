@@ -1,4 +1,23 @@
 2000-06-01  Peter Williams  <peter@newton.cx>
+	Remove the totally ignored IDL stuff
+
+	* idl/*: Die!
+	* configure.in: Don't check for ORBit, don't build
+	idl/Makefile
+	* balsa.spec.in: Don't check for installed gnorba data
+	* Makefile.am: idl out of SUBDIRS
+	* src/Makefile.am: Don't link with the servant libraries
+	and don't include $(root)/idl stuff
+	* src/main.c: Don't use ORBit init stuff
+	* po/*.po: Sync with new gobfiles et al
+	* libinit_balsa/balsa-druid-page-{error,finish,user}.gob:
+	Properly access the 'construct' class function
+	* libinit_balsa/Makefile.am: Work around gob ignoring
+	the '--no-private-header' option; put built sources in
+	srcdir as this is what we're supposed to do (according to
+	people on automake-list)
+
+2000-06-01  Peter Williams  <peter@newton.cx>
 
 	* libinit_balsa/balsa-druid-page-directory.gob:
 	Use new GOB 1.0.0 stuff and arrays as we should. Also

@@ -262,6 +262,7 @@ ok_new_mailbox (GtkWidget * widget)
       local->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
       local->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
       balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, local);
+      add_mailbox_config(local->name,local->path,0);
       break;
       
     case NM_PAGE_POP3:

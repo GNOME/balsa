@@ -29,7 +29,7 @@ add_mailbox_config (gchar * name, gchar * path, gint type)
   GString *gstring;
   gchar **mblist;
 
-  GList *list;
+  GList *list=NULL;
   Mailbox *mailbox;
 
   gint i = 0;
@@ -39,9 +39,16 @@ add_mailbox_config (gchar * name, gchar * path, gint type)
   mblist = g_new (gchar *, g_list_length (balsa_app.mailbox_list));
 
   list = g_list_first (balsa_app.mailbox_list);
-  for (i = 0; list; list = list->next, i++, mailbox = list->data)
+  if (!list)
+  {
+     printf("error adding new mailbox, aborting\n");
+     return;
+  }
+  for (i = 0; list; i++)
     {
+      mailbox = list->data;
       mblist[i] = g_strdup (mailbox->name);
+      list = list->next;
     }
 
   gnome_config_set_vector ("/balsa/Global/Accounts", i, (const char *const *) mblist);

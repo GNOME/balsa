@@ -55,7 +55,12 @@ extern "C" {
     struct _BalsaSendmsg {
 	GtkWidget *window;
 	GtkWidget *to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3];
+#define OLD_FROM (!GTK_CHECK_VERSION(2, 4, 0))
+#if OLD_FROM
         BalsaSendmsgAddress to_info, from_info, cc_info, bcc_info;
+#else
+        BalsaSendmsgAddress to_info, cc_info, bcc_info;
+#endif /* OLD_FROM */
 #if !defined(ENABLE_TOUCH_UI)        
         GtkWidget *reply_to[3];
         BalsaSendmsgAddress reply_to_info;

@@ -1142,7 +1142,11 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     gchar* message_text;
     gchar* compare_str;
     gchar** message_split;
+#if OLD_FROM
     gchar* tmpstr=libbalsa_address_to_gchar(ident->address, 0);
+#else
+    gchar* tmpstr;
+#endif /* OLD_FROM */
     const gchar* subject;
     gint replen, fwdlen;
     
@@ -1153,8 +1157,13 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
 
     /* change entries to reflect new identity */
+#if OLD_FROM
     gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]), tmpstr);
     g_free(tmpstr);
+#else
+    gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
+                             g_list_index(balsa_app.identities, ident));
+#endif /* OLD_FROM */
 
 #if !defined(ENABLE_TOUCH_UI)
     gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
@@ -2109,7 +2118,55 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
     set_ready(LIBBALSA_ADDRESS_ENTRY(arr[1]), sma);
 }
 
+#if OLD_FROM
+#else
+static void
+sw_combo_box_changed(GtkComboBox * combo_box, BalsaSendmsg * bsmsg)
+{
+    gint active = gtk_combo_box_get_active(combo_box);
+    LibBalsaIdentity *ident =
+        g_list_nth_data(balsa_app.identities, active);
 
+    update_bsmsg_identity(bsmsg, ident);
+}
+
+static void
+create_from_entry(GtkWidget * table, BalsaSendmsg * bsmsg)
+{
+    GList *list;
+    GtkListStore *store;
+    GtkCellRenderer *renderer;
+
+    store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+    for (list = balsa_app.identities; list; list = list->next) {
+        LibBalsaIdentity *ident = list->data;
+        LibBalsaAddress *address = ident->address;
+        gchar *from = libbalsa_address_to_gchar(address, 0);
+	gchar *name = g_strconcat("(", ident->identity_name, ")", NULL);
+        GtkTreeIter iter;
+
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, 0, from, 1, name, -1);
+        g_free(from);
+        g_free(name);
+    }
+    bsmsg->from[1] = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
+    renderer = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(bsmsg->from[1]), renderer,
+                               TRUE);
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(bsmsg->from[1]),
+                                   renderer, "text", 0, NULL);
+    renderer = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(bsmsg->from[1]), renderer,
+	                       FALSE);
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(bsmsg->from[1]),
+                                   renderer, "text", 1, NULL);
+    g_object_unref(store);
+    g_signal_connect(bsmsg->from[1], "changed",
+                     G_CALLBACK(sw_combo_box_changed), bsmsg);
+    create_email_or_string_entry(table, _("F_rom:"), 0, bsmsg->from);
+}
+#endif /* OLD_FROM */
 
 /* create_info_pane 
    creates upper panel with the message headers: From, To, ... and 
@@ -2131,9 +2188,13 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     bsmsg->bad_address_style = NULL;
 
     /* From: */
+#if OLD_FROM
     create_email_entry(table, _("F_rom:"), 0, GNOME_STOCK_BOOK_BLUE,
                        bsmsg, bsmsg->from,
                        &bsmsg->from_info, 1, 1);
+#else
+    create_from_entry(table, bsmsg);
+#endif /* OLD_FROM */
 
     /* To: */
     create_email_entry(table, _("_To:"), 1, GNOME_STOCK_BOOK_RED,
@@ -2896,9 +2957,14 @@ guess_identity(BalsaSendmsg* bsmsg)
 static void
 setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)    
 {
+#if OLD_FROM
     gchar* str = libbalsa_address_to_gchar(ident->address, 0);
     gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]), str);
     g_free(str); 
+#else
+    gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
+                             g_list_index(balsa_app.identities, ident));
+#endif /* OLD_FROM */
 #if !defined(ENABLE_TOUCH_UI)
     if(ident->replyto)
         gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]), ident->replyto);
@@ -3205,11 +3271,16 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     if (type == SEND_CONTINUE) {
 	setup_headers_from_message(bsmsg, message);
 
+#if OLD_FROM
 	/* Replace "From" and "Reply-To" with values from the
 	 * continued messages - they may have been hand edited. */
 	if (message->headers->from != NULL)
 	    gtk_entry_set_text(GTK_ENTRY(bsmsg->from[1]),
 			       libbalsa_address_to_gchar(message->headers->from, 0));
+#else
+	/* Replace "Reply-To" with value from the continued messages -
+	 * it may have been hand edited. */
+#endif /* OLD_FROM */
 #if !defined(ENABLE_TOUCH_UI)
 	if (message->headers->reply_to != NULL)
 	    gtk_entry_set_text(GTK_ENTRY(bsmsg->reply_to[1]),
@@ -3553,8 +3624,13 @@ static gboolean
 is_ready_to_send(BalsaSendmsg * bsmsg)
 {
     gboolean ready;
+#if OLD_FROM
     ready = bsmsg->from_info.ready && bsmsg->to_info.ready
         && bsmsg->cc_info.ready && bsmsg->bcc_info.ready;
+#else
+    ready = bsmsg->to_info.ready
+        && bsmsg->cc_info.ready && bsmsg->bcc_info.ready;
+#endif /* OLD_FROM */
 #if !defined(ENABLE_TOUCH_UI)
     ready = ready && bsmsg->reply_to_info.ready;
 #endif
@@ -3671,12 +3747,24 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     const gchar *ctmp;
     gchar recvtime[50];
     GtkTextIter start, end;
+#if OLD_FROM
+#else
+    gint active;
+    LibBalsaIdentity *ident;
+#endif /* OLD_FROM */
 
     g_assert(bsmsg != NULL);
     message = libbalsa_message_new();
 
+#if OLD_FROM
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1]));
     message->headers->from = libbalsa_address_new_from_string(ctmp);
+#else
+    active = gtk_combo_box_get_active(GTK_COMBO_BOX(bsmsg->from[1]));
+    ident = g_list_nth_data(balsa_app.identities, active);
+    message->headers->from = libbalsa_address_new();
+    libbalsa_address_set_copy(message->headers->from, ident->address);
+#endif /* OLD_FROM */
 
     tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
     strip_chars(tmp, "\r\n");
@@ -4298,7 +4386,11 @@ toggle_entry(BalsaSendmsg * bbsmsg, GtkWidget * entry[], int pos, int cnt)
 static gint
 toggle_from_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+#if OLD_FROM
     return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS, 3);
+#else
+    return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS, 2);
+#endif /* OLD_FROM */
 }
 
 static gint

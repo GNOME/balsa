@@ -1,5 +1,7 @@
-2003-02-11 17:33  PeterB
+2003-02-11 19:13  PeterB
 
+	* src/balsa-index.c: Use a weak pointer to find out when the
+	BalsaIndex has been destroyed.
 	* src/balsa-index-threading.c: Really try to avoid loops in the
 	thread tree.
 

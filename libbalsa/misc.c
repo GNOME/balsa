@@ -34,31 +34,6 @@
 
 /* #include "libmutt/imap.h" */
 
-MailboxNode *
-mailbox_node_new(const gchar * name, LibBalsaMailbox * mb, gint i)
-{
-    MailboxNode *mbn;
-    mbn = g_new(MailboxNode, 1);
-    mbn->name = g_strdup(name);
-
-    mbn->mailbox = mb;
-
-    mbn->IsDir = i;
-    mbn->expanded = FALSE;
-    mbn->style = 0;
-
-    return mbn;
-}
-
-void
-mailbox_node_destroy(MailboxNode * mbn)
-{
-    g_return_if_fail(mbn != NULL);
-
-    g_free(mbn->name);
-    g_free(mbn);
-}
-
 /* ------------------------------------------ */
 typedef void (*ImapBrowseCb) (const char *path, int isdir, void *);
 const char *imap_browse_foreach(const char *imap, const char *path,
@@ -246,6 +221,7 @@ imap_browse_foreach(const char *imap, const char *path,
 }
 #endif
 
+#if 0
 ImapDir *
 imapdir_new(void)
 {
@@ -416,6 +392,7 @@ imapdir_scan(ImapDir * id)
 
     return res;
 }
+#endif
 
 /* ------------------------------------------ */
 
@@ -641,44 +618,6 @@ libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, GtkSignalFunc func
     return_val = GTK_RETLOC_POINTER(args[2]);
     rfunc = (GtkSignal_POINTER__POINTER_POINTER) func;
     *return_val = (*rfunc) (object, GTK_VALUE_POINTER(args[0]), GTK_VALUE_POINTER(args[1]), func_data);
-}
-
-/*
- * Find  the named mailbox from the balsa_app.mailbox_nodes by it's
- * name
- */
-
-static gint
-find_mailbox_func(GNode * g1, gpointer data)
-{
-    MailboxNode *n1 = (MailboxNode *) g1->data;
-    gpointer *d = data;
-    LibBalsaMailbox *mb = *(LibBalsaMailbox **) data;
-
-    if (!n1 || n1->mailbox != mb)
-	return FALSE;
-
-    *(++d) = g1;
-    return TRUE;
-}
-
-/* find_gnode_in_mbox_list:
-   looks for given mailbox in th GNode tree, usually but not limited to
-   balsa_app.mailox_nodes
-*/
-GNode *
-find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox)
-{
-    gpointer d[2];
-    GNode *retval;
-
-    d[0] = mailbox;
-    d[1] = NULL;
-
-    g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
-		    find_mailbox_func, d);
-    retval = d[1];
-    return retval;
 }
 
 /* Delete the contents of a directory (not the directory itself).

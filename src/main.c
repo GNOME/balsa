@@ -43,7 +43,7 @@
 #include "balsa-icons.h"
 #include "main-window.h"
 #include "libbalsa.h"
-#include "misc.h"
+#include "mailbox-node.h"
 #include "save-restore.h"
 #include "main.h"
 #include "information.h"
@@ -432,20 +432,22 @@ version called system function either once or twice per directory. */
 static gboolean
 close_all_mailboxes(GNode * node, gpointer data)
 {
-    MailboxNode *mbnode = (MailboxNode *) node->data;
+    BalsaMailboxNode *mbnode = (BalsaMailboxNode *) node->data;
 
-    if (mbnode) {
-	if (mbnode->IsDir) {
-	    gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
-	    if (mbnode->expanded)
-		creat(tmpfile, S_IRUSR | S_IWUSR);
-	    else
-		unlink(tmpfile);
-	    g_free(tmpfile);
-	}
-
+    if(mbnode == NULL) /* true for root node only */
+	return FALSE;
+    
+    if (mbnode->mailbox) 
 	force_close_mailbox(mbnode->mailbox);
+    else {
+	gchar *tmpfile = g_strdup_printf("%s/.expanded", mbnode->name);
+	if (mbnode->expanded)
+	    close(creat(tmpfile, S_IRUSR | S_IWUSR));
+	else
+	    unlink(tmpfile);
+	g_free(tmpfile);
     }
+
     return FALSE;
 }
 

@@ -30,6 +30,8 @@ balsa_BASE_SOURCES =	\
 	local-mailbox.h		\
 	mailbox-conf.c		\
 	mailbox-conf.h		\
+	mailbox-node.c		\
+	mailbox-node.h		\
 	main-window.c		\
 	main-window.h		\
 	main.c			\

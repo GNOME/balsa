@@ -969,6 +969,7 @@ void
 update_pop3_servers(void)
 {
     GtkCList *clist;
+    GNode *node;
     GList *list = balsa_app.inbox_input;
     gchar *text[2];
     gint row;
@@ -995,7 +996,8 @@ update_pop3_servers(void)
 	    }
 	    text[1] = mailbox->name;
 	    row = gtk_clist_append(clist, text);
-	    gtk_clist_set_row_data(clist, row, mailbox);
+	    node = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+	    gtk_clist_set_row_data(clist, row, BALSA_MAILBOX_NODE(node->data));
 	}
 	list = list->next;
     }
@@ -2024,19 +2026,16 @@ pop3_edit_cb(GtkWidget * widget, gpointer data)
 {
     GtkCList *clist = GTK_CLIST(pui->pop3servers);
     gint row;
-
-    LibBalsaMailbox *mailbox = NULL;
+    BalsaMailboxNode *mbnode;
 
     if (!clist->selection)
 	return;
 
     row = GPOINTER_TO_INT(clist->selection->data);
 
-    mailbox = gtk_clist_get_row_data(clist, row);
-    if (!mailbox)
-	return;
-
-    mailbox_conf_edit(mailbox);
+    mbnode = gtk_clist_get_row_data(clist, row);
+    g_return_if_fail(mbnode);
+    mailbox_conf_edit(mbnode);
 }
 
 static void
@@ -2134,21 +2133,16 @@ pop3_del_cb(GtkWidget * widget, gpointer data)
 {
     GtkCList *clist = GTK_CLIST(pui->pop3servers);
     gint row;
-
-    LibBalsaMailbox *mailbox = NULL;
+    BalsaMailboxNode *mbnode;
 
     if (!clist->selection)
 	return;
 
     row = GPOINTER_TO_INT(clist->selection->data);
+    mbnode = gtk_clist_get_row_data(clist, row);
+    g_return_if_fail(mbnode);
 
-    mailbox = gtk_clist_get_row_data(clist, row);
-    if (!mailbox)
-	return;
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox));
-
-    mailbox_conf_delete(mailbox);
+    mailbox_conf_delete(mbnode);
 }
 
 void

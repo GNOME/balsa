@@ -36,6 +36,7 @@
 #else
 /* FIXME: Balsa dependency */
 #include "src/save-restore.h"	/*config_mailbox_update */
+#include "src/mailbox-conf.h"
 #endif
 
 static LibBalsaMailboxClass *parent_class = NULL;

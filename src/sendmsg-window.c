@@ -926,6 +926,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     GtkWidget *frame;
     GtkWidget *sc;
     GtkWidget *nb;
+    GList     *glist;
 
 
     table = gtk_table_new(10, 3, FALSE);
@@ -972,24 +973,14 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     gtk_object_set_data(GTK_OBJECT(msg->bcc[1]), "next_in_line",
 			msg->fcc[1]);
 
-    if (balsa_app.mailbox_nodes) {
-	GNode *walk;
-	GList *glist = NULL;
+    glist = g_list_append(glist, balsa_app.sentbox->name);
+    glist = g_list_append(glist, balsa_app.draftbox->name);
+    glist = g_list_append(glist, balsa_app.outbox->name);
+    glist = g_list_append(glist, balsa_app.trash->name);
+    
+    /* FIXME: glist = g_list_concat(glist, mblist_get_mailbox_name_list()) */
 
-	glist = g_list_append(glist, balsa_app.sentbox->name);
-	glist = g_list_append(glist, balsa_app.draftbox->name);
-	glist = g_list_append(glist, balsa_app.outbox->name);
-	glist = g_list_append(glist, balsa_app.trash->name);
-
-	walk = g_node_last_child(balsa_app.mailbox_nodes);
-	while (walk) {
-	    glist =
-		g_list_append(glist,
-			      ((MailboxNode *) ((walk)->data))->name);
-	    walk = walk->prev;
-	}
-	gtk_combo_set_popdown_strings(GTK_COMBO(msg->fcc[1]), glist);
-    }
+    gtk_combo_set_popdown_strings(GTK_COMBO(msg->fcc[1]), glist);
     gtk_table_attach(GTK_TABLE(table), msg->fcc[1], 1, 3, 5, 6,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 
@@ -1751,7 +1742,8 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     message = bsmsg2message(bsmsg);
     fcc = message->fcc_mailbox 
-	? balsa_find_mbox_by_name(message->fcc_mailbox) : NULL;
+	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
+	: NULL;
 
     if(queue_only)
 	libbalsa_message_queue(message, balsa_app.outbox, fcc,

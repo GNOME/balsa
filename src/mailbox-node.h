@@ -1,0 +1,85 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ *                         See the file AUTHORS for a list.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+#ifndef __BALSA_MAILBOX_NODE_H__
+#define __BALSA_MAILBOX_NODE_H__
+
+#include <gtk/gtk.h>
+#include "libbalsa.h"
+
+#define BALSA_TYPE_MAILBOX_NODE          (balsa_mailbox_node_get_type ())
+#define BALSA_MAILBOX_NODE(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MAILBOX_NODE, BalsaMailboxNode)
+#define BALSA_MAILBOX_NODE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MAILBOX_NODE, BalsaMailboxNodeClass)
+#define BALSA_IS_MAILBOX_NODE(obj)       GTK_CHECK_TYPE (obj, BALSA_TYPE_MAILBOX_NODE)
+
+typedef struct _BalsaMailboxNode BalsaMailboxNode;
+typedef struct _BalsaMailboxNodeClass BalsaMailboxNodeClass;
+
+/* BalsaMailboxNodeStyle 
+ * used to store the style of mailbox entry in the mailbox tree.
+ * Currently only MBNODE_STYLE_NEW_MAIL is really used, but
+ * the others may be used later for more efficient style handling.
+ * 
+ * MBNODE_STYLE_NEW_MAIL: Whether the full mailbox icon is displayed
+ *      (also when font is bolded)
+ * MBNODE_STYLE_UNREAD_MESSAGES: Whether the number of unread messages 
+ *      is being displayed in the maibox list
+ * MBNODE_STYLE_TOTAL_MESSAGES: Whether the number of total messages 
+ *      is being displayed in the mailbox list
+ * 
+ * */
+typedef enum {
+    MBNODE_STYLE_NEW_MAIL = 1 << 1,
+    MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
+    MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
+} BalsaMailboxNodeStyle;
+
+struct _BalsaMailboxNode {
+    GtkObject object;
+    BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
+    LibBalsaMailbox * mailbox; /* != NULL for leaves only */
+    gchar *name;       /* used for folders, i.e. when mailbox == NULL */
+    gboolean expanded; /* used for folders */
+    BalsaMailboxNodeStyle style;
+};
+
+struct _BalsaMailboxNodeClass {
+    GtkObjectClass parent_class;
+    void (*save_config) (BalsaMailboxNode * mn, const gchar * prefix);
+    void (*load_config) (BalsaMailboxNode * mn, const gchar * prefix);
+    GtkWidget* (*show_prop_dialog) (BalsaMailboxNode * mn);
+    void (*recreate) (BalsaMailboxNode * mn);
+};
+
+GtkType balsa_mailbox_node_get_type(void);
+
+GtkObject *balsa_mailbox_node_new(void);
+BalsaMailboxNode *balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox *m);
+BalsaMailboxNode *balsa_mailbox_node_new_from_dir(const gchar* dir);
+GtkWidget *balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode);
+void balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode * mbnode);
+void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
+
+/* 
+void mailbox_node_destroy(MailboxNode * mbn);
+*/
+
+#endif

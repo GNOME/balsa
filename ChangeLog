@@ -1,3 +1,23 @@
+2000-12-31  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Restructure MailboxNode code, separate UI code from backend.
+	* libbalsa/misc.[hc]: move MailboxNode code to src/mailbox-node
+	* src/mailbox-node.[hc]: added.
+	* src/Makefile.am: add mailbox-node.[hc]
+	* src/balsa-app.[hc]:
+	* src/balsa-mblist.[hc]: move mailbox-related UI code to mailbox-node
+	* src/local-mailbox.c: adapt partially to new structure.
+	* src/mailbox-conf.[hc]: same.
+	* src/main-window.c: same.
+	* src/main.c: same.
+	* src/pref-manager.c: same.
+	* src/save-restore.c: same.
+	* src/sendmsg-window.c: same.
+
+	* balsa.spec.in: adapt for RH 7.0
+	* libbalsa/address-book.h: update comments.
+	* libbalsa/mailbox_pop3.c: add needed include for non-threaded version.
+	
 2000-12-22  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/send.c

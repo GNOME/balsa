@@ -35,21 +35,21 @@
 
 #include "libbalsa.h"
 
+#include "address-book.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
+#include "balsa-index-page.h"
 #include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
-#include "balsa-index-page.h"
+#include "mailbox-conf.h"
+#include "mailbox-node.h"
+#include "main-window.h"
 #include "main.h"
 #include "message-window.h"
 #include "pref-manager.h"
-#include "sendmsg-window.h"
-#include "mailbox-conf.h"
-#include "main-window.h"
 #include "print.h"
-#include "address-book.h"
-#include "save-restore.h"	/*mailbox_get_pkey */
+#include "sendmsg-window.h"
 #include "store-address.h"
 
 #ifdef BALSA_USE_THREADS
@@ -120,7 +120,8 @@ static void balsa_window_unselect_message_cb(GtkWidget * widget,
 					     gpointer data);
 
 static void check_mailbox_list(GList * list);
-static gint mailbox_check_func(GNode * mbox, gpointer data);
+static void mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node,
+			       gpointer data);
 
 static void enable_mailbox_menus(LibBalsaMailbox * mailbox);
 static void enable_message_menus(LibBalsaMessage * message);
@@ -204,23 +205,25 @@ static GnomeUIInfo file_new_menu[] = {
     },
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_NEW_MBOX_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("Local Mbox mailbox..."), N_("Add a new mbox style mailbox"),
-			   mblist_menu_add_mbox_cb, GNOME_STOCK_PIXMAP_ADD),
+    GNOMEUIINFO_ITEM_STOCK(N_("Local Mbox mailbox..."), 
+			   N_("Add a new mbox style mailbox"),
+			   mailbox_conf_add_mbox_cb, 
+			   GNOME_STOCK_PIXMAP_ADD),
 #define MENU_FILE_NEW_MAILDIR_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("Local Maildir mailbox..."), N_("Add a new maildir style mailbox"),
-			   mblist_menu_add_maildir_cb, GNOME_STOCK_PIXMAP_ADD),
+    GNOMEUIINFO_ITEM_STOCK(N_("Local Maildir mailbox..."), 
+			   N_("Add a new maildir style mailbox"),
+			   mailbox_conf_add_maildir_cb, 
+			   GNOME_STOCK_PIXMAP_ADD),
 #define MENU_FILE_NEW_MH_POS 3
-    GNOMEUIINFO_ITEM_STOCK(N_("Local MH mailbox..."), N_("Add a new MH style mailbox"),
-			   mblist_menu_add_mh_cb, GNOME_STOCK_PIXMAP_ADD),
+    GNOMEUIINFO_ITEM_STOCK(N_("Local MH mailbox..."), 
+			   N_("Add a new MH style mailbox"),
+			   mailbox_conf_add_mh_cb, 
+			   GNOME_STOCK_PIXMAP_ADD),
 #define MENU_FILE_NEW_IMAP_POS 4
-    GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP mailbox..."), N_("Add a new IMAP mailbox"),
-			   mblist_menu_add_imap_cb, GNOME_STOCK_PIXMAP_ADD),
-    
-#if 0 
-#define MENU_FILE_NEW_NEW_MAILBOX_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("_Mailbox..."), N_("Add a new mailbox"),
-			   mblist_menu_add_cb, GNOME_STOCK_PIXMAP_ADD),
-#endif
+    GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP mailbox..."), 
+			   N_("Add a new IMAP mailbox"),
+			   mailbox_conf_add_imap_cb, 
+			   GNOME_STOCK_PIXMAP_ADD),
     GNOMEUIINFO_END
 };
 
@@ -427,11 +430,12 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EDIT_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit..."), N_("Edit the selected mailbox"),
-			   mblist_menu_edit_cb, GNOME_STOCK_MENU_PREF),
+			   balsa_mailbox_node_show_prop_dialog_cb,
+			   GNOME_STOCK_MENU_PREF),
 #define MENU_MAILBOX_DELETE_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("_Delete..."),
 			   N_("Delete the selected mailbox"),
-			   mblist_menu_delete_cb,
+			   mailbox_conf_delete_cb,
 			   GNOME_STOCK_PIXMAP_REMOVE),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_COMMIT_POS 7
@@ -1171,9 +1175,8 @@ fill_mailbox_passwords(GList * mailbox_list)
 	if(LIBBALSA_IS_MAILBOX_POP3(mailbox) && 
 	   LIBBALSA_MAILBOX_POP3(mailbox)->check) {
 	    s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-	    if (!s->passwd) {
+	    if (!s->passwd)
 		s->passwd = libbalsa_server_get_password(s, mailbox);
-	    }
 	}
 	list = g_list_next(list);
     }
@@ -1201,24 +1204,17 @@ check_mailbox_list(GList * mailbox_list)
 }
 
 /*Callback to check a mailbox in a balsa-mblist */
-static gint
-mailbox_check_func(GNode * node, gpointer data)
+static void
+mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
 {
-    MailboxNode *mbnode = (MailboxNode *) node->data;
+    BalsaMailboxNode *mbnode = gtk_ctree_node_get_row_data(ctree, node);
+    g_return_if_fail(mbnode);
 
-    if (!mbnode || mbnode->IsDir)
-	return FALSE;
-
-#ifdef BALSA_USE_THREADS
-    gdk_threads_enter();
-#endif
-
-    libbalsa_mailbox_check(mbnode->mailbox);
-
-#ifdef BALSA_USE_THREADS
-    gdk_threads_leave();
-#endif
-    return FALSE;
+    if(mbnode->mailbox) {/* mailbox, not a folder */
+	gdk_threads_enter();
+	libbalsa_mailbox_check(mbnode->mailbox);
+	gdk_threads_leave();
+    }
 }
 
 /*
@@ -1305,15 +1301,8 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
     fill_mailbox_passwords(balsa_app.inbox_input);
     check_mailbox_list(balsa_app.inbox_input);
 
-    libbalsa_mailbox_check(balsa_app.inbox);
-    libbalsa_mailbox_check(balsa_app.sentbox);
-    libbalsa_mailbox_check(balsa_app.draftbox);
-    libbalsa_mailbox_check(balsa_app.outbox);
-    libbalsa_mailbox_check(balsa_app.trash);
-
-    g_node_traverse(balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL,
-		    -1, (GNodeTraverseFunc) mailbox_check_func, NULL);
-
+    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
+			     mailbox_check_func, NULL);
     balsa_mblist_have_new(balsa_app.mblist);
 #endif
 }
@@ -1325,7 +1314,8 @@ static void
 send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 {
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
-			   balsa_app.smtp ? balsa_app.smtp_server : NULL, balsa_app.smtp_port);
+			   balsa_app.smtp ? balsa_app.smtp_server : NULL, 
+			   balsa_app.smtp_port);
 }
 
 /* this one is called only in the threaded code */
@@ -1347,16 +1337,8 @@ check_messages_thread(gpointer data)
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL, "Local Mail",
 		  0, 0);
 
-    gdk_threads_enter();
-    libbalsa_mailbox_check(balsa_app.inbox);
-    libbalsa_mailbox_check(balsa_app.sentbox);
-    libbalsa_mailbox_check(balsa_app.draftbox);
-    libbalsa_mailbox_check(balsa_app.outbox);
-    libbalsa_mailbox_check(balsa_app.trash);
-    gdk_threads_leave();
-
-    g_node_traverse(balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL,
-		    -1, (GNodeTraverseFunc) mailbox_check_func, NULL);
+    gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
+			     mailbox_check_func, NULL);
 
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_FINISHED, NULL, "Finished",
 		  0, 0);

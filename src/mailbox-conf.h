@@ -25,7 +25,13 @@
 #include "libbalsa.h"
 
 void mailbox_conf_new(GtkType mailbox_type);
-void mailbox_conf_edit(LibBalsaMailbox * mailbox);
-void mailbox_conf_delete(LibBalsaMailbox * mailbox);
+void mailbox_conf_edit(BalsaMailboxNode * mbnode);
+void mailbox_conf_delete(BalsaMailboxNode * mbnode);
 
+/* callbacks used also by the main window menu */
+void mailbox_conf_add_mbox_cb(GtkWidget * widget, gpointer data);
+void mailbox_conf_add_maildir_cb(GtkWidget * widget, gpointer data);
+void mailbox_conf_add_mh_cb(GtkWidget * widget, gpointer data);
+void mailbox_conf_add_imap_cb(GtkWidget * widget, gpointer data);
+void mailbox_conf_delete_cb(GtkWidget * widget, gpointer data);
 #endif				/* __MAILBOX_CONF_H__ */

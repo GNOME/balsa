@@ -70,11 +70,13 @@ LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
 							   prefix);
 
 /*
-  This will call the callback function once for each address in the address book. 
-  The recipient should make sure to ref the address if they will be keeping a
-  reference to it around. The callback may occur asynchronously.
+  This will call the callback function once for each address in the
+  address book.  The recipient should make sure to ref the address if
+  they will be keeping a reference to it around. The callback may
+  occur asynchronously.
   
-  After all addresses are loaded the callback will be called with address==NULL.
+  After all addresses are loaded the callback will be called with
+  address==NULL.  
 */
 void libbalsa_address_book_load(LibBalsaAddressBook * ab,
 				LibBalsaAddressBookLoadFunc callback,

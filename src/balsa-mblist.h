@@ -23,6 +23,7 @@
 #define __BALSA_MBLIST_H__
 
 #include <gtk/gtk.h>
+#include "mailbox-node.h"
 
 #define BALSA_TYPE_MBLIST          (balsa_mblist_get_type ())
 #define BALSA_MBLIST(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MBLIST, BalsaMBList)
@@ -37,7 +38,7 @@ struct _BalsaMBList {
     /* store the style of unread mailboxes */
     GtkStyle *unread_mailbox_style;
     /* shall the number of messages be displayed ? */
-    gboolean display_content_info;
+    gboolean display_info;
 };
 
 struct _BalsaMBListClass {
@@ -61,16 +62,10 @@ void balsa_mblist_update_mailbox(BalsaMBList * mblist,
 gboolean balsa_mblist_focus_mailbox(BalsaMBList * bmbl,
 				    LibBalsaMailbox * mailbox);
 
-void mblist_menu_add_mbox_cb(GtkWidget * widget, gpointer data);
-void mblist_menu_add_maildir_cb(GtkWidget * widget, gpointer data);
-void mblist_menu_add_mh_cb(GtkWidget * widget, gpointer data);
-void mblist_menu_add_imap_cb(GtkWidget * widget, gpointer data);
-
-void mblist_menu_edit_cb(GtkWidget * widget, gpointer data);
-void mblist_menu_delete_cb(GtkWidget * widget, gpointer data);
-void mblist_menu_open_cb(GtkWidget * widget, gpointer data);
-void mblist_menu_close_cb(GtkWidget * widget, gpointer data);
 GList *mblist_find_all_unread_mboxes(void);
+LibBalsaMailbox* mblist_find_mbox_by_name(BalsaMBList * mblist,
+					     const char* name);
 void mblist_open_mailbox(LibBalsaMailbox * mailbox);
+BalsaMailboxNode* mblist_get_selected_node(BalsaMBList *mblist);
 
 #endif

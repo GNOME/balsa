@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include "balsa-app.h"
+#include "mailbox-node.h"
 #include "save-restore.h"
 #include "quote-color.h"
 
@@ -109,16 +110,15 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     }
     if (*special) {
 	config_mailbox_add(*special, NULL);
-	node = g_node_new(mailbox_node_new(
-					   (*special)->name, *special,
-					   (*special)->is_directory));
+	node = g_node_new(balsa_mailbox_node_new_from_mailbox(*special));
 	g_node_append(balsa_app.mailbox_nodes, node);
     }
     config_mailbox_delete(mailbox);
     config_mailbox_add(mailbox, specialNames[which]);
 
-    node = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
-    g_node_unlink(node);
+    /* FIXME: hide it somehow
+       node = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+       g_node_unlink(node);  */
 
     *special = mailbox;
 }
@@ -228,7 +228,6 @@ config_mailbox_init(const gchar * prefix)
     const gchar *key =
 	prefix + strlen(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX);
     GNode *node;
-    gboolean is_mh;
 
     g_return_val_if_fail(prefix != NULL, FALSE);
 
@@ -257,10 +256,7 @@ config_mailbox_init(const gchar * prefix)
     else if (strcmp("Trash/", key) == 0)
 	balsa_app.trash = mailbox;
     else {
-	is_mh = LIBBALSA_IS_MAILBOX_MH(mailbox);
-
-	node = g_node_new(mailbox_node_new(mailbox->name,
-					   mailbox, is_mh));
+	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
 	g_node_append(balsa_app.mailbox_nodes, node);
     }
     return TRUE;

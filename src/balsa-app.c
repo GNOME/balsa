@@ -243,57 +243,7 @@ update_timer(gboolean update, guint minutes)
     }
 }
 
-/* searching mailbox tree code, see balsa_find_mbox_by_name below */
-static gboolean
-mbox_by_name(gconstpointer a, gconstpointer b)
-{
-    MailboxNode *mbnode = (MailboxNode *) a;
-    const gchar *name = (const gchar *) b;
-    g_assert(mbnode != NULL);
 
-    if (mbnode->mailbox == NULL)
-	return TRUE;
-
-    return strcmp(mbnode->mailbox->name, name) != 0;
-}
-
-/* mblist_find_mbox_by_name:
-   search the mailboxes tree for given name.
-*/
-LibBalsaMailbox *
-balsa_find_mbox_by_name(const gchar * name)
-{
-    GtkCTreeNode *node;
-    LibBalsaMailbox *res = NULL;
-
-
-    if (balsa_app.mailbox_nodes && name && *name) {
-	if (!strcmp(name, balsa_app.sentbox->name))
-	    res = balsa_app.sentbox;
-	else if (!strcmp(name, balsa_app.draftbox->name))
-	    res = balsa_app.draftbox;
-	else if (!strcmp(name, balsa_app.outbox->name))
-	    res = balsa_app.outbox;
-	else if (!strcmp(name, balsa_app.trash->name))
-	    res = balsa_app.trash;
-	else {
-	    node =
-		gtk_ctree_find_by_row_data_custom(GTK_CTREE
-						  (balsa_app.mblist), NULL,
-						  (gchar *) name,
-						  mbox_by_name);
-	    if (node) {
-		MailboxNode *mbnode =
-		    gtk_ctree_node_get_row_data(GTK_CTREE
-						(balsa_app.mblist), node);
-		res = mbnode->mailbox;
-	    } else
-		g_print("balsa_find_mbox_by_name: Mailbox %s not found\n",
-			name);
-	}
-    }
-    return res;
-}
 
 /* open_mailboxes_idle_cb:
    open mailboxes on startup if requested so.
@@ -303,6 +253,7 @@ balsa_find_mbox_by_name(const gchar * name)
 gboolean
 open_mailboxes_idle_cb(gchar * names[])
 {
+    LibBalsaMailbox *mbox;
     gint i = 0;
 
     g_return_val_if_fail(names, FALSE);
@@ -310,7 +261,7 @@ open_mailboxes_idle_cb(gchar * names[])
     gdk_threads_enter();
 
     while (names[i]) {
-	LibBalsaMailbox *mbox = balsa_find_mbox_by_name(names[i]);
+	mbox = mblist_find_mbox_by_name(balsa_app.mblist, names[i]);
 	if (balsa_app.debug)
 	    fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
 		    names[i], mbox);
@@ -331,4 +282,37 @@ GtkWidget *
 gnome_stock_button_with_label(const char *icon, const char *label)
 {
     return gnome_pixmap_button(gnome_stock_new_with_icon(icon), label);
+}
+
+static gint
+find_mailbox(GNode * g1, gpointer data)
+{
+    BalsaMailboxNode *n1 = (BalsaMailboxNode *) g1->data;
+    gpointer *d = data;
+    LibBalsaMailbox *mb = *(LibBalsaMailbox **) data;
+
+    if (!n1 || n1->mailbox != mb)
+        return FALSE;
+
+    *(++d) = g1;
+    return TRUE;
+}
+
+/* find_gnode_in_mbox_list:
+   looks for given mailbox in th GNode tree, usually but not limited to
+   balsa_app.mailbox_nodes
+*/
+GNode *
+find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox)
+{
+    gpointer d[2];
+    GNode *retval;
+
+    d[0] = mailbox;
+    d[1] = NULL;
+
+    g_node_traverse(gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+                    find_mailbox, d);
+    retval = d[1];
+    return retval;
 }

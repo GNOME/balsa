@@ -33,25 +33,26 @@
 #include "balsa-app.h"
 #include "local-mailbox.h"
 #include "libbalsa.h"
-#include "misc.h"
+#include "mailbox-node.h"
 
 
 static gboolean
-do_traverse(GNode * node, gpointer data)
+traverse_find_dirname(GNode * node, gpointer* d)
 {
-    gpointer *d = data;
-    if (!node->data)
+    BalsaMailboxNode *mn;
+    if (!node->data)  /* true for root node only */
 	return FALSE;
-    if (strcmp(((MailboxNode *) node->data)->name, (gchar *) d[0]))
+    mn = (BalsaMailboxNode *) node->data;
+    if (mn->name && strcmp(mn->name, (gchar *) d[0]))
 	return FALSE;
 
-    *(++d) = node;
+    ((gpointer*)d)[1] = node;
     return TRUE;
 }
 
 static GNode *
-find_my_node(GNode * root,
-	     GTraverseType order, GTraverseFlags flags, gpointer data)
+find_node_by_dirname(GNode * root, GTraverseType order, 
+		     GTraverseFlags flags, gpointer data)
 {
     gpointer d[2];
 
@@ -62,7 +63,8 @@ find_my_node(GNode * root,
     d[0] = data;
     d[1] = NULL;
 
-    g_node_traverse(root, order, flags, -1, do_traverse, d);
+    g_node_traverse(root, order, flags, -1, 
+		    (GNodeTraverseFunc) traverse_find_dirname, d);
 
     return d[1];
 }
@@ -71,13 +73,14 @@ static gboolean
 traverse_find_path(GNode * node, gpointer * d)
 {
     const gchar *path;
-    if (!node->data
-	|| !LIBBALSA_IS_MAILBOX_LOCAL(((MailboxNode *) node->data)->
-				      mailbox)) return FALSE;
+    LibBalsaMailbox * mailbox;
+    if(node->data == NULL) /* true for root node only */
+	return FALSE;
+    
+    mailbox = ((BalsaMailboxNode *) node->data)->mailbox;
+    if(!LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) return FALSE;
 
-    path =
-	LIBBALSA_MAILBOX_LOCAL(((MailboxNode *) node->data)->mailbox)->
-	path;
+    path = LIBBALSA_MAILBOX_LOCAL(mailbox)->path;
 
     if (strcmp(path, (gchar *) d[0]))
 	return FALSE;
@@ -87,12 +90,12 @@ traverse_find_path(GNode * node, gpointer * d)
 }
 
 static GNode *
-mb_node_find_path(GNode * root, GTraverseType order, GTraverseFlags flags,
-		  const gchar * data)
+find_by_path(GNode * root, GTraverseType order, GTraverseFlags flags,
+	     const gchar * path)
 {
     gpointer d[2];
 
-    d[0] = (gchar *) data;
+    d[0] = (gchar *) path;
     d[1] = NULL;
     g_node_traverse(root, order, flags, -1,
 		    (GNodeTraverseFunc) traverse_find_path, d);
@@ -107,12 +110,11 @@ mb_node_find_path(GNode * root, GTraverseType order, GTraverseFlags flags,
    (someone added a local mailbox - possibly aliased - located in LMD 
    to the configuration).
 */
-static void
-add_mailbox(const gchar * name, const gchar * path,
-	    GtkType type, gint isdir)
+static GNode*
+add_mailbox(GNode *rnode, const gchar * name, const gchar * path, GtkType type)
 {
     LibBalsaMailbox *mailbox;
-    GNode *rnode;
+    char *dirname;
     GNode *node;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox))
@@ -137,31 +139,12 @@ add_mailbox(const gchar * name, const gchar * path,
 	    0) return;
 
     /* don't add if the mailbox is already in the configuration */
-    if (mb_node_find_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER,
-			  G_TRAVERSE_ALL, path))
+    if (find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
+		     G_TRAVERSE_ALL, path))
 	return;
 
-    if (isdir && type == 0) {
-	gchar *tmppath;
-	gchar *dirname;
-	MailboxNode *mbnode;
-
-	mbnode = mailbox_node_new(path, NULL, TRUE);
-	tmppath = g_strdup_printf("%s/.expanded", path);
-
-	if (access(tmppath, F_OK) != -1)
-	    mbnode->expanded = TRUE;
-	else
-	    mbnode->expanded = FALSE;
-	node = g_node_new(mbnode);
-
-	g_free(tmppath);
-
-	dirname = g_dirname(path);
-	rnode = find_my_node(balsa_app.mailbox_nodes, G_LEVEL_ORDER,
-			     G_TRAVERSE_ALL, dirname);
-	g_free(dirname);
-
+    if (type == 0) {
+	node = g_node_new(balsa_mailbox_node_new_from_dir(path));
     } else {
 	if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
 	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mh_new(path, FALSE));
@@ -175,31 +158,20 @@ add_mailbox(const gchar * name, const gchar * path,
 	}
 	mailbox->name = g_strdup(name);
 
-	if (isdir && type == LIBBALSA_TYPE_MAILBOX_MH ) {
-	    char *dirname = g_dirname(path);
-	    node = g_node_new(mailbox_node_new(path, mailbox, TRUE));
-	    rnode = find_my_node(balsa_app.mailbox_nodes, G_LEVEL_ORDER,
-				 G_TRAVERSE_ALL, dirname);
-	    g_free(dirname);
-	} else {
-	    char *dirname = g_dirname(path);
-	    node = g_node_new(mailbox_node_new(path, mailbox, FALSE));
-	    rnode = find_my_node(balsa_app.mailbox_nodes, G_LEVEL_ORDER,
-				 G_TRAVERSE_ALL, dirname);
-	    g_free(dirname);
-	}
+	node = g_node_new(balsa_mailbox_node_new_from_mailbox(mailbox));
 
 	if (balsa_app.debug)
 	    g_print(_("Local Mailbox Loaded as: %s\n"),
 		    gtk_type_name(GTK_OBJECT_TYPE(mailbox)));
     }
-
-    if (rnode)
-	g_node_append(rnode, node);
-    else
-	g_node_append(balsa_app.mailbox_nodes, node);
+    
+    /* no type checking, parent is NULL for root */
+    BALSA_MAILBOX_NODE(node->data)->parent = (BalsaMailboxNode*)rnode->data;
+    g_node_append(rnode, node);
+    return node;
 }
 
+#if 0
 static int
 is_mh_message(gchar * str)
 {
@@ -216,77 +188,60 @@ is_mh_message(gchar * str)
     }
     return 1;
 }
+#endif
 
 static void
-read_dir(gchar * prefix, struct dirent *d)
+read_dir(GNode *rnode, const gchar * prefix)
 {
     DIR *dpc;
-    struct dirent *dc;
-
+    struct dirent *de;
+    gchar * name;
+    GNode *current_node;
     char filename[PATH_MAX];
     struct stat st;
     GtkType mailbox_type;
 
 
-    if (!d)
+    dpc = opendir(prefix);
+    if (!dpc)
 	return;
+    name = g_basename(prefix);
+    current_node = add_mailbox(rnode, name, prefix, 0);
+    g_free(name);
 
-    if (d->d_name[0] == '.')
-	return;
+    while ((de = readdir(dpc)) != NULL) {
+	if (de->d_name[0] == '.')
+	    continue;
+	snprintf(filename, PATH_MAX, "%s/%s", prefix, de->d_name);
 
-    snprintf(filename, PATH_MAX, "%s/%s", prefix, d->d_name);
+	/* ignore file if it can't be read. */
+	if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
+	    continue;
+	
+	if (S_ISDIR(st.st_mode)) {
+	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
 
-    /* ignore file if it can't be read. */
+	    if (balsa_app.debug)
+		fprintf(stderr, "Mailbox name = %s,  mailbox type = %d\n",
+			filename, mailbox_type);
 
-    if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
-	return;
-
-    if (S_ISDIR(st.st_mode)) {
-	mailbox_type = libbalsa_mailbox_type_from_path(filename);
-
-	if (balsa_app.debug)
-	    fprintf(stderr, "Mailbox name = %s,  mailbox type = %d\n",
-		    filename, mailbox_type);
-
-	if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH || mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
-	    add_mailbox(d->d_name, filename, mailbox_type, 1);
+	    if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH || 
+		mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
+		add_mailbox(current_node, de->d_name, filename, mailbox_type);
+	    } else
+		read_dir(current_node, filename);
 	} else {
-	    add_mailbox(d->d_name, filename, 0, 1);
-	}
-	if (mailbox_type != LIBBALSA_TYPE_MAILBOX_MAILDIR) {
-	    dpc = opendir(filename);
-	    if (!dpc)
-		return;
-	    while ((dc = readdir(dpc)) != NULL)
-		read_dir(filename, dc);
-	    closedir(dpc);
-	}
-    } else {
-	if (!is_mh_message(d->d_name)) {
-
 	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
 	    if (mailbox_type != 0)
-		add_mailbox(d->d_name, filename, mailbox_type, 0);
+		add_mailbox(current_node, de->d_name, filename, mailbox_type);
 	}
     }
+    closedir(dpc);
 }
 
 
 void
 load_local_mailboxes()
 {
-    DIR *dp;
-    struct dirent *d;
-
-    g_return_if_fail(balsa_app.local_mail_directory != NULL);
-    dp = opendir(balsa_app.local_mail_directory);
-    if (!dp)
-	return;
-
-    while ((d = readdir(dp)) != NULL) {
-	if (d->d_name[0] == '.')
-	    continue;
-	read_dir(balsa_app.local_mail_directory, d);
-    }
-    closedir(dp);
+    read_dir(balsa_app.mailbox_nodes, balsa_app.local_mail_directory);
 }

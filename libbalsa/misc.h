@@ -31,41 +31,6 @@ gchar *libbalsa_make_string_from_list(const GList *);
 
 size_t libbalsa_readfile(FILE * fp, char **buf);
 
-/* MailboxNodeStyle [MBG] 
- * 
- * MBNODE_STYLE_ICONFULL: Whether the full mailbox icon is displayed
- *      (also when font is bolded)
- * MBNODE_STYLE_UNREAD_MESSAGES: Whether the number of unread messages 
- *      is being displayed in the maibox list
- * MBNODE_STYLE_TOTAL_MESSAGES: Whether the number of total messages 
- *      is being displayed in the mailbox list
- * 
- * I added these style flags so we can easily keep track of what the
- * node looks like without having to resort to ugly gtk_get_style...
- * stuff.  Currently only MBNODE_STYLE_ICONFULL is really used, but
- * the others may be used later for more efficient style handling.
- * */
-typedef enum {
-    MBNODE_STYLE_ICONFULL = 1 << 1,
-    MBNODE_STYLE_UNREAD_MESSAGES = 1 << 2,
-    MBNODE_STYLE_TOTAL_MESSAGES = 1 << 3,
-} MailboxNodeStyle;
-
-
-typedef struct _MailboxNode MailboxNode;
-struct _MailboxNode {
-    GtkObject object;
-    gchar *name;
-    LibBalsaMailbox *mailbox;
-    gint IsDir;
-    gint expanded;
-    MailboxNodeStyle style;
-};
-
-MailboxNode *mailbox_node_new(const gchar * name, LibBalsaMailbox * mb,
-			      gint i);
-void mailbox_node_destroy(MailboxNode * mbn);
-
 gchar *libbalsa_get_hostname(void);
 gchar *libbalsa_get_domainname(void);
 
@@ -81,9 +46,6 @@ void libbalsa_marshal_POINTER__OBJECT(GtkObject * object,
 void libbalsa_marshall_POINTER__POINTER_POINTER(GtkObject *object, 
 						GtkSignalFunc func,
 						gpointer func_data, GtkArg *args);
-
-GNode *find_gnode_in_mbox_list(GNode * gnode_list,
-			       LibBalsaMailbox * mailbox);
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 

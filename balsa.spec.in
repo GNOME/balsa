@@ -18,7 +18,7 @@ Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7
 Requires: gnome-libs >= 1.2.0
 Provides: balsa
-Docdir: %{prefix}/doc
+Docdir: %{_docdir}/doc
 
 %description
 Balsa is an e-mail reader.  This client is part of the GNOME
@@ -44,7 +44,7 @@ else
 %endif
 fi
 
-patch -p0 < rpm-po.patch
+#patch -p0 < rpm-po.patch
 if [ "$SMP" != "" ]; then
   (make "MAKE=make -k -j $SMP"; exit 0)
   make

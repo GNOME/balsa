@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Balsa
+Comment=E-mail program
+Comment[pl]=Klient poczty
+Exec=balsa
+Icon=balsa/balsa-logo.png
+Terminal=0
+Type=Application

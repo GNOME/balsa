@@ -2,6 +2,9 @@ SUBDIRS = macros po intl sounds images help libmutt libbalsa libinit_balsa idl s
 
 man_MANS=balsa.1
 
+desktopdir = $(gnomedatadir)/gnome/apps/Networking/Mail
+desktop_DATA = balsa.desktop
+
 EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in

@@ -31,6 +31,7 @@ struct _BalsaSendmsg
 {
   GtkWidget *to, *from, *subject, *cc, *bcc;
   GtkWidget *text;
+  GtkWidget *window;
 };
 
 void sendmsg_window_new(GtkWidget *, gpointer);

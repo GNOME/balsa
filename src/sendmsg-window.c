@@ -54,8 +54,9 @@ close_window (GtkWidget * widget, gpointer data)
 }
 
 static GtkWidget *
-create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
+create_toolbar (BalsaSendmsg * bsmw)
 {
+	GtkWidget *window = bsmw->window;
   GtkWidget *toolbar;
   GtkWidget *toolbarbutton;
 
@@ -110,7 +111,8 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
   gtk_widget_destroy (bsm->subject);
   gtk_widget_destroy (bsm->cc);
   gtk_widget_destroy (bsm->bcc);
-/*  g_free (bsm); */
+  gtk_widget_destroy (bsm->window);
+  g_free (bsm);
 }
 
 static GtkWidget *
@@ -211,7 +213,6 @@ create_menu (GtkWidget * window)
 void
 sendmsg_window_new (GtkWidget * widget, gpointer data)
 {
-  GtkWidget *window;
   GtkWidget *vbox;
   GtkWidget *label;
   GtkWidget *table;
@@ -221,10 +222,10 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
 
   msg = g_malloc (sizeof (BalsaSendmsg));
 
-  window = gnome_app_new ("balsa_sendmsg_window", "New message");
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
+  msg->window = gnome_app_new ("balsa_sendmsg_window", "New message");
+  gtk_signal_connect (GTK_OBJECT (msg->window), "destroy",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
-  gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+  gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
 		      GTK_SIGNAL_FUNC (delete_event), NULL);
 
 
@@ -292,15 +293,15 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
 
 
 
-  gnome_app_set_contents (GNOME_APP (window), vbox);
+  gnome_app_set_contents (GNOME_APP (msg->window), vbox);
 
-  gnome_app_set_menus (GNOME_APP (window),
-		       GTK_MENU_BAR (create_menu (window)));
+  gnome_app_set_menus (GNOME_APP (msg->window),
+		       GTK_MENU_BAR (create_menu (msg->window)));
 
-  gnome_app_set_toolbar (GNOME_APP (window),
-			 GTK_TOOLBAR (create_toolbar (window, msg)));
+  gnome_app_set_toolbar (GNOME_APP (msg->window),
+			 GTK_TOOLBAR (create_toolbar (msg)));
 
-  gtk_widget_show (window);
+  gtk_widget_show (msg->window);
 }
 
 
@@ -366,7 +367,7 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   curhst = g_strdup (mylocalhost ());
 
   msg->from = mail_newaddr ();
-  msg->from->personal = g_strdup (personalname);
+  msg->from->personal = g_strdup (balsa_app.user_name);
   msg->from->mailbox = g_strdup (curusr);
   msg->from->host = g_strdup (curhst);
   msg->return_path = mail_newaddr ();
@@ -385,7 +386,7 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   text = gtk_text_to_email (textbuf);
   text = g_string_append (text, "\015\012");
 
-  body->contents.text.data = (unsigned char *) text->str;
+  body->contents.text.data = g_strdup(text->str);
   body->contents.text.size = strlen (text->str);
   rfc822_date (line);
   msg->date = (char *) fs_get (1 + strlen (line));
@@ -408,5 +409,5 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   mail_free_envelope (&msg);
   mail_free_body (&body);
   g_string_free (text, 1);
-/*  balsa_sendmsg_destroy (bsmsg); */
+  balsa_sendmsg_destroy (bsmsg);
 }

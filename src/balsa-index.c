@@ -50,9 +50,6 @@
 
 #include "filter.h"
 
-/* constants */
-#define BUFFER_SIZE 1024
-
 #define CLIST_WORKAROUND
 #if defined(CLIST_WORKAROUND)
 #define DO_CLIST_WORKAROUND(s) if((s)->row_list) (s)->row_list->prev = NULL;
@@ -88,6 +85,15 @@ static void clist_click_column(GtkCList * clist, gint column,
 			       gpointer data);
 
 /* statics */
+static void balsa_index_set_sort_order(BalsaIndex * bindex, int column, 
+				    GtkSortType order);
+static void balsa_index_set_first_new_message(BalsaIndex * bindex);
+/* adds a new message */
+static void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
+/* retrieve the selection */
+static void balsa_index_get_selected_rows(BalsaIndex * bindex,
+					  GtkCTreeNode *** rows,
+					  guint * nb_rows);
 static void balsa_index_set_col_images(BalsaIndex *, GtkCTreeNode*,
 				       LibBalsaMessage *);
 static void balsa_index_set_style(BalsaIndex * bindex, GtkCTreeNode *node);
@@ -516,7 +522,7 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
  * index's first_new_message field to point at that message.  If no
  * unread messages are found, first_new_message is set to NULL
  */
-void 
+static void
 balsa_index_set_first_new_message(BalsaIndex * bindex)
 {
     GtkCTreeNode *node =
@@ -1599,7 +1605,7 @@ mailbox_messages_delete_cb(BalsaIndex * bindex, GList * messages)
  * @nb_rows : a pointer on the returned number of selected rows  
  *
  */
-void
+static void
 balsa_index_get_selected_rows(BalsaIndex * bindex, GtkCTreeNode ***rows,
 			      guint * nb_rows)
 {
@@ -2368,7 +2374,7 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     balsa_window_set_threading_menu(thtype);
 }
 
-void
+static void
 balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
 {
     GtkCList * clist;

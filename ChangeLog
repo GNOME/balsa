@@ -1,3 +1,10 @@
+2002-05-18  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/mailbox.[ch]: remove unused code.
+	* src/balsa-index-threading.c: fix two issues intruduced 2 days ago.
+	* src/balsa-index.[ch]: make local functions static.
+	* src/filter-edit-dialog.c: make dialog resizeable.
+	
 2002-05-16  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c: reimplement libbalsa_mailbox_get_type()

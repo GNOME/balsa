@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -70,8 +70,6 @@ static void threading_simple(BalsaIndex* bindex);
 static void add_message(GtkCTree *ctree, 
 			GtkCTreeNode *node, 
 			GHashTable* msg_table);
-
-static void dump(GNode *node, int indent);
 
 void
 balsa_index_threading(BalsaIndex* bindex)
@@ -523,19 +521,19 @@ construct(GNode *node, GtkCTree *ctree)
     }
 
     if(node->data!=NULL) {
-        GtkCTreeNode *ctreenode = GTK_CTREE_NODE(node->data);
+        ctreenode = GTK_CTREE_NODE(node->data);
 	gtk_ctree_move(ctree, ctreenode, ctreeparent, NULL);
     }
 
     if(node->next!=NULL) {
-        sibling = GTK_CTREE_NODE(node->data);
+        sibling = GTK_CTREE_NODE(node->next->data);
 	gtk_ctree_move(ctree, sibling, ctreeparent, ctreenode);
     }
 
     if(node->children!=NULL) {
 	GNode *children;
 	for(children=node->children; children; children=children->next) {
-            GtkCTreeNode *foo = GTK_CTREE_NODE(node->data);
+            GtkCTreeNode *foo = GTK_CTREE_NODE(children->data);
 	    if(foo)
 		gtk_ctree_move(ctree, foo, ctreenode, NULL);
 	}
@@ -839,7 +837,6 @@ static void
 add_message(GtkCTree *ctree, GtkCTreeNode *node, GHashTable *msg_table)
 {
     LibBalsaMessage* message=MESSAGE(node);
-    GtkCTreeNode *foo=NULL;
     if(!message->message_id)
 	return;
     if(!g_hash_table_lookup(msg_table, message->message_id))

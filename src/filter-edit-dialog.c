@@ -499,7 +499,7 @@ build_right_side(void)
     /* the main notebook */
     notebook = gtk_notebook_new();
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-    gtk_box_pack_start(GTK_BOX(rightside), notebook, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightside), notebook, TRUE, TRUE, 0);
 
     page = build_match_page();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -570,10 +570,13 @@ filters_edit_dialog(void)
 		       "clicked", fe_dialog_button_clicked, NULL);
     gtk_signal_connect(GTK_OBJECT(fe_window), "destroy",
 		       GTK_SIGNAL_FUNC(fe_destroy_window_cb), NULL);
+
+    gtk_window_set_policy (GTK_WINDOW (fe_window), TRUE, TRUE, FALSE);
+
     /* main hbox */
     hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(fe_window->vbox),
-		       hbox, FALSE, FALSE, 0);
+		       hbox, TRUE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 2);
 
@@ -582,7 +585,7 @@ filters_edit_dialog(void)
 
     fe_right_page = piece = build_right_side();
     gtk_widget_set_sensitive(fe_right_page, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), piece, TRUE, TRUE, 2);
 
     /* Populate the clist of filters */
 

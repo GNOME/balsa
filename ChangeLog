@@ -1,3 +1,8 @@
+2002-08-03  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: fix next undread for deep threads.
+	fix message deletion.
+
 2002-07-31  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/libbalsa.c: set the wmclass for the TLS certificate dialog.

@@ -522,8 +522,10 @@ bndx_expand_to_path(GtkTreeView * tree_view, GtkTreePath * path)
 {
     GtkTreePath *tmp = gtk_tree_path_copy(path);
 
-    while (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0)
+    if (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0) {
+        bndx_expand_to_path(tree_view, tmp);
         gtk_tree_view_expand_row(tree_view, tmp, FALSE);
+    }
 
     gtk_tree_path_free(tmp);
 }
@@ -834,7 +836,6 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     GtkTreeSelection *selection =
         gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     GtkTreeIter iter;
-    LibBalsaMessage *message;
     GList *children = NULL;
     GList *list;
 
@@ -845,11 +846,13 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
 
     /* make a list of children that need to be moved up */
     for (list = messages; list; list = g_list_next(list)) {
-        message = list->data;
-        if (bndx_find_message(index, NULL, &iter, message)) {
+        if (bndx_find_message(index, NULL, &iter, 
+                              LIBBALSA_MESSAGE(list->data))) {
             GtkTreeIter child_iter;
 
             if (gtk_tree_model_iter_children(model, &child_iter, &iter)) {
+                LibBalsaMessage *message;
+
                 do {
                     gtk_tree_model_get(model, &child_iter, 
                                        BNDX_MESSAGE_COLUMN, &message,
@@ -869,7 +872,8 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     for (list = children; list; list = g_list_next(list)) {
         GtkTreePath *path;
 
-        if (bndx_find_message(index, &path, NULL, message)) {
+        if (bndx_find_message(index, &path, NULL, 
+                              LIBBALSA_MESSAGE(list->data))) {
             balsa_index_move_subtree(model, path, NULL, NULL);
             gtk_tree_path_free(path);
         }
@@ -878,7 +882,8 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
 
     /* remove the messages */
     for (list = messages; list; list = g_list_next(list)) {
-        if (bndx_find_message(index, NULL, &iter, message)) {
+        if (bndx_find_message(index, NULL, &iter, 
+                              LIBBALSA_MESSAGE(list->data))) {
             gtk_tree_store_remove(GTK_TREE_STORE(model), &iter);
         }
     }

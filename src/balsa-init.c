@@ -432,23 +432,32 @@ complete_cb (GtkWidget * widget)
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);
   mailbox->name = g_strdup ("Inbox");
-  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
-  add_mailbox_config (mailbox);
+  if (mailbox)
+    {
+      MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
+      add_mailbox_config (mailbox);
+    }
   mailbox_free (mailbox);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->inbox)));
   mailbox = mailbox_new (type);
-  mailbox->name = g_strdup ("Outbox");
-  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->outbox)));
-  add_mailbox_config (mailbox);
+  if (mailbox)
+    {
+      mailbox->name = g_strdup ("Outbox");
+      MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->outbox)));
+      add_mailbox_config (mailbox);
+    }
   mailbox_free (mailbox);
 
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
   mailbox = mailbox_new (type);
-  mailbox->name = g_strdup ("Trash");
-  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
-  add_mailbox_config (mailbox);
-  mailbox_free (mailbox);
+  if (mailbox)
+    {
+      mailbox->name = g_strdup ("Trash");
+      MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
+      add_mailbox_config (mailbox);
+      mailbox_free (mailbox);
+    }
 
   save_global_settings ();
 

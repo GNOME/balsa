@@ -34,7 +34,12 @@ init_balsa_app (int argc, char *argv[])
 {
   struct passwd *pw;
 
+        gtk_widget_push_visual (gdk_imlib_get_visual ());
+        gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   balsa_app.main_window = create_main_window ();
+        gtk_widget_pop_colormap ();
+        gtk_widget_pop_visual ();
+
 
 
   /* include linkage for the c-client library */

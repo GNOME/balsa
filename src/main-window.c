@@ -29,21 +29,13 @@
 
 /* pixmaps for the toolbar */
 #include "pixmaps/p1.xpm"
-#include "pixmaps/p2.xpm"
-#include "pixmaps/p3.xpm"
 #include "pixmaps/p4.xpm"
 #include "pixmaps/p5.xpm"
 #include "pixmaps/p6.xpm"
-#include "pixmaps/p7.xpm"
 #include "pixmaps/p8.xpm"
-#include "pixmaps/p9.xpm"
 #include "pixmaps/p10.xpm"
 #include "pixmaps/p11.xpm"
-#include "pixmaps/p12.xpm"
-#include "pixmaps/p13.xpm"
 #include "pixmaps/p14.xpm"
-#include "pixmaps/p15.xpm"
-#include "pixmaps/p16.xpm"
 
 
 
@@ -148,8 +140,8 @@ new_icon (gchar ** xpm, GtkWidget * window)
   GtkWidget *pixmapwid;
   GdkBitmap *mask;
 
-  pixmap = gdk_pixmap_create_from_xpm_d (window->window, &mask,
-					 0, xpm);
+  pixmap = gdk_pixmap_create_from_xpm_d(window->window, &mask, 0, xpm);
+
   pixmapwid = gtk_pixmap_new (pixmap, mask);
   return pixmapwid;
 }
@@ -162,6 +154,8 @@ create_toolbar (MainWindow *mw)
   GtkWidget *toolbar;
   GtkWidget *toolbarbutton;
   GtkWidget *label;
+
+  gtk_widget_realize (window);
 
   toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
 

@@ -1,3 +1,9 @@
+2003-10-21 08:16  PeterB
+
+	* libbalsa/files.c, libbalsa/message.c, src/balsa-index.c,
+	src/balsa-index.h, src/balsa-message.c, src/main-window.c: More
+	memory leaks.
+
 2003-10-20 16:44  PeterB
 
 	* libbalsa/address.c: Plug a memory leak.

@@ -1543,13 +1543,14 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
 {
     gboolean retval;
     guint i;
+    gboolean real_flag = (set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-    g_return_val_if_fail(!mailbox->readonly
-                         || !((set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL),
-                         FALSE);
+    g_return_val_if_fail(!mailbox->readonly || !real_flag, FALSE);
 
-    libbalsa_lock_mailbox(mailbox);
+    if (real_flag)
+	libbalsa_lock_mailbox(mailbox);
+
     retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
 	messages_change_flags(mailbox, msgnos, set, clear);
 
@@ -1563,7 +1564,9 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
         libbalsa_mailbox_search_iter_free(iter_view);
     }
 
-    libbalsa_unlock_mailbox(mailbox);
+    if (real_flag)
+	libbalsa_unlock_mailbox(mailbox);
+
     if (set & LIBBALSA_MESSAGE_FLAG_DELETED && retval)
         g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED],
                       0);

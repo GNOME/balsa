@@ -1,3 +1,17 @@
+2004-05-05 14:34  PeterB
+
+	* src/mailbox-node.c: restore new mail check in closed mailboxes.
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
+	restore new mail check in closed mailboxes; manage message
+	references.
+	* libbalsa/: mailbox_local.c, mailbox_local.h, message.c: simplify
+	mailbox locking; restore threading in local mailboxes.
+	* libbalsa/: mailbox.c, mailbox.h: simplify mailbox locking; drop
+	LibBalsaMailboxIndexEntry::msgno; add accessors for
+	LibBalsaMailboxIndexEntry members.
+	* libbalsa/: filter.c, filter.h, libbalsa_private.h,
+	mailbox_imap.c: simplify mailbox locking.
+
 2004-05-05  Pawel Salek
 
 	* libbalsa/mailbox.[ch]: be more compatible with --disable-threads.

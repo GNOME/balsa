@@ -92,7 +92,6 @@ extern "C" {
 	GtkWidget *gpg_encrypt_menu_item;
 #endif
         GtkWidget *header_table;
-        GtkWidget *focus_widget;
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

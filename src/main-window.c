@@ -177,7 +177,7 @@ static void collapse_all_cb(GtkWidget * widget, gpointer data);
 
 static void address_book_cb(GtkWindow *widget, gpointer data);
 
-static void copy_cb(GtkWidget * widget, gpointer data);
+static void copy_cb(GtkWidget * widget, BalsaWindow *bw);
 static void ctrl_a_cb(GtkWidget * widget, gpointer data);
 static void select_all_cb(GtkWidget * widget, gpointer);
 static void mark_all_cb(GtkWidget * widget, gpointer);
@@ -1148,12 +1148,13 @@ enable_edit_menus(BalsaMessage * bm)
     gboolean enable;
     enable = (bm && balsa_message_can_select(bm));
 
-    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, enable);
+    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, bm !=
+                             NULL);
 
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_COPY_POS].widget, 
-                             enable);
-    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SELECT_ALL_POS].widget,
-                             enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_COPY_POS].widget,
+                             bm != NULL);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SELECT_ALL_POS].
+                             widget, enable);
 }
 
 /*
@@ -2395,14 +2396,15 @@ previous_part_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-copy_cb(GtkWidget * widget, gpointer data)
+copy_cb(GtkWidget * widget, BalsaWindow * bw)
 {
-    BalsaWindow *bw;
+    guint signal_id;
+    GtkWidget *focus_widget = gtk_window_get_focus(GTK_WINDOW(bw));
 
-    bw = BALSA_WINDOW(data);
-
-    if (bw->preview)
-        balsa_message_copy_clipboard(BALSA_MESSAGE(bw->preview));
+    signal_id = g_signal_lookup("copy-clipboard",
+                                G_TYPE_FROM_INSTANCE(focus_widget));
+    if (signal_id)
+        g_signal_emit(focus_widget, signal_id, (GQuark) 0);
 }
 
 /* Callback for the `Edit => Select All' menu item; if the keyboard

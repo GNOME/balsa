@@ -61,7 +61,7 @@ static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data);
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 
-static void copy_cb(GtkWidget * widget, gpointer data);
+static void copy_cb(GtkWidget * widget, MessageWindow * mw);
 static void select_all_cb(GtkWidget * widget, gpointer);
 
 static void select_part_cb(BalsaMessage * bm, gpointer data);
@@ -602,26 +602,21 @@ size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 static void
 select_part_cb(BalsaMessage * bm, gpointer data)
 {
-    gboolean enable;
-
-    if (balsa_message_can_select(bm))
-	enable = TRUE;
-    else
-	enable = FALSE;
-
-    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, enable);
+    gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, TRUE);
     gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
-			     enable);
+                             balsa_message_can_select(bm));
 }
 
-
 static void
-copy_cb(GtkWidget * widget, gpointer data)
+copy_cb(GtkWidget * widget, MessageWindow * mw)
 {
-    MessageWindow *mw = (MessageWindow *) (data);
+    guint signal_id;
+    GtkWidget *focus_widget = gtk_window_get_focus(GTK_WINDOW(mw->window));
 
-    if (mw->bmessage)
-	balsa_message_copy_clipboard(BALSA_MESSAGE(mw->bmessage));
+    signal_id = g_signal_lookup("copy-clipboard",
+                                G_TYPE_FROM_INSTANCE(focus_widget));
+    if (signal_id)
+        g_signal_emit(focus_widget, signal_id, (GQuark) 0);
 }
 
 static void

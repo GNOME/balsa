@@ -1742,13 +1742,6 @@ to_add(GtkWidget * widget,
     append_comma_separated(GTK_EDITABLE(widget), selection_data->data);
 }
 
-static gboolean
-sw_focus_in_cb(GtkWidget *widget, GdkEventFocus *event, BalsaSendmsg * bsmsg)
-{
-    bsmsg->focus_widget = widget;
-    return FALSE;
-}
-
 /*
  * static void create_email_or_string_entry()
  * 
@@ -1763,8 +1756,7 @@ sw_focus_in_cb(GtkWidget *widget, GdkEventFocus *event, BalsaSendmsg * bsmsg)
  */
 static void
 create_email_or_string_entry(GtkWidget * table, const gchar * label,
-                             int y_pos, GtkWidget * arr[],
-                             BalsaSendmsg * bsmsg)
+                             int y_pos, GtkWidget * arr[])
 {
     arr[0] = gtk_label_new_with_mnemonic(label);
     gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), arr[1]);
@@ -1779,8 +1771,6 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
                            (balsa_app.message_font));
     gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
 		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
-    g_signal_connect(G_OBJECT(arr[1]), "focus-in-event",
-		     G_CALLBACK(sw_focus_in_cb), bsmsg);
 }
 
 
@@ -1792,18 +1782,17 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
  * Input: GtkWidget* table       - Table to attach to.
  *        const gchar* label     - Label string.
  *        int y_pos              - position in the table.
- *        BalsaSendmsg * bsmsg   - passed to the focus-in callback.
  *      
  * Output: GtkWidget* arr[] - arr[0] will be the label widget.
  *                          - arr[1] will be the entry widget.
  */
 static void
 create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
-                    BalsaSendmsg * bsmsg, GtkWidget * arr[])
+                    GtkWidget * arr[])
 {
     arr[1] = gtk_entry_new();
     gtk_entry_set_max_length(GTK_ENTRY(arr[1]), 2048);
-    create_email_or_string_entry(table, label, y_pos, arr, bsmsg);
+    create_email_or_string_entry(table, label, y_pos, arr);
 }
 
 /*
@@ -1838,7 +1827,7 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
                    gint max_addresses)
 {
     arr[1] = libbalsa_address_entry_new();
-    create_email_or_string_entry(table, label, y_pos, arr, bsmsg);
+    create_email_or_string_entry(table, label, y_pos, arr);
 
     arr[2] = gtk_button_new();
     gtk_button_set_relief(GTK_BUTTON(arr[2]), GTK_RELIEF_NONE);
@@ -1928,7 +1917,7 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
     /* Subject: */
-    create_string_entry(table, _("S_ubject:"), 2, bsmsg, bsmsg->subject);
+    create_string_entry(table, _("S_ubject:"), 2, bsmsg->subject);
     g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
     /* cc: */
@@ -2025,10 +2014,10 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
 
 
     /* Comments: */
-    create_string_entry(table, _("Comments:"), 8, bsmsg, bsmsg->comments);
+    create_string_entry(table, _("Comments:"), 8, bsmsg->comments);
 
     /* Keywords: */
-    create_string_entry(table, _("Keywords:"), 9, bsmsg, bsmsg->keywords);
+    create_string_entry(table, _("Keywords:"), 9, bsmsg->keywords);
 
     /* Scrolled window to hold the header table. */
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -2097,8 +2086,6 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_container_add(GTK_CONTAINER(table), bsmsg->text);
     g_signal_connect(G_OBJECT(bsmsg->text), "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
-    g_signal_connect(G_OBJECT(bsmsg->text), "focus-in-event",
-		     G_CALLBACK(sw_focus_in_cb), bsmsg);
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), GTK_DEST_DEFAULT_ALL,
 		      drop_types, ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
@@ -2705,7 +2692,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->gpg_mode = 0;
 #endif
     bsmsg->wrap_timeout_id = 0;
-    bsmsg->focus_widget = NULL;
 
     if (message) {
         /* ref message so we don't lose it even if it is deleted */
@@ -3602,64 +3588,31 @@ static void
 clipboard_helper(BalsaSendmsg * bsmsg, gchar * signal)
 {
     guint signal_id;
+    GtkWidget *focus_widget =
+        gtk_window_get_focus(GTK_WINDOW(bsmsg->window));
 
-    if (!bsmsg->focus_widget)
-        return;
-    signal_id = g_signal_lookup(signal,
-                                G_TYPE_FROM_INSTANCE(bsmsg->focus_widget));
+    signal_id =
+        g_signal_lookup(signal, G_TYPE_FROM_INSTANCE(focus_widget));
     if (signal_id)
-        g_signal_emit(bsmsg->focus_widget, signal_id, (GQuark) 0);
+        g_signal_emit(focus_widget, signal_id, (GQuark) 0);
 }
 
 static void
 cut_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if 0
-    if (GTK_IS_TEXT_VIEW(bsmsg->focus_widget)) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-        GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
-
-        gtk_text_buffer_cut_clipboard(buffer, clipboard, TRUE);
-    } else if (GTK_IS_EDITABLE(bsmsg->focus_widget))
-        gtk_editable_cut_clipboard(GTK_EDITABLE(bsmsg->focus_widget));
-#else
     clipboard_helper(bsmsg, "cut-clipboard");
-#endif
 }
 
 static void
 copy_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if 0
-    if (GTK_IS_TEXT_VIEW(bsmsg->focus_widget)) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-        GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
-
-        gtk_text_buffer_copy_clipboard(buffer, clipboard);
-    } else if (GTK_IS_EDITABLE(bsmsg->focus_widget))
-        gtk_editable_copy_clipboard(GTK_EDITABLE(bsmsg->focus_widget));
-#else
     clipboard_helper(bsmsg, "copy-clipboard");
-#endif
 }
 
 static void
 paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-#if 0
-    if (GTK_IS_TEXT_VIEW(bsmsg->focus_widget)) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-        GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
-
-        gtk_text_buffer_paste_clipboard(buffer, clipboard, NULL, TRUE);
-    } else if (GTK_IS_EDITABLE(bsmsg->focus_widget))
-        gtk_editable_paste_clipboard(GTK_EDITABLE(bsmsg->focus_widget));
-#else
     clipboard_helper(bsmsg, "paste-clipboard");
-#endif
 }
 
 static void

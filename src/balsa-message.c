@@ -3285,7 +3285,8 @@ balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
  * are supported for this (GtkHTML could be, but I don't have a 
  * working build right now)
  */
-gboolean balsa_message_can_select(BalsaMessage * bmessage)
+gboolean
+balsa_message_can_select(BalsaMessage * bmessage)
 {
     GtkWidget *w;
 
@@ -3296,25 +3297,6 @@ gboolean balsa_message_can_select(BalsaMessage * bmessage)
 	return FALSE;
 
     return GTK_IS_EDITABLE(w) || GTK_IS_TEXT_VIEW(w);
-}
-
-void
-balsa_message_copy_clipboard(BalsaMessage * bmessage)
-{
-    GtkWidget *w;
-
-    g_return_if_fail(bmessage != NULL);
-    g_return_if_fail(bmessage->current_part != NULL);
-    g_return_if_fail((w = bmessage->current_part->focus_widget) != NULL);
-
-    if (GTK_IS_EDITABLE(w))
-        gtk_editable_copy_clipboard(GTK_EDITABLE(w));
-    else if (GTK_IS_TEXT_VIEW(w)) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(w));
-        GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
-        gtk_text_buffer_copy_clipboard(buffer, clipboard);
-    }
 }
 
 void

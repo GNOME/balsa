@@ -1,3 +1,16 @@
+1999-11-28  Hector Garcia Alvarez <hector@scouts-es.org>
+
+        * Added SMTP funtionalty. This should be consider
+	alpha software. It has only been probe by me. 
+
+        * src/balsa-app.h : Added balsa_app.smtp to struct
+
+	* src/save-restore.c : Added support to read and write
+	config parameter about using smtp or local mail delivery
+
+	* libbalsa/send.c : Added funtions balsa_smtp_send and
+	smtp_answer.
+				
 1999-11-28  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
 
 	* idl/Makefile.am: The auxiliary library libbalsasrv.a was

@@ -840,8 +840,11 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
 
     if (balsa_app.smtp) 
-   // snprintf (tmp, sizeof (tmp), "%d", balsa_app.smtp);
-        pl_dict_add_str_str (globals, "SMTP", 1);
+    {
+      snprintf (tmp, sizeof (tmp), "%d", balsa_app.smtp);
+      pl_dict_add_str_str (globals, "SMTP", tmp);
+    }
+
 #ifdef BALSA_SHOW_INFO
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
     pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);

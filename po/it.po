@@ -222,9 +222,10 @@ msgstr "Nome"
 msgid "Up"
 msgstr "Su"
 
+#"Giu\'" is not valid. Changed to Giu
 #: src/filter-edit-dialog.c:171
 msgid "Down"
-msgstr "Giu\'"
+msgstr "Giu"
 
 #: src/filter-edit-dialog.c:188
 msgid "New"
@@ -851,7 +852,7 @@ msgstr "Non posso avere informazioni sul file '%s': %s\n"
 #: src/sendmsg-window.c:188
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
-msgstr "L'allegato non e' un file valido: '%s'\n""
+msgstr "L'allegato non e' un file valido: '%s'\n"
 
 #: src/sendmsg-window.c:239
 msgid "Attach file"

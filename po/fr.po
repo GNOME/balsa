@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 1999-01-17 00:11+0100\n"
+"POT-Creation-Date: 1999-02-06 17:35+0100\n"
 "PO-Revision-Date: 1998-10-02 21:43+0200\n"
 "Last-Translator: Vincent Renardias <vincent@ldsol.com>\n"
 "Language-Team: Vincent Renardias <vincent@ldsol.com>\n"
@@ -65,12 +65,12 @@ msgstr ""
 "savoir comment contacter les auteurs ou faire part des bugs éventuels."
 
 #. your name
-#: src/balsa-init.c:247 src/pref-manager.c:343
+#: src/balsa-init.c:247 src/pref-manager.c:363
 msgid "Your name:"
 msgstr "Votre nom:"
 
 #. email address
-#: src/balsa-init.c:261 src/pref-manager.c:353
+#: src/balsa-init.c:261 src/pref-manager.c:373
 msgid "E-Mail address:"
 msgstr "Adresse E-Mail:"
 
@@ -109,7 +109,8 @@ msgstr "Enregistrer la partie MIME"
 msgid "Save"
 msgstr "Enregistrer"
 
-#: src/balsa-message.c:158 src/mailbox-conf.c:482 src/sendmsg-window.c:67
+#: src/balsa-message.c:158 src/mailbox-conf.c:482 src/sendmsg-window.c:73
+#: src/sendmsg-window.c:184
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -122,43 +123,43 @@ msgstr " L'ouverture de %s a échouée: %s "
 msgid "Ok"
 msgstr "Ok"
 
-#: src/index-child.c:142
+#: src/index-child.c:143
 msgid "Mailbox password:"
 msgstr "Mot de passe de la boite:"
 
-#: src/index-child.c:175
+#: src/index-child.c:176
 msgid "Unable to Open Mailbox!"
 msgstr "Impossible d'ouvrir la boite!"
 
-#: src/index-child.c:366
+#: src/index-child.c:399
 msgid "Transfer"
 msgstr "Transférer"
 
-#: src/index-child.c:386
+#: src/index-child.c:419
 msgid "Change Status"
 msgstr "Changer le status"
 
-#: src/index-child.c:389
+#: src/index-child.c:422
 msgid "Unread"
 msgstr "Non lu"
 
-#: src/index-child.c:395
+#: src/index-child.c:428
 msgid "Read"
 msgstr "Lu"
 
-#: src/index-child.c:401
+#: src/index-child.c:434
 msgid "Replied"
 msgstr "Répondu"
 
-#: src/index-child.c:407
+#: src/index-child.c:440
 msgid "Forwarded"
 msgstr "Transmi"
 
-#: src/index-child.c:416 src/main-window.c:206 src/pref-manager.c:447
+#: src/index-child.c:449 src/main-window.c:206 src/pref-manager.c:467
 msgid "Delete"
 msgstr "Effacer"
 
-#: src/index-child.c:424
+#: src/index-child.c:457
 msgid "Undelete"
 msgstr "Récupérer"
 
@@ -185,7 +186,7 @@ msgstr ""
 msgid "Mailbox Configurator"
 msgstr "Configuration des boites"
 
-#: src/mailbox-conf.c:280 src/mailbox-conf.c:885 src/pref-manager.c:437
+#: src/mailbox-conf.c:280 src/mailbox-conf.c:885 src/pref-manager.c:457
 msgid "Add"
 msgstr "Ajouter"
 
@@ -306,14 +307,12 @@ msgid "_Edit"
 msgstr "_Edition"
 
 #: src/main-window.c:161
-#, fuzzy
 msgid "Edit the selected mailbox"
-msgstr "Détruire boite"
+msgstr "Editer la boite sélectionnée"
 
 #: src/main-window.c:163
-#, fuzzy
 msgid "Delete the selected mailbox"
-msgstr "Détruire boite"
+msgstr "Détruire la boite sélectionnée"
 
 #: src/main-window.c:166
 msgid "C_lose current"
@@ -395,7 +394,7 @@ msgstr "Suivant"
 msgid "Open Next Message"
 msgstr "Ouvre le message suivant"
 
-#: src/main-window.c:216 src/sendmsg-window.c:65
+#: src/main-window.c:216 src/sendmsg-window.c:71
 msgid "Print"
 msgstr "Imprimer"
 
@@ -417,9 +416,8 @@ msgid ""
 msgstr ""
 
 #: src/message-window.c:54
-#, fuzzy
 msgid "Reply to this message"
-msgstr "Ajouter un attachement à ce message"
+msgstr "Repondre à ce message"
 
 #: src/message-window.c:61
 msgid "Reply to all recipients of this message"
@@ -429,143 +427,158 @@ msgstr "Répondre à tous les destinataires de ce message"
 msgid "Forward this message"
 msgstr "Faire suivre ce message"
 
-#: src/pref-manager.c:113
+#: src/pref-manager.c:116
 msgid "Balsa Preferences"
 msgstr "Préférences de Balsa"
 
 #. identity page
-#: src/pref-manager.c:128
+#: src/pref-manager.c:136
 msgid "Identity"
 msgstr "Identité"
 
 #. mailboxes page
-#: src/pref-manager.c:135
+#: src/pref-manager.c:143
 msgid "Mail Servers"
 msgstr "Serveurs de messagerie"
 
 #. display page
-#: src/pref-manager.c:142
+#: src/pref-manager.c:150
 msgid "Display"
 msgstr "Affichage"
 
 #. Misc page
-#: src/pref-manager.c:149
+#: src/pref-manager.c:157
 msgid "Misc"
 msgstr "Divers"
 
 #. reply-to address
-#: src/pref-manager.c:363
+#: src/pref-manager.c:383
 msgid "Reply-to address:"
 msgstr "Adresse Répondre-A:"
 
 #. signature
-#: src/pref-manager.c:373
+#: src/pref-manager.c:393
 msgid "Signature:"
 msgstr "Signature:"
 
-#: src/pref-manager.c:407
+#: src/pref-manager.c:427
 msgid "Remote Mailbox Servers"
 msgstr ""
 
-#: src/pref-manager.c:416
+#: src/pref-manager.c:436
 msgid "Type"
 msgstr "Type"
 
-#: src/pref-manager.c:417
+#: src/pref-manager.c:437
 msgid "Mailbox name"
 msgstr ""
 
-#: src/pref-manager.c:442
+#: src/pref-manager.c:462
 msgid "Modify"
 msgstr "Modifier"
 
-#: src/pref-manager.c:452
+#: src/pref-manager.c:472
 msgid "Local Mail"
 msgstr ""
 
-#: src/pref-manager.c:457
+#: src/pref-manager.c:477
 msgid "Local mail directory:"
 msgstr "Répertoire de mail local:"
 
 #. smtp server
-#: src/pref-manager.c:464
+#: src/pref-manager.c:484
 msgid "Outgoing Mail"
 msgstr ""
 
-#: src/pref-manager.c:472
+#: src/pref-manager.c:492
 msgid "Remote SMTP Server"
 msgstr "Serveur SMTP distant"
 
-#: src/pref-manager.c:481
+#: src/pref-manager.c:501
 msgid "Local mail user agent"
 msgstr ""
 
 #. Toolbars
-#: src/pref-manager.c:514
+#: src/pref-manager.c:534
 msgid "Toolbars"
 msgstr "Barres d'outils"
 
-#: src/pref-manager.c:534
+#: src/pref-manager.c:554
 msgid "Use preview pane"
 msgstr ""
 
-#: src/pref-manager.c:563
+#: src/pref-manager.c:561
+msgid "View mailbox content informations "
+msgstr ""
+
+#: src/pref-manager.c:590
 msgid "Debug"
 msgstr "Débug"
 
-#: src/pref-manager.c:570
+#: src/pref-manager.c:597
 msgid "Reply prefix:"
 msgstr ""
 
-#: src/sendmsg-window.c:59
+#: src/sendmsg-window.c:65
 msgid "Send"
 msgstr "Envoyer"
 
-#: src/sendmsg-window.c:59
+#: src/sendmsg-window.c:65
 msgid "Send this mail"
 msgstr "Envoyer ce message"
 
-#: src/sendmsg-window.c:61
+#: src/sendmsg-window.c:67
 msgid "Attach"
 msgstr "Attacher"
 
-#: src/sendmsg-window.c:61
+#: src/sendmsg-window.c:67
 msgid "Add attachments to this message"
 msgstr "Ajouter un attachement à ce message"
 
-#: src/sendmsg-window.c:63
+#: src/sendmsg-window.c:69
 msgid "Spelling"
 msgstr "Vérification orthographique"
 
-#: src/sendmsg-window.c:63
+#: src/sendmsg-window.c:69
 msgid "Check Spelling"
 msgstr "Vérifier l'orthographe"
 
-#: src/sendmsg-window.c:74
+#: src/sendmsg-window.c:80
 msgid "_Send"
 msgstr "_Envoyer"
 
-#: src/sendmsg-window.c:78
+#: src/sendmsg-window.c:84
 msgid "_Attach file..."
 msgstr "_Attacher fichier..."
 
-#: src/sendmsg-window.c:131
+#: src/sendmsg-window.c:137
 msgid "Remove"
 msgstr "Enlever"
 
-#: src/sendmsg-window.c:202
+# , c-format
+#: src/sendmsg-window.c:177
+#, c-format
+msgid "Cannot get info on file '%s': %s\n"
+msgstr "Impossible d'obtenir des informations sur le fichier '%s': %s\n"
+
+#: src/sendmsg-window.c:180
+#, c-format
+msgid "Attachment is not a regular file: '%s'\n"
+msgstr ""
+
+#: src/sendmsg-window.c:231
 msgid "Attach file"
 msgstr "Attacher fichier"
 
-#: src/sendmsg-window.c:441
+#: src/sendmsg-window.c:470
 msgid "Reply to "
 msgstr "Répondre à "
 
-#: src/sendmsg-window.c:446
+#: src/sendmsg-window.c:475
 msgid "Forward message"
 msgstr "Faire suivre"
 
-#: src/sendmsg-window.c:451
+#: src/sendmsg-window.c:480
 msgid "New message"
 msgstr "Nouveau message"
 
@@ -580,4 +593,3 @@ msgstr ""
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
-

@@ -1,3 +1,10 @@
+2002-12-18 09:32  PeterB
+
+	* src/balsa-message.c (store_button_coords, check_call_url,
+	part_info_init_mimetext): Fix #101292: g_signal_connect_after
+	doesn't seem to work for "button_press_event" on a GtkTextView; use
+	a better mask for stored_mask.
+
 2002-12-15 22:05  PeterB
 
 	* src/balsa-mblist.c: (balsa_mblist_mru_option_menu) *Really*

@@ -1,3 +1,8 @@
+2001-07-21  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in: fix sasl reporting
+	patch from Ali Akcaagac to check from balsa-enable libesmtp
+
 2001-07-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/Makefile.am: add missing PCRE_CFLAGS.

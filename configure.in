@@ -408,8 +408,12 @@ AC_ARG_WITH(esmtp, [  --with-esmtp	        Enable libESMTP [default=yes]],[
 
 AC_MSG_CHECKING([whether to build ESMTP support])
 if test "x$with_esmtp" != xno  ; then
-	AC_MSG_RESULT([yes])
+AC_MSG_RESULT([yes])
 	AC_CHECK_LIB(esmtp, smtp_start_session, AC_DEFINE(ENABLE_ESMTP) LIBS="$LIBS -lesmtp", AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]), -lesmtp)
+	AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, AC_DEFINE(ENABLE_ESMTP) LIBS="$LIBS -lesmtp", AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
+	'require_all_recipients'. Please get a Balsa aware
+	libESMTP from http://www.balsa.net/main.html or compile
+	libESMTP with './configure --enable-require-all-recipients'.]), -lesmtp)
 	test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
 else
 	AC_MSG_RESULT([no])
@@ -478,6 +482,7 @@ if test "x$with_sasl" != xno  ; then
 	need_sasl=yes
         need_md5=no        
 else
+	need_sasl=no
 	AC_MSG_RESULT([no])
 fi
 AM_CONDITIONAL(USE_SASL, test x$need_sasl = xyes)

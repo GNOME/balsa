@@ -1034,6 +1034,17 @@ delete_ident_cb(GtkButton* button, gpointer user_data)
     gtk_widget_destroy(confirm);
 }
 
+/* row_activated_cb:
+ * set the activated identity (which is also the currently selected
+ * identity) as the default.
+ */
+static void
+row_activated_cb(GtkTreeView * tree, GtkTreePath * path,
+                 GtkTreeViewColumn * column, gpointer data)
+{
+    set_default_ident_cb(NULL, (gpointer) tree);
+}
+
 /* in src/balsa-app.c: */
 extern GtkWidget *balsa_stock_button_with_label(const gchar *,
                                                 const gchar *);
@@ -1089,6 +1100,8 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     gtk_object_set_data(GTK_OBJECT(tree), "parent-window", parent);
     gtk_object_set_data(GTK_OBJECT(tree), "frame", display_frame);
+    gtk_signal_connect(GTK_OBJECT(tree), "row-activated",
+                       GTK_SIGNAL_FUNC(row_activated_cb), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
 

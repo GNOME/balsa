@@ -1,3 +1,8 @@
+2002-05-12  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/identity.c: double-click selects default identity.
+	* src/sendmsg-window.c: GtkDialog->GtkMessageDialog to save 5 lines.
+
 2002-05-11  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-app.[hc]: make balsa_stock_button_with_label use

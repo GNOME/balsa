@@ -536,22 +536,17 @@ delete_handler(BalsaSendmsg* bsmsg)
     if(balsa_app.debug) printf("delete_event_cb\n");
     if(bsmsg->modified) {
         const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
-	gchar* str = 
-	    g_strdup_printf(_("The message to '%s' is modified.\n"
-			      "Save message to Draftbox?"),
-                              tmp);
-	GtkWidget* l = gtk_label_new(str);
 	GtkWidget* d = 
-            gtk_dialog_new_with_buttons(_("Closing the Compose Window"),
-                                        GTK_WINDOW(bsmsg->window),
-                                        GTK_DIALOG_MODAL,
-                                        GTK_STOCK_YES, GTK_RESPONSE_YES,
-                                        GTK_STOCK_NO,  GTK_RESPONSE_NO,
-                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                        NULL);
-	g_free(str);
-	gtk_widget_show(l);
-	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(d)->vbox), l);
+            gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+                                   GTK_DIALOG_MODAL,
+                                   GTK_MESSAGE_QUESTION,
+                                   GTK_BUTTONS_YES_NO,
+                                   _("The message to '%s' is modified.\n"
+                                     "Save message to Draftbox?"),
+                                   tmp);
+
+        gtk_dialog_add_button(GTK_DIALOG(d),
+                              GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
 	reply = gtk_dialog_run(GTK_DIALOG(d));
         gtk_widget_destroy(d);
 	if(reply == GTK_RESPONSE_YES)

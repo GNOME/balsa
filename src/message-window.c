@@ -25,6 +25,26 @@
 #include "main-window.h"
 #include "misc.h"
 
+static void close_message_window(GtkWidget * widget, gpointer data);
+
+static GnomeUIInfo file_menu[] =
+{
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Close"), NULL, close_message_window, NULL,
+    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CLOSE, 'C', 0, NULL
+  },
+  GNOMEUIINFO_END
+};
+
+static GnomeUIInfo main_menu[] =
+{
+  GNOMEUIINFO_SUBTREE ("_File", file_menu),
+  GNOMEUIINFO_END
+};
+
+
+
+
 typedef struct _MessageWindow MessageWindow;
 struct _MessageWindow
   {
@@ -65,6 +85,9 @@ message_window_new (Message * message)
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
+  gnome_app_create_menus_with_data ( GNOME_APP (mw->window), main_menu,
+  				     mw->window );
+
   vbox = gtk_vbox_new (TRUE, 0);
   gnome_app_set_contents (GNOME_APP (mw->window), vbox);
 
@@ -102,3 +125,11 @@ destroy_message_window (GtkWidget * widget)
 
   g_free (mw);
 }
+
+static void
+close_message_window(GtkWidget * widget, gpointer data)
+{
+  destroy_message_window(GTK_WIDGET(data));
+}
+
+

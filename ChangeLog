@@ -8,6 +8,9 @@
 	- Added menu items to add, edit, and delete mailboxes.
 	- Corrected typo.
 
+	* src/message-window.c:
+	- added menu to message window, just File|Close right now.
+
 1998-12-13  Jeff Garzik <jgarzik@pobox.com>
 
 	* src/main-window.c:

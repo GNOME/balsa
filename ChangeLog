@@ -1,3 +1,8 @@
+2003-12-07 19:38  PeterB
+
+	* src/message-window.c: Manage sensitivity of next-unread toolbar
+	button.
+
 2003-12-02 15:26  PeterB
 
 	* libbalsa/body.c: Unref the message returned by

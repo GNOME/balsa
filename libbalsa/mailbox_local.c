@@ -366,10 +366,9 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox, guint msgno)
 	    ++new_messages;
 
     if (new_messages)
-	g_signal_emit_by_name(G_OBJECT(mailbox), "changed");
-
-    libbalsa_mailbox_set_unread_messages_flag(mailbox,
-					      mailbox->unread_messages > 0);
+	libbalsa_mailbox_set_unread_messages_flag(mailbox,
+						  mailbox->
+						  unread_messages > 0);
 }
 
 /*

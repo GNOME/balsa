@@ -1,3 +1,12 @@
+1999-01-07  bertrand   <Bertrand.Guiheneuf@inria.fr>
+
+	* libbalsa/mailbox.c (_mailbox_open_ref): unlock the mailbox even if
+	it was already opened before.
+	(message_move): test if we actually opened the mailbox or
+	if it was opened before. When it was already opened, don't
+	unref it.
+	--> the dnd move works now, yeepeeh !
+
 1999-01-07  Nat Friedman  <nat@nat.org>
 
 	* src/main-window.c (help_menu): Use GNOMEUIINFO_MENU_ABOUT_ITEM

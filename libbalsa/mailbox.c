@@ -395,8 +395,10 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
   if (CLIENT_CONTEXT_OPEN (mailbox))
     {
       if (flag == M_APPEND)
-	return FALSE;		/* we need the mailbox to be opened fresh i think */
-
+	{
+	  UNLOCK_MAILBOX (mailbox);
+	  return FALSE;		/* we need the mailbox to be opened fresh i think */
+	}
       /* incriment the reference count */
       mailbox->open_ref++;
 
@@ -471,6 +473,9 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
 void
 mailbox_open_unref (Mailbox * mailbox)
 {
+#ifdef DEBUG
+      g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
+#endif
   LOCK_MAILBOX (mailbox);
 
   if (mailbox->open_ref == 0)
@@ -480,9 +485,6 @@ mailbox_open_unref (Mailbox * mailbox)
 
   if (mailbox->open_ref == 0)
     {
-#ifdef DEBUG
-      g_print (_ ("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
-#endif
       free_messages (mailbox);
       mailbox->messages = 0;
 
@@ -1099,21 +1101,24 @@ void
 message_move (Message * message, Mailbox * dest)
 {
   HEADER *cur;
+  gint new_opened;
 
   RETURN_IF_CLIENT_CONTEXT_CLOSED (message->mailbox);
-
+  
   cur = CLIENT_CONTEXT (message->mailbox)->hdrs[message->msgno];
 
-  mailbox_open_append (dest);
+  /* if the mailbox is not already opened, open it */
+  new_opened = mailbox_open_append (dest);
 
   mutt_parse_mime_message (CLIENT_CONTEXT (message->mailbox), cur);
 
   mutt_append_message (CLIENT_CONTEXT (dest),
 		       CLIENT_CONTEXT (message->mailbox),
 		       cur, 0, CH_UPDATE_LEN);
-
-  mailbox_open_unref (dest);
-
+  
+  /* if we opened the mail box, close it */
+  if (new_opened) mailbox_open_unref (dest);
+  
   message_delete (message);
 }
 

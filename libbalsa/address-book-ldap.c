@@ -204,7 +204,8 @@ libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab)
 
 /*
  * Opens the ldap connection, and binds to the server.
- * Also enables LDAP caching.
+ * NOTE: We log messages at the debug level since they 
+ * are not important for ordinary user.
  */
 static gboolean
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
@@ -224,7 +225,8 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
     }
 
     /* ignore error if the V3 LDAP cannot be set */
-    ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version);
+    if(ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version)
+       != LDAP_SUCCESS) ldap_perror(ab->directory, "ldap_set_option");
 
     if(ab->enable_tls) {
 #ifdef HAVE_LDAP_TLS
@@ -232,7 +234,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
         result = ldap_start_tls_s(ab->directory, NULL, NULL);
         if(result != LDAP_SUCCESS) {
             libbalsa_information
-                (LIBBALSA_INFORMATION_ERROR,
+                (LIBBALSA_INFORMATION_DEBUG,
                  _("Couldn't enable TLS on the LDAP connection: %s"),
                  ldap_err2string(result));
             ldap_unbind(ab->directory);
@@ -252,7 +254,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
                                 ab->passwd);
 
     if (result != LDAP_SUCCESS) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
 			     _("Failed to bind to server: %s\n"
 			       "Check that the server name is valid."),
 			     ldap_err2string(result));
@@ -301,9 +303,10 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
     /* g_print("Performing full lookup...\n"); */
     msgid = ldap_search(ldap_ab->directory, ldap_ab->base_dn,
                      LDAP_SCOPE_SUBTREE, "(mail=*)", attrs, 0);
-    if (msgid == -1)
+    if (msgid == -1) {
+        libbalsa_address_book_ldap_close_connection(ldap_ab);
 	return LBABERR_CANNOT_SEARCH;
-    
+    }
     /* 
      * Now loop over all the results, and spit out the output.
      */

@@ -1,3 +1,9 @@
+2003-08-05  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/address.[hc]: move common address edition code here.
+	* src/ab-main.c: further hacking.
+	* src/store-address.c: remove common address edition code from here.
+
 2003-07-31 16:43  PeterB
 
 	* src/: balsa-message.c, balsa-message.h, main-window.c: Make all

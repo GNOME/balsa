@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <libgnome/gnome-i18n.h>
 
 #include "address.h"
 
@@ -735,3 +736,134 @@ libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
     return (gchar*)nth_address->data;
 }
 
+
+/* =================================================================== */
+/*                                UI PART                              */
+/* =================================================================== */
+
+/** libbalsa_address_get_edit_widget() returns an widget adapted
+    for a LibBalsaAddress edition, with initial values set if address
+    is provided. The edit entries are set in entries array 
+    and enumerated with LibBalsaAddressField constants
+*/
+GtkWidget*
+libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries)
+{
+    const static gchar *labels[NUM_FIELDS] = {
+	N_("_Displayed Name:"),
+	N_("_First Name:"),
+	N_("_Middle Name:"),
+	N_("_Last Name:"),
+	N_("_Nickname:"),
+	N_("O_rganization:"),
+	N_("_Email Address:")
+    };
+
+    GtkWidget *table, *label;
+    gchar *new_name = NULL;
+    gchar *new_email = NULL;
+    gchar *new_organization = NULL;
+    gchar *first_name = NULL;
+    gchar *middle_name = NULL;
+    gchar *last_name = NULL;
+    gchar *carrier = NULL;
+    gint cnt, cnt2;
+
+    new_email = g_strdup(address->address_list->data);
+    /* initialize the organization... */
+    if (address->organization == NULL)
+	new_organization = g_strdup("");
+    else
+	new_organization = g_strdup(address->organization);
+
+    /* if the message only contains an e-mail address */
+    if (address->full_name == NULL)
+	new_name = g_strdup(new_email);
+    else {
+        gchar **names;
+	/* make sure address->personal is not all whitespace */
+	new_name = g_strstrip(g_strdup(address->full_name));
+
+	/* guess the first name, middle name and last name */
+	if (*new_name != '\0') {
+	    names = g_strsplit(new_name, " ", 0);
+
+	    for (cnt=0; names[cnt]; cnt++)
+		;
+
+	    /* get first name */
+	    first_name = g_strdup(names[0]);
+
+	    /* get last name */
+	    if (cnt == 1)
+		last_name = g_strdup("");
+	    else
+		last_name = g_strdup(names[cnt - 1]);
+
+	    /* get middle name */
+	    middle_name = g_strdup("");
+
+	    cnt2 = 1;
+	    if (cnt > 2)
+		while (cnt2 != cnt - 1) {
+		    carrier = middle_name;
+		    middle_name = g_strconcat(middle_name, names[cnt2++], NULL);
+		    g_free(carrier);
+
+		    if (cnt2 != cnt - 1) {
+			carrier = middle_name;
+			middle_name = g_strconcat(middle_name, " ", NULL);
+			g_free(carrier);
+		    }
+		}
+
+	    g_strfreev(names);
+	}
+    }
+
+    if (first_name == NULL)
+	first_name = g_strdup("");
+    if (middle_name == NULL)
+	middle_name = g_strdup("");
+    if (last_name == NULL)
+	last_name = g_strdup("");
+
+
+    table = gtk_table_new(NUM_FIELDS, 2, FALSE);
+    gtk_container_set_border_width(GTK_CONTAINER(table), 3);
+
+    for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
+	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
+	entries[cnt] = gtk_entry_new();
+	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
+
+	gtk_table_attach(GTK_TABLE(table), label, 0, 1, cnt + 1, cnt + 2,
+			 GTK_FILL, GTK_FILL, 4, 4);
+
+	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+
+	gtk_table_attach(GTK_TABLE(table), entries[cnt], 1, 2, cnt + 1,
+			 cnt + 2, GTK_FILL | GTK_EXPAND,
+			 GTK_FILL | GTK_EXPAND, 2, 2);
+    }
+
+    gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[MIDDLE_NAME]), middle_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[EMAIL_ADDRESS]), new_email);
+    gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
+
+    gtk_editable_select_region(GTK_EDITABLE(entries[FULL_NAME]), 0, -1);
+
+    for (cnt = FULL_NAME + 1; cnt < NUM_FIELDS; cnt++)
+        gtk_editable_set_position(GTK_EDITABLE(entries[cnt]), 0);
+
+    g_free(new_name);
+    g_free(first_name);
+    g_free(middle_name);
+    g_free(last_name);
+    g_free(new_email);
+    g_free(new_organization);
+    return table;
+}

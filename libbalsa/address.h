@@ -23,7 +23,7 @@
 #ifndef __LIBBALSA_ADDRESS_H__
 #define __LIBBALSA_ADDRESS_H__
 
-#include <glib-object.h>
+#include <gtk/gtk.h>
 
 #define LIBBALSA_TYPE_ADDRESS				(libbalsa_address_get_type())
 #define LIBBALSA_ADDRESS(obj)				(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS, LibBalsaAddress))
@@ -105,4 +105,15 @@ const gchar *libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n);
 const gchar *libbalsa_address_get_phrase(LibBalsaAddress * address);
 #endif
 
+/* =================================================================== */
+/*                                UI PART                              */
+/* =================================================================== */
+
+/** libbalsa_address_get_edit_widget() returns an widget adapted
+    for a LibBalsaAddress edition, with initial values set if address
+    is provided. The edit entries are set in entries array 
+    and enumerated with LibBalsaAddressField constants
+*/
+GtkWidget* libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
+                                            GtkWidget **entries);
 #endif				/* __LIBBALSA_ADDRESS_H__ */

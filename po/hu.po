@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa VERSION\n"
-"POT-Creation-Date: 2001-01-10 14:56+0000\n"
-"PO-Revision-Date: 2001-01-10 15:51+0100\n"
+"POT-Creation-Date: 2001-01-11 18:48+0000\n"
+"PO-Revision-Date: 2001-01-11 18:51+0100\n"
 "Last-Translator: Andras TIMAR <timar@gnome.hu>\n"
 "Language-Team: Hungarian <hu@gnome.hu>\n"
 "MIME-Version: 1.0\n"
@@ -137,7 +137,6 @@ msgstr ""
 "Nem sikerült törölni %s-t:\n"
 "%s"
 
-
 #: libbalsa/mailbox_mbox.c:120
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
@@ -177,7 +176,7 @@ msgstr "A POP parancs végrehajtása nem sikerült"
 #: libbalsa/pop3.c:50
 #, fuzzy
 msgid "Could not write the message"
-msgstr "Levél folytatása"
+msgstr "A levél mentése nem sikerült"
 
 #: libbalsa/pop3.c:51
 msgid "Could not run the delivery program (procmail)"
@@ -190,7 +189,7 @@ msgstr ""
 #: libbalsa/pop3.c:53
 #, fuzzy
 msgid "Could not append message"
-msgstr "A fájl nyitása nem volt sikeres.\n"
+msgstr "A levél továbbírása nem sikerült"
 
 #: libbalsa/pop3.c:54
 msgid "Host not found"
@@ -368,8 +367,8 @@ msgstr "GnomeCard Címjegyzék"
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
-"\"%s\": az elérési útat a fájlrendszer gyökerétõl kiindulva kell megadni (/"
-"-el kezdõdik)."
+"\"%s\": az elérési útat a fájlrendszer gyökerétõl kiindulva kell megadni "
+"(/-el kezdõdik)."
 
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
@@ -529,14 +528,14 @@ msgid "Mailbox is read-only."
 msgstr "A postafiók csak olvasható."
 
 #: libmutt/mx.c:1065
-#, fuzzy, c-format
+#, c-format
 msgid "Purge %d deleted message?"
-msgstr "A szerkesztett levél nyomtatása"
+msgstr "Véglegesen törölsz %d kukába dobott levelet?"
 
 #: libmutt/mx.c:1065
-#, fuzzy, c-format
+#, c-format
 msgid "Purge %d deleted messages?"
-msgstr "A szerkesztett levél nyomtatása"
+msgstr "Véglegesen törölsz %d kukába dobott levelet?"
 
 #: libmutt/mx.c:1095
 #, c-format
@@ -984,14 +983,13 @@ msgid "Filename: %s"
 msgstr "Fájlnév: %s"
 
 #: src/balsa-message.c:806
-#, fuzzy
 msgid "Save part"
-msgstr "MIME mentése"
+msgstr "Részlet mentése"
 
 #: src/balsa-message.c:830
 #, c-format
 msgid "View part with %s"
-msgstr ""
+msgstr "Részlet megtekintése %s segítségével"
 
 #: src/balsa-message.c:1438
 msgid "Save..."
@@ -1398,9 +1396,8 @@ msgid "Local MH mailbox..."
 msgstr "Helyi MH postafiók..."
 
 #: src/main-window.c:220
-#, fuzzy
 msgid "Add a new MH style mailbox"
-msgstr "Uj _postafiók létrehozása"
+msgstr "Új MH postafiók létrehozása"
 
 #: src/main-window.c:224
 msgid "Remote IMAP mailbox..."
@@ -1423,13 +1420,12 @@ msgid "Continue editing current message"
 msgstr "Az aktuális levél folytatása"
 
 #: src/main-window.c:245
-#, fuzzy
 msgid "_Get New Mail"
 msgstr "_Új levél lekérdezése"
 
 #: src/main-window.c:245
 msgid "Fetch new incoming mail"
-msgstr "Újonan beérkezet levelek letöltése"
+msgstr "Újonnan beérkezet levelek letöltése"
 
 #: src/main-window.c:251
 msgid "_Send Queued Mail"
@@ -1437,7 +1433,7 @@ msgstr "_Várakozási sorban álló levelek elküldése"
 
 #: src/main-window.c:252
 msgid "Send mail from the outbox"
-msgstr ""
+msgstr "A kimenõ mappában levõ levelek elküldése"
 
 #: src/main-window.c:260
 msgid "_Address Book..."
@@ -1464,16 +1460,14 @@ msgid "Display no headers"
 msgstr "Nem jelenítí meg a fejlécet"
 
 #: src/main-window.c:297
-#, fuzzy
 msgid "S_elected Headers"
-msgstr "_Kiválasztott fejléc"
+msgstr "_Kiválasztott fejlécek"
 
 #: src/main-window.c:298
 msgid "Display selected headers"
-msgstr "Kiválasztott fejléc megjelenítése"
+msgstr "Kiválasztott fejlécek megjelenítése"
 
 #: src/main-window.c:300
-#, fuzzy
 msgid "All _Headers"
 msgstr "_Teljes fejléc"
 
@@ -1520,16 +1514,15 @@ msgstr "_Mindenkinek válaszol..."
 
 #: src/main-window.c:336
 msgid "Reply to all recipients of the current message"
-msgstr "Az aktuális levél minden címzettjének válaszol "
+msgstr "Az aktuális levél minden címzettjének válaszol"
 
 #: src/main-window.c:343
 msgid "Reply To _Group..."
 msgstr "_Csoportnak válaszol..."
 
 #: src/main-window.c:344
-#, fuzzy
 msgid "Reply to mailing list"
-msgstr "Mindenkinek"
+msgstr "Válasz levelezõlistának"
 
 #: src/main-window.c:351 src/message-window.c:114
 msgid "_Forward..."
@@ -1537,7 +1530,7 @@ msgstr "_Tovább..."
 
 #: src/main-window.c:352
 msgid "Forward the current message"
-msgstr "Aktuális levél továbbítása"
+msgstr "Az aktuális levél továbbítása"
 
 #: src/main-window.c:359 src/message-window.c:119
 msgid "Next Part"
@@ -1624,13 +1617,12 @@ msgid "Delete the selected mailbox"
 msgstr "A kiválasztott postafiók törlése"
 
 #: src/main-window.c:444
-#, fuzzy
 msgid "Co_mmit Current"
-msgstr "Érvényesít"
+msgstr "_Változások mentése"
 
 #: src/main-window.c:445
 msgid "Commit the changes in the currently opened mailbox"
-msgstr "a nyitott postafiók változások elfogadása"
+msgstr "A megnyitott postafiók változásainak elfogadása"
 
 #: src/main-window.c:449
 msgid "_Close"
@@ -1759,9 +1751,9 @@ msgid "Sending error: %s"
 msgstr "Hiba küldés közben: %s"
 
 #: src/main-window.c:1887
-#, fuzzy, c-format
+#, c-format
 msgid "Commiting mailbox %s failed."
-msgstr "Nincs postafiók kiválasztva"
+msgstr "%s postafiók változásait nem sikerült elmenteni."
 
 #: src/main-window.c:2108
 #, c-format
@@ -2121,25 +2113,22 @@ msgstr "Kiválasztott fejlécek"
 
 #. Information messages frame...
 #: src/pref-manager.c:1521
-#, fuzzy
 msgid "Information Messages"
-msgstr "Levél írása"
+msgstr "Információs üzenetek"
 
 #. gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
 #. gtk_table_set_col_spacings(GTK_TABLE(information_table), 5);
 #: src/pref-manager.c:1529
 msgid "Informational Messages"
-msgstr ""
+msgstr "Információs üzenetek"
 
 #: src/pref-manager.c:1542
-#, fuzzy
 msgid "Warning Messages"
-msgstr "Fogadás közben"
+msgstr "Figyelmeztetõ üzenetek"
 
 #: src/pref-manager.c:1555
-#, fuzzy
 msgid "Error Messages"
-msgstr "Elõzõ levél"
+msgstr "Hibaüzenetek"
 
 #: src/pref-manager.c:1568
 msgid "Fatal Error Messages"
@@ -2181,9 +2170,8 @@ msgstr ""
 
 #. ignore signature check box
 #: src/pref-manager.c:1733
-#, fuzzy
 msgid "Misc Spelling Settings"
-msgstr "Felhasználó beállításai"
+msgstr "Egyéb helyesírás-ellenõrzõ beállítások"
 
 #: src/pref-manager.c:1739
 msgid "Check signature"
@@ -2281,9 +2269,8 @@ msgid "Show In List"
 msgstr ""
 
 #: src/pref-manager.c:2238
-#, fuzzy
 msgid "Print to console"
-msgstr "Nyomtatónak küld:"
+msgstr "Nyomtatás konzolra"
 
 #: src/print.c:73
 #, c-format
@@ -2395,14 +2382,12 @@ msgid "_Wrap Body"
 msgstr "Tartalo_m törése"
 
 #: src/sendmsg-window.c:217
-#, fuzzy
 msgid "_Reflow Paragraph"
-msgstr "Bekezd_éshez von"
+msgstr "_Bekezdés újratördelése"
 
 #: src/sendmsg-window.c:221
-#, fuzzy
 msgid "R_eflow Message"
-msgstr "Levél_hez von"
+msgstr "_Levél újratördelése"
 
 #: src/sendmsg-window.c:235
 msgid "Fr_om"

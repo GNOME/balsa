@@ -3665,9 +3665,7 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     hide_all_parts(bm);
 
-    g_assert(!info || (info && bm->message && bm->message->mailbox));
-
-    if (info && bm->message) {
+    if (info) {
 	LibBalsaMailbox *mailbox = bm->message->mailbox;
 	/* Make sure message still exists. */
 	libbalsa_mailbox_check(mailbox);
@@ -4585,18 +4583,8 @@ part_info_init_mimetext_rfc2440(BalsaMessage * bm, BalsaPartInfo * info)
 
     /* force loading the gmime body if necessary (aka imap hack) */
     if (!info->body->mime_part) {
-	GMimeContentType * cont_type;
-
 	if (!libbalsa_mailbox_get_message_part(info->body->message, info->body))
 	    return FALSE;
-	
-	/* the crypto stuff needs to know the charset in the gmime world */
-	cont_type = (GMimeContentType *)
-            g_mime_part_get_content_type(GMIME_PART(info->body->mime_part));
-	if (info->body->charset && cont_type &&
-	    !g_mime_content_type_get_parameter (cont_type, "charset"))
-	    g_mime_content_type_set_parameter (cont_type, "charset",
-					       info->body->charset);
     }
 
     /* check if this is a RFC2440 part */

@@ -274,9 +274,11 @@ balsa_send_message_real(MessageQueueItem *first_message)
   MessageQueueItem *current_message, *next_message;
   int i;
 
-  if( !first_message )
+  if( !first_message ) {
+    sending_mail = FALSE;
     return TRUE;
-  
+  }
+
   /* the local MDA code is so simple that we handle it in short-circuit
      fashion.
   */
@@ -310,7 +312,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
              }
 
      }
-     else
+     else /*  return code i == 0 - success */
      {	     
      	if (first_message->fcc!=NULL) 
 	{

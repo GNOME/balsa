@@ -1625,9 +1625,9 @@ libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 	imap_mbox_store_flag(handle, msgno, IMSGF_ANSWERED, 0);
 
     if (set & LIBBALSA_MESSAGE_FLAG_NEW)
-	imap_mbox_store_flag(handle, msgno, IMSGF_SEEN, 1);
-    if (clear & LIBBALSA_MESSAGE_FLAG_NEW)
 	imap_mbox_store_flag(handle, msgno, IMSGF_SEEN, 0);
+    if (clear & LIBBALSA_MESSAGE_FLAG_NEW)
+	imap_mbox_store_flag(handle, msgno, IMSGF_SEEN, 1);
 
     if (set & LIBBALSA_MESSAGE_FLAG_FLAGGED)
 	imap_mbox_store_flag(handle, msgno, IMSGF_FLAGGED, 1);

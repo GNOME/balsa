@@ -92,7 +92,8 @@ create_toolbar (GtkWidget * window)
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 					 "Check Email", "Check Email", NULL,
-					   new_icon (p4_xpm, window), NULL,
+					   new_icon (p4_xpm, window),
+GTK_SIGNAL_FUNC(current_mailbox_check),
 					   "Check Email");
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
@@ -418,20 +419,6 @@ create_main_window ()
   mw->mailbox_option_menu = gtk_option_menu_new ();
   gtk_toolbar_append_widget (GTK_TOOLBAR (mw->toolbar), mw->mailbox_option_menu, NULL, NULL);
   gtk_widget_show (mw->mailbox_option_menu);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (mw->toolbar));
-
-  gtk_toolbar_append_item (GTK_TOOLBAR (mw->toolbar), "Check Mail",
-			   NULL, NULL, NULL, current_mailbox_check, NULL);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (mw->toolbar));
-
-  gtk_toolbar_append_item (GTK_TOOLBAR (mw->toolbar), "Compose",
-			   NULL, NULL, NULL, NULL, NULL);
-  gtk_toolbar_append_item (GTK_TOOLBAR (mw->toolbar), "Reply",
-			   NULL, NULL, NULL, NULL, NULL);
-  gtk_toolbar_append_item (GTK_TOOLBAR (mw->toolbar), "Delete",
-			   NULL, NULL, NULL, NULL, NULL);
 
   gtk_widget_show (mw->toolbar);
 

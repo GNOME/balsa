@@ -519,7 +519,7 @@ imap_mbox_handle_fetch_structure(ImapMboxHandle* handle, unsigned seqno)
   ImapResponse rc;
   ImapMessage *im = imap_mbox_handle_get_msg(handle, seqno);
   if(!im->body) {
-    char* cmd = g_strdup_printf("FETCH %u BODY", seqno);
+    char* cmd = g_strdup_printf("FETCH %u BODYSTRUCTURE", seqno);
     rc = imap_cmd_exec(handle, cmd);
     g_free(cmd);
   } else rc = IMR_OK;

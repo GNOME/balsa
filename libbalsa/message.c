@@ -658,6 +658,15 @@ libbalsa_message_set_flag(LibBalsaMessage * message,
 			  LibBalsaMessageFlag clear)
 {
     GArray *msgnos;
+
+    if (message->mailbox->readonly) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_WARNING,
+	    _("Mailbox (%s) is readonly: cannot change flags."),
+	    message->mailbox->name);
+	return;
+    }
+
     msgnos = g_array_sized_new(FALSE, FALSE, sizeof(guint), 1);
     g_array_append_val(msgnos, message->msgno);
     libbalsa_mailbox_register_msgnos(message->mailbox, msgnos);
@@ -690,7 +699,15 @@ libbalsa_messages_change_flag(GList * messages,
     
     if (!messages)
 	return;
+
     mbox = LIBBALSA_MESSAGE(messages->data)->mailbox;
+    if (mbox->readonly) {
+	libbalsa_information(
+	    LIBBALSA_INFORMATION_WARNING,
+	    _("Mailbox (%s) is readonly: cannot change flags."),
+	    mbox->name);
+	return;
+    }
 
     /* Construct the list of messages that actually change state */
     msgnos = g_array_new(FALSE, FALSE, sizeof(guint));

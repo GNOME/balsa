@@ -823,6 +823,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     struct remove_data dt;
     gboolean unlock;
     GNode *child;
+    GNode *parent;
 
     unlock = lbm_threads_enter();
 
@@ -842,31 +843,38 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     iter.stamp = mailbox->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
 
-    /* Prune msg_tree after getting the path and before emitting the
-     * signal. */
-    /* First promote any children to the node's parent. */
+    /* First promote any children to the node's parent; we'll insert
+     * them all before the current node, to keep the path calculation
+     * simple. */
+    parent = dt.node->parent;
     while ((child = dt.node->children)) {
-	GtkTreePath *child_path;
-
 	/* No need to notify the tree-view about unlinking the child--it
 	 * will assume we already did that when we notify it about
 	 * destroying the parent. */
 	g_node_unlink(child);
-	g_node_append(dt.node->parent, child);
-	iter.user_data = child;
-	child_path =
-	    gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+	g_node_insert_before(parent, dt.node, child);
+
 	/* Notify the tree-view about the new location of the child. */
-	g_signal_emit_by_name(mailbox, "row-inserted", child_path, &iter);
-	gtk_tree_path_free(child_path);
+	iter.user_data = child;
+	g_signal_emit_by_name(mailbox, "row-inserted", path, &iter);
+	if (child->children)
+	    g_signal_emit_by_name(mailbox, "row-has-child-toggled", path,
+				  &iter);
+	gtk_tree_path_next(path);
     }
 
     /* Now it's safe to destroy the node. */
     g_node_destroy(dt.node);
-
     g_signal_emit_by_name(mailbox, "row-deleted", path);
-    mailbox->stamp++;
+
+    if (parent->parent && !parent->children) {
+	gtk_tree_path_up(path);
+	iter.user_data = parent;
+	g_signal_emit_by_name(mailbox, "row-has-child-toggled", path, &iter);
+    }
+    
     gtk_tree_path_free(path);
+    mailbox->stamp++;
 
     if (unlock)
 	gdk_threads_leave();

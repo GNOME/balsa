@@ -1,5 +1,7 @@
-2005-03-22 17:59  PeterB
+2005-03-22 20:31  PeterB
 
+	* libbalsa/libbalsa-conf.c: more careful rewrite, more user
+	feedback.
 	* src/main.c: set balsa_icon.png as default window icon.
 	* src/: balsa-message.c, sendmsg-window.c: always pass URI to
 	gnome_vfs_mime_application_launch.

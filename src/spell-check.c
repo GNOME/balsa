@@ -30,6 +30,13 @@
 #include <pspell/pspell.h>
 #include <stdio.h>
 
+#ifdef HAVE_PCRE
+#  include <pcreposix.h>
+#else
+#  include <sys/types.h>
+#  include <regex.h>
+#endif
+
 #include "balsa-app.h"
 #include "quote-color.h"
 #include "spell-check.h"
@@ -1197,8 +1204,12 @@ next_word(BalsaSpellCheck * spell_check)
     gboolean at_end = FALSE;
 
     static gboolean in_line = FALSE;
-    const gchar *new_word_regex = "\\<[[:alpha:]']*\\>";
 
+#ifdef HAVE_PCRE
+    const gchar *new_word_regex = "\\<[[:alpha:]']*\\>";
+#else
+    const gchar *new_word_regex = "\\b[[:alpha:]']+\\b";
+#endif
 
     /* compile the regular expressions */
     if (regcomp(&quoted_rex, balsa_app.quote_regex, REG_EXTENDED)) {

@@ -661,8 +661,10 @@ customize_dialog_cb(GtkWidget *widget, gpointer data)
     customize_widget=gnome_property_box_new();
     
     gtk_window_set_title(GTK_WINDOW(customize_widget), _("Customize"));
-    gtk_window_set_policy(GTK_WINDOW(customize_widget), FALSE, FALSE, FALSE);
+    gtk_window_set_policy(GTK_WINDOW(customize_widget), TRUE, TRUE, TRUE);
     gtk_window_set_wmclass(GTK_WINDOW(customize_widget), "customize", "Balsa");
+    gtk_window_set_default_size(GTK_WINDOW(customize_widget), 600, 440);
+
     gnome_dialog_set_parent(GNOME_DIALOG(customize_widget),
 			    GTK_WINDOW(active_window));
     gtk_object_set_data(GTK_OBJECT(customize_widget), "balsawindow",
@@ -717,7 +719,7 @@ create_toolbar_page(gpointer data, int toolbar)
 
     /* Preview display */
     preview_frame=gtk_frame_new(_("Preview"));
-    gtk_box_pack_start(GTK_BOX(outer_box), preview_frame, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(outer_box), preview_frame, FALSE, FALSE, 0);
 
     preview_ctlbox=gtk_vbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(preview_frame), preview_ctlbox);
@@ -740,10 +742,10 @@ create_toolbar_page(gpointer data, int toolbar)
 				   GTK_POLICY_ALWAYS, GTK_POLICY_NEVER);
 
     gtk_box_pack_start(GTK_BOX(preview_ctlbox), preview_scroll, TRUE, 
-		       FALSE, 0);
+		       TRUE, 0);
 
     /* can't avoid the usize */
-    gtk_widget_set_usize(preview_scroll, 600, 86);
+    /* gtk_widget_set_usize(preview_scroll, 600, 86); */
     gtk_scrolled_window_add_with_viewport(
 	GTK_SCROLLED_WINDOW(preview_scroll), preview_box);
 
@@ -759,11 +761,11 @@ create_toolbar_page(gpointer data, int toolbar)
     lower_ctlbox=gtk_hbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(lower_ctlbox), 5);
 
-    gtk_box_pack_start(GTK_BOX(outer_box), lower_ctlbox, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(outer_box), lower_ctlbox, TRUE, TRUE, 0);
 
     /* A CList to show the available items */
     list_scroll=gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_usize(list_scroll, 300, 200);
+    /* gtk_widget_set_usize(list_scroll, 200, 200); */
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(list_scroll),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -773,7 +775,7 @@ create_toolbar_page(gpointer data, int toolbar)
     toolbar_pages[toolbar].list=list;
 
     gtk_box_pack_start(GTK_BOX(lower_ctlbox), list_frame,
-		       FALSE, FALSE, 0);
+		       TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(list_frame), list_scroll);
     gtk_container_add(GTK_CONTAINER(list_scroll), list);
 
@@ -781,7 +783,7 @@ create_toolbar_page(gpointer data, int toolbar)
 
     /* Another CList to show the current tools */
     destination_scroll=gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_usize(destination_scroll, 300, 200);
+    /* gtk_widget_set_usize(destination_scroll, 200, 200); */
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(destination_scroll),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -805,7 +807,7 @@ create_toolbar_page(gpointer data, int toolbar)
 
     back_button=gnome_pixmap_button(
 	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_UP),
-	"");
+	_("Up"));
     toolbar_pages[toolbar].back_button=back_button;
 
     gtk_box_pack_start(GTK_BOX(button_box), back_button, FALSE, FALSE, 0);
@@ -815,7 +817,7 @@ create_toolbar_page(gpointer data, int toolbar)
 
     remove_button=gnome_pixmap_button(
 	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_BACK),
-	"");
+	_("-"));
     toolbar_pages[toolbar].remove_button=remove_button;
 
     gtk_box_pack_start(GTK_BOX(move_button_box),
@@ -823,7 +825,7 @@ create_toolbar_page(gpointer data, int toolbar)
 
     add_button=gnome_pixmap_button(
 	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_FORWARD),
-	"");
+	_("+"));
     toolbar_pages[toolbar].add_button=add_button;
 
     gtk_box_pack_start(GTK_BOX(move_button_box),
@@ -831,14 +833,14 @@ create_toolbar_page(gpointer data, int toolbar)
 
     forward_button=gnome_pixmap_button(
 	gnome_stock_pixmap_widget(outer_box, GNOME_STOCK_PIXMAP_DOWN),
-	"");
+	_("Down"));
     toolbar_pages[toolbar].forward_button=forward_button;
 
     gtk_box_pack_start(GTK_BOX(button_box), forward_button, FALSE, FALSE, 0);
 
     /* Pack destination list */
     gtk_box_pack_start(GTK_BOX(lower_ctlbox), destination_frame,
-		       FALSE, FALSE, 0);
+		       TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(destination_frame), destination_scroll);
     gtk_container_add(GTK_CONTAINER(destination_scroll), destination);
 

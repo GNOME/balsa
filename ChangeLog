@@ -1,3 +1,22 @@
+2001-07-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Perl Compatible Regular Expressions by 
+	Albrecht Dreﬂ <albrecht.dress@arcormail.de>:
+	* acconfig.h: add HAVE_PCRE
+	* configure.in: look for PCRE library.
+	* src/Makefile.am: add PCRE_CFLAGS flags to CFLAGS and libs to
+	LIBS.
+	* src/quote-color.[hc]: make is_a_quote() take const regex()
+	* src/spell-check.c: use PCRE.
+	* libbalsa/filter.h: same.
+
+	* libbalsa/send.c: fix BCC handling 
+	(Brian Stafford <brian@stafford.uklinux.net>).
+
+	* src/main-window.c: add shortcut to customize.
+	* src/toolbar-prefs.c: get rid of _usize().
+	* po/POTFILES.in: add missing files.
+	
 2001-07-16  Pawel Salek  <pawsa@theochem.kth.se>
 
         IMAP flag handling and new mail notification

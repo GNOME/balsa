@@ -385,16 +385,16 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 {
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
-    GList *lista, *recip;
+    GList *lista, *recip, *bcc_recip;
     LibBalsaMessage *queu;
     LibBalsaAddress *addy; 
     smtp_session_t session;
-    smtp_message_t message;
+    smtp_message_t message, bcc_message;
     smtp_recipient_t recipient;
 #if 0
     const smtp_status_t *status;
 #endif
-    const gchar *phrase, *mailbox;
+    const gchar *phrase, *mailbox, *subject;
 #ifdef BALSA_USE_THREADS
     GtkWidget *send_dialog_source = NULL;
 
@@ -451,32 +451,54 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	    msg_queue_item_destroy(new_message);
 	} else {
 	    total_messages_left++;
-	    message = smtp_add_message (session);
 
 	    /* The mail and its attachments should probably be made into
 	       a MIME document at this point (if not already)  Ideally
-	       the message is fully prepared in RFC 822 format so that
+	       the message is fully prepared in RFC 2822 format so that
 	       all the callback needs to do is open and read the temporary
 	       file. */
 
+	    /* If the Bcc: recipient list is present, add a additional copy
+	       of the message to the session.  The recipient list for
+	       the main copy of the message is generated from the To:
+	       and Cc: recipient list and libESMTP is asked to strip the
+	       Bcc: header.  The BCC copy of the message recipient list
+	       is taken from the Bcc recipients.  recipient list and the
+	       Bcc: header is preserved in the message. */
+	    bcc_recip = g_list_first((GList *) queu->bcc_list);
+	    if (!bcc_recip)
+		bcc_message = NULL;
+	    else
+		bcc_message = smtp_add_message (session);
+
+	    /* Add this after the Bcc: copy. */
+	    message = smtp_add_message (session);
+	    if (bcc_message)
+		smtp_set_header_option (message, "Bcc", Hdr_PROHIBIT);
+
 	    smtp_message_set_application_data (message, queu);
 	    smtp_set_messagecb (message, libbalsa_message_cb, new_message);
-
+	    if (bcc_message) {
+		/*smtp_message_set_application_data (bcc_message, queu);*/
+		smtp_set_messagecb (bcc_message, libbalsa_message_cb,
+			            new_message);
+	    }
 
 	    /* Estimate the size of the message.  This need not be exact
 	       but its better to err on the large side.  Some message
 	       headers may be altered during the transfer. */
 	    {
-	      struct stat st;
-	      long estimate;
+		struct stat st;
+		long estimate;
 
-	      if (stat (new_message->tempfile, &st) == 0)
-	        {
-	          estimate = st.st_size;
-	          estimate += 1024 - (estimate % 1024);
-		  smtp_size_set_estimate (message, estimate);
+		if (stat (new_message->tempfile, &st) == 0) {
+		    estimate = st.st_size;
+		    estimate += 1024 - (estimate % 1024);
+		    smtp_size_set_estimate (message, estimate);
+		    if (bcc_message)
+			smtp_size_set_estimate (bcc_message, estimate);
 		}
-            }
+	    }
 
 #define LIBESMTP_ADDS_HEADERS
 #ifdef LIBESMTP_ADDS_HEADERS
@@ -485,23 +507,34 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 	       message. */
 
 	    smtp_set_header (message, "Date", &queu->date);
+	    if (bcc_message)
+		smtp_set_header (bcc_message, "Date", &queu->date);
 
-	    /* RFC 822 does not require a message to have a subject.
+	    /* RFC 2822 does not require a message to have a subject.
 	               I assume this is NULL if not present */
-	    if (LIBBALSA_MESSAGE_GET_SUBJECT(queu))
-	    	smtp_set_header (message, "Subject", 
-				 LIBBALSA_MESSAGE_GET_SUBJECT(queu));
+	    subject = LIBBALSA_MESSAGE_GET_SUBJECT(queu);
+	    if (subject) {
+	    	smtp_set_header (message, "Subject", subject);
+		if (bcc_message)
+		    smtp_set_header (bcc_message, "Subject", subject);
+	    }
 
 	    /* Add the sender info */
 	    phrase = libbalsa_address_get_phrase(queu->from);
 	    mailbox = libbalsa_address_get_mailbox(queu->from, 0);
 	    smtp_set_reverse_path (message, mailbox);
 	    smtp_set_header (message, "From", phrase, mailbox);
+	    if (bcc_message) {
+		smtp_set_reverse_path (bcc_message, mailbox);
+	        smtp_set_header (bcc_message, "From", phrase, mailbox);
+	    }
 
 	    if (queu->reply_to) {
 		phrase = libbalsa_address_get_phrase(queu->reply_to);
 		mailbox = libbalsa_address_get_mailbox(queu->reply_to, 0);
 		smtp_set_header (message, "Reply-To", phrase, mailbox);
+		if (bcc_message)
+		    smtp_set_header (bcc_message, "Reply-To", phrase, mailbox);
 	    }
 
 	    if (queu->dispnotify_to) {
@@ -509,10 +542,15 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 		mailbox = libbalsa_address_get_mailbox(queu->dispnotify_to, 0);
 		smtp_set_header (message, "Disposition-Notification-To",
 				 phrase, mailbox);
+		if (bcc_message)
+		    smtp_set_header (bcc_message, "Disposition-Notification-To",
+		    	             phrase, mailbox);
 	    }
 #endif
 
-	    /* Now need to add the recipients to the message */
+	    /* Now need to add the recipients to the message.  The main
+	       copy of the message gets the To and Cc recipient list.
+	       The bcc copy gets the Bcc recipients.  */
 
 	    recip = g_list_first((GList *) queu->to_list);
 	    while (recip) {
@@ -525,6 +563,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 			  for a particular recipient. */
 #ifdef LIBESMTP_ADDS_HEADERS
 		smtp_set_header (message, "To", phrase, mailbox);
+		if (bcc_message)
+		    smtp_set_header (bcc_message, "To", phrase, mailbox);
 #endif
 	    	recip = recip->next;
 	    }
@@ -538,23 +578,22 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 		/* XXX  -  DSN */
 #ifdef LIBESMTP_ADDS_HEADERS
 		smtp_set_header (message, "Cc", phrase, mailbox);
+		if (bcc_message)
+		    smtp_set_header (bcc_message, "Cc", phrase, mailbox);
 #endif
 	    	recip = recip->next;
 	    }
 
-	    recip = g_list_first((GList *) queu->bcc_list);
-	    while (recip) {
-        	addy = recip->data;
+	    while (bcc_recip) {
+        	addy = bcc_recip->data;
 		phrase = libbalsa_address_get_phrase(addy);
 		mailbox = libbalsa_address_get_mailbox(addy, 0);
-		recipient = smtp_add_recipient (message, mailbox);
+		recipient = smtp_add_recipient (bcc_message, mailbox);
 		/* XXX  -  DSN */
 #ifdef LIBESMTP_ADDS_HEADERS
-		/* XXX - interesting question. Should the Bcc header be added
-		         and let the MTA deal with it or not? */
-		/*smtp_set_header (message, "Bcc", phrase, mailbox);*/
-	    	recip = recip->next;
+		smtp_set_header (message, "Bcc", phrase, mailbox);
 #endif
+	    	bcc_recip = bcc_recip->next;
 	    }
 	}
 	lista = lista->next;
@@ -596,13 +635,14 @@ handle_successful_send (smtp_message_t message, void *arg)
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
 	msg = smtp_message_get_application_data (message);
-	libbalsa_message_delete(msg);
+	if (msg != NULL)
+	    libbalsa_message_delete(msg);
     } else {
 	/* XXX - Show the poor user the status codes and message. */
 	libbalsa_information(
 	    LIBBALSA_INFORMATION_WARNING, 
-	    _("Message delivery problem, placing it into your outbox.\n" 
-	      "System will attempt to redeliver the message until you delete it."));
+	    _("Message submission problem, placing it into your outbox.\n" 
+	      "System will attempt to resubmit the message until you delete it."));
     }
 }
 

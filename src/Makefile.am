@@ -71,7 +71,7 @@ INCLUDES = \
 	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 
-CFLAGS += $(GTKHTML_CFLAGS) $(PIXBUF_FLAGS)
+CFLAGS += $(GTKHTML_CFLAGS) $(PCRE_CFLAGS) $(PIXBUF_FLAGS)
 
 balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
@@ -87,6 +87,7 @@ balsa_LDADD = \
 	$(PTHREAD_LIB) \
 	$(GNOME_PRINT_LIBS) \
 	$(GTKHTML_LIBS)	\
+	$(PCRE_LIBS) \
 	$(PIXBUF_LIBS)
 
 balsa_DEPENDENCIES = \

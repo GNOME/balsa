@@ -30,8 +30,13 @@
 #ifndef _FILTER_H
 #define _FILTER_H
 
-#include <sys/types.h>
-#include <regex.h>
+#include "config.h"
+#ifdef HAVE_PCRE
+#  include <pcreposix.h>
+#else
+#  include <sys/types.h>
+#  include <regex.h>
+#endif
 #include <glib.h>
 
 #include "libbalsa.h"

@@ -47,3 +47,6 @@
 
 /* The prefixes to look for balsa data, at least most likely */
 #undef BALSA_COMMON_PREFIXES
+
+/* use pcre instead of `standard' rexexp's? */
+#undef HAVE_PCRE

@@ -5,6 +5,7 @@ libbalsa/address-book.c
 libbalsa/address-entry.c
 libbalsa/folder-scanners.c
 libbalsa/libbalsa_private.h
+libbalsa/identity.c
 libbalsa/mailbox.c
 libbalsa/mailbox_imap.c
 libbalsa/mailbox_local.c
@@ -12,6 +13,7 @@ libbalsa/mailbox_maildir.c
 libbalsa/mailbox_mbox.c
 libbalsa/mailbox_mh.c
 libbalsa/mailbox_pop3.c
+libbalsa/message.c
 libbalsa/pop3.c
 libbalsa/send.c
 libinit_balsa/balsa-druid-page-directory.gob
@@ -42,6 +44,7 @@ src/address-book-config.c
 src/address-book.c
 src/balsa-app.c
 src/balsa-index.c
+src/balsa-index-threading.c
 src/balsa-mblist.c
 src/balsa-message.c
 src/filter-edit-dialog.c
@@ -57,3 +60,4 @@ src/print.c
 src/sendmsg-window.c
 src/spell-check.c
 src/store-address.c
+src/toolbar-prefs.c

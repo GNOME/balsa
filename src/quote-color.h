@@ -29,10 +29,16 @@ extern "C" {
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#include <regex.h>
+#include "config.h"
+#ifdef HAVE_PCRE
+#  include <pcreposix.h>
+#else
+#  include <sys/types.h>
+#  include <regex.h>
+#endif
 
     extern void make_gradient(GdkColor colors[], gint, gint);
-    extern gint is_a_quote(const gchar *, const regex_t * rex);
+    extern gint is_a_quote(const gchar *, regex_t * rex);
     extern void allocate_quote_colors(GtkWidget *, GdkColor color[], gint, gint);
 
 

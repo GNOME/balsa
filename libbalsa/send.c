@@ -292,8 +292,10 @@ add_mutt_body_plain(const gchar * charset, gint encoding_style,
     body->encoding = encoding_style;
 
     mutt_set_parameter("charset", charset, &body->parameter);
-    if (flow)
-	mutt_set_parameter("format", "flowed", &body->parameter);
+    if (flow) {
+	mutt_set_parameter("DelSp", "Yes", &body->parameter);
+	mutt_set_parameter("Format", "Flowed", &body->parameter);
+    }
 
     mutt_mktemp(buffer);
     body->filename = g_strdup(buffer);

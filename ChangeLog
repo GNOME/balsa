@@ -1,5 +1,16 @@
 2000-08-08  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_remote.c:
+	* libbalsa/mailbox_remote.h: Put LibBalsaMailboxRemote into it's
+	own file. It is a trivial object, but it helps to keep things
+	organised if they are kept separate.
+
+	* configure.in: Check for proplist.h as well as the library itself.
+
+2000-08-08  Ian Campbell  <ijc25@cam.ac.uk>
+
 	* configure.in: Add check for libgnomeui/gnome-window-icon.h
 	* src/main.c: Only use the gnome-window-icon stuff if we have it.
 

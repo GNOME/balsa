@@ -118,40 +118,7 @@ struct _LibBalsaMailboxClass
 				    LibBalsaMessage *message);
 };
 
-/* Imap and Pop3 are remote mailboxes 
-   
-   this object doesn't do any real work.  it is abstract
-
-     this mini-struct greatly helps in getting the server
-     from the mailbox without having a Server pointer off of
-     all mailboxes....  which arguably we might want eventually,
-     and claim that a directory is a "server", but until then...
- */
-#define LIBBALSA_TYPE_MAILBOX_REMOTE	        (libbalsa_mailbox_remote_get_type())
-#define LIBBALSA_MAILBOX_REMOTE(obj)		(GTK_CHECK_CAST ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE, LibBalsaMailboxRemote))
-#define LIBBALSA_MAILBOX_REMOTE_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, LibBalsaMailboxRemoteClass))
-#define LIBBALSA_IS_MAILBOX_REMOTE(obj)		(GTK_CHECK_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE))
-#define LIBBALSA_IS_MAILBOX_REMOTE_CLASS(klass)	(GTK_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_REMOTE))
-
-#define LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox) (LIBBALSA_SERVER(LIBBALSA_MAILBOX_REMOTE(mailbox)->server))
-
-typedef struct _LibBalsaMailboxRemoteClass LibBalsaMailboxRemoteClass;
-struct _LibBalsaMailboxRemote
-{
-  LibBalsaMailbox mailbox;
-  
-  LibBalsaServer *server;
-};
-
-struct _LibBalsaMailboxRemoteClass
-{
-  LibBalsaMailboxClass parent_class;
-};
-
-
-
 GtkType libbalsa_mailbox_get_type (void);
-GtkType libbalsa_mailbox_remote_get_type (void);
 
 /* 
  * open and close a mailbox 

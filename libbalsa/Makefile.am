@@ -30,6 +30,8 @@ libbalsa_a_SOURCES = 		\
 	mailbox.c		\
 	mailbox_local.c		\
 	mailbox_local.h		\
+	mailbox_remote.c	\
+	mailbox_remote.h	\
 	mailbox_pop3.c		\
 	mailbox_pop3.h		\
 	mailbox_imap.c		\

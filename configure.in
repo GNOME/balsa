@@ -70,6 +70,8 @@ dnl Check for proplist, but don't add it to the LIBS
 dnl And give proplist the GTK+ libs but don't put them in LIBS etc.
 dnl ######################################################################################
 
+AC_CHECK_HEADER(proplist.h,,[AC_MSG_ERROR([*** libPropList header not found. Please check http://www.balsa.net for information on the required files.])])
+
 balsa_save_LDFLAGS="$LDFLAGS"
 balsa_save_LIBS="$LIBS"
 

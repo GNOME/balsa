@@ -46,6 +46,7 @@ typedef struct body MuttBody;
 
 #include "mailbox.h"
 #include "mailbox_local.h"
+#include "mailbox_remote.h"
 #include "mailbox_pop3.h"
 #include "mailbox_imap.h"
 

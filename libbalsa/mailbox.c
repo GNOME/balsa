@@ -245,48 +245,6 @@ libbalsa_mailbox_has_new_messages (LibBalsaMailbox * mailbox)
   return FALSE;
 }
 
-
-
-static void libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *klass);
-static void libbalsa_mailbox_remote_init(LibBalsaMailboxRemote *mailbox);
-
-GtkType
-libbalsa_mailbox_remote_get_type (void)
-{
-  static GtkType mailbox_type = 0;
-
-  if (!mailbox_type)
-    {
-      static const GtkTypeInfo mailbox_info =
-      {
-	"LibBalsaMailboxRemote",
-	sizeof (LibBalsaMailbox),
-	sizeof (LibBalsaMailboxClass),
-	(GtkClassInitFunc) libbalsa_mailbox_remote_class_init,
-	(GtkObjectInitFunc) libbalsa_mailbox_remote_init,
-        /* reserved_1 */ NULL,
-	/* reserved_2 */ NULL,
-	(GtkClassInitFunc) NULL,
-      };
-
-      mailbox_type = gtk_type_unique(libbalsa_mailbox_get_type(), &mailbox_info);
-    }
-
-  return mailbox_type;
-}
-
-static void
-libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *klass)
-{
-}
-
-static void
-libbalsa_mailbox_remote_init(LibBalsaMailboxRemote *mailbox)
-{
-  mailbox->server = NULL;
-}
-
-
 enum {
   OPEN_MAILBOX,
   CLOSE_MAILBOX,

@@ -35,18 +35,9 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
-
-
-
-
-
 #ifdef _PGPPATH
 #include "pgp.h"
 #endif
-
-
-
-
 
 /* Minimal support for IMAP 4rev1. Slightly more minimal for IMAP 4. */
 
@@ -2140,6 +2131,7 @@ int imap_buffy_check (char *path)
 	if (conn->data && 
 	    imap_handle_untagged (idata, buf) != 0)
 	  return (-1);
+	recent = idata->status == IMAP_NEW_MAIL;
       }
     }
   }

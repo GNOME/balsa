@@ -1,3 +1,10 @@
+2000-05-04 Pawel Salek <pawsa@theochem.kth.se>
+	IMAP mailbox polling to fix auto-logout bug.
+
+	* libbalsa/mailbox_imap.[hc]: mailbox_imap_has_new_messages added.
+	* libmutt/imap.c: do check the NOOP server response.
+	* src/balsa-mblist.c: actual mailbox polling.
+	
 2000-05-02  Peter Williams  <peter@beta.newton.cx>
 
 	* configure.in : change GLIB_CFLAGS to GNORBA_CFLAGS

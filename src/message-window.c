@@ -262,11 +262,16 @@ message_window_idle_handler(MessageWindow* mw)
 {
     BalsaMessage *msg = BALSA_MESSAGE(mw->bmessage);
     LibBalsaMessage *message = mw->message;
+    gchar *title;
 
     gdk_threads_enter();
 
     mw->idle_handler_id = 0;
 
+    title = libbalsa_message_title(message,
+                                   balsa_app.message_title_format);
+    gtk_window_set_title(GTK_WINDOW(mw->window), title);
+    g_free(title);
     balsa_message_set(msg, message);
 
     if(msg && msg->treeview) {
@@ -375,7 +380,6 @@ void
 message_window_new(LibBalsaMessage * message)
 {
     MessageWindow *mw;
-    gchar *title;
     BalsaToolbarModel *model;
     GtkWidget *toolbar;
     guint i;
@@ -399,10 +403,7 @@ message_window_new(LibBalsaMessage * message)
 
     mw = g_malloc0(sizeof(MessageWindow));
 
-    title = libbalsa_message_title(message,
-                                   balsa_app.message_title_format);
-    mw->window = gnome_app_new("balsa", title);
-    g_free(title);
+    mw->window = gnome_app_new("balsa", NULL);
 
     mw->headers_shown=balsa_app.shown_headers;
     mw->show_all_headers = FALSE;

@@ -53,3 +53,9 @@ Balsa CVS:
 	Balsa is hosted on the Gnome CVS servers. To get
 the latest source, get the module 'balsa' from the CVS
 root ':pserver:anonymous@anoncvs.gnome.org:/cvs/gnome'.
+
+Mailbox locking:
+	Balsa uses flock+dotfile for mailbox file locking. It does not
+use fcntl (although it can be enabled) since this locking method is
+very fragile and often not portable (see for example
+http://www.washington.edu/pine/tech-notes/low-level.html#locking).

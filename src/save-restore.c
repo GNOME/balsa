@@ -497,10 +497,12 @@ config_global_load(void)
 
     balsa_app.empty_trash_on_exit =
 	gnome_config_get_bool("EmptyTrash=false");
-    balsa_app.ab_dist_list_mode =
-	gnome_config_get_bool("AddressBookDistMode=false");
+
+    /* This setting is now per address book */
+    gnome_config_clean_key("AddressBookDistMode");
 
     gnome_config_pop_prefix();
+
     return TRUE;
 }				/* config_global_load */
 
@@ -664,9 +666,7 @@ gint config_save(void)
 	gnome_config_clean_key("DefaultAddressBook");
     }
 
-    /* address book */
-    gnome_config_set_bool("AddressBookDistMode",
-			  balsa_app.ab_dist_list_mode);
+    gnome_config_pop_prefix();
 
     gnome_config_sync();
     return TRUE;

@@ -475,7 +475,7 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 
     libbalsa_unlock_mutt();
 
-    tmp = libbalsa_address_to_gchar(message->from);
+    tmp = libbalsa_address_to_gchar(message->from, 0);
 
     libbalsa_lock_mutt();
     hdr->env->from = rfc822_parse_adrlist(hdr->env->from, tmp);
@@ -484,7 +484,7 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
     g_free(tmp);
 
     if (message->reply_to) {
-	tmp = libbalsa_address_to_gchar(message->reply_to);
+	tmp = libbalsa_address_to_gchar(message->reply_to, 0);
 
 	libbalsa_lock_mutt();
 	hdr->env->reply_to =

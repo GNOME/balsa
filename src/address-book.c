@@ -22,430 +22,193 @@
 #include "config.h"
 
 #include <gnome.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
-#include <errno.h>
 #include "balsa-app.h"
 
 #include "address-book.h"
 
-static GtkWidget *book_clist;
-static GtkWidget *add_clist;
-static GtkWidget *ab_entry;
-static gint composing;
-static LibBalsaAddressBook *current_address_book;
+#define LIST_COLUMN_NAME        0
+#define LIST_COLUMN_ADDRESS     1
 
-gint address_book_cb(GtkWidget * widget, gpointer data);
-
-static gint ab_gnomecard_cb(GtkWidget * widget, gpointer data);
-static gint ab_cancel_cb(GtkWidget * widget, gpointer data);
-static gint ab_okay_cb(GtkWidget * widget, gpointer data);
-static void ab_clear_clist(GtkCList * clist);
-static void ab_switch_cb(GtkWidget * widget, gpointer data);
-static void ab_select_row_event(GtkWidget * widget, gint row, gint column,
-				GdkEventButton * event, gpointer data);
-static void open_compose(GtkWidget * widget, gint row, gint column,
-			 GdkEventButton * event, gpointer data);
-static void swap_clist_entry(gint row, GtkWidget * src, GtkWidget * dst);
-
-/*#define AB_ADD_CB_USED*/
-#ifdef AB_ADD_CB_USED
-static gint ab_add_cb(GtkWidget * widget, gpointer data);
-#endif
-
-static void ab_load(GtkWidget * widget, gpointer data);
-static void ab_find(GtkWidget * group_entry);
-static gint ab_compare(GtkCList * clist, gconstpointer a, gconstpointer b);
-
-static void address_book_menu_cb(GtkWidget * widget, gpointer data);
-
-static gint
-ab_gnomecard_cb(GtkWidget * widget, gpointer data)
-{
-    char *argv[] = { "gnomecard" };
-
-    gnome_execute_async(NULL, 1, argv);
-    return FALSE;
-}
-
-static gint
-ab_cancel_cb(GtkWidget * widget, gpointer data)
-{
-    GnomeDialog *dialog = (GnomeDialog *) data;
-
-    g_assert(dialog != NULL);
-
-    ab_clear_clist(GTK_CLIST(book_clist));
-    ab_clear_clist(GTK_CLIST(add_clist));
-
-    gtk_widget_destroy(GTK_WIDGET(dialog));
-
-    return FALSE;
-}
-
-static void
-address_list_to_string(gchar * addr, gchar ** string)
-{
-    gchar *tmp;
-
-    if (strlen(*string) > 0)
-	tmp = g_strconcat(*string, ", ", addr, NULL);
-    else
-	tmp = g_strconcat(*string, addr, NULL);
-
-    g_free(*string);
-    *string = tmp;
-}
-
-/* ab_okay_cb:
-   processes the OK button pressed event. 
-   keep watch on memory leaks.
-*/
-static gint
-ab_okay_cb(GtkWidget * widget, gpointer data)
-{
-    gpointer row;
-    gchar *addr_str, *str, *new_addr;
-
-    if (composing) {
-
-	addr_str = g_strdup(gtk_entry_get_text(GTK_ENTRY(ab_entry)));
-	g_strchomp(addr_str);
-
-	while ((row = gtk_clist_get_row_data(GTK_CLIST(add_clist), 0))) {
-	    LibBalsaAddress *addy = LIBBALSA_ADDRESS(row);
-
-	    if (g_list_length(addy->address_list) > 1) {
-		str = g_strdup("");
-		g_list_foreach(addy->address_list,
-			       (GFunc) address_list_to_string, &str);
-	    } else {
-		str = g_strdup_printf("%s <%s>", addy->full_name,
-				    (gchar *) addy->address_list->data);
-	    }
-
-	    gtk_object_unref(GTK_OBJECT(addy));
-	    gtk_clist_remove(GTK_CLIST(add_clist), 0);
-
-	    if (*addr_str) {
-		new_addr = g_strconcat(addr_str, ", ", str, NULL);
-		g_free(str);
-	    } else
-		new_addr = str;
-
-	    g_free(addr_str);
-	    addr_str = new_addr;
-	}
-
-	gtk_entry_set_text(GTK_ENTRY(ab_entry), addr_str);
-	g_free(addr_str);
-    }
-    ab_cancel_cb(widget, data);
-
-    return FALSE;
-}
-
-static void
-ab_clear_clist(GtkCList * clist)
-{
-    gpointer row;
-
-    gtk_clist_freeze(GTK_CLIST(clist));
-    while ((row = gtk_clist_get_row_data(clist, 0))) {
-	LibBalsaAddress *addy = LIBBALSA_ADDRESS(row);
-	gtk_object_unref(GTK_OBJECT(addy));
-	gtk_clist_remove(GTK_CLIST(clist), 0);
-    }
-    gtk_clist_thaw(GTK_CLIST(clist));
-
-}
-
-static void
-swap_clist_entry(gint row, GtkWidget * src, GtkWidget * dst)
-{
-    gint num;
-    gchar *listdata[2];
-    LibBalsaAddress *addy_data;
-
-    if (src != NULL || dst != NULL) {
-	addy_data = LIBBALSA_ADDRESS(gtk_clist_get_row_data(GTK_CLIST(src), row));
-
-	listdata[0] = addy_data->id;
-	if (addy_data->address_list)
-	    listdata[1] = addy_data->address_list->data;
-	else
-	    listdata[1] = "";
-
-	gtk_clist_remove(GTK_CLIST(src), row);
-	num = gtk_clist_append(GTK_CLIST(dst), listdata);
-	gtk_clist_set_row_data(GTK_CLIST(dst), num, (gpointer) addy_data);
-    }
-}
-
-static void
-ab_select_row_event(GtkWidget * widget, gint row, gint column,
-		    GdkEventButton * event, gpointer data)
-{
-    if (event == NULL)
-	return;
-
-    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS)
-	swap_clist_entry(row,	                                            /* row to swap */
-			 GTK_WIDGET(data),	                            /* from */
-			 (data == book_clist) ? (add_clist) : (book_clist)  /* to */
-			 );
-
-}
-
-static void
-open_compose(GtkWidget * widget, gint row, gint column,
-	     GdkEventButton * event, gpointer data)
-{
-    BalsaSendmsg *snd;
-    gchar *addr;
-    gpointer adr_struct;
-
-    if (event == NULL)
-	return;
-    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
-	snd = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window), NULL, 
-			   SEND_NORMAL);
-	adr_struct = gtk_clist_get_row_data(GTK_CLIST(data), row);
-	addr = libbalsa_address_to_gchar(LIBBALSA_ADDRESS(adr_struct));
-	gtk_entry_set_text(GTK_ENTRY(snd->to[1]), addr);
-	g_free(addr);
-	gtk_widget_grab_focus(snd->subject[1]);
-    }
-}
-
-
-static void
-ab_switch_cb(GtkWidget * widget, gpointer data)
-{
-    GtkWidget *from = GTK_WIDGET(data);
-
-    while (GTK_CLIST(from)->selection) {
-	swap_clist_entry(GPOINTER_TO_INT(GTK_CLIST(from)->selection->data),
-			 from,
-			 (data == book_clist) ? (add_clist) : (book_clist));
-    }
-}
-
-#ifdef AB_ADD_CB_USED
-static gint
-ab_add_cb(GtkWidget * widget, gpointer data)
-{
-    GtkWidget *dialog, *vbox, *w, *hbox;
-
-    dialog = gnome_dialog_new(_("Add New Address"),
-			      GNOME_STOCK_BUTTON_CANCEL,
-			      GNOME_STOCK_BUTTON_OK, NULL);
-    gnome_dialog_set_parent(dialog, GTK_WINDOW(balsa_app.main_window));
-
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0,
-				GTK_SIGNAL_FUNC(ab_cancel_cb),
-				(gpointer) dialog);
-    vbox = GNOME_DIALOG(dialog)->vbox;
-
-    hbox = gtk_hbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Name:")), FALSE,
-		       FALSE, 0);
-    w = gtk_entry_new();
-    gtk_box_pack_start(GTK_BOX(hbox), w, FALSE, FALSE, 0);
-
-    hbox = gtk_hbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("E-Mail Address:")),
-		       FALSE, FALSE, 0);
-    w = gtk_entry_new();
-    gtk_box_pack_start(GTK_BOX(hbox), w, FALSE, FALSE, 0);
-
-    gtk_widget_show_all(dialog);
-
-    return FALSE;
-}
-#endif
 
 /*
- * ab_load()
- *
- * Loads the addressbooks into a clist.  This is used by the compose
- * window.
+  This struct holds the information associated with each row of a clist:
+
+  The LibBalsaAddress object, and which address within that the row contains.
+
+  I wish there was a better way to do this, but a CListRow can only
+  have a single data reference attached.
  */
-#define LINE_LEN 256
-static void
-ab_load(GtkWidget * widget, gpointer data)
+typedef struct _AddressBookEntry AddressBookEntry;
+
+struct _AddressBookEntry
 {
-    gchar *listdata[2];
-    GList *list;
-    LibBalsaAddress *addr;
-    gint rownum;
+    gint ref_count;
+    LibBalsaAddress *address;
+    gint which_multiple;
+};
 
-    /*
-     * Load the addressbooks
-     */
-    ab_clear_clist(GTK_CLIST(book_clist));
+/* Object system functions ... */
+static void balsa_address_book_init(BalsaAddressBook *ab);
+static void balsa_address_book_class_init(BalsaAddressBookClass *klass);
+static void balsa_address_book_set_composing(BalsaAddressBook *ab, 
+					     gboolean composing);
 
-    if (composing)
-	ab_clear_clist(GTK_CLIST(add_clist));
+/* CListRow data ... */
+static AddressBookEntry *address_book_entry_new(LibBalsaAddress *address, 
+						gint which_multiple);
+static void address_book_entry_unref(AddressBookEntry *entry);
 
-    if (current_address_book == NULL)
-	return;
+/* Loading ... */
+static void balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab, 
+				       LibBalsaAddress *address, 
+				       BalsaAddressBook *ab);
+static void balsa_address_book_load(BalsaAddressBook *ab);
+static void balsa_address_book_reload(GtkWidget *w, BalsaAddressBook *av);
 
-    libbalsa_address_book_load(current_address_book);
-    list = current_address_book->address_list;
+/* Callbacks ... */
+static void balsa_address_book_dist_mode_toggled(GtkWidget * w,
+						 BalsaAddressBook *ab);
+static void balsa_address_book_menu_changed(GtkWidget * widget, 
+					    BalsaAddressBook *ab);
+static void balsa_address_book_run_gnomecard(GtkWidget * widget, gpointer data);
+static void balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook *ab);
 
-    /*
-     * Add the GList to a gtk_clist()
-     */
-    gtk_clist_freeze(GTK_CLIST(book_clist));
-    while (list != NULL) {
-	addr = LIBBALSA_ADDRESS(list->data);
-	listdata[0] = addr->id;
+/* address and recipient list management ... */
+static void balsa_address_book_swap_clist_entry(GtkCList * src, GtkCList * dst);
+static void balsa_address_book_select_address(GtkWidget *widget, 
+					      gint row, gint column,
+					      GdkEventButton *event, 
+					      BalsaAddressBook *ab);
+static void balsa_address_book_select_recipient(GtkWidget *widget, 
+						gint row, gint column,
+						GdkEventButton *event, 
+						BalsaAddressBook *ab);
+static void balsa_address_book_move_to_recipient_list(GtkWidget *widget,
+						      BalsaAddressBook *ab);
+static void balsa_address_book_remove_from_recipient_list(GtkWidget *widget, 
+							  BalsaAddressBook *ab);
 
-	if (addr->address_list)
-	    listdata[1] = (gchar *) addr->address_list->data;
-	else
-	    listdata[1] = "";
+/* Utility ... */
+static gint balsa_address_book_compare_entries(GtkCList * clist, 
+					       gconstpointer a, 
+					       gconstpointer b);
 
-	gtk_object_ref(GTK_OBJECT(addr));
+GtkType
+balsa_address_book_get_type(void)
+{
+    static GtkType ab_type = 0;
 
-	rownum = gtk_clist_append(GTK_CLIST(book_clist), listdata);
-	gtk_clist_set_row_data(GTK_CLIST(book_clist), rownum, addr);
-	list = g_list_next(list);
+    if ( !ab_type ) {
+	GtkTypeInfo ab_info = {
+	    "BalsaAddressBook",
+	    sizeof(BalsaAddressBook),
+	    sizeof(BalsaAddressBookClass),
+	    (GtkClassInitFunc) balsa_address_book_class_init,
+	    (GtkObjectInitFunc) balsa_address_book_init,
+	    (GtkArgSetFunc) NULL,
+	    (GtkArgGetFunc) NULL,
+	};
+	ab_type = gtk_type_unique(GNOME_TYPE_DIALOG, &ab_info);
     }
+    return ab_type;
+}
 
-    /*
-     * Show the GList.
-     */
-    gtk_clist_set_column_width(GTK_CLIST(book_clist), 0,
-			       gtk_clist_optimal_column_width(GTK_CLIST(book_clist),0));
-    gtk_clist_thaw(GTK_CLIST(book_clist));
+GtkWidget *
+balsa_address_book_new(gboolean composing)
+{
+    GtkWidget *ret;
+
+    ret = gtk_type_new(BALSA_TYPE_ADDRESS_BOOK);
+
+    balsa_address_book_set_composing(BALSA_ADDRESS_BOOK(ret), composing);
+
+    return ret;
 
 }
 
 static void
-ab_find(GtkWidget * group_entry)
-{
-    gchar *entry_text;
-    gpointer row;
-    gchar *new;
-    gint num;
-
-    g_return_if_fail(book_clist);
-    g_return_if_fail(group_entry);
-
-    entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry));
-    if (strlen(entry_text) == 0)
-	return;
-
-    gtk_clist_unselect_all(GTK_CLIST(book_clist));
-    gtk_clist_freeze(GTK_CLIST(book_clist));
-
-    num = 0;
-    while ((row = gtk_clist_get_row_data(GTK_CLIST(book_clist), num)) != NULL) {
-	gtk_clist_get_text(GTK_CLIST(book_clist), num, 0, &new);
-	if (strncasecmp(new, entry_text, strlen(entry_text)) == 0) {
-	    gtk_clist_moveto(GTK_CLIST(book_clist), num, 0, 0, 0);
-	    break;
-	}
-	num++;
-    }
-    gtk_clist_thaw(GTK_CLIST(book_clist));
-    gtk_clist_select_row(GTK_CLIST(book_clist), num, 0);
-    return;
-}
-
-static void
-mode_toggled(GtkWidget * w, gpointer data)
-{
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data)))
-	balsa_app.ab_dist_list_mode = FALSE;
-    else
-	balsa_app.ab_dist_list_mode = TRUE;
-
-    ab_load(NULL, NULL);
-}
-
-gint
-address_book_cb(GtkWidget * widget, gpointer data)
+balsa_address_book_init(BalsaAddressBook *ab)
 {
     GtkWidget *find_label,
 	*find_entry,
-	*dialog,
-	*vbox,
+	*vbox, *vbox2,
 	*w,
 	*hbox,
 	*box2,
 	*scrolled_window,
-	*radio1, *radio2, *ab_option, *ab_menu, *menu_item;
+	*ab_option, *ab_menu, *menu_item,
+	*stock_widget, *frame, *label;
     GList *ab_list;
     LibBalsaAddressBook *address_book;
     guint default_offset = 0;
 
     static gchar *titles[2] = { N_("Name"), N_("E-Mail Address") };
+    
+    ab->current_address_book = NULL;
 
+    gtk_window_set_title(GTK_WINDOW(ab), _("Address Book"));
+
+    gnome_dialog_append_buttons(GNOME_DIALOG(ab), 
+				GNOME_STOCK_BUTTON_OK,
+				GNOME_STOCK_BUTTON_CANCEL,
+				NULL);
 #ifdef ENABLE_NLS
     titles[0] = _(titles[0]);
     titles[1] = _(titles[1]);
 #endif
 
-    dialog = gnome_dialog_new(_("Address Book"), GNOME_STOCK_BUTTON_OK,
-			      GNOME_STOCK_BUTTON_CANCEL, NULL);
+    vbox = GNOME_DIALOG(ab)->vbox;
 
-    /* If we have something in the data, then the addressbook was opened
-     * from a message window */
-    /* FIXME: (widget->parent->parent->parent->parent->parent) could be more elegant ;-) */
-    if (GTK_IS_BUTTON(widget))
-	gnome_dialog_set_parent(GNOME_DIALOG(dialog),
-				GTK_WINDOW(widget->parent->parent->
-					   parent->parent->parent->
-					   parent));
-    else
-	gnome_dialog_set_parent(GNOME_DIALOG(dialog),
-				GTK_WINDOW(widget->parent->parent));
+    gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
 
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0,
-				GTK_SIGNAL_FUNC(ab_okay_cb),
-				(gpointer) dialog);
-    gnome_dialog_button_connect(GNOME_DIALOG(dialog), 1,
-				GTK_SIGNAL_FUNC(ab_cancel_cb),
-				(gpointer) dialog);
-    vbox = GNOME_DIALOG(dialog)->vbox;
-
-    book_clist = gtk_clist_new_with_titles(2, titles);
-    gtk_clist_set_selection_mode(GTK_CLIST(book_clist),
+    /* The main address list */
+    ab->address_clist = gtk_clist_new_with_titles(2, titles);
+    gtk_clist_set_selection_mode(GTK_CLIST(ab->address_clist),
 				 GTK_SELECTION_MULTIPLE);
-    gtk_clist_column_titles_passive(GTK_CLIST(book_clist));
-    gtk_clist_set_compare_func(GTK_CLIST(book_clist), ab_compare);
-    gtk_clist_set_sort_type(GTK_CLIST(book_clist), GTK_SORT_ASCENDING);
-    gtk_clist_set_auto_sort(GTK_CLIST(book_clist), TRUE);
+    gtk_clist_column_titles_passive(GTK_CLIST(ab->address_clist));
+    gtk_clist_set_compare_func(GTK_CLIST(ab->address_clist), balsa_address_book_compare_entries);
+    gtk_clist_set_sort_type(GTK_CLIST(ab->address_clist), GTK_SORT_ASCENDING);
+    gtk_clist_set_auto_sort(GTK_CLIST(ab->address_clist), TRUE);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->address_clist), 0, TRUE);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->address_clist), 1, TRUE);
+    gtk_widget_show(ab->address_clist);
+    gtk_signal_connect(GTK_OBJECT(ab->address_clist), "select_row",
+		       GTK_SIGNAL_FUNC(balsa_address_book_select_address), ab);
 
-    add_clist = gtk_clist_new_with_titles(2, titles);
-    gtk_clist_set_selection_mode(GTK_CLIST(add_clist),
+    /* The clist for selected addresses in compose mode */
+    ab->recipient_clist = gtk_clist_new_with_titles(2, titles);
+    gtk_clist_set_selection_mode(GTK_CLIST(ab->recipient_clist),
 				 GTK_SELECTION_MULTIPLE);
-    gtk_clist_column_titles_passive(GTK_CLIST(add_clist));
-    gtk_clist_set_compare_func(GTK_CLIST(add_clist), ab_compare);
-    gtk_clist_set_sort_type(GTK_CLIST(add_clist), GTK_SORT_ASCENDING);
-    gtk_clist_set_auto_sort(GTK_CLIST(add_clist), TRUE);
+    gtk_clist_column_titles_passive(GTK_CLIST(ab->recipient_clist));
+    gtk_clist_set_compare_func(GTK_CLIST(ab->recipient_clist), balsa_address_book_compare_entries);
+    gtk_clist_set_sort_type(GTK_CLIST(ab->recipient_clist), GTK_SORT_ASCENDING);
+    gtk_clist_set_auto_sort(GTK_CLIST(ab->recipient_clist), TRUE);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->recipient_clist), 0, TRUE);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(ab->recipient_clist), 1, TRUE);
+    gtk_widget_show(ab->recipient_clist);
+    gtk_signal_connect(GTK_OBJECT(ab->recipient_clist), "select_row",
+		       GTK_SIGNAL_FUNC(balsa_address_book_select_recipient),
+		       (gpointer) ab);
 
+    /* The address book selection menu */
     ab_menu = gtk_menu_new();
     if (balsa_app.address_book_list) {
-	current_address_book = balsa_app.default_address_book;
+	ab->current_address_book = balsa_app.default_address_book;
 
 	ab_list = balsa_app.address_book_list;
 	while (ab_list) {
 	    address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
-	    if (current_address_book == NULL)
-		current_address_book = address_book;
+	    if (ab->current_address_book == NULL)
+		ab->current_address_book = address_book;
 
 	    menu_item = gtk_menu_item_new_with_label(address_book->name);
 	    gtk_widget_show(menu_item);
 	    gtk_menu_append(GTK_MENU(ab_menu), menu_item);
 
+	    gtk_object_set_data(GTK_OBJECT(menu_item), "address-book",
+				address_book);
 	    gtk_signal_connect(GTK_OBJECT(menu_item), "activate",
-			       address_book_menu_cb, address_book);
+			       balsa_address_book_menu_changed, ab);
 
 	    if (address_book == balsa_app.default_address_book)
 		gtk_menu_set_active(GTK_MENU(ab_menu), default_offset);
@@ -459,149 +222,514 @@ address_book_cb(GtkWidget * widget, gpointer data)
     ab_option = gtk_option_menu_new();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(ab_option), ab_menu);
     gtk_widget_show(ab_option);
+
     gtk_box_pack_start(GTK_BOX(vbox), ab_option, TRUE, TRUE, 0);
 
-    ab_entry = (GtkWidget *) data;
+    /* Entry widget for finding an address */
+    find_label = gtk_label_new(_("Search for Name:"));
+    gtk_widget_show(find_label);
 
     find_entry = gtk_entry_new();
     gtk_widget_show(find_entry);
     gtk_signal_connect(GTK_OBJECT(find_entry), "changed",
-		       GTK_SIGNAL_FUNC(ab_find), find_entry);
-    find_label = gtk_label_new(_("Name:"));
-    gtk_widget_show(find_label);
-    composing = FALSE;
-
-    hbox = gtk_hbox_new(FALSE, 0);
+		       GTK_SIGNAL_FUNC(balsa_address_book_find), ab);
+    
+    /* Horizontal layout */
+    hbox = gtk_hbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+    gtk_widget_show(hbox);
 
-    box2 = gtk_vbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), box2, FALSE, FALSE, 0);
-    /*gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(_("Address Book")), FALSE, FALSE, 0); */
+    /* Column for address list */
+    vbox2 = gtk_vbox_new(FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox2, FALSE, FALSE, 1);
+    gtk_widget_show(vbox2);
+
+    /* Pack the find stuff into a box */
+    box2 = gtk_hbox_new(FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(vbox2), box2, FALSE, FALSE, 1);
     gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box2), find_entry, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box2), find_entry, TRUE, TRUE, 0);
+    gtk_widget_show(GTK_WIDGET(box2));
 
+
+    /* A scrolled window for the address clist */
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(box2), scrolled_window, TRUE, TRUE, 0);
-    gtk_container_add(GTK_CONTAINER(scrolled_window), book_clist);
+    gtk_box_pack_start(GTK_BOX(vbox2), scrolled_window, TRUE, TRUE, 0);
+    gtk_widget_show(scrolled_window);
+    gtk_container_add(GTK_CONTAINER(scrolled_window), ab->address_clist);
     gtk_widget_set_usize(scrolled_window, 300, 250);
 
-    /* 
-     * Only display this part of * the window when we're adding to a composing 
-     * message. 
-     */
-    if (GTK_IS_ENTRY((GtkEntry *) data)) {
-	composing = TRUE;
+    /* Column for arrows in compose mode */
+    ab->arrow_box = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(hbox), ab->arrow_box, FALSE, FALSE, 1);
+    gtk_widget_show(ab->arrow_box);
 
-	gtk_signal_connect(GTK_OBJECT(book_clist), "select_row",
-			   GTK_SIGNAL_FUNC(ab_select_row_event),
-			   (gpointer) book_clist);
+    /* FIXME: Can make a stock button in one call... */
+    w = gtk_button_new();
+    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
+					     GNOME_STOCK_PIXMAP_FORWARD);
+    gtk_container_add(GTK_CONTAINER(w), stock_widget);
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    gtk_widget_show(stock_widget);
+    gtk_widget_show(w);
+    gtk_signal_connect(GTK_OBJECT(w), "clicked",
+		       GTK_SIGNAL_FUNC(balsa_address_book_move_to_recipient_list),
+		       ab);
 
-	box2 = gtk_vbox_new(FALSE, 5);
-	gtk_box_pack_start(GTK_BOX(hbox), box2, FALSE, FALSE, 0);
-	w = gtk_button_new();
-	gtk_container_add(GTK_CONTAINER(w),
-			  gnome_stock_pixmap_widget(dialog,
-						    GNOME_STOCK_PIXMAP_FORWARD));
-	gtk_signal_connect(GTK_OBJECT(w), "clicked",
-			   GTK_SIGNAL_FUNC(ab_switch_cb),
-			   (gpointer) book_clist);
-	gtk_box_pack_start(GTK_BOX(box2), w, TRUE, FALSE, 0);
-	w = gtk_button_new();
-	gtk_container_add(GTK_CONTAINER(w),
-			  gnome_stock_pixmap_widget(dialog,
-						    GNOME_STOCK_PIXMAP_BACK));
-	gtk_signal_connect(GTK_OBJECT(w), "clicked",
-			   GTK_SIGNAL_FUNC(ab_switch_cb),
-			   (gpointer) add_clist);
-	gtk_box_pack_start(GTK_BOX(box2), w, TRUE, FALSE, 0);
+    w = gtk_button_new();
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab),
+					     GNOME_STOCK_PIXMAP_BACK);
+    gtk_container_add(GTK_CONTAINER(w), stock_widget);
+    gtk_widget_show(stock_widget);
+    gtk_widget_show(w);
+    gtk_signal_connect(GTK_OBJECT(w), "clicked",
+		       GTK_SIGNAL_FUNC(balsa_address_book_remove_from_recipient_list),
+		       ab);
 
-	box2 = gtk_vbox_new(FALSE, 5);
-	gtk_box_pack_start(GTK_BOX(hbox), box2, TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(box2), gtk_label_new(_("Send-To")),
-			   FALSE, FALSE, 0);
-	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW
-				       (scrolled_window),
-				       GTK_POLICY_AUTOMATIC,
-				       GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(box2), scrolled_window, FALSE, FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(scrolled_window), add_clist);
-	gtk_clist_set_selection_mode(GTK_CLIST(add_clist),
-				     GTK_SELECTION_MULTIPLE);
-	gtk_clist_column_titles_passive(GTK_CLIST(add_clist));
-	gtk_widget_set_usize(scrolled_window, 300, 250);
+    /* Column for selected addresses in compose mode */
+    ab->send_to_box = gtk_vbox_new(FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(hbox), ab->send_to_box, TRUE, TRUE, 1);
 
-	gtk_signal_connect(GTK_OBJECT(add_clist), "select_row",
-			   GTK_SIGNAL_FUNC(ab_select_row_event),
-			   (gpointer) add_clist);
-    } else gtk_signal_connect(GTK_OBJECT(book_clist), "select_row",
-			      GTK_SIGNAL_FUNC(open_compose),
-			      (gpointer) book_clist);
+    label = gtk_label_new(_("Send-To"));
+    gtk_widget_show(label);
+    gtk_box_pack_start(GTK_BOX(ab->send_to_box), label,
+		       FALSE, FALSE, 1);
 
+    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_show(scrolled_window);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
+				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(ab->send_to_box), scrolled_window, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(scrolled_window), ab->recipient_clist);
+    gtk_widget_set_usize(scrolled_window, 300, 250);
+
+    /* Buttons ... */
     hbox = gtk_hbutton_box_new();
     gtk_hbutton_box_set_layout_default(GTK_BUTTONBOX_START);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-    w = gnome_pixmap_button(gnome_stock_pixmap_widget
-			    (dialog, GNOME_STOCK_PIXMAP_OPEN),
-			    _("Run GnomeCard"));
-
+    gtk_widget_show(GTK_WIDGET(hbox));
+    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab), GNOME_STOCK_PIXMAP_OPEN);
+    w = gnome_pixmap_button(stock_widget, _("Run GnomeCard"));
     gtk_signal_connect(GTK_OBJECT(w), "clicked",
-		       GTK_SIGNAL_FUNC(ab_gnomecard_cb), NULL);
+		       GTK_SIGNAL_FUNC(balsa_address_book_run_gnomecard), NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
-    gtk_widget_ref(w);
+    gtk_widget_show(GTK_WIDGET(w));
 
-    w =	gnome_pixmap_button(gnome_stock_pixmap_widget
-			    (dialog, GNOME_STOCK_PIXMAP_ADD),
-			    _("Re-Import"));
-    gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(ab_load),
-		       NULL);
+    /* FIXME: Should strive to not need this?? */
+    stock_widget = gnome_stock_pixmap_widget(GTK_WIDGET(ab), GNOME_STOCK_PIXMAP_ADD);
+    w =	gnome_pixmap_button(stock_widget, _("Re-Import"));
+    gtk_signal_connect(GTK_OBJECT(w), "clicked", GTK_SIGNAL_FUNC(balsa_address_book_reload),
+		       ab);
     gtk_container_add(GTK_CONTAINER(hbox), w);
+    gtk_widget_show(w);
 
-    ab_load(NULL, NULL);
+    balsa_address_book_load(ab);
 
     /* mode switching stuff */
-    radio1 = gtk_radio_button_new_with_label(NULL, _("Import first address only"));
-    radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON
-							 (radio1),
-							 _("Import all adresses"));
+    frame = gtk_frame_new(_("Treat multiple addresses as:"));
+/*      gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0); */
+    gtk_widget_show(frame);
 
-    gtk_signal_connect(GTK_OBJECT(radio1), "toggled",
-		       GTK_SIGNAL_FUNC(mode_toggled), radio1);
+    ab->single_address_mode_radio = gtk_radio_button_new_with_label
+	(NULL, _("alternative addresses for the same person"));
+    gtk_widget_show(ab->single_address_mode_radio);
 
-    /* Pack them into a box, then show all the widgets */
-    gtk_box_pack_start(GTK_BOX(vbox), radio1, TRUE, TRUE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), radio2, TRUE, TRUE, 1);
-    gtk_window_set_wmclass(GTK_WINDOW(dialog), "addressbook", "Balsa");
-    gtk_widget_show_all(dialog);
+    ab->dist_address_mode_radio = gtk_radio_button_new_with_label_from_widget
+	(GTK_RADIO_BUTTON(ab->single_address_mode_radio),
+	 _("a distribution list"));
+    gtk_widget_show(ab->dist_address_mode_radio);
+    ab->toggle_handler_id = gtk_signal_connect(GTK_OBJECT(ab->single_address_mode_radio), "toggled",
+					       GTK_SIGNAL_FUNC(balsa_address_book_dist_mode_toggled), ab);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio2),
-				 balsa_app.ab_dist_list_mode);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(ab->dist_address_mode_radio),
+				 ab->current_address_book->dist_list_mode);
+
+    /* Pack them into a box  */
+    box2 = gtk_vbox_new(TRUE, 1);
+    gtk_container_add(GTK_CONTAINER(frame), box2);
+    gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio, 
+		       FALSE, FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio, 
+		       FALSE, FALSE, 1);
+    gtk_widget_show(box2);
+    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 1);
+    
     gtk_widget_grab_focus(find_entry);
-
-    /* PS: I do not like modal dialog boxes but the only other option
-       is to reference the connected field and  check if it is
-       destroyed in ab_okay_cb before accessing it.
-     */
-    if (composing) {
-	gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-	gnome_dialog_run(GNOME_DIALOG(dialog));
-    }
-
-    return FALSE;
 }
 
 static void
-address_book_menu_cb(GtkWidget * widget, gpointer data)
+balsa_address_book_class_init(BalsaAddressBookClass *klass)
 {
-    current_address_book = LIBBALSA_ADDRESS_BOOK(data);
-    ab_load(widget, data);
 }
 
+/*
+  Show or hide the recipient list and friends
+*/
+static void
+balsa_address_book_set_composing(BalsaAddressBook *ab, gboolean composing)
+{
+    if ( composing ) {
+	gtk_widget_show(ab->send_to_box);
+	gtk_widget_show(ab->arrow_box);
+	gtk_window_set_modal(GTK_WINDOW(ab), TRUE);
+    } else {
+	gtk_widget_hide(ab->send_to_box);
+	gtk_widget_hide(ab->arrow_box);
+	gtk_window_set_modal(GTK_WINDOW(ab), FALSE);
+    }
+    ab->composing = composing;
+}
+
+/*
+  Runs gnome card
+*/
+static void
+balsa_address_book_run_gnomecard(GtkWidget * widget, gpointer data)
+{
+    char *argv[] = { "gnomecard" };
+
+    gnome_execute_async(NULL, 1, argv);
+}
+
+/*
+  Returns a string of all the selected recipients.
+ */
+gchar *
+balsa_address_book_get_recipients(BalsaAddressBook *ab)
+{
+    GString *str = NULL;
+    AddressBookEntry *entry;
+    gchar *text;
+    gint i;
+
+    g_return_val_if_fail(ab->composing, NULL);
+
+    for(i = 0; i < GTK_CLIST(ab->recipient_clist)->rows; i++) {
+	entry = (AddressBookEntry*)(gtk_clist_get_row_data(GTK_CLIST(ab->recipient_clist), i));
+
+	g_assert (entry != NULL);
+
+	text = libbalsa_address_to_gchar(entry->address, entry->which_multiple);
+	if ( text == NULL )
+	    continue;
+
+	if ( str )
+	    g_string_sprintfa(str, ", %s", text);
+	else
+	    str = g_string_new(text);
+	g_free(text);
+    }
+    if ( str != NULL ) {
+	text = str->str;
+	g_string_free(str, FALSE);
+	return text;
+    } else {
+	return NULL;
+    }
+}
+
+/*
+  Moves an entry between two CLists.
+*/
+/*
+  FIXME: Need to only move it back if it belongs in current address book?? 
+*/
+static void
+balsa_address_book_swap_clist_entry(GtkCList * src, GtkCList * dst)
+{
+    gint num;
+    gint row;
+    gchar *listdata[2];
+    AddressBookEntry *entry;
+    gchar *address_string;
+
+    g_return_if_fail(GTK_IS_CLIST(src));
+    g_return_if_fail(GTK_IS_CLIST(dst));
+
+    while ( src->selection ) {
+	row = GPOINTER_TO_INT(src->selection->data);
+	entry = (AddressBookEntry*)(gtk_clist_get_row_data(src, row));
+	
+	g_return_if_fail(gtk_clist_get_cell_type (src, row, LIST_COLUMN_ADDRESS) == GTK_CELL_TEXT);
+
+ 	gtk_clist_get_text (src, row, LIST_COLUMN_ADDRESS, &address_string);
+
+	listdata[LIST_COLUMN_NAME] = entry->address->id;
+	listdata[LIST_COLUMN_ADDRESS]= address_string;
+
+	num = gtk_clist_append(dst, listdata);
+
+	/* Will be unref'd on remove from source... */
+	entry->ref_count++;
+	gtk_clist_set_row_data_full(dst, num, entry, 
+				    (GtkDestroyNotify)address_book_entry_unref);
+
+	gtk_clist_remove(src, row);
+    }
+}
+
+/*
+  Handle a click on the main address list
+
+  If composing then move the address to the other clist, otherwise
+  open a compose window.
+
+*/
+static void
+balsa_address_book_select_address(GtkWidget *widget, gint row, gint column,
+				  GdkEventButton *event, BalsaAddressBook *ab)
+{
+    g_return_if_fail ( BALSA_IS_ADDRESS_BOOK(ab) );
+
+    if ( event == NULL )
+	return;
+
+
+    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
+	if ( ab->composing ) {
+	    balsa_address_book_swap_clist_entry(GTK_CLIST(ab->address_clist),
+						GTK_CLIST(ab->recipient_clist));
+	} else {
+	    BalsaSendmsg *snd;
+	    gchar *addr;
+	    AddressBookEntry *entry;
+
+	    snd = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window), NULL, 
+				     SEND_NORMAL);
+	    entry = (AddressBookEntry*)gtk_clist_get_row_data(GTK_CLIST(ab->address_clist), row);
+	    
+	    addr = libbalsa_address_to_gchar(entry->address, entry->which_multiple);
+	    gtk_entry_set_text(GTK_ENTRY(snd->to[1]), addr);
+	    g_free(addr);
+
+	    gtk_widget_grab_focus(snd->subject[1]);
+	}
+    }
+}
+
+/*
+  Handle a click on the recipient list.
+
+  Only sane if composing. Move to address list.
+ */
+static void balsa_address_book_select_recipient(GtkWidget *widget, gint row, gint column,
+					      GdkEventButton *event, BalsaAddressBook *ab)
+{
+    g_return_if_fail ( BALSA_IS_ADDRESS_BOOK(ab) );
+    g_return_if_fail ( ab->composing );
+
+    if ( event == NULL )
+	return;
+
+    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
+	if ( ab->composing ) {
+	    balsa_address_book_swap_clist_entry(GTK_CLIST(ab->recipient_clist),
+						GTK_CLIST(ab->address_clist));
+	}
+    }
+}
+
+/*
+  Handle a click on forward button
+*/
+static void
+balsa_address_book_move_to_recipient_list(GtkWidget *widget, BalsaAddressBook *ab)
+{
+    g_return_if_fail( BALSA_IS_ADDRESS_BOOK(ab) );
+    g_return_if_fail( ab->composing );
+
+    balsa_address_book_swap_clist_entry(GTK_CLIST(ab->address_clist), 
+					GTK_CLIST(ab->recipient_clist));
+}
+
+/*
+  Handle a click on the back button
+ */
+static void
+balsa_address_book_remove_from_recipient_list(GtkWidget *widget, BalsaAddressBook *ab)
+{
+    g_return_if_fail( BALSA_IS_ADDRESS_BOOK(ab) );
+    g_return_if_fail( ab->composing );
+
+    balsa_address_book_swap_clist_entry(GTK_CLIST(ab->recipient_clist), 
+					GTK_CLIST(ab->address_clist));
+}
+
+/*
+  Handle a click on the reload button.
+ */
+static void
+balsa_address_book_reload(GtkWidget *w, BalsaAddressBook *ab)
+{
+    balsa_address_book_load(ab);
+}
+
+
+/*
+ * Loads the addressbooks into a clist.  
+ */
+static void
+balsa_address_book_load(BalsaAddressBook *ab)
+{
+    g_return_if_fail(BALSA_IS_ADDRESS_BOOK(ab));
+    ab = BALSA_ADDRESS_BOOK(ab);
+
+    gtk_clist_clear(GTK_CLIST(ab->address_clist));
+
+    if (ab->current_address_book == NULL)
+	return;
+
+    libbalsa_address_book_load(ab->current_address_book, 
+			       (LibBalsaAddressBookLoadFunc)balsa_address_book_load_cb,
+			       ab);
+}
+
+/*
+  The address load callback. Adds a single address to the address list.
+
+  If the current address book is in dist list mode then create a
+  single entry, or else create an entry for each address in the book.
+ */
+static void
+balsa_address_book_load_cb(LibBalsaAddressBook *libbalsa_ab, LibBalsaAddress *address, BalsaAddressBook *ab)
+{
+    gchar *listdata[2];
+    gint rownum;
+    GList *address_list;
+    AddressBookEntry *entry;
+    gint count;
+
+    g_return_if_fail ( BALSA_IS_ADDRESS_BOOK(ab));
+    g_return_if_fail ( LIBBALSA_IS_ADDRESS_BOOK(libbalsa_ab) );
+
+    if ( address == NULL )
+	return;
+
+    if ( libbalsa_ab->dist_list_mode && g_list_length(address->address_list) >1) {
+
+	listdata[LIST_COLUMN_NAME] = address->id;
+	listdata[LIST_COLUMN_ADDRESS] = libbalsa_address_to_gchar(address, -1);
+	
+	rownum = gtk_clist_append(GTK_CLIST(ab->address_clist), listdata);
+
+	entry = address_book_entry_new(address, -1);
+	gtk_clist_set_row_data_full(GTK_CLIST(ab->address_clist), rownum, entry,
+				    (GtkDestroyNotify)address_book_entry_unref);
+    } else {
+	address_list = address->address_list;
+	count = 0;
+	while ( address_list ) {
+	    listdata[LIST_COLUMN_NAME] = address->id;
+	    listdata[LIST_COLUMN_ADDRESS] = (gchar *) address_list->data;
+	    
+	    rownum = gtk_clist_append(GTK_CLIST(ab->address_clist), listdata);
+	    
+	    entry = address_book_entry_new(address, count);
+	    gtk_clist_set_row_data_full(GTK_CLIST(ab->address_clist), rownum, entry,
+					(GtkDestroyNotify)address_book_entry_unref);
+
+	    address_list = g_list_next(address_list);
+	    count++;
+	}
+    }
+}
+
+/*
+  Search for an address in the address list.
+  Attached to the changed signal of the find entry.
+*/
+static void
+balsa_address_book_find(GtkWidget * group_entry, BalsaAddressBook *ab)
+{
+    gchar *entry_text;
+    gpointer row;
+    gchar *new;
+    gint num;
+
+    g_return_if_fail(BALSA_IS_ADDRESS_BOOK(ab));
+
+    entry_text = gtk_entry_get_text(GTK_ENTRY(group_entry));
+
+    if (strlen(entry_text) == 0)
+	return;
+
+    gtk_clist_unselect_all(GTK_CLIST(ab->address_clist));
+    gtk_clist_freeze(GTK_CLIST(ab->address_clist));
+
+    num = 0;
+    while ((row = gtk_clist_get_row_data(GTK_CLIST(ab->address_clist), num)) != NULL) {
+	gtk_clist_get_text(GTK_CLIST(ab->address_clist), num, 
+			   LIST_COLUMN_NAME, &new);
+
+	if (strncasecmp(new, entry_text, strlen(entry_text)) == 0) {
+	    gtk_clist_moveto(GTK_CLIST(ab->address_clist), 
+			     num, LIST_COLUMN_NAME, 
+			     0, 0);
+	    break;
+	}
+	num++;
+    }
+    gtk_clist_thaw(GTK_CLIST(ab->address_clist));
+    gtk_clist_select_row(GTK_CLIST(ab->address_clist), num, 
+			 LIST_COLUMN_NAME);
+    return;
+}
+
+/*
+  Handle a change in the dist mode
+*/
+static void
+balsa_address_book_dist_mode_toggled(GtkWidget * w, BalsaAddressBook *ab)
+{
+    gboolean active;
+
+    g_return_if_fail(BALSA_IS_ADDRESS_BOOK(ab));
+
+    active = gtk_toggle_button_get_active
+	(GTK_TOGGLE_BUTTON(ab->single_address_mode_radio));
+
+    if (active)
+	ab->current_address_book->dist_list_mode = FALSE;
+    else
+	ab->current_address_book->dist_list_mode = TRUE;
+
+    balsa_address_book_load(ab);
+}
+
+/*
+  Handle a change in the current address book.
+*/
+static void
+balsa_address_book_menu_changed(GtkWidget * widget, BalsaAddressBook *ab)
+{
+    LibBalsaAddressBook *addr;
+
+    addr = LIBBALSA_ADDRESS_BOOK(gtk_object_get_data(GTK_OBJECT(widget), "address-book"));
+    g_assert(addr != NULL);
+
+    ab->current_address_book = addr;
+
+    gtk_signal_handler_block(GTK_OBJECT(ab->single_address_mode_radio), ab->toggle_handler_id);
+    if ( ab->current_address_book->dist_list_mode )
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(ab->dist_address_mode_radio),
+				     TRUE);
+    else 
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(ab->single_address_mode_radio),
+				     TRUE);
+    gtk_signal_handler_unblock(GTK_OBJECT(ab->single_address_mode_radio), ab->toggle_handler_id);
+
+    balsa_address_book_load(ab);
+}
+
+/*
+  Compare two rows in a clist.
+*/
 static gint
-ab_compare(GtkCList * clist, gconstpointer a, gconstpointer b)
+balsa_address_book_compare_entries(GtkCList * clist, gconstpointer a, gconstpointer b)
 {
     gchar *c1, *c2;
 
@@ -618,4 +746,39 @@ ab_compare(GtkCList * clist, gconstpointer a, gconstpointer b)
 	return 0;
 
     return g_strcasecmp(c1, c2);
+}
+
+/*
+  Create the data attached to a clist row
+*/
+
+static AddressBookEntry *
+address_book_entry_new(LibBalsaAddress *address, gint which_multiple)
+{
+    AddressBookEntry *abe;
+
+    abe = g_new(AddressBookEntry, 1);
+
+    gtk_object_ref(GTK_OBJECT(address));
+
+    abe->ref_count = 1;
+    abe->address = address;
+    abe->which_multiple = which_multiple;
+    
+    return abe;
+}
+
+/*
+  Unref a row data struct and free if needed.
+ */
+static void
+address_book_entry_unref(AddressBookEntry *entry)
+{
+    entry->ref_count--;
+
+    if ( entry->ref_count > 0 ) 
+	return;
+
+    gtk_object_unref(GTK_OBJECT(entry->address));
+    g_free(entry);
 }

@@ -265,8 +265,6 @@ extern struct BalsaApplication {
     GList *address_book_list;
     LibBalsaAddressBook *default_address_book;
 
-    gboolean ab_dist_list_mode;
-
     /* spell checking */
     SpellCheckModule module;
     SpellCheckSuggestMode suggestion_mode;

@@ -174,25 +174,53 @@ libbalsa_address_new_from_libmutt(ADDRESS * caddr)
     return address;
 }
 
+/* 
+   Get a string version of this address.
+
+   If n == -1 then return all addresses, else return the n'th one.
+   If n > the number of addresses, will cause an error.
+*/
 gchar *
-libbalsa_address_to_gchar(LibBalsaAddress * addr)
+libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 {
     gchar *retc = NULL;
+    gchar *address_string;
+    GList *nth_address;
 
-    if (addr->full_name) {
-	if (addr->address_list) {
-	    gchar *email = addr->address_list->data;
-	    retc = g_strdup_printf("%s <%s>", addr->full_name, email);
-	} else {
-	    retc = g_strdup(addr->full_name);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
+    if ( n == -1 ) {
+	GString *str = NULL;
+
+	nth_address = address->address_list;
+	while ( nth_address ) {
+	    address_string = (gchar *)nth_address->data;
+	    if ( str )
+		g_string_sprintfa(str, ", %s", address_string);
+	    else
+		str = g_string_new(address_string);
+	    nth_address = g_list_next(nth_address);
+	}
+
+	if ( str ) {
+	    retc = str->str;
+	    g_string_free(str, FALSE);
+	} else { 
+	    retc = NULL;
 	}
     } else {
-	if (addr->address_list) {
-	    gchar *email = addr->address_list->data;
-	    retc = g_strdup(email);
+	nth_address = g_list_nth(address->address_list, n);
+	g_return_val_if_fail(nth_address != NULL, NULL);
+
+	address_string = (gchar*)nth_address->data;
+
+	if (address->full_name) {
+	    retc = g_strdup_printf("%s <%s>", address->full_name, address_string);
+	} else {
+	    retc = g_strdup(address_string);
 	}
     }
-
+    
     return retc;
 }
 

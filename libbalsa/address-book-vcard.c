@@ -29,6 +29,7 @@
 #include <gnome.h>
 
 #include <stdio.h>
+#include <sys/stat.h>
 
 #include "address-book.h"
 #include "address-book-vcard.h"
@@ -53,7 +54,9 @@ static void libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass
 static void libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard *ab);
 static void libbalsa_address_book_vcard_destroy(GtkObject * object);
 
-static void libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab);
+static void libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab, 
+					     LibBalsaAddressBookLoadFunc callback, 
+					     gpointer closure);
 static void libbalsa_address_book_vcard_store_address(LibBalsaAddressBook *ab,
 						      LibBalsaAddress *new_address);
 
@@ -72,6 +75,11 @@ static CompletionData *completion_data_new(LibBalsaAddress * address,
 static void completion_data_free(CompletionData * data);
 static gchar *completion_data_extract(CompletionData * data);
 static gint address_compare(LibBalsaAddress *a, LibBalsaAddress *b);
+
+static void load_vcard_file(LibBalsaAddressBook *ab);
+
+static gboolean vcard_address_book_need_reload(LibBalsaAddressBookVcard *ab);
+
 
 GtkType libbalsa_address_book_vcard_get_type(void)
 {
@@ -130,6 +138,9 @@ static void
 libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard * ab)
 {
     ab->path = NULL;
+    ab->address_list = NULL;
+    ab->mtime = 0;
+
     ab->name_complete  = g_completion_new((GCompletionFunc)completion_data_extract);
     ab->alias_complete = g_completion_new((GCompletionFunc)completion_data_extract);
 }
@@ -142,6 +153,10 @@ libbalsa_address_book_vcard_destroy(GtkObject * object)
     addr_vcard = LIBBALSA_ADDRESS_BOOK_VCARD(object);
 
     g_free(addr_vcard->path);
+
+    g_list_foreach(addr_vcard->address_list, (GFunc) gtk_object_unref, NULL);
+    g_list_free(addr_vcard->address_list);
+    addr_vcard->address_list = NULL;
 
     g_list_foreach(addr_vcard->name_complete->items, (GFunc)completion_data_free, NULL);
     g_list_foreach(addr_vcard->alias_complete->items, (GFunc)completion_data_free, NULL);
@@ -169,9 +184,41 @@ libbalsa_address_book_vcard_new(const gchar * name, const gchar * path)
     return ab;
 }
 
-/* FIXME: Could stat the file to see if it has changed since last time we read it */
+static gboolean 
+vcard_address_book_need_reload(LibBalsaAddressBookVcard *ab)
+{
+    struct stat stat_buf;
+
+    if ( stat(ab->path, &stat_buf) == -1 ) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Could not stat vcard address book: %s"), ab->path);
+	return FALSE;
+    }
+    if ( stat_buf.st_mtime > ab->mtime ) {
+	ab->mtime = stat_buf.st_mtime;
+	return TRUE;
+    } else {
+	return FALSE;
+    }
+}
+
 static void
-libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
+libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure)
+{
+    GList *lst;
+
+    load_vcard_file(ab);
+
+    lst = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->address_list;
+    while (lst) {
+	if ( callback ) 
+	    callback(ab, LIBBALSA_ADDRESS(lst->data), closure);
+	lst = g_list_next(lst);
+    }
+    callback(ab, NULL, closure);
+}
+
+/* FIXME: Could stat the file to see if it has changed since last time we read it */
+static void load_vcard_file(LibBalsaAddressBook *ab)
 {
     FILE *gc;
     gchar string[LINE_LEN];
@@ -186,9 +233,12 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
 
     addr_vcard = LIBBALSA_ADDRESS_BOOK_VCARD(ab);
 
-    g_list_foreach(ab->address_list, (GFunc) gtk_object_unref, NULL);
-    g_list_free(ab->address_list);
-    ab->address_list = NULL;
+    if ( vcard_address_book_need_reload(addr_vcard) == FALSE ) 
+	return;
+
+    g_list_foreach(addr_vcard->address_list, (GFunc) gtk_object_unref, NULL);
+    g_list_free(addr_vcard->address_list);
+    addr_vcard->address_list = NULL;
 
     g_list_foreach(addr_vcard->name_complete->items, (GFunc)completion_data_free, NULL);
     g_list_foreach(addr_vcard->alias_complete->items, (GFunc)completion_data_free, NULL);
@@ -276,7 +326,7 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
     fclose(gc);
 
     list = g_list_sort(list, (GCompareFunc)address_compare);
-    ab->address_list = list;
+    addr_vcard->address_list = list;
 
     completion_list = NULL;
     while ( list ) {
@@ -289,7 +339,7 @@ libbalsa_address_book_vcard_load(LibBalsaAddressBook * ab)
     g_list_free(completion_list);
 
     completion_list = NULL;
-    list = ab->address_list;
+    list = addr_vcard->address_list;
     while( list ) {
 	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data), TRUE);
 	completion_list = g_list_prepend(completion_list, cmp_data);
@@ -361,9 +411,9 @@ libbalsa_address_book_vcard_store_address(LibBalsaAddressBook * ab,
     LibBalsaAddress *address;
     FILE *fp;
 
-    libbalsa_address_book_load(ab);
+    load_vcard_file(ab);
 
-    list = ab->address_list;
+    list = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->address_list;
     while (list) {
 	address = LIBBALSA_ADDRESS(list->data);
 
@@ -464,6 +514,8 @@ static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * a
     if ( ab->expand_aliases == FALSE )
 	return NULL;
 
+    load_vcard_file(ab);
+
     resa = g_completion_complete(vc->name_complete, (gchar*)prefix, &p1);
     resb = g_completion_complete(vc->alias_complete, (gchar*)prefix, &p2);
 
@@ -482,10 +534,16 @@ static GList *libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * a
     /*
       Extract a list of addresses.
     */
-    while ( resa && resb ) {
-	addr1 = ((CompletionData*)resa->data)->address;
-	addr2 = ((CompletionData*)resb->data)->address;
-
+    while ( resa || resb ) {
+	if (resa)
+            addr1 = ((CompletionData*)resa->data)->address;
+	else
+	    addr1 = NULL;
+	if (resb)
+            addr2 = ((CompletionData*)resb->data)->address;
+	else
+	    addr2 = NULL;
+	
 	if ( addr1 == addr2 ) {
 	    res = g_list_prepend(res, addr1);
 	    gtk_object_ref(GTK_OBJECT(addr1));

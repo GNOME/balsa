@@ -36,6 +36,8 @@
 typedef struct _LibBalsaAddressBook LibBalsaAddressBook;
 typedef struct _LibBalsaAddressBookClass LibBalsaAddressBookClass;
 
+typedef void (*LibBalsaAddressBookLoadFunc)(LibBalsaAddressBook *ab, LibBalsaAddress *address, gpointer closure);
+
 struct _LibBalsaAddressBook {
     GtkObject parent;
 
@@ -45,13 +47,14 @@ struct _LibBalsaAddressBook {
     gchar *name;
     gboolean expand_aliases;
 
-    GList *address_list;
+    gboolean dist_list_mode;
 };
 
 struct _LibBalsaAddressBookClass {
     GtkObjectClass parent;
 
-    void (*load) (LibBalsaAddressBook * ab);
+    void (*load) (LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure);
+
     void (*store_address) (LibBalsaAddressBook * ab,
 			   LibBalsaAddress * address);
 
@@ -66,7 +69,17 @@ GtkType libbalsa_address_book_get_type(void);
 LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
 							   prefix);
 
-void libbalsa_address_book_load(LibBalsaAddressBook * ab);
+/*
+  This will call the callback function once for each address in the address book. 
+  The recipient should make sure to ref the address if they will be keeping a
+  reference to it around. The callback may occur asynchronously.
+  
+  After all addresses are loaded the callback will be called with address==NULL.
+*/
+void libbalsa_address_book_load(LibBalsaAddressBook * ab,
+				LibBalsaAddressBookLoadFunc callback,
+				gpointer closure);
+
 void libbalsa_address_book_store_address(LibBalsaAddressBook * ab,
 					 LibBalsaAddress * address);
 

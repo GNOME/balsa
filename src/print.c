@@ -211,7 +211,7 @@ print_message(GtkWidget * widget, gpointer data)
 	message =
 	    gtk_clist_get_row_data(clist, GPOINTER_TO_INT(list->data));
 	addr = message->from;
-	tmp = libbalsa_address_to_gchar(addr);
+	tmp = libbalsa_address_to_gchar(addr, 0);
 	date =
 	    libbalsa_message_date_to_gchar(message, balsa_app.date_string);
 	fprintf(fp, "\n\n");
@@ -346,7 +346,7 @@ prepare_page_header(PrintInfo * pi)
 
     if (pi->message->from) {
 	pi->headers[hdr++] = g_strdup(_("From:"));
-	pi->headers[hdr++] = libbalsa_address_to_gchar(pi->message->from);
+	pi->headers[hdr++] = libbalsa_address_to_gchar(pi->message->from, 0);
     }
 
     if (pi->message->to_list) {

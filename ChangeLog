@@ -1,3 +1,31 @@
+2000-12-04  Ian Campbell  <ijc25@cam.ac.uk>
+
+	Much work on the address book back and front ends. 
+	
+	* libbalsa/address-book.[ch]: New load funciton, takes a callback
+	and performs incremental loading, a big win for LDAP I
+	hope. Removed address_list member. Added dist_list_mode as per
+	address book information.
+	* libbalsa/address-book-ldap.c: Implement new load function.
+	* libbalsa/address-book-vcard.[ch]: Implement new load function. Use
+	stat to determine mtime and only reload when needed.
+	* libbalsa/address.[ch]: Add new parameter to to_gchar function,
+	selecting which email address to use if there are multiple
+	addresses in address_list.
+	* libbalsa/misc.c: Use new parameter to libbalsa_address_to_gchar.
+	* libbalsa/send.c: Use new parameter to libbalsa_address_to_gchar.
+	* src/address-book.[ch]: Turn into a GnomeDialog
+	decendant. Eliminate global variables. Update to make use of
+	incremental loading of addresses. Improve distribution list
+	behavior.
+	* src/balsa-message.c: Use new parameter to
+	libbalsa_address_to_gchar.
+	* src/print.c: Use new parameter to libbalsa_address_to_gchar.
+	* src/balsa-app.c: Remove dist_list_mode from global settings.
+	* src/save-restore.c: Remove dist_list_mode from global settings.
+	* src/main-window.c: Use new address book.
+	* src/sendmsg-window.c: Use new address book.
+	
 2000-12-01  Pawel Salek  <pawsa@theochem.kth.se>
 	Lubomir Gelo's <slon@slon.sk> patch for alternative layout.
 	* src/balsa-app.h: add alternative_layout field

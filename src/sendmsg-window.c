@@ -100,6 +100,8 @@ static void spell_check_done_cb(BalsaSpellCheck * spell_check,
 				BalsaSendmsg *);
 static void spell_check_set_sensitive(BalsaSendmsg * msg, gboolean state);
 
+static void address_book_cb(GtkWidget *widget, BalsaSendmsg *smd_msg_wind);
+
 static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
 
 /* Standard DnD types */
@@ -430,6 +432,29 @@ close_window(GtkWidget * widget, gpointer data)
 {
     balsa_sendmsg_destroy((BalsaSendmsg *) data);
     return TRUE;
+}
+
+static void
+address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
+{
+    GtkWidget *ab;
+    GtkEntry *entry;
+    gint button;
+
+    entry = GTK_ENTRY(gtk_object_get_data(GTK_OBJECT(widget), "address-entry"));
+
+    ab = balsa_address_book_new(TRUE);
+    gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(snd_msg_wind->window));
+
+    button = gnome_dialog_run(GNOME_DIALOG(ab));
+    if ( button == 0 ) {
+	gchar *t;
+	t = balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
+	if ( t ) 
+	    gtk_entry_set_text(GTK_ENTRY(entry), t);
+	g_free(t);
+    }
+    gnome_dialog_close(GNOME_DIALOG(ab));
 }
 
 static gint
@@ -799,6 +824,7 @@ create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
  *         const gchar *label - label to use.
  *         int y_pos          - How far down in the table to put label.
  *         const gchar *icon  - icon for the button.
+ *         BalsaSendmsg *smw  - The send message window
  * 
  * Output: GtkWidget *arr[]   - An array of GtkWidgets, as follows:
  *            arr[0]          - the label.
@@ -807,7 +833,7 @@ create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
  */
 static void
 create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
-		   const gchar * icon, GtkWidget * arr[])
+		   const gchar * icon, BalsaSendmsg *smw, GtkWidget * arr[])
 {
 
     gint *focus_counter;
@@ -821,9 +847,12 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		      gnome_stock_pixmap_widget(NULL, icon));
     gtk_table_attach(GTK_TABLE(table), arr[2], 2, 3, y_pos, y_pos + 1,
 		     0, 0, 0, 0);
+
     gtk_signal_connect(GTK_OBJECT(arr[2]), "clicked",
 		       GTK_SIGNAL_FUNC(address_book_cb),
-		       (gpointer) arr[1]);
+		       smw);
+    gtk_object_set_data(GTK_OBJECT(arr[2]), "address-entry", 
+			arr[1]);
     gtk_signal_connect(GTK_OBJECT(arr[1]), "drag_data_received",
 		       GTK_SIGNAL_FUNC(to_add), NULL);
     gtk_drag_dest_set(GTK_WIDGET(arr[1]), GTK_DEST_DEFAULT_ALL,
@@ -835,6 +864,7 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		       GTK_SIGNAL_FUNC(key_pressed_cb), arr[1]);
     gtk_signal_connect(GTK_OBJECT(arr[1]), "button-press-event",
 		       GTK_SIGNAL_FUNC(button_pressed_cb), arr[1]);
+
     /*
      * And these make sure we rescan the input if the user plays
      * around.
@@ -868,10 +898,10 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 
     /* From: */
     create_email_entry(table, _("From:"), 0, GNOME_STOCK_MENU_BOOK_BLUE,
-		       msg->from);
+		       msg, msg->from);
     /* To: */
     create_email_entry(table, _("To:"), 1, GNOME_STOCK_MENU_BOOK_RED,
-		       msg->to);
+		       msg, msg->to);
     gtk_signal_connect(GTK_OBJECT(msg->to[1]), "changed",
 		       GTK_SIGNAL_FUNC(check_readiness), msg);
 
@@ -882,13 +912,13 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 
     /* cc: */
     create_email_entry(table, _("cc:"), 3, GNOME_STOCK_MENU_BOOK_YELLOW,
-		       msg->cc);
+		       msg, msg->cc);
     gtk_object_set_data(GTK_OBJECT(msg->subject[1]), "next_in_line",
 			msg->cc[1]);
 
     /* bcc: */
     create_email_entry(table, _("bcc:"), 4, GNOME_STOCK_MENU_BOOK_GREEN,
-		       msg->bcc);
+		       msg, msg->bcc);
     gtk_object_set_data(GTK_OBJECT(msg->cc[1]), "next_in_line",
 			msg->bcc[1]);
 
@@ -929,7 +959,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
 
     /* Reply To: */
     create_email_entry(table, _("Reply To:"), 6, GNOME_STOCK_MENU_BOOK_RED,
-		       msg->reply_to);
+		       msg, msg->reply_to);
     gtk_object_set_data(GTK_OBJECT(msg->fcc[1]), "next_in_line",
 			msg->reply_to[1]);
 
@@ -1242,7 +1272,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
 	addr = (message->reply_to) ? message->reply_to : message->from;
 
-	tmp = libbalsa_address_to_gchar(addr);
+	tmp = libbalsa_address_to_gchar(addr, 0);
 	gtk_entry_set_text(GTK_ENTRY(msg->to[1]), tmp);
 	g_free(tmp);
     }

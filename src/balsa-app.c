@@ -184,7 +184,6 @@ balsa_app_init(void)
     /* address book */
     balsa_app.address_book_list = NULL;
     balsa_app.default_address_book = NULL;
-    balsa_app.ab_dist_list_mode = FALSE;
 
     /* spell check */
     balsa_app.module = SPELL_CHECK_MODULE_ASPELL;

@@ -22,15 +22,65 @@
 #ifndef __ADDRESS_BOOK_H__
 #define __ADDRESS_BOOK_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+BEGIN_GNOME_DECLS
 
-    extern gint address_book_cb(GtkWidget * widget, gpointer data);
-    extern GList *ab_load_addresses(gboolean);
+#define BALSA_TYPE_ADDRESS_BOOK            (balsa_address_book_get_type ())
+#define BALSA_ADDRESS_BOOK(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_ADDRESS_BOOK, BalsaAddressBook))
+#define BALSA_ADDRESS_BOOK_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_ADDRESS_BOOK, BalsaAddressBookClass))
+#define BALSA_IS_ADDRESS_BOOK(obj)         (GTK_CHECK_TYPE ((obj), BALSA_TYPE_ADDRESS_BOOK))
+#define BALSA_IS_ADDRESS_BOOK_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_ADDRESS_BOOK))
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+typedef struct _BalsaAddressBook BalsaAddressBook;
+typedef struct _BalsaAddressBookClass BalsaAddressBookClass;
+
+struct _BalsaAddressBook 
+{
+    GnomeDialog parent;
+
+    /* Are we composing? */
+    gboolean composing;
+
+    /* The current address book */
+    LibBalsaAddressBook *current_address_book;
+
+    /* The address list */
+    GtkWidget *address_clist;
+
+    /* The send to list */
+    GtkWidget *recipient_clist;
+
+    /* Radio buttons for dist list mode */
+    GtkWidget *single_address_mode_radio;
+    GtkWidget *dist_address_mode_radio;
+    guint toggle_handler_id;
+
+    /* Stuff to hide when not in compose mode */
+    GtkWidget *send_to_box;
+    GtkWidget *arrow_box;
+};
+
+struct _BalsaAddressBookClass
+{
+    GnomeDialogClass parent_class;
+};
+
+GtkType balsa_address_book_get_type(void);
+GtkWidget *balsa_address_book_new(gboolean composing);
+
+gchar *balsa_address_book_get_recipients(BalsaAddressBook *ab);
+
+END_GNOME_DECLS
+
 #endif				/* __ADDRESS_BOOK_H__ */
+
+
+
+
+
+
+
+
+
+
+

@@ -147,6 +147,7 @@ static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
+static void address_book_cb(GtkWindow *widget, gpointer data);
 
 static void copy_cb(GtkWidget * widget, gpointer data);
 static void select_all_cb(GtkWidget * widget, gpointer);
@@ -1783,6 +1784,17 @@ show_all_headers_cb(GtkWidget * widget, gpointer data)
     if (bw->preview)
 	balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
 					    HEADERS_ALL);
+}
+
+static void
+address_book_cb(GtkWindow *widget, gpointer data)
+{
+    GtkWidget *ab;
+
+    ab = balsa_address_book_new(FALSE);
+    gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(balsa_app.main_window));
+
+    gnome_dialog_run_and_close(GNOME_DIALOG(ab));
 }
 
 #ifdef BALSA_SHOW_ALL

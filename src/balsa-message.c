@@ -629,7 +629,7 @@ display_headers(BalsaMessage * bm)
     g_free(date);
 
     if (message->from) {
-	gchar *from = libbalsa_address_to_gchar(message->from);
+	gchar *from = libbalsa_address_to_gchar(message->from, 0);
 	add_header_gchar(bm, "from", _("From:"), from);
 	g_free(from);
     }

@@ -49,8 +49,9 @@ libbalsa_address_book_ldap_class_init(LibBalsaAddressBookLdapClass *
 static void libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab);
 static void libbalsa_address_book_ldap_destroy(GtkObject * object);
 
-static void libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab);
-
+static void libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, 
+					    LibBalsaAddressBookLoadFunc callback, 
+					    gpointer closure);
 static gboolean
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab);
 static void
@@ -64,6 +65,10 @@ static void libbalsa_address_book_ldap_load_config(LibBalsaAddressBook *ab,
 static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 							 const gchar * prefix, 
 							 gchar ** new_prefix);
+
+static LibBalsaAddress *libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
+							       LDAPMessage * e);
+
 
 static gchar *create_name(gchar *, gchar *);
 
@@ -216,13 +221,17 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
  *   Spits out balsa_information() when it deems necessary.
  */
 static void
-libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab)
+libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure)
 {
     LibBalsaAddressBookLdap *ldap_ab;
+    LibBalsaAddress *address;
+    LDAPMessage *e, *result;
+    int rc;
 
-    g_list_foreach(ab->address_list, (GFunc) gtk_object_unref, NULL);
-    g_list_free(ab->address_list);
-    ab->address_list = NULL;
+    g_return_if_fail ( LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab));
+
+    if (callback == NULL)
+	return;
 
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
     /*
@@ -232,6 +241,36 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab)
 	if (!libbalsa_address_book_ldap_open_connection(ldap_ab))
 	    return;
     }
+    
+    /* 
+     * Attempt to search for e-mail addresses. It returns success 
+     * or failure, but not all the matches. 
+     */ 
+    rc = ldap_search_s(ldap_ab->directory, ldap_ab->base_dn,
+		       LDAP_SCOPE_SUBTREE, "(mail=*)", NULL, 0, &result);
+    if (rc != LDAP_SUCCESS) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("Failed to do a search: %s"
+			       "Check that the base name is valid."),
+			     ldap_err2string(rc));
+	return;
+    }
+    
+    /* 
+     * Now loop over all the results, and spit out the output.
+     */
+    e = ldap_first_entry(ldap_ab->directory, result);
+    while (e != NULL) {
+	address = libbalsa_address_book_ldap_get_address(ab, e);
+	callback(ab, address, closure);
+	gtk_object_unref(GTK_OBJECT(address));
+	e = ldap_next_entry(ldap_ab->directory, e);
+    }
+    
+    callback(ab, NULL, closure);
+    
+    ldap_msgfree(result);
+    
 }
 
 /* libbalsa_address_book_ldap_get_address:
@@ -397,7 +436,7 @@ static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab
     e = ldap_first_entry(ldap_ab->directory, result);
     while (e != NULL) {
 	addr = libbalsa_address_book_ldap_get_address(ab, e);
-	if(!*new_prefix) *new_prefix = libbalsa_address_to_gchar(addr);
+	if(!*new_prefix) *new_prefix = libbalsa_address_to_gchar(addr, 0);
 	res = g_list_prepend(res, addr);
 
 	e = ldap_next_entry(ldap_ab->directory, e);

@@ -44,6 +44,10 @@ struct _LibBalsaAddressBookVcard {
 
     gchar *path;
 
+    GList *address_list;
+
+    time_t mtime;
+
     GCompletion *name_complete;
     GCompletion *alias_complete;
 };

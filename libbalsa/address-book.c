@@ -90,7 +90,8 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
 		       GTK_RUN_FIRST,
 		       object_class->type,
 		       GTK_SIGNAL_OFFSET(LibBalsaAddressBookClass, load),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+		       gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
+		       GTK_TYPE_POINTER, GTK_TYPE_POINTER);
     libbalsa_address_book_signals[STORE_ADDRESS] =
 	gtk_signal_new("store-address",
 		       GTK_RUN_FIRST,
@@ -136,9 +137,9 @@ libbalsa_address_book_init(LibBalsaAddressBook * ab)
 {
     ab->config_prefix = NULL;
 
-    ab->address_list = NULL;
     ab->name = NULL;
     ab->expand_aliases = FALSE;
+    ab->dist_list_mode = FALSE;
 }
 
 static void
@@ -147,10 +148,6 @@ libbalsa_address_book_destroy(GtkObject * object)
     LibBalsaAddressBook *ab;
 
     ab = LIBBALSA_ADDRESS_BOOK(object);
-
-    g_list_foreach(ab->address_list, (GFunc) gtk_object_unref, NULL);
-    g_list_free(ab->address_list);
-    ab->address_list = NULL;
 
     g_free(ab->config_prefix);
     ab->config_prefix = NULL;
@@ -208,11 +205,11 @@ libbalsa_address_book_new_from_config(const gchar * prefix)
 }
 
 void
-libbalsa_address_book_load(LibBalsaAddressBook * ab)
+libbalsa_address_book_load(LibBalsaAddressBook * ab, LibBalsaAddressBookLoadFunc callback, gpointer closure)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    gtk_signal_emit(GTK_OBJECT(ab), libbalsa_address_book_signals[LOAD]);
+    gtk_signal_emit(GTK_OBJECT(ab), libbalsa_address_book_signals[LOAD], callback, closure);
 }
 
 void
@@ -274,6 +271,7 @@ libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
     gnome_config_set_string("Type", gtk_type_name(GTK_OBJECT_TYPE(ab)));
     gnome_config_set_string("Name", ab->name);
     gnome_config_set_bool("ExpandAliases", ab->expand_aliases);
+    gnome_config_set_bool("DistListMode", ab->dist_list_mode);
 
     g_free(ab->config_prefix);
     ab->config_prefix = g_strdup(prefix);
@@ -289,6 +287,7 @@ libbalsa_address_book_real_load_config(LibBalsaAddressBook * ab,
     ab->config_prefix = g_strdup(prefix);
 
     ab->expand_aliases = gnome_config_get_bool("ExpandAliases=false");
+    ab->dist_list_mode = gnome_config_get_bool("DistListMode=false");
 
     g_free(ab->name);
     ab->name = gnome_config_get_string("Name=Address Book");

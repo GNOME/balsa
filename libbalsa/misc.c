@@ -444,7 +444,7 @@ libbalsa_make_string_from_list(const GList * the_list)
 
     while (list) {
 	addy = list->data;
-	str = libbalsa_address_to_gchar(addy);
+	str = libbalsa_address_to_gchar(addy, 0);
 	if (str)
 	    gs = g_string_append(gs, str);
 

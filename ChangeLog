@@ -1,3 +1,9 @@
+2000-12-17  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_new): If the
+	mailbox doesn't exist, and create is TRUE then create an Mbox
+	style mailbox.
+
 2000-12-17  Pawel Salek  <pawsa@theochem.kth.se>
 	Berend De Schouwer <bds@jhb.ucs.co.za> patch for improved
 	alias expansion.

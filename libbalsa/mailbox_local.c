@@ -129,6 +129,8 @@ libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 	g_warning("Got IMAP as type for local mailbox\n");
 	return NULL;
     default:			/* mailbox non-existent or unreadable */
+	if ( create ) 
+	    return libbalsa_mailbox_mbox_new(path, TRUE);
 	g_warning("Unknown mailbox type\n");
 	return NULL;
     }

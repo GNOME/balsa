@@ -33,6 +33,8 @@
 
 /* define _XOPEN_SOURCE to make strptime visible */
 #define _XOPEN_SOURCE
+/* extensions  needed additonally on Solaris for strptime */
+#define __EXTENSIONS__
 #include <stdio.h>
 #include <time.h>
 #include <sys/types.h>

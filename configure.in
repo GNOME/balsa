@@ -245,6 +245,7 @@ if test "x$with_esmtp" != xno  ; then
     AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
 	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
 	         [Defined when libESMTP has TLS support.]))
+    test "$with_esmtp" != yes && CPPFLAGS="$CPPFLAGS -I$with_esmtp/include"
 else
     AC_MSG_RESULT([no])
 fi
@@ -385,39 +386,6 @@ dnl ##########################################################################
 
 AC_ARG_WITH(gss, [  --with-gss              Enable GSS [default=no]],
     [with_gss=$withval],[with_gss=no])
-
-AC_MSG_CHECKING([whether to build GSS support])
-if test "x$with_gss" != xno  ; then
-   if test -d $with_gss && test -f "$with_gss/include/gssapi/gssapi.h" ; then
-      gssdir=$with_gss
-   else
-        AC_TRY_COMPILE([#include <gssapi/gssapi.h>], ,
-			gssdir=default,
-			gssdir="")
-	if test "x$gssdir" = x ; then
-           for dir in /usr /usr/local /usr/lib /usr/kerberos; do
-               if test -f "$dir/include/gssapi/gssapi.h"; then
-                  gssdir=$dir
-               fi
-           done
-	fi
-   fi
-   if test -z "$gssdir"; then
-      AC_MSG_ERROR([GSS requested but no GSS headers found ,$gssdir,.])
-   else
-      AC_MSG_RESULT($gsslib)
-      AC_CHECK_LIB(gssapi, gss_init_sec_context, [
-	  LIBS="$LIBS -L$gssdir/lib -lgssapi -lkrb5"
-      ],[
-	  LIBS="$LIBS -L$gssdir/lib -lgssapi_krb5"
-      ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$gssdir/lib)
-      BALSA_CFLAGS="$BALSA_CFLAGS -I$gssdir/include"
-   fi
-else
-   AC_MSG_RESULT(no)
-   gssdir=no
-fi
-AM_CONDITIONAL(USE_GSS, test x$gssdir != xno)
 
 dnl ###########################################################################
 dnl Test whether jw is installed

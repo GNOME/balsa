@@ -181,7 +181,6 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
                                              -1));
 
 #if ENABLE_ESMTP
-    if (balsa_app.smtp_server);
     g_free(balsa_app.smtp_server);
     balsa_app.smtp_server =
         gtk_editable_get_chars(GTK_EDITABLE(user->smtp), 0, -1);

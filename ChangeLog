@@ -1,3 +1,14 @@
+2004-01-10 05:28  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_local.c, libbalsa/mailbox_maildir.c,
+	libbalsa/mailbox_mbox.c, libbalsa/mailbox_mh.c,
+	libbalsa/mailbox_pop3.c, libbalsa/send.c, src/balsa-mblist.c,
+	src/main-window.c, src/message-window.c: Replace total_messages
+	member of LibBalsaMailbox with libbalsa_mailbox_total_messages();
+	add total_messages method to LibBalsaMailboxClass and implement in
+	backends.
+
 2004-01-09 06:11  PeterB
 
 	* libbalsa/imap/imap-handle.c: Free all of ImapAddress.

@@ -1,3 +1,11 @@
+2000-10-05  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/send.c, src/main-window.c: Call pthread_detach on new
+	threads, so we don't need to pthread_join them.
+	* src/main-window.c: Make the reply to all pixmaps use the
+	gnome-stock stuff. This means they will grayout properly. Initial
+	patch was from James A . Laska <james_laska@yahoo.com> (again!)
+
 2000-10-05  Szabolcs Ban  <shooby@gnome.hu>
 
 	* balsa.desktop: added Hungarian translations

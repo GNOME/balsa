@@ -61,6 +61,9 @@
 #include "pixmaps/reply_to_all.xpm"
 #include "pixmaps/reply_to_all_menu.xpm"
 
+#define BALSA_PIXMAP_MAIL_RPL_ALL 	"reply_to_all"
+#define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"
+
 #define MAILBOX_DATA "mailbox_data"
 
 #define APPBAR_KEY "balsa_appbar"
@@ -170,6 +173,8 @@ static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc );
 static void notebook_switch_page_cb( GtkWidget *notebook,
                                      GtkNotebookPage *page, guint page_num );
 static void send_msg_window_destroy_cb ( GtkWidget *widget, gpointer data );
+static void register_balsa_pixmaps(void);
+static void register_balsa_pixmap(gchar *name, gchar **data);
 
 static GnomeUIInfo file_new_menu[] =
 {
@@ -302,8 +307,8 @@ static GnomeUIInfo message_menu[] =
   {
     GNOME_APP_UI_ITEM, N_("Reply To _All..."),
     N_("Reply to all recipients of the current message"),
-    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_DATA,
-    reply_to_all_menu_xpm, 'A', 0, NULL
+    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    BALSA_PIXMAP_MAIL_RPL_ALL_MENU, 'A', 0, NULL
   },
 #define MENU_MESSAGE_FORWARD_POS 2
     /* F */
@@ -450,9 +455,9 @@ static GnomeUIInfo main_toolbar[] =
                           replyto_message_cb,
                           GNOME_STOCK_PIXMAP_MAIL_RPL),
 #define TOOLBAR_REPLY_ALL_POS 7
-  GNOMEUIINFO_ITEM (N_("Reply To All"), N_("Reply to all"),
+  GNOMEUIINFO_ITEM_STOCK (N_("Reply To All"), N_("Reply to all"),
                     replytoall_message_cb,
-                    reply_to_all_xpm),
+                    BALSA_PIXMAP_MAIL_RPL_ALL),
 #define TOOLBAR_FORWARD_POS 8
   GNOMEUIINFO_ITEM_STOCK (N_("Forward"), N_("Forward"),
                           forward_message_cb,
@@ -576,6 +581,9 @@ balsa_window_new ()
   GtkWidget *hpaned;
   GtkWidget *vpaned;
   GtkWidget *scroll;
+
+  /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS - allows for grey out */
+  register_balsa_pixmaps(); 
 
   window = gtk_type_new (BALSA_TYPE_WINDOW);
   gnome_app_construct(GNOME_APP(window), "balsa", "Balsa");
@@ -1189,12 +1197,18 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
       
       gtk_widget_show_all( progress_dialog );
     }
-  
+
 /* initiate threads */
   pthread_create( &get_mail_thread,
   		NULL,
   		(void *) &check_messages_thread,
 		NULL );
+  /* Detach so we don't need to pthread_join
+   * This means that all resources will be
+   * reclaimed as soon as the thread exits
+   */
+  pthread_detach(get_mail_thread);
+
 #else
   check_mailbox_list (balsa_app.inbox_input); 
 
@@ -2018,9 +2032,31 @@ select_part_cb(BalsaMessage *bm, gpointer data)
   enable_edit_menus(bm);
 }
 
+static void 
+register_balsa_pixmap(gchar *name, gchar **data)
+{
+  GnomeStockPixmapEntryData *entry; 
+  entry = g_malloc0(sizeof(*entry)); 
+  
+  entry->type = GNOME_STOCK_PIXMAP_TYPE_DATA; 
+  entry->xpm_data = data;
+  entry->width = 24;
+  entry->height = 24;
+  gnome_stock_pixmap_register(name, GNOME_STOCK_PIXMAP_REGULAR, (GnomeStockPixmapEntry *)entry); 
+}
+
+static void 
+register_balsa_pixmaps(void)
+{ 
+  register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm);
+  register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU, reply_to_all_menu_xpm);
+}
+
 static void
 send_msg_window_destroy_cb ( GtkWidget *widget, gpointer data )
 {
   balsa_window_enable_continue();
 }
+
+
 

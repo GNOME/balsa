@@ -252,6 +252,12 @@ libbalsa_message_send (LibBalsaMessage * message, LibBalsaMailbox* outbox,
 				NULL,
 				(void *) &balsa_send_message_real,
 				first_message );
+		/* Detach so we don't need to pthread_join
+		 * This means that all resources will be
+		 * reclaimed as soon as the thread exits
+		 */
+		pthread_detach(send_mail);
+
 	}
 #else  /*non-threaded code */
 

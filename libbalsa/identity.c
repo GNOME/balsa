@@ -1508,11 +1508,13 @@ add_show_menu(const char* label, gint value, GtkWidget* menu)
  * explaining the contents.  A reference to the entry is stored as
  * object data attached to the dialog with the given key.
  */
+#if GTK_CHECK_VERSION(2, 4, 0)
 static void
 ident_dialog_free_values(GArray * values)
 {
     g_array_free(values, TRUE);
 }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
 static void
 ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,

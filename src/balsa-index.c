@@ -2196,11 +2196,10 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 #if BALSA_MAJOR < 2
     GtkWidget *menuitem = gnome_stock_menu_item(type, label);
 #else
-    GtkWidget *menuitem = gtk_menu_item_new();
-    GtkWidget *hbox =
-        balsa_stock_hbox_with_label(type, GTK_ICON_SIZE_MENU, label);
+    GtkWidget *menuitem = gtk_image_menu_item_new_with_label(label);
+    GtkWidget *image = gtk_image_new_from_stock(type, GTK_ICON_SIZE_MENU);
 
-    gtk_container_add(GTK_CONTAINER(menuitem), hbox);
+    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
 #endif                          /* BALSA_MAJOR < 2 */
     gtk_widget_set_sensitive(menuitem, sensitive);
 

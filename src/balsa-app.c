@@ -497,30 +497,24 @@ balsa_stock_button_with_label(const char *icon, const char *text)
     pixmap = gnome_stock_new_with_icon(icon);
     button = gnome_pixmap_button(pixmap, label);
 #else
-    GtkWidget *w;
+    GtkWidget *pixmap = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
+    GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
 
     button = gtk_button_new();
-    w = balsa_stock_hbox_with_label(icon, GTK_ICON_SIZE_BUTTON, text);
-    gtk_container_add(GTK_CONTAINER(button), w);
+    gtk_container_add(GTK_CONTAINER(button), align);
+    gtk_container_add(GTK_CONTAINER(align), hbox);
+
+    gtk_box_pack_start(GTK_BOX(hbox), pixmap, FALSE, FALSE, 0);
+    if (text && *text) {
+        GtkWidget *label = gtk_label_new_with_mnemonic(text);
+        gtk_label_set_mnemonic_widget(GTK_LABEL(label), button);
+        gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 2);
+    }
+
     gtk_widget_show_all(button);
 #endif                          /* BALSA_MAJOR < 2 */
     return button;
-}
-
-GtkWidget *
-balsa_stock_hbox_with_label(const char *icon, GtkIconSize size,
-                              const char *text)
-{
-    GtkWidget *pixmap = gtk_image_new_from_stock(icon, size);
-    GtkWidget *w = gtk_hbox_new(FALSE, 0);
-
-    gtk_box_pack_start(GTK_BOX(w), pixmap, FALSE, FALSE, 0);
-    if (text && *text) {
-        GtkWidget *label = gtk_label_new(text);
-        gtk_box_pack_start(GTK_BOX(w), label, FALSE, FALSE, 2);
-    }
-
-    return w;
 }
 
 static gint

@@ -366,9 +366,6 @@ void update_timer(gboolean update, guint minutes);
 gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
 GtkWidget *balsa_stock_button_with_label(const char *icon,
 					 const char *label);
-GtkWidget *balsa_stock_hbox_with_label(const char *icon,
-                                         GtkIconSize size,
-					 const char *label);
 gboolean open_mailboxes_idle_cb(gchar * names[]);
 
 GNode *find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox);

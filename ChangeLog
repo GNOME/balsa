@@ -1,3 +1,17 @@
+2002-05-11  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-app.[hc]: make balsa_stock_button_with_label use
+	mnemonics; remove balsa_stock_hbox_with_label.
+	* src/balsa-index.c: use GtkImageMenuItem methods.
+
+	* libbalsa/identity.[hc]: replace GtkCList with GtkTreeView/Model;
+	use GtkDialog methods to manage dialog buttons; run the `manage
+	identities' dialog and return the result instead of returning the
+	dialog.
+
+	* src/main-window.c: pick up the result from the `manage
+	identities' dialog instead of running it.
+
 2002-05-10  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/files.[hc] (libbalsa_icon_finder): return icon mime

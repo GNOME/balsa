@@ -3455,20 +3455,16 @@ balsa_window_increment_progress(BalsaWindow* window)
 
 
 static void
-ident_manage_dialog_cb(GtkWidget* widget, gpointer user_data)
+ident_manage_dialog_cb(GtkWidget * widget, gpointer user_data)
 {
-    GtkWidget* dialog;
-
-    /* create dialog  */
-    dialog = libbalsa_identity_config_dialog(GTK_WINDOW(balsa_app.main_window),
-                                             &balsa_app.identities,
-                                             &balsa_app.current_ident);
-    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_CLOSE) {
+    if (libbalsa_identity_config_dialog(GTK_WINDOW(balsa_app.main_window),
+                                        &balsa_app.identities,
+                                        &balsa_app.current_ident)
+        == GTK_RESPONSE_CLOSE) {
         g_print("Saving identities...\n");
         config_identities_save();
         gnome_config_sync();
     }
-    gtk_widget_destroy(dialog);
 }
 
 

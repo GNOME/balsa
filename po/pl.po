@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-09-07 12:38+0200\n"
+"POT-Creation-Date: 2003-09-10 20:18+0200\n"
 "PO-Revision-Date: 2003-07-27 23:38+0100\n"
 "Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -346,10 +346,11 @@ msgstr ""
 "regularnych).\n"
 "Nastąpił powrót do domyślnej metody wyszukiwania"
 
-#: libbalsa/mailbox_imap.c:700
+#: libbalsa/mailbox_imap.c:700 libbalsa/mailbox_local.c:265
+#: libbalsa/mailbox_pop3.c:210
 #, c-format
-msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: Otwieranie %s Licznik odwołań: %d\n"
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "%s: Otwieranie %s Licznik odwołań: %d\n"
 
 #: libbalsa/mailbox_imap.c:900
 #, c-format
@@ -359,11 +360,6 @@ msgid ""
 msgstr ""
 "Polecenie IMAP SEARCH dla skrzynki %s nie powiodło się.\n"
 "Nastąpił powrót do domyślnej metody wyszukiwania"
-
-#: libbalsa/mailbox_local.c:265
-#, c-format
-msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: Otwieranie %s Licznik odwołań: %d\n"
 
 #: libbalsa/mailbox_maildir.c:115
 #, c-format
@@ -424,11 +420,6 @@ msgstr "Nie można utworzyć katalogu MH w %s (%s)"
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Nie można utworzyć struktury MH w %s (%s)"
-
-#: libbalsa/mailbox_pop3.c:210
-#, c-format
-msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Otwieranie %s Licznik odwołań: %d\n"
 
 #: libbalsa/mailbox_pop3.c:262
 #, c-format
@@ -625,7 +616,7 @@ msgstr "gpgme nie może utworzyć nowego obiektu danych: %s"
 #: libbalsa/rfc3156.c:581
 #, c-format
 msgid "gpgme decryption failed: %s"
-msgstr "odszyfrowywanie przy użyciu gpgme nie powiodło się: %s"
+msgstr "próba odszyfrowania przy użyciu gpgme nie powiodła się: %s"
 
 #: libbalsa/rfc3156.c:595
 #, c-format
@@ -924,7 +915,7 @@ msgstr "gpgme nie może utworzyć nowych danych: %s"
 msgid "Sending Mail..."
 msgstr "Wysyłanie listu..."
 
-#: libbalsa/send.c:221 src/main-window.c:1805
+#: libbalsa/send.c:221 src/main-window.c:1808
 msgid "_Hide"
 msgstr "U_kryj"
 
@@ -2219,15 +2210,15 @@ msgstr "Razem"
 msgid "Failed to find mailbox"
 msgstr "Nie można odnaleźć skrzynki"
 
-#: src/balsa-mblist.c:1790
+#: src/balsa-mblist.c:1788
 msgid "_Other..."
 msgstr "_Inny..."
 
-#: src/balsa-mblist.c:1851
+#: src/balsa-mblist.c:1849
 msgid "Choose destination folder"
 msgstr "Wybór folderu docelowego"
 
-#: src/balsa-mblist.c:2163
+#: src/balsa-mblist.c:2161
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Widoczna skrzynka: %s; %ld listów, %ld nowych"
@@ -2644,17 +2635,17 @@ msgstr "_Wszystkie"
 msgid "C_lear"
 msgstr "Wyc_zyść"
 
-#: src/filter-edit-callbacks.c:999 src/main-window.c:2736
+#: src/filter-edit-callbacks.c:999 src/main-window.c:2739
 msgid "_Body"
 msgstr "Tr_eść"
 
 #. To:
-#: src/filter-edit-callbacks.c:1006 src/main-window.c:2737
+#: src/filter-edit-callbacks.c:1006 src/main-window.c:2740
 #: src/sendmsg-window.c:1846
 msgid "_To:"
 msgstr "D_la:"
 
-#: src/filter-edit-callbacks.c:1013 src/main-window.c:2738
+#: src/filter-edit-callbacks.c:1013 src/main-window.c:2741
 msgid "_From:"
 msgstr "O_d:"
 
@@ -2662,7 +2653,7 @@ msgstr "O_d:"
 msgid "_Subject"
 msgstr "_Temat"
 
-#: src/filter-edit-callbacks.c:1028 src/main-window.c:2740
+#: src/filter-edit-callbacks.c:1028 src/main-window.c:2743
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -3796,11 +3787,11 @@ msgstr ""
 "Nie można otworzyć skrzynki!\n"
 "Sprawdź ustawienia skrzynki."
 
-#: src/main-window.c:1685
+#: src/main-window.c:1688
 msgid "translator_credits"
 msgstr "GNOME PL Team <translators@gnome.pl>"
 
-#: src/main-window.c:1700
+#: src/main-window.c:1703
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3814,72 +3805,72 @@ msgstr ""
 "Aby zgłosić błąd w programie, odwiedź witrynę\n"
 "http://bugzilla.gnome.org/"
 
-#: src/main-window.c:1802
+#: src/main-window.c:1805
 msgid "Checking Mail..."
 msgstr "Sprawdzanie poczty..."
 
-#: src/main-window.c:2100
+#: src/main-window.c:2103
 msgid "Finished Checking."
 msgstr "Zakończono sprawdzanie."
 
-#: src/main-window.c:2164
+#: src/main-window.c:2167
 #, c-format
 msgid "Sending error: %s"
 msgstr "Błąd przy wysyłaniu: %s"
 
-#: src/main-window.c:2260
+#: src/main-window.c:2263
 msgid "Balsa: New mail"
 msgstr "Balsa: Nowa poczta"
 
-#: src/main-window.c:2272
+#: src/main-window.c:2275
 #, c-format
 msgid "You have received %d new messages."
 msgstr "Odebrano %d nowych listów."
 
-#: src/main-window.c:2273
+#: src/main-window.c:2276
 msgid "You have received 1 new message."
 msgstr "Odebrano jeden nowy list."
 
-#: src/main-window.c:2696
+#: src/main-window.c:2699
 msgid "Search mailbox"
 msgstr "Przeszukiwanie skrzynki"
 
-#: src/main-window.c:2709
+#: src/main-window.c:2712
 msgid "_Reverse search"
 msgstr "Przeszukiwanie od _tyłu"
 
-#: src/main-window.c:2712
+#: src/main-window.c:2715
 msgid "_Search for:"
 msgstr "Wyszukiwany _napis:"
 
-#: src/main-window.c:2725
+#: src/main-window.c:2728
 msgid "In:"
 msgstr "Zakres:"
 
-#: src/main-window.c:2739
+#: src/main-window.c:2742
 msgid "S_ubject"
 msgstr "T_emat:"
 
-#: src/main-window.c:2854
+#: src/main-window.c:2857
 msgid "You can apply filters only on mailbox\n"
 msgstr "Można stosować filtry tylko na skrzynkach\n"
 
-#: src/main-window.c:2898 src/main-window.c:2917
+#: src/main-window.c:2901 src/main-window.c:2920
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Zapisanie zmian w skrzynce %s nie powiodło się."
 
-#: src/main-window.c:3046
+#: src/main-window.c:3049
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (tylko do odczytu)"
 
-#: src/main-window.c:3048
+#: src/main-window.c:3051
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3146
+#: src/main-window.c:3149
 msgid "Cannot access the message's body\n"
 msgstr "Nie można uzyskać dostępu do treści listu\n"
 
@@ -5626,6 +5617,12 @@ msgstr "Góra"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Dół"
+
+#~ msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxImap: Otwieranie %s Licznik odwołań: %d\n"
+
+#~ msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+#~ msgstr "LibBalsaMailboxLocal: Otwieranie %s Licznik odwołań: %d\n"
 
 #~ msgid "Search for Name:"
 #~ msgstr "Wyszukiwanie nazwy:"

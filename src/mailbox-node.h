@@ -112,6 +112,4 @@ void balsa_mailbox_node_rescan(BalsaMailboxNode* mn);
 /* applicable to any mailbox node */
 void balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode);
 
-#define BALSA_MAILBOX_NODE_NEW_MAILBOX "balsa-mailbox-node-new-mailbox"
-
 #endif

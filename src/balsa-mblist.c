@@ -1213,6 +1213,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 
     if (mbnode->mailbox) {
         LibBalsaMailbox *mailbox = mbnode->mailbox;
+	static guint mailbox_changed_signal = 0;
 
 	if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	    g_assert_not_reached();
@@ -1247,14 +1248,14 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 					  : LB_MAILBOX_SHOW_FROM);
 	}
 
-	if (g_object_get_data(G_OBJECT(mbnode),
-			      BALSA_MAILBOX_NODE_NEW_MAILBOX)) {
+	if (!mailbox_changed_signal)
+	    mailbox_changed_signal =
+		g_signal_lookup("changed", LIBBALSA_TYPE_MAILBOX);
+	if (!g_signal_has_handler_pending(G_OBJECT(mbnode->mailbox),
+                                          mailbox_changed_signal, 0, TRUE))
 	    g_signal_connect(mbnode->mailbox, "changed",
 			     G_CALLBACK(bmbl_mailbox_changed_cb),
 			     balsa_app.mblist_tree_store);
-	    g_object_set_data(G_OBJECT(mbnode),
-			      BALSA_MAILBOX_NODE_NEW_MAILBOX, NULL);
-	}
     } else {
 	/* new directory, but not a mailbox */
         in = mbnode->expanded ? BALSA_PIXMAP_MBOX_DIR_OPEN :

@@ -363,8 +363,6 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
     LIBBALSA_MAILBOX(m)->name = mbnode->name;
     mbnode->name = NULL;
     mbnode->mailbox = LIBBALSA_MAILBOX(m);
-    g_object_set_data(G_OBJECT(mbnode), BALSA_MAILBOX_NODE_NEW_MAILBOX,
-		      GINT_TO_POINTER(TRUE));
     load_mailbox_view(mbnode);
     if (isi->special) {
 	if (*isi->special)
@@ -488,8 +486,6 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     BalsaMailboxNode *mbn;
     mbn = BALSA_MAILBOX_NODE(balsa_mailbox_node_new());
     mbn->mailbox = mb;
-    g_object_set_data(G_OBJECT(mbn), BALSA_MAILBOX_NODE_NEW_MAILBOX,
-		      GINT_TO_POINTER(TRUE));
     load_mailbox_view(mbn);
     g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
 		     G_CALLBACK(mailbox_conf_edit), NULL);
@@ -577,8 +573,6 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
     g_assert(s);
 
     folder->mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
-    g_object_set_data(G_OBJECT(folder), BALSA_MAILBOX_NODE_NEW_MAILBOX,
-		      GINT_TO_POINTER(TRUE));
     g_object_ref(G_OBJECT(folder->mailbox));
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(folder->mailbox), s);

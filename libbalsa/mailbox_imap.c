@@ -1667,8 +1667,10 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 	} else 
             g_object_unref(G_OBJECT(msg));
     }
-    if (msg_info->message)
+    if (msg_info->message) {
+        printf("will ref %p -> %p\n", msg_info, msg_info->message);
 	g_object_ref(msg_info->message); /* we want to keep one copy */
+    }
     return msg_info->message;
 }
 

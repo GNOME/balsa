@@ -35,7 +35,7 @@
  * in gtk2>=2.3.5 b. may expose some bugs in gtk.
  */
 #define TREE_VIEW_FIXED_HEIGHT 1
-#undef TREE_VIEW_FIXED_HEIGHT
+/* #undef TREE_VIEW_FIXED_HEIGHT */
 
 #include "config.h"
 
@@ -270,7 +270,7 @@ bi_apply_other_column_settings(GtkTreeViewColumn *column,
     gtk_tree_view_column_set_alignment(column, 0.5);
 
 #if GTK_CHECK_VERSION(2,4,0) && defined(TREE_VIEW_FIXED_HEIGHT)
-    gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_FIXED);
+    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
 #endif
 }
 
@@ -1347,8 +1347,10 @@ balsa_index_selected_list(BalsaIndex * index)
                                         balsa_index_selected_list_func,
                                         &list);
     if (index->current_message
-        && !g_list_find(list, index->current_message))
+        && !g_list_find(list, index->current_message)) {
         list = g_list_prepend(list, index->current_message);
+        g_object_ref(index->current_message);
+    }
  
     return list;
 }

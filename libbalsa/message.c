@@ -102,7 +102,7 @@ libbalsa_message_init(LibBalsaMessage * message)
 #ifdef HAVE_GPGME
     message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
 #endif
-    /* printf("%p message created.\n", message); */ message_cnt++;
+    printf("%p message created.\n", message); message_cnt++;
 }
 
 
@@ -179,7 +179,7 @@ libbalsa_message_finalize(GObject * object)
 	message->mime_msg = NULL;
     }
     G_OBJECT_CLASS(parent_class)->finalize(object);
-    /* printf("%p message finalized.\n", message); */  message_cnt--;
+    printf("%p message finalized.\n", message);  message_cnt--;
 }
 
 static void libbalsa_message_find_charset(GMimeObject *mime_part, gpointer data)

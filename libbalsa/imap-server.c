@@ -109,13 +109,16 @@ libbalsa_imap_server_get_type(void)
 static void libbalsa_imap_server_set_username(LibBalsaServer * server,
                                               const gchar * name)
 {
-    LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
-    G_LOCK(imap_servers);
-    g_hash_table_steal(imap_servers, imap_server->key);
-    g_free(imap_server->key);
-    imap_server->key = g_strdup_printf("%s@%s", name, server->host);
-    g_hash_table_insert(imap_servers, imap_server->key, imap_server);
-    G_UNLOCK(imap_servers);
+    if(server->host && name) { /* we have been initialized... */
+        LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
+        
+        G_LOCK(imap_servers);
+        g_hash_table_steal(imap_servers, imap_server->key);
+        g_free(imap_server->key);
+        imap_server->key = g_strdup_printf("%s@%s", name, server->host);
+        g_hash_table_insert(imap_servers, imap_server->key, imap_server);
+        G_UNLOCK(imap_servers);
+    }
     (parent_class)->set_username(server, name);
 }
 static void libbalsa_imap_server_set_host(LibBalsaServer * server,

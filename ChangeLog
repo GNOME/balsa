@@ -1,3 +1,10 @@
+2003-01-25  PeterB
+
+	* src/balsa-index.c: Two patches from Manu <e.allaud@wanadoo.fr>:
+	1. search for messages without cycling through the whole mailbox;
+	2. clean up thread_has_unread. Also postpone the call to
+	bndx_set_parent_style until after rethreading.
+
 2003-01-25  Christian Neumair  <chris@gnome-de.org>
 
 	* libbalsa/identity.c: Reordered buttons to satisfy HIG.
@@ -11,7 +18,7 @@
 	support openssl-0.9.7
 	* libbalsa/address-book-ldap.c: handle connection errors better.
 
-2003-01-21 08:20  PeterB
+2003-01-21  PeterB
 
 	* src/folder-conf.c: Non-modal IMAP sub-folder dialog; use common
 	code for the folder and sub-folder dialogs as far as possible.

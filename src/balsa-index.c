@@ -567,11 +567,11 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
     case MESSAGE_REPLIED:
       balsa_index_update_flag (bindex, mw_message->message);
       break;
-
+/*
     case MESSAGE_NEW:
       balsa_index_add (bindex, mw_message->message);
       break;
-
+*/
     case MESSAGE_DELETE:
       break;
 

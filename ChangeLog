@@ -1,3 +1,14 @@
+2003-11-02 20:29  PeterB
+
+	* libbalsa/mailbox_mbox.c: Remove close_backend method and
+	reinstall it as close_mailbox; make mbox_sync a local helper with a
+	'gboolean reparse' option; call it with reparse = FALSE in
+	close_mailbox, to update the mailstore, and with reparse = TRUE in
+	the new mbox_sync.
+	* libbalsa/mailbox.c: Install default (noop) method for
+	close_backend; modify msg_tree before getting a path for a new
+	node; lock mailbox when syncing.
+
 2003-11-02  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/mailbox_imap.c: smarter envelope prefetching.

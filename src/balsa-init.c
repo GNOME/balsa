@@ -87,13 +87,14 @@ balsa_init_window_new ()
   GtkWidget *vbox;
   GtkWidget *pixmap;
   GtkWidget *label;
-  GtkWidget *hbox;
+  GtkWidget *bbox;
 
   iw = g_malloc0 (sizeof (InitWindow));
   prefs = g_malloc0 (sizeof (Prefs));
 
-  iw->window = gnome_app_new ("balsa", "Welcome to Balsa!");
-
+  iw->window = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW (iw->window), "Welcome To Balsa!");
+  
   gtk_signal_connect (GTK_OBJECT (iw->window),
 		      "delete_event",
 		      (GtkSignalFunc) delete_init_window,
@@ -101,7 +102,7 @@ balsa_init_window_new ()
 
   vbox = gtk_vbox_new (FALSE, 0);
 
-  gnome_app_set_contents (GNOME_APP (iw->window), vbox);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->vbox), vbox, FALSE, FALSE, 0);
   gtk_widget_show (vbox);
 
   pixmap = gnome_pixmap_new_from_xpm_d (balsa_logo_xpm);
@@ -135,13 +136,19 @@ balsa_init_window_new ()
 			    create_finished_page (),
 			    label);
 
-  hbox = gtk_hbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 5);
-  gtk_widget_show (hbox);
+
+  bbox = gtk_hbutton_box_new ();
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (iw->window)->action_area), bbox, TRUE, TRUE, 0);
+  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+                                 BALSA_BUTTON_WIDTH,
+                                 BALSA_BUTTON_HEIGHT);
+  gtk_widget_show (bbox);
+
 
   iw->prev = gtk_button_new_with_label ("Previous...");
-  gtk_widget_set_usize (iw->prev, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
-  gtk_box_pack_start (GTK_BOX (hbox), iw->prev, FALSE, FALSE, 5);
+  gtk_container_add(GTK_CONTAINER(bbox), iw->prev);
   gtk_widget_show (iw->prev);
 
   gtk_widget_set_sensitive (iw->prev, FALSE);
@@ -152,8 +159,7 @@ balsa_init_window_new ()
 		      NULL);
 
   iw->next = gtk_button_new_with_label ("Next...");
-  gtk_widget_set_usize (iw->next, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
-  gtk_box_pack_start (GTK_BOX (hbox), iw->next, FALSE, FALSE, 5);
+  gtk_container_add(GTK_CONTAINER(bbox), iw->next);
   gtk_widget_show (iw->next);
 
   gtk_signal_connect (GTK_OBJECT (iw->next),

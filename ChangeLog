@@ -1,3 +1,12 @@
+Wed Jul 29 08:05:28 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+	* src/balsa-init.c
+	Changed Balsa Init to use a gtk_dialog instead of a gnome_app window.
+	I'll probibly change this to a gnome_dialog later.  This should make
+	it look a little bit nicer.
+
+	*src/pref-manager.c
+	Changed the button box layout to SPREAD instead of END
+
 Tue Jul 28 21:43:58 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
 
 	* src/balsa-init.c

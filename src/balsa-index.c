@@ -334,8 +334,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (mailbox == NULL)
     return;
 
-  gdk_cursor_new(GDK_WATCH);
-  
   if (mailbox->open_ref == 0)
     mailbox_open_ref (mailbox);
 
@@ -377,8 +375,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (bindex->first_new_message == 0)
     bindex->first_new_message = i;
 
-  gdk_cursor_destory();
-  
   gtk_idle_add ((GtkFunction) moveto_handler, bindex);
 }
 

@@ -290,7 +290,11 @@ socket_open(const char* host, int iport)
   
   /* --- IPv4/6 --- */
   /* "65536\0" */
+#ifdef HOST_DOES_NOT_INCLUDE_PORT
   char port[6];
+#else
+  char *port;
+#endif
   struct addrinfo hints;
   struct addrinfo* res;
   struct addrinfo* cur;
@@ -301,7 +305,13 @@ socket_open(const char* host, int iport)
   hints.ai_family = USEIPV6 ? AF_UNSPEC : AF_INET;
   hints.ai_socktype = SOCK_STREAM;
 
+#ifdef HOST_DOES_NOT_INCLUDE_PORT
   snprintf (port, sizeof (port), "%d", iport);
+#else
+  port = strrchr(host, ':');
+  if (port)
+    *port++ = '\0';
+#endif
 
   rc = getaddrinfo(host, port, &hints, &res);
   if(rc)

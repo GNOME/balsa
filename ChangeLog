@@ -1,5 +1,21 @@
 2000-08-29  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/libbalsa.c: Reimplement libbalsa_error to be callable
+	from any thread, by defering the real callback to an idle
+	function (which will be called from the main thread..)
+	* libbalsa/mailbox_pop3.c: We can safely release the gdk_lock for
+	the duration of the mutt_FetchPop call (now the balsa_error is
+	safely callable from threads). We can also remove the hack of
+	replacing mutt_error with a non-GUI version.
+	* libinit_balsa/Makefile.am: Tell GOB not to bother with the
+	private headers
+	* src/balsa-app.c: Rewrite balsa_warning to display a list of
+	warnings, rather than popping up a new message box for each
+	warning (which could lead to hundreds of windows if a mail server
+	was down while you are away).
+	* src/main.c: initialize libbalsa with balsa_warning rather than
+	balsa_error.
+	
 	* libbalsa/send.c: Add #include <sys/socket.h> to fix solaris
 	build.
 

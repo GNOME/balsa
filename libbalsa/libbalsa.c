@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
+#include <stdarg.h>
 
 #include "libbalsa.h"
 #include "mailbackend.h"
@@ -43,6 +44,8 @@ int mutt_any_key_to_continue (const char *s);
 void mutt_clear_error (void);
 
 static void (*libbalsa_real_error_func)(const char *fmt,...);
+
+static void libbalsa_error_idle_handler(gchar *msg);
 
 void
 mutt_message (const char *fmt,...)
@@ -100,9 +103,10 @@ libbalsa_init ( void (*error_func) (const char *fmt,...) )
 
 	Hostname = libbalsa_get_hostname ();
 
-	mutt_error = libbalsa_error;
 	libbalsa_real_error_func = error_func;
 
+	mutt_error = libbalsa_error;
+	
 	Fqdn = g_strdup (Hostname);
 
 	Sendmail = SENDMAIL;
@@ -192,11 +196,44 @@ libbalsa_guess_mail_spool( void )
 	return gnome_util_prepend_user_home( "mailbox" );
 }
 
-/* This function calls the real error func */
-/* FIXME: Need to look into providing a global option as to whether
- * we should call gdk_thread_enter() here. This would be safe to do if the libmutt lock was held?
- */
+/*
+ * This function is hooked into the mutt_error callback and may also be called from
+ * libbalsa.
+ *
+ * We are adding an idle handler - we do not need to hold the gdk lock for this.
+ *
+ * We can't just grab the GDK lock and call the real_error function since this
+ * runs a dialog, which has a nested g_main loop - glib doesn't like haveing main 
+ * loops active in two threads at one time. When the idle handler gets run it is 
+ * from the main thread.
+ *
+ */ 
 void libbalsa_error(const char *fmt, ...)
 {
-	libbalsa_real_error_func(fmt);
+	gchar *msg;
+	va_list va_args;
+
+	g_assert ( libbalsa_real_error_func != NULL );
+
+	/* We format the string here. It must be free()d in the idle
+	 * handler We parse the args here because by the time the idle
+	 * function runs we will no longer be in this stack frame. 
+	 */
+	va_start(va_args, fmt);
+	msg = g_strdup_vprintf(fmt, va_args);
+	va_end(va_args);
+
+	gtk_idle_add ((GtkFunction)libbalsa_error_idle_handler, msg);
+}
+
+/*
+ * This is an idle handler, so we need to grab the GDK lock 
+ */
+static void libbalsa_error_idle_handler(gchar *msg)
+{
+	gdk_threads_enter();
+	libbalsa_real_error_func(msg);
+	gdk_threads_leave();
+
+	g_free(msg);
 }

@@ -909,7 +909,6 @@ check_mailbox_list (GList *mailbox_list)
 #ifdef BALSA_USE_THREADS
     gdk_threads_enter();
 #endif
-
     libbalsa_mailbox_check(mailbox);
     
 #ifdef BALSA_USE_THREADS
@@ -932,13 +931,13 @@ mailbox_check_func ( GNode *node, gpointer data )
     return FALSE;
 
 #ifdef BALSA_USE_THREADS
-    gdk_threads_enter();
+  gdk_threads_enter();
 #endif
 
   libbalsa_mailbox_check ( mbnode->mailbox );
 
 #ifdef BALSA_USE_THREADS
-    gdk_threads_leave();
+  gdk_threads_leave();
 #endif
   return FALSE;
 }

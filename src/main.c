@@ -213,7 +213,7 @@ main (int argc, char *argv[])
   balsa_app_init ();
 
   /* Initialize libbalsa */
-  libbalsa_init (balsa_error);
+  libbalsa_init(balsa_warning);
 
 #ifdef USE_PIXBUF
   gtk_widget_set_default_colormap(gdk_rgb_get_cmap());

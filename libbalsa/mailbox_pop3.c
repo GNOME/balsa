@@ -46,10 +46,6 @@ static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 *mailbox);
 static void libbalsa_mailbox_pop3_open (LibBalsaMailbox *mailbox, gboolean append);
 static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox);
 
-#ifdef BALSA_USE_THREADS
-static void error_in_thread( const char *format, ... );
-#endif
-
 GtkType
 libbalsa_mailbox_pop3_get_type (void)
 {
@@ -194,32 +190,14 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 #ifdef BALSA_USE_THREADS
 	gchar *msgbuf;
 	MailThreadMessage *threadmsg;
-	void (*mutt_error_backup)( const char *, ... );
-
-	/* Only check if lock has been set */
-#if 0 
-/* FIXME: IJC - I don't think this is needed */
-/* It is my intention that the libbalsa side of checking not care about threads (above locking libmutt) */
-	pthread_mutex_lock( &mailbox_lock);
-	if( !checking_mail ) {
-		libbalsa_unlock_mutt();
-		pthread_mutex_unlock( &mailbox_lock);
-		return;
-	}
-	pthread_mutex_unlock( &mailbox_lock );
-#endif
 #endif /* BALSA_USE_THREADS */
 
 	if (LIBBALSA_MAILBOX_POP3 (mailbox)->check) {
 		LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
+		/* Unlock GDK - this is safe since libbalsa_error is threadsafe. */
+		gdk_threads_leave();
 		libbalsa_lock_mutt();
-
-#ifdef BALSA_USE_THREADS
-		/* Otherwise we get multithreaded GTK+ calls... baaad */
-		mutt_error_backup = mutt_error;
-		mutt_error = error_in_thread;
-#endif
 
 		PopHost = g_strdup (server->host);
 		PopPort = (server->port);
@@ -276,31 +254,9 @@ static void libbalsa_mailbox_pop3_check (LibBalsaMailbox *mailbox)
 #endif
 		}
 
-#ifdef BALSA_USE_THREADS
-		mutt_error = mutt_error_backup;
-#endif
-		
+		/* Regrab the gdk lock before leaving */
 		libbalsa_unlock_mutt();
+		gdk_threads_enter();
 	}
 
 }
-
-#ifdef BALSA_USE_THREADS
-/* FIXME: Can remove by using GDK_THREAD_ENTER perhaps */
-static void error_in_thread( const char *format, ... )
-{
-	va_list val;
-	gchar *submessage, *message;
-	MailThreadMessage *tmsg;
-
-	va_start( val, format );
-	submessage = g_strdup_vprintf( format, val );
-	va_end( val );
-
-	message = g_strconcat( _("Error: "), submessage, NULL );
-	g_free( submessage );
-
-	MSGMAILTHREAD( tmsg, MSGMAILTHREAD_ERROR, message );
-	g_free( message );
-}
-#endif

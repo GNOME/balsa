@@ -1,17 +1,7 @@
-noinst_HEADERS =				\
-	balsa-initdruid-private.h		\
-	balsa-druid-page-private.h		\
-	balsa-druid-page-error-private.h	\
-	balsa-druid-page-welcome-private.h	\
-	balsa-druid-page-user-private.h		\
-	balsa-druid-page-directory-private.h	\
-	balsa-druid-page-finish-private.h	
-
 noinst_LIBRARIES = libinit_balsa.a
 
 libinit_balsa_a_SOURCES = 		\
 	$(BUILT_SOURCES)		\
-	$(noinst_HEADERS)		\
 	helper.c			\
 	helper.h			\
 	init_balsa.c			\
@@ -44,7 +34,7 @@ GOBFILES =				\
 
 EXTRA_DIST = $(GOBFILES)
 
-CLEANFILES = $(BUILD_SOURCES)
+CLEANFILES = $(BUILT_SOURCES)
 
 INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_builddir)/libmutt \
@@ -58,5 +48,5 @@ INCLUDES=-I. -I$(top_srcdir) \
 #		&& cp -f $(BUILT_SOURCES) $(distdir)
 
 @MAINT@%.c %.h: %.gob
-@MAINT@	(cd $(srcdir) && gob $<)
+@MAINT@	(cd $(srcdir) && gob --no-private-header $<)
 

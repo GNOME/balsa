@@ -108,9 +108,10 @@ setup_local_mailboxes ()
 static void
 my_special_mailbox ()
 {
+/*
   MailboxPOP3 *pop3;
   MailboxMH *mh;
-/*
+
   pop3 = (MailboxPOP3 *) mailbox_new (MAILBOX_POP3);
   pop3->name = g_strdup ("MyPOP Box");
   pop3->user = g_strdup ("pavlov");
@@ -118,8 +119,7 @@ my_special_mailbox ()
   pop3->server = g_strdup ("venus");
 
   balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, pop3);
-*/
-/*
+
   mh = (MailboxMH *) mailbox_new (MAILBOX_MH);
   mh->name = g_strdup ("GNOME CVS");
   mh->path = g_strdup ("gnomecvs");

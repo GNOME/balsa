@@ -224,9 +224,7 @@ mailbox_open (Mailbox * mailbox)
     case MAILBOX_MBOX:
       mbox = (MailboxMBox *) mailbox;
 
-      sprintf (buffer, "#mh/%s", mh->path);
-
-      mbox->stream = mail_open (NIL, buffer, NIL);
+      mbox->stream = mail_open (NIL, mbox->path, NIL);
       if (mbox->stream == NIL)
 	{
 	  balsa_app.current_mailbox = old_mailbox;
@@ -237,7 +235,9 @@ mailbox_open (Mailbox * mailbox)
     case MAILBOX_MH:
       mh = (MailboxMH *) mailbox;
 
-      mh->stream = mail_open (NIL, mh->path, NIL);
+      sprintf (buffer, "#mh/%s", mh->path);
+
+      mh->stream = mail_open (NIL, buffer, NIL);
       if (mh->stream == NIL)
 	{
 	  balsa_app.current_mailbox = old_mailbox;

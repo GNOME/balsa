@@ -44,8 +44,8 @@
 void show_about_box (GtkWidget * widget, gpointer data);
 GtkWidget * new_icon (gchar ** xpm, GtkWidget * window);
 static GtkWidget * create_toolbar (MainWindow *mw);
+static GtkWidget * create_statusbar (MainWindow *mw);
 static GtkWidget * create_menu (GtkWidget * window);
-
 
 extern void balsa_exit ();
 static GtkWidget *menu_items[18];
@@ -127,7 +127,9 @@ create_main_window ()
   gnome_app_set_menus (GNOME_APP (mw->window), GTK_MENU_BAR (create_menu (mw->window)));
   mw->toolbar = create_toolbar (mw);
   gnome_app_set_toolbar (GNOME_APP (mw->window), GTK_TOOLBAR (mw->toolbar));
-
+/*
+  gtk_box_pack_end(GTK_BOX (vbox), create_statusbar(mw), FALSE, FALSE, 0);
+*/
   gtk_widget_show (mw->window);
   return mw;
 }
@@ -147,6 +149,16 @@ new_icon (gchar ** xpm, GtkWidget * window)
   return pixmapwid;
 }
 
+
+static GtkWidget *
+create_statusbar (MainWindow *mw)
+{
+  GtkWidget *statusbar;
+  statusbar = gtk_statusbar_new();
+  gtk_statusbar_push(GTK_STATUSBAR(statusbar),1,"Something...");
+  gtk_widget_show (statusbar);
+  return statusbar;
+}
 
 static GtkWidget *
 create_toolbar (MainWindow *mw)

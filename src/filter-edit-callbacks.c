@@ -706,6 +706,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
                           gpointer throwaway)
 {
     LibBalsaCondition *new_cnd;
+    GError *err;
 
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -761,7 +762,13 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         gtk_widget_hide(dialog);
         break;
     case GTK_RESPONSE_HELP:     /* Help button */
-        /* FIXME */
+	err = NULL;
+	gnome_help_display("balsa", "win-condition", &err);
+	if (err) {
+	    g_print(_("Error displaying condition help: %s\n"),
+		    err->message);
+	    g_error_free(err);
+	}
 	break;
     }
     gtk_widget_set_sensitive(fe_window, TRUE);
@@ -1308,6 +1315,7 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         gtk_tree_view_get_model(fe_filters_list);
     GtkTreeIter iter;
     gboolean valid;
+    GError *err;
     
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -1344,7 +1352,14 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         break;
 
     case GTK_RESPONSE_HELP:     /* Help button */
-        /* more of something here */
+	err = NULL;
+	gnome_help_display("balsa", "win-filters", &err);
+	if (err) {
+	    g_print(_("Error displaying filter help: %s\n"),
+		    err->message);
+	    g_error_free(err);
+	}
+	break;
 
     default:
         /* we should NEVER get here */

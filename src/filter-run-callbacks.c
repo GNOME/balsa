@@ -128,6 +128,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 			gpointer throwaway)
 {
     BalsaFilterRunDialog * p;
+    GError *err;
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
     switch (response) {
@@ -146,7 +147,13 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 	
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
-	/* more of something here */
+	err = NULL;
+	gnome_help_display("balsa", "win-run-filters", &err);
+	if (err) {
+	    g_print(_("Error displaying run filters help: %s\n"),
+		    err->message);
+	    g_error_free(err);
+	}
 	return;
 
     default:

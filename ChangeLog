@@ -1,3 +1,10 @@
+Tue Jul 28 14:00:35 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+        * src/pref-manager.c
+	Removed open_main_window() call from pref manager if
+	balsa_app.current_index_child was NULL.  This was causing lots of
+	opened windows on startup.
+
 Tue Jul 28 04:01:40 1998  pavlov
 
 	* TODO, INSTALL, README:

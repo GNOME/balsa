@@ -622,7 +622,7 @@ get_open_mailboxes_string()
     if(balsa_app.notebook)
 	gtk_container_foreach(GTK_CONTAINER(balsa_app.notebook), cat_mbox_name,
 			      &res);
-    return res;
+    return res ? res : g_strdup("");
 }
 
 /* Load Balsa's global settings */

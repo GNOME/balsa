@@ -171,7 +171,8 @@ extern struct BalsaApplication {
     gchar *smtp_certificate_passphrase;
 #endif
 
-    /* IMAP folder scanning */
+    /* folder scanning */
+    guint local_scan_depth;
     guint imap_scan_depth;
 
     BalsaWindow *main_window;

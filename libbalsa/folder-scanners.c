@@ -40,21 +40,27 @@
 #include "imap-server.h"
 
 static void
-libbalsa_scanner_mdir(gpointer rnode,
-                        const gchar * prefix, 
-                        LocalHandler folder_handler, 
-                        LocalHandler mailbox_handler)
+libbalsa_scanner_mdir(gpointer rnode, const gchar * prefix,
+                      LocalCheck check_local_path,
+                      LocalMark mark_local_path,
+                      LocalHandler folder_handler,
+                      LocalHandler mailbox_handler, guint * depth)
 {
     DIR *dpc;
     struct dirent *de;
     char filename[PATH_MAX];
     struct stat st;
-    GNode* parent_node = NULL;
+    gpointer parent_node = NULL;
+
+    if (!check_local_path(prefix, *depth))
+        return;
+
+    mark_local_path(rnode);
 
     dpc = opendir(prefix);
     if (!dpc)
         return;
-    
+
     /*
      * if we don't find any subdirectories inside, we'll go
      * and ignore this one too...
@@ -66,36 +72,48 @@ libbalsa_scanner_mdir(gpointer rnode,
         /* ignore file if it can't be read. */
         if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
             continue;
-        
+
         if (S_ISDIR(st.st_mode)) {
             /*
              * if we think that this looks like a mailbox, include it as such.
              * otherwise we'll lose the mail in this folder
              */
             GType foo = libbalsa_mailbox_type_from_path(filename);
-            if( (foo == LIBBALSA_TYPE_MAILBOX_MH) ||
-                (foo == LIBBALSA_TYPE_MAILBOX_MAILDIR ) ) {
+            if ((foo == LIBBALSA_TYPE_MAILBOX_MH) ||
+                (foo == LIBBALSA_TYPE_MAILBOX_MAILDIR)) {
                 parent_node = mailbox_handler(rnode, de->d_name, filename);
-                libbalsa_scanner_mdir(parent_node, filename, 
-                                      folder_handler, mailbox_handler);
+                ++*depth;
+                libbalsa_scanner_mdir(parent_node, filename,
+                                      check_local_path, mark_local_path,
+                                      folder_handler, mailbox_handler,
+                                      depth);
+                --*depth;
             }
-        } 
+        }
         /* ignore regular files */
     }
     closedir(dpc);
 }
 
-void
-libbalsa_scanner_local_dir(gpointer rnode, const gchar * prefix, 
-                           LocalHandler folder_handler, 
-                           LocalHandler mailbox_handler)
+static void
+libbalsa_scanner_local_dir_helper(gpointer rnode, const gchar * prefix,
+                                  LocalCheck check_local_path,
+                                  LocalMark mark_local_path,
+                                  LocalHandler folder_handler,
+                                  LocalHandler mailbox_handler,
+                                  guint * depth)
 {
     DIR *dpc;
     struct dirent *de;
     char filename[PATH_MAX];
     struct stat st;
     GtkType mailbox_type;
-    GNode* current_node;
+    gpointer current_node;
+
+    if (!check_local_path(prefix, *depth))
+        return;
+
+    mark_local_path(rnode);
 
     dpc = opendir(prefix);
     if (!dpc)
@@ -109,23 +127,31 @@ libbalsa_scanner_local_dir(gpointer rnode, const gchar * prefix,
         /* ignore file if it can't be read. */
         if (stat(filename, &st) == -1 || access(filename, R_OK) == -1)
             continue;
-        
+
         if (S_ISDIR(st.st_mode)) {
             mailbox_type = libbalsa_mailbox_type_from_path(filename);
 
-            if ( (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) ||
-                 (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) ) {
-                current_node = mailbox_handler(rnode, de->d_name, filename);
-                libbalsa_scanner_mdir(current_node, filename, 
-                                        folder_handler, mailbox_handler);
+            ++*depth;
+            if ((mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) ||
+                (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR)) {
+                current_node =
+                    mailbox_handler(rnode, de->d_name, filename);
+                libbalsa_scanner_mdir(current_node, filename,
+                                      check_local_path, mark_local_path,
+                                      folder_handler, mailbox_handler,
+                                      depth);
             } else {
                 gchar *name = g_path_get_basename(prefix);
 
                 current_node = folder_handler(rnode, name, filename);
-                libbalsa_scanner_local_dir(current_node, filename, 
-                                           folder_handler, mailbox_handler);
+                libbalsa_scanner_local_dir_helper(current_node, filename,
+                                                  check_local_path,
+                                                  mark_local_path,
+                                                  folder_handler,
+                                                  mailbox_handler, depth);
                 g_free(name);
             }
+            --*depth;
         } else {
             mailbox_type = libbalsa_mailbox_type_from_path(filename);
             if (mailbox_type != 0)
@@ -133,6 +159,21 @@ libbalsa_scanner_local_dir(gpointer rnode, const gchar * prefix,
         }
     }
     closedir(dpc);
+}
+
+void
+libbalsa_scanner_local_dir(gpointer rnode, const gchar * prefix,
+                           LocalCheck check_local_path,
+                           LocalMark mark_local_path,
+                           LocalHandler folder_handler,
+                           LocalHandler mailbox_handler)
+{
+    guint depth = 0;
+
+    libbalsa_scanner_local_dir_helper(rnode, prefix,
+                                      check_local_path, mark_local_path,
+                                      folder_handler, mailbox_handler,
+                                      &depth);
 }
 
 /* ---------------------------------------------------------------------

@@ -445,7 +445,8 @@ balsa_app_init(void)
     /* Tooltips */
     balsa_app.tooltips = gtk_tooltips_new();
 
-    /* IMAP */
+    /* Local and IMAP */
+    balsa_app.local_scan_depth = 1;
     balsa_app.check_imap = 1;
     balsa_app.check_imap_inbox = 0;
     balsa_app.imap_scan_depth = 1;

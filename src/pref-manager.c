@@ -162,7 +162,8 @@ typedef struct _PropertyUI {
     GtkWidget *spell_check_sig;
     GtkWidget *spell_check_quoted;
 
-    /* IMAP folder scanning */
+    /* folder scanning */
+    GtkWidget *local_scan_depth;
     GtkWidget *imap_scan_depth;
 
 } PropertyUI;
@@ -233,7 +234,7 @@ static GtkWidget *deleting_messages_group(GtkWidget * page);
 /* Startup page */
 static GtkWidget *create_startup_page(gpointer);
 static GtkWidget *options_group(GtkWidget * page);
-static GtkWidget *imap_folder_scanning_group(GtkWidget * page);
+static GtkWidget *folder_scanning_group(GtkWidget * page);
 
 /* general helpers */
 static GtkWidget *create_table(gint rows, gint cols, GtkWidget * page);
@@ -569,6 +570,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->remember_open_mboxes), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
 
+    g_signal_connect(G_OBJECT(pui->local_scan_depth), "changed",
+		     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->imap_scan_depth), "changed",
 		     G_CALLBACK(properties_modified_cb), property_box);
 
@@ -826,6 +829,9 @@ apply_prefs(GtkDialog * pbox)
 	GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
     balsa_app.remember_open_mboxes =
 	GTK_TOGGLE_BUTTON(pui->remember_open_mboxes)->active;
+    balsa_app.local_scan_depth =
+	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
+					 (pui->local_scan_depth));
     balsa_app.imap_scan_depth =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->imap_scan_depth));
@@ -1104,6 +1110,8 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				 (pui->remember_open_mboxes),
 				 balsa_app.remember_open_mboxes);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->local_scan_depth),
+			      balsa_app.local_scan_depth);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->imap_scan_depth),
 			      balsa_app.imap_scan_depth);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->empty_trash),
@@ -2483,7 +2491,7 @@ create_startup_page(gpointer data)
     GtkWidget *page = pm_page_new();
 
     pm_page_add(page, options_group(page));
-    pm_page_add(page, imap_folder_scanning_group(page));
+    pm_page_add(page, folder_scanning_group(page));
 
     return page;
 }
@@ -2507,14 +2515,14 @@ options_group(GtkWidget * page)
 }
 
 static GtkWidget *
-imap_folder_scanning_group(GtkWidget * page)
+folder_scanning_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *label;
     GtkWidget *hbox;
     GtkObject *scan_adj;
 
-    group = pm_group_new(_("IMAP Folder Scanning"));
+    group = pm_group_new(_("Folder Scanning"));
 
     label = gtk_label_new(_("Choose depth 1 for fast startup; "
                             "this defers scanning some folders.\n"
@@ -2526,8 +2534,23 @@ imap_folder_scanning_group(GtkWidget * page)
 
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
     pm_group_add(group, hbox);
-    gtk_box_pack_start(GTK_BOX(hbox),
-                       gtk_label_new(_("Scan tree to depth")),
+    label = gtk_label_new(_("Scan local folders to depth"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    pm_page_add_to_size_group(page, label);
+    gtk_box_pack_start(GTK_BOX(hbox), label,
+                       FALSE, FALSE, 0);
+    scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
+    pui->local_scan_depth =
+        gtk_spin_button_new(GTK_ADJUSTMENT(scan_adj), 1, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->local_scan_depth,
+                       FALSE, FALSE, 0);
+
+    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    pm_group_add(group, hbox);
+    label = gtk_label_new(_("Scan IMAP folders to depth"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    pm_page_add_to_size_group(page, label);
+    gtk_box_pack_start(GTK_BOX(hbox), label,
                        FALSE, FALSE, 0);
     scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
     pui->imap_scan_depth =

@@ -70,7 +70,7 @@ static BalsaMailboxNode *imap_scan_create_mbnode(BalsaMailboxNode * root,
 						 char delim);
 static void imap_scan_attach_mailbox(BalsaMailboxNode * mbnode,
 				     imap_scan_item * isi);
-static gboolean imap_scan_children_idle(BalsaMailboxNode ** mn);
+static gboolean bmbn_scan_children_idle(BalsaMailboxNode ** mn);
 
 static BalsaMailboxNode *add_local_mailbox(BalsaMailboxNode * root,
 					   const gchar * name,
@@ -259,10 +259,65 @@ dir_conf_edit(BalsaMailboxNode* mb)
                       _("The folder edition to be written."));
 }
 
+/* read_dir_cb and helpers */
+
+typedef struct _CheckPathInfo CheckPathInfo;
+struct _CheckPathInfo {
+    gchar *url;
+    gboolean must_scan;
+};
+
+static void
+check_url_func(const gchar * url, LibBalsaMailboxView * view,
+	       CheckPathInfo * cpi)
+{
+    if ((view->exposed || view->open) && !cpi->must_scan
+	&& strncmp(url, cpi->url, strlen(cpi->url)) == 0)
+	cpi->must_scan = TRUE;
+}
+
+static gboolean
+check_local_path(const gchar * path, guint depth)
+{
+    size_t len;
+    CheckPathInfo cpi;
+
+    if (depth < balsa_app.local_scan_depth)
+        return TRUE;
+
+    len = strlen(balsa_app.local_mail_directory);
+    if (!strncmp(path, balsa_app.local_mail_directory, len)
+	&& !strchr(&path[++len], G_DIR_SEPARATOR))
+	/* Top level folder. */
+	return TRUE;
+
+    if (!balsa_app.mailbox_views)
+        return FALSE;
+
+    cpi.url = g_strconcat("file://", path, NULL);
+    cpi.must_scan = FALSE;
+    g_hash_table_foreach(balsa_app.mailbox_views,
+                         (GHFunc) check_url_func, &cpi);
+    if(balsa_app.debug) 
+	printf("check_local_path: path \"%s\" must_scan %d.\n",
+               cpi.url, cpi.must_scan);
+    g_free(cpi.url);
+
+    return cpi.must_scan;
+}
+
+static void
+mark_local_path(BalsaMailboxNode *mbnode)
+{
+    mbnode->scanned = TRUE;
+}
+
 static void
 read_dir_cb(BalsaMailboxNode* mb)
 {
     libbalsa_scanner_local_dir(mb, mb->name, 
+			       (LocalCheck *) check_local_path,
+			       (LocalMark *) mark_local_path,
 			       (LocalHandler *) add_local_folder,
 			       (LocalHandler *) add_local_mailbox);
 }
@@ -674,10 +729,7 @@ balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode)
 	     valid; valid = gtk_tree_model_iter_next(model, &iter)) {
             BalsaMailboxNode *mn;
 	    gtk_tree_model_get(model, &iter, 0, &mn, -1);
-            if ((LIBBALSA_IS_MAILBOX_IMAP(mn->mailbox)
-                 || (!mn->mailbox && mn->server
-                     && mn->server->type == LIBBALSA_SERVER_IMAP))
-                && !mn->scanned) {
+	    if (!mn->scanned) {
                 list = g_slist_prepend(list, mn);
                 g_object_add_weak_pointer(G_OBJECT(mn), & list->data);
             }
@@ -693,12 +745,12 @@ balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode)
         g_object_add_weak_pointer(G_OBJECT(mbnode), (gpointer) mn);
         g_object_set_data(G_OBJECT(mbnode), BALSA_MAILBOX_NODE_LIST_KEY,
                           g_slist_reverse(list));
-        g_idle_add((GSourceFunc) imap_scan_children_idle, mn);
+        g_idle_add((GSourceFunc) bmbn_scan_children_idle, mn);
     }
 }
 
 static gboolean
-imap_scan_children_idle(BalsaMailboxNode ** mbnode)
+bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
 {
     GSList *list;
     GSList *l;
@@ -1055,7 +1107,7 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
     return mbnode;
 }
 
-BalsaMailboxNode *
+static BalsaMailboxNode *
 add_local_folder(BalsaMailboxNode * root, const char *d_name,
 		 const char *path)
 {
@@ -1201,25 +1253,11 @@ handle_imap_path(const char *fn, char delim, int noselect, int noscan,
  *
  * returns TRUE if the path must be scanned.
  */
-typedef struct _CheckImapPathInfo CheckImapPathInfo;
-struct _CheckImapPathInfo {
-    gchar *imap_url;
-    gboolean must_scan;
-};
-
-static void
-check_imap_path_func(const gchar * url, LibBalsaMailboxView * view,
-                     CheckImapPathInfo * cipi)
-{
-    if ((view->exposed || view->open) && !cipi->must_scan)
-        cipi->must_scan =
-            !strncmp(url, cipi->imap_url, strlen(cipi->imap_url));
-}
 
 static gint
 check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
 {
-    CheckImapPathInfo cipi;
+    CheckPathInfo cpi;
 
     if (depth < balsa_app.imap_scan_depth)
         return TRUE;
@@ -1227,16 +1265,16 @@ check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
     if (!balsa_app.mailbox_views)
         return FALSE;
 
-    cipi.imap_url = libbalsa_imap_url(server, fn);
-    cipi.must_scan = FALSE;
+    cpi.url = libbalsa_imap_url(server, fn);
+    cpi.must_scan = FALSE;
     g_hash_table_foreach(balsa_app.mailbox_views,
-                         (GHFunc) check_imap_path_func, &cipi);
+                         (GHFunc) check_url_func, &cpi);
     if(balsa_app.debug) 
 	printf("check_imap_path: path \"%s\" must_scan %d.\n",
-               cipi.imap_url, cipi.must_scan);
-    g_free(cipi.imap_url);
+               cpi.url, cpi.must_scan);
+    g_free(cpi.url);
 
-    return cipi.must_scan;
+    return cpi.must_scan;
 }
 
 /* mark_imap_path:

@@ -22,7 +22,11 @@
 #ifndef __FOLDER_SCANNERS_H__
 #define __FOLDER_SCANNERS_H__
 
-typedef gpointer (LocalHandler)(gpointer root, const char*d_name, const char* fn);
+typedef gboolean LocalCheck(const gchar * fn, guint depth);
+typedef void LocalMark(gpointer node);
+typedef gpointer LocalHandler(gpointer root, const char *d_name,
+			      const char *fn);
+
 typedef gboolean ImapCheck(const char *fn, LibBalsaServer * server,
                            guint depth);
 typedef void ImapMark(const char *fn, gint noselect, gint noscan,
@@ -32,6 +36,8 @@ typedef void ImapHandler(const char *fn, char delim, gint noselect,
 
 /* read_dir used by mailbox-node append-subtree callback */
 void libbalsa_scanner_local_dir(gpointer rnode, const gchar * prefix, 
+				LocalCheck check_local_path,
+				LocalMark mark_local_path,
 				LocalHandler folder_handler, 
 				LocalHandler mailbox_handler);
 

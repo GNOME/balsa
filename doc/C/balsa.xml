@@ -2663,17 +2663,19 @@ This is version 2.718 of the Balsa manual.
 </varlistentry>
 
 <varlistentry>
-  <term><guilabel>IMAP Folder Scan Depth</guilabel></term>
+  <term><guilabel>Folder Scanning</guilabel></term>
   <listitem>
-    <para>Opening an &IMAP; folder can be time-consuming, because of the
+    <para>Scanning a folder tree can be time-consuming, because of the
     need to explore an entire tree of subfolders. You can defer scanning
     the tree by setting the scan depth to 1. &Balsa; will then descend
     into the tree only far enough to discover whether any folders that
     you can see have subfolders. The first time you expand any subtree,
-    &Balsa; will explore more of the tree.</para> <para>If you prefer
-    to have the whole tree available from startup, choose a depth as
-    great as that of your folder tree. Intermediate settings may also
-    be used.</para>
+    &Balsa; will explore more of the tree.</para>
+    <para> If you prefer to have the whole tree available from startup,
+    choose a depth as great as that of your folder tree.
+    Intermediate settings may also be used.</para>
+    <para>You may set the depth for initial scanning separately for
+    local and &IMAP; trees.</para>
   </listitem>
 </varlistentry>
 

@@ -843,9 +843,10 @@ config_global_load(void)
     balsa_app.quiet_background_check=d_get_gint("QuietBackgroundCheck", 0);
     gnome_config_pop_prefix();
 
-    /* IMAP folder scanning */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "IMAPFolderScanning/");
-    balsa_app.imap_scan_depth = d_get_gint("ScanDepth", 1);
+    /* folder scanning */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
+    balsa_app.local_scan_depth = d_get_gint("LocalScanDepth", 1);
+    balsa_app.imap_scan_depth = d_get_gint("ImapScanDepth", 1);
     gnome_config_pop_prefix();
 
     /* how to react if a message with MDN request is displayed */
@@ -1196,9 +1197,10 @@ config_save(void)
 
     gnome_config_pop_prefix();
 
-    /* IMAP folder scanning */
-    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "IMAPFolderScanning/");
-    gnome_config_set_int("ScanDepth", balsa_app.imap_scan_depth);
+    /* folder scanning */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
+    gnome_config_set_int("LocalScanDepth", balsa_app.local_scan_depth);
+    gnome_config_set_int("ImapScanDepth", balsa_app.imap_scan_depth);
     gnome_config_pop_prefix();
 
     /* how to react if a message with MDN request is displayed */

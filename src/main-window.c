@@ -890,7 +890,11 @@ show_about_box (void)
 }
 
 
-/* Check all mailboxes in a list */
+/* Check all mailboxes in a list
+ *
+ * FIXME: Some (all) of these are POP mailboxes, and so grabbing the lock causes a delay.
+ * We might as well not have the thread :-(
+ */
 static void 
 check_mailbox_list (GList *mailbox_list)
 {
@@ -901,20 +905,21 @@ check_mailbox_list (GList *mailbox_list)
   while(list)
   {
     mailbox = LIBBALSA_MAILBOX(list->data);
-    
+
 #ifdef BALSA_USE_THREADS
     gdk_threads_enter();
 #endif
-    
+
     libbalsa_mailbox_check(mailbox);
     
 #ifdef BALSA_USE_THREADS
     gdk_threads_leave();
 #endif
+
+  list = g_list_next (list);
     
   }
   
-  list = g_list_next (list);
 }
 
 /*Callback to check a mailbox in a balsa-mblist */

@@ -1753,15 +1753,21 @@ void
 balsa_index_transfer(BalsaIndex *index, GList * messages,
                      LibBalsaMailbox * to_mailbox, gboolean copy)
 {
+    gboolean success;
     LibBalsaMailbox *from_mailbox;
 
     if (messages == NULL)
         return;
 
-    if (copy)
-        libbalsa_messages_copy(messages, to_mailbox);
-    else {
-        libbalsa_messages_move(messages, to_mailbox);
+    success = copy ? libbalsa_messages_copy(messages, to_mailbox)
+		   : libbalsa_messages_move(messages, to_mailbox);
+    if (!success) {
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  messages->next 
+			  ? _("Failed to copy messages to mailbox \"%s\".")
+			  : _("Failed to copy message to mailbox \"%s\"."),
+			  to_mailbox->name);
+	return;
     }
 
     from_mailbox = index->mailbox_node->mailbox;

@@ -490,16 +490,12 @@ libbalsa_inputData_free(inputData * data)
  *     is a complete e-mail address.
  *************************************************************/
 static gboolean
-libbalsa_is_an_email(gchar *str) {
-    gboolean found;
-    unsigned i;
-    
-    found = FALSE;
-    for (i = 0; i < strlen(str); i++)
-	if ((str[i] == (gchar) '@') ||
-	    (str[i] == (gchar) '%') ||
-	    (str[i] == (gchar) '!')) found = TRUE;
-    return found;
+libbalsa_is_an_email(gchar * str)
+{
+    while (*str) 
+        if (*str == '@' || *str == '%' || *str++ == '!')
+            return TRUE;
+    return FALSE;
 }
 
 
@@ -636,21 +632,21 @@ libbalsa_make_address_string(emailData *addy)
 static void
 libbalsa_move_forward_word(LibBalsaAddressEntry *address_entry)
 {
-    inputData *input;
+    GList *active;
     emailData *addy;
+    size_t tmp;
 
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
 
-    input = address_entry->input;
-    addy = input->active->data;
-    if (addy->cursor < strlen(addy->user)) {
-	addy->cursor = strlen(addy->user);
+    active = address_entry->input->active;
+    addy = active->data;
+    if (addy->cursor < (tmp = strlen(addy->user))) {
+	addy->cursor = tmp;
     } else {
 	libbalsa_force_no_match(addy);
-	if (g_list_next(input->active)) {
-	    input->active = g_list_next(input->active);
-	    addy = input->active->data;
+	if ((active = g_list_next(active))) {
+	    addy = active->data;
 	    addy->cursor = strlen(addy->user);
 	}
     }
@@ -715,6 +711,7 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
     GList *list = NULL;
     emailData *addy;
     inputData *input;
+    size_t tmp;
 
     g_return_val_if_fail(address_entry != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry), NULL);
@@ -778,7 +775,8 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
     if (input->active != input->list)
 	addy->cursor = addy->cursor - 1; /* Compensate for the ',' */
     if (addy->cursor < 0) addy->cursor = 0;
-    if (addy->cursor > strlen(addy->user)) addy->cursor = strlen(addy->user);
+    if (addy->cursor > (tmp = strlen(addy->user)))
+        addy->cursor = tmp;
 
     return input;
 }
@@ -806,22 +804,17 @@ libbalsa_address_entry_set_text(LibBalsaAddressEntry *address,
     gint tmp_pos;
 
     GtkEditable *editable;
-    GtkEntry *entry;
 
     g_return_if_fail(address != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address));
     g_return_if_fail(text != NULL);
 
-    entry = GTK_ENTRY(address);
     editable = GTK_EDITABLE(address);
-    libbalsa_address_entry_delete_text(editable, 0, entry->text_length);
+    libbalsa_address_entry_delete_text(editable, 0, -1);
 
     tmp_pos = 0;
     gtk_editable_insert_text(editable, text, strlen(text), &tmp_pos);
-    editable->current_pos = tmp_pos;
-
-    editable->selection_start_pos = 0;
-    editable->selection_end_pos = 0;
+    gtk_editable_select_region(editable, 0, 0);
 }
 
 
@@ -877,7 +870,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
     /*
      * Lets see if the user is at the end of an e-mail entry.
      */
-    if (addy->cursor == strlen(addy->user)) {
+    if (addy->user[addy->cursor] == '\0') {
 	list = g_list_next(input->active);
 	if (list != NULL) {
 	    input->list = g_list_remove_link(input->list, list);
@@ -1222,7 +1215,7 @@ libbalsa_address_entry_delete_text(GtkEditable *editable,
 
     entry = GTK_ENTRY(editable);
 
-    if (end_pos < 0)
+    if (end_pos == (unsigned) -1)
 	end_pos = entry->text_length;
 
     if (editable->selection_start_pos > start_pos)
@@ -2303,6 +2296,7 @@ libbalsa_cut_clipboard(LibBalsaAddressEntry *address_entry)
     gchar *str, *left, *right, *new;
     emailData *addy;
     gint i;
+    size_t tmp;
 
     g_return_if_fail(address_entry != NULL);
     g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
@@ -2340,8 +2334,8 @@ libbalsa_cut_clipboard(LibBalsaAddressEntry *address_entry)
 	g_free(addy->user);
 	addy->user = new;
 	addy->cursor = start_pos;
-	if (addy->cursor > strlen(addy->user))
-	    addy->cursor = strlen(addy->user);
+	if (addy->cursor > (tmp = strlen(addy->user)))
+	    addy->cursor = tmp;
 	if (addy->cursor < 0)
 	    addy->cursor = 0;
     } else {
@@ -2357,8 +2351,8 @@ libbalsa_cut_clipboard(LibBalsaAddressEntry *address_entry)
 	addy->user = left;
 	addy->cursor = start_pos;
 	address_entry->input->active = start;
-	if (addy->cursor > strlen(addy->user))
-	    addy->cursor = strlen(addy->user);
+	if (addy->cursor > (tmp = strlen(addy->user)))
+	    addy->cursor = tmp;
 	
 	/*
 	 * Set the end data.
@@ -2941,12 +2935,10 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     start = editable->selection_start_pos;
     end = editable->selection_end_pos;
     tmp_pos = 0;
-    libbalsa_address_entry_delete_text(editable, 0,
-	    GTK_ENTRY(address_entry)->text_length);
+    libbalsa_address_entry_delete_text(editable, 0, -1);
     gtk_editable_insert_text(editable, show->str, show->len, &tmp_pos);
     gtk_editable_set_position(GTK_EDITABLE(address_entry), cursor);
-    editable->selection_start_pos = start;
-    editable->selection_end_pos = end;
+    gtk_editable_select_region(editable, start, end);
     libbalsa_address_entry_draw_text(address_entry);
     g_string_free(show, TRUE);
 }

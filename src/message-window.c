@@ -865,12 +865,10 @@ load_mru(MessageWindow * mw)
 
 	if(mru_entry->mailbox == NULL) {
 	    /* could not find mailbox of given URL; *
-	     * this is really an internal error.    *
-	     * FIXME: check for memory leaks        *
-	     * FIXME2: this is not the right place  *
-	     * to check the integrity of folder_mru */
-	    g_error(__FILE__ "mru_folder integrity compromised.\n");
+         * something changed since the MRUs     *
+         * were last saved; just skip it:       */
 	    g_free(mru_entry);
+        continue;
 	}
 	
 	mw->mru_list = g_list_append(mw->mru_list, mru_entry);

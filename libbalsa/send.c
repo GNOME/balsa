@@ -954,8 +954,12 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 static void
 handle_successful_send(MessageQueueItem *mqi)
 {
-    if (mqi->orig->mailbox)
-	libbalsa_message_delete(mqi->orig, TRUE);
+    if (mqi->orig->mailbox) {
+	GList * messages = g_list_prepend(NULL, mqi->orig);
+
+	libbalsa_messages_delete(messages, TRUE);
+	g_list_free(messages);
+    }
     mqi->status = MQI_SENT;
 }
 

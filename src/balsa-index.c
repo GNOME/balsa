@@ -18,6 +18,17 @@
  * 02111-1307, USA.
  */
 
+/* SORTING METHOD discussion:
+   auto_sort() is NOT used to sort the messages since the compare methods 
+   (numeric_compare, date_compare) use information from attached mailbox
+   which is unavailable at the insertion time. We have to sort after every
+   insertion which is not a big loose: NlnN process against sorted 
+   insersion N (though the prefactor is much bigger in the former case).
+
+   The alternative is to create a hidden column containing the sorting
+   key and replace the key on every change of the sort method.  
+*/
+
 #include "config.h"
 
 #include <stdio.h>
@@ -318,7 +329,6 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_row_height (clist, 16);
 
   /* Set default sorting behaviour */
-  gtk_clist_set_auto_sort (clist, TRUE);
   gtk_clist_set_sort_column (clist, 5);
   gtk_clist_set_compare_func (clist, date_compare);
   gtk_clist_set_sort_type (clist, GTK_SORT_DESCENDING);
@@ -509,6 +519,9 @@ balsa_index_add (BalsaIndex * bindex,
   if (bindex->first_new_message == 0)
     if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
       bindex->first_new_message = row + 1;
+
+  gtk_clist_sort (GTK_CLIST(bindex));
+  DO_CLIST_WORKAROUND(GTK_CLIST(bindex));
 }
 
 void

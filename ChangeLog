@@ -1,3 +1,15 @@
+2000-09-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalse/send.c: anihillate as many balsa-app dependences 
+	as possible (only libbalsa_message_send() depends on it now).
+	* libbalsa/message.h: ditto.
+	* src/main-window.c: use API updated by above.
+	* src/balsa-app.[ch]: remove unused balsa_app.checkbox field.
+	* src/balsa-index.c: kill the message sorting issue (see
+	discussion ad the beginning of the file).
+	* libmutt/pop.c: use LAST if UIDL fails (patch contributed by 
+	James A . Laska <james_laska@yahoo.com>).
+	
 2000-09-24  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/balsa-app.c: Kill a reference to proplist.h

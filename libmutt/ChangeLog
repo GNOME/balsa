@@ -1,3 +1,8 @@
+2000-09-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* pop.c: use LAST if UIDL fails (patch contributed by 
+	James A . Laska <james_laska@yahoo.com>).
+	
 2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* pop.c, protos.h: Added a porgress callback to

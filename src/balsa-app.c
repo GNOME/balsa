@@ -165,8 +165,6 @@ balsa_app_init (void)
   balsa_app.encoding_style = 0;
   balsa_app.charset = NULL;
 
-  balsa_app.checkbox = 0;
-
   /* compose: shown headers */
   balsa_app.compose_headers = NULL;
 

@@ -244,7 +244,7 @@ extern struct BalsaApplication
   gchar *charset;
   gchar *date_string;
 
-  gint checkbox;
+    //gint checkbox;
 
   /* printing */
   Printing_t PrintCommand;

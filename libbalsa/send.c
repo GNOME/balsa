@@ -22,6 +22,8 @@
 
 #include "config.h"
 
+/* #include <radlib.h>  */
+/* FreeBSD 4.1-STABLE FreeBSD 4.1-STABLE */
 #include <arpa/inet.h>
 #include <netdb.h>
 
@@ -93,7 +95,7 @@ static void encode_descriptions (BODY * b);
 static int libbalsa_smtp_send  (MessageQueueItem *first_message, char *server);
 static int libbalsa_smtp_protocol (int s, char *tempfile, HEADER *msg);
 static gboolean libbalsa_create_msg (LibBalsaMessage * message, HEADER *msg, 
-				  char *tempfile, int queu);
+				  char *tempfile, gint encoding, int queu);
 gchar** libbalsa_lookup_mime_type (const gchar* path);
 
 #ifdef BALSA_USE_THREADS
@@ -122,11 +124,12 @@ encode_descriptions (BODY * b)
 }
 
 static BODY *
-add_mutt_body_plain (const gchar* charset)
+add_mutt_body_plain (const gchar* charset, gint encoding_style)
 {
 	BODY *body;
 	gchar buffer[PATH_MAX];
 
+	g_return_val_if_fail(charset, NULL);
 	libbalsa_lock_mutt();
 	body = mutt_new_body ();
 
@@ -135,10 +138,10 @@ add_mutt_body_plain (const gchar* charset)
 	body->unlink = 1;
 	body->use_disp = 0;
   
-	body->encoding = balsa_app.encoding_style;
+	body->encoding = encoding_style;
 	body->parameter = mutt_new_parameter();
 	body->parameter->attribute = g_strdup("charset");
-	body->parameter->value = g_strdup(charset ? charset : balsa_app.charset);
+	body->parameter->value = g_strdup(charset);
 	body->parameter->next = NULL;
 
 	mutt_mktemp (buffer);
@@ -151,7 +154,8 @@ add_mutt_body_plain (const gchar* charset)
 }
 
 gboolean
-libbalsa_message_send (LibBalsaMessage * message)
+libbalsa_message_send (LibBalsaMessage * message, LibBalsaMailbox* outbox,
+		       gint encoding)
 {
 	MessageQueueItem *first_message, *current_message , *new_message;
 	GList *lista;
@@ -163,8 +167,8 @@ libbalsa_message_send (LibBalsaMessage * message)
 
 	if (message != NULL ) {
 		first_message = msg_queue_item_new(message);
-		if(!libbalsa_create_msg (message,first_message->message,
-				      first_message->tempfile,0)) {
+		if(!libbalsa_create_msg (message, first_message->message,
+					 first_message->tempfile, encoding,0)){
 			msg_queue_item_destroy(first_message);
 			return FALSE;
 		}
@@ -202,15 +206,16 @@ libbalsa_message_send (LibBalsaMessage * message)
 #endif
 
 		last_message = first_message;
-		libbalsa_mailbox_open (balsa_app.outbox, FALSE);
-		lista = balsa_app.outbox->message_list;
+		libbalsa_mailbox_open (outbox, FALSE);
+		lista = outbox->message_list;
 	
 		while (lista != NULL) {
 			queu = LIBBALSA_MESSAGE(lista->data);
 
 			new_message = msg_queue_item_new(queu);
-			if(!libbalsa_create_msg (queu,new_message->message,
-					      new_message->tempfile,1)) {
+			if(!libbalsa_create_msg (queu, new_message->message,
+						 new_message->tempfile,
+						 encoding, 1)) {
 				msg_queue_item_destroy(new_message);
 			} else {
 				if(current_message)
@@ -225,7 +230,7 @@ libbalsa_message_send (LibBalsaMessage * message)
 			lista = lista->next ;  
 		}
 	 
-		libbalsa_mailbox_close (balsa_app.outbox);
+		libbalsa_mailbox_close (outbox);
 	 
 #ifdef BALSA_USE_THREADS	
 	}
@@ -490,8 +495,9 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr)
 }
 
 gboolean
-libbalsa_message_postpone (LibBalsaMessage * message, 
-			   LibBalsaMessage * reply_message, gchar * fcc)
+libbalsa_message_postpone (LibBalsaMessage * message, LibBalsaMailbox*draftbox,
+			   LibBalsaMessage * reply_message, gchar * fcc,
+			   gint encoding)
 {
 	HEADER *msg;
 	BODY *last, *newbdy;
@@ -519,7 +525,7 @@ libbalsa_message_postpone (LibBalsaMessage * message,
 			newbdy = mutt_make_file_attach (body->filename);
 			libbalsa_unlock_mutt();
 		} else if (body->buffer) {
-			newbdy = add_mutt_body_plain (body->charset);
+			newbdy = add_mutt_body_plain (body->charset, encoding);
 			tempfp = safe_fopen (newbdy->filename, "w+");
 			fputs (body->buffer, tempfp);
 			fclose (tempfp);
@@ -557,14 +563,14 @@ libbalsa_message_postpone (LibBalsaMessage * message,
 	else
 		tmp = NULL;
 
-	mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (balsa_app.draftbox)->path,
+	mutt_write_fcc (LIBBALSA_MAILBOX_LOCAL (draftbox)->path,
 			msg, tmp, 1, fcc);
 	g_free(tmp);
 	mutt_free_header (&msg);
 	libbalsa_unlock_mutt();
 
-	if (balsa_app.draftbox->open_ref > 0)
-		libbalsa_mailbox_check (balsa_app.draftbox);
+	if (draftbox->open_ref > 0)
+		libbalsa_mailbox_check (draftbox);
 
 	return TRUE;
 }
@@ -890,7 +896,8 @@ gchar** libbalsa_lookup_mime_type (const gchar* path)
    mutt_free_header(mgs) leads to crash.
 */
 static gboolean 
-libbalsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int queu)
+libbalsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, 
+		     gint encoding, int queu)
 {
 	BODY *last, *newbdy;
 	FILE *tempfp;
@@ -958,7 +965,7 @@ libbalsa_create_msg (LibBalsaMessage *message, HEADER *msg, char *tmpfile, int q
 				g_strfreev (mime_type);
 			}
 		} else if (body->buffer) {
-			newbdy = add_mutt_body_plain (body->charset);
+			newbdy = add_mutt_body_plain (body->charset, encoding);
 			tempfp = safe_fopen (newbdy->filename, "w+");
 			fputs (body->buffer, tempfp);
 			fclose (tempfp);

@@ -372,6 +372,17 @@ void mutt_fetchPopMail (muttProgressCallback prog_cb)
   	
   	if (strncmp (buffer, "+OK", 3) != 0)
   	{
+	        /* BALSA: begin LAST support section */
+	        /* Check if "last" cmd is supported */
+	        write (s, "last\r\n", 6);
+		getLine (s, buffer, sizeof (buffer));
+		if (strncmp (buffer, "+OK", 3) == 0)
+		{       
+		    sscanf (buffer, "+OK %d", &first_msg);
+		    first_msg++; /* fix the off-by-one msg index  */
+		    break;
+		} 
+	        /* BALSA: end LAST support section */
   		mutt_remove_trailing_ws( buffer);
   		mutt_error (buffer);
   		goto finish; 

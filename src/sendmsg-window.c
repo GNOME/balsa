@@ -1576,7 +1576,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message = bsmsg2message (bsmsg);
 
-  if (libbalsa_message_send (message)) {
+  if (libbalsa_message_send (message, balsa_app.outbox, 
+			     balsa_app.encoding_style)) {
     if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
       {
       if (bsmsg->orig_message)
@@ -1607,10 +1608,11 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message = bsmsg2message(bsmsg);
   
   if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL))
-    libbalsa_message_postpone(message, bsmsg->orig_message,
-			      message->fcc_mailbox);
+    libbalsa_message_postpone(message, balsa_app.draftbox, bsmsg->orig_message,
+			      message->fcc_mailbox, balsa_app.encoding_style);
   else
-    libbalsa_message_postpone(message, NULL, message->fcc_mailbox);
+    libbalsa_message_postpone(message, balsa_app.draftbox, NULL, 
+			      message->fcc_mailbox, balsa_app.encoding_style);
 
  if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message)
    {
@@ -1853,7 +1855,7 @@ init_menus(BalsaSendmsg *msg)
    } else 
      i = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
 
-   printf("locale pos: %i\n", i);
+   if(balsa_app.debug) printf("locale pos: %i\n", i);
    set_locale(NULL, msg, i);
 
    /* gray 'send' and 'postpone' */
@@ -1876,10 +1878,13 @@ set_locale(GtkWidget* w, BalsaSendmsg *msg, gint idx) {
 
    font_name = get_font_name(balsa_app.message_font, msg->charset);
 
-   printf("Set locale %s\nwith font: %s.\n", msg->locale, font_name);
+   if(balsa_app.debug)
+     printf("Set locale %s\nwith font: %s.\n", msg->locale, font_name);
    old_locale = setlocale(LC_CTYPE, msg->locale);
    if(!old_locale) {
-     printf("Setlocale %s failed.\n", msg->locale); 
+     balsa_information(LIBBALSA_INFORMATION_WARNING, 
+		       _("Locale %s (%s) is not available on this computer."), 
+		       msg->locale, locales[idx].lang_name); 
      gtk_widget_set_sensitive(w, FALSE);
    }  else {
      if(msg->font) gdk_font_unref(msg->font); 
@@ -1923,6 +1928,7 @@ set_locale(GtkWidget* w, BalsaSendmsg *msg, gint idx) {
 
   return FALSE;
 }
+
 
 /* spell_check_cb
  * 

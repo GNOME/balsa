@@ -375,7 +375,7 @@ msgstr "Sábháil Teacs"
 #: src/balsa-message.c:301 src/balsa-message.c:315
 #, c-format
 msgid " Open of %s failed:%s "
-msgstr "Teip ag oscáilt %s: %s"
+msgstr "Teip ag oscailt %s: %s"
 
 #: src/balsa-message.c:302 src/balsa-message.c:317
 msgid "Ok"
@@ -446,7 +446,7 @@ msgstr ""
 #: src/balsa-message.c:1214
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr "Teip ag oscáil %s. Errno = %d, "
+msgstr "Teip ag oscail %s. Errno = %d, "
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
@@ -594,7 +594,7 @@ msgstr ""
 #. The action area
 #: src/filter-edit-dialog.c:671
 msgid "Action to perform:"
-msgstr ""
+msgstr "Gníomh a dheánamh:"
 
 #. The disposition area
 #: src/filter-edit-dialog.c:692
@@ -619,7 +619,7 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:741
 msgid "Action"
-msgstr ""
+msgstr "Gníomh"
 
 #: src/filter-edit-dialog.c:755
 msgid "Revert"
@@ -802,7 +802,7 @@ msgstr "Aniar"
 
 #: src/main-window.c:218
 msgid "Next Message"
-msgstr "Oscáil an Scéal Eile"
+msgstr "Oscail an Scéal Eile"
 
 #: src/main-window.c:224 src/main-window.c:387
 msgid "Previous"
@@ -810,7 +810,7 @@ msgstr "Siar"
 
 #: src/main-window.c:224
 msgid "Preivous Message"
-msgstr "Oscáil an riomh scéala"
+msgstr "Oscail an riomh scéala"
 
 #: src/main-window.c:230 src/main-window.c:397
 msgid "Next Unread"
@@ -978,11 +978,11 @@ msgstr ""
 
 #: src/main-window.c:392
 msgid "Open Next message"
-msgstr "Oscáil an cheád scéal eile"
+msgstr "Oscail an cheád scéal eile"
 
 #: src/main-window.c:397
 msgid "Open Next Unread Message"
-msgstr "Oscáil an cheád scéal eile"
+msgstr "Oscail an cheád scéal eile"
 
 #: src/main-window.c:402 src/print.c:82 src/sendmsg-window.c:125
 #: src/sendmsg-window.c:153
@@ -1027,7 +1027,7 @@ msgstr "Oscaíl an chéad boscaphoist [unread]"
 
 #: src/mblist-window.c:376
 msgid "Open Mailbox"
-msgstr "Oscáil Boscaphoist"
+msgstr "Oscail Boscaphoist"
 
 #: src/mblist-window.c:382
 msgid "Close Mailbox"
@@ -1673,7 +1673,7 @@ msgid "LDAP Directory for %s"
 msgstr "Eolaire LDAP do %s"
 
 msgid "%s: Opening %s Refcount: %d\n"
-msgstr "%s: Ag oscáil: %s Cuntas tagartha: %d\n"
+msgstr "%s: Ag oscail: %s Cuntas tagartha: %d\n"
 
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Teip ag cruthaigh MailDir san %s (%s)"
@@ -1868,7 +1868,7 @@ msgid "Remote _IMAP mailbox..."
 msgstr ""
 
 msgid "_Open"
-msgstr "_Oscáil"
+msgstr "_Oscail"
 
 msgid "Mark as D_raftbox"
 msgstr ""
@@ -2158,10 +2158,10 @@ msgid ""
 msgstr ""
 
 msgid "Open previous"
-msgstr "Oscáil an teachaireacht roimhe"
+msgstr "Oscail an teachaireacht roimhe"
 
 msgid "Open next"
-msgstr "Oscáil an cheád scéal eile"
+msgstr "Oscail an cheád scéal eile"
 
 msgid "Open next flagged message"
 msgstr ""
@@ -2190,7 +2190,7 @@ msgid "Sign"
 msgstr "Síniú"
 
 msgid "Redo"
-msgstr ""
+msgstr "Athdeánamh"
 
 msgid "Customize Toolbars"
 msgstr ""

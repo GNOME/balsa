@@ -50,7 +50,7 @@ static gboolean is_cyclic_tree(GNode* root, GNode* child);
 static void gen_container(GtkCTree *ctree, 
 			  GtkCTreeNode *node, 
 			  GHashTable* id_table);
-static GNode* get_container(LibBalsaMessage* message,
+static GNode* get_container(GtkCTreeNode *node, 
 			    GHashTable* id_table);
 static GNode* check_references(LibBalsaMessage* message,
 			       GHashTable *id_table);
@@ -70,8 +70,6 @@ static void threading_simple(BalsaIndex* bindex);
 static void add_message(GtkCTree *ctree, 
 			GtkCTreeNode *node, 
 			GHashTable* msg_table);
-
-static void dump(GNode *node, int indent);
 
 void
 balsa_index_threading(BalsaIndex* bindex)
@@ -111,8 +109,7 @@ threading_jwz(BalsaIndex* bindex)
 			 &root_set);
 
     balsa_window_setup_progress(BALSA_WINDOW(bindex->window), 
-                                g_slist_length(root_set)*3);
-    
+                                g_slist_length(root_set));
     
     for(foo=root_set; foo; foo=g_slist_next(foo)) {
 	g_node_traverse(foo->data,
@@ -122,7 +119,6 @@ threading_jwz(BalsaIndex* bindex)
 			-1,
 			(GNodeTraverseFunc)prune,
 			root_set);
-        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
 
     subject_table = g_hash_table_new(g_str_hash, g_str_equal);
@@ -131,7 +127,6 @@ threading_jwz(BalsaIndex* bindex)
     for(foo = root_set; foo; foo=g_slist_next(foo)) {
 	if(foo->data!=NULL)
 	    subject_merge(foo->data, subject_table, root_set, &save_node);
-        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
 
     for(foo = root_set; foo; foo=g_slist_next(foo)) {
@@ -150,7 +145,6 @@ threading_jwz(BalsaIndex* bindex)
 	    ((GNode*)(foo->data))->children=NULL;
 	    g_node_destroy((GNode*)(foo->data));
 	}
-        balsa_window_increment_progress(BALSA_WINDOW(bindex->window));
     }
     if(save_node!=NULL)
 	g_slist_free(save_node);
@@ -168,24 +162,14 @@ static void
 gen_container(GtkCTree *ctree, GtkCTreeNode *node, GHashTable *id_table)
 {
     LibBalsaMessage* message=MESSAGE(node);
-
     GNode* container=NULL;
-    GNode* parent=NULL;
 
-    container=get_container(message, id_table);
-    if(container==NULL) return;
-
-    parent=check_references(message, id_table);
-    if(parent==NULL) return;
-
-    if(parent!=NULL
-#if 0
-       && parent->children==NULL
-#endif
-	) {
-	adopt_child(parent, container);
+    container=get_container(node, id_table);
+    if(container) {
+        GNode* parent = check_references(message, id_table);
+        if(parent)
+            adopt_child(parent, container);
     }
-    /* dump(container, 0); */
 }
 
 static GNode*
@@ -390,8 +374,9 @@ is_cyclic_tree(GNode* root, GNode* child)
 }
 
 static GNode*
-get_container(LibBalsaMessage* message, GHashTable* id_table)
+get_container(GtkCTreeNode *node, GHashTable* id_table)
 {
+    LibBalsaMessage* message=MESSAGE(node);
     GNode* container=NULL;
 
     /*
@@ -408,10 +393,10 @@ get_container(LibBalsaMessage* message, GHashTable* id_table)
 
     container=g_hash_table_lookup(id_table, message->message_id);
     if(container!=NULL) {
-	container->data=message;
+	container->data=node;
     }
     else{
-	container=g_node_new(message);
+	container=g_node_new(node);
 	g_hash_table_insert(id_table, message->message_id, container);
     }
     return container;
@@ -424,9 +409,8 @@ find_root_set(gpointer key, GNode* value, GSList ** root_set)
      * Walk over the elements of id_table, and gather a list of the 
      * Container objects that have no parents. 
      */
-
-    if(value->parent!=NULL) return;
-    *root_set=g_slist_append(*root_set, value);
+    if(value->parent==NULL)
+        *root_set=g_slist_append(*root_set, value);
 }
 
 static gboolean 
@@ -476,7 +460,10 @@ prune(GNode *node, GSList *root_set)
        (node->parent!=NULL || node->children->next==NULL)) {
 	if(node->parent==NULL) {
 	    while(root_set) {
-		if(root_set->data==node) {root_set->data=node->children; break;}
+		if(root_set->data==node) {
+                    root_set->data=node->children; 
+                    break;
+                }
 		root_set=g_slist_next(root_set);
 	    }
 	    node->children->parent=NULL;
@@ -522,71 +509,32 @@ node_equal(GNode *node, GNode** parent)
     return FALSE;
 }
 
-
-static void
-dump(GNode *node, int indent)
-{
-    int i=indent;
-    GNode *children=node->children;
-    while(i) {printf(" "); i--;}
-    printf("%x, %x(%s)%d\n", 
-	   (int)(node), 
-	   (int)(node->data),
-	   ((node->data!=NULL) ?
-	    /* ((LibBalsaMessage *)(((GNode*)(node)->data)))->message_id : */
-	    LIBBALSA_MESSAGE_GET_SUBJECT(
-		((LibBalsaMessage *)(((GNode*)(node)->data)))) : "empty"),
-	   ((node->data!=NULL) ?
-	    (int)LIBBALSA_MESSAGE_GET_NO((((LibBalsaMessage *)(((GNode*)(node)->data))))+1) :
-	    -1)
-	);
-    while(children) {
-	dump(children, indent+2);
-	children=children->next;
-    }
-}
-
 static gboolean 
 construct(GNode *node, GtkCTree *ctree)
 {
     GtkCTreeNode *ctreenode=NULL;
     GtkCTreeNode *ctreeparent=NULL;
     GtkCTreeNode *sibling=NULL;
-    LibBalsaMessage *message=NULL;
-
-    /*
-      printf("construct: %x, %x, %x, %x\n", (int)node,(int)(node->parent),
-      (int)(node->next),(int)(node->children));
-    */
 
     if(node->parent!=NULL && node->parent->data!=NULL) {
-	message=(LibBalsaMessage *)(node->parent->data);
-	ctreeparent=gtk_ctree_find_by_row_data(ctree, NULL, (gpointer) message);
+	ctreeparent=GTK_CTREE_NODE(node->parent->data);
     }
 
     if(node->data!=NULL) {
-	message=(LibBalsaMessage *)(node->data);
-	ctreenode=gtk_ctree_find_by_row_data(ctree, NULL, (gpointer) message);
-	if(ctreenode==NULL)
-	    printf("null!! 1\n");
+        GtkCTreeNode *ctreenode = GTK_CTREE_NODE(node->data);
 	gtk_ctree_move(ctree, ctreenode, ctreeparent, NULL);
     }
 
     if(node->next!=NULL) {
-	message=(LibBalsaMessage *)(node->next->data);
-	sibling=gtk_ctree_find_by_row_data(ctree, NULL, (gpointer) message);
-	if(sibling==NULL)
-	    printf("null!! 2 message=%x\n", (int)message); 
+        sibling = GTK_CTREE_NODE(node->data);
 	gtk_ctree_move(ctree, sibling, ctreeparent, ctreenode);
     }
 
     if(node->children!=NULL) {
 	GNode *children;
-	GtkCTreeNode *foo=NULL;
 	for(children=node->children; children; children=children->next) {
-	    message=(LibBalsaMessage *)(children->data);
-	    foo=gtk_ctree_find_by_row_data(ctree, NULL, (gpointer) message);
-	    if(foo!=NULL)
+            GtkCTreeNode *foo = GTK_CTREE_NODE(node->data);
+	    if(foo)
 		gtk_ctree_move(ctree, foo, ctreenode, NULL);
 	}
     }
@@ -597,8 +545,9 @@ construct(GNode *node, GtkCTree *ctree)
 static void
 subject_gather(GNode *node, GHashTable* subject_table)
 {
-    LibBalsaMessage *message=NULL;
-    const gchar *subject=NULL;
+    GtkCTreeNode *ctnode, *old_node;
+    LibBalsaMessage *message, *old_message;
+    const gchar *subject=NULL, *old_subject;
     const gchar *chopped_subject=NULL;
     GNode* old;
 
@@ -672,9 +621,8 @@ subject_gather(GNode *node, GHashTable* subject_table)
 
     if(node==NULL) return;
 
-    message=(LibBalsaMessage *)(node->data!=NULL ? 
-				node->data : 
-				node->children->data);
+    ctnode = GTK_CTREE_NODE(node->data ? node->data : node->children->data);
+    message = MESSAGE(ctnode);
     
     g_return_if_fail(message!=NULL);
 
@@ -696,35 +644,30 @@ subject_gather(GNode *node, GHashTable* subject_table)
 	return;
     }
 
-    {
-	LibBalsaMessage *old_message=(LibBalsaMessage *)(old->data!=NULL ?
-							 old->data :
-							 old->children->data);
-	const gchar* old_subject;
-	g_return_if_fail(old_message!=NULL);
-	old_subject = LIBBALSA_MESSAGE_GET_SUBJECT(old_message);
+    old_node = GTK_CTREE_NODE(old->data ? old->data : old->children->data);
+    old_message = MESSAGE(old_node);
+    g_return_if_fail(old_message!=NULL);
+    old_subject = LIBBALSA_MESSAGE_GET_SUBJECT(old_message);
 
-	if( old_subject != chop_re(old_subject) && subject==chopped_subject) {
-	    g_hash_table_insert(subject_table, (gchar*)chopped_subject, node);
-	}
-    }
-    return;
+    if( old_subject != chop_re(old_subject) && subject==chopped_subject)
+        g_hash_table_insert(subject_table, (gchar*)chopped_subject, node);
 }
 
 static void
 subject_merge(GNode *node, GHashTable* subject_table, 
 	      GSList* root_set, GSList** save_node)
 {
-    LibBalsaMessage *message=NULL;
-    const gchar *subject=NULL;
-    const gchar *chopped_subject=NULL;
+    GtkCTreeNode *ctnode=NULL, *ctnode2;
+    LibBalsaMessage *message, *message2;
+    const gchar *subject, *subject2;
+    const gchar *chopped_subject, *chopped_subject2;
     GNode* node2;
 
     if(node==NULL) return;
 
-    message=(LibBalsaMessage *)(node->data!=NULL ? 
-				node->data : 
-				node->children->data);
+    
+    ctnode = GTK_CTREE_NODE(node->data ? node->data : node->children->data);
+    message = MESSAGE(ctnode);
 
     g_return_if_fail(message!=NULL);
 
@@ -752,31 +695,30 @@ subject_merge(GNode *node, GHashTable* subject_table,
 	return;
     }
 
-    {
-	LibBalsaMessage *message2=(LibBalsaMessage *)(node2->data);
-	const gchar* subject2 = LIBBALSA_MESSAGE_GET_SUBJECT(message2);
-	const gchar* chopped_subject2= chop_re(subject2);
+    ctnode2  = GTK_CTREE_NODE(node2->data);
+    message2 = MESSAGE(ctnode2);
+    subject2 = LIBBALSA_MESSAGE_GET_SUBJECT(message2);
+    chopped_subject2= chop_re(subject2);
 
-	if((subject2==chopped_subject2) && subject!=chopped_subject) {
-	    GSList* foo;
-	    reparent(node2, node);
-	    
-	    for(foo=root_set; foo; foo=g_slist_next(foo)) {
-		if(foo->data==node)
-		    foo->data=NULL;
-	    }
-	    return;
-	}
-	if((subject2!=chopped_subject2) && subject==chopped_subject) {
-	    GSList* foo;
-	    reparent(node, node2);
-	    g_hash_table_insert(subject_table, (char*)chopped_subject, node);
-	    for(foo=root_set; foo; foo=g_slist_next(foo)) {
-		if(foo->data==node2)
-		    foo->data=NULL;
-	    }
-	    return;
-	}
+    if((subject2==chopped_subject2) && subject!=chopped_subject) {
+        GSList* foo;
+        reparent(node2, node);
+        
+        for(foo=root_set; foo; foo=g_slist_next(foo)) {
+            if(foo->data==node)
+                foo->data=NULL;
+        }
+        return;
+    }
+    if((subject2!=chopped_subject2) && subject==chopped_subject) {
+        GSList* foo;
+        reparent(node, node2);
+        g_hash_table_insert(subject_table, (char*)chopped_subject, node);
+        for(foo=root_set; foo; foo=g_slist_next(foo)) {
+            if(foo->data==node2)
+                foo->data=NULL;
+        }
+        return;
     }
 
     {
@@ -878,9 +820,9 @@ threading_simple(BalsaIndex* bindex)
 	parent=NULL;
 	message=MESSAGE(p->data);
 	if(message->references_for_threading!=NULL) {
-	    parent = g_hash_table_lookup(
-					 msg_table, 
-					 g_list_last(message->references_for_threading)->data);
+	    parent = 
+                g_hash_table_lookup(msg_table, 
+                                    g_list_last(message->references_for_threading)->data);
 	    if(parent!=NULL)
 		gtk_ctree_move(ctree, p->data, parent, NULL);
 	}
@@ -895,10 +837,8 @@ static void
 add_message(GtkCTree *ctree, GtkCTreeNode *node, GHashTable *msg_table)
 {
     LibBalsaMessage* message=MESSAGE(node);
-    GtkCTreeNode *foo=NULL;
     if(!message->message_id)
 	return;
-    foo=g_hash_table_lookup(msg_table, message->message_id);
-    if(foo==NULL)
+    if(!g_hash_table_lookup(msg_table, message->message_id))
 	g_hash_table_insert(msg_table, message->message_id, node);
 }

@@ -2713,7 +2713,7 @@ find_real(BalsaIndex * bindex,gboolean again)
         gtk_dialog_set_default_response(GTK_DIALOG(dia), GTK_RESPONSE_OK);
 	do {
 	    ok=gtk_dialog_run(GTK_DIALOG(dia));
-	    if (ok==0) {
+	    if (ok==GTK_RESPONSE_OK) {
 		reverse=GTK_TOGGLE_BUTTON(reverse_button)->active;
 		g_free(cnd->match.string);
 		cnd->match.string =
@@ -2739,16 +2739,14 @@ find_real(BalsaIndex * bindex,gboolean again)
 		     * *balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
 		     * must provide a non-empty string")); */
 
-		    ok=1;
-		else ok=-1;
+		    ok=GTK_RESPONSE_OK;
+		else ok=GTK_RESPONSE_CANCEL; 
 	    }
-	    else ok=-1;
+            else ok=GTK_RESPONSE_CANCEL;
 	}
-	while (ok==0);
+	while (ok==GTK_RESPONSE_HELP);
 	gtk_widget_destroy(dia);
-	/* Here ok==1 means OK button was pressed, search is valid so let's go
-	 * else cancel was pressed return */
-	if (ok!=1) return;
+	if (ok!=GTK_RESPONSE_OK) return;
 	cnd->type=CONDITION_SIMPLE;
     }
 
@@ -2759,13 +2757,10 @@ find_real(BalsaIndex * bindex,gboolean again)
 	conditions=f->conditions;
     }
     else conditions=g_slist_append(NULL,cnd);
-
     balsa_index_find(bindex,
                      f ? f->conditions_op : FILTER_OP_OR,
                      conditions, reverse);
 
-    /* FIXME : See if this does not lead to a segfault because of
-       balsa_index_scan_info */
     if (!f) g_slist_free(conditions);
 }
 

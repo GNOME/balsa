@@ -3,7 +3,10 @@
 	* libbalsa/mailbox.c: reimplement libbalsa_mailbox_get_type()
 	without using mx_get_magic() that modified mailbox ctime.
 	* libbalsa/mailbox{local,maildir,mbox,mh}.c: use it. (#81751)
-
+	* src/balsa-index-threading.c: reduce threading scaling from N^2 to N.
+	* src/balsa-index.c: specify sibling to save some time.
+	* src/main-window.c: fix searching.
+	
 2002-05-16  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/identity.c: improve a11y of identities dialog.

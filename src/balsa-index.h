@@ -86,7 +86,6 @@ extern "C" {
     void balsa_index_set_first_new_message(BalsaIndex * bindex);
 
 /* adds a new message */
-    void balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message);
     void balsa_index_redraw_current(BalsaIndex *);
 
 /* move or copy a list of messages */

@@ -122,13 +122,14 @@ index_child_get_active (GnomeMDI * mdi)
 }
 
 IndexChild *
-index_child_new (Mailbox * mailbox)
+index_child_new (GnomeMDI *mdi, Mailbox * mailbox)
 {
   IndexChild *child;
 
   if (child = gtk_type_new (index_child_get_type ()))
     {
       child->mailbox = mailbox;
+      child->mdi = mdi;
 
       GNOME_MDI_CHILD (child)->name = g_strdup (mailbox->name);
       child_list = g_list_append (child_list, child);
@@ -138,7 +139,7 @@ index_child_new (Mailbox * mailbox)
 }
 
 static void
-index_child_destroy_view(GtkObject *obj)
+index_child_destroy(GtkObject *obj)
 {
   IndexChild *ic;
 
@@ -149,9 +150,13 @@ index_child_destroy_view(GtkObject *obj)
   mailbox_open_unref (ic->mailbox);
   mailbox_watcher_remove(ic->mailbox,ic->watcher_id);
 
+  gnome_mdi_remove_child(ic->mdi, GNOME_MDI_CHILD(ic), TRUE);
+/*
   if(GTK_OBJECT_CLASS(parent_class)->destroy)
       (* GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(ic));
-
+*/
+  g_free(ic);
+  ic = NULL;
 }
 
 static GtkWidget *
@@ -390,7 +395,7 @@ index_child_class_init (IndexChildClass * class)
   object_class = (GtkObjectClass *) class;
   child_class = GNOME_MDI_CHILD_CLASS (class);
 
-  object_class->destroy = index_child_destroy_view;
+  object_class->destroy = index_child_destroy;
   child_class->create_view = index_child_create_view;
 
   parent_class = gtk_type_class (gnome_mdi_child_get_type ());

@@ -32,6 +32,7 @@ typedef struct _IndexChildClass IndexChildClass;
 struct _IndexChild
   {
     GnomeMDIChild mdi_child;
+    GnomeMDI *mdi;
 
     Mailbox *mailbox;
 
@@ -45,7 +46,7 @@ struct _IndexChildClass
     GnomeMDIChildClass parent_class;
   };
 
-IndexChild *index_child_new (Mailbox *);
+IndexChild *index_child_new (GnomeMDI *, Mailbox *);
 void index_child_changed(GnomeMDI *, GnomeMDIChild *);
 IndexChild *index_child_get_active(GnomeMDI *);
 

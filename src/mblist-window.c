@@ -137,7 +137,7 @@ mailbox_select_cb (GtkCTree * ctree, GList * row, gint column)
   if (!mailbox)
     return;
 
-  index_child = index_child_new (mailbox);
+  index_child = index_child_new (mblw->mdi, mailbox);
   if (index_child)
     {
       gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));

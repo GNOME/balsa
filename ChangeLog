@@ -1,3 +1,9 @@
+1998-09-15  Robert Wilhelm  <robert@alpha.physiol.med.tu-muenchen.de>
+
+	* src/balsa-index.c (numeric_compare): new function to
+	get sorting by message number right.
+        (clist_click_column): use it here.
+	
 1998-09-11  Michael Lausch  <mla@gams.at>
 
 	* src/balsa-message.c: Start of saving MIME parts (aka

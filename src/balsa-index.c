@@ -52,6 +52,7 @@ static void balsa_index_size_request (GtkWidget * widget, GtkRequisition * requi
 static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
 static gint date_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2);
+static gint numeric_compare (GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2);
 static void clist_click_column (GtkCList * clist, gint column, gpointer data);
 
 
@@ -113,6 +114,34 @@ date_compare (GtkCList * clist,
 
   t1 = m1->datet;
   t2 = m2->datet;
+
+  if (t1 < t2)
+    return 1;
+  if (t1 > t2)
+    return -1;
+
+  return 0;
+}
+
+static gint
+numeric_compare (GtkCList * clist,
+	      gconstpointer ptr1,
+	      gconstpointer ptr2)
+{
+  Message *m1, *m2;
+  glong t1, t2;
+
+  GtkCListRow *row1 = (GtkCListRow *) ptr1;
+  GtkCListRow *row2 = (GtkCListRow *) ptr2;
+
+  m1 = row1->data;
+  m2 = row2->data;
+
+  if (!m1 || !m2)
+    return 0;
+
+  t1 = m1->msgno;
+  t2 = m2->msgno;
 
   if (t1 < t2)
     return 1;
@@ -203,6 +232,9 @@ clist_click_column (GtkCList * clist, gint column, gpointer data)
   else
     gtk_clist_set_sort_column (clist, column);
 
+  if (column == 0)
+    gtk_clist_set_compare_func (clist, numeric_compare);
+  else
   if (column == 5)
     gtk_clist_set_compare_func (clist, date_compare);
   else

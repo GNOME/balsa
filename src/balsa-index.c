@@ -2487,8 +2487,6 @@ balsa_index_refresh_date(BalsaIndex * index)
 static void
 bndx_set_current_message(BalsaIndex * index, LibBalsaMessage * message)
 {
-    gboolean switch_page = (message == index->current_message);
-
     index->current_message = message;
     bndx_changed(index);
 
@@ -2497,10 +2495,8 @@ bndx_set_current_message(BalsaIndex * index, LibBalsaMessage * message)
 
     bndx_preview_idle_remove(index);
 
-    /* update the preview only if the notebook page was switched,
-     * or we're the current index */
-    if (switch_page
-        || (GtkWidget *) index ==
+    /* update the preview only if we're the current index */
+    if ((GtkWidget *) index ==
         balsa_window_find_current_index(BALSA_WINDOW(index->window))) {
         index->preview_message = message;
         if (message)

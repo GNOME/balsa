@@ -46,6 +46,7 @@ struct _BalsaWindow {
     GtkWidget *preview;		/* message is child */
     GtkWidget *hpaned;
     GtkWidget *vpaned;
+    GtkWidget *current_index;
 };
 
 struct _BalsaWindowClass {

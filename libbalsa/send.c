@@ -89,7 +89,6 @@ struct _SendMessageInfo{
 #else
 static MessageQueueItem *message_queue;
 #endif
-static int total_messages_left;
 static int sending_threads = 0; /* how many sending threads are active? */
 /* end of state variables section */
 
@@ -567,7 +566,6 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 				 flow, 1)) {
 	    msg_queue_item_destroy(new_message);
 	} else {
-	    total_messages_left++;
             libbalsa_message_flag(msg, TRUE);
 	    /* If the Bcc: recipient list is present, add a additional
 	       copy of the message to the session.  The recipient list
@@ -884,11 +882,18 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     SendMessageInfo *send_message_info;
     GList *lista;
     LibBalsaMessage *queu;
-    gboolean start_thread;
 
     /* We do messages in queue now only if where are not sending them already */
 
     send_lock();
+
+#ifdef BALSA_USE_THREADS
+    if (sending_threads>0) {
+	send_unlock();
+	return TRUE;
+    }
+    sending_threads++;
+#endif
 
     ensure_send_progress_dialog();
     if (sending_threads==0) {
@@ -911,30 +916,24 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
 		    message_queue = new_message;
 
 		mqi = new_message;
-		total_messages_left++;
 	    }
 	    lista = lista->next;
 	}
     }
+    send_message_info=send_message_info_new(outbox);
+
 #ifdef BALSA_USE_THREADS
     
-    start_thread = sending_threads==0;
+    pthread_create(&send_mail, NULL,
+		   (void *) &balsa_send_message_real, send_message_info);
+    /* Detach so we don't need to pthread_join
+     * This means that all resources will be
+     * reclaimed as soon as the thread exits
+     */
+    pthread_detach(send_mail);
 
-    if (start_thread) {
-        sending_threads++;
-	send_message_info=send_message_info_new(outbox);
-
-	pthread_create(&send_mail, NULL,
-		       (void *) &balsa_send_message_real, send_message_info);
-	/* Detach so we don't need to pthread_join
-	 * This means that all resources will be
-	 * reclaimed as soon as the thread exits
-	 */
-	pthread_detach(send_mail);
-    }
 #else				/*non-threaded code */
-    
-    send_message_info=send_message_info_new(outbox);
+
     balsa_send_message_real(send_message_info);
 #endif
     send_unlock();
@@ -1059,7 +1058,6 @@ balsa_send_message_real(SendMessageInfo* info) {
     gdk_threads_leave();
 
     send_lock();
-    total_messages_left = 0;
 #ifdef BALSA_USE_THREADS
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     sending_threads--;
@@ -1112,7 +1110,6 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
 				  == ENC8BIT));
 	libbalsa_unlock_mutt();
 	mqi->status = (i==0?MQI_SENT : MQI_FAILED);
-	total_messages_left--; /* whatever the status is, one less to do*/
     }
 
     /* We give back all the resources used and delete the sent messages */
@@ -1133,7 +1130,6 @@ static guint balsa_send_message_real(SendMessageInfo* info) {
     gdk_threads_leave();
 
     message_queue = NULL;
-    total_messages_left = 0;
 #ifdef BALSA_USE_THREADS
     sending_threads--;
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);

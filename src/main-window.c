@@ -1400,6 +1400,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             enable_mailbox_menus(NULL);
             enable_message_menus(NULL);
             enable_edit_menus(NULL);
+            window->current_index = NULL;
         }
     }
 
@@ -2224,20 +2225,9 @@ display_new_mail_notification(int num_new)
 GtkWidget *
 balsa_window_find_current_index(BalsaWindow * window)
 {
-    GtkWidget *page;
-    GtkWidget *index;
-
     g_return_val_if_fail(window != NULL, NULL);
 
-    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(window->notebook),
-                                     gtk_notebook_get_current_page
-                                     (GTK_NOTEBOOK(window->notebook)));
-    if (!page)
-        return NULL;
-
-    index = gtk_bin_get_child(GTK_BIN(page));
-
-    return GTK_WIDGET(BALSA_INDEX(index));
+    return window->current_index;
 }
 
 
@@ -3009,7 +2999,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
 {
     GtkWidget *page;
     GtkWidget *index;
-    GtkWidget *window;
+    BalsaWindow *window;
     LibBalsaMailbox *mailbox;
     gchar *title;
 
@@ -3017,7 +3007,8 @@ notebook_switch_page_cb(GtkWidget * notebook,
     index = gtk_bin_get_child(GTK_BIN(page));
 
     mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    window = BALSA_INDEX(index)->window;
+    window = BALSA_WINDOW(BALSA_INDEX(index)->window);
+    window->current_index = GTK_WIDGET(index);
 
     if (mailbox->name) {
         if (mailbox->readonly) {

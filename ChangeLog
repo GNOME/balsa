@@ -1,3 +1,9 @@
+2002-09-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/main-window.c, src/balsa-index.[hc]: clean up index switching
+	after recent changes (PB).
+	* libbalsa/send.c: compile without libesmtp.
+
 2002-09-11  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-index.[hc]: handle idle handlers in a safer way.

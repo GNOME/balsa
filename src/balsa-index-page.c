@@ -551,29 +551,21 @@ create_menu(BalsaIndex * bindex)
 			   _("Store Address..."),
 			   balsa_store_address, bindex, TRUE);
 
-    /* menuitem = gtk_menu_item_new_with_label(_("Toggle Flagged")); */
     create_stock_menu_item (menu, BALSA_PIXMAP_FLAGGED, _("Toggle Flagged"),
                             balsa_message_toggle_flagged, bindex, TRUE);
-/*     gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly); */
-/*     gtk_signal_connect(GTK_OBJECT(menuitem), */
-/* 		       "activate", */
-/* 		       (GtkSignalFunc) balsa_message_toggle_flagged, */
-/* 		       bindex); */
-/*     gtk_menu_append(GTK_MENU(menu), menuitem); */
-/*     gtk_widget_show(menuitem); */
 
     menuitem = gtk_menu_item_new_with_label(_("Transfer"));
     gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
     submenu = gtk_menu_new();
 
     smenuitem = gtk_menu_item_new();
-    gtk_signal_connect(GTK_OBJECT(smenuitem), "button_release_event",
-		       (GtkSignalFunc) close_if_transferred_cb,
-		       (gpointer) bindex);
+    gtk_signal_connect (GTK_OBJECT(smenuitem), "button_release_event",
+                        (GtkSignalFunc) close_if_transferred_cb,
+                        (gpointer) bindex);
 
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), 
-				   GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    scroll = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroll), 
+                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
     bmbl = balsa_mblist_new();
     gtk_signal_connect(GTK_OBJECT(bmbl), "select_mailbox",
@@ -607,7 +599,12 @@ static gint
 close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
 			BalsaIndex * bi)
 {
-    return gtk_object_get_data(GTK_OBJECT(bi), "transferredp") == NULL;
+    if (gtk_object_get_data(GTK_OBJECT(bi), "transferredp") == NULL) {
+        return TRUE;
+    } else {
+        gtk_object_remove_data (GTK_OBJECT (bi), "transferredp");
+        return FALSE;
+    }
 }
 
 static void

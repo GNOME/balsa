@@ -1,3 +1,8 @@
+2000-11-05  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index-page.c (close_if_transferred_cb): Remove
+	"transferredp" data to allow for repeat transfers.
+
 2000-11-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README,INSTALL,help/C/README: build instructions for RH-7.0. 

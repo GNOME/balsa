@@ -1,3 +1,10 @@
+1999-11-20  Ragnar Henriksen <ragnar@juniks.org>
+        * new files: print.h print.c -> the beginning of printing.
+        * save-restore.c added saveing and loading of print setup.
+	* pref-manager.c added print notebook.
+	* balsa-app.h/c  added print setup to balsa struct.
+	* main-window.c added print icon.
+
 1999-11-18  Stuart Parmenter  <pavlov@netscape.com>
 
 	* libbalsa/mailbox.[ch]  Changed mailbox code to act as GtkObjects

@@ -1,3 +1,11 @@
+2001-07-31  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c: menu entry for message view source.
+	* libbalsa/Makefile.am: add source-viewer.c
+	* libbalsa/libbalsa.h: add libbalsa_show_message_source() header.
+	* libbalsa/source-viewer.c: the actual code for message source
+	browsing.
+	
 2001-07-28  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/address-book.c: do not crash on changing distribution mode

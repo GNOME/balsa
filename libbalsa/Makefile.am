@@ -60,6 +60,7 @@ libbalsa_a_SOURCES = 		\
 	send.c			\
 	server.c		\
 	server.h		\
+	source-viewer.c		\
 	threads.h
 
 

@@ -69,6 +69,8 @@ typedef struct body MuttBody;
 void libbalsa_init(LibBalsaInformationFunc information_callback);
 void libbalsa_set_spool(gchar * spool);
 
+void libbalsa_show_message_source(LibBalsaMessage* msg);
+
 gchar *libbalsa_guess_mail_spool(void);
 
 void libbalsa_lock_mutt(void);

@@ -170,6 +170,7 @@ static void previous_message_cb(GtkWidget * widget, gpointer data);
 static void next_part_cb(GtkWidget * widget, gpointer data);
 static void previous_part_cb(GtkWidget * widget, gpointer data);
 static void save_current_part_cb(GtkWidget * widget, gpointer data);
+static void view_msg_source_cb(GtkWidget * widget, gpointer data);
 
 static void trash_message_cb(GtkWidget * widget, gpointer data);
 static void delete_message_cb(GtkWidget * widget, gpointer data);
@@ -457,8 +458,15 @@ static GnomeUIInfo message_menu[] = {
 	save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
     },
+#define MENU_MESSAGE_SOURCE_POS 8
+    {
+	GNOME_APP_UI_ITEM, N_("_View Source..."),
+	N_("View source form of the message"),
+	view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	GNOME_STOCK_MENU_SAVE, 'v', GDK_CONTROL_MASK, NULL
+    },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_TRASH_POS 9
+#define MENU_MESSAGE_TRASH_POS 10
     /* D */
     {
 	GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
@@ -466,22 +474,22 @@ static GnomeUIInfo message_menu[] = {
 	trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
     },
-#define MENU_MESSAGE_DELETE_POS 10
+#define MENU_MESSAGE_DELETE_POS 11
     GNOMEUIINFO_ITEM_STOCK(N_("_Delete"), 
 			   N_("Delete the current message"),
 			   delete_message_cb, GNOME_STOCK_MENU_TRASH),
-#define MENU_MESSAGE_UNDEL_POS 11
+#define MENU_MESSAGE_UNDEL_POS 12
     /* U */
     {
 	GNOME_APP_UI_ITEM, N_("_Undelete"), N_("Undelete the message"),
 	undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
     },
-#define MENU_MESSAGE_TOGGLE_POS 12
+#define MENU_MESSAGE_TOGGLE_POS 13
     /* ! */
     GNOMEUIINFO_SUBTREE(N_("_Toggle"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 14
+#define MENU_MESSAGE_STORE_ADDRESS_POS 15
     /* S */
     {
 	GNOME_APP_UI_ITEM, N_("_Store Address..."),
@@ -923,6 +931,7 @@ enable_message_menus(LibBalsaMessage * message)
 
     gtk_widget_set_sensitive(file_menu[MENU_FILE_PRINT_POS].widget, enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SAVE_PART_POS].widget, enable);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_SOURCE_POS].widget, enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_POS].widget, enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_ALL_POS].widget, enable);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_REPLY_GROUP_POS].widget, enable);
@@ -2109,6 +2118,17 @@ save_current_part_cb(GtkWidget * widget, gpointer data)
     bw = BALSA_WINDOW(data);
     if (bw->preview)
 	balsa_message_save_current_part(BALSA_MESSAGE(bw->preview));
+}
+
+static void
+view_msg_source_cb(GtkWidget * widget, gpointer data)
+{
+    BalsaWindow *bw;
+    bw = BALSA_WINDOW(data);
+    if (bw->preview) {
+	LibBalsaMessage * msg = BALSA_MESSAGE(bw->preview)->message;
+	libbalsa_show_message(msg);
+    }
 }
 
 static void

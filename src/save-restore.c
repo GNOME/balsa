@@ -153,6 +153,7 @@ load_toolbars(void)
     char tmpkey[256];
     gchar *key;
     GSList **list;
+    guint changed = 0;
 
     libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
     balsa_app.toolbar_wrap_button_text = d_get_gint("WrapButtonText", 1);
@@ -178,6 +179,8 @@ load_toolbars(void)
 	    if ((real_item = balsa_toolbar_sanitize_id(item))) {
 		*list = g_slist_append(*list, g_strdup(real_item));
 		items++;
+		if (strcmp(real_item, item) != 0)
+		    ++changed;
 	    }
 	    g_free(item);
         }
@@ -210,12 +213,18 @@ load_toolbars(void)
 
             sprintf(tmpkey, "Toolbar%dItem%d", i, j);
             item = libbalsa_conf_get_string(tmpkey);
- 	    if ((real_item = balsa_toolbar_sanitize_id(item)))
+ 	    if ((real_item = balsa_toolbar_sanitize_id(item))) {
  		*list = g_slist_append(*list, g_strdup(real_item));
+		if (strcmp(real_item, item) != 0)
+		    ++changed;
+	    }
  	    g_free(item);
         }
     }
     libbalsa_conf_pop_prefix();
+
+    if (changed)
+	save_toolbars();
 }
 
 /* config_mailbox_set_as_special:

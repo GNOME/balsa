@@ -569,8 +569,12 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 	else
 	    add_menu_entry(menu, _("Close"), mb_close_cb, mbnode);
     }
-    add_menu_entry(menu, _("Properties..."), mb_conf_cb, mbnode);
-    add_menu_entry(menu, _("Delete"),        mb_del_cb,  mbnode);
+    if (gtk_signal_handler_pending(GTK_OBJECT(mbnode),
+				   balsa_mailbox_node_signals[SHOW_PROP_DIALOG],
+				   FALSE))
+	add_menu_entry(menu, _("Properties..."), mb_conf_cb, mbnode);
+    if (mbnode->mailbox || mbnode->config_prefix)
+	add_menu_entry(menu, _("Delete"),        mb_del_cb,  mbnode);
 
     
     if (mbnode->mailbox) {
@@ -841,6 +845,8 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
     if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
 	/* it already has a mailbox */
 	return node;
+    gtk_signal_connect(GTK_OBJECT(mbnode), "show-prop-dialog",
+		       folder_conf_imap_sub_node, NULL);
 
     m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
     libbalsa_mailbox_remote_set_server(

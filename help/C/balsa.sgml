@@ -245,6 +245,42 @@
 			    </menuchoice> &mdash; 
 			    
 			    Open a dialog box to create a new mailbox.
+			    There are various items like this,
+			    corresponding to the different types of
+			    mailbox that Balsa supports.
+			  </para>
+			</listitem>
+			
+			<listitem>
+			  <para>
+			    <menuchoice>
+			      <guimenu>File</guimenu>
+			      <guisubmenu>New</guisubmenu>
+			      <guimenuitem>Remote IMAP folder...</guimenuitem>
+			    </menuchoice> &mdash; 
+			    
+			    Open a dialog box to create a folder for
+			    an account on an IMAP server.  This <link
+			    linkend="folder-config">IMAP folder
+			    properties</link> dialog can also be used
+			    to change the details of the account.
+			  </para>
+			</listitem>
+			
+			<listitem>
+			  <para>
+			    <menuchoice>
+			      <guimenu>File</guimenu>
+			      <guisubmenu>New</guisubmenu>
+			      <guimenuitem>Remote IMAP
+			        subfolder...</guimenuitem>
+			    </menuchoice> &mdash; 
+			    
+			    Open a dialog box to create a new subfolder
+			    in an existing IMAP folder tree. This <link
+			    linkend="subfolder-config">IMAP subfolder
+			    properties</link> dialog can also be used
+			    to rename or move a subfolder.
 			  </para>
 			</listitem>
 		      </itemizedlist>
@@ -2744,6 +2780,36 @@
         server but if your IMAP server stores also other kind of files
         you may specify for instance &quot;mail&quot;.</para></listitem>
     </itemizedlist>
+
+  <sect2 id="subfolder-config">
+    <title>IMAP Subfolder Properties</title>
+    
+    <para>The subfolder properties dialog allows you to manage
+      folders on remote IMAP servers. Specifically, you
+      can <emphasis>create</emphasis> a new subfolder,
+      <emphasis>rename</emphasis> an existing subfolder, or
+      <emphasis>move</emphasis> a subfolder within the folder tree.</para>
+
+    <itemizedlist mark="bullet">
+      <listitem><para>``Folder name'' is how the folder is shown
+	in the mailbox tree on the left side.</para></listitem>
+      <listitem><para>``Subfolder of'' indicates the immediate 
+	parent of the folder.</para></listitem>
+    </itemizedlist>
+    <para>When the dialog is opened from the ``File->New->Remote IMAP
+      subfolder'' menu item, you can enter the folder name and 
+      browse IMAP trees to find the parent folder. If you had already 
+      selected a mailbox in an IMAP tree, only that tree is 
+      shown for browsing; otherwise, all IMAP trees will be shown.</para>
+
+    <para>When the dialog is opened by right-clicking on an IMAP
+      mailbox and selecting ``Properties...'', the mailbox may be:
+    <itemizedlist mark="bullet">
+      <listitem><para>Renamed, by editing the folder name;</para></listitem>
+      <listitem><para>Moved, by browsing for a different parent folder
+	in the same tree.</para></listitem>
+    </itemizedlist></para>
+  </sect2>
   </sect1>
 
   <sect1 id="its-not-working">

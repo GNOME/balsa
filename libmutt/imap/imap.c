@@ -105,6 +105,20 @@ int imap_create_mailbox (IMAP_DATA* idata, char* mailbox)
   return 0;
 }
 
+int imap_rename_mailbox(IMAP_DATA* idata, char* mailbox, char* new_name)
+{
+  char buf[LONG_STRING], mbox[LONG_STRING], new_mbox[LONG_STRING];
+
+  imap_munge_mbox_name (mbox, sizeof (mbox), mailbox);
+  imap_munge_mbox_name (new_mbox, sizeof (new_mbox), new_name);
+  snprintf (buf, sizeof (buf), "RENAME %s %s", mbox, new_mbox);
+      
+  if (imap_exec (idata, buf, 0) != 0)
+    return -1;
+
+  return 0;
+}
+
 int imap_delete_mailbox (CONTEXT* ctx, char* mailbox)
 {
   char buf[LONG_STRING], mbox[LONG_STRING];

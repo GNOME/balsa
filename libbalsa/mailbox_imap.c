@@ -472,6 +472,17 @@ libbalsa_imap_close_all_connections(void)
 }
 
 void
+libbalsa_imap_rename_subfolder(const gchar *dir, const gchar *parent,
+			       const gchar *folder, gboolean subscribe, 
+			       LibBalsaServer *server)
+{
+    gchar *imap_prefix = g_strdup_printf("imap://%s:%i/", server->host,
+                                                server->port);
+    imap_mailbox_rename(imap_prefix, dir, parent, folder, subscribe);
+    g_free(imap_prefix);
+}
+
+void
 libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
 			    gboolean subscribe, LibBalsaServer *server)
 {

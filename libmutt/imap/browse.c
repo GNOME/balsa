@@ -322,13 +322,70 @@ int imap_mailbox_create (const char* folder, const char* subfolder,
   return -1;
 }
 
+#ifdef LIBMUTT
+/*
+BALSA: rename capability
+Doesn't really belong here, but it goes with create.
+*/
+
+int imap_mailbox_rename (const char* prefix, const char* dir,
+			 const char* parent, const char* subfolder,
+			 int subscribe)
+{
+  IMAP_DATA* idata;
+  IMAP_MBOX mx;
+  char folder[LONG_STRING];
+  char buf[LONG_STRING];
+  short n;
+
+  snprintf(folder, sizeof (folder), "%s%s", prefix, dir);
+  if (imap_parse_path (folder, &mx) < 0)
+  {
+    dprint (1, (debugfile, "imap_mailbox_rename: Bad path %s\n", folder));
+    return -1;
+  }
+
+  if (!(idata = imap_conn_find (&mx.account, M_IMAP_CONN_NONEW)))
+  {
+    dprint (1, (debugfile, "imap_mailbox_rename: Couldn't find open connection to %s", mx.account.host));
+    goto fail;
+  }
+  
+  strfcpy (buf, parent, sizeof (buf));
+
+  /* append a delimiter if necessary */
+  n = mutt_strlen (buf);
+  if (n && (n < sizeof (buf) - 1) && (buf[n-1] != idata->delim))
+  {
+    buf[n++] = idata->delim;
+    buf[n] = '\0';
+  }
+  
+  strfcpy (buf + n, subfolder, sizeof (buf) - n);
+
+  if (imap_rename_mailbox (idata, mx.mbox, buf) < 0)
+    goto fail;
+
+  if (subscribe) {
+    snprintf(folder, sizeof (folder), "%s%s", prefix, buf);
+    if (imap_subscribe(folder, 1) < 0)
+      goto fail;
+  }
+
+  FREE (&mx.mbox);
+  return 0;
+
+ fail:
+  FREE (&mx.mbox);
+  return -1;
+}
+
 /*
 BALSA: this function is needed because the lower-level imap_delete_mailbox
 segfaults when called from Balsa.  It doesn't especially belong here,
 but it roughly complements imap_mailbox_create above.
 */
-#ifdef LIBMUTT
-int imap_mailbox_delete(const char *folder)
+int imap_mailbox_delete(const char* folder)
 {
   IMAP_DATA* idata;
   IMAP_MBOX mx;

@@ -1,3 +1,13 @@
+2001-07-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Peter Bloomfield's <bloomfld@eos.ncsu.edu> IMAP mailbox rename
+	patch.
+	* libbalsa/mailbox_imap.[hc]: libbalsa_imap_rename_subfolder() added.
+	* src/folder-conf.[hc]: (sub)folder rename support.
+	folder_conf_imap_sub_node() made global.
+	* src/mailbox-node.c: add IMAP mailbox deletion support.
+	* help/C/balsa.sgml: help for this all.
+	
 2001-07-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	all-bars3.patch from M. Thielker <balsa@t-data.com>

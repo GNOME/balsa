@@ -40,9 +40,6 @@ static void load_global_settings ();
 static int options_init ();
 static void setup_local_mailboxes ();
 static void my_special_mailbox ();
-void mailbox_add_gnome_config (gint, gchar *, gchar *, gint);
-
-
 
 void
 init_balsa_app (int argc, char *argv[])
@@ -202,7 +199,7 @@ options_init (void)
 		    envmail=getenv("MAIL");
 	      if (envmail)
 		{
-		  mailbox_add_gnome_config (0, "Default", envmail, 0);
+		  add_mailbox_config (0, "Default", envmail, 0);
 
 		  mbx = (MailboxMBX *) mailbox_new (MAILBOX_MBX);
 		  mbx->name = "Default";

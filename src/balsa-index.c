@@ -687,13 +687,13 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
 }
 
 
-void
+static void
 balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     gchar buff1[32];
     gchar *text[7];
     gchar *name_str=NULL;
-    GtkCTreeNode *node;
+    GtkCTreeNode *node, *sibling;
     GList *list;
     LibBalsaAddress *addy = NULL;
     LibBalsaMailbox* mailbox;
@@ -747,7 +747,8 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     text[6] =
 	libbalsa_message_size_to_gchar(message, balsa_app.line_length);
 
-    node = gtk_ctree_insert_node(GTK_CTREE(bindex->ctree), NULL, NULL, 
+    sibling = GTK_CTREE_NODE(GTK_CLIST(bindex->ctree)->row_list);
+    node = gtk_ctree_insert_node(GTK_CTREE(bindex->ctree), NULL, sibling, 
                                  text, 2, NULL, NULL, NULL, NULL, 
                                  FALSE, TRUE);
     if(append_dots) g_free(text[3]);
@@ -2353,14 +2354,14 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     
     for (list = mailbox->message_list; list; list = list->next)
 	balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
-
     /* do threading */
     balsa_index_threading(bindex);
     gtk_clist_sort(clist);
     DO_CLIST_WORKAROUND(clist);
     gtk_clist_thaw(clist);
-
-    balsa_index_update_tree(bindex, balsa_app.expand_tree /* *** Config: "Expand tree by default" */);
+    balsa_index_update_tree(bindex, 
+                            balsa_app.expand_tree 
+                            /* *** Config: "Expand tree by default" */);
 
 
     /* set the menu apriopriately */

@@ -221,6 +221,7 @@ text_event( GnomeCanvasItem * item, GdkEvent * event, gpointer data )
 
 	switch( event->type ) {
 	case GDK_BUTTON_PRESS:
+	        if( ((GdkEventButton*)event)->button != 3) break;
 		save_dialog = gnome_dialog_new( _("Save Text"),
 						_("Save"), _("Cancel"), NULL );
                 gnome_dialog_set_parent (GNOME_DIALOG (save_dialog), GTK_WINDOW (balsa_app.main_window));

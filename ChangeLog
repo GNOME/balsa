@@ -1,3 +1,14 @@
+2003-11-24 09:00  PeterB
+
+	* libbalsa/imap/: imap-commands.c, imap-commands.h: Add length
+	argument to imap_mbox_append_stream().
+	* libbalsa/: mailbox.c, mailbox_maildir.c, mailbox_mbox.c,
+	mailbox_mh.c: Ref/unref the message in
+	libbalsa_mailbox_copy_message() instead of the subclass method.
+	* libbalsa/mailbox_imap.c: Write message to a temp file, so we can
+	pass its length to imap_mbox_append_stream(); ref/unref the message
+	in libbalsa_mailbox_copy_message() instead of the subclass method.
+
 2003-11-23  Carlos Morgado  <chbm gnome.org>
 
 	* src/main.c: 

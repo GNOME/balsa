@@ -1,3 +1,12 @@
+2004-08-22 10:57  PeterB
+
+	* src/: folder-conf.c, mailbox-conf.c, mailbox-conf.h: pass a list
+	of default ports to be stripped from host string when use_ssl is
+	toggled.
+	* libbalsa/server.c: document libbalsa_server_connect_signals.
+	* libbalsa/mailbox_imap.c: use INBOX as default path if config file
+	does not provide one, and warn the user.
+
 2004-08-21 12:34  PeterB
 
 	* src/: mailbox-node.c, save-restore.c: keep config entries

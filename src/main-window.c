@@ -28,6 +28,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "html.h"
 
 #include "ab-window.h"
 #include "balsa-app.h"
@@ -2434,6 +2435,10 @@ copy_cb(GtkWidget * widget, BalsaWindow * bw)
                                 G_TYPE_FROM_INSTANCE(focus_widget));
     if (signal_id)
         g_signal_emit(focus_widget, signal_id, (GQuark) 0);
+#ifdef HAVE_GTKHTML
+    else if (libbalsa_html_can_select(focus_widget))
+	libbalsa_html_copy(focus_widget);
+#endif /* HAVE_GTKHTML */
 }
 
 static void

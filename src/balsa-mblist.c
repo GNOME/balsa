@@ -485,7 +485,7 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     mbnode->expanded = TRUE;
-    balsa_mblist_scan_mailbox_node(mbnode);
+    balsa_mailbox_node_scan_children(mbnode);
 }
 
 static void
@@ -1650,51 +1650,6 @@ balsa_mblist_remove_mailbox_node(GtkTreeStore * store,
     }
 
     return FALSE;
-}
-
-/* mblist_scan_mailbox_node:
- * public interface for checking whether a mailbox node's children need
- * scanning. 
- * Note that rescanning local_mail_directory will *not* trigger rescanning
- * eventual IMAP servers.
- */
-void
-balsa_mblist_scan_mailbox_node(BalsaMailboxNode * mbnode)
-{
-    GNode *gnode;
-    GSList *list = NULL, *l;
-
-    balsa_mailbox_nodes_lock(FALSE);
-
-    gnode = g_node_find(balsa_app.mailbox_nodes, G_IN_ORDER,
-                        G_TRAVERSE_ALL, mbnode);
-    if (gnode) {
-        for (gnode = gnode->children; gnode; gnode = gnode->next) {
-            mbnode = BALSA_MAILBOX_NODE(gnode->data);
-            if ((LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)
-                 || (!mbnode->mailbox && mbnode->server
-                     && mbnode->server->type == LIBBALSA_SERVER_IMAP))
-                && !mbnode->scanned) {
-                list = g_slist_prepend(list, mbnode);
-            }
-        }
-    } else
-        g_print("mblist_scan_mailbox_node: didn't find mbnode.\n");
-
-    balsa_mailbox_nodes_unlock(FALSE);
-
-    for (l = list; l; l = g_slist_next(l)) {
-        gboolean has_unread_messages = FALSE;
-        mbnode = l->data;
-        if (mbnode->mailbox)
-            has_unread_messages = mbnode->mailbox->has_unread_messages;
-        balsa_mailbox_node_rescan(mbnode);
-        if (mbnode->mailbox)
-            mbnode->mailbox->has_unread_messages = has_unread_messages;
-        mbnode->scanned = TRUE;
-    }
-
-    g_slist_free(list);
 }
 
 /* balsa_mblist_mru_menu:

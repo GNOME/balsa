@@ -98,7 +98,6 @@ create_toolbar (BalsaSendmsg *mw)
 
 void balsa_sendmsg_destroy(BalsaSendmsg *bsm)
 {
-/*
 gtk_widget_destroy(bsm->toolbar);
 gtk_widget_destroy(bsm->to);
 gtk_widget_destroy(bsm->from);
@@ -108,9 +107,8 @@ gtk_widget_destroy(bsm->bcc);
 gtk_widget_destroy(bsm->hscrollbar);
 gtk_widget_destroy(bsm->vscrollbar);
 gtk_widget_destroy(bsm->sendbutton);
-*/
 gtk_widget_destroy(bsm->window);
-
+free(bsm);
 }
 
 static GtkWidget *

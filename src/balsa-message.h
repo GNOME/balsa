@@ -52,6 +52,9 @@ struct _BalsaMessageClass
 
 guint balsa_message_get_type (void);
 GtkWidget *balsa_message_new ();
+void balsa_message_delete(BalsaMessage * bmessage,
+			MAILSTREAM * stream,
+			glong mesgno);
 void balsa_message_clear (BalsaMessage * bmessage);
 void balsa_message_set (BalsaMessage * bmessage,
 			MAILSTREAM * stream,

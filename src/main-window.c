@@ -49,6 +49,14 @@ static GtkWidget * create_menu (GtkWidget * window);
 extern void balsa_exit ();
 static GtkWidget *menu_items[18];
 
+void
+message_delete_one (GtkWidget *widget, MainWindow *mw)
+{
+  GtkWidget *clist = GTK_BIN (mw->index)->child;
+  gint row=selected_clist_row(clist);
+  BalsaMessage *bmsg = gtk_clist_get_row_data(GTK_CLIST(clist),row);
+  balsa_message_delete(bmsg,bmsg->current_stream,bmsg->current_mesgno);
+}
 
 
 MainWindow *
@@ -189,8 +197,8 @@ create_toolbar (MainWindow *mw)
 			     "Delete", 
 			     "Delete Message", 
 			     NULL,
-			     new_icon (p1_xpm, window), NULL,
-			     "Delete Message");
+			     new_icon (p1_xpm, window), GTK_SIGNAL_FUNC(message_delete_one),
+			     mw);
 
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));

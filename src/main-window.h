@@ -28,8 +28,6 @@ struct _MainWindow
     GtkWidget *window;
 
     GtkWidget *menubar;
-    GtkMenuFactory *factory;
-    GtkMenuFactory *subfactories[1];
 
     GtkWidget *toolbar;
     GtkWidget *mailbox_option_menu;

@@ -10,13 +10,4 @@ TODO LIST:
 
 Balsa Library (libbalsa):
 
- * Start with a mbox parser that puts everything into the
-   correct structures, etc.  Messages need to store the
-   starting and ending offsets for their messages, as well
-   as mime parts need to store their offsets in the body_list
-   inside the message structure.
-
- * mh folders, maildir, etc etc etc... same as above.
-
- * Steal RCS's time parser.  Josh says its really awsome. :)
-   (for rfc822 stuff)
+ * sending mail

@@ -1286,19 +1286,19 @@ mime_content_type2str (int contenttype)
   switch (contenttype)
     {
     case TYPEOTHER:
-      return "OTHER";
+      return "other";
     case TYPEAUDIO:
-      return "AUDIO";
+      return "audio";
     case TYPEAPPLICATION:
-      return "APPLICATION";
+      return "application";
     case TYPEIMAGE:
-      return "IMAGE";
+      return "image";
     case TYPEMULTIPART:
-      return "MULTIPART";
+      return "multipart";
     case TYPETEXT:
-      return "TEXT";
+      return "text";
     case TYPEVIDEO:
-      return "VIDEO";
+      return "video";
     default:
       return "";
     }

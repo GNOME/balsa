@@ -91,6 +91,45 @@ balsa_message_class_init (BalsaMessageClass * klass)
   widget_class->size_allocate = balsa_message_size_allocate;
 }
 
+char *urls [] = {
+	"unknown", "named (...)", "jump (#...)",
+	"file_local (file.html)", "file_remote (file://foo.bar/file)",
+	"ftp", "http", "gopher", "wais", "news", "telnet", "mailto",
+	"exec:foo_bar", "internal"
+};
+
+static void
+balsa_message_handle_mime_part(GtkObject* xmhtml_widget, gpointer data)
+{
+  XmHTMLAnchorCallbackStruct *cbs = (XmHTMLAnchorCallbackStruct *) data;
+  Message* message = 0;
+  BODY*    body = 0;
+  char*    ptr;
+  int rc;
+
+  printf ("click!\n");
+  printf ("URLtype: %d, %s\n", cbs->url_type, urls [cbs->url_type]);
+  printf ("line:    %d\n", cbs->line);
+  printf ("href:    %s\n", cbs->href);
+  printf ("target:  %s\n", cbs->target);
+  printf ("rel:     %s\n", cbs->rel);
+  printf ("rev:     %s\n", cbs->rev);
+  printf ("title:   %s\n", cbs->title);
+  printf ("doit:    %d\n", cbs->doit);
+  printf ("visited: %d\n", cbs->visited);
+  ptr = strchr(cbs->href,':');
+  if (!ptr)
+    {
+      g_warning("Malformed URL '%s' in message\n", cbs->href);
+      return;
+    }
+  rc = sscanf(ptr+3, "%p:%p", &message, &body);
+  printf("sscanf returns %d, ptr = '%s', message is at %p, body is at %p\n", rc, ptr+3, message, body);
+
+  printf("Save a '%s/%s'?\n", mime_content_type2str(body->type), body->subtype);
+}
+
+
 
 static void
 balsa_message_init (BalsaMessage * bmessage)
@@ -105,6 +144,10 @@ balsa_message_init (BalsaMessage * bmessage)
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), "");
   gtk_widget_show (GTK_BIN (bmessage)->child);
   gtk_widget_ref (GTK_BIN (bmessage)->child);
+  gtk_signal_connect(GTK_OBJECT(GTK_BIN(bmessage)->child),
+		     "activate",
+		     GTK_SIGNAL_FUNC(balsa_message_handle_mime_part),
+		     0);
 }
 
 

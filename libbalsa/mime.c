@@ -39,6 +39,11 @@
 #define  obstack_chunk_free  g_free
 
 static gchar tmp_file_name[PATH_MAX + 1];
+
+static void        header2row    (gchar * name, gchar * data, struct obstack *html_bfr);
+static void        headers2html  (Message * message, struct obstack *html_bfr);
+
+
 #define obstack_append_string(o, s)   obstack_grow(o, s, strlen(s))
 
 
@@ -275,7 +280,7 @@ audio2html (BODY * bdy, FILE * fp, struct obstack *bfr)
 
 
 void
-application2html (BODY * bdy, FILE * fp, struct obstack *bfr)
+application2html (Message* message, BODY * bdy, FILE * fp, struct obstack *bfr)
 {
   gchar link_bfr[128];
   PARAMETER *bdy_parameter = bdy->parameter;
@@ -293,7 +298,7 @@ application2html (BODY * bdy, FILE * fp, struct obstack *bfr)
       obstack_append_string (bfr, "<BR>");
       bdy_parameter = bdy_parameter->next;
     }
-  snprintf (link_bfr, 128, "<A HREF=memory://%p BODY> APPLICATION</A></td></tr></table>");
+  snprintf (link_bfr, 128, "<A HREF=memory://%p:%p BODY> APPLICATION</A></td></tr></table>", message, bdy);
   obstack_append_string (bfr, link_bfr);
 }
 
@@ -359,7 +364,7 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
 
 
 void
-part2html (BODY * bdy, FILE * fp, struct obstack *html_bfr)
+part2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
 
   switch (bdy->type)
@@ -371,7 +376,7 @@ part2html (BODY * bdy, FILE * fp, struct obstack *html_bfr)
       audio2html (bdy, fp, html_bfr);
       break;
     case TYPEAPPLICATION:
-      application2html (bdy, fp, html_bfr);
+      application2html (message, bdy, fp, html_bfr);
       break;
     case TYPEIMAGE:
       image2html (bdy, fp, html_bfr);
@@ -451,7 +456,7 @@ content2html (Message * message)
   gchar msg_filename[PATH_MAX];
   static struct obstack *html_buffer = 0;
   static gchar *html_buffer_content = (gchar *) - 1;
-
+    
   if (!html_buffer)
     {
       html_buffer = g_malloc (sizeof (struct obstack));
@@ -497,7 +502,7 @@ content2html (Message * message)
   while (body_list)
     {
       body = (Body *) body_list->data;
-      part2html (body->mutt_body, msg_stream, html_buffer);
+      part2html (message, body->mutt_body, msg_stream, html_buffer);
       body_list = g_list_next (body_list);
     }
   obstack_append_string (html_buffer, "</TT></P>\n</BODY></HTML>");

@@ -27,14 +27,14 @@
 
 GString * content2reply (Message * message);
 gchar * content2html (Message * message);
-void part2html (BODY * bdy, FILE * fp, struct obstack *html_bfr);
+void part2html (Message* message, BODY * bdy, FILE * fp, struct obstack *html_bfr);
 void other2html (BODY * bdy, FILE * fp, struct obstack *bfr);
 void mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr);
 void video2html (BODY * bdy, FILE * fp, struct obstack *bfr);
 void multipart2html (BODY * bdy, FILE * fp, struct obstack *bfr);
 void message2html (BODY * bdy, FILE * fp, struct obstack *bfr);
 void image2html (BODY * bdy, FILE * fp, struct obstack *bfr);
-void application2html (BODY * bdy, FILE * fp, struct obstack *bfr);
+void application2html (Message* message, BODY * bdy, FILE * fp, struct obstack *bfr);
 void audio2html (BODY * bdy, FILE * fp, struct obstack *bfr);
 
 

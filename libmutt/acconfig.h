@@ -103,3 +103,6 @@
 
 /* Does your system have the fchdir() call? */
 #undef HAVE_FCHDIR
+
+/* BALSA: use pcre instead of `standard' rexexp's? */
+#undef HAVE_PCRE

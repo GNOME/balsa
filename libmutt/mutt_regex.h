@@ -23,10 +23,16 @@
 #ifndef MUTT_REGEX_H
 #define MUTT_REGEX_H
 
-#ifdef USE_GNU_REGEX
-#include "_regex.h"
+/* BALSA: use PERL compatible Regular Expressions if available */
+#ifdef HAVE_PCRE
+#  include <pcreposix.h>
 #else
-#include <regex.h>
+#  ifdef USE_GNU_REGEX
+#    include "_regex.h"
+#  else
+#    include <sys/types.h>
+#    include <regex.h>
+#  endif
 #endif
 
 /* this is a non-standard option supported by Solaris 2.5.x which allows

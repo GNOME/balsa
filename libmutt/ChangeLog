@@ -1,3 +1,11 @@
+2001-07-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Perl Compatible Regular Expressions by 
+	Albrecht Dreﬂ <albrecht.dress@arcormail.de>:
+	* acconfig.h: 
+	* configure.in: detect PCRE and set HAVE_PCRE.
+	* mutt_regex.h: this is only place where it is used.
+	
 2001-07-16  Pawel Salek  <pawsa@theochem.kth.se>
 
         IMAP flag handling and new mail notification

@@ -58,10 +58,8 @@ balsa_LDADD = \
 	-lPropList	\
 	@LIBESD_LIB@	\
 	$(GNOME_LIBDIR) \
-	$(GNOMEUI_LIBS) \
 	$(top_builddir)/idl/libbalsasrv.a \
-	-lgnorba          \
-	$(ORB_LIBS)       \
+	$(GNOMEGNORBA_LIBS)  \
 	$(INTLLIBS)
 
 dist-hook:

@@ -1,8 +1,13 @@
+Fri Mar 19 03:32:49 1999  Timur Bakeyev  <mc@bat.ru>
+
+	* src/Makefile.am: Change set of "GNOMEUI_LIBS -lgnorba ORB_LIBS" to 
+	GNOMEGNORBA_LIBS, which is more correct and clean. And prevent from 
+	linker errors.
+
 1999-02-24  Sergey Panov  <sipan@mit.edu>
 
         * src/filter-edit-dialog.c, src/pref-manager.c:
         added missed _() macros
-
 
 1999-02-11  Sergey Panov  <sipan@mit.edu>
 
@@ -58,7 +63,6 @@
 	Set the step increment.
 
 1999-01-14  bertrand <Bertrand.Guiheneuf@inria.fr>
-
 
 	* src/mblist-window.c (mblist_open_window): take the 
 	"MailboxListHeight" into account.

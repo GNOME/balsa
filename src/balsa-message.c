@@ -81,12 +81,6 @@ balsa_message_init (BalsaMessage * bmessage)
 {
   bmessage->message = NULL;
   bmessage->html = NULL;
-
-   gnome_canvas_item_new( gnome_canvas_root (GNOME_CANVAS (bmessage)),
-		                    gnome_canvas_rect_get_type(),
-				                      "x1", 0, "y1", 0,
-						                        "x2", 500, "y2", 500,
-									                  "fill_color", "black", NULL);
 }
 
 GtkWidget *
@@ -94,6 +88,12 @@ balsa_message_new (void)
 {
   BalsaMessage *bmessage;
   bmessage = gtk_type_new (balsa_message_get_type ());
+  gnome_canvas_item_new (gnome_canvas_root (GNOME_CANVAS (bmessage)),
+                               gnome_canvas_rect_get_type (),
+	                            "x1", 0.0, "y1", 0.0,
+                              "x2", 1000.0, "y2", 1000.0,
+				   "fill_color", "white", NULL);
+  
   return GTK_WIDGET (bmessage);
 }
 

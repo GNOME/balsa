@@ -178,15 +178,11 @@ bm_item_new (BalsaMessage * bm)
   GnomeCanvasItem *new;
   GtkWidget *html;
 
-  parent = gnome_canvas_root(GNOME_CANVAS(bm));
+  parent = gnome_canvas_root (GNOME_CANVAS (bm));
 
   g_return_val_if_fail (parent != NULL, NULL);
   g_return_val_if_fail (GNOME_IS_CANVAS_GROUP (parent), NULL);
 
-#if 0
-  html = gtk_label_new("Hey!");
-  gtk_widget_show(html);
-  
   html = gtk_xmhtml_new ();
 
   /* create the HTML widget to render the message */
@@ -197,22 +193,29 @@ bm_item_new (BalsaMessage * bm)
 		      "activate",
 		      GTK_SIGNAL_FUNC (bm_item_handle_mime_part),
 		      NULL);
-  new = gnome_canvas_item_new (parent, gnome_canvas_widget_get_type(), "widget", html, NULL);
-#endif
 
-  new = gnome_canvas_item_new(parent,
-		  gnome_canvas_rect_get_type(),
-		  "x1", 0, "y1", 0,
-		  "x2", 500, "y2", 500,
-		  "fill_color", "black", NULL);
-  
+  new = gnome_canvas_item_new (parent,
+			       gnome_canvas_widget_get_type (),
+			       "widget", html,
+			       "x", 0.0, "y", 0.0,
+			       "width", 100.0, "height", 40.0,
+			       "anchor", GTK_ANCHOR_NW,
+			       "size_pixels", FALSE, NULL);
+#if 0
+  new = gnome_canvas_item_new (parent,
+			       gnome_canvas_rect_get_type (),
+			       "x1", 0.0, "y1", 0.0,
+			       "x2", 500.0, "y2", 300.0,
+			       "fill_color", "blue", NULL);
+#endif
+  gtk_widget_show (html);
   return GNOME_CANVAS_ITEM (new);
 }
 
 void
 bm_item_set (BalsaMessage * bmessage,
-		GnomeCanvasItem *item,
-		Message * message)
+	     GnomeCanvasItem * item,
+	     Message * message)
 {
   gchar *buff;
   GtkWidget *html;
@@ -220,8 +223,8 @@ bm_item_set (BalsaMessage * bmessage,
   g_return_if_fail (bmessage != NULL);
   g_return_if_fail (message != NULL);
 #if 0
-  html = GNOME_CANVAS_WIDGET(item)->widget;
-  
+  html = GNOME_CANVAS_WIDGET (item)->widget;
+
   if (bmessage->message == message)
     return;
 

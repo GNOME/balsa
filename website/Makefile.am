@@ -1,6 +1,4 @@
 IN_FILES = \
-	index.html.in \
-	main.html.in \
 	download.html.in \
 	faq.html.in \
 	features.html.in \

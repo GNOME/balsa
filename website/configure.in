@@ -1,4 +1,4 @@
-AC_INIT(index.html.in)
+AC_INIT(images/balsa-logo.jpg)
 dnl AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE(balsa-website, 1.0.0)
 dnl AC_ISC_POSIX
@@ -30,8 +30,6 @@ dnl ############################################################################
 
 AC_OUTPUT([
 Makefile
-index.html
-main.html
 download.html
 faq.html
 features.html

@@ -27,6 +27,7 @@ static Personality *optionspersselected;
 static GtkWidget *account_list;
 static personality_box_options *options = NULL;
 
+static void personality_delete_one (GtkWidget *, gpointer); 
 static void personality_edit (GtkWidget *, gpointer);
 static void personality_pop3_edit (Personality *);
 static void personality_imap_edit (Personality *);
@@ -328,9 +329,6 @@ new_options_box (GtkWidget * widget, gpointer data)
   gtk_widget_show (window);
 }
 
-
-
-
 /*
    FIXME:
    update personalities list and gnome-config stuff... this needs to be updated for
@@ -495,12 +493,12 @@ personality_box (GtkWidget * widget, gpointer data)
   button = gtk_button_new_with_label ("Delete");
   gtk_widget_set_usize (button, 70, 30);
   gtk_box_pack_start (GTK_BOX (vbox), button, TRUE, FALSE, 10);
-/*
+
    gtk_signal_connect_object (GTK_OBJECT (button),
    "clicked",
-   (GtkSignalFunc) account_delete_cb,
+   (GtkSignalFunc) personality_delete_one,
    NULL);
- */
+
   gtk_widget_show (button);
 
   if (mainOptions->pers)
@@ -588,6 +586,30 @@ personality_edit (GtkWidget * widget, gpointer something)
     personality_mbox_edit ((Personality *) (data));
 }
 
+static void
+personality_delete_one (GtkWidget * widget, gpointer something)
+{
+  gint row = selected_clist_row (account_list);
+  GString *gs=g_string_new(NULL);
+  gpointer *data = gtk_clist_get_row_data (GTK_CLIST (account_list), row);
+  gint persnum = ((Personality *) (data))->persnum;
+
+  gtk_clist_remove(GTK_CLIST(account_list),row);
+
+  g_string_sprintf(gs,"/balsa/Accounts/%i",persnum);
+  gnome_config_clean_key(gs->str);
+  fprintf(stderr,"cleaning key: %s\n",gs->str);
+
+  g_string_truncate (gs, 0);
+
+  g_string_sprintf(gs,"/balsa/%s/",((Personality *) (data))->name);
+  gnome_config_clean_section (gs->str);
+  fprintf(stderr,"cleaning section: %s\n",gs->str);
+  g_string_free(gs,1);
+  gnome_config_sync ();
+
+  mainOptions->pers=g_list_remove(mainOptions->pers,data);
+}
 
 static void
 personality_pop3_edit (Personality * currentpers)

@@ -481,12 +481,27 @@ load_messages (Mailbox * mailbox)
   glong msgno;
   Message *message;
   ENVELOPE *envelope;
+  MESSAGECACHE *elt;
   gint remaining = new_messages;
 
 
   for (msgno = mailbox->messages - new_messages + 1; msgno <= CLIENT_STREAM (mailbox)->nmsgs; msgno++)
     {
       envelope = mail_fetchenvelope (CLIENT_STREAM (mailbox), msgno);
+      elt = mail_elt (CLIENT_STREAM (mailbox), msgno);
+
+      if (!elt->seen)
+	message->flags |= MESSAGE_FLAG_NEW;
+
+      if (elt->deleted)
+	message->flags |= MESSAGE_FLAG_DELETED;
+
+      if (elt->flagged)
+	message->flags |= MESSAGE_FLAG_FLAGGED;
+
+      if (elt->answered)
+	message->flags |= MESSAGE_FLAG_ANSWERED;
+
       message = translate_message (envelope);
       message->mailbox = mailbox;
       message->msgno = msgno;
@@ -847,6 +862,8 @@ message_delete (Message * message)
 
   sprintf (tmp, "%ld", message->msgno);
   mail_setflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+
+  message->flags |= MESSAGE_FLAG_DELETED;
   send_watcher_mark_delete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();
@@ -863,6 +880,8 @@ message_undelete (Message * message)
 
   sprintf (tmp, "%ld", message->msgno);
   mail_clearflag (CLIENT_STREAM (message->mailbox), tmp, "\\DELETED");
+
+  message->flags &= !MESSAGE_FLAG_DELETED;
   send_watcher_mark_undelete_message (message->mailbox, message);
 
   UNLOCK_MAILBOX ();

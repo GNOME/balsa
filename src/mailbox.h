@@ -56,6 +56,8 @@ typedef enum
   MESSAGE_MARK_UNDELETE,    /* message has been marked undeleted */
   MESSAGE_DELETE,           /* message has been deleted */
   MESSAGE_NEW,              /* message is new to the mailbox */
+  MESSAGE_FLAGGED,          /* the message was flagged */
+  MESSAGE_ANSWERED          /* the message was answered */
 } MailboxWatcherMessageType;
 
 
@@ -66,14 +68,17 @@ typedef enum
   MESSAGE_MARK_UNDELETE_MASK  = 1 << 3,
   MESSAGE_DELETE_MASK         = 1 << 4,
   MESSAGE_NEW_MASK            = 1 << 5,
+  MESSAGE_FLAGGED_MASK        = 1 << 6,
+  MESSAGE_ANSWERED_MASK       = 1 << 7
 } MailboxWatcherMessageMask;
 
 
 typedef enum
 {
   MESSAGE_FLAG_NEW            = 1 << 1,
-  MESSAGE_FLAG_DELETE         = 1 << 2,
-  MESSAGE_FLAG_ANSWERED       = 1 << 3
+  MESSAGE_FLAG_DELETED        = 1 << 2,
+  MESSAGE_FLAG_ANSWERED       = 1 << 3,
+  MESSAGE_FLAG_FLAGGED        = 1 << 4
 } MessageFlags;
 
 

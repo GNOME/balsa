@@ -35,6 +35,10 @@ static void balsa_index_size_request (GtkWidget * widget, GtkRequisition * requi
 static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
 
+/* statics */
+static char * flag_str (MessageFlags flags);
+
+
 /* clist callbacks */
 static void select_message (GtkWidget * widget,
 			    gint row,
@@ -66,10 +70,8 @@ static void balsa_index_marshal_signal_1 (GtkObject * object,
 					  gpointer func_data,
 					  GtkArg * args);
 
-static gint balsa_index_signals[LAST_SIGNAL] =
-{0};
+static gint balsa_index_signals[LAST_SIGNAL] = {0};
 static GtkBinClass *parent_class = NULL;
-
 
 guint
 balsa_index_get_type ()
@@ -116,14 +118,10 @@ balsa_index_class_init (BalsaIndexClass * klass)
 		    GTK_SIGNAL_OFFSET (BalsaIndexClass, select_message),
 		    balsa_index_marshal_signal_1,
 		    GTK_TYPE_NONE, 2, GTK_TYPE_POINTER, GTK_TYPE_LONG);
-
   gtk_object_class_add_signals (object_class, balsa_index_signals, LAST_SIGNAL);
 
   widget_class->size_request = balsa_index_size_request;
   widget_class->size_allocate = balsa_index_size_allocate;
-
-  container_class->add = NULL;
-  container_class->remove = NULL;
 
   klass->select_message = NULL;
 }
@@ -317,7 +315,7 @@ balsa_index_add (BalsaIndex * bindex,
   if (bindex->mailbox == NULL)
     return;
 
-  text[0] = NULL;
+  text[0] = flag_str (message->flags);
 
   text[1] = buff1;
 
@@ -384,25 +382,22 @@ balsa_index_select_previous (BalsaIndex * bindex)
     gtk_clist_moveto (clist, row, 0, 0.0, 0.0);
 }
 
-void
-balsa_index_set_flag (BalsaIndex * bindex, Message * message, gchar * flag)
+static char *
+flag_str (MessageFlags flags)
 {
-#if 0
-  switch (*flag)
-    {
-    case 'N':
-      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, flag);
-      break;
+  if (flags & MESSAGE_FLAG_DELETED)
+    return "D";
 
-    case 'D':
-      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, flag);
-      break;
+  if (flags & MESSAGE_FLAG_FLAGGED)
+    return "F";
 
-    case ' ':
-      gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), msgno - 1, 0, NULL);
-      break;
-    }
-#endif
+  if (flags & MESSAGE_FLAG_ANSWERED)
+    return "A";
+
+  if (flags & MESSAGE_FLAG_NEW)
+    return "N";
+
+  return NULL;
 }
 
 

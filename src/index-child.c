@@ -56,7 +56,7 @@ index_child_get_type ()
 
 /* callbacks */
 static void mailbox_listener (MailboxWatcherMessage * iw_message);
-static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *);
+static void index_select_cb (GtkWidget * widget, Message * message, GdkEventButton *, gpointer data);
 
 static GtkWidget *create_menu (BalsaIndex * bindex, Message * message);
 
@@ -122,16 +122,16 @@ static GtkWidget *
 index_child_create_view (GnomeMDIChild * child)
 {
   GtkWidget *messagebox;
-  GtkWidget *vbox;
+  GtkWidget *vpane;
   IndexChild *iw;
 
   iw = INDEX_CHILD (child);
 
-  vbox = gtk_vbox_new (TRUE, 0);
-  gtk_widget_show (vbox);
+  vpane = gtk_vpaned_new ();
+  gtk_widget_show (vpane);
 
   iw->index = balsa_index_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), iw->index, TRUE, TRUE, 0);
+  gtk_paned_add1(GTK_PANED(vpane), iw->index);
   gtk_widget_show (iw->index);
 
   balsa_index_set_mailbox (BALSA_INDEX (iw->index), iw->mailbox);
@@ -139,13 +139,13 @@ index_child_create_view (GnomeMDIChild * child)
   gtk_signal_connect (GTK_OBJECT (iw->index),
 		      "select_message",
 		      (GtkSignalFunc) index_select_cb,
-		      NULL);
+		      iw);
 
   iw->watcher_id = mailbox_watcher_set (iw->mailbox,
 				      (MailboxWatcherFunc) mailbox_listener,
 					MESSAGE_NEW_MASK,
 					(gpointer) iw);
-
+  
   if (!mailbox_open_ref (iw->mailbox))
     {
       mailbox_watcher_remove (iw->mailbox, iw->watcher_id);
@@ -158,14 +158,19 @@ index_child_create_view (GnomeMDIChild * child)
       gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
       gtk_widget_show (messagebox);
       gtk_widget_destroy(iw->index);
-      gtk_widget_destroy(vbox);
+      gtk_widget_destroy(vpane);
       g_free(iw);
       iw = NULL;
       return NULL;
     }
   mailbox_open_unref(iw->mailbox);
 
-  return (vbox);
+  iw->message = balsa_message_new ();
+  gtk_paned_add2(GTK_PANED(vpane), iw->message);
+  gtk_widget_show(iw->message);
+	
+  
+  return (vpane);
 }
 
 
@@ -189,7 +194,8 @@ mailbox_listener (MailboxWatcherMessage * iw_message)
 static void
 index_select_cb (GtkWidget * widget,
 		 Message * message,
-		 GdkEventButton * bevent)
+		 GdkEventButton * bevent,
+		 gpointer data)
 {
   g_return_if_fail (widget != NULL);
   g_return_if_fail (BALSA_IS_INDEX (widget));
@@ -197,6 +203,8 @@ index_select_cb (GtkWidget * widget,
 
   set_imap_username(message->mailbox);
 
+  if (bevent && bevent->button == 1 && bevent->type == GDK_BUTTON_PRESS)
+	  balsa_message_set (BALSA_MESSAGE (((IndexChild*)data)->message), message);
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
   else if (bevent && bevent->button == 3)

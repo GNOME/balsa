@@ -211,6 +211,16 @@ check_all_pop3_hosts (Mailbox * to)
       list = list->next;
     }
 }
+
+gint 
+mailbox_have_new_messages (gchar * path)
+{
+  return 1;
+  /*
+     return test_new_folder(path);
+   */
+}
+
 /*
  * allocate a new mailbox
  */
@@ -1086,7 +1096,8 @@ message_body_ref (Message * message)
   if ((msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno)) != NULL)
     {
       b = cur->content;
-      g_print ("%s/%s", TYPE (b->type), b->subtype);
+      if (balsa_app.debug)
+	g_print ("%s/%s", TYPE (b->type), b->subtype);
 
       memset (&s, 0, sizeof (s));
       mutt_mktemp (tmpfile);

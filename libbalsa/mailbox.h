@@ -236,6 +236,7 @@ void mailbox_init (gchar *inbox);
 
 gint set_imap_username(Mailbox *mb);
 void check_all_pop3_hosts(Mailbox *);
+gint mailbox_have_new_messages(gchar *path);
 
 /* 
  * open and close a mailbox 

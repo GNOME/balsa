@@ -20,9 +20,10 @@
 #define __MBLIST_WINDOW_H__
 
 #include "mailbox.h"
+#include "misc.h"
 
 void mblist_open_window (GnomeMDI *);
-void mblist_add_mailbox (Mailbox * mailbox);
+void mblist_add_mailbox (Mailbox *);
 void mblist_remove_mailbox (Mailbox * mailbox);
 
 #endif /* __MBLIST_WINDOW_H__ */

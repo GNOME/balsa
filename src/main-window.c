@@ -27,11 +27,11 @@
 #include "balsa-message.h"
 #include "index-child.h"
 #include "mailbox.h"
+#include "misc.h"
 #include "mailbox-manager.h"
 #include "main-window.h"
 #include "mblist-window.h"
 #include "message-window.h"
-#include "misc.h"
 #include "pref-manager.h"
 #include "sendmsg-window.h"
 
@@ -525,9 +525,9 @@ show_about_box ()
  */
 
 static void
-check_pop3_cb (GtkWidget *widget)
+check_pop3_cb (GtkWidget * widget)
 {
-  check_all_pop3_hosts(balsa_app.inbox);
+  check_all_pop3_hosts (balsa_app.inbox);
 }
 
 static void
@@ -623,13 +623,9 @@ undelete_message_cb (GtkWidget * widget)
 static gboolean
 mblist_add_mailbox_traverse_nodes (GNode * node, gpointer data)
 {
-  Mailbox *mailbox;
   if (node->data)
-    if (((MailboxNode *) node->data)->mailbox)
-      {
-	mailbox = ((MailboxNode *) node->data)->mailbox;
-	mblist_add_mailbox (mailbox);
-      }
+    mblist_add_mailbox (((MailboxNode*)node->data)->mailbox);
+
   return FALSE;
 }
 

@@ -38,6 +38,7 @@ struct _IndexChild
 
     guint watcher_id;
     GtkWidget *index;
+    GtkWidget *message;
     GtkAccelGroup *accel;
   };
 

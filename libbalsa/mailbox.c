@@ -710,6 +710,51 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
     mailbox->unread_messages = 0;
 }
 
+/* libbalsa_mailbox_commit:
+   commits the data to storage (file, IMAP server, etc).
+   Then, it needs to find out:
+   b. new message indexes.
+   a. messages that have been deleted by third party (other proceess
+   accessing shared mailbox).
+   Returns TRUE on success, FALSE on failure.
+*/
+gboolean
+libbalsa_mailbox_commit(LibBalsaMailbox* mailbox)
+{
+    GList *deleted_list = NULL, *list;
+    int rc;
+
+    printf("libbalsa_mailbox_commit: enter\n");
+    if (CLIENT_CONTEXT_CLOSED(mailbox))
+	return FALSE;
+
+    LOCK_MAILBOX(mailbox);
+    libbalsa_lock_mutt();
+    rc = mx_sync_mailbox(CLIENT_CONTEXT(mailbox), NULL);
+
+    for(list = g_list_first(mailbox->message_list); list; list = list->next) {
+	LibBalsaMessage* message = list->data;
+	HEADER *h2 = hash_find(CLIENT_CONTEXT(mailbox)->id_hash,
+			       message->message_id);
+	if(h2 ==NULL) {
+	    printf("Deleting message-id: %s\n", message->message_id);
+	    deleted_list = g_list_append(deleted_list, message);
+	} else
+	    message->msgno = h2->msgno;
+    }
+    libbalsa_unlock_mutt();
+    UNLOCK_MAILBOX(mailbox);
+
+    if(deleted_list) {
+	gtk_signal_emit(GTK_OBJECT(mailbox),
+			libbalsa_mailbox_signals[MESSAGES_DELETE], 
+			deleted_list);
+	g_list_free(deleted_list);
+    }
+    printf("libbalsa_mailbox_commit: synced\n");
+    return rc ==0;
+}
+
 GtkType libbalsa_mailbox_type_from_path(const gchar * filename)
 {
     struct stat st;

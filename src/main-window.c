@@ -2482,8 +2482,7 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
 
     current_mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     
-    if (0 /* FIXME: write the true commit function.
-             libbalsa_mailbox_commit_changes(current_mailbox) != 0 */)
+    if (!libbalsa_mailbox_commit(current_mailbox))
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Commiting mailbox %s failed."),
                           current_mailbox->name);

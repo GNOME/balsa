@@ -1111,6 +1111,8 @@ int mx_sync_mailbox (CONTEXT *ctx, int *index_hint)
     return (0);
   }
 
+#ifndef LIBMUTT
+  /* In balsa, we always purge, no silly questions asked. */
   if (ctx->deleted)
   {
     char buf[SHORT_STRING];
@@ -1135,6 +1137,7 @@ int mx_sync_mailbox (CONTEXT *ctx, int *index_hint)
       }
     }
   }
+#endif /* LIBMUTT */
 
 #ifdef USE_IMAP
   if (ctx->magic == M_IMAP)

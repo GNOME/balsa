@@ -1,3 +1,7 @@
+2001-10-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* mx.c: when asked to sync mailbox, just do it, don't ask questions.
+
 2001-09-22  Peter Bloomfield <PeterBloomfield@MindSpring.Com>
 
 	* sendlib.c: make boundary delimiter self-seeding.

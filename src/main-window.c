@@ -2805,6 +2805,7 @@ find_real(BalsaIndex * bindex, gboolean again)
        CONDITION_NONE if nothing has been set up */
     static LibBalsaCondition * cnd = NULL;
     static gboolean reverse = FALSE;
+    static LibBalsaMailboxSearchIter *search_iter = NULL;
 
     if (!cnd) {
 	cnd = libbalsa_condition_new();
@@ -2929,9 +2930,16 @@ find_real(BalsaIndex * bindex, gboolean again)
 	gtk_widget_destroy(dia);
 	if (ok!=GTK_RESPONSE_OK) return;
 	cnd->type = CONDITION_STRING;
+
+	if (search_iter) {
+	    libbalsa_mailbox_search_iter_free(search_iter);
+	    search_iter = NULL;
+	}
     }
 
-    balsa_index_find(bindex, cnd, reverse);
+    if (!search_iter)
+	search_iter = libbalsa_mailbox_search_iter_new(cnd);
+    balsa_index_find(bindex, search_iter, reverse);
 }
 
 static void

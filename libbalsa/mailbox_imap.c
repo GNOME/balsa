@@ -571,6 +571,8 @@ imap_flags_cb(unsigned seqno, LibBalsaMailboxImap *mimap)
 	    UNLOCK_MAILBOX(LIBBALSA_MAILBOX(mimap));
 	    g_list_free_1(list);
 	}
+	/* invalidate iters; */
+	LIBBALSA_MAILBOX(mimap)->stamp++;
     }
 }
 
@@ -588,6 +590,8 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
             g_array_append_val(mimap->messages_info, a);
             libbalsa_mailbox_msgno_inserted(mailbox, i);
         }
+	/* invalidate iters*/
+	LIBBALSA_MAILBOX(mimap)->stamp++;
     }
 }
 
@@ -890,24 +894,33 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
 	imap_mbox_handle_get_msg(mimap->handle, msgno)) 
 	libbalsa_mailbox_imap_get_message(mailbox, msgno);
 
-    if (msg_info->message)
-	return match_condition(search_iter->condition, msg_info->message,
-			       TRUE);
+    if (libbalsa_condition_can_match(search_iter->condition,
+				     msg_info->message))
+	return libbalsa_condition_matches(search_iter->condition,
+					  msg_info->message, TRUE);
+
+    if (search_iter->stamp != mailbox->stamp && search_iter->mailbox
+	&& LIBBALSA_MAILBOX_GET_CLASS(search_iter->mailbox)->
+	search_iter_free)
+	LIBBALSA_MAILBOX_GET_CLASS(search_iter->mailbox)->
+	    search_iter_free(search_iter);
 
     matchings = search_iter->user_data;
     if (!matchings) {
 	ImapSearchKey* query;
 	ImapResult rc;
 
-	search_iter->user_data = matchings = g_hash_table_new(NULL, NULL);
+	matchings = g_hash_table_new(NULL, NULL);
 	query = lbmi_build_imap_query(search_iter->condition, NULL);
 	rc = imap_mbox_filter_msgnos(mimap->handle, query, matchings);
 	imap_search_key_free(query);
 	if (rc != IMR_OK) {
 	    g_hash_table_destroy(matchings);
-	    search_iter->user_data = NULL;
 	    return FALSE;
 	}
+	search_iter->user_data = matchings;
+	search_iter->mailbox = mailbox;
+	search_iter->stamp = mailbox->stamp;
     }
 
     return g_hash_table_lookup(matchings, GUINT_TO_POINTER(msgno)) != NULL;
@@ -918,8 +931,10 @@ libbalsa_mailbox_imap_search_iter_free(LibBalsaMailboxSearchIter * iter)
 {
     GHashTable *matchings = iter->user_data;
 
-    if (matchings)
+    if (matchings) {
 	g_hash_table_destroy(matchings);
+	iter->user_data = NULL;
+    }
     /* iter->condition and iter are freed in the LibBalsaMailbox method. */
 }
 

@@ -1,7 +1,9 @@
-2002-04-28  Pawel Salek <pawsa@theochem.kth.se>
+2002-04-27  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_{local,pop3}.c: push_prefix() before loading
 	filter configuration.
+	* src/sendmsg-window.c: do not crash on forwarding/including
+	messages without text body.
 
 2002-04-27  Pawel Salek <pawsa@theochem.kth.se>
 

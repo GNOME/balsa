@@ -2231,6 +2231,8 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	body = content2reply(message, NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, msg->flow);
+        if(!body) /* empty message, only non-text content, etc */
+            body = g_string_new(_("<No Text Body>\n"));
 
 	if (type == SEND_FORWARD_INLINE) {
 	    str = g_strdup(_("----- End Forwarded Message -----\n"));
@@ -2342,7 +2344,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
                     || type == SEND_FORWARD_INLINE))
         body = quoteBody(msg, message, type);
     else
-	body = g_string_new("");
+        body = g_string_new("");
 
     if ((signature = read_signature(msg)) != NULL) {
 	if ((reply_any && msg->ident->sig_whenreply)

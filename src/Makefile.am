@@ -27,7 +27,6 @@ balsa_SOURCES =	\
 	index-child.h		\
 	local-mailbox.h		\
 	mailbox-conf.h		\
-	mailbox-manager.h	\
 	main-window.h		\
 	main.h			\
 	mblist-window.h		\

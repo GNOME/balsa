@@ -528,15 +528,10 @@ config_global_load (void)
     return FALSE;
   balsa_app.real_name = g_strdup (field);
 
-  /* user's real name */
-  if ((field = pl_dict_get_str (globals, "UserName")) == NULL)
+  /* user's email address */
+  if ((field = pl_dict_get_str (globals, "Email")) == NULL)
     return FALSE;
-  balsa_app.username = g_strdup (field);
-
-  /* hostname */
-  if ((field = pl_dict_get_str (globals, "HostName")) == NULL)
-    return FALSE;
-  balsa_app.hostname = g_strdup (field);
+  balsa_app.email = g_strdup (field);
 
   /* directory */
   if ((field = pl_dict_get_str (globals, "LocalMailDir")) == NULL)
@@ -615,10 +610,8 @@ config_global_save (void)
   /* Create a new dictionary of global configurations */
   if (balsa_app.real_name != NULL)
     globals = pl_dict_add_str_str (NULL, "RealName", balsa_app.real_name);
-  if (balsa_app.username != NULL)
-    pl_dict_add_str_str (globals, "UserName", balsa_app.username);
-  if (balsa_app.hostname != NULL)
-    pl_dict_add_str_str (globals, "HostName", balsa_app.hostname);
+  if (balsa_app.email != NULL)
+    pl_dict_add_str_str (globals, "Email", balsa_app.email);
   if (balsa_app.local_mail_directory != NULL)
     pl_dict_add_str_str (globals, "LocalMailDir",
 			 balsa_app.local_mail_directory);

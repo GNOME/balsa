@@ -671,7 +671,7 @@ create_pop_mailbox_page (void)
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
 
-  gtk_entry_append_text (GTK_ENTRY (mcw->pop_username), balsa_app.username);
+  gtk_entry_append_text (GTK_ENTRY (mcw->pop_username), g_get_user_name());
 
   gtk_widget_show (mcw->pop_username);
 
@@ -793,7 +793,7 @@ create_imap_mailbox_page (void)
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
 
-  gtk_entry_append_text (GTK_ENTRY (mcw->imap_username), balsa_app.username);
+  gtk_entry_append_text (GTK_ENTRY (mcw->imap_username), g_get_user_name());
 
   gtk_widget_show (mcw->imap_username);
 

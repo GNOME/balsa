@@ -480,7 +480,6 @@ prev_cb (GtkWidget * widget, gpointer data)
 static void
 complete_cb (GtkWidget * widget, gpointer data)
 {
-  gchar *email, *c;
   GString *gs;
   Mailbox *mailbox;
   MailboxType type;
@@ -488,28 +487,8 @@ complete_cb (GtkWidget * widget, gpointer data)
   g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->real_name)));
 
-  email = c = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->email)));
-
-  while (*c != '\0' && *c != '@')
-    c++;
-
-  if (*c == '\0')
-    {
-      g_free (balsa_app.username);
-      balsa_app.username = g_strdup (email);
-    }
-  else
-    {
-      *c = '\0';
-      c++;
-
-      g_free (balsa_app.username);
-      balsa_app.username = g_strdup (email);
-
-      g_free (balsa_app.hostname);
-      balsa_app.hostname = g_strdup (c);
-    }
-  g_free (email);
+  g_free(balsa_app.email);
+  balsa_app.email = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->email)));
 
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->smtp_server)));

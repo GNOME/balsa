@@ -36,8 +36,7 @@ typedef struct _PropertyUI
 
     GtkWidget *real_name, *email, *replyto, *signature;
 
-    GtkWidget *pop3servers;
-    GtkWidget *smtp_server, *mail_directory;
+    GtkWidget *pop3servers, *smtp_server, *mail_directory;
 
     GtkWidget *previewpane;
     GtkWidget *debug;		/* enable/disable debugging */
@@ -198,7 +197,6 @@ cancel_prefs (void)
 static void
 apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 {
-  gchar *email, *c;
   gint i;
 
   /*
@@ -207,36 +205,14 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   g_free (balsa_app.real_name);
   balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->real_name)));
 
-  /* parse username/hostname from the email entry */
-  email = c = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email)));
-
-  while (*c != '\0' && *c != '@')
-    c++;
-
-  if (*c == '\0')
-    {
-      g_free (balsa_app.username);
-      balsa_app.username = g_strdup (email);
-    }
-  else
-    {
-      *c = '\0';
-      c++;
-
-      g_free (balsa_app.username);
-      balsa_app.username = g_strdup (email);
-
-      g_free (balsa_app.hostname);
-      balsa_app.hostname = g_strdup (c);
-    }
-  g_free (email);
+  g_free(balsa_app.email);
+  balsa_app.email = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email)));
 
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->smtp_server)));
 
   g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->mail_directory)));
-
 
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     if (GTK_TOGGLE_BUTTON (pui->toolbar_type[i])->active)
@@ -271,7 +247,6 @@ void
 set_prefs (void)
 {
   gint i;
-  GString *str;
 
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     if (balsa_app.toolbar_style == toolbar_type[i])
@@ -289,11 +264,7 @@ set_prefs (void)
 
   gtk_entry_set_text (GTK_ENTRY (pui->real_name), balsa_app.real_name);
 
-  str = g_string_new (balsa_app.username);
-  g_string_append_c (str, '@');
-  g_string_append (str, balsa_app.hostname);
-  gtk_entry_set_text (GTK_ENTRY (pui->email), str->str);
-  g_string_free (str, TRUE);
+  gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.email);
 
   gtk_entry_set_text (GTK_ENTRY (pui->smtp_server), balsa_app.smtp_server);
 

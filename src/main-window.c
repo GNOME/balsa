@@ -29,7 +29,6 @@
 #include "mailbox.h"
 #include "misc.h"
 #include "main.h"
-#include "mailbox-manager.h"
 #include "main-window.h"
 #include "mblist-window.h"
 #include "message-window.h"

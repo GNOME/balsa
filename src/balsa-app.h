@@ -45,8 +45,6 @@ extern struct BalsaApplication
   proplist_t proplist;
   /* personal information */
   gchar *real_name;
-  gchar *username;
-  gchar *hostname;
   gchar *email;
   gchar *local_mail_directory;
   gchar *smtp_server;

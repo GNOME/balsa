@@ -89,8 +89,7 @@ init_balsa_app (int argc, char *argv[])
    * to some reasonable defaults
    */
   balsa_app.real_name = NULL;
-  balsa_app.username = NULL;
-  balsa_app.hostname = NULL;
+  balsa_app.email = NULL;
   balsa_app.local_mail_directory = NULL;
   balsa_app.smtp_server = NULL;
 

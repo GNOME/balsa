@@ -343,11 +343,8 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   GTK_WIDGET_UNSET_FLAGS (msg->from, GTK_CAN_FOCUS);
   gtk_entry_set_editable (GTK_ENTRY (msg->from), FALSE);
 
-  from = g_malloc (strlen (balsa_app.real_name) + 2 + strlen (balsa_app.username) + 1 + strlen (balsa_app.hostname) + 2);
-  sprintf (from, "%s <%s@%s>",
-	   balsa_app.real_name,
-	   balsa_app.username,
-	   balsa_app.hostname);
+  from = g_malloc (strlen (balsa_app.real_name) + 2 + strlen (balsa_app.email) + 2);
+  sprintf (from, "%s <%s>", balsa_app.real_name, balsa_app.email);
 
   gtk_entry_set_text (GTK_ENTRY (msg->from), from);
   gtk_widget_show (msg->from);
@@ -487,9 +484,9 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
 
 
-	  rbdy = content2reply(message);
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, strlen(rbdy->str));
-	  g_string_free(rbdy, TRUE);
+	  rbdy = content2reply (message);
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, strlen (rbdy->str));
+	  g_string_free (rbdy, TRUE);
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 	}
       message_body_unref (message);
@@ -511,8 +508,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->from = address_new ();
   message->from->personal = g_strdup (balsa_app.real_name);
-  message->from->mailbox = g_malloc (strlen (balsa_app.username) + strlen (balsa_app.hostname) + 2);
-  sprintf (message->from->mailbox, "%s@%s", balsa_app.username, balsa_app.hostname);
+  message->from->mailbox = g_strdup(balsa_app.email);
   message->subject = g_strdup (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
 
   message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));

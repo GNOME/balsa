@@ -597,8 +597,9 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 	    }
 	} else {
 	    /* write From_ & message */
-	    if (g_mime_stream_write_string(temp_stream,
-					   msg_info->from) == -1
+	    if (!msg_info->from
+		|| g_mime_stream_write_string(temp_stream,
+					      msg_info->from) == -1
 		|| g_mime_stream_write_string(temp_stream, "\n") == -1
 		|| g_mime_message_write_to_stream(msg_info->message->mime_msg,
 						  temp_stream) == -1
@@ -750,15 +751,8 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
 
-    g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
-    g_assert(msgno > 0);
-    g_assert(msgno <= (unsigned)mailbox->total_messages);
-
     msg_info = &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
 			      struct message_info, msgno-1);
-
-    if (!msg_info)
-	return NULL;
 
     if (!msg_info->message)
 	msg_info->message = 
@@ -1065,4 +1059,6 @@ libbalsa_mailbox_mbox_change_message_flags(LibBalsaMailbox * mailbox,
 
     update_message_status_headers(msg_info->message->mime_msg,
 				  msg_info->flags);
+
+    libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }

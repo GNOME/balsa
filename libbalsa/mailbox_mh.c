@@ -1004,4 +1004,6 @@ libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox, guint msgno,
     g_return_if_fail (msg_info != NULL);
     msg_info->flags |= set;
     msg_info->flags &= ~clear;
+
+    libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }

@@ -53,6 +53,7 @@ GtkType balsa_mblist_get_type(void);
 GtkWidget *balsa_mblist_new(void);
 
 void balsa_mblist_repopulate(BalsaMBList * bmbl);
+void mblist_default_signal_bindings(BalsaMBList * tree);
 
 void balsa_mblist_have_new(BalsaMBList * bmbl);
 void balsa_mblist_update_mailbox(BalsaMBList * mblist,

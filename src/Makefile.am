@@ -23,7 +23,7 @@ balsa_SOURCES =	\
 
 INCLUDES=-I. -I$(srcdir)/../c-client $(GNOME_INCLUDEDIR)
 
-balsa_LDADD = -L$(srcdir)/../c-client/c-client.a \
+balsa_LDADD = $(top_builddir)/c-client/libc-client.a \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \
 	$(GTKXMHTML_LIBS) \

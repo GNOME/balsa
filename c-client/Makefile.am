@@ -1,6 +1,6 @@
-C_CLIENT_LIB = c-client.a
+noinst_LIBRARIES = libc-client.a
 
-C_CLIENT_SOURCES =	\
+libc_client_a_SOURCES = \
 	mail.c		\
 	misc.c		\
 	newsrc.c	\
@@ -29,4 +29,15 @@ C_CLIENT_SOURCES =	\
 	mh.c		\
 	mx.c
 
-INCLUDES=-I. -I$(srcdir)/../imap/c-client $(GNOME_INCLUDEDIR)
+INCLUDES = -I.
+
+# erk hardcoded stuff
+
+CPPFLAGS = \
+	-DNFSKLUDGE					\
+	-DSTDPROTO=unixproto				\
+	-DMAILSPOOL=\"/var/spool/mail\"			\
+	-DANONYMOUSHOME=\"/var/spool/mail/anonymous\"	\
+	-DACTIVEFILE=\"/usr/lib/news/active\"		\
+	-DNEWSSPOOL=\"/var/spool/news\"			\
+	-DRSHPATH=\"/usr/bin/rsh\"

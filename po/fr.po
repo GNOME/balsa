@@ -1,0 +1,103 @@
+# balsa fr.po
+# Copyright (C) 1998 Free Software Foundation, Inc.
+# Vincent Renardias <vincent@waw.com>, 1998.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: balsa VERSION\n"
+"POT-Creation-Date: 1998-05-31 20:26+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Vincent Renardias <vincent@waw.com>\n"
+"Language-Team: Vincent Renardias <vincent@waw.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/sendmsg-window.c:138
+msgid "Send"
+msgstr "Envoyer"
+
+#: src/sendmsg-window.c:149
+msgid "Attach File"
+msgstr "Attacher fichier"
+
+#: src/addrbook-manager.c:180 src/sendmsg-window.c:160
+msgid "Close"
+msgstr "Fermer"
+
+#: src/main-window.c:450 src/sendmsg-window.c:168
+msgid "Message"
+msgstr "Message"
+
+#: src/sendmsg-window.c:175
+msgid "Cut"
+msgstr "Couper"
+
+#: src/sendmsg-window.c:182
+msgid "Copy"
+msgstr "Copier"
+
+#: src/sendmsg-window.c:189
+msgid "Paste"
+msgstr "Coller"
+
+#: src/sendmsg-window.c:196
+msgid "Edit"
+msgstr "Edition"
+
+#: src/addrbook-manager.c:195 src/sendmsg-window.c:204
+msgid "Contents"
+msgstr "Contenu"
+
+#: src/addrbook-manager.c:200 src/main-window.c:507 src/sendmsg-window.c:209
+msgid "Help"
+msgstr "Aide"
+
+#: src/addrbook-manager.c:188 src/main-window.c:367
+msgid "File"
+msgstr "Fichier"
+
+#: src/main-window.c:337
+msgid "Get New Mail"
+msgstr "Récupérer les nouveaux messages"
+
+#: src/main-window.c:355
+msgid "Exit"
+msgstr "Quitter"
+
+#: src/main-window.c:377
+msgid "New"
+msgstr "Nouveau"
+
+#: src/main-window.c:390
+msgid "Reply"
+msgstr "Répondre"
+
+#: src/main-window.c:403
+msgid "Foward"
+msgstr "Faire suivre"
+
+#: src/main-window.c:419
+msgid "Delete"
+msgstr "Effacer"
+
+#: src/main-window.c:435
+msgid "Undelete"
+msgstr "Récupérer"
+
+#: src/main-window.c:460
+msgid "Preferences..."
+msgstr "Préférences..."
+
+#: src/main-window.c:472
+msgid "Mailbox Manager..."
+msgstr "Gestionnaire de dossiers..."
+
+#: src/main-window.c:484
+msgid "Settings"
+msgstr "Configuration"
+
+#: src/main-window.c:494
+msgid "About"
+msgstr "A Propos"

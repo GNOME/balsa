@@ -30,7 +30,7 @@ dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
 
-ALL_LINGUAS="ko de"
+ALL_LINGUAS="ko de fr ga"
 AM_GNU_GETTEXT
 
 

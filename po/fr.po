@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
-"POT-Creation-Date: 1998-05-31 20:26+0200\n"
+"POT-Creation-Date: 1998-06-20 15:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vincent Renardias <vincent@waw.com>\n"
 "Language-Team: Vincent Renardias <vincent@waw.com>\n"
@@ -26,7 +26,7 @@ msgstr "Attacher fichier"
 msgid "Close"
 msgstr "Fermer"
 
-#: src/main-window.c:450 src/sendmsg-window.c:168
+#: src/main-window.c:305 src/sendmsg-window.c:168
 msgid "Message"
 msgstr "Message"
 
@@ -50,54 +50,58 @@ msgstr "Edition"
 msgid "Contents"
 msgstr "Contenu"
 
-#: src/addrbook-manager.c:200 src/main-window.c:507 src/sendmsg-window.c:209
+#: src/addrbook-manager.c:200 src/main-window.c:373 src/sendmsg-window.c:209
 msgid "Help"
 msgstr "Aide"
 
-#: src/addrbook-manager.c:188 src/main-window.c:367
+#: src/addrbook-manager.c:188 src/main-window.c:222
 msgid "File"
 msgstr "Fichier"
 
-#: src/main-window.c:337
+#: src/main-window.c:192
 msgid "Get New Mail"
 msgstr "Récupérer les nouveaux messages"
 
-#: src/main-window.c:355
+#: src/main-window.c:210
 msgid "Exit"
 msgstr "Quitter"
 
-#: src/main-window.c:377
+#: src/main-window.c:232
 msgid "New"
 msgstr "Nouveau"
 
-#: src/main-window.c:390
+#: src/main-window.c:245
 msgid "Reply"
 msgstr "Répondre"
 
-#: src/main-window.c:403
+#: src/main-window.c:258
 msgid "Foward"
 msgstr "Faire suivre"
 
-#: src/main-window.c:419
+#: src/main-window.c:274
 msgid "Delete"
 msgstr "Effacer"
 
-#: src/main-window.c:435
+#: src/main-window.c:290
 msgid "Undelete"
 msgstr "Récupérer"
 
-#: src/main-window.c:460
+#: src/main-window.c:316
+msgid "Mailbox List"
+msgstr "Liste des B.A.L."
+
+#: src/main-window.c:327
 msgid "Preferences..."
 msgstr "Préférences..."
 
-#: src/main-window.c:472
+#: src/main-window.c:338
 msgid "Mailbox Manager..."
 msgstr "Gestionnaire de dossiers..."
 
-#: src/main-window.c:484
+#: src/main-window.c:350
 msgid "Settings"
 msgstr "Configuration"
 
-#: src/main-window.c:494
+#: src/main-window.c:360
 msgid "About"
 msgstr "A Propos"

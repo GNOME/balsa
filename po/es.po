@@ -1,3 +1,4 @@
+# traducción de es.po al Spanish
 # translation of es.po to Spanish
 # translation of balsa.HEAD.po to Spanish
 # translation of balsa.HEAD.es.po to Spanish
@@ -14,7 +15,7 @@ msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-08-19 00:02+0100\n"
-"PO-Revision-Date: 2004-05-30 13:45+0200\n"
+"PO-Revision-Date: 2004-08-21 01:46+0200\n"
 "Last-Translator: Francisco Javier F. Serrador <serrador@cvs.gnome.org>\n"
 "Language-Team: Spanish <traductores@es.gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -51,7 +52,6 @@ msgid "No-Name"
 msgstr "Sin nombre"
 
 #: libbalsa/address-book-ldap.c:261
-#, fuzzy
 msgid "TLS requested but not compiled in"
 msgstr "Se pidió TLS pero no hay soporte TLS compilado"
 
@@ -250,9 +250,8 @@ msgid "%s: signature verification failed: %s"
 msgstr "%s: la verificación de la firma falló: %s"
 
 #: libbalsa/gmime-gpgme-context.c:582
-#, fuzzy
 msgid "combined signing and encryption is only defined for RFC 2440"
-msgstr "la firma y el descifrado han fallado"
+msgstr "la firma y el descifrado combinado sólo están definidos para el RFC 2440"
 
 #: libbalsa/gmime-gpgme-context.c:652
 #, c-format
@@ -510,7 +509,7 @@ msgstr "No se puede conectar con el servidor: %s"
 #: libbalsa/imap-server.c:638
 #, c-format
 msgid "Exceeded the number of connections per server %s"
-msgstr ""
+msgstr "Se sobrepasó el número de conexiones por servidor %s"
 
 #: libbalsa/libbalsa.c:279
 #, c-format
@@ -520,9 +519,8 @@ msgstr "Directorio LDAP para %s"
 # libmutt/imap/imap_ssl.c:297
 # libmutt/imap/imap_ssl.c:297
 #: libbalsa/libbalsa.c:384
-#, fuzzy
 msgid "Invalid date"
-msgstr "[fecha inválida]"
+msgstr "Fecha inválida"
 
 # libmutt/imap/imap_ssl.c:254
 # libmutt/imap/imap_ssl.c:254
@@ -615,12 +613,12 @@ msgstr "No se pudo crear un buzón del tipo %s"
 #. login information...
 #: libbalsa/mailbox_imap.c:481
 msgid "IMAP connection has been severed. Reconnecting..."
-msgstr ""
+msgstr "La conexión IMAP se ha cortado. Reconectando..."
 
 #: libbalsa/mailbox_imap.c:484
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
-msgstr ""
+msgstr "El servidor IMAP ha terminado la conexión: %s reconectando..."
 
 #: libbalsa/mailbox_imap.c:825
 #, c-format
@@ -646,7 +644,7 @@ msgstr ""
 
 #: libbalsa/mailbox_imap.c:2186
 msgid "Server-side threading not supported."
-msgstr ""
+msgstr "Los hilos de conversación en el lado del servidor no están soportados."
 
 #: libbalsa/mailbox_local.c:1267
 #, c-format
@@ -822,7 +820,7 @@ msgstr "Error al acceder al buzón POP3 %s:%s\n"
 #: libbalsa/mailbox_pop3.c:535
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
-msgstr ""
+msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d kB - se salta."
 
 #: libbalsa/mailbox_pop3.c:546
 #, c-format
@@ -865,14 +863,12 @@ msgstr ""
 #: libbalsa/message.c:481
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
-msgstr ""
-"El buzón de origen (%s) es de sólo lectura. No se pueden mover los mensajes"
+msgstr "El buzón de origen (%s) es de sólo lectura. No se pueden mover los mensajes"
 
 #: libbalsa/message.c:633 libbalsa/message.c:673
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
-msgstr ""
-"El buzón de origen (%s) es de sólo lectura. No se pueden cambiar los flags."
+msgstr "El buzón de origen (%s) es de sólo lectura. No se pueden cambiar los flags."
 
 #: libbalsa/mime.c:80 src/balsa-message.c:2296 src/print.c:680
 #, c-format
@@ -978,8 +974,7 @@ msgstr "la creación de un contexto gpgme ha fallado"
 
 #: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
 msgid "Enter passphrase to unlock the secret key for signing"
-msgstr ""
-"Introduzca la frase de paso para desbloquear la clave secreta para firmar"
+msgstr "Introduzca la frase de paso para desbloquear la clave secreta para firmar"
 
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
@@ -1033,18 +1028,14 @@ msgid "The signature is valid but expired."
 msgstr "La firma es válida pero expiró."
 
 #: libbalsa/rfc3156.c:871
-msgid ""
-"The signature is valid but the key used to verify the signature has expired."
-msgstr ""
-"La firma es válida pero la clave usada para verificar la firma ha expirado."
+msgid "The signature is valid but the key used to verify the signature has expired."
+msgstr "La firma es válida pero la clave usada para verificar la firma ha expirado."
 
 #: libbalsa/rfc3156.c:874
-#, fuzzy
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
-msgstr ""
-"La firma es válida pero la clave usada para verificar la firma ha expirado."
+msgstr "La firma es válida pero la clave usada para verificar la firma se ha revocado."
 
 #: libbalsa/rfc3156.c:877
 msgid "The signature is invalid (Note: might be caused by gmime bug!)."
@@ -1060,8 +1051,7 @@ msgstr "Esta parte no es una firma PGP real."
 
 #: libbalsa/rfc3156.c:885
 msgid "The signature could not be verified due to an invalid crypto engine."
-msgstr ""
-"La firma no pudo ser verificada debido a un motor criptográfico inválido."
+msgstr "La firma no pudo ser verificada debido a un motor criptográfico inválido."
 
 #: libbalsa/rfc3156.c:888 libbalsa/rfc3156.c:1543
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
@@ -1197,25 +1187,23 @@ msgstr ""
 
 #: libbalsa/rfc3156.c:978
 msgid " revoked"
-msgstr ""
+msgstr "revocada"
 
 # src/main-window.c:448
 # src/main-window.c:455
 #: libbalsa/rfc3156.c:983
-#, fuzzy
 msgid " expired"
-msgstr "Respondido"
+msgstr "caducada"
 
 #: libbalsa/rfc3156.c:988
 msgid " disabled"
-msgstr ""
+msgstr "desactivada"
 
 # libmutt/imap/imap_ssl.c:297
 # libmutt/imap/imap_ssl.c:297
 #: libbalsa/rfc3156.c:993
-#, fuzzy
 msgid " invalid"
-msgstr "[fecha inválida]"
+msgstr "inválida"
 
 #: libbalsa/rfc3156.c:996
 #, c-format
@@ -1223,15 +1211,17 @@ msgid ""
 "\n"
 "Key attributes:%s"
 msgstr ""
+"\n"
+"Atributos de la clave:%s"
 
 #: libbalsa/rfc3156.c:998
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Key attribute:%s"
 msgstr ""
 "\n"
-"Clave creada el: %s"
+"Atributo de la clave: %s"
 
 # src/balsa-message.c:718
 # src/balsa-message.c:780
@@ -1480,7 +1470,7 @@ msgstr "Este mensaje no será encriptado para los destinatarios BCC."
 #: libbalsa/server.c:370
 #, c-format
 msgid "Logging in to %s using %s"
-msgstr ""
+msgstr "Iniciando sesión en %s usando %s"
 
 # src/sendmsg-window.c:191
 # src/sendmsg-window.c:196
@@ -2163,23 +2153,23 @@ msgstr "Falló al copiar el mensaje al buzón «%s»."
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: src/balsa-index.c:1956
-#, fuzzy, c-format
+#, c-format
 msgid "Copied to \"%s\"."
-msgstr "Copiando mensaje %d a %s..."
+msgstr "Copiado a «%s»."
 
 # src/balsa-index-page.c:495
 # src/balsa-index-page.c:546
 #: src/balsa-index.c:1957
-#, fuzzy, c-format
+#, c-format
 msgid "Moved to \"%s\"."
-msgstr "Enviar a la _papelera"
+msgstr "Movido a «%s»."
 
 # src/mblist-window.c:478 src/mblist-window.c:494 src/mblist-window.c:513
 # src/mblist-window.c:528
 # src/mblist-window.c:501 src/mblist-window.c:517 src/mblist-window.c:536
 # src/mblist-window.c:551
 #: src/balsa-index.c:2073
-#, fuzzy, c-format
+#, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Ha fallado el efectuar cambios en el buzón %s."
 
@@ -2328,9 +2318,9 @@ msgstr "Notificación:"
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
 #: src/balsa-message.c:1591
-#, fuzzy, c-format
+#, c-format
 msgid "Error loading attached image: %s\n"
-msgstr "Ha ocurrido un error al cargar %s: %s\n"
+msgstr "Ha ocurrido un error al cargar la imagen adjunta: %s\n"
 
 # src/balsa-message.c:713
 # src/balsa-message.c:775
@@ -2393,9 +2383,8 @@ msgid "Subject: %s\n"
 msgstr "Asunto: %s\n"
 
 #: src/balsa-message.c:1778
-#, fuzzy
 msgid "Se_nd message to obtain this part"
-msgstr "Enviar mensaje para obtener esta parte"
+msgstr "_Enviar mensaje para obtener esta parte"
 
 #: src/balsa-message.c:1883
 #, c-format
@@ -2420,17 +2409,16 @@ msgstr ""
 # src/balsa-message.c:725
 # src/balsa-message.c:788
 #: src/balsa-message.c:1903
-#, fuzzy
 msgid "S_ave part"
-msgstr "Guardar parte"
+msgstr "_Guardar parte"
 
 # ¿con "part" se refiere a MIME part?
 # src/balsa-message.c:701
 # src/balsa-message.c:812
 #: src/balsa-message.c:1927 src/balsa-message.c:1952
-#, fuzzy, c-format
+#, c-format
 msgid "View _part with %s"
-msgstr "Ver parte con %s"
+msgstr "Ver _parte con %s"
 
 # libmutt/mx.c:630
 # libmutt/mx.c:630
@@ -2499,21 +2487,20 @@ msgstr "mensaje rfc822 (desde %s, asunto «%s»)"
 # src/balsa-message.c:651
 # src/balsa-message.c:713
 #: src/balsa-message.c:2737
-#, fuzzy
 msgid "complete message"
-msgstr "Redactar un mensaje"
+msgstr "completar un mensaje"
 
 #: src/balsa-message.c:2754
-#, fuzzy, c-format
+#, c-format
 msgid "part %s: %s (file %s)"
-msgstr "%s: la firma falló:%s"
+msgstr "la parte %s: %s (archivo %s)"
 
 # src/mailbox-conf.c:485
 # src/mailbox-conf.c:490
 #: src/balsa-message.c:2765
-#, fuzzy, c-format
+#, c-format
 msgid "part %s: %s"
-msgstr "%s: %s"
+msgstr "parte %s: %s"
 
 # ¿con "part" se refiere a MIME part?
 # src/balsa-message.c:701
@@ -2634,9 +2621,8 @@ msgstr ""
 "MIME, pero este protocolo criptográfico no está disponible."
 
 #: src/balsa-message.c:4513 src/balsa-message.c:4730
-#, fuzzy
 msgid "_Run gpg to import this key"
-msgstr "ejecutar gpg para importar esta clave"
+msgstr "_Ejecutar gpg para importar esta clave"
 
 #: src/filter-edit-callbacks.c:286
 msgid "One of the specified fields contains:"
@@ -2674,8 +2660,7 @@ msgstr "Coincide cuando no tiene ninguna de estas marcas:"
 
 #: src/filter-edit-callbacks.c:449
 msgid "You must specify the name of the user header to match on"
-msgstr ""
-"Debe especificar el nombre de la cabecera de usuario con la que coincidir"
+msgstr "Debe especificar el nombre de la cabecera de usuario con la que coincidir"
 
 #: src/filter-edit-callbacks.c:464
 msgid "You must specify at least one field for matching"
@@ -2773,8 +2758,7 @@ msgstr "Dentro/fuera del intervalo de fechas"
 
 #: src/filter-edit-callbacks.c:964
 msgid "Match when one flag is set/when no flag is set"
-msgstr ""
-"Coincide cuando tiene una marca puesta/cuando no tiene una marca puesta"
+msgstr "Coincide cuando tiene una marca puesta/cuando no tiene una marca puesta"
 
 # src/filter-edit-dialog.c:271
 # src/filter-edit-dialog.c:263
@@ -3156,11 +3140,11 @@ msgstr "_Básico"
 
 #: src/folder-conf.c:287
 msgid "_Max number of connections"
-msgstr ""
+msgstr "Número _máximo de conexiones"
 
 #: src/folder-conf.c:294 src/mailbox-conf.c:1201
 msgid "Enable _persistent cache"
-msgstr ""
+msgstr "Activar caché _persistente"
 
 # src/address-book-config.c:427 src/filter-edit-dialog.c:414
 # src/mailbox-conf.c:292 src/mailbox-conf.c:931 src/pref-manager.c:1099
@@ -3203,9 +3187,8 @@ msgid "Subscribed _folders only"
 msgstr "Sólo carpetas _suscritas"
 
 #: src/folder-conf.c:336
-#, fuzzy
 msgid "Always show _INBOX"
-msgstr "_Siempre mostrar bandeja de entrada"
+msgstr "Siempre mostrar _bandeja de entrada"
 
 #: src/folder-conf.c:339
 msgid "Pr_efix"
@@ -3584,22 +3567,24 @@ msgstr "La edición de la carpeta a ser escrita."
 
 # src/mailbox-conf.c:581
 #: src/mailbox-node.c:420
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
-msgstr "Falló la inspección de %s: %s"
+msgstr ""
+"Falló el escrutinio de %s: %s\n"
+"Compruebe la conexión de red."
 
 # src/mailbox-conf.c:581
 #: src/mailbox-node.c:422
 #, c-format
 msgid "Scanning of %s failed: %s"
-msgstr "Falló la inspección de %s: %s"
+msgstr "Falló el escrutinio de %s: %s"
 
 #: src/mailbox-node.c:471
 #, c-format
 msgid "Scanning %s. Please wait..."
-msgstr "Inspeccionando %s. Espere por favor..."
+msgstr "Escrutando %s. Espere por favor..."
 
 # src/mailbox-conf.c:718
 # src/mailbox-conf.c:793
@@ -3715,7 +3700,7 @@ msgstr "Carpeta local %s\n"
 
 #: src/main-window.c:274
 msgid "Balsa closes files and connections. Please wait..."
-msgstr ""
+msgstr "Balsa cierra loas archivos y conexiones. Espere..."
 
 # src/main-window.c:338
 # src/main-window.c:341
@@ -4131,9 +4116,8 @@ msgid "Save Current Part..."
 msgstr "Guardar parte actual..."
 
 #: src/main-window.c:629 src/main-window.c:1043
-#, fuzzy
 msgid "Save currently displayed part of message"
-msgstr "Guarda la parte actual del mensaje"
+msgstr "Guarda la parte mostrada actualmente del mensaje"
 
 #: src/main-window.c:635 src/main-window.c:995 src/message-window.c:185
 msgid "_View Source..."
@@ -4226,14 +4210,12 @@ msgstr "Borrar el buzón seleccionado"
 # libmutt/mx.c:1065
 # libmutt/mx.c:1065
 #: src/main-window.c:731
-#, fuzzy
 msgid "E_xpunge Deleted Messages"
-msgstr "¿Purgar %d mensajes borrados?"
+msgstr "_Purgar los mensajes borrados"
 
 #: src/main-window.c:732 src/main-window.c:829
-#, fuzzy
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
-msgstr "Efectuar los cambios en el buzón actualmente abierto"
+msgstr "Purgar los mensajes marcados como borrados en el buzón actualmente abierto"
 
 # src/main-window.c:399
 # src/main-window.c:401
@@ -4256,14 +4238,12 @@ msgstr "Borrar los mensajes de la papelera"
 # src/filter-edit-dialog.c:783
 # src/filter-edit-dialog.c:693
 #: src/main-window.c:746
-#, fuzzy
 msgid "Select _Filters"
-msgstr "Restablecer _filtro"
+msgstr "Seleccionar _filtros"
 
 #: src/main-window.c:747 src/main-window.c:1065
-#, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Seleccionar todos los mensajes en el buzón actual"
+msgstr "Seleccionar los filtros que se aplicarán automáticamente al buzón actual"
 
 #: src/main-window.c:760
 msgid "_Toolbars..."
@@ -4297,150 +4277,130 @@ msgstr "_Mensaje"
 
 # libmutt/mbox.c:1066
 #: src/main-window.c:789
-#, fuzzy
 msgid "New mailbox..."
-msgstr "Reabriendo el buzón..."
+msgstr "Buzón nuevo..."
 
 # src/mailbox-conf.c:718
 # src/mailbox-conf.c:793
 #: src/main-window.c:794
-#, fuzzy
 msgid "New \"Maildir\" mailbox..."
-msgstr "Buzón Maildir local..."
+msgstr "Buzón «Maildir» nuevo..."
 
 # src/mailbox-conf.c:718
 # src/mailbox-conf.c:793
 #: src/main-window.c:798
-#, fuzzy
 msgid "New \"MH\" mailbox..."
-msgstr "Buzón MH local..."
+msgstr "Buzón «MH» nuevo..."
 
 # src/main-window.c:399
 # src/main-window.c:401
 #: src/main-window.c:828
-#, fuzzy
 msgid "_Compress Mailbox"
-msgstr "Cerrar buzón"
+msgstr "_Comprimir buzón"
 
 # src/balsa-mblist.c:218 src/mailbox-conf.c:950
 # src/balsa-mblist.c:218 src/mailbox-conf.c:1023
 #: src/main-window.c:858
-#, fuzzy
 msgid "Mail_boxes"
-msgstr "_Buzón"
+msgstr "_Buzones"
 
 #: src/main-window.c:883
 msgid "By _Arrival"
-msgstr ""
+msgstr "Por _llegada"
 
 #: src/main-window.c:883
 msgid "Arrival order"
-msgstr ""
+msgstr "Orden de llegada"
 
 # src/address-book.c:477
 # src/address-book.c:523
 #: src/main-window.c:887
-#, fuzzy
 msgid "By _Sender"
-msgstr "_Enviar a"
+msgstr "Por _remitente"
 
 #: src/main-window.c:887
 msgid "Sender order"
-msgstr ""
+msgstr "Orden por remitente"
 
 # src/balsa-index.c:304 src/filter-edit-dialog.c:349
 # src/balsa-index.c:297 src/filter-edit-dialog.c:326
 #: src/main-window.c:891
-#, fuzzy
 msgid "By S_ubject"
-msgstr "_Asunto"
+msgstr "Por _asunto"
 
 # src/balsa-index.c:304 src/filter-edit-dialog.c:349
 # src/balsa-index.c:297 src/filter-edit-dialog.c:326
 #: src/main-window.c:891
-#, fuzzy
 msgid "Subject order"
-msgstr "Asunto"
+msgstr "Orden por asunto"
 
 # src/balsa-index.c:305
 # src/balsa-index.c:298
 #: src/main-window.c:895
-#, fuzzy
 msgid "By _Date"
-msgstr "Fecha"
+msgstr "Por _fecha"
 
 #: src/main-window.c:895
 msgid "By sending date"
-msgstr ""
+msgstr "Por fecha de envío"
 
 # src/filter-edit-dialog.c:45
 # src/filter-edit-dialog.c:44
 #: src/main-window.c:899
-#, fuzzy
 msgid "By Si_ze"
-msgstr "Tamaño"
+msgstr "Por _tamaño"
 
 #: src/main-window.c:899
-#, fuzzy
 msgid "By message size"
-msgstr "Auto-ajustar las líneas del mensaje"
+msgstr "Por tamaño del mensaje"
 
 #: src/main-window.c:903
-#, fuzzy
 msgid "_Threaded"
-msgstr "Conversaciones"
+msgstr "_Conversaciones"
 
 #: src/main-window.c:903
-#, fuzzy
 msgid "Use message threading"
-msgstr "Conversaciones si_mples"
+msgstr "Usar hilado en conversaciones"
 
 # src/main-window.c:267 src/message-window.c:61
 # src/main-window.c:269
 #: src/main-window.c:927
-#, fuzzy
 msgid "_Headers"
-msgstr "Sin _cabeceras"
+msgstr "_Cabeceras"
 
 # src/pref-manager.c:1087
 # src/pref-manager.c:1218
 #: src/main-window.c:930
-#, fuzzy
 msgid "_Sort Mailbox"
-msgstr "Mo_strar árbol de buzones"
+msgstr "_Ordenar buzón"
 
 # src/main-window.c:259
 # src/main-window.c:262
 #: src/main-window.c:945
-#, fuzzy
 msgid "_View filter"
-msgstr "Nuevo filtro"
+msgstr "Filtro de _vista"
 
 #: src/main-window.c:946
-#, fuzzy
 msgid "Enable quick message index filter"
-msgstr "No se pudo cargar el cuerpo del mensaje que coincida con el filtro"
+msgstr "Activar el filtro rápido de indexado de mensajes"
 
 #: src/main-window.c:982 src/main-window.c:1056 src/sendmsg-window.c:501
 #: src/sendmsg-window.c:559 src/sendmsg-window.c:619
-#, fuzzy
 msgid "_More"
-msgstr "_Coreano"
+msgstr "_Más"
 
 # src/main-window.c:191
 # src/main-window.c:196
 #: src/main-window.c:1015
-#, fuzzy
 msgid "_New..."
-msgstr "_Nuevo"
+msgstr "_Nuevo..."
 
 # src/message-window.c:120
 # src/message-window.c:114
 #. F
 #: src/main-window.c:1035
-#, fuzzy
 msgid "_Forward..."
-msgstr "Reenviar"
+msgstr "_Reenviar..."
 
 #: src/main-window.c:1036 src/toolbar-factory.c:105
 msgid "Forward the current message"
@@ -4450,35 +4410,30 @@ msgstr "Reenviar el mensaje actual"
 # src/balsa-index-page.c:546
 #. D
 #: src/main-window.c:1049
-#, fuzzy
 msgid "_Delete to Trash"
-msgstr "Enviar a la _papelera"
+msgstr "_Borrar a la papelera"
 
 # src/main-window.c:177
 # src/main-window.c:184
 #: src/main-window.c:1061
-#, fuzzy
 msgid "_Manage..."
-msgstr "C_ambiar..."
+msgstr "_Administrar..."
 
 # src/filter-edit-dialog.c:783
 # src/filter-edit-dialog.c:693
 #: src/main-window.c:1064
-#, fuzzy
 msgid "_Select _Filters"
-msgstr "Restablecer _filtro"
+msgstr "_Seleccionar _filtros"
 
 # src/main-window.c:259
 # src/main-window.c:262
 #: src/main-window.c:1082
-#, fuzzy
 msgid "_Filters"
-msgstr "_Filtro"
+msgstr "_Filtros"
 
 #: src/main-window.c:1098 src/sendmsg-window.c:635
-#, fuzzy
 msgid "_Tools"
-msgstr "_Barras de herramientas..."
+msgstr "_Herramientas"
 
 #: src/main-window.c:1202
 msgid ""
@@ -4490,7 +4445,7 @@ msgstr ""
 
 #: src/main-window.c:1372
 msgid "Subject or Sender _Contains:"
-msgstr ""
+msgstr "El asunto o el remitente _contiene:"
 
 # libmutt/mbox.c:712
 #: src/main-window.c:2154
@@ -4547,9 +4502,8 @@ msgstr[0] "Ha recibido %d mensaje nuevo."
 msgstr[1] "Ha recibido %d mensajes nuevos."
 
 #: src/main-window.c:3059
-#, fuzzy
 msgid "You have new mail."
-msgstr "ha recibido 1 mensaje nuevo."
+msgstr "Tiene correo nuevo."
 
 # src/main-window.c:399
 # src/main-window.c:401
@@ -4561,7 +4515,7 @@ msgstr "Buscar buzón"
 # src/filter-edit-dialog.c:491
 #: src/main-window.c:3626
 msgid "_Search for:"
-msgstr "_Buscar nombre:"
+msgstr "_Buscar:"
 
 # libinit_balsa/balsa-druid-page-directory.gob:60
 # libinit_balsa/balsa-druid-page-directory.gob:60
@@ -4709,9 +4663,8 @@ msgstr "Papelera"
 
 # libmutt/mbox.c:1066
 #: src/main.c:470
-#, fuzzy
 msgid "Compressing mail folders..."
-msgstr "Reabriendo el buzón..."
+msgstr "Comprimiendo las carpetas de correo..."
 
 # src/main-window.c:267 src/message-window.c:61
 # src/main-window.c:269
@@ -4762,9 +4715,9 @@ msgstr "M_over"
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: src/message-window.c:274
-#, fuzzy, c-format
+#, c-format
 msgid "Message from %s: %s"
-msgstr "Mensaje nuevo a %s: %s"
+msgstr "Mensaje de %s: %s"
 
 #: src/pref-manager.c:321
 msgid "7 Bits"
@@ -5035,11 +4988,11 @@ msgstr ""
 
 #: src/pref-manager.c:1675
 msgid "_POP message size limit:"
-msgstr ""
+msgstr "Límite del tamaño del mensaje _POP:"
 
 #: src/pref-manager.c:1682
 msgid "MB"
-msgstr ""
+msgstr "Mib"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
@@ -5381,31 +5334,30 @@ msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
+"El siguiente ajuste es global, pero puede ser redefinido\n"
+"para el buzón seleccionado usando Buzón -> Ocultar mensajes:"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: src/pref-manager.c:2484
-#, fuzzy
 msgid "Hide messages marked as deleted"
-msgstr "Marcando %d mensajes borrados ...."
+msgstr "Ocultar mensajes marcados como borrados"
 
 #: src/pref-manager.c:2486
 msgid "The following settings are global."
-msgstr ""
+msgstr "Los siguientes ajustes son globales."
 
 #: src/pref-manager.c:2491
-#, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr "Ver mensaje automáticamente al abrir un buzón"
+msgstr "Purgar los mensajes borrados cuando se cierra un buzón"
 
 #: src/pref-manager.c:2498
-#, fuzzy
 msgid " ...and if mailbox is unused more than"
-msgstr "Efectuar cambios en el buzón si no se usa más de"
+msgstr "... y si el buzón no se usa más de"
 
 #: src/pref-manager.c:2511
 msgid "hours"
-msgstr ""
+msgstr "horas"
 
 # src/pref-manager.c:1931
 # src/pref-manager.c:2155
@@ -5619,8 +5571,7 @@ msgstr ""
 "ventana de redacción."
 
 #: src/save-restore.c:988
-msgid ""
-"The option to request a MDN is now on the Options menu of the compose window."
+msgid "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "La opción para solicitar un MDN está ahora en el menú de Opciones de la "
 "ventana de redacción."
@@ -5822,9 +5773,8 @@ msgstr "Adjuntar _mensaje(s)"
 # src/address-book.c:477
 # src/address-book.c:523
 #: src/sendmsg-window.c:320 src/sendmsg-window.c:507
-#, fuzzy
 msgid "Sen_d"
-msgstr "Enviar"
+msgstr "_Enviar"
 
 # libmutt/imap/browse.c:93
 # libmutt/imap/browse.c:93
@@ -5966,8 +5916,7 @@ msgstr "_Cifrar mensaje"
 
 #: src/sendmsg-window.c:437 src/sendmsg-window.c:597
 msgid "signs the message using GnuPG for all To: and CC: recipients"
-msgstr ""
-"firma el mensaje usando GNUPG para todos los destinatarios en Para: y Cc:"
+msgstr "firma el mensaje usando GNUPG para todos los destinatarios en Para: y Cc:"
 
 #: src/sendmsg-window.c:457 src/sendmsg-window.c:633
 msgid "_Show"
@@ -5985,14 +5934,13 @@ msgstr "_Opciones"
 
 #: src/sendmsg-window.c:503
 msgid "Sa_ve and Close"
-msgstr ""
+msgstr "_Guardar y cerrar"
 
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
 #: src/sendmsg-window.c:512
-#, fuzzy
 msgid "Send _Later"
-msgstr "El envío falló"
+msgstr "Enviar _más tarde"
 
 #: src/sendmsg-window.c:733
 #, c-format
@@ -6201,31 +6149,29 @@ msgid "sending message with gpg mode %d"
 msgstr "enviando mensaje con modo gpg %d"
 
 #: src/sendmsg-window.c:3913
-#, fuzzy
 msgid "Message could not be created"
-msgstr "No se pudo acceder al libreta de direcciones."
+msgstr "El mensaje no se pudo crear"
 
 #: src/sendmsg-window.c:3915
 msgid "Message could not be queued in outbox"
-msgstr ""
+msgstr "El mensaje no se pudo poner en la cola de salida"
 
 #: src/sendmsg-window.c:3917
 msgid "Message could not be saved in senbox"
-msgstr ""
+msgstr "El mensaje no se pudo guardar en el buzón de enviados"
 
 # src/sendmsg-window.c:1403
 # src/sendmsg-window.c:1454
 #: src/sendmsg-window.c:3919
-#, fuzzy
 msgid "Message could not be sent"
-msgstr "%s: no se pudo abrir  %s."
+msgstr "El mensaje no se pudo enviar"
 
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
 #: src/sendmsg-window.c:3923
-#, fuzzy, c-format
+#, c-format
 msgid "Send failed: %s"
-msgstr "El envío falló"
+msgstr "El envío falló: %s"
 
 # src/balsa-message.c:651
 # src/balsa-message.c:713
@@ -6236,9 +6182,8 @@ msgstr "No se pudo postponer el mensaje."
 # src/main-window.c:421
 # src/main-window.c:428
 #: src/sendmsg-window.c:4021
-#, fuzzy
 msgid "Message postponed."
-msgstr "Tipografía del mensaje"
+msgstr "Mensaje postpuesto"
 
 # libmutt/mbox.c:1028
 #: src/sendmsg-window.c:4037
@@ -6249,9 +6194,8 @@ msgstr "No se pudo abrir el buzón de borradores: %s"
 # src/main-window.c:421
 # src/main-window.c:428
 #: src/sendmsg-window.c:4059
-#, fuzzy
 msgid "Message saved."
-msgstr "Mensaje"
+msgstr "Mensaje guardado."
 
 # src/sendmsg-window.c:1403
 # src/sendmsg-window.c:1454
@@ -6573,9 +6517,8 @@ msgid "Close"
 msgstr "Cerrar"
 
 #: src/toolbar-factory.c:133
-#, fuzzy
 msgid "Close the compose window"
-msgstr "Ventana de redacción"
+msgstr "Cerrar la ventana de redacción"
 
 #: src/toolbar-factory.c:134
 msgid ""
@@ -7791,3 +7734,4 @@ msgstr "Bajar"
 
 #~ msgid "Couldn't set protocol version to LDAPv3."
 #~ msgstr "No se pudo establecer la versión del protocolo a LDAPv3"
+

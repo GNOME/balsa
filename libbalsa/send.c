@@ -1212,11 +1212,12 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     mutt_prepare_envelope(msg->env);
     encode_descriptions(msg->content);
 
-    if (reply_message != NULL)
+    if ((reply_message != NULL) && (reply_message->mailbox != NULL))
 	/* Just saves the message ID, mailbox type and mailbox name. We could
 	 * search all mailboxes for the ID but that would not be too fast. We
 	 * could also add more stuff ID like path, server, ... without this
-	 * if you change the name of the mailbox the flag will not be set. */
+	 * if you change the name of the mailbox the flag will not be set. 
+	 CHBM: unbreak this in 1.3 - use URL */
 	tmp = g_strdup_printf("%s\r%s",
 			      reply_message->message_id,
 			      reply_message->mailbox->name);

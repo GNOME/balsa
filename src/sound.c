@@ -18,8 +18,9 @@
  */
 
 #include "config.h"
+#ifdef HAVE_LIBESD
 #include <esd.h>
-
+#endif
 #include <gnome.h>
 
 #include "balsa-app.h"

@@ -1,3 +1,11 @@
+2004-01-21 15:03  PeterB
+
+	* src/message-window.c: Add `next unread' item to message menu with
+	ctrl+N binding, and manage its sensitivity; add zoom controls for
+	html parts.
+	* src/balsa-message.c: In a multipart message, make current_part
+	the part that's actually shown instead of the multipart parent.
+
 2004-01-20 16:59  PeterB
 
 	* src/balsa-index.c: expand tree on opening, if requested.

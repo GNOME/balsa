@@ -38,7 +38,6 @@
 #include <libesmtp.h>
 #endif
 
-#define NUM_TOOLBAR_MODES 3
 #define NUM_ENCODING_MODES 3
 #define NUM_PWINDOW_MODES 3
 #define NUM_THREADING_STYLES 3
@@ -127,7 +126,6 @@ typedef struct _PropertyUI {
     GtkWidget *date_format;
 
     GtkWidget *selected_headers;
-    GtkWidget *message_title_format;
 
     /* colours */
     GtkWidget *quoted_color[MAX_QUOTED_COLOR];
@@ -599,10 +597,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->selected_headers), "changed",
 		     G_CALLBACK(properties_modified_cb), property_box);
 
-    /* Format for the title of the message window */
-    g_signal_connect(G_OBJECT(pui->message_title_format), "changed",
-		     G_CALLBACK(properties_modified_cb), property_box);
-
     /* Colour */
     for(i=0;i<MAX_QUOTED_COLOR;i++)
 	g_signal_connect(G_OBJECT(pui->quoted_color[i]), "released",
@@ -856,12 +850,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.selected_headers =
 	g_ascii_strdown(gtk_entry_get_text(GTK_ENTRY(pui->selected_headers)),
                         -1);
-
-    /* message window title format */
-    g_free(balsa_app.message_title_format);
-    balsa_app.message_title_format =
-        gtk_editable_get_chars(GTK_EDITABLE(pui->message_title_format),
-                               0, -1);
 
     /* quoted text color */
     for(i=0;i<MAX_QUOTED_COLOR;i++) {
@@ -1144,11 +1132,6 @@ set_prefs(void)
     if (balsa_app.selected_headers)
 	gtk_entry_set_text(GTK_ENTRY(pui->selected_headers),
 			   balsa_app.selected_headers);
-
-    /* message window title format */
-    if (balsa_app.message_title_format)
-	gtk_entry_set_text(GTK_ENTRY(pui->message_title_format),
-			   balsa_app.message_title_format);
 
     /* Colour */
     for(i=0;i<MAX_QUOTED_COLOR;i++)
@@ -1778,7 +1761,7 @@ broken_8bit_codeset_group(GtkWidget * page)
     pui->convert_unknown_8bit_codeset = gtk_option_menu_new ();
     gtk_table_attach(GTK_TABLE(table), pui->convert_unknown_8bit_codeset,
 		     1, 2, 1, 2,
-		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), (GtkAttachOptions) (0), 0, 0);
     
     menu = create_codeset_menu();
     gtk_option_menu_set_menu(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset),
@@ -1786,7 +1769,10 @@ broken_8bit_codeset_group(GtkWidget * page)
     gtk_option_menu_set_history(GTK_OPTION_MENU(pui->convert_unknown_8bit_codeset),
 				balsa_app.convert_unknown_8bit_codeset);
 
-    gtk_size_group_add_widget(size_group, table);
+    gtk_size_group_add_widget(size_group,
+                              GTK_WIDGET(pui->convert_unknown_8bit[0]));
+    gtk_size_group_add_widget(size_group,
+                              GTK_WIDGET(pui->convert_unknown_8bit[1]));
     
     return group;
 }
@@ -2072,8 +2058,6 @@ display_formats_group(GtkWidget * page)
         attach_entry(_("Date encoding (for strftime):"), 0, GTK_TABLE(table));
     pui->selected_headers =
         attach_entry(_("Selected headers:"), 1, GTK_TABLE(table));
-    pui->message_title_format =
-        attach_entry(_("Message window title format:"), 2, GTK_TABLE(table));
 
     return group;
 }
@@ -2466,8 +2450,8 @@ deleting_messages_group(GtkWidget * page)
     group = pm_group_new(_("Deleting Messages"));
 
     label = gtk_label_new(_("The following setting is global, "
-			    "but may be overridden "
-			    "for the selected mailbox\n"
+			    "but may be overridden\n"
+			    "for the selected mailbox "
 			    "using Mailbox -> Hide messages:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);

@@ -878,6 +878,7 @@ balsa_window_new()
     balsa_app.main_window=window;
 
     gnome_app_construct(GNOME_APP(window), "balsa", "Balsa");
+    register_balsa_pixbufs(GTK_WIDGET(window));
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
 

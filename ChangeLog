@@ -1,3 +1,8 @@
+2003-10-14 08:35  PeterB
+
+	* src/message-window.c: Trash the message in the window, not the
+	current index selection (bug #124550).
+
 2003-10-13  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/message.h: libbalsa_message_send() accepts debug argument.

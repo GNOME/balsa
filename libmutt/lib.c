@@ -702,72 +702,6 @@ int mutt_copy_stream (FILE *fin, FILE *fout)
   return 0;
 }
 
-void mutt_expand_file_fmt (char *dest, size_t destlen, const char *fmt, const char *src)
-{
-  char *_src = mutt_quote_filename(src);
-  
-  mutt_expand_fmt(dest, destlen, fmt, _src);
-  safe_free((void **) &_src);
-}
-
-void mutt_expand_fmt (char *dest, size_t destlen, const char *fmt, const char *src)
-{
-  const char *p = fmt;
-  const char *last = p;
-  size_t len;
-  size_t slen;
-  int found = 0;
-
-  slen = mutt_strlen (src);
-  
-  while ((p = strchr (p, '%')) != NULL)
-  {
-    if (p[1] == 's')
-    {
-      found++;
-
-      len = (size_t) (p - last);
-      if (len)
-      {
-	if (len > destlen - 1)
-	  len = destlen - 1;
-
-	memcpy (dest, last, len);
-	dest += len;
-	destlen -= len;
-
-	if (destlen <= 0)
-	{
-	  *dest = 0;
-	  break; /* no more space */
-	}
-      }
-
-      strfcpy (dest, src, destlen);
-      if (slen > destlen)
-      {
-	/* no more room */
-	break;
-      }
-      dest += slen;
-      destlen -= slen;
-
-      p += 2;
-      last = p;
-    }
-    else if (p[1] == '%')
-      p++;
-
-    p++;
-  }
-
-  if (found)
-    strfcpy (dest, last, destlen);
-  else
-    snprintf (dest, destlen, "%s %s", fmt, src);
-  
-}
-
 static int 
 compare_stat (struct stat *osb, struct stat *nsb)
 {
@@ -1386,41 +1320,38 @@ int mutt_save_confirm (const char *s, struct stat *st)
  * From the Unix programming FAQ by way of Liviu.
  */
 
-char *mutt_quote_filename(const char *f)
+size_t mutt_quote_filename (char *d, size_t l, const char *f)
 {
-  char *d;
-  size_t i,l;
+  size_t i, j = 0;
 
-  if(!f) return NULL;
-  
-  for(i = 0, l = 3; f[i]; i++, l++)
+  if(!f) 
   {
-    if(f[i] == '\'' || f[i] == '`')
-      l += 3;
+    *d = '\0';
+    return 0;
   }
+
+  /* leave some space for the trailing characters. */
+  l -= 6;
   
-  d = safe_malloc(l);
+  d[j++] = '\'';
   
-  l = 0;
-  d[l++] = '\'';
-  
-  for(i = 0; f[i]; i++)
+  for(i = 0; j < l && f[i]; i++)
   {
     if(f[i] == '\'' || f[i] == '`')
     {
-      d[l++] = '\'';
-      d[l++] = '\\';
-      d[l++] = f[i];
-      d[l++] = '\'';
+      d[j++] = '\'';
+      d[j++] = '\\';
+      d[j++] = f[i];
+      d[j++] = '\'';
     }
     else
-      d[l++] = f[i];
+      d[j++] = f[i];
   }
   
-  d[l++] = '\'';
-  d[l]   = '\0';
+  d[j++] = '\'';
+  d[j]   = '\0';
   
-  return d;
+  return j;
 }
 
 void state_prefix_putc(char c, STATE *s)

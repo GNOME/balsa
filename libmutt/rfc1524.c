@@ -55,7 +55,7 @@ int rfc1524_expand_command (BODY *a, char *filename, char *_type,
     char *command, int clen)
 {
   int x=0,y=0;
-  int needspipe = MUTT_TRUE;
+  int needspipe = TRUE;
   char buf[LONG_STRING];
   char type[LONG_STRING];
   
@@ -76,46 +76,30 @@ int rfc1524_expand_command (BODY *a, char *filename, char *_type,
       if (command[x] == '{') 
       {
 	char param[STRING];
-	char pvalue[LONG_STRING];
+	char pvalue[STRING];
+	char *_pvalue;
 	int z = 0;
-	char *ret = NULL;
-	char *pv;
 
 	x++;
 	while (command[x] && command[x] != '}' && z<sizeof(param))
 	  param[z++] = command[x++];
 	param[z] = '\0';
-	dprint(2,(debugfile,"Parameter: %s  Returns: %s\n",param,ret));
-	pv = mutt_get_parameter (param, a->parameter);
-	strfcpy (pvalue, NONULL(pv), sizeof (pvalue));
-	if (option (OPTMAILCAPSANITIZE)) 
+	
+	_pvalue = mutt_get_parameter (param, a->parameter);
+	strfcpy (pvalue, NONULL(_pvalue), sizeof (pvalue));
+	if (option (OPTMAILCAPSANITIZE))
 	  mutt_sanitize_filename (pvalue, 0);
-	ret = mutt_quote_filename (pvalue);
-	dprint(2,(debugfile,"Parameter: %s  Returns: %s\n",param,ret));
-	z = 0;
-	while (ret && ret[z] && y<sizeof(buf))
-	  buf[y++] = ret[z++];
-	FREE(&ret);
+	
+	y += mutt_quote_filename (buf + y, sizeof (buf) - y, pvalue);
       }
       else if (command[x] == 's' && filename != NULL)
       {
-	char *fn = mutt_quote_filename(filename);
-	int i;
-	
-	for(i = 0; fn[i] && y < sizeof(buf); i++)
-	  buf[y++] = fn[i];
-	
-	FREE(&fn);
-	needspipe = MUTT_FALSE;
+	y += mutt_quote_filename (buf + y, sizeof (buf) - y, filename);
+	needspipe = FALSE;
       }
       else if (command[x] == 't')
       {
-	char *t = mutt_quote_filename (type);
-	char *s;
-	
-	for (s = t; *s && y < sizeof (buf);)
-	  buf[y++] = *s++;
-	FREE (&t);
+	y += mutt_quote_filename (buf + y, sizeof (buf) - y, type);
       }
       x++;
     }

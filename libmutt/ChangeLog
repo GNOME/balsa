@@ -1,3 +1,10 @@
+2001-02-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: fix SSL build.
+	* lib.c: fix some misuderstandings.
+	* mutt.h: include forgotten lib.h
+	* rfc1525.c: modify partially to accomodate API from imported mutt.
+	
 2001-02-11  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* mx.c, sendlib.c: fixed mistakes in importing.

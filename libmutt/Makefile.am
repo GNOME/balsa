@@ -1,4 +1,8 @@
-EXTRA_DIST = configure muttconfig.h.in
+EXTRA_DIST = configure muttconfig.h.in mutt_ssl.c mutt_ssl.h
+
+if USE_SSL
+SSLSOURCES = mutt_ssl.c mutt_ssl.h
+endif
 
 noinst_LIBRARIES = libmutt.a
 
@@ -25,7 +29,6 @@ libmutt_a_SOURCES = \
 	md5c.c		\
 	mh.c 		\
 	mx.c 		\
-	mutt_ssl.c	\
 	mutt_socket.c	\
 	parse.c 	\
 	pattern.c 	\
@@ -62,7 +65,6 @@ libmutt_a_SOURCES = \
 	mutt_menu.h	\
 	mutt_regex.h	\
 	mutt_sasl.h	\
-	mutt_ssl.h	\
 	mutt_socket.h	\
 	mx.h		\
 	pager.h		\
@@ -72,7 +74,8 @@ libmutt_a_SOURCES = \
 	rfc2047.h	\
 	rfc822.h	\
 	sort.h		\
-	url.h
+	url.h		\
+	$(SSLSOURCES)
 
 SUBDIRS = imap
 

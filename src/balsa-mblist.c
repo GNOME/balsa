@@ -1565,7 +1565,9 @@ mblist_drag_motion_cb(GtkWidget * mblist, GdkDragContext * context,
 
     y -= adjust;
     if (gtk_clist_get_selection_info(GTK_CLIST(mblist), x, y, &row, &col)
-        && row != GPOINTER_TO_INT(GTK_CLIST(mblist)->selection->data)) {
+        && (!GTK_CLIST(mblist)->selection
+            || row !=
+            GPOINTER_TO_INT(GTK_CLIST(mblist)->selection->data))) {
         gtk_signal_handler_block_by_func(GTK_OBJECT(mblist),
                                          GTK_SIGNAL_FUNC
                                          (select_mailbox), NULL);

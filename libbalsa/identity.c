@@ -319,17 +319,23 @@ libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
     ident->sig_prepend = prepend;
 }
 
+struct IdentitySelectDialog {
+    LibBalsaIdentity * ident;
+    gboolean close_ok;
+};
 
 LibBalsaIdentity*
 libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
 				GList** identities, LibBalsaIdentity** defid)
 {
-    LibBalsaIdentity* ident = NULL;
+    struct IdentitySelectDialog isd;
     GtkWidget* frame1 = gtk_frame_new(NULL);
     GtkWidget* clist = gtk_clist_new(2);
     GtkWidget* dialog;
     gint choice = 1;
 
+    isd.ident = NULL;
+    isd.close_ok = FALSE;
 
     gtk_object_set_data(GTK_OBJECT(clist), "parent-window", parent);
     gtk_object_set_data(GTK_OBJECT(clist), "identities", identities);
@@ -353,7 +359,7 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
     gtk_widget_set_usize(GTK_WIDGET(clist), 200, 200);
     gtk_signal_connect(GTK_OBJECT(clist), "select-row",
                        GTK_SIGNAL_FUNC(select_dialog_row_cb),
-                       &ident);
+                       &isd);
     identity_list_update(GTK_CLIST(clist));
 
 
@@ -364,10 +370,10 @@ libbalsa_identity_select_dialog(GtkWindow* parent, const gchar* prompt,
 
     choice = gnome_dialog_run(GNOME_DIALOG(dialog));
     
-    if (choice != 0)
+    if (choice != 0 && !isd.close_ok)
         return NULL;
     
-    return ident;
+    return isd.ident;
 }
 
 
@@ -376,24 +382,26 @@ select_dialog_row_cb(GtkCList* clist,
                      gint row, 
                      gint column, 
                      GdkEventButton* event, 
-                     gpointer user_data)
+		     gpointer user_data)
 {
-    LibBalsaIdentity** selected_ident = (LibBalsaIdentity**) user_data;
-    if (event && event->type == GDK_2BUTTON_PRESS)
+    struct IdentitySelectDialog *isd_p = user_data;
+
+    if (event && event->type == GDK_2BUTTON_PRESS) {
         /* it's a double-click:
-         * *selected_ident was set in the callback from the first click,
-         * so we can just close the dialog
+         * isd->ident was set in the callback from the first click,
+         * so we can set close_ok and close the dialog
          *
          * if we wanted to make this dialog single-click
          * (select-and-close), we'd ignore the GdkEventButton and just
          * set the identity then close the dialog (we'd also want to
          * remove the `OK' button from the dialog)
          * */
+        isd_p->close_ok = TRUE;
         gnome_dialog_close(GNOME_DIALOG
                            (gtk_widget_get_ancestor
                             (GTK_WIDGET(clist), GTK_TYPE_WINDOW)));
-    else
-        *selected_ident =
+    } else
+        isd_p->ident =
             LIBBALSA_IDENTITY(gtk_clist_get_row_data(clist, row));
 }
 

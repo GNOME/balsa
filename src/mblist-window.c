@@ -211,6 +211,10 @@ mblist_redraw ()
   GtkCTreeNode *ctnode;
   gchar *text[] =
   {"Balsa"};			/* for root tree stub */
+
+  if (!mblw)
+    return;
+
   if (!GTK_IS_CTREE (mblw->ctree))
     return;
 

@@ -105,6 +105,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     const char *p;
 
     Spoolfile = libbalsa_guess_mail_spool();
+    MhFlagged = "flagged";
+    MhReplied = "replied";
+    MhUnseen  = "unseen";
 
 #ifdef BALSA_USE_THREADS
     if (!g_thread_supported()) {

@@ -1,3 +1,8 @@
+2002-11-21  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/libbalsa.c: Initialize MH* libmutt variables (#99067).
+	* src/spell-check.c: UTF-8 conversion for pspell (#98335, Toralf Lund).
+
 2002-11-05  Pawel Salek <pawsa@theochem.kth.se>
 
 	* Makefile.am: remove intl from SUBDIRS.

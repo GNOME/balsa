@@ -33,8 +33,9 @@ typedef struct _PropertyUI
   {
     GnomePropertyBox *pbox;
     GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
+#if 0
     GtkRadioButton *mdi_type[NUM_MDI_MODES];
-
+#endif
     GtkWidget *real_name, *email, *replyto, *signature;
 
     GtkWidget *pop3servers, *smtp_server, *mail_directory;
@@ -62,7 +63,7 @@ gchar *toolbar_type_label[NUM_TOOLBAR_MODES] =
   "Icons",
   "Both",
 };
-
+#if 0
 guint mdi_type[NUM_MDI_MODES] =
 {
   GNOME_MDI_DEFAULT_MODE,
@@ -79,6 +80,7 @@ gchar *mdi_type_label[NUM_MDI_MODES] =
   "Modal",
 };
 
+#endif
 
 /* notebook pages */
 static GtkWidget *create_identity_page (void);
@@ -164,12 +166,13 @@ open_preferences_manager (void)
 			     label);
 
   set_prefs ();
-
+#if 0
   for (i = 0; i < NUM_MDI_MODES; i++)
     {
       gtk_signal_connect (GTK_OBJECT (pui->mdi_type[i]), "clicked",
 			  properties_modified_cb, pui->pbox);
     }
+#endif
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     {
       gtk_signal_connect (GTK_OBJECT (pui->toolbar_type[i]), "clicked",
@@ -247,14 +250,14 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 	balsa_app.toolbar_style = toolbar_type[i];
 	break;
       }
-
+#if 0
   for (i = 0; i < NUM_MDI_MODES; i++)
     if (GTK_TOGGLE_BUTTON (pui->mdi_type[i])->active)
       {
 	balsa_app.mdi_style = mdi_type[i];
 	break;
       }
-
+#endif
   balsa_app.debug = GTK_TOGGLE_BUTTON (pui->debug)->active;
   balsa_app.previewpane = GTK_TOGGLE_BUTTON (pui->previewpane)->active;
 
@@ -287,14 +290,14 @@ set_prefs (void)
 	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->toolbar_type[i]), TRUE);
 	break;
       }
-
+#if 0
   for (i = 0; i < NUM_MDI_MODES; i++)
     if (balsa_app.mdi_style == mdi_type[i])
       {
 	gtk_toggle_button_set_state (GTK_TOGGLE_BUTTON (pui->mdi_type[i]), TRUE);
 	break;
       }
-
+#endif
   gtk_entry_set_text (GTK_ENTRY (pui->real_name), balsa_app.real_name);
 
   gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.email);
@@ -528,7 +531,7 @@ create_display_page ()
 
   pui->previewpane = gtk_check_button_new_with_label (_ ("Use preview pane"));
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (pui->previewpane));
-
+#if 0
 /* MDI */
   frame = gtk_frame_new (_ ("MDI"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
@@ -545,7 +548,7 @@ create_display_page ()
 			  2);
       group = gtk_radio_button_group (pui->mdi_type[i]);
     }
-
+#endif
   return vbox;
 }
 

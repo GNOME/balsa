@@ -30,7 +30,6 @@
 #include "misc.h"
 #include "pref-manager.h"
 #include "save-restore.h"
-#include "mblist-window.h"
 
 /* we'll create the notebook pages in the
  * order of these enumerated types so they 

@@ -15,7 +15,6 @@ balsa_SOURCES =	\
 	mailbox-conf.c		\
 	main-window.c		\
 	main.c			\
-	mblist-window.c		\
 	message-window.c	\
 	pref-manager.c		\
 	save-restore.c		\
@@ -30,7 +29,6 @@ balsa_SOURCES =	\
 	mailbox-conf.h		\
 	main-window.h		\
 	main.h			\
-	mblist-window.h		\
 	message-window.h	\
 	pref-manager.h		\
 	save-restore.h		\

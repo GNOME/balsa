@@ -35,19 +35,10 @@
 #include "sendmsg-window.h"
 
 static void send_message_cb (GtkWidget *, BalsaSendmsg *);
+static void attach_clicked (GtkWidget *, gpointer);
 static void close_window (GtkWidget *, gpointer);
 
-
-static GtkWidget *create_menu (GtkWidget * window, BalsaSendmsg *);
-static GtkWidget *create_toolbar (GtkWidget * window, BalsaSendmsg *);
-
-static void attach_clicked (GtkWidget *, gpointer);
-
-
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
-
-static GtkWidget *menu_items[8];
-GtkTooltips *tooltips;
 
 /* Standard DnD types */
 enum {
@@ -60,71 +51,51 @@ static GtkTargetEntry drop_types [] = {
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
+
+static GnomeUIInfo main_toolbar[] =
+{
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Send"), N_ ("Send this mail"), send_message_cb, GNOME_STOCK_PIXMAP_MAIL_SND),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Attach"), N_ ("Add attachments to this message"), attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Spelling"), N_ ("Check Spelling"), NULL, GNOME_STOCK_PIXMAP_SPELLCHECK),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print"), NULL, GNOME_STOCK_PIXMAP_PRINT),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Cancel"), N_ ("Cancel"), close_window, GNOME_STOCK_PIXMAP_CLOSE),
+  GNOMEUIINFO_END
+};
+
+static GnomeUIInfo file_menu[] =
+{
+  {
+   GNOME_APP_UI_ITEM, N_ ("_Send"), NULL, send_message_cb, NULL,
+       NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_SND, 'Y', 0, NULL
+   },
+   {
+   GNOME_APP_UI_ITEM, N_ ("_Attach file..."), NULL, attach_clicked, NULL,
+       NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH, 'H', 0, NULL
+   },
+   GNOMEUIINFO_SEPARATOR,
+   {
+   GNOME_APP_UI_ITEM, N_ ("E_xit"), NULL, close_window, NULL,
+       NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_EXIT, 'Q', 0, NULL
+   },
+   GNOMEUIINFO_END
+};
+
+static GnomeUIInfo main_menu[] =
+{
+  GNOMEUIINFO_SUBTREE ("_File", file_menu),
+  GNOMEUIINFO_END
+};
+
 static void
 close_window (GtkWidget * widget, gpointer data)
 {
-  gtk_widget_destroy (GTK_WIDGET (data));
-}
-
-
-static GtkWidget *
-create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
-{
-  GtkWidget *toolbar;
-  GtkWidget *toolbarbutton;
-
-  tooltips = gtk_tooltips_new ();
-
-  toolbar = gtk_toolbar_new (0, 0);
-
-  gtk_widget_realize (window);
-
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-				     _ ("Send"), _ ("Send this mail"), NULL,
-	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_SND),
-					   GTK_SIGNAL_FUNC (send_message_cb),
-					   bsmw);
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-		  _ ("Attach"), _ ("Add attachments to this message"), NULL,
-	      gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_ATTACH),
-					   GTK_SIGNAL_FUNC (attach_clicked),
-					   bsmw->attachments);
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-				 _ ("Spelling"), _ ("Check Spelling"), NULL,
-	  gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_SPELLCHECK),
-					   NULL,
-					   bsmw);
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   _ ("Print"), _ ("Print"), NULL,
-	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
-					   NULL,
-					   bsmw);
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   _ ("Cancel"), _ ("Cancel"), NULL,
-	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_CLOSE),
-					   GTK_SIGNAL_FUNC (close_window),
-					   GTK_OBJECT (window));
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
-  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
-  gtk_widget_show (toolbar);
-  return toolbar;
+  BalsaSendmsg *bsm;
+  bsm = data;
+  balsa_sendmsg_destroy(bsm);
 }
 
 
@@ -174,112 +145,6 @@ select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event)
 		    event->button, event->time);
 }
 
-static GtkWidget *
-create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
-{
-  GtkWidget *menubar, *w, *menu;
-  GtkAccelGroup *accel;
-  int i = 0;
-
-  accel = gtk_accel_group_new ();
-  menubar = gtk_menu_bar_new ();
-  gtk_widget_show (menubar);
-
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_SND, _ ("Send"));
-  gtk_widget_show (w);
-  gtk_widget_add_accelerator (w, "activate", accel,
-			      'Y', 0, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-  gtk_signal_connect (GTK_OBJECT (w),
-		      "activate",
-		      GTK_SIGNAL_FUNC (send_message_cb),
-		      bmsg);
-
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_ATTACH, _ ("Attach File"));
-  gtk_widget_show (w);
-  gtk_widget_add_accelerator (w, "activate", accel,
-			      'H', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-  gtk_signal_connect (GTK_OBJECT (w),
-		      "activate",
-		      GTK_SIGNAL_FUNC (attach_clicked),
-		      bmsg->attachments);
-
-  w = gtk_menu_item_new ();
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("Cancel"));
-  gtk_widget_show (w);
-  gtk_widget_add_accelerator (w, "activate", accel,
-			      'A', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-  gtk_signal_connect_object (GTK_OBJECT (w), "activate",
-			     GTK_SIGNAL_FUNC (close_window),
-			     GTK_OBJECT (window));
-  menu_items[i++] = w;
-
-  w = gtk_menu_item_new_with_label (_ ("Message"));
-  gtk_widget_show (w);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CUT, _ ("Cut"));
-  gtk_widget_show (w);
-  gtk_widget_add_accelerator (w, "activate", accel,
-			      'X', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_COPY, _ ("Copy"));
-  gtk_widget_show (w);
-  gtk_widget_add_accelerator (w, "activate", accel,
-			      'C', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PASTE, _ ("Paste"));
-  gtk_widget_show (w);
-  gtk_widget_add_accelerator (w, "activate", accel,
-			      'V', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
-  w = gtk_menu_item_new_with_label (_ ("Edit"));
-  gtk_widget_show (w);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-  menu = gtk_menu_new ();
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_ABOUT, _ ("Contents"));
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-
-  w = gtk_menu_item_new_with_label (_ ("Help"));
-  gtk_widget_show (w);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
-  gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
-
-  if (balsa_app.debug)
-    g_print ("Menu items in sendmsg-window.c: %i\n", i);
-
-  menu_items[i] = NULL;
-  gtk_window_add_accel_group (GTK_WINDOW (window), accel);
-  return menubar;
-}
-
-
 static void
 add_attachment (GnomeIconList *iconlist, char *filename)
 {
@@ -324,8 +189,11 @@ attach_clicked (GtkWidget * widget, gpointer data)
   GtkWidget *fsw;
   GnomeIconList *iconlist;
   GtkFileSelection *fs;
+  BalsaSendmsg *bsm;
+  
+  bsm = data;
 
-  iconlist = GNOME_ICON_LIST (data);
+  iconlist = GNOME_ICON_LIST (bsm->attachments);
 
   fsw = gtk_file_selection_new (_ ("Attach file"));
   gtk_object_set_user_data (GTK_OBJECT (fsw), iconlist);
@@ -366,6 +234,7 @@ attachments_add (GtkWidget          *widget,
 static GtkWidget *
 create_info_pane (BalsaSendmsg * msg, SendType type)
 {
+  GtkWidget *sw;
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *button;
@@ -470,6 +339,11 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   /* create icon list */
+  sw = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(sw),
+		                    GTK_POLICY_AUTOMATIC,
+	                      GTK_POLICY_AUTOMATIC);
+
   msg->attachments = gnome_icon_list_new (100, NULL, FALSE);
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "drag_data_received",
 		      GTK_SIGNAL_FUNC(attachments_add), NULL);
@@ -489,7 +363,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 
   frame = gtk_frame_new (NULL);
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
-  gtk_container_add (GTK_CONTAINER (frame), msg->attachments);
+  gtk_container_add (GTK_CONTAINER (sw), msg->attachments);
+  gtk_container_add (GTK_CONTAINER (frame), sw);
 
   gtk_table_attach (GTK_TABLE (table), frame, 1, 3, 5, 6,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
@@ -685,13 +560,9 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   gnome_app_set_contents (GNOME_APP (window), vbox);
 
-  gnome_app_set_menus (GNOME_APP (window),
-		       GTK_MENU_BAR (create_menu (window, msg)));
+  gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, msg);
+  gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar, msg);
 
-  gnome_app_set_toolbar (GNOME_APP (window),
-			 GTK_TOOLBAR (create_toolbar (window, msg)));
-
-  gtk_widget_show_all (window);
 
   gtk_text_freeze (GTK_TEXT (msg->text));
   if (type != SEND_NORMAL)
@@ -745,6 +616,11 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   gtk_text_set_point (GTK_TEXT (msg->text), 0);
   gtk_text_thaw (GTK_TEXT (msg->text));
+  /* set the toolbar so we are consistant with the rest of balsa */
+  gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP(window)->toolbar), balsa_app.toolbar_style);
+
+  /* display the window */
+  gtk_widget_show_all (window);
 }
 
 static void

@@ -1,3 +1,8 @@
+1998-12-10  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/sendmsg-window.c (attachments_add): Add drag and drop
+	support for the attachments.
+
 1998-12-09  Jeff Garzik  <jgarzik@pobox.com>
 
 	* src/balsa-message.c, src/index-child.c:

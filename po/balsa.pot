@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-11-10 20:01-0600\n"
+"POT-Creation-Date: 1998-12-10 20:12-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#: src/balsa-index.c:265
+#: src/balsa-index.c:266
 msgid "From"
 msgstr ""
 
-#: src/balsa-index.c:266
+#: src/balsa-index.c:267
 msgid "Subject"
 msgstr ""
 
-#: src/balsa-index.c:267
+#: src/balsa-index.c:268
 msgid "Date"
 msgstr ""
 
@@ -102,17 +102,17 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: src/balsa-message.c:164 src/mailbox-conf.c:481 src/sendmsg-window.c:109
-#: src/sendmsg-window.c:207
+#: src/balsa-message.c:164 src/mailbox-conf.c:481 src/sendmsg-window.c:110
+#: src/sendmsg-window.c:208
 msgid "Cancel"
 msgstr ""
 
-#: src/balsa-message.c:217 src/balsa-message.c:232
+#: src/balsa-message.c:218 src/balsa-message.c:233
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr ""
 
-#: src/balsa-message.c:218 src/balsa-message.c:233
+#: src/balsa-message.c:219 src/balsa-message.c:234
 msgid "Ok"
 msgstr ""
 
@@ -120,43 +120,43 @@ msgstr ""
 msgid "Mailbox password:"
 msgstr ""
 
-#: src/index-child.c:159
+#: src/index-child.c:160
 msgid "Unable to Open Mailbox!"
 msgstr ""
 
-#: src/index-child.c:335
+#: src/index-child.c:338
 msgid "Transfer"
 msgstr ""
 
-#: src/index-child.c:355
+#: src/index-child.c:358
 msgid "Change Status"
 msgstr ""
 
-#: src/index-child.c:358
+#: src/index-child.c:361
 msgid "Unread"
 msgstr ""
 
-#: src/index-child.c:364
+#: src/index-child.c:367
 msgid "Read"
 msgstr ""
 
-#: src/index-child.c:370
+#: src/index-child.c:373
 msgid "Replied"
 msgstr ""
 
-#: src/index-child.c:376
+#: src/index-child.c:379
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:385 src/main-window.c:284 src/main-window.c:419
+#: src/index-child.c:388 src/main-window.c:170
 msgid "Delete"
 msgstr ""
 
-#: src/index-child.c:393 src/main-window.c:289
+#: src/index-child.c:396
 msgid "Undelete"
 msgstr ""
 
-#: src/local-mailbox.c:137
+#: src/local-mailbox.c:138
 #, c-format
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
@@ -205,123 +205,103 @@ msgstr ""
 msgid "IMAP server"
 msgstr ""
 
-#: src/main-window.c:143
-msgid "Mailboxes/<Separator>"
+#: src/main-window.c:87
+msgid "_Get new mail"
 msgstr ""
 
-#: src/main-window.c:237
-msgid "Get New Mail"
+#: src/main-window.c:92
+msgid "E_xit"
 msgstr ""
 
-#: src/main-window.c:245
-msgid "Exit"
+#: src/main-window.c:102
+msgid "_New"
 msgstr ""
 
-#: src/main-window.c:251
-msgid "File"
+#: src/main-window.c:107
+msgid "_Reply"
 msgstr ""
 
-#: src/main-window.c:261
-msgid "New"
+#: src/main-window.c:112
+msgid "Reply to _all"
 msgstr ""
 
-#: src/main-window.c:266 src/main-window.c:444 src/main-window.c:445
-msgid "Reply"
+#: src/main-window.c:117
+msgid "_Forward"
 msgstr ""
 
-#: src/main-window.c:271 src/main-window.c:454 src/main-window.c:455
-msgid "Reply to all"
+#: src/main-window.c:123
+msgid "_Delete"
 msgstr ""
 
-#: src/main-window.c:276 src/main-window.c:464 src/main-window.c:465
-msgid "Forward"
+#: src/main-window.c:128
+msgid "_Undelete"
 msgstr ""
 
-#: src/main-window.c:294 src/sendmsg-window.c:217
-msgid "Message"
+#: src/main-window.c:137
+msgid "List"
 msgstr ""
 
-#: src/main-window.c:304
-msgid "Mailbox List"
-msgstr ""
-
-#: src/main-window.c:312
-msgid "Open..."
-msgstr ""
-
-#: src/main-window.c:337
-msgid "Close"
-msgstr ""
-
-#: src/main-window.c:344
-msgid "Mailboxes"
-msgstr ""
-
-#: src/main-window.c:352
-msgid "Filters..."
-msgstr ""
-
-#: src/main-window.c:356
-msgid "Preferences..."
-msgstr ""
-
-#: src/main-window.c:360
-msgid "Settings"
-msgstr ""
-
-#: src/main-window.c:368
-msgid "About"
-msgstr ""
-
-#: src/main-window.c:373 src/sendmsg-window.c:258
-msgid "Help"
-msgstr ""
-
-#: src/main-window.c:405
+#: src/main-window.c:168
 msgid "Check"
 msgstr ""
 
-#: src/main-window.c:406
+#: src/main-window.c:168
 msgid "Check Email"
 msgstr ""
 
-#: src/main-window.c:420
+#: src/main-window.c:170
 msgid "Delete Message"
 msgstr ""
 
-#: src/main-window.c:433
+#: src/main-window.c:172
 msgid "Compose"
 msgstr ""
 
-#: src/main-window.c:434
+#: src/main-window.c:172
 msgid "Compose Message"
 msgstr ""
 
-#: src/main-window.c:478
+#: src/main-window.c:173
+msgid "Reply"
+msgstr ""
+
+#: src/main-window.c:174
+msgid "Reply to all"
+msgstr ""
+
+#: src/main-window.c:175
+msgid "Forward"
+msgstr ""
+
+#: src/main-window.c:177
 msgid "Previous"
 msgstr ""
 
-#: src/main-window.c:479
+#: src/main-window.c:177
 msgid "Open Previous Message"
 msgstr ""
 
-#: src/main-window.c:489
+#: src/main-window.c:178
 msgid "Next"
 msgstr ""
 
-#: src/main-window.c:490
+#: src/main-window.c:178
 msgid "Open Next Message"
 msgstr ""
 
-#: src/main-window.c:504 src/sendmsg-window.c:100
+#: src/main-window.c:180 src/sendmsg-window.c:101
 msgid "Print"
 msgstr ""
 
-#: src/main-window.c:505
+#: src/main-window.c:180
 msgid "Print current message"
 msgstr ""
 
-#: src/main-window.c:545
+#: src/main-window.c:240
+msgid "Mailboxes/<Separator>"
+msgstr ""
+
+#: src/main-window.c:349
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -330,15 +310,15 @@ msgid ""
 "http://www.gnome.org/cgi-bin/bugs"
 msgstr ""
 
-#: src/mblist-window.c:316
+#: src/mblist-window.c:330
 msgid "Add Mailbox"
 msgstr ""
 
-#: src/mblist-window.c:322
+#: src/mblist-window.c:336
 msgid "Edit Mailbox"
 msgstr ""
 
-#: src/mblist-window.c:328
+#: src/mblist-window.c:342
 msgid "Delete Mailbox"
 msgstr ""
 
@@ -372,101 +352,109 @@ msgstr ""
 msgid "Signature:"
 msgstr ""
 
-#: src/pref-manager.c:466
+#: src/pref-manager.c:473
 msgid "Local mail directory:"
 msgstr ""
 
-#: src/pref-manager.c:478
+#: src/pref-manager.c:485
 msgid "SMTP Server:"
 msgstr ""
 
 #. Toolbars
-#: src/pref-manager.c:502
+#: src/pref-manager.c:509
 msgid "Toolbars"
 msgstr ""
 
-#: src/pref-manager.c:522
+#: src/pref-manager.c:529
 msgid "Use preview pane"
 msgstr ""
 
 #. MDI
-#: src/pref-manager.c:526
+#: src/pref-manager.c:533
 msgid "MDI"
 msgstr ""
 
-#: src/pref-manager.c:568
+#: src/pref-manager.c:575
 msgid "Debug"
 msgstr ""
 
-#: src/pref-manager.c:575
+#: src/pref-manager.c:582
 msgid "Reply prefix:"
 msgstr ""
 
-#: src/sendmsg-window.c:73 src/sendmsg-window.c:180
+#: src/sendmsg-window.c:74 src/sendmsg-window.c:181
 msgid "Send"
 msgstr ""
 
-#: src/sendmsg-window.c:73
+#: src/sendmsg-window.c:74
 msgid "Send this mail"
 msgstr ""
 
-#: src/sendmsg-window.c:82
+#: src/sendmsg-window.c:83
 msgid "Attach"
 msgstr ""
 
-#: src/sendmsg-window.c:82
+#: src/sendmsg-window.c:83
 msgid "Add attachments to this message"
 msgstr ""
 
-#: src/sendmsg-window.c:91
+#: src/sendmsg-window.c:92
 msgid "Spelling"
 msgstr ""
 
-#: src/sendmsg-window.c:91
+#: src/sendmsg-window.c:92
 msgid "Check Spelling"
 msgstr ""
 
-#: src/sendmsg-window.c:147
+#: src/sendmsg-window.c:148
 msgid "Remove"
 msgstr ""
 
-#: src/sendmsg-window.c:192
+#: src/sendmsg-window.c:193
 msgid "Attach File"
 msgstr ""
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:218
+msgid "Message"
+msgstr ""
+
+#: src/sendmsg-window.c:225
 msgid "Cut"
 msgstr ""
 
-#: src/sendmsg-window.c:231
+#: src/sendmsg-window.c:232
 msgid "Copy"
 msgstr ""
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:239
 msgid "Paste"
 msgstr ""
 
-#: src/sendmsg-window.c:245
+#: src/sendmsg-window.c:246
 msgid "Edit"
 msgstr ""
 
-#: src/sendmsg-window.c:253
+#: src/sendmsg-window.c:254
 msgid "Contents"
 msgstr ""
 
-#: src/sendmsg-window.c:312
+#: src/sendmsg-window.c:259
+msgid "Help"
+msgstr ""
+
+#: src/sendmsg-window.c:313
 msgid "Attach file"
 msgstr ""
 
-#: src/sendmsg-window.c:513
+#: src/sendmsg-window.c:512
 msgid "Reply to "
 msgstr ""
 
-#: src/sendmsg-window.c:518
+#: src/sendmsg-window.c:517
 msgid "Forward message"
 msgstr ""
 
-#: src/sendmsg-window.c:523
+#: src/sendmsg-window.c:522
 msgid "New message"
 msgstr ""
 

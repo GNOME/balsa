@@ -49,7 +49,11 @@ static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 static GtkWidget *menu_items[8];
 GtkTooltips *tooltips;
 
+static GtkTargetEntry drop_types [] = {
+	{ "text/uri-list", 0, TARGET_URI_LIST }
+};
 
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 static void
 close_window (GtkWidget * widget, gpointer data)
@@ -272,22 +276,30 @@ create_menu (GtkWidget * window, BalsaSendmsg * bmsg)
 
 
 static void
+add_attachment (GnomeIconList *iconlist, char *filename)
+{
+	gint pos;
+	
+	pos = gnome_icon_list_append (
+		iconlist,
+		gnome_unconditional_pixmap_file ("balsa/attachment.png"),
+		g_basename (filename));
+	gnome_ic on_list_set_icon_data (iconlist, pos, filename);
+}
+
+static void
 attach_dialog_ok (GtkWidget * widget, gpointer data)
 {
   GtkFileSelection *fs;
   GnomeIconList *iconlist;
   gchar *filename;
-  gint pos;
 
   fs = GTK_FILE_SELECTION (data);
   iconlist = GNOME_ICON_LIST (gtk_object_get_user_data (GTK_OBJECT (fs)));
 
   filename = g_strdup (gtk_file_selection_get_filename (fs));
 
-  pos = gnome_icon_list_append (iconlist,
-		   gnome_unconditional_pixmap_file ("balsa/attachment.png"),
-				g_basename (filename));
-  gnome_icon_list_set_icon_data (iconlist, pos, filename);
+  add_attachment (iconlist, filename);
 
   /* FIXME */
   /* g_free(filename); */
@@ -323,6 +335,27 @@ attach_clicked (GtkWidget * widget, gpointer data)
 		      fs);
 
   gtk_widget_show (fsw);
+}
+
+static void
+attachments_add (GtkWidget          *widget,
+		 GdkDragContext     *context,
+		 gint                x,
+		 gint                y,
+		 GtkSelectionData   *selection_data,
+		 guint               info,
+		 guint32             time,
+		 GnomeIconList       *iconlist)
+{
+	GList *names, *l;
+	
+	names = gnome_uri_list_extract_uris (selection_data->data);
+	for (l = names; l; l = l->next){
+		char *name = l->data;
+		
+		add_attachment (GNOME_ICON_LIST (widget), name);
+	}
+	gnome_uri_list_free_strings (names);
 }
 
 static GtkWidget *
@@ -433,6 +466,12 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   /* create icon list */
   msg->attachments = gnome_icon_list_new (100, NULL, FALSE);
+  gtk_signal_connect (GTK_OBJECT (msg->attachments), "drag_data_received",
+		      GTK_SIGNAL_FUNC(attachment_add), NULL);
+  gtk_drag_dest_set (GTK_WIDGET (msg->attachments), GTK_DEST_DEFAULT_ALL,
+		     drop_types, ELEMENTS(drop_types),
+		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
+
   gtk_widget_pop_visual ();
   gtk_widget_pop_colormap ();
 
@@ -777,3 +816,4 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);
 }
+

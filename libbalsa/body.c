@@ -352,17 +352,20 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 }
 
 static GMimeStream *
-libbalsa_message_body_assure_stream_filter(GMimeStream * stream)
+libbalsa_message_body_stream_add_filter(GMimeStream * stream,
+                                        GMimeFilter * filter)
 {
-    GMimeStream *filtered_stream;
+    if (!GMIME_IS_STREAM_FILTER(stream)) {
+        GMimeStream *filtered_stream =
+            g_mime_stream_filter_new_with_stream(stream);
+        g_object_unref(stream);
+        stream = filtered_stream;
+    }
 
-    if (GMIME_IS_STREAM_FILTER(stream))
-        return stream;
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
+    g_object_unref(filter);
 
-    filtered_stream = g_mime_stream_filter_new_with_stream(stream);
-    g_object_unref(stream);
-
-    return filtered_stream;
+    return stream;
 }
 
 GMimeStream *
@@ -377,14 +380,38 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
     g_return_val_if_fail(body->message != NULL, NULL);
 
     if (body->message->mailbox
-	&& libbalsa_mailbox_get_message_part(body->message, body)) {
+        && libbalsa_mailbox_get_message_part(body->message, body)) {
         GMimeDataWrapper *wrapper;
+	GMimePartEncodingType encoding;
 
         wrapper =
             g_mime_part_get_content_object(GMIME_PART(body->mime_part));
-	stream = g_mime_stream_mem_new();
-	g_mime_data_wrapper_write_to_stream(wrapper, stream);
+        stream = g_mime_data_wrapper_get_stream(wrapper);
+        encoding = g_mime_data_wrapper_get_encoding(wrapper);
         g_object_unref(wrapper);
+
+        switch (encoding) {
+        case GMIME_PART_ENCODING_BASE64:
+            filter =
+                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
+            stream =
+                libbalsa_message_body_stream_add_filter(stream, filter);
+            break;
+        case GMIME_PART_ENCODING_QUOTEDPRINTABLE:
+            filter =
+                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_QP_DEC);
+            stream =
+                libbalsa_message_body_stream_add_filter(stream, filter);
+            break;
+        case GMIME_PART_ENCODING_UUENCODE:
+            filter =
+                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_UU_DEC);
+            stream =
+                libbalsa_message_body_stream_add_filter(stream, filter);
+            break;
+        default:
+            break;
+        }
     } else if (body->mime_part) {
         /* Not a GMimePart... */
 	GMimeObject *object = body->mime_part;
@@ -404,13 +431,11 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
 	&& strcmp(mime_type = libbalsa_message_body_get_mime_type(body),
 			                  "text/html") != 0
-	&& (charset = libbalsa_message_body_charset(body))
+	&& (charset = libbalsa_message_body_charset(body)) != NULL
 	&& g_ascii_strcasecmp(charset, "unknown-8bit") != 0
-	&& (filter = g_mime_filter_charset_new(charset, "UTF-8")) != NULL) {
-	stream = libbalsa_message_body_assure_stream_filter(stream);
-	g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
-	g_object_unref(filter);
-    }
+	&& (filter = g_mime_filter_charset_new(charset, "UTF-8")) != NULL)
+	stream = libbalsa_message_body_stream_add_filter(stream, filter);
+
     g_free(mime_type);
 
     g_mime_stream_reset(stream);

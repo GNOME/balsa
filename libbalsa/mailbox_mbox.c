@@ -1420,22 +1420,27 @@ lbm_mbox_prepare_object(GMimeObject * mime_part)
     }
 }
 
-static GMimeStream *
-lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
+static GMimeObject *
+lbm_mbox_armored_object(GMimeStream * stream)
 {
     GMimeParser *parser;
-    GMimeMessage *message;
-    GMimeStream *fstream;
-    GMimeFilter *filter;
+    GMimeObject *object;
 
     parser = g_mime_parser_new_with_stream(stream);
-    message = g_mime_parser_construct_message(parser);
+    object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
     g_object_unref(parser);
-    lbm_mbox_prepare_object(GMIME_OBJECT(message));
+    lbm_mbox_prepare_object(object);
 
-    stream = g_mime_stream_mem_new();
+    return object;
+}
+
+static GMimeStream *
+lbm_mbox_armored_stream(GMimeStream * stream)
+{
+    GMimeStream *fstream;
+    GMimeFilter *filter;
+    
     fstream = g_mime_stream_filter_new_with_stream(stream);
-    g_object_unref(stream);
 
     filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
 				    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
@@ -1445,14 +1450,6 @@ lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
     filter = g_mime_filter_from_new(GMIME_FILTER_FROM_MODE_ARMOR);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
-
-    /* Make sure we have "Status" and "X-Status" headers, so we can
-     * update them in place later, if necessary. */
-    update_message_status_headers(message, flags);
-
-    g_mime_object_write_to_stream(GMIME_OBJECT(message), fstream);
-    g_object_unref(message);
-    g_mime_stream_reset(fstream);
 
     return fstream;
 }
@@ -1470,7 +1467,8 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     const char *path;
     int fd;
     GMimeStream *orig;
-    GMimeStream *armored_stream;
+    GMimeObject *armored_object;
+    GMimeStream *armored_dest;
     GMimeStream *dest;
     gint retval = 1;
     off_t orig_length;
@@ -1538,28 +1536,33 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
 
     /* From_ armor */
-    armored_stream =
-        lbm_mbox_armor_stream(orig, (message->flags |
-                                     LIBBALSA_MESSAGE_FLAG_RECENT));
+    armored_object = lbm_mbox_armored_object(orig);
     g_object_unref(orig);
+    /* Make sure we have "Status" and "X-Status" headers, so we can
+     * update them in place later, if necessary. */
+    update_message_status_headers(GMIME_MESSAGE(armored_object),
+                                  message->flags |
+                                  LIBBALSA_MESSAGE_FLAG_RECENT);
+    armored_dest = lbm_mbox_armored_stream(dest);
 
     g_mime_stream_seek(dest, 0, GMIME_STREAM_SEEK_END);
     if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
-	|| g_mime_stream_write_to_stream (armored_stream, dest) < 0) {
+	|| g_mime_object_write_to_stream(armored_object, armored_dest) < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR, _("Data copy error"));
 	retval = -1;
     }
+    g_free(from);
+    g_object_unref(armored_object);
+    g_object_unref(armored_dest);
 
     if (retval > 0)
 	retval = lbm_mbox_newline(dest);
- 
-    g_object_unref(armored_stream);
+
     if(retval<0)
         truncate(path, orig_length);
     mbox_unlock (mailbox, dest);
     g_object_unref(dest);
-    g_free(from);
 
     return retval;
 }

@@ -183,9 +183,10 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     if (list_inbox)
         /* force INBOX into the mailbox list
          * delim doesn't matter, so we'll give it '/'
-         * and we'll mark it as not scanned, in case it
-         * has any subfolders */
-        mailbox_handler("INBOX", '/', FALSE, cb_data);
+         * and we'll mark it as scanned, because the only reason for
+         * using this option is to pickup an INBOX that isn't in the
+         * tree specified by the prefix */
+        mailbox_handler("INBOX", '/', TRUE, cb_data);
 
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
     safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);

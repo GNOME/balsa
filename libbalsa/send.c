@@ -284,6 +284,7 @@ add_mutt_body_plain(const gchar * charset, gint encoding_style,
     body->subtype = g_strdup("plain");
     body->unlink = 1;
     body->use_disp = 0;
+    body->force_charset = 1;
 
     body->encoding = encoding_style;
 

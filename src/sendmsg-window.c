@@ -3154,12 +3154,9 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     gboolean successful = TRUE;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc = NULL;
-    const char* old_charset;
 
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
-
-    old_charset = libbalsa_set_charset(bsmsg->charset);
 
     if (balsa_app.debug)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
@@ -3186,7 +3183,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					   balsa_app.encoding_style,
 					   bsmsg->flow); 
 #endif
-    libbalsa_set_charset(old_charset);
     if (successful) {
 	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
 	    bsmsg->type == SEND_REPLY_GROUP) {

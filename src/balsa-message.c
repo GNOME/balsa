@@ -3043,7 +3043,6 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     gchar *date, *dummy;
 
     /* create a message with the header set from the incoming message */
-    libbalsa_set_charset("ISO-8859-1");  /* how do I detect the *standard* setting? */
     message = libbalsa_message_new();
     dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
     message->from = libbalsa_address_new_from_string(dummy);

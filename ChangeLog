@@ -1,3 +1,9 @@
+2004-12-04 08:39  PeterB
+
+	* src/: balsa-index.c, balsa-index.h, message-window.c: remove
+	balsa_index_next_.*_msgno api; implement balsa_index_select() and
+	use it to manage highlighting in the mailbox index.
+
 2004-12-02 11:19  PeterB
 
 	* libbalsa/address-entry.c: connect to detailed signal.

@@ -101,10 +101,26 @@ dnl ###########################################################################
 
 AC_CONFIG_SUBDIRS(libmutt)
 
+dnl ###########################################################################
+dnl --enable-deprecated-pspell
+dnl ###########################################################################
+AC_ARG_ENABLE(deprecated-pspell, [  --enable-deprecated-pspell      Enable pspell support instead of default aspell.],[
+	enable_deprecated_pspell=$enableval
+],[
+	enable_deprecated_pspell=no
+])
 
-AC_CHECK_LIB(pspell, new_pspell_manager,,[
-	AC_MSG_ERROR([*** libpspell(-devel) not found.  Please check http://www.balsa.net for information on the required files.])
-], -lstdc++ -lpspell-modules)
+if test x$enable_deprecated_pspell = xyes ; then
+  AC_CHECK_LIB(pspell, new_pspell_manager,,[
+	AC_MSG_ERROR([*** pspell(-devel) not found. Please check http://www.balsa.net for information on the required files.])
+  ], -lstdc++ -lpspell-modules)
+else
+  AC_CHECK_LIB(pspell, new_aspell_speller,,[
+	AC_MSG_ERROR([*** aspell library not found.
+If You have deprecated pspell, please try to use --enable-deprecated-pspell
+configure switch. Upgrade to aspell>=0.50 is strongly recommended.])
+  ], -lstdc++)
+fi
 
 dnl Reset
 # LDFLAGS="$balsa_save_LDFLAGS"

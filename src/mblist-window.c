@@ -93,7 +93,6 @@ mblist_open_window (GnomeMDI * mdi)
   mblw->window = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (mblw->window), "Mailboxes");
 
-  gtk_widget_set_usize (GTK_WIDGET (mblw->window), balsa_app.mblist_width, balsa_app.mblist_height);
   gtk_window_set_policy (GTK_WINDOW (mblw->window), TRUE, TRUE, TRUE);
 
   mblw->mdi = mdi;
@@ -115,6 +114,8 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
+
+  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
 
   gtk_ctree_show_stub (mblw->ctree, FALSE);
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
@@ -219,8 +220,8 @@ close_mblist_window (GtkWidget * widget)
   if (!mblw)
     return;
 
-  balsa_app.mblist_width = mblw->window->allocation.width;
-  balsa_app.mblist_height = mblw->window->allocation.height;
+  balsa_app.mblist_width = GTK_WIDGET(mblw->ctree)->allocation.width;
+  balsa_app.mblist_height = GTK_WIDGET(mblw->ctree)->allocation.height;
 
   gtk_widget_destroy (mblw->window);
   gtk_widget_destroy (GTK_WIDGET (mblw->ctree));

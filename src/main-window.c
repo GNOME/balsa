@@ -104,8 +104,8 @@ main_window_set_cursor (gint type)
 static void
 destroy_window_cb (GnomeMDI * mdi, gpointer data)
 {
-  balsa_app.mw_width = GTK_WIDGET(mdi->active_window)->allocation.width;
-  balsa_app.mw_height = GTK_WIDGET(mdi->active_window)->allocation.height;
+  balsa_app.mw_width = GTK_WIDGET (mdi->active_window)->allocation.width;
+  balsa_app.mw_height = GTK_WIDGET (mdi->active_window)->allocation.height;
   balsa_exit ();
 }
 
@@ -250,6 +250,34 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) mblist_window_cb, NULL);
   gtk_widget_add_accelerator (w, "activate", accel, 'C', 0, GTK_ACCEL_VISIBLE);
   gtk_menu_append (GTK_MENU (menu), w);
+/* FIXME this needs to be updated if mailboxes and such are changed.... how?
+ * :)
+ */
+#if 0
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Open..."));
+  {
+    GtkWidget *submenu;
+    GtkWidget *smenuitem;
+    GtkWidget *bmbl;
+
+    submenu = gtk_menu_new ();
+    smenuitem = gtk_menu_item_new ();
+    bmbl = balsa_mblist_new ();
+    /*
+    gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
+			(GtkSignalFunc) transfer_messages_cb,
+			(gpointer) bindex);
+*/
+    gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, balsa_app.mblist_height);
+    gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
+    gtk_menu_append (GTK_MENU (submenu), smenuitem);
+    gtk_widget_show (bmbl);
+    gtk_widget_show (smenuitem);
+
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), submenu);
+  }
+  gtk_menu_append (GTK_MENU (menu), w);
+#endif
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("Close"));
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) mailbox_close_child, NULL);
@@ -412,7 +440,7 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 			     _ ("Print"),
 			     _ ("Print current message"),
 			     NULL,
-	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
+	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_PRINT),
 			     (GtkSignalFunc) NULL,
 			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);

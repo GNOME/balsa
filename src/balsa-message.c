@@ -540,6 +540,18 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * messa
 					 _("detected a good signature"));
 		} else {
 		    result = LIBBALSA_MESSAGE_SIGNATURE_BAD;
+
+#ifdef HAVE_GPG
+		    if (checkResult->status == GPGME_SIG_STAT_NOKEY) {
+			gchar *msg = 
+			    g_strdup_printf(_("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+					    sender, subject,
+					    libbalsa_gpgme_sig_stat_to_gchar(checkResult->status));
+			gpg_ask_import_key(msg, GTK_WINDOW(balsa_app.main_window), 
+					   checkResult->fingerprint);
+			g_free(msg);
+		    } else
+#endif
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					 _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
 					 sender, subject,
@@ -1740,6 +1752,17 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 		libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
 				       balsa_app.convert_unknown_8bit_codeset, NULL);
 		
+#ifdef HAVE_GPG
+		if (sig_res == GPGME_SIG_STAT_NOKEY) {
+		    gchar *msg = 
+			g_strdup_printf(_("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
+					sender, subject,
+					libbalsa_gpgme_sig_stat_to_gchar(sig_res));
+		    gpg_ask_import_key(msg, GTK_WINDOW(balsa_app.main_window), 
+				       info->body->sig_info->fingerprint);
+		    g_free(msg);
+		} else
+#endif
 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				     _("Checking the signature of the message sent by %s with subject \"%s\" returned:\n%s"),
 				     sender, subject,

@@ -120,6 +120,11 @@ if test x"$have_gpgme" != xno ; then
 			BALSA_LIBS="$BALSA_LIBS -lgpgme"
 		fi
 		have_gpgme=yes
+		AC_PATH_PROG(gpg_path, gpg)
+		if test x"$gpg_path" != "x" ; then
+			AC_DEFINE(HAVE_GPG,1,[Defined when gpg is available.])
+			AC_DEFINE_UNQUOTED(GPG_PATH,["$gpg_path"],[Path of gpg.])
+		fi
 	else
 		AC_MSG_WARN([sorry, you need gpgme version 0.3.x w/ x >= 14])
 		have_gpgme=no

@@ -99,6 +99,11 @@ const gchar *libbalsa_gpgme_validity_to_gchar(GpgmeValidity validity);
 gchar *libbalsa_signature_info_to_gchar(LibBalsaSignatureInfo * info, 
 					const gchar * date_string);
 
+#ifdef HAVE_GPG
+gboolean gpg_ask_import_key(const gchar *message, GtkWindow *parent,
+			    const gchar *fingerprint);
+#endif
+
 #endif /* HAVE_GPGME */
 
 #endif /* __RFC3156_GPG_H__ */

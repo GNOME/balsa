@@ -1256,6 +1256,133 @@ libbalsa_rfc2440_decrypt_buffer(gchar **buffer, const gchar *charset,
 }
 
 
+#ifdef HAVE_GPG
+
+#include <sys/wait.h>
+#include <fcntl.h>
+
+/* run gpg asynchronously to import a key */
+typedef struct _spawned_gpg_T {
+    gint child_pid;
+    gint standard_error;
+    GString *stderr_buf;
+    GtkWindow *parent;
+} spawned_gpg_T;
+
+static gboolean check_gpg_child(gpointer data);
+
+gboolean
+gpg_ask_import_key(const gchar *message, GtkWindow *parent, 
+		   const gchar *fingerprint)
+{
+    gboolean spawnres;
+    GtkWidget *dialog;
+    gint dialog_res;
+    gchar **argv;
+    spawned_gpg_T *spawned_gpg;
+
+    /* display a dialog, asking the user if (s)he wants to import the key */
+    dialog =
+	gtk_message_dialog_new (parent,
+				GTK_DIALOG_DESTROY_WITH_PARENT,
+				GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_YES_NO,
+				_("%s\nDo you want to run gpg to import the public key with fingerprint %s?"),
+				message, fingerprint);
+    dialog_res = gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+    if (dialog_res != GTK_RESPONSE_YES)
+	return FALSE;
+
+    /* launch gpg... */
+    argv = g_new(gchar *, 5);
+    argv[0] = g_strdup(GPG_PATH);
+    argv[1] = g_strdup("--no-greeting");
+    argv[2] = g_strdup("--recv-keys");
+    argv[3] = g_strdup(fingerprint);
+    argv[4] = NULL;
+    spawned_gpg = g_new0(spawned_gpg_T, 1);
+    spawnres =
+	g_spawn_async_with_pipes(NULL, argv, NULL,
+				 G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_STDOUT_TO_DEV_NULL,
+				 NULL, NULL, &spawned_gpg->child_pid,
+				 NULL, NULL,
+				 &spawned_gpg->standard_error,
+				 NULL);
+    g_strfreev(argv);
+    if (spawnres == FALSE) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("Could not launch %s to get the public key %s."),
+			     GPG_PATH, fingerprint);
+	g_free(spawned_gpg);
+	return FALSE;
+    }
+
+    /* install an idle handler to check if the child returnd successfully. */
+    fcntl(spawned_gpg->standard_error, F_SETFL, O_NONBLOCK);
+    spawned_gpg->stderr_buf = g_string_new("");
+    spawned_gpg->parent = parent;
+    g_idle_add(check_gpg_child, spawned_gpg);
+
+    return TRUE;
+}
+
+
+static gboolean
+check_gpg_child(gpointer data)
+{
+    spawned_gpg_T *spawned_gpg  = (spawned_gpg_T *)data;
+    int status, bytes_read;
+    gchar buffer[1024], *gpg_message;
+    GtkWidget *dialog;
+
+    /* read input from the child and append it to the buffer */
+    while ((bytes_read =
+	    read(spawned_gpg->standard_error, buffer, 1023)) > 0) {
+	buffer[bytes_read] = '\0';
+	g_string_append(spawned_gpg->stderr_buf, buffer);
+    }
+
+    /* check if the child exited */
+    if (waitpid(spawned_gpg->child_pid, &status, WNOHANG) !=
+	spawned_gpg->child_pid)
+	return TRUE;
+    
+    /* child exited, display some information... */
+    close(spawned_gpg->standard_error);
+
+    gpg_message = 
+	g_locale_to_utf8(spawned_gpg->stderr_buf->str, -1, NULL,
+			 &bytes_read, NULL);
+    gdk_threads_enter();
+    if (WEXITSTATUS(status) > 0)
+	dialog = 
+	    gtk_message_dialog_new(spawned_gpg->parent, 
+				   GTK_DIALOG_DESTROY_WITH_PARENT,
+				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+				   _("Running gpg failed with return value %d:\n%s"),
+				   WEXITSTATUS(status), gpg_message);
+    else
+	dialog = 
+	    gtk_message_dialog_new(spawned_gpg->parent,
+				   GTK_DIALOG_DESTROY_WITH_PARENT,
+				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+				   _("Running gpg successful:\n%s"),
+				   gpg_message);
+    g_free(gpg_message);
+    g_string_free(spawned_gpg->stderr_buf, TRUE);
+    g_free(spawned_gpg);
+
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    gdk_threads_leave();
+
+    return FALSE;
+}
+
+#endif
+
+
 /* ==== local stuff ======================================================== */
 
 

@@ -23,6 +23,9 @@
 #include "config.h"
 
 #include <gnome.h>
+#ifdef HAVE_SQLITE
+#include "address-book-gpe.h"
+#endif
 #include "balsa-app.h"
 #include "pref-manager.h"
 #include "mailbox-conf.h"
@@ -1215,6 +1218,10 @@ update_address_books(void)
 #if ENABLE_LDAP
 	else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book))
 	    type = "LDAP";
+#endif
+#if HAVE_SQLITE
+	else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
+	    type = "GPE";
 #endif
 	else
 	    type = _("Unknown");

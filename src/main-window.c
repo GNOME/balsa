@@ -178,8 +178,10 @@ static void toggle_answered_message_cb(GtkWidget * widget, gpointer data);
 static void store_address_cb(GtkWidget * widget, gpointer data);
 #if defined(ENABLE_TOUCH_UI)
 static void sort_change_cb(GtkWidget * widget, gpointer data);
+static void toggle_order_cb(GtkWidget * widget, gpointer data);
 static void balsa_window_set_sort_menu(BalsaWindow *window,
-                                       LibBalsaMailboxSortFields col);
+                                       LibBalsaMailboxSortFields col,
+                                       LibBalsaMailboxSortType   order);
 #endif /* ENABLE_TOUCH_UI */
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
@@ -890,15 +892,11 @@ static GnomeUIInfo tu_sort_l_menu[] = {
     GNOMEUIINFO_RADIOITEM_DATA
     (N_("By S_ubject"), N_("Subject order"),  sort_change_cb,
      GINT_TO_POINTER(LB_MAILBOX_SORT_SUBJECT), NULL),
-#define VIEW_SORT_DATE_POS 3
-    GNOMEUIINFO_RADIOITEM_DATA
-    (N_("By _Date"),    N_("By sending date"), sort_change_cb,
-     GINT_TO_POINTER(LB_MAILBOX_SORT_DATE), NULL),
-#define VIEW_SORT_SIZE_POS 4
+#define VIEW_SORT_SIZE_POS 3
     GNOMEUIINFO_RADIOITEM_DATA
     (N_("By Si_ze"), N_("By message size"), sort_change_cb,
      GINT_TO_POINTER(LB_MAILBOX_SORT_SIZE), NULL),
-#define VIEW_SORT_THREAD_POS 5
+#define VIEW_SORT_THREAD_POS 4
     GNOMEUIINFO_RADIOITEM_DATA
     (N_("_Threaded"), N_("Use message threading"), sort_change_cb,
      GINT_TO_POINTER(LB_MAILBOX_SORT_THREAD), NULL),
@@ -906,6 +904,11 @@ static GnomeUIInfo tu_sort_l_menu[] = {
 };
 
 static GnomeUIInfo tu_view_sort_menu[] = {
+#define MENU_VIEW_SORT_DESCENDING_POS 0
+    GNOMEUIINFO_TOGGLEITEM_DATA
+    (N_("_Descending"),  N_("Sort in a descending order"),
+     toggle_order_cb, NULL, NULL),
+    GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(tu_sort_l_menu),
     GNOMEUIINFO_END
 };
@@ -1655,7 +1658,6 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
         &tu_sort_l_menu[VIEW_SORT_SENDER_POS],
         &tu_sort_l_menu[VIEW_SORT_SUBJECT_POS],
-        &tu_sort_l_menu[VIEW_SORT_DATE_POS],
         &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
         &tu_sort_l_menu[VIEW_SORT_SIZE_POS],
         &tu_sort_l_menu[VIEW_SORT_THREAD_POS],
@@ -1712,7 +1714,8 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     if (mailbox) {
 #if defined(ENABLE_TOUCH_UI)
         balsa_window_set_sort_menu(window,
-                                   libbalsa_mailbox_get_sort_field(mailbox));
+                                   libbalsa_mailbox_get_sort_field(mailbox),
+                                   libbalsa_mailbox_get_sort_type(mailbox));
 #else
 	balsa_window_set_threading_menu(window,
 					libbalsa_mailbox_get_threading_type
@@ -2606,6 +2609,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
     progress_dialog_bar = gtk_progress_bar_new();
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
 		       progress_dialog_bar, FALSE, FALSE, 0);
+    gtk_window_set_default_size(GTK_WINDOW(progress_dialog), 250, 100);
     gtk_widget_show_all(progress_dialog);
 }
 #endif
@@ -3330,32 +3334,49 @@ store_address_cb(GtkWidget * widget, gpointer data)
 
 #if defined(ENABLE_TOUCH_UI)
 static void
-balsa_window_set_sort_menu(BalsaWindow *window, LibBalsaMailboxColumn col)
+balsa_window_set_sort_menu(BalsaWindow *window,
+                           LibBalsaMailboxSortFields col,
+                           LibBalsaMailboxSortType   order)
 {
     int pos;
+    GtkWidget *w;
+
     switch(col) {
+    case LB_MAILBOX_SORT_DATE:
     case LB_MAILBOX_SORT_NO:      pos = VIEW_SORT_MSGNO_POS;   break;
     case LB_MAILBOX_SORT_SENDER:  pos = VIEW_SORT_SENDER_POS;  break;
     case LB_MAILBOX_SORT_SUBJECT: pos = VIEW_SORT_SUBJECT_POS; break;
-    case LB_MAILBOX_SORT_DATE:    pos = VIEW_SORT_DATE_POS;    break;
     case LB_MAILBOX_SORT_SIZE:    pos = VIEW_SORT_SIZE_POS;    break;
     case LB_MAILBOX_SORT_THREAD:  pos = VIEW_SORT_THREAD_POS;   break;
     default: return;
     }
-    g_signal_handlers_block_by_func(G_OBJECT(tu_sort_l_menu[pos].widget),
-                                    tu_sort_l_menu[pos].moreinfo, 
+    w = tu_sort_l_menu[pos].widget;
+    g_signal_handlers_block_by_func(G_OBJECT(w),
+                                    tu_sort_l_menu[pos].moreinfo,
                                     window);
-    gtk_check_menu_item_set_active
-        (GTK_CHECK_MENU_ITEM(tu_sort_l_menu[pos].widget), TRUE);
-    g_signal_handlers_unblock_by_func(G_OBJECT(tu_sort_l_menu[pos].widget),
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
+    g_signal_handlers_unblock_by_func(G_OBJECT(w),
                                       tu_sort_l_menu[pos].moreinfo,
                                       window);
+    w = tu_view_sort_menu[MENU_VIEW_SORT_DESCENDING_POS].widget;
+    g_signal_handlers_block_by_func
+        (G_OBJECT(w),
+         tu_view_sort_menu[MENU_VIEW_SORT_DESCENDING_POS].moreinfo,
+         window);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w),
+                                   order == LB_MAILBOX_SORT_TYPE_DESC);
+    g_signal_handlers_unblock_by_func
+        (G_OBJECT(w),
+         tu_view_sort_menu[MENU_VIEW_SORT_DESCENDING_POS].moreinfo, 
+         window);
+    gtk_widget_set_sensitive(w, pos != VIEW_SORT_THREAD_POS);
 }
 
 static void
 sort_change_cb(GtkWidget * widget, gpointer data)
 {
     LibBalsaMailboxSortFields key;
+    LibBalsaMailboxSortType   order;
     GtkWidget       *bindex;
     LibBalsaMailbox *mailbox;
     gint             col;
@@ -3370,7 +3391,7 @@ sort_change_cb(GtkWidget * widget, gpointer data)
     key = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
                                              GNOMEUIINFO_KEY_UIDATA));
     mailbox = BALSA_INDEX(bindex)->mailbox_node->mailbox;
-    libbalsa_mailbox_set_sort_field(mailbox, key);
+
     switch(key) {
     case LB_MAILBOX_SORT_NO:      col = LB_MBOX_MSGNO_COL;   break;
     case LB_MAILBOX_SORT_SENDER:  col = LB_MBOX_FROM_COL;    break;
@@ -3378,18 +3399,60 @@ sort_change_cb(GtkWidget * widget, gpointer data)
     case LB_MAILBOX_SORT_DATE:    col = LB_MBOX_DATE_COL;    break;
     case LB_MAILBOX_SORT_SIZE:    col = LB_MBOX_SIZE_COL;    break;
     case LB_MAILBOX_SORT_THREAD:
+        libbalsa_mailbox_set_sort_field(mailbox, key);
         balsa_index_set_threading_type(BALSA_INDEX(bindex),
                                        LB_MAILBOX_THREADING_JWZ);
+        gtk_widget_set_sensitive
+            (tu_view_sort_menu[MENU_VIEW_SORT_DESCENDING_POS].widget, FALSE);
         return;
     default: return;
     }
+    gtk_widget_set_sensitive
+        (tu_view_sort_menu[MENU_VIEW_SORT_DESCENDING_POS].widget, TRUE);
     if(libbalsa_mailbox_get_threading_type(mailbox)
        != LB_MAILBOX_THREADING_FLAT)
         balsa_index_set_threading_type(BALSA_INDEX(bindex),
                                        LB_MAILBOX_THREADING_FLAT);
+    order = libbalsa_mailbox_get_sort_type(mailbox);
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(mailbox),
-                                         col, GTK_SORT_ASCENDING);
- }
+                                         col, 
+                                         order == LB_MAILBOX_SORT_TYPE_ASC
+                                         ? GTK_SORT_ASCENDING
+                                         : GTK_SORT_DESCENDING);
+}
+
+static void
+toggle_order_cb(GtkWidget * widget, gpointer data)
+{
+    LibBalsaMailboxSortType   order;
+    GtkWidget       *bindex;
+    LibBalsaMailbox *mailbox;
+    gint             col;
+
+    bindex = balsa_window_find_current_index(BALSA_WINDOW(data));
+    if(!bindex)
+        return;
+    mailbox = BALSA_INDEX(bindex)->mailbox_node->mailbox;
+    order = GTK_CHECK_MENU_ITEM(widget)->active
+        ? LB_MAILBOX_SORT_TYPE_DESC :  LB_MAILBOX_SORT_TYPE_ASC;
+
+    switch(libbalsa_mailbox_get_sort_field(mailbox)) {
+    case LB_MAILBOX_SORT_NO:      col = LB_MBOX_MSGNO_COL;   break;
+    case LB_MAILBOX_SORT_SENDER:  col = LB_MBOX_FROM_COL;    break;
+    case LB_MAILBOX_SORT_SUBJECT: col = LB_MBOX_SUBJECT_COL; break;
+    case LB_MAILBOX_SORT_DATE:    col = LB_MBOX_DATE_COL;    break;
+    case LB_MAILBOX_SORT_SIZE:    col = LB_MBOX_SIZE_COL;    break;
+    default:
+    case LB_MAILBOX_SORT_THREAD:
+        g_warning("This should not be possible"); return;
+    }
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(mailbox),
+                                         col, 
+                                         order == LB_MAILBOX_SORT_TYPE_ASC
+                                         ? GTK_SORT_ASCENDING
+                                         : GTK_SORT_DESCENDING);
+}
+
 #endif /* ENABLE_TOUCH_UI */
 static void
 wrap_message_cb(GtkWidget * widget, gpointer data)

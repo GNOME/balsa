@@ -355,7 +355,7 @@ fetch_async_cb(PopReqCode prc, void *arg, ...)
     case POP_REQ_DATA:
 	{unsigned len = va_arg(alist, unsigned);
 	char    *buf = va_arg(alist, char*);
-        if( (batch_cnt++ & 0x1f) &&
+        if( (batch_cnt++ & 0x04) &&
             last_update != (current_time = time(NULL))) {
             snprintf(threadbuf, sizeof(threadbuf),
                      _("Received %ld kB of %ld"),

@@ -38,6 +38,7 @@
 #include "address-book-ldap.h"
 #endif
 #include "address-book-vcard.h"
+#include "address-book-gpe.h"
 
 struct ABMainWindow {
     GtkWidget *entry_list; /* GtkListView widget */
@@ -561,6 +562,9 @@ bab_init(void)
     LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
 #if ENABLE_LDAP
     LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
+#endif
+#if HAVE_SQLITE
+    LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
     memset(&contacts_app, 0, sizeof(contacts_app));
 }

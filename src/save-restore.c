@@ -651,7 +651,7 @@ config_global_load(void)
     /* ... window sizes */
     balsa_app.mw_width = gnome_config_get_int("MainWindowWidth=640");
     balsa_app.mw_height = gnome_config_get_int("MainWindowHeight=480");
-    balsa_app.mblist_width = gnome_config_get_int("MailboxListWidth=100");
+    balsa_app.mblist_width = gnome_config_get_int("MailboxListWidth=130");
     /* sendmsg window sizes */
     balsa_app.sw_width = gnome_config_get_int("SendMsgWindowWidth=640");
     balsa_app.sw_height = gnome_config_get_int("SendMsgWindowHeight=480");

@@ -29,6 +29,8 @@ libbalsa_a_SOURCES = 		\
 	abook-completion.h	\
 	address-book-extern.c	\
 	address-book-extern.h	\
+	address-book-gpe.c	\
+	address-book-gpe.h	\
 	address-book-ldap.c 	\
 	address-book-ldap.h	\
 	address-book-ldif.c	\

@@ -45,7 +45,7 @@ static const int DEBUG_LDAP = 0;
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
 static const unsigned LDAP_MIN_LEN=2;
 /* Which parameters do we want back? */
-char* attrs[] = {
+static char* attrs[] = {
     "cn",        /* maps to displayed name */
     "mail",      /* maps to itself         */
     "sn",        /* maps to last name      */

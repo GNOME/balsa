@@ -37,6 +37,7 @@
 #include <ldap.h>
 #endif
 
+#include "address-book-gpe.h"
 #include "libbalsa.h"
 #include "misc.h"
 
@@ -95,6 +96,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
 #if ENABLE_LDAP
     LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
+#endif
+#if HAVE_SQLITE
+    LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
 }
 

@@ -25,6 +25,7 @@
 
 #include "balsa-app.h"
 #include "address-book-config.h"
+#include "address-book-gpe.h"
 
 typedef struct _AddressBookConfig AddressBookConfig;
 struct _AddressBookConfig {
@@ -80,6 +81,9 @@ static GtkWidget *create_externq_page(AddressBookConfig * abc);
 static GtkWidget *create_ldif_page(AddressBookConfig * abc);
 #ifdef ENABLE_LDAP
 static GtkWidget *create_ldap_page(AddressBookConfig * abc);
+#endif
+#ifdef HAVE_SQLITE
+static GtkWidget *create_gpe_page(AddressBookConfig * abc);
 #endif
 static void set_the_page(GtkWidget * button, AddressBookConfig * abc);
 
@@ -248,6 +252,19 @@ create_choice_page(AddressBookConfig * abc)
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
     gtk_widget_show(label);
 #endif
+#ifdef HAVE_SQLITE
+    radio_button = gtk_radio_button_new_with_label
+	(gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio_button)),
+	 _("GPE Address Book"));
+    gtk_box_pack_start(GTK_BOX(vbox), radio_button, FALSE, FALSE, 0);
+    g_signal_connect(G_OBJECT(radio_button), "clicked",
+		     G_CALLBACK(set_the_page), (gpointer) abc);
+    g_object_set_data(G_OBJECT(radio_button), "user_data",
+                      GINT_TO_POINTER(LIBBALSA_TYPE_ADDRESS_BOOK_GPE));
+    gtk_widget_show(radio_button);
+#else
+    /* Should we inform about missing SQLite support? */
+#endif
 
 
     return vbox;
@@ -266,6 +283,10 @@ create_page_from_type(AddressBookConfig * abc)
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
         return create_ldap_page(abc);
+#endif
+#ifdef HAVE_SQLITE
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
+        return create_gpe_page(abc);
 #endif
     } else {
         g_assert_not_reached();
@@ -499,6 +520,35 @@ create_ldap_page(AddressBookConfig * abc)
 }
 #endif
 
+#ifdef HAVE_SQLITE
+static GtkWidget *
+create_gpe_page(AddressBookConfig * abc)
+{
+    GtkWidget *table = gtk_table_new(2, 6, FALSE);
+
+    LibBalsaAddressBookLdap* ab;
+    GtkDialog* mcw = GTK_DIALOG(abc->window);
+    GtkWidget* label;
+
+    ab = (LibBalsaAddressBookLdap*)abc->address_book; /* may be NULL */
+
+    abc->link_id = "GPE";
+    /* mailbox name */
+
+    label = create_label(_("A_ddress Book Name"), table, 0);
+    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+				   ab ? abc->address_book->name 
+                                   : _("GPE Address Book"), 
+				   label);
+    abc->expand_aliases_button =
+	create_check(mcw, _("_Expand aliases as you type"), table, 3,
+		     ab ? abc->address_book->expand_aliases : TRUE);
+    gtk_widget_show_all(table);
+
+    return table;
+}
+#endif
+
 static void
 set_the_page(GtkWidget * button, AddressBookConfig * abc)
 {
@@ -725,6 +775,11 @@ create_book(AddressBookConfig * abc)
         address_book =
             libbalsa_address_book_ldap_new(name, host_name, base_dn,
                                            bind_dn, passwd, enable_tls);
+#endif
+#ifdef HAVE_SQLITE
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
+        address_book =
+            libbalsa_address_book_gpe_new(name);
 #endif
     } else
         g_assert_not_reached();

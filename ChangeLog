@@ -1,3 +1,20 @@
+2004-08-22  Pawel Salek
+
+	* configure.in: add --with-sqlite option.
+	* libbalsa/Makefile.am: add address-book-gpe.[hc] - support for
+	GPE address book - http://gpe.handhelds.org/
+	* libbalsa/libbalsa.c: register address book object.
+	* libbalsa/mailbox_pop3.c: update progress dialog more frequently.
+	* libbalsa/send.c: set default "Sending.." progress dialog size.
+	* src/ab-main.c: register GPE address book object.
+	* src/pref-manager.c: 
+	* src/address-book-config.c: add GPE address book config.
+	* src/balsa-app.h: more sensible default layout and fonts.
+	* src/save-restore.c: ditto.
+	* src/balsa-mblist.c: shorten column titles.
+	* src/main-window.c: more cleanup for touch-ui.
+	* src/main.c: fixes to -s option.
+
 2004-08-22 13:27  PeterB
 
 	* src/mailbox-node.c: steal the mailbox when moving a special

@@ -84,8 +84,8 @@ static void threads_destroy(void);
 #endif				/* BALSA_USE_THREADS */
 
 static void balsa_init(int argc, char **argv);
-static void config_init(void);
-static void mailboxes_init(void);
+static void config_init(gboolean check_only);
+static void mailboxes_init(gboolean check_only);
 static void balsa_cleanup(void);
 static gint balsa_kill_session(GnomeClient * client, gpointer client_data);
 static gint balsa_save_session(GnomeClient * client, gint phase,
@@ -139,6 +139,12 @@ balsa_handle_automation_options() {
 
        if (cmd_open_inbox)
 	   GNOME_Balsa_Application_openInbox (app, &ev);
+
+       if (cmd_get_stats) {
+           CORBA_long unread = 0, unsent = 0;
+	   GNOME_Balsa_Application_getStats (app, &unread, &unsent, &ev);
+           printf("Unread: %ld Unsent: %ld\n", (long)unread, (long)unsent);
+       }
 
        if (cmd_get_stats) {
            CORBA_long unread = 0, unsent = 0;
@@ -295,19 +301,19 @@ check_special_mailboxes(void)
 }
 
 static void
-config_init(void)
+config_init(gboolean check_only)
 {
-    while(!config_load()) {
+    while(!config_load() && !check_only) {
 	balsa_init_begin();
         config_defclient_save();
     }
 }
 
 static void
-mailboxes_init(void)
+mailboxes_init(gboolean check_only)
 {
     check_special_mailboxes();
-    if (!balsa_app.inbox) {
+    if (!balsa_app.inbox && !check_only) {
 	g_warning("*** error loading mailboxes\n");
 	balsa_init_begin();
         config_defclient_save();
@@ -405,14 +411,20 @@ void balsa_get_stats(long *unread, long *unsent);
 void
 balsa_get_stats(long *unread, long *unsent)
 {
+    
     if(balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL) ) {
+        /* set threading type to load messages */
+        gdk_threads_enter();
+        libbalsa_mailbox_set_threading(balsa_app.inbox,
+                                       balsa_app.inbox->view->threading_type);
+        gdk_threads_leave();
         *unread = balsa_app.inbox->unread_messages;
         libbalsa_mailbox_close(balsa_app.inbox, FALSE);
-    }
-    if(balsa_app.draftbox && libbalsa_mailbox_open(balsa_app.draftbox, NULL)){
-        *unsent = libbalsa_mailbox_total_messages(balsa_app.draftbox);
-        libbalsa_mailbox_close(balsa_app.draftbox, FALSE);
-    }
+    } else *unread = -1;
+    if(balsa_app.draftbox && libbalsa_mailbox_open(balsa_app.outbox, NULL)){
+        *unsent = libbalsa_mailbox_total_messages(balsa_app.outbox);
+        libbalsa_mailbox_close(balsa_app.outbox, FALSE);
+    } else *unsent = -1;
 }
 
 /* scan_mailboxes:
@@ -563,7 +575,8 @@ main(int argc, char *argv[])
     libbalsa_filters_set_filter_list(&balsa_app.filters);
     
     /* checking for valid config files */
-    config_init();
+    config_init(cmd_get_stats);
+
     libbalsa_mailbox_view_table =
 	g_hash_table_new_full(g_str_hash, g_str_equal,
 			      (GDestroyNotify) g_free,
@@ -588,7 +601,14 @@ main(int argc, char *argv[])
 
     /* load mailboxes */
     config_load_sections();
-    mailboxes_init();
+    mailboxes_init(cmd_get_stats);
+
+    if(cmd_get_stats) {
+        long unread, unsent;
+        balsa_get_stats(&unread, &unsent);
+        printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+        exit(0);
+    }
 
     /* session management */
     client = gnome_master_client();

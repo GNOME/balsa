@@ -248,7 +248,7 @@ ensure_send_progress_dialog()
     send_dialog_bar = gtk_progress_bar_new();
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
 		       send_dialog_bar, FALSE, FALSE, 0);
-
+    gtk_window_set_default_size(GTK_WINDOW(send_dialog), 250, 100);
     gtk_widget_show_all(send_dialog);
     g_signal_connect(G_OBJECT(send_dialog), "response", 
 		     G_CALLBACK(send_dialog_response_cb), NULL);

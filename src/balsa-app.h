@@ -56,16 +56,16 @@
 #define NUM_DEFAULT_WIDTH 30
 #define STATUS_DEFAULT_WIDTH 16
 #define ATTACHMENT_DEFAULT_WIDTH 16
-#define FROM_DEFAULT_WIDTH 160
-#define SUBJECT_DEFAULT_WIDTH 250
+#define FROM_DEFAULT_WIDTH 128
+#define SUBJECT_DEFAULT_WIDTH 180
 #define DATE_DEFAULT_WIDTH 128
 #define SIZE_DEFAULT_WIDTH 40
 
 /* default width settings for the mailbox list columns, not fully utilized yet */
 #define MBNAME_DEFAULT_WIDTH 80
 
-#define NEWMSGCOUNT_DEFAULT_WIDTH 45
-#define TOTALMSGCOUNT_DEFAULT_WIDTH 45
+#define NEWMSGCOUNT_DEFAULT_WIDTH 20
+#define TOTALMSGCOUNT_DEFAULT_WIDTH 25
 #define INFO_FIELD_LENGTH 10
 
 /*
@@ -89,9 +89,9 @@
 #define DEFAULT_SUBJECT_FONT "helvetica Bold 10"
 #define DEFAULT_DATE_FORMAT "%x %X"
 #define DEFAULT_PAPER_SIZE "A4"
-#define DEFAULT_PRINT_HEADER_FONT "Times Roman 11"
-#define DEFAULT_PRINT_BODY_FONT "Courier 11"
-#define DEFAULT_PRINT_FOOTER_FONT "Times Roman 7"
+#define DEFAULT_PRINT_HEADER_FONT "Bitstream Charter Bold 12"
+#define DEFAULT_PRINT_BODY_FONT "Courier Regular 11"
+#define DEFAULT_PRINT_FOOTER_FONT "Bitstream Charter Bold Italic 8"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_MESSAGE_TITLE_FORMAT "Message from %F: %s"
 #define DEFAULT_ENCODING ENC8BIT

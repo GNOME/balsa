@@ -338,6 +338,30 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+dnl #########################################################################
+dnl  Check for SQLite/GPE
+dnl #########################################################################
+
+AC_ARG_WITH([sqlite],
+        AC_HELP_STRING([--with-sqlite=DIR],
+                [Use SQLite for GPE address books (default=no)]),[
+	with_sqlite=$withval
+],[
+	with_sqlite=no
+])
+AC_MSG_CHECKING(whether to use SQLite)
+if test x$with_sqlite != xno ; then
+	AC_MSG_RESULT([yes])
+        PKG_CHECK_MODULES(SQLITE, [
+        sqlite >= 2.8
+        ])
+        AC_DEFINE(HAVE_SQLITE,1,[If defined, enable GPE address book support.])
+        BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE_CFLAGS"
+        BALSA_LIBS="$BALSA_LIBS $SQLITE_LIBS"
+else
+	AC_MSG_RESULT([no])
+fi
+
 dnl ##########################################################################
 dnl Have ESMTP ?
 dnl ##########################################################################

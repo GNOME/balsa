@@ -303,7 +303,7 @@ bmbl_init(BalsaMBList * mblist)
      * under its heading. */
     /* Unread message count column */
     column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, _("Unread"));
+    gtk_tree_view_column_set_title(column, "U");
     gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_column_pack_start(column, renderer, TRUE);
@@ -328,7 +328,7 @@ bmbl_init(BalsaMBList * mblist)
 
     /* Total message count column */
     column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, _("Total"));
+    gtk_tree_view_column_set_title(column, "T");
     gtk_tree_view_column_set_alignment(column, 0.5);
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_column_pack_start(column, renderer, TRUE);

@@ -1,5 +1,7 @@
-2003-03-12 02:35  PeterB
+2003-03-12 10:03  PeterB
 
+	* src/pref-manager.c: Implement pm_page_add_to_size_group to
+	simplify alignment.
 	* src/sendmsg-window.c: Add `format-flowed' to message options
 	menu.
 

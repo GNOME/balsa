@@ -190,10 +190,9 @@ balsa_index_init (BalsaIndex * bindex)
   GTK_BIN (bindex)->child =
     (GtkWidget *) clist = gtk_clist_new_with_titles (6, titles);
 
-  mailboxpix = gdk_pixmap_create_from_xpm_d (GTK_CLIST (GTK_BIN (bindex)->child)->clist_window,
-				   &mailbox_mask, transparent, mailbox_xpm);
-
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
+
+
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
   gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);
@@ -205,6 +204,7 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_width (clist, 3, 150);
   gtk_clist_set_column_width (clist, 4, 250);
   gtk_clist_set_column_width (clist, 5, 100);
+  gtk_clist_set_row_height (clist, 16);
 
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "select_row",
@@ -223,6 +223,18 @@ balsa_index_init (BalsaIndex * bindex)
 
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
+/*
+   gtk_widget_realize(GTK_WIDGET(bindex));
+   gtk_widget_realize(GTK_WIDGET(clist));
+ */
+  gdk_pixmap_colormap_create_from_xpm_d (NULL, gtk_widget_get_colormap (GTK_WIDGET (clist)),
+				   &mailbox_mask, transparent, mailbox_xpm);
+  /*
+     gtk_widget_get_visual (widget)->depth)
+
+     mailboxpix = gdk_pixmap_create_from_xpm_d (clist->clist_window,
+     &mailbox_mask, transparent, mailbox_xpm);
+   */
 }
 
 

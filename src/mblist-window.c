@@ -80,6 +80,7 @@ mblist_open_window (GnomeMDI * mdi)
   GtkWidget *button;
   GtkCTreeNode *ctnode;
   GdkColor *transparent = NULL;
+  gint height;
   gchar *text[] =
   {"Balsa"};
 
@@ -100,16 +101,16 @@ mblist_open_window (GnomeMDI * mdi)
 			    &closed_mask, transparent, mini_dir_closed_xpm);
 
   mailboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				   &mailbox_mask, transparent, plain_folder_xpm);
+			      &mailbox_mask, transparent, plain_folder_xpm);
 
   inboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				   &inbox_mask, transparent, inbox_xpm);
+				       &inbox_mask, transparent, inbox_xpm);
 
   outboxpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				   &outbox_mask, transparent, outbox_xpm);
+				     &outbox_mask, transparent, outbox_xpm);
 
   trashpix = gdk_pixmap_create_from_xpm_d (mblw->window->window,
-				   &trash_mask, transparent, trash_xpm);
+				       &trash_mask, transparent, trash_xpm);
 
   mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
@@ -125,6 +126,7 @@ mblist_open_window (GnomeMDI * mdi)
   mblw->ctree = GTK_CTREE (gtk_ctree_new (1, 0));
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
   gtk_clist_set_policy (GTK_CLIST (mblw->ctree), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_clist_set_row_height (GTK_CLIST (mblw->ctree), 16);
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
 
@@ -135,20 +137,20 @@ mblist_open_window (GnomeMDI * mdi)
 
   /* inbox */
   text[0] = "Inbox";
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, inboxpix,
-		                                        inbox_mask, inboxpix, inbox_mask, FALSE, TRUE);
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, inboxpix,
+			     inbox_mask, inboxpix, inbox_mask, FALSE, TRUE);
   gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.inbox);
 
   /* outbox */
   text[0] = "Outbox";
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, outboxpix,
-		                                        outbox_mask, outboxpix, outbox_mask, FALSE, TRUE);
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, outboxpix,
+			  outbox_mask, outboxpix, outbox_mask, FALSE, TRUE);
   gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.outbox);
 
   /* inbox */
   text[0] = "Trash";
-  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, trashpix,
-		                                        trash_mask, trashpix, trash_mask, FALSE, TRUE);
+  ctnode = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 5, trashpix,
+			     trash_mask, trashpix, trash_mask, FALSE, TRUE);
   gtk_ctree_set_row_data (mblw->ctree, ctnode, balsa_app.trash);
 
   if (balsa_app.mailbox_nodes)
@@ -166,7 +168,10 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_clist_thaw (GTK_CLIST (mblw->ctree));
 
-  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), -1, GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height);
+  height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
+  if (height > 300)
+    height = 300;
+  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), -1, height);
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,
@@ -211,7 +216,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
     {
       if (mbnode->mailbox->type == MAILBOX_IMAP)
 	{
-	  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
+	  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 				   NULL, NULL,
 				   NULL, NULL,
 				   G_NODE_IS_LEAF (gnode), TRUE);
@@ -222,7 +227,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  if (mbnode->mailbox->type == MAILBOX_MH ||
 	      mbnode->mailbox->type == MAILBOX_MAILDIR)
 	    {
-	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
+	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 				       NULL, NULL,
 				       NULL, NULL,
 				       G_NODE_IS_LEAF (gnode), TRUE);
@@ -231,7 +236,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	  else
 	    {
 	      /* normal mailbox */
-	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2,
+	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 				       mailboxpix, mailbox_mask,
 				       mailboxpix, mailbox_mask,
 				       FALSE, TRUE);
@@ -242,7 +247,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
   if (mbnode->name && !mbnode->mailbox)
     {
       /* new directory, but not a mailbox */
-      gtk_ctree_set_node_info (ctree, cnode, g_basename (mbnode->name), 2,
+      gtk_ctree_set_node_info (ctree, cnode, g_basename (mbnode->name), 5,
 			       closed_folder, closed_mask,
 			       open_folder, open_mask,
 			       G_NODE_IS_LEAF (gnode), TRUE);
@@ -339,6 +344,5 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 	  gnome_mdi_add_child (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	  gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	}
-/* TODO TODO FIXME remove index-child from list here */
     }
 }

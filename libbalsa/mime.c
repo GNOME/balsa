@@ -20,13 +20,22 @@
  * 02111-1307, USA.
  */
 
-#include <string.h>
-#include <libgnome/libgnome.h>
 #include "config.h"
+
+#include <string.h>
 
 #include "libbalsa.h"
 #include "misc.h"
 #include "html.h"
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 /* FIXME: The content of this file could go to message.c */
 

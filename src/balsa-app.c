@@ -593,12 +593,6 @@ GtkWidget *
 balsa_stock_button_with_label(const char *icon, const char *text)
 {
     GtkWidget *button;
-#if BALSA_MAJOR < 2
-    GtkWidget *pixmap;
-
-    pixmap = gnome_stock_new_with_icon(icon);
-    button = gnome_pixmap_button(pixmap, label);
-#else
     GtkWidget *pixmap = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
     GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
     GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
@@ -615,7 +609,6 @@ balsa_stock_button_with_label(const char *icon, const char *text)
     }
 
     gtk_widget_show_all(button);
-#endif                          /* BALSA_MAJOR < 2 */
     return button;
 }
 

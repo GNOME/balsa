@@ -28,13 +28,23 @@
 #include <errno.h>
 #include <string.h>
 
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "libbalsa-conf.h"
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
 #include "misc.h"
 
-#include <libgnome/libgnome.h> 
 
 enum {
     REMOVE_FILES,
@@ -319,7 +329,7 @@ libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
-    gnome_config_set_string("Path", libbalsa_mailbox_local_get_path(local));
+    libbalsa_conf_set_string("Path", libbalsa_mailbox_local_get_path(local));
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
@@ -337,7 +347,7 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 
     g_free(mailbox->url);
 
-    path = gnome_config_get_string("Path");
+    path = libbalsa_conf_get_string("Path");
     mailbox->url = g_strconcat("file://", path, NULL);
     g_free(path);
 

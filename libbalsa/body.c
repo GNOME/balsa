@@ -28,8 +28,15 @@
 #include <string.h>
 #include <glib.h>
 #include <fcntl.h>
-/* libgnome.h needed for _() */
-#include <libgnome/libgnome.h>
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "libbalsa.h"
 #include "misc.h"

@@ -22,17 +22,27 @@
 
 #include "config.h"
 
-#include "libbalsa.h"
-#include "libbalsa_private.h"
-#include "libbalsa-marshal.h"
-
-#include <libgnome/libgnome.h> 
 #include <string.h>
 #include <stdlib.h>
 
 #ifdef USE_TLS
 #include <openssl/err.h>
 #endif
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
+#include "libbalsa.h"
+#include "libbalsa_private.h"
+#include "libbalsa-marshal.h"
+#include "libbalsa-conf.h"
 
 static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);
@@ -294,24 +304,24 @@ void
 libbalsa_server_load_config(LibBalsaServer * server)
 {
     gboolean d;
-    server->host = gnome_config_get_string("Server");
+    server->host = libbalsa_conf_get_string("Server");
     if(server->host && strrchr(server->host, ':') == NULL) {
         gint port;
-        port = gnome_config_get_int_with_default("Port", &d);
+        port = libbalsa_conf_get_int_with_default("Port", &d);
         if (!d) {
             gchar *newhost = g_strdup_printf("%s:%d", server->host, port);
             g_free(server->host);
             server->host = newhost;
         }
     }       
-    server->use_ssl = gnome_config_get_bool("SSL=false");
+    server->use_ssl = libbalsa_conf_get_bool("SSL=false");
     d=0;
-    server->tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
+    server->tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
     if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
-    server->user = gnome_config_private_get_string("Username");
-    server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
+    server->user = libbalsa_conf_private_get_string("Username");
+    server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
     if(server->remember_passwd)
-        server->passwd = gnome_config_private_get_string("Password");
+        server->passwd = libbalsa_conf_private_get_string("Password");
     if(server->passwd && server->passwd[0] == '\0') {
 	g_free(server->passwd);
 	server->passwd = NULL;
@@ -336,18 +346,18 @@ libbalsa_server_load_config(LibBalsaServer * server)
 void
 libbalsa_server_save_config(LibBalsaServer * server)
 {
-    gnome_config_set_string("Server", server->host);
-    gnome_config_private_set_string("Username", server->user);
-    gnome_config_set_bool("RememberPasswd", 
+    libbalsa_conf_set_string("Server", server->host);
+    libbalsa_conf_private_set_string("Username", server->user);
+    libbalsa_conf_set_bool("RememberPasswd", 
                           server->remember_passwd && server->passwd != NULL);
 
     if (server->remember_passwd && server->passwd != NULL) {
 	gchar *buff = libbalsa_rot(server->passwd);
-	gnome_config_private_set_string("Password", buff);
+	libbalsa_conf_private_set_string("Password", buff);
 	g_free(buff);
     }
-    gnome_config_set_bool("SSL", server->use_ssl);
-    gnome_config_set_int("TLSMode", server->tls_mode);
+    libbalsa_conf_set_bool("SSL", server->use_ssl);
+    libbalsa_conf_set_int("TLSMode", server->tls_mode);
 }
 
 void

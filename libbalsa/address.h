@@ -40,9 +40,6 @@ typedef enum _LibBalsaAddressField LibBalsaAddressField;
 enum _LibBalsaAddressField {
     FULL_NAME,
     FIRST_NAME,
-#if !defined(ENABLE_TOUCH_UI)
-    MIDDLE_NAME,
-#endif
     LAST_NAME,
     NICK_NAME,
     ORGANIZATION,
@@ -50,8 +47,7 @@ enum _LibBalsaAddressField {
     NUM_FIELDS
 };
 
-/* General address structure. it should possible subclass more compact
-   rfc2822_mailbox, or something.
+/* General address structure to be used with address books.
 */
 struct _LibBalsaAddress {
     GObject parent;
@@ -64,17 +60,16 @@ struct _LibBalsaAddress {
     gchar *nick_name;
 
     /* First and last names
-     * VCard: N: field
-     * LDAP/LDIF: cn
-     * Full name is the bit in <> in an rfc822 address
+     * VCard: parsed from N: field
+     * LDAP/LDIF: cn, givenName, surName.
      */
     gchar *full_name;
     gchar *first_name;
-    gchar *middle_name;
     gchar *last_name;
 
     /* Organisation
      * VCard: ORG: field
+     * ldif: o: attribute.
      */
     gchar *organization;
 

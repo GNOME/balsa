@@ -20,6 +20,7 @@
 #define _POSIX_SOURCE 1
 #include <string.h>
 #include <time.h>
+#undef _POSIX_SOURCE
 
 #include "siobuf.h"
 #include "imap-handle.h"

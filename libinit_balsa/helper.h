@@ -46,11 +46,8 @@ struct EntryMaster_s {
 #define ENTRY_MASTER_P_DONE( ep ) ( ((ep)->setbits & (ep)->donemask) == (ep)->donemask )
 #define ENTRY_MASTER_DONE( e ) ( ((e).setbits & (e).donemask) == (e).donemask )
 
-#if BALSA_MAJOR < 2
-GdkImlibImage *balsa_init_get_png(const gchar * fname);
-#else
 GdkPixbuf *balsa_init_get_png(const gchar * fname);
-#endif                          /* BALSA_MAJOR < 2 */
+
 void balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
                                 const gchar * etext, EntryData * ed,
                                 GnomeDruid * druid, GtkWidget ** dest);

@@ -23,18 +23,16 @@
 #include "config.h"
 #include <ctype.h>
 #include <string.h>
+
+#ifdef HAVE_GNOME
 #include <gnome.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include <libgnomevfs/gnome-vfs-mime-info.h>
 #include <libgnomevfs/gnome-vfs.h>
+#endif
 
 #include "misc.h"
 #include "files.h"
-
-#if BALSA_MAJOR > 1
-#define PATH_SEP_STR G_DIR_SEPARATOR_S
-#endif
-
 
 static const gchar *permanent_prefixes[] = {
 /*	BALSA_DATA_PREFIX,
@@ -68,8 +66,8 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 
     for (i = 0; permanent_prefixes[i]; i++) {
 	cat =
-	    g_strconcat(permanent_prefixes[i], PATH_SEP_STR, splice,
-			PATH_SEP_STR, filename, NULL);
+	    g_strconcat(permanent_prefixes[i], G_DIR_SEPARATOR_S, splice,
+			G_DIR_SEPARATOR_S, filename, NULL);
 
 	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
 	    return cat;
@@ -80,8 +78,8 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
     if(prefixes) {
         for (i = 0; prefixes[i]; i++) {
             cat =
-                g_strconcat(prefixes[i], PATH_SEP_STR, splice, PATH_SEP_STR,
-                            filename, NULL);
+                g_strconcat(prefixes[i], G_DIR_SEPARATOR_S, splice,
+			    G_DIR_SEPARATOR_S, filename, NULL);
             
             if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
                 return cat;
@@ -89,7 +87,7 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
             g_free(cat);
         }
     }
-    cat =  g_strconcat("images", PATH_SEP_STR, filename, NULL);
+    cat =  g_strconcat("images", G_DIR_SEPARATOR_S, filename, NULL);
     if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
         return cat;
     g_free(cat);
@@ -137,11 +135,13 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
                      gchar** used_type, GtkIconSize size)
 {
     char *content_type;
-    const char *icon_file;
-    gchar *icon;
+    gchar *icon = NULL;
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
+#ifdef HAVE_GNOME
+    const char *icon_file;
     GtkIconTheme *icon_theme;
+#endif
 
     if (!gtk_icon_size_lookup(size, &width, &height))
 	width = height = 16;
@@ -153,6 +153,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     else
 	content_type = g_strdup("application/octet-stream");
 
+#ifdef HAVE_GNOME
     /* gtk+ 2.4.0 and above: use the default icon theme to get the icon */
     if ((icon_theme = gtk_icon_theme_get_default()))
 	if ((icon =
@@ -192,7 +193,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 	
 	g_free (gnome_icon);
     }
-
+#endif /* HAVE_GNOME */
     /* load the pixbuf */
     if (icon == NULL)
 	pixbuf = libbalsa_default_attachment_pixbuf(width);
@@ -217,7 +218,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     return pixbuf;
 }
 
-
+#ifdef HAVE_GNOME
 static void 
 add_vfs_menu_item(GtkMenu * menu, const GnomeVFSMimeApplication *app,
 		  GCallback callback, gpointer data)
@@ -231,12 +232,14 @@ add_vfs_menu_item(GtkMenu * menu, const GnomeVFSMimeApplication *app,
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
     g_free (menu_label);
 }
-
+#endif /* HAVE_GNOME */
 /* helper: fill the passed menu with vfs items */
 void
-libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu, const gchar * content_type,
+libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu,
+				       const gchar * content_type,
 				       GCallback callback, gpointer data)
 {
+#ifdef HAVE_GNOME
     GList* list;
     GnomeVFSMimeApplication *def_app;
     GList *app_list;
@@ -255,5 +258,6 @@ libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu, const gchar * content_typ
     gnome_vfs_mime_application_free(def_app);
     
     gnome_vfs_mime_application_list_free (app_list);
+#endif /* HAVE_GNOME */
 }
 

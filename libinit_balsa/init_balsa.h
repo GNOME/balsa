@@ -19,7 +19,4 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-#include <gnome.h>
-
 void balsa_init_begin( void );

@@ -30,15 +30,24 @@
 
 #include <stdio.h>
 #include <sys/stat.h>
-#include <libgnome/libgnome.h>
 
 #include "address-book.h"
+#include "libbalsa-conf.h"
 #include "address-book-extern.h"
 #include "information.h"
 #include "abook-completion.h"
 
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
 
 static LibBalsaAddressBookClass *parent_class = NULL;
 
@@ -311,8 +320,8 @@ libbalsa_address_book_externq_save_config(LibBalsaAddressBook * ab,
 
     vc = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
-    gnome_config_set_string("Load", vc->load);
-    gnome_config_set_string("Save", vc->save);
+    libbalsa_conf_set_string("Load", vc->load);
+    libbalsa_conf_set_string("Save", vc->save);
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config(ab, prefix);
@@ -329,8 +338,8 @@ libbalsa_address_book_externq_load_config(LibBalsaAddressBook * ab,
     vc = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
     g_free(vc->load);
-    vc->load = gnome_config_get_string("Load");
-    vc->save = gnome_config_get_string("Save");
+    vc->load = libbalsa_conf_get_string("Load");
+    vc->save = libbalsa_conf_get_string("Save");
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);

@@ -589,13 +589,6 @@ abc_response_cb(GtkDialog * d, gint response, AddressBookConfig * abc)
 static void
 help_button_cb(AddressBookConfig * abc)
 {
-#if BALSA_MAJOR < 2
-    static GnomeHelpMenuEntry help_entry = { NULL, NULL };
-    help_entry.name = gnome_app_id;
-    help_entry.path = g_strconcat("ab-conf.html#", abc->link_id, NULL);
-    gnome_help_display(NULL, &help_entry);
-    g_free(help_entry.path);
-#else
     GError *err = NULL;
 
     gnome_help_display("ab-conf.html", abc->link_id, &err);
@@ -606,7 +599,6 @@ help_button_cb(AddressBookConfig * abc)
 		err->message);
         g_error_free(err);
     }
-#endif                          /* BALSA_MAJOR < 2 */
 }
 
 static void

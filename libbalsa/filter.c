@@ -29,10 +29,24 @@
  * Primary author: Emmanuel ALLAUD
  */
 
+#include "config.h"
+
 #include <ctype.h>
 #include <string.h>
 
-#include <libgnome/libgnome.h>
+#ifdef HAVE_GNOME
+#include <libgnome/gnome-sound.h>
+#endif
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -255,8 +269,10 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
     if (msgnos->len == 0)
 	return FALSE;
 
+#ifdef HAVE_GNOME
     if (filt->sound)
 	gnome_sound_play(filt->sound);
+#endif /* HAVE_GNOME */
     if (filt->popup_text)
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
 			     filt->popup_text);

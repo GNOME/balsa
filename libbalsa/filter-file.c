@@ -41,13 +41,22 @@
 #endif
 #include <string.h>
 #include <time.h>
-
-#include <libgnome/libgnome.h>
-
 #include <sys/types.h>
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
 #include "filter-file.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
+#include "libbalsa-conf.h"
 #include "mailbox-filter.h"
 
 /* Load the header of a filter filter (you have to separately load the
@@ -61,12 +70,12 @@ libbalsa_filter_new_from_config(void)
     LibBalsaFilter * newf = libbalsa_filter_new();
     gchar *str, *p;
     /* First we load the fixed part of the filter */
-    newf->name          = gnome_config_get_string("Name");
-    p = str             = gnome_config_get_string("Condition");
-    newf->sound         = gnome_config_get_string("Sound");
-    newf->popup_text    = gnome_config_get_string("Popup-text");
-    newf->action        = gnome_config_get_int("Action-type");
-    newf->action_string = gnome_config_get_string("Action-string");
+    newf->name          = libbalsa_conf_get_string("Name");
+    p = str             = libbalsa_conf_get_string("Condition");
+    newf->sound         = libbalsa_conf_get_string("Sound");
+    newf->popup_text    = libbalsa_conf_get_string("Popup-text");
+    newf->action        = libbalsa_conf_get_int("Action-type");
+    newf->action_string = libbalsa_conf_get_string("Action-string");
     newf->condition     = libbalsa_condition_new_from_string(&p);
     g_free(str);
     if (newf->sound[0]=='\0') {
@@ -101,12 +110,12 @@ void
 libbalsa_filter_save_config(LibBalsaFilter * fil)
 {
     gchar *str = libbalsa_condition_to_string(fil->condition);
-    gnome_config_set_string("Name",          fil->name);
-    gnome_config_set_string("Condition",     str);
-    gnome_config_set_string("Sound",         fil->sound);
-    gnome_config_set_string("Popup-text",    fil->popup_text);
-    gnome_config_set_int("Action-type",      fil->action);
-    gnome_config_set_string("Action-string", fil->action_string);
+    libbalsa_conf_set_string("Name",          fil->name);
+    libbalsa_conf_set_string("Condition",     str);
+    libbalsa_conf_set_string("Sound",         fil->sound);
+    libbalsa_conf_set_string("Popup-text",    fil->popup_text);
+    libbalsa_conf_set_int("Action-type",      fil->action);
+    libbalsa_conf_set_string("Action-string", fil->action_string);
     g_free(str);
 }
 
@@ -125,7 +134,7 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
     GSList * lst;
 
     /* We load the associated filters */
-    gnome_config_get_vector_with_default(MAILBOX_FILTERS_KEY,&nb_filters,
+    libbalsa_conf_get_vector_with_default(MAILBOX_FILTERS_KEY,&nb_filters,
 					 &filters_names,&def);
     if (!def) {
 	for(i=0;i<nb_filters;i++) {
@@ -145,7 +154,7 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
     }
     g_strfreev(filters_names);
     if (!def) {
-	gnome_config_get_vector_with_default(MAILBOX_FILTERS_WHEN_KEY,
+	libbalsa_conf_get_vector_with_default(MAILBOX_FILTERS_WHEN_KEY,
                                              &nb_filters,&filters_names,&def);
 	if (def)
 	    for(lst=mbox->filters;lst;lst=g_slist_next(lst))
@@ -192,7 +201,7 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
 	lst=g_slist_next(lst);
     }
     g_slist_free(names);
-    gnome_config_set_vector(MAILBOX_FILTERS_KEY,nb_filters,
+    libbalsa_conf_set_vector(MAILBOX_FILTERS_KEY,nb_filters,
                             (const gchar**)filters_names);
 
     fil=mbox->filters;
@@ -202,13 +211,14 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
                             ((LibBalsaMailboxFilter*)fil->data)->when);
 	fil=g_slist_next(fil);
     }
-    gnome_config_set_vector(MAILBOX_FILTERS_WHEN_KEY,nb_filters,
+    libbalsa_conf_set_vector(MAILBOX_FILTERS_WHEN_KEY,nb_filters,
                             (const gchar**)filters_names);
     for (i=0;i<nb_filters;i++)
 	g_free(filters_names[i]);
     g_free(filters_names);
 }
 
+#ifdef HAVE_GNOME
 /* Temporary code for transition from 2.0.x */
 static LibBalsaCondition *
 libbalsa_condition_new_from_config()
@@ -225,23 +235,23 @@ libbalsa_condition_new_from_config()
 
     newc = libbalsa_condition_new();
 
-    newc->type = gnome_config_get_int("Type");
-    newc->negate = gnome_config_get_bool("Condition-not");
-    fields = gnome_config_get_int("Match-fields");
+    newc->type = libbalsa_conf_get_int("Type");
+    newc->negate = libbalsa_conf_get_bool("Condition-not");
+    fields = libbalsa_conf_get_int("Match-fields");
 
     switch (newc->type) {
     case CONDITION_STRING:
 	newc->match.string.fields = fields;
 	newc->match.string.string =
-	    gnome_config_get_string("Match-string");
+	    libbalsa_conf_get_string("Match-string");
 	newc->match.string.user_header =
 	    CONDITION_CHKMATCH(newc, CONDITION_MATCH_US_HEAD) ?
-	    gnome_config_get_string("User-header") : NULL;
+	    libbalsa_conf_get_string("User-header") : NULL;
 	break;
     case CONDITION_REGEX:
 	newc->match.regex.fields = fields;
 #if 0
-	gnome_config_get_vector("Reg-exps", &nbregexs, &regexs);
+	libbalsa_conf_get_vector("Reg-exps", &nbregexs, &regexs);
 	for (i = 0; i < nbregexs && (filter_errno == FILTER_NOERR); i++) {
 	    newreg = g_new(LibBalsaConditionRegex, 1);
 	    newreg->string = regexs[i];
@@ -255,7 +265,7 @@ libbalsa_condition_new_from_config()
 #endif
 	break;
     case CONDITION_DATE:
-	str = gnome_config_get_string("Low-date");
+	str = libbalsa_conf_get_string("Low-date");
 	if (str[0] == '\0')
 	    newc->match.date.date_low = 0;
 	else {
@@ -267,7 +277,7 @@ libbalsa_condition_new_from_config()
 		newc->match.date.date_low = mktime(&date);
 	}
 	g_free(str);
-	str = gnome_config_get_string("High-date");
+	str = libbalsa_conf_get_string("High-date");
 	if (str[0] == '\0')
 	    newc->match.date.date_high = 0;
 	else {
@@ -281,7 +291,7 @@ libbalsa_condition_new_from_config()
 	g_free(str);
 	break;
     case CONDITION_FLAG:
-	newc->match.flags = gnome_config_get_int("Flags");
+	newc->match.flags = libbalsa_conf_get_int("Flags");
 	break;
     default:
 	filter_errno = FILTER_EFILESYN;
@@ -331,15 +341,15 @@ libbalsa_condition_new_2_0(gchar * prefix, gchar * filter_section_name,
     tmp =
 	g_strconcat(CONDITION_SECTION_PREFIX, filter_section_name, ":",
 		    NULL);
-    iterator = gnome_config_init_iterator_sections(prefix);
+    iterator = libbalsa_conf_init_iterator_sections(prefix);
     filter_errno = FILTER_NOERR;
 
     while ((filter_errno == FILTER_NOERR) &&
-	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
+	   (iterator = libbalsa_conf_iterator_next(iterator, &key, NULL))) {
 
 	if (strncmp(key, tmp, pref_len) == 0) {
 	    condprefix = g_strconcat(prefix, key, "/", NULL);
-	    gnome_config_push_prefix(condprefix);
+	    libbalsa_conf_push_prefix(condprefix);
 	    g_free(condprefix);
 	    cond = libbalsa_condition_new_from_config();
 	    if (cond) {
@@ -360,7 +370,7 @@ libbalsa_condition_new_2_0(gchar * prefix, gchar * filter_section_name,
 		    tmp_list = g_list_prepend(tmp_list, tmp);
 		}
 	    }
-	    gnome_config_pop_prefix();
+	    libbalsa_conf_pop_prefix();
 	}
 	g_free(key);
     }
@@ -386,3 +396,4 @@ libbalsa_condition_new_2_0(gchar * prefix, gchar * filter_section_name,
 
     return cond_2_0;
 }
+#endif /* HAVE_GNOME */

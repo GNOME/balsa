@@ -8,12 +8,21 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
 #include "libbalsa.h"
+#include "libbalsa-conf.h"
 #include "imap-handle.h"
 #include "imap-server.h"
 #include "imap-commands.h"
-
-#include <libgnome/libgnome.h> 
 
 #ifdef USE_TLS
 #define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)
@@ -431,17 +440,17 @@ libbalsa_imap_server_new_from_config(void)
     gboolean d, d1;
     gint tls_mode, conn_limit;
 
-    tmp_server.host = gnome_config_get_string("Server");
+    tmp_server.host = libbalsa_conf_get_string("Server");
     if(strrchr(tmp_server.host, ':') == NULL) {
         gint port;
-        port = gnome_config_get_int_with_default("Port", &d);
+        port = libbalsa_conf_get_int_with_default("Port", &d);
         if (!d) {
             gchar *newhost = g_strdup_printf("%s:%d", tmp_server.host, port);
             g_free(tmp_server.host);
             tmp_server.host = newhost;
         }
     }       
-    tmp_server.user = gnome_config_private_get_string("Username");
+    tmp_server.user = libbalsa_conf_private_get_string("Username");
     if (!tmp_server.user)
         tmp_server.user = g_strdup(getenv("USER"));
 
@@ -454,19 +463,19 @@ libbalsa_imap_server_new_from_config(void)
         server->user = tmp_server.user;
         server->host = tmp_server.host;
     }
-    server->use_ssl |= gnome_config_get_bool("SSL=false");
-    tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
+    server->use_ssl |= libbalsa_conf_get_bool("SSL=false");
+    tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
     if(!d) server->tls_mode = tls_mode;
-    conn_limit = gnome_config_get_int_with_default("ConnectionLimit", &d);
+    conn_limit = libbalsa_conf_get_int_with_default("ConnectionLimit", &d);
     if(!d) imap_server->max_connections = conn_limit;
-    d1 = gnome_config_get_bool_with_default("PersistentCache", &d);
+    d1 = libbalsa_conf_get_bool_with_default("PersistentCache", &d);
     if(!d) imap_server->persistent_cache = !!d1;
-    d1 = gnome_config_get_bool_with_default("HasFetchBug", &d);
+    d1 = libbalsa_conf_get_bool_with_default("HasFetchBug", &d);
     if(!d) imap_server->has_fetch_bug = !!d1;
     if (!server->passwd) {
-        server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
+        server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
         if(server->remember_passwd)
-            server->passwd = gnome_config_private_get_string("Password");
+            server->passwd = libbalsa_conf_private_get_string("Password");
         if(server->passwd && server->passwd[0] == '\0') {
             g_free(server->passwd);
             server->passwd = NULL;
@@ -485,9 +494,9 @@ void
 libbalsa_imap_server_save_config(LibBalsaImapServer *server)
 {
     libbalsa_server_save_config(LIBBALSA_SERVER(server));
-    gnome_config_set_int("ConnectionLimit", server->max_connections);
-    gnome_config_set_bool("PersistentCache", server->persistent_cache);
-    gnome_config_set_bool("HasFetchBug", server->has_fetch_bug);
+    libbalsa_conf_set_int("ConnectionLimit", server->max_connections);
+    libbalsa_conf_set_bool("PersistentCache", server->persistent_cache);
+    libbalsa_conf_set_bool("HasFetchBug", server->has_fetch_bug);
 }
 
 /* handle_connection_error() releases handle_info data, clears password

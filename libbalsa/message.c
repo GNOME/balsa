@@ -36,9 +36,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
-
 #include <glib.h>
-#include <libgnome/libgnome.h> 
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

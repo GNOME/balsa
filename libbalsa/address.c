@@ -23,8 +23,16 @@
 #include "config.h"
 
 #include <string.h>
-#include <libgnome/libgnome.h>
 #include <gmime/gmime.h>
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "address.h"
 #include "misc.h"
@@ -78,7 +86,6 @@ libbalsa_address_init(LibBalsaAddress * addr)
     addr->nick_name = NULL;
     addr->full_name = NULL;
     addr->first_name = NULL;
-    addr->middle_name = NULL;
     addr->last_name = NULL;
     addr->organization = NULL;
     addr->address_list = NULL;
@@ -96,7 +103,6 @@ libbalsa_address_finalize(GObject * object)
     g_free(addr->nick_name);    addr->nick_name = NULL;
     g_free(addr->full_name);    addr->full_name = NULL;
     g_free(addr->first_name);   addr->first_name = NULL;
-    g_free(addr->middle_name);  addr->middle_name = NULL;
     g_free(addr->last_name);    addr->last_name = NULL;
     g_free(addr->organization); addr->organization = NULL;
 
@@ -125,8 +131,6 @@ libbalsa_address_set_copy(LibBalsaAddress * dest, LibBalsaAddress * src)
     dest->nick_name = g_strdup(src->nick_name);
     g_free(dest->full_name);
     dest->full_name = g_strdup(src->full_name);
-    g_free(dest->middle_name);
-    dest->middle_name = g_strdup(src->middle_name);
     g_free(dest->last_name);
     dest->last_name = g_strdup(src->last_name);
     g_free(dest->organization);
@@ -265,9 +269,6 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
     const static gchar *labels[NUM_FIELDS] = {
 	N_("_Displayed Name:"),
 	N_("_First Name:"),
-#if !defined(ENABLE_TOUCH_UI)
-	N_("_Middle Name:"),
-#endif
 	N_("_Last Name:"),
 	N_("_Nickname:"),
 	N_("O_rganization:"),
@@ -279,10 +280,8 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
     gchar *new_email = NULL;
     gchar *new_organization = NULL;
     gchar *first_name = NULL;
-    gchar *middle_name = NULL;
     gchar *last_name = NULL;
-    gchar *carrier = NULL;
-    gint cnt, cnt2;
+    gint cnt;
 
     new_email = g_strdup(address
                          && address->address_list
@@ -303,7 +302,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
 	/* make sure address->personal is not all whitespace */
 	new_name = g_strstrip(g_strdup(address->full_name));
 
-	/* guess the first name, middle name and last name */
+	/* guess the first name and last name */
 	if (*new_name != '\0') {
 	    names = g_strsplit(new_name, " ", 0);
 
@@ -323,6 +322,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
                 else
                     last_name = g_strdup(names[cnt - 1]);
             }
+#if 0
 	    /* get middle name */
 	    middle_name = g_strdup("");
 
@@ -339,15 +339,13 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
 			g_free(carrier);
 		    }
 		}
-
+#endif
 	    g_strfreev(names);
 	}
     }
 
     if (first_name == NULL)
 	first_name = g_strdup("");
-    if (middle_name == NULL)
-	middle_name = g_strdup("");
     if (last_name == NULL)
 	last_name = g_strdup("");
 
@@ -376,9 +374,6 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
 
     gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
     gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
-#if !defined(ENABLE_TOUCH_UI)
-    gtk_entry_set_text(GTK_ENTRY(entries[MIDDLE_NAME]), middle_name);
-#endif
     gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
     gtk_entry_set_text(GTK_ENTRY(entries[EMAIL_ADDRESS]), new_email);
     gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
@@ -390,7 +385,6 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
 
     g_free(new_name);
     g_free(first_name);
-    g_free(middle_name);
     g_free(last_name);
     g_free(new_email);
     g_free(new_organization);
@@ -415,9 +409,6 @@ libbalsa_address_new_from_edit_entries(GtkWidget **entries)
     address = libbalsa_address_new();
     SET_FIELD(address->full_name,   entries[FULL_NAME]);
     SET_FIELD(address->first_name,  entries[FIRST_NAME]);
-#if !defined(ENABLE_TOUCH_UI)
-    SET_FIELD(address->middle_name, entries[MIDDLE_NAME]);
-#endif
     SET_FIELD(address->last_name,   entries[LAST_NAME]);
     SET_FIELD(address->nick_name,   entries[NICK_NAME]);
     SET_FIELD(address->organization,entries[ORGANIZATION]);

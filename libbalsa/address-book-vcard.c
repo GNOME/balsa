@@ -34,11 +34,19 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#include <libgnome/libgnome.h>
-
 #include "address-book.h"
 #include "address-book-vcard.h"
 #include "abook-completion.h"
+#include "libbalsa-conf.h"
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
 
 /* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
 
@@ -581,13 +589,8 @@ libbalsa_address_book_vcard_add_address(LibBalsaAddressBook * ab,
 	fprintf(fp, "FN:%s\n", new_address->full_name);
     if (new_address->first_name && *new_address->first_name != '\0') {
 	if (new_address->last_name && *new_address->last_name != '\0') {
-	    if (new_address->middle_name
-		&& *new_address->middle_name != '\0')
-		fprintf(fp, "N:%s;%s;%s\n", new_address->last_name,
-			new_address->first_name, new_address->middle_name);
-	    else
-		fprintf(fp, "N:%s;%s\n", new_address->last_name,
-			new_address->first_name);
+            fprintf(fp, "N:%s;%s\n", new_address->last_name,
+                    new_address->first_name);
 	} else
 	    fprintf(fp, "N:;%s\n", new_address->first_name);
     }
@@ -630,7 +633,7 @@ libbalsa_address_book_vcard_save_config(LibBalsaAddressBook * ab,
 
     vc = LIBBALSA_ADDRESS_BOOK_VCARD(ab);
 
-    gnome_config_set_string("Path", vc->path);
+    libbalsa_conf_set_string("Path", vc->path);
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config(ab, prefix);
@@ -647,7 +650,7 @@ libbalsa_address_book_vcard_load_config(LibBalsaAddressBook * ab,
     vc = LIBBALSA_ADDRESS_BOOK_VCARD(ab);
 
     g_free(vc->path);
-    vc->path = gnome_config_get_string("Path");
+    vc->path = libbalsa_conf_get_string("Path");
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);

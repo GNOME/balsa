@@ -33,7 +33,15 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#include <libgnome/libgnome.h>
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #if ENABLE_LDAP
 #include <ldap.h>
@@ -207,7 +215,7 @@ libbalsa_guess_mail_spool(void)
      * ($HOME/mailbox) exists on
      * some systems, and it's a good enough default if we
      * can't guess it any other way. */
-    return gnome_util_prepend_user_home("mailbox");
+    return g_strconcat(g_get_home_dir(), "/mailbox", NULL);
 }
 
 /* Some more "guess" functions symmetric to libbalsa_guess_mail_spool()... */
@@ -307,14 +315,15 @@ gchar *libbalsa_guess_ldif_file()
     };
 
     for (i = 0; guesses[i] != NULL; i++) {
-	ldif = gnome_util_prepend_user_home(guesses[i]);
-	
+	ldif =  g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S, 
+			    guesses[i], NULL);
 	if (g_file_test(ldif, G_FILE_TEST_EXISTS))
 	     return ldif;
 	  
 	g_free(ldif);
     }
-    return  gnome_util_prepend_user_home(guesses[0]); /* *** Or NULL */
+    return g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S, 
+			guesses[i], NULL); /* *** Or NULL */
     
 }
 

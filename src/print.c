@@ -35,7 +35,6 @@
 #include <libgnomeprint/gnome-font.h>
 
 #include <libgnomeprintui/gnome-font-dialog.h>
-#ifdef HAVE_LGPRINT22
 #  include <libgnomeprint/gnome-print-job.h>
 #  include <libgnomeprintui/gnome-print-job-preview.h>
 #  define BALSA_GNOME_PRINT_UI GnomePrintJob
@@ -47,19 +46,6 @@
 #  define BALSA_GNOME_PRINT_UI_CLOSE gnome_print_job_close
 #  define BALSA_GNOME_PRINT_UI_PREVIEW_NEW gnome_print_job_preview_new
 #  define BALSA_GNOME_PRINT_UI_PRINT gnome_print_job_print
-#else
-#  include <libgnomeprint/gnome-print-master.h>
-#  include <libgnomeprintui/gnome-print-master-preview.h>
-#  define BALSA_GNOME_PRINT_UI GnomePrintMaster
-#  define BALSA_GNOME_PRINT_UI_GET_CONFIG gnome_print_master_get_config
-#  define BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG gnome_print_master_get_page_size_from_config
-#  define BALSA_GNOME_PRINT_UI_GET_CONTEXT gnome_print_master_get_context
-#  define BALSA_GNOME_PRINT_DIALOG_NEW gnome_print_dialog_new_from_master
-#  define BALSA_GNOME_PRINT_UI_NEW gnome_print_master_new()
-#  define BALSA_GNOME_PRINT_UI_CLOSE gnome_print_master_close
-#  define BALSA_GNOME_PRINT_UI_PREVIEW_NEW gnome_print_master_preview_new
-#  define BALSA_GNOME_PRINT_UI_PRINT gnome_print_master_print
-#endif
 
 #include <libgnomeprint/gnome-print-paper.h>
 #include <libgnomeprintui/gnome-print-dialog.h>

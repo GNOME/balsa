@@ -21,13 +21,26 @@
 
 #include "config.h"
 
-#include <libgnome/libgnome.h>
+#ifdef HAVE_GNOME
+#include <libgnome/gnome-help.h>
+#endif
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #ifdef HAVE_GPGME
 #  include "rfc3156.h"
 #endif
 #include "identity.h"
 #include "information.h"
+#include "libbalsa-conf.h"
 
 /*
  * The class.
@@ -1184,7 +1197,9 @@ help_ident_cb(void)
 {
     GError *err = NULL;
 
+#ifdef HAVE_GNOME
     gnome_help_display("balsa", "identities", &err);
+#endif
 
     if (err) {
         g_print(_("Error displaying help for identities: %s\n"),
@@ -1381,51 +1396,51 @@ libbalsa_identity_new_config(const gchar* prefix, const gchar* name)
     
     g_return_val_if_fail(prefix != NULL, NULL);
 
-    gnome_config_push_prefix(prefix);
+    libbalsa_conf_push_prefix(prefix);
 
     ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name(name));
 
-    tmpstr = gnome_config_get_string("FullName");
+    tmpstr = libbalsa_conf_get_string("FullName");
     internet_address_set_name(ident->ia, tmpstr);
     g_free(tmpstr);
 
-    tmpstr = gnome_config_get_string("Address");
+    tmpstr = libbalsa_conf_get_string("Address");
     internet_address_set_addr(ident->ia, tmpstr);
     g_free(tmpstr);
 
-    ident->replyto = gnome_config_get_string("ReplyTo");
-    ident->domain = gnome_config_get_string("Domain");
-    ident->bcc = gnome_config_get_string("Bcc");
+    ident->replyto = libbalsa_conf_get_string("ReplyTo");
+    ident->domain = libbalsa_conf_get_string("Domain");
+    ident->bcc = libbalsa_conf_get_string("Bcc");
 
     /* 
      * these two have defaults, so we need to use the appropriate
      * functions to manage the memory. 
      */
-    if ((tmpstr = gnome_config_get_string("ReplyString"))) {
+    if ((tmpstr = libbalsa_conf_get_string("ReplyString"))) {
         g_free(ident->reply_string);
         ident->reply_string = tmpstr;
     }
     
-    if ((tmpstr = gnome_config_get_string("ForwardString"))) {
+    if ((tmpstr = libbalsa_conf_get_string("ForwardString"))) {
         g_free(ident->forward_string);
         ident->forward_string = tmpstr;
     }
     
-    ident->signature_path = gnome_config_get_string("SignaturePath");
-    ident->sig_executable = gnome_config_get_bool("SigExecutable");
-    ident->sig_sending = gnome_config_get_bool("SigSending");
-    ident->sig_whenforward = gnome_config_get_bool("SigForward");
-    ident->sig_whenreply = gnome_config_get_bool("SigReply");
-    ident->sig_separator = gnome_config_get_bool("SigSeparator");
-    ident->sig_prepend = gnome_config_get_bool("SigPrepend");
+    ident->signature_path = libbalsa_conf_get_string("SignaturePath");
+    ident->sig_executable = libbalsa_conf_get_bool("SigExecutable");
+    ident->sig_sending = libbalsa_conf_get_bool("SigSending");
+    ident->sig_whenforward = libbalsa_conf_get_bool("SigForward");
+    ident->sig_whenreply = libbalsa_conf_get_bool("SigReply");
+    ident->sig_separator = libbalsa_conf_get_bool("SigSeparator");
+    ident->sig_prepend = libbalsa_conf_get_bool("SigPrepend");
 
 #ifdef HAVE_GPGME
-    ident->gpg_sign = gnome_config_get_bool("GpgSign");
-    ident->gpg_encrypt = gnome_config_get_bool("GpgEncrypt");
-    ident->crypt_protocol = gnome_config_get_int("CryptProtocol=16");
+    ident->gpg_sign = libbalsa_conf_get_bool("GpgSign");
+    ident->gpg_encrypt = libbalsa_conf_get_bool("GpgEncrypt");
+    ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
 #endif
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 
     return ident;
 }
@@ -1435,33 +1450,33 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* prefix)
 {
     g_return_if_fail(ident);
 
-    gnome_config_push_prefix(prefix);
-    gnome_config_set_string("FullName", ident->ia->name);
+    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_set_string("FullName", ident->ia->name);
     
     if (ident->ia->type == INTERNET_ADDRESS_NAME)
-        gnome_config_set_string("Address", ident->ia->value.addr);
+        libbalsa_conf_set_string("Address", ident->ia->value.addr);
 
-    gnome_config_set_string("ReplyTo", ident->replyto);
-    gnome_config_set_string("Domain", ident->domain);
-    gnome_config_set_string("Bcc", ident->bcc);
-    gnome_config_set_string("ReplyString", ident->reply_string);
-    gnome_config_set_string("ForwardString", ident->forward_string);
-    gnome_config_set_string("SignaturePath", ident->signature_path);
+    libbalsa_conf_set_string("ReplyTo", ident->replyto);
+    libbalsa_conf_set_string("Domain", ident->domain);
+    libbalsa_conf_set_string("Bcc", ident->bcc);
+    libbalsa_conf_set_string("ReplyString", ident->reply_string);
+    libbalsa_conf_set_string("ForwardString", ident->forward_string);
+    libbalsa_conf_set_string("SignaturePath", ident->signature_path);
 
-    gnome_config_set_bool("SigExecutable", ident->sig_executable);
-    gnome_config_set_bool("SigSending", ident->sig_sending);
-    gnome_config_set_bool("SigForward", ident->sig_whenforward);
-    gnome_config_set_bool("SigReply", ident->sig_whenreply);
-    gnome_config_set_bool("SigSeparator", ident->sig_separator);
-    gnome_config_set_bool("SigPrepend", ident->sig_prepend);
+    libbalsa_conf_set_bool("SigExecutable", ident->sig_executable);
+    libbalsa_conf_set_bool("SigSending", ident->sig_sending);
+    libbalsa_conf_set_bool("SigForward", ident->sig_whenforward);
+    libbalsa_conf_set_bool("SigReply", ident->sig_whenreply);
+    libbalsa_conf_set_bool("SigSeparator", ident->sig_separator);
+    libbalsa_conf_set_bool("SigPrepend", ident->sig_prepend);
 
 #ifdef HAVE_GPGME
-    gnome_config_set_bool("GpgSign", ident->gpg_sign);
-    gnome_config_set_bool("GpgEncrypt", ident->gpg_encrypt);
-    gnome_config_set_int("CryptProtocol", ident->crypt_protocol);
+    libbalsa_conf_set_bool("GpgSign", ident->gpg_sign);
+    libbalsa_conf_set_bool("GpgEncrypt", ident->gpg_encrypt);
+    libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
 #endif
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 }
 
 

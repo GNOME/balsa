@@ -1,8 +1,11 @@
 dnl -*- mode: m4 -*-
-AC_PREREQ(2.52)
-AC_INIT(src/balsa-app.h)
+dnl follow section 5.3 of Autoconf, Automake book.
+dnl
+dnl 1. Boilerplate.
+dnl
+AC_PREREQ(2.53)
 dnl ###########################################################################
-dnl Versioning
+dnl Boilerplace and versioning
 dnl ###########################################################################
 
 SCROLLKEEPER_REQUIRED=0.1.4
@@ -16,18 +19,10 @@ AC_SUBST(BALSA_REVISION)
 AC_SUBST(BALSA_PATCHLEVEL)
 AC_SUBST(BALSA_VERSION)
 
+AC_INIT(src/balsa-app.h)
 AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
-AC_CONFIG_SRCDIR(src/main.c)
-AM_CONFIG_HEADER(config.h)
-
-AM_MAINTAINER_MODE
-
-AC_ISC_POSIX
-AC_PROG_CC
-AC_STDC_HEADERS
-AM_PROG_LIBTOOL
-
-AC_CHECK_FUNCS(getaddrinfo getnameinfo gai_strerror)
+AC_CONFIG_SRCDIR([src/main.c])
+AC_CONFIG_HEADER([config.h])
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
                    [Define to the Balsa major version])
@@ -38,101 +33,33 @@ AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL,
 AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION",
                    [Define to the Balsa version])
 
-dnl ###########################################################################
-dnl Use the new GNOME2 pkgconfig to check required modules
-dnl ###########################################################################
-PKG_CHECK_MODULES(BALSA, [
-glib-2.0
-libgnome-2.0
-libgnomeui-2.0
-gtk+-2.0 >= 2.4
-gnome-vfs-2.0
-gnome-vfs-module-2.0
-$gnome_extras
-gmime-2.0 >= 2.1.9
-libbonobo-2.0
-])
-AC_SUBST(BALSA_CFLAGS)
-AC_SUBST(BALSA_LIBS)
-AC_SUBST(PTHREAD_LIB)
-
-if $PKG_CONFIG --exists libgnomeprint-2.2 ; then
-  PKG_CHECK_MODULES(LGPRINT, [
-  libgnomeprint-2.2 >= 2.1.4
-  libgnomeprintui-2.2 >= 2.1.4
-  ])
-  AC_DEFINE(HAVE_LGPRINT22,1,[If defined, build using libgnomeprint-2.2 specific API])
-else
-  PKG_CHECK_MODULES(LGPRINT, [
-  libgnomeprint-2.0 >= 1.106.0
-  libgnomeprintui-2.0 >= 1.106.0
-  ])
-fi
-
-BALSA_CFLAGS="$BALSA_CFLAGS $LGPRINT_CFLAGS"
-BALSA_LIBS="$BALSA_LIBS $LGPRINT_LIBS"
-
-dnl ##########################################################################
-dnl Check for GtkHTML if available
-dnl ##########################################################################
-
-AC_MSG_CHECKING(whether to use GtkHTML)
-AC_ARG_ENABLE([gtkhtml],
-              AC_HELP_STRING([--enable-gtkhtml],
-                             [Use GtkHTML if available (default=yes)]),[
-	use_gtkhtml=$enableval
+dnl #####################################################################
+dnl 2. Options
+dnl #####################################################################
+AC_ARG_WITH(iconv,      
+        AC_HELP_STRING([--with-iconv=DIR],
+                [Where libiconv is installed]),
+           [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
+                   CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
+                   LDFLAGS="-liconv -L${with_iconv}/lib $LDFLAGS"
+            fi])
+AC_ARG_WITH([gnome],
+        AC_HELP_STRING([--without-gnome],
+                [Use GNOME if available (default=yes)]),[
+	with_gnome=$withval
 ],[
-	use_gtkhtml=yes
+	with_gnome=yes
 ])
-AC_MSG_RESULT($use_gtkhtml)
 
-if test x"$use_gtkhtml" = xyes ; then 
-    if $PKG_CONFIG --exists libgtkhtml-3.1 ; then
-	PKG_CHECK_MODULES(HTML, [
-	libgtkhtml-3.1
-	])
-        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
-        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
-    elif $PKG_CONFIG --exists libgtkhtml-3.0 ; then
-	PKG_CHECK_MODULES(HTML, [
-	libgtkhtml-3.0
-	])
-        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
-        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
-    elif $PKG_CONFIG --exists libgtkhtml-2.0 ; then
-	PKG_CHECK_MODULES(HTML, [
-	libgtkhtml-2.0
-	])
-        AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
-        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
-    fi
-
-    BALSA_CFLAGS="$BALSA_CFLAGS $HTML_CFLAGS"
-    BALSA_LIBS="$BALSA_LIBS $HTML_LIBS"
+if test x$with_gnome != xno; then
+   gnome_extras="libgnome-2.0 libgnomeui-2.0 
+   gnome-vfs-2.0 gnome-vfs-module-2.0 libbonobo-2.0 
+   libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
+   AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
+else
+   gnome_extras=""
 fi
-
-dnl ###########################################################################
-dnl Check for documentation requirements
-dnl ###########################################################################
-AC_SUBST(SCROLLKEEPER_REQUIRED)
-AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
-if test x$SCROLLKEEPER_CONFIG = xno; then
-      AC_MSG_ERROR(Couldn't find scrollkeeper-config, please install the scrollkeeper package)
-fi
-
-dnl ###########################################################################
-dnl stuff for the CORBA interface
-dnl ###########################################################################
-                                                                               
-ORBIT_IDL="`$PKG_CONFIG --variable=orbit_idl ORBit-2.0`"
-AC_SUBST(ORBIT_IDL)
-                                                                                
-LIBBONOBO_IDL="`$PKG_CONFIG --variable=idldir libbonobo-2.0`"
-AC_SUBST(LIBBONOBO_IDL)
- 
-BONOBO_ACTIVATION_IDL="`$PKG_CONFIG --variable=idldir bonobo-activation-2.0`"
-AC_SUBST(BONOBO_ACTIVATION_IDL)
-
+AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
 
 dnl ###########################################################################
 dnl Configure locking
@@ -156,53 +83,6 @@ if test x$balsa_cv_fcntl = xyes; then
 	AC_DEFINE(USE_FCNTL,1,[Define if fcntl locking should be used.])
 fi
 
-dnl ###########################################################################
-dnl Spell check detection.
-dnl ###########################################################################
-
-AC_CHECK_LIB(aspell, new_aspell_speller,,[
-    AC_CHECK_LIB(pspell, new_pspell_manager,,[
-        AC_MSG_ERROR([*** Neither aspell >=0.50 (recommended) nor pspell (deprecated) library was found. Please check http://balsa.gnome.org for information on the required files. Alternatively, check config.log for clues.])
-     ], -lstdc++ -lpspell-modules)
-  ], -lstdc++)
-
-AC_CHECK_HEADER(pspell/pspell.h,,
-    AC_MSG_ERROR([** aspell/pspell library found but not related header files. This probably means corresponding aspell-devel package is not installed ]))
-
-dnl ###########################################################################
-dnl All the linguas, all the time.
-dnl ###########################################################################
-
-ALL_LINGUAS="am az bg ca cs da de en_CA en_GB el es et fi fr ga he hi hr hu it ja ko lt lv ml ms nl no nn pa pl pt pt_BR ro ru sk sl sq sr sr@Latn sv tr uk vi wa zh_CN zh_TW"
-GETTEXT_PACKAGE=balsa
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
-                   [The gettext package name.])
-
-AC_PROG_INTLTOOL
-AM_GLIB_GNU_GETTEXT
-
-dnl ###########################################################################
-dnl More checks
-dnl ###########################################################################
-
-dnl these may be used later.
-dnl AC_CHECK_LIB(des, des_encrypt)
-dnl AC_CHECK_LIB(krb, krb_sendauth)
-dnl AC_CHECK_LIB(acap, acap_OpenConnection)
-
-AC_MSG_CHECKING([for isblank])
-AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
-	     AC_MSG_RESULT(yes),
-	     [AC_MSG_RESULT(no)
-	      AC_DEFINE(isblank,isspace,
-                        [Redefined to isspace if isblank is not available.])] )
-
-
-dnl ###########################################################################
-dnl Use threading?
-dnl ###########################################################################
-
 AC_ARG_ENABLE(threads,
         AC_HELP_STRING([--enable-threads],
                        [Use threading for mail retrieval (default=yes)]),[
@@ -212,23 +92,177 @@ AC_ARG_ENABLE(threads,
 ])
 
 if test x"$use_threads" = xyes; then 
-        AC_DEFINE(BALSA_USE_THREADS, 1, [Defined when balsa is to use threads.])
+        AC_DEFINE(BALSA_USE_THREADS, 1,[Defined when balsa is to use threads.])
 fi
-  
-dnl ##########################################################################
-dnl Check for GPGME if available
-dnl (we don't use the std macro AM_PATH_GPGME here to avoid dependencies...)
-dnl ##########################################################################
-AC_MSG_CHECKING(whether to build with gpgme/GnuPG support)
-AC_ARG_WITH([gpgme],
-        AC_HELP_STRING([--with-gpgme=[gpgme-config]],
-                       [build with experimental gpgme/GnuPG support (default=no)]),
-	[ gpgmecfg=$withval ], [ gpgmecfg=no ])
-AC_ARG_ENABLE([smime],
-	AC_HELP_STRING([--enable-smime],
-                       [include S/MIME support (needs gpgme and gpgsm, experimental) (default=no)]),
-	[ have_smime=$enableval ], [ have_smime=no ])
 
+AC_ARG_WITH([ldap],
+        AC_HELP_STRING([--with-ldap=DIR],
+                [Use OpenLDAP if available (default=no)]),[
+	with_ldap=$withval
+],[
+	with_ldap=no
+])
+
+AC_ARG_WITH([gpgme],
+   AC_HELP_STRING([--with-gpgme=[gpgme-config]],
+                  [build with experimental gpgme/GnuPG support (default=no)]),
+	          [ gpgmecfg=$withval ], [ gpgmecfg=no ])
+AC_ARG_ENABLE([smime],
+   AC_HELP_STRING([--enable-smime],
+                  [include S/MIME support (needs gpgme and gpgsm, experimental) (default=no)]),
+	          [ have_smime=$enableval ], [ have_smime=no ])
+
+AC_ARG_ENABLE([gtkhtml],
+              AC_HELP_STRING([--enable-gtkhtml],
+                             [Use GtkHTML if available (default=yes)]),[
+	use_gtkhtml=$enableval
+],[
+	use_gtkhtml=yes
+])
+
+AC_ARG_WITH([sqlite],
+        AC_HELP_STRING([--with-sqlite=DIR],
+                [Use SQLite for GPE address books (default=no)]),[
+	with_sqlite=$withval
+],[
+	with_sqlite=no
+])
+
+AC_ARG_ENABLE([pcre], 
+   AC_HELP_STRING([--enable-pcre],
+                  [Use Perl-compatible regular expressions if available (default=yes)]),
+                  [ check_pcre=$enableval],[ check_pcre=yes ])
+
+
+AC_ARG_WITH(esmtp,
+   AC_HELP_STRING([--with-esmtp=DIR],
+                  [Enable libESMTP (default=yes)]),
+                  [ with_esmtp=$withval ],[ with_esmtp=yes ])
+
+AC_ARG_WITH(ssl,
+   AC_HELP_STRING([--with-ssl],
+                  [Enable SSL (default=no)]),
+                  [ with_ssl=$withval ],[ with_ssl=no ])
+
+AC_ARG_WITH(gss,
+   AC_HELP_STRING([--with-gss],
+                  [Enable GSS (default=no)]),
+                  [with_gss=$withval],[with_gss=no])
+
+AC_ARG_ENABLE(more-warnings,
+   AC_HELP_STRING([--enable-more-warnings],
+                  [Enable maximum compiler warnings (default=yes)]),
+                  [set_more_warnings="$enableval"], [set_more_warnings=yes])
+
+dnl ##########################################################################
+dnl Enable touchscreen optimized UI?
+dnl ##########################################################################
+
+AC_ARG_ENABLE(touch-ui,
+        AC_HELP_STRING([--enable-touch-ui],
+                [Enable Touchscreen UI mode (default=no)]),
+    [AC_DEFINE(ENABLE_TOUCH_UI,1,[Defined when touchscreen optimized UI is to be enabled.])])
+
+dnl #####################################################################
+dnl 3. Programs: compilers and their options.
+dnl #####################################################################
+AC_PROG_CC
+AM_PROG_LIBTOOL
+
+# scrollkeeper.
+#
+if test x$with_gnome != xno; then
+AC_SUBST(SCROLLKEEPER_REQUIRED)
+AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
+if test x$SCROLLKEEPER_CONFIG = xno; then
+      AC_MSG_ERROR([Couldn't find scrollkeeper-config, please install the scrollkeeper package])
+fi
+fi
+
+# glib-genmarshal
+#
+AC_SUBST(GLIB_GENMARSHAL)
+GLIB_GENMARSHAL=`pkg-config --variable=glib_genmarshal glib-2.0`
+
+# gettext
+#
+ALL_LINGUAS="am az bg ca cs da de en_CA en_GB el es et fi fr ga he hi hr hu it ja ko lt lv ml ms nl no nn pa pl pt pt_BR ro ru sk sl sq sr sr@Latn sv tr uk vi wa zh_CN zh_TW"
+GETTEXT_PACKAGE=balsa
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+        [The gettext package name.])
+
+AC_PROG_INTLTOOL
+AM_GLIB_GNU_GETTEXT
+
+# sendmail
+#
+if test x"$with_esmtp" != xno; then
+AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
+AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
+		   [Path to sendmail program.])
+fi
+
+dnl #####################################################################
+dnl 4. Libraries.
+dnl #####################################################################
+
+PKG_CHECK_MODULES(BALSA, [
+glib-2.0
+gtk+-2.0 >= 2.4
+gmime-2.0 >= 2.1.9
+$gnome_extras
+])
+
+# CORBA interface.
+#
+                                                                        
+ORBIT_IDL="`$PKG_CONFIG --variable=orbit_idl ORBit-2.0`"
+AC_SUBST(ORBIT_IDL)
+
+LIBBONOBO_IDL="`$PKG_CONFIG --variable=idldir libbonobo-2.0`"
+AC_SUBST(LIBBONOBO_IDL)
+ 
+BONOBO_ACTIVATION_IDL="`$PKG_CONFIG --variable=idldir bonobo-activation-2.0`"
+AC_SUBST(BONOBO_ACTIVATION_IDL)
+
+AC_SUBST(BALSA_CFLAGS)
+AC_SUBST(BALSA_LIBS)
+
+if $PKG_CONFIG --atleast-version=2.2.0 glib-2.0 ; then
+  AC_DEFINE(HAVE_GLIB22,1,[Defined when glib version is at least 2.2.0])
+fi
+
+# GtkHtml library.
+#
+AC_MSG_CHECKING(whether to use GtkHTML)
+
+if test x"$use_gtkhtml" = xyes ; then 
+    if $PKG_CONFIG --exists libgtkhtml-3.1 ; then
+	PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.1 ])
+        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
+        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
+    elif $PKG_CONFIG --exists libgtkhtml-3.0 ; then
+	PKG_CHECK_MODULES(HTML, [libgtkhtml-3.0	])
+        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
+        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
+    elif $PKG_CONFIG --exists libgtkhtml-2.0 ; then
+	PKG_CHECK_MODULES(HTML, [libgtkhtml-2.0])
+        AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
+        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
+    else
+        use_gtkhtml="not available"
+    fi
+
+    BALSA_CFLAGS="$BALSA_CFLAGS $HTML_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $HTML_LIBS"
+fi
+AC_MSG_RESULT($use_gtkhtml)
+
+# GPGME detection.
+# We don't use the std macro AM_PATH_GPGME here to avoid dependencies.
+
+AC_MSG_CHECKING(whether to build with gpgme/GnuPG support)
 if test x"$gpgmecfg" = xyes ; then
 	AC_MSG_RESULT(yes)
 	AC_PATH_PROG(gpgmecfg, gpgme-config, no)
@@ -278,47 +312,8 @@ AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
 AM_CONDITIONAL([BUILD_WITH_SMIME], [test $have_smime = "yes"])
 
 
-dnl ###########################################################################
-dnl Remember our prefixes
-dnl   The way prefix et al are defined makes us jump through some hoops.
-dnl ###########################################################################
-
-if test "x$prefix" = "xNONE"; then
-	prefix=$ac_default_prefix
-fi
-dnl datadir='${prefix}/share', so we must eval it or something. This works
-BALSA_STD_PREFIX=`eval "echo ${prefix}"`
-BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`
-
-dnl Consolidate them!
-AC_PROG_AWK
-BALSA_COMMON_PREFIXES=`sort<<EOF|uniq|${AWK} '{if(l!~/^$/)print l ",";l=$0}END{print l}'
-"${BALSA_STD_PREFIX}"
-"${BALSA_DATA_PREFIX}"
-EOF
-`
-
-dnl Better way to do this?
-AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX",
-                   [Directory for all balsa files.] )
-AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX",
-	           [Directory for storing balsa data files.] )
-AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES`,
-	           [Common directories for storing balsa icons.] ) 
-dnl bleah
-
-dnl #########################################################################
-dnl  Check for LDAP if available.
-dnl  For now, only look for OpenLDAP?
-dnl #########################################################################
-
-AC_ARG_WITH([ldap],
-        AC_HELP_STRING([--with-ldap=DIR],
-                [Use OpenLDAP if available (default=no)]),[
-	with_ldap=$withval
-],[
-	with_ldap=no
-])
+# OpenLDAP configuration.
+#
 AC_MSG_CHECKING(whether to use LDAP)
 if test x"$with_ldap" != xno ; then
 	AC_MSG_RESULT([yes])
@@ -336,23 +331,12 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-dnl #########################################################################
-dnl  Check for SQLite/GPE
-dnl #########################################################################
-
-AC_ARG_WITH([sqlite],
-        AC_HELP_STRING([--with-sqlite=DIR],
-                [Use SQLite for GPE address books (default=no)]),[
-	with_sqlite=$withval
-],[
-	with_sqlite=no
-])
+# SQLite configuration.
+#
 AC_MSG_CHECKING(whether to use SQLite)
 if test x$with_sqlite != xno ; then
 	AC_MSG_RESULT([yes])
-        PKG_CHECK_MODULES(SQLITE, [
-        sqlite >= 2.8
-        ])
+        PKG_CHECK_MODULES(SQLITE, [sqlite >= 2.8])
         AC_DEFINE(HAVE_SQLITE,1,[If defined, enable GPE address book support.])
         BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE_CFLAGS"
         BALSA_LIBS="$BALSA_LIBS $SQLITE_LIBS"
@@ -360,19 +344,8 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-dnl ##########################################################################
-dnl Have ESMTP ?
-dnl ##########################################################################
-
-AC_ARG_WITH(esmtp,
-        AC_HELP_STRING([--with-esmtp=DIR],
-                [Enable libESMTP (default=yes)]),[
-	with_esmtp=$withval
-],[
-	with_esmtp=yes
-])
-
-
+# LibESMTP configuration.
+#
 AC_MSG_CHECKING([whether to build ESMTP support])
 if test "x$with_esmtp" != xno  ; then
     AC_MSG_RESULT([yes])
@@ -396,77 +369,16 @@ else
     AC_MSG_RESULT([no])
 fi
 
-dnl ##########################################################################
-dnl Look for sendmail program
-dnl ##########################################################################
-AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
-AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
-		   [Path to sendmail program.])
-
-dnl ##########################################################################
-dnl Enable SASL?
-dnl ##########################################################################
-
-
-dnl AC_ARG_WITH(sasl, [  --with-sasl            Use Cyrus SASL library for POP/IMAP authentication [default=no]],[
-dnl 	with_sasl=$withval
-dnl ],[
-dnl 	with_sasl=no
-dnl ])
-dnl 
-dnl AC_MSG_CHECKING([whether to build SASL support])
-dnl if test "x$with_sasl" != xno  ; then
-dnl 	AC_MSG_RESULT([yes])
-dnl 	AC_CHECK_LIB(sasl, sasl_client_init,,AC_MSG_ERROR([could not find libsasl]),)
-dnl 	LIBS="$LIBS -lsasl"
-dnl 	AC_DEFINE(USE_SASL)
-dnl 	need_sasl=yes
-dnl         need_md5=no        
-dnl else
-dnl 	need_sasl=no
-dnl 	AC_MSG_RESULT([no])
-dnl fi
-dnl AM_CONDITIONAL(USE_SASL, test x$need_sasl = xyes)
-
-
-dnl #############################################################
-dnl Some systems have extra libiconv replacing iconv functions from
-dnl libc. Use this library if requested.
-dnl #############################################################
-AC_ARG_WITH(iconv,      
-        AC_HELP_STRING([--with-iconv=DIR],
-                [Where libiconv is installed]),
-           [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
-                   CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
-                   LDFLAGS="-L${with_iconv}/lib $LDFLAGS"
-            fi])
- AC_CHECK_LIB(iconv, iconv_open, , [
- AC_CHECK_FUNC(iconv_open, , [
- 	AC_MSG_ERROR([*** You need iconv for balsa.])
-  ])
-])
-
-dnl ##########################################################################
-dnl Check for PCRE if available
-dnl ##########################################################################
-
-AC_ARG_ENABLE([pcre], 
-        AC_HELP_STRING([--enable-pcre],
-                [Use Perl-compatible regular expressions if available (default=yes)]),[
-	check_pcre=$enableval],[
-	check_pcre=yes
-])
+# PCRE configuration.
+#
 
 AC_MSG_CHECKING(whether to use PCRE)
 if test x"$check_pcre" = xyes ; then
 	if pcre-config --libs-posix > /dev/null 2>&1; then
         	vers=`pcre-config --version`
-	        case $vers
-        	in
-                       2.*)
-                               have_pcre=no ;;
-                       *) 
-                               have_pcre=yes ;;
+	        case $vers in
+                       2.*) have_pcre=no ;;
+                       *)   have_pcre=yes ;;
         	esac
 	else
         	have_pcre=no
@@ -488,17 +400,8 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-dnl ##########################################################################
-dnl Enable SSL?
-dnl ##########################################################################
-
-AC_ARG_WITH(ssl,
-        AC_HELP_STRING([--with-ssl],
-                [Enable SSL (default=no)]),[
-	with_ssl=$withval
-],[
-	with_ssl=no
-])
+# OpenSSL configuration.
+#
 
 AC_MSG_CHECKING([whether to build SSL support])
 if test "x$with_ssl" != xno  ; then
@@ -543,14 +446,8 @@ else
    AC_MSG_RESULT(no)
 fi
 
-dnl ##########################################################################
-dnl Enable GSS?
-dnl ##########################################################################
-
-AC_ARG_WITH(gss,
-        AC_HELP_STRING([--with-gss],
-                [Enable GSS (default=no)]),
-    [with_gss=$withval],[with_gss=no])
+# KRB5/GSSAPI configuration.
+#
 if test "x$with_gss" != xno  ; then
    AC_PATH_PROG(KRB5_CONFIG, krb5-config,no)
    if test "x$KRB5_CONFIG" != xno ; then 
@@ -562,32 +459,34 @@ if test "x$with_gss" != xno  ; then
    fi
 fi
 
-dnl ##########################################################################
-dnl Enable touchscreen optimized UI?
-dnl ##########################################################################
+dnl #####################################################################
+dnl 5. Headers.
+dnl #####################################################################
 
-AC_ARG_ENABLE(touch-ui,
-        AC_HELP_STRING([--enable-touch-ui],
-                [Enable Touchscreen UI mode (default=no)]),
-    [AC_DEFINE(ENABLE_TOUCH_UI,1,[Defined when touchscreen optimized UI is to be enabled.])])
+# Spell check detection.
+#
+AC_TRY_LINK( [#include <iconv.h>], 
+             [iconv_open("UTF-8", "ISO-8859-2");],,
+             [AC_MSG_ERROR([*** You need iconv for balsa.])])
 
-dnl ##########################################################################
-dnl Check versions
-dnl ##########################################################################
+AC_CHECK_LIB(aspell, new_aspell_speller,,[
+    AC_CHECK_LIB(pspell, new_pspell_manager,,[
+        AC_MSG_ERROR([*** Neither aspell >=0.50 (recommended) nor pspell (deprecated) library was found. Please check http://balsa.gnome.org for information on the required files. Alternatively, check config.log for clues.])
+     ], -lstdc++ -lpspell-modules)
+  ], -lstdc++)
 
-if $PKG_CONFIG --atleast-version=2.2.0 glib-2.0 ; then
-  AC_DEFINE(HAVE_GLIB22,1,[Defined when glib version is at least 2.2.0])
-fi
+AC_CHECK_HEADER(pspell/pspell.h,,
+    AC_MSG_ERROR([** aspell/pspell library found but not related header files. This probably means corresponding aspell-devel package is not installed ]))
 
-dnl ###########################################################################
-dnl turn warnings into errors to enforce clean code
-dnl ###########################################################################
+dnl #####################################################################
+dnl 6. Typedefs, structures and compiler characteristics.
+dnl #####################################################################
+AC_C_CONST
+AC_STDC_HEADERS
 
 
-AC_ARG_ENABLE(more-warnings,
-        AC_HELP_STRING([--enable-more-warnings],
-        [Enable maximum compiler warnings (default=yes)]),
-set_more_warnings="$enableval", set_more_warnings=yes)
+# more warnings.
+#
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 	for option in -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized -Wmissing-prototypes -Wreturn-type; do
@@ -607,10 +506,8 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
         unset option
 fi
 
-dnl ###########################################################################
-dnl Check for CVS nature, for warnings + extra program checks
-dnl have it at the end so configure tests do not die on warnings.
-dnl ###########################################################################
+# extra warnings for CVS.
+#
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
@@ -622,12 +519,48 @@ fi
 AC_MSG_CHECKING([for CVS information])
 AC_MSG_RESULT($BALSA_FROM_CVS)
 
+dnl #####################################################################
+dnl 7. extra functions.
+dnl #####################################################################
+AC_CHECK_FUNCS(getaddrinfo getnameinfo gai_strerror)
+
+# isblank()
+AC_MSG_CHECKING([for isblank])
+AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
+	     AC_MSG_RESULT(yes),
+	     [AC_MSG_RESULT(no)
+	      AC_DEFINE(isblank,isspace,
+                        [Redefined to isspace if isblank is not available.])] )
+
+
 dnl ###########################################################################
-dnl Retrieve the command to generate marshallers from marshallers list files
+dnl Remember our prefixes
+dnl   The way prefix et al are defined makes us jump through some hoops.
 dnl ###########################################################################
 
-AC_SUBST(GLIB_GENMARSHAL)
-GLIB_GENMARSHAL=`pkg-config --variable=glib_genmarshal glib-2.0`
+if test "x$prefix" = "xNONE"; then
+	prefix=$ac_default_prefix
+fi
+dnl datadir='${prefix}/share', so we must eval it or something. This works
+BALSA_STD_PREFIX=`eval "echo ${prefix}"`
+BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`
+
+dnl Consolidate them!
+AC_PROG_AWK
+BALSA_COMMON_PREFIXES=`sort<<EOF|uniq|${AWK} '{if(l!~/^$/)print l ",";l=$0}END{print l}'
+"${BALSA_STD_PREFIX}"
+"${BALSA_DATA_PREFIX}"
+EOF
+`
+
+dnl Better way to do this?
+AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX",
+                   [Directory for all balsa files.] )
+AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX",
+	           [Directory for storing balsa data files.] )
+AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES`,
+	           [Common directories for storing balsa icons.] ) 
+dnl bleah
 
 
 dnl ###########################################################################
@@ -647,10 +580,9 @@ fi
 AC_MSG_RESULT($inst_gnome_icons)
 AM_CONDITIONAL([INSTALL_GNOME_ICONS], [test $inst_gnome_icons = "yes"])
 
-
-dnl ##########################################################################
-dnl Create files.
-dnl ##########################################################################
+dnl #####################################################################
+dnl 8. Output
+dnl #####################################################################
 
 AC_OUTPUT([
 Makefile

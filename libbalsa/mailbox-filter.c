@@ -29,9 +29,19 @@
 
 #include "config.h"
 #include <string.h>
-#include <libgnome/libgnome.h> 
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "filter-file.h"
+#include "libbalsa-conf.h"
 #include "mailbox-filter.h"
 #include "misc.h"
 
@@ -66,16 +76,16 @@ mailbox_filters_section_lookup(const gchar * name)
     void * iterator;
 
     g_return_val_if_fail(name && name[0],NULL);
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
+    iterator = libbalsa_conf_init_iterator_sections(BALSA_CONFIG_PREFIX);
     while (!section &&
-	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
+	   (iterator = libbalsa_conf_iterator_next(iterator, &key, NULL))) {
 	if (libbalsa_str_has_prefix(key, MAILBOX_FILTERS_SECTION_PREFIX)) {
 	    gchar *url;
 
 	    section = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-	    gnome_config_push_prefix(section);
-	    url = gnome_config_get_string(MAILBOX_FILTERS_URL_KEY);
-	    gnome_config_pop_prefix();
+	    libbalsa_conf_push_prefix(section);
+	    url = libbalsa_conf_get_string(MAILBOX_FILTERS_URL_KEY);
+	    libbalsa_conf_pop_prefix();
 	    if (strcmp(url, name) != 0) {
 		g_free(section);
 		section = NULL;
@@ -95,9 +105,9 @@ config_mailbox_filters_load(LibBalsaMailbox * mbox)
 
     section = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
     if (section) {
-	gnome_config_push_prefix(section);
+	libbalsa_conf_push_prefix(section);
 	g_free(section);
 	libbalsa_mailbox_filters_load_config(mbox);
-	gnome_config_pop_prefix();
+	libbalsa_conf_pop_prefix();
     }
 }

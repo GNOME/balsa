@@ -29,14 +29,22 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "libbalsa.h"
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
 #include "libbalsa-marshal.h"
+#include "libbalsa.h"
+#include "libbalsa-conf.h"
+#include "mailbox-filter.h"
 #include "message.h"
 #include "misc.h"
-
-#include <libgnome/libgnome.h> 
-
-#include "mailbox-filter.h"
 #include "libbalsa_private.h"
 
 #include "libbalsa-marshal.h"
@@ -382,13 +390,13 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
     gboolean got_default;
     LibBalsaMailbox *mailbox;
 
-    gnome_config_push_prefix(prefix);
-    type_str = gnome_config_get_string_with_default("Type", &got_default);
+    libbalsa_conf_push_prefix(prefix);
+    type_str = libbalsa_conf_get_string_with_default("Type", &got_default);
 
     if (got_default) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Cannot load mailbox %s"), prefix);
-        gnome_config_pop_prefix();
+        libbalsa_conf_pop_prefix();
         return NULL;
     }
     type = g_type_from_name(type_str);
@@ -396,7 +404,7 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("No such mailbox type: %s"), type_str);
         g_free(type_str);
-        gnome_config_pop_prefix();
+        libbalsa_conf_pop_prefix();
         return NULL;
     }
 
@@ -405,10 +413,10 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
      * FIXME: This should be removed in som efuture release.
      */
     if ( type == LIBBALSA_TYPE_MAILBOX_LOCAL ) {
-        gchar *path = gnome_config_get_string("Path");
+        gchar *path = libbalsa_conf_get_string("Path");
         type = libbalsa_mailbox_type_from_path(path);
         if (type != G_TYPE_OBJECT)
-            gnome_config_set_string("Type", g_type_name(type));
+            libbalsa_conf_set_string("Type", g_type_name(type));
         else
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Bad local mailbox path \"%s\""), path);
@@ -421,7 +429,7 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
     else 
         libbalsa_mailbox_load_config(mailbox, prefix);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
     g_free(type_str);
 
     return mailbox;
@@ -720,12 +728,12 @@ libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
      */
     g_free(mailbox->config_prefix);
     mailbox->config_prefix = g_strdup(prefix);
-    gnome_config_private_clean_section(prefix);
-    gnome_config_clean_section(prefix);
+    libbalsa_conf_private_clean_section(prefix);
+    libbalsa_conf_clean_section(prefix);
 
-    gnome_config_push_prefix(prefix);
+    libbalsa_conf_push_prefix(prefix);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->save_config(mailbox, prefix);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 }
 
 void
@@ -735,9 +743,9 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    gnome_config_push_prefix(prefix);
+    libbalsa_conf_push_prefix(prefix);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_config(mailbox, prefix);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 }
 
 static void
@@ -792,9 +800,9 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    gnome_config_set_string("Type",
+    libbalsa_conf_set_string("Type",
                             g_type_name(G_OBJECT_TYPE(mailbox)));
-    gnome_config_set_string("Name", mailbox->name);
+    libbalsa_conf_set_string("Name", mailbox->name);
 }
 
 static void
@@ -807,7 +815,7 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
     mailbox->config_prefix = g_strdup(prefix);
 
     g_free(mailbox->name);
-    mailbox->name = gnome_config_get_string("Name=Mailbox");
+    mailbox->name = libbalsa_conf_get_string("Name=Mailbox");
 }
 
 static gboolean

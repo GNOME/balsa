@@ -33,12 +33,22 @@
 #include <errno.h>
 #include <glib.h>
 #include <string.h>
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
 #include "libbalsa.h"
+#include "libbalsa-conf.h"
 #include "pop3.h"
 #include "mailbox.h"
 #include "mailbox_pop3.h"
-
-#include <libgnome/libgnome.h> 
 
 int PopDebug = 0;
 
@@ -671,12 +681,12 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 
     libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
 
-    gnome_config_set_bool("Check", pop->check);
-    gnome_config_set_bool("Delete", pop->delete_from_server);
-    gnome_config_set_bool("DisableApop", pop->disable_apop);
-    gnome_config_set_bool("Filter", pop->filter);
+    libbalsa_conf_set_bool("Check", pop->check);
+    libbalsa_conf_set_bool("Delete", pop->delete_from_server);
+    libbalsa_conf_set_bool("DisableApop", pop->disable_apop);
+    libbalsa_conf_set_bool("Filter", pop->filter);
     if(pop->filter_cmd)
-        gnome_config_set_string("FilterCmd", pop->filter_cmd);
+        libbalsa_conf_set_string("FilterCmd", pop->filter_cmd);
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
@@ -695,11 +705,11 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 
     libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
 
-    pop->check = gnome_config_get_bool("Check=false");
-    pop->delete_from_server = gnome_config_get_bool("Delete=false");
-    pop->disable_apop = gnome_config_get_bool("DisableApop=false");
-    pop->filter = gnome_config_get_bool("Filter=false");
-    pop->filter_cmd = gnome_config_get_string("FilterCmd");
+    pop->check = libbalsa_conf_get_bool("Check=false");
+    pop->delete_from_server = libbalsa_conf_get_bool("Delete=false");
+    pop->disable_apop = libbalsa_conf_get_bool("DisableApop=false");
+    pop->filter = libbalsa_conf_get_bool("Filter=false");
+    pop->filter_cmd = libbalsa_conf_get_string("FilterCmd");
     if(pop->filter_cmd && *pop->filter_cmd == '\0') {
 	g_free(pop->filter_cmd); pop->filter_cmd = NULL;
     }

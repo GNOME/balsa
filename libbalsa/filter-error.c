@@ -27,8 +27,17 @@
 
 #include "config.h"
 
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
 #include "filter.h"
-#include <libgnome/libgnome.h> 
 
 /*
  * Error reporting use this global gint. All function that positions it will destroy previous error, so

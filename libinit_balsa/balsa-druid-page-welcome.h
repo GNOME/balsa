@@ -38,13 +38,8 @@ extern "C" {
 /*
  * Public methods
  */
-#if BALSA_MAJOR < 2
-    void balsa_druid_page_welcome(GnomeDruid * druid,
-                                  GdkImlibImage * default_logo);
-#else
     void balsa_druid_page_welcome(GnomeDruid * druid,
                                   GdkPixbuf * default_logo);
-#endif                          /* BALSA_MAJOR < 2 */
 
 #ifdef __cplusplus
 }

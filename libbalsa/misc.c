@@ -24,16 +24,31 @@
 
 #define _SVID_SOURCE           1
 #define _XOPEN_SOURCE          500
-#include <stdio.h>
-#include <sys/utsname.h>
 #include <ctype.h>
-#include <string.h>
-#include <errno.h>
 #include <dirent.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/file.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
 
+#ifdef HAVE_GNOME
 #include <libgnomevfs/gnome-vfs.h>
-#include <libgnome/libgnome.h>
+#endif
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -51,6 +66,7 @@ static int getdnsdomainname(char *s, size_t l);
 gchar*
 libbalsa_lookup_mime_type(const gchar * path)
 {
+#ifdef HAVE_GNOME
     GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
     gchar* uri, *mime_type;
 
@@ -68,6 +84,9 @@ libbalsa_lookup_mime_type(const gchar * path)
     mime_type = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
     gnome_vfs_file_info_unref(vi);
     return mime_type;
+#else
+    return g_strdup("application/octet-stream");
+#endif/* HAVE_GNOME */
 }
 
 gchar *
@@ -135,7 +154,7 @@ getdnsdomainname (char *s, size_t l)
 gchar *
 libbalsa_get_domainname(void)
 {
-    char domainname[SYS_NMLN];
+    char domainname[256]; /* arbitrary length */
     struct utsname utsname;
     gchar *d;
  
@@ -145,7 +164,7 @@ libbalsa_get_domainname(void)
         return g_strdup( d+1 );
     }
  
-    if ( getdnsdomainname(domainname, SYS_NMLN) == 0 ) {
+    if ( getdnsdomainname(domainname, sizeof(domainname)) == 0 ) {
 	return g_strdup(domainname);
     }
     return NULL;

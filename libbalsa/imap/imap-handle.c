@@ -374,10 +374,7 @@ imap_socket_open(const char* host, const char *def_port)
   for (cur = res; cur != NULL; cur = cur->ai_next) {
     fd = socket (cur->ai_family, cur->ai_socktype, cur->ai_protocol);
     if (fd >= 0) {
-      int sa_size = sizeof (struct sockaddr_in);
-      if (cur->ai_addr->sa_family == AF_INET6)
-        sa_size = sizeof (struct sockaddr_in6);
-      if ((rc=connect(fd, cur->ai_addr, sa_size)) == 0) {
+      if ((rc=connect(fd, cur->ai_addr, cur->ai_addrlen)) == 0) {
 	break;
       } else {
 	close (fd);

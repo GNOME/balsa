@@ -24,10 +24,19 @@
 
 #include <gtk/gtkmarshal.h>
 
-#include <libgnome/libgnome.h>
-
 #include "address-book.h"
 #include "libbalsa-marshal.h"
+
+#include "libbalsa-conf.h"
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
 
 static GObjectClass *parent_class = NULL;
 
@@ -207,12 +216,12 @@ libbalsa_address_book_new_from_config(const gchar * prefix)
     gboolean got_default;
     LibBalsaAddressBook *address_book = NULL;
 
-    gnome_config_push_prefix(prefix);
-    type_str = gnome_config_get_string_with_default("Type", &got_default);
+    libbalsa_conf_push_prefix(prefix);
+    type_str = libbalsa_conf_get_string_with_default("Type", &got_default);
 
     if (got_default == TRUE) {
         /* type entry missing, skip it */
-	gnome_config_pop_prefix();
+	libbalsa_conf_pop_prefix();
 	return NULL;
     }
 
@@ -220,14 +229,14 @@ libbalsa_address_book_new_from_config(const gchar * prefix)
     if (type == 0) {
         /* type unknown, skip it */
 	g_free(type_str);
-	gnome_config_pop_prefix();
+	libbalsa_conf_pop_prefix();
 	return NULL;
     }
 
     address_book = g_object_new(type, NULL);
     libbalsa_address_book_load_config(address_book, prefix);
 
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
     g_free(type_str);
 
     return address_book;
@@ -309,14 +318,14 @@ libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    gnome_config_private_clean_section(prefix);
-    gnome_config_clean_section(prefix);
-    gnome_config_push_prefix(prefix);
+    libbalsa_conf_private_clean_section(prefix);
+    libbalsa_conf_clean_section(prefix);
+    libbalsa_conf_push_prefix(prefix);
 
     g_signal_emit(G_OBJECT(ab),
                   libbalsa_address_book_signals[SAVE_CONFIG], 0,
                   prefix);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 }
 
 void
@@ -325,11 +334,11 @@ libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    gnome_config_push_prefix(prefix);
+    libbalsa_conf_push_prefix(prefix);
     g_signal_emit(G_OBJECT(ab),
 		  libbalsa_address_book_signals[LOAD_CONFIG], 0,
                   prefix);
-    gnome_config_pop_prefix();
+    libbalsa_conf_pop_prefix();
 }
 
 GList *
@@ -363,10 +372,10 @@ libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    gnome_config_set_string("Type", g_type_name(G_OBJECT_TYPE(ab)));
-    gnome_config_set_string("Name", ab->name);
-    gnome_config_set_bool("ExpandAliases", ab->expand_aliases);
-    gnome_config_set_bool("DistListMode", ab->dist_list_mode);
+    libbalsa_conf_set_string("Type", g_type_name(G_OBJECT_TYPE(ab)));
+    libbalsa_conf_set_string("Name", ab->name);
+    libbalsa_conf_set_bool("ExpandAliases", ab->expand_aliases);
+    libbalsa_conf_set_bool("DistListMode", ab->dist_list_mode);
 
     g_free(ab->config_prefix);
     ab->config_prefix = g_strdup(prefix);
@@ -381,11 +390,11 @@ libbalsa_address_book_real_load_config(LibBalsaAddressBook * ab,
     g_free(ab->config_prefix);
     ab->config_prefix = g_strdup(prefix);
 
-    ab->expand_aliases = gnome_config_get_bool("ExpandAliases=false");
-    ab->dist_list_mode = gnome_config_get_bool("DistListMode=false");
+    ab->expand_aliases = libbalsa_conf_get_bool("ExpandAliases=false");
+    ab->dist_list_mode = libbalsa_conf_get_bool("DistListMode=false");
 
     g_free(ab->name);
-    ab->name = gnome_config_get_string("Name=Address Book");
+    ab->name = libbalsa_conf_get_string("Name=Address Book");
 }
 
 const gchar*

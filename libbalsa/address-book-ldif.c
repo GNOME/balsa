@@ -31,12 +31,20 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <libgnome/libgnome.h>
-
 #include "address-book.h"
 #include "abook-completion.h"
 #include "address-book-ldif.h"
 #include "information.h"
+#include "libbalsa-conf.h"
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
 
 /* FIXME: Make an option */
 #define CASE_INSENSITIVE_NAME
@@ -758,7 +766,7 @@ libbalsa_address_book_ldif_save_config(LibBalsaAddressBook * ab,
 
     vc = LIBBALSA_ADDRESS_BOOK_LDIF(ab);
 
-    gnome_config_set_string("Path", vc->path);
+    libbalsa_conf_set_string("Path", vc->path);
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config(ab, prefix);
@@ -775,7 +783,7 @@ libbalsa_address_book_ldif_load_config(LibBalsaAddressBook * ab,
     vc = LIBBALSA_ADDRESS_BOOK_LDIF(ab);
 
     g_free(vc->path);
-    vc->path = gnome_config_get_string("Path");
+    vc->path = libbalsa_conf_get_string("Path");
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);

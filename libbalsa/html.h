@@ -23,8 +23,13 @@
 #ifndef   __LIBBALSA_HTML_H__
 # define  __LIBBALSA_HTML_H__
 
+#include "config.h"
+
 #  include <gtk/gtk.h>
+
+#ifdef HAVE_GNOME
 #  include <libgnomeprint/gnome-print.h>
+#endif /* HAVE_GNOME */
 
 /* We need this enum even if we're not using GtkHtml. */
 typedef enum {
@@ -36,12 +41,14 @@ typedef enum {
 
 # ifdef HAVE_GTKHTML
 
+#ifdef HAVE_GNOME
 typedef void (*LibBalsaHTMLPrintCallback) (GtkWidget * widget,
 					   GnomePrintContext *
 					   print_context, gdouble x,
 					   gdouble y, gdouble width,
 					   gdouble height,
 					   gpointer user_data);
+#endif
 
 GtkWidget *libbalsa_html_new(const gchar * text, size_t len,
 			     gpointer message,
@@ -53,6 +60,7 @@ gboolean libbalsa_html_can_select(GtkWidget * widget);
 void libbalsa_html_select_all(GtkWidget * widget);
 void libbalsa_html_copy(GtkWidget * widget);
 gboolean libbalsa_html_can_print(void);
+#ifdef HAVE_GNOME
 void libbalsa_html_print(GtkWidget * widget,
 			 GnomePrintContext * print_context,
 			 gdouble header_height, gdouble footer_height,
@@ -63,7 +71,7 @@ gint libbalsa_html_print_get_pages_num(GtkWidget * widget,
 				       GnomePrintContext * print_context,
 				       gdouble header_height,
 				       gdouble footer_height);
-
+#endif /* HAVE_GNOME */
 guint libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text,
 			   guint len);
 

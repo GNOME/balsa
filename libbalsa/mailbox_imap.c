@@ -47,7 +47,15 @@
 #include <pthread.h>
 #endif
 
-#include <libgnome/libgnome.h>
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "libimap.h"
 #include "filter-funcs.h"
@@ -59,7 +67,7 @@
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap-server.h"
-
+#include "libbalsa-conf.h"
 
 struct _LibBalsaMailboxImap {
     LibBalsaMailboxRemote mailbox;
@@ -1440,7 +1448,7 @@ libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 
-    gnome_config_set_string("Path", mimap->path);
+    libbalsa_conf_set_string("Path", mimap->path);
 
     libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
 
@@ -1460,7 +1468,7 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 
     g_free(mimap->path);
-    mimap->path = gnome_config_get_string("Path");
+    mimap->path = libbalsa_conf_get_string("Path");
     if (!mimap->path) {
 	mimap->path = g_strdup("INBOX");
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,

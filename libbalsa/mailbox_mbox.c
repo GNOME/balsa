@@ -24,7 +24,6 @@
 
 #define _XOPEN_SOURCE 500
 
-#include <libgnome/libgnome.h>
 #include <gmime/gmime-stream-fs.h>
 
 #include <stdlib.h>
@@ -33,9 +32,21 @@
 #include <errno.h>
 #include <utime.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 /* we include time because pthread.h may require it when compiled with c89 */
 #include <time.h>
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

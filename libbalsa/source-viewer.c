@@ -25,8 +25,16 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <libgnome/libgnome.h>
-#include <libgnomeui/libgnomeui.h>
+
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
 
 #include "misc.h"
 #include "libbalsa.h"
@@ -183,8 +191,8 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
    pops up a window containing the source of the message msg.
 */
 
-static void
-lbsv_app_set_menus(GnomeApp * app, GtkAction ** action)
+static GtkWidget*
+lbsv_app_set_menus(GtkWindow * app, GtkAction ** action)
 {
     GtkWidget *window;
     GtkWidget *menubar;
@@ -213,14 +221,14 @@ lbsv_app_set_menus(GnomeApp * app, GtkAction ** action)
                                            -1, &error)) {
         g_message("building menus failed: %s", error->message);
         g_error_free(error);
-        return;
+        return NULL;
     }
 
     menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
-    gnome_app_set_menus(app, GTK_MENU_BAR(menubar));
 
     *action =
         gtk_ui_manager_get_action(ui_manager, "/MainMenu/ViewMenu/Escape");
+    return menubar;
 }
 
 void
@@ -229,7 +237,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
 {
     GtkWidget *text;
     PangoFontDescription *desc;
-    GtkWidget *interior;
+    GtkWidget *vbox, *interior;
     GtkWidget *window;
     GtkAction *escape_action = NULL;
     LibBalsaSourceViewerInfo *lsvi;
@@ -252,12 +260,17 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
                                    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
 
-    window = gnome_app_new("balsa", _("Message Source"));
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
     g_object_set_data(G_OBJECT(window), "text", text);
-    lbsv_app_set_menus(GNOME_APP(window), &escape_action);
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
-    gnome_app_set_contents(GNOME_APP(window), interior);
+    vbox = gtk_vbox_new(FALSE, 1);
+    gtk_box_pack_start_defaults(GTK_BOX(vbox), 
+				lbsv_app_set_menus(GTK_WINDOW(window),
+						   &escape_action));
+    gtk_box_pack_start_defaults(GTK_BOX(vbox), interior);
+    gtk_container_add(GTK_CONTAINER(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);
     lsvi->msg = msg;

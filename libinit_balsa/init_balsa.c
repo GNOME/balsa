@@ -20,11 +20,25 @@
  */
 
 #include "config.h"
-#include <gnome.h>
-#include "helper.h"
+
+#include <gtk/gtk.h>
+
 #include "init_balsa.h"
+#ifdef HAVE_GNOME
+#include "helper.h"
 #include "balsa-initdruid.h"
 #include "balsa-druid-page-welcome.h"
+#else
+#ifdef HAVE_GETTEXT
+#include <libintl.h>
+#ifndef _
+#define _(x)  gettext(x)
+#endif
+#else
+#define _(x)  (x)
+#endif
+#define N_(x) (x)
+#endif /* HAVE_GNOME */
 
 static gboolean
 dismiss_the_wizard(GtkWidget *wizard)
@@ -42,13 +56,14 @@ balsa_init_begin(void)
     gtk_window_set_title(GTK_WINDOW(window), _("Configure Balsa"));
     gtk_window_set_wmclass(GTK_WINDOW(window), "druid", "Balsa");
 
+#ifdef HAVE_GNOME
     balsa_initdruid(GTK_WINDOW(window));
-
     gtk_widget_show_all(window);
 
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
+#endif
 
     /* we do not want to destroy wizard immediately to avoid confusing
        delay between the wizard that left and balsa that entered. */

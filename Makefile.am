@@ -20,6 +20,8 @@ EXTRA_DIST = \
 	intltool-merge.in	\
 	intltool-update.in	\
 	gnome-balsa2.png \
+	bootstrap.sh	\
+	mkinstalldirs	\
 	HACKING			\
 	docs/mh-mail-HOWTO	\
 	docs/vconvert.awk	\

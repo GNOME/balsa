@@ -1,3 +1,9 @@
+2000-09-25  Christophe Merlet  <christophe@merlet.net>
+
+	* fr.po: Updated French translation.
+	* POTFILES.in: Added src/ldap-addressbook.c
+	* POTFILES.ignore: Added src/orbit-glue.c
+
 2000-09-25  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* no.po: Updated Norwegian translation.

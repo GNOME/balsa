@@ -50,6 +50,14 @@ typedef enum
   }
 MailboxConfPageType;
 
+/* the return value of several routines */
+typedef enum {
+  MC_RET_OK,
+  MC_RET_CANCEL,
+  MC_RET_RETRY 
+} MailboxConfStatus;
+
+
 
 
 typedef struct _MailboxConfWindow MailboxConfWindow;
@@ -316,23 +324,17 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
   
   g_return_if_fail ( LIBBALSA_IS_MAILBOX (mailbox) );
   
-  if ( LIBBALSA_IS_MAILBOX_LOCAL(mailbox) )
-  {
+  if ( LIBBALSA_IS_MAILBOX_LOCAL(mailbox) ) {
     LibBalsaMailboxLocal *local;
 
     mcw->the_page = MC_PAGE_LOCAL;
-
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
-    gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), 
-			   MC_PAGE_LOCAL);
+    gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
     if ( mailbox->name )
-      gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_name), 
-			  mailbox->name);
-
+      gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_name), mailbox->name);
     if ( local->path )
-      gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_path), 
-			  local->path);
+      gtk_entry_set_text (GTK_ENTRY (mcw->local_mailbox_path), local->path);
   }
   else if ( LIBBALSA_IS_MAILBOX_POP3(mailbox) )
   {
@@ -340,35 +342,26 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
     LibBalsaServer *server;
 
     mcw->the_page = MC_PAGE_POP3;
-    
     pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
     port = g_strdup_printf ("%d", server->port);
 
     if (  mailbox->name )
-      gtk_entry_set_text (GTK_ENTRY (mcw->pop_mailbox_name),
-			  mailbox->name);
-
+      gtk_entry_set_text (GTK_ENTRY (mcw->pop_mailbox_name), mailbox->name);
     if ( server->host )
       gtk_entry_set_text (GTK_ENTRY (mcw->pop_server), server->host);
-
     gtk_entry_set_text (GTK_ENTRY (mcw->pop_port), port);
-
     if ( server->user )
       gtk_entry_set_text (GTK_ENTRY (mcw->pop_username), server->user);
-
     if ( server->passwd )
       gtk_entry_set_text (GTK_ENTRY (mcw->pop_password), server->passwd);
-
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_use_apop), 
 				  pop3->use_apop);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_check), 
 				  pop3->check);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server), 
 				  pop3->delete_from_server);
-
-    gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
     g_free(port);
   }  
   else if ( LIBBALSA_IS_MAILBOX_IMAP(mailbox) )
@@ -384,7 +377,6 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
     if ( mailbox->name ) 
       gtk_entry_set_text (GTK_ENTRY (mcw->imap_mailbox_name), 
 			  mailbox->name);
-    
     port = g_strdup_printf("%d", server->port);
     
     if ( server->host ) 
@@ -399,22 +391,19 @@ mailbox_conf_set_values (LibBalsaMailbox * mailbox)
       gtk_entry_set_text (GTK_ENTRY(
 	gnome_entry_gtk_entry(GNOME_ENTRY (mcw->imap_folderpath))),
 			  imap->path );
-
-    gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), 
-			   MC_PAGE_IMAP);
     g_free(port);
-  } else {
-    /* do nothing for now */
   }
+
+  gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), mcw->the_page);
 }
 
 
-/* Returns 1 if everything was okey
- * Returns -2 if there was a blank field and the user wants to re-edit
- * Returns -1 if there was a blank field and the user wants to cancel
+/* Returns:
+ * MC_RET_OK if everything was okey
+ * MC_RET_RETRY  if there was a blank field and the user wants to re-edit
+ * MC_RET_CANCEL if there was a blank field and the user wants to cancel
  */
-/* FIXME: We have code that prompts for a password if it is empty. Check */
-static int
+static MailboxConfStatus
 check_for_blank_fields(MailboxConfPageType mbox_type)
 {
     gchar *msg = NULL;
@@ -449,144 +438,35 @@ check_for_blank_fields(MailboxConfPageType mbox_type)
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)), "") ||
        !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))  {
-      
-      
+            
       if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)),"")) 
-	{
 	  msg = _("You need to fill in the Mailbox Name field.");
-	}
       else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)),""))
-	{
 	  msg = _("You need to fill in the user field.");
-	}
       else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))
-	{
 	  msg = _("You need to fill in the server field.");
-	}
       else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_port)), ""))
-	{
 	  msg = _("You need to fill in the port field.");
-	}
       else
-	{
 	  msg = _("Some of the fields are blank.");
-	}
     }
     break;
     case MC_PAGE_NEW:
-	g_warning("a 'Cannot happen' occured. Report it");
-    
+	g_warning("a 'Cannot happen' occured. Report it"); 
   }
   
   if(msg == NULL)   /* msg == NULL only if no fields where blank */
-    return 1;
+    return MC_RET_OK;
   
   ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
 			      GNOME_STOCK_BUTTON_OK, 
 			      GNOME_STOCK_BUTTON_CANCEL, NULL);
-  
-  
+
   gnome_dialog_set_default(GNOME_DIALOG(ask), 1);
-  gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
-  clicked_button = gnome_dialog_run(GNOME_DIALOG(ask));
-  
-  if(clicked_button == 1)
-    return -2;               /* Was a blank, want to re-edit */
-  else
-    return -1;               /* Was a blank, want to cancel */
-}
-
-static int
-conf_update_mailbox (LibBalsaMailbox * mailbox)
-{
-  LibBalsaMailboxImap *mb_imap;
-  LibBalsaMailboxPop3 *mb_pop3;
-  LibBalsaServer *server;
-
-  int field_check;
-
-  if (!mailbox)
-    return 1;
-
-  field_check = check_for_blank_fields(mcw->the_page);
-  
-  if(field_check != 1) return field_check;
-  
-  if ( LIBBALSA_IS_MAILBOX_LOCAL (mailbox) )
-  {
-    gchar *filename;
-    
-    filename =
-      gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
-    g_free (mailbox->name);
-    g_free (LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
-    mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
-    LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
-    config_mailbox_update (mailbox);
-  }
-  else if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) ) 
-  {
-    mb_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-
-    g_free (mailbox->name);
-    
-    mailbox->name = g_strdup (gtk_entry_get_text (
-      GTK_ENTRY (mcw->pop_mailbox_name)));
-    
-    libbalsa_server_set_username(server,
-				 gtk_entry_get_text(GTK_ENTRY(mcw->pop_username)));
-
-    libbalsa_server_set_password(server,
-				 gtk_entry_get_text(GTK_ENTRY(mcw->pop_password)));
-
-    libbalsa_server_set_host(server,
-			     gtk_entry_get_text(GTK_ENTRY(mcw->pop_server)),
-			     atoi(gtk_entry_get_text(GTK_ENTRY(mcw->pop_port))));
-
-    mb_pop3->use_apop = GTK_TOGGLE_BUTTON (mcw->pop_use_apop)->active;
-    mb_pop3->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
-    mb_pop3->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
-    
-    config_mailbox_update (mailbox);
-  } 
-  else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
-  {
-    gchar *path;
-
-    mb_imap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    
-    g_free (mailbox->name);
-    
-    mailbox->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->imap_mailbox_name)));
-    
-
-    libbalsa_server_set_username(server,
-				 gtk_entry_get_text(GTK_ENTRY(mcw->imap_username)));
-
-    libbalsa_server_set_password(server,
-				 gtk_entry_get_text(GTK_ENTRY(mcw->imap_password)));
-
-    libbalsa_server_set_host(server,
-			     gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
-			     atoi(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
-
-    path = gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY(mcw->imap_folderpath))));
-
-    if ( path == NULL || path[0] == '\0' )
-      libbalsa_mailbox_imap_set_path(mb_imap, "INBOX");
-    else
-      libbalsa_mailbox_imap_set_path(mb_imap, path);
-				       
-    config_mailbox_update (mailbox);
-  } 
-  else 
-  {
-    /* Do nothing for now */
-  }
-
-  return 1;
+  clicked_button = gnome_dialog_run_and_close(GNOME_DIALOG(ask));
+  return (clicked_button == 0) 
+    ? MC_RET_RETRY              /* Was a blank, want to re-edit */
+    : MC_RET_CANCEL;               /* Was a blank, want to cancel */
 }
 
 static void
@@ -605,32 +485,111 @@ fill_in_imap_data(gchar **name, gchar **path)
 	    _("%s on %s"), fos, 
 	    gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)));
     }
-    *path   = g_strdup ( fos);
+    *path = g_strdup (fos);
 }
 
-static gboolean
+static void
+update_pop_mailbox(LibBalsaMailboxPop3 *mailbox)
+{
+  g_free (LIBBALSA_MAILBOX(mailbox)->name);
+  LIBBALSA_MAILBOX(mailbox)->name = g_strdup (gtk_entry_get_text (
+    GTK_ENTRY (mcw->pop_mailbox_name)));
+  
+  libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+			       gtk_entry_get_text(GTK_ENTRY(mcw->pop_username)));
+  libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+			       gtk_entry_get_text(GTK_ENTRY(mcw->pop_password)));
+  libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+			   gtk_entry_get_text(GTK_ENTRY(mcw->pop_server)),
+			   atoi (gtk_entry_get_text(GTK_ENTRY(mcw->pop_port))));
+  mailbox->check = gtk_toggle_button_get_active(
+    GTK_TOGGLE_BUTTON (mcw->pop_check));
+  mailbox->delete_from_server =  gtk_toggle_button_get_active(
+    GTK_TOGGLE_BUTTON(mcw->pop_delete_from_server));
+}
+
+static void
+update_imap_mailbox(LibBalsaMailboxImap *mailbox)
+{
+  gchar *path;
+
+  g_free (LIBBALSA_MAILBOX(mailbox)->name);
+  fill_in_imap_data(&LIBBALSA_MAILBOX(mailbox)->name, &path);
+  libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+			       gtk_entry_get_text(GTK_ENTRY(mcw->imap_username)));
+  libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+			       gtk_entry_get_text(GTK_ENTRY(mcw->imap_password)));
+  libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+			   gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
+			   atoi(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
+  gtk_signal_connect(GTK_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)), 
+		     "get-password", GTK_SIGNAL_FUNC(ask_password), mailbox);
+  
+  libbalsa_mailbox_imap_set_path(mailbox, (path == NULL || path[0] == '\0')
+				 ? "INBOX"
+				 : path);
+  g_free(path);
+}
+
+static MailboxConfStatus
+conf_update_mailbox (LibBalsaMailbox * mailbox)
+{
+  MailboxConfStatus field_check;
+
+  if (!mailbox) return MC_RET_CANCEL;
+
+  field_check = check_for_blank_fields(mcw->the_page);
+  if(field_check != MC_RET_OK) return field_check;
+  
+  if ( LIBBALSA_IS_MAILBOX_LOCAL (mailbox) )
+  {
+    gchar *filename;
+    
+    filename =
+      gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
+    g_free (mailbox->name);
+    g_free (LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
+    mailbox->name = g_strdup (
+      gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
+    LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
+  }
+  else if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) ) 
+    update_pop_mailbox(LIBBALSA_MAILBOX_POP3(mailbox));    
+  else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
+    update_imap_mailbox(LIBBALSA_MAILBOX_IMAP(mailbox));
+
+  config_mailbox_update (mailbox);
+  return MC_RET_OK;
+}
+
+/* conf_add_mailbox:
+   adds a new mailbox.
+   Sometimes does not use LIBBALSA_XXX conversions to avoid misleading 
+   glib warning messages on mailbox accessing error.
+*/
+static MailboxConfStatus
 conf_add_mailbox (LibBalsaMailbox **mbox)
 {
   LibBalsaMailbox *mailbox = NULL;
   GNode *node;
-  int field_check;
+  MailboxConfStatus field_check;
 
   *mbox = NULL;
 
   field_check = check_for_blank_fields(mcw->the_page);
-  if(field_check == -1)
-      return FALSE;
+  if(field_check != MC_RET_OK) return field_check;
   
-  switch (mcw->the_page)		/* see what page we are on */
-    {
-
-/* Local Mailboxes */
+  switch (mcw->the_page) {		/* see what page we are on */
+    /* Local Mailboxes */
     case MC_PAGE_LOCAL:
       {
 	gchar *filename = gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
-
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_local_new (filename, TRUE));
-	
+	mailbox = (LibBalsaMailbox*)libbalsa_mailbox_local_new(filename, TRUE);
+	if(!mailbox) {
+	  balsa_information(LIBBALSA_INFORMATION_WARNING,
+			    _("Could not access mailbox '%s'"), filename);
+	  return MC_RET_RETRY;
+	}
 	mailbox->name = g_strdup (gtk_entry_get_text (
 	  GTK_ENTRY (mcw->local_mailbox_name)));
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
@@ -642,21 +601,7 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 /* POP3 Mailboxes */
     case MC_PAGE_POP3:
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new());
-
-      mailbox->name = g_strdup (gtk_entry_get_text (
-	  GTK_ENTRY (mcw->pop_mailbox_name)));
-
-      libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-				    gtk_entry_get_text(GTK_ENTRY(mcw->pop_username)));
-      libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-				    gtk_entry_get_text(GTK_ENTRY(mcw->pop_password)));
-      libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-				gtk_entry_get_text(GTK_ENTRY(mcw->pop_server)),
-				atoi (gtk_entry_get_text(GTK_ENTRY(mcw->pop_port))));
-
-      LIBBALSA_MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
-      LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
-
+      update_pop_mailbox(LIBBALSA_MAILBOX_POP3(mailbox));
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
       break;
 
@@ -670,7 +615,7 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 	dir->user   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)));
 	dir->passwd = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)));
 	dir->host   = g_strdup ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_server)));
-	dir->port   = atol     ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)) );
+	dir->port   = atoi     ( gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)) );
 
 	imapdir_scan(dir);
 	if(!G_NODE_IS_LEAF(dir->file_tree)) {
@@ -685,42 +630,15 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
     }
 #endif
     case MC_PAGE_IMAP:
-    {
-      LibBalsaMailboxImap * m;
-      gchar *path;
-
-	mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
-	m = LIBBALSA_MAILBOX_IMAP(mailbox);
-
-	fill_in_imap_data(&mailbox->name, &path);
-
-	libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-				      gtk_entry_get_text(GTK_ENTRY(mcw->imap_username)));
-	libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-				      gtk_entry_get_text(GTK_ENTRY(mcw->imap_password)));
-	libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
-				  gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)),
-				  atol(gtk_entry_get_text(GTK_ENTRY(mcw->imap_port))));
-      gtk_signal_connect(GTK_OBJECT(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)), 
-			 "get-password",GTK_SIGNAL_FUNC(ask_password),mailbox);
-
-	if (path == NULL || path[0] == '\0' )
-	    /* FIXME: disable when IMAPDir stuff becomes functional */
-	{
-	  libbalsa_mailbox_imap_set_path(m, "INBOX");
-	} else {
-	  libbalsa_mailbox_imap_set_path(m, path);
-	}
-	g_free(path);
-
-	node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
-	g_node_append (balsa_app.mailbox_nodes, node);
-
-	break;
-    }
+      mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
+      update_imap_mailbox(LIBBALSA_MAILBOX_IMAP(mailbox));
+      
+      node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
+      g_node_append (balsa_app.mailbox_nodes, node);
+      break;
 
     case MC_PAGE_NEW:
-	    g_warning( "An unimportant can\'t-happen has occurred. mailbox-conf.c:712" );
+	    g_warning("An unimportant can\'t-happen has occurred. mailbox-conf.c:712" );
 	    break;
     }
 
@@ -735,33 +653,18 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
   int return_value;
 
-  if ( save ) 
-  {
+  if ( save )  {
     LibBalsaMailbox *mailbox = mcw->mailbox;
-    mailbox = mcw->mailbox;
     
-    if (mcw->add == FALSE)		/* we are updating the mailbox */
-    {
-      return_value = conf_update_mailbox (mcw->mailbox);
-      if (LIBBALSA_IS_MAILBOX_POP3(mailbox) && return_value != -1)
-	/* redraw the pop3 server list */
-	update_pop3_servers ();
-      else                                   /* redraw the main mailbox list */
-	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));	
-      
-      if(return_value == -1)
-	return;
-    }
-    else 
-    {
-      if( !conf_add_mailbox ( &mailbox) ) 
-	return;
-      
-      if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
-	update_pop3_servers ();
-      else
-	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
-    }
+    return_value = mcw->add ?
+      conf_add_mailbox ( &mailbox) : conf_update_mailbox (mailbox);
+    
+    if (LIBBALSA_IS_MAILBOX_POP3(mailbox) && return_value == MC_RET_OK)
+      /* redraw the pop3 server list */
+      update_pop3_servers ();
+    else                                   /* redraw the main mailbox list */
+      balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));	
+    if(return_value == MC_RET_RETRY) return;
   }
   else
   {
@@ -828,6 +731,7 @@ create_new_page (void)
 		      GTK_SIGNAL_FUNC (set_the_page), (gpointer) MC_PAGE_IMAP);
   gtk_widget_show (radio_button);
 
+#if 0
   /* imapdir entry */
   radio_button = gtk_radio_button_new_with_label
       (gtk_radio_button_group (GTK_RADIO_BUTTON (radio_button)), 
@@ -837,8 +741,32 @@ create_new_page (void)
 		      GTK_SIGNAL_FUNC (set_the_page), 
 		      (gpointer) MC_PAGE_IMAP_DIR);
   gtk_widget_show (radio_button);
-
+#endif
   return vbox;
+}
+
+static GtkWidget *
+create_label(const gchar *label, GtkWidget* table, gint row)
+{
+  GtkWidget * w = gtk_label_new (label);
+  gtk_misc_set_alignment (GTK_MISC (w), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), w, 0, 1, row, row+1,
+		    GTK_FILL, GTK_FILL,
+		    10, 10);
+  gtk_widget_show (w);
+  return w;
+}
+
+static GtkWidget *
+create_entry( GtkWidget* table, gint row, const gchar *initval)
+{
+  GtkWidget * entry = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row+1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL,
+		    0, 10);
+  if(initval) gtk_entry_append_text (GTK_ENTRY (entry), initval);
+  gtk_widget_show (entry);
+  return entry;
 }
 
 
@@ -846,7 +774,6 @@ static GtkWidget *
 create_local_mailbox_page (void)
 {
   GtkWidget *vbox;
-  GtkWidget *label;
   GtkWidget *table;
   GtkWidget *file;
 
@@ -856,20 +783,11 @@ create_local_mailbox_page (void)
   gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 5);
 
   /* mailbox name */
-  label = gtk_label_new (_("Mailbox Name:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL, 10, 10);
-
-  mcw->local_mailbox_name = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->local_mailbox_name, 1, 2, 0, 1,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+  create_label (_("Mailbox Name:"), table, 0);
+  mcw->local_mailbox_name = create_entry (table, 0, NULL);
 
   /* path to file */
-  label = gtk_label_new (_("Mailbox path:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		    GTK_FILL, GTK_FILL, 10, 10);
+  create_label (_("Mailbox path:"), table, 1);
 
   file = gnome_file_entry_new ("Mailbox Path", "Mailbox Path");
   mcw->local_mailbox_path = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file));
@@ -884,97 +802,31 @@ create_pop_mailbox_page (void)
 {
   GtkWidget *return_widget;
   GtkWidget *table;
-  GtkWidget *label;
 
   return_widget = table = gtk_table_new (8, 2, FALSE);
   gtk_widget_show (table);
 
   /* mailbox name */
-
-  label = gtk_label_new (_("Mailbox Name:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
-  gtk_widget_show (label);
-
-  mcw->pop_mailbox_name = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_mailbox_name, 1, 2, 0, 1,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
-  gtk_widget_show (mcw->pop_mailbox_name);
-
+  create_label(_("Mailbox Name:"), table, 0);
+  mcw->pop_mailbox_name = create_entry (table, 0, NULL);
+  
   /* pop server */
-
-  label = gtk_label_new (_("Server:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
-  gtk_widget_show (label);
-
-  mcw->pop_server = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_server, 1, 2, 1, 2,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
-  gtk_entry_append_text (GTK_ENTRY (mcw->pop_server), "localhost");
-
-  gtk_widget_show (mcw->pop_server);
-
+  create_label(_("Server:"), table, 1);
+  mcw->pop_server = create_entry (table, 1, "localhost");
+  
   /* pop port */
-
-  label = gtk_label_new (_("Port:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
-  gtk_widget_show (label);
-
-  mcw->pop_port = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_port, 1, 2, 2, 3,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
-  gtk_entry_append_text (GTK_ENTRY (mcw->pop_port), "110");
-
-  gtk_widget_show (mcw->pop_port);
-
+  create_label (_("Port:"), table, 2);
+  mcw->pop_port = create_entry (table, 2, "110");
+  
   /* username  */
-
-  label = gtk_label_new (_("Username:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-  gtk_widget_show (label);
-  mcw->pop_username = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_username, 1, 2, 3, 4,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
-  gtk_entry_append_text (GTK_ENTRY (mcw->pop_username), g_get_user_name ());
-
-  gtk_widget_show (mcw->pop_username);
+  create_label (_("Username:"), table, 3);
+  mcw->pop_username = create_entry (table, 3, g_get_user_name ());
 
   /* password field */
 
-  label = gtk_label_new (_("Password:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-  gtk_widget_show (label);
-  mcw->pop_password = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->pop_password, 1, 2, 4, 5,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
+  create_label (_("Password:"), table, 4);
+  mcw->pop_password = create_entry (table, 4, NULL);
   gtk_entry_set_visibility (GTK_ENTRY (mcw->pop_password), FALSE);
-  gtk_widget_show (mcw->pop_password);
 
   /* toggle for apop */
 
@@ -1008,7 +860,6 @@ create_imap_mailbox_page (void)
 {
   GtkWidget *return_widget;
   GtkWidget *table;
-  GtkWidget *label;
 
   return_widget = gtk_vbox_new (0, FALSE);
 
@@ -1016,79 +867,27 @@ create_imap_mailbox_page (void)
   gtk_box_pack_start (GTK_BOX (return_widget), table, FALSE, FALSE, 0);
 
   /* mailbox name */
-  label = gtk_label_new (_("Mailbox Name:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL, 10, 10);
-
-  mcw->imap_mailbox_name = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->imap_mailbox_name, 1, 2, 0, 1,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+  create_label (_("Mailbox Name:"), table, 0);
+  mcw->imap_mailbox_name = create_entry (table, 0, NULL);
 
   /* imap server */
-  label = gtk_label_new (_("Server:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
-  mcw->imap_server = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->imap_server, 1, 2, 1, 2,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
-  gtk_entry_append_text (GTK_ENTRY (mcw->imap_server), "localhost");
+  create_label (_("Server:"), table, 1);
+  mcw->imap_server = create_entry (table, 1, "localhost");
 
   /* imap server port number */
-  label = gtk_label_new (_("Port:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
-  mcw->imap_port = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->imap_port, 1, 2, 2, 3,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
-  gtk_entry_append_text (GTK_ENTRY (mcw->imap_port), "143");
-
+  create_label (_("Port:"), table, 2);
+  mcw->imap_port = create_entry (table, 2, "143");
 
   /* username  */
-  label = gtk_label_new (_("Username:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
-  mcw->imap_username = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->imap_username, 1, 2, 3, 4,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
-  gtk_entry_append_text (GTK_ENTRY (mcw->imap_username), g_get_user_name ());
-
+  create_label (_("Username:"), table, 3);
+  mcw->imap_username = create_entry (table, 3, g_get_user_name ());
 
   /* password field */
-  label = gtk_label_new (_("Password:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
-		    GTK_FILL, GTK_FILL,
-		    10, 10);
-
-  mcw->imap_password = gtk_entry_new ();
-  gtk_table_attach (GTK_TABLE (table), mcw->imap_password, 1, 2, 4, 5,
-		    GTK_EXPAND | GTK_FILL, GTK_FILL,
-		    0, 10);
-
+  create_label (_("Password:"), table, 4);
+  mcw->imap_password = create_entry (table, 4, NULL);
   gtk_entry_set_visibility (GTK_ENTRY (mcw->imap_password), FALSE);
 
-  label = gtk_label_new (_("Folder path:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
-                    GTK_FILL, GTK_FILL,
-                    10, 10);
+  create_label (_("Folder path:"), table, 5);
 
   mcw->imap_folderpath= gnome_entry_new("IMAP Folder History");
   gtk_entry_append_text(GTK_ENTRY(gnome_entry_gtk_entry(
@@ -1138,26 +937,10 @@ next_cb (GtkWidget * widget)
   gtk_container_add (GTK_CONTAINER (bbox), mcw->ok);
   gtk_box_reorder_child (GTK_BOX (bbox), mcw->ok, 0);
 
-  switch (mcw->the_page)
-    {
-    case MC_PAGE_LOCAL:
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_LOCAL);
-      break;
-
-    case MC_PAGE_POP3:
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_POP3);
-      break;
-
-    case MC_PAGE_IMAP:
-    case MC_PAGE_IMAP_DIR:
-      gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), MC_PAGE_IMAP);
-      break;
-    case MC_PAGE_NEW:
-      g_warning ("In mailbox_conf.c: next_cb: Invalid value of mcw->next_page\n");
-      break;
-    }
+  gtk_notebook_set_page (GTK_NOTEBOOK (mcw->notebook), mcw->the_page);
 }
 
+#if 0
 void
 mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data)
 {
@@ -1193,6 +976,4 @@ mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data)
       return;
     }
 }
-
-
-
+#endif

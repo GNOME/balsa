@@ -6,6 +6,7 @@
 	* src/sendmsg-window.c: updates to the language selection
 	code. setlocale() calls led to really weird hangs (X-server
 	dependent?), got rid of them for this release.
+	* src/mailbox-conf.c: KISS and armour mailbox creation/edition code.
 		
 2000-09-26  Ian Campbell  <ijc25@cam.ac.uk>
 

@@ -1,3 +1,9 @@
+2004-08-02 12:35  PeterB
+
+	* libbalsa/mailbox_imap.c: use LIST command and \Marked flag in
+	LIST response to test for new mail in a closed mailbox--not
+	guaranteed to work, as some servers seem never to use \Marked.
+
 2004-08-02 12:18  Darko Obradovic
 
 	* libbalsa/message.c, libbalsa/message.h, src/balsa-app.h,

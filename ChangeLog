@@ -1,3 +1,11 @@
+2000-10-26  Matthew Guenther  <guentherm@asme.org>
+
+	* TODO: Add some future projects (after 1.0).
+	* src/balsa-message.c: Plug memory leaks
+	* src/main-window.c: Enable continue button using
+	->has_unread_messages instead of opening and closing the mailbox.
+	Fixes long delays when selecting large numbers of messages.
+
 2000-10-26  Dan Damian  <dand@dnttm.ro>
 
 	* balsa.desktop: added Romanian translations.

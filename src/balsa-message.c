@@ -1481,6 +1481,8 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
 	    exe_str = g_strdup_printf(cps, info->body->temp_filename);
 	    gnome_execute_shell(NULL, exe_str);
 	    fprintf(stderr, "Executed\n");
+            g_free (cps);
+            g_free (exe_str);
 	}
     } else
 	fprintf(stderr, "view for %s returned NULL\n", content_type);

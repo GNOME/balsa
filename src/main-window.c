@@ -429,6 +429,8 @@ static GnomeUIInfo view_menu[] = {
       zoom_cb, GINT_TO_POINTER(-1), NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_ZOOM_OUT, 0, 0, NULL},
 #define MENU_VIEW_ZOOM_100 MENU_VIEW_ZOOM_OUT + 1
+      /* To warn msgfmt that the % sign isn't a format specifier: */
+      /* xgettext:no-c-format */
     { GNOME_APP_UI_ITEM, N_("Zoom _100%"), N_("No magnification"),
       zoom_cb, GINT_TO_POINTER(0), NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_ZOOM_100, 0, 0, NULL},

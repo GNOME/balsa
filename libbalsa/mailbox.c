@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <sys/utsname.h>
 #include <time.h>
 #include <gnome.h>
 
@@ -135,7 +136,20 @@ static Address *translate_address (ADDRESS * caddr);
 void
 mailbox_init ()
 {
-/* put stuff here later */
+  struct utsname utsname;
+  char *p, buffer[STRING], error[STRING];
+  uname (&utsname);
+  /* some systems report the FQDN instead of just the hostname */
+  if ((p = strchr (utsname.nodename, '.')))
+    {
+      Hostname = mutt_substrdup (utsname.nodename, p);
+      p++;
+      strfcpy (buffer, p, sizeof (buffer));	/* save the domain for below */
+    }
+  else
+    Hostname = safe_strdup (utsname.nodename);
+
+  Tempdir = safe_strdup ((p = getenv ("TMPDIR")) ? p : "/tmp");
 }
 
 
@@ -987,7 +1001,7 @@ message_body_ref (Message * message)
   BODY *b;
   FILE *fp;
   STATE s;
-  char buf[101];
+  gchar *buf;
   gchar tmpfile[PATH_MAX];
 
   if (!message)
@@ -1006,35 +1020,32 @@ message_body_ref (Message * message)
    */
   if ((msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno)) != NULL)
     {
-      /*     mutt_view_attachment (msg->fp, cur->content, M_REGULAR);
-       */
       b = cur->content;
       g_print ("%s/%s", TYPE (b->type), b->subtype);
-/*
+
       memset (&s, 0, sizeof (s));
       mutt_mktemp (tmpfile);
 
-      fp = fopen(cur->filename,"r");
+      fp = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
       s.fpout = fopen (tmpfile, "w");
       fseek ((s.fpin = fp), b->offset, 0);
       mutt_decode_attachment (b, &s);
+
+      fclose (fp);
       fclose (s.fpout);
-*/
-/*
-   message->body_list = g_list_append (message->body_list,
-   g_strdup (cur->content));
-   message->body_ref++;
- */
+
+      readfile (tmpfile, &buf);
+
+      body = body_new ();
+      body->buffer = g_strdup (buf);
+      message->body_list = g_list_append (message->body_list, body);
+      message->body_ref++;
+      g_free (buf);
+
       mx_close_message (&msg);
+      unlink(tmpfile);
     }
 
-#if 0
-  body = body_new ();
-  body->buffer = g_strdup (mail_fetchtext (CLIENT_STREAM (message->mailbox),
-					   message->msgno));
-  message->body_list = g_list_append (message->body_list, body);
-  message->body_ref++;
-#endif
   /*
    * emit read message
    */

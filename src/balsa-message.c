@@ -233,7 +233,7 @@ message2html (Message * message)
 
       /* from */
       if (message->from->personal)
-	snprintf (tbuff, 1024, "%s <%s@%s>",
+	snprintf (tbuff, 1024, "%s <%s>",
 		 message->from->personal,
 		 message->from->mailbox);
       else

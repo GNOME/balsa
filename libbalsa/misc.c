@@ -17,6 +17,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
 #include "config.h"
 
 #include <gnome.h>
@@ -95,11 +100,87 @@ get_int_set_default (const char *path,
 gchar *
 make_string_from_list (GList * the_list)
 {
-  return NULL;
+  gchar *retc;
+  GList *list;
+  GString *gs = g_string_new (NULL);
+  Address *addy;
+
+  list = g_list_first (the_list);
+
+  while (list)
+    {
+      addy = list->data;
+      if (addy->personal)
+	{
+	  gs = g_string_append (gs, addy->personal);
+	  gs = g_string_append_c (gs, ' ');
+	}
+      if (addy->mailbox)
+	{
+	  gs = g_string_append_c (gs, '<');
+	  gs = g_string_append (gs, addy->mailbox);
+	  gs = g_string_append_c (gs, '>');
+	}
+
+      if (list->next)
+	gs = g_string_append (gs, ", ");
+
+      list = list->next;
+    }
+  retc = g_strdup (gs->str);
+  g_string_free (gs, 1);
+  return retc;
 }
 
 GList *
 make_list_from_string (gchar * the_str)
 {
   return NULL;
+}
+
+int
+readfile (char *filename, char **buf)
+{
+  size_t size;
+  off_t offset;
+  int r;
+  int fd = open (filename, O_RDONLY);
+  struct stat statbuf;
+
+  if (fstat (fd, &statbuf) == -1)
+    return -1;
+
+  size = statbuf.st_size;
+
+  if (!size)
+    {
+      *buf = NULL;
+      return size;
+    }
+
+  *buf = (char *) malloc (size);
+  if ((int) *buf == -1)
+    {
+      return -1;
+    }
+
+  offset = 0;
+  while (offset < size)
+    {
+      r = read (fd, *buf + offset, size - offset);
+      if (r > 0)
+	{
+	  offset += r;
+	}
+      else if (!r)
+	{
+	  return offset;
+	}
+      else if ((errno != EAGAIN) && (errno != EINTR))
+	{
+	  return -1;
+	}
+    }
+
+  return size;
 }

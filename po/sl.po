@@ -612,7 +612,7 @@ msgstr "Shranjujem zastavice stanja sporoèila... [%d/%d]"
 
 #: libmutt/imap/imap.c:951
 msgid "Expunging messages from server..."
-msgstr "Unièujem sporoèila na stre¾niku...."
+msgstr "Unièujem sporoèila na stre¾niku..."
 
 #: libmutt/imap/imap.c:1227
 #, c-format
@@ -1176,7 +1176,7 @@ msgstr "Mno¾ica oddaljenih map IMAP"
 #. INPUT FIELD CREATION
 #: src/folder-conf.c:112
 msgid "Descriptive _Name:"
-msgstr "Opisno _imeÈ"
+msgstr "Opisno _ime:"
 
 #. pop server
 #: src/folder-conf.c:117 src/mailbox-conf.c:848 src/mailbox-conf.c:897
@@ -2581,7 +2581,7 @@ msgstr "Tur¹èina"
 
 #: src/sendmsg-window.c:324 src/sendmsg-window.c:435
 msgid "Ukrainian"
-msgstr "Ukrain¹èina"
+msgstr "Ukrajin¹èina"
 
 #: src/sendmsg-window.c:331
 msgid "_A-J"

@@ -2,7 +2,6 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa\n"
@@ -228,7 +227,6 @@ msgid "_Get new mail"
 msgstr "Lees nieuwe mail"
 
 #: src/main-window.c:90
-#, fuzzy
 msgid "Fetch new incoming mail"
 msgstr "Lees nieuwe mail"
 
@@ -237,7 +235,6 @@ msgid "_New"
 msgstr "_Nieuw"
 
 #: src/main-window.c:107
-#, fuzzy
 msgid "Compose a new message"
 msgstr "Maak een nieuw bericht"
 
@@ -246,7 +243,6 @@ msgid "_Reply"
 msgstr "Beantwoorden"
 
 #: src/main-window.c:113
-#, fuzzy
 msgid "Reply to the current message"
 msgstr "Beantwoord huidig bericht"
 
@@ -263,7 +259,6 @@ msgid "_Forward"
 msgstr "Doorsturen"
 
 #: src/main-window.c:126
-#, fuzzy
 msgid "Forward the current message"
 msgstr "Stuur het huidige bericht door"
 
@@ -272,7 +267,6 @@ msgid "_Delete"
 msgstr "Verwijderen"
 
 #: src/main-window.c:133
-#, fuzzy
 msgid "Delete the current message"
 msgstr "Verwijder het huidige bericht"
 
@@ -281,7 +275,6 @@ msgid "_Undelete"
 msgstr "Terughalen"
 
 #: src/main-window.c:139
-#, fuzzy
 msgid "Undelete the message"
 msgstr "Haal het bericht terug"
 
@@ -290,12 +283,10 @@ msgid "List"
 msgstr "Opnemen in lijst"
 
 #: src/main-window.c:155
-#, fuzzy
 msgid "_Open"
 msgstr "_Openen"
 
 #: src/main-window.c:155
-#, fuzzy
 msgid "Open the selected mailbox"
 msgstr "Open het geselecteerde postvak"
 
@@ -304,32 +295,26 @@ msgid "_Close"
 msgstr "Sluiten"
 
 #: src/main-window.c:157
-#, fuzzy
 msgid "Close the selected mailbox"
 msgstr "Sluit het geselecteerde postvak"
 
 #: src/main-window.c:159
-#, fuzzy
 msgid "_Add"
 msgstr "Toevoegen"
 
 #: src/main-window.c:159
-#, fuzzy
 msgid "Add a new mailbox"
 msgstr "Postvak toevoegen"
 
 #: src/main-window.c:161
-#, fuzzy
 msgid "_Edit"
 msgstr "Bewerken"
 
 #: src/main-window.c:161
-#, fuzzy
 msgid "Edit the selected mailbox"
 msgstr "Bewerk het geselecteerde postvak"
 
 #: src/main-window.c:163
-#, fuzzy
 msgid "Delete the selected mailbox"
 msgstr "Verwijder het geselecteerde postvak"
 
@@ -358,12 +343,10 @@ msgid "Manage filters"
 msgstr "Beheer van filters"
 
 #: src/main-window.c:195
-#, fuzzy
 msgid "_Message"
 msgstr "Bericht"
 
 #: src/main-window.c:196
-#, fuzzy
 msgid "Mail_boxes"
 msgstr "Postvakken"
 
@@ -441,17 +424,14 @@ msgstr ""
 "Voor bugreports: http://www.gnome.org/cgi-bin/bugs"
 
 #: src/message-window.c:54
-#, fuzzy
 msgid "Reply to this message"
 msgstr "Beantwoord dit bericht"
 
 #: src/message-window.c:61
-#, fuzzy
 msgid "Reply to all recipients of this message"
 msgstr "Beantwoord alle geadresseerden van dit bericht"
 
 #: src/message-window.c:67
-#, fuzzy
 msgid "Forward this message"
 msgstr "Stuur dit bericht door"
 
@@ -584,7 +564,7 @@ msgid "Remove"
 msgstr "Verwijderen"
 
 #: src/sendmsg-window.c:177
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Info over bestand '%s' kan niet verkregen worden\n"
 

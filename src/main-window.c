@@ -521,15 +521,6 @@ balsa_window_class_init(BalsaWindowClass * klass)
 
     parent_class = gtk_type_class(gnome_app_get_type());
 
-#if 0
-    window_signals[SET_CURSOR] =
-	gtk_signal_new("set_cursor",
-		       GTK_RUN_LAST,
-		       object_class->type,
-		       GTK_SIGNAL_OFFSET(BalsaWindowClass, set_cursor),
-		       gtk_marshal_NONE__POINTER,
-		       GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
-#endif
     window_signals[OPEN_MAILBOX] =
 	gtk_signal_new("open_mailbox",
 		       GTK_RUN_LAST,
@@ -837,28 +828,6 @@ balsa_window_enable_continue(void)
     }
 }
 
-#if 0
-void
-balsa_window_set_cursor(BalsaWindow * window, GdkCursor * cursor)
-{
-    g_return_if_fail(window != NULL);
-    g_return_if_fail(BALSA_IS_WINDOW(window));
-
-    gtk_signal_emit(GTK_OBJECT(window), window_signals[SET_CURSOR],
-		    cursor);
-}
-
-static void
-balsa_window_real_set_cursor(BalsaWindow * window, GdkCursor * cursor)
-{
-    /* XXX fixme to work with NULL cursors
-       gtk_widget_set_sensitive (GTK_WIDGET(window->progress_bar), FALSE);
-       gtk_progress_set_activity_mode (GTK_WIDGET(window->progress_bar), FALSE);
-       gtk_timeout_remove (pbar_timeout);
-       gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0); */
-    gdk_window_set_cursor(GTK_WIDGET(window)->window, cursor);
-}
-#endif
 
 /* balsa_window_open_mailbox: 
    opens mailbox, creates message index. mblist_open_mailbox() is what
@@ -1122,10 +1091,32 @@ show_about_box(void)
 }
 
 
+/* fill_mailbox_passwords:
+   fills in missing POP3 passwords. Must be called in the main thread,
+   or g_main_run() will complain and hang.
+*/
+static void
+fill_mailbox_passwords(GList * mailbox_list)
+{
+    GList *list;
+    LibBalsaMailbox *mailbox;
+    LibBalsaServer *s;
+
+    list = g_list_first(mailbox_list);
+    while (list) {
+	mailbox = LIBBALSA_MAILBOX(list->data);
+	if(LIBBALSA_IS_MAILBOX_POP3(mailbox) && 
+	   LIBBALSA_MAILBOX_POP3(mailbox)->check) {
+	    s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+	    if (s->passwd)
+		s->passwd = libbalsa_server_get_password(s, mailbox);
+	}
+	list = g_list_next(list);
+    }
+}
+
 /* Check all mailboxes in a list
  *
- * FIXME: Some (all) of these are POP mailboxes, and so grabbing the lock causes a delay.
- * We might as well not have the thread :-(
  */
 static void
 check_mailbox_list(GList * mailbox_list)
@@ -1137,19 +1128,13 @@ check_mailbox_list(GList * mailbox_list)
     while (list) {
 	mailbox = LIBBALSA_MAILBOX(list->data);
 
-#ifdef BALSA_USE_THREADS
 	gdk_threads_enter();
-#endif
 	libbalsa_mailbox_check(mailbox);
-
-#ifdef BALSA_USE_THREADS
 	gdk_threads_leave();
-#endif
 
 	list = g_list_next(list);
 
     }
-
 }
 
 /*Callback to check a mailbox in a balsa-mblist */
@@ -1203,12 +1188,13 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
     pthread_mutex_lock(&mailbox_lock);
     if (checking_mail) {
 	pthread_mutex_unlock(&mailbox_lock);
-	fprintf(stderr, "Already Checking Mail!  \n");
+	fprintf(stderr, "Already Checking Mail!\n");
 	return;
     }
     checking_mail = 1;
     pthread_mutex_unlock(&mailbox_lock);
 
+    fill_mailbox_passwords(balsa_app.inbox_input);
     if (balsa_app.pwindow_option == WHILERETR ||
 	(balsa_app.pwindow_option == UNTILCLOSED &&
 	 !(progress_dialog && GTK_IS_WIDGET(progress_dialog)))) {
@@ -1251,6 +1237,7 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
     pthread_detach(get_mail_thread);
 
 #else
+    fill_mailbox_passwords(balsa_app.inbox_input);
     check_mailbox_list(balsa_app.inbox_input);
 
     libbalsa_mailbox_check(balsa_app.inbox);

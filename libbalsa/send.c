@@ -230,10 +230,10 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, gint encoding,
     MessageQueueItem *mqi, *new_message;
     GList *lista;
     LibBalsaMessage *queu;
-    gboolean start_thread;
     /* We do messages in queue now only if where are not sending them already */
 
 #ifdef BALSA_USE_THREADS
+    gboolean start_thread;
     GtkWidget *send_dialog_source = NULL;
 
     pthread_mutex_lock(&send_messages_lock);

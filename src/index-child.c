@@ -71,8 +71,8 @@ static void undelete_message_cb (GtkWidget *, BalsaIndex *);
 void
 index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
 {
-  if (mdi_child)
-    balsa_app.current_index_child = INDEX_CHILD (mdi_child);
+  if (mdi->active_child)
+    balsa_app.current_index_child = INDEX_CHILD (mdi->active_child);
   else
     balsa_app.current_index_child = NULL;
 }
@@ -80,7 +80,10 @@ index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
 IndexChild *
 index_child_get_active (GnomeMDI * mdi)
 {
-  return INDEX_CHILD (mdi->active_child);
+  if (mdi)
+    return INDEX_CHILD (mdi->active_child);
+  else
+    return NULL;
 }
 
 static void

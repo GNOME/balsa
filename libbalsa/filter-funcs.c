@@ -145,9 +145,7 @@ filter *filter_new()
     newfil->flags = FILTER_EMPTY;
     newfil->match_fields = FILTER_EMPTY;
     newfil->match.string[0] = '\0';
-#ifdef HAVE_LIBESD
     newfil->sound[0] = '\0';
-#endif
     newfil->popup_text[0] = '\0';
     newfil->regex = NULL;
 

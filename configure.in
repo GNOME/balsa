@@ -59,14 +59,6 @@ AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION)
 AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL)
 AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION")
 
-LIBESD_LIB=""
-AC_CHECK_LIB(esd, esd_open_sound,
-  AC_CHECK_HEADER(esd.h,
-    [LIBESD_LIB='-lesd'
-     AC_DEFINE(HAVE_LIBESD)],
-    AC_MSG_WARN(*** Disabling sound support (ESound headers not found) ***)),
-  AC_MSG_WARN(*** Disabling sound support (ESound libs not found) ***), -lm)
-
 AC_CHECK_LIB(crypt, crypt)
 
 AC_CHECK_LIB(des, des_encrypt)

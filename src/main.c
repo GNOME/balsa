@@ -29,10 +29,6 @@
 
 #include "main.h"
 
-#ifdef HAVE_LIBESD
-#include <esd.h>
-#endif
-
 int
 main (int argc, char *argv[])
 {
@@ -113,11 +109,7 @@ balsa_exit (void)
   if (balsa_app.proplist)
     config_global_save ();
 
-#ifdef HAVE_LIBESD
-  g_free (balsa_app.esound_host);
-  close (balsa_app.esound);
-  balsa_app.esound = -1;
-#endif
+  gnome_sound_shutdown();
 
   gtk_exit (0);
 }

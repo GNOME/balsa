@@ -338,7 +338,6 @@ balsa_message_set (BalsaMessage * bmessage,
 
   /* set message contents */
   buff = content2html (message);
-  g_print(buff);
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
   message_body_unref (bmessage->message);
 }

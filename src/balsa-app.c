@@ -34,13 +34,8 @@
 #include "main.h"
 #include "mailbox.h"
 #include "save-restore.h"
-#include "sound.h"
 #include "index-child.h"
 #include "main-window.h"
-
-#ifdef HAVE_LIBESD
-#include <esd.h>
-#endif
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -124,12 +119,9 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_DEFAULT_MODE;
 
-#ifdef HAVE_LIBESD
-  balsa_app.esound_host = g_strdup ("localhost");
-  balsa_app.esound = esd_open_sound (balsa_app.esound_host);
+  gnome_sound_init("localhost");
 
-  play_sound (gnome_datadir_file ("sounds/estart.wav"));
-#endif
+  gnome_sound_play (gnome_sound_file ("estart.wav"));
 
   if (config_load (BALSA_CONFIG_FILE) == FALSE)
     {

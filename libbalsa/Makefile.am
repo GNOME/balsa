@@ -21,6 +21,7 @@ libbalsa_a_SOURCES = 		\
 	filter-error.c		\
 	filter-file.c		\
 	filter-funcs.c		\
+	imapdir.h		\
 	libbalsa.c		\
 	libbalsa.h		\
 	libbalsa_private.h	\

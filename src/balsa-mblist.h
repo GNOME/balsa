@@ -76,4 +76,5 @@ void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
 GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 
                                         GList ** url_list,
                                         gchar ** url);
+void balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox);
 #endif

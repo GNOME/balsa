@@ -3056,6 +3056,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
     enable_mailbox_menus(BALSA_INDEX(index)->mailbox_node);
 
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
+    balsa_mblist_set_status_bar(mailbox);
 
     balsa_index_refresh_date(GTK_NOTEBOOK(balsa_app.notebook),
 			     NULL, 0, index);

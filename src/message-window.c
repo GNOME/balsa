@@ -237,6 +237,11 @@ message_window_idle_handler(MessageWindow* mw)
 	}
     }
     gtk_object_unref(GTK_OBJECT(message)); 
+
+    /* Update the style and message counts in the mailbox list */
+    balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
+                                message->mailbox);
+
     gdk_threads_leave();
     return FALSE;
 }

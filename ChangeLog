@@ -2,7 +2,9 @@
 
 	* src/balsa-mblist.c: use "pixbuf" property of
 	GtkCellRendererPixbuf instead of "stock-id"
-
+	* src/balsa-index.c,  src/balsa-mblist.[hc], src/main-window.c,
+	src/message-window.c: update status bar properly.
+	
 2002-06-26  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/Makefile.am, balsa.spec.in: remove last gdbm experiment traces.

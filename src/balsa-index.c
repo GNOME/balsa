@@ -2497,6 +2497,7 @@ balsa_index_transfer(GList * messages, LibBalsaMailbox * from_mailbox,
         balsa_index_sync_backend(from_mailbox);
     }
 
+    balsa_mblist_set_status_bar(from_mailbox);
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
                                 to_mailbox);
 

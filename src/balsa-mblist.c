@@ -971,6 +971,7 @@ balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox)
     }
     
     balsa_mblist_have_new(balsa_app.mblist_tree_store);
+    balsa_mblist_set_status_bar(mailbox);
 }
 
 void
@@ -1343,7 +1344,7 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
 {
     GtkTreeModel *model = GTK_TREE_MODEL(store);
     GtkTreeIter iter;
-    gchar *desc;
+    GtkWidget *bindex;
 
     /* try and find the mailbox */
     if (!bmbl_prerecursive(model, &iter,
@@ -1355,14 +1356,11 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
     /* Do the folder styles as well */
     balsa_mblist_have_new(GTK_TREE_STORE(model));
 
-    desc =
-        g_strdup_printf(_
-                        ("Shown mailbox: %s with %ld messages, %ld new"),
-                        mailbox->name, mailbox->total_messages,
-                        mailbox->unread_messages);
+    bindex = balsa_window_find_current_index(balsa_app.main_window);
+    if (!bindex || mailbox != BALSA_INDEX(bindex)->mailbox_node->mailbox)
+        return;
 
-    gnome_appbar_set_default(balsa_app.appbar, desc);
-    g_free(desc);
+    balsa_mblist_set_status_bar(mailbox);
 }
 
 static void
@@ -2097,4 +2095,17 @@ bmbl_mru_option_menu_destroy_cb(GtkWidget * widget, GdkEvent * event,
 {
     g_free(mro);
     return FALSE;
+}
+
+void
+balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
+{
+    gchar *desc =
+        g_strdup_printf(_
+                        ("Shown mailbox: %s with %ld messages, %ld new"),
+                        mailbox->name, mailbox->total_messages,
+                        mailbox->unread_messages);
+
+    gnome_appbar_set_default(balsa_app.appbar, desc);
+    g_free(desc);
 }

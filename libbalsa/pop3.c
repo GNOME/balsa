@@ -411,7 +411,7 @@ static PopStatus send_fetch_req(int s, int msgno, char* buffer, size_t bufsz)
 
 typedef size_t (*msg_append_func)(const char *, size_t len, void *data);
 static PopStatus
-fetch_single_msg(int s, void *msg, msg_append_func msg_append,
+fetch_single_msg(int s, void *file, msg_append_func msg_append,
 		 int msgno, int first_msg, int msgs, 
 		 int *num_bytes, int tot_bytes, 
                  ProgressCallback prog_cb, void* prog_data)
@@ -419,6 +419,7 @@ fetch_single_msg(int s, void *msg, msg_append_func msg_append,
     char buffer[2048];
     time_t last_update_time = time(NULL);
     char threadbuf[160];    
+   
     sprintf(threadbuf, _("Retrieving Message %d of %d"), msgno, msgs);
     prog_cb (prog_data, threadbuf, *num_bytes, tot_bytes);
 
@@ -462,9 +463,8 @@ fetch_single_msg(int s, void *msg, msg_append_func msg_append,
 	else
 	    p = buffer;
 	
-	/* fwrite(p, 1, chunk, stdout); */
-	if(msg_append (p, (size_t) chunk, msg) != (size_t) chunk)
-            return POP_WRITE_ERR;
+	if ( fwrite( p, chunk, 1, file ) < (size_t)chunk )
+	    return POP_WRITE_ERR;
     } /* end of while */
     
     DM("POP3: Message %d retrieved", msgno);
@@ -539,7 +539,7 @@ fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 static size_t
 fetch_direct_msg_append(const char *text, size_t len, void *data)
 {
-    return g_mime_stream_write((GMimeStream*)data, (char*)text, len);
+    return(len);
 }
 
 static PopStatus
@@ -550,40 +550,34 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
     gint i, num_bytes;
     char buffer[2048];
     PopStatus err = POP_OK;
-    LibBalsaMailbox *mailbox;
-    GMimeStream *stream;
     
     g_return_val_if_fail(spoolfile, POP_OK);
 
-    mailbox = (LibBalsaMailbox*)libbalsa_mailbox_local_new(spoolfile, FALSE);
-    if(mailbox == NULL) return POP_OPEN_ERR;
 
     num_bytes=0;  
     for (i = first_msg; i <= msgs; i++) {
+	gchar *msgfile;
+	FILE *f;
+
 	if( (err=send_fetch_req(s, i, buffer, sizeof(buffer))) != POP_OK)
 	    break;
-	stream = g_mime_stream_mem_new();
-	if (stream == NULL)  {
-	    DM("POP3: Error while creating new message %d", i );
-	    err = POP_MSG_APPEND;
-	    break;
-	}
 
-	err = fetch_single_msg(s, stream, fetch_direct_msg_append, 
+	msgfile = g_strdup_printf ( "%s/%d", spoolfile, i );
+	f = fopen (msgfile, "w");
+	if (!f)
+	    break;
+	g_free (msgfile);
+	err = fetch_single_msg(s, f, fetch_direct_msg_append, 
 			       i, first_msg, msgs, &num_bytes,
 			       tot_bytes, prog_cb, prog_data);
+	fclose (f);
 	if(err != POP_OK) {
-	    g_mime_stream_unref(stream);
 	    break;
 	}
-	libbalsa_mailbox_add_message_stream(mailbox, stream, 0);
-	g_mime_stream_unref(stream);
-	
 	if (err) break;
 	if (delete_on_server) delete_msg(s, i); /* ignore errors */
     }
     if (err != POP_OK) reset_server(s, buffer, sizeof(buffer));
-    g_object_unref(G_OBJECT(mailbox));
     return err;
 }
 

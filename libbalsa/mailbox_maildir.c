@@ -67,8 +67,7 @@ static GMimeMessage *libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mail
 static LibBalsaMessage *libbalsa_mailbox_maildir_load_message(
 				    LibBalsaMailbox * mailbox, guint msgno);
 static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
-						GMimeStream *stream,
-						LibBalsaMessageFlag flags);
+						LibBalsaMessage * message );
 static void libbalsa_mailbox_maildir_change_message_flags(LibBalsaMailbox * mailbox,
 						     guint msgno,
 						     LibBalsaMessageFlag set,
@@ -729,8 +728,7 @@ static LibBalsaMessage *libbalsa_mailbox_maildir_load_message(
 }
 
 static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
-						GMimeStream *stream,
-						LibBalsaMessageFlag flags)
+						LibBalsaMessage * message )
 {
     char *path;
     char *tmp;
@@ -742,6 +740,7 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), -1);
 
     LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
+    g_object_ref ( G_OBJECT(message ) );
 
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
@@ -752,7 +751,8 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     }
     out_stream = g_mime_stream_fs_new(fd);
-    if (g_mime_stream_write_to_stream(stream, out_stream) == -1)
+    if (g_mime_stream_write_to_stream(libbalsa_mailbox_get_message_stream( message->mailbox, message ), 
+				      out_stream) == -1)
     {
 	g_mime_stream_unref(out_stream);
 	unlink (tmp);
@@ -771,7 +771,7 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     msg_info->subdir = "tmp";
     msg_info->key = g_strdup(new_filename);
     msg_info->filename = g_strdup(new_filename);
-    msg_info->flags = flags;
+    msg_info->flags = message->flags;
     maildir_sync(msg_info->key, msg_info, path);
     if (MAILBOX_OPEN(mailbox)) {
 	    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
@@ -780,6 +780,8 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	    mailbox->new_messages++;
     }
     g_free(tmp);
+
+    g_object_unref ( G_OBJECT(message ) );  
     UNLOCK_MAILBOX(mailbox);
 
     return 1;

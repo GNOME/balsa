@@ -253,9 +253,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	tmp_file = g_mkstemp(tmp_path);
     } while ((tmp_file < 0) && (errno == EEXIST));
 
-    /* newer glibc does this for us */
-    fchmod(tmp_file,  S_IRUSR | S_IWUSR );
-
     if(tmp_file < 0) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 mailbox %s temp file error:\n%s"), 
@@ -265,6 +262,16 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }
     close(tmp_file);
+    unlink(tmp_path);
+
+    if( mkdir(tmp_path, 0600) < 0 ) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _("POP3 mailbox %s temp file error:\n%s"), 
+			     mailbox->name,
+			     g_strerror(errno));
+	g_free(tmp_path);
+	return;	
+    }
 
     status =  m->filter 
 	? libbalsa_fetch_pop_mail_filter (m, uid, m->filter_cmd,
@@ -290,7 +297,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     } 
 
     tmp_mailbox = (LibBalsaMailbox*)
-        libbalsa_mailbox_local_new(tmp_path, FALSE);
+        libbalsa_mailbox_mh_new(tmp_path, FALSE);
     if(!tmp_mailbox)  {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 mailbox %s temp mailbox error:\n"), 

@@ -1,3 +1,22 @@
+2003-09-28  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/pop3.c: 
+	* libbalsa/mailbox_pop3.c: 
+	* libbalsa/mailbox_imap.c: 
+	* libbalsa/mailbox_maildir.c: 
+	* libbalsa/mailbox_mh.c: 
+	* libbalsa/mailbox_mbox.c: 
+	* libbalsa/mailbox.c: 
+	* libbalsa/message.h: 
+	replace add_message_stream with copy_message API. 
+
+	* libbalsa/pop3.c: 
+	* libbalsa/mailbox_pop3.c: 
+	use a mh mailbox instead of mbox
+	
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_sync): 
+	don't crash on closing empty mailboxes
+
 2003-09-28 09:02  PeterB
 
 	* libbalsa/mailbox.c: Set mailbox->has_unread_messages when adding

@@ -66,8 +66,7 @@ static GMimeMessage *libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox,
 static LibBalsaMessage *libbalsa_mailbox_mh_load_message(
 				    LibBalsaMailbox * mailbox, guint msgno);
 static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
-					   GMimeStream *stream,
-					   LibBalsaMessageFlag flags);
+					   LibBalsaMessage * message );
 static void libbalsa_mailbox_mh_change_message_flags(LibBalsaMailbox * mailbox,
 						     guint msgno,
 						     LibBalsaMessageFlag set,
@@ -850,7 +849,7 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox)
     g_mime_stream_unref(unseen_line);
     g_mime_stream_unref(flagged_line);
     g_mime_stream_unref(replied_line);
-    msg_count = mh->messages_info->len - 1;
+    msg_count = mh->messages_info->len;
     for (; msg_count; msg_count--) {
 	msg_info = &g_array_index(mh->messages_info,
 		       struct message_info, msg_count);
@@ -972,8 +971,7 @@ static LibBalsaMessage *libbalsa_mailbox_mh_load_message(
 }
 
 static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
-					   GMimeStream *stream,
-					   LibBalsaMessageFlag flags)
+					   LibBalsaMessage * message )
 {
     LibBalsaMailboxMh *mh;
     char *path;
@@ -986,9 +984,12 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     struct message_info *msg_info;
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MH(mailbox), -1);
+    g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), -1);
+
     mh = LIBBALSA_MAILBOX_MH(mailbox);
 
     LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
+    g_object_ref ( G_OBJECT(message ) );
 
     read_mh_sequences(mh);
     parse_mailbox(mh);
@@ -1001,7 +1002,8 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     }
     out_stream = g_mime_stream_fs_new(fd);
-    if (g_mime_stream_write_to_stream(stream, out_stream) == -1)
+    if (g_mime_stream_write_to_stream( libbalsa_mailbox_get_message_stream( message->mailbox, message )
+				       , out_stream) == -1)
     {
 	g_mime_stream_unref(out_stream);
 	unlink (tmp);
@@ -1044,8 +1046,10 @@ static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     g_array_set_size(mh->messages_info, msgno);
     msg_info = &g_array_index(mh->messages_info, struct message_info, msgno - 1);
     msg_info->filename = g_strdup_printf("%d", msgno);
-    msg_info->flags = msg_info->orig_flags = flags;
+    msg_info->flags = msg_info->orig_flags = message->flags;
     mailbox->new_messages++;
+
+    g_object_unref ( G_OBJECT(message ) );    
     UNLOCK_MAILBOX(mailbox);
 
     return 1;

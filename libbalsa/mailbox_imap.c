@@ -105,8 +105,8 @@ static LibBalsaMessage *libbalsa_mailbox_imap_load_message(
 						  LibBalsaMailbox * mailbox,
 						  guint msgno);
 static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
-					     GMimeStream *stream,
-					     LibBalsaMessageFlag flags);
+					     LibBalsaMessage * message );
+
 void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox,
 						guint msgno,
 						LibBalsaMessageFlag set,
@@ -1541,49 +1541,42 @@ LibBalsaMessage *libbalsa_mailbox_imap_load_message(LibBalsaMailbox * mailbox, g
 }
 
 int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
-				      GMimeStream *stream,
-				      LibBalsaMessageFlag flags)
+				      LibBalsaMessage * message )
 {
     ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
-    GMimeStream *mem_stream;
     ImapResponse rc;
-    gchar *message;
+    gchar *mtext;
     size_t len;
     ImapMboxHandle *handle;
 
-    if ((flags & LIBBALSA_MESSAGE_FLAG_NEW) == 0)
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+
+    g_object_ref ( G_OBJECT(message ) );
+
+    if ( LIBBALSA_MESSAGE_IS_UNREAD(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_SEEN);
-    if (flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+    if ( LIBBALSA_MESSAGE_IS_DELETED(message ) ) 
 	IMSG_FLAG_SET(imap_flags,IMSGF_DELETED);
-    if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+    if ( LIBBALSA_MESSAGE_IS_FLAGGED(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_FLAGGED);
-    if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+    if ( LIBBALSA_MESSAGE_IS_REPLIED(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_ANSWERED);
 
-    mem_stream = g_mime_stream_mem_new();
-    g_mime_stream_write_to_stream(stream, mem_stream);
-    message = GMIME_STREAM_MEM(mem_stream)->buffer->data;
-    len = g_mime_stream_length(mem_stream);
-
-    /* remove From_ line */
-    if (strncmp("From ", message, 5) == 0) {
-	message += 5;
-	len -= 5;
-	while (len && *message!='\n') {
-	    len--;
-	    message++;
-	}
-	len--;
-	message++;
-    }
-    if (!len)
-	return -1;
+    LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
+    
+    mtext = g_mime_message_to_string (message->mime_msg); /* suck alert */
+    len = strlen (mtext);
 
     handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox));
     rc = imap_mbox_append_str(handle, LIBBALSA_MAILBOX_IMAP(mailbox)->path,
-                              imap_flags, len, message);
+                              imap_flags, len, mtext);
     RELEASE_HANDLE(mailbox, handle);
-    g_mime_stream_unref(mem_stream);
+
+    g_free (mtext);
+    g_object_unref ( G_OBJECT(message ) );    
+    UNLOCK_MAILBOX(mailbox);
+    
     return rc == IMR_OK ? 1 : -1;
 }
 

@@ -268,8 +268,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
 					      append ? M_APPEND : 0, NULL);
     libbalsa_unlock_mutt();
     g_free(tmp);
-    gdk_threads_enter();
-
 
     if (CLIENT_CONTEXT_OPEN(mailbox)) {
 	mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
@@ -277,21 +275,22 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, gboolean append)
 	mailbox->total_messages = 0;
 	mailbox->unread_messages = 0;
 	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
-	imap_allow_reopen (CLIENT_CONTEXT(mailbox));
-	libbalsa_mailbox_load_messages(mailbox);
-
 	if(mailbox->open_ref == 0)
 	    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
 	/* increment the reference count */
 	mailbox->open_ref++;
 
+	UNLOCK_MAILBOX(mailbox);
+	gdk_threads_enter();
+	libbalsa_mailbox_load_messages(mailbox);
 #ifdef DEBUG
 	g_print(_("LibBalsaMailboxImap: Opening %s Refcount: %d\n"),
 		mailbox->name, mailbox->open_ref);
 #endif
-
+    } else {
+	UNLOCK_MAILBOX(mailbox);
+	gdk_threads_enter();
     }
-    UNLOCK_MAILBOX(mailbox);
 }
 
 static void
@@ -348,23 +347,27 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 	LOCK_MAILBOX(mailbox);
 	newmsg = CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
 	index_hint = CLIENT_CONTEXT(mailbox)->vcount;
+
 	libbalsa_lock_mutt();
 	imap_allow_reopen(CLIENT_CONTEXT(mailbox));
-	if (newmsg == 0 && 
-	    (i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0))
-	    < 0) {
+	i = mx_check_mailbox(CLIENT_CONTEXT(mailbox), &index_hint, 0);
+	libbalsa_unlock_mutt();
+
+	if (i < 0) {
 	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
 	    if(CLIENT_CONTEXT_CLOSED(mailbox)||
 	       !CLIENT_CONTEXT(mailbox)->id_hash)
 		libbalsa_mailbox_free_messages(mailbox);
-	} else if (newmsg || i == M_NEW_MAIL || i == M_REOPENED) {
+	} 
+	if (newmsg || i == M_NEW_MAIL || i == M_REOPENED) {
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
+	    
+	    UNLOCK_MAILBOX(mailbox);
 	    libbalsa_mailbox_load_messages(mailbox);
+	} else {
+	    UNLOCK_MAILBOX(mailbox);
 	}
-	
-	libbalsa_unlock_mutt();
-	UNLOCK_MAILBOX(mailbox);
     }
 }
 

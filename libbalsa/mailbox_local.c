@@ -212,8 +212,9 @@ libbalsa_mailbox_local_destroy(GtkObject * object)
 
 /* libbalsa_mailbox_local_open:
    THREADING: it is always called from a signal handler so the gdk lock
-   is held on entry. The lock is released on the time-consumin open
+   is held on entry. The lock is released on the time-consuming open
    operation and taken back when job is finished.
+   Order is crucial to avoid deadlocks.
 */
 static void
 libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
@@ -255,26 +256,27 @@ libbalsa_mailbox_local_open(LibBalsaMailbox * mailbox, gboolean append)
     else
 	CLIENT_CONTEXT(mailbox) = mx_open_mailbox(local->path, 0, NULL);
     libbalsa_unlock_mutt();
-    gdk_threads_enter();
-
-    if (CLIENT_CONTEXT_OPEN(mailbox)) {
-	mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
-	mailbox->messages = 0;
-	mailbox->total_messages = 0;
-	mailbox->unread_messages = 0;
-	mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
-	libbalsa_mailbox_load_messages(mailbox);
-
-	/* increment the reference count */
-	mailbox->open_ref++;
-
-#ifdef DEBUG
-	g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),
-		mailbox->name, mailbox->open_ref);
-#endif
+    
+    if (!CLIENT_CONTEXT_OPEN(mailbox)) {
+	UNLOCK_MAILBOX(mailbox);
+	gdk_threads_enter();
+	return;
     }
-
+    mailbox->readonly = CLIENT_CONTEXT(mailbox)->readonly;
+    mailbox->messages = 0;
+    mailbox->total_messages = 0;
+    mailbox->unread_messages = 0;
+    mailbox->new_messages = CLIENT_CONTEXT(mailbox)->msgcount;
+    mailbox->open_ref++;
     UNLOCK_MAILBOX(mailbox);
+    gdk_threads_enter();
+    libbalsa_mailbox_load_messages(mailbox);
+    
+    /* increment the reference count */
+#ifdef DEBUG
+    g_print(_("LibBalsaMailboxLocal: Opening %s Refcount: %d\n"),
+	    mailbox->name, mailbox->open_ref);
+#endif
 }
 
 static void
@@ -297,12 +299,15 @@ libbalsa_mailbox_local_check(LibBalsaMailbox * mailbox)
 
 	if (i < 0) {
 	    g_print("mx_check_mailbox() failed on %s\n", mailbox->name);
-	} else if (i == M_NEW_MAIL || i == M_REOPENED) {
+	} 
+	if (i == M_NEW_MAIL || i == M_REOPENED) {
 	    mailbox->new_messages =
 		CLIENT_CONTEXT(mailbox)->msgcount - mailbox->messages;
+	    UNLOCK_MAILBOX(mailbox);
 	    libbalsa_mailbox_load_messages(mailbox);
+	} else {
+	    UNLOCK_MAILBOX(mailbox);
 	}
-	UNLOCK_MAILBOX(mailbox);
     }
 }
 

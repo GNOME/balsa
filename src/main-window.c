@@ -2095,6 +2095,7 @@ set_icon(GnomeApp * app)
     GdkWindowAttr att;
     XIconSize *is;
     gint i, count, j;
+    char *filename;
 
     w = GTK_WIDGET(app)->window;
 
@@ -2141,33 +2142,28 @@ set_icon(GnomeApp * app)
     att.colormap = gdk_imlib_get_colormap();
 #endif
     ic_win = gdk_window_new(NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
-    {
-	/*char *filename = gnome_unconditional_pixmap_file ("balsa/balsa_icon.png"); */
-	char *filename = balsa_pixmap_finder("balsa/balsa_icon.png");
+    gdk_window_set_icon(w, ic_win, NULL, NULL);
 
+    if( (filename = balsa_pixmap_finder("balsa/balsa_icon.png")) ) {
 #ifdef USE_PIXBUF
 	pb = gdk_pixbuf_new_from_file(filename);
 #else
 	im = gdk_imlib_load_image(filename);
+	gdk_imlib_render(im, att.width, att.height);
+	pmap = gdk_imlib_move_image(im);
+	mask = gdk_imlib_move_mask(im);
+	gdk_window_set_back_pixmap(ic_win, pmap, FALSE);
+#endif
+        gdk_window_clear(ic_win);
+#ifndef USE_PIXBUF
+	gdk_window_shape_combine_mask(ic_win, mask, 0, 0);
+	gdk_imlib_free_pixmap(pmap);
+	gdk_imlib_destroy_image(im);
+#else
+	gdk_pixbuf_unref(pb);
 #endif
 	g_free(filename);
     }
-    gdk_window_set_icon(w, ic_win, NULL, NULL);
-#ifndef USE_PIXBUF
-    gdk_imlib_render(im, att.width, att.height);
-    pmap = gdk_imlib_move_image(im);
-    mask = gdk_imlib_move_mask(im);
-    gdk_window_set_back_pixmap(ic_win, pmap, FALSE);
-#endif
-    gdk_window_clear(ic_win);
-#ifndef USE_PIXBUF
-    gdk_window_shape_combine_mask(ic_win, mask, 0, 0);
-    gdk_imlib_free_pixmap(pmap);
-    gdk_imlib_destroy_image(im);
-#endif
-#ifdef USE_PIXBUF
-    gdk_pixbuf_unref(pb);
-#endif
 }
 
 /* PKGW: remember when they change the position of the vpaned. */

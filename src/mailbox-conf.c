@@ -42,7 +42,7 @@ struct _MailboxConfWindow {
     LibBalsaMailbox *mailbox;
 
 
-    GtkWidget *window;
+    GnomeDialog *window;
 
     GtkWidget *mailbox_name;
     GtkType mailbox_type;
@@ -94,10 +94,6 @@ static GtkWidget *create_page(MailboxConfWindow *mcw);
 static GtkWidget *create_local_mailbox_page(MailboxConfWindow *mcw);
 static GtkWidget *create_pop_mailbox_page(MailboxConfWindow *mcw);
 static GtkWidget *create_imap_mailbox_page(MailboxConfWindow *mcw);
-
-static GtkWidget *create_label(const gchar * label, GtkWidget * table, gint row, guint *keyval);
-static GtkWidget *create_entry(MailboxConfWindow *mcw, GtkWidget * table, gint row, const gchar * initval, const guint keyval);
-static GtkWidget *create_check(MailboxConfWindow *mcw, const gchar * label, GtkWidget * table, gint row);
 
 #if 0
 void mailbox_conf_edit_imap_server(GtkWidget * widget, gpointer data);
@@ -225,6 +221,62 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     }
 }
 
+static void
+run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type, 
+		 void (*ok_handler)(MailboxConfWindow*), 
+		 const char* ok_button_name,
+		 const char* ok_pixmap)
+{
+    MailboxConfWindow* mcw;
+    GtkWidget* page;
+    int button;
+
+    g_return_if_fail(gtk_type_is_a(mailbox_type, LIBBALSA_TYPE_MAILBOX));
+
+    mcw = g_new0(MailboxConfWindow, 1);
+
+    mcw->mailbox = mbnode ? mbnode->mailbox : NULL;
+    mcw->mailbox_type = mailbox_type;
+
+    mcw->window = GNOME_DIALOG(gnome_dialog_new(_("Mailbox Configurator"),
+						NULL));
+    gtk_window_set_wmclass(GTK_WINDOW(mcw->window), "mailbox_config_dialog", "Balsa");
+
+    gnome_dialog_close_hides(mcw->window, TRUE);
+
+    gnome_dialog_append_button_with_pixmap(mcw->window, 
+					   ok_button_name,
+					   ok_pixmap);
+    gnome_dialog_append_button(mcw->window, GNOME_STOCK_BUTTON_CLOSE);
+    
+    gnome_dialog_set_sensitive(mcw->window, 0, FALSE);
+    gnome_dialog_set_default(mcw->window, 0);
+
+    gnome_dialog_set_parent(mcw->window, GTK_WINDOW(balsa_app.main_window));
+
+    page = create_page(mcw);
+    gtk_widget_show_all(page);    
+
+    gtk_box_pack_start(GTK_BOX(mcw->window->vbox),
+		       page, TRUE, TRUE, 0);
+
+    if(mbnode) {
+	mailbox_conf_set_values(mcw);
+	if(mbnode->parent && LIBBALSA_IS_MAILBOX_LOCAL(mbnode->mailbox))
+	    gtk_widget_set_sensitive(mcw->mb_data.local.path, FALSE);
+    }
+    gtk_widget_grab_focus(mcw->mailbox_name);
+
+    button = gnome_dialog_run(mcw->window);
+
+    if ( button == 0 )
+	ok_handler(mcw);
+
+    /* close the new mailbox window */
+    gtk_object_destroy(GTK_OBJECT(mcw->window));
+
+    g_free(mcw);
+}
 /*
  * Brings up dialog to configure a new mailbox of type mailbox_type.
  * If the used clicks save add the new mailbox to the tree.
@@ -232,53 +284,8 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 void
 mailbox_conf_new(GtkType mailbox_type)
 {
-    GtkWidget *page;
-    MailboxConfWindow *mcw;
-    gint button;
-
-    g_return_if_fail(gtk_type_is_a(mailbox_type, LIBBALSA_TYPE_MAILBOX));
-
-    mcw = g_new0(MailboxConfWindow, 1);
-
-    mcw->mailbox = NULL;
-    mcw->mailbox_type = mailbox_type;
-
-    mcw->window = gnome_dialog_new(_("Mailbox Configurator"),
-				   NULL);
-    gtk_window_set_wmclass(GTK_WINDOW(mcw->window), "mailbox_config_dialog", "Balsa");
-
-    gnome_dialog_close_hides(GNOME_DIALOG(mcw->window), TRUE);
-
-    gnome_dialog_append_button_with_pixmap(GNOME_DIALOG(mcw->window), 
-					   _("Add"),
-					   GNOME_STOCK_PIXMAP_NEW);
-    gnome_dialog_append_button(GNOME_DIALOG(mcw->window), GNOME_STOCK_BUTTON_CLOSE);
-    
-    gnome_dialog_set_sensitive(GNOME_DIALOG(mcw->window), 0,
-			       FALSE);
-    gnome_dialog_set_default(GNOME_DIALOG(mcw->window), 0);
-
-    gnome_dialog_set_parent(GNOME_DIALOG(mcw->window),
-			    GTK_WINDOW(balsa_app.main_window));
-
-    page = create_page(mcw);
-    gtk_widget_show_all(page);    
-
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(mcw->window)->vbox),
-		       page, TRUE, TRUE, 0);
-
-    gtk_widget_grab_focus(mcw->mailbox_name);
-
-    button = gnome_dialog_run(GNOME_DIALOG(mcw->window));
-
-    if ( button == 0 )
-	mailbox_conf_add(mcw);
-
-    /* close the new mailbox window */
-    gtk_object_destroy(GTK_OBJECT(mcw->window));
-
-    g_free(mcw);
-
+    run_mailbox_conf(NULL, mailbox_type,
+		     mailbox_conf_add, _("Add"), GNOME_STOCK_PIXMAP_NEW);
 }
 
 /*
@@ -287,56 +294,10 @@ mailbox_conf_new(GtkType mailbox_type)
 void
 mailbox_conf_edit(BalsaMailboxNode *mbnode)
 {
-    GtkWidget *page;
-    MailboxConfWindow *mcw;
-    gint button;
-
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-
-    mcw = g_new0(MailboxConfWindow, 1);
-
-    mcw->mailbox = mbnode->mailbox;
-    mcw->mailbox_type = GTK_OBJECT_TYPE(GTK_OBJECT(mbnode->mailbox));
-
-    mcw->window = gnome_dialog_new(_("Mailbox Configurator"), 
-				   NULL);
-    gtk_window_set_wmclass(GTK_WINDOW(mcw->window), "mailbox_config_dialog", "Balsa");
-
-    gnome_dialog_close_hides(GNOME_DIALOG(mcw->window), TRUE);
-
-    gnome_dialog_append_button_with_pixmap(GNOME_DIALOG(mcw->window), 
-					   _("Update"),
-					   GNOME_STOCK_PIXMAP_SAVE);
-    gnome_dialog_append_button(GNOME_DIALOG(mcw->window), GNOME_STOCK_BUTTON_CLOSE);
-
-    gnome_dialog_set_sensitive(GNOME_DIALOG(mcw->window), 0,
-			       TRUE);
-    gnome_dialog_set_default(GNOME_DIALOG(mcw->window), 0);
-
-    gnome_dialog_set_parent(GNOME_DIALOG(mcw->window),
-			    GTK_WINDOW(balsa_app.main_window));
-    
-    page = create_page(mcw);
-    gtk_widget_show_all(page);
-
-    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(mcw->window)->vbox),
-		       page, TRUE, TRUE, 0);
-
-    mailbox_conf_set_values(mcw);
-    if(mbnode->parent && LIBBALSA_IS_MAILBOX_LOCAL(mbnode->mailbox))
-	gtk_widget_set_sensitive(mcw->mb_data.local.path, FALSE);
-
-    gtk_widget_grab_focus(mcw->mailbox_name);
-
-    button = gnome_dialog_run(GNOME_DIALOG(mcw->window));
-    
-    if ( button == 0 ) 
-	mailbox_conf_update(mcw);
-
-    /* close the new mailbox window */
-    gtk_object_destroy(GTK_OBJECT(mcw->window));
-
-    g_free(mcw);
+    run_mailbox_conf(mbnode, GTK_OBJECT_TYPE(GTK_OBJECT(mbnode->mailbox)),
+		     mailbox_conf_update, _("Update"),
+		     GNOME_STOCK_PIXMAP_SAVE);
 }
 
 /*
@@ -460,8 +421,7 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 	    sensitive = FALSE;
     }
 
-    gnome_dialog_set_sensitive(GNOME_DIALOG(mcw->window),
-			       0, sensitive);
+    gnome_dialog_set_sensitive(mcw->window, 0, sensitive);
 }
 
 /*
@@ -707,76 +667,6 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
 }
 
-/* Create a label and add it to a table */
-static GtkWidget *
-create_label(const gchar * label, GtkWidget * table, gint row, guint *keyval)
-{
-    guint kv;
-
-    GtkWidget *w = gtk_label_new("");
-    kv = gtk_label_parse_uline(GTK_LABEL(w), label);
-    if ( keyval ) 
-	*keyval = kv;
-
-    gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.5);
-
-    gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
-		     GTK_FILL, GTK_FILL, 5, 5);
-
-    gtk_widget_show(w);
-    return w;
-}
-
-static GtkWidget *
-create_check(MailboxConfWindow *mcw, const gchar * label, GtkWidget * table, gint row)
-{
-    guint kv;
-    GtkWidget *cb, *l;
-    
-    cb = gtk_check_button_new();
-
-    l = gtk_label_new("");
-    kv = gtk_label_parse_uline(GTK_LABEL(l), label);
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
-    gtk_widget_show(l);
-
-    gtk_container_add(GTK_CONTAINER(cb), l);
-
-    gtk_widget_add_accelerator(cb, "grab_focus",
-			       GNOME_DIALOG(mcw->window)->accelerators,
-			       kv, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-
-    gtk_table_attach(GTK_TABLE(table), cb, 1, 2, row, row+1,
-		     GTK_FILL, GTK_FILL, 5, 5);
-
-    return cb;
-}
-
-/* Create a text entry and add it to the table */
-static GtkWidget *
-create_entry(MailboxConfWindow *mcw, GtkWidget * table, gint row, const gchar * initval, const guint keyval)
-{
-    GtkWidget *entry = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
-    if (initval)
-	gtk_entry_append_text(GTK_ENTRY(entry), initval);
-
-    gtk_widget_add_accelerator(entry, "grab_focus",
-			       GNOME_DIALOG(mcw->window)->accelerators,
-			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-
-    gnome_dialog_editable_enters(GNOME_DIALOG(mcw->window),
-				 GTK_EDITABLE(entry));
-
-    /* Watch for changes... */
-    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
-		       GTK_SIGNAL_FUNC(check_for_blank_fields), mcw);
-
-    gtk_widget_show(entry);
-    return entry;
-}
-
 /* Create a page for the type of mailbox... */
 static GtkWidget *
 create_page(MailboxConfWindow *mcw)
@@ -803,7 +693,9 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
 
     /* mailbox name */
     create_label(_("Mailbox _Name:"), table, 0, &keyval);
-    mcw->mailbox_name = create_entry(mcw, table, 0, NULL, keyval);
+    mcw->mailbox_name = create_entry(mcw->window, table,
+				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     mcw, 0, NULL, keyval);
 
     /* path to file */
     create_label(_("Mailbox _Path:"), table, 1, &keyval);
@@ -813,9 +705,9 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
 	gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(file));
     gtk_widget_add_accelerator(mcw->mb_data.local.path, 
 			       "grab_focus",
-			       GNOME_DIALOG(mcw->window)->accelerators,
+			       mcw->window->accelerators,
 			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-    gnome_dialog_editable_enters(GNOME_DIALOG(mcw->window),
+    gnome_dialog_editable_enters(mcw->window,
 				 GTK_EDITABLE(mcw->mb_data.local.path));
 
     gtk_signal_connect(GTK_OBJECT(mcw->mb_data.local.path),
@@ -839,39 +731,51 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 
     /* mailbox name */
     create_label(_("Mailbox _Name:"), table, 0, &keyval);
-    mcw->mailbox_name = create_entry(mcw, table, 0, NULL, keyval);
+    mcw->mailbox_name = create_entry(mcw->window, table,
+				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     mcw, 0, NULL, keyval);
 
     /* pop server */
     create_label(_("_Server:"), table, 1, &keyval);
-    mcw->mb_data.pop3.server = create_entry(mcw, table, 1, "localhost", keyval);
+    mcw->mb_data.pop3.server = create_entry(mcw->window, table,
+				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     mcw, 1, "localhost", keyval);
 
     /* pop port */
     create_label(_("_Port:"), table, 2, &keyval);
-    mcw->mb_data.pop3.port = create_entry(mcw, table, 2, "110", keyval);
+    mcw->mb_data.pop3.port = create_entry(mcw->window, table, NULL,
+					  NULL, 2, "110", keyval);
 
     /* username  */
     create_label(_("_Username:"), table, 3, &keyval);
-    mcw->mb_data.pop3.username = create_entry(mcw, table, 3, g_get_user_name(), keyval);
+    mcw->mb_data.pop3.username = create_entry(mcw->window, table,
+				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     mcw, 3, g_get_user_name(), keyval);
 
     /* password field */
     create_label(_("Pass_word:"), table, 4, &keyval);
-    mcw->mb_data.pop3.password = create_entry(mcw, table, 4, NULL, keyval);
+    mcw->mb_data.pop3.password = create_entry(mcw->window, table, 
+					      NULL, NULL, 4, NULL, keyval);
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.pop3.password), FALSE);
 
     /* toggle for apop */
-    mcw->mb_data.pop3.use_apop = create_check(mcw, _("Use _APOP Authentication"), table, 5);
+    mcw->mb_data.pop3.use_apop = create_check(mcw->window, _("Use _APOP Authentication"), table, 5);
 
     /* toggle for deletion from server */
-    mcw->mb_data.pop3.delete_from_server = create_check(mcw, _("_Delete messages from server after download"),
-							table, 6);
+    mcw->mb_data.pop3.delete_from_server = 
+	create_check(mcw->window, 
+		     _("_Delete messages from server after download"),
+		     table, 6);
 
     /* Procmail */
-    mcw->mb_data.pop3.filter = create_check(mcw,_("_Filter messages through procmail"),
-					    table, 7);
+    mcw->mb_data.pop3.filter = 
+	create_check(mcw->window, _("_Filter messages through procmail"),
+		     table, 7);
 
     /* toggle for check */
-    mcw->mb_data.pop3.check = create_check(mcw, _("Periodically _check this mailbox for new mail"), 
-					   table, 8);
+    mcw->mb_data.pop3.check = 
+	create_check(mcw->window, _("_Check this mailbox for new mail"), 
+		     table, 8);
 
     return table;
 }
@@ -888,23 +792,33 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 
     /* mailbox name */
     create_label(_("Mailbox _Name:"), table, 0, &keyval);
-    mcw->mailbox_name = create_entry(mcw, table, 0, NULL, keyval);
+    mcw->mailbox_name = create_entry(mcw->window, table,
+				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     mcw, 0, NULL, keyval);
 
     /* imap server */
     create_label(_("_Server:"), table, 1, &keyval);
-    mcw->mb_data.imap.server = create_entry(mcw, table, 1, "localhost", keyval);
+    mcw->mb_data.imap.server = 
+	create_entry(mcw->window, table,
+		     GTK_SIGNAL_FUNC(check_for_blank_fields),
+		     mcw, 1, "localhost", keyval);
 
     /* imap server port number */
     create_label(_("_Port:"), table, 2, &keyval);
-    mcw->mb_data.imap.port = create_entry(mcw, table, 2, "143", keyval);
+    mcw->mb_data.imap.port = 
+	create_entry(mcw->window, table, NULL, NULL, 2, "143", keyval);
 
     /* username  */
     create_label(_("_Username:"), table, 3, &keyval);
-    mcw->mb_data.imap.username = create_entry(mcw, table, 3, g_get_user_name(), keyval);
+    mcw->mb_data.imap.username = 
+	create_entry(mcw->window, table,
+		     GTK_SIGNAL_FUNC(check_for_blank_fields),
+		     mcw, 3, g_get_user_name(), keyval);
 
     /* password field */
     create_label(_("Pass_word:"), table, 4, &keyval);
-    mcw->mb_data.imap.password = create_entry(mcw, table, 4, NULL, keyval);
+    mcw->mb_data.imap.password = 
+	create_entry(mcw->window, table, NULL, NULL, 4, NULL, keyval);
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.imap.password), FALSE);
 
     create_label(_("F_older Path:"), table, 5, &keyval);
@@ -915,9 +829,9 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 
     gtk_widget_add_accelerator(mcw->mb_data.imap.folderpath, 
 			       "grab_focus",
-			       GNOME_DIALOG(mcw->window)->accelerators,
+			       mcw->window->accelerators,
 			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-    gnome_dialog_editable_enters(GNOME_DIALOG(mcw->window),
+    gnome_dialog_editable_enters(mcw->window,
 				 GTK_EDITABLE(mcw->mb_data.imap.folderpath));
 
     gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.folderpath),

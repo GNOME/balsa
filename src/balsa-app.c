@@ -255,6 +255,9 @@ balsa_app_init(void)
     /* date format */
     balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
 
+    /* printing */
+    balsa_app.paper_size = g_strdup(DEFAULT_PAPER_SIZE);
+
     /* address book */
     balsa_app.address_book_list = NULL;
     balsa_app.default_address_book = NULL;
@@ -435,5 +438,84 @@ find_gnode_of_folder(GNode * gnode_list, BalsaMailboxNode* mbnode)
                     find_by_mbnode, d);
     retval = d[1];
     return retval;
+}
+
+/* create_label:
+   Create a label and add it to a table in the first column of given row,
+   setting the keyval to found accelerator value, that can be later used 
+   in create_entry.
+*/
+GtkWidget *
+create_label(const gchar * label, GtkWidget * table, gint row, guint *keyval)
+{
+    guint kv;
+
+    GtkWidget *w = gtk_label_new("");
+    kv = gtk_label_parse_uline(GTK_LABEL(w), label);
+    if ( keyval ) 
+	*keyval = kv;
+
+    gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.5);
+
+    gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+
+    gtk_widget_show(w);
+    return w;
+}
+
+/* create_check:
+   creates a checkbox with a given label and places them in given array.
+*/
+GtkWidget *
+create_check(GnomeDialog *mcw, const gchar *label, GtkWidget *table, gint row)
+{
+    guint kv;
+    GtkWidget *cb, *l;
+    
+    cb = gtk_check_button_new();
+
+    l = gtk_label_new("");
+    kv = gtk_label_parse_uline(GTK_LABEL(l), label);
+    gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
+    gtk_widget_show(l);
+
+    gtk_container_add(GTK_CONTAINER(cb), l);
+
+    gtk_widget_add_accelerator(cb, "grab_focus",
+			       mcw->accelerators,
+			       kv, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
+
+    gtk_table_attach(GTK_TABLE(table), cb, 1, 2, row, row+1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+
+    return cb;
+}
+
+/* Create a text entry and add it to the table */
+GtkWidget *
+create_entry(GnomeDialog *mcw, GtkWidget * table, 
+	     GtkSignalFunc changed_func, gpointer data, gint row, 
+	     const gchar * initval, const guint keyval)
+{
+    GtkWidget *entry = gtk_entry_new();
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
+		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+    if (initval)
+	gtk_entry_append_text(GTK_ENTRY(entry), initval);
+
+    gtk_widget_add_accelerator(entry, "grab_focus",
+			       mcw->accelerators,
+			       keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
+
+    gnome_dialog_editable_enters(mcw, GTK_EDITABLE(entry));
+
+    /* Watch for changes... */
+    if(changed_func)
+	gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+			   changed_func, data);
+
+    gtk_widget_show(entry);
+    return entry;
 }
 

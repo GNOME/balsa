@@ -71,6 +71,7 @@ struct _BalsaMailboxNode {
 	   BALSA_SORT_SUBJECT=4,BALSA_SORT_DATE=5 } sort_field;
     GtkSortType sort_type;
     LibBalsaServer * server; /* Used only by remote; is referenced */
+    gboolean subscribed;     /* Used only by remote */
 };
 
 struct _BalsaMailboxNodeClass {
@@ -94,6 +95,7 @@ BalsaMailboxNode *balsa_mailbox_node_new_from_config(const gchar* prefix);
 GtkWidget *balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode, GNode *r);
+void balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
 

@@ -1,3 +1,22 @@
+2001-02-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/folder-scanners.[hc]: 
+	initial support for subscribed mailboxes.
+	* libbalsa/mailbox.c: lock mailbox in libbalsa_mailbox_load_messages().
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_local.c: locking fixes.
+	* src/balsa-app.[hc]: collect some common widget creation code:
+	create_entry, create_label, create_check. Read paper size for 
+	printing from configuration.
+	* src/balsa-index.c: performance improvements; fix for view_on_open
+	disabled.
+	* src/folder-conf.c: initial support for subscribed mailboxes.
+	* src/mailbox-node.[hc]: same.
+	* src/information-dialog.c: print new line after message.
+	* src/mailbox-conf.c: move commonly used function to balsa-app
+	* src/main-window.c: gdk_pixbuf fixes.
+	* src/print.c: use paper size from configuration.
+	
 2001-02-18  Matthew Guenther  <guentherm@asme.org>
 
 	* src/balsa-index.c: start progress bar in activity mode when

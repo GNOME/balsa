@@ -218,5 +218,5 @@ balsa_information_stderr(LibBalsaInformationType type, char *msg)
     default:
 	break;
     }
-    fputs(msg, stderr);
+    fprintf(stderr, "%s\n", msg);
 }

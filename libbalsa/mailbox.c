@@ -544,6 +544,7 @@ libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
  * private 
  * PS: called by mail_progress_notify_cb:
  * loads incrementally new messages, if any.
+   Mailbox lock MUST NOT BE HELD before calling this function.
  */
 void
 libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
@@ -556,6 +557,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     if (CLIENT_CONTEXT_CLOSED(mailbox))
 	return;
 
+    LOCK_MAILBOX(mailbox);
     for (msgno = mailbox->messages; mailbox->new_messages > 0; msgno++) {
 	cur = CLIENT_CONTEXT(mailbox)->hdrs[msgno];
 
@@ -618,6 +620,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 
 	messages=g_list_append(messages, message);
     }
+    UNLOCK_MAILBOX(mailbox);
 
     if(messages!=NULL){
       gtk_signal_emit(GTK_OBJECT(mailbox),

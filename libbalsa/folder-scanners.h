@@ -31,7 +31,7 @@ void scanner_local_dir(GNode *rnode, const gchar * prefix,
 		       LocalHandler mailbox_handler);
 
 void scanner_imap_dir(GNode *rnode, LibBalsaServer* server, 
-		      const gchar* path, int depth,
+		      const gchar* path, gboolean subscribed, int depth,
 		      ImapHandler folder_handler, 
 		      ImapHandler mailbox_handler);
 

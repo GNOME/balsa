@@ -138,9 +138,10 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->name = NULL;
     mn->dir = NULL;
     mn->config_prefix = NULL;
-    mn->threading_type = BALSA_INDEX_THREADING_JWZ;
+    mn->threading_type = BALSA_INDEX_THREADING_SIMPLE;
     mn->sort_type = GTK_SORT_DESCENDING;
     mn->sort_field = BALSA_SORT_NO;
+    mn->subscribed = FALSE;
 }
 
 static void
@@ -170,6 +171,7 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
     libbalsa_server_save_config(mn->server);
     gnome_config_set_string("Name",      mn->name);
     gnome_config_set_string("Directory", mn->dir);
+    gnome_config_set_bool("Subscribed", mn->subscribed);
 
     g_free(mn->config_prefix);
     mn->config_prefix = g_strdup(prefix);
@@ -177,7 +179,12 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
 
 static void
 balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn, const gchar * prefix)
-{}
+{
+    g_free(mn->config_prefix);
+    mn->config_prefix = g_strdup(prefix);
+    g_free(mn->name);
+    mn->name = gnome_config_get_string("Name");
+}
 
 
 BalsaMailboxNode*
@@ -215,7 +222,7 @@ static void
 imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     g_return_if_fail(mb->server);
-    scanner_imap_dir(r, mb->server, mb->dir, 3,
+    scanner_imap_dir(r, mb->server, mb->dir, mb->subscribed, 7,
 	     add_imap_folder, add_imap_mailbox);
     /* register whole tree */
     g_node_traverse(r, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
@@ -263,7 +270,6 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
     gnome_config_push_prefix(prefix);
 
-    printf("Creating remote server %s\n", prefix);
     folder->server = LIBBALSA_SERVER(
 	libbalsa_server_new(LIBBALSA_SERVER_IMAP));
     /* take over the ownership */
@@ -278,8 +284,11 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 		       folder_conf_imap_node, NULL);
     gtk_signal_connect(GTK_OBJECT(folder), "append-subtree", 
 		       imap_dir_cb, NULL);
-    folder->name = gnome_config_get_string("Name");
+    balsa_mailbox_node_load_config(folder, prefix);
+
     folder->dir = gnome_config_get_string("Directory");
+    folder->subscribed =
+	gnome_config_get_bool("Subscribed");
     gnome_config_pop_prefix();
 
     return folder;
@@ -338,6 +347,18 @@ balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
 {
     balsa_mailbox_node_show_prop_dialog((BalsaMailboxNode*)data);
 }
+
+/* balsa_mailbox_node_load_config:
+   load general configurtion: name ordering, threading option etc
+   with some sane defaults.
+*/
+void
+balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix)
+{
+    gtk_signal_emit(GTK_OBJECT(mn),
+		    balsa_mailbox_node_signals[LOAD_CONFIG], prefix);
+}
+
 void
 balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix)
 {

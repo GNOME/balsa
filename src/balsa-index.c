@@ -75,8 +75,8 @@ static void clist_click_column(GtkCList * clist, gint column,
 			       gpointer data);
 
 /* statics */
-static void balsa_index_set_col_images(BalsaIndex *, gint row, 
-                                       LibBalsaMessage *);
+static void balsa_index_set_col_images(BalsaIndex *, GtkCTreeNode*,
+				       LibBalsaMessage *);
 
 /* mailbox callbacks */
 static void balsa_index_del (BalsaIndex * bindex, LibBalsaMessage * message);
@@ -454,6 +454,7 @@ bi_get_largest_selected(GtkCList * clist)
 static void
 clist_click_column(GtkCList * clist, gint column, gpointer data)
 {
+    gint h;
     GtkSortType sort_type = clist->sort_type;
 
     if (column == clist->sort_column)
@@ -461,6 +462,12 @@ clist_click_column(GtkCList * clist, gint column, gpointer data)
 	    GTK_SORT_DESCENDING : GTK_SORT_ASCENDING;
 	
     balsa_index_set_sort_order(BALSA_INDEX(data), column, sort_type);
+    gtk_clist_sort(clist);
+    DO_CLIST_WORKAROUND(clist);
+
+    if ((h = bi_get_largest_selected(clist)) >= 0 &&
+	gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
+	gtk_clist_moveto(clist, h, 0, 1.0, 0.0);
 }
 
 /* 
@@ -492,19 +499,11 @@ moveto_handler(BalsaIndex * bindex)
     if (row_data) {
         row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree),
                                             row_data);
-
-        if (balsa_app.view_message_on_open) {  
+	
+        if (balsa_app.view_message_on_open)
             balsa_index_select_row (bindex, row);
-        } else {
-            gtk_signal_handler_block_by_func(GTK_OBJECT(bindex->ctree),
-                                             GTK_SIGNAL_FUNC(select_message),
-                                             bindex);
-            gtk_clist_select_row (GTK_CLIST (bindex->ctree), row, -1);
-            gtk_signal_handler_unblock_by_func(GTK_OBJECT(bindex->ctree),
-                                             GTK_SIGNAL_FUNC(select_message),
-                                               bindex);
-            gtk_clist_moveto (GTK_CLIST (bindex->ctree), row, -1, 0.5, 0.0);
-        }
+	else
+	   gtk_clist_moveto (GTK_CLIST (bindex->ctree), row, -1, 0.5, 0.0);
     }
     
     gdk_threads_leave();
@@ -636,9 +635,9 @@ balsa_index_load_mailbox_node (BalsaIndex * bindex, BalsaMailboxNode* mbnode)
     }
 
     /* do threading */
-    balsa_index_set_threading_type(bindex, mbnode->threading_type);
     balsa_index_set_sort_order(bindex, mbnode->sort_field, 
 			       mbnode->sort_type);
+    balsa_index_set_threading_type(bindex, mbnode->threading_type);
 
     gtk_clist_thaw(GTK_CLIST(bindex->ctree));
 
@@ -658,7 +657,6 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 {
     gchar buff1[32];
     gchar *text[6];
-    gint row;
     GtkCTreeNode *node;
     GList *list;
     LibBalsaAddress *addy = NULL;
@@ -713,8 +711,7 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
     gtk_ctree_node_set_row_data (GTK_CTREE (bindex->ctree), node, 
                                  (gpointer) message);
 
-    row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->ctree), message);
-    balsa_index_set_col_images(bindex, row, message);
+    balsa_index_set_col_images(bindex, node, message);
 
     if (bindex->first_new_message == NULL)
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
@@ -969,59 +966,55 @@ balsa_index_redraw_current(BalsaIndex * bindex)
 void
 balsa_index_update_flag(BalsaIndex * bindex, LibBalsaMessage * message)
 {
-    gint row;
-
+    GtkCTreeNode* node;
     g_return_if_fail(bindex != NULL);
     g_return_if_fail(message != NULL);
 
-    row = gtk_clist_find_row_from_data(GTK_CLIST(bindex->ctree), message);
-    if (row < 0)
-	return;
-
-    balsa_index_set_col_images(bindex, row, message);
+    if( (node=gtk_ctree_find_by_row_data(GTK_CTREE(bindex->ctree), 
+					 NULL, message)) )
+	balsa_index_set_col_images(bindex, node, message);
 }
 
 
 static void
-balsa_index_set_col_images(BalsaIndex * bindex, gint row,
-			    LibBalsaMessage * message)
+balsa_index_set_col_images(BalsaIndex * bindex, GtkCTreeNode *node,
+			   LibBalsaMessage * message)
 {
     guint tmp;
-    GtkCList* clist;
+    GtkCTree* ctree;
     GdkPixmap* pixmap;
     GdkPixmap* bitmap;
 
-    /* HEADER* current; */
-    clist = GTK_CLIST (bindex->ctree);
+    ctree = bindex->ctree;
     
     if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
-	gtk_clist_set_pixmap(clist, row, 1,
-			     balsa_icon_get_pixmap(BALSA_ICON_TRASH),
-			     balsa_icon_get_bitmap(BALSA_ICON_TRASH));
+	gtk_ctree_node_set_pixmap(ctree, node, 1,
+				  balsa_icon_get_pixmap(BALSA_ICON_TRASH),
+				  balsa_icon_get_bitmap(BALSA_ICON_TRASH));
     else if (message->flags & LIBBALSA_MESSAGE_FLAG_FLAGGED) {
         gnome_stock_pixmap_gdk (BALSA_PIXMAP_FLAGGED, "regular", 
                                 &pixmap, &bitmap);
-	gtk_clist_set_pixmap(clist, row, 1, pixmap, bitmap);
+	gtk_ctree_node_set_pixmap(ctree, node, 1, pixmap, bitmap);
     }
     
     else if (message->flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
-	gtk_clist_set_pixmap(clist, row, 1,
-			     balsa_icon_get_pixmap(BALSA_ICON_REPLIED),
-			     balsa_icon_get_bitmap(BALSA_ICON_REPLIED));
+	gtk_ctree_node_set_pixmap(ctree, node, 1,
+				  balsa_icon_get_pixmap(BALSA_ICON_REPLIED),
+				  balsa_icon_get_bitmap(BALSA_ICON_REPLIED));
 
     else if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-	gtk_clist_set_pixmap(clist, row, 1,
-			     balsa_icon_get_pixmap(BALSA_ICON_ENVELOPE),
-			     balsa_icon_get_bitmap(BALSA_ICON_ENVELOPE));
+	gtk_ctree_node_set_pixmap(ctree, node, 1,
+				  balsa_icon_get_pixmap(BALSA_ICON_ENVELOPE),
+				  balsa_icon_get_bitmap(BALSA_ICON_ENVELOPE));
     else
-	gtk_clist_set_text(clist, row, 1, NULL);
+	gtk_ctree_node_set_text(ctree, node, 1, NULL);
 
     tmp = libbalsa_message_has_attachment(message);
 
     if (tmp) {
-	gtk_clist_set_pixmap(clist, row, 2,
-			     balsa_icon_get_pixmap(BALSA_ICON_MULTIPART),
-			     balsa_icon_get_bitmap(BALSA_ICON_MULTIPART));
+	gtk_ctree_node_set_pixmap(ctree, node, 2,
+				  balsa_icon_get_pixmap(BALSA_ICON_MULTIPART),
+				  balsa_icon_get_bitmap(BALSA_ICON_MULTIPART));
     }
 }
 
@@ -2073,7 +2066,6 @@ replace_attached_data(GtkObject * obj, const gchar * key, GtkObject * data)
 void
 balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 {
-    GList *list;
     LibBalsaMailbox* mailbox = NULL;
 
     g_return_if_fail (bindex);
@@ -2083,27 +2075,18 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     bindex->threading_type = thtype;
 
     mailbox = bindex->mailbox_node->mailbox;
-    
-    if(mailbox) {
-	gtk_clist_freeze(GTK_CLIST(bindex->ctree));
-	gtk_clist_clear(GTK_CLIST(bindex->ctree));
-	list = mailbox->message_list;
-	while (list) {
-	    balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
-	    list = list->next;
-	}
-	
-	balsa_index_threading(bindex);
-	gtk_clist_sort(GTK_CLIST(bindex->ctree));
-	DO_CLIST_WORKAROUND(GTK_CLIST(bindex->ctree));
-	gtk_clist_thaw(GTK_CLIST(bindex->ctree));
-    }
+    	
+    gtk_clist_freeze(GTK_CLIST(bindex->ctree));
+    balsa_index_threading(bindex);
+    gtk_clist_sort(GTK_CLIST(bindex->ctree));
+    DO_CLIST_WORKAROUND(GTK_CLIST(bindex->ctree));
+    gtk_clist_thaw(GTK_CLIST(bindex->ctree));
+
 }
 
 void
 balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
 {
-    gint h;
     GtkCList * clist;
     g_return_if_fail(bindex->mailbox_node);
     g_return_if_fail(column>=0 && column <=5);
@@ -2126,11 +2109,4 @@ balsa_index_set_sort_order(BalsaIndex * bindex, int column, GtkSortType order)
     default:
 	gtk_clist_set_compare_func(clist, NULL);
     }
-
-    gtk_clist_sort(clist);
-    DO_CLIST_WORKAROUND(clist);
-
-    if ((h = bi_get_largest_selected(clist)) >= 0 &&
-	gtk_clist_row_is_visible(clist, h) != GTK_VISIBILITY_FULL)
-	gtk_clist_moveto(clist, h, 0, 1.0, 0.0);
 }

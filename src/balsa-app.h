@@ -76,6 +76,7 @@
 #define DEFAULT_MESSAGE_FONT "-*-fixed-medium-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_SUBJECT_FONT "-*-fixed-bold-r-normal-*-*-*-*-*-c-*-iso8859-1"
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
+#define DEFAULT_PAPER_SIZE "A4"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
@@ -255,6 +256,7 @@ extern struct BalsaApplication {
 
     /* printing */
     Printing_t PrintCommand;
+    gchar* paper_size; /* A4 or Letter */
 
     /* compose: shown headers */
     gchar *compose_headers;
@@ -300,4 +302,13 @@ gboolean open_mailboxes_idle_cb(gchar * names[]);
 
 GNode *find_gnode_in_mbox_list(GNode * gnode_list, LibBalsaMailbox * mailbox);
 GNode *find_gnode_of_folder(GNode * gnode_list, BalsaMailboxNode* mbnode);
+
+GtkWidget *create_label(const gchar * label, GtkWidget * table, 
+			       gint row, guint *keyval);
+GtkWidget *create_entry(GnomeDialog *mcw, GtkWidget * table, 
+			GtkSignalFunc func, gpointer data, gint row, 
+			const gchar * initval, const guint keyval);
+GtkWidget *create_check(GnomeDialog *mcw, const gchar * label, 
+			GtkWidget * table, gint row);
+
 #endif				/* __BALSA_APP_H__ */

@@ -141,7 +141,7 @@ void imap_add_folder (char delim, char *folder, int noselect, int noinferiors,
 		      struct browser_state *state, short isparent);
 void
 scanner_imap_dir(GNode *rnode, LibBalsaServer * server, 
-		 const gchar* path, int depth,
+		 const gchar* path, gboolean subscribed, int depth,
 		 ImapHandler folder_handler, ImapHandler mailbox_handler)
 {
     gchar* imap_path;
@@ -165,13 +165,19 @@ scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
        }
     }
 	
-    unset_option(OPTIMAPLSUB);
     libbalsa_lock_mutt();
     safe_free((void **)&ImapUser);   ImapUser = safe_strdup(server->user);
     safe_free((void **)&ImapPass);   ImapPass = safe_strdup(server->passwd);
     safe_free((void **)&ImapCRAMKey);ImapCRAMKey = safe_strdup(server->passwd);
-    
-    state.subfolders = g_list_append(NULL, g_strdup(path));
+
+    /* subscribed triggers a bug in libmutt, disable it now */
+    if( 0 /* subscribed */) {
+	state.subfolders = g_list_append(NULL, g_strdup(""));
+	set_option(OPTIMAPLSUB);
+    } else {
+	unset_option(OPTIMAPLSUB);
+	state.subfolders = g_list_append(NULL, g_strdup(path));
+    }
     for(i=0; state.subfolders && i<depth; i++) {
 	list = state.subfolders;
 	state.subfolders = NULL;

@@ -318,7 +318,7 @@ message_print(LibBalsaMessage * msg)
     default:
 	return;
     }
-    pi = print_info_new("A4", msg, GNOME_PRINT_DIALOG(dialog));
+    pi = print_info_new(balsa_app.paper_size, msg, GNOME_PRINT_DIALOG(dialog));
     gnome_dialog_close(GNOME_DIALOG(dialog));
 
     /* do the Real Job */

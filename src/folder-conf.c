@@ -26,65 +26,41 @@
 #include "mailbox-node.h"
 #include "save-restore.h"
 
-/* FIXME: create_label and create_entry identical as in mailbox-conf.c */
-
-/* Create a label and add it to a table */
-static GtkWidget *
-create_label(const gchar* label, GtkWidget* table, gint row, guint* keyval)
-{
-    guint kv;
-
-    GtkWidget *w = gtk_label_new("");
-    kv = gtk_label_parse_uline(GTK_LABEL(w), label);
-    if ( keyval ) 
-        *keyval = kv;
-
-    gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.5);
-
-    gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
-                     GTK_FILL, GTK_FILL, 5, 5);
-
-    gtk_widget_show(w);
-    return w;
-}
-
-/* Create a text entry and add it to the table */
-static GtkWidget *
-create_entry(GnomeDialog *fcw, GtkWidget * table, gint row, 
-	     const gchar* initval, const guint keyval)
-{
-    GtkWidget *entry = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
-                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
-    if (initval)
-        gtk_entry_append_text(GTK_ENTRY(entry), initval);
-    
-    gtk_widget_add_accelerator(entry, "grab_focus",
-                               fcw->accelerators,
-                               keyval, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-
-    gnome_dialog_editable_enters(fcw, GTK_EDITABLE(entry));
-
-    /* Watch for changes... */
-    /* gtk_signal_connect(GTK_OBJECT(entry), "changed", 
-       GTK_SIGNAL_FUNC(check_for_blank_fields), fcw); */
-
-    gtk_widget_show(entry);
-    return entry;
-}
+typedef struct {
+    GnomeDialog *dialog;
+    GtkWidget * folder_name, *server, *port, *username, *password, 
+	*subscribed, *prefix;
+} FolderDialogData;
 
 /* folder_conf_imap_node:
    show configuration widget for given mailbox node, allow user to 
    modify it and update mailbox node accordingly.
    Creates the node when mn == NULL.
 */
+static void validate_folder(FolderDialogData * fcw)
+{
+    gboolean sensitive = TRUE;
+    
+    if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)))
+	sensitive = FALSE;
+    else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->server)))
+	sensitive = FALSE;
+    gnome_dialog_set_sensitive(fcw->dialog, 0, sensitive);
+}
+
+static void subscribed_func(GtkWidget* tb, FolderDialogData * fcw)
+{
+    gtk_widget_set_sensitive
+	(fcw->prefix, 
+	 !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed)));
+}
+
 void
 folder_conf_imap_node(BalsaMailboxNode *mn)
 {
     static GnomeHelpMenuEntry help_entry = { NULL, "folder-config.html" };
-    GnomeDialog *dialog;
     GtkWidget *frame, *table;
-    GtkWidget * folder_name, *server, *port, *username, *password, *prefix;
+    FolderDialogData fcw;
     guint keyval;
     gint button, port_no;
     gboolean insert;
@@ -92,62 +68,70 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     LibBalsaServer * s = mn ? mn->server : NULL;
 
     help_entry.name = gnome_app_id;
-    dialog = GNOME_DIALOG(gnome_dialog_new(_("Remote IMAP folder"), 
-					   mn ? _("Update") : _("Create"), 
-					   GNOME_STOCK_BUTTON_CANCEL, 
-					   GNOME_STOCK_BUTTON_HELP,
-					   NULL));
-    gnome_dialog_set_parent(dialog,
+    fcw.dialog = GNOME_DIALOG(gnome_dialog_new(_("Remote IMAP folder"), 
+					       mn ? _("Update") : _("Create"), 
+					       GNOME_STOCK_BUTTON_CANCEL, 
+					       GNOME_STOCK_BUTTON_HELP,
+					       NULL));
+    gnome_dialog_set_parent(fcw.dialog,
                             GTK_WINDOW(balsa_app.main_window));
-    gtk_window_set_wmclass(GTK_WINDOW(dialog), 
+    gtk_window_set_wmclass(GTK_WINDOW(fcw.dialog), 
 			   "folder_config_dialog", "Balsa");
 
     frame = gtk_frame_new(_("Remote IMAP folder set"));
-    gtk_box_pack_start(GTK_BOX(dialog->vbox),
+    gtk_box_pack_start(GTK_BOX(fcw.dialog->vbox),
                        frame, TRUE, TRUE, 0);
-    table = gtk_table_new(6, 2, FALSE);
+    table = gtk_table_new(7, 2, FALSE);
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
     create_label(_("Descriptive _Name:"), table, 0, &keyval);
-    folder_name = create_entry(dialog, table, 0, 
-			       mn ? mn->name : NULL, 
-			       keyval);
+    fcw.folder_name = create_entry(fcw.dialog, table, validate_folder, &fcw, 
+				   0, mn ? mn->name : NULL, 
+				   keyval);
 
     create_label(_("_Server:"), table, 1, &keyval);
-    server = create_entry(dialog, table, 1, 
+    fcw.server = create_entry(fcw.dialog, table, validate_folder, &fcw, 1, 
 			  s ? s->host : "localhost",
 			  keyval);
 
     create_label(_("_Port:"), table, 2, &keyval);
     if(s) {
 	gchar* tmp = g_strdup_printf("%d", s->port);
-	port = create_entry(dialog, table, 2, tmp, keyval);
+	fcw.port = create_entry(fcw.dialog, table, NULL, NULL, 2, tmp, keyval);
 	g_free(tmp);
-    } else port = create_entry(dialog, table, 2, "143", keyval);
+    } else fcw.port = 
+	       create_entry(fcw.dialog, table, NULL, NULL, 2, "143", keyval);
 
 
     create_label(_("_User name:"), table, 3, &keyval);
-    username = create_entry(dialog, table, 3, 
+    fcw.username = create_entry(fcw.dialog, table, validate_folder, &fcw, 3, 
 			    s ? s->user : g_get_user_name(), 
 			    keyval);
 
     create_label(_("_Password:"), table, 4, &keyval);
-    password = create_entry(dialog, table, 4, 
-			    s ? s->passwd : NULL, 
-			    keyval);
-    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
+    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 4,
+				s ? s->passwd : NULL, 
+				keyval);
+    gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
 
-    create_label(_("_Prefix:"), table, 5, &keyval);
-    prefix = create_entry(dialog, table, 5, 
-			  mn ? mn->dir : NULL, keyval);
+    fcw.subscribed = 
+	create_check(fcw.dialog, _("_Subscribed folders only"), table, 5);
+    gtk_signal_connect(GTK_OBJECT(fcw.subscribed), "toggled", 
+		       subscribed_func, &fcw);
+    if(mn && mn->subscribed)
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw.subscribed), TRUE);
 
-    gtk_widget_show_all(GTK_WIDGET(dialog));
-    gnome_dialog_close_hides(dialog, TRUE);
-    gtk_widget_grab_focus(folder_name);
+    create_label(_("_Prefix"), table, 6, &keyval);
+    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
+			      mn ? mn->dir : NULL, keyval);
+
+    gtk_widget_show_all(GTK_WIDGET(fcw.dialog));
+    gnome_dialog_close_hides(fcw.dialog, TRUE);
+    gtk_widget_grab_focus(fcw.folder_name);
 
     /* FIXME: I don't like this loop. */
-    while( (button = gnome_dialog_run(dialog)) == 2) 
+    while( (button = gnome_dialog_run(fcw.dialog)) == 2) 
 	gnome_help_display(NULL, &help_entry);
     
     if(button == 0) { /* do create/update */
@@ -157,21 +141,23 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	}
 	else insert = FALSE;
 	
-	port_no = atoi(gtk_entry_get_text(GTK_ENTRY(port)));
-	libbalsa_server_set_host(s, gtk_entry_get_text(GTK_ENTRY(server)), 
+	port_no = atoi(gtk_entry_get_text(GTK_ENTRY(fcw.port)));
+	libbalsa_server_set_host(s, gtk_entry_get_text(GTK_ENTRY(fcw.server)), 
 				 port_no);
 	libbalsa_server_set_username
-	    (s, gtk_entry_get_text(GTK_ENTRY(username)));
+	    (s, gtk_entry_get_text(GTK_ENTRY(fcw.username)));
 	libbalsa_server_set_password
-	    (s, gtk_entry_get_text(GTK_ENTRY(password)));
+	    (s, gtk_entry_get_text(GTK_ENTRY(fcw.password)));
 	
 	if(!mn)
 	    mn = balsa_mailbox_node_new_imap_folder(s, NULL);
 
 	g_free(mn->dir);  
-	mn->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(prefix)));
+	mn->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw.prefix)));
 	g_free(mn->name); 
-	mn->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(folder_name)));
+	mn->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw.folder_name)));
+	mn->subscribed = 
+	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw.subscribed));
 	
 	if(insert) {
 	    g_node_append(balsa_app.mailbox_nodes, gnode = g_node_new(mn));
@@ -185,7 +171,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	balsa_mblist_repopulate(balsa_app.mblist);
     }
 
-    gtk_widget_destroy(GTK_WIDGET(dialog));
+    gtk_widget_destroy(GTK_WIDGET(fcw.dialog));
 }
 
 void

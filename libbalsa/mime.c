@@ -262,6 +262,7 @@ other2html(BODY* bdy, FILE* fp, struct obstack* bfr)
   text2html(ptr, bfr);
   free(ptr);
   fclose(s.fpout);
+  unlink(tmp_file_name);
 }
 
 void
@@ -344,6 +345,7 @@ mimetext2html(BODY* bdy, FILE* fp, struct obstack* bfr)
   text2html(ptr, bfr);
   free(ptr);
   fclose(s.fpout);
+  unlink(tmp_file_name);
   return;
 }
 

@@ -222,6 +222,9 @@ open_cb (GtkWidget * widget, gpointer data)
   ctnode = GTK_CLIST (mblw->ctree)->selection->data;
   mailbox = gtk_ctree_get_row_data (mblw->ctree, ctnode);
 
+  if (!mailbox)
+    return;
+
   index_child = index_child_new (mblw->mdi, mailbox);
   if (index_child)
     {

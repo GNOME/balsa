@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-08 12:42-0400\n"
+"POT-Creation-Date: 1998-08-08 14:15-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,17 +44,17 @@ msgid ""
 msgstr ""
 
 #. your name
-#: src/balsa-init.c:209 src/pref-manager.c:396
+#: src/balsa-init.c:209 src/pref-manager.c:377
 msgid "Your name:"
 msgstr ""
 
 #. email address
-#: src/balsa-init.c:223 src/pref-manager.c:413
+#: src/balsa-init.c:223 src/pref-manager.c:394
 msgid "E-Mail address:"
 msgstr ""
 
 #. smtp server
-#: src/balsa-init.c:238 src/pref-manager.c:445
+#: src/balsa-init.c:238 src/pref-manager.c:426
 msgid "SMTP server:"
 msgstr ""
 
@@ -179,7 +179,7 @@ msgid "Message"
 msgstr ""
 
 #. MDI page
-#: src/main-window.c:279 src/pref-manager.c:161 src/pref-manager.c:668
+#: src/main-window.c:279 src/pref-manager.c:162 src/pref-manager.c:649
 msgid "MDI"
 msgstr ""
 
@@ -192,7 +192,7 @@ msgid "Close"
 msgstr ""
 
 #. mailboxes page
-#: src/main-window.c:312 src/pref-manager.c:149
+#: src/main-window.c:312 src/pref-manager.c:150
 msgid "Mailboxes"
 msgstr ""
 
@@ -252,74 +252,74 @@ msgstr ""
 msgid "Balsa is a E-Mail Client"
 msgstr ""
 
-#: src/pref-manager.c:110
+#: src/pref-manager.c:111
 msgid "Preferences"
 msgstr ""
 
 #. identity page
-#: src/pref-manager.c:143
+#: src/pref-manager.c:144
 msgid "Identity"
 msgstr ""
 
 #. view page
-#: src/pref-manager.c:155
+#: src/pref-manager.c:156
 msgid "View"
 msgstr ""
 
 #. organization
-#: src/pref-manager.c:429
+#: src/pref-manager.c:410
 msgid "Organization:"
 msgstr ""
 
-#: src/pref-manager.c:483
+#: src/pref-manager.c:464
 msgid "Local mail directory:"
 msgstr ""
 
 #. inbox path
-#: src/pref-manager.c:499
+#: src/pref-manager.c:480
 msgid "Inbox Path:"
 msgstr ""
 
 #. outbox path
-#: src/pref-manager.c:516
+#: src/pref-manager.c:497
 msgid "Outbox Path:"
 msgstr ""
 
 #. trash path
-#: src/pref-manager.c:532
+#: src/pref-manager.c:513
 msgid "Trash Path:"
 msgstr ""
 
 #. Toolbars
-#: src/pref-manager.c:567
+#: src/pref-manager.c:548
 msgid "Toolbars"
 msgstr ""
 
-#: src/pref-manager.c:578
+#: src/pref-manager.c:559
 msgid "Show as Text"
 msgstr ""
 
-#: src/pref-manager.c:594
+#: src/pref-manager.c:575
 msgid "Show as Images"
 msgstr ""
 
-#: src/pref-manager.c:610
+#: src/pref-manager.c:591
 msgid "Show as Text and Images"
 msgstr ""
 
-#: src/pref-manager.c:637
+#: src/pref-manager.c:618
 msgid "Debug"
 msgstr ""
 
-#: src/pref-manager.c:679
+#: src/pref-manager.c:660
 msgid "Notebook"
 msgstr ""
 
-#: src/pref-manager.c:695
+#: src/pref-manager.c:676
 msgid "Toplevel"
 msgstr ""
 
-#: src/pref-manager.c:711
+#: src/pref-manager.c:692
 msgid "Modal"
 msgstr ""
 

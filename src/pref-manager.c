@@ -31,7 +31,7 @@ typedef struct _PreferencesManagerWindow PreferencesManagerWindow;
 struct _PreferencesManagerWindow
 {
   GtkWidget *window;
-  
+
   /* identity */
   GtkWidget *real_name;
   GtkWidget *email;
@@ -92,113 +92,66 @@ open_preferences_manager ()
   GtkWidget *hbox;
   GtkWidget *bbox;
   GtkWidget *button;
-  GtkWidget *notebook;
+  GtkWidget *prop_win;
 
 
   /* only one preferences manager window */
   if (pmw)
     {
-      gdk_window_raise (pmw->window->window);
+      gdk_window_raise (GTK_WIDGET(GNOME_DIALOG(pmw->window))->window);
       return;
     }
 
+  prop_win = gnome_property_box_new ();
+  
   pmw = g_malloc (sizeof (PreferencesManagerWindow));
 
+  pmw->window = prop_win;
 
-
-  pmw->window = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (pmw->window), _("Preferences"));
-  gtk_window_set_wmclass (GTK_WINDOW (pmw->window),
-			  "preferences_manager",
-			  "Balsa");
-  gtk_window_position (GTK_WINDOW (pmw->window), GTK_WIN_POS_CENTER);
-
-  gtk_container_border_width (GTK_CONTAINER (pmw->window), 0);
-
-  gtk_signal_connect (GTK_OBJECT (pmw->window),
+  gtk_signal_connect (GTK_OBJECT (prop_win),
 		      "destroy",
 		      (GtkSignalFunc) cancel_preferences_manager,
 		      NULL);
 
-  gtk_signal_connect (GTK_OBJECT (pmw->window),
+  gtk_signal_connect (GTK_OBJECT (prop_win),
 		      "delete_event",
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
 
-  /* get the vbox from the dialog window */
-  hbox = gtk_hbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (pmw->window)->vbox), hbox, TRUE, TRUE, 5);
-  gtk_widget_show (hbox);
-
-
-  /* notbook */
-  notebook = gtk_notebook_new ();
-  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-  gtk_box_pack_start (GTK_BOX (hbox), notebook, TRUE, TRUE, 5);
-  gtk_widget_show (notebook);
-
-
   /* identity page */
   label = gtk_label_new (_("Identity"));
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+  gtk_notebook_append_page (GTK_NOTEBOOK(GNOME_PROPERTY_BOX(prop_win)->notebook),
 			    create_identity_page (),
 			    label);
 
   /* mailboxes page */
   label = gtk_label_new (_("Mailboxes"));
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+  gtk_notebook_append_page (GTK_NOTEBOOK(GNOME_PROPERTY_BOX(prop_win)->notebook),
 			    create_mailboxes_page (),
 			    label);
 
   /* view page */
   label = gtk_label_new (_("View"));
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+  gtk_notebook_append_page (GTK_NOTEBOOK(GNOME_PROPERTY_BOX(prop_win)->notebook),
 			    create_view_page (),
 			    label);
 
   /* MDI page */
   label = gtk_label_new (_("MDI"));
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+  gtk_notebook_append_page (GTK_NOTEBOOK(GNOME_PROPERTY_BOX(prop_win)->notebook),
 			    create_mdi_page (),
 			    label);
 
   /* ok/cancel buttons (bottom dialog) */
-  bbox = gtk_hbutton_box_new ();
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (pmw->window)->action_area), bbox, TRUE, TRUE, 0);
-  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
-				 BALSA_BUTTON_WIDTH,
-				 BALSA_BUTTON_HEIGHT);
-  gtk_widget_show (bbox);
 
-
-  button = gnome_stock_button (GNOME_STOCK_BUTTON_OK);
-  gtk_container_add (GTK_CONTAINER (bbox), button);
-
-  gtk_signal_connect_object (GTK_OBJECT (button),
-			     "clicked",
-			     (GtkSignalFunc) ok_preferences_manager,
-			     GTK_OBJECT (pmw->window));
-
-  gtk_widget_show (button);
-
-
-  button = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);
-  gtk_container_add (GTK_CONTAINER (bbox), button);
-
-  gtk_signal_connect_object (GTK_OBJECT (button),
-			     "clicked",
-			     (GtkSignalFunc) cancel_preferences_manager,
-			     GTK_OBJECT (pmw->window));
-
-  gtk_widget_show (button);
-
+  gtk_signal_connect (GTK_OBJECT (prop_win), "apply",
+                      GTK_SIGNAL_FUNC (ok_preferences_manager), NULL);
 
   /* set data and show the whole thing */
   refresh_preferences_manager ();
-  gtk_widget_show (pmw->window);
+
+  gtk_widget_show_all(prop_win);
 }
 
 
@@ -737,6 +690,8 @@ set_mdi_style_cb (GtkWidget * widget, gpointer data)
 
   g_return_if_fail (widget != NULL);
   
+  gnome_property_box_changed (GNOME_PROPERTY_BOX (pmw->window));
+
   pref = (PreferencesManagerWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   pref->mdi_style = (guint) data;
@@ -749,6 +704,8 @@ set_toolbar_style_cb (GtkWidget * widget, gpointer data)
 
   g_return_if_fail (widget != NULL);
   
+  gnome_property_box_changed (GNOME_PROPERTY_BOX (pmw->window));
+
   pref = (PreferencesManagerWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
 
   pref->toolbar_style = (GtkToolbarStyle) data;
@@ -763,6 +720,8 @@ set_debug_cb (GtkWidget * widget, gpointer data)
 {
   g_return_if_fail (widget != NULL);
 
+  gnome_property_box_changed (GNOME_PROPERTY_BOX (pmw->window));
+  
   balsa_app.debug = GTK_TOGGLE_BUTTON(widget)->active;
 }
 

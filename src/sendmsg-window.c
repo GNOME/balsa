@@ -39,8 +39,7 @@
 #include "mime.h"
 #include "send.h"
 #include "sendmsg-window.h"
-
-extern gint address_book_cb(GtkWidget *, gpointer);
+#include "address-book.h"
 
 static gint send_message_cb (GtkWidget *, BalsaSendmsg *);
 static gint postpone_message_cb (GtkWidget *, BalsaSendmsg *);

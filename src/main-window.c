@@ -41,6 +41,8 @@
 #include "mailbox-conf.h"
 #include "mblist-window.h"
 #include "print.h"
+#include "address-book.h"
+
 #define MAILBOX_DATA "mailbox_data"
 
 #define APPBAR_KEY "balsa_appbar"
@@ -92,8 +94,6 @@ static void previous_message_cb (GtkWidget * widget, gpointer data);
 
 static void delete_message_cb (GtkWidget * widget, gpointer data);
 static void undelete_message_cb (GtkWidget * widget, gpointer data);
-
-extern gint address_book_cb (GtkWidget *widget, gpointer data);
 
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 

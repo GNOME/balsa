@@ -410,8 +410,16 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
         }
     } else if (body->mime_part) {
         /* Not a GMimePart... */
+	GMimeObject *object = body->mime_part;
+        if (GMIME_IS_MESSAGE_PART(object))
+            object =
+                GMIME_OBJECT(g_mime_message_part_get_message
+                             ((GMimeMessagePart *) object));
+	else
+	    g_object_ref(object);
         stream = g_mime_stream_mem_new();
-        g_mime_object_write_to_stream(body->mime_part, stream);
+        g_mime_object_write_to_stream(object, stream);
+	g_object_unref(object);
     } else
         return NULL;
 

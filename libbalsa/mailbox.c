@@ -141,6 +141,7 @@ mailbox_init (gchar * inbox_path)
 {
   struct utsname utsname;
   char *p;
+  gchar *tmp;
 
   Spoolfile = inbox_path;
 
@@ -160,6 +161,15 @@ mailbox_init (gchar * inbox_path)
 
   Shell = g_strdup ((p = getenv ("SHELL")) ? p : "/bin/sh");
   Tempdir = g_get_tmp_dir ();
+
+  if (UserHeader)
+    UserHeader = UserHeader->next;
+  UserHeader = mutt_new_list ();
+  tmp = g_malloc (18 + strlen (VERSION));
+  snprintf (tmp, sizeof (tmp), "X-Mailer: Balsa v%s", VERSION);
+  UserHeader->data = g_strdup (tmp);
+  g_free (tmp);
+
 }
 
 gint
@@ -212,11 +222,8 @@ mailbox_new (MailboxType type)
   switch (type)
     {
     case MAILBOX_MBOX:
-      mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
-      MAILBOX_LOCAL (mailbox)->path = NULL;
-      break;
-
     case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
       mailbox = (Mailbox *) g_malloc (sizeof (MailboxLocal));
       MAILBOX_LOCAL (mailbox)->path = NULL;
       break;
@@ -269,10 +276,8 @@ mailbox_free (Mailbox * mailbox)
   switch (mailbox->type)
     {
     case MAILBOX_MBOX:
-      g_free (MAILBOX_LOCAL (mailbox)->path);
-      break;
-
     case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
       g_free (MAILBOX_LOCAL (mailbox)->path);
       break;
 
@@ -318,10 +323,8 @@ mailbox_open_ref (Mailbox * mailbox)
     {
       /* add mail dir */
     case MAILBOX_MBOX:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, 0, NULL);
-      break;
-
     case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
       CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, 0, NULL);
       break;
 
@@ -796,6 +799,9 @@ mailbox_type_from_description (gchar * description)
   else if (!strcmp (description, "mh"))
     return MAILBOX_MH;
 
+  else if (!strcmp (description, "maildir"))
+    return MAILBOX_MAILDIR;
+
   else if (!strcmp (description, "pop3"))
     return MAILBOX_POP3;
 
@@ -818,6 +824,10 @@ mailbox_type_description (MailboxType type)
 
     case MAILBOX_MH:
       return "mh";
+      break;
+
+    case MAILBOX_MAILDIR:
+      return "maildir";
       break;
 
     case MAILBOX_POP3:
@@ -850,7 +860,7 @@ mailbox_valid (gchar * filename)
       return MAILBOX_MH;
       break;
     case M_MAILDIR:
-      return MAILBOX_MBOX;
+      return MAILBOX_MAILDIR;
       break;
     case M_IMAP:
       return MAILBOX_IMAP;
@@ -886,13 +896,8 @@ message_new ()
   message->bcc_list = NULL;
   message->in_reply_to = NULL;
   message->message_id = NULL;
-  message->newsgroups = NULL;
-  message->followup_to = NULL;
-  message->references = NULL;
   message->body_ref = 0;
   message->body_list = NULL;
-
-  message->offset = 0;
 
   return message;
 }
@@ -913,9 +918,6 @@ message_free (Message * message)
 
   g_free (message->in_reply_to);
   g_free (message->message_id);
-  g_free (message->newsgroups);
-  g_free (message->followup_to);
-  g_free (message->references);
 
   /* finally free the message */
   g_free (message);

@@ -34,8 +34,9 @@
  */
 typedef enum
   {
-    MAILBOX_MBOX,		/* fair */
-    MAILBOX_MH,			/* very poor */
+    MAILBOX_MBOX,
+    MAILBOX_MH,
+    MAILBOX_MAILDIR,
     MAILBOX_POP3,
     MAILBOX_IMAP,
     MAILBOX_UNKNOWN
@@ -139,6 +140,7 @@ struct _MailboxIMAP
     gchar *passwd;
     gchar *server;
     gchar *path;
+    gint port;
   };
 
 
@@ -201,17 +203,9 @@ struct _Message
     /* message ID */
     gchar *message_id;
 
-    /* USENET */
-    gchar *newsgroups;
-    gchar *followup_to;
-    gchar *references;
-
     /* message body */
     guint body_ref;
     GList *body_list;
-
-    /* offset in file */
-    glong offset;
   };
 
 

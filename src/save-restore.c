@@ -26,13 +26,13 @@
 
 
 void
-add_mailbox_config (gchar * name, gchar * path, gint type)
+add_mailbox_config (Mailbox * mailbox)
 {
   GString *gstring;
   gchar **mblist;
 
   GList *list = NULL;
-  Mailbox *mailbox;
+  Mailbox *mb;
 
   gint i = 0;
 
@@ -50,14 +50,37 @@ add_mailbox_config (gchar * name, gchar * path, gint type)
   gnome_config_set_vector ("/balsa/Global/Accounts", i, (const char *const *) mblist);
 #endif
   g_string_truncate (gstring, 0);
-  g_string_sprintf (gstring, "/balsa/%s/", name);
+  g_string_sprintf (gstring, "/balsa/%s/", mailbox->name);
   gnome_config_push_prefix (gstring->str);
-  gnome_config_set_string ("Path", path);
-  gnome_config_set_int ("Type", type);
+
+  switch (mailbox->type)
+    {
+    case MAILBOX_MBOX:
+    case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
+      gnome_config_set_int ("Type", 0);
+      gnome_config_set_string ("Path", MAILBOX_LOCAL (mailbox)->path);
+      break;
+    case MAILBOX_POP3:
+      gnome_config_set_int ("Type", 1);
+      gnome_config_set_string ("username", MAILBOX_POP3 (mailbox)->user);
+      gnome_config_set_string ("password", MAILBOX_POP3 (mailbox)->passwd);
+      gnome_config_set_string ("server", MAILBOX_POP3 (mailbox)->server);
+      break;
+    case MAILBOX_IMAP:
+      gnome_config_set_int ("Type", 2);
+      gnome_config_set_string ("username", MAILBOX_IMAP (mailbox)->user);
+      gnome_config_set_string ("password", MAILBOX_IMAP (mailbox)->passwd);
+      gnome_config_set_string ("server", MAILBOX_IMAP (mailbox)->server);
+      gnome_config_set_int ("port", MAILBOX_IMAP (mailbox)->port);
+      gnome_config_set_string ("Path", MAILBOX_IMAP (mailbox)->path);
+      break;
+    }
+
   gnome_config_pop_prefix ();
 
   gnome_config_sync ();
-  g_string_free (gstring, 1);
+  g_string_free (gstring, TRUE);
 }
 
 
@@ -166,7 +189,7 @@ load_mailboxes (gchar * name)
       MAILBOX_POP3 (mailbox)->user = gnome_config_get_string ("username");
       MAILBOX_POP3 (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_POP3 (mailbox)->server = gnome_config_get_string ("server");
-      balsa_app.inbox_input = g_list_append(balsa_app.inbox_input,mailbox);
+      balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
       break;
 
       /*  IMAP  */
@@ -176,6 +199,7 @@ load_mailboxes (gchar * name)
       MAILBOX_IMAP (mailbox)->user = gnome_config_get_string ("username");
       MAILBOX_IMAP (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_IMAP (mailbox)->server = gnome_config_get_string ("server");
+      MAILBOX_IMAP (mailbox)->port = get_int_set_default ("port",143);
       MAILBOX_IMAP (mailbox)->path = gnome_config_get_string ("Path");
       node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
       g_node_append (balsa_app.mailbox_nodes, node);

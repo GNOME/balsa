@@ -1098,7 +1098,7 @@ int mutt_write_rfc822_header (FILE *fp, ENVELOPE *env, BODY *attach, int mode)
     fputs ("Mime-Version: 1.0\n", fp);
     mutt_write_mime_header (attach, fp);
   }
-
+#ifndef LIBMUTT
 #ifndef NO_XMAILER
   if (mode == 0)
   {
@@ -1106,7 +1106,7 @@ int mutt_write_rfc822_header (FILE *fp, ENVELOPE *env, BODY *attach, int mode)
     fprintf (fp, "X-Mailer: Mutt %s\n", VERSION);
   }
 #endif
-
+#endif
   /* Add any user defined headers */
   for (; tmp; tmp = tmp->next)
   {

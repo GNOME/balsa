@@ -29,41 +29,46 @@
 #include "mailbackend.h"
 
 gboolean
-send_message (Message * message, gchar *smtp_server, glong debug)
+send_message (Message * message, gchar * smtp_server, glong debug)
 {
-#if 0
-  char line[MAILTMPLEN];
-
-  SENDSTREAM *stream = NIL;
-  ENVELOPE *envelope = mail_newenvelope ();
-  BODY *body = mail_newbody ();
-
+  FILE *tempfp = NULL;
+  BODY *pbody;
+  HEADER *msg;
   gchar *text;
+  gchar buffer[PATH_MAX];
 
-  char *hostlist[] =
-  {				/* SMTP server host list */
-    NULL,
-    "localhost",
-    NIL
-  };
-  hostlist[0] = g_strdup(smtp_server);
+  msg = mutt_new_header ();
 
-  envelope->from = mail_newaddr ();
-  envelope->from->personal = g_strdup (message->from->personal);
-  envelope->from->mailbox = g_strdup (message->from->user);
-  envelope->from->host = g_strdup (message->from->host);
-  envelope->return_path = mail_newaddr ();
-  envelope->return_path->mailbox = g_strdup (message->from->user);
-  envelope->return_path->host = g_strdup (message->from->host);
+  if (!msg->env)
+    msg->env = mutt_new_envelope ();
 
-  rfc822_parse_adrlist (&envelope->to,
-			make_string_from_list (message->to_list),
-			message->from->host);
-  if (message->cc_list)
-    rfc822_parse_adrlist (&envelope->cc,
-			  make_string_from_list (message->cc_list),
-			  message->from->host);
-  envelope->subject = g_strdup (message->subject);
+  pbody = mutt_new_body ();
+  pbody->next = msg->content;	/* don't kill command-line attachments */
+  msg->content = pbody;
+
+  msg->content->type = TYPETEXT;
+  msg->content->subtype = safe_strdup ("plain");
+  msg->content->unlink = 1;
+  msg->content->use_disp = 0;
+
+  mutt_mktemp (buffer);
+  tempfp = safe_fopen (buffer, "w+");
+  msg->content->filename = safe_strdup (buffer);
+/*
+  process_user_header (msg->env);
+*/
+  msg->env->from = g_strdup (message->from);
+  msg->env->subject = g_strdup(message->subject);
+
+  msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list(message->to_list));
+  msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list(message->cc_list));
+  msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list(message->bcc_list));
+	  
+  fclose (tempfp);
+  tempfp = NULL;
+
+#if 0
+
   body->type = TYPETEXT;
 
   /* FIXME: mabey problem */
@@ -72,10 +77,7 @@ send_message (Message * message, gchar *smtp_server, glong debug)
   body->contents.text.data = g_strdup (text);
   body->contents.text.size = strlen (body->contents.text.data);
 
-  rfc822_date (line);
-  envelope->date = (char *) fs_get (1 + strlen (line));
-  strcpy (envelope->date, line);
-  if (envelope->to)
+  if (msg->env->to)
     {
       fprintf (stderr, "Sending...\n");
       if (stream = smtp_open (hostlist, debug))
@@ -93,6 +95,10 @@ send_message (Message * message, gchar *smtp_server, glong debug)
   mail_free_envelope (&envelope);
   mail_free_body (&body);
 #endif
+
+  if (tempfp)
+    fclose (tempfp);
+  mutt_free_header (&msg);
+
   return TRUE;
 }
-

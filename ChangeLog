@@ -1,3 +1,8 @@
+2003-01-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: store config prefix.
+	* src/mailbox-conf.c: handle better empty fields.
+	
 2003-01-15  PeterB
 
 	* src/mailbox-node.c: Fix #102139 (append-subtree failed for
@@ -13,7 +18,7 @@
 
 2003-01-13  Pawel Salek  <pawsa@theochem.kth.se>
 
-	Albrecht Dreß's patch to ignore alternative HTML parts.
+	Albrecht Dress's patch to ignore alternative HTML parts.
 	* src/balsa-app.h: add a new gboolean config variable display_alt_plain
 	* src/balsa-message.c: modify scanning of multipart/alternative msgs.
 	* src/pref-manager.c: add a check button in Display->Message.

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -463,7 +463,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	gtk_entry_set_text(GTK_ENTRY(mcw->mailbox_name),
 			   mailbox->name);
 
-    if(mcw->identity)
+    if(mcw->identity && mailbox->identity_name)
 	gtk_entry_set_text(GTK_ENTRY(mcw->identity), mailbox->identity_name);
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
@@ -774,7 +774,10 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	save_to_config = balsa_app.local_mail_directory == NULL
 	    || strncmp(balsa_app.local_mail_directory, path,
 		       strlen(balsa_app.local_mail_directory)) != 0;
+        printf("Save to config: %d\n", save_to_config);
 	if(save_to_config) {
+            gchar* fn = strrchr(path, '/');
+            mcw->mailbox->name = g_strdup(fn? fn+1 : path);
 	    node =g_node_new(mbnode);
             balsa_mailbox_nodes_lock(TRUE);
 	    g_node_append(balsa_app.mailbox_nodes, node);

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -543,6 +543,8 @@ libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
     /* These are incase this section was used for another
      * type of mailbox that has now been deleted...
      */
+    g_free(mailbox->config_prefix);
+    mailbox->config_prefix = g_strdup(prefix);
     gnome_config_private_clean_section(prefix);
     gnome_config_clean_section(prefix);
 

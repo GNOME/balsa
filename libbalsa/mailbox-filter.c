@@ -63,27 +63,30 @@ mailbox_filters_section_lookup(const gchar * name)
     gint pref_len=strlen(MAILBOX_FILTERS_SECTION_PREFIX);
     guint name_len;
 
-    gchar * tmp, *section;
+    gchar * key, *section = NULL;
     void * iterator;
-    gboolean res;
 
     g_return_val_if_fail(name && name[0],NULL);
     name_len=strlen(name);
     iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &tmp, NULL))) {
-	if (strncmp(tmp, MAILBOX_FILTERS_SECTION_PREFIX, pref_len) == 0) {
-	    section = g_strconcat(BALSA_CONFIG_PREFIX, tmp, "/", NULL);
-	    g_free(tmp);
+    while (!section &&
+	   (iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
+	if (strncmp(key, MAILBOX_FILTERS_SECTION_PREFIX, pref_len) == 0) {
+	    gchar *url;
+
+	    section = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
 	    gnome_config_push_prefix(section);
-	    tmp=gnome_config_get_string(MAILBOX_FILTERS_URL_KEY);
+	    url = gnome_config_get_string(MAILBOX_FILTERS_URL_KEY);
 	    gnome_config_pop_prefix();
-	    res=strncmp(tmp,name,name_len)==0;
-	    g_free(tmp);
-	    if (res) return section;
-	    g_free(section);
+	    if (strncmp(url, name, name_len)) {
+		g_free(section);
+		section = NULL;
+	    }
+	    g_free(url);
 	}
+	g_free(key);
     }
-    return NULL;
+    return section;
 }
 
 void

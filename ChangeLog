@@ -1,5 +1,6 @@
-2005-04-01 09:27  PeterB
+2005-04-01 18:46  PeterB
 
+	* src/sendmsg-window.c: omit all identity addresses from cc header.
 	* src/balsa-message.c, src/print.c, libbalsa/body.c,
 	libbalsa/html.c, libbalsa/html.h: move charset conversion for html
 	parts to libbalsa/html.c, as it's handled differently by the two

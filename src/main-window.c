@@ -473,7 +473,9 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 			     (GtkSignalFunc) next_message_cb,
 			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
+/*
+   gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
+ */
   return GTK_TOOLBAR (toolbar);
 }
 
@@ -499,13 +501,12 @@ show_about_box (void)
   else
     about_box_visible = TRUE;
 
-
   about = gnome_about_new ("Balsa",
 			   BALSA_VERSION,
 			   "Copyright (C) 1997-98",
 			   authors,
 			   _ ("The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://www.balsa.net/\n\nIf you need to report bugs, please do so at: http://www.gnome.org/cgi-bin/bugs"),
-			   NULL);
+			   "balsa_logo.png");
 
   gtk_signal_connect (GTK_OBJECT (about),
 		      "destroy",

@@ -20,7 +20,13 @@
 #include "config.h"
 
 #include <gnome.h>
+
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <string.h>
+
 #include "mailbox.h"
 #include "main.h"
 #include "misc.h"
@@ -373,18 +379,10 @@ delete_init_window (GtkWidget * widget, gpointer data)
 static void
 create_mailbox_if_not_present (gchar * filename)
 {
-  FILE *f;
+  struct stat st;
 
-  /* Make sure the mailbox exists */
-  if ((f = fopen (filename, "r")) == NULL)
-    {
-      /* If it doesn't exist, try to create it */
-      f = fopen (filename, "w");
-      if (f != NULL)
-	fclose (f);
-    }
-  else
-    fclose (f);
+  if (stat (filename, &st) != 0)
+    creat (filename, S_IRUSR | S_IWUSR);
 }				/* create_mailbox_if_not_present */
 
 static void

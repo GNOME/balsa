@@ -54,7 +54,7 @@ enum
     TARGET_MESSAGE,
   };
 
-static GtkTargetEntry drag_types[] =
+static GtkTargetEntry dnd_mb_target[] =
 {
   {"x-application-gnome/balsa", 0, TARGET_MESSAGE}
 };
@@ -66,7 +66,9 @@ static GtkTargetEntry drag_types[] =
 void mblist_close_mailbox (Mailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
 static GtkWidget *mblist_create_menu (GtkCTree * ctree, Mailbox * mailbox);
+
 static void mblist_drag_data_received (GtkWidget * widget, GdkDragContext * context, gint x, gint y, GtkSelectionData * selection_data, guint info, guint32 time, gpointer data);
+static gboolean mblist_drag_motion (GtkWidget *widget, GdkDragContext *context, gint x, gint y, guint time);
 
 
 static void mblist_open_cb (GtkWidget *, gpointer);
@@ -129,7 +131,7 @@ mblist_open_window (GnomeMDI * mdi)
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
 
   gtk_drag_dest_set (GTK_WIDGET (mblw->ctree), GTK_DEST_DEFAULT_ALL,
-		     drag_types, ELEMENTS (drag_types),
+		     dnd_mb_target, ELEMENTS (dnd_mb_target),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
 
@@ -138,8 +140,15 @@ mblist_open_window (GnomeMDI * mdi)
 
 
 
+  /* callback when object dropped on a mailbox */
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_data_received",
 		      GTK_SIGNAL_FUNC (mblist_drag_data_received), NULL);
+  /* callback when dragged object moves in the mblist window */
+    gtk_signal_connect (GTK_OBJECT (mblw->ctree), "drag_motion",
+                      GTK_SIGNAL_FUNC (mblist_drag_motion), NULL);
+
+
+  
 #if 0
   bbox = gtk_hbutton_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area),
@@ -237,9 +246,32 @@ mblist_drag_data_received (GtkWidget * widget,
 
   if (!gtk_clist_get_selection_info (clist, x, y, &row, NULL))
     return;
+  g_print("clist received data\n");
 
   /* FIXME what now... ? */
 }
+
+
+static gboolean
+mblist_drag_motion         (GtkWidget          *widget,
+                            GdkDragContext     *context,
+                            gint                x,
+                            gint                y,
+                            guint               time)
+{
+  GtkCList *clist = GTK_CLIST (widget);
+  GtkCTree *ctree = GTK_CTREE (widget);
+  gint row;
+  gint mb_selected;
+  GtkCTreeNode *node;
+
+
+  mb_selected = gtk_clist_get_selection_info (clist, x, y, &row, NULL);
+  node = gtk_ctree_node_nth( ctree, row );
+  gtk_ctree_select(ctree, node);
+  return TRUE;
+}
+
 
 static void
 mailbox_select_cb (BalsaMBList * bmbl, Mailbox * mailbox, GtkCTreeNode * row, GdkEventButton * event)

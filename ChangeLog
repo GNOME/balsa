@@ -1,3 +1,7 @@
+2003-01-29  PeterB
+
+	* src/print.c: Work around poor error handling in gnome_font_find.
+
 2002-12-28  Daniel Yacob  <yacob@geez.org>
 
 	* configure.in: Added Amharic (am) in ALL_LINGUAS.

@@ -341,7 +341,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 				   lbm_mbox_header_cb, &msg_info_p);
 
     msg_info.message = NULL;
-    while (!g_mime_stream_eos(mbox->gmime_stream)) {
+    while (!g_mime_parser_eos(gmime_parser)) {
 	GMimeMessage *mime_message;
         LibBalsaMessage *msg;
 

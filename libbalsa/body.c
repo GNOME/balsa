@@ -524,6 +524,10 @@ gchar *
 libbalsa_message_body_get_mime_type(LibBalsaMessageBody * body)
 {
     gchar *res, *tmp;
+
+    if (!body->content_type)
+	return g_strdup("text/plain");
+
     tmp = strchr(body->content_type, ';');
     res = g_ascii_strdown(body->content_type,
                           tmp ? tmp-body->content_type : -1);

@@ -288,7 +288,7 @@ get_cache_name(LibBalsaMailboxImap* mailbox, const gchar* type)
 {
     gchar* fname, *start;
     LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    gchar* postfix = g_strconcat(".balsa/", s->host, "-",
+    gchar* postfix = g_strconcat(".balsa/", s->user, "@", s->host, "-",
                                  (mailbox->path ? mailbox->path : "INBOX"),
                                  "-", type, ".dir", NULL);
     for(start=strchr(postfix+7, '/'); start; start = strchr(start,'/'))

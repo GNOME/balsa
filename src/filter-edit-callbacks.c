@@ -421,7 +421,9 @@ fe_clist_button_event_press (GtkWidget * widget,
       gtk_clist_set_text (GTK_CLIST (fe_clist),
 			  row,
 			  column,
-			  "");
+			  NULL);
+
+      gtk_clist_select_row(GTK_CLIST(fe_clist), row, -1);
   }
   else
   {
@@ -437,6 +439,8 @@ fe_clist_button_event_press (GtkWidget * widget,
 			    0,
 			    pixmap,
 			    mask);
+
+      gtk_clist_select_row(GTK_CLIST(fe_clist), row, -1);
 
       gdk_pixmap_unref (pixmap);
       gdk_bitmap_unref (mask);

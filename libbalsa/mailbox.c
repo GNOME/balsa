@@ -1055,6 +1055,20 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     lbm_threads_leave(unlock);
 }
 
+void
+libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox, guint seqno)
+{
+    LibBalsaMailboxSearchIter *search_iter;
+
+    if (!mailbox->view_filter)
+	return;
+
+    search_iter = libbalsa_mailbox_search_iter_new(mailbox->view_filter);
+    if (!libbalsa_mailbox_message_match(mailbox, seqno, search_iter))
+	libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
+    libbalsa_mailbox_search_iter_free(search_iter);
+}
+
 /* Search iters */
 LibBalsaMailboxSearchIter *
 libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
@@ -2660,7 +2674,6 @@ libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 	/* msg_tree has never been populated */
 	g_node_destroy(mailbox->msg_tree);
 	mailbox->msg_tree = new_tree;
-	mailbox->stamp++;
 	lbm_set_msg_tree(mailbox);
     }
 }

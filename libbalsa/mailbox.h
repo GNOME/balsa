@@ -260,8 +260,6 @@ gboolean libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
-void libbalsa_mailbox_remove_messages(LibBalsaMailbox * mbox,
-				      GList * messages);
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 					       gboolean has_unread);
 void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
@@ -421,6 +419,7 @@ void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox * mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
+void libbalsa_mailbox_msgno_deselected(LibBalsaMailbox * mailbox, guint seqno);
 
 /* Search */
 gboolean libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox,

@@ -1,3 +1,7 @@
+2000-10-05  Szabolcs Ban  <shooby@gnome.hu>
+
+	* balsa.desktop: added Hungarian translations
+
 2000-10-04  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mime.c,libbalsa/misc.c: don't crash on replying empty mails.

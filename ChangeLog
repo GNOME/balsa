@@ -1,3 +1,10 @@
+1999-11-23   Ragnar Henriksen <ragnar@juniks.org>
+
+	* new file: address-book.h
+	* rewrote ab_load().
+	* added name search.
+	* removed al comp. warningsi for address-book.c.
+
 1999-11-22  Peter Williams  <peter@wgwill.ne.mediaone.net>
 
 	* src/balsa-app.h (DEFAULT_MESSAGE_FONT): This

@@ -2,6 +2,7 @@ src/balsa-app.c
 src/balsa-index.c
 src/balsa-init.c
 src/balsa-message.c
+src/filter-edit-dialog.c
 src/index-child.c
 src/local-mailbox.c
 src/mailbox-conf.c

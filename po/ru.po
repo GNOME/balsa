@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 1999-02-02 18:02-0500\n"
+"POT-Creation-Date: 1999-02-24 00:50-0500\n"
 "PO-Revision-Date: 1999-02-19 08:40-0500\n"
 "Last-Translator: Alexander Kirillov <kirillov@math.ias.edu>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 msgid "From"
 msgstr "Отправитель"
 
-#: src/balsa-index.c:232
+#: src/balsa-index.c:232 src/filter-edit-dialog.c:311
 msgid "Subject"
 msgstr "Тема"
 
@@ -44,31 +44,33 @@ msgstr "Судя по всему, Вы запускаете Balsa впервые.\n"
 #: src/balsa-init.c:196
 msgid ""
 "The following steps will setup Balsa by asking a few simple questions.  "
-msgstr "Для начальной настройки Balsa, мы просим Вас "
-"ответить на несколько простых вопросов."
+msgstr ""
+"Для начальной настройки Balsa, мы просим Вас ответить на несколько простых "
+"вопросов."
 
 #: src/balsa-init.c:197
 msgid ""
 "Once you have completed these steps, you can always change them at a later "
 "time through Balsa's preferences.  "
-msgstr "Начальная настройка может быть изменена впоследствии с помощью "
-"кнопки \"настройка  Balsa\". "
+msgstr ""
+"Начальная настройка может быть изменена впоследствии с помощью кнопки "
+"\"настройка  Balsa\". "
 
 #: src/balsa-init.c:198
 msgid ""
 "Please check the about box in Balsa's main window for more information on "
 "contacting the authors or reporting bugs."
 msgstr ""
-"Чтобы узнать адреса авторов, воспользуйтесь кнопкой \"О программе\"   "
-"в главном окошке Balsa"
+"Чтобы узнать адреса авторов, воспользуйтесь кнопкой \"О программе\"   в "
+"главном окошке Balsa"
 
 #. your name
-#: src/balsa-init.c:247 src/pref-manager.c:363
+#: src/balsa-init.c:247 src/pref-manager.c:367
 msgid "Your name:"
 msgstr "Ваше имя:"
 
 #. email address
-#: src/balsa-init.c:261 src/pref-manager.c:373
+#: src/balsa-init.c:261 src/pref-manager.c:377
 msgid "E-Mail address:"
 msgstr "E-mail адрес"
 
@@ -109,8 +111,8 @@ msgstr "Сохранить MIME-закодированную часть"
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/balsa-message.c:158 src/mailbox-conf.c:482 src/sendmsg-window.c:73
-#: src/sendmsg-window.c:184
+#: src/balsa-message.c:158 src/mailbox-conf.c:486 src/sendmsg-window.c:75
+#: src/sendmsg-window.c:186
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -122,6 +124,151 @@ msgstr "Не удалось открыть %s:%s"
 #: src/balsa-message.c:230 src/balsa-message.c:245
 msgid "Ok"
 msgstr ""
+
+#: src/filter-edit-dialog.c:100
+msgid "On"
+msgstr "Вкл."
+
+#: src/filter-edit-dialog.c:101
+msgid "Name"
+msgstr "Имя"
+
+#: src/filter-edit-dialog.c:161
+msgid "Up"
+msgstr "Вверх"
+
+#: src/filter-edit-dialog.c:167
+msgid "Down"
+msgstr "Вниз"
+
+#: src/filter-edit-dialog.c:184
+msgid "New"
+msgstr "Новый"
+
+#: src/filter-edit-dialog.c:190 src/index-child.c:449 src/main-window.c:211
+#: src/pref-manager.c:471
+msgid "Delete"
+msgstr "Удалить"
+
+#: src/filter-edit-dialog.c:233
+msgid "Match in:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:251
+msgid "All"
+msgstr ""
+
+#: src/filter-edit-dialog.c:263
+#, fuzzy
+msgid "Header"
+msgstr "Заголовок"
+
+#: src/filter-edit-dialog.c:275
+#, fuzzy
+msgid "Body"
+msgstr "Изменить"
+
+#: src/filter-edit-dialog.c:287
+msgid "To:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:299
+msgid "From:"
+msgstr "От:"
+
+#: src/filter-edit-dialog.c:324
+msgid "Match string:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:376 src/mailbox-conf.c:281 src/mailbox-conf.c:900
+#: src/pref-manager.c:461
+msgid "Add"
+msgstr "Добавить"
+
+#: src/filter-edit-dialog.c:387 src/sendmsg-window.c:139
+msgid "Remove"
+msgstr "Удалить"
+
+#: src/filter-edit-dialog.c:416
+msgid "Command:"
+msgstr "Команда:"
+
+#. The name entry
+#: src/filter-edit-dialog.c:452
+msgid "Filter name:"
+msgstr "Имя фильтра:"
+
+#. The "Process when:" option menu
+#: src/filter-edit-dialog.c:471
+msgid "Process when:"
+msgstr ""
+
+#. The "Run on:" option menu
+#: src/filter-edit-dialog.c:502
+msgid "Run on:"
+msgstr ""
+
+#. the type notebook's option menu
+#: src/filter-edit-dialog.c:532
+msgid "Search type:"
+msgstr ""
+
+#. The notification area
+#: src/filter-edit-dialog.c:588
+msgid "Notification:"
+msgstr ""
+
+#. Notification buttons
+#: src/filter-edit-dialog.c:597
+msgid "Play sound:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:605
+msgid "Use Sound..."
+msgstr ""
+
+#: src/filter-edit-dialog.c:614
+msgid "Popup text:"
+msgstr ""
+
+#. The action area
+#: src/filter-edit-dialog.c:633
+msgid "Action to perform:"
+msgstr ""
+
+#. The disposition area
+#: src/filter-edit-dialog.c:654
+msgid "Disposition:"
+msgstr ""
+
+#: src/filter-edit-dialog.c:662
+msgid "Place/leave in default folder"
+msgstr ""
+
+#: src/filter-edit-dialog.c:667
+msgid "Do not place/leave in default folder"
+msgstr ""
+
+#: src/filter-edit-dialog.c:672
+msgid "Stop filtering here"
+msgstr ""
+
+#: src/filter-edit-dialog.c:700
+msgid "Match"
+msgstr ""
+
+#: src/filter-edit-dialog.c:703
+msgid "Action"
+msgstr "Действие"
+
+#: src/filter-edit-dialog.c:717
+msgid "Revert"
+msgstr "Восстановить"
+
+#: src/filter-edit-dialog.c:745
+#, fuzzy
+msgid "Balsa Filters"
+msgstr "Управление фильтрами"
 
 #: src/index-child.c:143
 msgid "Mailbox password:"
@@ -155,10 +302,6 @@ msgstr "Отвечено"
 msgid "Forwarded"
 msgstr "Переслано"
 
-#: src/index-child.c:449 src/main-window.c:206 src/pref-manager.c:467
-msgid "Delete"
-msgstr "Уничтожить"
-
 #: src/index-child.c:457
 msgid "Undelete"
 msgstr "Восстановить"
@@ -168,7 +311,7 @@ msgstr "Восстановить"
 msgid "Local Mailbox Loaded as: %s\n"
 msgstr ""
 
-#: src/mailbox-conf.c:160
+#: src/mailbox-conf.c:161
 msgid ""
 "This will remove the mailbox and it's files permanently from your system.\n"
 "Are you sure you want to remove this mailbox?"
@@ -176,49 +319,45 @@ msgstr ""
 "Тем самым Вы необратимо уничтожите почтовый ящик и все его содержимое.\n"
 "Вы уверены, что Вы этого хотите?"
 
-#: src/mailbox-conf.c:165
+#: src/mailbox-conf.c:166
 msgid ""
 "This will remove the mailbox from the list of mailboxes\n"
 "You may use \"Add Mailbox\" later to access this mailbox again\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 "Тем самым Вы удалите почтовый ящик из своего списка\n"
-"Вы сможете снова получить к нему доступ в будущем "
-"при помощи команды \"Добавить почтовый ящик\"\n "
-"Вы уверены, что Вы этого хотите?"
+"Вы сможете снова получить к нему доступ в будущем при помощи команды "
+"\"Добавить почтовый ящик\"\n"
+" Вы уверены, что Вы этого хотите?"
 
-#: src/mailbox-conf.c:237
+#: src/mailbox-conf.c:238
 msgid "Mailbox Configurator"
 msgstr "Конфигурация почт. ящика"
 
-#: src/mailbox-conf.c:280 src/mailbox-conf.c:885 src/pref-manager.c:457
-msgid "Add"
-msgstr "Добавить"
-
-#: src/mailbox-conf.c:289
+#: src/mailbox-conf.c:290
 msgid "Update"
 msgstr "Обновить"
 
-#: src/mailbox-conf.c:481
+#: src/mailbox-conf.c:485
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Не удалось создать почтовый ящик '%s': %s\n"
 
-#: src/mailbox-conf.c:522
+#: src/mailbox-conf.c:527
 msgid " on "
 msgstr " на "
 
-#: src/mailbox-conf.c:625
+#: src/mailbox-conf.c:630
 msgid "New mailbox type:"
 msgstr "Тип нового почтового ящика"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:631
+#: src/mailbox-conf.c:636
 msgid "Local mailbox"
 msgstr "Местный почтовый ящик"
 
-#: src/mailbox-conf.c:639
+#: src/mailbox-conf.c:644
 msgid "IMAP server"
 msgstr "IMAP сервер"
 
@@ -262,7 +401,7 @@ msgstr "Переслать"
 msgid "Forward the current message"
 msgstr "Переслать текущее письмо"
 
-#: src/main-window.c:133 src/main-window.c:163
+#: src/main-window.c:133 src/main-window.c:168
 msgid "_Delete"
 msgstr "Уничтожить"
 
@@ -278,149 +417,155 @@ msgstr "Восстановить"
 msgid "Undelete the message"
 msgstr "Восстановить письмо"
 
-#: src/main-window.c:151
+#: src/main-window.c:155
 msgid "List"
 msgstr "Список"
 
-#: src/main-window.c:155
+#: src/main-window.c:159
 msgid "_Open"
 msgstr "Открыть"
 
-#: src/main-window.c:155
+#: src/main-window.c:159
 msgid "Open the selected mailbox"
 msgstr "Открыть выбранный почтовый ящик"
 
-#: src/main-window.c:157
+#: src/main-window.c:161
 msgid "_Close"
 msgstr "Закрыть"
 
-#: src/main-window.c:157
+#: src/main-window.c:161
 msgid "Close the selected mailbox"
 msgstr "Закрыть выбранный почтовый ящик"
 
-#: src/main-window.c:159
+#: src/main-window.c:164
 msgid "_Add"
 msgstr "Добавить"
 
-#: src/main-window.c:159
+#: src/main-window.c:164
 msgid "Add a new mailbox"
 msgstr "Добавить ещё один почтовый ящик"
 
-#: src/main-window.c:161
+#: src/main-window.c:166
 msgid "_Edit"
 msgstr "Правка"
 
-#: src/main-window.c:161
+#: src/main-window.c:166
 msgid "Edit the selected mailbox"
 msgstr "Редактировать выбранный почтовый ящик"
 
-#: src/main-window.c:163
+#: src/main-window.c:168
 msgid "Delete the selected mailbox"
 msgstr "Уничтожить выбранный почтовый ящик"
 
-#: src/main-window.c:166
+#: src/main-window.c:171
 msgid "C_lose current"
 msgstr "Закрыть"
 
-#: src/main-window.c:166
+#: src/main-window.c:171
 msgid "Close the currently opened mailbox"
 msgstr "Закрыть текущий почтовый ящик"
 
-#: src/main-window.c:169
+#: src/main-window.c:173
 msgid "Co_mmit current"
 msgstr "Подтвердить изменения"
 
-#: src/main-window.c:169
+#: src/main-window.c:173
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Сделать необратимыми изменения в текущем почтовом ящике"
 
-#: src/main-window.c:177
+#: src/main-window.c:176
+msgid "O_pened"
+msgstr "Открыты"
+
+#: src/main-window.c:182
 msgid "_Filters..."
 msgstr "Фильтры..."
 
-#: src/main-window.c:177
+#: src/main-window.c:182
 msgid "Manage filters"
 msgstr "Управление фильтрами"
 
-#: src/main-window.c:195
+#: src/main-window.c:200
 msgid "_Message"
 msgstr "Письмо"
 
-#: src/main-window.c:196
+#: src/main-window.c:201
 msgid "Mail_boxes"
 msgstr "Почтовые ящики"
 
-#: src/main-window.c:204
+#: src/main-window.c:209
 msgid "Check"
 msgstr "Проверить"
 
-#: src/main-window.c:204
+#: src/main-window.c:209
 msgid "Check Email"
 msgstr "Проверить почту"
 
-#: src/main-window.c:206
+#: src/main-window.c:211
 msgid "Delete Message"
 msgstr "Уничтожить письмо"
 
-#: src/main-window.c:208
+#: src/main-window.c:213
 msgid "Compose"
 msgstr "Составить"
 
-#: src/main-window.c:208
+#: src/main-window.c:213
 msgid "Compose Message"
 msgstr "Составить письмо"
 
-#: src/main-window.c:209
+#: src/main-window.c:214
 msgid "Reply"
 msgstr "Ответить"
 
-#: src/main-window.c:210
+#: src/main-window.c:215
 msgid "Reply to all"
 msgstr "Ответить всем"
 
-#: src/main-window.c:211
+#: src/main-window.c:216
 msgid "Forward"
 msgstr "Переслать"
 
-#: src/main-window.c:213
+#: src/main-window.c:218
 msgid "Previous"
 msgstr "Предыдущее"
 
-#: src/main-window.c:213
+#: src/main-window.c:218
 msgid "Open Previous Message"
 msgstr "Открыть предыдущее письмо"
 
-#: src/main-window.c:214
+#: src/main-window.c:219
 msgid "Next"
 msgstr "Следующее"
 
-#: src/main-window.c:214
+#: src/main-window.c:219
 msgid "Open Next Message"
 msgstr "Открыть следующее письмо"
 
-#: src/main-window.c:216 src/sendmsg-window.c:71
+#: src/main-window.c:222 src/sendmsg-window.c:72
 msgid "Print"
 msgstr "Напечатать"
 
-#: src/main-window.c:216
+#: src/main-window.c:222
 msgid "Print current message"
 msgstr "Напечатать текущее письмо"
 
-#: src/main-window.c:287
-msgid "Mailboxes/<Separator>"
-msgstr "Почтовые ящики/<Разделитель>"
+#: src/main-window.c:294
+msgid "Mailboxes/Opened/"
+msgstr "Почтовые ящики/Открыты/"
 
-#: src/main-window.c:404
+#: src/main-window.c:407
+msgid "Copyright (C) 1997-1999"
+msgstr ""
+
+#: src/main-window.c:409
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
-"If you need to report bugs, please do so at: "
-"http://www.gnome.org/cgi-bin/bugs"
+"If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"Программа для электронной почты Balsa является частью рабочей "
-"среды GNOME. Подробное описание Balsa можно найти по адресу "
-"http://www.balsa.net/\n"
+"Программа для электронной почты Balsa является частью рабочей среды GNOME. "
+"Подробное описание Balsa можно найти по адресу http://www.balsa.net/\n"
 "Сообщить об обнаруженных ошибках можно по адресу "
 "http://www.gnome.org/cgi-bin/bugs"
 
@@ -436,95 +581,100 @@ msgstr "Ответить всем адресатам этого письма"
 msgid "Forward this message"
 msgstr "Переслать это письмо"
 
-#: src/pref-manager.c:116
+#: src/pref-manager.c:117
 msgid "Balsa Preferences"
 msgstr "Настройка Balsa"
 
 #. identity page
-#: src/pref-manager.c:136
+#: src/pref-manager.c:137
 msgid "Identity"
 msgstr "Идентификация"
 
 #. mailboxes page
-#: src/pref-manager.c:143
+#: src/pref-manager.c:144
 msgid "Mail Servers"
 msgstr "Mail-серверы"
 
 #. display page
-#: src/pref-manager.c:150
+#: src/pref-manager.c:151
 msgid "Display"
 msgstr "Дисплей"
 
 #. Misc page
-#: src/pref-manager.c:157
+#: src/pref-manager.c:158 src/pref-manager.c:587
 msgid "Misc"
 msgstr "Разное"
 
 #. reply-to address
-#: src/pref-manager.c:383
+#: src/pref-manager.c:387
 msgid "Reply-to address:"
 msgstr "Обратный адрес:"
 
 #. signature
-#: src/pref-manager.c:393
+#: src/pref-manager.c:397
 msgid "Signature:"
 msgstr "Файл подписи:"
 
-#: src/pref-manager.c:427
+#: src/pref-manager.c:431
 msgid "Remote Mailbox Servers"
 msgstr "Серверы удаленных почтовых ящиков"
 
-#: src/pref-manager.c:436
+#: src/pref-manager.c:440
 msgid "Type"
 msgstr "Тип"
 
-#: src/pref-manager.c:437
+#: src/pref-manager.c:441
 msgid "Mailbox name"
 msgstr "Название почтового ящика"
 
-#: src/pref-manager.c:462
+#: src/pref-manager.c:466
 msgid "Modify"
 msgstr "Изменить"
 
-#: src/pref-manager.c:472
+#: src/pref-manager.c:476
 msgid "Local Mail"
 msgstr "Местная почта"
 
-#: src/pref-manager.c:477
+#: src/pref-manager.c:481
 msgid "Local mail directory:"
 msgstr "Каталог местной почты:"
 
 #. smtp server
-#: src/pref-manager.c:484
+#: src/pref-manager.c:488
 msgid "Outgoing Mail"
 msgstr "Исходящая почта"
 
-#: src/pref-manager.c:492
+#: src/pref-manager.c:496
 msgid "Remote SMTP Server"
 msgstr "Удаленный SMTP сервер"
 
-#: src/pref-manager.c:501
+#: src/pref-manager.c:505
 msgid "Local mail user agent"
 msgstr "Местный почтовый клиент (MUA)"
 
 #. Toolbars
-#: src/pref-manager.c:534
+#: src/pref-manager.c:538
 msgid "Toolbars"
 msgstr "Панели инструментов"
 
-#: src/pref-manager.c:554
+#. Main window
+#: src/pref-manager.c:555
+msgid "Main window"
+msgstr ""
+
+#: src/pref-manager.c:558
 msgid "Use preview pane"
 msgstr "Использовать панель предпросмотра"
 
-#: src/pref-manager.c:561
+#: src/pref-manager.c:565
 msgid "View mailbox content informations "
 msgstr "Посмотреть информацию о содержимом п/я"
 
-#: src/pref-manager.c:590
+#: src/pref-manager.c:594
 msgid "Debug"
 msgstr "Отладка"
 
-#: src/pref-manager.c:597
+#: src/pref-manager.c:601
 msgid "Reply prefix:"
 msgstr "Префикс для ответов:"
 
@@ -544,60 +694,57 @@ msgstr "Приложить"
 msgid "Add attachments to this message"
 msgstr "Добавить файл как приложение к этому письму"
 
-#: src/sendmsg-window.c:69
+#: src/sendmsg-window.c:70
 msgid "Spelling"
 msgstr "Правописание"
 
-#: src/sendmsg-window.c:69
+#: src/sendmsg-window.c:70
 msgid "Check Spelling"
 msgstr "Проверить орфографию"
 
-#: src/sendmsg-window.c:80
+#: src/sendmsg-window.c:82
 msgid "_Send"
 msgstr "Послать"
 
-#: src/sendmsg-window.c:84
+#: src/sendmsg-window.c:86
 msgid "_Attach file..."
 msgstr "Приложить файл..."
 
-#: src/sendmsg-window.c:137
-msgid "Remove"
-msgstr "Удалить"
-
-#: src/sendmsg-window.c:177
+#: src/sendmsg-window.c:179
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Нет информации про файл '%s': %s\n"
 
-#: src/sendmsg-window.c:180
+#: src/sendmsg-window.c:182
 #, c-format
 msgid "Attachment is not a regular file: '%s'\n"
 msgstr "Приложение не является обычным файлом: '%s'\n"
 
-#: src/sendmsg-window.c:231
+#: src/sendmsg-window.c:233
 msgid "Attach file"
 msgstr "Приложить файл"
 
-#: src/sendmsg-window.c:470
+#: src/sendmsg-window.c:472
 msgid "Reply to "
 msgstr "Ответить..."
 
-#: src/sendmsg-window.c:475
+#: src/sendmsg-window.c:477
 msgid "Forward message"
 msgstr "Переслать письмо"
 
-#: src/sendmsg-window.c:480
+#: src/sendmsg-window.c:482
 msgid "New message"
 msgstr "Новое письмо"
 
-#: libbalsa/mailbox.c:463
+#: libbalsa/mailbox.c:475
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:483
+#: libbalsa/mailbox.c:495
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-
+#~ msgid "Mailboxes/<Separator>"
+#~ msgstr "Почтовые ящики/<Разделитель>"

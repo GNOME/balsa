@@ -77,6 +77,7 @@ struct _SendMessageInfo{
        is opaque to the application. */
     smtp_session_t session;
 #endif
+    gboolean debug;
 };
 
 /* Variables storing the state of the sending thread.
@@ -143,24 +144,27 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
 
 #if ENABLE_ESMTP
 static SendMessageInfo *
-send_message_info_new(LibBalsaMailbox* outbox, smtp_session_t session)
+send_message_info_new(LibBalsaMailbox* outbox, smtp_session_t session,
+                      gboolean debug)
 {
     SendMessageInfo *smi;
 
     smi=g_new(SendMessageInfo,1);
     smi->session = session;
     smi->outbox = outbox;
+    smi->debug = debug;
 
     return smi;
 }
 #else
 static SendMessageInfo *
-send_message_info_new(LibBalsaMailbox* outbox)
+send_message_info_new(LibBalsaMailbox* outbox, gboolean debug)
 {
     SendMessageInfo *smi;
 
     smi=g_new(SendMessageInfo,1);
     smi->outbox = outbox;
+    smi->debug = debug;
 
     return smi;
 }
@@ -418,7 +422,7 @@ LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                       LibBalsaMailbox * fccbox, gint encoding,
                       gchar * smtp_server, auth_context_t smtp_authctx,
-                      gint tls_mode, gboolean flow)
+                      gint tls_mode, gboolean flow, gboolean debug)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
@@ -427,7 +431,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 					flow);
      if (result == LIBBALSA_MESSAGE_CREATE_OK)
 	 if (!libbalsa_process_queue(outbox, smtp_server,
-				     smtp_authctx, tls_mode))
+				     smtp_authctx, tls_mode, debug))
 	     return LIBBALSA_MESSAGE_SEND_ERROR;
  
      return result;
@@ -436,7 +440,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, gint encoding,
-		      gboolean flow)
+		      gboolean flow, gboolean debug)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
@@ -444,7 +448,7 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
  	result = libbalsa_message_queue(message, outbox, fccbox, encoding,
  					flow);
     if (result == LIBBALSA_MESSAGE_CREATE_OK)
- 	if (!libbalsa_process_queue(outbox))
+ 	if (!libbalsa_process_queue(outbox, debug))
  	    return LIBBALSA_MESSAGE_SEND_ERROR;
  
     return result;
@@ -516,7 +520,8 @@ add_recipients(smtp_message_t message, smtp_message_t bcc_message,
  */
 gboolean
 libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
-                       auth_context_t smtp_authctx, gint tls_mode)
+                       auth_context_t smtp_authctx, gint tls_mode,
+                       gboolean debug)
 {
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
@@ -739,7 +744,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
       a new thread is always required to dispatch it.
     */
 
-    send_message_info=send_message_info_new(outbox, session);
+    send_message_info=send_message_info_new(outbox, session, debug);
 
 #ifdef BALSA_USE_THREADS
     sending_threads++;
@@ -924,7 +929,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
    handler does that.
 */
 gboolean 
-libbalsa_process_queue(LibBalsaMailbox* outbox)
+libbalsa_process_queue(LibBalsaMailbox* outbox, gboolean debug)
 {
     MessageQueueItem *mqi, *new_message;
     SendMessageInfo *send_message_info;
@@ -981,7 +986,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox)
 	lista = lista->next;
     }
 
-    send_message_info=send_message_info_new(outbox);
+    send_message_info=send_message_info_new(outbox, debug);
     
 #ifdef BALSA_USE_THREADS
     
@@ -1031,8 +1036,6 @@ static MessageQueueItem* get_msg2send()
 #endif /* ESMTP */
 
 #if ENABLE_ESMTP
-
-#ifdef DEBUG
 static void
 monitor_cb (const char *buf, int buflen, int writing, void *arg)
 {
@@ -1050,7 +1053,6 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
  if (buf[buflen - 1] != '\n')
    putc ('\n', fp);
 }
-#endif
 
 /* balsa_send_message_real:
    does the actual message sending. 
@@ -1062,7 +1064,8 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
 /* [BCS] radically different since it uses the libESMTP interface.
  */
 static guint
-balsa_send_message_real(SendMessageInfo* info) {
+balsa_send_message_real(SendMessageInfo* info)
+{
     gboolean session_started;
 #ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
@@ -1074,14 +1077,10 @@ balsa_send_message_real(SendMessageInfo* info) {
     */
     smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
 #endif
-#ifdef DEBUG
-    /* Add a protocol monitor when compiled with DEBUG.  This is somewhat
-       unsatisfactory, it would be better handled at run time with an
-       option in the preferences dialogue.  I don't know how to access
-       app level options within libbalsa however without breaking the
-       current modularity of the code. */
-    smtp_set_monitorcb (info->session, monitor_cb, stderr, 1);
-#endif
+
+    /* Add a protocol monitor when debugging is enabled. */
+    if(info->debug)
+        smtp_set_monitorcb (info->session, monitor_cb, stderr, 1);
 
     /* Kick off the connection with the MTA.  When this returns, all
        messages with valid recipients have been sent. */
@@ -1098,8 +1097,8 @@ balsa_send_message_real(SendMessageInfo* info) {
                    "specify it explicitly via: \"host:smtp\".\n"
                    "Message is left in outbox."));
             break;
-            /* case SMTP_ERR_NOTHING_TO_DO: silence this one?
-               break; */
+        case SMTP_ERR_NOTHING_TO_DO: /* silence this one? */
+            break;
         default:
             libbalsa_information (LIBBALSA_INFORMATION_ERROR,
                                   _("SMTP server problem (%d): %s\n"
@@ -1120,6 +1119,7 @@ balsa_send_message_real(SendMessageInfo* info) {
                              &session_started);
 
     libbalsa_mailbox_close(info->outbox);
+    gdk_flush();
     gdk_threads_leave();
 
     send_lock();
@@ -1233,6 +1233,7 @@ balsa_send_message_real(SendMessageInfo* info)
     
     gdk_threads_enter();
     libbalsa_mailbox_close(info->outbox);
+    gdk_flush();
     gdk_threads_leave();
 
     message_queue = NULL;

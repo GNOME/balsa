@@ -1,3 +1,9 @@
+2003-08-23 18:47  PeterB
+
+	* src/balsa-message.c: Implement bm_sender_to_gchar() to put all
+	the "No sender" checks in one place; use it in display_part() for
+	content type "message/rfc822".
+
 2003-08-22 14:17  PeterB
 
 	* src/balsa-message.c: Allow message structure tree to be collapsed

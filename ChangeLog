@@ -1,5 +1,10 @@
-2003-09-26 05:30  PeterB
+2003-09-26 05:57  PeterB
 
+	* ChangeLog, configure.in, libbalsa/body.c,
+	libbalsa/mailbox_mbox.c, libbalsa/server.c, libbalsa/url.c,
+	libbalsa/imap/Makefile.am, libbalsa/imap/auth-cram.c,
+	libbalsa/imap/imap-auth.c, libbalsa/imap/imap-handle.c,
+	libbalsa/imap/siobuf.c: Compile with -Werror etc.
 	* src/mailbox-node.c: Change mark_imap_path() to set noselect as
 	well as noscan.
 	* libbalsa/: folder-scanners.c, folder-scanners.h: Handle

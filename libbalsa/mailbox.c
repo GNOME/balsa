@@ -1223,7 +1223,7 @@ libbalsa_mailbox_copy_message(LibBalsaMessage * message,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), -1);
 
     LOCK_MAILBOX_RETURN_VAL(dest, -1);
-    g_object_ref(message);	/* Should we also lock its mailbox? */
+    g_object_ref(message);	/* mailbox is locked before calling. */
 
     retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message(dest, message);
     if (retval > 0 && !LIBBALSA_MESSAGE_IS_DELETED(message)

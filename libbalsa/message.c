@@ -494,6 +494,9 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	    LIBBALSA_MESSAGE(messages->data)->mailbox->name);
 	return FALSE;
     }
+
+    LOCK_MAILBOX_RETURN_VAL(LIBBALSA_MESSAGE(messages->data)->mailbox,
+			    FALSE);
     
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
@@ -503,6 +506,8 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	else
 	    r = FALSE;
     }
+
+    UNLOCK_MAILBOX(LIBBALSA_MESSAGE(messages->data)->mailbox);
 
     if (d) {
         libbalsa_messages_change_flag (d, LIBBALSA_MESSAGE_FLAG_DELETED,
@@ -559,6 +564,9 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     g_return_val_if_fail(messages != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
 
+    LOCK_MAILBOX_RETURN_VAL(LIBBALSA_MESSAGE(messages->data)->mailbox,
+			    FALSE);
+
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
 	if(message->mailbox==NULL) continue;
@@ -566,8 +574,10 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
 	    rethread = TRUE;
     }
 
+    UNLOCK_MAILBOX(LIBBALSA_MESSAGE(messages->data)->mailbox);
+
     libbalsa_mailbox_check(dest);
-    if (rethread)
+    if (rethread && MAILBOX_OPEN(dest))
 	libbalsa_mailbox_set_threading(dest, dest->view->threading_type);
 
     return TRUE;

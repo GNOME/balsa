@@ -189,8 +189,7 @@ static void copy_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void reflow_par_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
 static gint quote_messages_cb(GtkWidget *, BalsaSendmsg *);
 
@@ -262,8 +261,12 @@ static GnomeUIInfo edit_menu[] = {
     {GNOME_APP_UI_ITEM, N_("_Wrap Body"), N_("Wrap message lines"),
      (gpointer) wrap_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_b, GDK_CONTROL_MASK, NULL},
+#define EDIT_MENU_REFLOW_SELECTED EDIT_MENU_WRAP_BODY + 1
+    {GNOME_APP_UI_ITEM, N_("_Reflow Selected Text"), NULL,
+     (gpointer) reflow_selected_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
+     GDK_r, GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_ADD_SIGNATURE EDIT_MENU_WRAP_BODY + 2
+#define EDIT_MENU_ADD_SIGNATURE EDIT_MENU_REFLOW_SELECTED + 2
     {GNOME_APP_UI_ITEM, N_("Insert Si_gnature"), NULL,
      (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      GDK_g, GDK_CONTROL_MASK, NULL},
@@ -272,16 +275,7 @@ static GnomeUIInfo edit_menu[] = {
      (gpointer) quote_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
      0, 0, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_REFLOW_PARA EDIT_MENU_QUOTE + 2
-    {GNOME_APP_UI_ITEM, N_("_Reflow Paragraph"), NULL,
-     (gpointer) reflow_par_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_r, GDK_CONTROL_MASK, NULL},
-#define EDIT_MENU_REFLOW_MESSAGE EDIT_MENU_REFLOW_PARA + 1
-    {GNOME_APP_UI_ITEM, N_("R_eflow Message"), NULL,
-     (gpointer) reflow_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_r, GDK_CONTROL_MASK | GDK_SHIFT_MASK, NULL},
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SPELL_CHECK EDIT_MENU_REFLOW_MESSAGE + 2
+#define EDIT_MENU_SPELL_CHECK EDIT_MENU_QUOTE + 2
     GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
                            N_("Check the spelling of the message"),
                            spell_check_cb,
@@ -2751,15 +2745,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
      * if another compose window is opened. */
     bsmsg->undo_widget = edit_menu[EDIT_MENU_UNDO].widget;
     bsmsg->redo_widget = edit_menu[EDIT_MENU_REDO].widget;
-    /*
-     * `Reflow paragraph' and `Reflow message' don't seem to make much
-     * sense when we're using `format=flowed'
-     * */
+
     bsmsg->flow = balsa_app.wordwrap;
-    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_PARA].widget,
-                             !bsmsg->flow);
-    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_MESSAGE].widget,
-                             !bsmsg->flow);
+    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_SELECTED].widget,
+                             bsmsg->flow);
 
     model = sendmsg_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);
@@ -3789,45 +3778,35 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 }
 
 static void
-do_reflow(BalsaSendmsg * bsmsg, gint mode)
+reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    gint pos;
-    gchar *the_text;
-    GtkTextIter start, end, now;
+    GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
+    regex_t rex;
+
+    if (!bsmsg->flow)
+	return;
+
+    if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED)) {
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  _("Could not compile %s"),
+			  _("Quoted Text Regular Expression"));
+	return;
+    }
 
     sw_buffer_save(bsmsg);
 
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    the_text = gtk_text_iter_get_text(&start, &end);
+    g_signal_handler_block(buffer, bsmsg->changed_sig_id);
+    g_signal_handler_block(buffer, bsmsg->delete_range_sig_id);
+    libbalsa_unwrap_selection(buffer, &rex);
+    libbalsa_wrap_view(text_view, balsa_app.wraplength);
+    g_signal_handler_unblock(buffer, bsmsg->changed_sig_id);
+    g_signal_handler_unblock(buffer, bsmsg->delete_range_sig_id);
 
-    gtk_text_buffer_get_iter_at_mark(buffer, &now,
-                                     gtk_text_buffer_get_insert(buffer));
-    pos = gtk_text_iter_get_offset(&now);
-
-    reflow_string(the_text, mode, &pos, balsa_app.wraplength);
-
-    gtk_text_buffer_set_text(buffer, "", 0);
-    libbalsa_insert_with_url(buffer, the_text, NULL, NULL, NULL);
-    gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
-    gtk_text_buffer_place_cursor(buffer, &now);
-    gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(bsmsg->text),
-                                 gtk_text_buffer_get_insert(buffer),
-                                 0, FALSE, 0, 0);
-    g_free(the_text);
-}
-
-static void
-reflow_par_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    do_reflow(bsmsg, 0);
-}
-
-static void
-reflow_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    do_reflow(bsmsg, -1);
+    bsmsg->modified = TRUE;
+    gtk_text_view_scroll_to_mark(text_view,
+				 gtk_text_buffer_get_insert(buffer),
+				 0, FALSE, 0, 0);
 }
 
 /* To field "changed" signal callback. */
@@ -3958,6 +3937,8 @@ static void
 toggle_format_cb(GtkCheckMenuItem * check_menu_item, BalsaSendmsg * bsmsg)
 {
     bsmsg->flow = gtk_check_menu_item_get_active(check_menu_item);
+    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_SELECTED].widget,
+                             bsmsg->flow);
 }
 
 #ifdef HAVE_GPGME

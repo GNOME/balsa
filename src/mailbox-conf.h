@@ -51,6 +51,7 @@ typedef struct {
     GtkWidget *tls_mode;
     GtkTable  *table;      /* internal */
     GtkWidget *tls_option; /* internal */
+    GtkWidget *server;     /* internal */
     unsigned   used_rows;  /* internal */
 } BalsaServerConf;
 

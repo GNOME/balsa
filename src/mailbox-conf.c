@@ -80,7 +80,6 @@ struct _MailboxConfWindow {
 	} local;
 	/* for imap mailboxes & directories */
 	struct {
-	    GtkWidget *server;
 	    GtkWidget *port;
 	    GtkWidget *username;
             GtkWidget *remember;
@@ -92,7 +91,6 @@ struct _MailboxConfWindow {
 
 	/* for pop3 mailboxes */
 	struct {
-	    GtkWidget *server;
 	    GtkWidget *username;
 	    GtkWidget *password;
 	    GtkWidget *check;
@@ -149,11 +147,18 @@ get_combo_menu(unsigned cnt, const struct menu_data *data)
 }
 
 static void
-bsc_ssl_toggled_cb(GtkWidget * widget, BalsaServerConf *bsc)
+bsc_ssl_toggled_cb(GtkWidget * widget, BalsaServerConf * bsc)
 {
+    const gchar *host, *colon;
     gboolean newstate =
         !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
     gtk_widget_set_sensitive(bsc->tls_option, newstate);
+
+    host = gtk_entry_get_text(GTK_ENTRY(bsc->server));
+    if ((colon = strchr(host, ':')) != NULL)
+        gtk_editable_delete_text(GTK_EDITABLE(bsc->server), colon - host,
+                                 -1);
 }
 
 GtkWidget*
@@ -593,7 +598,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 
 
 	if (server->host)
-	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.server), 
+	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server), 
                                server->host);
 	if (server->user)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), 
@@ -626,7 +631,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
 	if (server->host)
-	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.server), 
+	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.bsc.server), 
                                server->host);
 	if (server->user)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.username),
@@ -675,12 +680,12 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 	    sensitive = FALSE;
     } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP ) ) {
 	if (!*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.folderpath))
-            || !*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.server))
+            || !*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.bsc.server))
             || !*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.username)))
 	    sensitive = FALSE;
     } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
 	if (!*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username))
-            || !*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.server)))
+            || !*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server)))
 	    sensitive = FALSE;
     }
 
@@ -706,7 +711,7 @@ fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
 
 	*name = g_strdup_printf(_("%s on %s"), *path,
 				gtk_entry_get_text(GTK_ENTRY
-						   (mcw->mb_data.imap.server)));
+						   (mcw->mb_data.imap.bsc.server)));
     }
 }
 
@@ -734,7 +739,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 						    (mcw->mb_data.pop3.password)));
     libbalsa_server_set_host(server,
 			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.pop3.server)),
+						(mcw->mb_data.pop3.bsc.server)),
                              balsa_server_conf_get_use_ssl
                              (&mcw->mb_data.pop3.bsc));
     server->tls_mode = balsa_server_conf_get_tls_mode(&mcw->mb_data.pop3.bsc);
@@ -779,7 +784,7 @@ update_imap_mailbox(MailboxConfWindow *mcw)
                                                        mb_data.imap.remember));
     libbalsa_server_set_host(server,
 			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.imap.server)),
+						(mcw->mb_data.imap.bsc.server)),
                              balsa_server_conf_get_use_ssl
                              (&mcw->mb_data.imap.bsc));
     server->tls_mode = balsa_server_conf_get_tls_mode(&mcw->mb_data.imap.bsc);
@@ -1048,7 +1053,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 				     mcw, 0, NULL, label);
     /* pop server */
     label = create_label(_("_Server:"), table, 1);
-    mcw->mb_data.pop3.server = create_entry(mcw->window, table,
+    mcw->mb_data.pop3.bsc.server = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
 				     mcw, 1, "localhost", label);
 
@@ -1139,7 +1144,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 
     /* imap server */
     label = create_label(_("_Server:"), table, ++row);
-    mcw->mb_data.imap.server = 
+    mcw->mb_data.imap.bsc.server = 
 	create_entry(mcw->window, table,
 		     GTK_SIGNAL_FUNC(check_for_blank_fields),
 		     mcw, row, "localhost", label);
@@ -1206,7 +1211,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     gtk_widget_show_all(notebook);
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
     gtk_widget_grab_focus(mcw->mailbox_name? 
-                          mcw->mailbox_name : mcw->mb_data.imap.server);
+                          mcw->mailbox_name : mcw->mb_data.imap.bsc.server);
     return notebook;
 }
 

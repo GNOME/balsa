@@ -51,7 +51,7 @@ struct _CommonDialogData {
 struct _FolderDialogData {
     FOLDER_CONF_COMMON;
     BalsaServerConf bsc;
-    GtkWidget *folder_name, *server, *port, *username, *remember,
+    GtkWidget *folder_name, *port, *username, *remember,
         *password, *subscribed, *list_inbox, *prefix;
     GtkWidget *use_ssl, *tls_mode;
     GtkWidget *connection_limit, *enable_persistent;
@@ -141,7 +141,7 @@ validate_folder(GtkWidget *w, FolderDialogData * fcw)
     gboolean sensitive = TRUE;
     if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)))
 	sensitive = FALSE;
-    else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->server)))
+    else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->bsc.server)))
 	sensitive = FALSE;
 
     gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, sensitive);
@@ -162,7 +162,7 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     const gchar *username;
     const gchar *host;
 
-    host = gtk_entry_get_text(GTK_ENTRY(fcw->server));
+    host = gtk_entry_get_text(GTK_ENTRY(fcw->bsc.server));
     username = gtk_entry_get_text(GTK_ENTRY(fcw->username));
 
     if (fcw->mbnode) {
@@ -309,7 +309,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     default_server = libbalsa_guess_imap_server();
     label = create_label(_("_Server:"), table, 1);
-    fcw->server = create_entry(fcw->dialog, table,
+    fcw->bsc.server = create_entry(fcw->dialog, table,
                               GTK_SIGNAL_FUNC(validate_folder),
                               fcw, 1, s ? s->host : default_server,
 			      label);

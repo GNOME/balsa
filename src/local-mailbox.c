@@ -35,8 +35,9 @@ do_traverse (GNode * node, gpointer data)
   gpointer *d = data;
   if (!node->data)
     return FALSE;
-  if (strcmp (((MailboxNode *) node->data)->name, (gchar *) d))
+  if (strcmp (((MailboxNode *) node->data)->name, (gchar *) d[0]))
     return FALSE;
+
   *(++d) = node;
   return TRUE;
 }
@@ -75,8 +76,15 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
   if (!strcmp (path, balsa_app.trash_path))
     return;
 
-  if (isdir && type != MAILBOX_MH)
-    node = g_node_new (mailbox_node_new (g_basename (path), NULL, TRUE));
+  if (isdir && type == MAILBOX_UNKNOWN)
+    {
+      node = g_node_new (mailbox_node_new (g_strdup (path), NULL, TRUE));
+      rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
+      if (rnode)
+	g_node_append (rnode, node);
+      else
+	g_node_append (balsa_app.mailbox_nodes, node);
+    }
   else
     {
       mailbox = mailbox_new (type);
@@ -143,6 +151,8 @@ read_dir (gchar * prefix, struct dirent *d)
       mailbox_type = mailbox_valid (filename);
       if (mailbox_type == MAILBOX_MH)
 	add_mailbox (d->d_name, filename, mailbox_type, 1);
+      else
+	add_mailbox (d->d_name, filename, MAILBOX_UNKNOWN, 1);
       dpc = opendir (filename);
       if (!dpc)
 	return;

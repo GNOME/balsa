@@ -180,6 +180,9 @@ buffy_add_mailbox(const char *path, const char *user, const char *passwd)
       (*tmp)->user   = user   ? safe_strdup (user)   : NULL;
       (*tmp)->passwd = passwd ? safe_strdup (passwd) : NULL;
       (*tmp)->next = NULL;
+      /* it is tempting to set magic right here */
+      (*tmp)->magic = 0;
+      
     }
 
     (*tmp)->new = 0;
@@ -308,7 +311,7 @@ int mutt_buffy_check (int force)
   for (tmp = Incoming; tmp; tmp = tmp->next)
   {
 #ifdef USE_IMAP
-    if ((tmp->magic == M_IMAP) || mx_is_imap (tmp->path))
+    if (mx_is_imap (tmp->path))
       tmp->magic = M_IMAP;
     else
 #endif

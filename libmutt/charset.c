@@ -31,7 +31,6 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include <iconv.h>
 
 #include "mutt.h"
 #include "charset.h"
@@ -179,7 +178,7 @@ PreferredMIMENames[] =
   
   
   /* Suggested by Ionel Mugurel Ciobica <tgakic@sg10.chem.tue.nl> */
-  { "latin0"            "iso-8859-15"   }, /* this is not a bug */
+  { "latin0",            "iso-8859-15"   }, /* this is not a bug */
   
   { "iso_8859-16",      "iso-8859-16"   },
   { "latin10",          "iso-8859-16"   }, /* this is not a bug */
@@ -294,7 +293,7 @@ iconv_t iconv_open (const char *tocode, const char *fromcode)
   return (iconv_t)(-1);
 }
 
-size_t iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft,
+size_t iconv (iconv_t cd, ICONV_CONST **inbuf, size_t *inbytesleft,
 	      char **outbuf, size_t *outbytesleft)
 {
   return 0;
@@ -351,12 +350,12 @@ iconv_t mutt_iconv_open (const char *tocode, const char *fromcode, int flags)
  * if you're supplying an outrepl, the target charset should be.
  */
 
-size_t mutt_iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft,
+size_t mutt_iconv (iconv_t cd, ICONV_CONST char **inbuf, size_t *inbytesleft,
 		   char **outbuf, size_t *outbytesleft,
 		   const char **inrepls, const char *outrepl)
 {
   size_t ret = 0, ret1;
-  const char *ib = *inbuf;
+  ICONV_CONST char *ib = *inbuf;
   size_t ibl = *inbytesleft;
   char *ob = *outbuf;
   size_t obl = *outbytesleft;
@@ -374,7 +373,7 @@ size_t mutt_iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft,
 	const char **t;
 	for (t = inrepls; *t; t++)
 	{
-	  const char *ib1 = *t;
+	  ICONV_CONST char *ib1 = *t;
 	  size_t ibl1 = strlen (*t);
 	  char *ob1 = ob;
 	  size_t obl1 = obl;
@@ -428,7 +427,7 @@ int mutt_convert_string (char **ps, const char *from, const char *to, int flags)
   if (to && from && (cd = mutt_iconv_open (to, from, flags)) != (iconv_t)-1)
   {
     int len;
-    const char *ib;
+    ICONV_CONST char *ib;
     char *buf, *ob;
     size_t ibl, obl;
     const char **inrepls = 0;
@@ -528,7 +527,7 @@ int fgetconv (FGETCONV *_fc)
   if (fc->ibl)
   {
     size_t obl = sizeof (fc->bufo);
-    iconv (fc->cd, (const char **)&fc->ib, &fc->ibl, &fc->ob, &obl);
+    iconv (fc->cd, (ICONV_CONST char **)&fc->ib, &fc->ibl, &fc->ob, &obl);
     if (fc->p < fc->ob)
       return (unsigned char)*(fc->p)++;
   }
@@ -552,7 +551,7 @@ int fgetconv (FGETCONV *_fc)
   if (fc->ibl)
   {
     size_t obl = sizeof (fc->bufo);
-    mutt_iconv (fc->cd, (const char **)&fc->ib, &fc->ibl, &fc->ob, &obl,
+    mutt_iconv (fc->cd, (ICONV_CONST char **)&fc->ib, &fc->ibl, &fc->ob, &obl,
 		fc->inrepls, 0);
     if (fc->p < fc->ob)
       return (unsigned char)*(fc->p)++;

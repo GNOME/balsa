@@ -1,3 +1,34 @@
+2002-05-30  Carlos Morgado  <chbm@chbm.nu>
+
+	* send.c: unused, removed  
+
+	* sendlib.c: 
+	* rfc2047.c: 
+	* handler.c: 
+	* configure.in: 
+	* charset.h: iconv changes
+
+	* imap/util.c: 
+	* imap/message.c: 
+	* imap/imap.c:
+	* imap/command.c: 
+	* imap/message.c: 
+	* imap/browse.c: 
+	* mx.c: 
+	* muttlib.c: 
+	* mailbox.h: 
+	* lib.h: 
+	* lib.c: 
+	* buffy.c: 
+	* browser.c: 
+	* parse.c: 
+	* mx.c: 
+	* mutt_sasl.c: 
+	* mbox.c: 
+	* init.c: 
+	* charset.c: 
+	sync with mutt-1.4. 
+	
 2002-05-20  Carlos Morgado  <chbm@chbm.nu>
 
 	* charset.c (PreferredMIMENames): add PoS ks_c_5601-1987

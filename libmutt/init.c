@@ -1121,8 +1121,10 @@ static int parse_set (BUFFER *tmp, BUFFER *s, unsigned long data, BUFFER *err)
       s->dptr++;
       mutt_extract_token (tmp, s , 0);
 
-      if (parse_sort ((short *) MuttVars[idx].data, tmp->data, map, err) == -1)
+      if (parse_sort ((short *) MuttVars[idx].data, tmp->data, map, err) == -1) {
+	r = -1;
 	break;
+      }
     }
     else
     {

@@ -582,17 +582,6 @@ int imap_open_mailbox (CONTEXT* ctx)
       break;
 
     pc = idata->cmd.buf + 2;
-    pc = imap_next_word (pc);
-    if (!ascii_strncasecmp ("EXISTS", pc, 6))
-    {
-      /* imap_handle_untagged will have picked up the EXISTS message and
-       * set the NEW_MAIL flag. We clear it here. */
-      idata->reopen &= ~IMAP_NEWMAIL_PENDING;
-      count = idata->newMailCount;
-      idata->newMailCount = 0;
-    }
-
-    pc = idata->cmd.buf + 2;
 
     /* Obtain list of available flags here, may be overridden by a
      * PERMANENTFLAGS tag in the OK response */
@@ -625,6 +614,15 @@ int imap_open_mailbox (CONTEXT* ctx)
       idata->uid_validity = atoi(pc+15);
     }
 #endif
+    else
+    {
+      pc = imap_next_word (pc);
+      if (!ascii_strncasecmp ("EXISTS", pc, 6))
+      {
+	count = idata->newMailCount;
+	idata->newMailCount = 0;
+      }
+    }
   }
   while (rc == IMAP_CMD_CONTINUE);
 
@@ -1111,6 +1109,7 @@ void imap_close_mailbox (CONTEXT* ctx)
     idata->reopen &= IMAP_REOPEN_ALLOW;
     idata->state = IMAP_AUTHENTICATED;
     FREE (&(idata->mailbox));
+    mutt_free_list (&idata->flags);
   }
 
   /* free IMAP part of headers */

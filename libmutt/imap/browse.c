@@ -491,15 +491,7 @@ static int browse_get_namespace (IMAP_DATA* idata, char* nsbuf, int nsblen,
       for (type = IMAP_NS_PERSONAL; *s; type++)
       {
 	s = imap_next_word (s);
-#ifdef LIBMUTT
-	/* we reverte this change in libmutt. aparently we triger
-	   a folder scanning bug with "" namespaces that isn't seen on mutt. 
-	   this has been reported on mutt-devel
-	*/
 	if (*s && ascii_strncmp (s, "NIL", 3))
-#else
-	if (ascii_strncmp (s, "NIL", 3))
-#endif
 	{
 	  s++;
 	  while (*s && *s != ')')
@@ -559,8 +551,10 @@ static int browse_get_namespace (IMAP_DATA* idata, char* nsbuf, int nsblen,
 	      nsi++;
 	      (*nns)++;
 	    }
-	    while (*s && *s != ')') s++;
-	    s++;
+	    while (*s && *s != ')')
+	      s++;
+	    if (*s)
+	      s++;
 	  }
 	}
       }

@@ -96,6 +96,10 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
   while ((msgend) >= idata->ctx->hdrmax)
     mx_alloc_memory (idata->ctx);
 
+  oldmsgcount = ctx->msgcount;
+  idata->reopen &= ~IMAP_NEWMAIL_PENDING;
+  idata->newMailCount = 0;
+  
   for (msgno = msgbegin; msgno <= msgend ; msgno++)
   {
     if (ReadInc && (!msgno || ((msgno+1) % ReadInc == 0)))
@@ -125,8 +129,6 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
     memset (&h, 0, sizeof (h));
     h.data = safe_calloc (1, sizeof (IMAP_HEADER_DATA));
 
-    oldmsgcount = ctx->msgcount;
-
     /* this DO loop does two things:
      * 1. handles untagged messages, so we can try again on the same msg
      * 2. fetches the tagged response at the end of the last message.
@@ -150,7 +152,6 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
       /* update context with message header */
       ctx->hdrs[msgno] = mutt_new_header ();
 
-      ctx->hdrs[msgno]->index = ctx->msgcount;
       ctx->hdrs[msgno]->index = h.sid - 1;
       if (h.sid != ctx->msgcount + 1)
 	dprint (1, (debugfile, "imap_read_headers: msgcount and sequence ID are inconsistent!"));
@@ -179,9 +180,6 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
     while ((rc != IMAP_CMD_OK) && ((mfhrc == -1) ||
       ((msgno + 1) >= fetchlast)));
 
-    if (ctx->msgcount > oldmsgcount)
-      mx_update_context (ctx, ctx->msgcount - oldmsgcount);
-
     if ((mfhrc < -1) || ((rc != IMAP_CMD_CONTINUE) && (rc != IMAP_CMD_OK)))
     {
       imap_free_header_data ((void**) &h.data);
@@ -190,19 +188,21 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
       return -1;
     }
 	
-    /* h.data shouldn't be freed here, it is kept in ctx->headers */
-
     /* in case we get new mail while fetching the headers */
     if (idata->reopen & IMAP_NEWMAIL_PENDING)
     {
       msgend = idata->newMailCount - 1;
       while ((msgend) >= ctx->hdrmax)
 	mx_alloc_memory (ctx);
-      idata->status &= ~IMAP_NEWMAIL_PENDING;
+      idata->reopen &= ~IMAP_NEWMAIL_PENDING;
+      idata->newMailCount = 0;
     }
   }
 
   fclose(fp);
+
+  if (ctx->msgcount > oldmsgcount)
+    mx_update_context (ctx, ctx->msgcount - oldmsgcount);
 
   return msgend;
 }
@@ -358,8 +358,6 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
    * envelope into the old one. Also messy and lowlevel. */
   if (ctx->id_hash && h->env->message_id)
     hash_delete (ctx->id_hash, h->env->message_id, h, NULL);
-  if (ctx->subj_hash && h->env->real_subj)
-    hash_delete (ctx->subj_hash, h->env->real_subj, h, NULL);
   mutt_free_envelope (&h->env);
 #ifdef LIBMUTT
   h->env = mutt_read_rfc822_header (msg->fp, h, 1, 0);
@@ -368,8 +366,6 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
 #endif
   if (ctx->id_hash && h->env->message_id)
     hash_insert (ctx->id_hash, h->env->message_id, h, 0);
-  if (ctx->subj_hash && h->env->real_subj)
-    hash_insert (ctx->subj_hash, h->env->real_subj, h, 1);
 
   /* see above. We want the new status in h->read, so we unset it manually
    * and let mutt_set_flag set it correctly, updating context. */

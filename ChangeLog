@@ -1,5 +1,7 @@
-2004-11-21 13:30  PeterB
+2004-11-21 15:14  PeterB
 
+	* src/: balsa-index.c, balsa-index.h: catch "row-collapsed" events;
+	check for "next message" on expand and collapse events.
 	* src/sendmsg-window.c: don't use
 	libbalsa_address_entry_show_matches when NEW_ADDRESS_ENTRY_WIDGET
 	is undefined.

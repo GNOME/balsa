@@ -1858,15 +1858,13 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 	g_value_set_pointer(value, msg); break;
     case LB_MBOX_WEIGHT_COL:
 	g_value_set_uint(value,
-			 (msg && !LIBBALSA_MESSAGE_IS_DELETED(msg)
-			  && LIBBALSA_MESSAGE_IS_UNREAD(msg)) ?
+			 (msg && LIBBALSA_MESSAGE_IS_UNREAD(msg)) ?
 			 PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
 	break;
     case LB_MBOX_STYLE_COL:
 	g_value_set_uint(value,
-			 (msg && !LIBBALSA_MESSAGE_IS_DELETED(msg)
-			  && lbm_node_has_unread_child(lmm,
-						       iter->user_data)) ?
+			 (msg && lbm_node_has_unread_child(lmm, iter->
+							   user_data)) ?
 			 PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
 	break;
     }

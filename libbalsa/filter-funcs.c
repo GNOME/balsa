@@ -293,7 +293,7 @@ cond_to_string(LibBalsaCondition * cond, GString *res)
     switch(cond->type) {
     case CONDITION_STRING:
         g_string_append_printf(res, "STRING %u ", cond->match.string.fields);
-        if (cond->match.string.fields & CONDITION_MATCH_US_HEAD) {
+        if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_US_HEAD)) {
             append_quoted_string(res, cond->match.string.user_header);
             g_string_append_c(res, ' ');
         }
@@ -419,9 +419,9 @@ libbalsa_condition_clone(LibBalsaCondition* cnd)
     case CONDITION_STRING:
         new_cnd->match.string.string  = g_strdup(cnd->match.string.string);
 	new_cnd->match.string.fields = cnd->match.string.fields;
-    new_cnd->match.string.user_header 
-        = (cnd->match.string.user_header)
-        ? g_strdup(cnd->match.string.user_header) : NULL;
+	new_cnd->match.string.user_header =
+	    (cnd->match.string.user_header)
+	    ? g_strdup(cnd->match.string.user_header) : NULL;
         break;
     case CONDITION_REGEX:
 # if 0

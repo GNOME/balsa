@@ -233,28 +233,27 @@ balsa_message_class_init(BalsaMessageClass * klass)
 static void
 balsa_message_init(BalsaMessage * bm)
 {
-    bm->table = gtk_table_new(3, 1, FALSE);
-    gtk_container_add(GTK_CONTAINER(bm), bm->table);
+    /* The vbox widget */
+    bm->vbox = gtk_vbox_new(FALSE, 1);
+    gtk_container_add(GTK_CONTAINER(bm), bm->vbox);
+    gtk_widget_show(bm->vbox);
 
-    gtk_widget_show(bm->table);
-
-    bm->content = gtk_viewport_new(NULL, NULL);
-
-    gtk_table_attach(GTK_TABLE(bm->table), bm->content, 0, 1, 1,
-		     2, GTK_EXPAND | GTK_FILL,
-		     GTK_EXPAND | GTK_FILL, 0, 1);
-    gtk_widget_show(bm->content);
-
+    /* Widget to hold headers */
     bm->header_text = gtk_text_view_new();
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(bm->header_text), 2);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(bm->header_text), 2);
     gtk_signal_connect(GTK_OBJECT(bm->header_text), "key_press_event",
 		       (GtkSignalFunc) balsa_message_key_press_event,
 		       (gpointer) bm);
+    gtk_box_pack_start(GTK_BOX(bm->vbox), bm->header_text, FALSE, FALSE, 0);
 
-    gtk_table_attach(GTK_TABLE(bm->table), bm->header_text, 0, 1, 0, 1,
-		     GTK_EXPAND | GTK_FILL, 0, 0, 1);
+    /* Widget to hold content */
+    bm->content = gtk_viewport_new(NULL, NULL);
+    gtk_box_pack_start(GTK_BOX(bm->vbox), bm->content, TRUE, TRUE, 0);
+    gtk_widget_show(bm->content);
 
+    /* Widget to hold icons */
     bm->part_list = gnome_icon_list_new(100, NULL, FALSE);
-
     gnome_icon_list_set_selection_mode(GNOME_ICON_LIST(bm->part_list),
 				       GTK_SELECTION_MULTIPLE);
     gtk_signal_connect(GTK_OBJECT(bm->part_list), "select_icon",
@@ -262,9 +261,7 @@ balsa_message_init(BalsaMessage * bm)
     gtk_signal_connect(GTK_OBJECT(bm->part_list), "size_request",
 		       GTK_SIGNAL_FUNC(balsa_icon_list_size_request),
 		       (gpointer) bm);
-
-    gtk_table_attach(GTK_TABLE(bm->table), bm->part_list, 0, 1, 2, 3,
-		     GTK_EXPAND | GTK_FILL, 0, 0, 1);
+    gtk_box_pack_end(GTK_BOX(bm->vbox), bm->part_list, FALSE, FALSE, 0);
 
     bm->current_part = NULL;
     bm->message = NULL;
@@ -1234,8 +1231,8 @@ typedef struct _message_url_t {
 } message_url_t;
 
 static void handle_url(const message_url_t* url);
-static void emphasize_url(GtkWidget * widget, message_url_t * url,
-                          gboolean set);
+static void pointer_over_url(GtkWidget * widget, message_url_t * url,
+                             gboolean set);
 static message_url_t *find_url(GtkWidget * widget, gint x, gint y,
                                GList * url_list);
 
@@ -1429,17 +1426,12 @@ check_over_url(GtkWidget * widget, GdkEventMotion * event,
             was_over_url = TRUE;
         }
         if (url != current_url) {
-            if (current_url) {
-                emphasize_url(widget, current_url, FALSE);
-                balsa_gtk_html_on_url(NULL, NULL);
-            }
-            balsa_gtk_html_on_url(NULL, url->url);
-            emphasize_url(widget, url, TRUE);
+            pointer_over_url(widget, current_url, FALSE);
+            pointer_over_url(widget, url, TRUE);
         }
     } else if (was_over_url) {
         gdk_window_set_cursor(window, url_cursor_normal);
-        emphasize_url(widget, current_url, FALSE);
-        balsa_gtk_html_on_url(NULL, NULL);
+        pointer_over_url(widget, current_url, FALSE);
         was_over_url = FALSE;
     }
 
@@ -1586,6 +1578,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         item = gtk_text_view_new();
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(item));
+
+        gtk_text_view_set_left_margin(GTK_TEXT_VIEW(item), 2);
+        gtk_text_view_set_right_margin(GTK_TEXT_VIEW(item), 2);
 
         /* set the message font */
         gtk_widget_modify_font(item,
@@ -2976,19 +2971,24 @@ quote_tag(GtkTextBuffer * buffer, gint level)
     return tag;
 }
 
-/* emphasize_url:
- * change underlining of a url.
+/* pointer_over_url:
+ * change style of a url and set/clear the status bar.
  */
 static void
-emphasize_url(GtkWidget * widget, message_url_t * url, gboolean set)
+pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
-    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    GtkTextBuffer *buffer;
+    GtkTextTagTable *table;
     static const gchar name[] = "emphasize";
-    GtkTextTag *tag = gtk_text_tag_table_lookup(table, name);
+    GtkTextTag *tag;
     GtkTextIter start, end;
 
+    if (!url)
+        return;
+
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+    table = gtk_text_buffer_get_tag_table(buffer);
+    tag = gtk_text_tag_table_lookup(table, name);
     if (!tag)
         tag = gtk_text_buffer_create_tag(buffer, name, 
                                          "underline",
@@ -2999,14 +2999,18 @@ emphasize_url(GtkWidget * widget, message_url_t * url, gboolean set)
     gtk_text_buffer_get_iter_at_offset(buffer, &start, url->start);
     gtk_text_buffer_get_iter_at_offset(buffer, &end, url->end);
     
-    if (set)
+    if (set) {
         gtk_text_buffer_apply_tag(buffer, tag, &start, &end);
-    else
+        balsa_gtk_html_on_url(NULL, url->url);
+    } else {
         gtk_text_buffer_remove_tag(buffer, tag, &start, &end);
+        balsa_gtk_html_on_url(NULL, NULL);
+    }
 }
 
 /* find_url:
- * look in widget at coordinates x, y for a URL in url_list. */
+ * look in widget at coordinates x, y for a URL in url_list.
+ */
 static message_url_t *
 find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
 {

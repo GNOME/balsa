@@ -298,8 +298,11 @@ static GnomeUIInfo file_menu[] = {
      GNOME_STOCK_MENU_MAIL_SND, 'A', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_PRINT_POS 6
-    GNOMEUIINFO_MENU_PRINT_ITEM(message_print_cb, NULL),
+    { GNOME_APP_UI_ITEM, N_("_Print..."), NULL,
+      message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK, 
+      GNOME_STOCK_MENU_PRINT, 'P', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_PRINT_POS 8
     {
      GNOME_APP_UI_ITEM, N_("_Address Book..."),
      N_("Open the address book"),
@@ -471,9 +474,10 @@ static GnomeUIInfo message_menu[] = {
 	GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
     },
 #define MENU_MESSAGE_DELETE_POS 11
-    GNOMEUIINFO_ITEM_STOCK(N_("_Delete"), 
-			   N_("Delete the current message"),
-			   delete_message_cb, GNOME_STOCK_MENU_TRASH),
+    { GNOME_APP_UI_ITEM, N_("_Delete"), 
+      N_("Delete the current message"),
+      delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      GNOME_STOCK_MENU_TRASH, 'D', GDK_CONTROL_MASK, NULL },
 #define MENU_MESSAGE_UNDEL_POS 12
     /* U */
     {

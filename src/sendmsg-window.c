@@ -155,15 +155,15 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 
 #define MENU_FILE_SEND_POS 3
-    GNOMEUIINFO_ITEM_STOCK(N_("_Send"),
-			   N_("Send this message"),
-			   send_message_cb, GNOME_STOCK_MENU_MAIL_SND),
-
+    { GNOME_APP_UI_ITEM, N_("_Send"), 
+      N_("Send this message"),
+      send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      GNOME_STOCK_MENU_MAIL_SND, 'S', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 4
-    GNOMEUIINFO_ITEM_STOCK(N_("_Queue"),
-			   N_("Queue this message in Outbox for sending"),
-			   queue_message_cb, GNOME_STOCK_MENU_MAIL_SND),
-
+    { GNOME_APP_UI_ITEM, N_("_Queue"), 
+      N_("Queue this message in Outbox for sending"),
+      queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+      GNOME_STOCK_MENU_MAIL_SND, 'Q', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_POSTPONE_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
 			   postpone_message_cb, GNOME_STOCK_MENU_SAVE),

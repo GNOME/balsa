@@ -1,5 +1,9 @@
 2001-08-31  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* src/main-window.c, src/sendmsg-window.c: add some shortcuts (#57657).
+	
+2001-08-31  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* README, NEWS, configure.in: release balsa-1.2.pre3
 	* src/sendmsg-window.c: some people believe English means American
 	English.

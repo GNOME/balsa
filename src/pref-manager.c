@@ -241,6 +241,8 @@ ok_preferences_manager ()
    */
   gtk_widget_destroy (pmw->window);
   save_global_settings ();
+
+  if (!balsa_app.current_index) open_main_window();
 }
 
 

@@ -257,6 +257,20 @@
 		  </varlistentry>
 		</variablelist>
 	      </listitem>
+
+	      <listitem>
+		<para>
+		  <menuchoice>
+		    <shortcut>
+		      <keysym>C</keysym>
+		    </shortcut>
+		    <guimenu>File</guimenu>
+		    <guimenuitem>Continue</guimenuitem>
+		  </menuchoice> &mdash; 
+
+		  Continue a postponed message.
+		</para>
+	      </listitem>
 	      
 	      <listitem>
 		<para>
@@ -361,18 +375,6 @@
 		</para>
 	      </listitem>
 
-	      <listitem>
-		<para>
-		  <menuchoice>
-		    <guimenu>Edit</guimenu>
-		    <guimenuitem>Preferences...</guimenuitem>
-		  </menuchoice> &mdash; 
-
-		  Open the <link
-		  linkend="win-config">Preferences</link> window to
-		  change the settings of <application>Balsa</application>.
-		</para>
-	      </listitem>
 	    </itemizedlist>
 
 	  </listitem>
@@ -380,8 +382,10 @@
 
 	<varlistentry>
 	  <term><guimenu>View</guimenu></term>
+
 	  <listitem>
-	    
+	    <para>Menu for changing how messages are viewed.</para>
+
 	    <itemizedlist>
 	      <listitem>
 		<para>
@@ -448,19 +452,6 @@
 
 	    <itemizedlist>
 	      <listitem>
-		<para><menuchoice>
-		    <shortcut>
-		      <keysym>M</keysym>
-		    </shortcut>
-		    <guimenu>Message</guimenu>
-		    <guimenuitem>New</guimenuitem>
-		  </menuchoice> &mdash; 
-
-		  Send a new message.
-		</para>
-	      </listitem>
-
-	      <listitem>
 		<para>
 		  <menuchoice>
 		    <shortcut>
@@ -503,19 +494,6 @@
 		</para>
 	      </listitem>
 
-	      <listitem>
-		<para>
-		  <menuchoice>
-		    <shortcut>
-		      <keysym>C</keysym>
-		    </shortcut>
-		    <guimenu>Message</guimenu>
-		    <guimenuitem>Continue</guimenuitem>
-		  </menuchoice> &mdash; 
-
-		  Continue a postponed message.
-		</para>
-	      </listitem>
 
 	      <listitem>
 		<para>
@@ -744,6 +722,30 @@
 	      </listitem>
 	    </itemizedlist>
 
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guimenu>Settings</guimenu></term>
+	  <listitem>
+	    <para>Menu for changing <application>Balsas</application>
+	    configuration.</para>
+
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  <menuchoice>
+		    <guimenu>Settings</guimenu>
+		    <guimenuitem>Preferences...</guimenuitem>
+		  </menuchoice> &mdash; 
+		  
+		  Open the <link
+		  linkend="win-config">Preferences</link> window to
+		  change the settings of
+		  <application>Balsa</application>.
+		</para>
+	      </listitem>
+	    </itemizedlist>
 	  </listitem>
 	</varlistentry>
 

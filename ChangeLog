@@ -1,3 +1,9 @@
+2000-10-31  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/balsa.sgml: Manual updates.
+
+	* help/C/images/main-window.png: Update to reflect new menus.
+
 2000-10-31  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* src/sendmsg-window.c (add_attachment): Remove

@@ -228,7 +228,7 @@ mblist_get_selected_node(BalsaMBList *mbl)
 
     g_assert(mbl != NULL);
 
-    node = gtk_ctree_node_nth(GTK_CTREE(mbl), GTK_CLIST(mbl)->focus_row);
+    node = mbl->currently_selected_ctree_node;
     return gtk_ctree_node_get_row_data(GTK_CTREE(mbl), node);
 }
 

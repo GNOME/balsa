@@ -1889,7 +1889,7 @@ libbalsa_move_forward_character(LibBalsaAddressEntry *address_entry)
     } else if (g_list_next(input->active)) {
 	input->active = g_list_next(input->active);
 	addy = input->active->data;
-	addy->cursor = strlen(addy->user);
+	addy->cursor = 0;
     }
 }
 

@@ -1487,6 +1487,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
     gboolean select_next = TRUE;
     GList *messages=NULL;
     LibBalsaMailbox *orig;
+    gint message_count = 0;
 
     /* select the previous message if we're at the bottom of the index */
     if (GTK_CLIST(index->ctree)->rows - 1 == 
@@ -1498,6 +1499,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
 	message = gtk_ctree_node_get_row_data(index->ctree, list->data);
 	messages= g_list_append(messages, message);
 	orig = message->mailbox; /* sloppy way */
+	++message_count;
     }
     if(messages) {
 	if (move_to_trash && (index != trash)) {
@@ -1508,7 +1510,7 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
     }
     
     /* select another message depending on where we are in the list */
-    if (GTK_CLIST(index->ctree)->rows > 1) {
+    if (GTK_CLIST(index->ctree)->rows > message_count) {
         if (select_next)
             balsa_index_select_next(index);
 	else
@@ -1967,6 +1969,8 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     GList *list, *messages;
     LibBalsaMessage* message;
     BalsaMailboxNode *mbnode;
+    gboolean select_next = TRUE;
+    gint message_count = 0;
 
     g_return_if_fail(data != NULL);
 
@@ -1981,17 +1985,32 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     if (bindex->mailbox_node->mailbox == mbnode->mailbox)
 	return;
 
+    /* select the previous message if we're at the bottom of the index */
+    if (clist->rows - 1 == bi_get_largest_selected(clist))
+        select_next = FALSE;
+
+
     messages=NULL;
     for (list = clist->selection; list;list = list->next) {
 	message = gtk_ctree_node_get_row_data(GTK_CTREE(bindex->ctree), 
 					      list->data);
 	messages=g_list_append(messages, message);
+	++message_count;
     }
 
     if(messages!=NULL) {
 	balsa_messages_move(messages, mbnode->mailbox);
 	g_list_free(messages);
     }
+   
+    /* select another message depending on where we are in the list */
+    if (clist->rows > message_count) {
+        if (select_next)
+            balsa_index_select_next(bindex);
+        else
+            balsa_index_select_previous(bindex);
+    }
+
 
     libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
 

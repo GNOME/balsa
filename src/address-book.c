@@ -513,21 +513,20 @@ balsa_address_book_select_address(GtkWidget *widget, gint row, gint column,
 
   Only sane if composing. Move to address list.
  */
-static void balsa_address_book_select_recipient(GtkWidget *widget, gint row, gint column,
-					      GdkEventButton *event, BalsaAddressBook *ab)
+static void balsa_address_book_select_recipient(GtkWidget *widget, 
+						gint row, gint column,
+						GdkEventButton *event, 
+						BalsaAddressBook *ab)
 {
-    g_return_if_fail ( BALSA_IS_ADDRESS_BOOK(ab) );
-    g_return_if_fail ( ab->composing );
+    g_return_if_fail( BALSA_IS_ADDRESS_BOOK(ab) );
+    g_return_if_fail( ab->composing );
 
     if ( event == NULL )
 	return;
 
-    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
-	if ( ab->composing ) {
+    if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS)
 	    balsa_address_book_swap_clist_entry(GTK_CLIST(ab->recipient_clist),
 						GTK_CLIST(ab->address_clist));
-	}
-    }
 }
 
 /*

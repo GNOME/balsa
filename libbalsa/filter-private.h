@@ -65,9 +65,9 @@
 #define FILTER_MATCH_SUBJECT 1<<5	/* match in the Subject field */
 
 /* FILTER_SIMPLE macros */
-#define FILTER_SETMATCH(x, y) ((((filter*)(x))->matchfields) |= (y))
-#define FILTER_CLRMATCH(x, y) ((((filter*)(x))->matchfields) &= ~(y))
-#define FILTER_CHKMATCH(x, y) ((((filter*)(x))->matchfields) & (y))
+#define FILTER_SETMATCH(x, y) ((((filter*)(x))->match_fields) |= (y))
+#define FILTER_CLRMATCH(x, y) ((((filter*)(x))->match_fields) &= ~(y))
+#define FILTER_CHKMATCH(x, y) ((((filter*)(x))->match_fields) & (y))
 
 /* regex struct */
 typedef struct _filter_regex {

@@ -1,3 +1,16 @@
+2001-07-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.c: wrong mailbox was offered to delete when 
+	mailbox switching using tabs (Peter Bloomfield).
+	* src/balsa-index.c: open a new message (when available) after
+	transfer. Do not show wrong warning messages after multiple delete.
+	* libbalsa/address-entry.c: place cursor at the beginning (Emmanuel).
+	* libbalsa/filter-funcs.c: clear one more field.
+	* libbalsa/filter-private.h: fix field names (not yet used).
+	* src/address-book.c: remove redundant test.
+
+	* balsa.spec.in: cleaned up (Spider <spider@darkmere.wanfear.com>)
+
 2001-07-01  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/main.c: 

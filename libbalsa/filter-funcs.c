@@ -158,6 +158,7 @@ filter_new(void)
 	return (NULL);
     }
 
+    newfil->name=NULL;
     newfil->type = FILTER_NONE;
     newfil->flags = FILTER_EMPTY;
     newfil->match_fields = FILTER_EMPTY;

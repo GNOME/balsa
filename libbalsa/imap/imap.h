@@ -24,8 +24,8 @@ typedef enum {
 } ImapMboxFlag;
 
 typedef unsigned ImapMboxFlags;
-#define IMAP_MBOX_HAS_FLAG(flg,f) ( (flg) & (1 << (f)))
-#define IMAP_MBOX_SET_FLAG(flg,f) do{ (flg) |= 1 << (f); }while(0)
+#define IMAP_MBOX_HAS_FLAG(flg,f) ((flg) &  (1 << (f)))
+#define IMAP_MBOX_SET_FLAG(flg,f) ((flg) |= (1 << (f)))
 
 /* see section 2.3.2 of draft-crispin-imapv-20.txt */
 typedef enum {

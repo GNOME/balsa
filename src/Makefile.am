@@ -22,6 +22,7 @@ balsa_SOURCES =	\
 	print.c			\
 	save-restore.c		\
 	sendmsg-window.c	\
+	address-book.h		\
 	balsa-app.h		\
 	balsa-icons.h		\
 	balsa-index.h		\
@@ -68,3 +69,15 @@ balsa_LDADD = \
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1205,7 +1205,8 @@ lbml_thread_message(GNode * node, ThreadingInfo * ti)
 				     g_list_last(refs)->data);
     if (!parent)
 	parent = ti->msg_tree;
-    if (parent != node->parent)
+    if (parent != node->parent && parent != node
+	&& !g_node_is_ancestor(node, parent))
 	libbalsa_mailbox_unlink_and_prepend(ti->mailbox, node, parent);
 
     return FALSE;

@@ -1395,14 +1395,11 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     return TRUE;
 }
 
-LibBalsaMessage*
+static LibBalsaMessage*
 libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
     LibBalsaMailboxImap *mimap;
-
-    g_return_val_if_fail (LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
-    g_return_val_if_fail (msgno > 0, NULL);
 
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
@@ -1819,13 +1816,9 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 	g_assert_not_reached();
 	new_tree = NULL;
     }
-    if(!new_tree) return;
-    if(mailbox->msg_tree)
-	g_node_destroy(mailbox->msg_tree);
-    mailbox->msg_tree = new_tree;
 
-    /* FIXME: do not only just invalidate iterators, force update as well */
-    mailbox->stamp++;
+    if (new_tree)
+	libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
 }
 
 static gint
@@ -1846,8 +1839,6 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
     GArray *tmp;
     len = array->len;
 
-    if(mbox->view->threading_type != LB_MAILBOX_THREADING_FLAT)
-        return; /* FIXME: implement threading with sorting */
     if(mbox->sort_column_id == LB_MBOX_MSGNO_COL) {
         g_array_sort_with_data(array, (GCompareDataFunc)lbmi_compare_func,
                                GINT_TO_POINTER(mbox->order ==

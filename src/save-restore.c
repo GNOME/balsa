@@ -1592,30 +1592,19 @@ config_views_load(void)
 }
 
 /* config_views_save:
-   iterates over all mailboxes and save the views.
+   iterates over all mailbox views.
 */
-static gboolean
-save_view(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
-	  gpointer user_data)
+static void
+save_view(const gchar * url, LibBalsaMailboxView * view)
 {
-    BalsaMailboxNode *mn;
-    LibBalsaMailbox *mailbox;
-    LibBalsaMailboxView *view;
     gchar *url_enc;
     gchar *prefix;
-    
-    gtk_tree_model_get(model, iter, 0, &mn, -1);
-    mailbox = mn->mailbox;
-    g_object_unref(mn);
-    if (!mailbox)
-	return FALSE;
 
-    view = mailbox->view;
     if (!view || view->in_sync)
-	return FALSE;
+	return;
     view->in_sync = TRUE;
 
-    url_enc = libbalsa_urlencode(mn->mailbox->url);
+    url_enc = libbalsa_urlencode(url);
     prefix = g_strconcat(BALSA_CONFIG_PREFIX VIEW_BY_URL_SECTION_PREFIX,
 			 url_enc, "/", NULL);
     g_free(url_enc);
@@ -1650,7 +1639,6 @@ save_view(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
 	gnome_config_set_bool("Open",	    view->open);
 
     gnome_config_pop_prefix();
-    return FALSE;
 }
 
 void
@@ -1658,8 +1646,8 @@ config_views_save(void)
 {
     config_clean_sections(VIEW_SECTION_PREFIX);
     /* save current */
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   save_view, NULL);
+    g_hash_table_foreach(libbalsa_mailbox_view_table, (GHFunc) save_view,
+			 NULL);
 }
 
 static void

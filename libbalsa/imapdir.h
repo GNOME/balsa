@@ -30,7 +30,7 @@ struct _ImapDir
     gchar *host;
     gint port;
     GNode* file_tree; /* GNode structure representing the IMAP directory */
-    int ignore_hidden:1;
+    gboolean ignore_hidden;
 };
 
 ImapDir *imapdir_new(void);

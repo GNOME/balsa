@@ -806,17 +806,21 @@ int mx_close_mailbox (CONTEXT *ctx)
   if (read_msgs && quadoption (OPT_MOVE) != M_NO)
   {
     char *p;
-
+#ifndef LIBMUTT
     if ((p = mutt_find_hook (M_MBOXHOOK, ctx->path)))
     {
       isSpool = 1;
       strfcpy (mbox, p, sizeof (mbox));
     }
+    
     else
     {
+#endif
       strfcpy (mbox, Inbox, sizeof (mbox));
       isSpool = mutt_is_spool (ctx->path) && !mutt_is_spool (mbox);
+#ifndef LIBMUTT
     }
+#endif
     mutt_expand_path (mbox, sizeof (mbox));
 
     if (isSpool)

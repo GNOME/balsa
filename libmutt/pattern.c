@@ -518,7 +518,7 @@ void mutt_pattern_free (pattern_t **pat)
     safe_free ((void **) &tmp);
   }
 }
-
+#ifndef LIBMUTT
 pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 {
   pattern_t *curlist = NULL;
@@ -1061,3 +1061,4 @@ int mutt_search_command (int cur, int op)
   mutt_error ("Not found.");
   return (-1);
 }
+#endif

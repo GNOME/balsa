@@ -19,6 +19,8 @@
 #include "sort.h"
 #include "buffy.h"
 
+#ifndef LIBMUTT
+
 #define DT_MASK		0x0f
 #define DT_BOOL		1 /* boolean option */
 #define DT_NUM		2 /* a number */
@@ -308,3 +310,4 @@ struct command_t Commands[] = {
   { "unset",		parse_set,		M_SET_UNSET },
   { NULL }
 };
+#endif

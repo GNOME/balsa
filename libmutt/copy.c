@@ -365,10 +365,10 @@ _mutt_copy_message (FILE *fpout, FILE *fpin, HEADER *hdr, BODY *body,
 {
   char prefix[SHORT_STRING];
   STATE s;
-
+#ifndef LIBMUTT
   if (flags & M_CM_PREFIX)
     _mutt_make_string (prefix, sizeof (prefix), NONULL (Prefix), Context, hdr, 0);
-
+#endif
   if ((flags & M_CM_NOHEADER) == 0)
   {
     if (flags & M_CM_PREFIX)
@@ -574,11 +574,11 @@ static int copy_delete_attach(HEADER *h, HEADER *p, BODY *m, FILE *fpin,
       }
       else
       {
-
 	if (h) h->lines = 0;
+#ifndef LIBMUTT
 	mutt_make_string (buf, sizeof (buf), NONULL (DeleteFmt), NULL,
 			  (p) ? p : h);
-
+#endif
 	/* Go through deleted attachment headers, weed Content-Length,
 	 * Content-Type and Content-Transfer-Encoding 
 	 * Also, keep track of what we write to update the length */

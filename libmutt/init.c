@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 
+
 #define toggle_quadoption(opt) QuadOptions ^= (1 << (2 * opt))
 
 void set_quadoption (int opt, int flag)
@@ -69,7 +70,7 @@ int query_quadoption (int opt, const char *prompt)
 
   /* not reached */
 }
-
+#ifndef LIBMUTT
 /* given the variable ``s'', return the index into the rc_vars array which
    matches, or -1 if the variable is not found.  */
 int mutt_option_index (char *s)
@@ -81,7 +82,7 @@ int mutt_option_index (char *s)
       return (MuttVars[i].type == DT_SYN ?  mutt_option_index ((char *) MuttVars[i].data) : i);
   return (-1);
 }
-
+#endif
 static void add_char (BUFFER *buf, char ch)
 {
   size_t offset;
@@ -280,7 +281,7 @@ int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
   SKIPWS (tok->dptr);
   return 0;
 }
-
+#ifndef LIBMUTT
 void mutt_add_to_list (LIST **list, BUFFER *inp)
 {
   LIST *t, *last = NULL;
@@ -386,7 +387,7 @@ static int parse_unlist (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err
   remove_from_list ((LIST **) data, s);
   return 0;
 }
-#ifndef LIBMUTT
+
 static int parse_unalias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
 {
   ALIAS *tmp, *last = NULL;
@@ -461,7 +462,7 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
     Aliases = tmp;
   return 0;
 }
-#endif
+
 static int
 parse_unmy_hdr (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
 {
@@ -508,7 +509,7 @@ parse_unmy_hdr (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   while (MoreArgs (s));
   return 0;
 }
-
+#endif
 static int parse_my_hdr (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
 {
   LIST *tmp;
@@ -586,7 +587,7 @@ parse_sort (short *val, const char *s, const struct mapping_t *map, BUFFER *err)
 
   return 0;
 }
-
+#ifndef LIBMUTT
 static void mutt_restore_default (struct option_t *p)
 {
   switch (p->type & DT_MASK)
@@ -1007,7 +1008,7 @@ void mutt_nocurses_error (const char *fmt, ...)
   va_end (ap);
   fputc ('\n', stderr);
 }
-#ifndef LIBMUTT
+
 /* reads the specified initialization file.  returns -1 if errors were found
    so that we can pause to let the user know...  */
 static int source_rc (const char *rcfile, BUFFER *err)

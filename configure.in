@@ -13,8 +13,8 @@ dnl   For RPM, which keeps the release as a separate field
 dnl ###########################################################################
 
 BALSA_MAJOR=1
-BALSA_REVISION=1
-BALSA_PATCHLEVEL=7
+BALSA_REVISION=2
+BALSA_PATCHLEVEL=pre1
 BALSA_RELEASE=1
 use_release=no
 

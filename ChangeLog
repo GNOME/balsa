@@ -1,3 +1,14 @@
+2001-08-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README: clarify the print page size syntax.
+	* src/balsa-message.c: Albrecht Dreﬂ <albrecht.dress@arcormail.de>
+	speedup and clean up of the URL code. + some bug fixes.
+
+	* balsa.spec.in: don't pass CFLAGS to libmutt, it's enough to pass
+	the flags to configure script.
+	* NEWS, onfigure.in: bump version number to 1.2.pre2
+	
+
 2001-08-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: fix #58642: closing mailbox after idle

@@ -1129,9 +1129,18 @@ reflow_string(gchar * str, gint mode, gint * cur_pos, int width)
     while ((*iidx++ = *u++));
 }
 
+typedef enum {
+    URL_HTTP = 1,
+    URL_FTP,
+    URL_MAILTO,
+    URL_NNTP,
+    URL_NEWS
+} url_dest_t;
+
 typedef struct _message_url_t {
     gint line, start, end;       /* text line and pos in the line */
     gchar *url;                  /* the link */
+    url_dest_t url_dest;         /* which service to call */
 } message_url_t;
 
 typedef struct _hotarea_t {
@@ -1143,9 +1152,9 @@ typedef struct _hotarea_t {
 #define DEFAULT_TAB_STOP_WIDTH   8      /* chars per tab */
 
 #ifdef HAVE_PCRE
-static const char *url_str = "\\b(http|ftp)s?://(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#\\w])+\\b";
+static const char *url_str = "\\b(((https?|ftps?|nntp)://)|(mailto:|news:))(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#\\w])+\\b";
 #else
-static const char *url_str = "(http|ftp)s?://(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+";
+static const char *url_str = "(((https?|ftps?|nntp)://)|(mailto:|news:))(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+";
 #endif
 
 /* the cursors which are displayed over URL's and normal message text */
@@ -1183,6 +1192,57 @@ free_hotarea_list(GList *l)
     }
 }
 
+/* prescanner: 
+ * used to find candidates for lines containing URL's.
+ * Empirially, this approach is faster (by factor of 8) than scanning
+ * entire message with regexec. YMMV.
+ * s - is the line to scan. 
+ * returns TRUE if the line may contain an URL.
+ */
+static gboolean
+prescanner(const gchar *s)
+{
+    gint left = strlen(s) - 6;
+    
+    if (left <= 0)
+	return FALSE;
+    
+    while (left--) {
+	switch (tolower(*s++)) {
+	case 'f':    /* ftp:/, ftps: */
+	    if (tolower(*s) == 't' &&
+		tolower(*(s + 1)) == 'p' &&
+		(*(s + 2) == ':' || tolower(*(s + 2)) == 's') &&
+		(*(s + 3) == ':' || *(s + 3) == '/'))
+		return TRUE;
+	    break;
+	case 'h':    /* http:, https */
+	    if (tolower(*s) == 't' &&
+		tolower(*(s + 1)) == 't' &&
+		tolower(*(s + 2)) == 'p' &&
+		(*(s + 3) == ':' || tolower(*(s + 3)) == 's'))
+		return TRUE;
+	    break;
+	case 'm':    /* mailt */
+	    if (tolower(*s) == 'a' &&
+		tolower(*(s + 1)) == 'i' &&
+		tolower(*(s + 2)) == 'l' &&
+		tolower(*(s + 3)) == 't')
+		return TRUE;
+	    break;
+	case 'n':    /* news:, nntp: */
+	    if ((tolower(*s) == 'e' || tolower(*s) == 'n') &&
+		(tolower(*(s + 1)) == 'w' || tolower(*(s + 1)) == 't') &&
+		(tolower(*(s + 2)) == 's' || tolower(*(s + 2)) == 'p') &&
+		*(s + 3) == ':')
+		return TRUE;
+	    break;
+	}
+    }
+    
+    return FALSE;
+}
+
 /* do a gtk_text_insert, but mark URL's with balsa_app.url_color */
 static void
 gtk_text_insert_with_url(GtkText *text, GdkFont *font, GdkColor *dflt, 
@@ -1213,32 +1273,52 @@ gtk_text_insert_with_url(GtkText *text, GdkFont *font, GdkColor *dflt,
     } else
 	buf = p = g_strdup(chars);
 
-    match = regexec(url_reg, p, 1, &url_match, 0);
-    while (!match) {
-	gchar *buf;
-	message_url_t *url_found;
-
-	if (url_match.rm_so) {
-	    buf = g_strndup(p, url_match.rm_so);
-	    gtk_text_insert(text, font, dflt, NULL, buf, -1);
-	    g_free(buf);
-	}
-      
-	buf = g_strndup(p + url_match.rm_so, 
-			url_match.rm_eo - url_match.rm_so);
-	gtk_text_insert(text, font, &balsa_app.url_color, NULL, buf, -1);
-
-	/* remember the URL and its position within the text */
-	url_found = g_malloc(sizeof(message_url_t));
-	url_found->line = textline;
-	url_found->start = url_match.rm_so + offset;
-	url_found->end = url_match.rm_eo + offset;
-	url_found->url = buf;  /* gets freed later... */
-	*url_list = g_list_append(*url_list, url_found);
-
-	p += url_match.rm_eo;
-	offset += url_match.rm_eo;
+    if (prescanner(p)) {
 	match = regexec(url_reg, p, 1, &url_match, 0);
+	while (!match) {
+	    gchar *buf;
+	    message_url_t *url_found;
+	    
+	    if (url_match.rm_so) {
+		buf = g_strndup(p, url_match.rm_so);
+		gtk_text_insert(text, font, dflt, NULL, buf, -1);
+		g_free(buf);
+	    }
+	    
+	    buf = g_strndup(p + url_match.rm_so, 
+			    url_match.rm_eo - url_match.rm_so);
+	    gtk_text_insert(text, font, &balsa_app.url_color, NULL, buf, -1);
+	    
+	    /* remember the URL and its position within the text */
+	    url_found = g_malloc(sizeof(message_url_t));
+	    url_found->line = textline;
+	    url_found->start = url_match.rm_so + offset;
+	    url_found->end = url_match.rm_eo + offset;
+	    url_found->url = buf;  /* gets freed later... */
+	    if (tolower(*buf) == 'h')
+		url_found->url_dest = URL_HTTP;
+	    else if (tolower(*buf) == 'f')
+		url_found->url_dest = URL_FTP;
+	    else if (tolower(*buf) == 'm')
+		url_found->url_dest = URL_MAILTO;
+	    else if (tolower(*buf) == 'n') {
+		if (tolower(*(buf + 1)) == 'n')
+		    url_found->url_dest = URL_NNTP;
+		else if (tolower(*(buf + 1)) == 'e')
+		    url_found->url_dest = URL_NEWS;
+		else
+		    url_found->url_dest = -1;
+	    } else
+		url_found->url_dest = -1;
+	    *url_list = g_list_append(*url_list, url_found);
+	    
+	    p += url_match.rm_eo;
+	    offset += url_match.rm_eo;
+	    if (prescanner(p))
+		match = regexec(url_reg, p, 1, &url_match, 0);
+	    else
+		match = -1;
+	}
     }
 
     if (*p)
@@ -1246,15 +1326,17 @@ gtk_text_insert_with_url(GtkText *text, GdkFont *font, GdkColor *dflt,
     g_free(buf);
 }
 
-/* fix the gtk_text widget's event mask so that pointer motions are reported */
+/* set the gtk_text widget's cursor to a vertical bar
+   fix event mask so that pointer motions are reported (if necessary) */
 static gboolean
-fix_event_mask(GtkWidget *widget, gpointer data)
+fix_text_widget(GtkWidget *widget, gpointer data)
 {
     GdkWindow *w = GTK_TEXT(widget)->text_area;
     
-    gdk_window_set_events(w, gdk_window_get_events(w) | GDK_POINTER_MOTION_MASK);
+    if (data)
+	gdk_window_set_events(w, gdk_window_get_events(w) | GDK_POINTER_MOTION_MASK);
     if (!url_cursor_normal || !url_cursor_over_url) {
-	url_cursor_normal = gdk_cursor_new(GDK_LEFT_PTR);
+	url_cursor_normal = gdk_cursor_new(GDK_XTERM);
 	url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
     }
     gdk_window_set_cursor(w, url_cursor_normal);
@@ -1269,15 +1351,14 @@ calc_text_end(const gchar *buf, gint *xpos, gint *linepos, GdkFont *fnt,
     gint width, rmargin;
     hotarea_t *new_area;
 
-    //    rmargin = is_last ? winwidth : winwidth - LINE_WRAP_ROOM;
     rmargin = winwidth - LINE_WRAP_ROOM;
     gdk_string_extents(fnt, buf, NULL, NULL, &width, NULL, NULL);
 
-    if (*xpos + width >= rmargin) {
+    if (*xpos + width > rmargin) {
 	gchar *rempart, *p;
 	rempart = p = g_strdup(buf);
 	
-	while (*xpos + width >= rmargin) {
+	while (*xpos + width > rmargin) {
 	    gchar *test;
 	    gint n;
 
@@ -1287,7 +1368,7 @@ calc_text_end(const gchar *buf, gint *xpos, gint *linepos, GdkFont *fnt,
 		n--;
 		test [n] = 0;
 		gdk_string_extents(fnt, test, NULL, NULL, &width, NULL, NULL);
-	    } while (n && *xpos + width >= winwidth - LINE_WRAP_ROOM);
+	    } while (n && *xpos + width > winwidth - LINE_WRAP_ROOM);
 	    g_free(test);
 	    rempart += n;
 	    
@@ -1335,6 +1416,7 @@ mail_text_draw(GtkWidget *widget, GdkRectangle *area, gpointer data)
 
     g_return_val_if_fail(url_list, FALSE); /* this should not happen... */
 
+    gtk_object_set_data(GTK_OBJECT(widget), "hotarea-list", NULL);
     free_hotarea_list(hotarea_list);
     hotarea_list = NULL;
     
@@ -1397,7 +1479,8 @@ check_over_url(GtkWidget *widget, GdkEvent *event, gpointer data)
     GdkModifierType mask;
     static gboolean was_over_url = FALSE;
 
-    g_return_val_if_fail(hotarea_list, FALSE); /* this should not happen... */
+    if (!hotarea_list)
+	return FALSE;
 
     gdk_window_get_pointer(GTK_TEXT(widget)->text_area, &x, &y, &mask);
     while (hotarea_list) {
@@ -1434,7 +1517,8 @@ check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
     GList *hotarea_list = 
 	(GList *)gtk_object_get_data(GTK_OBJECT(widget), "hotarea-list");
     
-    g_return_val_if_fail(hotarea_list, FALSE); /* this should not happen... */
+    if (!hotarea_list)
+	return FALSE;
 
     if (event->type == GDK_BUTTON_RELEASE && event->button == 1) {
 	gint x;
@@ -1447,11 +1531,33 @@ check_call_url(GtkWidget *widget, GdkEventButton *event, gpointer data)
 
 	    if (hotarea_data->xul <= x && x <= hotarea_data->xlr &&
 		hotarea_data->yul <= y && y <= hotarea_data->ylr) {
-		gchar *notice =
-		    g_strdup_printf(_("Calling URL %s..."), hotarea_data->url->url);
-		gnome_appbar_set_status(balsa_app.appbar, notice);
-		g_free(notice);
-		gnome_url_show(hotarea_data->url->url);
+		gchar *notice;
+
+		switch (hotarea_data->url->url_dest)
+		    {
+		    case URL_FTP:
+		    case URL_HTTP:
+			notice = 
+			    g_strdup_printf(_("Calling browser with %s..."),
+					    hotarea_data->url->url);
+			gnome_appbar_set_status(balsa_app.appbar, notice);
+			g_free(notice);
+			gnome_url_show(hotarea_data->url->url);
+			break;
+//		    case URL_FTP: 
+		    case URL_MAILTO:
+		    case URL_NNTP:
+		    case URL_NEWS:
+			g_warning(__FUNCTION__ 
+				  ": URL destination code %d for %s not yet implemented...",
+				  hotarea_data->url->url_dest, hotarea_data->url->url);
+			break;
+		    default:
+			g_warning(__FUNCTION__ 
+				  ": unknown URL destination code %d",
+				  hotarea_data->url->url_dest);
+			break;
+		    }
 		break;
 	    }
 	    hotarea_list = g_list_next(hotarea_list);
@@ -1587,6 +1693,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 	    regfree(&rex);
 	}
 	
+	gtk_signal_connect_after(GTK_OBJECT(item), "realize",
+				 (GtkSignalFunc)fix_text_widget, url_list);
 	if (url_list) {
 	    gtk_object_set_data(GTK_OBJECT(item), "url-list", 
 				(gpointer) url_list);
@@ -1596,8 +1704,6 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 				     (GtkSignalFunc)check_call_url, NULL);
 	    gtk_signal_connect(GTK_OBJECT(item), "motion-notify-event",
 			       (GtkSignalFunc)check_over_url, NULL);
-	    gtk_signal_connect_after(GTK_OBJECT(item), "realize",
-				     (GtkSignalFunc)fix_event_mask, NULL);
  	    gtk_signal_connect_after(GTK_OBJECT(item), "draw",
  				     (GtkSignalFunc)mail_text_draw, fnt);
 	}

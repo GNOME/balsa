@@ -220,4 +220,8 @@ Known issues:
 	configuration.
 
 * 	The printer media is assumed to be A4. If your printer uses Letter,
-	set PaperSize in ~/.gnome/balsa file to US-Letter.
+	set PaperSize in ~/.gnome/balsa file to US-Letter, so the Printing
+	section look as follows:
+
+[Printing]
+PaperSize=US-Letter

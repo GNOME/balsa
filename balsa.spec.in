@@ -1,5 +1,7 @@
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings
-
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-system-install --disable-more-warnings --disable-pcre
+# we disable PCRE because it introduces dependency on KDE packages,
+# it is better to reduce number of dependencies in the standard build
+# and link against glibc version of regex library.
 Summary:   Balsa Mail Client
 Name:      balsa
 Version:   @BALSA_SHORT_VERSION@
@@ -12,7 +14,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: Pawel Salek <pawsa@theochem.kth.se>
 Requires: gtk+ >= 1.2.7
 Requires: gnome-libs >= 1.2.0
-Requires: libesmtp >= 0.7.1
+Requires: libesmtp >= 0.8.3
 Provides: balsa
 
 BuildRequires:  libesmtp >= 0.7.1
@@ -44,7 +46,7 @@ if [ "$SMP" != "" ]; then
   (make "MAKE=make -k -j $SMP"; exit 0)
   make
 else
-  make CFLAGS="$RPM_OPT_FLAGS"
+  make
 fi
 
 %install
@@ -64,7 +66,8 @@ make prefix=$RPM_BUILD_ROOT%{_prefix} \
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+make clean
+rm -rf "$RPM_BUILD_ROOT"
 
 %files -f %{name}.lang
 %defattr(-, root, root)

@@ -6,7 +6,7 @@
 	
 	Albrecht Dreﬂ <albrecht.dress@arcormail.de>:
 	* src/balsa-index.c: justify the message size to right.
-	* src/main-window.c: set locale.
+	* src/main.c: set locale.
 	* src/spell-check.c: use new PCRE to handle national characters
 	better.
 

@@ -39,6 +39,10 @@
 #include <pthread.h>
 #endif
 
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif
+
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
@@ -322,6 +326,7 @@ main(int argc, char *argv[])
     /* Initialize the i18n stuff */
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
     textdomain(PACKAGE);
+    setlocale(LC_CTYPE, gnome_i18n_get_language());
 
 #ifdef BALSA_USE_THREADS
     /* initiate thread mutexs, variables */

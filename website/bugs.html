@@ -1,42 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
-<head>
-<title>Balsa -- Bugs</title>
-<link rel="stylesheet" type="text/css" href="@website_root@/style.css">
-</head>
-<body background="@website_root@/images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
-<table width="100%">
-	<tr>
-		<td width="80"></td>
-		<td>
-			<dd align="left"><img src="@website_root@/images/balsa.jpg" alt="balsa" align="middle" width="476" height="122">
-			<big><big><b>Reporting Bugs</b></big></big><br></dd>
 
-<p>To report Balsa's bugs, please first check <a
-href="http://bugzilla.gnome.org/query.cgi">the GNOME bug tracker</a>
-to see if your bug has already been reported. Do not create yet
-another report for a registered bug, rather add a comment to the
-existing report confirming the bug.</p>
+<head>
+  <title>Balsa - Reporting Bugs</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300" alink="#993300">
+
+<!-- header (logo, nav) -->
+<center>
+  <img src="images/balsa.jpg" alt="Balsa - an e-mail client for GNOME" height=122 width=476 border=0 vspace=10>
+  <p class="navigation">
+  <a href="index.html">News</a> | 
+  <a href="features.html">Features</a> | 
+  <a href="screenshots.html">Screenshots</a> | 
+  <a href="download.html">Download</a> | 
+  <a href="faq.html">FAQ</a> | 
+  <a href="list.html">Mailing List</a> | 
+  <a name="bugs.html">Reporting Bugs</a> 
+  </p>
+</center>
+
+<br>
+<!-- begin page -->
+
+<p class="heading">Reporting Bugs</p>
+
+<p>To report a bug in Balsa, please check the 
+<a href="http://bugzilla.gnome.org/query.cgi">GNOME bug tracker</a>
+first to see if your bug has already been reported. Do not create a 
+new report for a registered bug, instead add a comment to the existing 
+report to confirm the bug.</p>
 
 <p>Please, provide detailed information, particularly when filing a
 new bug report. Most often, we need to know:</p>
 
-			<ul>
-			<li>Your system information: processor, version of Linux, locale, etc. Bug-buddy, gnome-bug, and the like can
-				probably autodetect this information.</li>
-			<li>How Balsa was set up: How was configure run? Is it an RPM or a source tarball?</li>
-			<li>What causes the bug. <b>Please please please</b> try to find a reliable way to reproduce your bug.
-				It can be difficult to do this, but a bug that can be reproduced can usually be solved very
-				quickly.</li>
-			</ul>
+<ul>
+<li>Your system information: processor, version of Linux, locale, etc. 
+Bug-buddy, gnome-bug, and the like can probably autodetect this 
+information.</li>
+<li>How Balsa was set up: How was configure run? Is it an RPM or a 
+source tarball?</li>
+<li>What causes the bug. <em>Please</em> try to find a reliable way to 
+reproduce your bug.  It can be difficult to do this, but a bug that can 
+be reproduced can usually be solved very quickly.</li>
+</ul>
 
-			<p>Your bug report can be submitted via the bug-buddy, which automates the process
-			of generating stack traces described below. In general, you will have to fill in some blanks, and write
-			some text about the bug. Whatever data you can get your hands on, paste into there.</p>
+<p>Your bug report can be submitted via the bug-buddy, which automates 
+the process of generating stack traces described below. In general, you 
+will have to fill in some blanks, and write some text about the bug. 
+Whatever data you can get your hands on, paste into there.</p>
 
-			<p>If you're feeling adventurous, you can try using gdb to get a stack trace. The only thing better than
-			a reproducible bug is a stack trace. We have some quick instructions for you to follow if you're not
-			familiar with using gdb. First, you use gdb to run balsa. We give it the option --disable-crash-dialog
-			so that the program stops where the crash occurred, instead of going on into Gnome's crash handler:</p>
+<p>If you're feeling adventurous, you can try using gdb to get a stack 
+trace. The only thing better than a reproducible bug is a stack trace. 
+We have some quick instructions for you to follow if you're not familiar 
+with using gdb. First, you use gdb to run Balsa. We give it the option 
+--disable-crash-dialog so that the program stops where the crash occurred, 
+instead of going on into Gnome's crash handler:</p>
 
 			<blockquote>
 			$ gdb /path/to/balsa<br>
@@ -50,9 +71,10 @@ new bug report. Most often, we need to know:</p>
 			(gdb) <b>run --disable-crash-dialog</b><br>
 			</blockquote>
 
-			<p>At this point Balsa should run. Do whatever you need to do to make it crash. Have no mercy. You'll
-			get something like the following. The first order of business is to get a backtrace, with the 
-			&quot;bt&quot; command.</p>
+<p>At this point Balsa should run. Do whatever you need to do to make it 
+crash. Have no mercy. You'll get something like the following. The first 
+order of business is to get a backtrace, with the &quot;bt&quot; 
+command.</p>
 
 			<blockquote>
 			Program received signal SIGSEGV, Segmentation fault.<br>
@@ -74,8 +96,9 @@ new bug report. Most often, we need to know:</p>
 			#9  0x806a5f8 in main (argc=2, argv=0xbffffcb4) at main.c:234<br>
 			</blockquote>
 
-			<p>Save this output. This is the all-important stacktrace. There's a little more information to
-			be gleaned though. Try repeating these commands three or four times:</p>
+<p>Save this output. This is the all-important stacktrace. There's a little 
+more information to be gleaned though. Try repeating these commands three or 
+four times:</p>
 
 			<blockquote>
 			(gdb) <b>list</b><br>
@@ -121,9 +144,28 @@ new bug report. Most often, we need to know:</p>
 			(gdb) <br>
 			</blockquote>
 
-			<p>Et cetera. These commands might be pointless or you might not be able to even execute them,
-			but if you can, send us this output as well. We will be forever in your debt.</p>
-		</td>
-	</tr>
-</table>
+<p>Et cetera. These commands might be pointless or you might not be able 
+to even execute them, but if you can, send us this output as well. We will 
+forever be in your debt.</p>
+
+<!-- end page -->
+<br>
+
+<!-- footer (nav repeated, copyright) -->
+<center>
+  <p class="navigation">
+  <a href="index.html">News</a> | 
+  <a href="features.html">Features</a> | 
+  <a href="screenshots.html">Screenshots</a> | 
+  <a href="download.html">Download</a> | 
+  <a href="faq.html">FAQ</a> | 
+  <a href="list.html">Mailing List</a> | 
+  <a name="bugs.html">Reporting Bugs</a> 
+  </p>
+  <p class="copyright">Copyright (C) 1997-2001 Stuart 
+  Parmenter and others</p>
+</center>
+
 </body>
+
+</html>

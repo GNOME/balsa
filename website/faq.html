@@ -123,13 +123,15 @@ also use LDAP to access a remote e-mail directory.
 <a name="faq07"></a>
 <dl>
 <dt>Does Balsa support filters?</dt>
-<dd>Yes and no. To see the progress of filters on the GUI part you
-must run ./configure with the option "--enable-all".  This will
-allow you to see the most current filter code.  This code is not
-in active development, but new filter tools are being worked on.
+<dd>Yes. You can set up filters which will match on any message header
+(even on user headers, eg like X-Mailer header), or on message body, on
+message date, message flag (read, replied, flagged...). Moreover you
+can use simple substring look up or full regular expression search.
+Each filter has an associated action: every message that matches
+the filter conditions can be either copied, moved, trashed.
 <br><br>
-On the other hand, the POP3 filtering backend based on
-<tt>procmail</tt> is functional. When the respective POP3
+You can also use the POP3 filtering backend based on
+<tt>procmail</tt>. When the respective POP3
 'mailbox' has the 'filter' box checked, the downloaded mail is passed
 on to procmail which will use ~/.procmailrc file as its configuration,
 so you can share it between Balsa and fetchmail and get consistent
@@ -225,9 +227,10 @@ File->Continue.</dd>
 <a name="faq15"></a>
 <dl>
 <dt>How can I perform a search on a mailbox?</dt>
-<dd>This feature is not yet implented, but it's planned for the next 
-development cycle! In that time you can use the <tt>grepmail</tt> utility 
-that comes with your distribution.</dd>
+<dd> You have a dedicated dialog box which allows you to look for messages
+that contains a given substring either in the common headers (From, Subject,
+To, CC) or in the message body.
+</dd>
 </dl>
 
 <a name="faq16"></a>
@@ -303,8 +306,10 @@ the message menu.</dd>
 <a name="faq24"></a>
 <dl>
 <dt>Is a port to gtk2 planned?</dt>
-<dd>Yes, a port to gtk2 is one of the changes that should/will happen in 
-1.3.x series.</dd>
+<dd>Yes, and it is now the most active branch of development: the 2.0.x branch.
+It is now as stable as the 1.4.x branch (which is based on GNOME-1.4), and
+even has more features now.
+</dd>
 </dl>
 
 <a name="faq25"></a>
@@ -317,7 +322,7 @@ the message menu.</dd>
 <a name="faq26"></a>
 <dl>
 <dt>Why can't I find the answer to my question?</dt>
-<dd>Probably because it isn't a <em>frequently</em> asked question.  
+<dd>Probably because it isn't a <em>frequently</em> asked question.
 Feel free to contact the Balsa <a href="list.html">mailing list</a> 
 with questions that aren't addressed on this page.</dd>
 </dl>

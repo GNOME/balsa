@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-06-06 14:48+0000\n"
-"PO-Revision-Date: 2000-06-06 14:49+00:00\n"
+"POT-Creation-Date: 2000-06-11 18:51+0000\n"
+"PO-Revision-Date: 2000-06-11 18:52+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,12 +17,12 @@ msgstr ""
 msgid "Error: "
 msgstr "Ошибка: "
 
-#: libbalsa/mailbox.c:631
+#: libbalsa/mailbox.c:646
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr "Почтовый ящик: Открыто: %s  Число ссылок: %d\n"
 
-#: libbalsa/mailbox.c:651
+#: libbalsa/mailbox.c:666
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr "Почтовый ящик: Закрыто %s  Число ссылок: %d\n"
@@ -231,28 +231,28 @@ msgstr "Запустить GnomeCard"
 msgid "Re-Import"
 msgstr "Реимпортировать"
 
-#: src/balsa-app.c:217
+#: src/balsa-app.c:218
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa не может открыть ваш почтовый ящик \"%s\""
 
-#: src/balsa-app.c:230
+#: src/balsa-app.c:231
 msgid "Inbox"
 msgstr "Входящие"
 
-#: src/balsa-app.c:235
+#: src/balsa-app.c:236
 msgid "Outbox"
 msgstr "Исходящие"
 
-#: src/balsa-app.c:240
+#: src/balsa-app.c:241
 msgid "Sentbox"
 msgstr "Отправленные"
 
-#: src/balsa-app.c:245
+#: src/balsa-app.c:246
 msgid "Draftbox"
 msgstr "Черновики"
 
-#: src/balsa-app.c:250
+#: src/balsa-app.c:251
 msgid "Trash"
 msgstr "Мусорная корзина"
 
@@ -261,7 +261,7 @@ msgid "Mailbox password:"
 msgstr "Пароль для почтового ящика:"
 
 #. password field
-#: src/balsa-index-page.c:298 src/mailbox-conf.c:992 src/mailbox-conf.c:1091
+#: src/balsa-index-page.c:298 src/mailbox-conf.c:991 src/mailbox-conf.c:1090
 msgid "Password:"
 msgstr "Пароль:"
 
@@ -335,7 +335,7 @@ msgstr "Дата"
 msgid "To"
 msgstr "Кому"
 
-#: src/balsa-mblist.c:221 src/mailbox-conf.c:1186
+#: src/balsa-mblist.c:221 src/mailbox-conf.c:1185
 msgid "Mailbox"
 msgstr "Почтовый ящик"
 
@@ -360,7 +360,7 @@ msgstr "Сохранить MIME-закодированную часть"
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:667
+#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:670
 #: src/sendmsg-window.c:129 src/sendmsg-window.c:426 src/sendmsg-window.c:1098
 #: src/sendmsg-window.c:1405 src/sendmsg-window.c:1428
 msgid "Cancel"
@@ -544,7 +544,7 @@ msgstr "В тексте письма"
 msgid "Match string:"
 msgstr "Строка для сравнения:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:282 src/mailbox-conf.c:1151
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:285 src/mailbox-conf.c:1150
 #: src/pref-manager.c:873
 msgid "Add"
 msgstr "Добавить"
@@ -633,7 +633,7 @@ msgstr "Восстановить"
 msgid "Balsa Filters"
 msgstr "Управление фильтрами"
 
-#: src/mailbox-conf.c:159
+#: src/mailbox-conf.c:162
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
@@ -643,7 +643,7 @@ msgstr ""
 "Почтовый ящик %s и все его содержимое будут удалены из системы.\n"
 "Вы уверены, что Вы этого хотите?"
 
-#: src/mailbox-conf.c:164
+#: src/mailbox-conf.c:167
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -655,122 +655,122 @@ msgstr ""
 "почтовый ящик\"\n"
 " Вы уверены, что Вы этого хотите?"
 
-#: src/mailbox-conf.c:193
+#: src/mailbox-conf.c:196
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Почтовый ящик не найден в узлах balsa_app.mailbox?\n"
 
-#: src/mailbox-conf.c:237
+#: src/mailbox-conf.c:240
 msgid "Mailbox Configurator"
 msgstr "Конфигурация почт. ящика"
 
-#: src/mailbox-conf.c:292 src/mailbox-conf.c:1145
+#: src/mailbox-conf.c:295 src/mailbox-conf.c:1144
 msgid "Update"
 msgstr "Обновить"
 
-#: src/mailbox-conf.c:436 src/mailbox-conf.c:452 src/mailbox-conf.c:465
+#: src/mailbox-conf.c:439 src/mailbox-conf.c:455 src/mailbox-conf.c:468
 msgid "You need to fill in the Mailbox Name field."
 msgstr "Вы должны заполнить поле названия почтового ящика."
 
-#: src/mailbox-conf.c:439
+#: src/mailbox-conf.c:442
 msgid "You need to fill in the folderpath field."
 msgstr "Вам необходимо заполнить поле \"Путь к папке\"."
 
-#: src/mailbox-conf.c:441
+#: src/mailbox-conf.c:444
 msgid "You need to fill in the IMAP Server field"
 msgstr "Вы должны заполнить поле IMAP-сервера"
 
-#: src/mailbox-conf.c:443
+#: src/mailbox-conf.c:446
 msgid "You need to fill in the username field"
 msgstr "Вы должны заполнить поле имени пользователя"
 
-#: src/mailbox-conf.c:445
+#: src/mailbox-conf.c:448
 msgid "You need to fill in the password field"
 msgstr "Вы должны заполнить поле пароля"
 
-#: src/mailbox-conf.c:447
+#: src/mailbox-conf.c:450
 msgid "You need to fill in the port field"
 msgstr "Вы должны заполнить поле порта"
 
-#: src/mailbox-conf.c:469
+#: src/mailbox-conf.c:472
 msgid "You need to fill in the user field."
 msgstr "Вы должны заполнить поле пользователя."
 
-#: src/mailbox-conf.c:473
+#: src/mailbox-conf.c:476
 msgid "You need to fill in the password field."
 msgstr "Вы должны заполнить поле пароля."
 
-#: src/mailbox-conf.c:477
+#: src/mailbox-conf.c:480
 msgid "You need to fill in the server field."
 msgstr "Вы должны заполнить поле сервера."
 
-#: src/mailbox-conf.c:481
+#: src/mailbox-conf.c:484
 msgid "You need to fill in the port field."
 msgstr "Вы должны заполнить поле \"Порт\"."
 
-#: src/mailbox-conf.c:485
+#: src/mailbox-conf.c:488
 msgid "Some of the fields are blank."
 msgstr "Некоторые из полей пусты."
 
-#: src/mailbox-conf.c:666
+#: src/mailbox-conf.c:669
 #, c-format
 msgid "Cannot create mailbox '%s': %s\n"
 msgstr "Не удалось создать почтовый ящик '%s': %s\n"
 
 #. used to build a string: MAILBOXNAME " on " SERVERNAME
-#: src/mailbox-conf.c:735
+#: src/mailbox-conf.c:734
 msgid " on "
 msgstr " на "
 
-#: src/mailbox-conf.c:848
+#: src/mailbox-conf.c:847
 msgid "New mailbox type:"
 msgstr "Тип нового почтового ящика"
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:854
+#: src/mailbox-conf.c:853
 msgid "Local mailbox"
 msgstr "Местный почтовый ящик"
 
-#: src/mailbox-conf.c:862
+#: src/mailbox-conf.c:861
 msgid "IMAP server"
 msgstr "IMAP сервер"
 
 #. mailbox name
-#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
+#: src/mailbox-conf.c:884 src/mailbox-conf.c:919 src/mailbox-conf.c:1036
 msgid "Mailbox Name:"
 msgstr "Название почтового ящика:"
 
 #. path to file
-#: src/mailbox-conf.c:895
+#: src/mailbox-conf.c:894
 msgid "Mailbox path:"
 msgstr "Путь к почтовому ящику:"
 
 #. pop server
-#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
+#: src/mailbox-conf.c:936 src/mailbox-conf.c:1046
 msgid "Server:"
 msgstr "Сервер:"
 
 #. pop port
-#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
+#: src/mailbox-conf.c:955 src/mailbox-conf.c:1060
 msgid "Port:"
 msgstr "Порт:"
 
 #. username
-#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
+#: src/mailbox-conf.c:974 src/mailbox-conf.c:1075
 msgid "Username:"
 msgstr "Имя пользоватеся:"
 
 #. toggle for check
-#: src/mailbox-conf.c:1007 src/main-window.c:362
+#: src/mailbox-conf.c:1006 src/main-window.c:362
 msgid "Check"
 msgstr "Проверить"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:1015
+#: src/mailbox-conf.c:1014
 msgid "Delete from server"
 msgstr "Удалить с сервера"
 
-#: src/mailbox-conf.c:1104
+#: src/mailbox-conf.c:1103
 msgid "Folder path:"
 msgstr "Путь к папке:"
 
@@ -1039,28 +1039,44 @@ msgstr "MAILBOXNAME"
 msgid "Opens first unread mailbox"
 msgstr "Открыть первый почтовый ящик с непрочитанными письмами"
 
-#: src/mblist-window.c:376
+#: src/mblist-window.c:412
 msgid "Open Mailbox"
 msgstr "Открыть почтовый ящик"
 
-#: src/mblist-window.c:382
+#: src/mblist-window.c:413
 msgid "Close Mailbox"
 msgstr "Закрыть почтовый ящик"
 
-#: src/mblist-window.c:389
+#: src/mblist-window.c:416
 msgid "Add New Mailbox"
 msgstr "Добавить новый почтовый ящик"
 
-#: src/mblist-window.c:397
+#: src/mblist-window.c:420
 msgid "Edit Mailbox Properties"
 msgstr "Правка свойств почтового ящика"
 
-#: src/mblist-window.c:403
+#: src/mblist-window.c:421
 msgid "Delete Mailbox"
 msgstr "Удалить почтовый ящик"
 
-#: src/mblist-window.c:430 src/mblist-window.c:446 src/mblist-window.c:464
-#: src/mblist-window.c:479
+#: src/mblist-window.c:422
+msgid "Mark as Inbox"
+msgstr "Пометить как входящие"
+
+#: src/mblist-window.c:423
+msgid "Mark as Sentbox"
+msgstr "Пометить как отправленные"
+
+#: src/mblist-window.c:424
+msgid "Mark as Trash"
+msgstr "Пометить как удаленные"
+
+#: src/mblist-window.c:425
+msgid "Mark as Draftbox"
+msgstr "Пометить как черновики"
+
+#: src/mblist-window.c:448 src/mblist-window.c:464 src/mblist-window.c:482
+#: src/mblist-window.c:497
 msgid "No mailbox selected."
 msgstr "Почтовый ящик не выбран."
 

@@ -219,26 +219,42 @@ gboolean
 libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 {
     if (body->temp_filename == NULL) {
-	gchar *tmp_file_name;
-	gchar *dotpos = NULL;
-	int fd;
+	gint count = 100; /* Magic number, same as in g_mkstemp. */
 
-	fd = g_file_open_tmp("balsa-body-XXXXXX", &tmp_file_name, NULL);
-	if (fd < 0)
-	    return FALSE;
+	/* We want a temporary file with a name that ends with the same
+	 * set of suffices as body->filename (for the benefit of helpers
+	 * that depend on such things); however, g_file_open_tmp() works
+	 * only with templates that end with "XXXXXX", so we fake it. */
+	do {
+	    gint fd;
+	    gchar *tmp_file_name;
+	    gchar *dotpos = NULL;
 
-	if (body->filename) {
-	    gchar *seppos = strrchr(body->filename, G_DIR_SEPARATOR);
-	    dotpos = strchr(seppos ? seppos : body->filename, '.');
-	}
-	if (dotpos) {
-	    body->temp_filename = g_strdup_printf("%s%s", tmp_file_name,
-						  dotpos);
-	    g_free(tmp_file_name);
-	}
-	else
-	    body->temp_filename = tmp_file_name;
-	return libbalsa_message_body_save_fd(body, fd);
+	    fd = g_file_open_tmp("balsa-body-XXXXXX", &tmp_file_name,
+				 NULL);
+	    if (fd < 0)
+		return FALSE;
+	    close(fd);
+	    unlink(tmp_file_name);
+
+	    if (body->filename) {
+		gchar *seppos = strrchr(body->filename, G_DIR_SEPARATOR);
+		dotpos = strchr(seppos ? seppos : body->filename, '.');
+	    }
+	    g_free(body->temp_filename);
+	    if (dotpos) {
+		body->temp_filename =
+		    g_strdup_printf("%s%s", tmp_file_name, dotpos);
+		g_free(tmp_file_name);
+	    } else
+		body->temp_filename = tmp_file_name;
+	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT, 0600);
+	    if (fd >= 0)
+		return libbalsa_message_body_save_fd(body, fd);
+	} while (errno == EEXIST && --count > 0);
+
+	/* Either we hit a real error, or we used up 100 attempts. */
+	return FALSE;
     } else {
 	/* the temporary name has been already allocated on previous
 	   save_temporary action. We just check if the file is still there.

@@ -51,6 +51,7 @@ INCLUDES = \
 	-I$(top_srcdir)/libbalsa \
 	-I$(top_srcdir)/idl \
 	-I$(top_builddir)/libmutt \
+	-I$(top_builddir)/idl \
 	-I$(top_srcdir)/libmutt \
 	 $(GNOME_INCLUDEDIR)
 

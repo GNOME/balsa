@@ -40,6 +40,7 @@ typedef struct _BalsaMessageClass BalsaMessageClass;
 struct _BalsaMessage
 {
   GnomeCanvas canvas;
+  GnomeCanvasGroup *headers;
   GList *html; /* list of xmhtml widgets */
   
   Message *message;

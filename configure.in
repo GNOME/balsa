@@ -45,7 +45,7 @@ AC_MSG_ERROR([*** libPropList not found.  Please check http://www.balsa.net for 
 LDFLAGS="$balsa_save_LDFLAGS"
 LIBS="$balsa_save_LIBS"
 
-ALL_LINGUAS="da de el es et fi fr ga ja ko no it nl pl ru pt_BR sv uk zh_CN"
+ALL_LINGUAS="da de el es et fi fr ga ja ko no it nl pl ru pt_BR sv tr uk zh_CN"
 AM_GNU_GETTEXT
 
 

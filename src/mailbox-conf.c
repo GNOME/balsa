@@ -1093,7 +1093,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 #ifdef USE_SSL
     /* toggle for SSL */
     mcw->mb_data.imap.use_ssl = 
-        create_check(mcw->window, _("Use SS_L (imaps)"), table, 7, FALSE);
+        create_check(mcw->window, _("Use SS_L (IMAPS)"), table, 7, FALSE);
     g_signal_connect(G_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
                      G_CALLBACK(imap_use_ssl_cb), mcw);
 #endif

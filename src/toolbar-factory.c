@@ -138,7 +138,7 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_SHOW_HEADERS, N_("All\nheaders"),
      N_("Show all headers"), TOOLBAR_BUTTON_TYPE_TOGGLE},
     {BALSA_PIXMAP_TRASH_EMPTY, N_("Empty Trash"),
-     N_("Delete messages from the trash mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
+     N_("Delete messages from the Trash mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_CLOSE_MBOX, N_("Close"),
      N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SHOW_PREVIEW, N_("Msg Preview"),

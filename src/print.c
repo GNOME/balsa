@@ -757,7 +757,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
     pdata->labels[hdr++] = g_strdup(_("Type:"));
     pdata->labels[hdr++] = g_strdup(conttype);
     if (body->filename) {
-	pdata->labels[hdr++] = g_strdup(_("Filename:"));
+	pdata->labels[hdr++] = g_strdup(_("File name:"));
 	pdata->labels[hdr++] = g_strdup(body->filename);
     }
     pdata->label_width = gnome_font_get_width_utf8(pi->header_font, pdata->labels[0]);

@@ -76,7 +76,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     g_free(preset);
 
     preset = libbalsa_guess_email_address();
-    balsa_init_add_table_entry(table, 1, _("_Email address:"), preset,
+    balsa_init_add_table_entry(table, 1, _("_Email Address:"), preset,
                                &(user->ed1), druid, &(user->email));
     g_free(preset);
 

@@ -830,10 +830,10 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
         mailbox = va_arg (ap, const char *);
         message = va_arg (ap, smtp_message_t);
 	status = smtp_reverse_path_status (message);
-	snprintf (buf, sizeof buf, _("From: %d <%s>"), status->code, mailbox);
+	snprintf (buf, sizeof buf, "%s %d <%s>", _("From:"), status->code, mailbox);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
 
-	snprintf (buf, sizeof buf, _("From %s: %d %s"),
+	snprintf (buf, sizeof buf, "%s %s: %d %s", _("From"),
 	          mailbox, status->code, status->text);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
         break;
@@ -841,10 +841,10 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
         mailbox = va_arg (ap, const char *);
         recipient = va_arg (ap, smtp_recipient_t);
 	status = smtp_recipient_status (recipient);
-	snprintf (buf, sizeof buf, _("To: %d <%s>"), status->code, mailbox);
+	snprintf (buf, sizeof buf, "%s %d <%s>", _("To:"), status->code, mailbox);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
 
-	snprintf (buf, sizeof buf, _("To %s: %d %s"),
+	snprintf (buf, sizeof buf, "%s %s: %d %s", _("To"),
 	          mailbox, status->code, status->text);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
         break;
@@ -868,8 +868,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
     case SMTP_EV_MESSAGESENT:
         message = va_arg (ap, smtp_message_t);
         status = smtp_message_transfer_status (message);
-	snprintf (buf, sizeof buf, _("%d %s"),
-		  status->code, status->text);
+	snprintf (buf, sizeof buf, "%d %s", status->code, status->text);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
         /* Reset 'mqi->sent' for the next message (i.e. bcc copy) */

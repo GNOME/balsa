@@ -359,7 +359,7 @@ save_dialog_ok(GtkWidget* save_dialog, BalsaPartInfo * info)
 	result = libbalsa_message_body_save(info->body, NULL, filename);
 	if (!result)
             balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _(" Could not save %s: %s"),
+                              _("Could not save %s: %s"),
                               filename, strerror(errno));
     }
 }
@@ -1072,7 +1072,7 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
     if (info->body->filename) {
-        msg = g_strdup_printf(_("Filename: %s"), info->body->filename);
+        msg = g_strdup_printf(_("File name: %s"), info->body->filename);
         gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg), FALSE, FALSE,
                            0);
         g_free(msg);
@@ -2139,7 +2139,7 @@ part_context_menu_cb(GtkWidget * menu_item, BalsaPartInfo * info)
         && (cmd = gnome_vfs_mime_get_value(content_type, key)) != NULL) {
 	if (!libbalsa_message_body_save_temporary(info->body, NULL)) {
 	    balsa_information(LIBBALSA_INFORMATION_WARNING,
-			      _("could not create temporary file %s"),
+			      _("Could not create temporary file %s"),
 			      info->body->temp_filename);
 	    g_free(content_type);
 	    return;
@@ -2898,7 +2898,7 @@ create_mdn_dialog(gchar * sender, gchar * mdn_to_address,
                                  "Do you want to send "
                                  "this notification?"),
                                sender, mdn_to_address);
-    gtk_window_set_title(GTK_WINDOW(mdn_dialog), _("reply to MDN?"));
+    gtk_window_set_title(GTK_WINDOW(mdn_dialog), _("Reply to MDN?"));
     g_object_set_data(G_OBJECT(mdn_dialog), "balsa-send-msg", send_msg);
     g_signal_connect(G_OBJECT(mdn_dialog), "response",
                      G_CALLBACK(mdn_dialog_response), NULL);

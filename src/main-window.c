@@ -273,7 +273,7 @@ static GnomeUIInfo file_new_menu[] = {
                            GTK_STOCK_ADD),
 #define MENU_FILE_NEW_IMAP_SUBFOLDER_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP subfolder..."), 
-                           N_("Add new IMAP subfolder"),
+                           N_("Add a new IMAP subfolder"),
                            folder_conf_add_imap_sub_cb, 
                            GTK_STOCK_ADD),
     GNOMEUIINFO_END

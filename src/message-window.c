@@ -151,12 +151,12 @@ static GnomeUIInfo message_menu[] = {
      BALSA_PIXMAP_MENU_FORWARD, 'F', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
     {
-     GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in Message"),
+     GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in message"),
      next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_MENU_NEXT, '.', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Previous Part"),
-     N_("Previous part in Message"),
+     N_("Previous part in message"),
      previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_MENU_PREVIOUS, ',', GDK_CONTROL_MASK, NULL},
     {

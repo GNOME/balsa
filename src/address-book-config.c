@@ -401,7 +401,7 @@ create_ldif_page(AddressBookConfig * abc)
 				   ? abc->address_book->name : NULL, 
 				   label);
 
-    label = gtk_label_new_with_mnemonic(_("_File name"));
+    label = gtk_label_new_with_mnemonic(_("_File Name"));
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
 		     GTK_FILL, GTK_FILL, 10, 10);

@@ -36,7 +36,7 @@ static void balsa_index_size_allocate (GtkWidget * widget, GtkAllocation * alloc
 
 
 /* statics */
-static char * flag_str (MessageFlags flags);
+static char *flag_str (MessageFlags flags);
 static void mailbox_listener (MailboxWatcherMessage * mw_message);
 
 
@@ -71,8 +71,11 @@ static void balsa_index_marshal_signal_1 (GtkObject * object,
 					  gpointer func_data,
 					  GtkArg * args);
 
-static gint balsa_index_signals[LAST_SIGNAL] = {0};
+static gint balsa_index_signals[LAST_SIGNAL] =
+{0};
 static GtkBinClass *parent_class = NULL;
+
+static guint first_new_message;
 
 guint
 balsa_index_get_type ()
@@ -260,7 +263,7 @@ void
 balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 {
   GList *list;
-
+  guint i = 0;
   g_return_if_fail (bindex != NULL);
 
   if (bindex->mailbox == mailbox)
@@ -276,7 +279,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
       g_list_free (bindex->selection);
       bindex->selection = NULL;
       gtk_clist_clear (GTK_CLIST (GTK_BIN (bindex)->child));
-    }  
+    }
 
   /*
    * set the new mailbox
@@ -286,7 +289,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     return;
 
   mailbox_open_ref (mailbox);
-  bindex->watcher_id = 
+  bindex->watcher_id =
     mailbox_watcher_set (mailbox,
 			 (MailboxWatcherFunc) mailbox_listener,
 			 MESSAGE_MARK_READ_MASK |
@@ -297,7 +300,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 			 MESSAGE_FLAGGED_MASK |
 			 MESSAGE_ANSWERED_MASK,
 			 (gpointer) bindex);
-  
+
 
   /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode
    * (the default for this index), the first row appended automagicly gets
@@ -313,10 +316,20 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     {
       balsa_index_add (bindex, (Message *) list->data);
       list = list->next;
+      i++;
     }
 
   gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
 				GTK_SELECTION_BROWSE);
+
+  if (first_new_message != 0)
+    gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_message, 0, 0.0, 0.0);
+  else
+    {
+      g_print ("%i\n", i);
+      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i - 1, 0, 0.0, 0.0);
+    }
+  first_new_message = 0;
 }
 
 
@@ -356,6 +369,10 @@ balsa_index_add (BalsaIndex * bindex,
   gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, text[1]);
 
   gtk_clist_set_row_data (GTK_CLIST (GTK_BIN (bindex)->child), row, (gpointer) message);
+
+  if (first_new_message == 0)
+    if (message->flags & MESSAGE_FLAG_NEW)
+      first_new_message = row;
 }
 
 
@@ -560,7 +577,7 @@ unselect_message (GtkWidget * widget,
 /*
  * listen for mailbox messages
  */
-static void 
+static void
 mailbox_listener (MailboxWatcherMessage * mw_message)
 {
   BalsaIndex *bindex = (BalsaIndex *) mw_message->data;

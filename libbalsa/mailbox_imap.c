@@ -1116,13 +1116,20 @@ libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox,
  * pings the connection with NOOP for an open IMAP mailbox.
  * this keeps the connections alive.
  * new messages are loaded in exists-notify signal handler.
+ *
+ * FIXME: shift responsibility for keeping the connection alive to
+ * LibBalsaImapServer.
  */
 
 void
 libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mimap)
 {
-    g_return_if_fail(mimap->handle);
-    imap_mbox_handle_noop(mimap->handle);
+    g_return_if_fail(mimap != NULL);
+
+    if (mimap->handle)
+	if (imap_mbox_handle_noop(mimap->handle) != IMR_OK)
+	    /* FIXME: report error... */
+	    ;
 }
 
 /* imap_close_all_connections:

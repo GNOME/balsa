@@ -149,6 +149,7 @@ static GnomeUIInfo mailbox_menu[] =
     GNOME_APP_UI_ITEM, N_ ("Add"), NULL, mblist_menu_add_cb, NULL,
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'A', 0, NULL
   },
+#if 0
   {
     GNOME_APP_UI_ITEM, N_ ("Edit"), NULL, mblist_menu_edit_cb, NULL,
     NULL, GNOME_APP_PIXMAP_NONE, GNOME_STOCK_MENU_PROP, 'E', 0, NULL
@@ -157,6 +158,7 @@ static GnomeUIInfo mailbox_menu[] =
     GNOME_APP_UI_ITEM, N_ ("Delete"), NULL, mblist_menu_delete_cb, NULL,
     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
   },
+#endif
   GNOMEUIINFO_ITEM_STOCK ("Close", NULL, mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END

@@ -276,6 +276,7 @@ balsa_index_select_next (BalsaIndex * bindex)
   GtkCList *clist;
 
   clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  if (!clist->selection) return;
   row = (gint) clist->selection->data + 1;
   
   gtk_clist_select_row (clist, row, -1);
@@ -291,6 +292,7 @@ balsa_index_select_previous (BalsaIndex * bindex)
   GtkCList *clist;
 
   clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  if (!clist->selection) return;
   row = (gint) clist->selection->data - 1;
   
   gtk_clist_select_row (clist, row, -1);

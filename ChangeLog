@@ -12,6 +12,7 @@
 
 2004-04-19 09:17  PeterB
 
+	* libbalsa/message.c: don't add standard headers to user_hdrs.
 	* src/balsa-message.c: emit "row-changed" signal after updating the
 	attach icon.
 

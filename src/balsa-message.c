@@ -258,19 +258,12 @@ GtkWidget *
 balsa_message_new (void)
 {
   BalsaMessage *bmessage;
-  GtkStyle *style;
-  GdkColormap* colormap;
   
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   bmessage = gtk_type_new (balsa_message_get_type ());
   gtk_widget_pop_visual ();
   gtk_widget_pop_colormap ();
-
-  style =  gtk_style_new ();
-  colormap = gtk_widget_get_colormap (GTK_WIDGET (bmessage));
-  gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);
-  gtk_widget_set_style (GTK_WIDGET (bmessage), style);
 
   gtk_signal_connect_after(GTK_OBJECT (bmessage), "key_press_event", GTK_SIGNAL_FUNC (key_pressed), NULL);
   gtk_signal_connect(GTK_OBJECT (bmessage), "button_press_event", GTK_SIGNAL_FUNC (button_pressed), NULL);
@@ -424,7 +417,7 @@ balsa_message_text_item (gchar * text, GnomeCanvasGroup * group, double x, doubl
 			       "x", x,
 			       "y", y,
 			       "anchor", GTK_ANCHOR_NW,
-       "font", "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1",
+			       "font",  balsa_app.message_font,
 			       "text", text, NULL);
   return new;
 }
@@ -533,6 +526,14 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
       next_height = next_row_height (row);
       item = balsa_message_text_item (_("Cc:"), row[0], 0.0, next_height);
       data = balsa_message_text_item (make_string_from_list (message->cc_list),
+				      row[1], 0.0, next_height);
+    }
+
+  if (message->bcc_list)
+    {
+      next_height = next_row_height (row);
+      item = balsa_message_text_item (_("Bcc:"), row[0], 0.0, next_height);
+      data = balsa_message_text_item (make_string_from_list (message->bcc_list),
 				      row[1], 0.0, next_height);
     }
 

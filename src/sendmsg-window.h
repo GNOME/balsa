@@ -31,7 +31,8 @@ extern "C"
       SEND_NORMAL,
       SEND_REPLY,
       SEND_REPLY_ALL,
-      SEND_FORWARD
+      SEND_FORWARD,
+      SEND_CONTINUE
     }
   SendType;
 
@@ -41,7 +42,7 @@ extern "C"
   struct _BalsaSendmsg
     {
       GtkWidget *window;
-      GtkWidget *to, *from, *subject, *cc, *bcc;
+      GtkWidget *to, *from, *subject, *cc, *bcc, *fcc;
       GtkWidget *attachments;
       GtkWidget *text;
       Message *orig_message;

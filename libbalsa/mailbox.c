@@ -469,7 +469,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
       load_messages (mailbox, 0);
 
-      /* incriment the reference count */
+      /* increment the reference count */
       mailbox->open_ref++;
 
 #ifdef DEBUG
@@ -515,7 +515,10 @@ mailbox_open_unref (Mailbox * mailbox)
 	     don't ask me what to do - AC */
 
 	  if (mx_close_mailbox (CLIENT_CONTEXT (mailbox)) == 0)
-	    CLIENT_CONTEXT (mailbox) = NULL;
+	    {
+	      free (CLIENT_CONTEXT (mailbox));
+	      CLIENT_CONTEXT (mailbox) = NULL;
+	    }
 	}
     }
 
@@ -549,7 +552,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
     }
   else if (i == M_NEW_MAIL || i == M_REOPENED)
     {
-      g_print ("got new mail! yippie!\n");
+      // g_print ("got new mail! yippie!\n");
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
 
       if (mailbox->new_messages > 0)
@@ -692,6 +695,13 @@ load_messages (Mailbox * mailbox, gint emit)
 
       if (!cur)
 	continue;
+      if (cur->env->subject && 
+          !strcmp (cur->env->subject, 
+                   "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA")) {
+          mailbox->new_messages--;
+          mailbox->messages++;
+          continue;
+      }
 
       message = translate_message (cur);
       message->mailbox = mailbox;
@@ -1107,8 +1117,8 @@ mailbox_gather_content_info(Mailbox *mailbox)
     }
 
   mailbox_open_unref (mailbox);
-  return TRUE;
 #endif
+  return TRUE;
 }
 
 
@@ -1165,6 +1175,7 @@ message_new (void)
   message->to_list = NULL;
   message->cc_list = NULL;
   message->bcc_list = NULL;
+  message->fcc_mailbox = NULL;
   message->in_reply_to = NULL;
   message->message_id = NULL;
   message->body_ref = 0;
@@ -1177,6 +1188,8 @@ message_new (void)
 void
 message_free (Message * message)
 {
+  GList* list;
+
   g_free (message->remail);
   g_free (message->date);
   address_free (message->from);
@@ -1184,8 +1197,17 @@ message_free (Message * message)
   address_free (message->reply_to);
   g_free (message->subject);
 
+  for (list = g_list_first (message->to_list); list; list = g_list_next (list))
+    address_free (list->data);
   g_list_free (message->to_list);
+
+  for (list = g_list_first (message->cc_list); list; list = g_list_next (list))
+    address_free (list->data);
   g_list_free (message->cc_list);
+
+  for (list = g_list_first (message->bcc_list); list; list = g_list_next (list))
+    address_free (list->data);
+  g_list_free (message->bcc_list);
 
   g_free (message->in_reply_to);
   g_free (message->message_id);

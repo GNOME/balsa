@@ -65,12 +65,15 @@ static void new_message_cb (GtkWidget * widget, gpointer data);
 static void replyto_message_cb (GtkWidget * widget, gpointer data);
 static void replytoall_message_cb (GtkWidget * widget, gpointer data);
 static void forward_message_cb (GtkWidget * widget, gpointer data);
+static void continue_message_cb (GtkWidget * widget, gpointer data);
 
 static void next_message_cb (GtkWidget * widget, gpointer data);
 static void previous_message_cb (GtkWidget * widget, gpointer data);
 
 static void delete_message_cb (GtkWidget * widget, gpointer data);
 static void undelete_message_cb (GtkWidget * widget, gpointer data);
+
+extern gint address_book_cb (GtkWidget *widget, gpointer data);
 
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
@@ -127,6 +130,12 @@ static GnomeUIInfo message_menu[] =
     forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
   },
+    /* C */
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Continue"), N_("Continue editing current message"),
+    continue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL, 'C', 0, NULL
+  },
   GNOMEUIINFO_SEPARATOR,
     /* D */
   {
@@ -140,6 +149,14 @@ static GnomeUIInfo message_menu[] =
     undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
   },
+
+  GNOMEUIINFO_SEPARATOR,
+  {
+    GNOME_APP_UI_ITEM, N_ ("Address Book"), N_("Opens the address book"),
+    address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL
+  },
+
   GNOMEUIINFO_END
 };
 
@@ -214,9 +231,18 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("Reply"), N_ ("Reply"), replyto_message_cb, GNOME_STOCK_PIXMAP_MAIL_RPL),
   GNOMEUIINFO_ITEM_STOCK (N_ ("Reply to all"), N_ ("Reply to all"), replytoall_message_cb, GNOME_STOCK_PIXMAP_MAIL_RPL),
   GNOMEUIINFO_ITEM_STOCK (N_ ("Forward"), N_ ("Forward"), forward_message_cb, GNOME_STOCK_PIXMAP_MAIL_FWD),
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Continue"), N_ ("Continue"), continue_message_cb, GNOME_STOCK_PIXMAP_MAIL),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Previous"), N_ ("Open Previous Message"), previous_message_cb, GNOME_STOCK_PIXMAP_BACK),
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Next"), N_ ("Open Next Message"), next_message_cb, GNOME_STOCK_PIXMAP_FORWARD),
+  {
+    GNOME_APP_UI_ITEM, N_ ("Previous"), N_("Open Previous message"),
+    previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_PIXMAP_BACK, 'P', 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("Next"), N_("Open Next message"),
+    next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_PIXMAP_FORWARD, 'N', 0, NULL
+  },
 #ifdef BALSA_SHOW_ALL
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print current message"), NULL, GNOME_STOCK_PIXMAP_PRINT),
@@ -267,14 +293,19 @@ main_window_set_cursor (gint type)
 static void
 destroy_mdi_cb (GnomeMDI * mdi, gpointer data)
 {
+  gint x, y;
+  gchar *geometry;
+  
+  geometry = gnome_geometry_string (GTK_WIDGET (mdi->active_window)->window);
+  gnome_parse_geometry (geometry, &x, &y, &balsa_app.mw_width, 
+                        &balsa_app.mw_height);
+  g_free (geometry);
   balsa_exit ();
 }
 
 static void
 destroy_window_cb (GtkObject *object)
 {
-  balsa_app.mw_width = GTK_WIDGET (object)->allocation.width;
-  balsa_app.mw_height = GTK_WIDGET (object)->allocation.height;  
 }
 
 void
@@ -302,6 +333,9 @@ main_window_init (void)
 
   gnome_app_install_menu_hints(mdi->active_window,
 		       gnome_mdi_get_menubar_info(mdi->active_window));
+
+  if (balsa_app.check_mail_upon_startup)
+    check_new_messages_cb(NULL, NULL);
 }
 
 static gint
@@ -342,7 +376,7 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   gtk_object_set_data (GTK_OBJECT (app), APPBAR_KEY, appbar);
 
   gtk_window_set_policy (GTK_WINDOW (app), TRUE, TRUE, FALSE);
-  gtk_widget_set_usize (GTK_WIDGET (app), balsa_app.mw_width, balsa_app.mw_height);
+  gtk_window_set_default_size (GTK_WINDOW (app), balsa_app.mw_width, balsa_app.mw_height);
 
   mblist_open_window (mdi);
 
@@ -425,11 +459,24 @@ show_about_box (void)
 static void
 check_new_messages_cb (GtkWidget * widget, gpointer data)
 {
-  if (balsa_app.current_index_child != NULL)
-    mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
+  GtkWidget *dialog, *w;
+
+  dialog = gnome_dialog_new("Checking Mail...", GNOME_STOCK_BUTTON_OK, NULL);
+  gnome_dialog_set_close(GNOME_DIALOG(dialog), TRUE);
+
+  w = gtk_label_new("Checking Mail....");
+  gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), w, FALSE, FALSE, 0);
+
+  gtk_widget_show_all(dialog);
 
   check_all_pop3_hosts (balsa_app.inbox, balsa_app.inbox_input);
   check_all_imap_hosts (balsa_app.inbox, balsa_app.inbox_input);
+
+  if (balsa_app.current_index_child != NULL)
+    mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
+
+  gtk_label_set_text(GTK_LABEL(w), N_("Checked."));
+//  gtk_widget_destroy(dialog);
 }
 
 static void
@@ -504,6 +551,30 @@ forward_message_cb (GtkWidget * widget, gpointer data)
     {
       message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
       sendmsg_window_new (widget, message, SEND_FORWARD);
+      list = list->next;
+    }
+}
+
+
+static void
+continue_message_cb (GtkWidget * widget, gpointer data)
+{
+  GtkCList *clist;
+  GList *list;
+  Message *message;
+
+  g_return_if_fail (widget != NULL);
+
+  if (!balsa_app.current_index_child || 
+      balsa_app.current_index_child->mailbox != balsa_app.draftbox)
+    return;
+
+  clist = GTK_CLIST (balsa_app.current_index_child->index);
+  list = clist->selection;
+  while (list)
+    {
+      message = gtk_clist_get_row_data (clist, GPOINTER_TO_INT (list->data));
+      sendmsg_window_new (widget, message, SEND_CONTINUE);
       list = list->next;
     }
 }
@@ -663,6 +734,7 @@ set_icon (GnomeApp * app)
       att.width = 32;
       att.height = 24;
     }
+  att.event_mask = GDK_ALL_EVENTS_MASK;
   att.wclass = GDK_INPUT_OUTPUT;
   att.window_type = GDK_WINDOW_TOPLEVEL;
   att.x = 0;
@@ -670,7 +742,11 @@ set_icon (GnomeApp * app)
   att.visual = gdk_imlib_get_visual ();
   att.colormap = gdk_imlib_get_colormap ();
   ic_win = gdk_window_new (NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
-  im = gdk_imlib_load_image (gnome_unconditional_pixmap_file ("balsa/balsa_icon.png"));
+  {
+    char *filename = gnome_unconditional_pixmap_file ("balsa/balsa_icon.png");
+    im = gdk_imlib_load_image (filename);
+    g_free (filename);
+  }
   gdk_window_set_icon (w, ic_win, NULL, NULL);
   gdk_imlib_render (im, att.width, att.height);
   pmap = gdk_imlib_move_image (im);

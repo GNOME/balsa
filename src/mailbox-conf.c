@@ -386,20 +386,139 @@ mailbox_conf_set_values (Mailbox * mailbox)
 }
 
 
-static void
+/* Returns 1 if everything was okey
+ * Returns -2 if there was a blank field and the user wants to re-edit
+ * Returns -1 if there was a blank field and the user wants to cancel
+ */
+
+static int
+check_for_blank_fields(Mailbox *mailbox)
+{
+  gchar *msg = NULL;
+  GtkWidget *ask;
+  gint clicked_button;
+  
+  switch(mailbox->type) {
+  case MAILBOX_MH:
+  case MAILBOX_MAILDIR:
+  case MAILBOX_UNKNOWN:
+    return 1;
+    break;
+  case MAILBOX_IMAP:
+    if(!strcmp(gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY 
+					       (mcw->imap_folderpath)))),"") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY(mcw->imap_server)), "") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)), "") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)), "") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), "")) {
+      
+      if(!strcmp(gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry
+					      (GNOME_ENTRY 
+					       (mcw->imap_folderpath)))),"")) 
+	{
+	  msg = _("You need to fill in the folderpath field.");
+	}
+      else if(!strcmp(gtk_entry_get_text(GTK_ENTRY(mcw->imap_server)), "")) 
+	{ 
+	  msg = _("You need to fill in the IMAP Server field");
+	}
+      else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_username)), ""))
+	{
+	  msg = _("You need to fill in the username field");
+	}  
+      else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_password)), ""))
+	{
+	  msg = _("You need to fill in the password field");
+	}
+      else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), "")) 
+	{
+	  msg = _("You need to fill in the port field");
+	}
+      else
+	msg = _("All of the fields must be filled in");
+    }
+
+    break;
+
+  case MAILBOX_MBOX:
+    if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)), "")) 
+      msg = _("You need to fill in the Mailbox Name field.");
+    
+    break;
+  case MAILBOX_POP3:
+    if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)), "") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)), "") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)), "") ||
+       !strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))  {
+      
+      
+      if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)),"")) 
+	{
+	  msg = _("You need to fill in the Mailbox Name field.");
+	}
+      else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)),""))
+	{
+	  msg = _("You need to fill in the user field.");
+	}
+      else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)),""))
+	{
+	  msg = _("You need to fill in the password field.");
+	}
+      else if(!strcmp(gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)), ""))
+	{
+	  msg = _("You need to fill in the server field.");
+	}
+      else
+	{
+	  msg = _("Some of the fields are blank.");
+	}
+    }
+    break;
+    
+  }
+  
+  if(msg == NULL)   /* msg == NULL only if no fields where blank */
+    return 1;
+  
+  ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
+			      GNOME_STOCK_BUTTON_OK, 
+			      GNOME_STOCK_BUTTON_CANCEL, NULL);
+  
+  
+  gnome_dialog_set_default(GNOME_DIALOG(ask), 1);
+  gtk_window_set_modal(GTK_WINDOW(ask), TRUE);
+  clicked_button = gnome_dialog_run(GNOME_DIALOG(ask));
+  
+  if(clicked_button == 1)
+    return -2;               /* Was a blank, want to re-edit */
+  else
+    return -1;               /* Was a blank, want to cancel */
+}
+
+static int
 conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
 {
-  if (!mailbox)
-    return;
+  int field_check;
 
+  if (!mailbox)
+    return 1;
+  
   switch (mailbox->type)
     {
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
     case MAILBOX_MBOX:
       {
-	gchar *filename =
-	gtk_entry_get_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (mcw->local_mailbox_path))));
+	gchar *filename;
+	field_check = check_for_blank_fields(mailbox);
+	
+	if(field_check == -1) 
+	  return -1;
+	else if(field_check == -2)
+	  return -2;
+	
+	filename =
+	  gtk_entry_get_text (GTK_ENTRY ((mcw->local_mailbox_path)));
 	g_free (mailbox->name);
 	g_free (MAILBOX_LOCAL (mailbox)->path);
 	mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
@@ -410,6 +529,12 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       break;
 
     case MAILBOX_POP3:
+      field_check = check_for_blank_fields(mailbox);
+      if(field_check == -1)
+	return -1;
+      else if(field_check == -2)
+	return 1;
+      
       g_free (mailbox->name);
       g_free (MAILBOX_POP3 (mailbox)->user);
       g_free (MAILBOX_POP3 (mailbox)->passwd);
@@ -426,6 +551,12 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       break;
 
     case MAILBOX_IMAP:
+      field_check = check_for_blank_fields(mailbox);
+      if(field_check == -1)
+	return -1;
+      else if(field_check == -2)
+	return 1;
+
       g_free (mailbox->name);
       g_free (MAILBOX_IMAP (mailbox)->user);
       g_free (MAILBOX_IMAP (mailbox)->passwd);
@@ -453,6 +584,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       /* Do nothing for now */
       break;
     }
+  return 1;
 }
 
 
@@ -464,6 +596,7 @@ conf_add_mailbox ()
   GNode *node;
   GString *fos;
   GString *idstr;
+  int field_check;
 
   MailboxConfPageType cur_page;
   cur_page = gtk_notebook_get_current_page (GTK_NOTEBOOK (mcw->notebook));
@@ -496,6 +629,13 @@ conf_add_mailbox ()
 	    type = MAILBOX_MBOX;
 	  }
 	mailbox = mailbox_new (type);
+
+	field_check = check_for_blank_fields(mailbox);
+	if(field_check == -2)
+	  break;
+	else if(field_check == -1)
+	  return NULL;
+	
 	mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
 	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
@@ -509,12 +649,20 @@ conf_add_mailbox ()
 /* POP3 Mailboxes */
     case MC_PAGE_POP3:
       mailbox = mailbox_new (MAILBOX_POP3);
+
+      field_check = check_for_blank_fields(mailbox);
+      if(field_check == -2)
+	break;
+      else if(field_check == -1)
+	return NULL;
+
       mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_mailbox_name)));
       MAILBOX_POP3 (mailbox)->user = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_username)));
       MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
       MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
       MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
+
       balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
       config_mailbox_add (mailbox, NULL);
       add_mailboxes_for_checking (mailbox);
@@ -524,7 +672,13 @@ conf_add_mailbox ()
 /* IMAP Mailboxes */
     case MC_PAGE_IMAP:
       mailbox = mailbox_new (MAILBOX_IMAP);
-      
+
+      field_check = check_for_blank_fields(mailbox);
+      if(field_check == -2)
+	break;
+      else if(field_check == -1)
+	return NULL;
+
       fos=(GString *) gtk_entry_get_text(GTK_ENTRY(gnome_entry_gtk_entry(GNOME_ENTRY (mcw->imap_folderpath))));
       idstr=(GString *) g_string_new((const gchar *)fos);
       /* used to build a string: MAILBOXNAME " on " SERVERNAME */
@@ -561,22 +715,27 @@ static void
 mailbox_conf_close (GtkWidget * widget, gboolean save)
 {
   Mailbox *mailbox;
+  int return_value;
 
   mailbox = mcw->mailbox;
 
   if (mailbox && save)		/* we are updating the mailbox */
     {
       gchar *old_mbox_name = g_strdup (mailbox->name);
-      conf_update_mailbox (mcw->mailbox, old_mbox_name);
+      return_value = conf_update_mailbox (mcw->mailbox, old_mbox_name);
       g_free (old_mbox_name);
 
-      if (mailbox->type == MAILBOX_POP3)	/* redraw the pop3 server list */
+      if (mailbox->type == MAILBOX_POP3 &&
+	  return_value != -1)                /* redraw the pop3 server list */
 	update_pop3_servers ();
+      else                                   /* redraw the main mailbox list */
+	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));	
 
-      else
-	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));	/* redraw the main mailbox list */
-
-      /* TODO cleanup */
+      if(return_value != -1) {
+	gtk_widget_destroy (mcw->window);
+	g_free (mcw);
+	mcw = NULL;
+      }
 
       return;			/* don't continue */
     }

@@ -36,6 +36,6 @@ struct _MailboxNode
     gint expanded;
   };
 
-MailboxNode *mailbox_node_new (gchar * name, Mailbox * mb, gint i);
+MailboxNode *mailbox_node_new (const gchar * name, Mailbox * mb, gint i);
 gchar *g_get_host_name (void);
 #endif /* __MISC_H__ */

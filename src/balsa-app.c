@@ -101,6 +101,8 @@ balsa_app_init (void)
   balsa_app.inbox = NULL;
   balsa_app.inbox_input = NULL;
   balsa_app.outbox = NULL;
+  balsa_app.sentbox = NULL;
+  balsa_app.draftbox = NULL;
   balsa_app.trash = NULL;
 
   balsa_app.mailbox_nodes = g_node_new (NULL);
@@ -124,6 +126,11 @@ balsa_app_init (void)
 
   /* font */
   balsa_app.message_font = NULL;
+
+  /*encoding */
+  balsa_app.encoding_style = 0;
+  balsa_app.charset = NULL;
+
 }
 
 gint

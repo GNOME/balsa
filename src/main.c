@@ -74,11 +74,15 @@ balsa_init (int argc, char **argv)
   balsa_mail_send balsa_servant;
   PortableServer_POA root_poa;
   PortableServer_POAManager pm;
+  static struct poptOption options[] = {
+         {"checkmail", 'c', POPT_ARG_NONE, &(balsa_app.check_mail_upon_startup), 0, N_("Get new mail on startup"), NULL},
+         {NULL, '\0', 0, NULL, 0} /* end the list */
+  };
 
   CORBA_exception_init (&ev);
 
-  orb = gnome_CORBA_init ("balsa", VERSION,
-			  &argc, argv,
+  orb = gnome_CORBA_init_with_popt_table ("balsa", VERSION,
+			  &argc, argv, options, 0, NULL,
 			  GNORBA_INIT_SERVER_FUNC,
 			  &ev);
 
@@ -138,9 +142,11 @@ mailboxes_init (void)
      were not able to locate the settings for them anywhere in our
      configuartion and should run balsa-init. */
   if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
-      balsa_app.trash == NULL)
+      balsa_app.sentbox == NULL || balsa_app.trash == NULL ||
+      balsa_app.draftbox == NULL)
     {
-      fprintf (stderr, "*** One of inbox/outbox/trash is NULL\n");
+      fprintf (stderr, 
+               "*** One of inbox/outbox/sentbox/draftbox/trash is NULL\n");
       initialize_balsa ();
       return;
     }
@@ -245,6 +251,24 @@ balsa_exit (void)
     }
 
   mailbox = balsa_app.outbox;
+  if (mailbox)
+    {
+      if (balsa_app.debug)
+	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+      while (mailbox->open_ref > 0)
+	mailbox_open_unref (mailbox);
+    }
+
+  mailbox = balsa_app.sentbox;
+  if (mailbox)
+    {
+      if (balsa_app.debug)
+	g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
+      while (mailbox->open_ref > 0)
+	mailbox_open_unref (mailbox);
+    }
+
+  mailbox = balsa_app.draftbox;
   if (mailbox)
     {
       if (balsa_app.debug)

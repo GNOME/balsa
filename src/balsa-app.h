@@ -38,7 +38,10 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
+#define DEFAULT_MESSAGE_FONT "-adobe-helvetica-medium-r-normal--12-*-72-72-p-*-iso8859-1"
 
+#define DEFAULT_CHARSET "ISO-8859-1"
+#define DEFAULT_ENCODING ENC8BIT
 
 /* global balsa application structure */
 extern struct BalsaApplication
@@ -59,6 +62,8 @@ extern struct BalsaApplication
   
   Mailbox *inbox;
   GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
+  Mailbox *sentbox;
+  Mailbox *draftbox;
   Mailbox *outbox;
   Mailbox *trash;
   
@@ -88,6 +93,17 @@ extern struct BalsaApplication
   
   /* arp --- string to prefix "replied to" messages. */
   gchar *quote_str;
+
+  gint check_mail_upon_startup;
+
+  /* font used to display messages */
+  gchar *message_font;
+
+  /* encoding stuff */
+  gint encoding_style;
+  gchar *charset;
+
+      
 }
 balsa_app;
 

@@ -267,12 +267,12 @@ balsa_mblist_insert_mailbox (BalsaMBList * mblist,
 				  FALSE, FALSE);
   gtk_ctree_node_set_row_data (GTK_CTREE (mblist), ctnode, mailbox);
 #ifdef BALSA_SHOW_INFO
-  if (bmbl->display_content_info)
+  if (mblist->display_content_info)
     {
       mailbox_gather_content_info (balsa_app.trash);
-      g_snprintf (text[1], INFO_FIELD_LENGTH, "%ld", (balsa_app.trash)->unread_messages);
-      g_snprintf (text[2], INFO_FIELD_LENGTH, "%ld", (balsa_app.trash)->total_messages);
-      balsa_mblist_add_watched_mailbox (bmbl, balsa_app.trash);
+//      g_snprintf (text[1], INFO_FIELD_LENGTH, "%ld", (balsa_app.trash)->unread_messages);
+//      g_snprintf (text[2], INFO_FIELD_LENGTH, "%ld", (balsa_app.trash)->total_messages);
+//      balsa_mblist_add_watched_mailbox (mblist, balsa_app.trash);
     }
 #endif
 }
@@ -308,6 +308,8 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
 
   balsa_mblist_insert_mailbox (bmbl, balsa_app.inbox, BALSA_ICON_INBOX);
   balsa_mblist_insert_mailbox (bmbl, balsa_app.outbox, BALSA_ICON_OUTBOX);
+  balsa_mblist_insert_mailbox (bmbl, balsa_app.sentbox, BALSA_ICON_TRAY_EMPTY);
+  balsa_mblist_insert_mailbox (bmbl, balsa_app.draftbox, BALSA_ICON_TRAY_EMPTY);
   balsa_mblist_insert_mailbox (bmbl, balsa_app.trash, BALSA_ICON_TRASH);
 
   if (balsa_app.mailbox_nodes)

@@ -25,9 +25,12 @@
 #include "mailbox-conf.h"
 #include "main-window.h"
 #include "save-restore.h"
+#include "../libmutt/mime.h"
+#include "../libmutt/mutt.h"
 
 #define NUM_TOOLBAR_MODES 3
 #define NUM_MDI_MODES 4
+#define NUM_ENCODING_MODES 3
 
 typedef struct _PropertyUI
   {
@@ -46,6 +49,15 @@ typedef struct _PropertyUI
 #endif
     /* arp */
     GtkWidget *quote_str;
+
+    GtkWidget *message_font;    /* font used to display messages */ 
+    GtkWidget *font_picker;
+
+      /* charset */
+    GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
+    GtkWidget *charset;
+
+
   }
 PropertyUI;
 
@@ -68,11 +80,26 @@ gchar *toolbar_type_label[NUM_TOOLBAR_MODES] =
   N_("Both"),
 };
 
+guint encoding_type[NUM_ENCODING_MODES] =
+{
+    ENC7BIT,
+    ENC8BIT,
+    ENCQUOTEDPRINTABLE
+};
+
+gchar *encoding_type_label[NUM_ENCODING_MODES] =
+{
+    N_("7bits"),
+    N_("8bits"),
+    N_("quoted")
+};
+
 /* notebook pages */
 static GtkWidget *create_identity_page (void);
 static GtkWidget *create_mailservers_page (void);
 static GtkWidget *create_display_page (void);
 static GtkWidget *create_misc_page (void);
+static GtkWidget *create_encoding_page (void);
 
 
 /* save the settings */
@@ -88,6 +115,7 @@ void update_pop3_servers (void);
 
 /* callbacks */
 static void properties_modified_cb (GtkWidget *, GnomePropertyBox *);
+static void font_changed (GtkWidget * widget, GnomePropertyBox * pbox);
 
 static void pop3_add_cb (GtkWidget * widget, gpointer data);
 static void pop3_edit_cb (GtkWidget * widget, gpointer data);
@@ -161,6 +189,12 @@ open_preferences_manager (void)
 			     create_misc_page (),
 			     label);
 
+  /* Misc page */
+  label = gtk_label_new (_ ("Encoding"));
+  gtk_notebook_append_page (
+		    GTK_NOTEBOOK (GNOME_PROPERTY_BOX (pui->pbox)->notebook),
+			     create_encoding_page (),
+			     label);
   set_prefs ();
   for (i = 0; i < NUM_TOOLBAR_MODES; i++)
     {
@@ -196,6 +230,27 @@ open_preferences_manager (void)
   gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
 		      GTK_SIGNAL_FUNC (properties_modified_cb),
 		      pui->pbox);
+
+  /* message font */
+  gtk_signal_connect (GTK_OBJECT (pui->message_font), "changed",
+		      GTK_SIGNAL_FUNC (font_changed),
+		      pui->pbox);
+
+  gtk_signal_connect (GTK_OBJECT (pui->font_picker), "font_set",
+  		      GTK_SIGNAL_FUNC (font_changed),
+		      pui->pbox);
+ 
+  /* charset */
+  gtk_signal_connect (GTK_OBJECT (pui->charset), "changed",
+		      GTK_SIGNAL_FUNC (properties_modified_cb),
+		      pui->pbox);
+
+ for (i = 0; i < NUM_ENCODING_MODES; i++)
+    {
+      gtk_signal_connect (GTK_OBJECT (pui->encoding_type[i]), "clicked",
+			  properties_modified_cb, pui->pbox);
+    }
+
 
   /* set data and show the whole thing */
   gtk_widget_show_all (GTK_WIDGET (pui->pbox));
@@ -263,6 +318,23 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   balsa_app.quote_str =
     g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->quote_str)));
 
+  g_free (balsa_app.message_font);
+  balsa_app.message_font =
+    g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->message_font)));
+
+
+  /* charset*/
+  g_free (balsa_app.charset);
+  balsa_app.charset =
+      g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->charset)));
+  mutt_set_charset (balsa_app.charset);
+
+  for (i = 0; i < NUM_ENCODING_MODES; i++)
+    if (GTK_TOGGLE_BUTTON (pui->encoding_type[i])->active)
+      {
+	balsa_app.encoding_style = encoding_type[i];
+	break;
+      }
 
   refresh_main_window ();
 
@@ -305,6 +377,21 @@ set_prefs (void)
 #endif
   /* arp */
   gtk_entry_set_text (GTK_ENTRY (pui->quote_str), balsa_app.quote_str);
+
+  /* message font */
+  gtk_entry_set_text (GTK_ENTRY (pui->message_font), balsa_app.message_font);
+  gtk_entry_set_position (GTK_ENTRY (pui->message_font), 0);
+
+  /* charset */
+  gtk_entry_set_text (GTK_ENTRY (pui->charset), balsa_app.charset);
+  for (i = 0; i < NUM_ENCODING_MODES; i++)
+    if (balsa_app.encoding_style == encoding_type[i])
+      {
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->encoding_type[i]), TRUE);
+	break;
+      }
+
+
 }
 
 void
@@ -353,6 +440,7 @@ static GtkWidget *
 create_identity_page (void)
 {
   GtkWidget *vbox;
+  GtkWidget *frame;
   GtkWidget *table;
   GtkWidget *label;
   GtkWidget *signature;
@@ -360,8 +448,13 @@ create_identity_page (void)
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
+  /* identity frame */
+  frame = gtk_frame_new (_("Identity"));
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+
   table = gtk_table_new (4, 2, FALSE);
-  gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (table), 5);
+  gtk_container_add (GTK_CONTAINER (frame), table);
 
   /* your name */
   label = gtk_label_new (_ ("Your name:"));
@@ -476,6 +569,7 @@ create_mailservers_page ()
   frame = gtk_frame_new (_("Local Mail"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
   hbox = gtk_hbox_new (TRUE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
 
   label = gtk_label_new (_ ("Local mail directory:"));
@@ -489,6 +583,7 @@ create_mailservers_page ()
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
 
   table1 = gtk_table_new (2, 2, FALSE);
+  gtk_container_set_border_width (GTK_CONTAINER (table1), 5);
   gtk_container_add (GTK_CONTAINER (frame), table1);
   gtk_widget_show (table1);
 
@@ -579,8 +674,7 @@ create_misc_page ()
   GtkWidget *table;
   GtkWidget *label;
 
-
-  vbox = gtk_vbox_new (FALSE, 0);
+  vbox = gtk_vbox_new (FALSE, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
   /* Misc */
@@ -589,6 +683,7 @@ create_misc_page ()
 
   /* arp */
   vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 5);
   gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (vbox1));
 
   pui->debug = gtk_check_button_new_with_label (_("Debug"));
@@ -609,8 +704,94 @@ create_misc_page ()
 
   gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
 
+  /* font picker */
+  table = gtk_table_new (1, 3, FALSE);
+
+  label = gtk_label_new (_("Font:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL, 10, 10);
+
+  pui->message_font = gtk_entry_new ();
+  gtk_table_attach (GTK_TABLE (table), pui->message_font, 1, 2, 0, 1,
+		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 10);
+  
+  pui->font_picker = gnome_font_picker_new ();
+  gnome_font_picker_set_font_name (GNOME_FONT_PICKER (pui->font_picker),
+				   gtk_entry_get_text (GTK_ENTRY (pui->message_font)));
+  gnome_font_picker_set_mode (GNOME_FONT_PICKER (pui->font_picker),
+			      GNOME_FONT_PICKER_MODE_USER_WIDGET);
+  
+  label = gtk_label_new (_("Browse..."));
+  gnome_font_picker_uw_set_widget (GNOME_FONT_PICKER (pui->font_picker), GTK_WIDGET (label));
+  gtk_object_set_user_data (GTK_OBJECT(pui->font_picker), GTK_OBJECT(pui->message_font)); 
+  gtk_object_set_user_data (GTK_OBJECT(pui->message_font), GTK_OBJECT(pui->font_picker)); 
+
+  gtk_table_attach (GTK_TABLE (table), pui->font_picker,
+		    2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 10);
+
+  gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+
 
   return vbox;
+}
+
+/*
+ * encoding notepad
+ */
+static GtkWidget *
+create_encoding_page ()
+{
+   
+  GtkWidget *vbox;
+  GtkWidget *frame;
+
+  /* arp */
+  GtkWidget *vbox1;
+  GtkWidget *table;
+  GtkWidget *label;
+  GSList    *group;
+  gint      i;
+
+  vbox = gtk_vbox_new (FALSE, 5);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
+
+  // Misc 
+  frame = gtk_frame_new (_("Encoding"));
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
+
+  // arp 
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 5);
+  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (vbox1));
+
+  
+  table = gtk_table_new (1, 2, FALSE);
+
+  label = gtk_label_new (_("Charset:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL, 10, 10);
+
+   pui->charset = gtk_entry_new ();
+   gtk_table_attach (GTK_TABLE (table), pui->charset, 1, 2, 0, 1,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (table), TRUE, TRUE, 2);
+
+  group = NULL;
+  for (i = 0; i < NUM_ENCODING_MODES; i++)
+    {
+      pui->encoding_type[i] = GTK_RADIO_BUTTON (gtk_radio_button_new_with_label (group,
+						    _(encoding_type_label[i])));
+      gtk_box_pack_start (GTK_BOX (vbox1), GTK_WIDGET (pui->encoding_type[i]), TRUE, TRUE,
+			  2);
+      group = gtk_radio_button_group (pui->encoding_type[i]);
+    }
+
+
+  return vbox;
+
 }
 
 /*
@@ -620,6 +801,23 @@ static void
 properties_modified_cb (GtkWidget * widget, GnomePropertyBox * pbox)
 {
   gnome_property_box_changed (pbox);
+}
+
+static void
+font_changed (GtkWidget * widget, GnomePropertyBox * pbox)
+{
+  gchar *font;
+  GtkWidget *peer;
+  if (GNOME_IS_FONT_PICKER (widget)){
+    font = gnome_font_picker_get_font_name (GNOME_FONT_PICKER (widget));
+    peer = gtk_object_get_user_data (GTK_OBJECT (widget));
+    gtk_entry_set_text (GTK_ENTRY (peer), font);
+  } else {
+    font = gtk_entry_get_text (GTK_ENTRY (widget));
+    peer = gtk_object_get_user_data (GTK_OBJECT (widget));
+    gnome_font_picker_set_font_name (GNOME_FONT_PICKER (peer), font);
+    properties_modified_cb (widget, pbox);
+  }
 }
 
 static void

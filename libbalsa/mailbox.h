@@ -226,6 +226,9 @@ struct _Message
     GList *to_list;
     GList *cc_list;
     GList *bcc_list;
+    
+    /* File Carbon Copy Mailbox */
+    Mailbox *fcc_mailbox;
 
     /* replied message ID */
     gchar *in_reply_to;

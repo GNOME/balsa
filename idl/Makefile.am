@@ -8,6 +8,8 @@ balsagnorba_DATA = $(balsa_GNORBA)
 lib_LIBRARIES = libbalsasrv.a
 
 BUILT_SOURCES = balsa-skels.c \
+		balsa-common.c \
+		balsa-stubs.c \
 		balsa.h
 
 INCLUDES=$(GNOME_INCLUDEDIR)

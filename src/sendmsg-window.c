@@ -40,10 +40,13 @@
 #include "send.h"
 #include "sendmsg-window.h"
 
+extern gint address_book_cb(GtkWidget *, gpointer);
+
 static gint send_message_cb (GtkWidget *, BalsaSendmsg *);
+static gint postpone_message_cb (GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked (GtkWidget *, gpointer);
 static gint close_window (GtkWidget *, gpointer);
-
+static gint check_if_regular_file (gchar *);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
 /* Standard DnD types */
@@ -72,6 +75,8 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Attach"), N_ ("Add attachments to this message"), attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
   GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Postpone"), N_ ("Continue this message later"), postpone_message_cb, GNOME_STOCK_PIXMAP_SAVE),
+  GNOMEUIINFO_SEPARATOR,
 #ifdef BALSA_SHOW_INFO
   GNOMEUIINFO_ITEM_STOCK (N_ ("Spelling"), N_ ("Check Spelling"), NULL, GNOME_STOCK_PIXMAP_SPELLCHECK),
   GNOMEUIINFO_SEPARATOR,
@@ -91,6 +96,10 @@ static GnomeUIInfo file_menu[] =
   {
     GNOME_APP_UI_ITEM, N_ ("_Attach file..."), NULL, attach_clicked, NULL,
     NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH, 'H', 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Postpone"), NULL, postpone_message_cb, NULL,
+    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_SAVE, 'P', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
 
@@ -124,6 +133,7 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
   gtk_widget_destroy (bsm->subject);
   gtk_widget_destroy (bsm->cc);
   gtk_widget_destroy (bsm->bcc);
+  gtk_widget_destroy (bsm->fcc);
   gtk_widget_destroy (bsm->window);
   g_free (bsm);
   bsm = NULL;
@@ -165,13 +175,17 @@ select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event)
 static void
 add_attachment (GnomeIconList * iconlist, char *filename)
 {
-  gint pos;
-
-  pos = gnome_icon_list_append (
+  /* Why use unconditional? */ 
+  gchar *pix = gnome_pixmap_file ("balsa/attachment.png");
+  
+  if (pix && check_if_regular_file(pix)) {
+    gint pos;
+    pos = gnome_icon_list_append (
 				 iconlist,
-		   gnome_unconditional_pixmap_file ("balsa/attachment.png"),
+				 pix,
 				 g_basename (filename));
-  gnome_icon_list_set_icon_data (iconlist, pos, filename);
+    gnome_icon_list_set_icon_data (iconlist, pos, filename);
+  }
 }
 
 static gint
@@ -286,13 +300,13 @@ to_add (GtkWidget * widget,
 		 GnomeIconList * iconlist)
 {
 
-   if (strlen (gtk_entry_get_text (GTK_WIDGET(widget))) == 0)
+   if (strlen (gtk_entry_get_text (GTK_ENTRY(widget))) == 0)
    {
-      gtk_entry_set_text (GTK_WIDGET(widget), selection_data->data);
+      gtk_entry_set_text (GTK_ENTRY(widget), selection_data->data);
       return;
    } else {
-      gtk_entry_append_text (GTK_WIDGET(widget),",");
-      gtk_entry_append_text (GTK_WIDGET(widget),selection_data->data);
+      gtk_entry_append_text (GTK_ENTRY(widget),",");
+      gtk_entry_append_text (GTK_ENTRY(widget),selection_data->data);
    }
 }
 
@@ -304,10 +318,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   GtkWidget *label;
   GtkWidget *button;
   GtkWidget *frame;
-  GtkStyle *style;
-  GdkColormap* colormap;
 
-  table = gtk_table_new (6, 3, FALSE);
+  table = gtk_table_new (7, 3, FALSE);
   gtk_table_set_row_spacings (GTK_TABLE (table), 2);
   gtk_table_set_col_spacings (GTK_TABLE (table), 2);
 
@@ -328,6 +340,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	       gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_RED));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 0, 1,
 		    0, 0, 0, 0);
+  gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(address_book_cb),
+		     (gpointer) msg->to);
   gtk_signal_connect (GTK_OBJECT (msg->to), "drag_data_received",
 		      GTK_SIGNAL_FUNC (to_add), NULL);
   gtk_drag_dest_set (GTK_WIDGET (msg->to), GTK_DEST_DEFAULT_ALL,
@@ -381,6 +395,8 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	    gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_YELLOW));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
 		    0, 0, 0, 0);
+  gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(address_book_cb),
+		     (gpointer) msg->cc);
   gtk_signal_connect (GTK_OBJECT (msg->cc), "drag_data_received",
 		      GTK_SIGNAL_FUNC (to_add), NULL);
   gtk_drag_dest_set (GTK_WIDGET (msg->cc), GTK_DEST_DEFAULT_ALL,
@@ -404,16 +420,46 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	     gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_GREEN));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 4, 5,
 		    0, 0, 0, 0);
+  gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(address_book_cb),
+		     (gpointer) msg->bcc);
   gtk_signal_connect (GTK_OBJECT (msg->bcc), "drag_data_received",
 		      GTK_SIGNAL_FUNC (to_add), NULL);
   gtk_drag_dest_set (GTK_WIDGET (msg->bcc), GTK_DEST_DEFAULT_ALL,
 		     email_field_drop_types, ELEMENTS (email_field_drop_types),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
+  /* fcc: */
+  label = gtk_label_new (_("fcc:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
+		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
+
+  msg->fcc = gtk_combo_new ();
+  gtk_combo_set_use_arrows (GTK_COMBO (msg->fcc), 0);
+  gtk_combo_set_use_arrows_always (GTK_COMBO (msg->fcc), 0);
+  
+  if (balsa_app.mailbox_nodes) {
+    GNode *walk;
+    GList *glist = NULL;
+    
+    glist = g_list_append (glist, "Sentbox");
+    glist = g_list_append (glist, "Draftbox");
+    glist = g_list_append (glist, "Outbox");
+    glist = g_list_append (glist, "Trash");
+    walk = g_node_last_child (balsa_app.mailbox_nodes);
+    while (walk) {
+      glist = g_list_append (glist, ((MailboxNode *)((walk)->data))->name);
+      walk = walk->prev;
+    }
+    gtk_combo_set_popdown_strings (GTK_COMBO (msg->fcc), glist);
+  }
+  gtk_table_attach (GTK_TABLE (table), msg->fcc, 1, 3, 5, 6, 
+      GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+
   /* Attachment list */
   label = gtk_label_new (_("Attachments:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 6, 7,
 		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
   gtk_widget_push_visual (gdk_imlib_get_visual ());
@@ -434,12 +480,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_widget_pop_visual ();
   gtk_widget_pop_colormap ();
 
-  /* set bg of icon list to white */
-  style = style = gtk_style_new ();
-  colormap = gtk_widget_get_colormap (GTK_WIDGET (msg->attachments));
-  gdk_color_white (colormap, &style->bg[GTK_STATE_NORMAL]);  
-  gtk_widget_set_style (msg->attachments, style);
-
   gtk_widget_set_usize (msg->attachments, -1, 50);
 
   frame = gtk_frame_new (NULL);
@@ -447,7 +487,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_container_add (GTK_CONTAINER (sw), msg->attachments);
   gtk_container_add (GTK_CONTAINER (frame), sw);
 
-  gtk_table_attach (GTK_TABLE (table), frame, 1, 3, 5, 6,
+  gtk_table_attach (GTK_TABLE (table), frame, 1, 3, 6, 7,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND | GTK_SHRINK, 0, 0);
 
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "select_icon",
@@ -467,10 +507,12 @@ create_text_area (BalsaSendmsg * msg)
   GtkWidget *hscrollbar;
   GtkWidget *vscrollbar;
   GdkFont *font;
+  GdkColormap* colormap;
   GtkStyle *style;
 
   style = gtk_style_new ();
-  font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
+  font = gdk_font_load ("-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-1");
+  colormap = gtk_widget_get_colormap (GTK_WIDGET (msg->attachments));
   style->font = font;
 
   table = gtk_table_new (2, 2, FALSE);
@@ -479,7 +521,7 @@ create_text_area (BalsaSendmsg * msg)
   gtk_text_set_editable (GTK_TEXT (msg->text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (msg->text), TRUE);
   gtk_widget_set_style (msg->text, style);
-  gtk_widget_set_usize (msg->text, (72 * 7) + (2 * msg->text->style->klass->xthickness) + 8, -1);
+  gtk_widget_set_usize (msg->text, (82 * 7) + (2 * msg->text->style->klass->xthickness), -1);
   gtk_widget_show (msg->text);
   gtk_table_attach_defaults (GTK_TABLE (table), msg->text, 0, 1, 0, 1);
   hscrollbar = gtk_hscrollbar_new (GTK_TEXT (msg->text)->hadj);
@@ -518,6 +560,11 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       window = gnome_app_new ("balsa", _ ("Forward message"));
       msg->orig_message = message;
       break;
+      
+    case SEND_CONTINUE:
+      window = gnome_app_new ("balsa", _ ("Continue message"));
+      msg->orig_message = message;
+      break;
 
     default:
       window = gnome_app_new ("balsa", _ ("New message"));
@@ -553,7 +600,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
       g_free (tmp);
     }
-
+    
   /* From: */
   {
     gchar *from;
@@ -624,6 +671,28 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       newsubject = NULL;
     }
 
+  if (type == SEND_CONTINUE) {
+    gchar *tmp;
+
+    if (message->to_list) {
+      tmp = make_string_from_list (message->to_list);
+      gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
+      g_free (tmp);
+    }
+    if (message->cc_list) {
+      tmp = make_string_from_list (message->cc_list);
+      gtk_entry_set_text (GTK_ENTRY (msg->cc), tmp);
+      g_free (tmp);
+    }
+    if (message->bcc_list) {
+      tmp = make_string_from_list (message->bcc_list);
+      gtk_entry_set_text (GTK_ENTRY (msg->bcc), tmp);
+      g_free (tmp);
+    }
+    if (message->subject)
+      gtk_entry_set_text (GTK_ENTRY (msg->subject), message->subject);
+  }
+
   if (type == SEND_REPLY_ALL)
     {
       gchar *tmp;
@@ -690,12 +759,17 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 	  str = g_string_append (str, _(" wrote:\n"));
 
 
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, str->str, strlen (str->str));
+      if (type != SEND_CONTINUE)
+	    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, str->str, strlen (str->str));
 
 
 	  g_string_free (str, TRUE);
 
-	  rbdy = content2reply (message, balsa_app.quote_str);	/* arp */
+      if (type != SEND_CONTINUE)
+	    rbdy = content2reply (message, balsa_app.quote_str);	/* arp */
+	  else
+	    rbdy = content2reply (message, NULL);	/* arp */
+
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, strlen (rbdy->str));
 	  g_string_free (rbdy, TRUE);
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
@@ -703,7 +777,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
       message_body_unref (message);
     }
 
-  if (balsa_app.signature)
+  if (balsa_app.signature && type != SEND_CONTINUE)
     gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, balsa_app.signature, strlen (balsa_app.signature));
 
   gtk_text_set_point (GTK_TEXT (msg->text), 0);
@@ -763,6 +837,32 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));
   message->cc_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)));
+  message->bcc_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->bcc)));
+  
+  tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc)->entry));
+  message->fcc_mailbox = NULL;
+  if (balsa_app.mailbox_nodes && tmp != NULL) {
+    if (!strcmp (tmp, "Sentbox"))
+       message->fcc_mailbox = balsa_app.sentbox;
+    else if (!strcmp (tmp, "Draftbox"))
+       message->fcc_mailbox = balsa_app.draftbox;
+    else if (!strcmp (tmp, "Outbox"))
+       message->fcc_mailbox = balsa_app.outbox;
+    else if (!strcmp (tmp, "Trash"))
+       message->fcc_mailbox = balsa_app.trash;
+    else {
+      GNode *walk;
+    
+      walk = g_node_last_child (balsa_app.mailbox_nodes);
+      while (walk) {
+        if (!strcmp (tmp, ((MailboxNode *)((walk)->data))->name)) {
+          message->fcc_mailbox = ((MailboxNode *)((walk)->data))->mailbox;
+          break;
+        } else
+          walk = walk->prev;
+      }
+    }
+  }
 
   message->reply_to = address_new ();
 
@@ -789,12 +889,93 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   }
 
 
-  if (balsa_send_message (message))
+  if (balsa_send_message (message)) {
     if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
       {
-	if (bsmsg->orig_message)
-	  message_reply (bsmsg->orig_message);
+      if (bsmsg->orig_message)
+	    message_reply (bsmsg->orig_message);
       }
+    else if (bsmsg->type == SEND_CONTINUE) {
+      if (bsmsg->orig_message)
+        message_delete (bsmsg->orig_message);
+    }
+  }
+
+  g_list_free (message->body_list);
+  message_free (message);
+  balsa_sendmsg_destroy (bsmsg);
+
+  return TRUE;
+}
+
+static gint
+postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+  Message *message;
+  Body *body;
+  gchar *tmp;
+
+  tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to));
+  {
+    size_t len;
+    len = strlen (tmp);
+
+    if (len < 1)		/* empty */
+      return FALSE;
+
+    if (tmp[len - 1] == '@')	/* this shouldn't happen */
+      return FALSE;
+
+    if (len < 4)
+      {
+	if (strchr (tmp, '@'))	/* you won't have an @ in an
+				   address less than 4 characters */
+	  return FALSE;
+
+	/* assume they are mailing it to someone in their local domain */
+      }
+  }
+
+  message = message_new ();
+
+  /* we should just copy balsa_app.address */
+  message->from = address_new ();
+  message->from->personal = g_strdup (balsa_app.address->personal);
+  message->from->mailbox = g_strdup (balsa_app.address->mailbox);
+  message->subject = g_strdup (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
+
+  message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));
+  message->cc_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)));
+  message->bcc_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->bcc)));
+  
+  message->reply_to = address_new ();
+
+  message->reply_to->personal = g_strdup (balsa_app.address->personal);
+  message->reply_to->mailbox = g_strdup (balsa_app.replyto);
+
+
+  body = body_new ();
+
+  body->buffer = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0,
+			      gtk_text_get_length (GTK_TEXT (bsmsg->text)));
+
+  message->body_list = g_list_append (message->body_list, body);
+
+  {				/* handle attachments */
+    gint i;
+    Body *abody;
+    for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments)->icons; i++)
+      {
+	abody = body_new ();
+	abody->filename = g_strdup ((gchar *) gnome_icon_list_get_icon_data (GNOME_ICON_LIST (bsmsg->attachments), i));
+	message->body_list = g_list_append (message->body_list, abody);
+      }
+  }
+
+
+  balsa_postpone_message (message);
+  if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message)
+      message_delete (bsmsg->orig_message);
 
   g_list_free (message->body_list);
   message_free (message);

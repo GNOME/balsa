@@ -3,6 +3,7 @@ CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
 bin_PROGRAMS = balsa
 
 balsa_SOURCES =	\
+	address-book.c		\
 	balsa-app.c		\
 	balsa-icons.c		\
 	balsa-index.c		\

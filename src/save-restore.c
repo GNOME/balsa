@@ -35,6 +35,7 @@
 #include "mailbox.h"
 #include "misc.h"
 #include "save-restore.h"
+#include "../libmutt/mutt.h"
 
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
@@ -554,6 +555,14 @@ config_mailbox_init (proplist_t mbox, gchar * key)
     {
       balsa_app.outbox = mailbox;
     }
+  else if (strcmp ("Sentbox", key) == 0)
+    {
+      balsa_app.sentbox = mailbox;
+    }
+  else if (strcmp ("Draftbox", key) == 0)
+    {
+      balsa_app.draftbox = mailbox;
+    }
   else if (strcmp ("Trash", key) == 0)
     {
       balsa_app.trash = mailbox;
@@ -595,14 +604,17 @@ config_global_load (void)
   /* user's real name */
   if ((field = pl_dict_get_str (globals, "RealName")) == NULL)
     return FALSE;
+  g_free (balsa_app.address->personal);
   balsa_app.address->personal = g_strdup (field);
 
   /* user's email address */
   if ((field = pl_dict_get_str (globals, "Email")) == NULL)
     return FALSE;
+  g_free (balsa_app.address->mailbox);
   balsa_app.address->mailbox = g_strdup (field);
 
   /* users's replyto address */
+  g_free (balsa_app.replyto);
   if ((field = pl_dict_get_str (globals, "ReplyTo")) == NULL)
     balsa_app.replyto = g_strdup (balsa_app.address->mailbox);
   else
@@ -611,9 +623,11 @@ config_global_load (void)
   /* directory */
   if ((field = pl_dict_get_str (globals, "LocalMailDir")) == NULL)
     return FALSE;
+  g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = g_strdup (field);
 
   /* signature file path */
+  g_free (balsa_app.signature_path);
   if ((field = pl_dict_get_str (globals, "SignaturePath")) == NULL)
     {
       balsa_app.signature_path = g_malloc (strlen (g_get_home_dir ()) + 12);
@@ -625,6 +639,7 @@ config_global_load (void)
   /* smtp server */
   if ((field = pl_dict_get_str (globals, "SMTPServer")) == NULL)
     ;				/* an optional field for now */
+  g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (field);
 
   /* toolbar style */
@@ -653,37 +668,57 @@ config_global_load (void)
 
   /* window sizes */
   if ((field = pl_dict_get_str (globals, "MainWindowWidth")) == NULL)
-    balsa_app.mw_width = 670;
+    balsa_app.mw_width = 640;
   else
     balsa_app.mw_width = atoi (field);
 
   if ((field = pl_dict_get_str (globals, "MainWindowHeight")) == NULL)
-    balsa_app.mw_height = 435;
+    balsa_app.mw_height = 480;
   else
     balsa_app.mw_height = atoi (field);
 
   if ((field = pl_dict_get_str (globals, "MailboxListWidth")) == NULL)
-    balsa_app.mblist_width = 170;
+    balsa_app.mblist_width = 100;
   else
     balsa_app.mblist_width = atoi (field);
   /* FIXME this can be removed later */
-  if (balsa_app.mblist_width < 100)
-	  balsa_app.mblist_width = 170;
+  //  if (balsa_app.mblist_width < 100)
+  //	  balsa_app.mblist_width = 170;
   if ((field = pl_dict_get_str (globals, "MailboxListHeight")) == NULL)
     balsa_app.mblist_height = 170;
   else
     balsa_app.mblist_height = atoi (field);
   /* FIXME this can be removed later */
-  if (balsa_app.mblist_height < 100)
-	  balsa_app.mblist_width = 200;
+  //  if (balsa_app.mblist_height < 100)
+  //	  balsa_app.mblist_height = 200;
 
 
 
   /* arp --- LeadinStr for "reply to" leadin. */
+  g_free (balsa_app.quote_str);
   if ((field = pl_dict_get_str (globals, "LeadinStr")) == NULL)
     balsa_app.quote_str = g_strdup ("> ");
   else
     balsa_app.quote_str = g_strdup (field);
+
+  /* font used to display messages */
+  if ((field = pl_dict_get_str (globals, "MessageFont")) == NULL)
+    balsa_app.message_font = g_strdup (DEFAULT_MESSAGE_FONT);
+  else
+    balsa_app.message_font = g_strdup (field);
+
+  /* more here */
+  g_free(balsa_app.charset);
+  if (( field = pl_dict_get_str (globals, "Charset")) == NULL)
+      balsa_app.charset = g_strdup(DEFAULT_CHARSET);
+  else
+      balsa_app.charset = g_strdup(field);
+  mutt_set_charset (balsa_app.charset);
+
+  if (( field = pl_dict_get_str (globals, "EncodingStyle")) == NULL)
+      balsa_app.encoding_style = /*DEFAULT_ENCODING*/ 2;
+  else
+      balsa_app.encoding_style = atoi(field);
 
   return TRUE;
 }				/* config_global_load */
@@ -748,6 +783,9 @@ config_global_save (void)
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_height);
     pl_dict_add_str_str (globals, "MailboxListHeight", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.encoding_style);
+    pl_dict_add_str_str (globals, "EncodingStyle", tmp);
   }
 
 
@@ -757,6 +795,17 @@ config_global_save (void)
   else
     pl_dict_add_str_str (globals, "LeadinStr", "> ");
 
+  /* message font */
+  if (balsa_app.message_font != NULL)
+    pl_dict_add_str_str (globals, "MessageFont", balsa_app.message_font);
+  else
+    pl_dict_add_str_str (globals, "MessageFont", DEFAULT_MESSAGE_FONT);
+
+  /* encoding */
+  if (balsa_app.charset != NULL)
+      pl_dict_add_str_str(globals, "Charset", balsa_app.charset);
+  else
+      pl_dict_add_str_str(globals, "Charset", DEFAULT_CHARSET);
 
   /* Add it to configuration file */
   temp_str = PLMakeString ("Globals");

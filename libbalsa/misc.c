@@ -33,7 +33,7 @@
 #include "misc.h"
 
 MailboxNode *
-mailbox_node_new (gchar * name, Mailbox * mb, gint i)
+mailbox_node_new (const gchar * name, Mailbox * mb, gint i)
 {
   MailboxNode *mbn;
   mbn = g_malloc (sizeof (MailboxNode));

@@ -64,6 +64,8 @@ struct _Prefs
     GtkWidget *smtp_server;
 
     GtkWidget *inbox;
+    GtkWidget *sentbox;
+    GtkWidget *draftbox;
     GtkWidget *outbox;
     GtkWidget *trash;
   };
@@ -324,7 +326,7 @@ create_mailboxes_page (void)
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox);
 
-  table = gtk_table_new (3, 2, FALSE);
+  table = gtk_table_new (5, 2, FALSE);
   gtk_widget_show (table);
   gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
 
@@ -353,14 +355,38 @@ create_mailboxes_page (void)
 
   gs = g_string_truncate (gs, 0);
   gs = g_string_append (gs, g_get_home_dir ());
-  gs = g_string_append (gs, "/Mail/trash");
-  label = gtk_label_new (_ ("Trash Path:"));
+  gs = g_string_append (gs, "/Mail/sentbox");
+  label = gtk_label_new (_ ("Sentbox Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL, 10, 10);
+  prefs->sentbox = gtk_entry_new ();
+  gtk_entry_set_text (GTK_ENTRY (prefs->sentbox), gs->str);
+  gtk_table_attach (GTK_TABLE (table), prefs->sentbox, 1, 2, 2, 3,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  gs = g_string_truncate (gs, 0);
+  gs = g_string_append (gs, g_get_home_dir ());
+  gs = g_string_append (gs, "/Mail/draftbox");
+  label = gtk_label_new (_ ("Draftbox Path:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
+		    GTK_FILL, GTK_FILL, 10, 10);
+  prefs->draftbox = gtk_entry_new ();
+  gtk_entry_set_text (GTK_ENTRY (prefs->draftbox), gs->str);
+  gtk_table_attach (GTK_TABLE (table), prefs->draftbox, 1, 2, 3, 4,
+		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+
+  gs = g_string_truncate (gs, 0);
+  gs = g_string_append (gs, g_get_home_dir ());
+  gs = g_string_append (gs, "/Mail/trash");
+  label = gtk_label_new (_ ("Trash Path:"));
+  gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
+  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
+		    GTK_FILL, GTK_FILL, 10, 10);
   prefs->trash = gtk_entry_new ();
   gtk_entry_set_text (GTK_ENTRY (prefs->trash), gs->str);
-  gtk_table_attach (GTK_TABLE (table), prefs->trash, 1, 2, 2, 3,
+  gtk_table_attach (GTK_TABLE (table), prefs->trash, 1, 2, 4, 5,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
   g_string_free (gs, TRUE);
@@ -451,7 +477,15 @@ create_mailbox_if_not_present (gchar * filename)
 
 /* Make the as much of the path as required. */
   if (make_parents (dir))
-    creat (filename, S_IRUSR | S_IWUSR);
+    {
+      int fd = creat (filename, S_IRUSR | S_IWUSR);
+      if (fd == 1)
+	{
+	  /* FIXME: Complain fiercely!  */
+	}
+      else
+	close (fd);
+    }
   g_free (dir);
 }				/* create_mailbox_if_not_present */
 
@@ -473,6 +507,20 @@ check_mailboxes_for_finish (GtkWidget * widget, gpointer data)
     }
 
   mbox = gtk_entry_get_text (GTK_ENTRY (prefs->outbox));
+  if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
+    {
+      g_string_sprintf (str, _("Mailbox \"%s\" is not valid.\n\nWould you like to create it?"), mbox);
+      goto BADMAILBOX;
+    }
+
+  mbox = gtk_entry_get_text (GTK_ENTRY (prefs->sentbox));
+  if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
+    {
+      g_string_sprintf (str, _("Mailbox \"%s\" is not valid.\n\nWould you like to create it?"), mbox);
+      goto BADMAILBOX;
+    }
+
+  mbox = gtk_entry_get_text (GTK_ENTRY (prefs->draftbox));
   if (mailbox_valid (mbox) == MAILBOX_UNKNOWN)
     {
       g_string_sprintf (str, _("Mailbox \"%s\" is not valid.\n\nWould you like to create it?"), mbox);
@@ -601,6 +649,22 @@ complete_cb (GtkWidget * widget, gpointer data)
   add_mailboxes_for_checking (mailbox);
   mailbox_free (mailbox);
 
+  type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->sentbox)));
+  mailbox = mailbox_new (type);
+  mailbox->name = g_strdup (_("Sentbox"));
+  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->sentbox)));
+  config_mailbox_add (mailbox, "Sentbox");
+  add_mailboxes_for_checking (mailbox);
+  mailbox_free (mailbox);
+
+  type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->draftbox)));
+  mailbox = mailbox_new (type);
+  mailbox->name = g_strdup (_("Draftbox"));
+  MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->draftbox)));
+  config_mailbox_add (mailbox, "Draftbox");
+  add_mailboxes_for_checking (mailbox);
+  mailbox_free (mailbox);
+
   type = mailbox_valid (gtk_entry_get_text (GTK_ENTRY (prefs->trash)));
   mailbox = mailbox_new (type);
   mailbox->name = g_strdup (_("Trash"));
@@ -616,6 +680,8 @@ complete_cb (GtkWidget * widget, gpointer data)
   gtk_widget_destroy (prefs->smtp_server);
 
   gtk_widget_destroy (prefs->inbox);
+  gtk_widget_destroy (prefs->sentbox);
+  gtk_widget_destroy (prefs->draftbox);
   gtk_widget_destroy (prefs->outbox);
   gtk_widget_destroy (prefs->trash);
 

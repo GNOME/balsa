@@ -23,6 +23,7 @@
 #include <string.h>
 #include <gnome.h>
 
+#include "../src/balsa-app.h"
 #include "mailbox.h"
 #include "misc.h"
 #include "mailbackend.h"
@@ -70,6 +71,12 @@ add_mutt_body_plain (void)
   body->subtype = g_strdup ("plain");
   body->unlink = 1;
   body->use_disp = 0;
+  
+  body->encoding = balsa_app.encoding_style;
+  body->parameter = mutt_new_parameter();
+  body->parameter->attribute = g_strdup("charset");
+  body->parameter->value = g_strdup(balsa_app.charset);
+  body->parameter->next = NULL;
 
   mutt_mktemp (buffer);
   body->filename = g_strdup (buffer);
@@ -173,6 +180,15 @@ balsa_send_message (Message * message)
 
 /* FIXME */
   mutt_send_message (msg);
+  
+  if ((balsa_app.sentbox->type == MAILBOX_MAILDIR ||
+       balsa_app.sentbox->type == MAILBOX_MH ||
+       balsa_app.sentbox->type == MAILBOX_MBOX) &&
+       message->fcc_mailbox != NULL) {
+    mutt_write_fcc (MAILBOX_LOCAL (message->fcc_mailbox)->path, msg, NULL, 0);
+    if (message->fcc_mailbox->open_ref > 0)
+        mailbox_check_new_messages (message->fcc_mailbox);
+  }
 #if 0
   switch (balsa_app.outbox->type)
     {
@@ -192,6 +208,107 @@ balsa_send_message (Message * message)
     }
 #endif
 
+  mutt_free_header (&msg);
+
+  return TRUE;
+}
+
+gboolean
+balsa_postpone_message (Message * message)
+{
+  HEADER *msg;
+  BODY *last, *newbdy;
+  gchar *tmp;
+  GList *list;
+
+  msg = mutt_new_header ();
+
+  if (!msg->env)
+    msg->env = mutt_new_envelope ();
+
+  msg->env->userhdrs = mutt_new_list ();
+  {
+    LIST *sptr = UserHeader;
+    LIST *dptr = msg->env->userhdrs;
+    LIST *delptr = 0;
+    while (sptr)
+      {
+	dptr->data = g_strdup (sptr->data);
+	sptr = sptr->next;
+	delptr = dptr;
+	dptr->next = mutt_new_list ();
+	dptr = dptr->next;
+      }
+    g_free (delptr->next);
+    delptr->next = 0;
+  }
+
+  tmp = address_to_gchar (message->from);
+  msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
+  g_free (tmp);
+
+  tmp = address_to_gchar (message->reply_to);
+  msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
+  g_free (tmp);
+
+  msg->env->subject = g_strdup (message->subject);
+
+  msg->env->to = rfc822_parse_adrlist (msg->env->to, make_string_from_list (message->to_list));
+  msg->env->cc = rfc822_parse_adrlist (msg->env->cc, make_string_from_list (message->cc_list));
+  msg->env->bcc = rfc822_parse_adrlist (msg->env->bcc, make_string_from_list (message->bcc_list));
+
+  list = message->body_list;
+
+  last = msg->content;
+  while (last && last->next)
+    last = last->next;
+
+  while (list)
+    {
+      FILE *tempfp = NULL;
+      Body *body;
+      newbdy = NULL;
+
+      body = list->data;
+
+      if (body->filename)
+	newbdy = mutt_make_file_attach (body->filename);
+
+      else if (body->buffer)
+	{
+	  newbdy = add_mutt_body_plain ();
+	  tempfp = safe_fopen (newbdy->filename, "w+");
+	  fputs (body->buffer, tempfp);
+	  fclose (tempfp);
+	  tempfp = NULL;
+	}
+
+      if (newbdy)
+	{
+	  if (last)
+	    last->next = newbdy;
+	  else
+	    msg->content = newbdy;
+
+	  last = newbdy;
+	}
+
+      list = list->next;
+    }
+
+  if (msg->content)
+    {
+      if (msg->content->next)
+	msg->content = mutt_make_multipart (msg->content);
+    }
+
+  mutt_prepare_envelope (msg->env);
+
+  encode_descriptions (msg->content);
+
+  mutt_write_fcc (MAILBOX_LOCAL (balsa_app.draftbox)->path, msg, NULL, 1);
+  if (balsa_app.draftbox->open_ref > 0)
+    mailbox_check_new_messages (balsa_app.draftbox);
   mutt_free_header (&msg);
 
   return TRUE;

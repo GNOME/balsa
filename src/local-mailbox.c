@@ -83,6 +83,16 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
     if (strcmp (path, MAILBOX_LOCAL (balsa_app.outbox)->path) == 0)
       return;
 
+  if (balsa_app.sentbox->type != MAILBOX_IMAP &&
+      balsa_app.sentbox->type != MAILBOX_POP3)
+    if (strcmp (path, MAILBOX_LOCAL (balsa_app.sentbox)->path) == 0)
+      return;
+
+  if (balsa_app.draftbox->type != MAILBOX_IMAP &&
+      balsa_app.draftbox->type != MAILBOX_POP3)
+    if (strcmp (path, MAILBOX_LOCAL (balsa_app.draftbox)->path) == 0)
+      return;
+
   if (balsa_app.trash->type != MAILBOX_IMAP &&
       balsa_app.trash->type != MAILBOX_POP3)
     if (strcmp (path, MAILBOX_LOCAL (balsa_app.trash)->path) == 0)
@@ -93,7 +103,7 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
       gchar *tmppath;
       MailboxNode *mbnode;
 
-      mbnode = mailbox_node_new (g_strdup (path), NULL, TRUE);
+      mbnode = mailbox_node_new (path, NULL, TRUE);
       tmppath = g_strdup_printf ("%s/.expanded", path);
 
       if (access (tmppath, F_OK) != -1)
@@ -119,7 +129,7 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
       if (isdir && type == MAILBOX_MH)
 	{
 	  /*      g_strdup (g_basename (g_dirname (myfile))) */
-	  node = g_node_new (mailbox_node_new (g_strdup (path), mailbox, TRUE));
+	  node = g_node_new (mailbox_node_new (path, mailbox, TRUE));
 	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
 	  if (rnode)
 	    {
@@ -134,8 +144,10 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 	}
       else
 	{
-	  node = g_node_new (mailbox_node_new (g_strdup (path), mailbox, FALSE));
-	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, g_dirname (path));
+	  char *dirname = g_dirname (path);
+	  node = g_node_new (mailbox_node_new (path, mailbox, FALSE));
+	  rnode = find_my_node (balsa_app.mailbox_nodes, G_LEVEL_ORDER, G_TRAVERSE_ALL, dirname);
+	  g_free (dirname);
 	  if (rnode)
 	    {
 	      add_mailboxes_for_checking (mailbox);

@@ -127,7 +127,7 @@ void build_left_side()
 {
     static gchar *titles[] =
     {
-	"Enabled",
+	"On",
 	"Name",
     };
 

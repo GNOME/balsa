@@ -106,7 +106,7 @@ config_save (gchar * user_filename)
   /* There might be passwords and things in the file, so we chmod the
      file to 0600 BEFORE we write any data into it.  This involves
      creating the file independently of PLSave. */
-  fd = creat (filename, 0600);
+  fd = creat (filename, S_IRUSR | S_IWUSR);
   if (fd < 0)
     {
       fprintf (stderr, "config_save: Error writing config file %s!\n",

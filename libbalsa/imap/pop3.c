@@ -468,7 +468,7 @@ gboolean
 pop_connect(PopHandle *pop, const char *host, GError **err)
 {
   static const int SIO_BUFSZ=8192;
-  static const char *service = "pop3";
+  const char *service = "pop3";
   char line[POP_LINE_LEN];
 
 #ifdef USE_TLS

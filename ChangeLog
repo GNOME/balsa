@@ -4,6 +4,8 @@
 
 2004-03-31 09:24  PeterB
 
+	* src/main-window.c: handle mailbox-changed signal in an idle
+	handler.
 	* libbalsa/imap/imap-handle.c: declaration out of order.
 
 2004-03-30 15:39  PeterB

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #ifndef _RFC1524_H
@@ -39,7 +39,6 @@ void rfc1524_free_entry (rfc1524_entry **);
 int rfc1524_expand_command (BODY *, char *, char *, char *, int);
 int rfc1524_expand_filename (char *, char *, char *, size_t);
 int rfc1524_mailcap_lookup (BODY *, char *, rfc1524_entry *, int);
-void mutt_adv_mktemp (char *, size_t);
 int mutt_rename_file (char *, char *);
 
 #endif /* _RFC1524_H */

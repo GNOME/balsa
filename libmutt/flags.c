@@ -62,6 +62,16 @@ void _mutt_set_flag (CONTEXT *ctx, HEADER *h, int flag, int bf, int upd_ctx)
 	  if (upd_ctx) ctx->changed = 1;
 	}
 #endif
+	/* 
+	 * If the user undeletes a message which is marked as
+	 * "trash" in the maildir folder on disk, the folder has
+	 * been changed, and is marked accordingly.  However, we do
+	 * _not_ mark the message itself changed, because trashing
+	 * is checked in specific code in the maildir folder
+	 * driver. 
+	 */
+	if (ctx->magic == M_MAILDIR && upd_ctx && h->trash)
+	  ctx->changed = 1;
       }
       break;
 
@@ -220,14 +230,13 @@ void mutt_tag_set_flag (int flag, int bf)
     if (Context->hdrs[Context->v2r[j]]->tagged)
       mutt_set_flag (Context, Context->hdrs[Context->v2r[j]], flag, bf);
 }
-
-int mutt_thread_set_flag (HEADER *cur, int flag, int bf, int subthread)
+int mutt_thread_set_flag (HEADER *hdr, int flag, int bf, int subthread)
 {
-  HEADER *start;
+  THREAD *start, *cur = hdr->thread;
   
   if ((Sort & SORT_MASK) != SORT_THREADS)
   {
-    mutt_error ("Threading is not enabled.");
+    mutt_error _("Threading is not enabled.");
     return (-1);
   }
 
@@ -236,12 +245,17 @@ int mutt_thread_set_flag (HEADER *cur, int flag, int bf, int subthread)
       cur = cur->parent;
   start = cur;
   
-  mutt_set_flag (Context, cur, flag, bf);
+  if (cur->message)
+    mutt_set_flag (Context, cur->message, flag, bf);
+
   if ((cur = cur->child) == NULL)
     return (0);
+
   FOREVER
   {
-    mutt_set_flag (Context, cur, flag, bf);
+    if (cur->message)
+      mutt_set_flag (Context, cur->message, flag, bf);
+
     if (cur->child)
       cur = cur->child;
     else if (cur->next)
@@ -266,7 +280,7 @@ int mutt_change_flag (HEADER *h, int bf)
   int i, flag;
   event_t event;
 
-  mvprintw (LINES - 1, 0, "%s? (D/N/O/r/*/!): ", bf ? "Set flag" : "Clear flag");
+  mvprintw (LINES - 1, 0, "%s? (D/N/O/r/*/!): ", bf ? _("Set flag") : _("Clear flag"));
   clrtoeol ();
 
   event = mutt_getch();

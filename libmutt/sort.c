@@ -35,6 +35,7 @@ static sort_t *AuxSort = NULL;
   unset_option(OPTAUXSORT); \
 }
 
+#ifndef LIBMUTT
 int compare_score (const void *a, const void *b)
 {
   HEADER **pa = (HEADER **) a;
@@ -43,6 +44,7 @@ int compare_score (const void *a, const void *b)
   AUXSORT(result,a,b);
   return (SORTCODE (result));
 }
+#endif
 
 int compare_size (const void *a, const void *b)
 {
@@ -167,8 +169,10 @@ sort_t *mutt_get_sort_func (int method)
       return (compare_size);
     case SORT_TO:
       return (compare_to);
+#ifndef LIBMUTT
     case SORT_SCORE:
       return (compare_score);
+#endif
     default:
       return (NULL);
   }
@@ -177,10 +181,13 @@ sort_t *mutt_get_sort_func (int method)
 
 void mutt_sort_headers (CONTEXT *ctx, int init)
 {
+#ifndef LIBMUTT
   int i;
   HEADER *h;
+  THREAD *thread, *top;
   sort_t *sortfunc;
   
+  init = 1; /* XXX temporary bug workaround (hopefully!) */
   unset_option (OPTNEEDRESORT);
 
   if (!ctx)
@@ -211,6 +218,15 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
     unset_option (OPTNEEDRESCORE);
   }
 
+  if (option (OPTRESORTINIT))
+  {
+    unset_option (OPTRESORTINIT);
+    init = 1;
+  }
+
+  if (init && ctx->tree)
+    mutt_clear_threads (ctx);
+
   if ((Sort & SORT_MASK) == SORT_THREADS)
   {
     AuxSort = NULL;
@@ -218,7 +234,8 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
        subthreads need to be resorted */
     if (option (OPTSORTSUBTHREADS))
     {
-      ctx->tree = mutt_sort_subthreads (ctx->tree, mutt_get_sort_func (SortAux));
+      if (ctx->tree)
+	ctx->tree = mutt_sort_subthreads (ctx->tree, 1);     
       unset_option (OPTSORTSUBTHREADS);
     }
     mutt_sort_threads (ctx, init);
@@ -233,11 +250,6 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
   else 
     qsort ((void *) ctx->hdrs, ctx->msgcount, sizeof (HEADER *), sortfunc);
 
-  /* the threading function find_reference() needs to know how the mailbox
-   * is currently sorted in memory in order to speed things up a bit
-   */
-  ctx->revsort = (Sort & SORT_REVERSE) ? 1 : 0;
-
   /* adjust the virtual message numbers */
   ctx->vcount = 0;
   for (i = 0; i < ctx->msgcount; i++)
@@ -250,24 +262,27 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
       ctx->vcount++;
     }
     cur->msgno = i;
-#ifndef LIBMUTT
   mutt_cache_index_colors(ctx);
-#endif
   }
 
   /* re-collapse threads marked as collapsed */
   if ((Sort & SORT_MASK) == SORT_THREADS)
   {
-    h = ctx->tree;
-    while (h)
+    top = ctx->tree;
+    while ((thread = top) != NULL)
     {
+      while (!thread->message)
+	thread = thread->child;
+      h = thread->message;
+     
       if (h->collapsed)
 	mutt_collapse_thread (ctx, h);
-      h = h->next;
+      top = top->next;
     }
     mutt_set_virtual (ctx);
   }
 
   if (!ctx->quiet)
     mutt_clear_error ();
+#endif
 }

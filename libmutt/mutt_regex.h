@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 /*
@@ -23,6 +23,7 @@
 #ifndef MUTT_REGEX_H
 #define MUTT_REGEX_H
 
+/* LIBMUTT */
 /* BALSA: use PERL compatible Regular Expressions if available */
 #ifdef HAVE_PCRE
 #  include <pcreposix.h>
@@ -53,9 +54,11 @@ typedef struct
 } REGEXP;
 
 WHERE REGEXP Alternates;
+/* LIBMUTT - Mask clashes with X.h */
 WHERE REGEXP FileMask;
 WHERE REGEXP QuoteRegexp;
 WHERE REGEXP ReplyRegexp;
 WHERE REGEXP Smileys;
+WHERE REGEXP GecosMask;
 
 #endif /* MUTT_REGEX_H */

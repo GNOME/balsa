@@ -76,6 +76,12 @@
 # define ISSPACE(c) isspace((unsigned char)c)
 # define strfcpy(A,B,C) strncpy(A,B,C), *(A+(C)-1)=0
 
+# undef MAX
+# undef MIN
+# define MAX(a,b) ((a) < (b) ? (b) : (a))
+# define MIN(a,b) ((a) < (b) ? (a) : (b))
+
+
 #define FOREVER while (1)
 
 /* this macro must check for *c == 0 since isspace(0) has unreliable behavior

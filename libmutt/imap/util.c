@@ -58,7 +58,7 @@ int imap_expand_path (char* path, size_t len)
   mutt_account_tourl (&mx.account, &url);
   url.path = mx.mbox;
 
-  rc = url_ciss_tostring (&url, path, len);
+  rc = url_ciss_tostring (&url, path, len, U_DECODE_PASSWD);
   FREE (&mx.mbox);
 
   return rc;
@@ -122,7 +122,7 @@ int imap_parse_path (const char* path, IMAP_MBOX* mx)
   else
   {
     FREE (&c);
-    if (sscanf (path, "{%128[^}]}", tmp) != 1) 
+    if (sscanf (path, "{%127[^}]}", tmp) != 1) 
       return -1;
 
     c = strchr (path, '}');
@@ -140,7 +140,7 @@ int imap_parse_path (const char* path, IMAP_MBOX* mx)
       mx->account.flags |= M_ACCT_USER;
     }
   
-    if ((n = sscanf (tmp, "%128[^:/]%128s", mx->account.host, tmp)) < 1)
+    if ((n = sscanf (tmp, "%127[^:/]%127s", mx->account.host, tmp)) < 1)
     {
       dprint (1, (debugfile, "imap_parse_path: NULL host in %s\n", path));
       FREE (&mx->mbox);
@@ -148,11 +148,11 @@ int imap_parse_path (const char* path, IMAP_MBOX* mx)
     }
   
     if (n > 1) {
-      if (sscanf (tmp, ":%hd%128s", &(mx->account.port), tmp) >= 1)
+      if (sscanf (tmp, ":%hd%127s", &(mx->account.port), tmp) >= 1)
 	mx->account.flags |= M_ACCT_PORT;
       if (sscanf (tmp, "/%s", tmp) == 1)
       {
-	if (!strncmp (tmp, "ssl", 3))
+	if (!ascii_strncmp (tmp, "ssl", 3))
 	  mx->account.flags |= M_ACCT_SSL;
 	else
 	{
@@ -191,7 +191,7 @@ void imap_pretty_mailbox (char* path)
 
   tlen = mutt_strlen (target.mbox);
   /* check whether we can do '=' substitution */
-  if (! imap_parse_path (Maildir, &home))
+  if (mx_is_imap(Maildir) && !imap_parse_path (Maildir, &home))
   {
     hlen = mutt_strlen (home.mbox);
     if (tlen && mutt_account_match (&home.account, &target.account) &&
@@ -223,7 +223,7 @@ void imap_pretty_mailbox (char* path)
     /* FIXME: That hard-coded constant is bogus. But we need the actual
      *   size of the buffer from mutt_pretty_mailbox. And these pretty
      *   operations usually shrink the result. Still... */
-    url_ciss_tostring (&url, path, 1024);
+    url_ciss_tostring (&url, path, 1024, 0);
   }
 
   FREE (&target.mbox);
@@ -256,6 +256,7 @@ IMAP_DATA* imap_new_idata (void) {
     return NULL;
 
   idata->conn = NULL;
+  idata->capstr = NULL;
   idata->state = IMAP_DISCONNECTED;
   idata->seqno = 0;
 
@@ -426,7 +427,7 @@ void imap_qualify_path (char *dest, size_t len, IMAP_MBOX *mx, char* path)
   mutt_account_tourl (&mx->account, &url);
   url.path = path;
 
-  url_ciss_tostring (&url, dest, len);
+  url_ciss_tostring (&url, dest, len, 0);
 }
 
 
@@ -594,14 +595,12 @@ int imap_wait_keepalive (pid_t pid)
 
   sigaction (SIGALRM, &act, &oldalrm);
 
-  /* RFC 2060 specifies a minimum of 30 minutes before disconnect when in
-   * the AUTHENTICATED state. We'll poll at half that. */
-  alarm (900);
+  alarm (ImapKeepalive);
   while (waitpid (pid, &rc, 0) < 0 && errno == EINTR)
   {
     alarm (0); /* cancel a possibly pending alarm */
     imap_keepalive ();
-    alarm (900);
+    alarm (ImapKeepalive);
   }
 
   alarm (0);	/* cancel a possibly pending alarm */

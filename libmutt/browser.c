@@ -681,7 +681,7 @@ void mutt_select_file (char *f, size_t flen, int buffy)
 	
       case OP_ENTER_MASK:
 
-	strfcpy (buf, Mask.pattern, sizeof (buf));
+	strfcpy (buf, NONULL(Mask.pattern), sizeof (buf));
 	if (mutt_get_field ("File Mask: ", buf, sizeof (buf), 0) == 0)
 	{
 	  regex_t *rx = (regex_t *) safe_malloc (sizeof (regex_t));

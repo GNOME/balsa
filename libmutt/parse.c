@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #include "mutt.h"
@@ -21,12 +21,12 @@
 #include "mailbox.h"
 #include "mime.h"
 #include "rfc2047.h"
+#include "rfc2231.h"
 
 
-
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
 #include "pgp.h"
-#endif /* _PGPPATH */
+#endif /* HAVE_PGP */
 
 
 
@@ -36,7 +36,6 @@
 #include <stdlib.h>
 
 #ifdef LIBMUTT
-#define _(a) (a)
 #define sleep(a) 
 #endif
 
@@ -95,23 +94,65 @@ static char *read_rfc822_line (FILE *f, char *line, size_t *linelen)
   /* not reached */
 }
 
-static LIST *mutt_parse_references (char *s)
+static LIST *mutt_parse_references (char *s, int in_reply_to)
 {
   LIST *t, *lst = NULL;
+  int m, n = 0;
+  char *o = NULL, *new, *at;
 
-  while ((s = strtok (s, " \t")) != NULL)
+  while ((s = strtok (s, " \t;")) != NULL)
   {
     /*
      * some mail clients add other garbage besides message-ids, so do a quick
      * check to make sure this looks like a valid message-id
+     * some idiotic clients also break their message-ids between lines, deal
+     * with that too (give up if it's more than two lines, though)
      */
+    t = NULL;
+    new = NULL;
+
     if (*s == '<')
     {
-      t = (LIST *)safe_malloc (sizeof (LIST));
-      t->data = safe_strdup (s);
-      t->next = lst;
-      lst = t;
+      n = strlen (s);
+      if (s[n-1] != '>')
+      {
+	o = s;
+	s = NULL;
+	continue;
+      }
+
+      new = safe_strdup (s);
     }
+    else if (o)
+    {
+      m = strlen (s);
+      if (s[m - 1] == '>')
+      {
+	new = safe_malloc (sizeof (char) * (n + m + 1));
+	strcpy (new, o);	/* __STRCPY_CHECKED__ */
+	strcpy (new + n, s);	/* __STRCPY_CHECKED__ */
+      }
+    }
+    if (new)
+    {
+      /* make sure that this really does look like a message-id.
+       * it should have exactly one @, and if we're looking at
+       * an in-reply-to header, make sure that the part before
+       * the @ has more than eight characters or it's probably
+       * an email address
+       */
+      if (!(at = strchr (new, '@')) || strchr (at + 1, '@')
+	  || (in_reply_to && at - new <= 8))
+	safe_free ((void **) &new);
+      else
+      {
+	t = (LIST *) safe_malloc (sizeof (LIST));
+	t->data = new;
+	t->next = lst;
+	lst = t;
+      }
+    }
+    o = NULL;
     s = NULL;
   }
 
@@ -120,18 +161,22 @@ static LIST *mutt_parse_references (char *s)
 
 int mutt_check_encoding (const char *c)
 {
-  if (mutt_strncasecmp ("7bit", c, sizeof ("7bit")-1) == 0)
+  if (ascii_strncasecmp ("7bit", c, sizeof ("7bit")-1) == 0)
     return (ENC7BIT);
-  else if (mutt_strncasecmp ("8bit", c, sizeof ("8bit")-1) == 0)
+  else if (ascii_strncasecmp ("8bit", c, sizeof ("8bit")-1) == 0)
     return (ENC8BIT);
-  else if (mutt_strncasecmp ("binary", c, sizeof ("binary")-1) == 0)
+  else if (ascii_strncasecmp ("binary", c, sizeof ("binary")-1) == 0)
     return (ENCBINARY);
-  else if (mutt_strncasecmp ("quoted-printable", c, sizeof ("quoted-printable")-1) == 0)
+  else if (ascii_strncasecmp ("quoted-printable", c, sizeof ("quoted-printable")-1) == 0)
     return (ENCQUOTEDPRINTABLE);
-  else if (mutt_strncasecmp ("base64", c, sizeof("base64")-1) == 0)
+  else if (ascii_strncasecmp ("base64", c, sizeof("base64")-1) == 0)
     return (ENCBASE64);
-  else if (mutt_strncasecmp ("x-uuencode", c, sizeof("x-uuencode")-1) == 0)
+  else if (ascii_strncasecmp ("x-uuencode", c, sizeof("x-uuencode")-1) == 0)
     return (ENCUUENCODED);
+#ifdef SUN_ATTACHMENT
+  else if (ascii_strncasecmp ("uuencode", c, sizeof("uuencode")-1) == 0)
+    return (ENCUUENCODED);
+#endif
   else
     return (ENCOTHER);
 }
@@ -143,12 +188,14 @@ static PARAMETER *parse_parameters (const char *s)
   const char *p;
   size_t i;
 
+  dprint (2, (debugfile, "parse_parameters: `%s'\n", s));
+  
   while (*s)
   {
     if ((p = strpbrk (s, "=;")) == NULL)
     {
       dprint(1, (debugfile, "parse_parameters: malformed parameter: %s\n", s));
-      return (head); /* just bail out now */
+      goto bail;
     }
 
     /* if we hit a ; now the parameter has no value, just skip it */
@@ -197,6 +244,10 @@ static PARAMETER *parse_parameters (const char *s)
 
       new->value = safe_strdup (buffer);
 
+      dprint (2, (debugfile, "parse_parameter: `%s' = `%s'\n",
+		  new->attribute ? new->attribute : "",
+		  new->value ? new->value : ""));
+      
       /* Add this parameter to the list */
       if (head)
       {
@@ -226,26 +277,33 @@ static PARAMETER *parse_parameters (const char *s)
     while (*s == ';'); /* skip empty parameters */
   }    
 
+  bail:
+
+  rfc2231_decode_parameters (&head);
   return (head);
 }
 
 int mutt_check_mime_type (const char *s)
 {
-  if (mutt_strcasecmp ("text", s) == 0)
+  if (ascii_strcasecmp ("text", s) == 0)
     return TYPETEXT;
-  else if (mutt_strcasecmp ("multipart", s) == 0)
+  else if (ascii_strcasecmp ("multipart", s) == 0)
     return TYPEMULTIPART;
-  else if (mutt_strcasecmp ("application", s) == 0)
+#ifdef SUN_ATTACHMENT 
+  else if (ascii_strcasecmp ("x-sun-attachment", s) == 0)
+    return TYPEMULTIPART;
+#endif
+  else if (ascii_strcasecmp ("application", s) == 0)
     return TYPEAPPLICATION;
-  else if (mutt_strcasecmp ("message", s) == 0)
+  else if (ascii_strcasecmp ("message", s) == 0)
     return TYPEMESSAGE;
-  else if (mutt_strcasecmp ("image", s) == 0)
+  else if (ascii_strcasecmp ("image", s) == 0)
     return TYPEIMAGE;
-  else if (mutt_strcasecmp ("audio", s) == 0)
+  else if (ascii_strcasecmp ("audio", s) == 0)
     return TYPEAUDIO;
-  else if (mutt_strcasecmp ("video", s) == 0)
+  else if (ascii_strcasecmp ("video", s) == 0)
     return TYPEVIDEO;
-  else if (mutt_strcasecmp ("model", s) == 0)
+  else if (ascii_strcasecmp ("model", s) == 0)
     return TYPEMODEL;
   else
     return TYPEOTHER;
@@ -270,8 +328,15 @@ void mutt_parse_content_type (char *s, BODY *ct)
     /* Some pre-RFC1521 gateways still use the "name=filename" convention,
      * but if a filename has already been set in the content-disposition,
      * let that take precedence, and don't set it here */
-    if ((pc = mutt_get_parameter("name", ct->parameter)) != 0 && !ct->filename)
+    if ((pc = mutt_get_parameter( "name", ct->parameter)) != 0 && !ct->filename)
       ct->filename = safe_strdup(pc);
+    
+#ifdef SUN_ATTACHMENT
+    /* this is deep and utter perversion */
+    if ((pc = mutt_get_parameter ("conversions", ct->parameter)) != 0)
+      ct->encoding = mutt_check_encoding (pc);
+#endif
+    
   }
   
   /* Now get the subtype */
@@ -286,6 +351,11 @@ void mutt_parse_content_type (char *s, BODY *ct)
 
   /* Finally, get the major type */
   ct->type = mutt_check_mime_type (s);
+
+#ifdef SUN_ATTACHMENT
+  if (ascii_strcasecmp ("x-sun-attachment", s) == 0)
+      ct->subtype = safe_strdup ("x-sun-attachment");
+#endif
 
   if (ct->type == TYPEOTHER)
   {
@@ -315,15 +385,22 @@ void mutt_parse_content_type (char *s, BODY *ct)
       ct->subtype = safe_strdup ("x-unknown");
   }
 
+  /* Default character set for text types. */
+  if (ct->type == TYPETEXT)
+  {
+    if (!(pc = mutt_get_parameter ("charset", ct->parameter)))
+      mutt_set_parameter ("charset", "us-ascii", &ct->parameter);
+  }
+
 }
 
 static void parse_content_disposition (char *s, BODY *ct)
 {
   PARAMETER *parms;
 
-  if (!mutt_strncasecmp ("inline", s, 6))
+  if (!ascii_strncasecmp ("inline", s, 6))
     ct->disposition = DISPINLINE;
-  else if (!mutt_strncasecmp ("form-data", s, 9))
+  else if (!ascii_strncasecmp ("form-data", s, 9))
     ct->disposition = DISPFORMDATA;
   else
     ct->disposition = DISPATTACH;
@@ -334,14 +411,7 @@ static void parse_content_disposition (char *s, BODY *ct)
     s++;
     SKIPWS (s);
     if ((s = mutt_get_parameter ("filename", (parms = parse_parameters (s)))) != 0)
-    {
-      /* free() here because the content-type parsing routine might
-       * have allocated space if a "name=filename" parameter was
-       * specified.
-       */
-      safe_free ((void **) &ct->filename);
-      ct->filename = safe_strdup (s); 
-    }
+      mutt_str_replace (&ct->filename, s);
     if ((s = mutt_get_parameter ("name", parms)) != 0)
       ct->form_name = safe_strdup (s);
     mutt_free_parameter (&parms);
@@ -362,11 +432,12 @@ BODY *mutt_read_mime_header (FILE *fp, int digest)
   char *line = safe_malloc (LONG_STRING);
   size_t linelen = LONG_STRING;
   
-  p->hdr_offset = ftell(fp);
+  p->hdr_offset  = ftell(fp);
 
-  p->encoding = ENC7BIT; /* default from RFC1521 */
-  p->type = digest ? TYPEMESSAGE : TYPETEXT;
-
+  p->encoding    = ENC7BIT; /* default from RFC1521 */
+  p->type        = digest ? TYPEMESSAGE : TYPETEXT;
+  p->disposition = DISPINLINE;
+  
   while (*(line = read_rfc822_line (fp, line, &linelen)) != 0)
   {
     /* Find the value of the current header */
@@ -387,20 +458,36 @@ BODY *mutt_read_mime_header (FILE *fp, int digest)
       break;
     }
 
-    if (!mutt_strncasecmp ("content-", line, 8))
+    if (!ascii_strncasecmp ("content-", line, 8))
     {
-      if (!mutt_strcasecmp ("type", line + 8))
+      if (!ascii_strcasecmp ("type", line + 8))
 	mutt_parse_content_type (c, p);
-      else if (!mutt_strcasecmp ("transfer-encoding", line + 8))
+      else if (!ascii_strcasecmp ("transfer-encoding", line + 8))
 	p->encoding = mutt_check_encoding (c);
-      else if (!mutt_strcasecmp ("disposition", line + 8))
+      else if (!ascii_strcasecmp ("disposition", line + 8))
 	parse_content_disposition (c, p);
-      else if (!mutt_strcasecmp ("description", line + 8))
+      else if (!ascii_strcasecmp ("description", line + 8))
       {
-        mutt_str_replace (&p->description, c);
+	mutt_str_replace (&p->description, c);
+	rfc2047_decode (&p->description);
+      }
+    } 
+#ifdef SUN_ATTACHMENT
+    else if (!ascii_strncasecmp ("x-sun-", line, 6))
+    {
+      if (!ascii_strcasecmp ("data-type", line + 6))
+        mutt_parse_content_type (c, p);
+      else if (!ascii_strcasecmp ("encoding-info", line + 6))
+        p->encoding = mutt_check_encoding (c);
+      else if (!ascii_strcasecmp ("content-lines", line + 6))
+        mutt_set_parameter ("content-lines", safe_strdup (c), &(p->parameter));
+      else if (!ascii_strcasecmp ("data-description", line + 6))
+      {
+	mutt_str_replace (&p->description, c);
         rfc2047_decode (&p->description);
       }
     }
+#endif
   }
   p->offset = ftell (fp); /* Mark the start of the real data */
   if (p->type == TYPETEXT && !p->subtype)
@@ -413,26 +500,24 @@ BODY *mutt_read_mime_header (FILE *fp, int digest)
   return (p);
 }
 
-#ifdef LIBMUTT
-int mutt_is_message_type (int type, const char *subtype)
-{
-  if (type != TYPEMESSAGE)
-    return 0;
-
-  subtype = NONULL(subtype);
-  return (mutt_strcasecmp (subtype, "rfc822") == 0 || mutt_strcasecmp (subtype, "news") == 0);
-}
-#endif
-
 void mutt_parse_part (FILE *fp, BODY *b)
 {
+  char *bound = 0;
+
   switch (b->type)
   {
     case TYPEMULTIPART:
+#ifdef SUN_ATTACHMENT
+      if ( !ascii_strcasecmp (b->subtype, "x-sun-attachment") )
+          bound = "--------";
+      else
+#endif
+          bound = mutt_get_parameter ("boundary", b->parameter);
+
       fseek (fp, b->offset, SEEK_SET);
-      b->parts =  mutt_parse_multipart (fp, mutt_get_parameter ("boundary", b->parameter), 
+      b->parts =  mutt_parse_multipart (fp, bound, 
 					b->offset + b->length,
-					mutt_strcasecmp ("digest", b->subtype) == 0);
+					ascii_strcasecmp ("digest", b->subtype) == 0);
       break;
 
     case TYPEMESSAGE:
@@ -441,7 +526,7 @@ void mutt_parse_part (FILE *fp, BODY *b)
 	fseek (fp, b->offset, SEEK_SET);
 	if (mutt_is_message_type(b->type, b->subtype))
 	  b->parts = mutt_parse_messageRFC822 (fp, b);
-	else if (mutt_strcasecmp (b->subtype, "external-body") == 0)
+	else if (ascii_strcasecmp (b->subtype, "external-body") == 0)
 	  b->parts = mutt_read_mime_header (fp, 0);
 	else
 	  return;
@@ -456,8 +541,7 @@ void mutt_parse_part (FILE *fp, BODY *b)
   if (!b->parts)
   {
     b->type = TYPETEXT;
-    safe_free ((void **) &b->subtype);
-    b->subtype = safe_strdup ("plain");
+    mutt_str_replace (&b->subtype, "plain");
   }
 }
 
@@ -478,10 +562,7 @@ BODY *mutt_parse_messageRFC822 (FILE *fp, BODY *parent)
 
   parent->hdr = mutt_new_header ();
   parent->hdr->offset = ftell (fp);
-
-  /* BALSA: Pass user_hdrs=1 */
-  parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 1, 0);
-
+  parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 0, 0);
   msg = parent->hdr->content;
 
   /* ignore the length given in the content-length since it could be wrong
@@ -512,6 +593,9 @@ BODY *mutt_parse_messageRFC822 (FILE *fp, BODY *parent)
 
 BODY *mutt_parse_multipart (FILE *fp, const char *boundary, long end_off, int digest)
 {
+#ifdef SUN_ATTACHMENT
+  int lines;
+#endif
   int blen, len, crlf = 0;
   char buffer[LONG_STRING];
   BODY *head = 0, *last = 0, *new = 0;
@@ -520,7 +604,7 @@ BODY *mutt_parse_multipart (FILE *fp, const char *boundary, long end_off, int di
 
   if (!boundary)
   {
-    mutt_error ("multipart message has no boundary parameter!");
+    mutt_error _("multipart message has no boundary parameter!");
     return (NULL);
   }
 
@@ -529,11 +613,7 @@ BODY *mutt_parse_multipart (FILE *fp, const char *boundary, long end_off, int di
   {
     len = mutt_strlen (buffer);
 
-    /* take note of the line ending.  I'm assuming that either all endings
-     * will use <CR><LF> or none will.
-     */
-    if (len > 1 && buffer[len - 2] == '\r')
-      crlf = 1;
+    crlf =  (len > 1 && buffer[len - 2] == '\r') ? 1 : 0;
 
     if (buffer[0] == '-' && buffer[1] == '-' &&
 	mutt_strncmp (buffer + 2, boundary, blen) == 0)
@@ -561,6 +641,15 @@ BODY *mutt_parse_multipart (FILE *fp, const char *boundary, long end_off, int di
       else if (buffer[2 + blen] == 0)
       {
 	new = mutt_read_mime_header (fp, digest);
+
+#ifdef SUN_ATTACHMENT
+        if (mutt_get_parameter ("content-lines", new->parameter)) {
+	  for (lines = atoi(mutt_get_parameter ("content-lines", new->parameter));
+	       lines; lines-- )
+	     if (ftell (fp) >= end_off || fgets (buffer, LONG_STRING, fp) == NULL)
+	       break;
+	}
+#endif
 	
 	/*
 	 * Consistency checking - catch
@@ -728,15 +817,11 @@ time_t mutt_parse_date (const char *s, HEADER *h)
 	break;
 
       case 2: /* year */
-	      /* OH NO! WE ARE NOT Y2K COMPLIANT! */
 	tm.tm_year = atoi (t);
-	if (tm.tm_year >= 1900)
+        if (tm.tm_year < 50)
+	  tm.tm_year += 100;
+        else if (tm.tm_year >= 1900)
 	  tm.tm_year -= 1900;
-	else if(tm.tm_year <= 70)
-		tm.tm_year += 100;
-	/* We assume that no one has pre-1970 email lying
-	 * around. I shudder at the thought of who would...
-	 */
 	break;
 
       case 3: /* time of day */
@@ -779,7 +864,7 @@ time_t mutt_parse_date (const char *s, HEADER *h)
 
 	  tz = bsearch (ptz, TimeZones, sizeof TimeZones/sizeof (struct tz_t),
 			sizeof (struct tz_t),
-			(int (*)(const void *, const void *)) strcasecmp
+			(int (*)(const void *, const void *)) ascii_strcasecmp
 			/* This is safe to do: A pointer to a struct equals
 			 * a pointer to its first element*/);
 
@@ -791,11 +876,11 @@ time_t mutt_parse_date (const char *s, HEADER *h)
 	  }
 
 	  /* ad hoc support for the European MET (now officially CET) TZ */
-	  if (mutt_strcasecmp (t, "MET") == 0)
+	  if (ascii_strcasecmp (t, "MET") == 0)
 	  {
 	    if ((t = strtok (NULL, " \t")) != NULL)
 	    {
-	      if (!mutt_strcasecmp (t, "DST"))
+	      if (!ascii_strcasecmp (t, "DST"))
 		zhours++;
 	    }
 	  }
@@ -856,9 +941,9 @@ void mutt_parse_mime_message (CONTEXT *ctx, HEADER *cur)
     mutt_parse_part (msg->fp, cur->content);
 
 
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
     cur->pgp = pgp_query (cur->content);
-#endif /* _PGPPATH */
+#endif /* HAVE_PGP */
 
 
     mx_close_message (&msg);
@@ -866,7 +951,7 @@ void mutt_parse_mime_message (CONTEXT *ctx, HEADER *cur)
 }
 
 int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short user_hdrs, short weed,
-			    short do_2047, LIST **lastp, char **in_reply_to)
+			    short do_2047, LIST **lastp)
 {
   int matched = 0;
   LIST *last = NULL;
@@ -874,15 +959,15 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
   if (lastp)
     last = *lastp;
   
-  switch (tolower (line[0]))
+  switch (ascii_tolower (line[0]))
   {
     case 'a':
-    if (mutt_strcasecmp (line+1, "pparently-to") == 0)
+    if (ascii_strcasecmp (line+1, "pparently-to") == 0)
     {
       e->to = rfc822_parse_adrlist (e->to, p);
       matched = 1;
     }
-    else if (mutt_strcasecmp (line+1, "pparently-from") == 0)
+    else if (ascii_strcasecmp (line+1, "pparently-from") == 0)
     {
       e->from = rfc822_parse_adrlist (e->from, p);
       matched = 1;
@@ -890,7 +975,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 'b':
-    if (mutt_strcasecmp (line+1, "cc") == 0)
+    if (ascii_strcasecmp (line+1, "cc") == 0)
     {
       e->bcc = rfc822_parse_adrlist (e->bcc, p);
       matched = 1;
@@ -898,26 +983,26 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 'c':
-    if (mutt_strcasecmp (line+1, "c") == 0)
+    if (ascii_strcasecmp (line+1, "c") == 0)
     {
       e->cc = rfc822_parse_adrlist (e->cc, p);
       matched = 1;
     }
-    else if (mutt_strncasecmp (line + 1, "ontent-", 7) == 0)
+    else if (ascii_strncasecmp (line + 1, "ontent-", 7) == 0)
     {
-      if (mutt_strcasecmp (line+8, "type") == 0)
+      if (ascii_strcasecmp (line+8, "type") == 0)
       {
 	if (hdr)
 	  mutt_parse_content_type (p, hdr->content);
 	matched = 1;
       }
-      else if (mutt_strcasecmp (line+8, "transfer-encoding") == 0)
+      else if (ascii_strcasecmp (line+8, "transfer-encoding") == 0)
       {
 	if (hdr)
 	  hdr->content->encoding = mutt_check_encoding (p);
 	matched = 1;
       }
-      else if (mutt_strcasecmp (line+8, "length") == 0)
+      else if (ascii_strcasecmp (line+8, "length") == 0)
       {
 	if (hdr)
 	{
@@ -926,7 +1011,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
 	}
 	matched = 1;
       }
-      else if (mutt_strcasecmp (line+8, "description") == 0)
+      else if (ascii_strcasecmp (line+8, "description") == 0)
       {
 	if (hdr)
 	{
@@ -935,7 +1020,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
 	}
 	matched = 1;
       }
-      else if (mutt_strcasecmp (line+8, "disposition") == 0)
+      else if (ascii_strcasecmp (line+8, "disposition") == 0)
       {
 	if (hdr)
 	  parse_content_disposition (p, hdr->content);
@@ -945,7 +1030,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 'd':
-    if (!mutt_strcasecmp ("ate", line + 1))
+    if (!ascii_strcasecmp ("ate", line + 1))
     {
       mutt_str_replace (&e->date, p);
       if (hdr)
@@ -956,20 +1041,20 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     /* BALSA: we implement extra feature for balsa.*/
     else if (!mutt_strcasecmp ("isposition-notification-to", line + 1))
       {
-	e->dispnotify_to = rfc822_parse_adrlist (e->dispnotify_to, p);
-	matched = 1;
+        e->dispnotify_to = rfc822_parse_adrlist (e->dispnotify_to, p);
+        matched = 1;
       }
 #endif
     break;
     
     case 'e':
-    if (!mutt_strcasecmp ("xpires", line + 1) &&
+    if (!ascii_strcasecmp ("xpires", line + 1) &&
 	hdr && mutt_parse_date (p, NULL) < time (NULL))
       hdr->expired = 1;
     break;
     
     case 'f':
-    if (!mutt_strcasecmp ("rom", line + 1))
+    if (!ascii_strcasecmp ("rom", line + 1))
     {
       e->from = rfc822_parse_adrlist (e->from, p);
       matched = 1;
@@ -977,19 +1062,16 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 'i':
-    if (!mutt_strcasecmp (line+1, "n-reply-to"))
+    if (!ascii_strcasecmp (line+1, "n-reply-to"))
     {
-      if (hdr && in_reply_to)
-      {
-	mutt_str_replace (in_reply_to, p);
-	if (do_2047)
-	  rfc2047_decode (in_reply_to);
-      }
+      mutt_free_list (&e->in_reply_to);
+      e->in_reply_to = mutt_parse_references (p, 1);
+      matched = 1;
     }
     break;
     
     case 'l':
-    if (!mutt_strcasecmp (line + 1, "ines"))
+    if (!ascii_strcasecmp (line + 1, "ines"))
     {
       if (hdr)
 	hdr->lines = atoi (p);
@@ -998,29 +1080,29 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 'm':
-    if (!mutt_strcasecmp (line + 1, "ime-version"))
+    if (!ascii_strcasecmp (line + 1, "ime-version"))
     {
       if (hdr)
 	hdr->mime = 1;
       matched = 1;
     }
-    else if (!mutt_strcasecmp (line + 1, "essage-id"))
+    else if (!ascii_strcasecmp (line + 1, "essage-id"))
     {
       /* We add a new "Message-Id:" when building a message */
       safe_free ((void **) &e->message_id);
       e->message_id = extract_message_id (p);
       matched = 1;
     }
-    else if (!mutt_strncasecmp (line + 1, "ail-", 4))
+    else if (!ascii_strncasecmp (line + 1, "ail-", 4))
     {
-      if (!mutt_strcasecmp (line + 5, "reply-to"))
+      if (!ascii_strcasecmp (line + 5, "reply-to"))
       {
 	/* override the Reply-To: field */
 	rfc822_free_address (&e->reply_to);
 	e->reply_to = rfc822_parse_adrlist (e->reply_to, p);
 	matched = 1;
       }
-      else if (!mutt_strcasecmp (line + 5, "followup-to"))
+      else if (!ascii_strcasecmp (line + 5, "followup-to"))
       {
 	e->mail_followup_to = rfc822_parse_adrlist (e->mail_followup_to, p);
 	matched = 1;
@@ -1029,23 +1111,23 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 'r':
-    if (!mutt_strcasecmp (line + 1, "eferences"))
+    if (!ascii_strcasecmp (line + 1, "eferences"))
     {
       mutt_free_list (&e->references);
-      e->references = mutt_parse_references (p);
+      e->references = mutt_parse_references (p, 0);
       matched = 1;
     }
-    else if (!mutt_strcasecmp (line + 1, "eply-to"))
+    else if (!ascii_strcasecmp (line + 1, "eply-to"))
     {
       e->reply_to = rfc822_parse_adrlist (e->reply_to, p);
       matched = 1;
     }
-    else if (!mutt_strcasecmp (line + 1, "eturn-path"))
+    else if (!ascii_strcasecmp (line + 1, "eturn-path"))
     {
       e->return_path = rfc822_parse_adrlist (e->return_path, p);
       matched = 1;
     }
-    else if (!mutt_strcasecmp (line + 1, "eceived"))
+    else if (!ascii_strcasecmp (line + 1, "eceived"))
     {
       if (hdr && !hdr->received)
       {
@@ -1058,18 +1140,18 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 's':
-    if (!mutt_strcasecmp (line + 1, "ubject"))
+    if (!ascii_strcasecmp (line + 1, "ubject"))
     {
       if (!e->subject)
 	e->subject = safe_strdup (p);
       matched = 1;
     }
-    else if (!mutt_strcasecmp (line + 1, "ender"))
+    else if (!ascii_strcasecmp (line + 1, "ender"))
     {
       e->sender = rfc822_parse_adrlist (e->sender, p);
       matched = 1;
     }
-    else if (!mutt_strcasecmp (line + 1, "tatus"))
+    else if (!ascii_strcasecmp (line + 1, "tatus"))
     {
       if (hdr)
       {
@@ -1093,13 +1175,13 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
       }
       matched = 1;
     }
-    else if ((!mutt_strcasecmp ("upersedes", line + 1) ||
-	      !mutt_strcasecmp ("upercedes", line + 1)) && hdr)
+    else if ((!ascii_strcasecmp ("upersedes", line + 1) ||
+	      !ascii_strcasecmp ("upercedes", line + 1)) && hdr)
       e->supersedes = safe_strdup (p);
     break;
     
     case 't':
-    if (mutt_strcasecmp (line+1, "o") == 0)
+    if (ascii_strcasecmp (line+1, "o") == 0)
     {
       e->to = rfc822_parse_adrlist (e->to, p);
       matched = 1;
@@ -1107,7 +1189,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
     break;
     
     case 'x':
-    if (mutt_strcasecmp (line+1, "-status") == 0)
+    if (ascii_strcasecmp (line+1, "-status") == 0)
     {
       if (hdr)
       {
@@ -1132,7 +1214,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
       }
       matched = 1;
     }
-    else if (mutt_strcasecmp (line+1, "-label") == 0)
+    else if (ascii_strcasecmp (line+1, "-label") == 0)
     {
       e->x_label = safe_strdup(p);
       matched = 1;
@@ -1194,7 +1276,6 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
   LIST *last = NULL;
   char *line = safe_malloc (LONG_STRING);
   char *p;
-  char *in_reply_to = 0;
   long loc;
   int matched;
   size_t linelen = LONG_STRING;
@@ -1229,7 +1310,7 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
       /* some bogus MTAs will quote the original "From " line */
       if (mutt_strncmp (">From ", line, 6) == 0)
 	continue; /* just ignore */
-      else if (t = is_from (line, return_path, sizeof (return_path)))
+      else if (is_from (line, return_path, sizeof (return_path), &t))
       {
 	/* MH somtimes has the From_ line in the middle of the header! */
 	if (hdr && !hdr->received)
@@ -1247,7 +1328,7 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
     if (!*p)
       continue; /* skip empty header fields */
 
-    matched = mutt_parse_rfc822_line (e, hdr, line, p, user_hdrs, weed, 1, &last, &in_reply_to);
+    matched = mutt_parse_rfc822_line (e, hdr, line, p, user_hdrs, weed, 1, &last);
     
   }
 
@@ -1258,24 +1339,6 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
     hdr->content->hdr_offset = hdr->offset;
     hdr->content->offset = ftell (f);
 
-    /* if an in-reply-to was given, check to see if it is in the references
-     * list already.  if not, add it so we can do a better job of threading.
-     */
-    if (in_reply_to && (p = extract_message_id (in_reply_to)) != NULL)
-    {
-      if (!e->references ||
-	  (e->references && mutt_strcmp (e->references->data, p) != 0))
-      {
-	LIST *tmp = mutt_new_list ();
-
-	tmp->data = p;
-	tmp->next = e->references;
-	e->references = tmp;
-      }
-      else
-	safe_free ((void **) &p);
-    }
-
     /* do RFC2047 decoding */
     rfc2047_decode_adrlist (e->from);
     rfc2047_decode_adrlist (e->to);
@@ -1284,8 +1347,6 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
     rfc2047_decode_adrlist (e->mail_followup_to);
     rfc2047_decode_adrlist (e->return_path);
     rfc2047_decode_adrlist (e->sender);
-    /* BALSA: additional field disposition-notification-to */
-    rfc2047_decode_adrlist (e->dispnotify_to);
 
     if (e->subject)
     {
@@ -1307,10 +1368,8 @@ ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs,
     }
   }
 
-  safe_free ((void *) &in_reply_to);
   return (e);
 }
-
 
 ADDRESS *mutt_parse_adrlist (ADDRESS *p, const char *s)
 {

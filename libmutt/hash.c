@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #include <stdlib.h>
@@ -44,15 +44,18 @@ int hash_string (const unsigned char *s, int n)
 HASH *hash_create (int nelem)
 {
   HASH *table = safe_malloc (sizeof (HASH));
+  if (nelem == 0)
+    nelem = 2;
   table->nelem = nelem;
   table->table = safe_calloc (nelem, sizeof (struct hash_elem *));
   return table;
 }
 
 /* table        hash table to update
-   key          key to hash on
-   data         data to associate with `key'
-   allow_dup    if nonzero, duplicate keys are allowed in the table */
+ * key          key to hash on
+ * data         data to associate with `key'
+ * allow_dup    if nonzero, duplicate keys are allowed in the table 
+ */
 int hash_insert (HASH * table, const char *key, void *data, int allow_dup)
 {
   struct hash_elem *ptr;
@@ -108,20 +111,18 @@ void hash_delete_hash (HASH * table, int hash, const char *key, const void *data
 		       void (*destroy) (void *))
 {
   struct hash_elem *ptr = table->table[hash];
-  struct hash_elem *last = NULL;
-  for (; ptr; last = ptr, ptr = ptr->next)
+  struct hash_elem **last = &table->table[hash];
+
+  for (; ptr; last = &ptr->next, ptr = ptr->next)
   {
     /* if `data' is given, look for a matching ->data member.  this is
-       required for the case where we have multiple entries with the same
-       key */
-    if (data == ptr->data || (!data && mutt_strcmp (ptr->key, key) == 0))
+     * required for the case where we have multiple entries with the same
+     * key
+     */
+    if ((data == ptr->data) || (!data && mutt_strcmp (ptr->key, key) == 0))
     {
-      if (last)
-	last->next = ptr->next;
-      else
-	table->table[hash] = ptr->next;
-      if (destroy)
-	destroy (ptr->data);
+      *last = ptr->next;
+      if (destroy) destroy (ptr->data);
       FREE (&ptr);
       return;
     }
@@ -129,7 +130,8 @@ void hash_delete_hash (HASH * table, int hash, const char *key, const void *data
 }
 
 /* ptr		pointer to the hash table to be freed
-   destroy()	function to call to free the ->data member (optional) */
+ * destroy()	function to call to free the ->data member (optional) 
+ */
 void hash_destroy (HASH **ptr, void (*destroy) (void *))
 {
   int i;

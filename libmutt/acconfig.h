@@ -114,5 +114,7 @@
 /* Define as 1 if iconv() only converts exactly and we should treat
  * all return values other than (size_t)(-1) as equivalent. */
 #define ICONV_NONTRANS 0
- 
- 
+
+/* Define if GSS_C_NT_HOSTBASED_SERVICE is defined in the gssapi.h
+   header file.  Only relevant when using GSSAPI.  */
+#undef HAVE_GSS_C_NT_HOSTBASED_SERVICE

@@ -16,6 +16,10 @@
  *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */ 
 
+
+#ifndef MAPPING_H
+#define MAPPING_H
+
 struct mapping_t
 {
   char *name;
@@ -26,3 +30,5 @@ char *mutt_getnamebyvalue (int, const struct mapping_t *);
 char *mutt_compile_help (char *, size_t, int, struct mapping_t *);
 
 int mutt_getvaluebyname (const char *, const struct mapping_t *);
+
+#endif

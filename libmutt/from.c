@@ -57,7 +57,7 @@ static int is_day_name (const char *s)
  * From [ <return-path> ] <weekday> <month> <day> <time> [ <timezone> ] <year>
  */
 
-time_t is_from (const char *s, char *path, size_t pathlen)
+int is_from (const char *s, char *path, size_t pathlen, time_t *tp)
 {
   struct tm tm;
   int yr;

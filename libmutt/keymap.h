@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #ifndef KEYMAP_H
@@ -58,16 +58,19 @@ enum
   MENU_MAIN,
   MENU_PAGER,
   MENU_POST,
+  MENU_QUERY,
 
-#ifdef _PGPPATH
+  
+#ifdef HAVE_PGP
   MENU_PGP,
+#endif
+
+#ifdef MIXMASTER
+  MENU_MIX,
 #endif
 
 
 
-
-
-  MENU_QUERY,
   MENU_MAX
 };
 
@@ -97,9 +100,16 @@ extern struct binding_t OpCompose[];
 extern struct binding_t OpBrowser[];
 extern struct binding_t OpEditor[];
 extern struct binding_t OpQuery[];
+extern struct binding_t OpAlias[];
 
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
 extern struct binding_t OpPgp[];
-#endif /* _PGPPATH */
+#endif /* HAVE_PGP */
+
+#ifdef MIXMASTER
+extern struct binding_t OpMix[];
+#endif
+
+#include "keymap_defs.h"
 
 #endif /* KEYMAP_H */

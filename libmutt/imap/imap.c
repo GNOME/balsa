@@ -119,14 +119,27 @@ int imap_rename_mailbox(IMAP_DATA* idata, char* mailbox, char* new_name)
   return 0;
 }
 
-int imap_delete_mailbox (CONTEXT* ctx, char* mailbox)
+int imap_delete_mailbox (CONTEXT* ctx, IMAP_MBOX mx)
 {
   char buf[LONG_STRING], mbox[LONG_STRING];
-  
-  imap_munge_mbox_name (mbox, sizeof (mbox), mailbox);
+  IMAP_DATA *idata;
+
+  if (!ctx || !ctx->data) {
+  	if (!(idata = imap_conn_find (&mx.account,
+    		option (OPTIMAPPASSIVE) ? M_IMAP_CONN_NONEW : 0)))
+  	{
+    		FREE (&mx.mbox);
+    		return -1;
+	}
+  } else {
+	  idata = ctx->data;
+  }
+
+  imap_munge_mbox_name (mbox, sizeof (mbox), mx.mbox);
+
   snprintf (buf, sizeof (buf), "DELETE %s", mbox);
 
-  if (imap_exec ((IMAP_DATA*) ctx->data, buf, 0) != 0)
+  if (imap_exec ((IMAP_DATA*) idata, buf, 0) != 0)
     return -1;
 
   return 0;
@@ -309,7 +322,7 @@ static int imap_check_capabilities (IMAP_DATA* idata)
       ||mutt_bit_isset(idata->capabilities,IMAP4REV1)))
   {
     mutt_error _("This IMAP server is ancient. Mutt does not work with it.");
-    mutt_sleep (5);	/* pause a moment to let the user see the error */
+    mutt_sleep (2);	/* pause a moment to let the user see the error */
 
     return -1;
   }
@@ -373,7 +386,6 @@ IMAP_DATA* imap_conn_find (const ACCOUNT* account, int flags)
 int imap_open_connection (IMAP_DATA* idata)
 {
   char buf[LONG_STRING];
-  int rc;
 
   if (mutt_socket_open (idata->conn) < 0)
     return -1;
@@ -383,7 +395,7 @@ int imap_open_connection (IMAP_DATA* idata)
   if (imap_cmd_step (idata) != IMAP_CMD_CONTINUE)
     goto bail;
 
-  if (mutt_strncmp ("* OK", idata->cmd.buf, 4) == 0)
+  if (ascii_strncmp ("* OK", idata->cmd.buf, 4) == 0)
   {
     /* TODO: Parse new tagged CAPABILITY data (* OK [CAPABILITY...]) */
     if (imap_check_capabilities (idata))
@@ -392,6 +404,7 @@ int imap_open_connection (IMAP_DATA* idata)
     /* Attempt STARTTLS if available and desired. */
     if (mutt_bit_isset (idata->capabilities, STARTTLS) && !idata->conn->ssf)
     {
+      int rc;
 #ifndef LIBMUTT
       if ((rc = query_quadoption (OPT_SSLSTARTTLS,
         _("Secure connection with TLS?"))) == -1)
@@ -427,7 +440,7 @@ int imap_open_connection (IMAP_DATA* idata)
       dprint (2, (debugfile, "Communication encrypted at %d bits\n",
 	idata->conn->ssf));
   }
-  else if (mutt_strncmp ("* PREAUTH", idata->cmd.buf, 9) == 0)
+  else if (ascii_strncmp ("* PREAUTH", idata->cmd.buf, 9) == 0)
   {
     if (imap_check_capabilities (idata) != 0)
       goto bail;
@@ -521,7 +534,7 @@ int imap_open_mailbox (CONTEXT* ctx)
   
   if (imap_parse_path (ctx->path, &mx))
   {
-    mutt_error ("%s is an invalid IMAP path", ctx->path);
+    mutt_error (_("%s is an invalid IMAP path"), ctx->path);
     return -1;
   }
 
@@ -569,17 +582,6 @@ int imap_open_mailbox (CONTEXT* ctx)
       break;
 
     pc = idata->cmd.buf + 2;
-    pc = imap_next_word (pc);
-    if (!ascii_strncasecmp ("EXISTS", pc, 6))
-    {
-      /* imap_handle_untagged will have picked up the EXISTS message and
-       * set the NEW_MAIL flag. We clear it here. */
-      idata->reopen &= ~IMAP_NEWMAIL_PENDING;
-      count = idata->newMailCount;
-      idata->newMailCount = 0;
-    }
-
-    pc = idata->cmd.buf + 2;
 
     /* Obtain list of available flags here, may be overridden by a
      * PERMANENTFLAGS tag in the OK response */
@@ -612,6 +614,15 @@ int imap_open_mailbox (CONTEXT* ctx)
       idata->uid_validity = atoi(pc+15);
     }
 #endif
+    else
+    {
+      pc = imap_next_word (pc);
+      if (!ascii_strncasecmp ("EXISTS", pc, 6))
+      {
+	count = idata->newMailCount;
+	idata->newMailCount = 0;
+      }
+    }
   }
   while (rc == IMAP_CMD_CONTINUE);
 
@@ -629,7 +640,7 @@ int imap_open_mailbox (CONTEXT* ctx)
     goto fail;
 
   /* check for READ-ONLY notification */
-  if (!strncmp (imap_get_qualifier (idata->cmd.buf), "[READ-ONLY]", 11))
+  if (!ascii_strncmp (imap_get_qualifier (idata->cmd.buf), "[READ-ONLY]", 11))
   {
     dprint (2, (debugfile, "Mailbox is read-only.\n"));
     ctx->readonly = 1;
@@ -1098,6 +1109,7 @@ void imap_close_mailbox (CONTEXT* ctx)
     idata->reopen &= IMAP_REOPEN_ALLOW;
     idata->state = IMAP_AUTHENTICATED;
     FREE (&(idata->mailbox));
+    mutt_free_list (&idata->flags);
   }
 
   /* free IMAP part of headers */
@@ -1146,10 +1158,10 @@ int imap_check_mailbox (CONTEXT *ctx, int *index_hint)
    * changes to process, since we can reopen here. */
   imap_cmd_finish (idata);
 
-  if (idata->check_status & IMAP_NEWMAIL_PENDING)
-    result = M_NEW_MAIL;
-  else if (idata->check_status & IMAP_EXPUNGE_PENDING)
+  if (idata->check_status & IMAP_EXPUNGE_PENDING)
     result = M_REOPENED;
+  else if (idata->check_status & IMAP_NEWMAIL_PENDING)
+    result = M_NEW_MAIL;
   else if (idata->check_status & IMAP_FLAGS_PENDING)
     result = M_FLAGS;
 
@@ -1213,7 +1225,7 @@ int imap_mailbox_check (char* path, int new)
    */
 
   if (mutt_strcmp (mbox_unquoted, idata->mailbox) == 0
-      || (mutt_strcasecmp (mbox_unquoted, "INBOX") == 0
+      || (ascii_strcasecmp (mbox_unquoted, "INBOX") == 0
 	  && mutt_strcasecmp (mbox_unquoted, idata->mailbox) == 0))
   {
     strfcpy (buf, "NOOP", sizeof (buf));
@@ -1319,7 +1331,7 @@ int imap_parse_list_response(IMAP_DATA* idata, char **name, int *noselect,
       return 0;
     s = imap_next_word (s); /* delim */
     /* Reset the delimiter, this can change */
-    if (strncmp (s, "NIL", 3))
+    if (ascii_strncmp (s, "NIL", 3))
     {
       if (s && s[0] == '\"' && s[1] && s[2] == '\"')
 	*delim = s[1];
@@ -1336,7 +1348,12 @@ int imap_parse_list_response(IMAP_DATA* idata, char **name, int *noselect,
       *name = idata->cmd.buf;
     }
     else
-      *name = s;
+    {
+#ifdef LIBMUTT
+     imap_unquote_string(s);
+#endif
+     *name = s;
+    }
   }
 
   return 0;
@@ -1350,8 +1367,12 @@ int imap_subscribe (char *path, int subscribe)
   char mbox[LONG_STRING];
   IMAP_MBOX mx;
 
-  if (imap_parse_path (path, &mx))
+  if (!mx_is_imap (path) || imap_parse_path (path, &mx))
+  {
+    mutt_error (_("Bad mailbox name"));
     return -1;
+  }
+
 
   if (!(idata = imap_conn_find (&(mx.account), 0)))
     goto fail;
@@ -1460,7 +1481,7 @@ int imap_complete(char* dest, size_t dlen, char* path) {
       completions++;
     }
   }
-  while (mutt_strncmp(idata->cmd.seq, idata->cmd.buf, SEQLEN));
+  while (ascii_strncmp(idata->cmd.seq, idata->cmd.buf, SEQLEN));
 
   if (completions)
   {

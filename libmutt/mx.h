@@ -61,7 +61,7 @@ void mbox_unlock_mailbox (CONTEXT *);
 int mh_read_dir (CONTEXT *, const char *);
 int mh_sync_mailbox (CONTEXT *, int *);
 int mh_check_mailbox (CONTEXT *, int *);
-int mh_parse_sequences (CONTEXT *, const char *);
+int mh_buffy (const char *);
 
 int maildir_read_dir (CONTEXT *);
 
@@ -71,11 +71,13 @@ int mh_commit_message (CONTEXT *, MESSAGE *, HEADER *);
 int maildir_open_new_message (MESSAGE *, CONTEXT *, HEADER *);
 int mh_open_new_message (MESSAGE *, CONTEXT *, HEADER *);
 
+FILE *maildir_open_find_message (const char *, const char *);
+
 int mbox_strict_cmp_headers (const HEADER *, const HEADER *);
 int mutt_reopen_mailbox (CONTEXT *, int *);
 
 void mx_alloc_memory (CONTEXT *);
-void mx_update_context (CONTEXT *);
+void mx_update_context (CONTEXT *, int);
 void mx_update_tables (CONTEXT *, int);
 
 

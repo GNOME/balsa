@@ -23,6 +23,7 @@
 #include <ctype.h>
 
 #include "mutt.h"
+#include "mutt_curses.h"
 #include "imap_private.h"
 #include "message.h"
 #include "mx.h"
@@ -52,7 +53,7 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
   char tempfile[_POSIX_PATH_MAX];
   int msgno;
   IMAP_HEADER h;
-  int rc, mfhrc;
+  int rc, mfhrc, oldmsgcount;
   int fetchlast = 0;
 #ifdef LIBMUTT
   const char *want_headers = 
@@ -84,13 +85,21 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
    * as they come in. */
   mutt_mktemp (tempfile);
   if (!(fp = safe_fopen (tempfile, "w+")))
+  {
+    mutt_error (_("Could not create temporary file %s"), tempfile);
+    mutt_sleep (2);
     return -1;
+  }
   unlink (tempfile);
 
   /* make sure context has room to hold the mailbox */
   while ((msgend) >= idata->ctx->hdrmax)
     mx_alloc_memory (idata->ctx);
 
+  oldmsgcount = ctx->msgcount;
+  idata->reopen &= ~IMAP_NEWMAIL_PENDING;
+  idata->newMailCount = 0;
+  
   for (msgno = msgbegin; msgno <= msgend ; msgno++)
   {
     if (ReadInc && (!msgno || ((msgno+1) % ReadInc == 0)))
@@ -143,7 +152,6 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
       /* update context with message header */
       ctx->hdrs[msgno] = mutt_new_header ();
 
-      ctx->hdrs[msgno]->index = ctx->msgcount;
       ctx->hdrs[msgno]->index = h.sid - 1;
       if (h.sid != ctx->msgcount + 1)
 	dprint (1, (debugfile, "imap_read_headers: msgcount and sequence ID are inconsistent!"));
@@ -167,7 +175,7 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
       /* content built as a side-effect of mutt_read_rfc822_header */
       ctx->hdrs[msgno]->content->length = h.content_length;
 
-      mx_update_context (ctx); /* increments ->msgcount */
+      ctx->msgcount++;
     }
     while ((rc != IMAP_CMD_OK) && ((mfhrc == -1) ||
       ((msgno + 1) >= fetchlast)));
@@ -180,19 +188,21 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
       return -1;
     }
 	
-    /* h.data shouldn't be freed here, it is kept in ctx->headers */
-
     /* in case we get new mail while fetching the headers */
     if (idata->reopen & IMAP_NEWMAIL_PENDING)
     {
       msgend = idata->newMailCount - 1;
       while ((msgend) >= ctx->hdrmax)
 	mx_alloc_memory (ctx);
-      idata->status &= ~IMAP_NEWMAIL_PENDING;
+      idata->reopen &= ~IMAP_NEWMAIL_PENDING;
+      idata->newMailCount = 0;
     }
   }
 
   fclose(fp);
+
+  if (ctx->msgcount > oldmsgcount)
+    mx_update_context (ctx, ctx->msgcount - oldmsgcount);
 
   return msgend;
 }
@@ -241,7 +251,10 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
     }
   }
 
-  mutt_message _("Fetching message...");
+#ifndef LIBMUTT
+  if (!isendwin())
+    mutt_message _("Fetching message...");
+#endif 
 
   cache->uid = HEADER_DATA(h)->uid;
   mutt_mktemp (path);
@@ -343,20 +356,16 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
    * mutt_free_envelope gets called, but keep their spots in the hash. This
    * confuses threading. Alternatively we could try to merge the new
    * envelope into the old one. Also messy and lowlevel. */
-  if (h->env->message_id)
+  if (ctx->id_hash && h->env->message_id)
     hash_delete (ctx->id_hash, h->env->message_id, h, NULL);
-  if (h->env->real_subj)
-    hash_delete (ctx->subj_hash, h->env->real_subj, h, NULL);
   mutt_free_envelope (&h->env);
 #ifdef LIBMUTT
   h->env = mutt_read_rfc822_header (msg->fp, h, 1, 0);
 #else
   h->env = mutt_read_rfc822_header (msg->fp, h, 0, 0);
 #endif
-  if (h->env->message_id)
+  if (ctx->id_hash && h->env->message_id)
     hash_insert (ctx->id_hash, h->env->message_id, h, 0);
-  if (h->env->real_subj)
-    hash_insert (ctx->subj_hash, h->env->real_subj, h, 1);
 
   /* see above. We want the new status in h->read, so we unset it manually
    * and let mutt_set_flag set it correctly, updating context. */
@@ -614,6 +623,9 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
   }
   
   imap_fix_path (idata, mx.mbox, mbox, sizeof (mbox));
+  
+  memset (&cmd, 0, sizeof (cmd));
+  mutt_buffer_addstr (&cmd, "UID COPY ");
 
   memset (&cmd, 0, sizeof (cmd));
   mutt_buffer_addstr (&cmd, "UID COPY ");
@@ -646,6 +658,7 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
     mutt_message (_("Copying message %d to %s..."), h->index+1, mbox);
     snprintf (uid, sizeof (uid), "%u", HEADER_DATA (h)->uid);
     mutt_buffer_addstr (&cmd, uid);
+    mutt_buffer_addstr (&cmd, uid);
   }
 
   /* let's get it on */
@@ -657,7 +670,7 @@ int imap_copy_messages (CONTEXT* ctx, HEADER* h, char* dest, int delete)
   if (rc == -2)
   {
     /* bail out if command failed for reasons other than nonexistent target */
-    if (strncmp (imap_get_qualifier (idata->cmd.buf), "[TRYCREATE]", 11))
+    if (ascii_strncmp (imap_get_qualifier (idata->cmd.buf), "[TRYCREATE]", 11))
     {
       imap_error ("imap_copy_messages", idata->cmd.buf);
       goto fail;

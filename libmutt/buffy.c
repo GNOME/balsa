@@ -180,6 +180,9 @@ buffy_add_mailbox(const char *path, const char *user, const char *passwd)
       (*tmp)->user   = user   ? safe_strdup (user)   : NULL;
       (*tmp)->passwd = passwd ? safe_strdup (passwd) : NULL;
       (*tmp)->next = NULL;
+      /* it is tempting to set magic right here */
+      (*tmp)->magic = 0;
+      
     }
 
     (*tmp)->new = 0;
@@ -308,7 +311,7 @@ int mutt_buffy_check (int force)
   for (tmp = Incoming; tmp; tmp = tmp->next)
   {
 #ifdef USE_IMAP
-    if ((tmp->magic == M_IMAP) || mx_is_imap (tmp->path))
+    if (mx_is_imap (tmp->path))
       tmp->magic = M_IMAP;
     else
 #endif
@@ -362,12 +365,7 @@ int mutt_buffy_check (int force)
 	break;
 
       case M_MAILDIR:
-      case M_MH:
-
-	if(tmp->magic == M_MAILDIR)
-	  snprintf (path, sizeof (path), "%s/new", tmp->path);
-	else
-	  strfcpy (path, tmp->path, sizeof(path));
+	snprintf (path, sizeof (path), "%s/new", tmp->path);
 	if ((dirp = opendir (path)) == NULL)
 	{
 	  tmp->magic = 0;
@@ -375,7 +373,9 @@ int mutt_buffy_check (int force)
 	}
 	while ((de = readdir (dirp)) != NULL)
 	{
-	  if (*de->d_name != '.')
+	  char *p;
+	  if (*de->d_name != '.' && 
+	      (!(p = strstr (de->d_name, ":2,")) || !strchr (p + 3, 'T')))
 	  {
 	    /* one new message is enough */
 	    BuffyCount++;
@@ -384,6 +384,11 @@ int mutt_buffy_check (int force)
 	  }
 	}
 	closedir (dirp);
+	break;
+	
+      case M_MH:
+	if ((tmp->new = mh_buffy (tmp->path)) > 0)
+	  BuffyCount++;
 	break;
 
 #ifdef USE_IMAP

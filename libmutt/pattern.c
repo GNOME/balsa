@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-9 Michael R. Elkins <me@cs.hmc.edu>, and others
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>, and others
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 #include "mutt.h"
@@ -31,7 +31,7 @@
 
 
 
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
 #include "pgp.h"
 #endif
 
@@ -41,6 +41,7 @@ static int eat_regexp (pattern_t *pat, BUFFER *, BUFFER *);
 static int eat_date (pattern_t *pat, BUFFER *, BUFFER *);
 static int eat_range (pattern_t *pat, BUFFER *, BUFFER *);
 
+#ifndef LIBMUTT
 struct pattern_flags
 {
   int tag;	/* character used to represent this op */
@@ -61,13 +62,13 @@ Flags[] =
   { 'E', M_EXPIRED,		0,		NULL },
   { 'f', M_FROM,		0,		eat_regexp },
   { 'F', M_FLAG,		0,		NULL },
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
   { 'g', M_PGP_SIGN, 		0, 		NULL },
   { 'G', M_PGP_ENCRYPT, 	0, 		NULL },
 #endif
   { 'h', M_HEADER,		M_FULL_MSG,	eat_regexp },
   { 'i', M_ID,			0,		eat_regexp },
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
   { 'k', M_PGP_KEY, 		0, 		NULL },
 #endif
   { 'L', M_ADDRESS,		0,		eat_regexp },
@@ -88,7 +89,9 @@ Flags[] =
   { 'U', M_UNREAD,		0,		NULL },
   { 'v', M_COLLAPSED,		0,		NULL },
   { 'x', M_REFERENCE,		0,		eat_regexp },
+  { 'y', M_XLABEL,		0,		eat_regexp },
   { 'z', M_SIZE,		0,		eat_range },
+  { '=', M_DUPLICATED,		0,		NULL },
   { 0 }
 };
 
@@ -98,6 +101,19 @@ static char LastSearchExpn[LONG_STRING] = { 0 }; /* expanded version of
 						    LastSearch */
 
 #define M_MAXRANGE -1
+#endif /* LIBMUTT - we don't need this search */
+
+/* constants for parse_date_range() */
+#define M_PDR_NONE	0x0000
+#define M_PDR_MINUS	0x0001
+#define M_PDR_PLUS	0x0002
+#define M_PDR_WINDOW	0x0004
+#define M_PDR_ABSOLUTE	0x0008
+#define M_PDR_DONE	0x0010
+#define M_PDR_ERROR	0x0100
+#define M_PDR_ERRORDONE	(M_PDR_ERROR | M_PDR_DONE)
+
+#ifndef LIBMUTT
 
 int mutt_getvaluebychar (char ch, struct mapping_t *table)
 {
@@ -143,7 +159,7 @@ msg_search (CONTEXT *ctx, regex_t *rx, char *buf, size_t blen, int op, int msgno
       /* decode the header / body */
       memset (&s, 0, sizeof (s));
       s.fpin = msg->fp;
-      s.flags |= M_CHARCONV;
+      s.flags = M_CHARCONV;
       mutt_mktemp (tempfile);
       if ((s.fpout = safe_fopen (tempfile, "w+")) == NULL)
       {
@@ -160,7 +176,7 @@ msg_search (CONTEXT *ctx, regex_t *rx, char *buf, size_t blen, int op, int msgno
 
 
 
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
 	if (h->pgp & PGPENCRYPT && !pgp_valid_passphrase())
 	{
 	  mx_close_message (&msg);
@@ -236,7 +252,7 @@ int eat_regexp (pattern_t *pat, BUFFER *s, BUFFER *err)
   if (mutt_extract_token (&buf, s, M_TOKEN_PATTERN | M_TOKEN_COMMENT) != 0 ||
       !buf.data)
   {
-    snprintf (err->data, err->dsize, "Error in expression: %s", s->dptr);
+    snprintf (err->data, err->dsize, _("Error in expression: %s"), s->dptr);
     return (-1);
   }
   pat->rx = safe_malloc (sizeof (regex_t));
@@ -256,7 +272,17 @@ int eat_range (pattern_t *pat, BUFFER *s, BUFFER *err)
 {
   char *tmp;
   int do_exclusive = 0;
+  int skip_quote = 0;
   
+  /*
+   * If simple_search is set to "~m %s", the range will have double quotes 
+   * around it...
+   */
+  if (*s->dptr == '"')
+  {
+    s->dptr++;
+    skip_quote = 1;
+  }
   if (*s->dptr == '<')
     do_exclusive = 1;
   if ((*s->dptr != '-') && (*s->dptr != '<'))
@@ -319,6 +345,9 @@ int eat_range (pattern_t *pat, BUFFER *s, BUFFER *err)
   else
     pat->max = M_MAXRANGE;
 
+  if (skip_quote && *tmp == '"')
+    tmp++;
+
   SKIPWS (tmp);
   s->dptr = tmp;
   return 0;
@@ -330,10 +359,10 @@ static const char *getDate (const char *s, struct tm *t, BUFFER *err)
   time_t now = time (NULL);
   struct tm *tm = localtime (&now);
 
-  t->tm_mday = strtol (s, &p, 0);
+  t->tm_mday = strtol (s, &p, 10);
   if (t->tm_mday < 1 || t->tm_mday > 31)
   {
-    snprintf (err->data, err->dsize, "Invalid day of month: %s", s);
+    snprintf (err->data, err->dsize, _("Invalid day of month: %s"), s);
     return NULL;
   }
   if (*p != '/')
@@ -344,10 +373,10 @@ static const char *getDate (const char *s, struct tm *t, BUFFER *err)
     return p;
   }
   p++;
-  t->tm_mon = strtol (p, &p, 0) - 1;
+  t->tm_mon = strtol (p, &p, 10) - 1;
   if (t->tm_mon < 0 || t->tm_mon > 11)
   {
-    snprintf (err->data, err->dsize, "Invalid month: %s", p);
+    snprintf (err->data, err->dsize, _("Invalid month: %s"), p);
     return NULL;
   }
   if (*p != '/')
@@ -356,7 +385,7 @@ static const char *getDate (const char *s, struct tm *t, BUFFER *err)
     return p;
   }
   p++;
-  t->tm_year = strtol (p, &p, 0);
+  t->tm_year = strtol (p, &p, 10);
   if (t->tm_year < 70) /* year 2000+ */
     t->tm_year += 100;
   else if (t->tm_year > 1900)
@@ -368,28 +397,140 @@ static const char *getDate (const char *s, struct tm *t, BUFFER *err)
    Nm	months
    Nw	weeks
    Nd	days */
-static const char *get_offset (struct tm *tm, const char *s)
+static const char *get_offset (struct tm *tm, const char *s, int sign)
 {
   char *ps;
   int offset = strtol (s, &ps, 0);
+  if ((sign < 0 && offset > 0) || (sign > 0 && offset < 0))
+    offset = -offset;
 
   switch (*ps)
   {
     case 'y':
-      tm->tm_year -= offset;
+      tm->tm_year += offset;
       break;
     case 'm':
-      tm->tm_mon -= offset;
+      tm->tm_mon += offset;
       break;
     case 'w':
-      tm->tm_mday -= 7 * offset;
+      tm->tm_mday += 7 * offset;
       break;
     case 'd':
-      tm->tm_mday -= offset;
+      tm->tm_mday += offset;
       break;
+    default:
+      return s;
   }
   mutt_normalize_time (tm);
   return (ps + 1);
+}
+
+static void adjust_date_range (struct tm *min, struct tm *max)
+{
+  if (min->tm_year > max->tm_year
+      || (min->tm_year == max->tm_year && min->tm_mon > max->tm_mon)
+      || (min->tm_year == max->tm_year && min->tm_mon == max->tm_mon
+	&& min->tm_mday > max->tm_mday))
+  {
+    int tmp;
+    
+    tmp = min->tm_year;
+    min->tm_year = max->tm_year;
+    max->tm_year = tmp;
+      
+    tmp = min->tm_mon;
+    min->tm_mon = max->tm_mon;
+    max->tm_mon = tmp;
+      
+    tmp = min->tm_mday;
+    min->tm_mday = max->tm_mday;
+    max->tm_mday = tmp;
+    
+    min->tm_hour = min->tm_min = min->tm_sec = 0;
+    max->tm_hour = 23;
+    max->tm_min = max->tm_sec = 59;
+  }
+}
+
+static const char * parse_date_range (const char* pc, struct tm *min,
+    struct tm *max, int haveMin, struct tm *baseMin, BUFFER *err)
+{
+  int flag = M_PDR_NONE;	
+  while (*pc && ((flag & M_PDR_DONE) == 0))
+  {
+    const char *pt;
+    char ch = *pc++;
+    SKIPWS (pc);
+    switch (ch)
+    {
+      case '-':
+      {
+	/* try a range of absolute date minus offset of Ndwmy */
+	pt = get_offset (min, pc, -1);
+	if (pc == pt)
+	{
+	  if (flag == M_PDR_NONE)
+	  { /* nothing yet and no offset parsed => absolute date? */
+	    if (!getDate (pc, max, err))
+	      flag |= (M_PDR_ABSOLUTE | M_PDR_ERRORDONE);  /* done bad */
+	    else
+	    {
+	      /* reestablish initial base minimum if not specified */
+	      if (!haveMin)
+		memcpy (min, baseMin, sizeof(struct tm));
+	      flag |= (M_PDR_ABSOLUTE | M_PDR_DONE);  /* done good */
+	    }
+	  }
+	  else
+	    flag |= M_PDR_ERRORDONE;
+	}
+	else
+	{
+	  pc = pt;
+	  if (flag == M_PDR_NONE && !haveMin)
+	  { /* the very first "-3d" without a previous absolute date */
+	    max->tm_year = min->tm_year;
+	    max->tm_mon = min->tm_mon;
+	    max->tm_mday = min->tm_mday;
+	  }
+	  flag |= M_PDR_MINUS;
+	}
+      }
+      break;
+      case '+':
+      { /* enlarge plusRange */
+	pt = get_offset (max, pc, 1);
+	if (pc == pt)
+	  flag |= M_PDR_ERRORDONE;
+	else
+	{
+	  pc = pt;
+	  flag |= M_PDR_PLUS;
+	}
+      }
+      break;
+      case '*':
+      { /* enlarge window in both directions */
+	pt = get_offset (min, pc, -1);
+	if (pc == pt)
+	  flag |= M_PDR_ERRORDONE;
+	else
+	{
+	  pc = get_offset (max, pc, 1);
+	  flag |= M_PDR_WINDOW;
+	}
+      }
+      break;
+      default:
+	flag |= M_PDR_ERRORDONE;
+    }
+    SKIPWS (pc);
+  }
+  if ((flag & M_PDR_ERROR) && !(flag & M_PDR_ABSOLUTE))
+  { /* getDate has its own error message, don't overwrite it here */
+    snprintf (err->data, err->dsize, _("Invalid relative date: %s"), pc-1);
+  }
+  return ((flag & M_PDR_ERROR) ? NULL : pc);
 }
 
 static int eat_date (pattern_t *pat, BUFFER *s, BUFFER *err)
@@ -401,7 +542,7 @@ static int eat_date (pattern_t *pat, BUFFER *s, BUFFER *err)
   if (mutt_extract_token (&buffer, s, M_TOKEN_COMMENT | M_TOKEN_PATTERN) != 0
       || !buffer.data)
   {
-    strfcpy (err->data, "error in expression", err->dsize);
+    strfcpy (err->data, _("error in expression"), err->dsize);
     return (-1);
   }
 
@@ -448,9 +589,10 @@ static int eat_date (pattern_t *pat, BUFFER *s, BUFFER *err)
 	exact++;
     }
     tm->tm_hour = 23;
-    tm->tm_min = max.tm_sec = 59;
+    tm->tm_min = tm->tm_sec = 59;
 
-    get_offset (tm, buffer.data + 1);
+    /* force negative offset */
+    get_offset (tm, buffer.data + 1, -1);
 
     if (exact)
     {
@@ -463,7 +605,9 @@ static int eat_date (pattern_t *pat, BUFFER *s, BUFFER *err)
   {
     const char *pc = buffer.data;
 
-    if (*pc != '-')
+    int haveMin = FALSE;
+    int untilNow = FALSE;
+    if (isdigit ((unsigned char)*pc))
     {
       /* mininum date specified */
       if ((pc = getDate (pc, &min, err)) == NULL)
@@ -471,28 +615,46 @@ static int eat_date (pattern_t *pat, BUFFER *s, BUFFER *err)
 	FREE (&buffer.data);
 	return (-1);
       }
+      haveMin = TRUE;
+      SKIPWS (pc);
+      if (*pc == '-')
+      {
+        const char *pt = pc + 1;
+	SKIPWS (pt);
+	untilNow = (*pt == '\0');
+      }
     }
 
-    if (*pc && *pc == '-')
-    {
-      /* max date */
-      pc++; /* skip the `-' */
-      SKIPWS (pc);
-      if (*pc)
-	if (!getDate (pc, &max, err))
-	{
-	  FREE (&buffer.data);
-	  return (-1);
-	}
-    }
-    else
-    {
-      /* search for messages on a specific day */
+    if (!untilNow)
+    { /* max date or relative range/window */
+
+      struct tm baseMin;
+
+      if (!haveMin)
+      { /* save base minimum and set current date, e.g. for "-3d+1d" */
+	time_t now = time (NULL);
+	struct tm *tm = localtime (&now);
+	memcpy (&baseMin, &min, sizeof(baseMin));
+	memcpy (&min, tm, sizeof (min));
+	min.tm_hour = min.tm_sec = min.tm_min = 0;
+      }
+      
+      /* preset max date for relative offsets,
+	 if nothing follows we search for messages on a specific day */
       max.tm_year = min.tm_year;
       max.tm_mon = min.tm_mon;
       max.tm_mday = min.tm_mday;
+
+      if (!parse_date_range (pc, &min, &max, haveMin, &baseMin, err))
+      { /* bail out on any parsing error */
+	FREE (&buffer.data);
+	return (-1);
+      }
     }
   }
+
+  /* Since we allow two dates to be specified we'll have to adjust that. */
+  adjust_date_range (&min, &max);
 
   pat->min = mutt_mktime (&min, 1);
   pat->max = mutt_mktime (&max, 1);
@@ -529,6 +691,7 @@ static /* const */ char *find_matching_paren (/* const */ char *s)
   }
   return s;
 }
+#endif /* LIBMUTT */
 
 void mutt_pattern_free (pattern_t **pat)
 {
@@ -550,6 +713,7 @@ void mutt_pattern_free (pattern_t **pat)
   }
 }
 
+#ifndef LIBMUTT
 pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 {
   pattern_t *curlist = NULL;
@@ -586,7 +750,7 @@ pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 	{
 	  if (!curlist)
 	  {
-	    snprintf (err->data, err->dsize, "error in pattern at: %s", ps.dptr);
+	    snprintf (err->data, err->dsize, _("error in pattern at: %s"), ps.dptr);
 	    return NULL;
 	  }
 	  if (curlist->next)
@@ -634,13 +798,13 @@ pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 	ps.dptr++; /* move past the ~ */
 	if ((entry = lookup_tag (*ps.dptr)) == NULL)
 	{
-	  snprintf (err->data, err->dsize, "%c: invalid command", *ps.dptr);
+	  snprintf (err->data, err->dsize, _("%c: invalid command"), *ps.dptr);
 	  mutt_pattern_free (&curlist);
 	  return NULL;
 	}
 	if (entry->class && (flags & entry->class) == 0)
 	{
-	  snprintf (err->data, err->dsize, "%c: not supported in this mode", *ps.dptr);
+	  snprintf (err->data, err->dsize, _("%c: not supported in this mode"), *ps.dptr);
 	  mutt_pattern_free (&curlist);
 	  return NULL;
 	}
@@ -653,7 +817,7 @@ pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 	{
 	  if (!*ps.dptr)
 	  {
-	    snprintf (err->data, err->dsize, "missing parameter");
+	    snprintf (err->data, err->dsize, _("missing parameter"));
 	    mutt_pattern_free (&curlist);
 	    return NULL;
 	  }
@@ -669,7 +833,7 @@ pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 	p = find_matching_paren (ps.dptr + 1);
 	if (*p != ')')
 	{
-	  snprintf (err->data, err->dsize, "mismatched parenthesis: %s", ps.dptr);
+	  snprintf (err->data, err->dsize, _("mismatched parenthesis: %s"), ps.dptr);
 	  mutt_pattern_free (&curlist);
 	  return NULL;
 	}
@@ -687,21 +851,21 @@ pattern_t *mutt_pattern_comp (/* const */ char *s, int flags, BUFFER *err)
 	else
 	  curlist = tmp;
 	last = tmp;
-	tmp->not = not;
-	tmp->alladdr = alladdr;
+	tmp->not ^= not;
+	tmp->alladdr |= alladdr;
 	not = 0;
 	alladdr = 0;
 	ps.dptr = p + 1; /* restore location */
 	break;
       default:
-	snprintf (err->data, err->dsize, "error in pattern at: %s", ps.dptr);
+	snprintf (err->data, err->dsize, _("error in pattern at: %s"), ps.dptr);
 	mutt_pattern_free (&curlist);
 	return NULL;
     }
   }
   if (!curlist)
   {
-    strfcpy (err->data, "empty pattern", err->dsize);
+    strfcpy (err->data, _("empty pattern"), err->dsize);
     return NULL;
   }
   if (curlist->next)
@@ -764,9 +928,19 @@ static int match_reference (regex_t *rx, LIST *refs)
       return 1;
   return 0;
 }
-#ifndef LIBMUTT
 
 int mutt_is_list_recipient (int alladdr, ADDRESS *a1, ADDRESS *a2)
+{
+  for (; a1 ; a1 = a1->next)
+    if (alladdr ^ mutt_is_subscribed_list (a1))
+      return (! alladdr);
+  for (; a2 ; a2 = a2->next)
+    if (alladdr ^ mutt_is_subscribed_list (a2))
+      return (! alladdr);
+  return alladdr;
+}
+
+int mutt_is_list_cc (int alladdr, ADDRESS *a1, ADDRESS *a2)
 {
   for (; a1 ; a1 = a1->next)
     if (alladdr ^ mutt_is_mail_list (a1))
@@ -787,7 +961,6 @@ static int match_user (int alladdr, ADDRESS *a1, ADDRESS *a2)
       return (! alladdr);
   return alladdr;
 }
-#endif
 
 /* flags
    	M_MATCH_FULL_ADDRESS	match both personal and machine address */
@@ -863,7 +1036,6 @@ mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx,
 					pat->alladdr, 4, h->env->from,
 					h->env->sender, h->env->to, h->env->cc));
     case M_RECIPIENT:
-#ifndef LIBMUTT
       return (pat->not ^ match_adrlist (pat->rx, flags & M_MATCH_FULL_ADDRESS,
 					pat->alladdr, 2, h->env->to, h->env->cc));
     case M_LIST:
@@ -874,7 +1046,7 @@ mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx,
       return (pat->not ^ match_user (pat->alladdr, h->env->from, NULL));
     case M_COLLAPSED:
       return (pat->not ^ (h->collapsed && h->num_hidden > 1));
-#ifdef _PGPPATH
+#ifdef HAVE_PGP
    case M_PGP_SIGN:
      return (pat->not ^ (h->pgp & PGPSIGN));
    case M_PGP_ENCRYPT:
@@ -882,19 +1054,21 @@ mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx,
    case M_PGP_KEY:
      return (pat->not ^ (h->pgp & PGPKEY));
 #endif
-#endif
+    case M_XLABEL:
+      return (pat->not ^ (h->env->x_label && regexec (pat->rx, h->env->x_label, 0, NULL, 0) == 0));
+    case M_DUPLICATED:
+      return (pat->not ^ (h->thread && h->thread->duplicate_thread));
   }
-  mutt_error ("error: unknown op %d (report this error).", pat->op);
+  mutt_error (_("error: unknown op %d (report this error)."), pat->op);
   return (-1);
 }
-#ifndef LIBMUTT
 
 static void quote_simple(char *tmp, size_t len, const char *p)
 {
   int i = 0;
   
   tmp[i++] = '"';
-  while (*p && i < len - 2)
+  while (*p && i < len - 3)
   {
     if (*p == '\\' || *p == '"')
       tmp[i++] = '\\';
@@ -909,27 +1083,31 @@ void mutt_check_simple (char *s, size_t len, const char *simple)
 {
   char tmp[LONG_STRING];
 
+  /* XXX - is ascii_strcasecmp() right here, or should we use locale's
+   * equivalences?
+   */
+  
   if (!strchr (s, '~')) /* yup, so spoof a real request */
   {
     /* convert old tokens into the new format */
-    if (mutt_strcasecmp ("all", s) == 0 ||
+    if (ascii_strcasecmp ("all", s) == 0 ||
 	!mutt_strcmp ("^", s) || !mutt_strcmp (".", s)) /* ~A is more efficient */
       strfcpy (s, "~A", len);
-    else if (mutt_strcasecmp ("del", s) == 0)
+    else if (ascii_strcasecmp ("del", s) == 0)
       strfcpy (s, "~D", len);
-    else if (mutt_strcasecmp ("flag", s) == 0)
+    else if (ascii_strcasecmp ("flag", s) == 0)
       strfcpy (s, "~F", len);
-    else if (mutt_strcasecmp ("new", s) == 0)
+    else if (ascii_strcasecmp ("new", s) == 0)
       strfcpy (s, "~N", len);
-    else if (mutt_strcasecmp ("old", s) == 0)
+    else if (ascii_strcasecmp ("old", s) == 0)
       strfcpy (s, "~O", len);
-    else if (mutt_strcasecmp ("repl", s) == 0)
+    else if (ascii_strcasecmp ("repl", s) == 0)
       strfcpy (s, "~Q", len);
-    else if (mutt_strcasecmp ("read", s) == 0)
+    else if (ascii_strcasecmp ("read", s) == 0)
       strfcpy (s, "~R", len);
-    else if (mutt_strcasecmp ("tag", s) == 0)
+    else if (ascii_strcasecmp ("tag", s) == 0)
       strfcpy (s, "~T", len);
-    else if (mutt_strcasecmp ("unread", s) == 0)
+    else if (ascii_strcasecmp ("unread", s) == 0)
       strfcpy (s, "~U", len);
     else
     {
@@ -950,7 +1128,7 @@ int mutt_pattern_func (int op, char *prompt)
   if (mutt_get_field (prompt, buf, sizeof (buf), M_PATTERN | M_CLEAR) != 0 || !buf[0])
     return (-1);
 
-  mutt_message ("Compiling search pattern...");
+  mutt_message _("Compiling search pattern...");
   
   simple = safe_strdup (buf);
   mutt_check_simple (buf, sizeof (buf), NONULL (SimpleSearch));
@@ -964,7 +1142,7 @@ int mutt_pattern_func (int op, char *prompt)
     return (-1);
   }
 
-  mutt_message ("Executing command on matching messages...");
+  mutt_message _("Executing command on matching messages...");
 
 #define THIS_BODY Context->hdrs[i]->content
 
@@ -1027,7 +1205,7 @@ int mutt_pattern_func (int op, char *prompt)
     if (!Context->vcount)
     {
       Context->vcount = Context->msgcount;
-      mutt_error ("No messages matched criteria.");
+      mutt_error _("No messages matched criteria.");
       /* restore full display */
       for (i = 0; i < Context->msgcount; i++)
       {
@@ -1060,7 +1238,7 @@ int mutt_search_command (int cur, int op)
   if (op != OP_SEARCH_NEXT && op != OP_SEARCH_OPPOSITE)
   {
     strfcpy (buf, LastSearch, sizeof (buf));
-    if (mutt_get_field ((op == OP_SEARCH) ? "Search for: " :
+    if (mutt_get_field ((op == OP_SEARCH) ? _("Search for: ") :
 		      "Reverse search for: ", buf, sizeof (buf),
 		      M_CLEAR | M_PATTERN) != 0 || !buf[0])
       return (-1);
@@ -1079,7 +1257,7 @@ int mutt_search_command (int cur, int op)
     {
       set_option (OPTSEARCHINVALID);
       strfcpy (LastSearch, buf, sizeof (LastSearch));
-      mutt_message ("Compiling search pattern...");
+      mutt_message _("Compiling search pattern...");
       mutt_pattern_free (&SearchPattern);
       err.data = error;
       err.dsize = sizeof (error);
@@ -1093,7 +1271,7 @@ int mutt_search_command (int cur, int op)
   }
   else if (!SearchPattern)
   {
-    mutt_error ("No search pattern.");
+    mutt_error _("No search pattern.");
     return (-1);
   }
 
@@ -1114,10 +1292,10 @@ int mutt_search_command (int cur, int op)
     {
       i = 0;
       if (option (OPTWRAPSEARCH))
-        mutt_message ("Search wrapped to top.");
+        mutt_message _("Search wrapped to top.");
       else 
       {
-        mutt_message ("Search hit bottom without finding match");
+        mutt_message _("Search hit bottom without finding match");
 	return (-1);
       }
     }
@@ -1125,10 +1303,10 @@ int mutt_search_command (int cur, int op)
     {
       i = Context->vcount - 1;
       if (option (OPTWRAPSEARCH))
-        mutt_message ("Search wrapped to bottom.");
+        mutt_message _("Search wrapped to bottom.");
       else 
       {
-        mutt_message ("Search hit top without finding match");
+        mutt_message _("Search hit top without finding match");
 	return (-1);
       }
     }
@@ -1150,7 +1328,7 @@ int mutt_search_command (int cur, int op)
 
     if (SigInt)
     {
-      mutt_error ("Search interrupted.");
+      mutt_error _("Search interrupted.");
       SigInt = 0;
       return (-1);
     }
@@ -1158,7 +1336,7 @@ int mutt_search_command (int cur, int op)
     i += incr;
   }
 
-  mutt_error ("Not found.");
+  mutt_error _("Not found.");
   return (-1);
 }
-#endif
+#endif  /* LIBMUTT */

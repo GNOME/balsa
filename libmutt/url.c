@@ -67,7 +67,7 @@ url_scheme_t url_check_scheme (const char *s)
   char *t;
   int i;
   
-  if (!(t = strchr (s, ':')))
+  if (!s || !(t = strchr (s, ':')))
     return U_UNKNOWN;
   if ((t - s) + 1 >= sizeof (sbuf))
     return U_UNKNOWN;
@@ -162,7 +162,7 @@ int url_parse_ciss (ciss_url_t *ciss, char *src)
 }
 
 /* url_ciss_tostring: output the URL string for a given CISS object. */
-int url_ciss_tostring (ciss_url_t* ciss, char* dest, size_t len)
+int url_ciss_tostring (ciss_url_t* ciss, char* dest, size_t len, int flags)
 {
   if (ciss->scheme == U_UNKNOWN)
     return -1;
@@ -172,10 +172,14 @@ int url_ciss_tostring (ciss_url_t* ciss, char* dest, size_t len)
   if (ciss->host)
   {
     strncat (dest, "//", len - strlen (dest));
-    if (ciss->user)
-      snprintf (dest + strlen (dest), len - strlen (dest), "%s@",
-	ciss->user);
-    /* password deliberately omitted. */
+    if (ciss->user) {
+      if (flags & U_DECODE_PASSWD && ciss->pass)
+	snprintf (dest + strlen (dest), len - strlen (dest), "%s:%s@",
+		  ciss->user, ciss->pass);
+      else
+	snprintf (dest + strlen (dest), len - strlen (dest), "%s@",
+		  ciss->user);
+    }
 
     if (ciss->port)
       snprintf (dest + strlen (dest), len - strlen (dest), "%s:%hu/",
@@ -204,8 +208,10 @@ int url_parse_mailto (ENVELOPE *e, char **body, const char *src)
   
   if (!(t = strchr (src, ':')))
     return -1;
-  
-  tmp = safe_strdup (t + 1);
+ 
+  if ((tmp = safe_strdup (t + 1)) == NULL)
+    return -1;
+
   if ((headers = strchr (tmp, '?')))
     *headers++ = '\0';
 
@@ -234,7 +240,7 @@ int url_parse_mailto (ENVELOPE *e, char **body, const char *src)
       scratch[taglen] = '\0';
       value = &scratch[taglen+1];
       SKIPWS (value);
-      mutt_parse_rfc822_line (e, NULL, scratch, value, 1, 0, 0, &last, NULL);
+      mutt_parse_rfc822_line (e, NULL, scratch, value, 1, 0, 0, &last);
     }
   }
   

@@ -16,7 +16,7 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 
-AM_WITH_NLS
+dnl AM_GNU_GETTEXT([use-libtool])
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
@@ -60,7 +60,7 @@ AC_CHECK_SIZEOF(long)
 
 AC_TYPE_PID_T
 
-AC_CHECK_FUNCS(setegid srand48 strerror)
+AC_CHECK_FUNCS(fgetpos memmove setegid srand48 strerror)
 
 AC_REPLACE_FUNCS(strcasecmp)
 
@@ -235,34 +235,71 @@ AC_ARG_WITH(gss, [  --with-gss            Enable GSS [default=no]],
 
 AC_MSG_CHECKING([whether to build GSS support])
 if test "x$with_gss" != xno  ; then
-   if test -d $with_gss && test -f "$with_gss/include/gssapi/gssapi.h" ; then
-      gssdir=$with_gss
-   else
-        AC_TRY_COMPILE([#include <gssapi/gssapi.h>], ,
-			gssdir=default,
-			gssdir="")
-	if test "x$gssdir" = x ; then
-           for dir in /usr /usr/local /usr/lib /usr/kerberos; do
-               if test -f "$dir/include/gssapi/gssapi.h"; then
-                  gssdir=$dir
-               fi
-           done
+    AC_MSG_RESULT(yes)
+    if test x"$with_gss" != xyes ; then
+	dirs="$with_gss default /usr/local /usr/kerberos /usr/lib /usr"
+    else
+	dirs="default /usr/local /usr/kerberos /usr/lib /usr"
+    fi
+    gssdir=""
+    save_CPP="$CPP"
+    for dir in $dirs ; do
+	test x"$dir" != xdefault && CPP="$save_CPP -I$dir/include"
+	AC_CHECK_HEADERS(gssapi.h gssapi/gssapi.h,  break,
+        [ unset ac_cv_header_gssapi_gssapi_h ac_cv_header_gssapi_h ])
+        if test x"$ac_cv_header_gssapi_gssapi_h" = xyes -o \
+                x"$ac_cv_header_gssapi_h" = xyes; then
+           gssdir="$dir"; break
+        fi
+    done
+    if test x"$dir" != xdefault; then
+        # keep CPP set for subsequent CHECK_HEADERS
+        CPP="$save_CPP -I$dir/include"
+        CFLAGS="$CFLAGS -I$dir/include"
+    fi
+    echo "dir='$dir' gssdir='$gssdir'"
+    if test -z "$gssdir"; then
+	AC_MSG_ERROR([GSS requested but no GSS headers found])
+    else
+	AC_CHECK_HEADERS(gssapi/gssapi_generic.h)
+	if test "x$gssdir" = xdefault ; then
+	    extra_libs=""
+	else
+	    extra_libs="-L$gssdir/lib"
 	fi
-   fi
-   if test -z "$gssdir"; then
-      AC_MSG_ERROR([GSS requested but no GSS headers found ,$gssdir,.])
-   else
-      AC_MSG_RESULT($gssdir)
-      AC_CHECK_LIB(gssapi, gss_init_sec_context, [
-	  LIBS="$LIBS -L$gssdir/lib -lgssapi -lkrb5"
-      ],[
-	  LIBS="$LIBS -L$gssdir/lib -lgssapi_krb5"
-      ], -lkrb5 -ldes -lasn1 -lroken -lcrypt -lcom_err -L$gssdir/lib)
-      CFLAGS="$CFLAGS -I$gssdir/include"
+	save_LIBS="$LIBS"
+	for lib in krb5 des asn1 roken crypt com_err ; do
+	    LIBS="$LIBS -l$lib"
+            AC_CACHE_CHECK([for -l$lib],[ac_cv_lib_$lib],
+                   AC_TRY_LINK(, [main()], [eval ac_cv_lib_$lib=yes],
+                           [eval ac_cv_lib_$lib=no]))
+           eval "test x\"\$ac_cv_lib_$lib\" = xyes" && extra_libs="$extra_libs -l$lib"
+	    LIBS="$save_LIBS"
+	done
+
+	for lib in gssapi gssapi_krb5 gss ; do
+	    AC_CHECK_LIB($lib, gss_init_sec_context, [gsslib="$lib";break], , 
+                         $extra_libs)
+	done
+
+	if test x"$gsslib" = x ; then
+	    AC_MSG_ERROR([GSS requested but no GSS libraries found])
+	else
+	    LIBS="$LIBS -l$gsslib $extra_libs"
+	    test x"$gsslib" = xgssapi && x"$av_cv_lib_krb5" = xyes &&
+		LIBS="$LIBS -lkrb5"
+	    if test "$ac_cv_header_gssapi_h" = "yes"; then
+		AC_EGREP_HEADER(GSS_C_NT_HOSTBASED_SERVICE, gssapi.h,
+		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE))
+	    else
+		AC_EGREP_HEADER(GSS_C_NT_HOSTBASED_SERVICE, gssapi/gssapi.h,
+		    AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE))
+	    fi
+	fi
     fi
 else 
-   AC_MSG_RESULT(no)
-   gssdir=no
+    AC_MSG_RESULT(no)
+    gssdir=no
 fi
 AM_CONDITIONAL(USE_GSS, test x$gssdir != xno)
 
@@ -271,7 +308,7 @@ dnl ##########################################################################
 dnl Enable SSL ?
 dnl ##########################################################################
 
-AC_ARG_WITH(ssl, [    --with-ssl[=PFX]         Compile in SSL socket support for IMAP],
+AC_ARG_WITH(ssl, [  --with-ssl[=PFX]         Compile in SSL socket support for IMAP],
 [	if test "$with_ssl" != "no"
 	then
 	  if test "$need_imap" != "yes"; then
@@ -337,6 +374,30 @@ AC_ARG_WITH(sasl, [  --with-sasl[=DIR]          Use Cyrus SASL library for POP/I
 	])
 AM_CONDITIONAL(USE_SASL, test x$need_sasl = xyes)
 
+dnl SSL support via NSS
+AC_ARG_WITH(nss, [  --with-nss[=PFX]           Compile in SSL support for POP/IMAP via NSS],
+[       if test "$with_nss" != no
+        then
+          if test "$need_socket" != "yes"; then
+           AC_MSG_ERROR([SSL support is only useful with POP or IMAP support])
+          fi
+
+          if test "$with_nss" != "yes"
+          then
+           LDFLAGS="$LDFLAGS -L$withval/lib"
+           CPPFLAGS="$CPPFLAGS -I$withval/include -I$withval/public/security"
+          fi
+
+          AC_DEFINE(USE_NSS,1,[ Define if you want support for SSL via the NSS library. ])
+          MUTTLIBS="$MUTTLIBS -lssl -lnss -lcertdb -lcerthi -lcryptohi"
+          MUTTLIBS="$MUTTLIBS -lpk11wrap -lsoftoken -lsecutil -ldbm -lplds4 -lplc4 -lfreebl"
+          MUTTLIBS="$MUTTLIBS -lnspr4"
+
+          MUTT_LIB_OBJECTS="$MUTT_LIB_OBJECTS mutt_ssl_nss.o"
+          need_ssl=yes
+        fi
+])
+AM_CONDITIONAL(USE_NSS, test x$need_nss = xyes)
 
 mutt_cv_flock=yes
 AC_ARG_ENABLE(flock, [  --disable-fcntl            Do NOT use flock() to lock files ],
@@ -376,47 +437,95 @@ AC_ARG_ENABLE(exact-address, [  --enable-exact-address     enable regeneration o
 		AC_DEFINE(EXACT_ADDRESS)
 	fi])
 
-AC_ARG_WITH(iconv, [  --with-iconv=DIR           Where libiconv is installed ],
-       [mutt_cv_iconv=$withval
-       if test "$mutt_cv_iconv" != yes -a \
-               "$mutt_cv_iconv" != no -a \
-               "$mutt_cv_iconv" != /usr; then
-               CPPFLAGS="-I${mutt_cv_iconv}/include $CPPFLAGS"
-               LDFLAGS="-L${mutt_cv_iconv}/lib $LDFLAGS"
-       fi])
 
-LIBICONV=
+dnl -----------------------------------
+dnl ICONV
+dnl -----------------------------------
+  dnl Some systems have iconv in libc, some have it in libiconv (OSF/1 and
+  dnl those with the standalone portable GNU libiconv installed).
 
-if test "$mutt_cv_iconv" != no; then
+  AC_ARG_WITH([iconv],
+[  --with-iconv[=DIR]  search for libiconv in DIR/include and DIR/lib], [
+    if test "$withval" != no ; then
+    for dir in `echo "$withval" | tr : ' '`; do
+      if test -d $dir/include; then CPPFLAGS="$CPPFLAGS -I$dir/include"; fi
+      if test -d $dir/lib; then LDFLAGS="$LDFLAGS -L$dir/lib"; fi
+    done
+    else
+      use_iconv=no
+    fi
+   ],use_iconv=yes)
 
-AC_CACHE_CHECK(for iconv, mutt_cv_func_iconv,
-    [ mutt_cv_func_iconv=no
-      mutt_cv_lib_iconv=no
+  if test "$use_iconv" = yes ; then
+  AC_CACHE_CHECK(for iconv, am_cv_func_iconv, [
+    am_cv_func_iconv="no, consider installing GNU libiconv"
+    am_cv_lib_iconv=no
+    AC_TRY_LINK([#include <stdlib.h>
+#include <iconv.h>],
+      [iconv_t cd = iconv_open("","");
+       iconv(cd,NULL,NULL,NULL,NULL);
+       iconv_close(cd);],
+      am_cv_func_iconv=yes)
+    if test "$am_cv_func_iconv" != yes; then
+      am_save_LIBS="$LIBS"
+      LIBS="$LIBS -liconv"
       AC_TRY_LINK([#include <stdlib.h>
 #include <iconv.h>],
-        [iconv_t cd = iconv_open("",""); iconv(cd,NULL,NULL,NULL,NULL); iconv_close(cd);],
-        mutt_cv_func_iconv=yes)
-      if test "$mutt_cv_func_iconv" = no; then
-        mutt_save_LIBS="$LIBS"
-        LIBS="$LIBS -liconv"
-        AC_TRY_LINK([#include <stdlib.h>
-#include <iconv.h>],
-          [iconv_t cd = iconv_open("",""); iconv(cd,NULL,NULL,NULL,NULL); iconv_close(cd);],
-          mutt_cv_lib_iconv=yes
-          mutt_cv_func_iconv=yes)
-        LIBS="$mutt_save_LIBS"
-      fi
-    ])
-if test "$mutt_cv_func_iconv" = no; then
-  AC_MSG_ERROR(Unable to find iconv library)
-fi
-if test "$mutt_cv_lib_iconv" = yes; then
-  LIBICONV="-liconv"
-fi
-AC_DEFINE(HAVE_ICONV)
+        [iconv_t cd = iconv_open("","");
+         iconv(cd,NULL,NULL,NULL,NULL);
+         iconv_close(cd);],
+        am_cv_lib_iconv=yes
+        am_cv_func_iconv=yes)
+      LIBS="$am_save_LIBS"
+    fi
+  ])
+  if test "$am_cv_func_iconv" = yes; then
+    AC_DEFINE(HAVE_ICONV, 1, [Define if you have the iconv() function.])
+    AC_MSG_CHECKING([for iconv declaration])
+    AC_CACHE_VAL(am_cv_proto_iconv, [
+      AC_TRY_COMPILE([
+#include <stdlib.h>
+#include <iconv.h>
+extern
+#ifdef __cplusplus
+"C"
+#endif
+#if defined(__STDC__) || defined(__cplusplus)
+size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
+#else
+size_t iconv();
+#endif
+], [], am_cv_proto_iconv_arg1="", am_cv_proto_iconv_arg1="const")
+      am_cv_proto_iconv="extern size_t iconv (iconv_t cd, $am_cv_proto_iconv_arg1 char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);"])
+    am_cv_proto_iconv=`echo "[$]am_cv_proto_iconv" | tr -s ' ' | sed -e 's/( /(/'`
+    AC_MSG_RESULT([$]{ac_t:-
+         }[$]am_cv_proto_iconv)
+    AC_DEFINE_UNQUOTED(ICONV_CONST, $am_cv_proto_iconv_arg1,
+      [Define as const if the declaration of iconv() needs const.])
+  fi
+  LIBICONV=
+  if test "$am_cv_lib_iconv" = yes; then
+    LIBICONV="-liconv"
+  fi
+  AC_SUBST(LIBICONV)
 
-AC_SUBST(LIBICONV)
+  fi # use_iconv
 
+
+
+AC_CHECK_HEADERS(iconv.h,
+        [AC_MSG_CHECKING(whether iconv.h defines iconv_t)
+         AC_EGREP_HEADER([typedef.*iconv_t],iconv.h,
+                [AC_MSG_RESULT(yes)
+                 AC_DEFINE(HAVE_ICONV_T_DEF, 1,
+                        [Define if <iconv.h> defines iconv_t.])],
+                 AC_MSG_RESULT(no))])
+
+if test "$am_cv_func_iconv" != "yes"
+then
+#  AC_MSG_ERROR([Unable to find an iconv function. See INSTALL for help])
+  AC_MSG_WARN([Unable to find an iconv function. See INSTALL for help])
+else
 
 dnl (1) Some implementations of iconv won't convert from UTF-8 to UTF-8.
 dnl (2) In glibc-2.1.2 and earlier there is a bug that messes up ob and
@@ -444,8 +553,7 @@ changequote([, ])dnl
                 mutt_cv_iconv_good=yes,
                 mutt_cv_iconv_good=no,
                 mutt_cv_iconv_good=yes)
-        LIBS="$mutt_save_LIBS",
-	[ AC_MSG_ERROR("Cannot cross compile libmutt. Yet")] )
+        LIBS="$mutt_save_LIBS")
 if test "$mutt_cv_iconv_good" = no; then
   AC_MSG_ERROR(Try using libiconv instead)
 fi
@@ -477,13 +585,24 @@ changequote([, ])dnl
                 mutt_cv_iconv_nontrans=no,
                 mutt_cv_iconv_nontrans=yes,
                 mutt_cv_iconv_nontrans=no)
-        LIBS="$mutt_save_LIBS",
-	[ AC_MSG_ERROR("Cannot cross compile libmutt. Yet")] )
+        LIBS="$mutt_save_LIBS")
 if test "$mutt_cv_iconv_nontrans" = yes; then
-  AC_DEFINE(ICONV_NONTRANS, 1, [Iconv bug detection])
+  AC_DEFINE(ICONV_NONTRANS, 1)
+else
+  AC_DEFINE(ICONV_NONTRANS, 0)
 fi
 
+fi # libiconv
+
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/intl"
+
+if test "$BUILD_INCLUDED_LIBINTL" = "yes"; then
+  AC_DEFINE(HAVE_BIND_TEXTDOMAIN_CODESET,1,
+          [ Define if your gettext has bind_textdomain_codeset. ])
+else
+  AC_CHECK_FUNCS(bind_textdomain_codeset)
 fi
+
 
 
 

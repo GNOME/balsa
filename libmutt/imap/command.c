@@ -135,18 +135,18 @@ int imap_cmd_step (IMAP_DATA* idata)
   }
   
   /* handle untagged messages. The caller still gets its shot afterwards. */
-  if (!strncmp (cmd->buf, "* ", 2) &&
+  if (!ascii_strncmp (cmd->buf, "* ", 2) &&
       cmd_handle_untagged (idata))
     return IMAP_CMD_BAD;
 
   /* server demands a continuation response from us */
-  if (!strncmp (cmd->buf, "+ ", 2))
+  if (!ascii_strncmp (cmd->buf, "+ ", 2))
   {
     return IMAP_CMD_RESPOND;
   }
 
   /* tagged completion code */
-  if (!mutt_strncmp (cmd->buf, cmd->seq, SEQLEN))
+  if (!ascii_strncmp (cmd->buf, cmd->seq, SEQLEN))
   {
     imap_cmd_finish (idata);
     return imap_code (cmd->buf) ? IMAP_CMD_OK : IMAP_CMD_NO;
@@ -257,8 +257,7 @@ void imap_cmd_finish (IMAP_DATA* idata)
       /* check_status: curs_main uses imap_check_mailbox to detect
        *   whether the index needs updating */
       idata->check_status = IMAP_NEWMAIL_PENDING;
-      idata->reopen &= ~IMAP_NEWMAIL_PENDING;
-      count = imap_read_headers (idata, idata->ctx->msgcount, count-1)+1;
+      imap_read_headers (idata, idata->ctx->msgcount, count-1);
     }
     else if (idata->reopen & IMAP_EXPUNGE_PENDING)
     {
@@ -410,7 +409,7 @@ static void cmd_parse_capabilities (IMAP_DATA* idata, char* s)
   idata->capstr = safe_strdup (s);
 
   memset (idata->capabilities, 0, sizeof (idata->capabilities));
-
+  
   while (*s)
   {
     for (x = 0; x < CAPMAX; x++)

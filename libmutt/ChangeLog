@@ -1,11 +1,186 @@
+2002-05-30  Carlos Morgado  <chbm@chbm.nu>
+
+	copied libmutt from HEAD to BALSA2, there were some changes
+	on HEAD uncommited to 2
+	
+	* send.c: unused, removed  
+
+	* sendlib.c: 
+	* rfc2047.c: 
+	* handler.c: 
+	* configure.in: 
+	* charset.h: iconv changes
+
+	* imap/util.c: 
+	* imap/message.c: 
+	* imap/imap.c:
+	* imap/command.c: 
+	* imap/message.c: 
+	* imap/browse.c: 
+	* mx.c: 
+	* muttlib.c: 
+	* mailbox.h: 
+	* lib.h: 
+	* lib.c: 
+	* buffy.c: 
+	* browser.c: 
+	* parse.c: 
+	* mx.c: 
+	* mutt_sasl.c: 
+	* mbox.c: 
+	* init.c: 
+	* charset.c: 
+	sync with mutt-1.4. 
+	
+2002-05-20  Carlos Morgado  <chbm@chbm.nu>
+
+	* charset.c (PreferredMIMENames): add PoS ks_c_5601-1987
+
 2002-05-15  Pawel Salek  <pawsa@theochem.kth.se>
 
-	* imap/imap.c: add imap_uid_search(). skip right number of words 
-	when processing SEARCH response.
+	* imap/imap.c: add imap_uid_search()
+	* configure.in: AM_WITH_NLS redundant (and deprecated in gettext).
 	
+2002-05-10  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* mutt.h: undefine M_READ because it conflicts with Solaris headers.
+
+2002-04-24  Carlos Morgado  <chbm@chbm.nu>
+
+	* mutt.h: mutt_set_charset() proto
+
+2002-04-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: second round of GSS detection fixes from Steve Wall.
+
+2002-03-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap.c: unquote folder names if necessary (Thomas Maeder).
+	Fixes folder names containing spaces on Cyrus. Not needed with
+	UW-IMAP.
+
+2002-03-26  Carlos Morgado  <chbm@chbm.nu>
+
+	* sort.c (mutt_sort_headers): do away with it. it's not like we use it.
+
+2002-03-24  Steve Wall <hitched97@myrealbox.com>
+
+	* configure.in, imap/auth_gss.c: portably(?) handle GSS authentication
+	(Steve Wall)
+
+2002-03-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* mx.c (mx_sync_mailbox): ifdef away if(OPTSAVEEMPTY)
+
 2002-03-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, lib.h: add proper NLS support.
+
+2002-03-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: remove curs_lib.c.
+	* parse.c: translate translatable strings.
+	* pattern.c: do not compile unused functions.
+	
+2002-02-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* sendlib.c (mutt_write_mime_header): re-enable disposition: 
+	now that libbalsa uses it
+
+2002-02-27  Carlos Morgado  <chbm@chbm.nu>
+
+	* imap/command.c (cmd_parse_capabilities): unbreak patch aplied 
+	twice on the last libmutt update
+
+2002-02-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: mbyte.h is not in libmutt.
+
+2002-02-17  Carlos Morgado  <chbm@chbm.nu>
+
+	* configure.in: USE_NSS
+
+	* filter.c:
+	* mutt_tunnel.c:
+	* rfc1524.c:
+	* system.c:
+	* score.c:
+	* thread.c: removed, unused
+
+	* recvattach.c:
+	* curs_lib.c:
+	* url.c: 
+	* url.h: 
+	* sort.c: 
+	* sort.h: 
+	* sendlib.c: 
+	* rfc2231.h: added 
+	* rfc2231.c: added, MIME
+	* rfc2047.c: 
+	* rfc2047.h: 
+	* protos.h: 
+	* pattern.c: 
+	* parse.c: 
+	* mx.c: 
+	* mx.h: 
+	* muttlib.c: 	
+	* mutt_ssl_nss.c: added. support for mozilla's NSS 
+	* mutt_ssl.c: 
+	* mutt_ssl.h: 
+	* mutt_socket.c: 
+	* mutt_sasl.c: 
+	* mutt_sasl.h: 
+	* mutt_regex.h:
+	* mutt_menu.h: 
+	* mutt.h: 
+	* mh.c: better maildir and mh handling
+	* mbox.c: 
+	* mailbox.h: added flags field to MESSAGE
+	* keymap.h:
+	* keymap_defs.h: added
+	* init.h: 
+	* init.c: 
+	* imap/util.c: moved from 900 secs imap connect timeout to 
+		ImapKeepalive
+	* imap/message.c: 
+	* imap/imap.c:
+	* imap/imap.h:
+	* imap/command.c: 
+	* imap/browse.c: 
+	* imap/auth_sasl.c: 
+	* imap/auth.c: 
+	* hash.c:
+	* handler.c: 
+	* globals.h: 
+	* getdomain.c: 
+	* functions.h: 
+	* flags.c: 
+	* copy.c: 
+	* copy.h: 
+	* complete.c: 
+	* charset.c: 
+	* buffy.c: better maildir/mh handling
+	* attach.h: 
+	* attach.c: 
+	* ascii.h:
+	updated libmutt to mutt-1.3.27, most important changes to balsa
+	are noted
+
+2002-02-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* mutt_socket.c (mutt_conn_find): removed _tunnel references
+	and preconnect
+	* rfc1425.c: removed
+	* sort.c: removed sort by score and threading
+	* mx.c: removed references to mutt_score
+	* Makefile.am: removed filter.c, score.c, mutt_tunnel.c
+	* mutt_tunnel.c: removed, we can't use it anyway 
+	* score.c: removed
+	* pattern.c: mostly ifdefed out
+	* filter.c: removed
+	* init.c (mutt_extract_token): removed ` functionality
+	* handler.c: removed functions non used by libbalsa
+	* copy.c (_mutt_copy_message): removed M_CM_DECODE
 
 2002-01-29  Pawel Salek  <pawsa@theochem.kth.se>
 

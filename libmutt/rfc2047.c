@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
- * Copyright (C) 2000 Edmund Grimley Evans <edmundo@rano.org>
+ * Copyright (C) 2000-2001 Edmund Grimley Evans <edmundo@rano.org>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <iconv.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,11 +46,11 @@
 
 extern char RFC822Specials[];
 
-typedef size_t (*encoder_t) (char *, const char *, size_t,
+typedef size_t (*encoder_t) (char *, ICONV_CONST char *, size_t,
 			     const char *);
 
-static size_t convert_string (const char *f, size_t flen,
-			      const char *from, const char *to,
+static size_t convert_string (ICONV_CONST char *f, size_t flen,
+			      const char *from, ICONV_CONST char *to,
 			      char **t, size_t *tlen)
 {
   iconv_t cd;
@@ -150,7 +149,7 @@ char *mutt_choose_charset (const char *fromcode, const char *charsets,
   return tocode;
 }
 
-static size_t b_encoder (char *s, const char *d, size_t dlen,
+static size_t b_encoder (char *s, ICONV_CONST char *d, size_t dlen,
 			 const char *tocode)
 {
   char *s0 = s;
@@ -191,7 +190,7 @@ static size_t b_encoder (char *s, const char *d, size_t dlen,
   return s - s0;
 }
 
-static size_t q_encoder (char *s, const char *d, size_t dlen,
+static size_t q_encoder (char *s, ICONV_CONST char *d, size_t dlen,
 			 const char *tocode)
 {
   char hex[] = "0123456789ABCDEF";
@@ -227,13 +226,13 @@ static size_t q_encoder (char *s, const char *d, size_t dlen,
  * tocode, unless fromcode is 0, in which case the data is assumed to
  * be already in tocode, which should be 8-bit and stateless.
  */
-static size_t try_block (const char *d, size_t dlen,
+static size_t try_block (ICONV_CONST char *d, size_t dlen,
 			 const char *fromcode, const char *tocode,
 			 encoder_t *encoder, size_t *wlen)
 {
   char buf1[ENCWORD_LEN_MAX - ENCWORD_LEN_MIN + 1];
   iconv_t cd;
-  const char *ib;
+  ICONV_CONST char *ib;
   char *ob, *p;
   size_t ibl, obl;
   int count, len, len_b, len_q;
@@ -305,7 +304,7 @@ static size_t encode_block (char *s, char *d, size_t dlen,
 {
   char buf1[ENCWORD_LEN_MAX - ENCWORD_LEN_MIN + 1];
   iconv_t cd;
-  const char *ib;
+  ICONV_CONST char *ib;
   char *ob;
   size_t ibl, obl, n1, n2;
 
@@ -335,21 +334,20 @@ static size_t choose_block (char *d, size_t dlen, int col,
 			    encoder_t *encoder, size_t *wlen)
 {
   size_t n, nn;
+  int utf8 = fromcode && !ascii_strcasecmp (fromcode, "UTF-8");
 
   n = dlen;
   for (;;)
   {
     assert (d + n > d);
     nn = try_block (d, n, fromcode, tocode, encoder, wlen);
-    if (!nn && col + *wlen <= ENCWORD_LEN_MAX + 1)
+    if (!nn && (col + *wlen <= ENCWORD_LEN_MAX + 1 || n <= 1))
       break;
-    nn = (nn ? nn : n) - 1;
-    while (CONTINUATION_BYTE(d[nn]))
-      --nn;
-    assert (d + nn >= d);
-    if (!nn)
-      break;
-    n = nn;
+    n = (nn ? nn : n) - 1;
+    assert (n > 0);
+    if (utf8)
+      while (n > 1 && CONTINUATION_BYTE(d[n]))
+	--n;
   }
   return n;
 }
@@ -364,7 +362,7 @@ static size_t choose_block (char *d, size_t dlen, int col,
  * The input data is assumed to be a single line starting at column col;
  * if col is non-zero, the preceding character was a space.
  */
-static int rfc2047_encode (const char *d, size_t dlen, int col,
+static int rfc2047_encode (ICONV_CONST char *d, size_t dlen, int col,
 			   const char *fromcode, const char *charsets,
 			   char **e, size_t *elen, char *specials)
 {
@@ -445,8 +443,10 @@ static int rfc2047_encode (const char *d, size_t dlen, int col,
   {
     if (!HSPACE(*(t0-1)))
       continue;
-    for (t = t0 + 1; t < u + ulen && CONTINUATION_BYTE(*t); t++)
-      ;
+    t = t0 + 1;
+    if (icode)
+      while (t < u + ulen && CONTINUATION_BYTE(*t))
+	++t;
     if (!try_block (t0, t - t0, icode, tocode, &encoder, &wlen) &&
 	col + (t0 - u) + wlen <= ENCWORD_LEN_MAX + 1)
       break;
@@ -457,8 +457,10 @@ static int rfc2047_encode (const char *d, size_t dlen, int col,
   {
     if (!HSPACE(*t1))
       continue;
-    for (t = t1 - 1; CONTINUATION_BYTE(*t); t--)
-      ;
+    t = t1 - 1;
+    if (icode)
+      while (CONTINUATION_BYTE(*t))
+	--t;
     if (!try_block (t, t1 - t, icode, tocode, &encoder, &wlen) &&
 	1 + wlen + (u + ulen - t1) <= ENCWORD_LEN_MAX + 1)
       break;
@@ -484,8 +486,10 @@ static int rfc2047_encode (const char *d, size_t dlen, int col,
       /* See if we can fit the us-ascii suffix, too. */
       if (col + wlen + (u + ulen - t1) <= ENCWORD_LEN_MAX + 1)
 	break;
-      for (n = t1 - t - 1; CONTINUATION_BYTE(t[n]); n--)
-	;
+      n = t1 - t - 1;
+      if (icode)
+	while (CONTINUATION_BYTE(t[n]))
+	  --n;
       assert (t + n >= t);
       if (!n)
       {

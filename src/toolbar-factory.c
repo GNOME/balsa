@@ -94,6 +94,7 @@ static char *toolbar0_legal[]={
     BALSA_PIXMAP_SHOW_PREVIEW,
     BALSA_PIXMAP_TRASH,
     BALSA_PIXMAP_TRASH_EMPTY,
+    BALSA_PIXMAP_TOGGLE_FLAGGED,
     NULL
 };
 
@@ -125,6 +126,7 @@ static char *toolbar2_legal[]={
     BALSA_PIXMAP_SHOW_HEADERS,
     BALSA_PIXMAP_TRASH,
     BALSA_PIXMAP_TRASH_EMPTY,
+    BALSA_PIXMAP_TOGGLE_FLAGGED,
     GNOME_STOCK_PIXMAP_CLOSE,
     NULL
 };
@@ -187,7 +189,9 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_CLOSE_MBOX, N_("Close"),
      N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SHOW_PREVIEW, N_("Msg Preview"),
-     N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
+     N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE},
+    {BALSA_PIXMAP_TOGGLE_FLAGGED, N_("Toggle\nflagged"),
+     N_("Toggle message is flagged"), TOOLBAR_BUTTON_TYPE_BUTTON}
 };
 
 const int toolbar_button_count = sizeof(toolbar_buttons)

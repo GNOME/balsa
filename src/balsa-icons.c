@@ -43,6 +43,7 @@
 #include "pixmaps/balsa_trash_empty.xpm"
 #include "pixmaps/balsa_next_unread.xpm"
 #include "pixmaps/balsa_next_flagged.xpm"
+#include "pixmaps/balsa_flagged.xpm"
 #include "pixmaps/balsa_show_headers.xpm"
 #include "pixmaps/balsa_show_preview.xpm"
 #include "pixmaps/balsa_marked_new.xpm"
@@ -251,6 +252,7 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_MARKED_ALL,	    balsa_marked_all_xpm,  24, 24 },
 	{ BALSA_PIXMAP_IDENTITY,	    balsa_identity_xpm,	   24, 24 },
 	{ BALSA_PIXMAP_CLOSE_MBOX,	    balsa_close_mbox_xpm,  24, 24 },
+	{ BALSA_PIXMAP_TOGGLE_FLAGGED,      balsa_flagged_xpm,     24, 24 },
 
 	/* Menu icons */
 	{ BALSA_PIXMAP_MENU_NEW,	    menu_new_xpm,	   16, 16 },

@@ -789,7 +789,8 @@ balsa_window_new()
         { BALSA_PIXMAP_SHOW_HEADERS,     show_all_headers_tool_cb },
         { BALSA_PIXMAP_TRASH_EMPTY,      (void(*)())empty_trash },
         { BALSA_PIXMAP_CLOSE_MBOX,       mailbox_close_cb },
-        { BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb }
+        { BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb },
+        { BALSA_PIXMAP_TOGGLE_FLAGGED,   toggle_flagged_message_cb }
     };
 
     BalsaWindow *window;
@@ -1032,7 +1033,8 @@ enable_message_menus(LibBalsaMessage * message)
     const static gchar* tools[] = { /* toolbar items */
         BALSA_PIXMAP_REPLY,       BALSA_PIXMAP_REPLY_ALL,  
         BALSA_PIXMAP_REPLY_GROUP, BALSA_PIXMAP_FORWARD, 
-        BALSA_PIXMAP_MARKED_NEW,  BALSA_PIXMAP_PRINT
+        BALSA_PIXMAP_MARKED_NEW,  BALSA_PIXMAP_PRINT,
+        BALSA_PIXMAP_TOGGLE_FLAGGED
     };
     const static GnomeUIInfo* mods[] = { /* menu items to modify message */
         &message_menu[MENU_MESSAGE_DELETE_POS], 

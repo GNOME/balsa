@@ -41,6 +41,7 @@
 #define BALSA_PIXMAP_TRASH_EMPTY		"balsa_trash_empty"
 #define BALSA_PIXMAP_NEXT_UNREAD		"balsa_next_unread"
 #define BALSA_PIXMAP_NEXT_FLAGGED		"balsa_next_flagged"
+#define BALSA_PIXMAP_TOGGLE_FLAGGED             "balsa_flagged"
 #define BALSA_PIXMAP_SHOW_HEADERS		"balsa_show_headers"
 #define BALSA_PIXMAP_SHOW_PREVIEW		"balsa_show_preview"
 #define BALSA_PIXMAP_MARKED_NEW			"balsa_marked_new"

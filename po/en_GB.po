@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-04-22 19:09-0400\n"
-"PO-Revision-Date: 2004-04-22 19:11-0400\n"
+"POT-Creation-Date: 2004-04-26 08:51-0400\n"
+"PO-Revision-Date: 2004-04-26 08:52-0400\n"
 "Last-Translator: Gareth Owen <gowen72@yahoo.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1079,7 +1079,7 @@ msgstr "Sending Mail..."
 msgid "_Hide"
 msgstr "_Hide"
 
-#: libbalsa/send.c:752
+#: libbalsa/send.c:755
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1090,7 +1090,7 @@ msgstr ""
 "%d: %s\n"
 "Message left in your outbox.\n"
 
-#: libbalsa/send.c:797
+#: libbalsa/send.c:800
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1101,7 +1101,7 @@ msgstr ""
 "%d: %s\n"
 "Message left in your outbox.\n"
 
-#: libbalsa/send.c:807
+#: libbalsa/send.c:810
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1109,33 +1109,33 @@ msgstr ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 
-#: libbalsa/send.c:837
+#: libbalsa/send.c:840
 msgid "Connected to MTA"
 msgstr "Connected to MTA"
 
-#: libbalsa/send.c:844 src/balsa-message.c:1234 src/print.c:367
+#: libbalsa/send.c:847 src/balsa-message.c:1234 src/print.c:367
 #: src/sendmsg-window.c:678 src/sendmsg-window.c:2245 src/store-address.c:303
 msgid "From:"
 msgstr "From:"
 
-#: libbalsa/send.c:847 src/balsa-index.c:310
+#: libbalsa/send.c:850 src/balsa-index.c:310
 msgid "From"
 msgstr "From"
 
-#: libbalsa/send.c:855 src/balsa-message.c:1243 src/print.c:371
+#: libbalsa/send.c:858 src/balsa-message.c:1243 src/print.c:371
 #: src/sendmsg-window.c:677 src/sendmsg-window.c:2252 src/store-address.c:304
 msgid "To:"
 msgstr "To:"
 
-#: libbalsa/send.c:858 src/balsa-index.c:775
+#: libbalsa/send.c:861 src/balsa-index.c:775
 msgid "To"
 msgstr "To"
 
-#: libbalsa/send.c:894
+#: libbalsa/send.c:897
 msgid "Disconnected"
 msgstr "Disconnected"
 
-#: libbalsa/send.c:1111
+#: libbalsa/send.c:1118
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -1149,7 +1149,7 @@ msgstr ""
 "via: \"host:smtp\".\n"
 "Message is left in outbox."
 
-#: libbalsa/send.c:1121
+#: libbalsa/send.c:1128
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1158,12 +1158,12 @@ msgstr ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 
-#: libbalsa/send.c:1431
+#: libbalsa/send.c:1438
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 
-#: libbalsa/send.c:1725 libbalsa/send.c:1801
+#: libbalsa/send.c:1732 libbalsa/send.c:1808
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "This message will not be encrpyted for the BCC: recipient(s)."
 
@@ -1687,12 +1687,21 @@ msgstr "_Other..."
 msgid "Choose destination folder"
 msgstr "Choose destination folder"
 
-#: src/balsa-mblist.c:2136
+#: src/balsa-mblist.c:2135
 #, c-format
-msgid "Shown mailbox: %s with %d message, %ld new"
-msgid_plural "Shown mailbox: %s with %d messages, %ld new"
-msgstr[0] "Shown mailbox: %s with %d message, %ld new"
-msgstr[1] "Shown mailbox: %s with %d messages, %ld new"
+msgid "Shown mailbox: %s with %d message, "
+msgid_plural "Shown mailbox: %s with %d messages, "
+msgstr[0] "Shown mailbox: %s with %d message, "
+msgstr[1] "Shown mailbox: %s with %d messages, "
+
+#. xgettext: this is the second part of the message
+#. * "Shown mailbox: %s with %d messages, %ld new".
+#: src/balsa-mblist.c:2141
+#, c-format
+msgid "%ld new"
+msgid_plural "%ld new"
+msgstr[0] "%ld new"
+msgstr[1] "%ld new"
 
 #: src/balsa-message.c:469
 msgid "Content"

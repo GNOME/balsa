@@ -63,7 +63,9 @@ enum {
     CLOSE_MAILBOX,
     MESSAGE_STATUS_CHANGED,
     MESSAGE_NEW,
+    MESSAGES_NEW,
     MESSAGE_DELETE,
+    MESSAGES_DELETE,
     GET_MESSAGE_STREAM,
     CHECK,
     SET_UNREAD_MESSAGES_FLAG,
@@ -142,6 +144,15 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
 		       LIBBALSA_TYPE_MESSAGE);
 
+    libbalsa_mailbox_signals[MESSAGES_NEW] =
+	gtk_signal_new("messages-new",
+		       GTK_RUN_FIRST,
+		       object_class->type,
+		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,
+					 messages_new),
+		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+		       GTK_TYPE_POINTER);
+
     libbalsa_mailbox_signals[MESSAGE_DELETE] =
 	gtk_signal_new("message-delete",
 		       GTK_RUN_FIRST,
@@ -150,6 +161,15 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 					 message_delete),
 		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
 		       LIBBALSA_TYPE_MESSAGE);
+
+    libbalsa_mailbox_signals[MESSAGES_DELETE] =
+	gtk_signal_new("messages-delete",
+		       GTK_RUN_FIRST,
+		       object_class->type,
+		       GTK_SIGNAL_OFFSET(LibBalsaMailboxClass,
+					 messages_delete),
+		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+		       GTK_TYPE_POINTER);
 
     libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG] =
 	gtk_signal_new("set-unread-messages-flag",
@@ -206,7 +226,9 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 
     klass->message_status_changed = NULL;
     klass->message_new = NULL;
+    klass->messages_new = NULL;
     klass->message_delete = NULL;
+    klass->messages_delete = NULL;
 
     klass->get_message_stream = NULL;
     klass->check = NULL;
@@ -493,6 +515,7 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
     glong msgno;
     LibBalsaMessage *message;
     HEADER *cur = 0;
+    GList *messages=NULL;
 
     if (CLIENT_CONTEXT_CLOSED(mailbox))
 	return;
@@ -557,8 +580,13 @@ libbalsa_mailbox_load_messages(LibBalsaMailbox * mailbox)
 
 	mailbox->new_messages--;
 
-	gtk_signal_emit(GTK_OBJECT(mailbox),
-			libbalsa_mailbox_signals[MESSAGE_NEW], message);
+	messages=g_list_append(messages, message);
+    }
+
+    if(messages!=NULL){
+      gtk_signal_emit(GTK_OBJECT(mailbox),
+			libbalsa_mailbox_signals[MESSAGES_NEW], messages);
+      g_list_free(messages);
     }
 
     if (mailbox->unread_messages > 0)
@@ -580,12 +608,15 @@ libbalsa_mailbox_free_messages(LibBalsaMailbox * mailbox)
 
     list = g_list_first(mailbox->message_list);
 
+    if(list){
+      gtk_signal_emit(GTK_OBJECT(mailbox),
+		      libbalsa_mailbox_signals[MESSAGES_DELETE], list);
+    }
+
     while (list) {
 	message = list->data;
 	list = list->next;
 
-	gtk_signal_emit(GTK_OBJECT(mailbox),
-			libbalsa_mailbox_signals[MESSAGE_DELETE], message);
 	message->mailbox = NULL;
 	gtk_object_unref(GTK_OBJECT(message));
     }
@@ -644,14 +675,30 @@ libbalsa_mailbox_commit_changes(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_open(mailbox, FALSE);
 
     /* examine all the message in the mailbox */
+    {
+	GList *p=NULL;
+	message_list = mailbox->message_list;
+	while (message_list) {
+	    current_message = LIBBALSA_MESSAGE(message_list->data);
+	    tmp_message_list = message_list->next;
+	    if (current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
+		p=g_list_append(p, current_message);
+	    }
+	    message_list = tmp_message_list;
+	}
+	if(p){
+	    gtk_signal_emit(GTK_OBJECT(mailbox),
+			    libbalsa_mailbox_signals[MESSAGES_DELETE],
+			    p);
+	    g_list_free(p);
+	}
+    }
+
     message_list = mailbox->message_list;
     while (message_list) {
 	current_message = LIBBALSA_MESSAGE(message_list->data);
 	tmp_message_list = message_list->next;
 	if (current_message->flags & LIBBALSA_MESSAGE_FLAG_DELETED) {
-	    gtk_signal_emit(GTK_OBJECT(mailbox),
-			    libbalsa_mailbox_signals[MESSAGE_DELETE],
-			    current_message);
 	    current_message->mailbox = NULL;
 	    gtk_object_unref(GTK_OBJECT(current_message));
 	    mailbox->message_list =

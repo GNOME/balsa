@@ -1,3 +1,16 @@
+2000-11-16  Pawel Salek  <pawsa@theochem.kth.se>
+        Atsuhiko Yamanaka's <ymnk@jcraft.com> speedup patch with minor
+	changes and updates.
+	
+	* libbalsa/mailbox.[hc]: implement new "messages-new" and
+	"messages-delete" signal for fast insertion and removal of
+	multiple messages.
+	* libbalsa/message.c: use new signals for moving and removing
+	messages. Extra safety in libbalsa_message_body_ref()
+	* src/balsa-index-page.c: make sure there is only one idle_handler
+	waiting for execution. Use new signals for (re)moving messages.
+	* src/balsa-index.c: use new signals for (re)moving messages.
+	
 2000-11-14  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox_pop3.c: pass last_uid to libbalsa_fetch_pop()

@@ -438,6 +438,61 @@ libbalsa_message_move(LibBalsaMessage * message, LibBalsaMailbox * dest)
     return TRUE;
 }
 
+gboolean
+libbalsa_messages_move(GList * messages, LibBalsaMailbox * dest)
+{
+    HEADER *cur;
+    LibBalsaMessage *message;
+    GList *p;
+
+    g_return_val_if_fail(messages != NULL, FALSE);
+    g_return_val_if_fail(dest != NULL, FALSE);
+    /*RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);*/
+
+    libbalsa_mailbox_open(dest, TRUE);
+
+    if (!CLIENT_CONTEXT(dest) || dest->readonly == TRUE) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _
+			     ("Couldn't open destination mailbox (%s) for writing"),
+			     dest->name);
+	return FALSE;
+    }
+
+    message=(LibBalsaMessage *)(messages->data);
+
+    if (message->mailbox->readonly == TRUE) {
+	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+			     _
+			     ("Source mailbox (%s) is readonly. Cannot move message"),
+			     message->mailbox->name);
+	return FALSE;
+    }
+
+    libbalsa_lock_mutt();
+
+    p=messages;
+    while(p){
+	message=(LibBalsaMessage *)(p->data);
+	cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+	mutt_parse_mime_message(CLIENT_CONTEXT(message->mailbox), cur);
+	mutt_append_message(CLIENT_CONTEXT(dest),
+			    CLIENT_CONTEXT(message->mailbox), cur, 0, 0);
+
+	dest->total_messages++;
+
+	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
+	    dest->unread_messages++;
+	p=g_list_next(p);
+    }
+
+    libbalsa_unlock_mutt();
+
+    libbalsa_mailbox_close(dest);
+    libbalsa_messages_delete(messages);
+    return TRUE;
+}
+
 static void
 libbalsa_message_real_clear_flags(LibBalsaMessage * message)
 {
@@ -652,6 +707,19 @@ libbalsa_message_delete(LibBalsaMessage * message)
 		    libbalsa_message_signals[SET_DELETED], TRUE);
 }
 
+void
+libbalsa_messages_delete(GList * messages)
+{
+    LibBalsaMessage * message;
+    g_return_if_fail(messages != NULL);
+
+    while(messages){
+      message=(LibBalsaMessage *)(messages->data);
+      gtk_signal_emit(GTK_OBJECT(message),
+  	  	      libbalsa_message_signals[SET_DELETED], TRUE);
+      messages=g_list_next(messages);
+    }
+}
 
 void
 libbalsa_message_undelete(LibBalsaMessage * message)
@@ -688,6 +756,10 @@ mime_content_type2str(int contenttype)
 }
 #endif
 
+/* libbalsa_message_body_ref:
+   references the body of given message.
+   NO OP for 'loose' messages (i.e not associated with any mailbox).
+*/
 void
 libbalsa_message_body_ref(LibBalsaMessage * message)
 {
@@ -695,8 +767,8 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     HEADER *cur;
     MESSAGE *msg;
 
-    if (!message)
-	return;
+    g_return_if_fail(message);
+    if (!message->mailbox) return;
 
     if (message->body_ref > 0) {
 	message->body_ref++;

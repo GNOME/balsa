@@ -73,9 +73,15 @@ static void mailbox_message_changed_status_cb(LibBalsaMailbox * mb,
 static void mailbox_message_new_cb(LibBalsaMailbox * mb,
 				   LibBalsaMessage * message,
 				   BalsaIndex * bindex);
+static void mailbox_messages_new_cb(LibBalsaMailbox * mb,
+				    GList * messages,
+				    BalsaIndex * bindex);
 static void mailbox_message_delete_cb(LibBalsaMailbox * mb,
 				      LibBalsaMessage * message,
 				      BalsaIndex * bindex);
+static void mailbox_messages_delete_cb(LibBalsaMailbox * mb,
+				       GList  * message,
+				       BalsaIndex * bindex);
 
 /* clist callbacks */
 static void button_event_press_cb(GtkCList * clist, GdkEventButton * event,
@@ -425,8 +431,14 @@ balsa_index_set_mailbox(BalsaIndex * bindex, LibBalsaMailbox * mailbox)
     gtk_signal_connect(GTK_OBJECT(mailbox), "message-new",
 		       GTK_SIGNAL_FUNC(mailbox_message_new_cb),
 		       (gpointer) bindex);
+    gtk_signal_connect(GTK_OBJECT(mailbox), "messages-new",
+		       GTK_SIGNAL_FUNC(mailbox_messages_new_cb),
+		       (gpointer) bindex);
     gtk_signal_connect(GTK_OBJECT(mailbox), "message-delete",
 		       GTK_SIGNAL_FUNC(mailbox_message_delete_cb),
+		       (gpointer) bindex);
+    gtk_signal_connect(GTK_OBJECT(mailbox), "messages-delete",
+		       GTK_SIGNAL_FUNC(mailbox_messages_delete_cb),
 		       (gpointer) bindex);
 
     gtk_clist_freeze(GTK_CLIST(bindex));
@@ -507,7 +519,7 @@ balsa_index_add(BalsaIndex * bindex, LibBalsaMessage * message)
 	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW)
 	    bindex->first_new_message = row + 1;
 
-    gtk_clist_sort(GTK_CLIST(bindex));
+    /*gtk_clist_sort(GTK_CLIST(bindex));*/
     DO_CLIST_WORKAROUND(GTK_CLIST(bindex));
 }
 
@@ -882,7 +894,31 @@ mailbox_message_new_cb(LibBalsaMailbox * mb, LibBalsaMessage * message,
 		       BalsaIndex * bindex)
 {
     gnome_triggers_do("You have new mail!", "email", "newmail", NULL);
+    gtk_clist_freeze(GTK_CLIST (bindex));
     balsa_index_add(bindex, message);
+    if(bindex->mailbox->new_messages==0){
+      gtk_clist_sort (GTK_CLIST (bindex));
+    }
+    DO_CLIST_WORKAROUND(GTK_CLIST (bindex));
+    gtk_clist_thaw (GTK_CLIST (bindex));
+}
+
+static void
+mailbox_messages_new_cb(LibBalsaMailbox * mb, GList *messages,
+		       BalsaIndex * bindex)
+{
+    LibBalsaMessage * message;
+
+    gnome_triggers_do("You have new mail!", "email", "newmail", NULL);
+    gtk_clist_freeze(GTK_CLIST (bindex));
+    while(messages){
+	message=(LibBalsaMessage *)(messages->data);
+	balsa_index_add(bindex, message);
+	messages=g_list_next(messages);
+    }
+    gtk_clist_sort (GTK_CLIST (bindex));
+    DO_CLIST_WORKAROUND(GTK_CLIST (bindex));
+    gtk_clist_thaw (GTK_CLIST (bindex));
 }
 
 static void
@@ -890,6 +926,20 @@ mailbox_message_delete_cb(LibBalsaMailbox * mb, LibBalsaMessage * message,
 			  BalsaIndex * bindex)
 {
     balsa_index_del(bindex, message);
+}
+
+static void
+mailbox_messages_delete_cb(LibBalsaMailbox * mb, GList * messages,
+			  BalsaIndex * bindex)
+{
+    LibBalsaMessage * message;
+    gtk_clist_freeze(GTK_CLIST(bindex));
+    while(messages){
+	message=(LibBalsaMessage *)(messages->data);
+	balsa_index_del(bindex, message);
+	messages=g_list_next(messages);
+    }
+    gtk_clist_thaw(GTK_CLIST(bindex));
 }
 
 /* 

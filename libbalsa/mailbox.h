@@ -99,8 +99,12 @@ struct _LibBalsaMailboxClass {
 
     void (*message_new) (LibBalsaMailbox * mailbox,
 			 LibBalsaMessage * message);
+    void (*messages_new) (LibBalsaMailbox * mailbox,
+			  GList * messages);
     void (*message_delete) (LibBalsaMailbox * mailbox,
 			    LibBalsaMessage * message);
+    void (*messages_delete) (LibBalsaMailbox * mailbox,
+			     GList * messages);
     void (*message_append) (LibBalsaMailbox * mailbox,
 			    LibBalsaMessage * message);
     void (*message_status_changed) (LibBalsaMailbox * mailbox,

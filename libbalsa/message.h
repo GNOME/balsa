@@ -124,11 +124,14 @@ gboolean libbalsa_message_copy(LibBalsaMessage * message,
 			       LibBalsaMailbox * dest);
 gboolean libbalsa_message_move(LibBalsaMessage * message,
 			       LibBalsaMailbox * mailbox);
+gboolean libbalsa_messages_move(GList * messages,
+				LibBalsaMailbox * mailbox);
 void libbalsa_message_clear_flags(LibBalsaMessage * message);
 
 void libbalsa_message_read(LibBalsaMessage * message);
 void libbalsa_message_unread(LibBalsaMessage * message);
 void libbalsa_message_delete(LibBalsaMessage * message);
+void libbalsa_messages_delete(GList * messages);
 void libbalsa_message_undelete(LibBalsaMessage * message);
 
 void libbalsa_message_flag(LibBalsaMessage * message);

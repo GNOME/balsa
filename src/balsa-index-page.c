@@ -416,6 +416,7 @@ balsa_index_update_message(BalsaIndexPage * index_page)
     replace_attached_data(GTK_OBJECT(index), "data",
 			  GTK_OBJECT(index_page));
 
+    if(handler) gtk_idle_remove(handler);
     handler = gtk_idle_add((GtkFunction) idle_handler_cb, index);
 }
 
@@ -632,12 +633,19 @@ transfer_messages_cb(BalsaMBList * bmbl, LibBalsaMailbox * mailbox,
     if (page->mailbox == mailbox)	/*Transferring to same mailbox? */
 	return;
 
-    list = clist->selection;
-    while (list) {
-	message =
-	    gtk_clist_get_row_data(clist, GPOINTER_TO_INT(list->data));
-	libbalsa_message_move(message, mailbox);
-	list = list->next;
+    {
+	GList *messages=NULL;
+	list = clist->selection;
+	while (list) {
+	    message =
+		gtk_clist_get_row_data(clist, GPOINTER_TO_INT(list->data));
+	    messages=g_list_append(messages, message);
+	    list = list->next;
+	}
+	if(messages!=NULL){
+ 	  libbalsa_messages_move(messages, mailbox);
+	  g_list_free(messages);
+	}
     }
 
     libbalsa_mailbox_commit_changes(bindex->mailbox);
@@ -917,6 +925,7 @@ balsa_message_delete(GtkWidget * widget, gpointer index)
     BalsaIndexPage *page = NULL;
     LibBalsaMessage *message;
     gboolean to_trash;
+    GList *messages=NULL;
 
     g_return_if_fail(widget != NULL);
     g_return_if_fail(index != NULL);
@@ -931,12 +940,15 @@ balsa_message_delete(GtkWidget * widget, gpointer index)
     while (list) {
 	message = gtk_clist_get_row_data(GTK_CLIST(index),
 					 GPOINTER_TO_INT(list->data));
-	if (to_trash)
-	    libbalsa_message_move(message, balsa_app.trash);
-	else
-	    libbalsa_message_delete(message);
-
+	messages=g_list_append(messages, message);
 	list = list->next;
+    }
+    if(messages){
+	if (to_trash)
+	    libbalsa_messages_move(messages, balsa_app.trash);
+	else
+	    libbalsa_messages_delete(messages);
+	g_list_free(messages);
     }
     balsa_index_select_next(index);
 

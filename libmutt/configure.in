@@ -616,7 +616,7 @@ if test x"$check_pcre" = xyes ; then
 	if test x"$have_pcre" = xyes ; then
 	       	AC_MSG_RESULT(yes)
 		CFLAGS="$CFLAGS `pcre-config --cflags-posix`"
-		AC_DEFINE(HAVE_PCRE,1,[Define if PCRE library is available.]a<)
+		AC_DEFINE(HAVE_PCRE,1,[Define if PCRE library is available.])
 	else
 	        AC_MSG_RESULT(not found)
 	fi

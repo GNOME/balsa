@@ -98,6 +98,9 @@ static guint libbalsa_mailbox_signals[LAST_SIGNAL];
 /* GtkTreeModel function prototypes */
 static void  mbox_model_init(GtkTreeModelIface *iface);
 
+/* GtkTreeDragSource function prototypes */
+static void  mbox_drag_source_init(GtkTreeDragSourceIface *iface);
+
 /* GtkTreeSortable function prototypes */
 static void  mbox_sortable_init(GtkTreeSortableIface *iface);
 
@@ -125,6 +128,12 @@ libbalsa_mailbox_get_type(void)
 	    NULL
 	};
     
+	static const GInterfaceInfo mbox_drag_source_info = {
+	    (GInterfaceInitFunc) mbox_drag_source_init,
+	    NULL,
+	    NULL
+	};
+
 	static const GInterfaceInfo mbox_sortable_info = {
 	    (GInterfaceInitFunc) mbox_sortable_init,
 	    NULL,
@@ -137,6 +146,9 @@ libbalsa_mailbox_get_type(void)
 	g_type_add_interface_static(mailbox_type,
 				    GTK_TYPE_TREE_MODEL,
 				    &mbox_model_info);
+	g_type_add_interface_static(mailbox_type,
+				    GTK_TYPE_TREE_DRAG_SOURCE,
+				    &mbox_drag_source_info);
 	g_type_add_interface_static(mailbox_type,
 				    GTK_TYPE_TREE_SORTABLE,
 				    &mbox_sortable_info);
@@ -1629,6 +1641,54 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf)
 			      [LIBBALSA_MESSAGE_ATTACH_ENCR]);
 }
 #endif /* HAVE_GPGME */
+
+/* =================================================================== *
+ * GtkTreeDragSource implementation functions.                         *
+ * =================================================================== */
+
+static gboolean mbox_row_draggable(GtkTreeDragSource * drag_source,
+				   GtkTreePath * path);
+static gboolean mbox_drag_data_delete(GtkTreeDragSource * drag_source,
+				      GtkTreePath * path);
+static gboolean mbox_drag_data_get(GtkTreeDragSource * drag_source,
+				   GtkTreePath * path,
+				   GtkSelectionData * selection_data);
+
+static void
+mbox_drag_source_init(GtkTreeDragSourceIface * iface)
+{
+    iface->row_draggable    = mbox_row_draggable;
+    iface->drag_data_delete = mbox_drag_data_delete;
+    iface->drag_data_get    = mbox_drag_data_get;
+}
+
+/* These three methods are apparently never called, so what they return
+ * is irrelevant.  The code reflects guesses about what they should
+ * return if they were ever called.
+ */
+static gboolean
+mbox_row_draggable(GtkTreeDragSource * drag_source, GtkTreePath * path)
+{
+    /* All rows are valid sources. */
+    return TRUE;
+}
+
+static gboolean
+mbox_drag_data_delete(GtkTreeDragSource * drag_source, GtkTreePath * path)
+{
+    /* The "drag-data-received" callback handles deleting messages that
+     * are dragged out of the mailbox, so we don't. */
+    return FALSE;
+}
+
+static gboolean
+mbox_drag_data_get(GtkTreeDragSource * drag_source, GtkTreePath * path,
+		   GtkSelectionData * selection_data)
+{
+    /* The "drag-data-get" callback passes the list of selected messages
+     * to the GtkSelectionData, so we don't. */
+    return FALSE;
+}
 
 /* =================================================================== *
  * GtkTreeSortable implementation functions.                           *

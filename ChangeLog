@@ -1,3 +1,12 @@
+2005-03-04 19:56  Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/gmime-part-rfc2440.c, src/balsa-message.c,
+	src/balsa-message.h, src/sendmsg-window.c: add and evaluate the RFC
+	2440 headers properly; write the stream to a new (plain) stream;
+	rename libbalsa_msg_perform_crypto to balsa_message_perform_crypto,
+	add a parameter to decrypt only and export the function; call
+	balsa_message_perform_crypto() to fix the bug Kacper reported.
+
 2005-03-03 20:07  PeterB
 
 	* libbalsa/: mailbox_mbox.c, mailbox_mbox.h: implement

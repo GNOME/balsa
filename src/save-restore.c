@@ -70,21 +70,21 @@ delete_mailbox_config (gchar * name)
   g_string_sprintf (gstring, "/balsa/%s", name);
   gnome_config_clean_section (gstring->str);
 
+/* TODO we should prolly lower this by one here, so save on some memory... */
   mblist = g_new (gchar *, g_list_length (balsa_app.mailbox_list));
-
-  list = g_list_first (balsa_app.mailbox_list);
-  for (; list; list = list->next, mailbox = list->data)
-    {
-      if (!strcmp (name, mailbox->name))
-	{
-	  balsa_app.mailbox_list = g_list_remove (balsa_app.mailbox_list, list->data);
-	}
-    }
 
   list = g_list_first (balsa_app.mailbox_list);
   for (i = 0; list; list = list->next, i++, mailbox = list->data)
     {
-      mblist[i] = g_strdup (mailbox->name);
+      if (!strcmp (name, mailbox->name))
+	{
+	  balsa_app.mailbox_list = g_list_remove (balsa_app.mailbox_list, list->data);
+	  i--;			/* lets move this back down one */
+	}
+      else
+	{
+	  mblist[i] = g_strdup (mailbox->name);
+	}
     }
 }
 

@@ -1,5 +1,9 @@
 1998-12-18  Jeff Garzik  <jgarzik@pobox.com>
 
+	* po/de.po: big update from Michael Glauche <glauche@plum.de>
+
+1998-12-18  Jeff Garzik  <jgarzik@pobox.com>
+
 	* libbalsa/mailbox.c, libmutt/commands.c, libmutt/curs_main.c,
 	  libmutt/flaglib.c, libmutt/flags.c, libmutt/mutt.h,
 	  libmutt/mx.c, libmutt/pager.c, libmutt/pattern.c:

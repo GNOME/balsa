@@ -202,13 +202,13 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
       mbox_dict = pl_dict_add_str_str (NULL, "Type", "POP3");
       pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
       pl_dict_add_str_str (mbox_dict, "Username",
-			   MAILBOX_POP3 (mailbox)->user);
+			   MAILBOX_POP3(mailbox)->server->user);
       /* Do not save the password if the field is NULL.  This is here
          so that asving the password to the balsarc file can be optional */
-      if (MAILBOX_POP3 (mailbox)->passwd)
+      if (MAILBOX_POP3(mailbox)->server->passwd)
 	{
 	  gchar *buff;
-	  buff = rot (MAILBOX_POP3 (mailbox)->passwd);
+	  buff = rot (MAILBOX_POP3(mailbox)->server->passwd);
 	  pl_dict_add_str_str (mbox_dict, "Password",
 			       buff);
 	  g_free (buff);
@@ -242,26 +242,26 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
       mbox_dict = pl_dict_add_str_str (NULL, "Type", "IMAP");
       pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
       pl_dict_add_str_str (mbox_dict, "Server",
-			   MAILBOX_IMAP (mailbox)->server);
+			   MAILBOX_IMAP (mailbox)->server->host);
 
       /* Add the Port entry */
       {
 	char tmp[MAX_PROPLIST_KEY_LEN];
-	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_IMAP (mailbox)->port);
+	snprintf (tmp, sizeof (tmp), "%d", MAILBOX_IMAP(mailbox)->server->port);
 	pl_dict_add_str_str (mbox_dict, "Port", tmp);
       }
 
       pl_dict_add_str_str (mbox_dict, "Path", MAILBOX_IMAP (mailbox)->path);
       pl_dict_add_str_str (mbox_dict, "Username",
-			   MAILBOX_IMAP (mailbox)->user);
-      if (MAILBOX_IMAP (mailbox)->passwd != NULL)
-	{
-	  gchar *buff;
-	  buff = rot (MAILBOX_IMAP (mailbox)->passwd);
-	  pl_dict_add_str_str (mbox_dict, "Password",
-			       buff);
-	  g_free (buff);
-	}
+			   MAILBOX_IMAP (mailbox)->server->user);
+
+      if (MAILBOX_IMAP(mailbox)->server->passwd != NULL)
+      {
+	gchar *buff;
+	buff = rot (MAILBOX_IMAP(mailbox)->server->passwd);
+	pl_dict_add_str_str (mbox_dict, "Password", buff);
+	g_free (buff);
+      }
       break;
 
     default:
@@ -483,21 +483,21 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 
       if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
 	return FALSE;
-      MAILBOX_POP3 (mailbox)->user = g_strdup (field);
+      MAILBOX_POP3 (mailbox)->server->user = g_strdup (field);
 
       if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
 	{
 	  gchar *buff;
 	  buff = rot (field);
-	  MAILBOX_POP3 (mailbox)->passwd = g_strdup (buff);
+	  MAILBOX_POP3 (mailbox)->server->passwd = g_strdup (buff);
 	  g_free (buff);
 	}
       else
-	MAILBOX_POP3 (mailbox)->passwd = NULL;
+	MAILBOX_POP3 (mailbox)->server->passwd = NULL;
 
       if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
-      MAILBOX_POP3 (mailbox)->server = g_strdup (field);
+      MAILBOX_POP3 (mailbox)->server->host = g_strdup (field);
 
       if ((field = pl_dict_get_str (mbox, "Check")) == NULL)
 	MAILBOX_POP3 (mailbox)->check = FALSE;
@@ -526,25 +526,25 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 
       if ((field = pl_dict_get_str (mbox, "Username")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->user = g_strdup (field);
+      MAILBOX_IMAP (mailbox)->server->user = g_strdup (field);
 
       if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
-	{
-	  gchar *buff;
-	  buff = rot (field);
-	  MAILBOX_IMAP (mailbox)->passwd = g_strdup (buff);
-	  g_free (buff);
-	}
+      {
+	gchar *buff;
+	buff = rot (field);
+	MAILBOX_IMAP (mailbox)->server->passwd = g_strdup (buff);
+	g_free (buff);
+      }
       else
-	MAILBOX_IMAP (mailbox)->passwd = NULL;
+	MAILBOX_IMAP (mailbox)->server->passwd = NULL;
 
       if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->server = g_strdup (field);
+      MAILBOX_IMAP (mailbox)->server->host = g_strdup (field);
 
       if ((field = pl_dict_get_str (mbox, "Port")) == NULL)
 	return FALSE;
-      MAILBOX_IMAP (mailbox)->port = atol (field);
+      MAILBOX_IMAP (mailbox)->server->port = atol (field);
 
       if ((field = pl_dict_get_str (mbox, "Path")) == NULL)
 	return FALSE;

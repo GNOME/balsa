@@ -124,11 +124,11 @@ mailbox_init (gchar * inbox_path,
 gint
 set_imap_username (Mailbox * mb)
 {
-  if (mb->type != MAILBOX_IMAP)
+  if (!MAILBOX_IS_IMAP(mb))
     return 0;
 
-  ImapUser = MAILBOX_IMAP (mb)->user;
-  ImapPass = MAILBOX_IMAP (mb)->passwd;
+  ImapUser = MAILBOX_IMAP(mb)->server->user;
+  ImapPass = MAILBOX_IMAP(mb)->server->passwd;
 
   return 1;
 }
@@ -159,10 +159,10 @@ check_all_pop3_hosts (Mailbox * to, GList *mailboxes)
       mailbox = list->data;
       if (MAILBOX_POP3 (mailbox)->check)
 	{
-	  PopHost = g_strdup (MAILBOX_POP3 (mailbox)->server);
+	  PopHost = g_strdup (MAILBOX_POP3(mailbox)->server->host);
 	  PopPort = 110;
-	  PopPass = g_strdup (MAILBOX_POP3 (mailbox)->passwd);
-	  PopUser = g_strdup (MAILBOX_POP3 (mailbox)->user);
+	  PopPass = g_strdup (MAILBOX_POP3(mailbox)->server->passwd);
+	  PopUser = g_strdup (MAILBOX_POP3(mailbox)->server->user);
 
 	  if( MAILBOX_POP3 (mailbox)->last_popped_uid == NULL)
 	    uid[0] = 0;
@@ -204,8 +204,7 @@ add_mailboxes_for_checking (Mailbox * mailbox)
   BUFFY **tmp;
   gchar *path;
 
-  if (mailbox->type == MAILBOX_POP3 ||
-      mailbox->type == MAILBOX_IMAP)
+  if (!MAILBOX_IS_LOCAL(mailbox))
     return;
 
   path = MAILBOX_LOCAL (mailbox)->path;
@@ -249,6 +248,30 @@ mailbox_have_new_messages (gchar * path)
   return FALSE;
 }
 
+
+Server *
+server_new(ServerType type)
+{
+  Server *server;
+
+  /* we can create the same thing for now */
+  server = (Server *)g_malloc(sizeof(Server));
+  server->user = NULL;
+  server->passwd = NULL;
+  server->host = NULL;
+  server->port = -1;
+
+  return server;
+}
+
+void
+server_free(Server *server)
+{
+  g_free(server->user);
+  g_free(server->passwd);
+  g_free(server->host);
+}
+
 /*
  * allocate a new mailbox
  */
@@ -268,9 +291,7 @@ mailbox_new (MailboxType type)
 
     case MAILBOX_POP3:
       mailbox = (Mailbox *) g_malloc (sizeof (MailboxPOP3));
-      MAILBOX_POP3 (mailbox)->user = NULL;
-      MAILBOX_POP3 (mailbox)->passwd = NULL;
-      MAILBOX_POP3 (mailbox)->server = NULL;
+      MAILBOX_POP3(mailbox)->server = server_new(SERVER_POP3);
       MAILBOX_POP3 (mailbox)->check = FALSE;
       MAILBOX_POP3 (mailbox)->delete_from_server = FALSE;
 	  MAILBOX_POP3 (mailbox)->last_popped_uid = NULL;
@@ -278,9 +299,7 @@ mailbox_new (MailboxType type)
 
     case MAILBOX_IMAP:
       mailbox = (Mailbox *) g_malloc (sizeof (MailboxIMAP));
-      MAILBOX_IMAP (mailbox)->user = NULL;
-      MAILBOX_IMAP (mailbox)->passwd = NULL;
-      MAILBOX_IMAP (mailbox)->server = NULL;
+      MAILBOX_IMAP(mailbox)->server = server_new(SERVER_IMAP);
       MAILBOX_IMAP (mailbox)->path = NULL;
       MAILBOX_IMAP (mailbox)->tmp_file_path = NULL;
       break;
@@ -326,16 +345,12 @@ mailbox_free (Mailbox * mailbox)
       break;
 
     case MAILBOX_POP3:
-      g_free (MAILBOX_POP3 (mailbox)->user);
-      g_free (MAILBOX_POP3 (mailbox)->passwd);
-      g_free (MAILBOX_POP3 (mailbox)->server);
-	  g_free (MAILBOX_POP3 (mailbox)->last_popped_uid);
+      server_free(MAILBOX_POP3(mailbox)->server);
+      g_free (MAILBOX_POP3 (mailbox)->last_popped_uid);
       break;
 
     case MAILBOX_IMAP:
-      g_free (MAILBOX_IMAP (mailbox)->user);
-      g_free (MAILBOX_IMAP (mailbox)->passwd);
-      g_free (MAILBOX_IMAP (mailbox)->server);
+      server_free(MAILBOX_POP3(mailbox)->server);
       g_free (MAILBOX_IMAP (mailbox)->path);
       break;
 
@@ -385,7 +400,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
 	}
     }
 
-  if (mailbox->type != MAILBOX_IMAP && mailbox->type != MAILBOX_POP3)
+  if (MAILBOX_IS_LOCAL(mailbox))
     {
       if (stat (MAILBOX_LOCAL (mailbox)->path, &st) == -1)
 	{
@@ -404,14 +419,14 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
       break;
 
     case MAILBOX_POP3:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, flag, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3(mailbox)->server->host, flag, NULL);
       break;
 
     case MAILBOX_IMAP:
       tmp = g_string_new (NULL);
       g_string_append_c (tmp, '{');
-      g_string_append (tmp, MAILBOX_IMAP (mailbox)->server);
-      g_string_sprintfa (tmp, ":%i", MAILBOX_IMAP (mailbox)->port);
+      g_string_append (tmp, MAILBOX_IMAP(mailbox)->server->host);
+      g_string_sprintfa (tmp, ":%i", MAILBOX_IMAP(mailbox)->server->port);
       g_string_append_c (tmp, '}');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
       set_imap_username (mailbox);

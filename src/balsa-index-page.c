@@ -168,11 +168,11 @@ set_password (GtkWidget * widget, GtkWidget * entry)
   if (!mailbox)
     return;
 
-  if (mailbox->type == MAILBOX_IMAP)
-    MAILBOX_IMAP(mailbox)->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+  if (MAILBOX_IS_IMAP(mailbox))
+    MAILBOX_IMAP(mailbox)->server->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
 
-  if (mailbox->type == MAILBOX_POP3)
-    MAILBOX_POP3(mailbox)->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+  if (MAILBOX_IS_POP3(mailbox))
+    MAILBOX_POP3(mailbox)->server->passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
 
   gtk_object_remove_data (GTK_OBJECT (entry), "mailbox");
 }
@@ -192,8 +192,8 @@ void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
   gdk_cursor_destroy(cursor);
 #endif
 
-  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->passwd) ||
-      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->passwd))
+  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->server->passwd) ||
+      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->server->passwd))
   {
     GtkWidget *hbox;
     GtkWidget *label;
@@ -223,8 +223,8 @@ void balsa_index_page_load_mailbox(BalsaIndexPage *page, Mailbox * mailbox)
   }
 
   /* check to see if its still null */
-  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->passwd) ||
-      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->passwd))
+  if ((mailbox->type == MAILBOX_IMAP && !MAILBOX_IMAP(mailbox)->server->passwd) ||
+      (mailbox->type == MAILBOX_POP3 && !MAILBOX_POP3(mailbox)->server->passwd))
   {
     return;
   }

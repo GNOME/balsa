@@ -34,6 +34,7 @@
 #define MAILBOX_POP3(mailbox)   ((MailboxPOP3 *)(mailbox))
 #define MAILBOX_IMAP(mailbox)   ((MailboxIMAP *)(mailbox))
 
+
 /*
  * enumes
  */
@@ -46,6 +47,21 @@ typedef enum
   MAILBOX_IMAP,
   MAILBOX_UNKNOWN
 } MailboxType;
+
+typedef enum
+{
+  SERVER_POP3,
+  SERVER_IMAP,
+  SERVER_UNKNOWN
+}
+ServerType;
+
+
+#define MAILBOX_IS_LOCAL(mailbox) ((mailbox->type == MAILBOX_MBOX) || \
+				   (mailbox->type == MAILBOX_MH) ||   \
+				   (mailbox->type == MAILBOX_MAILDIR))
+#define MAILBOX_IS_POP3(mailbox)  (mailbox->type == MAILBOX_POP3)
+#define MAILBOX_IS_IMAP(mailbox)  (mailbox->type == MAILBOX_IMAP)
 
 typedef enum
 {
@@ -100,9 +116,13 @@ typedef enum
 /*
  * strucutres
  */
+typedef struct _Server Server;
+
 typedef struct _MailboxLocal MailboxLocal;
+typedef struct _MailboxRemote MailboxRemote;
 typedef struct _MailboxPOP3 MailboxPOP3;
 typedef struct _MailboxIMAP MailboxIMAP;
+
 
 typedef struct _MailboxWatcherMessage MailboxWatcherMessage;
 typedef struct _MailboxWatcherMessageNew MailboxWatcherMessageNew;
@@ -154,13 +174,25 @@ struct _MailboxLocal
   gchar *path;
 };
 
+struct _Server
+{
+  //  GtkObject object;
+  ServerType type;
+  gchar *name;
+
+  gchar *host;
+  gint port;
+
+  gchar *user;
+  gchar *passwd;
+};
 
 struct _MailboxPOP3
 {
   Mailbox mailbox;
-  gchar *user;
-  gchar *passwd;
-  gchar *server;
+
+  Server *server;
+
   gboolean check;
   gboolean delete_from_server;
   gchar *last_popped_uid;
@@ -170,11 +202,10 @@ struct _MailboxPOP3
 struct _MailboxIMAP
 {
   Mailbox mailbox;
-  gchar *user;
-  gchar *passwd;
-  gchar *server;
+
+  Server *server;
+
   gchar *path;
-  gint port;
   gchar *tmp_file_path;
 };
 

@@ -1,3 +1,8 @@
+2004-05-22  Pawel Salek
+
+	* libbalsa/imap-server.c. libinit_balsa/balsa-druid-page-directory.c:
+	compile without SSL.
+	
 2004-05-15 16:12  PeterB
 
 	* src/message-window.c: keep MessageWindow::bmessage alive while we

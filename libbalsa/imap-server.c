@@ -113,11 +113,7 @@ static void libbalsa_imap_server_set_username(LibBalsaServer * server,
     (parent_class)->set_username(server, name);
 }
 static void libbalsa_imap_server_set_host(LibBalsaServer * server,
-                      const gchar * host
-#ifdef USE_SSL
-                      , gboolean use_ssl
-#endif
-                      )
+                      const gchar * host, gboolean use_ssl)
 {
     LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
     G_LOCK(imap_servers);
@@ -126,11 +122,7 @@ static void libbalsa_imap_server_set_host(LibBalsaServer * server,
     imap_server->key = g_strdup_printf("%s@%s", server->user, host);
     g_hash_table_insert(imap_servers, imap_server->key, imap_server);
     G_UNLOCK(imap_servers);
-    (parent_class)->set_host(server, host
-#ifdef USE_SSL
-                             , use_ssl
-#endif
-                            );
+    (parent_class)->set_host(server, host, use_ssl);
 }
 static void
 libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)

@@ -439,6 +439,25 @@ balsa_delete_message (BalsaIndex * bindex)
   mail_setflag (bindex->stream, tmp, "\\DELETED");
 }
 
+void
+balsa_undelete_message (BalsaIndex * bindex)
+{
+  GtkCList *clist;
+  glong row;
+  char tmp[10];
+
+  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+
+  if (!clist->selection)
+    return;
+
+  row = (glong) clist->selection->data;
+
+  gtk_clist_set_text (clist, row, 1, NULL);
+
+  sprintf (tmp, "%ld", row + 1);
+  mail_setflag (bindex->stream, tmp, "\\UNDELETED");
+}
 
 static void
 append_messages (BalsaIndex * bindex,

@@ -51,6 +51,12 @@ index_delete_message ()
  balsa_delete_message (balsa_app.main_window->index);
 }
 
+void
+index_undelete_message ()
+{
+ balsa_undelete_message (balsa_app.main_window->index);
+}
+
 /* remove the old mailbox menu, and create a new one
  * from the current postoffice  */
 void

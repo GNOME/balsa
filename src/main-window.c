@@ -66,7 +66,7 @@ create_main_window ()
   /* main window */
   mw->window = gnome_app_new ("balsa", "Balsa");
   gtk_window_set_wmclass (GTK_WINDOW (mw->window), "balsa_app", "Balsa");
-  gtk_widget_set_usize (mw->window, 660, 400);
+  gtk_widget_set_usize (mw->window, 640, 400);
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
@@ -228,7 +228,17 @@ create_toolbar (MainWindow * mw)
 			     GTK_SIGNAL_FUNC (index_delete_message),
 			     mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
+/*
+  toolbarbutton =
+    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+			     "UnDelete",
+			     "UnDelete Message",
+			     NULL,
+	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
+			     GTK_SIGNAL_FUNC (index_undelete_message),
+			     mw);
+  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+*/
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
   toolbarbutton =

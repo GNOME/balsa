@@ -18,7 +18,7 @@
 /* filter match types */
 typedef enum
 {
-    FILTER_NONE = 0,
+    FILTER_NONE,
     FILTER_SIMPLE,
     FILTER_REGEX,
     FILTER_EXEC
@@ -34,7 +34,7 @@ typedef enum
 
 typedef enum
 {
-    FILTER_NOTHING = 0,
+    FILTER_NOTHING,
     FILTER_COPY,
     FILTER_MOVE,
     FILTER_PRINT,

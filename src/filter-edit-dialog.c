@@ -1,13 +1,27 @@
-/* -*- C -*-
- * filter-edit-dialog.c
+/* Balsa E-Mail Client
+ * Copyright (C) 1998 Joel Becker and Stuart Parmenter
  *
- * GTK code for balsa's filter edit dialog
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
 
 #include "config.h"
 
 #include <gnome.h>
 
+#include "balsa-app.h"
 #include "filter.h"
 #include "filter-edit.h"
 
@@ -127,17 +141,20 @@ build_left_side ()
   bbox = gtk_hbutton_box_new ();
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), 25, 15);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+		  BALSA_BUTTON_WIDTH/2, BALSA_BUTTON_HEIGHT/2);
 
   gtk_box_pack_start (GTK_BOX (vbox), bbox, FALSE, FALSE, 2);
 
   /* up button */
-  button = gnome_stock_button (GNOME_STOCK_BUTTON_UP);
+  pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_UP);
+  button = gnome_pixmap_button (pixmap, "Up");
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
 		      GTK_SIGNAL_FUNC (fe_up_pressed), clist);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   /* down button */
-  button = gnome_stock_button (GNOME_STOCK_BUTTON_DOWN);
+  pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_DOWN);
+  button = gnome_pixmap_button (pixmap, "Down");
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
 		      GTK_SIGNAL_FUNC (fe_down_pressed), clist);
   gtk_container_add (GTK_CONTAINER (bbox), button);
@@ -147,18 +164,19 @@ build_left_side ()
   bbox = gtk_hbutton_box_new ();
   gtk_button_box_set_spacing (GTK_BUTTON_BOX (bbox), 2);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
-  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox), 25, 15);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+		  BALSA_BUTTON_WIDTH/2, BALSA_BUTTON_HEIGHT/2);
 
   gtk_box_pack_start (GTK_BOX (vbox), bbox, FALSE, FALSE, 2);
 
   /* new button */
-  pixmap = gnome_stock_new_with_icon (GNOME_STOCK_PIXMAP_NEW);
+  pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_NEW);
   button = gnome_pixmap_button (pixmap, "New");
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
 		      GTK_SIGNAL_FUNC (fe_new_pressed), clist);
   gtk_container_add (GTK_CONTAINER (bbox), button);
   /* delete button */
-  pixmap = gnome_stock_new_with_icon (GNOME_STOCK_PIXMAP_TRASH);
+  pixmap = gnome_stock_new_with_icon (GNOME_STOCK_MENU_TRASH);
   button = gnome_pixmap_button (pixmap, "Delete");
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
 		      GTK_SIGNAL_FUNC (fe_delete_pressed), clist);

@@ -1,5 +1,7 @@
-2004-03-04 09:59  PeterB
+2004-03-04 15:02  PeterB
 
+	* libbalsa/mailbox_mbox.c: crlf-filter message parts, not the whole
+	message.
 	* libbalsa/filter-funcs.c: step over closing '"'.
 	* configure.in, libbalsa/html.c: require gmime-2.0 >= 2.1.2; drop
 	HAVE_GMIME21.

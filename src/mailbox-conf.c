@@ -60,6 +60,9 @@ struct _BalsaMailboxConfView {
     GtkWidget *identity_label;
     GtkWidget *show_from;
     GtkWidget *show_to;
+#ifdef HAVE_GPGME
+    GtkWidget *chk_crypt;
+#endif
 };
 typedef struct _MailboxConfWindow MailboxConfWindow;
 struct _MailboxConfWindow {
@@ -1317,8 +1320,43 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
 	      view_info->show_to : view_info->show_from);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
+#ifdef HAVE_GPGME
+    {
+	/* scope */
+	static const struct menu_data chk_crypt_menu[] = {
+	    { N_("Never"),       LB_MAILBOX_CHK_CRYPT_NEVER  },
+	    { N_("If Possible"), LB_MAILBOX_CHK_CRYPT_MAYBE  },
+	    { N_("Always"),      LB_MAILBOX_CHK_CRYPT_ALWAYS }
+	};
+	GtkWidget * chk_crypt_w;
+	
+	create_label(_("decrypt and check\nsignatures automatically"), table, ++row);
+	
+	box = gtk_hbox_new(FALSE, 12);
+	chk_crypt_w = gtk_option_menu_new ();
+	view_info->chk_crypt = get_combo_menu(ELEMENTS(chk_crypt_menu), chk_crypt_menu);
+	gtk_option_menu_set_menu (GTK_OPTION_MENU(chk_crypt_w),
+				  view_info->chk_crypt);
+	gtk_option_menu_set_history (GTK_OPTION_MENU (chk_crypt_w),
+				     libbalsa_mailbox_get_crypto_mode(mailbox));
+	gtk_box_pack_start(GTK_BOX(box), chk_crypt_w, FALSE, FALSE, 0);
+	gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
+			 GTK_FILL, 0, 0, 0);
+    }
+#endif
+
     return view_info;
 }
+
+#ifdef HAVE_GPGME
+static LibBalsaChkCryptoMode
+balsa_mailbox_conf_get_crypto_mode(BalsaMailboxConfView *view_info)
+{
+    GtkWidget *menu_item = gtk_menu_get_active(GTK_MENU(view_info->chk_crypt));
+    return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item),
+                                             "balsa-data"));
+}
+#endif
 
 /* When closing the dialog, check whether any view items were changed,
  * and carry out the changes if necessary.
@@ -1356,6 +1394,12 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 				  ? LB_MAILBOX_SHOW_FROM
 				  : LB_MAILBOX_SHOW_TO))
 	changed = TRUE;
+
+#ifdef HAVE_GPGME
+    if (libbalsa_mailbox_set_crypto_mode(mailbox,
+					 balsa_mailbox_conf_get_crypto_mode(view_info)))
+	changed = TRUE;
+#endif
 
     if (!changed || !libbalsa_mailbox_get_open(mailbox))
 	return;

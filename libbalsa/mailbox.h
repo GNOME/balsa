@@ -25,6 +25,7 @@
 
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
+#include "config.h"
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -132,6 +133,15 @@ typedef enum {
     LB_MAILBOX_STATE_CLOSING
 } LibBalsaMailboxState;
 
+#ifdef HAVE_GPGME
+typedef enum {
+    LB_MAILBOX_CHK_CRYPT_NEVER,     /* never auto decrypt/signature check */
+    LB_MAILBOX_CHK_CRYPT_MAYBE,     /* auto decrypt/signature check if possible */
+    LB_MAILBOX_CHK_CRYPT_ALWAYS     /* always auto decrypt/signature check */
+} LibBalsaChkCryptoMode;
+#endif
+
+
 /*
  * structures
  */
@@ -156,6 +166,10 @@ struct _LibBalsaMailboxView {
     unsigned open:1;
     unsigned in_sync:1;		/* view is in sync with config */
     unsigned frozen:1;		/* don't update view if set    */
+
+#ifdef HAVE_GPGME
+    LibBalsaChkCryptoMode gpg_chk_mode;
+#endif
 };
 
 struct _LibBalsaMailbox {
@@ -458,6 +472,10 @@ void libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open);
 void libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter);
 void libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen);
+#ifdef HAVE_GPGME
+gboolean libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
+					  LibBalsaChkCryptoMode gpg_chk_mode);
+#endif
 
 LibBalsaAddress *libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox
 							   * mailbox);
@@ -473,6 +491,9 @@ gboolean libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox);
 gint libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox);
+#ifdef HAVE_GPGME
+LibBalsaChkCryptoMode libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox);
+#endif
 
 /** force update of given msgno */
 void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);

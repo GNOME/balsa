@@ -1856,7 +1856,10 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     0,				/* exposed              */
     0,				/* open                 */
     1,				/* in_sync              */
-    0				/* frozen		*/
+    0,				/* frozen		*/
+#ifdef HAVE_GPGME
+    LB_MAILBOX_CHK_CRYPT_MAYBE  /* gpg_chk_mode         */
+#endif
 };
 
 LibBalsaMailboxView *
@@ -2031,6 +2034,24 @@ libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen)
 	view->frozen = frozen ? 1 : 0;
 }
 
+#ifdef HAVE_GPGME
+gboolean 
+libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
+                                LibBalsaChkCryptoMode gpg_chk_mode)
+{
+    LibBalsaMailboxView *view;
+
+    g_return_val_if_fail(mailbox != NULL && mailbox->view != NULL, FALSE);
+
+    view = mailbox->view;
+    if (view->gpg_chk_mode != gpg_chk_mode) {
+	view->gpg_chk_mode = gpg_chk_mode;
+	return TRUE;
+    } else
+	return FALSE;
+}
+#endif
+
 /* End of set methods. */
 
 /* Get methods; NULL mailbox is valid, and returns the default value. */
@@ -2109,6 +2130,16 @@ libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox)
     return (mailbox && mailbox->view) ?
 	mailbox->view->frozen : FALSE;
 }
+
+#ifdef HAVE_GPGME
+LibBalsaChkCryptoMode
+libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->gpg_chk_mode :
+	libbalsa_mailbox_view_default.gpg_chk_mode;
+}
+#endif
 
 /* End of get methods. */
 

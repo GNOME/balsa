@@ -73,6 +73,7 @@
 #ifdef HAVE_GPGME
 #  include "pixmaps/balsa_gpg_sign.xpm"
 #  include "pixmaps/balsa_gpg_encrypt.xpm"
+#  include "pixmaps/balsa_gpg_recheck.xpm"
 #  include "pixmaps/info_lock.xpm"
 #  include "pixmaps/info_lock_good.xpm"
 #  include "pixmaps/info_lock_sigtrust.xpm"
@@ -159,6 +160,7 @@ register_balsa_pixmaps(void)
 #ifdef HAVE_GPGME
 	{ BALSA_PIXMAP_GPG_SIGN,            balsa_gpg_sign_xpm},
 	{ BALSA_PIXMAP_GPG_ENCRYPT,         balsa_gpg_encrypt_xpm},
+	{ BALSA_PIXMAP_GPG_RECHECK,         balsa_gpg_recheck_xpm},
 #endif
 
 	/* Menu icons */

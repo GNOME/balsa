@@ -1621,6 +1621,11 @@ config_views_load_with_prefix(const gchar * prefix, gboolean compat)
 		tmp = gnome_config_get_bool_with_default("Open", &def);
                 if (!def)
 		    view->open = tmp;
+#ifdef HAVE_GPGME
+		tmp = gnome_config_get_int_with_default("CryptoMode", &def);
+                if (!def)
+		    view->gpg_chk_mode = tmp;
+#endif
             }
             gnome_config_pop_prefix();
             g_free(url);
@@ -1684,6 +1689,10 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 	gnome_config_set_bool("Exposed",    view->exposed);
     if (view->open           != libbalsa_mailbox_get_open(NULL))
 	gnome_config_set_bool("Open",	    view->open);
+#ifdef HAVE_GPGME
+    if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))
+	gnome_config_set_int("CryptoMode",  view->gpg_chk_mode);
+#endif
 
     gnome_config_pop_prefix();
 }

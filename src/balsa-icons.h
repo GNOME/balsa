@@ -91,6 +91,7 @@
 #ifdef HAVE_GPGME
 #  define BALSA_PIXMAP_GPG_SIGN                 "balsa_gpg_sign"
 #  define BALSA_PIXMAP_GPG_ENCRYPT              "balsa_gpg_encrypt"
+#  define BALSA_PIXMAP_GPG_RECHECK              "balsa_gpg_recheck"
 #  define BALSA_PIXMAP_INFO_SIGN                "balsa_info_sign"
 #  define BALSA_PIXMAP_INFO_SIGN_GOOD           "balsa_info_sign_good"
 #  define BALSA_PIXMAP_INFO_SIGN_NOTRUST        "balsa_info_sign_trust"

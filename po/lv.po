@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2003-01-21 11:01+0100\n"
-"PO-Revision-Date: 2003-01-21 15:59+0200\n"
+"POT-Creation-Date: 2003-01-22 11:01+0100\n"
+"PO-Revision-Date: 2003-01-22 14:50+0200\n"
 "Last-Translator: Artis Trops <hornet@navigator.lv>\n"
 "Language-Team: Latvian <ll10nt@os.lv>\n"
 "MIME-Version: 1.0\n"
@@ -1550,8 +1550,7 @@ msgid "Enable _TLS"
 msgstr "Aktivizēt _TLS"
 
 #: src/address-book-config.c:553
-#: src/folder-conf.c:183
-#: src/folder-conf.c:472
+#: src/folder-conf.c:91
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Kļūda parādot %s: %s\n"
@@ -2357,72 +2356,72 @@ msgstr "_Lejup"
 msgid "The filters dialog is opened, close it before you can run filters on any mailbox"
 msgstr "Filtru dialogs ir atvērts, aizveriet to pirms varat palaist filtrus uz jebkuras no pastkastītēm"
 
-#: src/folder-conf.c:237
+#: src/folder-conf.c:261
 msgid "Remote IMAP folder"
 msgstr "Attālināta IMAP mape"
 
-#: src/folder-conf.c:240
-#: src/folder-conf.c:626
+#: src/folder-conf.c:264
+#: src/folder-conf.c:671
 #: src/mailbox-conf.c:446
 msgid "_Update"
 msgstr "_Atjaunināt"
 
-#: src/folder-conf.c:240
-#: src/folder-conf.c:626
+#: src/folder-conf.c:264
+#: src/folder-conf.c:671
 msgid "_Create"
 msgstr "_Izveidot"
 
-#: src/folder-conf.c:255
+#: src/folder-conf.c:279
 msgid "Remote IMAP folder set"
 msgstr "Attālinātas IMAP mapes iestatīšana"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:262
+#: src/folder-conf.c:286
 msgid "Descriptive _Name:"
 msgstr "Aprakstošais _Nosaukums:"
 
 #. pop server
-#: src/folder-conf.c:268
+#: src/folder-conf.c:292
 #: src/mailbox-conf.c:895
 #: src/mailbox-conf.c:983
 msgid "_Server:"
 msgstr "_Serveris:"
 
 #. username
-#: src/folder-conf.c:274
+#: src/folder-conf.c:298
 #: src/mailbox-conf.c:902
 msgid "Use_r name:"
 msgstr "Lietotāj_a vārds:"
 
-#: src/folder-conf.c:280
+#: src/folder-conf.c:304
 msgid "_Remember password"
 msgstr "_Atcerēties paroli"
 
-#: src/folder-conf.c:285
+#: src/folder-conf.c:309
 msgid "_Password:"
 msgstr "_Parole"
 
-#: src/folder-conf.c:290
+#: src/folder-conf.c:314
 msgid "Subscribed _folders only"
 msgstr "Pierakstītās _mapes tikai"
 
-#: src/folder-conf.c:292
+#: src/folder-conf.c:316
 msgid "_Always show INBOX"
 msgstr "_Vienmēr parādīt INBOX"
 
-#: src/folder-conf.c:295
+#: src/folder-conf.c:319
 msgid "_Prefix"
 msgstr "_Priedēklis"
 
-#: src/folder-conf.c:301
+#: src/folder-conf.c:325
 msgid "Use SS_L (IMAPS)"
 msgstr "Lietot SS_L (IMAPS)"
 
-#: src/folder-conf.c:420
+#: src/folder-conf.c:457
 msgid "Select parent folder"
 msgstr "Izvēlieties senča mapi"
 
-#: src/folder-conf.c:497
+#: src/folder-conf.c:526
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2437,68 +2436,71 @@ msgstr ""
 "INBOX un tās apakšmapes paliks.\n"
 "Ko jūs vēlētos darīt?"
 
-#: src/folder-conf.c:504
+#: src/folder-conf.c:532
 msgid "Question"
 msgstr "Jautājums"
 
-#: src/folder-conf.c:507
+#: src/folder-conf.c:537
 msgid "Rename INBOX"
 msgstr "Pārsaukt INBOX"
 
-#: src/folder-conf.c:508
+#: src/folder-conf.c:539
 #: src/toolbar-factory.c:132
 msgid "Cancel"
 msgstr "Atsaukt"
 
-#: src/folder-conf.c:599
+#: src/folder-conf.c:644
 msgid "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr "IMAP mape, kas nav pastkastīte\n"
 "nav rekvizītu, kas var tikt mainīti."
 
-#: src/folder-conf.c:623
+#: src/folder-conf.c:668
 msgid "Remote IMAP subfolder"
 msgstr "Pārsaukt IMAP apakšmapi"
 
-#: src/folder-conf.c:635
+#: src/folder-conf.c:690
 msgid "Rename or move subfolder"
 msgstr "Pārsaukt vai pārvietot apakšmapi"
 
-#: src/folder-conf.c:636
+#: src/folder-conf.c:691
 msgid "Create subfolder"
 msgstr "Izveidot apakšmapi"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:643
+#: src/folder-conf.c:698
 msgid "_Folder name:"
 msgstr "_Mapes nosaukums:"
 
-#: src/folder-conf.c:649
+#: src/folder-conf.c:704
 msgid "_Subfolder of:"
 msgstr "_Apakšmape:"
 
-#: src/folder-conf.c:654
-msgid "Browse..."
-msgstr "Lūkoties..."
+#: src/folder-conf.c:709
+msgid "_Browse..."
+msgstr "_Lūkoties..."
 
-#: src/folder-conf.c:662
+#. For the `Properties' dialog, add an identity widget; as of now,
+#. * we can't associate an identity with a new subfolder, so we don't
+#. * make the widget.
+#: src/folder-conf.c:721
 #: src/mailbox-conf.c:872
 #: src/mailbox-conf.c:1037
 msgid "_Identity:"
 msgstr "_Identitāte:"
 
-#: src/folder-conf.c:690
+#: src/folder-conf.c:751
 msgid "This folder is not stored in configuration.I do not yet know how to remove it from remote server."
 msgstr "Šī mape nav noglabāta konfigurācijā. Es vēl nezinu, kā to izņemt no attālinātā servera."
 
-#: src/folder-conf.c:700
+#: src/folder-conf.c:761
 #, c-format
 msgid "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr "Šis izņems mapi \"%s\" no saraksta.\n"
 "Jūs vēlāk variet lietot \"Jauna IMAP Mape\", lai pievienotu šo mapi atkal.\n"
 
-#: src/folder-conf.c:705
+#: src/folder-conf.c:766
 msgid "Confirm"
 msgstr "Apstiprināt"
 

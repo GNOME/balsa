@@ -417,11 +417,11 @@ mailbox_open_ref (Mailbox * mailbox)
     case MAILBOX_MBOX:
     case MAILBOX_MH:
     case MAILBOX_MAILDIR:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, M_NOSORT, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_LOCAL (mailbox)->path, 0, NULL);
       break;
 
     case MAILBOX_POP3:
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, M_NOSORT, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (MAILBOX_POP3 (mailbox)->server, 0, NULL);
       break;
 
     case MAILBOX_IMAP:
@@ -432,7 +432,7 @@ mailbox_open_ref (Mailbox * mailbox)
       g_string_append_c (tmp, '}');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
       set_imap_username (mailbox);
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, M_NOSORT, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, 0, NULL);
       g_string_free (tmp, TRUE);
       break;
 
@@ -452,9 +452,10 @@ mailbox_open_ref (Mailbox * mailbox)
       if (balsa_app.debug)
 	g_print (_ ("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 
-      /* fixme */
+      /* FIXME */
+/*
       mailbox_sort(mailbox, MAILBOX_SORT_DATE);
-
+*/
       UNLOCK_MAILBOX ();
       return TRUE;
     }

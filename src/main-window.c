@@ -55,7 +55,6 @@ static void show_about_box (void);
 
 /* callbacks */
 static void check_new_messages_cb (GtkWidget *, gpointer data);
-static void check_pop3_cb (GtkWidget * widget, gpointer data);
 
 static void new_message_cb (GtkWidget * widget, gpointer data);
 static void replyto_message_cb (GtkWidget * widget, gpointer data);
@@ -184,15 +183,6 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 
   w = gtk_menu_item_new ();
   gtk_menu_append (GTK_MENU (menu), w);
-
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Check POP3"));
-  gtk_menu_append (GTK_MENU (menu), w);
-  gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) check_pop3_cb, NULL);
-
-  w = gtk_menu_item_new ();
-  gtk_widget_show (w);
-  gtk_menu_append (GTK_MENU (menu), w);
-
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("Exit"));
   gtk_widget_add_accelerator (w, "activate", accel, 'Q', 0, GTK_ACCEL_VISIBLE);
@@ -458,11 +448,6 @@ check_new_messages_cb (GtkWidget * widget, gpointer data)
     return;
 
   mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
-}
-
-static void
-check_pop3_cb (GtkWidget * widget, gpointer data)
-{
   check_all_pop3_hosts (balsa_app.inbox);
 }
 

@@ -655,24 +655,45 @@ imap_mbox_scan(ImapMboxHandle *handle, const char*what, const char*str)
   return rc;
 }
 
+/* imap_mbox_unselect()'s main purpose is to stop the notification
+   signals from being triggered. On the other hand, all the precached
+   data is lost on UNSELECT so the gain from using UNSELECT can be
+   questioned.
+*/
+ImapResponse
+imap_mbox_unselect(ImapMboxHandle *h)
+{
+  ImapResponse rc;
+  if(imap_mbox_handle_can_do(h, IMCAP_UNSELECT)) {
+    rc = imap_cmd_exec(h, "UNSELECT");  
+    if(rc == IMR_OK)
+      h->state = IMHS_AUTHENTICATED;
+  } else 
+    rc = IMR_OK;
+  return rc;
+}
+
 /*
  * THREAD Command
  * see draft-ietf-imapext-thread-12.txt
  */
 ImapResponse
-imap_mbox_thread(ImapMboxHandle *h, const char *how)
+imap_mbox_thread(ImapMboxHandle *h, const char *how, const char *filter)
 {
-  const gchar *filter = imap_mbox_get_filter(h);
-  gchar * cmd = g_strdup_printf("THREAD %s UTF-8 %s", how, filter);
-  ImapResponse rc = imap_cmd_exec(h, cmd);  
-  g_free(cmd);
-  return rc;
+  if(imap_mbox_handle_can_do(h, IMCAP_THREAD_REFERENCES)) {
+    gchar * cmd = g_strdup_printf("THREAD %s UTF-8 %s", how, filter);
+    ImapResponse rc = imap_cmd_exec(h, cmd);  
+    g_free(cmd);
+    return rc;
+  } else
+    return IMR_NO;
 }
 
 
-ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, const char *query, 
-                                  void (*cb)(unsigned uid, void *),
-                                  void *cb_data)
+ImapResponse
+imap_mbox_uid_search(ImapMboxHandle *handle, const char *query, 
+                     void (*cb)(unsigned uid, void *),
+                     void *cb_data)
 {
   /* FIXME: Implement me! */
   return IMR_BAD;
@@ -684,6 +705,23 @@ sort_coealesce_func(int i, unsigned msgno[])
   return msgno[i];
 }
 
+static const char*
+sort_code_to_string(ImapSortKey key)
+{
+  const char *keystr;
+  switch(key) {
+  case IMSO_ARRIVAL: keystr = "Arrival"; break;
+  case IMSO_CC:      keystr = "Cc";      break;
+  case IMSO_DATE:    keystr = "Date";    break;
+  case IMSO_FROM:    keystr = "From";    break;
+  case IMSO_SIZE:    keystr = "Size";    break;
+  case IMSO_SUBJECT: keystr = "Subject"; break;
+  default:
+  case IMSO_TO:      keystr = "To";      break;
+  }
+  return keystr;
+}
+
 ImapResponse
 imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
                 int ascending, int *msgno, unsigned cnt)
@@ -693,18 +731,11 @@ imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
   char *seq, *cmd;
   unsigned i;
 
-  printf("xxx: %s\n", __func__);
-  switch(key) {
-  case IMSO_ARRIVAL: keystr = "ARRIVAL"; break;
-  case IMSO_CC:      keystr = "CC";      break;
-  case IMSO_DATE:    keystr = "DATE";    break;
-  case IMSO_FROM:    keystr = "FROM";    break;
-  case IMSO_SIZE:    keystr = "SIZE";    break;
-  case IMSO_SUBJECT: keystr = "SUBJECT"; break;
-  default:
-  case IMSO_TO:      keystr = "TO";      break;
-  }
-  seq = coalesce_seq_range(0,cnt-1, (CoalesceFunc)sort_coealesce_func, msgno);
+  if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
+    return IMR_NO;
+
+  keystr = sort_code_to_string(key);
+  seq = coalesce_seq_range(0, cnt-1,(CoalesceFunc)sort_coealesce_func, msgno);
   cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", 
                        ascending ? "" : "REVERSE ",
                        keystr, seq);
@@ -718,6 +749,40 @@ imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
 
   for(i=0; i<cnt; i++)
     msgno[i] = handle->mbox_view.arr[i];
+
+  return rc;
+}
+
+ImapResponse
+imap_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
+                 char *filter)
+{
+  ImapResponse rc;
+  const char *keystr;
+  char *cmd;
+  unsigned i;
+
+  if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
+    return IMR_NO;
+
+  keystr = sort_code_to_string(key);
+  cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", 
+                       ascending ? "" : "REVERSE ",
+                       keystr, filter);
+
+  handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
+                                  * we should not be doing such 
+                                  * low level manipulations here */
+  rc = imap_cmd_exec(handle, cmd);
+  g_free(cmd);
+
+    if(handle->thread_root)
+      g_node_destroy(handle->thread_root);
+    handle->thread_root = g_node_new(NULL);
+
+  for(i=0; i<handle->mbox_view.entries; i++)
+    g_node_append_data(handle->thread_root,
+                       GUINT_TO_POINTER(handle->mbox_view.arr[i]));
 
   return rc;
 }

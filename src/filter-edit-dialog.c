@@ -85,7 +85,7 @@ GtkWidget * fe_condition_delete_button,* fe_condition_edit_button;
 /* ******************************** */
 
 option_list fe_search_type[] = {
-    {N_("Simple"), CONDITION_SIMPLE, NULL},
+    {N_("Simple"), CONDITION_STRING, NULL},
     {N_("Regular Expression"), CONDITION_REGEX, NULL},
     {N_("Date interval"),CONDITION_DATE,NULL},
     {N_("Flag condition"),CONDITION_FLAG,NULL}
@@ -472,7 +472,7 @@ filters_edit_dialog(void)
     GtkWidget *hbox;
     GtkWidget *piece;
     LibBalsaFilter * cpfil,* fil;
-    GSList * cnds,* filter_list;
+    GSList * filter_list;
     GtkTreeModel *model;
     GtkTreeIter iter;
 
@@ -538,7 +538,7 @@ filters_edit_dialog(void)
 	cpfil->flags=fil->flags;
 	if (fil->sound) cpfil->sound=g_strdup(fil->sound);
 	if (fil->popup_text) cpfil->popup_text=g_strdup(fil->popup_text);
-	cpfil->conditions_op=fil->conditions_op;
+	/* FIXME: cpfil->conditions_op=fil->conditions_op; */
 	cpfil->flags=fil->flags;
 
 	/* We have to unset the "compiled" flag, because we don't copy
@@ -552,6 +552,7 @@ filters_edit_dialog(void)
 
 	FILTER_CLRFLAG(cpfil,FILTER_COMPILED);
 	/* Copy conditions */
+#if FIXME
       	for (cnds=fil->conditions; cnds; cnds=g_slist_next(cnds)) {
             LibBalsaCondition *c = (LibBalsaCondition*)cnds->data;
 	    cpfil->conditions = 
@@ -564,7 +565,7 @@ filters_edit_dialog(void)
 		fe_add_new_user_header(c->user_header);
         }
 	cpfil->conditions=g_slist_reverse(cpfil->conditions);
-
+#endif
 	cpfil->action=fil->action;
 	if (fil->action_string) 
             cpfil->action_string=g_strdup(fil->action_string);	

@@ -40,7 +40,8 @@ typedef enum {
 
 typedef char ImapCmdTag[7]; /* Imap command tag */
 
-/* Capabilities recognized by the library. Add new ones alphabetically. */
+/* Capabilities recognized by the library. Add new ones alphabetically
+ * and modify ir_capability_data() accordingly. */
 typedef enum
 {
   IMCAP_IMAP4 = 0,
@@ -53,10 +54,12 @@ typedef enum
   IMCAP_AUTH_ANON, 	        /*           AUTH=ANONYMOUS */
   IMCAP_STARTTLS,		/* RFC 2595: STARTTLS */
   IMCAP_LOGINDISABLED,		/*           LOGINDISABLED */
-  IMCAP_SORT,                   /* SORT and thread described at: */
+  IMCAP_SORT,                   /* SORT and THREAD described at: */
   /* http://www.ietf.org/internet-drafts/draft-ietf-imapext-sort-13.txt */
   IMCAP_THREAD_ORDEREDSUBJECT,
   IMCAP_THREAD_REFERENCES,
+  IMCAP_UNSELECT,               /* FIXME: RFC? */
+  IMCAP_SCAN,                   /* FIXME: RFC? */
   IMCAP_MAX
 } ImapCapability;
 

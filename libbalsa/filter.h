@@ -32,6 +32,7 @@
 
 #include <glib.h>
 
+#include <time.h>
 #include "libbalsa.h"
 
 typedef struct _LibBalsaConditionRegex LibBalsaConditionRegex;
@@ -39,7 +40,7 @@ typedef struct _LibBalsaConditionRegex LibBalsaConditionRegex;
 /* Conditions definition :
  * a condition is the basic component of a filter
  * It can be of type (mimic the old filter types) :
- * - CONDITION_SIMPLE : matches when a string is contained in 
+ * - CONDITION_STRING : matches when a string is contained in 
  *   one of the specified fields
  * - CONDITION_REGEX : matches when one of the reg exs matches on one
  *   of the specified fields
@@ -47,38 +48,85 @@ typedef struct _LibBalsaConditionRegex LibBalsaConditionRegex;
  *   with parameters (FIXME : what are they???, see proposition for filter command) returns 1
  *
  * A condition has attributes :
- * - match_fields : a gint specifying on which fields to apply the condition
- * - condition_not : a gboolean to negate (logical not) the condition
+ * - fields : a gint specifying on which fields to apply the condition
+ * - negate : a gboolean to negate (logical not) the condition
  */
 
 /* condition match types */
 
 typedef enum {
     CONDITION_NONE,
-    CONDITION_SIMPLE,
+    CONDITION_STRING, /*  */
     CONDITION_REGEX,
     CONDITION_DATE,
-    CONDITION_FLAG
+    CONDITION_FLAG,
+    CONDITION_AND, /* Condition has a list of subconditions and
+                    * matches if all the subconditions match. */
+    CONDITION_OR   /* Condition has a list of subconditions and
+                    * matches if any subcondition matches. */
 } ConditionMatchType;
 
-typedef struct _LibBalsaCondition {
+struct _LibBalsaCondition {
+    gboolean negate; /* negate the result of the condition. */
     ConditionMatchType type;
-    gboolean condition_not;
 
     /* The match type fields */
     union _match {
-	gchar * string;	           /* for CONDITION_SIMPLE,CONDITION_DATE */
-	GSList * regexs;           /* for CONDITION_REGEX */
+        /* CONDITION_STRING */
+        struct {
+            unsigned fields;     /* Contains the header list for
+                                  * that this search should look in. */
+            gchar * string;	 
+            gchar * user_header; /* This is !=NULL and gives the name
+                                  * of the user header against which
+                                  * we make the match if fields
+                                  * includes
+                                  * CONDITION_MATCH_US_HEAD. */
+        } string;
+        /* CONDITION_REGEX */
+        struct {
+            unsigned fields;     /* Contains the header list for
+                                  * that this search should look in. */
+            /* GSList * regexs; */
+        } regex;
+        /* CONDITION_DATE */
 	struct {
 	    time_t date_low,date_high; /* for CONDITION_DATE            */
                                        /* (date_high==0=>no high limit) */
-	} interval;
+	} date;
+        /* CONDITION_FLAG */
 	LibBalsaMessageFlag flags;
+
+        /* CONDITION_AND and CONDITION_OR */
+        struct {
+            LibBalsaCondition *left, *right;
+        } andor;
     } match;
-    guint match_fields;         /* Contains the flag mask for CONDITION_FLAG type */
-    gchar * user_header;        /* This is !=NULL and gives the name of the user
-				   header against which we make the match */
-} LibBalsaCondition;
+};
+
+LibBalsaCondition* libbalsa_condition_new_from_string(gchar **string);
+gchar*             libbalsa_condition_to_string(LibBalsaCondition *cond);
+
+LibBalsaCondition* libbalsa_condition_new_flag_enum(gboolean negated,
+                                                    LibBalsaMessageFlag flgs);
+
+LibBalsaCondition* libbalsa_condition_new_bool_ptr(gboolean negated,
+                                                   ConditionMatchType cmt,
+                                                   LibBalsaCondition *left,
+                                                   LibBalsaCondition *right);
+LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
+void               libbalsa_condition_free (LibBalsaCondition*); 
+
+gboolean           match_condition(LibBalsaCondition* cond,
+                                   LibBalsaMessage * message,
+                                   gboolean mbox_locked);
+
+
+typedef enum {
+    FILTER_NOOP,
+    FILTER_OP_OR,
+    FILTER_OP_AND             /* Must be the last one */
+} FilterOpType;
 
 /* Filter definition :
  * a filter is defined by 
@@ -96,12 +144,6 @@ typedef enum {
     FILTER_RUN,
     FILTER_TRASH              /* Must be the last one */
 } FilterActionType;
-
-typedef enum {
-    FILTER_NOOP,
-    FILTER_OP_OR,
-    FILTER_OP_AND             /* Must be the last one */
-} FilterOpType;
 
 /*
  * filter error codes
@@ -123,10 +165,10 @@ extern gint filter_errno;
 typedef struct _LibBalsaFilter {
 
     gchar *name;
-    FilterOpType conditions_op;
     gint flags;
 
-    GSList * conditions;
+    LibBalsaCondition *condition; /* A codition, possibly a composite
+                                   * one. */
 
     /* The notification fields : NULL signifies no notification */
     gchar * sound;
@@ -174,14 +216,14 @@ const gchar* libbalsa_condition_regex_get(LibBalsaConditionRegex * reg);
 void libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
                                       LibBalsaConditionRegex *new_reg);
 
-gint match_condition(LibBalsaCondition* cond,LibBalsaMessage* message,
-		     gboolean mbox_locked);
+/** libbalsa_condition_matches() checks whether given message matches the 
+ * condition. */
+gboolean libbalsa_condition_matches(LibBalsaCondition* cond,
+                                    LibBalsaMessage* message,
+                                    gboolean mbox_locked);
 
-gint match_conditions(FilterOpType op,GSList* cond,LibBalsaMessage* message,
-		      gboolean mbox_locked);
 
-gchar* libbalsa_filter_build_imap_query(FilterOpType, GSList* conditions,
-					gboolean only_recent);
+gchar* libbalsa_condition_build_imap_query(LibBalsaCondition *condition);
 
 /* Filtering functions */
 /* FIXME : perhaps I should try to use multithreading -> but we must
@@ -219,8 +261,8 @@ void libbalsa_filter_sanitize(GSList * filter_list);
 
 gboolean libbalsa_filter_apply(GSList * filter_list);
 
-/* libalsa_extract_new_messages : returns a sublist of the messages list containing all
-   "new" messages, ie just retrieved mails
+/* libalsa_extract_new_messages : returns a sublist of the messages
+   list containing all "new" messages, ie just retrieved mails
 */
 
 GList * libbalsa_extract_new_messages(GList * messages);

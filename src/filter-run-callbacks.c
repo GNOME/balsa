@@ -207,7 +207,7 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
                             "mailbox (that causes recursion)."),
                           fil->name, p->mbox->name);
 
-    if (!libbalsa_mailbox_can_match(p->mbox, fil->conditions))
+    if (!libbalsa_mailbox_can_match(p->mbox, fil->condition))
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("The filter \"%s\" is not compatible with "
 			    "the mailbox type of \"%s\".\n"

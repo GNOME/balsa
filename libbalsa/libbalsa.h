@@ -29,6 +29,7 @@ typedef struct _LibBalsaMessage LibBalsaMessage;
 typedef struct _LibBalsaMessageHeaders LibBalsaMessageHeaders;
 typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
 typedef struct _LibBalsaServer LibBalsaServer;
+typedef struct _LibBalsaCondition LibBalsaCondition;
 
 #include "address.h"
 #include "message.h"

@@ -1,3 +1,25 @@
+2004-01-01  Pawel Salek
+
+	* libbalsa/filter-file.c: remove old LibBalsaCondition config IO.
+	* libbalsa/filter-funcs.c: more compact string representation of
+	match keys. 
+	* libbalsa/filter-funcs.h: renamed filed adjustments.
+	* libbalsa/filter.[hc]: just compile the code.
+	* libbalsa/imap-server.c: reuse connections better(?).
+	* libbalsa/libbalsa.h: add LibBalsaCondition typedef.
+	* libbalsa/mailbox.[ch]: make libbalsa_mailbox_set_view_filter()
+	work.
+	* libbalsa/mailbox_imap.[hc]: view-related changes.
+	* libbalsa/imap/imap-commands.[hc]: add imap_mbox_unselect() and
+	imap_sort_filter(),
+	* libbalsa/imap/imap-handle.[hc]: expand the IMAP extension list.
+	* src/balsa-index.[hc]: view-related changes.
+	* src/filter-edit-{callbacks,dialog}.c:
+	* src/filter-run-callbacks.c: LibBalsaCondition related changes.
+	* src/main-window.c: filter-related changes.
+	* src/pref-manager.c: remove hide-deleted from here.
+	* src/save-restore.c: ditto.
+	
 2004-01-01  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/html.c: 

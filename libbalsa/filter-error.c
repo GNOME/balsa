@@ -28,7 +28,7 @@
 #include "config.h"
 
 #include "filter.h"
-#include <gnome.h>
+#include <libgnome/gnome-i18n.h> 
 
 /*
  * Error reporting use this global gint. All function that positions it will destroy previous error, so

@@ -62,7 +62,7 @@ gboolean libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox,
                                          gboolean subscribe);
 
 GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
-						 int op, GSList * conditions,
+						 LibBalsaCondition *condition,
 						 gboolean only_recent,
 						 gboolean * err);
 

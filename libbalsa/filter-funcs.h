@@ -46,11 +46,11 @@
 
 /* match_fields macros */
 #define CONDITION_SETMATCH(x, y) \
-          ((((LibBalsaCondition*)(x))->match_fields) |= (y))
+          ((((LibBalsaCondition*)(x))->match.string.fields) |= (y))
 #define CONDITION_CLRMATCH(x, y) \
-          ((((LibBalsaCondition*)(x))->match_fields) &= ~(y))
+          ((((LibBalsaCondition*)(x))->match.string.fields) &= ~(y))
 #define CONDITION_CHKMATCH(x, y) \
-          ((((LibBalsaCondition*)(x))->match_fields) & (y))
+          ((((LibBalsaCondition*)(x))->match.string.fields) & (y))
 
 /* Filter defintions */
 /* filter flags */
@@ -69,15 +69,14 @@
 
 LibBalsaCondition* libbalsa_condition_new(void);
 
-void libbalsa_condition_free(LibBalsaCondition*); 
 void libbalsa_conditions_free(GSList * conditions);
 
 LibBalsaConditionRegex* libbalsa_condition_regex_new(void);
-LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
 void libbalsa_condition_regex_free(LibBalsaConditionRegex *, gpointer);
 void regexs_free(GSList *);
 void libbalsa_condition_compile_regexs(LibBalsaCondition* cond);
-gboolean libbalsa_conditions_compare(GSList * cnds1,GSList *cnds2);
+gboolean libbalsa_condition_compare(LibBalsaCondition *c1,
+                                    LibBalsaCondition *c2);
 
 /* Filters */
 /* Free a filter

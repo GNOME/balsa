@@ -1,9 +1,8 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
-LibBalsaImapServer is a class for managing connections to one IMAP server. Idle
-connections are disconnected after a timeout, or when the user switches to
-offline mode.
-
-How to handle responses related to a mailbox, have to be investigated.
+  LibBalsaImapServer is a class for managing connections to one IMAP
+  server. Idle connections are disconnected after a timeout, or when
+  the user switches to offline mode.
 */
 #include <string.h>
 #include <stdlib.h>
@@ -460,13 +459,17 @@ LibBalsaImapServer* libbalsa_imap_server_new_from_config(void)
  * libbalsa_imap_server_get_handle:
  * @server: A #LibBalsaImapServer
  *
- * Returns a connected handle to the IMAP server, if needed it connects.
- * If there is no password set, the user is asked to supply one.
+ * Returns a connected handle to the IMAP server, if needed it
+ * connects.  If there is no password set, the user is asked to supply
+ * one.  Sometimes (like for LIST, SUBSCRIBE, UNSUBSCRIBE, CREATE,
+ * DELETE, APPEND commands) it is sufficient to provide any open
+ * handle, also one in a SELECTed state.
  *
- * Return value: a handle to the server, or %NULL when there are no free
- * connections.
+ * Return value: a handle to the server, or %NULL when there are no
+ * free connections.
  **/
-ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
+ImapMboxHandle*
+libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
     struct handle_info *info = NULL;
@@ -503,17 +506,17 @@ ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
 	}
 	 */
     }
-    if (info && imap_mbox_is_disconnected(info->handle)) {
-	rc=imap_mbox_handle_connect(info->handle, server->host,
-				    server->user, server->passwd);
-	if(rc != IMAP_SUCCESS) {
-	    lb_imap_server_info_free(info);
-	    g_mutex_unlock(imap_server->lock);
-	    return NULL;
-	}
-    }
-    /* add handle to used list */
     if (info) {
+        if(imap_mbox_is_disconnected(info->handle)) {
+            rc=imap_mbox_handle_connect(info->handle, server->host,
+                                        server->user, server->passwd);
+            if(rc != IMAP_SUCCESS) {
+                lb_imap_server_info_free(info);
+                g_mutex_unlock(imap_server->lock);
+                return NULL;
+            }
+        }
+        /* add handle to used list */
 	imap_server->used_handles = g_list_prepend(imap_server->used_handles,
 						   info);
 	imap_server->used_connections++;
@@ -528,15 +531,18 @@ ImapMboxHandle* libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server)
  * @server: A #LibBalsaImapServer
  * @user: user for handle
  *
- * Returns a connected handle to the IMAP server, if needed it connects.
- * If there is no password set, the user is asked to supply one.
- * This function first tries to find a handle last used by @user, then a handle
- * without a user and finaly the least recently used.
+ * Returns a connected handle to the IMAP server, if needed it
+ * connects.  If there is no password set, the user is asked to supply
+ * one.  This function first tries to find a handle last used by
+ * @user, then a handle without a user and finally the least recently
+ * used.
  *
  * Return value: a handle to the server, or %NULL when there are no free
  * connections.
  **/
-ImapMboxHandle* libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server, gpointer user)
+ImapMboxHandle*
+libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
+                                          gpointer user)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
     struct handle_info *info = NULL;

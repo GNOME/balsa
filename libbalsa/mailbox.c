@@ -57,8 +57,8 @@ static void libbalsa_mailbox_real_release_message (LibBalsaMailbox * mailbox,
 						   LibBalsaMessage * message);
 static void libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox,
                                        GArray *sort_array);
-static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
-						GSList * conditions);
+static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
+						LibBalsaCondition *condition);
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
@@ -501,14 +501,14 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 gboolean
 libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
 			       LibBalsaMessage * message,
-			       int op, GSList * conditions)
+			       LibBalsaCondition *condition)
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match(mailbox,
-							      message, op,
-							      conditions);
+							      message,
+							      condition);
 }
 
 /* libbalsa_mailbox_match:
@@ -525,21 +525,22 @@ libbalsa_mailbox_match(LibBalsaMailbox * mailbox, GSList * filters_list)
 						       filters_list);
 }
 
-gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox* mailbox,
-					 GSList * conditions)
+gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
+					 LibBalsaCondition *condition)
 {
     /* By default : all filters is OK */
     return TRUE;
 }
 
 gboolean
-libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox, GSList * conditions)
+libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
+                           LibBalsaCondition *condition)
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->can_match(mailbox,
-							  conditions);
+							  condition);
 }
 
 /* Helper function to run the "on reception" filters on a mailbox */
@@ -918,6 +919,15 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     lbm_threads_leave(unlock);
 }
 
+gboolean
+libbalsa_mailbox_find(LibBalsaMailbox *mailbox, GtkTreeIter *pos,
+                      gboolean search_forward,
+                      LibBalsaCondition *condition,
+                      GList *exclude)
+{
+    /* finds first message matching the condition. */
+    return FALSE;
+}
 /* Find a message in the tree-model, by its message number. */
 gboolean
 libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
@@ -1201,15 +1211,19 @@ libbalsa_mailbox_change_message_flags(LibBalsaMailbox * mailbox,
 }
 
 /*
- * Mailbox views
+ * Mailbox views.
+ *
+ * NOTE: call to mailbox_filter_view MUST be followed by a call to
+ * libbalsa_mailbox_set_threading that will actually create the
+ * message tree.
  */
 void
-libbalsa_mailbox_filter_view(LibBalsaMailbox *mailbox,...)
+libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
+                                 LibBalsaCondition *cond)
 {
-    va_list alist;
-    g_warning("Implement me!");
-    va_start(alist, mailbox);
-    va_end(alist);
+    if(mailbox->view_filter)
+        libbalsa_condition_free(mailbox->view_filter);
+    mailbox->view_filter = cond;
 }
 
 static void mbox_sort_helper(LibBalsaMailbox * mbox, GNode * parent);
@@ -1587,7 +1601,6 @@ mbox_model_iter_next(GtkTreeModel      *tree_model,
 		     GtkTreeIter       *iter)
 {
     GNode *node;
-
     g_return_val_if_fail(VALID_ITER(iter, tree_model), FALSE);
 
     node = iter->user_data;

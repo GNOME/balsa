@@ -24,10 +24,10 @@
 #define __LIBBALSA_MAILBOX_H__
 
 #include <gdk/gdk.h>
+#include <gmime/gmime.h>
 
 #include "libbalsa.h"
-
-#include <gmime/gmime.h>
+#include "filter.h"
 
 #define LIBBALSA_TYPE_MAILBOX \
     (libbalsa_mailbox_get_type())
@@ -164,6 +164,9 @@ struct _LibBalsaMailbox {
 		     * it is often different from g_list_count(messages) */  
     glong new_messages;
     GNode *msg_tree; /* the possibly filtered tree of messages */
+    LibBalsaCondition *view_filter; /* to choose a subset of messages
+                                     * to be displayed, e.g., only
+                                     * undeleted. */
 
     /* info fields */
     gboolean has_unread_messages;
@@ -214,11 +217,11 @@ struct _LibBalsaMailboxClass {
     void (*check) (LibBalsaMailbox * mailbox);
     gboolean (*message_match) (LibBalsaMailbox * mailbox,
 			       LibBalsaMessage * message,
-			       int op, GSList* conditions);
+			       LibBalsaCondition *condition);
     void (*mailbox_match) (LibBalsaMailbox * mailbox,
 			   GSList * filters_list);
     gboolean (*can_match) (LibBalsaMailbox * mailbox,
-			   GSList * conditions);
+			   LibBalsaCondition *condition);
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     gboolean (*sync) (LibBalsaMailbox * mailbox, gboolean expunge);
@@ -318,12 +321,21 @@ gboolean libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox,
    use the SEARCH IMAP command for regex match, so the
    match is done via default filtering funcs->can be slow)
  */
-gboolean libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
-				    GSList * conditions);
-gboolean libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
-					LibBalsaMessage * message,
-					int op, GSList* conditions);
+gboolean libbalsa_mailbox_can_match(LibBalsaMailbox  *mailbox,
+				    LibBalsaCondition *condition);
+gboolean libbalsa_mailbox_message_match(LibBalsaMailbox  *mailbox,
+					LibBalsaMessage  *message,
+					LibBalsaCondition *condition);
 
+/* libbalsa_mailbox_find() looks in mailbox mailbox, starting at
+   position pos, searching forward if search_forward is true, for a
+   first message that matches (op, cond_list) filter, excluding
+   messages in exclude list.
+*/
+gboolean libbalsa_mailbox_find(LibBalsaMailbox *mailbox, GtkTreeIter *pos,
+                               gboolean search_forward,
+                               LibBalsaCondition *condition,
+                               GList *exclude);
 /* Virtual function (this function is different for IMAP
  */
 void libbalsa_mailbox_match(LibBalsaMailbox * mbox, GSList * filter_list );
@@ -363,7 +375,8 @@ void libbalsa_mailbox_messages_status_changed(LibBalsaMailbox * mbox,
 /*
  * Mailbox views-related functions.
  */
-void libbalsa_mailbox_filter_view(LibBalsaMailbox *mailbox,...);
+void libbalsa_mailbox_set_view_filter(LibBalsaMailbox   *mailbox,
+                                      LibBalsaCondition *filter_condition);
 
 /** libbalsa_mailbox_set_threading() uses backend-optimized threading mode
     to produce a tree of messages. The tree is put in msg_tree and used

@@ -82,7 +82,6 @@ typedef struct _PropertyUI {
     GtkWidget *commit_mailbox_auto;
     GtkWidget *commit_mailbox_minutes;
     GtkWidget *delete_immediately;
-    GtkWidget *hide_deleted;
 
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
@@ -521,8 +520,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     g_signal_connect(G_OBJECT(pui->delete_immediately), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
-		     G_CALLBACK(properties_modified_cb), property_box);
 
     g_signal_connect(G_OBJECT(pui->browse_wrap), "toggled",
 		     G_CALLBACK(browse_modified_cb), property_box);
@@ -801,15 +798,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.delete_immediately =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->delete_immediately));
-    {
-        gboolean hide =
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                         (pui->hide_deleted));
-        if (balsa_app.hide_deleted != hide) {
-            balsa_app.hide_deleted = hide;
-            balsa_index_hide_deleted(hide);
-        }
-    }
 
     /* external editor */
     balsa_app.edit_headers = GTK_TOGGLE_BUTTON(pui->edit_headers)->active;
@@ -1062,9 +1050,6 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->delete_immediately),
                                  balsa_app.delete_immediately);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                 (pui->hide_deleted),
-                                 balsa_app.hide_deleted);
 
     gtk_widget_set_sensitive(pui->close_mailbox_minutes,
 			     GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
@@ -2527,9 +2512,6 @@ deleting_messages_group(GtkWidget * page)
     pui->delete_immediately =
         pm_group_add_check(group, _("Delete immediately "
                                     "and irretrievably"));
-    pui->hide_deleted =
-        pm_group_add_check(group, _("Hide deleted messages"));
-
     return group;
 }
 

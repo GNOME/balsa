@@ -67,7 +67,9 @@ ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
 
 /* Experimental/Expansion */
 ImapResult imap_mbox_scan(ImapMboxHandle *r, const char*what, const char*str);
-ImapResult imap_mbox_thread(ImapMboxHandle *h, const char *how);
+ImapResponse imap_mbox_unselect(ImapMboxHandle *h);
+ImapResult imap_mbox_thread(ImapMboxHandle *h, const char *how,
+                            const char *filter);
 
 ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, const char *query, 
                                   void (*cb)(unsigned uid, void *),
@@ -75,5 +77,7 @@ ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, const char *query,
 
 ImapResponse imap_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
                              int ascending, int *msgno, unsigned cnt);
+ImapResponse imap_sort_filter(ImapMboxHandle *handle, ImapSortKey key,
+                              int ascending, char *filter);
 
 #endif /* __IMAP_COMMANDS_H__ */

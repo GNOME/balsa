@@ -100,7 +100,8 @@ extern "C" {
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
     gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
-                                           BalsaMailboxNode * mbnode);
+                                           BalsaMailboxNode * mbnode,
+                                           LibBalsaCondition *view_filter);
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
 
@@ -114,8 +115,8 @@ extern "C" {
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
 
-    void balsa_index_find(BalsaIndex * bindex, FilterOpType op,
-                          GSList * conditions, gboolean previous);
+    void balsa_index_find(BalsaIndex * bindex, LibBalsaCondition *condition,
+                          gboolean previous);
 
 /* balsa index page stuff */
     void balsa_message_reply(GtkWidget * widget, gpointer user_data);
@@ -144,10 +145,6 @@ extern "C" {
     /* Updating index columns when preferences change */
     void balsa_index_refresh_date (BalsaIndex * index);
     void balsa_index_refresh_size (BalsaIndex * index);
-
-    /* Change the display of all indexes when balsa_app.hide_deleted is
-     * changed */
-    void balsa_index_hide_deleted(gboolean hide);
 
     /* Threading Stuff, implementation is in balsa-index-threading.c */
     void balsa_index_threading(BalsaIndex* bindex,

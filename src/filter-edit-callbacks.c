@@ -338,7 +338,7 @@ fe_negate_condition(GtkWidget * widget, gpointer data)
 {
     condition_not = !condition_not;
     switch (get_condition_type()) {
-    case CONDITION_SIMPLE: 
+    case CONDITION_STRING: 
         fe_update_label(fe_type_simple_label, &simple_label); break;
     case CONDITION_REGEX:  
         fe_update_label(fe_type_regex_label,  &regex_label);  break;
@@ -347,6 +347,8 @@ fe_negate_condition(GtkWidget * widget, gpointer data)
     case CONDITION_FLAG:   
         fe_update_label(fe_type_flag_label,   &flags_label);
     case CONDITION_NONE:
+    case CONDITION_AND:
+    case CONDITION_OR:
         /* to avoid warnings */
 	break;
     }
@@ -413,7 +415,6 @@ fe_add_new_user_header(const gchar * str)
 static gboolean
 condition_validate(LibBalsaCondition* new_cnd)
 {
-    LibBalsaConditionRegex * new_reg;
     gchar * str,* p;
     const gchar *c_str;
     gint row, col;
@@ -458,7 +459,7 @@ condition_validate(LibBalsaCondition* new_cnd)
 	    gtk_entry_set_text(GTK_ENTRY(fe_user_header->entry),str);
 	    g_free(str);
 	}
-        else if (new_cnd->match_fields==CONDITION_EMPTY) {
+        else if (new_cnd->match.string.fields==CONDITION_EMPTY) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("You must specify at least one "
                                 "field for matching"));
@@ -466,7 +467,7 @@ condition_validate(LibBalsaCondition* new_cnd)
         }
     }
     switch (new_cnd->type) {
-    case CONDITION_SIMPLE:
+    case CONDITION_STRING:
         c_str = gtk_entry_get_text(GTK_ENTRY(fe_type_simple_entry));
         if (!c_str || c_str[0]=='\0') {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -492,7 +493,7 @@ condition_validate(LibBalsaCondition* new_cnd)
                                   _("Low date is incorrect"));
                 return FALSE;
             }
-            new_cnd->match.interval.date_low=mktime(&date);
+            new_cnd->match.date.date_low=mktime(&date);
         }
         c_str = gtk_entry_get_text(GTK_ENTRY(fe_type_date_high_entry));
         if (c_str && c_str[0]!='\0') {
@@ -503,10 +504,10 @@ condition_validate(LibBalsaCondition* new_cnd)
                                   _("High date is incorrect"));
                 return FALSE;
             }
-            new_cnd->match.interval.date_high=mktime(&date);
+            new_cnd->match.date.date_high=mktime(&date);
         }
-        if (new_cnd->match.interval.date_low >
-            new_cnd->match.interval.date_high) {
+        if (new_cnd->match.date.date_low >
+            new_cnd->match.date.date_high) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("Low date is greater than high date"));
             return FALSE;
@@ -514,23 +515,28 @@ condition_validate(LibBalsaCondition* new_cnd)
         break;
     case CONDITION_FLAG:
     case CONDITION_NONE:
+    case CONDITION_AND:
+    case CONDITION_OR:
         /* to avoid warnings */
 	break;
     }
 
     /* Sanity checks OK, retrieve datas from widgets */
 
-    new_cnd->condition_not=condition_not;
+    new_cnd->negate = condition_not;
     if (CONDITION_CHKMATCH(new_cnd,CONDITION_MATCH_US_HEAD))
-	new_cnd->user_header=g_strdup(gtk_entry_get_text(GTK_ENTRY(fe_user_header->entry)));
+	new_cnd->match.string.user_header =
+            g_strdup(gtk_entry_get_text(GTK_ENTRY(fe_user_header->entry)));
     /* Set the type specific fields of the condition */
     switch (new_cnd->type) {
-    case CONDITION_SIMPLE:
-        new_cnd->match.string =
+    case CONDITION_STRING:
+        new_cnd->match.string.string =
             g_strdup(gtk_entry_get_text(GTK_ENTRY(fe_type_simple_entry)));
         break;
 
     case CONDITION_REGEX:
+#if 0
+        FIXME;
         do {
             gchar* str;
             gtk_tree_model_get(model, &iter, 0, &str, -1);
@@ -538,8 +544,8 @@ condition_validate(LibBalsaCondition* new_cnd)
             libbalsa_condition_regex_set(new_reg, str);
             libbalsa_condition_prepend_regex(new_cnd, new_reg);
         } while (gtk_tree_model_iter_next(model, &iter));
+#endif
         break;
-
     case CONDITION_DATE:
         break;
 
@@ -551,6 +557,8 @@ condition_validate(LibBalsaCondition* new_cnd)
                     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_type_flag_buttons[row*2+col])) ? 1 << (row*2+col+1): 0;
 
     case CONDITION_NONE:
+    case CONDITION_AND: /*FIXME: verify this! */
+    case CONDITION_OR:
         /* To avoid warnings :) */
 	break;
     }
@@ -600,19 +608,15 @@ fill_condition_widgets(LibBalsaCondition* cnd)
 {
     GtkTreeModel *model =
         gtk_tree_view_get_model(fe_type_regex_list);
-    GtkTreeIter iter;
-    GtkTreeSelection *selection =
-        gtk_tree_view_get_selection(fe_type_regex_list);
-    GSList * regex;
     gchar str[20];
     struct tm * date;
     gint row,col;
     gboolean andmask;
     static gchar xformat[] = "%x"; /* to suppress error in strftime */
     
-    condition_not=cnd->condition_not;
+    condition_not=cnd->negate;
     /* Clear all widgets */
-    if (cnd->type!=CONDITION_SIMPLE)
+    if (cnd->type!=CONDITION_STRING)
         gtk_entry_set_text(GTK_ENTRY(fe_type_simple_entry),"");
 
     if (cnd->type!=CONDITION_REGEX)
@@ -644,7 +648,9 @@ fill_condition_widgets(LibBalsaCondition* cnd)
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask);
     if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask) {
 	gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),TRUE);
-	gtk_entry_set_text(GTK_ENTRY(fe_user_header->entry),cnd->user_header ? cnd->user_header : "");
+	gtk_entry_set_text(GTK_ENTRY(fe_user_header->entry),
+                           cnd->match.string.user_header 
+                           ? cnd->match.string.user_header : "");
     }
     else {
 	gtk_widget_set_sensitive(GTK_WIDGET(fe_user_header),FALSE);
@@ -652,12 +658,15 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     }	
     /* Next update type specific fields */
     switch (cnd->type) {
-    case CONDITION_SIMPLE:
+    case CONDITION_STRING:
         gtk_entry_set_text(GTK_ENTRY(fe_type_simple_entry),
-                           cnd->match.string==NULL ? "" : cnd->match.string);
+                           cnd->match.string.string 
+                           ? cnd->match.string.string : "");
         fe_update_label(fe_type_simple_label, &simple_label);
         break;
     case CONDITION_REGEX:
+#if 0
+        FIXME;
         for (regex = cnd->match.regexs; regex; regex = g_slist_next(regex)) {
             gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
             gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0,
@@ -671,17 +680,18 @@ fill_condition_widgets(LibBalsaCondition* cnd)
         } else
             gtk_widget_set_sensitive(fe_regex_remove_button, FALSE);
         fe_update_label(fe_type_regex_label, &regex_label);
+#endif
         break;
     case CONDITION_DATE:
-        if (cnd->match.interval.date_low==0) str[0]='\0';
+        if (cnd->match.date.date_low==0) str[0]='\0';
         else {
-            date=localtime(&cnd->match.interval.date_low);
+            date=localtime(&cnd->match.date.date_low);
             strftime(str, sizeof(str), xformat, date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_low_entry),str);
-        if (cnd->match.interval.date_high==0) str[0]='\0';
+        if (cnd->match.date.date_high==0) str[0]='\0';
         else {
-            date=localtime(&cnd->match.interval.date_high);
+            date=localtime(&cnd->match.date.date_high);
             strftime(str,sizeof(str), xformat, date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_high_entry),str);
@@ -695,6 +705,8 @@ fill_condition_widgets(LibBalsaCondition* cnd)
         fe_update_label(fe_type_flag_label,   &flags_label);
         break;
     case CONDITION_NONE:
+    case CONDITION_AND:
+    case CONDITION_OR:
         /* To avoid warnings :), we should never get there */
 	break;
     }
@@ -1584,7 +1596,7 @@ fe_new_pressed(GtkWidget * widget, gpointer data)
     /* Fill the filter with default values */
 
     fil->name=g_strdup(new_item);
-    fil->conditions_op=FILTER_OP_OR;
+    /* FIXME: fil->conditions_op=FILTER_OP_OR; */
 
     FILTER_SETFLAG(fil,FILTER_COMPILED);
     fil->action=FILTER_MOVE;
@@ -1719,17 +1731,19 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
     /* Set the op-codes associated with the selected item */
 
-    fil->conditions_op =
-        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"));
-
+    /* FIXME:
+       fil->conditions_op =
+       GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu),"value"));
+    */
     /* Retrieve all conditions for that filter */
 
     FILTER_SETFLAG(fil,FILTER_VALID);
 
-    /* Here I set back FILTER_COMPILED, that way, modified filters with no Regex condition
-     * won't have to recalculate regex (that they don't have actually :)
-     * but modified filters with regex condition will have their compiled flag unset by filter_append_condition,
-     * So that's OK
+    /* Here I set back FILTER_COMPILED, that way, modified filters
+     * with no Regex condition won't have to recalculate regex (that
+     * they don't have actually :) but modified filters with regex
+     * condition will have their compiled flag unset by
+     * filter_append_condition, So that's OK
      */
     FILTER_SETFLAG(fil,FILTER_COMPILED);
 
@@ -1822,8 +1836,10 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     GtkTreeModel *model;
     GtkTreeIter iter;
     LibBalsaFilter* fil;
+#if FIXME
     LibBalsaCondition* cnd;
     GSList *list;
+#endif
 
     if (!gtk_tree_selection_get_selected(selection, &model, &iter)) {
         if (gtk_tree_model_iter_n_children(model, NULL) == 0)
@@ -1847,9 +1863,10 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_action_option_menu), 
                                 fil->action-1);
+#ifdef FIXME
     gtk_option_menu_set_history(GTK_OPTION_MENU(fe_op_codes_option_menu), 
                                 fil->conditions_op-1);
-
+#endif
     if (fil->action!=FILTER_TRASH && fil->action_string)
         balsa_mblist_mru_option_menu_set(fe_mailboxes,
                                          fil->action_string);
@@ -1862,6 +1879,7 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
 
     /* Populate the conditions list */
     filter_errno=FILTER_NOERR;
+#if FIXME
     for (list=fil->conditions;
          list && filter_errno==FILTER_NOERR;list=g_slist_next(list)) {
         cnd=(LibBalsaCondition*) list->data;
@@ -1871,7 +1889,7 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
                            1, libbalsa_condition_clone(cnd),
                            -1);
     }
-
+#endif
     if (filter_errno!=FILTER_NOERR)
         gtk_widget_destroy(fe_window);
 

@@ -1637,24 +1637,6 @@ config_filters_load(void)
 	    FILTER_SETFLAG(fil,FILTER_VALID);
 	    FILTER_SETFLAG(fil,FILTER_COMPILED);
 	    gnome_config_pop_prefix();
-
-	    if (fil) {
-		libbalsa_conditions_new_from_config(BALSA_CONFIG_PREFIX,key,fil);
-		if (filter_errno==FILTER_EFILESYN) {
-		    /* Don't abort on syntax error, just remember it
-		     * FIXME : we could make a GSList of errors to report them to user 
-		     */
-		    non_critical_error=FILTER_EFILESYN;
-		    filter_errno=FILTER_NOERR;
-		}
-		else if (filter_errno!=FILTER_NOERR) {
-		    /* Critical error, we abort the loading process
-		     */
-		    libbalsa_filter_free(fil,NULL);
-		    return;
-		}
-		balsa_app.filters = g_slist_prepend(balsa_app.filters,(gpointer)fil);
-	    }
 	}
 	g_free(key);	
     }
@@ -1685,13 +1667,6 @@ config_filters_save(void)
 	gnome_config_push_prefix(buffer);
 	libbalsa_filter_save_config(fil);
 	gnome_config_pop_prefix();
-
-	/* We suppress the final "/", this is necessary in order that
-	 * libbalsa_conditions_save_config can construct the condition
-	 * section name */
-	tmp[i-1]='\0';
-	libbalsa_conditions_save_config(fil->conditions,
-					BALSA_CONFIG_PREFIX,section_name);
     }
     gnome_config_sync();
     /* This loop takes care of cleaning up old filter sections */
@@ -1699,12 +1674,6 @@ config_filters_save(void)
 	i=snprintf(tmp,tmp_len,"%d/",nb++);
 	if (gnome_config_has_section(buffer)) {
 	    gnome_config_clean_section(buffer);
-	    /* We suppress the final "/", this is necessary in order
-	     * that libbalsa_clean_condition_sections can construct
-	     * the condition section name */
-	    tmp[i-1]='\0';
-	    libbalsa_clean_condition_sections(BALSA_CONFIG_PREFIX,
-					      section_name);
 	}
 	else break;
     }
@@ -1712,7 +1681,8 @@ config_filters_save(void)
     g_free(buffer);
 }
 
-void config_mailbox_filters_save(LibBalsaMailbox * mbox)
+void
+config_mailbox_filters_save(LibBalsaMailbox * mbox)
 {
     gchar * tmp;
 

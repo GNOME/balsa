@@ -110,6 +110,7 @@ static void balsa_window_destroy(GtkObject * object);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 static gboolean balsa_close_commit_mailbox_on_timer(GtkWidget * widget, 
 					     gpointer * data);
+static LibBalsaCondition* bw_get_view_filter(BalsaWindow *window);
 
 static void balsa_window_index_changed_cb(GtkWidget * widget,
                                           gpointer data);
@@ -203,8 +204,7 @@ static void remove_duplicates_cb(GtkWidget * widget, gpointer data);
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
-static void hide_set_cb(GtkWidget * widget, gpointer data);
-static void hide_unset_cb(GtkWidget * widget, gpointer data);
+static void hide_changed_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
@@ -574,31 +574,48 @@ static GnomeUIInfo message_menu[] = {
     GNOMEUIINFO_END
 };
 
+/* Really, entire mailbox_hide_menu should be build dynamically from
+ * the hide_states array since different mailboxes support different
+ * set of flags/keywords. */
+static struct {
+    LibBalsaMessageFlag flag;
+    unsigned set:1;
+} hide_states[] = {
+    { LIBBALSA_MESSAGE_FLAG_DELETED, 1 },
+    { LIBBALSA_MESSAGE_FLAG_DELETED, 0 },
+    { LIBBALSA_MESSAGE_FLAG_NEW,     0 },
+    { LIBBALSA_MESSAGE_FLAG_NEW,     1 },
+    { LIBBALSA_MESSAGE_FLAG_FLAGGED, 1 },
+    { LIBBALSA_MESSAGE_FLAG_FLAGGED, 0 },
+    { LIBBALSA_MESSAGE_FLAG_REPLIED, 1 },
+    { LIBBALSA_MESSAGE_FLAG_REPLIED, 0 }
+};
+
 static GnomeUIInfo mailbox_hide_menu[] = {
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("_Deleted"),  "",
-     hide_set_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_DELETED), NULL),
+     hide_changed_cb, GINT_TO_POINTER(0), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("Un_Deleted"),  "",
-     hide_unset_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_DELETED), NULL),
+     hide_changed_cb, GINT_TO_POINTER(1), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("_Read"),     "",
-     hide_set_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_NEW), NULL),
+     hide_changed_cb, GINT_TO_POINTER(2), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("Un_read"),     "",
-     hide_unset_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_NEW), NULL),
+     hide_changed_cb, GINT_TO_POINTER(3), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("_Flagged"),  "",
-     hide_set_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_FLAGGED), NULL),
+     hide_changed_cb, GINT_TO_POINTER(4), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("Un_flagged"),  "",
-     hide_unset_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_FLAGGED), NULL),
+     hide_changed_cb, GINT_TO_POINTER(5), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("_Answered"), "",
-     hide_set_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_REPLIED), NULL),
+     hide_changed_cb, GINT_TO_POINTER(6), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
     (N_("Un_answered"), "",
-     hide_unset_cb, GINT_TO_POINTER(LIBBALSA_MESSAGE_FLAG_REPLIED), NULL),
+     hide_changed_cb, GINT_TO_POINTER(7), NULL),
     GNOMEUIINFO_END
 };
 
@@ -1449,7 +1466,9 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
     index->window = GTK_WIDGET(window);
 
     balsa_window_increase_activity(window);
-    failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index), mbnode);
+    failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index),
+                                             mbnode,
+                                             bw_get_view_filter(window));
     balsa_window_decrease_activity(window);
 
     if(failurep) {
@@ -2745,7 +2764,6 @@ find_real(BalsaIndex * bindex, gboolean again)
     /* Condition set up for the search, it will be of type
        CONDITION_NONE if nothing has been set up */
     static LibBalsaCondition * cnd = NULL;
-    GSList * conditions;
     static gboolean reverse = FALSE;
 
     if (!cnd) {
@@ -2810,9 +2828,11 @@ find_real(BalsaIndex * bindex, gboolean again)
 	gtk_box_pack_start(GTK_BOX(vbox), reverse_button,TRUE,TRUE,0);
 	gtk_widget_show_all(vbox);
 
-	if (cnd->match.string)
-	    gtk_entry_set_text(GTK_ENTRY(search_entry),cnd->match.string);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),reverse);
+	if (cnd->match.string.string)
+	    gtk_entry_set_text(GTK_ENTRY(search_entry),
+                               cnd->match.string.string);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),
+                                     reverse);
 	gtk_toggle_button_set_active(matching_body,
 				     CONDITION_CHKMATCH(cnd,
 							CONDITION_MATCH_BODY));
@@ -2835,10 +2855,10 @@ find_real(BalsaIndex * bindex, gboolean again)
 	    ok=gtk_dialog_run(GTK_DIALOG(dia));
 	    if (ok==GTK_RESPONSE_OK) {
 		reverse = GTK_TOGGLE_BUTTON(reverse_button)->active;
-		g_free(cnd->match.string);
-		cnd->match.string =
+		g_free(cnd->match.string.string);
+		cnd->match.string.string =
                     g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
-		cnd->match_fields=CONDITION_EMPTY;
+		cnd->match.string.fields=CONDITION_EMPTY;
 
 		if (gtk_toggle_button_get_active(matching_body))
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_BODY);
@@ -2850,7 +2870,8 @@ find_real(BalsaIndex * bindex, gboolean again)
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_FROM);
 		if (gtk_toggle_button_get_active(matching_cc))
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_CC);
-		if (cnd->match_fields!=CONDITION_EMPTY && cnd->match.string[0])
+		if (cnd->match.string.fields!=CONDITION_EMPTY &&
+                    cnd->match.string.string[0])
 
 		    /* FIXME : We should print error messages, but for
 		     * that we should first make find dialog non-modal
@@ -2867,13 +2888,11 @@ find_real(BalsaIndex * bindex, gboolean again)
 	while (ok==GTK_RESPONSE_HELP);
 	gtk_widget_destroy(dia);
 	if (ok!=GTK_RESPONSE_OK) return;
-	cnd->type = CONDITION_SIMPLE;
+	cnd->type = CONDITION_STRING;
     }
 
-    conditions = g_slist_append(NULL,cnd);
-    balsa_index_find(bindex, FILTER_OP_OR, conditions, reverse);
-
-    g_slist_free(conditions);
+    balsa_index_find(bindex, cnd, reverse);
+    libbalsa_condition_free(cnd);
 }
 
 static void
@@ -2942,43 +2961,91 @@ mailbox_close_cb(GtkWidget * widget, gpointer data)
 static void
 mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 {
-   balsa_window_real_close_mbnode(balsa_app.main_window, (BalsaMailboxNode *)data);
+   balsa_window_real_close_mbnode(balsa_app.main_window,
+                                  (BalsaMailboxNode *)data);
 }
 
 
-static void
-hide_set_cb(GtkWidget * widget, gpointer data)
+static LibBalsaCondition*
+bw_get_view_filter(BalsaWindow *window)
 {
-    LibBalsaMailbox *mailbox;
-    gboolean state = GTK_CHECK_MENU_ITEM(widget)->active;
-    LibBalsaMessageFlag flag =
-        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
-                                          GNOMEUIINFO_KEY_UIDATA));
-    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
-    g_return_if_fail(index != NULL);
-    mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    /* FIXME: make sure that corresponding unset flag is not selected */
-    libbalsa_mailbox_filter_view(mailbox,
-                                 CONDITION_FLAG,
-                                 flag, state);
+    static struct {
+        LibBalsaMessageFlag flag;
+        short setby;
+        unsigned state:1;
+    } match_flags[] = {
+        { LIBBALSA_MESSAGE_FLAG_DELETED, -1, 0 },
+        { LIBBALSA_MESSAGE_FLAG_NEW,     -1, 0 },
+        { LIBBALSA_MESSAGE_FLAG_FLAGGED, -1, 0 },
+        { LIBBALSA_MESSAGE_FLAG_REPLIED, -1, 0 }
+    };
+    unsigned i, j;
+    LibBalsaCondition *filter;
+    
+    for(i=0; i<ELEMENTS(match_flags); i++)
+        match_flags[i].setby = -1;
+
+    for(i=0; i<ELEMENTS(mailbox_hide_menu); i++) {
+        LibBalsaMessageFlag flag;
+        gboolean set;
+        int states_index =
+            GPOINTER_TO_INT(mailbox_hide_menu[i].user_data);
+        if(mailbox_hide_menu[i].type != GNOME_APP_UI_TOGGLEITEM)
+            continue;
+        if(!GTK_CHECK_MENU_ITEM(mailbox_hide_menu[i].widget)->active)
+            continue;
+        flag = hide_states[states_index].flag;
+        set  = hide_states[states_index].set;
+        for(j=0; j<ELEMENTS(match_flags); j++)
+            if(match_flags[j].flag == flag) {
+                match_flags[j].setby = i;
+                match_flags[j].state = set;
+                break;
+            }
+    }
+    
+    /* match_flags contains collected information, time to create a
+     * LibBalsaCondition data structure.
+     */
+    filter = NULL;
+    for(j=0; j<ELEMENTS(match_flags); j++) {
+        LibBalsaCondition *lbc;
+        if(match_flags[j].setby < 0) continue;
+        lbc = libbalsa_condition_new_flag_enum(match_flags[j].state,
+                                               match_flags[j].flag);
+        if(filter)
+            filter = 
+                libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+                                                filter, lbc);
+        else
+            filter = lbc;
+    }
+    if(filter) {
+        gchar *str = libbalsa_condition_to_string(filter);
+        printf("%s: Filter is: %s\n", __func__, str);
+        g_free(str);
+    }
+    return filter;
 }
 
 static void
-hide_unset_cb(GtkWidget * widget, gpointer data)
+hide_changed_cb(GtkWidget * widget, gpointer data)
 {
     LibBalsaMailbox *mailbox;
-    gboolean state = GTK_CHECK_MENU_ITEM(widget)->active;
-    LibBalsaMessageFlag flag =
-        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
-                                          GNOMEUIINFO_KEY_UIDATA));
-    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
-    g_return_if_fail(index != NULL);
+    GtkWidget *index = balsa_window_find_current_index(balsa_app.main_window);
+    LibBalsaCondition *filter;
+
+    if(!index)
+        return;
     mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    printf("%s: %d (%d)\n", __func__,
-           flag, LIBBALSA_MESSAGE_FLAG_DELETED);
-    libbalsa_mailbox_filter_view(mailbox,
-                                 CONDITION_FLAG,
-                                 flag, !state);
+
+    filter = bw_get_view_filter(balsa_app.main_window);
+    /* libbalsa_mailbox_set_view_filter() will take the ownership of
+     * filter.  We need also to rethread to take into account that
+     * some messages might have been removed or added to the view. */
+    libbalsa_mailbox_set_view_filter(mailbox, filter);
+    balsa_index_set_threading_type(BALSA_INDEX(index),
+                                   mailbox->view->threading_type);
 }
 
 static void

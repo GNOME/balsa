@@ -67,27 +67,17 @@ static void bndx_expand_to_row_and_select(BalsaIndex * index,
                                           gboolean select);
 static gboolean bndx_find_row_and_select(BalsaIndex * index,
 					 LibBalsaMessageFlag flag,
-					 FilterOpType op,
-					 GSList * conditions,
+					 LibBalsaCondition *condition,
 					 gboolean previous,
 					 gboolean threaded);
 static gboolean bndx_find_row(BalsaIndex * index,
                               GtkTreeIter * pos, gboolean reverse_search,
                               LibBalsaMessageFlag flag,
-                              FilterOpType op, GSList * conditions,
+                              LibBalsaCondition *condition,
                               GList * exclude, gboolean threaded);
-static gboolean bndx_find_row_func(LibBalsaMessage * message,
-                                   LibBalsaMessageFlag flag,
-                                   GSList * conditions, FilterOpType op,
-                                   GList * exclude, gboolean viewable);
-static gboolean bndx_find_next(GtkTreeView * tree_view, GtkTreePath * path,
-                               GtkTreeIter * iter, gboolean wrap);
-static gboolean bndx_find_prev(GtkTreeView * tree_view, GtkTreePath * path,
-                               GtkTreeIter * iter);
 static void bndx_select_message(BalsaIndex * index,
                                 LibBalsaMessage * message);
 static void bndx_changed_find_row(BalsaIndex * index);
-static void bndx_hide_deleted(BalsaIndex * index, gboolean hide);
 
 /* mailbox callbacks */
 static void bndx_row_changed_cb(GtkTreeModel *model, GtkTreePath *path,
@@ -738,7 +728,9 @@ balsa_index_new(void)
 */
 
 gboolean
-balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
+balsa_index_load_mailbox_node (BalsaIndex * index,
+                               BalsaMailboxNode* mbnode,
+                               LibBalsaCondition *view_filter)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     LibBalsaMailbox* mailbox;
@@ -786,6 +778,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index, BalsaMailboxNode* mbnode)
 			     (gpointer) index);
 
     /* Set the tree store, load messages, and do threading. */
+    libbalsa_mailbox_set_view_filter(mailbox, view_filter);
     bndx_load_and_thread(index, mailbox->view->threading_type);
 #if 0
     bndx_moveto(index);
@@ -838,14 +831,14 @@ void
 balsa_index_select_next(BalsaIndex * index)
 {
     bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                             FILTER_NOOP, NULL, FALSE, FALSE);
+                             NULL, FALSE, FALSE);
 }
 
 static void
 bndx_select_next_threaded(BalsaIndex * index)
 {
     if (!bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                             FILTER_NOOP, NULL, FALSE, TRUE))
+                                  NULL, FALSE, TRUE))
 	balsa_index_select_previous(index);
 }
 
@@ -853,44 +846,43 @@ void
 balsa_index_select_previous(BalsaIndex * index)
 {
     bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                             FILTER_NOOP, NULL, TRUE, FALSE);
+                             NULL, TRUE, FALSE);
 }
 
 void
 balsa_index_select_next_unread(BalsaIndex * index)
 {
     bndx_find_row_and_select(index, LIBBALSA_MESSAGE_FLAG_NEW,
-                             FILTER_NOOP, NULL, FALSE, TRUE);
+                             NULL, FALSE, TRUE);
 }
 
 void
 balsa_index_select_next_flagged(BalsaIndex * index)
 {
     bndx_find_row_and_select(index, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                             FILTER_NOOP, NULL, FALSE, TRUE);
+                             NULL, FALSE, TRUE);
 }
 
 void
-balsa_index_find(BalsaIndex * index, FilterOpType op, GSList * conditions,
+balsa_index_find(BalsaIndex * index, LibBalsaCondition *condition,
                  gboolean previous)
 {
     bndx_find_row_and_select(index, (LibBalsaMessageFlag) 0,
-                             op, conditions, previous, TRUE);
+                             condition, previous, TRUE);
 }
 
 /* Helpers for the message selection methods. */
 static gboolean
 bndx_find_row_and_select(BalsaIndex * index,
                          LibBalsaMessageFlag flag,
-                         FilterOpType op,
-                         GSList * conditions,
+                         LibBalsaCondition *condition,
                          gboolean previous,
 			 gboolean threaded)
 {
     GtkTreeIter pos;
     gboolean retval = FALSE;
 
-    if (bndx_find_row(index, &pos, previous, flag, op, conditions, NULL,
+    if (bndx_find_row(index, &pos, previous, flag, condition, NULL,
 		      threaded)) {
 	bndx_expand_to_row_and_select(index, &pos, TRUE);
 	retval = TRUE;
@@ -920,9 +912,10 @@ bndx_find_row_and_select(BalsaIndex * index,
 static gboolean
 bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
               gboolean reverse_search, LibBalsaMessageFlag flag,
-              FilterOpType op, GSList * conditions, GList * exclude,
+              LibBalsaCondition *condition, GList *exclude,
 	      gboolean threaded)
 {
+#if 0
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreePath *path;
@@ -987,15 +980,26 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * pos,
         /* for next message when deleting or moving, fall back to previous */
         return bndx_find_row(index, pos, TRUE, flag, op, conditions,
                              exclude, threaded);
-
     return found;
+#endif
+    LibBalsaCondition cond_flag, cond_and;
+    cond_flag.negate      = FALSE;
+    cond_flag.type        = CONDITION_FLAG;
+    cond_flag.match.flags = flag;
+    cond_and.negate       = FALSE;
+    cond_and.type         = CONDITION_AND;
+    cond_and.match.andor.left  = &cond_flag;
+    cond_and.match.andor.right = condition;
+    
+    return  libbalsa_mailbox_find(index->mailbox_node->mailbox, pos,
+                                  !reverse_search, &cond_and, exclude);
 }
 
+#if 0
 static gboolean
 bndx_find_row_func(LibBalsaMessage * message,
                    LibBalsaMessageFlag flag,
-                   GSList * conditions,
-                   FilterOpType op,
+                   LibBalsaCondition *condition,
                    GList * exclude,
                    gboolean viewable)
 {
@@ -1010,7 +1014,7 @@ bndx_find_row_func(LibBalsaMessage * message,
             return FALSE;
     } else if (conditions) {
 	if (!libbalsa_mailbox_message_match(message->mailbox, message,
-					    op, conditions))
+					    condition))
 	    return FALSE;
    } else if (exclude) {
         /* looking for messages not in the excluded list */
@@ -1112,7 +1116,7 @@ bndx_find_prev(GtkTreeView * tree_view, GtkTreePath * path,
     }
     return FALSE;
 }
-
+#endif
 /* bndx_expand_to_row_and_select:
  * make sure it's viewable, then pass it to bndx_select_row
  * no-op if it's NULL
@@ -1823,39 +1827,6 @@ balsa_index_refresh_date(BalsaIndex * index)
 {
 }
 
-
-/* balsa_index_hide_deleted:
- * called from pref manager when balsa_app.hide_deleted is changed.
- */
-void
-balsa_index_hide_deleted(gboolean hide)
-{
-    gint i;
-    GtkWidget *page;
-    GtkWidget *index;
-
-    for (i = 0; (page =
-                 gtk_notebook_get_nth_page(GTK_NOTEBOOK
-                                           (balsa_app.notebook),
-                                           i)) != NULL; ++i) {
-        index = gtk_bin_get_child(GTK_BIN(page));
-        bndx_hide_deleted(BALSA_INDEX(index), hide);
-    }
-}
-
-/* bndx_hide_deleted:
- * hide (or show, if hide is FALSE) deleted messages.
- */
-static void
-bndx_hide_deleted(BalsaIndex * index, gboolean hide)
-{
-    LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
-    libbalsa_mailbox_filter_view(mailbox,
-                                 CONDITION_FLAG,
-                                 LIBBALSA_MESSAGE_FLAG_DELETED,
-                                 hide);
-}
-
 /* Transfer messages. */
 void
 balsa_index_transfer(BalsaIndex *index, GList * messages,
@@ -1908,9 +1879,9 @@ static void
 bndx_changed_find_row(BalsaIndex * index)
 {
     index->next_message =
-        bndx_find_row(index, NULL, FALSE, 0, FILTER_NOOP, NULL, NULL, FALSE);
+        bndx_find_row(index, NULL, FALSE, 0, NULL, NULL, FALSE);
     index->prev_message =
-        bndx_find_row(index, NULL, TRUE,  0, FILTER_NOOP, NULL, NULL, FALSE);
+        bndx_find_row(index, NULL, TRUE,  0, NULL, NULL, FALSE);
 
     g_signal_emit(G_OBJECT(index), balsa_index_signals[INDEX_CHANGED], 0);
 }

@@ -92,21 +92,20 @@ static GMimeStream *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 static void libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox,
 						    LibBalsaMessage * msg,
-						    int op,
-						    GSList* conditions);
+						    LibBalsaCondition *ct);
 static void hash_table_to_list_func(gpointer key,
 				    gpointer value,
 				    gpointer data);
 static GList * hash_table_to_list(GHashTable * hash);
 
-static void run_filters_on_reception(LibBalsaMailboxImap * mbox);				     
+static void run_filters_on_reception(LibBalsaMailboxImap * mbox);
 static gboolean libbalsa_mailbox_real_imap_match(LibBalsaMailboxImap * mbox,
 						 GSList * filters_list,
 						 gboolean only_recent);
 static void libbalsa_mailbox_imap_mbox_match(LibBalsaMailbox * mbox,
 					     GSList * filters_list);
-static gboolean libbalsa_mailbox_imap_can_match(LibBalsaMailbox * mbox,
-						GSList * conditions);
+static gboolean libbalsa_mailbox_imap_can_match(LibBalsaMailbox  *mbox,
+						LibBalsaCondition *condition);
 static void libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
@@ -572,11 +571,6 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     }
 }
 
-#ifdef BALSA_USE_THREADS
-static pthread_mutex_t imap_handle_lock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t imap_handle_cond = PTHREAD_COND_INITIALIZER;
-#endif				/* BALSA_USE_THREADS */
-
 static void
 libbalsa_mailbox_imap_release_handle(LibBalsaMailboxImap * mimap)
 {
@@ -591,11 +585,6 @@ libbalsa_mailbox_imap_release_handle(LibBalsaMailboxImap * mimap)
 					     0, 0, NULL, NULL, mimap);
 	RELEASE_HANDLE(mimap, mimap->handle);
 	mimap->handle = NULL;
-#ifdef BALSA_USE_THREADS
-	pthread_mutex_lock(&imap_handle_lock);
-	pthread_cond_broadcast(&imap_handle_cond);
-	pthread_mutex_unlock(&imap_handle_lock);
-#endif				/* BALSA_USE_THREADS */
     }
 }
 
@@ -613,20 +602,11 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap)
     if (!LIBBALSA_IS_IMAP_SERVER(server))
 	return NULL;
     imap_server = LIBBALSA_IMAP_SERVER(server);
-    if(mimap->handle)
-        libbalsa_mailbox_imap_release_handle(mimap);
-
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_lock(&imap_handle_lock);
-    while (mimap->handle)
-	pthread_cond_wait(&imap_handle_cond, &imap_handle_lock);
-    pthread_mutex_unlock(&imap_handle_lock);
-#endif				/* BALSA_USE_THREADS */
-
-    mimap->handle =
-        libbalsa_imap_server_get_handle_with_user(imap_server, mimap);
-    if (!mimap->handle)
-	return NULL;
+    if(!mimap->handle) {
+        mimap->handle = libbalsa_imap_server_get_handle(imap_server);
+        if (!mimap->handle)
+            return NULL;
+    }
     rc = imap_mbox_select(mimap->handle, mimap->path,
 			  &(LIBBALSA_MAILBOX(mimap)->readonly));
     if (rc != IMR_OK) {
@@ -734,11 +714,14 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 	g_hash_table_destroy(mbox->matching_messages);
 	mbox->matching_messages = NULL;
     }
-    if (mbox->conditions) {
-	libbalsa_conditions_free(mbox->conditions);
+#ifdef FIXME
+    if (mbox->condition) {
+	libbalsa_condition_free(mbox->condition);
 	mbox->conditions = NULL;
 	mbox->op = FILTER_NOOP;
     }
+#endif
+    imap_mbox_unselect(mbox->handle);
     free_messages_info(mbox);
     libbalsa_mailbox_imap_release_handle(mbox);
 }
@@ -842,7 +825,7 @@ imap_matched(unsigned uid, ImapSearchData* data)
 */
 
 GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
-						 int op, GSList * conditions,
+						 LibBalsaCondition *ct,
 						 gboolean only_recent,
 						 gboolean * err)
 {
@@ -855,7 +838,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
     cbdata = g_new( ImapSearchData, 1 );
     cbdata->uids = g_hash_table_new(NULL, NULL); 
     cbdata->res  = g_hash_table_new(NULL, NULL);
-    query = libbalsa_filter_build_imap_query(op, conditions, only_recent);
+    query = libbalsa_condition_build_imap_query(ct /* FIXME: ONLY RECENT! */);
     if (query) {
 #ifdef UID_SEARCH_IMPLEMENTED
 	for(msgs= LIBBALSA_MAILBOX(mbox)->message_list; msgs;
@@ -897,8 +880,10 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 static gboolean
 libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mbox,
 				    LibBalsaMessage * message,
-				    int op, GSList* conditions)
+				    LibBalsaCondition *condition)
 {
+#if 0
+    /* FIXME: whole searching code needs to be fixed */
     LibBalsaMailboxImap * mailbox = LIBBALSA_MAILBOX_IMAP(mbox);
     gboolean error;
     GSList * cnds;
@@ -928,6 +913,8 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mbox,
        BE CAREFUL HERE : the mailbox must NOT BE LOCKED here
     */
     else return match_conditions(op, conditions, message, FALSE);
+#endif
+    return FALSE;
 }
 
 static void hash_table_to_list_func(gpointer key,
@@ -951,7 +938,7 @@ static GList * hash_table_to_list(GHashTable * hash)
 }
 
 gboolean libbalsa_mailbox_real_imap_match(LibBalsaMailboxImap * mbox,
-					  GSList * filter_list,					  
+					  GSList * filter_list,
 					  gboolean only_recent)
 {
     GSList * lst;
@@ -962,7 +949,7 @@ gboolean libbalsa_mailbox_real_imap_match(LibBalsaMailboxImap * mbox,
     for (lst = filter_list; lst; lst = g_slist_next(lst)) {
 	flt = lst->data;
 	if (!libbalsa_mailbox_imap_can_match(LIBBALSA_MAILBOX(mbox),
-					     flt->conditions))
+					     flt->condition))
 	    return FALSE;
     }
 
@@ -976,8 +963,7 @@ gboolean libbalsa_mailbox_real_imap_match(LibBalsaMailboxImap * mbox,
 	
 	flt = lst->data;
 	matchings = libbalsa_mailbox_imap_get_matchings(mbox,
-							flt->conditions_op,
-							flt->conditions,
+							flt->condition,
 							only_recent,
 							&error);
 	if (error) return FALSE;
@@ -1026,14 +1012,17 @@ void libbalsa_mailbox_imap_mbox_match(LibBalsaMailbox * mbox,
    be done by default filters functions hence leading to
    SLOW match
 */
-gboolean libbalsa_mailbox_imap_can_match(LibBalsaMailbox* mailbox,
-					 GSList * cnds)
+gboolean libbalsa_mailbox_imap_can_match(LibBalsaMailbox  *mailbox,
+					 LibBalsaCondition *condition)
 {
-    for (; cnds; cnds = g_slist_next(cnds)) {
+#if 0
+    GSList *cnds;
+    for (cnds =  conditions->cond_list; cnds; cnds = g_slist_next(cnds)) {
 	LibBalsaCondition * cnd = cnds->data;
 	
 	if (cnd->type==CONDITION_REGEX) return FALSE;
     }
+#endif
     return TRUE;
 }
 
@@ -1201,7 +1190,9 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
 	return;
 
     /* Some IMAP servers (UW2000) do not like removing subscribed mailboxes:
-     * they do not remove the mailbox from the subscription list. */
+     * they do not remove the mailbox from the subscription list since 
+     * the subscription list should be treated as a list of bookmarks,
+     * not a list of physically existing mailboxes. */
     imap_mbox_subscribe(handle, mailbox->path, FALSE);
     imap_mbox_delete(handle, mailbox->path);
 
@@ -1799,16 +1790,27 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     GNode * new_tree;
     int msgno;
+    gchar *filter = libbalsa_condition_build_imap_query(mailbox->view_filter);
 
+    mailbox->view->threading_type = thread_type;
     switch(thread_type) {
     case LB_MAILBOX_THREADING_FLAT:
-	new_tree = g_node_new(NULL);
-	for(msgno = 1; msgno <= mailbox->total_messages; msgno++)
-	    g_node_append_data(new_tree, GUINT_TO_POINTER(msgno));
+        if(filter) {
+            imap_sort_filter(mimap->handle,
+                             lbmi_get_imap_sort_key(mailbox),
+                             mailbox->order == GTK_SORT_ASCENDING,
+                             filter);
+            new_tree =
+                g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
+        } else {
+            new_tree = g_node_new(NULL);
+            for(msgno = 1; msgno <= mailbox->total_messages; msgno++)
+                g_node_append_data(new_tree, GUINT_TO_POINTER(msgno));
+        }
         break;
-    case  LB_MAILBOX_THREADING_SIMPLE:
+    case LB_MAILBOX_THREADING_SIMPLE:
     case LB_MAILBOX_THREADING_JWZ:
-	imap_mbox_thread(mimap->handle, "REFERENCES");
+	imap_mbox_thread(mimap->handle, "REFERENCES", filter ? filter : "ALL");
 	new_tree =
             g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
 	break;

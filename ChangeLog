@@ -5,6 +5,7 @@
 2003-05-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: make ESMTP protocol more verbose - fix bug 112285.
+	* libbalsa/filter.c: play sound and popup dialogs if requested (EA).
 
 2003-05-05 08:30  PeterB
 

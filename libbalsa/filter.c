@@ -578,12 +578,11 @@ libbalsa_filter_apply(GSList * filter_list)
     for (lst=filter_list;lst;lst=g_slist_next(lst)) {
 	filt=(LibBalsaFilter*)lst->data;
 	if (!filt->matching_messages) continue;
-        if (filt->sound) {
-            /* FIXME : Emit sound */
-        }
-        if (filt->popup_text) {
-            /* FIXME : Print popup text */
-        }
+        if (filt->sound)
+	    gnome_sound_play(filt->sound);
+        if (filt->popup_text)
+	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+				 filt->popup_text);
         switch (filt->action) {
         case FILTER_COPY:
             mbox = url_to_mailbox_mapper(filt->action_string);

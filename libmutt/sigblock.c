@@ -22,8 +22,12 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <signal.h>
+#ifdef HAVE_SIGACTION
 #include <sigaction.h>
+#endif
+#ifdef HAVE_SIGSET
 #include <sigset.h>
+#endif
 
 sigset_t Sigset;
 

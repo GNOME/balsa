@@ -1,11 +1,13 @@
 Source: balsa
 Section: x11
 Priority: optional
-Maintainer:  <pavlov@innerx.net>
+Maintainer: Stuart Parmenter <pavlov@innerx.net>
 Standards-Version: 2.4.0.0
 
 Package: balsa
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: Missing
- Missing
+Description: GNOME email client
+ Balsa is a e-mail reader.  This client is part of the GNOME
+ desktop environment.  It supports local mailboxes, POP3 and
+ IMAP.

@@ -2,7 +2,7 @@ balsa (0.3.5-1) unstable; urgency=low
 
   * Initial Release.
 
- --  <pavlov@innerx.net>  Mon, 27 Jul 1998 11:44:08 -0400
+ -- Stuart Parmenter <pavlov@innerx.net>  Mon, 27 Jul 1998 11:44:08 -0400
 
 Local variables:
 mode: debian-changelog

@@ -1,3 +1,7 @@
+2000-09-09  Matthew Guenther <guentherm@asme.org>
+
+	* download.html: Add comments about new libpspell dependency.
+
 2000-09-05  Pawel Salek <pawsa@theochem.kth.se>
 
 	* download.html: don't generate it. Mention krb5 requirements for

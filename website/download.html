@@ -18,11 +18,18 @@ body {margin-left: 50pt;}
 
 <li>Balsa needs <samp>libPropList</samp>. Check if you don't have it
 already on your system, subsequently try to download suitable rpm. If
-you cannot do it for some reason, grab 
-<a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList.tar.gz</a>,
+you cannot do it for some reason, grab <a
+href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList-0.10.1.tar.gz">libPropList.tar.gz</a>,
 It must be installed with a prefix of <samp>/usr</samp> if you wish to
 also use a Balsa RPM. Note, that in this last case you might need to
 ignore dependices warnings when installing rpm.</li>
+
+<li>Balsa v0.9.5 and greater also uses the <samp>libpspell</samp>
+library for spell checking, which is available in both rpm and deb
+format as well as plain source.  You can find the library and modules at the
+pspell <a href="http://pspell.sourceforge.net">website.</a> The same
+comment above about using Balsa rpms with self-compliled libraries
+applies here as well.</li>
 
 <li>balsa-0.9.4 binary rpms are compiled on RH-6.2 with update
 packages installed. The binaries come with GSS authorisation

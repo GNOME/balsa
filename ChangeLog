@@ -24,9 +24,9 @@
 	* src/pref-manager.c:  new configuration hooked in.
 	* src/save-restore.[ch]:  new configuration code implemented.
 
-2000-09-07  Matthew Guenther  <guentherm@asme.org>
+2000-09-08  Matthew Guenther  <guentherm@asme.org>
 
-	* README: Added comment about pspell dependency
+	* INSTALL: Added comment about pspell dependency
 	* configure.in: Check for pspell library
 	* src/spell-check.[ch]: Complete rewrite to use pspell for spell
 	checking.  Could be improved but pretty good for now.

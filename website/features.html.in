@@ -19,6 +19,7 @@
 				<li>POP3</li>
 				<li>IMAP</li>
 				<li>Printing</li>
+				<li>Spell Checking</li>
 				<li>Multi-threaded mail retrevial (optional)</li>
 				<li>MIME support (view images inline, save parts)</li>
 				<li>Supports both SMTP and the use of a local MTA</li>

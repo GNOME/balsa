@@ -1,6 +1,10 @@
+2002-08-06  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: fix message selection change on msg delete.
+	
 2002-08-03  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
-	* src/balsa-index.c: fix next undread for deep threads.
+	* src/balsa-index.c: fix next unread for deep threads.
 	fix message deletion.
 
 2002-07-31  Peter Bloomfield  <PeterBloomfield@MindSpring.com>

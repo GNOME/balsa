@@ -1,3 +1,9 @@
+2002-06-27  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/folder-scanners.c:
+	* src/balsa-mblist.c: more conservative imap scanning locking scheme.
+	* balsa.spec.in: remove last traces of gdbm (PS).
+
 2002-06-24  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/main.c: do not forget to GDK-lock idle functions.

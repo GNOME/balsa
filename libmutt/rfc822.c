@@ -240,6 +240,10 @@ parse_address (const char *s,
   }
 
   terminate_string (token, *tokenlen, tokenmax);
+#ifdef LIBMUTT
+  if (*tokenlen > 0 && token[0] != '@' && token[*tokenlen - 1] != '@'
+      && (*tokenlen >= 4 || !strchr(token, '@')))
+#endif
   addr->mailbox = safe_strdup (token);
 
   if (*commentlen && !addr->personal)

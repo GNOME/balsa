@@ -1,7 +1,9 @@
-2004-09-24 16:32  PeterB
+2004-09-24 21:47  PeterB
 
-	* libbalsa/body.c: use content-type "text/plain" when
-	body->content_type is NULL.
+	* libbalsa/body.c: make inline the default content-disposition for
+	message/rfc822, instead of forcing creation of content-disposition
+	header--that breaks crypto.
+	use content-type "text/plain" when body->content_type is NULL.
 
 2004-09-21  Pawel Salek
 

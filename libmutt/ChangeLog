@@ -5,7 +5,6 @@
 	* filter.c:
 	* mutt_tunnel.c:
 	* rfc1524.c:
-	* rfc1524.h:
 	* system.c:
 	* score.c:
 	* thread.c: removed, unused

@@ -3,12 +3,6 @@
 	* src/balsa-mblist.c: Clean up sorting the mailbox list (Manu);
 	simplify bmbl_row_compare.
 
-2003-02-07 17:46  pawels
-
-	* src/balsa-mblist.c: * src/balsa-index.c: idle handlers should
-	handle expunged messages.  * src/balsa-mblist.c: idle handler for
-	"set-unread-messages-flag".
-
 2003-02-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-index.c: idle handlers should handle expunged messages.

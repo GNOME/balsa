@@ -43,6 +43,7 @@ struct message_info {
     unsigned msgno; /* FIXME: get rid of this field, it is redundant */
     LibBalsaMessageFlag flags;
     LibBalsaMessageFlag orig_flags;
+    LibBalsaMessage *message;
 };
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;
@@ -414,6 +415,7 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	    msg_info->key=key;
 	    msg_info->filename=g_strdup(filename);
 	    msg_info->orig_flags = flags;
+	    msg_info->msgno = msgno_2_msg_info->len;
 	} else
 	    g_free(key);
 	msg_info->subdir = subdir;
@@ -480,6 +482,31 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
     return TRUE;
 }
 
+/* Check for a new message in subdir. */
+static gboolean
+lbm_maildir_check(const gchar * subdir)
+{
+    GDir *dir;
+    const gchar *filename;
+    const gchar *p;
+    gboolean retval = FALSE;
+
+    if ((dir = g_dir_open(subdir, 0, NULL))) {
+	while ((filename = g_dir_read_name(dir))) {
+	    if (*filename != '.' && (!(p = strstr(filename, ":2,"))
+				     || !(strchr(p + 3, 'S')
+					  || strchr(p + 3, 'T')))) {
+		/* One new message is enough. */
+		retval = TRUE;
+		break;
+	    }
+	}
+	g_dir_close(dir);
+    }
+
+    return retval;
+}
+
 /* Called with mailbox locked. */
 static void
 libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
@@ -492,29 +519,23 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 
     g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
-    if (!MAILBOX_OPEN(mailbox)) {
-	if (libbalsa_notify_check_mailbox(mailbox))
-	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-	return;
-    }
-
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
     path = libbalsa_mailbox_local_get_path(mailbox);
 
     if (stat(path, &st) == -1)
 	return;
-    if (st.st_mtime != mdir->mtime)
+    if (st.st_mtime > mdir->mtime)
 	modified = 1;
 
     if (stat(mdir->curdir, &st_cur) == -1)
 	return;
-    if (st_cur.st_mtime != mdir->mtime_cur)
+    if (st_cur.st_mtime > mdir->mtime_cur)
 	modified = 1;
 
     if (stat(mdir->newdir, &st_new) == -1)
 	return;
-    if (st_new.st_mtime != mdir->mtime_new)
+    if (st_new.st_mtime > mdir->mtime_new)
 	modified = 1;
 
     if (!modified)
@@ -523,6 +544,16 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
     mdir->mtime = st.st_mtime;
     mdir->mtime_cur = st_cur.st_mtime;
     mdir->mtime_new = st_new.st_mtime;
+
+    if (!MAILBOX_OPEN(mailbox)) {
+	libbalsa_mailbox_set_unread_messages_flag(mailbox,
+						  lbm_maildir_check(mdir->
+								    newdir)
+						  ||
+						  lbm_maildir_check(mdir->
+								    curdir));
+	return;
+    }
 
     last_msgno = mdir->msgno_2_msg_info->len;
     parse_mailbox_subdirs(mailbox);
@@ -537,6 +568,11 @@ free_message_info(struct message_info *msg_info)
 	return;
     g_free(msg_info->key);
     g_free(msg_info->filename);
+    if (msg_info->message) {
+	msg_info->message->mailbox = NULL;
+	g_object_remove_weak_pointer(G_OBJECT(msg_info->message),
+				     (gpointer) & msg_info->message);
+    }
     g_free(msg_info);
 }
 
@@ -690,14 +726,17 @@ lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean expunge)
 	g_hash_table_foreach(mdir->messages_info,
 			     (GHFunc) maildir_renumber, removed);
 	g_ptr_array_remove(mdir->msgno_2_msg_info, removed);
-	libbalsa_mailbox_msgno_removed(LIBBALSA_MAILBOX(mdir),
-				       removed->msgno);
+	libbalsa_mailbox_local_msgno_removed(LIBBALSA_MAILBOX(mdir),
+					     removed->msgno);
 	/* This will free removed: */
 	g_hash_table_remove(mdir->messages_info, removed->key);
     }
     g_slist_free(si.removed_list);
 
-    /* FIXME: record mtime of dirs */
+    /* Record mtime of dirs; we'll just use the current time--someone
+     * else might have changed something since we did, but we'll find
+     * out eventually. */
+    mdir->mtime = mdir->mtime_cur = mdir->mtime_new = time(NULL);
 
     return TRUE;
 }
@@ -747,7 +786,6 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
                                      guint msgno)
 {
     struct message_info *msg_info;
-    LibBalsaMessage *message;
     const gchar *path;
     gchar *filename;
 
@@ -756,20 +794,31 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
     if (!msg_info)
 	return NULL;
 
-    message = libbalsa_message_new();
-    path = libbalsa_mailbox_local_get_path(mailbox);
-    filename = g_build_filename(path, msg_info->subdir,
-				msg_info->filename, NULL);
-    if (libbalsa_message_load_envelope_from_file(message, filename) == FALSE) {
-	g_free(filename);
-	/* FIXME: what to do if loading the envelope fails?
-	return NULL; */
-    } else
-	g_free(filename);
+    if (msg_info->message)
+	g_object_ref(msg_info->message);
+    else {
+	LibBalsaMessage *message;
 
-    message->flags = msg_info->flags = msg_info->orig_flags;
+	msg_info->message = message = libbalsa_message_new();
+	g_object_add_weak_pointer(G_OBJECT(message),
+				  (gpointer) & msg_info->message);
+	path = libbalsa_mailbox_local_get_path(mailbox);
+	filename = g_build_filename(path, msg_info->subdir,
+				    msg_info->filename, NULL);
+	if (!libbalsa_message_load_envelope_from_file(message, filename)) {
+	    g_free(filename);
+	    /* FIXME: what to do if loading the envelope fails?
+	       return NULL; */
+	} else
+	    g_free(filename);
 
-    return message;
+	message->flags = msg_info->flags = msg_info->orig_flags;
+	message->mailbox = mailbox;
+	message->msgno = msgno;
+	libbalsa_message_set_icons(message);
+    }
+
+    return msg_info->message;
 }
 
 /* Called with mailbox locked. */

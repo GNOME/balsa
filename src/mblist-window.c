@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <gtk/gtkfeatures.h>
 
 #include "balsa-app.h"
 #include "balsa-index.h"
@@ -82,11 +83,8 @@ mblist_open_window (GnomeMDI * mdi)
 {
   GtkWidget *bbox;
   GtkWidget *button;
-  GtkCTreeNode *ctnode;
   GdkColor *transparent = NULL;
   gint height;
-  gchar *text[] =
-  {"Balsa"};
 
   if (mblw)
     {
@@ -339,7 +337,6 @@ open_cb (GtkWidget * widget, gpointer data)
   IndexChild *index_child;
   GtkCTreeNode *ctnode;
   Mailbox *mailbox;
-  GnomeMDIChild *child;
 
   if (!GTK_CLIST (mblw->ctree)->selection)
     return;

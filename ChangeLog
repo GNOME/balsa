@@ -1,5 +1,7 @@
-2004-12-01 08:19  PeterB
+2004-12-01 08:22  PeterB
 
+	* libbalsa/mailbox_maildir.c: issue message instead of warning on
+	unanticipated flag change.
 	* src/balsa-index.c: block "selection-changed" signal while
 	collapsing all threads.
 

@@ -1543,13 +1543,17 @@ int imap_uid_search(CONTEXT* ctx, const char* query,
 
   imap_cmd_start (idata, cmd.data);
   cnt = 0;
-  do
+  for (;;)
     {
+      int res;
+
       rc = imap_cmd_step (idata);
       if (rc != IMAP_CMD_CONTINUE)
 	break;
-      cnt += uid_search_parse_response(idata, cb, cbdata);
-    }  while (rc != IMAP_CMD_OK);
+      res = uid_search_parse_response(idata, cb, cbdata);
+      if (res > 0)
+	cnt += res;
+    }
 
   printf("imap_uid_search(%s): %d msgs matched.\n", query, cnt);
   return cnt;

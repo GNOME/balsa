@@ -1036,8 +1036,8 @@ gboolean balsa_mblist_focus_mailbox (BalsaMBList* bmbl, LibBalsaMailbox* mailbox
  * 
  * Description: This function takes a widget and returns a bold
  * version of font that it is currently using.  If it fails, it simply
- * returns the default font of the widget.  ** This function references
- * the fonts now (change of behavior) ** 
+ * returns the default font of the widget.  
+ * This function references the fonts now (change of behavior).
  * */
 GdkFont* 
 balsa_widget_get_bold_font (GtkWidget* widget)
@@ -1048,6 +1048,7 @@ balsa_widget_get_bold_font (GtkWidget* widget)
   GdkFont* font;
   GtkStyle* style;
   GSList* list;
+  gint i;
   
   style = gtk_widget_get_style (widget);
   font = style->font;
@@ -1058,18 +1059,20 @@ balsa_widget_get_bold_font (GtkWidget* widget)
 
   /* Split the XLFD into it's components */
   temp_xlfd = g_strsplit (old_xlfd, "-", 14);
-  
-  /* Change the weight to bold */
-  g_free (temp_xlfd[3]);
-  temp_xlfd[3] = g_strdup ("bold");
-
-  /* Reassemble the XLFD */
-  new_xlfd = g_strjoinv ("-", temp_xlfd);
-  g_strfreev (temp_xlfd);
-
-  /* Try to load it, if it doesn't succeed, re-load the old font */
-  font = gdk_font_load (new_xlfd);
-  g_free (new_xlfd);
+  while(i<4 && temp_xlfd[i]) i++;
+  if(i>3) { 
+    /* Change the weight to bold */
+    g_free (temp_xlfd[3]);
+    temp_xlfd[3] = g_strdup ("bold");
+    
+    /* Reassemble the XLFD */
+    new_xlfd = g_strjoinv ("-", temp_xlfd);
+    g_strfreev (temp_xlfd);
+    
+    /* Try to load it, if it doesn't succeed, re-load the old font */
+    font = gdk_font_load (new_xlfd);
+    g_free (new_xlfd);
+  } else font = NULL;
 
   if (font == NULL) {
     font = gdk_font_load (old_xlfd);

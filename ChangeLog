@@ -1,3 +1,10 @@
+2000-09-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README: added comment on dotlocking and new mail sound.
+	* src/Makefile.am: removed linking against PropList
+	* Makefile.am: added idl/balsa.idl to EXTRA_DIST (dist test).
+	* src/balsa-mblist.c: fix get_bold_font() crash.
+	
 2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
 
 	* libbalsa/mailbox.[ch], libbalsa/mailbox_local.c,

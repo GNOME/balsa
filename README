@@ -94,3 +94,13 @@ shoot yourself in your leg.
 Reporting Bugs:
 	See http://www.balsa.net/bugs.html for instructions.  Do not
 report bugs with GtkHTML - it is quite unstable. Patches are welcome.
+
+Known issues:
+	Balsa does not play sound on receiving new mail. This part of
+	code has to be rewritten to eliminate overlapping sound when
+	more than one new mail is received.
+
+	When dotlocking is not possible (Wrong access privilieges for
+	the mailbox file) balsa will open mailbox for reading only.
+	Verify that balsa can create dot file in the mailbox directory.
+	Recommended access privileges to /var/spool/mail are rwxrwxrwxt (01777)

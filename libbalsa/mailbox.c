@@ -774,9 +774,13 @@ lbm_threads_enter(void)
 	    g_warning("Main thread was unlocked");
     } else {
 	if (!unlock) {
+#ifdef DEBUG
 	    g_print("Sub thread must wait for lock...");
 	    gdk_threads_enter();
 	    g_print("got it!\n");
+#else
+	    gdk_threads_enter();
+#endif
 	    unlock = TRUE;
 	}
     }

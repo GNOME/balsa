@@ -1875,8 +1875,9 @@ idle_handler_cb(GtkWidget * widget)
     }
     
     /* Update the style and message counts in the mailbox list */
-    balsa_mblist_update_mailbox(balsa_app.mblist, 
-                                index->mailbox_node->mailbox);
+    if(index->mailbox_node)
+	balsa_mblist_update_mailbox(balsa_app.mblist, 
+				    index->mailbox_node->mailbox);
 
     gdk_threads_leave();
     return FALSE;

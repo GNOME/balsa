@@ -1,4 +1,12 @@
-2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
+2001-08-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Peter Bloomfield's fix for IMAP mailbox deletion problems.
+	
+	* imap/browse.c: move imap_mailbox_delete to imap/imap.c...
+	* imap/imap.c: ... and use IDATA for mailbox removal.
+	* imap/imap.h: remove imap_delete_mailbox() prototype.
+
+2001-08-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* browser.h: add state_free() prototype.
 	* imap/browse.c: implement it.

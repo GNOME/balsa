@@ -151,7 +151,7 @@ void imap_logout_all (void)
       imap_logout ((IMAP_DATA*) conn->data);
       mutt_clear_error ();
       mutt_socket_close (conn);
-      imap_free_idata(&conn->data);
+      imap_free_idata(&(IMAP_DATA*)conn->data);
       mutt_socket_free (conn);
     }
 

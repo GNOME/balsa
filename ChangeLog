@@ -1,3 +1,8 @@
+2001-08-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: do not crash when there is an index without 
+	associated mailbox_node.
+
 2001-08-22  Carlos Morgado  <chbm@chbm.nu>
 
 	based on patch from M . Thielker <balsa@t-data.com>

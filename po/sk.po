@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-04 20:25+0100\n"
-"PO-Revision-Date: 2005-01-04 20:26+0100\n"
+"POT-Creation-Date: 2005-01-09 20:25+0100\n"
+"PO-Revision-Date: 2005-01-09 20:36+0100\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "Nemôžem vyhľadávať v adresári"
 msgid "Cannot add duplicate entry"
 msgstr "Nemôžem pridať duplikátnu položku"
 
-#: libbalsa/address-book.c:407 src/main-window.c:2203 src/main-window.c:4191
+#: libbalsa/address-book.c:407 src/main-window.c:2187 src/main-window.c:4176
 #: src/sendmsg-window.c:4810
 msgid "Unknown error"
 msgstr "Neznáma chyba"
@@ -99,7 +99,7 @@ msgstr "_Organizácia:"
 msgid "_Email Address:"
 msgstr "Adresa _elektronickej pošty:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:1136 libbalsa/message.c:835
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:1134 libbalsa/message.c:835
 msgid "(No subject)"
 msgstr "(Bez predmetu)"
 
@@ -262,8 +262,8 @@ msgid "%s: multiple keys for %s"
 msgstr "%s: viacnásobné kľúče pre %s"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1272
-#: libbalsa/mailbox_local.c:1274 src/sendmsg-window.c:3370
+#: libbalsa/identity.c:92 libbalsa/mailbox_local.c:1253
+#: libbalsa/mailbox_local.c:1255 src/sendmsg-window.c:3370
 #: src/sendmsg-window.c:3371
 msgid "Re:"
 msgstr "Odp:"
@@ -524,7 +524,7 @@ msgstr "IMAP server prerušil spojenie: %s Opätovné spájanie..."
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Otváram %s Počet odkazov: %d\n"
 
-#: libbalsa/mailbox_imap.c:1040 libbalsa/mailbox_imap.c:2067
+#: libbalsa/mailbox_imap.c:1040 libbalsa/mailbox_imap.c:2106
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Sťahovanie %ld kB"
@@ -543,21 +543,25 @@ msgstr ""
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "Nebola nájdená cesta pre poštovú schránku \"%s\", použijem \"%s\""
 
-#: libbalsa/mailbox_imap.c:2259
+#: libbalsa/mailbox_imap.c:1555 libbalsa/mailbox_imap.c:1595
+msgid "Cannot get IMAP handle"
+msgstr "NEpodarilo sa získať IMAP deskriptor"
+
+#: libbalsa/mailbox_imap.c:2298
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Odosielam %ld kB"
 
-#: libbalsa/mailbox_imap.c:2446
+#: libbalsa/mailbox_imap.c:2485
 msgid "Server-side threading not supported."
 msgstr "Vlákna na serveri nie sú podporované."
 
-#: libbalsa/mailbox_local.c:1421
+#: libbalsa/mailbox_local.c:1419
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Otváranie %s zlyhalo. Errno = %d, "
 
-#: libbalsa/mailbox_local.c:1443
+#: libbalsa/mailbox_local.c:1441
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Zlyhala synchronizácia poštovej schránky \"%s\""
@@ -1241,7 +1245,7 @@ msgstr "Skúste opäť neskôr."
 msgid "Sending Mail..."
 msgstr "Posielam správu..."
 
-#: libbalsa/send.c:240 src/main-window.c:2641
+#: libbalsa/send.c:240 src/main-window.c:2625
 msgid "_Hide"
 msgstr "_Skryť"
 
@@ -1489,7 +1493,7 @@ msgstr "Adresár Gnome"
 msgid "Address Book"
 msgstr "Adresár"
 
-#: libinit_balsa/balsa-druid-page-user.c:51
+#: libinit_balsa/balsa-druid-page-user.c:69
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
 "be, in the Email application in the 'Preferences' and 'Identities' commands "
@@ -1499,7 +1503,7 @@ msgstr ""
 "budete potrebovať, v poštovej aplikácii v príkazoch 'Predvoľby' a 'Identity' "
 "v menu 'Nástroje')"
 
-#: libinit_balsa/balsa-druid-page-user.c:56
+#: libinit_balsa/balsa-druid-page-user.c:74
 msgid ""
 " Whoever provides your email account should be able to give you the "
 "following information (if you have a Network Administrator, they may already "
@@ -1509,60 +1513,64 @@ msgstr ""
 "vám nasledujúce informácie (ak máte správcu siete, mohol to už pre vás "
 "nastaviť):"
 
-#: libinit_balsa/balsa-druid-page-user.c:62
+#: libinit_balsa/balsa-druid-page-user.c:80
 msgid "Yes, remember it"
 msgstr "Áno, zapamätať si ho"
 
-#: libinit_balsa/balsa-druid-page-user.c:62
+#: libinit_balsa/balsa-druid-page-user.c:80
 msgid "No, type it in every time"
 msgstr "Nie, zadávať ho vždy znova"
 
-#: libinit_balsa/balsa-druid-page-user.c:95
+#: libinit_balsa/balsa-druid-page-user.c:112
 msgid "Name of mail server for incoming _mail:"
 msgstr "Názov poštového servera pre prichádzajúcu _poštu:"
 
-#: libinit_balsa/balsa-druid-page-user.c:100
+#: libinit_balsa/balsa-druid-page-user.c:117
 msgid "_Type of mail server:"
 msgstr "_Typ poštového servera:"
 
-#: libinit_balsa/balsa-druid-page-user.c:104
+#: libinit_balsa/balsa-druid-page-user.c:121
 msgid "Connect using _SSL:"
 msgstr "Pripojiť pomocou _SSL:"
 
-#: libinit_balsa/balsa-druid-page-user.c:107
-msgid "Your e-mail _login name:"
-msgstr "Vaše _prihlasovacie meno elktronickej pošty:"
+#: libinit_balsa/balsa-druid-page-user.c:124
+msgid "Your email _login name:"
+msgstr "Vaše _prihlasovacie meno elektronickej pošty:"
 
-#: libinit_balsa/balsa-druid-page-user.c:110
+#: libinit_balsa/balsa-druid-page-user.c:127
 msgid "Your _password:"
 msgstr "Vaše _heslo:"
 
-#: libinit_balsa/balsa-druid-page-user.c:118
+#: libinit_balsa/balsa-druid-page-user.c:135
 msgid "_SMTP Server:"
 msgstr "Server _SMTP:"
 
 #. 2.1
-#: libinit_balsa/balsa-druid-page-user.c:123
+#: libinit_balsa/balsa-druid-page-user.c:140
 msgid "Your real _name:"
 msgstr "Vaše skutočné _meno:"
 
-#: libinit_balsa/balsa-druid-page-user.c:129
+#: libinit_balsa/balsa-druid-page-user.c:146
 msgid "Your _Email Address, for this email account:"
 msgstr "Vaša adresa _elektronickej pošty pre tento email účet:"
 
-#: libinit_balsa/balsa-druid-page-user.c:134
+#: libinit_balsa/balsa-druid-page-user.c:151
 msgid "_Remember your password:"
 msgstr "_Zapamätať vaše heslo:"
 
-#: libinit_balsa/balsa-druid-page-user.c:139
+#: libinit_balsa/balsa-druid-page-user.c:154
+msgid "_Refer to this account as:"
+msgstr "_Odvolávať sa na tento účet ako:"
+
+#: libinit_balsa/balsa-druid-page-user.c:162
 msgid "_Local mail directory:"
 msgstr "_Lokálny priečinok pošty:"
 
-#: libinit_balsa/balsa-druid-page-user.c:156
+#: libinit_balsa/balsa-druid-page-user.c:179
 msgid "User Settings"
 msgstr "Používateľské nastavenia"
 
-#: libinit_balsa/balsa-druid-page-user.c:302
+#: libinit_balsa/balsa-druid-page-user.c:325
 #, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -1795,7 +1803,7 @@ msgstr "Povoliť _TLS"
 msgid "Error displaying %s: %s\n"
 msgstr "Chyba pri zobrazovaní %s: %s\n"
 
-#: src/address-book-config.c:623 src/mailbox-conf.c:622
+#: src/address-book-config.c:623 src/mailbox-conf.c:630
 #: src/pref-manager.c:1748 src/pref-manager.c:3016
 msgid "_Add"
 msgstr "_Pridať"
@@ -1842,7 +1850,7 @@ msgstr "_Heslo pre poštovú schránku %s@%s:"
 msgid "Password needed"
 msgstr "Je potrebné heslo"
 
-#: src/balsa-app.c:95 src/folder-conf.c:344
+#: src/balsa-app.c:95 src/folder-conf.c:346
 msgid "_Remember password"
 msgstr "_Zapamätať heslo"
 
@@ -1973,11 +1981,11 @@ msgstr "_Ostatné..."
 msgid "Choose destination folder"
 msgstr "Vybrať cieľový priečinok"
 
-#: src/balsa-mblist.c:1895
+#: src/balsa-mblist.c:1917 src/balsa-mblist.c:1920
 msgid "Other..."
 msgstr "Ostatné..."
 
-#: src/balsa-mblist.c:2188
+#: src/balsa-mblist.c:2241
 #, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1987,7 +1995,7 @@ msgstr[2] "Zobrazená poštová schránka: %s, obsahujúca %d správy, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2194
+#: src/balsa-mblist.c:2247
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
@@ -2489,17 +2497,17 @@ msgstr "_Všetky"
 msgid "C_lear"
 msgstr "V_yčistiť"
 
-#: src/filter-edit-callbacks.c:1133 src/main-window.c:3788
+#: src/filter-edit-callbacks.c:1133 src/main-window.c:3772
 msgid "_Body"
 msgstr "_Telo"
 
 #. To:
-#: src/filter-edit-callbacks.c:1140 src/main-window.c:3789
+#: src/filter-edit-callbacks.c:1140 src/main-window.c:3773
 #: src/sendmsg-window.c:2797
 msgid "_To:"
 msgstr "_Pre:"
 
-#: src/filter-edit-callbacks.c:1147 src/main-window.c:3790
+#: src/filter-edit-callbacks.c:1147 src/main-window.c:3774
 msgid "_From:"
 msgstr "_Od:"
 
@@ -2507,7 +2515,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "Pre_dmet"
 
-#: src/filter-edit-callbacks.c:1162 src/main-window.c:3792
+#: src/filter-edit-callbacks.c:1162 src/main-window.c:3776
 msgid "_Cc:"
 msgstr "Kó_pia:"
 
@@ -2756,76 +2764,76 @@ msgstr ""
 "Dialógové okná filtrov sú otvorené. Zatvorte ich, aby ste mohli spustiť "
 "filtre na poštovú schránku"
 
-#: src/folder-conf.c:269
+#: src/folder-conf.c:271
 msgid "Remote IMAP folder"
 msgstr "Vzdialený priečinok IMAP"
 
 #. must NOT be modal
-#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:633
+#: src/folder-conf.c:274 src/folder-conf.c:727 src/mailbox-conf.c:641
 msgid "_Update"
 msgstr "_Aktualizovať"
 
-#: src/folder-conf.c:272 src/folder-conf.c:704
-msgid "_Create"
+#: src/folder-conf.c:274
+msgid "C_reate"
 msgstr "_Vytvoriť"
 
-#: src/folder-conf.c:294 src/mailbox-conf.c:1131 src/mailbox-conf.c:1222
+#: src/folder-conf.c:296 src/mailbox-conf.c:1139 src/mailbox-conf.c:1230
 msgid "_Basic"
 msgstr "_Základný"
 
-#: src/folder-conf.c:299
+#: src/folder-conf.c:301
 msgid "_Max number of connections"
 msgstr "_Maximálny počet spojení"
 
-#: src/folder-conf.c:306 src/mailbox-conf.c:1292
+#: src/folder-conf.c:308 src/mailbox-conf.c:1300
 msgid "Enable _persistent cache"
 msgstr "Povoliť _trvalú vyrovnávaciu pamäť"
 
-#: src/folder-conf.c:314 src/mailbox-conf.c:1296
+#: src/folder-conf.c:316 src/mailbox-conf.c:1304
 msgid "Enable _bug workarounds"
 msgstr "Povoliť obchádzanie _chýb"
 
-#: src/folder-conf.c:320 src/mailbox-conf.c:1185 src/mailbox-conf.c:1298
+#: src/folder-conf.c:322 src/mailbox-conf.c:1193 src/mailbox-conf.c:1306
 msgid "_Advanced"
 msgstr "_Rozšírený"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:323
+#: src/folder-conf.c:325
 msgid "Descriptive _Name:"
 msgstr "Popisné me_no:"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:330 src/mailbox-conf.c:1139 src/mailbox-conf.c:1231
+#: src/folder-conf.c:332 src/mailbox-conf.c:1147 src/mailbox-conf.c:1239
 msgid "_Server:"
 msgstr "_Server:"
 
 #. username
-#: src/folder-conf.c:338 src/mailbox-conf.c:1147
+#: src/folder-conf.c:340 src/mailbox-conf.c:1155
 msgid "Use_r name:"
 msgstr "Meno po_užívateľa:"
 
-#: src/folder-conf.c:349
+#: src/folder-conf.c:351
 msgid "_Password:"
 msgstr "_Heslo:"
 
-#: src/folder-conf.c:354
+#: src/folder-conf.c:356
 msgid "Subscribed _folders only"
 msgstr "Len prihlásené _priečinky"
 
-#: src/folder-conf.c:356
+#: src/folder-conf.c:358
 msgid "Always show _INBOX"
 msgstr "Vždy zobr_aziť Doručenú poštu"
 
-#: src/folder-conf.c:359
+#: src/folder-conf.c:361
 msgid "Pr_efix"
 msgstr "Pr_edpona"
 
-#: src/folder-conf.c:504
+#: src/folder-conf.c:509
 msgid "Select parent folder"
 msgstr "Vybrať rodičovský priečinok"
 
-#: src/folder-conf.c:577
+#: src/folder-conf.c:583
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2840,19 +2848,29 @@ msgstr ""
 "Doručená pošta a jej podpriečinky budú ponechané.\n"
 "Čo chcete spraviť?"
 
-#: src/folder-conf.c:583
+#: src/folder-conf.c:589
 msgid "Question"
 msgstr "Otázka"
 
-#: src/folder-conf.c:588
+#: src/folder-conf.c:594
 msgid "Rename INBOX"
 msgstr "Premenovať Doručenú poštu"
 
-#: src/folder-conf.c:590
+#: src/folder-conf.c:596
 msgid "Cancel"
 msgstr "Storno"
 
-#: src/folder-conf.c:686
+#: src/folder-conf.c:617
+#, c-format
+msgid "Folder rename failed. Reason: %s"
+msgstr "Premenovanie priečinka zlyhalo: Dôvod: %s"
+
+#: src/folder-conf.c:669
+#, c-format
+msgid "Folder creation failed. Reason: %s"
+msgstr "Vytvorenie priečinka zlyhalo. Dôvod: %s"
+
+#: src/folder-conf.c:709
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -2860,32 +2878,40 @@ msgstr ""
 "Priečinok IMAP, ktorý nie je poštovou schránkou\n"
 "nemá vlastnosti, ktoré môžu byť zmenené."
 
-#: src/folder-conf.c:701
+#: src/folder-conf.c:724
 msgid "Remote IMAP subfolder"
 msgstr "Vzdialený podpriečinok IMAP"
 
-#: src/folder-conf.c:725
+#: src/folder-conf.c:727
+msgid "_Create"
+msgstr "_Vytvoriť"
+
+#: src/folder-conf.c:748
 msgid "Rename or move subfolder"
 msgstr "Premenovať alebo presunúť podpriečinok"
 
-#: src/folder-conf.c:726
+#: src/folder-conf.c:749
 msgid "Create subfolder"
 msgstr "Vytvoriť podpriečinok"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:733
+#: src/folder-conf.c:756
 msgid "_Folder name:"
 msgstr "Ná_zov priečinka:"
 
-#: src/folder-conf.c:739
-msgid "_Subfolder of:"
-msgstr "P_odpriečinok priečinka:"
+#: src/folder-conf.c:765
+msgid "Host:"
+msgstr "Hostiteľ:"
 
-#: src/folder-conf.c:744
+#: src/folder-conf.c:771
 msgid "_Browse..."
 msgstr "_Prehliadať..."
 
-#: src/folder-conf.c:775
+#: src/folder-conf.c:780
+msgid "_Subfolder of:"
+msgstr "P_odpriečinok priečinka:"
+
+#: src/folder-conf.c:809
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -2893,7 +2919,7 @@ msgstr ""
 "Tento priečinok nie je uložený v konfigurácii. Zatiaľ neviem, ako ho mám "
 "odstrániť zo vzdialeného servera."
 
-#: src/folder-conf.c:784
+#: src/folder-conf.c:818
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2902,7 +2928,7 @@ msgstr ""
 "Toto odstráni priečinok \"%s\" zo zoznamu.\n"
 "Neskôr môžete použiť \"Nový priečinok IMAP\" na jeho opätovné pridanie.\n"
 
-#: src/folder-conf.c:789
+#: src/folder-conf.c:823
 msgid "Confirm"
 msgstr "Potvrdiť"
 
@@ -2925,13 +2951,13 @@ msgstr "CHYBA: "
 msgid "FATAL: "
 msgstr "ZÁVAŽNÉ: "
 
-#: src/mailbox-conf.c:213 src/mailbox-conf.c:1385 src/pref-manager.c:364
+#: src/mailbox-conf.c:213 src/mailbox-conf.c:1393 src/pref-manager.c:364
 #: src/pref-manager.c:3392 src/pref-manager.c:3398 src/pref-manager.c:3520
 #: src/pref-manager.c:3526
 msgid "Never"
 msgstr "Nikdy"
 
-#: src/mailbox-conf.c:214 src/mailbox-conf.c:1386 src/pref-manager.c:3521
+#: src/mailbox-conf.c:214 src/mailbox-conf.c:1394 src/pref-manager.c:3521
 #: src/pref-manager.c:3527
 msgid "If Possible"
 msgstr "Ak je možné"
@@ -3022,20 +3048,25 @@ msgstr ""
 msgid "_Remove from list"
 msgstr "_Odstrániť zo zoznamu"
 
-#: src/mailbox-conf.c:562 src/sendmsg-window.c:1179
+#: src/mailbox-conf.c:512
+#, c-format
+msgid "Folder deletion failed. Reason: %s"
+msgstr "Odstránenie priečinka zlyhalo. Dôvod: %s"
+
+#: src/mailbox-conf.c:570 src/sendmsg-window.c:1179
 msgid "Select Identity"
 msgstr "Vybrať identitu"
 
-#: src/mailbox-conf.c:589
+#: src/mailbox-conf.c:597
 msgid "Mailbox Configurator"
 msgstr "Konfigurátor poštovej schránky"
 
-#: src/mailbox-conf.c:784
+#: src/mailbox-conf.c:792
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
 
-#: src/mailbox-conf.c:922
+#: src/mailbox-conf.c:930
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -3045,86 +3076,86 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:1087 src/mailbox-conf.c:1134 src/mailbox-conf.c:1225
+#: src/mailbox-conf.c:1095 src/mailbox-conf.c:1142 src/mailbox-conf.c:1233
 msgid "Mailbox _Name:"
 msgstr "Me_no poštovej schránky:"
 
 #. path to file
-#: src/mailbox-conf.c:1095
+#: src/mailbox-conf.c:1103
 msgid "Mailbox _Path:"
 msgstr "Cesta k _poštovej schránke:"
 
-#: src/mailbox-conf.c:1097
+#: src/mailbox-conf.c:1105
 msgid "Mailbox Path"
 msgstr "Cesta k poštovej schránke"
 
 #. password field
-#: src/mailbox-conf.c:1153 src/mailbox-conf.c:1253
+#: src/mailbox-conf.c:1161 src/mailbox-conf.c:1261
 msgid "Pass_word:"
 msgstr "_Heslo:"
 
-#: src/mailbox-conf.c:1161
+#: src/mailbox-conf.c:1169
 msgid "_Delete messages from server after download"
 msgstr "_Vymazať správy zo servera po stiahnutí"
 
-#: src/mailbox-conf.c:1166
+#: src/mailbox-conf.c:1174
 msgid "_Filter messages through procmail"
 msgstr "_Filtrovať správy cez procmail"
 
-#: src/mailbox-conf.c:1170
+#: src/mailbox-conf.c:1178
 msgid "Fi_lter Command:"
 msgstr "Príkaz _filtra:"
 
-#: src/mailbox-conf.c:1178
+#: src/mailbox-conf.c:1186
 msgid "_Enable check for new mail"
 msgstr "Povoliť kontrolu novej _elektronickej pošty"
 
-#: src/mailbox-conf.c:1189
+#: src/mailbox-conf.c:1197
 msgid "Disable _APOP"
 msgstr "Zakázať _APOP"
 
 #. username
-#: src/mailbox-conf.c:1239
+#: src/mailbox-conf.c:1247
 msgid "_Username:"
 msgstr "Meno po_užívateľa:"
 
-#: src/mailbox-conf.c:1247
+#: src/mailbox-conf.c:1255
 msgid "_Remember Password"
 msgstr "_Zapamätať heslo"
 
-#: src/mailbox-conf.c:1258
+#: src/mailbox-conf.c:1266
 msgid "F_older Path:"
 msgstr "Cesta k zl_ožke:"
 
-#: src/mailbox-conf.c:1346
+#: src/mailbox-conf.c:1354
 msgid "Identity:"
 msgstr "Identita:"
 
-#: src/mailbox-conf.c:1352
+#: src/mailbox-conf.c:1360
 msgid "(No identity set)"
 msgstr "(nenastavená identita)"
 
-#: src/mailbox-conf.c:1356
+#: src/mailbox-conf.c:1364
 msgid "C_hange..."
 msgstr "Z_meniť..."
 
-#: src/mailbox-conf.c:1363
+#: src/mailbox-conf.c:1371
 msgid "Show address:"
 msgstr "Ukázať adresu:"
 
-#: src/mailbox-conf.c:1366
+#: src/mailbox-conf.c:1374
 msgid "_From"
 msgstr "_Od"
 
-#: src/mailbox-conf.c:1372
+#: src/mailbox-conf.c:1380
 msgid "_To"
 msgstr "_Pre"
 
-#: src/mailbox-conf.c:1387 src/pref-manager.c:3394 src/pref-manager.c:3400
+#: src/mailbox-conf.c:1395 src/pref-manager.c:3394 src/pref-manager.c:3400
 msgid "Always"
 msgstr "vždy"
 
-#: src/mailbox-conf.c:1393
+#: src/mailbox-conf.c:1401
 msgid ""
 "decrypt and check\n"
 "signatures automatically"
@@ -3856,11 +3887,11 @@ msgstr ""
 "Balsa teraz odosiela poštu.\n"
 "Prerušiť odosielanie?"
 
-#: src/main-window.c:1379 src/main-window.c:4877
+#: src/main-window.c:1379 src/main-window.c:4864
 msgid "Subject or Sender _Contains:"
 msgstr "Predmet alebo odosielateľ _obsahuje:"
 
-#: src/main-window.c:2202
+#: src/main-window.c:2186
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -3869,11 +3900,11 @@ msgstr ""
 "Nepodarilo sa otvoriť poštovú schránku!\n"
 "%s."
 
-#: src/main-window.c:2519
-msgid "translator_credits"
+#: src/main-window.c:2503
+msgid "translator-credits"
 msgstr "Marcel Telka <marcel@telka.sk>"
 
-#: src/main-window.c:2535
+#: src/main-window.c:2519
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3886,34 +3917,34 @@ msgstr ""
 "Ak potrebujete oznámiť chyby v programe, urobte tak, prosím, na adrese "
 "http://bugzilla.gnome.org/"
 
-#: src/main-window.c:2638
+#: src/main-window.c:2622
 msgid "Checking Mail..."
 msgstr "Kontrolujem poštu..."
 
-#: src/main-window.c:2837
+#: src/main-window.c:2821
 #, c-format
 msgid "IMAP Server %s: %s"
 msgstr "IMAP server %s: %s"
 
-#: src/main-window.c:2840
+#: src/main-window.c:2824
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Lokálna poštová schránka: %s"
 
-#: src/main-window.c:2977
+#: src/main-window.c:2961
 msgid "Finished Checking."
 msgstr "Kontrola ukončená."
 
-#: src/main-window.c:3039
+#: src/main-window.c:3023
 #, c-format
 msgid "Sending error: %s"
 msgstr "Chyba pri posielaní: %s"
 
-#: src/main-window.c:3124
+#: src/main-window.c:3108
 msgid "Balsa: New mail"
 msgstr "Balsa: Nová pošta"
 
-#: src/main-window.c:3136
+#: src/main-window.c:3120
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
@@ -3921,71 +3952,71 @@ msgstr[0] "Prijali ste %d nových správ."
 msgstr[1] "Prijali ste %d novú správu."
 msgstr[2] "Prijali ste %d nové správy."
 
-#: src/main-window.c:3139
+#: src/main-window.c:3123
 msgid "You have new mail."
 msgstr "Máte novú poštu."
 
-#: src/main-window.c:3750
+#: src/main-window.c:3734
 msgid "Search mailbox"
 msgstr "Vyhľadať v poštovej schránke"
 
-#: src/main-window.c:3767
+#: src/main-window.c:3751
 msgid "_Search for:"
 msgstr "_Vyhľadať:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3780
+#: src/main-window.c:3764
 msgid "In:"
 msgstr "V:"
 
-#: src/main-window.c:3791
+#: src/main-window.c:3775
 msgid "S_ubject"
 msgstr "_Predmet"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3796
+#: src/main-window.c:3780
 msgid "Show only matching messages"
 msgstr "Zobraziť len zodpovedajúce správy"
 
 #. Frame with OK button
-#: src/main-window.c:3817
+#: src/main-window.c:3801
 msgid "Open next matching message"
 msgstr "Otvoriť ďalšiu zodpovedajúcu správu"
 
-#: src/main-window.c:3828
+#: src/main-window.c:3812
 msgid "_Reverse search"
 msgstr "_Spätné vyhľadávanie"
 
-#: src/main-window.c:3833
+#: src/main-window.c:3817
 msgid "_Wrap around"
 msgstr "_Prechádzať dookola"
 
-#: src/main-window.c:3909
+#: src/main-window.c:3893
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Chyba pri zobrazovaní pomocníka: %s\n"
 
-#: src/main-window.c:3994
+#: src/main-window.c:3978
 msgid "You can apply filters only on mailbox\n"
 msgstr "Môžete aplikovať filtre len na poštovú schránku\n"
 
-#: src/main-window.c:4190
+#: src/main-window.c:4175
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Nepodarilo sa otvoriť kôš: %s"
 
-#: src/main-window.c:4317
+#: src/main-window.c:4304
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (len na čítanie)"
 
-#: src/main-window.c:4319
+#: src/main-window.c:4306
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:4876
+#: src/main-window.c:4863
 msgid "Subject or Receiver _Contains:"
 msgstr "Predmet alebo príjemca _obsahuje:"
 

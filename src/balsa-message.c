@@ -668,18 +668,19 @@ body2canvas (BalsaMessage * bmessage, Message * message)
 
   bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
 
-  if(bmessage->headers)
+  if(bmessage->headers) {
      gnome_canvas_item_get_bounds (
 	GNOME_CANVAS_ITEM (bmessage->headers), &x1, &y1, &x2, &y2);
-  else {
-     x1 = x2= y1 = y2 = 0;
+     y1 = (y2 - y1) + 15;
+  } else {
+     y1 = 0;
   }
 
   bmessage->body =
     GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
 					       GNOME_TYPE_CANVAS_GROUP,
 					       "x", (double) 10.0,
-					       "y", (double) (y2 - y1) + 15,
+					       "y", (double) y1,
 					       NULL));
 
   message_body_ref (message);

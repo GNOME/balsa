@@ -1178,6 +1178,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   body->buffer = gtk_editable_get_chars ( GTK_EDITABLE (bsmsg->text), 0, -1);
   if(balsa_app.wordwrap)
     wrap_string (body->buffer, balsa_app.wraplength);
+  body->charset = g_strdup(bsmsg->charset);
 
   message->body_list = g_list_append (message->body_list, body);
   
@@ -1268,6 +1269,7 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
 					gtk_text_get_length (
 					   GTK_TEXT (bsmsg->text)));
+  body->charset = g_strdup(bsmsg->charset);
 
   message->body_list = g_list_append (message->body_list, body);
 
@@ -1527,7 +1529,9 @@ set_iso_charset(BalsaSendmsg *msg, gint code, gint idx) {
    
    if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
       return TRUE;
-   
+
+   msg->charset = iso_charset_names[idx];
+
    font_name = get_font_name(balsa_app.message_font, code);
    if(msg->font) gdk_font_unref(msg->font);
 

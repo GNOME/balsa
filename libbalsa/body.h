@@ -30,6 +30,7 @@ struct _Body
   gchar *htmlized;		/* holds htmlrep of buffer, or NULL */
   BODY *mutt_body;		/* pointer to BODY struct of mutt message */
   gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
+  gchar *charset;               /* the charset, used for sending, replying. */
 };
 
 Body *body_new(void);

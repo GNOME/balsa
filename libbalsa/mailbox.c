@@ -1462,6 +1462,7 @@ body_new ()
   body->buffer = NULL;
   body->mutt_body = NULL;
   body->filename = NULL;
+  body->charset  = NULL;
   return body;
 }
 
@@ -1475,5 +1476,7 @@ body_free (Body * body)
   g_free (body->htmlized);
   g_free (body->buffer);
   g_free (body->filename);
+  g_free (body->charset);
   g_free (body);
 }
+

@@ -442,7 +442,7 @@ lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
     gmime_stream = g_mime_stream_fs_new(fd);
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
 					GMIME_STREAM_BUFFER_BLOCK_READ);
-    g_mime_stream_unref(gmime_stream);
+    g_object_unref(gmime_stream);
     line = g_byte_array_new();
     do {
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
@@ -451,7 +451,7 @@ lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
 	lbm_mh_handle_seq_line(mailbox, line->data);
 	line->len = 0;
     } while (!g_mime_stream_eos(gmime_stream_buffer));
-    g_mime_stream_unref(gmime_stream_buffer);
+    g_object_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
 }
 
@@ -528,7 +528,7 @@ lbm_mh_check(LibBalsaMailboxMh * mh, const gchar * path)
     gmime_stream = g_mime_stream_fs_new(fd);
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
 					GMIME_STREAM_BUFFER_BLOCK_READ);
-    g_mime_stream_unref(gmime_stream);
+    g_object_unref(gmime_stream);
 
     line = (GByteArray *) g_array_new(TRUE, FALSE, 1);
     do {
@@ -567,7 +567,7 @@ lbm_mh_check(LibBalsaMailboxMh * mh, const gchar * path)
 	}
     } while (!g_mime_stream_eos(gmime_stream_buffer));
 
-    g_mime_stream_unref(gmime_stream_buffer);
+    g_object_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
 
     return retval;
@@ -880,10 +880,10 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     fd = libbalsa_mailbox_mh_open_temp(path, &tmp);
     if (fd == -1)
     {
-	g_mime_stream_unref(unseen.line);
-	g_mime_stream_unref(flagged.line);
-	g_mime_stream_unref(replied.line);
-	g_mime_stream_unref(recent.line);
+	g_object_unref(unseen.line);
+	g_object_unref(flagged.line);
+	g_object_unref(replied.line);
+	g_object_unref(recent.line);
 	libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
 	return FALSE;
     }
@@ -893,7 +893,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     gmime_stream = g_mime_stream_fs_new(sequences_fd);
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
 					GMIME_STREAM_BUFFER_BLOCK_READ);
-    g_mime_stream_unref(gmime_stream);
+    g_object_unref(gmime_stream);
     line = g_byte_array_new();
     do {
 	line->len = 0;
@@ -908,7 +908,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    g_mime_stream_write(temp_stream, line->data, line->len);
 	}
     } while (!g_mime_stream_eos(gmime_stream_buffer));
-    g_mime_stream_unref(gmime_stream_buffer);
+    g_object_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
 
     /* write sequences */
@@ -918,17 +918,17 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	!lbm_mh_finish_line(&recent, temp_stream, LibBalsaMailboxMhRecent)) {
 	unlink(tmp);
 	g_free(tmp);
-	g_mime_stream_unref(temp_stream);
-	g_mime_stream_unref(unseen.line);
-	g_mime_stream_unref(flagged.line);
-	g_mime_stream_unref(replied.line);
-	g_mime_stream_unref(recent.line);
+	g_object_unref(temp_stream);
+	g_object_unref(unseen.line);
+	g_object_unref(flagged.line);
+	g_object_unref(replied.line);
+	g_object_unref(recent.line);
 	libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
 	return FALSE;
     }
 
     /* close tempfile */
-    g_mime_stream_unref(temp_stream);
+    g_object_unref(temp_stream);
 
     /* unlink '.mh_sequences' file */
     unlink(sequences_filename);
@@ -939,10 +939,10 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	unlink (tmp);
 
     g_free(tmp);
-    g_mime_stream_unref(unseen.line);
-    g_mime_stream_unref(flagged.line);
-    g_mime_stream_unref(replied.line);
-    g_mime_stream_unref(recent.line);
+    g_object_unref(unseen.line);
+    g_object_unref(flagged.line);
+    g_object_unref(replied.line);
+    g_object_unref(recent.line);
 
     /* Record the mtimes; we'll just use the current time--someone else
      * might have changed something since we did, despite the file
@@ -1083,11 +1083,11 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	in_stream = g_mime_stream_filter_new_with_stream (tmp);
 	g_mime_stream_filter_add ( GMIME_STREAM_FILTER (in_stream), crlffilter );
 	g_object_unref (crlffilter);
-	g_mime_stream_unref (tmp);
+	g_object_unref (tmp);
     }    
     if (g_mime_stream_write_to_stream( in_stream, out_stream) == -1)
     {
-	g_mime_stream_unref(out_stream);
+	g_object_unref(out_stream);
 	unlink (tmp);
 	g_free(tmp);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
@@ -1095,8 +1095,8 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
                     _("Data copy error"));
 	return -1;
     }
-    g_mime_stream_unref(out_stream);
-    g_mime_stream_unref(in_stream);
+    g_object_unref(out_stream);
+    g_object_unref(in_stream);
 
     fileno = mh->last_fileno; 
     retries = 10;

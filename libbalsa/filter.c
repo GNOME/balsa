@@ -32,7 +32,8 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <gnome.h>
+#include <libgnome/gnome-i18n.h>
+#include <libgnome/gnome-sound.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

@@ -27,6 +27,7 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_VCARD_H__
 #define __LIBBALSA_ADDRESS_BOOK_VCARD_H__
 
+#include <time.h>
 #include "address-book.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_VCARD		(libbalsa_address_book_vcard_get_type())

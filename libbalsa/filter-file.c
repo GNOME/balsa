@@ -40,13 +40,15 @@
 #endif
 #include <string.h>
 #include <time.h>
+
+#include <libgnome/gnome-i18n.h>
+#include <libgnome/gnome-config.h>
+
 #include <sys/types.h>
 #include "filter-file.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
-#include <gnome.h>
-
 
 /* Load the header of a filter filter (you have to separately load the
  * associated conditions) Filter is marked as invalid Position

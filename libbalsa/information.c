@@ -22,8 +22,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
-
 #include "information.h"
 
 struct information_data {

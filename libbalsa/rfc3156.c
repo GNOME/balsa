@@ -22,11 +22,13 @@
 
 #ifdef HAVE_GPGME
 
-#include <gnome.h>
 #include <string.h>
 #include <gpgme.h>
 #include <pwd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+
+#include <libgnome/gnome-i18n.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

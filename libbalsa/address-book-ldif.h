@@ -27,6 +27,7 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_LDIF_H__
 #define __LIBBALSA_ADDRESS_BOOK_LDIF_H__
 
+#include <time.h>
 #include "address-book.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_LDIF			(libbalsa_address_book_ldif_get_type())

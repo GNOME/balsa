@@ -26,7 +26,6 @@
 
 #ifdef HAVE_GPGME
 
-#include <gnome.h>
 #include <gpgme.h>
 #include "libbalsa.h"
 #include "misc.h"

@@ -43,7 +43,8 @@
 #include <pthread.h>
 #endif
 
-#include <gnome.h> /* for gnome-i18n.h, gnome-config and gnome-util */
+#include <libgnome/gnome-i18n.h>
+#include <libgnome/gnome-config.h>
 
 #include "libimap.h"
 #include "filter-funcs.h"
@@ -1649,11 +1650,11 @@ libbalsa_address_new_from_imap_address(ImapAddress *addr)
     /* it will be owned by the caller */
 
     if (addr->name)
-	address->full_name = g_mime_utils_8bit_header_decode(addr->name);
+	address->full_name = g_mime_utils_header_decode_text(addr->name);
     if (addr->addr_spec)
 	address->address_list =
 	    g_list_append(address->address_list,
-			  g_mime_utils_8bit_header_decode(addr->
+			  g_mime_utils_header_decode_text(addr->
 							  addr_spec));
     else { /* FIXME: is that a right thing? */
         g_object_unref(G_OBJECT(address));
@@ -1693,7 +1694,7 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
 
     if(is_embedded) {
         headers->subject = 
-            g_mime_utils_8bit_header_decode(envelope->subject);
+            g_mime_utils_header_decode_text(envelope->subject);
         libbalsa_utf8_sanitize(&headers->subject, TRUE, NULL);
     }
 }
@@ -1720,7 +1721,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 	libbalsa_message_set_headers_from_string(message, hdr);
     envelope        = imsg->envelope;
     message->length = imsg->rfc822size;
-    message->subj   = g_mime_utils_8bit_header_decode(envelope->subject);
+    message->subj   = g_mime_utils_header_decode_text(envelope->subject);
     libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
     message->sender =
 	libbalsa_address_new_from_imap_address(envelope->sender);
@@ -1809,7 +1810,7 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     str = imap_body_get_dsp_param(imap_body, "filename");
     if(!str) str = imap_body_get_param(imap_body, "name");
     if(str) {
-        lbbody->filename  = g_mime_utils_8bit_header_decode(str);
+        lbbody->filename  = g_mime_utils_header_decode_text(str);
         libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
     }
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
@@ -1855,7 +1856,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
     g_mime_parser_set_scan_from(mime_parser, FALSE);
     message->mime_msg = g_mime_parser_construct_message(mime_parser);
     g_object_unref(mime_parser);
-    g_mime_stream_unref(stream);
+    g_object_unref(stream);
     
     /* follow libbalsa_mailbox_local_fetch_structure here;
      * perhaps create common helper */
@@ -2204,7 +2205,7 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 
     stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);
     tmpstream = g_mime_stream_filter_new_with_stream(stream);
-    g_mime_stream_unref(stream);
+    g_object_unref(stream);
 
     crlffilter =
 	g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
@@ -2215,13 +2216,13 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, err);
     if (outfd < 0) {
 	g_warning("Could not create temporary file: %s", (*err)->message);
-	g_mime_stream_unref(tmpstream);
+	g_object_unref(tmpstream);
 	return -1;
     }
 
     outstream = g_mime_stream_fs_new(outfd);
     g_mime_stream_write_to_stream(tmpstream, outstream);
-    g_mime_stream_unref(tmpstream);
+    g_object_unref(tmpstream);
 
     len = g_mime_stream_tell(outstream);
     g_mime_stream_reset(outstream);
@@ -2242,7 +2243,7 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     }
     libbalsa_mailbox_imap_release_handle(mimap);
 
-    g_mime_stream_unref(outstream);
+    g_object_unref(outstream);
     unlink(outfile);
     g_free(outfile);
 

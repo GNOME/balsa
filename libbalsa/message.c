@@ -175,7 +175,7 @@ libbalsa_message_finalize(GObject * object)
     message->body_list = NULL;
 
     if (message->mime_msg) {
-	g_mime_object_unref(GMIME_OBJECT(message->mime_msg));
+	g_object_unref(message->mime_msg);
 	message->mime_msg = NULL;
     }
     G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -300,8 +300,7 @@ libbalsa_message_charset(LibBalsaMessage * message)
         if (!charset)
             return NULL;
     }
-    /* FIXME: use function g_mime_charset_canon_name from gmime-2.2 */
-    tmp = g_mime_charset_name(charset);
+    tmp = g_mime_charset_canon_name(charset);
     return g_strdup(tmp);
 }
 
@@ -444,7 +443,7 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
     value = g_mime_message_get_header(message, "In-Reply-To");
     if (value) {
 	res = g_list_prepend(res, libbalsa_create_hdr_pair("In-Reply-To",
-				g_mime_utils_8bit_header_decode(value)));
+				g_mime_utils_header_decode_text(value)));
     }
 
     g_mime_header_foreach(GMIME_OBJECT(message)->headers,
@@ -488,8 +487,8 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
     out_stream = g_mime_stream_file_new(outfile);
     res = g_mime_stream_write_to_stream(msg_stream, out_stream);
 
-    g_mime_stream_unref(msg_stream);
-    g_mime_stream_unref(out_stream);
+    g_object_unref(msg_stream);
+    g_object_unref(out_stream);
 
     return res >= 0;
 }
@@ -829,7 +828,7 @@ libbalsa_message_get_subject(LibBalsaMessage* msg)
         ret = g_mime_message_get_subject(msg->mime_msg);
 	if (ret)
 	    LIBBALSA_MESSAGE_SET_SUBJECT(msg, (gchar*)
-				 ret = g_mime_utils_8bit_header_decode(ret));
+				 ret = g_mime_utils_header_decode_text(ret));
     } else
 	ret = msg->subj;
 
@@ -1006,7 +1005,7 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
 #ifdef MESSAGE_COPY_CONTENT
     header = g_mime_message_get_subject(mime_msg);
     if (header) {
-	message->subj = g_mime_utils_8bit_header_decode(header);
+	message->subj = g_mime_utils_header_decode_text(header);
         canonize_header_value(message->subj);
 	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
     }
@@ -1131,7 +1130,7 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	    return FALSE;
 #if MESSAGE_COPY_CONTENT
 	g_free(message->subj);
-        message->subj = g_mime_utils_8bit_header_decode(value);
+        message->subj = g_mime_utils_header_decode_text(value);
 	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
 #endif
     } else

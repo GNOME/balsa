@@ -22,8 +22,10 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include <gtk/gtkmarshal.h>
+
+#include <libgnome/gnome-i18n.h>
+#include <libgnome/gnome-config.h>
 
 #include "address-book.h"
 #include "libbalsa-marshal.h"

@@ -22,8 +22,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
-
 #include "abook-completion.h"
 #include "information.h"
 #include "misc.h"

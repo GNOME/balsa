@@ -144,7 +144,7 @@ msg_queue_item_destroy(MessageQueueItem * mqi)
     if (*mqi->tempfile)
 	unlink(mqi->tempfile);
     if (mqi->stream)
-	g_mime_stream_unref(mqi->stream);
+	g_object_unref(mqi->stream);
     if (mqi->orig)
 	g_object_unref(mqi->orig);
     g_free(mqi);
@@ -272,6 +272,22 @@ ensure_send_progress_dialog()
 #define send_unlock() 
 #endif
 
+static void
+lbs_set_content(GMimePart * mime_part, gchar * content)
+{
+    GMimeStream *stream;
+    GMimeDataWrapper *wrapper;
+
+    stream = g_mime_stream_mem_new();
+    g_mime_stream_write(stream, content, strlen(content));
+
+    wrapper = g_mime_data_wrapper_new();
+    g_mime_data_wrapper_set_stream(wrapper, stream);
+    g_object_unref(stream);
+
+    g_mime_part_set_content_object(mime_part, wrapper);
+    g_object_unref(wrapper);
+}
 
 static GMimeObject *
 add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style, 
@@ -308,11 +324,12 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
     g_mime_part_set_encoding(mime_part, encoding_style);
     g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
 					     "charset", charset);
-    if (flow)
+    if (flow) {
 	g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
 						 "DelSp", "Yes");
         g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
 						 "Format", "Flowed");
+    }
 
     if (!charset)
 	charset="us-ascii";
@@ -337,10 +354,10 @@ add_mime_body_plain(LibBalsaMessageBody *body, gint encoding_style,
 
 	g_object_unref(G_OBJECT(wrapper));
 	g_object_unref(G_OBJECT(filter));
-	g_mime_stream_unref(filter_stream);
-	g_mime_stream_unref(stream);
+	g_object_unref(filter_stream);
+	g_object_unref(stream);
     } else
-	g_mime_part_set_content(mime_part, body->buffer, strlen(body->buffer));
+	lbs_set_content(mime_part, body->buffer);
 
     return GMIME_OBJECT(mime_part);
 }
@@ -604,9 +621,9 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 		g_object_unref(G_OBJECT(filter));
 		mem_stream = g_mime_stream_mem_new();
 		g_mime_stream_write_to_stream(filter_stream, mem_stream);
-		g_mime_stream_unref(filter_stream);
+		g_object_unref(filter_stream);
 		g_mime_stream_reset(mem_stream);
-		g_mime_stream_unref(new_message->stream);
+		g_object_unref(new_message->stream);
 		new_message->stream = mem_stream;
 	    }
 
@@ -1287,7 +1304,7 @@ balsa_send_message_real(SendMessageInfo* info)
 	    g_mime_stream_file_set_owner(GMIME_STREAM_FILE(out), FALSE);
 	    if (g_mime_stream_write_to_stream(mqi->stream, out) == -1)
 		mqi->status = MQI_FAILED;
-	    g_mime_stream_unref(out);
+	    g_object_unref(out);
 	    if (pclose(sendmail) != 0)
 		mqi->status = MQI_FAILED;
 	    if (mqi->status != MQI_FAILED)
@@ -1490,9 +1507,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		    g_mime_object_set_content_type_parameter(mime_part,
 					     "name", body->filename);
 		}
-		g_mime_part_set_content(GMIME_PART(mime_part),
-					"Note: this is _not_ the real body!\n",
-					34);
+		lbs_set_content(GMIME_PART(mime_part),
+                                "Note: this is _not_ the real body!\n");
 	    } else if (g_ascii_strcasecmp(mime_type[0], "message") == 0) {
 		int fd;
 		GMimeStream *stream;
@@ -1557,7 +1573,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		stream = g_mime_stream_fs_new(fd);
 		content = g_mime_data_wrapper_new_with_stream(stream,
 			GMIME_PART_ENCODING_DEFAULT);
-		g_mime_stream_unref(stream);
+		g_object_unref(stream);
 		g_mime_part_set_content_object(GMIME_PART(mime_part),
 			                       content);
 		g_object_unref(content);
@@ -1785,7 +1801,8 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
                                     "X-Balsa-Fcc");
 	mqi->stream = g_mime_stream_mem_new();
-	g_mime_message_write_to_stream(message->mime_msg, mqi->stream);
+	g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
+                                      mqi->stream);
 	g_mime_stream_reset(mqi->stream);
     } else
 	mqi->stream = libbalsa_mailbox_get_message_stream(message->mailbox,

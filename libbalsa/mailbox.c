@@ -921,6 +921,10 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  */
 
 #ifdef BALSA_USE_THREADS
+#if GTK_CHECK_VERSION(2, 4, 0)
+#define lbm_threads_enter() (gdk_threads_enter(), TRUE)
+#define lbm_threads_leave(unlock) gdk_threads_leave()
+#else
 static pthread_t holding_thread = 0;
 static gboolean
 lbm_threads_enter(void)
@@ -964,6 +968,7 @@ lbm_threads_leave(gboolean unlock)
         holding_thread = 0;
     }
 }
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 #else
 #define lbm_threads_enter() FALSE
 #define lbm_threads_leave(unlock)
@@ -1608,7 +1613,8 @@ libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
             get_message_stream(mailbox, message);
     else {
         mime_stream = g_mime_stream_mem_new();
-        g_mime_message_write_to_stream(message->mime_msg, mime_stream);
+        g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
+                                      mime_stream);
         g_mime_stream_reset(mime_stream);
     }
 
@@ -3244,14 +3250,14 @@ lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage * msg)
                                              LB_FETCH_RFC822_HEADERS);
     mime_msg = msg->mime_msg;
     if (mime_msg)
-        g_mime_object_ref(GMIME_OBJECT(mime_msg));
+        g_object_ref(mime_msg);
     else {
         GMimeStream *stream;
         GMimeParser *parser;
 
         stream = libbalsa_mailbox_get_message_stream(mailbox, msg);
         parser = g_mime_parser_new_with_stream(stream);
-        g_mime_stream_unref(stream);
+        g_object_unref(stream);
         mime_msg = g_mime_parser_construct_message(parser);
         g_object_unref(parser);
     }
@@ -3294,7 +3300,7 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
             g_ptr_array_add(partials, partial);
             if (g_mime_message_partial_get_total(partial) > 0)
                 total = g_mime_message_partial_get_total(partial);
-            g_mime_object_unref(GMIME_OBJECT(mime_message));
+            g_object_unref(mime_message);
 
             g_array_append_val(messages, msgno);
         } 

@@ -25,13 +25,16 @@
 #define _XOPEN_SOURCE 500
 
 #include <glib.h>
-#include <gnome.h>
 
 #include <string.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
+#include <sys/stat.h>
 #include <stdarg.h>
 #include <unistd.h>
+
+#include <libgnome/gnome-util.h>
+#include <libgnome/gnome-i18n.h>
 
 #if ENABLE_LDAP
 #include <ldap.h>

@@ -1,3 +1,6 @@
+2000-2-26  Peter Williams <peter@newton.cx>
+	* Allowed the user to save the text in any message by clicking.
+	
 2000-2-26   Birger Langkjer <birger.langkjer@image.dk>
 
 	* Integrated a patch from Mikael Hermansson <mikeh@bahnhof.se>
@@ -16,19 +19,15 @@
 	* balsa.desktop:
 	* Makefile.am: added desktop file for balsa.
 
+2000-2-1   Matthew Guenther <mguenther@netcom.ca>
+	* src/mblist-window.c: Column size saving code cleaned up, better
+	  implementation using notebook selection.  Good to go.
+	
 2000-1-29   Matthew Guenther <mguenther@netcom.ca>
 	
 	* src/balsa-app.h:
 	* src/balsa-app.c:
-	* src/pref-manager.c:
-	* src/balsa-index.c: Added the ability to save index column sizes
-	  between mailboxes and sessions.  Rough. 
-
-2000-1-29   Matthew Guenther <mguenther@netcom.ca>
-	
-	* src/balsa-app.h:
-	* src/balsa-app.c:
-	* src/pref-manager.c:
+	* src/save-restore.c:
 	* src/balsa-index.c: Added the ability to save index column sizes
 	  between mailboxes and sessions.  Rough. 
 

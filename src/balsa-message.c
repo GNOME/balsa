@@ -152,6 +152,7 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
 
   GtkWidget *save_dialog;
   GtkWidget *file_entry;
+  GtkWidget *label;
 
   GdkCursor *cursor = NULL;
 
@@ -162,6 +163,7 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
     case GDK_BUTTON_PRESS:
       save_dialog = gnome_dialog_new (_ ("Save MIME Part"),
 				      _ ("Save"), _ ("Cancel"), NULL);
+      label = gtk_label_new( _("Please choose a filename to save this part of the message as:") );
       file_entry = gnome_file_entry_new ("Balsa_MIME_Saver",
 					 _ ("Save MIME Part"));
       info->file_entry = file_entry;
@@ -171,6 +173,8 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
 	  gtk_entry_set_text (GTK_ENTRY (gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (file_entry))), info->body->filename);
 	}
 
+      gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), label, FALSE, FALSE, 10);
+      gtk_widget_show (label);
       gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (save_dialog)->vbox), file_entry, FALSE, FALSE, 10);
       gtk_widget_show (file_entry);
       gnome_dialog_button_connect (GNOME_DIALOG (save_dialog), 0, save_MIME_part, info);
@@ -200,6 +204,64 @@ item_event (GnomeCanvasItem * item, GdkEvent * event, gpointer data)
       break;
     }
 }
+
+/* PKGW: right-click on a text area to save it. */
+static void
+text_event( GnomeCanvasItem * item, GdkEvent * event, gpointer data )
+{
+	BalsaSaveFileInfo *info;
+	GtkWidget *save_dialog;
+	GtkWidget *file_entry;
+	GtkWidget *label;
+	GdkCursor *cursor = NULL;
+
+	info = (BalsaSaveFileInfo *) data;
+
+	switch( event->type ) {
+	case GDK_BUTTON_PRESS:
+		save_dialog = gnome_dialog_new( _("Save Text"),
+						_("Save"), _("Cancel"), NULL );
+		label = gtk_label_new( _("Please choose a filename to save this part of the message as:") );
+		file_entry = gnome_file_entry_new( "Balsa_MIME_Saver",
+					 _("Save Text") );
+		info->file_entry = file_entry;
+
+		/* Sorry for the unclear code :-( */
+		if( info->body->filename ) {
+			gtk_entry_set_text( GTK_ENTRY( gnome_file_entry_gtk_entry( 
+				GNOME_FILE_ENTRY( file_entry ))), info->body->filename );
+		}
+
+
+		gtk_widget_show( label );
+		gtk_box_pack_start( GTK_BOX( GNOME_DIALOG( save_dialog )->vbox ), 
+				    label, FALSE, FALSE, 10 );
+		gtk_box_pack_start( GTK_BOX( GNOME_DIALOG( save_dialog )->vbox ), 
+				    file_entry, FALSE, FALSE, 10 );
+		gtk_widget_show( file_entry );
+		gnome_dialog_button_connect( GNOME_DIALOG( save_dialog ), 0, save_MIME_part, info );
+		gtk_window_set_modal( GTK_WINDOW( save_dialog ), TRUE );
+		gnome_dialog_run( GNOME_DIALOG( save_dialog ) );
+		gtk_widget_destroy( save_dialog );
+		save_dialog = NULL;
+		break;
+
+	case GDK_ENTER_NOTIFY:
+		cursor = gdk_cursor_new( GDK_HAND2 );
+		gdk_window_set_cursor( GTK_LAYOUT( item->canvas )->bin_window, cursor );
+		gdk_cursor_destroy( cursor );
+		break;
+
+	case GDK_LEAVE_NOTIFY:
+		cursor = gdk_cursor_new( GDK_HAND1 );
+		gdk_window_set_cursor( GTK_LAYOUT( item->canvas )->bin_window, NULL );
+       		break;
+
+	default:
+		break;
+	}
+}
+/* End PKGW */
 
 static void
 save_MIME_part (GtkObject * o, BalsaSaveFileInfo * info)
@@ -420,15 +482,17 @@ balsa_message_set (BalsaMessage * bmessage,
 static GnomeCanvasItem *
 balsa_message_text_item (gchar * text, GnomeCanvasGroup * group, double x, double y)
 {
-  GnomeCanvasItem *new;
-  new = gnome_canvas_item_new (group,
-			       GNOME_TYPE_CANVAS_TEXT,
-			       "x", x,
-			       "y", y,
-			       "anchor", GTK_ANCHOR_NW,
-			       "font",  balsa_app.message_font,
-			       "text", text, NULL);
-  return new;
+	GnomeCanvasItem *item;
+
+	item = gnome_canvas_item_new( group,
+				      GNOME_TYPE_CANVAS_TEXT,
+				      "x", x,
+				      "y", y,
+				      "anchor", GTK_ANCHOR_NW,
+				      "font",  balsa_app.message_font,
+				      "text", text, 
+				      NULL );
+	return item;
 }
 
 static GnomeCanvasItem *
@@ -771,56 +835,71 @@ video2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group
 static void
 mimetext2canvas (Message * message, BODY * bdy, FILE * fp, GnomeCanvasGroup * group)
 {
-  STATE s;
-  gchar *ptr = 0;
-  size_t alloced;
-  GnomeCanvasItem *item;
-  BalsaSaveFileInfo *info;
+	STATE s;
+	gchar *ptr = 0;
+	size_t alloced;
+	BalsaSaveFileInfo *info;
 
-  fseek (fp, bdy->offset, 0);
-  s.fpin = fp;
-  s.prefix = '\0';
-  mutt_mktemp (tmp_file_name);
-  s.prefix = 0;
-  s.fpout = fopen (tmp_file_name, "w+");
-  mutt_decode_attachment (bdy, &s);
-  fflush (s.fpout);
-  alloced = readfile (s.fpout, &ptr);
-  if (ptr)
-    {
-      ptr[alloced - 1] = '\0';
-      if (strcmp (bdy->subtype, "html") == 0)
-	{
-	  GnomeCanvasItem *item;
-	  item = balsa_message_text_item ("--HTML--", group, 0.0, next_part_height (group));
-	  balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
-	  goto END;
+	fseek( fp, bdy->offset, 0 );
+	s.fpin = fp;
+	s.prefix = '\0';
+
+	mutt_mktemp( tmp_file_name );
+	s.fpout = fopen( tmp_file_name, "w+" );
+
+
+	mutt_decode_attachment( bdy, &s );
+	fflush( s.fpout );
+
+	alloced = readfile( s.fpout, &ptr );
+
+	if( ptr ) {
+		gchar *linktext = "--TEXT--";
+		gboolean showtext, showlink;
+
+		ptr[alloced - 1] = '\0';
+
+		if( g_strcasecmp( bdy->subtype, "html" ) == 0 ) {
+			linktext = "--HTML--";
+			showtext = FALSE;
+			showlink = TRUE;
+		} else {
+			showtext = TRUE;
+			showlink = FALSE;
+		}
+
+		if( bdy->filename == NULL )
+			bdy->filename = g_strdup( "textfile" );
+
+		info = balsa_save_file_info_new( NULL, message, bdy );
+
+		/* create text and info, set them up */
+		if( showlink ) {
+			GnomeCanvasItem *link;
+
+			link = balsa_message_text_item( linktext, group, 0.0,
+							next_part_height( group ) );
+			balsa_message_text_item_set_bg( link, group, BGLINKCOLOR );
+			gtk_signal_connect( GTK_OBJECT( link ), "event", GTK_SIGNAL_FUNC( item_event ), info );
+		}
+
+		/* conditionally add the text item to the canvas */
+		if( showtext ) {
+			GnomeCanvasItem *text;
+
+			text = balsa_message_text_item( ptr, group, 0.0, next_part_height (group) );
+
+			if( showlink == FALSE ) {
+				gtk_signal_connect( GTK_OBJECT( text ), "event", 
+						    GTK_SIGNAL_FUNC( text_event ), info );
+			}
+		}
+
+		g_free( ptr );
 	}
 
-      /* add an hook for saving the file */
-      if ( bdy->filename != NULL ) {
-	      /* create text */
-	      item = balsa_message_text_item ("--TEXTFILE--", group, 0.0,
-					      next_part_height (group));
-	      /* create item's background under text as created above */
-	      balsa_message_text_item_set_bg (item, group, BGLINKCOLOR);
-	      
-	      info = balsa_save_file_info_new (NULL, message, bdy);
-	      /* attach a signal to the background we created, so that we can change it
-	       * when the mouse is moved over it */
-	      gtk_signal_connect (GTK_OBJECT (item), "event",
-				  GTK_SIGNAL_FUNC (item_event), info);
-      }
-      /* add the text item to the canvas */
-      balsa_message_text_item (ptr, group, 0.0, next_part_height (group));
-      g_free (ptr);
-     
-    }
-
-END:
-  fclose (s.fpout);
-  unlink (tmp_file_name);
-  return;
+	fclose( s.fpout );
+	unlink( tmp_file_name );
 }
 
 

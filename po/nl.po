@@ -1,13 +1,14 @@
 # The wonderfull balsa translation made for world piece. 
 # Copyright (C) 2000 Free Software Foundation, Inc.
 # Dennis Smit <synap@area101.penguin.nl>, 2000.
+# Mendel Mobach <mendel@mobach.nl>, 2000.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa\n"
-"POT-Creation-Date: 2000-07-16 01:36+0200\n"
-"PO-Revision-Date: 2000-07-16 00:38+0200\n"
-"Last-Translator: Dennis Smit <synap@area101.penguin.nl> \n"
+"POT-Creation-Date: 2000-07-17 20:38+0200\n"
+"PO-Revision-Date: 2000-07-17 22:44+0200\n"
+"Last-Translator: Mendel Mobach <mendel@mobach.nl> \n"
 "Language-Team: Dutch (for info synap@area101.penguin.nl) \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -41,22 +42,25 @@ msgid "Trash:"
 msgstr "Prullenbak:"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:77
-#, c-format
 msgid ""
 "The pathname \"%s\" must be specified canonically -- it must start with a "
 "'/'."
 msgstr ""
+"De padnaam moet compleet worden opgegeven -- Hij moet beginnen met een '/'."
+""
 
 #: libinit_balsa/balsa-druid-page-directory.gob:100
 #, c-format
 msgid "The mailbox \"%s\" does not appear to be valid."
-msgstr ""
+msgstr "De Postbus \"%s\" lijkt niet beschikbaar"
 
 #: libinit_balsa/balsa-druid-page-directory.gob:152
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
+"Controleer de locatie of de standaard Postbus bestanden.\n"
+"Deze worden gemaakt indien nodig."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:195
 msgid "Mail Files"
@@ -71,14 +75,16 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
+"Balsa is perfect opgezet. Succes ermee!\n"
+"   -- Het Balsa ontwikkel team"
 
 #: libinit_balsa/balsa-druid-page-finish.gob:57
 msgid "All Done!"
-msgstr ""
+msgstr "Alles gedaan!"
 
 #: libinit_balsa/balsa-druid-page-user.gob:75
 msgid "Please enter information about yourself."
-msgstr ""
+msgstr "Tik hier informatie over uzelf"
 
 #: libinit_balsa/balsa-druid-page-user.gob:83 src/address-book.c:205
 #: src/address-book.c:467
@@ -119,35 +125,44 @@ msgid ""
 "main window for more information about contacting the authors or\n"
 "reporting bugs."
 msgstr ""
+"Het lijkt erop dat u balsa voor de eerste keer draait. De volgende\n"
+"stappen zullen worden doorlopen door het beantwoorden van een paar vragen\n"
+"Als U deze vragen heeft beantwoord kunt u deze altijd nog herzien\n"
+"I de voorkeuren van balsa. Als er een bestand of map moet worden aangemaakt\n"
+"zal die automatisch gebeuren. Kijk in de 'aboutbox' in het hoofdscherm\n"
+"Van balsa als u contact wilt opnemen met de makers van balsa vanwege fouten.\n"
+" -- Het balsa ontwikkel team."
 
 #: libinit_balsa/balsa-initdruid.gob:95
 msgid ""
 "This will exit Balsa. Do you\n"
 "really want to do this?"
 msgstr ""
+"Hierdoor sluit u Balsa af.!\n"
+"Wilt u dit echt doen?"
 
 #: libinit_balsa/helper.c:142
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr ""
+msgstr "Het pad %s moet relatief zijn aan het hoofd bestandssysteem (beginnende met /)."
 
 #: libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr ""
+msgstr "Kan de map. niet maken: mkdir() faalde op padnaam \"%s\""
 
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr ""
+msgstr "Het bestand met padnaam \"%s\" is geen map."
 
 #: libinit_balsa/init_balsa.c:36
 msgid "Configure Balsa"
-msgstr ""
+msgstr "Configureer Balsa"
 
 #: src/address-book.c:193
 msgid "Add New Address"
-msgstr ""
+msgstr "Voeg nieuw adres toe"
 
 #: src/address-book.c:212
 msgid "E-Mail Address:"
@@ -159,14 +174,16 @@ msgid ""
 "Unable to open address book %s for reading.\n"
 " - %s\n"
 msgstr ""
+"Kan het adresboek %s niet openenen om te lezen.\n"
+" - %s\n"
 
 #: src/address-book.c:294 src/sendmsg-window.c:407
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: src/address-book.c:314
 msgid "No-Id"
-msgstr ""
+msgstr "Geen-ID"
 
 #: src/address-book.c:322
 msgid "No-Name"
@@ -195,11 +212,11 @@ msgstr "Start GnomeCard"
 
 #: src/address-book.c:527
 msgid "Re-Import"
-msgstr ""
+msgstr "Herimporteren"
 
 #: src/address-book.c:535
 msgid "Import first address only"
-msgstr ""
+msgstr "Alleen het eerste adres importeren"
 
 #: src/address-book.c:537
 msgid "Import all adresses"
@@ -208,7 +225,7 @@ msgstr "Importeer alle adressen"
 #: src/balsa-app.c:215
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
-msgstr ""
+msgstr "Balsa kan uw postbus \"%s\" niet openen."
 
 #: src/balsa-app.c:228
 msgid "Inbox"
@@ -239,6 +256,8 @@ msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
 msgstr ""
+"Kan uw Postbus niet openen!\n"
+"Controleer uw instellingen"
 
 #: src/balsa-index-page.c:579 src/filter-edit-dialog.c:222
 msgid "New"
@@ -271,7 +290,7 @@ msgstr "bewaar Adres"
 
 #: src/balsa-index-page.c:601 src/main-window.c:311
 msgid "Toggle flagged"
-msgstr ""
+msgstr "Verander status van Flag"
 
 #: src/balsa-index-page.c:609
 msgid "Transfer"
@@ -279,7 +298,7 @@ msgstr "Overzetten"
 
 #: src/balsa-index-page.c:812
 msgid "Sorry, no semicolons are allowed in the name!\n"
-msgstr ""
+msgstr "Sorry, er zijn geen dubblepunten toegestaan in de naam!\n"
 
 #: src/balsa-index-page.c:844
 #, c-format
@@ -287,10 +306,12 @@ msgid ""
 "Unable to open %s for read.\n"
 " - %s\n"
 msgstr ""
+"Kan %s niet openen om te lezen.\n"
+" - %s\n"
 
 #: src/balsa-index-page.c:849
 msgid "The Card Name field must be non-empty.\n"
-msgstr ""
+msgstr "De naam van de kaart MOET ingevuld zijn.\n"
 
 #: src/balsa-index-page.c:855
 #, c-format
@@ -298,6 +319,8 @@ msgid ""
 "There is already an address book entry for %s.\n"
 "Run GnomeCard if you would like to edit your address book entries.\n"
 msgstr ""
+"Er is al een bestaande entry in het adresboek.\n"
+"Draai GnomeCard als u het adresboek wilt bewerken.\n"
 
 #: src/balsa-index-page.c:1119
 msgid "Card Name:"
@@ -321,19 +344,19 @@ msgstr "Email adres:"
 
 #: src/balsa-index-page.c:1136
 msgid "In order to store an address, you must select a message.\n"
-msgstr ""
+msgstr "Om een adres op te slaan, moet u wel een bericht selecteren.\n"
 
 #: src/balsa-index-page.c:1146
 msgid "You may only store one address at a time.\n"
-msgstr ""
+msgstr "U kunt selects 1 adres per keer opslaan.\n"
 
 #: src/balsa-index-page.c:1159
 msgid "This message doesn't contain an e-mail address.\n"
-msgstr ""
+msgstr "Dit bericht bevat geen emailadres.\n"
 
 #: src/balsa-index-page.c:1210
 msgid "Contact Information"
-msgstr ""
+msgstr "Contact Informatie"
 
 #: src/balsa-index.c:256
 msgid "From"
@@ -351,7 +374,7 @@ msgstr "Datum"
 msgid "To"
 msgstr "Naar"
 
-#: src/balsa-mblist.c:225 src/mailbox-conf.c:1165
+#: src/balsa-mblist.c:225 src/mailbox-conf.c:1185
 msgid "Mailbox"
 msgstr "Postvak"
 
@@ -366,7 +389,7 @@ msgstr "Totaal"
 #: src/balsa-mblist.c:822
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
-msgstr ""
+msgstr "Postbus: %s met %ld berichten, %ld nieuws"
 
 #: src/balsa-message.c:225 src/balsa-message.c:229
 msgid "Save MIME Part"
@@ -384,12 +407,12 @@ msgstr "Annuleren"
 
 #: src/balsa-message.c:227
 msgid "Please choose a filename to save this part of the message as:"
-msgstr ""
+msgstr "Kiest alstublieft een bestandsnaam om dit deel van het bericht onder op te slaan."
 
 #: src/balsa-message.c:258
 #, c-format
 msgid " Could not save %s:%s "
-msgstr ""
+msgstr "Kan %s:%s niet bewaren"
 
 #: src/balsa-message.c:526
 msgid "Date:"
@@ -430,12 +453,12 @@ msgstr "Kan plaatje niet afbeelden\n"
 
 #: src/balsa-message.c:658
 msgid "Balsa does not know how to display this message part"
-msgstr ""
+msgstr "Balsa weet niet hoe zij dit deel van het bericht moet weergeven"
 
 #: src/balsa-message.c:663
 #, c-format
 msgid "Content Type: %s"
-msgstr ""
+msgstr "Type inhoud: %s"
 
 #: src/balsa-message.c:672
 #, c-format
@@ -448,11 +471,11 @@ msgstr "Bewaar deel"
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
-msgstr ""
+msgstr "Binnen"
 
 #: src/filter-edit-dialog.c:31
 msgid "Outbound"
-msgstr ""
+msgstr "Buiten"
 
 #: src/filter-edit-dialog.c:32
 msgid "Before Sending"
@@ -460,7 +483,7 @@ msgstr "Voor verzenden"
 
 #: src/filter-edit-dialog.c:33
 msgid "Demand"
-msgstr "Eisen"
+msgstr "Verzoek"
 
 #: src/filter-edit-dialog.c:38
 msgid "Matches"
@@ -480,15 +503,15 @@ msgstr "Simpel"
 
 #: src/filter-edit-dialog.c:46
 msgid "Regular Expression"
-msgstr ""
+msgstr "Reguliere expressie"
 
 #: src/filter-edit-dialog.c:47
 msgid "External Command"
-msgstr "Extern Commando"
+msgstr "Externe Opdracht"
 
 #: src/filter-edit-dialog.c:52
 msgid "Copy to folder:"
-msgstr "Copier naar map:"
+msgstr "Kopieer naar map:"
 
 #: src/filter-edit-dialog.c:53
 msgid "Move to folder:"
@@ -536,9 +559,9 @@ msgstr "Body"
 
 #: src/filter-edit-dialog.c:362
 msgid "Match string:"
-msgstr "Overeenkomsten string:"
+msgstr "Overeenkomsten inhoud:"
 
-#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:300 src/mailbox-conf.c:1130
+#: src/filter-edit-dialog.c:414 src/mailbox-conf.c:321 src/mailbox-conf.c:1150
 #: src/pref-manager.c:890
 msgid "Add"
 msgstr "Toevoegen"
@@ -559,7 +582,7 @@ msgstr "Filter naam:"
 #. The "Process when:" option menu
 #: src/filter-edit-dialog.c:509
 msgid "Process when:"
-msgstr ""
+msgstr "Uitvoeren wanneer:"
 
 #. The "Run on:" option menu
 #: src/filter-edit-dialog.c:540
@@ -574,46 +597,46 @@ msgstr "Zoek type:"
 #. The notification area
 #: src/filter-edit-dialog.c:626
 msgid "Notification:"
-msgstr ""
+msgstr "Notificatie:"
 
 #. Notification buttons
 #: src/filter-edit-dialog.c:635
 msgid "Play sound:"
-msgstr ""
+msgstr "Geluid afspelen"
 
 #: src/filter-edit-dialog.c:643
 msgid "Use Sound..."
-msgstr ""
+msgstr "Geluid gebruiken..."
 
 #: src/filter-edit-dialog.c:652
 msgid "Popup text:"
-msgstr ""
+msgstr "Popup tekst:"
 
 #. The action area
 #: src/filter-edit-dialog.c:671
 msgid "Action to perform:"
-msgstr ""
+msgstr "Uit te voeren actie:"
 
 #. The disposition area
 #: src/filter-edit-dialog.c:692
 msgid "Disposition:"
-msgstr ""
+msgstr "Laten zien aan:"
 
 #: src/filter-edit-dialog.c:700
 msgid "Place/leave in default folder"
-msgstr ""
+msgstr "Plaatsen/laten staan in de standaard map"
 
 #: src/filter-edit-dialog.c:705
 msgid "Do not place/leave in default folder"
-msgstr ""
+msgstr "Niet plaatse/bewaren in de standaard map"
 
 #: src/filter-edit-dialog.c:710
 msgid "Stop filtering here"
-msgstr "Stop filters hier"
+msgstr "Stop filter hier"
 
 #: src/filter-edit-dialog.c:738
 msgid "Match"
-msgstr ""
+msgstr "Gelijk zijn"
 
 #: src/filter-edit-dialog.c:741
 msgid "Action"
@@ -628,15 +651,17 @@ msgid "Balsa Filters"
 msgstr "Balsa Filters"
 
 #. FIXME: Should prompt to remove file aswell
-#: src/mailbox-conf.c:180
+#: src/mailbox-conf.c:181
 #, c-format
 msgid ""
 "This will remove the mailbox %s and it's files permanently from your "
 "system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
+"Dit haalt uw postbus %s en de bestanden permanent weg."
+"Weet u zeker dat u deze postbus wilt weghalen?"
 
-#: src/mailbox-conf.c:185
+#: src/mailbox-conf.c:186
 #, c-format
 msgid ""
 "This will remove the mailbox %s from the list of mailboxes\n"
@@ -647,126 +672,118 @@ msgstr ""
 "U kunt later \"Toevoegen postvak\" gebruiken om het postvak weer te "
 "benaderen, Weet u zeker dat u het postvak wilt verwijderen?"
 
-#: src/mailbox-conf.c:213
+#: src/mailbox-conf.c:214
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
-msgstr ""
+msgstr "(lame English message:)Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 
-#: src/mailbox-conf.c:255
+#: src/mailbox-conf.c:268
 msgid "Mailbox Configurator"
 msgstr "Postvakinstellingen"
 
-#: src/mailbox-conf.c:310 src/mailbox-conf.c:1124
+#: src/mailbox-conf.c:330 src/mailbox-conf.c:1144
 msgid "Update"
 msgstr "Verversen"
 
-#: src/mailbox-conf.c:442 src/mailbox-conf.c:448 src/mailbox-conf.c:472
+#: src/mailbox-conf.c:458 src/mailbox-conf.c:464 src/mailbox-conf.c:488
 msgid "You need to fill in the Mailbox Name field."
-msgstr ""
+msgstr "U moet het emailbus naamveld invullen."
 
-#: src/mailbox-conf.c:451
+#: src/mailbox-conf.c:467
 msgid "You need to fill in the folderpath field."
-msgstr ""
+msgstr "U moet het polderpad invullen."
 
-#: src/mailbox-conf.c:453
+#: src/mailbox-conf.c:469
 msgid "You need to fill in the IMAP Server field"
-msgstr ""
+msgstr "U moet het IMAPserver veld invullen"
 
-#: src/mailbox-conf.c:455
+#: src/mailbox-conf.c:471
 msgid "You need to fill in the username field"
-msgstr ""
+msgstr "U moet een gebruikersnaam invullen"
 
-#: src/mailbox-conf.c:457
-msgid "You need to fill in the password field"
-msgstr ""
-
-#: src/mailbox-conf.c:459
+#: src/mailbox-conf.c:475
 msgid "You need to fill in the port field"
-msgstr ""
-
-#: src/mailbox-conf.c:476
-msgid "You need to fill in the user field."
-msgstr ""
-
-#: src/mailbox-conf.c:480
-msgid "You need to fill in the password field."
-msgstr ""
-
-#: src/mailbox-conf.c:484
-msgid "You need to fill in the server field."
-msgstr ""
-
-#: src/mailbox-conf.c:488
-msgid "You need to fill in the port field."
-msgstr ""
+msgstr "U moet een poortveld invullen"
 
 #: src/mailbox-conf.c:492
-msgid "Some of the fields are blank."
-msgstr ""
+msgid "You need to fill in the user field."
+msgstr "U moet een gebruikers(user)-veld invullen"
 
-#: src/mailbox-conf.c:626
+#: src/mailbox-conf.c:500
+msgid "You need to fill in the server field."
+msgstr "U moet het serverveld invullen"
+
+#: src/mailbox-conf.c:504
+msgid "You need to fill in the port field."
+msgstr "U moet het poortveld invullen"
+
+#: src/mailbox-conf.c:508
+msgid "Some of the fields are blank."
+msgstr "Er zijn nog een aantal lege velden"
+
+#: src/mailbox-conf.c:642
 #, c-format
 msgid "%s on %s"
 msgstr "%s op %s"
 
-#: src/mailbox-conf.c:815
+#: src/mailbox-conf.c:835
 msgid "New mailbox type:"
 msgstr "Type van nieuw postvak: "
 
 #. radio buttons
 #. local mailbox
-#: src/mailbox-conf.c:821
+#: src/mailbox-conf.c:841
 msgid "Local mailbox"
 msgstr "Lokaal postvak"
 
-#: src/mailbox-conf.c:831
+#: src/mailbox-conf.c:851
 msgid "Single IMAP folder"
-msgstr ""
+msgstr "Enkele Imap map"
 
-#: src/mailbox-conf.c:840
+#: src/mailbox-conf.c:860
 msgid "IMAP folder set"
-msgstr "IMAP folder set"
+msgstr "IMAP folder ingesteld"
 
 #. mailbox name
-#: src/mailbox-conf.c:865 src/mailbox-conf.c:900 src/mailbox-conf.c:1017
+#: src/mailbox-conf.c:885 src/mailbox-conf.c:920 src/mailbox-conf.c:1037
 msgid "Mailbox Name:"
 msgstr "Naam van postvak:"
 
 #. path to file
-#: src/mailbox-conf.c:875
+#: src/mailbox-conf.c:895
 msgid "Mailbox path:"
 msgstr "Pad van postvak:"
 
 #. pop server
-#: src/mailbox-conf.c:917 src/mailbox-conf.c:1027
+#: src/mailbox-conf.c:937 src/mailbox-conf.c:1047
 msgid "Server:"
 msgstr "Server:"
 
 #. pop port
-#: src/mailbox-conf.c:936 src/mailbox-conf.c:1041
+#: src/mailbox-conf.c:956 src/mailbox-conf.c:1061
 msgid "Port:"
 msgstr "Poort:"
 
 #. username
-#: src/mailbox-conf.c:955 src/mailbox-conf.c:1056
+#: src/mailbox-conf.c:975 src/mailbox-conf.c:1076
 msgid "Username:"
 msgstr "Gebruikers naam:"
 
 #. password field
-#: src/mailbox-conf.c:972 src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:992 src/mailbox-conf.c:1091
 msgid "Password:"
 msgstr "Wachtwoord:"
 
 #. toggle for check
-#: src/mailbox-conf.c:987 src/main-window.c:399
+#: src/mailbox-conf.c:1007 src/main-window.c:399
 msgid "Check"
-msgstr "Check"
+msgstr "Controleer"
 
 #. toggle for deletion from server
-#: src/mailbox-conf.c:995
+#: src/mailbox-conf.c:1015
 msgid "Delete from server"
 msgstr "Verwijder van server"
 
-#: src/mailbox-conf.c:1084
+#: src/mailbox-conf.c:1104
 msgid "Folder path:"
 msgstr "Folder pad:"
 
@@ -848,7 +865,7 @@ msgstr "Bewaar geopend Deel"
 
 #: src/main-window.c:252 src/message-window.c:106
 msgid "Save Current Part in Message"
-msgstr ""
+msgstr "Sla huidige deel op in bericht"
 
 #: src/main-window.c:260
 msgid "_New"
@@ -884,11 +901,11 @@ msgstr "Stuur het huidige bericht door"
 
 #: src/main-window.c:289
 msgid "_Continue"
-msgstr "_Continue"
+msgstr "Doorgaan"
 
 #: src/main-window.c:289
 msgid "Continue editing current message"
-msgstr ""
+msgstr "Doorgaan met het bewerken van het bericht"
 
 #: src/main-window.c:297 src/main-window.c:350
 msgid "_Delete"
@@ -908,7 +925,7 @@ msgstr "Haal het bericht terug"
 
 #: src/main-window.c:311
 msgid "_Toggle flagged"
-msgstr ""
+msgstr "Flag ingesteld"
 
 #: src/main-window.c:319
 msgid "_Store Address"
@@ -916,11 +933,11 @@ msgstr "Bewaar Adres"
 
 #: src/main-window.c:319
 msgid "Store address of sender in addressbook"
-msgstr ""
+msgstr "Sla het adres van de zender op in het adresboek"
 
 #: src/main-window.c:325 src/message-window.c:112
 msgid "_Wrap"
-msgstr ""
+msgstr "Verwissel"
 
 #: src/main-window.c:342
 msgid "List"
@@ -984,7 +1001,7 @@ msgstr "Laat mailbox boom zien"
 
 #: src/main-window.c:376
 msgid "Show mailbox _tabs"
-msgstr ""
+msgstr "Laat postbus _tabs zien"
 
 #: src/main-window.c:390
 msgid "_Message"
@@ -1012,7 +1029,7 @@ msgstr "Nieuw bericht opstellen"
 
 #: src/main-window.c:419
 msgid "Continue"
-msgstr "Continue"
+msgstr "Doorgaan"
 
 #: src/main-window.c:424
 msgid "Open Previous message"
@@ -1055,6 +1072,7 @@ msgstr ""
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
+"Om een adres op te slaan moet u een postbus openen en  een bericht selecteren.\n"
 
 #: src/main.c:80
 msgid "Get new mail on startup"
@@ -1110,10 +1128,10 @@ msgstr "Markeer als prullebak"
 
 #: src/mblist-window.c:426
 msgid "Mark as Draftbox"
-msgstr ""
+msgstr "Opslaan als klad."
 
-#: src/mblist-window.c:449 src/mblist-window.c:465 src/mblist-window.c:484
-#: src/mblist-window.c:499
+#: src/mblist-window.c:446 src/mblist-window.c:462 src/mblist-window.c:481
+#: src/mblist-window.c:496
 msgid "No mailbox selected."
 msgstr "Geen postvak geselecteerd"
 
@@ -1151,7 +1169,7 @@ msgstr "8bits"
 
 #: src/pref-manager.c:144
 msgid "quoted"
-msgstr ""
+msgstr "aangehaald"
 
 #: src/pref-manager.c:156
 msgid "While Retrieving Messages"
@@ -1195,7 +1213,7 @@ msgstr "Afdrukken"
 
 #: src/pref-manager.c:209 src/pref-manager.c:1338 src/pref-manager.c:1356
 msgid "Encoding"
-msgstr "Encoding"
+msgstr "Coderen"
 
 #: src/pref-manager.c:212 src/pref-manager.c:1384
 msgid "Misc"
@@ -1251,7 +1269,7 @@ msgstr "Gebruik Signatuur bestand als:"
 
 #: src/pref-manager.c:812
 msgid "enable signature separator"
-msgstr ""
+msgstr "ontekenings scheider aanzetten"
 
 #: src/pref-manager.c:849
 msgid "Remote Mailbox Servers"
@@ -1299,7 +1317,7 @@ msgstr "Uitgaand"
 
 #: src/pref-manager.c:1012
 msgid "Checking"
-msgstr "Checking"
+msgstr "Controleren"
 
 #: src/pref-manager.c:1022
 msgid "Minutes"
@@ -1335,11 +1353,11 @@ msgstr "Hoofd window"
 
 #: src/pref-manager.c:1147
 msgid "use preview pane"
-msgstr ""
+msgstr "gebruik voorbeeld vensterdeel"
 
 #: src/pref-manager.c:1153
 msgid "Show mailbox statistics in left pane"
-msgstr ""
+msgstr "laat de email statistieken zien in het linkergedeelte"
 
 #: src/pref-manager.c:1160
 msgid "Toolbars"
@@ -1371,7 +1389,7 @@ msgstr "Print commando:"
 
 #: src/pref-manager.c:1290
 msgid "Break line at:"
-msgstr ""
+msgstr "Stop opregel:"
 
 #: src/pref-manager.c:1324
 msgid "Charset"
@@ -1404,11 +1422,11 @@ msgstr "Selecteer een lettertype om te gebruiken"
 
 #: src/pref-manager.c:1453
 msgid "Browse..."
-msgstr "Browse..."
+msgstr "Bladeren..."
 
 #: src/pref-manager.c:1458
 msgid "Preview pane"
-msgstr ""
+msgstr "Voorbeeld vensterdeel"
 
 #. mblist unread colour
 #: src/pref-manager.c:1466
@@ -1417,7 +1435,7 @@ msgstr "Kleuren"
 
 #: src/pref-manager.c:1477 src/pref-manager.c:1484
 msgid "Mailbox with unread messages colour"
-msgstr ""
+msgstr "Postbus met ongelezen berichten kleur"
 
 #: src/pref-manager.c:1511
 msgid "Options"
@@ -1429,7 +1447,7 @@ msgstr "Check post bij opstarten"
 
 #: src/pref-manager.c:1527
 msgid "Remember open mailboxes between sessions"
-msgstr ""
+msgstr "Onthoud open postbussen tussen sessies."
 
 #: src/print.c:96
 #, c-format
@@ -1437,6 +1455,8 @@ msgid ""
 "Enter print command below\n"
 "Remember to include '%s'"
 msgstr ""
+"Tik het printercommando hier in\n"
+"onthoud door '%s' toe te voegen"
 
 #: src/print.c:104
 msgid "Print Command:"
@@ -1460,7 +1480,7 @@ msgstr "Voeg bijlages ('attachments') toe aan dit bericht"
 
 #: src/sendmsg-window.c:120
 msgid "Postpone"
-msgstr ""
+msgstr "Postpone"
 
 #: src/sendmsg-window.c:120
 msgid "Continue this message later"
@@ -1488,11 +1508,11 @@ msgstr "Versturen"
 
 #: src/sendmsg-window.c:148
 msgid "Send the currently edited message"
-msgstr ""
+msgstr "Zend het huidigbewerkte bericht"
 
 #: src/sendmsg-window.c:152
 msgid "_Postpone"
-msgstr ""
+msgstr "_Postpone"
 
 #: src/sendmsg-window.c:156
 msgid "Print the edited message"
@@ -1500,7 +1520,7 @@ msgstr "Druk het bewerkte bericht af"
 
 #: src/sendmsg-window.c:174
 msgid "_Wrap body"
-msgstr "_Wrap body"
+msgstr "Draai body om."
 
 #: src/sendmsg-window.c:174
 msgid "Wrap message lines"
@@ -1548,11 +1568,11 @@ msgstr "Bijlages"
 
 #: src/sendmsg-window.c:206
 msgid "_Comments"
-msgstr ""
+msgstr "_Commentaar"
 
 #: src/sendmsg-window.c:208
 msgid "_Keywords"
-msgstr ""
+msgstr "_Sleutelwoorden"
 
 #: src/sendmsg-window.c:219
 msgid "_Western (ISO-8859-1)"
@@ -1711,8 +1731,186 @@ msgstr ""
 msgid "Error executing lpr"
 msgstr ""
 
-#~ msgid "Mailbox: Opening %s Refcount: %d\n"
-#~ msgstr "Postvak:  %s refcount: %d\n"
+#: libbalsa/mailbox_imap.c:202
+#, fuzzy, c-format
+msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
+msgstr "Postvak:  %s refcount: %d\n"
+
+#: libbalsa/mailbox_local.c:218
+#, fuzzy, c-format
+msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
+msgstr "Postvak:  %s refcount: %d\n"
+
+#: libbalsa/mailbox_pop3.c:179
+#, fuzzy, c-format
+msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
+msgstr "Postvak:  %s refcount: %d\n"
+
+#: libmutt/mbox.c:134 libmutt/mbox.c:292
+msgid "Reading %s... %d (%d%%)"
+msgstr ""
+
+#: libmutt/mbox.c:158 libmutt/mbox.c:217
+#, fuzzy
+msgid "Mailbox is corrupt!"
+msgstr "Pad van postvak:"
+
+#: libmutt/mbox.c:665
+#, fuzzy
+msgid "Mailbox was corrupted!"
+msgstr "Wachtwoord voor postvak:"
+
+#: libmutt/mbox.c:702 libmutt/mbox.c:977
+msgid "Fatal error!  Could not reopen mailbox!"
+msgstr ""
+
+#: libmutt/mbox.c:711
+#, fuzzy
+msgid "Unable to lock mailbox!"
+msgstr "Postvak kan niet geopend worden!"
+
+#: libmutt/mbox.c:740
+msgid "Could not create temporary file!"
+msgstr ""
+
+#. this means ctx->changed or ctx->deleted was set, but no
+#. * messages were found to be changed or deleted.  This should
+#. * never happen, is we presume it is a bug in mutt.
+#.
+#: libmutt/mbox.c:757
+msgid "sync: mbox modified, but no modified messages! (report this bug)"
+msgstr ""
+
+#: libmutt/mbox.c:787
+msgid "Writing messages... %d (%d%%)"
+msgstr ""
+
+#: libmutt/mbox.c:961
+#, c-format
+msgid "Write failed!  Saved partial mailbox to %s"
+msgstr ""
+
+#: libmutt/mbox.c:1027
+#, fuzzy
+msgid "Could not reopen mailbox!"
+msgstr "Sluit het geopende postvak"
+
+#: libmutt/mbox.c:1065
+#, fuzzy
+msgid "Reopening mailbox..."
+msgstr "Open Post-vak"
+
+#: libmutt/mx.c:119
+#, c-format
+msgid "Lock count exceeded, remove lock for %s?"
+msgstr ""
+
+#: libmutt/mx.c:131
+#, c-format
+msgid "Can't dotlock %s.\n"
+msgstr ""
+
+#: libmutt/mx.c:189
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr ""
+
+#: libmutt/mx.c:195
+#, c-format
+msgid "Waiting for fcntl lock... %d"
+msgstr ""
+
+#: libmutt/mx.c:223
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr ""
+
+#: libmutt/mx.c:230
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr ""
+
+#: libmutt/mx.c:459 libmutt/mx.c:605
+#, c-format
+msgid "%s is not a mailbox."
+msgstr "%s is geen postbus."
+
+#: libmutt/mx.c:542
+#, c-format
+msgid "Couldn't lock %s\n"
+msgstr "Kan niet blokkeren %s\n"
+
+#: libmutt/mx.c:630
+#, c-format
+msgid "Reading %s..."
+msgstr "Lezen %s...."
+
+#: libmutt/mx.c:719
+#, c-format
+msgid "Writing %s..."
+msgstr ""
+
+#: libmutt/mx.c:746
+#, c-format
+msgid "Could not synchronize mailbox %s!"
+msgstr ""
+
+#: libmutt/mx.c:848
+#, c-format
+msgid "Moving read messages to %s..."
+msgstr ""
+
+#: libmutt/mx.c:899 libmutt/mx.c:1056
+#, fuzzy
+msgid "Mailbox is unchanged."
+msgstr "Naam van postvak"
+
+#: libmutt/mx.c:929
+#, c-format
+msgid "%d kept, %d moved, %d deleted."
+msgstr ""
+
+#: libmutt/mx.c:932 libmutt/mx.c:1098
+#, c-format
+msgid "%d kept, %d deleted."
+msgstr ""
+
+#: libmutt/mx.c:1040
+#, c-format
+msgid " Press '%s' to toggle write"
+msgstr ""
+
+#: libmutt/mx.c:1043
+msgid "Use 'toggle-write' to re-enable write!"
+msgstr ""
+
+#: libmutt/mx.c:1045
+#, c-format
+msgid "Mailbox is marked unwritable. %s"
+msgstr ""
+
+#: libmutt/mx.c:1050
+#, fuzzy
+msgid "Mailbox is read-only."
+msgstr "Naam van postvak"
+
+#: libmutt/mx.c:1065
+#, fuzzy, c-format
+msgid "Purge %d deleted message?"
+msgstr "Druk het bewerkte bericht af"
+
+#: libmutt/mx.c:1065
+#, fuzzy, c-format
+msgid "Purge %d deleted messages?"
+msgstr "Druk het bewerkte bericht af"
+
+#: libmutt/mx.c:1095
+#, c-format
+msgid "%d kept."
+msgstr ""
+
+#: libmutt/mx.c:1375
+#, fuzzy
+msgid "Can't write message"
+msgstr "Haal het bericht terug"
 
 #~ msgid "Mailbox: Closing %s Refcount: %d\n"
 #~ msgstr "Postvak: Sluiten van %s Refcount: %d\n"
@@ -1751,9 +1949,6 @@ msgstr ""
 #~ msgid "C_lose current"
 #~ msgstr "Sluit huidig postvak"
 
-#~ msgid "Close the currently opened mailbox"
-#~ msgstr "Sluit het geopende postvak"
-
 #, fuzzy
 #~ msgid "O_pened"
 #~ msgstr "_Openen"
@@ -1783,10 +1978,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Create Mail Directory?"
 #~ msgstr "Map voor lokale mail:"
-
-#, fuzzy
-#~ msgid "Mailbox Creation Failed"
-#~ msgstr "Naam van postvak"
 
 #, fuzzy
 #~ msgid "Your mailbox directory:"
@@ -1838,9 +2029,6 @@ msgstr ""
 #~ "Als u hiervoor IMAP wilt gebruiken,\n"
 #~ "wijzig dit dan binnen Balsa\n"
 
-#~ msgid "Unable to Open Mailbox!"
-#~ msgstr "Postvak kan niet geopend worden!"
-
 #~ msgid "Change Status"
 #~ msgstr "Verander status"
 
@@ -1862,5 +2050,3 @@ msgstr ""
 
 #~ msgid "E_xit"
 #~ msgstr "Afsluiten"
-
-

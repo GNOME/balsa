@@ -66,7 +66,7 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.trash = NULL;
   balsa_app.trash_path = NULL;
 
-  balsa_app.node = NULL;
+  balsa_app.mailbox_nodes = g_node_new(NULL);
   balsa_app.current_index_child = NULL;
   balsa_app.addressbook_list = NULL;
 

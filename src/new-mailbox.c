@@ -247,7 +247,7 @@ ok_new_mailbox (GtkWidget * widget)
   GtkWidget *menuitem;
   MailboxType mailbox_type;
   Mailbox *mailbox;
-
+  GNode *node;
 
   switch (nmw->next_page)
     {
@@ -259,8 +259,9 @@ ok_new_mailbox (GtkWidget * widget)
       mailbox =  mailbox_new (mailbox_type);
       mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_name)));
       MAILBOX_LOCAL (mailbox)->path = g_strdup (gtk_entry_get_text (GTK_ENTRY (nmw->local_mailbox_path)));
-      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
-
+      node = g_node_new (mailbox);
+      g_node_append (balsa_app.mailbox_nodes, node);
+      
       add_mailbox_config (mailbox->name, MAILBOX_LOCAL (mailbox)->path, 0);
       break;
       

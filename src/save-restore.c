@@ -38,15 +38,8 @@ add_mailbox_config (gchar * name, gchar * path, gint type)
 
   gstring = g_string_new (NULL);
 
-  mblist = g_new (gchar *, g_list_length (balsa_app.mailbox_list));
-
-  list = g_list_first (balsa_app.mailbox_list);
-  if (!list)
-    {
-      printf ("error adding new mailbox, aborting\n");
-      return;
-    }
-
+  mblist = g_new (gchar *, g_node_n_children (balsa_app.mailbox_nodes));
+#if 0
   for (i = 0; list; i++)
     {
       mailbox = list->data;
@@ -55,7 +48,7 @@ add_mailbox_config (gchar * name, gchar * path, gint type)
     }
 
   gnome_config_set_vector ("/balsa/Global/Accounts", i, (const char *const *) mblist);
-
+#endif
   g_string_truncate (gstring, 0);
   g_string_sprintf (gstring, "/balsa/%s/", name);
   gnome_config_push_prefix (gstring->str);
@@ -82,8 +75,8 @@ delete_mailbox_config (gchar * name)
   gnome_config_clean_section (gstring->str);
 
   /* TODO we should prolly lower this by one here, so save on some memory... */
-  mblist = g_new (gchar *, g_list_length (balsa_app.mailbox_list));
-
+  mblist = g_new (gchar *, g_node_n_children (balsa_app.mailbox_nodes));
+#if 0
   list = g_list_first (balsa_app.mailbox_list);
   for (i = 0; list; list = list->next, i++, mailbox = list->data)
     {
@@ -97,6 +90,7 @@ delete_mailbox_config (gchar * name)
 	  mblist[i] = g_strdup (mailbox->name);
 	}
     }
+#endif
   gnome_config_sync ();
   g_string_free (gstring, 1);
 }
@@ -126,11 +120,9 @@ load_mailboxes (gchar * name)
   MailboxType mailbox_type;
   Mailbox *mailbox;
   gint type;
-  GString *gstring;
+  GString *gstring = g_string_new (NULL);
   gchar *path;
-  gstring = g_string_new (NULL);
   GNode *node;
-  
 
   g_string_truncate (gstring, 0);
   g_string_sprintf (gstring, "/balsa/%s", name);
@@ -159,8 +151,11 @@ load_mailboxes (gchar * name)
 	  mailbox = mailbox_new (mailbox_type);
 	  mailbox->name = g_strdup (name);
 	  MAILBOX_LOCAL (mailbox)->path = g_strdup (path);
-      node = g_node_new(mailbox);
-      g_node_append(balsa_app.mailbox_nodes, node);
+	  node = g_node_new (mailbox);
+	  if (balsa_app.mailbox_nodes)
+	    g_node_append (balsa_app.mailbox_nodes, node);
+	  else
+	    balsa_app.mailbox_nodes = node;
 	}
       break;
 
@@ -171,8 +166,8 @@ load_mailboxes (gchar * name)
       MAILBOX_POP3 (mailbox)->user = gnome_config_get_string ("username");
       MAILBOX_POP3 (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_POP3 (mailbox)->server = gnome_config_get_string ("server");
-      node = g_node_new(mailbox);
-      g_node_append(balsa_app.mailbox_nodes, node);
+      node = g_node_new (mailbox);
+      g_node_append (balsa_app.mailbox_nodes, node);
       break;
 
       /*  IMAP  */
@@ -183,9 +178,8 @@ load_mailboxes (gchar * name)
       MAILBOX_IMAP (mailbox)->passwd = gnome_config_get_string ("password");
       MAILBOX_IMAP (mailbox)->server = gnome_config_get_string ("server");
       MAILBOX_IMAP (mailbox)->path = gnome_config_get_string ("Path");
-      balsa_app.mailbox_list = g_list_append (balsa_app.mailbox_list, mailbox);
-      node = g_node_new(mailbox);
-      g_node_append(balsa_app.mailbox_nodes, node);
+      node = g_node_new (mailbox);
+      g_node_append (balsa_app.mailbox_nodes, node);
       break;
     }
 
@@ -211,10 +205,10 @@ restore_global_settings ()
   gnome_config_push_prefix ("/balsa/Global/");
 
   /* user's real name */
-  balsa_app.real_name = get_string_set_default ("real name", g_get_real_name());
+  balsa_app.real_name = get_string_set_default ("real name", g_get_real_name ());
 
   /* user name */
-  balsa_app.username = get_string_set_default ("user name", g_get_user_name());
+  balsa_app.username = get_string_set_default ("user name", g_get_user_name ());
 
   /* hostname */
   balsa_app.hostname = get_string_set_default ("host name", "localhost");
@@ -223,13 +217,13 @@ restore_global_settings ()
   balsa_app.organization = get_string_set_default ("organization", "None");
 
   /* important mailboxes */
-  balsa_app.inbox_path = get_string_set_default("inbox", NULL);
-  balsa_app.outbox_path = get_string_set_default("outbox", NULL);
-  balsa_app.trash_path = get_string_set_default("trash", NULL);
+  balsa_app.inbox_path = get_string_set_default ("inbox", NULL);
+  balsa_app.outbox_path = get_string_set_default ("outbox", NULL);
+  balsa_app.trash_path = get_string_set_default ("trash", NULL);
 
   /* directory */
   path = g_string_new (NULL);
-  g_string_sprintf (path, "%s/Mail", g_get_home_dir());
+  g_string_sprintf (path, "%s/Mail", g_get_home_dir ());
   balsa_app.local_mail_directory = get_string_set_default ("local mail directory", path->str);
   g_string_free (path, 1);
 

@@ -1,3 +1,7 @@
+2002-01-28  Stanislav Visnovsky <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* .potignore: Removed. Thanks to Marcel Telka <marcel@telka.sk>.
+
 2002-01-27  Takeshi Aihana <aihana@gnome.gr.jp>
 
 	* ja.po: Updated Japanese translation.

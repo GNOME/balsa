@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1998-08-15 11:20-0400\n"
+"POT-Creation-Date: 1998-08-15 12:17-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -98,11 +98,11 @@ msgstr ""
 msgid "Forwarded"
 msgstr ""
 
-#: src/index-child.c:273 src/main-window.c:261
+#: src/index-child.c:273 src/main-window.c:262
 msgid "Undelete"
 msgstr ""
 
-#: src/index-child.c:281 src/main-window.c:247 src/main-window.c:415
+#: src/index-child.c:281 src/main-window.c:248 src/main-window.c:411
 msgid "Delete"
 msgstr ""
 
@@ -146,61 +146,56 @@ msgstr ""
 msgid "Delete..."
 msgstr ""
 
-#: src/main-window.c:90
+#: src/main-window.c:91
 msgid "Mailboxes/<Separator>"
 msgstr ""
 
-#: src/main-window.c:151
+#: src/main-window.c:152
 msgid "Get New Mail"
 msgstr ""
 
-#: src/main-window.c:168
+#: src/main-window.c:169
 msgid "Check POP3"
 msgstr ""
 
-#: src/main-window.c:183
+#: src/main-window.c:184
 msgid "Exit"
 msgstr ""
 
-#: src/main-window.c:195
+#: src/main-window.c:196
 msgid "File"
 msgstr ""
 
-#: src/main-window.c:205
+#: src/main-window.c:206
 msgid "New"
 msgstr ""
 
-#: src/main-window.c:218 src/main-window.c:440 src/main-window.c:441
+#: src/main-window.c:219 src/main-window.c:436 src/main-window.c:437
 msgid "Reply"
 msgstr ""
 
-#: src/main-window.c:231 src/main-window.c:451 src/main-window.c:452
+#: src/main-window.c:232 src/main-window.c:447 src/main-window.c:448
 msgid "Forward"
 msgstr ""
 
-#: src/main-window.c:274 src/sendmsg-window.c:163
+#: src/main-window.c:275 src/sendmsg-window.c:163
 msgid "Message"
 msgstr ""
 
-#. MDI page
-#: src/main-window.c:279 src/pref-manager.c:141 src/pref-manager.c:621
-msgid "MDI"
-msgstr ""
-
-#: src/main-window.c:286
+#: src/main-window.c:283
 msgid "Mailbox List"
 msgstr ""
 
-#: src/main-window.c:297 src/sendmsg-window.c:155
+#: src/main-window.c:294 src/sendmsg-window.c:155
 msgid "Close"
 msgstr ""
 
 #. mailboxes page
-#: src/main-window.c:312 src/pref-manager.c:129
+#: src/main-window.c:309 src/pref-manager.c:129
 msgid "Mailboxes"
 msgstr ""
 
-#: src/main-window.c:321
+#: src/main-window.c:318
 msgid "Preferences..."
 msgstr ""
 
@@ -216,55 +211,55 @@ msgstr ""
 #. gtk_menu_append (GTK_MENU (menu), w);
 #. menu_items[i++] = w;
 #.
-#: src/main-window.c:344
+#: src/main-window.c:341
 msgid "Settings"
 msgstr ""
 
-#: src/main-window.c:352
+#: src/main-window.c:349
 msgid "About"
 msgstr ""
 
-#: src/main-window.c:365 src/sendmsg-window.c:204
+#: src/main-window.c:362 src/sendmsg-window.c:204
 msgid "Help"
 msgstr ""
 
-#: src/main-window.c:400
+#: src/main-window.c:397
 msgid "Check"
 msgstr ""
 
-#: src/main-window.c:401
+#: src/main-window.c:398
 msgid "Check Email"
 msgstr ""
 
-#: src/main-window.c:416
+#: src/main-window.c:412
 msgid "Delete Message"
 msgstr ""
 
-#: src/main-window.c:429
+#: src/main-window.c:425
 msgid "Compose"
 msgstr ""
 
-#: src/main-window.c:430
+#: src/main-window.c:426
 msgid "Compose Message"
 msgstr ""
 
-#: src/main-window.c:465
+#: src/main-window.c:461
 msgid "Previous"
 msgstr ""
 
-#: src/main-window.c:466
+#: src/main-window.c:462
 msgid "Open Previous Message"
 msgstr ""
 
-#: src/main-window.c:476
+#: src/main-window.c:472
 msgid "Next"
 msgstr ""
 
-#: src/main-window.c:477
+#: src/main-window.c:473
 msgid "Open Next Message"
 msgstr ""
 
-#: src/main-window.c:514
+#: src/main-window.c:510
 msgid "Balsa is a E-Mail Client"
 msgstr ""
 
@@ -284,6 +279,11 @@ msgstr ""
 #. view page
 #: src/pref-manager.c:135
 msgid "View"
+msgstr ""
+
+#. MDI page
+#: src/pref-manager.c:141 src/pref-manager.c:621
+msgid "MDI"
 msgstr ""
 
 #. organization
@@ -383,17 +383,17 @@ msgstr ""
 msgid "Forward message"
 msgstr ""
 
-#: libbalsa/mailbox.c:403
+#: libbalsa/mailbox.c:404
 #, c-format
 msgid "Mailbox: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:428
+#: libbalsa/mailbox.c:429
 #, c-format
 msgid "Mailbox: Closing %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox.c:1279
+#: libbalsa/mailbox.c:1292
 #, c-format
 msgid "Loading message: %s/%s\n"
 msgstr ""

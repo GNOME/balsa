@@ -384,7 +384,7 @@ mailbox_open_ref (Mailbox * mailbox)
       g_string_append_c (tmp, '}');
       g_string_append (tmp, MAILBOX_IMAP (mailbox)->path);
       set_imap_username (mailbox);
-      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, M_NOSORT, NULL);
+      CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, 0, NULL);
       g_string_free (tmp, TRUE);
       break;
 
@@ -394,7 +394,8 @@ mailbox_open_ref (Mailbox * mailbox)
 
   if (CLIENT_CONTEXT_OPEN (mailbox))
     {
-      mailbox->messages = mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
+      mailbox->messages = 0;
+      mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount;
       load_messages (mailbox, 0);
 
       /* incriment the reference count */
@@ -450,10 +451,12 @@ mailbox_check_new_messages (Mailbox * mailbox)
 {
   gint i = 0;
 
+  if (!mailbox)
+    return FALSE;
+
   LOCK_MAILBOX_RETURN_VAL (mailbox, FALSE);
   RETURN_VAL_IF_CONTEXT_CLOSED (mailbox, FALSE);
 
-  mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL);
   if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), NULL)) < 0)
     {
       UNLOCK_MAILBOX ();
@@ -461,18 +464,22 @@ mailbox_check_new_messages (Mailbox * mailbox)
     }
   else if (i == M_NEW_MAIL || i == M_REOPENED)
     {
-      UNLOCK_MAILBOX ();
 
       mailbox->new_messages = CLIENT_CONTEXT (mailbox)->msgcount - mailbox->messages;
 
       if (mailbox->new_messages > 0)
 	{
 	  load_messages (mailbox, 1);
+	  UNLOCK_MAILBOX ();
 	  return TRUE;
 	}
       else
-	return FALSE;
+	{
+	  UNLOCK_MAILBOX ();
+	  return FALSE;
+	}
     }
+  UNLOCK_MAILBOX ();
   return FALSE;
 }
 
@@ -586,44 +593,50 @@ load_messages (Mailbox * mailbox, gint emit)
   Message *message;
   HEADER *cur = 0;
 
-  for (msgno = mailbox->messages - mailbox->new_messages;
-       msgno <= mailbox->messages - 1;
+  for (msgno = mailbox->messages;
+       mailbox->new_messages > 0;
        msgno++)
-    {
-      cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
+#if 0
+    for (msgno = mailbox->messages - mailbox->new_messages;
+	 msgno <= mailbox->messages - 1;
+	 msgno++)
+#endif
+      {
+	cur = CLIENT_CONTEXT (mailbox)->hdrs[msgno];
 
-      if (!cur)
-	continue;
+	if (!cur)
+	  continue;
 
-      message = translate_message (cur);
-      message->mailbox = mailbox;
-      message->msgno = msgno;
+	message = translate_message (cur);
+	message->mailbox = mailbox;
+	message->msgno = msgno;
+	mailbox->messages++;
 
-      if (!cur->read)
-	message->flags |= MESSAGE_FLAG_NEW;
+	if (!cur->read)
+	  message->flags |= MESSAGE_FLAG_NEW;
 
-      if (cur->deleted)
-	message->flags |= MESSAGE_FLAG_DELETED;
+	if (cur->deleted)
+	  message->flags |= MESSAGE_FLAG_DELETED;
 
-      if (cur->flagged)
-	message->flags |= MESSAGE_FLAG_FLAGGED;
+	if (cur->flagged)
+	  message->flags |= MESSAGE_FLAG_FLAGGED;
 
-      if (cur->replied)
-	message->flags |= MESSAGE_FLAG_REPLIED;
+	if (cur->replied)
+	  message->flags |= MESSAGE_FLAG_REPLIED;
 
-      mailbox->message_list = g_list_append (mailbox->message_list, message);
-      mailbox->new_messages--;
+	mailbox->message_list = g_list_append (mailbox->message_list, message);
+	mailbox->new_messages--;
 
-      if (emit)
-	send_watcher_new_message (mailbox, message, mailbox->new_messages);
+	if (emit)
+	  send_watcher_new_message (mailbox, message, mailbox->new_messages);
 
-      /* 
-       * give time to gtk so the GUI isn't blocked
-       * this is kinda a hack right now
-       */
-      while (gtk_events_pending ())
-	gtk_main_iteration ();
-    }
+	/* 
+	 * give time to gtk so the GUI isn't blocked
+	 * this is kinda a hack right now
+	 */
+	while (gtk_events_pending ())
+	  gtk_main_iteration ();
+      }
 }
 
 

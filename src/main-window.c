@@ -55,6 +55,7 @@ static void show_about_box ();
 
 
 /* callbacks */
+static void check_new_messages_cb (GtkWidget *);
 static void check_pop3_cb (GtkWidget * widget);
 
 static void new_message_cb (GtkWidget * widget);
@@ -151,12 +152,12 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Get New Mail"));
   gtk_menu_append (GTK_MENU (menu), w);
   gtk_widget_add_accelerator (w, "activate", accel, 'M', GDK_CONTROL_MASK, 0);
-#if 0
+
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
 		      (GtkSignalFunc) check_new_messages_cb,
 		      NULL);
-#endif
+
   gtk_widget_show (w);
 
   menu_items[i++] = w;
@@ -325,17 +326,17 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 /*
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
-  gtk_widget_show (w);
+   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
+   gtk_widget_show (w);
 
-  gtk_signal_connect (GTK_OBJECT (w),
-		      "activate",
-		      (GtkSignalFunc) open_mailbox_manager,
-		      NULL);
+   gtk_signal_connect (GTK_OBJECT (w),
+   "activate",
+   (GtkSignalFunc) open_mailbox_manager,
+   NULL);
 
-  gtk_menu_append (GTK_MENU (menu), w);
-  menu_items[i++] = w;
-*/
+   gtk_menu_append (GTK_MENU (menu), w);
+   menu_items[i++] = w;
+ */
 
   w = gtk_menu_item_new_with_label (_ ("Settings"));
   gtk_widget_show (w);
@@ -397,8 +398,7 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 			     _ ("Check Email"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
-  /*                   (GtkSignalFunc) check_new_messages_cb, */
-			     (GtkSignalFunc) NULL,
+			     GTK_SIGNAL_FUNC (check_new_messages_cb),
 			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
@@ -522,6 +522,15 @@ show_about_box ()
 /*
  * Callbacks
  */
+
+static void
+check_new_messages_cb (GtkWidget * widget)
+{
+  if (!balsa_app.current_index_child)
+    return;
+
+  mailbox_check_new_messages (BALSA_INDEX (balsa_app.current_index_child->index)->mailbox);
+}
 
 static void
 check_pop3_cb (GtkWidget * widget)

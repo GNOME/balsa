@@ -1,9 +1,14 @@
+2001-09-06  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/send.c: make gcc happier, make return of libbalsa_message_postpone
+	safer
+
 2001-09-06  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main.c, src/sendmsg-window.c: fix couple of ugly warning in
 	the code I have just commited.
 
-2001-09-06  Carlos Morgado  <chbm@cprm.net>
+2001-09-06  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c: removed autopostpone_message_cb. no longer
 	needed

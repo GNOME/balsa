@@ -1148,8 +1148,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     gchar *tmp;
     LibBalsaMessageBody *body;
     LibBalsaServer *server;
-    int thereturn = 0; 
-    /* or -1, because not resetting it means the mailbox is not supported? */
+    int thereturn; 
 
     libbalsa_lock_mutt();
     msg = mutt_new_header();
@@ -1260,7 +1259,8 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
 	thereturn = mutt_write_fcc(LIBBALSA_MAILBOX(draftbox)->url,
  		       msg, tmp, 1, fcc);
-    }
+    } else 
+	thereturn = -1;
     g_free(tmp);
     mutt_free_header(&msg);
     libbalsa_unlock_mutt();

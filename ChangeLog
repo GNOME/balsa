@@ -1,3 +1,8 @@
+2003-09-24  Magick  <magick Linux-Fan.com>
+
+	* configure.in: support for --disable-{flock,fcntl} options.
+	* libbalsa/imap-server.[hc]: files to be commited yesterday.
+
 2003-09-23  Magick  <magick Linux-Fan.com>
 
 	* libbalsa/Makefile.am: add imap-server.[hc]

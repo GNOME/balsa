@@ -568,12 +568,19 @@ free_message_info(struct message_info *msg_info)
     g_free(msg_info);
 }
 
+static gboolean lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir,
+				      gboolean closing);
+
 static void
 libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
 {
-    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+    LibBalsaMailboxMaildir *mdir;
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
+
+    mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+
+    lbm_maildir_sync_real(mdir, TRUE);
 
     if (mdir->messages_info) {
 	g_hash_table_destroy(mdir->messages_info);
@@ -612,6 +619,7 @@ static int libbalsa_mailbox_maildir_open_temp (const gchar *dest_path,
 struct sync_info {
     gchar *path;
     GSList *removed_list;
+    gboolean closing;
 };
     
 static void maildir_sync_add(struct message_info *msg_info,
@@ -626,8 +634,8 @@ maildir_sync(gchar *key, struct message_info *msg_info, struct sync_info *si)
 				      msg_info->filename);
 	unlink (orig);
 	g_free(orig);
-	si->removed_list =
-	    g_slist_prepend(si->removed_list, msg_info);
+	if (!si->closing)
+	    si->removed_list = g_slist_prepend(si->removed_list, msg_info);
 	return;
     }
      
@@ -685,8 +693,7 @@ maildir_renumber(gchar * key, struct message_info *msg_info,
 }
 
 static gboolean
-libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox,
-                              gboolean expunge)
+lbm_maildir_sync_real(LibBalsaMailboxMaildir * mdir, gboolean closing)
 {
     /*
      * foreach message_info
@@ -698,31 +705,40 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox,
     struct sync_info si;
     GSList *l;
 
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), FALSE);
-
-    si.path = g_strdup(libbalsa_mailbox_local_get_path(mailbox));
+    si.path =
+	g_strdup(libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX(mdir)));
     si.removed_list = NULL;
-    g_hash_table_foreach(LIBBALSA_MAILBOX_MAILDIR(mailbox)->messages_info,
-			 (GHFunc) maildir_sync, &si);
+    si.closing = closing;
+    g_hash_table_foreach(mdir->messages_info, (GHFunc) maildir_sync, &si);
     g_free(si.path);
+
+    if (closing)
+	return TRUE;
+
     for (l = si.removed_list; l; l = l->next) {
 	struct message_info *removed = l->data;
 
-	g_hash_table_foreach(LIBBALSA_MAILBOX_MAILDIR(mailbox)->
-			     messages_info, (GHFunc) maildir_renumber,
-			     removed);
-	g_ptr_array_remove(LIBBALSA_MAILBOX_MAILDIR(mailbox)->
-			   msgno_2_msg_info, removed);
-	libbalsa_mailbox_msgno_removed(mailbox, removed->message->msgno);
-	/* This will free removed: */ 
-	g_hash_table_remove(LIBBALSA_MAILBOX_MAILDIR(mailbox)->
-			    messages_info, removed->key);
+	g_hash_table_foreach(mdir->messages_info,
+			     (GHFunc) maildir_renumber, removed);
+	g_ptr_array_remove(mdir->msgno_2_msg_info, removed);
+	libbalsa_mailbox_msgno_removed(LIBBALSA_MAILBOX(mdir),
+				       removed->message->msgno);
+	/* This will free removed: */
+	g_hash_table_remove(mdir->messages_info, removed->key);
     }
     g_slist_free(si.removed_list);
 
     /* FIXME: record mtime of dirs */
 
     return TRUE;
+}
+
+static gboolean
+libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
+{
+    g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
+
+    return lbm_maildir_sync_real(LIBBALSA_MAILBOX_MAILDIR(mailbox), FALSE);
 }
 
 static struct message_info *message_info_from_msgno(

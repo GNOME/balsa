@@ -1,3 +1,10 @@
+2003-11-05  Pawel Salek
+
+	* libbalsa/mailbox.c: compile with --disable-threads.
+	* libbalsa/mailbox_imap.c: do not deadlock in imap_sync().
+	* src/balsa-index.c: clean up message_status_changed() - it is almost
+	redundant now.
+
 2003-11-04 16:25  PeterB
 
 	* src/main-window.c: Check for unreffed mbnode.

@@ -757,6 +757,7 @@ static void
 lbm_emit(LibBalsaMailbox * mailbox, const gchar * signal,
 	 GtkTreePath * path, GtkTreeIter * iter)
 {
+#ifdef BALSA_USE_THREADS
     gboolean unlock = g_mutex_trylock(gdk_threads_mutex);
     gboolean is_main_thread =
 	(pthread_self() == libbalsa_get_main_thread());
@@ -771,11 +772,13 @@ lbm_emit(LibBalsaMailbox * mailbox, const gchar * signal,
 	    unlock = TRUE;
 	}
     }
-
     g_signal_emit_by_name(mailbox, signal, path, iter);
 
     if (unlock)
 	gdk_threads_leave();
+#else
+    g_signal_emit_by_name(mailbox, signal, path, iter);
+#endif
 }
 
 void

@@ -1264,9 +1264,7 @@ libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_return_val_if_fail(mimap->opened, FALSE);
     /* we are always in sync, we need only to do expunge now and then */
     if(expunge) {
-        LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
         res =  imap_mbox_expunge(mimap->handle) == IMR_OK;
-        UNLOCK_MAILBOX(mailbox);
     }
     return res;
 }

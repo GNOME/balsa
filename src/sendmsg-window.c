@@ -1011,7 +1011,7 @@ void
 send_body_wrap (Body *body, GtkText *text)
 {
   guint final_length, length;
-  int pos, tabspace, offset, minbreak, line_len;
+  int pos, tabspace, offset, minbreak, line_len, wraplength;
   char *last_break, *current_line, *current_char;
   char buffer[512];
   GList *body_list=NULL, *next_line=NULL;
@@ -1027,8 +1027,13 @@ send_body_wrap (Body *body, GtkText *text)
   /* while the remaining text is greater than screen width */
   while(length > balsa_app.wraplength)
     {
+      if( *current_line == '>')
+	wraplength = balsa_app.wraplength;
+      else
+	wraplength = balsa_app.wraplength - 6;
+
       /* find last 'breaking' character */
-      for(pos=0; (offset=pos+tabspace) < balsa_app.wraplength; pos++)
+      for(pos=0; (offset=pos+tabspace) < wraplength; pos++)
 	{
 	  current_char = (char *)(current_line+pos);
 	  if(*current_char=='\n')
@@ -1046,8 +1051,8 @@ send_body_wrap (Body *body, GtkText *text)
       /* if first break is on left side of screen, don't bother */
       if( line_len < minbreak && *last_break != '\n' )
 	{
-	  last_break = (char *)(current_line+balsa_app.wraplength);
-	  line_len = balsa_app.wraplength;
+	  last_break = (char *)(current_line+wraplength);
+	  line_len = wraplength;
 	}
       strncpy(buffer, current_line, line_len);
       if(buffer[line_len-1]=='\n')

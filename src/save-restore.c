@@ -707,7 +707,7 @@ config_global_load (void)
     balsa_app.wordwrap = atoi (field);
 
   if ((field = pl_dict_get_str (globals, "WrapLength")) == NULL)
-    balsa_app.wraplength = 74;
+    balsa_app.wraplength = 79;
   else
     balsa_app.wraplength = atoi (field);
 

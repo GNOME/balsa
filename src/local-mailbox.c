@@ -190,24 +190,24 @@ is_mh_message(gchar * str)
 }
 #endif
 
-static void
+void
 read_dir(GNode *rnode, const gchar * prefix)
 {
     DIR *dpc;
     struct dirent *de;
     gchar * name;
-    GNode *current_node;
     char filename[PATH_MAX];
     struct stat st;
     GtkType mailbox_type;
+    GNode* current_node;
 
 
     dpc = opendir(prefix);
     if (!dpc)
 	return;
-    name = g_basename(prefix);
+    /* name = g_basename(prefix);
     current_node = add_mailbox(rnode, name, prefix, 0);
-    g_free(name);
+    g_free(name); */
 
     while ((de = readdir(dpc)) != NULL) {
 	if (de->d_name[0] == '.')
@@ -227,13 +227,17 @@ read_dir(GNode *rnode, const gchar * prefix)
 
 	    if (mailbox_type == LIBBALSA_TYPE_MAILBOX_MH || 
 		mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR) {
-		add_mailbox(current_node, de->d_name, filename, mailbox_type);
-	    } else
+		add_mailbox(rnode, de->d_name, filename, mailbox_type);
+	    } else {
+		name = g_basename(prefix);
+		current_node = add_mailbox(rnode, name, prefix, 0);
+		g_free(name);
 		read_dir(current_node, filename);
+	    }
 	} else {
 	    mailbox_type = libbalsa_mailbox_type_from_path(filename);
 	    if (mailbox_type != 0)
-		add_mailbox(current_node, de->d_name, filename, mailbox_type);
+		add_mailbox(rnode, de->d_name, filename, mailbox_type);
 	}
     }
     closedir(dpc);
@@ -243,5 +247,8 @@ read_dir(GNode *rnode, const gchar * prefix)
 void
 load_local_mailboxes()
 {
-    read_dir(balsa_app.mailbox_nodes, balsa_app.local_mail_directory);
+    /* read_dir(balsa_app.mailbox_nodes, balsa_app.local_mail_directory);
+     */
+    g_node_append(balsa_app.mailbox_nodes,
+		  g_node_new(balsa_mailbox_node_new_from_dir(balsa_app.local_mail_directory)));
 }

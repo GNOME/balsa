@@ -926,7 +926,7 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     GtkWidget *frame;
     GtkWidget *sc;
     GtkWidget *nb;
-    GList     *glist;
+    GList     *glist = NULL;
 
 
     table = gtk_table_new(10, 3, FALSE);

@@ -24,4 +24,7 @@
 
 void load_local_mailboxes(void);
 
+/* read_dir used by mailbox-node append-subtree callback */
+void read_dir(GNode *rnode, const gchar * prefix); 
+
 #endif				/* __LOCAL_MAILBOX_H__ */

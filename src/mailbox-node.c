@@ -23,6 +23,7 @@
 
 #include <unistd.h>
 #include "balsa-app.h"
+#include "local-mailbox.h"
 #include "mailbox-conf.h"
 #include "mailbox-node.h"
 #include "save-restore.h"
@@ -49,7 +50,7 @@ enum {
     SAVE_CONFIG,
     LOAD_CONFIG,
     SHOW_PROP_DIALOG,
-    RECREATE,
+    APPEND_SUBTREE,
     LAST_SIGNAL
 };
 
@@ -102,10 +103,12 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
 		       GTK_SIGNAL_OFFSET(BalsaMailboxNodeClass, 
 					 show_prop_dialog),
 		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
-    balsa_mailbox_node_signals[RECREATE] =
-	gtk_signal_new("recreate", GTK_RUN_FIRST, object_class->type,
-		       GTK_SIGNAL_OFFSET(BalsaMailboxNodeClass, recreate),
-		       gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+    balsa_mailbox_node_signals[APPEND_SUBTREE] =
+	gtk_signal_new("append-subtree", GTK_RUN_FIRST, object_class->type,
+		       GTK_SIGNAL_OFFSET(BalsaMailboxNodeClass, 
+					 append_subtree),
+		       gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+		       GTK_TYPE_POINTER);
     gtk_object_class_add_signals(object_class,
 				 balsa_mailbox_node_signals,
 				 LAST_SIGNAL);
@@ -113,7 +116,7 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
     klass->save_config = balsa_mailbox_node_real_save_config;
     klass->load_config = balsa_mailbox_node_real_load_config;
     klass->show_prop_dialog = NULL;
-    klass->recreate    = NULL;
+    klass->append_subtree   = NULL;
 
     object_class->destroy = balsa_mailbox_node_destroy;
 }
@@ -167,6 +170,14 @@ dir_conf_edit(BalsaMailboxNode* mb)
 	gnome_error_dialog(_("The folder edition to be written."));
     gnome_dialog_run_and_close(GNOME_DIALOG(err_dialog));
 }
+
+static void
+read_dir_cb(BalsaMailboxNode* mb, GNode* r)
+{
+    printf("read_dir_cb: reading from %s\n", mb->name);
+    read_dir(r, mb->name);
+}
+
 BalsaMailboxNode *
 balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
 {
@@ -191,15 +202,23 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
     mbn->name = g_strdup(dir);
     gtk_signal_connect(GTK_OBJECT(mbn), "show-prop-dialog", 
 		       dir_conf_edit, NULL);
+    gtk_signal_connect(GTK_OBJECT(mbn), "append-subtree", 
+		       read_dir_cb, NULL);
     return mbn;
 }
 
 void
 balsa_mailbox_show_prop_dialog(BalsaMailboxNode* mn)
 {
-    GtkWidget* retval = NULL;
     gtk_signal_emit(GTK_OBJECT(mn),
 		    balsa_mailbox_node_signals[SHOW_PROP_DIALOG]);
+}
+
+void
+balsa_mailbox_node_append_subtree(BalsaMailboxNode * mn, GNode *r)
+{
+    gtk_signal_emit(GTK_OBJECT(mn),
+		    balsa_mailbox_node_signals[APPEND_SUBTREE], r);
 }
 
 void 

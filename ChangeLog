@@ -1,3 +1,13 @@
+2001-01-01  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: initialize glist.
+	* src/mailbox-node.[hc]: finish restructuring the MailboxNode code,
+	separate folder subtree expansion.
+	* src/local-mailbox.[hc]: separate local mailbox tree creation from
+	local mail folder creation.
+	* src/mailbox-conf.c: initial support for mailbox deletion in the
+	new paradigm.
+	
 2000-12-31  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Restructure MailboxNode code, separate UI code from backend.

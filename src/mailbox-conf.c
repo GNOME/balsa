@@ -212,25 +212,20 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 
     gtk_object_unref(GTK_OBJECT(mailbox));
 
-    /* Don't forget to remove the node from balsa's mailbox list */
-    if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
+    /* Remove the node from balsa's mailbox list */
+    if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
 	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
 					      mailbox);
-    } else {
-
-	/* 
-	   FIXME: remove it somehow from the list. 
-	   Recreation of the entire tree may be expensive (e.g. dialup IMAP)
-
-	   gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
+    else {
+	gnode = find_gnode_in_mbox_list(balsa_app.mailbox_nodes, mailbox);
 	if (!gnode) {
 	    fprintf(stderr,
 		    _("Oooop! mailbox not found in balsa_app.mailbox "
 		      "nodes?\n"));
 	} else {
 	    g_node_unlink(gnode);
-	    g_node_destroy(gnode); // this will remove mbnode
-	    } */
+	    g_node_destroy(gnode); /* this will remove mbnode */
+	}
     }
 }
 

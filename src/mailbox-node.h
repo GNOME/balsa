@@ -66,7 +66,7 @@ struct _BalsaMailboxNodeClass {
     void (*save_config) (BalsaMailboxNode * mn, const gchar * prefix);
     void (*load_config) (BalsaMailboxNode * mn, const gchar * prefix);
     GtkWidget* (*show_prop_dialog) (BalsaMailboxNode * mn);
-    void (*recreate) (BalsaMailboxNode * mn);
+    void (*append_subtree) (BalsaMailboxNode * mn, GNode* root);
 };
 
 GtkType balsa_mailbox_node_get_type(void);
@@ -76,10 +76,7 @@ BalsaMailboxNode *balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox *m);
 BalsaMailboxNode *balsa_mailbox_node_new_from_dir(const gchar* dir);
 GtkWidget *balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode * mbnode);
+void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode, GNode *r);
 void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
-
-/* 
-void mailbox_node_destroy(MailboxNode * mbn);
-*/
 
 #endif

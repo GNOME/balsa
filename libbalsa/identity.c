@@ -359,11 +359,29 @@ ident_dialog_cleanup(GtkDialog* dialog)
 }
 
 enum{
-    ICON_COLUMN,
+    DEFAULT_COLUMN,
     NAME_COLUMN,
     IDENT_COLUMN,
     N_COLUMNS
 };
+
+static void
+toggle_cb(GtkCellRendererToggle * cellrenderertoggle, gchar * path,
+          gpointer user_data)
+{
+    GtkTreeView *tree = GTK_TREE_VIEW(user_data);
+    GtkTreeModel *model = gtk_tree_view_get_model(tree);
+    GtkTreeIter iter;
+
+    if (gtk_tree_model_get_iter_from_string(model, &iter, path)) {
+        LibBalsaIdentity *identity, **default_id;
+
+        gtk_tree_model_get(model, &iter, IDENT_COLUMN, &identity, -1);
+        default_id = gtk_object_get_data(GTK_OBJECT(tree), "default-id");
+        *default_id = identity;
+        identity_list_update(tree);
+    }
+}
 
 static GtkWidget *
 libbalsa_identity_tree(GtkWindow* parent, GList** identities,
@@ -378,7 +396,7 @@ libbalsa_identity_tree(GtkWindow* parent, GList** identities,
     GtkTreeSelection *select;
 
     store = gtk_list_store_new(N_COLUMNS,
-                               GDK_TYPE_PIXBUF,
+                               G_TYPE_BOOLEAN,
                                G_TYPE_STRING,
                                G_TYPE_POINTER);
 
@@ -388,9 +406,9 @@ libbalsa_identity_tree(GtkWindow* parent, GList** identities,
     gtk_object_set_data(GTK_OBJECT(tree), "identities", identities);
     gtk_object_set_data(GTK_OBJECT(tree), "default-id", defid);
 
-    renderer = gtk_cell_renderer_pixbuf_new();
-    column = gtk_tree_view_column_new_with_attributes ("Icon", renderer,
-                                                       "pixbuf", ICON_COLUMN,
+    renderer = gtk_cell_renderer_toggle_new();
+    column = gtk_tree_view_column_new_with_attributes ("Current", renderer,
+                                                       "radio", DEFAULT_COLUMN,
                                                        NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW (tree), column);
 
@@ -400,7 +418,6 @@ libbalsa_identity_tree(GtkWindow* parent, GList** identities,
                                                        NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW (tree), column);
 
-    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW (tree), FALSE);
     select = gtk_tree_view_get_selection(GTK_TREE_VIEW (tree));
     gtk_tree_selection_set_mode(select, mode);
     g_signal_connect(G_OBJECT(select), "changed",
@@ -502,9 +519,6 @@ libbalsa_identity_config_frame(GList** identities,
                                config_frame, GTK_SELECTION_BROWSE);
     gtk_container_add(GTK_CONTAINER(config_frame), tree);
 
-    gtk_object_set_data(GTK_OBJECT(tree), "identities", identities);
-    gtk_object_set_data(GTK_OBJECT(tree), "default-id", defid);
-
     identity_list_update(GTK_TREE_VIEW(tree));
 
     return config_frame;
@@ -543,22 +557,13 @@ identity_list_update(GtkTreeView * tree)
     sorted = g_list_copy(*identities);
     sorted = g_list_sort(sorted, (GCompareFunc) compare_identities);
     for (list = sorted; list; list = g_list_next(list)) {
-        GdkPixbuf *pixbuf;
-
         ident = LIBBALSA_IDENTITY(list->data);
         gtk_list_store_append(store, &iter);
         gtk_list_store_set(store, &iter,
+                           DEFAULT_COLUMN, ident == *default_id,
                            NAME_COLUMN, ident->identity_name,
                            IDENT_COLUMN, ident,
                            -1);
-        
-        pixbuf = gtk_widget_render_icon(GTK_WIDGET(tree),
-                                        ident == *default_id ?
-                                        GNOME_STOCK_MENU_FORWARD :
-                                        GNOME_STOCK_MENU_BLANK,
-                                        GTK_ICON_SIZE_BUTTON,
-                                        "Balsa");
-        gtk_list_store_set(store, &iter, ICON_COLUMN, pixbuf, -1);
     }
     g_list_free(sorted);
 
@@ -1077,6 +1082,8 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
     GtkTreeSelection *select;
     GtkTreeModel *model;
     GtkTreeIter iter;
+    GtkTreeViewColumn *column;
+    GtkCellRenderer *renderer;
 
     tree = GTK_TREE_VIEW(gtk_bin_get_child(GTK_BIN(frame)));
     select = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
@@ -1102,6 +1109,11 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
     gtk_object_set_data(GTK_OBJECT(tree), "frame", display_frame);
     gtk_signal_connect(GTK_OBJECT(tree), "row-activated",
                        GTK_SIGNAL_FUNC(row_activated_cb), NULL);
+    column = gtk_tree_view_get_column (tree, DEFAULT_COLUMN);
+    renderer = gtk_tree_view_column_get_cell_renderers(column)->data;
+    g_signal_connect(G_OBJECT(renderer), "toggled",
+                     G_CALLBACK(toggle_cb), tree);
+    gtk_tree_view_column_set_title(column, "Default");
 
     gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
 

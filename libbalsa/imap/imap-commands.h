@@ -8,7 +8,8 @@ ImapResult imap_mbox_handle_noop(ImapMboxHandle *r);
 /* Non-Authenticated State */
 
 /* Authenticated State */
-ImapResult imap_mbox_select(ImapMboxHandle* handle, const char* mbox);
+ImapResult imap_mbox_select(ImapMboxHandle* handle, const char* mbox,
+			    gboolean *readonly_mbox);
 ImapResult imap_mbox_examine(ImapMboxHandle* handle, const char* mbox);
 ImapResult imap_mbox_create(ImapMboxHandle* handle, const char* new_mbox);
 ImapResult imap_mbox_delete(ImapMboxHandle* handle, const char* mbox);
@@ -19,7 +20,8 @@ ImapResult imap_mbox_subscribe(ImapMboxHandle* handle,
 			       const char* mbox, gboolean subscribe);
 ImapResult imap_mbox_list(ImapMboxHandle *r, const char*what, const char*how);
 ImapResult imap_mbox_lsub(ImapMboxHandle *r, const char*what, const char*how);
-ImapResult imap_mbox_append(ImapMboxHandle *handle, ImapMsgFlags flags,
+ImapResult imap_mbox_append(ImapMboxHandle *handle, const char* mbox,
+			    ImapMsgFlags flags,
 			    size_t len, const char *msgtext);
 
 /* Selected State */

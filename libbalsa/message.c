@@ -482,7 +482,6 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	return FALSE;
     }
     
-    libbalsa_mailbox_open(dest);
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
 	if(message->mailbox==NULL) continue;
@@ -491,12 +490,10 @@ libbalsa_messages_move (GList* messages, LibBalsaMailbox* dest)
 	else
 	    r = FALSE;
     }
-    libbalsa_mailbox_sync_storage(dest);
 
     if (d)
 	    libbalsa_messages_delete (d, TRUE);
 
-    libbalsa_mailbox_close(dest);
     libbalsa_mailbox_check(dest);
     return r;
 }
@@ -542,15 +539,12 @@ libbalsa_messages_copy (GList * messages, LibBalsaMailbox * dest)
     g_return_val_if_fail(messages != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
 
-    libbalsa_mailbox_open(dest);
     for(p=messages; p; 	p=g_list_next(p)) {
 	message=LIBBALSA_MESSAGE(p->data);
 	if(message->mailbox==NULL) continue;
 	libbalsa_mailbox_copy_message(message, dest);
     }
 
-    libbalsa_mailbox_sync_storage(dest);
-    libbalsa_mailbox_close(dest);
     libbalsa_mailbox_check(dest);
     return TRUE;
 }

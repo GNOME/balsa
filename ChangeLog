@@ -1,4 +1,21 @@
-2003-09-07  Carlos Morgado  <chbm chbm.net>
+2003-09-07  Bart Visscher <magick@Linux-Fan.com>
+
+	* libbalsa/message.c: remove open/sync/close around add_message
+
+	* libbalsa/imap/imap-commands.c:
+   	* libbalsa/imap/imap-commands.h:
+   	* libbalsa/imap/imap-handle.c:
+   	* libbalsa/imap/imap_private.h:
+   	* libbalsa/mailbox_imap.c:
+   	Fix open/close for imap,
+   	Fix readonly flag,
+   	prepare libbalsa_mailbox_imap_add_message for a closed mailbox
+
+   	* libbalsa/mailbox_maildir.c:
+   	prepare libbalsa_mailbox_maildir_add_message for a closed mailbox
+
+
+2003-09-07  Carlos Morgado  <chbm chbm.net>	
 
 	* libbalsa/mailbox_mbox.c: plug leak in close, indent
 

@@ -798,9 +798,10 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     }
 
     mimap->handle = handle;
-    if(imap_mbox_select(handle, mimap->path) == IMAP_SUCCESS) {
+
+    if(imap_mbox_select(handle, mimap->path, &mailbox->readonly)
+       == IMAP_SUCCESS) {
 	mimap->msgno_2_msg_info = g_ptr_array_new();
-	mailbox->readonly = 0;//mimap->readonly;
 	mailbox->messages = 0;
 	mailbox->total_messages = 0;
 	mailbox->unread_messages = 0;
@@ -838,6 +839,9 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 	    (LIBBALSA_MAILBOX(mailbox));
     if(mailbox->open_ref == 0) {
 	LibBalsaMailboxImap * mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
+
+	g_object_unref(mbox->handle);
+	mbox->handle=NULL;
 
 	libbalsa_notify_register_mailbox(mailbox);
 	if (mbox->matching_messages) {
@@ -888,7 +892,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 	if (!msg_info->msg) {
 	    char *seq;
 
-	    imap_mbox_select(mimap->handle, LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+	    imap_mbox_select(mimap->handle, mimap->path, &mailbox->readonly);
 
 	    seq = g_strdup_printf("%d", message->msgno+1);
 	    rc = imap_mbox_handle_fetch_body(mimap->handle, seq);
@@ -1436,7 +1440,7 @@ GMimeMessage *libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint
 	GMimeParser *gmime_parser;
 	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 
-	imap_mbox_select(mimap->handle, mimap->path);
+	imap_mbox_select(mimap->handle, mimap->path, &mailbox->readonly);
 
 	seq = g_strdup_printf("%d", msgno+1);
 	rc = imap_mbox_handle_fetch_body(mimap->handle, seq);
@@ -1530,6 +1534,7 @@ int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     ImapResponse rc;
     gchar *message;
     size_t len;
+    ImapMboxHandle *handle;
 
     memset(&imap_flags, 0, sizeof(imap_flags));
     if ((flags & LIBBALSA_MESSAGE_FLAG_NEW) == 0)
@@ -1560,8 +1565,11 @@ int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     if (!len)
 	return -1;
 
-    rc = imap_mbox_append(LIBBALSA_MAILBOX_IMAP(mailbox)->handle, imap_flags,
-			  len, message);
+    handle = libbalsa_mailbox_imap_get_handle(LIBBALSA_MAILBOX_IMAP(mailbox),
+					      NULL);
+    rc = imap_mbox_append(handle, LIBBALSA_MAILBOX_IMAP(mailbox)->path,
+			  imap_flags, len, message);
+    g_object_unref(handle);
     g_mime_stream_unref(mem_stream);
     return rc == IMAP_SUCCESS ? 1 : -1;
 }
@@ -1571,9 +1579,10 @@ void libbalsa_mailbox_imap_change_message_flags(LibBalsaMailbox * mailbox, guint
 					   LibBalsaMessageFlag clear)
 {
     int seq = msgno + 1;
-    ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    ImapMboxHandle *handle = mimap->handle;
 
-    imap_mbox_select(handle, LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+    imap_mbox_select(handle, mimap->path, &mailbox->readonly);
 
     if (set & LIBBALSA_MESSAGE_FLAG_REPLIED)
 	imap_mbox_store_flag(handle, seq, IMSGF_ANSWERED, 1);

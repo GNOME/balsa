@@ -478,6 +478,8 @@ static gboolean libbalsa_mailbox_mbox_close_backend(LibBalsaMailbox * mailbox)
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
     free_messages_info(mbox->messages_info);
+    g_array_free(mbox->messages_info, TRUE);
+    mbox->messages_info = NULL;
     g_mime_stream_unref(mbox->gmime_stream);
     mbox->gmime_stream = NULL; // chbm: is this correct ?
 
@@ -649,22 +651,22 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
     if (g_mime_stream_reset(temp_stream) == -1) {
 	    g_warning("mbox_sync: can't rewind temporary copy.\n");
     } else
-    if (g_mime_stream_seek(gmime_stream, offset, GMIME_STREAM_SEEK_SET) == -1
-	|| g_mime_stream_read(gmime_stream, buffer, 5) == -1
-	|| strncmp ("From ", buffer, 5) != 0)
-    {
-	    g_warning("mbox_sync: message not in expected position.\n");
-    } else {
-	if (g_mime_stream_seek(gmime_stream, offset,
-			       GMIME_STREAM_SEEK_SET) != -1
-	    && g_mime_stream_write_to_stream(temp_stream, gmime_stream) != -1)
-	{
-	    save_failed = FALSE;
-	    mbox->size = g_mime_stream_tell(gmime_stream);
-	    ftruncate(GMIME_STREAM_FS(gmime_stream)->fd, 
-		      mbox->size);
-	}
-    }
+	if (g_mime_stream_seek(gmime_stream, offset, GMIME_STREAM_SEEK_SET) == -1
+	    || g_mime_stream_read(gmime_stream, buffer, 5) == -1
+	    || strncmp ("From ", buffer, 5) != 0)
+	    {
+		g_warning("mbox_sync: message not in expected position.\n");
+	    } else {
+		if (g_mime_stream_seek(gmime_stream, offset,
+				       GMIME_STREAM_SEEK_SET) != -1
+		    && g_mime_stream_write_to_stream(temp_stream, gmime_stream) != -1)
+		    {
+			save_failed = FALSE;
+			mbox->size = g_mime_stream_tell(gmime_stream);
+			ftruncate(GMIME_STREAM_FS(gmime_stream)->fd, 
+				  mbox->size);
+		    }
+	    }
     g_mime_stream_unref(temp_stream);
     mbox_unlock(mailbox, gmime_stream);
     if (g_mime_stream_flush(gmime_stream) == -1 || save_failed)
@@ -711,9 +713,8 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox)
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
     for (i = first, j = first; i < messages; i++)
     {
-	struct message_info *msg_info=
-	    &g_array_index(mbox->messages_info,
-			   struct message_info, j);
+	msg_info = &g_array_index(mbox->messages_info,
+				  struct message_info, j);
 
 	g_free(msg_info->from);
 	g_mime_object_unref(GMIME_OBJECT(msg_info->mime_message));

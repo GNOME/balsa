@@ -22,6 +22,7 @@ struct _ImapMboxHandle {
   unsigned unseen;
   ImapUID  uidnext;
   ImapUID  uidval;
+  gboolean readonly_mbox;
 
   ImapMessage **msg_cache;
   /* BYE handling depends on the state */

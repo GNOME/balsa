@@ -215,28 +215,38 @@ GObject *
 libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
-
+    LibBalsaMailboxMaildir *mdir;
 
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MAILDIR, NULL);
-    
+
     mailbox->is_directory = TRUE;
-	
+
     LIBBALSA_MAILBOX(mailbox)->url = g_strconcat("file://", path, NULL);
 
-    
+
     if(libbalsa_mailbox_maildir_create(path, create) < 0) {
 	g_object_unref(G_OBJECT(mailbox));
 	return NULL;
     }
-    
+
+    mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+    mdir->curdir = g_strdup_printf("%s/cur", path);
+    mdir->newdir = g_strdup_printf("%s/new", path);
+
     libbalsa_notify_register_mailbox(mailbox);
-    
+
     return G_OBJECT(mailbox);
 }
 
 static void
 libbalsa_mailbox_maildir_finalize(GObject * object)
 {
+    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(object);
+    g_free(mdir->curdir);
+    mdir->curdir = NULL;
+    g_free(mdir->newdir);
+    mdir->newdir = NULL;
+
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -422,9 +432,11 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
 	return FALSE;
     }
 
+    mdir->messages_info = g_hash_table_new_full(g_str_hash, g_str_equal,
+				  NULL, (GDestroyNotify)free_message_info);
+    mdir->msgno_2_msg_info = g_ptr_array_new();
+
     mdir->mtime = st.st_mtime;
-    mdir->curdir = g_strdup_printf("%s/cur", path);
-    mdir->newdir = g_strdup_printf("%s/new", path);
     mdir->mtime_cur = 0;
     mdir->mtime_new = 0;
     if (stat(mdir->curdir, &st) != -1) {
@@ -434,16 +446,12 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
 	mdir->mtime_new = st.st_mtime;
     }
 
-    mdir->messages_info =
-	g_hash_table_new_full(g_str_hash, g_str_equal,
-			      NULL, (GDestroyNotify)free_message_info);
-    mdir->msgno_2_msg_info = g_ptr_array_new();
-
     if (!mailbox->readonly)
 	mailbox->readonly = access (path, W_OK) ? TRUE : FALSE;
     mailbox->messages = 0;
     mailbox->total_messages = 0;
     mailbox->unread_messages = 0;
+    mailbox->new_messages = 0;
     parse_mailbox(mailbox, "cur");
     parse_mailbox(mailbox, "new");
     mailbox->open_ref++;
@@ -456,7 +464,7 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
 
     /* increment the reference count */
 #ifdef DEBUG
-    g_print(_("LibBalsaMailboxMbox: Opening %s Refcount: %d\n"),
+    g_print(_("LibBalsaMailboxMaildir: Opening %s Refcount: %d\n"),
 	    mailbox->name, mailbox->open_ref);
 #endif
     return TRUE;
@@ -533,15 +541,15 @@ static void free_message_info(struct message_info *msg_info)
 
 static gboolean libbalsa_mailbox_maildir_close_backend(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), FALSE);
 
-    g_hash_table_destroy(LIBBALSA_MAILBOX_MAILDIR(mailbox)->messages_info);
-    g_ptr_array_free(LIBBALSA_MAILBOX_MAILDIR(mailbox)->msgno_2_msg_info, TRUE);
-    LIBBALSA_MAILBOX_MAILDIR(mailbox)->msgno_2_msg_info = NULL;
-    g_free(LIBBALSA_MAILBOX_MAILDIR(mailbox)->curdir);
-    LIBBALSA_MAILBOX_MAILDIR(mailbox)->curdir = NULL;
-    g_free(LIBBALSA_MAILBOX_MAILDIR(mailbox)->newdir);
-    LIBBALSA_MAILBOX_MAILDIR(mailbox)->newdir = NULL;
+    g_hash_table_destroy(mdir->messages_info);
+    mdir->messages_info = NULL;
+    g_ptr_array_free(mdir->msgno_2_msg_info, TRUE);
+    mdir->msgno_2_msg_info = NULL;
+
     return TRUE;
 }
 
@@ -745,11 +753,14 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 
     g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), -1);
 
+    LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
+
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
     fd = libbalsa_mailbox_maildir_open_temp(path, &tmp);
     if (fd == -1)
     {
+	UNLOCK_MAILBOX(mailbox);
 	return -1;
     }
     out_stream = g_mime_stream_fs_new(fd);
@@ -758,6 +769,7 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	g_mime_stream_unref(out_stream);
 	unlink (tmp);
 	g_free(tmp);
+	UNLOCK_MAILBOX(mailbox);
 	return -1;
     }
     g_mime_stream_unref(out_stream);
@@ -773,11 +785,14 @@ static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     msg_info->filename = g_strdup(new_filename);
     msg_info->flags = flags;
     maildir_sync(msg_info->key, msg_info, path);
-    g_hash_table_insert(LIBBALSA_MAILBOX_MAILDIR(mailbox)->messages_info,
-			msg_info->key, msg_info);
-    g_ptr_array_add(LIBBALSA_MAILBOX_MAILDIR(mailbox)->msgno_2_msg_info, msg_info);
+    if (MAILBOX_OPEN(mailbox)) {
+	    LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+	    g_hash_table_insert(mdir->messages_info, msg_info->key, msg_info);
+	    g_ptr_array_add(mdir->msgno_2_msg_info, msg_info);
+	    mailbox->new_messages++;
+    }
     g_free(tmp);
-    mailbox->new_messages++;
+    UNLOCK_MAILBOX(mailbox);
 
     return 1;
 }

@@ -65,7 +65,8 @@ imap_mbox_handle_noop(ImapMboxHandle *handle)
 
 /* 6.3.1 SELECT Command */
 ImapResult
-imap_mbox_select(ImapMboxHandle* handle, const char* mbox)
+imap_mbox_select(ImapMboxHandle* handle, const char* mbox,
+		 gboolean *readonly_mbox)
 {
   gchar* cmd;
   ImapResponse rc;
@@ -79,6 +80,8 @@ imap_mbox_select(ImapMboxHandle* handle, const char* mbox)
     g_free(handle->mbox);
     handle->mbox = g_strdup(mbox);
     handle->state = IMHS_SELECTED;
+    if (readonly_mbox)
+	*readonly_mbox = handle->readonly_mbox;
     return IMAP_SUCCESS;
   } else return IMAP_SELECT_FAILED;
 }
@@ -209,7 +212,7 @@ imap_mbox_lsub(ImapMboxHandle *handle, const char*ref, const char *mbox)
 
 /* 6.3.11 APPEND Command */
 ImapResult
-imap_mbox_append(ImapMboxHandle *handle, ImapMsgFlags flags,
+imap_mbox_append(ImapMboxHandle *handle, const char *mbox, ImapMsgFlags flags,
 		 size_t len, const char *msgtext)
 {
   GString *cmd;
@@ -224,7 +227,7 @@ imap_mbox_append(ImapMboxHandle *handle, ImapMsgFlags flags,
     return IMAP_PROTOCOL_ERROR;
 
   cmd = g_string_new("APPEND ");
-  g_string_append(cmd, handle->mbox);
+  g_string_append(cmd, mbox);
   for (i=0; i < IMSGF_LAST; i++)
       if (flags[i]==TRUE) {
 	  flags_todo++;

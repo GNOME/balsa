@@ -221,7 +221,7 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int port,
   if( (rc = imap_authenticate(ret, user, passwd)) != IMAP_SUCCESS)
     return rc;
 
-  if(mbox) rc = imap_mbox_select(ret, mbox);
+  if(mbox) rc = imap_mbox_select(ret, mbox, NULL);
   return rc;
 }
 
@@ -761,8 +761,8 @@ ir_resp_text_code(ImapMboxHandle *h)
   case 2: ir_capability_data(h); break;
   case 3: /* ignore parse */; break;
   case 4: ir_permanent_flags(h); break;
-  case 5: /* ignore read-only */; break;
-  case 6: /* ignore read-write */; break;
+  case 5: h->readonly_mbox = TRUE; /* read-only */ break;
+  case 6: h->readonly_mbox = FALSE; /* read-write */ break;
   case 7: /* ignore try-create */; break;
   case 8: imap_get_atom(h->sio, buf, sizeof(buf)); h->uidnext=atoi(buf); break;
   case 9: imap_get_atom(h->sio, buf, sizeof(buf)); h->uidval =atoi(buf); break;

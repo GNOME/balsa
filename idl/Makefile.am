@@ -1,3 +1,10 @@
+balsa_GNORBA	= balsa.gnorba
+EXTRA_DIST	= $(balsa_GNORBA)
+
+balsagnorbadir	= $(sysconfdir)/CORBA/servers
+balsagnorba_DATA = $(balsa_GNORBA)
+
+
 lib_LIBRARIES = libbalsasrv.a
 
 BUILT_SOURCES = balsa-skels.c \

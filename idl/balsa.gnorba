@@ -2,4 +2,4 @@
 type=exe
 repo_id=balsa
 description=BALSA Client
-localtion-info=/usr/local/gnome-cvs/bin/balsa
+localtion-info=balsa

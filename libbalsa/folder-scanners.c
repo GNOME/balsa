@@ -171,14 +171,12 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     }
     /* try getting password, quit on cancel */
     if (!server->passwd) {
-        gdk_threads_enter();
         server->passwd = libbalsa_server_get_password(server, NULL);
-        gdk_threads_leave();
         if(!server->passwd)
             return;
     }
 
-    gdk_threads_enter(); libbalsa_lock_mutt();
+    libbalsa_lock_mutt();
 
     if (list_inbox)
         /* force INBOX into the mailbox list
@@ -229,7 +227,7 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
     g_list_foreach((GList*)state.subfolders, (GFunc)g_free, NULL);
     g_list_free((GList*)state.subfolders);
     state_free (&state);
-    libbalsa_unlock_mutt(); gdk_threads_leave();
+    libbalsa_unlock_mutt(); 
 }
 
 /* this function ovverrides mutt's one.

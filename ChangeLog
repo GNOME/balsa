@@ -1,3 +1,15 @@
+2002-08-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/filter-file.c: remove redundant #include.
+	* libbalsa/libbalsa.c, libbalsa/misc.h: store ID of main thread.
+	pass UI operations to the main thread explicitely.
+	* libbalsa/mailbox.c: allow thread cancelation only in safe places.
+	* libbalsa/folder-scanners.c: do not lock GDK after all.
+	* src/balsa-app.c: pass UI operations to the main thread
+	explicitely.
+	* src/main-window.c: disable thread cancelation in arbitrary places.
+	* src/main.c: cancel all threads on quit.
+
 2002-08-18  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* autogen.sh: build both with vicious-scripts and on RH beta (PS).

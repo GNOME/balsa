@@ -497,6 +497,27 @@ balsa_cleanup(void)
 
     config_save();
 
+#ifdef BALSA_USE_THREADS
+    /* move threads shutdown to separate routine?
+       There are actually many things to do, e.g. threads should not
+       be started after this point.
+    */
+    pthread_mutex_lock(&mailbox_lock);
+    if(checking_mail) {
+        /* We want to quit but there is a checking thread active.
+           The alternatives are to:
+           a. wait for the checking thread to finish - but it could be
+           time consuming.  
+           b. send cancel signal to it. 
+        */
+        pthread_cancel(get_mail_thread);
+        libbalsa_unlock_mutt();
+        printf("Mail check thread cancelled. I know it is rough.\n");
+        sleep(1);
+    }
+    pthread_mutex_unlock(&mailbox_lock);
+#endif
+
     /* FIXME: stop switching notebook pages in a more elegant way.
        Probably, the cleanest solution is to call enable_menus_xxx
        functions from an idle function connected to balsa_message_set. */

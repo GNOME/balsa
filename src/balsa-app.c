@@ -27,6 +27,7 @@
 #include <pthread.h>
 #endif
 
+#include "misc.h"
 #include "balsa-app.h"
 
 
@@ -111,13 +112,15 @@ ask_passwd_idle(gpointer data)
     return FALSE;
 }
 
+/* ask_password_mt:
+   GDK lock must not be held.
+*/
 static gchar *
 ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
     static pthread_mutex_t ask_passwd_lock = PTHREAD_MUTEX_INITIALIZER;
     AskPasswdData apd;
 
-    gdk_threads_leave();
     pthread_mutex_lock(&ask_passwd_lock);
     pthread_cond_init(&apd.cond, NULL);
     apd.server = server;
@@ -128,7 +131,6 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     pthread_cond_destroy(&apd.cond);
     pthread_mutex_unlock(&ask_passwd_lock);
     pthread_mutex_destroy(&ask_passwd_lock);
-    gdk_threads_enter();
     return apd.res;
 }
 #endif
@@ -175,7 +177,9 @@ set_passwd_from_matching_server(GNode *nd, gpointer data)
     
     return FALSE;
 }
-
+/* ask_password:
+   when called from thread, gdk lock must not be held.
+*/
 gchar *
 ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 {
@@ -196,7 +200,8 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     }
     if (!password)
 #ifdef BALSA_USE_THREADS
-	return ask_password_mt(server, mbox);
+	return (pthread_self() == libbalsa_get_main_thread()) ?
+            ask_password_real(server, mbox) : ask_password_mt(server, mbox);
 #else
 	return ask_password_real(server, mbox);
 #endif

@@ -497,6 +497,9 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHECK], 0);
+#ifdef BALSA_USE_THREADS
+    pthread_testcancel();
+#endif
 }
 
 /* libbalsa_mailbox_get_matching:

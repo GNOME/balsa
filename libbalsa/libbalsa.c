@@ -41,6 +41,7 @@
 
 #ifdef BALSA_USE_THREADS
 static GMutex *mutt_lock;
+static pthread_t main_thread_id;
 #endif
 
 #define POP_SERVER "pop"
@@ -110,6 +111,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 	g_error("Threads have not been initialised.");
     }
     mutt_lock = g_mutex_new();
+    main_thread_id = pthread_self();
 #endif
 
     uname(&utsname);
@@ -570,7 +572,7 @@ ask_cert_idle(gpointer data)
 }
 /* libmutt_ask_for_cert_acceptance:
    executed with GDK UNLOCKED. see mailbox_imap_open() and
-   imap_folder_imap_dir().
+   imap_dir_cb()/imap_folder_imap_dir().
 */
 int
 libmutt_ask_for_cert_acceptance(X509 *cert)
@@ -582,9 +584,9 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
     pthread_cond_init(&acd.cond, NULL);
     acd.cert = cert;
     gtk_idle_add(ask_cert_idle, &acd);
-    libbalsa_unlock_mutt(); gdk_threads_leave();
+    libbalsa_unlock_mutt(); 
     pthread_cond_wait(&acd.cond, &ask_cert_lock);
-    gdk_threads_enter(); libbalsa_lock_mutt();
+    libbalsa_lock_mutt();
     
     pthread_cond_destroy(&acd.cond);
     pthread_mutex_unlock(&ask_cert_lock);
@@ -600,3 +602,12 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
 #endif /* BALSA_USE_THREADS */
 
 #endif /* WITH_SSL */
+
+
+#ifdef BALSA_USE_THREADS
+pthread_t
+libbalsa_get_main_thread(void)
+{
+    return main_thread_id;
+}
+#endif

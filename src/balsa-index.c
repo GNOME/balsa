@@ -1098,7 +1098,6 @@ bndx_find_row(BalsaIndex * index, GtkTreeIter * iter, gboolean previous,
 
     g_return_val_if_fail(index != NULL, FALSE);
 
-    printf("Balsa idnex find node\n");
     bi.tree_view = tree_view;
     bi.message = index->current_message;
     bi.flag = flag;

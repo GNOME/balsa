@@ -1,3 +1,9 @@
+2005-03-20 12:35  PeterB
+
+	* configure.in, libbalsa/misc.c, libbalsa/misc.h,
+	src/balsa-message.c, src/sendmsg-window.c: more appropriate version
+	checks.
+
 2005-03-20 Pawel Salek
 
 	* src/address-book-config.c: s,GNOME_DISABLE_DEPR,GTK_DISABLE_DEPR,

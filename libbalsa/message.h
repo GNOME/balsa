@@ -209,6 +209,8 @@ gchar *libbalsa_message_date_to_gchar(LibBalsaMessage * message,
 				      const gchar * date_string);
 gchar *libbalsa_message_size_to_gchar(LibBalsaMessage * message,
                                       gboolean lines);
+gchar *libbalsa_message_title(LibBalsaMessage * message,
+                              const gchar * format);
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 const gchar *libbalsa_message_charset(LibBalsaMessage * message);

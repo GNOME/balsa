@@ -1,3 +1,17 @@
+2002-02-04  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* help/C/balsa.sgml: add message window title doc.
+	* libbalsa/address-entry.[hc]: remove most of the code without
+	affecting functionality much. 
+	* libbalsa/files.[hc]: do not print senseless warnings.
+	* libbalsa/message.[hc]: implement libbalsa_message_title().
+	* libbalsa/misc.[hc]: implement truncate_string()
+	* src/balsa-app.h: set default message title.
+	* src/message-window.c: use message title.
+	* src/pref-manager.c: edit message title format.
+	* src/save-restore.c: save and restore it.
+	* src/sendmsg-window.c: remove focus-out event handler (hm...)
+
 2002-02-02  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/balsa-mblist.c: rescanning root's children not needed(?)

@@ -548,6 +548,13 @@ config_global_load(void)
     balsa_app.selected_headers =
 	gnome_config_get_string("SelectedHeaders=" DEFAULT_SELECTED_HDRS);
     g_strdown(balsa_app.selected_headers);
+
+    /* ... Message window title format */
+    g_free(balsa_app.message_title_format);
+    balsa_app.message_title_format =
+        gnome_config_get_string("MessageTitleFormat="
+                                DEFAULT_MESSAGE_TITLE_FORMAT);
+
     balsa_app.threading_type = d_get_gint("ThreadingType", 
 					  BALSA_INDEX_THREADING_JWZ);
 
@@ -877,6 +884,8 @@ gint config_save(void)
     gnome_config_set_string("DateFormat", balsa_app.date_string);
     gnome_config_set_int("ShownHeaders", balsa_app.shown_headers);
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
+    gnome_config_set_string("MessageTitleFormat",
+                            balsa_app.message_title_format);
     gnome_config_set_int("ThreadingType", balsa_app.threading_type);
     gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
     gnome_config_set_bool("RecognizeRFC2646FormatFlowed", 

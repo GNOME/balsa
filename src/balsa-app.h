@@ -90,6 +90,7 @@
 #define DEFAULT_DATE_FORMAT "%Y.%m.%d %H:%M"
 #define DEFAULT_PAPER_SIZE "A4"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
+#define DEFAULT_MESSAGE_TITLE_FORMAT "Message from %F: %s"
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
 
@@ -263,6 +264,7 @@ extern struct BalsaApplication {
     gint browse_wrap_length;
     ShownHeaders shown_headers;
     gchar *selected_headers;
+    gchar *message_title_format;
     BalsaIndexThreadingType threading_type;
     gboolean show_mblist;
     gboolean show_notebook_tabs;

@@ -2455,13 +2455,77 @@ align="center"></graphic>
   </varlistentry>
 	
   <varlistentry>
-    <term><guilabel>Displayed Headers</guilabel></term>
+    <term><guilabel>Selected Headers</guilabel></term>
     <listitem>
     <para>A space-separated list of the headers to display in the
       message window.</para>
     </listitem>
   </varlistentry>
 	
+  <varlistentry>
+    <term><guilabel>Message window title format</guilabel></term> 
+    <listitem>
+      <para>
+        Set the format &Balsa; uses as the title of the window you use
+        to read a message.  This uses a format string of the same
+        general kind as <function>printf</function>. It's a mixture of
+        text and substitution commands, where the text is used
+        literally, and substition commands are in one of the forms:
+
+      <itemizedlist>
+
+	<listitem>
+ 	  <para><literal>%</literal><emphasis>h</emphasis> &mdash; insert
+          the <emphasis>h</emphasis> header field.</para>
+	</listitem>
+
+	<listitem>
+ 	  <para><literal>%</literal><emphasis>wh</emphasis> &mdash; insert
+          the <emphasis>h</emphasis> header field, in a field of at most
+          <emphasis>w</emphasis> characters.</para>
+	</listitem>
+
+	<listitem>
+ 	  <para><literal>%</literal><emphasis>w.dh</emphasis> &mdash; insert
+          the <emphasis>h</emphasis> header field, in a field of at most
+          <emphasis>w</emphasis> characters, and if the header is
+          truncated, replace the last <emphasis>d</emphasis> characters
+          with dots.</para>
+	</listitem>
+
+      </itemizedlist>
+
+        The headers that may be used are:
+
+      <itemizedlist>
+
+	<listitem>
+	  <para><literal>F</literal> &mdash; The <literal>From:</literal>
+	    header line.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>f</literal> &mdash; The email address part of
+  	    the <literal>From:</literal> header line.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>s</literal> &mdash; The
+	    <literal>Subject</literal>.</para>
+	</listitem>
+
+	</itemizedlist>
+
+        For example, if you set this string to
+        <literal>From: %15.3f, Subject: %25s</literal>,
+        the title will be something like
+        <quote>From: bugzilla-dae..., Subject: [Bug 70225] Changed -
+        Pet</quote>. The default value is the uninformative
+        <literal>Message</literal>.
+      </para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>
 </sect1>
 

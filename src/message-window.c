@@ -218,6 +218,7 @@ void
 message_window_new(LibBalsaMessage * message)
 {
     MessageWindow *mw;
+    gchar *title;
     GtkWidget *scroll;
     GnomeIconList *gil;
 
@@ -254,7 +255,10 @@ message_window_new(LibBalsaMessage * message)
     mw->message = message;
     mw->mru_list= NULL;
 
-    mw->window = gnome_app_new("balsa", "Message");
+    title = libbalsa_message_title(message,
+                                   balsa_app.message_title_format);
+    mw->window = gnome_app_new("balsa", title);
+    g_free(title);
 
     mw->show_all_headers_save=-1;
     mw->headers_shown=balsa_app.shown_headers;

@@ -1572,16 +1572,6 @@ create_email_entry(GtkWidget * table, const gchar * label, int y_pos,
 		      ELEMENTS(email_field_drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-    /*
-     * This must remain here, until someone can fix
-     * libbalsa/address-entry.c/libbalsa_address_entry_class_init()
-     * to assign it when the widget gets created.
-     *
-     * Berend De Schouwer <bds@jhb.ucs.co.za>
-     */
-    gtk_signal_connect(GTK_OBJECT(arr[1]), "focus-out-event",
-		       GTK_SIGNAL_FUNC(libbalsa_address_entry_focus_out),
-		       arr[1]);
     libbalsa_address_entry_set_find_match(LIBBALSA_ADDRESS_ENTRY(arr[1]),
 		       expand_alias_find_match);
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(arr[1]),

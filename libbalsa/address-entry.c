@@ -21,21 +21,6 @@
  */
 
 /*
- * FIXME:
- *
- * Need to add credits, I think... How do we do that?
- *
- * Parts of this code is copied out of GTK+.  GTK+ is licensed
- * under the LGPL, and Balsa under the GPL.  The consensus among
- * all parties involved (Balsa maintainers, GTK+, and GNU (for
- * writing the license)) this is legal.  The new and cut&pasted
- * code has to be GPL-ed.
- *
- * I would like to thank the GTK+ Authors at this point
- * for their work.
- */
-
-/*
  * A subclass of gtkentry to support alias completion.
  */
 
@@ -49,23 +34,11 @@
 #include <sys/stat.h>
 #include <ctype.h>
 
-/* pawsa: the update of cursor pos is completely reduntant with gtk+-1.2.9
-   and since the char_offsets happens to be shorter than computed cursor_pos,
-   the entry tends to move the alignment left and right.
-   I disable it.
-*/
-#define DISABLE_UPDATE_CUR_POS
 /*
  * LibBalsa includes.
  */
 #include "libbalsa.h"
 #include "address-entry.h"
-
-/*
- * Internal API definitiions.
- */
-#define DRAW_TIMEOUT	20
-#define INNER_BORDER	2
 
 /*
  * Global variable.  We need this for destroying this widget.
@@ -79,38 +52,25 @@ static GtkWidgetClass *parent_class = NULL;
 static void libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass);
 static void libbalsa_address_entry_init(LibBalsaAddressEntry *ab);
 static void libbalsa_address_entry_destroy(GtkObject * object);
+static void libbalsa_address_entry_draw(GtkWidget * widget,
+                                        GdkRectangle * area);
 
 /*
  * Other function prototypes.
  */
-void libbalsa_inputData_free(inputData * data);
-inputData *libbalsa_inputData_new(void);
-emailData *libbalsa_emailData_new(void);
-void libbalsa_emailData_free(emailData *addy);
-static gint libbalsa_address_entry_timer(gpointer);
-static gint libbalsa_address_entry_find_position(LibBalsaAddressEntry *, gint);
-static void libbalsa_address_entry_make_backing_pixmap(LibBalsaAddressEntry *,
-						       gint, gint);
-static void libbalsa_address_entry_queue_draw(LibBalsaAddressEntry *);
-static void libbalsa_address_entry_draw_cursor_on_drawable(
-					LibBalsaAddressEntry *, GdkDrawable *);
-static void libbalsa_address_entry_delete_text(GtkEditable *, 
-					       unsigned, unsigned);
-static void libbalsa_address_entry_draw(GtkWidget *, GdkRectangle *);
-static gint libbalsa_address_entry_button_press(GtkWidget *, GdkEventButton *);
-static void libbalsa_address_entry_draw_cursor(LibBalsaAddressEntry *);
-static void libbalsa_address_entry_draw_text(LibBalsaAddressEntry *);
+static void libbalsa_inputData_free(inputData * data);
+static inputData *libbalsa_inputData_new(void);
+static emailData *libbalsa_emailData_new(void);
+static void libbalsa_emailData_free(emailData * addy);
+static gint libbalsa_address_entry_button_press(GtkWidget *,
+                                                GdkEventButton *);
 static gint libbalsa_address_entry_key_press(GtkWidget *, GdkEventKey *);
-inputData *libbalsa_address_entry_get_input(LibBalsaAddressEntry *entry);
-void libbalsa_address_entry_set_input(LibBalsaAddressEntry *entry,
-				      inputData *data);
-void libbalsa_address_entry_show(LibBalsaAddressEntry *entry);
-void libbalsa_address_entry_set_text(LibBalsaAddressEntry *, const gchar *);
-void libbalsa_force_no_match(emailData *);
-void libbalsa_address_entry_clear_match(LibBalsaAddressEntry *);
-void libbalsa_address_entry_set_focus(LibBalsaAddressEntry *, gint);
-gint libbalsa_address_entry_get_focus(LibBalsaAddressEntry *);
-GList *libbalsa_strsplit(const gchar *, gchar);
+static void libbalsa_address_entry_show(LibBalsaAddressEntry * entry);
+static void libbalsa_force_no_match(emailData *);
+static void libbalsa_address_entry_clear_match(LibBalsaAddressEntry *);
+static GList *libbalsa_strsplit(const gchar *, gchar);
+static gint libbalsa_address_entry_focus_out(GtkWidget * widget,
+                                             GdkEventFocus * event);
 
 
 /*
@@ -249,33 +209,8 @@ libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass)
     klass->gtk_entry_button_press = gtk_widget_class->button_press_event;
     gtk_widget_class->button_press_event = libbalsa_address_entry_button_press;
     gtk_widget_class->key_press_event = libbalsa_address_entry_key_press;
-    /*
-     * FIXME: PLEASE HELP!
-     *
-     * If I set the focus_out function here, GTK+ spits out error messages
-     * a few times a second.  According to gdb, these happen inside poll(),
-     * inside GTK+.
-     *
-     * If src/sendmsg-window.c() assigns this function via
-     * gtk_signal_connect(), and nothing else changes, the bug does
-     * NOT appear.
-     *
-     * It is reproducable with:
-     * - The current source.
-     * - Using gtk+-1.2.8/gtk/gtkentry.c's focus_out() function.
-     * - An empty focus_out() function.
-     *
-     * It appears to be a stray GtkObject reference somewhere, that
-     * doesn't get released, which makes gtk/poll() call an invalid
-     * widget.
-     *
-     * Berend De Schouwer <bds@jhb.ucs.co.za>
-     */
-#if 0
     gtk_widget_class->focus_out_event = libbalsa_address_entry_focus_out;
-#endif
 }
-
 
 static void
 libbalsa_address_entry_init(LibBalsaAddressEntry *address_entry)
@@ -372,7 +307,7 @@ libbalsa_address_entry_destroy(GtkObject * object)
  *   results:
  *     Modifies the structure.
  *************************************************************/
-void
+static void
 libbalsa_force_no_match(emailData *addy) {
     g_return_if_fail(addy != NULL);
 
@@ -392,7 +327,7 @@ libbalsa_force_no_match(emailData *addy) {
  *   results:
  *     A new emailData structure.
  *************************************************************/
-emailData *
+static emailData *
 libbalsa_emailData_new(void)
 {
     emailData *tmp;
@@ -416,7 +351,7 @@ libbalsa_emailData_new(void)
  *   results:
  *     None.
  *************************************************************/
-void
+static void
 libbalsa_emailData_free(emailData *addy)
 {
     g_return_if_fail(addy != NULL);
@@ -440,7 +375,7 @@ libbalsa_emailData_free(emailData *addy)
  *   results:
  *     A newly allocated structure.
  *************************************************************/
-inputData *
+static inputData *
 libbalsa_inputData_new(void)
 {
     inputData *tmp;
@@ -462,7 +397,7 @@ libbalsa_inputData_new(void)
  *   results:
  *     None.
  *************************************************************/
-void
+static void
 libbalsa_inputData_free(inputData * data)
 {
     g_return_if_fail(data != NULL);
@@ -534,7 +469,7 @@ libbalsa_alias_accept_match(emailData *addy) {
  *     Returns a newly allocated GList* with newly allocated
  *     data inside it.
  *************************************************************/
-GList *
+static GList *
 libbalsa_strsplit(const gchar *str, gchar delimiter)
 {
     GList *glist;
@@ -782,45 +717,6 @@ libbalsa_fill_input(LibBalsaAddressEntry *address_entry)
     return input;
 }
 
-
-/*************************************************************
- * libbalsa_address_entry_set_text:
- *     Sets the text string of a LibBalsaAddressEntry without
- *     drawing the text.
- *
- *   credits:
- *     Modified from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: The LibBalsaAddressEntry to act on.
- *     text:          A gchar* string to set the text to.
- *
- *   results:
- *     Sets the text in the widget.
- *************************************************************/
-void
-libbalsa_address_entry_set_text(LibBalsaAddressEntry *address,
-				const gchar *text)
-{
-    gint tmp_pos;
-
-    GtkEditable *editable;
-
-    g_return_if_fail(address != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address));
-    g_return_if_fail(text != NULL);
-
-    editable = GTK_EDITABLE(address);
-    libbalsa_address_entry_delete_text(editable, 0, -1);
-
-    tmp_pos = 0;
-    gtk_editable_insert_text(editable, text, strlen(text), &tmp_pos);
-
-    editable->selection_start_pos = 0;
-    editable->selection_end_pos = 0;
-}
-
-
 /*************************************************************
  * libbalsa_delete_line:
  *     Deletes the text string of a LibBalsaAddressEntry.
@@ -900,7 +796,7 @@ libbalsa_delete_forward_word(LibBalsaAddressEntry *address_entry)
 	    g_assert(addy != NULL);
 	    addy->cursor = 0;
 	} else {
-	    libbalsa_address_entry_set_text(address_entry, "");
+	    gtk_entry_set_text(GTK_ENTRY(address_entry), "");
 	    libbalsa_inputData_free(address_entry->input);
 	    address_entry->input = libbalsa_fill_input(address_entry);
 	}
@@ -970,7 +866,7 @@ libbalsa_delete_backward_word(LibBalsaAddressEntry *address_entry)
 	    g_assert(addy != NULL);
 	    addy->cursor = strlen(addy->user);
 	} else {
-	    libbalsa_address_entry_set_text(address_entry, "");
+	    gtk_entry_set_text(GTK_ENTRY(address_entry), "");
 	    libbalsa_inputData_free(address_entry->input);
 	    address_entry->input = libbalsa_fill_input(address_entry);
 	}
@@ -1031,340 +927,12 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
     libbalsa_address_entry_show(address_entry);
 }
 
-
-/*************************************************************
- * libbalsa_address_entry_timer:
- *     Is this used to keep it thread-safe? (late at night)
- *     Attempts to call draw_text() if the timer expires.
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: The LibBalsaAddressEntry to act on.
- *
- *   results:
- *     ???
- *************************************************************/
-static gint
-libbalsa_address_entry_timer(gpointer data)
-{
-    LibBalsaAddressEntry *address_entry;
-    GtkEntry *entry;
-
-    GDK_THREADS_ENTER ();
-
-    address_entry = LIBBALSA_ADDRESS_ENTRY(data);
-    entry = GTK_ENTRY(data);
-    entry->timer = 0;
-
-    GDK_THREADS_LEAVE ();
-    return TRUE;
-}
-
-
-/*************************************************************
- * libbalsa_address_entry_find_position:
- *     Find the cursor position?
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: The LibBalsaAddressEntry to act on.
- *     x:             ???
- *
- *   results:
- *     ???
- *************************************************************/
-static gint
-libbalsa_address_entry_find_position(LibBalsaAddressEntry *address_entry,
-									gint x)
-{
-    GtkEntry *entry;
-    gint start = 0;
-    gint end;
-    gint half;
-
-    g_return_val_if_fail(address_entry != NULL, 0);
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry), 0);
-
-    entry = GTK_ENTRY(address_entry);
-    end = entry->text_length;
-    if (x <= 0)
-	return 0;
-    if (x >= entry->char_offset[end])
-	return end;
-  
-    /* invariant - char_offset[start] <= x < char_offset[end] */
-
-    while (start != end) {
-	half = (start+end)/2;
-	if (half == start)
-	    return half;
-	else if (entry->char_offset[half] <= x)
-	    start = half;
-	else
-	    end = half;
-    }
-    return start;
-}
-
-
-/*************************************************************
- * libbalsa_address_entry_make_backing_pixmap:
- *     Makes a pixmap to draw on if we don't use the widget
- *     directly.
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: The LibBalsaAddressEntry to act on.
- *     width:         ???
- *     height:        ???
- *
- *   results:
- *     ???
- *************************************************************/
-static void
-libbalsa_address_entry_make_backing_pixmap(LibBalsaAddressEntry *address_entry,
-							gint width, gint height)
-{
-    GtkEntry *entry;
-    gint pixmap_width, pixmap_height;
-
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-
-    entry = GTK_ENTRY(address_entry);
-    if (!entry->backing_pixmap) {
-	/* allocate */
-	entry->backing_pixmap = gdk_pixmap_new(entry->text_area,
-		                               width, height, -1);
-    } else {
-	/* reallocate if sizes don't match */
-	gdk_window_get_size(entry->backing_pixmap,
-		            &pixmap_width, &pixmap_height);
-	if ((pixmap_width != width) || (pixmap_height != height)) {
-	    gdk_pixmap_unref(entry->backing_pixmap);
-	    entry->backing_pixmap = gdk_pixmap_new(entry->text_area,
-		                                   width, height, -1);
-	}
-    }
-}
-
-
-/*************************************************************
- * libbalsa_address_entry_queue_draw:
- *     ???
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: The LibBalsaAddressEntry to act on.
- *
- *   results:
- *     Sets the text in the widget.
- *************************************************************/
-static void
-libbalsa_address_entry_queue_draw(LibBalsaAddressEntry *address_entry)
-{
-    GtkEntry *entry;
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-
-    entry = GTK_ENTRY(address_entry);
-    if (!entry->timer)
-	entry->timer = gtk_timeout_add(DRAW_TIMEOUT,
-		                       libbalsa_address_entry_timer, entry);
-}
-
-
-/*************************************************************
- * libbalsa_address_entry_delete_text:
- *     ???
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     editable:	???
- *     start_pos:	???
- *     end_pos:		???
- *
- *   results:
- *     Modifies the text in the widget.
- *************************************************************/
-static void
-libbalsa_address_entry_delete_text(GtkEditable *editable, 
-				   unsigned start_pos, unsigned end_pos)
-{
-    GdkWChar *text;
-    gint deletion_length;
-    unsigned i;
-    GtkEntry *entry;
-  
-    g_return_if_fail(editable != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(editable));
-
-    entry = GTK_ENTRY(editable);
-
-    if (end_pos == (unsigned) -1)
-	end_pos = entry->text_length;
-
-    if (editable->selection_start_pos > start_pos)
-	editable->selection_start_pos -= MIN(end_pos, editable->selection_start_pos) - start_pos;
-    if (editable->selection_end_pos > start_pos)
-	editable->selection_end_pos -= MIN(end_pos, editable->selection_end_pos) - start_pos;
-  
-    if ((start_pos < end_pos) &&
-	(start_pos >= 0) &&
-	(end_pos <= entry->text_length)) {
-	text = entry->text;
-	deletion_length = end_pos - start_pos;
-
-	/* Fix up the character offsets */
-	if (GTK_WIDGET_REALIZED (entry)) {
-	    gint deletion_width = 
-		entry->char_offset[end_pos] - entry->char_offset[start_pos];
-	    for (i = 0; i <= entry->text_length - end_pos; i++)
-		entry->char_offset[start_pos+i] = 
-		    entry->char_offset[end_pos+i] - deletion_width;
-	}
-
-	for (i = end_pos; i < entry->text_length; i++)
-	    text[i - deletion_length] = text[i];
-
-	for (i = entry->text_length - deletion_length; i < entry->text_length; i++)
-	    text[i] = '\0';
-	entry->text_length -= deletion_length;
-	editable->current_pos = start_pos;
-    }
-
-    entry->text_mb_dirty = 1;
-    libbalsa_address_entry_queue_draw (LIBBALSA_ADDRESS_ENTRY(editable));
-}
-
-
-/*************************************************************
- * libbalsa_address_entry_draw_cursor_on_drawable:
- *     For once, its clear :)  Maybe.
- *     Usually you'll want to use
- *     libbalsa_address_entry_draw_cursor() instead.
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: the widget.
- *     drawable:      foreground or background.
- *
- *   results:
- *     None?  Changes the appearance of the widget.
- *************************************************************/
-static void
-libbalsa_address_entry_draw_cursor_on_drawable(
-		    LibBalsaAddressEntry *address_entry, GdkDrawable *drawable)
-{
-    GtkWidget *widget;
-    GtkEditable *editable;
-    GtkEntry *entry;
-    gint xoffset;
-    gint text_area_height;
-
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-
-    entry = GTK_ENTRY(address_entry);
-    widget = GTK_WIDGET (entry);
-    editable = GTK_EDITABLE (entry);
-
-    if (! (GTK_WIDGET_DRAWABLE(entry))) return;
-
-    xoffset = INNER_BORDER + entry->char_offset[editable->current_pos];
-    xoffset -= entry->scroll_offset;
-    gdk_window_get_size (entry->text_area, NULL, &text_area_height);
-
-    if (GTK_WIDGET_HAS_FOCUS(widget) &&
-	  (editable->selection_start_pos == editable->selection_end_pos)) {
-	gdk_draw_line(drawable, widget->style->fg_gc[GTK_STATE_NORMAL], 
-		      xoffset, INNER_BORDER,
-		      xoffset, text_area_height - INNER_BORDER);
-    } else {
-	gint yoffset = 
-	    (text_area_height - 
-	    (widget->style->font->ascent + widget->style->font->descent)) / 2
-	    + widget->style->font->ascent;
-	gtk_paint_flat_box(widget->style, drawable,
-		           GTK_WIDGET_STATE(widget), GTK_SHADOW_NONE,
-		           NULL, widget, "entry_bg", 
-		           xoffset, INNER_BORDER, 
-		           1, text_area_height - INNER_BORDER);
-	  
-	/*
-	 * Draw the character under the cursor again
-	 */
-	if ((editable->current_pos < entry->text_length) &&
-	      (editable->selection_start_pos == editable->selection_end_pos)) {
-	     GdkWChar c = editable->visible ?
-		                 *(entry->text + editable->current_pos) :
-		                 '*';
-	      
-	     gdk_draw_text_wc(drawable, widget->style->font,
-		              widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
-			      xoffset, yoffset, &c, 1);
-	}
-    }
-
-    /*
-     * This #ifdef won't ever be true in Balsa.  Does this break
-     * things if GTK was compiled with USE_XIM?
-     */
-#ifdef USE_XIM
-    if (GTK_WIDGET_HAS_FOCUS(widget) && gdk_im_ready() && editable->ic && 
-	  (gdk_ic_get_style (editable->ic) & GDK_IM_PREEDIT_POSITION)) {
-	editable->ic_attr->spot_location.x = xoffset;
-	editable->ic_attr->spot_location.y =
-	    (text_area_height + (widget->style->font->ascent
-		- widget->style->font->descent) + 1) / 2;
-	gdk_ic_set_attr(editable->ic, editable->ic_attr, GDK_IC_SPOT_LOCATION);
-    }
-#endif
-}
-
-
-/*************************************************************
- * libbalsa_address_entry_draw_cursor:
- *     Draws the cursor.
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: the widget.
- *
- *   results:
- *     None?  Changes the appearance of the widget.
- *************************************************************/
-static void
-libbalsa_address_entry_draw_cursor(LibBalsaAddressEntry *address_entry)
-{
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-
-    libbalsa_address_entry_draw_cursor_on_drawable(address_entry,
-					GTK_ENTRY(address_entry)->text_area);
-}
-
-
 /*************************************************************
  * libbalsa_address_entry_draw:
  *     Draws the entire widget.
  *
  *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
+ *     hands over all the work to GTK_WIDGET_CLASS(parent_class)->draw
  *
  *   arguments:
  *     widget: the widget.
@@ -1373,78 +941,42 @@ libbalsa_address_entry_draw_cursor(LibBalsaAddressEntry *address_entry)
  *   results:
  *     None?  Changes the appearance of the widget.
  *************************************************************/
+#define INNER_BORDER     2
 static void
-libbalsa_address_entry_draw(GtkWidget *widget, GdkRectangle *area)
+libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
 {
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(widget));
-    g_return_if_fail(area != NULL);
- 
-    if (GTK_WIDGET_DRAWABLE(widget)) {
-	gtk_widget_draw_focus(widget);
-	libbalsa_address_entry_draw_text(LIBBALSA_ADDRESS_ENTRY(widget));
+    GtkEntry *entry = GTK_ENTRY(widget);
+    GtkEditable *editable = GTK_EDITABLE(widget);
+    LibBalsaAddressEntry *address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
+    
+    if (editable->has_selection)
+        /* there's a real selection */
+        (*GTK_WIDGET_CLASS(parent_class)->draw) (widget, area);
+    else {
+        gint start = editable->selection_start_pos;
+        gint end = editable->selection_end_pos;
+        gint xoffset;
+        gint text_area_height;
+        
+        editable->selection_start_pos = address_entry->alias_start_pos;
+        editable->selection_end_pos = address_entry->alias_end_pos;
+
+        (*GTK_WIDGET_CLASS(parent_class)->draw) (widget, area);
+
+        editable->selection_start_pos = start;
+        editable->selection_end_pos = end;
+        
+        /* FIXME: the cursor doesn't seem to get set, so here's one
+         * piece of code lifted from gtkentry.c: */
+        xoffset = INNER_BORDER + entry->char_offset[editable->current_pos];
+        xoffset -= entry->scroll_offset;
+        gdk_window_get_size(entry->text_area, NULL, &text_area_height);
+        gdk_draw_line(entry->text_area,
+                      widget->style->fg_gc[GTK_STATE_NORMAL], xoffset,
+                      INNER_BORDER, xoffset,
+                      text_area_height - INNER_BORDER);
     }
 }
-
-
-/*************************************************************
- * libbalsa_address_entry_adjust_scroll:
- *     ???
- *
- *   credits:
- *     This is stolen from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: the widget.
- *
- *   results:
- *     None?  Changes the appearance of the widget.
- *************************************************************/
-static void
-libbalsa_address_entry_adjust_scroll(LibBalsaAddressEntry *address_entry)
-{
-    GtkEntry *entry;
-    gint xoffset, max_offset;
-    gint text_area_width;
-
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-
-    entry = GTK_ENTRY(address_entry);
-    if (!entry->text_area)
-	return;
-
-    gdk_window_get_size(entry->text_area, &text_area_width, NULL);
-    text_area_width -= 2 * INNER_BORDER;
-
-    /* Display as much text as we can */
-    max_offset = MAX(0,
-	    entry->char_offset[entry->text_length] - text_area_width);
-
-    if (entry->scroll_offset > max_offset)
-	entry->scroll_offset = max_offset;
-
-    /* And make sure cursor is on screen. Note that the cursor is
-     * actually drawn one pixel into the INNER_BORDER space on
-     * the right, when the scroll is at the utmost right. This
-     * looks better to to me than confining the cursor inside the
-     * border entirely, though it means that the cursor gets one
-     * pixel closer to the the edge of the widget on the right than
-     * on the left. This might need changing if one changed
-     * INNER_BORDER from 2 to 1, as one would do on a
-     * small-screen-real-estate display.
-     */
-    xoffset = entry->char_offset[GTK_EDITABLE(entry)->current_pos];
-    xoffset -= entry->scroll_offset;
-
-    if (xoffset < 0)
-	entry->scroll_offset += xoffset;
-    else if (xoffset > text_area_width)
-	entry->scroll_offset += xoffset - text_area_width;
-
-    gtk_widget_queue_draw(GTK_WIDGET(entry));
-}
-
 
 /*************************************************************
  * libbalsa_address_entry_button_press:
@@ -2183,46 +1715,6 @@ libbalsa_find_list_entry(LibBalsaAddressEntry *address_entry, gint *cursor)
     return previous;
 }
 
-#ifndef DISABLE_UPDATE_CUR_POS
-/*************************************************************
- * libbalsa_address_entry_update_cursor_pos:
- *     Sets the cursor position without modifying the
- *     selection information.
- *
- *   arguments:
- *     address_entry: the widget.
- *
- *   results:
- *     modifies address_entry->current_pos;
- *************************************************************/
-static void
-libbalsa_address_entry_update_cursor_pos(LibBalsaAddressEntry *address_entry)
-{
-    GList *list;
-    gint i;
-    gboolean found;
-    emailData *addy;
-
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-
-    i = 0;
-    found = FALSE;
-    for (list = address_entry->input->list;
-	 (list != NULL) && (found == FALSE);
-	 list = g_list_next(list)) {
-	if (list == address_entry->input->active) {
-	    found = TRUE;
-	    addy = (emailData *)list->data;
-	    i = i + addy->cursor;
-	} else {
-	    addy = (emailData *)list->data;
-	    i = i + strlen(addy->user) + 2;
-	}
-    }
-    GTK_EDITABLE(address_entry)->current_pos = i;
-}
-#endif
 /*************************************************************
  * libbalsa_force_expand:
  *     force alias expansion.
@@ -2580,16 +2072,13 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 	 */
 	if (event->length > 0) {
 	    extend_selection = FALSE;
+	    editable->has_selection = FALSE;
 	    return_val = TRUE;
 	    libbalsa_keystroke_add_key(address_entry, event->string);
 	}
 	break;
     }
 
-#ifndef DISABLE_UPDATE_CUR_POS
-    libbalsa_address_entry_update_cursor_pos(address_entry);
-#endif
-    
     /*
      * Since we emit signals from within the above code,
      * the widget might already be destroyed or at least
@@ -2615,8 +2104,6 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
 	gtk_editable_claim_selection(editable,
 		editable->selection_start_pos != editable->selection_end_pos,
 		event->time);
-	libbalsa_address_entry_adjust_scroll(address_entry);
-	libbalsa_address_entry_queue_draw(address_entry);
     }
 
     /*
@@ -2625,217 +2112,6 @@ libbalsa_address_entry_key_press(GtkWidget *widget, GdkEventKey *event)
     libbalsa_address_entry_show(address_entry);
     return return_val;
 }
-
-
-/*************************************************************
- * libbalsa_address_entry_draw_text:
- *     Draws the widget.
- *
- *   credits:
- *     Most of this comes from gtk+-1.2.8/gtk/gtkentry.c
- *
- *   arguments:
- *     address_entry: the widget.
- *
- *   results:
- *     modifies address_entry
- *
- *   caveat:
- *     GTK doesn't offer multiple highlight colours, so we can
- *     only highlight either the selection, or the alias.
- *     Since the selection is a USER action, the selection
- *     gets preference in the highlight.
- *************************************************************/
-static void
-libbalsa_address_entry_draw_text(LibBalsaAddressEntry *address_entry)
-{
-    GtkWidget *widget;
-    GtkEditable *editable;
-    GtkEntry *entry;
-
-    GtkStateType selected_state;
-    gint start_pos;
-    gint end_pos;
-    gint start_xoffset;
-    gint colour_start_pos;
-    gint colour_end_pos;
-    gint colour_start_xoffset;
-    gint colour_end_xoffset;
-    gint width, height;
-    gint y;
-    GdkDrawable *drawable;
-    gint use_backing_pixmap;
-    GdkWChar *stars;
-    GdkWChar *toprint;
-
-    g_return_if_fail(address_entry != NULL);
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_ENTRY(address_entry));
-
-    widget = GTK_WIDGET(address_entry);
-    editable = GTK_EDITABLE(address_entry);
-    entry = GTK_ENTRY(address_entry);
-
-    /*
-     * What is this used for???
-     */
-    if (entry->timer) {
-	gtk_timeout_remove(entry->timer);
-	entry->timer = 0;
-    }
-
-    /*
-     * Don't draw it if we don't have to.
-     */
-    if (! (GTK_WIDGET_DRAWABLE(address_entry))) return;
-
-    /*
-     * If there is no text, draw a rectangle.
-     */
-    if (!entry->text) {         
-	gtk_paint_flat_box(widget->style, entry->text_area,
-		           GTK_WIDGET_STATE(widget), GTK_SHADOW_NONE,
-		           NULL, widget, "entry_bg", 
-		           0, 0, -1, -1);
-	if (editable->editable)
-	    libbalsa_address_entry_draw_cursor(address_entry);
-	return;
-    }
-
-    gdk_window_get_size (entry->text_area, &width, &height);
-
-    g_assert(entry->text != NULL);
-    /*
-     * If the widget has focus, draw on a backing pixmap to avoid flickering
-     * and copy it to the text_area.
-     * Otherwise draw to text_area directly for better speed.
-     */
-    use_backing_pixmap = GTK_WIDGET_HAS_FOCUS(widget) && (entry->text != NULL);
-    if (use_backing_pixmap) {
-	libbalsa_address_entry_make_backing_pixmap
-	                                        (address_entry, width, height);
-	drawable = entry->backing_pixmap;
-    } else {
-	drawable = entry->text_area;
-    }
-
-    gtk_paint_flat_box(widget->style, drawable,
-		       GTK_WIDGET_STATE(widget), GTK_SHADOW_NONE,
-		       NULL, widget, "entry_bg", 
-		       0, 0, width, height);
-
-    y = (height - (widget->style->font->ascent + widget->style->font->descent))
-	/ 2;
-    y += widget->style->font->ascent;
-
-    start_pos = libbalsa_address_entry_find_position(address_entry,
-	                                             entry->scroll_offset);
-    start_xoffset = entry->char_offset[start_pos] - entry->scroll_offset;
-
-    end_pos = libbalsa_address_entry_find_position(address_entry,
-	                                        entry->scroll_offset + width);
-    if (end_pos < entry->text_length)
-	end_pos += 1;
-
-    /*
-     * First, grab the selection...
-     */
-    colour_start_pos = MIN(editable->selection_start_pos,
-	                   editable->selection_end_pos);
-    colour_end_pos = MAX(editable->selection_start_pos,
-		         editable->selection_end_pos);
-    
-    /*
-     * If there was no selection, grab the alias colour positions.
-     */
-    if (colour_start_pos == colour_end_pos) {
-	colour_start_pos = MIN(address_entry->alias_start_pos,
-	                       address_entry->alias_end_pos);
-	colour_end_pos = MAX(address_entry->alias_start_pos,
-		             address_entry->alias_end_pos);
-    }
-
-    /*
-     * Do we need to colour at all?
-     */
-    if (editable->has_selection || (colour_start_pos != colour_end_pos))
-	selected_state = GTK_STATE_SELECTED;
-    else
-	selected_state = GTK_STATE_ACTIVE;
-
-    /*
-     * Now clamp the values: Make sure they are valid.
-     */
-    colour_start_pos = CLAMP(colour_start_pos, start_pos, end_pos);
-    colour_end_pos = CLAMP(colour_end_pos, start_pos, end_pos);
-
-    colour_start_xoffset = 
-	entry->char_offset[colour_start_pos] - entry->scroll_offset;
-    colour_end_xoffset = 
-	entry->char_offset[colour_end_pos] - entry->scroll_offset;
-
-    /*
-     * if editable->visible, print a bunch of stars.
-     * If not, print the standard text.
-     */
-    if (editable->visible) {
-	  toprint = entry->text + start_pos;
-    } else {
-	  gint i;
-	  stars = g_new(GdkWChar, end_pos - start_pos);
-	  for (i = 0; i < end_pos - start_pos; i++)
-	      stars[i] = '*';
-	  toprint = stars;
-    }
-      
-    if (colour_start_pos > start_pos) {
-	gdk_draw_text_wc(drawable, widget->style->font,
-		         widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
-		         INNER_BORDER + start_xoffset, y,
-		         toprint,
-		         colour_start_pos - start_pos);
-    }
-      
-    if ((colour_end_pos >= start_pos) && 
-	(colour_start_pos < end_pos) &&
-	(colour_start_pos != colour_end_pos)) {
-	gtk_paint_flat_box(widget->style, drawable, 
-		           selected_state, GTK_SHADOW_NONE,
-		           NULL, widget, "text",
-		           INNER_BORDER + colour_start_xoffset,
-		           INNER_BORDER,
-		           colour_end_xoffset - colour_start_xoffset,
-			   height - 2*INNER_BORDER);
-	gdk_draw_text_wc(drawable, widget->style->font,
-		         widget->style->fg_gc[selected_state],
-		         INNER_BORDER + colour_start_xoffset, y,
-		         toprint + colour_start_pos - start_pos,
-		         colour_end_pos - colour_start_pos);
-    }          
-       
-    if (colour_end_pos < end_pos) {
-	gdk_draw_text_wc(drawable, widget->style->font,
-		         widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
-		         INNER_BORDER + colour_end_xoffset, y,
-		         toprint + colour_end_pos - start_pos,
-		         end_pos - colour_end_pos);
-    }
-    
-    /*
-     * free the space allocated for the stars if it's neccessary.
-     */
-    if (!editable->visible)
-	g_free (toprint);
-
-    if (editable->editable)
-	libbalsa_address_entry_draw_cursor_on_drawable(address_entry, drawable);
-
-    if (use_backing_pixmap)
-	gdk_draw_pixmap(entry->text_area,
-		        widget->style->fg_gc[GTK_STATE_NORMAL],
-		        entry->backing_pixmap,
-		        0, 0, 0, 0, width, height);       
-}
-
 
 /*************************************************************
  * libbalsa_address_entry_show:
@@ -2856,7 +2132,7 @@ libbalsa_address_entry_draw_text(LibBalsaAddressEntry *address_entry)
  *       that got written after this function got written,
  *       like libbalsa_make_address_string()
  *************************************************************/
-void
+static void
 libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
 {
     GtkEditable *editable;
@@ -2929,13 +2205,12 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
     start = editable->selection_start_pos;
     end = editable->selection_end_pos;
     tmp_pos = 0;
-    libbalsa_address_entry_delete_text(editable, 0, -1);
+    gtk_editable_delete_text(editable, 0, -1);
     gtk_editable_insert_text(editable, show->str, show->len, &tmp_pos);
-    gtk_editable_set_position(GTK_EDITABLE(address_entry), cursor);
+    gtk_editable_set_position(editable, cursor);
+    g_string_free(show, TRUE);
     editable->selection_start_pos = start;
     editable->selection_end_pos = end;
-    libbalsa_address_entry_draw_text(address_entry);
-    g_string_free(show, TRUE);
 }
 
 
@@ -2949,7 +2224,7 @@ libbalsa_address_entry_show(LibBalsaAddressEntry *address_entry)
  *   results:
  *     modifies address_entry
  *************************************************************/
-void
+static void
 libbalsa_address_entry_clear_match(LibBalsaAddressEntry *address_entry)
 {
     emailData *addy;
@@ -3023,7 +2298,7 @@ libbalsa_address_entry_new(void)
  *   results:
  *     Sets a flag in the widget.
  *************************************************************/
-gint
+static gint
 libbalsa_address_entry_focus_out(GtkWidget *widget, GdkEventFocus *event)
 {
     LibBalsaAddressEntry *address_entry;

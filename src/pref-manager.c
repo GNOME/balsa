@@ -120,6 +120,7 @@ typedef struct _PropertyUI {
     GtkWidget *date_format;
 
     GtkWidget *selected_headers;
+    GtkWidget *message_title_format;
 
     /* colours */
     GtkWidget *unread_color;
@@ -487,7 +488,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->date_format), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+
+    /* Selected headers */
     gtk_signal_connect(GTK_OBJECT(pui->selected_headers), "changed",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+
+    /* Format for the title of the message window */
+    gtk_signal_connect(GTK_OBJECT(pui->message_title_format), "changed",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
 
@@ -749,6 +757,12 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.selected_headers =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->selected_headers)));
     g_strdown(balsa_app.selected_headers);
+
+    /* message window title format */
+    g_free(balsa_app.message_title_format);
+    balsa_app.message_title_format =
+        gtk_editable_get_chars(GTK_EDITABLE(pui->message_title_format),
+                               0, -1);
 
     /* unread mailbox color */
     gdk_colormap_free_colors(gdk_window_get_colormap
@@ -1028,9 +1042,16 @@ set_prefs(void)
     if (balsa_app.date_string)
 	gtk_entry_set_text(GTK_ENTRY(pui->date_format),
 			   balsa_app.date_string);
+
+    /* selected headers */
     if (balsa_app.selected_headers)
 	gtk_entry_set_text(GTK_ENTRY(pui->selected_headers),
 			   balsa_app.selected_headers);
+
+    /* message window title format */
+    if (balsa_app.message_title_format)
+	gtk_entry_set_text(GTK_ENTRY(pui->message_title_format),
+			   balsa_app.message_title_format);
 
     /* Colour */
     gnome_color_picker_set_i16(GNOME_COLOR_PICKER(pui->unread_color),
@@ -1874,6 +1895,8 @@ create_display_page(gpointer data)
     
     pui->date_format = attach_entry(_("Date encoding (for strftime):"),0,ftbl);
     pui->selected_headers = attach_entry(_("Selected headers:"), 1, ftbl);
+    pui->message_title_format =
+        attach_entry(_("Message window title format:"), 2, ftbl);
 
     group = NULL;
     for (i = 0; i < NUM_PWINDOW_MODES; i++) {

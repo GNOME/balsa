@@ -132,7 +132,6 @@ struct _LibBalsaAddressEntryClass {
 
 GtkType libbalsa_address_entry_get_type(void);
 GtkWidget *libbalsa_address_entry_new(void);
-gint libbalsa_address_entry_focus_out(GtkWidget *, GdkEventFocus *);
 void libbalsa_address_entry_set_find_match(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
 void libbalsa_address_entry_clear_to_send(GtkWidget *);

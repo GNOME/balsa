@@ -46,7 +46,7 @@ static const gchar *permanent_prefixes[] = {
  */
 gchar *
 balsa_file_finder(const gchar * filename, const gchar * splice,
-		  const gchar ** prefixes)
+		  const gchar ** prefixes, gboolean warn)
 {
     gchar *cat;
     int i;
@@ -68,9 +68,10 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
     }
 
     if (prefixes == NULL) {
-	g_warning
-	    ("Cannot find expected file \"%s\" (spliced with \"%s\") with no extra prefixes",
-	     filename, splice);
+	if (warn)
+            g_warning("Cannot find expected file \"%s\" "
+                      "(spliced with \"%s\") with no extra prefixes",
+	              filename, splice);
 	return NULL;
     }
 
@@ -85,9 +86,10 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	g_free(cat);
     }
 
-    g_warning
-	("Cannot find expected file \"%s\" (spliced with \"%s\") even with extra prefixes",
-	 filename, splice);
+    if (warn)
+        g_warning("Cannot find expected file \"%s\" "
+                  "(spliced with \"%s\") even with extra prefixes",
+	          filename, splice);
     return NULL;
 }
 
@@ -122,7 +124,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
 	if (p_gnome_icon != NULL)
 	    *p_gnome_icon = '-';
 
-	icon = balsa_pixmap_finder (gnome_icon);
+	icon = balsa_pixmap_finder_no_warn (gnome_icon);
 
 	/*
 	 * FIXME: Should use a better icon. Since this one is small

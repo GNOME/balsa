@@ -893,12 +893,15 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 {
     HEADER *msg_header;
     LibBalsaMessageBody *body;
+    gboolean res;
 
+    g_return_val_if_fail(message, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox), FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
 
+    LOCK_MAILBOX(message->mailbox);
     msg_header = message->header;
 
     /* FIXME: This is wrong, but less so than earlier versions; a message
@@ -906,8 +909,11 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
 	      Content-type: multipart/mixed AND members with
 	      Content-disposition: attachment. Unfortunately, part list may
 	      not be available at this stage. */
-    return (msg_header->content->type==TYPEMULTIPART &&
+    res = (msg_header->content->type==TYPEMULTIPART &&
 	    g_strcasecmp("mixed", msg_header->content->subtype)==0);
+
+    UNLOCK_MAILBOX(message->mailbox);
+    return res;
 }
 
 gchar *
@@ -1174,4 +1180,85 @@ libbalsa_message_headers_update(LibBalsaMessage * message)
         message->references_for_threading = g_list_remove(foo, foo->data);
     }
 #endif
+}
+
+/* libbalsa_message_title:
+ * create a title (for a message window, for instance)
+ *
+ * Arguments
+ *   message    the message
+ *   format     the format string
+ *
+ * Value
+ *   pointer to a newly allocated string containing the title
+ *
+ * the title consists of the format string, with conversions specified
+ * in one of the forms
+ *   %c
+ *   %wc
+ *   %w.dc
+ * where:
+ *   c specifies the string to be inserted; current choices are:
+ *     F        `From' header;
+ *     f        `From' mailbox;
+ *     s        subject;
+ *     %        literal '%' character
+ *   w specifies the maximum field width; 
+ *   d specifies a number trailing dots to indicate truncation.
+ */
+gchar *
+libbalsa_message_title(LibBalsaMessage * message, const gchar * format)
+{
+    GString *string = g_string_new("");
+    gchar *tmp;
+    gchar *tmp1;
+
+    while ((tmp = strchr(format, '%')) != NULL) {
+        gint c;
+        gint length = 0;
+        gint dots = 0;
+
+        while (format < tmp)
+            g_string_append_c(string, *format++);
+
+        while (isdigit(c = *++format))
+            length = 10 * length + (c - '0');
+
+        if (c == '.')
+            while (isdigit(c = *++format))
+                dots = 10 * dots + (c - '0');
+
+        switch (c) {
+        case 'f':
+            tmp = g_strdup(libbalsa_address_get_mailbox(message->from, 0));
+            break;
+        case 'F':
+            tmp = libbalsa_address_to_gchar(message->from, 0);
+            break;
+        case 's':
+            tmp = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+            break;
+        case '%':
+            tmp = g_strdup("%");
+            break;
+        default:
+            tmp = g_strdup("???");
+            break;
+        }
+
+        tmp1 = libbalsa_truncate_string(tmp, length, dots);
+        g_free(tmp);
+        g_string_append(string, tmp1);
+        g_free(tmp1);
+
+        if (c)
+            ++format;
+    }
+
+    if (*format)
+        g_string_append(string, format);
+
+    tmp = string->str;
+    g_string_free(string, FALSE);
+    return tmp;
 }

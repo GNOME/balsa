@@ -25,6 +25,7 @@
 typedef enum
   {
     MAILBOX_MBOX,
+    MAILBOX_MBX,
     MAILBOX_MH,
     MAILBOX_POP3,
     MAILBOX_IMAP,
@@ -43,6 +44,16 @@ struct _Mailbox
 
 typedef struct _MailboxMBox MailboxMBox;
 struct _MailboxMBox
+  {
+    MailboxType type;
+    gchar *name;
+    MAILSTREAM *stream;
+
+    gchar *path;
+  };
+
+typedef struct _MailboxMBX MailboxMBX;
+struct _MailboxMBX
   {
     MailboxType type;
     gchar *name;
@@ -105,6 +116,7 @@ union _MailboxUnion
     MailboxType type;
     Mailbox mailbox;
     MailboxMBox mbox;
+    MailboxMBX mbx;
     MailboxMH mh;
     MailboxPOP3 pop3;
     MailboxIMAP imap;

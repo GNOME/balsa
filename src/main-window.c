@@ -121,15 +121,14 @@ create_main_window ()
   gtk_paned_add2 (GTK_PANED (vpane), hbox);
   gtk_widget_show (hbox);
 
+  gtk_box_pack_end(GTK_BOX (vbox), create_statusbar(mw), FALSE, FALSE, 3);
 
   /* set the various parts of the GNOME APP up */
   gnome_app_set_contents (GNOME_APP (mw->window), vbox);
   gnome_app_set_menus (GNOME_APP (mw->window), GTK_MENU_BAR (create_menu (mw->window)));
   mw->toolbar = create_toolbar (mw);
   gnome_app_set_toolbar (GNOME_APP (mw->window), GTK_TOOLBAR (mw->toolbar));
-/*
-  gtk_box_pack_end(GTK_BOX (vbox), create_statusbar(mw), FALSE, FALSE, 0);
-*/
+
   gtk_widget_show (mw->window);
   return mw;
 }

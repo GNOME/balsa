@@ -2151,7 +2151,7 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 {
     GList *list;
     LibBalsaMailbox* mailbox = NULL;
-    guint i=0;
+    gint i=0;
     GtkCList *clist;
     BalsaMessage *msg;
 
@@ -2167,13 +2167,9 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
 
     gtk_clist_freeze(clist);
     gtk_clist_clear(clist);
-    list = mailbox->message_list;
     
-    while (list) {
+    for (list = mailbox->message_list; list; list = list->next)
 	balsa_index_add(bindex, LIBBALSA_MESSAGE(list->data));
-	list = list->next;
-	i++;
-    }
 
     /* do threading */
     balsa_index_threading(bindex);

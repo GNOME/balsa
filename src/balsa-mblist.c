@@ -1522,6 +1522,11 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
 
         /* cannot transfer to the originating mailbox */
         if (mailbox != orig_mailbox) {
+            if (balsa_app.drag_default_is_move)
+                gdk_drag_status(context,
+                                (context->actions ==
+                                 GDK_ACTION_COPY) ? GDK_ACTION_COPY :
+                                GDK_ACTION_MOVE, time);
             switch (context->action) {
             case GDK_ACTION_MOVE:
                 libbalsa_messages_move (messages, mailbox);
@@ -1547,7 +1552,6 @@ static gboolean
 mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context, 
                        gint x, gint y, guint time, gpointer user_data)
 {
-#if 0
     gint row, col;
     gint flag;
     int adjust=0;
@@ -1569,13 +1573,6 @@ mblist_drag_motion_cb (GtkWidget* mblist, GdkDragContext* context,
 	gtk_signal_handler_unblock_by_func(GTK_OBJECT (mblist), 
 					   GTK_SIGNAL_FUNC (select_mailbox),
 					   NULL);
-    }
-#endif
-    if(balsa_app.drag_default_is_move) {
-	gdk_drag_status(context,
-			(context->actions == GDK_ACTION_COPY)
-			? GDK_ACTION_COPY : GDK_ACTION_MOVE,
-			time);
     }
     return FALSE;
 }

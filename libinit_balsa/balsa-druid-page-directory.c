@@ -49,6 +49,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
 {
     gchar *dup;
     gchar *index;
+    char tmp[32] = "/tmp/balsa.XXXXXX";
     ciss_url_t url;
     gboolean ssl = FALSE;
 
@@ -116,20 +117,21 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
 
     if (*box == NULL) {
         if (strcmp("/var/spool/mail/", path)) {
-            (*error) =
-                g_strdup_printf(_
-                                ("The mailbox \"%s\" does not appear to be valid.\n"
-                                 "Your system does not allow for creation of mailboxes\n"
-                                 "in /var/spool/mail. Balsa wouldn't function properly\n"
-                                 "until the system created the mailboxes. Please change\n"
-                                 "the mailbox path or check your system configuration."),
-                                path);
-        } else {
+	    /* Don't fail if you can't create the spool mailbox. */
+	    close(mkstemp(tmp));
+		*box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(tmp, FALSE);
+		if (*box) {
+			free((*box)->url);
+			(*box)->url = g_strdup_printf("file://%s",path);
+		}
+		unlink(tmp);
+	}
+    }
+    if ( *box == NULL) {
             (*error) =
                 g_strdup_printf(_
                                 ("The mailbox \"%s\" does not appear to be valid."),
                                 path);
-        }
         return;
     }
 

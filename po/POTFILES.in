@@ -1,6 +1,7 @@
 # List of source files containing translatable strings.
 # Please keep this list in alphabetical order.
 # src/orbit-glue.c : disabled because it is excluded from the dist file
+balsa.desktop.in
 libbalsa/address-book-extern.c
 libbalsa/address-book-ldap.c
 libbalsa/address-book-ldif.c

@@ -377,7 +377,7 @@ AC_ARG_WITH(nss, [  --with-nss[=PFX]           Compile in SSL support for POP/IM
 AM_CONDITIONAL(USE_NSS, test x$need_nss = xyes)
 
 mutt_cv_flock=yes
-AC_ARG_ENABLE(flock, [  --disable-fcntl            Do NOT use flock() to lock files ],
+AC_ARG_ENABLE(flock, [  --disable-flock            Do NOT use flock() to lock files ],
 	[if test $enableval = no; then mutt_cv_flock=no; fi])
 
 if test $mutt_cv_flock = yes; then

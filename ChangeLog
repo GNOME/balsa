@@ -1,6 +1,10 @@
 2004-07-04  Pawel Salek
 
 	* Makefile.am, balsa.desktop.in: port patches from 142769.
+	* libbalsa/{misc,address-book-vcard}.c:
+	apply -2.0.14-64bit-fixes from fedora.
+	* libmutt/configure.in: broken-flock from fedora.
+	* libinit_balsa/balsa-druid-page-directory.c: spoolbox from fedora.
 
 2004-05-28 14:21  PeterB
 

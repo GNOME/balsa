@@ -8,10 +8,6 @@ if USE_SASL
 SASLSOURCES = mutt_sasl.c
 endif
 
-if USE_NSS
-NSSSOURCES = mutt_ssl_nss.c
-endif
-
 noinst_LIBRARIES = libmutt.a
 
 

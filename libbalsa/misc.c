@@ -1070,7 +1070,7 @@ libbalsa_utf8_sanitize(gchar **text, gboolean fallback, LibBalsaCodeset codeset,
 	    *p = '?';
     } else {
 	/* */
-	gint b_written;
+	gsize b_written;
 	GError *conv_error = NULL;
 	const gchar *use_enc = libbalsa_get_codeset_name(*text, codeset);
 	gchar *p = g_convert(*text, strlen(*text), "utf-8", use_enc, NULL,

@@ -163,21 +163,25 @@ void
 headers2canvas (BalsaMessage * bmessage, Message * message)
 {
   double max_width = 0;
+  double text_height = 0;
+  double next_height = 0;
   double x1, x2, y1, y2;
 
   GnomeCanvasGroup *bm_root;
   GnomeCanvasItem *date_item = NULL, *date_data = NULL;
+  GnomeCanvasItem *to_item = NULL, *to_data = NULL;
+  GnomeCanvasItem *cc_item = NULL, *cc_data = NULL;
+  GnomeCanvasItem *from_item = NULL, *from_data = NULL;
+  GnomeCanvasItem *subject_item = NULL, *subject_data = NULL;
 
   bm_root = GNOME_CANVAS_GROUP (GNOME_CANVAS (bmessage)->root);
 
   bmessage->headers =
     GNOME_CANVAS_GROUP (gnome_canvas_item_new (bm_root,
 					       GNOME_TYPE_CANVAS_GROUP,
-					       "x", (double) 100.0,
-					       "y", (double) 100.0,
+					       "x", (double) 0.0,
+					       "y", (double) 0.0,
 					       NULL));
-
-  /* create header items */
 
   if (message->date)
     {
@@ -185,28 +189,185 @@ headers2canvas (BalsaMessage * bmessage, Message * message)
 					 GNOME_TYPE_CANVAS_TEXT,
 					 "x", (double) 0.0,
 					 "y", (double) 0.0,
+					 "anchor", GTK_ANCHOR_NW,
 					 "font", "fixed",
-					 "text", "Date", NULL);
+					 "text", "Date:", NULL);
 
       gnome_canvas_item_get_bounds (date_item, &x1, &y1, &x2, &y2);
 
       max_width = (x2 - x1);
-      g_print ("%f - %f = %f\n", x2, x1, max_width);
+      
+      if (text_height == 0)
+	text_height = y2 - y1;
+
+      next_height += text_height + 3;
     }
 
-  /* create data items (second column) */
+  if (message->to_list)
+    {
+      to_item = gnome_canvas_item_new (bmessage->headers,
+				       GNOME_TYPE_CANVAS_TEXT,
+				       "x", (double) 0.0,
+				       "y", (double) next_height,
+				       "anchor", GTK_ANCHOR_NW,
+				       "font", "fixed",
+				       "text", "To:", NULL);
+
+      gnome_canvas_item_get_bounds (to_item, &x1, &y1, &x2, &y2);
+
+      if ((x2 - x1) > max_width)
+	max_width = (x2 - x1);
+
+      if (text_height == 0)
+	text_height = y2 - y1;
+
+      next_height += text_height + 3;
+
+    }
+
+  if (message->cc_list)
+    {
+      cc_item = gnome_canvas_item_new (bmessage->headers,
+				       GNOME_TYPE_CANVAS_TEXT,
+				       "x", (double) 0.0,
+				       "y", (double) next_height,
+				       "anchor", GTK_ANCHOR_NW,
+				       "font", "fixed",
+				       "text", "Cc:", NULL);
+
+      gnome_canvas_item_get_bounds (cc_item, &x1, &y1, &x2, &y2);
+      
+      if ((x2 - x1) > max_width)
+	max_width = (x2 - x1);
+
+      if (text_height == 0)
+	text_height = y2 - y1;
+
+      next_height += text_height + 3;
+    }
+
+  if (message->from)
+    {
+      from_item = gnome_canvas_item_new (bmessage->headers,
+					 GNOME_TYPE_CANVAS_TEXT,
+					 "x", (double) 0.0,
+					 "y", (double) next_height,
+					 "anchor", GTK_ANCHOR_NW,
+					 "font", "fixed",
+					 "text", "From:", NULL);
+
+      gnome_canvas_item_get_bounds (from_item, &x1, &y1, &x2, &y2);
+
+      if ((x2 - x1) > max_width)
+	max_width = (x2 - x1);
+
+      if (text_height == 0)
+	text_height = y2 - y1;
+
+      next_height += text_height + 3;
+    }
+
+  if (message->subject)
+    {
+      subject_item = gnome_canvas_item_new (bmessage->headers,
+					    GNOME_TYPE_CANVAS_TEXT,
+					    "x", (double) 0.0,
+					    "y", (double) next_height,
+					    "anchor", GTK_ANCHOR_NW,
+					    "font", "fixed",
+					    "text", "Subject:", NULL);
+
+      gnome_canvas_item_get_bounds (subject_item, &x1, &y1, &x2, &y2);
+
+      if ((x2 - x1) > max_width)
+	max_width = (x2 - x1);
+
+      if (text_height == 0)
+	text_height = y2 - y1;
+
+      next_height += text_height + 3;
+    }
+
+  next_height = 0;
+  max_width += 50;
 
   if (date_item)
     {
       date_data = gnome_canvas_item_new (bmessage->headers,
 					 GNOME_TYPE_CANVAS_TEXT,
-					 "x", (double) 0.0,
-					 "y", (double) 0.0,
+					 "x", max_width,
+					 "y", next_height,
+					 "anchor", GTK_ANCHOR_NW,
 					 "font", "fixed",
 					 "text", message->date,
 					 NULL);
 
-      gnome_canvas_item_move (date_data, max_width + 100, 0);
+      next_height += text_height + 3;
     }
 
+  if (to_item)
+    {
+      to_data = gnome_canvas_item_new (bmessage->headers,
+				       GNOME_TYPE_CANVAS_TEXT,
+				       "x", (double) max_width,
+				       "y", (double) next_height,
+				       "anchor", GTK_ANCHOR_NW,
+				       "font", "fixed",
+				       "text",
+				       make_string_from_list(message->to_list),
+				       NULL);
+
+      next_height += text_height + 3;
+    }
+  
+  if (cc_item)
+    {
+      cc_data = gnome_canvas_item_new (bmessage->headers,
+				       GNOME_TYPE_CANVAS_TEXT,
+				       "x", max_width,
+				       "y", next_height,
+				       "anchor", GTK_ANCHOR_NW,
+				       "font", "fixed",
+				       "text",
+				       make_string_from_list(message->cc_list),
+				       NULL);
+      
+      next_height += text_height + 3;
+    }
+
+  if (from_item)
+    {
+      gchar tbuff[1024];
+      
+      if (message->from->personal)
+	snprintf (tbuff, 1024, "%s <%s>",
+		  message->from->personal,
+		  message->from->mailbox);
+      else
+	snprintf (tbuff, 1024, "%s", message->from->mailbox);
+
+      from_data = gnome_canvas_item_new (bmessage->headers,
+					 GNOME_TYPE_CANVAS_TEXT,
+					 "x", max_width,
+					 "y", next_height,
+					 "anchor", GTK_ANCHOR_NW,
+					 "font", "fixed",
+					 "text", tbuff, NULL);
+
+      next_height += text_height + 3;
+    }
+
+  if (subject_item)
+    {
+      subject_data = gnome_canvas_item_new (bmessage->headers,
+					    GNOME_TYPE_CANVAS_TEXT,
+					    "x", max_width,
+					    "y", next_height,
+					    "anchor", GTK_ANCHOR_NW,
+					    "font", "fixed",
+					    "text", message->subject,
+					    NULL);
+      
+      next_height += text_height + 3;
+    }    
 }

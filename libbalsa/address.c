@@ -201,7 +201,7 @@ static gchar *rfc2822_mailbox(const gchar *full_name, gchar *address)
 {
     gchar *new_str;
 
-    if(full_name) {
+    if(full_name && *full_name) {
         gchar *dequote = g_new(char, strlen(full_name) + 1);
         const gchar *p = full_name;
         gchar *q = dequote;

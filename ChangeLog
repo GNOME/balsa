@@ -1,3 +1,8 @@
+2002-06-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/address.c: don't mangle the heap when full_name is empty.
+	* src/balsa-mblist.c: align columns in the mb list.
+
 2002-06-17  Pawel Salek <pawsa@theochem.kth.se>
 
 	* balsa.spec.in: package help files.

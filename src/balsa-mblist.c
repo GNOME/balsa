@@ -63,7 +63,6 @@ enum {
     WEIGHT_COLUMN,
     UNREAD_COLUMN,
     TOTAL_COLUMN,
-    ONE_COLUMN,
     N_COLUMNS
 };
 
@@ -350,10 +349,10 @@ bmbl_init(BalsaMBList * mblist)
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_column_pack_start(column, renderer, TRUE);
     renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "xalign", 1.0, NULL);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", UNREAD_COLUMN,
-                                        "xalign", ONE_COLUMN,
                                         NULL);
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_column_pack_start(column, renderer, TRUE);
@@ -370,10 +369,10 @@ bmbl_init(BalsaMBList * mblist)
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_column_pack_start(column, renderer, TRUE);
     renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "xalign", 1.0, NULL);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", TOTAL_COLUMN,
-                                        "xalign", ONE_COLUMN,
                                         NULL);
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_column_pack_start(column, renderer, TRUE);
@@ -426,8 +425,7 @@ bmbl_get_store(void)
                                GDK_TYPE_COLOR,    /* COLOR_COLUMN  */
                                PANGO_TYPE_WEIGHT, /* WEIGHT_COLUMN */
                                G_TYPE_STRING,     /* UNREAD_COLUMN */
-                               G_TYPE_STRING,     /* TOTAL_COLUMN  */
-                               G_TYPE_FLOAT       /* ONE_COLUMN    */
+                               G_TYPE_STRING      /* TOTAL_COLUMN  */
             );
 
     return balsa_app.mblist_tree_store;
@@ -1177,7 +1175,6 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
                        WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
                        UNREAD_COLUMN, "",
                        TOTAL_COLUMN,  "",
-                       ONE_COLUMN,    1.0,
                        -1);
     g_free(name);
     return TRUE;

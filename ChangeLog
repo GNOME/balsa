@@ -1,3 +1,9 @@
+2004-12-02 04:07  PeterB
+
+	* libbalsa/mailbox_imap.c: return error from
+	libbalsa_mailbox_imap_fetch_structure() on protocol error in
+	imap_mbox_handle_fetch_range().
+
 2004-12-01 21:23  PeterB
 
 	* src/: balsa-message.c, message-window.c: use error return from

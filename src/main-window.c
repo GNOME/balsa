@@ -4473,8 +4473,11 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     BalsaIndex *orig_index;
     LibBalsaMailbox* orig_mailbox;
 
+    if (!selection_data)
+	/* Drag'n'drop is weird... */
+	return;
+
     orig_index = *(BalsaIndex **) selection_data->data;
-    g_free(data);
     if (orig_index->selected->len == 0)
         /* it is actually possible to drag from GtkTreeView when no rows
          * are selected: Disable preview for that. */

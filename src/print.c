@@ -106,7 +106,7 @@ typedef struct _FontInfo FontInfo;
 typedef struct _CommonInfo CommonInfo;
 
 struct _FontInfo {
-    gchar **font_name;
+    guchar **font_name;
     GnomeFont *font;
     GtkWidget* font_status, *name_label;
     CommonInfo *common_info;
@@ -216,7 +216,7 @@ print_foot_lines(PrintInfo * pi, GnomeFont * font, float y,
 	gnome_print_moveto(pi->pc, 
 			   pi->margin_left + (pi->printable_width - width) / 2.0,
 			   y);
-	gnome_print_show(pi->pc, ptr);
+	gnome_print_show(pi->pc, (guchar *) ptr);
 	ptr = eol;
 	if (eol) {
 	    *eol = '\n';
@@ -239,7 +239,7 @@ start_new_page_real(PrintInfo * pi)
     if (balsa_app.debug)
 	g_print("Processing page %s\n", buf);
 
-    gnome_print_beginpage(pi->pc, buf);
+    gnome_print_beginpage(pi->pc, (guchar *) buf);
     /* print the page number */
     if (balsa_app.print_highlight_cited)
 	gnome_print_setrgbcolor (pi->pc, 0.0, 0.0, 0.0);
@@ -249,7 +249,7 @@ start_new_page_real(PrintInfo * pi)
     width = gnome_font_get_width_utf8(pi->header_font, page_no);
     gnome_print_moveto(pi->pc, pi->page_width - pi->margin_left - width,
 		       ypos);
-    gnome_print_show(pi->pc, page_no);
+    gnome_print_show(pi->pc, (guchar *) page_no);
     g_free(page_no);
     
     /* print the footer */
@@ -521,7 +521,7 @@ print_header_val(PrintInfo * pi, gint x, float * y,
 	if (eol)
 	    *eol = '\0';
 	gnome_print_moveto(pi->pc, x, *y);
-	gnome_print_show(pi->pc, ptr);
+	gnome_print_show(pi->pc, (guchar *) ptr);
 	ptr = eol;
 	if (eol)
 	    ptr++;
@@ -555,7 +555,7 @@ print_header(PrintInfo * pi, gpointer * data)
 	if (pi->ypos < pi->margin_bottom)
 	    start_new_page(pi);
 	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
-	gnome_print_show(pi->pc, pair[0]);
+	gnome_print_show(pi->pc, (guchar *) pair[0]);
 	print_header_val(pi, pi->margin_left + pdata->header_label_width,
 			 &pi->ypos, font_size, pair[1], pi->header_font);
 	g_strfreev(pair);
@@ -719,7 +719,7 @@ print_html_header(GtkWidget * html, GnomePrintContext * print_context,
     gnome_print_moveto(pi->pc,
 		       pi->page_width - pi->margin_left - page_no_width,
 		       ypos);
-    gnome_print_show(pi->pc, page_no);
+    gnome_print_show(pi->pc, (guchar *) page_no);
     g_free(page_no);
 }
 
@@ -928,7 +928,7 @@ print_plaintext(PrintInfo * pi, gpointer * data)
  		gnome_print_setrgbcolor (pi->pc, 0.0, 0.0, 0.0);
  	}
  	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
- 	gnome_print_show(pi->pc, lineInfo->lineData);
+ 	gnome_print_show(pi->pc, (guchar *) lineInfo->lineData);
  	g_free(lineInfo->lineData);
  	g_free(l->data);
  	l = l->next;
@@ -1021,10 +1021,10 @@ print_image_from_pixbuf(GnomePrintContext * gpc, GdkPixbuf * pixbuf)
     width     = gdk_pixbuf_get_width(pixbuf);
 
     if (has_alpha)
-        gnome_print_rgbaimage(gpc, (char *) raw_image, width, height,
+        gnome_print_rgbaimage(gpc, (guchar *) raw_image, width, height,
                               rowstride);
     else
-        gnome_print_rgbimage(gpc, (char *) raw_image, width, height,
+        gnome_print_rgbimage(gpc, (guchar *) raw_image, width, height,
                              rowstride);
 }
 
@@ -1062,7 +1062,7 @@ print_default(PrintInfo * pi, gpointer data)
     offset = pi->margin_left + pdata->image_width + 10;
     for (i = 0; pdata->labels[i]; i += 2) {
 	gnome_print_moveto(pi->pc, offset, pi->ypos);
-	gnome_print_show(pi->pc, pdata->labels[i]);
+	gnome_print_show(pi->pc, (guchar *) pdata->labels[i]);
 	print_header_val(pi, offset + pdata->label_width, &pi->ypos,
  			 font_size, pdata->labels[i + 1], pi->header_font);
  	pi->ypos -= font_size;
@@ -1222,7 +1222,7 @@ print_crypto_signature(PrintInfo * pi, gpointer * data)
 	    gnome_print_setfont(pi->pc, pi->header_font);
 	}
  	gnome_print_moveto(pi->pc, pi->margin_left, pi->ypos);
- 	gnome_print_show(pi->pc, lineInfo->lineData);
+ 	gnome_print_show(pi->pc, (guchar *) lineInfo->lineData);
  	g_free(lineInfo->lineData);
  	g_free(l->data);
  	l = l->next;
@@ -1320,11 +1320,11 @@ find_font(const gchar * name)
     space = strrchr(copy, ' ');
     if (space)
         *space = 0;
-    face = gnome_font_face_find(copy);
+    face = gnome_font_face_find((guchar *) copy);
     g_free(copy);
     if (face) {
         gnome_font_face_unref(face);
-        font = gnome_font_find_from_full_name(name);
+        font = gnome_font_find_from_full_name((guchar *) name);
     }
     return font;
 #endif          /*  GNOME_FONT_FIND_HANDLES_BAD_NAME_SANELY */
@@ -1336,7 +1336,7 @@ get_length_from_config(GnomePrintConfig * config, const gchar * key)
     const GnomePrintUnit *unit;
     gdouble length = 0.0;
 
-    if (gnome_print_config_get_length(config, key, &length, &unit))
+    if (gnome_print_config_get_length(config, (guchar *) key, &length, &unit))
         gnome_print_convert_distance(&length, unit, GNOME_PRINT_PS_UNIT);
 
     return length;
@@ -1529,14 +1529,14 @@ set_dialog_buttons_sensitive(CommonInfo * ci)
 static void
 set_font_status(FontInfo *fi)
 {
-    gtk_label_set_text(GTK_LABEL(fi->name_label), *fi->font_name);
+    gtk_label_set_text(GTK_LABEL(fi->name_label), (gchar *) *fi->font_name);
     if(fi->font) 
 	gtk_label_set_text(GTK_LABEL(fi->font_status),
 			   _("Font available for printing"));
     else {
 	GnomeFont* fncl = 
 	    gnome_font_find_closest_from_full_name(*fi->font_name);
-	gchar* fn = gnome_font_get_full_name(fncl);
+	guchar* fn = gnome_font_get_full_name(fncl);
 	gchar *msg = 
 	    g_strdup_printf(_("Font <b>not</b> available for printing. "
 			      "Closest: %s"), fn);
@@ -1586,7 +1586,7 @@ font_frame(gchar * title, FontInfo * fi)
     GtkWidget *hbox    = gtk_hbox_new(FALSE, 3);
     GtkWidget *button = gtk_button_new_with_label(_("Change..."));
 
-    fi->name_label = gtk_label_new(*fi->font_name);
+    fi->name_label = gtk_label_new((gchar *) *fi->font_name);
     gtk_box_pack_start(GTK_BOX(hbox), fi->name_label, TRUE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 5);
     g_signal_connect(G_OBJECT(button), "clicked", 
@@ -1618,8 +1618,9 @@ print_dialog(CommonInfo * ci)
     GtkWidget  *chkbut;
     GList      *childList;
 
-    dialog = BALSA_GNOME_PRINT_DIALOG_NEW(ci->master, _("Print message"),
-				    GNOME_PRINT_DIALOG_COPIES);
+    dialog = BALSA_GNOME_PRINT_DIALOG_NEW(ci->master,
+                                          (guchar *) _("Print message"),
+                                          GNOME_PRINT_DIALOG_COPIES);
     ci->dialog = dialog;
     common_info_setup(ci);
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
@@ -1664,7 +1665,7 @@ print_dialog(CommonInfo * ci)
 static void
 font_info_setup(FontInfo * fi, gchar ** font_name, CommonInfo * ci)
 {
-    fi->font_name = font_name;
+    fi->font_name = (guchar **) font_name;
     fi->common_info = ci;
     fi->font = find_font(*font_name);
     if (!fi->font)
@@ -1745,25 +1746,20 @@ print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
     }
 
     config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
+#define CONFIG_GET(key) \
+    ((gchar *) gnome_print_config_get(config, (guchar *) (key)))
     g_free(balsa_app.paper_size);
-    balsa_app.paper_size =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_SIZE); 
-    balsa_app.print_unit =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PREFERED_UNIT); 
-    balsa_app.margin_left =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_LEFT); 
-    balsa_app.margin_top =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_TOP); 
-    balsa_app.margin_right =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT);
-    balsa_app.margin_bottom =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM); 
-    balsa_app.print_layout =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_LAYOUT); 
+    balsa_app.paper_size = CONFIG_GET(GNOME_PRINT_KEY_PAPER_SIZE); 
+    balsa_app.print_unit = CONFIG_GET(GNOME_PRINT_KEY_PREFERED_UNIT); 
+    balsa_app.margin_left = CONFIG_GET(GNOME_PRINT_KEY_PAGE_MARGIN_LEFT); 
+    balsa_app.margin_top = CONFIG_GET(GNOME_PRINT_KEY_PAGE_MARGIN_TOP); 
+    balsa_app.margin_right = CONFIG_GET(GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT);
+    balsa_app.margin_bottom = CONFIG_GET(GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM); 
+    balsa_app.print_layout = CONFIG_GET(GNOME_PRINT_KEY_LAYOUT); 
     balsa_app.paper_orientation =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_ORIENTATION); 
-    balsa_app.page_orientation =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAGE_ORIENTATION); 
+	CONFIG_GET(GNOME_PRINT_KEY_PAPER_ORIENTATION); 
+    balsa_app.page_orientation = CONFIG_GET(GNOME_PRINT_KEY_PAGE_ORIENTATION); 
+#undef CONFIG_GET
 
     gnome_print_config_unref(config);
 
@@ -1775,7 +1771,8 @@ print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
     if (preview) {
 	GtkWidget *preview_widget =
 	    BALSA_GNOME_PRINT_UI_PREVIEW_NEW(ci->master,
-		 			   _("Balsa: message print preview"));
+                                             (guchar *)
+					     _("Balsa: message print preview"));
         gtk_window_set_wmclass(GTK_WINDOW(preview_widget), "print-preview",
                                "Balsa");
 	gtk_widget_show(preview_widget);
@@ -1840,33 +1837,30 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
      * initial value in the Paper page. Is there some Gnome-2-wide
      * repository for data like this? */
     config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
-    gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_SIZE, 
-                           balsa_app.paper_size);
+#define CONFIG_SET(key, value) \
+    gnome_print_config_set(config, (guchar *) (key), (guchar *) (value))
+    CONFIG_SET(GNOME_PRINT_KEY_PAPER_SIZE, balsa_app.paper_size);
     if(balsa_app.print_unit)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_PREFERED_UNIT,
-			       balsa_app.print_unit); 
+	CONFIG_SET(GNOME_PRINT_KEY_PREFERED_UNIT, balsa_app.print_unit); 
     if(balsa_app.margin_left)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_LEFT,
-			       balsa_app.margin_left); 
+	CONFIG_SET(GNOME_PRINT_KEY_PAGE_MARGIN_LEFT, balsa_app.margin_left); 
     if(balsa_app.margin_top)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_TOP,
-			       balsa_app.margin_top); 
+	CONFIG_SET(GNOME_PRINT_KEY_PAGE_MARGIN_TOP, balsa_app.margin_top); 
     if(balsa_app.margin_right)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT,
-			       balsa_app.margin_right);
+	CONFIG_SET(GNOME_PRINT_KEY_PAGE_MARGIN_RIGHT, balsa_app.margin_right);
     if(balsa_app.margin_bottom)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM,
-			       balsa_app.margin_bottom); 
+	CONFIG_SET(GNOME_PRINT_KEY_PAGE_MARGIN_BOTTOM,
+		   balsa_app.margin_bottom); 
     if(balsa_app.print_layout)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_LAYOUT,
-			       balsa_app.print_layout); 
+	CONFIG_SET(GNOME_PRINT_KEY_LAYOUT, balsa_app.print_layout); 
     if(balsa_app.paper_orientation)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_ORIENTATION,
-			       balsa_app.paper_orientation); 
+	CONFIG_SET(GNOME_PRINT_KEY_PAPER_ORIENTATION,
+		   balsa_app.paper_orientation); 
     if(balsa_app.page_orientation)
-	gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_ORIENTATION,
-			       balsa_app.page_orientation); 
+	CONFIG_SET(GNOME_PRINT_KEY_PAPER_ORIENTATION,
+		   balsa_app.page_orientation); 
     gnome_print_config_unref(config);
+#undef CONFIG_SET
     
     ci->dialog = print_dialog(ci);
     gtk_window_set_transient_for(GTK_WINDOW(ci->dialog), parent);

@@ -33,6 +33,7 @@
 
 #include "misc.h"
 #include "files.h"
+#include "i18n.h"
 
 static const gchar *permanent_prefixes[] = {
 /*	BALSA_DATA_PREFIX,
@@ -171,7 +172,11 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 	    }
 	}
 
+#if 0
     icon_file = gnome_vfs_mime_get_icon(content_type);
+#else
+    icon_file = gnome_vfs_mime_get_value(content_type, "icon_filename");
+#endif
     
     /* check if the icon file is good and try harder otherwise */
     if (icon_file && g_file_test (icon_file, G_FILE_TEST_IS_REGULAR))

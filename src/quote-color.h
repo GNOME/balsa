@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
     extern void make_gradient(GdkColor colors[], gint, gint);
-    extern gint is_a_quote(const gchar *, regex_t * rex);
+    extern guint is_a_quote(const gchar *, regex_t * rex);
     extern void allocate_quote_colors(GtkWidget *, GdkColor color[], gint, gint);
 
 

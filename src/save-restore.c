@@ -41,7 +41,6 @@
 #include "threads.h"
 #endif
 
-#define BALSA_CONFIG_PREFIX "balsa/"
 #define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
@@ -50,9 +49,9 @@
 #define VIEW_BY_URL_SECTION_PREFIX "viewByUrl-"
 
 static gint config_global_load(void);
-static gint config_folder_init(const gchar * prefix);
-static gint config_mailbox_init(const gchar * prefix);
-static gchar *config_get_unused_section(const gchar * prefix);
+static gint config_folder_init(const gchar * group);
+static gint config_mailbox_init(const gchar * group);
+static gchar *config_get_unused_group(const gchar * group);
 
 static void save_color(gchar * key, GdkColor * color);
 static void load_color(gchar * key, GdkColor * color);
@@ -70,17 +69,17 @@ static void config_filters_load(void);
 #define folder_section_path(mn) \
     BALSA_MAILBOX_NODE(mn)->config_prefix ? \
     g_strdup(BALSA_MAILBOX_NODE(mn)->config_prefix) : \
-    config_get_unused_section(FOLDER_SECTION_PREFIX)
+    config_get_unused_group(FOLDER_SECTION_PREFIX)
 
 #define mailbox_section_path(mbox) \
     LIBBALSA_MAILBOX(mbox)->config_prefix ? \
     g_strdup(LIBBALSA_MAILBOX(mbox)->config_prefix) : \
-    config_get_unused_section(MAILBOX_SECTION_PREFIX)
+    config_get_unused_group(MAILBOX_SECTION_PREFIX)
 
 #define address_book_section_path(ab) \
     LIBBALSA_ADDRESS_BOOK(ab)->config_prefix ? \
     g_strdup(LIBBALSA_ADDRESS_BOOK(ab)->config_prefix) : \
-    config_get_unused_section(ADDRESS_BOOK_SECTION_PREFIX)
+    config_get_unused_group(ADDRESS_BOOK_SECTION_PREFIX)
 
 gint config_load(void)
 {
@@ -94,11 +93,8 @@ static gboolean
 config_load_section(const gchar * key, const gchar * value, gpointer data)
 {
     gint(*cb) (const gchar *) = data;
-    gchar *tmp;
 
-    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-    cb(tmp);                    /* FIXME do something about error?? */
-    g_free(tmp);
+    cb(key);                    /* FIXME do something about error?? */
 
     return FALSE;
 }
@@ -106,12 +102,12 @@ config_load_section(const gchar * key, const gchar * value, gpointer data)
 void
 config_load_sections(void)
 {
-    libbalsa_conf_foreach_section(MAILBOX_SECTION_PREFIX,
-                                  config_load_section,
-                                  config_mailbox_init);
-    libbalsa_conf_foreach_section(FOLDER_SECTION_PREFIX,
-                                  config_load_section,
-                                  config_folder_init);
+    libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX,
+                                config_load_section,
+                                config_mailbox_init);
+    libbalsa_conf_foreach_group(FOLDER_SECTION_PREFIX,
+                                config_load_section,
+                                config_folder_init);
 }
 
 static gint
@@ -139,28 +135,25 @@ save_toolbars(void)
 {
     guint i, j;
 
-    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "Toolbars/");
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    libbalsa_conf_remove_group("Toolbars");
+    libbalsa_conf_push_group("Toolbars");
     libbalsa_conf_set_int("WrapButtonText",
                          balsa_app.toolbar_wrap_button_text);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     for (i = 0; i < ELEMENTS(toolbars); i++) {
         GSList *list;
-        gchar *key;
 
-        key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
-        libbalsa_conf_clean_section(key);
-        libbalsa_conf_push_prefix(key);
-        g_free(key);
+        libbalsa_conf_remove_group(toolbars[i].key);
+        libbalsa_conf_push_group(toolbars[i].key);
 
         for (j = 0, list = *toolbars[i].current; list;
              j++, list = list->next) {
-            key = g_strdup_printf("Item%d", j);
+            gchar *key = g_strdup_printf("Item%d", j);
             libbalsa_conf_set_string(key, list->data);
             g_free(key);
         }
-        libbalsa_conf_pop_prefix();
+        libbalsa_conf_pop_group();
     }
 }
 
@@ -173,15 +166,13 @@ load_toolbars(void)
     GSList **list;
     guint changed = 0;
 
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    libbalsa_conf_push_group("Toolbars");
     balsa_app.toolbar_wrap_button_text = d_get_gint("WrapButtonText", 1);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     items = 0;
     for (i = 0; i < ELEMENTS(toolbars); i++) {
-        key = g_strconcat(BALSA_CONFIG_PREFIX, toolbars[i].key, "/", NULL);
-        libbalsa_conf_push_prefix(key);
-        g_free(key);
+        libbalsa_conf_push_group(toolbars[i].key);
 
         list = toolbars[i].current;
         for (j = 0;; j++) {
@@ -202,7 +193,7 @@ load_toolbars(void)
 	    }
 	    g_free(item);
         }
-        libbalsa_conf_pop_prefix();
+        libbalsa_conf_pop_group();
     }
 
     if (items)
@@ -210,7 +201,7 @@ load_toolbars(void)
 
     /* We didn't find new-style toolbar configs, so we'll try the old
      * style */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Toolbars/");
+    libbalsa_conf_push_group("Toolbars");
     for (i = 0; i < ELEMENTS(toolbars); i++) {
         guint type;
 
@@ -239,7 +230,7 @@ load_toolbars(void)
  	    g_free(item);
         }
     }
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     if (changed)
 	save_toolbars();
@@ -330,13 +321,13 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 void
 config_address_book_save(LibBalsaAddressBook * ab)
 {
-    gchar *prefix;
+    gchar *group;
 
-    prefix = address_book_section_path(ab);
+    group = address_book_section_path(ab);
 
-    libbalsa_address_book_save_config(ab, prefix);
+    libbalsa_address_book_save_config(ab, group);
 
-    g_free(prefix);
+    g_free(group);
 
     libbalsa_conf_sync();
 }
@@ -345,8 +336,8 @@ void
 config_address_book_delete(LibBalsaAddressBook * ab)
 {
     if (ab->config_prefix) {
-	libbalsa_conf_clean_section(ab->config_prefix);
-	libbalsa_conf_private_clean_section(ab->config_prefix);
+	libbalsa_conf_remove_group(ab->config_prefix);
+	libbalsa_conf_private_remove_group(ab->config_prefix);
 	libbalsa_conf_sync();
     }
 }
@@ -363,13 +354,12 @@ gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg)
     if (key_arg == NULL)
 	tmp = mailbox_section_path(mailbox);
     else
-	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX
-			      "%s/", key_arg);
+	tmp = g_strdup_printf(MAILBOX_SECTION_PREFIX "%s", key_arg);
 
-    libbalsa_conf_clean_section(tmp);
-    libbalsa_conf_push_prefix(tmp);
+    libbalsa_conf_remove_group(tmp);
+    libbalsa_conf_push_group(tmp);
     libbalsa_mailbox_save_config(mailbox, tmp);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     g_free(tmp);
 
     libbalsa_conf_sync();
@@ -388,12 +378,11 @@ gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg)
     if (key_arg == NULL)
 	tmp = folder_section_path(mbnode);
     else
-	tmp = g_strdup_printf(BALSA_CONFIG_PREFIX FOLDER_SECTION_PREFIX
-			      "%s/", key_arg);
+	tmp = g_strdup_printf(FOLDER_SECTION_PREFIX "%s", key_arg);
 
-    libbalsa_conf_push_prefix(tmp);
+    libbalsa_conf_push_group(tmp);
     balsa_mailbox_node_save_config(mbnode, tmp);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     g_free(tmp);
 
     libbalsa_conf_sync();
@@ -406,8 +395,8 @@ gint config_mailbox_delete(const LibBalsaMailbox * mailbox)
     gchar *tmp;			/* the key in the mailbox section name */
     gint res;
     tmp = mailbox_section_path(mailbox);
-    res = libbalsa_conf_has_section(tmp);
-    libbalsa_conf_clean_section(tmp);
+    res = libbalsa_conf_has_group(tmp);
+    libbalsa_conf_remove_group(tmp);
     libbalsa_conf_sync();
     g_free(tmp);
     return res;
@@ -419,8 +408,8 @@ config_folder_delete(const BalsaMailboxNode * mbnode)
     gchar *tmp;			/* the key in the mailbox section name */
     gint res;
     tmp = folder_section_path(mbnode);
-    res = libbalsa_conf_has_section(tmp);
-    libbalsa_conf_clean_section(tmp);
+    res = libbalsa_conf_has_group(tmp);
+    libbalsa_conf_remove_group(tmp);
     libbalsa_conf_sync();
     g_free(tmp);
     return res;
@@ -433,13 +422,13 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
     gint res;
 
     key = mailbox_section_path(mailbox);
-    res = libbalsa_conf_has_section(key);
-    libbalsa_conf_clean_section(key);
-    libbalsa_conf_private_clean_section(key);
-    libbalsa_conf_push_prefix(key);
+    res = libbalsa_conf_has_group(key);
+    libbalsa_conf_remove_group(key);
+    libbalsa_conf_private_remove_group(key);
+    libbalsa_conf_push_group(key);
     libbalsa_mailbox_save_config(mailbox, key);
     g_free(key);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     libbalsa_conf_sync();
     return res;
 }				/* config_mailbox_update */
@@ -451,13 +440,13 @@ gint config_folder_update(BalsaMailboxNode * mbnode)
     gint res;
 
     key = folder_section_path(mbnode);
-    res = libbalsa_conf_has_section(key);
-    libbalsa_conf_clean_section(key);
-    libbalsa_conf_private_clean_section(key);
-    libbalsa_conf_push_prefix(key);
+    res = libbalsa_conf_has_group(key);
+    libbalsa_conf_remove_group(key);
+    libbalsa_conf_private_remove_group(key);
+    libbalsa_conf_push_group(key);
     balsa_mailbox_node_save_config(mbnode, key);
     g_free(key);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     libbalsa_conf_sync();
     return res;
 }				/* config_folder_update */
@@ -510,8 +499,7 @@ static gint
 config_mailbox_init(const gchar * prefix)
 {
     LibBalsaMailbox *mailbox;
-    const gchar *key =
-	prefix + strlen(BALSA_CONFIG_PREFIX MAILBOX_SECTION_PREFIX);
+    const gchar *key = prefix + strlen(MAILBOX_SECTION_PREFIX);
 
     g_return_val_if_fail(prefix != NULL, FALSE);
 
@@ -542,15 +530,15 @@ config_mailbox_init(const gchar * prefix)
 	BalsaMailboxNode *mbnode;
 
 	mbnode = balsa_mailbox_node_new_from_mailbox(mailbox);
-	if (strcmp(INBOX_NAME "/", key) == 0)
+	if (strcmp(INBOX_NAME, key) == 0)
 	    special = &balsa_app.inbox;
-	else if (strcmp(OUTBOX_NAME "/", key) == 0)
+	else if (strcmp(OUTBOX_NAME, key) == 0)
 	    special = &balsa_app.outbox;
-	else if (strcmp(SENTBOX_NAME "/", key) == 0)
+	else if (strcmp(SENTBOX_NAME, key) == 0)
 	    special = &balsa_app.sentbox;
-	else if (strcmp(DRAFTS_NAME "/", key) == 0)
+	else if (strcmp(DRAFTS_NAME, key) == 0)
 	    special = &balsa_app.draftbox;
-	else if (strcmp(TRASH_NAME "/", key) == 0) {
+	else if (strcmp(TRASH_NAME, key) == 0) {
 	    special = &balsa_app.trash;
             libbalsa_filters_set_trash(balsa_app.trash);
 	}
@@ -621,7 +609,7 @@ config_global_load(void)
     check_for_old_sigs(balsa_app.identities);
 
     /* Section for the balsa_information() settings... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
+    libbalsa_conf_push_group("InformationMessages");
 
     balsa_app.information_message =
 	d_get_gint("ShowInformationMessages", BALSA_INFORMATION_SHOW_BAR);
@@ -634,10 +622,10 @@ config_global_load(void)
     balsa_app.fatal_message = 
 	d_get_gint("ShowFatalMessages", BALSA_INFORMATION_SHOW_DIALOG);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Section for geometry ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Geometry/");
+    libbalsa_conf_push_group("Geometry");
 
     /* ... column width settings */
     balsa_app.mblist_name_width =
@@ -682,10 +670,10 @@ config_global_load(void)
     if (balsa_app.notebook_height < 100)
 	balsa_app.notebook_height = 200;
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Message View options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
+    libbalsa_conf_push_group("MessageDisplay");
 
     /* ... How we format dates */
     g_free(balsa_app.date_string);
@@ -772,10 +760,10 @@ config_global_load(void)
     balsa_app.convert_unknown_8bit_codeset =
 	libbalsa_conf_get_int("ConvertUnknown8BitCodeset=" DEFAULT_BROKEN_CODESET);
     libbalsa_set_fallback_codeset(balsa_app.convert_unknown_8bit_codeset);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Interface Options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Interface/");
+    libbalsa_conf_push_group("Interface");
 
     /* ... interface elements to show */
     balsa_app.previewpane = libbalsa_conf_get_bool("ShowPreviewPane=true");
@@ -819,16 +807,16 @@ config_global_load(void)
     balsa_app.mw_action_after_move = libbalsa_conf_get_int(
         "MessageWindowActionAfterMove");
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Source browsing ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
+    libbalsa_conf_push_group("SourcePreview");
     balsa_app.source_escape_specials = 
         libbalsa_conf_get_bool("EscapeSpecials=true");
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Printing options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
+    libbalsa_conf_push_group("Printing");
 
     /* ... Printing */
     g_free(balsa_app.paper_size);
@@ -865,10 +853,10 @@ config_global_load(void)
                                 DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited =
         libbalsa_conf_get_bool("PrintHighlightCited=false");
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Spelling options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Spelling/");
+    libbalsa_conf_push_group("Spelling");
 
     balsa_app.module = d_get_gint("PspellModule", DEFAULT_PSPELL_MODULE);
     balsa_app.suggestion_mode =
@@ -880,19 +868,19 @@ config_global_load(void)
     balsa_app.check_quoted =
 	d_get_gint("SpellCheckQuoted", DEFAULT_CHECK_QUOTED);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Mailbox checking ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
+    libbalsa_conf_push_group("MailboxList");
 
     /* ... show mailbox content info */
     balsa_app.mblist_show_mb_content_info =
 	libbalsa_conf_get_bool("ShowMailboxContentInfo=true");
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Maibox checking options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
+    libbalsa_conf_push_group("MailboxChecking");
 
     balsa_app.notify_new_mail_dialog =
 	d_get_gint("NewMailNotificationDialog", 0);
@@ -910,22 +898,22 @@ config_global_load(void)
     balsa_app.check_imap_inbox=d_get_gint("CheckIMAPInbox", 0);
     balsa_app.quiet_background_check=d_get_gint("QuietBackgroundCheck", 0);
     balsa_app.msg_size_limit=d_get_gint("POPMsgSizeLimit", 20000);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* folder scanning */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
+    libbalsa_conf_push_group("FolderScanning");
     balsa_app.local_scan_depth = d_get_gint("LocalScanDepth", 1);
     balsa_app.imap_scan_depth = d_get_gint("ImapScanDepth", 1);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* how to react if a message with MDN request is displayed */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
+    libbalsa_conf_push_group("MDNReply");
     balsa_app.mdn_reply_clean = libbalsa_conf_get_int("Clean=1");
     balsa_app.mdn_reply_notclean = libbalsa_conf_get_int("Suspicious=0");
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Sending options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
+    libbalsa_conf_push_group("Sending");
 
 #if ENABLE_ESMTP
     /* ... SMTP server */
@@ -998,10 +986,10 @@ config_global_load(void)
 	balsa_app.always_queue_sent_mail = d_get_gint("AlwaysQueueSentMail", 0);
 	balsa_app.copy_to_sentbox = d_get_gint("CopyToSentbox", 1);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Compose window ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
+    libbalsa_conf_push_group("Compose");
 
     balsa_app.edit_headers = 
         libbalsa_conf_get_bool("ExternEditorEditHeaders=false");
@@ -1021,17 +1009,17 @@ config_global_load(void)
                      "the Options menu of the compose window."));
 
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Global config options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
+    libbalsa_conf_push_group("Globals");
 
     /* directory */
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory = libbalsa_conf_get_string("MailDir");
 
     if(!balsa_app.local_mail_directory) {
-	libbalsa_conf_pop_prefix();
+	libbalsa_conf_pop_group();
 	return FALSE;
     }
     balsa_app.root_node =
@@ -1060,30 +1048,30 @@ config_global_load(void)
     /* This setting is now per address book */
     libbalsa_conf_clean_key("AddressBookDistMode");
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     
     /* Toolbars */
     load_toolbars();
 
     /* Last used paths options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
+    libbalsa_conf_push_group("Paths");
     g_free(balsa_app.attach_dir);
     balsa_app.attach_dir = libbalsa_conf_get_string("AttachDir");
     g_free(balsa_app.save_dir);
     balsa_app.save_dir = libbalsa_conf_get_string("SavePartDir");
     g_free(balsa_app.pipe_cmd);
     balsa_app.pipe_cmd = libbalsa_conf_get_string("PipeCmd");
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
 	/* Folder MRU */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
+    libbalsa_conf_push_group("FolderMRU");
     load_mru(&balsa_app.folder_mru);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
 	/* FCC MRU */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
+    libbalsa_conf_push_group("FccMRU");
     load_mru(&balsa_app.fcc_mru);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     return TRUE;
 }				/* config_global_load */
@@ -1097,18 +1085,18 @@ config_save(void)
     config_identities_save();
 
     /* Section for the balsa_information() settings... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "InformationMessages/");
+    libbalsa_conf_push_group("InformationMessages");
     libbalsa_conf_set_int("ShowInformationMessages",
 			 balsa_app.information_message);
     libbalsa_conf_set_int("ShowWarningMessages", balsa_app.warning_message);
     libbalsa_conf_set_int("ShowErrorMessages", balsa_app.error_message);
     libbalsa_conf_set_int("ShowDebugMessages", balsa_app.debug_message);
     libbalsa_conf_set_int("ShowFatalMessages", balsa_app.fatal_message);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Section for geometry ... */
     /* FIXME: Saving window sizes is the WM's job?? */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Geometry/");
+    libbalsa_conf_push_group("Geometry");
 
     /* ... column width settings */
     libbalsa_conf_set_int("MailboxListNameWidth",
@@ -1137,11 +1125,11 @@ config_save(void)
                          balsa_app.message_window_height);
     libbalsa_conf_set_int("NotebookHeight", balsa_app.notebook_height);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Message View options ... */
-    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "MessageDisplay/");
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
+    libbalsa_conf_remove_group("MessageDisplay");
+    libbalsa_conf_push_group("MessageDisplay");
 
     libbalsa_conf_set_string("DateFormat", balsa_app.date_string);
     libbalsa_conf_set_int("ShownHeaders", balsa_app.shown_headers);
@@ -1175,10 +1163,10 @@ config_save(void)
     libbalsa_conf_set_int("ConvertUnknown8BitCodeset", 
 			    balsa_app.convert_unknown_8bit_codeset);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Interface Options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Interface/");
+    libbalsa_conf_push_group("Interface");
 
     libbalsa_conf_set_bool("ShowPreviewPane", balsa_app.previewpane);
     libbalsa_conf_set_bool("ShowMailboxList", balsa_app.show_mblist);
@@ -1200,16 +1188,16 @@ config_save(void)
     libbalsa_conf_set_int("MessageWindowActionAfterMove",
         balsa_app.mw_action_after_move);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Source browsing ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
+    libbalsa_conf_push_group("SourcePreview");
     libbalsa_conf_set_bool("EscapeSpecials",
                           balsa_app.source_escape_specials);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Printing options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
+    libbalsa_conf_push_group("Printing");
     libbalsa_conf_set_string("PaperSize",balsa_app.paper_size);
     if(balsa_app.margin_left)
 	libbalsa_conf_set_string("LeftMargin",   balsa_app.margin_left);
@@ -1236,10 +1224,10 @@ config_save(void)
                             balsa_app.print_footer_font);
     libbalsa_conf_set_bool("PrintHighlightCited",
                           balsa_app.print_highlight_cited);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Spelling options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Spelling/");
+    libbalsa_conf_push_group("Spelling");
 
     libbalsa_conf_set_int("PspellModule", balsa_app.module);
     libbalsa_conf_set_int("PspellSuggestMode", balsa_app.suggestion_mode);
@@ -1247,18 +1235,18 @@ config_save(void)
     libbalsa_conf_set_int("SpellCheckSignature", balsa_app.check_sig);
     libbalsa_conf_set_int("SpellCheckQuoted", balsa_app.check_quoted);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Mailbox list options */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxList/");
+    libbalsa_conf_push_group("MailboxList");
 
     libbalsa_conf_set_bool("ShowMailboxContentInfo",
 			  balsa_app.mblist_show_mb_content_info);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Maibox checking options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MailboxChecking/");
+    libbalsa_conf_push_group("MailboxChecking");
 
 	libbalsa_conf_set_int("NewMailNotificationDialog",
 				balsa_app.notify_new_mail_dialog);
@@ -1273,24 +1261,24 @@ config_save(void)
 			 balsa_app.quiet_background_check);
     libbalsa_conf_set_int("POPMsgSizeLimit", balsa_app.msg_size_limit);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* folder scanning */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderScanning/");
+    libbalsa_conf_push_group("FolderScanning");
     libbalsa_conf_set_int("LocalScanDepth", balsa_app.local_scan_depth);
     libbalsa_conf_set_int("ImapScanDepth", balsa_app.imap_scan_depth);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* how to react if a message with MDN request is displayed */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "MDNReply/");
+    libbalsa_conf_push_group("MDNReply");
     libbalsa_conf_set_int("Clean", balsa_app.mdn_reply_clean);
     libbalsa_conf_set_int("Suspicious", balsa_app.mdn_reply_notclean);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Sending options ... */
-    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "Sending/");
-    libbalsa_conf_private_clean_section(BALSA_CONFIG_PREFIX "Sending/");
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Sending/");
+    libbalsa_conf_remove_group("Sending");
+    libbalsa_conf_private_remove_group("Sending");
+    libbalsa_conf_push_group("Sending");
 #if ENABLE_ESMTP
     libbalsa_conf_set_string("ESMTPServer", balsa_app.smtp_server);
     libbalsa_conf_set_string("ESMTPUser", balsa_app.smtp_user);
@@ -1316,20 +1304,20 @@ config_save(void)
 
 	libbalsa_conf_set_int("AlwaysQueueSentMail", balsa_app.always_queue_sent_mail);
 	libbalsa_conf_set_int("CopyToSentbox", balsa_app.copy_to_sentbox);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Compose window ... */
-    libbalsa_conf_clean_section(BALSA_CONFIG_PREFIX "Compose/");
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
+    libbalsa_conf_remove_group("Compose");
+    libbalsa_conf_push_group("Compose");
 
     libbalsa_conf_set_string("ComposeHeaders", balsa_app.compose_headers);
     libbalsa_conf_set_bool("ExternEditorEditHeaders", balsa_app.edit_headers);
     libbalsa_conf_set_string("QuoteString", balsa_app.quote_str);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Global config options ... */
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
+    libbalsa_conf_push_group("Globals");
 
     libbalsa_conf_set_string("MailDir", balsa_app.local_mail_directory);
 
@@ -1344,37 +1332,35 @@ config_save(void)
 			  balsa_app.remember_open_mboxes);
     libbalsa_conf_set_bool("EmptyTrash", balsa_app.empty_trash_on_exit);
 
-    if (balsa_app.default_address_book) {
-	libbalsa_conf_set_string("DefaultAddressBook",
-				balsa_app.default_address_book->
-				config_prefix +
-				strlen(BALSA_CONFIG_PREFIX));
-    } else {
+    if (balsa_app.default_address_book)
+        libbalsa_conf_set_string("DefaultAddressBook",
+                                 balsa_app.default_address_book->
+                                 config_prefix);
+    else
 	libbalsa_conf_clean_key("DefaultAddressBook");
-    }
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     /* Toolbars */
     save_toolbars();
 
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Paths/");
+    libbalsa_conf_push_group("Paths");
     if(balsa_app.attach_dir)
 	libbalsa_conf_set_string("AttachDir", balsa_app.attach_dir);
     if(balsa_app.save_dir)
 	libbalsa_conf_set_string("SavePartDir", balsa_app.save_dir);
     if(balsa_app.pipe_cmd)
 	libbalsa_conf_set_string("PipeCmd", balsa_app.pipe_cmd);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
 	
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FolderMRU/");
+    libbalsa_conf_push_group("FolderMRU");
     save_mru(balsa_app.folder_mru);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "FccMRU/");
+    libbalsa_conf_push_group("FccMRU");
     save_mru(balsa_app.fcc_mru);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     libbalsa_conf_sync();
     return TRUE;
@@ -1384,7 +1370,7 @@ config_save(void)
 /* must use a sensible prefix, or this goes weird */
 
 static gboolean
-config_get_used_section(const gchar * key, const gchar * value,
+config_get_used_group(const gchar * key, const gchar * value,
                         gpointer data)
 {
     gint *max = data;
@@ -1397,14 +1383,14 @@ config_get_used_section(const gchar * key, const gchar * value,
 }
 
 static gchar *
-config_get_unused_section(const gchar * prefix)
+config_get_unused_group(const gchar * prefix)
 {
     gint max = 0;
     gchar *name;
 
-    libbalsa_conf_foreach_section(prefix, config_get_used_section, &max);
+    libbalsa_conf_foreach_group(prefix, config_get_used_group, &max);
 
-    name = g_strdup_printf(BALSA_CONFIG_PREFIX "%s%d/", prefix, ++max);
+    name = g_strdup_printf("%s%d", prefix, ++max);
     if (balsa_app.debug)
         g_print("config_mailbox_get_highest_number: name='%s'\n", name);
 
@@ -1416,21 +1402,20 @@ config_list_section(const gchar * key, const gchar * value, gpointer data)
 {
     GSList **l = data;
 
-    *l = g_slist_prepend(*l,
-                         g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL));
+    *l = g_slist_prepend(*l, g_strdup(key));
 
     return FALSE;
 }
 
 static void
-config_clean_sections(const gchar * section_prefix)
+config_remove_groups(const gchar * section_prefix)
 {
     GSList *sections = NULL, *list;
 
-    libbalsa_conf_foreach_section(section_prefix, config_list_section,
-                                  &sections);
+    libbalsa_conf_foreach_group(section_prefix, config_list_section,
+                                &sections);
     for (list = sections; list; list = list->next) {
-	libbalsa_conf_clean_section(list->data);
+	libbalsa_conf_remove_group(list->data);
 	g_free(list->data);
     }
     g_slist_free(sections);
@@ -1441,24 +1426,19 @@ config_address_book_load(const gchar * key, const gchar * value,
                          gpointer data)
 {
     const gchar *default_address_book_prefix = data;
-    gchar *tmp;
     LibBalsaAddressBook *address_book;
 
-    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-
-    address_book = libbalsa_address_book_new_from_config(tmp);
+    address_book = libbalsa_address_book_new_from_config(key);
 
     if (address_book) {
         balsa_app.address_book_list =
             g_list_append(balsa_app.address_book_list, address_book);
 
         if (default_address_book_prefix
-            && strcmp(tmp, default_address_book_prefix) == 0) {
+            && strcmp(key, default_address_book_prefix) == 0) {
             balsa_app.default_address_book = address_book;
         }
     }
-
-    g_free(tmp);
 
     return FALSE;
 }
@@ -1467,14 +1447,11 @@ static void
 config_address_books_load(void)
 {
     gchar *default_address_book_prefix;
-    gchar *tmp;
 
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "Globals/");
-    tmp = libbalsa_conf_get_string("DefaultAddressBook");
+    libbalsa_conf_push_group("Globals");
     default_address_book_prefix =
-	g_strconcat(BALSA_CONFIG_PREFIX, tmp, NULL);
-    g_free(tmp);
-    libbalsa_conf_pop_prefix();
+        libbalsa_conf_get_string("DefaultAddressBook");
+    libbalsa_conf_pop_group();
 
     /* Free old data in case address books were set by eg. config druid. */
     g_list_foreach(balsa_app.address_book_list, (GFunc) g_object_unref,
@@ -1482,9 +1459,9 @@ config_address_books_load(void)
     g_list_free(balsa_app.address_book_list);
     balsa_app.address_book_list = NULL;
 
-    libbalsa_conf_foreach_section(ADDRESS_BOOK_SECTION_PREFIX,
-                                  config_address_book_load,
-                                  default_address_book_prefix);
+    libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
+                                config_address_book_load,
+                                default_address_book_prefix);
 
     g_free(default_address_book_prefix);
 }
@@ -1500,13 +1477,10 @@ static gboolean
 config_identity_load(const gchar * key, const gchar * value, gpointer data)
 {
     const gchar *default_ident = data;
-    gchar *tmp;
     LibBalsaIdentity *ident;
 
-    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-    ident = libbalsa_identity_new_config(tmp, value);
+    ident = libbalsa_identity_new_config(key, value);
     balsa_app.identities = g_list_prepend(balsa_app.identities, ident);
-    g_free(tmp);
     if (g_ascii_strcasecmp(default_ident, ident->identity_name) == 0)
         balsa_app.current_ident = ident;
 
@@ -1523,19 +1497,18 @@ config_identities_load()
     g_list_free(balsa_app.identities);
     balsa_app.identities = NULL;
 
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "identity/");
+    libbalsa_conf_push_group("identity");
     default_ident = libbalsa_conf_get_string("CurrentIdentity");
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
-    libbalsa_conf_foreach_section(IDENTITY_SECTION_PREFIX,
-                                  config_identity_load,
-                                  default_ident);
+    libbalsa_conf_foreach_group(IDENTITY_SECTION_PREFIX,
+                                config_identity_load,
+                                default_ident);
 
     if (!balsa_app.identities)
         balsa_app.identities =
             g_list_prepend(NULL,
-                           libbalsa_identity_new_config(BALSA_CONFIG_PREFIX
-                                                        "identity-default/",
+                           libbalsa_identity_new_config("identity-default",
                                                         "default"));
 
     if (balsa_app.current_ident == NULL)
@@ -1561,19 +1534,19 @@ config_identities_save(void)
 
     g_assert(conf_vec != NULL);
     
-    libbalsa_conf_push_prefix(BALSA_CONFIG_PREFIX "identity/");
+    libbalsa_conf_push_group("identity");
     libbalsa_conf_set_string("CurrentIdentity", 
                             balsa_app.current_ident->identity_name);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     g_free(conf_vec);
 
-    config_clean_sections(IDENTITY_SECTION_PREFIX);
+    config_remove_groups(IDENTITY_SECTION_PREFIX);
 
     /* save current */
     for (list = balsa_app.identities; list; list = list->next) {
 	ident = LIBBALSA_IDENTITY(list->data);
-	prefix = g_strconcat(BALSA_CONFIG_PREFIX IDENTITY_SECTION_PREFIX, 
-			     ident->identity_name, "/", NULL);
+	prefix = g_strconcat(IDENTITY_SECTION_PREFIX, 
+			     ident->identity_name, NULL);
         libbalsa_identity_save(ident, prefix);
 	g_free(prefix);
     }
@@ -1583,13 +1556,10 @@ static gboolean
 config_view_load(const gchar * key, const gchar * value, gpointer data)
 {
     gboolean compat = GPOINTER_TO_INT(data);
-    gchar *tmp;
     gchar *url;
     gint def;
 
-    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-    libbalsa_conf_push_prefix(tmp);
-    g_free(tmp);
+    libbalsa_conf_push_group(key);
 
     url = compat ? libbalsa_conf_get_string_with_default("URL", &def) :
         libbalsa_urldecode(value);
@@ -1649,7 +1619,7 @@ config_view_load(const gchar * key, const gchar * value, gpointer data)
 #endif
     }
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     g_free(url);
 
     return FALSE;
@@ -1659,12 +1629,12 @@ void
 config_views_load(void)
 {
     /* Load old-style config sections in compatibility mode. */
-    libbalsa_conf_foreach_section(VIEW_SECTION_PREFIX,
-                                  config_view_load,
-                                  GINT_TO_POINTER(TRUE));
-    libbalsa_conf_foreach_section(VIEW_BY_URL_SECTION_PREFIX,
-                                  config_view_load,
-                                  GINT_TO_POINTER(FALSE));
+    libbalsa_conf_foreach_group(VIEW_SECTION_PREFIX,
+                                config_view_load,
+                                GINT_TO_POINTER(TRUE));
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                config_view_load,
+                                GINT_TO_POINTER(FALSE));
 }
 
 /* config_views_save:
@@ -1681,12 +1651,11 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
     view->in_sync = TRUE;
 
     url_enc = libbalsa_urlencode(url);
-    prefix = g_strconcat(BALSA_CONFIG_PREFIX VIEW_BY_URL_SECTION_PREFIX,
-			 url_enc, "/", NULL);
+    prefix = g_strconcat(VIEW_BY_URL_SECTION_PREFIX, url_enc, NULL);
     g_free(url_enc);
 
-    libbalsa_conf_clean_section(prefix);
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_remove_group(prefix);
+    libbalsa_conf_push_group(prefix);
     g_free(prefix);
 
     if (view->mailing_list_address !=
@@ -1720,13 +1689,13 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 	libbalsa_conf_set_int("CryptoMode",  view->gpg_chk_mode);
 #endif
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 }
 
 void
 config_views_save(void)
 {
-    config_clean_sections(VIEW_SECTION_PREFIX);
+    config_remove_groups(VIEW_SECTION_PREFIX);
     /* save current */
     g_hash_table_foreach(libbalsa_mailbox_view_table, (GHFunc) save_view,
 			 NULL);
@@ -1747,12 +1716,9 @@ static gboolean
 config_filter_load(const gchar * key, const gchar * value, gpointer data)
 {
     guint *save = data;
-    gchar *tmp;
     LibBalsaFilter *fil;
 
-    tmp = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-    libbalsa_conf_push_prefix(tmp);
-    g_free(tmp);
+    libbalsa_conf_push_group(key);
 
     fil = libbalsa_filter_new_from_config();
     if (!fil->condition) {
@@ -1760,10 +1726,7 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
         FilterOpType op = libbalsa_conf_get_int("Operation");
         ConditionMatchType cmt =
             op == FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
-        libbalsa_conf_pop_prefix();
-        fil->condition =
-            libbalsa_condition_new_2_0(BALSA_CONFIG_PREFIX, key, cmt);
-        libbalsa_conf_push_prefix(tmp);
+        fil->condition = libbalsa_condition_new_2_0(key, cmt);
         if (fil->condition)
             ++save;
     }
@@ -1776,7 +1739,7 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
         FILTER_SETFLAG(fil, FILTER_COMPILED);
         balsa_app.filters = g_slist_prepend(balsa_app.filters, fil);
     }
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     return filter_errno != FILTER_NOERR;
 }
@@ -1787,8 +1750,8 @@ config_filters_load(void)
     guint save = 0;
 
     filter_errno = FILTER_NOERR;
-    libbalsa_conf_foreach_section(FILTER_SECTION_PREFIX,
-                                  config_filter_load, &save);
+    libbalsa_conf_foreach_group(FILTER_SECTION_PREFIX,
+                                config_filter_load, &save);
 
     if (save)
         config_filters_save();
@@ -1801,29 +1764,28 @@ config_filters_save(void)
 {
     GSList *list;
     LibBalsaFilter* fil;
-    gchar * buffer,* tmp,* section_name;
+    gchar * buffer,* tmp;
     gint i,nb=0,tmp_len=strlen(FILTER_SECTION_MAX)+2;
 
     /* We allocate once for all a buffer to store conditions sections names */
-    buffer=g_strdup_printf(BALSA_CONFIG_PREFIX FILTER_SECTION_PREFIX "%s/",FILTER_SECTION_MAX);
+    buffer=g_strdup_printf(FILTER_SECTION_PREFIX "%s", FILTER_SECTION_MAX);
     /* section_name points to the beginning of the filter section name */
-    section_name=buffer+strlen(BALSA_CONFIG_PREFIX);
     /* tmp points to the space where filter number is appended */
-    tmp=section_name+strlen(FILTER_SECTION_PREFIX);
+    tmp = buffer + strlen(FILTER_SECTION_PREFIX);
 
     for(list = balsa_app.filters; list; list = list->next) {
 	fil = (LibBalsaFilter*)(list->data);
 	i=snprintf(tmp,tmp_len,"%d/",nb++);
-	libbalsa_conf_push_prefix(buffer);
+	libbalsa_conf_push_group(buffer);
 	libbalsa_filter_save_config(fil);
-	libbalsa_conf_pop_prefix();
+	libbalsa_conf_pop_group();
     }
     libbalsa_conf_sync();
     /* This loop takes care of cleaning up old filter sections */
     while (TRUE) {
 	i=snprintf(tmp,tmp_len,"%d/",nb++);
-	if (libbalsa_conf_has_section(buffer)) {
-	    libbalsa_conf_clean_section(buffer);
+	if (libbalsa_conf_has_group(buffer)) {
+	    libbalsa_conf_remove_group(buffer);
 	}
 	else break;
     }
@@ -1840,24 +1802,24 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
     tmp = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
     if (!mbox->filters) {
 	if (tmp) {
-	    libbalsa_conf_clean_section(tmp);
+	    libbalsa_conf_remove_group(tmp);
 	    g_free(tmp);
 	}
 	return;
     }
     if (!tmp) {
 	/* If there was no existing filters section for this mailbox we create one */
-	tmp=config_get_unused_section(MAILBOX_FILTERS_SECTION_PREFIX);
-	libbalsa_conf_push_prefix(tmp);
+	tmp=config_get_unused_group(MAILBOX_FILTERS_SECTION_PREFIX);
+	libbalsa_conf_push_group(tmp);
 	g_free(tmp);
 	libbalsa_conf_set_string(MAILBOX_FILTERS_URL_KEY,mbox->url);
     }
     else {
-	libbalsa_conf_push_prefix(tmp);
+	libbalsa_conf_push_group(tmp);
 	g_free(tmp);
     }
     libbalsa_mailbox_filters_save_config(mbox);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     libbalsa_conf_sync();
 }
 

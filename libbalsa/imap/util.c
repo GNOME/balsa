@@ -158,16 +158,19 @@ static int Index_64[128] = {
 
 /* raw bytes to null-terminated base 64 string */
 void
-lit_conv_to_base64(char *out, const char *sin, size_t len,
-                   size_t olen)
+lit_conv_to_base64(char *out, const char *in, size_t len, size_t olen)
 {
-  const unsigned char *in = sin;
+  unsigned char in0, in1, in2;
+
   while (len >= 3 && olen > 10)
   {
-    *out++ = B64Chars[in[0] >> 2];
-    *out++ = B64Chars[((in[0] << 4) & 0x30) | (in[1] >> 4)];
-    *out++ = B64Chars[((in[1] << 2) & 0x3c) | (in[2] >> 6)];
-    *out++ = B64Chars[in[2] & 0x3f];
+    in0 = in[0];
+    *out++ = B64Chars[in0 >> 2];
+    in1 = in[1];
+    *out++ = B64Chars[((in0 << 4) & 0x30) | (in1 >> 4)];
+    in2 = in[2];
+    *out++ = B64Chars[((in1 << 2) & 0x3c) | (in2 >> 6)];
+    *out++ = B64Chars[in2 & 0x3f];
     olen  -= 4;
     len   -= 3;
     in    += 3;
@@ -178,12 +181,18 @@ lit_conv_to_base64(char *out, const char *sin, size_t len,
   {
     unsigned char fragment;
 
-    *out++ = B64Chars[in[0] >> 2];
-    fragment = (in[0] << 4) & 0x30;
-    if (len > 1)
-      fragment |= in[1] >> 4;
-    *out++ = B64Chars[fragment];
-    *out++ = (len < 2) ? '=' : B64Chars[(in[1] << 2) & 0x3c];
+    in0 = in[0];
+    *out++ = B64Chars[in0 >> 2];
+    fragment = (in0 << 4) & 0x30;
+    if (len > 1) {
+      in1 = in[1];
+      fragment |= in1 >> 4;
+      *out++ = B64Chars[fragment];
+      *out++ = B64Chars[(in1 << 2) & 0x3c];
+    } else {
+      *out++ = B64Chars[fragment];
+      *out++ = '=';
+    }
     *out++ = '=';
   }
   *out = '\0';
@@ -258,12 +267,12 @@ static char base64chars[] =
  *     (worst case: 8 octets UTF-7 becomes 9 octets UTF-8)
  */
 char*
-imap_mailbox_to_utf8(const unsigned char *mbox)
+imap_mailbox_to_utf8(const char *mbox)
 {
   unsigned c, i, bitcount;
   unsigned long ucs4, utf16, bitbuf;
   unsigned char base64[256];
-  const unsigned char *src;
+  const char *src;
   char *dst, *res  = malloc(2*strlen(mbox)+1);
   
   bitbuf = 0;
@@ -347,13 +356,13 @@ imap_mailbox_to_utf8(const unsigned char *mbox)
  *  coded URLs
  */
 char*
-imap_utf8_to_mailbox(const unsigned char *src)
+imap_utf8_to_mailbox(const char *src)
 {
   unsigned int utf8pos, utf8total, c, utf7mode, bitstogo, utf16flag;
   unsigned long ucs4 = 0, bitbuf = 0;
 
   /* initialize hex lookup table */
-  unsigned char *dst, *res = malloc(2*strlen(src)+1);
+  char *dst, *res = malloc(2*strlen(src)+1);
   dst = res;
   if(!dst) return NULL;
 
@@ -361,7 +370,7 @@ imap_utf8_to_mailbox(const unsigned char *src)
   utf8total = 0;
   bitstogo = 0;
   utf8pos = 0;
-  while ((c = *src) != '\0') {
+  while ((c = (unsigned char)*src) != '\0') {
     ++src;
     /* normal character? */
     if (c >= ' ' && c <= '~') {

@@ -1380,14 +1380,14 @@ display_frame_set_boolean(GtkDialog * dialog,
    configuration data.
 */
 LibBalsaIdentity*
-libbalsa_identity_new_config(const gchar* prefix, const gchar* name)
+libbalsa_identity_new_config(const gchar* group, const gchar* name)
 {
     LibBalsaIdentity* ident;
     gchar* tmpstr;
     
-    g_return_val_if_fail(prefix != NULL, NULL);
+    g_return_val_if_fail(group != NULL, NULL);
 
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_push_group(group);
 
     ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name(name));
 
@@ -1431,17 +1431,17 @@ libbalsa_identity_new_config(const gchar* prefix, const gchar* name)
     ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
 #endif
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     return ident;
 }
 
 void 
-libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* prefix)
+libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 {
     g_return_if_fail(ident);
 
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_push_group(group);
     libbalsa_conf_set_string("FullName", ident->ia->name);
     
     if (ident->ia->type == INTERNET_ADDRESS_NAME)
@@ -1467,7 +1467,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* prefix)
     libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
 #endif
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 }
 
 

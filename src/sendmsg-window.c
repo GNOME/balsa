@@ -1092,12 +1092,20 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
     tmpfd = mkstemp(filename);
     app = gnome_vfs_mime_get_default_application ("text/plain");
     if (app) {
+#if GTK_CHECK_VERSION(2, 6, 0)
+        gboolean adduri = gnome_vfs_mime_application_supports_uris(app);
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
 	gboolean adduri = (app->expects_uris ==
                            GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
         argc = 2;
         argv = g_new0 (char *, argc+1);
+#if GTK_CHECK_VERSION(2, 6, 0)
+	argv[0] = g_strdup(gnome_vfs_mime_application_get_exec(app));
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
         argv[0] = g_strdup(app->command);
-        argv[1] = g_strdup_printf("%s%s", adduri ? "file:" : "", filename);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
+        argv[1] = g_strdup_printf("%s%s", adduri ? "file://" : "", filename);
 
         /* this does not work really well with gnome-terminal
          * that quits before the text editing application quits.
@@ -1585,19 +1593,34 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(info != NULL);
 
     if ((id = g_object_get_data (G_OBJECT (menu_item), "mime_action"))) {
+#if GTK_CHECK_VERSION(2, 6, 0)
+        GnomeVFSMimeApplication *app=
+            gnome_vfs_mime_application_new_from_desktop_id(id);
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
         GnomeVFSMimeApplication *app=
             gnome_vfs_mime_application_new_from_id(id);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
         if (app) {
+#if GTK_CHECK_VERSION(2, 6, 0)
+            gboolean tmp = gnome_vfs_mime_application_supports_uris(app);
+            gchar *uri = tmp ? g_strconcat("file://", info->filename, NULL)
+                             : g_strdup(info->filename);
+            GList *uris = g_list_prepend(NULL, uri);
+            gnome_vfs_mime_application_launch(app, uris);
+            g_free(uri);
+            g_list_free(uris);
+#else /* GTK_CHECK_VERSION(2, 6, 0) */
 	    gboolean tmp =
 		(app->expects_uris ==
 		 GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
 	    gchar *exe_str =
 		g_strdup_printf("%s \"%s%s\"", app->command,
-				tmp ? "file:" : "", info->filename);
+				tmp ? "file://" : "", info->filename);
                 
 	    gnome_execute_shell(NULL, exe_str);
 	    fprintf(stderr, "Executed: %s\n", exe_str);
 	    g_free (exe_str);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 	    gnome_vfs_mime_application_free(app);    
         } else {
             fprintf(stderr, "lookup for application %s returned NULL\n", id);
@@ -1778,7 +1801,8 @@ get_fwd_mail_headers(const gchar *mailfile)
 	if (!subject)
 	    headers->subject = g_strdup(_("(no subject)"));
 	else
-	    headers->subject = g_mime_utils_header_decode_text(subject);
+	    headers->subject =
+		g_mime_utils_header_decode_text((guchar *) subject);
     }
     libbalsa_utf8_sanitize(&headers->subject,
 			   balsa_app.convert_unknown_8bit,
@@ -2326,14 +2350,14 @@ attachments_add(GtkWidget * widget,
 	    g_object_unref(message);
         }
     } else if (info == TARGET_URI_LIST) {
-        GSList *uri_list = uri2gslist(selection_data->data);
+        GSList *uri_list = uri2gslist((gchar *) selection_data->data);
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
 	    add_attachment(bsmsg,
 			   uri_list->data, FALSE, NULL); /* steal strings */
         }
         g_slist_free(uri_list);
     } else if( info == TARGET_STRING) {
-	gchar *url = rfc2396_uri(selection_data->data);
+	gchar *url = rfc2396_uri((gchar *) selection_data->data);
 
 	if (url)
 	    add_urlref_attachment(bsmsg, url);
@@ -2352,7 +2376,8 @@ to_add(GtkWidget * widget,
        GtkSelectionData * selection_data,
        guint info, guint32 time)
 {
-    append_comma_separated(GTK_EDITABLE(widget), selection_data->data);
+    append_comma_separated(GTK_EDITABLE(widget),
+	                   (gchar *) selection_data->data);
     gtk_drag_finish(context, TRUE, FALSE, time);
 }
 
@@ -2889,7 +2914,7 @@ drag_data_quote(GtkWidget * widget,
         }
         break;
     case TARGET_URI_LIST: {
-        GSList *uri_list = uri2gslist(selection_data->data);
+        GSList *uri_list = uri2gslist((gchar *) selection_data->data);
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
             /* Since current GtkTextView gets this signal twice for
              * every action (#150141) we need to check for duplicates,

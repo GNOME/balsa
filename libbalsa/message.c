@@ -403,8 +403,12 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
 
     value = g_mime_message_get_header(message, "In-Reply-To");
     if (value) {
-	res = g_list_prepend(res, libbalsa_create_hdr_pair("In-Reply-To",
-				g_mime_utils_header_decode_text(value)));
+        res =
+            g_list_prepend(res,
+                           libbalsa_create_hdr_pair
+                           ("In-Reply-To",
+                            g_mime_utils_header_decode_text
+                            ((unsigned char *) value)));
     }
 
     g_mime_header_foreach(GMIME_OBJECT(message)->headers,
@@ -934,7 +938,8 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
 #ifdef MESSAGE_COPY_CONTENT
     header = g_mime_message_get_subject(mime_msg);
     if (header) {
-	message->subj = g_mime_utils_header_decode_text(header);
+        message->subj =
+            g_mime_utils_header_decode_text((unsigned char *) header);
         canonize_header_value(message->subj);
 	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
     }
@@ -1059,7 +1064,8 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	    return FALSE;
 #if MESSAGE_COPY_CONTENT
 	g_free(message->subj);
-        message->subj = g_mime_utils_header_decode_text(value);
+        message->subj =
+	    g_mime_utils_header_decode_text((unsigned char *) value);
 	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
 #endif
     } else
@@ -1139,7 +1145,7 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
     GMimeStream *gmime_stream;
     GMimeStream *gmime_stream_buffer;
     GByteArray *line;
-    char lookahead;
+    guchar lookahead;
     gboolean ret = FALSE;
 
     gmime_stream =
@@ -1154,8 +1160,8 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
     do {
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 	while (!g_mime_stream_eos(gmime_stream_buffer)
-	       && g_mime_stream_read(gmime_stream_buffer, &lookahead, 1) == 1)
-	{
+	       && g_mime_stream_read(gmime_stream_buffer,
+		                     (char *) &lookahead, 1) == 1) {
 		if (lookahead == ' ' || lookahead == '\t') {
 		    g_byte_array_append(line, &lookahead, 1);
 		    g_mime_stream_buffer_readln(gmime_stream_buffer, line);
@@ -1168,7 +1174,9 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
 	    break;
 	}
 	line->data[line->len-1]='\0'; /* terminate line by overwriting '\n' */
-	if (!lb_message_set_headers_from_string(message, line->data, FALSE)) {
+	if (!lb_message_set_headers_from_string(message,
+				                (gchar *) line->data,
+						FALSE)) {
 	    /* Ignore error return caused by malformed header. */
 	}
 	if (lookahead == '\n') {/* end of headers */

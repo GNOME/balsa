@@ -466,6 +466,7 @@ libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
     GMimeStream *filter_stream;
     GMimeFilter *filter;
     guint32 flags;
+    guint8 zero = 0;
 
     switch (html_type) {
     case LIBBALSA_HTML_TYPE_ENRICHED:
@@ -493,11 +494,11 @@ libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
     g_mime_stream_write(filter_stream, *text, len);
     g_object_unref(filter_stream);
 
-    g_byte_array_append(array, "", 1);
+    g_byte_array_append(array, &zero, 1);
 
     retval = array->len;
     g_free(*text);
-    *text = g_byte_array_free(array, FALSE);
+    *text = (gchar *) g_byte_array_free(array, FALSE);
     return retval;
 }
 

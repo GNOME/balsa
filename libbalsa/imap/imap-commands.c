@@ -1126,7 +1126,7 @@ sort_code_to_string(ImapSortKey key)
 
 ImapResponse
 imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
-                     int ascending, int *msgno, unsigned cnt)
+                     int ascending, unsigned int *msgno, unsigned cnt)
 {
   ImapResponse rc;
   const char *keystr;

@@ -62,9 +62,9 @@ static void balsa_mailbox_node_dispose(GObject * object);
 static void balsa_mailbox_node_finalize(GObject * object);
 
 static void balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn,
-						const gchar * prefix);
+						const gchar * group);
 static void balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn,
-						const gchar * prefix);
+						const gchar * group);
 
 static BalsaMailboxNode *imap_scan_create_mbnode(BalsaMailboxNode * root,
 						 imap_scan_item * isi,
@@ -230,10 +230,10 @@ balsa_mailbox_node_finalize(GObject * object)
 }
 
 static void
-balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
+balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * group)
 {
     if(mn->name)
-	printf("Saving mailbox node %s with prefix %s\n", mn->name, prefix);
+	printf("Saving mailbox node %s with group %s\n", mn->name, group);
     libbalsa_imap_server_save_config(LIBBALSA_IMAP_SERVER(mn->server));
     libbalsa_conf_set_string("Name",      mn->name);
     libbalsa_conf_set_string("Directory", mn->dir);
@@ -241,14 +241,14 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * prefix)
     libbalsa_conf_set_bool("ListInbox",   mn->list_inbox);
     
     g_free(mn->config_prefix);
-    mn->config_prefix = g_strdup(prefix);
+    mn->config_prefix = g_strdup(group);
 }
 
 static void
-balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn, const gchar * prefix)
+balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn, const gchar * group)
 {
     g_free(mn->config_prefix);
-    mn->config_prefix = g_strdup(prefix);
+    mn->config_prefix = g_strdup(group);
     g_free(mn->name);
     mn->name = libbalsa_conf_get_string("Name");
 }
@@ -537,10 +537,10 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
    similiar to mailbox creation from configuration data.
 */
 BalsaMailboxNode*
-balsa_mailbox_node_new_from_config(const gchar* prefix)
+balsa_mailbox_node_new_from_config(const gchar* group)
 {
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_push_group(group);
 
     folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
@@ -553,14 +553,14 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 		     G_CALLBACK(imap_dir_cb), NULL);
     libbalsa_server_connect_signals(folder->server,
                                     G_CALLBACK(ask_password), NULL);
-    balsa_mailbox_node_load_config(folder, prefix);
+    balsa_mailbox_node_load_config(folder, group);
 
     folder->dir = libbalsa_conf_get_string("Directory");
     folder->subscribed =
 	libbalsa_conf_get_bool("Subscribed"); 
     folder->list_inbox =
 	libbalsa_conf_get_bool("ListInbox=true"); 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     return folder;
 }
@@ -632,17 +632,17 @@ balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
    with some sane defaults.
 */
 void
-balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix)
+balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* group)
 {
     g_signal_emit(G_OBJECT(mn),
-		  balsa_mailbox_node_signals[LOAD_CONFIG], 0, prefix);
+		  balsa_mailbox_node_signals[LOAD_CONFIG], 0, group);
 }
 
 void
-balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix)
+balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* group)
 {
     g_signal_emit(G_OBJECT(mn),
-		  balsa_mailbox_node_signals[SAVE_CONFIG], 0, prefix);
+		  balsa_mailbox_node_signals[SAVE_CONFIG], 0, group);
 }
 
 /* ---------------------------------------------------------------------

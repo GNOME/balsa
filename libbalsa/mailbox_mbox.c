@@ -613,7 +613,7 @@ lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
 	    line->len = 0;
 	    g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 	} while (!(eos = g_mime_stream_eos(gmime_stream_buffer))
-		 && !libbalsa_str_has_prefix(line->data, "From "));
+		 && !libbalsa_str_has_prefix((gchar *) line->data, "From "));
 	if (eos)
 	    break;
 
@@ -623,17 +623,18 @@ lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
 	do {
 	    line->len = 0;
 	    g_mime_stream_buffer_readln(gmime_stream_buffer, line);
-	    if (g_ascii_strncasecmp(line->data, "Status: ", 8) == 0) {
-		if (strchr(line->data + 8, 'R'))
+	    if (g_ascii_strncasecmp((gchar *) line->data,
+				    "Status: ", 8) == 0) {
+		if (strchr((gchar *) line->data + 8, 'R'))
 		    new_undeleted = FALSE;
-	    } else if (g_ascii_strncasecmp(line->data, "X-Status: ", 10) ==
-		       0) {
-		if (strchr(line->data + 10, 'D'))
+	    } else if (g_ascii_strncasecmp((gchar *) line->data,
+				           "X-Status: ", 10) == 0) {
+		if (strchr((gchar *) line->data + 10, 'D'))
 		    new_undeleted = FALSE;
 	    } else
-		if (g_ascii_strncasecmp(line->data, "Content-Length: ", 16)
-		    == 0) {
-		content_length = atoi(line->data + 16);
+		if (g_ascii_strncasecmp((gchar *) line->data,
+					"Content-Length: ", 16) == 0) {
+		content_length = atoi((gchar *) line->data + 16);
 	    }
 	    /* Blank line ends headers. */
 	} while (!(eos = g_mime_stream_eos(gmime_stream_buffer))

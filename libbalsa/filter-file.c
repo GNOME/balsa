@@ -316,7 +316,6 @@ compare_conditions_order(gconstpointer a, gconstpointer b)
 #define CONDITION_SECTION_PREFIX "condition-"
 
 struct lbc_new_info {
-    const gchar *prefix;
     GList *tmp_list;
     gint err;
 };
@@ -325,12 +324,9 @@ static gboolean
 lbc_new_helper(const gchar * key, const gchar * value, gpointer data)
 {
     struct lbc_new_info *info = data;
-    gchar *condprefix;
     LibBalsaCondition *cond;
 
-    condprefix = g_strconcat(info->prefix, key, "/", NULL);
-    libbalsa_conf_push_prefix(condprefix);
-    g_free(condprefix);
+    libbalsa_conf_push_group(key);
 
     cond = libbalsa_condition_new_from_config();
     if (cond) {
@@ -352,14 +348,13 @@ lbc_new_helper(const gchar * key, const gchar * value, gpointer data)
         }
     }
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
 
     return filter_errno != FILTER_NOERR;
 }
 
 LibBalsaCondition *
-libbalsa_condition_new_2_0(const gchar * prefix,
-                           const gchar * filter_section_name,
+libbalsa_condition_new_2_0(const gchar * filter_section_name,
                            ConditionMatchType cmt)
 {
     struct lbc_new_info info;
@@ -367,14 +362,13 @@ libbalsa_condition_new_2_0(const gchar * prefix,
     LibBalsaCondition *cond_2_0 = NULL;
     GList *l;
 
-    info.prefix = prefix;
     info.tmp_list = NULL;
     info.err = filter_errno = FILTER_NOERR;
 
     section_prefix =
         g_strconcat(CONDITION_SECTION_PREFIX, filter_section_name, ":",
                     NULL);
-    libbalsa_conf_foreach_section(section_prefix, lbc_new_helper, &info);
+    libbalsa_conf_foreach_group(section_prefix, lbc_new_helper, &info);
     g_free(section_prefix);
 
     /* We position filter_errno to the last non-critical error */

@@ -27,16 +27,32 @@
 
 #include <glib.h>
 
-/* Wrapper for iterating over sections. */
+void libbalsa_conf_push_group(const char *group);
+void libbalsa_conf_remove_group_(const char *group, gboolean priv);
+#define libbalsa_conf_remove_group(group) \
+        (libbalsa_conf_remove_group_((group),FALSE))
+#define libbalsa_conf_private_remove_group(group) \
+        (libbalsa_conf_remove_group_((group),TRUE))
+
+gboolean libbalsa_conf_has_group(const char *group);
+
+/* Wrapper for iterating over groups. */
 typedef gboolean (*LibBalsaConfForeachFunc)(const gchar * key,
                                             const gchar * value,
                                             gpointer data);
-void libbalsa_conf_foreach_section(const gchar * prefix,
-                                   LibBalsaConfForeachFunc func,
-                                   gpointer data);
+void libbalsa_conf_foreach_group(const gchar * prefix,
+                                 LibBalsaConfForeachFunc func,
+                                 gpointer data);
 
-#if defined(HAVE_GNOME) && !defined(GNOME_DISABLE_DEPRECATED)
+#if !defined(HAVE_GNOME) || defined(GNOME_DISABLE_DEPRECATED)
+# define BALSA_USE_G_KEY_FILE TRUE
+#else
+# undef BALSA_USE_G_KEY_FILE
+#endif
 
+#if !BALSA_USE_G_KEY_FILE
+
+#define libbalsa_conf_pop_group               gnome_config_pop_prefix
 #define libbalsa_conf_set_string              gnome_config_set_string
 #define libbalsa_conf_get_string              gnome_config_get_string
 #define libbalsa_conf_private_set_string      gnome_config_private_set_string
@@ -54,28 +70,14 @@ void libbalsa_conf_foreach_section(const gchar * prefix,
 
 #define libbalsa_conf_push_prefix             gnome_config_push_prefix
 #define libbalsa_conf_pop_prefix              gnome_config_pop_prefix
-#define libbalsa_conf_private_clean_section   gnome_config_private_clean_section
-#define libbalsa_conf_clean_section           gnome_config_clean_section
 #define libbalsa_conf_clean_key               gnome_config_clean_key
-#define libbalsa_conf_has_section             gnome_config_has_section
 #define libbalsa_conf_drop_all                gnome_config_drop_all
 #define libbalsa_conf_sync                    gnome_config_sync
 #include <libgnome/gnome-config.h>
 
-#else
+#else                           /* BALSA_USE_G_KEY_FILE */
 
-void libbalsa_conf_push_prefix               (const char *path);
-void libbalsa_conf_pop_prefix                (void);
-
-void libbalsa_conf_clean_section_            (const char *path,
-	                                      gboolean priv);
-#define libbalsa_conf_clean_section(path) \
-        (libbalsa_conf_clean_section_((path),FALSE))
-#define libbalsa_conf_private_clean_section(path) \
-        (libbalsa_conf_clean_section_((path),TRUE))
-
-gboolean libbalsa_conf_has_section           (const char *path);
-
+void libbalsa_conf_pop_group                 (void);
 void libbalsa_conf_clean_key                 (const char *key);
 
 void libbalsa_conf_set_bool_                 (const char *path,
@@ -140,6 +142,6 @@ void libbalsa_conf_get_vector_with_default_  (const char *path,
 void libbalsa_conf_drop_all                  (void);
 void libbalsa_conf_sync                      (void);
 
-#endif                          /* HAVE_GNOME */
+#endif                          /* BALSA_USE_G_KEY_FILE */
 
 #endif                          /* __LIBCONFIG_H__ */

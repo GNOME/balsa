@@ -57,9 +57,9 @@ static void libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox,
 static gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
                                                 LibBalsaCondition *condition);
 static void libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
-                                              const gchar * prefix);
+                                              const gchar * group);
 static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
-                                              const gchar * prefix);
+                                              const gchar * group);
 static gboolean libbalsa_mailbox_real_close_backend (LibBalsaMailbox *
                                                      mailbox);
 
@@ -374,20 +374,20 @@ libbalsa_mailbox_finalize(GObject * object)
 
 /* Create a new mailbox by loading it from a config entry... */
 LibBalsaMailbox *
-libbalsa_mailbox_new_from_config(const gchar * prefix)
+libbalsa_mailbox_new_from_config(const gchar * group)
 {
     gchar *type_str;
     GType type;
     gboolean got_default;
     LibBalsaMailbox *mailbox;
 
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_push_group(group);
     type_str = libbalsa_conf_get_string_with_default("Type", &got_default);
 
     if (got_default) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Cannot load mailbox %s"), prefix);
-        libbalsa_conf_pop_prefix();
+                             _("Cannot load mailbox %s"), group);
+        libbalsa_conf_pop_group();
         return NULL;
     }
     type = g_type_from_name(type_str);
@@ -395,7 +395,7 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("No such mailbox type: %s"), type_str);
         g_free(type_str);
-        libbalsa_conf_pop_prefix();
+        libbalsa_conf_pop_group();
         return NULL;
     }
 
@@ -417,10 +417,10 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Could not create a mailbox of type %s"),
                              type_str);
-    else 
-        libbalsa_mailbox_load_config(mailbox, prefix);
+    else
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_config(mailbox, group);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     g_free(type_str);
 
     return mailbox;
@@ -711,7 +711,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 
 void
 libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
-                             const gchar * prefix)
+                             const gchar * group)
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
@@ -720,25 +720,13 @@ libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
      * type of mailbox that has now been deleted...
      */
     g_free(mailbox->config_prefix);
-    mailbox->config_prefix = g_strdup(prefix);
-    libbalsa_conf_private_clean_section(prefix);
-    libbalsa_conf_clean_section(prefix);
+    mailbox->config_prefix = g_strdup(group);
+    libbalsa_conf_private_remove_group(group);
+    libbalsa_conf_remove_group(group);
 
-    libbalsa_conf_push_prefix(prefix);
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->save_config(mailbox, prefix);
-    libbalsa_conf_pop_prefix();
-}
-
-void
-libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
-                             const gchar * prefix)
-{
-    g_return_if_fail(mailbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-    libbalsa_conf_push_prefix(prefix);
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_config(mailbox, prefix);
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_push_group(group);
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->save_config(mailbox, group);
+    libbalsa_conf_pop_group();
 }
 
 static void
@@ -789,7 +777,7 @@ libbalsa_mailbox_real_sort(LibBalsaMailbox* mbox, GArray *sort_array)
 
 static void
 libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
-                                  const gchar * prefix)
+                                  const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
@@ -800,12 +788,12 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 
 static void
 libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
-                                  const gchar * prefix)
+                                  const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     g_free(mailbox->config_prefix);
-    mailbox->config_prefix = g_strdup(prefix);
+    mailbox->config_prefix = g_strdup(group);
 
     g_free(mailbox->name);
     mailbox->name = libbalsa_conf_get_string("Name=Mailbox");

@@ -1696,12 +1696,14 @@ internet_address_new_from_imap_address(ImapAddress *addr)
     /* it will be owned by the caller */
 
     if (addr->name) {
-	gchar *tmp = g_mime_utils_header_decode_text(addr->name);
+	gchar *tmp =
+	    g_mime_utils_header_decode_text((unsigned char *) addr->name);
 	internet_address_set_name(address, tmp);
 	g_free(tmp);
     }
     if (addr->addr_spec) {
-	gchar *tmp = g_mime_utils_header_decode_text(addr->addr_spec);
+	gchar *tmp =
+	    g_mime_utils_header_decode_text((unsigned char *) addr->addr_spec);
 	internet_address_set_addr(address, tmp);
 	g_free(tmp);
     } else { /* FIXME: is that a right thing? */
@@ -1744,8 +1746,9 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
 	internet_address_new_list_from_imap_address_list(envelope->bcc);
 
     if(is_embedded) {
-        headers->subject = 
-            g_mime_utils_header_decode_text(envelope->subject);
+        headers->subject =
+            g_mime_utils_header_decode_text((unsigned char *) envelope->
+                                            subject);
         libbalsa_utf8_sanitize(&headers->subject, TRUE, NULL);
     }
 }
@@ -1772,7 +1775,8 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 	libbalsa_message_set_headers_from_string(message, hdr);
     envelope        = imsg->envelope;
     message->length = imsg->rfc822size;
-    message->subj   = g_mime_utils_header_decode_text(envelope->subject);
+    message->subj   =
+        g_mime_utils_header_decode_text((unsigned char *) envelope->subject);
     libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
     message->sender =
 	internet_address_new_list_from_imap_address_list(envelope->sender);
@@ -1861,7 +1865,8 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     str = imap_body_get_dsp_param(imap_body, "filename");
     if(!str) str = imap_body_get_param(imap_body, "name");
     if(str) {
-        lbbody->filename  = g_mime_utils_header_decode_text(str);
+        lbbody->filename  =
+	    g_mime_utils_header_decode_text((unsigned char *) str);
         libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
     }
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));

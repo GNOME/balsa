@@ -1337,14 +1337,13 @@ static void
 lb_text_attr(const gchar * text, gboolean * has_esc, gboolean * has_hi_bit,
              gboolean * has_hi_ctrl)
 {
-    const guchar *p;
-
-    for (p = text; *p; p++) {
-        if (*p == 0x1b)
+    for (; *text; text++) {
+	guchar c = *text;
+        if (c == 0x1b)
             *has_esc = TRUE;
-        if (*p >= 0x80) {
+        if (c >= 0x80) {
             *has_hi_bit = TRUE;
-            if (*p <= 0x9f)
+            if (c <= 0x9f)
                 *has_hi_ctrl = TRUE;
         }
     }
@@ -1851,7 +1850,7 @@ libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
 #if defined (USE_FCNTL) || defined (USE_FLOCK)
     int count;
     int attempt;
-    struct stat prev_sb;
+    struct stat prev_sb = { 0 };
 #endif
     int r = 0;
 

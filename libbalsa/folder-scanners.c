@@ -367,7 +367,7 @@ libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server,
                           GError **error)
 {
     struct browser_state state;
-    int i;
+    guint i;
     ImapMboxHandle* handle;
     gulong list_handler_id, lsub_handler_id;
 

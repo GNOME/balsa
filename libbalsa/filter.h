@@ -282,8 +282,7 @@ gboolean libbalsa_condition_is_flag_only(LibBalsaCondition * cond,
                                          guint msgno, gboolean * match);
 
 /* Compatibility */
-LibBalsaCondition *libbalsa_condition_new_2_0(const gchar * prefix,
-                                              const gchar *
+LibBalsaCondition *libbalsa_condition_new_2_0(const gchar *
                                               filter_section_name,
                                               ConditionMatchType cmt);
 

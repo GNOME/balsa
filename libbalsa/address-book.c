@@ -39,10 +39,10 @@ static void libbalsa_address_book_finalize(GObject * object);
 
 static void libbalsa_address_book_real_save_config(LibBalsaAddressBook *
 						   ab,
-						   const gchar * prefix);
+						   const gchar * group);
 static void libbalsa_address_book_real_load_config(LibBalsaAddressBook *
 						   ab,
-						   const gchar * prefix);
+						   const gchar * group);
 
 enum {
     LOAD,
@@ -201,19 +201,19 @@ libbalsa_address_book_finalize(GObject * object)
 }
 
 LibBalsaAddressBook *
-libbalsa_address_book_new_from_config(const gchar * prefix)
+libbalsa_address_book_new_from_config(const gchar * group)
 {
     gchar *type_str;
     GType type;
     gboolean got_default;
     LibBalsaAddressBook *address_book = NULL;
 
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_push_group(group);
     type_str = libbalsa_conf_get_string_with_default("Type", &got_default);
 
     if (got_default == TRUE) {
         /* type entry missing, skip it */
-	libbalsa_conf_pop_prefix();
+	libbalsa_conf_pop_group();
 	return NULL;
     }
 
@@ -221,14 +221,14 @@ libbalsa_address_book_new_from_config(const gchar * prefix)
     if (type == 0) {
         /* type unknown, skip it */
 	g_free(type_str);
-	libbalsa_conf_pop_prefix();
+	libbalsa_conf_pop_group();
 	return NULL;
     }
 
     address_book = g_object_new(type, NULL);
-    libbalsa_address_book_load_config(address_book, prefix);
+    libbalsa_address_book_load_config(address_book, group);
 
-    libbalsa_conf_pop_prefix();
+    libbalsa_conf_pop_group();
     g_free(type_str);
 
     return address_book;
@@ -306,31 +306,31 @@ libbalsa_address_book_set_status(LibBalsaAddressBook * ab, gchar *str)
 
 void
 libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
-                                  const gchar * prefix)
+                                  const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    libbalsa_conf_private_clean_section(prefix);
-    libbalsa_conf_clean_section(prefix);
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_private_remove_group(group);
+    libbalsa_conf_remove_group(group);
+    libbalsa_conf_push_group(group);
 
     g_signal_emit(G_OBJECT(ab),
                   libbalsa_address_book_signals[SAVE_CONFIG], 0,
-                  prefix);
-    libbalsa_conf_pop_prefix();
+                  group);
+    libbalsa_conf_pop_group();
 }
 
 void
 libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
-				  const gchar * prefix)
+				  const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    libbalsa_conf_push_prefix(prefix);
+    libbalsa_conf_push_group(group);
     g_signal_emit(G_OBJECT(ab),
 		  libbalsa_address_book_signals[LOAD_CONFIG], 0,
-                  prefix);
-    libbalsa_conf_pop_prefix();
+                  group);
+    libbalsa_conf_pop_group();
 }
 
 GList *
@@ -360,7 +360,7 @@ gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
 
 static void
 libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
-				       const gchar * prefix)
+				       const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
@@ -370,17 +370,17 @@ libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
     libbalsa_conf_set_bool("DistListMode", ab->dist_list_mode);
 
     g_free(ab->config_prefix);
-    ab->config_prefix = g_strdup(prefix);
+    ab->config_prefix = g_strdup(group);
 }
 
 static void
 libbalsa_address_book_real_load_config(LibBalsaAddressBook * ab,
-				       const gchar * prefix)
+				       const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
     g_free(ab->config_prefix);
-    ab->config_prefix = g_strdup(prefix);
+    ab->config_prefix = g_strdup(group);
 
     ab->expand_aliases = libbalsa_conf_get_bool("ExpandAliases=false");
     ab->dist_list_mode = libbalsa_conf_get_bool("DistListMode=false");

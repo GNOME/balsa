@@ -19,6 +19,10 @@
  * 02111-1307, USA.
  */
 
+#undef GTK_DISABLE_DEPRECATED
+#undef GNOME_DISABLE_DEPRECATED
+#undef GNOME_DISABLE_DEPRECATED_SOURCE
+
 #include "config.h"
 
 #include <string.h>
@@ -39,6 +43,7 @@
 #endif
 #include "address-book-vcard.h"
 #include "address-book-gpe.h"
+#include "i18n.h"
 
 struct ABMainWindow {
     GtkWidget *entry_list; /* GtkListView widget */
@@ -542,12 +547,13 @@ bab_get_filter_box(void)
 static GtkWidget*
 bab_window_new()
 {
-    GtkWidget* menubar, *main_vbox, *cont_box, *vbox, *scroll;
+    GtkWidget* menubar = NULL, *main_vbox, *cont_box, *vbox, *scroll;
     GtkWidget *wnd = gnome_app_new("Contacts", "Contacts");
     GList *first_ab;
 
     get_main_menu(GTK_WIDGET(wnd), &menubar, contacts_app.address_book_list);
-    gnome_app_set_menus(GNOME_APP(wnd), GTK_MENU_BAR(menubar));
+    if (menubar)
+	gnome_app_set_menus(GNOME_APP(wnd), GTK_MENU_BAR(menubar));
     /* main vbox */
     main_vbox = gtk_vbox_new(FALSE, 1);
 

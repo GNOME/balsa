@@ -423,7 +423,7 @@ static void
 x509_fingerprint (char *s, unsigned len, X509 * cert)
 {
     unsigned j, i, n, c;
-    char md[EVP_MAX_MD_SIZE];
+    unsigned char md[EVP_MAX_MD_SIZE];
 
 
     X509_digest(cert, EVP_md5(), md, &n);

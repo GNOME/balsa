@@ -103,7 +103,8 @@ ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, ImapSearchKey *key,
                                   void *cb_data);
 
 ImapResponse imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
-                                  int ascending, int *msgno, unsigned cnt);
+                                  int ascending, unsigned int *msgno,
+				  unsigned cnt);
 ImapResponse imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key,
                                    int ascending, ImapSearchKey *filter);
 ImapResponse imap_mbox_filter_msgnos(ImapMboxHandle * handle,

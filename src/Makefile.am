@@ -84,7 +84,8 @@ DEFS =                                   \
        -DG_DISABLE_DEPRECATED            \
        -DGDK_DISABLE_DEPRECATED          \
        -DGDK_PIXBUF_DISABLE_DEPRECATED   \
-#      -DGNOME_DISABLE_DEPRECATED        \
+       -DGMIME_DISABLE_DEPRECATED	 \
+       -DGNOME_DISABLE_DEPRECATED        \
        -DGNOME_DISABLE_DEPRECATED_SOURCE \
        -DGNOME_VFS_DISABLE_DEPRECATED    \
        -DGTK_DISABLE_DEPRECATED          \
@@ -95,7 +96,6 @@ balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libbalsa/imap/libimap.a	\
 	$(balsa_IDL_OBJS) \
-	-lltdl	\
 	$(INTLLIBS) \
         $(BALSA_LIBS)
 

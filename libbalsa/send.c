@@ -472,7 +472,7 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
 
     *len = g_mime_stream_length(current_message->stream)
 	    - g_mime_stream_tell(current_message->stream);
-    ptr = mem_stream->buffer->data
+    ptr = (char *) mem_stream->buffer->data
 	    + g_mime_stream_tell(current_message->stream);
     g_mime_stream_seek(current_message->stream, *len, GMIME_STREAM_SEEK_CUR);
 

@@ -108,7 +108,8 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
 
     subj = g_mime_message_get_subject(msg);
     if (subj) {
-	ehdr->subject = g_mime_utils_header_decode_text(subj);
+	ehdr->subject =
+	    g_mime_utils_header_decode_text((const unsigned char *) subj);
 	libbalsa_utf8_sanitize(&ehdr->subject, TRUE, NULL);
     } else 
 	ehdr->subject = g_strdup(_("(No subject)"));
@@ -485,11 +486,11 @@ libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf)
     g_object_unref(stream);
 
     if (len >= 0) {
+	guint8 zero = 0;
         len = array->len;
 	/* NULL-terminate, in case it is used as a string. */
-	g_byte_array_append(array, "", 1);
-        *buf = array->data;
-        g_byte_array_free(array, FALSE);
+	g_byte_array_append(array, &zero, 1);
+        *buf = (gchar *) g_byte_array_free(array, FALSE);
     } else
         g_byte_array_free(array, TRUE);
 
@@ -512,7 +513,7 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 
     loader = gdk_pixbuf_loader_new();
     while ((count = g_mime_stream_read(stream, buf, sizeof(buf))) > 0) {
-        if (!gdk_pixbuf_loader_write(loader, buf, count, err)) {
+        if (!gdk_pixbuf_loader_write(loader, (guchar *) buf, count, err)) {
             ok = FALSE;
             break;
         }

@@ -228,15 +228,17 @@ static char B64Chars[64] = {
 
 /* raw bytes to null-terminated base 64 string */
 static void
-string_to_base64(unsigned char *out, const unsigned char *in, size_t len,
-		 size_t olen)
+string_to_base64(char *out, const char *in, size_t len, size_t olen)
 {
+  unsigned char in0, in1, in2;
+
   while (len >= 3 && olen > 10)
   {
-    *out++ = B64Chars[in[0] >> 2];
-    *out++ = B64Chars[((in[0] << 4) & 0x30) | (in[1] >> 4)];
-    *out++ = B64Chars[((in[1] << 2) & 0x3c) | (in[2] >> 6)];
-    *out++ = B64Chars[in[2] & 0x3f];
+    in0 = in[0]; in1 = in[1]; in2 = in[2];
+    *out++ = B64Chars[in0 >> 2];
+    *out++ = B64Chars[((in0 << 4) & 0x30) | (in1 >> 4)];
+    *out++ = B64Chars[((in1 << 2) & 0x3c) | (in2 >> 6)];
+    *out++ = B64Chars[in2 & 0x3f];
     olen  -= 4;
     len   -= 3;
     in    += 3;
@@ -247,12 +249,18 @@ string_to_base64(unsigned char *out, const unsigned char *in, size_t len,
   {
     unsigned char fragment;
 
-    *out++ = B64Chars[in[0] >> 2];
-    fragment = (in[0] << 4) & 0x30;
-    if (len > 1)
-      fragment |= in[1] >> 4;
-    *out++ = B64Chars[fragment];
-    *out++ = (len < 2) ? '=' : B64Chars[(in[1] << 2) & 0x3c];
+    in0 = in[0];
+    *out++ = B64Chars[in0 >> 2];
+    fragment = (in0 << 4) & 0x30;
+    if (len > 1) {
+      in1 = in[1];
+      fragment |= in1 >> 4;
+      *out++ = B64Chars[fragment];
+      *out++ = B64Chars[(in1 << 2) & 0x3c];
+    } else {
+      *out++ = B64Chars[fragment];
+      *out++ = '=';
+    }
     *out++ = '=';
   }
   *out = '\0';

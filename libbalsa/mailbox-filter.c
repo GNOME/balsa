@@ -36,9 +36,6 @@
 #include "misc.h"
 #include "i18n.h"
 
-/* FIXME : double definition : first is in save-restore.c */
-#define BALSA_CONFIG_PREFIX "balsa/"
-
 /* Returns a slist of filters having the corresponding when field
  * There is no copy, the new list references object of the source list
  */
@@ -55,13 +52,13 @@ libbalsa_mailbox_filters_when(GSList * filters, gint when)
     return lst;
 }
 
-/* Looks for a mailbox filters section with MBOX_URL field equals to mbox->url
- * returns the section name or NULL if none found
+/* Looks for a mailbox filters group with MBOX_URL field equals to mbox->url
+ * returns the group name or NULL if none found
  * The returned string has to be freed by the caller
  */
 struct lbmf_section_lookup_info {
     const gchar *name;
-    gchar *section;
+    gchar *group;
 };
 
 static gboolean
@@ -71,17 +68,14 @@ lbmf_section_lookup_func(const gchar * key, const gchar * value,
     struct lbmf_section_lookup_info *info = data;
     gchar *url;
 
-    info->section = g_strconcat(BALSA_CONFIG_PREFIX, key, "/", NULL);
-    libbalsa_conf_push_prefix(info->section);
+    libbalsa_conf_push_group(key);
     url = libbalsa_conf_get_string(MAILBOX_FILTERS_URL_KEY);
-    libbalsa_conf_pop_prefix();
-    if (strcmp(url, info->name) != 0) {
-        g_free(info->section);
-        info->section = NULL;
-    }
+    libbalsa_conf_pop_group();
+    if (strcmp(url, info->name) == 0)
+        info->group = g_strdup(key);
     g_free(url);
 
-    return info->section != NULL;
+    return info->group != NULL;
 }
 
 gchar *
@@ -92,23 +86,23 @@ mailbox_filters_section_lookup(const gchar * name)
     g_return_val_if_fail(name && name[0], NULL);
 
     info.name = name;
-    info.section = NULL;
-    libbalsa_conf_foreach_section(MAILBOX_FILTERS_SECTION_PREFIX,
+    info.group = NULL;
+    libbalsa_conf_foreach_group(MAILBOX_FILTERS_SECTION_PREFIX,
                                   lbmf_section_lookup_func, &info);
 
-    return info.section;
+    return info.group;
 }
 
 void
 config_mailbox_filters_load(LibBalsaMailbox * mbox)
 {
-    gchar * section;
+    gchar * group;
 
-    section = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
-    if (section) {
-	libbalsa_conf_push_prefix(section);
-	g_free(section);
+    group = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
+    if (group) {
+	libbalsa_conf_push_group(group);
+	g_free(group);
 	libbalsa_mailbox_filters_load_config(mbox);
-	libbalsa_conf_pop_prefix();
+	libbalsa_conf_pop_group();
     }
 }

@@ -161,14 +161,14 @@ lsv_escape_cb(GtkAction * action, gpointer data)
     mem_stream = g_mime_stream_mem_new();
     g_mime_stream_write_to_stream(msg_stream, mem_stream);
     g_mime_stream_write(mem_stream, "", 1); /* close string */
-    raw_message = GMIME_STREAM_MEM(mem_stream)->buffer->data;
+    raw_message = (char *) GMIME_STREAM_MEM(mem_stream)->buffer->data;
 
     *(lsvi->escape_specials) =
 	gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
     lsv_show_message(raw_message, lsvi, *(lsvi->escape_specials));
 
-    g_mime_stream_unref(msg_stream);
-    g_mime_stream_unref(mem_stream);
+    g_object_unref(msg_stream);
+    g_object_unref(mem_stream);
 }
 
 static void

@@ -157,7 +157,8 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 			    "Comment: created by Balsa " BALSA_VERSION
 			    " (http://balsa.gnome.org)", charset);
 	g_byte_array_remove_range(cipherdata, 0, 27);
-	g_byte_array_prepend(cipherdata, rfc2440header, strlen(rfc2440header));
+	g_byte_array_prepend(cipherdata, (guint8 *) rfc2440header,
+			     strlen(rfc2440header));
 	g_free(rfc2440header);
     }
 

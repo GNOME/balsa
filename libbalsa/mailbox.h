@@ -403,8 +403,6 @@ void libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
-void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
-				  const gchar * prefix);
 
 int libbalsa_mailbox_copy_message(LibBalsaMessage *message,
 				  LibBalsaMailbox *dest, GError **err);

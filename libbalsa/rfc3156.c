@@ -48,6 +48,7 @@
 #endif
 
 #include "padlock-keyhole.xpm"
+#include "i18n.h"
 
 
 /* local prototypes */
@@ -1190,7 +1191,8 @@ static gboolean
 check_gpg_child(gpointer data)
 {
     spawned_gpg_T *spawned_gpg = (spawned_gpg_T *) data;
-    int status, bytes_read;
+    int status;
+    unsigned int bytes_read;
     gchar buffer[1024], *gpg_message;
     GtkWidget *dialog;
 

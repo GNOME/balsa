@@ -1286,14 +1286,14 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
     if (tmp) {
 	gchar **filters_names = NULL;
 	gboolean def;
-	guint nb_filters;
+	gint nb_filters;
 
-	libbalsa_conf_push_prefix(tmp);
+	libbalsa_conf_push_group(tmp);
 	libbalsa_conf_get_vector_with_default(MAILBOX_FILTERS_KEY,
 					     &nb_filters, &filters_names,
 					     &def);
 	if (!def) {
-	    guint i;
+	    gint i;
 	    GList *lst;
 
 	    for (i = 0; i < nb_filters;) {
@@ -1312,7 +1312,7 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 				     new_name);
 		    } else {
 			/* Name removing */
-			guint j;
+			gint j;
 
 			for (j = i; j < nb_filters - 1; j++)
 			    filters_names[j] = filters_names[j + 1];
@@ -1329,10 +1329,10 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 	if (nb_filters) {
 	    libbalsa_conf_set_vector(MAILBOX_FILTERS_KEY, nb_filters,
 				    (const gchar **) filters_names);
-	    libbalsa_conf_pop_prefix();
+	    libbalsa_conf_pop_group();
 	} else {
-	    libbalsa_conf_pop_prefix();
-	    libbalsa_conf_clean_section(tmp);
+	    libbalsa_conf_pop_group();
+	    libbalsa_conf_remove_group(tmp);
 	}
 	g_strfreev(filters_names);
 	g_free(tmp);

@@ -448,10 +448,12 @@ lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
     g_object_unref(gmime_stream);
     line = g_byte_array_new();
     do {
-	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
-	g_byte_array_append(line, "", 1);
+	guint8 zero = 0;
 
-	lbm_mh_handle_seq_line(mailbox, line->data);
+	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
+	g_byte_array_append(line, &zero, 1);
+
+	lbm_mh_handle_seq_line(mailbox, (gchar *) line->data);
 	line->len = 0;
     } while (!g_mime_stream_eos(gmime_stream_buffer));
     g_object_unref(gmime_stream_buffer);
@@ -538,9 +540,10 @@ lbm_mh_check(LibBalsaMailboxMh * mh, const gchar * path)
 	line->len = 0;
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 
-	if (libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhUnseen)) {
+	if (libbalsa_str_has_prefix((gchar *) line->data,
+				    LibBalsaMailboxMhUnseen)) {
 	    /* Found the "unseen: " line... */
-	    gchar *p = line->data + strlen(LibBalsaMailboxMhUnseen);
+	    gchar *p = (gchar *) line->data + strlen(LibBalsaMailboxMhUnseen);
 	    gchar **sequences, **seq;
 	    
 	    sequences = g_strsplit(p, " ", 0);
@@ -899,16 +902,19 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_object_unref(gmime_stream);
     line = g_byte_array_new();
     do {
+	gchar *tmp;
+
 	line->len = 0;
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
-	if (line->data &&
-	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhUnseen) &&
-	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhFlagged) &&
-	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhReplied) &&
-	    !libbalsa_str_has_prefix(line->data, LibBalsaMailboxMhRecent))
+	tmp = (gchar *) line->data;
+	if (tmp &&
+	    !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhUnseen) &&
+	    !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhFlagged) &&
+	    !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhReplied) &&
+	    !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhRecent))
 	{
 	    /* unknown sequence */
-	    g_mime_stream_write(temp_stream, line->data, line->len);
+	    g_mime_stream_write(temp_stream, tmp, line->len);
 	}
     } while (!g_mime_stream_eos(gmime_stream_buffer));
     g_object_unref(gmime_stream_buffer);

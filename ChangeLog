@@ -1,3 +1,7 @@
+2002-03-27  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/print.c: use proper charset names instead of aliases (#76609).
+
 2002-03-26  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox.c (libbalsa_mailbox_load_messages): be more liberal 

@@ -1,3 +1,9 @@
+2002-03-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* imap/imap.c: unquote folder names if necessary (Thomas Maeder).
+	Fixes folder names containing spaces on Cyrus. Not needed with
+	UW-IMAP.
+
 2002-03-26  Carlos Morgado  <chbm@chbm.nu>
 
 	* sort.c (mutt_sort_headers): do away with it. it's not like we use it.

@@ -1349,7 +1349,12 @@ int imap_parse_list_response(IMAP_DATA* idata, char **name, int *noselect,
       *name = idata->cmd.buf;
     }
     else
-      *name = s;
+    {
+#ifdef LIBMUTT
+     imap_unquote_string(s);
+#endif
+     *name = s;
+    }
   }
 
   return 0;

@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-05-28 21:28+0000\n"
-"PO-Revision-Date: 2000-05-28 21:31+00:00\n"
+"POT-Creation-Date: 2000-06-01 21:56+0000\n"
+"PO-Revision-Date: 2000-06-01 21:58+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +102,7 @@ msgid "Please enter information about yourself."
 msgstr "Пожалуйста введите информацию о себе."
 
 #: libinit_balsa/balsa-druid-page-user.gob:82 src/address-book.c:205
-#: src/address-book.c:451
+#: src/address-book.c:450
 msgid "Name:"
 msgstr "Имя:"
 
@@ -185,7 +185,7 @@ msgstr "Добавить новый адрес"
 msgid "E-Mail Address:"
 msgstr "Электронный адрес:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:1043
+#: src/address-book.c:291 src/balsa-index-page.c:1046
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -194,41 +194,41 @@ msgstr ""
 "Не удалось открыть ~/.gnome/GnomeCard.gcrd для чтения.\n"
 "- %s\n"
 
-#: src/address-book.c:294 src/balsa-index-page.c:1025
-#: src/balsa-index-page.c:1046 src/balsa-index-page.c:1082
+#: src/address-book.c:294 src/balsa-index-page.c:1028
+#: src/balsa-index-page.c:1049 src/balsa-index-page.c:1085
 #: src/sendmsg-window.c:393
 msgid "OK"
 msgstr "OK"
 
-#: src/address-book.c:313
+#: src/address-book.c:312
 msgid "No-Id"
 msgstr "Нет ID"
 
-#: src/address-book.c:321
+#: src/address-book.c:320
 msgid "No-Name"
 msgstr "Нет Имени"
 
-#: src/address-book.c:416 src/filter-edit-dialog.c:135
+#: src/address-book.c:415 src/filter-edit-dialog.c:135
 msgid "Name"
 msgstr "Имя"
 
-#: src/address-book.c:416
+#: src/address-book.c:415
 msgid "E-Mail Address"
 msgstr "Электронный адрес"
 
-#: src/address-book.c:423 src/address-book.c:461 src/main-window.c:173
+#: src/address-book.c:422 src/address-book.c:460 src/main-window.c:173
 msgid "Address Book"
 msgstr "Адресная книга"
 
-#: src/address-book.c:493
+#: src/address-book.c:492
 msgid "Send-To"
 msgstr "Послать"
 
-#: src/address-book.c:507
+#: src/address-book.c:506
 msgid "Run GnomeCard"
 msgstr "Запустить GnomeCard"
 
-#: src/address-book.c:513
+#: src/address-book.c:512
 msgid "Re-Import"
 msgstr "Реимпортировать"
 
@@ -274,44 +274,44 @@ msgstr ""
 "Невозможно открыть почтовый ящик!\n"
 "Проверьте его настройки."
 
-#: src/balsa-index-page.c:587 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:590 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Новый"
 
-#: src/balsa-index-page.c:595 src/main-window.c:373
+#: src/balsa-index-page.c:598 src/main-window.c:373
 msgid "Reply"
 msgstr "Ответить"
 
-#: src/balsa-index-page.c:603 src/main-window.c:376
+#: src/balsa-index-page.c:606 src/main-window.c:376
 msgid "Reply to all"
 msgstr "Ответить всем"
 
-#: src/balsa-index-page.c:611 src/main-window.c:379
+#: src/balsa-index-page.c:614 src/main-window.c:379
 msgid "Forward"
 msgstr "Переслать"
 
-#: src/balsa-index-page.c:619 src/filter-edit-dialog.c:228
+#: src/balsa-index-page.c:622 src/filter-edit-dialog.c:228
 #: src/main-window.c:366 src/pref-manager.c:886
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/balsa-index-page.c:627
+#: src/balsa-index-page.c:630
 msgid "Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index-page.c:635
+#: src/balsa-index-page.c:638
 msgid "Store Address"
 msgstr "Сохранить адрес"
 
-#: src/balsa-index-page.c:643
+#: src/balsa-index-page.c:646
 msgid "Transfer"
 msgstr "Передать"
 
-#: src/balsa-index-page.c:1023
+#: src/balsa-index-page.c:1026
 msgid "You may only store one address at a time.\n"
 msgstr "Вы можете сохранить только один адрес за раз.\n"
 
-#: src/balsa-index-page.c:1079
+#: src/balsa-index-page.c:1082
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -320,23 +320,25 @@ msgstr ""
 "Для %s уже есть запись в адресной книге.\n"
 "Запустить GnomeCard если хотите отредактировать записи в адресной книге.\n"
 
-#: src/balsa-index-page.c:1097
+#: src/balsa-index-page.c:1100
 msgid ""
 "\n"
 "BEGIN:VCARD\n"
-msgstr "\nНАЧАЛО:VCARD\n"
+msgstr ""
+"\n"
+"НАЧАЛО:VCARD\n"
 
-#: src/balsa-index-page.c:1098
+#: src/balsa-index-page.c:1101
 #, c-format
 msgid "FN:%s\n"
-msgstr ""
+msgstr "FN:%s\n"
 
-#: src/balsa-index-page.c:1099
+#: src/balsa-index-page.c:1102
 #, c-format
 msgid "EMAIL;INTERNET:%s\n"
 msgstr "ЭЛ.АДРЕС;ИНТЕРНЕТ:%s\n"
 
-#: src/balsa-index-page.c:1100
+#: src/balsa-index-page.c:1103
 msgid "END:VCARD\n"
 msgstr "КОНЕЦ:VCARD\n"
 
@@ -391,7 +393,7 @@ msgstr "Выберите имя файла для сохранения этой части изображения:"
 msgid "Save Text"
 msgstr "Сохранить текст"
 
-#: src/balsa-message.c:301 src/balsa-message.c:316
+#: src/balsa-message.c:301 src/balsa-message.c:315
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr "Не удалось открыть %s:%s"
@@ -400,40 +402,45 @@ msgstr "Не удалось открыть %s:%s"
 msgid "Ok"
 msgstr "Ok"
 
-#: src/balsa-message.c:643
+#: src/balsa-message.c:644
 msgid "Date:"
 msgstr "Дата:"
 
 #. From:
-#: src/balsa-message.c:647 src/filter-edit-dialog.c:337
+#: src/balsa-message.c:648 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:591
 msgid "From:"
 msgstr "От:"
 
 #. To:
-#: src/balsa-message.c:651 src/filter-edit-dialog.c:325
+#: src/balsa-message.c:652 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:593
 msgid "To:"
 msgstr "Кому:"
 
-#: src/balsa-message.c:652
+#: src/balsa-message.c:653
 msgid "Cc:"
 msgstr "Официальные копии (Сс):"
 
-#: src/balsa-message.c:653
+#: src/balsa-message.c:654
 msgid "Bcc:"
 msgstr "Скрытые копии:"
 
-#: src/balsa-message.c:656
+#: src/balsa-message.c:657
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:657 src/sendmsg-window.c:599
+#: src/balsa-message.c:658 src/sendmsg-window.c:599
 msgid "Subject:"
 msgstr "Тема:"
 
-#: src/balsa-message.c:766
+#: src/balsa-message.c:734
+#, c-format
+msgid "other part: error writing to temporary file %s: %s"
+msgstr "другая часть: ошибка записи во временный файл %s: %s"
+
+#: src/balsa-message.c:788
 msgid ""
 "<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
 "application/"
@@ -441,15 +448,25 @@ msgstr ""
 "<tr><td bgcolor=\\\"#f0f0f0\\\"> Вы получили закодированный файл типа "
 "application/"
 
-#: src/balsa-message.c:770
+#: src/balsa-message.c:792
 msgid "<P>The parameters of this message are:<BR>"
 msgstr "<P>Параметры этого сообщения:<BR>"
 
-#: src/balsa-message.c:771
+#: src/balsa-message.c:793
 msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
 msgstr "<table border=0><tr><th>Атрибут</th><th>Значение</th></tr>\n"
 
-#: src/balsa-message.c:1179
+#: src/balsa-message.c:827
+#, c-format
+msgid "image: error writing to temporary file: %s"
+msgstr "изображение: ошибка записи во временный файл: %s"
+
+#: src/balsa-message.c:1068
+#, c-format
+msgid "text part: error writing to temporary file %s: %s"
+msgstr "текстовая часть: ошибка записи во временный файл %s: %s"
+
+#: src/balsa-message.c:1214
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Не удалось открыть %s. Номер ошибки = %d, "

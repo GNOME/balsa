@@ -302,7 +302,12 @@ create_menu (GtkWidget * window)
   /* FILE Menu */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Get New Mail"));
+#define GNOME_STOCK_PIXMAP_MAIL        "Mail"
+#define GNOME_STOCK_PIXMAP_MAIL_SND    "Send Mail"
+
+
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Get New Mail"));
   gtk_menu_append (GTK_MENU (menu), w);
   gtk_widget_install_accelerator (w, accel, "activate", 'M', GDK_CONTROL_MASK);
   gtk_signal_connect_object (GTK_OBJECT (w), 
@@ -331,7 +336,7 @@ create_menu (GtkWidget * window)
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Print..."));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PRINT, _ ("Print..."));
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
@@ -387,7 +392,7 @@ create_menu (GtkWidget * window)
   /* MESSAGE Menu */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("New"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL, _ ("New"));
   gtk_widget_show (w);
   gtk_widget_install_accelerator (w, accel, "activate", 'N', GDK_CONTROL_MASK);
   gtk_signal_connect_object (GTK_OBJECT (w), 

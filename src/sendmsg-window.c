@@ -137,7 +137,7 @@ create_menu (GtkWidget * window)
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Send"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_SND, _ ("Send"));
   gtk_widget_show (w);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;

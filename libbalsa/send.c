@@ -1380,6 +1380,24 @@ lbs_file_get_charset(const gchar * filename)
 	return NULL;
 }
 
+/* We could have used g_strsplit_set(s, "/;", 3) but it is not
+ * available in older glib. */
+static gchar**
+parse_content_type(const char* content_type)
+{
+    gchar ** ret = g_new0(gchar*, 3);
+    char *delim, *slash = strchr(content_type, '/');
+    if(!slash) {
+        ret[0] = g_strdup(content_type);
+        return ret;
+    }
+    ret[0] = g_strndup(content_type, slash-content_type);
+    slash++;
+    for(delim=slash; *delim && *delim != ';' && *delim != ' '; delim++);
+    ret[1] = g_strndup(slash, delim-slash);
+    return ret;
+}
+
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 				     gboolean flow, gboolean postponing)
@@ -1430,7 +1448,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		    mime_type = g_strsplit(mt,"/", 2);
 		    g_free(mt);
 		} else
-		    mime_type = g_strsplit_set(body->content_type, "/;", 3);
+		    mime_type = parse_content_type(body->content_type);
 
 		if (!strcasecmp(mime_type[0], "text")) {
 		    charset = lbs_file_get_charset(body->filename);

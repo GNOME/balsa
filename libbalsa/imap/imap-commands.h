@@ -54,6 +54,7 @@ ImapResponse imap_mbox_append_stream(ImapMboxHandle * handle,
 				     GMimeStream * stream, ssize_t len);
 
 /* Selected State */
+ImapResponse imap_mbox_close(ImapMboxHandle *h);
 ImapResult imap_mbox_search(ImapMboxHandle *h, const char* query);
 ImapResponse imap_mbox_noop(ImapMboxHandle *r);
 ImapResponse imap_mbox_expunge(ImapMboxHandle* h);

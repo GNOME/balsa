@@ -194,6 +194,9 @@ static void collapse_all_cb(GtkWidget * widget, gpointer data);
 #ifdef HAVE_GTKHTML
 static void zoom_cb(GtkWidget * widget, gpointer data);
 #endif				/* HAVE_GTKHTML */
+#if defined(ENABLE_TOUCH_UI)
+static void open_mailbox_cb(GtkWidget *widget, gpointer data);
+#endif /* ENABLE_TOUCH_UI */
 
 static void address_book_cb(GtkWindow *widget, gpointer data);
 
@@ -218,14 +221,18 @@ static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
 static void hide_changed_cb(GtkWidget * widget, gpointer data);
+#ifdef DEBUG
 static void show_name_cb(GtkWidget * widget, gpointer data);
 static void show_patch_cb(GtkWidget * widget, gpointer data);
+#endif
 static void reset_filter_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
 static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
 static void show_mbtree_cb(GtkWidget * widget, gpointer data);
+#if !defined(ENABLE_TOUCH_UI)
 static void show_mbtabs_cb(GtkWidget * widget, gpointer data);
+#endif
 
 static void notebook_size_alloc_cb(GtkWidget * notebook,
                                    GtkAllocation * alloc);
@@ -411,18 +418,42 @@ static GnomeUIInfo threading_menu[] = {
     GNOMEUIINFO_END
 };
 
-
 static GnomeUIInfo view_menu[] = {
-#define MENU_VIEW_MAILBOX_LIST_POS 0
+#if defined(ENABLE_TOUCH_UI)
+    { GNOME_APP_UI_ITEM, N_("_In"),  N_("Show Incoming Folder"),
+     open_mailbox_cb, GINT_TO_POINTER('I'), NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'I', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL},
+    { GNOME_APP_UI_ITEM, N_("_Drafts"),  N_("Show Drafts"),
+     open_mailbox_cb, GINT_TO_POINTER('D'), NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'D', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL},
+    { GNOME_APP_UI_ITEM, N_("_Out"),  N_("Show Outgoing Folder"),
+     open_mailbox_cb, GINT_TO_POINTER('O'), NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'O', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL},
+    { GNOME_APP_UI_ITEM, N_("_Sent"),  N_("Show Sent Messages"),
+     open_mailbox_cb, GINT_TO_POINTER('S'), NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'I', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL},
+    { GNOME_APP_UI_ITEM, N_("_Trash"),  N_("Show Trashed Messages"),
+     open_mailbox_cb, GINT_TO_POINTER('T'), NULL, GNOME_APP_PIXMAP_NONE,
+     NULL, 'T', GDK_CONTROL_MASK|GDK_SHIFT_MASK, NULL},
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_VIEW_MAILBOX_LIST_POS 6
+#else
+#define MENU_VIEW_MAILBOX_LIST_POS  0
+#endif
     GNOMEUIINFO_TOGGLEITEM(N_("_Show Mailbox Tree (F9)"),
                            N_("Toggle display of mailbox and folder tree"),
                            show_mbtree_cb, NULL),
+#if !defined(ENABLE_TOUCH_UI)
 #define MENU_VIEW_MAILBOX_TABS_POS 1
     GNOMEUIINFO_TOGGLEITEM(N_("Show Mailbox _Tabs"),
                            N_("Toggle display of mailbox notebook tabs"),
                            show_mbtabs_cb, NULL),
+#define SHOW_MENU_CNT 2
+#else
+#define SHOW_MENU_CNT 1
+#endif /* ENABLE_TOUCH_UI */
     GNOMEUIINFO_SEPARATOR,
-#define MENU_VIEW_WRAP_POS 3
+#define MENU_VIEW_WRAP_POS (MENU_VIEW_MAILBOX_LIST_POS+SHOW_MENU_CNT+1)
     GNOMEUIINFO_TOGGLEITEM(N_("_Wrap"), N_("Wrap message lines"),
                            wrap_message_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
@@ -430,12 +461,12 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_RADIOLIST(threading_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_VIEW_EXPAND_ALL_POS 9
+#define MENU_VIEW_EXPAND_ALL_POS (MENU_VIEW_WRAP_POS+6)
     { GNOME_APP_UI_ITEM, N_("E_xpand All"),
      N_("Expand all threads"),
      expand_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'E', GDK_CONTROL_MASK, NULL},
-#define MENU_VIEW_COLLAPSE_ALL_POS 10
+#define MENU_VIEW_COLLAPSE_ALL_POS (MENU_VIEW_EXPAND_ALL_POS+1)
     { GNOME_APP_UI_ITEM, N_("_Collapse All"),
      N_("Collapse all expanded threads"),
      collapse_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
@@ -667,14 +698,19 @@ static GnomeUIInfo mailbox_menu[] = {
 #define MENU_MAILBOX_HIDE_POS (MENU_MAILBOX_NEXT_FLAGGED_POS+2)
     GNOMEUIINFO_SUBTREE(N_("_Hide messages"), mailbox_hide_menu),
     /* the next one is for testing only */
+#ifdef DEBUG
     GNOMEUIINFO_ITEM_STOCK(N_("Show from _name"),  "",
                            show_name_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_ITEM_STOCK(N_("Show _Patches"),  "",
                            show_patch_cb, GTK_STOCK_FIND),
+#define FILTER_ENTRIES_CNT 5
+#else
+#define FILTER_ENTRIES_CNT 3
+#endif
     GNOMEUIINFO_ITEM_STOCK(N_("Reset _Filter"),  "",
                            reset_filter_cb, GTK_STOCK_FIND),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+5)
+#define MENU_MAILBOX_MARK_ALL_POS (MENU_MAILBOX_HIDE_POS+FILTER_ENTRIES_CNT)
     {
         GNOME_APP_UI_ITEM, N_("Select all"),
         N_("Select all messages in current mailbox"),
@@ -1112,10 +1148,12 @@ balsa_window_new()
                                        (shown_hdrs_menu[balsa_app.shown_headers].widget),
                                        TRUE);
 
+#if !defined(ENABLE_TOUCH_UI)
     if (balsa_app.show_notebook_tabs)
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                        (view_menu[MENU_VIEW_MAILBOX_TABS_POS].widget),
                                        TRUE);
+#endif
 
     /* Disable menu items at start up */
     balsa_window_enable_mailbox_menus(window, NULL);
@@ -2939,6 +2977,24 @@ zoom_cb(GtkWidget * widget, gpointer data)
 }
 #endif				/* HAVE_GTKHTML */
 
+#if defined(ENABLE_TOUCH_UI)
+static void
+open_mailbox_cb(GtkWidget *widget, gpointer data)
+{
+    LibBalsaMailbox *mailbox;
+    switch(GPOINTER_TO_INT(data)) {
+    default:
+    case 'I': mailbox = balsa_app.inbox;    break;
+    case 'D': mailbox = balsa_app.draftbox; break;
+    case 'O': mailbox = balsa_app.outbox;   break;
+    case 'S': mailbox = balsa_app.sentbox;  break;
+    case 'T': mailbox = balsa_app.trash;    break;
+    }
+    balsa_mblist_open_mailbox(mailbox);
+}
+
+#endif /* ENABLE_TOUCH_UI */
+
 static void
 address_book_cb(GtkWindow *widget, gpointer data)
 {
@@ -3406,6 +3462,7 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
 }
 
+#ifdef DEBUG
 static void
 show_name_cb(GtkWidget * widget, gpointer data)
 {
@@ -3472,7 +3529,7 @@ show_patch_cb(GtkWidget * widget, gpointer data)
         filter = name;
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
 }
-
+#endif /* def DEBUG */
 static void
 reset_filter_cb(GtkWidget * widget, gpointer data)
 {
@@ -3554,6 +3611,7 @@ show_mbtree_cb(GtkWidget * widget, gpointer data)
     }
 }
 
+#if !defined(ENABLE_TOUCH_UI)
 static void
 show_mbtabs_cb(GtkWidget * widget, gpointer data)
 {
@@ -3561,6 +3619,7 @@ show_mbtabs_cb(GtkWidget * widget, gpointer data)
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(balsa_app.notebook),
                                balsa_app.show_notebook_tabs);
 }
+#endif
 
 void
 balsa_change_window_layout(BalsaWindow *window)

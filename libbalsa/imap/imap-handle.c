@@ -1525,7 +1525,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
   if( (delim=sio_getc(h->sio)) == '"') 
     { delim=sio_getc(h->sio); while(sio_getc(h->sio)!= '"'); }
   else {
-    if(sio_getc(h->sio) != 'N' ||
+    if(delim            != 'N' ||
        sio_getc(h->sio) != 'I' ||
        sio_getc(h->sio) != 'L') return IMR_PROTOCOL;
   }

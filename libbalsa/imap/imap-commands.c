@@ -515,7 +515,17 @@ imap_mbox_append_stream(ImapMboxHandle *handle, const char *mbox,
 /* FIXME: implement */
 
 /* 6.4.2 CLOSE Command */
-/* FIXME: implement */
+ImapResponse
+imap_mbox_close(ImapMboxHandle *h)
+{
+  ImapResponse rc;
+  IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
+
+  rc = imap_cmd_exec(h, "CLOSE");  
+  if(rc == IMR_OK)
+    h->state = IMHS_AUTHENTICATED;
+  return rc;
+}
 
 /* 6.4.3 EXPUNGE Command */
 ImapResponse

@@ -90,6 +90,7 @@ static GnomeUIInfo shown_hdrs_menu[] = {
 static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_MENU_PRINT_ITEM(print_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
+#define MENU_FILE_CLOSE_POS 2
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_message_window, NULL),
     GNOMEUIINFO_END
 };
@@ -487,6 +488,11 @@ message_window_new(LibBalsaMessage * message)
 
     gtk_widget_show_all(mw->window);
     mw_set_message(mw, message);
+    gtk_widget_add_accelerator(file_menu[MENU_FILE_CLOSE_POS].widget,
+			       "activate",
+			       GNOME_APP(mw->window)->accel_group,
+			       GDK_Escape, (GdkModifierType)0, 
+                               (GtkAccelFlags) 0);
 }
 
 static void

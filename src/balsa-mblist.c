@@ -320,7 +320,8 @@ bmbl_init(BalsaMBList * mblist)
     gtk_tree_view_append_column(tree_view, column);
     gtk_tree_view_column_set_sort_column_id(column,
                                             BMBL_TREE_COLUMN_NAME);
- 
+     /* set sort column id will make the column clickable - disable that! */
+    gtk_tree_view_column_set_clickable(column, FALSE);
 
     /* Message counts are right-justified, each in a column centered
      * under its heading. */
@@ -344,9 +345,10 @@ bmbl_init(BalsaMBList * mblist)
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_visible(column, mblist->display_info);
     gtk_tree_view_append_column(tree_view, column);
+#ifdef SORTING_MAILBOX_LIST_IS_USEFUL
     gtk_tree_view_column_set_sort_column_id(column,
                                             BMBL_TREE_COLUMN_UNREAD);
-
+#endif
 
     /* Total message count column */
     column = gtk_tree_view_column_new();
@@ -368,9 +370,10 @@ bmbl_init(BalsaMBList * mblist)
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_visible(column, mblist->display_info);
     gtk_tree_view_append_column(tree_view, column);
+#ifdef SORTING_MAILBOX_LIST_IS_USEFUL
     gtk_tree_view_column_set_sort_column_id(column,
                                             BMBL_TREE_COLUMN_TOTAL);
-
+#endif
     /* arrange for non-mailbox nodes to be non-selectable */
     gtk_tree_selection_set_select_function(gtk_tree_view_get_selection
                                            (tree_view),
@@ -396,6 +399,7 @@ bmbl_init(BalsaMBList * mblist)
                                     bmbl_row_compare,
                                     GINT_TO_POINTER(BMBL_TREE_COLUMN_NAME),
                                     NULL);
+#ifdef SORTING_MAILBOX_LIST_IS_USEFUL
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store),
                                     BMBL_TREE_COLUMN_UNREAD,
                                     bmbl_row_compare,
@@ -406,6 +410,7 @@ bmbl_init(BalsaMBList * mblist)
                                     bmbl_row_compare,
                                     GINT_TO_POINTER(BMBL_TREE_COLUMN_TOTAL),
                                     NULL);
+#endif
     /* Default is ascending sort by name */
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store),
 					 BMBL_TREE_COLUMN_NAME,
@@ -1359,11 +1364,19 @@ bmbl_core_mailbox(LibBalsaMailbox* mailbox)
 {
     static const int num_core_mailboxes = 5;
     LibBalsaMailbox* core_mailbox[] = {
+#if !defined(ENABLE_TOUCH_UI)
         balsa_app.inbox,
         balsa_app.sentbox,
         balsa_app.draftbox,
         balsa_app.outbox,
         balsa_app.trash
+#else /* defined(ENABLE_TOUCH_UI) */
+        balsa_app.inbox,
+        balsa_app.draftbox,
+        balsa_app.outbox,
+        balsa_app.sentbox,
+        balsa_app.trash
+#endif /* defined(ENABLE_TOUCH_UI) */
     };
     gint i = 0;
     

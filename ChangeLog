@@ -1,3 +1,18 @@
+2004-07-23  Pawel Salek
+
+	* configure.in: add --enable-touch-ui
+	* libbalsa/imap-server.c: do not pass OK noise on. 
+	* libbalsa/libbalsa.h: separate error class for network problems.
+	* libbalsa/send.c: do not use g_strsplit_set() - too new.
+	* libbalsa/imap/imap-commands.[hc]: add imap_mbox_close().
+	* libbalsa/imap/imap-commands.c: fix error in parsing LIST response.
+	* libinit_balsa/balsa-druid-page-directory.c: alternative UI.
+	* src/balsa-mblist.c: improve keyboard navigation: only default order.
+	* src/mailbox-node.c: report network related problems explicitely.
+	* src/main-window.c: streamline UI.
+	* src/message-window.c: close with Esc.
+	* src/toolbar-factory.c: disable toolbar keyboard navigation.
+
 2004-07-22 07:45  PeterB
 
 	* src/main-window.c: fix bug #148063.

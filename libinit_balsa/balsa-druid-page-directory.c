@@ -289,6 +289,19 @@ balsa_druid_page_directory_prepare(GnomeDruidPage * page,
     gnome_druid_set_show_finish(druid, FALSE);
 }
 
+#if !defined(ENABLE_TOUCH_UI)
+#define INBOX_NAME    "Inbox"
+#define OUTBOX_NAME   "Outbox"
+#define SENTBOX_NAME  "Sentbox"
+#define DRAFTBOX_NAME "Draftbox"
+#else /* defined(ENABLE_TOUCH_UI) */
+#define INBOX_NAME    "In"
+#define OUTBOX_NAME   "Out"
+#define SENTBOX_NAME  "Sent"
+#define DRAFTBOX_NAME "Draft"
+#endif /* defined(ENABLE_TOUCH_UI) */
+#define TRASH_NAME    "Trash"
+
 static gboolean
 balsa_druid_page_directory_next(GnomeDruidPage * page, GtkWidget * druid,
                                 BalsaDruidPageDirectory * dir)
@@ -296,19 +309,19 @@ balsa_druid_page_directory_next(GnomeDruidPage * page, GtkWidget * druid,
     gchar *error = NULL;
 
     unconditional_mailbox(gtk_entry_get_text
-                          (GTK_ENTRY(dir->inbox)), "Inbox",
+                          (GTK_ENTRY(dir->inbox)), INBOX_NAME,
                           &balsa_app.inbox, &error);
     unconditional_mailbox(gtk_entry_get_text
-                          (GTK_ENTRY(dir->outbox)), "Outbox",
+                          (GTK_ENTRY(dir->outbox)), OUTBOX_NAME,
                           &balsa_app.outbox, &error);
     unconditional_mailbox(gtk_entry_get_text
-                          (GTK_ENTRY(dir->sentbox)), "Sentbox",
+                          (GTK_ENTRY(dir->sentbox)), SENTBOX_NAME,
                           &balsa_app.sentbox, &error);
     unconditional_mailbox(gtk_entry_get_text
-                          (GTK_ENTRY(dir->draftbox)),
-                          "Draftbox", &balsa_app.draftbox, &error);
+                          (GTK_ENTRY(dir->draftbox)), DRAFTBOX_NAME,
+                          &balsa_app.draftbox, &error);
     unconditional_mailbox(gtk_entry_get_text
-                          (GTK_ENTRY(dir->trash)), "Trash",
+                          (GTK_ENTRY(dir->trash)), TRASH_NAME,
                           &balsa_app.trash, &error);
 
     dir->paths_locked = TRUE;

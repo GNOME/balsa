@@ -347,6 +347,7 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
                                        bti->user_data);
 	g_object_add_weak_pointer(G_OBJECT(bti->widget),
 				  (gpointer) &bti->widget);
+        GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(bti->widget), GTK_CAN_FOCUS);
         g_free(text);
         gtk_widget_set_sensitive(bti->widget, bti->sensitive);
         if (type == GTK_TOOLBAR_CHILD_TOGGLEBUTTON) {

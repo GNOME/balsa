@@ -245,9 +245,12 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
         fmt = _("IMAP server %s error: %s");
         it = LIBBALSA_INFORMATION_ERROR;
         break;
-    default: /* IMAP host name + message */
-        fmt = _("%s: %s");
-        it = LIBBALSA_INFORMATION_MESSAGE; break;
+    default: 
+        return;
+        /* As much as it is fun to watch different commands succeed,
+         * it is just a distraction for the users, isn't it? */
+        /* IMAP host name + message */
+        /* fmt = _("%s: %s");  it = LIBBALSA_INFORMATION_MESSAGE; break; */
     }
     libbalsa_information(it, fmt, is->host, str);
 }
@@ -513,7 +516,9 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
                 if(rc == IMAP_AUTH_FAILURE)
                     libbalsa_server_set_password(server, NULL);
                 g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                            LIBBALSA_MAILBOX_OPEN_ERROR,
+                            rc == IMAP_AUTH_FAILURE
+                            ? LIBBALSA_MAILBOX_AUTH_ERROR :
+                            LIBBALSA_MAILBOX_NETWORK_ERROR,
                             _("Cannot connect to the server: %s"), msg);
                 g_free(msg);
                 lb_imap_server_info_free(info);

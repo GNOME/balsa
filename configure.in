@@ -520,15 +520,19 @@ if test "x$with_gss" != xno  ; then
 fi
 
 dnl ##########################################################################
+dnl Enable touchscreen optimized UI?
+dnl ##########################################################################
+
+AC_ARG_ENABLE(touch-ui, [  --enable-touch-ui              Enable Touchscreen UI mode [default=no]],
+    [AC_DEFINE(ENABLE_TOUCH_UI,1,[Defined when touchscreen optimized UI is to be enabled.])])
+
+dnl ##########################################################################
 dnl Check versions
 dnl ##########################################################################
 
 if $PKG_CONFIG --atleast-version=2.2.0 glib-2.0 ; then
   AC_DEFINE(HAVE_GLIB22,1,[Defined when glib version is at least 2.2.0])
 fi
-dnl if $PKG_CONFIG --atleast-version=2.2.0 gtk+-2.0 ; then
-dnl   AC_DEFINE(HAVE_GTK22,1,[Defined when Gtk+ version is at least 2.2.0])
-dnl fi
 
 dnl ###########################################################################
 dnl turn warnings into errors to enforce clean code

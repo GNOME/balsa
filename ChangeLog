@@ -1,3 +1,12 @@
+2004-04-07 06:55  PeterB
+
+	* libbalsa/imap/pop3.c: free pop->host.
+	* libbalsa/: mailbox_local.c, mailbox_maildir.c, mailbox_mbox.c,
+	mailbox_mh.c, message.c, message.h: scrap
+	LibBalsaMessage::references_for_threading and create the list on
+	the fly instead; allocate extra headers in body-ref and deallocate
+	them in body-unref.
+
 2004-04-06  Pawel Salek
 
 	* libbalsa/mailbox.c: make nth_child return correct answer for closed

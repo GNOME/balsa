@@ -1,3 +1,9 @@
+2001-01-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c: try to guess IMAP passwords when possible
+	by Berend De Schouwer <bds@jhb.ucs.co.za>.
+	* src/main.c: make the initial configuration even more robust.
+
 2001-01-17  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/mailbox-node.c: (balsa_mailbox_node_get_context_menu)

@@ -1,3 +1,9 @@
+2001-01-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* rfc822.c: Berend De Schouwer <bds@jhb.ucs.co.za> patch that
+	fixes quoting. Feel free to tak it back when mutt's code does it
+	right.
+	
 2001-01-08  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* browser.h: added from mutt-1.2.5i

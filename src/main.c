@@ -162,12 +162,14 @@ check_special_mailboxes(void)
 static void
 config_init(void)
 {
-    config_load();
-    if (check_special_mailboxes()) {
-	g_warning("*** Could not load basic mailboxes!\n");
-	balsa_init_begin();
-	/*return; */
-    }
+    do {
+	config_load();
+	if (check_special_mailboxes()) {
+	    g_warning("*** Could not load basic mailboxes!\n");
+	    balsa_init_begin();
+	    /*return; */
+	} else break;
+    } while(1);
 }
 
 static void

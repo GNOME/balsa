@@ -48,6 +48,9 @@ const gchar *pspell_suggest_modes[] = {
     "bad-spellers"
 };
 
+gchar * ask_password_real(LibBalsaServer *, LibBalsaMailbox *);
+gboolean check_mailbox_password(GNode *, gpointer);
+
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
@@ -58,7 +61,7 @@ handle_password(gchar * string, gchar ** target)
 }
 
 gchar *
-ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox)
+ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
     GtkWidget *dialog;
     gchar *prompt, *passwd = NULL;
@@ -84,6 +87,75 @@ ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox)
     
     return passwd;
 }
+
+gboolean
+check_mailbox_password(GNode *nd, gpointer data)
+{
+    LibBalsaServer *server;
+    LibBalsaServer *master;
+    LibBalsaMailbox *mbox;
+    BalsaMailboxNode *node;
+
+    /*
+     * What follows is a mixture of g_return_val_if_fail(), and
+     * if() return FALSE;  It uses the if()... return FALSE;
+     * constructs if the error is /expected/.
+     *
+     * I probably overdid it, but this way the code worked first time...
+     */
+    g_return_val_if_fail(node != NULL, FALSE);
+    node = (BalsaMailboxNode *)nd->data;
+    g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(node), FALSE);
+    mbox = node->mailbox;
+    g_return_val_if_fail(mbox != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
+
+    if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) return FALSE;
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
+    g_return_val_if_fail(server != NULL, FALSE);
+    g_return_val_if_fail(server->host != NULL, FALSE);
+    g_return_val_if_fail(server->user != NULL, FALSE);
+    if (server->passwd == NULL) return FALSE;
+
+    master = (LibBalsaServer *)data;
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(master), FALSE);
+    if (master == server) return FALSE;
+
+    g_return_val_if_fail(server->host != NULL, FALSE);
+    g_return_val_if_fail(server->user != NULL, FALSE);
+
+    if ((strcmp(server->host, master->host) == 0) &&
+	(strcmp(server->user, master->user) == 0)) {
+	g_free(master->passwd);
+	master->passwd = g_strdup(server->passwd);
+	return TRUE;
+    };
+    
+    return FALSE;
+}
+
+gchar *
+ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
+{
+    gchar *password;
+    
+    g_return_val_if_fail(server != NULL, NULL);
+
+    password = NULL;
+    if (mbox) {
+        g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_LEAFS,
+		-1, check_mailbox_password, server);
+	if (server->passwd != NULL) {
+	    password = server->passwd;
+	    server->passwd = NULL;
+	}
+    }
+    if (!password)
+	return ask_password_real(server, mbox);
+    else
+	return password;
+}
+
 
 void
 balsa_app_init(void)

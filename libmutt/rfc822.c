@@ -123,6 +123,10 @@ parse_comment (const char *s,
   return s;
 }
 
+/*
+ * BALSA: parse_quote in libmutt is believed to be broken.
+ *        Given '\abc' it returns '\bc' instead of 'abc'.
+ */
 static const char *
 parse_quote (const char *s, char *token, size_t *tokenlen, size_t tokenmax)
 {
@@ -138,6 +142,13 @@ parse_quote (const char *s, char *token, size_t *tokenlen, size_t tokenmax)
     {
       if (!*++s)
 	break;
+      /*
+       * BALSE: the 'else' part is new.
+       */
+      else {
+        (*tokenlen)--;
+        token[*tokenlen] = *s;
+      }
     }
     s++;
   }
@@ -529,7 +540,8 @@ void rfc822_write_address_single (char *buf, size_t buflen, ADDRESS *addr)
 {
   size_t len;
   char *pbuf = buf;
-  char *pc;
+  char *pc, *test;
+  int skip_last_quote;
   
   if (!addr)
     return;
@@ -565,14 +577,27 @@ void rfc822_write_address_single (char *buf, size_t buflen, ADDRESS *addr)
 	goto done;
       *pbuf++ = '"';
       buflen--;
-      for (pc = addr->personal; *pc && buflen > 0; pc++)
+      /*
+       * BALSA: we skip first and last quotes.
+       */
+      pc = addr->personal;
+      if ((*pc == '"') && (pc[strlen(pc) - 1] == '"')) {
+        pc++;
+        skip_last_quote = 1;
+      } else
+        skip_last_quote = 0;
+      for (; *pc && buflen > 0; pc++)
       {
 	if (*pc == '"' || *pc == '\\')
 	{
-	  if (!buflen)
-	    goto done;
-	  *pbuf++ = '\\';
-	  buflen--;
+          test = pc;
+          test++;
+          if ((*test) || (skip_last_quote == 0)) {
+            if (!buflen)
+              goto done;
+            *pbuf++ = '\\';
+            buflen--;
+          }
 	}
 	if (!buflen)
 	  goto done;
@@ -581,8 +606,10 @@ void rfc822_write_address_single (char *buf, size_t buflen, ADDRESS *addr)
       }
       if (!buflen)
 	goto done;
-      *pbuf++ = '"';
-      buflen--;
+      if (skip_last_quote == 0) {
+        *pbuf++ = '"';
+        buflen--;
+      }
     }
     else
     {

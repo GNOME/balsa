@@ -561,12 +561,8 @@ delete_handler(BalsaSendmsg* bsmsg)
 	reply = gtk_dialog_run(GTK_DIALOG(d));
         gtk_widget_destroy(d);
 	if(reply == GTK_RESPONSE_YES)
-	    if(!message_postpone(bsmsg)) {
-                balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                           LIBBALSA_INFORMATION_WARNING,
-                                           _("Could not postpone message."));
+	    if(!message_postpone(bsmsg))
                 reply = GTK_RESPONSE_CANCEL;
-            }
 	/* cancel action  when reply = "yes" or "no" */
 	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
     }
@@ -3240,7 +3236,7 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
     GtkWidget* info = 
         gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
                         "Please choose the charset used to encode the file.\n"
-			"(if unsure chose Generic UTF-8)"));
+			"(choose Generic UTF-8 if unsure)."));
     GtkListStore* store = gtk_list_store_new(N_COLUMNS,
                                              G_TYPE_STRING);
     GtkWidget* tree = 
@@ -3600,28 +3596,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     return message;
 }
 
-/* "send message" menu and toolbar callback.
- * FIXME: automatic charset detection, as libmutt does for strings?
- */
-static gint
-send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
+static gboolean
+is_charset_ok(BalsaSendmsg *bsmsg)
 {
-    LibBalsaMsgCreateResult result;
-    LibBalsaMessage *message;
-    LibBalsaMailbox *fcc;
-    gchar *tmp;
-    gchar *res;
-    GError *err = NULL;
+    gchar *tmp, *res;
     gsize bytes_read, bytes_written;
+    GError *err = NULL;
     GtkTextIter start, end;
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-
-    if (!is_ready_to_send(bsmsg))
-	return FALSE;
-
-    if (balsa_app.debug)
-	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     tmp = gtk_text_iter_get_text(&start, &end);
@@ -3640,6 +3623,26 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         g_error_free(err);
         return FALSE;
     }
+    return TRUE;
+}
+/* "send message" menu and toolbar callback.
+ * FIXME: automatic charset detection, as libmutt does for strings?
+ */
+static gint
+send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
+{
+    LibBalsaMsgCreateResult result;
+    LibBalsaMessage *message;
+    LibBalsaMailbox *fcc;
+
+    if (!is_ready_to_send(bsmsg))
+	return FALSE;
+
+    if (balsa_app.debug)
+	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
+
+    if(!is_charset_ok(bsmsg))
+        return FALSE;
 #ifdef HAVE_GPGME
     if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0 &&
         (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
@@ -3759,6 +3762,9 @@ message_postpone(BalsaSendmsg * bsmsg)
 {
     gboolean successp;
     LibBalsaMessage *message;
+
+    if(!is_charset_ok(bsmsg))
+        return FALSE;
     message = bsmsg2message(bsmsg);
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
@@ -3783,7 +3789,11 @@ message_postpone(BalsaSendmsg * bsmsg)
                                           TRUE);
 	    g_list_free(messages);
 	}
-    }
+    } else
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not postpone message."));
+
     g_object_unref(G_OBJECT(message));
     return successp;
 }
@@ -3795,10 +3805,6 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     if (is_ready_to_send(bsmsg)) {
         if(message_postpone(bsmsg))
             gtk_widget_destroy(bsmsg->window);
-        else
-            balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                       LIBBALSA_INFORMATION_WARNING,
-                                       _("Could not postpone message."));
     }
 }
 
@@ -3806,11 +3812,12 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    if (!message_postpone(bsmsg) ||
-        !libbalsa_mailbox_open(balsa_app.draftbox)) {
+    if (!message_postpone(bsmsg))
+        return;
+    if(!libbalsa_mailbox_open(balsa_app.draftbox)) {
 	balsa_information_parented(GTK_WINDOW(bsmsg->window),
 				   LIBBALSA_INFORMATION_WARNING,
-				   _("Could not save message."));
+				   _("Could not open draftbox."));
 	return;
     }
 

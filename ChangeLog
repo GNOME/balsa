@@ -1,3 +1,9 @@
+2004-04-29  Pawel Salek
+
+	* configure.in: INTLTOOL needed for FC2.
+	* src/sendmsg-window.c: postpone messages very carefully.
+	* bootstrap.sh: cheap autogen.sh replacement.
+
 2004-04-27 11:07  PeterB
 
 	* libbalsa/rfc3156.c: build --with-gpgme --disable-threads.

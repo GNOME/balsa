@@ -581,7 +581,7 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
         /* If this is the last notebook page clear the message preview */
         page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
         if (page == NULL)
-            balsa_message_clear (window->preview);
+            balsa_message_clear (BALSA_MESSAGE( window->preview ));
       }
 }
 

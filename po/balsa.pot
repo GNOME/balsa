@@ -1,0 +1,481 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 1998-11-10 20:01-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: src/balsa-index.c:265
+msgid "From"
+msgstr ""
+
+#: src/balsa-index.c:266
+msgid "Subject"
+msgstr ""
+
+#: src/balsa-index.c:267
+msgid "Date"
+msgstr ""
+
+#: src/balsa-init.c:110
+msgid "Welcome To Balsa!"
+msgstr ""
+
+#: src/balsa-init.c:193
+msgid ""
+"Welcome to Balsa!\n"
+"\n"
+msgstr ""
+
+#: src/balsa-init.c:195
+msgid "You seem to be running Balsa for the first time.\n"
+msgstr ""
+
+#: src/balsa-init.c:196
+msgid ""
+"The following steps will setup Balsa by asking a few simple questions.  "
+msgstr ""
+
+#: src/balsa-init.c:197
+msgid ""
+"Once you have completed these steps, you can always change them at a later "
+"time through Balsa's preferences.  "
+msgstr ""
+
+#: src/balsa-init.c:198
+msgid ""
+"Please check the about box in Balsa's main window for more information on "
+"contacting the authors or reporting bugs."
+msgstr ""
+
+#. your name
+#: src/balsa-init.c:247 src/pref-manager.c:366
+msgid "Your name:"
+msgstr ""
+
+#. email address
+#: src/balsa-init.c:261 src/pref-manager.c:376
+msgid "E-Mail address:"
+msgstr ""
+
+#. smtp server
+#: src/balsa-init.c:276
+msgid "SMTP server:"
+msgstr ""
+
+#: src/balsa-init.c:331
+msgid "Inbox Path:"
+msgstr ""
+
+#: src/balsa-init.c:345
+msgid "Outbox Path:"
+msgstr ""
+
+#: src/balsa-init.c:357
+msgid "Trash Path:"
+msgstr ""
+
+#: src/balsa-init.c:368
+msgid ""
+"If you wish to use IMAP for these\n"
+"please change them inside Balsa\n"
+msgstr ""
+
+#: src/balsa-init.c:533
+msgid "Finish"
+msgstr ""
+
+#: src/balsa-message.c:163 src/balsa-message.c:166
+msgid "Save MIME Part"
+msgstr ""
+
+#: src/balsa-message.c:164
+msgid "Save"
+msgstr ""
+
+#: src/balsa-message.c:164 src/mailbox-conf.c:481 src/sendmsg-window.c:109
+#: src/sendmsg-window.c:207
+msgid "Cancel"
+msgstr ""
+
+#: src/balsa-message.c:217 src/balsa-message.c:232
+#, c-format
+msgid " Open of %s failed:%s "
+msgstr ""
+
+#: src/balsa-message.c:218 src/balsa-message.c:233
+msgid "Ok"
+msgstr ""
+
+#: src/index-child.c:127
+msgid "Mailbox password:"
+msgstr ""
+
+#: src/index-child.c:159
+msgid "Unable to Open Mailbox!"
+msgstr ""
+
+#: src/index-child.c:335
+msgid "Transfer"
+msgstr ""
+
+#: src/index-child.c:355
+msgid "Change Status"
+msgstr ""
+
+#: src/index-child.c:358
+msgid "Unread"
+msgstr ""
+
+#: src/index-child.c:364
+msgid "Read"
+msgstr ""
+
+#: src/index-child.c:370
+msgid "Replied"
+msgstr ""
+
+#: src/index-child.c:376
+msgid "Forwarded"
+msgstr ""
+
+#: src/index-child.c:385 src/main-window.c:284 src/main-window.c:419
+msgid "Delete"
+msgstr ""
+
+#: src/index-child.c:393 src/main-window.c:289
+msgid "Undelete"
+msgstr ""
+
+#: src/local-mailbox.c:137
+#, c-format
+msgid "Local Mailbox Loaded as: %s\n"
+msgstr ""
+
+#: src/mailbox-conf.c:160
+msgid ""
+"This will remove the mailbox and it's files permanently from your system.\n"
+"Are you sure you want to remove this mailbox?"
+msgstr ""
+
+#: src/mailbox-conf.c:165
+msgid ""
+"This will remove the mailbox from the list of mailboxes\n"
+"You may use \"Add Mailbox\" later to access this mailbox again\n"
+"Are you sure you want to remove this mailbox?"
+msgstr ""
+
+#: src/mailbox-conf.c:237
+msgid "Mailbox Configurator"
+msgstr ""
+
+#: src/mailbox-conf.c:280 src/mailbox-conf.c:866
+msgid "Add"
+msgstr ""
+
+#: src/mailbox-conf.c:289
+msgid "Update"
+msgstr ""
+
+#: src/mailbox-conf.c:480
+#, c-format
+msgid "Cannot create mailbox '%s': %s\n"
+msgstr ""
+
+#: src/mailbox-conf.c:618
+msgid "New mailbox type:"
+msgstr ""
+
+#. radio buttons
+#. local mailbox
+#: src/mailbox-conf.c:624
+msgid "Local mailbox"
+msgstr ""
+
+#: src/mailbox-conf.c:632
+msgid "IMAP server"
+msgstr ""
+
+#: src/main-window.c:143
+msgid "Mailboxes/<Separator>"
+msgstr ""
+
+#: src/main-window.c:237
+msgid "Get New Mail"
+msgstr ""
+
+#: src/main-window.c:245
+msgid "Exit"
+msgstr ""
+
+#: src/main-window.c:251
+msgid "File"
+msgstr ""
+
+#: src/main-window.c:261
+msgid "New"
+msgstr ""
+
+#: src/main-window.c:266 src/main-window.c:444 src/main-window.c:445
+msgid "Reply"
+msgstr ""
+
+#: src/main-window.c:271 src/main-window.c:454 src/main-window.c:455
+msgid "Reply to all"
+msgstr ""
+
+#: src/main-window.c:276 src/main-window.c:464 src/main-window.c:465
+msgid "Forward"
+msgstr ""
+
+#: src/main-window.c:294 src/sendmsg-window.c:217
+msgid "Message"
+msgstr ""
+
+#: src/main-window.c:304
+msgid "Mailbox List"
+msgstr ""
+
+#: src/main-window.c:312
+msgid "Open..."
+msgstr ""
+
+#: src/main-window.c:337
+msgid "Close"
+msgstr ""
+
+#: src/main-window.c:344
+msgid "Mailboxes"
+msgstr ""
+
+#: src/main-window.c:352
+msgid "Filters..."
+msgstr ""
+
+#: src/main-window.c:356
+msgid "Preferences..."
+msgstr ""
+
+#: src/main-window.c:360
+msgid "Settings"
+msgstr ""
+
+#: src/main-window.c:368
+msgid "About"
+msgstr ""
+
+#: src/main-window.c:373 src/sendmsg-window.c:258
+msgid "Help"
+msgstr ""
+
+#: src/main-window.c:405
+msgid "Check"
+msgstr ""
+
+#: src/main-window.c:406
+msgid "Check Email"
+msgstr ""
+
+#: src/main-window.c:420
+msgid "Delete Message"
+msgstr ""
+
+#: src/main-window.c:433
+msgid "Compose"
+msgstr ""
+
+#: src/main-window.c:434
+msgid "Compose Message"
+msgstr ""
+
+#: src/main-window.c:478
+msgid "Previous"
+msgstr ""
+
+#: src/main-window.c:479
+msgid "Open Previous Message"
+msgstr ""
+
+#: src/main-window.c:489
+msgid "Next"
+msgstr ""
+
+#: src/main-window.c:490
+msgid "Open Next Message"
+msgstr ""
+
+#: src/main-window.c:504 src/sendmsg-window.c:100
+msgid "Print"
+msgstr ""
+
+#: src/main-window.c:505
+msgid "Print current message"
+msgstr ""
+
+#: src/main-window.c:545
+msgid ""
+"The Balsa email client is part of the GNOME desktop environment.  "
+"Information on Balsa can be found at http://www.balsa.net/\n"
+"\n"
+"If you need to report bugs, please do so at: "
+"http://www.gnome.org/cgi-bin/bugs"
+msgstr ""
+
+#: src/mblist-window.c:316
+msgid "Add Mailbox"
+msgstr ""
+
+#: src/mblist-window.c:322
+msgid "Edit Mailbox"
+msgstr ""
+
+#: src/mblist-window.c:328
+msgid "Delete Mailbox"
+msgstr ""
+
+#. identity page
+#: src/pref-manager.c:139
+msgid "Identity"
+msgstr ""
+
+#. mailboxes page
+#: src/pref-manager.c:146
+msgid "Mail Servers"
+msgstr ""
+
+#. display page
+#: src/pref-manager.c:153
+msgid "Display"
+msgstr ""
+
+#. Misc page
+#: src/pref-manager.c:160
+msgid "Misc"
+msgstr ""
+
+#. reply-to address
+#: src/pref-manager.c:386
+msgid "Reply-to address:"
+msgstr ""
+
+#. signature
+#: src/pref-manager.c:396
+msgid "Signature:"
+msgstr ""
+
+#: src/pref-manager.c:466
+msgid "Local mail directory:"
+msgstr ""
+
+#: src/pref-manager.c:478
+msgid "SMTP Server:"
+msgstr ""
+
+#. Toolbars
+#: src/pref-manager.c:502
+msgid "Toolbars"
+msgstr ""
+
+#: src/pref-manager.c:522
+msgid "Use preview pane"
+msgstr ""
+
+#. MDI
+#: src/pref-manager.c:526
+msgid "MDI"
+msgstr ""
+
+#: src/pref-manager.c:568
+msgid "Debug"
+msgstr ""
+
+#: src/pref-manager.c:575
+msgid "Reply prefix:"
+msgstr ""
+
+#: src/sendmsg-window.c:73 src/sendmsg-window.c:180
+msgid "Send"
+msgstr ""
+
+#: src/sendmsg-window.c:73
+msgid "Send this mail"
+msgstr ""
+
+#: src/sendmsg-window.c:82
+msgid "Attach"
+msgstr ""
+
+#: src/sendmsg-window.c:82
+msgid "Add attachments to this message"
+msgstr ""
+
+#: src/sendmsg-window.c:91
+msgid "Spelling"
+msgstr ""
+
+#: src/sendmsg-window.c:91
+msgid "Check Spelling"
+msgstr ""
+
+#: src/sendmsg-window.c:147
+msgid "Remove"
+msgstr ""
+
+#: src/sendmsg-window.c:192
+msgid "Attach File"
+msgstr ""
+
+#: src/sendmsg-window.c:224
+msgid "Cut"
+msgstr ""
+
+#: src/sendmsg-window.c:231
+msgid "Copy"
+msgstr ""
+
+#: src/sendmsg-window.c:238
+msgid "Paste"
+msgstr ""
+
+#: src/sendmsg-window.c:245
+msgid "Edit"
+msgstr ""
+
+#: src/sendmsg-window.c:253
+msgid "Contents"
+msgstr ""
+
+#: src/sendmsg-window.c:312
+msgid "Attach file"
+msgstr ""
+
+#: src/sendmsg-window.c:513
+msgid "Reply to "
+msgstr ""
+
+#: src/sendmsg-window.c:518
+msgid "Forward message"
+msgstr ""
+
+#: src/sendmsg-window.c:523
+msgid "New message"
+msgstr ""
+
+#: libbalsa/mailbox.c:448
+#, c-format
+msgid "Mailbox: Opening %s Refcount: %d\n"
+msgstr ""
+
+#: libbalsa/mailbox.c:478
+#, c-format
+msgid "Mailbox: Closing %s Refcount: %d\n"
+msgstr ""

@@ -234,7 +234,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   /* FILE Menu */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Get New Mail"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("_Get New Mail"));
   gtk_widget_add_accelerator (w, "activate", accel, 'M', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) check_new_messages_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
@@ -242,13 +242,13 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   w = gtk_menu_item_new ();
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("Exit"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("E_xit"));
   gtk_widget_add_accelerator (w, "activate", accel, 'Q', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) close_main_window, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
 
-  w = gtk_menu_item_new_with_label (_ ("File"));
+  w = gtk_menu_item_new_with_label (_ ("_File"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
@@ -258,22 +258,22 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   /* MESSAGE Menu */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL, _ ("New"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL, _ ("_New"));
   gtk_widget_add_accelerator (w, "activate", accel, 'M', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) new_message_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("_Reply"));
   gtk_widget_add_accelerator (w, "activate", accel, 'R', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) replyto_message_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply to all"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply to _all"));
   gtk_widget_add_accelerator (w, "activate", accel, 'A', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) replytoall_message_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("Forward"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_FWD, _ ("_Forward"));
   gtk_widget_add_accelerator (w, "activate", accel, 'F', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) forward_message_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
@@ -281,17 +281,17 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   w = gtk_menu_item_new ();
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("Delete"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_TRASH, _ ("_Delete"));
   gtk_widget_add_accelerator (w, "activate", accel, 'D', 0, GTK_ACCEL_VISIBLE);
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) delete_message_cb, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("Undelete"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_UNDELETE, _ ("_Undelete"));
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) undelete_message_cb, NULL);
   gtk_widget_add_accelerator (w, "activate", accel, 'U', 0, GTK_ACCEL_VISIBLE);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gtk_menu_item_new_with_label (_ ("Message"));
+  w = gtk_menu_item_new_with_label (_ ("_Message"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
@@ -301,7 +301,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 /* Mailbox list */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Mailbox List"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Mailbox List"));
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) mblist_window_cb, NULL);
   gtk_widget_add_accelerator (w, "activate", accel, 'C', 0, GTK_ACCEL_VISIBLE);
   gtk_menu_append (GTK_MENU (menu), w);
@@ -309,7 +309,7 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
  * :)
  */
 #if 0
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Open..."));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Open..."));
   {
     GtkWidget *submenu;
     GtkWidget *smenuitem;
@@ -334,14 +334,14 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
   gtk_menu_append (GTK_MENU (menu), w);
 #endif
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("Close"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_CLOSE, _ ("_Close"));
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) mailbox_close_child, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
   w = gtk_menu_item_new ();
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gtk_menu_item_new_with_label (_ ("Mailboxes"));
+  w = gtk_menu_item_new_with_label (_ ("_Mailboxes"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
@@ -349,15 +349,15 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 /* Settings Menu */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Filters..."));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Filters..."));
   gtk_signal_connect (GTK_OBJECT (w), "activate", GTK_SIGNAL_FUNC (filter_dlg_cb), NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Preferences..."));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("_Preferences..."));
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) open_preferences_manager, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
-  w = gtk_menu_item_new_with_label (_ ("Settings"));
+  w = gtk_menu_item_new_with_label (_ ("_Settings"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
@@ -365,15 +365,14 @@ create_menu (GnomeMDI * mdi, GtkWidget * app)
 /* Help Menu */
   menu = gtk_menu_new ();
 
-  w = gnome_stock_menu_item (GNOME_STOCK_MENU_ABOUT, _ ("About"));
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_ABOUT, _ ("_About"));
   gtk_signal_connect (GTK_OBJECT (w), "activate", (GtkSignalFunc) show_about_box, NULL);
   gtk_menu_append (GTK_MENU (menu), w);
 
 
-  w = gtk_menu_item_new_with_label (_ ("Help"));
+  w = gtk_menu_item_new_with_label (_ ("_Help"));
   gtk_widget_show (w);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (w), menu);
-  gtk_menu_item_right_justify (GTK_MENU_ITEM (w));
   gtk_menu_bar_append (GTK_MENU_BAR (menubar), w);
 
   gtk_window_add_accel_group (GTK_WINDOW (app), accel);

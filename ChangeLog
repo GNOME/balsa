@@ -1,3 +1,8 @@
+1998-11-18  Richard Hestilow  <hestgray@ionet.net>
+
+	* src/main-window.c: Added underscore accelerators, no longer right
+	justify "Help" menu either.
+
 1998-09-23  Michael Lausch  <mla@gams.at>
 
 	*  libbalse/mime.c (Mailbox): reorganized the translation of MIME 

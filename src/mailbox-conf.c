@@ -326,9 +326,9 @@ balsa_server_conf_get_tls_mode(BalsaServerConf *bsc)
 {
 #if GTK_CHECK_VERSION(2, 4, 0)
     struct mailbox_conf_combo_box_info *info =
-        g_object_get_data(G_OBJECT(bsc->tls_mode),
+        g_object_get_data(G_OBJECT(bsc->tls_option),
                           BALSA_MC_COMBO_BOX_INFO);
-    gint active = gtk_combo_box_get_active(GTK_COMBO_BOX(bsc->tls_mode));
+    gint active = gtk_combo_box_get_active(GTK_COMBO_BOX(bsc->tls_option));
 
     return (LibBalsaTlsMode)
         GPOINTER_TO_INT(g_slist_nth_data(info->tags, active));

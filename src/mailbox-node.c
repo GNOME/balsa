@@ -1078,7 +1078,7 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 		LIBBALSA_MAILBOX(libbalsa_mailbox_maildir_new(path, FALSE));
 	} else {
 	    /* type is not a valid local mailbox type. */
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
+	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
 			      _("The path \"%s\" does not lead to a mailbox."),
 			      path);
 	    mailbox = NULL;

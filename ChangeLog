@@ -1,3 +1,8 @@
+2004-11-08  Pawel Salek
+
+	* src/mailbox-conf.c: do not crash on POP3 mailbox update.
+	* src/mailbox-node.c: do not complain loudly on finding non-mailboxes.
+
 2004-11-07  Pawel Salek
 
 	* libbalsa/address-book-{extern,gpe,ldap}.c: fix crashes in ::complete.

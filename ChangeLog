@@ -1,5 +1,9 @@
 2000-10-01  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/message.c: libbalsa_message_move,
+	libbalsa_message_copy, add errro checking and reporting if source
+	and/or destination mailboxes are not writable. Fixes bug #18348.
+
 	* src/sendmsg-window.c: Include locale.h. Fixes solaris build.
 
 2000-09-29  Pawel Salek  <pawsa@theochem.kth.se>

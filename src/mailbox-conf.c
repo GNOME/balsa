@@ -86,9 +86,7 @@ struct _MailboxConfWindow {
             GtkWidget *remember;
 	    GtkWidget *password;
 	    GtkWidget *folderpath;
-#ifdef USE_SSL
-	    GtkWidget *use_ssl;
-#endif
+            BalsaServerConf bsc;
 	} imap;
 
 	/* for pop3 mailboxes */
@@ -98,14 +96,10 @@ struct _MailboxConfWindow {
 	    GtkWidget *password;
 	    GtkWidget *check;
 	    GtkWidget *delete_from_server;
-	    GtkWidget *disable_apop; /* on servers that should support it */
+            BalsaServerConf bsc;
+            GtkWidget *disable_apop;
 	    GtkWidget *filter;
 	    GtkWidget *filter_cmd;
-#ifdef USE_SSL
-#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
-	    GtkWidget *use_ssl;
-#endif
-#endif
 	} pop3;
     } mb_data;
 };
@@ -131,48 +125,125 @@ static GtkWidget *create_local_mailbox_page(MailboxConfWindow *mcw);
 static GtkWidget *create_pop_mailbox_page(MailboxConfWindow *mcw);
 static GtkWidget *create_imap_mailbox_page(MailboxConfWindow *mcw);
 
-#if 0
-void mailbox_conf_edit_imap_server(GtkWidget * widget, gpointer data);
-#endif
-
-
-#ifdef USE_SSL
-static void imap_use_ssl_cb(GtkToggleButton* w, MailboxConfWindow * mcw);
-
-static void
-imap_use_ssl_cb(GtkToggleButton * button, MailboxConfWindow * mcw)
+/* ========================================================= */
+/* BEGIN BalsaServerConf =================================== */
+struct menu_data {
+    const char *label;
+    int tag;
+};
+static GtkWidget*
+get_combo_menu(unsigned cnt, const struct menu_data *data)
 {
-    char *colon, *newhost;
-    const gchar* host = 
-        gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.server));
-    gchar* port = gtk_toggle_button_get_active(button) ? "993" : "143";
-
-    if( (colon=strchr(host,':')) != NULL) 
-        *colon = '\0';
-    newhost = g_strconcat(host, ":", port, NULL);
-    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.server), newhost);
-    g_free(newhost);
+    GtkWidget *menu       = gtk_menu_new();
+    unsigned i;
+    for(i=0; i<cnt; i++) {
+        GtkWidget *menu_item =
+            gtk_menu_item_new_with_label(_(data[i].label));
+        g_object_set_data(G_OBJECT(menu_item), "balsa-data",
+                          GINT_TO_POINTER(data[i].tag));
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+    }
+    gtk_widget_show_all(menu);
+    return menu;
 }
 
-#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
-static void pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
-
 static void
-pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
+bsc_ssl_toggled_cb(GtkWidget * widget, BalsaServerConf *bsc)
 {
-    char *colon, *newhost;
-    const gchar* host = gtk_editable_get_text(mcw->mb_data.pop3.host);
-    GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl);
-    gchar* port = gtk_toggle_button_get_active(button) ? "995" : "110";
-
-    if( (colon=strchr(text,':')) != NULL) 
-        *colon = '\0';
-    newhost = g_strconcat(host, ":", port);
-    gtk_editable_set_text(mcw->mb_data.pop3.host, newhost);
-    g_free(newhost);
+    gboolean newstate =
+        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+    gtk_widget_set_sensitive(bsc->tls_option, newstate);
 }
-#endif
-#endif
+
+GtkWidget*
+balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
+                                      int extra_rows)
+{
+    static const struct menu_data tls_menu[] = {
+        { N_("Never"),       LIBBALSA_TLS_DISABLED },
+        { N_("If Possible"), LIBBALSA_TLS_ENABLED  },
+        { N_("Required"),    LIBBALSA_TLS_REQUIRED }
+    };
+    GtkWidget *label;
+    gboolean use_ssl = s && s->use_ssl;
+
+    bsc->table = GTK_TABLE(gtk_table_new(3+extra_rows, 2, FALSE));
+    bsc->used_rows = 0;
+
+    bsc->use_ssl = balsa_server_conf_add_checkbox(bsc, _("Use _SSL"));
+    if(use_ssl)
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bsc->use_ssl), TRUE);
+
+    label = gtk_label_new_with_mnemonic(_("Use _TLS"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_table_attach(bsc->table, label, 0, 1, 1, 2,
+		     GTK_FILL, GTK_FILL, 0, 0);
+
+    bsc->tls_option = gtk_option_menu_new ();
+    bsc->tls_mode = get_combo_menu(ELEMENTS(tls_menu), tls_menu);
+    gtk_option_menu_set_menu (GTK_OPTION_MENU(bsc->tls_option),
+			      bsc->tls_mode);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (bsc->tls_option),
+				 s ? s->tls_mode : LIBBALSA_TLS_ENABLED);
+    gtk_table_attach(bsc->table, bsc->tls_option, 1, 2, 1, 2,
+		     GTK_FILL, GTK_FILL, 5, 5);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), bsc->tls_option);
+
+    g_signal_connect(G_OBJECT (bsc->use_ssl), "toggled",
+                     G_CALLBACK (bsc_ssl_toggled_cb), bsc);
+    gtk_widget_show_all(GTK_WIDGET(bsc->table));
+    bsc->used_rows = 2;
+    gtk_widget_set_sensitive(bsc->tls_option, !use_ssl);
+    return (GtkWidget*)bsc->table;
+}
+
+GtkWidget*
+balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
+                               const char *label)
+{
+    GtkWidget *checkbox;
+    GtkWidget *lbl = gtk_label_new_with_mnemonic(label);
+    gtk_misc_set_alignment(GTK_MISC(lbl), 1.0, 0.5);
+    gtk_table_attach(bsc->table, lbl, 0, 1,
+                     bsc->used_rows, bsc->used_rows+1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+    checkbox = gtk_check_button_new();
+    gtk_table_attach(bsc->table, checkbox, 1, 2,
+                     bsc->used_rows, bsc->used_rows+1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), checkbox);
+    return checkbox;
+}
+
+void
+balsa_server_conf_set_values(BalsaServerConf *bsc, LibBalsaServer *server)
+{
+    g_return_if_fail(server);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bsc->use_ssl), 
+                                 server->use_ssl);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (bsc->tls_option),
+				 server->tls_mode);
+    gtk_widget_set_sensitive(bsc->tls_option, !server->use_ssl);
+}
+
+
+gboolean
+balsa_server_conf_get_use_ssl(BalsaServerConf *bsc)
+{
+    return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->use_ssl));
+}
+
+LibBalsaTlsMode
+balsa_server_conf_get_tls_mode(BalsaServerConf *bsc)
+{
+    GtkWidget *menu_item = gtk_menu_get_active(GTK_MENU(bsc->tls_mode));
+    return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menu_item),
+                                             "balsa-data"));
+}
+
+/* END BalsaServerConf ===================================== */
+/* ========================================================= */
 
 static void
 pop3_enable_filter_cb(GtkWidget * w, MailboxConfWindow * mcw)
@@ -518,13 +589,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	if (server->passwd)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password),
 			       server->passwd);
-#ifdef USE_SSL
-#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl),
-				     server->use_ssl);
-#endif
-#endif
-
+        balsa_server_conf_set_values(&mcw->mb_data.pop3.bsc, server);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop),
 				     pop3->disable_apop);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check),
@@ -564,11 +629,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	if (path)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),
 			       path);
-#ifdef USE_SSL
-	gtk_toggle_button_set_active
-	    (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl),
-	     server->use_ssl);
-#endif
+        balsa_server_conf_set_values(&mcw->mb_data.imap.bsc, server);
         if(!server->remember_passwd)
             gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
                                      FALSE);
@@ -638,30 +699,26 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 {
     LibBalsaMailboxPop3 * mailbox;
     const gchar *cmd;
-
+    LibBalsaServer *server;
     mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
 
     g_free(LIBBALSA_MAILBOX(mailbox)->name);
     LIBBALSA_MAILBOX(mailbox)->name =
 	g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)));
 
-    libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    libbalsa_server_set_username(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.pop3.username)));
-    libbalsa_server_set_password(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+    libbalsa_server_set_password(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.pop3.password)));
-    libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+    libbalsa_server_set_host(server,
 			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.pop3.server))
-#ifdef USE_SSL
-#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
-			     , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl))
-#else
-			     , FALSE
-#endif
-#endif
-);
+						(mcw->mb_data.pop3.server)),
+                             balsa_server_conf_get_use_ssl
+                             (&mcw->mb_data.pop3.bsc));
+    server->tls_mode = balsa_server_conf_get_tls_mode(&mcw->mb_data.pop3.bsc);
     mailbox->check =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
     mailbox->disable_apop =
@@ -703,11 +760,10 @@ update_imap_mailbox(MailboxConfWindow *mcw)
                                                        mb_data.imap.remember));
     libbalsa_server_set_host(server,
 			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.imap.server))
-#ifdef USE_SSL
-			     , gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl))
-#endif
-);
+						(mcw->mb_data.imap.server)),
+                             balsa_server_conf_get_use_ssl
+                             (&mcw->mb_data.imap.bsc));
+    server->tls_mode = balsa_server_conf_get_tls_mode(&mcw->mb_data.imap.bsc);
     libbalsa_server_set_password(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.password)));
@@ -927,9 +983,12 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
 static GtkWidget *
 create_pop_mailbox_page(MailboxConfWindow *mcw)
 {
-    GtkWidget *table, *label;
+    GtkWidget *notebook, *table, *label, *advanced;
 
+    notebook = gtk_notebook_new();
     table = gtk_table_new(9, 2, FALSE);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
+                             gtk_label_new_with_mnemonic(_("_Basic")));
 
     /* mailbox name */
     label = create_label(_("Mailbox _Name:"), table, 0);
@@ -940,7 +999,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     label = create_label(_("_Server:"), table, 1);
     mcw->mb_data.pop3.server = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
-				     mcw, 1, "localhost:110", label);
+				     mcw, 1, "localhost", label);
 
 
     /* username  */
@@ -954,11 +1013,6 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.password = create_entry(mcw->window, table, 
 					      NULL, NULL, 4, NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.pop3.password), FALSE);
-
-    /* toggle for apop */
-    mcw->mb_data.pop3.disable_apop = 
-	create_check(mcw->window, _("Disable _APOP"), table, 5,
-		     FALSE);
 
     /* toggle for deletion from server */
     mcw->mb_data.pop3.delete_from_server = 
@@ -983,21 +1037,20 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 	create_check(mcw->window, _("_Enable check for new mail"), 
 		     table, 9, TRUE);
 
-#ifdef USE_SSL_FOR_POP3_IF_WE_EVER_DECIDE_WE_NEED_TO
-    /*
-     * chbm: we don't do pop3s. i did all the necessary config stuff 
-     * and then realized libbalsa/pop3.c can't use libmutt/ stuff
-     */
-    /* toggle for ssl */
-    mcw->mb_data.pop3.use_ssl = 
-	create_check(mcw->window, _("Use SS_L (pop3s)"), 
-		     table, 9, FALSE);
-    g_signal_connect(G_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", 
-                     G_CALLBACK(pop3_use_ssl_cb), mcw);
-#endif
+    advanced =
+        balsa_server_conf_get_advanced_widget(&mcw->mb_data.pop3.bsc,
+                                              NULL, 1);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
+                             gtk_label_new_with_mnemonic(_("_Advanced")));
+    /* toggle for apop */
+    mcw->mb_data.pop3.disable_apop = 
+        balsa_server_conf_add_checkbox(&mcw->mb_data.pop3.bsc,
+                                       _("Disable _APOP"));
 
+    gtk_widget_show_all(notebook);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
     gtk_widget_grab_focus(mcw->mailbox_name);
-    return table;
+    return notebook;
 }
 
 static void
@@ -1022,7 +1075,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     GtkWidget *entry;
     gint row = -1;
 
-    table = gtk_table_new(8, 2, FALSE);
+    table = gtk_table_new(7, 2, FALSE);
 
     /* mailbox name */
     label = create_label(_("Mailbox _Name:"), table, ++row);
@@ -1080,14 +1133,6 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
-
-#ifdef USE_SSL
-    /* toggle for SSL */
-    mcw->mb_data.imap.use_ssl = 
-        create_check(mcw->window, _("Use SS_L (IMAPS)"), table, ++row, FALSE);
-    g_signal_connect(G_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
-                     G_CALLBACK(imap_use_ssl_cb), mcw);
-#endif
 
     mcw->view_info = mailbox_conf_view_new(mcw->mailbox,
                                            GTK_WINDOW(mcw->window),

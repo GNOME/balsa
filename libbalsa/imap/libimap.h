@@ -42,6 +42,12 @@ typedef enum {
   IMAP_SELECT_FAILED /* SELECT command failed */
 } ImapResult;
 
+typedef enum {
+  IMAP_TLS_DISABLED,
+  IMAP_TLS_ENABLED,
+  IMAP_TLS_REQUIRED
+} ImapTlsMode;
+
 typedef enum { 
   IMLIST_MARKED = 0,
   IMLIST_UNMARKED,

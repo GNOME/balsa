@@ -92,7 +92,6 @@ typedef enum {
 } ImapFetchType;
 
 typedef struct _ImapMboxHandleClass ImapMboxHandleClass;
-
 typedef void (*LBIResponseCallback)(ImapMboxHandle *h, const char* response,
                                     void *data);
 
@@ -126,7 +125,7 @@ ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst,
                                     int over_ssl);
 ImapResult imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                       gboolean *readonly);
-unsigned imap_mbox_handle_require_tls(ImapMboxHandle* r, unsigned state);
+ImapTlsMode imap_handle_set_tls_mode(ImapMboxHandle *h, ImapTlsMode option);
 
 /* int below is a boolean */
 int      imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);

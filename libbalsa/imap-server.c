@@ -267,6 +267,7 @@ lb_imap_server_info_new(LibBalsaServer *server)
 {
     ImapMboxHandle *handle;
     struct handle_info *info;
+    ImapTlsMode mode;
 
     /* We do not ask for password now since the authentication might
      * not require it. Instead, we handle authentication requiests in
@@ -278,7 +279,13 @@ lb_imap_server_info_new(LibBalsaServer *server)
     imap_handle_set_monitorcb(handle, monitor_cb, info);
     imap_handle_set_infocb(handle,    is_info_cb, server);
     imap_handle_set_usercb(handle,    libbalsa_server_user_cb, server);
-
+    switch(server->tls_mode) {
+    case LIBBALSA_TLS_DISABLED: mode = IMAP_TLS_DISABLED; break;
+    default:
+    case LIBBALSA_TLS_ENABLED : mode = IMAP_TLS_ENABLED;  break;
+    case LIBBALSA_TLS_REQUIRED: mode = IMAP_TLS_REQUIRED; break;
+    }
+    imap_handle_set_tls_mode(handle, mode);
     return info;
 }
 
@@ -433,11 +440,9 @@ LibBalsaImapServer* libbalsa_imap_server_new_from_config(void)
         server->user = tmp_server.user;
         server->host = tmp_server.host;
     }
-#ifdef USE_SSL
-    server->use_ssl |= gnome_config_get_bool_with_default("SSL", &d);
-    if (d)
-        tmp_server.use_ssl |= FALSE;
-#endif
+    server->use_ssl |= gnome_config_get_bool("SSL=false");
+    server->tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
+    if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
     if (!server->passwd) {
         server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
         if(server->remember_passwd)

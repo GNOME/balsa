@@ -45,11 +45,8 @@ static void libbalsa_server_real_set_username(LibBalsaServer * server,
 static void libbalsa_server_real_set_password(LibBalsaServer * server,
 					      const gchar * passwd);
 static void libbalsa_server_real_set_host(LibBalsaServer * server,
-					  const gchar * host
-#ifdef USE_SSL
-					  ,gboolean use_ssl
-#endif
-					  );
+					  const gchar * host,
+                                          gboolean use_ssl);
 /* static gchar* libbalsa_server_real_get_password(LibBalsaServer *server); */
 
 enum {
@@ -126,16 +123,9 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 		     G_STRUCT_OFFSET(LibBalsaServerClass,
                                      set_host),
                      NULL, NULL,
-#ifdef USE_SSL
                      libbalsa_VOID__POINTER_INT,
                      G_TYPE_NONE, 2,
-                     G_TYPE_POINTER, G_TYPE_INT
-#else
-                     g_cclosure_marshal_VOID__POINTER,
-                     G_TYPE_NONE, 1,
-                     G_TYPE_POINTER
-#endif
-                     );
+                     G_TYPE_POINTER, G_TYPE_INT);
 
 
     libbalsa_server_signals[GET_PASSWORD] =
@@ -162,9 +152,8 @@ libbalsa_server_init(LibBalsaServer * server)
     server->user = NULL;
     server->passwd = NULL;
     server->remember_passwd = TRUE;
-#ifdef USE_SSL
-    server->use_ssl        = FALSE;
-#endif
+    server->use_ssl         = FALSE;
+    server->tls_mode        = LIBBALSA_TLS_ENABLED;
 }
 
 /* leave object in sane state (NULLified fields) */
@@ -219,21 +208,14 @@ libbalsa_server_set_password(LibBalsaServer * server, const gchar * passwd)
 }
 
 void
-libbalsa_server_set_host(LibBalsaServer * server, const gchar * host
-#ifdef USE_SSL
-			 , gboolean use_ssl
-#endif
-)
+libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
+                         gboolean use_ssl)
 {
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_signal_emit(G_OBJECT(server), libbalsa_server_signals[SET_HOST],
-		  0, host
-#ifdef USE_SSL
-		  , use_ssl
-#endif
-		  );
+		  0, host, use_ssl);
 
 }
 
@@ -274,19 +256,14 @@ libbalsa_server_real_set_password(LibBalsaServer * server,
 }
 
 static void
-libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host
-#ifdef USE_SSL
-			      , gboolean use_ssl
-#endif
-			      )
+libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
+                              gboolean use_ssl)
 {
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_free(server->host);
     server->host = g_strdup(host);
-#ifdef USE_SSL
     server->use_ssl = use_ssl;
-#endif 
 }
 
 
@@ -321,11 +298,10 @@ libbalsa_server_load_config(LibBalsaServer * server)
             server->host = newhost;
         }
     }       
-#ifdef USE_SSL
-    server->use_ssl = gnome_config_get_bool_with_default("SSL", &d);
-    if (d)
-	server->use_ssl = FALSE;
-#endif
+    server->use_ssl = gnome_config_get_bool("SSL=false");
+    d=0;
+    server->tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
+    if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
     server->user = gnome_config_private_get_string("Username");
     server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
     if(server->remember_passwd)
@@ -364,9 +340,8 @@ libbalsa_server_save_config(LibBalsaServer * server)
 	gnome_config_private_set_string("Password", buff);
 	g_free(buff);
     }
-#ifdef USE_SSL
     gnome_config_set_bool("SSL", server->use_ssl);
-#endif
+    gnome_config_set_int("TLSMode", server->tls_mode);
 }
 
 void

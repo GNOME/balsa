@@ -50,11 +50,10 @@ struct _CommonDialogData {
 
 struct _FolderDialogData {
     FOLDER_CONF_COMMON;
+    BalsaServerConf bsc;
     GtkWidget *folder_name, *server, *port, *username, *remember,
         *password, *subscribed, *list_inbox, *prefix;
-#ifdef USE_SSL
-    GtkWidget *use_ssl;
-#endif
+    GtkWidget *use_ssl, *tls_mode;
 };
 
 /* FIXME: identity_name will leak on cancelled folder edition */
@@ -136,31 +135,6 @@ validate_folder(GtkWidget *w, FolderDialogData * fcw)
     gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, sensitive);
 }
 
-#ifdef USE_SSL
-static void imap_use_ssl_cb(GtkToggleButton * button,
-                            FolderDialogData * fcw);
-
-/* imap_use_ssl_cb:
- * set default text in the `port' entry box according to the state of
- * the `Use SSL' checkbox
- *
- * callback on toggling fcw->use_ssl
- * */
-static void
-imap_use_ssl_cb(GtkToggleButton * button, FolderDialogData * fcw)
-{
-    char *colon, *newhost;
-    const gchar* host = gtk_entry_get_text(GTK_ENTRY(fcw->server));
-    gchar* port = gtk_toggle_button_get_active(button) ? "993" : "143";
-
-    if( (colon=strchr(host,':')) != NULL) 
-        *colon = '\0';
-    newhost = g_strconcat(host, ":", port, NULL);
-    gtk_entry_set_text(GTK_ENTRY(fcw->server), newhost);
-    g_free(newhost);
-}
-#endif
-
 static void
 remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
 {
@@ -190,13 +164,9 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
                          G_CALLBACK(ask_password), NULL);
     }
 
-    libbalsa_server_set_host(s, host
-#ifdef USE_SSL
-                             ,
-                             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                                          (fcw->use_ssl))
-#endif
-        );
+    libbalsa_server_set_host(s, host, 
+                             balsa_server_conf_get_use_ssl(&fcw->bsc));
+    s->tls_mode = balsa_server_conf_get_tls_mode(&fcw->bsc);
     libbalsa_server_set_username(s, username);
     s->remember_passwd =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
@@ -246,7 +216,7 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
 void
 folder_conf_imap_node(BalsaMailboxNode *mn)
 {
-    GtkWidget *frame, *table, *label;
+    GtkWidget *notebook, *table, *label, *advanced;
     FolderDialogData *fcw;
     static FolderDialogData *fcw_new;
     LibBalsaServer *s;
@@ -287,12 +257,16 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                                   (gpointer) &fcw_new);
     }
 
-    frame = gtk_frame_new(_("Remote IMAP folder set"));
+    notebook = gtk_notebook_new();
     gtk_box_pack_start(GTK_BOX(fcw->dialog->vbox),
-                       frame, TRUE, TRUE, 0);
+                       notebook, TRUE, TRUE, 0);
     table = gtk_table_new(9, 2, FALSE);
-    gtk_container_add(GTK_CONTAINER(frame), table);
- 
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
+                             gtk_label_new_with_mnemonic(_("_Basic")));
+    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 0);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
+                             gtk_label_new_with_mnemonic(_("_Advanced")));
+
     /* INPUT FIELD CREATION */
     label = create_label(_("Descriptive _Name:"), table, 0);
     fcw->folder_name = create_entry(fcw->dialog, table,
@@ -331,14 +305,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     fcw->prefix = create_entry(fcw->dialog, table, NULL, NULL, 8,
 			      mn ? mn->dir : NULL, label);
     
-#ifdef USE_SSL
-    fcw->use_ssl = create_check(fcw->dialog,
-			       _("Use SS_L (IMAPS)"),
-			       table, 9, s ? s->use_ssl : FALSE);
-    g_signal_connect(G_OBJECT(fcw->use_ssl), "toggled",
-                     G_CALLBACK(imap_use_ssl_cb), fcw);
-#endif
-
     gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
 
     validate_folder(NULL, fcw);
@@ -347,6 +313,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     gtk_dialog_set_default_response(fcw->dialog, 
                                     mn ? GTK_RESPONSE_OK 
                                     : GTK_RESPONSE_CANCEL);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
 
     g_signal_connect(G_OBJECT(fcw->dialog), "response",
                      G_CALLBACK(folder_conf_response), fcw);

@@ -1,3 +1,15 @@
+2004-05-08  Pawel Salek
+
+	* libbalsa/imap-server.c: allow disabling TLS.
+	* libbalsa/{mailbox_pop3,server}.c: ditto.
+	* libbalsa/server.h: declare related constants.
+	* libbalsa/imap/imap-handle.[ch]: backend support for that.
+	* libbalsa/imap/{imap_private,libimap}.h: ditto.
+	* libbalsa/imap/pop3.[hc]: same for POP.
+	* src/{folder,mailbox}-conf.c: UI for this functionality.
+	* src/mailbox-node.c: ditto.
+	* src/save-restore.c: clean mailbox-node section before saving.
+
 2004-05-08 08:23  PeterB
 
 	* libbalsa/mailbox.c: don't cache has-unseen-child.

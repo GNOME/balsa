@@ -135,7 +135,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
 #ifdef USE_TLS
   handle->using_tls = 0;
 #endif
-  handle->require_tls = 0;
+  handle->tls_mode = IMAP_TLS_ENABLED;
   handle->cmd_queue = g_hash_table_new(NULL, NULL);
 
   handle->info_cb  = NULL;
@@ -305,13 +305,13 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
   return rc;
 }
 
-unsigned
-imap_mbox_handle_require_tls(ImapMboxHandle* r, unsigned state)
+ImapTlsMode
+imap_handle_set_tls_mode(ImapMboxHandle* r, ImapTlsMode state)
 {
-  unsigned res;
+  ImapTlsMode res;
   g_return_val_if_fail(r,0);
-  res = r->require_tls;
-  r->require_tls = state;
+  res = r->tls_mode;
+  r->tls_mode = state;
   return res;
 }
 
@@ -424,7 +424,8 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #if defined(USE_TLS)
   if(handle->over_ssl)
     resp = IMR_OK; /* secured already with SSL */
-  else if(imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
+  else if(handle->tls_mode != IMAP_TLS_DISABLED &&
+          imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
     if( imap_handle_starttls(handle) != IMR_OK)
       return IMAP_UNSECURE; /* TLS negotiation error */
     resp = IMR_OK; /* secured with TLS */
@@ -433,7 +434,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #else
   resp = IMR_NO;
 #endif
-  if(handle->require_tls && resp != IMR_OK)
+  if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK)
     return IMAP_UNSECURE;
     
   return IMAP_SUCCESS;

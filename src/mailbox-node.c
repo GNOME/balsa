@@ -482,14 +482,9 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
 
     folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
-#ifdef USE_SSL  
     if(balsa_app.debug)
 	printf("Server loaded, host: %s, %s.\n", folder->server->host,
 	       folder->server->use_ssl ? "SSL" : "no SSL");
-#else
-    if(balsa_app.debug)
-	printf("Server loaded, host: %s\n", folder->server->host);
-#endif
     g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
 		     G_CALLBACK(folder_conf_imap_node), NULL);
     g_signal_connect(G_OBJECT(folder), "append-subtree", 

@@ -73,13 +73,13 @@ struct _ImapMboxHandle {
 
   ImapSearchCb search_cb;
   void *search_arg;
-  unsigned readonly_mbox:1;
+  ImapTlsMode tls_mode; /* disabled, enabled, required */
 #ifdef USE_TLS
   unsigned over_ssl:1; /* transmission is to be made over SSL-protected
                         * connection, usually to imaps port. */
   unsigned using_tls:1;
 #endif
-  unsigned require_tls:1;
+  unsigned readonly_mbox:1;
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)

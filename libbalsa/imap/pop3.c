@@ -99,9 +99,11 @@ struct PopHandle_ {
   unsigned max_req_queue_len;
   unsigned req_insert_pos;
   /* various options */
+  ImapTlsMode tls_mode;
   unsigned disable_apop:1;
   unsigned filter_cr:1;
   unsigned over_ssl:1;
+  unsigned tls_enabled:1;
   unsigned enable_pipe:1;
   unsigned completing_requests:1; /* internal flag of the queuing code */
 };
@@ -112,6 +114,8 @@ pop_new(void)
 {
   PopHandle *pop = g_new0(PopHandle, 1);
   pop->timeout = -1;
+  pop->tls_mode = IMAP_TLS_ENABLED;
+  pop->tls_enabled = 0;
   return pop;
 }
 
@@ -124,6 +128,16 @@ pop_set_option(PopHandle *pop, PopOption opt, gboolean state)
   case IMAP_POP_OPT_OVER_SSL    : pop->over_ssl     = state; break;
   case IMAP_POP_OPT_PIPELINE    : pop->enable_pipe  = state; break;
   }
+}
+
+ImapTlsMode
+pop_set_tls_mode(PopHandle *h, ImapTlsMode state)
+{
+  ImapTlsMode res;
+  g_return_val_if_fail(h,0);
+  res = h->tls_mode;
+  h->tls_mode = state;
+  return res;
 }
 
 void
@@ -399,6 +413,7 @@ pop_stls(PopHandle *pop, GError **err)
   }
   if(imap_setup_ssl(pop->sio, pop->host, ssl,
                     pop->user_cb, pop->user_arg)) {
+    pop->tls_enabled = 1;
     return TRUE;
   } else {
     SSL_free(ssl);
@@ -469,12 +484,19 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   }
   
 #ifdef USE_TLS
-  if(pop_can_do(pop, POP_CAP_STLS)) {
-    if(!pop_stls(pop, err))
-      return FALSE;
+  if(pop->tls_mode != IMAP_TLS_DISABLED && pop_can_do(pop, POP_CAP_STLS)) {
+    pop_stls(pop, err); /* Try... */
   }
 #endif
-  
+  if(pop->tls_mode == IMAP_TLS_REQUIRED && 
+     !(pop->tls_enabled || pop->over_ssl) ) {
+    sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
+    pop->state = IMHS_DISCONNECTED;
+    if(!*err)
+      g_set_error(err, IMAP_ERROR, IMAP_POP_CONNECT_ERROR,
+                  "Encryption required but could not be enabled");
+    return FALSE;
+  }
   if(!pop_authenticate(pop, line, err)) {
     if(pop->state != IMHS_DISCONNECTED) { /* we might have been already off */
       sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
@@ -502,8 +524,6 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   pop->max_req_queue_len = 
     pop_can_do(pop, POP_CAP_PIPELINING) /* && pop->enable_pipe */
     ? POP_QUEUE_LEN/2 : 1;
-  printf("batching requests in groups of %u.\n",
-         pop->max_req_queue_len);
   return TRUE;
 }
 

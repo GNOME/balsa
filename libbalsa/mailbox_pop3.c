@@ -439,10 +439,17 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     GHashTable *uids = NULL, *current_uids = NULL;
     const struct PopDownloadMode *mode;
     unsigned long current_pos = 0, total_size;
+    ImapTlsMode tls_mode;
     
     if (!m->check) return;
 
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(m);
+    switch(server->tls_mode) {
+    case LIBBALSA_TLS_DISABLED: tls_mode = IMAP_TLS_DISABLED; break;
+    default:
+    case LIBBALSA_TLS_ENABLED : tls_mode = IMAP_TLS_ENABLED;  break;
+    case LIBBALSA_TLS_REQUIRED: tls_mode = IMAP_TLS_REQUIRED; break;
+    }
 
     msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
     libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE,0,0,msgbuf);
@@ -480,6 +487,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     PopHandle * pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
     pop_set_option(pop, IMAP_POP_OPT_DISABLE_APOP, m->disable_apop);
+    pop_set_tls_mode(pop, tls_mode);
     pop_set_timeout(pop, 60000); /* wait 1.5 minute for packets */
     pop_set_usercb(pop, libbalsa_server_user_cb, server);
     pop_set_monitorcb(pop, monitor_cb, NULL);

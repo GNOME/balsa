@@ -390,6 +390,8 @@ gint config_folder_update(BalsaMailboxNode * mbnode)
 
     key = folder_section_path(mbnode);
     res = gnome_config_has_section(key);
+    gnome_config_clean_section(key);
+    gnome_config_private_clean_section(key);
     gnome_config_push_prefix(key);
     balsa_mailbox_node_save_config(mbnode, key);
     g_free(key);

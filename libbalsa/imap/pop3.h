@@ -65,6 +65,7 @@ typedef void (*PopMonitorCb)(const char *buffer, int length, int direction,
 
 PopHandle *pop_new         (void);
 void     pop_set_option    (PopHandle *pop, PopOption opt, gboolean state);
+ImapTlsMode pop_set_tls_mode(PopHandle *h, ImapTlsMode option);
 void     pop_set_timeout   (PopHandle *pop, int milliseconds);
 void     pop_set_monitorcb (PopHandle *pop, PopMonitorCb cb, void*);
 void     pop_set_usercb    (PopHandle *pop, ImapUserCb user_cb, void *arg_cb);

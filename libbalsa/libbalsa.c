@@ -458,9 +458,6 @@ libbalsa_is_cert_known(X509* cert, long vfy_result)
         
         res = FALSE;
         while ((tmpcert = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
-            printf("comparing with cert: %s\n", 
-                   X509_NAME_oneline(X509_get_subject_name (tmpcert),
-                                     buf, sizeof (buf)));
             res = X509_cmp(cert, tmpcert)==0;
             X509_free(tmpcert);
             if(res) break;

@@ -47,6 +47,12 @@ typedef enum {
     LIBBALSA_SERVER_UNKNOWN
 } LibBalsaServerType;
 
+typedef enum {
+    LIBBALSA_TLS_DISABLED,
+    LIBBALSA_TLS_ENABLED,
+    LIBBALSA_TLS_REQUIRED
+} LibBalsaTlsMode;
+
 struct _LibBalsaServer {
     GObject object;
 
@@ -54,11 +60,13 @@ struct _LibBalsaServer {
 
     gchar *host;
     gchar *user;
-    gchar *passwd; /* NULL means "ask for it". Empty ("") is a legal one */
-    unsigned remember_passwd:1;
-#ifdef USE_SSL
+    gchar *passwd;
+    /* We include SSL support in UI unconditionally to preserve config
+     * between SSL and non-SSL builds. We just fail if SSL is requested
+     * in non-SSL build. */
+    LibBalsaTlsMode tls_mode;
     unsigned use_ssl:1;
-#endif
+    unsigned remember_passwd:1;
 };
 
 struct _LibBalsaServerClass {
@@ -67,11 +75,7 @@ struct _LibBalsaServerClass {
     void (*set_username) (LibBalsaServer * server, const gchar * name);
     void (*set_password) (LibBalsaServer * server, const gchar * passwd);
     void (*set_host) (LibBalsaServer * server,
-		      const gchar * host
-#ifdef USE_SSL
-		      , gboolean use_ssl
-#endif
-		      );
+		      const gchar * host, gboolean use_ssl);
     gchar *(*get_password) (LibBalsaServer * server);
 };
 
@@ -81,11 +85,8 @@ void libbalsa_server_set_username(LibBalsaServer * server,
 				  const gchar * username);
 void libbalsa_server_set_password(LibBalsaServer * server,
 				  const gchar * passwd);
-void libbalsa_server_set_host(LibBalsaServer * server, const gchar * host
-#ifdef USE_SSL
-			      , gboolean use_ssl
-#endif
-			      );
+void libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
+                              gboolean use_ssl);
 gchar *libbalsa_server_get_password(LibBalsaServer * server,
 				    LibBalsaMailbox * mbox);
 

@@ -3,7 +3,9 @@ noinst_LIBRARIES = libbalsa.a
 libbalsa_a_SOURCES = \
 	libbalsa.c	\
 	misc.c		\
+	mime.c		\
 	mailbox.c	\
 	send.c
 
-INCLUDES=-I. -I../src -I../libmutt $(GNOME_INCLUDEDIR)
+INCLUDES=-I. -I${top_srcdir}/src -I${top_srcdir}/libmutt \
+	$(GNOME_INCLUDEDIR)

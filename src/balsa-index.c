@@ -1202,9 +1202,11 @@ button_event_release_cb(GtkWidget * clist, GdkEventButton * event,
     bindex = BALSA_INDEX(data);
 
     if(gtk_clist_get_selection_info(GTK_CLIST(bindex->ctree), 
-				    event->x, event->y, &row, &column))
+				    event->x, event->y, &row, &column)) {
 	balsa_index_set_style_recursive(bindex, gtk_ctree_node_nth (bindex->ctree, row));
-    
+	balsa_index_set_parent_style(bindex, gtk_ctree_node_nth (bindex->ctree, row));
+    }
+
 }
 
 

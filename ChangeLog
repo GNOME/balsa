@@ -1,3 +1,6 @@
+1999-12-31  Ragnar Henriksen <ragnar@juniks.org>
+        * src/pref-manager.c: The help button are now working.
+
 1999-12-31  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
 
 	* .cvsignore: Removed the ABOUT-NLS from CVS because gettext adds

@@ -412,22 +412,22 @@ msgstr "[-- Долучення #%d"
 #: libmutt/handler.c:1156
 #, c-format
 msgid "[-- Type: %s/%s, Encoding: %s, Size: %s --]\n"
-msgstr ""
+msgstr "[-- Тип: %s/%s, кодування: %s, розм╕р: %s --]\n"
 
 #: libmutt/handler.c:1215
 #, c-format
 msgid "[-- Autoview using %s --]\n"
-msgstr ""
+msgstr "[-- Автоперегляд за допомогою %s --]\n"
 
 #: libmutt/handler.c:1216
 #, c-format
 msgid "Invoking autoview command: %s"
-msgstr ""
+msgstr "Виклик команди автоперегляду: %s"
 
 #: libmutt/handler.c:1253 libmutt/handler.c:1271
 #, c-format
 msgid "[-- Autoview stderr of %s --]\n"
-msgstr ""
+msgstr "[-- stderr автоперегляду %s --]\n"
 
 #: libmutt/handler.c:1303
 msgid "[-- Error: message/external-body has no access-type parameter --]\n"

@@ -1,5 +1,7 @@
-2003-12-01 05:56  PeterB
+2003-12-01 20:42  PeterB
 
+	* libbalsa/body.c: Store the content of a message/rfc822 message
+	part as its child, not its sibling.
 	* libbalsa/body.c: Treat message_part->mime_part as inline if it's
 	a GMimePart.
 

@@ -142,8 +142,6 @@ static void register_open_mailbox(LibBalsaMailbox *m);
 static void unregister_open_mailbox(LibBalsaMailbox *m);
 static gboolean is_open_mailbox(LibBalsaMailbox *m);
 
-static gint about_box_visible = FALSE;
-
 /* dialogs */
 static void show_about_box(void);
 
@@ -201,6 +199,7 @@ static void find_cb(GtkWidget * widget, gpointer data);
 static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
+static void filter_run_cb(GtkWidget * widget, gpointer data);
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
@@ -210,7 +209,6 @@ static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
 static void show_mbtree_cb(GtkWidget * widget, gpointer data);
 static void show_mbtabs_cb(GtkWidget * widget, gpointer data);
-static void about_box_destroy_cb(void);
 
 static void set_icon(GnomeApp * app);
 
@@ -260,33 +258,33 @@ static GnomeUIInfo file_new_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Local mbox mailbox..."), 
                            N_("Add a new mbox style mailbox"),
                            mailbox_conf_add_mbox_cb, 
-                           GNOME_STOCK_PIXMAP_ADD),
+                           GTK_STOCK_ADD),
 #define MENU_FILE_NEW_MAILDIR_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("Local Maildir mailbox..."), 
                            N_("Add a new Maildir style mailbox"),
                            mailbox_conf_add_maildir_cb, 
-                           GNOME_STOCK_PIXMAP_ADD),
+                           GTK_STOCK_ADD),
 #define MENU_FILE_NEW_MH_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("Local MH mailbox..."), 
                            N_("Add a new MH style mailbox"),
                            mailbox_conf_add_mh_cb, 
-                           GNOME_STOCK_PIXMAP_ADD),
+                           GTK_STOCK_ADD),
 #define MENU_FILE_NEW_IMAP_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP mailbox..."), 
                            N_("Add a new IMAP mailbox"),
                            mailbox_conf_add_imap_cb, 
-                           GNOME_STOCK_PIXMAP_ADD),
+                           GTK_STOCK_ADD),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_NEW_IMAP_FOLDER_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP folder..."), 
                            N_("Add a new IMAP folder"),
                            folder_conf_add_imap_cb, 
-                           GNOME_STOCK_PIXMAP_ADD),
+                           GTK_STOCK_ADD),
 #define MENU_FILE_NEW_IMAP_SUBFOLDER_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("Remote IMAP subfolder..."), 
                            N_("Add new IMAP subfolder"),
                            folder_conf_add_imap_sub_cb, 
-                           GNOME_STOCK_PIXMAP_ADD),
+                           GTK_STOCK_ADD),
     GNOMEUIINFO_END
 };
 
@@ -333,7 +331,7 @@ static GnomeUIInfo file_menu[] = {
 	GNOME_APP_UI_ITEM, N_("_Address Book..."),
 	N_("Open the address book"),
 	address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-	GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL
+	GNOME_STOCK_BOOK_RED, 'B', 0, NULL
     },
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_MENU_EXIT_ITEM(balsa_quit_nicely, NULL),
@@ -359,9 +357,9 @@ static GnomeUIInfo edit_menu[] = {
 /*     GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL), */
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_ITEM_STOCK(N_("_Filters..."), N_("Manage filters"),
-                           filter_dlg_cb, GNOME_STOCK_MENU_PROP),
+                           filter_dlg_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_ITEM_STOCK(N_("_Export filters"), N_("Export filters as Sieve scripts"),
-			   filter_export_cb, GNOME_STOCK_MENU_PROP),
+			   filter_export_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_END
 };
 
@@ -514,7 +512,7 @@ static GnomeUIInfo message_menu[] = {
         GNOME_APP_UI_ITEM, N_("_View Source..."),
         N_("View source form of the message"),
         view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        GNOME_STOCK_MENU_BOOK_OPEN, 'v', GDK_CONTROL_MASK, NULL
+        GNOME_STOCK_BOOK_OPEN, 'v', GDK_CONTROL_MASK, NULL
     },
 	GNOMEUIINFO_SEPARATOR,   
 #define MENU_MESSAGE_COPY_POS 11
@@ -533,19 +531,19 @@ static GnomeUIInfo message_menu[] = {
         GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
         N_("Move the current message to Trash mailbox"),
         trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
+        GNOME_STOCK_TRASH, 'D', 0, NULL
     },
 #define MENU_MESSAGE_DELETE_POS 15
     { GNOME_APP_UI_ITEM, N_("_Delete"), 
       N_("Delete the current message"),
       delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      GNOME_STOCK_MENU_TRASH, 'D', GDK_CONTROL_MASK, NULL },
+      GNOME_STOCK_TRASH, 'D', GDK_CONTROL_MASK, NULL },
 #define MENU_MESSAGE_UNDEL_POS 16
     /* U */
     {
         GNOME_APP_UI_ITEM, N_("_Undelete"), N_("Undelete the message"),
         undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
+        GTK_STOCK_UNDELETE, 'U', 0, NULL
     },
 #define MENU_MESSAGE_TOGGLE_POS 17
     /* ! */
@@ -557,7 +555,7 @@ static GnomeUIInfo message_menu[] = {
         GNOME_APP_UI_ITEM, N_("_Store Address..."),
         N_("Store address of sender in addressbook"),
         store_address_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-        GNOME_STOCK_MENU_BOOK_RED, 'S', 0, NULL
+        GNOME_STOCK_BOOK_RED, 'S', 0, NULL
     },
     GNOMEUIINFO_END
 };
@@ -601,32 +599,37 @@ static GnomeUIInfo mailbox_menu[] = {
 #define MENU_MAILBOX_EDIT_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit..."), N_("Edit the selected mailbox"),
                            mailbox_conf_edit_cb,
-                           GNOME_STOCK_MENU_PREF),
+                           GTK_STOCK_PREFERENCES),
 #define MENU_MAILBOX_DELETE_POS 8
     GNOMEUIINFO_ITEM_STOCK(N_("_Delete..."),
                            N_("Delete the selected mailbox"),
                            mailbox_conf_delete_cb,
-                           GNOME_STOCK_PIXMAP_REMOVE),
+                           GTK_STOCK_REMOVE),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_COMMIT_POS 10
     GNOMEUIINFO_ITEM_STOCK(
         N_("Co_mmit Current"),
         N_("Commit the changes in the currently opened mailbox"),
         mailbox_commit_changes,
-        GNOME_STOCK_MENU_REFRESH),
+        GTK_STOCK_REFRESH),
     GNOMEUIINFO_ITEM_STOCK(
         N_("Commit _All"),
         N_("Commit the changes in all mailboxes"),
         mailbox_commit_all,
-        GNOME_STOCK_MENU_REFRESH),
+        GTK_STOCK_REFRESH),
 #define MENU_MAILBOX_CLOSE_POS 12
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
-                           mailbox_close_cb, GNOME_STOCK_MENU_CLOSE),
+                           mailbox_close_cb, GTK_STOCK_CLOSE),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EMPTY_TRASH_POS 14
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
-                           empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
+                           empty_trash, GTK_STOCK_REMOVE),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_APPLY_FILTERS 16
+    GNOMEUIINFO_ITEM_STOCK(N_("Edit/Apply Filters"),
+                           N_("Filter the content of the selected mailbox"),
+                           filter_run_cb, GNOME_STOCK_MENU_PROP),
     GNOMEUIINFO_END
 };
 
@@ -636,7 +639,7 @@ static GnomeUIInfo settings_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Customize..."),
                            N_("Customize toolbars and menus"),
                            customize_dialog_cb,
-                           GNOME_STOCK_MENU_EXEC),
+                           GTK_STOCK_EXECUTE),
     GNOMEUIINFO_ITEM_STOCK(N_("_Identities..."), 
                            N_("Create and set current identities"), 
                            ident_manage_dialog_cb, 
@@ -671,18 +674,21 @@ balsa_window_get_type(void)
     static GtkType window_type = 0;
 
     if (!window_type) {
-        static const GtkTypeInfo window_info = {
-            "BalsaWindow",
-            sizeof(BalsaWindow),
+        static const GTypeInfo window_info = {
             sizeof(BalsaWindowClass),
-            (GtkClassInitFunc) balsa_window_class_init,
-            (GtkObjectInitFunc) balsa_window_init,
-            /* reserved_1 */ NULL,
-            /* reserved_2 */ NULL,
-            (GtkClassInitFunc) NULL,
+            NULL,               /* base_init */
+            NULL,               /* base_finalize */
+            (GClassInitFunc) balsa_window_class_init,
+            NULL,               /* class_finalize */
+            NULL,               /* class_data */
+            sizeof(BalsaWindow),
+            0,                  /* n_preallocs */
+            (GInstanceInitFunc) balsa_window_init
         };
 
-        window_type = gtk_type_unique(gnome_app_get_type(), &window_info);
+        window_type =
+            g_type_register_static(GNOME_TYPE_APP, "BalsaWindow",
+                                   &window_info, 0);
     }
 
     return window_type;
@@ -700,20 +706,22 @@ balsa_window_class_init(BalsaWindowClass * klass)
     parent_class = gtk_type_class(gnome_app_get_type());
 
     window_signals[OPEN_MAILBOX_NODE] =
-        gtk_signal_new("open_mailbox_node",
-                       GTK_RUN_LAST,
-                       BALSA_TYPE_WINDOW,
-                       GTK_SIGNAL_OFFSET(BalsaWindowClass, open_mbnode),
-                       gtk_marshal_NONE__POINTER,
-                       GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
+        g_signal_new("open_mailbox_node",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST,
+                     G_STRUCT_OFFSET(BalsaWindowClass, open_mbnode),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__OBJECT,
+                     G_TYPE_NONE, 1, G_TYPE_OBJECT);
 
     window_signals[CLOSE_MAILBOX_NODE] =
-        gtk_signal_new("close_mailbox_node",
-                       GTK_RUN_LAST,
-                       BALSA_TYPE_WINDOW,
-                       GTK_SIGNAL_OFFSET(BalsaWindowClass, close_mbnode),
-                       gtk_marshal_NONE__POINTER,
-                       GTK_TYPE_NONE, 1, GTK_TYPE_POINTER);
+        g_signal_new("close_mailbox_node",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST,
+                     G_STRUCT_OFFSET(BalsaWindowClass, close_mbnode),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__OBJECT,
+                     G_TYPE_NONE, 1, G_TYPE_OBJECT);
 
     object_class->destroy = balsa_window_destroy;
 
@@ -800,7 +808,7 @@ balsa_window_new()
      * - allows for grey out */
     register_balsa_pixmaps();
 
-    window = gtk_type_new(BALSA_TYPE_WINDOW);
+    window = g_object_new(BALSA_TYPE_WINDOW, NULL);
 
     balsa_app.main_window=window;
 
@@ -819,12 +827,12 @@ balsa_window_new()
         GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
     gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));
     gtk_progress_bar_set_pulse_step(gnome_appbar_get_progress(appbar), 0.01);
-    gtk_object_set_data(GTK_OBJECT(window), APPBAR_KEY, appbar);
+    g_object_set_data(G_OBJECT(window), APPBAR_KEY, appbar);
     balsa_app.appbar = appbar;
     gnome_app_install_appbar_menu_hints(GNOME_APPBAR(balsa_app.appbar),
                                         main_menu);
 
-    gtk_window_set_policy(GTK_WINDOW(window), TRUE, TRUE, FALSE);
+    gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
     gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width,
                                 balsa_app.mw_height);
 
@@ -835,17 +843,17 @@ balsa_window_new()
                                balsa_app.show_notebook_tabs);
     gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
-    gtk_signal_connect(GTK_OBJECT(window->notebook), "size_allocate",
-                       GTK_SIGNAL_FUNC(notebook_size_alloc_cb), NULL);
-    gtk_signal_connect(GTK_OBJECT(window->notebook), "switch_page",
-                       GTK_SIGNAL_FUNC(notebook_switch_page_cb), NULL);
+    g_signal_connect(G_OBJECT(window->notebook), "size_allocate",
+                     G_CALLBACK(notebook_size_alloc_cb), NULL);
+    g_signal_connect(G_OBJECT(window->notebook), "switch_page",
+                     G_CALLBACK(notebook_switch_page_cb), NULL);
     gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
                        notebook_drop_types, NUM_DROP_TYPES,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
-    gtk_signal_connect (GTK_OBJECT (window->notebook), "drag-data-received",
-                        GTK_SIGNAL_FUNC (notebook_drag_received_cb), NULL);
-    gtk_signal_connect (GTK_OBJECT (window->notebook), "drag-motion",
-                        GTK_SIGNAL_FUNC (notebook_drag_motion_cb), NULL);
+    g_signal_connect(G_OBJECT (window->notebook), "drag-data-received",
+                     G_CALLBACK (notebook_drag_received_cb), NULL);
+    g_signal_connect(G_OBJECT (window->notebook), "drag-motion",
+                     G_CALLBACK (notebook_drag_motion_cb), NULL);
    balsa_app.notebook = window->notebook;
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -855,8 +863,8 @@ balsa_window_new()
 
     window->preview = balsa_message_new();
 
-    gtk_signal_connect(GTK_OBJECT(window->preview), "select-part",
-                       GTK_SIGNAL_FUNC(select_part_cb), window);
+    g_signal_connect(G_OBJECT(window->preview), "select-part",
+                     G_CALLBACK(select_part_cb), window);
 
     gtk_container_add(GTK_CONTAINER(scroll), window->preview);
     gtk_widget_show(scroll);
@@ -872,8 +880,8 @@ balsa_window_new()
                       GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_signal_connect(GTK_OBJECT(balsa_app.mblist), "size_allocate",
-		       GTK_SIGNAL_FUNC(size_allocate_cb), NULL);
+    g_signal_connect(G_OBJECT(balsa_app.mblist), "size_allocate",
+		     G_CALLBACK(size_allocate_cb), NULL);
     balsa_mblist_default_signal_bindings(balsa_app.mblist);
     gtk_widget_show_all(window->mblist);
 
@@ -948,14 +956,14 @@ balsa_window_new()
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), balsa_app.previewpane);
 
     /* we can only set icon after realization, as we have no windows before. */
-    gtk_signal_connect(GTK_OBJECT(window), "realize",
-                       GTK_SIGNAL_FUNC(set_icon), NULL);
-    gtk_signal_connect(GTK_OBJECT(window), "size_allocate",
-                       GTK_SIGNAL_FUNC(mw_size_alloc_cb), NULL);
-    gtk_signal_connect (GTK_OBJECT (window), "destroy",
-                        GTK_SIGNAL_FUNC (gtk_main_quit), NULL);
-    gtk_signal_connect(GTK_OBJECT(window), "delete-event",
-       GTK_SIGNAL_FUNC(delete_cb), NULL);
+    g_signal_connect(G_OBJECT(window), "realize",
+                     G_CALLBACK(set_icon), NULL);
+    g_signal_connect(G_OBJECT(window), "size_allocate",
+                     G_CALLBACK(mw_size_alloc_cb), NULL);
+    g_signal_connect(G_OBJECT (window), "destroy",
+                     G_CALLBACK (gtk_main_quit), NULL);
+    g_signal_connect(G_OBJECT(window), "delete-event",
+                     G_CALLBACK(delete_cb), NULL);
 
     return GTK_WIDGET(window);
 }
@@ -1197,14 +1205,14 @@ balsa_window_set_threading_menu(int option)
     pos = MENU_THREADING_JWZ_POS; break;
     default: return;
     }
-    gtk_signal_handler_block_by_func(GTK_OBJECT(threading_menu[pos].widget),
-                                     threading_menu[pos].moreinfo, 
-                                     balsa_app.main_window);
+    g_signal_handlers_block_by_func(G_OBJECT(threading_menu[pos].widget),
+                                    threading_menu[pos].moreinfo, 
+                                    balsa_app.main_window);
     gtk_check_menu_item_set_active
         (GTK_CHECK_MENU_ITEM(threading_menu[pos].widget), TRUE);
-    gtk_signal_handler_unblock_by_func(GTK_OBJECT(threading_menu[pos].widget),
-                                       threading_menu[pos].moreinfo,
-                                       balsa_app.main_window);
+    g_signal_handlers_unblock_by_func(G_OBJECT(threading_menu[pos].widget),
+                                      threading_menu[pos].moreinfo,
+                                      balsa_app.main_window);
 }
 
 /* balsa_window_open_mbnode: 
@@ -1218,8 +1226,8 @@ balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
     g_return_if_fail(window != NULL);
     g_return_if_fail(BALSA_IS_WINDOW(window));
 
-    gtk_signal_emit(GTK_OBJECT(window), window_signals[OPEN_MAILBOX_NODE],
-                    mbnode);
+    g_signal_emit(G_OBJECT(window), window_signals[OPEN_MAILBOX_NODE],
+                  0, mbnode);
 }
 
 void
@@ -1228,8 +1236,8 @@ balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
     g_return_if_fail(window != NULL);
     g_return_if_fail(BALSA_IS_WINDOW(window));
 
-    gtk_signal_emit(GTK_OBJECT(window), window_signals[CLOSE_MAILBOX_NODE],
-                    mbnode);
+    g_signal_emit(G_OBJECT(window), window_signals[CLOSE_MAILBOX_NODE],
+                  0, mbnode);
 }
 
 static void
@@ -1258,10 +1266,10 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        close_pix = gnome_stock_pixmap_widget(GTK_WIDGET(balsa_app.main_window),
                BALSA_PIXMAP_OTHER_CLOSE);
 #else
-       close_pix = gtk_image_new_from_stock(GNOME_STOCK_PIXMAP_CLOSE,
+       close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
                                             GTK_ICON_SIZE_MENU);
-       gtk_signal_connect(GTK_OBJECT(but), "size-request",
-                          GTK_SIGNAL_FUNC(mailbox_tab_size_request), NULL);
+       g_signal_connect(G_OBJECT(but), "size-request",
+                        G_CALLBACK(mailbox_tab_size_request), NULL);
 #endif                          /* BALSA_MAJOR < 2 */
 
        gtk_button_set_relief(GTK_BUTTON (but), GTK_RELIEF_NONE);
@@ -1271,8 +1279,8 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        gtk_box_pack_start(GTK_BOX (box), but, FALSE, FALSE, 0);
        gtk_widget_show_all(box);
 
-       gtk_signal_connect(GTK_OBJECT (but), "clicked", 
-              GTK_SIGNAL_FUNC(mailbox_tab_close_cb), mbnode);
+       g_signal_connect(G_OBJECT (but), "clicked", 
+                        G_CALLBACK(mailbox_tab_close_cb), mbnode);
                                                                                                                    
        return box;
 }
@@ -1323,9 +1331,9 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
         return;
     }
 
-    gtk_signal_connect(GTK_OBJECT (index), "index-changed",
-                       GTK_SIGNAL_FUNC (balsa_window_index_changed_cb),
-                       window);
+    g_signal_connect(G_OBJECT (index), "index-changed",
+                     G_CALLBACK (balsa_window_index_changed_cb),
+                     window);
 
     /* if(config_short_label) label = gtk_label_new(mbnode->mailbox->name);
        else */
@@ -1349,8 +1357,9 @@ real_open_mbnode(BalsaMailboxNode * mbnode)
     page_num = gtk_notebook_page_num(GTK_NOTEBOOK
                                      (balsa_app.main_window->notebook),
                                      scroll);
-    gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.main_window->notebook),
-                          page_num);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK
+                                  (balsa_app.main_window->notebook),
+                                  page_num);
     register_open_mailbox(mbnode->mailbox);
 
     /* Enable relavent menu items... */
@@ -1583,7 +1592,7 @@ static gboolean is_open_mailbox(LibBalsaMailbox *m)
 static void
 show_about_box(void)
 {
-    GtkWidget *about;
+    static GtkWidget *about = NULL;
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
         "Peter Bloomfield <PeterBloomfield@mindspring.com>",
@@ -1598,10 +1607,10 @@ show_about_box(void)
 
 
     /* only show one about box at a time */
-    if (about_box_visible)
+    if (about) {
+        gdk_window_raise(about->window);
         return;
-    else
-        about_box_visible = TRUE;
+    }
 
     about = gnome_about_new("Balsa",
                             BALSA_VERSION,
@@ -1627,10 +1636,7 @@ show_about_box(void)
 #endif                          /* BALSA_MAJOR < 2 */
                            );
 
-
-    gtk_signal_connect(GTK_OBJECT(about),
-                       "destroy",
-                       (GtkSignalFunc) about_box_destroy_cb, NULL);
+    g_object_add_weak_pointer(G_OBJECT(about), (gpointer) &about);
 
     gtk_widget_show(about);
 }
@@ -1755,12 +1761,10 @@ ensure_check_mail_dialog(void)
     gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
 			   "progress_dialog", "Balsa");
         
-    gtk_signal_connect(GTK_OBJECT(progress_dialog), "destroy",
-		       GTK_SIGNAL_FUNC(progress_dialog_destroy_cb),
-		       NULL);
-    gtk_signal_connect(GTK_OBJECT(progress_dialog), "response",
-		       GTK_SIGNAL_FUNC(progress_dialog_response_cb),
-		       NULL);
+    g_signal_connect(G_OBJECT(progress_dialog), "destroy",
+		     G_CALLBACK(progress_dialog_destroy_cb), NULL);
+    g_signal_connect(G_OBJECT(progress_dialog), "response",
+		     G_CALLBACK(progress_dialog_response_cb), NULL);
     
     progress_dialog_source = gtk_label_new("Checking Mail....");
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
@@ -1951,9 +1955,7 @@ mail_progress_notify_cb()
     GtkWidget *errorbox;
 
     msgbuffer = g_malloc(MSG_BUFFER_SIZE);
-
-    g_io_channel_read(mail_thread_msg_receive, msgbuffer,
-                      MSG_BUFFER_SIZE, &count);
+    count = read(mail_thread_pipes[0], msgbuffer, MSG_BUFFER_SIZE);
 
     /* FIXME: imagine reading just half of the pointer. The sync is gone.. */
     if (count < sizeof(MailThreadMessage *)) {
@@ -2088,8 +2090,7 @@ send_progress_notify_cb()
     float fraction;
 
     msgbuffer = malloc(2049);
-
-    g_io_channel_read(send_thread_msg_receive, msgbuffer, 2048, &count);
+    count = read(send_thread_pipes[0], msgbuffer, 2048);
 
     if (count < sizeof(void *)) {
         free(msgbuffer);
@@ -2224,12 +2225,12 @@ display_new_mail_notification(int num_new)
     gtk_box_pack_start(GTK_BOX(dlg->action_area), ok_button, FALSE, FALSE, 0);
     gtk_widget_grab_default(ok_button);
     
-    gtk_signal_connect_object(GTK_OBJECT(ok_button), "clicked",
-                              GTK_SIGNAL_FUNC(gtk_object_destroy),
-                              GTK_OBJECT(dlg));
+    g_signal_connect_swapped(G_OBJECT(ok_button), "clicked",
+                             G_CALLBACK(gtk_object_destroy),
+                             GTK_OBJECT(dlg));
 
-    gtk_signal_connect(GTK_OBJECT(dlg), "destroy",
-                       GTK_SIGNAL_FUNC(new_mail_dialog_destroy_cb), NULL);
+    g_signal_connect(G_OBJECT(dlg), "destroy",
+                     G_CALLBACK(new_mail_dialog_destroy_cb), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(dlg));
 }
@@ -2252,8 +2253,8 @@ new_message_cb(GtkWidget * widget, gpointer data)
 
     smwindow = sendmsg_window_new(widget, NULL, SEND_NORMAL);
 
-    gtk_signal_connect(GTK_OBJECT(smwindow->window), "destroy",
-                       GTK_SIGNAL_FUNC(send_msg_window_destroy_cb), NULL);
+    g_signal_connect(G_OBJECT(smwindow->window), "destroy",
+                     G_CALLBACK(send_msg_window_destroy_cb), NULL);
 }
 
 
@@ -2552,8 +2553,8 @@ threading_change_cb(GtkWidget * widget, gpointer data)
                                BALSA_INDEX(index)->mailbox_node->mailbox);
     g_return_if_fail(gnode != NULL);
 
-    type = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(widget),
-                                               GNOMEUIINFO_KEY_UIDATA));
+    type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
+                                             GNOMEUIINFO_KEY_UIDATA));
     balsa_index_set_threading_type(BALSA_INDEX(index), type);
 }
 
@@ -2632,8 +2633,8 @@ find_real(BalsaIndex * bindex,gboolean again)
 	
 	/* FIXME : we'll set up this callback later when selecting
 	   filters has been enabled
-	   gtk_signal_connect(GTK_OBJECT(dia),"clicked",
-	   find_dialog_button_cb,&f);
+	   g_signal_connect(G_OBJECT(dia), "clicked",
+	   G_CALLBACK(find_dialog_button_cb), &f);
 	*/
         vbox = GTK_DIALOG(dia)->vbox;
 	reverse_button = 
@@ -2643,7 +2644,8 @@ find_real(BalsaIndex * bindex,gboolean again)
 	w = gtk_label_new_with_mnemonic(_("_Search for:"));
 	gtk_table_attach(GTK_TABLE(page),w,0, 1, 0, 1,
 			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-	search_entry = gtk_entry_new_with_max_length(30);
+	search_entry = gtk_entry_new();
+        gtk_entry_set_max_length(GTK_ENTRY(search_entry), 30);
 	gtk_table_attach(GTK_TABLE(page),search_entry,1, 2, 0, 1,
 			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
 	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 2);
@@ -2775,6 +2777,21 @@ static void
 filter_export_cb(GtkWidget * widget, gpointer data)
 {
     filters_export_dialog();
+}
+
+static void
+filter_run_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
+
+    if (index)
+        filters_run_dialog(BALSA_INDEX(index)->mailbox_node->mailbox);
+    else
+	/* FIXME : Perhaps should we be able to apply filters on folders (ie recurse on all mailboxes in it),
+	   but there are problems of infinite recursion (when one mailbox being filtered is also the destination
+	   of the filter action (eg a copy)). So let's see that later :) */
+	balsa_information(LIBBALSA_INFORMATION_WARNING, NULL,
+                          _("You can apply filters only on mailbox\n"));
 }
 
 /* closes the mailbox on the notebook's active page */
@@ -2920,12 +2937,6 @@ balsa_change_window_layout(BalsaWindow *window)
 }
 
 static void
-about_box_destroy_cb(void)
-{
-    about_box_visible = FALSE;
-}
-
-static void
 set_icon(GnomeApp * app)
 {
     GdkPixbuf *pb = NULL;
@@ -2973,7 +2984,7 @@ set_icon(GnomeApp * app)
     att.x = 0;
     att.y = 0;
     att.visual = gdk_rgb_get_visual();
-    att.colormap = gdk_rgb_get_cmap();
+    att.colormap = gdk_rgb_get_colormap();
     ic_win = gdk_window_new(NULL, &att, GDK_WA_VISUAL | GDK_WA_COLORMAP);
     gdk_window_set_icon(w, ic_win, NULL, NULL);
 
@@ -2984,7 +2995,7 @@ set_icon(GnomeApp * app)
         pb = gdk_pixbuf_new_from_file(filename, NULL);
 #endif                          /* BALSA_MAJOR < 2 */
         gdk_window_clear(ic_win);
-        gdk_pixbuf_unref(pb);
+        g_object_unref(G_OBJECT(pb));
         g_free(filename);
     }
 }
@@ -3252,19 +3263,18 @@ balsa_window_increase_activity(BalsaWindow* window)
     progress_bar =
         GTK_PROGRESS_BAR(gnome_appbar_get_progress
                          (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(progress_bar), 
-                                                  "in_use"));
+    in_use = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar), 
+                                               "in_use"));
     
     if (!in_use) {
-        gtk_object_set_data(GTK_OBJECT(progress_bar), "in_use", 
-                            GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
+        g_object_set_data(G_OBJECT(progress_bar), "in_use", 
+                          GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
 
         /* add a timeout to make the activity bar move */
         activity_handler = gtk_timeout_add(100, balsa_window_progress_timeout,
                                            progress_bar);
-        gtk_object_set_data(GTK_OBJECT(progress_bar), 
-                            "activity_handler", 
-                            GINT_TO_POINTER(activity_handler));
+        g_object_set_data(G_OBJECT(progress_bar), "activity_handler", 
+                          GINT_TO_POINTER(activity_handler));
     } else if (in_use != BALSA_PROGRESS_ACTIVITY) {
         /* the progress bar is already in use doing something else, so
          * quit */
@@ -3272,13 +3282,12 @@ balsa_window_increase_activity(BalsaWindow* window)
     }
     
     /* increment the reference counter */
-    activity_counter = GPOINTER_TO_UINT(
-        gtk_object_get_data(GTK_OBJECT(progress_bar),
-                            "activity_counter"));
+    activity_counter =
+        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(progress_bar),
+                                           "activity_counter"));
     ++activity_counter;
-    gtk_object_set_data(GTK_OBJECT(progress_bar), 
-                        "activity_counter", 
-                        GUINT_TO_POINTER(activity_counter));
+    g_object_set_data(G_OBJECT(progress_bar), "activity_counter", 
+                      GUINT_TO_POINTER(activity_counter));
 }
 
 
@@ -3299,16 +3308,16 @@ balsa_window_decrease_activity(BalsaWindow* window)
     progress_bar =
         GTK_PROGRESS_BAR(gnome_appbar_get_progress
                          (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use = GPOINTER_TO_INT(
-        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+    in_use = GPOINTER_TO_INT(g_object_get_data
+                             (G_OBJECT(progress_bar), "in_use"));
 
     /* make sure the progress bar is being used for activity */
     if (in_use != BALSA_PROGRESS_ACTIVITY)
         return;
 
-    activity_counter = GPOINTER_TO_UINT(
-        gtk_object_get_data(GTK_OBJECT(progress_bar),
-                            "activity_counter"));
+    activity_counter =
+        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(progress_bar),
+                                           "activity_counter"));
     
     /* decrement the counter if it exists */
     if (activity_counter) {
@@ -3317,24 +3326,22 @@ balsa_window_decrease_activity(BalsaWindow* window)
         /* if the reference count is now zero, clear the bar and make
          * it available for others to use */
         if (!activity_counter) {
-            activity_handler = GPOINTER_TO_INT(
-                gtk_object_get_data(GTK_OBJECT(progress_bar),
-                                    "activity_handler"));
+            activity_handler =
+                GPOINTER_TO_INT(g_object_get_data
+                                (G_OBJECT(progress_bar),
+                                 "activity_handler"));
             gtk_timeout_remove(activity_handler);
             activity_handler = 0;
             
-            gtk_object_set_data(GTK_OBJECT(progress_bar), 
-                                "activity_handler",
-                                GINT_TO_POINTER(activity_handler));
-            gtk_object_set_data(GTK_OBJECT(progress_bar),
-                                "in_use", 
-                                GINT_TO_POINTER(BALSA_PROGRESS_NONE));
+            g_object_set_data(G_OBJECT(progress_bar), "activity_handler",
+                              GINT_TO_POINTER(activity_handler));
+            g_object_set_data(G_OBJECT(progress_bar), "in_use",
+                              GINT_TO_POINTER(BALSA_PROGRESS_NONE));
             gtk_progress_bar_set_fraction(progress_bar, 0);
         }
         /* make sure to store the counter value */
-        gtk_object_set_data(GTK_OBJECT(progress_bar), 
-                            "activity_counter",
-                            GUINT_TO_POINTER(activity_counter));
+        g_object_set_data(G_OBJECT(progress_bar), "activity_counter",
+                          GUINT_TO_POINTER(activity_counter));
     }
 }
 
@@ -3361,17 +3368,16 @@ balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound)
     progress_bar =
         GTK_PROGRESS_BAR(gnome_appbar_get_progress
                          (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use = GPOINTER_TO_INT(
-        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+    in_use = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar),
+                                               "in_use"));
 
     /* make sure the progress bar is currently unused */
     if (in_use != BALSA_PROGRESS_NONE) 
         return FALSE;
     
     in_use = BALSA_PROGRESS_INCREMENT;
-    gtk_object_set_data(GTK_OBJECT(progress_bar), 
-                        "in_use", 
-                        GINT_TO_POINTER(in_use));
+    g_object_set_data(G_OBJECT(progress_bar), "in_use",
+                      GINT_TO_POINTER(in_use));
     
     return TRUE;
 }
@@ -3391,8 +3397,8 @@ balsa_window_clear_progress(BalsaWindow* window)
     progress_bar =
         GTK_PROGRESS_BAR(gnome_appbar_get_progress
                          (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use = GPOINTER_TO_INT(
-        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+    in_use =
+        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar), "in_use"));
 
     /* make sure we're using it before it is cleared */
     if (in_use != BALSA_PROGRESS_INCREMENT)
@@ -3401,9 +3407,8 @@ balsa_window_clear_progress(BalsaWindow* window)
     gtk_progress_bar_set_fraction(progress_bar, 0);
 
     in_use = BALSA_PROGRESS_NONE;
-    gtk_object_set_data(GTK_OBJECT(progress_bar), 
-                        "in_use", 
-                        GINT_TO_POINTER(in_use));
+    g_object_set_data(G_OBJECT(progress_bar), "in_use",
+                      GINT_TO_POINTER(in_use));
 }
 
 
@@ -3428,8 +3433,8 @@ balsa_window_increment_progress(BalsaWindow* window)
     progress_bar =
         GTK_PROGRESS_BAR(gnome_appbar_get_progress
                          (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use = GPOINTER_TO_INT(
-        gtk_object_get_data(GTK_OBJECT(progress_bar), "in_use"));
+    in_use = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar),
+                                               "in_use"));
 
     /* make sure the progress bar is being incremented */
     if (in_use != BALSA_PROGRESS_INCREMENT)
@@ -3536,14 +3541,14 @@ void
 update_view_menu(void)
 {
     GtkWidget *w = view_menu[MENU_VIEW_WRAP_POS].widget;
-    gtk_signal_handler_block_by_func(GTK_OBJECT(w), 
-                                     GTK_SIGNAL_FUNC(wrap_message_cb),
-                                     balsa_app.main_window);
+    g_signal_handlers_block_by_func(G_OBJECT(w), 
+                                    G_CALLBACK(wrap_message_cb),
+                                    balsa_app.main_window);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w),
                                    balsa_app.browse_wrap);
-    gtk_signal_handler_unblock_by_func(GTK_OBJECT(w), 
-                                       GTK_SIGNAL_FUNC(wrap_message_cb),
-                                       balsa_app.main_window);
+    g_signal_handlers_unblock_by_func(G_OBJECT(w), 
+                                      G_CALLBACK(wrap_message_cb),
+                                      balsa_app.main_window);
     if (balsa_app.main_window->preview)
         balsa_message_set_wrap(BALSA_MESSAGE(balsa_app.main_window->preview),
                                balsa_app.browse_wrap);

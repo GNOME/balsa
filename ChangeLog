@@ -1,5 +1,10 @@
 2000-08-09  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/mailbox.c: Make the libbalsa_mailbox_get_message_stream
+	a proper GTK+ signal instead of messing with the class ourselves.
+	
+2000-08-09  Ian Campbell  <ijc25@cam.ac.uk>
+
 	* libbalsa/libbalsa.c, libbalsa/libbalsa.h:
 	* libbalsa/misc.c, libbalsa/misc.h:
 	libbalsa/misc.h: Don't pass the spoolfile to libbalsa_init

@@ -59,6 +59,11 @@ static void message_status_changed_cb (LibBalsaMessage *message, LibBalsaMailbox
 
 static LibBalsaMessage *translate_message (HEADER * cur);
 
+/* Marshalling function */
+static void libbalsa_marshal_POINTER__OBJECT (GtkObject * object,
+					       GtkSignalFunc func,
+					       gpointer func_data, GtkArg * args);
+
 #ifdef BALSA_USE_THREADS
 static void error_in_thread( const char *format, ... );
 
@@ -251,6 +256,7 @@ enum {
   MESSAGE_STATUS_CHANGED,
   MESSAGE_NEW,
   MESSAGE_DELETE,
+  GET_MESSAGE_STREAM,
   LAST_SIGNAL
 };
 
@@ -330,7 +336,17 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, message_delete),
 		    gtk_marshal_NONE__POINTER,
 		    GTK_TYPE_NONE, 1, LIBBALSA_TYPE_MESSAGE);
-  
+
+  /* Virtual functions. Use GTK_RUN_NO_HOOKS
+     which prevents the signal being connected to */
+  libbalsa_mailbox_signals[GET_MESSAGE_STREAM] =
+    gtk_signal_new ("get-message-stream",
+		    GTK_RUN_LAST|GTK_RUN_NO_HOOKS,
+		    object_class->type,
+		    GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, get_message_stream),
+		    libbalsa_marshal_POINTER__OBJECT,
+		    GTK_TYPE_POINTER, 1, LIBBALSA_TYPE_MESSAGE);
+
   gtk_object_class_add_signals (object_class, libbalsa_mailbox_signals, LAST_SIGNAL);
 
   object_class->destroy = libbalsa_mailbox_destroy;
@@ -403,19 +419,15 @@ libbalsa_mailbox_close(LibBalsaMailbox *mailbox)
 FILE*
 libbalsa_mailbox_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *message)
 {
-  LibBalsaMailboxClass *klass;
-  FILE *res = NULL;
+  FILE *retval = NULL;
 
   g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
   g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
   g_return_val_if_fail(message->mailbox == mailbox, NULL);
 
-  klass = LIBBALSA_MAILBOX_CLASS(GTK_OBJECT(mailbox)->klass);
-  
-  if ( klass->get_message_stream )
-    res = klass->get_message_stream(mailbox, message);
- 
-  return res;
+  gtk_signal_emit(GTK_OBJECT(mailbox), libbalsa_mailbox_signals[GET_MESSAGE_STREAM], message, &retval);
+
+  return retval;
 }
 
 static void 
@@ -741,4 +753,16 @@ translate_message (HEADER * cur)
 static void message_status_changed_cb (LibBalsaMessage *message, LibBalsaMailbox *mb )
 {
   gtk_signal_emit ( GTK_OBJECT(message->mailbox), libbalsa_mailbox_signals[MESSAGE_STATUS_CHANGED], message);
+}
+
+typedef gpointer (*GtkSignal_POINTER__OBJECT)(GtkObject *object, GtkObject *parm, gpointer user_data);
+
+static void libbalsa_marshal_POINTER__OBJECT (GtkObject * object, GtkSignalFunc func, gpointer func_data, GtkArg * args)
+{
+  GtkSignal_POINTER__OBJECT rfunc;
+  gpointer* return_val;
+  
+  return_val = GTK_RETLOC_POINTER(args[1]);
+  rfunc = (GtkSignal_POINTER__OBJECT)func;
+  *return_val = (*rfunc)(object, GTK_VALUE_OBJECT(args[0]), func_data);
 }

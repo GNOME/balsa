@@ -42,13 +42,16 @@
 #include "address-book.h"
 
 static gchar *read_signature (void);
+static gint include_file_cb (GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb (GtkWidget *, BalsaSendmsg *);
 static gint postpone_message_cb (GtkWidget *, BalsaSendmsg *);
+static gint print_message_cb (GtkWidget *, BalsaSendmsg *);
 static gint attach_clicked (GtkWidget *, gpointer);
 static gint close_window (GtkWidget *, gpointer);
-static gint check_if_regular_file (gchar *);
+static gint check_if_regular_file (const gchar *);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 void send_body_wrap (Body *body, GtkText *text);
+
 
 static void set_menus(BalsaSendmsg*);
 static gint toggle_from_cb (GtkWidget *, BalsaSendmsg *);
@@ -58,6 +61,15 @@ static gint toggle_cc_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_bcc_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_fcc_cb (GtkWidget *, BalsaSendmsg *);
 static gint toggle_attachments_cb (GtkWidget *, BalsaSendmsg *);
+
+static gint iso_font_set(BalsaSendmsg*, gint , gint );
+static gint iso_1_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_15_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_2_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_3_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_5_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_8_cb(GtkWidget* , BalsaSendmsg *);
+static gint iso_9_cb(GtkWidget* , BalsaSendmsg *);
 
 /* Standard DnD types */
 enum
@@ -94,10 +106,10 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_ITEM_STOCK (N_ ("Spelling"), N_ ("Check Spelling"), 
 			  NULL, GNOME_STOCK_PIXMAP_SPELLCHECK),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print"), 
-			  NULL, GNOME_STOCK_PIXMAP_PRINT),
-  GNOMEUIINFO_SEPARATOR,
 #endif
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print"), 
+			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
+  GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Cancel"), N_ ("Cancel"), 
 			  close_window, GNOME_STOCK_PIXMAP_CLOSE),
   GNOMEUIINFO_END
@@ -105,18 +117,17 @@ static GnomeUIInfo main_toolbar[] =
 
 static GnomeUIInfo file_menu[] =
 {
-  {
-    GNOME_APP_UI_ITEM, N_ ("_Send"), NULL, send_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_SND, 'Y', 0, NULL
-  },
-  {
-    GNOME_APP_UI_ITEM, N_ ("_Attach file..."), NULL, attach_clicked, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH, 'H', 0, NULL
-  },
-  {
-    GNOME_APP_UI_ITEM, N_ ("_Postpone"), NULL, postpone_message_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_SAVE, 'P', 0, NULL
-  },
+  GNOMEUIINFO_ITEM_STOCK(N_ ("_Include File..."), NULL,
+			 include_file_cb, GNOME_STOCK_MENU_OPEN),
+  GNOMEUIINFO_ITEM_STOCK(N_ ("_Attach file..."), NULL, 
+			 attach_clicked, GNOME_STOCK_MENU_ATTACH),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_ITEM_STOCK(N_ ("_Send"),N_ ("Send the currently edited message"),
+			 send_message_cb, GNOME_STOCK_MENU_MAIL_SND),
+  GNOMEUIINFO_ITEM_STOCK(N_ ("_Postpone"), NULL, 
+			 postpone_message_cb, GNOME_STOCK_MENU_SAVE),
+  GNOMEUIINFO_ITEM_STOCK(N_ ("Print"), N_ ("Print the edited message"), 
+			  print_message_cb, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
 
   GNOMEUIINFO_MENU_CLOSE_ITEM(close_window, NULL),
@@ -124,50 +135,60 @@ static GnomeUIInfo file_menu[] =
   GNOMEUIINFO_END
 };
 
+
 static GnomeUIInfo view_menu[] =
 {
 #define MENU_TOGGLE_FROM_POS 0
-  {
-     GNOME_APP_UI_TOGGLEITEM, N_ ("_From"), NULL,
-    toggle_from_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, NULL , GDK_VoidSymbol, 0, NULL
-  },
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_From"), NULL, toggle_from_cb, NULL),
 #define MENU_TOGGLE_TO_POS 1
-  {
-     GNOME_APP_UI_TOGGLEITEM, N_ ("_To"), NULL,
-    toggle_to_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, NULL , GDK_VoidSymbol, 0, NULL
-  },
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_To"), NULL, toggle_to_cb, NULL),
 #define MENU_TOGGLE_SUBJECT_POS 2
-  {
-     GNOME_APP_UI_TOGGLEITEM, N_ ("_Subject"), NULL,
-    toggle_subject_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, NULL , GDK_VoidSymbol, 0, NULL
-  },
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Subject"), NULL, toggle_subject_cb, NULL),
 #define MENU_TOGGLE_CC_POS 3
-  {
-     GNOME_APP_UI_TOGGLEITEM, N_ ("_Cc"), NULL,
-    toggle_cc_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, NULL , GDK_VoidSymbol, 0, NULL
-  },
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Cc"), NULL, toggle_cc_cb, NULL),
 #define MENU_TOGGLE_BCC_POS 4
-  {
-     GNOME_APP_UI_TOGGLEITEM, N_ ("_Bcc"), NULL,
-    toggle_bcc_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, NULL , GDK_VoidSymbol, 0, NULL
-  },
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Bcc"), NULL, toggle_bcc_cb, NULL),
 #define MENU_TOGGLE_FCC_POS 5
-  {
-     GNOME_APP_UI_TOGGLEITEM, N_ ("_Fcc"), NULL,
-    toggle_fcc_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, NULL , GDK_VoidSymbol, 0, NULL
-  },
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Fcc"), NULL, toggle_fcc_cb, NULL),
 #define MENU_TOGGLE_ATTACHMENTS_POS 6
-  {
-     GNOME_APP_UI_TOGGLEITEM, N_ ("_Attachments"), NULL,
-    toggle_attachments_cb, NULL,
-    NULL, GNOME_APP_PIXMAP_NONE, NULL , GDK_VoidSymbol, 0, NULL
-  },
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Attachments"),NULL,toggle_attachments_cb,NULL),
+  GNOMEUIINFO_END
+};
+
+
+/* ISO-8859-1 MUST BE at the first position - see set_menus */
+static GnomeUIInfo iso_charset_menu[] = {
+#define ISO_CHARSET_1_POS 0
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Western (ISO-8859-1)"), NULL, iso_1_cb),
+#define ISO_CHARSET_15_POS 1
+  GNOMEUIINFO_ITEM_NONE( N_ ("W_estern (ISO-8859-15)"), NULL, iso_15_cb),
+#define ISO_CHARSET_2_POS 2
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Central European (ISO-8859-2)"), NULL,iso_2_cb),
+#define ISO_CHARSET_3_POS 3
+  GNOMEUIINFO_ITEM_NONE( N_ ("_South European (ISO-8859-3)"), NULL, iso_3_cb),
+#define ISO_CHARSET_5_POS 4
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Cyrylic (ISO-8859-5)"), NULL, iso_5_cb),
+#define ISO_CHARSET_8_POS 5
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Hebrew (ISO-8859-8)"), NULL, iso_8_cb),
+#define ISO_CHARSET_9_POS 6
+  GNOMEUIINFO_ITEM_NONE( N_ ("_Turkish (ISO-8859-9)"), NULL, iso_9_cb),
+  GNOMEUIINFO_END
+};
+
+/* the same sequence as in iso_charset_menu */
+static gchar* iso_charset_names[] = {
+   "ISO-8859-1",
+   "ISO-8859-15",
+   "ISO-8859-2",
+   "ISO-8859-3",
+   "ISO-8859-5",
+   "ISO-8859-8",
+   "ISO-8859-9",
+};
+
+static GnomeUIInfo iso_menu[] = {
+  { GNOME_APP_UI_RADIOITEMS, NULL, NULL, iso_charset_menu, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL, 0, 0, NULL },
   GNOMEUIINFO_END
 };
 
@@ -176,55 +197,60 @@ static GnomeUIInfo main_menu[] =
 {
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
   GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
+  GNOMEUIINFO_SUBTREE(N_("_ISO Charset"), iso_menu),
   GNOMEUIINFO_END
 };
 
+/* the callback handlers */
 static gint
 close_window (GtkWidget * widget, gpointer data)
 {
-  BalsaSendmsg *bsm;
-  bsm = data;
-  balsa_sendmsg_destroy (bsm);
-
+  balsa_sendmsg_destroy ((BalsaSendmsg*)data);
   return TRUE;
 }
 
+static gint
+delete_event_cb (GtkWidget * widget, GdkEvent *e, gpointer data)
+{
+  balsa_sendmsg_destroy ((BalsaSendmsg*)data);
+  return TRUE;
+}
 
+/* the balsa_sendmsg destructor */
 static void
 balsa_sendmsg_destroy (BalsaSendmsg * bsm)
 {
-  gtk_widget_destroy (bsm->to[1]);
-  gtk_widget_destroy (bsm->from[1]);
-  gtk_widget_destroy (bsm->subject[1]);
-  gtk_widget_destroy (bsm->cc[1]);
-  gtk_widget_destroy (bsm->bcc[1]);
-  gtk_widget_destroy (bsm->fcc[1]);
-  gtk_widget_destroy (bsm->window);
-  g_free (bsm);
-  
-  bsm = NULL;
+   g_assert(bsm != NULL);
+   
+   gtk_widget_destroy (bsm->window);
+   if(balsa_app.debug) printf("balsa_sendmsg_destroy: Freeing bsm\n");
+   g_free (bsm);
+   bsm = NULL; // useless - it's just a local variable...
 }
 
 static void
 remove_attachment (GtkWidget * widget, GnomeIconList * ilist)
 {
-  gint num = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (ilist), "selectednumbertoremove"));
+  gint num = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (ilist), 
+						   "selectednumbertoremove"));
   gnome_icon_list_remove (ilist, num);
   gtk_object_remove_data (GTK_OBJECT (ilist), "selectednumbertoremove");
 }
 
+/* the menu is createn on right-button click an an attachement */
 static GtkWidget *
 create_popup_menu (GnomeIconList * ilist, gint num)
 {
   GtkWidget *menu, *menuitem;
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label (_ ("Remove"));
-  gtk_object_set_data (GTK_OBJECT (ilist), "selectednumbertoremove", GINT_TO_POINTER (num));
+  gtk_object_set_data (GTK_OBJECT (ilist), "selectednumbertoremove", 
+		       GINT_TO_POINTER (num));
   gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 		      GTK_SIGNAL_FUNC (remove_attachment), ilist);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
-
+  
   return menu;
 }
 
@@ -251,52 +277,55 @@ select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event,
 static void
 add_attachment (GnomeIconList * iconlist, char *filename)
 {
-  /* Why use unconditional? */ 
-  gchar *pix = gnome_pixmap_file ("balsa/attachment.png");
-
-  printf("attachment icon position: %s\n",pix);
-  if( !check_if_regular_file( filename ) ) {
+   /* FIXME: the path to the file must not be hardcoded */ 
+   gchar *pix = gnome_pixmap_file ("balsa/attachment.png");
+   
+   if( !check_if_regular_file( filename ) ) {
       /*c_i_r_f() will pop up an error dialog for us, so we need do nothing.*/
       return;
-  }
-
-  if( pix && check_if_regular_file( pix ) ) {
-    gint pos;
-    pos = gnome_icon_list_append (
-				 iconlist,
-				 pix,
-				 g_basename (filename));
-    gnome_icon_list_set_icon_data (iconlist, pos, filename);
-  } else {
+   }
+   
+   if( pix && check_if_regular_file( pix ) ) {
+      gint pos;
+      pos = gnome_icon_list_append (
+	 iconlist, pix,
+	 g_basename (filename));
+      gnome_icon_list_set_icon_data (iconlist, pos, filename);
+   } else {
       /*PKGW*/
-      GtkWidget *box = gnome_message_box_new( _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
-						"This means you cannot attach any files.\n"), 
-					      GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
-      gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
-      gnome_dialog_run( GNOME_DIALOG( box ) );
-      gtk_widget_destroy( GTK_WIDGET( box ) );
-  }
+      GtkWidget *box = gnome_message_box_new( 
+	 _("The attachment pixmap (balsa/attachment.png) cannot be found.\n"
+	  "This means you cannot attach any files.\n"), 
+	GNOME_MESSAGE_BOX_ERROR, _("OK"), NULL );
+     gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+     gnome_dialog_run( GNOME_DIALOG( box ) );
+     gtk_widget_destroy( GTK_WIDGET( box ) );
+   }
 }
 
 static gint
-check_if_regular_file (gchar *filename)
+check_if_regular_file (const gchar *filename)
 {
   struct stat s;
   GtkWidget *msgbox;
-  gchar *ptr = 0;
+  gchar *ptr = NULL;
   gint result = TRUE;
+
   if (stat (filename, &s)) {
-    ptr = g_strdup_printf (_ ("Cannot get info on file '%s': %s\n"), filename, strerror (errno));
+    ptr = g_strdup_printf (_ ("Cannot get info on file '%s': %s\n"), filename,
+			   strerror (errno));
     result = FALSE;
   } else if (!S_ISREG (s.st_mode)) {
-    ptr = g_strdup_printf (_ ("Attachment is not a regular file: '%s'\n"), filename);
+    ptr = g_strdup_printf (_ ("Attachment is not a regular file: '%s'\n"), 
+			   filename);
     result = FALSE;
   }
   if (ptr) {
-    msgbox = gnome_message_box_new (ptr, GNOME_MESSAGE_BOX_ERROR, _ ("Cancel"), NULL);
+    msgbox = gnome_message_box_new (ptr, GNOME_MESSAGE_BOX_ERROR, 
+				    _ ("Cancel"), NULL);
+    g_free (ptr);
     gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
     gnome_dialog_run (GNOME_DIALOG (msgbox));
-    free (ptr);
   }
   return result;
 }
@@ -314,17 +343,9 @@ attach_dialog_ok (GtkWidget * widget, gpointer data)
   filename = g_strdup (gtk_file_selection_get_filename (fs));
   add_attachment (iconlist, filename);
 
-  /* FIXME */
-  /* g_free(filename); */
+  /* don't g_free(filename) - the add_attachment arg is not const */
 
   gtk_widget_destroy (GTK_WIDGET (fs));
-}
-
-static gint
-attach_dialog_cancel (GtkWidget * widget, gpointer data)
-{
-  gtk_widget_destroy (GTK_WIDGET (data));
-  return TRUE;
 }
 
 static gint
@@ -348,7 +369,7 @@ attach_clicked (GtkWidget * widget, gpointer data)
 		      (GtkSignalFunc) attach_dialog_ok,
 		      fs);
   gtk_signal_connect (GTK_OBJECT (fs->cancel_button), "clicked",
-		      (GtkSignalFunc) attach_dialog_cancel,
+		      (GtkSignalFunc) GTK_SIGNAL_FUNC(gtk_widget_destroy),
 		      fs);
 
   gtk_widget_show (fsw);
@@ -404,8 +425,6 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 {
   GtkWidget *sw;
   GtkWidget *table;
-  //GtkWidget *label;
-  //GtkWidget *button;
   GtkWidget *frame;
 
   table = gtk_table_new (7, 3, FALSE);
@@ -590,34 +609,29 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   msg->attachments[3] = frame;
 
   gtk_widget_show_all( GTK_WIDGET(table) );
-  set_menus(msg);
 
   return table;
 }
 
+/* create_text_area should not have any hard-coded assumptions about the 
+   font charset that is to be used.
+*/
 static GtkWidget *
 create_text_area (BalsaSendmsg * msg)
 {
   GtkWidget *table;
   GtkWidget *hscrollbar;
   GtkWidget *vscrollbar;
-  GdkFont *font;
-  GdkColormap* colormap;
-  GtkStyle *style;
-
-  style = gtk_style_new ();
-  font = gdk_font_load ( balsa_app.message_font );
-  colormap = gtk_widget_get_colormap (GTK_WIDGET (msg->attachments[1]));
-
-  style->font = font;
 
   table = gtk_table_new (2, 2, FALSE);
 
   msg->text = gtk_text_new (NULL, NULL);
   gtk_text_set_editable (GTK_TEXT (msg->text), TRUE);
   gtk_text_set_word_wrap (GTK_TEXT (msg->text), TRUE);
-  gtk_widget_set_style (msg->text, style);
-  gtk_widget_set_usize (msg->text, (82 * 7) + (2 * msg->text->style->klass->xthickness), -1);
+
+  gtk_widget_set_usize (msg->text, 
+			(82 * 7) + (2 * msg->text->style->klass->xthickness), 
+			-1);
   gtk_widget_show (msg->text);
   gtk_table_attach_defaults (GTK_TABLE (table), msg->text, 0, 1, 0, 1);
   hscrollbar = gtk_hscrollbar_new (GTK_TEXT (msg->text)->hadj);
@@ -635,17 +649,105 @@ create_text_area (BalsaSendmsg * msg)
   return table;
 }
 
+/* continueBody ---------------------------------------------------------
+   a short-circuit procedure for the 'Continue action'
+*/
+static void
+continueBody(Message * message, BalsaSendmsg *msg)
+{
+   GString *rbdy;
+
+   g_return_if_fail(message->body_list != NULL); /* FIXME: is it needed? */
+
+   rbdy = content2reply (message, NULL); 
+   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
+		    strlen (rbdy->str));
+   g_string_free (rbdy, TRUE);
+}
+
+/* quoteBody ------------------------------------------------------------
+   quotes properly the body of the message
+   Continue basically copies the text over to the entry field.
+*/
+static void 
+quoteBody(Message * message, BalsaSendmsg *msg, SendType type)
+{
+   GString *rbdy;
+   gchar *str, *personStr;
+
+   message_body_ref (message); /* avoid unexpected object vanishing(?) */
+   
+   //body = (Body *) message->body_list->data;
+
+   personStr = (message->from && message->from->personal) ?
+      message->from->personal : _("you");
+   
+      /* Should use instead something like:
+       * 	strftime( buf, sizeof(buf), _("On %A %B %d %Y etc"),
+       * 	                somedateparser(message-date)));
+       * 	tmp = g_strdup_printf (buf);
+       * so the date attribution can fully (and properly) translated.
+       */
+   if(message->date)
+      str = g_strdup_printf (_("On %s %s wrote:\n"), message->date, personStr);
+   else
+      str = g_strdup_printf (_("%s wrote:\n"), personStr);
+
+
+   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
+		    str, strlen (str));
+   
+   g_free (str);
+
+   rbdy = content2reply (message, 
+			 (type == SEND_REPLY || type == SEND_REPLY_ALL) ?
+			 balsa_app.quote_str : NULL); 
+   
+   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
+		    strlen (rbdy->str));
+   g_string_free (rbdy, TRUE);
+
+   gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
+   message_body_unref (message);
+}
+
+/* fillBody --------------------------------------------------------------
+   fills the body of the message to be composed based on the given message.
+   First quotes the original one and then adds the signature
+*/
+static void
+fillBody(Message * message, BalsaSendmsg *msg, SendType type)
+{
+   gchar *signature;
+   
+   if (type != SEND_NORMAL && message) 
+      quoteBody(message, msg, type);
+   
+  if ((signature = read_signature()) != NULL) {
+     if ( ((type == SEND_REPLY || type == SEND_REPLY_ALL) && 
+	   balsa_app.sig_whenreply) ||
+	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
+	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) ) {
+	gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
+			 signature, strlen (signature));
+     }
+     g_free (signature);
+  }
+  /* FIXME: workaround for buggy GtkText, is it needed? */
+  gtk_text_set_point( GTK_TEXT(msg->text), 0); 
+  gtk_editable_set_position( GTK_EDITABLE(msg->text), 0);
+}
+
 void
 sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 {
   GtkWidget *window;
   GtkWidget *paned = gtk_vpaned_new ();
   gchar *newsubject = NULL;
-  gchar *signature;
-
   BalsaSendmsg *msg = NULL;
 
   msg = g_malloc (sizeof (BalsaSendmsg));
+  msg->font = NULL;
 
   switch (type)
     {
@@ -675,8 +777,10 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   msg->window  = window;
   msg->type    = type;
 
-  gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
-		      GTK_SIGNAL_FUNC (gtk_false), NULL);
+  gtk_signal_connect (GTK_OBJECT(msg->window), "delete_event",
+		      GTK_SIGNAL_FUNC (delete_event_cb), msg);
+  gtk_signal_connect (GTK_OBJECT (msg->window), "destroy_event",
+  		      GTK_SIGNAL_FUNC (delete_event_cb), msg);
 
   gnome_app_create_menus_with_data (GNOME_APP (window), main_menu, msg);
   gnome_app_create_toolbar_with_data (GNOME_APP (window), main_toolbar, msg);
@@ -830,77 +934,12 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   gnome_app_set_contents (GNOME_APP (window), paned);
 
+  gtk_text_insert   (GTK_TEXT(msg->text), NULL, NULL, NULL, "\n", 1);
 
-  gtk_text_freeze (GTK_TEXT (msg->text));
-  if (type != SEND_NORMAL)
-    {
-      Body *body = NULL;
-      GString *str = g_string_new ("\n\n");
-      GString *rbdy;
-      gchar *tmp;
-
-      message_body_ref (message);
-
-      if (message->body_list)
-	{
-	  body = (Body *) message->body_list->data;
-
-	  if (message->date)
-	    {
-              /* Should use instead something like:
-               * 	strftime( buf, sizeof(buf), _("On %A %B %d %Y etc"),
-               * 	                somedateparser(message-date)));
-               * 	tmp = g_strdup_printf (buf);
-               * so the date attribution can fully (and properly) translated.
-               */		
-	      tmp = g_strdup_printf (_("On %s "), message->date);
-	      str = g_string_append (str, tmp);
-	      g_free (tmp);
-	    }
-
-	  if (message->from)
-	    {
-	      if (message->from->personal)
-		str = g_string_append (str, message->from->personal);
-	      else
-		str = g_string_append (str, _("you"));
-	    }
-	  else
-	    str = g_string_append (str, _("you"));
-
-	  str = g_string_append (str, _(" wrote:\n"));
-
-
-      if (type != SEND_CONTINUE)
-	    gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
-			     str->str, strlen (str->str));
-
-	  g_string_free (str, TRUE);
-
-      if (type != SEND_CONTINUE)
-	    rbdy = content2reply (message, balsa_app.quote_str);     /* arp */
-	  else
-	    rbdy = content2reply (message, NULL);	             /* arp */
-
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, 
-			   strlen (rbdy->str));
-	  g_string_free (rbdy, TRUE);
-	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
-	}
-      message_body_unref (message);
-    }
-
-  if ((signature = read_signature()) != NULL && type != SEND_CONTINUE) {
-     if ( ((type == SEND_REPLY || type == SEND_REPLY_ALL) && 
-	   balsa_app.sig_whenreply) ||
-	  ( (type == SEND_FORWARD) && balsa_app.sig_whenforward) ||
-	  ( (type == SEND_NORMAL) && balsa_app.sig_sending) )
-	gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, 
-			 signature, strlen (signature));
-     g_free (signature);
-    }
-  gtk_text_set_point (GTK_TEXT (msg->text), 0);
-  gtk_text_thaw (GTK_TEXT (msg->text));
+  if(type==SEND_CONTINUE) 
+     continueBody(message,msg);
+  else
+     fillBody(message, msg, type);
 
   /* set the toolbar so we are consistant with the rest of balsa */
   {
@@ -914,10 +953,12 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
     gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), balsa_app.toolbar_style);
   }
 
-  /* display the window, but some stuff shold be hidden? */
-
+  /* set the menus  - and charset index - and display the window */
+  /* FIXME: this will also reset the font, copying the text back and 
+     forth which is sub-optimal
+  */
+  set_menus(msg); 
   gtk_widget_show (window);
-
 }
 
 static gchar *
@@ -941,12 +982,83 @@ read_signature (void)
   return ret;
 }
 
+/* opens the load file dialog box, allows selection of the file and includes
+   it at current point */
+static void do_insert_file(GtkWidget *selector, GtkFileSelection* fs) {
+   gchar* fname;
+   guint cnt;
+   gchar buf[4096];
+   FILE* fl;
+   BalsaSendmsg * bsmsg;
+
+   bsmsg = (BalsaSendmsg*) gtk_object_get_user_data (GTK_OBJECT (fs));
+   fname = gtk_file_selection_get_filename( GTK_FILE_SELECTION(fs) );
+
+   cnt = gtk_editable_get_position( GTK_EDITABLE(bsmsg->text) );
+
+   if(! (fl = fopen(fname,"rt")) ) {
+      GtkWidget *box = gnome_message_box_new( 
+	 _("Could not open the file.\n"), 
+	 GNOME_MESSAGE_BOX_ERROR, _("Cancel"), NULL );
+      gtk_window_set_modal( GTK_WINDOW( box ), TRUE );
+      gnome_dialog_run( GNOME_DIALOG( box ) );
+      gtk_widget_destroy( GTK_WIDGET( box ) );
+   } else {
+      gnome_appbar_push(balsa_app.appbar, _("Loading..."));
+
+      gtk_text_freeze( GTK_TEXT(bsmsg->text) );
+      gtk_text_set_point( GTK_TEXT(bsmsg->text), cnt); 
+      while( (cnt=fread(buf, 1,sizeof(buf), fl)) > 0) {
+	 if(balsa_app.debug)
+	    printf("%s cnt: %d (max: %d)\n",fname, cnt, sizeof(buf));
+	 gtk_text_insert(GTK_TEXT(bsmsg->text), bsmsg->font, 
+			 NULL, NULL, buf, cnt);
+      }
+      if(balsa_app.debug)
+	 printf("%s cnt: %d (max: %d)\n",fname, cnt, sizeof(buf));
+
+      gtk_text_thaw( GTK_TEXT(bsmsg->text) );
+      fclose(fl);
+      gnome_appbar_pop(balsa_app.appbar);
+   }
+   /* g_free(fname); */
+   gtk_widget_destroy(GTK_WIDGET(fs) );
+   
+}
+
+static gint include_file_cb (GtkWidget *widget, BalsaSendmsg *bsmsg) {
+   GtkWidget *file_selector;
+
+   file_selector =  gtk_file_selection_new(_("Include file"));
+   gtk_object_set_user_data (GTK_OBJECT (file_selector), bsmsg);
+
+   gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION(file_selector));
+
+   gtk_signal_connect (GTK_OBJECT(
+      GTK_FILE_SELECTION(file_selector)->ok_button),
+		       "clicked", GTK_SIGNAL_FUNC (do_insert_file), 
+		       file_selector);
+                             
+   /* Ensure that the dialog box is destroyed when the user clicks a button. */
+     
+   gtk_signal_connect_object (GTK_OBJECT(
+      GTK_FILE_SELECTION(file_selector)->cancel_button),  
+			      "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+			      (gpointer) file_selector);
+   
+   /* Display that dialog */
+   gtk_widget_show (file_selector);
+
+   return TRUE;
+}
+
 static gint
 send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
   Message *message;
   Body *body;
   gchar *tmp;
+  gchar *def_charset;
 
   tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to[1]));
   {
@@ -1043,6 +1155,12 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   }
 
 
+  /* not really a nice way of doing it, is it? */
+  def_charset =  balsa_app.charset;
+  balsa_app.charset = iso_charset_names[bsmsg->charset_idx];
+  if(balsa_app.debug) 
+     fprintf(stderr, "sending with charset: %s\n", balsa_app.charset);
+
   if (balsa_send_message (message)) {
     if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
       {
@@ -1063,6 +1181,8 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
           }
       }
   }
+
+  balsa_app.charset = def_charset;
 
   g_list_free (message->body_list);
   message_destroy (message);
@@ -1123,32 +1243,36 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   body = body_new ();
 
-  body->buffer = gtk_editable_get_chars (GTK_EDITABLE (bsmsg->text), 0,
-			      gtk_text_get_length (GTK_TEXT (bsmsg->text)));
+  body->buffer = gtk_editable_get_chars(GTK_EDITABLE (bsmsg->text), 0,
+					gtk_text_get_length (
+					   GTK_TEXT (bsmsg->text)));
 
   message->body_list = g_list_append (message->body_list, body);
 
   {				/* handle attachments */
     gint i;
     Body *abody;
-    for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments[1])->icons; i++)
-      {
-	abody = body_new ();
-	/* PKGW: see above about why this isn't strduped. */
-	abody->filename = (gchar *) gnome_icon_list_get_icon_data (GNOME_ICON_LIST (bsmsg->attachments[1]), i);
-	message->body_list = g_list_append (message->body_list, abody);
-      }
+
+    for (i = 0; i < GNOME_ICON_LIST (bsmsg->attachments[1])->icons; i++) {
+      abody = body_new ();
+      /* PKGW: see above about why this isn't strduped. */
+      abody->filename = (gchar *) 
+	gnome_icon_list_get_icon_data(GNOME_ICON_LIST(bsmsg->attachments[1]),
+				      i);
+      message->body_list = g_list_append (message->body_list, abody);
+    }
   }
+  
 
+  if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
+      && bsmsg->orig_message)
+     balsa_postpone_message (message, bsmsg->orig_message, 
+			     gtk_entry_get_text (
+				GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
+  else
+     balsa_postpone_message (message, NULL, gtk_entry_get_text (
+	GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
 
- if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL)
-     && bsmsg->orig_message)
-   balsa_postpone_message (message, bsmsg->orig_message, 
-                           gtk_entry_get_text (
-                               GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
- else
-   balsa_postpone_message (message, NULL, gtk_entry_get_text (
-       GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry)));
  if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message)
    {
      message_delete (bsmsg->orig_message);
@@ -1162,6 +1286,68 @@ postpone_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   return TRUE;
 }
 
+/* very harsh print handler. Prints headers and the body only, as raw text
+*/
+static gint 
+print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+
+#ifdef GNOME_PRINT
+#error this is not finished yet!
+#define FNT_SZ 12
+   GnomePrintFont * fnt;
+   GnomePrintContext * prn = gnome_print_context_new(
+      gnome_print_default_printer());
+
+   fnt = gnome_print_find_font("Times", FNT_SZ);
+   gnome_print_set_font(prn,fnt);
+
+
+   gnome_print_context_close(prn);
+   gnome_print_context_free (prn);
+#else
+   gchar* str;
+   gchar* dest;
+   FILE * lpr;
+
+   dest = g_strdup_printf(balsa_app.PrintCommand.PrintCommand, "-");
+   lpr  = popen(dest,"w");
+   g_free(dest);
+
+   if(!lpr) {
+      GtkWidget* msgbox = gnome_message_box_new (
+	 _("Cannot execute print command."), 
+	 GNOME_MESSAGE_BOX_ERROR, 
+	 _("Cancel"), NULL);
+      gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
+      gnome_dialog_run (GNOME_DIALOG (msgbox));
+   }
+
+   str = gtk_editable_get_chars( GTK_EDITABLE(bsmsg->from[1]),0,-1);
+   fprintf(lpr, "From   : %s\n",str);
+   g_free(str);
+   str = gtk_editable_get_chars( GTK_EDITABLE(bsmsg->to[1]),0,-1);
+   fprintf(lpr, "To     : %s\n",str);
+   g_free(str);
+   str = gtk_editable_get_chars( GTK_EDITABLE(bsmsg->subject[1]),0,-1);
+   fprintf(lpr, "Subject: %s\n",str);
+   g_free(str);
+
+   str = gtk_editable_get_chars( GTK_EDITABLE(bsmsg->text), 0, -1);
+   fputs(str, lpr);
+   g_free(str);
+   fputs("\n\f",lpr);
+
+   if(pclose(lpr)!=0) {
+      GtkWidget* msgbox = gnome_message_box_new (
+	 _("Error executing lpr"), GNOME_MESSAGE_BOX_ERROR, 
+	 _("Cancel"), NULL);
+      gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
+      gnome_dialog_run (GNOME_DIALOG (msgbox));
+   }
+#endif
+   return TRUE;
+}
 
 void
 send_body_wrap (Body *body, GtkText *text)
@@ -1235,7 +1421,7 @@ send_body_wrap (Body *body, GtkText *text)
   if(length)
     body_list = g_list_append(body_list,g_strndup(current_line,length));
 
-  body->buffer = malloc(final_length);
+  body->buffer = g_malloc(final_length);
   current_line = body->buffer;
 
   /* use the list of wrapped lines to create message body */
@@ -1244,13 +1430,12 @@ send_body_wrap (Body *body, GtkText *text)
     {
       strcpy(current_line, (char *)next_line->data);
       current_line += strlen( next_line->data);
-      free(next_line->data);
+      g_free(next_line->data);
       next_line=next_line->next;
     }
   g_list_free(body_list);
 
 }
-
 
 static gint 
 toggle_entry (GtkWidget *entry[], int pos, int cnt)
@@ -1295,6 +1480,7 @@ static gint toggle_attachments_cb (GtkWidget * widget, BalsaSendmsg *bsmsg)
 /* note that hiding the entries must be done seperately */
 static void set_menus(BalsaSendmsg *msg)
 {
+   unsigned i;
    gtk_check_menu_item_set_active(
       GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_TO_POS].widget), TRUE );
 
@@ -1320,4 +1506,81 @@ static void set_menus(BalsaSendmsg *msg)
       GTK_CHECK_MENU_ITEM(view_menu[MENU_TOGGLE_ATTACHMENTS_POS].widget),
       FALSE);
    toggle_entry(msg->attachments,  MENU_TOGGLE_ATTACHMENTS_POS,4); 
+
+   /* this should be read from the preferences set up. If not found, 
+      set to the 0th set.
+   */
+   i = sizeof(iso_charset_names)/sizeof(iso_charset_names[0])-1;
+   while( i>0 && g_strcasecmp (iso_charset_names[i],balsa_app.charset) !=0)
+      i--;
+
+   if(i==0) 
+      iso_font_set(msg, 1, 0);
+   else
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+	 iso_charset_menu[i].widget), TRUE);
+   msg->charset_idx = i;
 }
+
+/* hardcoded charset set :
+   text is the GtkText message edit widget, code is the iso-8859 character 
+   set encoding and pos is the menu position.
+   gtk_text_set_point doesn't work.
+   gtk_text_get_point doesn't work if the cursor pointer position was changed
+   by a mouse click
+*/
+
+static gint iso_font_set(BalsaSendmsg *msg, gint code, gint idx) {
+static const char base_mask[] = 
+   "-*-fixed-medium-r-normal--14-*-*-*-c-*-iso8859";
+   guint point, txt_len;
+   gchar* str;
+   /* ten extra characters for the code only is more than sufficent */
+   gchar font_name[sizeof(base_mask)+10]; 
+   
+   msg->charset_idx = idx;
+
+   if( ! GTK_CHECK_MENU_ITEM(iso_charset_menu[idx].widget)->active)
+      return TRUE;
+   
+   g_snprintf(font_name,sizeof(font_name),"%s-%d",base_mask,code);
+   
+   if(msg->font) gdk_font_unref(msg->font);
+
+   if( !( msg->font = gdk_font_load (font_name)) ) {
+      printf("Cannot find fond: %s\n", font_name);
+      return TRUE;
+   }
+   if(balsa_app.debug) 
+      fprintf(stderr,"loaded font with mask: %s\n", font_name);
+
+   gtk_text_freeze( GTK_TEXT(msg->text) );
+   point   = gtk_editable_get_position( GTK_EDITABLE(msg->text) ); 
+   txt_len = gtk_text_get_length( GTK_TEXT(msg->text) );
+   str     = gtk_editable_get_chars( GTK_EDITABLE(msg->text), 0, txt_len);
+   
+   gtk_text_set_point( GTK_TEXT(msg->text), 0);
+   gtk_text_forward_delete ( GTK_TEXT(msg->text), txt_len); 
+   
+   gtk_text_insert(GTK_TEXT(msg->text), msg->font, NULL, NULL, str, txt_len);
+   g_free(str);
+   gtk_text_thaw( GTK_TEXT(msg->text) );
+
+   gtk_editable_set_position( GTK_EDITABLE(msg->text), point);
+   return FALSE;
+}
+
+static gint iso_1_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return iso_font_set(bsmsg,  1, ISO_CHARSET_1_POS); }
+static gint iso_15_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return iso_font_set(bsmsg, 15, ISO_CHARSET_15_POS); }
+static gint iso_2_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return iso_font_set(bsmsg,  2, ISO_CHARSET_2_POS); }
+static gint iso_3_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return iso_font_set(bsmsg,  3, ISO_CHARSET_3_POS); }
+static gint iso_5_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return iso_font_set(bsmsg,  5, ISO_CHARSET_5_POS); }
+static gint iso_8_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return iso_font_set(bsmsg,  8, ISO_CHARSET_8_POS); }
+static gint iso_9_cb(GtkWidget* widget, BalsaSendmsg *bsmsg)
+{return iso_font_set(bsmsg,  9, ISO_CHARSET_9_POS); }

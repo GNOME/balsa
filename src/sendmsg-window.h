@@ -1,4 +1,3 @@
-
 /* Balsa E-Mail Client
  * Copyright (C) 1998 Jay Painter and Stuart Parmenter
  *
@@ -25,32 +24,34 @@
 extern "C"
 {
 #endif				/* __cplusplus */
-
-  typedef enum
-    {
-      SEND_NORMAL,
-      SEND_REPLY,
-      SEND_REPLY_ALL,
-      SEND_FORWARD,
-      SEND_CONTINUE
-    }
-  SendType;
-
-
-  typedef struct _BalsaSendmsg BalsaSendmsg;
-
-  struct _BalsaSendmsg
-    {
-      GtkWidget *window;
-      GtkWidget* to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3];
-      GtkWidget *attachments[4];
-      GtkWidget *text;
-      Message *orig_message;
-      SendType type;
-    };
+   
+   typedef enum
+   {
+      SEND_NORMAL,              /* initialized by Compose */
+      SEND_REPLY,               /* by Reply               */
+      SEND_REPLY_ALL,           /* by Reply All           */
+      SEND_FORWARD,             /* by Forward             */
+      SEND_CONTINUE             /* by Continue postponed  */
+   }
+   SendType;
+   
+   
+   typedef struct _BalsaSendmsg BalsaSendmsg;
+   
+   struct _BalsaSendmsg
+   {
+	 GtkWidget *window;
+	 GtkWidget* to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3];
+	 GtkWidget *attachments[4];
+	 GtkWidget *text;
+	 GdkFont   *font;
+	 Message *orig_message;
+	 SendType type;
+	 guint charset_idx;
+   };
 
   void sendmsg_window_new (GtkWidget *, Message *, SendType);
-
+   
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

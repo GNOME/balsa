@@ -1,5 +1,8 @@
-2003-10-25 14:15  PeterB
+2003-10-25 18:29  PeterB
 
+	* libbalsa/: mailbox_imap.c, mailbox_maildir.c, mailbox_mbox.c,
+	mailbox_mh.c: Unref messages when closing mailbox.
+	* src/balsa-mblist.c: Plug a memory leak.
 	* src/balsa-index.c: Restore initial sort.
 	* libbalsa/mailbox_imap.c: Imap `seen' flag has opposite sense to
 	Balsa's `new' flag.

@@ -21,16 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "balsa-message.h"
-/*
-   #define HTML_HEAD "<html><body bgcolor=#ffffff><pre>"
-   #define HTML_FOOT "</pre></body></html>"
- */
 
 #define HTML_HEAD "<html><body bgcolor=#ffffff><p><tt>\n"
 #define HTML_FOOT "</tt></p></body></html>\n"
-
-static GString *text2html (char *buff);
-
 
 /* widget */
 static void balsa_message_class_init (BalsaMessageClass * klass);
@@ -38,11 +31,11 @@ static void balsa_message_init (BalsaMessage * bmessage);
 static void balsa_message_size_request (GtkWidget * widget, GtkRequisition * requisition);
 static void balsa_message_size_allocate (GtkWidget * widget, GtkAllocation * allocation);
 
-
+/* static */
+static gchar * message2html (Message * message);
+static gchar * text2html (char * buff);
 
 static GtkBinClass *parent_class = NULL;
-
-
 
 guint
 balsa_message_get_type ()
@@ -92,9 +85,7 @@ balsa_message_init (BalsaMessage * bmessage)
 {
   GTK_WIDGET_SET_FLAGS (bmessage, GTK_NO_WINDOW);
 
-  bmessage->current_mailbox = NULL;
-  bmessage->current_msgno = 0;
-
+  bmessage->message = NULL;
 
   /* create the HTML widget to render the message */
   GTK_BIN (bmessage)->child = gtk_xmhtml_new ();
@@ -177,34 +168,91 @@ balsa_message_clear (BalsaMessage * bmessage)
 {
   g_return_if_fail (bmessage != NULL);
 
-  bmessage->current_mailbox = NULL;
-  bmessage->current_msgno = 0;
+  bmessage->message = NULL;
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), "");
 }
 
 
 void
 balsa_message_set (BalsaMessage * bmessage,
-		   Mailbox * mailbox,
-		   glong msgno)
+		   Message * message)
 {
-  g_return_if_fail (bmessage != NULL);
+  gchar *buff;
 
-  bmessage->current_mailbox = mailbox;
-  bmessage->current_msgno = msgno;
+  g_return_if_fail (bmessage != NULL);
+  g_return_if_fail (message != NULL);
+
+  if (bmessage->message == message)
+    return;
+
+  message_body_unref (bmessage->message);
+  bmessage->message = message;
+  message_body_ref (bmessage->message);
 
   /* set message contents */
-  gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), "Message Dude");
+  buff = message2html (message);
+  gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
+  g_free (buff);
+}
+
+static gchar *
+message2html (Message * message)
+{
+  GString *mbuff = g_string_new (NULL);
+  Body *body;
+  gchar *buff;
+  gchar tbuff[1024];
+
+
+  g_string_append (mbuff, "<html><body bgcolor=#ffffff><p><b>Date: </b>");
+
+  /* date */
+  buff = text2html (message->date);
+  g_string_append (mbuff, buff);
+  g_free (buff);
+
+  g_string_append (mbuff, "<br><b>From: </b>");
+
+  /* to */
+  if (message->from->personal)
+    sprintf (tbuff, "%s <%s@%s>",
+	     message->from->personal,
+	     message->from->user, 
+	     message->from->host);
+  else
+    sprintf (tbuff, "%s@%s", message->from->user, message->from->host);
+
+  buff = text2html (tbuff);
+  g_string_append (mbuff, buff);
+  g_free (buff);
+
+  g_string_append (mbuff, "<br><b>Subject: </b>");
+
+  /* subject */
+  buff = text2html (message->subject);
+  g_string_append (mbuff, buff);
+  g_free (buff);
+
+  g_string_append (mbuff, "<br></p><p><tt>");
+
+  body = (Body *) message->body_list->data;
+  buff = text2html (body->buffer);
+  g_string_append (mbuff, buff);
+  g_free (buff);
+
+  g_string_append (mbuff, "</tt></p></body></html>");
+  buff = mbuff->str;
+  g_string_free (mbuff, 0);
+  return buff;
 }
 
 
-
-static GString *
-text2html (char *buff)
+static gchar *
+text2html (char * buff)
 {
   int i = 0, len = strlen (buff);
+  gchar *str;
   GString *gs = g_string_new (NULL);
-
 
   for (i = 0; i < len; i++)
     {
@@ -389,6 +437,33 @@ text2html (char *buff)
 	  }
     }
 
-
-  return gs;
+  str = gs->str;
+  g_string_free (gs, 0);
+  return str;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -892,6 +892,60 @@ translate_message (ENVELOPE * cenv)
 }
 
 
+void 
+message_body_ref (Message * message)
+{
+  Body *body;
+ 
+  if (!message)
+    return;
+ 
+  if (message->body_ref > 0)
+    {
+      message->body_ref++;
+      return;
+    }
+
+  g_print("Message: loading %s\n", message->subject);
+
+  body = body_new ();
+  body->buffer = g_strdup("Hello, this is a test message.\nThank you for trying Balsa!");
+  
+  message->body_list = g_list_append (message->body_list, body);
+  message->body_ref++;
+}
+
+
+void 
+message_body_unref (Message * message)
+{
+  GList *list;
+  Body *body;
+  
+  if (!message)
+    return;
+
+  if (message->body_ref == 0)
+    return;
+
+  if (--message->body_ref == 0)
+    {
+      g_print("Message: unloading %s\n", message->subject);
+
+      list = message->body_list;
+      while (list)
+	{
+	  body = (Body *) list->data;
+	  list = list->next;
+
+	  g_free (body->mime);
+	  g_free (body->buffer);
+	}
+
+      g_list_free (message->body_list);
+      message->body_list = NULL;
+    }
+}
 
 
 /*

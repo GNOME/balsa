@@ -196,7 +196,6 @@ struct _Message
   gchar *followup_to;
   gchar *references;
 
-
   /* message body */
   guint body_ref;
   GList *body_list;
@@ -262,6 +261,9 @@ void message_free (Message * message);
 void message_move (Message * message, Mailbox * mailbox);
 void message_delete (Message * message);
 void message_undelete (Message * message);
+
+void message_body_ref (Message * message);
+void message_body_unref (Message * message);
 
 
 /*

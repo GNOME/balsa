@@ -490,10 +490,11 @@ select_message (GtkWidget * widget,
   bindex = BALSA_INDEX (data);
   message = (Message *) gtk_clist_get_row_data (GTK_CLIST (widget), row);
 
-  gtk_signal_emit (GTK_OBJECT (bindex),
-		   balsa_index_signals[SELECT_MESSAGE],
-		   message,
-		   NULL);
+  if (message)
+    gtk_signal_emit (GTK_OBJECT (bindex),
+		     balsa_index_signals[SELECT_MESSAGE],
+		     message,
+		     NULL);
 }
 
 

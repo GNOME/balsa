@@ -76,7 +76,7 @@ static void show_about_box ();
 static void move_resize_cb ();
 
 static void check_new_messages_cb (GtkWidget * widget);
-static void index_select_cb (GtkWidget * widget, Mailbox * mailbox, glong msgno);
+static void index_select_cb (GtkWidget * widget, Message * message);
 static void next_message_cb (GtkWidget * widget);
 static void previous_message_cb (GtkWidget * widget);
 
@@ -711,17 +711,16 @@ check_new_messages_cb (GtkWidget * widget)
 
 static void
 index_select_cb (GtkWidget * widget,
-		 Mailbox * mailbox,
-		 glong msgno)
+		 Message * message)
 {
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (BALSA_IS_INDEX (widget));
+  g_return_if_fail (message != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
-
-  balsa_message_set (BALSA_MESSAGE (mainwindow->message_area), mailbox, msgno);
+  balsa_message_set (BALSA_MESSAGE (mainwindow->message_area), message);
 }
 
 

@@ -20,7 +20,7 @@
 #ifndef __BALSA_MESSAGE_H__
 #define __BALSA_MESSAGE_H__
 
-#include <gtk/gtk.h>
+#include <gnome.h>
 #include "mailbox.h"
 
 #ifdef __cplusplus
@@ -40,24 +40,18 @@ typedef struct _BalsaMessageClass BalsaMessageClass;
 struct _BalsaMessage
 {
   GtkBin bin;
-  
-  Mailbox *current_mailbox;
-  glong current_msgno;
+  Message *message;
 };
-
 
 struct _BalsaMessageClass
 {
     GtkBinClass parent_class;
 };
 
-
-
 guint balsa_message_get_type (void);
 GtkWidget * balsa_message_new ();
 void balsa_message_clear (BalsaMessage * bmessage);
-void balsa_message_set (BalsaMessage * bmessage, Mailbox * mailbox, glong msgno);
-
+void balsa_message_set (BalsaMessage * bmessage, Message * message);
 
 #ifdef __cplusplus
 }

@@ -538,6 +538,8 @@ static void
 imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
                 LibBalsaMailboxImap *mimap)
 {
+    guint i;
+
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
     printf("%s\n", __func__);
@@ -545,7 +547,13 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     if(msg_info->message)
         g_object_unref(G_OBJECT(msg_info->message));
     g_array_remove_index(mimap->messages_info, seqno-1);
-    mailbox->total_messages--;
+
+    for (i = seqno - 1; i < mimap->messages_info->len; i++) {
+	struct message_info *msg_info =
+	    &g_array_index(mimap->messages_info, struct message_info, i);
+	if (msg_info->message)
+	    msg_info->message->msgno = i + 1;
+    }
 }
 
 static ImapMboxHandle *

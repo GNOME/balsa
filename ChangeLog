@@ -1,3 +1,12 @@
+2004-07-28  21:20 Pawel Salek
+
+	* libbalsa/imap-server.[hc]: add "persistent_cache" flag.
+	* libbalsa/mailbox_imap.[hc]: support persistent and non-persistent
+	caching modes.
+	* libbalsa/send.c: strip CRLF from libesmtp messages.
+	* src/{folder,mailbox}-conf.c: configure persistent cache.
+	* src/sendmsg-window.c: fix GPG build broken by my last commit.
+	
 2004-07-28 15:09  PeterB
 
 	* libbalsa/mailbox_imap.c: plug leak.

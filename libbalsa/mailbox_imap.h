@@ -74,4 +74,5 @@ void libbalsa_imap_delete_folder(LibBalsaMailboxImap * mailbox);
 gchar *libbalsa_imap_path(LibBalsaServer * server, const gchar * path);
 gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);
 
+void libbalsa_imap_remove_temp_dir(void);
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

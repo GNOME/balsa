@@ -54,7 +54,7 @@ struct _FolderDialogData {
     GtkWidget *folder_name, *server, *port, *username, *remember,
         *password, *subscribed, *list_inbox, *prefix;
     GtkWidget *use_ssl, *tls_mode;
-    GtkWidget *connection_limit;
+    GtkWidget *connection_limit, *enable_persistent;
 };
 
 /* FIXME: identity_name will leak on cancelled folder edition */
@@ -173,7 +173,11 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         (LIBBALSA_IMAP_SERVER(s),
          gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                           (fcw->connection_limit)));
-
+#if !defined(ENABLE_TOUCH_UI)
+    libbalsa_imap_server_enable_persistent_cache
+        (LIBBALSA_IMAP_SERVER(s),
+         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent)));
+#endif
     libbalsa_server_set_username(s, username);
     s->remember_passwd =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
@@ -269,7 +273,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     table = gtk_table_new(9, 2, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
                              gtk_label_new_with_mnemonic(_("_Basic")));
-    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 1);
+    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 2);
     /* Limit number of connections */
     fcw->connection_limit = 
         balsa_server_conf_add_spinner
@@ -277,6 +281,14 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
          s 
          ? libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(s))
          : 20);
+#if !defined(ENABLE_TOUCH_UI)
+    fcw->enable_persistent = 
+        balsa_server_conf_add_checkbox(&fcw->bsc,
+                                       _("Enable _persistent cache"));
+    if(libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s)))
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent),
+                                     TRUE);
+#endif
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 

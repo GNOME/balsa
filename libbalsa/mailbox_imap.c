@@ -370,29 +370,50 @@ server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
 }
 
 static gchar*
-get_cache_name(LibBalsaMailboxImap* mailbox, const gchar* type)
+get_cache_dir(LibBalsaMailboxImap* mailbox, const gchar* type,
+               gboolean is_persistent)
 {
-    gchar* fname, *start;
-    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    gchar* postfix = g_strconcat(".balsa/", s->user, "@", s->host, "-",
-                                 (mailbox->path ? mailbox->path : "INBOX"),
-                                 "-", type, ".dir", NULL);
-    for(start=strchr(postfix+7, '/'); start; start = strchr(start,'/'))
-        *start='-';
+    gchar *fname;
+    if(mailbox && is_persistent) {
+        LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+        gchar *start;
+        const gchar *home = g_get_home_dir();
+        fname = g_strconcat(home,
+                            "/.balsa/", s->user, "@", s->host, "-",
+                            (mailbox->path ? mailbox->path : "INBOX"),
+                            "-", type, ".dir", NULL);
+        for(start=fname+strlen(home)+8; *start; start++)
+            if(*start == '/') *start = '-';
+    } else
+        fname = g_strconcat("/tmp/balsa-",  g_get_user_name(), NULL);
 
-    fname = gnome_util_prepend_user_home(postfix);
-    g_free(postfix);
     return fname;
 }
 
-static gchar*
-get_cache_name_body(LibBalsaMailboxImap* mailbox, ImapUID uid)
+static gchar**
+get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
+                    ImapUID uid)
 {
-    gchar* fname = get_cache_name(mailbox, "body");
+    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+    LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
+    gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
+    gchar **res = g_malloc(3*sizeof(gchar*));
     ImapUID uid_validity = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
-    gchar *fn = g_strdup_printf("%s/%u-%u", fname, uid_validity, uid);
-    g_free(fname);
-    return fn;
+
+    res[0] = get_cache_dir(mailbox, type, is_persistent);
+    if(is_persistent) 
+        res[1] = g_strdup_printf("%u-%u", uid_validity, uid);
+    else {
+        gchar *start;
+        res[1] = g_strdup_printf("%s@%s-%s-%s-%u-%u",
+                                 s->user, s->host,
+                                 (mailbox->path ? mailbox->path : "INBOX"),
+                                 type, uid_validity, uid);
+        for(start=res[1]; *start; start++)
+            if(*start == '/') *start = '-';
+    }
+    res[2] = NULL;
+    return res;
 }
 
 /* clean_cache:
@@ -457,15 +478,23 @@ clean_dir(const char *dir_name)
 static gboolean
 clean_cache(LibBalsaMailbox* mailbox)
 {
+    LibBalsaServer *s= LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    gboolean is_persistent =
+        libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s));
     gchar* dir;
 
-    dir = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "body");
+    dir = get_cache_dir(LIBBALSA_MAILBOX_IMAP(mailbox), "body",
+                        is_persistent);
     clean_dir(dir);
     g_free(dir);
-    dir = get_cache_name(LIBBALSA_MAILBOX_IMAP(mailbox), "part");
-    clean_dir(dir);
-    g_free(dir);
-    
+    /* the body and part dirs are different only with persistent caching. */
+    if(is_persistent) {
+        dir = get_cache_dir(LIBBALSA_MAILBOX_IMAP(mailbox), "part",
+                            is_persistent);
+        clean_dir(dir);
+        g_free(dir);
+    }
+ 
     return TRUE;
 }
 
@@ -614,11 +643,14 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     libbalsa_mailbox_msgno_removed(mailbox, seqno);
     ++mimap->search_stamp;
     if(msg_info->message) {
-	gchar *fn =
-            get_cache_name_body(mimap, IMAP_MESSAGE_UID(msg_info->message));
+	gchar **pair =
+            get_cache_name_pair(mimap, "body", 
+                                IMAP_MESSAGE_UID(msg_info->message));
+        gchar *fn = g_strconcat(pair[0], "/", pair[1], NULL);
         unlink(fn); /* ignore error; perhaps the message 
                      * was not in the cache.  */
         g_free(fn);
+        g_strfreev(pair);
         g_object_unref(G_OBJECT(msg_info->message));
     }
     g_array_remove_index(mimap->messages_info, seqno-1);
@@ -820,29 +852,29 @@ get_cache_stream(LibBalsaMailbox *mailbox, unsigned uid)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *stream;
-    gchar *cache_name, *msg_name;
+    gchar **pair, *path;
     unsigned uidval;
 
     g_assert(mimap->handle);
     uidval = imap_mbox_handle_get_validity(mimap->handle);
-    cache_name = get_cache_name(mimap, "body");
-    msg_name   = g_strdup_printf("%s/%u-%u", cache_name, uidval, uid);
-
-    stream = fopen(msg_name, "rb");
+    pair = get_cache_name_pair(mimap, "body", uid);
+    path = g_strconcat(pair[0], "/", pair[1], NULL);
+    stream = fopen(path, "rb");
     if(!stream) {
         FILE *cache;
 	ImapResponse rc;
 
         libbalsa_assure_balsa_dir();
-        mkdir(cache_name, S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
-        cache = fopen(msg_name, "wb");
+        mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+        /* printf("%s path: %s\n", __FUNCTION__, path); */
+        cache = fopen(path, "wb");
         rc = imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache);
         fclose(cache);
 
-	stream = fopen(msg_name,"rb");
+	stream = fopen(path,"rb");
     }
-    g_free(msg_name); 
-    g_free(cache_name);
+    g_free(path); 
+    g_strfreev(pair);
     return stream;
 }
 
@@ -1758,19 +1790,15 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
     GMimeStream *partstream = NULL;
 
     if(!part->mime_part) { /* !part->mime_part */
-	gchar *cache_name, *part_name;
+	gchar **pair,  *part_name;
 	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
 	FILE *fp;
 	gchar *section = get_section_for(msg, part);
 
-	cache_name = get_cache_name(mimap, "part");
-	part_name   = 
-	    g_strdup_printf("%s/%u-%u-%s", cache_name,
-			    imap_mbox_handle_get_validity(mimap->handle),
-			    IMAP_MESSAGE_UID(msg),
-			    section);
+	pair = get_cache_name_pair(mimap, "part", IMAP_MESSAGE_UID(msg));
+	part_name   = g_strconcat(pair[0], "/", pair[1], "-", section, NULL);
 	fp = fopen(part_name,"rb+");
-        
+
 	if(!fp) { /* no cache element */
 	    struct part_data dt;
 	    GMimePart *prefilt;
@@ -1787,8 +1815,8 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	    dt.body  = imap_message_get_body_from_section(im, section);
 	    dt.block = g_malloc(dt.body->octets+1);
 	    dt.pos   = 0;
-	    rc = imap_mbox_handle_fetch_body(mimap->handle, msg->msgno, section,
-					     append_str, &dt);
+	    rc = imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
+                                             section, append_str, &dt);
 	    if(rc != IMR_OK)
 		g_error("FIXME: error handling here!\n");
 	    
@@ -1805,11 +1833,12 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	    g_free(dt.block);
 	    
 	    libbalsa_assure_balsa_dir();
-	    mkdir(cache_name, S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+	    mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+            /* printf("%s path: %s\n", __FUNCTION__, part_name); */
 	    fp = fopen(part_name, "wb+");
 	    if(!fp) {
                 g_free(section); 
-                g_free(cache_name);
+                g_strfreev(pair);
                 g_free(part_name);
 		return NULL; /* something better ? */
             }
@@ -1849,7 +1878,7 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 	}
 	g_object_unref (partstream);
 	g_free(section); 
-        g_free(cache_name);
+        g_strfreev(pair);
         g_free(part_name);
     }
 
@@ -2200,4 +2229,37 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 
     /* Couldn't use server-side copy, fall back to default method. */
     return parent_class->messages_copy(mailbox, msgnos, dest);
+}
+
+/* libbalsa_imap_remove_temp_dir() removes the temporary directory used
+   for non-persistent message caching. */
+void
+libbalsa_imap_remove_temp_dir(void)
+{
+    gchar *dir_name = get_cache_dir(NULL, NULL, FALSE);
+    DIR* dir;
+    struct dirent* key;
+    GList *list, *lst;
+    dir = opendir(dir_name);
+    if(!dir) {
+        g_free(dir_name);
+        return;
+    }
+
+    list = NULL;
+    while ( (key=readdir(dir)) != NULL)
+        list = g_list_prepend(list, g_strdup(key->d_name));
+    closedir(dir);
+
+    for(lst = list; lst; lst = lst->next) {
+        struct stat st;
+        gchar *fname = g_strconcat(dir_name, "/", lst->data, NULL);
+        if(stat(fname, &st) == 0 && S_ISREG(st.st_mode))
+            unlink(fname);
+        g_free(fname);
+        g_free(lst->data);
+    }
+    
+    g_list_free(list);
+    g_free(dir_name);
 }

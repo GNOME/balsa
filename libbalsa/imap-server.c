@@ -25,17 +25,21 @@
 static LibBalsaServerClass *parent_class = NULL;
 
 struct LibBalsaImapServer_ {
-        LibBalsaServer server;
-
-        guint connection_cleanup_id;
-        gchar *key;
-        guint max_connections;
-        gboolean offline_mode;
-
-        GMutex *lock; /* protects the following members */
-        guint used_connections;
-        GList *used_handles;
-        GList *free_handles;
+    LibBalsaServer server;
+    
+    guint connection_cleanup_id;
+    gchar *key;
+    guint max_connections;
+    gboolean offline_mode;
+    gboolean persistent_cache; /* if TRUE, messages will be cached in
+                                  $HOME and preserved between
+                                  sessions. If FALSE, messages will be
+                                  kept in /tmp and cleaned on exit. */
+    
+    GMutex *lock; /* protects the following members */
+    guint used_connections;
+    GList *used_handles;
+    GList *free_handles;
 };
 
 typedef struct LibBalsaImapServerClass_ {
@@ -158,6 +162,11 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
     imap_server->used_connections = 0;
     imap_server->used_handles = NULL;
     imap_server->free_handles = NULL;
+#if defined(ENABLE_TOUCH_UI)
+    imap_server->persistent_cache = FALSE;
+#else
+    imap_server->persistent_cache = TRUE;
+#endif /* ENABLE_TOUCH_UI */
     imap_server->connection_cleanup_id = 
         g_timeout_add(CONNECTION_CLEANUP_POLL_PERIOD*1000,
                       connection_cleanup, imap_server);
@@ -413,7 +422,7 @@ libbalsa_imap_server_new_from_config(void)
     LibBalsaServer tmp_server;
     LibBalsaImapServer *imap_server;
     LibBalsaServer *server;
-    gboolean d;
+    gboolean d, d1;
     gint conn_limit;
 
     tmp_server.host = gnome_config_get_string("Server");
@@ -443,8 +452,9 @@ libbalsa_imap_server_new_from_config(void)
     server->tls_mode = gnome_config_get_int_with_default("TLSMode", &d);
     if(!d) server->tls_mode = LIBBALSA_TLS_ENABLED;
     conn_limit = gnome_config_get_int_with_default("ConnectionLimit", &d);
-    if(!d)
-        imap_server->max_connections = conn_limit;
+    if(!d) imap_server->max_connections = conn_limit;
+    d1 = gnome_config_get_bool_with_default("PersistentCache", &d);
+    if(!d) imap_server->persistent_cache = d1;
     if (!server->passwd) {
         server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
         if(server->remember_passwd)
@@ -468,6 +478,7 @@ libbalsa_imap_server_save_config(LibBalsaImapServer *server)
 {
     libbalsa_server_save_config(LIBBALSA_SERVER(server));
     gnome_config_set_int("ConnectionLimit", server->max_connections);
+    gnome_config_set_bool("PersistentCache", server->persistent_cache);
 }
 
 /**
@@ -710,6 +721,18 @@ libbalsa_imap_server_get_max_connections(LibBalsaImapServer *server)
     return server->max_connections;
 }
 
+void
+libbalsa_imap_server_enable_persistent_cache(LibBalsaImapServer *server,
+                                             gboolean enable)
+{
+    server->persistent_cache = enable;
+}
+gboolean
+libbalsa_imap_server_has_persistent_cache(LibBalsaImapServer *srv)
+{
+    return srv->persistent_cache;
+}
+
 /**
  * libbalsa_imap_server_force_disconnect:
  * @server: A #LibBalsaImapServer
@@ -744,12 +767,14 @@ static void close_all_connections_cb(gpointer key, gpointer value,
     libbalsa_imap_server_set_offline_mode(LIBBALSA_IMAP_SERVER(value), TRUE);
 #endif
 }
-void libbalsa_imap_server_close_all_connections(void)
+void
+libbalsa_imap_server_close_all_connections(void)
 {
     G_LOCK(imap_servers);
     if(imap_servers) 
         g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
     G_UNLOCK(imap_servers);
+    libbalsa_imap_remove_temp_dir();
 }
 
 /**

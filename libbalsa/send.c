@@ -384,9 +384,11 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 						   threading_type);
                     */
             }
-            libbalsa_mailbox_check(fccbox);
+            if (MAILBOX_OPEN(fccbox))
+                libbalsa_mailbox_check(fccbox);
 	}
-	libbalsa_mailbox_check(outbox);
+        if (MAILBOX_OPEN(outbox))
+            libbalsa_mailbox_check(outbox);
     } 
 
     return result;
@@ -860,6 +862,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 
 	snprintf (buf, sizeof buf, "%s %s: %d %s", _("From"),
 	          mailbox, status->code, status->text);
+        g_strchomp(buf);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
         break;
     case SMTP_EV_RCPTSTATUS:
@@ -871,6 +874,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 
 	snprintf (buf, sizeof buf, "%s %s: %d %s", _("To"),
 	          mailbox, status->code, status->text);
+        g_strchomp(buf);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
         break;
     case SMTP_EV_MESSAGEDATA:
@@ -894,6 +898,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
         message = va_arg (ap, smtp_message_t);
         status = smtp_message_transfer_status (message);
 	snprintf (buf, sizeof buf, "%d %s", status->code, status->text);
+        g_strchomp(buf);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
         /* Reset 'mqi->sent' for the next message (i.e. bcc copy) */
@@ -1612,6 +1617,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 	pair = g_strsplit(list->data, ":", 1);
 	g_strchug(pair[1]);
 	g_mime_message_add_header(mime_message, pair[0], pair[1]);
+        printf("adding header '%s:%s'\n", pair[0], pair[1]);
 	g_strfreev(pair);
     }
 

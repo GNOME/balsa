@@ -52,6 +52,9 @@ void libbalsa_imap_server_release_handle(LibBalsaImapServer *server,
 void libbalsa_imap_server_set_max_connections(LibBalsaImapServer *server,
                                               int max);
 int  libbalsa_imap_server_get_max_connections(LibBalsaImapServer *server);
+void libbalsa_imap_server_enable_persistent_cache(LibBalsaImapServer *server,
+                                                  gboolean enable);
+gboolean libbalsa_imap_server_has_persistent_cache(LibBalsaImapServer *srv);
 void libbalsa_imap_server_force_disconnect(LibBalsaImapServer *server);
 void libbalsa_imap_server_close_all_connections(void);
 gboolean libbalsa_imap_server_has_free_handles(LibBalsaImapServer *server);

@@ -86,6 +86,7 @@ struct _MailboxConfWindow {
             GtkWidget *remember;
 	    GtkWidget *password;
 	    GtkWidget *folderpath;
+            GtkWidget *enable_persistent;
             BalsaServerConf bsc;
 	} imap;
 
@@ -212,6 +213,7 @@ balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
                      bsc->used_rows, bsc->used_rows+1,
 		     GTK_FILL, GTK_FILL, 5, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), checkbox);
+    bsc->used_rows++;
     return checkbox;
 }
 
@@ -234,6 +236,7 @@ balsa_server_conf_add_spinner(BalsaServerConf *bsc,
                      bsc->used_rows, bsc->used_rows+1,
 		     GTK_FILL, GTK_FILL, 5, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), spin_button);
+    bsc->used_rows++;
     return spin_button;
 }
 
@@ -639,6 +642,13 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),
 			       path);
         balsa_server_conf_set_values(&mcw->mb_data.imap.bsc, server);
+#if !defined(ENABLE_TOUCH_UI)
+        if(libbalsa_imap_server_has_persistent_cache
+           (LIBBALSA_IMAP_SERVER(server)))
+            gtk_toggle_button_set_active
+                (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent),
+                 TRUE);
+#endif
         if(!server->remember_passwd)
             gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
                                      FALSE);
@@ -776,6 +786,12 @@ update_imap_mailbox(MailboxConfWindow *mcw)
     libbalsa_server_set_password(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.password)));
+#if !defined(ENABLE_TOUCH_UI)
+    libbalsa_imap_server_enable_persistent_cache
+        (LIBBALSA_IMAP_SERVER(server),
+         gtk_toggle_button_get_active
+         GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent));
+#endif
 
     g_signal_connect(G_OBJECT(server), "get-password",
                      G_CALLBACK(ask_password), mailbox);
@@ -1150,6 +1166,11 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     advanced =
         balsa_server_conf_get_advanced_widget(&mcw->mb_data.imap.bsc,
                                               NULL, 1);
+#if !defined(ENABLE_TOUCH_UI)
+    mcw->mb_data.imap.enable_persistent = 
+        balsa_server_conf_add_checkbox(&mcw->mb_data.imap.bsc,
+                                       _("Enable _persistent cache"));
+#endif
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 

@@ -115,7 +115,9 @@ static void toggle_sign_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
 static void toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_encrypt_tb_cb(GtkToggleButton * widget, BalsaSendmsg * bsmsg);
 static void toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg);
+static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg, GtkWidget *toolbar);
+static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
+                                                LibBalsaIdentity *new_ident);
 #endif
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
@@ -1121,7 +1123,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     }
     
 #ifdef HAVE_GPGME
-    bsmsg_update_gpg_ui_on_ident_change(bsmsg);
+    bsmsg_update_gpg_ui_on_ident_change(bsmsg, ident);
 #endif
 
     g_free(old_sig);
@@ -2917,7 +2919,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         /* Get the identity from the To: field of the original message */
         guess_identity(bsmsg);
 #ifdef HAVE_GPGME
-    bsmsg_setup_gpg_ui(bsmsg);
+    bsmsg_setup_gpg_ui(bsmsg, toolbar);
 #endif
 
     /* create the top portion with the to, from, etc in it */
@@ -4505,7 +4507,8 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
 
 #ifdef HAVE_GPGME
 static void
-bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg)
+bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
+                                    LibBalsaIdentity *ident)
 {
     if (balsa_app.has_openpgp || balsa_app.has_smime) {
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
@@ -4528,7 +4531,7 @@ bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg)
 }
 
 static void
-bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg)
+bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg, GtkWidget *toolbar)
 {
     bsmsg->gpg_sign_menu_item = opts_menu[OPTS_MENU_SIGN_POS].widget;
     g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "toolbar", toolbar);

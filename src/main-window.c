@@ -2172,9 +2172,6 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
        else */
     label = balsa_notebook_label_new(info->mbnode);
 
-    /* for updating date when settings change */
-    index->line_length = balsa_app.line_length;
-
     /* store for easy access */
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),

@@ -102,7 +102,7 @@ gboolean initial_open_inbox(void);
 */
 static gchar *cmd_line_open_mailboxes;
 static gboolean cmd_check_mail_on_startup,
-    cmd_open_unread_mailbox, cmd_open_inbox;
+    cmd_open_unread_mailbox, cmd_open_inbox, cmd_get_stats;
 
 /* opt_attach_list: list of attachments */
 static GSList* opt_attach_list = NULL;
@@ -139,6 +139,12 @@ balsa_handle_automation_options() {
 
        if (cmd_open_inbox)
 	   GNOME_Balsa_Application_openInbox (app, &ev);
+
+       if (cmd_get_stats) {
+           CORBA_long unread = 0, unsent = 0;
+	   GNOME_Balsa_Application_getStats (app, &unread, &unsent, &ev);
+           printf("Unread: %ld Unsent: %ld\n", (long)unread, (long)unsent);
+       }
 
        if (cmd_line_open_mailboxes)
 	   GNOME_Balsa_Application_openMailbox (app,
@@ -213,6 +219,9 @@ balsa_init(int argc, char **argv)
 	{"open-inbox", 'i', POPT_ARG_NONE,
 	 &(cmd_open_inbox), 0,
 	 N_("Opens default Inbox on startup"), NULL},
+	{"get-stats", 's', POPT_ARG_NONE,
+	 &(cmd_get_stats), 0,
+	 N_("Prints number unread and unsent messages"), NULL},
 	{"debug-pop", 'd', POPT_ARG_NONE, &PopDebug, 0, 
 	 N_("Debug POP3 connection"), NULL},
 	{"debug-imap", 'D', POPT_ARG_NONE, &ImapDebug, 0, 
@@ -392,6 +401,20 @@ initial_open_inbox()
     return FALSE;
 }
 
+void balsa_get_stats(long *unread, long *unsent);
+void
+balsa_get_stats(long *unread, long *unsent)
+{
+    if(balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL) ) {
+        *unread = balsa_app.inbox->unread_messages;
+        libbalsa_mailbox_close(balsa_app.inbox, FALSE);
+    }
+    if(balsa_app.draftbox && libbalsa_mailbox_open(balsa_app.draftbox, NULL)){
+        *unsent = libbalsa_mailbox_total_messages(balsa_app.draftbox);
+        libbalsa_mailbox_close(balsa_app.draftbox, FALSE);
+    }
+}
+
 /* scan_mailboxes:
    this is an idle handler. Expands subtrees.
 */
@@ -431,6 +454,12 @@ scan_mailboxes_idle_cb()
 
     if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
 	g_idle_add((GSourceFunc) initial_open_inbox, NULL);
+
+    if(cmd_get_stats) {
+        long unread, unsent;
+        balsa_get_stats(&unread, &unsent);
+        printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+    }
 
     return FALSE; 
 }

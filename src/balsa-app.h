@@ -282,7 +282,6 @@ extern struct BalsaApplication {
     gboolean show_notebook_tabs;
     gboolean alternative_layout;
     gboolean view_message_on_open;
-    gboolean line_length;
     gboolean pgdownmod;
     gint pgdown_percent;
 #if defined(ENABLE_TOUCH_UI)

@@ -41,6 +41,7 @@ module GNOME {
 			void openMailbox (in string name);
 			void openUnread ( );
 			void openInbox ( );
+			void getStats (out long unread, out long unsent);
 		};
 	};
 };

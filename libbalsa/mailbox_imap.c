@@ -2176,7 +2176,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
 				    LibBalsaMailboxThreadingType thread_type)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    GNode * new_tree;
+    GNode * new_tree = NULL;
     guint msgno;
     ImapSearchKey *filter = lbmi_build_imap_query(mailbox->view_filter, NULL);
     ImapResponse rc;
@@ -2203,9 +2203,12 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
                                      mailbox->view->sort_type ==
                                      LB_MAILBOX_SORT_TYPE_ASC,
                                      filter));
-            new_tree =
-                g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
-        } else {
+            if(rc == IMR_OK)
+                new_tree =
+                    g_node_copy
+                    (imap_mbox_handle_get_thread_root(mimap->handle));
+        }
+        if(!new_tree) { /* fall back */
             new_tree = g_node_new(NULL);
             for(msgno = 1; msgno <= mimap->messages_info->len; msgno++)
                 g_node_append_data(new_tree, GUINT_TO_POINTER(msgno));

@@ -87,7 +87,6 @@ typedef struct _PropertyUI {
     GtkWidget *previewpane;
     GtkWidget *alternative_layout;
     GtkWidget *view_message_on_open;
-    GtkWidget *line_length;
     GtkWidget *pgdownmod;
     GtkWidget *pgdown_percent;
     GtkWidget *view_allheaders;
@@ -450,8 +449,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT (pui->view_message_on_open), "toggled",
                      G_CALLBACK (properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT (pui->line_length), "toggled",
-                     G_CALLBACK (properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->pgdownmod), "toggled",
 		     G_CALLBACK(pgdown_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->pgdown_percent), "changed",
@@ -720,7 +717,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
     balsa_app.alternative_layout = GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
     balsa_app.view_message_on_open = GTK_TOGGLE_BUTTON (pui->view_message_on_open)->active;
-    balsa_app.line_length = GTK_TOGGLE_BUTTON (pui->line_length)->active;
     balsa_app.pgdownmod = GTK_TOGGLE_BUTTON(pui->pgdownmod)->active;
     balsa_app.pgdown_percent =
       gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->pgdown_percent));
@@ -983,8 +979,6 @@ set_prefs(void)
 				 balsa_app.alternative_layout);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->view_message_on_open),
                                  balsa_app.view_message_on_open);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->line_length),
-                                 balsa_app.line_length);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->pgdownmod),
 				 balsa_app.pgdownmod);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->pgdown_percent),
@@ -2020,8 +2014,6 @@ main_window_group(GtkWidget * page)
     pui->view_message_on_open =
         pm_group_add_check(group, _("Automatically view message "
                                     "when mailbox opened"));
-    pui->line_length =
-        pm_group_add_check(group, _("Display message size as number of lines"));
 
     table = create_table(1, 3, page);
     pm_group_add(group, table);

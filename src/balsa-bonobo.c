@@ -64,10 +64,14 @@ static void impl_balsa_application_openUnread (PortableServer_Servant _servant,
 					       CORBA_Environment * ev);
 static void impl_balsa_application_openInbox (PortableServer_Servant _servant,
 					      CORBA_Environment * ev);
+static void impl_balsa_application_getStats (PortableServer_Servant _servant,
+                                             CORBA_long *unread,
+                                             CORBA_long *unsent,
+                                             CORBA_Environment * ev);
 /* from main.c */
 gboolean initial_open_unread_mailboxes();
 gboolean initial_open_inbox();
-
+void balsa_get_stats(long *unread, long *unsent);
 
 /*
  *
@@ -209,6 +213,7 @@ balsa_application_class_init (BalsaApplicationClass *klass)
     epv->openMailbox = impl_balsa_application_openMailbox;
     epv->openUnread = impl_balsa_application_openUnread;
     epv->openInbox = impl_balsa_application_openInbox;
+    epv->getStats  = impl_balsa_application_getStats;
 }
 
 
@@ -238,6 +243,17 @@ static void
 impl_balsa_application_openInbox (PortableServer_Servant _servant,
 				  CORBA_Environment * ev) {
     initial_open_inbox();
+}
+
+static void
+impl_balsa_application_getStats (PortableServer_Servant _servant,
+                                 CORBA_long *unread,
+                                 CORBA_long *unsent,
+                                 CORBA_Environment * ev) {
+    long r, s;
+    balsa_get_stats(&r, &s);
+    *unread = r;
+    *unsent = s;
 }
  
 static void

@@ -64,8 +64,6 @@ extern "C" {
 	GSList *selected;
         gchar *sos_filter; /* SenderOrSubject filter string, if any */
 
-	gboolean line_length;
-
         /* signal handler ids */
         gulong selection_changed_id;
         gulong row_expanded_id;

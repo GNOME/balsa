@@ -32,6 +32,8 @@ g_mime_part_check_rfc2440(GMimePart * part)
     const gchar *content;
 
     content = g_mime_part_get_content(part, &content_len);
+    if (content_len <= 0)
+	return GMIME_PART_RFC2440_NONE;
 
     if (!strncmp(content, "-----BEGIN PGP MESSAGE-----", 27) &&
 	strstr(content, "-----END PGP MESSAGE-----"))

@@ -25,7 +25,7 @@
 #include "balsa-app.h"
 #include "addrbook.h"
 #include "addrbook-manager.h"
-
+#if 0
 gint delete_event (GtkWidget *, gpointer);
 
 static GtkWidget *menu_items[9];
@@ -380,6 +380,7 @@ addressbook_window_new (GtkWidget * widget, gpointer data)
   gtk_widget_show (window);
 }
 
+#endif
 
 gint
 delete_event (GtkWidget * widget, gpointer data)

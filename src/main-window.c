@@ -322,10 +322,10 @@ create_menu ()
   GtkWidget *menu;
   GtkWidget *menu1;
   GtkWidget *menu_items[14];
-  GtkAcceleratorTable *accel;
+  GtkAccelGroup *accel;
 
 
-  accel = gtk_accelerator_table_new ();
+  accel = gtk_accel_group_new ();
   menubar = gtk_menu_bar_new ();
   gnome_app_set_menus (GNOME_APP (mw->window), GTK_MENU_BAR (menubar));
   gtk_widget_show (menubar);
@@ -336,7 +336,7 @@ create_menu ()
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RCV, _ ("Get New Mail"));
   gtk_menu_append (GTK_MENU (menu), w);
-  gtk_widget_install_accelerator (w, accel, "activate", 'M', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel, 'M', GDK_CONTROL_MASK, 0);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -354,7 +354,7 @@ create_menu ()
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_EXIT, _ ("Exit"));
   gtk_widget_show (w);
-  gtk_widget_install_accelerator (w, accel, "activate", 'Q', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel, 'Q', GDK_CONTROL_MASK, 0);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -376,7 +376,7 @@ create_menu ()
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL, _ ("New"));
   gtk_widget_show (w);
-  gtk_widget_install_accelerator (w, accel, "activate", 'N', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel, 'N', GDK_CONTROL_MASK, 0);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -389,7 +389,7 @@ create_menu ()
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_MAIL_RPL, _ ("Reply"));
   gtk_widget_show (w);
-  gtk_widget_install_accelerator (w, accel, "activate", 'R', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel, 'R', GDK_CONTROL_MASK, 0);
 
   gtk_signal_connect (GTK_OBJECT (w),
 		      "activate",
@@ -426,7 +426,7 @@ create_menu ()
 		      (GtkSignalFunc) delete_message_cb,
 		      NULL);
 
-  gtk_widget_install_accelerator (w, accel, "activate", 'D', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel, 'D', GDK_CONTROL_MASK, 0);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
@@ -512,7 +512,7 @@ create_menu ()
 
 
   menu_items[i] = NULL;
-  gtk_window_add_accelerator_table (GTK_WINDOW (mw->window), accel);
+  gtk_window_add_accel_group (GTK_WINDOW (mw->window), accel);
 }
 
 

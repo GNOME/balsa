@@ -126,10 +126,10 @@ create_menu (BalsaSendmsg * bmsg)
 {
   GtkWidget *window = bmsg->window;
   GtkWidget *menubar, *w, *menu;
-  GtkAcceleratorTable *accel;
+  GtkAccelGroup *accel;
   int i = 0;
 
-  accel = gtk_accelerator_table_new ();
+  accel = gtk_accel_group_new ();
   menubar = gtk_menu_bar_new ();
   gtk_widget_show (menubar);
 
@@ -174,22 +174,22 @@ create_menu (BalsaSendmsg * bmsg)
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_CUT, _ ("Cut"));
   gtk_widget_show (w);
-  gtk_widget_install_accelerator (w, accel, "activate",
-				  'X', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel,
+				  'X', GDK_CONTROL_MASK, 0);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_COPY, _ ("Copy"));
   gtk_widget_show (w);
-  gtk_widget_install_accelerator (w, accel, "activate",
-				  'C', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel,
+				  'C', GDK_CONTROL_MASK, 0);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PASTE, _ ("Paste"));
   gtk_widget_show (w);
-  gtk_widget_install_accelerator (w, accel, "activate",
-				  'V', GDK_CONTROL_MASK);
+  gtk_widget_add_accelerator (w, "activate", accel,
+				  'V', GDK_CONTROL_MASK, 0);
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 
@@ -214,7 +214,7 @@ create_menu (BalsaSendmsg * bmsg)
 
 
   menu_items[i] = NULL;
-  gtk_window_add_accelerator_table (GTK_WINDOW (window), accel);
+  gtk_window_add_accel_group (GTK_WINDOW (window), accel);
   return menubar;
 }
 

@@ -15,11 +15,15 @@ dnl ############################################################################
 BALSA_MAJOR=0
 BALSA_REVISION=8
 BALSA_PATCHLEVEL=0
-BALSA_RELEASE=
+BALSA_RELEASE=1
+use_release=no
 
-dnl It's okay to set BALSA_RELEASE= ; this handles it
+dnl BALSA_RELEASE must be specified (1 if nothing else), but
+dnl change use_release depending on whether we want it to be
+dnl appended to our official version. (no usually, yes for
+dnl something like 'pre1' or 'beta4')
 
-if test x"$BALSA_RELEASE" = x ; then
+if test x"$use_release" = xno ; then
 	brsffx=
 else
 	brsffx="-${BALSA_RELEASE}"

@@ -114,11 +114,24 @@ libbalsa_mailbox_mh_create(const gchar * path, gboolean create)
 	}
     } else {
 	if(create) {
-	    /*FIXME: Create Mh...*/
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-				 _("Sorry. Balsa doesn't (yet) know how to create a mh mailbox"));
+	    char tmp[_POSIX_PATH_MAX];
+	    int i;
+
+	    if (mkdir (path, S_IRWXU)) {
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+				     _("Could not create MH directory at %s (%s)"), path, strerror(errno) );
+		return (-1);
+	    } 
+	    snprintf (tmp, sizeof (tmp), "%s/.mh_sequences", path);
+	    if ((i = creat (tmp, S_IRWXU)) == -1)
+		{
+		    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
+					 _("Could not create MH structure at %s (%s)"), path, strerror(errno) );
+		    rmdir (path);
+		    return (-1);
+		}	    	    
+	} else 
 	    return(-1);
-	}
     }
     return(0);
 }

@@ -1,3 +1,10 @@
+1999-07-28 Tomasz K³oczko <kloczek@pld.org.pl>
+
+	* po/pl.po, configure.in
+	Sync with PLD cvs tree:
+	- added pl translation (translation by Pawe³ Dziekoñski
+	<dziekons@pld.org.pl> and fixes by Zbigniew Chyla <cyba@pld.org.pl>)
+
 1999-04-08 Jesse Sightler <jsight@pair.com>
 
 	* src/balsa-message.c: Added keyboard navigation.

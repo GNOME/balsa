@@ -2074,7 +2074,7 @@ balsa_index_remove_duplicates(BalsaIndex * index)
         LibBalsaMessage *message = list->data;
         LibBalsaMessage *master;
 
-        if (!message->message_id)
+        if (LIBBALSA_MESSAGE_IS_DELETED(message) || !message->message_id)
             continue;
 
         master =g_hash_table_lookup(table, message->message_id);

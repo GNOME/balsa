@@ -1,3 +1,28 @@
+2003-05-27 09:15  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h: Move view info into a new
+	LibBalsaMailboxView structure, and implement methods for it.
+	* src/save-restore.c: Save and restore mailbox views; scrap list of
+	open mailboxes.
+	* src/main-window.c: Use mailbox views; maintain the `open' member.
+	* src/balsa-mblist.c: Use mailbox views; maintain the `exposed'
+	member.
+	* src/: balsa-index.c, mailbox-conf.c, main.c, sendmsg-window.c:
+        Use mailbox views.
+	* src/: balsa-app.c, balsa-app.h: Add balsa_app.mailbox_views, a
+	hash table of LibBalsaMailboxView structures that persists over
+	rescans; use views to remember open mailboxes, instead of a special
+	list; open them without descending into the tree (imap mailboxes
+	that need to be opened are already there).
+	* libbalsa/: mailbox_imap.c, mailbox_imap.h: Implement and use
+	convenience methods for making imap URLs and paths (a path is a URL
+	without the user info).
+	* libbalsa/: folder-scanners.c, folder-scanners.h: Browse imap
+	folders recursively, instead of by depth; use callbacks to decide
+	how deep and to notify about browsing.
+	* src/mailbox-node.c: Use mailbox views; attach mailbox view when
+	opening a mailbox; provide callbacks for imap browsing.
+
 2003-05-21 19:34  PeterB
 
 	* src/main-window.c: Fix #113130: Make new mail notification window

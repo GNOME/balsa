@@ -430,10 +430,6 @@ balsa_app_init(void)
     balsa_app.check_imap_inbox = 0;
     balsa_app.imap_scan_depth = 1;
 
-    /* RFC2646 format=flowed */
-    balsa_app.recognize_rfc2646_format_flowed = TRUE;
-    balsa_app.send_rfc2646_format_flowed = TRUE;
-
     /* Message filing */
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;

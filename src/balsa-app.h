@@ -326,11 +326,8 @@ extern struct BalsaApplication {
     gchar* print_footer_font;  /* font for printing footers */
     gboolean print_highlight_cited;
 
-    /* compose: shown headers */
+    /* compose */
     gchar *compose_headers;
-
-    /* compose: request a disposition notification */
-    gboolean req_dispnotify;   
     gboolean always_queue_sent_mail;
     gboolean copy_to_sentbox;
 
@@ -362,8 +359,6 @@ extern struct BalsaApplication {
     /* how to act if a MDN request is received */
     BalsaMDNReply mdn_reply_clean;
     BalsaMDNReply mdn_reply_notclean;
-    gboolean recognize_rfc2646_format_flowed;
-    gboolean send_rfc2646_format_flowed;
 
     /* how to handle multipart/alternative */
     gboolean display_alt_plain;

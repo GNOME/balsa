@@ -99,7 +99,6 @@ typedef struct _PropertyUI {
     GtkRadioButton *pwindow_type[NUM_PWINDOW_MODES];
     GtkWidget *wordwrap;
     GtkWidget *wraplength;
-    GtkWidget *send_rfc2646_format_flowed;
     GtkWidget *open_inbox_upon_startup;
     GtkWidget *check_mail_upon_startup;
     GtkWidget *remember_open_mboxes;
@@ -152,7 +151,6 @@ typedef struct _PropertyUI {
     /* wrap incoming text/plain */
     GtkWidget *browse_wrap;
     GtkWidget *browse_wrap_length;
-    GtkWidget *recognize_rfc2646_format_flowed;
 
     /* how to display multipart/alternative */
     GtkWidget *display_alt_plain;
@@ -514,8 +512,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		     G_CALLBACK(wrap_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->wraplength), "changed",
 		     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->send_rfc2646_format_flowed), "toggled",
-		     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->always_queue_sent_mail), "toggled",
 		     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->copy_to_sentbox), "toggled",
@@ -541,9 +537,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                       (GNOME_ENTRY(pui->quote_pattern))), "changed",
                      G_CALLBACK(properties_modified_cb),
                      property_box);
-    g_signal_connect(G_OBJECT(pui->recognize_rfc2646_format_flowed), 
-		     "toggled", G_CALLBACK(properties_modified_cb),
-		     property_box);
 
     /* multipart/alternative */
     g_signal_connect(G_OBJECT(pui->display_alt_plain), "toggled",
@@ -760,8 +753,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.wordwrap = GTK_TOGGLE_BUTTON(pui->wordwrap)->active;
     balsa_app.wraplength =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
-    balsa_app.send_rfc2646_format_flowed =
-	GTK_TOGGLE_BUTTON(pui->send_rfc2646_format_flowed)->active;
     balsa_app.autoquote =
 	GTK_TOGGLE_BUTTON(pui->autoquote)->active;
     balsa_app.reply_strip_html =
@@ -829,8 +820,6 @@ apply_prefs(GtkDialog * pbox)
     update_view_menu();
     balsa_app.browse_wrap_length =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->browse_wrap_length));
-    balsa_app.recognize_rfc2646_format_flowed =
-	GTK_TOGGLE_BUTTON(pui->recognize_rfc2646_format_flowed)->active;
 
     balsa_app.display_alt_plain =
 	GTK_TOGGLE_BUTTON(pui->display_alt_plain)->active;
@@ -1070,9 +1059,6 @@ set_prefs(void)
 				 balsa_app.wordwrap);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->wraplength),
 			      (float) balsa_app.wraplength);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-		    		 (pui->send_rfc2646_format_flowed),
-				 balsa_app.send_rfc2646_format_flowed);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail),
 				 balsa_app.always_queue_sent_mail);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->copy_to_sentbox),
@@ -1085,8 +1071,6 @@ set_prefs(void)
 				 balsa_app.forward_attached);
 
     gtk_widget_set_sensitive(pui->wraplength,
-			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
-    gtk_widget_set_sensitive(pui->send_rfc2646_format_flowed,
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
 
     /* external editor */
@@ -1109,11 +1093,6 @@ set_prefs(void)
                              balsa_app.browse_wrap);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->browse_wrap_length),
                               (float) balsa_app.browse_wrap_length);
-
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                 (pui->recognize_rfc2646_format_flowed),
-                                 balsa_app.
-                                 recognize_rfc2646_format_flowed);
 
     /* how to treat multipart/alternative */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
@@ -1743,12 +1722,6 @@ quoted_group(GtkWidget * page)
     gtk_table_attach(GTK_TABLE(table), label, 2, 3, 1, 2,
                      GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
-    pui->recognize_rfc2646_format_flowed =
-	gtk_check_button_new_with_label(_("Reflow messages of type "
-					  "`text/plain; format=flowed'"));
-    gtk_table_attach(GTK_TABLE(table), pui->recognize_rfc2646_format_flowed,
-                     0, 3, 2, 3, GTK_FILL, 0, 0, 0);
-
     return group;
 }
 
@@ -1861,10 +1834,7 @@ word_wrap_group(GtkWidget * page)
     pm_page_add_to_size_group(page, pui->wordwrap);
 
     spinbutton_adj =
-        gtk_adjustment_new(1.0, 40.0,
-                           balsa_app.send_rfc2646_format_flowed
-                           ? 79.0 : 200.0, 1.0,
-                           5.0, 0.0);
+        gtk_adjustment_new(1.0, 40.0, 79.0, 1.0, 5.0, 0.0);
     pui->wraplength =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->wraplength, 1, 2, 0, 1,
@@ -1875,14 +1845,6 @@ word_wrap_group(GtkWidget * page)
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 2, 3, 0, 1,
 		     GTK_EXPAND | GTK_FILL, (GtkAttachOptions) (0), 0, 0);
-
-    pui->send_rfc2646_format_flowed =
-	gtk_check_button_new_with_label(_("Send message as type "
-					  "`text/plain; format=flowed'"));
-    gtk_table_attach(GTK_TABLE(table), pui->send_rfc2646_format_flowed,
-		     0, 3, 1, 2,
-		     (GtkAttachOptions) (GTK_FILL),
-		     (GtkAttachOptions) (0), 0, 0);
 
     return group;
 }
@@ -2879,8 +2841,6 @@ wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->wordwrap));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->wraplength), newstate);
-    gtk_widget_set_sensitive(GTK_WIDGET(pui->send_rfc2646_format_flowed),
-			     newstate);
     properties_modified_cb(widget, pbox);
 }
 

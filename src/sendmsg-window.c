@@ -102,8 +102,7 @@ static gint toggle_reply_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_attachments_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_comments_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_keywords_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static gint toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 static void toggle_format_cb(GtkCheckMenuItem * check_menu_item,
                              BalsaSendmsg * bsmsg);
 
@@ -476,10 +475,7 @@ static GnomeUIInfo opts_menu[] = {
 #define OPTS_MENU_DISPNOTIFY_POS 0
     GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, 
 			   toggle_reqdispnotify_cb, NULL),
-#define OPTS_MENU_QUEUE_POS 1
-    GNOMEUIINFO_TOGGLEITEM(N_("_Always Queue Sent Mail"), NULL, 
-			   toggle_queue_cb, NULL),
-#define OPTS_MENU_FORMAT_POS 2
+#define OPTS_MENU_FORMAT_POS 1
     GNOMEUIINFO_TOGGLEITEM(N_("_Format = Flowed"), NULL, 
 			   toggle_format_cb, NULL),
     GNOMEUIINFO_END
@@ -2073,7 +2069,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
             GtkTextBuffer *buffer =
                 gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
 
-            if (msg->flow && libbalsa_flowed_rfc2646(body))
+            if (msg->flow && libbalsa_message_body_is_flowed(body))
                 llen = balsa_app.wraplength;
 	    if (!strcmp(body_type, "text/plain") &&
 		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
@@ -2633,13 +2629,12 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
     /* set options */
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (opts_menu[OPTS_MENU_DISPNOTIFY_POS].widget), balsa_app.req_dispnotify);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                   (opts_menu[OPTS_MENU_DISPNOTIFY_POS].
+                                    widget), FALSE);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                    (opts_menu[OPTS_MENU_FORMAT_POS].
-                                    widget),
-                                   balsa_app.wordwrap
-                                   && balsa_app.
-                                   send_rfc2646_format_flowed);
+                                    widget), balsa_app.wordwrap);
 
     /* Set up the default identity */
     if(!set_identity_from_mailbox(msg))
@@ -3128,7 +3123,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     if (*ctmp)
 	message->reply_to = libbalsa_address_new_from_string(ctmp);
 
-    if (balsa_app.req_dispnotify)
+    if (bsmsg->req_dispnotify)
 	libbalsa_message_set_dispnotify(message, bsmsg->ident->address);
 
     if (bsmsg->orig_message != NULL) {
@@ -3629,18 +3624,10 @@ toggle_keywords_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 			2);
 }
 
-static gint
+static void
 toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    balsa_app.req_dispnotify = GTK_CHECK_MENU_ITEM(widget)->active;
-    return TRUE;
-}
-
-static gint
-toggle_queue_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    balsa_app.always_queue_sent_mail = GTK_CHECK_MENU_ITEM(widget)->active;
-    return TRUE;
+    bsmsg->req_dispnotify = GTK_CHECK_MENU_ITEM(widget)->active;
 }
 
 static void

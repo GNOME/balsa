@@ -1618,8 +1618,7 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         libbalsa_utf8_sanitize(ptr);
 
-        if (balsa_app.recognize_rfc2646_format_flowed
-            && libbalsa_flowed_rfc2646(info->body)) {
+        if (libbalsa_message_body_is_flowed(info->body)) {
             ptr = libbalsa_wrap_rfc2646(ptr,
                                         (bm->wrap_text
                                          ? balsa_app.browse_wrap_length
@@ -2819,12 +2818,10 @@ handle_mdn_request(LibBalsaMessage *message)
 			      balsa_app.encoding_style,  
 			      balsa_app.smtp_server,
 			      balsa_app.smtp_authctx,
-			      balsa_app.smtp_tls_mode,
-			      balsa_app.send_rfc2646_format_flowed);
+			      balsa_app.smtp_tls_mode, TRUE);
 #else
 	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
-			      balsa_app.encoding_style,
-			      balsa_app.send_rfc2646_format_flowed);
+			      balsa_app.encoding_style, TRUE);
 #endif
 	g_object_unref(G_OBJECT(mdn));
     }
@@ -2919,12 +2916,10 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
                               balsa_app.encoding_style,
                               balsa_app.smtp_server,
                               balsa_app.smtp_authctx,
-                              balsa_app.smtp_tls_mode,
-                              balsa_app.send_rfc2646_format_flowed);
+                              balsa_app.smtp_tls_mode, TRUE);
 #else
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-                              balsa_app.encoding_style,
-                              balsa_app.send_rfc2646_format_flowed);
+                              balsa_app.encoding_style, TRUE);
 #endif
     }
 

@@ -78,6 +78,7 @@ extern "C" {
 	guint delete_sig_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
+	gboolean req_dispnotify; /* send a MDN */ 
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */
         /* style for changing the color of address labels when the

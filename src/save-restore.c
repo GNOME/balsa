@@ -539,6 +539,15 @@ config_folder_init(const gchar * prefix)
 }				/* config_folder_init */
 
 /* Load Balsa's global settings */
+static gboolean
+config_warning_idle(const gchar * text)
+{
+    gdk_threads_enter();
+    balsa_information(LIBBALSA_INFORMATION_WARNING, text);
+    gdk_threads_leave();
+    return FALSE;
+}
+
 static gint
 config_global_load(void)
 {
@@ -655,8 +664,14 @@ config_global_load(void)
     g_free(balsa_app.quote_regex);
     balsa_app.quote_regex =
 	gnome_config_get_string("QuoteRegex=" DEFAULT_QUOTE_REGEX);
-    balsa_app.recognize_rfc2646_format_flowed =
-	gnome_config_get_bool("RecognizeRFC2646FormatFlowed=true");
+
+    /* Obsolete. */
+    gnome_config_get_bool_with_default("RecognizeRFC2646FormatFlowed=true",
+                                       &def_used);
+    if (!def_used)
+        g_idle_add((GSourceFunc) config_warning_idle,
+                   _("The option not to recognize \"format=flowed\" "
+                     "text has been removed."));
 
     {
 	int i;
@@ -862,8 +877,15 @@ config_global_load(void)
     balsa_app.wraplength = gnome_config_get_int("WrapLength=72");
     if (balsa_app.wraplength < 40)
 	balsa_app.wraplength = 40;
-    balsa_app.send_rfc2646_format_flowed =
-	gnome_config_get_bool("SendRFC2646FormatFlowed=true");
+
+    /* Obsolete. */
+    gnome_config_get_bool_with_default("SendRFC2646FormatFlowed=true",
+                                       &def_used);
+    if (!def_used)
+        g_idle_add((GSourceFunc) config_warning_idle,
+                   _("The option not to send \"format=flowed\" is now "
+                     "on the Options menu of the compose window."));
+
     balsa_app.autoquote = 
 	gnome_config_get_bool("AutoQuote=true");
     balsa_app.reply_strip_html = 
@@ -890,8 +912,15 @@ config_global_load(void)
     g_free(balsa_app.compose_headers);
     balsa_app.compose_headers =
 	gnome_config_get_string("ComposeHeaders=to subject cc");
-    balsa_app.req_dispnotify = 
-	gnome_config_get_bool("RequestDispositionNotification=false");
+
+    /* Obsolete. */
+    gnome_config_get_bool_with_default("RequestDispositionNotification=false",
+                                       &def_used);
+    if (!def_used)
+        g_idle_add((GSourceFunc) config_warning_idle,
+                   _("The option to request a MDN is now on "
+                     "the Options menu of the compose window."));
+
 
     gnome_config_pop_prefix();
 
@@ -1015,6 +1044,7 @@ config_save(void)
     gnome_config_pop_prefix();
 
     /* Message View options ... */
+    gnome_config_clean_section(BALSA_CONFIG_PREFIX "MessageDisplay/");
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "MessageDisplay/");
 
     gnome_config_set_string("DateFormat", balsa_app.date_string);
@@ -1025,8 +1055,6 @@ config_save(void)
     gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);
     gnome_config_set_int("ThreadingType", balsa_app.threading_type);
     gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
-    gnome_config_set_bool("RecognizeRFC2646FormatFlowed", 
-			  balsa_app.recognize_rfc2646_format_flowed);
     gnome_config_set_string("MessageFont", balsa_app.message_font);
     gnome_config_set_string("SubjectFont", balsa_app.subject_font);
     gnome_config_set_bool("WordWrap", balsa_app.browse_wrap);
@@ -1151,8 +1179,6 @@ config_save(void)
     gnome_config_set_int("EncodingStyle", balsa_app.encoding_style);
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
     gnome_config_set_int("WrapLength", balsa_app.wraplength);
-    gnome_config_set_bool("SendRFC2646FormatFlowed",
-			   balsa_app.send_rfc2646_format_flowed);
     gnome_config_set_bool("AutoQuote", balsa_app.autoquote);
     gnome_config_set_bool("StripHtmlInReply", balsa_app.reply_strip_html);
     gnome_config_set_bool("ForwardAttached", balsa_app.forward_attached);
@@ -1162,11 +1188,10 @@ config_save(void)
     gnome_config_pop_prefix();
 
     /* Compose window ... */
+    gnome_config_clean_section(BALSA_CONFIG_PREFIX "Compose/");
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
 
     gnome_config_set_string("ComposeHeaders", balsa_app.compose_headers);
-    gnome_config_set_bool("RequestDispositionNotification", 
-                          balsa_app.req_dispnotify);
     gnome_config_set_string("ExternEditorCommand", 
                             balsa_app.extern_editor_command);
     gnome_config_set_bool("ExternEditorEditHeaders", balsa_app.edit_headers);

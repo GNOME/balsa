@@ -99,6 +99,8 @@ void balsa_window_open_mailbox(BalsaWindow * window,
 			       LibBalsaMailbox * mailbox);
 void balsa_window_close_mailbox(BalsaWindow * window,
 				LibBalsaMailbox * mailbox);
+static gboolean balsa_close_mailbox_on_timer(GtkWidget * widget, 
+					     gpointer * data);
 
 static void balsa_window_select_message_cb(GtkWidget * widget,
 					   LibBalsaMessage * message,
@@ -155,8 +157,6 @@ static void select_part_cb(BalsaMessage * bm, gpointer data);
 #ifdef BALSA_SHOW_ALL
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 #endif
-
-gboolean balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data);
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
@@ -957,12 +957,15 @@ balsa_window_real_close_mailbox(BalsaWindow * window,
 	balsa_mblist_focus_mailbox(balsa_app.mblist, index->mailbox);
 }
 
-gboolean
+static gboolean
 balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 {
     GTimeVal current_time;
     GtkWidget *page, *index_page;
     int i, c, time;
+
+    if (! balsa_app.close_mailbox_auto)
+	return TRUE;
 
     g_get_current_time(&current_time);
 
@@ -978,7 +981,7 @@ balsa_close_mailbox_on_timer(GtkWidget * widget, gpointer * data)
 	time =
 	    current_time.tv_sec -
 	    BALSA_INDEX_PAGE(index_page)->last_use.tv_sec;
-	if (time > 600) {
+	if (time > (balsa_app.close_mailbox_timeout * 60)) {
 	    if (balsa_app.debug)
 		fprintf(stderr, "Closing Page %d, time: %d\n", i, time);
 	    gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);

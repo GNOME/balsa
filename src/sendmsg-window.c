@@ -1414,7 +1414,6 @@ sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
     GtkWidget* entry;
     g_return_if_fail(bsmsg);
  
-    printf("sendmsg_window_set_field: %20s =>%s\n", key, val);
     if     (g_strcasecmp(key, "to")     ==0) entry = bsmsg->to[1];
     else if(g_strcasecmp(key, "subject")==0) entry = bsmsg->subject[1];
     else if(g_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];
@@ -1671,8 +1670,9 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
     message = bsmsg2message(bsmsg);
-   fcc = message->fcc_mailbox 
-       ? balsa_find_mbox_by_name(message->fcc_mailbox) : NULL;
+    fcc = message->fcc_mailbox 
+	? balsa_find_mbox_by_name(message->fcc_mailbox) : NULL;
+
     if(queue_only)
 	libbalsa_message_queue(message, balsa_app.outbox, fcc,
 			       balsa_app.encoding_style);

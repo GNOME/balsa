@@ -1,3 +1,18 @@
+2000-11-21  Pawel Salek  <pawsa@theochem.kth.se>
+
+	fix #32805.
+	* libbalsa/mailbox_pop3.c: omit mailboxes without password field
+	* src/main-window.c: implement fill_mailbox_passwords that ask for 
+	passwords in the main thread. Remove some old garbage.
+	* libbalsa/send.c: compile with threads disabled.
+
+	Patch from Lubomir Gelo <slon@slon.sk> for controlling auto close 
+	feature:
+	* src/balsa-app.h: define close_mailbox_auto and close_mailbox_timeout
+	* src/main-window.c: the timeout-checking code
+	* src/pref-manager.c: the configuration part.
+	* src/save-restore.c: save-restore part.
+	
 2000-11-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: place outbox and fccbox in right positions

@@ -173,6 +173,11 @@ extern struct BalsaApplication {
     gint check_mail_timer;
     gint check_mail_timer_id;
 
+
+    /* automatically close mailboxes after XX minutes */
+    gboolean close_mailbox_auto;
+    gint close_mailbox_timeout;
+
     /* GUI settings */
     gint mw_width;
     gint mw_height;

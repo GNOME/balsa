@@ -477,6 +477,9 @@ config_global_load(void)
     /* debugging enabled */
     balsa_app.debug = gnome_config_get_bool("Debug=false");
 
+    balsa_app.close_mailbox_auto = gnome_config_get_bool("AutoCloseMailbox=true");
+    balsa_app.close_mailbox_timeout = gnome_config_get_int("AutoCloseMailboxTimeout=10");
+
     balsa_app.remember_open_mboxes =
 	gnome_config_get_bool("RememberOpenMailboxes=false");
     gnome_config_get_vector("OpenMailboxes", &open_mailbox_count,
@@ -630,6 +633,10 @@ gint config_save(void)
     gnome_config_set_string("MailDir", balsa_app.local_mail_directory);
 
     gnome_config_set_bool("Debug", balsa_app.debug);
+
+    gnome_config_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);
+    gnome_config_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout);
+
 
     open_mailboxes_vector =
 	mailbox_list_to_vector(balsa_app.open_mailbox_list);

@@ -53,6 +53,9 @@ typedef struct _PropertyUI {
     GtkWidget *check_mail_auto;
     GtkWidget *check_mail_minutes;
 
+    GtkWidget *close_mailbox_auto;
+    GtkWidget *close_mailbox_minutes;
+
     GtkWidget *previewpane;
     GtkWidget *view_allheaders;
     GtkWidget *debug;		/* enable/disable debugging */
@@ -146,6 +149,7 @@ static void address_book_edit_cb(GtkWidget * widget, gpointer data);
 static void address_book_add_cb(GtkWidget * widget, gpointer data);
 static void address_book_delete_cb(GtkWidget * widget, gpointer data);
 static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+static void mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
@@ -349,6 +353,13 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     gtk_signal_connect(GTK_OBJECT(pui->check_mail_minutes), "changed",
 		       GTK_SIGNAL_FUNC(timer_modified_cb), property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_auto), "toggled",
+		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
+
+    gtk_signal_connect(GTK_OBJECT(pui->close_mailbox_minutes), "changed",
+		       GTK_SIGNAL_FUNC(mailbox_timer_modified_cb), property_box);
+
     gtk_signal_connect(GTK_OBJECT(pui->wordwrap), "toggled",
 		       GTK_SIGNAL_FUNC(wrap_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->wraplength), "changed",
@@ -569,6 +580,11 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     g_free(balsa_app.bcc);
     balsa_app.bcc = g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->bcc)));
 
+    balsa_app.close_mailbox_auto =
+	GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->active;
+    balsa_app.close_mailbox_timeout =
+	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
+					 (pui->close_mailbox_minutes));
 
     /* arp */
     g_free(balsa_app.quote_str);
@@ -757,6 +773,15 @@ set_prefs(void)
 				 balsa_app.check_mail_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->check_mail_minutes),
 			      (float) balsa_app.check_mail_timer);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->close_mailbox_auto),
+				 balsa_app.close_mailbox_auto);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->close_mailbox_minutes),
+			      (float) balsa_app.close_mailbox_timeout);
+
+    gtk_widget_set_sensitive(pui->close_mailbox_minutes,
+			     GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)->
+    		    	    active);
 
     gtk_widget_set_sensitive(pui->smtp_server,
 			     GTK_TOGGLE_BUTTON(pui->rb_smtp_server)->
@@ -1678,8 +1703,11 @@ create_misc_page(gpointer data)
     GtkWidget *label927;
     GtkWidget *label;
     GtkWidget *label9;
+    GtkWidget *label33;
     GtkWidget *color_frame;
     GtkWidget *vbox12;
+    GtkWidget *hbox1;
+    GtkObject *spinbutton4_adj;
 
     vbox9 = gtk_vbox_new(FALSE, 0);
 
@@ -1696,6 +1724,25 @@ create_misc_page(gpointer data)
 	gtk_check_button_new_with_label(_("Empty trash on exit"));
     gtk_box_pack_start(GTK_BOX(vbox10), pui->empty_trash, FALSE, FALSE, 0);
 
+    hbox1 = gtk_hbox_new(FALSE, 0);
+    gtk_widget_show(hbox1);
+    gtk_box_pack_start(GTK_BOX(vbox10), hbox1, FALSE, FALSE, 0);
+
+    pui->close_mailbox_auto =
+	gtk_check_button_new_with_label(_("Automatically close mailbox if unused more than"));
+    gtk_widget_show(pui->close_mailbox_auto);
+    gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_auto, FALSE, FALSE, 0);
+
+    spinbutton4_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
+    pui->close_mailbox_minutes =
+	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton4_adj), 1, 0);
+    gtk_widget_show(pui->close_mailbox_minutes);
+    gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
+    gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_minutes, FALSE, FALSE, 0);
+
+    label33 = gtk_label_new(_("Minutes"));
+    gtk_widget_show(label33);
+    gtk_box_pack_start(GTK_BOX(hbox1), label33, FALSE, TRUE, 0);
 
     /* font */
     frame14 = gtk_frame_new(_("Font"));
@@ -2138,4 +2185,17 @@ create_information_message_menu(void)
     add_show_menu(_("Show In List"), BALSA_INFORMATION_SHOW_LIST,   menu);
     return menu;
 }
+
+void
+mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean newstate =	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+	    pui->close_mailbox_auto));
+
+    gtk_widget_set_sensitive(GTK_WIDGET(pui->close_mailbox_minutes),
+			     newstate);
+
+    properties_modified_cb(widget, pbox);
+}
+
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-02-11 02:20+0100\n"
+"POT-Creation-Date: 2001-02-14 12:22+0100\n"
 "PO-Revision-Date: 2000-07-07 12:30+0200\n"
 "Last-Translator: Andraz Tori <andraz.tori1@guest.arnes.si>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -546,159 +546,114 @@ msgstr "%d ohranjenih."
 msgid "Can't write message"
 msgstr "Ne mroem pisati sporoèila"
 
-#: libmutt/imap/auth.c:110
-msgid "Authenticating (CRAM-MD5)..."
-msgstr "Avtentificiram (CRAM-MD5)..."
-
-#: libmutt/imap/auth.c:202
-msgid "Authenticating (anonymous)..."
-msgstr "Avtentificiram (anonimno)..."
-
-#: libmutt/imap/auth.c:288
-msgid "Anonymous authentication not supported."
-msgstr "Anonimna avtentifikacija ni podprta."
-
-#: libmutt/imap/auth.c:301
-msgid "GSSAPI authentication failed."
-msgstr "GSSAPI avtentifikacija ni uspela."
-
-#: libmutt/imap/auth.c:329
-msgid "CRAM-MD5 authentication failed."
-msgstr "CRAM-MD5 avtentifikacija ni uspela."
-
-#: libmutt/imap/auth.c:344
-msgid "Skipping CRAM-MD5 authentication."
-msgstr "Preskakujem CRAM-MD5 avtentifikacijo."
-
-#: libmutt/imap/auth.c:366
-msgid "Logging in..."
-msgstr "Prijavljam se..."
-
-#. Login failed, try again
-#: libmutt/imap/auth.c:378
-msgid "Login failed."
-msgstr "Prijava ni uspela."
-
 #. now begin login
-#: libmutt/imap/auth_gss.c:88
+#: libmutt/imap/auth_gss.c:87
 msgid "Authenticating (GSSAPI)..."
 msgstr "Avtentificiram (GSSAPI)..."
 
-#: libmutt/imap/browse.c:108
+#: libmutt/imap/auth_gss.c:262
+msgid "GSSAPI authentication failed."
+msgstr "GSSAPI avtentifikacija ni uspela."
+
+#: libmutt/imap/browse.c:95
 msgid "Getting namespaces..."
 msgstr "Dobivam prostore imen..."
 
-#: libmutt/imap/browse.c:135
+#: libmutt/imap/browse.c:104
 msgid "Getting folder list..."
 msgstr "Dobivam seznam map..."
 
-#: libmutt/imap/imap_ssl.c:92
-msgid "Filling entropy pool"
-msgstr "Polnim zalogo entropije z nakljuènimi dogodki"
+#: libmutt/imap/browse.c:281
+msgid "Create mailbox: "
+msgstr "Ustvari po¹tni predal:"
 
-#: libmutt/imap/imap_ssl.c:124
-msgid "Failed to find enough entropy on your system"
-msgstr "V va¹em sistemu nisem na¹el dovolj nakljuènih dogodkov"
+#: libmutt/imap/browse.c:287
+msgid "Mailbox created."
+msgstr "Predal ustvarjen."
 
-#: libmutt/imap/imap_ssl.c:139
-msgid "SSL disabled due the lack of entropy"
-msgstr "SSL izkljuèen zaradi pomanjkanja nakljuènih dogodkov"
+#: libmutt/imap/imap.c:89
+msgid "Closing connection to %s..."
+msgstr "Zapiram povezavo z %s..."
 
-#: libmutt/imap/imap_ssl.c:219
-msgid "Unable to get certificate from peer"
-msgstr "Od sogovornika ne morem dobiti certifikata"
+#: libmutt/imap/imap.c:295
+msgid "This IMAP server is ancient. Mutt does not work with it."
+msgstr "To je prazgodovinski stre¾nik IMAP. Mutt z njim ne deluje."
 
-#: libmutt/imap/imap_ssl.c:230
+#: libmutt/imap/imap.c:497
+msgid "Selecting %s..."
+msgstr "Izbiram %s..."
+
+#. STATUS not supported
+#: libmutt/imap/imap.c:667
+msgid "Unable to append to IMAP mailboxes at this server"
+msgstr "Na tem stre¾niku ni bilo mogoèe dodati po¹tnih predalov IMAP"
+
+#. command failed cause folder doesn't exist
+#: libmutt/imap/imap.c:676 libmutt/imap/message.c:577
+msgid "Create %s?"
+msgstr "Ustvari %s?"
+
+#: libmutt/imap/imap.c:712
+msgid "Closing connection to IMAP server..."
+msgstr "Zapiram povezavo s stre¾nikom IMAP..."
+
+#: libmutt/imap/imap.c:875
+msgid "Marking %d messages deleted..."
+msgstr "Oznaèujem %d sporoèil kot izbrisana..."
+
+#: libmutt/imap/imap.c:894
 #, c-format
-msgid "SSL connection using %s"
-msgstr "SSL povezava z uporabo %s"
+msgid "Saving message status flags... [%d/%d]"
+msgstr "Shranjujem zastavice stanja sporoèila... [%d/%d]"
 
-#: libmutt/imap/imap_ssl.c:255
-msgid "Unknown"
-msgstr "Neznan"
+#: libmutt/imap/imap.c:951
+msgid "Expunging messages from server..."
+msgstr "Unièujem sporoèila na stre¾niku...."
 
-#: libmutt/imap/imap_ssl.c:280
-msgid "[unable to calculate]"
-msgstr "[nisem mogel izraèunati]"
+#: libmutt/imap/imap.c:1227
+msgid "Subscribing to %s..."
+msgstr "Naroèam se na %s..."
 
-#: libmutt/imap/imap_ssl.c:298
-msgid "[invalid date]"
-msgstr "[napaèen datum]"
+#: libmutt/imap/imap.c:1229
+msgid "Unsubscribing to %s..."
+msgstr "Preklicujem naroènino %s..."
 
-#: libmutt/imap/imap_ssl.c:373
-msgid "Server certificate is not yet valid"
-msgstr "Certifikat stre¾nika ¹e ni veljaven"
+#. Unable to fetch headers for lower versions
+#: libmutt/imap/message.c:74
+msgid "Unable to fetch headers from this IMAP server version."
+msgstr "S stre¾nika IMAP te razlièice ne morem prenesti glav."
 
-#: libmutt/imap/imap_ssl.c:380
-msgid "Server certificate has expired"
-msgstr "Certifikat stre¾nika je potekel"
+#: libmutt/imap/message.c:92
+msgid "Fetching message headers... [%d/%d]"
+msgstr "Prena¹am gave sporoèil. [%d/%d]"
 
-#: libmutt/imap/imap_ssl.c:454
-msgid "This certificate belongs to:"
-msgstr "Ta certifikat pripada:"
+#: libmutt/imap/message.c:237
+msgid "Fetching message..."
+msgstr "Prena¹am sporoèilo..."
 
-#: libmutt/imap/imap_ssl.c:464
-msgid "This certificate was issued by:"
-msgstr "Ta certifikat je izdal:"
+#: libmutt/imap/message.c:276
+msgid "The message index is incorrect. Try reopening the mailbox."
+msgstr "Zaporedna ¹tevilka sporoèila ni veljavna. Poskusite na novo odpreti po¹tni predal."
 
-#: libmutt/imap/imap_ssl.c:474
-msgid "This certificate is valid"
-msgstr "Ta certifikat je veljaven"
+#: libmutt/imap/message.c:467
+msgid "Uploading message ..."
+msgstr "Nalagam sporoèilo ..."
 
-#: libmutt/imap/imap_ssl.c:475
-#, c-format
-msgid "   from %s"
-msgstr "   od %s"
+#: libmutt/imap/message.c:555
+msgid "Copying %d messages to %s..."
+msgstr "Kopiram %d sporoèil v %s..."
 
-#: libmutt/imap/imap_ssl.c:477
-#, c-format
-msgid "     to %s"
-msgstr "     do %s"
-
-#: libmutt/imap/imap_ssl.c:483
-#, c-format
-msgid "Fingerprint: %s"
-msgstr "Prstni odtis: %s"
-
-#: libmutt/imap/imap_ssl.c:485
-msgid "SSL Certificate check"
-msgstr "Preverjanje SSL certifikata"
-
-#: libmutt/imap/imap_ssl.c:488
-msgid "(r)eject, accept (o)nce, (a)ccept always"
-msgstr "zav(r)ni, sprejmi (e)nkrat, (v)edno sprejmi"
-
-#: libmutt/imap/imap_ssl.c:489
-msgid "roa"
-msgstr "rev"
-
-#: libmutt/imap/imap_ssl.c:493
-msgid "(r)eject, accept (o)nce"
-msgstr "zav(r)ni, sprejmi (e)nkrat"
-
-#: libmutt/imap/imap_ssl.c:494
-msgid "ro"
-msgstr "re"
-
-#: libmutt/imap/imap_ssl.c:498
-msgid "Exit  "
-msgstr "Izhod"
-
-#: libmutt/imap/imap_ssl.c:500
-msgid "Help"
-msgstr "Pomoè"
-
-#: libmutt/imap/imap_ssl.c:523
-msgid "Warning: Couldn't save certificate"
-msgstr "Opozorilo: Nisem mogel shraniti certifikata"
-
-#: libmutt/imap/imap_ssl.c:525
-msgid "Certificate saved"
-msgstr "Certifikat shranjen"
+#: libmutt/imap/message.c:559
+msgid "Copying message %d to %s..."
+msgstr "Prestavljam sporoèilo %d v %s..."
 
 #: libmutt/imap/util.c:43
 msgid "Continue?"
 msgstr "Nadaljuj?"
+
+#: libmutt/imap/util.c:49
+msgid "%s [%s]\n"
+msgstr "%s [%s]\n"
 
 #: src/address-book.c:161 src/filter-edit-dialog.c:130
 msgid "Name"
@@ -788,7 +743,7 @@ msgid "Base Domain Name"
 msgstr "Osnovno ime domene"
 
 #: src/address-book-config.c:460 src/filter-edit-dialog.c:379
-#: src/mailbox-conf.c:256 src/pref-manager.c:1233 src/pref-manager.c:2023
+#: src/mailbox-conf.c:256 src/pref-manager.c:1233 src/pref-manager.c:2021
 msgid "Add"
 msgstr "Dodaj"
 
@@ -816,19 +771,19 @@ msgid "Mailbox password for %s@%s:"
 msgstr "Geslo po¹tnega predala za %s@%s:"
 
 #. FIXME:
-#: src/balsa-index.c:273
+#: src/balsa-index.c:266
 msgid "From"
 msgstr "Od"
 
-#: src/balsa-index.c:274 src/filter-edit-dialog.c:326
+#: src/balsa-index.c:267 src/filter-edit-dialog.c:326
 msgid "Subject"
 msgstr "Zadeva"
 
-#: src/balsa-index.c:275
+#: src/balsa-index.c:268
 msgid "Date"
 msgstr "Datum"
 
-#: src/balsa-index.c:564
+#: src/balsa-index.c:546
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -836,60 +791,60 @@ msgstr ""
 "Ne morem odpreti po¹tnega predala!\n"
 "Prosim preverite nastavitve predala."
 
-#: src/balsa-index.c:575
+#: src/balsa-index.c:557
 msgid "To"
 msgstr "Za"
 
-#: src/balsa-index.c:1796
+#: src/balsa-index.c:1786
 msgid "Cannot access the message's body\n"
 msgstr "Ne morem dostopati do telesa sporoèila\n"
 
-#: src/balsa-index.c:1833
+#: src/balsa-index.c:1823
 msgid "Reply..."
 msgstr "Odgovori..."
 
-#: src/balsa-index.c:1837
+#: src/balsa-index.c:1827
 msgid "Reply To All..."
 msgstr "Odgovori vsem..."
 
-#: src/balsa-index.c:1841
+#: src/balsa-index.c:1831
 msgid "Reply To Group..."
 msgstr "Odgovori skupini..."
 
-#: src/balsa-index.c:1845
+#: src/balsa-index.c:1835
 msgid "Forward..."
 msgstr "Posreduj naprej..."
 
-#: src/balsa-index.c:1850
+#: src/balsa-index.c:1840
 msgid "Undelete"
 msgstr "Odbri¹i"
 
-#: src/balsa-index.c:1853 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
-#: src/main-window.c:526 src/pref-manager.c:1235 src/pref-manager.c:2025
+#: src/balsa-index.c:1843 src/filter-edit-dialog.c:224 src/mailbox-node.c:471
+#: src/main-window.c:526 src/pref-manager.c:1235 src/pref-manager.c:2023
 msgid "Delete"
 msgstr "Zbri¹i"
 
-#: src/balsa-index.c:1857
+#: src/balsa-index.c:1847
 msgid "Move To Trash"
 msgstr "Prestavi v smeti"
 
-#: src/balsa-index.c:1862
+#: src/balsa-index.c:1852
 msgid "Store Address..."
 msgstr "Shrani naslov..."
 
-#: src/balsa-index.c:1865
+#: src/balsa-index.c:1855
 msgid "Toggle"
 msgstr "Preklopi"
 
-#: src/balsa-index.c:1868 src/main-window.c:347
+#: src/balsa-index.c:1858 src/main-window.c:347
 msgid "Flagged"
 msgstr "Oznaèeno"
 
-#: src/balsa-index.c:1871 src/balsa-mblist.c:479
+#: src/balsa-index.c:1861 src/balsa-mblist.c:479
 msgid "Unread"
 msgstr "Neprebrano"
 
-#: src/balsa-index.c:1882
+#: src/balsa-index.c:1872
 msgid "Transfer"
 msgstr "Prenesi"
 
@@ -1963,7 +1918,7 @@ msgstr "Podpis"
 msgid "Mail Servers"
 msgstr "Po¹tni stre¾niki"
 
-#: src/pref-manager.c:251 src/pref-manager.c:1990
+#: src/pref-manager.c:251 src/pref-manager.c:1988
 msgid "Address Books"
 msgstr "Adresarji"
 
@@ -1975,7 +1930,7 @@ msgstr "Mo¾nmosti po¹te"
 msgid "Display"
 msgstr "Prikaz"
 
-#: src/pref-manager.c:264 src/pref-manager.c:1762 src/pref-manager.c:1802
+#: src/pref-manager.c:264 src/pref-manager.c:1760 src/pref-manager.c:1800
 msgid "Printing"
 msgstr "Tiskanje"
 
@@ -1983,7 +1938,7 @@ msgstr "Tiskanje"
 msgid "Spelling"
 msgstr "Èrkovanje"
 
-#: src/pref-manager.c:272 src/pref-manager.c:1913
+#: src/pref-manager.c:272 src/pref-manager.c:1911
 msgid "Misc"
 msgstr "Razno"
 
@@ -2051,7 +2006,7 @@ msgstr "Vrini podpis pred citiranimi sporoèili"
 msgid "Remote Mailbox Servers"
 msgstr "Oddaljeni sre¾niki po¹tnih predalov"
 
-#: src/pref-manager.c:1225 src/pref-manager.c:2012
+#: src/pref-manager.c:1225 src/pref-manager.c:2010
 msgid "Type"
 msgstr "Tip"
 
@@ -2059,7 +2014,7 @@ msgstr "Tip"
 msgid "Mailbox Name"
 msgstr "Ime predala"
 
-#: src/pref-manager.c:1234 src/pref-manager.c:2024
+#: src/pref-manager.c:1234 src/pref-manager.c:2022
 msgid "Modify"
 msgstr "Spremeni"
 
@@ -2099,7 +2054,7 @@ msgstr "Odhodna"
 msgid "Checking"
 msgstr "Preverjam"
 
-#: src/pref-manager.c:1349 src/pref-manager.c:1942
+#: src/pref-manager.c:1349 src/pref-manager.c:1940
 msgid "minutes"
 msgstr "minut"
 
@@ -2181,8 +2136,8 @@ msgid "Selected headers:"
 msgstr "Izbrane glave:"
 
 #: src/pref-manager.c:1568
-msgid "Messages"
-msgstr "Sporoèila"
+msgid "Status Messages"
+msgstr "Sporoèila stanja"
 
 #. gtk_table_set_row_spacings(GTK_TABLE(information_table), 1);
 #. gtk_table_set_col_spacings(GTK_TABLE(information_table), 5);
@@ -2206,47 +2161,47 @@ msgstr "Sporoèila o usodnih napakah"
 msgid "Debug Messages"
 msgstr "Razhro¹èevalna sporoèila"
 
-#: src/pref-manager.c:1644
+#: src/pref-manager.c:1645
 msgid "Colors"
 msgstr "Barve"
 
-#: src/pref-manager.c:1646
+#: src/pref-manager.c:1647
 msgid "Mailbox Colors"
 msgstr "Barve predala"
 
-#: src/pref-manager.c:1652
+#: src/pref-manager.c:1653
 msgid "Mailbox with unread messages color"
 msgstr "Barva predala z neprebranimi sporoèili"
 
-#: src/pref-manager.c:1654
+#: src/pref-manager.c:1655
 msgid "Message Colors"
 msgstr "Barve sporoèila"
 
-#: src/pref-manager.c:1660
+#: src/pref-manager.c:1661
 msgid "Quoted text primary color"
 msgstr "Osnovna barva citiranega besedila"
 
-#: src/pref-manager.c:1662
+#: src/pref-manager.c:1663
 msgid "Quoted text secondary color"
 msgstr "Drugotna barva citiranega besedila"
 
-#: src/pref-manager.c:1666
+#: src/pref-manager.c:1668
 msgid "Fonts"
 msgstr "Pisave"
 
-#: src/pref-manager.c:1668
+#: src/pref-manager.c:1670
 msgid "Preview Font"
 msgstr "Predogled pisave"
 
-#: src/pref-manager.c:1687 src/pref-manager.c:1723
+#: src/pref-manager.c:1687 src/pref-manager.c:1721
 msgid "Select a font to use"
 msgstr "Izberite pisavo, ki naj se uprabi"
 
-#: src/pref-manager.c:1690 src/pref-manager.c:1726
+#: src/pref-manager.c:1690 src/pref-manager.c:1724
 msgid "Select..."
 msgstr "Izberi..."
 
-#: src/pref-manager.c:1697 src/pref-manager.c:1734
+#: src/pref-manager.c:1697 src/pref-manager.c:1732
 msgid "Preview pane"
 msgstr "Polje predogleda"
 
@@ -2255,98 +2210,98 @@ msgstr "Polje predogleda"
 msgid "Subject Header Font"
 msgstr "Izberi pisavo glave"
 
-#: src/pref-manager.c:1787
+#: src/pref-manager.c:1785
 msgid "characters"
 msgstr "znaki"
 
-#: src/pref-manager.c:1790
+#: src/pref-manager.c:1788
 msgid "Print command:"
 msgstr "Ukaz za tiskanje:"
 
-#: src/pref-manager.c:1796
+#: src/pref-manager.c:1794
 msgid "Break line at:"
 msgstr "Prelomi vrstico pri:"
 
 #. pspell frame
-#: src/pref-manager.c:1852
+#: src/pref-manager.c:1850
 msgid "Pspell Settings"
 msgstr "Nastavitve programa pspell"
 
 #. do the module menu
-#: src/pref-manager.c:1858
+#: src/pref-manager.c:1856
 msgid "Spell Check Module"
 msgstr "Modul za preverjanje èrkovanje"
 
-#: src/pref-manager.c:1864
+#: src/pref-manager.c:1862
 msgid "Suggestion Level"
 msgstr "Stopnja predlogov"
 
-#: src/pref-manager.c:1872
+#: src/pref-manager.c:1870
 msgid "Ignore words shorter than"
 msgstr "Prezri besede kraj¹e od"
 
 #. ignore signature check box
-#: src/pref-manager.c:1879
+#: src/pref-manager.c:1877
 msgid "Misc Spelling Settings"
 msgstr "Razliène nastavitve èrkovanja"
 
-#: src/pref-manager.c:1885
+#: src/pref-manager.c:1883
 msgid "Check signature"
 msgstr "Preveri podpis"
 
-#: src/pref-manager.c:1889
+#: src/pref-manager.c:1887
 msgid "Check quoted"
 msgstr "Preveri citirano"
 
-#: src/pref-manager.c:1919
+#: src/pref-manager.c:1917
 msgid "Debug"
 msgstr "Razhro¹èevanje"
 
-#: src/pref-manager.c:1923
+#: src/pref-manager.c:1921
 msgid "Empty Trash on exit"
 msgstr "Ob izhodu sprazni Smeti"
 
-#: src/pref-manager.c:1931
+#: src/pref-manager.c:1929
 msgid "Automatically close mailbox if unused more than"
 msgstr "Samnodejno zapri po¹tni predal èe ni uporabljen veè kot"
 
-#: src/pref-manager.c:1958
+#: src/pref-manager.c:1956
 msgid "Options"
 msgstr "Mo¾nosti"
 
-#: src/pref-manager.c:1965
+#: src/pref-manager.c:1963
 msgid "Check mail upon startup"
 msgstr "Preveri po¹to ob zagonu"
 
-#: src/pref-manager.c:1970
+#: src/pref-manager.c:1968
 msgid "Remember open mailboxes between sessions"
 msgstr "Zapomni si odprte predale med sejami"
 
-#: src/pref-manager.c:2015
+#: src/pref-manager.c:2013
 msgid "Address Book Name"
 msgstr "Ime adresarja"
 
-#: src/pref-manager.c:2019
+#: src/pref-manager.c:2017
 msgid "Expand aliases"
 msgstr "Raz¹iri soimena"
 
-#: src/pref-manager.c:2026
+#: src/pref-manager.c:2024
 msgid "Set as default"
 msgstr "Postavi za privzeto"
 
-#: src/pref-manager.c:2273
+#: src/pref-manager.c:2271
 msgid "Show nothing"
 msgstr "Ne ka¾i nièesar"
 
-#: src/pref-manager.c:2274
+#: src/pref-manager.c:2272
 msgid "Show dialog"
 msgstr "Ka¾i dialog"
 
-#: src/pref-manager.c:2275
+#: src/pref-manager.c:2273
 msgid "Show in list"
 msgstr "Ka¾i v seznamu"
 
-#: src/pref-manager.c:2276
+#: src/pref-manager.c:2274
 msgid "Print to console"
 msgstr "Tiskaj na konzolo"
 
@@ -2805,6 +2760,102 @@ msgstr "Noben adresar ni izbran...."
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 
+#~ msgid "Authenticating (CRAM-MD5)..."
+#~ msgstr "Avtentificiram (CRAM-MD5)..."
+
+#~ msgid "Authenticating (anonymous)..."
+#~ msgstr "Avtentificiram (anonimno)..."
+
+#~ msgid "Anonymous authentication not supported."
+#~ msgstr "Anonimna avtentifikacija ni podprta."
+
+#~ msgid "CRAM-MD5 authentication failed."
+#~ msgstr "CRAM-MD5 avtentifikacija ni uspela."
+
+#~ msgid "Skipping CRAM-MD5 authentication."
+#~ msgstr "Preskakujem CRAM-MD5 avtentifikacijo."
+
+#~ msgid "Logging in..."
+#~ msgstr "Prijavljam se..."
+
+#~ msgid "Login failed."
+#~ msgstr "Prijava ni uspela."
+
+#~ msgid "Filling entropy pool"
+#~ msgstr "Polnim zalogo entropije z nakljuènimi dogodki"
+
+#~ msgid "Failed to find enough entropy on your system"
+#~ msgstr "V va¹em sistemu nisem na¹el dovolj nakljuènih dogodkov"
+
+#~ msgid "SSL disabled due the lack of entropy"
+#~ msgstr "SSL izkljuèen zaradi pomanjkanja nakljuènih dogodkov"
+
+#~ msgid "Unable to get certificate from peer"
+#~ msgstr "Od sogovornika ne morem dobiti certifikata"
+
+#~ msgid "SSL connection using %s"
+#~ msgstr "SSL povezava z uporabo %s"
+
+#~ msgid "Unknown"
+#~ msgstr "Neznan"
+
+#~ msgid "[unable to calculate]"
+#~ msgstr "[nisem mogel izraèunati]"
+
+#~ msgid "[invalid date]"
+#~ msgstr "[napaèen datum]"
+
+#~ msgid "Server certificate is not yet valid"
+#~ msgstr "Certifikat stre¾nika ¹e ni veljaven"
+
+#~ msgid "Server certificate has expired"
+#~ msgstr "Certifikat stre¾nika je potekel"
+
+#~ msgid "This certificate belongs to:"
+#~ msgstr "Ta certifikat pripada:"
+
+#~ msgid "This certificate was issued by:"
+#~ msgstr "Ta certifikat je izdal:"
+
+#~ msgid "This certificate is valid"
+#~ msgstr "Ta certifikat je veljaven"
+
+#~ msgid "   from %s"
+#~ msgstr "   od %s"
+
+#~ msgid "     to %s"
+#~ msgstr "     do %s"
+
+#~ msgid "Fingerprint: %s"
+#~ msgstr "Prstni odtis: %s"
+
+#~ msgid "SSL Certificate check"
+#~ msgstr "Preverjanje SSL certifikata"
+
+#~ msgid "(r)eject, accept (o)nce, (a)ccept always"
+#~ msgstr "zav(r)ni, sprejmi (e)nkrat, (v)edno sprejmi"
+
+#~ msgid "roa"
+#~ msgstr "rev"
+
+#~ msgid "(r)eject, accept (o)nce"
+#~ msgstr "zav(r)ni, sprejmi (e)nkrat"
+
+#~ msgid "ro"
+#~ msgstr "re"
+
+#~ msgid "Exit  "
+#~ msgstr "Izhod"
+
+#~ msgid "Help"
+#~ msgstr "Pomoè"
+
+#~ msgid "Warning: Couldn't save certificate"
+#~ msgstr "Opozorilo: Nisem mogel shraniti certifikata"
+
+#~ msgid "Certificate saved"
+#~ msgstr "Certifikat shranjen"
+
 #~ msgid ""
 #~ "Enter print command below\n"
 #~ "Remember to include '%s'"
@@ -2862,9 +2913,6 @@ msgstr "Oprostite, dvopièja v imenu niso dovoljena!\n"
 
 #~ msgid "Could not find address for host %s."
 #~ msgstr "Nisem mogel najti naslova za stre¾nik %s."
-
-#~ msgid "Unable to get APOP seed from server"
-#~ msgstr "S stre¾nika ne morem dobiti APOP semena"
 
 #~ msgid "Add New Address"
 #~ msgstr "Dodaj Nov Naslov"

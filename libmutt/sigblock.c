@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-extern sigset_t Sigset;
+sigset_t Sigset;
 
 /* signals which are important to block while doing critical ops */
 void mutt_block_signals (void)

@@ -1,5 +1,6 @@
-2003-11-18 18:22  PeterB
+2003-11-18 22:07  PeterB
 
+	* libbalsa/send.c: Encoding goes on mime_part, not content.
 	* libbalsa/send.c: Simplify call to
 	libbalsa_message_create_mime_message(); call it when postponing,
 	and save fcc in X-Balsa-Fcc header.

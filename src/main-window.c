@@ -18,7 +18,7 @@
  */
 
 #include <string.h>
-#include "../config.h"
+#include "config.h"
 #include "main-window.h"
 #include "balsa-message.h"
 #include "balsa-index.h"

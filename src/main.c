@@ -17,13 +17,12 @@
  * 02111-1307, USA.
  */
 
+#include "config.h"
 #include <gnome.h>
-
 #include "balsa-app.h"
 #include "index.h"
 #include "c-client.h"
 #include "mailbox.h"
-#include "../config.h"
 
 int
 main (int argc, char *argv[])

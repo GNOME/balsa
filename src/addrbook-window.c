@@ -28,7 +28,7 @@ gint delete_event (GtkWidget *, gpointer);
 static GtkWidget *menu_items[9];
 extern void close_window (GtkWidget *, gpointer);
 
-static update_addyb_window(GtkWidget *, gpointer);
+static update_addyb_window (GtkWidget *, gpointer);
 
 static GtkWidget *addyb_list;
 static GtkWidget *email_list;
@@ -45,27 +45,44 @@ static struct _addyb_item
 static void
 addyb_item_new (gchar * name, gchar * comments)
 {
-  addyb_item *new_item = g_malloc0 (sizeof (addyb_item));
+  addyb_item *new_item = g_malloc (sizeof (addyb_item));
   gchar *list_item[1];
   new_item->name = list_item[0] = name;
   new_item->comments = comments;
+  new_item->email = NULL;
   gtk_clist_set_row_data (GTK_CLIST (addyb_list),
 		       gtk_clist_append (GTK_CLIST (addyb_list), list_item),
 			  new_item);
-                gtk_signal_connect(GTK_OBJECT(addyb_list),
-                                   "select_row",
-                                   GTK_SIGNAL_FUNC(update_addyb_window),
-                                   NULL);
+  gtk_signal_connect (GTK_OBJECT (addyb_list),
+		      "select_row",
+		      GTK_SIGNAL_FUNC (update_addyb_window),
+		      NULL);
+  g_list_append (balsa - app.addressbook_list, new_item);
+}
 
+static void
+addyb_email_item_new (addyb_item * ai, gchar * addy)
+{
+  gchar *list_item[1];
+  new_item->email = NULL;
+  list_item[0] = addy;
+  gtk_clist_set_row_data (GTK_CLIST (addyb_list),
+		       gtk_clist_append (GTK_CLIST (email_list), list_item),
+			  ai);
+  gtk_signal_connect (GTK_OBJECT (email_list),
+		      "select_row",
+		      NULL,
+		      NULL);
+  g_list_append (new_item->email, addy);
 }
 
 static void
 addyb_compose_update (addyb_item * ai)
 {
   gtk_text_freeze (GTK_TEXT (commentstext));
-  gtk_editable_delete_text(GTK_EDITABLE(commentstext), 0, gtk_text_get_length(GTK_TEXT(commentstext)));
+  gtk_editable_delete_text (GTK_EDITABLE (commentstext), 0, gtk_text_get_length (GTK_TEXT (commentstext)));
 
-  gtk_text_insert (GTK_TEXT (commentstext), NULL, NULL, NULL, ai->comments, strlen (ai->comments)+1);
+  gtk_text_insert (GTK_TEXT (commentstext), NULL, NULL, NULL, ai->comments, strlen (ai->comments) + 1);
   gtk_text_thaw (GTK_TEXT (commentstext));
 }
 
@@ -87,12 +104,13 @@ addyb_emaillist_update (addyb_item * ai)
   gtk_clist_thaw (GTK_CLIST (email_list));
 }
 
-static update_addyb_window(GtkWidget *widget, gpointer data)
+static 
+update_addyb_window (GtkWidget * widget, gpointer data)
 {
-  addyb_item *ai = (addyb_item *)gtk_clist_get_row_data(GTK_CLIST(widget), ((gint)GTK_CLIST(widget)->selection->data));
+  addyb_item *ai = (addyb_item *) gtk_clist_get_row_data (GTK_CLIST (widget), ((gint) GTK_CLIST (widget)->selection->data));
 
-  addyb_emaillist_update(ai);
-  addyb_compose_update(ai);
+  addyb_emaillist_update (ai);
+  addyb_compose_update (ai);
 }
 
 static GtkWidget *

@@ -227,21 +227,24 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
 /* Helper: seek to offset, and return TRUE if the seek succeeds and a
  * message begins there. */
 static gboolean
-lbm_mbox_seek_to_message(LibBalsaMailboxMbox * mbox, off_t offset)
+lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
 {
     char buffer[5];
     gboolean retval;
 
-    retval =
-        g_mime_stream_seek(mbox->gmime_stream, offset,
-                           GMIME_STREAM_SEEK_SET) >= 0
-        && g_mime_stream_read(mbox->gmime_stream, buffer,
-                              sizeof(buffer)) >= 0
+    retval = g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET) >= 0
+        && g_mime_stream_read(stream, buffer, sizeof(buffer)) >= 0
         && strncmp("From ", buffer, 5) == 0;
 
-    g_mime_stream_seek(mbox->gmime_stream, offset, GMIME_STREAM_SEEK_SET);
+    g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET);
 
     return retval;
+}
+
+static gboolean
+lbm_mbox_seek_to_message(LibBalsaMailboxMbox * mbox, off_t offset)
+{
+    return lbm_mbox_stream_seek_to_message(mbox->gmime_stream, offset);
 }
 
 static GMimeStream *
@@ -463,6 +466,15 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 	return FALSE;
     }
     gmime_stream = g_mime_stream_fs_new(fd);
+
+    if (st.st_size > 0
+        && !lbm_mbox_stream_seek_to_message(gmime_stream, 0)) {
+        g_object_unref(gmime_stream);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_OPEN_ERROR,
+                    _("Mailbox is not in mbox format."));
+        return FALSE;
+    }
 
     if (mbox_lock(mailbox, gmime_stream)) {
 	g_object_unref(gmime_stream);
@@ -1547,12 +1559,22 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
     
     orig_length = lseek (fd, 0, SEEK_END);
+    lseek (fd, 0, SEEK_SET);
     dest = g_mime_stream_fs_new (fd);
     if (!dest) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("%s: could not get new mime stream."),
                     "MBOX");
+	g_free(from);
+	return -1;
+    }
+    if (orig_length > 0 && !lbm_mbox_stream_seek_to_message(dest, 0)) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_APPEND_ERROR,
+                    _("%s: %s is not in mbox format."),
+                    "MBOX", path);
+	g_object_unref(dest);
 	g_free(from);
 	return -1;
     }
@@ -1574,6 +1596,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     orig = lbm_mbox_armor_stream(orig, (message->flags |
 					LIBBALSA_MESSAGE_FLAG_RECENT));
 
+    g_mime_stream_seek(dest, 0, GMIME_STREAM_SEEK_END);
     if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
 	|| g_mime_stream_write_to_stream (orig, dest) < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,

@@ -4183,9 +4183,16 @@ empty_trash(BalsaWindow * window)
 {
     guint msgno, total;
     GArray *messages;
+    GError *err = NULL;
 
-    if (!libbalsa_mailbox_open(balsa_app.trash, NULL))
+    if(!libbalsa_mailbox_open(balsa_app.trash, &err)) {
+	balsa_information_parented(GTK_WINDOW(window),
+				   LIBBALSA_INFORMATION_WARNING,
+				   _("Could not open trash: %s"),
+				   err ? err->message : _("Unknown error"));
+	g_clear_error(&err);
 	return;
+    }
 
     messages = g_array_new(FALSE, FALSE, sizeof(guint));
     total = libbalsa_mailbox_total_messages(balsa_app.trash);

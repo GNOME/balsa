@@ -40,6 +40,9 @@
 
 #include "libbalsa-marshal.h"
 
+#define MBOX_SORT_COLUMN_UNSORTED (-2)
+#define MBOX_IS_SORTED(mbox) \
+    (LIBBALSA_MAILBOX(mbox)->sort_column_id != MBOX_SORT_COLUMN_UNSORTED)
 /* Class functions */
 static void libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass);
 static void libbalsa_mailbox_init(LibBalsaMailbox * mailbox);
@@ -89,6 +92,9 @@ static guint libbalsa_mailbox_signals[LAST_SIGNAL];
 /* GtkTreeModel function prototypes */
 static void  mbox_model_init(GtkTreeModelIface *iface);
 
+/* GtkTreeSortable function prototypes */
+static void  mbox_sortable_init(GtkTreeSortableIface *iface);
+
 GType
 libbalsa_mailbox_get_type(void)
 {
@@ -106,8 +112,15 @@ libbalsa_mailbox_get_type(void)
             0,                  /* n_preallocs */
 	    (GInstanceInitFunc) libbalsa_mailbox_init
 	};
+
 	static const GInterfaceInfo mbox_model_info = {
 	    (GInterfaceInitFunc) mbox_model_init,
+	    NULL,
+	    NULL
+	};
+    
+	static const GInterfaceInfo mbox_sortable_info = {
+	    (GInterfaceInitFunc) mbox_sortable_init,
 	    NULL,
 	    NULL
 	};
@@ -118,6 +131,9 @@ libbalsa_mailbox_get_type(void)
 	g_type_add_interface_static(mailbox_type,
 				    GTK_TYPE_TREE_MODEL,
 				    &mbox_model_info);
+	g_type_add_interface_static(mailbox_type,
+				    GTK_TYPE_TREE_SORTABLE,
+				    &mbox_sortable_info);
     }
 
     return mailbox_type;
@@ -247,6 +263,8 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     do
 	mailbox->stamp = g_random_int ();
     while (mailbox->stamp == 0);
+
+    mailbox->sort_column_id = MBOX_SORT_COLUMN_UNSORTED;
 }
 
 /*
@@ -1528,3 +1546,302 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf)
 			      [LIBBALSA_MESSAGE_ATTACH_ENCR]);
 }
 #endif /* HAVE_GPGME */
+
+/* =================================================================== *
+ * GtkTreeSortable implementation functions.                           *
+ * =================================================================== */
+
+static void mbox_sort(LibBalsaMailbox * mbox);
+static gboolean mbox_get_sort_column_id(GtkTreeSortable * sortable,
+					gint * sort_column_id,
+					GtkSortType * order);
+static void mbox_set_sort_column_id(GtkTreeSortable * sortable,
+				    gint sort_column_id,
+				    GtkSortType order);
+static void mbox_set_sort_func(GtkTreeSortable * sortable,
+			       gint sort_column_id,
+			       GtkTreeIterCompareFunc func, gpointer data,
+			       GtkDestroyNotify destroy);
+static void mbox_set_default_sort_func(GtkTreeSortable * sortable,
+				       GtkTreeIterCompareFunc func,
+				       gpointer data,
+				       GtkDestroyNotify destroy);
+static gboolean mbox_has_default_sort_func(GtkTreeSortable * sortable);
+
+static void
+mbox_sortable_init(GtkTreeSortableIface * iface)
+{
+    iface->get_sort_column_id    = mbox_get_sort_column_id;
+    iface->set_sort_column_id    = mbox_set_sort_column_id;
+    iface->set_sort_func         = mbox_set_sort_func;
+    iface->set_default_sort_func = mbox_set_default_sort_func;
+    iface->has_default_sort_func = mbox_has_default_sort_func;
+}
+
+/* Sorting */
+typedef struct _SortTuple {
+    gint offset;
+    GNode *node;
+} SortTuple;
+
+static gint
+mbox_compare_msgno(LibBalsaMessage * message_a,
+		   LibBalsaMessage * message_b)
+{
+    glong msgno_a, msgno_b;
+
+    g_return_val_if_fail(message_a && message_b, 0);
+
+    msgno_a = LIBBALSA_MESSAGE_GET_NO(message_a);
+    msgno_b = LIBBALSA_MESSAGE_GET_NO(message_b);
+
+    return msgno_a-msgno_b;
+}
+
+static gint
+mbox_compare_from(LibBalsaMessage * message_a,
+		  LibBalsaMessage * message_b)
+{
+    gchar *from_a = get_from_field(message_a);
+    gchar *from_b = get_from_field(message_b);
+    gboolean retval = g_ascii_strcasecmp(from_a, from_b);
+
+    g_free(from_a);
+    g_free(from_b);
+
+    return retval;
+}
+
+static gint
+mbox_compare_subject(LibBalsaMessage * message_a,
+		     LibBalsaMessage * message_b)
+{
+    const gchar *subject_a = LIBBALSA_MESSAGE_GET_SUBJECT(message_a);
+    const gchar *subject_b = LIBBALSA_MESSAGE_GET_SUBJECT(message_b);
+
+    return g_ascii_strcasecmp(subject_a, subject_b);
+}
+
+static gint
+mbox_compare_date(LibBalsaMessage * message_a,
+		  LibBalsaMessage * message_b)
+{
+    g_return_val_if_fail(message_a && message_b && message_a->headers
+			 && message_b->headers, 0);
+    return message_a->headers->date - message_b->headers->date;
+}
+
+static gint
+mbox_compare_size(LibBalsaMessage * message_a,
+		  LibBalsaMessage * message_b)
+{
+    glong size_a, size_b;
+
+    g_return_val_if_fail(message_a && message_b, 0);
+
+    if (FALSE /* balsa_app.line_length */) {
+        size_a = LIBBALSA_MESSAGE_GET_LINES(message_a);
+        size_b = LIBBALSA_MESSAGE_GET_LINES(message_b);
+    } else {
+        size_a = LIBBALSA_MESSAGE_GET_LENGTH(message_a);
+        size_b = LIBBALSA_MESSAGE_GET_LENGTH(message_b);
+    }
+
+    return size_a - size_b;
+}
+
+static gint
+mbox_compare_func(const SortTuple * a,
+		  const SortTuple * b,
+		  LibBalsaMailbox * mbox)
+{
+    LibBalsaMessage *message_a;
+    LibBalsaMessage *message_b;
+    gint retval;
+
+    message_a =
+	libbalsa_mailbox_get_message(mbox,
+				     GPOINTER_TO_UINT(a->node->data));
+    message_b =
+	libbalsa_mailbox_get_message(mbox,
+				     GPOINTER_TO_UINT(b->node->data));
+
+    switch (mbox->sort_column_id) {
+    case LB_MBOX_MSGNO_COL:
+	retval = mbox_compare_msgno(message_a, message_b);
+	break;
+    case LB_MBOX_FROM_COL:
+	retval = mbox_compare_from(message_a, message_b);
+	break;
+    case LB_MBOX_SUBJECT_COL:
+	retval = mbox_compare_subject(message_a, message_b);
+	break;
+    case LB_MBOX_DATE_COL:
+	retval = mbox_compare_date(message_a, message_b);
+	break;
+    case LB_MBOX_SIZE_COL:
+	retval = mbox_compare_size(message_a, message_b);
+	break;
+    default:
+	retval = 0;
+	break;
+    }
+
+    if (mbox->order == GTK_SORT_DESCENDING) {
+	if (retval > 0)
+	    retval = -1;
+	else if (retval < 0)
+	    retval = 1;
+    }
+
+    return retval;
+}
+
+static void
+mbox_sort_helper(LibBalsaMailbox * mbox,
+		 GNode           * parent)
+{
+    GtkTreeIter iter;
+    GArray *sort_array;
+    GNode *node;
+    GNode *tmp_node;
+    gint list_length;
+    gint i;
+    gint *new_order;
+    GtkTreePath *path;
+
+    node = parent->children;
+    g_assert(node != NULL);
+    if (node->next == NULL) {
+	if (node->children)
+	    mbox_sort_helper(mbox, node);
+	return;
+    }
+
+    g_assert(MBOX_IS_SORTED(mbox));
+
+    list_length = 0;
+    for (tmp_node = node; tmp_node; tmp_node = tmp_node->next)
+	list_length++;
+
+    sort_array =
+	g_array_sized_new(FALSE, FALSE, sizeof(SortTuple), list_length);
+
+    i = 0;
+    for (tmp_node = node; tmp_node; tmp_node = tmp_node->next) {
+	SortTuple tuple;
+
+	tuple.offset = i;
+	tuple.node = tmp_node;
+	g_array_append_val(sort_array, tuple);
+	i++;
+    }
+
+    /* Sort the array */
+    g_array_sort_with_data(sort_array,
+			   (GCompareDataFunc) mbox_compare_func, mbox);
+
+    for (i = 0; i < list_length - 1; i++) {
+	g_array_index(sort_array, SortTuple, i).node->next =
+	    g_array_index(sort_array, SortTuple, i + 1).node;
+	g_array_index(sort_array, SortTuple, i + 1).node->prev =
+	    g_array_index(sort_array, SortTuple, i).node;
+    }
+    g_array_index(sort_array, SortTuple, list_length - 1).node->next =
+	NULL;
+    g_array_index(sort_array, SortTuple, 0).node->prev = NULL;
+    parent->children = g_array_index(sort_array, SortTuple, 0).node;
+
+    /* Let the world know about our new order */
+    new_order = g_new(gint, list_length);
+    for (i = 0; i < list_length; i++)
+	new_order[i] = g_array_index(sort_array, SortTuple, i).offset;
+
+    iter.stamp = mbox->stamp;
+    iter.user_data = parent;
+    path = parent->parent ? mbox_model_get_path(GTK_TREE_MODEL(mbox), &iter)
+			  : gtk_tree_path_new();
+    gtk_tree_model_rows_reordered(GTK_TREE_MODEL(mbox),
+				  path, &iter, new_order);
+    gtk_tree_path_free(path);
+    g_free(new_order);
+    g_array_free(sort_array, TRUE);
+
+    for (tmp_node = parent->children; tmp_node; tmp_node = tmp_node->next)
+	if (tmp_node->children)
+	    mbox_sort_helper(mbox, tmp_node);
+}
+
+static void
+mbox_sort(LibBalsaMailbox * mbox)
+{
+    if (mbox->msg_tree->children)
+	mbox_sort_helper(mbox, mbox->msg_tree);
+}
+
+/* called from gtk-tree-view-column */
+static gboolean
+mbox_get_sort_column_id(GtkTreeSortable * sortable,
+			gint            * sort_column_id,
+			GtkSortType     * order)
+{
+    LibBalsaMailbox *mbox = (LibBalsaMailbox *) sortable;
+
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(sortable), FALSE);
+
+    if (mbox->sort_column_id == GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID)
+	return FALSE;
+
+    if (sort_column_id)
+	*sort_column_id = mbox->sort_column_id;
+    if (order)
+	*order = mbox->order;
+
+    return TRUE;
+}
+
+/* called from gtk-tree-view-column */
+static void
+mbox_set_sort_column_id(GtkTreeSortable * sortable,
+			gint              sort_column_id,
+			GtkSortType       order)
+{
+    LibBalsaMailbox *mbox = (LibBalsaMailbox *) sortable;
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(sortable));
+
+    if ((mbox->sort_column_id == sort_column_id) &&
+	(mbox->order == order))
+	return;
+
+    mbox->sort_column_id = sort_column_id;
+    mbox->order = order;
+
+    gtk_tree_sortable_sort_column_changed(sortable);
+
+    mbox_sort(mbox);
+}
+
+static void
+mbox_set_sort_func(GtkTreeSortable * sortable,
+		   gint sort_column_id,
+		   GtkTreeIterCompareFunc func,
+		   gpointer data, GtkDestroyNotify destroy)
+{
+    g_warning("%s called but not implemented.\n", __func__);
+}
+
+static void
+mbox_set_default_sort_func(GtkTreeSortable * sortable,
+			   GtkTreeIterCompareFunc func,
+			   gpointer data, GtkDestroyNotify destroy)
+{
+    g_warning("%s called but not implemented.\n", __func__);
+}
+
+/* called from gtk-tree-view-column */
+static gboolean
+mbox_has_default_sort_func(GtkTreeSortable * sortable)
+{
+    return FALSE;
+}

@@ -182,6 +182,10 @@ struct _LibBalsaMailbox {
     GSList * filters;
 
     LibBalsaMailboxView *view;
+
+    /* GtkTreeSortable stuff */
+    gint sort_column_id;
+    GtkSortType order;
 };
 
 struct _LibBalsaMailboxClass {

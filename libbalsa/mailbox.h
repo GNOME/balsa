@@ -165,10 +165,10 @@ void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 void libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
-
 /*
  * misc mailbox releated functions
  */
 GtkType libbalsa_mailbox_type_from_path(const gchar * filename);
+gboolean libbalsa_mailbox_commit(LibBalsaMailbox* mailbox);
 
 #endif				/* __LIBBALSA_MAILBOX_H__ */

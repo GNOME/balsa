@@ -1,3 +1,7 @@
+2001-10-07  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox.h: libbalsa_mailbox_commit prototype
+
 2001-10-07  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c: libbalsa_mailbox_commit() implemented.

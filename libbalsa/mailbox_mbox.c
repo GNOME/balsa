@@ -878,11 +878,10 @@ static void update_message_status_headers(GMimeMessage *message,
 static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
                                              LibBalsaMessage *message )
 {
-    GMimeMessage *msg;
-    char date_string[27];
-    const char *sender;
+    gchar date_string[27];
+    gchar *sender;
     gchar *address;
-    const gchar *brack;
+    gchar *brack;
     gchar *from = NULL;
     ssize_t flen;
     const char *path;
@@ -897,19 +896,20 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     LOCK_MAILBOX_RETURN_VAL(mailbox, -1);
     g_object_ref ( G_OBJECT(message ) );
 
-    msg = message->mime_msg;
-
     ctime_r(&(message->headers->date), date_string);
 
-    sender = g_mime_message_get_sender(msg);
+    sender = message->headers->from ?
+	libbalsa_address_to_gchar(message->headers->from, 0) :
+	g_strdup("none");
     if ( (brack = strrchr( sender, '<' )) ) {
-        const gchar * a = strrchr ( brack , '>' );
+        gchar * a = strrchr ( brack , '>' );
         if (a)
             address = g_strndup(brack + 1, a - brack - 1);
         else
             address = g_strdup("none");
+	g_free(sender);
     } else {
-        address = g_strdup(sender);
+        address = sender;
     }
     from = g_strdup_printf ("From %s %s", address, date_string );
     g_free(address);

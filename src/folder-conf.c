@@ -217,7 +217,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                               &fcw, 1, s ? s->host : default_server,
 			      label);
 
-    label= create_label(_("_User name:"), table, 3);
+    label= create_label(_("Use_r name:"), table, 3);
     fcw.username = create_entry(fcw.dialog, table,
                                 GTK_SIGNAL_FUNC(validate_folder),
                                 &fcw, 3, s ? s->user : g_get_user_name(), 
@@ -233,7 +233,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 				s ? s->passwd : NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
 
-    fcw.subscribed = create_check(fcw.dialog, _("_Subscribed folders only"), 
+    fcw.subscribed = create_check(fcw.dialog, _("Subscribed _folders only"), 
                                   table, 6, mn ? mn->subscribed : FALSE);
     fcw.list_inbox = create_check(fcw.dialog, _("_Always show INBOX"), 
                                   table, 7, mn ? mn->list_inbox : TRUE); 
@@ -244,7 +244,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     
 #ifdef USE_SSL
     fcw.use_ssl = create_check(fcw.dialog,
-			       _("Use SSL (IMAPS)"),
+			       _("Use SS_L (IMAPS)"),
 			       table, 9, s ? s->use_ssl : FALSE);
     g_signal_connect(G_OBJECT(fcw.use_ssl), "toggled",
                      G_CALLBACK(imap_use_ssl_cb), &fcw);

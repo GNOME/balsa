@@ -549,7 +549,6 @@ clean_cache(LibBalsaMailbox* mailbox)
     }
 
     dir = opendir(fname);
-    printf("Attempting to clean IMAP cache for '%s'\n", mailbox->name);
     if(!dir) {
         g_free(fname);
         return FALSE;

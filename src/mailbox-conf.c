@@ -251,9 +251,9 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                        "What would you like to do?"),
                                      mailbox->name);
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
-                               _("Remove from list"), 0,
-                               _("Remove from list and disk"), 1,
-                               _("Cancel"), GTK_RESPONSE_CANCEL,
+                               _("Remove from _list"), 0,
+                               _("Remove from list and _disk"), 1,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
 	/* deleting remote IMAP mailbox in a folder set */
@@ -273,8 +273,8 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	                               "What would you like to do?"),
 			             mailbox->name, mailbox->name);
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
-                               _("Remove from server"), 0,
-                               _("Cancel"), GTK_RESPONSE_CANCEL,
+                               _("_Remove from server"), 0,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
     } else { /* deleting other remote mailbox */
         ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
@@ -289,8 +289,8 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 			 	       "What would you like to do?"),
 			             mailbox->name);
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
-                               _("Remove from list"), 0,
-                               _("Cancel"), GTK_RESPONSE_CANCEL,
+                               _("_Remove from list"), 0,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
     }
     
@@ -874,7 +874,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 
 
     /* username  */
-    label= create_label(_("_Username:"), table, 3);
+    label= create_label(_("Use_r name:"), table, 3);
     mcw->mb_data.pop3.username = create_entry(mcw->window, table,
 				     GTK_SIGNAL_FUNC(check_for_blank_fields),
 				     mcw, 3, g_get_user_name(), label);
@@ -913,7 +913,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
      */
     /* toggle for ssl */
     mcw->mb_data.pop3.use_ssl = 
-	create_check(mcw->window, _("_Use SSL (pop3s)"), 
+	create_check(mcw->window, _("Use SS_L (pop3s)"), 
 		     table, 9, FALSE);
     g_signal_connect(G_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", 
                      G_CALLBACK(pop3_use_ssl_cb), mcw);
@@ -1004,7 +1004,7 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
 #ifdef USE_SSL
     /* toggle for SSL */
     mcw->mb_data.imap.use_ssl = 
-        create_check(mcw->window, _("Use SSL (imaps)"), table, 7, FALSE);
+        create_check(mcw->window, _("Use SS_L (imaps)"), table, 7, FALSE);
     g_signal_connect(G_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", 
                      G_CALLBACK(imap_use_ssl_cb), mcw);
 #endif

@@ -148,7 +148,8 @@ static gboolean bmbl_find_data_func(GtkTreeModel * model,
 static void bmbl_mbnode_tab_style(BalsaMailboxNode * mbnode, gint unread);
 static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
-static void bmbl_do_popup(GtkWidget * widget, GdkEventButton * event);
+static void bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
+                          GdkEventButton * event);
 /* end of prototypes */
 
 /* class methods */
@@ -620,16 +621,11 @@ bmbl_button_press_cb(GtkWidget * widget, GdkEventButton * event,
         || event->window != gtk_tree_view_get_bin_window(tree_view))
         return FALSE;
 
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
-                                      &path, NULL, NULL, NULL)) {
-        GtkTreeSelection *selection =
-            gtk_tree_view_get_selection(tree_view);
-
-        gtk_tree_selection_select_path(selection, path);
-        gtk_tree_path_free(path);
-    }
-
-    bmbl_do_popup(widget, event);
+    if (!gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
+                                       &path, NULL, NULL, NULL))
+        path = NULL;
+    bmbl_do_popup(tree_view, path, event);
+    /* bmbl_do_popup frees path */
 
     return TRUE;
 }
@@ -641,23 +637,34 @@ bmbl_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 static gboolean
 bmbl_popup_menu(GtkWidget * widget)
 {
-    bmbl_do_popup(widget, NULL);
+    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkTreePath *path;
+
+    gtk_tree_view_get_cursor(tree_view, &path, NULL);
+    bmbl_do_popup(tree_view, path, NULL);
+    /* bmbl_do_popup frees path */
     return TRUE;
 }
 
+/* bmbl_do_popup:
+ * do the popup, and free the path
+ */
 static void
-bmbl_do_popup(GtkWidget * widget, GdkEventButton * event)
+bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
+              GdkEventButton * event)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-    GtkTreeModel *model;
-    GtkTreeIter iter;
     BalsaMailboxNode *mbnode = NULL;
     gint event_button;
     guint event_time;
 
-    if (gtk_tree_selection_get_selected(selection, &model, &iter))
-        gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
+    if (path) {
+        GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+        GtkTreeIter iter;
+
+        if (gtk_tree_model_get_iter(model, &iter, path))
+            gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
+        gtk_tree_path_free(path);
+    }
 
     if (event) {
         event_button = event->button;

@@ -29,6 +29,13 @@
 #include "mailbackend.h"
 #include "send.h"
 
+/* prototype this so that this file doesn't whine.  this function isn't in
+ * mutt any longer, so we had to provide it inside mutt for libmutt :-)
+ */
+int mutt_send_message (HEADER *msg);
+
+BODY * add_mutt_body_plain (void);
+
 BODY *
 add_mutt_body_plain (void)
 {

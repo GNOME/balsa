@@ -1,5 +1,7 @@
-2004-01-15 10:40  PeterB
+2004-01-15 22:13  PeterB
 
+	* src/: balsa-message.c, balsa-message.h: Nest embedded messages
+	with increasing border width.
 	* src/balsa-message.c: Set embedded headers in the same style of
 	widget as message headers.
 

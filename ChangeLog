@@ -1,6 +1,7 @@
 2002-09-18  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/pop3.c: msg count instead of byte count (HEAD:20020623)
+	* libbalsa/send.c: gdk_threads lock operations that can trigger GDK.
 
 2002-09-17  Carlos Morgado  <chbm@chbm.nu>
 

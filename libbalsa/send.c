@@ -758,6 +758,7 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
     if (mqi != NULL)
       mqi->refcount--;
 
+    gdk_threads_enter();
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0) {
@@ -773,7 +774,7 @@ handle_successful_send (smtp_message_t message, void *be_verbose)
 	    _("Message submission problem, placing it into your outbox.\n" 
 	      "System will attempt to resubmit the message until you delete it."));
     }
-
+    gdk_threads_leave();
     if (mqi != NULL && mqi->refcount <= 0)
         msg_queue_item_destroy(mqi);
     send_unlock();

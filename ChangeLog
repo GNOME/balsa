@@ -1,3 +1,8 @@
+2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c (ab_switch_cb): Fix crash when multiple
+	addresses were selected.
+
 2000-09-15  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README: added comment on dotlocking and new mail sound.

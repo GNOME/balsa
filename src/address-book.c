@@ -156,16 +156,13 @@ ab_switch_cb(GtkWidget * widget, gpointer data)
 {
 	GtkWidget      *from = GTK_WIDGET(data);
 	GtkWidget      *to = (data == book_clist) ? add_clist : book_clist;
-	GList          *glist = GTK_CLIST(from)->selection;
-	GList          *pointer;
 
-	for (pointer = g_list_first(glist); pointer != NULL; 
-	     pointer = g_list_next(pointer)) {
+	while ( GTK_CLIST(from)->selection ){
 		gint            num;
 		gchar           *listdata[2];
 		LibBalsaAddress *addy_data;
-		
-		num = GPOINTER_TO_INT(pointer->data);
+
+		num = GPOINTER_TO_INT(GTK_CLIST(from)->selection->data);
 		
 		addy_data = LIBBALSA_ADDRESS(gtk_clist_get_row_data(GTK_CLIST(from), num));
 

@@ -494,6 +494,17 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 	g_free(tmp);
     }
 
+    if (message->dispnotify_to) {
+	tmp = libbalsa_address_to_gchar(message->dispnotify_to, 0);
+
+	libbalsa_lock_mutt();
+	hdr->env->dispnotify_to =
+	    rfc822_parse_adrlist(hdr->env->dispnotify_to, tmp);
+	libbalsa_unlock_mutt();
+
+	g_free(tmp);
+    }
+
     hdr->env->subject = g_strdup(message->subject);
 
     /* This continuous lock/unlock business is because 

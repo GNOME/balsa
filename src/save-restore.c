@@ -487,6 +487,8 @@ config_global_load(void)
     g_free(balsa_app.compose_headers);
     balsa_app.compose_headers =
 	gnome_config_get_string("ComposeHeaders=to subject cc");
+    balsa_app.req_dispnotify = 
+	gnome_config_get_bool("RequestDispositionNotification=false");
 
     gnome_config_pop_prefix();
 
@@ -655,6 +657,7 @@ gint config_save(void)
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Compose/");
 
     gnome_config_set_string("ComposeHeaders", balsa_app.compose_headers);
+    gnome_config_set_bool("RequestDispositionNotification", balsa_app.req_dispnotify);
     gnome_config_set_string("QuoteString", balsa_app.quote_str);
 
     gnome_config_pop_prefix();

@@ -95,6 +95,7 @@ static gint toggle_reply_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_attachments_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_comments_cb(GtkWidget *, BalsaSendmsg *);
 static gint toggle_keywords_cb(GtkWidget *, BalsaSendmsg *);
+static gint toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
 static void spell_check_done_cb(BalsaSpellCheck * spell_check,
@@ -335,6 +336,11 @@ static GnomeUIInfo lang_menu[] = {
     GNOMEUIINFO_END
 };
 
+static GnomeUIInfo opts_menu[] = {
+#define OPTS_MENU_DISPNOTIFY_POS 0
+    GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, toggle_reqdispnotify_cb, NULL),
+    GNOMEUIINFO_END
+};
 
 #define CASE_INSENSITIVE_NAME
 #define PRESERVE_CASE TRUE
@@ -352,7 +358,7 @@ headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject", 2},
 };
 
 
-#define MAIN_MENUS_COUNT 4
+#define MAIN_MENUS_COUNT 5
 static GnomeUIInfo main_menu[] = {
 #define MAIN_FILE_MENU 0
     GNOMEUIINFO_MENU_FILE_TREE(file_menu),
@@ -362,6 +368,8 @@ static GnomeUIInfo main_menu[] = {
     GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
 #define MAIN_CHARSET_MENU 3
     GNOMEUIINFO_SUBTREE(N_("_Language"), lang_menu),
+#define MAIN_OPTION_MENU
+    GNOMEUIINFO_SUBTREE(N_("_Options"), opts_menu),
     GNOMEUIINFO_END
 };
 
@@ -1260,6 +1268,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->ready_widgets[2] = main_toolbar[TOOL_SEND_POS].widget;
     msg->current_language_menu = lang_menu[LANG_CURRENT_POS].widget;
 
+    /* set options - just the Disposition Notification request for now */
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (opts_menu[OPTS_MENU_DISPNOTIFY_POS].widget), balsa_app.req_dispnotify);
+
     /* create spell checking disable widget list */
     list = NULL;
 
@@ -1677,6 +1688,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	&& strlen(tmp) > 0)
 	message->reply_to = libbalsa_address_new_from_string(tmp);
 
+    if (balsa_app.req_dispnotify)
+	libbalsa_message_set_dispnotify(message, balsa_app.address);
+
     if (bsmsg->orig_message != NULL &&
 	!GTK_OBJECT_DESTROYED(bsmsg->orig_message)) {
 
@@ -2078,6 +2092,13 @@ toggle_keywords_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     return toggle_entry(bsmsg, bsmsg->keywords, MENU_TOGGLE_KEYWORDS_POS,
 			2);}
+
+static gint
+toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    balsa_app.req_dispnotify = GTK_CHECK_MENU_ITEM(widget)->active;
+    return TRUE;
+}
 
 /* init_menus:
    performs the initial menu setup: shown headers as well as correct

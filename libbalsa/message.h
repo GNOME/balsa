@@ -65,10 +65,11 @@ struct _LibBalsaMessage {
     /* message composition date */
     time_t date;
 
-    /* from, sender, and reply addresses */
+    /* from, sender, reply, and disposition notification addresses */
     LibBalsaAddress *from;
     LibBalsaAddress *sender;
     LibBalsaAddress *reply_to;
+    LibBalsaAddress *dispnotify_to;
 
     /* subject line */
     gchar *subject;
@@ -180,5 +181,8 @@ gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
 GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
 gchar *libbalsa_message_get_text_content(LibBalsaMessage * msg,
 					 gint line_len);
+
+void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
+				     LibBalsaAddress *address);
 
 #endif				/* __LIBBALSA_MESSAGE_H__ */

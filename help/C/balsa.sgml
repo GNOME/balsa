@@ -1432,6 +1432,28 @@
 	  </listitem>
 	</varlistentry>
 
+	<varlistentry>
+	  <term><guimenu>Options</guimenu></term>
+
+	  <listitem>
+
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  <menuchoice>
+		    <guimenu>Options</guimenu>
+		    <guimenuitem>Request Disposition Notification</guimenuitem>
+		  </menuchoice>
+		  &mdash; If checked <application>Balsa</application> will include
+                  the <literal>Disposition-Notification-To</literal> header line with
+                  your <literal>From</literal> address.  Please note that the handling
+                  of this request depends on the receiving mail program and that it not
+                  guaranteed that this notification will be sent back.
+		</para>
+	      </listitem>
+	    </itemizedlist>
+	  </listitem>
+	</varlistentry>
       </variablelist>
     </sect2>
 

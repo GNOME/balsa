@@ -1,3 +1,14 @@
+2001-01-19  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Patch from Albrecht Dreﬂ <albrecht.dress@arcormail.de> for sending
+	Disposition-Notification requests.
+	* libbalsa/message.[hc]: add dispnotify_to field and handle it.
+	* libbalsa/send.c: pass dispnotify_to to libmutt.
+	* src/balsa-app.h: add "request a disposition notification" field.
+	* src/save-restore.c: save&restore req_dispnotify field.
+	* src/sendmsg-window.c: add "RDN" menu entries and handlers.
+	* help/C/balsa.sgml: add "RDN" description
+
 2001-01-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-app.c: try to guess IMAP passwords when possible

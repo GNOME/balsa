@@ -1332,6 +1332,15 @@ int mutt_write_rfc822_header (FILE *fp, ENVELOPE *env, BODY *attach, int mode)
     mutt_write_address_list (env->mail_followup_to, fp, 18);
   }
 
+  /* BALSA: Handle dispnotify_to field */
+  if (env->dispnotify_to)
+  {
+    buffer[0] = 0;
+    rfc822_write_address (buffer, sizeof (buffer), env->dispnotify_to);
+    fprintf (fp, "Disposition-Notification-To: %s\n", buffer);
+  }
+  /* BALSA: end of dispnotify_to field handling code */
+
   if (mode <= 0)
   {
     if (env->references)
@@ -1867,6 +1876,8 @@ void mutt_prepare_envelope (ENVELOPE *env)
   rfc2047_encode_adrlist (env->from);
   rfc2047_encode_adrlist (env->mail_followup_to);
   rfc2047_encode_adrlist (env->reply_to);
+  /* BALSA: Handle dispnotify_to field */
+  rfc2047_encode_adrlist (env->dispnotify_to);
 
   if (env->subject)
   {

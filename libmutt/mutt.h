@@ -462,6 +462,8 @@ typedef struct envelope
   ADDRESS *bcc;
   ADDRESS *sender;
   ADDRESS *reply_to;
+ /* BALSA: added dispnotify_to field */
+  ADDRESS *dispnotify_to;
   ADDRESS *mail_followup_to;
   char *subject;
   char *real_subj;		/* offset of the real subject */

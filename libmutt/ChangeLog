@@ -1,3 +1,8 @@
+2001-01-19  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libmutt/mutt.h: add dispnotify_to field.
+	* libmutt/sendlib.c: handle dispnotify_to field.
+
 2001-01-18  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* rfc822.c: Berend De Schouwer <bds@jhb.ucs.co.za> patch that

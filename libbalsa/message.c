@@ -224,6 +224,10 @@ libbalsa_message_destroy(GtkObject * object)
 	gtk_object_unref(GTK_OBJECT(message->reply_to));
 	message->reply_to = NULL;
     }
+    if(message->dispnotify_to) {
+	gtk_object_unref(GTK_OBJECT(message->dispnotify_to));
+	message->dispnotify_to = NULL;
+    }
 
     g_list_foreach(message->to_list, (GFunc) gtk_object_unref, NULL);
     g_list_free(message->to_list);
@@ -257,7 +261,7 @@ libbalsa_message_destroy(GtkObject * object)
     libbalsa_message_body_free(message->body_list);
     message->body_list = NULL;
 
-    if(message->references_for_threading!=NULL){
+    if(message->references_for_threading!=NULL) {
 	GList *list=message->references_for_threading;
 	for(; list; list=g_list_next(list)){
 	    if(list->data)
@@ -266,6 +270,9 @@ libbalsa_message_destroy(GtkObject * object)
 	g_list_free (message->references_for_threading);
 	message->references_for_threading=NULL;
     }
+
+    if (GTK_OBJECT_CLASS(parent_class)->destroy)
+	(*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
 }
 
 const gchar *
@@ -987,4 +994,20 @@ libbalsa_message_get_text_content(LibBalsaMessage * msg, gint line_len)
     res = str->str;
     g_string_free(str, FALSE);
     return res;
+}
+
+/* libbalsa_message_set_dispnotify:
+   sets a disposition notify to a given address
+   address can be NULL.
+*/
+void
+libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
+				LibBalsaAddress *address)
+{
+    g_return_if_fail(message);
+    if(message->dispnotify_to) 
+	gtk_object_unref(GTK_OBJECT(message->dispnotify_to));
+    message->dispnotify_to = address;
+    if(address)
+	gtk_object_ref(GTK_OBJECT(message->dispnotify_to));
 }

@@ -258,6 +258,9 @@ extern struct BalsaApplication {
     /* compose: shown headers */
     gchar *compose_headers;
 
+    /* compose: request a disposition notification */
+    gboolean req_dispnotify;   
+
     /* appbar */
     GnomeAppBar *appbar;
     GtkWidget *notebook;

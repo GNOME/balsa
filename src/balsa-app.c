@@ -718,48 +718,6 @@ balsa_find_dir(GNode * root, const gchar * path)
 }
 
 static gboolean
-find_path(GNode * gnode, BalsaFind * bf)
-{
-    LibBalsaMailbox *mailbox;
-    const gchar *path;
-
-    if (gnode->data == NULL)
-        return FALSE;
-
-    mailbox = ((BalsaMailboxNode *) gnode->data)->mailbox;
-
-    if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox))
-        path = libbalsa_mailbox_local_get_path(mailbox);
-    else if (!mailbox)
-        path = ((BalsaMailboxNode *) gnode->data)->name;
-    else 
-        return FALSE;
-    
-    if (strcmp(path, bf->data))
-        return FALSE;
-
-    bf->gnode = gnode;
-    return TRUE;
-}
-
-/* balsa_find_path:
-   looks for a mailbox with the given path.
-   returns the GNode whose mbnode points to the mailbox, 
-   or NULL on failure
-*/
-GNode *
-balsa_find_path(GNode * root, const gchar * path)
-{
-    BalsaFind bf;
-
-    bf.data = path;
-    bf.gnode = NULL;
-    g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
-                    (GNodeTraverseFunc) find_path, &bf);
-    return bf.gnode;
-}
-
-static gboolean
 find_url(GNode * gnode, BalsaFind * bf)
 {
     LibBalsaMailbox *mailbox;
@@ -781,7 +739,7 @@ find_url(GNode * gnode, BalsaFind * bf)
    returns the GNode whose mbnode points to the mailbox, 
    or NULL on failure
 */
-GNode *
+static GNode *
 balsa_find_url(GNode * root, const gchar * url)
 {
     BalsaFind bf;
@@ -816,70 +774,7 @@ balsa_find_mailbox_by_url(const gchar * url)
     return mailbox;
 }
 
-static gboolean
-find_name(GNode * gnode, BalsaFind * bf)
-{
-    LibBalsaMailbox *mailbox;
-
-    if (gnode->data == NULL)
-        return FALSE;
-
-    mailbox = ((BalsaMailboxNode *) gnode->data)->mailbox;
-
-    if (!mailbox || !mailbox->name || strcmp(mailbox->name, bf->data))
-        return FALSE;
-
-    if (!bf->gnode) {
-        bf->gnode = gnode;
-        /* keep looking, in case there are more matches */
-        return FALSE;
-    } else {
-        g_warning(_("Multiple mailboxes named \"%s\""),
-                  (const gchar *) bf->data);
-        /* quit looking, we already warned the user */
-        return TRUE;
-    }
-}
-
-/* balsa_find_name:
-   looks for a mailbox with the given name.
-   returns the gnode whose data is the mbnode pointing to the mailbox,
-   returns NULL on failure
-   This function isn't exported, but could be, so it's in the 
-   balsa_find_.* namespace.
-*/
-static GNode *
-balsa_find_name(GNode * root, const gchar * name)
-{
-    BalsaFind bf;
-
-    bf.data = name;
-    bf.gnode = NULL;
-    g_node_traverse(root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1,
-                    (GNodeTraverseFunc) find_name, &bf);
-    return bf.gnode;
-}
-
-/* balsa_find_mailbox_by_name:
- * looks for a mailbox with the given name.
- * returns NULL on failure
- */
-LibBalsaMailbox *
-balsa_find_mailbox_by_name(const gchar * name)
-{
-    GNode *gnode;
-    LibBalsaMailbox *mailbox;
-
-    gdk_threads_leave();
-    balsa_mailbox_nodes_lock(FALSE);
-    gnode = balsa_find_name(balsa_app.mailbox_nodes, name);
-    mailbox = gnode ? ((BalsaMailboxNode *) gnode->data)->mailbox : NULL;
-    balsa_mailbox_nodes_unlock(FALSE);
-    gdk_threads_enter();
-
-    return mailbox;
-}
-
+/* End of search utilities. */
 
 /* balsa_remove_children_mailbox_nodes:
    remove all children of given node leaving the node itself intact.

@@ -388,10 +388,7 @@ gboolean open_mailboxes_idle_cb(gchar * names[]);
 GNode *balsa_find_mailbox(GNode * root, LibBalsaMailbox * mailbox);
 GNode *balsa_find_mbnode(GNode * root, BalsaMailboxNode * mbnode);
 GNode *balsa_find_dir(GNode * root, const gchar * path);
-GNode *balsa_find_path(GNode * root, const gchar * path);
-GNode *balsa_find_url(GNode * root, const gchar * url);
 LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
-LibBalsaMailbox *balsa_find_mailbox_by_name(const gchar * name);
 
 void  balsa_remove_children_mailbox_nodes(GNode* gnode);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);

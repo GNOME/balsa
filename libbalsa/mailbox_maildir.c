@@ -837,7 +837,7 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
 	g_object_add_weak_pointer(G_OBJECT(message),
 				  (gpointer) & msg_info->message);
 
-	message->flags = msg_info->flags;
+	message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 	message->mailbox = mailbox;
 	message->msgno = msgno;
 	libbalsa_message_load_envelope(message);
@@ -931,7 +931,8 @@ libbalsa_mailbox_maildir_messages_change_flags(LibBalsaMailbox * mailbox,
 
         msg_info->flags |= set;
         msg_info->flags &= ~clear;
-        if (old_flags == msg_info->flags)
+        if (!((old_flags ^ msg_info->flags) & LIBBALSA_MESSAGE_FLAGS_REAL))
+	    /* No real flags changed. */
             continue;
         ++changed;
 

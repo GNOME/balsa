@@ -1306,7 +1306,9 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
     if (g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                     GUINT_TO_POINTER(seqno))) {
-        if (!match)
+        if (!match &&
+	    libbalsa_mailbox_msgno_has_flags(mailbox, seqno, 0,
+                                             LIBBALSA_MESSAGE_FLAG_SELECTED))
             libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
     } else {
         if (match)
@@ -1623,6 +1625,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
                                        LibBalsaMessageFlag clear)
 {
     gboolean retval;
+    guint i;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(!mailbox->readonly, FALSE);
@@ -1630,6 +1633,17 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
     libbalsa_lock_mailbox(mailbox);
     retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
 	messages_change_flags(mailbox, msgnos, set, clear);
+
+    if (retval && mailbox->view_filter) {
+        LibBalsaMailboxSearchIter *iter_view =
+            libbalsa_mailbox_search_iter_view(mailbox);
+        for (i = 0; i < msgnos->len; i++) {
+            guint msgno = g_array_index(msgnos, guint, i);
+            libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view);
+        }
+        libbalsa_mailbox_search_iter_free(iter_view);
+    }
+
     libbalsa_unlock_mailbox(mailbox);
     if (set & LIBBALSA_MESSAGE_FLAG_DELETED && retval)
         g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED],

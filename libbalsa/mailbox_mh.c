@@ -844,7 +844,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 		old_file = g_build_filename(path, tmp, NULL);
 		g_free(tmp);
 
-		msg_info->orig_flags = msg_info->flags;
+		msg_info->orig_flags =
+		    msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 
 		tmp = MH_BASENAME(msg_info);
 		new_file = g_build_filename(path, tmp, NULL);
@@ -857,7 +858,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 		g_free(old_file);
 		g_free(new_file);
 	    } else
-		msg_info->orig_flags = msg_info->flags;
+		msg_info->orig_flags =
+		    msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 	    msgno++;
 	}
     }
@@ -982,7 +984,7 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
 	if (msg_info->flags == INVALID_FLAG)
 	    msg_info->flags = msg_info->orig_flags;
-	message->flags = msg_info->flags;
+	message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 	message->mailbox = mailbox;
 	message->msgno = msgno;
 	libbalsa_message_load_envelope(message);
@@ -1147,12 +1149,14 @@ libbalsa_mailbox_mh_messages_change_flags(LibBalsaMailbox * mailbox,
 
         msg_info->flags |= set;
         msg_info->flags &= ~clear;
-        if (old_flags == msg_info->flags)
+        if (!((old_flags ^ msg_info->flags) & LIBBALSA_MESSAGE_FLAGS_REAL))
+	    /* No real flags changed. */
             continue;
         ++changed;
 
         if (msg_info->message)
-            msg_info->message->flags = msg_info->flags;
+            msg_info->message->flags =
+		msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 
         libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
         libbalsa_mailbox_msgno_changed(mailbox, msgno);

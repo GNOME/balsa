@@ -1214,7 +1214,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	g_free(msg_info->from);
 	msg_info->from = g_mime_parser_get_from(gmime_parser);
 	msg_info->end = g_mime_parser_tell(gmime_parser);
-	msg_info->orig_flags = msg_info->flags;
+	msg_info->orig_flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 	g_assert(mime_msg != NULL);
 	g_assert(mime_msg->mime_part != NULL);
 	if (!msg_info->message || !msg_info->message->mime_msg)
@@ -1255,7 +1255,8 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 	msg_info->message = lbm_mbox_message_new(mime_message, msg_info);
 	msg_info->message->mailbox = mailbox;
 	msg_info->message->msgno   = msgno;
-	msg_info->message->flags   = msg_info->flags;
+	msg_info->message->flags   =
+	    msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 	g_object_unref(mime_message);
 	g_object_unref(gmime_parser);
 	g_object_weak_ref(G_OBJECT(msg_info->message), mbox_msg_unref,
@@ -1605,12 +1606,14 @@ libbalsa_mailbox_mbox_messages_change_flags(LibBalsaMailbox * mailbox,
 
         msg_info->flags |= set;
         msg_info->flags &= ~clear;
-        if (old_flags == msg_info->flags)
+        if (!((old_flags ^ msg_info->flags) & LIBBALSA_MESSAGE_FLAGS_REAL))
+	    /* No real flags changed. */
             continue;
         ++changed;
 
         if (msg_info->message)
-            msg_info->message->flags = msg_info->flags;
+            msg_info->message->flags =
+		msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 
         libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
         libbalsa_mailbox_msgno_changed(mailbox, msgno);

@@ -79,6 +79,7 @@ struct _LibBalsaMailboxImapClass {
 
 struct message_info {
     LibBalsaMessage *message;
+    LibBalsaMessageFlag user_flags;
 };
 
 static LibBalsaMailboxClass *parent_class = NULL;
@@ -2262,6 +2263,28 @@ transform_flags(LibBalsaMessageFlag set, LibBalsaMessageFlag clr,
 	*flg_clr |= IMSGF_DELETED;
 }
 
+static void
+lbm_imap_change_user_flags(LibBalsaMailbox * mailbox, GArray * seqno,
+                           LibBalsaMessageFlag set,
+			   LibBalsaMessageFlag clear)
+{
+    gint i;
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+
+    set   &= ~LIBBALSA_MESSAGE_FLAGS_REAL;
+    clear &= ~LIBBALSA_MESSAGE_FLAGS_REAL;
+    if (!set && !clear)
+	return;
+
+    for (i = seqno->len; --i >= 0;) {
+	guint msgno = g_array_index(seqno, guint, i);
+        struct message_info *msg_info = 
+            message_info_from_msgno(mimap, msgno);
+	msg_info->user_flags |= set;
+	msg_info->user_flags &= ~clear;
+    }
+}
+
 static gboolean
 lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 			       LibBalsaMessageFlag set,
@@ -2270,6 +2293,12 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
     ImapMsgFlag flag_set, flag_clr;
     ImapResponse rc = IMR_OK;
     ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
+
+    lbm_imap_change_user_flags(mailbox, seqno, set, clear);
+
+    if (!((set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL))
+	/* No real flags. */
+	return TRUE;
 
     g_array_sort(seqno, cmp_msgno);
     transform_flags(set, clear, &flag_set, &flag_clr);
@@ -2291,13 +2320,29 @@ libbalsa_mailbox_imap_msgno_has_flags(LibBalsaMailbox * m, unsigned msgno,
                                       LibBalsaMessageFlag set,
                                       LibBalsaMessageFlag unset)
 {
+    LibBalsaMessageFlag user_set, user_unset;
     ImapMsgFlag flag_set, flag_unset;
-    ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(m)->handle;
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(m);
+    ImapMboxHandle *handle;
 
-    g_return_val_if_fail(handle, FALSE);
+    user_set   = set   & ~LIBBALSA_MESSAGE_FLAGS_REAL;
+    user_unset = unset & ~LIBBALSA_MESSAGE_FLAGS_REAL;
+    if (user_set || user_unset) {
+        struct message_info *msg_info =
+            message_info_from_msgno(mimap, msgno);
+        if ((msg_info->user_flags & user_set) != user_set ||
+            (msg_info->user_flags & user_unset) != 0)
+            return FALSE;
+    }
+
     transform_flags(set, unset, &flag_set, &flag_unset);
-    return imap_mbox_handle_msgno_has_flags(handle, msgno,
-                                            flag_set, flag_unset);
+    if (!flag_set && !flag_unset)
+        return TRUE;
+
+    handle = mimap->handle;
+    g_return_val_if_fail(handle, FALSE);
+    return imap_mbox_handle_msgno_has_flags(handle, msgno, flag_set,
+                                            flag_unset);
 }
 
 static gboolean

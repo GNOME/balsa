@@ -1,3 +1,9 @@
+2004-03-26 11:14  PeterB
+
+	* libbalsa/: mailbox_maildir.c, mailbox_maildir.h: test the subdirs
+	for write permission, as well as the main dir--set readonly if any
+	fails.
+
 2004-03-25 12:45  PeterB
 
 	* src/balsa-index.c: report errors when copying or moving messages.

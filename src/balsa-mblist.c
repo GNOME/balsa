@@ -31,6 +31,7 @@
 #include "mblist-window.h"
 #include "misc.h"
 #include "mailbox.h"
+#include "cfg-memory-widgets.h"
 
 enum
 {
@@ -219,11 +220,14 @@ static void
 balsa_mblist_init (BalsaMBList * tree)
 {
   char *titles[3] = {"Mailbox", "Unread", "Total"};
+  cfg_location_t *uiroot;
+
 #ifdef BALSA_SHOW_INFO
   gtk_ctree_construct (GTK_CTREE (tree), 3, 0, titles);
 #else
   gtk_ctree_construct (GTK_CTREE (tree), 1, 0, titles);
 #endif
+
 #ifdef BALSA_SHOW_INFO
   if (tree->display_content_info)
     gtk_clist_column_titles_show (GTK_CLIST (tree));
@@ -241,7 +245,17 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_ctree_set_line_style (GTK_CTREE (tree), GTK_CTREE_LINES_DOTTED);
   gtk_ctree_set_expander_style (GTK_CTREE (tree), GTK_CTREE_EXPANDER_SQUARE);
   gtk_clist_set_row_height (GTK_CLIST (tree), 16);
-  gtk_clist_set_column_width (GTK_CLIST (tree), 0, balsa_app.mblist_name_width);
+
+  uiroot = cfg_memory_default_root();
+#ifdef BALSA_SHOW_INFO
+  cfg_memory_add_to_clist( GTK_CLIST( tree ), uiroot, "MBList", 3, 40, 20, 30 );
+#else
+  cfg_memory_add_to_clist( GTK_CLIST( tree ), uiroot, "MBList", 1, 90 );
+#endif
+  cfg_location_free( uiroot );
+
+  /* gtk_clist_set_column_width (GTK_CLIST (tree), 0, balsa_app.mblist_name_width); */
+
 #ifdef BALSA_SHOW_INFO
 
 

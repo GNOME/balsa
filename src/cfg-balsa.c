@@ -28,6 +28,7 @@
 #include "cfg-backend.h"
 #include "cfg-engine.h"
 #include "cfg-offsets.h" /*OFFSET HEADER <- do not edit this*/
+#include "cfg-memory-widgets.h"
 
 /* OFFSET DEF[[ #include "libbalsa.h" ]] */
 /* OFFSET DEF[[ #include "balsa-app.h" ]] */
@@ -564,15 +565,7 @@ static const cfg_parm_t parms_BalsaApp[] = {
 	{ "UseSigSeparator", BALSA_OFFSET_BalsaApp_ELEM_sig_separator, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
 	{ "SignatureFile", BALSA_OFFSET_BalsaApp_ELEM_signature_path, CPT_STR, NULL, cfg_type_const_init_str( NULL, fetch_sigpath, NULL ) },
 	{ "AutoCheckMail", BALSA_OFFSET_BalsaApp_ELEM_check_mail_auto, CPT_BOOL, NULL, cfg_type_const_init_bool( TRUE ) },
-	{ "MailboxWindowWidth", BALSA_OFFSET_BalsaApp_ELEM_mw_width, CPT_NUM, NULL, cfg_type_const_init_num( MW_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "MailboxWindowHeight", BALSA_OFFSET_BalsaApp_ELEM_mw_height, CPT_NUM, NULL, cfg_type_const_init_num( MW_DEFAULT_HEIGHT, 1, 0, CPNF_USEMIN ) },
 	{ "MailboxListWidth", BALSA_OFFSET_BalsaApp_ELEM_mblist_width, CPT_NUM, NULL, cfg_type_const_init_num( DEFAULT_MBLIST_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "IndexWidthNum", BALSA_OFFSET_BalsaApp_ELEM_index_num_width, CPT_NUM, NULL, cfg_type_const_init_num( NUM_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "IndexWidthStatus", BALSA_OFFSET_BalsaApp_ELEM_index_status_width, CPT_NUM, NULL, cfg_type_const_init_num( STATUS_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "IndexWidthAttachment", BALSA_OFFSET_BalsaApp_ELEM_index_attachment_width, CPT_NUM, NULL, cfg_type_const_init_num( ATTACHMENT_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "IndexWidthFrom", BALSA_OFFSET_BalsaApp_ELEM_index_from_width, CPT_NUM, NULL, cfg_type_const_init_num( FROM_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "IndexWidthSubject", BALSA_OFFSET_BalsaApp_ELEM_index_subject_width, CPT_NUM, NULL, cfg_type_const_init_num( SUBJECT_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
-	{ "IndexWidthDate", BALSA_OFFSET_BalsaApp_ELEM_index_date_width, CPT_NUM, NULL, cfg_type_const_init_num( DATE_DEFAULT_WIDTH, 1, 0, CPNF_USEMIN ) },
 	{ "NotebookHeight", BALSA_OFFSET_BalsaApp_ELEM_notebook_height, CPT_NUM, NULL, cfg_type_const_init_num( DEFAULT_NOTEBOOK_HEIGHT, 1, 0, CPNF_USEMIN ) },
 
 #ifdef BALSA_SHOW_INFO
@@ -858,9 +851,14 @@ gboolean cfg_save( void )
 	down = cfg_location_godown( root, "Mailboxes" );
 	if( cfg_meta_MailboxArray_write( NULL, down, NULL ) )
 		return TRUE;
-	cfg_location_free( root );
+	cfg_location_free( down );
+
+	down = cfg_memory_default_root();
+	cfg_memory_write_all( down );
+	cfg_location_free( down );
 
 	cfg_sync();
+	cfg_location_free( root );
 	return FALSE;
 }
 
@@ -885,8 +883,9 @@ gboolean cfg_load( void )
 		return TRUE;
 	if( cfg_meta_MailboxArray_read( NULL, down, NULL ) )
 		return TRUE;
-	cfg_location_free( root );
+	cfg_location_free( down );
 
+	cfg_location_free( root );
 	return FALSE;
 }
 

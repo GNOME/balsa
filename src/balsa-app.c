@@ -117,8 +117,6 @@ balsa_app_init (void)
 
   /* GUI settings */
   balsa_app.mblist_width = 100;
-  balsa_app.mw_width = MW_DEFAULT_WIDTH;
-  balsa_app.mw_height = MW_DEFAULT_HEIGHT;
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.pwindow_option = WHILERETR;
   balsa_app.wordwrap = TRUE;
@@ -128,13 +126,6 @@ balsa_app_init (void)
   balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
   balsa_app.show_mblist = TRUE;
   balsa_app.show_notebook_tabs = FALSE;
-
-  balsa_app.index_num_width = NUM_DEFAULT_WIDTH;
-  balsa_app.index_status_width = STATUS_DEFAULT_WIDTH;
-  balsa_app.index_attachment_width = ATTACHMENT_DEFAULT_WIDTH;
-  balsa_app.index_from_width = FROM_DEFAULT_WIDTH;
-  balsa_app.index_subject_width = SUBJECT_DEFAULT_WIDTH;
-  balsa_app.index_date_width = DATE_DEFAULT_WIDTH;
 
 /* Mailbox list column width (not fully implemented) */
   balsa_app.mblist_name_width = MBNAME_DEFAULT_WIDTH;

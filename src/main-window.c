@@ -52,6 +52,7 @@
 #include "print.h"
 #include "cfg-balsa.h"
 #include "address-book.h"
+#include "cfg-memory-widgets.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -155,8 +156,6 @@ static void about_box_destroy_cb (void);
 static void set_icon (GnomeApp * app);
 
 static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc );
-static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc );
-
 static void notebook_switch_page_cb( GtkWidget *notebook,
                                      GtkNotebookPage *page, guint page_num );
 
@@ -502,7 +501,7 @@ balsa_window_new ()
   GtkWidget *preview;
   GtkWidget *hpaned;
   GtkWidget *vpaned;
-
+  cfg_location_t *uiroot;
 
   window = gtk_type_new (BALSA_TYPE_WINDOW);
   gnome_app_construct(GNOME_APP(window), "balsa", "Balsa");
@@ -513,8 +512,6 @@ balsa_window_new ()
   /* we can only set icon after realization, as we have no windows before. */
   gtk_signal_connect (GTK_OBJECT (window), "realize",
 		      GTK_SIGNAL_FUNC (set_icon), NULL);
-  gtk_signal_connect( GTK_OBJECT( window ), "size_allocate", 
-		      GTK_SIGNAL_FUNC( mw_size_alloc_cb ), NULL );
 
   appbar = GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
   gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));
@@ -522,7 +519,11 @@ balsa_window_new ()
   balsa_app.appbar=appbar;
   
   gtk_window_set_policy(GTK_WINDOW(window), TRUE, TRUE, FALSE);
-  gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width, balsa_app.mw_height);
+
+  /*gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width, balsa_app.mw_height);*/
+  uiroot = cfg_memory_default_root();
+  cfg_memory_add_to_window( GTK_WINDOW( window ), uiroot, "Main-Window", 333, 222 );
+  cfg_location_free( uiroot );
 
   vpaned = gtk_vpaned_new();
   hpaned = gtk_hpaned_new();
@@ -1631,12 +1632,6 @@ static void notebook_size_alloc_cb( GtkWidget *notebook, GtkAllocation *alloc )
 {
   if (balsa_app.previewpane)
     balsa_app.notebook_height = alloc->height;
-}
-
-static void mw_size_alloc_cb( GtkWidget *window, GtkAllocation *alloc )
-{
-    balsa_app.mw_height = alloc->height;
-    balsa_app.mw_width = alloc->width;
 }
 
 /* When page is switched we change the preview window and the selected 

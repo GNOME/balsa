@@ -139,18 +139,23 @@ extern struct BalsaApplication
   gint check_mail_timer_id;
   
   /* GUI settings */
+	/*
   gint mw_width;
   gint mw_height;
+	*/
+
   gint mblist_width;
   
   /* Column width settings */
-  gint index_num_width;
+	/*
+gint index_num_width;
   gint index_status_width;
   gint index_attachment_width;
   gint index_from_width;
   gint index_subject_width;
   gint index_date_width;
-  
+	*/
+
 /*gint mblist_height; PKGW: unused */
   gint notebook_height; /* PKGW: used :-) */
 

@@ -37,6 +37,7 @@
 #include "main-window.h"
 #include "mailbox-conf.h"
 #include "../libbalsa/mailbox.h"
+#include "cfg-memory-widgets.h"
 
 typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
@@ -151,78 +152,85 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
-  GtkWidget *page = NULL;
-  int i, c;
+	cfg_location_t *uiroot;
+	GtkWidget *page = NULL;
+	int i, c;
 
-  if (!mblw)
-    return;
+	if (!mblw)
+		return;
 
-  c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
+	c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
 
-  /* If we currently have a page open, update the time last visited */
-  if (c != -1) { 
-    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
-    page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
-    g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use); 
-  } 
+	/* If we currently have a page open, update the time last visited */
+	if (c != -1) { 
+		page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),c); 
+		page = gtk_object_get_data(GTK_OBJECT(page),"indexpage"); 
+
+		uiroot = cfg_memory_default_root();
+		cfg_memory_clist_sync_to( GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), uiroot );
+		cfg_location_free( uiroot );
+		cfg_sync();
+
+		g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use); 
+	} 
   
-  if( mailbox->open_ref ) {
-    i = balsa_find_notebook_page_num( mailbox );
-    if( i != -1 )
-      {
-	gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
-	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
-	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
-	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+	if( mailbox->open_ref ) {
+		i = balsa_find_notebook_page_num( mailbox );
+		if( i != -1 ) {
+			uiroot = cfg_memory_default_root();
+			
+			/*c = gtk_notebook_get_current_page( GTK_NOTEBOOK( balsa_app.notebook ) );
+			page = gtk_notebook_get_nth_page( GTK_NOTEBOOK( balsa_app.notebook ), c );
+			page = gtk_object_get_data( GTK_OBJECT( page ), "indexpage" );
+			cfg_memory_clist_sync_to( GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), uiroot );
+			*/
 
-/* This nasty looking piece of code is for the column resizing patch, it needs
-   to change the size of the columns before they get displayed.  To do this we
-   need to get the reference to the index page, which gives us a reference to
-   the index, which gives us the clist, which we then reference.  Looks ugly
-   but works well. */
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 0, balsa_app.index_num_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 1, balsa_app.index_status_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 2, balsa_app.index_attachment_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 3, balsa_app.index_from_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 4, balsa_app.index_subject_width);
-	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 5, balsa_app.index_date_width);
-        
-        balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
-	return;
-      }
-  }
-
-  balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);
-
-  balsa_window_set_cursor(BALSA_WINDOW(mblw->window), NULL);
-    
+			gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+			page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),i);
+			page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
+			cfg_memory_clist_sync_from( GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), uiroot );
+			
+			cfg_location_free( uiroot );
+			
+			g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
+			
+			balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
+			return;
+		}
+	}
+	
+	balsa_window_open_mailbox(BALSA_WINDOW(mblw->window), mailbox);
+	
+	balsa_window_set_cursor(BALSA_WINDOW(mblw->window), NULL);
+	
 #ifdef BALSA_SHOW_INFO
-  if (balsa_app.mblist->display_content_info){
-    balsa_mblist_update_mailbox (balsa_app.mblist, mailbox);
-  }
+	if (balsa_app.mblist->display_content_info){
+		balsa_mblist_update_mailbox (balsa_app.mblist, mailbox);
+	}
 #endif
-
-  balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
-
-  /* I don't know what is the purpose of that code, so I put
-     it in comment until somebody tells me waht it  is useful 
-     for.      -Bertrand 
-  
-  if (!strcmp (mailbox->name, _("Inbox")) ||
-      !strcmp (mailbox->name, _("Outbox")) ||
-      !strcmp (mailbox->name, _("Trash")))
-    return ;
-  
-
-  gtk_ctree_set_node_info (GTK_CTREE (mblw->ctree),
-    row,
-    mailbox->name, 5,
-    NULL, NULL,
-    balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
-    balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
-    FALSE, TRUE); 
-    
-    gtk_ctree_node_set_row_style (GTK_CTREE (mblw->ctree), row, NULL); */
+	
+	balsa_mblist_have_new (BALSA_MBLIST(mblw->ctree));
+	
+	/* I don't know what is the purpose of that code, so I put
+	 * it in comment until somebody tells me waht it  is useful 
+	 * for.      -Bertrand 
+	 * 
+	 *  if (!strcmp (mailbox->name, _("Inbox")) ||
+	 * !strcmp (mailbox->name, _("Outbox")) ||
+	 * !strcmp (mailbox->name, _("Trash")))
+	 * return ;
+	 *
+	 *
+	 * gtk_ctree_set_node_info (GTK_CTREE (mblw->ctree),
+	 * row,
+	 * mailbox->name, 5,
+	 * NULL, NULL,
+	 * balsa_icon_get_pixmap (BALSA_ICON_TRAY_EMPTY),
+	 * balsa_icon_get_bitmap (BALSA_ICON_TRAY_EMPTY),
+	 * FALSE, TRUE); 
+	 *
+	 * gtk_ctree_node_set_row_style (GTK_CTREE (mblw->ctree), row, NULL); 
+	 */
 }
 
 

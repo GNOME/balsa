@@ -27,6 +27,7 @@
 #include "balsa-icons.h"
 #include "balsa-index.h"
 #include "main-window.h"
+#include "cfg-memory-widgets.h"
 
 /* constants */
 #define BUFFER_SIZE 1024
@@ -64,10 +65,6 @@ static void unselect_message (GtkWidget * widget,
                               gint column,
                               GdkEventButton * bevent,
                               gpointer * data);
-static void resize_column_event_cb (GtkCList * clist, 
-				    gint column, 
-				    gint width, 
-				    gpointer * data);
 
 /* signals */
 enum
@@ -234,6 +231,8 @@ static void
 balsa_index_init (BalsaIndex * bindex)
 {
   GtkCList *clist;
+  cfg_location_t *uiroot;
+
 /*
  * status
  * priority
@@ -268,13 +267,12 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
 
-/* Set the width of any new columns to the current column widths being used */
-  gtk_clist_set_column_width (clist, 0, balsa_app.index_num_width);
-  gtk_clist_set_column_width (clist, 1, balsa_app.index_status_width);
-  gtk_clist_set_column_width (clist, 2, balsa_app.index_attachment_width);
-  gtk_clist_set_column_width (clist, 3, balsa_app.index_from_width);
-  gtk_clist_set_column_width (clist, 4, balsa_app.index_subject_width);
-  gtk_clist_set_column_width (clist, 5, balsa_app.index_date_width);
+  uiroot = cfg_memory_default_root();
+  cfg_memory_add_to_clist( GTK_CLIST( clist ), uiroot, "MessageIndex", 6, 
+			   NUM_DEFAULT_WIDTH, STATUS_DEFAULT_WIDTH, ATTACHMENT_DEFAULT_WIDTH,
+			   FROM_DEFAULT_WIDTH, SUBJECT_DEFAULT_WIDTH, DATE_DEFAULT_WIDTH );
+  cfg_location_free( uiroot );
+
   gtk_clist_set_row_height (clist, 16);
   
   gtk_signal_connect (GTK_OBJECT (clist),
@@ -297,12 +295,6 @@ balsa_index_init (BalsaIndex * bindex)
 		      (GtkSignalFunc) button_event_release_cb,
 		      (gpointer) bindex);
 
-  /* We want to catch column resize attempts to store the new value */
-  gtk_signal_connect (GTK_OBJECT (clist),
-		      "resize_column",
-		      GTK_SIGNAL_FUNC (resize_column_event_cb),
-		      NULL);
-  
   gtk_widget_show (GTK_WIDGET (clist));
   gtk_widget_ref (GTK_WIDGET (clist));
 }
@@ -733,45 +725,6 @@ unselect_message (GtkWidget * widget,
 		     balsa_index_signals[UNSELECT_MESSAGE],
 		     message,
 		     bevent);
-}
-
-/* When a column is resized, store the new size for later use */
-static void 
-resize_column_event_cb (GtkCList * clist, 
-				    gint column, 
-				    gint width, 
-				    gpointer * data)
-{
-  switch (column)
-  {
-  case 0:
-    balsa_app.index_num_width = width;
-    break;
-    
-  case 1:
-    balsa_app.index_status_width = width;
-    break;
-    
-  case 2:
-    balsa_app.index_attachment_width = width;
-    break;
-    
-  case 3:
-    balsa_app.index_from_width = width;
-    break;
-    
-  case 4:
-    balsa_app.index_subject_width = width;
-    break;
-    
-  case 5:
-    balsa_app.index_date_width = width;
-    break;
-
-  default:
-    if (balsa_app.debug)
-      fprintf (stderr, "** Error: Unknown column resize\n");
-  }
 }
 
 /*

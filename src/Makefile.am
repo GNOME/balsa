@@ -40,7 +40,9 @@ balsa_SOURCES =	\
 	sendmsg-window.h	\
 	threads.h		\
 	cfg-balsa.c		\
-	cfg-balsa.h
+	cfg-balsa.h		\
+	cfg-memory-widgets.c	\
+	cfg-memory-widgets.h
 
 #	index-child.h		\
 #	spell-check.c		\

@@ -55,6 +55,10 @@ rm -rf $RPM_BUILD_ROOT
 
 make prefix=$RPM_BUILD_ROOT%{prefix} install
 
+# cp -f balsa.1 $RPM_BUILD_ROOT%{prefix}/man/man1
+mkdir -p $RPM_BUILD_ROOT%{prefix}/man/man1
+install -c -m 644 balsa.1 $RPM_BUILD_ROOT%{prefix}/man/man1
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -67,6 +71,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Oct  5 1999 Jan Nieuwenhuizen <janneke@gnu.org>
+
+- Fixed man install
+
 * Sun Sep 26 1999 Stuart Parmenter <pavlov@balsa.net>
 
 - Updated to version 0.5.0

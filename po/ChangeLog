@@ -1,3 +1,7 @@
+2004-09-20  Carlos Morgado  <chbm gnome.org>
+
+	* all: make update-po 
+
 2004-09-20  Raphael Higino  <raphaelh@cvs.gnome.org>
 
 	* pt_BR.po: Updated Brazilian Portuguese translation.

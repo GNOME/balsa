@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-19 17:06+0200\n"
+"POT-Creation-Date: 2004-09-20 22:49+0100\n"
 "PO-Revision-Date: 2004-09-19 17:07+0200\n"
 "Last-Translator: Francisco Javier F. Serrador <serrador@cvs.gnome.org>\n"
 "Language-Team: Spanish <traductores@es.gnome.org>\n"
@@ -251,7 +251,8 @@ msgstr "%s: la verificación de la firma falló: %s"
 
 #: libbalsa/gmime-gpgme-context.c:582
 msgid "combined signing and encryption is only defined for RFC 2440"
-msgstr "la firma y el descifrado combinado sólo están definidos para el RFC 2440"
+msgstr ""
+"la firma y el descifrado combinado sólo están definidos para el RFC 2440"
 
 #: libbalsa/gmime-gpgme-context.c:652
 #, c-format
@@ -881,12 +882,14 @@ msgstr ""
 #: libbalsa/message.c:482
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
-msgstr "El buzón de origen (%s) es de sólo lectura. No se pueden mover los mensajes"
+msgstr ""
+"El buzón de origen (%s) es de sólo lectura. No se pueden mover los mensajes"
 
 #: libbalsa/message.c:634 libbalsa/message.c:674
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
-msgstr "El buzón de origen (%s) es de sólo lectura. No se pueden cambiar los flags."
+msgstr ""
+"El buzón de origen (%s) es de sólo lectura. No se pueden cambiar los flags."
 
 #: libbalsa/mime.c:92
 msgid ""
@@ -976,7 +979,8 @@ msgstr "la creación de un contexto gpgme ha fallado"
 
 #: libbalsa/rfc3156.c:253 libbalsa/rfc3156.c:631
 msgid "Enter passphrase to unlock the secret key for signing"
-msgstr "Introduzca la frase de paso para desbloquear la clave secreta para firmar"
+msgstr ""
+"Introduzca la frase de paso para desbloquear la clave secreta para firmar"
 
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
@@ -1030,8 +1034,10 @@ msgid "The signature is valid but expired."
 msgstr "La firma es válida pero expiró."
 
 #: libbalsa/rfc3156.c:871
-msgid "The signature is valid but the key used to verify the signature has expired."
-msgstr "La firma es válida pero la clave usada para verificar la firma ha expirado."
+msgid ""
+"The signature is valid but the key used to verify the signature has expired."
+msgstr ""
+"La firma es válida pero la clave usada para verificar la firma ha expirado."
 
 #: libbalsa/rfc3156.c:874
 msgid ""
@@ -1055,7 +1061,8 @@ msgstr "Esta parte no es una firma PGP real."
 
 #: libbalsa/rfc3156.c:885
 msgid "The signature could not be verified due to an invalid crypto engine."
-msgstr "La firma no pudo ser verificada debido a un motor criptográfico inválido."
+msgstr ""
+"La firma no pudo ser verificada debido a un motor criptográfico inválido."
 
 #: libbalsa/rfc3156.c:888 libbalsa/rfc3156.c:1543
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
@@ -2760,7 +2767,8 @@ msgstr "Coincide cuando no tiene ninguna de estas marcas:"
 
 #: src/filter-edit-callbacks.c:449
 msgid "You must specify the name of the user header to match on"
-msgstr "Debe especificar el nombre de la cabecera de usuario con la que coincidir"
+msgstr ""
+"Debe especificar el nombre de la cabecera de usuario con la que coincidir"
 
 #: src/filter-edit-callbacks.c:464
 msgid "You must specify at least one field for matching"
@@ -2864,7 +2872,8 @@ msgstr "Dentro/fuera del intervalo de fechas"
 
 #: src/filter-edit-callbacks.c:964
 msgid "Match when one flag is set/when no flag is set"
-msgstr "Coincide cuando tiene una marca puesta/cuando no tiene una marca puesta"
+msgstr ""
+"Coincide cuando tiene una marca puesta/cuando no tiene una marca puesta"
 
 # src/filter-edit-dialog.c:271
 # src/filter-edit-dialog.c:263
@@ -4337,7 +4346,8 @@ msgstr "_Purgar los mensajes borrados"
 
 #: src/main-window.c:734 src/main-window.c:831
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
-msgstr "Purgar los mensajes marcados como borrados en el buzón actualmente abierto"
+msgstr ""
+"Purgar los mensajes marcados como borrados en el buzón actualmente abierto"
 
 # src/main-window.c:399
 # src/main-window.c:401
@@ -4365,7 +4375,8 @@ msgstr "Seleccionar _filtros"
 
 #: src/main-window.c:749 src/main-window.c:1068
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Seleccionar los filtros que se aplicarán automáticamente al buzón actual"
+msgstr ""
+"Seleccionar los filtros que se aplicarán automáticamente al buzón actual"
 
 #: src/main-window.c:762
 msgid "_Toolbars..."
@@ -5699,7 +5710,8 @@ msgstr ""
 "ventana de redacción."
 
 #: src/save-restore.c:1007
-msgid "The option to request a MDN is now on the Options menu of the compose window."
+msgid ""
+"The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "La opción para solicitar un MDN está ahora en el menú de Opciones de la "
 "ventana de redacción."
@@ -6044,7 +6056,8 @@ msgstr "_Cifrar mensaje"
 
 #: src/sendmsg-window.c:438 src/sendmsg-window.c:598
 msgid "signs the message using GnuPG for all To: and CC: recipients"
-msgstr "firma el mensaje usando GNUPG para todos los destinatarios en Para: y Cc:"
+msgstr ""
+"firma el mensaje usando GNUPG para todos los destinatarios en Para: y Cc:"
 
 #: src/sendmsg-window.c:458 src/sendmsg-window.c:634
 msgid "_Show"
@@ -7940,4 +7953,3 @@ msgstr "Bajar"
 
 #~ msgid "Couldn't set protocol version to LDAPv3."
 #~ msgstr "No se pudo establecer la versión del protocolo a LDAPv3"
-

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-20 11:00+0200\n"
+"POT-Creation-Date: 2004-09-20 22:49+0100\n"
 "PO-Revision-Date: 2004-09-20 07:38-0300\n"
 "Last-Translator: Raphael Higino <raphaelh@uai.com.br>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
@@ -224,7 +224,8 @@ msgstr "%s: não foi possível criar o contexto: %s"
 
 #: libbalsa/gmime-gpgme-context.c:819
 msgid "the crypto engine for protocol OpenPGP is not available"
-msgstr "O mecanismo de criptografia para o protocolo OpenPGP não está disponível"
+msgstr ""
+"O mecanismo de criptografia para o protocolo OpenPGP não está disponível"
 
 #: libbalsa/gmime-gpgme-context.c:829
 msgid "the crypto engine for protocol CMS is not available"
@@ -442,7 +443,9 @@ msgstr ""
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
-msgstr "\n<b>Esse certificado foi emitido por:</b>\n"
+msgstr ""
+"\n"
+"<b>Esse certificado foi emitido por:</b>\n"
 
 #: libbalsa/libbalsa.c:566
 #, c-format
@@ -5923,7 +5926,9 @@ msgstr "Abaixo"
 #~ msgid ""
 #~ "The OpenPGP encrypted message part contains 8-bit characters, but no "
 #~ "header describing the used codeset (converted to %s)"
-#~ msgstr "O OpenPGP criptografou parte da mensagem que contém caracteres de 8 bits, mas não o cabeçalho que descreve o código usado (convertido para %s)"
+#~ msgstr ""
+#~ "O OpenPGP criptografou parte da mensagem que contém caracteres de 8 bits, "
+#~ "mas não o cabeçalho que descreve o código usado (convertido para %s)"
 
 #~ msgid "%s: could not retrieve key for %s: %s"
 #~ msgstr "%s: não foi possível recuperar a chave para %s: %s"

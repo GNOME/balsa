@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-08-19 00:02+0100\n"
+"POT-Creation-Date: 2004-09-20 22:49+0100\n"
 "PO-Revision-Date: 2001-10-06 22:29+0400\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -69,8 +69,8 @@ msgstr "Открыть адресную книгу"
 msgid "Cannot add duplicate entry"
 msgstr ""
 
-#: libbalsa/address-book.c:406 src/main-window.c:2155
-#: src/sendmsg-window.c:4038
+#: libbalsa/address-book.c:406 src/main-window.c:2158
+#: src/sendmsg-window.c:4047
 #, fuzzy
 msgid "Unknown error"
 msgstr "неизвестная ошибка"
@@ -105,12 +105,12 @@ msgstr "Имя:"
 msgid "O_rganization:"
 msgstr "Организация:"
 
-#: libbalsa/address.c:405 libinit_balsa/balsa-druid-page-user.c:79
+#: libbalsa/address.c:405
 #, fuzzy
 msgid "_Email Address:"
 msgstr "Эл.адрес:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:986 libbalsa/message.c:909
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:976 libbalsa/message.c:914
 #, fuzzy
 msgid "(No subject)"
 msgstr "Тема"
@@ -259,13 +259,13 @@ msgid "%s: multiple keys for %s"
 msgstr ""
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1122
-#: libbalsa/mailbox_local.c:1124 src/sendmsg-window.c:2632
-#: src/sendmsg-window.c:2633
+#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1112
+#: libbalsa/mailbox_local.c:1114 src/sendmsg-window.c:2637
+#: src/sendmsg-window.c:2638
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:92 src/sendmsg-window.c:2662 src/sendmsg-window.c:2663
+#: libbalsa/identity.c:92 src/sendmsg-window.c:2667 src/sendmsg-window.c:2668
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -405,7 +405,7 @@ msgid "S/MIME mode"
 msgstr ""
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:255
+#: libbalsa/imap-server.c:258
 #, fuzzy, c-format
 msgid ""
 "IMAP server %s alert:\n"
@@ -413,42 +413,47 @@ msgid ""
 msgstr "Проблема с SMTP сервером: %s"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:259
+#: libbalsa/imap-server.c:262
 #, fuzzy, c-format
 msgid "IMAP server %s error: %s"
 msgstr "Проблема с SMTP сервером: %s"
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:265
+#: libbalsa/imap-server.c:268
 #, fuzzy, c-format
 msgid "%s: %s"
 msgstr "%d %s"
 
-#: libbalsa/imap-server.c:550 libbalsa/imap-server.c:653
+#: libbalsa/imap-server.c:506
 #, fuzzy, c-format
 msgid "Cannot connect to the server: %s"
 msgstr "Не удалось подключиться к %s (%s)."
 
-#: libbalsa/imap-server.c:638
+#: libbalsa/imap-server.c:510
+#, fuzzy
+msgid "Cannot connect to the server"
+msgstr "Не удалось подключиться к %s (%s)."
+
+#: libbalsa/imap-server.c:658
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:279
+#: libbalsa/libbalsa.c:283
 #, fuzzy, c-format
 msgid "LDAP Directory for %s"
 msgstr "Каталог: %s\n"
 
-#: libbalsa/libbalsa.c:384
+#: libbalsa/libbalsa.c:388
 #, fuzzy
 msgid "Invalid date"
 msgstr "[неправильная дата]"
 
-#: libbalsa/libbalsa.c:400 src/pref-manager.c:1226 src/pref-manager.c:1323
+#: libbalsa/libbalsa.c:404 src/pref-manager.c:1262 src/pref-manager.c:1359
 msgid "Unknown"
 msgstr "Неизвестно"
 
-#: libbalsa/libbalsa.c:539
+#: libbalsa/libbalsa.c:543
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -456,14 +461,14 @@ msgid ""
 "<b>This certificate belongs to:</b>\n"
 msgstr ""
 
-#: libbalsa/libbalsa.c:551
+#: libbalsa/libbalsa.c:555
 #, fuzzy
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
 msgstr "Этот сертификат выдал:"
 
-#: libbalsa/libbalsa.c:562
+#: libbalsa/libbalsa.c:566
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -472,20 +477,20 @@ msgid ""
 "<b>Fingerprint:</b> %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:571
+#: libbalsa/libbalsa.c:575
 #, fuzzy
 msgid "SSL/TLS certificate"
 msgstr "Проверка SSL-сертификата"
 
-#: libbalsa/libbalsa.c:573
+#: libbalsa/libbalsa.c:577
 msgid "_Accept Once"
 msgstr ""
 
-#: libbalsa/libbalsa.c:574
+#: libbalsa/libbalsa.c:578
 msgid "Accept&_Save"
 msgstr ""
 
-#: libbalsa/libbalsa.c:575
+#: libbalsa/libbalsa.c:579
 #, fuzzy
 msgid "_Reject"
 msgstr "Тема"
@@ -513,64 +518,79 @@ msgstr "Невозможно создать почтовый ящик типа %
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
 #. login information...
-#: libbalsa/mailbox_imap.c:481
+#: libbalsa/mailbox_imap.c:500
 msgid "IMAP connection has been severed. Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:484
+#: libbalsa/mailbox_imap.c:503
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:825
+#: libbalsa/mailbox_imap.c:851
 #, c-format
 msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:888 libbalsa/mailbox_maildir.c:482
-#: libbalsa/mailbox_mbox.c:435 libbalsa/mailbox_mh.c:502
+#: libbalsa/mailbox_imap.c:914 libbalsa/mailbox_maildir.c:480
+#: libbalsa/mailbox_mbox.c:461 libbalsa/mailbox_mh.c:502
 #, fuzzy, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxPop3: Открыто %s Число ссылок: %d\n"
 
-#: libbalsa/mailbox_imap.c:1316
+#: libbalsa/mailbox_imap.c:978 libbalsa/mailbox_imap.c:1991
+#, c-format
+msgid "Downloading %ld kB"
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:1345
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
 "falling back to default searching method"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2186
+#: libbalsa/mailbox_imap.c:1405
+#, c-format
+msgid "No path found for mailbox \"%s\", using \"%s\""
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:2171
+#, c-format
+msgid "Uploading %ld kB"
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:2321
 msgid "Server-side threading not supported."
 msgstr ""
 
-#: libbalsa/mailbox_local.c:1267
+#: libbalsa/mailbox_local.c:1260
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Сбой открытия %s. Номер ошибки - %d, "
 
-#: libbalsa/mailbox_local.c:1289
+#: libbalsa/mailbox_local.c:1282
 #, fuzzy, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Невозможно заблокировать почтовый ящик!"
 
-#: libbalsa/mailbox_maildir.c:189
+#: libbalsa/mailbox_maildir.c:188
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Вероятно почтовый ящик \"%s\" не является ящиком Maildir."
 
-#: libbalsa/mailbox_maildir.c:198
+#: libbalsa/mailbox_maildir.c:197
 #, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "Невозможно создать каталог MailDir в %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:205 libbalsa/mailbox_maildir.c:213
-#: libbalsa/mailbox_maildir.c:223
+#: libbalsa/mailbox_maildir.c:204 libbalsa/mailbox_maildir.c:212
+#: libbalsa/mailbox_maildir.c:222
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "Невозможно создать MailDir в %s (%s)"
 
-#: libbalsa/mailbox_maildir.c:324 libbalsa/mailbox_mh.c:266
+#: libbalsa/mailbox_maildir.c:323 libbalsa/mailbox_mh.c:266
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -579,7 +599,7 @@ msgstr ""
 "Не удалось удалить содержимое %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:330 libbalsa/mailbox_mbox.c:247
+#: libbalsa/mailbox_maildir.c:329 libbalsa/mailbox_mbox.c:267
 #: libbalsa/mailbox_mh.c:272
 #, c-format
 msgid ""
@@ -589,48 +609,46 @@ msgstr ""
 "Невозможно удалить %s:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:454 libbalsa/mailbox_mbox.c:399
+#: libbalsa/mailbox_maildir.c:452 libbalsa/mailbox_mbox.c:425
 #: libbalsa/mailbox_mh.c:483
 #, fuzzy
 msgid "Mailbox does not exist."
 msgstr "Почтовый ящик создан."
 
-#: libbalsa/mailbox_mbox.c:181
+#: libbalsa/mailbox_mbox.c:179
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Вероятно почтовый ящик \"%s\" не в формате Mbox."
 
-#: libbalsa/mailbox_mbox.c:407
+#: libbalsa/mailbox_mbox.c:433
 #, fuzzy
 msgid "Cannot open mailbox."
 msgstr "Невозможно загрузить почтовый ящик %s"
 
-#: libbalsa/mailbox_mbox.c:415
+#: libbalsa/mailbox_mbox.c:441
 #, fuzzy
 msgid "Cannot lock mailbox."
 msgstr "Невозможно загрузить почтовый ящик %s"
 
-#: libbalsa/mailbox_mbox.c:1488
+#: libbalsa/mailbox_mbox.c:1500
 #, fuzzy, c-format
 msgid "%s: could not open %s."
 msgstr "Не удалось открыть файл %s.\n"
 
-#: libbalsa/mailbox_mbox.c:1496
+#: libbalsa/mailbox_mbox.c:1508
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr ""
 
-#: libbalsa/mailbox_mbox.c:1506
+#: libbalsa/mailbox_mbox.c:1518
 #, fuzzy, c-format
 msgid "%s: could not get message stream."
 msgstr "Невозможно записать письмо"
 
-#: libbalsa/mailbox_mbox.c:1521
-#, c-format
-msgid ""
-"Error copying message to mailbox %s!\n"
-"Mailbox might have been corrupted!"
-msgstr ""
+#: libbalsa/mailbox_mbox.c:1533
+#, fuzzy, c-format
+msgid "Error copying message to mailbox %s!"
+msgstr "Отправить текущее сообщение в мусорную корзину"
 
 #: libbalsa/mailbox_mh.c:172
 #, c-format
@@ -724,51 +742,37 @@ msgstr ""
 "Ошибка доступа к почтовому ящику POP3 %s:\n"
 "%s"
 
-#: libbalsa/message.c:481
+#: libbalsa/message.c:482
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr ""
 
-#: libbalsa/message.c:633 libbalsa/message.c:673
+#: libbalsa/message.c:634 libbalsa/message.c:674
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
 
-#: libbalsa/mime.c:80 src/balsa-message.c:2296 src/print.c:680
-#, c-format
-msgid ""
-"Error writing to temporary file %s.\n"
-"Check the directory permissions."
-msgstr ""
-"Ошибка записи во временный файл %s.\n"
-"Проверьте права на каталог."
-
-#: libbalsa/mime.c:87 src/balsa-message.c:2304 src/print.c:687
-#, c-format
-msgid "Cannot open temporary file %s."
-msgstr "Не удалось открыть временный файл %s."
-
-#: libbalsa/mime.c:107
+#: libbalsa/mime.c:92
 msgid ""
 "\n"
 "--\n"
 "This is an OpenPGP signed message part:\n"
 msgstr ""
 
-#: libbalsa/misc.c:1627
+#: libbalsa/misc.c:1629
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Исчерпано время ожидания при попытке выполнить fcntl lock!"
 
-#: libbalsa/misc.c:1634
+#: libbalsa/misc.c:1636
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Ожидание fcntl lock... %d"
 
-#: libbalsa/misc.c:1662
+#: libbalsa/misc.c:1664
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Исчерпано время ожидания при попытке выполнить flock lock!"
 
-#: libbalsa/misc.c:1669
+#: libbalsa/misc.c:1671
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Ожидание завершения попытки выполнить flock ... %d"
@@ -1147,16 +1151,16 @@ msgstr ""
 msgid "Try again later."
 msgstr ""
 
-#: libbalsa/send.c:233 libbalsa/send.c:240
+#: libbalsa/send.c:237 libbalsa/send.c:244
 msgid "Sending Mail..."
 msgstr "Отправка почты..."
 
-#: libbalsa/send.c:236 src/main-window.c:2591
+#: libbalsa/send.c:240 src/main-window.c:2595
 #, fuzzy
 msgid "_Hide"
 msgstr "Скрыть"
 
-#: libbalsa/send.c:765
+#: libbalsa/send.c:764
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1164,7 +1168,7 @@ msgid ""
 "Message left in your outbox.\n"
 msgstr ""
 
-#: libbalsa/send.c:810
+#: libbalsa/send.c:818
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1172,75 +1176,82 @@ msgid ""
 "Message left in your outbox.\n"
 msgstr ""
 
-#: libbalsa/send.c:820
+#: libbalsa/send.c:828
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr ""
 
-#: libbalsa/send.c:850
+#: libbalsa/send.c:858
 msgid "Connected to MTA"
 msgstr "Соединение установлено"
 
-#: libbalsa/send.c:857 src/balsa-message.c:1415 src/print.c:369
-#: src/sendmsg-window.c:855 src/sendmsg-window.c:2459 src/store-address.c:303
+#: libbalsa/send.c:865 src/balsa-message.c:1462 src/print.c:369
+#: src/sendmsg-window.c:859 src/sendmsg-window.c:2464 src/store-address.c:303
 msgid "From:"
 msgstr "От:"
 
-#: libbalsa/send.c:860 src/balsa-index.c:335
+#: libbalsa/send.c:868 src/balsa-index.c:338
 msgid "From"
 msgstr "Отправитель"
 
-#: libbalsa/send.c:869 src/balsa-message.c:1424 src/print.c:373
-#: src/sendmsg-window.c:854 src/sendmsg-window.c:2466 src/store-address.c:304
+#: libbalsa/send.c:877 src/balsa-message.c:1471 src/print.c:373
+#: src/sendmsg-window.c:858 src/sendmsg-window.c:2471 src/store-address.c:304
 msgid "To:"
 msgstr "Кому:"
 
-#: libbalsa/send.c:872 src/balsa-index.c:906
+#: libbalsa/send.c:880 src/balsa-index.c:991
 msgid "To"
 msgstr "Кому"
 
-#: libbalsa/send.c:910
+#: libbalsa/send.c:918
 msgid "Disconnected"
 msgstr "Отключён"
 
-#: libbalsa/send.c:1128
+#: libbalsa/send.c:1148
 msgid ""
 "SMTP server refused connection.\n"
-"Balsa by default uses submission service (587).\n"
-"If you want to submit mail using relay service (25),specify it explicitly "
-"via: \"host:smtp\".\n"
-"Message is left in outbox."
+"Check your internet connection."
 msgstr ""
 
-#: libbalsa/send.c:1138
+#: libbalsa/send.c:1153
+msgid ""
+"SMTP server cannot be reached.\n"
+"Check your internet connection."
+msgstr ""
+
+#: libbalsa/send.c:1162
+msgid "Message left in Outbox (try again later)"
+msgstr ""
+
+#: libbalsa/send.c:1166
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 msgstr ""
 
-#: libbalsa/send.c:1466
+#: libbalsa/send.c:1514
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 
-#: libbalsa/send.c:1759 libbalsa/send.c:1835
-msgid "This message will not be encrpyted for the BCC: recipient(s)."
+#: libbalsa/send.c:1808 libbalsa/send.c:1884
+msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr ""
 
 #. host, authentication method
-#: libbalsa/server.c:370
+#: libbalsa/server.c:377
 #, c-format
 msgid "Logging in to %s using %s"
 msgstr ""
 
-#: libbalsa/source-viewer.c:52 src/main-window.c:645
+#: libbalsa/source-viewer.c:52 src/main-window.c:647
 #, fuzzy
 msgid "_Select Text"
 msgstr "Выбрать все"
 
-#: libbalsa/source-viewer.c:53 src/main-window.c:646
+#: libbalsa/source-viewer.c:53 src/main-window.c:648
 #, fuzzy
 msgid "Select entire mail"
 msgstr "Выбрать пользователя"
@@ -1330,14 +1341,15 @@ msgstr ""
 msgid "Mail Files"
 msgstr "Файлы с почтой"
 
-#: libinit_balsa/balsa-druid-page-directory.c:341
+#: libinit_balsa/balsa-druid-page-directory.c:342
+#: libinit_balsa/balsa-druid-page-directory.c:376
 #, fuzzy, c-format
 msgid ""
 "Problem Creating Mailboxes\n"
 "%s"
 msgstr "Проблема при создании почтового ящика"
 
-#: libinit_balsa/balsa-druid-page-finish.c:37
+#: libinit_balsa/balsa-druid-page-finish.c:40
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -1345,43 +1357,92 @@ msgstr ""
 "Вы успешно установили Balsa. Наслаждайтесь!\n"
 "  -- Команда разработки Balsa"
 
-#: libinit_balsa/balsa-druid-page-finish.c:43
+#: libinit_balsa/balsa-druid-page-finish.c:46
 msgid "All Done!"
 msgstr "Все сделано!"
 
-#: libinit_balsa/balsa-druid-page-finish.c:70
+#: libinit_balsa/balsa-druid-page-finish.c:76
 msgid "GnomeCard Address Book"
 msgstr "Адресная книга GnomeCard"
 
-#: libinit_balsa/balsa-druid-page-finish.c:77
-#: libinit_balsa/balsa-druid-page-finish.c:85 src/ab-window.c:207
+#: libinit_balsa/balsa-druid-page-finish.c:83
+#: libinit_balsa/balsa-druid-page-finish.c:91 src/ab-window.c:207
 msgid "Address Book"
 msgstr "Адресная книга"
 
-#: libinit_balsa/balsa-druid-page-user.c:67
-msgid "Please enter information about yourself."
-msgstr "Пожалуйста введите информацию о себе."
+#: libinit_balsa/balsa-druid-page-user.c:51
+msgid ""
+"The following settings are also needed (and you can find them later, if need "
+"be, in the Email application in the 'Preferences' and 'Identities' commands "
+"on the 'Tools' menu)"
+msgstr ""
 
-#: libinit_balsa/balsa-druid-page-user.c:74
+#: libinit_balsa/balsa-druid-page-user.c:56
+msgid ""
+" Whoever provides your email account should be able to give you the "
+"following information (if you have a Network Administrator, they may already "
+"have set this up for you):"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:62
+msgid "Yes, remember it"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:62
+msgid "No, type it in every time"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:95
+msgid "Name of mail server for incoming _mail:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:100
 #, fuzzy
-msgid "_Name:"
-msgstr "Имя:"
+msgid "_Type of mail server:"
+msgstr "Тип доступа: mail-server\n"
 
-#: libinit_balsa/balsa-druid-page-user.c:84
+#: libinit_balsa/balsa-druid-page-user.c:104
+msgid "Connect using _SSL:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:107
+msgid "Your e-mail _login name:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:110
 #, fuzzy
-msgid "_Local Mail Directory:"
-msgstr "Каталог местной почты:"
+msgid "Your _password:"
+msgstr "Пароль:"
 
-#: libinit_balsa/balsa-druid-page-user.c:91
+#: libinit_balsa/balsa-druid-page-user.c:118
 #, fuzzy
 msgid "_SMTP Server:"
 msgstr "SMTP сервер:"
 
-#: libinit_balsa/balsa-druid-page-user.c:109
+#. 2.1
+#: libinit_balsa/balsa-druid-page-user.c:123
+msgid "Your real _name:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:129
+msgid "Your _Email Address, for this email account:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:134
+#, fuzzy
+msgid "_Remember your password:"
+msgstr "Пароль:"
+
+#: libinit_balsa/balsa-druid-page-user.c:139
+#, fuzzy
+msgid "_Local mail directory:"
+msgstr "Каталог местной почты:"
+
+#: libinit_balsa/balsa-druid-page-user.c:156
 msgid "User Settings"
 msgstr "Настройки пользователя"
 
-#: libinit_balsa/balsa-druid-page-user.c:177
+#: libinit_balsa/balsa-druid-page-user.c:302
 #, fuzzy, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -1393,24 +1454,18 @@ msgid "Welcome to Balsa!"
 msgstr "Balsa приветствует вас!"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:34
-#, fuzzy
 msgid ""
-"You seem to be running Balsa for the first time. The following steps will "
-"set up Balsa by asking a few simple questions. Once you have completed these "
-"steps, you can always change them later in Balsa's preferences. If any files "
-"or directories need to be created, it will be done so automatically.\n"
-"  Please check the about box in Balsa's main window for more information "
-"about contacting the authors or reporting bugs."
+"Before you can send or receive email:\n"
+"\n"
+"-- either you should already have Internet access and an email account, "
+"provided by an Internet Service Provider, and you should have made that "
+"Internet connection on your computer\n"
+"\n"
+"-- or your Network Administrator at your place of work/study/similar may "
+"have set up your computer to connect to the network."
 msgstr ""
-"Кажется вы запускаете Balsa в первый раз. Следующие шаги\n"
-"позволят установить Balsa ответив на несколько простых вопросов.\n"
-"После прохождения эти шагов, вы всегда сможете изменить их\n"
-"позже в настройках Balsa. Если какие-либо файлы или каталоги должны\n"
-"быть созданы, это будет сделано автоматически. Для получения контактной\n"
-"информации и сообщений об ошибках откройте окно \"О программе\" в меню\n"
-"главного окна Balsa."
 
-#: libinit_balsa/balsa-initdruid.c:75
+#: libinit_balsa/balsa-initdruid.c:79
 #, fuzzy
 msgid ""
 "This will exit Balsa.\n"
@@ -1419,24 +1474,24 @@ msgstr ""
 "Вы хотите\n"
 "выйти из Balsa?"
 
-#: libinit_balsa/helper.c:65
+#: libinit_balsa/helper.c:68
 #, fuzzy, c-format
 msgid "Error loading %s: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: libinit_balsa/helper.c:152
+#: libinit_balsa/helper.c:226
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
 "Путь %s должен быть указан относительно корня файловой системы (начинается "
 "с /)."
 
-#: libinit_balsa/helper.c:165 libinit_balsa/helper.c:189
+#: libinit_balsa/helper.c:239 libinit_balsa/helper.c:263
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr "Не удалось создать каталог: mkdir() failed on pathname \"%s\"."
 
-#: libinit_balsa/helper.c:175 libinit_balsa/helper.c:198
+#: libinit_balsa/helper.c:249 libinit_balsa/helper.c:272
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "Файл с названием \"%s\" не является каталогом."
@@ -1463,13 +1518,13 @@ msgstr ""
 msgid "New mail notification"
 msgstr "Уведомление:"
 
-#: src/ab-main.c:337 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:338 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Имя"
 
-#: src/ab-main.c:457
+#: src/ab-main.c:458
 #, fuzzy
 msgid "F_ilter:"
 msgstr "Имя фильтра:"
@@ -1517,140 +1572,147 @@ msgid ""
 "%s"
 msgstr "Не удалось открыть адресную книгу LDIF %s."
 
-#: src/address-book-config.c:147
+#: src/address-book-config.c:151
 #, fuzzy
 msgid "Add Address Book"
 msgstr "Адресная книга"
 
-#: src/address-book-config.c:155
+#: src/address-book-config.c:159
 #, fuzzy
 msgid "Modify Address Book"
 msgstr "Адресная книга"
 
-#: src/address-book-config.c:190
+#: src/address-book-config.c:194
 msgid "New Address Book type:"
 msgstr "Новый тип адресной книги:"
 
-#: src/address-book-config.c:199
+#: src/address-book-config.c:203
 msgid "VCard Address Book (GnomeCard)"
 msgstr "Адресная книга VCard (GnomeCard)"
 
-#: src/address-book-config.c:212
+#: src/address-book-config.c:216
 msgid "External query (a program)"
 msgstr ""
 
-#: src/address-book-config.c:224
+#: src/address-book-config.c:228
 msgid "LDIF Address Book"
 msgstr "Адресная книга LDIF"
 
-#: src/address-book-config.c:239
+#: src/address-book-config.c:243
 msgid "LDAP Address Book"
 msgstr "Адресная книга LDAP"
 
-#: src/address-book-config.c:247
+#: src/address-book-config.c:251
 msgid "Balsa is not compiled with LDAP support"
 msgstr "Balsa скомпилирована без поддержки LDAP"
 
+#: src/address-book-config.c:258 src/address-book-config.c:540
+#, fuzzy
+msgid "GPE Address Book"
+msgstr "Адресная книга"
+
 #. mailbox name
-#: src/address-book-config.c:291 src/address-book-config.c:336
-#: src/address-book-config.c:398 src/address-book-config.c:458
+#: src/address-book-config.c:312 src/address-book-config.c:357
+#: src/address-book-config.c:419 src/address-book-config.c:479
+#: src/address-book-config.c:538
 #, fuzzy
 msgid "A_ddress Book Name"
 msgstr "Название адресной книги"
 
-#: src/address-book-config.c:296 src/address-book-config.c:404
+#: src/address-book-config.c:317 src/address-book-config.c:425
 #, fuzzy
 msgid "_File Name"
 msgstr "Название файла"
 
-#: src/address-book-config.c:303
+#: src/address-book-config.c:324
 #, fuzzy
 msgid "Select path for VCARD address book"
 msgstr "Открыть адресную книгу"
 
-#: src/address-book-config.c:308 src/address-book-config.c:367
-#: src/address-book-config.c:417 src/address-book-config.c:489
+#: src/address-book-config.c:329 src/address-book-config.c:388
+#: src/address-book-config.c:438 src/address-book-config.c:510
+#: src/address-book-config.c:543
 msgid "_Expand aliases as you type"
 msgstr "Расширять псевдонимы при наборе"
 
-#: src/address-book-config.c:341
+#: src/address-book-config.c:362
 msgid "Load program location"
 msgstr ""
 
-#: src/address-book-config.c:348
+#: src/address-book-config.c:369
 #, fuzzy
 msgid "Select load program for address book"
 msgstr "Невозможно загрузить адресную книгу %s"
 
-#: src/address-book-config.c:354
+#: src/address-book-config.c:375
 msgid "Save program location"
 msgstr ""
 
-#: src/address-book-config.c:360
+#: src/address-book-config.c:381
 msgid "Select save program for address book"
 msgstr ""
 
-#: src/address-book-config.c:411
+#: src/address-book-config.c:432
 #, fuzzy
 msgid "Select path for LDIF address book"
 msgstr "Не удалось открыть адресную книгу LDIF %s."
 
-#: src/address-book-config.c:463
+#: src/address-book-config.c:484
 msgid "_Host Name"
 msgstr "Имя хоста"
 
-#: src/address-book-config.c:468
+#: src/address-book-config.c:489
 #, fuzzy
 msgid "Base Domain _Name"
 msgstr "Основное доменное имя"
 
-#: src/address-book-config.c:473
+#: src/address-book-config.c:494
 msgid "_User Name (Bind DN)"
 msgstr ""
 
-#: src/address-book-config.c:478
+#: src/address-book-config.c:499
 #, fuzzy
 msgid "_Password"
 msgstr "Пароль:"
 
-#: src/address-book-config.c:485
+#: src/address-book-config.c:506
 msgid "Enable _TLS"
 msgstr ""
 
-#: src/address-book-config.c:556 src/folder-conf.c:103
+#: src/address-book-config.c:605 src/folder-conf.c:103
 #, fuzzy, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: src/address-book-config.c:574 src/mailbox-conf.c:550
-#: src/pref-manager.c:1519 src/pref-manager.c:2665
+#: src/address-book-config.c:623 src/mailbox-conf.c:564
+#: src/pref-manager.c:1555 src/pref-manager.c:2699
 #, fuzzy
 msgid "_Add"
 msgstr "Добавить"
 
-#: src/address-book-config.c:653
+#: src/address-book-config.c:702
 #, fuzzy, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr ""
 "Путь к файлу адресной книги \"%s\" не корректен.\n"
 "Хотите исправить имя файла?"
 
-#: src/address-book-config.c:656
+#: src/address-book-config.c:705
 #, fuzzy, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "Файл с названием \"%s\" не является каталогом."
 
-#: src/address-book-config.c:659
+#: src/address-book-config.c:708
 #, fuzzy, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "Файл с названием \"%s\" не является каталогом."
 
-#: src/address-book-config.c:662
+#: src/address-book-config.c:711
 #, fuzzy, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "Файл с названием \"%s\" не является каталогом."
 
-#: src/address-book-config.c:665
+#: src/address-book-config.c:714
 msgid "Do you want to correct the path?"
 msgstr ""
 
@@ -1673,122 +1735,122 @@ msgstr "Пароль для почтового ящика %s@%s:"
 msgid "Password needed"
 msgstr "Пароль:"
 
-#: src/balsa-app.c:95 src/folder-conf.c:324
+#: src/balsa-app.c:95 src/folder-conf.c:344
 msgid "_Remember password"
 msgstr ""
 
-#: src/balsa-app.c:579
+#: src/balsa-app.c:578
 #, fuzzy, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Не удалось открыть почтовый ящик!"
 
-#: src/balsa-index.c:348
+#: src/balsa-index.c:351 src/pref-manager.c:353
 msgid "Subject"
 msgstr "Тема"
 
-#: src/balsa-index.c:362
+#: src/balsa-index.c:365 src/pref-manager.c:354
 msgid "Date"
 msgstr "Дата"
 
-#: src/balsa-index.c:374
+#: src/balsa-index.c:377 src/pref-manager.c:355
 msgid "Size"
 msgstr "Размер"
 
-#: src/balsa-index.c:870
+#: src/balsa-index.c:955
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Открытие почтового ящика %s. Пожалуйста подождите..."
 
 #. R
-#: src/balsa-index.c:1611 src/main-window.c:576 src/main-window.c:1021
+#: src/balsa-index.c:1712 src/main-window.c:578 src/main-window.c:1024
 #: src/message-window.c:143
 msgid "_Reply..."
 msgstr "Ответить..."
 
-#: src/balsa-index.c:1613
+#: src/balsa-index.c:1714
 #, fuzzy
 msgid "Reply To _All..."
 msgstr "Ответить всем..."
 
-#: src/balsa-index.c:1615
+#: src/balsa-index.c:1716
 #, fuzzy
 msgid "Reply To _Group..."
 msgstr "Ответить группе..."
 
-#: src/balsa-index.c:1617
+#: src/balsa-index.c:1718
 #, fuzzy
 msgid "_Forward Attached..."
 msgstr "Переслать присоединённым..."
 
-#: src/balsa-index.c:1619
+#: src/balsa-index.c:1720
 #, fuzzy
 msgid "Forward _Inline..."
 msgstr "Переслать вставленным..."
 
-#: src/balsa-index.c:1621 src/main-window.c:666 src/main-window.c:1005
+#: src/balsa-index.c:1722 src/main-window.c:668 src/main-window.c:1008
 msgid "_Store Address..."
 msgstr "Сохранить адрес..."
 
-#: src/balsa-index.c:1636 src/filter-edit-dialog.c:216 src/mailbox-node.c:957
-#: src/pref-manager.c:1521 src/pref-manager.c:2669
+#: src/balsa-index.c:1737 src/filter-edit-dialog.c:216 src/mailbox-node.c:965
+#: src/pref-manager.c:1557 src/pref-manager.c:2703
 msgid "_Delete"
 msgstr "Уничтожить"
 
-#: src/balsa-index.c:1641
+#: src/balsa-index.c:1742
 msgid "_Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index.c:1646
+#: src/balsa-index.c:1747
 #, fuzzy
 msgid "Move To _Trash"
 msgstr "Отправить в корзину"
 
-#: src/balsa-index.c:1650
+#: src/balsa-index.c:1751
 #, fuzzy
 msgid "T_oggle"
 msgstr "Переключить"
 
-#: src/balsa-index.c:1654 src/main-window.c:325 src/main-window.c:354
+#: src/balsa-index.c:1755 src/main-window.c:327 src/main-window.c:356
 #, fuzzy
 msgid "_Flagged"
 msgstr "Cигнализируемое"
 
-#: src/balsa-index.c:1657
+#: src/balsa-index.c:1758
 #, fuzzy
 msgid "_Unread"
 msgstr "Непрочитанное"
 
-#: src/balsa-index.c:1665
+#: src/balsa-index.c:1766
 #, fuzzy
 msgid "_Move to"
 msgstr "Переместить"
 
-#: src/balsa-index.c:1673
+#: src/balsa-index.c:1774
 #, fuzzy
 msgid "_View Source"
 msgstr "Источник сообщения"
 
-#: src/balsa-index.c:1942
+#: src/balsa-index.c:2042
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\"."
 msgstr ""
 
-#: src/balsa-index.c:1943
+#: src/balsa-index.c:2043
 #, fuzzy, c-format
 msgid "Failed to copy message to mailbox \"%s\"."
 msgstr "Отправить текущее сообщение в мусорную корзину"
 
-#: src/balsa-index.c:1956
+#: src/balsa-index.c:2056
 #, fuzzy, c-format
 msgid "Copied to \"%s\"."
 msgstr "Копирование сообщения %d в %s..."
 
-#: src/balsa-index.c:1957
+#: src/balsa-index.c:2057
 #, fuzzy, c-format
 msgid "Moved to \"%s\"."
 msgstr "Отправить в корзину"
 
-#: src/balsa-index.c:2073
+#: src/balsa-index.c:2177
 #, fuzzy, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Подтверждение почтового ящика %s не удалось."
@@ -1796,14 +1858,6 @@ msgstr "Подтверждение почтового ящика %s не уда�
 #: src/balsa-mblist.c:278
 msgid "Mailbox"
 msgstr "Почтовый ящик"
-
-#: src/balsa-mblist.c:306 src/filter-edit-callbacks.c:802
-msgid "Unread"
-msgstr "Непрочитанное"
-
-#: src/balsa-mblist.c:331
-msgid "Total"
-msgstr "Всего"
 
 #: src/balsa-mblist.c:1011 src/balsa-mblist.c:1047
 #, fuzzy
@@ -1820,7 +1874,7 @@ msgstr "Фильтры..."
 msgid "Choose destination folder"
 msgstr "Переместить в папку:"
 
-#: src/balsa-mblist.c:2033
+#: src/balsa-mblist.c:2034
 #, fuzzy, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1829,259 +1883,265 @@ msgstr[1] "Показан почтовый ящик: %s c %ld сообщения
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2039
+#: src/balsa-mblist.c:2040
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/balsa-message.c:578
+#: src/balsa-message.c:606
 #, fuzzy
 msgid "Content"
 msgstr "Продолжить"
 
-#: src/balsa-message.c:661
+#: src/balsa-message.c:688
 #, fuzzy
 msgid "Message parts"
 msgstr "Цвета письма"
 
-#: src/balsa-message.c:776
+#: src/balsa-message.c:803
 msgid "File already exists. Overwrite?"
 msgstr "Файл уже существует. Переписать?"
 
-#: src/balsa-message.c:788
+#: src/balsa-message.c:815
 #, fuzzy, c-format
 msgid "Could not save %s: %s"
 msgstr "Невозможно сохранить %s: %s"
 
-#: src/balsa-message.c:802
+#: src/balsa-message.c:829
 #, fuzzy, c-format
 msgid "Save %s MIME Part"
 msgstr "Сохранить MIME-закодированную часть"
 
-#: src/balsa-message.c:969
+#: src/balsa-message.c:996
 #, fuzzy
 msgid "Save selected..."
 msgstr "Выделить..."
 
-#: src/balsa-message.c:1108
+#: src/balsa-message.c:1135
 #, fuzzy
 msgid "(No sender)"
 msgstr "Без заголовков"
 
-#: src/balsa-message.c:1406 src/print.c:358 src/sendmsg-window.c:859
-#: src/sendmsg-window.c:2454
+#: src/balsa-message.c:1199 src/balsa-message.c:3699
+#, fuzzy, c-format
+msgid "Could not access message; mailbox \"%s\" was changed."
+msgstr "Отправить текущее сообщение в мусорную корзину"
+
+#: src/balsa-message.c:1453 src/print.c:358 src/sendmsg-window.c:863
+#: src/sendmsg-window.c:2459
 msgid "Subject:"
 msgstr "Тема:"
 
-#: src/balsa-message.c:1410 src/print.c:364 src/sendmsg-window.c:2448
+#: src/balsa-message.c:1457 src/print.c:364 src/sendmsg-window.c:2453
 msgid "Date:"
 msgstr "Дата:"
 
-#: src/balsa-message.c:1421 src/sendmsg-window.c:856
+#: src/balsa-message.c:1468 src/sendmsg-window.c:860
 #, fuzzy
 msgid "Reply-To:"
 msgstr "Обратный адрес:"
 
 #. cc:
-#: src/balsa-message.c:1425 src/print.c:374 src/sendmsg-window.c:858
-#: src/sendmsg-window.c:2146 src/sendmsg-window.c:2473 src/store-address.c:305
+#: src/balsa-message.c:1472 src/print.c:374 src/sendmsg-window.c:862
+#: src/sendmsg-window.c:2150 src/sendmsg-window.c:2478 src/store-address.c:305
 msgid "Cc:"
 msgstr "Официальные копии (Сс):"
 
 #. bcc:
-#: src/balsa-message.c:1426 src/print.c:375 src/sendmsg-window.c:857
-#: src/sendmsg-window.c:2151 src/store-address.c:306
+#: src/balsa-message.c:1473 src/print.c:375 src/sendmsg-window.c:861
+#: src/sendmsg-window.c:2155 src/store-address.c:306
 msgid "Bcc:"
 msgstr "Скрытые копии:"
 
-#: src/balsa-message.c:1429 src/print.c:376
+#: src/balsa-message.c:1476 src/print.c:376
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:1434 src/print.c:381
+#: src/balsa-message.c:1481 src/print.c:381
 msgid "Disposition-Notification-To:"
 msgstr ""
 
-#: src/balsa-message.c:1591
+#: src/balsa-message.c:1614 src/balsa-message.c:1645
 #, fuzzy, c-format
 msgid "Error loading attached image: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: src/balsa-message.c:1661 src/balsa-message.c:1677 src/balsa-message.c:1709
-#: src/balsa-message.c:1762
+#: src/balsa-message.c:1715 src/balsa-message.c:1731 src/balsa-message.c:1763
+#: src/balsa-message.c:1816
 msgid "Content Type: external-body\n"
 msgstr "Тип содержимого: external-body\n"
 
-#: src/balsa-message.c:1662
+#: src/balsa-message.c:1716
 msgid "Access type: local-file\n"
 msgstr "Тип доступа: local-file\n"
 
-#: src/balsa-message.c:1663 src/balsa-message.c:1716 src/balsa-message.c:1875
+#: src/balsa-message.c:1717 src/balsa-message.c:1770 src/balsa-message.c:1929
 #, c-format
 msgid "File name: %s"
 msgstr "Имя файла: %s"
 
-#: src/balsa-message.c:1678
+#: src/balsa-message.c:1732
 #, fuzzy
 msgid "Access type: URL\n"
 msgstr "Тип доступа: %s\n"
 
-#: src/balsa-message.c:1679
+#: src/balsa-message.c:1733
 #, c-format
 msgid "URL: %s"
 msgstr ""
 
-#: src/balsa-message.c:1710
+#: src/balsa-message.c:1764
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Тип доступа: %s\n"
 
-#: src/balsa-message.c:1713
+#: src/balsa-message.c:1767
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "Сайт FTP: %s\n"
 
-#: src/balsa-message.c:1715
+#: src/balsa-message.c:1769
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Каталог: %s\n"
 
-#: src/balsa-message.c:1763
+#: src/balsa-message.c:1817
 msgid "Access type: mail-server\n"
 msgstr "Тип доступа: mail-server\n"
 
-#: src/balsa-message.c:1764
+#: src/balsa-message.c:1818
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Почтовый сервер: %s\n"
 
-#: src/balsa-message.c:1766
+#: src/balsa-message.c:1820
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Тема: %s\n"
 
-#: src/balsa-message.c:1778
+#: src/balsa-message.c:1832
 #, fuzzy
 msgid "Se_nd message to obtain this part"
 msgstr "Послать почту из ящика \"Исходящие\""
 
-#: src/balsa-message.c:1883
+#: src/balsa-message.c:1937
 #, c-format
 msgid "Type: %s (%s)"
 msgstr ""
 
-#: src/balsa-message.c:1886
+#: src/balsa-message.c:1940
 #, c-format
 msgid "Content Type: %s"
 msgstr "Тип содержимого: %s"
 
-#: src/balsa-message.c:1897
+#: src/balsa-message.c:1951
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Нет действия для просмотра определенного в GNOME MIME для этого типа "
 "содержимого"
 
-#: src/balsa-message.c:1903
+#: src/balsa-message.c:1957
 #, fuzzy
 msgid "S_ave part"
 msgstr "Сохранить часть"
 
-#: src/balsa-message.c:1927 src/balsa-message.c:1952
+#: src/balsa-message.c:1981 src/balsa-message.c:2006
 #, fuzzy, c-format
 msgid "View _part with %s"
 msgstr "Просмотреть часть в %s"
 
-#: src/balsa-message.c:2231
+#: src/balsa-message.c:2285
 #, fuzzy, c-format
 msgid "Calling URL %s..."
 msgstr "Чтение %s..."
 
-#: src/balsa-message.c:2241 src/balsa-message.c:3093 src/balsa-message.c:3776
+#: src/balsa-message.c:2295 src/balsa-message.c:3116 src/balsa-message.c:3834
 #, fuzzy, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: src/balsa-message.c:2345
+#: src/balsa-message.c:2381
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
 "header describing the used codeset (converted to %s)"
 msgstr ""
 
-#: src/balsa-message.c:2444
-msgid "This is an OpenPGP signed message part:\n"
-msgstr ""
-
-#: src/balsa-message.c:2664
+#: src/balsa-message.c:2680
 #, fuzzy
 msgid "mixed parts"
 msgstr "Сохранить часть"
 
-#: src/balsa-message.c:2666
+#: src/balsa-message.c:2682
 #, fuzzy
 msgid "alternative parts"
 msgstr "Сохранить часть"
 
-#: src/balsa-message.c:2668
+#: src/balsa-message.c:2684
 msgid "signed parts"
 msgstr ""
 
-#: src/balsa-message.c:2670
+#: src/balsa-message.c:2686
 msgid "encrypted parts"
 msgstr ""
 
-#: src/balsa-message.c:2672
+#: src/balsa-message.c:2688
 #, fuzzy
 msgid "rfc822 message"
 msgstr "Напечатать письмо"
 
-#: src/balsa-message.c:2674
+#: src/balsa-message.c:2690
 #, c-format
 msgid "\"%s\" parts"
 msgstr ""
 
-#: src/balsa-message.c:2730
+#: src/balsa-message.c:2746
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr ""
 
-#: src/balsa-message.c:2737
+#: src/balsa-message.c:2753
 #, fuzzy
 msgid "complete message"
 msgstr "Составить сообщение"
 
-#: src/balsa-message.c:2754
+#: src/balsa-message.c:2770
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr ""
 
-#: src/balsa-message.c:2765
+#: src/balsa-message.c:2781
 #, fuzzy, c-format
 msgid "part %s: %s"
 msgstr "Невозможно сохранить %s: %s"
 
-#: src/balsa-message.c:2855
+#: src/balsa-message.c:2796
+#, fuzzy
+msgid "encrypted: "
+msgstr "Сбой идентификации"
+
+#: src/balsa-message.c:2878
 #, fuzzy, c-format
 msgid "Open with %s"
 msgstr "Просмотреть часть в %s"
 
-#: src/balsa-message.c:2986
+#: src/balsa-message.c:3009
 msgid "Save..."
 msgstr "Сохранить..."
 
-#: src/balsa-message.c:3175
+#: src/balsa-message.c:3194
 #, fuzzy, c-format
 msgid "Could not create temporary file %s"
 msgstr "невозможно создать временный файл %s"
 
-#: src/balsa-message.c:3220
+#: src/balsa-message.c:3239
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "невозможно создать временный файл %s"
 
-#: src/balsa-message.c:4050
+#: src/balsa-message.c:4111
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2089,27 +2149,86 @@ msgid ""
 "Do you want to send this notification?"
 msgstr ""
 
-#: src/balsa-message.c:4057
+#: src/balsa-message.c:4118
 #, fuzzy
 msgid "Reply to MDN?"
 msgstr "ответить MDN?"
 
-#: src/balsa-message.c:4260
+#: src/balsa-message.c:4436
+#, c-format
+msgid ""
+"This is an inline OpenPGP signed %s message part:\n"
+"%s"
+msgstr ""
+
+#: src/balsa-message.c:4454
+msgid "_Run gpg to import this key"
+msgstr ""
+
+#: src/balsa-message.c:4570 src/balsa-message.c:4793
+msgid ""
+"This operation can not be performed because this message is displayed more "
+"than once.\n"
+"Please close the other instances of this message and try again."
+msgstr ""
+
+#: src/balsa-message.c:4606
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains an encrypted part, but "
+"it's structure is invalid."
+msgstr ""
+
+#: src/balsa-message.c:4614
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: src/balsa-message.c:4627
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: src/balsa-message.c:4681
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a signed part, but it's "
+"structure is invalid. The signature, if there is any, can not be checked."
+msgstr ""
+
+#: src/balsa-message.c:4694
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr ""
 
-#: src/balsa-message.c:4263
+#: src/balsa-message.c:4696
 msgid "PGP"
 msgstr ""
 
-#: src/balsa-message.c:4263
+#: src/balsa-message.c:4696
 msgid "S/MIME"
 msgstr ""
 
-#: src/balsa-message.c:4298 src/balsa-message.c:4615
+#: src/balsa-message.c:4715 src/balsa-message.c:4820
+#, fuzzy
+msgid "Detected a good signature"
+msgstr "Подпись"
+
+#: src/balsa-message.c:4721
+msgid "Detected a good signature with insufficient validity"
+msgstr ""
+
+#: src/balsa-message.c:4726 src/balsa-message.c:4824
+msgid "Detected a good signature with insufficient validity/trust"
+msgstr ""
+
+#: src/balsa-message.c:4733 src/balsa-message.c:4830
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2117,43 +2236,11 @@ msgid ""
 "%s"
 msgstr ""
 
-#: src/balsa-message.c:4305
+#: src/balsa-message.c:4745
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
-msgstr ""
-
-#: src/balsa-message.c:4337
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a signed part, but it's "
-"structure is invalid. The signature, if there is any, can not be checked."
-msgstr ""
-
-#: src/balsa-message.c:4401
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains an encrypted part, but "
-"it's structure is invalid."
-msgstr ""
-
-#: src/balsa-message.c:4408
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
-"but this crypto protocol is not available."
-msgstr ""
-
-#: src/balsa-message.c:4420
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
-"but this crypto protocol is not available."
-msgstr ""
-
-#: src/balsa-message.c:4513 src/balsa-message.c:4730
-msgid "_Run gpg to import this key"
 msgstr ""
 
 #: src/filter-edit-callbacks.c:286
@@ -2221,6 +2308,10 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr "Ошибка соединения c %s."
+
+#: src/filter-edit-callbacks.c:802
+msgid "Unread"
+msgstr "Непрочитанное"
 
 #: src/filter-edit-callbacks.c:802
 #, fuzzy
@@ -2293,19 +2384,19 @@ msgstr "Где угодно"
 msgid "C_lear"
 msgstr "Закрыть"
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:3647
+#: src/filter-edit-callbacks.c:1011 src/main-window.c:3715
 #, fuzzy
 msgid "_Body"
 msgstr "В тексте письма"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:3648
-#: src/sendmsg-window.c:2135
+#: src/filter-edit-callbacks.c:1018 src/main-window.c:3716
+#: src/sendmsg-window.c:2139
 #, fuzzy
 msgid "_To:"
 msgstr "Кому"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:3649
+#: src/filter-edit-callbacks.c:1025 src/main-window.c:3717
 #, fuzzy
 msgid "_From:"
 msgstr "От:"
@@ -2314,7 +2405,7 @@ msgstr "От:"
 msgid "_Subject"
 msgstr "Тема"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:3651
+#: src/filter-edit-callbacks.c:1040 src/main-window.c:3719
 #, fuzzy
 msgid "_Cc:"
 msgstr "Официальные копии (Сс)"
@@ -2371,7 +2462,7 @@ msgstr ""
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr ""
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:346
+#: src/filter-edit-dialog.c:88 src/pref-manager.c:361
 msgid "Simple"
 msgstr "Простое"
 
@@ -2417,8 +2508,8 @@ msgstr ""
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:929 src/main-window.c:365
-#: src/main-window.c:424
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:937 src/main-window.c:367
+#: src/main-window.c:426
 msgid "_New"
 msgstr "Новое"
 
@@ -2565,79 +2656,83 @@ msgid ""
 "mailbox"
 msgstr ""
 
-#: src/folder-conf.c:259
+#: src/folder-conf.c:269
 msgid "Remote IMAP folder"
 msgstr "Удаленный IMAP сервер"
 
 #. must NOT be modal
-#: src/folder-conf.c:262 src/folder-conf.c:684 src/mailbox-conf.c:561
+#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:575
 #, fuzzy
 msgid "_Update"
 msgstr "Обновить"
 
-#: src/folder-conf.c:262 src/folder-conf.c:684
+#: src/folder-conf.c:272 src/folder-conf.c:704
 #, fuzzy
 msgid "_Create"
 msgstr "Создать"
 
-#: src/folder-conf.c:282 src/mailbox-conf.c:1042 src/mailbox-conf.c:1132
+#: src/folder-conf.c:294 src/mailbox-conf.c:1073 src/mailbox-conf.c:1164
 #, fuzzy
 msgid "_Basic"
 msgstr "Скрытые копии"
 
-#: src/folder-conf.c:287
+#: src/folder-conf.c:299
 msgid "_Max number of connections"
 msgstr ""
 
-#: src/folder-conf.c:294 src/mailbox-conf.c:1201
+#: src/folder-conf.c:306 src/mailbox-conf.c:1234
 msgid "Enable _persistent cache"
 msgstr ""
 
-#: src/folder-conf.c:301 src/mailbox-conf.c:1095 src/mailbox-conf.c:1204
+#: src/folder-conf.c:314 src/mailbox-conf.c:1238
+msgid "Enable _bug workarounds"
+msgstr ""
+
+#: src/folder-conf.c:320 src/mailbox-conf.c:1127 src/mailbox-conf.c:1240
 #, fuzzy
 msgid "_Advanced"
 msgstr "Отменить"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:304
+#: src/folder-conf.c:323
 msgid "Descriptive _Name:"
 msgstr "Описательное имя:"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:311 src/mailbox-conf.c:1050 src/mailbox-conf.c:1141
+#: src/folder-conf.c:330 src/mailbox-conf.c:1081 src/mailbox-conf.c:1173
 msgid "_Server:"
 msgstr "Сервер:"
 
 #. username
-#: src/folder-conf.c:318 src/mailbox-conf.c:1057
+#: src/folder-conf.c:338 src/mailbox-conf.c:1089
 #, fuzzy
 msgid "Use_r name:"
 msgstr "Имя пользователя:"
 
-#: src/folder-conf.c:329
+#: src/folder-conf.c:349
 msgid "_Password:"
 msgstr "Пароль:"
 
-#: src/folder-conf.c:334
+#: src/folder-conf.c:354
 #, fuzzy
 msgid "Subscribed _folders only"
 msgstr "Только подписанные папки"
 
-#: src/folder-conf.c:336
+#: src/folder-conf.c:356
 msgid "Always show _INBOX"
 msgstr ""
 
-#: src/folder-conf.c:339
+#: src/folder-conf.c:359
 #, fuzzy
 msgid "Pr_efix"
 msgstr "Префикс"
 
-#: src/folder-conf.c:484
+#: src/folder-conf.c:504
 msgid "Select parent folder"
 msgstr ""
 
-#: src/folder-conf.c:557
+#: src/folder-conf.c:577
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2647,52 +2742,52 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/folder-conf.c:563
+#: src/folder-conf.c:583
 msgid "Question"
 msgstr ""
 
-#: src/folder-conf.c:568
+#: src/folder-conf.c:588
 msgid "Rename INBOX"
 msgstr ""
 
-#: src/folder-conf.c:570
+#: src/folder-conf.c:590
 msgid "Cancel"
 msgstr "Отменить"
 
-#: src/folder-conf.c:666
+#: src/folder-conf.c:686
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr ""
 
-#: src/folder-conf.c:681
+#: src/folder-conf.c:701
 msgid "Remote IMAP subfolder"
 msgstr "Удалить вложенную папку IMAP"
 
-#: src/folder-conf.c:703
+#: src/folder-conf.c:725
 msgid "Rename or move subfolder"
 msgstr "Переименовать или перенести вложенную папку"
 
-#: src/folder-conf.c:704
+#: src/folder-conf.c:726
 msgid "Create subfolder"
 msgstr "Создать вложенную папку"
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:711
+#: src/folder-conf.c:733
 msgid "_Folder name:"
 msgstr "Название папки:"
 
-#: src/folder-conf.c:717
+#: src/folder-conf.c:739
 #, fuzzy
 msgid "_Subfolder of:"
 msgstr "Только подписанные папки"
 
-#: src/folder-conf.c:722
+#: src/folder-conf.c:744
 #, fuzzy
 msgid "_Browse..."
 msgstr "Просмотр..."
 
-#: src/folder-conf.c:753
+#: src/folder-conf.c:775
 #, fuzzy
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
@@ -2700,7 +2795,7 @@ msgid ""
 msgstr ""
 "Эта папка не хранится в конфигурации. Неизвестно как удалить ее с сервера."
 
-#: src/folder-conf.c:762
+#: src/folder-conf.c:784
 #, fuzzy, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2711,7 +2806,7 @@ msgstr ""
 "\"\n"
 "Что вы хотите сделать?"
 
-#: src/folder-conf.c:767
+#: src/folder-conf.c:789
 msgid "Confirm"
 msgstr ""
 
@@ -2735,34 +2830,34 @@ msgstr "ОШИБКА: "
 msgid "FATAL: "
 msgstr "ФАТАЛЬНОЕ: "
 
-#: src/mailbox-conf.c:164 src/pref-manager.c:335 src/pref-manager.c:2999
-#: src/pref-manager.c:3078
+#: src/mailbox-conf.c:178 src/mailbox-conf.c:1327 src/pref-manager.c:341
+#: src/pref-manager.c:3021 src/pref-manager.c:3111
 msgid "Never"
 msgstr "Никогда"
 
-#: src/mailbox-conf.c:165 src/pref-manager.c:3079
+#: src/mailbox-conf.c:179 src/mailbox-conf.c:1328 src/pref-manager.c:3112
 msgid "If Possible"
 msgstr ""
 
-#: src/mailbox-conf.c:166 src/pref-manager.c:3080
+#: src/mailbox-conf.c:180 src/pref-manager.c:3113
 msgid "Required"
 msgstr ""
 
-#: src/mailbox-conf.c:174
+#: src/mailbox-conf.c:188
 #, fuzzy
 msgid "Use _SSL"
 msgstr "Использовать TLS"
 
-#: src/mailbox-conf.c:178
+#: src/mailbox-conf.c:192
 #, fuzzy
 msgid "Use _TLS"
 msgstr "Использовать TLS"
 
-#: src/mailbox-conf.c:315
+#: src/mailbox-conf.c:329
 msgid "No mailbox selected."
 msgstr "Почтовый ящик не выбран."
 
-#: src/mailbox-conf.c:342
+#: src/mailbox-conf.c:356
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2770,7 +2865,7 @@ msgid ""
 "to some other mailbox."
 msgstr ""
 
-#: src/mailbox-conf.c:352
+#: src/mailbox-conf.c:366
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2785,17 +2880,17 @@ msgstr ""
 "при помощи команды \"Добавить почтовый ящик\"\n"
 "Что вы хотите сделать?"
 
-#: src/mailbox-conf.c:364
+#: src/mailbox-conf.c:378
 #, fuzzy
 msgid "Remove from _list"
 msgstr "Удалить из списка"
 
-#: src/mailbox-conf.c:365
+#: src/mailbox-conf.c:379
 #, fuzzy
 msgid "Remove from list and _disk"
 msgstr "Удалить из списка и с диска"
 
-#: src/mailbox-conf.c:373
+#: src/mailbox-conf.c:387
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2809,12 +2904,12 @@ msgstr ""
 "\"\n"
 "Что вы хотите сделать?"
 
-#: src/mailbox-conf.c:386
+#: src/mailbox-conf.c:400
 #, fuzzy
 msgid "_Remove from server"
 msgstr "Удалить с сервера"
 
-#: src/mailbox-conf.c:393
+#: src/mailbox-conf.c:407
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2826,25 +2921,25 @@ msgstr ""
 "почтовый ящик\"\n"
 "Что вы хотите сделать?"
 
-#: src/mailbox-conf.c:402
+#: src/mailbox-conf.c:416
 #, fuzzy
 msgid "_Remove from list"
 msgstr "Удалить из списка"
 
-#: src/mailbox-conf.c:490 src/sendmsg-window.c:1036
+#: src/mailbox-conf.c:504 src/sendmsg-window.c:1040
 msgid "Select Identity"
 msgstr "Выбрать пользователя"
 
-#: src/mailbox-conf.c:517
+#: src/mailbox-conf.c:531
 msgid "Mailbox Configurator"
 msgstr "Конфигурация почт. ящика"
 
-#: src/mailbox-conf.c:707
+#: src/mailbox-conf.c:726
 #, c-format
 msgid "%s on %s"
 msgstr "%s на %s"
 
-#: src/mailbox-conf.c:836
+#: src/mailbox-conf.c:864
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2854,893 +2949,902 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:998 src/mailbox-conf.c:1045 src/mailbox-conf.c:1135
+#: src/mailbox-conf.c:1029 src/mailbox-conf.c:1076 src/mailbox-conf.c:1167
 msgid "Mailbox _Name:"
 msgstr "Название почтового ящика:"
 
 #. path to file
-#: src/mailbox-conf.c:1006
+#: src/mailbox-conf.c:1037
 msgid "Mailbox _Path:"
 msgstr "Путь к почтовому ящику:"
 
-#: src/mailbox-conf.c:1008
+#: src/mailbox-conf.c:1039
 #, fuzzy
 msgid "Mailbox Path"
 msgstr "Путь к почтовому ящику:"
 
 #. password field
-#: src/mailbox-conf.c:1063 src/mailbox-conf.c:1162
+#: src/mailbox-conf.c:1095 src/mailbox-conf.c:1195
 msgid "Pass_word:"
 msgstr "Пароль:"
 
-#: src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:1103
 msgid "_Delete messages from server after download"
 msgstr "Удалить сообщения с сервера после скачивания"
 
-#: src/mailbox-conf.c:1076
+#: src/mailbox-conf.c:1108
 msgid "_Filter messages through procmail"
 msgstr "Фильтровать сообщения через procmail"
 
-#: src/mailbox-conf.c:1080
+#: src/mailbox-conf.c:1112
 #, fuzzy
 msgid "Fi_lter Command:"
 msgstr "Команда:"
 
-#: src/mailbox-conf.c:1088
+#: src/mailbox-conf.c:1120
 msgid "_Enable check for new mail"
 msgstr "Включить проверку новой почты"
 
-#: src/mailbox-conf.c:1099
+#: src/mailbox-conf.c:1131
 msgid "Disable _APOP"
 msgstr ""
 
 #. username
-#: src/mailbox-conf.c:1148
+#: src/mailbox-conf.c:1181
 msgid "_Username:"
 msgstr "Имя пользователя:"
 
-#: src/mailbox-conf.c:1156
+#: src/mailbox-conf.c:1189
 #, fuzzy
 msgid "_Remember Password"
 msgstr "Пароль:"
 
-#: src/mailbox-conf.c:1167
+#: src/mailbox-conf.c:1200
 msgid "F_older Path:"
 msgstr "Путь к папке:"
 
-#: src/mailbox-conf.c:1252
+#: src/mailbox-conf.c:1288
 #, fuzzy
 msgid "Identity:"
 msgstr "Правка пользователя"
 
-#: src/mailbox-conf.c:1258
+#: src/mailbox-conf.c:1294
 #, fuzzy
 msgid "(No identity set)"
 msgstr "Выбрать пользователя"
 
-#: src/mailbox-conf.c:1262
+#: src/mailbox-conf.c:1298
 #, fuzzy
 msgid "C_hange..."
 msgstr "Письмо..."
 
-#: src/mailbox-conf.c:1269
+#: src/mailbox-conf.c:1305
 #, fuzzy
 msgid "Show address:"
 msgstr "Сохранить адрес"
 
-#: src/mailbox-conf.c:1272
+#: src/mailbox-conf.c:1308
 #, fuzzy
 msgid "_From"
 msgstr "От:"
 
-#: src/mailbox-conf.c:1278
+#: src/mailbox-conf.c:1314
 msgid "_To"
 msgstr "Кому"
 
-#: src/mailbox-node.c:259
+#: src/mailbox-conf.c:1329 src/pref-manager.c:3023
+msgid "Always"
+msgstr "Всегда"
+
+#: src/mailbox-conf.c:1333
+msgid ""
+"decrypt and check\n"
+"signatures automatically"
+msgstr ""
+
+#: src/mailbox-node.c:266
 msgid "The folder edition to be written."
 msgstr ""
 
-#: src/mailbox-node.c:420
+#: src/mailbox-node.c:428
 #, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
 msgstr ""
 
-#: src/mailbox-node.c:422
+#: src/mailbox-node.c:430
 #, fuzzy, c-format
 msgid "Scanning of %s failed: %s"
 msgstr ""
 "Не удалось переименовать %s в %s:\n"
 "%s"
 
-#: src/mailbox-node.c:471
+#: src/mailbox-node.c:479
 #, fuzzy, c-format
 msgid "Scanning %s. Please wait..."
 msgstr "Открытие почтового ящика %s. Пожалуйста подождите..."
 
-#: src/mailbox-node.c:914
+#: src/mailbox-node.c:922
 #, fuzzy
 msgid "Local _mbox mailbox..."
 msgstr "Локальный почтовый ящик Mbox..."
 
-#: src/mailbox-node.c:916
+#: src/mailbox-node.c:924
 #, fuzzy
 msgid "Local Mail_dir mailbox..."
 msgstr "Локальный почтовый ящик Maildir..."
 
-#: src/mailbox-node.c:918
+#: src/mailbox-node.c:926
 #, fuzzy
 msgid "Local M_H mailbox..."
 msgstr "Локальный почтовый ящик MH..."
 
-#: src/mailbox-node.c:920
+#: src/mailbox-node.c:928
 #, fuzzy
 msgid "Remote _IMAP mailbox..."
 msgstr "Удаленный почтовый ящик IMAP..."
 
-#: src/mailbox-node.c:923
+#: src/mailbox-node.c:931
 #, fuzzy
 msgid "Remote IMAP _folder..."
 msgstr "Удаленная папка IMAP..."
 
-#: src/mailbox-node.c:925
+#: src/mailbox-node.c:933
 #, fuzzy
 msgid "Remote IMAP _subfolder..."
 msgstr "Удалить вложенную папку IMAP..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:936 src/mailbox-node.c:962
+#: src/mailbox-node.c:944 src/mailbox-node.c:970
 #, fuzzy
 msgid "_Rescan"
 msgstr "Перечитать"
 
-#: src/mailbox-node.c:945
+#: src/mailbox-node.c:953
 #, fuzzy
 msgid "_Open"
 msgstr "Открыть"
 
-#: src/mailbox-node.c:948 src/main-window.c:737 src/main-window.c:834
+#: src/mailbox-node.c:956 src/main-window.c:739 src/main-window.c:836
 msgid "_Close"
 msgstr "Закрыть"
 
-#: src/mailbox-node.c:954
+#: src/mailbox-node.c:962
 #, fuzzy
 msgid "_Properties..."
 msgstr "Свойства..."
 
-#: src/mailbox-node.c:969
+#: src/mailbox-node.c:977
 #, fuzzy
 msgid "_Subscribe"
 msgstr "Подписаться"
 
-#: src/mailbox-node.c:971
+#: src/mailbox-node.c:979
 #, fuzzy
 msgid "_Unsubscribe"
 msgstr "Отказаться от подписки"
 
-#: src/mailbox-node.c:976
+#: src/mailbox-node.c:984
 #, fuzzy
 msgid "Mark as _Inbox"
 msgstr "Пометить как входящие"
 
-#: src/mailbox-node.c:979
+#: src/mailbox-node.c:987
 #, fuzzy
 msgid "_Mark as Sentbox"
 msgstr "Пометить как отправленные"
 
-#: src/mailbox-node.c:982
+#: src/mailbox-node.c:990
 #, fuzzy
 msgid "Mark as _Trash"
 msgstr "Пометить как удаленные"
 
-#: src/mailbox-node.c:985
+#: src/mailbox-node.c:993
 #, fuzzy
 msgid "Mark as D_raftbox"
 msgstr "Пометить как черновики"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:988
+#: src/mailbox-node.c:996
 msgid "_Edit/Apply filters"
 msgstr ""
 
-#: src/mailbox-node.c:1069
+#: src/mailbox-node.c:1077
 #, fuzzy, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
 msgstr "Вероятно почтовый ящик \"%s\" испорчен."
 
-#: src/mailbox-node.c:1082
+#: src/mailbox-node.c:1090
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Локальный почтовый ящик %s загружен как: %s\n"
 
-#: src/mailbox-node.c:1109
+#: src/mailbox-node.c:1117
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Локальная папка %s\n"
 
-#: src/main-window.c:274
+#: src/main-window.c:276
 msgid "Balsa closes files and connections. Please wait..."
 msgstr ""
 
-#: src/main-window.c:313 src/main-window.c:359
+#: src/main-window.c:315 src/main-window.c:361
 #, fuzzy
 msgid "_Deleted"
 msgstr "Уничтожить"
 
-#: src/main-window.c:316
+#: src/main-window.c:318
 #, fuzzy
 msgid "Un_Deleted"
 msgstr "Удалить"
 
-#: src/main-window.c:319
+#: src/main-window.c:321
 #, fuzzy
 msgid "_Read"
 msgstr "Перечитать"
 
-#: src/main-window.c:322
+#: src/main-window.c:324
 #, fuzzy
 msgid "Un_read"
 msgstr "Непрочитанное"
 
-#: src/main-window.c:328
+#: src/main-window.c:330
 #, fuzzy
 msgid "Un_flagged"
 msgstr "Cигнализируемое"
 
-#: src/main-window.c:331 src/main-window.c:371
+#: src/main-window.c:333 src/main-window.c:373
 #, fuzzy
 msgid "_Answered"
 msgstr "Непрочитанное"
 
-#: src/main-window.c:334
+#: src/main-window.c:336
 msgid "Un_answered"
 msgstr ""
 
-#: src/main-window.c:340
+#: src/main-window.c:342
 #, fuzzy
 msgid "_No Headers"
 msgstr "Без заголовков"
 
-#: src/main-window.c:340
+#: src/main-window.c:342
 msgid "Display no headers"
 msgstr "Не показывать заголовки"
 
-#: src/main-window.c:342
+#: src/main-window.c:344
 msgid "S_elected Headers"
 msgstr "Выбранные заголовки"
 
-#: src/main-window.c:343
+#: src/main-window.c:345
 msgid "Display selected headers"
 msgstr "Показать выбранные заголовки"
 
-#: src/main-window.c:345 src/message-window.c:85
+#: src/main-window.c:347 src/message-window.c:85
 msgid "All _Headers"
 msgstr "Все заголовки"
 
-#: src/main-window.c:345
+#: src/main-window.c:347
 msgid "Display all headers"
 msgstr "Показывать все заголовки"
 
-#: src/main-window.c:354
+#: src/main-window.c:356
 msgid "Toggle flagged"
 msgstr "Переключить сигнализируемое"
 
-#: src/main-window.c:360
+#: src/main-window.c:362
 #, fuzzy
 msgid "Toggle deleted flag"
 msgstr "Составить новое письмо"
 
-#: src/main-window.c:365
+#: src/main-window.c:367
 msgid "Toggle New"
 msgstr "Переключить новый"
 
-#: src/main-window.c:371
+#: src/main-window.c:373
 #, fuzzy
 msgid "Toggle Answered"
 msgstr "Переключить новый"
 
-#: src/main-window.c:386
+#: src/main-window.c:388
 msgid "_Message..."
 msgstr "Письмо..."
 
-#: src/main-window.c:386 src/main-window.c:1015
+#: src/main-window.c:388 src/main-window.c:1018
 msgid "Compose a new message"
 msgstr "Составить новое письмо"
 
 #. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
 #. of including at specified position
-#: src/main-window.c:393
+#: src/main-window.c:395
 msgid "Local mbox mailbox..."
 msgstr "Локальный почтовый ящик Mbox..."
 
-#: src/main-window.c:394 src/main-window.c:790
+#: src/main-window.c:396 src/main-window.c:792
 msgid "Add a new mbox style mailbox"
 msgstr "Добавить новый почтовый ящик в стиле mbox"
 
-#: src/main-window.c:397
+#: src/main-window.c:399
 msgid "Local Maildir mailbox..."
 msgstr "Локальный почтовый ящик Maildir..."
 
-#: src/main-window.c:398 src/main-window.c:795
+#: src/main-window.c:400 src/main-window.c:797
 msgid "Add a new Maildir style mailbox"
 msgstr "Добавить новый почтовый ящик в стиле Maildir"
 
-#: src/main-window.c:401
+#: src/main-window.c:403
 msgid "Local MH mailbox..."
 msgstr "Локальный почтовый ящик MH..."
 
-#: src/main-window.c:402 src/main-window.c:799
+#: src/main-window.c:404 src/main-window.c:801
 msgid "Add a new MH style mailbox"
 msgstr "Добавить новый почтовый ящик в стиле MH"
 
-#: src/main-window.c:405 src/main-window.c:802 src/pref-manager.c:2832
+#: src/main-window.c:407 src/main-window.c:804 src/pref-manager.c:2866
 msgid "Remote IMAP mailbox..."
 msgstr "Удаленный почтовый ящик IMAP..."
 
-#: src/main-window.c:406 src/main-window.c:803
+#: src/main-window.c:408 src/main-window.c:805
 msgid "Add a new IMAP mailbox"
 msgstr "Добавить новый почтовый ящик IMAP"
 
-#: src/main-window.c:410 src/main-window.c:807 src/pref-manager.c:2837
+#: src/main-window.c:412 src/main-window.c:809 src/pref-manager.c:2871
 msgid "Remote IMAP folder..."
 msgstr "Удаленная папка IMAP..."
 
-#: src/main-window.c:411 src/main-window.c:808
+#: src/main-window.c:413 src/main-window.c:810
 msgid "Add a new IMAP folder"
 msgstr "Добавить новую папку IMAP"
 
-#: src/main-window.c:414 src/main-window.c:811
+#: src/main-window.c:416 src/main-window.c:813
 msgid "Remote IMAP subfolder..."
 msgstr "Удалить вложенную папку IMAP..."
 
-#: src/main-window.c:415 src/main-window.c:812
+#: src/main-window.c:417 src/main-window.c:814
 #, fuzzy
 msgid "Add a new IMAP subfolder"
 msgstr "Добавить новую вложенную папку IMAP"
 
-#: src/main-window.c:428
+#: src/main-window.c:430
 msgid "_Continue"
 msgstr "Продолжить"
 
-#: src/main-window.c:429
+#: src/main-window.c:431
 msgid "Continue editing current message"
 msgstr "Продолжить редактирование текущего письма"
 
 #. Ctrl-M
-#: src/main-window.c:436 src/main-window.c:854
+#: src/main-window.c:438 src/main-window.c:856
 msgid "_Get New Mail"
 msgstr "Проверить почту"
 
-#: src/main-window.c:436 src/main-window.c:854
+#: src/main-window.c:438 src/main-window.c:856
 msgid "Fetch new incoming mail"
 msgstr "Взять вновь пришедшую почту"
 
 #. Ctrl-S
-#: src/main-window.c:442 src/main-window.c:849
+#: src/main-window.c:444 src/main-window.c:851
 msgid "_Send Queued Mail"
 msgstr "Послать почту из очереди"
 
-#: src/main-window.c:443 src/main-window.c:850
+#: src/main-window.c:445 src/main-window.c:852
 #, fuzzy
 msgid "Send messages from the outbox"
 msgstr "Послать почту из ящика \"Исходящие\""
 
 #. Ctrl-B
-#: src/main-window.c:449 src/main-window.c:844
+#: src/main-window.c:451 src/main-window.c:846
 #, fuzzy
 msgid "Send and _Receive Mail"
 msgstr "Послать почту из очереди"
 
-#: src/main-window.c:450 src/main-window.c:845 src/toolbar-factory.c:123
+#: src/main-window.c:452 src/main-window.c:847 src/toolbar-factory.c:123
 #, fuzzy
 msgid "Send and Receive messages"
 msgstr "Послать это сообщение"
 
-#: src/main-window.c:455 src/main-window.c:859 src/sendmsg-window.c:338
-#: src/sendmsg-window.c:499
+#: src/main-window.c:457 src/main-window.c:861 src/sendmsg-window.c:339
+#: src/sendmsg-window.c:500
 msgid "_Print..."
 msgstr "Печать..."
 
-#: src/main-window.c:456 src/main-window.c:860 src/toolbar-factory.c:119
+#: src/main-window.c:458 src/main-window.c:862 src/toolbar-factory.c:119
 msgid "Print current message"
 msgstr "Напечатать текущее письмо"
 
-#: src/main-window.c:462 src/main-window.c:1074
+#: src/main-window.c:464 src/main-window.c:1077
 msgid "_Address Book..."
 msgstr "Адресная книга..."
 
-#: src/main-window.c:463 src/main-window.c:1075
+#: src/main-window.c:465 src/main-window.c:1078
 msgid "Open the address book"
 msgstr "Открыть адресную книгу"
 
-#: src/main-window.c:487
+#: src/main-window.c:489
 #, fuzzy
 msgid "F_ilters..."
 msgstr "Фильтры..."
 
-#: src/main-window.c:487 src/main-window.c:1061
+#: src/main-window.c:489 src/main-window.c:1064
 msgid "Manage filters"
 msgstr "Управление фильтрами"
 
-#: src/main-window.c:489 src/main-window.c:1067
+#: src/main-window.c:491 src/main-window.c:1070
 #, fuzzy
 msgid "_Export Filters"
 msgstr "Фильтры..."
 
-#: src/main-window.c:489 src/main-window.c:1068
+#: src/main-window.c:491 src/main-window.c:1071
 msgid "Export filters as Sieve scripts"
 msgstr ""
 
-#: src/main-window.c:497
+#: src/main-window.c:499
 msgid "_Flat index"
 msgstr "Сплошной индекс"
 
-#: src/main-window.c:498
+#: src/main-window.c:500
 msgid "No threading at all"
 msgstr "Не разбирать по темам"
 
-#: src/main-window.c:503
+#: src/main-window.c:505
 #, fuzzy
 msgid "Si_mple threading"
 msgstr "Простой разбор по темам"
 
-#: src/main-window.c:504
+#: src/main-window.c:506
 msgid "Simple threading algorithm"
 msgstr "Простой алгоритм разбора по темам"
 
-#: src/main-window.c:509
+#: src/main-window.c:511
 msgid "_JWZ threading"
 msgstr "Разбор по темам JWZ"
 
-#: src/main-window.c:510
+#: src/main-window.c:512
 msgid "Elaborate JWZ threading"
 msgstr "Развитие разбора по темам JWZ"
 
-#: src/main-window.c:520
+#: src/main-window.c:522
 msgid "_Show Mailbox Tree"
 msgstr "Показать дерево почтового ящика"
 
-#: src/main-window.c:521
+#: src/main-window.c:523
 msgid "Toggle display of mailbox and folder tree"
 msgstr "Переключить отображение почтового ящика и дерева папок"
 
-#: src/main-window.c:525
+#: src/main-window.c:527
 msgid "Show Mailbox _Tabs"
 msgstr "Показать закладки почтового ящика"
 
-#: src/main-window.c:526
+#: src/main-window.c:528
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "Переключить отображение закладок почтового ящика"
 
-#: src/main-window.c:530 src/main-window.c:928 src/message-window.c:116
+#: src/main-window.c:532 src/main-window.c:931 src/message-window.c:116
 msgid "_Wrap"
 msgstr "Перенос"
 
-#: src/main-window.c:530 src/main-window.c:928 src/sendmsg-window.c:367
-#: src/sendmsg-window.c:524
+#: src/main-window.c:532 src/main-window.c:931 src/sendmsg-window.c:368
+#: src/sendmsg-window.c:525
 msgid "Wrap message lines"
 msgstr "Переносить строки письма"
 
-#: src/main-window.c:539 src/main-window.c:934
+#: src/main-window.c:541 src/main-window.c:937
 #, fuzzy
 msgid "E_xpand All"
 msgstr "Раскрыть все"
 
-#: src/main-window.c:540 src/main-window.c:935
+#: src/main-window.c:542 src/main-window.c:938
 msgid "Expand all threads"
 msgstr "Расширять все подборки"
 
-#: src/main-window.c:544 src/main-window.c:939
+#: src/main-window.c:546 src/main-window.c:942
 msgid "_Collapse All"
 msgstr "Свернуть все"
 
-#: src/main-window.c:545 src/main-window.c:940
+#: src/main-window.c:547 src/main-window.c:943
 msgid "Collapse all expanded threads"
 msgstr "Свернуть все развёрнутые подборки"
 
-#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
+#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
 msgid "Zoom _In"
 msgstr ""
 
-#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
+#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
 msgid "Increase magnification"
 msgstr ""
 
-#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
+#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
 msgid "Zoom _Out"
 msgstr ""
 
-#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
+#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
 msgid "Decrease magnification"
 msgstr ""
 
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
 #. * format specifier:
-#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
+#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
 #, no-c-format
 msgid "Zoom _100%"
 msgstr ""
 
-#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
+#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
 #, fuzzy
 msgid "No magnification"
 msgstr "Уведомление:"
 
-#: src/main-window.c:577 src/main-window.c:1022 src/toolbar-factory.c:99
+#: src/main-window.c:579 src/main-window.c:1025 src/toolbar-factory.c:99
 msgid "Reply to the current message"
 msgstr "Ответить на текущее письмо"
 
 #. A
-#: src/main-window.c:584 src/main-window.c:1028 src/message-window.c:148
+#: src/main-window.c:586 src/main-window.c:1031 src/message-window.c:148
 msgid "Reply to _All..."
 msgstr "Ответить всем..."
 
-#: src/main-window.c:585 src/main-window.c:1029
+#: src/main-window.c:587 src/main-window.c:1032
 msgid "Reply to all recipients of the current message"
 msgstr "Ответить всем адресатам текущего письма"
 
-#: src/main-window.c:592 src/message-window.c:154
+#: src/main-window.c:594 src/message-window.c:154
 msgid "Reply to _Group..."
 msgstr "Ответить группе..."
 
-#: src/main-window.c:593 src/message-window.c:155 src/toolbar-factory.c:103
+#: src/main-window.c:595 src/message-window.c:155 src/toolbar-factory.c:103
 msgid "Reply to mailing list"
 msgstr "Ответить в список рассылки"
 
-#: src/main-window.c:600 src/message-window.c:160
+#: src/main-window.c:602 src/message-window.c:160
 msgid "_Forward attached..."
 msgstr "Переслать присоединённым..."
 
-#: src/main-window.c:601
+#: src/main-window.c:603
 msgid "Forward the current message as attachment"
 msgstr "Переслать текущее письмо как вложение"
 
-#: src/main-window.c:607
+#: src/main-window.c:609
 #, fuzzy
 msgid "Forward _inline..."
 msgstr "Переслать вложенным..."
 
-#: src/main-window.c:608
+#: src/main-window.c:610
 msgid "Forward the current message inline"
 msgstr "Переслать текущее письмо вложенным"
 
-#: src/main-window.c:615 src/message-window.c:171
+#: src/main-window.c:617 src/message-window.c:171
 msgid "Next Part"
 msgstr "След. часть"
 
-#: src/main-window.c:615 src/message-window.c:171
+#: src/main-window.c:617 src/message-window.c:171
 msgid "Next part in message"
 msgstr "Следующая часть сообщения"
 
-#: src/main-window.c:621 src/message-window.c:175
+#: src/main-window.c:623 src/message-window.c:175
 msgid "Previous Part"
 msgstr "Пред. часть"
 
-#: src/main-window.c:622 src/message-window.c:176
+#: src/main-window.c:624 src/message-window.c:176
 msgid "Previous part in message"
 msgstr "Предыдущая часть сообщения"
 
-#: src/main-window.c:628 src/main-window.c:1042 src/message-window.c:180
+#: src/main-window.c:630 src/main-window.c:1045 src/message-window.c:180
 msgid "Save Current Part..."
 msgstr "Сохранить текущую часть..."
 
-#: src/main-window.c:629 src/main-window.c:1043
+#: src/main-window.c:631 src/main-window.c:1046
 #, fuzzy
 msgid "Save currently displayed part of message"
 msgstr "Сохранить текущую часть сообщения"
 
-#: src/main-window.c:635 src/main-window.c:995 src/message-window.c:185
+#: src/main-window.c:637 src/main-window.c:998 src/message-window.c:185
 msgid "_View Source..."
 msgstr ""
 
-#: src/main-window.c:636 src/main-window.c:996 src/message-window.c:186
+#: src/main-window.c:638 src/main-window.c:999 src/message-window.c:186
 #, fuzzy
 msgid "View source form of the message"
 msgstr "Вставить подпись перед цитируемым сообщением"
 
-#: src/main-window.c:654
+#: src/main-window.c:656
 msgid "_Move to Trash"
 msgstr "Отправить в корзину"
 
-#: src/main-window.c:655 src/main-window.c:1050
+#: src/main-window.c:657 src/main-window.c:1053
 msgid "Move the current message to Trash mailbox"
 msgstr "Отправить текущее сообщение в мусорную корзину"
 
 #. !
-#: src/main-window.c:661 src/main-window.c:1001
+#: src/main-window.c:663 src/main-window.c:1004
 #, fuzzy
 msgid "_Toggle flag"
 msgstr "Переключить сигнализируемое"
 
-#: src/main-window.c:667 src/main-window.c:1006
+#: src/main-window.c:669 src/main-window.c:1009
 msgid "Store address of sender in addressbook"
 msgstr "Сохранить адрес отправителя в записной книжке"
 
-#: src/main-window.c:678 src/main-window.c:959
+#: src/main-window.c:680 src/main-window.c:962
 msgid "Next Message"
 msgstr "Следующее письмо"
 
-#: src/main-window.c:684 src/main-window.c:963
+#: src/main-window.c:686 src/main-window.c:966
 msgid "Previous Message"
 msgstr "Предыдущее письмо"
 
-#: src/main-window.c:690 src/main-window.c:691 src/main-window.c:953
-#: src/main-window.c:954 src/message-window.c:192 src/message-window.c:193
+#: src/main-window.c:692 src/main-window.c:693 src/main-window.c:956
+#: src/main-window.c:957 src/message-window.c:192 src/message-window.c:193
 msgid "Next Unread Message"
 msgstr "След. непрочитанное письмо"
 
-#: src/main-window.c:697 src/main-window.c:698 src/main-window.c:920
-#: src/main-window.c:921
+#: src/main-window.c:699 src/main-window.c:700 src/main-window.c:923
+#: src/main-window.c:924
 msgid "Next Flagged Message"
 msgstr "След. отмеченное письмо"
 
-#: src/main-window.c:705 src/main-window.c:931
+#: src/main-window.c:707 src/main-window.c:934
 #, fuzzy
 msgid "_Hide messages"
 msgstr "Выкинуть %d удаленных сообщений?"
 
-#: src/main-window.c:708
+#: src/main-window.c:710
 #, fuzzy
 msgid "Reset _Filter"
 msgstr "Управление фильтрами"
 
-#: src/main-window.c:713
+#: src/main-window.c:715
 #, fuzzy
 msgid "Select all"
 msgstr "Выбрать все"
 
-#: src/main-window.c:714
+#: src/main-window.c:716
 #, fuzzy
 msgid "Select all messages in current mailbox"
 msgstr "Отметить все сообщения в текущем почтовом ящике"
 
-#: src/main-window.c:720 src/main-window.c:822
+#: src/main-window.c:722 src/main-window.c:824
 msgid "_Edit..."
 msgstr "Правка..."
 
-#: src/main-window.c:720 src/main-window.c:822
+#: src/main-window.c:722 src/main-window.c:824
 msgid "Edit the selected mailbox"
 msgstr "Редактировать выбранный почтовый ящик"
 
-#: src/main-window.c:724 src/main-window.c:817
+#: src/main-window.c:726 src/main-window.c:819
 msgid "_Delete..."
 msgstr "Уничтожить..."
 
-#: src/main-window.c:725 src/main-window.c:818
+#: src/main-window.c:727 src/main-window.c:820
 msgid "Delete the selected mailbox"
 msgstr "Уничтожить выбранный почтовый ящик"
 
-#: src/main-window.c:731
+#: src/main-window.c:733
 #, fuzzy
 msgid "E_xpunge Deleted Messages"
 msgstr "Выкинуть %d удаленных сообщений?"
 
-#: src/main-window.c:732 src/main-window.c:829
+#: src/main-window.c:734 src/main-window.c:831
 #, fuzzy
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr "Сделать необратимыми изменения в текущем почтовом ящике"
 
-#: src/main-window.c:737 src/main-window.c:835
+#: src/main-window.c:739 src/main-window.c:837
 msgid "Close mailbox"
 msgstr "Закрыть почтовый ящик"
 
-#: src/main-window.c:741 src/main-window.c:1079
+#: src/main-window.c:743 src/main-window.c:1082
 msgid "Empty _Trash"
 msgstr "Очистить мусорную корзину"
 
-#: src/main-window.c:742 src/main-window.c:1080 src/toolbar-factory.c:141
+#: src/main-window.c:744 src/main-window.c:1083 src/toolbar-factory.c:141
 msgid "Delete messages from the Trash mailbox"
 msgstr "Удалить сообщения из мусорной корзины"
 
-#: src/main-window.c:746
+#: src/main-window.c:748
 #, fuzzy
 msgid "Select _Filters"
 msgstr "Управление фильтрами"
 
-#: src/main-window.c:747 src/main-window.c:1065
+#: src/main-window.c:749 src/main-window.c:1068
 #, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr "Отметить все сообщения в текущем почтовом ящике"
 
-#: src/main-window.c:760
+#: src/main-window.c:762
 #, fuzzy
 msgid "_Toolbars..."
 msgstr "Панели инструментов"
 
-#: src/main-window.c:761
+#: src/main-window.c:763
 #, fuzzy
 msgid "Customize toolbars"
 msgstr "Настроить панели и меню"
 
-#: src/main-window.c:764 src/main-window.c:1083
+#: src/main-window.c:766 src/main-window.c:1086
 msgid "_Identities..."
 msgstr "Пользователи..."
 
-#: src/main-window.c:765 src/main-window.c:1084
+#: src/main-window.c:767 src/main-window.c:1087
 msgid "Create and set current identities"
 msgstr ""
 
-#: src/main-window.c:776
+#: src/main-window.c:778
 msgid "Mail_box"
 msgstr "Почтовый ящик"
 
-#: src/main-window.c:777 src/main-window.c:1097 src/message-window.c:209
+#: src/main-window.c:779 src/main-window.c:1100 src/message-window.c:209
 msgid "_Message"
 msgstr "Письмо"
 
-#: src/main-window.c:789
+#: src/main-window.c:791
 #, fuzzy
 msgid "New mailbox..."
 msgstr "Открытие почтового ящика..."
 
-#: src/main-window.c:794
+#: src/main-window.c:796
 #, fuzzy
 msgid "New \"Maildir\" mailbox..."
 msgstr "Локальный почтовый ящик Maildir..."
 
-#: src/main-window.c:798
+#: src/main-window.c:800
 #, fuzzy
 msgid "New \"MH\" mailbox..."
 msgstr "Локальный почтовый ящик MH..."
 
-#: src/main-window.c:828
+#: src/main-window.c:830
 #, fuzzy
 msgid "_Compress Mailbox"
 msgstr "Закрыть почтовый ящик"
 
-#: src/main-window.c:858
+#: src/main-window.c:860
 #, fuzzy
 msgid "Mail_boxes"
 msgstr "Почтовый ящик"
 
-#: src/main-window.c:883
+#: src/main-window.c:885
 msgid "By _Arrival"
 msgstr ""
 
-#: src/main-window.c:883
+#: src/main-window.c:885
 msgid "Arrival order"
 msgstr ""
 
-#: src/main-window.c:887
+#: src/main-window.c:889
 #, fuzzy
 msgid "By _Sender"
 msgstr "Послать"
 
-#: src/main-window.c:887
+#: src/main-window.c:889
 msgid "Sender order"
 msgstr ""
 
-#: src/main-window.c:891
+#: src/main-window.c:893
 #, fuzzy
 msgid "By S_ubject"
 msgstr "Тема:"
 
-#: src/main-window.c:891
+#: src/main-window.c:893
 #, fuzzy
 msgid "Subject order"
 msgstr "Тема"
 
-#: src/main-window.c:895
-#, fuzzy
-msgid "By _Date"
-msgstr "Дата"
-
-#: src/main-window.c:895
-msgid "By sending date"
-msgstr ""
-
-#: src/main-window.c:899
+#: src/main-window.c:897
 #, fuzzy
 msgid "By Si_ze"
 msgstr "Размер"
 
-#: src/main-window.c:899
+#: src/main-window.c:897
 #, fuzzy
 msgid "By message size"
 msgstr "Переносить строки письма"
 
-#: src/main-window.c:903
+#: src/main-window.c:901
 #, fuzzy
 msgid "_Threaded"
 msgstr "Разбор по темам JWZ"
 
-#: src/main-window.c:903
+#: src/main-window.c:901
 #, fuzzy
 msgid "Use message threading"
 msgstr "Простой разбор по темам"
 
-#: src/main-window.c:927
+#: src/main-window.c:909
+msgid "_Descending"
+msgstr ""
+
+#: src/main-window.c:909
+msgid "Sort in a descending order"
+msgstr ""
+
+#: src/main-window.c:930
 #, fuzzy
 msgid "_Headers"
 msgstr "Без заголовков"
 
-#: src/main-window.c:930
+#: src/main-window.c:933
 #, fuzzy
 msgid "_Sort Mailbox"
 msgstr "Показать дерево почтового ящика"
 
-#: src/main-window.c:945
+#: src/main-window.c:948
 #, fuzzy
 msgid "_View filter"
 msgstr "Управление фильтрами"
 
-#: src/main-window.c:946
+#: src/main-window.c:949
 msgid "Enable quick message index filter"
 msgstr ""
 
-#: src/main-window.c:982 src/main-window.c:1056 src/sendmsg-window.c:501
-#: src/sendmsg-window.c:559 src/sendmsg-window.c:619
+#: src/main-window.c:985 src/main-window.c:1059 src/sendmsg-window.c:502
+#: src/sendmsg-window.c:560 src/sendmsg-window.c:620
 #, fuzzy
 msgid "_More"
 msgstr "Переместить"
 
-#: src/main-window.c:1015
+#: src/main-window.c:1018
 #, fuzzy
 msgid "_New..."
 msgstr "Новое"
 
 #. F
-#: src/main-window.c:1035
+#: src/main-window.c:1038
 #, fuzzy
 msgid "_Forward..."
 msgstr "Переслать"
 
-#: src/main-window.c:1036 src/toolbar-factory.c:105
+#: src/main-window.c:1039 src/toolbar-factory.c:105
 msgid "Forward the current message"
 msgstr "Переслать текущее письмо"
 
 #. D
-#: src/main-window.c:1049
+#: src/main-window.c:1052
 #, fuzzy
 msgid "_Delete to Trash"
 msgstr "Отправить в корзину"
 
-#: src/main-window.c:1061
+#: src/main-window.c:1064
 #, fuzzy
 msgid "_Manage..."
 msgstr "Письмо..."
 
-#: src/main-window.c:1064
+#: src/main-window.c:1067
 #, fuzzy
-msgid "_Select _Filters"
+msgid "_Select Filters"
 msgstr "Выбрать все"
 
-#: src/main-window.c:1082
+#: src/main-window.c:1085
 #, fuzzy
 msgid "_Filters"
 msgstr "Фильтры..."
 
-#: src/main-window.c:1098 src/sendmsg-window.c:635
+#: src/main-window.c:1101 src/sendmsg-window.c:636
 #, fuzzy
 msgid "_Tools"
 msgstr "Панели инструментов"
 
-#: src/main-window.c:1202
+#: src/main-window.c:1205
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr ""
 
-#: src/main-window.c:1372
+#: src/main-window.c:1375
 #, fuzzy
 msgid "Subject or Sender _Contains:"
 msgstr "Шрифт заголовка темы"
 
-#: src/main-window.c:2154
+#: src/main-window.c:2157
 #, fuzzy, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
 msgstr "Невозможно заблокировать почтовый ящик!"
 
-#: src/main-window.c:2470
+#: src/main-window.c:2474
 msgid "translator_credits"
 msgstr ""
 
-#: src/main-window.c:2486
+#: src/main-window.c:2490
 #, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
@@ -3753,171 +3857,172 @@ msgstr ""
 "\n"
 "Сообщить об обнаруженных ошибках можно по адресу http://bugzilla.gnome.org"
 
-#: src/main-window.c:2588
+#: src/main-window.c:2592
 #, fuzzy
 msgid "Checking Mail..."
 msgstr "Отправка почты..."
 
-#: src/main-window.c:2897
+#: src/main-window.c:2906
 #, fuzzy
 msgid "Finished Checking."
 msgstr "Завершить проверку правописания"
 
-#: src/main-window.c:2959
+#: src/main-window.c:2968
 #, c-format
 msgid "Sending error: %s"
 msgstr "Ошибка отправки: %s"
 
-#: src/main-window.c:3044
+#: src/main-window.c:3053
 msgid "Balsa: New mail"
 msgstr ""
 
-#: src/main-window.c:3056
+#: src/main-window.c:3065
 #, fuzzy, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "Послать это сообщение"
 msgstr[1] "Послать это сообщение"
 
-#: src/main-window.c:3059
+#: src/main-window.c:3068
 #, fuzzy
 msgid "You have new mail."
 msgstr "Послать это сообщение"
 
-#: src/main-window.c:3609
+#: src/main-window.c:3677
 #, fuzzy
 msgid "Search mailbox"
 msgstr "Закрыть почтовый ящик"
 
-#: src/main-window.c:3626
+#: src/main-window.c:3694
 #, fuzzy
 msgid "_Search for:"
 msgstr "Поиск имени:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3639
+#: src/main-window.c:3707
 #, fuzzy
 msgid "In:"
 msgstr "Входящие:"
 
-#: src/main-window.c:3650
+#: src/main-window.c:3718
 #, fuzzy
 msgid "S_ubject"
 msgstr "Тема:"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3655
+#: src/main-window.c:3723
 #, fuzzy
 msgid "Show only matching messages"
 msgstr "Послать это сообщение"
 
 #. Frame with OK button
-#: src/main-window.c:3676
+#: src/main-window.c:3744
 #, fuzzy
 msgid "Open next matching message"
 msgstr "Открыть следующее непрочитанное письмо"
 
-#: src/main-window.c:3687
+#: src/main-window.c:3755
 msgid "_Reverse search"
 msgstr ""
 
-#: src/main-window.c:3692
+#: src/main-window.c:3760
 #, fuzzy
 msgid "_Wrap around"
 msgstr "Перенос тела письма"
 
-#: src/main-window.c:3768
+#: src/main-window.c:3836
 #, fuzzy, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: src/main-window.c:3853
+#: src/main-window.c:3921
 msgid "You can apply filters only on mailbox\n"
 msgstr ""
 
-#: src/main-window.c:4166
+#: src/main-window.c:4239
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (только для чтения)"
 
-#: src/main-window.c:4168
+#: src/main-window.c:4241
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:4272
-msgid "Cannot access the message's body\n"
-msgstr "Нет доступа к содержимому этого сообщения\n"
-
-#: src/main.c:203
+#: src/main.c:215
 msgid "Get new mail on startup"
 msgstr "Проверить почту при запуске"
 
-#: src/main.c:205
+#: src/main.c:217
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Cоставить новое письмо для EMAIL@ADRESS"
 
-#: src/main.c:207
+#: src/main.c:219
 #, fuzzy
 msgid "Attach file at PATH"
 msgstr "Вложить файл"
 
-#: src/main.c:209
+#: src/main.c:221
 msgid "Opens MAILBOXNAME"
 msgstr "Открывается MAILBOXNAME"
 
-#: src/main.c:209
+#: src/main.c:221
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:212
+#: src/main.c:224
 msgid "Opens first unread mailbox"
 msgstr "Открыть первый почтовый ящик с непрочитанными письмами"
 
-#: src/main.c:215
+#: src/main.c:227
 #, fuzzy
 msgid "Opens default Inbox on startup"
 msgstr "Проверить почту при запуске"
 
-#: src/main.c:217
+#: src/main.c:230
+#, fuzzy
+msgid "Prints number unread and unsent messages"
+msgstr "Напечатать текущее письмо"
+
+#: src/main.c:232
 msgid "Debug POP3 connection"
 msgstr ""
 
-#: src/main.c:219
+#: src/main.c:234
 msgid "Debug IMAP connection"
 msgstr ""
 
-#: src/main.c:241
+#: src/main.c:256
 msgid "The Balsa E-Mail Client"
 msgstr ""
 
-#: src/main.c:258 src/main.c:263 src/main.c:269 src/main.c:275 src/main.c:281
+#: src/main.c:273 src/main.c:278 src/main.c:284 src/main.c:290 src/main.c:296
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa не может открыть ваш почтовый ящик \"%s\""
 
-#: src/main.c:258
+#: src/main.c:273
 msgid "Inbox"
 msgstr "Входящие"
 
-#: src/main.c:264
+#: src/main.c:279
 msgid "Outbox"
 msgstr "Исходящие"
 
-#: src/main.c:270
+#: src/main.c:285
 msgid "Sentbox"
 msgstr "Отправленные"
 
-#: src/main.c:276
+#: src/main.c:291
 msgid "Draftbox"
 msgstr "Черновики"
 
-#: src/main.c:281
+#: src/main.c:296
 msgid "Trash"
 msgstr "Мусорная корзина"
 
-#: src/main.c:470
+#: src/main.c:511
 #, fuzzy
 msgid "Compressing mail folders..."
 msgstr "Открытие почтового ящика..."
@@ -3959,697 +4064,705 @@ msgstr "Сохранить текущую часть сообщения"
 msgid "M_ove"
 msgstr "Переместить"
 
-#: src/message-window.c:274
+#: src/message-window.c:280
 #, fuzzy, c-format
 msgid "Message from %s: %s"
 msgstr "Цвета письма"
 
-#: src/pref-manager.c:321
+#: src/pref-manager.c:327
 #, fuzzy
 msgid "7 Bits"
 msgstr "7 бит"
 
-#: src/pref-manager.c:322
+#: src/pref-manager.c:328
 #, fuzzy
 msgid "8 Bits"
 msgstr "8 бит"
 
-#: src/pref-manager.c:323
+#: src/pref-manager.c:329
 #, fuzzy
 msgid "Quoted"
 msgstr "quoted"
 
-#: src/pref-manager.c:333
+#: src/pref-manager.c:339
 msgid "While Retrieving Messages"
 msgstr "При получении сообщений"
 
-#: src/pref-manager.c:334
+#: src/pref-manager.c:340
 msgid "Until Closed"
 msgstr "До закрытия"
 
-#: src/pref-manager.c:339
+#: src/pref-manager.c:345
 msgid "Fast"
 msgstr "Наибыстрый"
 
-#: src/pref-manager.c:340
+#: src/pref-manager.c:346
 msgid "Normal"
 msgstr "Нормальный"
 
-#: src/pref-manager.c:341
+#: src/pref-manager.c:347
 msgid "Bad Spellers"
 msgstr ""
 
-#: src/pref-manager.c:345
+#: src/pref-manager.c:352
+#, fuzzy
+msgid "Message number"
+msgstr "Источник сообщения"
+
+#: src/pref-manager.c:356
+#, fuzzy
+msgid "Sender"
+msgstr "Послать"
+
+#: src/pref-manager.c:360
 #, fuzzy
 msgid "Flat"
 msgstr "Наибыстрый"
 
-#: src/pref-manager.c:347
+#: src/pref-manager.c:362
 msgid "JWZ"
 msgstr ""
 
-#: src/pref-manager.c:351
+#: src/pref-manager.c:366
 msgid "west european (traditional)"
 msgstr ""
 
-#: src/pref-manager.c:352
+#: src/pref-manager.c:367
 msgid "east european"
 msgstr ""
 
-#: src/pref-manager.c:353
+#: src/pref-manager.c:368
 msgid "south european"
 msgstr ""
 
-#: src/pref-manager.c:354
+#: src/pref-manager.c:369
 msgid "north european"
 msgstr ""
 
-#: src/pref-manager.c:355
+#: src/pref-manager.c:370
 msgid "cyrillic (iso/windows)"
 msgstr ""
 
-#: src/pref-manager.c:356
+#: src/pref-manager.c:371
 msgid "arabic"
 msgstr ""
 
-#: src/pref-manager.c:357
+#: src/pref-manager.c:372
 #, fuzzy
 msgid "greek"
 msgstr "Греческий"
 
-#: src/pref-manager.c:358
+#: src/pref-manager.c:373
 msgid "hebrew"
 msgstr ""
 
-#: src/pref-manager.c:359
+#: src/pref-manager.c:374
 #, fuzzy
 msgid "turkish"
 msgstr "Турецкий"
 
-#: src/pref-manager.c:360
+#: src/pref-manager.c:375
 msgid "nordic"
 msgstr ""
 
-#: src/pref-manager.c:361
+#: src/pref-manager.c:376
 msgid "thai"
 msgstr ""
 
-#: src/pref-manager.c:362
+#: src/pref-manager.c:377
 msgid "baltic"
 msgstr ""
 
-#: src/pref-manager.c:363
+#: src/pref-manager.c:378
 msgid "celtic"
 msgstr ""
 
-#: src/pref-manager.c:364
+#: src/pref-manager.c:379
 msgid "west european (euro)"
 msgstr ""
 
-#: src/pref-manager.c:365
+#: src/pref-manager.c:380
 #, fuzzy
 msgid "russian (koi)"
 msgstr "Русский (KOI)"
 
-#: src/pref-manager.c:366
+#: src/pref-manager.c:381
 #, fuzzy
 msgid "ukranian (koi)"
 msgstr "Украинский"
 
-#: src/pref-manager.c:367
+#: src/pref-manager.c:382
 #, fuzzy
 msgid "japanese"
 msgstr "Японский"
 
-#: src/pref-manager.c:368
+#: src/pref-manager.c:383
 #, fuzzy
 msgid "korean"
 msgstr "Корейский"
 
 #. must NOT be modal
-#: src/pref-manager.c:388
+#: src/pref-manager.c:403
 msgid "Balsa Preferences"
 msgstr "Настройка Balsa"
 
-#: src/pref-manager.c:414
+#: src/pref-manager.c:429
 msgid "Mail Servers"
 msgstr "Mail-серверы"
 
-#: src/pref-manager.c:418 src/pref-manager.c:2615
+#: src/pref-manager.c:433 src/pref-manager.c:2649
 msgid "Address Books"
 msgstr "Адресные книги"
 
-#: src/pref-manager.c:422
+#: src/pref-manager.c:437
 msgid "Mail Options"
 msgstr "Параметры почты"
 
-#: src/pref-manager.c:426 src/pref-manager.c:1978
+#: src/pref-manager.c:441 src/pref-manager.c:2013
 msgid "Display"
 msgstr "Дисплей"
 
-#: src/pref-manager.c:430 src/toolbar-factory.c:130
+#: src/pref-manager.c:445 src/toolbar-factory.c:130
 msgid "Spelling"
 msgstr "Правописание"
 
-#: src/pref-manager.c:434
+#: src/pref-manager.c:449
 msgid "Misc"
 msgstr "Разное"
 
-#: src/pref-manager.c:438
+#: src/pref-manager.c:453
 msgid "Startup"
 msgstr "Запуск"
 
-#: src/pref-manager.c:1229
+#: src/pref-manager.c:1265
 #, fuzzy, c-format
 msgid "%s (default)"
 msgstr "Установить по умолчанию"
 
-#: src/pref-manager.c:1478
+#: src/pref-manager.c:1514
 msgid "Remote Mailbox Servers"
 msgstr "Удаленные серверы почтовых ящиков"
 
-#: src/pref-manager.c:1499 src/pref-manager.c:2636
+#: src/pref-manager.c:1535 src/pref-manager.c:2670
 msgid "Type"
 msgstr "Тип"
 
-#: src/pref-manager.c:1507
+#: src/pref-manager.c:1543
 msgid "Mailbox Name"
 msgstr "Название почтового ящика"
 
-#: src/pref-manager.c:1520 src/pref-manager.c:2667
+#: src/pref-manager.c:1556 src/pref-manager.c:2701
 #, fuzzy
 msgid "_Modify"
 msgstr "Изменить"
 
-#: src/pref-manager.c:1535
+#: src/pref-manager.c:1571
 #, fuzzy
 msgid "Local Mail"
 msgstr "Местная почта"
 
-#: src/pref-manager.c:1537
+#: src/pref-manager.c:1573
 msgid "Select your local mail directory"
 msgstr "Выбор каталога местной почты"
 
-#: src/pref-manager.c:1557
+#: src/pref-manager.c:1593
 #, fuzzy
 msgid "Outgoing Mail"
 msgstr "Исходящая почта"
 
-#: src/pref-manager.c:1562
+#: src/pref-manager.c:1598
 msgid "Remote SMTP Server"
 msgstr "Удаленный SMTP сервер"
 
-#: src/pref-manager.c:1564
+#: src/pref-manager.c:1600
 msgid "User"
 msgstr "Пользователь"
 
-#: src/pref-manager.c:1567
+#: src/pref-manager.c:1603
 msgid "Pass Phrase"
 msgstr "Пароль"
 
 #. STARTTLS
-#: src/pref-manager.c:1571
+#: src/pref-manager.c:1607
 msgid "Use TLS"
 msgstr "Использовать TLS"
 
-#: src/pref-manager.c:1589
+#: src/pref-manager.c:1625
 #, fuzzy
 msgid "Certificate Pass Phrase"
 msgstr "Сертификат сохранён"
 
-#: src/pref-manager.c:1607
+#: src/pref-manager.c:1643
 msgid "Incoming"
 msgstr "Полученная"
 
-#: src/pref-manager.c:1609
+#: src/pref-manager.c:1645
 msgid "Outgoing"
 msgstr "Отправленная"
 
-#: src/pref-manager.c:1633
+#: src/pref-manager.c:1669
 msgid "Checking"
 msgstr "Проверить"
 
-#: src/pref-manager.c:1638
+#: src/pref-manager.c:1674
 #, fuzzy
 msgid "_Check mail automatically every:"
 msgstr "Проверять почту автоматически каждые:"
 
-#: src/pref-manager.c:1649 src/pref-manager.c:2460
+#: src/pref-manager.c:1685 src/pref-manager.c:2494 src/pref-manager.c:2545
 msgid "minutes"
 msgstr "минут"
 
-#: src/pref-manager.c:1655
+#: src/pref-manager.c:1691
 #, fuzzy
 msgid "Check _IMAP mailboxes"
 msgstr "Добавить новый почтовый ящик IMAP"
 
-#: src/pref-manager.c:1661
+#: src/pref-manager.c:1697
 msgid "Check INBOX _only"
 msgstr ""
 
-#: src/pref-manager.c:1666
+#: src/pref-manager.c:1702
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr ""
 
-#: src/pref-manager.c:1671
+#: src/pref-manager.c:1707
 msgid "Do background check quietly (no messages in status bar)"
 msgstr ""
 
-#: src/pref-manager.c:1675
+#: src/pref-manager.c:1711
 msgid "_POP message size limit:"
 msgstr ""
 
-#: src/pref-manager.c:1682
+#: src/pref-manager.c:1718
 msgid "MB"
 msgstr ""
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1701
+#: src/pref-manager.c:1737
 #, fuzzy
 msgid "Quoted and Flowed Text"
 msgstr "Цитируемый текст"
 
-#: src/pref-manager.c:1705 src/sendmsg-window.c:4222
+#: src/pref-manager.c:1741 src/sendmsg-window.c:4231
 msgid "Quoted Text Regular Expression"
 msgstr "Регулярное выражение цитируемого текcта"
 
-#: src/pref-manager.c:1716
+#: src/pref-manager.c:1752
 msgid "Wrap Incoming Text at:"
 msgstr "Перенос выступающего текста по:"
 
-#: src/pref-manager.c:1727 src/pref-manager.c:1902
+#: src/pref-manager.c:1763 src/pref-manager.c:1937
 #, fuzzy
 msgid "characters"
 msgstr "Буквы"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:1742
+#: src/pref-manager.c:1778
 msgid "Display of Multipart/Alternative Parts"
 msgstr ""
 
-#: src/pref-manager.c:1745
+#: src/pref-manager.c:1781
 msgid "prefer text/plain over html"
 msgstr ""
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:1763
+#: src/pref-manager.c:1798
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 
-#: src/pref-manager.c:1769
+#: src/pref-manager.c:1804
 #, fuzzy
 msgid "display as \"?\""
 msgstr "Показывать форматы"
 
-#: src/pref-manager.c:1778
+#: src/pref-manager.c:1813
 #, fuzzy
 msgid "display using codeset"
 msgstr "Не показывать заголовки"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1813
+#: src/pref-manager.c:1848
 msgid "Message Disposition Notification Requests"
 msgstr ""
 
-#: src/pref-manager.c:1815
+#: src/pref-manager.c:1850
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
 
-#: src/pref-manager.c:1826
+#: src/pref-manager.c:1861
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
 "I am in the \"To:\" or \"Cc:\" list)."
 msgstr ""
 
-#: src/pref-manager.c:1844
+#: src/pref-manager.c:1879
 msgid "The message header looks suspicious."
 msgstr ""
 
-#: src/pref-manager.c:1883
+#: src/pref-manager.c:1918
 msgid "Word Wrap"
 msgstr "Перевод строки"
 
-#: src/pref-manager.c:1888
+#: src/pref-manager.c:1923
 msgid "Wrap Outgoing Text at:"
 msgstr "Перенос выступающего текста по:"
 
-#: src/pref-manager.c:1916
+#: src/pref-manager.c:1951
 #, fuzzy
 msgid "Other Options"
 msgstr "Другие параметры"
 
-#: src/pref-manager.c:1921
+#: src/pref-manager.c:1956
 #, fuzzy
 msgid "Reply Prefix:"
 msgstr "Префикс для ответов:"
 
-#: src/pref-manager.c:1924
+#: src/pref-manager.c:1959
 msgid "Edit headers in external editor"
 msgstr ""
 
-#: src/pref-manager.c:1926
+#: src/pref-manager.c:1961
 msgid "Automatically quote original when replying"
 msgstr ""
 
-#: src/pref-manager.c:1929
+#: src/pref-manager.c:1964
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr ""
 
-#: src/pref-manager.c:1932
+#: src/pref-manager.c:1967
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr ""
 
-#: src/pref-manager.c:1935
+#: src/pref-manager.c:1970
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
 
-#: src/pref-manager.c:1938
+#: src/pref-manager.c:1973
 #, fuzzy
 msgid "Copy outgoing messages to sentbox"
 msgstr "Копирование %d сообщений в %s..."
 
-#: src/pref-manager.c:1951 src/pref-manager.c:2075
+#: src/pref-manager.c:1986 src/pref-manager.c:2108
 msgid "Encoding"
 msgstr "Кодирование"
 
-#: src/pref-manager.c:1981
+#: src/pref-manager.c:2016
 msgid "Status Messages"
 msgstr "Состояние писем"
 
-#: src/pref-manager.c:1983
+#: src/pref-manager.c:2018
 msgid "Colors"
 msgstr "Цвета"
 
-#: src/pref-manager.c:1985
+#: src/pref-manager.c:2020
 #, fuzzy
 msgid "Message"
 msgstr "Письмо"
 
-#: src/pref-manager.c:1987 src/pref-manager.c:2284
-#, fuzzy
-msgid "Threading"
-msgstr "Разбор по темам JWZ"
+#: src/pref-manager.c:2022
+msgid "Sort and Thread"
+msgstr ""
 
-#: src/pref-manager.c:2012
+#: src/pref-manager.c:2047
 #, fuzzy
 msgid "Main Window"
 msgstr "Главное окно"
 
-#: src/pref-manager.c:2015
+#: src/pref-manager.c:2050
 msgid "Use preview pane"
 msgstr "Использовать панель просмотра"
 
-#: src/pref-manager.c:2017
+#: src/pref-manager.c:2052
 msgid "Show mailbox statistics in left pane"
 msgstr "Показывать статистику почтового ящика на левой панели"
 
-#: src/pref-manager.c:2019
+#: src/pref-manager.c:2054
 msgid "Use alternative main window layout"
 msgstr "Использовать альтернативное выравнивание главного окна"
 
-#: src/pref-manager.c:2021
+#: src/pref-manager.c:2056
 msgid "Automatically view message when mailbox opened"
 msgstr "Автоматически открывать сообщение когда открыт почтовый ящик"
 
-#: src/pref-manager.c:2024
-msgid "Display message size as number of lines"
-msgstr ""
-
-#: src/pref-manager.c:2029
+#: src/pref-manager.c:2062
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr ""
 
-#: src/pref-manager.c:2040
+#: src/pref-manager.c:2073
 msgid "percent"
 msgstr ""
 
-#: src/pref-manager.c:2055
+#: src/pref-manager.c:2088
 #, fuzzy
 msgid "Display Progress Dialog"
 msgstr "Показывать диалог прогресса"
 
-#: src/pref-manager.c:2080
+#: src/pref-manager.c:2113
 msgid "Date encoding (for strftime):"
 msgstr "Кодирование данных (для strftime):"
 
-#: src/pref-manager.c:2082
+#: src/pref-manager.c:2115
 msgid "Selected headers:"
 msgstr "Выбранные заголовки:"
 
-#: src/pref-manager.c:2103 src/pref-manager.c:2108
+#: src/pref-manager.c:2136 src/pref-manager.c:2141
 msgid "Information Messages"
 msgstr "Информационные сообщения"
 
-#: src/pref-manager.c:2112
+#: src/pref-manager.c:2145
 msgid "Warning Messages"
 msgstr "Предупреждающие сообщения"
 
-#: src/pref-manager.c:2116
+#: src/pref-manager.c:2149
 msgid "Error Messages"
 msgstr "Сообщения об ошибках"
 
-#: src/pref-manager.c:2120
+#: src/pref-manager.c:2153
 msgid "Fatal Error Messages"
 msgstr "Фатальные сообщения об ошибках"
 
-#: src/pref-manager.c:2124
+#: src/pref-manager.c:2157
 msgid "Debug Messages"
 msgstr "Отладочные сообщения"
 
-#: src/pref-manager.c:2150
+#: src/pref-manager.c:2183
 msgid "Message Colors"
 msgstr "Цвета письма"
 
-#: src/pref-manager.c:2155
+#: src/pref-manager.c:2188
 #, c-format
 msgid "Quote level %d color"
 msgstr "%d цвет цитируемого текста"
 
-#: src/pref-manager.c:2168
+#: src/pref-manager.c:2201
 msgid "Link Color"
 msgstr "Цвет ссылки"
 
-#: src/pref-manager.c:2170
+#: src/pref-manager.c:2203
 msgid "Hyperlink color"
 msgstr "Цвет гиперссылки"
 
-#: src/pref-manager.c:2181
+#: src/pref-manager.c:2214
 #, fuzzy
 msgid "Composition Window"
 msgstr "Составить"
 
-#: src/pref-manager.c:2185
+#: src/pref-manager.c:2218
 msgid "Invalid or incomplete address label color"
 msgstr ""
 
-#: src/pref-manager.c:2210
+#: src/pref-manager.c:2243
 msgid "Fonts"
 msgstr "Шрифты"
 
-#: src/pref-manager.c:2225 src/pref-manager.c:2250
+#: src/pref-manager.c:2258 src/pref-manager.c:2283
 msgid "Select a font to use"
 msgstr "Выбор шрифта"
 
-#: src/pref-manager.c:2228 src/pref-manager.c:2253
+#: src/pref-manager.c:2261 src/pref-manager.c:2286
 msgid "Select..."
 msgstr "Выделить..."
 
-#: src/pref-manager.c:2235
+#: src/pref-manager.c:2268
 #, fuzzy
 msgid "Message Font"
 msgstr "Письмо"
 
-#: src/pref-manager.c:2261
+#: src/pref-manager.c:2294
 #, fuzzy
 msgid "Message Subject Font"
 msgstr "Источник сообщения"
 
-#: src/pref-manager.c:2287
-msgid "Expand mailbox tree on open"
-msgstr ""
+#: src/pref-manager.c:2317
+#, fuzzy
+msgid "Sorting and Threading"
+msgstr "Разбор по темам JWZ"
 
-#: src/pref-manager.c:2291
+#: src/pref-manager.c:2321
+#, fuzzy
+msgid "Default sort column"
+msgstr "По умолчанию"
+
+#: src/pref-manager.c:2325
 #, fuzzy
 msgid "Default threading style"
 msgstr "Не разбирать по темам"
 
-#: src/pref-manager.c:2370
+#: src/pref-manager.c:2330
+#, fuzzy
+msgid "Expand threads on open"
+msgstr "Расширять все подборки"
+
+#: src/pref-manager.c:2406
 msgid "Pspell Settings"
 msgstr "Настройки Pspell"
 
-#: src/pref-manager.c:2376
+#: src/pref-manager.c:2412
 msgid "Spell Check Module"
 msgstr "Модуль проверки правописания"
 
-#: src/pref-manager.c:2383
+#: src/pref-manager.c:2418
 msgid "Suggestion Level"
 msgstr ""
 
 #. do the ignore length
-#: src/pref-manager.c:2389
+#: src/pref-manager.c:2423
 msgid "Ignore words shorter than"
 msgstr "Игнорировать слова короче чем"
 
-#: src/pref-manager.c:2410
+#: src/pref-manager.c:2444
 #, fuzzy
 msgid "Miscellaneous Spelling Settings"
 msgstr "Разные настройки проверки правописания"
 
-#: src/pref-manager.c:2412
+#: src/pref-manager.c:2446
 msgid "Check signature"
 msgstr "Проверить подпись"
 
-#: src/pref-manager.c:2413
+#: src/pref-manager.c:2447
 msgid "Check quoted"
 msgstr "Проверить цитату"
 
-#: src/pref-manager.c:2437
+#: src/pref-manager.c:2471
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/pref-manager.c:2439
+#: src/pref-manager.c:2473
 msgid "Debug"
 msgstr "Отладка"
 
-#: src/pref-manager.c:2440
+#: src/pref-manager.c:2474
 msgid "Empty Trash on exit"
 msgstr "Очистить мусорную корзину при выходе"
 
-#: src/pref-manager.c:2446
+#: src/pref-manager.c:2480
 msgid "Automatically close mailbox if unused more than"
 msgstr "Автоматически закрывать почтовый ящик, если не используется дольше чем"
 
-#: src/pref-manager.c:2474
+#: src/pref-manager.c:2508
 #, fuzzy
 msgid "Deleting Messages"
 msgstr "Отладочные сообщения"
 
-#: src/pref-manager.c:2476
+#: src/pref-manager.c:2510
 msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
 
-#: src/pref-manager.c:2484
+#: src/pref-manager.c:2518
 #, fuzzy
 msgid "Hide messages marked as deleted"
 msgstr "Помечание %d сообщений для удаления..."
 
-#: src/pref-manager.c:2486
+#: src/pref-manager.c:2520
 msgid "The following settings are global."
 msgstr ""
 
-#: src/pref-manager.c:2491
+#: src/pref-manager.c:2525
 #, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "Автоматически открывать сообщение когда открыт почтовый ящик"
 
-#: src/pref-manager.c:2498
+#: src/pref-manager.c:2532
 #, fuzzy
 msgid " ...and if mailbox is unused more than"
 msgstr "Автоматически закрывать почтовый ящик, если не используется дольше чем"
 
-#: src/pref-manager.c:2511
-msgid "hours"
-msgstr ""
-
-#: src/pref-manager.c:2533
+#: src/pref-manager.c:2567
 msgid "Options"
 msgstr "Параметры"
 
-#: src/pref-manager.c:2536
+#: src/pref-manager.c:2570
 #, fuzzy
 msgid "Open Inbox upon startup"
 msgstr "Проверить почту при запуске"
 
-#: src/pref-manager.c:2538
+#: src/pref-manager.c:2572
 msgid "Check mail upon startup"
 msgstr "Проверить почту при запуске"
 
-#: src/pref-manager.c:2540
+#: src/pref-manager.c:2574
 msgid "Remember open mailboxes between sessions"
 msgstr "Запоминать открытые почтовые ящики между сеансами"
 
-#: src/pref-manager.c:2554
+#: src/pref-manager.c:2588
 msgid "Folder Scanning"
 msgstr ""
 
-#: src/pref-manager.c:2556
+#: src/pref-manager.c:2590
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
 msgstr ""
 
-#: src/pref-manager.c:2566
+#: src/pref-manager.c:2600
 msgid "Scan local folders to depth"
 msgstr ""
 
-#: src/pref-manager.c:2579
+#: src/pref-manager.c:2613
 #, fuzzy
 msgid "Scan IMAP folders to depth"
 msgstr "Набор папок удаленного IMAP сервера"
 
-#: src/pref-manager.c:2644
+#: src/pref-manager.c:2678
 msgid "Address Book Name"
 msgstr "Название адресной книги"
 
-#: src/pref-manager.c:2652
+#: src/pref-manager.c:2686
 msgid "Expand aliases"
 msgstr "Расширять псевдонимы"
 
-#: src/pref-manager.c:2671
+#: src/pref-manager.c:2705
 #, fuzzy
 msgid "_Set as default"
 msgstr "Установить по умолчанию"
 
-#: src/pref-manager.c:2827
+#: src/pref-manager.c:2861
 msgid "Remote POP3 mailbox..."
 msgstr "Удаленный почтовый ящик POP3..."
 
-#: src/pref-manager.c:2976
+#: src/pref-manager.c:2998
 msgid "Show nothing"
 msgstr "Не показывать ничего"
 
-#: src/pref-manager.c:2977
+#: src/pref-manager.c:2999
 msgid "Show dialog"
 msgstr "Показать диалог"
 
-#: src/pref-manager.c:2978
+#: src/pref-manager.c:3000
 msgid "Show in list"
 msgstr "Показать в списке"
 
-#: src/pref-manager.c:2979
+#: src/pref-manager.c:3001
 #, fuzzy
 msgid "Show in status bar"
 msgstr "Показать в списке"
 
-#: src/pref-manager.c:2980
+#: src/pref-manager.c:3002
 msgid "Print to console"
 msgstr "Печатать на консоль"
 
-#: src/pref-manager.c:3000
+#: src/pref-manager.c:3022
 msgid "Ask me"
 msgstr "Спросить пользователя"
 
-#: src/pref-manager.c:3001
-msgid "Always"
-msgstr "Всегда"
-
-#: src/pref-manager.c:3105
+#: src/pref-manager.c:3138
 #, fuzzy, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: src/print.c:258 src/print.c:741
+#: src/print.c:258 src/print.c:724
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Страница: %i/%i"
 
-#: src/print.c:667
+#: src/print.c:666
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
@@ -4657,477 +4770,477 @@ msgstr ""
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:1007
+#: src/print.c:981
 msgid "Type:"
 msgstr "Тип:"
 
-#: src/print.c:1010
+#: src/print.c:984
 #, fuzzy
 msgid "File name:"
 msgstr "Название файла:"
 
-#: src/print.c:1553
+#: src/print.c:1526
 msgid "Font available for printing"
 msgstr ""
 
-#: src/print.c:1559
+#: src/print.c:1532
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr ""
 
-#: src/print.c:1572
+#: src/print.c:1545
 #, fuzzy
 msgid "Select Font"
 msgstr "Выбрать все"
 
-#: src/print.c:1605
+#: src/print.c:1578
 #, fuzzy
 msgid "Change..."
 msgstr "Загрузка..."
 
-#: src/print.c:1638
+#: src/print.c:1612
 msgid "Print message"
 msgstr "Напечатать письмо"
 
 #. create a 2nd notebook page for the fonts
-#: src/print.c:1647
+#: src/print.c:1623
 #, fuzzy
 msgid "_Fonts"
 msgstr "Шрифты"
 
-#: src/print.c:1650
+#: src/print.c:1626
 #, fuzzy
 msgid "Header font"
 msgstr "В заголовке"
 
-#: src/print.c:1652
+#: src/print.c:1628
 #, fuzzy
 msgid "Body font"
 msgstr "В тексте письма"
 
-#: src/print.c:1654
+#: src/print.c:1630
 msgid "Footer font"
 msgstr ""
 
 #. highlight cited stuff
-#: src/print.c:1658
+#: src/print.c:1634
 msgid "Highlight cited text"
 msgstr ""
 
-#: src/print.c:1662
+#: src/print.c:1638
 msgid "_Enable highlighting of cited text"
 msgstr ""
 
-#: src/print.c:1687
+#: src/print.c:1664
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr ""
 
-#: src/print.c:1792
+#: src/print.c:1769
 msgid "Balsa: message print preview"
 msgstr "Balsa: просмотр печати письма"
 
-#: src/save-restore.c:591
+#: src/save-restore.c:600
 msgid "Error during filters loading: "
 msgstr ""
 
-#: src/save-restore.c:593
+#: src/save-restore.c:602
 #, fuzzy, c-format
 msgid ""
 "Error during filters loading: %s\n"
 "Filters may not be correct."
 msgstr "Файл %s не может быть прочитан\n"
 
-#: src/save-restore.c:703
+#: src/save-restore.c:716
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr ""
 
-#: src/save-restore.c:956
+#: src/save-restore.c:975
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr ""
 
-#: src/save-restore.c:988
+#: src/save-restore.c:1007
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 
-#: src/save-restore.c:1724
+#: src/save-restore.c:1753
 #, fuzzy
 msgid "Filter with no condition was ignored"
 msgstr "Файл уже существует. Переписать?"
 
-#: src/save-restore.c:1902
+#: src/save-restore.c:1931
 #, fuzzy
 msgid "Error opening GConf database\n"
 msgstr "Ошибка при открытии почтового ящика"
 
-#: src/save-restore.c:1910 src/save-restore.c:1921
+#: src/save-restore.c:1939 src/save-restore.c:1950
 #, fuzzy, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: src/sendmsg-window.c:218
+#: src/sendmsg-window.c:219
 #, fuzzy
 msgid "_Brazilian"
 msgstr "Бразильский"
 
-#: src/sendmsg-window.c:219
+#: src/sendmsg-window.c:220
 #, fuzzy
 msgid "_Catalan"
 msgstr "Итальянский"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:221
 msgid "_Chinese Simplified"
 msgstr ""
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:222
 msgid "_Chinese Traditional"
 msgstr ""
 
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:223
 #, fuzzy
 msgid "_Czech"
 msgstr "Официальные копии (Сс)"
 
-#: src/sendmsg-window.c:223
+#: src/sendmsg-window.c:224
 #, fuzzy
 msgid "_Danish"
 msgstr "Датский"
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:225
 #, fuzzy
 msgid "_Dutch"
 msgstr "Голландский"
 
-#: src/sendmsg-window.c:225
+#: src/sendmsg-window.c:226
 msgid "_English (American)"
 msgstr ""
 
-#: src/sendmsg-window.c:226
+#: src/sendmsg-window.c:227
 msgid "_English (British)"
 msgstr ""
 
-#: src/sendmsg-window.c:227
+#: src/sendmsg-window.c:228
 msgid "_Esperanto"
 msgstr ""
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:229
 #, fuzzy
 msgid "_Estonian"
 msgstr "Эстонский"
 
-#: src/sendmsg-window.c:229
+#: src/sendmsg-window.c:230
 #, fuzzy
 msgid "_Finnish"
 msgstr "Финский"
 
-#: src/sendmsg-window.c:230
+#: src/sendmsg-window.c:231
 #, fuzzy
 msgid "_French"
 msgstr "Французский"
 
-#: src/sendmsg-window.c:231
+#: src/sendmsg-window.c:232
 #, fuzzy
 msgid "_German"
 msgstr "Немецкий"
 
-#: src/sendmsg-window.c:232
+#: src/sendmsg-window.c:233
 #, fuzzy
 msgid "_Greek"
 msgstr "Греческий"
 
-#: src/sendmsg-window.c:233
+#: src/sendmsg-window.c:234
 msgid "_Hebrew"
 msgstr ""
 
-#: src/sendmsg-window.c:234
+#: src/sendmsg-window.c:235
 #, fuzzy
 msgid "_Hungarian"
 msgstr "Венгерский"
 
-#: src/sendmsg-window.c:235
+#: src/sendmsg-window.c:236
 #, fuzzy
 msgid "_Italian"
 msgstr "Итальянский"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:237
 #, fuzzy
 msgid "_Japanese"
 msgstr "Японский"
 
-#: src/sendmsg-window.c:237
+#: src/sendmsg-window.c:238
 #, fuzzy
 msgid "_Korean"
 msgstr "Корейский"
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:239
 #, fuzzy
 msgid "_Latvian"
 msgstr "Латышский"
 
-#: src/sendmsg-window.c:239
+#: src/sendmsg-window.c:240
 #, fuzzy
 msgid "_Lithuanian"
 msgstr "Литовский"
 
-#: src/sendmsg-window.c:240
+#: src/sendmsg-window.c:241
 #, fuzzy
 msgid "_Norwegian"
 msgstr "Норвежский"
 
-#: src/sendmsg-window.c:241
+#: src/sendmsg-window.c:242
 #, fuzzy
 msgid "_Polish"
 msgstr "Польский"
 
-#: src/sendmsg-window.c:242
+#: src/sendmsg-window.c:243
 #, fuzzy
 msgid "_Portugese"
 msgstr "Португальский"
 
-#: src/sendmsg-window.c:243
+#: src/sendmsg-window.c:244
 #, fuzzy
 msgid "_Romanian"
 msgstr "Румынский"
 
-#: src/sendmsg-window.c:244
+#: src/sendmsg-window.c:245
 #, fuzzy
 msgid "_Russian (ISO)"
 msgstr "Русский (ISO)"
 
-#: src/sendmsg-window.c:245
+#: src/sendmsg-window.c:246
 #, fuzzy
 msgid "_Russian (KOI)"
 msgstr "Русский (KOI)"
 
-#: src/sendmsg-window.c:246
+#: src/sendmsg-window.c:247
 #, fuzzy
 msgid "_Serbian"
 msgstr "Послать"
 
-#: src/sendmsg-window.c:247
+#: src/sendmsg-window.c:248
 msgid "_Serbian (Latin)"
 msgstr ""
 
-#: src/sendmsg-window.c:248
+#: src/sendmsg-window.c:249
 #, fuzzy
 msgid "_Slovak"
 msgstr "Словацкий"
 
-#: src/sendmsg-window.c:249
+#: src/sendmsg-window.c:250
 #, fuzzy
 msgid "_Spanish"
 msgstr "Испанский"
 
-#: src/sendmsg-window.c:250
+#: src/sendmsg-window.c:251
 #, fuzzy
 msgid "_Swedish"
 msgstr "Шведский"
 
-#: src/sendmsg-window.c:251
+#: src/sendmsg-window.c:252
 #, fuzzy
 msgid "_Turkish"
 msgstr "Турецкий"
 
-#: src/sendmsg-window.c:252
+#: src/sendmsg-window.c:253
 #, fuzzy
 msgid "_Ukrainian"
 msgstr "Украинский"
 
-#: src/sendmsg-window.c:253
+#: src/sendmsg-window.c:254
 msgid "_Generic UTF-8"
 msgstr ""
 
-#: src/sendmsg-window.c:277
+#: src/sendmsg-window.c:278
 msgid "_GnuPG uses MIME mode"
 msgstr ""
 
-#: src/sendmsg-window.c:283
+#: src/sendmsg-window.c:284
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr ""
 
-#: src/sendmsg-window.c:290
+#: src/sendmsg-window.c:291
 msgid "_S/MIME mode (GpgSM)"
 msgstr ""
 
-#: src/sendmsg-window.c:305 src/sendmsg-window.c:477
+#: src/sendmsg-window.c:306 src/sendmsg-window.c:478
 msgid "_Include File..."
 msgstr "Включить файл..."
 
-#: src/sendmsg-window.c:308 src/sendmsg-window.c:490
+#: src/sendmsg-window.c:309 src/sendmsg-window.c:491
 msgid "_Attach File..."
 msgstr "Приложить файл..."
 
-#: src/sendmsg-window.c:311 src/sendmsg-window.c:479
+#: src/sendmsg-window.c:312 src/sendmsg-window.c:480
 #, fuzzy
 msgid "I_nclude Message(s)"
 msgstr "Отладочные сообщения"
 
-#: src/sendmsg-window.c:314 src/sendmsg-window.c:482
+#: src/sendmsg-window.c:315 src/sendmsg-window.c:483
 #, fuzzy
 msgid "Attach _Message(s)"
 msgstr "Состояние писем"
 
-#: src/sendmsg-window.c:320 src/sendmsg-window.c:507
+#: src/sendmsg-window.c:321 src/sendmsg-window.c:508
 #, fuzzy
 msgid "Sen_d"
 msgstr "Послать"
 
-#: src/sendmsg-window.c:321 src/sendmsg-window.c:508 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "Послать это сообщение"
 
-#: src/sendmsg-window.c:325
+#: src/sendmsg-window.c:326
 msgid "_Queue"
 msgstr "Очередь"
 
-#: src/sendmsg-window.c:326 src/sendmsg-window.c:513
+#: src/sendmsg-window.c:327 src/sendmsg-window.c:514
 msgid "Queue this message in Outbox for sending"
 msgstr "Поставить это сообщение в очередь для отправки в \"Исходящие\""
 
-#: src/sendmsg-window.c:330
+#: src/sendmsg-window.c:331
 msgid "_Postpone"
 msgstr "Отложить"
 
-#: src/sendmsg-window.c:333 src/sendmsg-window.c:494
+#: src/sendmsg-window.c:334 src/sendmsg-window.c:495
 msgid "_Save"
 msgstr "Сохранить"
 
-#: src/sendmsg-window.c:334 src/sendmsg-window.c:495
+#: src/sendmsg-window.c:335 src/sendmsg-window.c:496
 #, fuzzy
 msgid "Save this message"
 msgstr "Послать это сообщение"
 
-#: src/sendmsg-window.c:338 src/sendmsg-window.c:499
+#: src/sendmsg-window.c:339 src/sendmsg-window.c:500
 msgid "Print the edited message"
 msgstr "Напечатать редактируемое письмо"
 
-#: src/sendmsg-window.c:367 src/sendmsg-window.c:524
+#: src/sendmsg-window.c:368 src/sendmsg-window.c:525
 msgid "_Wrap Body"
 msgstr "Перенос тела письма"
 
-#: src/sendmsg-window.c:371 src/sendmsg-window.c:528
+#: src/sendmsg-window.c:372 src/sendmsg-window.c:529
 #, fuzzy
 msgid "_Reflow Selected Text"
 msgstr "Выбрать все"
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:556
+#: src/sendmsg-window.c:377 src/sendmsg-window.c:557
 #, fuzzy
 msgid "Insert Si_gnature"
 msgstr "Вставить подпись"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:532
+#: src/sendmsg-window.c:381 src/sendmsg-window.c:533
 #, fuzzy
 msgid "_Quote Message(s)"
 msgstr "Отладочные сообщения"
 
-#: src/sendmsg-window.c:385 src/sendmsg-window.c:605
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:606
 #, fuzzy
 msgid "C_heck Spelling"
 msgstr "Проверить орфографию"
 
-#: src/sendmsg-window.c:386 src/sendmsg-window.c:606
+#: src/sendmsg-window.c:387 src/sendmsg-window.c:607
 msgid "Check the spelling of the message"
 msgstr "Проверить правописание в сообщении"
 
-#: src/sendmsg-window.c:391 src/sendmsg-window.c:612
+#: src/sendmsg-window.c:392 src/sendmsg-window.c:613
 msgid "Select _Identity..."
 msgstr "Выбрать пользователя..."
 
-#: src/sendmsg-window.c:392 src/sendmsg-window.c:613
+#: src/sendmsg-window.c:393 src/sendmsg-window.c:614
 msgid "Select the Identity to use for the message"
 msgstr ""
 
-#: src/sendmsg-window.c:397
+#: src/sendmsg-window.c:398
 msgid "_Edit with Gnome-Editor"
 msgstr ""
 
-#: src/sendmsg-window.c:398
+#: src/sendmsg-window.c:399
 msgid "Edit the current message with the default Gnome editor"
 msgstr ""
 
-#: src/sendmsg-window.c:410 src/sendmsg-window.c:569
+#: src/sendmsg-window.c:411 src/sendmsg-window.c:570
 msgid "Fr_om"
 msgstr "От"
 
-#: src/sendmsg-window.c:412 src/sendmsg-window.c:571
+#: src/sendmsg-window.c:413 src/sendmsg-window.c:572
 msgid "_Cc"
 msgstr "Официальные копии (Сс)"
 
-#: src/sendmsg-window.c:414 src/sendmsg-window.c:573
+#: src/sendmsg-window.c:415 src/sendmsg-window.c:574
 msgid "_Bcc"
 msgstr "Скрытые копии"
 
-#: src/sendmsg-window.c:416 src/sendmsg-window.c:575
+#: src/sendmsg-window.c:417 src/sendmsg-window.c:576
 msgid "_Fcc"
 msgstr "Fcc:"
 
-#: src/sendmsg-window.c:418
+#: src/sendmsg-window.c:419
 msgid "_Reply To"
 msgstr "Обратный адрес"
 
-#: src/sendmsg-window.c:424 src/sendmsg-window.c:617
+#: src/sendmsg-window.c:425 src/sendmsg-window.c:618
 msgid "_Request Disposition Notification"
 msgstr ""
 
-#: src/sendmsg-window.c:427 src/sendmsg-window.c:587
+#: src/sendmsg-window.c:428 src/sendmsg-window.c:588
 msgid "_Format = Flowed"
 msgstr ""
 
-#: src/sendmsg-window.c:432 src/sendmsg-window.c:592
+#: src/sendmsg-window.c:433 src/sendmsg-window.c:593
 #, fuzzy
 msgid "_Sign Message"
 msgstr "Письмо"
 
-#: src/sendmsg-window.c:433 src/sendmsg-window.c:593
+#: src/sendmsg-window.c:434 src/sendmsg-window.c:594
 msgid "signs the message using GnuPG"
 msgstr ""
 
-#: src/sendmsg-window.c:436 src/sendmsg-window.c:596
+#: src/sendmsg-window.c:437 src/sendmsg-window.c:597
 #, fuzzy
 msgid "_Encrypt Message"
 msgstr "Сообщения об ошибках"
 
-#: src/sendmsg-window.c:437 src/sendmsg-window.c:597
+#: src/sendmsg-window.c:438 src/sendmsg-window.c:598
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr ""
 
-#: src/sendmsg-window.c:457 src/sendmsg-window.c:633
+#: src/sendmsg-window.c:458 src/sendmsg-window.c:634
 msgid "_Show"
 msgstr "Показать"
 
-#: src/sendmsg-window.c:459 src/sendmsg-window.c:610
+#: src/sendmsg-window.c:460 src/sendmsg-window.c:611
 msgid "_Language"
 msgstr "Язык"
 
-#: src/sendmsg-window.c:461
+#: src/sendmsg-window.c:462
 msgid "_Options"
 msgstr "Параметры"
 
-#: src/sendmsg-window.c:503
+#: src/sendmsg-window.c:504
 msgid "Sa_ve and Close"
 msgstr ""
 
-#: src/sendmsg-window.c:512
+#: src/sendmsg-window.c:513
 msgid "Send _Later"
 msgstr ""
 
-#: src/sendmsg-window.c:733
+#: src/sendmsg-window.c:735
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr ""
 
-#: src/sendmsg-window.c:985
+#: src/sendmsg-window.c:989
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr ""
 
-#: src/sendmsg-window.c:1434
+#: src/sendmsg-window.c:1438
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5137,136 +5250,136 @@ msgid ""
 "Do you really want to attach this file as reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1445
+#: src/sendmsg-window.c:1449
 msgid "Attach as Reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1535
+#: src/sendmsg-window.c:1539
 msgid "Remove"
 msgstr "Удалить"
 
-#: src/sendmsg-window.c:1546
+#: src/sendmsg-window.c:1550
 #, fuzzy
 msgid "attach as reference"
 msgstr "Настройка Balsa"
 
-#: src/sendmsg-window.c:1552
+#: src/sendmsg-window.c:1556
 #, fuzzy
 msgid "attach as file"
 msgstr "Вложить файл"
 
-#: src/sendmsg-window.c:1686
+#: src/sendmsg-window.c:1690
 #, fuzzy, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "Ошибка соединения c %s."
 
-#: src/sendmsg-window.c:1723
+#: src/sendmsg-window.c:1727
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Нет информации про файл '%s': %s"
 
-#: src/sendmsg-window.c:1728
+#: src/sendmsg-window.c:1732
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Вложение %s не является обычным файлом."
 
-#: src/sendmsg-window.c:1731
+#: src/sendmsg-window.c:1735
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Файл %s не может быть прочитан\n"
 
-#: src/sendmsg-window.c:1775
+#: src/sendmsg-window.c:1779
 msgid "Attach file"
 msgstr "Вложить файл"
 
-#: src/sendmsg-window.c:1872 src/sendmsg-window.c:1935
-#: src/sendmsg-window.c:3264
+#: src/sendmsg-window.c:1876 src/sendmsg-window.c:1939
+#: src/sendmsg-window.c:3271
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr ""
 
 #. From:
-#: src/sendmsg-window.c:2130
+#: src/sendmsg-window.c:2134
 #, fuzzy
 msgid "F_rom:"
 msgstr "От:"
 
 #. Subject:
-#: src/sendmsg-window.c:2142
+#: src/sendmsg-window.c:2146
 #, fuzzy
 msgid "S_ubject:"
 msgstr "Тема:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:2156
+#: src/sendmsg-window.c:2160
 #, fuzzy
 msgid "F_cc:"
 msgstr "Fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:2187
+#: src/sendmsg-window.c:2191
 #, fuzzy
 msgid "_Reply To:"
 msgstr "Обратный адрес"
 
 #. Attachment list
-#: src/sendmsg-window.c:2192
+#: src/sendmsg-window.c:2196
 #, fuzzy
 msgid "_Attachments:"
 msgstr "Вложения:"
 
-#: src/sendmsg-window.c:2433
+#: src/sendmsg-window.c:2438
 msgid "you"
 msgstr "вы"
 
-#: src/sendmsg-window.c:2442
+#: src/sendmsg-window.c:2447
 #, fuzzy, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "Переслать письмо"
 
-#: src/sendmsg-window.c:2477
+#: src/sendmsg-window.c:2482
 #, fuzzy, c-format
 msgid "Message-ID: %s\n"
 msgstr "Цвета письма"
 
-#: src/sendmsg-window.c:2483
+#: src/sendmsg-window.c:2488
 #, fuzzy
 msgid "References:"
 msgstr "Настройка Balsa"
 
-#: src/sendmsg-window.c:2494
+#: src/sendmsg-window.c:2499
 #, fuzzy, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "На %s %s написал:\n"
 
-#: src/sendmsg-window.c:2496
+#: src/sendmsg-window.c:2501
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s написал:\n"
 
-#: src/sendmsg-window.c:3420
+#: src/sendmsg-window.c:3427
 #, fuzzy
 msgid "Choose charset"
 msgstr "Сохранить адрес"
 
-#: src/sendmsg-window.c:3427
+#: src/sendmsg-window.c:3434
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file.\n"
 "(choose Generic UTF-8 if unsure)."
 msgstr ""
 
-#: src/sendmsg-window.c:3494
+#: src/sendmsg-window.c:3501
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Не удалось открыть файл %s.\n"
 
-#: src/sendmsg-window.c:3516
+#: src/sendmsg-window.c:3523
 msgid "Include file"
 msgstr "Включить файл"
 
-#: src/sendmsg-window.c:3811
+#: src/sendmsg-window.c:3818
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5274,81 +5387,82 @@ msgid ""
 "For multi-language messages, choose UTF-8."
 msgstr ""
 
-#: src/sendmsg-window.c:3852
+#: src/sendmsg-window.c:3859
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
 "if the complete message shall be protected. Do you really want to proceed?"
 msgstr ""
 
-#: src/sendmsg-window.c:3868
+#: src/sendmsg-window.c:3875
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr ""
 
-#: src/sendmsg-window.c:3913
+#: src/sendmsg-window.c:3922
 msgid "Message could not be created"
 msgstr ""
 
-#: src/sendmsg-window.c:3915
+#: src/sendmsg-window.c:3924
 msgid "Message could not be queued in outbox"
 msgstr ""
 
-#: src/sendmsg-window.c:3917
-msgid "Message could not be saved in senbox"
-msgstr ""
+#: src/sendmsg-window.c:3926
+#, fuzzy
+msgid "Message could not be saved in sentbox"
+msgstr "Цвета письма"
 
-#: src/sendmsg-window.c:3919
+#: src/sendmsg-window.c:3928
 #, fuzzy
 msgid "Message could not be sent"
 msgstr "Цвета письма"
 
-#: src/sendmsg-window.c:3923
+#: src/sendmsg-window.c:3932
 #, fuzzy, c-format
 msgid "Send failed: %s"
 msgstr "Сбой CLOSE."
 
-#: src/sendmsg-window.c:4007
+#: src/sendmsg-window.c:4016
 #, fuzzy
 msgid "Could not postpone message."
 msgstr "Не удалось добавить сообщение"
 
-#: src/sendmsg-window.c:4021
+#: src/sendmsg-window.c:4030
 #, fuzzy
 msgid "Message postponed."
 msgstr "Источник сообщения"
 
-#: src/sendmsg-window.c:4037
+#: src/sendmsg-window.c:4046
 #, fuzzy, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Не удалось открыть файл %s.\n"
 
-#: src/sendmsg-window.c:4059
+#: src/sendmsg-window.c:4068
 #, fuzzy
 msgid "Message saved."
 msgstr "Источник сообщения"
 
-#: src/sendmsg-window.c:4221
+#: src/sendmsg-window.c:4230
 #, fuzzy, c-format
 msgid "Could not compile %s"
 msgstr "Не удалось открыть файл %s.\n"
 
-#: src/sendmsg-window.c:4709
+#: src/sendmsg-window.c:4718
 #, fuzzy, c-format
 msgid "Reply to %s: %s"
 msgstr "Ответить"
 
-#: src/sendmsg-window.c:4714
+#: src/sendmsg-window.c:4723
 #, fuzzy, c-format
 msgid "Forward message to %s: %s"
 msgstr "Переслать письмо"
 
-#: src/sendmsg-window.c:4718
+#: src/sendmsg-window.c:4727
 #, fuzzy, c-format
 msgid "Continue message to %s: %s"
 msgstr "Продолжить письмо"
 
-#: src/sendmsg-window.c:4722
+#: src/sendmsg-window.c:4731
 #, fuzzy, c-format
 msgid "New message to %s: %s"
 msgstr "Новое письмо"
@@ -5747,6 +5861,51 @@ msgstr "Вверх"
 #: src/toolbar-prefs.c:508
 msgid "Down"
 msgstr "Вниз"
+
+#~ msgid ""
+#~ "Error writing to temporary file %s.\n"
+#~ "Check the directory permissions."
+#~ msgstr ""
+#~ "Ошибка записи во временный файл %s.\n"
+#~ "Проверьте права на каталог."
+
+#~ msgid "Cannot open temporary file %s."
+#~ msgstr "Не удалось открыть временный файл %s."
+
+#~ msgid "Please enter information about yourself."
+#~ msgstr "Пожалуйста введите информацию о себе."
+
+#, fuzzy
+#~ msgid "_Name:"
+#~ msgstr "Имя:"
+
+#, fuzzy
+#~ msgid ""
+#~ "You seem to be running Balsa for the first time. The following steps will "
+#~ "set up Balsa by asking a few simple questions. Once you have completed "
+#~ "these steps, you can always change them later in Balsa's preferences. If "
+#~ "any files or directories need to be created, it will be done so "
+#~ "automatically.\n"
+#~ "  Please check the about box in Balsa's main window for more information "
+#~ "about contacting the authors or reporting bugs."
+#~ msgstr ""
+#~ "Кажется вы запускаете Balsa в первый раз. Следующие шаги\n"
+#~ "позволят установить Balsa ответив на несколько простых вопросов.\n"
+#~ "После прохождения эти шагов, вы всегда сможете изменить их\n"
+#~ "позже в настройках Balsa. Если какие-либо файлы или каталоги должны\n"
+#~ "быть созданы, это будет сделано автоматически. Для получения контактной\n"
+#~ "информации и сообщений об ошибках откройте окно \"О программе\" в меню\n"
+#~ "главного окна Balsa."
+
+#~ msgid "Total"
+#~ msgstr "Всего"
+
+#, fuzzy
+#~ msgid "By _Date"
+#~ msgstr "Дата"
+
+#~ msgid "Cannot access the message's body\n"
+#~ msgstr "Нет доступа к содержимому этого сообщения\n"
 
 #, fuzzy
 #~ msgid "Could not add address to address book %s while trying to execute: %s"
@@ -6162,10 +6321,6 @@ msgstr "Вниз"
 #, fuzzy
 #~ msgid "Use SS_L (imaps)"
 #~ msgstr "Использовать SSL (imaps)"
-
-#, fuzzy
-#~ msgid "Print currently selected messages"
-#~ msgstr "Напечатать текущее письмо"
 
 #~ msgid "Delete the current message"
 #~ msgstr "Уничтожить текущее письмо"

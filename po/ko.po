@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 1.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-08-19 00:02+0100\n"
+"POT-Creation-Date: 2004-09-20 22:49+0100\n"
 "PO-Revision-Date: 2001-02-09 18:35+0900\n"
 "Last-Translator: Sung-Hyun Nam <namsh@kldp.org>\n"
 "Language-Team: Korean <ko@li.org>\n"
@@ -67,8 +67,8 @@ msgstr "주소록 열기"
 msgid "Cannot add duplicate entry"
 msgstr ""
 
-#: libbalsa/address-book.c:406 src/main-window.c:2155
-#: src/sendmsg-window.c:4038
+#: libbalsa/address-book.c:406 src/main-window.c:2158
+#: src/sendmsg-window.c:4047
 #, fuzzy
 msgid "Unknown error"
 msgstr "모름"
@@ -103,12 +103,12 @@ msgstr "이름:"
 msgid "O_rganization:"
 msgstr "직장:"
 
-#: libbalsa/address.c:405 libinit_balsa/balsa-druid-page-user.c:79
+#: libbalsa/address.c:405
 #, fuzzy
 msgid "_Email Address:"
 msgstr "전자우편 주소:"
 
-#: libbalsa/body.c:115 libbalsa/mailbox_local.c:986 libbalsa/message.c:909
+#: libbalsa/body.c:115 libbalsa/mailbox_local.c:976 libbalsa/message.c:914
 #, fuzzy
 msgid "(No subject)"
 msgstr "제목"
@@ -257,13 +257,13 @@ msgid "%s: multiple keys for %s"
 msgstr ""
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1122
-#: libbalsa/mailbox_local.c:1124 src/sendmsg-window.c:2632
-#: src/sendmsg-window.c:2633
+#: libbalsa/identity.c:91 libbalsa/mailbox_local.c:1112
+#: libbalsa/mailbox_local.c:1114 src/sendmsg-window.c:2637
+#: src/sendmsg-window.c:2638
 msgid "Re:"
 msgstr ""
 
-#: libbalsa/identity.c:92 src/sendmsg-window.c:2662 src/sendmsg-window.c:2663
+#: libbalsa/identity.c:92 src/sendmsg-window.c:2667 src/sendmsg-window.c:2668
 msgid "Fwd:"
 msgstr ""
 
@@ -403,7 +403,7 @@ msgid "S/MIME mode"
 msgstr ""
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:255
+#: libbalsa/imap-server.c:258
 #, c-format
 msgid ""
 "IMAP server %s alert:\n"
@@ -411,42 +411,47 @@ msgid ""
 msgstr ""
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:259
+#: libbalsa/imap-server.c:262
 #, c-format
 msgid "IMAP server %s error: %s"
 msgstr ""
 
 #. IMAP host name + message
-#: libbalsa/imap-server.c:265
+#: libbalsa/imap-server.c:268
 #, fuzzy, c-format
 msgid "%s: %s"
 msgstr "발사: %s"
 
-#: libbalsa/imap-server.c:550 libbalsa/imap-server.c:653
+#: libbalsa/imap-server.c:506
 #, c-format
 msgid "Cannot connect to the server: %s"
 msgstr ""
 
-#: libbalsa/imap-server.c:638
+#: libbalsa/imap-server.c:510
+#, fuzzy
+msgid "Cannot connect to the server"
+msgstr "%s에 연결중입니다"
+
+#: libbalsa/imap-server.c:658
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:279
+#: libbalsa/libbalsa.c:283
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:384
+#: libbalsa/libbalsa.c:388
 #, fuzzy
 msgid "Invalid date"
 msgstr "[잘못된 날짜]"
 
-#: libbalsa/libbalsa.c:400 src/pref-manager.c:1226 src/pref-manager.c:1323
+#: libbalsa/libbalsa.c:404 src/pref-manager.c:1262 src/pref-manager.c:1359
 msgid "Unknown"
 msgstr "모름"
 
-#: libbalsa/libbalsa.c:539
+#: libbalsa/libbalsa.c:543
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -454,14 +459,14 @@ msgid ""
 "<b>This certificate belongs to:</b>\n"
 msgstr ""
 
-#: libbalsa/libbalsa.c:551
+#: libbalsa/libbalsa.c:555
 #, fuzzy
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
 msgstr "이 증명서가 발행된 곳:"
 
-#: libbalsa/libbalsa.c:562
+#: libbalsa/libbalsa.c:566
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -470,20 +475,20 @@ msgid ""
 "<b>Fingerprint:</b> %s"
 msgstr ""
 
-#: libbalsa/libbalsa.c:571
+#: libbalsa/libbalsa.c:575
 #, fuzzy
 msgid "SSL/TLS certificate"
 msgstr "SSL 증명 확인"
 
-#: libbalsa/libbalsa.c:573
+#: libbalsa/libbalsa.c:577
 msgid "_Accept Once"
 msgstr ""
 
-#: libbalsa/libbalsa.c:574
+#: libbalsa/libbalsa.c:578
 msgid "Accept&_Save"
 msgstr ""
 
-#: libbalsa/libbalsa.c:575
+#: libbalsa/libbalsa.c:579
 #, fuzzy
 msgid "_Reject"
 msgstr "제목(_S)"
@@ -511,65 +516,80 @@ msgstr "%s 형식의 우편함을 생성할 수 없습니다"
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
 #. login information...
-#: libbalsa/mailbox_imap.c:481
+#: libbalsa/mailbox_imap.c:500
 msgid "IMAP connection has been severed. Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:484
+#: libbalsa/mailbox_imap.c:503
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:825
+#: libbalsa/mailbox_imap.c:851
 #, c-format
 msgid "IMAP SEARCH UNSEEN request failed for mailbox %s"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:888 libbalsa/mailbox_maildir.c:482
-#: libbalsa/mailbox_mbox.c:435 libbalsa/mailbox_mh.c:502
+#: libbalsa/mailbox_imap.c:914 libbalsa/mailbox_maildir.c:480
+#: libbalsa/mailbox_mbox.c:461 libbalsa/mailbox_mh.c:502
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:1316
+#: libbalsa/mailbox_imap.c:978 libbalsa/mailbox_imap.c:1991
+#, c-format
+msgid "Downloading %ld kB"
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:1345
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
 "falling back to default searching method"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2186
+#: libbalsa/mailbox_imap.c:1405
+#, c-format
+msgid "No path found for mailbox \"%s\", using \"%s\""
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:2171
+#, c-format
+msgid "Uploading %ld kB"
+msgstr ""
+
+#: libbalsa/mailbox_imap.c:2321
 #, fuzzy
 msgid "Server-side threading not supported."
 msgstr "Anonymous 인증은 지원되지 않습니다."
 
-#: libbalsa/mailbox_local.c:1267
+#: libbalsa/mailbox_local.c:1260
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "%s 열기 실패. 에러값 = %d, "
 
-#: libbalsa/mailbox_local.c:1289
+#: libbalsa/mailbox_local.c:1282
 #, fuzzy, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "%s 우편함에 동기를 맞출 수 없습니다!"
 
-#: libbalsa/mailbox_maildir.c:189
+#: libbalsa/mailbox_maildir.c:188
 #, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "우편함 %s는 Maildir 우편함으로 보이지 않습니다."
 
-#: libbalsa/mailbox_maildir.c:198
+#: libbalsa/mailbox_maildir.c:197
 #, fuzzy, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "%s 형식의 우편함을 생성할 수 없습니다"
 
-#: libbalsa/mailbox_maildir.c:205 libbalsa/mailbox_maildir.c:213
-#: libbalsa/mailbox_maildir.c:223
+#: libbalsa/mailbox_maildir.c:204 libbalsa/mailbox_maildir.c:212
+#: libbalsa/mailbox_maildir.c:222
 #, fuzzy, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "%s 형식의 우편함을 생성할 수 없습니다"
 
-#: libbalsa/mailbox_maildir.c:324 libbalsa/mailbox_mh.c:266
+#: libbalsa/mailbox_maildir.c:323 libbalsa/mailbox_mh.c:266
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -578,7 +598,7 @@ msgstr ""
 "%s의 내용을 삭제할 수 없습니다:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:330 libbalsa/mailbox_mbox.c:247
+#: libbalsa/mailbox_maildir.c:329 libbalsa/mailbox_mbox.c:267
 #: libbalsa/mailbox_mh.c:272
 #, c-format
 msgid ""
@@ -588,47 +608,45 @@ msgstr ""
 "%s를 삭제할 수 없습니다:\n"
 "%s"
 
-#: libbalsa/mailbox_maildir.c:454 libbalsa/mailbox_mbox.c:399
+#: libbalsa/mailbox_maildir.c:452 libbalsa/mailbox_mbox.c:425
 #: libbalsa/mailbox_mh.c:483
 msgid "Mailbox does not exist."
 msgstr ""
 
-#: libbalsa/mailbox_mbox.c:181
+#: libbalsa/mailbox_mbox.c:179
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "우편함 %s는 Mbox 우편함으로 보이지 않습니다."
 
-#: libbalsa/mailbox_mbox.c:407
+#: libbalsa/mailbox_mbox.c:433
 #, fuzzy
 msgid "Cannot open mailbox."
 msgstr "우편함 %s를 읽어들일 수 없습니다"
 
-#: libbalsa/mailbox_mbox.c:415
+#: libbalsa/mailbox_mbox.c:441
 #, fuzzy
 msgid "Cannot lock mailbox."
 msgstr "우편함 %s를 읽어들일 수 없습니다"
 
-#: libbalsa/mailbox_mbox.c:1488
+#: libbalsa/mailbox_mbox.c:1500
 #, fuzzy, c-format
 msgid "%s: could not open %s."
 msgstr "%s 파일을 열 수 없습니다.\n"
 
-#: libbalsa/mailbox_mbox.c:1496
+#: libbalsa/mailbox_mbox.c:1508
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr ""
 
-#: libbalsa/mailbox_mbox.c:1506
+#: libbalsa/mailbox_mbox.c:1518
 #, fuzzy, c-format
 msgid "%s: could not get message stream."
 msgstr "메시지를 쓸 수 없습니다"
 
-#: libbalsa/mailbox_mbox.c:1521
-#, c-format
-msgid ""
-"Error copying message to mailbox %s!\n"
-"Mailbox might have been corrupted!"
-msgstr ""
+#: libbalsa/mailbox_mbox.c:1533
+#, fuzzy, c-format
+msgid "Error copying message to mailbox %s!"
+msgstr "에러 메시지"
 
 #: libbalsa/mailbox_mh.c:172
 #, c-format
@@ -720,49 +738,37 @@ msgstr ""
 msgid "POP3 temp mailbox %s was not removed (system error message: %s)"
 msgstr ""
 
-#: libbalsa/message.c:481
+#: libbalsa/message.c:482
 #, c-format
 msgid "Source mailbox (%s) is readonly. Cannot move messages"
 msgstr ""
 
-#: libbalsa/message.c:633 libbalsa/message.c:673
+#: libbalsa/message.c:634 libbalsa/message.c:674
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
 
-#: libbalsa/mime.c:80 src/balsa-message.c:2296 src/print.c:680
-#, c-format
-msgid ""
-"Error writing to temporary file %s.\n"
-"Check the directory permissions."
-msgstr ""
-
-#: libbalsa/mime.c:87 src/balsa-message.c:2304 src/print.c:687
-#, fuzzy, c-format
-msgid "Cannot open temporary file %s."
-msgstr "%s 파일을 열 수 없습니다.\n"
-
-#: libbalsa/mime.c:107
+#: libbalsa/mime.c:92
 msgid ""
 "\n"
 "--\n"
 "This is an OpenPGP signed message part:\n"
 msgstr ""
 
-#: libbalsa/misc.c:1627
+#: libbalsa/misc.c:1629
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "fcntl 잠금을 시도하던 중 시간이 초과되었습니다!"
 
-#: libbalsa/misc.c:1634
+#: libbalsa/misc.c:1636
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "fcntl 잠금을 기다리는 중입니다... %d"
 
-#: libbalsa/misc.c:1662
+#: libbalsa/misc.c:1664
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "flock 잠금을 시도하던 중 시간이 초과되었습니다!"
 
-#: libbalsa/misc.c:1669
+#: libbalsa/misc.c:1671
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "flock 잠금을 기다리는 중입니다... %d"
@@ -1136,16 +1142,16 @@ msgstr ""
 msgid "Try again later."
 msgstr ""
 
-#: libbalsa/send.c:233 libbalsa/send.c:240
+#: libbalsa/send.c:237 libbalsa/send.c:244
 msgid "Sending Mail..."
 msgstr "편지를 보냅니다..."
 
-#: libbalsa/send.c:236 src/main-window.c:2591
+#: libbalsa/send.c:240 src/main-window.c:2595
 #, fuzzy
 msgid "_Hide"
 msgstr "숨김"
 
-#: libbalsa/send.c:765
+#: libbalsa/send.c:764
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1153,7 +1159,7 @@ msgid ""
 "Message left in your outbox.\n"
 msgstr ""
 
-#: libbalsa/send.c:810
+#: libbalsa/send.c:818
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1161,49 +1167,56 @@ msgid ""
 "Message left in your outbox.\n"
 msgstr ""
 
-#: libbalsa/send.c:820
+#: libbalsa/send.c:828
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr ""
 
-#: libbalsa/send.c:850
+#: libbalsa/send.c:858
 #, fuzzy
 msgid "Connected to MTA"
 msgstr "%s에 연결중입니다"
 
-#: libbalsa/send.c:857 src/balsa-message.c:1415 src/print.c:369
-#: src/sendmsg-window.c:855 src/sendmsg-window.c:2459 src/store-address.c:303
+#: libbalsa/send.c:865 src/balsa-message.c:1462 src/print.c:369
+#: src/sendmsg-window.c:859 src/sendmsg-window.c:2464 src/store-address.c:303
 msgid "From:"
 msgstr "보낸이:"
 
-#: libbalsa/send.c:860 src/balsa-index.c:335
+#: libbalsa/send.c:868 src/balsa-index.c:338
 msgid "From"
 msgstr "보낸이"
 
-#: libbalsa/send.c:869 src/balsa-message.c:1424 src/print.c:373
-#: src/sendmsg-window.c:854 src/sendmsg-window.c:2466 src/store-address.c:304
+#: libbalsa/send.c:877 src/balsa-message.c:1471 src/print.c:373
+#: src/sendmsg-window.c:858 src/sendmsg-window.c:2471 src/store-address.c:304
 msgid "To:"
 msgstr "받는이:"
 
-#: libbalsa/send.c:872 src/balsa-index.c:906
+#: libbalsa/send.c:880 src/balsa-index.c:991
 msgid "To"
 msgstr "받는이"
 
-#: libbalsa/send.c:910
+#: libbalsa/send.c:918
 msgid "Disconnected"
 msgstr ""
 
-#: libbalsa/send.c:1128
+#: libbalsa/send.c:1148
 msgid ""
 "SMTP server refused connection.\n"
-"Balsa by default uses submission service (587).\n"
-"If you want to submit mail using relay service (25),specify it explicitly "
-"via: \"host:smtp\".\n"
-"Message is left in outbox."
+"Check your internet connection."
 msgstr ""
 
-#: libbalsa/send.c:1138
+#: libbalsa/send.c:1153
+msgid ""
+"SMTP server cannot be reached.\n"
+"Check your internet connection."
+msgstr ""
+
+#: libbalsa/send.c:1162
+msgid "Message left in Outbox (try again later)"
+msgstr ""
+
+#: libbalsa/send.c:1166
 #, fuzzy, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1212,27 +1225,27 @@ msgstr ""
 "SMTP 프로토콜 에러. 중계할 수 없습니다.\n"
 "메시지가 보낼우편함에 남아있습니다."
 
-#: libbalsa/send.c:1466
+#: libbalsa/send.c:1514
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 
-#: libbalsa/send.c:1759 libbalsa/send.c:1835
-msgid "This message will not be encrpyted for the BCC: recipient(s)."
+#: libbalsa/send.c:1808 libbalsa/send.c:1884
+msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr ""
 
 #. host, authentication method
-#: libbalsa/server.c:370
+#: libbalsa/server.c:377
 #, fuzzy, c-format
 msgid "Logging in to %s using %s"
 msgstr "%s를 사용하여 SSL 연결"
 
-#: libbalsa/source-viewer.c:52 src/main-window.c:645
+#: libbalsa/source-viewer.c:52 src/main-window.c:647
 #, fuzzy
 msgid "_Select Text"
 msgstr "모두 선택"
 
-#: libbalsa/source-viewer.c:53 src/main-window.c:646
+#: libbalsa/source-viewer.c:53 src/main-window.c:648
 #, fuzzy
 msgid "Select entire mail"
 msgstr "서명 파일 선택"
@@ -1323,14 +1336,15 @@ msgstr ""
 msgid "Mail Files"
 msgstr "메일 파일"
 
-#: libinit_balsa/balsa-druid-page-directory.c:341
+#: libinit_balsa/balsa-druid-page-directory.c:342
+#: libinit_balsa/balsa-druid-page-directory.c:376
 #, fuzzy, c-format
 msgid ""
 "Problem Creating Mailboxes\n"
 "%s"
 msgstr "우편함 생성중 문제 발생"
 
-#: libinit_balsa/balsa-druid-page-finish.c:37
+#: libinit_balsa/balsa-druid-page-finish.c:40
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -1338,43 +1352,93 @@ msgstr ""
 "발사를 성공적으로 셋업하였습니다. 좋은 시간 가지세요!\n"
 "   -- 발사 개발 팀"
 
-#: libinit_balsa/balsa-druid-page-finish.c:43
+#: libinit_balsa/balsa-druid-page-finish.c:46
 msgid "All Done!"
 msgstr "모두 완료!"
 
-#: libinit_balsa/balsa-druid-page-finish.c:70
+#: libinit_balsa/balsa-druid-page-finish.c:76
 msgid "GnomeCard Address Book"
 msgstr "그놈카드 주소록"
 
-#: libinit_balsa/balsa-druid-page-finish.c:77
-#: libinit_balsa/balsa-druid-page-finish.c:85 src/ab-window.c:207
+#: libinit_balsa/balsa-druid-page-finish.c:83
+#: libinit_balsa/balsa-druid-page-finish.c:91 src/ab-window.c:207
 msgid "Address Book"
 msgstr "주소록"
 
-#: libinit_balsa/balsa-druid-page-user.c:67
-msgid "Please enter information about yourself."
-msgstr "당신의 정보를 입력하시기 바랍니다."
+#: libinit_balsa/balsa-druid-page-user.c:51
+msgid ""
+"The following settings are also needed (and you can find them later, if need "
+"be, in the Email application in the 'Preferences' and 'Identities' commands "
+"on the 'Tools' menu)"
+msgstr ""
 
-#: libinit_balsa/balsa-druid-page-user.c:74
+#: libinit_balsa/balsa-druid-page-user.c:56
+msgid ""
+" Whoever provides your email account should be able to give you the "
+"following information (if you have a Network Administrator, they may already "
+"have set this up for you):"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:62
+msgid "Yes, remember it"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:62
+msgid "No, type it in every time"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:95
+msgid "Name of mail server for incoming _mail:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:100
 #, fuzzy
-msgid "_Name:"
-msgstr "이름:"
+msgid "_Type of mail server:"
+msgstr "서버에서 삭제"
 
-#: libinit_balsa/balsa-druid-page-user.c:84
+#: libinit_balsa/balsa-druid-page-user.c:104
+msgid "Connect using _SSL:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:107
+msgid "Your e-mail _login name:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:110
 #, fuzzy
-msgid "_Local Mail Directory:"
-msgstr "지역 메일 디렉토리:"
+msgid "Your _password:"
+msgstr "비밀번호(_P):"
 
-#: libinit_balsa/balsa-druid-page-user.c:91
+#: libinit_balsa/balsa-druid-page-user.c:118
 #, fuzzy
 msgid "_SMTP Server:"
 msgstr "SMTP 서버:"
 
-#: libinit_balsa/balsa-druid-page-user.c:109
+#. 2.1
+#: libinit_balsa/balsa-druid-page-user.c:123
+#, fuzzy
+msgid "Your real _name:"
+msgstr "이름:"
+
+#: libinit_balsa/balsa-druid-page-user.c:129
+msgid "Your _Email Address, for this email account:"
+msgstr ""
+
+#: libinit_balsa/balsa-druid-page-user.c:134
+#, fuzzy
+msgid "_Remember your password:"
+msgstr "비밀번호(_P):"
+
+#: libinit_balsa/balsa-druid-page-user.c:139
+#, fuzzy
+msgid "_Local mail directory:"
+msgstr "지역 메일 디렉토리:"
+
+#: libinit_balsa/balsa-druid-page-user.c:156
 msgid "User Settings"
 msgstr "사용자 설정"
 
-#: libinit_balsa/balsa-druid-page-user.c:177
+#: libinit_balsa/balsa-druid-page-user.c:302
 #, fuzzy, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -1386,24 +1450,18 @@ msgid "Welcome to Balsa!"
 msgstr "발사 사용을 환영합니다!"
 
 #: libinit_balsa/balsa-druid-page-welcome.c:34
-#, fuzzy
 msgid ""
-"You seem to be running Balsa for the first time. The following steps will "
-"set up Balsa by asking a few simple questions. Once you have completed these "
-"steps, you can always change them later in Balsa's preferences. If any files "
-"or directories need to be created, it will be done so automatically.\n"
-"  Please check the about box in Balsa's main window for more information "
-"about contacting the authors or reporting bugs."
+"Before you can send or receive email:\n"
+"\n"
+"-- either you should already have Internet access and an email account, "
+"provided by an Internet Service Provider, and you should have made that "
+"Internet connection on your computer\n"
+"\n"
+"-- or your Network Administrator at your place of work/study/similar may "
+"have set up your computer to connect to the network."
 msgstr ""
-"발사를 처음 사용하시는 것 같습니다. 다음 스텝에서\n"
-"발사 셋업을 위해 몇가지 간단한 질문을 하겠습니다.\n"
-"한번 셋업이 되면 발사의 선택사항 항목에서 언제든\n"
-"바꿀 수 있습니다. 파일이나 디렉토리의 생성이 필요한\n"
-"경우 자동으로 생성될 것입니다. 발사 메인 창에서 발사에\n"
-"대하여 박스를 확인해 보시기 바랍니다. 거기에서 저자에게\n"
-"연락하는 방법이나 버그를 레포팅하는 방법등을 알 수 있습니다"
 
-#: libinit_balsa/balsa-initdruid.c:75
+#: libinit_balsa/balsa-initdruid.c:79
 #, fuzzy
 msgid ""
 "This will exit Balsa.\n"
@@ -1412,23 +1470,23 @@ msgstr ""
 "발사를 종료합니다.\n"
 "정말로 원하세요?"
 
-#: libinit_balsa/helper.c:65
+#: libinit_balsa/helper.c:68
 #, fuzzy, c-format
 msgid "Error loading %s: %s\n"
 msgstr "%s로 연결 도중 에러가 발생했습니다."
 
-#: libinit_balsa/helper.c:152
+#: libinit_balsa/helper.c:226
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr "경로 %s는 루트 파일시스템 (/로 시작)에 대해 상대적이어야 합니다."
 
-#: libinit_balsa/helper.c:165 libinit_balsa/helper.c:189
+#: libinit_balsa/helper.c:239 libinit_balsa/helper.c:263
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr ""
 "디렉토리를 생성할 수 없습니다: mkdir()이 경로명 \"%s\"에 대해 실패했습니다."
 
-#: libinit_balsa/helper.c:175 libinit_balsa/helper.c:198
+#: libinit_balsa/helper.c:249 libinit_balsa/helper.c:272
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "경로명 \"%s\"를 가진 파일이 디렉토리가 아닙니다."
@@ -1455,13 +1513,13 @@ msgstr ""
 msgid "New mail notification"
 msgstr "통지:"
 
-#: src/ab-main.c:337 src/ab-window.c:167 src/filter-edit-dialog.c:193
+#: src/ab-main.c:338 src/ab-window.c:167 src/filter-edit-dialog.c:193
 #: src/filter-export-dialog.c:88 src/filter-run-dialog.c:220
 #: src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "이름"
 
-#: src/ab-main.c:457
+#: src/ab-main.c:458
 #, fuzzy
 msgid "F_ilter:"
 msgstr "필터 이름:"
@@ -1508,142 +1566,149 @@ msgid ""
 "%s"
 msgstr "에러: %s 호스트의 주소를 찾을 수 없습니다."
 
-#: src/address-book-config.c:147
+#: src/address-book-config.c:151
 #, fuzzy
 msgid "Add Address Book"
 msgstr "주소록"
 
-#: src/address-book-config.c:155
+#: src/address-book-config.c:159
 #, fuzzy
 msgid "Modify Address Book"
 msgstr "주소록"
 
-#: src/address-book-config.c:190
+#: src/address-book-config.c:194
 msgid "New Address Book type:"
 msgstr "새 주소록 형식:"
 
-#: src/address-book-config.c:199
+#: src/address-book-config.c:203
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard 주소록 (그놈카드)"
 
-#: src/address-book-config.c:212
+#: src/address-book-config.c:216
 msgid "External query (a program)"
 msgstr ""
 
-#: src/address-book-config.c:224
+#: src/address-book-config.c:228
 #, fuzzy
 msgid "LDIF Address Book"
 msgstr "LDAP 주소록"
 
-#: src/address-book-config.c:239
+#: src/address-book-config.c:243
 msgid "LDAP Address Book"
 msgstr "LDAP 주소록"
 
-#: src/address-book-config.c:247
+#: src/address-book-config.c:251
 msgid "Balsa is not compiled with LDAP support"
 msgstr "발사가 LDAP를 지원하도록 컴파일되지 않았습니다"
 
+#: src/address-book-config.c:258 src/address-book-config.c:540
+#, fuzzy
+msgid "GPE Address Book"
+msgstr "주소록"
+
 #. mailbox name
-#: src/address-book-config.c:291 src/address-book-config.c:336
-#: src/address-book-config.c:398 src/address-book-config.c:458
+#: src/address-book-config.c:312 src/address-book-config.c:357
+#: src/address-book-config.c:419 src/address-book-config.c:479
+#: src/address-book-config.c:538
 #, fuzzy
 msgid "A_ddress Book Name"
 msgstr "주소록 이름"
 
-#: src/address-book-config.c:296 src/address-book-config.c:404
+#: src/address-book-config.c:317 src/address-book-config.c:425
 #, fuzzy
 msgid "_File Name"
 msgstr "파일 이름"
 
-#: src/address-book-config.c:303
+#: src/address-book-config.c:324
 #, fuzzy
 msgid "Select path for VCARD address book"
 msgstr "주소록 열기"
 
-#: src/address-book-config.c:308 src/address-book-config.c:367
-#: src/address-book-config.c:417 src/address-book-config.c:489
+#: src/address-book-config.c:329 src/address-book-config.c:388
+#: src/address-book-config.c:438 src/address-book-config.c:510
+#: src/address-book-config.c:543
 msgid "_Expand aliases as you type"
 msgstr ""
 
-#: src/address-book-config.c:341
+#: src/address-book-config.c:362
 msgid "Load program location"
 msgstr ""
 
-#: src/address-book-config.c:348
+#: src/address-book-config.c:369
 #, fuzzy
 msgid "Select load program for address book"
 msgstr "주소록 %s를 읽어올 수 없습니다"
 
-#: src/address-book-config.c:354
+#: src/address-book-config.c:375
 msgid "Save program location"
 msgstr ""
 
-#: src/address-book-config.c:360
+#: src/address-book-config.c:381
 msgid "Select save program for address book"
 msgstr ""
 
-#: src/address-book-config.c:411
+#: src/address-book-config.c:432
 #, fuzzy
 msgid "Select path for LDIF address book"
 msgstr "주소록 열기"
 
-#: src/address-book-config.c:463
+#: src/address-book-config.c:484
 #, fuzzy
 msgid "_Host Name"
 msgstr "호스트 이름"
 
-#: src/address-book-config.c:468
+#: src/address-book-config.c:489
 #, fuzzy
 msgid "Base Domain _Name"
 msgstr "기본 도메인 이름"
 
-#: src/address-book-config.c:473
+#: src/address-book-config.c:494
 msgid "_User Name (Bind DN)"
 msgstr ""
 
-#: src/address-book-config.c:478
+#: src/address-book-config.c:499
 #, fuzzy
 msgid "_Password"
 msgstr "비밀번호(_P):"
 
-#: src/address-book-config.c:485
+#: src/address-book-config.c:506
 msgid "Enable _TLS"
 msgstr ""
 
-#: src/address-book-config.c:556 src/folder-conf.c:103
+#: src/address-book-config.c:605 src/folder-conf.c:103
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr ""
 
-#: src/address-book-config.c:574 src/mailbox-conf.c:550
-#: src/pref-manager.c:1519 src/pref-manager.c:2665
+#: src/address-book-config.c:623 src/mailbox-conf.c:564
+#: src/pref-manager.c:1555 src/pref-manager.c:2699
 #, fuzzy
 msgid "_Add"
 msgstr "추가"
 
-#: src/address-book-config.c:653
+#: src/address-book-config.c:702
 #, fuzzy, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr ""
 "주소록 파일 경로 '%s'가 맞지 않습니다.\n"
 "파일 이름을 바꿀까요?"
 
-#: src/address-book-config.c:656
+#: src/address-book-config.c:705
 #, fuzzy, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "경로명 \"%s\"를 가진 파일이 디렉토리가 아닙니다."
 
-#: src/address-book-config.c:659
+#: src/address-book-config.c:708
 #, fuzzy, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "경로명 \"%s\"를 가진 파일이 디렉토리가 아닙니다."
 
-#: src/address-book-config.c:662
+#: src/address-book-config.c:711
 #, fuzzy, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "경로명 \"%s\"를 가진 파일이 디렉토리가 아닙니다."
 
-#: src/address-book-config.c:665
+#: src/address-book-config.c:714
 msgid "Do you want to correct the path?"
 msgstr ""
 
@@ -1666,121 +1731,121 @@ msgstr "%s@%s의 우편함 비밀번호:"
 msgid "Password needed"
 msgstr "비밀번호(_P):"
 
-#: src/balsa-app.c:95 src/folder-conf.c:324
+#: src/balsa-app.c:95 src/folder-conf.c:344
 msgid "_Remember password"
 msgstr ""
 
-#: src/balsa-app.c:579
+#: src/balsa-app.c:578
 #, fuzzy, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "우편함을 다시 열 수 없습니다"
 
-#: src/balsa-index.c:348
+#: src/balsa-index.c:351 src/pref-manager.c:353
 msgid "Subject"
 msgstr "제목"
 
-#: src/balsa-index.c:362
+#: src/balsa-index.c:365 src/pref-manager.c:354
 msgid "Date"
 msgstr "날짜"
 
-#: src/balsa-index.c:374
+#: src/balsa-index.c:377 src/pref-manager.c:355
 #, fuzzy
 msgid "Size"
 msgstr "단순"
 
-#: src/balsa-index.c:870
+#: src/balsa-index.c:955
 #, fuzzy, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "우편함을 다시 여는 중입니다..."
 
 #. R
-#: src/balsa-index.c:1611 src/main-window.c:576 src/main-window.c:1021
+#: src/balsa-index.c:1712 src/main-window.c:578 src/main-window.c:1024
 #: src/message-window.c:143
 msgid "_Reply..."
 msgstr "회신(_R)..."
 
-#: src/balsa-index.c:1613
+#: src/balsa-index.c:1714
 #, fuzzy
 msgid "Reply To _All..."
 msgstr "전체 회신..."
 
-#: src/balsa-index.c:1615
+#: src/balsa-index.c:1716
 #, fuzzy
 msgid "Reply To _Group..."
 msgstr "그룹 회신..."
 
-#: src/balsa-index.c:1617
+#: src/balsa-index.c:1718
 #, fuzzy
 msgid "_Forward Attached..."
 msgstr "전달(_F)..."
 
-#: src/balsa-index.c:1619
+#: src/balsa-index.c:1720
 #, fuzzy
 msgid "Forward _Inline..."
 msgstr "전달..."
 
-#: src/balsa-index.c:1621 src/main-window.c:666 src/main-window.c:1005
+#: src/balsa-index.c:1722 src/main-window.c:668 src/main-window.c:1008
 msgid "_Store Address..."
 msgstr "주소 저장(_S)..."
 
-#: src/balsa-index.c:1636 src/filter-edit-dialog.c:216 src/mailbox-node.c:957
-#: src/pref-manager.c:1521 src/pref-manager.c:2669
+#: src/balsa-index.c:1737 src/filter-edit-dialog.c:216 src/mailbox-node.c:965
+#: src/pref-manager.c:1557 src/pref-manager.c:2703
 msgid "_Delete"
 msgstr "삭제(_D)"
 
-#: src/balsa-index.c:1641
+#: src/balsa-index.c:1742
 msgid "_Undelete"
 msgstr "복구(_U)"
 
-#: src/balsa-index.c:1646
+#: src/balsa-index.c:1747
 #, fuzzy
 msgid "Move To _Trash"
 msgstr "휴지통으로 보냄"
 
-#: src/balsa-index.c:1650
+#: src/balsa-index.c:1751
 #, fuzzy
 msgid "T_oggle"
 msgstr "토글"
 
-#: src/balsa-index.c:1654 src/main-window.c:325 src/main-window.c:354
+#: src/balsa-index.c:1755 src/main-window.c:327 src/main-window.c:356
 msgid "_Flagged"
 msgstr ""
 
-#: src/balsa-index.c:1657
+#: src/balsa-index.c:1758
 #, fuzzy
 msgid "_Unread"
 msgstr "안읽음"
 
-#: src/balsa-index.c:1665
+#: src/balsa-index.c:1766
 #, fuzzy
 msgid "_Move to"
 msgstr "폴더로 이동:"
 
-#: src/balsa-index.c:1673
+#: src/balsa-index.c:1774
 msgid "_View Source"
 msgstr ""
 
-#: src/balsa-index.c:1942
+#: src/balsa-index.c:2042
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\"."
 msgstr ""
 
-#: src/balsa-index.c:1943
+#: src/balsa-index.c:2043
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\"."
 msgstr ""
 
-#: src/balsa-index.c:1956
+#: src/balsa-index.c:2056
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr ""
 
-#: src/balsa-index.c:1957
+#: src/balsa-index.c:2057
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr ""
 
-#: src/balsa-index.c:2073
+#: src/balsa-index.c:2177
 #, fuzzy, c-format
 msgid "Committing mailbox %s failed."
 msgstr "우편함 %s의 현재 상태 저장이 실패했습니다."
@@ -1788,14 +1853,6 @@ msgstr "우편함 %s의 현재 상태 저장이 실패했습니다."
 #: src/balsa-mblist.c:278
 msgid "Mailbox"
 msgstr "우편함"
-
-#: src/balsa-mblist.c:306 src/filter-edit-callbacks.c:802
-msgid "Unread"
-msgstr "안읽음"
-
-#: src/balsa-mblist.c:331
-msgid "Total"
-msgstr "총"
 
 #: src/balsa-mblist.c:1011 src/balsa-mblist.c:1047
 #, fuzzy
@@ -1812,7 +1869,7 @@ msgstr "필터(_F)..."
 msgid "Choose destination folder"
 msgstr "폴더로 이동:"
 
-#: src/balsa-mblist.c:2033
+#: src/balsa-mblist.c:2034
 #, fuzzy, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -1821,257 +1878,263 @@ msgstr[1] "읽지 않은 메시지를 가진 우편함 색"
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2039
+#: src/balsa-mblist.c:2040
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/balsa-message.c:578
+#: src/balsa-message.c:606
 #, fuzzy
 msgid "Content"
 msgstr "계속"
 
-#: src/balsa-message.c:661
+#: src/balsa-message.c:688
 #, fuzzy
 msgid "Message parts"
 msgstr "메시지"
 
-#: src/balsa-message.c:776
+#: src/balsa-message.c:803
 msgid "File already exists. Overwrite?"
 msgstr "파일이 이미 존재합니다. 덮어쓸까요?"
 
-#: src/balsa-message.c:788
+#: src/balsa-message.c:815
 #, fuzzy, c-format
 msgid "Could not save %s: %s"
 msgstr " %s를 저장할 수 없습니다:%s "
 
-#: src/balsa-message.c:802
+#: src/balsa-message.c:829
 #, fuzzy, c-format
 msgid "Save %s MIME Part"
 msgstr "MIME 부분 저장"
 
-#: src/balsa-message.c:969
+#: src/balsa-message.c:996
 #, fuzzy
 msgid "Save selected..."
 msgstr "선택..."
 
-#: src/balsa-message.c:1108
+#: src/balsa-message.c:1135
 #, fuzzy
 msgid "(No sender)"
 msgstr "헤더 없음(_o)"
 
-#: src/balsa-message.c:1406 src/print.c:358 src/sendmsg-window.c:859
-#: src/sendmsg-window.c:2454
+#: src/balsa-message.c:1199 src/balsa-message.c:3699
+#, fuzzy, c-format
+msgid "Could not access message; mailbox \"%s\" was changed."
+msgstr "우편함 '%s'에 접근할 수 없습니다"
+
+#: src/balsa-message.c:1453 src/print.c:358 src/sendmsg-window.c:863
+#: src/sendmsg-window.c:2459
 msgid "Subject:"
 msgstr "제목:"
 
-#: src/balsa-message.c:1410 src/print.c:364 src/sendmsg-window.c:2448
+#: src/balsa-message.c:1457 src/print.c:364 src/sendmsg-window.c:2453
 msgid "Date:"
 msgstr "날짜:"
 
-#: src/balsa-message.c:1421 src/sendmsg-window.c:856
+#: src/balsa-message.c:1468 src/sendmsg-window.c:860
 #, fuzzy
 msgid "Reply-To:"
 msgstr "Reply To:"
 
 #. cc:
-#: src/balsa-message.c:1425 src/print.c:374 src/sendmsg-window.c:858
-#: src/sendmsg-window.c:2146 src/sendmsg-window.c:2473 src/store-address.c:305
+#: src/balsa-message.c:1472 src/print.c:374 src/sendmsg-window.c:862
+#: src/sendmsg-window.c:2150 src/sendmsg-window.c:2478 src/store-address.c:305
 msgid "Cc:"
 msgstr "참조:"
 
 #. bcc:
-#: src/balsa-message.c:1426 src/print.c:375 src/sendmsg-window.c:857
-#: src/sendmsg-window.c:2151 src/store-address.c:306
+#: src/balsa-message.c:1473 src/print.c:375 src/sendmsg-window.c:861
+#: src/sendmsg-window.c:2155 src/store-address.c:306
 msgid "Bcc:"
 msgstr "다음참조:"
 
-#: src/balsa-message.c:1429 src/print.c:376
+#: src/balsa-message.c:1476 src/print.c:376
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:1434 src/print.c:381
+#: src/balsa-message.c:1481 src/print.c:381
 #, fuzzy
 msgid "Disposition-Notification-To:"
 msgstr "통지:"
 
-#: src/balsa-message.c:1591
+#: src/balsa-message.c:1614 src/balsa-message.c:1645
 #, c-format
 msgid "Error loading attached image: %s\n"
 msgstr ""
 
-#: src/balsa-message.c:1661 src/balsa-message.c:1677 src/balsa-message.c:1709
-#: src/balsa-message.c:1762
+#: src/balsa-message.c:1715 src/balsa-message.c:1731 src/balsa-message.c:1763
+#: src/balsa-message.c:1816
 #, fuzzy
 msgid "Content Type: external-body\n"
 msgstr "내용 형식: %s"
 
-#: src/balsa-message.c:1662
+#: src/balsa-message.c:1716
 msgid "Access type: local-file\n"
 msgstr ""
 
-#: src/balsa-message.c:1663 src/balsa-message.c:1716 src/balsa-message.c:1875
+#: src/balsa-message.c:1717 src/balsa-message.c:1770 src/balsa-message.c:1929
 #, fuzzy, c-format
 msgid "File name: %s"
 msgstr "파일명: %s"
 
-#: src/balsa-message.c:1678
+#: src/balsa-message.c:1732
 msgid "Access type: URL\n"
 msgstr ""
 
-#: src/balsa-message.c:1679
+#: src/balsa-message.c:1733
 #, c-format
 msgid "URL: %s"
 msgstr ""
 
-#: src/balsa-message.c:1710
+#: src/balsa-message.c:1764
 #, c-format
 msgid "Access type: %s\n"
 msgstr ""
 
-#: src/balsa-message.c:1713
+#: src/balsa-message.c:1767
 #, c-format
 msgid "FTP site: %s\n"
 msgstr ""
 
-#: src/balsa-message.c:1715
+#: src/balsa-message.c:1769
 #, c-format
 msgid "Directory: %s\n"
 msgstr ""
 
-#: src/balsa-message.c:1763
+#: src/balsa-message.c:1817
 msgid "Access type: mail-server\n"
 msgstr ""
 
-#: src/balsa-message.c:1764
+#: src/balsa-message.c:1818
 #, fuzzy, c-format
 msgid "Mail server: %s\n"
 msgstr "메일 서버"
 
-#: src/balsa-message.c:1766
+#: src/balsa-message.c:1820
 #, fuzzy, c-format
 msgid "Subject: %s\n"
 msgstr "제목:"
 
-#: src/balsa-message.c:1778
+#: src/balsa-message.c:1832
 msgid "Se_nd message to obtain this part"
 msgstr ""
 
-#: src/balsa-message.c:1883
+#: src/balsa-message.c:1937
 #, c-format
 msgid "Type: %s (%s)"
 msgstr ""
 
-#: src/balsa-message.c:1886
+#: src/balsa-message.c:1940
 #, c-format
 msgid "Content Type: %s"
 msgstr "내용 형식: %s"
 
-#: src/balsa-message.c:1897
+#: src/balsa-message.c:1951
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr "이런 형식의 MIME에 대해 열거나 보기 동작이 정의되지 않았습니다"
 
-#: src/balsa-message.c:1903
+#: src/balsa-message.c:1957
 #, fuzzy
 msgid "S_ave part"
 msgstr "부분 저장"
 
-#: src/balsa-message.c:1927 src/balsa-message.c:1952
+#: src/balsa-message.c:1981 src/balsa-message.c:2006
 #, c-format
 msgid "View _part with %s"
 msgstr ""
 
-#: src/balsa-message.c:2231
+#: src/balsa-message.c:2285
 #, fuzzy, c-format
 msgid "Calling URL %s..."
 msgstr "%s 읽는 중..."
 
-#: src/balsa-message.c:2241 src/balsa-message.c:3093 src/balsa-message.c:3776
+#: src/balsa-message.c:2295 src/balsa-message.c:3116 src/balsa-message.c:3834
 #, fuzzy, c-format
 msgid "Error showing %s: %s\n"
 msgstr "%s로 연결 도중 에러가 발생했습니다."
 
-#: src/balsa-message.c:2345
+#: src/balsa-message.c:2381
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
 "header describing the used codeset (converted to %s)"
 msgstr ""
 
-#: src/balsa-message.c:2444
-msgid "This is an OpenPGP signed message part:\n"
-msgstr ""
-
-#: src/balsa-message.c:2664
+#: src/balsa-message.c:2680
 #, fuzzy
 msgid "mixed parts"
 msgstr "부분 저장"
 
-#: src/balsa-message.c:2666
+#: src/balsa-message.c:2682
 #, fuzzy
 msgid "alternative parts"
 msgstr "부분 저장"
 
-#: src/balsa-message.c:2668
+#: src/balsa-message.c:2684
 msgid "signed parts"
 msgstr ""
 
-#: src/balsa-message.c:2670
+#: src/balsa-message.c:2686
 msgid "encrypted parts"
 msgstr ""
 
-#: src/balsa-message.c:2672
+#: src/balsa-message.c:2688
 #, fuzzy
 msgid "rfc822 message"
 msgstr "메시지 인쇄"
 
-#: src/balsa-message.c:2674
+#: src/balsa-message.c:2690
 #, c-format
 msgid "\"%s\" parts"
 msgstr ""
 
-#: src/balsa-message.c:2730
+#: src/balsa-message.c:2746
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr ""
 
-#: src/balsa-message.c:2737
+#: src/balsa-message.c:2753
 #, fuzzy
 msgid "complete message"
 msgstr "메시지 삭제"
 
-#: src/balsa-message.c:2754
+#: src/balsa-message.c:2770
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr ""
 
-#: src/balsa-message.c:2765
+#: src/balsa-message.c:2781
 #, fuzzy, c-format
 msgid "part %s: %s"
 msgstr "발사: %s"
 
-#: src/balsa-message.c:2855
+#: src/balsa-message.c:2796
+#, fuzzy
+msgid "encrypted: "
+msgstr "인증이 실패했습니다"
+
+#: src/balsa-message.c:2878
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: src/balsa-message.c:2986
+#: src/balsa-message.c:3009
 msgid "Save..."
 msgstr "저장..."
 
-#: src/balsa-message.c:3175
+#: src/balsa-message.c:3194
 #, fuzzy, c-format
 msgid "Could not create temporary file %s"
 msgstr "임시파일 %s를 생성할 수 없습니다"
 
-#: src/balsa-message.c:3220
+#: src/balsa-message.c:3239
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "임시파일 %s를 생성할 수 없습니다"
 
-#: src/balsa-message.c:4050
+#: src/balsa-message.c:4111
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2079,27 +2142,86 @@ msgid ""
 "Do you want to send this notification?"
 msgstr ""
 
-#: src/balsa-message.c:4057
+#: src/balsa-message.c:4118
 #, fuzzy
 msgid "Reply to MDN?"
 msgstr "Reply to "
 
-#: src/balsa-message.c:4260
+#: src/balsa-message.c:4436
+#, c-format
+msgid ""
+"This is an inline OpenPGP signed %s message part:\n"
+"%s"
+msgstr ""
+
+#: src/balsa-message.c:4454
+msgid "_Run gpg to import this key"
+msgstr ""
+
+#: src/balsa-message.c:4570 src/balsa-message.c:4793
+msgid ""
+"This operation can not be performed because this message is displayed more "
+"than once.\n"
+"Please close the other instances of this message and try again."
+msgstr ""
+
+#: src/balsa-message.c:4606
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains an encrypted part, but "
+"it's structure is invalid."
+msgstr ""
+
+#: src/balsa-message.c:4614
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: src/balsa-message.c:4627
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: src/balsa-message.c:4681
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a signed part, but it's "
+"structure is invalid. The signature, if there is any, can not be checked."
+msgstr ""
+
+#: src/balsa-message.c:4694
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr ""
 
-#: src/balsa-message.c:4263
+#: src/balsa-message.c:4696
 msgid "PGP"
 msgstr ""
 
-#: src/balsa-message.c:4263
+#: src/balsa-message.c:4696
 msgid "S/MIME"
 msgstr ""
 
-#: src/balsa-message.c:4298 src/balsa-message.c:4615
+#: src/balsa-message.c:4715 src/balsa-message.c:4820
+#, fuzzy
+msgid "Detected a good signature"
+msgstr "서명 확인"
+
+#: src/balsa-message.c:4721
+msgid "Detected a good signature with insufficient validity"
+msgstr ""
+
+#: src/balsa-message.c:4726 src/balsa-message.c:4824
+msgid "Detected a good signature with insufficient validity/trust"
+msgstr ""
+
+#: src/balsa-message.c:4733 src/balsa-message.c:4830
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2107,43 +2229,11 @@ msgid ""
 "%s"
 msgstr ""
 
-#: src/balsa-message.c:4305
+#: src/balsa-message.c:4745
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
-msgstr ""
-
-#: src/balsa-message.c:4337
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a signed part, but it's "
-"structure is invalid. The signature, if there is any, can not be checked."
-msgstr ""
-
-#: src/balsa-message.c:4401
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains an encrypted part, but "
-"it's structure is invalid."
-msgstr ""
-
-#: src/balsa-message.c:4408
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
-"but this crypto protocol is not available."
-msgstr ""
-
-#: src/balsa-message.c:4420
-#, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
-"but this crypto protocol is not available."
-msgstr ""
-
-#: src/balsa-message.c:4513 src/balsa-message.c:4730
-msgid "_Run gpg to import this key"
 msgstr ""
 
 #: src/filter-edit-callbacks.c:286
@@ -2210,6 +2300,10 @@ msgstr ""
 #, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr ""
+
+#: src/filter-edit-callbacks.c:802
+msgid "Unread"
+msgstr "안읽음"
 
 #: src/filter-edit-callbacks.c:802
 #, fuzzy
@@ -2280,19 +2374,19 @@ msgstr "모두"
 msgid "C_lear"
 msgstr ""
 
-#: src/filter-edit-callbacks.c:1011 src/main-window.c:3647
+#: src/filter-edit-callbacks.c:1011 src/main-window.c:3715
 #, fuzzy
 msgid "_Body"
 msgstr "본문"
 
 #. To:
-#: src/filter-edit-callbacks.c:1018 src/main-window.c:3648
-#: src/sendmsg-window.c:2135
+#: src/filter-edit-callbacks.c:1018 src/main-window.c:3716
+#: src/sendmsg-window.c:2139
 #, fuzzy
 msgid "_To:"
 msgstr "받는이(_T)"
 
-#: src/filter-edit-callbacks.c:1025 src/main-window.c:3649
+#: src/filter-edit-callbacks.c:1025 src/main-window.c:3717
 #, fuzzy
 msgid "_From:"
 msgstr "보낸이:"
@@ -2301,7 +2395,7 @@ msgstr "보낸이:"
 msgid "_Subject"
 msgstr "제목(_S)"
 
-#: src/filter-edit-callbacks.c:1040 src/main-window.c:3651
+#: src/filter-edit-callbacks.c:1040 src/main-window.c:3719
 #, fuzzy
 msgid "_Cc:"
 msgstr "참조(_C)"
@@ -2357,7 +2451,7 @@ msgstr ""
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr ""
 
-#: src/filter-edit-dialog.c:88 src/pref-manager.c:346
+#: src/filter-edit-dialog.c:88 src/pref-manager.c:361
 msgid "Simple"
 msgstr "단순"
 
@@ -2403,8 +2497,8 @@ msgstr ""
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: src/filter-edit-dialog.c:210 src/mailbox-node.c:929 src/main-window.c:365
-#: src/main-window.c:424
+#: src/filter-edit-dialog.c:210 src/mailbox-node.c:937 src/main-window.c:367
+#: src/main-window.c:426
 msgid "_New"
 msgstr "새 편지(_N)"
 
@@ -2550,78 +2644,82 @@ msgid ""
 "mailbox"
 msgstr ""
 
-#: src/folder-conf.c:259
+#: src/folder-conf.c:269
 msgid "Remote IMAP folder"
 msgstr "원격 IMAP 폴더"
 
 #. must NOT be modal
-#: src/folder-conf.c:262 src/folder-conf.c:684 src/mailbox-conf.c:561
+#: src/folder-conf.c:272 src/folder-conf.c:704 src/mailbox-conf.c:575
 #, fuzzy
 msgid "_Update"
 msgstr "갱신"
 
-#: src/folder-conf.c:262 src/folder-conf.c:684
+#: src/folder-conf.c:272 src/folder-conf.c:704
 #, fuzzy
 msgid "_Create"
 msgstr "생성"
 
-#: src/folder-conf.c:282 src/mailbox-conf.c:1042 src/mailbox-conf.c:1132
+#: src/folder-conf.c:294 src/mailbox-conf.c:1073 src/mailbox-conf.c:1164
 #, fuzzy
 msgid "_Basic"
 msgstr "다음참조(_B)"
 
-#: src/folder-conf.c:287
+#: src/folder-conf.c:299
 msgid "_Max number of connections"
 msgstr ""
 
-#: src/folder-conf.c:294 src/mailbox-conf.c:1201
+#: src/folder-conf.c:306 src/mailbox-conf.c:1234
 msgid "Enable _persistent cache"
 msgstr ""
 
-#: src/folder-conf.c:301 src/mailbox-conf.c:1095 src/mailbox-conf.c:1204
+#: src/folder-conf.c:314 src/mailbox-conf.c:1238
+msgid "Enable _bug workarounds"
+msgstr ""
+
+#: src/folder-conf.c:320 src/mailbox-conf.c:1127 src/mailbox-conf.c:1240
 msgid "_Advanced"
 msgstr ""
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:304
+#: src/folder-conf.c:323
 msgid "Descriptive _Name:"
 msgstr "서술적 이름(_N):"
 
 #. pop server
 #. imap server
-#: src/folder-conf.c:311 src/mailbox-conf.c:1050 src/mailbox-conf.c:1141
+#: src/folder-conf.c:330 src/mailbox-conf.c:1081 src/mailbox-conf.c:1173
 msgid "_Server:"
 msgstr "서버(_S):"
 
 #. username
-#: src/folder-conf.c:318 src/mailbox-conf.c:1057
+#: src/folder-conf.c:338 src/mailbox-conf.c:1089
 #, fuzzy
 msgid "Use_r name:"
 msgstr "사용자명(_U):"
 
-#: src/folder-conf.c:329
+#: src/folder-conf.c:349
 msgid "_Password:"
 msgstr "비밀번호(_P):"
 
-#: src/folder-conf.c:334
+#: src/folder-conf.c:354
 msgid "Subscribed _folders only"
 msgstr ""
 
-#: src/folder-conf.c:336
+#: src/folder-conf.c:356
 msgid "Always show _INBOX"
 msgstr ""
 
-#: src/folder-conf.c:339
+#: src/folder-conf.c:359
 #, fuzzy
 msgid "Pr_efix"
 msgstr "접두어(_P):"
 
-#: src/folder-conf.c:484
+#: src/folder-conf.c:504
 #, fuzzy
 msgid "Select parent folder"
 msgstr "사용할 글꼴 선택"
 
-#: src/folder-conf.c:557
+#: src/folder-conf.c:577
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -2631,58 +2729,58 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/folder-conf.c:563
+#: src/folder-conf.c:583
 msgid "Question"
 msgstr ""
 
-#: src/folder-conf.c:568
+#: src/folder-conf.c:588
 msgid "Rename INBOX"
 msgstr ""
 
-#: src/folder-conf.c:570
+#: src/folder-conf.c:590
 msgid "Cancel"
 msgstr "취소"
 
-#: src/folder-conf.c:666
+#: src/folder-conf.c:686
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr ""
 
-#: src/folder-conf.c:681
+#: src/folder-conf.c:701
 #, fuzzy
 msgid "Remote IMAP subfolder"
 msgstr "원격 IMAP 폴더"
 
-#: src/folder-conf.c:703
+#: src/folder-conf.c:725
 msgid "Rename or move subfolder"
 msgstr ""
 
-#: src/folder-conf.c:704
+#: src/folder-conf.c:726
 msgid "Create subfolder"
 msgstr ""
 
 #. INPUT FIELD CREATION
-#: src/folder-conf.c:711
+#: src/folder-conf.c:733
 #, fuzzy
 msgid "_Folder name:"
 msgstr "필터 이름:"
 
-#: src/folder-conf.c:717
+#: src/folder-conf.c:739
 msgid "_Subfolder of:"
 msgstr ""
 
-#: src/folder-conf.c:722
+#: src/folder-conf.c:744
 msgid "_Browse..."
 msgstr ""
 
-#: src/folder-conf.c:753
+#: src/folder-conf.c:775
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
 msgstr ""
 
-#: src/folder-conf.c:762
+#: src/folder-conf.c:784
 #, fuzzy, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -2692,7 +2790,7 @@ msgstr ""
 "나중에 \"우편함 추가\"를 이용해서 이 우편함을 다시 사용할 수 있습니다\n"
 "어떡하시겠습니까?"
 
-#: src/folder-conf.c:767
+#: src/folder-conf.c:789
 msgid "Confirm"
 msgstr ""
 
@@ -2716,32 +2814,32 @@ msgstr "에러: "
 msgid "FATAL: "
 msgstr "치명적 에러: "
 
-#: src/mailbox-conf.c:164 src/pref-manager.c:335 src/pref-manager.c:2999
-#: src/pref-manager.c:3078
+#: src/mailbox-conf.c:178 src/mailbox-conf.c:1327 src/pref-manager.c:341
+#: src/pref-manager.c:3021 src/pref-manager.c:3111
 msgid "Never"
 msgstr "결코"
 
-#: src/mailbox-conf.c:165 src/pref-manager.c:3079
+#: src/mailbox-conf.c:179 src/mailbox-conf.c:1328 src/pref-manager.c:3112
 msgid "If Possible"
 msgstr ""
 
-#: src/mailbox-conf.c:166 src/pref-manager.c:3080
+#: src/mailbox-conf.c:180 src/pref-manager.c:3113
 msgid "Required"
 msgstr ""
 
-#: src/mailbox-conf.c:174
+#: src/mailbox-conf.c:188
 msgid "Use _SSL"
 msgstr ""
 
-#: src/mailbox-conf.c:178
+#: src/mailbox-conf.c:192
 msgid "Use _TLS"
 msgstr ""
 
-#: src/mailbox-conf.c:315
+#: src/mailbox-conf.c:329
 msgid "No mailbox selected."
 msgstr "선택된 우편함 없음."
 
-#: src/mailbox-conf.c:342
+#: src/mailbox-conf.c:356
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -2749,7 +2847,7 @@ msgid ""
 "to some other mailbox."
 msgstr ""
 
-#: src/mailbox-conf.c:352
+#: src/mailbox-conf.c:366
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -2764,17 +2862,17 @@ msgstr ""
 "가\"를 하실 수 있습니다.\n"
 "어떡하시겠습니까?"
 
-#: src/mailbox-conf.c:364
+#: src/mailbox-conf.c:378
 #, fuzzy
 msgid "Remove from _list"
 msgstr "목록에서 삭제"
 
-#: src/mailbox-conf.c:365
+#: src/mailbox-conf.c:379
 #, fuzzy
 msgid "Remove from list and _disk"
 msgstr "목록과 디스크에서 삭제"
 
-#: src/mailbox-conf.c:373
+#: src/mailbox-conf.c:387
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -2784,12 +2882,12 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 
-#: src/mailbox-conf.c:386
+#: src/mailbox-conf.c:400
 #, fuzzy
 msgid "_Remove from server"
 msgstr "서버에서 삭제"
 
-#: src/mailbox-conf.c:393
+#: src/mailbox-conf.c:407
 #, fuzzy, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -2800,26 +2898,26 @@ msgstr ""
 "나중에 \"우편함 추가\"를 이용해서 이 우편함을 다시 사용할 수 있습니다\n"
 "어떡하시겠습니까?"
 
-#: src/mailbox-conf.c:402
+#: src/mailbox-conf.c:416
 #, fuzzy
 msgid "_Remove from list"
 msgstr "목록에서 삭제"
 
-#: src/mailbox-conf.c:490 src/sendmsg-window.c:1036
+#: src/mailbox-conf.c:504 src/sendmsg-window.c:1040
 #, fuzzy
 msgid "Select Identity"
 msgstr "신원"
 
-#: src/mailbox-conf.c:517
+#: src/mailbox-conf.c:531
 msgid "Mailbox Configurator"
 msgstr "우편함 설정"
 
-#: src/mailbox-conf.c:707
+#: src/mailbox-conf.c:726
 #, c-format
 msgid "%s on %s"
 msgstr ""
 
-#: src/mailbox-conf.c:836
+#: src/mailbox-conf.c:864
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -2829,888 +2927,896 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: src/mailbox-conf.c:998 src/mailbox-conf.c:1045 src/mailbox-conf.c:1135
+#: src/mailbox-conf.c:1029 src/mailbox-conf.c:1076 src/mailbox-conf.c:1167
 msgid "Mailbox _Name:"
 msgstr "우편함 이름(_N):"
 
 #. path to file
-#: src/mailbox-conf.c:1006
+#: src/mailbox-conf.c:1037
 msgid "Mailbox _Path:"
 msgstr "우편함 경로(_P):"
 
-#: src/mailbox-conf.c:1008
+#: src/mailbox-conf.c:1039
 #, fuzzy
 msgid "Mailbox Path"
 msgstr "우편함 경로(_P):"
 
 #. password field
-#: src/mailbox-conf.c:1063 src/mailbox-conf.c:1162
+#: src/mailbox-conf.c:1095 src/mailbox-conf.c:1195
 msgid "Pass_word:"
 msgstr "비밀번호(_w):"
 
-#: src/mailbox-conf.c:1071
+#: src/mailbox-conf.c:1103
 msgid "_Delete messages from server after download"
 msgstr "내려받기 후 서버에서 메시지 삭제(_D)"
 
-#: src/mailbox-conf.c:1076
+#: src/mailbox-conf.c:1108
 msgid "_Filter messages through procmail"
 msgstr "procmail을 통해 메시지 거름(_F)"
 
-#: src/mailbox-conf.c:1080
+#: src/mailbox-conf.c:1112
 #, fuzzy
 msgid "Fi_lter Command:"
 msgstr "인쇄 명령:"
 
-#: src/mailbox-conf.c:1088
+#: src/mailbox-conf.c:1120
 msgid "_Enable check for new mail"
 msgstr ""
 
-#: src/mailbox-conf.c:1099
+#: src/mailbox-conf.c:1131
 msgid "Disable _APOP"
 msgstr ""
 
 #. username
-#: src/mailbox-conf.c:1148
+#: src/mailbox-conf.c:1181
 msgid "_Username:"
 msgstr "사용자명(_U):"
 
-#: src/mailbox-conf.c:1156
+#: src/mailbox-conf.c:1189
 #, fuzzy
 msgid "_Remember Password"
 msgstr "비밀번호(_P):"
 
-#: src/mailbox-conf.c:1167
+#: src/mailbox-conf.c:1200
 msgid "F_older Path:"
 msgstr "폴더 경로(_o):"
 
-#: src/mailbox-conf.c:1252
+#: src/mailbox-conf.c:1288
 #, fuzzy
 msgid "Identity:"
 msgstr "신원"
 
-#: src/mailbox-conf.c:1258
+#: src/mailbox-conf.c:1294
 msgid "(No identity set)"
 msgstr ""
 
-#: src/mailbox-conf.c:1262
+#: src/mailbox-conf.c:1298
 #, fuzzy
 msgid "C_hange..."
 msgstr "메시지(_M)..."
 
-#: src/mailbox-conf.c:1269
+#: src/mailbox-conf.c:1305
 #, fuzzy
 msgid "Show address:"
 msgstr "주소 저장"
 
-#: src/mailbox-conf.c:1272
+#: src/mailbox-conf.c:1308
 #, fuzzy
 msgid "_From"
 msgstr "보낸이"
 
-#: src/mailbox-conf.c:1278
+#: src/mailbox-conf.c:1314
 msgid "_To"
 msgstr "받는이(_T)"
 
-#: src/mailbox-node.c:259
+#: src/mailbox-conf.c:1329 src/pref-manager.c:3023
+msgid "Always"
+msgstr "항상"
+
+#: src/mailbox-conf.c:1333
+msgid ""
+"decrypt and check\n"
+"signatures automatically"
+msgstr ""
+
+#: src/mailbox-node.c:266
 msgid "The folder edition to be written."
 msgstr ""
 
-#: src/mailbox-node.c:420
+#: src/mailbox-node.c:428
 #, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
 "Check network connectivity."
 msgstr ""
 
-#: src/mailbox-node.c:422
+#: src/mailbox-node.c:430
 #, fuzzy, c-format
 msgid "Scanning of %s failed: %s"
 msgstr ""
 "%s를 %s로 이름바꾸기 실패:\n"
 "%s"
 
-#: src/mailbox-node.c:471
+#: src/mailbox-node.c:479
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr ""
 
-#: src/mailbox-node.c:914
+#: src/mailbox-node.c:922
 #, fuzzy
 msgid "Local _mbox mailbox..."
 msgstr "로컬 mbox 우편함..."
 
-#: src/mailbox-node.c:916
+#: src/mailbox-node.c:924
 #, fuzzy
 msgid "Local Mail_dir mailbox..."
 msgstr "로컬 Maildir 우편함..."
 
-#: src/mailbox-node.c:918
+#: src/mailbox-node.c:926
 #, fuzzy
 msgid "Local M_H mailbox..."
 msgstr "로컬 MH 우편함..."
 
-#: src/mailbox-node.c:920
+#: src/mailbox-node.c:928
 #, fuzzy
 msgid "Remote _IMAP mailbox..."
 msgstr "원격 IMAP 우편함..."
 
-#: src/mailbox-node.c:923
+#: src/mailbox-node.c:931
 #, fuzzy
 msgid "Remote IMAP _folder..."
 msgstr "원격 IMAP 폴더..."
 
-#: src/mailbox-node.c:925
+#: src/mailbox-node.c:933
 #, fuzzy
 msgid "Remote IMAP _subfolder..."
 msgstr "원격 IMAP 폴더..."
 
 #. clicked on the empty space
-#: src/mailbox-node.c:936 src/mailbox-node.c:962
+#: src/mailbox-node.c:944 src/mailbox-node.c:970
 msgid "_Rescan"
 msgstr ""
 
-#: src/mailbox-node.c:945
+#: src/mailbox-node.c:953
 #, fuzzy
 msgid "_Open"
 msgstr "열기"
 
-#: src/mailbox-node.c:948 src/main-window.c:737 src/main-window.c:834
+#: src/mailbox-node.c:956 src/main-window.c:739 src/main-window.c:836
 msgid "_Close"
 msgstr "닫기(_C)"
 
-#: src/mailbox-node.c:954
+#: src/mailbox-node.c:962
 #, fuzzy
 msgid "_Properties..."
 msgstr "속성..."
 
-#: src/mailbox-node.c:969
+#: src/mailbox-node.c:977
 msgid "_Subscribe"
 msgstr ""
 
-#: src/mailbox-node.c:971
+#: src/mailbox-node.c:979
 msgid "_Unsubscribe"
 msgstr ""
 
-#: src/mailbox-node.c:976
+#: src/mailbox-node.c:984
 #, fuzzy
 msgid "Mark as _Inbox"
 msgstr "받은편지함으로 표시"
 
-#: src/mailbox-node.c:979
+#: src/mailbox-node.c:987
 #, fuzzy
 msgid "_Mark as Sentbox"
 msgstr "보낸편지함으로 표시"
 
-#: src/mailbox-node.c:982
+#: src/mailbox-node.c:990
 #, fuzzy
 msgid "Mark as _Trash"
 msgstr "휴지통으로 표시"
 
-#: src/mailbox-node.c:985
+#: src/mailbox-node.c:993
 #, fuzzy
 msgid "Mark as D_raftbox"
 msgstr "보낸편지함으로 표시"
 
 #. FIXME : No test on mailbox type is made yet, should we ?
-#: src/mailbox-node.c:988
+#: src/mailbox-node.c:996
 msgid "_Edit/Apply filters"
 msgstr ""
 
-#: src/mailbox-node.c:1069
+#: src/mailbox-node.c:1077
 #, fuzzy, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
 msgstr "우편함 \"%s\"는 비정상적입니다."
 
-#: src/mailbox-node.c:1082
+#: src/mailbox-node.c:1090
 #, fuzzy, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "로컬 우편함 적재: %s\n"
 
-#: src/mailbox-node.c:1109
+#: src/mailbox-node.c:1117
 #, fuzzy, c-format
 msgid "Local folder %s\n"
 msgstr "로컬 우편함 적재: %s\n"
 
-#: src/main-window.c:274
+#: src/main-window.c:276
 msgid "Balsa closes files and connections. Please wait..."
 msgstr ""
 
-#: src/main-window.c:313 src/main-window.c:359
+#: src/main-window.c:315 src/main-window.c:361
 #, fuzzy
 msgid "_Deleted"
 msgstr "삭제(_D)"
 
-#: src/main-window.c:316
+#: src/main-window.c:318
 #, fuzzy
 msgid "Un_Deleted"
 msgstr "삭제(_D)"
 
-#: src/main-window.c:319
+#: src/main-window.c:321
 #, fuzzy
 msgid "_Read"
 msgstr "보내기(_S)"
 
-#: src/main-window.c:322
+#: src/main-window.c:324
 #, fuzzy
 msgid "Un_read"
 msgstr "안읽음"
 
-#: src/main-window.c:328
+#: src/main-window.c:330
 msgid "Un_flagged"
 msgstr ""
 
-#: src/main-window.c:331 src/main-window.c:371
+#: src/main-window.c:333 src/main-window.c:373
 msgid "_Answered"
 msgstr ""
 
-#: src/main-window.c:334
+#: src/main-window.c:336
 msgid "Un_answered"
 msgstr ""
 
-#: src/main-window.c:340
+#: src/main-window.c:342
 #, fuzzy
 msgid "_No Headers"
 msgstr "헤더 없음(_o)"
 
-#: src/main-window.c:340
+#: src/main-window.c:342
 msgid "Display no headers"
 msgstr "헤더 표시 않함"
 
-#: src/main-window.c:342
+#: src/main-window.c:344
 msgid "S_elected Headers"
 msgstr "선택된 헤더(_e)"
 
-#: src/main-window.c:343
+#: src/main-window.c:345
 msgid "Display selected headers"
 msgstr "선택된 헤더 표시"
 
-#: src/main-window.c:345 src/message-window.c:85
+#: src/main-window.c:347 src/message-window.c:85
 msgid "All _Headers"
 msgstr "모든 헤더(_H)"
 
-#: src/main-window.c:345
+#: src/main-window.c:347
 msgid "Display all headers"
 msgstr "모든 헤더 표시"
 
-#: src/main-window.c:354
+#: src/main-window.c:356
 msgid "Toggle flagged"
 msgstr ""
 
-#: src/main-window.c:360
+#: src/main-window.c:362
 msgid "Toggle deleted flag"
 msgstr ""
 
-#: src/main-window.c:365
+#: src/main-window.c:367
 msgid "Toggle New"
 msgstr ""
 
-#: src/main-window.c:371
+#: src/main-window.c:373
 msgid "Toggle Answered"
 msgstr ""
 
-#: src/main-window.c:386
+#: src/main-window.c:388
 msgid "_Message..."
 msgstr "메시지(_M)..."
 
-#: src/main-window.c:386 src/main-window.c:1015
+#: src/main-window.c:388 src/main-window.c:1018
 msgid "Compose a new message"
 msgstr "새 메시지 작성"
 
 #. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
 #. of including at specified position
-#: src/main-window.c:393
+#: src/main-window.c:395
 msgid "Local mbox mailbox..."
 msgstr "로컬 mbox 우편함..."
 
-#: src/main-window.c:394 src/main-window.c:790
+#: src/main-window.c:396 src/main-window.c:792
 msgid "Add a new mbox style mailbox"
 msgstr "새 mbox 형식 우편함 추가"
 
-#: src/main-window.c:397
+#: src/main-window.c:399
 msgid "Local Maildir mailbox..."
 msgstr "로컬 Maildir 우편함..."
 
-#: src/main-window.c:398 src/main-window.c:795
+#: src/main-window.c:400 src/main-window.c:797
 msgid "Add a new Maildir style mailbox"
 msgstr "새 Maildir 형식 우편함 추가"
 
-#: src/main-window.c:401
+#: src/main-window.c:403
 msgid "Local MH mailbox..."
 msgstr "로컬 MH 우편함..."
 
-#: src/main-window.c:402 src/main-window.c:799
+#: src/main-window.c:404 src/main-window.c:801
 msgid "Add a new MH style mailbox"
 msgstr "새 MH 형식 우편함 추가"
 
-#: src/main-window.c:405 src/main-window.c:802 src/pref-manager.c:2832
+#: src/main-window.c:407 src/main-window.c:804 src/pref-manager.c:2866
 msgid "Remote IMAP mailbox..."
 msgstr "원격 IMAP 우편함..."
 
-#: src/main-window.c:406 src/main-window.c:803
+#: src/main-window.c:408 src/main-window.c:805
 msgid "Add a new IMAP mailbox"
 msgstr "새 IMAP 우편함 추가"
 
-#: src/main-window.c:410 src/main-window.c:807 src/pref-manager.c:2837
+#: src/main-window.c:412 src/main-window.c:809 src/pref-manager.c:2871
 msgid "Remote IMAP folder..."
 msgstr "원격 IMAP 폴더..."
 
-#: src/main-window.c:411 src/main-window.c:808
+#: src/main-window.c:413 src/main-window.c:810
 #, fuzzy
 msgid "Add a new IMAP folder"
 msgstr "새 IMAP 우편함 추가"
 
-#: src/main-window.c:414 src/main-window.c:811
+#: src/main-window.c:416 src/main-window.c:813
 #, fuzzy
 msgid "Remote IMAP subfolder..."
 msgstr "원격 IMAP 폴더..."
 
-#: src/main-window.c:415 src/main-window.c:812
+#: src/main-window.c:417 src/main-window.c:814
 #, fuzzy
 msgid "Add a new IMAP subfolder"
 msgstr "새 IMAP 우편함 추가"
 
-#: src/main-window.c:428
+#: src/main-window.c:430
 msgid "_Continue"
 msgstr "계속(_C)"
 
-#: src/main-window.c:429
+#: src/main-window.c:431
 msgid "Continue editing current message"
 msgstr "현재 메시지 편집 계속"
 
 #. Ctrl-M
-#: src/main-window.c:436 src/main-window.c:854
+#: src/main-window.c:438 src/main-window.c:856
 msgid "_Get New Mail"
 msgstr "새 편지 받기(_G)"
 
-#: src/main-window.c:436 src/main-window.c:854
+#: src/main-window.c:438 src/main-window.c:856
 msgid "Fetch new incoming mail"
 msgstr "새로 도착한 편지 가져오기"
 
 #. Ctrl-S
-#: src/main-window.c:442 src/main-window.c:849
+#: src/main-window.c:444 src/main-window.c:851
 msgid "_Send Queued Mail"
 msgstr "큐에 있는 편지 보내기(_S)"
 
-#: src/main-window.c:443 src/main-window.c:850
+#: src/main-window.c:445 src/main-window.c:852
 #, fuzzy
 msgid "Send messages from the outbox"
 msgstr "보낼우편함에서 편지 보내기"
 
 #. Ctrl-B
-#: src/main-window.c:449 src/main-window.c:844
+#: src/main-window.c:451 src/main-window.c:846
 #, fuzzy
 msgid "Send and _Receive Mail"
 msgstr "큐에 있는 편지 보내기(_S)"
 
-#: src/main-window.c:450 src/main-window.c:845 src/toolbar-factory.c:123
+#: src/main-window.c:452 src/main-window.c:847 src/toolbar-factory.c:123
 #, fuzzy
 msgid "Send and Receive messages"
 msgstr "이 메시지 보내기"
 
-#: src/main-window.c:455 src/main-window.c:859 src/sendmsg-window.c:338
-#: src/sendmsg-window.c:499
+#: src/main-window.c:457 src/main-window.c:861 src/sendmsg-window.c:339
+#: src/sendmsg-window.c:500
 #, fuzzy
 msgid "_Print..."
 msgstr "인쇄..."
 
-#: src/main-window.c:456 src/main-window.c:860 src/toolbar-factory.c:119
+#: src/main-window.c:458 src/main-window.c:862 src/toolbar-factory.c:119
 msgid "Print current message"
 msgstr "현재 메시지 인쇄"
 
-#: src/main-window.c:462 src/main-window.c:1074
+#: src/main-window.c:464 src/main-window.c:1077
 msgid "_Address Book..."
 msgstr "주소록(_A)..."
 
-#: src/main-window.c:463 src/main-window.c:1075
+#: src/main-window.c:465 src/main-window.c:1078
 msgid "Open the address book"
 msgstr "주소록 열기"
 
-#: src/main-window.c:487
+#: src/main-window.c:489
 #, fuzzy
 msgid "F_ilters..."
 msgstr "필터(_F)..."
 
-#: src/main-window.c:487 src/main-window.c:1061
+#: src/main-window.c:489 src/main-window.c:1064
 msgid "Manage filters"
 msgstr "필터 관리"
 
-#: src/main-window.c:489 src/main-window.c:1067
+#: src/main-window.c:491 src/main-window.c:1070
 #, fuzzy
 msgid "_Export Filters"
 msgstr "필터(_F)..."
 
-#: src/main-window.c:489 src/main-window.c:1068
+#: src/main-window.c:491 src/main-window.c:1071
 msgid "Export filters as Sieve scripts"
 msgstr ""
 
-#: src/main-window.c:497
+#: src/main-window.c:499
 msgid "_Flat index"
 msgstr ""
 
-#: src/main-window.c:498
+#: src/main-window.c:500
 msgid "No threading at all"
 msgstr ""
 
-#: src/main-window.c:503
+#: src/main-window.c:505
 msgid "Si_mple threading"
 msgstr ""
 
-#: src/main-window.c:504
+#: src/main-window.c:506
 msgid "Simple threading algorithm"
 msgstr ""
 
-#: src/main-window.c:509
+#: src/main-window.c:511
 msgid "_JWZ threading"
 msgstr ""
 
-#: src/main-window.c:510
+#: src/main-window.c:512
 msgid "Elaborate JWZ threading"
 msgstr ""
 
-#: src/main-window.c:520
+#: src/main-window.c:522
 msgid "_Show Mailbox Tree"
 msgstr "우편함 트리 보이기(_S)"
 
-#: src/main-window.c:521
+#: src/main-window.c:523
 msgid "Toggle display of mailbox and folder tree"
 msgstr "우편함과 폴더 트리 표시 토글"
 
-#: src/main-window.c:525
+#: src/main-window.c:527
 msgid "Show Mailbox _Tabs"
 msgstr "우편함 탭 보이기(_T)"
 
-#: src/main-window.c:526
+#: src/main-window.c:528
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "우편함 노트북 탭 표시 토글"
 
-#: src/main-window.c:530 src/main-window.c:928 src/message-window.c:116
+#: src/main-window.c:532 src/main-window.c:931 src/message-window.c:116
 msgid "_Wrap"
 msgstr ""
 
-#: src/main-window.c:530 src/main-window.c:928 src/sendmsg-window.c:367
-#: src/sendmsg-window.c:524
+#: src/main-window.c:532 src/main-window.c:931 src/sendmsg-window.c:368
+#: src/sendmsg-window.c:525
 msgid "Wrap message lines"
 msgstr ""
 
-#: src/main-window.c:539 src/main-window.c:934
+#: src/main-window.c:541 src/main-window.c:937
 msgid "E_xpand All"
 msgstr ""
 
-#: src/main-window.c:540 src/main-window.c:935
+#: src/main-window.c:542 src/main-window.c:938
 #, fuzzy
 msgid "Expand all threads"
 msgstr "모든 헤더 표시"
 
-#: src/main-window.c:544 src/main-window.c:939
+#: src/main-window.c:546 src/main-window.c:942
 msgid "_Collapse All"
 msgstr ""
 
-#: src/main-window.c:545 src/main-window.c:940
+#: src/main-window.c:547 src/main-window.c:943
 msgid "Collapse all expanded threads"
 msgstr ""
 
-#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
+#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
 msgid "Zoom _In"
 msgstr ""
 
-#: src/main-window.c:551 src/main-window.c:968 src/message-window.c:122
+#: src/main-window.c:553 src/main-window.c:971 src/message-window.c:122
 msgid "Increase magnification"
 msgstr ""
 
-#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
+#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
 msgid "Zoom _Out"
 msgstr ""
 
-#: src/main-window.c:555 src/main-window.c:972 src/message-window.c:126
+#: src/main-window.c:557 src/main-window.c:975 src/message-window.c:126
 msgid "Decrease magnification"
 msgstr ""
 
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
 #. * format specifier:
-#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
+#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
 #, no-c-format
 msgid "Zoom _100%"
 msgstr ""
 
-#: src/main-window.c:561 src/main-window.c:978 src/message-window.c:133
+#: src/main-window.c:563 src/main-window.c:981 src/message-window.c:133
 #, fuzzy
 msgid "No magnification"
 msgstr "통지:"
 
-#: src/main-window.c:577 src/main-window.c:1022 src/toolbar-factory.c:99
+#: src/main-window.c:579 src/main-window.c:1025 src/toolbar-factory.c:99
 msgid "Reply to the current message"
 msgstr "현재 메시지에 대해 회신"
 
 #. A
-#: src/main-window.c:584 src/main-window.c:1028 src/message-window.c:148
+#: src/main-window.c:586 src/main-window.c:1031 src/message-window.c:148
 msgid "Reply to _All..."
 msgstr "전체 회신(_A)..."
 
-#: src/main-window.c:585 src/main-window.c:1029
+#: src/main-window.c:587 src/main-window.c:1032
 msgid "Reply to all recipients of the current message"
 msgstr "현재 메시지의 모든 수신자에게 회신"
 
-#: src/main-window.c:592 src/message-window.c:154
+#: src/main-window.c:594 src/message-window.c:154
 msgid "Reply to _Group..."
 msgstr "그룹 회신(_G)..."
 
-#: src/main-window.c:593 src/message-window.c:155 src/toolbar-factory.c:103
+#: src/main-window.c:595 src/message-window.c:155 src/toolbar-factory.c:103
 msgid "Reply to mailing list"
 msgstr "메일링리스트 회신"
 
-#: src/main-window.c:600 src/message-window.c:160
+#: src/main-window.c:602 src/message-window.c:160
 #, fuzzy
 msgid "_Forward attached..."
 msgstr "전달(_F)..."
 
-#: src/main-window.c:601
+#: src/main-window.c:603
 #, fuzzy
 msgid "Forward the current message as attachment"
 msgstr "현재 메시지 전달"
 
-#: src/main-window.c:607
+#: src/main-window.c:609
 #, fuzzy
 msgid "Forward _inline..."
 msgstr "전달..."
 
-#: src/main-window.c:608
+#: src/main-window.c:610
 #, fuzzy
 msgid "Forward the current message inline"
 msgstr "현재 메시지 전달"
 
-#: src/main-window.c:615 src/message-window.c:171
+#: src/main-window.c:617 src/message-window.c:171
 msgid "Next Part"
 msgstr "다음 부분"
 
-#: src/main-window.c:615 src/message-window.c:171
+#: src/main-window.c:617 src/message-window.c:171
 msgid "Next part in message"
 msgstr "메시지의 다음 부분"
 
-#: src/main-window.c:621 src/message-window.c:175
+#: src/main-window.c:623 src/message-window.c:175
 msgid "Previous Part"
 msgstr "이전 부분"
 
-#: src/main-window.c:622 src/message-window.c:176
+#: src/main-window.c:624 src/message-window.c:176
 msgid "Previous part in message"
 msgstr "메시지의 이전 부분"
 
-#: src/main-window.c:628 src/main-window.c:1042 src/message-window.c:180
+#: src/main-window.c:630 src/main-window.c:1045 src/message-window.c:180
 msgid "Save Current Part..."
 msgstr "현재 부분 저장..."
 
-#: src/main-window.c:629 src/main-window.c:1043
+#: src/main-window.c:631 src/main-window.c:1046
 #, fuzzy
 msgid "Save currently displayed part of message"
 msgstr "메시지의 현재 부분 저장"
 
-#: src/main-window.c:635 src/main-window.c:995 src/message-window.c:185
+#: src/main-window.c:637 src/main-window.c:998 src/message-window.c:185
 msgid "_View Source..."
 msgstr ""
 
-#: src/main-window.c:636 src/main-window.c:996 src/message-window.c:186
+#: src/main-window.c:638 src/main-window.c:999 src/message-window.c:186
 msgid "View source form of the message"
 msgstr ""
 
-#: src/main-window.c:654
+#: src/main-window.c:656
 #, fuzzy
 msgid "_Move to Trash"
 msgstr "휴지통으로 보냄"
 
-#: src/main-window.c:655 src/main-window.c:1050
+#: src/main-window.c:657 src/main-window.c:1053
 #, fuzzy
 msgid "Move the current message to Trash mailbox"
 msgstr "휴지통 우편함에서 메시지 삭제"
 
 #. !
-#: src/main-window.c:661 src/main-window.c:1001
+#: src/main-window.c:663 src/main-window.c:1004
 #, fuzzy
 msgid "_Toggle flag"
 msgstr "토글(_T)"
 
-#: src/main-window.c:667 src/main-window.c:1006
+#: src/main-window.c:669 src/main-window.c:1009
 msgid "Store address of sender in addressbook"
 msgstr "보낸이의 주소를 주소록에 저장"
 
-#: src/main-window.c:678 src/main-window.c:959
+#: src/main-window.c:680 src/main-window.c:962
 msgid "Next Message"
 msgstr "다음 메시지"
 
-#: src/main-window.c:684 src/main-window.c:963
+#: src/main-window.c:686 src/main-window.c:966
 msgid "Previous Message"
 msgstr "이전 메시지"
 
-#: src/main-window.c:690 src/main-window.c:691 src/main-window.c:953
-#: src/main-window.c:954 src/message-window.c:192 src/message-window.c:193
+#: src/main-window.c:692 src/main-window.c:693 src/main-window.c:956
+#: src/main-window.c:957 src/message-window.c:192 src/message-window.c:193
 msgid "Next Unread Message"
 msgstr "다음 안읽은 메시지"
 
-#: src/main-window.c:697 src/main-window.c:698 src/main-window.c:920
-#: src/main-window.c:921
+#: src/main-window.c:699 src/main-window.c:700 src/main-window.c:923
+#: src/main-window.c:924
 #, fuzzy
 msgid "Next Flagged Message"
 msgstr "다음 안읽은 메시지"
 
-#: src/main-window.c:705 src/main-window.c:931
+#: src/main-window.c:707 src/main-window.c:934
 #, fuzzy
 msgid "_Hide messages"
 msgstr "새 메시지"
 
-#: src/main-window.c:708
+#: src/main-window.c:710
 #, fuzzy
 msgid "Reset _Filter"
 msgstr "발사 필터"
 
-#: src/main-window.c:713
+#: src/main-window.c:715
 #, fuzzy
 msgid "Select all"
 msgstr "모두 선택"
 
-#: src/main-window.c:714
+#: src/main-window.c:716
 #, fuzzy
 msgid "Select all messages in current mailbox"
 msgstr "휴지통 우편함에서 메시지 삭제"
 
-#: src/main-window.c:720 src/main-window.c:822
+#: src/main-window.c:722 src/main-window.c:824
 msgid "_Edit..."
 msgstr "편집(_E)..."
 
-#: src/main-window.c:720 src/main-window.c:822
+#: src/main-window.c:722 src/main-window.c:824
 msgid "Edit the selected mailbox"
 msgstr "선택된 우편함 편집"
 
-#: src/main-window.c:724 src/main-window.c:817
+#: src/main-window.c:726 src/main-window.c:819
 msgid "_Delete..."
 msgstr "삭제(_D)..."
 
-#: src/main-window.c:725 src/main-window.c:818
+#: src/main-window.c:727 src/main-window.c:820
 msgid "Delete the selected mailbox"
 msgstr "선택된 우편함 삭제"
 
-#: src/main-window.c:731
+#: src/main-window.c:733
 #, fuzzy
 msgid "E_xpunge Deleted Messages"
 msgstr "%d 개의 삭제된 메시지를 제거할까요?"
 
-#: src/main-window.c:732 src/main-window.c:829
+#: src/main-window.c:734 src/main-window.c:831
 #, fuzzy
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr "열려진 우편함의 현재 수정된 사항 저장"
 
-#: src/main-window.c:737 src/main-window.c:835
+#: src/main-window.c:739 src/main-window.c:837
 msgid "Close mailbox"
 msgstr "우편함 닫기"
 
-#: src/main-window.c:741 src/main-window.c:1079
+#: src/main-window.c:743 src/main-window.c:1082
 msgid "Empty _Trash"
 msgstr "휴지통 비우기(_T)"
 
-#: src/main-window.c:742 src/main-window.c:1080 src/toolbar-factory.c:141
+#: src/main-window.c:744 src/main-window.c:1083 src/toolbar-factory.c:141
 msgid "Delete messages from the Trash mailbox"
 msgstr "휴지통 우편함에서 메시지 삭제"
 
-#: src/main-window.c:746
+#: src/main-window.c:748
 #, fuzzy
 msgid "Select _Filters"
 msgstr "발사 필터"
 
-#: src/main-window.c:747 src/main-window.c:1065
+#: src/main-window.c:749 src/main-window.c:1068
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr ""
 
-#: src/main-window.c:760
+#: src/main-window.c:762
 #, fuzzy
 msgid "_Toolbars..."
 msgstr "툴바"
 
-#: src/main-window.c:761
+#: src/main-window.c:763
 msgid "Customize toolbars"
 msgstr ""
 
-#: src/main-window.c:764 src/main-window.c:1083
+#: src/main-window.c:766 src/main-window.c:1086
 #, fuzzy
 msgid "_Identities..."
 msgstr "필터(_F)..."
 
-#: src/main-window.c:765 src/main-window.c:1084
+#: src/main-window.c:767 src/main-window.c:1087
 msgid "Create and set current identities"
 msgstr ""
 
-#: src/main-window.c:776
+#: src/main-window.c:778
 msgid "Mail_box"
 msgstr "우편함(_b)"
 
-#: src/main-window.c:777 src/main-window.c:1097 src/message-window.c:209
+#: src/main-window.c:779 src/main-window.c:1100 src/message-window.c:209
 msgid "_Message"
 msgstr "메시지(_M)"
 
-#: src/main-window.c:789
+#: src/main-window.c:791
 #, fuzzy
 msgid "New mailbox..."
 msgstr "새 우편함 추가..."
 
-#: src/main-window.c:794
+#: src/main-window.c:796
 #, fuzzy
 msgid "New \"Maildir\" mailbox..."
 msgstr "로컬 Maildir 우편함..."
 
-#: src/main-window.c:798
+#: src/main-window.c:800
 #, fuzzy
 msgid "New \"MH\" mailbox..."
 msgstr "새 우편함 추가..."
 
-#: src/main-window.c:828
+#: src/main-window.c:830
 #, fuzzy
 msgid "_Compress Mailbox"
 msgstr "우편함 닫기"
 
-#: src/main-window.c:858
+#: src/main-window.c:860
 #, fuzzy
 msgid "Mail_boxes"
 msgstr "우편함(_b)"
 
-#: src/main-window.c:883
+#: src/main-window.c:885
 msgid "By _Arrival"
 msgstr ""
 
-#: src/main-window.c:883
+#: src/main-window.c:885
 msgid "Arrival order"
 msgstr ""
 
-#: src/main-window.c:887
+#: src/main-window.c:889
 #, fuzzy
 msgid "By _Sender"
 msgstr "보내기(_S)"
 
-#: src/main-window.c:887
+#: src/main-window.c:889
 msgid "Sender order"
 msgstr ""
 
-#: src/main-window.c:891
+#: src/main-window.c:893
 #, fuzzy
 msgid "By S_ubject"
 msgstr "제목"
 
-#: src/main-window.c:891
+#: src/main-window.c:893
 #, fuzzy
 msgid "Subject order"
 msgstr "제목"
 
-#: src/main-window.c:895
-#, fuzzy
-msgid "By _Date"
-msgstr "날짜"
-
-#: src/main-window.c:895
-#, fuzzy
-msgid "By sending date"
-msgstr "편지 보냄"
-
-#: src/main-window.c:899
+#: src/main-window.c:897
 msgid "By Si_ze"
 msgstr ""
 
-#: src/main-window.c:899
+#: src/main-window.c:897
 #, fuzzy
 msgid "By message size"
 msgstr "새 메시지"
 
-#: src/main-window.c:903
+#: src/main-window.c:901
 #, fuzzy
 msgid "_Threaded"
 msgstr "헤더 없음(_o)"
 
-#: src/main-window.c:903
+#: src/main-window.c:901
 msgid "Use message threading"
 msgstr ""
 
-#: src/main-window.c:927
+#: src/main-window.c:909
+msgid "_Descending"
+msgstr ""
+
+#: src/main-window.c:909
+msgid "Sort in a descending order"
+msgstr ""
+
+#: src/main-window.c:930
 #, fuzzy
 msgid "_Headers"
 msgstr "머리글"
 
-#: src/main-window.c:930
+#: src/main-window.c:933
 #, fuzzy
 msgid "_Sort Mailbox"
 msgstr "우편함 트리 보이기(_S)"
 
-#: src/main-window.c:945
+#: src/main-window.c:948
 #, fuzzy
 msgid "_View filter"
 msgstr "필터 관리"
 
-#: src/main-window.c:946
+#: src/main-window.c:949
 msgid "Enable quick message index filter"
 msgstr ""
 
-#: src/main-window.c:982 src/main-window.c:1056 src/sendmsg-window.c:501
-#: src/sendmsg-window.c:559 src/sendmsg-window.c:619
+#: src/main-window.c:985 src/main-window.c:1059 src/sendmsg-window.c:502
+#: src/sendmsg-window.c:560 src/sendmsg-window.c:620
 msgid "_More"
 msgstr ""
 
-#: src/main-window.c:1015
+#: src/main-window.c:1018
 #, fuzzy
 msgid "_New..."
 msgstr "새 편지(_N)"
 
 #. F
-#: src/main-window.c:1035
+#: src/main-window.c:1038
 msgid "_Forward..."
 msgstr "전달(_F)..."
 
-#: src/main-window.c:1036 src/toolbar-factory.c:105
+#: src/main-window.c:1039 src/toolbar-factory.c:105
 msgid "Forward the current message"
 msgstr "현재 메시지 전달"
 
 #. D
-#: src/main-window.c:1049
+#: src/main-window.c:1052
 #, fuzzy
 msgid "_Delete to Trash"
 msgstr "휴지통으로 보냄"
 
-#: src/main-window.c:1061
+#: src/main-window.c:1064
 #, fuzzy
 msgid "_Manage..."
 msgstr "메시지(_M)..."
 
-#: src/main-window.c:1064
+#: src/main-window.c:1067
 #, fuzzy
-msgid "_Select _Filters"
+msgid "_Select Filters"
 msgstr "선택된 헤더(_S)"
 
-#: src/main-window.c:1082
+#: src/main-window.c:1085
 #, fuzzy
 msgid "_Filters"
 msgstr "필터(_F)..."
 
-#: src/main-window.c:1098 src/sendmsg-window.c:635
+#: src/main-window.c:1101 src/sendmsg-window.c:636
 #, fuzzy
 msgid "_Tools"
 msgstr "툴바"
 
-#: src/main-window.c:1202
+#: src/main-window.c:1205
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr ""
 
-#: src/main-window.c:1372
+#: src/main-window.c:1375
 #, fuzzy
 msgid "Subject or Sender _Contains:"
 msgstr "제목 헤더 글꼴"
 
-#: src/main-window.c:2154
+#: src/main-window.c:2157
 #, fuzzy, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
 msgstr "우편함을 잠글 수 없습니다!"
 
-#: src/main-window.c:2470
+#: src/main-window.c:2474
 msgid "translator_credits"
 msgstr ""
 
-#: src/main-window.c:2486
+#: src/main-window.c:2490
 #, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
@@ -3722,169 +3828,170 @@ msgstr ""
 "http://www.balsa.net/에서 찾을 수 있습니다.\n"
 "버그 레포트가 필요하시면 http://bugs.gnome.org/에서 해주세요"
 
-#: src/main-window.c:2588
+#: src/main-window.c:2592
 #, fuzzy
 msgid "Checking Mail..."
 msgstr "편지를 보냅니다..."
 
-#: src/main-window.c:2897
+#: src/main-window.c:2906
 #, fuzzy
 msgid "Finished Checking."
 msgstr "철자 검색이 끝냅니다"
 
-#: src/main-window.c:2959
+#: src/main-window.c:2968
 #, c-format
 msgid "Sending error: %s"
 msgstr "보내기 에러: %s"
 
-#: src/main-window.c:3044
+#: src/main-window.c:3053
 msgid "Balsa: New mail"
 msgstr ""
 
-#: src/main-window.c:3056
+#: src/main-window.c:3065
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/main-window.c:3059
+#: src/main-window.c:3068
 msgid "You have new mail."
 msgstr ""
 
-#: src/main-window.c:3609
+#: src/main-window.c:3677
 #, fuzzy
 msgid "Search mailbox"
 msgstr "우편함 닫기"
 
-#: src/main-window.c:3626
+#: src/main-window.c:3694
 #, fuzzy
 msgid "_Search for:"
 msgstr "찾을 이름:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3639
+#: src/main-window.c:3707
 #, fuzzy
 msgid "In:"
 msgstr "받은우편함:"
 
-#: src/main-window.c:3650
+#: src/main-window.c:3718
 #, fuzzy
 msgid "S_ubject"
 msgstr "제목"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3655
+#: src/main-window.c:3723
 #, fuzzy
 msgid "Show only matching messages"
 msgstr "이 메시지 보내기"
 
 #. Frame with OK button
-#: src/main-window.c:3676
+#: src/main-window.c:3744
 #, fuzzy
 msgid "Open next matching message"
 msgstr "다음 메시지 열기"
 
-#: src/main-window.c:3687
+#: src/main-window.c:3755
 msgid "_Reverse search"
 msgstr ""
 
-#: src/main-window.c:3692
+#: src/main-window.c:3760
 msgid "_Wrap around"
 msgstr ""
 
-#: src/main-window.c:3768
+#: src/main-window.c:3836
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr ""
 
-#: src/main-window.c:3853
+#: src/main-window.c:3921
 msgid "You can apply filters only on mailbox\n"
 msgstr ""
 
-#: src/main-window.c:4166
+#: src/main-window.c:4239
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "발사: %s (읽기전용)"
 
-#: src/main-window.c:4168
+#: src/main-window.c:4241
 #, c-format
 msgid "Balsa: %s"
 msgstr "발사: %s"
 
-#: src/main-window.c:4272
-msgid "Cannot access the message's body\n"
-msgstr "메시지 본문에 접근할 수 없습니다\n"
-
-#: src/main.c:203
+#: src/main.c:215
 msgid "Get new mail on startup"
 msgstr "시작할 때 새 메시지 가져오기"
 
-#: src/main.c:205
+#: src/main.c:217
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "EMAIL@ADDRESS로 새 편지 작성"
 
-#: src/main.c:207
+#: src/main.c:219
 #, fuzzy
 msgid "Attach file at PATH"
 msgstr "파일 첨부"
 
-#: src/main.c:209
+#: src/main.c:221
 msgid "Opens MAILBOXNAME"
 msgstr "MAILBOXNAME 열기"
 
-#: src/main.c:209
+#: src/main.c:221
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:212
+#: src/main.c:224
 msgid "Opens first unread mailbox"
 msgstr "안읽은 첫번째 우편함 열기"
 
-#: src/main.c:215
+#: src/main.c:227
 #, fuzzy
 msgid "Opens default Inbox on startup"
 msgstr "시작할 때 새 메시지 가져오기"
 
-#: src/main.c:217
+#: src/main.c:230
+#, fuzzy
+msgid "Prints number unread and unsent messages"
+msgstr "현재 메시지 인쇄"
+
+#: src/main.c:232
 msgid "Debug POP3 connection"
 msgstr ""
 
-#: src/main.c:219
+#: src/main.c:234
 msgid "Debug IMAP connection"
 msgstr ""
 
-#: src/main.c:241
+#: src/main.c:256
 msgid "The Balsa E-Mail Client"
 msgstr ""
 
-#: src/main.c:258 src/main.c:263 src/main.c:269 src/main.c:275 src/main.c:281
+#: src/main.c:273 src/main.c:278 src/main.c:284 src/main.c:290 src/main.c:296
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "\"%s\" 우편함을 열 수 없습니다."
 
-#: src/main.c:258
+#: src/main.c:273
 msgid "Inbox"
 msgstr "받은우편함"
 
-#: src/main.c:264
+#: src/main.c:279
 msgid "Outbox"
 msgstr "보낼우편함"
 
-#: src/main.c:270
+#: src/main.c:285
 msgid "Sentbox"
 msgstr "보낸보관함"
 
-#: src/main.c:276
+#: src/main.c:291
 msgid "Draftbox"
 msgstr ""
 
-#: src/main.c:281
+#: src/main.c:296
 msgid "Trash"
 msgstr "휴지통"
 
-#: src/main.c:470
+#: src/main.c:511
 #, fuzzy
 msgid "Compressing mail folders..."
 msgstr "우편함을 다시 여는 중입니다..."
@@ -3928,692 +4035,700 @@ msgstr "메시지의 현재 부분 저장"
 msgid "M_ove"
 msgstr ""
 
-#: src/message-window.c:274
+#: src/message-window.c:280
 #, fuzzy, c-format
 msgid "Message from %s: %s"
 msgstr "메시지 색상"
 
-#: src/pref-manager.c:321
+#: src/pref-manager.c:327
 #, fuzzy
 msgid "7 Bits"
 msgstr "7비트"
 
-#: src/pref-manager.c:322
+#: src/pref-manager.c:328
 #, fuzzy
 msgid "8 Bits"
 msgstr "8비트"
 
-#: src/pref-manager.c:323
+#: src/pref-manager.c:329
 msgid "Quoted"
 msgstr ""
 
-#: src/pref-manager.c:333
+#: src/pref-manager.c:339
 msgid "While Retrieving Messages"
 msgstr "메시지 받는 동안"
 
-#: src/pref-manager.c:334
+#: src/pref-manager.c:340
 msgid "Until Closed"
 msgstr "닫힐 때 까지"
 
-#: src/pref-manager.c:339
+#: src/pref-manager.c:345
 msgid "Fast"
 msgstr "빠르게"
 
-#: src/pref-manager.c:340
+#: src/pref-manager.c:346
 msgid "Normal"
 msgstr "보통"
 
-#: src/pref-manager.c:341
+#: src/pref-manager.c:347
 msgid "Bad Spellers"
 msgstr "나쁜 철자검색기"
 
-#: src/pref-manager.c:345
+#: src/pref-manager.c:352
+#, fuzzy
+msgid "Message number"
+msgstr "메시지 색상"
+
+#: src/pref-manager.c:356
+#, fuzzy
+msgid "Sender"
+msgstr "보내기"
+
+#: src/pref-manager.c:360
 #, fuzzy
 msgid "Flat"
 msgstr "빠르게"
 
-#: src/pref-manager.c:347
+#: src/pref-manager.c:362
 msgid "JWZ"
 msgstr ""
 
-#: src/pref-manager.c:351
+#: src/pref-manager.c:366
 msgid "west european (traditional)"
 msgstr ""
 
-#: src/pref-manager.c:352
+#: src/pref-manager.c:367
 msgid "east european"
 msgstr ""
 
-#: src/pref-manager.c:353
+#: src/pref-manager.c:368
 msgid "south european"
 msgstr ""
 
-#: src/pref-manager.c:354
+#: src/pref-manager.c:369
 msgid "north european"
 msgstr ""
 
-#: src/pref-manager.c:355
+#: src/pref-manager.c:370
 msgid "cyrillic (iso/windows)"
 msgstr ""
 
-#: src/pref-manager.c:356
+#: src/pref-manager.c:371
 msgid "arabic"
 msgstr ""
 
-#: src/pref-manager.c:357
+#: src/pref-manager.c:372
 #, fuzzy
 msgid "greek"
 msgstr "그리스"
 
-#: src/pref-manager.c:358
+#: src/pref-manager.c:373
 msgid "hebrew"
 msgstr ""
 
-#: src/pref-manager.c:359
+#: src/pref-manager.c:374
 #, fuzzy
 msgid "turkish"
 msgstr "터키"
 
-#: src/pref-manager.c:360
+#: src/pref-manager.c:375
 msgid "nordic"
 msgstr ""
 
-#: src/pref-manager.c:361
+#: src/pref-manager.c:376
 msgid "thai"
 msgstr ""
 
-#: src/pref-manager.c:362
+#: src/pref-manager.c:377
 msgid "baltic"
 msgstr ""
 
-#: src/pref-manager.c:363
+#: src/pref-manager.c:378
 msgid "celtic"
 msgstr ""
 
-#: src/pref-manager.c:364
+#: src/pref-manager.c:379
 msgid "west european (euro)"
 msgstr ""
 
-#: src/pref-manager.c:365
+#: src/pref-manager.c:380
 #, fuzzy
 msgid "russian (koi)"
 msgstr "러시아 (KOI)"
 
-#: src/pref-manager.c:366
+#: src/pref-manager.c:381
 #, fuzzy
 msgid "ukranian (koi)"
 msgstr "우크라이나"
 
-#: src/pref-manager.c:367
+#: src/pref-manager.c:382
 #, fuzzy
 msgid "japanese"
 msgstr "일본"
 
-#: src/pref-manager.c:368
+#: src/pref-manager.c:383
 #, fuzzy
 msgid "korean"
 msgstr "한국"
 
 #. must NOT be modal
-#: src/pref-manager.c:388
+#: src/pref-manager.c:403
 msgid "Balsa Preferences"
 msgstr "발사 속성"
 
-#: src/pref-manager.c:414
+#: src/pref-manager.c:429
 msgid "Mail Servers"
 msgstr "메일 서버"
 
-#: src/pref-manager.c:418 src/pref-manager.c:2615
+#: src/pref-manager.c:433 src/pref-manager.c:2649
 msgid "Address Books"
 msgstr "주소록"
 
-#: src/pref-manager.c:422
+#: src/pref-manager.c:437
 msgid "Mail Options"
 msgstr "편지 옵션"
 
-#: src/pref-manager.c:426 src/pref-manager.c:1978
+#: src/pref-manager.c:441 src/pref-manager.c:2013
 msgid "Display"
 msgstr "표시"
 
-#: src/pref-manager.c:430 src/toolbar-factory.c:130
+#: src/pref-manager.c:445 src/toolbar-factory.c:130
 msgid "Spelling"
 msgstr "철자"
 
-#: src/pref-manager.c:434
+#: src/pref-manager.c:449
 msgid "Misc"
 msgstr "기타"
 
-#: src/pref-manager.c:438
+#: src/pref-manager.c:453
 msgid "Startup"
 msgstr "시작"
 
-#: src/pref-manager.c:1229
+#: src/pref-manager.c:1265
 #, fuzzy, c-format
 msgid "%s (default)"
 msgstr "기본값으로 설정"
 
-#: src/pref-manager.c:1478
+#: src/pref-manager.c:1514
 msgid "Remote Mailbox Servers"
 msgstr "원격 우편함 서버"
 
-#: src/pref-manager.c:1499 src/pref-manager.c:2636
+#: src/pref-manager.c:1535 src/pref-manager.c:2670
 msgid "Type"
 msgstr "형식"
 
-#: src/pref-manager.c:1507
+#: src/pref-manager.c:1543
 msgid "Mailbox Name"
 msgstr "우편함 이름"
 
-#: src/pref-manager.c:1520 src/pref-manager.c:2667
+#: src/pref-manager.c:1556 src/pref-manager.c:2701
 #, fuzzy
 msgid "_Modify"
 msgstr "수정"
 
-#: src/pref-manager.c:1535
+#: src/pref-manager.c:1571
 #, fuzzy
 msgid "Local Mail"
 msgstr "지역 편지"
 
-#: src/pref-manager.c:1537
+#: src/pref-manager.c:1573
 msgid "Select your local mail directory"
 msgstr "지역 편지 디렉토리 선택"
 
-#: src/pref-manager.c:1557
+#: src/pref-manager.c:1593
 msgid "Outgoing Mail"
 msgstr ""
 
-#: src/pref-manager.c:1562
+#: src/pref-manager.c:1598
 #, fuzzy
 msgid "Remote SMTP Server"
 msgstr "원격 SMTP 서버"
 
-#: src/pref-manager.c:1564
+#: src/pref-manager.c:1600
 msgid "User"
 msgstr ""
 
-#: src/pref-manager.c:1567
+#: src/pref-manager.c:1603
 msgid "Pass Phrase"
 msgstr ""
 
 #. STARTTLS
-#: src/pref-manager.c:1571
+#: src/pref-manager.c:1607
 msgid "Use TLS"
 msgstr ""
 
-#: src/pref-manager.c:1589
+#: src/pref-manager.c:1625
 #, fuzzy
 msgid "Certificate Pass Phrase"
 msgstr "증명서를 저장했습니다"
 
-#: src/pref-manager.c:1607
+#: src/pref-manager.c:1643
 msgid "Incoming"
 msgstr ""
 
-#: src/pref-manager.c:1609
+#: src/pref-manager.c:1645
 msgid "Outgoing"
 msgstr ""
 
-#: src/pref-manager.c:1633
+#: src/pref-manager.c:1669
 msgid "Checking"
 msgstr ""
 
-#: src/pref-manager.c:1638
+#: src/pref-manager.c:1674
 #, fuzzy
 msgid "_Check mail automatically every:"
 msgstr "자동으로 편지 확인:"
 
-#: src/pref-manager.c:1649 src/pref-manager.c:2460
+#: src/pref-manager.c:1685 src/pref-manager.c:2494 src/pref-manager.c:2545
 msgid "minutes"
 msgstr "분"
 
-#: src/pref-manager.c:1655
+#: src/pref-manager.c:1691
 #, fuzzy
 msgid "Check _IMAP mailboxes"
 msgstr "원격 IMAP 우편함..."
 
-#: src/pref-manager.c:1661
+#: src/pref-manager.c:1697
 msgid "Check INBOX _only"
 msgstr ""
 
-#: src/pref-manager.c:1666
+#: src/pref-manager.c:1702
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr ""
 
-#: src/pref-manager.c:1671
+#: src/pref-manager.c:1707
 msgid "Do background check quietly (no messages in status bar)"
 msgstr ""
 
-#: src/pref-manager.c:1675
+#: src/pref-manager.c:1711
 msgid "_POP message size limit:"
 msgstr ""
 
-#: src/pref-manager.c:1682
+#: src/pref-manager.c:1718
 msgid "MB"
 msgstr ""
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:1701
+#: src/pref-manager.c:1737
 msgid "Quoted and Flowed Text"
 msgstr ""
 
-#: src/pref-manager.c:1705 src/sendmsg-window.c:4222
+#: src/pref-manager.c:1741 src/sendmsg-window.c:4231
 msgid "Quoted Text Regular Expression"
 msgstr ""
 
-#: src/pref-manager.c:1716
+#: src/pref-manager.c:1752
 msgid "Wrap Incoming Text at:"
 msgstr ""
 
-#: src/pref-manager.c:1727 src/pref-manager.c:1902
+#: src/pref-manager.c:1763 src/pref-manager.c:1937
 msgid "characters"
 msgstr "문자"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:1742
+#: src/pref-manager.c:1778
 msgid "Display of Multipart/Alternative Parts"
 msgstr ""
 
-#: src/pref-manager.c:1745
+#: src/pref-manager.c:1781
 msgid "prefer text/plain over html"
 msgstr ""
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:1763
+#: src/pref-manager.c:1798
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 
-#: src/pref-manager.c:1769
+#: src/pref-manager.c:1804
 #, fuzzy
 msgid "display as \"?\""
 msgstr "표시 형식"
 
-#: src/pref-manager.c:1778
+#: src/pref-manager.c:1813
 #, fuzzy
 msgid "display using codeset"
 msgstr "헤더 표시 않함"
 
 #. How to handle received MDN requests
-#: src/pref-manager.c:1813
+#: src/pref-manager.c:1848
 msgid "Message Disposition Notification Requests"
 msgstr ""
 
-#: src/pref-manager.c:1815
+#: src/pref-manager.c:1850
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
 msgstr ""
 
-#: src/pref-manager.c:1826
+#: src/pref-manager.c:1861
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
 "I am in the \"To:\" or \"Cc:\" list)."
 msgstr ""
 
-#: src/pref-manager.c:1844
+#: src/pref-manager.c:1879
 msgid "The message header looks suspicious."
 msgstr ""
 
-#: src/pref-manager.c:1883
+#: src/pref-manager.c:1918
 msgid "Word Wrap"
 msgstr ""
 
-#: src/pref-manager.c:1888
+#: src/pref-manager.c:1923
 msgid "Wrap Outgoing Text at:"
 msgstr ""
 
-#: src/pref-manager.c:1916
+#: src/pref-manager.c:1951
 #, fuzzy
 msgid "Other Options"
 msgstr "다른 옵션"
 
-#: src/pref-manager.c:1921
+#: src/pref-manager.c:1956
 #, fuzzy
 msgid "Reply Prefix:"
 msgstr "접두어(_P):"
 
-#: src/pref-manager.c:1924
+#: src/pref-manager.c:1959
 msgid "Edit headers in external editor"
 msgstr ""
 
-#: src/pref-manager.c:1926
+#: src/pref-manager.c:1961
 msgid "Automatically quote original when replying"
 msgstr ""
 
-#: src/pref-manager.c:1929
+#: src/pref-manager.c:1964
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr ""
 
-#: src/pref-manager.c:1932
+#: src/pref-manager.c:1967
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr ""
 
-#: src/pref-manager.c:1935
+#: src/pref-manager.c:1970
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
 
-#: src/pref-manager.c:1938
+#: src/pref-manager.c:1973
 msgid "Copy outgoing messages to sentbox"
 msgstr ""
 
-#: src/pref-manager.c:1951 src/pref-manager.c:2075
+#: src/pref-manager.c:1986 src/pref-manager.c:2108
 msgid "Encoding"
 msgstr "인코딩"
 
-#: src/pref-manager.c:1981
+#: src/pref-manager.c:2016
 #, fuzzy
 msgid "Status Messages"
 msgstr "메시지"
 
-#: src/pref-manager.c:1983
+#: src/pref-manager.c:2018
 msgid "Colors"
 msgstr "색상"
 
-#: src/pref-manager.c:1985
+#: src/pref-manager.c:2020
 #, fuzzy
 msgid "Message"
 msgstr "메시지(_M)"
 
-#: src/pref-manager.c:1987 src/pref-manager.c:2284
-msgid "Threading"
+#: src/pref-manager.c:2022
+msgid "Sort and Thread"
 msgstr ""
 
-#: src/pref-manager.c:2012
+#: src/pref-manager.c:2047
 #, fuzzy
 msgid "Main Window"
 msgstr "메인 창"
 
-#: src/pref-manager.c:2015
+#: src/pref-manager.c:2050
 msgid "Use preview pane"
 msgstr "미리보기 창 사용"
 
-#: src/pref-manager.c:2017
+#: src/pref-manager.c:2052
 msgid "Show mailbox statistics in left pane"
 msgstr "왼쪽 창에 우편함 통계 보이기"
 
-#: src/pref-manager.c:2019
+#: src/pref-manager.c:2054
 msgid "Use alternative main window layout"
 msgstr "다른 메인 창 배치 사용"
 
-#: src/pref-manager.c:2021
+#: src/pref-manager.c:2056
 msgid "Automatically view message when mailbox opened"
 msgstr "우편함이 열렸을 때 자동으로 메시지 보기"
 
-#: src/pref-manager.c:2024
-msgid "Display message size as number of lines"
-msgstr ""
-
-#: src/pref-manager.c:2029
+#: src/pref-manager.c:2062
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr ""
 
-#: src/pref-manager.c:2040
+#: src/pref-manager.c:2073
 msgid "percent"
 msgstr ""
 
-#: src/pref-manager.c:2055
+#: src/pref-manager.c:2088
 #, fuzzy
 msgid "Display Progress Dialog"
 msgstr "진행 대화상자 표시"
 
-#: src/pref-manager.c:2080
+#: src/pref-manager.c:2113
 msgid "Date encoding (for strftime):"
 msgstr "날짜 인코딩 (strftime 형식):"
 
-#: src/pref-manager.c:2082
+#: src/pref-manager.c:2115
 msgid "Selected headers:"
 msgstr "선택된 헤더:"
 
-#: src/pref-manager.c:2103 src/pref-manager.c:2108
+#: src/pref-manager.c:2136 src/pref-manager.c:2141
 msgid "Information Messages"
 msgstr "정보 메시지"
 
-#: src/pref-manager.c:2112
+#: src/pref-manager.c:2145
 msgid "Warning Messages"
 msgstr "경고 메시지"
 
-#: src/pref-manager.c:2116
+#: src/pref-manager.c:2149
 msgid "Error Messages"
 msgstr "에러 메시지"
 
-#: src/pref-manager.c:2120
+#: src/pref-manager.c:2153
 msgid "Fatal Error Messages"
 msgstr "심각한 에러 메시지"
 
-#: src/pref-manager.c:2124
+#: src/pref-manager.c:2157
 msgid "Debug Messages"
 msgstr "디버그 메시지"
 
-#: src/pref-manager.c:2150
+#: src/pref-manager.c:2183
 msgid "Message Colors"
 msgstr "메시지 색상"
 
-#: src/pref-manager.c:2155
+#: src/pref-manager.c:2188
 #, c-format
 msgid "Quote level %d color"
 msgstr ""
 
-#: src/pref-manager.c:2168
+#: src/pref-manager.c:2201
 #, fuzzy
 msgid "Link Color"
 msgstr "색상"
 
-#: src/pref-manager.c:2170
+#: src/pref-manager.c:2203
 msgid "Hyperlink color"
 msgstr ""
 
-#: src/pref-manager.c:2181
+#: src/pref-manager.c:2214
 msgid "Composition Window"
 msgstr ""
 
-#: src/pref-manager.c:2185
+#: src/pref-manager.c:2218
 msgid "Invalid or incomplete address label color"
 msgstr ""
 
-#: src/pref-manager.c:2210
+#: src/pref-manager.c:2243
 msgid "Fonts"
 msgstr "글꼴"
 
-#: src/pref-manager.c:2225 src/pref-manager.c:2250
+#: src/pref-manager.c:2258 src/pref-manager.c:2283
 msgid "Select a font to use"
 msgstr "사용할 글꼴 선택"
 
-#: src/pref-manager.c:2228 src/pref-manager.c:2253
+#: src/pref-manager.c:2261 src/pref-manager.c:2286
 msgid "Select..."
 msgstr "선택..."
 
-#: src/pref-manager.c:2235
+#: src/pref-manager.c:2268
 #, fuzzy
 msgid "Message Font"
 msgstr "메시지"
 
-#: src/pref-manager.c:2261
+#: src/pref-manager.c:2294
 #, fuzzy
 msgid "Message Subject Font"
 msgstr "제목 헤더 글꼴"
 
-#: src/pref-manager.c:2287
-msgid "Expand mailbox tree on open"
+#: src/pref-manager.c:2317
+msgid "Sorting and Threading"
 msgstr ""
 
-#: src/pref-manager.c:2291
+#: src/pref-manager.c:2321
+#, fuzzy
+msgid "Default sort column"
+msgstr "기본 도메인:"
+
+#: src/pref-manager.c:2325
 msgid "Default threading style"
 msgstr ""
 
-#: src/pref-manager.c:2370
+#: src/pref-manager.c:2330
+#, fuzzy
+msgid "Expand threads on open"
+msgstr "모든 헤더 표시"
+
+#: src/pref-manager.c:2406
 msgid "Pspell Settings"
 msgstr "Pspell 설정"
 
-#: src/pref-manager.c:2376
+#: src/pref-manager.c:2412
 msgid "Spell Check Module"
 msgstr "철자 검사 모듈"
 
-#: src/pref-manager.c:2383
+#: src/pref-manager.c:2418
 msgid "Suggestion Level"
 msgstr "제안 레벨"
 
 #. do the ignore length
-#: src/pref-manager.c:2389
+#: src/pref-manager.c:2423
 msgid "Ignore words shorter than"
 msgstr "..보다 짧은 단어 무시"
 
-#: src/pref-manager.c:2410
+#: src/pref-manager.c:2444
 #, fuzzy
 msgid "Miscellaneous Spelling Settings"
 msgstr "기타 철자검사 설정"
 
-#: src/pref-manager.c:2412
+#: src/pref-manager.c:2446
 msgid "Check signature"
 msgstr "서명 확인"
 
-#: src/pref-manager.c:2413
+#: src/pref-manager.c:2447
 msgid "Check quoted"
 msgstr ""
 
-#: src/pref-manager.c:2437
+#: src/pref-manager.c:2471
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/pref-manager.c:2439
+#: src/pref-manager.c:2473
 msgid "Debug"
 msgstr "디버그"
 
-#: src/pref-manager.c:2440
+#: src/pref-manager.c:2474
 msgid "Empty Trash on exit"
 msgstr "종료시 휴지통 비우기"
 
-#: src/pref-manager.c:2446
+#: src/pref-manager.c:2480
 msgid "Automatically close mailbox if unused more than"
 msgstr "..이상 사용않된 우편함 자동으로 닫기"
 
-#: src/pref-manager.c:2474
+#: src/pref-manager.c:2508
 #, fuzzy
 msgid "Deleting Messages"
 msgstr "디버그 메시지"
 
-#: src/pref-manager.c:2476
+#: src/pref-manager.c:2510
 msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
 
-#: src/pref-manager.c:2484
+#: src/pref-manager.c:2518
 msgid "Hide messages marked as deleted"
 msgstr ""
 
-#: src/pref-manager.c:2486
+#: src/pref-manager.c:2520
 msgid "The following settings are global."
 msgstr ""
 
-#: src/pref-manager.c:2491
+#: src/pref-manager.c:2525
 #, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "우편함이 열렸을 때 자동으로 메시지 보기"
 
-#: src/pref-manager.c:2498
+#: src/pref-manager.c:2532
 #, fuzzy
 msgid " ...and if mailbox is unused more than"
 msgstr "..이상 사용않된 우편함 자동으로 닫기"
 
-#: src/pref-manager.c:2511
-msgid "hours"
-msgstr ""
-
-#: src/pref-manager.c:2533
+#: src/pref-manager.c:2567
 msgid "Options"
 msgstr "옵션"
 
-#: src/pref-manager.c:2536
+#: src/pref-manager.c:2570
 #, fuzzy
 msgid "Open Inbox upon startup"
 msgstr "시작시 메일 확인"
 
-#: src/pref-manager.c:2538
+#: src/pref-manager.c:2572
 msgid "Check mail upon startup"
 msgstr "시작시 메일 확인"
 
-#: src/pref-manager.c:2540
+#: src/pref-manager.c:2574
 msgid "Remember open mailboxes between sessions"
 msgstr "세션간에 열려진 우편함 기억"
 
-#: src/pref-manager.c:2554
+#: src/pref-manager.c:2588
 msgid "Folder Scanning"
 msgstr ""
 
-#: src/pref-manager.c:2556
+#: src/pref-manager.c:2590
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
 msgstr ""
 
-#: src/pref-manager.c:2566
+#: src/pref-manager.c:2600
 msgid "Scan local folders to depth"
 msgstr ""
 
-#: src/pref-manager.c:2579
+#: src/pref-manager.c:2613
 #, fuzzy
 msgid "Scan IMAP folders to depth"
 msgstr "원격 IMAP 폴더 설정"
 
-#: src/pref-manager.c:2644
+#: src/pref-manager.c:2678
 msgid "Address Book Name"
 msgstr "주소록 이름"
 
-#: src/pref-manager.c:2652
+#: src/pref-manager.c:2686
 msgid "Expand aliases"
 msgstr ""
 
-#: src/pref-manager.c:2671
+#: src/pref-manager.c:2705
 #, fuzzy
 msgid "_Set as default"
 msgstr "기본값으로 설정"
 
-#: src/pref-manager.c:2827
+#: src/pref-manager.c:2861
 #, fuzzy
 msgid "Remote POP3 mailbox..."
 msgstr "원격 IMAP 우편함..."
 
-#: src/pref-manager.c:2976
+#: src/pref-manager.c:2998
 msgid "Show nothing"
 msgstr "아무것도 않보기"
 
-#: src/pref-manager.c:2977
+#: src/pref-manager.c:2999
 msgid "Show dialog"
 msgstr "대화상자로 보기"
 
-#: src/pref-manager.c:2978
+#: src/pref-manager.c:3000
 msgid "Show in list"
 msgstr "목록에서 보기"
 
-#: src/pref-manager.c:2979
+#: src/pref-manager.c:3001
 #, fuzzy
 msgid "Show in status bar"
 msgstr "목록에서 보기"
 
-#: src/pref-manager.c:2980
+#: src/pref-manager.c:3002
 msgid "Print to console"
 msgstr "콘솔로 출력"
 
-#: src/pref-manager.c:3000
+#: src/pref-manager.c:3022
 msgid "Ask me"
 msgstr ""
 
-#: src/pref-manager.c:3001
-msgid "Always"
-msgstr "항상"
-
-#: src/pref-manager.c:3105
+#: src/pref-manager.c:3138
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr ""
 
-#: src/print.c:258 src/print.c:741
+#: src/print.c:258 src/print.c:724
 #, c-format
 msgid "Page: %i/%i"
 msgstr "페이지: %i/%i"
 
-#: src/print.c:667
+#: src/print.c:666
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
@@ -4621,479 +4736,479 @@ msgstr ""
 
 #. gather some info about this part
 #. four fields, one terminator
-#: src/print.c:1007
+#: src/print.c:981
 #, fuzzy
 msgid "Type:"
 msgstr "형식"
 
-#: src/print.c:1010
+#: src/print.c:984
 #, fuzzy
 msgid "File name:"
 msgstr "파일 이름"
 
-#: src/print.c:1553
+#: src/print.c:1526
 msgid "Font available for printing"
 msgstr ""
 
-#: src/print.c:1559
+#: src/print.c:1532
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr ""
 
-#: src/print.c:1572
+#: src/print.c:1545
 #, fuzzy
 msgid "Select Font"
 msgstr "모두 선택"
 
-#: src/print.c:1605
+#: src/print.c:1578
 #, fuzzy
 msgid "Change..."
 msgstr "읽는 중..."
 
-#: src/print.c:1638
+#: src/print.c:1612
 msgid "Print message"
 msgstr "메시지 인쇄"
 
 #. create a 2nd notebook page for the fonts
-#: src/print.c:1647
+#: src/print.c:1623
 #, fuzzy
 msgid "_Fonts"
 msgstr "글꼴"
 
-#: src/print.c:1650
+#: src/print.c:1626
 #, fuzzy
 msgid "Header font"
 msgstr "머리글"
 
-#: src/print.c:1652
+#: src/print.c:1628
 #, fuzzy
 msgid "Body font"
 msgstr "본문"
 
-#: src/print.c:1654
+#: src/print.c:1630
 msgid "Footer font"
 msgstr ""
 
 #. highlight cited stuff
-#: src/print.c:1658
+#: src/print.c:1634
 msgid "Highlight cited text"
 msgstr ""
 
-#: src/print.c:1662
+#: src/print.c:1638
 msgid "_Enable highlighting of cited text"
 msgstr ""
 
-#: src/print.c:1687
+#: src/print.c:1664
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
 "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 msgstr ""
 
-#: src/print.c:1792
+#: src/print.c:1769
 msgid "Balsa: message print preview"
 msgstr "발사: 메시지 인쇄 미리보기"
 
-#: src/save-restore.c:591
+#: src/save-restore.c:600
 msgid "Error during filters loading: "
 msgstr ""
 
-#: src/save-restore.c:593
+#: src/save-restore.c:602
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
 "Filters may not be correct."
 msgstr ""
 
-#: src/save-restore.c:703
+#: src/save-restore.c:716
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr ""
 
-#: src/save-restore.c:956
+#: src/save-restore.c:975
 msgid ""
 "The option not to send \"format=flowed\" is now on the Options menu of the "
 "compose window."
 msgstr ""
 
-#: src/save-restore.c:988
+#: src/save-restore.c:1007
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 
-#: src/save-restore.c:1724
+#: src/save-restore.c:1753
 msgid "Filter with no condition was ignored"
 msgstr ""
 
-#: src/save-restore.c:1902
+#: src/save-restore.c:1931
 msgid "Error opening GConf database\n"
 msgstr ""
 
-#: src/save-restore.c:1910 src/save-restore.c:1921
+#: src/save-restore.c:1939 src/save-restore.c:1950
 #, fuzzy, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "%s로 연결 도중 에러가 발생했습니다."
 
-#: src/sendmsg-window.c:218
+#: src/sendmsg-window.c:219
 #, fuzzy
 msgid "_Brazilian"
 msgstr "브라질"
 
-#: src/sendmsg-window.c:219
+#: src/sendmsg-window.c:220
 #, fuzzy
 msgid "_Catalan"
 msgstr "카탈로니아"
 
-#: src/sendmsg-window.c:220
+#: src/sendmsg-window.c:221
 msgid "_Chinese Simplified"
 msgstr ""
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:222
 msgid "_Chinese Traditional"
 msgstr ""
 
-#: src/sendmsg-window.c:222
+#: src/sendmsg-window.c:223
 #, fuzzy
 msgid "_Czech"
 msgstr "참조(_C)"
 
-#: src/sendmsg-window.c:223
+#: src/sendmsg-window.c:224
 #, fuzzy
 msgid "_Danish"
 msgstr "덴마크"
 
-#: src/sendmsg-window.c:224
+#: src/sendmsg-window.c:225
 #, fuzzy
 msgid "_Dutch"
 msgstr "네덜란드"
 
-#: src/sendmsg-window.c:225
+#: src/sendmsg-window.c:226
 msgid "_English (American)"
 msgstr ""
 
-#: src/sendmsg-window.c:226
+#: src/sendmsg-window.c:227
 msgid "_English (British)"
 msgstr ""
 
-#: src/sendmsg-window.c:227
+#: src/sendmsg-window.c:228
 msgid "_Esperanto"
 msgstr ""
 
-#: src/sendmsg-window.c:228
+#: src/sendmsg-window.c:229
 #, fuzzy
 msgid "_Estonian"
 msgstr "에스토니아"
 
-#: src/sendmsg-window.c:229
+#: src/sendmsg-window.c:230
 #, fuzzy
 msgid "_Finnish"
 msgstr "핀란드"
 
-#: src/sendmsg-window.c:230
+#: src/sendmsg-window.c:231
 #, fuzzy
 msgid "_French"
 msgstr "프랑스"
 
-#: src/sendmsg-window.c:231
+#: src/sendmsg-window.c:232
 #, fuzzy
 msgid "_German"
 msgstr "독일"
 
-#: src/sendmsg-window.c:232
+#: src/sendmsg-window.c:233
 #, fuzzy
 msgid "_Greek"
 msgstr "그리스"
 
-#: src/sendmsg-window.c:233
+#: src/sendmsg-window.c:234
 msgid "_Hebrew"
 msgstr ""
 
-#: src/sendmsg-window.c:234
+#: src/sendmsg-window.c:235
 #, fuzzy
 msgid "_Hungarian"
 msgstr "헝가리"
 
-#: src/sendmsg-window.c:235
+#: src/sendmsg-window.c:236
 #, fuzzy
 msgid "_Italian"
 msgstr "이태리"
 
-#: src/sendmsg-window.c:236
+#: src/sendmsg-window.c:237
 #, fuzzy
 msgid "_Japanese"
 msgstr "일본"
 
-#: src/sendmsg-window.c:237
+#: src/sendmsg-window.c:238
 #, fuzzy
 msgid "_Korean"
 msgstr "한국"
 
-#: src/sendmsg-window.c:238
+#: src/sendmsg-window.c:239
 #, fuzzy
 msgid "_Latvian"
 msgstr "라트비아"
 
-#: src/sendmsg-window.c:239
+#: src/sendmsg-window.c:240
 #, fuzzy
 msgid "_Lithuanian"
 msgstr "리투아니아"
 
-#: src/sendmsg-window.c:240
+#: src/sendmsg-window.c:241
 #, fuzzy
 msgid "_Norwegian"
 msgstr "노르웨이"
 
-#: src/sendmsg-window.c:241
+#: src/sendmsg-window.c:242
 #, fuzzy
 msgid "_Polish"
 msgstr "폴란드"
 
-#: src/sendmsg-window.c:242
+#: src/sendmsg-window.c:243
 #, fuzzy
 msgid "_Portugese"
 msgstr "포르투갈"
 
-#: src/sendmsg-window.c:243
+#: src/sendmsg-window.c:244
 #, fuzzy
 msgid "_Romanian"
 msgstr "루마니아"
 
-#: src/sendmsg-window.c:244
+#: src/sendmsg-window.c:245
 #, fuzzy
 msgid "_Russian (ISO)"
 msgstr "러시아 (ISO)"
 
-#: src/sendmsg-window.c:245
+#: src/sendmsg-window.c:246
 #, fuzzy
 msgid "_Russian (KOI)"
 msgstr "러시아 (KOI)"
 
-#: src/sendmsg-window.c:246
+#: src/sendmsg-window.c:247
 #, fuzzy
 msgid "_Serbian"
 msgstr "보내기(_S)"
 
-#: src/sendmsg-window.c:247
+#: src/sendmsg-window.c:248
 msgid "_Serbian (Latin)"
 msgstr ""
 
-#: src/sendmsg-window.c:248
+#: src/sendmsg-window.c:249
 #, fuzzy
 msgid "_Slovak"
 msgstr "슬로바키아"
 
-#: src/sendmsg-window.c:249
+#: src/sendmsg-window.c:250
 #, fuzzy
 msgid "_Spanish"
 msgstr "스페인"
 
-#: src/sendmsg-window.c:250
+#: src/sendmsg-window.c:251
 #, fuzzy
 msgid "_Swedish"
 msgstr "스웨덴"
 
-#: src/sendmsg-window.c:251
+#: src/sendmsg-window.c:252
 #, fuzzy
 msgid "_Turkish"
 msgstr "터키"
 
-#: src/sendmsg-window.c:252
+#: src/sendmsg-window.c:253
 #, fuzzy
 msgid "_Ukrainian"
 msgstr "우크라이나"
 
-#: src/sendmsg-window.c:253
+#: src/sendmsg-window.c:254
 msgid "_Generic UTF-8"
 msgstr ""
 
-#: src/sendmsg-window.c:277
+#: src/sendmsg-window.c:278
 msgid "_GnuPG uses MIME mode"
 msgstr ""
 
-#: src/sendmsg-window.c:283
+#: src/sendmsg-window.c:284
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr ""
 
-#: src/sendmsg-window.c:290
+#: src/sendmsg-window.c:291
 msgid "_S/MIME mode (GpgSM)"
 msgstr ""
 
-#: src/sendmsg-window.c:305 src/sendmsg-window.c:477
+#: src/sendmsg-window.c:306 src/sendmsg-window.c:478
 msgid "_Include File..."
 msgstr "파일 포함(_I)..."
 
-#: src/sendmsg-window.c:308 src/sendmsg-window.c:490
+#: src/sendmsg-window.c:309 src/sendmsg-window.c:491
 msgid "_Attach File..."
 msgstr "파일 첨부(_A)..."
 
-#: src/sendmsg-window.c:311 src/sendmsg-window.c:479
+#: src/sendmsg-window.c:312 src/sendmsg-window.c:480
 #, fuzzy
 msgid "I_nclude Message(s)"
 msgstr "디버그 메시지"
 
-#: src/sendmsg-window.c:314 src/sendmsg-window.c:482
+#: src/sendmsg-window.c:315 src/sendmsg-window.c:483
 #, fuzzy
 msgid "Attach _Message(s)"
 msgstr "메시지(_M)"
 
-#: src/sendmsg-window.c:320 src/sendmsg-window.c:507
+#: src/sendmsg-window.c:321 src/sendmsg-window.c:508
 #, fuzzy
 msgid "Sen_d"
 msgstr "보내기"
 
-#: src/sendmsg-window.c:321 src/sendmsg-window.c:508 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:322 src/sendmsg-window.c:509 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "이 메시지 보내기"
 
-#: src/sendmsg-window.c:325
+#: src/sendmsg-window.c:326
 msgid "_Queue"
 msgstr "큐(_Q)"
 
-#: src/sendmsg-window.c:326 src/sendmsg-window.c:513
+#: src/sendmsg-window.c:327 src/sendmsg-window.c:514
 msgid "Queue this message in Outbox for sending"
 msgstr ""
 
-#: src/sendmsg-window.c:330
+#: src/sendmsg-window.c:331
 msgid "_Postpone"
 msgstr "연기(_P)"
 
-#: src/sendmsg-window.c:333 src/sendmsg-window.c:494
+#: src/sendmsg-window.c:334 src/sendmsg-window.c:495
 #, fuzzy
 msgid "_Save"
 msgstr "저장"
 
-#: src/sendmsg-window.c:334 src/sendmsg-window.c:495
+#: src/sendmsg-window.c:335 src/sendmsg-window.c:496
 #, fuzzy
 msgid "Save this message"
 msgstr "이 메시지 보내기"
 
-#: src/sendmsg-window.c:338 src/sendmsg-window.c:499
+#: src/sendmsg-window.c:339 src/sendmsg-window.c:500
 msgid "Print the edited message"
 msgstr "편집된 메시지 인쇄"
 
-#: src/sendmsg-window.c:367 src/sendmsg-window.c:524
+#: src/sendmsg-window.c:368 src/sendmsg-window.c:525
 msgid "_Wrap Body"
 msgstr ""
 
-#: src/sendmsg-window.c:371 src/sendmsg-window.c:528
+#: src/sendmsg-window.c:372 src/sendmsg-window.c:529
 msgid "_Reflow Selected Text"
 msgstr ""
 
-#: src/sendmsg-window.c:376 src/sendmsg-window.c:556
+#: src/sendmsg-window.c:377 src/sendmsg-window.c:557
 #, fuzzy
 msgid "Insert Si_gnature"
 msgstr "서명"
 
-#: src/sendmsg-window.c:380 src/sendmsg-window.c:532
+#: src/sendmsg-window.c:381 src/sendmsg-window.c:533
 #, fuzzy
 msgid "_Quote Message(s)"
 msgstr "디버그 메시지"
 
-#: src/sendmsg-window.c:385 src/sendmsg-window.c:605
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:606
 #, fuzzy
 msgid "C_heck Spelling"
 msgstr "철자 확인"
 
-#: src/sendmsg-window.c:386 src/sendmsg-window.c:606
+#: src/sendmsg-window.c:387 src/sendmsg-window.c:607
 #, fuzzy
 msgid "Check the spelling of the message"
 msgstr "이 메시지의 모든 수신자에게 회신"
 
-#: src/sendmsg-window.c:391 src/sendmsg-window.c:612
+#: src/sendmsg-window.c:392 src/sendmsg-window.c:613
 #, fuzzy
 msgid "Select _Identity..."
 msgstr "선택..."
 
-#: src/sendmsg-window.c:392 src/sendmsg-window.c:613
+#: src/sendmsg-window.c:393 src/sendmsg-window.c:614
 #, fuzzy
 msgid "Select the Identity to use for the message"
 msgstr "현재 편집된 메시지 보내기"
 
-#: src/sendmsg-window.c:397
+#: src/sendmsg-window.c:398
 msgid "_Edit with Gnome-Editor"
 msgstr ""
 
-#: src/sendmsg-window.c:398
+#: src/sendmsg-window.c:399
 msgid "Edit the current message with the default Gnome editor"
 msgstr ""
 
-#: src/sendmsg-window.c:410 src/sendmsg-window.c:569
+#: src/sendmsg-window.c:411 src/sendmsg-window.c:570
 msgid "Fr_om"
 msgstr "보낸이(_o)"
 
-#: src/sendmsg-window.c:412 src/sendmsg-window.c:571
+#: src/sendmsg-window.c:413 src/sendmsg-window.c:572
 msgid "_Cc"
 msgstr "참조(_C)"
 
-#: src/sendmsg-window.c:414 src/sendmsg-window.c:573
+#: src/sendmsg-window.c:415 src/sendmsg-window.c:574
 msgid "_Bcc"
 msgstr "다음참조(_B)"
 
-#: src/sendmsg-window.c:416 src/sendmsg-window.c:575
+#: src/sendmsg-window.c:417 src/sendmsg-window.c:576
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: src/sendmsg-window.c:418
+#: src/sendmsg-window.c:419
 msgid "_Reply To"
 msgstr ""
 
-#: src/sendmsg-window.c:424 src/sendmsg-window.c:617
+#: src/sendmsg-window.c:425 src/sendmsg-window.c:618
 msgid "_Request Disposition Notification"
 msgstr ""
 
-#: src/sendmsg-window.c:427 src/sendmsg-window.c:587
+#: src/sendmsg-window.c:428 src/sendmsg-window.c:588
 msgid "_Format = Flowed"
 msgstr ""
 
-#: src/sendmsg-window.c:432 src/sendmsg-window.c:592
+#: src/sendmsg-window.c:433 src/sendmsg-window.c:593
 #, fuzzy
 msgid "_Sign Message"
 msgstr "메시지(_M)"
 
-#: src/sendmsg-window.c:433 src/sendmsg-window.c:593
+#: src/sendmsg-window.c:434 src/sendmsg-window.c:594
 msgid "signs the message using GnuPG"
 msgstr ""
 
-#: src/sendmsg-window.c:436 src/sendmsg-window.c:596
+#: src/sendmsg-window.c:437 src/sendmsg-window.c:597
 #, fuzzy
 msgid "_Encrypt Message"
 msgstr "에러 메시지"
 
-#: src/sendmsg-window.c:437 src/sendmsg-window.c:597
+#: src/sendmsg-window.c:438 src/sendmsg-window.c:598
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr ""
 
-#: src/sendmsg-window.c:457 src/sendmsg-window.c:633
+#: src/sendmsg-window.c:458 src/sendmsg-window.c:634
 msgid "_Show"
 msgstr "보이기(_S)"
 
-#: src/sendmsg-window.c:459 src/sendmsg-window.c:610
+#: src/sendmsg-window.c:460 src/sendmsg-window.c:611
 msgid "_Language"
 msgstr "언어(_L)"
 
-#: src/sendmsg-window.c:461
+#: src/sendmsg-window.c:462
 msgid "_Options"
 msgstr "옵션(_O)"
 
-#: src/sendmsg-window.c:503
+#: src/sendmsg-window.c:504
 msgid "Sa_ve and Close"
 msgstr ""
 
-#: src/sendmsg-window.c:512
+#: src/sendmsg-window.c:513
 msgid "Send _Later"
 msgstr ""
 
-#: src/sendmsg-window.c:733
+#: src/sendmsg-window.c:735
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr ""
 
-#: src/sendmsg-window.c:985
+#: src/sendmsg-window.c:989
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr ""
 
-#: src/sendmsg-window.c:1434
+#: src/sendmsg-window.c:1438
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5103,135 +5218,135 @@ msgid ""
 "Do you really want to attach this file as reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1445
+#: src/sendmsg-window.c:1449
 msgid "Attach as Reference?"
 msgstr ""
 
-#: src/sendmsg-window.c:1535
+#: src/sendmsg-window.c:1539
 msgid "Remove"
 msgstr "삭제"
 
-#: src/sendmsg-window.c:1546
+#: src/sendmsg-window.c:1550
 #, fuzzy
 msgid "attach as reference"
 msgstr "발사 속성"
 
-#: src/sendmsg-window.c:1552
+#: src/sendmsg-window.c:1556
 #, fuzzy
 msgid "attach as file"
 msgstr "파일 첨부"
 
-#: src/sendmsg-window.c:1686
+#: src/sendmsg-window.c:1690
 #, fuzzy, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "%s로 연결 도중 에러가 발생했습니다."
 
-#: src/sendmsg-window.c:1723
+#: src/sendmsg-window.c:1727
 #, fuzzy, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "파일 '%s'의 정보를 얻을 수 없습니다: %s\n"
 
-#: src/sendmsg-window.c:1728
+#: src/sendmsg-window.c:1732
 #, fuzzy, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "첨부 파일이 일반 파일이 아니거나 읽을 수 없습니다: '%s'\n"
 
-#: src/sendmsg-window.c:1731
+#: src/sendmsg-window.c:1735
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr ""
 
-#: src/sendmsg-window.c:1775
+#: src/sendmsg-window.c:1779
 msgid "Attach file"
 msgstr "파일 첨부"
 
-#: src/sendmsg-window.c:1872 src/sendmsg-window.c:1935
-#: src/sendmsg-window.c:3264
+#: src/sendmsg-window.c:1876 src/sendmsg-window.c:1939
+#: src/sendmsg-window.c:3271
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr ""
 
 #. From:
-#: src/sendmsg-window.c:2130
+#: src/sendmsg-window.c:2134
 #, fuzzy
 msgid "F_rom:"
 msgstr "보낸이:"
 
 #. Subject:
-#: src/sendmsg-window.c:2142
+#: src/sendmsg-window.c:2146
 #, fuzzy
 msgid "S_ubject:"
 msgstr "제목:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: src/sendmsg-window.c:2156
+#: src/sendmsg-window.c:2160
 #, fuzzy
 msgid "F_cc:"
 msgstr "Fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:2187
+#: src/sendmsg-window.c:2191
 #, fuzzy
 msgid "_Reply To:"
 msgstr "Reply To:"
 
 #. Attachment list
-#: src/sendmsg-window.c:2192
+#: src/sendmsg-window.c:2196
 #, fuzzy
 msgid "_Attachments:"
 msgstr "첨부:"
 
-#: src/sendmsg-window.c:2433
+#: src/sendmsg-window.c:2438
 msgid "you"
 msgstr "you"
 
-#: src/sendmsg-window.c:2442
+#: src/sendmsg-window.c:2447
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr ""
 
-#: src/sendmsg-window.c:2477
+#: src/sendmsg-window.c:2482
 #, fuzzy, c-format
 msgid "Message-ID: %s\n"
 msgstr "메시지"
 
-#: src/sendmsg-window.c:2483
+#: src/sendmsg-window.c:2488
 #, fuzzy
 msgid "References:"
 msgstr "발사 속성"
 
-#: src/sendmsg-window.c:2494
+#: src/sendmsg-window.c:2499
 #, fuzzy, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "On %s %s wrote:\n"
 
-#: src/sendmsg-window.c:2496
+#: src/sendmsg-window.c:2501
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s wrote:\n"
 
-#: src/sendmsg-window.c:3420
+#: src/sendmsg-window.c:3427
 msgid "Choose charset"
 msgstr ""
 
-#: src/sendmsg-window.c:3427
+#: src/sendmsg-window.c:3434
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file.\n"
 "(choose Generic UTF-8 if unsure)."
 msgstr ""
 
-#: src/sendmsg-window.c:3494
+#: src/sendmsg-window.c:3501
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "%s 파일을 열 수 없습니다.\n"
 
-#: src/sendmsg-window.c:3516
+#: src/sendmsg-window.c:3523
 msgid "Include file"
 msgstr "파일 포함"
 
-#: src/sendmsg-window.c:3811
+#: src/sendmsg-window.c:3818
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5239,81 +5354,82 @@ msgid ""
 "For multi-language messages, choose UTF-8."
 msgstr ""
 
-#: src/sendmsg-window.c:3852
+#: src/sendmsg-window.c:3859
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
 "if the complete message shall be protected. Do you really want to proceed?"
 msgstr ""
 
-#: src/sendmsg-window.c:3868
+#: src/sendmsg-window.c:3875
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr ""
 
-#: src/sendmsg-window.c:3913
+#: src/sendmsg-window.c:3922
 msgid "Message could not be created"
 msgstr ""
 
-#: src/sendmsg-window.c:3915
+#: src/sendmsg-window.c:3924
 msgid "Message could not be queued in outbox"
 msgstr ""
 
-#: src/sendmsg-window.c:3917
-msgid "Message could not be saved in senbox"
-msgstr ""
+#: src/sendmsg-window.c:3926
+#, fuzzy
+msgid "Message could not be saved in sentbox"
+msgstr "메시지 색상"
 
-#: src/sendmsg-window.c:3919
+#: src/sendmsg-window.c:3928
 #, fuzzy
 msgid "Message could not be sent"
 msgstr "메시지 색상"
 
-#: src/sendmsg-window.c:3923
+#: src/sendmsg-window.c:3932
 #, fuzzy, c-format
 msgid "Send failed: %s"
 msgstr "보내기 에러: %s"
 
-#: src/sendmsg-window.c:4007
+#: src/sendmsg-window.c:4016
 #, fuzzy
 msgid "Could not postpone message."
 msgstr "메시지를 추가할 수 없습니다"
 
-#: src/sendmsg-window.c:4021
+#: src/sendmsg-window.c:4030
 #, fuzzy
 msgid "Message postponed."
 msgstr "메시지 색상"
 
-#: src/sendmsg-window.c:4037
+#: src/sendmsg-window.c:4046
 #, fuzzy, c-format
 msgid "Could not open draftbox: %s"
 msgstr "우편함을 다시 열 수 없습니다"
 
-#: src/sendmsg-window.c:4059
+#: src/sendmsg-window.c:4068
 #, fuzzy
 msgid "Message saved."
 msgstr "메시지"
 
-#: src/sendmsg-window.c:4221
+#: src/sendmsg-window.c:4230
 #, fuzzy, c-format
 msgid "Could not compile %s"
 msgstr "%s 파일을 열 수 없습니다.\n"
 
-#: src/sendmsg-window.c:4709
+#: src/sendmsg-window.c:4718
 #, fuzzy, c-format
 msgid "Reply to %s: %s"
 msgstr "Reply to "
 
-#: src/sendmsg-window.c:4714
+#: src/sendmsg-window.c:4723
 #, fuzzy, c-format
 msgid "Forward message to %s: %s"
 msgstr "메시지 전달"
 
-#: src/sendmsg-window.c:4718
+#: src/sendmsg-window.c:4727
 #, fuzzy, c-format
 msgid "Continue message to %s: %s"
 msgstr "메시지 계속"
 
-#: src/sendmsg-window.c:4722
+#: src/sendmsg-window.c:4731
 #, fuzzy, c-format
 msgid "New message to %s: %s"
 msgstr "새 메시지"
@@ -5717,6 +5833,49 @@ msgstr "위"
 msgid "Down"
 msgstr "아래"
 
+#, fuzzy
+#~ msgid "Cannot open temporary file %s."
+#~ msgstr "%s 파일을 열 수 없습니다.\n"
+
+#~ msgid "Please enter information about yourself."
+#~ msgstr "당신의 정보를 입력하시기 바랍니다."
+
+#, fuzzy
+#~ msgid "_Name:"
+#~ msgstr "이름:"
+
+#, fuzzy
+#~ msgid ""
+#~ "You seem to be running Balsa for the first time. The following steps will "
+#~ "set up Balsa by asking a few simple questions. Once you have completed "
+#~ "these steps, you can always change them later in Balsa's preferences. If "
+#~ "any files or directories need to be created, it will be done so "
+#~ "automatically.\n"
+#~ "  Please check the about box in Balsa's main window for more information "
+#~ "about contacting the authors or reporting bugs."
+#~ msgstr ""
+#~ "발사를 처음 사용하시는 것 같습니다. 다음 스텝에서\n"
+#~ "발사 셋업을 위해 몇가지 간단한 질문을 하겠습니다.\n"
+#~ "한번 셋업이 되면 발사의 선택사항 항목에서 언제든\n"
+#~ "바꿀 수 있습니다. 파일이나 디렉토리의 생성이 필요한\n"
+#~ "경우 자동으로 생성될 것입니다. 발사 메인 창에서 발사에\n"
+#~ "대하여 박스를 확인해 보시기 바랍니다. 거기에서 저자에게\n"
+#~ "연락하는 방법이나 버그를 레포팅하는 방법등을 알 수 있습니다"
+
+#~ msgid "Total"
+#~ msgstr "총"
+
+#, fuzzy
+#~ msgid "By _Date"
+#~ msgstr "날짜"
+
+#, fuzzy
+#~ msgid "By sending date"
+#~ msgstr "편지 보냄"
+
+#~ msgid "Cannot access the message's body\n"
+#~ msgstr "메시지 본문에 접근할 수 없습니다\n"
+
 #~ msgid ""
 #~ "Failed to initialise LDAP server.\n"
 #~ "Check that the servername is valid."
@@ -6013,9 +6172,6 @@ msgstr "아래"
 #~ msgid "Printing"
 #~ msgstr "인쇄"
 
-#~ msgid "Your name:"
-#~ msgstr "이름:"
-
 #~ msgid "E-mail address:"
 #~ msgstr "전자우편 주소:"
 
@@ -6158,9 +6314,6 @@ msgstr "아래"
 
 #~ msgid "Some of the fields are blank."
 #~ msgstr "몇몇 항목이 비었습니다."
-
-#~ msgid "Could not access mailbox '%s'"
-#~ msgstr "우편함 '%s'에 접근할 수 없습니다"
 
 #~ msgid "New mailbox type:"
 #~ msgstr "새 우편함 형식:"

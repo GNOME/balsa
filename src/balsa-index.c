@@ -251,6 +251,7 @@ balsa_index_init (BalsaIndex * bindex)
  * priority
  * attachments
  */
+  GtkWidget *sw;
   GtkCList *clist;
   static gchar *titles[] =
   {
@@ -296,11 +297,15 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
+  sw = gtk_scrolled_window_new(NULL,NULL);
+  gtk_widget_set_parent (sw, GTK_WIDGET (bindex));
+  
   /* create the clist */
-  GTK_BIN (bindex)->child =
-    (GtkWidget *) clist = gtk_clist_new_with_titles (6, titles);
+  GTK_BIN (bindex)->child = sw = gtk_scrolled_window_new(NULL,NULL);
+  gtk_widget_set_parent (sw, GTK_WIDGET (bindex));
 
-  gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
+  bindex->clist = clist = gtk_clist_new_with_titles (6, titles);
+  gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(clist));
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -309,14 +314,17 @@ balsa_index_init (BalsaIndex * bindex)
 		      GTK_SIGNAL_FUNC (clist_click_column),
 		      NULL);
 
-  gtk_clist_set_policy (GTK_CLIST(clist), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(sw),
+		  GTK_POLICY_AUTOMATIC,
+		  GTK_POLICY_AUTOMATIC);
+
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_EXTENDED);
   gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);
   gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
   gtk_clist_set_column_width (clist, 0, 40);
-  gtk_clist_set_column_width (clist, 1, 40);
-  gtk_clist_set_column_width (clist, 2, 40);
+  gtk_clist_set_column_width (clist, 1, 16);
+  gtk_clist_set_column_width (clist, 2, 16);
   gtk_clist_set_column_width (clist, 3, 170);
   gtk_clist_set_column_width (clist, 4, 260);
   gtk_clist_set_column_width (clist, 5, 80);
@@ -408,7 +416,7 @@ moveto_handler (BalsaIndex * bindex)
 {
   if (!GTK_WIDGET_VISIBLE (GTK_WIDGET (bindex)))
     return TRUE;
-  gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), bindex->first_new_message - 1, -1, 0.0, 0.0);
+  gtk_clist_moveto (GTK_CLIST (bindex->clist), bindex->first_new_message - 1, -1, 0.0, 0.0);
   return FALSE;
 }
 
@@ -433,7 +441,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
     {
       mailbox_watcher_remove (mailbox, bindex->watcher_id);
       mailbox_open_unref (bindex->mailbox);
-      gtk_clist_clear (GTK_CLIST (GTK_BIN (bindex)->child));
+      gtk_clist_clear (GTK_CLIST (bindex->clist));
     }
 
   /*
@@ -464,7 +472,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
    * makes it appear as if the message is displayed before the index; so we set
    * the clist selection mode to a mode that doesn't automagicly select, select
    * manually, then switch back */
-  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
+  gtk_clist_set_selection_mode (GTK_CLIST (bindex->clist),
 				GTK_SELECTION_EXTENDED);
 
   list = mailbox->message_list;
@@ -475,7 +483,7 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
       i++;
     }
 
-  gtk_clist_set_selection_mode (GTK_CLIST (GTK_BIN (bindex)->child),
+  gtk_clist_set_selection_mode (GTK_CLIST (bindex->clist),
 				GTK_SELECTION_EXTENDED);
 
   /* FIXME MAJOR HACK */
@@ -517,13 +525,13 @@ balsa_index_add (BalsaIndex * bindex,
 
   text[5] = message->date;
 
-  row = gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
+  row = gtk_clist_append (GTK_CLIST (bindex->clist), text);
 
   /* set message number */
   sprintf (text[0], "%d", row + 1);
-  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 0, text[0]);
+  gtk_clist_set_text (GTK_CLIST (bindex->clist), row, 0, text[0]);
 
-  gtk_clist_set_row_data (GTK_CLIST (GTK_BIN (bindex)->child), row, (gpointer) message);
+  gtk_clist_set_row_data (GTK_CLIST (bindex->clist), row, (gpointer) message);
 
   clist_set_col_img_from_flag (bindex, row, message);
 
@@ -543,7 +551,7 @@ balsa_index_select_next (BalsaIndex * bindex)
 
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  clist = GTK_CLIST (bindex->clist);
 
   if (!clist->selection)
     return;
@@ -579,7 +587,7 @@ balsa_index_select_previous (BalsaIndex * bindex)
 
   g_return_if_fail (bindex != NULL);
 
-  clist = GTK_CLIST (GTK_BIN (bindex)->child);
+  clist = GTK_CLIST (bindex->clist);
 
   if (!clist->selection)
     return;
@@ -617,7 +625,7 @@ balsa_index_update_flag (BalsaIndex * bindex, Message * message)
   g_return_if_fail (bindex != NULL);
   g_return_if_fail (message != NULL);
 
-  row = gtk_clist_find_row_from_data (GTK_CLIST (GTK_BIN (bindex)->child), message);
+  row = gtk_clist_find_row_from_data (GTK_CLIST (bindex->clist), message);
   if (row < 0)
     return;
 
@@ -629,17 +637,17 @@ static void
 clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
 {
   if (message->flags & MESSAGE_FLAG_DELETED)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, deleted_pix, deleted_mask);
+    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, deleted_pix, deleted_mask);
 /*
    if (message->flags & MESSAGE_FLAG_FLAGGED)
-   gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, , mailbox_mask);
+   gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, , mailbox_mask);
  */
   else if (message->flags & MESSAGE_FLAG_REPLIED)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, replied_pix, replied_mask);
+    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, replied_pix, replied_mask);
   else if (message->flags & MESSAGE_FLAG_NEW)
-    gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, new_pix, new_mask);
+    gtk_clist_set_pixmap (GTK_CLIST (bindex->clist), row, 1, new_pix, new_mask);
   else
-    gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, NULL);
+    gtk_clist_set_text (GTK_CLIST (bindex->clist), row, 1, NULL);
 }
 
 

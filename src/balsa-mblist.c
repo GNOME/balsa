@@ -161,10 +161,10 @@ balsa_mblist_init (BalsaMBList * tree)
 		      GTK_SIGNAL_FUNC (select_mailbox),
 		      (gpointer) NULL);
 
-  gtk_signal_connect (GTK_OBJECT (tree),
+  /*gtk_signal_connect (GTK_OBJECT (tree),
 		      "button_press_event",
 		      (GtkSignalFunc) button_event_press_cb,
-		      (gpointer) NULL);
+		      (gpointer) NULL);*/
 
   balsa_mblist_redraw (tree);
 }
@@ -410,7 +410,7 @@ button_event_press_cb (GtkCList * clist, GdkEventButton * event, gpointer data)
   gint row, column;
   Mailbox *mailbox;
   GtkCTreeNode *ctrow;
-
+  printf("bim bim\n");
   if (event->window != clist->clist_window)
     return;
 

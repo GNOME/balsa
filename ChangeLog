@@ -1,3 +1,13 @@
+1999-01-14  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	
+	* src/mblist-window.c (mblist_button_press_cb): 
+	removed the mblist_clicked_cb function and replaced it by this new one.
+	All mouse press events are handled in this callback now. Before this, 
+	things were not very clear. For example, the double-click left button
+	was handled in the mailbox_select callback. 
+	
+
 1999-01-13  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	* src/mailbox-conf.c (mailbox_conf_delete): bug when removing 
@@ -12,7 +22,7 @@
 	contextual menus more precisely and in particular, allowing the menu
 	to appear even when the mouse does not click on one mailbox row.
 
-1999-01-12  
+1999-01-12  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	* src/filter-edit-callbacks.c 
 	* src/mailbox-conf.c 

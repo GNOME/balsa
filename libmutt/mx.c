@@ -870,6 +870,7 @@ int mx_close_mailbox (CONTEXT *ctx)
     }
   }
 
+#ifndef LIBMUTT
   if (ctx->deleted)
   {
     snprintf (buf, sizeof (buf), "Purge %d deleted message%s?",
@@ -877,6 +878,7 @@ int mx_close_mailbox (CONTEXT *ctx)
     if ((purge = query_quadoption (OPT_DELETE, buf)) < 0)
       return (-1);
   }
+#endif
 
   if (option (OPTMARKOLD))
   {

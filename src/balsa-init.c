@@ -474,6 +474,8 @@ next_cb (GtkWidget * widget, gpointer data)
 static void
 prev_cb (GtkWidget * widget, gpointer data)
 {
+  gtk_label_set (GTK_LABEL (GTK_BIN (iw->next)->child), "Next...");
+
   gtk_notebook_prev_page (GTK_NOTEBOOK (iw->notebook));
   gtk_widget_set_sensitive (iw->next, TRUE);
   if (gtk_notebook_current_page (GTK_NOTEBOOK (iw->notebook)) == IW_PAGE_WELCOME)

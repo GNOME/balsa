@@ -1,3 +1,8 @@
+2003-08-19 14:17  PeterB
+
+	* imap/imap.c: Use value returned by
+	uid_search_parse_response() more carefully.
+
 2003-07-21  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* buffy.[hc]: add mutt_buffy_free() routine.

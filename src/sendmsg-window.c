@@ -3746,8 +3746,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     gchar *tmp;
     gchar recvtime[50];
     GtkTextIter start, end;
-#if OLD_FROM
+#if !defined(ENABLE_TOUCH_UI)
     const gchar *ctmp;
+#endif
+#if OLD_FROM
 #else
     gint active;
     LibBalsaIdentity *ident;

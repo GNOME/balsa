@@ -1,5 +1,9 @@
-2003-11-13 08:57  PeterB
+2003-11-13 14:48  PeterB
 
+	* libbalsa/send.c: Attach the created GMimeMessage to the
+	LibBalsaMessage; don't grab the gdk lock while enumerating smtp
+	messages.
+	* libbalsa/misc.c: Free only a non-NULL error.
 	* libbalsa/mailbox.c: Implement GtkTreeDragSource
 	interface--trivial, but necessary to support dnd.
 

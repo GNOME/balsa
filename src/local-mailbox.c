@@ -111,7 +111,7 @@ add_mailbox (gchar * name, gchar * path, MailboxType type, gint isdir)
 	    g_node_append (balsa_app.mailbox_nodes, node);
 	}
       if (balsa_app.debug)
-	g_print ("Local Mailbox Loaded as: %s\n", mailbox_type_description (mailbox->type));
+	g_print (_("Local Mailbox Loaded as: %s\n"), mailbox_type_description (mailbox->type));
     }
 }
 

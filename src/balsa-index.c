@@ -165,9 +165,9 @@ balsa_index_init (BalsaIndex * bindex)
     "#",
     "S",
     "A",
-    "From",
-    "Subject",
-    "Date"
+    _("From"),
+    _("Subject"),
+    _("Date")
   };
 
 

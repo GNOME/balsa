@@ -38,7 +38,7 @@
 do {\
   if (client_mailbox)\
     {\
-      g_print ("*** ERROR: Mailbox Lock Failed: %s ***\n", __PRETTY_FUNCTION__);\
+      g_print (_("*** ERROR: Mailbox Lock Failed: %s ***\n"), __PRETTY_FUNCTION__);\
       return;\
     }\
   else\
@@ -50,7 +50,7 @@ do {\
 do {\
   if (client_mailbox)\
     {\
-      g_print ("*** ERROR: Mailbox Lock Failed: %s ***\n", __PRETTY_FUNCTION__);\
+      g_print (_("*** ERROR: Mailbox Lock Failed: %s ***\n"), __PRETTY_FUNCTION__);\
       return (val);\
     }\
   else\
@@ -67,7 +67,7 @@ do {\
 do {\
   if (CLIENT_CONTEXT_CLOSED (mailbox))\
     {\
-      g_print ("*** ERROR: Mailbox Stream Closed: %s ***\n", __PRETTY_FUNCTION__);\
+      g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
       UNLOCK_MAILBOX ();\
       return;\
     }\
@@ -76,7 +76,7 @@ do {\
 do {\
   if (CLIENT_CONTEXT_CLOSED (mailbox))\
     {\
-      g_print ("*** ERROR: Mailbox Stream Closed: %s ***\n", __PRETTY_FUNCTION__);\
+      g_print (_("*** ERROR: Mailbox Stream Closed: %s ***\n"), __PRETTY_FUNCTION__);\
       UNLOCK_MAILBOX ();\
       return (val);\
     }\
@@ -365,7 +365,7 @@ mailbox_open_ref (Mailbox * mailbox)
       /* incriment the reference count */
       mailbox->open_ref++;
 
-      g_print ("Mailbox: Opening %s Refcount: %d\n", mailbox->name, mailbox->open_ref);
+      g_print (_("Mailbox: Opening %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 
       UNLOCK_MAILBOX ();
       return TRUE;
@@ -390,7 +390,7 @@ mailbox_open_unref (Mailbox * mailbox)
 
   if (mailbox->open_ref == 0)
     {
-      g_print ("Mailbox: Closing %s Refcount: %d\n", mailbox->name, mailbox->open_ref);
+      g_print (_("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 
       free_messages (mailbox);
       mailbox->messages = 0;
@@ -1099,7 +1099,7 @@ message_body_ref (Message * message)
       b = cur->content;
 
       if (balsa_app.debug)
-	g_print ("Loading message: %s/%s\n", TYPE (b->type), b->subtype);
+	g_print (_("Loading message: %s/%s\n"), TYPE (b->type), b->subtype);
 
       memset (&s, 0, sizeof (s));
       mutt_mktemp (tmpfile);

@@ -58,9 +58,9 @@ open_mailbox_manager ()
 
   static gchar *titles[] =
   {
-    "Account",
-    "Type",
-    "Server"
+    _("Account"),
+    _("Type"),
+    _("Server")
   };
 
 
@@ -77,7 +77,7 @@ open_mailbox_manager ()
 
   /* dialog window */
   mmw->window = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (mmw->window), "Mailbox Manager");
+  gtk_window_set_title (GTK_WINDOW (mmw->window), _("Mailbox Manager"));
   gtk_window_set_wmclass (GTK_WINDOW (mmw->window), "mailbox_manager", "Balsa");
   gtk_window_position (GTK_WINDOW (mmw->window), GTK_WIN_POS_CENTER);
   gtk_container_border_width (GTK_CONTAINER (mmw->window), 0);
@@ -131,7 +131,7 @@ open_mailbox_manager ()
 
 
   /* edit account button */
-  button = gtk_button_new_with_label ("Edit...");
+  button = gtk_button_new_with_label (_("Edit..."));
   gtk_widget_set_usize (button, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 
@@ -144,7 +144,7 @@ open_mailbox_manager ()
 
 
   /* edit account button */
-  button = gtk_button_new_with_label ("New...");
+  button = gtk_button_new_with_label (_("New..."));
   gtk_widget_set_usize (button, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 10);
 
@@ -157,7 +157,7 @@ open_mailbox_manager ()
 
 
   /* delete account button */
-  button = gtk_button_new_with_label ("Delete...");
+  button = gtk_button_new_with_label (_("Delete..."));
   gtk_widget_set_usize (button, BALSA_BUTTON_WIDTH, BALSA_BUTTON_HEIGHT);
   gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 

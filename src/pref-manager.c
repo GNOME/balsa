@@ -104,7 +104,7 @@ open_preferences_manager ()
 
 
   pmw->window = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (pmw->window), "Preferences");
+  gtk_window_set_title (GTK_WINDOW (pmw->window), _("Preferences"));
   gtk_window_set_wmclass (GTK_WINDOW (pmw->window),
 			  "preferences_manager",
 			  "Balsa");
@@ -137,25 +137,25 @@ open_preferences_manager ()
 
 
   /* identity page */
-  label = gtk_label_new ("Identity");
+  label = gtk_label_new (_("Identity"));
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
 			    create_identity_page (),
 			    label);
 
   /* mailboxes page */
-  label = gtk_label_new ("Mailboxes");
+  label = gtk_label_new (_("Mailboxes"));
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
 			    create_mailboxes_page (),
 			    label);
 
   /* view page */
-  label = gtk_label_new ("View");
+  label = gtk_label_new (_("View"));
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
 			    create_view_page (),
 			    label);
 
   /* MDI page */
-  label = gtk_label_new ("MDI");
+  label = gtk_label_new (_("MDI"));
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
 			    create_mdi_page (),
 			    label);
@@ -390,7 +390,7 @@ create_identity_page ()
 
 
   /* your name */
-  label = gtk_label_new ("Your name:");
+  label = gtk_label_new (_("Your name:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL,
@@ -407,7 +407,7 @@ create_identity_page ()
 
 
   /* email address */
-  label = gtk_label_new ("E-Mail address:");
+  label = gtk_label_new (_("E-Mail address:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL,
@@ -423,7 +423,7 @@ create_identity_page ()
 
 
   /* organization */
-  label = gtk_label_new ("Organization:");
+  label = gtk_label_new (_("Organization:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL,
@@ -439,7 +439,7 @@ create_identity_page ()
 
 
   /* smtp server */
-  label = gtk_label_new ("SMTP server:");
+  label = gtk_label_new (_("SMTP server:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
 		    GTK_FILL, GTK_FILL,
@@ -477,7 +477,7 @@ create_mailboxes_page ()
   gtk_widget_show (table);
 
 
-  label = gtk_label_new ("Local mail directory:");
+  label = gtk_label_new (_("Local mail directory:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL,
@@ -493,7 +493,7 @@ create_mailboxes_page ()
 
 
   /* inbox path */
-  label = gtk_label_new ("Inbox Path:");
+  label = gtk_label_new (_("Inbox Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL,
@@ -510,7 +510,7 @@ create_mailboxes_page ()
 
 
   /* outbox path */
-  label = gtk_label_new ("Outbox Path:");
+  label = gtk_label_new (_("Outbox Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL,
@@ -526,7 +526,7 @@ create_mailboxes_page ()
 
 
   /* trash path */
-  label = gtk_label_new ("Trash Path:");
+  label = gtk_label_new (_("Trash Path:"));
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
 		    GTK_FILL, GTK_FILL,
@@ -561,7 +561,7 @@ create_view_page ()
   gtk_widget_show (vbox);
 
   /* Toolbars */
-  frame = gtk_frame_new ("Toolbars");
+  frame = gtk_frame_new (_("Toolbars"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
   gtk_widget_show (frame);
 
@@ -572,7 +572,7 @@ create_view_page ()
   gtk_widget_show (table);
 
 
-  pmw->toolbar_text = gtk_radio_button_new_with_label (NULL, "Show as Text");
+  pmw->toolbar_text = gtk_radio_button_new_with_label (NULL, _("Show as Text"));
   gtk_table_attach (GTK_TABLE (table), pmw->toolbar_text, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
 		    0, 0);
@@ -588,7 +588,7 @@ create_view_page ()
   
 
   pmw->toolbar_icons = gtk_radio_button_new_with_label 
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->toolbar_text)), "Show as Images");
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->toolbar_text)), _("Show as Images"));
   gtk_table_attach (GTK_TABLE (table), pmw->toolbar_icons, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
 		    0, 0);
@@ -604,7 +604,7 @@ create_view_page ()
 
 
   pmw->toolbar_both = gtk_radio_button_new_with_label 
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->toolbar_text)), "Show as Text and Images");
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->toolbar_text)), _("Show as Text and Images"));
   gtk_table_attach (GTK_TABLE (table), pmw->toolbar_both, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
 		    0, 0);
@@ -631,7 +631,7 @@ create_view_page ()
   gtk_widget_show (table);
 
 
-  pmw->debug = gtk_check_button_new_with_label ("Debug");
+  pmw->debug = gtk_check_button_new_with_label (_("Debug"));
   gtk_table_attach (GTK_TABLE (table), pmw->debug, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
 		    0, 0);
@@ -662,7 +662,7 @@ create_mdi_page ()
   gtk_widget_show (vbox);
 
   /* MDI */
-  frame = gtk_frame_new ("MDI");
+  frame = gtk_frame_new (_("MDI"));
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 5);
   gtk_widget_show (frame);
 
@@ -673,7 +673,7 @@ create_mdi_page ()
   gtk_widget_show (table);
 
 
-  pmw->mdi_notebook = gtk_radio_button_new_with_label (NULL, "Notebook");
+  pmw->mdi_notebook = gtk_radio_button_new_with_label (NULL, _("Notebook"));
   gtk_table_attach (GTK_TABLE (table), pmw->mdi_notebook, 0, 1, 0, 1,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
 		    0, 0);
@@ -689,7 +689,7 @@ create_mdi_page ()
   
 
   pmw->mdi_toplevel = gtk_radio_button_new_with_label 
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->mdi_notebook)), "Toplevel");
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->mdi_notebook)), _("Toplevel"));
   gtk_table_attach (GTK_TABLE (table), pmw->mdi_toplevel, 0, 1, 1, 2,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
 		    0, 0);
@@ -705,7 +705,7 @@ create_mdi_page ()
 
 
   pmw->mdi_modal = gtk_radio_button_new_with_label 
-    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->mdi_notebook)), "Modal");
+    (gtk_radio_button_group (GTK_RADIO_BUTTON (pmw->mdi_notebook)), _("Modal"));
   gtk_table_attach (GTK_TABLE (table), pmw->mdi_modal, 0, 1, 2, 3,
 		    GTK_FILL, GTK_FILL | GTK_EXPAND, 
 		    0, 0);

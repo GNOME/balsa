@@ -39,7 +39,7 @@ gint g_list_index (GList * list, gpointer data);
 gchar *make_string_from_list (GList *);
 GList *make_list_from_string (gchar *);
 
-int readfile (FILE * fp, char **buf);
+size_t readfile (FILE * fp, char **buf);
 
 typedef struct _MailboxNode MailboxNode;
 struct _MailboxNode
@@ -49,6 +49,6 @@ struct _MailboxNode
     gint IsDir;
   };
 
-MailboxNode *mailbox_node_new(gchar *name, Mailbox *mb, gint i);
-  
+MailboxNode *mailbox_node_new (gchar * name, Mailbox * mb, gint i);
+
 #endif /* __MISC_H__ */

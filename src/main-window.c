@@ -21,7 +21,6 @@
 #include <string.h>
 #include <gnome.h>
 
-#include "addrbook-manager.h"
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
@@ -396,13 +395,13 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Check",
-			     "Check Email",
+			     _("Check"),
+			     ("Check Email"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RCV),
   /*                   (GtkSignalFunc) check_new_messages_cb, */
 			     (GtkSignalFunc) NULL,
-			     "Check Email");
+			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -411,8 +410,8 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Delete",
-			     "Delete Message",
+			     _("Delete"),
+			     _("Delete Message"),
 			     NULL,
 	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
 			     (GtkSignalFunc) delete_message_cb,
@@ -425,34 +424,34 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Compose",
-			     "Compose Message",
+			     _("Compose"),
+			     _("Compose Message"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_NEW),
 			     (GtkSignalFunc) new_message_cb,
-			     "Compose Message");
+			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Reply",
-			     "Reply",
+			     _("Reply"),
+			     _("Reply"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_RPL),
 			     (GtkSignalFunc) replyto_message_cb,
-			     "Reply");
+			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Forward",
-			     "Forward",
+			     _("Forward"),
+			     _("Forward"),
 			     NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_FWD),
 			     (GtkSignalFunc) forward_message_cb,
-			     "Forward");
+			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
@@ -461,23 +460,23 @@ create_toolbar (GnomeMDI * mdi, GtkWidget * app)
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Previous",
-			     "Open Previous Message",
+			     _("Previous"),
+			     _("Open Previous Message"),
 			     NULL,
 		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_BACK),
 			     (GtkSignalFunc) previous_message_cb,
-			     "Open Previous Message");
+			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "Next",
-			     "Open Next Message",
+			     _("Next"),
+			     _("Open Next Message"),
 			     NULL,
 	     gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_FORWARD),
 			     (GtkSignalFunc) next_message_cb,
-			     "Open Next Message");
+			     NULL);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 
   return GTK_TOOLBAR (toolbar);
@@ -510,7 +509,7 @@ show_about_box ()
 			   BALSA_VERSION,
 			   "Copyright (C) 1997-98",
 			   authors,
-			   "Balsa is a E-Mail Client",
+			   _("Balsa is a E-Mail Client"),
 			   NULL);
 
   gtk_signal_connect (GTK_OBJECT (about),

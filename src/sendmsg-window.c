@@ -66,7 +66,7 @@ create_toolbar (BalsaSendmsg * bsmw)
   gtk_widget_realize (window);
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-					   "Send", "Send", NULL,
+					   _("Send"), _("Send"), NULL,
 	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_SND),
 					   GTK_SIGNAL_FUNC (send_message_cb),
 					   bsmw);
@@ -238,7 +238,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   switch (type)
     {
     case 0:
-      msg->window = gnome_app_new ("balsa", "New message");
+      msg->window = gnome_app_new ("balsa", _("New message"));
       break;
     case 1:
       clist = GTK_CLIST (GTK_BIN (bindex)->child);
@@ -250,7 +250,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
       message = (Message *) gtk_clist_get_row_data (clist, row);
 
-      msg->window = gnome_app_new ("balsa", "Reply to ");
+      msg->window = gnome_app_new ("balsa", _("Reply to "));
       break;
     case 2:
       clist = GTK_CLIST (GTK_BIN (bindex)->child);
@@ -262,7 +262,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
       message = (Message *) gtk_clist_get_row_data (clist, row);
 
-      msg->window = gnome_app_new ("balsa", "Forward message");
+      msg->window = gnome_app_new ("balsa", _("Forward message"));
       break;
     }
 

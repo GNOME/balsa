@@ -60,7 +60,7 @@ mailbox_node_new (gchar * name, Mailbox * mb, gint i)
 {
   MailboxNode *mbn;
   mbn = g_malloc (sizeof (MailboxNode));
-  mbn->name = g_strdup(name);
+  mbn->name = g_strdup (name);
   mbn->mailbox = mb;
   mbn->IsDir = i;
   return mbn;
@@ -148,7 +148,7 @@ make_list_from_string (gchar * the_str)
   return NULL;
 }
 
-int
+size_t
 readfile (FILE * fp, char **buf)
 {
   size_t size;
@@ -190,7 +190,7 @@ readfile (FILE * fp, char **buf)
 	}
       else if ((errno != EAGAIN) && (errno != EINTR))
 	{
-	  perror ("bleh:");
+	  perror ("Error reading file:");
 	  return -1;
 	}
     }

@@ -150,7 +150,7 @@ index_child_create_view (GnomeMDIChild * child)
     {
       mailbox_watcher_remove (iw->mailbox, iw->watcher_id);
 
-      messagebox = gnome_message_box_new ("Unable to Open Mailbox!",
+      messagebox = gnome_message_box_new (_("Unable to Open Mailbox!"),
 					  GNOME_MESSAGE_BOX_ERROR,
 					  GNOME_STOCK_BUTTON_OK,
 					  NULL);
@@ -223,7 +223,7 @@ create_menu (BalsaIndex * bindex, Message * message)
   GList *list;
 
   menu = gtk_menu_new ();
-  menuitem = gtk_menu_item_new_with_label ("Transfer");
+  menuitem = gtk_menu_item_new_with_label (_("Transfer"));
 #if 0				/* FIXME */
   list = g_list_first (balsa_app.mailbox_list);
   submenu = gtk_menu_new ();
@@ -241,28 +241,28 @@ create_menu (BalsaIndex * bindex, Message * message)
   gtk_widget_show (menuitem);
 #endif
 
-  menuitem = gtk_menu_item_new_with_label ("Change Status");
+  menuitem = gtk_menu_item_new_with_label (_("Change Status"));
 
   submenu = gtk_menu_new ();
-  smenuitem = gtk_menu_item_new_with_label ("Unread");
+  smenuitem = gtk_menu_item_new_with_label (_("Unread"));
   gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
 		      (GtkSignalFunc) message_status_set_new_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
-  smenuitem = gtk_menu_item_new_with_label ("Read");
+  smenuitem = gtk_menu_item_new_with_label (_("Read"));
   gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
 		      (GtkSignalFunc) message_status_set_read_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
-  smenuitem = gtk_menu_item_new_with_label ("Replied");
+  smenuitem = gtk_menu_item_new_with_label (_("Replied"));
   gtk_signal_connect (GTK_OBJECT (smenuitem), "activate",
 		   (GtkSignalFunc) message_status_set_answered_cb, message);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
-  smenuitem = gtk_menu_item_new_with_label ("Forwarded");
+  smenuitem = gtk_menu_item_new_with_label (_("Forwarded"));
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
   gtk_widget_show (smenuitem);
 
@@ -272,7 +272,7 @@ create_menu (BalsaIndex * bindex, Message * message)
 
   if (message->flags & MESSAGE_FLAG_DELETED)
     {
-      menuitem = gtk_menu_item_new_with_label ("Undelete");
+      menuitem = gtk_menu_item_new_with_label (_("Undelete"));
       gtk_signal_connect (GTK_OBJECT (menuitem),
 			  "activate",
 			  (GtkSignalFunc) undelete_message_cb,
@@ -280,7 +280,7 @@ create_menu (BalsaIndex * bindex, Message * message)
     }
   else
     {
-      menuitem = gtk_menu_item_new_with_label ("Delete");
+      menuitem = gtk_menu_item_new_with_label (_("Delete"));
       gtk_signal_connect (GTK_OBJECT (menuitem),
 			  "activate",
 			  (GtkSignalFunc) delete_message_cb,

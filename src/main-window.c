@@ -141,6 +141,7 @@ static GnomeUIInfo message_menu[] =
   },
   GNOMEUIINFO_END
 };
+
 static GnomeUIInfo mailbox_menu[] =
 {
     /* C */

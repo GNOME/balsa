@@ -23,9 +23,17 @@
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "main-window.h"
+#include "sendmsg-window.h"
+#include "message-window.h"
 #include "misc.h"
 
+/* callbacks */
+static void destroy_message_window (GtkWidget * widget, gpointer data);
 static void close_message_window(GtkWidget * widget, gpointer data);
+
+static void replyto_message_cb(GtkWidget * widget, gpointer data);
+static void replytoall_message_cb(GtkWidget * widget, gpointer data);
+static void forward_message_cb(GtkWidget * widget, gpointer data);
 
 /*
  * The list of messages which are being displayed.
@@ -39,9 +47,36 @@ static GnomeUIInfo file_menu[] =
   GNOMEUIINFO_END
 };
 
+static GnomeUIInfo message_menu[] =
+{
+    /* R */
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Reply"), N_("Reply to this message"),
+    replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
+  },
+    /* A */
+  {
+    GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
+    N_("Reply to all recipients of this message"),
+    replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL
+  },
+    /* F */
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Forward"), N_("Forward this message"),
+    forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+    GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
+  },
+
+  GNOMEUIINFO_END
+};
+
 static GnomeUIInfo main_menu[] =
 {
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
+  GNOMEUIINFO_SUBTREE ("_Message", message_menu),
+  
   GNOMEUIINFO_END
 };
 
@@ -54,11 +89,6 @@ struct _MessageWindow
 
     Message * message;
   };
-
-void message_window_new (Message * message);
-
-/* callbacks */
-static void destroy_message_window (GtkWidget * widget, gpointer data);
 
 void
 message_window_new (Message * message)
@@ -94,7 +124,6 @@ message_window_new (Message * message)
        */
       displayed_messages = g_hash_table_new(g_direct_hash, g_direct_equal);
     }
-  
 
   mw = g_malloc0 (sizeof (MessageWindow));
 
@@ -103,7 +132,7 @@ message_window_new (Message * message)
   mw->message = message;
 
   mw->window = gnome_app_new ("balsa", "Message");
-  gtk_object_set_data (GTK_OBJECT (mw->window), "msgwin", mw->window);
+  gtk_object_set_data (GTK_OBJECT (mw->window), "msgwin", mw);
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
@@ -139,7 +168,7 @@ message_window_new (Message * message)
 static void
 destroy_message_window (GtkWidget * widget, gpointer data)
 {
-  MessageWindow *mw = data;
+  MessageWindow *mw = (MessageWindow *) data;
 
   g_hash_table_remove(displayed_messages, mw->message);
   
@@ -147,6 +176,40 @@ destroy_message_window (GtkWidget * widget, gpointer data)
   gtk_widget_destroy (mw->bmessage);
 
   g_free (mw);
+}
+
+static void
+replyto_message_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) gtk_object_get_data (GTK_OBJECT (data),
+							     "msgwin");
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (mw != NULL);
+
+  sendmsg_window_new (widget, mw->message, SEND_REPLY);
+}
+
+static void
+replytoall_message_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) data;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (mw != NULL);
+
+  sendmsg_window_new (widget, mw->message, SEND_REPLY_ALL);
+}
+
+static void
+forward_message_cb(GtkWidget * widget, gpointer data)
+{
+  MessageWindow *mw = (MessageWindow *) data;
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (mw != NULL);
+
+  sendmsg_window_new (widget, mw->message, SEND_FORWARD);
 }
 
 static void

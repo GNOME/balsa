@@ -38,8 +38,8 @@ static GtkWidget *information_list = NULL;
 
 static void balsa_information_list_button_cb ( GnomeDialog *dialog, gint button, gpointer data );
 
-static void balsa_information_list (LibBalsaInformationType type, const char *fmt,...);
-static void balsa_information_dialog (LibBalsaInformationType type, const char *fmt, ...);
+static void balsa_information_list (LibBalsaInformationType type, char *msg);
+static void balsa_information_dialog (LibBalsaInformationType type, char *msg);
 
 /* Handle button clicks in the warning window */
 /* Button 0 is clear, button 1 is close */
@@ -63,6 +63,12 @@ void
 balsa_information (LibBalsaInformationType type, const char *fmt, ...)
 {
 	BalsaInformationShow show;
+	gchar *msg;
+	va_list ap;
+
+	va_start (ap, fmt);
+	msg = g_strdup_vprintf(fmt, ap);
+	va_end (ap);
 
 	switch ( type ) {
 	case LIBBALSA_INFORMATION_MESSAGE:
@@ -83,36 +89,29 @@ balsa_information (LibBalsaInformationType type, const char *fmt, ...)
 	case BALSA_INFORMATION_SHOW_NONE:
 		break;
 	case BALSA_INFORMATION_SHOW_DIALOG:
-		balsa_information_dialog(type, fmt);
+		balsa_information_dialog(type, msg);
 		break;
 	case BALSA_INFORMATION_SHOW_LIST:
-		balsa_information_list(type, fmt);
+		balsa_information_list(type, msg);
 		break;
 	}
 
+	g_free(msg);
 }
 
 /*
  * Pops up an error dialog
  */
 static void
-balsa_information_dialog (LibBalsaInformationType type, const char *fmt,...)
+balsa_information_dialog (LibBalsaInformationType type, char *msg)
 {
 	GtkWidget *messagebox;
-	gchar *outstr;
-	va_list ap;
 
-	va_start (ap, fmt);
-	outstr = g_strdup_vprintf(fmt, ap);
-	va_end (ap);
+	g_warning (msg);
 
-	g_warning (outstr);
-
-	messagebox = gnome_error_dialog_parented (outstr, GTK_WINDOW(balsa_app.main_window));
+	messagebox = gnome_error_dialog_parented (msg, GTK_WINDOW(balsa_app.main_window));
 
 	gtk_window_set_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
-
-	g_free ( outstr );
 
 	if ( type == LIBBALSA_INFORMATION_ERROR )
 		balsa_exit();
@@ -126,14 +125,11 @@ balsa_information_dialog (LibBalsaInformationType type, const char *fmt,...)
  * hundreds of windows is ugly.
  */
 static void
-balsa_information_list (LibBalsaInformationType type, const char *fmt, ...)
+balsa_information_list (LibBalsaInformationType type, char *msg)
 {
 	gchar *outstr[1];
-	va_list ap;
 
-	va_start (ap, fmt);
-	outstr[0] = g_strdup_vprintf (fmt, ap);
-	va_end (ap);
+	outstr[0] = msg;
 
 	if ( information_list == NULL ) {
 		GtkWidget *information_dialog;
@@ -175,8 +171,6 @@ balsa_information_list (LibBalsaInformationType type, const char *fmt, ...)
 	/* FIXME: Colour hilight the list */
 
 	gnome_appbar_set_status(balsa_app.appbar, outstr[0]);
-
-	g_free(outstr[0]);
 
 }
 

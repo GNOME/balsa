@@ -373,7 +373,6 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
 {
     GMimeStream *stream;
     GMimeFilter *filter;
-    gchar *mime_type = NULL;
     const gchar *charset;
 
     g_return_val_if_fail(body != NULL, NULL);
@@ -429,8 +428,6 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
 
     /* convert text bodies but HTML - gtkhtml does conversion on its own. */
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
-        && strcmp(mime_type = libbalsa_message_body_get_mime_type(body),
-                  "text/html") != 0
         && (charset = libbalsa_message_body_charset(body)) != NULL
         && g_ascii_strcasecmp(charset, "unknown-8bit") != 0) {
         GMimeStream *stream_null;
@@ -439,12 +436,15 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
 
         stream_null = g_mime_stream_null_new();
         stream_filter = g_mime_stream_filter_new_with_stream(stream_null);
+        g_object_unref(stream_null);
+
         filter_windows = g_mime_filter_windows_new(charset);
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter),
                                  filter_windows);
 
         g_mime_stream_reset(stream);
         g_mime_stream_write_to_stream(stream, stream_filter);
+        g_object_unref(stream_filter);
 
         charset = g_mime_filter_windows_real_charset(GMIME_FILTER_WINDOWS
                                                      (filter_windows));
@@ -454,13 +454,8 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
             g_free(body->charset);
             body->charset = g_strdup(charset);
         }
-
         g_object_unref(filter_windows);
-        g_object_unref(stream_filter);
-        g_object_unref(stream_null);
     }
-
-    g_free(mime_type);
 
     g_mime_stream_reset(stream);
     return stream;

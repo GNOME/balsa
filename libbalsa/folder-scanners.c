@@ -185,7 +185,8 @@ libbalsa_imap_add_folder (ImapMboxHandle* handle,
     else if (isFolder)
 	state->folder_handler(folder, delim, state->cb_data);
 
-    if (IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS))
+    if (IMAP_MBOX_HAS_FLAG(*flags,IMLIST_NOINFERIORS)||
+        IMAP_MBOX_HAS_FLAG(*flags,IMLIST_HASNOCHILDREN))
         state->mark_imap_path(folder, state->cb_data);
 }
 

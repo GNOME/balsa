@@ -1,3 +1,8 @@
+2003-09-21  Pawel Salek  <pawsa theochem.kth.se>
+
+	* libbalsa/folder-scanners.c: call mark_imap_path() for NOCHILDREN
+	folders.
+
 2003-09-20  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/address-entry.c: initalize emailData::address and fix

@@ -210,10 +210,10 @@ dnl ############################################################################
 dnl Use threading?
 dnl ######################################################################################
 
-AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval (unstable) [default=no]],[
+AC_ARG_ENABLE(threads, [  --enable-threads        Use threading for mail retrieval [default=yes]],[
 	use_threads=$enableval
 ],[
-	use_threads=no
+	use_threads=yes
 ])
 
 AC_MSG_CHECKING([whether to use threads])
@@ -348,8 +348,8 @@ dnl turn warnings into errors to enforce clean code
 dnl #############################################################
 
 AC_ARG_ENABLE(more-warnings,
-[  --enable-more-warnings  Maximum compiler warnings],
-set_more_warnings="$enableval", set_more_warnings=no)
+[  --enable-more-warnings  Enable maximum compiler warnings [default=yes]],
+set_more_warnings="$enableval", set_more_warnings=yes)
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
         CFLAGS="$CFLAGS \

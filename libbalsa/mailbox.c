@@ -145,6 +145,9 @@ mailbox_init (gchar * inbox_path,
   snprintf (tmp, 17 + strlen (VERSION), "X-Mailer: Balsa %s", VERSION);
   UserHeader->data = g_strdup (tmp);
   g_free (tmp);
+
+  set_option (OPTSAVEEMPTY);
+
 }
 
 gint
@@ -583,7 +586,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
 	{
 	  
 	  /* we need the mailbox to be opened fresh i think */
-	  mx_close_mailbox( CLIENT_CONTEXT(mailbox)  );
+	  mx_close_mailbox( CLIENT_CONTEXT(mailbox), NULL);
 	  
 	} 
       else 
@@ -665,6 +668,7 @@ _mailbox_open_ref (Mailbox * mailbox, gint flag)
 void
 mailbox_open_unref (Mailbox * mailbox)
 {
+  int check;
 #ifdef DEBUG
       g_print (_("Mailbox: Closing %s Refcount: %d\n"), mailbox->name, mailbox->open_ref);
 #endif
@@ -686,16 +690,16 @@ mailbox_open_unref (Mailbox * mailbox)
       /* now close the mail stream and expunge deleted
        * messages -- the expunge may not have to be done */
       if (CLIENT_CONTEXT_OPEN (mailbox))
-	{
-	  /* If it closed we have no context. If it didnt close right
-	     don't ask me what to do - AC */
-
-	  if (mx_close_mailbox (CLIENT_CONTEXT (mailbox)) == 0)
-	    {
-	      free (CLIENT_CONTEXT (mailbox));
-	      CLIENT_CONTEXT (mailbox) = NULL;
-	    }
-	}
+      {
+	  while( (check=mx_close_mailbox (CLIENT_CONTEXT (mailbox), NULL) )) {
+	      UNLOCK_MAILBOX (mailbox);
+	      g_print("mailbox_open_unref: close failed, retrying...\n");
+	      mailbox_check_new_messages(mailbox);
+	      LOCK_MAILBOX (mailbox);
+	  }
+	  free (CLIENT_CONTEXT (mailbox));
+	  CLIENT_CONTEXT (mailbox) = NULL;
+      }
     }
 
   UNLOCK_MAILBOX (mailbox);
@@ -721,7 +725,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
 
   index_hint = CLIENT_CONTEXT (mailbox)->vcount;
 
-  if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint)) < 0)
+  if ((i = mx_check_mailbox (CLIENT_CONTEXT (mailbox), &index_hint, 0)) < 0)
     {
       UNLOCK_MAILBOX (mailbox);
       g_print ("error or something\n");

@@ -35,6 +35,11 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
+#ifdef LIBMUTT
+#define _(a) (a)
+#define sleep(a) 
+#endif
+
 /* Reads an arbitrarily long header field, and looks ahead for continuation
  * lines.  ``line'' must point to a dynamically allocated string; it is
  * increased if more space is required to fit the whole line.
@@ -474,7 +479,7 @@ BODY *mutt_parse_messageRFC822 (FILE *fp, BODY *parent)
 
   parent->hdr = mutt_new_header ();
   parent->hdr->offset = ftell (fp);
-  parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 0);
+  parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 0, 0);
   msg = parent->hdr->content;
 
   /* ignore the length given in the content-length since it could be wrong
@@ -869,8 +874,12 @@ void mutt_parse_mime_message (CONTEXT *ctx, HEADER *cur)
  * user_hdrs	If set, store user headers.  Used for edit-message and 
  * 		postpone modes.
  * 
+ * weed		If this parameter is set and the user has activated the
+ * 		$weed option, honor the header weed list for user headers.
+ * 	        Not used in this version.
  */
-ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs)
+ENVELOPE *mutt_read_rfc822_header (FILE *f, HEADER *hdr, short user_hdrs, 
+				   short weed)
 {
   ENVELOPE *e = mutt_new_envelope();
   LIST *last = NULL;

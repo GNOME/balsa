@@ -139,7 +139,7 @@ static HEADER *maildir_parse_message(int magic, const char *fname, int is_old)
   if ((f = fopen (fname, "r")) != NULL)
   {
     h = mutt_new_header();
-    h->env = mutt_read_rfc822_header (f, h, 0);
+    h->env = mutt_read_rfc822_header (f, h, 0, 0);
 
     fstat (fileno (f), &st);
     fclose (f);
@@ -725,7 +725,10 @@ static int maildir_sync_message (CONTEXT *ctx, int msgno)
   return (0);
 }
 
-int mh_sync_mailbox (CONTEXT * ctx)
+/* mh_sync_mailbox: 
+   index_hint - is used in future versions.
+*/
+int mh_sync_mailbox (CONTEXT * ctx, int *index_hint)
 {
   char path[_POSIX_PATH_MAX], tmp[_POSIX_PATH_MAX];
   int i, j, rc = 0;

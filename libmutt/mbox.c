@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
+ * Copyright (C) 1996-2000 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  */ 
 
 /* This file contains code to parse ``mbox'' and ``mmdf'' style mailboxes */
@@ -37,11 +37,19 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#ifdef LIBMUTT
+#define _(a) (a)
+#define sleep(a) 
+#endif
+
 /* struct used by mutt_sync_mailbox() to store new offsets */
 struct m_update_t
 {
+  short valid;
   long hdr;
   long body;
+  long lines;
+  long length;
 };
 
 /* parameters:
@@ -79,6 +87,7 @@ int mmdf_parse_mailbox (CONTEXT *ctx)
 {
   char buf[HUGE_STRING];
   char return_path[LONG_STRING];
+  int count = 0;
   int lines;
   time_t t, tz;
   long loc, tmploc;
@@ -119,6 +128,12 @@ int mmdf_parse_mailbox (CONTEXT *ctx)
     if (mutt_strcmp (buf, ctx->magic == M_MMDF ? MMDF_SEP : KENDRA_SEP) == 0)
     {
       loc = ftell (ctx->fp);
+      
+      count++;
+      if (!ctx->quiet && ReadInc && ((count % ReadInc == 0) || count == 1))
+	mutt_message (_("Reading %s... %d (%d%%)"), ctx->path, count,
+		      loc / (ctx->size / 100 + 1));
+
 
       if (ctx->msgcount == ctx->hdrmax)
 	mx_alloc_memory (ctx);
@@ -140,14 +155,14 @@ int mmdf_parse_mailbox (CONTEXT *ctx)
 	if (fseek (ctx->fp, loc, SEEK_SET) != 0)
 	{
 	  dprint (1, (debugfile, "mmdf_parse_mailbox: fseek() failed\n"));
-	  mutt_error ("Mailbox is corrupt!");
+	  mutt_error _("Mailbox is corrupt!");
 	  return (-1);
 	}
       } 
       else
 	hdr->received = t - tz;
 
-      hdr->env = mutt_read_rfc822_header (ctx->fp, hdr, 1);
+      hdr->env = mutt_read_rfc822_header (ctx->fp, hdr, 0, 0);
 
       loc = ftell (ctx->fp);
 
@@ -155,7 +170,7 @@ int mmdf_parse_mailbox (CONTEXT *ctx)
       {
 	tmploc = loc + hdr->content->length;
 
-	if (tmploc < ctx->size)
+	if (0 < tmploc && tmploc < ctx->size)
 	{
 	  if (fseek (ctx->fp, tmploc, SEEK_SET) != 0 ||
 	      fgets (buf, sizeof (buf) - 1, ctx->fp) == NULL ||
@@ -199,7 +214,7 @@ int mmdf_parse_mailbox (CONTEXT *ctx)
     else
     {
       dprint (1, (debugfile, "mmdf_parse_mailbox: corrupt mailbox!\n"));
-      mutt_error ("Mailbox is corrupt!");
+      mutt_error _("Mailbox is corrupt!");
       return (-1);
     }
   }
@@ -221,9 +236,6 @@ int mbox_parse_mailbox (CONTEXT *ctx)
   time_t t, tz;
   int count = 0, lines = 0;
   long loc;
-#ifdef LIBMUTT
-  int i = 0;
-#endif
 #ifdef NFS_ATTRIBUTE_HACK
   struct utimbuf newtime;
 #endif
@@ -275,15 +287,9 @@ int mbox_parse_mailbox (CONTEXT *ctx)
       }
 
       count++;
-#ifdef LIBMUTT
-      if (count > i)
-      {
-        i+=50;
-      }
-#endif
 
       if (!ctx->quiet && ReadInc && ((count % ReadInc == 0) || count == 1))
-	mutt_message ("Reading %s... %d (%d%%)", ctx->path, count,
+	mutt_message (_("Reading %s... %d (%d%%)"), ctx->path, count,
 		      ftell (ctx->fp) / (ctx->size / 100 + 1));
 
       if (ctx->msgcount == ctx->hdrmax)
@@ -294,7 +300,7 @@ int mbox_parse_mailbox (CONTEXT *ctx)
       curhdr->offset = loc;
       curhdr->index = ctx->msgcount;
 	
-      curhdr->env = mutt_read_rfc822_header (ctx->fp, curhdr, 1);
+      curhdr->env = mutt_read_rfc822_header (ctx->fp, curhdr, 0, 0);
 
       /* if we know how long this message is, either just skip over the body,
        * or if we don't know how many lines there are, count them now (this will
@@ -307,7 +313,7 @@ int mbox_parse_mailbox (CONTEXT *ctx)
 	loc = ftell (ctx->fp);
 	tmploc = loc + curhdr->content->length + 1;
 
-	if (tmploc < ctx->size)
+	if (0 < tmploc && tmploc < ctx->size)
 	{
 	  /*
 	   * check to see if the content-length looks valid.  we expect to
@@ -656,7 +662,7 @@ int mbox_check_mailbox (CONTEXT *ctx, int *index_hint)
   mbox_unlock_mailbox (ctx);
   mx_fastclose_mailbox (ctx);
   mutt_unblock_signals ();
-  mutt_error ("Mailbox was corrupted!");
+  mutt_error _("Mailbox was corrupted!");
   return (-1);
 }
 
@@ -664,17 +670,19 @@ int mbox_check_mailbox (CONTEXT *ctx, int *index_hint)
  *	0	success
  *	-1	failure
  */
-int mbox_sync_mailbox (CONTEXT *ctx)
+int mbox_sync_mailbox (CONTEXT *ctx, int *index_hint)
 {
   char tempfile[_POSIX_PATH_MAX];
   char buf[32];
   int i, j, save_sort = SORT_ORDER;
+  int rc = -1;
   int need_sort = 0; /* flag to resort mailbox if new mail arrives */
-  int first;	/* first message to be written */
+  int first = -1;	/* first message to be written */
   long offset;	/* location in mailbox to write changed messages */
   struct stat statbuf;
   struct utimbuf utimebuf;
   struct m_update_t *newOffset = NULL;
+  struct m_update_t *oldOffset = NULL;
   FILE *fp = NULL;
 
   /* sort message by their position in the mailbox on disk */
@@ -691,7 +699,7 @@ int mbox_sync_mailbox (CONTEXT *ctx)
   if ((ctx->fp = freopen (ctx->path, "r+", ctx->fp)) == NULL)
   {
     mx_fastclose_mailbox (ctx);
-    mutt_error ("Fatal error!  Could not reopen mailbox!");
+    mutt_error _("Fatal error!  Could not reopen mailbox!");
     return (-1);
   }
 
@@ -700,19 +708,17 @@ int mbox_sync_mailbox (CONTEXT *ctx)
   if (mbox_lock_mailbox (ctx, 1, 1) == -1)
   {
     mutt_unblock_signals ();
-    mutt_error ("Unable to lock mailbox!");
+    mutt_error _("Unable to lock mailbox!");
     goto bail;
   }
 
   /* Check to make sure that the file hasn't changed on disk */
-  if ((i = mbox_check_mailbox (ctx, NULL)) == M_NEW_MAIL ||  i == M_REOPENED)
+  if ((i = mbox_check_mailbox (ctx, index_hint)) == M_NEW_MAIL ||  i == M_REOPENED)
   {
-      /* new mail arrived, or mailbox reopened */
-      /* The previous way of handling it: need_sort = i; goto bail;
-	 It was not right: if we are aseked to sync the mailbox,
-	 we must do it. */
-      fprintf(stderr,"mbox_sync would bail but will reparse...\n");
-      if(i = mbox_parse_mailbox (ctx)) goto bail;
+    /* new mail arrived, or mailbox reopened */
+    need_sort = i;
+    rc = i;
+    goto bail;
   }
   else if (i < 0)
   {
@@ -731,7 +737,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
       close (i);
       unlink (tempfile);
     }
-    mutt_error ("Could not create temporary file!");
+    mutt_error _("Could not create temporary file!");
+    sleep (5);
     goto bail;
   }
 
@@ -747,7 +754,7 @@ int mbox_sync_mailbox (CONTEXT *ctx)
      * messages were found to be changed or deleted.  This should
      * never happen, is we presume it is a bug in mutt.
      */
-    mutt_error ("sync: mbox modified, but no modified messages! (report this bug)");
+    mutt_error _("sync: mbox modified, but no modified messages! (report this bug)");
     sleep(5); /* the mutt_error /will/ get cleared! */
     dprint(1, (debugfile, "mbox_sync_mailbox(): no modified messages.\n"));
     unlink (tempfile);
@@ -769,6 +776,7 @@ int mbox_sync_mailbox (CONTEXT *ctx)
   
   /* allocate space for the new offsets */
   newOffset = safe_calloc (ctx->msgcount - first, sizeof (struct m_update_t));
+  oldOffset = safe_calloc (ctx->msgcount - first, sizeof (struct m_update_t));
 
   for (i = first, j = 0; i < ctx->msgcount; i++)
   {
@@ -776,13 +784,15 @@ int mbox_sync_mailbox (CONTEXT *ctx)
     {
       j++;
       if (!ctx->quiet && WriteInc && ((i % WriteInc) == 0 || j == 1))
-	mutt_message ("Writing messages... %d (%d%%)", i,
+	mutt_message (_("Writing messages... %d (%d%%)"), i,
 		      ftell (ctx->fp) / (ctx->size / 100 + 1));
 
       if (ctx->magic == M_MMDF)
       {
 	if (fputs (MMDF_SEP, fp) == EOF)
 	{
+	  mutt_perror (tempfile);
+	  sleep (5);
 	  unlink (tempfile);
 	  goto bail;
 	}
@@ -792,11 +802,24 @@ int mbox_sync_mailbox (CONTEXT *ctx)
       {
 	if (fputs (KENDRA_SEP, fp) == EOF)
 	{
+	  mutt_perror (tempfile);
+	  sleep (5);
 	  unlink (tempfile);
 	  goto bail;
 	}
       }
 
+      /*
+       * back up some information which is needed to restore offsets when
+       * something fails.
+       */
+
+      oldOffset[i-first].valid  = 1;
+      oldOffset[i-first].hdr    = ctx->hdrs[i]->offset;
+      oldOffset[i-first].body   = ctx->hdrs[i]->content->offset;
+      oldOffset[i-first].lines  = ctx->hdrs[i]->lines;
+      oldOffset[i-first].length = ctx->hdrs[i]->content->length;
+      
       /* save the new offset for this message.  we add `offset' because the
        * temporary file only contains saved message which are located after
        * `offset' in the real mailbox
@@ -805,6 +828,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
 
       if (mutt_copy_message (fp, ctx, ctx->hdrs[i], M_CM_UPDATE, CH_FROM | CH_UPDATE | CH_UPDATE_LEN) == -1)
       {
+	mutt_perror (tempfile);
+	sleep (5);
 	unlink (tempfile);
 	goto bail;
       }
@@ -823,6 +848,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
 	case M_MMDF: 
 	  if(fputs(MMDF_SEP, fp) == EOF) 
 	  {
+	    mutt_perror (tempfile);
+	    sleep (5);
 	    unlink (tempfile);
 	    goto bail; 
 	  }
@@ -830,6 +857,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
 	case M_KENDRA:
 	  if(fputs(KENDRA_SEP, fp) == EOF)
 	  {
+	    mutt_perror (tempfile);
+	    sleep (5);
 	    unlink (tempfile);
 	    goto bail;
 	  }
@@ -837,6 +866,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
 	default:
 	  if(fputs("\n", fp) == EOF) 
 	  {
+	    mutt_perror (tempfile);
+	    sleep (5);
 	    unlink (tempfile);
 	    goto bail;
 	  }
@@ -849,6 +880,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
     fp = NULL;
     dprint(1, (debugfile, "mbox_sync_mailbox: fclose() returned non-zero.\n"));
     unlink (tempfile);
+    mutt_perror (tempfile);
+    sleep (5);
     goto bail;
   }
   fp = NULL;
@@ -856,6 +889,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
   /* Save the state of this folder. */
   if (stat (ctx->path, &statbuf) == -1)
   {
+    mutt_perror (ctx->path);
+    sleep (5);
     unlink (tempfile);
     goto bail;
   }
@@ -866,6 +901,7 @@ int mbox_sync_mailbox (CONTEXT *ctx)
     mx_fastclose_mailbox (ctx);
     dprint (1, (debugfile, "mbox_sync_mailbox: unable to reopen temp copy of mailbox!\n"));
     mutt_perror (tempfile);
+    sleep (5);
     return (-1);
   }
 
@@ -922,7 +958,8 @@ int mbox_sync_mailbox (CONTEXT *ctx)
     mutt_unblock_signals ();
     mx_fastclose_mailbox (ctx);
     mutt_pretty_mailbox (savefile);
-    mutt_error ("Write failed!  Saved partial mailbox to %s", savefile);
+    mutt_error (_("Write failed!  Saved partial mailbox to %s"), savefile);
+    sleep (5);
     return (-1);
   }
 
@@ -937,7 +974,7 @@ int mbox_sync_mailbox (CONTEXT *ctx)
     unlink (tempfile);
     mutt_unblock_signals ();
     mx_fastclose_mailbox (ctx);
-    mutt_error ("Fatal error!  Could not reopen mailbox!");
+    mutt_error _("Fatal error!  Could not reopen mailbox!");
     Sort = save_sort;
     return (-1);
   }
@@ -954,6 +991,7 @@ int mbox_sync_mailbox (CONTEXT *ctx)
     }
   }
   safe_free ((void **) &newOffset);
+  safe_free ((void **) &oldOffset);
   unlink (tempfile); /* remove partial copy of the mailbox */
   mutt_unblock_signals ();
   Sort = save_sort; /* Restore the default value. */
@@ -962,19 +1000,31 @@ int mbox_sync_mailbox (CONTEXT *ctx)
 
 bail:  /* Come here in case of disaster */
 
-  /* Disadvantage of using "goto" */
-  if (fp)
-    fclose (fp);
+  safe_fclose (&fp);
 
+  /* restore offsets, as far as they are valid */
+  if (first >= 0 && oldOffset)
+  {
+    for (i = first; i < ctx->msgcount && oldOffset[i-first].valid; i++)
+    {
+      ctx->hdrs[i]->offset = oldOffset[i-first].hdr;
+      ctx->hdrs[i]->content->hdr_offset = oldOffset[i-first].hdr;
+      ctx->hdrs[i]->content->offset = oldOffset[i-first].body;
+      ctx->hdrs[i]->lines = oldOffset[i-first].lines;
+      ctx->hdrs[i]->content->length = oldOffset[i-first].length;
+    }
+  }
+  
   /* this is ok to call even if we haven't locked anything */
   mbox_unlock_mailbox (ctx);
 
   mutt_unblock_signals ();
   safe_free ((void **) &newOffset);
+  safe_free ((void **) &oldOffset);
 
   if ((ctx->fp = freopen (ctx->path, "r", ctx->fp)) == NULL)
   {
-    mutt_error ("Could not reopen mailbox!");
+    mutt_error _("Could not reopen mailbox!");
     mx_fastclose_mailbox (ctx);
     return (-1);
   }
@@ -987,7 +1037,7 @@ bail:  /* Come here in case of disaster */
     mutt_sort_headers (ctx, (need_sort == M_REOPENED));
   }
 
-  return (-1);
+  return rc;
 }
 
 /* close a mailbox opened in write-mode */
@@ -1012,7 +1062,7 @@ int mutt_reopen_mailbox (CONTEXT *ctx, int *index_hint)
   /* silent operations */
   ctx->quiet = 1;
   
-  mutt_message ("Reopening mailbox...");
+  mutt_message _("Reopening mailbox...");
   
   /* our heuristics require the old mailbox to be unsorted */
   if (Sort != SORT_ORDER)

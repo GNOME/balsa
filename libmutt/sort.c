@@ -207,7 +207,7 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
   if (option (OPTNEEDRESCORE))
   {
     for (i = 0; i < ctx->msgcount; i++)
-      mutt_score_message (ctx->hdrs[i]);
+      mutt_score_message (ctx, ctx->hdrs[i], 1);
     unset_option (OPTNEEDRESCORE);
   }
 

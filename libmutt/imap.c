@@ -751,7 +751,7 @@ static int imap_read_headers (CONTEXT *ctx, int msgbegin, int msgend)
     ctx->hdrs[ctx->msgcount] = mutt_new_header ();
     ctx->hdrs[ctx->msgcount]->index = ctx->msgcount;
 
-    ctx->hdrs[msgno]->env = mutt_read_rfc822_header (fp, ctx->hdrs[msgno], 0);
+    ctx->hdrs[msgno]->env = mutt_read_rfc822_header (fp, ctx->hdrs[msgno],0,0);
     ploc=ftell(fp);
     ctx->hdrs[msgno]->read = h->read;
     ctx->hdrs[msgno]->old = h->old;
@@ -1665,7 +1665,8 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
    */
   rewind (msg->fp);
   mutt_free_envelope (&ctx->hdrs[msgno]->env);
-  ctx->hdrs[msgno]->env = mutt_read_rfc822_header (msg->fp, ctx->hdrs[msgno],0);
+  ctx->hdrs[msgno]->env = mutt_read_rfc822_header (msg->fp, ctx->hdrs[msgno],
+						   0, 0);
   fgets (buf, sizeof (buf), msg->fp);
   while (!feof (msg->fp))
   {
@@ -1859,7 +1860,11 @@ static void _imap_set_flag (CONTEXT *ctx, int aclbit, int flag, const char *str,
   }
 }
 
-int imap_sync_mailbox (CONTEXT *ctx)
+/* imap_sync_mailbox:
+   expunge    - will be used in future versions
+   index_hint - will be used in future versions
+*/
+int imap_sync_mailbox (CONTEXT *ctx, int expunge, int *index_hint)
 {
   char seq[8];
   char buf[LONG_STRING];

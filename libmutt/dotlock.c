@@ -215,9 +215,10 @@ dotlock_init_privs (void)
 /* 
  * This function is intended to be invoked from within
  * mutt instead of mx.c's invoke_dotlock ().
+ * fd is not used in this version.
  */
 
-int dotlock_invoke (const char *path, int flags, int retry)
+int dotlock_invoke (const char *path, int fd, int flags, int retry)
 {
   int currdir;
   int r;

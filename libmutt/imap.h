@@ -24,7 +24,7 @@ int imap_check_mailbox (CONTEXT *ctx, int *index_hint);
 int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno);
 int imap_open_mailbox (CONTEXT *ctx);
 int imap_open_mailbox_append (CONTEXT *ctx);
-int imap_sync_mailbox (CONTEXT *ctx);
+int imap_sync_mailbox (CONTEXT *ctx, int expunge, int *index_hint);
 void imap_fastclose_mailbox (CONTEXT *ctx);
 int imap_buffy_check (char *path);
 

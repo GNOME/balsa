@@ -51,13 +51,13 @@ MESSAGE *mx_open_new_message (CONTEXT *, HEADER *, int);
 
 void mx_fastclose_mailbox (CONTEXT *);
 
-int mx_close_mailbox (CONTEXT *);
-int mx_sync_mailbox (CONTEXT *);
+int mx_close_mailbox (CONTEXT *, int *index_hint);
+int mx_sync_mailbox (CONTEXT *ctx, int *index_hint);
 int mx_commit_message (MESSAGE *, CONTEXT *);
 int mx_close_message (MESSAGE **);
 int mx_get_magic (const char *);
 int mx_set_magic (const char *);
-int mx_check_mailbox (CONTEXT *, int *);
+int mx_check_mailbox (CONTEXT *ctx, int *index_hint, int lock);
 #ifdef USE_IMAP
 int mx_is_imap (const char *);
 #endif

@@ -89,7 +89,7 @@ BODY *mutt_parse_multipart (FILE *, const char *, long, int);
 BODY *mutt_parse_messageRFC822 (FILE *, BODY *);
 BODY *mutt_read_mime_header (FILE *, int);
 
-ENVELOPE *mutt_read_rfc822_header (FILE *, HEADER *, short);
+ENVELOPE *mutt_read_rfc822_header (FILE *, HEADER *, short, short);
 HEADER *mutt_dup_header (HEADER *);
 
 ATTACHPTR **mutt_gen_attach_list (BODY *, int, ATTACHPTR **, short *, short *, int, int);
@@ -179,7 +179,7 @@ void mutt_query_menu (char *, size_t);
 void mutt_safe_path (char *s, size_t l, ADDRESS *a);
 void mutt_sanitize_filename (char *, short);
 void mutt_save_path (char *s, size_t l, ADDRESS *a);
-void mutt_score_message (HEADER *);
+void mutt_score_message (CONTEXT *, HEADER *, int);
 void mutt_select_fcc (char *, size_t, HEADER *);
 void mutt_select_file (char *, size_t, int);
 void mutt_send_hook (HEADER *);

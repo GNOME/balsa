@@ -51,7 +51,7 @@ void mutt_check_rescore (CONTEXT *ctx)
     set_option (OPTFORCEREDRAWPAGER);
 
     for (i = 0; i < ctx->msgcount; i++)
-      mutt_score_message (ctx->hdrs[i]);
+      mutt_score_message (ctx, ctx->hdrs[i], 1);
 #ifndef LIBMUTT
     mutt_cache_index_colors (ctx);
 #endif
@@ -117,7 +117,10 @@ int mutt_parse_score (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   return 0;
 }
 
-void mutt_score_message (HEADER *hdr)
+/* mutt_score_message:
+   ctx and upd_ctx will be used in future versions.
+*/
+void mutt_score_message (CONTEXT * ctx, HEADER *hdr, int upd_ctx)
 {
   SCORE *tmp;
 

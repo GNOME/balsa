@@ -1037,7 +1037,7 @@ BODY *mutt_make_message_attach (CONTEXT *ctx, HEADER *hdr, int attach_msg)
   body->hdr = mutt_new_header();
   body->hdr->offset = 0;
   /* we don't need the user headers here */
-  body->hdr->env = mutt_read_rfc822_header(fp, body->hdr, 0);
+  body->hdr->env = mutt_read_rfc822_header(fp, body->hdr, 0, 0);
 #ifdef _PGPPATH
   body->hdr->pgp = pgp;
 #endif /* _PGPPATH */
@@ -1989,7 +1989,7 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, 
     if ((tempfp = safe_fopen (tempfile, "w+")) == NULL)
     {
       mutt_perror (tempfile);
-      mx_close_mailbox (&f);
+      mx_close_mailbox (&f, NULL);
       return (-1);
     }
   }
@@ -1997,7 +1997,7 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, 
   hdr->read = !post; /* make sure to put it in the `cur' directory (maildir) */
   if ((msg = mx_open_new_message (&f, hdr, M_ADD_FROM)) == NULL)
   {
-    mx_close_mailbox (&f);
+    mx_close_mailbox (&f, NULL);
     return (-1);
   }
 
@@ -2071,7 +2071,7 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, 
       unlink (tempfile);
       mx_commit_message (msg, &f);	/* XXX - really? */
       mx_close_message (&msg);
-      mx_close_mailbox (&f);
+      mx_close_mailbox (&f, NULL);
       return -1;
     }
 
@@ -2099,7 +2099,7 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, 
 
   mx_commit_message (msg, &f);
   mx_close_message (&msg);
-  mx_close_mailbox (&f);
+  mx_close_mailbox (&f, NULL);
 
   return r;
 }

@@ -1,3 +1,10 @@
+2000-06-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	mailbox sync code synchronized with mutt-1.2.2.
+	* mx.[hc], mbox.c: completely synchronized files.
+	* dotlock.[hc], libmutt/imap.[hc],mh.c,mutt.h,parse.[ch],
+	pop.c,protos.h,score.c,sendlib.c,sort.c: API update.
+
 2000-03-05  Morten Welinder  <terra@diku.dk>
 
 	* mutt.h (M_READ): Workaround for Solaris.  (Bug is in Balsa,

@@ -1,3 +1,14 @@
+2003-05-03 03:50  PeterB
+
+	* src/: balsa-app.c, balsa-app.h, balsa-mblist.c, mailbox-node.c,
+	main.c, main-window.c, save-restore.c, src/sendmsg-window.c,
+	sendmsg-window.h: Use mailbox views to remember expanded folders.
+	* src/sendmsg-window.c: Make Edit => {cut,copy,paste} apply to
+	widget with focus, not always the text (#111801);
+        agree on `bsmsg' as the identifier for a BalsaSendmsg.
+	* libbalsa/address-entry.c: Use clipboard signals instead of
+	catching ctrl+{x,c,v}.
+
 2003-05-01 21:44  PeterB
 
 	* libbalsa/filter.c: Message list for filter action must not have

@@ -129,6 +129,9 @@ static void bm_message_weak_ref_cb(BalsaMessage * bm,
 
 static void display_headers(BalsaMessage * bm);
 static void display_content(BalsaMessage * bm);
+static void display_embedded_headers(BalsaMessage * bm,
+				     LibBalsaMessageBody * body,
+				     GtkWidget *emb_hdr_view);
 
 static void display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 			 GtkTreeIter * parent_iter);
@@ -151,10 +154,11 @@ static gboolean tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data);
 static gboolean tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 				     gpointer data);
 
-static void add_header_gchar(BalsaMessage * bm, const gchar *header,
-			     const gchar *label, const gchar *value);
-static void add_header_glist(BalsaMessage * bm, gchar * header,
-			     gchar * label, GList * list);
+static void add_header_gchar(BalsaMessage * bm, GtkTextView * view,
+			     const gchar *header, const gchar *label,
+			     const gchar *value);
+static void add_header_glist(BalsaMessage * bm, GtkTextView * view,
+			     gchar * header, gchar * label, GList * list);
 
 static void scroll_set(GtkAdjustment * adj, gint value);
 static void scroll_change(GtkAdjustment * adj, gint diff);
@@ -793,10 +797,14 @@ static gint
 balsa_message_scan_signatures(LibBalsaMessageBody *body, LibBalsaMessage * message)
 {
     gint result = LIBBALSA_MESSAGE_SIGNATURE_UNKNOWN;
-    gchar *sender = message->from
-        ? libbalsa_address_to_gchar(message->from, -1)
-        : g_strdup(_("(No sender)"));
+    gchar *sender;
     gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
+
+    g_return_val_if_fail(message->headers != NULL, result);
+
+    sender = message->headers->from
+        ? libbalsa_address_to_gchar(message->headers->from, -1)
+        : g_strdup(_("(No sender)"));
 
     for (; body; body = body->next) {
 	gint signres = libbalsa_is_pgp_signed(body);
@@ -944,8 +952,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	    message->body_list->parts =
 		libbalsa_body_decrypt(message->body_list->parts, NULL);
 	else if (encrres < 0) {
-	    gchar *sender = message->from
-                ? libbalsa_address_to_gchar(message->from, -1)
+	    gchar *sender = message->headers && message->headers->from
+                ? libbalsa_address_to_gchar(message->headers->from, -1)
                 : g_strdup(_("(No sender)"));
 	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 	
@@ -986,7 +994,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
      * present.
      *
      */
-    if (is_new && message->dispnotify_to)
+    if (is_new && message->headers->dispnotify_to)
 	handle_mdn_request (message);
 
     /*
@@ -1025,6 +1033,23 @@ balsa_message_save_current_part(BalsaMessage * bm)
 	save_part(bm->current_part);
 }
 
+static gboolean
+balsa_message_set_embedded_hdr(GtkTreeModel * model, GtkTreePath * path,
+			       GtkTreeIter *iter, gpointer data)
+{
+    BalsaPartInfo *info = NULL;
+    BalsaMessage * bm = BALSA_MESSAGE(data);
+
+    gtk_tree_model_get(model, iter, PART_INFO_COLUMN, &info, -1);
+    if (info) {
+	if (info->body && info->body->embhdrs)
+	    display_embedded_headers(bm, info->body, info->widget);
+	g_object_unref(G_OBJECT(info));
+    }
+    
+    return FALSE;
+}
+
 void
 balsa_message_set_displayed_headers(BalsaMessage * bmessage,
 				    ShownHeaders sh)
@@ -1034,9 +1059,11 @@ balsa_message_set_displayed_headers(BalsaMessage * bmessage,
 
     bmessage->shown_headers = sh;
 
-    if (bmessage->message)
+    if (bmessage->message) {
 	display_headers(bmessage);
-
+	gtk_tree_model_foreach(gtk_tree_view_get_model(GTK_TREE_VIEW(bmessage->treeview)),
+			       balsa_message_set_embedded_hdr, bmessage);
+    }
 }
 
 void
@@ -1060,7 +1087,7 @@ balsa_message_set_wrap(BalsaMessage * bm, gboolean wrap)
 #define BALSA_TAB2         (BALSA_TAB1 + BALSA_ONE_CHAR)
 
 static void
-add_header_gchar(BalsaMessage * bm, const gchar * header,
+add_header_gchar(BalsaMessage * bm, GtkTextView *view, const gchar * header,
                  const gchar * label, const gchar * value)
 {
     PangoTabArray *tab;
@@ -1075,11 +1102,11 @@ add_header_gchar(BalsaMessage * bm, const gchar * header,
     tab = pango_tab_array_new_with_positions(2, TRUE,
                                              PANGO_TAB_LEFT, BALSA_TAB1,
                                              PANGO_TAB_LEFT, BALSA_TAB2);
-    gtk_text_view_set_tabs(GTK_TEXT_VIEW(bm->header_text), tab);
+    gtk_text_view_set_tabs(view, tab);
     pango_tab_array_free(tab);
 
     /* always display the label in the predefined font */
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bm->header_text));
+    buffer = gtk_text_view_get_buffer(view);
     font_tag = NULL;
     if (strcmp(header, "subject") == 0)
         font_tag =
@@ -1119,8 +1146,8 @@ add_header_gchar(BalsaMessage * bm, const gchar * header,
 }
 
 static void
-add_header_glist(BalsaMessage * bm, gchar * header, gchar * label,
-		 GList * list)
+add_header_glist(BalsaMessage * bm, GtkTextView * view, gchar * header,
+		 gchar * label, GList * list)
 {
     gchar *value;
 
@@ -1133,21 +1160,22 @@ add_header_glist(BalsaMessage * bm, gchar * header, gchar * label,
 
     value = libbalsa_make_string_from_list(list);
 
-    add_header_gchar(bm, header, label, value);
+    add_header_gchar(bm, view, header, label, value);
 
     g_free(value);
 }
 
 #ifdef HAVE_GPGME
 static void
-add_header_sigstate(BalsaMessage * bm, LibBalsaSignatureInfo *siginfo)
+add_header_sigstate(BalsaMessage * bm, GtkTextView *view,
+		    LibBalsaSignatureInfo *siginfo)
 {
     GtkTextBuffer *buffer;
     GtkTextIter insert;
     GtkTextTag *color_tag;
     GdkColor sigStateCol;
     
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bm->header_text));
+    buffer = gtk_text_view_get_buffer(view);
     gtk_text_buffer_get_iter_at_mark(buffer, &insert,
                                      gtk_text_buffer_get_insert(buffer));
     if (gtk_text_buffer_get_char_count(buffer))
@@ -1173,76 +1201,81 @@ add_header_sigstate(BalsaMessage * bm, LibBalsaSignatureInfo *siginfo)
 #endif
 
 static void
-display_headers(BalsaMessage * bm)
+display_headers_real(BalsaMessage * bm, LibBalsaMessageHeaders * headers,
+		     LibBalsaMessageBody * sig_body, const gchar * subject,
+		     GtkTextView * view)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bm->header_text));
-    LibBalsaMessage *message = bm->message;
-    GList *p, *lst;
-    gchar **pair, *hdr;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(view);
+    GList *p;
     gchar *date;
 
     gtk_text_buffer_set_text(buffer, "", 0);
+    g_return_if_fail(headers);
  
     if (!bm->show_all_headers && bm->shown_headers == HEADERS_NONE) {
-	gtk_widget_hide(bm->header_text);
+	gtk_widget_hide(GTK_WIDGET(view));
 	return;
     } else {
-	gtk_widget_show(bm->header_text);
+	gtk_widget_show(GTK_WIDGET(view));
     }
 
-    add_header_gchar(bm, "subject", _("Subject:"), 
-		     LIBBALSA_MESSAGE_GET_SUBJECT(message));
+    add_header_gchar(bm, view, "subject", _("Subject:"), subject);
 
-    date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
-    add_header_gchar(bm, "date", _("Date:"), date);
+    date = libbalsa_message_headers_date_to_gchar(headers, balsa_app.date_string);
+    add_header_gchar(bm, view, "date", _("Date:"), date);
     g_free(date);
 
-    if (message->from) {
-	gchar *from = libbalsa_address_to_gchar(message->from, 0);
-	add_header_gchar(bm, "from", _("From:"), from);
+    if (headers->from) {
+	gchar *from = libbalsa_address_to_gchar(headers->from, 0);
+	add_header_gchar(bm, view, "from", _("From:"), from);
 	g_free(from);
     }
 
-    if (message->reply_to) {
-	gchar *reply_to = libbalsa_address_to_gchar(message->reply_to, 0);
-	add_header_gchar(bm, "reply-to", _("Reply-To:"), reply_to);
+    if (headers->reply_to) {
+	gchar *reply_to = libbalsa_address_to_gchar(headers->reply_to, 0);
+	add_header_gchar(bm, view, "reply-to", _("Reply-To:"), reply_to);
 	g_free(reply_to);
     }
-    add_header_glist(bm, "to", _("To:"), message->to_list);
-    add_header_glist(bm, "cc", _("Cc:"), message->cc_list);
-    add_header_glist(bm, "bcc", _("Bcc:"), message->bcc_list);
+    add_header_glist(bm, view, "to", _("To:"), headers->to_list);
+    add_header_glist(bm, view, "cc", _("Cc:"), headers->cc_list);
+    add_header_glist(bm, view, "bcc", _("Bcc:"), headers->bcc_list);
 
-    if (message->fcc_url)
-	add_header_gchar(bm, "fcc", _("Fcc:"), message->fcc_url);
+    if (headers->fcc_url)
+	add_header_gchar(bm, view, "fcc", _("Fcc:"), headers->fcc_url);
 
-    if (message->dispnotify_to) {
-	gchar *mdn_to = libbalsa_address_to_gchar(message->dispnotify_to, 0);
-	add_header_gchar(bm, "disposition-notification-to", 
+    if (headers->dispnotify_to) {
+	gchar *mdn_to = libbalsa_address_to_gchar(headers->dispnotify_to, 0);
+	add_header_gchar(bm, view, "disposition-notification-to", 
 			 _("Disposition-Notification-To:"), mdn_to);
 	g_free(mdn_to);
     }
 
     /* remaining headers */
-    lst = libbalsa_message_user_hdrs(message);
-    for (p = g_list_first(lst); p; p = g_list_next(p)) {
-	pair = p->data;
+    for (p = g_list_first(headers->user_hdrs); p; p = g_list_next(p)) {
+	gchar **pair = p->data;
+	gchar *hdr;
+
 	hdr = g_strconcat(pair[0], ":", NULL);
-	add_header_gchar(bm, pair[0], hdr, pair[1]);
+	add_header_gchar(bm, view, pair[0], hdr, pair[1]);
 	g_free(hdr);
-	g_strfreev(pair);
     }
-    g_list_free(lst);
 
 #ifdef HAVE_GPGME
-    if (libbalsa_is_pgp_signed(message->body_list) > 0) {
-	if (message->body_list->parts->next->sig_info)
-	    add_header_sigstate(bm, message->body_list->parts->next->sig_info);
+    if (sig_body && libbalsa_is_pgp_signed(sig_body) > 0) {
+	if (sig_body->parts->next->sig_info)
+	    add_header_sigstate(bm, view, sig_body->parts->next->sig_info);
     }
 #endif
 
-    gtk_widget_queue_resize(GTK_WIDGET(bm->header_text));
+    gtk_widget_queue_resize(GTK_WIDGET(view));
+}
 
+static void
+display_headers(BalsaMessage * bm)
+{
+    display_headers_real(bm, bm->message->headers, bm->message->body_list,
+			 LIBBALSA_MESSAGE_GET_SUBJECT(bm->message),
+			 GTK_TEXT_VIEW(bm->header_text));
 }
 
 
@@ -1496,6 +1529,14 @@ part_info_init_message_extbody_mail(BalsaMessage * bm, BalsaPartInfo * info)
 }
 
 static void
+display_embedded_headers(BalsaMessage * bm, LibBalsaMessageBody *body,
+			 GtkWidget *emb_hdr_view)
+{
+    display_headers_real(bm, body->embhdrs, body->parts, body->embhdrs->subject,
+			 GTK_TEXT_VIEW(emb_hdr_view));
+}
+
+static void
 part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 {
     gchar* body_type;
@@ -1532,6 +1573,20 @@ part_info_init_message(BalsaMessage * bm, BalsaPartInfo * info)
 	    break;
 	}
 	g_free(access_type);
+    } else if (!g_ascii_strcasecmp("message/rfc822", body_type)) {
+	GtkWidget *emb_hdrs = gtk_text_view_new();
+	
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(emb_hdrs), FALSE);
+	gtk_text_view_set_left_margin(GTK_TEXT_VIEW(emb_hdrs), 2);
+	gtk_text_view_set_right_margin(GTK_TEXT_VIEW(emb_hdrs), 2);
+	gtk_widget_modify_font(emb_hdrs,
+			       pango_font_description_from_string
+			       (balsa_app.message_font));
+	display_embedded_headers(bm, info->body, emb_hdrs);
+	
+	info->focus_widget = emb_hdrs;
+	info->widget = emb_hdrs;
+	info->can_display = FALSE;
     } else {
 	g_print("TODO: part_info_init_message\n");
 	part_info_init_mimetext(bm, info);
@@ -1997,8 +2052,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 
         if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
 				    balsa_app.convert_unknown_8bit_codeset, &target_cs)) {
-	    gchar *from = bm->message->from
-                ? libbalsa_address_to_gchar(bm->message->from, 0)
+	    gchar *from = bm->message->headers && bm->message->headers->from
+                ? libbalsa_address_to_gchar(bm->message->headers->from, 0)
                 : g_strdup(_("(No sender)"));
 	    gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 	
@@ -2053,8 +2108,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
 					     _("detected a good signature with insufficient validity/trust"));
 		}
 	    } else if (sig_res != GPGME_SIG_STAT_NONE) {
-		gchar *sender = bm->message->from 
-                    ? libbalsa_address_to_gchar(bm->message->from, -1)
+		gchar *sender = bm->message->headers && bm->message->headers->from 
+                    ? libbalsa_address_to_gchar(bm->message->headers->from, -1)
                     : g_strdup(_("(No sender)"));
 		gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 	
@@ -2366,6 +2421,8 @@ mpart_content_name(const gchar *content_type)
 	return g_strdup(_("signed parts"));
     else if (g_ascii_strcasecmp(content_type, "multipart/encrypted") == 0)
 	return g_strdup(_("encrypted parts"));
+    else if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0)
+	return g_strdup(_("rfc822 message"));
     else
 	return g_strdup_printf(_("\"%s\" parts"), 
 			       strchr(content_type, '/') + 1);
@@ -2389,6 +2446,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
     pix = libbalsa_icon_finder(content_type, body->filename, NULL);
 	
     if(!is_multipart ||
+       g_ascii_strcasecmp(content_type, "message/rfc822")==0 ||
        g_ascii_strcasecmp(content_type, "multipart/signed")==0 ||
        g_ascii_strcasecmp(content_type, "multipart/encrypted")==0 ||
        g_ascii_strcasecmp(content_type, "multipart/mixed")==0 ||
@@ -2723,7 +2781,7 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
     /* create a message */
     message = libbalsa_message_new();
     data = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
-    message->from = libbalsa_address_new_from_string(data);
+    message->headers->from = libbalsa_address_new_from_string(data);
     g_free (data);
 
     data = libbalsa_message_body_get_parameter(info->body, "subject");
@@ -2731,7 +2789,7 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
 	LIBBALSA_MESSAGE_SET_SUBJECT(message, data);
 
     data = libbalsa_message_body_get_parameter(info->body, "server");
-    message->to_list = libbalsa_address_new_list_from_string(data);
+    message->headers->to_list = libbalsa_address_new_list_from_string(data);
     g_free (data);
 
     /* the original body my have some data to be returned as commands... */
@@ -3432,19 +3490,20 @@ handle_mdn_request(LibBalsaMessage *message)
 
     /* Check if the dispnotify_to address is equal to the (in this order,
        if present) reply_to, from or sender address. */
-    if (message->reply_to)
-	use_from = message->reply_to;
-    else if (message->from)
-	use_from = message->from;
+    if (message->headers->reply_to)
+	use_from = message->headers->reply_to;
+    else if (message->headers->from)
+	use_from = message->headers->from;
     else if (message->sender)
 	use_from = message->sender;
     else
 	use_from = NULL;
-    suspicious = !rfc2298_address_equal (message->dispnotify_to, use_from);
+    suspicious =
+	!rfc2298_address_equal (message->headers->dispnotify_to, use_from);
     
     if (!suspicious) {
 	/* Try to find "my" address first in the to, then in the cc list */
-	list = g_list_first(message->to_list);
+	list = g_list_first(message->headers->to_list);
 	found = FALSE;
 	while (list && !found) {
 	    addr = list->data;
@@ -3452,7 +3511,7 @@ handle_mdn_request(LibBalsaMessage *message)
 	    list = list->next;
 	}
 	if (!found) {
-	    list = g_list_first(message->cc_list);
+	    list = g_list_first(message->headers->cc_list);
 	    while (list && !found) {
 		addr = list->data;
 		found = rfc2298_address_equal (balsa_app.current_ident->address, addr);
@@ -3481,7 +3540,8 @@ handle_mdn_request(LibBalsaMessage *message)
 	gchar *reply_to;
 	
 	sender = libbalsa_address_to_gchar (use_from, 0);
-	reply_to = libbalsa_address_to_gchar (message->dispnotify_to, -1);
+	reply_to = 
+	    libbalsa_address_to_gchar (message->headers->dispnotify_to, -1);
 	gtk_widget_show_all (create_mdn_dialog (sender, reply_to, mdn));
 	g_free (reply_to);
 	g_free (sender);
@@ -3511,12 +3571,12 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
     dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, 0);
-    message->from = libbalsa_address_new_from_string(dummy);
+    message->headers->from = libbalsa_address_new_from_string(dummy);
     g_free (dummy);
     LIBBALSA_MESSAGE_SET_SUBJECT(message,
 				 g_strdup("Message Disposition Notification"));
-    dummy = libbalsa_address_to_gchar(for_msg->dispnotify_to, 0);
-    message->to_list = libbalsa_address_new_list_from_string(dummy);
+    dummy = libbalsa_address_to_gchar(for_msg->headers->dispnotify_to, 0);
+    message->headers->to_list = libbalsa_address_new_list_from_string(dummy);
     g_free (dummy);
 
     /* RFC 2298 requests this mime type... */
@@ -3530,7 +3590,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     /* the first part of the body is an informational note */
     body = libbalsa_message_body_new(message);
     date = libbalsa_message_date_to_gchar(for_msg, balsa_app.date_string);
-    dummy = libbalsa_make_string_from_list(for_msg->to_list);
+    dummy = libbalsa_make_string_from_list(for_msg->headers->to_list);
     body->buffer = g_strdup_printf(
 	"The message sent on %s to %s with subject \"%s\" has been displayed.\n"
 	"There is no guarantee that the message has been read or understood.\n\n",

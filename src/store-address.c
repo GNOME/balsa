@@ -318,11 +318,13 @@ store_address_note_frame(StoreAddressInfo *info)
 
     for (list = info->message_list; list; list = g_list_next(list)) {
         message = LIBBALSA_MESSAGE(list->data);
-        if (message->from)
-            store_address_add_address(info, _("From:"), message->from);
-        store_address_add_glist(info, _("To:"), message->to_list);
-        store_address_add_glist(info, _("Cc:"), message->cc_list);
-        store_address_add_glist(info, _("Bcc:"), message->bcc_list);
+	if (message->headers) {
+	    if (message->headers->from)
+		store_address_add_address(info, _("From:"), message->headers->from);
+	    store_address_add_glist(info, _("To:"), message->headers->to_list);
+	    store_address_add_glist(info, _("Cc:"), message->headers->cc_list);
+	    store_address_add_glist(info, _("Bcc:"), message->headers->bcc_list);
+	}
     }
 
     return frame;

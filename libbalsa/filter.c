@@ -144,18 +144,19 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
     GString * body;
 
     g_return_val_if_fail(cond, FALSE); 
+    g_return_val_if_fail(message->headers != NULL, FALSE); 
 
     switch (cond->type) {
     case CONDITION_SIMPLE:
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
-	    str=libbalsa_make_string_from_list(message->to_list);
+	    str=libbalsa_make_string_from_list(message->headers->to_list);
 	    match=in_string_utf8(str,cond->match.string);
 	    g_free(str);
             if(match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)
-            && message->from) {
-	    str=libbalsa_address_to_gchar(message->from,0);
+            && message->headers->from) {
+	    str=libbalsa_address_to_gchar(message->headers->from,0);
 	    match=in_string_utf8(str,cond->match.string);
 	    g_free(str);
 	    if (match) break;
@@ -168,7 +169,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
             }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
-	    str=libbalsa_make_string_from_list(message->cc_list);
+	    str=libbalsa_make_string_from_list(message->headers->cc_list);
 	    match=in_string_utf8(str,cond->match.string);
 	    g_free(str);
 	    if (match) break;
@@ -221,7 +222,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 	for (;regexs;regexs=g_slist_next(regexs)) {
 	    regex=(LibBalsaConditionRegex*) regexs->data;
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
-		str=libbalsa_make_string_from_list(message->to_list);
+		str=libbalsa_make_string_from_list(message->headers->to_list);
 		if (str) {
 		    match=REGEXEC(*(regex->compiled),str)==0;
 		    g_free(str);
@@ -229,8 +230,8 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		}
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)
-                && message->from) {
-		str=libbalsa_address_to_gchar(message->from,0);
+                && message->headers->from) {
+		str=libbalsa_address_to_gchar(message->headers->from,0);
 		if (str) {
 		    match=REGEXEC(*(regex->compiled),str)==0;
 		    g_free(str);
@@ -243,7 +244,7 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
 		if (match) break;
 	    }
 	    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
-		str=libbalsa_make_string_from_list(message->cc_list);
+		str=libbalsa_make_string_from_list(message->headers->cc_list);
 		if (str) {
 		    match=REGEXEC(*(regex->compiled),str)==0;
 		    g_free(str);
@@ -296,9 +297,9 @@ match_condition(LibBalsaCondition* cond, LibBalsaMessage * message,
         match = LIBBALSA_MESSAGE_HAS_FLAG(message, cond->match.flags);
         break;
     case CONDITION_DATE:
-        match = message->date>=cond->match.interval.date_low 
+        match = message->headers->date>=cond->match.interval.date_low 
 	       && (cond->match.interval.date_high==0 || 
-                   message->date<=cond->match.interval.date_high);
+                   message->headers->date<=cond->match.interval.date_high);
     case CONDITION_NONE:
         break;
     }

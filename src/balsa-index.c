@@ -2444,13 +2444,15 @@ bndx_add_message(BalsaIndex * index, LibBalsaMessage * message)
 
     append_dots = FALSE;
     if (mailbox->view->show == LB_MAILBOX_SHOW_TO) {
-	if (message->to_list) {
-	    list = g_list_first(message->to_list);
+	if (message->headers && message->headers->to_list) {
+	    list = g_list_first(message->headers->to_list);
 	    addy = list->data;
 	    append_dots = list->next != NULL;
 	}
-    } else
-        addy = message->from;
+    } else {
+ 	if (message->headers && message->headers->from)
+	    addy = message->headers->from;
+    }
     if (addy)
 	name_str = libbalsa_address_get_name(addy);
     if(!name_str)		/* !addy, or addy contained no name/address */
@@ -2755,8 +2757,8 @@ bndx_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
 static gint
 date_compare(LibBalsaMessage * m1, LibBalsaMessage * m2)
 {
-    g_return_val_if_fail(m1 && m2, 0);
-    return m1->date - m2->date;
+    g_return_val_if_fail(m1 && m2 && m1->headers && m2->headers, 0);
+    return m1->headers->date - m2->headers->date;
 }
 
 

@@ -1965,9 +1965,10 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
         balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
         balsa_app.fcc_mru = g_list_reverse(balsa_app.fcc_mru);
     }
-    if (type == SEND_CONTINUE && bsmsg->orig_message->fcc_url)
+    if (type == SEND_CONTINUE && bsmsg->orig_message->headers &&
+	bsmsg->orig_message->headers->fcc_url)
         balsa_mblist_mru_add(&balsa_app.fcc_mru,
-                             bsmsg->orig_message->fcc_url);
+                             bsmsg->orig_message->headers->fcc_url);
     bsmsg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
@@ -2188,9 +2189,10 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
     const gchar *orig_address;
 
     libbalsa_message_body_ref(message, TRUE);
+    g_return_val_if_fail(message->headers, NULL);
 
-    if (message->from && (orig_address =
-                          libbalsa_address_get_name(message->from))) {
+    if (message->headers->from && 
+	(orig_address = libbalsa_address_get_name(message->headers->from))) {
         personStr = g_strdup(orig_address);
         libbalsa_utf8_sanitize(&personStr,
                                balsa_app.convert_unknown_8bit,
@@ -2199,7 +2201,7 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
     } else
         personStr = g_strdup(_("you"));
 
-    if (message->date)
+    if (message->headers->date)
         date = libbalsa_message_date_to_gchar(message,
                                               balsa_app.date_string);
 
@@ -2221,20 +2223,22 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
 	    g_string_append_printf(body, "%s %s\n", _("Subject:"), subject);
 	g_free(subject);
 
-	if (message->from) {
-	    gchar *from = libbalsa_address_to_gchar(message->from, 0);
+	if (message->headers->from) {
+	    gchar *from = libbalsa_address_to_gchar(message->headers->from, 0);
 	    g_string_append_printf(body, "%s %s\n", _("From:"), from);
 	    g_free(from);
 	}
 
-	if (message->to_list) {
-	    gchar *to_list = libbalsa_make_string_from_list(message->to_list);
+	if (message->headers->to_list) {
+	    gchar *to_list =
+		libbalsa_make_string_from_list(message->headers->to_list);
 	    g_string_append_printf(body, "%s %s\n", _("To:"), to_list);
 	    g_free(to_list);
 	}
 
-	if (message->cc_list) {
-	    gchar *cc_list = libbalsa_make_string_from_list(message->cc_list);
+	if (message->headers->cc_list) {
+	    gchar *cc_list = 
+		libbalsa_make_string_from_list(message->headers->cc_list);
 	    g_string_append_printf(body, "%s %s\n", _("Cc:"), cc_list);
 	    g_free(cc_list);
 	}
@@ -2422,10 +2426,11 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
 	if (!subject) {
-	    if (message->from && message->from->address_list)
+	    if (message->headers && message->headers->from &&
+		message->headers->from->address_list)
 		newsubject = g_strdup_printf("%s from %s",
 					     ident->forward_string,
-					     libbalsa_address_get_mailbox(message->from, 0));
+					     libbalsa_address_get_mailbox(message->headers->from, 0));
 	    else
 		newsubject = g_strdup(ident->forward_string);
 	} else {
@@ -2441,11 +2446,12 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
 		}
 	    }
 	    while( *tmp && isspace((int)*tmp) ) tmp++;
-	    if (message->from && message->from->address_list)
+	    if (message->headers && message->headers->from &&
+		message->headers->from->address_list)
 		newsubject = 
 		    g_strdup_printf("%s %s [%s]",
 				    ident->forward_string, 
-				    tmp,  libbalsa_address_get_mailbox(message->from, 0));
+				    tmp, libbalsa_address_get_mailbox(message->headers->from, 0));
 	    else {
 		newsubject = 
 		    g_strdup_printf("%s %s", 
@@ -2526,12 +2532,14 @@ set_entry_from_address_list(LibBalsaAddressEntry * address_entry,
 static void
 setup_headers_from_message(BalsaSendmsg* bsmsg, LibBalsaMessage *message)
 {
+    g_return_if_fail(message->headers);
+
     set_entry_from_address_list(LIBBALSA_ADDRESS_ENTRY(bsmsg->to[1]),
-                                message->to_list);
+                                message->headers->to_list);
     set_entry_from_address_list(LIBBALSA_ADDRESS_ENTRY(bsmsg->cc[1]),
-                                message->cc_list);
+                                message->headers->cc_list);
     set_entry_from_address_list(LIBBALSA_ADDRESS_ENTRY(bsmsg->bcc[1]),
-                                message->bcc_list);
+                                message->headers->bcc_list);
 }
 
 
@@ -2578,14 +2586,15 @@ guess_identity(BalsaSendmsg* bsmsg)
 {
     GList *alist;
     LibBalsaMessage *message = bsmsg->orig_message;
-    if( !message || !message->to_list || !balsa_app.identities)
+    if( !message  || !message->headers || !message->headers->to_list ||
+	!balsa_app.identities)
         return FALSE; /* use default */
 
     /*
      * Loop through all the addresses in the message's To:
      * field, and look for an identity that matches one of them.
      */
-    for (alist = message->to_list; alist; alist = g_list_next(alist)) {
+    for (alist = message->headers->to_list; alist; alist = g_list_next(alist)) {
         LibBalsaAddress *addy;
         gchar *address_string;
         GList *ilist;
@@ -2814,7 +2823,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     /* To: */
     if (type == SEND_REPLY || type == SEND_REPLY_ALL) {
         LibBalsaAddress *addr =
-            (message->reply_to) ? message->reply_to : message->from;
+            (message->headers->reply_to) 
+	    ? message->headers->reply_to : message->headers->from;
 
         if (addr) {
             tmp = libbalsa_address_to_gchar(addr, 0);
@@ -2838,15 +2848,15 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	setup_headers_from_message(bsmsg, message);
 
     if (type == SEND_REPLY_ALL) {
-	tmp = libbalsa_make_string_from_list(message->to_list);
+	tmp = libbalsa_make_string_from_list(message->headers->to_list);
 
  	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
  			       balsa_app.convert_unknown_8bit_codeset, NULL);
 	gtk_entry_set_text(GTK_ENTRY(bsmsg->cc[1]), tmp);
 	g_free(tmp);
 
-	if (message->cc_list) {
-	    tmp = libbalsa_make_string_from_list(message->cc_list);
+	if (message->headers->cc_list) {
+	    tmp = libbalsa_make_string_from_list(message->headers->cc_list);
  	    libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
  				   balsa_app.convert_unknown_8bit_codeset, NULL);
 	    append_comma_separated(GTK_EDITABLE(bsmsg->cc[1]), tmp);
@@ -3276,20 +3286,20 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     message = libbalsa_message_new();
 
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->from[1]));
-    message->from = libbalsa_address_new_from_string(ctmp);
+    message->headers->from = libbalsa_address_new_from_string(ctmp);
 
     tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
     strip_chars(tmp, "\r\n");
     LIBBALSA_MESSAGE_SET_SUBJECT(message, tmp);
 
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
-    message->to_list = libbalsa_address_new_list_from_string(ctmp);
+    message->headers->to_list = libbalsa_address_new_list_from_string(ctmp);
 
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->cc[1]));
-    message->cc_list = libbalsa_address_new_list_from_string(ctmp);
+    message->headers->cc_list = libbalsa_address_new_list_from_string(ctmp);
 
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->bcc[1]));
-    message->bcc_list = libbalsa_address_new_list_from_string(ctmp);
+    message->headers->bcc_list = libbalsa_address_new_list_from_string(ctmp);
 
     /* get the fcc-box from the option menu widget */
     bsmsg->fcc_url =
@@ -3297,7 +3307,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     ctmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->reply_to[1]));
     if (*ctmp)
-	message->reply_to = libbalsa_address_new_from_string(ctmp);
+	message->headers->reply_to = libbalsa_address_new_from_string(ctmp);
 
     if (bsmsg->req_dispnotify)
 	libbalsa_message_set_dispnotify(message, bsmsg->ident->address);
@@ -3313,7 +3323,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    }
 	    message->references = g_list_reverse(message->references);
 	}
-	footime = localtime(&bsmsg->orig_message->date);
+	footime = localtime(&bsmsg->orig_message->headers->date);
 	strftime(recvtime, sizeof(recvtime),
 		 "%a, %b %d, %Y at %H:%M:%S %z", footime);
 
@@ -3322,9 +3332,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
                 g_list_prepend(message->references,
                                g_strdup(bsmsg->orig_message->message_id));
             message->in_reply_to =
-                bsmsg->orig_message->from
+                bsmsg->orig_message->headers->from
                 ? g_strconcat(bsmsg->orig_message->message_id, "; from ",
-                              bsmsg->orig_message->from->address_list->data,
+                              bsmsg->orig_message->headers->from->address_list->data,
                               " on ", recvtime, NULL)
                 : g_strdup(bsmsg->orig_message->message_id);
         }
@@ -3375,7 +3385,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	}
     }
 
-    message->date = time(NULL);
+    message->headers->date = time(NULL);
 #ifdef HAVE_GPGME
     message->gpg_mode = bsmsg->gpg_mode;
 #endif
@@ -4201,12 +4211,11 @@ set_list_post_address(BalsaSendmsg * bsmsg)
         gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
         g_free(tmp);
     } else {
-        GList *lst = libbalsa_message_user_hdrs(message);
-        if (!set_list_post_rfc2369(bsmsg, lst)) {
+        if (!set_list_post_rfc2369(bsmsg, message->headers->user_hdrs)) {
             /* we didn't find "list-post", so try some nonstandard
              * alternatives: */
             GList *p;
-            for (p = lst; p; p = g_list_next(p)) {
+            for (p = message->headers->user_hdrs; p; p = g_list_next(p)) {
                 gchar **pair = p->data;
                 if (libbalsa_find_word(pair[0],
                                        "x-beenthere x-mailing-list")) {
@@ -4215,8 +4224,6 @@ set_list_post_address(BalsaSendmsg * bsmsg)
                 }
             }
         }
-        g_list_foreach(lst, (GFunc) g_strfreev, NULL);
-        g_list_free(lst);
     }
 }
 

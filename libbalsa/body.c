@@ -38,6 +38,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
 
     body->message = message;
     body->buffer = NULL;
+    body->embhdrs = NULL;
     body->mime_type = NULL;
     body->mutt_body = NULL;
     body->filename = NULL;
@@ -64,6 +65,7 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 	return;
 
     g_free(body->buffer);
+    libbalsa_message_headers_destroy(body->embhdrs);
     g_free(body->mime_type);
     g_free(body->filename);
 
@@ -86,6 +88,39 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     g_free(body);
 }
 
+
+static LibBalsaMessageHeaders *
+libbalsa_message_body_extract_embedded_headers(HEADER *hdr)
+{
+    LibBalsaMessageHeaders *ehdr;
+    ENVELOPE *env;
+
+    g_return_val_if_fail(hdr->env != NULL, NULL);
+    env = hdr->env;
+    ehdr = g_new0(LibBalsaMessageHeaders, 1);
+
+    libbalsa_message_headers_from_mutt(ehdr, hdr);
+    ehdr->user_hdrs = libbalsa_message_user_hdrs_from_mutt(hdr);
+
+    libbalsa_lock_mutt();
+
+    if (env->subject)
+	ehdr->subject = g_strdup(env->subject);
+    else if (env->real_subj)
+	ehdr->subject = g_strdup(env->real_subj);
+    else 
+	ehdr->subject = g_strdup(_("(No subject)"));
+    if (env->date)
+	ehdr->date = mutt_parse_date(env->date, NULL);
+    else if (hdr->date_sent != 0)
+    	ehdr->date = hdr->date_sent;
+
+    libbalsa_unlock_mutt();
+
+    return ehdr;
+}
+
+
 void
 libbalsa_message_body_set_mutt_body(LibBalsaMessageBody * body,
 				    MuttBody * mutt_body)
@@ -96,6 +131,11 @@ libbalsa_message_body_set_mutt_body(LibBalsaMessageBody * body,
     body->filename = g_strdup(mutt_body->filename);
     if(body->filename)
 	rfc2047_decode(&body->filename);
+    if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE &&
+	body->mutt_body->subtype && body->mutt_body->hdr &&
+	!g_ascii_strcasecmp("rfc822", body->mutt_body->subtype))
+	body->embhdrs =
+	    libbalsa_message_body_extract_embedded_headers(body->mutt_body->hdr);
     if (mutt_body->next) {
 	body->next = libbalsa_message_body_new(body->message);
 	libbalsa_message_body_set_mutt_body(body->next, mutt_body->next);

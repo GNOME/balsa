@@ -574,7 +574,12 @@ BODY *mutt_parse_messageRFC822 (FILE *fp, BODY *parent)
 
   parent->hdr = mutt_new_header ();
   parent->hdr->offset = ftell (fp);
+#ifdef LIBMUTT
+  /* BALSA: we want to know **everything** about embedded messages */
+  parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 1, 0);
+#else
   parent->hdr->env = mutt_read_rfc822_header (fp, parent->hdr, 0, 0);
+#endif
   msg = parent->hdr->content;
 
   /* ignore the length given in the content-length since it could be wrong

@@ -1,3 +1,20 @@
+2003-07-03  Carlos Morgado  <chbm chbm.nu>
+
+	* libbalsa/send.c: send text attachs as unknown-8bit
+
+	* libbalsa/body.c,h:
+	* libbalsa/filter.c:
+	* libbalsa/libbalsa.h:
+	* libbalsa/message.c,h:
+	* libbalsa/send.c:
+	* libmutt/parse.c:
+	* src/balsa-index.c:
+	* src/balsa-message.c:
+	* src/print.c:
+	* src/sendmsg-window.c:
+	* src/store-address.c:
+	aply Albrecht's patch #114411 - show embeded headers
+
 2003-07-02  Danilo Šegan  <dsegan@gmx.net>
 
 	* configure.in: Added "sr" and "sr@Latn" to ALL_LINGUAS.

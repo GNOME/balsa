@@ -269,7 +269,7 @@ start_new_page(PrintInfo * pi)
 }
 
 /*
- * ~~~ stuff for the message header ~~~
+ * ~~~ stuff for the message and embedded headers ~~~
  */
 typedef struct _HeaderInfo {
     guint id_tag;
@@ -316,86 +316,63 @@ print_header_list(GList **header_list, const gchar *field_id,
     *header_list = g_list_append(*header_list, hdr_pair);
 }
 
-static void
-prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
+static HeaderInfo *
+prepare_header_real(PrintInfo * pi, LibBalsaMessageBody * sig_body,
+		    LibBalsaMessageHeaders *headers, gchar *the_subject)
 {
     gint lines;
     gdouble font_size;
     HeaderInfo *pdata;
-    GString *footer_string = NULL;
     gchar *subject;
     gchar *date;
-    GList *other_hdrs, *p;
+    GList *p;
 
     pdata = g_malloc(sizeof(HeaderInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_HEADER;
     pdata->headers = NULL;
 
-    subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(pi->message));
+    subject = g_strdup(the_subject);
     libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
 			   balsa_app.convert_unknown_8bit_codeset, NULL);
     if (subject) {
 	print_header_string (&pdata->headers, "subject", _("Subject:"),
 			     subject);
-	footer_string = g_string_new(subject);
     }
     g_free(subject);
 
-    date = libbalsa_message_date_to_gchar(pi->message, balsa_app.date_string);
+    date = libbalsa_message_headers_date_to_gchar(headers, balsa_app.date_string);
     print_header_string (&pdata->headers, "date", _("Date:"), date);
-    if (footer_string) {
-	footer_string = g_string_append(footer_string, " - ");
-	footer_string = g_string_append(footer_string, date);
-    } else {
-	footer_string = g_string_new(date);
-    }
     g_free(date);
 
-    if (pi->message->from) {
-	gchar *from = libbalsa_address_to_gchar(pi->message->from, 0);
+    if (headers->from) {
+	gchar *from = libbalsa_address_to_gchar(headers->from, 0);
 	print_header_string (&pdata->headers, "from", _("From:"), from);
-	if (footer_string) {
-	    footer_string = g_string_prepend(footer_string, " - ");
-	    footer_string = g_string_prepend(footer_string, from);
-	} else {
-	    footer_string = g_string_new(from);
-	}
 	g_free(from);
     }
 
-    print_header_list(&pdata->headers, "to", _("To:"), pi->message->to_list);
-    print_header_list(&pdata->headers, "cc", _("Cc:"), pi->message->cc_list);
-    print_header_list(&pdata->headers, "bcc", _("Bcc:"), pi->message->bcc_list);
-    print_header_string (&pdata->headers, "fcc", _("Fcc:"),
-			 pi->message->fcc_url);
+    print_header_list(&pdata->headers, "to", _("To:"), headers->to_list);
+    print_header_list(&pdata->headers, "cc", _("Cc:"), headers->cc_list);
+    print_header_list(&pdata->headers, "bcc", _("Bcc:"), headers->bcc_list);
+    print_header_string (&pdata->headers, "fcc", _("Fcc:"), headers->fcc_url);
 
-    if (pi->message->dispnotify_to) {
-	gchar *mdn_to = libbalsa_address_to_gchar(pi->message->dispnotify_to, 0);
+    if (headers->dispnotify_to) {
+	gchar *mdn_to = libbalsa_address_to_gchar(headers->dispnotify_to, 0);
 	print_header_string (&pdata->headers, "disposition-notification-to", 
 			     _("Disposition-Notification-To:"), mdn_to);
 	g_free(mdn_to);
     }
 
     /* and now for the remaining headers... */
-    other_hdrs = libbalsa_message_user_hdrs(pi->message);
-    p = g_list_first(other_hdrs);
+    p = g_list_first(headers->user_hdrs);
     while (p) {
 	gchar **pair, *curr_hdr;
 	pair = p->data;
 	curr_hdr = g_strconcat(pair[0], ":", NULL);
 	print_header_string (&pdata->headers, pair[0], curr_hdr, pair[1]);
 	g_free(curr_hdr);
-	g_strfreev(pair);
 	p = g_list_next(p);
     }
-    g_list_free(other_hdrs);
 
-    /* wrap the footer if necessary */
-    pi->footer = footer_string->str;
-    g_string_free(footer_string, FALSE);
-
-    print_wrap_string(&pi->footer, pi->footer_font, pi->printable_width, pi->tab_width);
-    
     /* calculate the label width */
     pdata->header_label_width = 0;
     p = g_list_first(pdata->headers);
@@ -424,10 +401,10 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
 
 #ifdef HAVE_GPGME
     /* add the signature status info if available */
-    if (balsa_app.shown_headers != HEADERS_NONE &&
-	libbalsa_is_pgp_signed(body) > 0 && body->parts->next->sig_info) {
+    if (balsa_app.shown_headers != HEADERS_NONE && sig_body &&
+	libbalsa_is_pgp_signed(sig_body) > 0 && sig_body->parts->next->sig_info) {
 	pdata->sig_status =
-	    g_strdup(libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status));
+	    g_strdup(libbalsa_gpgme_sig_stat_to_gchar(sig_body->parts->next->sig_info->status));
 	lines += print_wrap_string(&pdata->sig_status, pi->header_font,
 				   pi->printable_width, pi->tab_width);
     } else {
@@ -448,6 +425,66 @@ prepare_header(PrintInfo * pi, LibBalsaMessageBody * body)
     } else
 	pi->ypos -= lines * font_size;
 
+    return pdata;
+}
+
+static void
+prepare_message_header(PrintInfo * pi, LibBalsaMessageBody * body)
+{
+    HeaderInfo *pdata;
+    GString *footer_string = NULL;
+    gchar *subject;
+    gchar *date;
+
+    g_return_if_fail(pi->message->headers);
+
+    /* create the headers */
+    subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(pi->message));
+    pdata = prepare_header_real(pi, body, pi->message->headers, subject);
+    pi->print_parts = g_list_append (pi->print_parts, pdata);
+
+    /* create the footer */
+    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
+			   balsa_app.convert_unknown_8bit_codeset, NULL);
+    if (subject)
+	footer_string = g_string_new(subject);
+    g_free(subject);
+
+    date = libbalsa_message_date_to_gchar(pi->message, balsa_app.date_string);
+    if (footer_string) {
+	footer_string = g_string_append(footer_string, " - ");
+	footer_string = g_string_append(footer_string, date);
+    } else {
+	footer_string = g_string_new(date);
+    }
+    g_free(date);
+
+    if (pi->message->headers->from) {
+	gchar *from = libbalsa_address_to_gchar(pi->message->headers->from, 0);
+	if (footer_string) {
+	    footer_string = g_string_prepend(footer_string, " - ");
+	    footer_string = g_string_prepend(footer_string, from);
+	} else {
+	    footer_string = g_string_new(from);
+	}
+	g_free(from);
+    }
+
+    /* wrap the footer if necessary */
+    pi->footer = footer_string->str;
+    g_string_free(footer_string, FALSE);
+
+    print_wrap_string(&pi->footer, pi->footer_font, pi->printable_width, pi->tab_width);
+}
+
+static void
+prepare_embedded_header(PrintInfo * pi, LibBalsaMessageBody * body)
+{
+    HeaderInfo *pdata;
+
+    g_return_if_fail(body->embhdrs);
+
+    pdata = prepare_header_real(pi, body->parts, body->embhdrs, body->embhdrs->subject);
     pi->print_parts = g_list_append (pi->print_parts, pdata);
 }
 
@@ -1062,6 +1099,7 @@ scan_body(PrintInfo * pi, LibBalsaMessageBody * body)
 	{"text/html", prepare_default},   /* don't print html source */
 	{"text", prepare_plaintext},
 	{"image", prepare_image},
+	{"message/rfc822", prepare_embedded_header},
 #ifdef HAVE_GPGME
 	{"application/pgp-signature", prepare_gpg_signature},
 #endif
@@ -1185,11 +1223,11 @@ print_info_new(CommonInfo * ci)
     /* now get the message contents... */
     if (!pi->message->mailbox 
         || libbalsa_message_body_ref(pi->message, TRUE)) {
-	prepare_header(pi, pi->message->body_list);
+	prepare_message_header(pi, pi->message->body_list);
         scan_body(pi, pi->message->body_list);
         libbalsa_message_body_unref(pi->message);
     } else
-	prepare_header(pi, NULL);
+	prepare_message_header(pi, NULL);
 
     return pi;
 }

@@ -76,6 +76,35 @@ enum _LibBalsaMsgCreateResult {
 #define  LIBBALSA_MESSAGE_SIGNATURE_BAD         3
 #endif
 
+/*
+ * LibBalsaMessageHeaders contains all headers which are used to display both
+ * a "main" message's headers as well as those from an embedded message/rfc822
+ * part.
+ */
+struct _LibBalsaMessageHeaders {
+    /* message composition date */
+    time_t date;
+
+    /* subject (for embedded messages only) */
+    gchar *subject;
+
+    /* from, reply, and disposition notification addresses */
+    LibBalsaAddress *from;
+    LibBalsaAddress *reply_to;
+    LibBalsaAddress *dispnotify_to;
+
+    /* primary, secondary, and blind recipent lists */
+    GList *to_list;
+    GList *cc_list;
+    GList *bcc_list;
+
+    /* File Carbon Copy Mailbox URL */
+    gchar *fcc_url;
+
+    /* user headers */
+    GList *user_hdrs;
+};
+
 struct _LibBalsaMessage {
     GObject object;
 
@@ -85,18 +114,15 @@ struct _LibBalsaMessage {
     /* flags */
     LibBalsaMessageFlag flags;
 
+    /* headers */
     MuttHeader* header;
+    LibBalsaMessageHeaders *headers;
+
     /* remail header if any */
     gchar *remail;
 
-    /* message composition date */
-    time_t date;
-
-    /* from, sender, reply, and disposition notification addresses */
-    LibBalsaAddress *from;
+    /* sender address */
     LibBalsaAddress *sender;
-    LibBalsaAddress *reply_to;
-    LibBalsaAddress *dispnotify_to;
 
     /* subject line; we still need it here for sending;
      * although _SET_SUBJECT might resolve it(?) 
@@ -111,13 +137,6 @@ struct _LibBalsaMessage {
 #endif
 #define LIBBALSA_MESSAGE_SET_SUBJECT(m,s) \
         { g_free((m)->subj); (m)->subj = (s); }
-    /* primary, secondary, and blind recipent lists */
-    GList *to_list;
-    GList *cc_list;
-    GList *bcc_list;
-
-    /* File Carbon Copy Mailbox URL */
-    gchar *fcc_url;
 
     /* replied message ID's */
     GList *references;
@@ -189,6 +208,15 @@ struct _LibBalsaMessageClass {
 GType libbalsa_message_get_type(void);
 
 /*
+ * message headers
+ */
+void libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers);
+void libbalsa_message_headers_from_mutt(LibBalsaMessageHeaders *headers,
+					MuttHeader *mheader);
+GList *libbalsa_message_user_hdrs_from_mutt(MuttHeader* header);
+
+
+/*
  * messages
  */
 LibBalsaMessage *libbalsa_message_new(void);
@@ -240,8 +268,10 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 /*
  * misc message releated functions
  */
-gchar *libbalsa_message_date_to_gchar(LibBalsaMessage * message,
-				      const gchar * date_string);
+gchar *libbalsa_message_headers_date_to_gchar(LibBalsaMessageHeaders * headers,
+					      const gchar * date_string);
+#define libbalsa_message_date_to_gchar(m,s) \
+        libbalsa_message_headers_date_to_gchar((m)->headers,s)
 gchar *libbalsa_message_size_to_gchar(LibBalsaMessage * message,
                                       gboolean lines);
 gchar *libbalsa_message_title(LibBalsaMessage * message,
@@ -258,7 +288,6 @@ gboolean libbalsa_message_is_pgp_signed(LibBalsaMessage * message);
 gboolean libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message);
 #endif
 
-GList *libbalsa_message_user_hdrs(LibBalsaMessage * message);
 GList *libbalsa_message_find_user_hdr(LibBalsaMessage * message, 
                                       const gchar * find);
 FILE* libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id);

@@ -612,7 +612,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	       the Bcc: header.  The BCC copy of the message recipient
 	       list is taken from the Bcc recipient list and the Bcc:
 	       header is preserved in the message. */
-	    bcc_recip = g_list_first((GList *) msg->bcc_list);
+	    bcc_recip = g_list_first((GList *) msg->headers->bcc_list);
 	    if (!bcc_recip)
 		bcc_message = NULL;
 	    else
@@ -638,9 +638,9 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 		     aren't necessary since they should already be in the
 		     message. */
 
-	    smtp_set_header (message, "Date", &msg->date);
+	    smtp_set_header (message, "Date", &msg->headers->date);
 	    if (bcc_message)
-		smtp_set_header (bcc_message, "Date", &msg->date);
+		smtp_set_header (bcc_message, "Date", &msg->headers->date);
 
 	    /* RFC 2822 does not require a message to have a subject.
 	               I assume this is NULL if not present */
@@ -652,9 +652,9 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	    }
 
 	    /* Add the sender info */
-            if (msg->from) {
-	        phrase = libbalsa_address_get_phrase(msg->from);
-	        mailbox = libbalsa_address_get_mailbox(msg->from, 0);
+            if (msg->headers->from) {
+	        phrase = libbalsa_address_get_phrase(msg->headers->from);
+	        mailbox = libbalsa_address_get_mailbox(msg->headers->from, 0);
             } else
                 phrase = mailbox = "";
 	    smtp_set_reverse_path (message, mailbox);
@@ -664,17 +664,17 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	        smtp_set_header (bcc_message, "From", phrase, mailbox);
 	    }
 
-	    if (msg->reply_to) {
-		phrase = libbalsa_address_get_phrase(msg->reply_to);
-		mailbox = libbalsa_address_get_mailbox(msg->reply_to, 0);
+	    if (msg->headers->reply_to) {
+		phrase = libbalsa_address_get_phrase(msg->headers->reply_to);
+		mailbox = libbalsa_address_get_mailbox(msg->headers->reply_to, 0);
 		smtp_set_header (message, "Reply-To", phrase, mailbox);
 		if (bcc_message)
 		    smtp_set_header (bcc_message, "Reply-To", phrase, mailbox);
 	    }
 
-	    if (msg->dispnotify_to) {
-		phrase = libbalsa_address_get_phrase(msg->dispnotify_to);
-		mailbox = libbalsa_address_get_mailbox(msg->dispnotify_to, 0);
+	    if (msg->headers->dispnotify_to) {
+		phrase = libbalsa_address_get_phrase(msg->headers->dispnotify_to);
+		mailbox = libbalsa_address_get_mailbox(msg->headers->dispnotify_to, 0);
 		smtp_set_header (message, "Disposition-Notification-To",
 				 phrase, mailbox);
 		if (bcc_message)
@@ -687,7 +687,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	       copy of the message gets the To and Cc recipient list.
 	       The bcc copy gets the Bcc recipients.  */
 
-	    recip = g_list_first((GList *) msg->to_list);
+	    recip = g_list_first((GList *) msg->headers->to_list);
 	    while (recip) {
         	addy = recip->data;
 		phrase = libbalsa_address_get_phrase(addy);
@@ -704,7 +704,7 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, gchar * smtp_server,
 	    	recip = recip->next;
 	    }
 
-	    recip = g_list_first((GList *) msg->cc_list);
+	    recip = g_list_first((GList *) msg->headers->cc_list);
 	    while (recip) {
         	addy = recip->data;
 		phrase = libbalsa_address_get_phrase(addy);
@@ -1270,14 +1270,14 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 	} safe_free((void **) &delptr->next);
     }
 
-    if (message->from) {
-        tmp = libbalsa_address_to_gchar_p(message->from, 0);
+    if (message->headers->from) {
+        tmp = libbalsa_address_to_gchar_p(message->headers->from, 0);
         hdr->env->from = rfc822_parse_adrlist(hdr->env->from, tmp);
         g_free(tmp);
     }
 
-    if (message->reply_to) {
-	tmp = libbalsa_address_to_gchar_p(message->reply_to, 0);
+    if (message->headers->reply_to) {
+	tmp = libbalsa_address_to_gchar_p(message->headers->reply_to, 0);
 
 	hdr->env->reply_to =
 	    rfc822_parse_adrlist(hdr->env->reply_to, tmp);
@@ -1285,8 +1285,8 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 	g_free(tmp);
     }
 
-    if (message->dispnotify_to) {
-	tmp = libbalsa_address_to_gchar_p(message->dispnotify_to, 0);
+    if (message->headers->dispnotify_to) {
+	tmp = libbalsa_address_to_gchar_p(message->headers->dispnotify_to, 0);
 
 	hdr->env->dispnotify_to =
 	    rfc822_parse_adrlist(hdr->env->dispnotify_to, tmp);
@@ -1296,15 +1296,15 @@ message2HEADER(LibBalsaMessage * message, HEADER * hdr) {
 
     hdr->env->subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
-    tmp = libbalsa_make_string_from_list_p(message->to_list);
+    tmp = libbalsa_make_string_from_list_p(message->headers->to_list);
     hdr->env->to = rfc822_parse_adrlist(hdr->env->to, tmp);
     g_free(tmp);
 
-    tmp = libbalsa_make_string_from_list_p(message->cc_list);
+    tmp = libbalsa_make_string_from_list_p(message->headers->cc_list);
     hdr->env->cc = rfc822_parse_adrlist(hdr->env->cc, tmp);
     g_free(tmp);
 
-    tmp = libbalsa_make_string_from_list_p(message->bcc_list);
+    tmp = libbalsa_make_string_from_list_p(message->headers->bcc_list);
     hdr->env->bcc = rfc822_parse_adrlist(hdr->env->bcc, tmp);
     g_free(tmp);
 
@@ -1647,8 +1647,13 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		       !strcasecmp(mime_type[1],"rfc822")) {
 			newbdy->encoding = ENC8BIT;
 			newbdy->disposition = DISPINLINE;
-		    } else if(strcasecmp(mime_type[0],"text") != 0)
+		    } else if(strcasecmp(mime_type[0],"text") != 0) {
 			newbdy->encoding = ENCBASE64;
+		    } else {
+			/* is text, force unknown-8bit here. FIXME! PLEASE! */
+			newbdy->force_charset = 1;
+			mutt_set_parameter( "charset", "unknown-8bit", &newbdy->parameter );
+		    }
 		    newbdy->type = mutt_check_mime_type(mime_type[0]);
 		    g_free(newbdy->subtype);
 		    newbdy->subtype = g_strdup(mime_type[1]);

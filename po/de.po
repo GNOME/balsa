@@ -17,8 +17,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 1.0.pre4\n"
-"POT-Creation-Date: 2000-11-03 19:55+0100\n"
-"PO-Revision-Date: 2000-11-03 19:56+0100\n"
+"POT-Creation-Date: 2000-11-03 20:37+0100\n"
+"PO-Revision-Date: 2000-11-03 20:40+01:00\n"
 "Last-Translator: Kai Lahmann <kl@linuxfaqs.de>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -49,11 +49,11 @@ msgstr "Suche gescheitert: %s Prüfen Sie, ob der Basisname gültig ist."
 
 #: libbalsa/address-book-ldap.c:322 libbalsa/address-book-vcard.c:192
 msgid "No-Id"
-msgstr "Keine-ID"
+msgstr "Keine ID"
 
 #: libbalsa/address-book-ldap.c:329 libbalsa/address-book-vcard.c:201
 msgid "No-Name"
-msgstr "Kein-Name"
+msgstr "Kein Name"
 
 #: libbalsa/address-book-vcard.c:170
 #, c-format
@@ -103,17 +103,17 @@ msgstr "Postfach des Typs %s konnte nicht angelegt werden"
 #: libbalsa/mailbox_imap.c:284
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: %s Ref.-Zähler wird geöffnet: %d\n"
+msgstr "LibBalsaMailboxImap: %s wird geöffnet; Ref.-Zähler: %d\n"
 
 #: libbalsa/mailbox_local.c:257
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: %s Ref.-Zähler wird geöffnet: %d\n"
+msgstr "LibBalsaMailboxLocal: %s wird geöffnet; Ref.-Zähler: %d\n"
 
 #: libbalsa/mailbox_pop3.c:198
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: %s Ref.-Zähler wird geöffnet: %d\n"
+msgstr "LibBalsaMailboxPop3: %s wird geöffnet; Ref.-Zähler: %d\n"
 
 #: libbalsa/send.c:788
 #, c-format
@@ -232,12 +232,12 @@ msgid ""
 "reporting bugs."
 msgstr ""
 "Sie scheinen Balsa zum ersten Mal auszuführen. Um Balsa einzurichten,\n"
-"beantworten Sie bitte die folgenden Fragen. Sie können die eingegebenen\n"
-"Daten später jederzeit im Einstellungsdialog ändern. Sofern Dateien oder\n"
-"Verzeichnisse nicht existieren, werden diese automatisch angelegt.\n"
-"Das Info-Dialogfeld im Balsa-Hauptfenster enthält weitere Informationen\n"
-"über die Kontaktaufnahme mit den Autoren oder das Einsenden von\n"
-"Fehlerberichten."
+"beantworten Sie bitte die folgenden Fragen. Sie können die\n"
+"eingegebenen Daten später jederzeit im Einstellungsdialogfeld\n"
+"ändern. Sofern Dateien oder Verzeichnisse nicht existieren, werden\n"
+"diese automatisch angelegt.  Das Info-Dialogfeld im Balsa-Hauptfenster\n"
+"enthält weitere Informationen über die Kontaktaufnahme mit den Autoren\n"
+"oder das Einsenden von Fehlerberichten."
 
 #: libinit_balsa/balsa-initdruid.gob:97
 msgid ""
@@ -249,7 +249,7 @@ msgstr ""
 
 #: libinit_balsa/balsa-initdruid.gob:119
 msgid "GnomeCard Address Book"
-msgstr "GNOMECard-Adressbuch"
+msgstr "GnomeCard-Adressbuch"
 
 #: libinit_balsa/helper.c:142
 #, c-format
@@ -268,7 +268,7 @@ msgstr ""
 #: libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Die Datei mit dem Namen \"%s\" ist kein Verzeichnis."
+msgstr "Die Datei mit dem Pfadnamen \"%s\" ist kein Verzeichnis."
 
 #: libinit_balsa/init_balsa.c:36
 msgid "Configure Balsa"
@@ -1092,7 +1092,8 @@ msgstr "Lokales Postfach geladen als: %s\n"
 #: src/mailbox-conf.c:151
 #, c-format
 msgid ""
-"This will remove the mailbox %s and it's files permanently from your system.\n"
+"This will remove the mailbox %s and it's files permanently from your "
+"system.\n"
 "Are you sure you want to remove this mailbox?"
 msgstr ""
 "Das Postfach %s und sein Inhalt werden unwiederbringlich gelöscht.\n"
@@ -1566,8 +1567,8 @@ msgstr "Copyright (C) 1997-2000"
 
 #: src/main-window.c:1106
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  Information "
-"on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  "
+"Information on Balsa can be found at http://www.balsa.net/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
@@ -2525,8 +2526,7 @@ msgid "Replace the current word with the selected suggestion"
 msgstr "Aktuelles Wort mit gewählten Vorschlag ersetzen"
 
 #: src/spell-check.c:487
-msgid ""
-"Replace all occurances of the current word with the selected suggestion"
+msgid "Replace all occurances of the current word with the selected suggestion"
 msgstr "Im ganzen Text dieses Wort mit gewähltem Vorschlag ersetzen"
 
 #: src/spell-check.c:494
@@ -2596,4 +2596,3 @@ msgstr "Kein Adressbuch ausgewählt..."
 #: src/store-address.c:255
 msgid "Sorry, no semicolons are allowed in the name!\n"
 msgstr "Es sind leider keine Semikola im Namen erlaubt!\n"
-

@@ -296,6 +296,13 @@ else
 fi
 
 dnl ##########################################################################
+dnl Look for sendmail program
+dnl ##########################################################################
+AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
+AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
+		   [Path to sendmail program.])
+
+dnl ##########################################################################
 dnl Enable SASL?
 dnl ##########################################################################
 

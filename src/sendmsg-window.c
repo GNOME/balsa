@@ -2168,14 +2168,19 @@ attachments_add(GtkWidget * widget,
     if (balsa_app.debug)
         printf("attachments_add: info %d\n", info);
     if (info == TARGET_MESSAGES) {
-        LibBalsaMessage **message_array =
-            (LibBalsaMessage **) selection_data->data;
-
-        while (*message_array) {
-            if(!attach_message(bsmsg, *message_array++))
+	BalsaIndex *index = *(BalsaIndex **) selection_data->data;
+	LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
+	gint i;
+        
+	for (i = index->selected->len; --i >= 0;) {
+	    guint msgno = g_array_index(index->selected, guint, i);
+	    LibBalsaMessage *message =
+		libbalsa_mailbox_get_message(mailbox, msgno);
+            if(!attach_message(bsmsg, message))
                 libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                      _("Attaching message failed.\n"
                                        "Possible reason: not enough temporary space"));
+	    g_object_unref(message);
         }
     } else if (info == TARGET_URI_LIST) {
         GSList *uri_list = uri2gslist(selection_data->data);
@@ -2563,18 +2568,28 @@ drag_data_quote(GtkWidget * widget,
                 GtkSelectionData * selection_data,
                 guint info, guint32 time, BalsaSendmsg * bsmsg)
 {
-    LibBalsaMessage **message_array;
     GtkTextBuffer *buffer;
+    BalsaIndex *index;
+    LibBalsaMailbox *mailbox;
+    gint i;
+
     if (context->action == GDK_ACTION_ASK)
         context->action = GDK_ACTION_COPY;
 
     switch(info) {
     case TARGET_MESSAGES:
-        message_array = (LibBalsaMessage **) selection_data->data;
+	index = *(BalsaIndex **) selection_data->data;
+	mailbox = index->mailbox_node->mailbox;
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
         
-        while (*message_array) {
-            GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
+	for (i = index->selected->len; --i >= 0;) {
+	    guint msgno = g_array_index(index->selected, guint, i);
+	    LibBalsaMessage *message;
+            GString *body;
+
+	    message = libbalsa_mailbox_get_message(mailbox, msgno);
+            body = quoteBody(bsmsg, message, SEND_REPLY);
+	    g_object_unref(message);
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
         }

@@ -161,12 +161,18 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
     /* FIXME: Role our own mktemp that doesn't need a large array (use g_strdup_printf) */
     if (body->temp_filename == NULL) {
 	gchar tmp_file_name[PATH_MAX + 1];
+	gchar *dotpos = NULL;
 
 	libbalsa_lock_mutt();
 	mutt_mktemp(tmp_file_name);
 	libbalsa_unlock_mutt();
 
-	body->temp_filename = g_strdup(tmp_file_name);
+	if (body->filename)
+	    dotpos = strchr(body->filename, '.');
+	if (dotpos)
+	    body->temp_filename = g_strdup_printf("%s%s", tmp_file_name, dotpos);
+	else
+	    body->temp_filename = g_strdup(tmp_file_name);
 	return libbalsa_message_body_save(body, prefix, body->temp_filename);
     } else {
 	/* the temporary name has been already allocated on previous

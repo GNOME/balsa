@@ -2979,6 +2979,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
     gchar *date, *dummy;
+    gchar **params;
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
@@ -2991,6 +2992,14 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     message->to_list = libbalsa_address_new_list_from_string(dummy);
     g_free (dummy);
 
+    /* RFC 2298 requests this mime type... */
+    message->subtype = g_strdup("report");
+    params = g_new(gchar *, 3);
+    params[0] = g_strdup("report-type");
+    params[1] = g_strdup("disposition-notification");
+    params[2] = NULL;
+    message->parameters = g_list_prepend(message->parameters, params);
+    
     /* the first part of the body is an informational note */
     body = libbalsa_message_body_new(message);
     date = libbalsa_message_date_to_gchar(for_msg, balsa_app.date_string);

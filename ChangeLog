@@ -1,3 +1,8 @@
+2003-05-07  Albrecht Dreﬂ  <albrecht.dress@arcor.de>
+
+	* libbalsa/body.c: use attachment's extension for temporary files.
+	* src/balsa-message.c: set MDN message type to multipart/report.
+
 2003-05-06 05:35  PeterB
 
 	* libbalsa/mailbox_local.c: Fix #111288.

@@ -2705,10 +2705,10 @@ icm_store_cached_data(ImapMboxHandle *handle)
     icm->uidvalidity = imap_mbox_handle_get_validity(handle);
     icm->uidnext     = imap_mbox_handle_get_uidnext(handle);
     for(i=1; i<=cnt; i++) {
+        void *ptr;
         uint32_t *uid = &g_array_index(icm->uidmap, uint32_t, i-1);
         ImapMessage *imsg = imap_mbox_handle_get_msg(handle, i);
-        if(imsg) {
-            void *ptr = imap_message_serialize(imsg);
+        if(imsg && (ptr = imap_message_serialize(imsg)) != NULL) {
             g_hash_table_insert(icm->headers,
                                 GUINT_TO_POINTER(imsg->uid), ptr);
             *uid = imsg->uid;

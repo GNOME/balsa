@@ -1077,6 +1077,8 @@ imap_message_serialize(ImapMessage *imsg)
   ssize_t tot_size;
   gchar *ptr;
   struct ImapMsgEnvSerialized *imes;
+  if(!imsg->envelope) /* envelope is required */
+    return NULL; 
   strings[0] = imsg->fetched_header_fields;
   strings[1] = imsg->envelope->subject;
   strings[2] = imap_address_to_string(imsg->envelope->from);

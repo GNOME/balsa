@@ -1,3 +1,7 @@
+2004-11-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* POTFILES.in: remove sounds/email.soundlist.in
+	
 2004-11-17  Miloslav Trmac  <mitr@volny.cz>
 
 	* cs.po: Updated Czech translation.

@@ -1,3 +1,14 @@
+2004-11-20  Pawel Salek
+
+	* NEWS, configure.in: modify for balsa-2.2.6 release.
+	* balsa.spec.in: prefer "our" gmime when building package.
+
+	* libbalsa/mailbox_imap.c: avoid crash when serializing partially
+	constructed ImapMessages.
+	* libbalsa/imap/imap-handle.c: ditto.
+	* libbalsa/imap/auth-gssapi.c: revert last change,
+	it breaks krb5-devel-1.3.4-7
+
 2004-11-19 12:30  PeterB
 
 	* libbalsa/: address-entry.c, address-entry.h: implement

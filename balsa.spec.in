@@ -67,11 +67,11 @@ dir=`pwd`; cd gmime-%{gmimever} && ./configure --prefix=`pwd` --disable-shared &
 
 if [ ! -f configure ]; then
   CFLAGS="$RPM_OPT_FLAGS" \
-  PKG_CONFIG_PATH="$PKG_CONFIG_PATH:gmime-%{gmimever}" \
+  PKG_CONFIG_PATH="gmime-%{gmimever}:$PKG_CONFIG_PATH" \
   ./autogen.sh $ARCHFLAG %{config_opts}
 else
   CFLAGS="$RPM_OPT_FLAGS" \
-  PKG_CONFIG_PATH="$PKG_CONFIG_PATH:gmime-%{gmimever}" \
+  PKG_CONFIG_PATH="gmime-%{gmimever}:$PKG_CONFIG_PATH" \
   ./configure $ARCHFLAG %{config_opts}
 fi
 

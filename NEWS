@@ -1,4 +1,13 @@
-* Balsa-2.2.5 release. Release date 2004-09-02
+* Balsa-2.2.6 release. Release date 2004-11-19
+
+- fixed MBOX driver over NFS problem.
+- use ISO-2022-JP for composing Japanese messages.
+- yet more exceptions caught.
+- S/MIME support.
+- improved identity selection and address book completions.
+- IMAP optimizations.
+
+* Balsa-2.2.5 release. Release date 2004-10-02
 
 - sent messages saved to sentbox only after being sent.
 - use of fixed-height with gtk2>=2.4.9 to speed up large mailboxes.

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.8\n"
-"POT-Creation-Date: 2000-08-07 13:51+0300\n"
+"POT-Creation-Date: 2000-08-11 10:56+0300\n"
 "PO-Revision-Date: 1999-12-27 11:14+0200\n"
 "Last-Translator: Yuri Syrota <rasta@renome.rovno.ua>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=koi8-u\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: libbalsa/mailbox.c:75
+#: libbalsa/mailbox.c:80
 msgid "Error: "
 msgstr "Помилка: "
 
@@ -220,28 +220,29 @@ msgstr "╤мпортувати лише першу адресу"
 msgid "Import all adresses"
 msgstr "╤мпортувати вс╕ адреси"
 
-#: src/balsa-app.c:244
+#: src/balsa-app.c:233 src/balsa-app.c:238 src/balsa-app.c:243
+#: src/balsa-app.c:248 src/balsa-app.c:253
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Неможливо в╕дкрити вашу поштову скриньку \"%s\"."
 
-#: src/balsa-app.c:257
+#: src/balsa-app.c:233
 msgid "Inbox"
 msgstr "Вх╕дн╕"
 
-#: src/balsa-app.c:262
+#: src/balsa-app.c:238
 msgid "Outbox"
 msgstr "Вих╕дн╕"
 
-#: src/balsa-app.c:267
+#: src/balsa-app.c:243
 msgid "Sentbox"
 msgstr "В╕д╕слан╕"
 
-#: src/balsa-app.c:272
+#: src/balsa-app.c:248
 msgid "Draftbox"
 msgstr "Чернетки"
 
-#: src/balsa-app.c:277
+#: src/balsa-app.c:253
 msgid "Trash"
 msgstr "См╕тник"
 
@@ -384,26 +385,26 @@ msgstr "Непрочитане"
 msgid "Total"
 msgstr "Всього"
 
-#: src/balsa-mblist.c:840
+#: src/balsa-mblist.c:833
 #, c-format
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Показано скриньку: %s, пов╕домлень: %ld, нових: %ld"
 
-#: src/balsa-message.c:240 src/balsa-message.c:244
+#: src/balsa-message.c:240 src/balsa-message.c:243
 msgid "Save MIME Part"
 msgstr "Зберегти закодовану MIME частину"
 
-#: src/balsa-message.c:241 src/balsa-message.c:1176
+#: src/balsa-message.c:241 src/balsa-message.c:1180
 msgid "Save"
 msgstr "Зберегти"
 
 #: src/balsa-message.c:241 src/sendmsg-window.c:132 src/sendmsg-window.c:446
-#: src/sendmsg-window.c:1196 src/sendmsg-window.c:1485
-#: src/sendmsg-window.c:1508
+#: src/sendmsg-window.c:1200 src/sendmsg-window.c:1478
+#: src/sendmsg-window.c:1501
 msgid "Cancel"
 msgstr "В╕дм╕нити"
 
-#: src/balsa-message.c:242
+#: src/balsa-message.c:250
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "Введ╕ть назву фалу щоб зберегти цю частину пов╕домлення:"
 
@@ -418,13 +419,13 @@ msgstr "Дата:"
 
 #. From:
 #: src/balsa-message.c:548 src/filter-edit-dialog.c:337
-#: src/sendmsg-window.c:677
+#: src/sendmsg-window.c:681
 msgid "From:"
 msgstr "В╕д:"
 
 #. To:
 #: src/balsa-message.c:552 src/filter-edit-dialog.c:325
-#: src/sendmsg-window.c:679
+#: src/sendmsg-window.c:683
 msgid "To:"
 msgstr "До:"
 
@@ -441,7 +442,7 @@ msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:559 src/sendmsg-window.c:684
+#: src/balsa-message.c:559 src/sendmsg-window.c:688
 msgid "Subject:"
 msgstr "Тема:"
 
@@ -449,23 +450,33 @@ msgstr "Тема:"
 msgid "Couldn't render image\n"
 msgstr "Неможливо в╕зуал╕зувати зображення\n"
 
-#: src/balsa-message.c:675
-msgid "Balsa does not know how to display this message part"
-msgstr "Balsa не може в╕добразити цю частину пов╕домлення"
+#: src/balsa-message.c:677
+#, c-format
+msgid "View part with %s"
+msgstr "Подивитись частину в %s"
 
-#: src/balsa-message.c:680
+#: src/balsa-message.c:685
+msgid "No view action defined in gnome MIME for this content type"
+msgstr "Нема╓ д╕╖ для перегляду визначеного в GNOME MIME для цього типу вм╕сту"
+
+#: src/balsa-message.c:689
 #, c-format
 msgid "Content Type: %s"
 msgstr "Тип вм╕сту: %s"
 
-#: src/balsa-message.c:689
+#: src/balsa-message.c:694
 #, c-format
 msgid "Filename: %s"
 msgstr "Назва файлу: %s"
 
-#: src/balsa-message.c:696
+#: src/balsa-message.c:701
 msgid "Save part"
 msgstr "Зберегти частину"
+
+#: src/balsa-message.c:1253
+#, c-format
+msgid "could not create temporary file %s"
+msgstr "неможливо створити тимчасовий файл %s"
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
@@ -1075,30 +1086,30 @@ msgstr ""
 "\n"
 "В╕дсилайте пов╕домлення про помилки на: http://bugs.gnome.org/"
 
-#: src/main-window.c:1496
+#: src/main-window.c:1499
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
 msgstr ""
 "Для збереження адреси, вам необх╕дно в╕дкрити поштову скриньку ╕ вибрати "
 "пов╕домлення.\n"
 
-#: src/main.c:80
+#: src/main.c:82
 msgid "Get new mail on startup"
 msgstr "Отримати нову кореспонденц╕ю на початку"
 
-#: src/main.c:82
+#: src/main.c:84
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "П╕дготувати нове пов╕домлення до ЕПОШТА@АДРЕСА"
 
-#: src/main.c:84
+#: src/main.c:86
 msgid "Opens MAILBOXNAME"
 msgstr "В╕дкрива╓ НАЗВА_ПОШТОВО╥_СКРИНЬКИ"
 
-#: src/main.c:84
+#: src/main.c:86
 msgid "MAILBOXNAME"
 msgstr "НАЗВА_ПОШТОВО╥_СКРИНЬКИ"
 
-#: src/main.c:85
+#: src/main.c:87
 msgid "Opens first unread mailbox"
 msgstr "В╕дкрити вибрану поштову скриньку"
 
@@ -1665,87 +1676,87 @@ msgid "Attach file"
 msgstr "Долучити файл"
 
 #. cc:
-#: src/sendmsg-window.c:688
+#: src/sendmsg-window.c:692
 msgid "cc:"
 msgstr "cc:"
 
 #. bcc:
-#: src/sendmsg-window.c:693
+#: src/sendmsg-window.c:697
 msgid "bcc:"
 msgstr "bcc:"
 
 #. fcc:
-#: src/sendmsg-window.c:697
+#: src/sendmsg-window.c:701
 msgid "fcc:"
 msgstr "fcc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:727
+#: src/sendmsg-window.c:731
 msgid "Reply To:"
 msgstr "В╕дпов╕сти:"
 
 #. Attachment list
-#: src/sendmsg-window.c:733
+#: src/sendmsg-window.c:737
 msgid "Attachments:"
 msgstr "Долучення:"
 
 #. Comments:
-#: src/sendmsg-window.c:776
+#: src/sendmsg-window.c:780
 msgid "Comments:"
 msgstr "Коментар╕:"
 
 #. Keywords:
-#: src/sendmsg-window.c:779
+#: src/sendmsg-window.c:783
 msgid "Keywords:"
 msgstr "Ключов╕ слова:"
 
-#: src/sendmsg-window.c:860
+#: src/sendmsg-window.c:864
 msgid "you"
 msgstr "ви"
 
-#: src/sendmsg-window.c:870
+#: src/sendmsg-window.c:874
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "%s %s писали:\n"
 
-#: src/sendmsg-window.c:873
+#: src/sendmsg-window.c:877
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s писали:\n"
 
-#: src/sendmsg-window.c:947
+#: src/sendmsg-window.c:951
 msgid "Reply to "
 msgstr "В╕дпв╕сти "
 
-#: src/sendmsg-window.c:952
+#: src/sendmsg-window.c:956
 msgid "Forward message"
 msgstr "Переслати пов╕домлення"
 
-#: src/sendmsg-window.c:957
+#: src/sendmsg-window.c:961
 msgid "Continue message"
 msgstr "Продовжити написання пов╕домлення"
 
-#: src/sendmsg-window.c:962
+#: src/sendmsg-window.c:966
 msgid "New message"
 msgstr "Нове пов╕домлення"
 
-#: src/sendmsg-window.c:1195
+#: src/sendmsg-window.c:1199
 msgid "Could not open the file.\n"
 msgstr "Неможливо в╕дкрити файл.\n"
 
-#: src/sendmsg-window.c:1201
+#: src/sendmsg-window.c:1205
 msgid "Loading..."
 msgstr "Завантаження..."
 
-#: src/sendmsg-window.c:1226
+#: src/sendmsg-window.c:1230
 msgid "Include file"
 msgstr "Включити файл"
 
-#: src/sendmsg-window.c:1483
+#: src/sendmsg-window.c:1476
 msgid "Cannot execute print command."
 msgstr "Неможливо виконати команду друку."
 
-#: src/sendmsg-window.c:1507
+#: src/sendmsg-window.c:1500
 msgid "Error executing lpr"
 msgstr "Помилка виконання lpr"
 
@@ -1754,7 +1765,7 @@ msgstr "Помилка виконання lpr"
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxImap: В╕дкривання %s Посилань: %d\n"
 
-#: libbalsa/mailbox_local.c:218
+#: libbalsa/mailbox_local.c:220
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
 msgstr "LibBalsaMailboxLocal: В╕дкривання %s Посилань: %d\n"
@@ -1794,7 +1805,9 @@ msgstr "Неможливо в╕дкрити файл.!"
 #.
 #: libmutt/mbox.c:757
 msgid "sync: mbox modified, but no modified messages! (report this bug)"
-msgstr "sync: mbox модиф╕ковано, але нема╓ модиф╕кованих пов╕домлень! (пов╕домте про цю помилку)"
+msgstr ""
+"sync: mbox модиф╕ковано, але нема╓ модиф╕кованих пов╕домлень! (пов╕домте про "
+"цю помилку)"
 
 #: libmutt/mbox.c:787
 msgid "Writing messages... %d (%d%%)"

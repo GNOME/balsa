@@ -1,5 +1,7 @@
-2004-04-20 12:57  PeterB
+2004-04-20 15:44  PeterB
 
+	* libbalsa/message.c: don't add to user_hdrs when processing basic
+	headers.
 	* src/message-window.c: set title bar when message is set.
 	* src/balsa-message.c: check GMIME_IS_PART(info->body->mime_part).
 	* libbalsa/gmime-part-rfc2440.c: check for empty content.

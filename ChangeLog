@@ -1,5 +1,7 @@
-2005-03-22 20:31  PeterB
+2005-03-22 22:07  PeterB
 
+	* libbalsa/: libbalsa-conf.c, libbalsa-conf.h: set up correctly for
+	new user.
 	* libbalsa/libbalsa-conf.c: more careful rewrite, more user
 	feedback.
 	* src/main.c: set balsa_icon.png as default window icon.

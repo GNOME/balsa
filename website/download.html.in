@@ -18,30 +18,38 @@
 	<th colspan="2" align="left"><big>Source</big></th>
 </tr>
 <tr>
-	<td colspan="2"><a href="ftp://ftp.balsa.net/pub/balsa/balsa-0.6.0.tar.gz">Balsa 0.6.0</a></td>
+	<td colspan="2"><a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0.tar.gz">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0.tar.gz</a></td>
+	<td colspan="2"><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0.tar.gz</a></td>
 </tr>
 <tr>
 	<td colspan="2"><hr></td>
 </tr>
-<!--
 <tr>
 	<th colspan="2" align="left"><big>Packages</big></th>
 </tr>
 <tr>
-	<td>Red Hat</td>
-	<td><a href="ftp://ftp.balsa.net/pub/balsa/debian/balsa_0.6.0-1_i386.deb">Debian i386 (potato)</a></td>
+	<td><a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.src.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.src.rpm</a></td>
+	<td><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.src.rpm</a></td>
+</tr>
+<tr>
+	<td><a href="ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.i386.rpm">ftp://ftp.newton.cx/pub/balsa/balsa-0.8.0-1.i386.rpm</a></td
+	<td><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.8.0-1.i386.rpm</a></td>
+</tr>
+<tr>
+	<td><p>We are looking for someone to help us make Debian packages or provide packages for more architectures. If you're interested, 
+		email <a href="mailto:balsa-maintainers@theochem.kth.se>the Balsa maintainers</a></p></td>
 </tr>
 <tr>
 	<td colspan="2"><hr></td>
 </tr>
--->
 <tr>
 	<th colspan="2" align="left"><big>Requirements</big></th>
 </tr>
 <tr>
-	<td colspan="2">
-		<p><a href="http://www.gnome.org/start/">GNOME</a>, <a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList.tar.gz">libPropList</a></p>
-	</td>
+	<td colspan="2"><a href="http://www.gnome.org/start/">A basic GNOME installation</a></td>
+</tr>
+<tr>
+	<td colspan="2"><a href="http://windowmaker.org/ftp/pub/beta/srcs/libPropList.tar.gz">libPropList</a></td>
 </tr>
 </table>
 

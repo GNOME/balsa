@@ -1,3 +1,9 @@
+2000-05-21  Peter Williams  <peter@beta.newton.cx>
+
+	* main.html.in: Announce Balsa 0.8.0
+
+	* download.html.in: Nicer download page.
+
 2000-05-16  Peter Williams  <peter@beta.newton.cx>
 
 	* Makefile.am: Comment out .png's when installing from images/;

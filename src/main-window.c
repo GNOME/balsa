@@ -2240,13 +2240,14 @@ display_new_mail_notification(int num_new)
         gdk_window_raise(dlg->window);
     } else {
         num_total = num_new;
-        dlg = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                                     GTK_DIALOG_DESTROY_WITH_PARENT,
+        dlg = gtk_message_dialog_new(NULL, /* NOT transient for
+                                            * Balsa's main window */
+                                     (GtkDialogFlags) 0,
                                      GTK_MESSAGE_INFO,
                                      GTK_BUTTONS_OK, msg);
         gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
-        gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog",
-                               "Balsa");
+        gtk_window_set_type_hint(GTK_WINDOW(dlg),
+                                 GDK_WINDOW_TYPE_HINT_NORMAL);
         g_signal_connect(G_OBJECT(dlg), "response",
                          G_CALLBACK(gtk_widget_destroy), NULL);
         g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);

@@ -1,3 +1,8 @@
+2005-03-31 19:58  PeterB
+
+	* src/sendmsg-window.c: remember folder when including file in
+	message content.
+
 2005-03-30 19:45  PeterB
 
 	* src/balsa-message.c: fix bug 172145.

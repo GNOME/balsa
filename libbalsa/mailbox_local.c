@@ -323,7 +323,7 @@ libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
     LibBalsaMessage *message =
 	libbalsa_mailbox_get_message(mailbox, msgno);
 
-    return match_condition(iter->condition, message, TRUE);
+    return libbalsa_condition_matches(iter->condition, message, TRUE);
 }
 
 static void
@@ -363,7 +363,7 @@ libbalsa_mailbox_link_message(LibBalsaMailboxLocal *mailbox,
 	&& !LIBBALSA_MESSAGE_IS_DELETED(msg))
         mbx->unread_messages++;
     if(!mbx->view_filter ||
-       match_condition(mbx->view_filter, msg, TRUE))
+       libbalsa_condition_matches(mbx->view_filter, msg, TRUE))
         libbalsa_mailbox_msgno_inserted(mbx, msg->msgno);
     if (libbalsa_message_is_partial(msg, &id)) {
 	libbalsa_mailbox_try_reassemble(mbx, id);
@@ -445,9 +445,10 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
 	 */
         gboolean old_match = 
             (!mailbox->view_filter || 
-             match_condition(mailbox->view_filter, msg, TRUE));
+             libbalsa_condition_matches(mailbox->view_filter, msg, TRUE));
         gboolean new_match = 
-            (!view_filter || match_condition(view_filter, msg, TRUE));
+            (!view_filter ||
+	     libbalsa_condition_matches(view_filter, msg, TRUE));
         if(old_match && !new_match) {
             printf("removing %d (%ld) from view\n", msgno, msg->msgno);
 	    libbalsa_mailbox_msgno_filt_out(mailbox, msgno);

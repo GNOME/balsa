@@ -462,9 +462,9 @@ fetch_single_msg(int s, void *file, msg_append_func msg_append,
 	}
 	else
 	    p = buffer;
-	
-	if ( fwrite( p, chunk, 1, file ) < (size_t)chunk )
-	    return POP_WRITE_ERR;
+
+	if(msg_append (p, (size_t) chunk, file) != 1)
+            return POP_WRITE_ERR;	
     } /* end of while */
     
     DM("POP3: Message %d retrieved", msgno);
@@ -539,7 +539,7 @@ fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 static size_t
 fetch_direct_msg_append(const char *text, size_t len, void *data)
 {
-    return(len);
+    return fwrite( text, len, 1, (FILE *)data );
 }
 
 static PopStatus

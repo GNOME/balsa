@@ -544,6 +544,9 @@ static void free_messages_info(GArray *messages_info)
     struct message_info *msg_info;
     guint i;
 
+    if(!messages_info)
+	return;
+
     for (i=0; i<messages_info->len; i++) {
 	msg_info = &g_array_index(messages_info, struct message_info, i);
 	g_free(msg_info->filename);
@@ -628,11 +631,10 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox)
 	    if (!msg_info->filename || msg_info->filename[0] == ',')
 		continue;
 	    /* MH just moves files out of the way when you delete them */
-	    char *orig = g_strdup_printf("%s/%s", path, msg_info->filename);
-	    tmp = g_strdup_printf("%s/,%s", path, msg_info->filename);
-	    unlink(tmp);
-	    rename(orig, tmp); /* FIXME: change to safe_rename??? */
-	    g_free(tmp);
+	    /* chbm: not quite, however this is probably a good move for
+	       flag deleted */
+ 	    char *orig = g_strdup_printf("%s/%s", path, msg_info->filename);
+	    unlink(orig);
 	    g_free(orig);
 	    /* free old information */
 	    g_free(msg_info->filename);

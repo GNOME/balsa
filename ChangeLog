@@ -1,5 +1,6 @@
-2003-10-19 20:12  PeterB
+2003-10-20 16:44  PeterB
 
+	* libbalsa/address.c: Plug a memory leak.
 	* src/: balsa-message.c, save-restore.c: Plug memory leaks.
 
 2003-10-19  Carlos Morgado  <chbm gnome.org>

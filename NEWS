@@ -1,9 +1,16 @@
-* Balsa-2.1.91 release. Release date 2004-06-06
+* Balsa-2.2.0 release. Release date 2004-07-06
+
+- fix 143322, 143263, 145701.
+- GPGME updates.
+- GSSAPI IMAP authentication.
+- more build fixes.
+
+* Balsa-2.1.91 release. Release date 2004-07-06
 
 - multiple build fixes.
 - few crashes fixed.
 
-* Balsa-2.1.90 release. Release date 2004-06-03
+* Balsa-2.1.90 release. Release date 2004-07-03
 
 - mailbox scanning improvements.
 - Edit/Find UI more user-friendly.

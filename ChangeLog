@@ -1,5 +1,6 @@
-2004-01-07 18:39  PeterB
+2004-01-07 19:15  PeterB
 
+	* libbalsa/mailbox_imap.c: Fix last commit.
 	* src/balsa-mblist.c: new_messages member has gone away.
 	* src/balsa-index.c: Don't connect to column "clicked"; remove
 	callback and simplify helpers; use LibBalsaMailboxColumn enum.

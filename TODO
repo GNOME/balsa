@@ -1,20 +1,32 @@
 TODO LIST:
 
- * Look into recursing directories upon local mail reading.
-   This this should create submenus under the mailbox ctree.
+For 0.4.5 release:
 
-   * Update (07/27/98)
-     It now does recursion, but we will need to complete
-     gforest to replace the glist that the mailboxes are
-     currently stored in.
+ * get reply/forward working
+     need to convert the message body into text and quote it.  mla is working
+     on this.
+ 
+ * mailbox-conf - (is run from right clicking on the mailbox list).  This
+   may need to use multiple windows, but I don't really want to do this.
+   Adding mailboxes under a folder, should add them to that tree limb, and
+   should create the mailbox as a 0 len file if it doesn't already exist.
 
- * Make an inbox which all external mail sources route mail
-   through, which filters then move around as needed.  It
-   needs to be possible to set a default folder for external
-   sources to be delivered into as well.
+ * inbox/outbox/trash should be able to be something other than mbox.  Need to
+   add support for IMAP, mh or maildir ones.  (mh and/or maildir might work)
+
+ * fix it under solaris.  test under aix, hpux, and osf (digital unix i fink?)
+ 
+ * fix checking for new mail inside mailboxes.
+     we have a full mail tray and an empty one.  full should be used to show
+     messages with new mail.  the mailbox name should also be in bold.
+
+ * finish balsa-init so that it will setup your mailboxes correctly.
+
+ * get pref-manager working with gnome-propertybox
+
+later stuff:
 
  * digest/undigest mail.
 
-Balsa Library (libbalsa):
+ * add mutt keybindings
 
- * sending mail

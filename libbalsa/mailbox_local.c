@@ -168,25 +168,31 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 
     g_return_val_if_fail(mailbox, -1);
     g_return_val_if_fail(path, -1);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), -1);
 
     if ( mailbox->path != NULL ) {
 	if (g_strcasecmp(path, mailbox->path) == 0)
 	    return 0;
-	else
+	else 
 	    i = rename(mailbox->path, path);
     } else {
-	if(LIBBALSA_MAILBOX(mailbox)->is_directory)
+	if(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox))
 	    i = libbalsa_mailbox_maildir_create(path, TRUE);
-	else 
-	    i = libbalsa_mailbox_mbox_create(path, TRUE);
+	else if(LIBBALSA_IS_MAILBOX_MH(mailbox))
+	    i = libbalsa_mailbox_mh_create(path, TRUE);
+	else if(LIBBALSA_IS_MAILBOX_MBOX(mailbox))
+	    i = libbalsa_mailbox_mbox_create(path, TRUE);	    
     }
 
     /* update mailbox data */
-    libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
-    g_free(mailbox->path);
-    mailbox->path = g_strdup(path);
-    libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
-    return i;
+    if(!i) {
+	libbalsa_notify_unregister_mailbox(LIBBALSA_MAILBOX(mailbox));
+	g_free(mailbox->path);
+	mailbox->path = g_strdup(path);
+	libbalsa_notify_register_mailbox(LIBBALSA_MAILBOX(mailbox));
+	return(0);
+    } else
+	return errno;
 }
 
 void

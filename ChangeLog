@@ -1,3 +1,10 @@
+2001-03-05  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_local.c: 
+	* libbalsa/mailbox_maildir.c:
+	* libbalsa/mailbox_mbox.c:
+	* libbalsa/mailbox_mh.c: better handling of errors, MH and maildirs
+	
 2001-03-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/main-window.c: do mailbox notify_check() in the checking thread.

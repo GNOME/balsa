@@ -108,9 +108,11 @@ libbalsa_mailbox_mbox_create(const gchar * path, gboolean create)
 	magic_type = mx_get_magic(path);
 	libbalsa_unlock_mutt();
 	
-	if ( magic_type != M_MBOX )
+	if ( magic_type != M_MBOX ) {
 	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 				 _("Mailbox %s does not appear to be an Mbox mailbox."), path);
+	    return(-1);
+	}
     } else {
 	if(!create)
 	    return(-1);

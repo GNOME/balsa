@@ -36,63 +36,13 @@ gchar *libbalsa_make_string_from_list_p(const GList * the_list);
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 extern pthread_mutex_t mailbox_lock;
-/*  #define DEBUG */
+void libbalsa_lock_mailbox(LibBalsaMailbox * mailbox);
+void libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox);
 
-#ifdef DEBUG
-#define DMSG1(s) fprintf(stderr,s)
-#define DMSG2(a,b) fprintf(stderr,a,b)
-#else
-#define DMSG1(s)
-#define DMSG2(a,b)
-#endif
+#define LOCK_MAILBOX(mailbox) libbalsa_lock_mailbox(mailbox)
+#define LOCK_MAILBOX_RETURN_VAL(mailbox, val) libbalsa_lock_mailbox(mailbox)
+#define UNLOCK_MAILBOX(mailbox) libbalsa_unlock_mailbox(mailbox)
 
-#ifndef __GNUC__
-#define __PRETTY_FUNCTION__	__FILE__
-#endif
-
-#define LOCK_MAILBOX(mailbox)\
-do {\
-  pthread_mutex_lock( &mailbox_lock );\
-    if ( !mailbox->lock )\
-    {\
-	  DMSG2("Locking mailbox %s\n", mailbox->name );\
-      mailbox->lock = TRUE;\
-      pthread_mutex_unlock( &mailbox_lock );\
-      break;\
-    }\
-  else\
-    {\
-      DMSG1("... Mailbox lock collision ..." );\
-      pthread_mutex_unlock( &mailbox_lock );\
-      usleep( 250 );\
-    }\
-  } while ( 1 )
-
-#define LOCK_MAILBOX_RETURN_VAL(mailbox, val)\
-do {\
-  pthread_mutex_lock( &mailbox_lock );\
-    if ( !mailbox->lock )\
-    {\
-	  DMSG1( "Locking mailbox \n" );\
-      mailbox->lock = TRUE;\
-      pthread_mutex_unlock( &mailbox_lock );\
-      break;\
-    }\
-  else\
-    {\
-      DMSG1( "Mailbox lock collision \n" );\
-      pthread_mutex_unlock( &mailbox_lock );\
-      usleep( 250 );\
-    }\
-  } while ( 1 )
-
-#define UNLOCK_MAILBOX(mailbox)\
-do {\
-  DMSG1( "Unlocking mailbox \n" );\
-  pthread_mutex_lock( &mailbox_lock );\
-  mailbox->lock = FALSE;\
-  pthread_mutex_unlock( &mailbox_lock );\
-}  while( 0 )
 #else
 
 /* Non-threaded locking mechanism */

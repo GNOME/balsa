@@ -307,8 +307,9 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 unsigned
 imap_mbox_handle_require_tls(ImapMboxHandle* r, unsigned state)
 {
+  unsigned res;
   g_return_val_if_fail(r,0);
-  unsigned res = r->require_tls;
+  res = r->require_tls;
   r->require_tls = state;
   return res;
 }

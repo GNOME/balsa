@@ -64,6 +64,9 @@ balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h \
 
 balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
 
+EXTRA_DIST = \
+	Balsa.idl
+
 # auto* *SHOULD* figure this out *grr*
 $(balsa_BASE_SRCLIST): $(balsa_IDL_SRCLIST)
 

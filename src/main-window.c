@@ -1754,6 +1754,8 @@ show_about_box(void)
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
         "Peter Bloomfield <PeterBloomfield@bellsouth.net>",
+	"Bart Visscher <magick@linux-fan.com>",
+        "Emmanuel Allaud <e.allaud@wanadoo.fr>",
         "Carlos Morgado <chbm@chbm.nu>",
         "Pawel Salek <pawsa@theochem.kth.se>",
         "and many others (see AUTHORS file)",

@@ -46,11 +46,6 @@ static pthread_t main_thread_id;
 #define LDAP_SERVER "ldap"
 
 
-void mutt_exit(int code);
-int mutt_yesorno(const char *msg, int def);
-int mutt_any_key_to_continue(const char *s);
-void mutt_clear_error(void);
-
 static gchar *qualified_hostname(const char *name);
 static char *Spoolfile; // libmutt leftover
 
@@ -63,25 +58,6 @@ libbalsa_message(const char *fmt, ...)
     libbalsa_information_varg(NULL, LIBBALSA_INFORMATION_MESSAGE,
                               fmt, va_args);
     va_end(va_args);
-}
-
-void
-mutt_exit(int code)
-{
-}
-
-
-int
-mutt_yesorno(const char *msg, int def)
-{
-    libbalsa_information(LIBBALSA_INFORMATION_DEBUG, "YES/NO: %s (%d)",
-			 msg, def);
-    return 1;
-}
-
-void
-mutt_clear_error(void)
-{
 }
 
 void
@@ -373,11 +349,9 @@ libbalsa_assure_balsa_dir(void)
 
 
 #ifdef USE_SSL
-#include "keymap_defs.h"
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <openssl/err.h>
-int libmutt_ask_for_cert_acceptance(X509 *cert);
 char *asn1time_to_string (ASN1_UTCTIME *tm);
 char *x509_get_part (char *line, const char *ndx);
 void x509_fingerprint (char *s, int l, X509 * cert);

@@ -1,3 +1,7 @@
+* Balsa-2.1.0 release. Release date 2004-01-11
+
+- entirely new backend and message index.
+
 * Balsa-2.0.14 release. Release date 2003-08-26
 
 - message wrapping improvements, RFC 2646 support.

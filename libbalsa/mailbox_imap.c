@@ -1279,7 +1279,10 @@ libbalsa_address_new_from_imap_address(ImapAddress *addr)
 	    g_list_append(address->address_list,
 			  g_mime_utils_header_decode_text(addr->
 							  addr_spec));
-
+    else { /* FIXME: is that a right thing? */
+        g_object_unref(G_OBJECT(address));
+        address = NULL;
+    }
     return address;
 }
 

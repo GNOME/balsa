@@ -14,6 +14,9 @@ EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in \
 	balsa.desktop \
+	intltool-extract.in	\
+	intltool-merge.in	\
+	intltool-update.in	\
 	gnome-balsa2.png \
 	HACKING			\
 	docs/mh-mail-HOWTO	\

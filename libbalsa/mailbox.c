@@ -1409,30 +1409,8 @@ translate_message (HEADER * cur)
           p = tmp->data + 11;
           SKIPWS (p);
 
-          message->fcc_mailbox = NULL;
-          if (balsa_app.mailbox_nodes && p != NULL) {
-            if (!strcmp (p, balsa_app.sentbox->name))
-              message->fcc_mailbox = balsa_app.sentbox;
-            else if (!strcmp (p, balsa_app.draftbox->name))
-              message->fcc_mailbox = balsa_app.draftbox;
-            else if (!strcmp (p, balsa_app.outbox->name))
-              message->fcc_mailbox = balsa_app.outbox;
-            else if (!strcmp (p, balsa_app.trash->name))
-              message->fcc_mailbox = balsa_app.trash;
-            else {
-                GNode *walk;
-    
-                walk = g_node_last_child (balsa_app.mailbox_nodes);
-                while (walk) {
-                  if (!strcmp (p, ((MailboxNode *)((walk)->data))->name)) {
-                    message->fcc_mailbox =
-                        ((MailboxNode *)((walk)->data))->mailbox;
-                    break;
-                  } else
-                    walk = walk->prev;
-                }
-            }
-          }
+          message->fcc_mailbox = p != NULL ?
+	      balsa_find_mbox_by_name(p) : NULL;
         }
       else if (mutt_strncasecmp ("X-Mutt-Fcc:", tmp->data, 18) == 0)
         {

@@ -694,10 +694,37 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, Mailbox *mailbox
 	gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw), label);
 	
 	/* change the page to the newly selected notebook item */
-	gtk_notebook_set_page(GTK_NOTEBOOK(window->notebook),
-			      gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
+	gtk_notebook_set_page(
+	    GTK_NOTEBOOK(window->notebook),
+	    gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), 
+				  GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
 
+	g_free(balsa_app.open_mailbox);
+	balsa_app.open_mailbox = get_open_mailboxes_string();
 }
+
+static void cat_mbox_name(GtkWidget * w, gpointer data) {
+    gchar ** str = data;
+    GtkWidget * page = gtk_object_get_data(GTK_OBJECT(w),"indexpage");
+    if(*str) {
+	gchar *ns = g_strconcat(*str,";",
+				BALSA_INDEX_PAGE(page)->mailbox->name,
+				NULL);
+	g_free(*str);
+	*str = ns;
+    } else *str = g_strdup(BALSA_INDEX_PAGE(page)->mailbox->name);
+}
+
+static gchar *
+get_open_mailboxes_string()
+{
+    gchar * res = NULL;
+    if(balsa_app.notebook)
+	gtk_container_foreach(GTK_CONTAINER(balsa_app.notebook), cat_mbox_name,
+			      &res);
+    return res ? res : g_strdup("");
+}
+
 
 static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbox)
 {
@@ -725,6 +752,8 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, Mailbox *mailbo
 	  balsa_message_clear (BALSA_MESSAGE( window->preview ));
 	  gnome_appbar_set_default (balsa_app.appbar, "Mailbox closed");
 	}
+	g_free(balsa_app.open_mailbox);
+	balsa_app.open_mailbox = get_open_mailboxes_string();
       }
 }
 

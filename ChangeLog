@@ -1,4 +1,16 @@
-2000-06-20  Pawel Salek  <pawsa@theochem.kth.se>
+2000-06-1   Pawel Salek  <pawsa@theochem.kth.se>
+
+	Safe quitting and general clean up.
+	* libbalsa/mailbox.c,src/sendmsg-window.c: use
+	balsa_find_mbox_by_name(p)
+	* src/balsa-app.[hc]: balsa_find_mbox_by_name(p) generalized,
+	moved from src/mblist-window.c
+	* src/main-window.c: recreate list of open mailboxes on change.
+	* src/main.c: code clean up, use force_close_mailbox(), empty trash()
+	doesn't try to refer to nonexisting objects.
+	* src/save-restore.c: use pre-created open mailboxes string.
+	
+	2000-06-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* README: local mailbox locking configure switches explained.
 	

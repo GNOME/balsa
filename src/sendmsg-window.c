@@ -1282,29 +1282,9 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message = bsmsg2message (bsmsg);
 
   tmp = gtk_entry_get_text (GTK_ENTRY(GTK_COMBO(bsmsg->fcc[1])->entry));
-  message->fcc_mailbox = NULL;
-  if (balsa_app.mailbox_nodes && tmp != NULL) {
-    if (!strcmp (tmp, balsa_app.sentbox->name))
-       message->fcc_mailbox = balsa_app.sentbox;
-    else if (!strcmp (tmp, balsa_app.draftbox->name))
-       message->fcc_mailbox = balsa_app.draftbox;
-    else if (!strcmp (tmp, balsa_app.outbox->name))
-       message->fcc_mailbox = balsa_app.outbox;
-    else if (!strcmp (tmp, balsa_app.trash->name))
-       message->fcc_mailbox = balsa_app.trash;
-    else {
-      GNode *walk;
-    
-      walk = g_node_last_child (balsa_app.mailbox_nodes);
-      while (walk) {
-        if (!strcmp (tmp, ((MailboxNode *)((walk)->data))->name)) {
-          message->fcc_mailbox = ((MailboxNode *)((walk)->data))->mailbox;
-          break;
-        } else
-          walk = walk->prev;
-      }
-    }
-  }
+  message->fcc_mailbox = tmp != NULL ? 
+      balsa_find_mbox_by_name(tmp) : NULL;
+  
 
   /* not a really nice way of setting and restoring charset..  */
   def_charset =  balsa_app.charset;

@@ -691,30 +691,6 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 }				/* config_mailbox_init */
 
 
-static void cat_mbox_name(GtkWidget * w, gpointer data) {
-    gchar ** str = data;
-    GtkWidget * page = gtk_object_get_data(GTK_OBJECT(w),"indexpage");
-    if(*str) {
-	gchar *ns = g_strconcat(*str,";",
-				BALSA_INDEX_PAGE(page)->mailbox->name,
-				NULL);
-	g_free(*str);
-	*str = ns;
-    } else *str = g_strdup(BALSA_INDEX_PAGE(page)->mailbox->name);
-}
-
-/* FIXME PS: it seems that this function is called when balsa_app.notebook
-   is NULL. This is possibly a bug, search and destroy it. */
-static gchar *
-get_open_mailboxes_string()
-{
-    gchar * res = NULL;
-    if(balsa_app.notebook)
-	gtk_container_foreach(GTK_CONTAINER(balsa_app.notebook), cat_mbox_name,
-			      &res);
-    return res ? res : g_strdup("");
-}
-
 /* Load Balsa's global settings */
 gint
 config_global_load (void)
@@ -1084,7 +1060,6 @@ config_global_save (void)
 {
   proplist_t globals, temp_str;
   char tmp[MAX_PROPLIST_KEY_LEN];
-  gchar * oms;
 
   g_assert (balsa_app.proplist != NULL);
 
@@ -1267,9 +1242,7 @@ config_global_save (void)
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.check_mail_upon_startup);
   pl_dict_add_str_str (globals, "CheckMailUponStartup", tmp);
 
-  oms = get_open_mailboxes_string();
-  pl_dict_add_str_str (globals, "OpenMailboxes", oms);
-  g_free(oms);
+  pl_dict_add_str_str (globals, "OpenMailboxes", balsa_app.open_mailbox);
 
   snprintf (tmp, sizeof (tmp), "%d", balsa_app.remember_open_mboxes);
   pl_dict_add_str_str (globals, "RememberOpenMailboxes", tmp);

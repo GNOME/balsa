@@ -236,7 +236,7 @@ main (int argc, char *argv[])
      gint i =0;
      gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
      while(names[i]) {
-	Mailbox *mbox = mblist_find_mbox_by_name(names[i]);
+	Mailbox *mbox = balsa_find_mbox_by_name(names[i]);
 	if(balsa_app.debug)
 	    fprintf(stderr,"opening %s => %p..\n", names[i], mbox);
 	if(mbox) {
@@ -260,53 +260,6 @@ main (int argc, char *argv[])
   return 0;
 }
 
-static gboolean
-close_all_mailboxes (GNode * node, gpointer data)
-{
-  Mailbox *mailbox;
-  MailboxNode *mbnode;
-
-  if (node->data)
-    {
-      mbnode = (MailboxNode *) node->data;
-
-      if (mbnode)
-	{
-	  gchar *tmpfile;
-
-	  if (mbnode->IsDir)
-	    {
-	      if (mbnode->expanded)
-		{
-		  tmpfile = g_strdup_printf ("%s/.expanded", mbnode->name);
-		  if (access (tmpfile, F_OK) == -1)
-		    creat (tmpfile, S_IRUSR | S_IWUSR);
-		  g_free (tmpfile);
-		}
-	      else
-		{
-		  tmpfile = g_strdup_printf ("%s/.expanded", mbnode->name);
-		  if (access (tmpfile, F_OK) != -1)
-		    unlink (tmpfile);
-		  g_free (tmpfile);
-		}
-	    }
-
-	  mailbox = mbnode->mailbox;
-
-	  if (!mailbox)
-	    return FALSE;
-
-	  if (balsa_app.debug)
-	    g_print ("Mailbox: %s Ref: %d\n", mailbox->name, mailbox->open_ref);
-
-	  while (mailbox->open_ref > 0)
-	    mailbox_open_unref (mailbox);
-	}
-    }
-  return FALSE;
-}
-
 static void
 force_close_mailbox(Mailbox *mailbox) {
     if (!mailbox) return;
@@ -316,6 +269,30 @@ force_close_mailbox(Mailbox *mailbox) {
 	mailbox_open_unref (mailbox);
 }
 
+static gboolean
+close_all_mailboxes (GNode * node, gpointer data)
+{
+    Mailbox *mailbox;
+    MailboxNode *mbnode = (MailboxNode *) node->data;
+    
+    if (mbnode)
+    {
+	if (mbnode->IsDir)
+	{
+	    gchar *tmpfile = g_strdup_printf ("%s/.expanded", mbnode->name);
+	    if (access (tmpfile, F_OK) != -1) {
+		if (mbnode->expanded)
+		    creat (tmpfile, S_IRUSR | S_IWUSR);
+		else
+		    unlink (tmpfile);
+	    }
+	    g_free (tmpfile);
+	}
+	
+	force_close_mailbox(mbnode->mailbox);
+    }
+    return FALSE;
+}
 
 void
 balsa_exit (void)
@@ -355,7 +332,7 @@ empty_trash( void )
 	BalsaIndexPage *page;
 	GList *message;
 
-	balsa_mailbox_open(balsa_app.trash);
+	mailbox_open_ref(balsa_app.trash);
 
 	message = balsa_app.trash->message_list;
 
@@ -365,7 +342,7 @@ empty_trash( void )
 	}
 	mailbox_commit_flagged_changes(balsa_app.trash);
 
-	balsa_mailbox_close(balsa_app.trash);
+	mailbox_open_unref(balsa_app.trash);
 
 	if ( balsa_app.notebook && 
 	     (page=balsa_find_notebook_page(balsa_app.trash)))

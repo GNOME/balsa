@@ -213,6 +213,34 @@ mru_menu_cb(gchar * url, gpointer data)
     close_message_window(NULL, (gpointer) mw);
 }
 
+/* FIXME: any protection for destroying message window before idle
+   handler is called?
+*/
+static gboolean
+message_window_idle_handler(MessageWindow* mw)
+{
+    BalsaMessage *msg = BALSA_MESSAGE(mw->bmessage);
+    LibBalsaMessage *message;
+
+    gdk_threads_enter();
+    message = gtk_object_get_data(GTK_OBJECT(msg), "message");
+
+    balsa_message_set(msg, message);
+
+    if(msg && msg->part_list) {
+        GnomeIconList *gil = GNOME_ICON_LIST(msg->part_list);
+	if(gil->icons >= 2) {
+	    set_toolbar_button_sensitive(mw->window, 2,
+					 BALSA_PIXMAP_PREVIOUS, TRUE);
+	    set_toolbar_button_sensitive(mw->window, 2,
+					 BALSA_PIXMAP_NEXT, TRUE);
+	}
+    }
+    gtk_object_unref(GTK_OBJECT(message)); 
+    gdk_threads_leave();
+    return FALSE;
+}
+
 void
 message_window_new(LibBalsaMessage * message)
 {
@@ -220,7 +248,6 @@ message_window_new(LibBalsaMessage * message)
     gchar *title;
     GtkWidget *scroll;
     GtkWidget *move_menu, *submenu;
-    GnomeIconList *gil;
 
     if (!message)
 	return;
@@ -351,18 +378,9 @@ message_window_new(LibBalsaMessage * message)
     gtk_widget_show(mw->bmessage);
     gtk_widget_show(mw->window);
 
-    balsa_message_set(BALSA_MESSAGE(mw->bmessage), message);
-
-    if(mw->bmessage != NULL &&
-       ((BalsaMessage *)mw->bmessage)->part_list != NULL) {
-	gil=GNOME_ICON_LIST(((BalsaMessage *)mw->bmessage)->part_list);
-	if(gil->icons >= 2) {
-	    set_toolbar_button_sensitive(mw->window, 2,
-					 BALSA_PIXMAP_PREVIOUS, TRUE);
-	    set_toolbar_button_sensitive(mw->window, 2,
-					 BALSA_PIXMAP_NEXT, TRUE);
-	}
-    }
+    gtk_object_set_data(GTK_OBJECT(mw->bmessage), "message", message);
+    gtk_object_ref(GTK_OBJECT(message)); /* protect from destroying */
+    gtk_idle_add((GtkFunction)message_window_idle_handler, mw);
 }
 
 static void

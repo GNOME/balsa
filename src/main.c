@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2002 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -258,17 +258,19 @@ threads_destroy(void)
 static gboolean
 initial_open_unread_mailboxes()
 {
-    GList *i, *gl = mblist_find_all_unread_mboxes();
+    GList *i, *gl;
+    
+    gdk_threads_enter();
+    gl = mblist_find_all_unread_mboxes();
 
-    if (!gl)
-	return FALSE;
-
-    for (i = g_list_first(gl); i; i = g_list_next(i)) {
-	printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
-	mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+    if (gl) {
+        for (i = g_list_first(gl); i; i = g_list_next(i)) {
+            printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
+            mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+        }
+        g_list_free(gl);
     }
-    g_list_free(gl);
-
+    gdk_threads_leave();
     return FALSE;
 }
 
@@ -282,7 +284,9 @@ initial_open_inbox()
 	return FALSE;
 
     printf("opening %s..\n", (LIBBALSA_MAILBOX(balsa_app.inbox))->name);
+    gdk_threads_enter();
     mblist_open_mailbox(LIBBALSA_MAILBOX(balsa_app.inbox));
+    gdk_threads_leave();
     
     return FALSE;
 }

@@ -1,3 +1,9 @@
+2002-06-24  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/main.c: do not forget to GDK-lock idle functions.
+	* src/message-window.c: idle-open message in a separate window -
+	the original method could lock window manager.
+
 2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
 
 	* libbalsa/folder-scanners.c: do not lock GDK when scanning imap.

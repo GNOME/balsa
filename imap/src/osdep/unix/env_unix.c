@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	11 March 1998
+ * Last Edited:	10 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -318,8 +318,7 @@ void server_traps (void *clkint,void *kodint,void *hupint,void *trmint)
   arm_signal (SIGHUP,hupint);	/* prepare for hangup */
   arm_signal (SIGTERM,trmint);	/* prepare for termination */
 }
-
-
+
 /* Server log in
  * Accepts: user name string
  *	    password string
@@ -342,8 +341,11 @@ long server_login (char *user,char *pwd,int argc,char *argv[])
 	   ((pw = checkpw (pw,pwd,argc,argv)) ||
 	    ((*pwd == ' ') && (pw = getpwnam (usr)) &&
 	     (pw = checkpw (pw,pwd + 1,argc,argv)))) &&
-	   ((pw->pw_uid == geteuid ()) || loginpw (pw,argc,argv)))
-    return env_init (pw->pw_name,pw->pw_dir);
+	   ((pw->pw_uid == geteuid ()) || loginpw (pw,argc,argv)) &&
+	   env_init (pw->pw_name,pw->pw_dir)) {
+    chdir (myhomedir ());	/* placate those who would be upset */
+    return LONGT;
+  }
   s = (logtry-- > 0) ? "Login failure" : "Excessive login attempts";
 				/* note the failure in the syslog */
   syslog (LOG_INFO,"%s user=%.80s host=%.80s",s,user,tcp_clienthost ());
@@ -362,8 +364,11 @@ long anonymous_login (int argc,char *argv[])
 {
   struct passwd *pw = getpwnam (anonymous_user);
 				/* log in Mr. A. N. Onymous */
-  return (pw && pw->pw_uid && loginpw (pw,argc,argv)) ?
-    env_init (NIL,NIL) : NIL;
+  if (pw && pw->pw_uid && loginpw (pw,argc,argv) && env_init (NIL,NIL)) {
+    chdir (myhomedir ());	/* placate those who would be upset */
+    return LONGT;
+  }
+  return NIL;
 }
 
 /* Initialize environment
@@ -412,7 +417,6 @@ long env_init (char *user,char *home)
 				/* make sure an error message happens */
     if (!blackBoxDir) blackBoxDir = blackBoxDefaultHome = anonymousHome;
   }
-  chdir (myHomeDir);		/* placate those who would be upset */
   dorc (strcat (strcpy (tmp,myHomeDir),"/.mminit"),T);
   dorc (strcat (strcpy (tmp,myHomeDir),"/.imaprc"),NIL);
   if (!myLocalHost) mylocalhost ();

@@ -9,7 +9,7 @@
 #		Internet: MRC@CAC.Washington.EDU
 #
 # Date:		11 May 1989
-# Last Edited:	23 March 1998
+# Last Edited:	14 April 1998
 #
 # Copyright 1998 by the University of Washington
 #
@@ -46,7 +46,7 @@ AFSLIB=$(AFSDIR)/lib
 AFSLDFLAGS=-L$(AFSLIB)/afs -L$(AFSLIB)\
  -lkauth -lprot -lubik -lauth -lrxkad -lsys -lrx -llwp -ldes -lcom_err\
  $(AFSLIB)/afs/util.a -laudit
-DCECFLAGS= -DDCE_MINIMAL -DPASSWD_OVERRIDE=\\\"/opt/pop3/passwd/passwd\\\"
+DCECFLAGS= -DDCE_MINIMAL -DPASSWD_OVERRIDE=\"/opt/pop3/passwd/passwd\"
 DCELDFLAGS= -ldce
 
 
@@ -566,14 +566,14 @@ build:	clean once ckp$(PASSWDTYPE) $(EXTRAAUTHENTICATORS) $(ARCHIVE)
 all:	$(ARCHIVE)
 
 $(ARCHIVE): $(BINARIES)
-	$(RM) $(ARCHIVE)
+	$(RM) $(ARCHIVE) || true
 	$(ARRC) $(ARCHIVE) $(BINARIES)
 	$(RANLIB) $(ARCHIVE)
 
 # Cleanup
 
 clean:
-	$(RM) *.o linkage.[ch] auths.c $(ARCHIVE) osdep.* *TYPE *FLAGS
+	$(RM) *.o linkage.[ch] auths.c $(ARCHIVE) osdep.* *TYPE *FLAGS || true
 
 
 # Dependencies
@@ -622,7 +622,7 @@ osdep.o:mail.h misc.h env.h fs.h ftl.h nl.h tcp.h \
 	$(CC) $(CFLAGS) `cat OSCFLAGS` -c osdep.c
 
 osdep.c: osdepbas.c osdepckp.c osdeplog.c
-	$(RM) osdep.c
+	$(RM) osdep.c || true
 	cat osdepbas.c osdepckp.c osdeplog.c > osdep.c
 
 siglocal.c:	# cretin Linux

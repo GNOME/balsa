@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	22 November 1989
- * Last Edited:	25 March 1998
+ * Last Edited:	12 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -306,6 +306,11 @@ void *mail_parameters (MAILSTREAM *stream,long function,void *value)
     mailproxycopy = (mailproxycopy_t) value;
   case GET_MAILPROXYCOPY:
     ret = (void *) mailproxycopy;
+    break;
+  case SET_PARSEPHRASE:
+    mailparsephrase = (parsephrase_t) value;
+  case GET_PARSEPHRASE:
+    ret = (void *) mailparsephrase;
     break;
   case SET_SERVICENAME:
     servicename = (char *) value;
@@ -1092,7 +1097,8 @@ char *mail_fetch_message (MAILSTREAM *stream,unsigned long msgno,
 				/* copy in case text method stomps on it */
   s = memcpy ((char *) fs_get ((size_t) i),u,(size_t) i);
   if ((*stream->dtb->text) (stream,msgno,&bs,flags)) {
-				/* build combined copy */
+    t = &stream->text;		/* build combined copy */
+    if (t->data) fs_give ((void **) &t->data);
     t->data = (unsigned char *) fs_get ((t->size = i + SIZE (&bs)) + 1);
     memcpy (t->data,s,(size_t) i);
     for (j = i; j < t->size; j++) t->data[j] = SNX (&bs);
@@ -4190,10 +4196,12 @@ void mail_free_threadnode (THREADNODE **thr)
 
 void auth_link (AUTHENTICATOR *auth)
 {
-  AUTHENTICATOR **a = &mailauthenticators;
-  while (*a) a = &(*a)->next;	/* find end of list of authenticators */
-  *a = auth;			/* put authenticator at the end */
-  auth->next = NIL;		/* this authenticator is the end of the list */
+  if (!auth->valid || (*auth->valid) ()) {
+    AUTHENTICATOR **a = &mailauthenticators;
+    while (*a) a = &(*a)->next;	/* find end of list of authenticators */
+    *a = auth;			/* put authenticator at the end */
+    auth->next = NIL;		/* this authenticator is the end of the list */
+  }
 }
 
 
@@ -4212,7 +4220,8 @@ char *mail_auth (char *mechanism,authresponse_t resp,int argc,char *argv[])
 				/* make upper case copy of mechanism name */
   ucase (strcpy (tmp,mechanism));
   for (auth = mailauthenticators; auth; auth = auth->next)
-    if (!strcmp (auth->name,tmp)) return (*auth->server) (resp,argc,argv);
+    if (auth->server && !strcmp (auth->name,tmp))
+      return (*auth->server) (resp,argc,argv);
   return NIL;			/* no authenticator found */
 }
 

@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	22 November 1989
- * Last Edited:	25 March 1998
+ * Last Edited:	2 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -885,6 +885,7 @@ typedef long (*mailproxycopy_t) (MAILSTREAM *stream,char *sequence,
 typedef long (*tcptimeout_t) (long time);
 typedef void *(*authchallenge_t) (void *stream,unsigned long *len);
 typedef long (*authrespond_t) (void *stream,char *s,unsigned long size);
+typedef long (*authcheck_t) (void);
 typedef long (*authclient_t) (authchallenge_t challenger,
 			      authrespond_t responder,NETMBX *mb,void *s,
 			      unsigned long *trial,char *user);
@@ -898,7 +899,7 @@ typedef char *(*imapreferral_t) (MAILSTREAM *stream,char *url,long code);
 typedef void (*overview_t) (MAILSTREAM *stream,unsigned long uid,OVERVIEW *ov);
 typedef unsigned long *(*sorter_t) (MAILSTREAM *stream,char *charset,
 				    SEARCHPGM *spg,SORTPGM *pgm,long flags);
-typedef ADDRESS *(*parsephrase_t) (char *phrase,char *end);
+typedef ADDRESS *(*parsephrase_t) (char *phrase,char *end,char *host);
 
 
 /* Globals */
@@ -952,6 +953,7 @@ NAMESPACE {
 
 AUTHENTICATOR {
   char *name;			/* name of this authenticator */
+  authcheck_t valid;		/* authenticator valid on this system */
   authclient_t client;		/* client function that supports it */
   authserver_t server;		/* server function that supports it */
   AUTHENTICATOR *next;		/* next authenticator */

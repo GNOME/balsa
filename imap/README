@@ -1,5 +1,5 @@
 		  IMAP4rev1/c-client Development Environment
-				8 January 1998
+				11 April 1998
 				 Mark Crispin
 
 			     BUG REPORTING ADDRESS
@@ -39,6 +39,7 @@ Sources:
  . src/charset		pre-processed character set conversion tables
  . src/ipopd		pre-processed POP2/POP3 daemon sources
  . src/imapd		pre-processed IMAP4rev1 daemon sources
+ . src/kerberos		unsupported Kerberos 4 modules from CMU
  . src/mtest		pre-processed c-client testbed sources
  . src/osdep/amiga	pre-processed Amiga-specific sources
  . src/osdep/dos	pre-processed DOS-specific sources
@@ -121,7 +122,7 @@ the user's home directory and is in UNIX mailbox format, then when INBOX is
 opened this file will be selected as INBOX instead of the mail spool file.
 Messages will be automatically transferred from the mail spool file into the
 mbox file.  To disable this behavior, delete "mbox" from the EXTRADRIVERS list
-in the file .../src/osdep/unix/Makefile and rebuild.
+in the top-level Makefile and rebuild.
 
      WARNING: The SVR2 (sv2) port is *incomplete*.  SVR2 does not appear to
 have any way to do ftruncate(), which is needed by the mbox, mbx, mmdf, mtx,
@@ -319,6 +320,8 @@ BATCON execute it.
      KCC loves to give lots of diagnostics about unused parameters.  That's
 perfectly alright; just ignore them.
 
+				OTHER SYSTEMS
+
 			       VMS BUILD NOTES
 
      This port is based upon files sent to me by Yehavi Bourvine,
@@ -342,3 +345,26 @@ time zone; the VMS C compiler returns a null pointer from gmtime()!
 
      Otherwise you're pretty much on your own here.  Ask Yehavi for help, not
 me.  Yehavi has a VMS local mail driver so you can get local mail services.
+
+
+		      AMIGA BUILD AND INSTALLATION NOTES
+
+     See the UNIX build notes.  I can't tell you much more than that, since
+the Amiga code was contributed.
+
+
+			       WCE BUILD NOTES
+
+     I build using Visual C++ 5.0 with the WCE extensions.  The current code
+has SH3 wired in for the compiler building.
+
+     To build under NT, connect to the imap-4.1 directory and do:
+	nmake -f makefile.wce
+
+     The only binary produced is a cclient.lib file.  I haven't gotten as far
+as building mtest on WCE, mainly because I don't have a stdlib library.
+
+
+			       OS2 BUILD NOTES
+
+     The OS2 port is incomplete.  There are no plans to continue work on it.

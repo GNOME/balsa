@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	11 May 1989
- * Last Edited:	30 December 1997
+ * Last Edited:	2 April 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -86,7 +86,7 @@ long env_init (char *user,char *home)
 {
   if (may_need_server_init) {	/* maybe need to do server init cruft? */
     may_need_server_init = NIL;	/* not any more we don't */
-    if (getuid () <= 0) {	/* if root, we're most likely a server */
+    if (!getuid ()) {		/* if root, we're most likely a server */
       t_sync (0);		/* PTX inetd is stupid, stupid, stupid */
       ioctl (0,I_PUSH,"tirdwr");/*  it needs this cruft, else servers won't */
       dup2 (0,1);		/*  work.  How obnoxious!!! */

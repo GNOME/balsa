@@ -1,4 +1,4 @@
-Updated: 20 January 1998
+Updated: 11 April 1998
 
 This is a snapshot of development sources of of the IMAP 4.1 toolkit.  It
 is updated frequently.
@@ -98,7 +98,7 @@ The following are known problems/deficiencies:
    . Bezerk driver is read-only and does not handle LF-only newlines well
    . No support for any TCP timeouts on Waterloo DOS
    . No support for TCP open timeouts on Winsock and generic DOS
-   . Flat file formats (bezerk, mts) do not permit mailboxes to have inferior
+   . Flat file formats (bezerk, mtx) do not permit mailboxes to have inferior
       names
  . Windows CE limitations:
    . No Kerberos support.

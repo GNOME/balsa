@@ -32,8 +32,8 @@ an incompatible manner.
 
      There are two other build-time configuration issues which you may
 need to consider: drivers and authenticators.  Both of these are set
-up in .../src/osdep/unix/Makefile -- in particular, by the
-EXTRADRIVERS and EXTRAAUTHENTICATORS variables.
+up in the top-level Makefile -- in particular, by the EXTRADRIVERS and
+EXTRAAUTHENTICATORS variables.
 
      Drivers are code modules that support different mailbox storage
 technologies.  By default, all drivers are enabled.  There is little

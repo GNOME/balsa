@@ -9,7 +9,7 @@
 #		Internet: MRC@CAC.Washington.EDU
 #
 # Date:		7 December 1989
-# Last Edited:	12 March 1998
+# Last Edited:	14 April 1998
 #
 # Copyright 1998 by the University of Washington
 #
@@ -100,7 +100,7 @@ BUILD=$(MAKE) build $(BUILDOPTIONS) EXTRASPECIALS="$(EXTRASPECIALS)"
 
 # Make the IMAP Toolkit
 
-all:	c-client rebuild
+all:	c-client rebuild bundled
 
 
 #  The following ports are defined.  These refer to the *standard* compiler
@@ -248,9 +248,12 @@ an ua:
 	$(TOOLS)/$@ "$(LN)" src/charset c-client
 	$(LN) `pwd`/src/kerberos/* c-client
 	$(TOOLS)/$@ "$(LN)" src/osdep/$(SYSTEM) c-client
+	$(TOOLS)/$@ "$(LN)" src/mtest mtest
+	$(TOOLS)/$@ "$(LN)" src/ipopd ipopd
+	$(TOOLS)/$@ "$(LN)" src/imapd imapd
 	$(LN) $(TOOLS)/$@ .
 
-build:	OSTYPE rebuild rebuildclean
+build:	OSTYPE rebuild rebuildclean bundled
 
 OSTYPE:
 	@echo Building c-client for $(OS)...
@@ -264,11 +267,17 @@ rebuild:
 	$(CD) c-client;$(MAKE) all CC=`cat CCTYPE` CFLAGS="`cat CFLAGS`"
 
 rebuildclean:
-	$(RM) rebuild
+	$(RM) rebuild || true
+
+bundled:
+	@echo Building bundled tools...
+	$(CD) mtest;$(MAKE)
+	$(CD) ipopd;$(MAKE)
+	$(CD) imapd;$(MAKE)
 
 clean:
 	@echo Removing old processed sources and binaries...
-	$(RM) an ua OSTYPE c-client
+	$(RM) an ua OSTYPE c-client mtest imapd ipopd || true
 	$(CD) tools;$(MAKE) clean
 
 

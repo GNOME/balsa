@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	5 December 1995
- * Last Edited:	19 January 1997
+ * Last Edited:	2 April 1998
  *
- * Copyright 1997 by the University of Washington
+ * Copyright 1998 by the University of Washington
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -40,6 +40,7 @@ char *auth_login_server (authresponse_t responder,int argc,char *argv[]);
 
 AUTHENTICATOR auth_log = {
   "LOGIN",			/* authenticator name */
+  NIL,				/* always valid */
   auth_login_client,		/* client method */
   auth_login_server,		/* server method */
   NIL				/* next authenticator */

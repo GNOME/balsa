@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	15 June 1988
- * Last Edited:	23 March 1998
+ * Last Edited:	13 April 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -1852,31 +1852,34 @@ IMAPPARSEDREPLY *imap_send_astring (MAILSTREAM *stream,char *tag,char **s,
 				    SIZEDTEXT *as,long wildok)
 {
   unsigned long j;
+  char c;
   STRING st;
 				/* default to not quoted unless empty */
-  int quoted = as->size ? NIL : T;
-  for (j = 0; j < as->size; j++) switch (as->data[j]) {
+  int qflag = as->size ? NIL : T;
+  for (j = 0; j < as->size; j++) switch (c = as->data[j]) {
+  default:			/* all other characters */
+    if (!(c & 0x80)) {		/* must not be 8bit */
+      if (c <= ' ') qflag = T;	/* must quote if a CTL */
+      break;
+    }
   case '\0':			/* not a CHAR */
   case '\012': case '\015':	/* not a TEXT-CHAR */
   case '"': case '\\':		/* quoted-specials (IMAP2 required this) */
     INIT (&st,mail_string,(void *) as->data,as->size);
     return imap_send_literal (stream,tag,s,&st);
-  default:			/* all other characters */
-				/* break if not a CTL */
-    if (as->data[j] > ' ') break;
   case '*': case '%':		/* list_wildcards */
     if (wildok) break;		/* allowed if doing the wild thing */
 				/* atom_specials */
-  case '(': case ')': case '{': case ' ':
+  case '(': case ')': case '{': case ' ': case 0x7f:
 #if 0
   case '"': case '\\':		/* quoted-specials (could work in IMAP4) */
 #endif
-    quoted = T;			/* must use quoted string format */
+    qflag = T;			/* must use quoted string format */
     break;
   }
-  if (quoted) *(*s)++ = '"';	/* write open quote */
+  if (qflag) *(*s)++ = '"';	/* write open quote */
   for (j = 0; j < as->size; j++) *(*s)++ = as->data[j];
-  if (quoted) *(*s)++ = '"';	/* write close quote */
+  if (qflag) *(*s)++ = '"';	/* write close quote */
   return NIL;
 }
 

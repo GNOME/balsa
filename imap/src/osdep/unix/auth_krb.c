@@ -10,9 +10,9 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 May 1996
- * Last Edited:	10 October 1996
+ * Last Edited:	2 April 1998
  *
- * Copyright 1996 by the University of Washington.
+ * Copyright 1998 by the University of Washington.
  *
  *  Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -43,8 +43,9 @@ char *auth_krb_server (authresponse_t responder,int argc,char *argv[]);
 
 AUTHENTICATOR auth_krb = {
   "KERBEROS_V4",		/* authenticator name */
+  NIL,				/* always valid */
   auth_krb_client,		/* client method */
-  auth_krb_server,		/* server method */
+  NIL,				/* server method */
   NIL				/* next authenticator */
 };
 
@@ -83,17 +84,4 @@ long auth_krb_client (authchallenge_t challenger,authrespond_t responder,
   } while (rc != ACTE_DONE);
   mech->free_state (state);	/* clean up */
   return T;
-}
-
-
-/* Server authenticator
- * Accepts: responder function
- *	    argument count
- *	    argument vector
- * Returns: authenticated user name or NIL
- */
-
-char *auth_krb_server (authresponse_t responder,int argc,char *argv[])
-{
-  return NIL;
 }

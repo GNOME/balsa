@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	12 January 1998
- * Last Edited:	27 January 1998
+ * Last Edited:	2 April 1998
  *
  * Copyright 1998 by the University of Washington
  *
@@ -39,6 +39,7 @@
 #include <gssapi/gssapi_krb5.h>
 #include <krb5.h>
 
+long auth_gssapi_valid (void);
 long auth_gssapi_client (authchallenge_t challenger,authrespond_t responder,
 			 NETMBX *mb,void *stream,unsigned long *trial,
 			 char *user);
@@ -46,6 +47,7 @@ char *auth_gssapi_server (authresponse_t responder,int argc,char *argv[]);
 
 AUTHENTICATOR auth_gss = {
   "GSSAPI",			/* authenticator name */
+  auth_gssapi_valid,		/* check if valid */
   auth_gssapi_client,		/* client method */
   auth_gssapi_server,		/* server method */
   NIL				/* next authenticator */
@@ -58,6 +60,30 @@ AUTHENTICATOR auth_gss = {
 #define AUTH_GSSAPI_C_MAXSIZE 8192
 
 #define SERVER_LOG(x,y) syslog (LOG_ALERT,x,y)
+
+extern char *krb5_defkeyname;	/* sneaky way to get this name */
+
+/* Check if GSSAPI valid on this system
+ * Returns: T if valid, NIL otherwise
+ */
+
+long auth_gssapi_valid (void)
+{
+  char *s,tmp[MAILTMPLEN];
+  OM_uint32 min;
+  gss_buffer_desc buf;
+  gss_name_t name;
+  struct stat sbuf;
+  sprintf (tmp,"host@%s",mylocalhost ());
+  buf.length = strlen (buf.value = tmp) + 1;
+				/* see if can build a name */
+  if (gss_import_name (&min,&buf,gss_nt_service_name,&name) != GSS_S_COMPLETE)
+    return NIL;			/* failed */
+  if ((s = strchr (krb5_defkeyname,':')) && stat (++s,&sbuf))
+    auth_gss.server = NIL;	/* can't do server if no keytab */
+  gss_release_name (&min,name);	/* finished with name */
+  return LONGT;
+}
 
 /* Client authenticator
  * Accepts: challenger function
@@ -79,23 +105,24 @@ long auth_gssapi_client (authchallenge_t challenger,authrespond_t responder,
   OM_uint32 mctx = 0;
   gss_ctx_id_t ctx = GSS_C_NO_CONTEXT;
   gss_buffer_desc chal,resp,buf;
-  gss_name_t crname;
+  gss_name_t crname = NIL;
   long i;
   int conf;
   gss_qop_t qop;
   *trial = 0;			/* never retry */
-  sprintf (tmp,"%s@%s",mb->service,mb->host);
-  buf.length = strlen (buf.value = tmp) + 1;
-				/* get initial (empty) challenge and name */
   if ((chal.value = (*challenger) (stream,(unsigned long *) &chal.length)) &&
-      !chal.length && (gss_import_name (&min,&buf,gss_nt_service_name,&crname)
-		       == GSS_S_COMPLETE)) {
-				/* get context */
-    switch (maj = gss_init_sec_context (&min,GSS_C_NO_CREDENTIAL,&ctx,crname,
-					GSS_C_NO_OID,
-					GSS_C_MUTUAL_FLAG | GSS_C_REPLAY_FLAG,
-					0,GSS_C_NO_CHANNEL_BINDINGS,
-					GSS_C_NO_BUFFER,NIL,&resp,NIL,NIL)) {
+      !chal.length) {		/* get initial (empty) challenge */
+    sprintf (tmp,"%s@%s",mb->service,mb->host);
+    buf.length = strlen (buf.value = tmp) + 1;
+				/* get service name */
+    if (gss_import_name (&min,&buf,gss_nt_service_name,&crname) !=
+	GSS_S_COMPLETE) (*responder) (stream,NIL,0);
+    else switch (maj =		/* get context */
+		 gss_init_sec_context (&min,GSS_C_NO_CREDENTIAL,&ctx,
+				       crname,GSS_C_NO_OID,
+				       GSS_C_MUTUAL_FLAG | GSS_C_REPLAY_FLAG,
+				       0,GSS_C_NO_CHANNEL_BINDINGS,
+				       GSS_C_NO_BUFFER,NIL,&resp,NIL,NIL)) {
     case GSS_S_CONTINUE_NEEDED:
       do {			/* negotiate authentication */
 	if (chal.value) fs_give ((void **) &chal.value);
@@ -194,7 +221,7 @@ long auth_gssapi_client (authchallenge_t challenger,authrespond_t responder,
       break;
     }
 				/* finished with credentials name */
-    gss_release_name (&min,crname);
+    if (crname) gss_release_name (&min,crname);
   }
   return ret;			/* return status */
 }
@@ -304,7 +331,6 @@ char *auth_gssapi_server (authresponse_t responder,int argc,char *argv[])
     }
 
     else {			/* can't acquire credentials! */
-
       if (gss_display_name (&mmin,crname,&buf,&mech) == GSS_S_COMPLETE)
 	SERVER_LOG ("Failed to acquire credentials for %s",buf.value);
       if (maj != GSS_S_FAILURE) do

@@ -10,7 +10,7 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	27 July 1988
- * Last Edited:	25 March 1998
+ * Last Edited:	30 March 1998
  *
  * Sponsorship:	The original version of this work was developed in the
  *		Symbolic Systems Resources Group of the Knowledge Systems
@@ -1058,7 +1058,7 @@ ADDRESS *rfc822_parse_group (ADDRESS **lst,ADDRESS *last,char **string,
 
 ADDRESS *rfc822_parse_mailbox (char **string,char *defaulthost)
 {
-  ADDRESS *adr;
+  ADDRESS *adr = NIL;
   char *s,*end;
   parsephrase_t pp = (parsephrase_t) mail_parameters (NIL,GET_PARSEPHRASE,NIL);
   if (!*string) return NIL;	/* no string */
@@ -1075,7 +1075,8 @@ ADDRESS *rfc822_parse_mailbox (char **string,char *defaulthost)
       adr->personal = rfc822_cpy (s);
     }
 				/* call external phraseparser if phrase only */
-    else if (pp && rfc822_phraseonly (s,end) && (adr = (*pp) (s,end))) {
+    else if (pp && rfc822_phraseonly (s,end) &&
+	     (adr = (*pp) (s,end,defaulthost))) {
       *string = end;		/* update parse pointer */
       rfc822_skipws (string);	/* skip WS in the normal way */
     }

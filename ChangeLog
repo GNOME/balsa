@@ -1,3 +1,7 @@
+2001-10-24  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/main-window.c: Commit All menu entry
+
 2001-10-23  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/mailbox.c: try harder to commit the mailbox.

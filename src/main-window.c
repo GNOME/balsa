@@ -206,6 +206,7 @@ static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
 static void mailbox_commit_changes(GtkWidget * widget, gpointer data);
+static void mailbox_commit_all(GtkWidget * widget, gpointer data);
 
 static void show_mbtree_cb(GtkWidget * widget, gpointer data);
 static void show_mbtabs_cb(GtkWidget * widget, gpointer data);
@@ -587,11 +588,16 @@ static GnomeUIInfo mailbox_menu[] = {
         N_("Commit the changes in the currently opened mailbox"),
         mailbox_commit_changes,
         GNOME_STOCK_MENU_REFRESH),
-#define MENU_MAILBOX_CLOSE_POS 11
+    GNOMEUIINFO_ITEM_STOCK(
+        N_("Commit All"),
+        N_("Commit the changes in all mailboxes"),
+        mailbox_commit_all,
+        GNOME_STOCK_MENU_REFRESH),
+#define MENU_MAILBOX_CLOSE_POS 12
     GNOMEUIINFO_ITEM_STOCK(N_("_Close"), N_("Close mailbox"),
                            mailbox_close_cb, GNOME_STOCK_MENU_CLOSE),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MAILBOX_EMPTY_TRASH_POS 13
+#define MENU_MAILBOX_EMPTY_TRASH_POS 14
     GNOMEUIINFO_ITEM_STOCK(N_("Empty _Trash"),
                            N_("Delete messages from the Trash mailbox"),
                            empty_trash, GNOME_STOCK_PIXMAP_REMOVE),
@@ -2533,6 +2539,34 @@ mailbox_commit_changes(GtkWidget * widget, gpointer data)
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Commiting mailbox %s failed."),
                           current_mailbox->name);
+}
+
+
+static gboolean
+mailbox_commit_each(GNode *node, gpointer data) 
+{
+    LibBalsaMailbox *box;
+    box = BALSA_MAILBOX_NODE(node->data)->mailbox;
+    
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(box), FALSE);
+
+    if(box->open_ref == 0)
+	return(FALSE);
+
+    if (!libbalsa_mailbox_commit(box))
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Commiting mailbox %s failed."),
+                          box->name);
+    return(FALSE);
+}
+
+
+static void
+mailbox_commit_all(GtkWidget * widget, gpointer data)
+{
+    g_node_traverse(balsa_app.mailbox_nodes, G_IN_ORDER, G_TRAVERSE_ALL,
+		    -1, (GNodeTraverseFunc)mailbox_commit_each, 
+		    NULL);
 }
 
 /* empty_trash:

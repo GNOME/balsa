@@ -2692,7 +2692,18 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->update_config = FALSE;
     bsmsg->quit_on_close = FALSE;
     bsmsg->orig_message = message;
+
     bsmsg->window = window = gnome_app_new("balsa", NULL);
+    /*
+     * restore the SendMsg window size
+     */
+    gtk_window_set_default_size(GTK_WINDOW(window), 
+			balsa_app.sw_width,
+			balsa_app.sw_height);
+
+    gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
+    gtk_widget_show(window);
+
     bsmsg->type = type;
     bsmsg->spell_checker = NULL;
 #ifdef HAVE_GPGME
@@ -2852,17 +2863,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     /* set the initial window title */
     sendmsg_window_set_title(bsmsg);
-
-    /*
-     * restore the SendMsg window size
-     */
-    gtk_window_set_default_size(GTK_WINDOW(window), 
-			balsa_app.sw_width,
-			balsa_app.sw_height);
-
-    gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
-
-    gtk_widget_show(window);
 
 
     if (type == SEND_NORMAL || type == SEND_FORWARD_ATTACH || 

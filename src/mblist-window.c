@@ -342,7 +342,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 		  font = gdk_font_load ("-adobe-courier-medium-r-*-*-*-120-*-*-*-*-iso8859-1");
 		  style->font = font;
 
-		  gtk_widget_set_style (GTK_CELL_WIDGET((GTK_CTREE_ROW(cnode)->row).cell)->widget, style);
+		  gtk_widget_set_style (GTK_CELL_WIDGET ((GTK_CTREE_ROW (cnode)->row).cell)->widget, style);
 
 		  gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 5,
 					   NULL, NULL,
@@ -498,6 +498,11 @@ mailbox_select_cb (GtkCTree * ctree, GtkCTreeNode * row, gint column)
 	  gnome_mdi_add_view (mblw->mdi, GNOME_MDI_CHILD (index_child));
 	}
       main_window_set_cursor (-1);
+
+      gtk_ctree_set_node_info (ctree, row, mailbox->name, 5,
+			       NULL, NULL,
+			       tray_empty, tray_empty_mask,
+			       FALSE, TRUE);
     }
 }
 

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2001 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -85,12 +85,6 @@ void fe_conditions_select_row(GtkWidget * widget, gint row, gint column,
 			      GdkEventButton * bevent, gpointer data);
 void fe_edit_condition(GtkWidget * widget, gpointer data);
 void fe_condition_remove_pressed(GtkWidget * widget, gpointer data);
-
-/* regexs callbacks */
-void fe_add_pressed(GtkWidget * widget, gpointer data);
-void fe_remove_pressed(GtkWidget * widget, gpointer data);
-void fe_regexs_select_row(GtkWidget * widget, gint row, gint column,
-			  GdkEventButton * bevent, gpointer data);
 
 /* action callback */
 void fe_action_selected(GtkWidget * widget, gpointer data);

@@ -6,6 +6,9 @@
 	* libbalsa/address-book-extern.[hc]: support for ab save programs.
 	* libbalsa/address-book-{ldif,vcard}.c: Extract common parts to
 	abook-completion.[hc]
+	* src/address-book-config.c: support for saving addresses to
+	extern books.
+	* src/filter-edit.h: remove redundant declarations.
 	
 2001-11-27  Pawel Salek  <pawsa@theochem.kth.se>
 

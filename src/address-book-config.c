@@ -48,7 +48,8 @@ struct _AddressBookConfig {
 	    GtkWidget *path;
 	} vcard;
 	struct {
-		GtkWidget *path;
+		GtkWidget *load;
+		GtkWidget *save;
 	} externq;
 	struct {
 	    GtkWidget *path;
@@ -202,12 +203,16 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 		address_book = libbalsa_address_book_vcard_new(name, path);
             g_free(path);
  	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
-	    gchar *path =
+	    gchar *load =
  		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
- 					       (abc->ab_specific.externq.path),
+ 					       (abc->ab_specific.externq.load),
 					       FALSE);
- 	    if (path != NULL) 
- 		address_book = libbalsa_address_book_externq_new(name, path);
+		gchar *save = 
+ 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
+ 					       (abc->ab_specific.externq.save),
+					       FALSE);
+ 	    if (load != NULL && save != NULL) 
+ 		address_book = libbalsa_address_book_externq_new(name, load, save);
 	} else if (abc->create_type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
 	    gchar *path =
 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
@@ -250,15 +255,23 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book)
 	    }
  	} else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERN(address_book)) {
  	    LibBalsaAddressBookExtern *externq;
- 	    gchar *path =
+ 	    gchar *load =
  		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
- 					       (abc->ab_specific.externq.path),
+ 					       (abc->ab_specific.externq.load),
+					       FALSE);
+ 	    gchar *save =
+ 		gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
+ 					       (abc->ab_specific.externq.save),
 					       FALSE);
  
  	    externq = LIBBALSA_ADDRESS_BOOK_EXTERN(address_book);
- 	    if (path) {
- 		g_free(externq->path);
- 		externq->path = path;
+ 	    if (load) {
+ 		g_free(externq->load);
+ 		externq->load = load;;
+	    }
+ 	    if (save) {
+ 		g_free(externq->save);
+ 		externq->save = save;
 	    }
 	} else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book)) {
 	    LibBalsaAddressBookLdif *ldif;
@@ -435,13 +448,13 @@ create_externq_page(AddressBookConfig * abc)
 {
     GtkWidget *table;
     GnomeDialog* mcw = GNOME_DIALOG(abc->window);
-    GtkWidget *label;
+    GtkWidget *label_load;
+	GtkWidget *label_save;
     guint keyval;
     LibBalsaAddressBookExtern* ab;
     ab = (LibBalsaAddressBookExtern*)abc->address_book; /* may be NULL */
-
     abc->help_path = "ab-conf.html#EXTERN";
-    table = gtk_table_new(2, 3, FALSE);
+    table = gtk_table_new(3, 3, FALSE);
 
     /* mailbox name */
 
@@ -450,26 +463,41 @@ create_externq_page(AddressBookConfig * abc)
 				   ab ? abc->address_book->name : NULL, 
 				   keyval);
 
-    label = gtk_label_new(_("Program location"));
-    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
+    label_load = gtk_label_new(_("Load program location"));
+    gtk_misc_set_alignment(GTK_MISC(label_load), 1.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label_load, 0, 1, 1, 2,
 		     GTK_FILL, GTK_FILL, 10, 10);
 
-    abc->ab_specific.externq.path =
-	gnome_file_entry_new("EXTERN ADDRESS BOOK PATH",
-			     _("Select program for address book"));
-    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.path, 1, 2,
+    label_save = gtk_label_new(_("Save program location"));
+    gtk_misc_set_alignment(GTK_MISC(label_save), 1.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label_save, 0, 1, 2, 3,
+		     GTK_FILL, GTK_FILL, 10, 10);
+
+    abc->ab_specific.externq.load =
+	gnome_file_entry_new("EXTERN ADDRESS BOOK LOAD PATH",
+			     _("Select load program for address book"));
+    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.load, 1, 2,
 		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
-    abc->expand_aliases_button =
+    abc->ab_specific.externq.save =
+	gnome_file_entry_new("EXTERN ADDRESS BOOK SAVE PATH",
+			     _("Select save program for address book"));
+    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.save, 1, 2,
+		     2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
+    
+	abc->expand_aliases_button =
 	create_check(mcw, _("_Expand aliases as you type"), table, 3,
 		     ab ? abc->address_book->expand_aliases : TRUE);
 
     if (ab) {
 	GtkWidget *entry;
 	entry = GTK_WIDGET(gnome_file_entry_gtk_entry
-			   (GNOME_FILE_ENTRY(abc->ab_specific.externq.path)));
-	gtk_entry_set_text(GTK_ENTRY(entry), ab->path);
+			   (GNOME_FILE_ENTRY(abc->ab_specific.externq.load)));
+	gtk_entry_set_text(GTK_ENTRY(entry), ab->load);
+
+	entry = GTK_WIDGET(gnome_file_entry_gtk_entry
+			   (GNOME_FILE_ENTRY(abc->ab_specific.externq.save)));
+	gtk_entry_set_text(GTK_ENTRY(entry), ab->save);
     }
     gtk_widget_show_all(table);
     return table;

@@ -1,5 +1,9 @@
 2000-12-20  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* libbalsa/libbalsa.c (libbalsa_init): set_option(OPTMHPURGE) so
+	MH messages are really deleted rather than moved to ,<number>. (We
+	don't need to keep these , files, since we delete to trash)
+
 	* libbalsa/libbalsa.c (libbalsa_init): Properly construct Fqdn
 	from hostname and domainname. This makes Message-ID generation
 	much securer.

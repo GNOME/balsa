@@ -1,3 +1,5 @@
+EXTRA_DIST = configure
+
 noinst_LIBRARIES = libmutt.a
 
 libmutt_a_SOURCES = \

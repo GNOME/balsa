@@ -2140,7 +2140,8 @@ static gint
 postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message;
-
+    gboolean thereturn = FALSE;
+    
     if (!is_ready_to_send(bsmsg)) 
         return FALSE;
 
@@ -2148,16 +2149,18 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
         bsmsg->type == SEND_REPLY_GROUP))
-	libbalsa_message_postpone(message, balsa_app.draftbox,
+	thereturn = libbalsa_message_postpone(message, balsa_app.draftbox,
 				  bsmsg->orig_message,
 				  message->fcc_mailbox,
 				  balsa_app.encoding_style);
     else
-	libbalsa_message_postpone(message, balsa_app.draftbox, 
+	thereturn = libbalsa_message_postpone(message, balsa_app.draftbox, 
                                   NULL,
 				  message->fcc_mailbox,
 				  balsa_app.encoding_style);
-
+    if(!thereturn)
+	return FALSE;
+    
     if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message) {
 	libbalsa_message_delete(bsmsg->orig_message);
 	libbalsa_mailbox_sync_backend(bsmsg->orig_message->mailbox);

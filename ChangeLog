@@ -1,8 +1,12 @@
 2001-09-05  Carlos Morgado  <chbm@chbm.nu>
 
+	* src/sendmsg-window.c (postpone_message_cb): don't destroy the
+	message if postpone fails
+
 	* libbalsa/send.c: patch from Anders Larsen <bulk@alarsen.net> 
 	to permit draftbox on imap. same juju as imap on ...
-
+	clean a couple of (void *)0
+		
 	* src/main-window.c: MENU_FILE_PRINT_POS was defined twice. eek.
 
 2001-09-04  Carlos Morgado  <chbm@chbm.nu>

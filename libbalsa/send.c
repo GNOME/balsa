@@ -310,7 +310,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 			/* it will lock up when NO IMAP mailbox has been accessed since */
 			/* balsa was started. This should be safe because we have already */
 			/* established that fccbox is in fact an IMAP mailbox */
-			if(server == (LibBalsaServer *)0) {
+			if(server == (LibBalsaServer *)NULL) {
 				libbalsa_unlock_mutt();
 				libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open sentbox - could not get server information");
 				return;
@@ -1148,6 +1148,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     gchar *tmp;
     LibBalsaMessageBody *body;
     LibBalsaServer *server;
+    int thereturn;
 
     libbalsa_lock_mutt();
     msg = mutt_new_header();
@@ -1226,8 +1227,8 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	tmp = NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(draftbox)) {
-	mutt_write_fcc(libbalsa_mailbox_local_get_path(draftbox),
-		       msg, tmp, 1, fcc);
+	thereturn = mutt_write_fcc(libbalsa_mailbox_local_get_path(draftbox),
+				   msg, tmp, 1, fcc);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(draftbox)) {
 	server = LIBBALSA_MAILBOX_REMOTE(draftbox)->server;
 	if(!CLIENT_CONTEXT_OPEN(draftbox)) /* Has not been opened */
@@ -1236,7 +1237,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	    /* it will lock up when NO IMAP mailbox has been accessed since */
 	    /* balsa was started. This should be safe because we have already */
 	    /* established that draftbox is in fact an IMAP mailbox */
-	    if(server == (LibBalsaServer *)0) {
+	    if(server == (LibBalsaServer *)NULL) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "Unable to open draftbox - could not get server information");
 		g_free(tmp);
 		mutt_free_header(&msg);
@@ -1256,7 +1257,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 
 	/* Passwords are guaranteed to be set now */
 
-	mutt_write_fcc(LIBBALSA_MAILBOX(draftbox)->url,
+	thereturn = mutt_write_fcc(LIBBALSA_MAILBOX(draftbox)->url,
  		       msg, tmp, 1, fcc);
     }
     g_free(tmp);
@@ -1266,7 +1267,10 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     if (draftbox->open_ref > 0)
 	libbalsa_mailbox_check(draftbox);
 
-    return TRUE;
+    if(thereturn<0)
+	return FALSE;
+    else
+	return TRUE;
 }
 
 /* balsa_lookup_mime_type [MBG] 

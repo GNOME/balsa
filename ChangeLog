@@ -1,5 +1,8 @@
-2003-02-03 17:37  PeterB
+2003-02-03 22:24  PeterB
 
+	* src/sendmsg-window.c: Check for orig_message->mailbox before
+	setting `replied' or deleting the message (mailbox is NULL if the
+	orig_message has itself been deleted).
 	* src/balsa-message.c: Rearrange part_info_init_unknown display.
 	* libbalsa/: mailbox.c, message.c: Code cleanup (Manu).
 	* src/: balsa-index-threading.c, balsa-index.c, balsa-index.h: Add

@@ -1,3 +1,7 @@
+2004-01-06 15:43  PeterB
+
+	* src/balsa-message.c: Show and hide the appropriate widgets.
+
 2004-01-04  Pawel Salek
 
 	* src/balsa-message.[ch]: bug 127776 - nicer display of headers.

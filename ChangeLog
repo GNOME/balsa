@@ -1,5 +1,7 @@
-2004-08-05 00:17  PeterB
+2004-08-05 10:01  PeterB
 
+	* libbalsa/: mailbox_local.c, mailbox_maildir.c, mailbox_maildir.h:
+	populate subdir strings when creating a maildir.
 	* libbalsa/mailbox.c: set validated state of iter on return.
 
 2004-08-04  Pawel Salek

@@ -1,3 +1,10 @@
+2003-02-20 15:52  PeterB
+
+	* src/: main-window.c, sendmsg-window.c: Remove conflicts over
+	ctrl+A accelerators; make main window's `Edit => Select All'
+	focus-aware; make compose window's `Edit => Select All' consistent
+	with main window.
+
 2003-02-19  Carlos Morgado  <chbm chbm.nu>
 
 	* src/balsa-index.c: actually update last_use so that autocommit and autoclose work. we're a little too liberal updating it
@@ -5,7 +12,6 @@
 2003-02-19 Steve Wall  <hitched97@myrealbox.com>
 
 	* src/balsa-message.c: add '<' brackets to content-ID.
-
 
 2003-02-18 23:02  PeterB
 

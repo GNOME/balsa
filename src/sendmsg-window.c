@@ -80,7 +80,7 @@ create_toolbar (GtkWidget * window, BalsaSendmsg * bsmw)
 
   toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
 		  _ ("Attach"), _ ("Add attachments to this message"), NULL,
-		gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_ATTACH),
+	      gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_ATTACH),
 					   GTK_SIGNAL_FUNC (attach_clicked),
 					   bsmw->attachments);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
@@ -426,9 +426,9 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
 		    GTK_FILL, GTK_FILL, 0, 0);
 
-  msg->attachments = gnome_icon_list_new (100,NULL,TRUE);
-  
-  gtk_widget_show(msg->attachments);
+  msg->attachments = gnome_icon_list_new (100, NULL, TRUE);
+
+  gtk_widget_show (msg->attachments);
   gtk_table_attach (GTK_TABLE (table), msg->attachments, 1, 3, 5, 6,
 		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "select_icon",
@@ -668,8 +668,25 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   gchar *tmp;
 
   tmp = gtk_entry_get_text (GTK_ENTRY (bsmsg->to));
-  if (strlen (tmp) < 4)
-    return;
+  {
+    size_t len;
+    len = strlen (tmp);
+
+    if (len < 1)		/* empty */
+      return;
+
+    if (tmp[len - 1] == '@')	/* this shouldn't happen */
+      return;
+
+    if (len < 4)
+      {
+	if (strchr (tmp, '@'))	/* you won't have an @ in an
+				   address less than 4 characters */
+	  return;
+
+	/* assume they are mailing it to someone in their local domain */
+      }
+  }
 
   message = message_new ();
 

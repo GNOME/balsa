@@ -4069,6 +4069,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	libbalsa_prepare_delsp(bsmsg->buffer2);
     gtk_text_buffer_get_bounds(bsmsg->buffer2, &start, &end);
     body->buffer = gtk_text_iter_get_text(&start, &end);
+    if (bsmsg->flow)
+	body->buffer =
+	    libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength,
+                                  TRUE, FALSE, TRUE);
     /* Disable undo and redo, because buffer2 was changed. */
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 

@@ -733,7 +733,7 @@ no_change_to_extbody(GtkWidget *widget, gpointer user_data)
 static void
 add_extbody_attachment(GnomeIconList *ilist, 
 		       const gchar *name, const gchar *mime_type,
-		       gboolean delete_on_destroy) {
+		       gboolean delete_on_destroy, gboolean is_url) {
     gchar *pix;
     gchar *label;
     attachment_t *attach;
@@ -742,7 +742,10 @@ add_extbody_attachment(GnomeIconList *ilist,
     g_return_if_fail(name != NULL); 
     
     attach = g_malloc(sizeof(attachment_t));
-    attach->filename = g_strdup_printf("URL=\"%s\"",name);
+    if (is_url) 
+	attach->filename = g_strdup_printf("URL %s", name);
+    else
+	attach->filename = g_strdup(name);
     attach->force_mime_type = mime_type != NULL ? g_strdup(mime_type) : NULL;
     attach->delete_on_destroy = delete_on_destroy;
     attach->as_extbody = TRUE;
@@ -781,7 +784,7 @@ extbody_attachment(GtkWidget * widget, gpointer user_data)
     gnome_icon_list_freeze(ilist);
     add_extbody_attachment(ilist, oldattach->filename, 
 			   oldattach->force_mime_type, 
-			   oldattach->delete_on_destroy );
+			   oldattach->delete_on_destroy, FALSE);
     gnome_icon_list_remove(ilist, num);
     gnome_icon_list_thaw(ilist);
     
@@ -1283,7 +1286,7 @@ attachments_add(GtkWidget * widget,
 	bsmsg->update_config = TRUE;
     } else if( info == TARGET_STRING) {
 	add_extbody_attachment( GNOME_ICON_LIST(bsmsg->attachments[1]),
-				selection_data->data, "text/html", FALSE );
+				selection_data->data, "text/html", FALSE, TRUE);
     }	
 }
 

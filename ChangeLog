@@ -1,3 +1,11 @@
+2001-10-18  Carlos Morgado  <chbm@cprm.net>
+
+	* src/sendmsg-window.c: 
+	* src/balsa-message.c: 
+	* libbalsa/send.c:
+	patch from Albert to fix URL encoding.
+	removed text/html content for URL. it doesn't make much sense.
+
 2001-10-17  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-ldif.c: strcpy+strcat->g_strconcat

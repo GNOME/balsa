@@ -277,16 +277,17 @@ add_mutt_body_as_extbody(const gchar *filename, const gchar *mime_type)
     body->use_disp = 0;
 
     body->encoding = ENC7BIT;
-
-    if(!strncmp( filename, "URL", 3 ))
-	mutt_set_parameter("access-type","URL", &body->parameter);
-    else
+    if(!strncmp( filename, "URL", 3 )) {
+	mutt_set_parameter("access-type", "URL", &body->parameter);
+	mutt_set_parameter("URL", filename + 4, &body->parameter);
+    } else {
 	mutt_set_parameter("access-type", "local-file", &body->parameter);
-    mutt_set_parameter("name", filename, &body->parameter);
+	mutt_set_parameter("name", filename, &body->parameter);
+    }
     mutt_mktemp(buffer);
     body->filename = g_strdup(buffer);
     tempfp = safe_fopen(body->filename, "w+");
-    fprintf(tempfp, "Content-type: %s\n\nNote: this is _not_ the real body!\n",
+    fprintf(tempfp, "Note: this is _not_ the real body!\n",
 	    mime_type);
     fclose(tempfp);
 

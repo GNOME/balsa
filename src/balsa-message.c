@@ -874,10 +874,14 @@ part_info_init_message_extbody_url(BalsaMessage * bm, BalsaPartInfo * info,
 	gchar *local_name;
 
 	local_name = 
-	    libbalsa_message_body_get_parameter(info->body, "name");
+	    libbalsa_message_body_get_parameter(info->body, "URL");
 
-	url = g_strdup(local_name+5);
-	url[strlen(url)-1] = '\0';
+	if (!local_name) {
+	    part_info_init_unknown(bm, info);
+	    return;
+	}
+
+	url = g_strdup(local_name);
 	msg = g_string_new(_("Content Type: external-body\n"));
 	g_string_sprintfa(msg, _("Access type: URL\n"));
 	g_string_sprintfa(msg, _("URL: %s"), url);

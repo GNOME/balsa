@@ -4531,9 +4531,15 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
+    GtkWidget *focus_widget;
+    GtkTextView *text_view;
+    GtkTextBuffer *buffer;
     regex_t rex;
+
+    focus_widget = gtk_window_get_focus(GTK_WINDOW(bsmsg->window));
+    if (focus_widget && GTK_IS_ENTRY(focus_widget)
+        && libbalsa_address_entry_show_matches((GtkEntry *) focus_widget))
+        return;
 
     if (!bsmsg->flow)
 	return;
@@ -4547,6 +4553,8 @@ reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     sw_buffer_save(bsmsg);
 
+    text_view = GTK_TEXT_VIEW(bsmsg->text);
+    buffer = gtk_text_view_get_buffer(text_view);
     sw_buffer_signals_block(bsmsg, buffer);
     libbalsa_unwrap_selection(buffer, &rex);
     libbalsa_wrap_view(text_view, balsa_app.wraplength);

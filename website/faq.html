@@ -13,6 +13,24 @@ body {margin-left: 50pt;}
 <img src="images/balsa.jpg" alt="balsa" align="middle" width="476" height="122">
 <h1>Frequently Asked Questions</h1>
 <ol>
+<li><p>Balsa cannot lock my INBOX under <samp>/var/spool/mail</samp>
+	      --  my INBOX is opened readonly.</p>
+
+<blockquote>
+     <p>Balsa uses flock+dotfile for mailbox file locking. It does not
+use fcntl (although it can be enabled) since this locking method is
+very fragile and often not portable (see 
+<a
+   href="http://www.washington.edu/pine/tech-notes/low-level.html#locking">
+here</a> for example).</p>
+
+<p>Make sure that your spool directory has <samp>drwxrwxrwt</samp> (01777) access
+privileges. Presently, dotfile locking requires this unconditionally
+In the future, we may relax this requirement and will allow you to
+shoot yourself in your leg.</p>
+
+</blockquote>
+
 <li><p>I see many compilation warnings. Is balsa broken?</p>
 <blockquote>
 It is really a problem with <samp>gcc</samp>. Upgrade <samp>gcc</samp> or

@@ -1,3 +1,7 @@
+2000-12-14  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* faq.html: Add entry about /var/spool/mail permissions.
+
 2000-11-11  Pawel Salek <pawsa@theochem.kth.se>
 
 	* faq.html: libtool; POP3 filtering code described.

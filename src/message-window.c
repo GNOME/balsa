@@ -285,8 +285,6 @@ message_window_idle_handler(MessageWindow* mw)
 	}
     }
 
-    g_object_unref(G_OBJECT(message)); 
-
     /* Update the style and message counts in the mailbox list */
     balsa_mblist_update_mailbox(balsa_app.mblist_tree_store,
                                 message->mailbox);
@@ -427,6 +425,8 @@ message_window_new(LibBalsaMessage * message)
                      G_CALLBACK(size_alloc_cb), NULL);
     
     mw->bindex = balsa_find_index_by_mailbox(message->mailbox);
+    g_object_weak_ref(G_OBJECT(mw->bindex),
+		      (GWeakNotify) gtk_widget_destroy, mw->window);
     g_object_add_weak_pointer(G_OBJECT(mw->bindex), (gpointer) &mw->bindex);
     g_signal_connect_swapped(G_OBJECT(mw->bindex), "index-changed",
 			     G_CALLBACK(mw_set_buttons_sensitive), mw);
@@ -491,14 +491,14 @@ mw_clear_message(MessageWindow * mw)
 {
     if (mw->idle_handler_id) {
 	g_source_remove(mw->idle_handler_id);
-	if (mw->message)
-	    g_object_unref(mw->message);
 	mw->idle_handler_id = 0;
-    } else if (mw->message) {
+    } 
+    if (mw->message) {
 	g_object_set_data(G_OBJECT(mw->message), BALSA_MESSAGE_WINDOW_KEY,
 			  NULL);
+	g_object_unref(mw->message);
+	mw->message = NULL;
     }
-    mw->message = NULL;
 }
 
 /* Handler for the "destroy" signal for mw->window. */

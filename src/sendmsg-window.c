@@ -98,12 +98,6 @@ create_toolbar (BalsaSendmsg * bsmw)
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  toolbarbutton = gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-		   "Context Sensitive Help", "Context Sensitive Help", NULL,
-					   new_icon (p16_xpm, window), NULL,
-					   "Context Sensitive Help");
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-
   gtk_widget_show (toolbar);
   return toolbar;
 }

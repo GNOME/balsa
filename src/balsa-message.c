@@ -134,7 +134,7 @@ balsa_message_set (BalsaMessage * bmessage,
 {
   BODY *body;
   STRINGLIST *lines, *cur;
-  gchar *c, *buff;
+  gchar *c, *buff, *d;
   GString *gs;
 
   g_return_if_fail (bmessage != NULL);
@@ -170,6 +170,66 @@ balsa_message_set (BalsaMessage * bmessage,
   cur = cur->next = mail_newstringlist ();
   cur->text.size = strlen (cur->text.data = (unsigned char *) cpystr ("Newsgroups"));
 
+#ifdef 0
+  buff = g_realloc (buff, strlen (buff) + strlen ("<table>\n") + 1);
+  strcat (buff, "<table>\n");
+
+  /* date */
+  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>Date:</td><td>") + 1);
+  strcat (buff, "<tr><td>Date:</td><td>");
+  d = get_header ("date", stream, mesgno);
+  gs = text2html (d);
+  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+  strcat (buff, gs->str);
+  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
+  strcat (buff, "</td></tr>\n");
+
+  /* from */
+  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>From:</td><td>") + 1);
+  strcat (buff, "<tr><td>From:</td><td>");
+  d = get_header_from (stream, mesgno);
+  gs = text2html (d);
+  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+  strcat (buff, gs->str);
+  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
+  strcat (buff, "</td></tr>\n");
+
+  /* subject */
+  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>Subject:</td><td>") + 1);
+  strcat (buff, "<tr><td>Subject:</td><td>");
+  d = get_header ("subject", stream, mesgno);
+  gs = text2html (d);
+  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+  strcat (buff, gs->str);
+  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
+  strcat (buff, "</td></tr>\n");
+
+  /* To */
+  buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>To:</td><td>") + 1);
+  strcat (buff, "<tr><td>To:</td><td>");
+  d = get_header ("to", stream, mesgno);
+  gs = text2html (d);
+  buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+  strcat (buff, gs->str);
+  buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
+  strcat (buff, "</td></tr>\n");
+
+  /* cc */
+  d = get_header ("cc", stream, mesgno);
+  if (strlen (d) > 3)
+    {
+      buff = g_realloc (buff, strlen (buff) + strlen ("<tr><td>cc:</td><td>") + 1);
+      strcat (buff, "<tr><td>cc:</td><td>");
+      gs = text2html (d);
+      buff = g_realloc (buff, strlen (buff) + strlen (gs->str) + 1);
+      strcat (buff, gs->str);
+      buff = g_realloc (buff, strlen (buff) + strlen ("</td></tr>\n") + 1);
+      strcat (buff, "</td></tr>\n");
+    }
+
+  buff = g_realloc (buff, strlen (buff) + strlen ("</table>\n") + 1);
+  strcat (buff, "</table>\n");
+#endif
 
   /* message headers */
   c = mail_fetchheader_full (stream, mesgno, lines, NIL, NIL);
@@ -203,7 +263,7 @@ balsa_message_set (BalsaMessage * bmessage,
 #ifdef DEBUG
   fprintf (stderr, buff);
 #endif
-/* set message contents */
+  /* set message contents */
   gtk_xmhtml_source (GTK_XMHTML (GTK_BIN (bmessage)->child), buff);
   g_free (buff);
 }
@@ -367,6 +427,9 @@ text2html (char *buff)
 	     * replace with a &nbsp; or lines will not wrap! bad
 	     * thing(tm)
 	     */
+	  case '\t':
+	    gs = g_string_append(gs, "&nbsp; &nbsp; &nbsp; &nbsp; ");
+	    break;
 	  case ' ':
 	    gs = g_string_append (gs, " ");
 	    break;

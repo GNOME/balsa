@@ -164,7 +164,7 @@ if test x"$with_website" != xno ; then
 	website_subdir=website
 	website_used=yes
 	website_root="http://www.balsa.net"
-	test -z "$with_website" || website_root=$withval
+	test -z "$with_website" -a x"$with_website" != xyes || website_root=$withval
 	website_desc="yes; root $website_root"
 else
 	website_subdir=
@@ -190,7 +190,10 @@ AC_ARG_WITH(website-prefix, [  --with-website-prefix=PREFIX Install the website 
 AC_MSG_CHECKING([whether and where to install the website])
 if test x"$with_website_prefix" != xno ; then
 	if test x"$website_used" = xyes ; then
-		website_prefix=$withval
+		if test x"$with_website_prefix" = xyes ; then
+			AC_MSG_ERROR([--with-website-prefix must be follow by a path])
+		fi
+		website_prefix=$with_website_prefix
 		website_installed=yes
 		website_install_desc="yes; $withval"
 	else

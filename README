@@ -15,3 +15,30 @@ Description:
     desktop environment.  It supports local mailboxes, POP3 and
     IMAP.
 
+Configuration:
+	Balsa has a lot of options to its configure script; you
+should run './configure --help' to get an idea of them. More
+complete descriptions are here.
+
+--enable-all
+	Will turn on some features that are less than stable,
+or unfinsished, such as filtering.
+
+--enable-info
+	Enable an information pane displaying the status of
+all of your mailboxes in the righthand pane, such as unread
+messages, etc. Pretty much broken right now.
+
+--enable-threads
+	Compile Balsa with threading for more responsiveness.
+This works very well and should be enabled if possible.
+
+--with-website=ROOT
+	If specified, generate HTML files for Balsa's website.
+This is not necessary unless you wish to mirror Balsa's
+website, in which case ROOT is the prefix for all URL's in
+the site, defaulting to http://www.balsa.net.
+
+--with-website-prefix=PREFIX
+	Specifies where to install the website, if desired;
+the website is not installed when not specified.

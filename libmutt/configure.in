@@ -444,6 +444,8 @@ dnl -----------------------------------
   dnl Some systems have iconv in libc, some have it in libiconv (OSF/1 and
   dnl those with the standalone portable GNU libiconv installed).
 
+  use_iconv=yes
+
   AC_ARG_WITH([iconv],
 [  --with-iconv[=DIR]  search for libiconv in DIR/include and DIR/lib], [
     if test "$withval" != no ; then
@@ -523,8 +525,8 @@ AC_CHECK_HEADERS(iconv.h,
 
 if test "$am_cv_func_iconv" != "yes"
 then
-#  AC_MSG_ERROR([Unable to find an iconv function. See INSTALL for help])
-  AC_MSG_WARN([Unable to find an iconv function. See INSTALL for help])
+  AC_MSG_ERROR([Unable to find an iconv function. See INSTALL for help])
+#  AC_MSG_WARN([Unable to find an iconv function. See INSTALL for help])
 else
 
 dnl (1) Some implementations of iconv won't convert from UTF-8 to UTF-8.

@@ -463,24 +463,23 @@ dnl Enable SASL?
 dnl ##########################################################################
 
 
-AC_ARG_WITH(sasl, [  --with-sasl[=PFX]          Use Cyrus SASL library for POP/IMAP authentication],
-        if test "$with_sasl" != "no"
-        then
-          if test "$with_sasl" != "yes"
-          then
-            CPPFLAGS="$CPPFLAGS -I$with_sasl/include"
-            LDFLAGS="$LDFLAGS -L$with_sasl/lib"
-          fi
+AC_ARG_WITH(sasl, [  --with-sasl            Use Cyrus SASL library for POP/IMAP authentication [default=no]],[
+	with_sasl=$withval
+],[
+	with_sasl=no
+])
 
-          AC_CHECK_LIB(sasl, sasl_client_init,,
-            AC_MSG_ERROR([could not find libsasl]),)
-
-          LIBS="$LIBS -lsasl"
-          AC_DEFINE(USE_SASL)
-          need_sasl=yes
-          need_md5=no
-        fi
-        ])
+AC_MSG_CHECKING([whether to build SASL support])
+if test "x$with_sasl" != xno  ; then
+	AC_MSG_RESULT([yes])
+	AC_CHECK_LIB(sasl, sasl_client_init,,AC_MSG_ERROR([could not find libsasl]),)
+	LIBS="$LIBS -lsasl"
+	AC_DEFINE(USE_SASL)
+	need_sasl=yes
+        need_md5=no        
+else
+	AC_MSG_RESULT([no])
+fi
 AM_CONDITIONAL(USE_SASL, test x$need_sasl = xyes)
 
 
@@ -589,7 +588,7 @@ echo "               Use GtkHTML: $have_gtkhtml"
 echo "                  Use LDAP: $use_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                   Use SSL: $with_ssl"
-echo "                  Use SASL: $with_sasl"
+echo "                  Use SASL: $need_sasl"
 echo "          Printing support: $printing_support"
 echo ""
 

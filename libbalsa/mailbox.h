@@ -114,8 +114,6 @@ struct _Mailbox
     glong messages;
     glong new_messages;
     GList *message_list;
-
-    GList *children;
   };
 
 

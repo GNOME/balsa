@@ -32,6 +32,9 @@ AM_PROG_LIBTOOL
 dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
+AC_CHECK_LIB(PropList, PLGetProplistWithPath, ,
+AC_MSG_ERROR([*** libPropList not found.  Please check http://www.balsa.net for information on the required files.]),)
+
 
 ALL_LINGUAS="ko de fr ga fi"
 AM_GNU_GETTEXT

@@ -1,8 +1,9 @@
 2002-09-23  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* src/address-book-config.[ch]: don't use gtk_dialog_run with a
-	GnomeFileEntry in the dialog.
+	GnomeFileEntry in the dialog. 
 	* src/pref-manager.c: new balsa_address_book_config_new api.
+	* libbalsa/send.c: do not send deleted messages in outbox (#93666).
 	
 2002-09-21  Carlos Morgado  <chbm@chbm.nu>
 

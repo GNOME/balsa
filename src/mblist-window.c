@@ -43,7 +43,8 @@ static void mailbox_select_cb (GtkCTree *, GtkCTreeNode *, gint);
 void
 mblist_open_window (GnomeMDI * mdi)
 {
-  GtkWidget *vbox;
+  GtkWidget *bbox;
+  GtkWidget *button;
   gchar *text[] =
   {NULL, "Balsa"};
 
@@ -52,8 +53,9 @@ mblist_open_window (GnomeMDI * mdi)
 
   mblw = g_malloc (sizeof (MBListWindow));
 
-  mblw->window = gnome_app_new ("balsa", "Mailboxes");
-
+  mblw->window = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW (mblw->window), "Mailboxes");
+  
   mblw->mdi = mdi;
   gtk_signal_connect (GTK_OBJECT (mblw->window),
 		      "destroy",
@@ -65,14 +67,10 @@ mblist_open_window (GnomeMDI * mdi)
 		      (GtkSignalFunc) gtk_false,
 		      NULL);
 
-  vbox = gtk_vbox_new (TRUE, 0);
-  gnome_app_set_contents (GNOME_APP (mblw->window), vbox);
-  gtk_widget_show (vbox);
-
   mblw->ctree = GTK_CTREE (gtk_ctree_new (2, 1));
   gtk_ctree_set_line_style (mblw->ctree, GTK_CTREE_LINES_DOTTED);
   gtk_clist_set_policy (GTK_CLIST (mblw->ctree), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->vbox), GTK_WIDGET (mblw->ctree), TRUE, TRUE, 0);
   gtk_widget_show (GTK_WIDGET (mblw->ctree));
 
   mblw->parent = gtk_ctree_insert (mblw->ctree, NULL, NULL, text, 0, NULL,
@@ -81,6 +79,23 @@ mblist_open_window (GnomeMDI * mdi)
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,
 		      (gpointer) NULL);
+
+  bbox = gtk_hbutton_box_new ();
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (mblw->window)->action_area), bbox, TRUE, TRUE, 0);
+  gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 2);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (bbox), GTK_BUTTONBOX_SPREAD);
+  gtk_button_box_set_child_size (GTK_BUTTON_BOX (bbox),
+                                   BALSA_BUTTON_WIDTH/2,
+                                   BALSA_BUTTON_HEIGHT/2);
+  gtk_widget_show (bbox);
+
+  button = gtk_button_new_with_label ("Open");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  gtk_widget_show(button);
+
+  button = gtk_button_new_with_label ("Close");
+  gtk_container_add (GTK_CONTAINER (bbox), button);
+  gtk_widget_show(button);
 
   gtk_widget_show (mblw->window);
 }

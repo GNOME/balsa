@@ -254,8 +254,11 @@ ok_preferences_manager ()
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
 
+  g_free (balsa_app.local_mail_directory);
+  balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
+
   g_free (balsa_app.inbox_path);
-  balsa_app.local_mail_directory = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->mail_inbox)));
+  balsa_app.inbox_path = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->mail_inbox)));
 
   g_free (balsa_app.outbox_path);
   balsa_app.outbox_path = g_strdup (gtk_entry_get_text (GTK_ENTRY (pmw->mail_outbox)));

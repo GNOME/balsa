@@ -1,5 +1,6 @@
 #intl dir needed for tarball --disable-nls build.
 SUBDIRS = po sounds images doc libmutt libbalsa libinit_balsa src
+# set tar in case it is not set by automake or make
 
 man_MANS=balsa.1
 
@@ -48,8 +49,9 @@ dist-hook: balsa.spec
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change
 bzdist: distdir
+	@test -n "$(TAR)" || { echo "TAR undefined. Run make bzdist TAR=gtar"; false; }
 	-chmod -R a+r $(distdir)
-	$(AMTAR) chojf $(distdir).tar.bz2 $(distdir)
+	$(TAR) chojf $(distdir).tar.bz2 $(distdir)
 	-rm -rf $(distdir)
 
 ACLOCAL_AMFLAGS = -I m4  

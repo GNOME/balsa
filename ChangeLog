@@ -1,3 +1,7 @@
+2003-02-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in, Makefile.am: release balsa-2.0.8
+
 2003-02-16 10:05  PeterB
 
 	* src/mailbox-node.c: Find special mailboxes by mailbox instead of

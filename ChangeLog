@@ -1,3 +1,7 @@
+1999-11-21  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-init.c: Complete rewrite with GnomeDruid! Yahoo!
+
 1999-11-20  Ragnar Henriksen <ragnar@juniks.org>
         * new files: print.h print.c -> the beginning of printing.
         * save-restore.c added saveing and loading of print setup.

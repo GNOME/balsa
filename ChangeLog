@@ -1,3 +1,8 @@
+1999-01-20  Nat Friedman  <nat@nat.org>
+
+	* src/pref-manager.c (open_preferences_manager): Connect the help
+ 	signal of the GnomePropertyBox to gnome_help_pbox_display.
+
 1999-01-19  Jeff Garzik  <jgarzik@pobox.com>
 
 	* src/balsa-app.c, src/balsa-init.c, src/filter-edit-dialog.c,

@@ -98,6 +98,7 @@ static void pop3_del_cb (GtkWidget * widget, gpointer data);
 void
 open_preferences_manager (void)
 {
+  static GnomeHelpMenuEntry help_entry = { NULL, "properties" };
   GtkWidget *label;
   gint i;
   GnomeApp *active_win;
@@ -124,6 +125,11 @@ open_preferences_manager (void)
 
   gtk_signal_connect (GTK_OBJECT (pui->pbox), "apply",
 		      GTK_SIGNAL_FUNC (apply_prefs), pui);
+
+  help_entry.name = gnome_app_id;
+  gtk_signal_connect (GTK_OBJECT (pui->pbox), "help",
+		      GTK_SIGNAL_FUNC (gnome_help_pbox_display),
+		      &help_entry);
 
 
   /* identity page */

@@ -1121,10 +1121,10 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
         gtk_dialog_new_with_buttons(_("Manage Identities"),
                                     parent,
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_CLOSE, IDENTITY_RESPONSE_CLOSE,
+                                    GTK_STOCK_HELP, IDENTITY_RESPONSE_HELP,
                                     GTK_STOCK_NEW, IDENTITY_RESPONSE_NEW,
                                     GTK_STOCK_REMOVE, IDENTITY_RESPONSE_REMOVE,
-                                    GTK_STOCK_HELP, IDENTITY_RESPONSE_HELP,
+                                    GTK_STOCK_CLOSE, IDENTITY_RESPONSE_CLOSE,
                                     NULL);
     g_signal_connect(G_OBJECT(dialog), "response",
                      G_CALLBACK(md_response_cb), tree);

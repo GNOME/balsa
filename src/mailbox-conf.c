@@ -254,7 +254,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
                                _("Remove from _list"), 0,
                                _("Remove from list and _disk"), 1,
-                               _("_Cancel"), GTK_RESPONSE_CANCEL,
+                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                NULL);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
 	/* deleting remote IMAP mailbox in a folder set */
@@ -275,7 +275,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 			             mailbox->name, mailbox->name);
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
                                _("_Remove from server"), 0,
-                               _("_Cancel"), GTK_RESPONSE_CANCEL,
+                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                NULL);
     } else { /* deleting other remote mailbox */
         ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
@@ -291,7 +291,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 			             mailbox->name);
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
                                _("_Remove from list"), 0,
-                               _("_Cancel"), GTK_RESPONSE_CANCEL,
+                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                NULL);
     }
     

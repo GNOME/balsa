@@ -1,3 +1,9 @@
+2003-01-25  Christian Neumair  <chris@gnome-de.org>
+
+	* libbalsa/identity.c: Reordered buttons to satisfy HIG.
+	* src/mailbox-conf.c: Use GTK+ stock buttons where possible. Reduces
+	number of strings marked for translation.
+
 2003-01-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Compile against gnome-2.2 and openssl-0.9.7

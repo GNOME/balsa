@@ -1199,7 +1199,7 @@ libbalsa_utf8_sanitize(gchar **text, gboolean fallback,
 	    gchar *p = *text;
 	    while (!g_utf8_validate(p, -1, (const gchar **) &p))
 		*p = '?';
-	    g_warning("conversion %s -> utf8 failed: %s", use_enc,
+	    g_message("conversion %s -> utf8 failed: %s", use_enc,
 		      conv_error->message);
 	    g_error_free(conv_error);
 	}

@@ -544,7 +544,7 @@ replyto_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
 
-  if (!balsa_app.current_index_child->index)
+  if (!balsa_app.current_index_child)
     return;
 
   sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index_child->index), 1);
@@ -556,7 +556,7 @@ forward_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
 
-  if (!balsa_app.current_index_child->index)
+  if (!balsa_app.current_index_child)
     return;
 
   sendmsg_window_new (widget, BALSA_INDEX (balsa_app.current_index_child->index), 2);
@@ -568,7 +568,7 @@ next_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
 
-  if (!balsa_app.current_index_child->index)
+  if (!balsa_app.current_index_childx)
     return;
 
   balsa_index_select_next (BALSA_INDEX (balsa_app.current_index_child->index));
@@ -580,7 +580,7 @@ previous_message_cb (GtkWidget * widget)
 {
   g_return_if_fail (widget != NULL);
 
-  if (!balsa_app.current_index_child->index)
+  if (!balsa_app.current_index_child)
     return;
 
   balsa_index_select_previous (BALSA_INDEX (balsa_app.current_index_child->index));
@@ -592,7 +592,7 @@ delete_message_cb (GtkWidget * widget)
 {
   GList *list;
 
-  if (!balsa_app.current_index_child->index)
+  if (!balsa_app.current_index_child)
     return;
 
   list = BALSA_INDEX (balsa_app.current_index_child->index)->selection;
@@ -610,6 +610,9 @@ static void
 undelete_message_cb (GtkWidget * widget)
 {
   GList *list;
+
+  if (!balsa_app.current_index_child)
+    return;
 
   list = BALSA_INDEX (balsa_app.current_index_child->index)->selection;
   while (list)

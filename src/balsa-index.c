@@ -1942,6 +1942,7 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 	    approach would be to change preview, e.g. to top of thread. */
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeIter iter;
 
     if (expand) {
@@ -1949,9 +1950,12 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
         gtk_tree_view_expand_all(tree_view);
 	g_signal_handler_unblock(index, index->row_expanded_id);
     } else {
+	g_signal_handler_block(selection, index->selection_changed_id);
 	g_signal_handler_block(index, index->row_collapsed_id);
         gtk_tree_view_collapse_all(tree_view);
 	g_signal_handler_unblock(index, index->row_collapsed_id);
+	g_signal_handler_unblock(selection, index->selection_changed_id);
+        g_signal_emit_by_name(selection, "changed");
     }
 
     /* Re-expand msg_node's thread; cf. Remarks */

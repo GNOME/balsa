@@ -94,7 +94,8 @@ libbalsa_scanner_mdir(gpointer rnode, const gchar * prefix,
             GType foo = libbalsa_mailbox_type_from_path(filename);
             if ((foo == LIBBALSA_TYPE_MAILBOX_MH) ||
                 (foo == LIBBALSA_TYPE_MAILBOX_MAILDIR)) {
-                parent_node = mailbox_handler(rnode, de->d_name, filename);
+                parent_node =
+		    mailbox_handler(rnode, de->d_name, filename, foo);
                 ++*depth;
                 libbalsa_scanner_mdir(parent_node, filename,
                                       check_local_path, mark_local_path,
@@ -148,11 +149,11 @@ libbalsa_scanner_local_dir_helper(gpointer rnode, const gchar * prefix,
             if ((mailbox_type == LIBBALSA_TYPE_MAILBOX_MH) ||
                 (mailbox_type == LIBBALSA_TYPE_MAILBOX_MAILDIR)) {
                 current_node =
-                    mailbox_handler(rnode, de->d_name, filename);
+                    mailbox_handler(rnode, de->d_name, filename, mailbox_type);
 		helper = libbalsa_scanner_mdir;
             } else {
                 gchar *name = g_path_get_basename(prefix);
-                current_node = folder_handler(rnode, name, filename);
+                current_node = folder_handler(rnode, name, filename, 0);
                 g_free(name);
 		helper = libbalsa_scanner_local_dir_helper;
             }
@@ -165,7 +166,7 @@ libbalsa_scanner_local_dir_helper(gpointer rnode, const gchar * prefix,
         } else {
             mailbox_type = libbalsa_mailbox_type_from_path(filename);
             if (mailbox_type != 0)
-                mailbox_handler(rnode, de->d_name, filename);
+                mailbox_handler(rnode, de->d_name, filename, mailbox_type);
         }
     }
     closedir(dpc);

@@ -25,7 +25,7 @@
 typedef gboolean LocalCheck(const gchar * fn, guint depth);
 typedef void LocalMark(gpointer node);
 typedef gpointer LocalHandler(gpointer root, const char *d_name,
-			      const char *fn);
+			      const char *fn, GType type);
 
 typedef gboolean ImapCheck(const char *fn, LibBalsaServer * server,
                            guint depth);

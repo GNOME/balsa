@@ -73,7 +73,8 @@ static gboolean bmbn_scan_children_idle(BalsaMailboxNode ** mn);
 
 static BalsaMailboxNode *add_local_mailbox(BalsaMailboxNode * root,
 					   const gchar * name,
-					   const gchar * path);
+					   const gchar * path,
+					   GType type);
 static BalsaMailboxNode *add_local_folder(BalsaMailboxNode * root,
 					  const char *d_name,
 					  const char *fn);
@@ -1044,11 +1045,10 @@ remove_special_mailbox_by_url(const gchar* url, LibBalsaMailbox *** special)
 
 static BalsaMailboxNode *
 add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
-		  const gchar * path)
+		  const gchar * path, GType type)
 {
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
-    GtkType type;
     gchar* url;
 
     if(root == NULL) return NULL;
@@ -1056,8 +1056,6 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
     
     mbnode = remove_special_mailbox_by_url(url, NULL);
     if (!mbnode) {
-	type = libbalsa_mailbox_type_from_path(path);
-	
 	if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
 	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mh_new(path, FALSE));
 	} else if ( type == LIBBALSA_TYPE_MAILBOX_MBOX ) {

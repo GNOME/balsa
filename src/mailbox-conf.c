@@ -915,13 +915,10 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     table = gtk_table_new(7, 2, FALSE);
 
     /* mailbox name */
-    if(mcw->mailbox && BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox)) {
-        create_label(_("Mailbox _Name:"), table, 0, &keyval);
-        mcw->mailbox_name = 
-            create_entry(mcw->window, table,
-                         GTK_SIGNAL_FUNC(check_for_blank_fields),
-                         mcw, 0, NULL, keyval);
-    } else mcw->mailbox_name = NULL;
+    create_label(_("Mailbox _Name:"), table, 0, &keyval);
+    mcw->mailbox_name = create_entry(mcw->window, table,
+                                     GTK_SIGNAL_FUNC(check_for_blank_fields),
+                                     mcw, 0, NULL, keyval);
 
     /* imap server */
     create_label(_("_Server:"), table, 1, &keyval);

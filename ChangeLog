@@ -7,6 +7,7 @@
 	acceptance. Corrected to compile without SSL.
 	* libbalsa/mailbox_imap.c: assure_balsa_dir() moved to libbalsa.c
 	* src/information-dialog.c: missing i18n string.
+	* src/mailbox-conf.c: IMAP mailboxes do need name entry.
 	
 2002-06-23  Pawel Salek <pawsa@theochem.kth.se>
 

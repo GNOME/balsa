@@ -109,43 +109,6 @@ static GtkWidget *create_imap_mailbox_page (void);
 
 void mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data);
 
-/*
- * Find  the named mailbox from the balsa_app.mailbox_nodes by it's
- * name
- */
-
-static gint
-find_mailbox_func (GNode * g1, gpointer data)
-{
-  MailboxNode *n1 = (MailboxNode *) g1->data;
-  gpointer *d = data;
-  LibBalsaMailbox *mb = *(LibBalsaMailbox**) data;
-
-  if (!n1 || n1->mailbox != mb)
-     return FALSE;
-
-  *(++d) = g1;
-  return TRUE;
-}
-
-/* find_gnode_in_mbox_list:
-   looks for given mailbox in th GNode tree, usually but not limited to
-   balsa_app.mailox_nodes
-*/
-GNode *
-find_gnode_in_mbox_list (GNode * gnode_list, LibBalsaMailbox * mailbox)
-{
-  gpointer d[2];
-  GNode *retval;
-
-  d[0] = mailbox;
-  d[1] = NULL;
-
-  g_node_traverse (gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
-  retval = d[1];
-  return retval;
-}
-
 void
 mailbox_remove_files (gchar * mbox_path)
 {
@@ -534,7 +497,7 @@ check_for_blank_fields(MailboxConfPageType mbox_type)
 }
 
 static int
-conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
+conf_update_mailbox (LibBalsaMailbox * mailbox)
 {
   LibBalsaMailboxImap *mb_imap;
   LibBalsaMailboxPop3 *mb_pop3;
@@ -559,7 +522,7 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
     g_free (LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
     mailbox->name = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->local_mailbox_name)));
     LIBBALSA_MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
-    config_mailbox_update (mailbox, old_mbox_pkey);
+    config_mailbox_update (mailbox);
   }
   else if ( LIBBALSA_IS_MAILBOX_POP3 (mailbox) ) 
   {
@@ -585,7 +548,7 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
     mb_pop3->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
     mb_pop3->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
     
-    config_mailbox_update (mailbox, old_mbox_pkey);
+    config_mailbox_update (mailbox);
   } 
   else if ( LIBBALSA_IS_MAILBOX_IMAP (mailbox) )
   {
@@ -616,7 +579,7 @@ conf_update_mailbox (LibBalsaMailbox * mailbox, gchar * old_mbox_pkey)
     else
       libbalsa_mailbox_imap_set_path(mb_imap, path);
 				       
-    config_mailbox_update (mailbox, old_mbox_pkey);
+    config_mailbox_update (mailbox);
   } 
   else 
   {
@@ -699,6 +662,7 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 
 /* IMAP Mailboxes */
     case MC_PAGE_IMAP_DIR: 
+#if 0
     {
 	ImapDir *dir = imapdir_new();
 	fill_in_imap_data(&dir->name, &dir->path);
@@ -719,6 +683,7 @@ conf_add_mailbox (LibBalsaMailbox **mbox)
 	    imapdir_destroy(dir);
 	/* and assume it was ordinary IMAP mailbox */
     }
+#endif
     case MC_PAGE_IMAP:
     {
       LibBalsaMailboxImap * m;
@@ -777,10 +742,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
     
     if (mcw->add == FALSE)		/* we are updating the mailbox */
     {
-      gchar *old_mbox_pkey = mailbox_get_pkey(mailbox);
-      return_value = conf_update_mailbox (mcw->mailbox, old_mbox_pkey);
-      g_free (old_mbox_pkey);
-      
+      return_value = conf_update_mailbox (mcw->mailbox);
       if (LIBBALSA_IS_MAILBOX_POP3(mailbox) && return_value != -1)
 	/* redraw the pop3 server list */
 	update_pop3_servers ();

@@ -541,6 +541,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
         g_free (balsa_app.quote_regex);
         entry_widget = gnome_entry_gtk_entry(GNOME_ENTRY (pui->quote_pattern));
         balsa_app.quote_regex = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry_widget)));
+
 	/* charset*/
 	g_free (balsa_app.charset);
 	balsa_app.charset = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->charset)));
@@ -616,13 +617,10 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	menu_item = gtk_menu_get_active ( GTK_MENU(pui->debug_message_menu) );
 	balsa_app.debug_message = GPOINTER_TO_INT (gtk_object_get_user_data(GTK_OBJECT(menu_item)));
 
-	/* XXX */
-	/*  refresh_main_window (); */
-	
 	/*
 	 * close window and free memory
 	 */
-	config_global_save ();
+	config_save ();
         balsa_mblist_redraw (balsa_app.mblist);
         balsa_window = GTK_WIDGET (gtk_object_get_data (GTK_OBJECT (pbox), "balsawindow"));
         balsa_window_refresh (BALSA_WINDOW (balsa_window));

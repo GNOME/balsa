@@ -1090,7 +1090,6 @@ mail_progress_notify_cb( )
     uint count;
     gfloat percent;
     GtkWidget *errorbox;
-    gchar *pkey;
 
     msgbuffer = malloc( 2049 );
 
@@ -1145,9 +1144,7 @@ mail_progress_notify_cb( )
 	      }
 	    break;
 	  case MSGMAILTHREAD_UPDATECONFIG:
-		  pkey = mailbox_get_pkey( threadmessage->mailbox );
-		  config_mailbox_update( threadmessage->mailbox, pkey ); 
-		  g_free( pkey );
+		  config_mailbox_update( threadmessage->mailbox); 
 		  break;
 
 	  case MSGMAILTHREAD_PROGRESS:

@@ -38,24 +38,20 @@ typedef enum {
     SPECIAL_INBOX = 0,
     SPECIAL_SENT,
     SPECIAL_TRASH,
-    SPECIAL_DRAFT
+    SPECIAL_DRAFT,
+    SPECIAL_OUTBOX
 }  specialType;
 
 void config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which);
 
-gint config_load (gchar * user_filename);
-gint config_save (gchar * user_filename);
+gint config_load (void);
+gint config_save (void);
 
 gchar* mailbox_get_pkey(const LibBalsaMailbox * mbox);
 gint config_mailbox_add (LibBalsaMailbox * mailbox, const char *key_arg);
 gint config_mailbox_delete (const LibBalsaMailbox *mailbox);
-gint config_mailbox_update (LibBalsaMailbox * mailbox, const gchar * old_mbox_pkey);
-
-gint config_mailboxes_init (void);
+gint config_mailbox_update (LibBalsaMailbox * mailbox);
 
 gint config_imapdir_add(ImapDir *dir);
-
-gint config_global_load (void);
-gint config_global_save (void);
 
 #endif /* __SAVE_RESTORE_H__ */

@@ -110,25 +110,51 @@ balsa_init (int argc, char **argv)
   gnome_init_with_popt_table (PACKAGE, VERSION, argc, argv, options, 0, NULL);
 }
 
+/* check_special_mailboxes: 
+   check for special mailboxes. Cannot use GUI because main window is not
+   initialized yet.  
+*/
+static gboolean
+check_special_mailboxes (void)
+{
+  gboolean bomb = FALSE;
+
+  if( balsa_app.inbox == NULL ) {
+    g_warning ( _("Balsa cannot open your \"%s\" mailbox."),  _("Inbox") );
+    bomb = TRUE;
+  }
+  
+  if( balsa_app.outbox == NULL ) {
+    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Outbox") );
+    bomb = TRUE;
+  } 
+  
+  if( balsa_app.sentbox == NULL ) {
+    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Sentbox") );
+    bomb = TRUE;
+  }
+  
+  if( balsa_app.draftbox == NULL ) {
+    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Draftbox") );
+    bomb = TRUE;
+  }
+  
+  if( balsa_app.trash == NULL ) {
+    g_warning( _("Balsa cannot open your \"%s\" mailbox."),  _("Trash") );
+    bomb = TRUE;
+  }
+  
+  return bomb;
+}
+
 static void
 config_init (void)
 {
-  if (config_load (BALSA_CONFIG_FILE) == FALSE)
-    {
-      fprintf (stderr, "*** Could not load config file %s!\n",
-	       BALSA_CONFIG_FILE);
+  config_load ();
+  if (check_special_mailboxes())  {
+      g_warning("*** Could not load basic mailboxes!\n");
       balsa_init_begin ();
       /*return;*/
-    }
-
-  /* Load all the global settings.  If there's an error, then some crucial
-     piece of the global settings was not available, and we need to run
-     balsa-init. */
-  if (config_global_load () == FALSE)
-    {
-      fprintf (stderr, "*** config_global_load failed\n");
-      balsa_init_begin ();
-      return;
     }
 }
 
@@ -137,7 +163,7 @@ mailboxes_init (void)
 {
   if ( !do_load_mailboxes () )
     {
-      fprintf (stderr, "*** error loading mailboxes\n");
+      g_warning("*** error loading mailboxes\n");
       balsa_init_begin ();
       return;
     }
@@ -235,7 +261,6 @@ main (int argc, char *argv[])
   config_init ();
 
   /* load mailboxes */
-  config_mailboxes_init ();
   mailboxes_init ();
 
   /* create all the pretty icons that balsa uses that
@@ -381,11 +406,7 @@ balsa_exit (void)
   force_close_mailbox(balsa_app.draftbox);
   force_close_mailbox(balsa_app.trash);
 
-  if (balsa_app.proplist)
-    config_global_save ();
-
   gnome_sound_shutdown ();
-
   gtk_main_quit();
 }
 

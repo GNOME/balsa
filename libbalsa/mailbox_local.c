@@ -47,6 +47,7 @@ static void libbalsa_mailbox_local_destroy (GtkObject *object);
 
 static void libbalsa_mailbox_local_open(LibBalsaMailbox *mailbox, gboolean append);
 static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox);
+static void libbalsa_mailbox_local_save_conf (LibBalsaMailbox *mailbox);
 static FILE* libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *message);
 
 GtkType
@@ -88,6 +89,7 @@ libbalsa_mailbox_local_class_init (LibBalsaMailboxLocalClass *klass)
 	libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_local_open;
 	libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_local_get_message_stream;
 	libbalsa_mailbox_class->check = libbalsa_mailbox_local_check;
+	libbalsa_mailbox_class->save_config = libbalsa_mailbox_local_save_conf;
 }
 
 static void
@@ -294,4 +296,12 @@ static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox)
 		}
 		UNLOCK_MAILBOX (mailbox);
 	}
+}
+
+static void libbalsa_mailbox_local_save_conf (LibBalsaMailbox *mailbox)
+{
+    gnome_config_private_set_string ("type", "local");
+    gnome_config_private_set_string ("name", mailbox->name);
+    gnome_config_private_set_string ("path", 
+				     LIBBALSA_MAILBOX_LOCAL (mailbox)->path);
 }

@@ -1,3 +1,23 @@
+2000-09-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.[hc]: implement save-config signal and
+	libbalsa_mailbox_save_config() method. add pkey configuration field.
+	* libbalsa/mailbox_imap.c: implement save-config signal.
+	* libbalsa/mailbox_pop3.c: implement save-config signal.
+	* libbalsa/mailbox_local.c: implement save-config signal.
+	* libbalsa/misc.[ch]: ind_mailbox_func() moved from src/mailbox-conf.c
+	* libbalsa/server.[ch]: rot() moved from mailbox-conf.c,
+	libbalsa_server_save_conf() implemented
+	* libinit_balsa/balsa-druid-page-finish.gob: new conf hooked in.
+	* libinit_balsa/balsa-druid-page-directory.gob: initialize
+	created mailboxes.
+	* libinit_balsa/balsa-initdruid.gob: new configuration hooked in.
+	* src/balsa-app.[ch]: new configuration hooked in.
+	* src/mailbox-conf.[ch]: new configuration hooked in.
+	* src/main-window.c: new pop config update hooked in.
+	* src/main.c: new configuration hooked in.
+	* src/pref-manager.c:  new configuration hooked in.
+	* src/save-restore.[ch]:  new configuration code implemented.
 2000-09-07  Matthew Guenther  <guentherm@asme.org>
 
 	* README: Added comment about pspell dependency

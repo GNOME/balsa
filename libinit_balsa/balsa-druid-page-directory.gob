@@ -59,13 +59,14 @@ ISPRIME(9)
 
 static gchar *init_mbnames[NUM_EDs] = { N_("Inbox:"), N_("Outbox:"), N_("Sentbox:"), N_("Draftbox:"), N_("Trash:") };
 
-static void unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error );
+static void unconditional_mailbox( const gchar *path, const gchar *prettyname,
+				   LibBalsaMailbox **box, gchar **error );
 
-static void unconditional_mailbox( const gchar *path, const gchar *prettyname, gchar **error )
+static void unconditional_mailbox(const gchar *path, const gchar *prettyname,
+				  LibBalsaMailbox **box, gchar **error )
 {
 	gchar *dup;
 	gchar *index;
-	LibBalsaMailbox *box;
 
 	if( (*error) != NULL )
 		return;
@@ -94,18 +95,17 @@ static void unconditional_mailbox( const gchar *path, const gchar *prettyname, g
 	/* The mailbox currently may not be IMAP or POP3 */
 	/* Due to the above test for a / at the start of the filename */
 
-	box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(path, TRUE);
+	*box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(path, TRUE);
 
-	if( box == NULL ) {
+	if( *box == NULL ) {
 	  (*error) = g_strdup_printf( _("The mailbox \"%s\" does not appear to be valid."),
 				      path );
 		return;
 	}
 
-	box->name = g_strdup( gettext( prettyname ) );
+	(*box)->name = g_strdup( gettext( prettyname ) );
 
-	config_mailbox_add( box, (char *) prettyname );
-	gtk_object_destroy( GTK_OBJECT( box ) );
+	config_mailbox_add( *box, (char *) prettyname );
 }
 
 %}
@@ -248,15 +248,15 @@ class Balsa:Druid:Page:Directory from Balsa:Druid:Page {
 		BalsaDruidPageDirectory *self = BALSA_DRUID_PAGE_DIRECTORY( _self );	
 
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->inbox ) ),
-			"Inbox", &error );
+			"Inbox", &balsa_app.inbox, &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->outbox ) ),
-			"Outbox", &error );
+			"Outbox", &balsa_app.outbox, &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->sentbox ) ),
-			"Sentbox", &error );
+			"Sentbox", &balsa_app.sentbox, &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->draftbox ) ),
-			"Draftbox", &error );
+			"Draftbox", &balsa_app.draftbox, &error );
 		unconditional_mailbox( gtk_entry_get_text( GTK_ENTRY( self->_priv->trash ) ),
-			"Trash", &error );
+			"Trash", &balsa_app.trash, &error );
 
 		self->_priv->paths_locked = TRUE;
 

@@ -59,6 +59,7 @@ enum {
 	GET_MESSAGE_STREAM,
 	CHECK,
 	SET_UNREAD_MESSAGES_FLAG,
+	SAVE_CONFIG,
 	LAST_SIGNAL
 };
 
@@ -164,6 +165,14 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 				gtk_marshal_NONE__NONE,
 				GTK_TYPE_NONE, 0);
 
+	libbalsa_mailbox_signals[SAVE_CONFIG] =
+		gtk_signal_new ("save-config",
+				GTK_RUN_LAST,
+				object_class->type,
+				GTK_SIGNAL_OFFSET (LibBalsaMailboxClass, save_config),
+				gtk_marshal_NONE__NONE,
+				GTK_TYPE_NONE, 0);
+
 	gtk_object_class_add_signals (object_class, libbalsa_mailbox_signals, LAST_SIGNAL);
 
 	object_class->destroy = libbalsa_mailbox_destroy;
@@ -178,6 +187,7 @@ libbalsa_mailbox_class_init (LibBalsaMailboxClass *klass)
 
 	klass->get_message_stream = NULL;
 	klass->check = NULL;
+	klass->save_config = NULL;
 }
 
 static void
@@ -186,6 +196,7 @@ libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
 	mailbox->lock = FALSE;
 	mailbox->is_directory = FALSE;
 
+	mailbox->pkey = NULL;
 	mailbox->name = NULL;
 	CLIENT_CONTEXT (mailbox) = NULL;
 
@@ -198,6 +209,9 @@ libbalsa_mailbox_init(LibBalsaMailbox *mailbox)
 	mailbox->message_list = NULL;
 }
 
+/* libbalsa_mailbox_destroy:
+   destroys mailbox. Must leave it in sane state.
+*/
 static void 
 libbalsa_mailbox_destroy (GtkObject *object)
 {
@@ -210,7 +224,8 @@ libbalsa_mailbox_destroy (GtkObject *object)
 		while (mailbox->open_ref > 0)
 			libbalsa_mailbox_close(mailbox);
 
-	g_free(mailbox->name);
+	g_free(mailbox->name);     mailbox->name = NULL;	
+	g_free(mailbox->pkey);     mailbox->pkey = NULL;	
 
 	if (GTK_OBJECT_CLASS(parent_class)->destroy)
 		(*GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(object));
@@ -250,6 +265,15 @@ libbalsa_mailbox_check (LibBalsaMailbox *mailbox)
 	g_return_if_fail (LIBBALSA_IS_MAILBOX(mailbox));
 
 	gtk_signal_emit (GTK_OBJECT(mailbox), libbalsa_mailbox_signals[CHECK]);
+}
+
+void
+libbalsa_mailbox_save_config (LibBalsaMailbox *mailbox)
+{
+	g_return_if_fail (mailbox != NULL);
+	g_return_if_fail (LIBBALSA_IS_MAILBOX(mailbox));
+
+	gtk_signal_emit (GTK_OBJECT(mailbox), libbalsa_mailbox_signals[SAVE_CONFIG]);
 }
 
 FILE*

@@ -53,11 +53,6 @@ const gchar* pspell_suggest_modes[] = {
   "bad-spellers"
 };
 
-
-
-/* prototypes */
-static gboolean check_special_mailboxes (void);
-
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
@@ -213,9 +208,6 @@ balsa_app_init (void)
 gboolean
 do_load_mailboxes (void)
 {
-  if( check_special_mailboxes () )
-	return FALSE;
-
   if ( LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox) )
   {
     libbalsa_set_spool (LIBBALSA_MAILBOX_LOCAL(balsa_app.inbox)->path);
@@ -235,38 +227,6 @@ do_load_mailboxes (void)
   return TRUE;
 }
 
-static gboolean
-check_special_mailboxes (void)
-{
-	gboolean bomb = FALSE;
-
-	if( balsa_app.inbox == NULL ) {
-		balsa_information ( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Inbox") );
-		bomb = TRUE;
-	}
-
-	if( balsa_app.outbox == NULL ) {
-		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Outbox") );
-		bomb = TRUE;
-	} 
-
-	if( balsa_app.sentbox == NULL ) {
-		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Sentbox") );
-		bomb = TRUE;
-	}
-
-	if( balsa_app.draftbox == NULL ) {
-		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Draftbox") );
-		bomb = TRUE;
-	}
-
-	if( balsa_app.trash == NULL ) {
-		balsa_information( LIBBALSA_INFORMATION_WARNING, _("Balsa cannot open your \"%s\" mailbox."),  _("Trash") );
-		bomb = TRUE;
-	}
-
-	return bomb;
-}
 
 void 
 update_timer( gboolean update, guint minutes )

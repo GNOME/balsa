@@ -20,7 +20,6 @@
 #define __BALSA_APP_H__
 
 #include <gnome.h>
-#include <proplist.h>
 #include "libbalsa.h"
 #include "balsa-mblist.h"
 #include "balsa-index-page.h"
@@ -141,7 +140,6 @@ const gchar** spell_check_suggest_mode_name;
 /* global balsa application structure */
 extern struct BalsaApplication
 {
-  proplist_t proplist;
   /* personal information */
   LibBalsaAddress *address;
   gchar *replyto;

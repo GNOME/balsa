@@ -43,6 +43,7 @@ static void libbalsa_mailbox_imap_init(LibBalsaMailboxImap *mailbox);
 static void libbalsa_mailbox_imap_open (LibBalsaMailbox *mailbox, gboolean append);
 static FILE* libbalsa_mailbox_imap_get_message_stream (LibBalsaMailbox *mailbox, LibBalsaMessage *message);
 static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox);
+static void libbalsa_mailbox_imap_save_conf (LibBalsaMailbox *mailbox);
 
 static void server_settings_changed(LibBalsaServer *server, LibBalsaMailbox *mailbox);
 static void server_user_settings_changed_cb(LibBalsaServer *server, gchar* string, LibBalsaMailbox *mailbox);
@@ -88,6 +89,7 @@ libbalsa_mailbox_imap_class_init (LibBalsaMailboxImapClass *klass)
 	libbalsa_mailbox_class->get_message_stream = libbalsa_mailbox_imap_get_message_stream;
 
 	libbalsa_mailbox_class->check = libbalsa_mailbox_imap_check;
+	libbalsa_mailbox_class->save_config = libbalsa_mailbox_imap_save_conf;
 
 	ImapCheckTimeout = 10;
 }
@@ -302,4 +304,13 @@ static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 
 		UNLOCK_MAILBOX (mailbox);
 	}
+}
+
+static void libbalsa_mailbox_imap_save_conf (LibBalsaMailbox *mailbox)
+{
+    gnome_config_private_set_string("type", "IMAP");
+    gnome_config_private_set_string("name", mailbox->name);
+    gnome_config_private_set_string(
+	    "path",  LIBBALSA_MAILBOX_IMAP(mailbox)->path);
+    libbalsa_server_save_conf(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
 }

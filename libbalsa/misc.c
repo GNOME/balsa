@@ -569,3 +569,40 @@ libbalsa_marshal_POINTER__OBJECT (GtkObject * object, GtkSignalFunc func, gpoint
 	rfunc = (GtkSignal_POINTER__OBJECT)func;
 	*return_val = (*rfunc)(object, GTK_VALUE_OBJECT(args[0]), func_data);
 }
+
+/*
+ * Find  the named mailbox from the balsa_app.mailbox_nodes by it's
+ * name
+ */
+
+static gint
+find_mailbox_func (GNode * g1, gpointer data)
+{
+  MailboxNode *n1 = (MailboxNode *) g1->data;
+  gpointer *d = data;
+  LibBalsaMailbox *mb = *(LibBalsaMailbox**) data;
+
+  if (!n1 || n1->mailbox != mb)
+     return FALSE;
+
+  *(++d) = g1;
+  return TRUE;
+}
+
+/* find_gnode_in_mbox_list:
+   looks for given mailbox in th GNode tree, usually but not limited to
+   balsa_app.mailox_nodes
+*/
+GNode *
+find_gnode_in_mbox_list (GNode * gnode_list, LibBalsaMailbox * mailbox)
+{
+  gpointer d[2];
+  GNode *retval;
+
+  d[0] = mailbox;
+  d[1] = NULL;
+
+  g_node_traverse (gnode_list, G_IN_ORDER, G_TRAVERSE_LEAFS, -1, find_mailbox_func, d);
+  retval = d[1];
+  return retval;
+}

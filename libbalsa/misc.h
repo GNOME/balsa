@@ -75,4 +75,6 @@ void libbalsa_wrap_string(gchar* str, int width);
 void libbalsa_set_charset(const gchar* charset);
 void  libbalsa_marshal_POINTER__OBJECT (GtkObject * object, GtkSignalFunc func, gpointer func_data, GtkArg * args);
 
+GNode *find_gnode_in_mbox_list (GNode * gnode_list, LibBalsaMailbox * mailbox);
+
 #endif /* __LIBBALSA_MISC_H__ */

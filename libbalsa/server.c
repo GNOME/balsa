@@ -227,3 +227,39 @@ libbalsa_server_real_get_password(LibBalsaServer *server)
 	return g_strdup(server->passwd);
 }
 #endif
+
+static gchar * rot (gchar * pass)
+{
+  gchar *buff;
+  gint len = 0, i = 0;
+
+  /*PKGW: let's do the assert() BEFORE we coredump... */
+  g_assert( pass != NULL );
+
+  len = strlen (pass);
+  buff = g_strdup (pass);
+
+  for (i = 0; i < len; i++) {
+      if ((buff[i] <= 'M' && buff[i] >= 'A')
+	  || (buff[i] <= 'm' && buff[i] >= 'a'))
+	buff[i] += 13;
+      else if ((buff[i] <= 'Z' && buff[i] >= 'N')
+	       || (buff[i] <= 'z' && buff[i] >= 'n'))
+	buff[i] -= 13;
+    }
+  return buff;
+}
+
+void libbalsa_server_save_conf(LibBalsaServer *server)
+{
+	gnome_config_private_set_string ("server",   server->host);
+	gnome_config_private_set_int (   "port",     server->port);
+	gnome_config_private_set_string ("username", server->user);
+	
+	if (server->passwd != NULL) {
+		gchar *buff;
+		buff = rot (server->passwd);
+		gnome_config_private_set_string ("password", buff);
+		g_free (buff);
+	}
+}

@@ -24,6 +24,5 @@
 
 void mailbox_conf_new (LibBalsaMailbox * mailbox, gint add_new_mailbox);
 void mailbox_conf_delete (LibBalsaMailbox * mailbox);
-GNode *find_gnode_in_mbox_list (GNode * gnode_list, LibBalsaMailbox * mailbox);
 
 #endif /* __NEW_MAILBOX_H__ */

@@ -38,7 +38,8 @@ static void really_cb( gint reply, BalsaInitDruid *druid );
 static void really_cb( gint reply, BalsaInitDruid *druid )
 {
     if( reply == GNOME_YES ) {
-	balsa_initdruid_finished( druid );
+	gnome_config_drop_all();
+	/* balsa_initdruid_finished( druid ); */
 	gtk_exit( 0 );
     }
 }
@@ -95,7 +96,7 @@ class Balsa:InitDruid from Gnome:Druid {
 		dialog = gnome_question_dialog_modal( _("This will exit Balsa. Do you\n"
 				        "really want to do this?"), 
 				 	(GnomeReplyCallback) really_cb, _self );
-    		gnome_dialog_run( GNOME_DIALOG( dialog ) );
+		gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
 	}
 
 	public void finished( self ) {
@@ -112,6 +113,8 @@ class Balsa:InitDruid from Gnome:Druid {
 		gtk_object_destroy( win );
 
 		gtk_main_quit();
-		/*config_global_save(); When cancelling this makes us coredump */
 	}
 }
+
+
+

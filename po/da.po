@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 0.5\n"
 "POT-Creation-Date: 2000-05-03 14:19+0200\n"
-"PO-Revision-Date: 2000-04-26 13:30+02:00\n"
+"PO-Revision-Date: 2000-05-04 03:30+02:00\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@klid.dk>\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,6 @@ msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Postkassen \"%s\" ser ikke ud til at være gyldig."
 
 #: libinit_balsa/balsa-druid-page-directory.gob:146
-#, fuzzy
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
@@ -1410,9 +1409,8 @@ msgid "_South European (ISO-8859-3)"
 msgstr "_Sydeuropa (ISO-8859-3)"
 
 #: src/sendmsg-window.c:223
-#, fuzzy
 msgid "_Baltic (ISO-8859-13)"
-msgstr "_Kyrillisk (ISO-8859-5)"
+msgstr "_Baltisk (ISO-8859-13)"
 
 #: src/sendmsg-window.c:225
 msgid "Cy_rillic (ISO-8859-5)"

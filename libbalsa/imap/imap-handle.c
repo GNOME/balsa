@@ -1461,8 +1461,10 @@ ir_preauth(ImapMboxHandle *h)
 static ImapResponse
 ir_bye(ImapMboxHandle *h)
 {
-  int c; while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
+  char line[LONG_STRING];
+  sio_gets(h->sio, line, sizeof(line));
   if(!h->doing_logout) {/* it is not we, so it must be the server */
+    imap_mbox_handle_set_msg(h, line);
     imap_mbox_handle_set_state(h, IMHS_DISCONNECTED);
     /* we close the connection here unless we are doing logout. */
     if(h->sio) { sio_detach(h->sio); h->sio = NULL; }

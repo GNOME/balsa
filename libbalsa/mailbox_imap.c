@@ -473,10 +473,15 @@ clean_cache(LibBalsaMailbox* mailbox)
    LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
    login information... */
 #define II(rc,h,line) \
-   {int trials=2;do{rc=line; if(rc!= IMR_SEVERED) break;\
+   {int trials=2;do{rc=line; \
+    if(rc==IMR_SEVERED) \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-    _("IMAP connection has been severed. Reconnecting..."));\
-    imap_mbox_handle_reconnect(h, NULL);}while(trials-->0);}
+    _("IMAP connection has been severed. Reconnecting...")); \
+    else if(rc==IMR_BYE) {char *msg = imap_mbox_handle_get_last_msg(h); \
+    libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
+    _("IMAP server has shut the connection: %s Reconnecting..."), msg); \
+    g_free(msg);}\
+    else break; imap_mbox_handle_reconnect(h, NULL);}while(trials-->0);}
 
 static ImapMboxHandle *
 libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)

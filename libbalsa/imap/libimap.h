@@ -255,6 +255,10 @@ typedef void (*ImapUserCb)(ImapUserEventType ue, void *arg, ...);
 
 ImapMessage *imap_message_new(void);
 void imap_message_free(ImapMessage *);
+void imap_mbox_handle_msg_deserialize(ImapMboxHandle *h, unsigned msgno,
+                                      void *data);
+void*        imap_message_serialize(ImapMessage *);
+ImapMessage* imap_message_deserialize(void *data);
 
 const char *lbi_strerror(ImapResult rc);
 

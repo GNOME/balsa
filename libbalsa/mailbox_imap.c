@@ -490,14 +490,28 @@ clean_cache(LibBalsaMailbox* mailbox)
  
     return TRUE;
 }
+struct ImapCacheManager;
+static void icm_destroy(struct ImapCacheManager *icm);
+static struct ImapCacheManager *icm_store_cached_data(ImapMboxHandle *h);
+static void icm_restore_from_cache(ImapMboxHandle *h,
+                                   struct ImapCacheManager *icm);
 
+static ImapResult
+mi_reconnect(ImapMboxHandle *h)
+{
+    struct ImapCacheManager *icm = icm_store_cached_data(h);
+    ImapResult r = imap_mbox_handle_reconnect(h, NULL);
+    if(r==IMAP_SUCCESS) icm_restore_from_cache(h, icm);
+    icm_destroy(icm);
+    return r;
+}
 /* ImapIssue macro handles reconnecting. We might issue a
-   LIBBALSA_INFORMATION_MMESSAGE here but it would be overwritten by
+   LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
    login information... */
 #define II(rc,h,line) \
    {int trials=2;do{\
-    if(imap_mbox_is_disconnected(h)&&\
-       imap_mbox_handle_reconnect(h, NULL)!=IMAP_SUCCESS){rc=IMR_NO;break;};\
+    if(imap_mbox_is_disconnected(h) &&mi_reconnect!=IMAP_SUCCESS)\
+        {rc=IMR_NO;break;};\
     rc=line; \
     if(rc==IMR_SEVERED) \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
@@ -905,6 +919,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
     LibBalsaServer *server;
     unsigned i;
     guint total_messages;
+    struct ImapCacheManager *icm;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
@@ -930,6 +945,9 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
         /* dummy entry in mindex for now */
         g_ptr_array_add(mailbox->mindex, NULL);
     }
+    icm = g_object_get_data(G_OBJECT(mailbox), "cache-manager");
+    if(icm)
+        icm_restore_from_cache(mimap->handle, icm);
 
     mailbox->first_unread = imap_mbox_handle_first_unseen(mimap->handle);
     libbalsa_mailbox_run_filters_on_reception(mailbox);
@@ -973,6 +991,8 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     clean_cache(mailbox);
 
     mbox->opened = FALSE;
+    g_object_set_data(G_OBJECT(mailbox), "cache-manager",
+                      icm_store_cached_data(mbox->handle));
 
     /* we do not attempt to reconnect here */
     if (expunge)
@@ -2028,7 +2048,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
                                        section, append_str, &dt));
         if(rc != IMR_OK)
-            g_error("FIXME: error handling here!\n");
+            g_warning("FIXME: error handling here!\n");
         
         libbalsa_unlock_mailbox(msg->mailbox);
         
@@ -2042,6 +2062,9 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             g_free(part_name);
             return FALSE; /* something better ? */
         }
+        fputs(im->fetched_header_fields && msg->body_list == part
+              ? im->fetched_header_fields
+              : "MIME-version: 1.0\r\ncontent-type: text/plain\r\n", fp);
 	fwrite(dt.block, dt.body->octets, 1, fp);
 	fseek(fp, 0, SEEK_SET);
     }
@@ -2488,4 +2511,122 @@ libbalsa_imap_purge_temp_dir(off_t cache_size)
     gchar *dir_name = get_cache_dir(NULL, NULL, FALSE);
     clean_dir(dir_name, cache_size);
     g_free(dir_name);
+}
+
+/* ===================================================================
+   ImapCacheManager implementation.  The main task of the
+   ImapCacheManager is to reuse msgno->UID mappings. This is useful
+   mostly for operations when the imap connection cannot last as long
+   as it should due to external constraints (flaky connection,
+   pay-by-the-minute connections). The goal is to extract any UID
+   information that the low level libimap handle might have on
+   connection close and provide it to the new one whenever one is
+   created.
+
+   The general scheme is that libimap does not cache any data
+   persistently based on UIDs - this task is left to ImapCacheManager.
+ .
+   ICM provides two main functions:
+
+   - init_on_select() - preloads ImapMboxHandle msgno-based cache with
+     all available information. It may ask ImapMboxHandle to provide
+     UID->msgno maps if it considers it necessary.
+
+   - store_cached_data() - extracts all information that is known to
+     ImapMboxHandle and can be potentially used in future sessions -
+     mostly all ImapMessage and ImapEnvelope structures.
+
+     Current implementation stores the information in memory but an
+     implementation storing data on disk is possible, too.
+
+ */
+struct ImapCacheManager {
+    GHashTable *headers;
+    GArray     *uidmap;
+    uint32_t    uidvalidity;
+    uint32_t    uidnext;
+    uint32_t    exists;
+};
+
+static struct ImapCacheManager*
+imap_cache_manager_new(guint cnt)
+{
+    struct ImapCacheManager *icm = g_new0(struct ImapCacheManager, 1);
+    icm->exists = cnt;
+    icm->headers = 
+        g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, g_free);
+    icm->uidmap = g_array_sized_new(FALSE,  TRUE, sizeof(uint32_t), cnt);
+    return icm;
+}
+
+static void
+icm_destroy(struct ImapCacheManager *icm)
+{
+    g_hash_table_destroy(icm->headers);
+    g_array_free(icm->uidmap, TRUE);
+}
+
+/* icm_init_on_select_() preloads header cache of the ImapMboxHandle object.
+   It currently handles following cases:
+   a). uidvalidity different - entire cache has to be invalidated.
+   b). cache->exists == h->exists && cache->uidnext == h->uidnext:
+   nothing has changed - feed entire cache.
+   else fetch the message numbers for the UIDs in cache (not yet handled).
+   Problem: what to do about UID fragmentation?
+*/
+static void
+icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
+{
+    unsigned exists, uidvalidity, uidnext;
+    unsigned i;
+
+    if(!icm || ! h)
+        return;
+    uidvalidity = imap_mbox_handle_get_validity(h);
+    exists  = imap_mbox_handle_get_exists(h);
+    uidnext = imap_mbox_handle_get_uidnext(h);
+    if(icm->uidvalidity != uidvalidity) {
+        printf("different validities %u %u- cache invalidated\n",
+               icm->uidvalidity, uidvalidity);
+        return;
+    }
+
+    /* detect unhandled "else" case */
+    if(icm->exists != exists || icm->uidnext != uidnext) {
+        printf("mailbox modified exists: %u %u uidnext: %u %u\n",
+               icm->exists, exists, icm->uidnext, uidnext);
+        return;
+    }
+    for(i=1; i<=icm->exists; i++) {
+        uint32_t uid = g_array_index(icm->uidmap, uint32_t, i-1);
+        void *data = g_hash_table_lookup(icm->headers,
+                                         GUINT_TO_POINTER(uid));
+        if(data) /* if uid known */
+            imap_mbox_handle_msg_deserialize(h, i, data);
+    }
+}
+static struct ImapCacheManager*
+icm_store_cached_data(ImapMboxHandle *handle)
+{
+    struct ImapCacheManager *icm;
+    unsigned cnt, i;
+
+    if(!handle)
+        return NULL;
+
+    cnt = imap_mbox_handle_get_exists(handle);
+    icm = imap_cache_manager_new(cnt);
+    icm->uidvalidity = imap_mbox_handle_get_validity(handle);
+    icm->uidnext     = imap_mbox_handle_get_uidnext(handle);
+    for(i=1; i<=cnt; i++) {
+        uint32_t *uid = &g_array_index(icm->uidmap, uint32_t, i-1);
+        ImapMessage *imsg = imap_mbox_handle_get_msg(handle, i);
+        if(imsg) {
+            void *ptr = imap_message_serialize(imsg);
+            g_hash_table_insert(icm->headers,
+                                GUINT_TO_POINTER(imsg->uid), ptr);
+            *uid = imsg->uid;
+        } else *uid = 0;
+    }
+    return icm;
 }

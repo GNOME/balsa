@@ -771,7 +771,7 @@ ic_construct_header_list(const char **hdr, ImapFetchType ift)
   if(ift & IMFETCH_RFC822HEADERS) hdr[idx++] = "RFC822.HEADERS";
   if(ift & IMFETCH_RFC822HEADERS_SELECTED)
     hdr[idx++] = "BODY.PEEK[HEADER.FIELDS.NOT (DATE SUBJECT FROM SENDER "
-      "REPLY-TO TO CC BCC IN-REPLY-TO MESSAGE-ID CONTENT-TYPE)]";
+      "REPLY-TO TO CC BCC IN-REPLY-TO MESSAGE-ID)]";
   hdr[idx] = NULL;
 }
 
@@ -916,7 +916,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
   if(strcmp(section, "1") == 0 && msg &&
      msg->body && msg->body->media_basic != IMBMEDIA_MESSAGE_RFC822 &&
      msg->body->media_basic != IMBMEDIA_MULTIPART)
-    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[HEADER] BODY[%s])",
+    snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]",
              seqno, section);
   else
     snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s.MIME] BODY[%s])",

@@ -1,3 +1,12 @@
+2004-10-10  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: first shot at systematic ImapCacheManager
+	+ do not fetch headers twice.
+	* libbalsa/imap/imap-commands.c: do not fetch headers twice.
+	* libbalsa/imap/imap-handle.[hc]: header cache serialize support.
+	* libbalsa/imap/libimap.h: ditto.
+	* bootstrap.sh: check automake result.
+
 2004-10-08 11:27  PeterB
 
 	* src/: balsa-mblist.c, main-window.c: check whether Balsa has

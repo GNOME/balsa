@@ -121,6 +121,7 @@ ImapTlsMode imap_handle_set_tls_mode(ImapMboxHandle *h, ImapTlsMode option);
 int      imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
 unsigned imap_mbox_handle_get_exists(ImapMboxHandle* handle);
 unsigned imap_mbox_handle_get_validity(ImapMboxHandle* handle);
+unsigned imap_mbox_handle_get_uidnext(ImapMboxHandle* handle);
 int      imap_mbox_handle_get_delim(ImapMboxHandle* handle,
                                     const char *namespace);
 char* imap_mbox_handle_get_last_msg(ImapMboxHandle *handle);

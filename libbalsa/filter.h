@@ -24,29 +24,65 @@
  * 
  * Header for libfilter, the mail filtering porting of balsa
  *
- * Author:  Joel Becker
+ * Authors:  Joel Becker - Emmanuel Allaud
  */
 
-#ifndef _FILTER_H
-#define _FILTER_H
+#ifndef __FILTER_H__
+#define __FILTER_H__
 
 #include <glib.h>
 
 #include "libbalsa.h"
 
-/* filter match types */
-typedef enum {
-    FILTER_NONE,
-    FILTER_SIMPLE,
-    FILTER_REGEX,
-    FILTER_EXEC
-} filter_match_type;
+/* Conditions definition :
+ * a condition is the basic component of a filter
+ * It can be of type (mimic the old filter types) :
+ * - CONDITION_SIMPLE : matches when a string is contained in 
+ *   one of the specified fields
+ * - CONDITION_REGEX : matches when one of the reg exs matches on one
+ *   of the specified fields
+ * - CONDITION_EXEC : matches when the execution of the given command
+ *   with parameters (FIXME : what are they???, see proposition for filter command) returns 1
+ *
+ * A condition has attributes :
+ * - match_fields : a gint specifying on which fields to apply the condition
+ * - condition_not : a gboolean to negate (logical not) the condition
+ */
+
+/* condition match types */
 
 typedef enum {
-    FILTER_MATCHES,
-    FILTER_NOMATCH,
-    FILTER_ALWAYS,
-} filter_when_type;
+    CONDITION_NONE,
+    CONDITION_SIMPLE,
+    CONDITION_REGEX,
+    CONDITION_DATE,
+    CONDITION_FLAG
+} ConditionMatchType;
+
+typedef struct _LibBalsaCondition {
+    ConditionMatchType type;
+    gboolean condition_not;
+
+    /* The match type fields */
+    union _match {
+	gchar * string;	           /* for CONDITION_SIMPLE,CONDITION_DATE */
+	GSList * regexs;           /* for CONDITION_REGEX */
+	struct {
+	    time_t date_low,date_high; /* for CONDITION_DATE            */
+                                       /* (date_high==0=>no high limit) */
+	} interval;
+	LibBalsaMessageFlag flags;
+    } match;
+    guint match_fields;         /* Contains the flag mask for CONDITION_FLAG type */
+} LibBalsaCondition;
+
+/* Filter definition :
+ * a filter is defined by 
+ * - a list of conditions and a gint conditions_op
+ *   specifying the logical op to apply on the result of the condition match
+ * - an action to perform on match : move, copy, print or trash the matching message,
+ *   emit a sound, popup a text, execute a command
+ */
 
 typedef enum {
     FILTER_NOTHING,
@@ -54,78 +90,122 @@ typedef enum {
     FILTER_MOVE,
     FILTER_PRINT,
     FILTER_RUN,
-    FILTER_TRASH
-} filter_action_type;
+    FILTER_TRASH              // Must be the last one
+} FilterActionType;
 
-/* filter_run_dialog() modes */
-#define FILTER_RUN_SINGLE    0
-#define FILTER_RUN_MULTIPLE  1
+typedef enum {
+    FILTER_NOOP,
+    FILTER_OP_OR,
+    FILTER_OP_AND             // Must be the last one
+} FilterOpType;
 
 /*
  * filter error codes
- * (not an enum cause they *have* to match filter_errlist
+ * (not an enum cause they *have* to match filter_errlist)
  */
-#define FILTER_NOERR         0
-#define FILTER_ENOFILE       1
-#define FILTER_ENOREAD       2
-#define FILTER_EFILESYN      3
-#define FILTER_ENOMSG        4
-#define FILTER_ENOMEM        5
-#define FILTER_EREGSYN       6
 
+#define FILTER_NOERR         0
+#define FILTER_EFILESYN      1
+#define FILTER_ENOMEM        2
+#define FILTER_EREGSYN       3
+#define FILTER_EINVALID      4
 
 /*
  * Filter errors set the variable filter_errno (like errno)
+ * See policy to use it in filter-error.c
  */
-gint filter_errno;
+extern gint filter_errno;
 
-/* filters */
-typedef struct _filter {
-    gint group;
+typedef struct _LibBalsaFilter {
+
     gchar *name;
-    filter_match_type type;
-    filter_when_type match_when;
-    guint flags;
+    FilterOpType conditions_op;
+    gint flags;
 
-    /* The match type fields */
-    union _match {
-	gchar string[1024];	/* for FILTER_SIMPLE */
-	gchar command[1024];	/* for FILTER_EXEC */
-    } match;
-    guint match_fields;		/* for FILTER_SIMPLE filters */
+    GSList * conditions;
 
-    /* The notification fields */
-    gchar sound[PATH_MAX];
-    gchar popup_text[256];
+    /* The notification fields : NULL signifies no notification */
+    gchar * sound;
+    gchar * popup_text;
 
     /* The action */
-    filter_action_type action;
-    gchar action_string[PATH_MAX];
+    FilterActionType action;
+    /* action_string depends on action : 
+     * - if action is FILTER_MOVE, or FILTER_COPY, action_string is the name of the
+     *   mailbox to move/copy the matching message
+     * - if action is FILTER_RUN, action_string is the command to run
+         for now this is the way to specify parameters (replaced by pieces of the
+	 matching message) for the running command, proposition :
+	 %f,%t,%c,%s are replaced by the corresponding header (from,to,cc,subject) field of the matching message
+	 on the command line with enclosing quotes if necessary, e.g. : 
+	 command_to_run %t %s -----> command_to_run manu@wanadoo.fr "about filters"
+	 If you want the body, we must find a way to pipe it to the std input of the command (FIXME what do we do for
+	 different parts, attachments and so on?)
+     * - if action is FILTER_TRASH it's NULL
+     * - FIXME if action is FILTER_PRINT it could be the print command ?
+     */
+    gchar * action_string;
 
-    /* other options I haven't thought of yet */
+    /* The following fields are used when the filter runs */
 
-    /* the regex list */
-    GList *regex;
-} filter;
+    /* List of matching messages */
+    GList * matching_messages;
+
+} LibBalsaFilter;
 
 /*
  * Exported filter functions
+ * A lot are, to have a fine-grained API so we can use filter engine for a lot of different
+ * purpose : search functions, virtual folders..., not only filtering
  */
-GList *filter_init(gchar * filter_file);
-gint filter_load(GList * filter_list, gchar * filter_file);
-gint filter_save(GList * filter_list, gchar * filter_file);
-gint filter_run_all(GList * filter_list, LibBalsaMessage * message);
-gint filter_run_group(GList * filter_list,
-		      LibBalsaMessage * message, gint group);
-gint filter_run_nth(GList * filter_list,
-		    LibBalsaMessage * message, gint n);
-gint filter_run_single(filter * filt, LibBalsaMessage * message);
-void filter_free(filter * fil, gpointer throwaway);
+
+gint match_condition(LibBalsaCondition* cond,LibBalsaMessage* message);
+
+gint match_conditions(FilterOpType op,GSList* cond,LibBalsaMessage* message);
+
+/* Filtering functions */
+/* FIXME : perhaps I should try to use multithreading -> but we must therefore use lock very well */
+
+/* prepare_filters_to_run will test all filters for correctness, compile regexs if needed
+ * Return 
+ * - TRUE on success (all filters are valid, ready to be applied)
+ * - FALSE if there are invalid filters
+ */
+
+gint filters_prepare_to_run(GSList * filters);
+
+/* filters_run_on_messages run all filters on the list of messages
+ * It returns TRUE if the trash bin has been filled with something
+ * this is used to call enable_empty_trash after
+ * FIXME : No locking is done for now
+ */
+
+gboolean filters_run_on_messages(GSList * filter_list, GList * messages);
+
+/*
+ * libbalsa_filter_by_name()
+ * search in the filter list the filter of name fname or NULL if unfound
+ */
+
+LibBalsaFilter* libbalsa_filter_get_by_name(const gchar* fname);
+
 /*
  * Dialog calls
  */
-void filter_edit_dialog(GList * filter_list);
-void filter_run_dialog(GList * filter_list, guint mode);
+/* filters_edit_dialog launches (guess what :) the filters edit dialog box
+ * to modify the list of all filters
+ */
+void filters_edit_dialog(void);
+
+/* filter_run_dialog edits and runs the list of filters of the mailbox
+ */
+void filters_run_dialog(LibBalsaMailbox *mbox);
+
+/* filter_export_dialog to export filters as sieve scripts
+ */
+
+void
+filters_export_dialog(void);
 
 /*
  * Error calls
@@ -133,4 +213,4 @@ void filter_run_dialog(GList * filter_list, guint mode);
 gchar *filter_strerror(gint filter_errnum);
 void filter_perror(const gchar * s);
 
-#endif				/* _FILTER_H */
+#endif				/* __FILTER_H__ */

@@ -134,13 +134,10 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
 
-
     mailbox = gtk_type_new(LIBBALSA_TYPE_MAILBOX_MBOX);
-    
     mailbox->is_directory = FALSE;
 	
     mailbox->url = g_strconcat("file://", path, NULL);
-	
     if( libbalsa_mailbox_mbox_create(path, create) < 0 ) {
 	gtk_object_destroy(GTK_OBJECT(mailbox));
 	return NULL;

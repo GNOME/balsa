@@ -201,6 +201,7 @@ static void select_part_cb(BalsaMessage * bm, gpointer data);
 
 #ifdef BALSA_SHOW_ALL
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
+static void filter_export_cb(GtkWidget * widget, gpointer data);
 #endif
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
@@ -361,6 +362,8 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_ITEM_STOCK(N_("_Filters..."), N_("Manage filters"),
                            filter_dlg_cb, GNOME_STOCK_MENU_PROP),
+    GNOMEUIINFO_ITEM_STOCK(N_("_Export filters"), N_("Export filters as Sieve scripts"),
+			   filter_export_cb, GNOME_STOCK_MENU_PROP),
 #endif
     GNOMEUIINFO_END
 };
@@ -2539,7 +2542,12 @@ address_book_cb(GtkWindow *widget, gpointer data)
 static void
 filter_dlg_cb(GtkWidget * widget, gpointer data)
 {
-    filter_edit_dialog(NULL);
+    filters_edit_dialog();
+}
+static void
+filter_export_cb(GtkWidget * widget, gpointer data)
+{
+    filters_export_dialog();
 }
 #endif
 

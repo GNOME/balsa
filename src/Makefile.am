@@ -1,5 +1,19 @@
 bin_PROGRAMS = balsa
 
+if BALSA_SHOW_ALL
+filter_src = \
+	filter-edit.h		\
+	filter-edit-callbacks.c	\
+	filter-edit-dialog.c	\
+	filter-export-callbacks.c \
+	filter-export-dialog.c	\
+	filter-export.h		\
+	filter-run.h		\
+	filter-run-callbacks.c	\
+	filter-run-dialog.c
+
+endif
+
 balsa_BASE_SRCLIST =	\
 	address-book.c		\
 	address-book.h		\
@@ -21,9 +35,6 @@ balsa_BASE_SRCLIST =	\
 	expand-alias.h		\
 	folder-conf.c		\
 	folder-conf.h		\
-	filter-edit.h		\
-	filter-edit-callbacks.c	\
-	filter-edit-dialog.c	\
 	information-dialog.h	\
 	information-dialog.c	\
 	mailbox-conf.c		\
@@ -53,7 +64,8 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.c		\
 	toolbar-prefs.h		\
 	toolbar-factory.c	\
-	toolbar-factory.h
+	toolbar-factory.h	\
+	$(filter_src)
 
 balsa_IDL_SRCLIST = # balsa-common.c balsa-skels.c balsa-stubs.c		
 

@@ -61,10 +61,6 @@ typedef struct header MuttHeader;
 #include "mailbox_mh.h"
 #include "mailbox_maildir.h"
 
-#ifdef BALSA_SHOW_ALL
-#include "filter.h"
-#endif
-
 /*
  * Initialize the library
  */

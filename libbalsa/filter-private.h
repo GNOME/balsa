@@ -25,8 +25,8 @@
  * private filter defninitions
  */
 
-#ifndef _FILTER_PRIVATE_H
-#define _FILTER_PRIVATE_H
+#ifndef __FILTER_PRIVATE_H__
+#define __FILTER_PRIVATE_H__
 
 #ifdef HAVE_PCRE
 #  include <pcreposix.h>
@@ -35,52 +35,51 @@
 #  include <regex.h>
 #endif
 
+#include "libmutt/mutt.h"
+#include "libmutt/mutt_regex.h"
+
 /* regex options */
 #define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
 #define FILTER_REGEXEC       0
 
+/* Conditions definitions */
+
+/*  match flags */
+#define CONDITION_EMPTY         0       /* for initialization */
+#define CONDITION_MATCH_TO      1<<0	/* match in the To: field */
+#define CONDITION_MATCH_FROM    1<<1	/* match in the From: field */
+#define CONDITION_MATCH_SUBJECT 1<<2	/* match in the Subject field */
+#define CONDITION_MATCH_CC      1<<3	/* match in the cc: field */
+#define CONDITION_MATCH_BODY    1<<7	/* match in the body */
+
+/* match_fields macros */
+#define CONDITION_SETMATCH(x, y) \
+          ((((LibBalsaCondition*)(x))->match_fields) |= (y))
+#define CONDITION_CLRMATCH(x, y) \
+          ((((LibBalsaCondition*)(x))->match_fields) &= ~(y))
+#define CONDITION_CHKMATCH(x, y) \
+          ((((LibBalsaCondition*)(x))->match_fields) & (y))
+
+/* regex struct */
+typedef struct _LibBalsaConditionRegex {
+    gchar *string;
+    regex_t *compiled;
+} LibBalsaConditionRegex;
+
+/* Filter defintions */
 
 /* filter flags */
 #define FILTER_EMPTY         0	/* for clearing bitfields */
-#define FILTER_BUILT         1<<0	/* options have been turned into
-					   regex strings */
-#define FILTER_COMPILED      1<<1	/* regex strings have been compiled
-					   with regcomp() */
-#define FILTER_MODIFIED      1<<2	/* the filter has been modified and
-					   the regex's are no longer valid */
-#define FILTER_ENABLED       1<<3	/* the filter is enabled
-					   a filter can be disabled because
-					   of user selection or an error in the
-					   regex */
+
+#define FILTER_VALID         1<<1	/* ready to filter (eg regex strings 
+					   have been compiled with regcomp(), with no errors...) */					
+#define FILTER_COMPILED      1<<2	/* the filter needs to be compiled (ie there are uncompiled regex) */
 #define FILTER_SOUND         1<<4	/* play a sound when matches */
 #define FILTER_POPUP         1<<5	/* popup text when matches */
-#define FILTER_PLACE         1<<6	/* "Place" disposition */
-#define FILTER_NOPLACE       1<<7	/* "Do not Place" disposition */
-#define FILTER_STOP          1<<8	/* "Stop" disposition */
 
 /* flag operation macros */
-#define FILTER_SETFLAG(x, y) ((((filter*)(x))->flags) |= (y))
-#define FILTER_CLRFLAG(x, y) ((((filter*)(x))->flags) &= ~(y))
-#define FILTER_CHKFLAG(x, y) ((((filter*)(x))->flags) & (y))
+#define FILTER_SETFLAG(x, y) ((((LibBalsaFilter*)(x))->flags) |= (y))
+#define FILTER_CLRFLAG(x, y) ((((LibBalsaFilter*)(x))->flags) &= ~(y))
+#define FILTER_CHKFLAG(x, y) ((((LibBalsaFilter*)(x))->flags) & (y))
 
-/* FILTER_SIMPLE match flags */
-#define FILTER_MATCH_ALL     1<<0	/* match entire message */
-#define FILTER_MATCH_HEADER  1<<1	/* match in the header */
-#define FILTER_MATCH_BODY    1<<2	/* match in the body */
-#define FILTER_MATCH_TO      1<<3	/* match in the To: field */
-#define FILTER_MATCH_FROM    1<<4	/* match in the From: field */
-#define FILTER_MATCH_SUBJECT 1<<5	/* match in the Subject field */
-
-/* FILTER_SIMPLE macros */
-#define FILTER_SETMATCH(x, y) ((((filter*)(x))->match_fields) |= (y))
-#define FILTER_CLRMATCH(x, y) ((((filter*)(x))->match_fields) &= ~(y))
-#define FILTER_CHKMATCH(x, y) ((((filter*)(x))->match_fields) & (y))
-
-/* regex struct */
-typedef struct _filter_regex {
-    gchar *string;
-    regex_t *compiled;
-} filter_regex;
-
-
-#endif				/* _FILTER_PRIVATE_H */
+#endif				/* __FILTER_PRIVATE_H__ */

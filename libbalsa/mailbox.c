@@ -36,6 +36,10 @@
 #include "threads.h"
 #endif
 
+#ifdef BALSA_SHOW_ALL
+#include "mailbox-filter.h"
+#endif
+
 /* Class functions */
 static void libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass);
 static void libbalsa_mailbox_init(LibBalsaMailbox * mailbox);
@@ -265,6 +269,10 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 
     mailbox->readonly = FALSE;
     mailbox->mailing_list_address = NULL;
+
+#ifdef BALSA_SHOW_ALL
+    mailbox->filters=NULL;
+#endif
 }
 
 /* libbalsa_mailbox_destroy:
@@ -315,7 +323,6 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
 	gnome_config_pop_prefix();
 	return NULL;
     }
-
     type = gtk_type_from_name(type_str);
     if (type == 0) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -429,6 +436,7 @@ libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
     gnome_config_push_prefix(prefix);
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[SAVE_CONFIG], prefix);
+
     gnome_config_pop_prefix();
 }
 
@@ -442,6 +450,7 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
     gnome_config_push_prefix(prefix);
     gtk_signal_emit(GTK_OBJECT(mailbox),
 		    libbalsa_mailbox_signals[LOAD_CONFIG], prefix);
+
     gnome_config_pop_prefix();
 }
 
@@ -534,6 +543,7 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix)
 {
     gchar *tmp;
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gnome_config_set_string("Type",
@@ -547,10 +557,8 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
     } else {
 	gnome_config_clean_key("MailingListAddress");
     }
-
     g_free(mailbox->config_prefix);
     mailbox->config_prefix = g_strdup(prefix);
-
 }
 
 static void

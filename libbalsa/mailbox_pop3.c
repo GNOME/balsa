@@ -43,6 +43,10 @@
 #include "src/mailbox-conf.h"
 #endif
 
+#ifdef BALSA_SHOW_ALL
+#include "mailbox-filter.h"
+#endif
+
 static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_pop3_destroy(GtkObject * object);
@@ -293,15 +297,26 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }	
     libbalsa_mailbox_open(tmp_mailbox);
-    if((m->inbox) && (tmp_mailbox->messages) &&
-	!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Error placing messages from %s on %s\n"
-			       "Messages are left in %s\n"),
-			     mailbox->name, 
-			     LIBBALSA_MAILBOX(m->inbox)->name,
-			     tmp_path);
-	libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));	
+    if((m->inbox) && (tmp_mailbox->messages)) {
+
+#ifdef BALSA_SHOW_ALL
+       GSList * filters= 
+           libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(m)->filters,
+                                         FILTER_WHEN_INCOMING);
+
+       /* We apply filter if needed */
+       filters_run_on_messages(filters, tmp_mailbox->message_list);
+#endif /*BALSA_SHOW_ALL*/
+
+	if (!libbalsa_messages_move(tmp_mailbox->message_list, m->inbox)) {    
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 _("Error placing messages from %s on %s\n"
+				   "Messages are left in %s\n"),
+				 mailbox->name, 
+				 LIBBALSA_MAILBOX(m->inbox)->name,
+				 tmp_path);
+	    libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
+	}
     } else {
 	libbalsa_mailbox_close(LIBBALSA_MAILBOX(tmp_mailbox));
 	unlink((const char*)tmp_path);

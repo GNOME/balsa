@@ -1,5 +1,13 @@
 noinst_LIBRARIES = libbalsa.a
 
+if BALSA_SHOW_ALL
+filter_src = \
+	filter-file.c		\
+	filter-file.h		\
+	filter.c		\
+	filter.h
+endif
+
 libbalsa_a_SOURCES = 		\
 	address-book-ldap.c 	\
 	address-book-ldap.h	\
@@ -18,11 +26,9 @@ libbalsa_a_SOURCES = 		\
 	files.c			\
 	files.h			\
 	filter-error.c		\
-	filter-file.c		\
 	filter-funcs.c		\
 	filter-funcs.h		\
 	filter-private.h	\
-	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
 	identity.c		\
@@ -33,6 +39,8 @@ libbalsa_a_SOURCES = 		\
 	libbalsa.h		\
 	libbalsa_private.h	\
 	mailbackend.h		\
+	mailbox-filter.c	\
+	mailbox-filter.h	\
 	mailbox.c		\
 	mailbox.h		\
 	mailbox_imap.c		\
@@ -63,7 +71,8 @@ libbalsa_a_SOURCES = 		\
 	server.c		\
 	server.h		\
 	source-viewer.c		\
-	threads.h
+	threads.h		\
+	$(filter_src)
 
 INCLUDES=-I${top_srcdir} -I${top_builddir}/libmutt \
 	$(PCRE_CFLAGS)

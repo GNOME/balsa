@@ -1096,8 +1096,9 @@ message_body_ref (Message * message)
   if ((msg = mx_open_message (CLIENT_CONTEXT (message->mailbox), cur->msgno)) != NULL)
     {
       b = cur->content;
+
       if (balsa_app.debug)
-	g_print ("%s/%s", TYPE (b->type), b->subtype);
+	g_print ("Loading message: %s/%s\n", TYPE (b->type), b->subtype);
 
       memset (&s, 0, sizeof (s));
       mutt_mktemp (tmpfile);

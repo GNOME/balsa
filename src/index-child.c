@@ -67,11 +67,11 @@ static void message_status_set_answered_cb (GtkWidget *, Message *);
 static void delete_message_cb (GtkWidget *, Message *);
 static void undelete_message_cb (GtkWidget *, Message *);
 
-void 
+void
 index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
 {
   if (mdi_child)
-    balsa_app.current_index_child = INDEX_CHILD(mdi_child);
+    balsa_app.current_index_child = INDEX_CHILD (mdi_child);
   else
     balsa_app.current_index_child = NULL;
 }
@@ -79,11 +79,11 @@ index_child_changed (GnomeMDI * mdi, GnomeMDIChild * mdi_child)
 IndexChild *
 index_child_get_active (GnomeMDI * mdi)
 {
-  return INDEX_CHILD(mdi->active_child);
+  return INDEX_CHILD (mdi->active_child);
 }
 
 IndexChild *
-index_child_new (GnomeMDI *mdi, Mailbox * mailbox)
+index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
 {
   IndexChild *child;
 
@@ -100,21 +100,21 @@ index_child_new (GnomeMDI *mdi, Mailbox * mailbox)
 }
 
 static void
-index_child_destroy(GtkObject *obj)
+index_child_destroy (GtkObject * obj)
 {
   IndexChild *ic;
 
-  ic = INDEX_CHILD(obj);
+  ic = INDEX_CHILD (obj);
 
-  mailbox_watcher_remove(ic->mailbox,ic->watcher_id);
+  mailbox_watcher_remove (ic->mailbox, ic->watcher_id);
   mailbox_open_unref (ic->mailbox);
 
-  gnome_mdi_remove_child(ic->mdi, GNOME_MDI_CHILD(ic), FALSE);
+  gnome_mdi_remove_child (ic->mdi, GNOME_MDI_CHILD (ic), FALSE);
 /*
-  if(GTK_OBJECT_CLASS(parent_class)->destroy)
-      (* GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(ic));
-*/
-  g_free(ic);
+   if(GTK_OBJECT_CLASS(parent_class)->destroy)
+   (* GTK_OBJECT_CLASS(parent_class)->destroy)(GTK_OBJECT(ic));
+ */
+  g_free (ic);
   ic = NULL;
 }
 
@@ -131,7 +131,7 @@ index_child_create_view (GnomeMDIChild * child)
   gtk_widget_show (vpane);
 
   iw->index = balsa_index_new ();
-  gtk_paned_add1(GTK_PANED(vpane), iw->index);
+  gtk_paned_add1 (GTK_PANED (vpane), iw->index);
   gtk_widget_show (iw->index);
 
   balsa_index_set_mailbox (BALSA_INDEX (iw->index), iw->mailbox);
@@ -145,7 +145,7 @@ index_child_create_view (GnomeMDIChild * child)
 				      (MailboxWatcherFunc) mailbox_listener,
 					MESSAGE_NEW_MASK,
 					(gpointer) iw);
-  
+
   if (!mailbox_open_ref (iw->mailbox))
     {
       mailbox_watcher_remove (iw->mailbox, iw->watcher_id);
@@ -157,19 +157,19 @@ index_child_create_view (GnomeMDIChild * child)
       gtk_widget_set_usize (messagebox, MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT);
       gtk_window_position (GTK_WINDOW (messagebox), GTK_WIN_POS_CENTER);
       gtk_widget_show (messagebox);
-      gtk_widget_destroy(iw->index);
-      gtk_widget_destroy(vpane);
-      g_free(iw);
+      gtk_widget_destroy (iw->index);
+      gtk_widget_destroy (vpane);
+      g_free (iw);
       iw = NULL;
       return NULL;
     }
-  mailbox_open_unref(iw->mailbox);
+  mailbox_open_unref (iw->mailbox);
 
   iw->message = balsa_message_new ();
-  gtk_paned_add2(GTK_PANED(vpane), iw->message);
-  gtk_widget_show(iw->message);
-	
-  
+  gtk_paned_add2 (GTK_PANED (vpane), iw->message);
+  gtk_widget_show (iw->message);
+
+
   return (vpane);
 }
 
@@ -201,14 +201,14 @@ index_select_cb (GtkWidget * widget,
   g_return_if_fail (BALSA_IS_INDEX (widget));
   g_return_if_fail (message != NULL);
 
-  set_imap_username(message->mailbox);
+  set_imap_username (message->mailbox);
 
-  if (bevent && bevent->button == 1 && bevent->type == GDK_BUTTON_PRESS)
-	  balsa_message_set (BALSA_MESSAGE (((IndexChild*)data)->message), message);
   if (bevent && bevent->button == 1 && bevent->type == GDK_2BUTTON_PRESS)
     message_window_new (message);
   else if (bevent && bevent->button == 3)
     gtk_menu_popup (GTK_MENU (create_menu (BALSA_INDEX (widget), message)), NULL, NULL, NULL, NULL, bevent->button, bevent->time);
+  else
+    balsa_message_set (BALSA_MESSAGE (((IndexChild *) data)->message), message);
 }
 /*
  * CLIST Callbacks
@@ -222,7 +222,7 @@ create_menu (BalsaIndex * bindex, Message * message)
 
   menu = gtk_menu_new ();
   menuitem = gtk_menu_item_new_with_label ("Transfer");
-#if 0 /* FIXME */
+#if 0				/* FIXME */
   list = g_list_first (balsa_app.mailbox_list);
   submenu = gtk_menu_new ();
   while (list)

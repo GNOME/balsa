@@ -104,7 +104,6 @@ void mailbox_conf_edit_imap_server(GtkWidget * widget, gpointer data);
 
 #ifdef USE_SSL
 static void imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
-static void pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
 
 static void
 imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
@@ -117,6 +116,9 @@ imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
     gtk_editable_insert_text(port, use_ssl ? "993" : "143", 3, &zero);
 }
 
+#if 0
+static void pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
+
 static void
 pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
 {
@@ -127,6 +129,7 @@ pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
     gtk_editable_delete_text(port, 0, -1);
     gtk_editable_insert_text(port, use_ssl ? "995" : "110", 3, &zero);
 }
+#endif
 #endif
 
 /* BEGIN OF COMMONLY USED CALLBACKS SECTION ---------------------- */
@@ -860,7 +863,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 	create_check(mcw->window, _("_Enable check for new mail"), 
 		     table, 8, TRUE);
 
-#ifdef 0
+#if 0
     /*
      * chbm: we don't do pop3s. i did all the necessary config stuff 
      * and then realized libbalsa/pop3.c can't use libmutt/ stuff

@@ -1,3 +1,7 @@
+2001-08-23  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/mailbox-conf.c: remove pop3s
+
 2001-08-23  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* configure.in, NEWS, README: release 1.2.pre2

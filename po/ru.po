@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 1\n"
-"POT-Creation-Date: 2001-01-23 16:47+0300\n"
-"PO-Revision-Date: 2001-01-23 17:04+03:00\n"
+"POT-Creation-Date: 2001-01-26 12:58+0300\n"
+"PO-Revision-Date: 2001-01-26 12:59+03:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -209,6 +209,15 @@ msgstr "Получение сообщения %d из %d"
 #, c-format
 msgid "Received %d bytes of %d"
 msgstr "Получено %d байт из %d"
+
+#. We create here the progress bar
+#: libbalsa/send.c:273 libbalsa/send.c:276
+msgid "Sending Mail..."
+msgstr "Отправка почты..."
+
+#: libbalsa/send.c:273
+msgid "Hide"
+msgstr "Скрыть"
 
 #: libbalsa/send.c:416
 msgid ""
@@ -693,45 +702,45 @@ msgstr "Сертификат сохранен"
 msgid "Continue?"
 msgstr "Продолжить?"
 
-#: src/address-book.c:160 src/filter-edit-dialog.c:130
+#: src/address-book.c:161 src/filter-edit-dialog.c:130
 msgid "Name"
 msgstr "Имя"
 
-#: src/address-book.c:160
+#: src/address-book.c:161
 msgid "E-Mail Address"
 msgstr "Электронный адрес"
 
-#: src/address-book.c:163
+#: src/address-book.c:164
 msgid "Address Book"
 msgstr "Адресная книга"
 
 #. Entry widget for finding an address
-#: src/address-book.c:242
+#: src/address-book.c:243
 msgid "Search for Name:"
 msgstr "Поиск имени:"
 
-#: src/address-book.c:310
+#: src/address-book.c:311
 msgid "Send-To"
 msgstr "Послать"
 
-#: src/address-book.c:329
+#: src/address-book.c:330
 msgid "Run GnomeCard"
 msgstr "Запустить GnomeCard"
 
-#: src/address-book.c:337
+#: src/address-book.c:338
 msgid "Re-Import"
 msgstr "Реимпортировать"
 
 #. mode switching stuff
-#: src/address-book.c:346
+#: src/address-book.c:347
 msgid "Treat multiple addresses as:"
 msgstr "Рассматривать множественные адреса как:"
 
-#: src/address-book.c:350
+#: src/address-book.c:351
 msgid "alternative addresses for the same person"
 msgstr "альтернативные адреса для того же лица"
 
-#: src/address-book.c:355
+#: src/address-book.c:356
 msgid "a distribution list"
 msgstr "список рассылки"
 
@@ -905,7 +914,7 @@ msgid "Save"
 msgstr "Сохранить"
 
 #: src/balsa-message.c:291 src/mailbox-conf.c:170 src/mailbox-conf.c:180
-#: src/sendmsg-window.c:160 src/sendmsg-window.c:665
+#: src/sendmsg-window.c:160 src/sendmsg-window.c:666
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -923,7 +932,7 @@ msgid " Could not save %s:%s "
 msgstr "Невозможно сохранить %s:%s "
 
 #. Subject:
-#: src/balsa-message.c:643 src/print.c:358 src/sendmsg-window.c:949
+#: src/balsa-message.c:643 src/print.c:358 src/sendmsg-window.c:950
 msgid "Subject:"
 msgstr "Тема:"
 
@@ -933,28 +942,28 @@ msgstr "Дата:"
 
 #. From:
 #: src/balsa-message.c:651 src/filter-edit-dialog.c:316 src/print.c:348
-#: src/sendmsg-window.c:940
+#: src/sendmsg-window.c:941
 msgid "From:"
 msgstr "От:"
 
 #. To:
 #: src/balsa-message.c:655 src/filter-edit-dialog.c:306 src/print.c:353
-#: src/sendmsg-window.c:943
+#: src/sendmsg-window.c:944
 msgid "To:"
 msgstr "Кому:"
 
 #. cc:
-#: src/balsa-message.c:656 src/sendmsg-window.c:951
+#: src/balsa-message.c:656 src/sendmsg-window.c:952
 msgid "Cc:"
 msgstr "Официальные копии (Сс):"
 
 #. bcc:
-#: src/balsa-message.c:657 src/sendmsg-window.c:955
+#: src/balsa-message.c:657 src/sendmsg-window.c:956
 msgid "Bcc:"
 msgstr "Скрытые копии:"
 
 #. fcc:
-#: src/balsa-message.c:660 src/sendmsg-window.c:959
+#: src/balsa-message.c:660 src/sendmsg-window.c:960
 msgid "Fcc:"
 msgstr "Fcc:"
 
@@ -1096,7 +1105,7 @@ msgstr "В тексте письма"
 msgid "Match string:"
 msgstr "Строка для сравнения:"
 
-#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:574
+#: src/filter-edit-dialog.c:384 src/sendmsg-window.c:575
 msgid "Remove"
 msgstr "Удалить"
 
@@ -2576,7 +2585,7 @@ msgstr "Язык"
 msgid "_Options"
 msgstr "Параметры"
 
-#: src/sendmsg-window.c:638
+#: src/sendmsg-window.c:639
 msgid ""
 "The attachment pixmap (balsa/attachment.png) cannot be found.\n"
 "This means you cannot attach any files.\n"
@@ -2584,89 +2593,89 @@ msgstr ""
 "Изображение вложения (balsa/attachment.png) не было найдено.\n"
 "Это значит что вы не можете вложить какие-либо файлы.\n"
 
-#: src/sendmsg-window.c:653
+#: src/sendmsg-window.c:654
 #, c-format
 msgid "Cannot get info on file '%s': %s\n"
 msgstr "Нет информации про файл '%s': %s\n"
 
-#: src/sendmsg-window.c:659
+#: src/sendmsg-window.c:660
 #, c-format
 msgid "Attachment is not a regular file or cannot be read: '%s'\n"
 msgstr ""
 "Приложение не является обычным файлом или не может быть прочитано: '%s'\n"
 
-#: src/sendmsg-window.c:735
+#: src/sendmsg-window.c:736
 msgid "Attach file"
 msgstr "Приложить файл"
 
 #. Reply To:
-#: src/sendmsg-window.c:982
+#: src/sendmsg-window.c:983
 msgid "Reply To:"
 msgstr "Обратный адрес:"
 
 #. Attachment list
-#: src/sendmsg-window.c:986
+#: src/sendmsg-window.c:987
 msgid "Attachments:"
 msgstr "Вложения:"
 
 #. Comments:
-#: src/sendmsg-window.c:1031
+#: src/sendmsg-window.c:1032
 msgid "Comments:"
 msgstr "Комментарии:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1034
+#: src/sendmsg-window.c:1035
 msgid "Keywords:"
 msgstr "Ключевые слова:"
 
-#: src/sendmsg-window.c:1128
+#: src/sendmsg-window.c:1129
 msgid "you"
 msgstr "вы"
 
-#: src/sendmsg-window.c:1133
+#: src/sendmsg-window.c:1134
 #, c-format
 msgid "On %s %s wrote:\n"
 msgstr "На %s %s написал:\n"
 
-#: src/sendmsg-window.c:1136
+#: src/sendmsg-window.c:1137
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s написал:\n"
 
-#: src/sendmsg-window.c:1227
+#: src/sendmsg-window.c:1228
 msgid "Reply to "
 msgstr "Ответить"
 
-#: src/sendmsg-window.c:1232
+#: src/sendmsg-window.c:1233
 msgid "Forward message"
 msgstr "Переслать письмо"
 
-#: src/sendmsg-window.c:1237
+#: src/sendmsg-window.c:1238
 msgid "Continue message"
 msgstr "Продолжить письмо"
 
-#: src/sendmsg-window.c:1242
+#: src/sendmsg-window.c:1243
 msgid "New message"
 msgstr "Новое письмо"
 
-#: src/sendmsg-window.c:1554
+#: src/sendmsg-window.c:1555
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Не удалось открыть файл %s.\n"
 
-#: src/sendmsg-window.c:1556
+#: src/sendmsg-window.c:1557
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: src/sendmsg-window.c:1583
+#: src/sendmsg-window.c:1584
 msgid "Include file"
 msgstr "Включить файл"
 
-#: src/sendmsg-window.c:1866
+#: src/sendmsg-window.c:1867
 msgid "Cannot execute print command."
 msgstr "Не удалось выполнить команду печати."
 
-#: src/sendmsg-window.c:1889
+#: src/sendmsg-window.c:1890
 msgid "Error executing lpr"
 msgstr "Ошибка выполнения lpr"
 

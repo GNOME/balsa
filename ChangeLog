@@ -1,3 +1,13 @@
+2004-03-15 05:17  PeterB
+
+	* src/balsa-mblist.c: update total messages when mailbox is closed.
+	* libbalsa/: message.c, message.h: check that flags really change.
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
+	signal new mailbox size when closing.
+	* libbalsa/mailbox_local.c: don't emit signal; set unread-messages
+	flag only if new mail arrived.
+	* libbalsa/mailbox.c: check that message flags really change.
+
 2004-03-14 09:15  PeterB
 
 	* src/balsa-mblist.c: connect to mailbox's "changed" signal instead

@@ -49,7 +49,6 @@
 #include "save-restore.h"
 #include "sendmsg-window.h"
 #include "information.h"
-#include "pop3.h"
 #include "imap-server.h"
 
 #include "libinit_balsa/init_balsa.h"

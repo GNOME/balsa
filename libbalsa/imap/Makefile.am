@@ -16,6 +16,8 @@ libimap_a_SOURCES = \
 	libimap-marshal.c	\
 	libimap-marshal.h	\
 	imap_private.h	\
+	pop3.c		\
+	pop3.h		\
 	siobuf.c	\
 	siobuf.h	\
 	util.c		\

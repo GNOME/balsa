@@ -31,6 +31,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef USE_TLS
+#include <openssl/err.h>
+#endif
+
 static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);
 static void libbalsa_server_init(LibBalsaServer * server);
@@ -159,7 +163,8 @@ libbalsa_server_init(LibBalsaServer * server)
     server->passwd = NULL;
     server->remember_passwd = TRUE;
 #ifdef USE_SSL
-    server->use_ssl = FALSE;
+    server->use_ssl        = FALSE;
+    server->accepted_certs = NULL;
 #endif
 }
 
@@ -176,6 +181,11 @@ libbalsa_server_finalize(GObject * object)
     g_free(server->host);   server->host = NULL;
     g_free(server->user);   server->user = NULL;
     g_free(server->passwd); server->passwd = NULL;
+#ifdef USE_TLS
+    g_list_foreach(server->accepted_certs, (GFunc)X509_free, NULL);
+    g_list_free(server->accepted_certs);
+    server->accepted_certs = NULL;
+#endif
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -363,4 +373,142 @@ libbalsa_server_save_config(LibBalsaServer * server)
 #ifdef USE_SSL
     gnome_config_set_bool("SSL", server->use_ssl);
 #endif
+}
+
+#ifdef USE_TLS
+/* compare Example 10-7 in the OpenSSL book */
+static gboolean
+libbalsa_is_cert_known(LibBalsaServer *is, X509* cert)
+{
+    char buf[256];
+    X509 *tmpcert = NULL;
+    FILE *fp;
+    gchar *cert_name;
+    gboolean res = FALSE;
+    GList *lst;
+
+    for(lst = is->accepted_certs; lst; lst = lst->next) {
+        int res = X509_cmp(cert, lst->data);
+        if(res == 0)
+            return TRUE;
+    }
+    
+    cert_name = g_strconcat(g_get_home_dir(), "/.balsa/certificates", NULL);
+
+    fp = fopen(cert_name, "rt");
+    g_free(cert_name);
+    if(!fp) {
+        return FALSE;
+    }
+    printf("Looking for cert: %s\n", 
+               X509_NAME_oneline(X509_get_subject_name (cert),
+                                 buf, sizeof (buf)));
+
+    res = FALSE;
+    while ((tmpcert = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
+        printf("comparing with cert: %s\n", 
+               X509_NAME_oneline(X509_get_subject_name (tmpcert),
+                                 buf, sizeof (buf)));
+        res = X509_cmp(cert, tmpcert)==0;
+        X509_free(tmpcert);
+        if(res) break;
+    }
+    ERR_clear_error();
+    fclose(fp);
+    
+    return res;
+}
+
+static gboolean
+libbalsa_save_cert(X509 *cert)
+{
+    gboolean res = FALSE;
+    FILE *cert_file;
+    gchar *cert_name = g_strconcat(g_get_home_dir(),
+                                   "/.balsa/certificates", NULL);
+
+    cert_file = fopen(cert_name, "a");
+     if (cert_file) {
+        if(PEM_write_X509 (cert_file, cert))
+            res = TRUE;
+        fclose(cert_file);
+     }
+     g_free(cert_name);
+     return res;
+}
+#endif
+
+void
+libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
+{
+    va_list alist;
+    int *ok;
+    LibBalsaServer *is = LIBBALSA_SERVER(arg);
+
+    va_start(alist, arg);
+    switch(ue) {
+    case IME_GET_USER_PASS: {
+        gchar *method = va_arg(alist, gchar*);
+        gchar **user = va_arg(alist, gchar**);
+        gchar **pass = va_arg(alist, gchar**);
+        ok = va_arg(alist, int*);
+        if(!is->passwd) {
+            is->passwd = libbalsa_server_get_password(is, NULL);
+        }
+        *ok = is->passwd != NULL;
+        if(*ok) {
+            g_free(*user); *user = g_strdup(is->user);
+            g_free(*pass); *pass = g_strdup(is->passwd);
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, method);
+        }
+        break;
+    }
+    case IME_GET_USER:  { /* for eg kerberos */
+        gchar **user = va_arg(alist, gchar**);
+        ok = va_arg(alist, int*);
+        *ok = 1; /* consider popping up a dialog window here */
+        g_free(*user); *user = g_strdup(is->user);
+        break;
+    }
+    case IME_TLS_VERIFY_ERROR:  {
+#ifdef USE_TLS
+        long vfy_result;
+        SSL *ssl;
+        X509 *cert;
+        const char *reason;
+        ok = va_arg(alist, int*);
+        vfy_result = va_arg(alist, long);
+        reason =  X509_verify_cert_error_string(vfy_result);
+        printf("IMAP:TLS: failed cert verification:\n"
+               "%ld : %s.\n", vfy_result, reason);
+        ssl = va_arg(alist, SSL*);
+        cert = SSL_get_peer_certificate(ssl);
+        *ok = libbalsa_is_cert_known(is, cert);
+        if(!*ok) {
+            *ok = libbalsa_ask_for_cert_acceptance(cert, reason);
+            if(*ok == 2)
+                libbalsa_save_cert(cert);
+            if(*ok == 1)
+                is->accepted_certs = g_list_prepend(is->accepted_certs,
+                                                    X509_dup(cert));
+        }
+        X509_free(cert);
+#else
+        g_warning("TLS error with TLS disabled!?");
+#endif
+        break;
+    }
+    case IME_TLS_NO_PEER_CERT: {
+        ok = va_arg(alist, int*); *ok = 0;
+        printf("IMAP:TLS: Server presented no cert!\n");
+        break;
+    }
+    case IME_TLS_WEAK_CIPHER: {
+        ok = va_arg(alist, int*); *ok = 1;
+        printf("IMAP:TLS: Weak cipher accepted.\n");
+        break;
+    }
+    default: g_warning("unhandled imap event type! Fix the code."); break;
+    }
+    va_end(alist);
 }

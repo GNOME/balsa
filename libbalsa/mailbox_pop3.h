@@ -63,4 +63,6 @@ GObject *libbalsa_mailbox_pop3_new(void);
 void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                      LibBalsaMailbox *inbox);
 
+extern int PopDebug;
+
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

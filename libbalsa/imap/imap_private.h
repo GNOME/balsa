@@ -37,9 +37,9 @@ struct _ImapMboxHandle {
   char *host;
   char* mbox; /* currently selected mailbox, if any */
 
-  ImapMboxHandleState state;
+  ImapConnectionState state;
   gboolean has_capabilities;
-  ImapCapability capabilities[IMCAP_MAX];
+  char capabilities[IMCAP_MAX];
   unsigned exists;
   unsigned recent;
   unsigned unseen; /* msgno of first unseen message */
@@ -101,8 +101,13 @@ ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,
 #ifdef USE_TLS
 #include <openssl/ssl.h>
 SSL* imap_create_ssl(void);
-ImapResponse imap_handle_setup_ssl(ImapMboxHandle *handle, SSL *ssl);
+int imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
+                   ImapUserCb user_cb, void *user_arg);
 #endif
+
+ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);
+void imap_mbox_handle_set_state(ImapMboxHandle *h,
+                                ImapConnectionState newstate);
 
 /* even more private functions */
 int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);
@@ -111,5 +116,8 @@ int      imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len);
 void     imap_handle_flush(ImapMboxHandle *handle);
 unsigned imap_make_tag(ImapCmdTag tag);
 void mbox_view_append_no(MboxView *mv, unsigned seqno);
+
+int imap_socket_open(const char* host, const char *def_port);
+
 
 #endif /* __IMAP_PRIVATE_H__ */

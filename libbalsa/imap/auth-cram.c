@@ -55,7 +55,7 @@ imap_auth_cram(ImapMboxHandle* handle)
 
   ok = 0;
   if(!ok && handle->user_cb)
-    handle->user_cb(handle, IME_GET_USER_PASS, handle->user_arg, 
+    handle->user_cb(IME_GET_USER_PASS, handle->user_arg, 
                     "CRAM-MD5", &user, &pass, &ok);
   if(!ok || user == NULL || pass == NULL)
     return IMAP_AUTH_FAILURE;

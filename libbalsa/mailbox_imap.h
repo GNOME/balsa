@@ -22,8 +22,6 @@
 #ifndef __LIBBALSA_MAILBOX_IMAP_H__
 #define __LIBBALSA_MAILBOX_IMAP_H__
 
-#include "imap/imap.h"
-
 #define LIBBALSA_TYPE_MAILBOX_IMAP \
     (libbalsa_mailbox_imap_get_type())
 #define LIBBALSA_MAILBOX_IMAP(obj) \
@@ -42,12 +40,6 @@ GType libbalsa_mailbox_imap_get_type(void);
 typedef struct _LibBalsaMailboxImap LibBalsaMailboxImap;
 typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
 
-enum _ImapAuthType {
-    AuthLogin,
-    AuthCram,
-    AuthGSS
-};
-typedef enum _ImapAuthType ImapAuthType;
 #define POINTER_TO_UID(p) GPOINTER_TO_UINT(p)
 #define UID_TO_POINTER(p) GUINT_TO_POINTER(p)
 

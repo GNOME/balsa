@@ -13,11 +13,10 @@
 #include "imap-server.h"
 #include "imap-commands.h"
 
-#include <gnome.h>
 #include <libgnome/gnome-config.h>
+#include <libgnome/gnome-i18n.h> 
 
 #ifdef USE_TLS
-#include <openssl/err.h>
 #define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)
 #else
 #define REQ_SSL(s) (0)
@@ -37,9 +36,6 @@ struct LibBalsaImapServer_ {
 	guint used_connections;
 	GList *used_handles;
 	GList *free_handles;
-#ifdef USE_TLS
-    GList *accepted_certs; /* certs accepted for this session */
-#endif
 };
 
 typedef struct LibBalsaImapServerClass_ {
@@ -171,9 +167,6 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
     imap_server->connection_cleanup_id = 
 	g_timeout_add(CONNECTION_CLEANUP_POLL_PERIOD*1000,
 		      connection_cleanup, imap_server);
-#ifdef USE_TLS
-    imap_server->accepted_certs = NULL;
-#endif
 }
 
 /* leave object in sane state (NULLified fields) */
@@ -200,11 +193,6 @@ libbalsa_imap_server_finalize(GObject * object)
     libbalsa_imap_server_force_disconnect(imap_server);
     g_mutex_free(imap_server->lock);
     g_free(imap_server->key); imap_server->key = NULL;
-#ifdef USE_TLS
-    g_list_foreach(imap_server->accepted_certs, (GFunc)X509_free, NULL);
-    g_list_free(imap_server->accepted_certs);
-    imap_server->accepted_certs = NULL;
-#endif
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -297,142 +285,7 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
     libbalsa_information(it, fmt, is->host, str);
 }
 
-#ifdef USE_TLS
-/* compare Example 10-7 in the OpenSSL book */
-static gboolean
-libbalsa_is_cert_known(LibBalsaImapServer *is, X509* cert)
-{
-    char buf[256];
-    X509 *tmpcert = NULL;
-    FILE *fp;
-    gchar *cert_name;
-    gboolean res = FALSE;
-    GList *lst;
 
-    for(lst = is->accepted_certs; lst; lst = lst->next) {
-        int res = X509_cmp(cert, lst->data);
-        if(res == 0)
-            return TRUE;
-    }
-    
-    cert_name = gnome_util_prepend_user_home(".balsa/certificates");
-
-    fp = fopen(cert_name, "rt");
-    g_free(cert_name);
-    if(!fp) {
-        return FALSE;
-    }
-    printf("Looking for cert: %s\n", 
-               X509_NAME_oneline(X509_get_subject_name (cert),
-                                 buf, sizeof (buf)));
-
-    res = FALSE;
-    while ((tmpcert = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
-        printf("comparing with cert: %s\n", 
-               X509_NAME_oneline(X509_get_subject_name (tmpcert),
-                                 buf, sizeof (buf)));
-        res = X509_cmp(cert, tmpcert)==0;
-        X509_free(tmpcert);
-        if(res) break;
-    }
-    ERR_clear_error();
-    fclose(fp);
-    
-    return res;
-}
-
-static gboolean
-libbalsa_save_cert(X509 *cert)
-{
-    gboolean res = FALSE;
-    FILE *cert_file;
-    gchar *cert_name = gnome_util_prepend_user_home(".balsa/certificates");
-    cert_file = fopen(cert_name, "a");
-     if (cert_file) {
-        if(PEM_write_X509 (cert_file, cert))
-            res = TRUE;
-        fclose(cert_file);
-     }
-     g_free(cert_name);
-     return res;
-}
-#endif
-
-static void
-is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
-{
-    va_list alist;
-    int *ok;
-    LibBalsaServer *is = LIBBALSA_SERVER(arg);
-
-    va_start(alist, arg);
-    switch(ue) {
-    case IME_GET_USER_PASS: {
-        gchar *method = va_arg(alist, gchar*);
-        gchar **user = va_arg(alist, gchar**);
-        gchar **pass = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
-        if(!is->passwd) {
-            is->passwd = libbalsa_server_get_password(is, NULL);
-        }
-        *ok = is->passwd != NULL;
-        if(*ok) {
-            g_free(*user); *user = g_strdup(is->user);
-            g_free(*pass); *pass = g_strdup(is->passwd);
-            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, method);
-        }
-        break;
-    }
-    case IME_GET_USER:  { /* for eg kerberos */
-        gchar **user = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
-        *ok = 1; /* consider popping up a dialog window here */
-        g_free(*user); *user = g_strdup(is->user);
-        break;
-    }
-    case IME_TLS_VERIFY_ERROR:  {
-#ifdef USE_TLS
-        long vfy_result;
-        SSL *ssl;
-        X509 *cert;
-        const char *reason;
-        LibBalsaImapServer *ims = LIBBALSA_IMAP_SERVER(is);
-        ok = va_arg(alist, int*);
-        vfy_result = va_arg(alist, long);
-        reason =  X509_verify_cert_error_string(vfy_result);
-        printf("IMAP:TLS: failed cert verification:\n"
-               "%ld : %s.\n", vfy_result, reason);
-        ssl = va_arg(alist, SSL*);
-        cert = SSL_get_peer_certificate(ssl);
-        *ok = libbalsa_is_cert_known(ims, cert);
-        if(!*ok) {
-            *ok = libbalsa_ask_for_cert_acceptance(cert, reason);
-            if(*ok == 2)
-                libbalsa_save_cert(cert);
-            if(*ok == 1)
-                ims->accepted_certs = g_list_prepend(ims->accepted_certs,
-                                                     X509_dup(cert));
-        }
-        X509_free(cert);
-#else
-        g_warning("TLS error with TLS disabled!?");
-#endif
-        break;
-    }
-    case IME_TLS_NO_PEER_CERT: {
-        ok = va_arg(alist, int*); *ok = 0;
-        printf("IMAP:TLS: Server presented no cert!\n");
-        break;
-    }
-    case IME_TLS_WEAK_CIPHER: {
-        ok = va_arg(alist, int*); *ok = 1;
-        printf("IMAP:TLS: Weak cipher accepted.\n");
-        break;
-    }
-    default: g_warning("unhandled imap event type! Fix the code."); break;
-    }
-    va_end(alist);
-}
 /* Create a struct handle_info with a new handle. */
 static struct handle_info *
 lb_imap_server_info_new(LibBalsaServer *server)
@@ -442,14 +295,14 @@ lb_imap_server_info_new(LibBalsaServer *server)
 
     /* We do not ask for password now since the authentication might
      * not require it. Instead, we handle authentication requiests in
-     * is_user_cb(). */
+     * libbalsa_server_user_cb(). */
 
     handle = imap_mbox_handle_new();
     info = g_new0(struct handle_info, 1);
     info->handle = handle;
     imap_handle_set_monitorcb(handle, monitor_cb, info);
     imap_handle_set_infocb(handle,    is_info_cb, server);
-    imap_handle_set_usercb(handle,    is_user_cb, server);
+    imap_handle_set_usercb(handle,    libbalsa_server_user_cb, server);
 
     g_signal_connect(G_OBJECT(handle), "expunge-notify",
 		     G_CALLBACK(libbalsa_imap_server_expunge_notify_cb),

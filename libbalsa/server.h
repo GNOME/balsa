@@ -23,6 +23,8 @@
 #ifndef __LIBBALSA_SERVER_H__
 #define __LIBBALSA_SERVER_H__
 
+#include "imap/libimap.h"
+
 #define LIBBALSA_TYPE_SERVER \
     (libbalsa_server_get_type())
 #define LIBBALSA_SERVER(obj) \
@@ -51,13 +53,16 @@ struct _LibBalsaServer {
     LibBalsaServerType type;
 
     gchar *host;
-#ifdef USE_SSL
-    gboolean use_ssl;
+#ifdef USE_TLS
+    GList *accepted_certs; /* certs accepted for this session */
 #endif
 
     gchar *user;
     gchar *passwd; /* NULL means "ask for it". Empty ("") is a legal one */
-    gboolean remember_passwd;
+    unsigned remember_passwd:1;
+#ifdef USE_SSL
+    unsigned use_ssl:1;
+#endif
 };
 
 struct _LibBalsaServerClass {
@@ -91,4 +96,6 @@ gchar *libbalsa_server_get_password(LibBalsaServer * server,
 void libbalsa_server_load_config(LibBalsaServer * server);
 void libbalsa_server_save_config(LibBalsaServer * server);
 
+
+void libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...);
 #endif				/* __LIBBALSA_SERVER_H__ */

@@ -231,7 +231,8 @@ host_matches_domain(const char* host, const char*domain, int host_len)
 }
 
 static int
-check_server_identity(ImapMboxHandle *handle, SSL *ssl)
+imap_check_server_identity(SSL *ssl, const char *host,
+                           ImapUserCb user_cb, void *user_arg)
 {
   long vfy_result;
   X509 *cert;
@@ -239,15 +240,15 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
   int ok, extcount, i, j, stack_len, host_len;
   gchar *colon;
   
-  if(!handle->host)
+  if(!host)
     return 0;
   /* Check whether the certificate matches the server. */
   cert = SSL_get_peer_certificate(ssl);
   if(!cert)
     return 0;
 
-  colon = strchr(handle->host, ':');
-  host_len = colon ? colon - handle->host : (int)strlen(handle->host);
+  colon = strchr(host, ':');
+  host_len = colon ? colon - host : (int)strlen(host);
   ok = 0;
   extcount = X509_get_ext_count(cert);
   for(i=0; i<extcount; i++) {
@@ -274,7 +275,7 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
       for(j=0; j<stack_len; j++) {
         nval = sk_CONF_VALUE_value(val, j);
         if(strcmp(nval->name, "DNS") == 0 &&
-           host_matches_domain(handle->host, nval->value, host_len)) {
+           host_matches_domain(host, nval->value, host_len)) {
           ok = 1;
           break;
         }
@@ -288,7 +289,7 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
     if( (subj = X509_get_subject_name(cert)) &&
         X509_NAME_get_text_by_NID(subj, NID_commonName, data, sizeof(data))>0){
       data[sizeof(data)-1] = 0;
-      if(host_matches_domain(handle->host, data, host_len))
+      if(host_matches_domain(host, data, host_len))
         ok =1;
     }
   }
@@ -304,54 +305,48 @@ check_server_identity(ImapMboxHandle *handle, SSL *ssl)
    * application what to do with this.
    */
   ok = 0;
-  if(handle->user_cb)
-    handle->user_cb(handle, IME_TLS_VERIFY_ERROR, handle->user_arg, &ok, 
-                    vfy_result, ssl);
+  if(user_cb)
+    user_cb(IME_TLS_VERIFY_ERROR, user_arg, &ok, 
+            vfy_result, ssl);
   return ok;
 }
 
 static int
-check_cipher_strength(ImapMboxHandle *handle, SSL *ssl)
+check_cipher_strength(SSL *ssl, ImapUserCb user_cb, void *user_arg)
 {
-  int ok, bits = SSL_get_cipher_bits (ssl, NULL);
+  int ok, bits = SSL_get_cipher_bits(ssl, NULL);
 
   if (bits > 40) 
     return 1;
   ok = 0;
-  if (handle->user_cb != NULL)
-    handle->user_cb(handle, IME_TLS_WEAK_CIPHER, handle->user_arg,
+  if (user_cb != NULL)
+    user_cb(IME_TLS_WEAK_CIPHER, user_arg,
                     bits, &ok);
   return ok;
 }
 
-ImapResponse
-imap_handle_setup_ssl(ImapMboxHandle *handle, SSL *ssl)
+int
+imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
+               ImapUserCb user_cb, void *user_arg)
 {
   if(ERR_peek_error()) {
     fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
     ERR_print_errors_fp(stderr);
     fprintf(stderr, "\nEnd of print_errors\n");
   }
-  if(sio_set_tlsclient_ssl (handle->sio, ssl)) {
-    handle->using_tls = 1;
-    /* forget capabilities. */
-    handle->has_capabilities = 0;
-    if(!check_server_identity(handle, ssl)) {
+  if(sio_set_tlsclient_ssl (sio, ssl)) {
+    if(!imap_check_server_identity(ssl, host, user_cb, user_arg)) {
       printf("Server identity not confirmed\n");
-      sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
-      handle->state = IMHS_DISCONNECTED;
-      return IMR_NO;
+      return 0;
     }
-    if(!check_cipher_strength(handle, ssl)) {
+    if(!check_cipher_strength(ssl, user_cb, user_arg)) {
       printf("Cipher too weak\n");
-      sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
-      handle->state = IMHS_DISCONNECTED;
-      return IMR_NO;
+      return 0;
     }
-    return IMR_OK;
+    return 1;
   } else {
-    printf("set_tlscliend failed!\n");
-    return IMR_NO;
+    printf("set_tlsclient failed!\n");
+    return 0;
   }
 }
 
@@ -375,6 +370,16 @@ imap_handle_starttls(ImapMboxHandle *handle)
     SSL_free(ssl);
     return rc;
   }
-  return imap_handle_setup_ssl(handle, ssl);
+  if(imap_setup_ssl(handle->sio, handle->host, ssl,
+                    handle->user_cb, handle->user_arg)) {
+    handle->using_tls = 1;
+    handle->has_capabilities = 0;
+    return IMR_OK;
+  } else {
+    SSL_free(ssl);
+    sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
+    handle->state = IMHS_DISCONNECTED;
+    return IMR_NO;
+  }
 }
 #endif /* USE_TLS */

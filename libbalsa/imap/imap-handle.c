@@ -322,8 +322,8 @@ struct ListData {
   void * cb_data;
 };
 
-static int
-socket_open(const char* host, const char *def_port)
+int
+imap_socket_open(const char* host, const char *def_port)
 {
   static const int USEIPV6 = 0;
   int rc, fd = -1;
@@ -384,7 +384,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   handle->using_tls = 0;
   if(handle->over_ssl) service = "imaps";
 #endif
-  handle->sd = socket_open(handle->host, service);
+  handle->sd = imap_socket_open(handle->host, service);
   if(handle->sd<0) return IMAP_CONNECT_FAILED;
   
   /* Add buffering to the socket */
@@ -397,8 +397,14 @@ imap_mbox_connect(ImapMboxHandle* handle)
   if(handle->over_ssl) {
     SSL *ssl = imap_create_ssl();
     if(!ssl) return IMAP_UNSECURE;
-    ImapResponse rc = imap_handle_setup_ssl(handle, ssl);
-    if(rc != IMR_OK) return IMAP_UNSECURE;
+    if(imap_setup_ssl(handle->sio, handle->host, ssl,
+                      handle->user_cb, handle->user_arg)) 
+      handle->using_tls = 1;
+    else {
+      sio_detach(handle->sio); handle->sio = NULL; close(handle->sd);
+      handle->state = IMHS_DISCONNECTED;
+      return IMAP_UNSECURE;
+    }
   }
 #endif
   if(handle->monitor_cb) 
@@ -493,14 +499,14 @@ imap_cmd_get_tag(struct siobuf *sio, char* tag, size_t len)
 }
 
   
-ImapMboxHandleState
+ImapConnectionState
 imap_mbox_handle_get_state(ImapMboxHandle *h)
 {
   return h->state; 
 }
 
 void
-imap_mbox_handle_set_state(ImapMboxHandle *h, ImapMboxHandleState newstate)
+imap_mbox_handle_set_state(ImapMboxHandle *h, ImapConnectionState newstate)
 {
   h->state = newstate;
 }

@@ -21,31 +21,12 @@
 
 #include <glib.h>
 
-#include "imap.h"
+#include "libimap.h"
 
 typedef enum {
   IM_EVENT_EXISTS,
   IM_EVENT_EXPUNGE
 } ImapMboxEventType;
-
-/* user events below usually require application's or user's
- *  intervention */
-typedef enum {
-  IME_GET_USER_PASS,
-  IME_GET_USER,
-  IME_TLS_VERIFY_ERROR,
-  IME_TLS_NO_PEER_CERT,
-  IME_TLS_WEAK_CIPHER
-} ImapUserEventType;
-
-
-/* connection states, as defined in rfc-2060, 3 */
-typedef enum {
-  IMHS_DISCONNECTED,
-  IMHS_CONNECTED, /* non authenticated */
-  IMHS_AUTHENTICATED,
-  IMHS_SELECTED
-} ImapMboxHandleState;
 
 int imap_mbox_is_disconnected (ImapMboxHandle *h);
 int imap_mbox_is_connected    (ImapMboxHandle *h);
@@ -119,8 +100,6 @@ typedef void (*ImapMboxNotifyCb)(ImapMboxHandle*handle, ImapMboxEventType ev,
 
 typedef void (*ImapInfoCb)(ImapMboxHandle *h, ImapResponse rc,
                            const char *buffer, void *arg);
-typedef void (*ImapUserCb)(ImapMboxHandle *h, ImapUserEventType ue, void *arg,
-                           ...);
 typedef void (*ImapMonitorCb)(const char *buffer, int length, int direction,
                               void *arg);
 
@@ -230,10 +209,5 @@ unsigned mbox_view_get_rev_no(MboxView *mv, unsigned seqno);
 const char *mbox_view_get_str(MboxView *mv);
 
 /* ================ END OF MBOX_VIEW FUNCTIONS ========================= */
-
-/* possibly private functions... */
-ImapMboxHandleState imap_mbox_handle_get_state(ImapMboxHandle *h);
-void imap_mbox_handle_set_state(ImapMboxHandle *h,
-                                ImapMboxHandleState newstate);
 
 #endif

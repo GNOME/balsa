@@ -1,3 +1,17 @@
+2004-03-27  Pawel Salek
+
+	* libbalsa/Makefile.am: remove old POP3 support.
+	* libbalsa/server.[hc]:
+	* libbalsa/imap-server.c: share SSL code between IMAP and POP.
+	* libbalsa/mailbox_imap.[hc]: remove old crust.
+	* libbalsa/mailbox_pop3.[hc]: use new POP3 code, fix 104963, 134912.
+	* libbalsa/misc.c: remove plenty of space.
+	* libbalsa/imap/Makefile.am: add new POP support.
+
+	* libbalsa/imap/{auth-cram,imap-auth}.c: share code between pop
+	and IMAP.
+	* libbalsa/imap/{imap-auth.h,imap-handle.c,imap_private.h}: ditto.
+
 2004-03-26 17:05  PeterB
 
 	* libbalsa/mime.c: file descriptor leak.

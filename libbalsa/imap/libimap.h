@@ -21,6 +21,15 @@
 
 #include <time.h>
 
+/* connection states, as defined in rfc-2060, 3 */
+typedef enum {
+  IMHS_DISCONNECTED,
+  IMHS_CONNECTED, /* non authenticated */
+  IMHS_AUTHENTICATED,
+  IMHS_SELECTED
+} ImapConnectionState;
+
+
 typedef enum {
   IMAP_SUCCESS = 0,  /* action succeeded*/
   IMAP_NOMEM,          /* no memory */
@@ -201,6 +210,17 @@ void imap_body_append_part(ImapBody* body, ImapBody* sibling);
 void imap_body_append_child(ImapBody* body, ImapBody* child);
 void imap_body_set_id(ImapBody *body, char *id);
 
+/* user events below usually require application's or user's
+ *  intervention */
+typedef enum {
+  IME_GET_USER_PASS,
+  IME_GET_USER,
+  IME_TLS_VERIFY_ERROR,
+  IME_TLS_NO_PEER_CERT,
+  IME_TLS_WEAK_CIPHER
+} ImapUserEventType;
+
+typedef void (*ImapUserCb)(ImapUserEventType ue, void *arg, ...);
 
 ImapMessage *imap_message_new(void);
 void imap_message_free(ImapMessage *);

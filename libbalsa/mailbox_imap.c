@@ -39,6 +39,7 @@
 
 #include <gnome.h> /* for gnome-i18n.h, gnome-config and gnome-util */
 
+#include "libimap.h"
 #include "filter-funcs.h"
 #include "filter.h"
 #include "mailbox-filter.h"
@@ -56,7 +57,6 @@ struct _LibBalsaMailboxImap {
     guint handle_refs;		/* reference counter */
 
     gchar *path;		/* Imap local path (third part of URL) */
-    ImapAuthType auth_type;	/* accepted authentication type */
     ImapUID      uid_validity;
 
     GArray* messages_info;
@@ -256,7 +256,6 @@ static void
 libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
 {
     mailbox->path = NULL;
-    mailbox->auth_type = AuthCram;	/* reasonable default */
     mailbox->handle = NULL;
     mailbox->handle_refs = 0;
 }

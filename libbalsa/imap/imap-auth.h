@@ -19,7 +19,7 @@
  * 02111-1307, USA.
  */
 
-#include "imap.h"
+#include "libimap.h"
 #include "imap-handle.h"
 
 typedef ImapResult (*ImapAuthenticator)(ImapMboxHandle* handle);

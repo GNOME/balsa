@@ -34,7 +34,7 @@
 
 #include "libbalsa.h"
 #include "folder-scanners.h"
-#include "imap.h"
+#include "libimap.h"
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap-server.h"

@@ -354,9 +354,7 @@ bndx_instance_init(BalsaIndex * index)
     column = 
         gtk_tree_view_column_new_with_attributes(_("From"), renderer,
                                                  "text", LB_MBOX_FROM_COL,
-#if 0
-						 "weight",BNDX_WEIGHT_COLUMN,
-#endif
+						 "weight", LB_MBOX_WEIGHT_COL,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
@@ -375,9 +373,8 @@ bndx_instance_init(BalsaIndex * index)
 #if 0
                                                  "foreground-gdk",
                                                  BNDX_COLOR_COLUMN,
-                                                 "weight",
-                                                 BNDX_WEIGHT_COLUMN,
 #endif
+						 "weight", LB_MBOX_WEIGHT_COL,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
@@ -394,9 +391,7 @@ bndx_instance_init(BalsaIndex * index)
     column = 
         gtk_tree_view_column_new_with_attributes(_("Date"), renderer,
                                                  "text", LB_MBOX_DATE_COL,
-#if 0
-						 "weight",BNDX_WEIGHT_COLUMN,
-#endif
+						 "weight", LB_MBOX_WEIGHT_COL,
                                                  NULL);
     gtk_tree_view_column_set_alignment(column, 0.5);
     gtk_tree_view_column_set_resizable(column, TRUE);
@@ -416,9 +411,7 @@ bndx_instance_init(BalsaIndex * index)
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", LB_MBOX_SIZE_COL,
-#if 0
-					"weight",BNDX_WEIGHT_COLUMN,
-#endif
+					"weight", LB_MBOX_WEIGHT_COL,
                                         NULL);
     gtk_tree_view_column_set_sort_column_id(column,
                                             LB_MBOX_SIZE_COL);

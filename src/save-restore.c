@@ -555,6 +555,7 @@ config_global_load(void)
         gnome_config_get_string("MessageTitleFormat="
                                 DEFAULT_MESSAGE_TITLE_FORMAT);
 
+    balsa_app.expand_tree = gnome_config_get_bool("ExpandTree=false");
     balsa_app.threading_type = d_get_gint("ThreadingType", 
 					  BALSA_INDEX_THREADING_JWZ);
 
@@ -886,6 +887,7 @@ gint config_save(void)
     gnome_config_set_string("SelectedHeaders", balsa_app.selected_headers);
     gnome_config_set_string("MessageTitleFormat",
                             balsa_app.message_title_format);
+    gnome_config_set_bool("ExpandTree", balsa_app.expand_tree);
     gnome_config_set_int("ThreadingType", balsa_app.threading_type);
     gnome_config_set_string("QuoteRegex", balsa_app.quote_regex);
     gnome_config_set_bool("RecognizeRFC2646FormatFlowed", 

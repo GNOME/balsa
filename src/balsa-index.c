@@ -2396,7 +2396,7 @@ balsa_index_set_threading_type(BalsaIndex * bindex, int thtype)
     DO_CLIST_WORKAROUND(clist);
     gtk_clist_thaw(clist);
 
-    balsa_index_update_tree(bindex, FALSE /* *** Config: "Expand tree by default" */);
+    balsa_index_update_tree(bindex, balsa_app.expand_tree /* *** Config: "Expand tree by default" */);
 
 
     /* set the menu apriopriately */

@@ -1209,7 +1209,7 @@ balsa_window_set_threading_menu(int option)
     gtk_signal_handler_unblock_by_func(GTK_OBJECT(threading_menu[pos].widget),
                                        threading_menu[pos].moreinfo,
                                        balsa_app.main_window);
-    balsa_app.threading_type = option;
+
     /* FIXME: the print below reveals that the threading is reset on
        every message preview change. It means: much too often. */
     /* printf("balsa_window_set_threading_menu::Threading set to %d\n", 

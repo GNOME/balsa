@@ -318,6 +318,7 @@ balsa_app_init(void)
     balsa_app.shown_headers = HEADERS_SELECTED;
     balsa_app.selected_headers = g_strdup(DEFAULT_SELECTED_HDRS);
     balsa_app.threading_type = BALSA_INDEX_THREADING_JWZ;
+    balsa_app.expand_tree = FALSE;
     balsa_app.show_mblist = TRUE;
     balsa_app.show_notebook_tabs = FALSE;
     balsa_app.alternative_layout = FALSE;

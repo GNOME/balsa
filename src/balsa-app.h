@@ -116,7 +116,7 @@ enum _ShownHeaders {
 };
 
 
-/* The different pspell modules available to the program. */
+/* The different spell modules available to the program. */
 #define NUM_PSPELL_MODULES 2
 typedef enum _SpellCheckModule SpellCheckModule;
 enum _SpellCheckModule {
@@ -126,7 +126,7 @@ enum _SpellCheckModule {
 const gchar **spell_check_modules_name;
 
 
-/* The suggestion modes available to pspell.  If this is changed,
+/* The suggestion modes available to spell.  If this is changed,
  * don't forget to also update the array in pref-manager.c containing
  * the labels used in the preferences dialog. 
  * */
@@ -266,6 +266,7 @@ extern struct BalsaApplication {
     gchar *selected_headers;
     gchar *message_title_format;
     BalsaIndexThreadingType threading_type;
+    gboolean expand_tree;
     gboolean show_mblist;
     gboolean show_notebook_tabs;
     gboolean alternative_layout;

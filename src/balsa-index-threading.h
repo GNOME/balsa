@@ -26,6 +26,8 @@ extern "C"
 {
 #endif				/* __cplusplus */
 
+    /* MBG: If this enum is changed (even just the order) make sure to
+     * update pref-manager.c so the preferences work correctly */
     typedef enum
     {
 	BALSA_INDEX_THREADING_FLAT,

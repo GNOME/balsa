@@ -1,3 +1,17 @@
+2002-02-16  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index.c (balsa_index_set_threading_type): expand or
+	collapse tree upon initally opening mailbox according to
+	preferences.
+	* src/pref-manager.c: add Threading page to Display prefs, add
+	expand tree by default checkbox and threading style optionmenu
+	* src/save-restore.c: save expand/collapse tree preference
+	* src/balsa-app.[ch]: add expand_tree to maintain that preference
+	* src/balsa-index-threading.h: add note to ensure future
+	maintainability
+	* src/main-window.c (balsa_window_set_threading_menu): don't set
+	balsa_app.threading_type here anymore, only via prefs
+	
 2002-02-16  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* libbalsa/address-entry.[hc]: make the LibBalsaAddressEntry

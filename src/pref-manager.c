@@ -44,6 +44,7 @@
 #define NUM_TOOLBAR_MODES 3
 #define NUM_ENCODING_MODES 3
 #define NUM_PWINDOW_MODES 3
+#define NUM_THREADING_STYLES 3
 
 typedef struct _PropertyUI {
     GtkRadioButton *toolbar_type[NUM_TOOLBAR_MODES];
@@ -128,6 +129,11 @@ typedef struct _PropertyUI {
     GtkWidget *url_color;
     GtkWidget *bad_address_color;
 
+    /* threading prefs */
+    GtkWidget *tree_expand_check;
+    GtkWidget *default_threading_style;
+    gint threading_style_index;
+
     /* quote regex */
     GtkWidget *quote_pattern;
 
@@ -161,8 +167,6 @@ static GtkWidget *create_display_page(gpointer);
 static GtkWidget *create_misc_page(gpointer);
 static GtkWidget *create_startup_page(gpointer);
 static GtkWidget *create_spelling_page(gpointer);
-static GtkWidget *create_spelling_option_menu(const gchar * names[],
-					      gint size, gint * index);
 static GtkWidget *create_address_book_page(gpointer);
 
 static GtkWidget *create_information_message_menu(void);
@@ -194,7 +198,13 @@ static void mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+static GtkWidget* add_pref_menu(const gchar* label, const gchar* names[], 
+                                gint size, gint* index, GtkBox* parent, 
+                                gint padding, GtkSignalFunc callback);
+static GtkWidget* create_pref_option_menu(const gchar* names[], gint size, 
+                                          gint* index, GtkSignalFunc callback);
 static void spelling_optionmenu_cb(GtkItem * menuitem, gpointer data);
+static void threading_optionmenu_cb(GtkItem* menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget * button, gpointer data);
 static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
 
@@ -239,6 +249,13 @@ const gchar *spell_check_suggest_mode_label[NUM_SUGGEST_MODES] = {
     N_("Normal"),
     N_("Bad Spellers")
 };
+
+const gchar* threading_style_label[NUM_THREADING_STYLES] = {
+    N_("Flat"),
+    N_("Simple"),
+    N_("JWZ")
+};
+
 
 /* and now the important stuff: */
 void
@@ -469,6 +486,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_signal_connect(GTK_OBJECT(pui->empty_trash), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
+
+    /* threading */
+    gtk_signal_connect(GTK_OBJECT(pui->tree_expand_check), "toggled",
+                       GTK_SIGNAL_FUNC(properties_modified_cb),
+                       property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->default_threading_style), "clicked",
+                       GTK_SIGNAL_FUNC(properties_modified_cb),
+                       property_box);
 
     /* spell checking */
     gtk_signal_connect(GTK_OBJECT(pui->module), "clicked",
@@ -803,6 +828,10 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 			       &(balsa_app.bad_address_color.blue),
 			       0);			       
 
+    /* threading */
+    balsa_app.expand_tree = GTK_TOGGLE_BUTTON(pui->tree_expand_check)->active;
+    balsa_app.threading_type = pui->threading_style_index;
+
     /* Information dialogs */
     menu_item =
 	gtk_menu_get_active(GTK_MENU(pui->information_message_menu));
@@ -1021,6 +1050,13 @@ set_prefs(void)
 			      balsa_app.imap_scan_depth);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->empty_trash),
 				 balsa_app.empty_trash_on_exit);
+
+    /* threading */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->tree_expand_check), 
+                                 balsa_app.expand_tree);
+    pui->threading_style_index = balsa_app.threading_type;
+    gtk_option_menu_set_history(GTK_OPTION_MENU(pui->default_threading_style),
+                                balsa_app.threading_type);
 
     /* spelling */
     pui->module_index = balsa_app.module;
@@ -1816,7 +1852,14 @@ create_display_page(gpointer data)
     GtkWidget *label4;
     GtkWidget *label5;
     GtkObject *scroll_adj;
+
+    /* Threading page */
+    GtkWidget* vbox10;
+    GtkWidget* threading_frame;
+    GtkWidget* threading_vbox;
+
     GtkWidget *current_vbox;
+    const gint padding = 5;
 
     vbox1 = gtk_vbox_new (FALSE, 0);
     subnb = gtk_notebook_new ();
@@ -2069,18 +2112,36 @@ create_display_page(gpointer data)
 		     (GtkAttachOptions) (GTK_JUSTIFY_RIGHT), 0, 0);
     gtk_label_set_justify(GTK_LABEL(label4), GTK_JUSTIFY_RIGHT);
 
+
+    /* Threading notebook page */
+    vbox10 = gtk_vbox_new(FALSE, 0);
+    gtk_notebook_append_page(GTK_NOTEBOOK(subnb), vbox10,
+                             gtk_label_new(_("Threading")));
+    threading_frame = gtk_frame_new(_("Threading"));
+    gtk_container_set_border_width(GTK_CONTAINER(threading_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox10), threading_frame, FALSE, FALSE, 0);
+    threading_vbox = vbox_in_container(threading_frame);
+    pui->tree_expand_check = box_start_check(_("Expand mailbox tree on open"), threading_vbox);
+    
+    pui->default_threading_style = 
+        add_pref_menu(_("Default threading style"), threading_style_label, 
+                      NUM_THREADING_STYLES, &pui->threading_style_index, 
+                      GTK_BOX(threading_vbox), padding, 
+                      GTK_SIGNAL_FUNC(threading_optionmenu_cb));
+    
     return vbox1;
 }
 
 
 static GtkWidget*
-add_spell_menu(const gchar* label, const gchar *names[], gint size, 
-	       gint *index, GtkBox* parent, gint padding)
+add_pref_menu(const gchar* label, const gchar *names[], gint size, 
+	       gint *index, GtkBox* parent, gint padding, 
+               GtkSignalFunc callback)
 {
     GtkWidget *omenu;
     GtkWidget* table, *hbox, *lbw;
 
-    omenu = create_spelling_option_menu(names, size, index);
+    omenu = create_pref_option_menu(names, size, index, callback);
 
     table = gtk_table_new(1, 2, TRUE);
     gtk_table_attach_defaults(GTK_TABLE(table), omenu, 0, 1, 0, 1);
@@ -2122,14 +2183,16 @@ create_spelling_page(gpointer data)
     vbox1 = vbox_in_container(frame0);
 
     /* do the module menu */
-    pui->module = add_spell_menu(_("Spell Check Module"),
+    pui->module = add_pref_menu(_("Spell Check Module"),
 				 spell_check_modules_name, NUM_PSPELL_MODULES,
-				 &pui->module_index, GTK_BOX(vbox1), padding);
+				 &pui->module_index, GTK_BOX(vbox1), padding,
+                                GTK_SIGNAL_FUNC(spelling_optionmenu_cb));
 
     /* do the suggestion modes menu */
-    pui->suggestion_mode = add_spell_menu(
+    pui->suggestion_mode = add_pref_menu(
 	_("Suggestion Level"), spell_check_suggest_mode_label,
-	NUM_SUGGEST_MODES, &pui->suggestion_mode_index,GTK_BOX(vbox1),padding);
+	NUM_SUGGEST_MODES, &pui->suggestion_mode_index,GTK_BOX(vbox1),padding,
+        GTK_SIGNAL_FUNC(spelling_optionmenu_cb));
 
     /* do the ignore length */
     ignore_adj = gtk_adjustment_new(0.0, 0.0, 99.0, 1.0, 5.0, 0.0);
@@ -2592,8 +2655,17 @@ spelling_optionmenu_cb(GtkItem * menuitem, gpointer data)
 }
 
 
+static void
+threading_optionmenu_cb(GtkItem* menuitem, gpointer data)
+{
+    /* update the index number */
+    gint *index = (gint*) data;
+    *index = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(menuitem), "menu_index"));
+}
+
+
 static GtkWidget *
-create_spelling_option_menu(const gchar * names[], gint size, gint * index)
+create_pref_option_menu(const gchar * names[], gint size, gint * index, GtkSignalFunc callback)
 {
     GtkWidget *omenu;
     GtkWidget *gmenu;
@@ -2607,8 +2679,7 @@ create_spelling_option_menu(const gchar * names[], gint size, gint * index)
 	menuitem = gtk_menu_item_new_with_label(names[i]);
 	gtk_object_set_data(GTK_OBJECT(menuitem), "menu_index",
 			    GINT_TO_POINTER(i));
-	gtk_signal_connect(GTK_OBJECT(menuitem), "select",
-			   GTK_SIGNAL_FUNC(spelling_optionmenu_cb),
+	gtk_signal_connect(GTK_OBJECT(menuitem), "select", callback,
 			   (gpointer) index);
 	gtk_signal_connect(GTK_OBJECT(menuitem), "select",
 			   GTK_SIGNAL_FUNC(properties_modified_cb),

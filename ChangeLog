@@ -1,5 +1,7 @@
-2004-12-30 10:40  PeterB
+2004-12-30 17:04  PeterB
 
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_local.c: reduce the
+	amount of tree modification when updating threading.
 	* libbalsa/send.c: convert file name to utf-8 for GMime.
 
 2004-12-29 11:49  PeterB

@@ -610,12 +610,15 @@ static void cat_mbox_name(GtkWidget * w, gpointer data) {
 	   MAX_PROPLIST_KEY_LEN);
 }
 
+/* FIXME PS: it seems that this function is called when balsa_app.notebook
+   is NULL. This is possibly a bug, search and destroy it. */
 static void
 get_open_mailboxes_string(char * tmp)
 {
     *tmp = '\0';
-    gtk_container_foreach(GTK_CONTAINER(balsa_app.notebook), cat_mbox_name,
-			  tmp);
+    if(balsa_app.notebook)
+	gtk_container_foreach(GTK_CONTAINER(balsa_app.notebook), cat_mbox_name,
+			      tmp);
 }
 
 /* Load Balsa's global settings */

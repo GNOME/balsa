@@ -1,3 +1,17 @@
+2002-12-23 00:28  PeterB
+
+	* src/balsa-message.c (balsa_message_set): Implement
+	bm_content_has_focus and bm_focus_on_first_child, and use them
+	to manage keyboard focus.
+	* src/balsa-index.c (balsa_index_select_next,
+	balsa_index_select_previous, balsa_index_select_next_unread,
+	balsa_index_select_next_flagged, balsa_index_find): Implement
+	bndx_find_row_and_select and use it to simplify the message
+	selection methods, now that GtkTreeView fully supports scrolling
+	with use_align = FALSE.
+	* src/balsa-index.c, src/balsa-index.h (bndx_find_row,
+	balsa_index_find): Declare filter ops using FilterOpType enum.
+
 2002-12-21  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox_local.c: fix the M_REOPENED fix, 

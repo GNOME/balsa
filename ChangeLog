@@ -1,7 +1,12 @@
 2005-02-07  Pawel Salek
 
 	* src/address-book-config.c: compile with gtk-2.4
-
+	* balsa.spec.in: distribute new icons.
+	* configure.in: bump version to 2.3.0.
+	* images/24x24/Makefile.am: fix install-data-hook:
+	* libbalsa/Makefile.am: add missing i18n.h file.
+	* libbalsa/mailbox_imap.c: remove debugging output.
+	
 2005-02-06 20:43  PeterB
 
 	* configure.in, images/16x16/Makefile, images/16x16/Makefile.in,

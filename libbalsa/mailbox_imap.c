@@ -2175,7 +2175,6 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             else
                 ifbo = IMFB_MIME;
         }
-        printf("ifbo=%d NONE=%d\n", ifbo, IMFB_NONE);
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
                                        section, ifbo, append_str, &dt));

@@ -114,11 +114,14 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %{_bindir}/balsa
 %{_libdir}/bonobo/servers/GNOME_Balsa.server
 %{_datadir}/applications/balsa.desktop
-%{_datadir}/pixmaps/gnome-balsa2.png
-%{_datadir}/gnome/help/balsa/*
-%{_datadir}/omf/balsa/*
+%{_datadir}/balsa/hicolor/16x16/apps/*
+%{_datadir}/balsa/hicolor/24x24/apps/*
 %{_datadir}/balsa/pixmaps/*
+%{_datadir}/gnome/help/balsa/*
+%{_datadir}/icons/hicolor/48x48/mimetypes/*
 %{_datadir}/idl/Balsa.idl
+%{_datadir}/omf/balsa/*
+%{_datadir}/pixmaps/gnome-balsa2.png
 %{_datadir}/sounds/balsa/*
 %{_mandir}/man1/balsa.1*
 %config %{_sysconfdir}/sound/events/*

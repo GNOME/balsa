@@ -70,15 +70,18 @@ libbalsa_a_SOURCES = 		\
 	folder-scanners.h	\
 	html.c                  \
 	html.h                  \
+	i18n.h			\
 	identity.c		\
 	identity.h		\
+	imap-server.c		\
+	imap-server.h		\
 	information.c		\
 	information.h		\
-	libbalsa.c		\
-	libbalsa.h		\
 	libbalsa-conf.h		\
 	libbalsa-marshal.c	\
 	libbalsa-marshal.h	\
+	libbalsa.c		\
+	libbalsa.h		\
 	libbalsa_private.h	\
 	mailbackend.h		\
 	mailbox-filter.c	\
@@ -111,8 +114,6 @@ libbalsa_a_SOURCES = 		\
 	send.h			\
 	server.c		\
 	server.h		\
-	imap-server.c		\
-	imap-server.h		\
 	source-viewer.c		\
 	url.c			\
 	url.h			\

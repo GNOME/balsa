@@ -656,7 +656,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	UNLOCK_MAILBOX(mailbox);
 	gdk_threads_enter();
     }
-    return TRUE;
+    return CLIENT_CONTEXT_OPEN(mailbox);
 }
 
 static LibBalsaMailboxAppendHandle* 
@@ -921,4 +921,6 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox)
     imap_mailbox_delete(LIBBALSA_MAILBOX(mailbox)->url);
     libbalsa_mailbox_imap_close(LIBBALSA_MAILBOX(mailbox));
 }
+
+
 

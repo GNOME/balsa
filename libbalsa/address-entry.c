@@ -41,7 +41,7 @@
 #include "address-entry.h"
 
 /*
- * Global variable.  We need this for destroying this widget.
+ * Global variable.  We need this for access to parent methods.
  */
 static GtkWidgetClass *parent_class = NULL;
 
@@ -206,7 +206,6 @@ libbalsa_address_entry_class_init(LibBalsaAddressEntryClass *klass)
     object_class->destroy = libbalsa_address_entry_destroy;
 
     gtk_widget_class->draw = libbalsa_address_entry_draw;
-    klass->gtk_entry_button_press = gtk_widget_class->button_press_event;
     gtk_widget_class->button_press_event = libbalsa_address_entry_button_press;
     gtk_widget_class->key_press_event = libbalsa_address_entry_key_press;
     gtk_widget_class->focus_out_event = libbalsa_address_entry_focus_out;
@@ -945,19 +944,17 @@ libbalsa_delete_to_line_end(LibBalsaAddressEntry *address_entry)
 static void
 libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
 {
-    GtkEntry *entry = GTK_ENTRY(widget);
     GtkEditable *editable = GTK_EDITABLE(widget);
-    LibBalsaAddressEntry *address_entry = LIBBALSA_ADDRESS_ENTRY(widget);
-    
+
     if (editable->has_selection || !GTK_WIDGET_HAS_FOCUS(widget))
         (*GTK_WIDGET_CLASS(parent_class)->draw) (widget, area);
     else {
         /* highlight the expansion text by faking a selection */
         gint start = editable->selection_start_pos;
         gint end = editable->selection_end_pos;
-        gint xoffset;
-        gint text_area_height;
-        
+        LibBalsaAddressEntry *address_entry =
+            LIBBALSA_ADDRESS_ENTRY(widget);
+
         editable->selection_start_pos = address_entry->alias_start_pos;
         editable->selection_end_pos = address_entry->alias_end_pos;
 
@@ -965,16 +962,10 @@ libbalsa_address_entry_draw(GtkWidget * widget, GdkRectangle * area)
 
         editable->selection_start_pos = start;
         editable->selection_end_pos = end;
-        
-        /* FIXME: the cursor doesn't seem to get set, so here's one
-         * piece of code lifted from gtkentry.c: */
-        xoffset = INNER_BORDER + entry->char_offset[editable->current_pos];
-        xoffset -= entry->scroll_offset;
-        gdk_window_get_size(entry->text_area, NULL, &text_area_height);
-        gdk_draw_line(entry->text_area,
-                      widget->style->fg_gc[GTK_STATE_NORMAL], xoffset,
-                      INNER_BORDER, xoffset,
-                      text_area_height - INNER_BORDER);
+
+        /* now draw the cursor (there's no method specifically for that,
+         * but draw_focus includes the cursor) */
+        GTK_WIDGET_CLASS(parent_class)->draw_focus(widget);
     }
 }
 
@@ -1000,7 +991,6 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
     GtkEntry *entry;
     GtkEditable *editable;
     LibBalsaAddressEntry *address_entry;
-    LibBalsaAddressEntryClass *klass;
     gint return_val;
 
     g_return_val_if_fail(widget != NULL, FALSE);
@@ -1026,13 +1016,10 @@ libbalsa_address_entry_button_press(GtkWidget * widget, GdkEventButton * event)
 
     /*
      * Now that we have done the ONE LINE that we needed to do,
-     * lets rip in the source from gtk+-1.2.8/gtk/gtkentry.c.
-     *
-     * NEW: klass = gtk_type_class avoids cut-and-paste-ing
-     *      about 1000 lines of code.
+     * let's hand over to the parent method.
      */
-    klass = gtk_type_class(LIBBALSA_TYPE_ADDRESS_ENTRY);
-    return_val = klass->gtk_entry_button_press(widget, event);
+    return_val =
+        GTK_WIDGET_CLASS(parent_class)->button_press_event(widget, event);
 
     /*
      * Check if it is mouse button 2 (paste text)

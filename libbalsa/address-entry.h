@@ -111,15 +111,6 @@ struct _LibBalsaAddressEntry {
 
 struct _LibBalsaAddressEntryClass {
     GtkEntryClass parent_class;
-
-    /*
-     * Keeps track of various gtk_entry functions.
-     *
-     * Why?  Duplicating the code in libbalsa/address-entry.c causes
-     *       code bloat, and means that there are bugs that get fixed
-     *       in GTK+, that don't get fixed in LibBalsa.
-     */
-    gint (* gtk_entry_button_press) (GtkWidget *, GdkEventButton *event);
 };
 
 

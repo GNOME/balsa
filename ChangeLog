@@ -1,3 +1,8 @@
+2002-02-05  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* libbalsa/mailbox_imap.c: return open status (PS).
+	* libbalsa/address-entry.[hc]: finish clean up (on my side).
+
 2002-02-04  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	* help/C/balsa.sgml: add message window title doc.

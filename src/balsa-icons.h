@@ -47,6 +47,8 @@
 
 #define BALSA_PIXMAP_MAIL_EMPTY_TRASH	"empty_trash"
 
+#define BALSA_PIXMAP_SHOW_PREVIEW	"show_preview"
+
 typedef enum {
     BALSA_ICON_DRAFTBOX,
     BALSA_ICON_INBOX,

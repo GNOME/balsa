@@ -182,6 +182,7 @@ static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data);
 static void reset_show_all_headers(void);
+static void show_preview_pane_cb(GtkWidget * widget, gpointer data);
 
 static void threading_flat_cb(GtkWidget * widget, gpointer data);
 static void threading_simple_cb(GtkWidget * widget, gpointer data);
@@ -717,10 +718,12 @@ balsa_window_new()
         { BALSA_PIXMAP_SHOW_ALL_HEADERS, show_all_headers_tool_cb },
         { BALSA_PIXMAP_MAIL_EMPTY_TRASH, (void(*)())empty_trash },
         { BALSA_PIXMAP_MAIL_CLOSE_MBOX,  mailbox_close_cb },
+	{ BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb }
     };
     BalsaWindow *window;
     GnomeAppBar *appbar;
     GtkWidget *scroll;
+    GtkWidget* btn;
     unsigned i;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
@@ -729,7 +732,7 @@ balsa_window_new()
 
     window = gtk_type_new(BALSA_TYPE_WINDOW);
 
-        balsa_app.main_window=window;
+    balsa_app.main_window=window;
 
     gnome_app_construct(GNOME_APP(window), "balsa", "Balsa");
 
@@ -799,18 +802,16 @@ balsa_window_new()
     mblist_default_signal_bindings(balsa_app.mblist);
     gtk_widget_show_all(window->mblist);
 
+    gtk_paned_pack1(GTK_PANED(window->hpaned), window->mblist, TRUE, TRUE);
+    gtk_paned_pack2(GTK_PANED(window->vpaned), scroll, TRUE, TRUE);
     if  (balsa_app.alternative_layout){
         gnome_app_set_contents(GNOME_APP(window), window->vpaned);
-        gtk_paned_pack1(GTK_PANED(window->hpaned), window->mblist, TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(window->hpaned), window->notebook, TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(window->vpaned), window->hpaned, TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(window->vpaned), scroll, TRUE, TRUE);
+        gtk_paned_pack2(GTK_PANED(window->hpaned), window->notebook,TRUE,TRUE);
+        gtk_paned_pack1(GTK_PANED(window->vpaned), window->hpaned,  TRUE,TRUE);
     } else {
         gnome_app_set_contents(GNOME_APP(window), window->hpaned);
-        gtk_paned_pack1(GTK_PANED(window->hpaned), window->mblist, TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(window->hpaned), window->vpaned, TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(window->vpaned), window->notebook, TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(window->vpaned), scroll, TRUE, TRUE);
+        gtk_paned_pack2(GTK_PANED(window->hpaned), window->vpaned,  TRUE,TRUE);
+        gtk_paned_pack1(GTK_PANED(window->vpaned), window->notebook,TRUE,TRUE);
     }
 
     /*PKGW: do it this way, without the usizes. */
@@ -865,6 +866,11 @@ balsa_window_new()
     /* gdk_threads_enter();
     enable_empty_trash(TRASH_CHECK);
     gdk_threads_leave();*/
+
+    /* set initial state of toggle preview pane button */
+    btn=get_tool_widget(GTK_WIDGET(balsa_app.main_window), 0, BALSA_PIXMAP_SHOW_PREVIEW);
+    if (btn)
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), balsa_app.previewpane);
 
     /* we can only set icon after realization, as we have no windows before. */
     gtk_signal_connect(GTK_OBJECT(window), "realize",
@@ -1383,26 +1389,6 @@ balsa_window_refresh(BalsaWindow * window)
 
     index = balsa_window_find_current_index(window);
     if (index) {
-
-        if (balsa_app.alternative_layout)
-            paned = GTK_WIDGET(balsa_app.notebook)->parent->parent;
-        else    
-            paned = GTK_WIDGET(balsa_app.notebook)->parent;
-        g_assert(paned != NULL);
-
-        if (balsa_app.previewpane) {
-            balsa_index_redraw_current(BALSA_INDEX(index));
-            gtk_paned_set_position(GTK_PANED(paned),
-                                   balsa_app.notebook_height);
-        } else {
-            bmsg = BALSA_MESSAGE(BALSA_WINDOW(window)->preview);
-            if (bmsg)
-                balsa_message_clear(bmsg);
-            /* Set the height to something really big (those new hi-res
-               screens and all :) */
-            gtk_paned_set_position(GTK_PANED(paned), G_MAXINT);
-        }
-
         /* update the date column, only in the current page */
         balsa_index_refresh_date (GTK_NOTEBOOK(balsa_app.notebook),
                                   NULL, 0, index);
@@ -1411,6 +1397,23 @@ balsa_window_refresh(BalsaWindow * window)
                                   NULL, 0, index);
 
     }
+    if (balsa_app.alternative_layout)
+	paned = GTK_WIDGET(balsa_app.notebook)->parent->parent;
+    else    
+	paned = GTK_WIDGET(balsa_app.notebook)->parent;
+    g_assert(paned != NULL);
+    if (balsa_app.previewpane) {
+	if(index) balsa_index_redraw_current(BALSA_INDEX(index));
+	gtk_paned_set_position(GTK_PANED(paned), balsa_app.notebook_height);
+    } else {
+	bmsg = BALSA_MESSAGE(BALSA_WINDOW(window)->preview);
+	if (bmsg)
+	    balsa_message_clear(bmsg);
+	/* Set the height to something really big (those new hi-res
+	   screens and all :) */
+	gtk_paned_set_position(GTK_PANED(paned), G_MAXINT);
+    }
+
     /*
      * set the toolbar style
      */
@@ -3235,6 +3238,19 @@ reset_show_all_headers(void)
                         BALSA_PIXMAP_SHOW_ALL_HEADERS);
     if(btn)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), FALSE);
+}
+
+static void
+show_preview_pane_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *btn;
+    
+    btn=get_tool_widget(GTK_WIDGET(balsa_app.main_window), TOOLBAR_MAIN,
+			BALSA_PIXMAP_SHOW_PREVIEW);
+    if(!btn)
+	return;
+    balsa_app.previewpane = GTK_TOGGLE_BUTTON(btn)->active;
+    balsa_window_refresh(balsa_app.main_window);
 }
 
 /* browse_wrap can also be changed in the preferences window

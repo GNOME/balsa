@@ -2,7 +2,7 @@ noinst_LIBRARIES = libinit_balsa.a
 
 libinit_balsa_a_SOURCES = 		\
 	$(BUILT_SOURCES)		\
-	$(GOB_SOURCES)			\
+	$(GOB_SRCLIST)			\
 	helper.c			\
 	helper.h			\
 	init_balsa.c			\
@@ -24,7 +24,7 @@ BUILT_SOURCES =				\
 	balsa-druid-page-directory.h	\
 	balsa-druid-page-finish.h	
 
-GOB_SOURCES =				\
+GOB_SRCLIST =				\
 	balsa-initdruid.gob		\
 	balsa-druid-page.gob		\
 	balsa-druid-page-error.gob	\
@@ -38,6 +38,5 @@ INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
 	-I$(top_srcdir)/src
 
-%.c %.h: %.gob
-	(cd $(srcdir) && gob --no-private-header $<)
-
+%.c %.h %-private.h: %.gob
+	@GOB@ $<

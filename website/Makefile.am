@@ -35,10 +35,10 @@ install-data-local: $(website_DATA)
 		basefile=`basename $$file`; \
 		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/images/$$basefile; \
 	done
-	# -for file in $(srcdir)/images/*.png; do \
-	# 	basefile=`basename $$file`; \
-	# 	$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/images/$$basefile; \
-	# done
+#	 -for file in $(srcdir)/images/*.png; do \
+#	 	basefile=`basename $$file`; \
+# 	$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/images/$$basefile; \
+#	 done
 	$(mkinstalldirs) $(DESTDIR)$(websitedir)/screens
 	-for file in $(srcdir)/screens/*.jpg; do \
 		basefile=`basename $$file`; \

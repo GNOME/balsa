@@ -39,8 +39,6 @@ GNOME_INIT
 AC_PROG_CC
 AC_ISC_POSIX
 AC_STDC_HEADERS
-AC_ARG_PROGRAM
-AM_PROG_LEX
 AC_PROG_YACC
 AM_PROG_LIBTOOL
 
@@ -53,7 +51,7 @@ dnl this should come after `AC_PROG_CC'
 GNOME_X_CHECKS
 
 AC_CHECK_LIB(pspell, new_pspell_manager,,[
-	AC_MSG_ERROR([*** libpspell not found.  Please check http://www.balsa.net for information on the required files.])
+	AC_MSG_ERROR([*** libpspell(-devel) not found.  Please check http://www.balsa.net for information on the required files.])
 ])
 
 dnl Reset
@@ -369,11 +367,7 @@ dnl Things needed by CVS user
 dnl ##########################################################################
 
 if test x"$BALSA_FROM_CVS" = xyes ; then
-	AC_CHECK_PROG(HAS_GOB, gob, yes, no)
-
-	if test x"$HAS_GOB" = xno ; then
-		AC_MSG_ERROR([As a CVS user, you need to get gob to build Balsa. It is available from Gnome CVS in the module 'gob'])
-	fi
+	GOB_CHECK(0.93.4)
 fi
 
 dnl ##########################################################################

@@ -1,6 +1,6 @@
 bin_PROGRAMS = balsa
 
-balsa_BASE_SOURCES =	\
+balsa_BASE_SRCLIST =	\
 	address-book.c		\
 	address-book.h		\
 	address-book-config.c	\
@@ -55,9 +55,9 @@ balsa_BASE_SOURCES =	\
 	toolbar-factory.c	\
 	toolbar-factory.h
 
-balsa_IDL_SOURCES = # balsa-common.c balsa-skels.c balsa-stubs.c		
+balsa_IDL_SRCLIST = # balsa-common.c balsa-skels.c balsa-stubs.c		
 
-balsa_SOURCES = $(balsa_BASE_SOURCES) $(balsa_IDL_SOURCES)
+balsa_SOURCES = $(balsa_BASE_SRCLIST) $(balsa_IDL_SRCLIST)
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

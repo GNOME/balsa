@@ -53,7 +53,7 @@ pop_get_errstr(PopStatus status)
     static gchar* errmsgs[] = {
 	"",
 	N_("connection error"),
-	N_("POP command exection failed"),
+	N_("POP command execution failed"),
 	N_("Could not write the message"),
 	N_("Could not run the delivery program (procmail)"),
 	N_("Could not open mailbox for spooling"),
@@ -142,10 +142,12 @@ getApopStamp (char *buff, char *stamp) {
     char *finish;
     size_t len;
     
+    g_return_val_if_fail(buff, FALSE);
+    g_return_val_if_fail(stamp, FALSE);
     start = strchr(buff, '<');
     finish = strchr(buff, '>');
     
-    if( buff && stamp && start && finish ) {
+    if(start && finish) {
         len = strlen(start) - strlen(finish) + 1;
         strncpy( stamp, start, len );
         return TRUE;

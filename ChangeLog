@@ -1,3 +1,22 @@
+2001-10-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/pop3.c: fix misspelling in error msg. Remove redundant test.
+	
+	Ali Akcaagac <ali.akcaagac@stud.fh-wilhelmshaven.de> am/ac updates:
+	* configure.in: updated (mostly) for autoconf-2.5
+	* libinit_balsa/Makefile.am:
+	* src/Makefile.am:
+	* website/Makefile.am: updated for automake-1.5
+	* src/balsa-app.c: switch on mbox checking by default.
+
+	Adapted Willem Riede's <wriede@riede.org> preview switch button.
+	* src/balsa-icons.[hc]: add the icon.
+	* src/balsa-index.c: don't try to show message when no preview.
+	* src/balsa-message.c: remove dead comments.
+	* src/main-window.c: add preview switching button callback.
+	* src/toolbar-factory.c: add the button to the list of legal buttons.
+	* src/toolbar-prefs.c: add the configuration data.
+	
 2001-10-07  Carlos Morgado  <chbm@chbm.nu>
 
 	* libbalsa/mailbox.h: libbalsa_mailbox_commit prototype

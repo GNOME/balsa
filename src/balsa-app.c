@@ -245,8 +245,8 @@ balsa_app_init(void)
     balsa_app.new_messages_timer = 0;
     balsa_app.new_messages = 0;
 
-    balsa_app.check_mail_auto = FALSE;
-    balsa_app.check_mail_timer = 0;
+    balsa_app.check_mail_auto = TRUE;
+    balsa_app.check_mail_timer = 10;
 
     balsa_app.debug = FALSE;
     balsa_app.previewpane = TRUE;

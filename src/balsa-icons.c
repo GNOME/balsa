@@ -49,6 +49,8 @@
 
 #include "pixmaps/empty_trash.xpm"
 
+#include "pixmaps/preview.xpm"
+
 #include "pixmaps/draftbox.xpm"
 #include "pixmaps/inbox.xpm"
 #include "pixmaps/outbox.xpm"
@@ -185,6 +187,8 @@ void
 register_balsa_pixmaps(void)
 {
     register_balsa_pixmap(BALSA_PIXMAP_SHOW_ALL_HEADERS, all_headers_xpm,
+			  24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_SHOW_PREVIEW, preview_xpm,
 			  24, 24);
     register_balsa_pixmap(BALSA_PIXMAP_SMALL_CLOSE, close_xpm,
 			  9, 9);

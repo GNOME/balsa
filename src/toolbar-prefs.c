@@ -117,7 +117,9 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_MAIL_EMPTY_TRASH, N_("Empty Trash"),
      N_("Delete messages from the trash mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_MAIL_CLOSE_MBOX, N_("Close"),
-     N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON}
+     N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_SHOW_PREVIEW, N_("Preview\npane"),
+     N_("Show preview pane"), TOOLBAR_BUTTON_TYPE_TOGGLE}
 };
 
 int toolbar_button_count=sizeof(toolbar_buttons)/sizeof(button_data);

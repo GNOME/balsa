@@ -503,12 +503,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	handle_mdn_request (message);
 #endif
 
-    /* mark message as read; no-op if it was read so don't worry.
-       and this is the right place to do the marking.
-       body_ref marks the message as read.
-       libbalsa_message_read(message);
-     */
-
     bm->message = message;
 
     gtk_signal_connect(GTK_OBJECT(message), "destroy",

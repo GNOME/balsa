@@ -1237,14 +1237,16 @@ select_message(GtkWidget * widget, GtkCTreeNode *row, gint column,
     bindex = BALSA_INDEX(data);
     message = 
 	LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data (GTK_CTREE(widget), row));
-
-    replace_attached_data (GTK_OBJECT(bindex), "message", GTK_OBJECT(message));
-    handler = gtk_idle_add ((GtkFunction) idle_handler_cb, bindex);
-
     if (message) {
 	gtk_signal_emit(GTK_OBJECT(bindex),
 			balsa_index_signals[SELECT_MESSAGE],
 			message, NULL);
+    }
+
+    if(balsa_app.previewpane) {
+	replace_attached_data (GTK_OBJECT(bindex), "message", 
+			       GTK_OBJECT(message));
+	handler = gtk_idle_add ((GtkFunction) idle_handler_cb, bindex);
     }
 }
 
@@ -1909,7 +1911,9 @@ balsa_index_reset(BalsaIndex * index)
     gtk_notebook_set_page(GTK_NOTEBOOK(balsa_app.notebook), page_num);
 }
 
-
+/* balsa_index_update_message:
+   update preview window to currently selected message of index.
+*/
 void
 balsa_index_update_message(BalsaIndex * index)
 {
@@ -1917,19 +1921,17 @@ balsa_index_update_message(BalsaIndex * index)
     GtkObject *message;
     GtkCList *list;
 
+    if(!balsa_app.previewpane) return;
+
     list = GTK_CLIST(index->ctree);
     row = balsa_index_get_largest_selected (list);
 
-    if (row < 0)
-	message = NULL;
-    else
-	message = GTK_OBJECT(gtk_clist_get_row_data(list, row));
-
+    message = 
+	(row < 0) ? NULL : GTK_OBJECT(gtk_clist_get_row_data(list, row));
     replace_attached_data(GTK_OBJECT(index), "message", message);
 
     if(handler) 
         gtk_idle_remove(handler);
-
     handler = gtk_idle_add ((GtkFunction) idle_handler_cb, index);
 }
 

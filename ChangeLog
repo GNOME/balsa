@@ -1,3 +1,8 @@
+2004-11-17 18:18  PeterB
+
+	* libbalsa/mailbox_mbox.c: use fstat instead of stat while mailbox
+	is open.
+
 2004-11-17  Pawel Salek
 
 	* TRANSLATABLE_FILES: 

@@ -118,28 +118,25 @@ libbalsa_address_new(void)
 LibBalsaAddress *
 libbalsa_address_new_from_string(const gchar * str)
 {
-    LibBalsaAddress* addr;
-    InternetAddressList *list;
-    gchar *tmp = g_strdup(str);
-    
-    libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
-    list = internet_address_parse_string(tmp);
-    g_free(tmp);
-    if (!list)
-	return NULL;
+    LibBalsaAddress *addr = NULL;
+    GList *lst;
 
-    addr = libbalsa_address_new();
-    addr->full_name = g_strdup(list->address->name);
-    addr->address_list = g_list_append(addr->address_list, 
-				       g_strdup(list->address->value.addr));
-    internet_address_list_destroy(list);
+    lst = libbalsa_address_new_list_from_string(str);
+    if (lst) {
+	addr = lst->data;
+	g_object_ref(addr);
+	g_list_foreach(lst, (GFunc) g_object_unref, NULL);
+	g_list_free(lst);
+    }
+
     return addr;
 }
 
 void
-libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src)
+libbalsa_address_set_copy_member(LibBalsaAddress *dest,
+                                 LibBalsaAddress *src,
+				 const gchar * mailbox)
 {
-    GList *src_al;
     if(dest == src) /* safety check */
         return;
     g_free(dest->nick_name); dest->nick_name = g_strdup(src->nick_name);
@@ -152,11 +149,23 @@ libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src)
     g_list_free(dest->address_list);
 
     dest->address_list = NULL;
-    for(src_al = src->address_list; src_al; src_al = src_al->next)
-        dest->address_list = 
-            g_list_prepend(dest->address_list, g_strdup(src_al->data));
+    if (mailbox)
+        dest->address_list =
+            g_list_prepend(dest->address_list, g_strdup(mailbox));
+    else {
+        GList *src_al;
 
-    dest->address_list = g_list_reverse(dest->address_list);
+        for (src_al = src->address_list; src_al; src_al = src_al->next)
+            dest->address_list =
+                g_list_prepend(dest->address_list, g_strdup(src_al->data));
+        dest->address_list = g_list_reverse(dest->address_list);
+    }
+}
+
+void
+libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src)
+{
+    libbalsa_address_set_copy_member(dest, src, NULL);
 }
 
 GList *
@@ -207,6 +216,9 @@ libbalsa_address_new_list_from_string(const gchar * str)
     gchar *tmp;
     InternetAddressList *address_list;
     GList *lst;
+
+    if (!str || !*str)
+	return NULL;
 
     tmp = g_strdup(str);
     libbalsa_utf8_sanitize(&tmp, FALSE, NULL);

@@ -92,6 +92,9 @@ GType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
 LibBalsaAddress *libbalsa_address_new_from_string(const gchar * address);
+void libbalsa_address_set_copy_member(LibBalsaAddress * dest,
+                                      LibBalsaAddress * src,
+                                      const gchar * mailbox);
 void libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src);
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
 GList *libbalsa_address_new_list_from_gmime(const InternetAddressList *

@@ -1772,7 +1772,7 @@ ir_body_fld_lines(struct siobuf* sio, ImapBody* body)
   return IMR_OK;
 }
 
-/* body_fld_dsp ::= "(" string SPACE body_fld_param ")" / nil */
+/* body_fld_dsp = "(" string SP body_fld_param ")" / nil */
 static ImapResponse
 ir_body_fld_dsp (struct siobuf *sio, ImapBody * body)
 {
@@ -1780,83 +1780,95 @@ ir_body_fld_dsp (struct siobuf *sio, ImapBody * body)
   int c;
   char *str;
 
-  if ((c = sio_getc (sio)) == '(')
-    {
-      /* "(" string */
-      str = imap_get_string (sio);
-      if (body)
-	{
-	  if (!g_ascii_strcasecmp (str, "inline"))
-	    body->content_dsp = IMBDISP_INLINE;
-	  else if (!g_ascii_strcasecmp (str, "attachment"))
-	    body->content_dsp = IMBDISP_ATTACHMENT;
-	  else
-	    {
-	      body->content_dsp = IMBDISP_OTHER;
-	      body->content_dsp_other = g_strdup (str);
-	    }
-	}
-      g_free (str);
-      /* SPACE body_fld_param ")" */
-      if (sio_getc (sio) != ' ')
-	return IMR_PROTOCOL;
-      if (body)
-	body->dsp_params =
-	  g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free,
-				 g_free);
-      rc = ir_body_fld_param_hash (sio, body ? body->dsp_params : NULL);
-      if (rc != IMR_OK)
-	return rc;
-      if (sio_getc (sio) != ')')
-	return IMR_PROTOCOL;
-    }
-  else
+  if ((c = sio_getc (sio)) != '(')
     {
       /* nil */
       if (!imap_is_nil (sio, c))
 	return IMR_PROTOCOL;
+      return IMR_OK;
     }
+
+  /* "(" string */
+  str = imap_get_string (sio);
+  if (body)
+    {
+      if (!g_ascii_strcasecmp (str, "inline"))
+	body->content_dsp = IMBDISP_INLINE;
+      else if (!g_ascii_strcasecmp (str, "attachment"))
+	body->content_dsp = IMBDISP_ATTACHMENT;
+      else
+	{
+	  body->content_dsp = IMBDISP_OTHER;
+	  body->content_dsp_other = g_strdup (str);
+	}
+    }
+  g_free (str);
+
+  /* SP body_fld_param ")" */
+  if (sio_getc (sio) != ' ')
+    return IMR_PROTOCOL;
+  if (body)
+    {
+      body->dsp_params =
+	g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free,
+			       g_free);
+      rc = ir_body_fld_param_hash (sio, body->dsp_params);
+    }
+  else
+    rc = ir_body_fld_param_hash (sio, NULL);
+
+  if (rc != IMR_OK)
+    return rc;
+
+  if (sio_getc (sio) != ')')
+    return IMR_PROTOCOL;
+
   return IMR_OK;
 }
 
-/* body_fld_lang ::= nstring / "(" 1#string ")" */
+/* body-fld-lang = nstring / "(" string *(SP string) ")" */
 static ImapResponse
 ir_body_fld_lang (struct siobuf *sio, ImapBody * body)
 {
   int c;
+
   c = sio_getc (sio);
-  if (c == '(')
-    {
-      /* 1#string ")" */
-      do
-	{
-	  char *str = imap_get_string (sio);
-	  if (body)
-	    body->ext.mpart.lang = g_slist_append (body->ext.mpart.lang, str);
-	  else
-	    g_free (str);
-	  c = sio_getc (sio);
-	  if (c != ' ' && c != ')')
-	    return IMR_PROTOCOL;
-	}
-      while (c != ')');
-    }
-  else
+
+  if (c != '(')
     {
       /* nstring */
       char *str;
+
       sio_ungetc (sio);
       str = imap_get_nstring (sio);
       if (str && body)
 	body->ext.mpart.lang = g_slist_append (NULL, str);
       else
 	g_free (str);
+
+      return IMR_OK;
     }
+
+  /* string *(SP string) ")" */
+  do
+    {
+      char *str = imap_get_string (sio);
+      if (body)
+	body->ext.mpart.lang = g_slist_append (body->ext.mpart.lang, str);
+      else
+	g_free (str);
+      c = sio_getc (sio);
+      if (c != ' ' && c != ')')
+	return IMR_PROTOCOL;
+    }
+  while (c != ')');
 
   return IMR_OK;
 }
 
-/* body_extension  ::= nstring / number / "(" 1#body_extension ")" */
+/* body-extension = nstring / number /
+ *                  "(" body-extension *(SP body-extension) ")"
+ */
 static ImapResponse
 ir_body_extension (struct siobuf *sio, ImapBody * body)
 {
@@ -1866,7 +1878,7 @@ ir_body_extension (struct siobuf *sio, ImapBody * body)
   c = sio_getc (sio);
   if (c == '(')
     {
-      /* 1#body_extension ")" */
+      /* "(" body-extension *(SP body-extension) ")" */
       do
 	{
 	  rc = ir_body_extension (sio, body);
@@ -1892,163 +1904,334 @@ ir_body_extension (struct siobuf *sio, ImapBody * body)
   return IMR_OK;
 }
 
-/* body_ext_mpart  ::= body_fld_param
- *                     [SPACE body_fld_dsp SPACE body_fld_lang
- *                     [SPACE 1#body_extension]] */
-static ImapResponse
-ir_body_ext_mpart (struct siobuf *sio, ImapBody * body)
-{
-  ImapResponse rc;
-  int c;
+enum _ImapBodyExtensibility {
+    IMB_NON_EXTENSIBLE,
+    IMB_EXTENSIBLE
+};
+typedef enum _ImapBodyExtensibility ImapBodyExtensibility;
 
-  /* body_fld_param */
-  if (body)
-    body->ext.mpart.params =
-      g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free, g_free);
-  rc = ir_body_fld_param_hash (sio, body ? body->ext.mpart.params : NULL);
-  if (rc != IMR_OK)
-    return rc;
-  /* [SPACE */
-  if (sio_getc (sio) == ' ')
-    {
-      /* body_fld_dsp */
-      rc = ir_body_fld_dsp (sio, body);
-      if (rc != IMR_OK)
-	return rc;
-      /* SPACE body_fld_lang */
-      if (sio_getc (sio) != ' ')
-	return IMR_PROTOCOL;
-      ir_body_fld_lang (sio, body);
-      /* [SPACE 1#body_extension]] */
-      if ((c = sio_getc (sio)) == ' ')
-	do
-	  {
-	    rc = ir_body_extension (sio, body);
-	    if (rc != IMR_OK)
-	      return rc;
-	  }
-	while (sio_getc (sio) != ')');
-    }
-  return IMR_OK;
-}
+/* body-ext-mpart  = body-fld-param [SP body-fld-dsp [SP body-fld-lang
+ *                   [SP body-fld-loc *(SP body-extension)]]]
+ *                   ; MUST NOT be returned on non-extensible
+ *                   ; "BODY" fetch
+ */
 
-/* body_ext_1part ::= body_fld_md5 [SPACE body_fld_dsp
- *                    [SPACE body_fld_lang
- *                    [SPACE 1#body_extension]]]*/
 static ImapResponse
-ir_body_ext_1part (struct siobuf *sio, ImapBody * body)
+ir_body_ext_mpart (struct siobuf *sio, ImapBody * body,
+		   ImapBodyExtensibility type)
 {
   ImapResponse rc;
   char *str;
 
-  /* body_fld_md5    ::= nstring */
+  if (type == IMB_NON_EXTENSIBLE)
+    return IMR_PROTOCOL;
+
+  /* body_fld_param */
+  if (body)
+    {
+      body->ext.mpart.params =
+	g_hash_table_new_full (g_str_hash, imap_str_case_equal, g_free,
+			       g_free);
+      rc = ir_body_fld_param_hash (sio, body->ext.mpart.params);
+    }
+  else
+    rc = ir_body_fld_param_hash (sio, NULL);
+
+  if (rc != IMR_OK)
+    return rc;
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
+    {
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body_fld_dsp */
+  rc = ir_body_fld_dsp (sio, body);
+  if (rc != IMR_OK)
+    return rc;
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
+    {
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body_fld_lang */
+  rc = ir_body_fld_lang (sio, body);
+  if (rc != IMR_OK)
+    return rc;
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
+    {
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body-fld-loc */
+  str = imap_get_nstring (sio);
+  if (body)
+    body->content_uri = str;
+  else
+    g_free(str);
+
+  /* (SP body-extension)]]] */
+  while (sio_getc (sio) == ' ')
+    {
+      rc = ir_body_extension (sio, body);
+      if (rc != IMR_OK)
+	return rc;
+    }
+  sio_ungetc (sio);
+
+  return IMR_OK;
+}
+
+/* body-ext-1part  = body-fld-md5 [SP body-fld-dsp [SP body-fld-lang
+ *                   [SP body-fld-loc *(SP body-extension)]]]
+ *                   ; MUST NOT be returned on non-extensible
+ *                   ; "BODY" fetch
+ */
+static ImapResponse
+ir_body_ext_1part (struct siobuf *sio, ImapBody * body,
+		   ImapBodyExtensibility type)
+{
+  ImapResponse rc;
+  char *str;
+
+  if (type == IMB_NON_EXTENSIBLE)
+    return IMR_PROTOCOL;
+
+  /* body_fld_md5 = nstring */
   str = imap_get_nstring (sio);
   if (body && str)
     body->ext.onepart.md5 = str;
   else
     g_free (str);
-  /* [SPACE body_fld_dsp */
-  if (sio_getc (sio) == ' ')
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
     {
-      rc = ir_body_fld_dsp (sio, body);
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body_fld_dsp */
+  rc = ir_body_fld_dsp (sio, body);
+  if (rc != IMR_OK)
+    return rc;
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
+    {
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body_fld_lang */
+  rc = ir_body_fld_lang (sio, body);
+  if (rc != IMR_OK)
+    return rc;
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
+    {
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body-fld-loc */
+  str = imap_get_nstring (sio);
+  if (body)
+    body->content_uri = str;
+  else
+    g_free(str);
+
+  /* (SP body-extension)]]] */
+  while (sio_getc (sio) == ' ')
+    {
+      rc = ir_body_extension (sio, body);
       if (rc != IMR_OK)
 	return rc;
-      /* [SPACE body_fld_lang */
-      if (sio_getc (sio) == ' ')
-	{
-	  rc = ir_body_fld_lang (sio, body);
-	  if (rc != IMR_OK)
-	    return rc;
-	  /* [SPACE 1#body_extension]]] */
-	  if (sio_getc (sio) == ' ')
-	    {
-	      do
-		{
-		  rc = ir_body_extension (sio, body);
-		  if (rc != IMR_OK)
-		    return rc;
-		}
-	      while (sio_getc (sio) == ' ');
-	      sio_ungetc (sio);
-	    }
-	}
     }
+  sio_ungetc (sio);
+
   return IMR_OK;
 }
 
-/* ir_body:
-   parses body item.
-   If body is null, ir_body will parse the output without storing it.
-*/
+/* body-type-mpart = 1*body SP media-subtype
+ *                   [SP body-ext-mpart]
+ */
+static ImapResponse ir_body (struct siobuf *sio, int c, ImapBody * body,
+			     ImapBodyExtensibility type);
 static ImapResponse
-ir_body(struct siobuf *sio, int c, ImapBody *body)
+ir_body_type_mpart (struct siobuf *sio, ImapBody * body,
+		    ImapBodyExtensibility type)
 {
   ImapResponse rc;
   ImapBody *b;
-  ImapEnvelope *env;
   gchar *str;
+  int c;
 
-  if( c != '(') return IMR_PROTOCOL;
-  if( (c=sio_getc(sio)) == '(') { /* body-type-mpart */
-    if(body) body->media_basic = IMBMEDIA_MULTIPART;
-    do {
-      do {
-        b =  body ? imap_body_new() : NULL;
-        rc = ir_body(sio, c, b);
-        if(body) imap_body_append_child(body, b);
-        if(rc !=IMR_OK) return rc;
-      } while((c=sio_getc(sio)) == '(');
-      if(c != ' ') return IMR_PROTOCOL;
-      str = imap_get_string(sio);
-      if(body) {
-        g_assert(body->media_subtype == NULL);
-        body->media_subtype = str;
-      } else g_free(str);
-      c = sio_getc(sio);
-      if(c==' ')
-        ir_body_ext_mpart(sio, body);
-      sio_ungetc(sio);
-    } while ((c=sio_getc(sio)) == ' ' && (c=sio_getc(sio)) == '(');
-  } else { /* body_type_1part */
-    ImapMediaBasic media_type;
-    sio_ungetc(sio);
-    if((rc=ir_media(sio, &media_type, body)) != IMR_OK) return rc;
-    if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
-    if( (rc=ir_body_fields(sio, body))       != IMR_OK) return rc;
-    switch(media_type) {
-    case IMBMEDIA_APPLICATION: 
+  if (body)
+    body->media_basic = IMBMEDIA_MULTIPART;
+
+  /* 1*body */
+  c = sio_getc (sio);
+  do
+    {
+      b = body ? imap_body_new () : NULL;
+      rc = ir_body (sio, c, b, type);
+      if (body)
+	{
+	  if (rc == IMR_OK)
+	    imap_body_append_child (body, b);
+	  else
+	    imap_body_free (b);
+	}
+      if (rc != IMR_OK)
+	return rc;
+    }
+  while ((c = sio_getc (sio)) == '(');
+
+  /* SP */
+  if (c != ' ')
+    return IMR_PROTOCOL;
+
+  /* media-subtype = string */
+  str = imap_get_string (sio);
+  if (body)
+    {
+      g_assert (body->media_subtype == NULL);
+      body->media_subtype = str;
+    }
+  else
+    g_free (str);
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
+    {
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body-ext-mpart] */
+  rc = ir_body_ext_mpart (sio, body, type);
+  if (rc != IMR_OK)
+    return rc;
+
+  return IMR_OK;
+}
+
+/* body-type-1part = (body-type-basic / body-type-msg / body-type-text)
+ *                   [SP body-ext-1part]
+ */
+static ImapResponse
+ir_body_type_1part (struct siobuf *sio, ImapBody * body,
+		    ImapBodyExtensibility type)
+{
+  ImapResponse rc;
+  ImapMediaBasic media_type;
+  ImapEnvelope *env;
+  ImapBody *b;
+
+  /* body-type-basic = media-basic SP body-fields 
+   * body-type-msg   = media-message SP body-fields SP envelope
+   *                   SP body SP body-fld-lines 
+   * body-type-text  = media-text SP body-fields SP body-fld-lines */
+  if ((rc = ir_media (sio, &media_type, body)) != IMR_OK)
+    return rc;
+  if (sio_getc (sio) != ' ')
+    return IMR_PROTOCOL;
+  if ((rc = ir_body_fields (sio, body)) != IMR_OK)
+    return rc;
+
+  switch (media_type)
+    {
+    case IMBMEDIA_APPLICATION:
     case IMBMEDIA_AUDIO:
     case IMBMEDIA_IMAGE:
     case IMBMEDIA_MESSAGE_OTHER:
     case IMBMEDIA_OTHER:
-    case IMBMEDIA_MULTIPART: /*FIXME: check this one */
+    case IMBMEDIA_MULTIPART:	/*FIXME: check this one */
       break;
     case IMBMEDIA_MESSAGE_RFC822:
-      if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
-      env = body ? imap_envelope_new() : NULL;
-      rc=ir_envelope(sio, env);
-      if(rc!= IMR_OK) { if(env) imap_envelope_free(env); return rc; }
-      c = sio_getc(sio); 
-      g_assert(c==' ');
-      if(body) {
-        b =  imap_body_new();
-        b->envelope = env;
-      } else b = NULL;
-      rc = ir_body(sio, sio_getc(sio), b);
-      if(body) imap_body_append_child(body, b);
-      if(rc != IMR_OK) return rc;
-      if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
-      if( (rc=ir_body_fld_lines(sio, body))   != IMR_OK) return rc;
+      if (sio_getc (sio) != ' ')
+	return IMR_PROTOCOL;
+      env = body ? imap_envelope_new () : NULL;
+      rc = ir_envelope (sio, env);
+      if (rc != IMR_OK)
+	{
+	  if (env)
+	    imap_envelope_free (env);
+	  return rc;
+	}
+      if (sio_getc (sio) != ' ')
+	return IMR_PROTOCOL;
+      if (body)
+	{
+	  b = imap_body_new ();
+	  b->envelope = env;
+	}
+      else
+	b = NULL;
+      rc = ir_body (sio, sio_getc (sio), b, type);
+      if (body)
+	imap_body_append_child (body, b);
+      if (rc != IMR_OK)
+	return rc;
+      if (sio_getc (sio) != ' ')
+	return IMR_PROTOCOL;
+      if ((rc = ir_body_fld_lines (sio, body)) != IMR_OK)
+	return rc;
       break;
     case IMBMEDIA_TEXT:
-      if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
-      if( (rc=ir_body_fld_lines(sio, body))   != IMR_OK) return rc;
+      if (sio_getc (sio) != ' ')
+	return IMR_PROTOCOL;
+      if ((rc = ir_body_fld_lines (sio, body)) != IMR_OK)
+	return rc;
       /* printf("Lines: %d\n", body->lines); */
     }
-    c = sio_getc(sio);
-    if(c==' ')
-      return ir_body_ext_1part(sio, body);
-  }
+
+  /* [SP */
+  if (sio_getc (sio) != ' ')
+    {
+      sio_ungetc (sio);
+      return IMR_OK;
+    }
+
+  /* body-ext-1part] */
+  rc = ir_body_ext_1part (sio, body, type);
+  if (rc != IMR_OK)
+    return rc;
+
+  return IMR_OK;
+}
+
+/* body = "(" (body-type-1part / body-type-mpart) ")" */
+static ImapResponse
+ir_body (struct siobuf *sio, int c, ImapBody * body,
+	 ImapBodyExtensibility type)
+{
+  ImapResponse rc;
+
+  if (c != '(')
+    return IMR_PROTOCOL;
+
+  c = sio_getc (sio);
+  sio_ungetc (sio);
+  if (c == '(')
+    rc = ir_body_type_mpart (sio, body, type);
+  else
+    rc = ir_body_type_1part (sio, body, type);
+  if (rc != IMR_OK)
+    return rc;
+
+  if (sio_getc (sio) != ')')
+    return IMR_PROTOCOL;
 
   return IMR_OK;
 }
@@ -2080,7 +2263,8 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
     break;
   case ' ':
     rc = ir_body(h->sio, sio_getc(h->sio),
-                 msg->body ? NULL : (msg->body = imap_body_new()));
+                 msg->body ? NULL : (msg->body = imap_body_new()), 
+		 IMB_NON_EXTENSIBLE);
     break;
   default: rc = IMR_PROTOCOL; break;
   }
@@ -2091,12 +2275,17 @@ static ImapResponse
 ir_msg_att_bodystructure(ImapMboxHandle *h, int c, unsigned seqno)
 {
   ImapMessage *msg = h->msg_cache[seqno-1];
+  ImapResponse rc;
 
-  if (c != ' ')
-    return IMR_PROTOCOL;
-
-  return ir_body(h->sio, sio_getc(h->sio),
-	         msg->body ? NULL : (msg->body = imap_body_new()));;
+  switch(c) {
+  case ' ':
+    rc = ir_body(h->sio, sio_getc(h->sio),
+                 msg->body ? NULL : (msg->body = imap_body_new()), 
+		 IMB_EXTENSIBLE);
+    break;
+  default: rc = IMR_PROTOCOL; break;
+  }
+  return rc;
 }
 
 static ImapResponse

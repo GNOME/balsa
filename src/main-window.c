@@ -2185,6 +2185,34 @@ message_print_cb(GtkWidget * widget, gpointer data)
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
 
+static gboolean
+check_messages_after(gpointer data)
+{
+    MailThreadMessage *threadmessage;
+    int new_msgs_before, new_msgs_after;
+
+    gdk_threads_enter();
+    if (!balsa_app.mblist_tree_store) {
+	gdk_threads_leave();
+        return FALSE;
+    }
+
+    new_msgs_before = GPOINTER_TO_INT(data);
+    new_msgs_after = 0;
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                           (GtkTreeModelForeachFunc)
+                           count_unread_msgs_func, &new_msgs_after);
+
+    new_msgs_after -= new_msgs_before;
+    if (new_msgs_after < 0)
+        new_msgs_after = 0;
+    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
+                  new_msgs_after, 0);
+
+    gdk_threads_leave();
+    return FALSE;
+}
+
 static void
 check_messages_thread(gpointer data)
 {
@@ -2202,7 +2230,7 @@ check_messages_thread(gpointer data)
     /* total of all new messages in all mailboxes will be caused by new */
     /* and nothing else */
     
-    int new_msgs_before=0, new_msgs_after=0;
+    int new_msgs_before = 0;
 
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
@@ -2220,15 +2248,11 @@ check_messages_thread(gpointer data)
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) mailbox_check_func,
 			   NULL);
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) count_unread_msgs_func,
-			   &new_msgs_after);
 
-    new_msgs_after-=new_msgs_before;
-    if(new_msgs_after < 0)
-        new_msgs_after=0;
-    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
-                  new_msgs_after, 0);
+    /* Count unread messages in an idle callback, in case any mailbox
+     * updates its count in its own idle callback (currently, as of July
+     * 2004, imap mailboxes do). */
+    g_idle_add(check_messages_after, GINT_TO_POINTER(new_msgs_before));
     
     pthread_mutex_lock(&mailbox_lock);
     checking_mail = 0;

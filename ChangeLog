@@ -1,5 +1,10 @@
-2003-11-04 00:08  PeterB
+2003-11-04 08:21  PeterB
 
+	* libbalsa/mailbox_mbox.c: Give lbm_mbox_sync_real() a `closing'
+	argument instead of `reparse', for consistency; drop a local
+	variable; no need to check
+	LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox.
+	* libbalsa/mailbox_maildir.c: Expunge on close.
 	* libbalsa/mailbox_maildir.c: Close the mailbox with a
 	close_mailbox method instead of close_backend; implement
 	parse_mailbox_subdirs() helper; build list of removed messages when

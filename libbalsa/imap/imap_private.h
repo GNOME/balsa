@@ -107,8 +107,6 @@ ImapResponse imap_handle_setup_ssl(ImapMboxHandle *handle, SSL *ssl);
 /* even more private functions */
 int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);
 ImapResponse imap_cmd_step(ImapMboxHandle* handle, unsigned cmdno);
-ImapResponse imap_write_string(ImapMboxHandle *handle, const char *string,
-                               unsigned cmdno, int use_literal);
 int      imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len);
 void     imap_handle_flush(ImapMboxHandle *handle);
 unsigned imap_make_tag(ImapCmdTag tag);

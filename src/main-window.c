@@ -479,7 +479,7 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EDIT_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit..."), N_("Edit the selected mailbox"),
-			   balsa_mailbox_node_show_prop_dialog_cb,
+			   mailbox_conf_edit_cb,
 			   GNOME_STOCK_MENU_PREF),
 #define MENU_MAILBOX_DELETE_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("_Delete..."),
@@ -1029,6 +1029,7 @@ real_open_mbnode(BalsaMailboxNode* mbnode)
 	    LIBBALSA_INFORMATION_ERROR,
 	    _("Unable to Open Mailbox!\nPlease check the mailbox settings."));
 	gtk_object_destroy(GTK_OBJECT(index));
+	gdk_threads_enter();
 	return;
     }
 

@@ -1,3 +1,10 @@
+2001-02-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.[hc]: implement mblist_remove_mailbox_node().
+	* src/mailbox-conf.[hc]: use mblist_remove_mailbox_node() instead of 
+	mblist_repopulate(). callaback for mailbox edition from menu fixed.
+	* src/main-window.c: fix mailbox edition from menu; release gdk_lock
+	
 2001-02-22  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-entry.c: bug fix from 

@@ -225,13 +225,11 @@ BalsaMailboxNode*
 mblist_get_selected_node(BalsaMBList *mbl)
 {
     GtkCTreeNode *node;
-    BalsaMailboxNode *mbnode;
 
     g_assert(mbl != NULL);
 
-    node   = gtk_ctree_node_nth(GTK_CTREE(mbl), GTK_CLIST(mbl)->focus_row);
-    mbnode = gtk_ctree_node_get_row_data(GTK_CTREE(mbl), node);
-    return mbnode;
+    node = gtk_ctree_node_nth(GTK_CTREE(mbl), GTK_CLIST(mbl)->focus_row);
+    return gtk_ctree_node_get_row_data(GTK_CTREE(mbl), node);
 }
 
 /* mbox_is_unread: 
@@ -1326,6 +1324,23 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
 	return FALSE;
 }
 
+/* mblist_remove_mailbox_node:
+   remove give mailbox node from the mailbox tree.
+   Return TRUE (or equivalent) on success, FALSE on failure.
+*/
+gboolean
+mblist_remove_mailbox_node(BalsaMBList *mblist, BalsaMailboxNode* mbnode)
+{
+    GtkCTreeNode* node;
+    g_return_val_if_fail(mblist, FALSE);
+    g_return_val_if_fail(mbnode, FALSE);
+
+    node = gtk_ctree_find_by_row_data(GTK_CTREE(mblist), NULL, mbnode);
+    if(node)
+	gtk_ctree_remove_node(GTK_CTREE(mblist), node);
+
+    return node != NULL;
+}
 /* balsa_widget_get_bold_font [MBG]
  * 
  * Description: This function takes a widget and returns a bold

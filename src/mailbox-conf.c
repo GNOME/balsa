@@ -134,13 +134,17 @@ mailbox_conf_delete_cb(GtkWidget * widget, gpointer data)
         GtkWidget *err_dialog =
             gnome_error_dialog(_("No mailbox selected."));
         gnome_dialog_run_and_close(GNOME_DIALOG(err_dialog));
-        /* gtk_widget_destroy(GTK_WIDGET(err_dialog)); */
-    } else {
-	g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
+    } else
 	mailbox_conf_delete(mbnode);
-    }
 }
 
+/* This can be used  for both mailbox and folder edition */
+void
+mailbox_conf_edit_cb(GtkWidget * widget, gpointer data)
+{
+    BalsaMailboxNode *mbnode = mblist_get_selected_node(balsa_app.mblist);
+    balsa_mailbox_node_show_prop_dialog(mbnode);
+}
 
 /* END OF COMMONLY USED CALLBACKS SECTION ------------------------ */
 void
@@ -154,7 +158,6 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     LibBalsaMailbox* mailbox = mbnode->mailbox;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	/* FIXME: Should prompt to remove file aswell */
 	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes.\n"
 				"You may also delete the disk file or files associated with this mailbox.\n"
 				"If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
@@ -214,9 +217,9 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 		    _("Oooop! mailbox not found in balsa_app.mailbox "
 		      "nodes?\n"));
 	} else {
+	    mblist_remove_mailbox_node(balsa_app.mblist, mbnode);
 	    g_node_unlink(gnode);
 	    g_node_destroy(gnode); /* this will remove mbnode */
-	    balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
  	}
     }
 }

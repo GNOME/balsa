@@ -34,4 +34,5 @@ void mailbox_conf_add_maildir_cb(GtkWidget * widget, gpointer data);
 void mailbox_conf_add_mh_cb(GtkWidget * widget, gpointer data);
 void mailbox_conf_add_imap_cb(GtkWidget * widget, gpointer data);
 void mailbox_conf_delete_cb(GtkWidget * widget, gpointer data);
+void mailbox_conf_edit_cb(GtkWidget * widget, gpointer data);
 #endif				/* __MAILBOX_CONF_H__ */

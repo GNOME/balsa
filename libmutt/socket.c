@@ -31,7 +31,6 @@
 /* support for multiple socket connections */
 
 static CONNECTION *Connections = NULL;
-static int NumConnections = 0;
 
 /* simple read buffering to speed things up. */
 int mutt_socket_readchar (CONNECTION *conn, char *c)
@@ -39,7 +38,6 @@ int mutt_socket_readchar (CONNECTION *conn, char *c)
   if (conn->bufpos >= conn->available)
   {
     conn->available = read (conn->fd, conn->inbuf, LONG_STRING);
-    dprint (1, (debugfile, "mutt_socket_readchar(): buffered %d chars\n", conn->available));
     conn->bufpos = 0;
     if (conn->available <= 0)
       return conn->available; /* returns 0 for EOF or -1 for other error */
@@ -62,7 +60,10 @@ int mutt_socket_read_line (char *buf, size_t buflen, CONNECTION *conn)
       break;
     buf[i] = ch;
   }
-  buf[i-1] = 0;
+  if (i)
+    buf[i-1] = '\0';
+  else
+    buf[i] = '\0';
   return (i + 1);
 }
 
@@ -76,38 +77,63 @@ int mutt_socket_read_line_d (char *buf, size_t buflen, CONNECTION *conn)
 int mutt_socket_write (CONNECTION *conn, const char *buf)
 {
   dprint (1,(debugfile,"mutt_socket_write():%s", buf));
-  return (write (conn->fd, buf, strlen (buf)));
+  return (write (conn->fd, buf, mutt_strlen (buf)));
 }
 
 CONNECTION *mutt_socket_select_connection (char *host, int port, int flags)
 {
-  int x;
+  CONNECTION *conn;
 
   if (flags != M_NEW_SOCKET)
   {
-    for (x = 0; x < NumConnections; x++)
+    conn = Connections;
+    while (conn)
     {
-      if (!strcmp (host, Connections[x].server) && 
-	  (port == Connections[x].port))
-	return &Connections[x];
+      if (!mutt_strcmp (host, conn->server) && (port == conn->port))
+	return conn;
+      conn = conn->next;
     }
   }
-  if (NumConnections == 0)
-  {
-    NumConnections = 1;
-    Connections = (CONNECTION *) safe_malloc (sizeof (CONNECTION));
-  }
-  else
-  {
-    NumConnections++;
-    safe_realloc ((void *)&Connections, sizeof (CONNECTION) * NumConnections);
-  }
-  Connections[NumConnections - 1].bufpos = 0;
-  Connections[NumConnections - 1].available = 0;
-  Connections[NumConnections - 1].uses = 0;
-  Connections[NumConnections - 1].server = safe_strdup (host);
-  Connections[NumConnections - 1].port = port;
+  conn = (CONNECTION *) safe_calloc (1, sizeof (CONNECTION));
+  conn->bufpos = 0;
+  conn->available = 0;
+  conn->uses = 0;
+  conn->server = safe_strdup (host);
+  conn->port = port;
+  conn->next = Connections;
+  Connections = conn;
 
-  return &Connections[NumConnections - 1];
+  return conn;
 }
 
+int mutt_socket_open_connection (CONNECTION *conn)
+{
+  struct sockaddr_in sin;
+  struct hostent *he;
+
+  memset (&sin, 0, sizeof (sin));
+  sin.sin_port = htons (conn->port);
+  sin.sin_family = AF_INET;
+  if ((he = gethostbyname (conn->server)) == NULL)
+  {
+    mutt_perror (conn->server);
+    return (-1);
+  }
+  memcpy (&sin.sin_addr, he->h_addr_list[0], he->h_length);
+
+  if ((conn->fd = socket (AF_INET, SOCK_STREAM, IPPROTO_IP)) < 0)
+  {
+    mutt_perror ("socket");
+    return (-1);
+  }
+
+  mutt_message ("Connecting to %s...", conn->server); 
+
+  if (connect (conn->fd, (struct sockaddr *) &sin, sizeof (sin)) < 0)
+  {
+    mutt_perror ("connect");
+    close (conn->fd);
+  }
+
+  return 0;
+}

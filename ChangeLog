@@ -1,5 +1,7 @@
-2003-11-24 18:11  PeterB
+2003-11-24 23:55  PeterB
 
+	* libbalsa/body.c: Get a file descriptor for body->temp_filename,
+	even when it has suffices.
 	* libbalsa/body.c: Content of message/rfc822 is next part, not
 	child part.
 

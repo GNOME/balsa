@@ -290,6 +290,7 @@ extern struct BalsaApplication {
 
     gboolean empty_trash_on_exit;
     gboolean previewpane;
+    gboolean source_escape_specials;
     gboolean debug;
 
     /* external editor */

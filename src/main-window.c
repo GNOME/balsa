@@ -410,7 +410,7 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_RADIOLIST(threading_menu),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_VIEW_EXPAND_ALL_POS 9
-    { GNOME_APP_UI_ITEM, N_("_Expand All"),
+    { GNOME_APP_UI_ITEM, N_("E_xpand All"),
      N_("Expand all threads"),
      expand_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
      NULL, 'E', GDK_CONTROL_MASK, NULL},
@@ -418,7 +418,7 @@ static GnomeUIInfo view_menu[] = {
     { GNOME_APP_UI_ITEM, N_("_Collapse All"),
      N_("Collapse all expanded threads"),
      collapse_all_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
-     NULL, 'C', GDK_CONTROL_MASK, NULL},
+     NULL, 'L', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define MENU_VIEW_ZOOM_IN MENU_VIEW_COLLAPSE_ALL_POS + 2
     { GNOME_APP_UI_ITEM, N_("Zoom _In"), N_("Increase magnification"),
@@ -2457,7 +2457,8 @@ view_msg_source_cb(GtkWidget * widget, gpointer data)
     bw = BALSA_WINDOW(data);
     if (bw->preview) {
         LibBalsaMessage * msg = BALSA_MESSAGE(bw->preview)->message;
-        libbalsa_show_message_source(msg, balsa_app.message_font);
+        libbalsa_show_message_source(msg, balsa_app.message_font,
+                                     &balsa_app.source_escape_specials);
     }
 }
 

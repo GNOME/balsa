@@ -106,6 +106,7 @@ struct _LibBalsaSourceViewerInfo {
     LibBalsaMessage *msg;
     GtkWidget *text;
     GtkWidget *window;
+    gboolean *escape_specials;
 };
 
 typedef struct _LibBalsaSourceViewerInfo LibBalsaSourceViewerInfo;
@@ -161,7 +162,8 @@ lsv_escape_cb(GtkWidget * widget, gpointer data)
     f = libbalsa_mailbox_get_message_stream(msg->mailbox, msg);
     fseek(f, hdr->offset, 0);
     length = (hdr->content->offset - hdr->offset) + hdr->content->length;
-    lsv_show_file(f, length, lsvi, GTK_CHECK_MENU_ITEM(widget)->active);
+    *(lsvi->escape_specials) = GTK_CHECK_MENU_ITEM(widget)->active;
+    lsv_show_file(f, length, lsvi, *(lsvi->escape_specials));
     fclose(f);
 }
 
@@ -185,7 +187,8 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
    pops up a window containing the source of the message msg.
 */
 void
-libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font)
+libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font,
+                             gboolean* escape_specials)
 {
     GtkWidget *text;
     GtkWidget *interior;
@@ -219,13 +222,17 @@ libbalsa_show_message_source(LibBalsaMessage * msg, const gchar * font)
                       (GWeakNotify) lsv_msg_weak_ref_notify, lsvi);
     lsvi->text = text;
     lsvi->window = window;
+    lsvi->escape_specials = escape_specials;
     g_object_set_data_full(G_OBJECT(window), "lsvi", lsvi,
                            (GDestroyNotify) lsv_window_destroy_notify);
 
     gtk_widget_show_all(window);
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                   (view_menu[MENU_VIEW_ESCAPE_POS].
-                                    widget), TRUE);
+    if(*escape_specials) 
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                       (view_menu[MENU_VIEW_ESCAPE_POS].
+                                        widget), *escape_specials);
+    else
+        lsv_escape_cb(view_menu[MENU_VIEW_ESCAPE_POS].widget, window);
 }
 
 

@@ -202,7 +202,7 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
 			   attach_clicked, BALSA_PIXMAP_MENU_ATTACHMENT),
 #define MENU_MSG_INCLUDE_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("_Include Message(s)"), NULL,
+    GNOMEUIINFO_ITEM_STOCK(N_("I_nclude Message(s)"), NULL,
 			   include_message_cb, BALSA_PIXMAP_MENU_NEW),
 #define MENU_FILE_ATTACH_MSG_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
@@ -224,12 +224,12 @@ static GnomeUIInfo file_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
 			   postpone_message_cb, BALSA_PIXMAP_MENU_POSTPONE),
 #define MENU_FILE_SAVE_POS 8
-    { GNOME_APP_UI_ITEM, N_("_Save"),
+    { GNOME_APP_UI_ITEM, N_("Sa_ve"),
       N_("Save this message"),
       save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_SAVE, 'S', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_PRINT_POS 9
-    GNOMEUIINFO_ITEM_STOCK(N_("Print..."), N_("Print the edited message"),
+    GNOMEUIINFO_ITEM_STOCK(N_("_Print..."), N_("Print the edited message"),
 			   print_message_cb, BALSA_PIXMAP_MENU_PRINT),
 #define MENU_FILE_SEPARATOR2_POS 10
     GNOMEUIINFO_SEPARATOR,
@@ -318,7 +318,7 @@ static GnomeUIInfo view_menu[] = {
     GNOMEUIINFO_TOGGLEITEM(N_("_Attachments"), NULL, toggle_attachments_cb,
 			   NULL),
 #define MENU_TOGGLE_COMMENTS_POS 8
-    GNOMEUIINFO_TOGGLEITEM(N_("_Comments"), NULL, toggle_comments_cb,
+    GNOMEUIINFO_TOGGLEITEM(N_("Co_mments"), NULL, toggle_comments_cb,
 			   NULL),
 #define MENU_TOGGLE_KEYWORDS_POS 9
     GNOMEUIINFO_TOGGLEITEM(N_("_Keywords"), NULL, toggle_keywords_cb,

@@ -752,6 +752,12 @@ config_global_load(void)
 
     gnome_config_pop_prefix();
 
+    /* Source browsing ... */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
+    balsa_app.source_escape_specials = 
+        gnome_config_get_bool("EscapeSpecials=true");
+    gnome_config_pop_prefix();
+
     /* Printing options ... */
     gnome_config_push_prefix(BALSA_CONFIG_PREFIX "Printing/");
 
@@ -1119,6 +1125,12 @@ config_save(void)
     gnome_config_set_bool("HideDeleted",
                           balsa_app.hide_deleted);
 
+    gnome_config_pop_prefix();
+
+    /* Source browsing ... */
+    gnome_config_push_prefix(BALSA_CONFIG_PREFIX "SourcePreview/");
+    gnome_config_set_bool("EscapeSpecials",
+                          balsa_app.source_escape_specials);
     gnome_config_pop_prefix();
 
     /* Printing options ... */

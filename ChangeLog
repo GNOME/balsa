@@ -1,7 +1,7 @@
 2003-07-22  Pawel Salek  <pawsa theochem.kth.se>
 
 	* src/mailbox-conf.c: fix (at least partially) bug 117163.
-	* src/main-window.c: change collapse thread shortcut to Ctrl-R 18070.
+	* src/main-window.c: change collapse thread shortcut to Ctrl-R 118070.
 	* libbalsa/libbalsa.h, libbalsa/source-viewer.c: remember
 	last setting of "Escape Specials" in message source viewer.
 	* src/balsa-app.h, src/balsa-index.c, src/message-window.c:

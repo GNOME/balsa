@@ -3352,9 +3352,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
                                g_strdup(bsmsg->orig_message->message_id));
             message->in_reply_to =
                 bsmsg->orig_message->headers->from
-                ? g_strconcat(bsmsg->orig_message->message_id, "; from ",
+                ? g_strconcat(bsmsg->orig_message->message_id, " (from ",
                               bsmsg->orig_message->headers->from->address_list->data,
-                              " on ", recvtime, NULL)
+                              " on ", recvtime, ")", NULL)
                 : g_strdup(bsmsg->orig_message->message_id);
         }
     }

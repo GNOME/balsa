@@ -50,10 +50,10 @@ load_local_mailboxes ()
     {
       sprintf (filename, "%s/%s", balsa_app.local_mail_directory, d->d_name);
 
-      if (lstat (filename, &st) < 0)
+      if (stat (filename, &st) < 0)
 	continue;
 
-      if (!S_ISREG (st.st_mode))
+      if (!S_ISREG(st.st_mode))
 	continue;
 
       mailbox_type = mailbox_valid (filename);

@@ -74,7 +74,9 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.toolbar_style = GTK_TOOLBAR_BOTH;
   balsa_app.mdi_style = GNOME_MDI_NOTEBOOK;
 
-
+  /* Check to see if this is the first time we've run balsa */
+  if (!gnome_config_get_string ("/balsa/Global/Accounts"))
+    initialize_balsa(argc, argv);
 
   /* initalize our mailbox access crap */
   mailbox_init ();

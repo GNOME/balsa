@@ -6,6 +6,8 @@
 
 	* libbalsa/send.c: make ESMTP protocol more verbose - fix bug 112285.
 	* libbalsa/filter.c: play sound and popup dialogs if requested (EA).
+	* libbalsa/address-book-ldap.c: ldap caching deprecated in 
+	openldap-2.1.x, remove references to it.
 
 2003-05-05 08:30  PeterB
 

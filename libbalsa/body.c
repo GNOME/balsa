@@ -89,7 +89,7 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     libbalsa_message_body_free(body->parts);
 
     if (body->mime_part)
-	g_object_unref(G_OBJECT(body->mime_part));	
+	g_object_unref(body->mime_part);	
     
     g_free(body);
 }
@@ -189,7 +189,7 @@ libbalsa_message_body_set_message_part(LibBalsaMessageBody * body,
 					    (embedded_message->mime_part),
 					    GMIME_DISPOSITION_INLINE);
 
-    g_mime_object_unref(GMIME_OBJECT(embedded_message));
+    g_object_unref(embedded_message);
 
     return next_part;
 }
@@ -237,9 +237,9 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
     g_return_if_fail(body != NULL);
     g_return_if_fail(GMIME_IS_OBJECT(mime_part));
 
-    g_object_ref(G_OBJECT(mime_part));
+    g_object_ref(mime_part);
     if (body->mime_part)
-	g_object_unref(G_OBJECT(body->mime_part));
+	g_object_unref(body->mime_part);
     body->mime_part = mime_part;
 
     libbalsa_message_body_set_filename(body);
@@ -362,40 +362,33 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd)
     GMimeStream *stream, *filter_stream;
     gchar *mime_type = NULL;
     const char *charset;
+    GMimeFilter *filter;
 
     stream = g_mime_stream_fs_new(fd);
-    filter_stream = g_mime_stream_filter_new_with_stream(stream);
-    g_mime_stream_unref(stream);
+    /* convert text bodies but HTML - gtkhtml does conversion on its own. */
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
 	&& strcmp(mime_type = libbalsa_message_body_get_content_type(body),
-		  "text/html") != 0) {
-	/* convert text bodies but HTML - gtkhtml does conversion on its own. */
-	charset = libbalsa_message_body_charset(body);
-	if (!charset)
-	    charset="us-ascii";
-	if (g_ascii_strcasecmp(charset, "unknown-8bit")) {
-	    GMimeFilter *filter =
-		g_mime_filter_charset_new(charset, "UTF-8");
-	    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
-				     filter);
-	    g_object_unref(G_OBJECT(filter));
-	}
+			                  "text/html") != 0
+	&& (charset = libbalsa_message_body_charset(body))
+	&& g_ascii_strcasecmp(charset, "unknown-8bit") != 0
+	&& (filter = g_mime_filter_charset_new(charset, "UTF-8")) != NULL) {
+	filter_stream = g_mime_stream_filter_new_with_stream(stream);
+	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+	g_object_unref(filter);
+	g_object_unref(stream);
+	stream = filter_stream;
     }
     g_free(mime_type);
 
     buf = libbalsa_mailbox_get_message_part(body->message, body, &len);
-    if (len && g_mime_stream_write(filter_stream, (char*)buf, len) == -1) {
-	g_mime_stream_unref(filter_stream);
-	/* FIXME: unlink??? */
-	return FALSE;
-    }
-    if (g_mime_stream_flush(filter_stream) == -1) {
-	g_mime_stream_unref(filter_stream);
+    if (len && (g_mime_stream_write(stream, buf, len) == -1
+		|| g_mime_stream_flush(stream) == -1)) {
+	g_object_unref(stream);
 	/* FIXME: unlink??? */
 	return FALSE;
     }
 
-    g_mime_stream_unref(filter_stream);
+    g_object_unref(stream);
 
     return TRUE;
 }

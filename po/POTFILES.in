@@ -5,6 +5,9 @@ libbalsa/libbalsa_private.h
 libbalsa/mailbox.c
 libbalsa/mailbox_imap.c
 libbalsa/mailbox_local.c
+libbalsa/mailbox_maildir.c
+libbalsa/mailbox_mbox.c
+libbalsa/mailbox_mh.c
 libbalsa/mailbox_pop3.c
 libbalsa/pop3.c
 libbalsa/send.c

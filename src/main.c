@@ -43,6 +43,7 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
+#include "filter.h"
 #include "main-window.h"
 #include "libbalsa.h"
 #include "mailbox-node.h"
@@ -59,7 +60,6 @@
 /* Globals for Thread creation, messaging, pipe I/O */
 pthread_t get_mail_thread;
 pthread_t send_mail;
-pthread_mutex_t mailbox_lock;
 pthread_mutex_t send_messages_lock;
 int checking_mail;
 int mail_thread_pipes[2];
@@ -355,7 +355,9 @@ main(int argc, char *argv[])
 
     /* Initialize libbalsa */
     libbalsa_init((LibBalsaInformationFunc) balsa_information);
-
+    libbalsa_filters_set_url_mapper(balsa_find_mailbox_by_url);
+    libbalsa_filters_set_filter_list(&balsa_app.filters);
+    
     /* checking for valid config files */
     config_init();
     /* load mailboxes */

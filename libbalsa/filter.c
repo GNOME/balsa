@@ -26,11 +26,14 @@
  *
  * Mostly skeletonic
  *
- * Author:  Emmanuel ALLAUD
+ * Primary author: Emmanuel ALLAUD
  */
 
 #include <ctype.h>
-#include "src/balsa-app.h"
+
+/* we need _() function, how to get it? */
+#include <gnome.h>
+
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
@@ -42,6 +45,29 @@
 #include "filter-funcs.h"
 #include "filter-private.h"
 #include "misc.h"
+
+/* filters_trash_mbox points to a mailbox that is used as Trash by filters
+ *  code. */
+static LibBalsaMailbox* filters_trash_mbox = NULL;
+
+static UrlToMailboxMapper url_to_mailbox_mapper = NULL;
+static GSList** filter_list = NULL;
+void
+libbalsa_filters_set_trash(LibBalsaMailbox* new_trash)
+{
+    filters_trash_mbox = new_trash;
+}
+
+void
+libbalsa_filters_set_url_mapper(UrlToMailboxMapper u2mm)
+{
+    url_to_mailbox_mapper = u2mm;
+}
+void
+libbalsa_filters_set_filter_list(GSList** list)
+{
+    filter_list = list;
+}
 
 /* FIXME : filtering takes time, we should notify progress to user */
 
@@ -394,63 +420,71 @@ libbalsa_filter_apply(GSList * filter_list)
     gboolean result=FALSE;
     LibBalsaMailbox *mbox;
 
+    g_return_val_if_fail(url_to_mailbox_mapper, FALSE);
     if (!filter_list) return FALSE;
 
     for (lst=filter_list;lst;lst=g_slist_next(lst)) {
 	filt=(LibBalsaFilter*)lst->data;
-	if (filt->matching_messages) {
-	    if (filt->sound) {
-	        /* FIXME : Emit sound */
-	    }
-	    if (filt->popup_text) {
-	        /* FIXME : Print popup text */
-	    }
-	    switch (filt->action) {
-	    case FILTER_COPY:
-		mbox =
-                    balsa_find_mailbox_by_url(filt->action_string);
-		if (!mbox)
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
-		else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when copying messages"));
-		else if (mbox==balsa_app.trash) result=TRUE;
-		break;
-	    case FILTER_TRASH:
-		if (!balsa_app.trash || !libbalsa_messages_move(filt->matching_messages,balsa_app.trash))
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when trashing messages"));
-		else result=TRUE;
-		break;
-	    case FILTER_MOVE:
-		mbox =
-                    balsa_find_mailbox_by_url(filt->action_string);
-		if (!mbox)
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Bad mailbox name for filter : %s"),filt->name);
-		else if (!libbalsa_messages_move(filt->matching_messages,mbox))
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR,_("Error when moving messages"));
-		else if (mbox==balsa_app.trash) result=TRUE;
-		break;
-	    case FILTER_PRINT:
-		/* FIXME : to be implemented */
-		break;
-	    case FILTER_RUN:
-		/* FIXME : to be implemented */
-		break;
-	    case FILTER_NOTHING:
-		/* Nothing to do */
-		break;
-	    }
-	    /* We unref all messages */
-	    for (lst_messages=filt->matching_messages;lst_messages;lst_messages=g_list_next(lst_messages))
-		g_object_unref(lst_messages->data);
-	    g_list_free(filt->matching_messages);
-	    filt->matching_messages=NULL;
-	}
+	if (!filt->matching_messages) continue;
+        if (filt->sound) {
+            /* FIXME : Emit sound */
+        }
+        if (filt->popup_text) {
+            /* FIXME : Print popup text */
+        }
+        switch (filt->action) {
+        case FILTER_COPY:
+            mbox = url_to_mailbox_mapper(filt->action_string);
+            if (!mbox)
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("Bad mailbox name for filter : %s"),
+                                     filt->name);
+            else if (!libbalsa_messages_copy(filt->matching_messages,mbox))
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("Error when copying messages"));
+            else if (mbox==filters_trash_mbox) result=TRUE;
+            break;
+        case FILTER_TRASH:
+            if (!filters_trash_mbox || 
+                !libbalsa_messages_move(filt->matching_messages,
+                                        filters_trash_mbox))
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("Error when trashing messages"));
+            else result=TRUE;
+            break;
+        case FILTER_MOVE:
+            mbox = url_to_mailbox_mapper(filt->action_string);
+            if (!mbox)
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("Bad mailbox name for filter : %s"),
+                                     filt->name);
+            else if (!libbalsa_messages_move(filt->matching_messages,mbox))
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                     _("Error when moving messages"));
+            else if (mbox==filters_trash_mbox) result=TRUE;
+            break;
+        case FILTER_PRINT:
+            /* FIXME : to be implemented */
+            break;
+        case FILTER_RUN:
+            /* FIXME : to be implemented */
+            break;
+        case FILTER_NOTHING:
+            /* Nothing to do */
+            break;
+        }
+        /* We unref all messages */
+        for (lst_messages=filt->matching_messages; lst_messages;
+             lst_messages=g_list_next(lst_messages))
+            g_object_unref(lst_messages->data);
+        g_list_free(filt->matching_messages);
+        filt->matching_messages=NULL;
     }
     return result;
 }
 
-/* libbalsa_extract_new_messages : returns a sublist of the messages list containing all
-   "new" messages, ie just retrieved mails
+/* libbalsa_extract_new_messages : returns a sublist of the messages
+   list containing all "new" messages, ie just retrieved mails
 */
 
 GList * libbalsa_extract_new_messages(GList * messages)
@@ -471,10 +505,11 @@ libbalsa_filter_get_by_name(const gchar * fname)
     GSList * list;
     gint fnamelen;
 
+    g_return_val_if_fail(filter_list, NULL);
     if (!fname || fname[0]=='\0') return NULL;
 
     fnamelen=strlen(fname);
-    for (list=balsa_app.filters;
+    for (list= *filter_list;
          list && 
              strncmp(fname,((LibBalsaFilter*)list->data)->name,fnamelen)!=0;
          list=g_slist_next(list))

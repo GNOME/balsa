@@ -918,6 +918,47 @@ libbalsa_marshal_VOID__POINTER_POINTER (GClosure     *closure,
             data2);
 }
 
+/* VOID:INT,INT,INT,STRING (/dev/stdin:1) */
+void
+libbalsa_marshal_VOID__INT_INT_INT_STRING (GClosure     *closure,
+                                           GValue       *return_value,
+                                           guint         n_param_values,
+                                           const GValue *param_values,
+                                           gpointer      invocation_hint,
+                                           gpointer      marshal_data)
+{
+  typedef void (*GMarshalFunc_VOID__INT_INT_INT_STRING) (gpointer     data1,
+                                                         gint         arg_1,
+                                                         gint         arg_2,
+                                                         gint         arg_3,
+                                                         const gchar* arg_4,
+                                                         gpointer     data2);
+  register GMarshalFunc_VOID__INT_INT_INT_STRING callback;
+  register GCClosure *cc = (GCClosure*) closure;
+  register gpointer data1, data2;
+
+  g_return_if_fail (n_param_values == 5);
+
+  if (G_CCLOSURE_SWAP_DATA (closure))
+    {
+      data1 = closure->data;
+      data2 = g_value_peek_pointer (param_values + 0);
+    }
+  else
+    {
+      data1 = g_value_peek_pointer (param_values + 0);
+      data2 = closure->data;
+    }
+  callback = (GMarshalFunc_VOID__INT_INT_INT_STRING) (marshal_data ? marshal_data : cc->callback);
+
+  callback (data1,
+            g_value_get_int (param_values + 1),
+            g_value_get_int (param_values + 2),
+            g_value_get_int (param_values + 3),
+            g_value_get_string (param_values + 4),
+            data2);
+}
+
 /* Delete the contents of a directory (not the directory itself).
    Return TRUE if everything was OK.
    If FALSE is returned then errno will be set to some useful value.

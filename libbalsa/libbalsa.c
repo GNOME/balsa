@@ -42,6 +42,7 @@
 #ifdef BALSA_USE_THREADS
 static GMutex *mutt_lock;
 static pthread_t main_thread_id;
+pthread_mutex_t mailbox_lock = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 #define POP_SERVER "pop"

@@ -69,7 +69,7 @@
 #endif
 
 #include "sendmsg-window.h"
-#include "address-book.h"
+#include "ab-window.h"
 #include "address-entry.h"
 #include "expand-alias.h"
 #include "print.h"
@@ -561,12 +561,12 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
         LIBBALSA_ADDRESS_ENTRY(g_object_get_data
                                (G_OBJECT(widget), "address-entry-widget"));
 
-    ab = balsa_address_book_new(TRUE, GTK_WINDOW(snd_msg_wind->window));
+    ab = balsa_ab_window_new(TRUE, GTK_WINDOW(snd_msg_wind->window));
 
     response = gtk_dialog_run(GTK_DIALOG(ab));
     if ( response == GTK_RESPONSE_OK ) {
 	gchar *t =
-            balsa_address_book_get_recipients(BALSA_ADDRESS_BOOK(ab));
+            balsa_ab_window_get_recipients(BALSA_AB_WINDOW(ab));
 
         append_comma_separated(GTK_EDITABLE(address_entry), t);
         g_free(t);

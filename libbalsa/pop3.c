@@ -412,15 +412,14 @@ static PopStatus send_fetch_req(int s, int msgno, char* buffer, size_t bufsz)
 
 static PopStatus
 fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs, 
-		 int *num_bytes, int tot_bytes, ProgressCallback prog_cb) {
+		 int *num_bytes, int tot_bytes, 
+                 ProgressCallback prog_cb, void* prog_data)
+{
     char buffer[2048];
-#ifdef BALSA_USE_THREADS
     time_t last_update_time = time(NULL);
-    char threadbuf[160];
-    
+    char threadbuf[160];    
     sprintf(threadbuf, _("Retrieving Message %d of %d"), msgno, msgs);
-    prog_cb ( threadbuf, 0, 0);
-#endif
+    prog_cb (prog_data, threadbuf, 0, 0);
 
     DM("POP3: fetching message %d", msgno);
     /* Now read the actual message. */
@@ -430,14 +429,12 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;
-#ifdef BALSA_USE_THREADS
 	if(last_update_time+2<time(NULL)) {
 	    sprintf(threadbuf,_("Received %d bytes of %d"), 
 		    *num_bytes, tot_bytes);
-	    prog_cb (threadbuf, *num_bytes, tot_bytes);
+	    prog_cb (prog_data, threadbuf, *num_bytes, tot_bytes);
 	    last_update_time = time(NULL);
 	}
-#endif
 	/* check to see if we got a full line */
 	if (buffer[chunk-2] == '\r' && buffer[chunk-1] == '\n') {
 	    if (strcmp(".\r\n", buffer) == 0) {
@@ -501,7 +498,7 @@ static PopStatus reset_server(int s, char* buffer, size_t bufsz)
 static PopStatus
 fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 	       gboolean delete_on_server, const gchar * procmail_path,
-	       ProgressCallback prog_cb)
+	       ProgressCallback prog_cb, void* prog_data)
 {
     gint i, num_bytes;
     char buffer[2048];
@@ -519,7 +516,7 @@ fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 	}
 	
 	err = fetch_single_msg(s, msg, i, first_msg, msgs, &num_bytes, 
-			       tot_bytes, prog_cb);
+			       tot_bytes, prog_cb, prog_data);
 	if (pclose (msg) != 0 && err == POP_OK) err = POP_PROCMAIL_ERR;
 	
 	if (err != POP_OK)  break; /* the 'for' loop */
@@ -535,7 +532,7 @@ fetch_procmail(int s, gint first_msg, gint msgs, gint tot_bytes,
 static PopStatus
 fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
 	     gboolean delete_on_server, const gchar *spoolfile,
-	     ProgressCallback prog_cb)
+	     ProgressCallback prog_cb, void* prog_data)
 {
     gint i, num_bytes;
     char buffer[2048];
@@ -564,7 +561,7 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
 	}
 
 	err = fetch_single_msg(s, msg->fp, i, first_msg, msgs, &num_bytes,
-			       tot_bytes, prog_cb);
+			       tot_bytes, prog_cb, prog_data);
 	if(err != POP_OK) break;
 	libbalsa_lock_mutt();
 	if (mx_commit_message (msg, &ctx) != 0) err = POP_WRITE_ERR;
@@ -588,14 +585,15 @@ fetch_direct(int s, gint first_msg, gint msgs, gint tot_bytes,
 typedef PopStatus
 (*ProcessCallback)(int s, gint first_msg, gint msgs, gint tot_bytes,
 		   gboolean delete_on_server, const gchar * procmail_path,
-		   ProgressCallback prog_cb);
+		   ProgressCallback prog_cb, void* prog_data);
 
 static PopStatus
 fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
 		const gchar *pop_pass, 
 		gboolean use_apop, gboolean delete_on_server,
-		gchar * last_uid, ProgressCallback prog_cb,
-		ProcessCallback proccb, const gchar *data)
+		gchar * last_uid, 
+		ProcessCallback proccb, const gchar *data,
+                ProgressCallback prog_cb, void* progress_data)
 {
     char buffer[2048];
     char uid[80];
@@ -621,7 +619,7 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
     DM("POP3 status after get stats: %d", status);
     if(status == POP_OK)
 	status = proccb(s, first_msg, msgs, bytes, delete_on_server, 
-			data, prog_cb);
+			data, prog_cb, progress_data);
     
     if(status != POP_CONN_ERR) {
 	DM("POP3 C: quit");
@@ -633,15 +631,15 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
     }
     close (s);
 
-    prog_cb ("", 0, -1); /* Finished */
+    prog_cb (progress_data, "", 0, -1); /* Finished */
     return status;
 }
 
 /* the only exported functions below */
 PopStatus
 libbalsa_fetch_pop_mail_direct (LibBalsaMailboxPop3* mailbox,
-				const gchar * spoolfile, 
-				ProgressCallback prog_cb, gchar* uid)
+				const gchar * spoolfile, gchar* uid,
+				ProgressCallback prog_cb, void* data)
 {
     LibBalsaServer *s;
     g_return_val_if_fail(mailbox, POP_OK);
@@ -649,11 +647,12 @@ libbalsa_fetch_pop_mail_direct (LibBalsaMailboxPop3* mailbox,
     s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     return fetch_pop_mail(s->host, s->user,s->passwd, 
 			  mailbox->use_apop, mailbox->delete_from_server,
-			  uid, prog_cb, fetch_direct, spoolfile);
+			  uid, fetch_direct, spoolfile, prog_cb, data);
 }
 PopStatus
 libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3* mailbox, 
-				ProgressCallback prog_cb, gchar* uid)
+				gchar* uid, 
+                                ProgressCallback prog_cb, void* data)
 {
     LibBalsaServer *s;
     g_return_val_if_fail(mailbox, POP_OK);
@@ -661,5 +660,5 @@ libbalsa_fetch_pop_mail_filter (LibBalsaMailboxPop3* mailbox,
     s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     return fetch_pop_mail(s->host, s->user,s->passwd, 
 			  mailbox->use_apop, mailbox->delete_from_server,
-			  uid, prog_cb, fetch_procmail, "procmail -f -");
+			  uid, fetch_procmail, "procmail -f -", prog_cb, data);
 }

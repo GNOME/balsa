@@ -19,20 +19,20 @@
  * 02111-1307, USA.
  */
 
-#ifndef __ADDRESS_BOOK_H__
-#define __ADDRESS_BOOK_H__
+#ifndef __AB_WINDOW_H__
+#define __AB_WINDOW_H__
 
-#define BALSA_TYPE_ADDRESS_BOOK            (balsa_address_book_get_type ())
-#define BALSA_ADDRESS_BOOK(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_ADDRESS_BOOK, BalsaAddressBook))
-#define BALSA_ADDRESS_BOOK_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_ADDRESS_BOOK, BalsaAddressBookClass))
-#define BALSA_IS_ADDRESS_BOOK(obj)         (GTK_CHECK_TYPE ((obj), BALSA_TYPE_ADDRESS_BOOK))
-#define BALSA_IS_ADDRESS_BOOK_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_ADDRESS_BOOK))
+#define BALSA_TYPE_AB_WINDOW            (balsa_ab_window_get_type ())
+#define BALSA_AB_WINDOW(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_AB_WINDOW, BalsaAbWindow))
+#define BALSA_AB_WINDOW_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_AB_WINDOW, BalsaAbWindowClass))
+#define BALSA_IS_AB_WINDOW(obj)         (GTK_CHECK_TYPE ((obj), BALSA_TYPE_AB_WINDOW))
+#define BALSA_IS_AB_WINDOW_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_AB_WINDOW))
 
 
-typedef struct _BalsaAddressBook BalsaAddressBook;
-typedef struct _BalsaAddressBookClass BalsaAddressBookClass;
+typedef struct _BalsaAbWindow BalsaAbWindow;
+typedef struct _BalsaAbWindowClass BalsaAbWindowClass;
 
-struct _BalsaAddressBook 
+struct _BalsaAbWindow 
 {
     GtkDialog parent;
 
@@ -51,17 +51,17 @@ struct _BalsaAddressBook
     /* Radio buttons for dist list mode */
     GtkWidget *single_address_mode_radio;
     GtkWidget *dist_address_mode_radio;
-    guint toggle_handler_id;
+    guint      toggle_handler_id;
 
     /* Stuff to hide when not in compose mode */
     GtkWidget *send_to_box;
     GtkWidget *arrow_box;
 };
 
-GtkType balsa_address_book_get_type(void);
-GtkWidget *balsa_address_book_new(gboolean composing, GtkWindow* parent);
+GtkType balsa_ab_window_get_type(void);
+GtkWidget *balsa_ab_window_new(gboolean composing, GtkWindow* parent);
 
-gchar *balsa_address_book_get_recipients(BalsaAddressBook *ab);
+gchar *balsa_ab_window_get_recipients(BalsaAbWindow *ab);
 
 
 #endif				/* __ADDRESS_BOOK_H__ */

@@ -1,10 +1,10 @@
-bin_PROGRAMS = balsa
+bin_PROGRAMS = balsa balsa-ab
 
 balsa_BASE_SRCLIST =	\
 	address-book-config.c	\
 	address-book-config.h	\
-	address-book.c		\
-	address-book.h		\
+	ab-window.c		\
+	ab-window.h		\
 	balsa-app.c		\
 	balsa-app.h		\
 	balsa-icons.c		\
@@ -80,6 +80,14 @@ balsa_LDADD = \
 	-lltdl	\
 	$(INTLLIBS) \
         $(BALSA_LIBS)
+
+balsa_ab_SOURCES =	ab-main.c
+
+balsa_ab_LDADD = \
+	$(top_builddir)/libmutt/imap/libimap.a	\
+	$(top_builddir)/libmutt/libmutt.a	\
+	$(top_builddir)/libbalsa/libbalsa.a	\
+	$(BALSA_LIBS)
 
 dist-hook:
 	mkdir $(distdir)/pixmaps

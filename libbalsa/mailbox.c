@@ -80,6 +80,7 @@ enum {
     MESSAGE_DELETE,
     MESSAGES_DELETE,
     GET_MESSAGE_STREAM,
+    PROGRESS_NOTIFY,
     CHECK,
     GET_MATCHING,
     SET_UNREAD_MESSAGES_FLAG,
@@ -210,6 +211,16 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      NULL, NULL,
                      g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1,
                      G_TYPE_BOOLEAN);
+
+    libbalsa_mailbox_signals[PROGRESS_NOTIFY] =
+	g_signal_new("progress-notify",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(LibBalsaMailboxClass,
+                                     progress_notify),
+                     NULL, NULL,
+                     libbalsa_marshal_VOID__INT_INT_INT_STRING, G_TYPE_NONE,
+                     4, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
 
     /* Virtual functions. Use G_SIGNAL_NO_HOOKS
        which prevents the signal being connected to them */
@@ -477,6 +488,21 @@ libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
     g_signal_emit(G_OBJECT(mailbox),
 		  libbalsa_mailbox_signals[SET_UNREAD_MESSAGES_FLAG],
 		  0, has_unread);
+}
+
+/* libbalsa_mailbox_progress_notify:
+   there has been a progress in current operation.
+*/
+void
+libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
+                                 int type, int prog, int tot, const gchar* msg)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    g_signal_emit(G_OBJECT(mailbox),
+		  libbalsa_mailbox_signals[PROGRESS_NOTIFY],
+		  0, type, prog, tot, msg);
 }
 
 void

@@ -26,9 +26,14 @@
 #include "quote-color.h"
 #include "toolbar-prefs.h"
 
+#include "filter.h"
 #include "filter-file.h"
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
+
+#ifdef BALSA_USE_THREADS
+#include "threads.h"
+#endif
 
 #define BALSA_CONFIG_PREFIX "balsa/"
 #define FOLDER_SECTION_PREFIX "folder-"
@@ -225,9 +230,13 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     *special = mailbox;
     g_object_ref(G_OBJECT(mailbox));
 
-    if(which == SPECIAL_SENT) {
-	balsa_mblist_mru_add(&balsa_app.fcc_mru, mailbox->url);
-    }    
+    switch(which) {
+    case SPECIAL_SENT: 
+	balsa_mblist_mru_add(&balsa_app.fcc_mru, mailbox->url); break;
+    case SPECIAL_TRASH:
+        libbalsa_filters_set_trash(balsa_app.trash); break;
+    default: break;
+    }
 
     if(do_rescan_for) balsa_mailbox_local_rescan_parent(do_rescan_for);
 }
@@ -387,6 +396,47 @@ config_section_init(const char* section_prefix, gint (*cb)(const char*))
     return TRUE;
 }				/* config_section_init */
 
+static void
+pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
+                     const char* msg)
+{
+#ifdef BALSA_USE_THREADS
+    MailThreadMessage *message;
+
+    message = g_new(MailThreadMessage, 1);
+    message->message_type = msg_type;
+    memcpy(message->message_string, msg, strlen(msg) + 1);
+    message->num_bytes = prog;
+    message->tot_bytes = tot;
+
+    /* FIXME: There is potential for a timeout with 
+       * the server here, if we don't get the lock back
+       * soon enough.. But it prevents the main thread from
+       * blocking on the mutt_lock, andthe pipe filling up.
+       * This would give us a deadlock.
+     */
+    write(mail_thread_pipes[1], (void *) &message, sizeof(void *));
+#else
+    while(gtk_events_pending())
+        gtk_main_iteration_do(FALSE);
+#endif
+}
+
+static void
+pop3_config_updated(LibBalsaMailboxPop3* mailbox)
+{
+#ifdef BALSA_USE_THREADS
+    MailThreadMessage *threadmsg;
+    threadmsg = g_new(MailThreadMessage, 1);
+    threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
+    threadmsg->mailbox = (void *) mailbox;
+    write(mail_thread_pipes[1], (void *) &threadmsg,
+          sizeof(void *));
+#else
+    config_mailbox_update(LIBBALSA_MAILBOX(mailbox));
+#endif
+}
+
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
 static gint
@@ -408,6 +458,12 @@ config_mailbox_init(const gchar * prefix)
                          mailbox);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
+        g_signal_connect(G_OBJECT(mailbox),
+                         "config-changed", G_CALLBACK(pop3_config_updated),
+                         mailbox);
+        g_signal_connect(G_OBJECT(mailbox),
+                         "progress-notify", G_CALLBACK(pop3_progress_notify),
+                         mailbox);
 	balsa_app.inbox_input =
 	    g_list_append(balsa_app.inbox_input, 
 			  balsa_mailbox_node_new_from_mailbox(mailbox));
@@ -426,9 +482,10 @@ config_mailbox_init(const gchar * prefix)
 	    balsa_app.sentbox = mailbox;
 	else if (strcmp("Draftbox/", key) == 0)
 	    balsa_app.draftbox = mailbox;
-	else if (strcmp("Trash/", key) == 0)
+	else if (strcmp("Trash/", key) == 0) {
 	    balsa_app.trash = mailbox;
-	else
+            libbalsa_filters_set_trash(balsa_app.trash);
+        } else
             special = FALSE;
 
 	if (special)

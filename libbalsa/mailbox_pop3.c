@@ -36,20 +36,19 @@
 #include "pop3.h"
 #include "mailbox.h"
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-#else
-/* FIXME: */
-void config_mailbox_update(LibBalsaMailbox* );
-#endif
-
 #include "mailbox-filter.h"
 #include "filter-file.h"
+#include "threads.h"
 
 #include <libgnome/gnome-config.h> 
 #include <libgnome/gnome-i18n.h> 
 
+enum {
+    CONFIG_CHANGED,
+    LAST_SIGNAL
+};
 static LibBalsaMailboxClass *parent_class = NULL;
+static guint libbalsa_mailbox_pop3_signals[LAST_SIGNAL];
 
 static void libbalsa_mailbox_pop3_finalize(GObject * object);
 static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
@@ -64,7 +63,7 @@ static void libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 
-static void progress_cb(char *msg, int prog, int tot);
+static void progress_cb(void* m, char *msg, int prog, int tot);
 
 GType
 libbalsa_mailbox_pop3_get_type(void)
@@ -103,6 +102,14 @@ libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class * klass)
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
     parent_class = g_type_class_peek_parent(klass);
+    libbalsa_mailbox_pop3_signals[CONFIG_CHANGED] =
+	g_signal_new("config-changed",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_HOOKS,
+                     G_STRUCT_OFFSET(LibBalsaMailboxPop3Class,
+                                     config_changed),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     object_class->finalize = libbalsa_mailbox_pop3_finalize;
 
@@ -154,6 +161,17 @@ libbalsa_mailbox_pop3_new(void)
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_POP3, NULL);
 
     return G_OBJECT(mailbox);
+}
+
+
+static void
+libbalsa_mailbox_pop3_config_changed(LibBalsaMailboxPop3* mailbox)
+{
+    g_return_if_fail(mailbox != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox));
+
+    g_signal_emit(G_OBJECT(mailbox), 
+                  libbalsa_mailbox_pop3_signals[CONFIG_CHANGED], 0);
 }
 
 static gboolean
@@ -219,10 +237,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
     LibBalsaServer *server;
     gboolean remove_tmp = TRUE;
-#ifdef BALSA_USE_THREADS
     gchar *msgbuf;
-    MailThreadMessage *threadmsg;
-#endif				/* BALSA_USE_THREADS */
     
     if (!m->check) return;
 
@@ -234,11 +249,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     /* Unlock GDK - this is safe since libbalsa_error is threadsafe. */
     gdk_threads_leave();
         
-#ifdef BALSA_USE_THREADS
     msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
-    MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_SOURCE, msgbuf);
+    libbalsa_mailbox_progress_notify(mailbox, MSGMAILTHREAD_SOURCE,0,0,msgbuf);
     g_free(msgbuf);
-#endif
 
     if(m->last_popped_uid) 
 	strncpy(uid, m->last_popped_uid, sizeof(uid));
@@ -258,13 +271,15 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     mailbox->name,
 			     g_strerror(errno));
 	g_free(tmp_path);
+        gdk_threads_enter();
 	return;
     }
     close(tmp_file);
 
     status =  LIBBALSA_MAILBOX_POP3(mailbox)->filter 
-	? libbalsa_fetch_pop_mail_filter (m, progress_cb, uid)
-	: libbalsa_fetch_pop_mail_direct (m, tmp_path, progress_cb, uid);
+	? libbalsa_fetch_pop_mail_filter (m, uid, progress_cb, mailbox)
+	: libbalsa_fetch_pop_mail_direct (m, tmp_path, uid, 
+                                          progress_cb, mailbox);
 
     if(status != POP_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -277,19 +292,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	       uid) != 0) {
 	
 	g_free(LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid);
-	
 	LIBBALSA_MAILBOX_POP3(mailbox)->last_popped_uid =
 	    g_strdup(uid);
 	
-#ifdef BALSA_USE_THREADS
-	threadmsg = g_new(MailThreadMessage, 1);
-	threadmsg->message_type = MSGMAILTHREAD_UPDATECONFIG;
-	threadmsg->mailbox = (void *) mailbox;
-	write(mail_thread_pipes[1], (void *) &threadmsg,
-	      sizeof(void *));
-#else
-	config_mailbox_update(mailbox);
-#endif
+        libbalsa_mailbox_pop3_config_changed(LIBBALSA_MAILBOX_POP3(mailbox));
     } 
 
     /* Regrab the gdk lock before leaving */
@@ -341,37 +347,20 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
 
 static void
-progress_cb(char *msg, int prog, int tot)
+progress_cb(void* mailbox, char *msg, int prog, int tot)
 {
-/* FIXME: We don't update progress in non threaded version?
- * I can't see how it used to work...
- */
-#ifdef BALSA_USE_THREADS
-    MailThreadMessage *message;
+    int msg_type;
 
-    message = g_new(MailThreadMessage, 1);
     switch(tot) {
-    case -1: message->message_type = MSGMAILTHREAD_FINISHED; break;
+    case -1: msg_type = MSGMAILTHREAD_FINISHED; break;
     case 0:
-        if (prog == 0) {
-            message->message_type = MSGMAILTHREAD_MSGINFO;
-            break;
-        }
-    default: message->message_type = MSGMAILTHREAD_MSGINFO; break;
+    default: msg_type = MSGMAILTHREAD_MSGINFO;  break;
     }
-    memcpy(message->message_string, msg, strlen(msg) + 1);
-    message->num_bytes = prog;
-    message->tot_bytes = tot;
 
-    /* FIXME: There is potential for a timeout with 
-       * the server here, if we don't get the lock back
-       * soon enough.. But it prevents the main thread from
-       * blocking on the mutt_lock, andthe pipe filling up.
-       * This would give us a deadlock.
-     */
-    write(mail_thread_pipes[1], (void *) &message, sizeof(void *));
-#endif
+    libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mailbox), 
+                                     msg_type, prog, tot, msg);
 }
+
 
 static void
 libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,

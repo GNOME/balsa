@@ -1,3 +1,10 @@
+* Balsa-1.3.3 release. Release date 2002-03-04
+
+- filter incoming POP3 messages.
+- fixed content-disposition and charset bugs.
+- (there is a yet-unidentified build problem on some boxes).
+
+
 * Balsa-1.3.2 release. Release date 2002-02-26
 
 - a number of bugs fixed.

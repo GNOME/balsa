@@ -59,7 +59,8 @@ balsa_exit ()
 	mailbox_close (mailbox);
     }
 
-
+  gtk_timeout_remove(balsa_app.check_mail_timer);
+  gtk_timeout_remove(balsa_app.new_mail_timer);
   save_global_settings ();
   gtk_exit (0);
 }

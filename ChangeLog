@@ -1,3 +1,14 @@
+1998-12-14  Stuart Parmenter  <pavlov@pavlov.net>
+
+        ./	  : INSTALL README balsa.1 balsa.spec configure.in,
+        po/	  : de.po es.po fi.po fr.po ga.po ko.po no.po,
+        libbalsa/ : Makefile.am libbalsa.c mime.c send.c,
+        idl/Makefile.am, sounds/Makefile.am, src/Makefile.am:
+	- Now passes 'make distcheck'
+
+        it.po:
+	- added the italian translation.
+
 1998-12-14  Jeff Garzik <jgarzik@pobox.com>
 
 	* src/main-window.c:

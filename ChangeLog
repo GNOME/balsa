@@ -5,6 +5,8 @@
 	* libbalsa/imap/imap-commands.c: make sure ImapMessage has always
 	right UID and Flags.
 	* src/balsa-index.c: inform the user if the move/copy was successful.
+	* libbalsa/mailbox.h: add LB_MAILBOX_SORT_THREAD.
+	* src/main-window.c: cleanup touchpad optimized UI.
 
 2004-08-03 11:47  PeterB
 

@@ -77,7 +77,9 @@ typedef enum {
     LB_MAILBOX_SORT_SUBJECT,
     LB_MAILBOX_SORT_DATE,
     LB_MAILBOX_SORT_SIZE,
-    LB_MAILBOX_SORT_SENDER
+    LB_MAILBOX_SORT_SENDER,
+    LB_MAILBOX_SORT_THREAD /* this is not exactly sorting flag but
+                            * a message index ordering flag. */
 } LibBalsaMailboxSortFields;
 
 typedef struct _SortTuple SortTuple;

@@ -1,5 +1,9 @@
-2003-03-09 07:38  PeterB
+2003-03-09 22:54  PeterB
 
+	* libbalsa/identity.c, src/balsa-message.c, src/folder-conf.c,
+	src/information-dialog.c, src/mailbox-conf.c, src/mailbox-node.c,
+	src/main-window.c, src/sendmsg-window.c, src/store-address.c: Use
+	[lib]balsa-information for error messages.
 	* src/print.c: Close print dialog when compose window is closed.
 
 2003-03-08 00:26  PeterB

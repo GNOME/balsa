@@ -47,7 +47,7 @@ read_dir (gchar * prefix, struct dirent *d)
   DIR *dpc;
   struct dirent *dc;
 
-  char filename[NAME_MAX];
+  char filename[PATH_MAX];
   struct stat st;
   MailboxType mailbox_type;
 

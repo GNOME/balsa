@@ -1,135 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
+
 <head>
-<title>Balsa -- Downloads</title>
-<link rel="stylesheet" type="text/css" href="style.css">
-<style type="text/css">
-<!--
-body {margin-left: 50pt;}
--->
-</style>
-
+  <title>Balsa - Download</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
-<body background="images/bg.jpg" bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300">
 
-<h1>Balsa download</h1>
-<h2>Requirements</h2>
-<ol>
-<li>A basic <a href="http://www.gnome.org/start/">GNOME installation</a>.</li>
+<body bgcolor="#ffffff" text="#000000" link="#993300" vlink="#993300" alink="#993300">
 
-<li>Since version 1.1.5, we use <a
-href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a> library
-for message submission. It is small (<100kB) but modern and resourceful.
-We have 
-<a href="http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.6-1.i386.rpm">precompiled binaries</a> (compiled on stock RH-7.1) or 
-<a href="http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.6-1.src.rpm">source rpm</a> packages (both for libesmtp-0.8.6) ready for you.</li>
+<!-- header (logo, nav) -->
+<center>
+  <img src="images/balsa.jpg" alt="Balsa - an e-mail client for GNOME" height=122 width=476 border=0 vspace=10>
+  <p class="navigation">
+  <a href="index.html">News</a> | 
+  <a href="features.html">Features</a> | 
+  <a href="screenshots.html">Screenshots</a> | 
+  <a name="download.html">Download</a> | 
+  <a href="faq.html">FAQ</a> | 
+  <a href="list.html">Mailing List</a> | 
+  <a href="bugs.html">Reporting Bugs</a> 
+  </p>
+</center>
 
-<li>Balsa 0.9.5 and greater uses the <b><samp>libpspell</samp></b>
-library for spell checking, which is available in both rpm and deb
-format as well as plain source.  You can find the library and modules at the
-pspell <a href="http://pspell.sourceforge.net/">website</a>.</li>
+<br>
+<!-- begin page -->
 
-<li>Make sure you have <b><samp>libtool</samp></b> package
-installed. It usually comes with your distribution. </li>
+<p class="heading">Download</p>
 
-<li>You may want to recompile balsa to get: HTML support
-(<samp>--enable-gtkhtml</samp>), GSS support (<samp>--with-gss</samp>)
-or LDAP support (<samp>--enable-ldap</samp>). You will need
-corresponding development modules.</li>
-</ol>
+<dl>
+<dt>Current stable source</dt>
+<dd>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1.tar.bz2">balsa-1.2.1.tar.bz2</a> (1.7MB)
+<br>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1.tar.gz">balsa-1.2.1.tar.gz</a> (2.5MB)
+</dd>
+</dl>
 
-<h2>Download</h2>
+<dl>
+<dt>Official Packages</dt>
+<dd>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1-1.i386.rpm">balsa-1.2.1-1.i386.rpm</a> (1.24MB)
+<br>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1-1.src.rpm">balsa-1.2.1-1.src.rpm</a> (1.77MB)
+</dd>
+</dl>
 
-<p>The binary rpm is compiled on RH-7.1 with update packages
-installed.  You may want to recompile balsa (you may find <samp>rpm
---rebuild balsa*src.rpm</samp> or <samp>rpm -ta balsa.tar.bz2</samp>
-handy) to enable LDAP, GSS or HTML support, which are disabled by
-default.</p>
+<p>The binary RPM is compiled on Redhat 7.1 with update packages.  You may 
+want to recompile Balsa to enable LDAP, GSS or HTML support, which are 
+disabled by default.  Packages for Redhat 7.2 (courtesy of 
+<a href="mailto:balsa@t-data.com">Melanie Thielker</a>) are also available 
+at <a href="http://fw.t-data.com/balsa/">http://fw.t-data.com/balsa/</a>.</p>
 
+<p>For Balsa versions later than 1.1.5, you will need the 
+<a href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a> library. 
+Get the sources from the home page or grab the RPM built on Redhat 7.1:</p>
 
-<h3>Source</h3>
-<ul type=square>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1.tar.bz2">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1.tar.bz2</a> (1.7MB)</li>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1.tar.gz</a> (2.5MB)</li>
-</ul>
+<dl>
+<dt>libESMTP packages</dt>
+<dd>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.6-1.i386.rpm">libesmtp-0.8.6-1.i386.rpm</a> (2.47MB)</li>
+<br>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.6-1.src.rpm">libesmtp-0.8.6-1.src.rpm</a> (2.47MB)</li>
+</dd>
+</dl>
 
-<h3>Packages</h3> 
-<ul>
-
-<li>Source RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1-1.src.rpm</a> (1.77MB)</li>
-</ul>
-<ul>
-<li>i386 binary RPM: <a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.2.1-1.i386.rpm</a> (1.24MB)</li>
-</ul>
-
-<p><i>Independent</i> packagers:</p>
-<ul type=square>
-<li><a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Most recent version for Slackware</a>.</li>
-<li><a href="http://www.tvec.net/users/wabbit/">Randall Gibson's</a> Debian package (experimental).</li>
-</ul>
+<dl>
+<dt>Independent Packages</dt>
+<dd>
+<a href="http://www.linuxmafia.org/pcentral/sview.php3?name=balsa">Slackware</a>
+<br>
+<a href="http://www.tvec.net/users/wabbit/">Debian</a> (courtesy of Randall Gibson; experimental)
+</dd>
+</dl>
 
 <a name="dev"></a>
-<h3>Development release - 1.1.7</h3>
+<dl>
+<dt>Development release - 1.1.7</dt>
+<dd>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7.tar.gz">balsa-1.1.7.tar.gz</a> (2.47MB)</li>
+<br>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7.tar.bz2">balsa-1.1.7.tar.bz2</a> (1.76MB)</li>
+<br>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7-1.i386.rpm">balsa-1.1.7-1.i386.rpm</a> (1.15MB)
+<br>
+<a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7-1.src.rpm">balsa-1.1.7-1.src.rpm</a> (1.77MB)</li>
+</dd>
+</dl>
 
-<p><b>2001-07-13</b>: This is most likely the last release in the
-development 1.1.x series. Several improvements in IMAP folder handling
-has been done, new command line options have been added and other UI
-improvements have been implemented. See <samp>NEWS</samp> or/and
-<samp>ChangeLog</samp> for more details.</p>
+<p>This is most likely the last release in the development 1.1.x series. 
+Several improvements in IMAP folder handling has been done, new command 
+line options have been added and other UI improvements have been implemented. 
+See <tt>NEWS</tt> and/or <tt>ChangeLog</tt> for more details.</p>
 
-<ul>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7.tar.gz</a> (2.47MB)</li>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7.tar.bz2">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7.tar.bz2</a> (1.76MB)</li>
-<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7-1.src.rpm</a> (1.77MB)</li>
+<br>
 
-<li><a
-href="http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-1.1.7-1.i386.rpm</a> (1.15MB)
-built on RH7.1 box as described above.</li>
-</ul>
+<a name="req"></a>
+<p class="heading">Requirements</p>
 
-<p>You need <a
-href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a>
-library. Get the sources from <a
-href="http://www.stafford.uklinux.net/libesmtp/">its home
-site</a>. You can grab <a
-href="ftp://ftp.chbm.nu/pub/libesmtp-0.8.4-2.src.rpm">0.8.4
-src rpm</a> and <a href="ftp://ftp.chbm.nu/pub/libesmtp-0.8.4-2-rh62.i386.rpm">0.8.3
-i386 rpm</a> packages directly (courtesy of <a href="ftp://ftp.chbm.nu/pub/">Carlos Morgado</a>) built on RH 6.2 or grab a 
-<a href="http://www.theochem.kth.se/~pawsa/balsa/libesmtp-0.8.4-1.i386.rpm">version re-built on RH 7.1</a> (source rpm is the same).</p>
+<p>Balsa requires a basic <a href="http://www.gnome.org/start/">GNOME 
+installation</a>.  Also make sure you have <tt>libtool</tt> and the 
+<a href="http://www.stafford.uklinux.net/libesmtp/">libESMTP</a> library 
+installed.</p>
 
-<h3>CVS source &amp; build instructions</h3>
+<p>Balsa 0.9.5 and greater uses the libpspell library for spell checking, 
+which is available in both rpm and deb format as well as plain source. You 
+can find the library and modules at the 
+<a href="http://pspell.sourceforge.net">pspell website</a>.</p>
 
-<p>Balsa source is also available from GNOME 
-<a href="http://developer.gnome.org/tools/cvs.html">CVS
-repository</a>. Check out <b>balsa</b> module. The CVS version is
-<em>sometimes</em> not sufficiently stable for everyday use it but has
-all the new features and is best starting point if you want to hack
-balsa.</p>
+<p>You may want to recompile Balsa to get: HTML support 
+(<tt>--enable-gtkhtml</tt>), GSS support (<tt>--with-gss</tt>) or LDAP 
+support (<tt>--enable-ldap</tt>). You will need corresponding development 
+modules.</p>
 
-<p>You will need <samp>pspell-devel</samp> (obligatory) and
-<samp>gnome-print-devel</samp> (optional) packages for building
-balsa. Get also <samp><a
-href="http://people.redhat.com/dcm/software.html">gnome-doc-tools</a></samp>
-or alternatively install <samp>png-support-3.?.dtd</samp> and
-<samp>gdp-both.dsl</samp> files yourself.
+<br>
 
-Most likely, it will be necessary to add to your
-<samp>/etc/sgml/docbook.cat</samp> (or whatever catalog file your
-db2html tool uses) a pointer to
-<samp>/usr/share/sgml/docbook/png-support-3.1/catalog</samp>!
+<p class="heading">CVS source &amp; build instructions</p>
+
+<p>Balsa source is also available from the 
+<a href="http://developer.gnome.org/tools/cvs.html">GNOME CVS repository</a>.  
+Check out <tt>balsa</tt> module. The CVS version is sometimes not sufficiently 
+stable for everyday use it but has all the new features and is the best 
+starting point if you want to hack Balsa.</p>
+
+<p>You will need <tt>pspell-devel</tt> (required) and <tt>gnome-print-devel</tt> 
+(optional) packages for building Balsa.  Also get 
+<tt><a href="http://people.redhat.com/dcm/software.html">gnome-doc-tools</a></tt>
+or install the <tt>png-support-3.?.dtd</tt> and <tt>gdp-both.dsl</tt> files yourself.
+
+Most likely, it will be necessary to add to your <tt>/etc/sgml/docbook.cat</tt> 
+(or whatever catalog file your db2html tool uses) a pointer to 
+<tt>/usr/share/sgml/docbook/png-support-3.1/catalog</tt>!
 
 Also, make sure your have <samp>libtool</samp> installed.</p>
 
-<p>If you get errors compiling balsa help file
-<samp>balsa.sgml</samp>, make sure your SGML catalog file contains
-paths to relevant packages. The frequent error is to omit PNG support
-files which results in seemingly unrelated errors.</p>
+<p>If you get errors compiling Balsa help file <tt>balsa.sgml</tt>, make sure your SGML 
+catalog file contains paths to relevant packages. The frequent error is to omit PNG 
+support files which results in seemingly unrelated errors.</p>
 
-<p>If you want to compile from the CVS source, you will need
-<samp>gob</samp>.</p>
+<p>Finally, if you want to compile from the CVS source, you will need <tt>gob</tt>.</p>
 
-<hr>
-<address>
-<a href="main.html">Balsa Website</a>,
-<a href="mailto:balsa-list@gnome.org">balsa-list@gnome.org</a></address>
+<!-- end page -->
+<br>
+
+<!-- footer (nav repeated, copyright) -->
+<center>
+  <p class="navigation">
+  <a href="index.html">News</a> | 
+  <a href="features.html">Features</a> | 
+  <a href="screenshots.html">Screenshots</a> | 
+  <a name="download.html">Download</a> | 
+  <a href="faq.html">FAQ</a> | 
+  <a href="list.html">Mailing List</a> | 
+  <a href="bugs.html">Reporting Bugs</a> 
+  </p>
+  <p class="copyright">Copyright (C) 1997-2001 Stuart 
+  Parmenter and others</p>
+</center>
+
 </body>
+
 </html>

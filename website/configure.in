@@ -30,10 +30,6 @@ dnl ############################################################################
 
 AC_OUTPUT([
 Makefile
-features.html
-screenshots.html
-bugs.html
-style.css
 ])
 
 echo ""

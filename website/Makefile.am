@@ -1,18 +1,15 @@
-IN_FILES = \
-	features.html.in \
-	screenshots.html.in \
-	bugs.html.in \
-	style.css.in
+IN_FILES =
 
 HTML_FILES = \
-	download.html \
-	index.html \
-	main.html \
-	download.html \
-	faq.html \
-	features.html \
-	screenshots.html \
-	bugs.html
+	bugs.html	\
+	download.html	\
+	download.html	\
+	faq.html	\
+	features.html	\
+	index.html	\
+	list.html	\
+	main.html	\
+	screenshots.html
 
 EXTRA_DIST = $(IN_FILES)
 
@@ -40,11 +37,13 @@ install-data-local: $(website_DATA)
 # 	$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/images/$$basefile; \
 #	 done
 	$(mkinstalldirs) $(DESTDIR)$(websitedir)/screens
-	-for file in $(srcdir)/screens/*.jpg; do \
+	-for file in $(srcdir)/screens/*.jpg  $(srcdir)/screens/*.png; do \
 		basefile=`basename $$file`; \
 		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/screens/$$basefile; \
 	done
-	-for file in $(srcdir)/screens/*.png; do \
+	$(mkinstalldirs) $(DESTDIR)$(websitedir)/screens/thumbnails
+	-for file in $(srcdir)/screens/thumbnails/*.png; do \
 		basefile=`basename $$file`; \
-		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/screens/$$basefile; \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(websitedir)/screens/thumbnails/$$basefile; \
 	done
+

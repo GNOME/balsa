@@ -113,7 +113,6 @@ int imap_cmd_step (IMAP_DATA* idata)
       idata->conn)) < 0)
     {
       dprint (1, (debugfile, "imap_cmd_step: Error while reading server response, closing connection.\n"));
-      mutt_socket_close (idata->conn);
       idata->status = IMAP_FATAL;
       cmd_handle_fatal (idata);
       return IMAP_CMD_FAIL;
@@ -345,12 +344,9 @@ static int cmd_handle_untagged (IMAP_DATA* idata)
     s += 3;
     SKIPWS (s);
     mutt_error (_("One of IMAP connections has been closed: %s"), s);
-    idata->status = IMAP_BYE;
-    if (idata->state == IMAP_SELECTED)
-      mx_fastclose_mailbox (idata->ctx);
-    mutt_socket_close (idata->conn);
-    idata->state = IMAP_DISCONNECTED;
-
+    cmd_handle_fatal(idata);
+    /* BALSA: line below needed to be able to reuse this connection later */
+    idata->conn->data = NULL; 
     return -1;
   }
   else if (option (OPTIMAPSERVERNOISE) && (mutt_strncasecmp ("NO", s, 2) == 0))

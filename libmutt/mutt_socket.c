@@ -60,8 +60,6 @@ int mutt_socket_close (CONNECTION* conn)
     rc = conn->close (conn);
 
   conn->fd = -1;
-  /* BALSA: don't keep closed connections on the connections list */
-  mutt_socket_free(conn); 
   return rc;
 }
 

@@ -23,7 +23,7 @@
 #include "sendmsg-window.h"
 
 gint delete_event (GtkWidget *, gpointer);
-void send_smtp_message(GtkWidget *, BalsaSendmsg *);
+void send_smtp_message (GtkWidget *, BalsaSendmsg *);
 
 
 static GtkMenuEntry main_menu_items[] =
@@ -44,7 +44,7 @@ static GtkMenuEntry main_menu_items[] =
 static int main_nmenu_items = sizeof (main_menu_items) / sizeof (main_menu_items[0]);
 
 
-void 
+void
 sendmsg_window_new (GtkWidget * widget, gpointer data)
 {
   BalsaSendmsg *msg = g_malloc0 (sizeof (BalsaSendmsg));
@@ -77,11 +77,11 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   gtk_box_pack_start (GTK_BOX (vbox), menubar, FALSE, TRUE, 0);
   gtk_widget_show (menubar);
 
-  sendbut=gtk_button_new_with_label("send");
+  sendbut = gtk_button_new_with_label ("send");
   gtk_box_pack_start (GTK_BOX (vbox), sendbut, FALSE, TRUE, 0);
-  gtk_widget_show(sendbut);
+  gtk_widget_show (sendbut);
   gtk_signal_connect (GTK_OBJECT (sendbut), "clicked",
-                      GTK_SIGNAL_FUNC (send_smtp_message), msg);
+		      GTK_SIGNAL_FUNC (send_smtp_message), msg);
 
   table = gtk_table_new (5, 2, FALSE);
   gtk_box_pack_start (GTK_BOX (vbox), table, FALSE, FALSE, 0);
@@ -161,37 +161,65 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   return;
 }
 
-static char *hostlist[] = {     /* SMTP server host list */
-  "localhost",     
+static char *hostlist[] =
+{				/* SMTP server host list */
+  "localhost",
   NIL
 };
 
-static char *newslist[] = {     /* Netnews server host list */
+static char *newslist[] =
+{				/* Netnews server host list */
   "news",
   NIL
 };
 
-char *curhst = NIL;             /* currently connected host */
-char *curusr = NIL;             /* current login user */
-char personalname[MAILTMPLEN];  /* user's personal name */
+char *curhst = NIL;		/* currently connected host */
+char *curusr = NIL;		/* current login user */
+char personalname[MAILTMPLEN];	/* user's personal name */
 
-void prompt (char *msg,char *txt)
+void 
+prompt (char *msg, char *txt)
 {
-  printf ("%s",msg);
+  printf ("%s", msg);
   gets (txt);
 }
 
-void send_smtp_message(GtkWidget * widget, BalsaSendmsg *bsmsg)
+
+static GString *
+gtk_text_to_email (char *buff)
 {
-  long debug=0;
+  int i = 0, len = strlen (buff);
+  GString *gs = g_string_new (NULL);
+
+  for (i = 0; i < len; i++)
+    {
+      switch (buff[i])
+	{
+	case '\n':
+	  gs = g_string_append (gs, "\015\012");
+	  break;
+	default:
+	  gs = g_string_append_c (gs, buff[i]);
+	  break;
+	}
+    }
+  return gs;
+}
+
+void 
+send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+  long debug = 0;
   SENDSTREAM *stream = NIL;
   char line[MAILTMPLEN];
-  char *text = (char *) fs_get (8*MAILTMPLEN);
-  ENVELOPE *msg = mail_newenvelope ();
+/*  char *text = (char *) fs_get (8 * MAILTMPLEN);
+*/  ENVELOPE *msg = mail_newenvelope ();
   BODY *body = mail_newbody ();
+  GString *text;
+  gchar *textbuf;
 
-curusr = cpystr(myusername());
-curhst = cpystr (mylocalhost ());
+  curusr = cpystr (myusername ());
+  curhst = cpystr (mylocalhost ());
 
   msg->from = mail_newaddr ();
   msg->from->personal = cpystr (personalname);
@@ -201,36 +229,53 @@ curhst = cpystr (mylocalhost ());
   msg->return_path->mailbox = cpystr (curusr);
   msg->return_path->host = cpystr (curhst);
 
-  rfc822_parse_adrlist (&msg->to,gtk_entry_get_text(GTK_ENTRY(bsmsg->to)),curhst);
-  if (msg->to) {
-    rfc822_parse_adrlist (&msg->cc,gtk_entry_get_text(GTK_ENTRY(bsmsg->cc)),curhst);
-  }
-  msg->subject = cpystr (gtk_entry_get_text(GTK_ENTRY(bsmsg->subject)));
+  rfc822_parse_adrlist (&msg->to, gtk_entry_get_text (GTK_ENTRY (bsmsg->to)), curhst);
+  if (msg->to)
+    {
+      rfc822_parse_adrlist (&msg->cc, gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)), curhst);
+    }
+  msg->subject = cpystr (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
   puts (" Msg (end with a line with only a '.'):");
   body->type = TYPETEXT;
-  *text = '\0'; 
-  while (gets (line)) {  
-    if (line[0] == '.') {
-      if (line[1] == '\0') break;
-      else strcat (text,".");
+/*
+  *text = '\0';
+  while (gets (line))
+    {
+      if (line[0] == '.')
+	{
+	  if (line[1] == '\0')
+	    break;
+	  else
+	    strcat (text, ".");
+	}
+      strcat (text, line);
+      strcat (text, "\015\012");
     }
-    strcat (text,line);
-    strcat (text,"\015\012");
-  }
-  body->contents.text.data = (unsigned char *) text;
-  body->contents.text.size = strlen (text);
+*/
+textbuf=gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text),0,gtk_text_get_length(GTK_TEXT(bsmsg->text)));
+text=gtk_text_to_email(textbuf);
+text = g_string_append (text, "\015\012");
+
+  body->contents.text.data = (unsigned char *) text->str;
+  body->contents.text.size = strlen (text->str);
   rfc822_date (line);
-  msg->date = (char *) fs_get (1+strlen (line));
-  strcpy (msg->date,line);  
-  if (msg->to) {
-    puts ("Sending...");
-    if (stream = smtp_open (hostlist,debug)) {
-      if (smtp_mail (stream,"MAIL",msg,body)) puts ("[Ok]");
-      else printf ("[Failed - %s]\n",stream->reply);
+  msg->date = (char *) fs_get (1 + strlen (line));
+  strcpy (msg->date, line);
+  if (msg->to)
+    {
+      puts ("Sending...");
+      if (stream = smtp_open (hostlist, debug))
+	{
+	  if (smtp_mail (stream, "MAIL", msg, body))
+	    puts ("[Ok]");
+	  else
+	    printf ("[Failed - %s]\n", stream->reply);
+	}
     }
-  }
-  if (stream) smtp_close (stream);
-  else puts ("[Can't open connection to any server]");
+  if (stream)
+    smtp_close (stream);
+  else
+    puts ("[Can't open connection to any server]");
   mail_free_envelope (&msg);
   mail_free_body (&body);
 

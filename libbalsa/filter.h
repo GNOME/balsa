@@ -25,6 +25,8 @@
 #define FILTER_ENOREAD       2
 #define FILTER_EFILESYN      3
 #define FILTER_ENOMSG        4
+#define FILTER_ENOMEM        5
+#define FILTER_EREGSYN       6
 
 
 /*
@@ -36,6 +38,7 @@ gint filter_errno;
 typedef struct _filter
 {
     guint16 type;
+    gchar *name;
     guint16 flags;
 
     /*

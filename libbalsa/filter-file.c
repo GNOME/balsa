@@ -15,6 +15,7 @@
 #include "filter.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
+#include <gtk/gtk.h>
 #include "misc.h"
 
 
@@ -31,11 +32,15 @@
  */
 gint filter_load(GList *filter_list, gchar *filter_file)
 {
+    FILE *fp;
     gchar *buf;
     size_t len;
 
     if ((! filter_file) || (filter_file[0] == '\0'))
+    {
+	filter_errno = FILTER_ENOFILE;
 	return(-FILTER_ENOFILE);
+    }
 
     /* here we'll delete an existing filter list, if there is one */
 
@@ -48,6 +53,7 @@ gint filter_load(GList *filter_list, gchar *filter_file)
 		   "Unable to load filter file %s",
 		   filter_file);
 	perror(filter_file_error);
+	filter_errno = FILTER_ENOREAD;
 	return(-FILTER_ENOREAD);
     }
 

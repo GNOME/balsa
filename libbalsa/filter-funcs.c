@@ -59,8 +59,7 @@ void filter_delete_regex(filter_regex *filter_reg,
     if (filter_reg->string)
 	g_free(filter_reg->string);
 
-    if (filter_reg->compiled)
-	g_free(filter_reg->compiled);
+    regfree(&(filter_reg->compiled));
 
     return;
 } /* end filter_delete_regex() */
@@ -75,8 +74,8 @@ void filter_delete_regex(filter_regex *filter_reg,
  *    filter *fil - the filter to delete
  *    gpointer throwaway - unused
  */
-void filter_delete_filter(filter *fil,
-			  gpointer throwaway)
+void filter_free(filter *fil,
+		 gpointer throwaway)
 {
     if (! fil)
 	return;
@@ -116,7 +115,7 @@ GList *filter_clear_filters(GList *filter_list)
 	return(NULL);
 
     g_list_foreach(filter_list,
-		   (GFunc)filter_delete_filter,
+		   (GFunc)filter_free,
 		   NULL);
     g_list_free(filter_list);
 
@@ -139,6 +138,12 @@ filter *filter_new()
 
     newfil = (filter*)g_malloc(sizeof(filter));
 
+    if (! newfil)
+    {
+	filter_errno = FILTER_ENOMEM;
+	return(NULL);
+    }
+
     newfil->type = FILTER_NONE;
     newfil->flags = FILTER_EMPTY;
     newfil->match_fields = FILTER_EMPTY;
@@ -148,3 +153,110 @@ filter *filter_new()
 
     return(newfil);
 } /* end filter_new() */
+
+
+/*
+ * filter_append_regex()
+ *
+ * Adds a regex to the current filter.
+ * Convenience wrapper around g_malloc()
+ * and g_list_append()
+ *
+ * Arguments:
+ *    filter *fil - the filter to add the regex to
+ *    gchar *regex - the regular expression
+ *
+ * Returns:
+ *    gint - 0 for success, negative on error
+ */
+gint filter_append_regex(filter *fil,
+			 gchar *reg)
+{
+    filter_regex *temp;
+
+    temp = (filter_regex*)g_malloc(sizeof(filter_regex));
+    if (! temp)
+    {
+	filter_errno = FILTER_ENOMEM;
+	return(-FILTER_ENOMEM);
+    }
+
+    temp->string = g_strdup(reg);
+
+    fil->regex = g_list_append(fil->regex,
+			       temp);
+
+    FILTER_SETFLAG(fil, FILTER_MODIFIED);
+
+    return(0);
+} /* end filter_append_regex() */
+
+
+/*
+ * filter_regcomp()
+ *
+ * Compiles a regex for a filter
+ *
+ * Arguments:
+ *    filter_regex *fre - the filter_regex struct to compile
+ */
+void filter_regcomp(filter_regex *fre,
+		    gpointer throwaway)
+{
+    gint rc;
+
+    rc = regcomp(&(fre->compiled),
+		 fre->string,
+		 FILTER_REGCOMP);
+
+    if (rc != 0)
+    {
+	gchar errorstring[256];
+
+	regerror(rc,
+		 &(fre->compiled),
+		 errorstring,
+		 256);
+
+	filter_errno = FILTER_EREGSYN;
+    }
+    
+} /* end filter_regcomp() */
+
+
+/*
+ * filter_compile_regexs
+ *
+ * Compiles all the regexs a filter has
+ *
+ * Arguments:
+ *    filter *fil - the filter to compile
+ *
+ * Returns:
+ *    gint - 0 for success, negative otherwise.
+ */
+gint filter_compile_regexs(filter *fil)
+{
+    /*
+     * Clear filter_errno, because it is
+     * the only way we know if a compile failed
+     */
+    filter_errno = FILTER_NOERR;
+
+    /* ASSERT: we were only called if there were filters */
+    g_list_foreach(fil->regex,
+		   (GFunc)filter_regcomp,
+		   NULL);
+    if (filter_errno != 0)
+    {
+	gchar errorstring[1024];
+	g_snprintf(errorstring,
+		   1024,
+		   "Unable to compile filter %s",
+		   fil->name);
+	filter_perror(errorstring);
+	FILTER_CLRFLAG(fil, FILTER_ENABLED);
+    }
+
+    return(0);
+}

@@ -8,8 +8,8 @@
 #define _FILTER_PRIVATE_H
 
 /* regex options */
-#define FILTER_RECOMP = (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
-#define FILTER_REEXEC = 0
+#define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
+#define FILTER_REGEXEC       0
 
 /* filter types */
 #define FILTER_NONE          0
@@ -30,9 +30,9 @@
 				     of user selection or an error in the
 				     regex */
 /* flag operation macros */
-#define FILTER_SETFLAG(x, y) (((filter*)(x)->flags) |= (y))
-#define FILTER_CLRFLAG(x, y) (((filter*)(x)->flags) &= ~(y))
-#define FILTER_CHKFLAG(x, y) (((filter*)(x)->flags) & (y))
+#define FILTER_SETFLAG(x, y) ((((filter*)(x))->flags) |= (y))
+#define FILTER_CLRFLAG(x, y) ((((filter*)(x))->flags) &= ~(y))
+#define FILTER_CHKFLAG(x, y) ((((filter*)(x))->flags) & (y))
 
 /* FILTER_SIMPLE match flags */
 #define FILTER_MATCH_ALL     1<<0 /* match entire message */
@@ -43,15 +43,15 @@
 #define FILTER_MATCH_SUBJECT 1<<5 /* match in the Subject field */
 
 /* FILTER_SIMPLE macros */
-#define FILTER_SETMATCH(x, y) (((filter*)(x)->matchfields) |= (y))
-#define FILTER_CLRMATCH(x, y) (((filter*)(x)->matchfields) &= ~(y))
-#define FILTER_CHKMATCH(x, y) (((filter*)(x)->matchfields) & (y))
+#define FILTER_SETMATCH(x, y) ((((filter*)(x))->matchfields) |= (y))
+#define FILTER_CLRMATCH(x, y) ((((filter*)(x))->matchfields) &= ~(y))
+#define FILTER_CHKMATCH(x, y) ((((filter*)(x))->matchfields) & (y))
 
 /* regex struct */
 typedef struct _filter_regex
 {
     gchar *string;
-    regex_t *compiled;
+    regex_t compiled;
 } filter_regex;
 
 

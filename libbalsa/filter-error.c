@@ -19,7 +19,9 @@ gchar *filter_errlist[] =
     "No filter configuration file found",
     "Unable to read filter configuration file",
     "Syntax error in the filter configuration file",
-    "No message to filter"
+    "No message to filter",
+    "Unable to allocate memory",
+    "Error in regular expression syntax"
 };
 
 

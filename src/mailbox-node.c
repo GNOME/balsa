@@ -342,7 +342,9 @@ imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     gchar* msg;
     BalsaMailboxNode* mroot=mb;
-
+#ifdef BALSA_USE_THREADS
+    pthread_t scan_th_id;
+#endif
     while(mroot->parent)
 	mroot = mroot->parent;
     msg = g_strdup_printf(_("Scanning %s. Please wait..."), mroot->name);
@@ -354,7 +356,6 @@ imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 	gtk_main_iteration();
     gdk_threads_leave();
 #ifdef BALSA_USE_THREADS
-    pthread_t scan_th_id;
     pthread_create(&scan_th_id, NULL, imap_dir_cb_real, r);
     pthread_detach(scan_th_id);
     /* give the thread change to start and grab the lock 

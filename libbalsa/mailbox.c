@@ -1337,7 +1337,7 @@ message_body_ref (Message * message)
       BODY *bdy = cur->content;
 
       if (balsa_app.debug)
-	g_print (_ ("Loading message: %s/%s\n"), TYPE (bdy->type), bdy->subtype);
+	g_print (_ ("Loading message: %s/%s\n"), TYPE (bdy), bdy->subtype);
 
       if (balsa_app.debug)
 	{

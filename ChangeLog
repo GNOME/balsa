@@ -1,3 +1,10 @@
+2001-10-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Peter Bloomfield code cleanup patches:
+	* libbalsa/misc.c, src/balsa-message.c, src/sendmsg-window.c:
+	g_string_xx() functions return a parameter; add doc for 
+	libbalsa_process_text_rfc2646(); improve dynamic mem allocation, etc.
+
 2001-10-10  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-icons.[hc]: cleanup icon registration code.

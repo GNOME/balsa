@@ -976,7 +976,7 @@ insert_selected_messages(BalsaSendmsg *msg, SendType type)
     }
     
     gtk_editable_insert_text(GTK_EDITABLE(msg->text), text->str,
-			     strlen(text->str), &pos);
+			     text->len, &pos);
     g_string_free(text, TRUE);
     
     return TRUE;
@@ -993,12 +993,9 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *msg)
 {
     GtkWidget *index =
 	balsa_window_find_current_index(balsa_app.main_window);
-    gint pos=gtk_editable_get_position(GTK_EDITABLE(msg->text));
-    GString *text = g_string_new("");
     
     if (index) {
 	GList *node;
-	GList *mailbox;
 	GtkCTree *ctree = GTK_CTREE(BALSA_INDEX(index)->ctree);
     
 	for (node = GTK_CLIST(ctree)->selection; node;
@@ -1014,10 +1011,6 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *msg)
             }
 	}
     }
-    
-    gtk_editable_insert_text(GTK_EDITABLE(msg->text), text->str,
-			     strlen(text->str), &pos);
-    g_string_free(text, TRUE);
     
     return TRUE;
 }
@@ -1078,7 +1071,7 @@ to_add(GtkWidget * widget,
        guint info, guint32 time, GnomeIconList * iconlist)
 {
 
-    if (strlen(gtk_entry_get_text(GTK_ENTRY(widget))) == 0) {
+    if (!*gtk_entry_get_text(GTK_ENTRY(widget))) {
 	gtk_entry_set_text(GTK_ENTRY(widget), selection_data->data);
     } else {
 	gtk_entry_append_text(GTK_ENTRY(widget), ",");
@@ -1394,11 +1387,11 @@ drag_data_quote(GtkWidget * widget,
         while (*message_array) {
             GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
 
-            text = g_string_append(text, body->str);
+            g_string_append(text, body->str);
             g_string_free(body, TRUE);
         }
         gtk_editable_insert_text(GTK_EDITABLE(widget), text->str,
-                                 strlen(text->str), &pos);
+                                 text->len, &pos);
         gtk_editable_set_position(GTK_EDITABLE(widget), orig_pos);
         g_string_free(text, TRUE);
     }
@@ -1464,7 +1457,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 		(rbdy = process_mime_part(message, body, NULL, -1, FALSE,
                                           msg->flow))) {
 		gtk_text_insert(GTK_TEXT(msg->text), NULL, NULL, NULL, 
-				rbdy->str, strlen(rbdy->str));
+				rbdy->str, rbdy->len);
 		g_string_free(rbdy, TRUE);
 	    }
 	    g_free(body_type);
@@ -1524,21 +1517,21 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 
 	if (date) {
 	    str = g_strdup_printf(_("Date: %s\n"), date);
-	    body = g_string_append(body, str);
+	    g_string_append(body, str);
 	    g_free(str);
 	}
 
 	subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
 	if (subject) {
 	    str = g_strdup_printf(_("Subject: %s\n"), subject);
-	    body = g_string_append(body, str);
+	    g_string_append(body, str);
 	    g_free(str);
 	}
 
 	if (message->from) {
 	    gchar *from = libbalsa_address_to_gchar(message->from, 0);
 	    str = g_strdup_printf(_("From: %s\n"), from);
-	    body = g_string_append(body, str);
+	    g_string_append(body, str);
 	    g_free(from);
 	    g_free(str);
 	}
@@ -1546,7 +1539,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	if (message->to_list) {
 	    gchar *to_list = libbalsa_make_string_from_list(message->to_list);
 	    str = g_strdup_printf(_("To: %s\n"), to_list);
-	    body = g_string_append(body, str);
+	    g_string_append(body, str);
 	    g_free(to_list);
 	    g_free(str);
 	}
@@ -1554,31 +1547,31 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	if (message->cc_list) {
 	    gchar *cc_list = libbalsa_make_string_from_list(message->cc_list);
 	    str = g_strdup_printf(_("CC: %s\n"), cc_list);
-	    body = g_string_append(body, str);
+	    g_string_append(body, str);
 	    g_free(cc_list);
 	    g_free(str);
 	}
 
 	str = g_strdup_printf(_("Message-ID: %s\n"), message->message_id);
-	body = g_string_append(body, str);
+	g_string_append(body, str);
 	g_free(str);
 
 	if (message->references) {
 	    GList *ref_list = message->references;
 
 	    str = g_strdup_printf(_("References: %s"), ref_list->data);
-	    body = g_string_append(body, str);
+	    g_string_append(body, str);
 	    g_free(str);
 	    ref_list = ref_list->next;
 
 	    while (ref_list) {
 		str = g_strdup_printf(" %s", ref_list->data);
-		body = g_string_append(body, str);
+		g_string_append(body, str);
 		g_free(str);
 		ref_list = ref_list->next;
 	    }
 		
-	    body = g_string_append(body, "\n");
+	    g_string_append(body, "\n");
 	}
     } else {
 	if (date)
@@ -1592,7 +1585,7 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, msg->flow);
 	if (body)
-	    body = g_string_prepend(body, str);
+	    g_string_prepend(body, str);
 	else
 	    body = g_string_new(str);
 	g_free(str);
@@ -1639,12 +1632,12 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	    }
 
 	    if (balsa_app.current_ident->sig_prepend && type != SEND_NORMAL) {
-	    	body = g_string_prepend(body, "\n\n");
-	    	body = g_string_prepend(body, signature);
+	    	g_string_prepend(body, "\n\n");
+	    	g_string_prepend(body, signature);
 	    } else {
-	    	body = g_string_append(body, signature);
+	    	g_string_append(body, signature);
 	    }
-	    body = g_string_prepend_c(body, '\n');
+	    g_string_prepend_c(body, '\n');
 	}
 	g_free(signature);
     }
@@ -2090,18 +2083,18 @@ decode_and_strdup(const gchar*str, int delim, gchar** newstr)
     while(str<eos) {
 	switch(*str) {
 	case '+':
-	    s = g_string_append_c(s, ' ');
+	    g_string_append_c(s, ' ');
 	    str++;
 	    break;
 	case '%':
 	    if(str+2<eos) {
 		strncpy(num, str+1, 2); num[2] = 0;
-		s = g_string_append_c(s, strtol(num,NULL,16));
+		g_string_append_c(s, strtol(num,NULL,16));
 	    }
 	    str+=3;
 	    break;
 	default:
-	    s = g_string_append_c(s, *str++);
+	    g_string_append_c(s, *str++);
 	}
     }
     if(newstr) *newstr = *eos ? eos+1 : NULL;
@@ -2371,7 +2364,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 					      (GTK_ENTRY(bsmsg->bcc[1])));
 
     if ((tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->reply_to[1]))) != NULL
-	&& strlen(tmp) > 0)
+	&& *tmp)
 	message->reply_to = libbalsa_address_new_from_string(tmp);
 
     if (balsa_app.req_dispnotify)
@@ -2408,11 +2401,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 					  gtk_text_get_length(GTK_TEXT
 							      (bsmsg->text)));
     if (bsmsg->flow) {
-        gchar *tmp = libbalsa_wrap_rfc2646(body->buffer,
-                                           balsa_app.wraplength,
-                                           TRUE, FALSE);
-        g_free(body->buffer);
-        body->buffer = tmp;
+        body->buffer =
+            libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength, TRUE,
+                                  FALSE);
     } else if (balsa_app.wordwrap)
         libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
     body->charset = g_strdup(bsmsg->charset);
@@ -2670,10 +2661,9 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     the_text = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->text), 0, -1);
     if (bsmsg->flow) {
-        gchar *tmp = libbalsa_wrap_rfc2646(the_text, balsa_app.wraplength,
-                                           TRUE, TRUE);
-        g_free(the_text);
-        the_text = tmp;
+        the_text =
+            libbalsa_wrap_rfc2646(the_text, balsa_app.wraplength, TRUE,
+                                  TRUE);
     } else
         libbalsa_wrap_string(the_text, balsa_app.wraplength);
 

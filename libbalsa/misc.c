@@ -170,12 +170,12 @@ libbalsa_make_string_from_list(const GList * the_list)
 	addy = list->data;
 	str = libbalsa_address_to_gchar(addy, 0);
 	if (str)
-	    gs = g_string_append(gs, str);
+	    g_string_append(gs, str);
 
 	g_free(str);
 
 	if (list->next)
-	    gs = g_string_append(gs, ", ");
+	    g_string_append(gs, ", ");
 
 	list = list->next;
     }
@@ -272,7 +272,7 @@ size_t libbalsa_readfile_nostat(FILE * fp, char **buf)
 	    };
 	    if (r > 0) {
 		rbuf[r] = '\0';	
-		gstr = g_string_append(gstr,rbuf);
+		g_string_append(gstr,rbuf);
 	    }
 	}
     } while( r != 0 );
@@ -380,7 +380,7 @@ libbalsa_wrap_string(gchar * str, int width)
  * if it's coming off the screen, don't destuff unquoted lines
  * */
 static void
-unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
+unwrap_rfc2646(gchar * par, gboolean from_screen, GString * result)
 {
     gchar *str = NULL;
     gchar **lines, **l;
@@ -402,7 +402,7 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
         quote_level = ql;
         tmp = str[ql];
         str[ql] = '\0';
-        *result_p = g_string_append(*result_p, str);
+        g_string_append(result, str);
         str[ql] = tmp;
 
         do {
@@ -424,11 +424,10 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
                      * it also serves to separate the quote string from
                      * the text, which might begin with '>'
                      * */
-                    *result_p = g_string_append_c(*result_p,
-                                                  flowed ? 'p' : 'f');
+                    g_string_append_c(result, flowed ? 'p' : 'f');
                     tagged = TRUE;
                 }
-                *result_p = g_string_append(*result_p, pending);
+                g_string_append(result, pending);
             }
             /* hold this line as pending */
             pending = dq;
@@ -457,9 +456,9 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
             *++p = '\0';
         }
         if (!tagged)
-            *result_p = g_string_append_c(*result_p, flowed ? 'p' : 'f');
-        *result_p = g_string_append(*result_p, pending);
-        *result_p = g_string_append_c(*result_p, '\n');
+            g_string_append_c(result, flowed ? 'p' : 'f');
+        g_string_append(result, pending);
+        g_string_append_c(result, '\n');
     }
 
     g_strfreev(l);
@@ -472,7 +471,7 @@ unwrap_rfc2646(gchar * par, gboolean from_screen, GString ** result_p)
  * */
 static void
 dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
-               gboolean quote, GString ** result_p)
+               gboolean quote, GString * result)
 {
     gchar **lines, **l;
 
@@ -505,7 +504,7 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
             gint len = ql;
 
             /* start of line: emit quote string */
-            *result_p = g_string_append(*result_p, quote_string);
+            g_string_append(result, quote_string);
             if (quote)
                 ++len;
             /* space-stuffing:
@@ -519,7 +518,7 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
                   && (*str == ' ' || *str == QUOTE_STRING[0]
                       || !strncmp(str, "From ", 5))) || len > 0)
                 && strcmp(str, "-- ")) {
-                *result_p = g_string_append_c(*result_p, ' ');
+                g_string_append_c(result, ' ');
                 ++len;
             }
             /* 
@@ -563,7 +562,7 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
                         str = line_break;
                     tmp = *str;
                     *str = '\0';
-                    *result_p = g_string_append(*result_p, start);
+                    g_string_append(result, start);
                     *str = tmp;
                     break;
                 }
@@ -575,8 +574,8 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
              * actual ' ' 
              * */
             if (str > start && isspace((int)str[-1]) && str[-1] != ' ')
-                *result_p = g_string_append_c(*result_p, ' ');
-            *result_p = g_string_append_c(*result_p, '\n');
+                g_string_append_c(result, ' ');
+            g_string_append_c(result, '\n');
         } while (*str);         /* end of loop over output lines */
 
         if (*quote_string)
@@ -586,32 +585,35 @@ dowrap_rfc2646(gchar * par, gint width, gboolean to_screen,
     g_strfreev(l);
 }
 
-/* libbalsa_process_text_rfc2646:
-   re-wraps given flowed string to required width.
-   FIXME: parameters?
+/* GString *libbalsa_process_text_rfc2646:
+   re-wrap given flowed string to required width. 
+   Parameters:
+   gchar * par:          string to be wrapped
+   gint width:           maximum length of wrapped line
+   gboolean from_screen: is par from the text input area of
+                         a sendmsg-window?
+   gboolean to_screen:   is the wrapped text going to be
+                         displayed in the text area of a sendmsg-window 
+                         or of a received message window?
+   gboolean quote:       should the wrapped lines be prefixed 
+                         with the RFC 2646 quote character '>'?
 */
 GString *
 libbalsa_process_text_rfc2646(gchar * par, gint width,
                               gboolean from_screen,
                               gboolean to_screen, gboolean quote)
 {
+    gint len = strlen(par);
+    GString *result = g_string_sized_new(len);
     gchar *str;
-    GString *result = g_string_new(NULL);
 
-    str = g_strndup(par, 20);
-    printf("libbalsa_process_text_rfc2646:\n");
-    printf(" par = <%s...>\n", str);
-    printf(" width = %d, quote = %s, from = %s, to = %s\n", width,
-           quote ? "TRUE" : "FALSE", from_screen ? "TRUE" : "FALSE",
-           to_screen ? "TRUE" : "FALSE");
-    g_free(str);
-
-    unwrap_rfc2646(par, from_screen, &result);
+    unwrap_rfc2646(par, from_screen, result);
     str = result->str;
+    len = result->len;
     g_string_free(result, FALSE);
 
-    result = g_string_new(NULL);
-    dowrap_rfc2646(str, width, to_screen, quote, &result);
+    result = g_string_sized_new(len);
+    dowrap_rfc2646(str, width, to_screen, quote, result);
     g_free(str);
 
     return result;
@@ -619,6 +621,8 @@ libbalsa_process_text_rfc2646(gchar * par, gint width,
 
 /* libbalsa_wrap_rfc2646:
    wraps given string using soft breaks according to rfc2646
+   convenience function, uses libbalsa_process_text_rfc2646 to do all
+   the work, but returns a gchar * and g_free's the string passed in
 */
 gchar *
 libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
@@ -629,6 +633,7 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
 
     result = libbalsa_process_text_rfc2646(par, width, from_screen,
                                            to_screen, FALSE);
+    g_free(par);
     str = result->str;
     g_string_free(result, FALSE);
 

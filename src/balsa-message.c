@@ -1810,11 +1810,9 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
     if (bm->wrap_text) {
         if (balsa_app.recognize_rfc2646_format_flowed
             && libbalsa_flowed_rfc2646(info->body)) {
-            gchar *tmp =
-                libbalsa_wrap_rfc2646(ptr, balsa_app.browse_wrap_length, FALSE,
-                                      TRUE);
-            g_free(ptr);
-            ptr = tmp;
+            ptr =
+                libbalsa_wrap_rfc2646(ptr, balsa_app.browse_wrap_length,
+                                      FALSE, TRUE);
         } else
             libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
     }

@@ -1959,8 +1959,8 @@ handle_mdn_request(LibBalsaMessage *message)
     } else {
 	libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 			      balsa_app.encoding_style,  
-			      balsa_app.smtp ? balsa_app.smtp_server : NULL,
-			      balsa_app.smtp_port);
+			      balsa_app.smtp_server,
+			      balsa_app.smtp_authctx);
 	gtk_object_destroy(GTK_OBJECT(mdn));
     }
 }
@@ -2112,8 +2112,8 @@ static void send_mdn_reply (GtkWidget *widget, gpointer user_data)
 	LIBBALSA_MESSAGE(gtk_object_get_user_data (GTK_OBJECT (dialog)));
     libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
 			  balsa_app.encoding_style,  
-			  balsa_app.smtp ? balsa_app.smtp_server : NULL,
-			  balsa_app.smtp_port);
+			  balsa_app.smtp_server,
+			  balsa_app.smtp_authctx);
     gtk_object_destroy(GTK_OBJECT(send_msg));
     gtk_widget_hide (dialog);
     gtk_object_destroy(GTK_OBJECT(dialog));

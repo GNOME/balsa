@@ -137,6 +137,7 @@ dnl More checks
 dnl ######################################################################################
 
 AC_CHECK_LIB(crypt, crypt)
+AC_CHECK_LIB(esmtp, smtp_start_session)
 
 dnl these may be used later.
 dnl AC_CHECK_LIB(des, des_encrypt)

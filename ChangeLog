@@ -1,3 +1,10 @@
+2001-05-07  Carlos Morgado  <chbm@chbm.nu>
+
+	Applied libESMTP patch from Brian Stafford. 
+	created branch 'libESMTP'.
+	
+	* src/save-restore.c: changed SMTP* to ESMTP* on .gnome/balsa 
+
 2001-05-05  Pawel Salek  <pawsa@theochem.kth.se>
 
 	A set of patches from Albrecht Dreﬂ <albrecht.dress@arcormail.de>

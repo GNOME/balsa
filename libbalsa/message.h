@@ -28,6 +28,7 @@
 #include <time.h>
 
 #include "libbalsa.h"
+#include <auth-client.h>
 
 #define LIBBALSA_TYPE_MESSAGE                      (libbalsa_message_get_type())
 #define LIBBALSA_MESSAGE(obj)                      (GTK_CHECK_CAST(obj, LIBBALSA_TYPE_MESSAGE, LibBalsaMessage))
@@ -162,7 +163,7 @@ gboolean libbalsa_message_send(LibBalsaMessage* message,
 			       LibBalsaMailbox* outbox,  
 			       LibBalsaMailbox* fccbox,
 			       gint encoding, gchar* smtp_server,
-			       gint smtp_port);
+			       auth_context_t smtp_authctx);
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
 				   LibBalsaMessage * reply_message,

@@ -1,3 +1,9 @@
+* Balsa-1.2.2 release. Release date 2001-10-31
+
+- few crash opportunities removed.
+- few UI improvements.
+- better handling of IMAP connection problems.
+
 * Balsa-1.2.1 release. Release date 2001-10-21
 
 - new icons (Ali Akcaagac).

@@ -1,5 +1,9 @@
 SUBDIRS = macros po intl libmutt libbalsa src
 
+EXTRA_DIST = balsa.1
+
+man_MANS=balsa.1
+
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change
 @MAINT@include macros/macros.dep

@@ -1,3 +1,7 @@
+1999-12-27  Yuri Syrota <rasta@renome.rovno.ua>
+
+	* configure.in: added "uk" to ALL_LINGUAS.
+
 1999-12-24  Héctor García Álvarez <hector@scouts-es.org>
 	* libbalsa/send.c: Now Balsa send queued messages as it should.
  

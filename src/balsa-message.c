@@ -123,6 +123,8 @@ static void balsa_gtk_text_size_request(GtkWidget * widget,
 static void balsa_gtk_html_size_request(GtkWidget * widget,
 					GtkRequisition * requisition,
 					gpointer data);
+static void balsa_gtk_html_link_clicked(GtkWidget *html, 
+					const gchar *url);
 #endif
 static void balsa_icon_list_size_request(GtkWidget * widget,
 					 GtkRequisition * requisition,
@@ -1235,6 +1237,9 @@ part_info_init_html(BalsaMessage * bm, BalsaPartInfo * info, gchar * ptr,
     gtk_signal_connect(GTK_OBJECT(html), "size_request",
 		       (GtkSignalFunc) balsa_gtk_html_size_request,
 		       (gpointer) bm);
+    gtk_signal_connect(GTK_OBJECT(html), "link_clicked",
+		       GTK_SIGNAL_FUNC(balsa_gtk_html_link_clicked),
+		       bm);
 
     gtk_container_add(GTK_CONTAINER(scroll), html);
 
@@ -1729,6 +1734,12 @@ balsa_gtk_html_size_request(GtkWidget * widget,
     requisition->width += GTK_LAYOUT(widget)->hadjustment->upper;
     requisition->height += GTK_LAYOUT(widget)->vadjustment->upper;
 
+}
+
+static void
+balsa_gtk_html_link_clicked(GtkWidget *html, const gchar *url)
+{
+    gnome_url_show(url);
 }
 #endif
 

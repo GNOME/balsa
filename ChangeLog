@@ -1,5 +1,8 @@
 2000-12-19  Ian Campbell  <ijc25@cam.ac.uk>
 
+	* src/balsa-message.c: Add a very simple link_clicked handler to
+	the html widget (calls gnome_show_url).
+
 	Initial implementation of Reply to Group function. Still needs
 	configuration options.
 	

@@ -1096,6 +1096,36 @@ mailbox_gather_content_info( Mailbox *mailbox )
 }
 
 
+void mailbox_commit_flagged_changes( Mailbox *mailbox )
+{
+  GList *message_list;
+  GList *tmp_message_list;
+  Message *current_message;
+
+
+  mailbox_open_ref (mailbox);
+
+  /* examine all the message in the mailbox */
+  message_list = mailbox->message_list;
+  while (message_list)
+    {
+      current_message = (Message *) message_list->data;
+      tmp_message_list =  message_list->next;
+      if ( current_message->flags & MESSAGE_FLAG_DELETED ) 
+	{
+	   send_watcher_delete_message (mailbox, current_message);
+	   message_free (current_message);
+	   mailbox->message_list = g_list_remove_link( mailbox->message_list, message_list);
+	}
+      message_list = tmp_message_list;
+      
+    }
+
+  mailbox_open_unref (mailbox);
+  mx_sync_mailbox( CLIENT_CONTEXT(mailbox)  );
+}
+
+
 /*
  * messages
  */

@@ -1,3 +1,20 @@
+1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	added the code to commit the changes which are flagged (generally
+	deletion). The code is OK, but some general issues remain to be fixed.
+	(in particular, the problem which open_unref automatically syncing
+	mailboxes and thus freeing delete-flagged messages )
+	
+	* src/main-window.c (mailbox_commit_changes): new menu for this
+	("Mailboxes" -> "commit current")
+	
+	* libbalsa/mailbox.c (mailbox_commit_flagged_changes): new function to 
+	commit the changes which are only flagged.
+
+	* src/balsa-index.c (balsa_index_del): new functino to delete a message
+	from the index list.
+	(mailbox_listener): proper answer to the delete watcher message.
+
 1999-01-10  bertrand  <Bertrand.Guiheneuf@inria.fr>
 
 	added the code to view infos about the mailboxes in the mailbox list

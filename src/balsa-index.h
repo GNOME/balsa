@@ -65,6 +65,8 @@ extern "C"
 
 /* adds a new message */
   void balsa_index_add (BalsaIndex * bindex, Message * message);
+/* del a message */
+  void balsa_index_del (BalsaIndex * bindex, Message * message);
   void balsa_index_update_flag (BalsaIndex * bindex, Message * message);
 
 

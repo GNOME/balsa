@@ -417,6 +417,30 @@ balsa_index_add (BalsaIndex * bindex,
       bindex->first_new_message = row + 1;
 }
 
+void
+balsa_index_del (BalsaIndex * bindex,
+		 Message * message)
+{
+  gint row;
+
+  g_return_if_fail (bindex != NULL);
+  g_return_if_fail (message != NULL);
+
+  if (bindex->mailbox == NULL)
+    return;
+
+  row = gtk_clist_find_row_from_data (GTK_CLIST (bindex), (gpointer) message);
+  if (row<0) return;
+  
+  if (row == (bindex->first_new_message) )
+      bindex->first_new_message = 0;
+  
+  gtk_clist_remove (GTK_CLIST (bindex),  row);
+
+
+}
+
+
 
 void
 balsa_index_select_next (BalsaIndex * bindex)
@@ -618,6 +642,7 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
       balsa_index_add (bindex, mw_message->message);
       break;
     case MESSAGE_DELETE:
+      balsa_index_del (bindex, mw_message->message);
       break;
     case MESSAGE_APPEND:
       balsa_index_add (bindex, mw_message->message);

@@ -345,6 +345,7 @@ gchar *mailbox_type_description (MailboxType type);
 MailboxType mailbox_valid (gchar * filename);
 gchar *message_pathname (Message * message);
 gboolean mailbox_gather_content_info( Mailbox *mailbox );
+void mailbox_commit_flagged_changes( Mailbox *mailbox );
 
 char *mime_content_type2str (int contenttype);
 

@@ -23,6 +23,7 @@
 #include <gdk/gdkx.h>
 #include <X11/Xutil.h>
 
+
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
@@ -39,7 +40,6 @@
 #include "sendmsg-window.h"
 #include "mailbox-conf.h"
 #include "mblist-window.h"
-
 #define MAILBOX_DATA "mailbox_data"
 
 #define APPBAR_KEY "balsa_appbar"
@@ -75,7 +75,7 @@ static void undelete_message_cb (GtkWidget * widget, gpointer data);
 static void filter_dlg_cb (GtkWidget * widget, gpointer data);
 
 static void mailbox_close_child (GtkWidget * widget, gpointer data);
-
+static void mailbox_commit_changes (GtkWidget * widget, gpointer data);
 static void about_box_destroy_cb (void);
 
 static void destroy_mdi_cb (GnomeMDI * mdi, gpointer data);
@@ -161,6 +161,10 @@ static GnomeUIInfo mailbox_menu[] =
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Close current"), N_("Close the currently opened mailbox"),
 			  mailbox_close_child, GNOME_STOCK_MENU_CLOSE),
+
+  GNOMEUIINFO_ITEM_STOCK (N_ ("Commit current"), N_("Commit the changes in the currently opened mailbox"),
+			  mailbox_commit_changes, GNOME_STOCK_MENU_CLOSE),
+
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_END
 };
@@ -585,6 +589,18 @@ mailbox_close_child (GtkWidget * widget, gpointer data)
 			    GNOME_MDI_CHILD (balsa_app.current_index_child),
 			    TRUE);
 }
+
+static void
+mailbox_commit_changes (GtkWidget * widget, gpointer data)
+{
+  Mailbox *current_mailbox;
+  
+  if (!balsa_app.current_index_child)
+    return;
+  current_mailbox =  balsa_app.current_index_child->mailbox;
+  mailbox_commit_flagged_changes( current_mailbox );
+}
+
 
 static void
 about_box_destroy_cb (void)

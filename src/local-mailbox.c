@@ -120,7 +120,7 @@ strisnum (gchar * str)
 {
   gint i, len;
   len = strlen (str);
-  for (len = 0; i <= len; i++)
+  for (i = 0; i < len; i++)
     {
       if (!isdigit (str[i]))
 	return 0;
@@ -168,7 +168,7 @@ read_dir (gchar * prefix, struct dirent *d)
 
   else
     {
-      if (strisnum (d->d_name))
+      if (!strisnum (d->d_name))
 	{
 
 	  mailbox_type = mailbox_valid (filename);

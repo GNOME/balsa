@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <sys/utsname.h>
+#include <string.h>
 #include <time.h>
 #include <gnome.h>
 
@@ -28,6 +29,7 @@
 
 #include "balsa-app.h"
 #include "mailbox.h"
+#include "misc.h"
 
 #define BUFFER_SIZE 1024
 
@@ -286,6 +288,9 @@ mailbox_free (Mailbox * mailbox)
       g_free (MAILBOX_IMAP (mailbox)->server);
       g_free (MAILBOX_IMAP (mailbox)->path);
       break;
+
+    case MAILBOX_UNKNOWN:
+      break;
     }
 
   g_free (mailbox);
@@ -333,6 +338,9 @@ mailbox_open_ref (Mailbox * mailbox)
       set_imap_username (mailbox);
       CLIENT_CONTEXT (mailbox) = mx_open_mailbox (tmp->str, 0, NULL);
       g_string_free (tmp, TRUE);
+      break;
+
+    case MAILBOX_UNKNOWN:
       break;
     }
 
@@ -417,6 +425,7 @@ mailbox_check_new_messages (Mailbox * mailbox)
       else
 	return FALSE;
     }
+  return FALSE;
 }
 
 guint
@@ -819,6 +828,7 @@ mailbox_type_description (MailboxType type)
       return "imap";
       break;
 
+    case MAILBOX_UNKNOWN:
     default:
       return "";
     }

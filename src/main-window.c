@@ -25,9 +25,12 @@
 #include "balsa-app.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
+#include "index-window.h"
 #include "mailbox.h"
 #include "mailbox-manager.h"
 #include "main-window.h"
+#include "mblist-window.h"
+#include "message-window.h"
 #include "misc.h"
 #include "pref-manager.h"
 #include "sendmsg-window.h"
@@ -89,6 +92,8 @@ static void undelete_message_cb (GtkWidget * widget);
 
 static void mailbox_select_cb (GtkWidget * widget);
 
+static void mblist_window_cb (GtkWidget * widget);
+
 static void about_box_destroy_cb ();
 
 static void mailbox_listener (MailboxWatcherMessage * mw_message);
@@ -118,9 +123,9 @@ open_main_window ()
   /* main window */
   mw->window = gnome_app_new ("balsa", "Balsa");
   gtk_window_set_wmclass (GTK_WINDOW (mw->window), "balsa_app", "Balsa");
-
+#if 0
   gtk_widget_set_usize (mw->window, balsa_app.mw_width, balsa_app.mw_height);
-
+#endif
 
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
@@ -146,7 +151,9 @@ open_main_window ()
 
   /* contents widget */
   vbox = gtk_vbox_new (FALSE, 0);
+#if 0
   gnome_app_set_contents (GNOME_APP (mw->window), vbox);
+#endif
   gtk_widget_show (vbox);
 
 
@@ -253,6 +260,7 @@ refresh_main_window ()
    * remove old menu from the mailbox-selection option menu,
    * and replace it with a new current one 
    */
+#if 0
   gtk_option_menu_remove_menu (GTK_OPTION_MENU (mw->mailbox_option_menu));
   mw->mailbox_menu = gtk_menu_new ();
 
@@ -278,7 +286,7 @@ refresh_main_window ()
 
     }
   gtk_option_menu_set_menu (GTK_OPTION_MENU (mw->mailbox_option_menu), mw->mailbox_menu);
-
+#endif
   /* now set the mailbox-menu back to it's previous state */
   if (mw->mailbox)
     main_window_set_mailbox (mw->mailbox);
@@ -288,6 +296,7 @@ refresh_main_window ()
 void
 main_window_set_mailbox (Mailbox * mailbox)
 {
+#if 0
   gint i;
   GtkWidget *menuitem;
   GList *children;
@@ -307,6 +316,7 @@ main_window_set_mailbox (Mailbox * mailbox)
 	  break;
 	}
     }
+#endif
 }
 
 
@@ -457,6 +467,18 @@ create_menu ()
   /* Settings Menu */
   menu = gtk_menu_new ();
 
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Mailbox List"));
+  gtk_widget_show (w);
+
+  gtk_signal_connect (GTK_OBJECT (w),
+		      "activate",
+		      (GtkSignalFunc) mblist_window_cb,
+		      NULL);
+
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_PROP, _ ("Preferences..."));
   gtk_widget_show (w);
 
@@ -467,7 +489,6 @@ create_menu ()
 
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
-
 
   w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Mailbox Manager..."));
   gtk_widget_show (w);
@@ -536,7 +557,7 @@ create_toolbar ()
   gnome_app_set_toolbar (GNOME_APP (mw->window), GTK_TOOLBAR (toolbar));
   gtk_widget_show (toolbar);
 
-
+#if 0
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
 
@@ -555,7 +576,7 @@ create_toolbar ()
 
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
-
+#endif
 
   toolbarbutton =
     gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
@@ -705,6 +726,7 @@ move_resize_cb ()
 static void
 check_new_messages_cb (GtkWidget * widget)
 {
+#if 0
   MainWindow *mainwindow;
 
   g_return_if_fail (widget != NULL);
@@ -713,8 +735,8 @@ check_new_messages_cb (GtkWidget * widget)
 
   if (mainwindow->mailbox)
     mailbox_check_new_messages (mainwindow->mailbox);
+#endif
 }
-
 
 static void
 index_select_cb (GtkWidget * widget,
@@ -816,7 +838,28 @@ undelete_message_cb (GtkWidget * widget)
   g_return_if_fail (widget != NULL);
 
   mainwindow = (MainWindow *) gtk_object_get_user_data (GTK_OBJECT (widget));
+  balsa_index_select_next (BALSA_INDEX (mainwindow->index));
+}
 
+
+static void
+mblist_window_cb (GtkWidget * widget)
+{
+  GList *list;
+  Mailbox *mailbox;
+
+  mblist_open_window ();
+
+  list = balsa_app.mailbox_list;
+  while (list)
+    {
+      mailbox = list->data;
+      list = list->next;
+
+      mblist_add_mailbox (mailbox);
+    }
+
+#if 0
   list = BALSA_INDEX (mainwindow->index)->selection;
   while (list)
     {
@@ -825,8 +868,8 @@ undelete_message_cb (GtkWidget * widget)
     }
 
   balsa_index_select_next (BALSA_INDEX (mainwindow->index));
+#endif
 }
-
 
 static void
 mailbox_select_cb (GtkWidget * widget)
@@ -849,6 +892,8 @@ mailbox_select_cb (GtkWidget * widget)
   if (!mailbox)
     return;
 
+  create_new_index (mailbox);
+#if 0
 
   /* 
    * let's not open a currently-open mailbox
@@ -892,6 +937,7 @@ mailbox_select_cb (GtkWidget * widget)
       if (mainwindow->mailbox)
 	main_window_set_mailbox (mainwindow->mailbox);
     }
+#endif
 }
 
 
@@ -913,6 +959,3 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
       break;
     }
 }
-
-
-

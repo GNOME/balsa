@@ -151,7 +151,6 @@ static void bmbl_folder_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gboolean bmbl_find_data_func(GtkTreeModel * model,
                                     GtkTreePath * path,
                                     GtkTreeIter * iter, gpointer data);
-static void bmbl_mbnode_tab_style(BalsaMailboxNode * mbnode, gint unread);
 static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter,
 			    gint total_messages);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
@@ -1430,47 +1429,6 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
     bmbl_update_mailbox(store, mailbox, -1);
 }
 
-/* bmbl_mbnode_tab_style: find the label widget by recursively searching
- * containers, and set its style.
- *
- * bmbl_mbnode_tab_foreach is the recursive helper.
- */
-static void
-bmbl_mbnode_tab_foreach(GtkWidget * widget, gpointer data)
-{
-    if (GTK_IS_CONTAINER(widget))
-	gtk_container_foreach((GtkContainer *) widget,
-			      bmbl_mbnode_tab_foreach, data);
-    else if (GTK_IS_LABEL(widget)) {
-	gint unread = GPOINTER_TO_INT(data);
-	gchar *str = unread ?
-	    g_strconcat("<b>", gtk_label_get_text(GTK_LABEL(widget)),
-			"</b>", NULL) :
-	    g_strdup(gtk_label_get_text(GTK_LABEL(widget)));
-	gtk_label_set_markup(GTK_LABEL(widget), str);
-	g_free(str);
-    }
-}
-
-static void
-bmbl_mbnode_tab_style(BalsaMailboxNode * mbnode, gint unread)
-{
-    BalsaIndex *index;
-    GtkWidget *label;
-
-    index = balsa_find_index_by_mailbox(mbnode->mailbox);
-    if (index == NULL)
-	return;
-
-    label = gtk_notebook_get_tab_label(GTK_NOTEBOOK
-				       (balsa_app.main_window->notebook),
-				       gtk_widget_get_parent(GTK_WIDGET
-							     (index)));
-
-    bmbl_mbnode_tab_foreach(label, GINT_TO_POINTER(unread));
-}
-
-
 /* bmbl_node_style [MBG]
  * 
  * model:  The model containing the mailbox
@@ -1508,9 +1466,6 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter, gint total_messages)
                                     GTK_ICON_SIZE_MENU, NULL),
                                WEIGHT_COLUMN, PANGO_WEIGHT_BOLD, -1);
 
-            /* update the notebook label */
-            bmbl_mbnode_tab_style(mbnode, 1);
-
             mbnode->style |= MBNODE_STYLE_NEW_MAIL;
 
             /* If we have a count of the unread messages, and we are showing
@@ -1541,7 +1496,6 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter, gint total_messages)
                                         icon, GTK_ICON_SIZE_MENU, NULL),
                                    WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
                                    STYLE_COLUMN, PANGO_STYLE_NORMAL, -1);
-                bmbl_mbnode_tab_style(mbnode, 0);
 
                 mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
             }

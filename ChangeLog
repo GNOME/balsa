@@ -1,3 +1,13 @@
+2000-09-27  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c: Move addresses on double click.
+	* src/balsa-index-page.c:
+	* src/balsa-message.c:
+	* src/main-window.c:
+	* src/mblist-window.c:
+	* src/message-window.c:
+	       Add ... to menu items which lead to a dialog.
+
 2000-09-26  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/send.c: compute correctly the sent data percentage.

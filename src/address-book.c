@@ -40,12 +40,15 @@ static gint ab_cancel_cb(GtkWidget * widget, gpointer data);
 static gint ab_okay_cb(GtkWidget * widget, gpointer data);
 static void ab_clear_clist(GtkCList * clist);
 static void ab_switch_cb(GtkWidget * widget, gpointer data);
+static void ab_select_row_event(GtkWidget *widget, gint row, gint column, GdkEventButton *event, gpointer data);
+static void swap_clist_entry (gint row, GtkWidget *src, GtkWidget *dst);
 /*#define AB_ADD_CB_USED*/
 #ifdef AB_ADD_CB_USED
 static gint ab_add_cb(GtkWidget * widget, gpointer data);
 #endif
 static void ab_load(GtkWidget * widget, gpointer data);
 static void ab_find(GtkWidget * group_entry) ;
+static gint ab_compare(GtkCList *clist, gconstpointer a, gconstpointer b);
 
 static void address_book_menu_cb(GtkWidget *widget, gpointer data);
 
@@ -150,32 +153,51 @@ ab_clear_clist(GtkCList * clist)
 
 }
 
+static void
+swap_clist_entry (gint row, GtkWidget *src, GtkWidget *dst)
+{
+    	gint 		num;
+	gchar 		*listdata[2];
+	LibBalsaAddress	*addy_data;
+
+	if (src != NULL || dst != NULL)
+	{
+		addy_data = LIBBALSA_ADDRESS(gtk_clist_get_row_data(GTK_CLIST(src), row));
+	
+		listdata[0] = addy_data->id;
+		if ( addy_data->address_list )
+			listdata[1] = addy_data->address_list->data;
+		else	
+			listdata[1] = "";
+
+		gtk_clist_remove(GTK_CLIST(src), row);
+		num = gtk_clist_append(GTK_CLIST(dst), listdata);
+		gtk_clist_set_row_data(GTK_CLIST(dst), num, (gpointer)addy_data);
+	}
+}
+
+static void
+ab_select_row_event (GtkWidget * widget, gint row, gint column, GdkEventButton *event, gpointer data)
+{
+  if ( event == NULL )
+    return;
+
+  if (event->type==GDK_2BUTTON_PRESS || event->type==GDK_3BUTTON_PRESS)
+    swap_clist_entry (row, /* row to swap */
+		      GTK_WIDGET(data), /* from */
+		      (data == book_clist) ? (add_clist) : (book_clist) /* to */);
+}
 
 static void
 ab_switch_cb(GtkWidget * widget, gpointer data)
 {
-	GtkWidget      *from = GTK_WIDGET(data);
-	GtkWidget      *to = (data == book_clist) ? add_clist : book_clist;
+    	GtkWidget      *from = GTK_WIDGET(data);
 
-	while ( GTK_CLIST(from)->selection ){
-		gint            num;
-		gchar           *listdata[2];
-		LibBalsaAddress *addy_data;
-
-		num = GPOINTER_TO_INT(GTK_CLIST(from)->selection->data);
-		
-		addy_data = LIBBALSA_ADDRESS(gtk_clist_get_row_data(GTK_CLIST(from), num));
-
-		listdata[0] = addy_data->id;
-		if ( addy_data->address_list )
-			listdata[1] = addy_data->address_list->data;
-		else
-			listdata[1] = "";
-		
-		gtk_clist_remove(GTK_CLIST(from), num);
-
-		num = gtk_clist_append(GTK_CLIST(to), listdata);
-		gtk_clist_set_row_data(GTK_CLIST(to), num,(gpointer)addy_data);
+	while ( GTK_CLIST(from)->selection )
+	{
+	    	swap_clist_entry (GPOINTER_TO_INT(GTK_CLIST(from)->selection->data),
+			    from, 
+			    (data == book_clist) ? (add_clist) : (book_clist));
 	}
 }
 
@@ -344,7 +366,7 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	titles[1]=_(titles[1]);
 #endif
 
-	dialog = gnome_dialog_new(_("Address Book"), GNOME_STOCK_BUTTON_CANCEL, GNOME_STOCK_BUTTON_OK, NULL); 
+	dialog = gnome_dialog_new(_("Address Book"), GNOME_STOCK_BUTTON_OK, GNOME_STOCK_BUTTON_CANCEL, NULL); 
 
         /* If we have something in the data, then the addressbook was opened
          * from a message window */
@@ -357,17 +379,23 @@ address_book_cb(GtkWidget * widget, gpointer data)
                 gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
                                          GTK_WINDOW (widget->parent->parent) );
 
-	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, GTK_SIGNAL_FUNC(ab_cancel_cb), (gpointer) dialog); 
-	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 1, GTK_SIGNAL_FUNC(ab_okay_cb), (gpointer) dialog); 
+	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 0, GTK_SIGNAL_FUNC(ab_okay_cb), (gpointer) dialog); 
+	gnome_dialog_button_connect(GNOME_DIALOG(dialog), 1, GTK_SIGNAL_FUNC(ab_cancel_cb), (gpointer) dialog); 
 	vbox = GNOME_DIALOG(dialog)->vbox; 
 
 	book_clist = gtk_clist_new_with_titles(2, titles); 
 	gtk_clist_set_selection_mode(GTK_CLIST(book_clist), GTK_SELECTION_MULTIPLE); 
 	gtk_clist_column_titles_passive(GTK_CLIST(book_clist)); 
-	
+	gtk_clist_set_compare_func(GTK_CLIST(book_clist), ab_compare);
+	gtk_clist_set_sort_type(GTK_CLIST(book_clist), GTK_SORT_ASCENDING);
+	gtk_clist_set_auto_sort(GTK_CLIST(book_clist), TRUE);
+
 	add_clist = gtk_clist_new_with_titles(2, titles); 
 	gtk_clist_set_selection_mode(GTK_CLIST(add_clist), GTK_SELECTION_MULTIPLE); 
 	gtk_clist_column_titles_passive(GTK_CLIST(add_clist)); 
+	gtk_clist_set_compare_func(GTK_CLIST(add_clist), ab_compare);
+	gtk_clist_set_sort_type(GTK_CLIST(add_clist), GTK_SORT_ASCENDING);
+	gtk_clist_set_auto_sort(GTK_CLIST(add_clist), TRUE);
 
 	ab_menu = gtk_menu_new ();	
 	if ( balsa_app.address_book_list ) {
@@ -424,6 +452,8 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	gtk_container_add(GTK_CONTAINER(scrolled_window), book_clist); 
 	gtk_widget_set_usize(scrolled_window, 300, 250);
 	
+	gtk_signal_connect(GTK_OBJECT(book_clist), "select_row", GTK_SIGNAL_FUNC(ab_select_row_event), (gpointer) book_clist);
+
 	/* 
 	 * Only display this part of * the window when we're adding to a composing 
 	 * message. 
@@ -453,6 +483,8 @@ address_book_cb(GtkWidget * widget, gpointer data)
 		gtk_clist_set_selection_mode(GTK_CLIST(add_clist), GTK_SELECTION_MULTIPLE); 
 		gtk_clist_column_titles_passive(GTK_CLIST(add_clist)); 
 		gtk_widget_set_usize(scrolled_window, 300, 250); 
+
+		gtk_signal_connect(GTK_OBJECT(add_clist), "select_row", GTK_SIGNAL_FUNC(ab_select_row_event), (gpointer) add_clist);
 	} 
 
 	hbox = gtk_hbutton_box_new(); 
@@ -505,4 +537,24 @@ static void address_book_menu_cb(GtkWidget *widget, gpointer data)
 {
 	current_address_book = LIBBALSA_ADDRESS_BOOK(data);
 	ab_load(widget, data);
+}
+
+static gint 
+ab_compare(GtkCList *clist, gconstpointer a, gconstpointer b)
+{
+  gchar *c1, *c2;
+
+  GtkCListRow *row1 = (GtkCListRow *) a;
+  GtkCListRow *row2 = (GtkCListRow *) b;
+
+  g_assert(row1->cell->type == GTK_CELL_TEXT);
+  g_assert(row2->cell->type == GTK_CELL_TEXT);
+
+  c1 = GTK_CELL_TEXT(*row1->cell)->text;
+  c2 = GTK_CELL_TEXT(*row2->cell)->text;
+
+  if ( c1 == NULL || c2 == NULL )
+    return 0;
+
+  return g_strcasecmp(c1, c2);
 }

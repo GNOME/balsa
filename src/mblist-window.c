@@ -434,7 +434,7 @@ mblist_create_context_menu (GtkCTree * ctree, LibBalsaMailbox * mailbox)
 
   menu = gtk_menu_new ();
 
-  add_menu_entry(menu, _("Add New Mailbox"), mb_add_cb, mailbox);
+  add_menu_entry(menu, _("Add New Mailbox..."), mb_add_cb, mailbox);
 
   /* If we didn't click on a mailbox then there is only one option. */
   if ( mailbox == NULL )
@@ -447,7 +447,7 @@ mblist_create_context_menu (GtkCTree * ctree, LibBalsaMailbox * mailbox)
   else
     add_menu_entry(menu, _("Close"), mb_close_cb, mailbox);
   
-  add_menu_entry(menu, _("Properties"), mb_conf_cb, mailbox);
+  add_menu_entry(menu, _("Properties..."), mb_conf_cb, mailbox);
 
   add_menu_entry(menu, _("Delete"),   mb_del_cb, mailbox);
   

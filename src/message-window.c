@@ -104,20 +104,20 @@ static GnomeUIInfo message_menu[] =
 {
     /* R */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Reply"), N_("Reply to this message"),
+    GNOME_APP_UI_ITEM, N_ ("_Reply..."), N_("Reply to this message"),
     replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
   },
     /* A */
   {
-    GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
+    GNOME_APP_UI_ITEM, N_ ("Reply to _all..."),
     N_("Reply to all recipients of this message"),
     replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL
   },
     /* F */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Forward"), N_("Forward this message"),
+    GNOME_APP_UI_ITEM, N_ ("_Forward..."), N_("Forward this message"),
     forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
   },
@@ -133,7 +133,7 @@ static GnomeUIInfo message_menu[] =
     GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL
   },
   {
-    GNOME_APP_UI_ITEM, N_ ("Save Current Part"), 
+    GNOME_APP_UI_ITEM, N_ ("Save Current Part..."), 
     N_ ("Save Current Part in Message"),
     save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL

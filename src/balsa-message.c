@@ -1239,7 +1239,7 @@ display_part (BalsaMessage *bm, LibBalsaMessageBody * body)
   if ( ! pix ) 
     pix = find_part_icon (info, content_type);
 
-  menu_item = gtk_menu_item_new_with_label( _("Save") );
+  menu_item = gtk_menu_item_new_with_label( _("Save...") );
   gtk_menu_append(GTK_MENU(info->popup_menu), menu_item);
   gtk_widget_show(menu_item);
   

@@ -176,7 +176,7 @@ static GnomeUIInfo file_new_menu[] =
   {
     GNOME_APP_UI_ITEM, N_ ("_Message..."), N_("Compose a new message"),
     new_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-    GNOME_STOCK_MENU_MAIL, 'M', 0, NULL
+    GNOME_STOCK_MENU_MAIL_NEW, 'M', 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_NEW_NEW_MAILBOX_POS 1
@@ -217,7 +217,7 @@ static GnomeUIInfo file_menu[] =
   GNOMEUIINFO_MENU_PRINT_ITEM(message_print_cb, NULL),
   GNOMEUIINFO_SEPARATOR,
   {
-    GNOME_APP_UI_ITEM, N_ ("_Address Book"), N_("Opens the address book"),
+    GNOME_APP_UI_ITEM, N_ ("_Address Book..."), N_("Opens the address book"),
     address_book_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_BOOK_RED, 'B', 0, NULL
   },
@@ -292,14 +292,14 @@ static GnomeUIInfo message_menu[] =
 #define MENU_MESSAGE_REPLY_POS 0
     /* R */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Reply"), N_("Reply to the current message"),
+    GNOME_APP_UI_ITEM, N_ ("_Reply..."), N_("Reply to the current message"),
     replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_RPL, 'R', 0, NULL
   },
 #define MENU_MESSAGE_REPLY_ALL_POS 1
     /* A */
   {
-    GNOME_APP_UI_ITEM, N_ ("Reply to _all"),
+    GNOME_APP_UI_ITEM, N_ ("Reply to _all..."),
     N_("Reply to all recipients of the current message"),
     replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_DATA,
     reply_to_all_menu_xpm, 'A', 0, NULL
@@ -307,7 +307,7 @@ static GnomeUIInfo message_menu[] =
 #define MENU_MESSAGE_FORWARD_POS 2
     /* F */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Forward"), N_("Forward the current message"),
+    GNOME_APP_UI_ITEM, N_ ("_Forward..."), N_("Forward the current message"),
     forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
   },
@@ -326,7 +326,7 @@ static GnomeUIInfo message_menu[] =
   },
 #define MENU_MESSAGE_SAVE_PART_POS 6
   {
-    GNOME_APP_UI_ITEM, N_ ("Save Current Part"), 
+    GNOME_APP_UI_ITEM, N_ ("Save Current Part..."), 
     N_ ("Save Current Part in Message"),
     save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
@@ -357,7 +357,7 @@ static GnomeUIInfo message_menu[] =
 #define MENU_MESSAGE_STORE_ADDRESS_POS 12
       /* S */
   {
-    GNOME_APP_UI_ITEM, N_ ("_Store Address"), N_("Store address of sender in addressbook"),
+    GNOME_APP_UI_ITEM, N_ ("_Store Address..."), N_("Store address of sender in addressbook"),
     store_address_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_BOOK_RED, 'S', 0, NULL
   },

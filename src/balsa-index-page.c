@@ -477,13 +477,13 @@ create_menu (BalsaIndex * bindex)
   
   menu = gtk_menu_new ();
   
-  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply"),
+  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply..."),
 			 balsa_message_reply, bindex, TRUE);
 
-  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply to all"),
+  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply to all..."),
 			 balsa_message_replytoall, bindex, TRUE);
 
-  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD, _("Forward"),
+  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD, _("Forward..."),
 			 balsa_message_forward, bindex, TRUE);
 
   if ( bindex->mailbox == balsa_app.trash ) {
@@ -497,7 +497,7 @@ create_menu (BalsaIndex * bindex)
   }
 
   create_stock_menu_item(menu, GNOME_STOCK_MENU_BOOK_RED, 
-			 _("Store Address"),
+			 _("Store Address..."),
 			 balsa_store_address, bindex, TRUE);
 
   menuitem = gtk_menu_item_new_with_label(_("Toggle flagged"));

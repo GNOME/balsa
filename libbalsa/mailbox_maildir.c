@@ -469,9 +469,12 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
 				  NULL, (GDestroyNotify)free_message_info);
     mdir->msgno_2_msg_info = g_ptr_array_new();
 
-    mdir->mtime = st.st_mtime;
+    mdir->mtime     = 0;
     mdir->mtime_cur = 0;
     mdir->mtime_new = 0;
+    if (stat(mdir->tmpdir, &st) != -1) {
+	mdir->mtime = st.st_mtime;
+    }
     if (stat(mdir->curdir, &st) != -1) {
 	mdir->mtime_cur = st.st_mtime;
     }
@@ -735,6 +738,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     GSList *l;
     guint renumber, msgno;
     struct message_info *msg_info;
+    struct stat st;
 
     for (msgno = 1; msgno <= mdir->msgno_2_msg_info->len; msgno++) {
 	msg_info = message_info_from_msgno(mailbox, msgno);
@@ -787,10 +791,9 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    msg_info->message->msgno = msgno;
     }
 
-    /* Record mtime of dirs; we'll just use the current time--someone
-     * else might have changed something since we did, but we'll find
-     * out eventually. */
-    mdir->mtime = mdir->mtime_cur = mdir->mtime_new = time(NULL);
+    /* Record mtime of dirs. */
+    stat(mdir->curdir, &st); mdir->mtime_cur = st.st_mtime;
+    stat(mdir->newdir, &st); mdir->mtime_new = st.st_mtime;
 
     return TRUE;
 }

@@ -50,11 +50,17 @@ static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 enum
   {
     TARGET_URI_LIST,
+    TARGET_EMAIL,
   };
 
 static GtkTargetEntry drop_types[] =
 {
   {"text/uri-list", 0, TARGET_URI_LIST}
+};
+
+static GtkTargetEntry email_field_drop_types[] = 
+{
+  {"x-application/x-email", 0, TARGET_EMAIL }
 };
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
@@ -269,6 +275,27 @@ attachments_add (GtkWidget * widget,
   gnome_uri_list_free_strings (names);
 }
 
+static void
+to_add (GtkWidget * widget,
+		 GdkDragContext * context,
+		 gint x,
+		 gint y,
+		 GtkSelectionData * selection_data,
+		 guint info,
+		 guint32 time,
+		 GnomeIconList * iconlist)
+{
+
+   if (strlen (gtk_entry_get_text (GTK_WIDGET(widget))) == 0)
+   {
+      gtk_entry_set_text (GTK_WIDGET(widget), selection_data->data);
+      return;
+   } else {
+      gtk_entry_append_text (GTK_WIDGET(widget),",");
+      gtk_entry_append_text (GTK_WIDGET(widget),selection_data->data);
+   }
+}
+
 static GtkWidget *
 create_info_pane (BalsaSendmsg * msg, SendType type)
 {
@@ -288,11 +315,11 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   label = gtk_label_new (_("To:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
   msg->to = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->to, 1, 2, 0, 1,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
@@ -301,17 +328,21 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	       gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_RED));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 0, 1,
 		    0, 0, 0, 0);
-
+  gtk_signal_connect (GTK_OBJECT (msg->to), "drag_data_received",
+		      GTK_SIGNAL_FUNC (to_add), NULL);
+  gtk_drag_dest_set (GTK_WIDGET (msg->to), GTK_DEST_DEFAULT_ALL,
+		     email_field_drop_types, ELEMENTS (email_field_drop_types),
+		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
   /* From: */
   label = gtk_label_new (_("From:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
   msg->from = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->from, 1, 2, 1, 2,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
   GTK_WIDGET_UNSET_FLAGS (msg->from, GTK_CAN_FOCUS);
   gtk_entry_set_editable (GTK_ENTRY (msg->from), FALSE);
 
@@ -327,21 +358,21 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   label = gtk_label_new (_("Subject:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 2, 3,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
   msg->subject = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->subject, 1, 2, 2, 3,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 
   /* cc: */
   label = gtk_label_new (_("cc:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 3, 4,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
   msg->cc = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->cc, 1, 2, 3, 4,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
@@ -350,16 +381,21 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	    gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_YELLOW));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
 		    0, 0, 0, 0);
+  gtk_signal_connect (GTK_OBJECT (msg->cc), "drag_data_received",
+		      GTK_SIGNAL_FUNC (to_add), NULL);
+  gtk_drag_dest_set (GTK_WIDGET (msg->cc), GTK_DEST_DEFAULT_ALL,
+		     email_field_drop_types, ELEMENTS (email_field_drop_types),
+		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
   /* bcc: */
   label = gtk_label_new (_("bcc:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 4, 5,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
   msg->bcc = gtk_entry_new ();
   gtk_table_attach (GTK_TABLE (table), msg->bcc, 1, 2, 4, 5,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
 
   button = gtk_button_new ();
   gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
@@ -368,12 +404,17 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
 	     gnome_stock_pixmap_widget (NULL, GNOME_STOCK_MENU_BOOK_GREEN));
   gtk_table_attach (GTK_TABLE (table), button, 2, 3, 4, 5,
 		    0, 0, 0, 0);
+  gtk_signal_connect (GTK_OBJECT (msg->bcc), "drag_data_received",
+		      GTK_SIGNAL_FUNC (to_add), NULL);
+  gtk_drag_dest_set (GTK_WIDGET (msg->bcc), GTK_DEST_DEFAULT_ALL,
+		     email_field_drop_types, ELEMENTS (email_field_drop_types),
+		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
   /* Attachment list */
   label = gtk_label_new (_("Attachments:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, 5, 6,
-		    GTK_FILL, GTK_FILL, 0, 0);
+		    GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
@@ -407,7 +448,7 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_container_add (GTK_CONTAINER (frame), sw);
 
   gtk_table_attach (GTK_TABLE (table), frame, 1, 3, 5, 6,
-		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
+		    GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND | GTK_SHRINK, 0, 0);
 
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "select_icon",
 		      GTK_SIGNAL_FUNC (select_attachment),
@@ -458,7 +499,7 @@ void
 sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 {
   GtkWidget *window;
-  GtkWidget *vbox;
+  GtkWidget *paned = gtk_vpaned_new ();
   gchar *newsubject = NULL;
 
   BalsaSendmsg *msg = NULL;
@@ -491,14 +532,9 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   gtk_signal_connect (GTK_OBJECT (msg->window), "delete_event",
 		      GTK_SIGNAL_FUNC (gtk_false), NULL);
 
-  vbox = gtk_vbox_new (FALSE, 1);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
-  gtk_widget_show (vbox);
-
 /* create the top portion with the to, from, etc in it */
-  gtk_box_pack_start (GTK_BOX (vbox),
-		      create_info_pane (msg, type),
-		      TRUE, TRUE, 0);
+  gtk_paned_add1 (GTK_PANED(paned),
+		      create_info_pane (msg, type));
 
   /* fill in that info: */
 
@@ -606,11 +642,9 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 	}
     }
 
-  gtk_box_pack_end (GTK_BOX (vbox),
-		    create_text_area (msg),
-		    TRUE, TRUE, 0);
+  gtk_paned_add2 (GTK_PANED (paned),create_text_area (msg));
 
-  gnome_app_set_contents (GNOME_APP (window), vbox);
+  gnome_app_set_contents (GNOME_APP (window), paned);
 
   gnome_app_create_menus_with_data (GNOME_APP (window), main_menu, msg);
   gnome_app_create_toolbar_with_data (GNOME_APP (window), main_toolbar, msg);

@@ -150,11 +150,17 @@ balsa_index_marshal_signal_1 (GtkObject * object,
 static void
 balsa_index_init (BalsaIndex * bindex)
 {
+/*
+ * status
+ * priority
+ * attachments
+ */
   GtkCList *clist;
   static gchar *titles[] =
   {
-    "F",
     "#",
+    "S",
+    "A",
     "From",
     "Subject",
     "Date"
@@ -167,18 +173,20 @@ balsa_index_init (BalsaIndex * bindex)
 
   /* create the clist */
   GTK_BIN (bindex)->child =
-    (GtkWidget *) clist = gtk_clist_new_with_titles (5, titles);
+    (GtkWidget *) clist = gtk_clist_new_with_titles (6, titles);
 
   gtk_widget_set_parent (GTK_WIDGET (clist), GTK_WIDGET (bindex));
   gtk_clist_set_policy (clist, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_BROWSE);
-  gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_CENTER);
-  gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_RIGHT);
-  gtk_clist_set_column_width (clist, 0, 9);
-  gtk_clist_set_column_width (clist, 1, 30);
-  gtk_clist_set_column_width (clist, 2, 150);
-  gtk_clist_set_column_width (clist, 3, 250);
-  gtk_clist_set_column_width (clist, 4, 100);
+  gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);
+  gtk_clist_set_column_justification (clist, 1, GTK_JUSTIFY_CENTER);
+  gtk_clist_set_column_justification (clist, 2, GTK_JUSTIFY_CENTER);
+  gtk_clist_set_column_width (clist, 0, 30);
+  gtk_clist_set_column_width (clist, 1, 9);
+  gtk_clist_set_column_width (clist, 2, 9);
+  gtk_clist_set_column_width (clist, 3, 150);
+  gtk_clist_set_column_width (clist, 4, 250);
+  gtk_clist_set_column_width (clist, 5, 100);
 
   gtk_signal_connect (GTK_OBJECT (clist),
 		      "select_row",
@@ -342,7 +350,7 @@ balsa_index_add (BalsaIndex * bindex,
 		 Message * message)
 {
   gchar buff1[1024], buff2[1024];
-  gchar *text[5];
+  gchar *text[6];
   gchar *tmp;
   gint row;
 
@@ -352,29 +360,32 @@ balsa_index_add (BalsaIndex * bindex,
   if (bindex->mailbox == NULL)
     return;
 
-  text[0] = flag_str (message->flags);
+  text[0] = buff1;
 
-  text[1] = buff1;
+  text[1] = flag_str (message->flags);
 
-  text[2] = buff2;
+  text[2] = NULL;  /* attachments */
+
+  text[3] = buff2;
+
   if (message->from)
     {
       if (message->from->personal)
-	sprintf (text[2], "%s", message->from->personal);
+	sprintf (text[3], "%s", message->from->personal);
       else
-	sprintf (text[2], "%s@%s", message->from->user, message->from->host);
+	sprintf (text[3], "%s@%s", message->from->user, message->from->host);
     }
   else
-    text[2] = NULL;
-  text[3] = message->subject;
+    text[3] = NULL;
+  text[4] = message->subject;
 
-  text[4] = message->date;
+  text[5] = message->date;
 
   row = gtk_clist_append (GTK_CLIST (GTK_BIN (bindex)->child), text);
 
   /* set message number */
-  sprintf (text[1], "%d", row + 1);
-  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, text[1]);
+  sprintf (text[0], "%d", row + 1);
+  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 0, text[0]);
 
   gtk_clist_set_row_data (GTK_CLIST (GTK_BIN (bindex)->child), row, (gpointer) message);
 
@@ -440,7 +451,7 @@ balsa_index_update_flag (BalsaIndex * bindex, Message * message)
   if (row < 0)
     return;
 
-  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 0, flag_str (message->flags));
+  gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, flag_str (message->flags));
 }
 
 

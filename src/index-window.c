@@ -64,8 +64,7 @@ static void undelete_message_cb (GtkWidget * widget, Message * message);
 
 
 
-void
-create_new_index (Mailbox * mailbox)
+void create_new_index (Mailbox * mailbox)
 {
   IndexWindow *iw;
   GList *list;

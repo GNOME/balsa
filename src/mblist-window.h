@@ -21,7 +21,7 @@
 
 #include "mailbox.h"
 
-void mblist_open_window (void);
+void mblist_open_window (GnomeMDI *);
 void mblist_add_mailbox (Mailbox * mailbox);
 void mblist_remove_mailbox (Mailbox * mailbox);
 

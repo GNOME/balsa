@@ -28,12 +28,13 @@ typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
   {
     GtkWidget *window;
+    GtkWidget *mdi;
     GtkWidget *tree;
   };
 
 static MBListWindow *mblw = NULL;
 
-void mblist_open_window (void);
+void mblist_open_window (GnomeMDI *);
 
 void mblist_add_mailbox (Mailbox * mailbox);
 void mblist_remove_mailbox (Mailbox * mailbox);
@@ -44,7 +45,7 @@ static void close_mblist_window (GtkWidget * widget);
 static void mailbox_select_cb (GtkTree * tree);
 
 void
-mblist_open_window (void)
+mblist_open_window (GnomeMDI *mdi)
 {
   GtkWidget *vbox;
   GtkWidget *scrolled_win;
@@ -141,6 +142,7 @@ mailbox_select_cb (GtkTree * tree)
   GList *selected;
   GtkTreeItem *selected_item;
   gint nb_selected;
+
 
   selected = tree->selection;
   nb_selected = g_list_length (selected);

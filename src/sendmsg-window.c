@@ -298,13 +298,13 @@ static GnomeUIInfo file_menu[] = {
 			   include_file_cb, GTK_STOCK_OPEN),
 #define MENU_FILE_ATTACH_POS 1
     GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
-			   attach_clicked, BALSA_PIXMAP_MENU_ATTACHMENT),
+			   attach_clicked, BALSA_PIXMAP_ATTACHMENT),
 #define MENU_MSG_INCLUDE_POS 2
     GNOMEUIINFO_ITEM_STOCK(N_("I_nclude Message(s)"), NULL,
-			   include_message_cb, BALSA_PIXMAP_MENU_NEW),
+			   include_message_cb, BALSA_PIXMAP_COMPOSE),
 #define MENU_FILE_ATTACH_MSG_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
-			   attach_message_cb, BALSA_PIXMAP_MENU_FORWARD),
+			   attach_message_cb, BALSA_PIXMAP_FORWARD),
 #define MENU_FILE_SEPARATOR1_POS 4
     GNOMEUIINFO_SEPARATOR,
 
@@ -312,23 +312,23 @@ static GnomeUIInfo file_menu[] = {
     { GNOME_APP_UI_ITEM, N_("Sen_d"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 6
     { GNOME_APP_UI_ITEM, N_("_Queue"),
       N_("Queue this message in Outbox for sending"),
       queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, 'Q', GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_SEND, 'Q', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_POSTPONE_POS 7
     GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
-			   postpone_message_cb, BALSA_PIXMAP_MENU_POSTPONE),
+			   postpone_message_cb, BALSA_PIXMAP_POSTPONE),
 #define MENU_FILE_SAVE_POS 8
     { GNOME_APP_UI_ITEM, N_("_Save"),
       N_("Save this message"),
       save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SAVE, 'S', GDK_CONTROL_MASK, NULL },
+      GTK_STOCK_SAVE, 'S', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_PRINT_POS 9
     GNOMEUIINFO_ITEM_STOCK(N_("_Print..."), N_("Print the edited message"),
-			   print_message_cb, BALSA_PIXMAP_MENU_PRINT),
+			   print_message_cb, GTK_STOCK_PRINT),
 #define MENU_FILE_SEPARATOR2_POS 10
     GNOMEUIINFO_SEPARATOR,
 
@@ -383,14 +383,14 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
                            N_("Select the Identity to use for the message"),
                            change_identity_dialog_cb,
-                           BALSA_PIXMAP_MENU_IDENTITY),
+                           BALSA_PIXMAP_IDENTITY),
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_EDIT_GNOME EDIT_MENU_SELECT_IDENT + 2
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit with Gnome-Editor"),
                            N_("Edit the current message with "
                               "the default Gnome editor"),
                            edit_with_gnome,
-                           BALSA_PIXMAP_MENU_IDENTITY), /*FIXME: Other icon */
+                           GTK_STOCK_EXECUTE), /*FIXME: Other icon */
     GNOMEUIINFO_END
 };
 
@@ -469,10 +469,10 @@ static GnomeUIInfo tu_file_more_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
 			   include_file_cb, GTK_STOCK_OPEN),
     GNOMEUIINFO_ITEM_STOCK(N_("I_nclude Message(s)"), NULL,
-			   include_message_cb, BALSA_PIXMAP_MENU_NEW),
+			   include_message_cb, BALSA_PIXMAP_NEW),
 #define MENU_FILE_ATTACH_MSG_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
-			   attach_message_cb, BALSA_PIXMAP_MENU_FORWARD),
+			   attach_message_cb, BALSA_PIXMAP_FORWARD),
     GNOMEUIINFO_END
 };
 
@@ -480,31 +480,31 @@ static GnomeUIInfo tu_file_more_menu[] = {
 static GnomeUIInfo file_menu[] = {
 #define MENU_FILE_ATTACH_POS 0
     GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
-			   attach_clicked, BALSA_PIXMAP_MENU_ATTACHMENT),
+			   attach_clicked, BALSA_PIXMAP_ATTACHMENT),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_SAVE_POS 2
     { GNOME_APP_UI_ITEM, N_("_Save"),
       N_("Save this message"),
       save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SAVE, 'S', GDK_CONTROL_MASK, NULL },
+      GTK_STOCK_SAVE, 'S', GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_PRINT_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("_Print..."), N_("Print the edited message"),
-			   print_message_cb, BALSA_PIXMAP_MENU_PRINT),
+			   print_message_cb, GTK_STOCK_PRINT),
     GNOMEUIINFO_SUBTREE(N_("_More"), tu_file_more_menu),
 #define MENU_FILE_POSTPONE_POS 5
     GNOMEUIINFO_ITEM_STOCK(N_("Sa_ve and Close"), NULL,
-			   postpone_message_cb, BALSA_PIXMAP_MENU_POSTPONE),
+			   postpone_message_cb, BALSA_PIXMAP_POSTPONE),
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_SEND_POS 7
     { GNOME_APP_UI_ITEM, N_("Sen_d"),
       N_("Send this message"),
       send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
 #define MENU_FILE_QUEUE_POS 8
     { GNOME_APP_UI_ITEM, N_("Send _Later"),
       N_("Queue this message in Outbox for sending"),
       queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_MENU_SEND, 'Q', GDK_CONTROL_MASK, NULL },
+      BALSA_PIXMAP_SEND, 'Q', GDK_CONTROL_MASK, NULL },
     GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_CLOSE_POS 10
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
@@ -604,7 +604,7 @@ static GnomeUIInfo tu_tools_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
                            N_("Select the Identity to use for the message"),
                            change_identity_dialog_cb,
-                           BALSA_PIXMAP_MENU_IDENTITY),
+                           BALSA_PIXMAP_IDENTITY),
 #define OPTS_MENU_DISPNOTIFY_POS 4
     GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, 
 			   toggle_reqdispnotify_cb, NULL),
@@ -2668,7 +2668,7 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     create_from_entry(table, bsmsg);
 
     /* To: */
-    create_email_entry(table, _("_To:"), 1, GNOME_STOCK_BOOK_RED,
+    create_email_entry(table, _("_To:"), 1, BALSA_PIXMAP_BOOK_RED,
                        bsmsg, bsmsg->to,
                        &bsmsg->to_info, 1, -1);
     g_signal_connect_swapped(G_OBJECT(bsmsg->to[1]), "changed",
@@ -2679,12 +2679,12 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
     g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
     /* cc: */
-    create_email_entry(table, _("Cc:"), 3, GNOME_STOCK_BOOK_YELLOW,
+    create_email_entry(table, _("Cc:"), 3, BALSA_PIXMAP_BOOK_YELLOW,
                        bsmsg, bsmsg->cc,
                        &bsmsg->cc_info, 0, -1);
 
     /* bcc: */
-    create_email_entry(table, _("Bcc:"), 4, GNOME_STOCK_BOOK_GREEN,
+    create_email_entry(table, _("Bcc:"), 4, BALSA_PIXMAP_BOOK_GREEN,
                        bsmsg, bsmsg->bcc,
                        &bsmsg->bcc_info, 0, -1);
 
@@ -2720,7 +2720,7 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
 
 #if !defined(ENABLE_TOUCH_UI)
     /* Reply To: */
-    create_email_entry(table, _("_Reply To:"), 6, GNOME_STOCK_BOOK_BLUE,
+    create_email_entry(table, _("_Reply To:"), 6, BALSA_PIXMAP_BOOK_BLUE,
                        bsmsg, bsmsg->reply_to,
                        &bsmsg->reply_to_info, 0, -1);
 #endif /* ENABLE_TOUCH_UI */
@@ -3585,8 +3585,8 @@ static const struct callback_item {
     {BALSA_PIXMAP_ATTACHMENT,  BALSA_TOOLBAR_FUNC(attach_clicked)},
     {BALSA_PIXMAP_IDENTITY,    BALSA_TOOLBAR_FUNC(change_identity_dialog_cb)},
     {BALSA_PIXMAP_POSTPONE,    BALSA_TOOLBAR_FUNC(postpone_message_cb)},
-    {BALSA_PIXMAP_PRINT,       BALSA_TOOLBAR_FUNC(print_message_cb)},
-    {BALSA_PIXMAP_SAVE,        BALSA_TOOLBAR_FUNC(save_message_cb)},
+    {GTK_STOCK_PRINT,          BALSA_TOOLBAR_FUNC(print_message_cb)},
+    {GTK_STOCK_SAVE,           BALSA_TOOLBAR_FUNC(save_message_cb)},
     {BALSA_PIXMAP_SEND,        BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
     {GTK_STOCK_CLOSE,          BALSA_TOOLBAR_FUNC(close_window_cb)},
     {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_cb)},
@@ -3607,7 +3607,7 @@ static const gchar* compose_toolbar[] = {
     "",
     BALSA_PIXMAP_ATTACHMENT,
     "",
-    BALSA_PIXMAP_SAVE,
+    GTK_STOCK_SAVE,
     "",
     BALSA_PIXMAP_SEND,
     "",
@@ -3619,7 +3619,7 @@ static const gchar* compose_toolbar[] = {
     "",
     BALSA_PIXMAP_ATTACHMENT,
     "",
-    BALSA_PIXMAP_SAVE,
+    GTK_STOCK_SAVE,
     "",
     GTK_STOCK_UNDO,
     GTK_STOCK_REDO,
@@ -3628,7 +3628,7 @@ static const gchar* compose_toolbar[] = {
     "",
     GTK_STOCK_SPELL_CHECK,
     "",
-    BALSA_PIXMAP_PRINT,
+    GTK_STOCK_PRINT,
     "",
     GTK_STOCK_CLOSE,
 #endif /* ENABLE_TOUCH_UI */

@@ -217,7 +217,7 @@ build_left_side(void)
     gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
     /* delete button */
     fe_delete_button =
-        balsa_stock_button_with_label(GNOME_STOCK_TRASH, _("_Delete"));
+        balsa_stock_button_with_label(GTK_STOCK_DELETE, _("_Delete"));
     g_signal_connect(G_OBJECT(fe_delete_button), "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);

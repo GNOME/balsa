@@ -4438,17 +4438,17 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     switch (gpgme_sigstat_to_protect_state(body)) {
     case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
 	icon = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-				      BALSA_PIXMAP_INFO_SIGN_GOOD,
+				      BALSA_PIXMAP_SIGN_GOOD,
 				      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
 	break;
     case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
 	icon = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-				      BALSA_PIXMAP_INFO_SIGN_NOTRUST,
+				      BALSA_PIXMAP_SIGN_NOTRUST,
 				      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
 	break;
     case LIBBALSA_MSG_PROTECT_SIGN_BAD:
 	icon = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-				      BALSA_PIXMAP_INFO_SIGN_BAD,
+				      BALSA_PIXMAP_SIGN_BAD,
 				      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
 	break;
     default:

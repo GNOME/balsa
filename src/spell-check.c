@@ -42,6 +42,7 @@
 #include "balsa-app.h"
 #include "quote-color.h"
 #include "spell-check.h"
+#include "balsa-icons.h"
 
 #define SPELLMGR_CODESET "UTF-8"
 
@@ -539,7 +540,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
                        vbox, FALSE, FALSE, 0);
 
     vbox = gtk_vbox_new(FALSE, padding);
-    learn = balsa_stock_button_with_label(GNOME_STOCK_BOOK_OPEN,
+    learn = balsa_stock_button_with_label(BALSA_PIXMAP_BOOK_OPEN,
                                           "_Learn");
     gtk_tooltips_set_tip(balsa_app.tooltips, learn,
 			 _("Add the current word to your personal dictionary"),

@@ -1,4 +1,4 @@
-SUBDIRS = mimetypes
+SUBDIRS = mimetypes 16x16 24x24
 
 # balsa_logo.png used by About menu (small one).
 # balsa-logo.png used by the init-druid
@@ -12,7 +12,14 @@ balsa_IMGS = \
 
 EXTRA_DIST =	$(balsa_IMGS)
 
-balsabitmapsdir = $(datadir)/balsa/pixmaps
+balsabitmapsdir = $(BALSA_DATA_PREFIX)/pixmaps
 
 balsabitmaps_DATA = $(balsa_IMGS)
 
+# the call to $(GTK_UPDATE_ICON_CACHE) updates the icon cache for the icons
+# installed in $(SUBDIRS) (Gtk+-2.6)
+install-data-hook:
+	if test -n "$(GTK_UPDATE_ICON_CACHE)" ; then                    \
+		$(GTK_UPDATE_ICON_CACHE) $(BALSA_DATA_PREFIX)/hicolor ; \
+		$(GTK_UPDATE_ICON_CACHE) $(HICOLOR_ICON_DIR) ;          \
+	fi

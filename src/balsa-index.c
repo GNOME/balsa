@@ -292,7 +292,6 @@ bi_apply_other_column_settings(GtkTreeViewColumn *column,
 
 /* BalsaIndex instance init method; no tree store is set on the tree
  * view--that's handled later, when the view is populated. */
-#define INDEX_ICON_SZ 16
 static void
 bndx_instance_init(BalsaIndex * index)
 {
@@ -300,6 +299,7 @@ bndx_instance_init(BalsaIndex * index)
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
+    gint icon_w, icon_h;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     {
@@ -315,6 +315,10 @@ bndx_instance_init(BalsaIndex * index)
 #else
 #define set_sizing(col)
 #endif
+
+    /* get the size of the icons */
+    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, &icon_h);
+    
     /* Index column */
     renderer = gtk_cell_renderer_text_new();
     column =
@@ -327,7 +331,7 @@ bndx_instance_init(BalsaIndex * index)
 
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
-    gtk_cell_renderer_set_fixed_size(renderer, INDEX_ICON_SZ, INDEX_ICON_SZ);
+    gtk_cell_renderer_set_fixed_size(renderer, icon_w, icon_h);
     column =
         gtk_tree_view_column_new_with_attributes("S", renderer,
                                                  "pixbuf", LB_MBOX_MARKED_COL,
@@ -337,7 +341,7 @@ bndx_instance_init(BalsaIndex * index)
 
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
-    gtk_cell_renderer_set_fixed_size(renderer, INDEX_ICON_SZ, INDEX_ICON_SZ);
+    gtk_cell_renderer_set_fixed_size(renderer, icon_w, icon_h);
     column =
         gtk_tree_view_column_new_with_attributes("A", renderer,
                                                  "pixbuf", LB_MBOX_ATTACH_COL,
@@ -1326,6 +1330,7 @@ void
 balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+    gint icon_w, icon_h;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     /* so that fixed width works properly */
@@ -1336,12 +1341,15 @@ balsa_index_set_column_widths(BalsaIndex * index)
                                          (tree_view, LB_MBOX_SIZE_COL),
                                          40); /* get a better guess */ 
 #endif
+    /* I have no idea why we must add 3 pixels to the icon width - otherwise,
+       the icon will be clipped... */
+    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, &icon_h);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MARKED_COL),
-                                         INDEX_ICON_SZ+2); 
+                                         icon_w + 3); 
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_ATTACH_COL),
-                                         INDEX_ICON_SZ+2);
+                                         icon_w + 3);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_FROM_COL),
                                          balsa_app.index_from_width);
@@ -1762,17 +1770,17 @@ bndx_popup_menu_create(BalsaIndex * index)
         GtkSignalFunc func;
     } entries[] = {
         {
-        BALSA_PIXMAP_MENU_REPLY, N_("_Reply..."),
+        BALSA_PIXMAP_REPLY, N_("_Reply..."),
                 GTK_SIGNAL_FUNC(balsa_message_reply)}, {
-        BALSA_PIXMAP_MENU_REPLY_ALL, N_("Reply To _All..."),
+        BALSA_PIXMAP_REPLY_ALL, N_("Reply To _All..."),
                 GTK_SIGNAL_FUNC(balsa_message_replytoall)}, {
-        BALSA_PIXMAP_MENU_REPLY_GROUP, N_("Reply To _Group..."),
+        BALSA_PIXMAP_REPLY_GROUP, N_("Reply To _Group..."),
                 GTK_SIGNAL_FUNC(balsa_message_replytogroup)}, {
-        BALSA_PIXMAP_MENU_FORWARD, N_("_Forward Attached..."),
+        BALSA_PIXMAP_FORWARD, N_("_Forward Attached..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_attached)}, {
-        BALSA_PIXMAP_MENU_FORWARD, N_("Forward _Inline..."),
+        BALSA_PIXMAP_FORWARD, N_("Forward _Inline..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_inline)}, {
-        GNOME_STOCK_BOOK_RED, N_("_Store Address..."),
+        BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."),
                 GTK_SIGNAL_FUNC(bndx_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
     unsigned i;
@@ -1786,7 +1794,7 @@ bndx_popup_menu_create(BalsaIndex * index)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), 
                           gtk_separator_menu_item_new());
     index->delete_item =
-        create_stock_menu_item(menu, GNOME_STOCK_TRASH,
+        create_stock_menu_item(menu, GTK_STOCK_DELETE,
                                _("_Delete"),
                                GTK_SIGNAL_FUNC(bi_toggle_deleted_cb),
                                index);
@@ -1796,7 +1804,7 @@ bndx_popup_menu_create(BalsaIndex * index)
                                GTK_SIGNAL_FUNC(bi_toggle_deleted_cb),
                                index);
     index->move_to_trash_item =
-        create_stock_menu_item(menu, GNOME_STOCK_TRASH,
+        create_stock_menu_item(menu, GTK_STOCK_DELETE,
                                _("Move To _Trash"),
                                GTK_SIGNAL_FUNC
                                (balsa_message_move_to_trash), index);
@@ -1808,7 +1816,7 @@ bndx_popup_menu_create(BalsaIndex * index)
                            _("_Flagged"),
                            GTK_SIGNAL_FUNC(bi_toggle_flagged_cb),
                            index);
-    create_stock_menu_item(submenu, BALSA_PIXMAP_MENU_NEW, _("_Unread"),
+    create_stock_menu_item(submenu, BALSA_PIXMAP_INFO_NEW, _("_Unread"),
                            GTK_SIGNAL_FUNC(bi_toggle_new_cb),
                            index);
 
@@ -1823,7 +1831,7 @@ bndx_popup_menu_create(BalsaIndex * index)
     
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), 
                           gtk_separator_menu_item_new());
-    create_stock_menu_item(menu, GNOME_STOCK_BOOK_OPEN,
+    create_stock_menu_item(menu, BALSA_PIXMAP_BOOK_OPEN,
                            _("_View Source"),
                            GTK_SIGNAL_FUNC(bndx_view_source),
                            index);

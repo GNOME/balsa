@@ -146,79 +146,79 @@ static GnomeUIInfo message_menu[] = {
     {
      GNOME_APP_UI_ITEM, N_("_Reply..."), N_("Reply to this message"),
      replyto_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_REPLY, 'R', 0, NULL},
+     BALSA_PIXMAP_REPLY, 'R', 0, NULL},
     /* A */
     {
      GNOME_APP_UI_ITEM, N_("Reply to _All..."),
      N_("Reply to all recipients of this message"),
      replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_REPLY_ALL, 'A', 0, NULL},
+     BALSA_PIXMAP_REPLY_ALL, 'A', 0, NULL},
     /* G */
     {
      GNOME_APP_UI_ITEM, N_("Reply to _Group..."),
      N_("Reply to mailing list"),
      replytogroup_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_REPLY_GROUP, 'G', 0, NULL},
+     BALSA_PIXMAP_REPLY_GROUP, 'G', 0, NULL},
     /* F */
     {
      GNOME_APP_UI_ITEM, N_("_Forward attached..."),
      N_("Forward this message as attachment"),
      forward_message_attached_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_FORWARD, 'F', 0, NULL},
+     BALSA_PIXMAP_FORWARD, 'F', 0, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Forward inline..."), 
      N_("Forward this message inline"),
      forward_message_inline_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_FORWARD, 'F', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_FORWARD, 'F', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MESSAGE_NEXT_PART_POS 6
     {
      GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in message"),
      next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_NEXT_PART, '.', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_NEXT_PART, '.', GDK_CONTROL_MASK, NULL},
 #define MENU_MESSAGE_PREVIOUS_PART_POS 7
     {
      GNOME_APP_UI_ITEM, N_("Previous Part"),
      N_("Previous part in message"),
      previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_PREVIOUS_PART, ',', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_PREVIOUS_PART, ',', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("Save Current Part..."),
      N_("Save current part in message"),
      save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL},
+     GTK_STOCK_SAVE, 's', GDK_CONTROL_MASK, NULL},
     {
      GNOME_APP_UI_ITEM, N_("_View Source..."),
      N_("View source form of the message"),
      view_msg_source_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_SAVE, 'v', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_BOOK_OPEN, 'v', GDK_CONTROL_MASK, NULL},
      GNOMEUIINFO_SEPARATOR,
     /* N */
 #define MENU_MESSAGE_NEXT_POS 11
     {
      GNOME_APP_UI_ITEM, N_("_Next Message"), N_("Next message"),
      next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_NEXT, 'N', 0, NULL},
+     BALSA_PIXMAP_NEXT, 'N', 0, NULL},
     /* P */
 #define MENU_MESSAGE_PREVIOUS_POS 12
     {
      GNOME_APP_UI_ITEM, N_("_Previous Message"),
      N_("Previous Message"),
      previous_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     BALSA_PIXMAP_MENU_PREVIOUS, 'P', 0, NULL},
+     BALSA_PIXMAP_PREVIOUS, 'P', 0, NULL},
     /* Ctrl + N */
 #define MENU_MESSAGE_NEXT_UNREAD_POS 13
     {
      GNOME_APP_UI_ITEM, N_("Next Unread Message"),
      N_("Next Unread Message"), next_unread_cb, NULL, NULL,
-     GNOME_APP_PIXMAP_STOCK, BALSA_PIXMAP_MENU_NEXT_UNREAD, 'N',
+     GNOME_APP_PIXMAP_STOCK, BALSA_PIXMAP_NEXT_UNREAD, 'N',
      GDK_CONTROL_MASK, NULL},
     /* Ctrl + Alt + F */
 #define MENU_MESSAGE_NEXT_FLAGGED_POS 14
     {
      GNOME_APP_UI_ITEM, N_("Next Flagged Message"),
      N_("Next Flagged Message"), next_flagged_cb, NULL, NULL,
-     GNOME_APP_PIXMAP_STOCK, BALSA_PIXMAP_MENU_NEXT_FLAGGED, 'F',
+     GNOME_APP_PIXMAP_STOCK, BALSA_PIXMAP_NEXT_FLAGGED, 'F',
      GDK_MOD1_MASK|GDK_CONTROL_MASK, NULL},
      GNOMEUIINFO_SEPARATOR,
      /* D */
@@ -227,7 +227,7 @@ static GnomeUIInfo message_menu[] = {
      GNOME_APP_UI_ITEM, N_("_Move to Trash"),
      N_("Move the message to Trash mailbox"),
      trash_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_TRASH, 'D', 0, NULL},
+     GTK_STOCK_DELETE, 'D', 0, NULL},
     GNOMEUIINFO_END
 };
 
@@ -401,9 +401,9 @@ static const struct callback_item {
     { BALSA_PIXMAP_NEXT_PART,    next_part_cb },
     { BALSA_PIXMAP_NEXT_UNREAD,  next_unread_cb },
     { BALSA_PIXMAP_NEXT_FLAGGED, next_flagged_cb },
-    { BALSA_PIXMAP_TRASH,        trash_cb },
-    { BALSA_PIXMAP_PRINT,        print_cb },
-    { BALSA_PIXMAP_SAVE,         save_current_part_cb },
+    { GTK_STOCK_DELETE,           trash_cb },
+    { GTK_STOCK_PRINT,           print_cb },
+    { GTK_STOCK_SAVE,            save_current_part_cb },
     { GTK_STOCK_CLOSE,           close_message_window },
     { BALSA_PIXMAP_SHOW_HEADERS, show_all_headers_tool_cb }
 };
@@ -417,9 +417,9 @@ static const gchar* message_toolbar[] = {
     BALSA_PIXMAP_REPLY_ALL,
     BALSA_PIXMAP_FORWARD,
     "",
-    BALSA_PIXMAP_PRINT,
+    GTK_STOCK_PRINT,
     "",
-    BALSA_PIXMAP_TRASH,
+    GTK_STOCK_DELETE,
     "",
     GTK_STOCK_CLOSE
 #else /* ENABLE_TOUCH_UI */
@@ -432,11 +432,11 @@ static const gchar* message_toolbar[] = {
     "",
     BALSA_PIXMAP_PREVIOUS_PART,
     BALSA_PIXMAP_NEXT_PART,
-    BALSA_PIXMAP_SAVE,
+    GTK_STOCK_SAVE,
     "",
-    BALSA_PIXMAP_PRINT,
+    GTK_STOCK_PRINT,
     "",
-    BALSA_PIXMAP_TRASH
+    GTK_STOCK_DELETE
 #endif /* ENEBLE_TOUCH_UI */
 };
 
@@ -495,7 +495,7 @@ bindex_closed_cb(gpointer data, GObject *bindex)
 static void
 mw_disable_trash(MessageWindow * mw, GtkWidget * toolbar)
 {
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_TRASH, FALSE);
+    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_DELETE, FALSE);
     gtk_widget_set_sensitive(mw->trash, FALSE);
 }
 

@@ -183,7 +183,7 @@ get_toolbar_button_index(const char *id)
         gchar *old;
     } button_converter[] = {
         { BALSA_PIXMAP_ATTACHMENT,   GNOME_STOCK_ATTACH },
-        { BALSA_PIXMAP_NEW,          GNOME_STOCK_MAIL_NEW },
+        { BALSA_PIXMAP_COMPOSE,      GNOME_STOCK_MAIL_NEW },
         { BALSA_PIXMAP_CONTINUE,     GNOME_STOCK_MAIL },
         { BALSA_PIXMAP_RECEIVE,      GNOME_STOCK_MAIL_RCV },
         { BALSA_PIXMAP_REPLY,        GNOME_STOCK_MAIL_RPL },
@@ -192,20 +192,19 @@ get_toolbar_button_index(const char *id)
         { BALSA_PIXMAP_FORWARD,      GNOME_STOCK_MAIL_FWD },
         { BALSA_PIXMAP_NEXT,         GTK_STOCK_GO_FORWARD },
         { BALSA_PIXMAP_PREVIOUS,     GTK_STOCK_GO_BACK },
-        { BALSA_PIXMAP_PRINT,        GTK_STOCK_PRINT },
-        { BALSA_PIXMAP_SAVE,         GTK_STOCK_SAVE },
+	{ GTK_STOCK_PRINT,           BALSA_OLD_PIXMAP_PRINT },
+	{ GTK_STOCK_SAVE,            BALSA_OLD_PIXMAP_SAVE },
         { BALSA_PIXMAP_SEND,         GNOME_STOCK_MAIL_SND },
-        { BALSA_PIXMAP_TRASH,        GNOME_STOCK_TRASH },
+	{ GTK_STOCK_DELETE,          BALSA_OLD_PIXMAP_TRASH },
         { BALSA_PIXMAP_TRASH_EMPTY,  "empty_trash" },
         { BALSA_PIXMAP_NEXT_UNREAD,  "next_unread" },
         { BALSA_PIXMAP_NEXT_FLAGGED, "next_flagged" },
         { BALSA_PIXMAP_SHOW_HEADERS, "show_all_headers" },
         { BALSA_PIXMAP_SHOW_PREVIEW, "show_preview" },
         { BALSA_PIXMAP_MARKED_NEW,   "flag_unread" },
-        { BALSA_PIXMAP_MARKED_ALL,   "mark_all" },
+        { BALSA_PIXMAP_MARK_ALL,     "mark_all" },
         { BALSA_PIXMAP_IDENTITY,     "identity" },
-        { BALSA_PIXMAP_CLOSE_MBOX,   GTK_STOCK_CLOSE },
-        { BALSA_PIXMAP_OTHER_CLOSE,  "close_mbox" },
+	{ GTK_STOCK_CANCEL,          BALSA_OLD_PIXMAP_CLOSE_MBOX },
         { NULL, NULL }
     };
 #endif

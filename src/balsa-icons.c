@@ -28,87 +28,27 @@
 #include "libbalsa.h"
 #include "mailbox.h"
 
-#include "pixmaps/balsa_attachment.xpm"
-#include "pixmaps/balsa_compose.xpm"
-#include "pixmaps/balsa_continue.xpm"
-#include "pixmaps/balsa_receive.xpm"
-#include "pixmaps/balsa_reply.xpm"
-#include "pixmaps/balsa_reply_all.xpm"
-#include "pixmaps/balsa_reply_group.xpm"
-#include "pixmaps/balsa_forward.xpm"
-#include "pixmaps/balsa_next.xpm"
-#include "pixmaps/balsa_next_part.xpm"
-#include "pixmaps/balsa_previous.xpm"
-#include "pixmaps/balsa_previous_part.xpm"
-#include "pixmaps/balsa_postpone.xpm"
-#include "pixmaps/balsa_print.xpm"
-#include "pixmaps/balsa_save.xpm"
-#include "pixmaps/balsa_send.xpm"
-#include "pixmaps/balsa_send_receive.xpm"
-#include "pixmaps/balsa_trash.xpm"
-#include "pixmaps/balsa_trash_empty.xpm"
-#include "pixmaps/balsa_next_unread.xpm"
-#include "pixmaps/balsa_next_flagged.xpm"
-#include "pixmaps/balsa_show_headers.xpm"
-#include "pixmaps/balsa_show_preview.xpm"
-#include "pixmaps/balsa_marked_new.xpm"
-#include "pixmaps/balsa_marked_all.xpm"
-#include "pixmaps/balsa_identity.xpm"
-#include "pixmaps/balsa_close_mbox.xpm"
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
-#include "pixmaps/mbox_draft.xpm"
-#include "pixmaps/mbox_in.xpm"
-#include "pixmaps/mbox_out.xpm"
-#include "pixmaps/mbox_sent.xpm"
-#include "pixmaps/mbox_trash.xpm"
+/* comment out the next line to suppress info about loading images */
+#define BICONS_VERBOSE
 
-#include "pixmaps/mbox_tray_empty.xpm"
-#include "pixmaps/mbox_tray_full.xpm"
-
-#include "pixmaps/mbox_dir_closed.xpm"
-#include "pixmaps/mbox_dir_open.xpm"
-
-#include "pixmaps/info_replied.xpm"
-#include "pixmaps/info_flagged.xpm"
-#include "pixmaps/info_new.xpm"
-#include "pixmaps/info_attachment.xpm"
-#ifdef HAVE_GPGME
-#  include "pixmaps/balsa_gpg_sign.xpm"
-#  include "pixmaps/balsa_gpg_encrypt.xpm"
-#  include "pixmaps/balsa_gpg_recheck.xpm"
-#  include "pixmaps/info_lock.xpm"
-#  include "pixmaps/info_lock_good.xpm"
-#  include "pixmaps/info_lock_sigtrust.xpm"
-#  include "pixmaps/info_lock_bad.xpm"
-#  include "pixmaps/info_lock_encr.xpm"
+#ifdef BICONS_VERBOSE
+#  define BICONS_LOG(...)   g_message(__VA_ARGS__)
+#  define BICONS_ERR(...)   g_warning(__VA_ARGS__)
+#else
+#  define BICONS_LOG(...)
+#  define BICONS_ERR(...)
 #endif
 
-#include "pixmaps/menu_flagged.xpm"
-#include "pixmaps/menu_new.xpm"
-#include "pixmaps/menu_identity.xpm"
-#include "pixmaps/menu_forward.xpm"
-#include "pixmaps/menu_reply.xpm"
-#include "pixmaps/menu_reply_all.xpm"
-#include "pixmaps/menu_reply_group.xpm"
-#include "pixmaps/menu_postpone.xpm"
-#include "pixmaps/menu_print.xpm"
-#include "pixmaps/menu_next.xpm"
-#include "pixmaps/menu_next_part.xpm"
-#include "pixmaps/menu_previous.xpm"
-#include "pixmaps/menu_previous_part.xpm"
-#include "pixmaps/menu_save.xpm"
-#include "pixmaps/menu_send.xpm"
-#include "pixmaps/menu_send_receive.xpm"
-#include "pixmaps/menu_compose.xpm"
-#include "pixmaps/menu_attachment.xpm"
-#include "pixmaps/menu_receive.xpm"
-#include "pixmaps/menu_next_flagged.xpm"
-#include "pixmaps/menu_next_unread.xpm"
-#include "pixmaps/menu_mark_all.xpm"
 
-#include "pixmaps/other_close.xpm"
-
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+#define BALSA_PIXMAP_SIZES     2
+typedef struct {
+    const gchar * name;
+    const gchar * stock_id;
+    GtkIconSize sizes[BALSA_PIXMAP_SIZES];
+} balsa_pixmap_t;
+    
 
 void
 balsa_icon_create(const gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
@@ -119,117 +59,191 @@ balsa_icon_create(const gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 }
 
 static void
-register_balsa_pixmap(const gchar * stock_id, const char ** data,
-                      GtkIconFactory * factory)
+load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory, 
+		  const balsa_pixmap_t *bpixmap)
 {
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_xpm_data(data);
-    GtkIconSet *icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
+    GdkPixbuf *pixbuf;
+    GtkIconSet *icon_set;
+    GError *error = NULL;
+    gint n, width, height;
 
-    gtk_icon_factory_add(factory, stock_id, icon_set);
+    BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
+	       bpixmap->stock_id);
+    if (!gtk_icon_size_lookup(bpixmap->sizes[0], &width, &height)) {
+	BICONS_ERR("failed: could not look up default icon size %d",
+		   bpixmap->sizes[0]);
+	return;
+    }
+
+    pixbuf = 
+	gtk_icon_theme_load_icon(icon_theme, bpixmap->stock_id, width,
+				 GTK_ICON_LOOKUP_USE_BUILTIN, &error);
+    if (!pixbuf) {
+	BICONS_ERR("default size %d failed: %s", width, error->message);
+	g_error_free(error);
+	return;
+    }
+    BICONS_LOG("\tloaded with size %d", width);
+    icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
+    g_object_unref(pixbuf);
+
+    for (n = 1; 
+	 n < BALSA_PIXMAP_SIZES && bpixmap->sizes[n] > GTK_ICON_SIZE_INVALID;
+	 n++) {
+	if (gtk_icon_size_lookup(bpixmap->sizes[n], &width, &height)) {
+	    pixbuf = 
+		gtk_icon_theme_load_icon(icon_theme, bpixmap->stock_id, width,
+					 GTK_ICON_LOOKUP_USE_BUILTIN, &error);
+	    if (!pixbuf) {
+		BICONS_ERR("additional size %d failed: %s", width,
+			   error->message);
+		g_error_free(error);
+		error = NULL;
+	    } else {
+		GtkIconSource *icon_source = gtk_icon_source_new();
+		
+		BICONS_LOG("\tloaded with size %d", width);
+		gtk_icon_source_set_pixbuf(icon_source, pixbuf);
+		g_object_unref(pixbuf);
+		gtk_icon_source_set_size(icon_source, bpixmap->sizes[n]);
+		gtk_icon_source_set_size_wildcarded(icon_source, FALSE);
+		gtk_icon_set_add_source(icon_set, icon_source);
+	    }
+	} else
+	    BICONS_ERR("bad size %d", bpixmap->sizes[n]);
+    }
+
+    gtk_icon_factory_add(factory, bpixmap->name, icon_set);
 }
 
 void
 register_balsa_pixmaps(void)
 {
-    const struct {
-	const char *name;
-	const char **xpm;
-    } icons[] = {
-	/* Toolbar icons */
-	{ BALSA_PIXMAP_ATTACHMENT,	    balsa_attachment_xpm},
-	{ BALSA_PIXMAP_NEW,		    balsa_compose_xpm},
-	{ BALSA_PIXMAP_CONTINUE,	    balsa_continue_xpm},
-	{ BALSA_PIXMAP_RECEIVE,		    balsa_receive_xpm},
-	{ BALSA_PIXMAP_REPLY,		    balsa_reply_xpm},
-	{ BALSA_PIXMAP_REPLY_ALL,	    balsa_reply_all_xpm},
-	{ BALSA_PIXMAP_REPLY_GROUP,	    balsa_reply_group_xpm},
-	{ BALSA_PIXMAP_FORWARD,		    balsa_forward_xpm},
-	{ BALSA_PIXMAP_NEXT,		    balsa_next_xpm},
-	{ BALSA_PIXMAP_NEXT_PART,		    balsa_next_part_xpm},
-	{ BALSA_PIXMAP_PREVIOUS,	    balsa_previous_xpm},
-	{ BALSA_PIXMAP_PREVIOUS_PART,	    balsa_previous_part_xpm},
-	{ BALSA_PIXMAP_POSTPONE,	    balsa_postpone_xpm},
-	{ BALSA_PIXMAP_PRINT,		    balsa_print_xpm},
-	{ BALSA_PIXMAP_SAVE,		    balsa_save_xpm},
-	{ BALSA_PIXMAP_SEND,		    balsa_send_xpm},
-	{ BALSA_PIXMAP_SEND_RECEIVE,	    balsa_send_receive_xpm},
-	{ BALSA_PIXMAP_TRASH,		    balsa_trash_xpm},
-	{ BALSA_PIXMAP_TRASH_EMPTY,	    balsa_trash_empty_xpm},
-	{ BALSA_PIXMAP_NEXT_UNREAD,	    balsa_next_unread_xpm},
-	{ BALSA_PIXMAP_NEXT_FLAGGED,	    balsa_next_flagged_xpm},
-	{ BALSA_PIXMAP_SHOW_HEADERS,	    balsa_show_headers_xpm},
-	{ BALSA_PIXMAP_SHOW_PREVIEW,	    balsa_show_preview_xpm},
-	{ BALSA_PIXMAP_MARKED_NEW,	    balsa_marked_new_xpm},
-	{ BALSA_PIXMAP_MARKED_ALL,	    balsa_marked_all_xpm},
-	{ BALSA_PIXMAP_IDENTITY,	    balsa_identity_xpm},
-	{ BALSA_PIXMAP_CLOSE_MBOX,	    balsa_close_mbox_xpm},
+    const balsa_pixmap_t balsa_icons[] = {
+	/* icons for buttons and menus (24x24 and 16x16) */
+	{ BALSA_PIXMAP_COMPOSE,         "stock_mail-compose", 
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_REPLY,           "stock_mail-reply", 
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_REPLY_GROUP,     "stock_mail-reply-to-all", 
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_SEND,            "stock_mail-send",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_RECEIVE,         "stock_mail-receive",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_SEND_RECEIVE,    "stock_mail-send-receive",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_FORWARD,         "stock_mail-forward",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_IDENTITY,        "stock_contact",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_CONTINUE,	"stock_mail",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_POSTPONE,	"balsa-postpone",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_REPLY_ALL,	"balsa-reply-all",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_NEXT_PART,	"balsa-next-part",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_PREVIOUS_PART,	"balsa-previous-part",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_MARK_ALL,	"balsa-mark-all",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_ATTACHMENT,	"stock_attach",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_NEXT,		"balsa-next",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_PREVIOUS,	"balsa-previous",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_NEXT_UNREAD,	"balsa-next-unread",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_NEXT_FLAGGED,	"balsa-next-flagged",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+
 #ifdef HAVE_GPGME
-	{ BALSA_PIXMAP_GPG_SIGN,            balsa_gpg_sign_xpm},
-	{ BALSA_PIXMAP_GPG_ENCRYPT,         balsa_gpg_encrypt_xpm},
-	{ BALSA_PIXMAP_GPG_RECHECK,         balsa_gpg_recheck_xpm},
+	/* crypto status icons, for both the structure view tree (24x24)
+	 * and the index (16x16) */
+        { BALSA_PIXMAP_SIGN,            "balsa-signature-unknown",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+        { BALSA_PIXMAP_SIGN_GOOD,       "balsa-signature-good",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_SIGN_NOTRUST,    "balsa-signature-notrust",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+        { BALSA_PIXMAP_SIGN_BAD,        "balsa-signature-bad",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+        { BALSA_PIXMAP_ENCR,            "balsa-encrypted",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 #endif
 
-	/* Menu icons */
-	{ BALSA_PIXMAP_MENU_NEW,	    menu_new_xpm},
-	{ BALSA_PIXMAP_MENU_FLAGGED,	    menu_flagged_xpm},
-	{ BALSA_PIXMAP_MENU_IDENTITY,	    menu_identity_xpm},
-	{ BALSA_PIXMAP_MENU_FORWARD,	    menu_forward_xpm},
-	{ BALSA_PIXMAP_MENU_REPLY,	    menu_reply_xpm},
-	{ BALSA_PIXMAP_MENU_REPLY_ALL,	    menu_reply_all_xpm},
-	{ BALSA_PIXMAP_MENU_REPLY_GROUP,    menu_reply_group_xpm},
-	{ BALSA_PIXMAP_MENU_POSTPONE,	    menu_postpone_xpm},
-	{ BALSA_PIXMAP_MENU_PRINT,	    menu_print_xpm},
-	{ BALSA_PIXMAP_MENU_NEXT,	    menu_next_xpm},
-	{ BALSA_PIXMAP_MENU_NEXT_PART,	    menu_next_part_xpm},
-	{ BALSA_PIXMAP_MENU_PREVIOUS,	    menu_previous_xpm},
-	{ BALSA_PIXMAP_MENU_PREVIOUS_PART,	    menu_previous_part_xpm},
-	{ BALSA_PIXMAP_MENU_SAVE,	    menu_save_xpm},
-	{ BALSA_PIXMAP_MENU_SEND,	    menu_send_xpm},
-	{ BALSA_PIXMAP_MENU_SEND_RECEIVE,   menu_send_receive_xpm},
-	{ BALSA_PIXMAP_MENU_COMPOSE,	    menu_compose_xpm},
-	{ BALSA_PIXMAP_MENU_ATTACHMENT,	    menu_attachment_xpm},
-	{ BALSA_PIXMAP_MENU_RECEIVE,	    menu_receive_xpm},
-	{ BALSA_PIXMAP_MENU_NEXT_FLAGGED,   menu_next_flagged_xpm},
-	{ BALSA_PIXMAP_MENU_NEXT_UNREAD,    menu_next_unread_xpm},
-	{ BALSA_PIXMAP_MENU_MARK_ALL,	    menu_mark_all_xpm},
+	/* the following book icons aren't strictly necessary as Gnome provides
+	   them. However, this simplifies porting balsa if the Gnome libs
+	   aren't present... */
+        { BALSA_PIXMAP_BOOK_RED,        "stock_book_red",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+        { BALSA_PIXMAP_BOOK_YELLOW,     "stock_book_yellow",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_BOOK_GREEN,      "stock_book_green",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_BOOK_BLUE,       "stock_book_blue",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_BOOK_OPEN,       "stock_book_open",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 
-	/* Other icons */
-	{ BALSA_PIXMAP_OTHER_CLOSE,		other_close_xpm},
-
-        /* BalsaMBList icons */
-        { BALSA_PIXMAP_MBOX_DRAFT,      mbox_draft_xpm },
-        { BALSA_PIXMAP_MBOX_IN,         mbox_in_xpm },
-        { BALSA_PIXMAP_MBOX_OUT,        mbox_out_xpm },
-        { BALSA_PIXMAP_MBOX_SENT,       mbox_sent_xpm },
-        { BALSA_PIXMAP_MBOX_TRASH,      mbox_trash_xpm },
-        { BALSA_PIXMAP_MBOX_TRAY_EMPTY, mbox_tray_empty_xpm },
-        { BALSA_PIXMAP_MBOX_TRAY_FULL,  mbox_tray_full_xpm },
-        { BALSA_PIXMAP_MBOX_DIR_OPEN,   mbox_dir_open_xpm },
-        { BALSA_PIXMAP_MBOX_DIR_CLOSED, mbox_dir_closed_xpm },
-
-        /* BalsaIndex icons */
-        { BALSA_PIXMAP_INFO_FLAGGED,    info_flagged_xpm },
-        { BALSA_PIXMAP_INFO_REPLIED,    info_replied_xpm },
-        { BALSA_PIXMAP_INFO_NEW,        info_new_xpm },
-        { BALSA_PIXMAP_INFO_ATTACHMENT, info_attachment_xpm },
-	{ BALSA_PIXMAP_INFO_DELETED,	mbox_trash_xpm}, /* share the icon */
+	/* button-only icons */
+	{ BALSA_PIXMAP_SHOW_HEADERS,    "stock_view-fields",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+	{ BALSA_PIXMAP_SHOW_PREVIEW,	"balsa-preview",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+	{ BALSA_PIXMAP_MARKED_NEW,	"balsa-marked-new",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+	{ BALSA_PIXMAP_TRASH_EMPTY,	"balsa-trash-empty",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
 #ifdef HAVE_GPGME
-        { BALSA_PIXMAP_INFO_SIGN,       info_sign_xpm },
-        { BALSA_PIXMAP_INFO_SIGN_GOOD,  info_sign_good_xpm },
-	{ BALSA_PIXMAP_INFO_SIGN_NOTRUST, info_lock_sigtrust_xpm },
-        { BALSA_PIXMAP_INFO_SIGN_BAD,   info_sign_bad_xpm },
-        { BALSA_PIXMAP_INFO_ENCR,       info_encr_xpm },
+	{ BALSA_PIXMAP_GPG_SIGN,        "balsa-sign",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+	{ BALSA_PIXMAP_GPG_ENCRYPT,     "balsa-encrypt",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
+	{ BALSA_PIXMAP_GPG_RECHECK,     "balsa-crypt-check",
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_INVALID } },
 #endif
-    };
+
+	/* mailbox icons (16x16) */
+        { BALSA_PIXMAP_MBOX_IN,         "stock_inbox",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_OUT,        "stock_outbox",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_DRAFT,      "balsa-mbox-draft",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_SENT,       "balsa-mbox-sent",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_TRAY_FULL,  "balsa-mbox-tray-full",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_TRAY_EMPTY, "balsa-mbox-tray-empty",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_DIR_OPEN,   "gnome-fs-directory-accept",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_DIR_CLOSED, "gnome-fs-directory",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+	
+	/* index icons (16x16) */
+        { BALSA_PIXMAP_INFO_REPLIED,    "stock_mail-replied",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_INFO_NEW,        "stock_mail-unread",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+	{ BALSA_PIXMAP_INFO_FLAGGED,    "stock_mail-flag-for-followup",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+
+	};
 
     unsigned i;
     GtkIconFactory *factory = gtk_icon_factory_new();
+    GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
 
     gtk_icon_factory_add_default(factory);
+    gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
 
-    for(i = 0; i < ELEMENTS(icons); i++)
-	register_balsa_pixmap(icons[i].name, icons[i].xpm,
-                              factory);
+    for (i = 0; i < ELEMENTS(balsa_icons); i++)
+	load_balsa_pixmap(icon_theme, factory, balsa_icons + i);
 }
 
 void
@@ -247,11 +261,11 @@ register_balsa_pixbufs(GtkWidget * widget)
 	libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT},
 #ifdef HAVE_GPGME
 	{
-	libbalsa_mailbox_set_good_icon, BALSA_PIXMAP_INFO_SIGN_GOOD}, {
-	libbalsa_mailbox_set_notrust_icon, BALSA_PIXMAP_INFO_SIGN_NOTRUST}, {
-	libbalsa_mailbox_set_bad_icon, BALSA_PIXMAP_INFO_SIGN_BAD}, {
-	libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_INFO_SIGN}, {
-	libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_INFO_ENCR},
+	libbalsa_mailbox_set_good_icon, BALSA_PIXMAP_SIGN_GOOD}, {
+	libbalsa_mailbox_set_notrust_icon, BALSA_PIXMAP_SIGN_NOTRUST}, {
+	libbalsa_mailbox_set_bad_icon, BALSA_PIXMAP_SIGN_BAD}, {
+	libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_SIGN}, {
+	libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_ENCR},
 #endif
     };
     guint i;

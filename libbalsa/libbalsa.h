@@ -130,6 +130,8 @@ void libbalsa_certs_destroy(void);
 #include <pthread.h>
 pthread_t libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
+void libbalsa_threads_init(void);
+void libbalsa_threads_destroy(void);
 #else
 #define libbalsa_am_i_subthread() FALSE
 #endif /* BALSA_USE_THREADS */

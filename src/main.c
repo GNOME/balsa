@@ -325,23 +325,7 @@ mailboxes_init(gboolean check_only)
     }
 }
 
-
 #ifdef BALSA_USE_THREADS
-/* Recursive mutex for gdk_threads_{enter,leave}. */
-static pthread_mutex_t balsa_threads_mutex;
-
-static void
-balsa_threads_enter(void)
-{
-    pthread_mutex_lock(&balsa_threads_mutex);
-}
-
-static void
-balsa_threads_leave(void)
-{
-    gdk_display_flush(gdk_display_get_default());
-    pthread_mutex_unlock(&balsa_threads_mutex);
-}
 
 static void
 threads_init(void)
@@ -354,9 +338,8 @@ threads_init(void)
         g_warning("pthread_mutexattr_init failed with %d\n", status);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&mailbox_lock, &attr);
-    pthread_mutex_init(&balsa_threads_mutex, &attr);
-    gdk_threads_set_lock_functions(G_CALLBACK(balsa_threads_enter),
-                                   G_CALLBACK(balsa_threads_leave));
+
+    libbalsa_threads_init();
     gdk_threads_init();
 
     pthread_mutexattr_destroy(&attr);
@@ -389,7 +372,7 @@ threads_destroy(void)
 {
     pthread_mutex_destroy(&mailbox_lock);
     pthread_mutex_destroy(&send_messages_lock);
-    pthread_mutex_destroy(&balsa_threads_mutex);
+    libbalsa_threads_destroy();
 }
 
 #endif				/* BALSA_USE_THREADS */

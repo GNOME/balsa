@@ -44,6 +44,7 @@
 
 #ifdef BALSA_USE_THREADS
 static pthread_t main_thread_id;
+static pthread_t libbalsa_threads_id;
 #endif
 
 #define POP_SERVER "pop"
@@ -680,37 +681,113 @@ static pthread_cond_t mailbox_cond = PTHREAD_COND_INITIALIZER;
 
 /* Lock/unlock a mailbox; no argument checking--we'll assume the caller
  * took care of that. 
- * We assume that this function is called for helper threads without gdk lock
- * since they usually do not have it but WITH for the main lock - which 
- * usually has it.
  */
+#define LIBBALSA_DEBUG_THREADS TRUE
 void
 libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {
     pthread_t thread_id = pthread_self();
-    gboolean is_main_thread =
-	(thread_id == main_thread_id);
 
     pthread_mutex_lock(&mailbox_lock);
+
     while (mailbox->lock && mailbox->thread_id != thread_id) {
-        if(is_main_thread) gdk_threads_leave();
+        gint count = 0;
+
+        while (thread_id == libbalsa_threads_id) {
+	    ++count;
+#if LIBBALSA_DEBUG_THREADS
+            g_message("Temporary gdk_threads_leave!!!");
+#endif /* LIBBALSA_DEBUG_THREADS */
+            gdk_threads_leave();
+	}
 	pthread_cond_wait(&mailbox_cond, &mailbox_lock);
-        if(is_main_thread) gdk_threads_enter();
+        while (--count >= 0) {
+            gdk_threads_enter();
+#if LIBBALSA_DEBUG_THREADS
+            g_message("...and gdk_threads_enter!!!");
+#endif /* LIBBALSA_DEBUG_THREADS */
+        }
     }
+
     /* We'll assume that no-one would destroy a mailbox while we've been
      * trying to lock it. If they have, we have larger problems than
      * this reference! */
     mailbox->lock++;
     mailbox->thread_id = thread_id;
+
     pthread_mutex_unlock(&mailbox_lock);
 }
 
 void
 libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
 {
+#if LIBBALSA_DEBUG_THREADS
+    pthread_t self;
+
+    self = pthread_self();
+
+    if (self != mailbox->thread_id) {
+	g_warning("Not holding mailbox lock!!!");
+	return;
+    }
+
+#endif /* LIBBALSA_DEBUG_THREADS */
     pthread_mutex_lock(&mailbox_lock);
     if(!--mailbox->lock)
         pthread_cond_broadcast(&mailbox_cond);
     pthread_mutex_unlock(&mailbox_lock);
 }
+
+/* Recursive mutex for gdk_threads_{enter,leave}. */
+static pthread_mutex_t libbalsa_threads_mutex;
+static guint libbalsa_threads_lock;
+
+static void
+libbalsa_threads_enter(void)
+{
+    pthread_t self;
+
+    self = pthread_self();
+
+    if (self != libbalsa_threads_id) {
+        pthread_mutex_lock(&libbalsa_threads_mutex);
+        libbalsa_threads_id = self;
+    }
+    ++libbalsa_threads_lock;
+}
+
+static void
+libbalsa_threads_leave(void)
+{
+#if LIBBALSA_DEBUG_THREADS
+    pthread_t self;
+
+    self = pthread_self();
+
+    if (self != libbalsa_threads_id) {
+	g_warning("Not holding gdk lock!!!");
+	return;
+    }
+#endif /* LIBBALSA_DEBUG_THREADS */
+    if (--libbalsa_threads_lock == 0) {
+        gdk_display_flush(gdk_display_get_default());
+        libbalsa_threads_id = 0;
+        pthread_mutex_unlock(&libbalsa_threads_mutex);
+    }
+}
+
+void
+libbalsa_threads_init(void)
+{
+    pthread_mutex_init(&libbalsa_threads_mutex, NULL);
+    gdk_threads_set_lock_functions(G_CALLBACK(libbalsa_threads_enter),
+                                   G_CALLBACK(libbalsa_threads_leave));
+}
+
+void
+libbalsa_threads_destroy(void)
+{
+    pthread_mutex_destroy(&libbalsa_threads_mutex);
+}
+
 #endif				/* BALSA_USE_THREADS */

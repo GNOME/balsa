@@ -974,15 +974,29 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 #endif /* CACHE_UNSEEN_CHILD */
 }
 
+static void 
+lbm_threads_enter(LibBalsaMailbox * mailbox)
+{
+    libbalsa_lock_mailbox(mailbox);
+    gdk_threads_enter();
+}
+
+static void 
+lbm_threads_leave(LibBalsaMailbox * mailbox)
+{
+    gdk_threads_leave();
+    libbalsa_unlock_mailbox(mailbox);
+}
+
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     if (!mailbox->msg_tree)
         return;
 
-    gdk_threads_enter();
+    lbm_threads_enter(mailbox);
     lbm_msgno_changed(mailbox, seqno);
-    gdk_threads_leave();
+    lbm_threads_leave(mailbox);
 }
 
 void
@@ -995,7 +1009,7 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
     if (!mailbox->msg_tree)
         return;
 
-    gdk_threads_enter();
+    lbm_threads_enter(mailbox);
 
     /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
@@ -1007,7 +1021,7 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
                   path, &iter);
     gtk_tree_path_free(path);
 
-    gdk_threads_leave();
+    lbm_threads_leave(mailbox);
 
     unthreaded =
         g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED);
@@ -1025,7 +1039,7 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     if (!mailbox->msg_tree)
         return;
 
-    gdk_threads_enter();
+    lbm_threads_enter(mailbox);
 
     /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
@@ -1037,7 +1051,7 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
                   path, &iter);
     gtk_tree_path_free(path);
 
-    gdk_threads_leave();
+    lbm_threads_leave(mailbox);
 }
 
 struct remove_data { unsigned seqno; GNode *node; };
@@ -1068,7 +1082,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     if (!mailbox->msg_tree)
         return;
 
-    gdk_threads_enter();
+    lbm_threads_enter(mailbox);
 
     dt.seqno = seqno;
     dt.node = NULL;
@@ -1081,7 +1095,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 
     if (!dt.node) {
         /* It's ok, apparently the view did not include this message */
-        gdk_threads_leave();
+        lbm_threads_leave(mailbox);
         return;
     }
 
@@ -1132,7 +1146,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gtk_tree_path_free(path);
     mailbox->stamp++;
 
-    gdk_threads_leave();
+    lbm_threads_leave(mailbox);
 }
 
 void
@@ -1146,13 +1160,13 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     if (!mailbox->msg_tree)
         return;
 
-    gdk_threads_enter();
+    lbm_threads_enter(mailbox);
 
     node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, 
                        GUINT_TO_POINTER(seqno));
     if (!node) {
         g_warning("filt_out: msgno %d not found", seqno);
-        gdk_threads_leave();
+        lbm_threads_leave(mailbox);
         return;
     }
 
@@ -1200,7 +1214,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     gtk_tree_path_free(path);
     mailbox->stamp++;
 
-    gdk_threads_leave();
+    lbm_threads_leave(mailbox);
 }
 
 void
@@ -1718,8 +1732,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 
     g_return_if_fail(MAILBOX_OPEN(mailbox)); /* or perhaps it's legal? */
 
-    libbalsa_lock_mailbox(mailbox);
-    gdk_threads_enter();
+    lbm_threads_enter(mailbox);
     saved_state = mailbox->state;
     mailbox->state = LB_MAILBOX_STATE_TREECLEANING;
 
@@ -1736,8 +1749,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
     g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED], 0);
 
     mailbox->state = saved_state;
-    gdk_threads_leave();
-    libbalsa_unlock_mailbox(mailbox);
+    lbm_threads_leave(mailbox);
 }
 
 void

@@ -281,16 +281,20 @@ refresh_mailbox_manager ()
 static void
 select_row_cb (GtkWidget * widget, gint row, gint column, GdkEventButton * bevent)
 {
+  Mailbox *mailbox;
   if (bevent)
     if (bevent->type == GDK_2BUTTON_PRESS)
-      open_new_mailbox ((Mailbox *) gtk_clist_get_row_data (GTK_CLIST (mmw->list), row));
+      {
+	mailbox = (Mailbox *) gtk_clist_get_row_data (GTK_CLIST (mmw->list), row);
+	edit_mailbox_dlg (mailbox, mailbox->type);
+      }
 }
 
 
 static void
 new_cb ()
 {
-  open_new_mailbox (NULL);
+  new_mailbox_dlg ();
 }
 
 
@@ -303,7 +307,7 @@ edit_cb ()
   row = (gint) GTK_CLIST (mmw->list)->selection->data;
   mailbox = (Mailbox *) gtk_clist_get_row_data (GTK_CLIST (mmw->list), row);
 
-  open_new_mailbox (mailbox);
+  edit_mailbox_dlg (mailbox, mailbox->type);
 }
 
 

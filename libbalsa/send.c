@@ -160,7 +160,6 @@ static void encode_descriptions(BODY * b);
 static gboolean libbalsa_create_msg(LibBalsaMessage * message,
 				    HEADER * msg, char *tempfile,
 				    gint encoding, int queu);
-gchar **libbalsa_lookup_mime_type(const gchar * path);
 
 #ifdef BALSA_USE_THREADS
 void balsa_send_thread(MessageQueueItem * first_message);
@@ -1170,9 +1169,37 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	    libbalsa_lock_mutt();
 	    newbdy = mutt_make_file_attach(body->filename);
 	    libbalsa_unlock_mutt();
+	    if (!newbdy) {
+		g_warning("Cannot attach file: %s.\nPostponing without it.",
+		     body->filename);
+	    } else {
+		gchar **mime_type;
+
+		/* Do this here because we don't want
+		 * to use libmutt's mime types */
+		if (!body->mime_type)
+		    mime_type =
+			g_strsplit(libbalsa_lookup_mime_type(body->filename),
+				   "/", 2);
+		else
+		    mime_type = g_strsplit(body->mime_type, "/", 2);
+		/* use BASE64 encoding for non-text mime types 
+		   use 8BIT for message */
+		libbalsa_lock_mutt();
+		if(!strcasecmp(mime_type[0],"message") && 
+		   !strcasecmp(mime_type[1],"rfc822")) {
+		    newbdy->encoding = ENC8BIT;
+		    newbdy->disposition = DISPINLINE;
+		} else if(strcasecmp(mime_type[0],"text") != 0)
+		    newbdy->encoding = ENCBASE64;
+		newbdy->type = mutt_check_mime_type(mime_type[0]);
+		g_free(newbdy->subtype);
+		newbdy->subtype = g_strdup(mime_type[1]);
+		libbalsa_unlock_mutt();
+		g_strfreev(mime_type);
+	    }
 	} else if (body->buffer) {
 	    newbdy = add_mutt_body_plain(body->charset, encoding);
-#ifdef BALSA_MDN_REPLY
 	    if (body->mime_type) {
 		/* change the type and subtype within the mutt body */
 		gchar *type, *subtype;
@@ -1187,7 +1214,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 		}
 		g_free (type);
 	    }
-#endif
 	    tempfp = safe_fopen(newbdy->filename, "w+");
 	    fputs(body->buffer, tempfp);
 	    fclose(tempfp);
@@ -1274,23 +1300,6 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 	return TRUE;
 }
 
-/* balsa_lookup_mime_type [MBG] 
- *
- * Description: This is a function to use the gnome mime functions to
- * get the type and subtype for later use.  Returns the type, and the
- * subtype in a gchar array, free using g_strfreev()
- * */
-gchar **libbalsa_lookup_mime_type(const gchar * path) {
-    gchar **tmp;
-    const gchar *mime_type;
-
-	
-    mime_type =
-	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
-    tmp = g_strsplit(mime_type, "/", 2);
-
-    return tmp;
-}
 /* balsa_create_msg:
    copies message to msg.
    PS: seems to be broken when queu == 1 - further execution of
@@ -1358,21 +1367,29 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 
 		/* Do this here because we don't want
 		 * to use libmutt's mime types */
-		mime_type =
-		    libbalsa_lookup_mime_type((const gchar *) body->
-					      filename);
-		/* use BASE64 encoding for non-text mime types */
-		if(strcasecmp(mime_type[0],"text") != 0)
+		if (!body->mime_type)
+		    mime_type =
+			g_strsplit(libbalsa_lookup_mime_type(body->filename),
+				   "/", 2);
+		else
+		    mime_type = g_strsplit(body->mime_type, "/", 2);
+		/* use BASE64 encoding for non-text mime types 
+		   use 8BIT for message */
+		libbalsa_lock_mutt();
+		if(!strcasecmp(mime_type[0],"message") && 
+		   !strcasecmp(mime_type[1],"rfc822")) {
+		    newbdy->encoding = ENC8BIT;
+		    newbdy->disposition = DISPINLINE;
+		} else if(strcasecmp(mime_type[0],"text") != 0)
 		    newbdy->encoding = ENCBASE64;
-		newbdy->type = mutt_check_mime_type(mime_type[0]);
 		newbdy->type = mutt_check_mime_type(mime_type[0]);
 		g_free(newbdy->subtype);
 		newbdy->subtype = g_strdup(mime_type[1]);
+		libbalsa_unlock_mutt();
 		g_strfreev(mime_type);
 	    }
 	} else if (body->buffer) {
 	    newbdy = add_mutt_body_plain(body->charset, encoding);
-#ifdef BALSA_MDN_REPLY
 	    if (body->mime_type) {
 		/* change the type and subtype within the mutt body */
 		gchar *type, *subtype;
@@ -1382,12 +1399,12 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		    *subtype++ = 0;
 		    libbalsa_lock_mutt();
 		    newbdy->type = mutt_check_mime_type (type);
+		    g_free(newbdy->subtype);
 		    newbdy->subtype = g_strdup(subtype);
 		    libbalsa_unlock_mutt();
 		}
 		g_free (type);
 	    }
-#endif
 	    tempfp = safe_fopen(newbdy->filename, "w+");
 	    fputs(body->buffer, tempfp);
 	    fclose(tempfp);

@@ -1583,8 +1583,8 @@ balsa_message_replytogroup(GtkWidget * widget, gpointer user_data)
 }
 
 
-void
-balsa_message_forward(GtkWidget * widget, gpointer user_data)
+static void
+balsa_message_forward(GtkWidget * widget, gpointer user_data, SendType fwd_type)
 {
     GList *list;
     LibBalsaMessage *message;
@@ -1600,12 +1600,34 @@ balsa_message_forward(GtkWidget * widget, gpointer user_data)
     while (list) {
 	message =
 	    gtk_ctree_node_get_row_data(index->ctree, list->data);
-	sm = sendmsg_window_new(widget, message, SEND_FORWARD);
+	sm = sendmsg_window_new(widget, message, fwd_type);
 	gtk_signal_connect(GTK_OBJECT(sm->window), "destroy",
 			   GTK_SIGNAL_FUNC(sendmsg_window_destroy_cb),
 			   NULL);
 	list = list->next;
     }
+}
+
+
+void
+balsa_message_forward_attached(GtkWidget * widget, gpointer user_data)
+{
+    balsa_message_forward(widget, user_data, SEND_FORWARD_ATTACH);
+}
+
+
+void
+balsa_message_forward_quoted(GtkWidget * widget, gpointer user_data)
+{
+    balsa_message_forward(widget, user_data, SEND_FORWARD_QUOTE);
+}
+
+
+void
+balsa_message_forward_default(GtkWidget * widget, gpointer user_data)
+{
+    balsa_message_forward(widget, user_data, 
+	balsa_app.forward_attached ? SEND_FORWARD_ATTACH : SEND_FORWARD_QUOTE);
 }
 
 
@@ -1661,8 +1683,12 @@ do_delete(BalsaIndex* index, gboolean move_to_trash)
     if(messages) {
 	if (move_to_trash && (index != trash)) {
 	    libbalsa_messages_move(messages, balsa_app.trash);
-	} else
+	    enable_empty_trash(TRASH_FULL);
+	} else {
 	    libbalsa_messages_delete(messages);
+	    if (index == trash)
+		enable_empty_trash(TRASH_CHECK);
+	}
 	g_list_free(messages);
     }
     
@@ -1715,6 +1741,11 @@ balsa_message_undelete(GtkWidget * widget, gpointer user_data)
 	libbalsa_message_undelete(message);
 	list = list->next;
     }
+
+/* XXX - Not sure this is relevant - this function apparently clears
+ * the 'Status: D' flag, but doesn't appear to move messages around.
+ */
+    enable_empty_trash(TRASH_CHECK);
 
     balsa_index_select_next(index);
 }
@@ -2007,13 +2038,17 @@ create_menu(BalsaIndex * bindex)
 			   _("Reply To All..."), balsa_message_replytoall,
 			   bindex, TRUE);
 
-    create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
+    create_stock_menu_item(menu, BALSA_PIXMAP_MAIL_RPL_GROUP_MENU,
 			   _("Reply To Group..."), balsa_message_replytogroup,
 			   bindex, TRUE);
 
     create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
-			   _("Forward..."), balsa_message_forward, bindex,
-			   TRUE);
+			   _("Forward Attached..."), balsa_message_forward_attached,
+			   bindex, TRUE);
+
+    create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD,
+			   _("Forward Quoted..."), balsa_message_forward_quoted,
+			   bindex, TRUE);
 
     create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH,
 			   _("Delete"), balsa_message_delete, bindex,
@@ -2190,6 +2225,12 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
 
 
     libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
+
+    if (mbnode->mailbox == balsa_app.trash) {
+	enable_empty_trash(TRASH_FULL);
+    } else if (bindex->mailbox_node->mailbox == balsa_app.trash) {
+	enable_empty_trash(TRASH_CHECK);
+    }
 
     balsa_remove_from_folder_mru(mbnode->mailbox->url);
     balsa_add_to_folder_mru(mbnode->mailbox->url);
@@ -2535,8 +2576,14 @@ mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry)
 
     libbalsa_mailbox_sync_backend(bindex->mailbox_node->mailbox);
 
-	balsa_remove_from_folder_mru(entry->mailbox->url);
-	balsa_add_to_folder_mru(entry->mailbox->url);
+    if (entry->mailbox == balsa_app.trash) {
+	enable_empty_trash(TRASH_FULL);
+    } else if (bindex->mailbox_node->mailbox == balsa_app.trash) {
+	enable_empty_trash(TRASH_CHECK);
+    }
+
+    balsa_remove_from_folder_mru(entry->mailbox->url);
+    balsa_add_to_folder_mru(entry->mailbox->url);
     gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }
 

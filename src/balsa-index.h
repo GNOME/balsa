@@ -111,7 +111,9 @@ extern "C" {
     void balsa_message_replytoall(GtkWidget * widget, gpointer user_data);
     void balsa_message_replytogroup(GtkWidget * widget, gpointer user_data);
 
-    void balsa_message_forward(GtkWidget * widget, gpointer user_data);
+    void balsa_message_forward_attached(GtkWidget * widget, gpointer user_data);
+    void balsa_message_forward_quoted(GtkWidget * widget, gpointer user_data);
+    void balsa_message_forward_default(GtkWidget * widget, gpointer user_data);
     void balsa_message_continue(GtkWidget * widget, gpointer user_data);
 
     void balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data);

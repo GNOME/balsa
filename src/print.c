@@ -677,8 +677,7 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body)
 	conttype = libbalsa_message_body_get_content_type(body);
     else
 	conttype = 
-	    g_strdup(gnome_mime_type_or_default_of_file(body->filename, 
-							"application/octet-stream"));
+	    g_strdup(libbalsa_lookup_mime_type(body->filename));
 
 #ifdef USE_PIXBUF
     /* get a pixbuf according to the mime type */

@@ -1,3 +1,8 @@
+2001-09-22  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* sendlib.c: don't include filename for `inline' disposition 
+	(see RFC2183).
+	
 2001-09-13  Carlos Morgado  <chbm@chbm.nu>
 
 	* mh.c (mh_check_mailbox): fix(?) mh/maildir bug where index

@@ -147,6 +147,8 @@ LibBalsaMessage *libbalsa_message_new(void);
 
 gboolean libbalsa_message_copy(LibBalsaMessage * message,
 			       LibBalsaMailbox * dest);
+gboolean libbalsa_message_save(LibBalsaMessage * message,
+			       const gchar *filename);
 gboolean libbalsa_message_move(LibBalsaMessage * message,
 			       LibBalsaMailbox * mailbox);
 gboolean libbalsa_messages_move(GList * messages,

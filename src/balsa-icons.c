@@ -39,6 +39,12 @@
 
 #include "pixmaps/reply_to_all.xpm"
 #include "pixmaps/reply_to_all_menu.xpm"
+#include "pixmaps/reply_to_group.xpm"
+#include "pixmaps/reply_to_group_menu.xpm"
+
+#include "pixmaps/close_mbox.xpm"
+
+#include "pixmaps/empty_trash.xpm"
 
 #include "pixmaps/draftbox.xpm"
 #include "pixmaps/inbox.xpm"
@@ -199,4 +205,12 @@ register_balsa_pixmaps(void)
 			  24, 24);
     register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU, reply_to_all_menu_xpm,
 			  16, 16);
+    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_GROUP, reply_to_group_xpm,
+			  24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_GROUP_MENU,
+			  reply_to_group_menu_xpm, 16, 15);
+    register_balsa_pixmap(BALSA_PIXMAP_MAIL_EMPTY_TRASH, empty_trash_xpm,
+			  24, 24);
+    register_balsa_pixmap(BALSA_PIXMAP_MAIL_CLOSE_MBOX, close_mbox_xpm,
+			  24, 24);
 }

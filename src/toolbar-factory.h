@@ -32,7 +32,7 @@ typedef enum {
 
 int create_stock_toolbar(int id);
 int get_toolbar_index(int id);
-void set_toolbar_button_callback(BalsaToolbarType toolbar, char *id, 
+void set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id, 
 				 void (*callback)(GtkWidget *, gpointer), 
 				 gpointer);
 void set_toolbar_button_sensitive(GtkWidget *window, BalsaToolbarType toolbar,

@@ -272,6 +272,9 @@ extern struct BalsaApplication {
     /* reply/forward: don't include text/html parts */
     gboolean reply_strip_html;
 
+    /* forward attached by default */
+    gboolean forward_attached;
+
     /* command line options */
     gint check_mail_upon_startup;
     gint remember_open_mboxes;

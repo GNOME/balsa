@@ -52,7 +52,10 @@ static void close_message_window(GtkWidget * widget, gpointer data);
 
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
 static void replytoall_message_cb(GtkWidget * widget, gpointer data);
-static void forward_message_cb(GtkWidget * widget, gpointer data);
+static void replytogroup_message_cb(GtkWidget * widget, gpointer data);
+static void forward_message_attached_cb(GtkWidget * widget, gpointer data);
+static void forward_message_quoted_cb(GtkWidget * widget, gpointer data);
+static void forward_message_default_cb(GtkWidget * widget, gpointer data);
 
 static void next_part_cb(GtkWidget * widget, gpointer data);
 static void previous_part_cb(GtkWidget * widget, gpointer data);
@@ -132,12 +135,22 @@ static GnomeUIInfo message_menu[] = {
      GNOME_APP_UI_ITEM, N_("Reply to _All..."),
      N_("Reply to all recipients of this message"),
      replytoall_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_MAIL_RPL, 'A', 0, NULL},
+     BALSA_PIXMAP_MAIL_RPL_ALL_MENU, 'A', 0, NULL},
+    /* G */
+    {
+     GNOME_APP_UI_ITEM, N_("Reply to _Group..."),
+     N_("Reply to mailing list"),
+     replytogroup_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     BALSA_PIXMAP_MAIL_RPL_GROUP_MENU, 'G', 0, NULL},
     /* F */
     {
-     GNOME_APP_UI_ITEM, N_("_Forward..."), N_("Forward this message"),
-     forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     GNOME_APP_UI_ITEM, N_("_Forward attached..."), N_("Forward this message as attachment"),
+     forward_message_attached_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL},
+    {
+     GNOME_APP_UI_ITEM, N_("Forward quoted..."), N_("Forward this message quoted"),
+     forward_message_quoted_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+     GNOME_STOCK_MENU_MAIL_FWD, 'F', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
     {
      GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in Message"),
@@ -241,8 +254,10 @@ message_window_new(LibBalsaMessage * message)
 				GTK_SIGNAL_FUNC(replyto_message_cb), mw);
     set_toolbar_button_callback(2, BALSA_PIXMAP_MAIL_RPL_ALL,
 				GTK_SIGNAL_FUNC(replytoall_message_cb), mw);
+    set_toolbar_button_callback(2, BALSA_PIXMAP_MAIL_RPL_GROUP,
+				GTK_SIGNAL_FUNC(replytogroup_message_cb), mw);
     set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_MAIL_FWD,
-				GTK_SIGNAL_FUNC(forward_message_cb), mw);
+				GTK_SIGNAL_FUNC(forward_message_default_cb), mw);
     set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_BACK,
 				GTK_SIGNAL_FUNC(previous_part_cb), mw);
     set_toolbar_button_callback(2, GNOME_STOCK_PIXMAP_FORWARD,
@@ -374,14 +389,48 @@ replytoall_message_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-forward_message_cb(GtkWidget * widget, gpointer data)
+replytogroup_message_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
 
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, SEND_FORWARD);
+    sendmsg_window_new(widget, mw->message, SEND_REPLY_GROUP);
+}
+
+static void
+forward_message_attached_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) data;
+
+    g_return_if_fail(widget != NULL);
+    g_return_if_fail(mw != NULL);
+
+    sendmsg_window_new(widget, mw->message, SEND_FORWARD_ATTACH);
+}
+
+static void
+forward_message_quoted_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) data;
+
+    g_return_if_fail(widget != NULL);
+    g_return_if_fail(mw != NULL);
+
+    sendmsg_window_new(widget, mw->message, SEND_FORWARD_QUOTE);
+}
+
+static void
+forward_message_default_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) data;
+
+    g_return_if_fail(widget != NULL);
+    g_return_if_fail(mw != NULL);
+
+    sendmsg_window_new(widget, mw->message,
+        balsa_app.forward_attached ? SEND_FORWARD_ATTACH : SEND_FORWARD_QUOTE);
 }
 
 static void

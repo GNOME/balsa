@@ -484,6 +484,33 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest)
     return TRUE;
 }
 
+/* libbalsa_message_save:
+   return TRUE on success and FALSE on failure.
+*/
+gboolean
+libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
+{
+    HEADER *cur;
+    FILE *outfile;
+    int res;
+
+    g_return_val_if_fail(message->mailbox, FALSE);
+    RETURN_VAL_IF_CONTEXT_CLOSED(message->mailbox, FALSE);
+
+    if( (outfile = fopen(filename, "w")) == NULL) return FALSE;
+    g_return_val_if_fail(outfile, FALSE);
+
+    cur = CLIENT_CONTEXT(message->mailbox)->hdrs[message->msgno];
+
+    libbalsa_lock_mutt();
+    res = mutt_copy_message(outfile, CLIENT_CONTEXT(message->mailbox), 
+			    cur, 0, 0);
+    libbalsa_unlock_mutt();
+
+    fclose(outfile);
+    return res != -1;
+}
+
 /* libbalsa_messages_copy:
    makes an assumption that all the messages come from the same mailbox.
 */

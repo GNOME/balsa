@@ -55,12 +55,23 @@ struct _BalsaWindowClass {
     void (*close_mbnode) (BalsaWindow * window, BalsaMailboxNode * mbnode);
 };
 
+/*
+ * Constants for enable_empty_trash()
+ */
+typedef enum {
+    TRASH_EMPTY, /* guaranteed to be empty */
+    TRASH_FULL,  /* guaranteed to contain something */
+    TRASH_CHECK  /* uncertain, better check */
+} TrashState;
+
+
 GtkType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_refresh(BalsaWindow * window);
 void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
+void enable_empty_trash(TrashState status);
 void balsa_window_enable_continue(void);
 void balsa_window_set_threading_menu(int);
 void balsa_change_window_layout(BalsaWindow *window);

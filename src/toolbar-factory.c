@@ -64,7 +64,7 @@ struct toolbar_bdata {
     GtkWidget *widget;
     void (*callback)(GtkWidget *, gpointer);
     gpointer data;
-    char *id;
+    const char *id;
     int disabled;
     int position;
 } toolbar_data[MAXTOOLBARS][MAXTOOLBARITEMS] = { { {0} } };
@@ -85,6 +85,7 @@ static char *toolbar0_legal[]={
     GNOME_STOCK_PIXMAP_MAIL,
     GNOME_STOCK_PIXMAP_MAIL_RPL,
     BALSA_PIXMAP_MAIL_RPL_ALL,
+    BALSA_PIXMAP_MAIL_RPL_GROUP,
     GNOME_STOCK_PIXMAP_MAIL_FWD,
     GNOME_STOCK_PIXMAP_BACK,
     GNOME_STOCK_PIXMAP_FORWARD,
@@ -93,6 +94,7 @@ static char *toolbar0_legal[]={
     BALSA_PIXMAP_FLAG_UNREAD,
     BALSA_PIXMAP_MARK_ALL_MSGS,
     BALSA_PIXMAP_SHOW_ALL_HEADERS,
+    BALSA_PIXMAP_MAIL_CLOSE_MBOX,
     NULL
 };
 
@@ -112,6 +114,7 @@ static char *toolbar2_legal[]={
     "",
     GNOME_STOCK_PIXMAP_MAIL_RPL,
     BALSA_PIXMAP_MAIL_RPL_ALL,
+    BALSA_PIXMAP_MAIL_RPL_GROUP,
     GNOME_STOCK_PIXMAP_MAIL_FWD,
     GNOME_STOCK_PIXMAP_BACK,
     GNOME_STOCK_PIXMAP_FORWARD,
@@ -121,13 +124,14 @@ static char *toolbar2_legal[]={
     GNOME_STOCK_PIXMAP_SAVE,
     GNOME_STOCK_PIXMAP_CLOSE,
     BALSA_PIXMAP_SHOW_ALL_HEADERS,
+    BALSA_PIXMAP_MAIL_EMPTY_TRASH,
     NULL
 };
 
 static char **toolbar_legal[]={toolbar0_legal, toolbar1_legal, toolbar2_legal};
 
 static void populate_stock_toolbar(int bar, int id);
-static int get_toolbar_button_slot(BalsaToolbarType toolbar, char *id);
+static int get_toolbar_button_slot(BalsaToolbarType toolbar, const char *id);
 static GtkToolbar *get_bar_instance(GtkWidget *window, 
 				    BalsaToolbarType toolbar);
 static int get_position_value(BalsaToolbarType toolbar, char *id);
@@ -276,6 +280,7 @@ static const gchar* compose_toolbar[] = {
 static const gchar* message_toolbar[] = {
     BALSA_PIXMAP_NEXT_UNREAD,    "",
     GNOME_STOCK_PIXMAP_MAIL_RPL, BALSA_PIXMAP_MAIL_RPL_ALL,
+    BALSA_PIXMAP_MAIL_RPL_GROUP,
     GNOME_STOCK_PIXMAP_MAIL_FWD, "",
     GNOME_STOCK_PIXMAP_BACK,     GNOME_STOCK_PIXMAP_FORWARD,
     GNOME_STOCK_PIXMAP_SAVE,     "",
@@ -506,7 +511,7 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 }
 
 static int
-get_toolbar_button_slot(BalsaToolbarType toolbar, char *id)
+get_toolbar_button_slot(BalsaToolbarType toolbar, const char *id)
 {
     int i;
     
@@ -544,7 +549,7 @@ get_toolbar_button_slot(BalsaToolbarType toolbar, char *id)
 
 */
 void
-set_toolbar_button_callback(BalsaToolbarType toolbar, char *id, 
+set_toolbar_button_callback(BalsaToolbarType toolbar, const char *id, 
 			    void (*callback)(GtkWidget *, gpointer), 
 			    gpointer data)
 {

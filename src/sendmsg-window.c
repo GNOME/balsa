@@ -362,6 +362,11 @@ headerMenuDesc headerDescs[] = { {"from", 3}, {"to", 3}, {"subject", 2},
 {"comments", 2}, {"keywords", 2}
 };
 
+typedef struct {
+    gchar *filename;
+    gchar *force_mime_type;
+    gboolean delete_on_destroy;
+} attachment_t;
 
 #define MAIN_MENUS_COUNT 5
 static GnomeUIInfo main_menu[] = {
@@ -718,31 +723,45 @@ select_attachment(GnomeIconList * ilist, gint num, GdkEventButton * event,
 		       NULL, NULL, NULL, NULL, event->button, event->time);
 }
 
+static void
+destroy_attachment (gpointer data)
+{
+    attachment_t *attach = (attachment_t *)data;
+
+    /* unlink the file if necessary */
+    if (attach->delete_on_destroy) {
+	char *last_slash = strrchr(attach->filename, '/');
+
+	if (balsa_app.debug)
+	    fprintf (stderr, __FILE__ ":" __FUNCTION__ ": unlink `%s'\n",
+		     attach->filename);
+	unlink(attach->filename);
+	*last_slash = 0;
+	if (balsa_app.debug)
+	    fprintf (stderr, __FILE__ ":" __FUNCTION__ ": rmdir `%s'\n",
+		     attach->filename);
+	rmdir(attach->filename);
+    }
+    /* clean up memory */
+    g_free(attach->filename);
+    g_free(attach->force_mime_type);
+    g_free(attach);
+}
+
 /* add_attachment:
    adds given filename to the list.
    takes over the ownership of filename.
 */
 void
-add_attachment(GnomeIconList * iconlist, char *filename)
+add_attachment(GnomeIconList * iconlist, char *filename, gboolean is_a_temp_file,
+	       gchar *forced_mime_type)
 {
     GtkWidget *msgbox;
     const gchar *content_type;
     gchar *pix, *err_msg;
 
-    /* FIXME: What is the default type? */
-    content_type = 
-	gnome_mime_type_or_default_of_file(filename, 
-					   "application/octet-stream");
-#ifdef GNOME_MIME_BUG_WORKAROUND
-    /* the function above returns for certains files a string which is
-       not a proper MIME type, e.g. "PDF document". Surprizingly, 
-       gnome_mime_type() does not fail in this case. This bug has been 
-       filed in bugzilla.
-    */
-    if(strchr(content_type, '/') == NULL)
-	content_type = 
-	    gnome_mime_type_or_default(filename, "application/octet-stream");
-#endif
+    content_type = forced_mime_type ? forced_mime_type 
+	: libbalsa_lookup_mime_type(filename);
     pix = libbalsa_icon_finder(content_type, filename);
 
     if (balsa_app.debug)
@@ -759,11 +778,17 @@ add_attachment(GnomeIconList * iconlist, char *filename)
     if (pix && (err_msg=check_if_regular_file(pix)) == NULL) {
 	gint pos;
 	gchar *label;
+	attachment_t *attach_data = g_malloc(sizeof(attachment_t));
 
 	label = g_strdup_printf ("%s (%s)", g_basename(filename), content_type);
 
 	pos = gnome_icon_list_append(iconlist, pix, label);
-	gnome_icon_list_set_icon_data(iconlist, pos, filename);
+	attach_data->filename = filename;
+	attach_data->force_mime_type = forced_mime_type 
+	    ? g_strdup(forced_mime_type): NULL;
+
+	attach_data->delete_on_destroy = is_a_temp_file;
+	gnome_icon_list_set_icon_data_full(iconlist, pos, attach_data, destroy_attachment);
 
 	g_free(label);
 
@@ -826,14 +851,14 @@ attach_dialog_ok(GtkWidget * widget, gpointer data)
     if (p)
 	*(p + 1) = '\0';
 
-    add_attachment(iconlist, sel_file);
+    add_attachment(iconlist, sel_file, FALSE, NULL);
     for (node = GTK_CLIST(fs->file_list)->selection; node;
 	 node = g_list_next(node)) {
 	gtk_clist_get_text(GTK_CLIST(fs->file_list),
 			   GPOINTER_TO_INT(node->data), 0, &p);
 	filename = g_strconcat(dir, p, NULL);
 	if (strcmp(filename, sel_file) != 0)
-	    add_attachment(iconlist, filename);
+	    add_attachment(iconlist, filename, FALSE, NULL);
 	/* do not g_free(filename) - the add_attachment arg is not const */
 	/* g_free(filename); */
     }
@@ -903,7 +928,7 @@ attachments_add(GtkWidget * widget,
 
     for (l = names; l; l = l->next)
 	add_attachment(GNOME_ICON_LIST(bsmsg->attachments[1]),
-		       g_strdup((char *) l->data));
+		       g_strdup((char *) l->data), FALSE, NULL);
 
     gnome_uri_list_free_strings(names);
 
@@ -1227,20 +1252,54 @@ create_text_area(BalsaSendmsg * msg)
 
 /* continueBody ---------------------------------------------------------
    a short-circuit procedure for the 'Continue action'
-   basically copies the text over to the entry field.
+   basically copies the first text/plain part over to the entry field.
+   Attachments (if any) are saved temporarily in subfolders to preserve
+   their original names and then attached again.
    NOTE that rbdy == NULL if message has no text parts.
 */
 static void
 continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 {
-    GString *rbdy;
+    LibBalsaMessageBody *body;
 
     libbalsa_message_body_ref(message);
-    rbdy = content2reply(message, NULL, -1, balsa_app.reply_strip_html);
-    if (rbdy) {
-	gtk_text_insert(GTK_TEXT(msg->text), NULL, NULL, NULL, rbdy->str,
-			strlen(rbdy->str));
-	g_string_free(rbdy, TRUE);
+    body = message->body_list;
+    if (body) {
+	if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
+	    body = body->parts;
+	/* if the first part is of type text/plain with a NULL filename, it
+	   was the message... */
+	if (body && !body->filename) {
+	    GString *rbdy;
+	    gchar *body_type = libbalsa_message_body_get_content_type(body);
+
+	    if (!strcmp(body_type, "text/plain") &&
+		(rbdy = process_mime_part(message, body, NULL, -1, FALSE))) {
+		gtk_text_insert(GTK_TEXT(msg->text), NULL, NULL, NULL, 
+				rbdy->str, strlen(rbdy->str));
+		g_string_free(rbdy, TRUE);
+	    }
+	    g_free(body_type);
+	    body = body->next;
+	}
+	while (body) {
+	    gchar *name, *body_type, tmp_file_name[PATH_MAX + 1];
+
+	    libbalsa_lock_mutt();
+	    mutt_mktemp(tmp_file_name);
+	    libbalsa_unlock_mutt();
+	    if (body->filename) {
+		mkdir(tmp_file_name, 0700);
+		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
+	    } else
+		name = g_strdup(tmp_file_name);
+	    libbalsa_message_body_save(body, NULL, name);
+	    body_type = libbalsa_message_body_get_content_type(body);
+	    add_attachment(GNOME_ICON_LIST(msg->attachments[1]), name,
+			   body->filename != NULL, body_type);
+	    g_free(body_type);
+	    body = body->next;
+	}
     }
 
     if (!msg->charset)
@@ -1256,7 +1315,7 @@ static GString *
 quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 {
     GString *body;
-    gchar *str, *date;
+    gchar *str, *date = NULL;
     const gchar *personStr;
 
     libbalsa_message_body_ref(message);
@@ -1264,27 +1323,94 @@ quoteBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     personStr = libbalsa_address_get_name(message->from);
     if (!personStr)
 	personStr = _("you");
+    if (message->date)
+	date = libbalsa_message_date_to_gchar(message, balsa_app.date_string);
 
-    if (message->date) {
-	date =
-	    libbalsa_message_date_to_gchar(message, balsa_app.date_string);
-	str = g_strdup_printf(_("On %s %s wrote:\n"), date, personStr);
-	g_free(date);
-    } else
-	str = g_strdup_printf(_("%s wrote:\n"), personStr);
+    if (type == SEND_FORWARD_ATTACH) {
+	const gchar *subject;
 
-    body = content2reply(message,
-			 (type == SEND_REPLY || type == SEND_REPLY_ALL || 
-			  type == SEND_REPLY_GROUP) ?
-			 balsa_app.quote_str : NULL,
-			 balsa_app.wordwrap ? balsa_app.wraplength : -1,
-			 balsa_app.reply_strip_html);
-
-    if (body)
-	body = g_string_prepend(body, str);
-    else
+	str = g_strdup_printf(_("------forwarded message------\n"), 
+			      personStr);
 	body = g_string_new(str);
-    g_free(str);
+	g_free(str);
+
+	if (date) {
+	    str = g_strdup_printf(_("Date: %s\n"), date);
+	    body = g_string_append(body, str);
+	    g_free(str);
+	}
+
+	subject = LIBBALSA_MESSAGE_GET_SUBJECT(message);
+	if (subject) {
+	    str = g_strdup_printf(_("Subject: %s\n"), subject);
+	    body = g_string_append(body, str);
+	    g_free(str);
+	}
+
+	if (message->from) {
+	    gchar *from = libbalsa_address_to_gchar(message->from, 0);
+	    str = g_strdup_printf(_("From: %s\n"), from);
+	    body = g_string_append(body, str);
+	    g_free(from);
+	    g_free(str);
+	}
+
+	if (message->to_list) {
+	    gchar *to_list = libbalsa_make_string_from_list(message->to_list);
+	    str = g_strdup_printf(_("To: %s\n"), to_list);
+	    body = g_string_append(body, str);
+	    g_free(to_list);
+	    g_free(str);
+	}
+
+	if (message->cc_list) {
+	    gchar *cc_list = libbalsa_make_string_from_list(message->cc_list);
+	    str = g_strdup_printf(_("CC: %s\n"), cc_list);
+	    body = g_string_append(body, str);
+	    g_free(cc_list);
+	    g_free(str);
+	}
+
+	str = g_strdup_printf(_("Message-ID: %s\n"), message->message_id);
+	body = g_string_append(body, str);
+	g_free(str);
+
+	if (message->references) {
+	    GList *ref_list = message->references;
+
+	    str = g_strdup_printf(_("References: %s"), ref_list->data);
+	    body = g_string_append(body, str);
+	    g_free(str);
+	    ref_list = ref_list->next;
+
+	    while (ref_list) {
+		str = g_strdup_printf(" %s", ref_list->data);
+		body = g_string_append(body, str);
+		g_free(str);
+		ref_list = ref_list->next;
+	    }
+		
+	    body = g_string_append(body, "\n");
+	}
+    } else {
+	if (date)
+	    str = g_strdup_printf(_("On %s %s wrote:\n"), date, personStr);
+	else
+	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
+	body = content2reply(message,
+			     (type == SEND_REPLY || type == SEND_REPLY_ALL || 
+			      type == SEND_REPLY_GROUP) ?
+			     balsa_app.quote_str : NULL,
+			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
+			     balsa_app.reply_strip_html);
+	if (body)
+	    body = g_string_prepend(body, str);
+	else
+	    body = g_string_new(str);
+	g_free(str);
+    }
+    
+    g_free(date);
 
     if (!msg->charset)
 	msg->charset = libbalsa_message_charset(message);
@@ -1312,7 +1438,8 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
     if ((signature = read_signature(msg)) != NULL) {
 	if (((type == SEND_REPLY || type == SEND_REPLY_ALL || type == SEND_REPLY_GROUP) &&
 	     balsa_app.current_ident->sig_whenreply) ||
-	    (type == SEND_FORWARD && balsa_app.current_ident->sig_whenforward) ||
+	    ((type == SEND_FORWARD_ATTACH || type == SEND_FORWARD_QUOTE) && 
+	     balsa_app.current_ident->sig_whenforward) ||
 	    (type == SEND_NORMAL && balsa_app.current_ident->sig_sending)) {
 
 	    if (balsa_app.current_ident->sig_separator
@@ -1405,7 +1532,8 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message, SendType type)
 	g_strchomp(newsubject);
 	break;
 
-    case SEND_FORWARD:
+    case SEND_FORWARD_ATTACH:
+    case SEND_FORWARD_QUOTE:
 	if (!subject) {
 	    if (message->from && message->from->address_list)
 		newsubject = g_strdup_printf("%s from %s",
@@ -1488,7 +1616,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	msg->orig_message = message;
 	break;
 
-    case SEND_FORWARD:
+    case SEND_FORWARD_ATTACH:
+    case SEND_FORWARD_QUOTE:
 	window = gnome_app_new("balsa", _("Forward message"));
 	msg->orig_message = message;
 	break;
@@ -1718,13 +1847,34 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_widget_show(window);
 
 
-    if (type == SEND_NORMAL || type == SEND_FORWARD)
+    if (type == SEND_NORMAL || type == SEND_FORWARD_ATTACH || 
+	type == SEND_FORWARD_QUOTE)
 	gtk_widget_grab_focus(msg->to[1]);
     else
 	gtk_widget_grab_focus(msg->text);
 
-    msg->update_config = TRUE;
+    if (type == SEND_FORWARD_ATTACH) {
+ 	gchar *name, tmp_file_name[PATH_MAX + 1];
+	
+ 	libbalsa_lock_mutt();
+ 	mutt_mktemp(tmp_file_name);
+ 	libbalsa_unlock_mutt();
+ 	mkdir(tmp_file_name, 0700);
+ 	name = g_strdup_printf("%s/forwarded-message", tmp_file_name);
+ 	libbalsa_message_save(message, name);
+ 	add_attachment(GNOME_ICON_LIST(msg->attachments[1]), name,
+ 		       TRUE, "message/rfc822");
+ 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+	    msg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+    }
 
+    if (type == SEND_CONTINUE && 
+	GNOME_ICON_LIST(msg->attachments[1])->icons)
+ 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+	    msg->view_checkitems[MENU_TOGGLE_ATTACHMENTS_POS]), TRUE);
+
+    msg->update_config = TRUE;
+ 
     msg->delete_sig_id = 
 	gtk_signal_connect(GTK_OBJECT(balsa_app.main_window), "delete-event",
 			   (GtkSignalFunc)delete_event_cb, msg);
@@ -1993,7 +2143,7 @@ strip_chars(gchar * str, const gchar * char2strip)
    (consider moving this code to mutt part).
 */
 static LibBalsaMessage *
-bsmsg2message(BalsaSendmsg * bsmsg, gboolean dup_filenames)
+bsmsg2message(BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
@@ -2068,22 +2218,23 @@ bsmsg2message(BalsaSendmsg * bsmsg, gboolean dup_filenames)
     {				/* handle attachments */
 	gint i;
 	for (i = 0; i < GNOME_ICON_LIST(bsmsg->attachments[1])->icons; i++) {
+	    attachment_t *attach;
+	    
 	    body = libbalsa_message_body_new(message);
 	    /* PKGW: This used to be g_strdup'ed. However, the original pointer 
 	       was strduped and never freed, so we'll take it. 
 	       A. Dreß, 2001/May/05: However, when printing a message from the
 	       composer, this will lead to a crash upon send as the resulting
 	       message will be unref'd after printing. */
-	    if (dup_filenames)
-		body->filename = 
-		    g_strdup((gchar *)
-			     gnome_icon_list_get_icon_data(GNOME_ICON_LIST
-							   (bsmsg->attachments[1]), i));
-		else
-		    body->filename = (gchar *)
-			gnome_icon_list_get_icon_data(GNOME_ICON_LIST
-						      (bsmsg->attachments[1]), i);
-
+	    /* A. Dreß, 2001/Aug/29: now the `attachment_t' struct has it's own
+	       destroy method, which frees the original filename later. So it's
+	       safe (and necessary) to make a copy of it for the new body. */
+	    attach = 
+		(attachment_t *)gnome_icon_list_get_icon_data(GNOME_ICON_LIST
+							      (bsmsg->attachments[1]), i);
+	    body->filename = g_strdup(attach->filename);
+	    if (attach->force_mime_type)
+		body->mime_type = g_strdup(attach->force_mime_type);
 	    libbalsa_message_append_part(message, body);
 	}
     }
@@ -2112,7 +2263,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if (balsa_app.debug)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
-    message = bsmsg2message(bsmsg, FALSE);
+    message = bsmsg2message(bsmsg);
     fcc = message->fcc_mailbox 
 	? mblist_find_mbox_by_name(balsa_app.mblist, message->fcc_mailbox)
 	: NULL;
@@ -2188,7 +2339,7 @@ message_postpone(BalsaSendmsg * bsmsg)
 {
     gboolean successp;
     LibBalsaMessage *message;
-    message = bsmsg2message(bsmsg, FALSE);
+    message = bsmsg2message(bsmsg);
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
         bsmsg->type == SEND_REPLY_GROUP))
@@ -2236,7 +2387,7 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     if (!is_ready_to_send(bsmsg)) 
         return FALSE;
 
-    message = bsmsg2message(bsmsg, FALSE);
+    message = bsmsg2message(bsmsg);
     gtk_object_ref(GTK_OBJECT(message));
 
     thereturn = message_postpone(bsmsg);
@@ -2271,7 +2422,7 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	_("Balsa has been compiled without gnome-print support.\n"
 	  "Printing is not possible."));
 #else
-    LibBalsaMessage *msg = bsmsg2message(bsmsg, TRUE);
+    LibBalsaMessage *msg = bsmsg2message(bsmsg);
     message_print(msg);
     gtk_object_destroy(GTK_OBJECT(msg));
 #endif

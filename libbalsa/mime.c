@@ -32,12 +32,12 @@ static GString *process_mime_multipart(LibBalsaMessage * message,
 				       LibBalsaMessageBody * body,
 				       gchar * reply_prefix_str,
 				       gint llen, gboolean ignore_html);
-static GString *process_mime_part(LibBalsaMessage * message,
-				  LibBalsaMessageBody * body,
-				  gchar * reply_prefix_str, gint llen,
-				  gboolean ignore_html);
 
-static GString *
+/* process_mime_part:
+   returns string representation of given message part.
+   NOTE: may return NULL(!).
+*/
+GString *
 process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		  gchar * reply_prefix_str, gint llen, gboolean ignore_html)
 {

@@ -80,6 +80,8 @@ button_data toolbar_buttons[]={
      N_("Reply to the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_MAIL_RPL_ALL, N_("Reply\nto all"),
      N_("Reply to all recipients"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_MAIL_RPL_GROUP, N_("Reply\nto list"),
+     N_("Reply to mailing list"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GNOME_STOCK_PIXMAP_MAIL_FWD, N_("Forward"), 
      N_("Forward the current message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GNOME_STOCK_PIXMAP_BACK, N_("Previous"), 
@@ -109,7 +111,11 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_MARK_ALL_MSGS, N_("Mark all"),
      N_("Mark all messages in current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_SHOW_ALL_HEADERS, N_("All\nheaders"),
-     N_("Show all headers"), TOOLBAR_BUTTON_TYPE_TOGGLE}
+     N_("Show all headers"), TOOLBAR_BUTTON_TYPE_TOGGLE},
+    {BALSA_PIXMAP_MAIL_EMPTY_TRASH, N_("Empty Trash"),
+     N_("Delete messages from the trash mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    {BALSA_PIXMAP_MAIL_CLOSE_MBOX, N_("Close"),
+     N_("Close current mailbox"), TOOLBAR_BUTTON_TYPE_BUTTON}
 };
 
 int toolbar_button_count=sizeof(toolbar_buttons)/sizeof(button_data);

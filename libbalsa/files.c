@@ -23,6 +23,7 @@
 #include "config.h"
 #include <gnome.h>
 
+#include "misc.h"
 #include "files.h"
 
 static const gchar *permanent_prefixes[] = {
@@ -102,7 +103,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename)
     gchar *icon = NULL;
     
     content_type = (!mime_type) ? 
-	gnome_mime_type_or_default_of_file(filename, "application/octet-stream") : 
+	libbalsa_lookup_mime_type(filename) : 
 	mime_type;
 
     icon_file = gnome_mime_get_value (content_type, "icon-filename");

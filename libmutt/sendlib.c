@@ -460,7 +460,9 @@ int mutt_write_mime_header (BODY *a, FILE *f)
       
       buffer[0] = 0;
       rfc822_cat (buffer, sizeof (buffer), t, MimeSpecials);
-      fprintf (f, "; filename=%s", buffer);
+      /* BALSA: don't include filename for `inline' disposition (see RFC2183) */
+      if (a->disposition != DISPINLINE)
+	fprintf (f, "; filename=%s", buffer);
     }
 
     fputc ('\n', f);

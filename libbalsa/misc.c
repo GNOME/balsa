@@ -27,11 +27,40 @@
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
+/* for gnome mime functions ... */
+#include <gnome.h>
 
 #include "libbalsa.h"
 #include "mailbackend.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
+#define GNOME_MIME_BUG_WORKAROUND 1
+
+/* balsa_lookup_mime_type:
+ *
+ * Description: This is a function to use the gnome mime functions to
+ * get the type and subtype for later use. 
+ * it includes a workaround for notorious gnome-mime bug.
+ * */
+const gchar*
+libbalsa_lookup_mime_type(const gchar * path) {
+    const gchar *mime_type;
+
+    mime_type =
+	gnome_mime_type_or_default_of_file(path, "application/octet-stream");
+#ifdef GNOME_MIME_BUG_WORKAROUND
+    /* the function above returns for certains files a string which is
+       not a proper MIME type, e.g. "PDF document". Surprizingly, 
+       gnome_mime_type() does not fail in this case. This bug has been 
+       filed in bugzilla. Still not fixed.
+    */
+    if(strchr(mime_type, '/') == NULL)
+	mime_type = 
+	    gnome_mime_type_or_default(path, "application/octet-stream");
+#endif
+    return mime_type;
+}
 
 gchar *
 libbalsa_get_hostname(void)

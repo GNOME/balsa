@@ -346,11 +346,13 @@ main(int argc, char *argv[])
 	    while ((delim = strchr (ptr, ','))) {
 		    *delim = '\0';
 		    attachment = g_strdup(ptr);
-		    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), attachment);
+		    add_attachment(GNOME_ICON_LIST(snd->attachments[1]),
+				   attachment, FALSE, NULL);
 		    ptr = delim + 1;
             }
 	    attachment = g_strdup(ptr);
-	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), attachment);
+	    add_attachment(GNOME_ICON_LIST(snd->attachments[1]), attachment,
+			   FALSE, NULL);
 	}
     } else
 	gtk_widget_show(window);

@@ -31,7 +31,8 @@ extern "C" {
 	SEND_REPLY,		/* by Reply               */
 	SEND_REPLY_ALL,		/* by Reply All           */
 	SEND_REPLY_GROUP,       /* by Reply to Group      */
-	SEND_FORWARD,		/* by Forward             */
+	SEND_FORWARD_ATTACH,    /* by Forward attached    */
+	SEND_FORWARD_QUOTE,     /* by Forward quoted      */
 	SEND_CONTINUE		/* by Continue postponed  */
     } SendType;
 
@@ -73,7 +74,8 @@ extern "C" {
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
 				  const gchar* val);
 
-    void add_attachment(GnomeIconList * iconlist, char *filename);
+    void add_attachment(GnomeIconList * iconlist, char *filename, gboolean is_a_temp_file,
+			gchar *forced_mime_type);
 
     typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
 

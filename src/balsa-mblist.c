@@ -1528,9 +1528,15 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
                 libbalsa_messages_copy (messages, mailbox);
                 break;
             }
-            
+
             libbalsa_mailbox_sync_backend (orig_mailbox);
 	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
+
+	    if (mailbox == balsa_app.trash) {
+		enable_empty_trash(TRASH_FULL);
+	    } else if (orig_mailbox == balsa_app.trash) {
+		enable_empty_trash(TRASH_CHECK);
+	    }
         }
     }
     

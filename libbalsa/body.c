@@ -37,9 +37,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
 
     body->message = message;
     body->buffer = NULL;
-#ifdef BALSA_MDN_REPLY
     body->mime_type = NULL;
-#endif
     body->mutt_body = NULL;
     body->filename = NULL;
     body->temp_filename = NULL;
@@ -59,9 +57,7 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 	return;
 
     g_free(body->buffer);
-#ifdef BALSA_MDN_REPLY
     g_free(body->mime_type);
-#endif
     g_free(body->filename);
 
     if (body->temp_filename)

@@ -91,6 +91,7 @@ typedef struct _PropertyUI {
     GtkWidget *mblist_show_mb_content_info;
     GtkWidget *always_queue_sent_mail;
     GtkWidget *reply_strip_html_parts;
+    GtkWidget *forward_attached;
 
     /* Information messages */
     GtkWidget *information_message_menu;
@@ -381,6 +382,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
     gtk_signal_connect(GTK_OBJECT(pui->reply_strip_html_parts), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
+    gtk_signal_connect(GTK_OBJECT(pui->forward_attached), "toggled",
+		       GTK_SIGNAL_FUNC(properties_modified_cb), property_box);
 
     /* arp */
     gtk_signal_connect(GTK_OBJECT(pui->quote_str), "changed",
@@ -596,6 +599,8 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
     balsa_app.reply_strip_html =
 	GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts)->active;
+    balsa_app.forward_attached =
+	GTK_TOGGLE_BUTTON(pui->forward_attached)->active;
     balsa_app.always_queue_sent_mail =
 	GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
 
@@ -832,6 +837,8 @@ set_prefs(void)
 				 balsa_app.always_queue_sent_mail);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts),
 				 balsa_app.reply_strip_html);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->forward_attached),
+				 balsa_app.forward_attached);
 
     gtk_widget_set_sensitive(pui->wraplength,
 			     GTK_TOGGLE_BUTTON(pui->wordwrap)->active);
@@ -1505,6 +1512,11 @@ outgoing_page(gpointer data)
     pui->reply_strip_html_parts =
 	gtk_check_button_new_with_label(_("don't include HTML parts as text when replying or forwarding mail"));
     gtk_box_pack_start(GTK_BOX(vbox2), pui->reply_strip_html_parts,
+		       FALSE, TRUE, 0);
+
+    pui->forward_attached =
+	gtk_check_button_new_with_label(_("forward a mail as attachment instead of quoting it"));
+    gtk_box_pack_start(GTK_BOX(vbox2), pui->forward_attached,
 		       FALSE, TRUE, 0);
 
 	pui->always_queue_sent_mail =

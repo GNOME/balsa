@@ -666,6 +666,8 @@ config_global_load(void)
 	balsa_app.wraplength = 40;
     balsa_app.reply_strip_html = 
 	gnome_config_get_bool("StripHtmlInReply=true");
+    balsa_app.forward_attached = 
+	gnome_config_get_bool("ForwardAttached=true");
 
 	balsa_app.always_queue_sent_mail = d_get_gint("AlwaysQueueSentMail", 0);
 
@@ -896,6 +898,7 @@ gint config_save(void)
     gnome_config_set_bool("WordWrap", balsa_app.wordwrap);
     gnome_config_set_int("WrapLength", balsa_app.wraplength);
     gnome_config_set_bool("StripHtmlInReply", balsa_app.reply_strip_html);
+    gnome_config_set_bool("ForwardAttached", balsa_app.forward_attached);
 
 	gnome_config_set_int("AlwaysQueueSentMail", balsa_app.always_queue_sent_mail);
     gnome_config_pop_prefix();

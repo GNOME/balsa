@@ -38,6 +38,12 @@
 
 #define BALSA_PIXMAP_MAIL_RPL_ALL	"reply_to_all"
 #define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"
+#define BALSA_PIXMAP_MAIL_RPL_GROUP	"reply_to_group"
+#define BALSA_PIXMAP_MAIL_RPL_GROUP_MENU "reply_to_group_menu"
+
+#define BALSA_PIXMAP_MAIL_CLOSE_MBOX	"close_mbox"
+
+#define BALSA_PIXMAP_MAIL_EMPTY_TRASH	"empty_trash"
 
 typedef enum {
     BALSA_ICON_DRAFTBOX,

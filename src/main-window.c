@@ -80,6 +80,8 @@ enum {
     TARGET_MESSAGES
 };
 
+#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
+
 #define NUM_DROP_TYPES 1
 static GtkTargetEntry notebook_drop_types[NUM_DROP_TYPES] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
@@ -153,7 +155,9 @@ static void new_message_cb(GtkWidget * widget, gpointer data);
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
 static void replytoall_message_cb(GtkWidget * widget, gpointer data);
 static void replytogroup_message_cb(GtkWidget * widget, gpointer data);
-static void forward_message_cb(GtkWidget * widget, gpointer data);
+static void forward_message_attached_cb(GtkWidget * widget, gpointer data);
+static void forward_message_quoted_cb(GtkWidget * widget, gpointer data);
+static void forward_message_default_cb(GtkWidget * widget, gpointer data);
 static void continue_message_cb(GtkWidget * widget, gpointer data);
 
 static void next_message_cb(GtkWidget * widget, gpointer data);
@@ -447,38 +451,44 @@ static GnomeUIInfo message_menu[] = {
 	GNOME_APP_UI_ITEM, N_("Reply to _Group..."),
 	N_("Reply to mailing list"),
 	replytogroup_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-	BALSA_PIXMAP_MAIL_RPL_ALL_MENU, 'G', 0, NULL
+	BALSA_PIXMAP_MAIL_RPL_GROUP_MENU, 'G', 0, NULL
     },
 #define MENU_MESSAGE_FORWARD_POS 3
     /* F */
     {
-	GNOME_APP_UI_ITEM, N_("_Forward..."),
-	N_("Forward the current message"),
-	forward_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	GNOME_APP_UI_ITEM, N_("_Forward attached..."),
+	N_("Forward the current message as attachment"),
+	forward_message_attached_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_MAIL_FWD, 'F', 0, NULL
     },
+    {
+	GNOME_APP_UI_ITEM, N_("Forward quoted..."),
+	N_("Forward the current message quoted"),
+	forward_message_quoted_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
+	GNOME_STOCK_MENU_MAIL_FWD, 'F', GDK_CONTROL_MASK, NULL
+    },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_NEXT_PART_POS 5
+#define MENU_MESSAGE_NEXT_PART_POS 6
     {
 	GNOME_APP_UI_ITEM, N_("Next Part"), N_("Next part in message"),
 	next_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_FORWARD, '.', GDK_CONTROL_MASK, NULL
     },
-#define MENU_MESSAGE_PREVIOUS_PART_POS 6
+#define MENU_MESSAGE_PREVIOUS_PART_POS 7
     {
 	GNOME_APP_UI_ITEM, N_("Previous Part"),
 	N_("Previous part in message"),
 	previous_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_BACK, ',', GDK_CONTROL_MASK, NULL
     },
-#define MENU_MESSAGE_SAVE_PART_POS 7
+#define MENU_MESSAGE_SAVE_PART_POS 8
     {
 	GNOME_APP_UI_ITEM, N_("Save Current Part..."),
 	N_("Save current part in message"),
 	save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
     },
-#define MENU_MESSAGE_SOURCE_POS 8
+#define MENU_MESSAGE_SOURCE_POS 9
     {
 	GNOME_APP_UI_ITEM, N_("_View Source..."),
 	N_("View source form of the message"),
@@ -486,7 +496,7 @@ static GnomeUIInfo message_menu[] = {
 	GNOME_STOCK_MENU_SAVE, 'v', GDK_CONTROL_MASK, NULL
     },
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_TRASH_POS 10
+#define MENU_MESSAGE_TRASH_POS 11
     /* D */
     {
 	GNOME_APP_UI_ITEM, N_("_Move to Trash"), 
@@ -494,23 +504,23 @@ static GnomeUIInfo message_menu[] = {
 	trash_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_TRASH, 'D', 0, NULL
     },
-#define MENU_MESSAGE_DELETE_POS 11
+#define MENU_MESSAGE_DELETE_POS 12
     { GNOME_APP_UI_ITEM, N_("_Delete"), 
       N_("Delete the current message"),
       delete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GNOME_STOCK_MENU_TRASH, 'D', GDK_CONTROL_MASK, NULL },
-#define MENU_MESSAGE_UNDEL_POS 12
+#define MENU_MESSAGE_UNDEL_POS 13
     /* U */
     {
 	GNOME_APP_UI_ITEM, N_("_Undelete"), N_("Undelete the message"),
 	undelete_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
 	GNOME_STOCK_MENU_UNDELETE, 'U', 0, NULL
     },
-#define MENU_MESSAGE_TOGGLE_POS 13
+#define MENU_MESSAGE_TOGGLE_POS 14
     /* ! */
     GNOMEUIINFO_SUBTREE(N_("_Toggle"), message_toggle_menu),
     GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_STORE_ADDRESS_POS 15
+#define MENU_MESSAGE_STORE_ADDRESS_POS 16
     /* S */
     {
 	GNOME_APP_UI_ITEM, N_("_Store Address..."),
@@ -675,11 +685,35 @@ balsa_window_init(BalsaWindow * window)
 GtkWidget *
 balsa_window_new()
 {
+    static const struct callback_item {
+	const char* icon_id;
+	void (*callback)(GtkWidget *, gpointer);
+    } callback_table[] = {
+	{ GNOME_STOCK_PIXMAP_MAIL_RCV,   check_new_messages_cb },
+	{ GNOME_STOCK_PIXMAP_TRASH,      trash_message_cb },
+	{ GNOME_STOCK_PIXMAP_MAIL_NEW,   new_message_cb },
+	{ GNOME_STOCK_PIXMAP_MAIL,       continue_message_cb },
+	{ GNOME_STOCK_PIXMAP_MAIL_RPL,   replyto_message_cb },
+	{ BALSA_PIXMAP_MAIL_RPL_ALL,     replytoall_message_cb },
+	{ BALSA_PIXMAP_MAIL_RPL_GROUP,   replytogroup_message_cb },
+	{ GNOME_STOCK_PIXMAP_MAIL_FWD,   forward_message_default_cb },
+	{ GNOME_STOCK_PIXMAP_BACK,       previous_message_cb },
+	{ GNOME_STOCK_PIXMAP_FORWARD,    next_message_cb },
+	{ BALSA_PIXMAP_NEXT_UNREAD,      next_unread_message_cb },
+	{ GNOME_STOCK_PIXMAP_PRINT,      message_print_cb },
+	{ BALSA_PIXMAP_FLAG_UNREAD,      toggle_new_message_cb },
+	{ BALSA_PIXMAP_MARK_ALL_MSGS,    mark_all_cb },
+	{ BALSA_PIXMAP_SHOW_ALL_HEADERS, show_all_headers_tool_cb },
+	{ BALSA_PIXMAP_MAIL_EMPTY_TRASH, (void(*)())empty_trash },
+	{ BALSA_PIXMAP_MAIL_CLOSE_MBOX,  mailbox_close_cb },
+    };
     BalsaWindow *window;
     GnomeAppBar *appbar;
     GtkWidget *scroll;
+    unsigned i;
 
-    /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS - allows for grey out */
+    /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
+     * - allows for grey out */
     register_balsa_pixmaps();
 
     window = gtk_type_new(BALSA_TYPE_WINDOW);
@@ -690,35 +724,10 @@ balsa_window_new()
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
 
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_MAIL_RCV,
-				check_new_messages_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_TRASH,
-				trash_message_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_MAIL_NEW,
-				new_message_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_MAIL,
-				continue_message_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_MAIL_RPL,
-				replyto_message_cb, window);
-    set_toolbar_button_callback(0, BALSA_PIXMAP_MAIL_RPL_ALL,
-				replytoall_message_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_MAIL_FWD,
-				forward_message_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_BACK,
-				previous_message_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_FORWARD,
-				next_message_cb, window);
-    set_toolbar_button_callback(0, BALSA_PIXMAP_NEXT_UNREAD,
-				next_unread_message_cb, window);
-    set_toolbar_button_callback(0, GNOME_STOCK_PIXMAP_PRINT,
-				message_print_cb, window);
-    set_toolbar_button_callback(0, BALSA_PIXMAP_FLAG_UNREAD,
-				toggle_new_message_cb, window);
-    set_toolbar_button_callback(0, BALSA_PIXMAP_MARK_ALL_MSGS,
-				mark_all_cb, window);
-    set_toolbar_button_callback(0, BALSA_PIXMAP_SHOW_ALL_HEADERS,
-				show_all_headers_tool_cb, window);
-    
+    for(i=0; i < ELEMENTS(callback_table); i++)
+	set_toolbar_button_callback(TOOLBAR_MAIN, callback_table[i].icon_id,
+				    callback_table[i].callback, window);
+
     gnome_app_set_toolbar(GNOME_APP(window),
 			  get_toolbar(GTK_WIDGET(window), TOOLBAR_MAIN));
     
@@ -841,6 +850,10 @@ balsa_window_new()
     enable_message_menus(NULL);
     enable_edit_menus(NULL);
     balsa_window_enable_continue();
+    /* gdk_threads_*() is needed, or balsa hangs on startup. */
+    /* gdk_threads_enter();
+    enable_empty_trash(TRASH_CHECK);
+    gdk_threads_leave();*/
 
     /* we can only set icon after realization, as we have no windows before. */
     gtk_signal_connect(GTK_OBJECT(window), "realize",
@@ -880,10 +893,12 @@ enable_mailbox_menus(BalsaMailboxNode * mbnode)
 				 0, GNOME_STOCK_PIXMAP_FORWARD, enable);
     set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
 				 0, BALSA_PIXMAP_NEXT_UNREAD, enable);
-    
+    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
+				 0, BALSA_PIXMAP_MAIL_CLOSE_MBOX, enable);
+
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_DELETE_POS].widget,
 			     enable);
-    
+
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_NEXT_POS].widget,
 			     enable);
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_PREV_POS].widget,
@@ -972,6 +987,8 @@ enable_message_menus(LibBalsaMessage * message)
 	set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
 			0, BALSA_PIXMAP_MAIL_RPL_ALL, enable);
 	set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
+			0, BALSA_PIXMAP_MAIL_RPL_GROUP, enable);
+	set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
 			0, GNOME_STOCK_PIXMAP_MAIL_FWD, enable);
 	set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window),
 			0, BALSA_PIXMAP_FLAG_UNREAD, enable);
@@ -996,6 +1013,50 @@ enable_edit_menus(BalsaMessage * bm)
     gtk_widget_set_sensitive(edit_menu[MENU_EDIT_COPY_POS].widget, enable);
     gtk_widget_set_sensitive(edit_menu[MENU_EDIT_SELECT_ALL_POS].widget,
 			     enable);
+}
+
+/*
+ * Enable/disable menu items/toolbar buttons which depend
+ * on the Trash folder containing messages
+ *
+ * If the trash folder is already open, use the message count
+ * to set the icon regardless of the parameter.  Else the
+ * value of the parameter is used to either set or clear trash
+ * items, or to open the trash folder and get the message count.
+ */
+void
+enable_empty_trash(TrashState status)
+{
+    gboolean set = TRUE;
+    if (balsa_app.trash->open_ref) {
+	set = balsa_app.trash->total_messages > 0;
+    } else {
+	switch(status) {
+	case TRASH_CHECK:
+	    /* Check msg count in trash; this may be expensive... 
+	     * lets just enable empty trash to be on the safe side */
+#if CAN_DO_MAILBOX_OPENING_VERY_VERY_FAST
+	    if (balsa_app.trash) {
+		libbalsa_mailbox_open(balsa_app.trash);
+		set = balsa_app.trash->total_messages > 0;
+		libbalsa_mailbox_close(balsa_app.trash);
+	    } else set = TRUE;
+#else
+	    set = TRUE;
+#endif
+	    break;
+	case TRASH_FULL:
+	    set = TRUE;
+	    break;
+	case TRASH_EMPTY:
+	    set = FALSE;
+	    break;
+	}
+    }
+    set_toolbar_button_sensitive(GTK_WIDGET(balsa_app.main_window), 0,
+				 BALSA_PIXMAP_MAIL_EMPTY_TRASH, set);
+    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_EMPTY_TRASH_POS].widget,
+			     set);
 }
 
 /*
@@ -2035,11 +2096,24 @@ replytogroup_message_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-forward_message_cb(GtkWidget * widget, gpointer data)
+forward_message_attached_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_message_forward(widget,
-			  balsa_window_find_current_index(BALSA_WINDOW
-							  (data)));
+    balsa_message_forward_attached(widget,
+	balsa_window_find_current_index(BALSA_WINDOW(data)));
+}
+
+static void
+forward_message_quoted_cb(GtkWidget * widget, gpointer data)
+{
+    balsa_message_forward_quoted(widget,
+	balsa_window_find_current_index(BALSA_WINDOW(data)));
+}
+
+static void
+forward_message_default_cb(GtkWidget * widget, gpointer data)
+{
+    balsa_message_forward_default(widget,
+	balsa_window_find_current_index(BALSA_WINDOW(data)));
 }
 
 
@@ -2415,6 +2489,7 @@ empty_trash(void)
     }
     libbalsa_mailbox_close(balsa_app.trash);
     balsa_mblist_update_mailbox(balsa_app.mblist, balsa_app.trash);
+    enable_empty_trash(TRASH_EMPTY);
 }
 
 static void
@@ -2778,6 +2853,12 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
         
         libbalsa_mailbox_sync_backend (orig_mailbox);
 	balsa_mblist_update_mailbox(balsa_app.mblist, orig_mailbox);
+
+	if (mailbox == balsa_app.trash) {
+	    enable_empty_trash(TRASH_FULL);
+	} else if (orig_mailbox == balsa_app.trash) {
+	    enable_empty_trash(TRASH_CHECK);
+	}
     }
 
     g_list_free (messages);

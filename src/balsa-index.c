@@ -520,19 +520,19 @@ static void
 bndx_moveto(BalsaIndex * index)
 {
     GtkTreeModel *model;
-    gint rows;
     GtkTreeIter iter;
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-    rows = gtk_tree_model_iter_n_children(model, NULL);
 
-    if (rows <= 0) {
+    if (!gtk_tree_model_get_iter_first(model, &iter))
         return;
-    }
 
     if (!bndx_find_row(index, &iter, FALSE, LIBBALSA_MESSAGE_FLAG_NEW,
-                       FILTER_NOOP, NULL, NULL))
-        gtk_tree_model_iter_nth_child(model, &iter, NULL, rows - 1);
+                       FILTER_NOOP, NULL, NULL)) {
+        GtkTreeIter tmp_iter = iter;
+	while (gtk_tree_model_iter_next(model, &tmp_iter))
+            iter = tmp_iter;
+    }
     bndx_expand_to_row_and_select(index, &iter,
                                   balsa_app.view_message_on_open);
 }

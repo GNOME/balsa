@@ -227,6 +227,7 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
   GtkCList *clist;
   GdkFont *font;
   GtkStyle *style;
+  GString *rbdy;
 
   BalsaSendmsg *msg = NULL;
   gchar *from;
@@ -481,14 +482,10 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, " wrote:\n", 8);
 
-	  c = body->buffer;
 
-	  if (c)
-	    {
-	      c = gt_replys (c);
-
-	      gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, c, strlen (c));
-	    }
+	  rbdy = content2reply(message);
+	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, rbdy->str, strlen(rbdy->str));
+	  g_string_free(rbdy, TRUE);
 	  gtk_text_insert (GTK_TEXT (msg->text), NULL, NULL, NULL, "\n\n", 2);
 	}
       message_body_unref (message);

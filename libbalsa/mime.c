@@ -44,7 +44,6 @@ static void
 text2html (gchar * buff, struct obstack *html_buff)
 {
   gint i = 0, len = strlen (buff);
-  gchar *str;
 
   for (i = 0; i < len; i++)
     {
@@ -248,7 +247,6 @@ other2html (BODY * bdy, FILE * fp, struct obstack *bfr)
   STATE s;
   gchar *ptr;
   size_t alloced;
-  gchar *retval;
 
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
@@ -327,7 +325,6 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
   STATE s;
   gchar *ptr = 0;
   size_t alloced;
-  gchar *retval;
 
   fseek (fp, bdy->offset, 0);
   s.fpin = fp;
@@ -359,8 +356,6 @@ mimetext2html (BODY * bdy, FILE * fp, struct obstack *bfr)
 void
 part2html (BODY * bdy, FILE * fp, struct obstack *html_bfr)
 {
-  gchar *ptr;
-  gchar *retval;
 
   switch (bdy->type)
     {
@@ -395,11 +390,8 @@ part2html (BODY * bdy, FILE * fp, struct obstack *html_bfr)
 gchar *
 content2html (Message * message)
 {
-  GString *mbuff;
-
   GList *body_list;
   Body *body;
-  gchar *buff;
   gchar tbuff[1024];
   FILE *msg_stream;
   gchar msg_filename[PATH_MAX];
@@ -479,7 +471,7 @@ content2html (Message * message)
 	    fprintf (stderr, "Open of %s failed. Errno = %d, ",
 		     msg_filename, errno);
 	    perror (NULL);
-	    return;
+	    return 0;
 	  }
 	break;
       }
@@ -502,4 +494,76 @@ content2html (Message * message)
   obstack_1grow (html_buffer, '\0');
   html_buffer_content = obstack_finish (html_buffer);
   return html_buffer_content;
+}
+
+
+GString *
+content2reply (Message * message)
+{
+  GList     *body_list;
+  Body      *body;
+  FILE      *msg_stream;
+  gchar      msg_filename[PATH_MAX];
+  size_t     alloced;
+  gchar     *ptr = 0;
+  GString   *reply = 0;
+  
+  switch (message->mailbox->type)
+    {
+    case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
+      {
+	snprintf (msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL (message->mailbox)->path, message_pathname (message));
+	msg_stream = fopen (msg_filename, "r");
+	if (!msg_stream || ferror (msg_stream))
+	  {
+	    fprintf (stderr, "Open of %s failed. Errno = %d, ",
+		     msg_filename, errno);
+	    perror (NULL);
+	    return 0;
+	  }
+	break;
+      }
+    case MAILBOX_IMAP:
+      msg_stream = fopen (MAILBOX_IMAP (message->mailbox)->tmp_file_path, "r");
+      break;
+    default:
+      msg_stream = fopen (MAILBOX_LOCAL (message->mailbox)->path, "r");
+      break;
+    }
+
+  body_list = message->body_list;
+  while (body_list)
+    {
+      body = (Body *) body_list->data;
+      switch (body->mutt_body->type)
+	{
+	case TYPETEXT:
+	  {
+	    STATE s;
+	    fseek(msg_stream, body->mutt_body->offset, 0);
+	    s.fpin = msg_stream;
+	    mutt_mktemp(tmp_file_name);
+	    s.prefix = ">";
+	    s.fpout  = fopen(tmp_file_name, "w+");
+	    mutt_decode_attachment(body->mutt_body, &s);
+	    fflush(s.fpout);
+	    alloced = readfile(s.fpout, &ptr);
+	    if (ptr)
+	      ptr[alloced - 1] = '\0';
+	    if (reply)
+	      {
+		reply = g_string_append(reply,"\n");
+		reply = g_string_append(reply, ptr);
+	      }
+	    else
+	      reply = g_string_new(ptr);
+	    fclose(s.fpout);
+	    unlink(tmp_file_name);
+	  }
+	}
+      body_list = g_list_next (body_list);
+    }
+  fclose(msg_stream);
+  return reply;
 }

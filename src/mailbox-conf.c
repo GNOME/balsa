@@ -430,7 +430,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	  node = g_node_new (mailbox_node_new (mailbox->name, mailbox,
 					    mailbox->type != MAILBOX_MBOX));
 	  g_node_append (balsa_app.mailbox_nodes, node);
-	  config_mailbox_add (mailbox, "generic");
+	  config_mailbox_add (mailbox, NULL);
 	}
 	break;
 
@@ -441,7 +441,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	MAILBOX_POP3 (mailbox)->passwd = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_password)));
 	MAILBOX_POP3 (mailbox)->server = g_strdup (gtk_entry_get_text (GTK_ENTRY (mcw->pop_server)));
 	balsa_app.inbox_input = g_list_append (balsa_app.inbox_input, mailbox);
-	config_mailbox_add (mailbox, "generic");
+	config_mailbox_add (mailbox, NULL);
 	break;
 
       case MC_PAGE_IMAP:
@@ -456,7 +456,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	node = g_node_new (mailbox_node_new (mailbox->name, mailbox, FALSE));
 	g_node_append (balsa_app.mailbox_nodes, node);
 
-	config_mailbox_add (mailbox, "generic");
+	config_mailbox_add (mailbox, NULL);
 	break;
       case MC_PAGE_NEW:
 	g_warning ("mailbox_conf_close: Invalid mcw->next_page value\n");

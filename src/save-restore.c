@@ -127,13 +127,13 @@ config_save (gchar * user_filename)
 }				/* config_save */
 
 
-/*
- * This routine inserts a new mailbox into the configuration's
+/* This routine inserts a new mailbox into the configuration's
  * accounts vector, modifying both the resident and on-disk
  * configurations.  The mailbox is specified by 'mailbox', and 'key'
  * actually refers to whether this is a special mailbox, such as
  * "Inbox", "Outbox", or "Trash", or whether it is a "generic"
- * mailbox.  The function returns TRUE on success and FALSE on
+ * mailbox.  If key is NULL, the mailbox's key is determine
+ * automatically.  The function returns TRUE on success and FALSE on
  * failure.
  */
 gint
@@ -176,8 +176,11 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
       pl_dict_add_str_str (mbox_dict, "Name", mailbox->name);
       pl_dict_add_str_str (mbox_dict, "Username",
 			   MAILBOX_POP3 (mailbox)->user);
-      pl_dict_add_str_str (mbox_dict, "Password",
-			   MAILBOX_POP3 (mailbox)->passwd);
+      /* Do not save the password if the field is NULL.  This is here
+	 so that asving the password to the balsarc file can be optional */
+      if (MAILBOX_POP3 (mailbox)->passwd != NULL)
+	pl_dict_add_str_str (mbox_dict, "Password",
+			     MAILBOX_POP3 (mailbox)->passwd);
       pl_dict_add_str_str (mbox_dict, "Server",
 			   MAILBOX_POP3 (mailbox)->server);
 
@@ -208,8 +211,9 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
       pl_dict_add_str_str (mbox_dict, "Path", MAILBOX_IMAP (mailbox)->path);
       pl_dict_add_str_str (mbox_dict, "Username",
 			   MAILBOX_IMAP (mailbox)->user);
-      pl_dict_add_str_str (mbox_dict, "Password",
-			   MAILBOX_IMAP (mailbox)->passwd);
+      if (MAILBOX_IMAP (mailbox)->passwd != NULL)
+	pl_dict_add_str_str (mbox_dict, "Password",
+			     MAILBOX_IMAP (mailbox)->passwd);
 
       break;
 
@@ -234,7 +238,7 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
 
   if (accounts == NULL)
     {
-      if (!strcmp(key_arg, "generic"))
+      if (key_arg == NULL)
 	strcpy(key, "m1");
       else
 	snprintf(key, sizeof(key), "%s", key_arg);
@@ -254,9 +258,8 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
       /* Before we can add the mailbox to the configuration, we need
 	 to pick a unique key for it.  "Inbox", "Outbox" and "Trash"
 	 all have unique keys, but for all other mailboxes, we are
-	 simply passed "generic" which we must replace with a unique
-	 key. */
-      if (!strcmp(key_arg, "generic"))
+	 simply passed NULL, meaning that we must supply the key ourselves. */
+      if (key_arg == NULL)
 	{
 	  int mbox_max;
 
@@ -282,7 +285,7 @@ config_mailbox_add (Mailbox * mailbox, char * key_arg)
 gint
 config_mailbox_delete (gchar * name)
 {
-  proplist_t accounts, mbox, temp_str;
+  proplist_t accounts, mbox, mbox_key, temp_str;
 
   if (balsa_app.proplist == NULL)
     {
@@ -302,7 +305,12 @@ config_mailbox_delete (gchar * name)
   if (mbox == NULL)
     return FALSE;
 
-  accounts = PLRemoveDictionaryEntry (accounts, mbox);
+  /* Now grab the associated key */
+  mbox_key = config_mailbox_get_key(mbox);
+  if (mbox_key == NULL)
+    return FALSE;
+
+  accounts = PLRemoveDictionaryEntry (accounts, mbox_key);
 
   config_save (BALSA_CONFIG_FILE);
   return TRUE;
@@ -423,9 +431,10 @@ config_mailbox_init (proplist_t mbox, gchar * key)
 	return FALSE;
       MAILBOX_POP3 (mailbox)->user = g_strdup (field);
 
-      if ((field = pl_dict_get_str (mbox, "Password")) == NULL)
-	return FALSE;
-      MAILBOX_POP3 (mailbox)->passwd = g_strdup (field);
+      if ((field = pl_dict_get_str (mbox, "Password")) != NULL)
+	MAILBOX_POP3 (mailbox)->passwd = g_strdup (field);
+      else
+	MAILBOX_POP3 (mailbox)->passwd = NULL;
 
       if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
@@ -444,8 +453,9 @@ config_mailbox_init (proplist_t mbox, gchar * key)
       MAILBOX_IMAP (mailbox)->user = g_strdup (field);
 
       if ((field = pl_dict_get_str (mbox, "Password")) == NULL)
-	return FALSE;
-      MAILBOX_IMAP (mailbox)->passwd = g_strdup (field);
+	MAILBOX_IMAP (mailbox)->passwd = g_strdup (field);
+      else
+	MAILBOX_POP3 (mailbox)->passwd = NULL;
 
       if ((field = pl_dict_get_str (mbox, "Server")) == NULL)
 	return FALSE;
@@ -743,3 +753,4 @@ config_mailbox_get_highest_number(proplist_t accounts)
 
   return max;
 } /* config_mailbox_get_highest_number */
+

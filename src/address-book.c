@@ -324,7 +324,8 @@ address_book_cb(GtkWidget * widget, gpointer data)
 	 * Only display this part of * the window when we're adding to a composing 
 	 * message. 
 	 */ 
-	if (!GNOME_IS_MDI((GnomeMDI *) data)) { 
+	/*if (!GNOME_IS_MDI((GnomeMDI *) data)) { */
+	if( GTK_IS_ENTRY( (GtkEntry *) data ) ) {
 		composing = TRUE; 
 		
 		box2 = gtk_vbox_new(FALSE, 5); 

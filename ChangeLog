@@ -1,6 +1,7 @@
-2004-05-07 00:32  PeterB
+2004-05-07 00:44  PeterB
 
 	* libbalsa/: mailbox_maildir.c, mailbox_mh.c: load flags correctly.
+	* libbalsa/mailbox.c: check for NULL entry.
 	* libbalsa/mailbox.c: manage has-unseen-child flag.
 
 2004-05-06 17:25  PeterB

@@ -804,9 +804,11 @@ libbalsa_message_body_ref(LibBalsaMessage * message)
     /*
      * load message body
      */
+    LOCK_MAILBOX(message->mailbox); /* checked that !=NULL here */
     libbalsa_lock_mutt();
     msg = mx_open_message(CLIENT_CONTEXT(message->mailbox), cur->msgno);
     libbalsa_unlock_mutt();
+    UNLOCK_MAILBOX(message->mailbox);
 
     if (!msg) { /*FIXME: crude but necessary error handling */
         if(CLIENT_CONTEXT_CLOSED(message->mailbox) ||
@@ -878,24 +880,29 @@ libbalsa_message_body_unref(LibBalsaMessage * message)
     if (message->body_ref == 0)
 	return;
 
+    if(message->mailbox) { LOCK_MAILBOX(message->mailbox); }
     if (--message->body_ref == 0) {
 	libbalsa_message_body_free(message->body_list);
 	message->body_list = NULL;
     }
+    if(message->mailbox) { UNLOCK_MAILBOX(message->mailbox); }
 }
 
 gboolean
 libbalsa_message_is_multipart(LibBalsaMessage * message)
 {
     HEADER *msg_header;
-
+    gboolean res;
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
     g_return_val_if_fail(message->mailbox, FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox), FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
 
+    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
     msg_header = message->header;	
-    return msg_header->content->type == TYPEMULTIPART;
+    res= msg_header->content->type == TYPEMULTIPART;
+    UNLOCK_MAILBOX(message->mailbox);
+    return res;
 }
 
 gboolean

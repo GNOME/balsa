@@ -156,7 +156,7 @@ libbalsa_conditions_new_from_config(gchar * prefix,
     LibBalsaCondition* cond;
     void *iterator;
     gchar *tmp,* condprefix,*key;
-    gint pref_len=strlen(CONDITION_SECTION_PREFIX)+strlen(filter_section_name);
+    gint pref_len=strlen(CONDITION_SECTION_PREFIX)+strlen(filter_section_name)+1;
     gint err=FILTER_NOERR;
     GList * tmp_list=NULL;
     GList *l;
@@ -164,7 +164,7 @@ libbalsa_conditions_new_from_config(gchar * prefix,
     FILTER_SETFLAG(fil,FILTER_VALID);
     FILTER_SETFLAG(fil,FILTER_COMPILED);
 
-    tmp=g_strconcat(CONDITION_SECTION_PREFIX,filter_section_name,NULL);
+    tmp=g_strconcat(CONDITION_SECTION_PREFIX,filter_section_name,":",NULL);
     iterator = gnome_config_init_iterator_sections(prefix);
     filter_errno=FILTER_NOERR;
 

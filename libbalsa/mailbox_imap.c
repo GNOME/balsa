@@ -729,7 +729,6 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
         rewind(stream);
         gdbm_close(dbf);
         free(data.dptr); /* allocated by gdbm_fetch */
-        printf("Message %d fetched from cache %s.\n", uid[1], fname);
     } else {
         MESSAGE *msg = safe_calloc(1, sizeof(MESSAGE));
         msg->magic = CLIENT_CONTEXT(mailbox)->magic;

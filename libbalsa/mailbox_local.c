@@ -250,7 +250,6 @@ run_filters_on_reception(LibBalsaMailbox * mailbox)
 
     filters = libbalsa_mailbox_filters_when(LIBBALSA_MAILBOX(mailbox)->filters,FILTER_WHEN_INCOMING);
     
-    g_print("Filters to run on mailbox %s ? %d\n",mailbox->name,filters!=NULL);
     /* We apply filter if needed */
 
     new_messages=libbalsa_extract_new_messages(mailbox->message_list);

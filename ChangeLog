@@ -1,3 +1,10 @@
+2000-06-15  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* libbalsa/send.c: Changed balsa_lookup_mime_type to use
+	gnome_mime_type_or_default instead of
+	gnome_mime_type_or_default_of_file because it was having trouble
+	with certain PDF and postscript files.  
+
 2000-06-15  Pawel Salek <pawsa@theochem.kth.se>
 	* libbalsa/Makefile.am: added contact.h to the list of files.
 

@@ -1,5 +1,10 @@
-2004-11-07 11:27  PeterB
+2004-11-07 14:07  PeterB
 
+	* src/balsa-mblist.c: make balsa_app.mblist_tree_store a weak
+	pointer, so we can detect when it has been destroyed.
+	* src/main-window.c: provide a localizable tooltip for Reset
+	_Filter menu item, and change its shortcut to _Reset Filter; add
+	shortcut _Select All.
 	* src/sendmsg-window.c: fix bug 156460--replace EUC-JP with
 	ISO-2022-JP for Japanese language option.
 

@@ -67,7 +67,6 @@
 #  include <sys/types.h>
 #  include <regex.h>
 #endif
-#include "balsa-index.h"
 #include "quote-color.h"
 
 #include <string.h>
@@ -90,7 +89,6 @@ typedef struct _PrintInfo {
     float margin_top, margin_bottom, margin_left, margin_right;
     float printable_width, printable_height;
     float pgnum_from_top;
-    gint chars_per_line;
 
     /* wrapping */
     gint tab_width;
@@ -117,10 +115,13 @@ struct _FontInfo {
 
 struct _CommonInfo {
     GHashTable *font_table;
-    GtkWidget *dialog;
     FontInfo header_font_info;
     FontInfo body_font_info;
     FontInfo footer_font_info;
+    /* Some other per-dialog data: */
+    GtkWidget *dialog;
+    BALSA_GNOME_PRINT_UI *master;
+    LibBalsaMessage *message;
 };
 
 typedef void (*prepare_func_t)(PrintInfo * pi, LibBalsaMessageBody * body);
@@ -1016,18 +1017,19 @@ find_font(const gchar * name, GHashTable * font_table)
 }
 
 static PrintInfo *
-print_info_new(LibBalsaMessage * msg, BALSA_GNOME_PRINT_UI * master,
-               CommonInfo * ci)
+print_info_new(CommonInfo * ci)
 {
-    GnomePrintConfig* config;
-    PrintInfo *pi = g_new0(PrintInfo, 1);
+    GnomePrintConfig *config;
+    PrintInfo *pi = g_new(PrintInfo, 1);
 
-    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(master);
-    BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG(config, &pi->page_width,
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
+    BALSA_GNOME_PRINT_UI_GET_PAGE_SIZE_FROM_CONFIG(config,
+                                                   &pi->page_width,
                                                    &pi->page_height);
     gnome_print_config_unref(config);
 
-    pi->pc = BALSA_GNOME_PRINT_UI_GET_CONTEXT(master);
+    pi->pc = BALSA_GNOME_PRINT_UI_GET_CONTEXT(ci->master);
+    pi->current_page = 0;
     pi->margin_top = 0.75 * 72;
     pi->margin_bottom = 0.75 * 72;
     pi->margin_left = 0.75 * 72;
@@ -1047,13 +1049,15 @@ print_info_new(LibBalsaMessage * msg, BALSA_GNOME_PRINT_UI * master,
     pi->body_font =   ci->body_font_info.font;
     pi->footer_font = ci->footer_font_info.font;
 
-    pi->message = msg;
+    pi->message = ci->message;
+    pi->print_parts = NULL;
     prepare_header(pi, NULL);
     
     /* now get the message contents... */
-    libbalsa_message_body_ref(msg, TRUE);
-    scan_body(pi, msg->body_list);
-    libbalsa_message_body_unref(msg);
+    if (libbalsa_message_body_ref(pi->message, TRUE)) {
+        scan_body(pi, pi->message->body_list);
+        libbalsa_message_body_unref(pi->message);
+    }
 
     return pi;
 }
@@ -1107,23 +1111,6 @@ print_message(PrintInfo * pi)
     gnome_print_showpage(pi->pc);
 }
 
-void
-message_print_cb(GtkWidget * widget, gpointer cbdata)
-{
-    BalsaIndex *index;
-    LibBalsaMessage *msg;
-
-    g_return_if_fail(cbdata);
-
-    index = BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(cbdata)));
-    if (!index)
-        return;
-
-    msg = index->current_message;
-    if (msg)
-        message_print(msg);
-}
-    
 /* callback to read a toggle button */
 static void 
 togglebut_changed (GtkToggleButton *tbut, gboolean *value)
@@ -1188,7 +1175,7 @@ font_frame(gchar * title, FontInfo * fi)
  * creates the print dialog, and adds a page for fonts
  */
 static GtkWidget *
-print_dialog(BALSA_GNOME_PRINT_UI * master, CommonInfo * ci)
+print_dialog(CommonInfo * ci)
 {
     GtkWidget  *dialog;
     GtkWidget  *frame;
@@ -1199,7 +1186,7 @@ print_dialog(BALSA_GNOME_PRINT_UI * master, CommonInfo * ci)
     GtkWidget  *chkbut;
     GList      *childList;
 
-    dialog = BALSA_GNOME_PRINT_DIALOG_NEW(master, _("Print message"),
+    dialog = BALSA_GNOME_PRINT_DIALOG_NEW(ci->master, _("Print message"),
 				    GNOME_PRINT_DIALOG_COPIES);
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");
     dlgVbox = GTK_DIALOG(dialog)->vbox;
@@ -1274,7 +1261,7 @@ font_info_setup(FontInfo * fi, gchar ** font_name, CommonInfo * ci)
 static void
 font_info_cleanup(FontInfo * fi)
 {
-    g_object_unref(G_OBJECT(fi->font));
+    g_object_unref(fi->font);
 }
 
 /*
@@ -1298,13 +1285,79 @@ common_info_setup(CommonInfo * ci)
     font_info_setup(&ci->footer_font_info, &balsa_app.print_footer_font, ci);
 }
 
+#define BALSA_PRINT_COMMON_INFO_KEY "balsa-print-common-info"
+
+/* GWeakNotify callback: destroy non-message-related stuff in
+ * CommonInfo. */
 static void
-common_info_cleanup(CommonInfo * ci)
+common_info_destroy(CommonInfo * ci)
 {
     g_hash_table_destroy(ci->font_table);
     font_info_cleanup(&ci->header_font_info);
     font_info_cleanup(&ci->body_font_info);
     font_info_cleanup(&ci->footer_font_info);
+
+    gtk_widget_destroy(GTK_WIDGET(ci->dialog));
+    g_object_unref(ci->master);
+
+    g_free(ci);
+}
+
+/* Clean up message-related stuff in CommonInfo, then destroy the rest. */
+static void
+common_info_cleanup(CommonInfo * ci)
+{
+    g_object_weak_unref(G_OBJECT(ci->message),
+                        (GWeakNotify) common_info_destroy, ci);
+    g_object_set_data(G_OBJECT(ci->message), BALSA_PRINT_COMMON_INFO_KEY,
+                      NULL);
+
+    common_info_destroy(ci);
+}
+
+/* Callback for the "response" signal for the print dialog. */
+static void
+print_response_cb(GtkDialog * dialog, gint response, CommonInfo * ci)
+{
+    GnomePrintConfig *config;
+    PrintInfo *pi;
+    gboolean preview;
+
+    switch (response) {
+    case GNOME_PRINT_DIALOG_RESPONSE_PRINT:
+        preview = FALSE;
+	break;
+    case GNOME_PRINT_DIALOG_RESPONSE_PREVIEW:
+	preview = TRUE;
+	break;
+    default:
+        common_info_cleanup(ci);
+	return;
+    }
+
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
+    g_free(balsa_app.paper_size);
+    balsa_app.paper_size =
+        gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_SIZE); 
+    gnome_print_config_unref(config);
+
+    pi = print_info_new(ci);
+
+    /* do the Real Job */
+    print_message(pi);
+    BALSA_GNOME_PRINT_UI_CLOSE(ci->master);
+    if (preview) {
+	GtkWidget *preview_widget =
+	    BALSA_GNOME_PRINT_UI_PREVIEW_NEW(ci->master,
+		 			   _("Balsa: message print preview"));
+        gtk_window_set_wmclass(GTK_WINDOW(preview_widget), "print-preview",
+                               "Balsa");
+	gtk_widget_show(preview_widget);
+    } else
+	BALSA_GNOME_PRINT_UI_PRINT(ci->master);
+
+    print_info_destroy(pi);
+    common_info_cleanup(ci);
 }
 
 /*
@@ -1315,63 +1368,40 @@ common_info_cleanup(CommonInfo * ci)
 void
 message_print(LibBalsaMessage * msg)
 {
-    CommonInfo ci;
-    BALSA_GNOME_PRINT_UI *master;
-    GnomePrintConfig* config;
-    PrintInfo *pi;
-    gboolean preview;
+    CommonInfo *ci;
+    GnomePrintConfig *config;
 
     g_return_if_fail(msg != NULL);
 
-    common_info_setup(&ci);
+    /* Show only one dialog per message. */
+    ci = g_object_get_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY);
+    if (ci) {
+        gdk_window_raise(ci->dialog->window);
+        return;
+    }
 
-    master = BALSA_GNOME_PRINT_UI_NEW;
+    ci = g_new(CommonInfo, 1);
+    g_object_set_data(G_OBJECT(msg), BALSA_PRINT_COMMON_INFO_KEY, ci);
+    common_info_setup(ci);
+
+    ci->message = msg;
+    g_object_weak_ref(G_OBJECT(msg), (GWeakNotify) common_info_destroy, ci);
+    ci->master = BALSA_GNOME_PRINT_UI_NEW;
 
     /* FIXME: this sets the paper size in the GnomePrintConfig. We can
      * change it in the Paper page of the GnomePrintDialog, and retrieve
      * it from the GnomePrintConfig. However, it doesn't get set as the
      * initial value in the Paper page. Is there some Gnome-2-wide
      * repository for data like this? */
-    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(master);
+    config = BALSA_GNOME_PRINT_UI_GET_CONFIG(ci->master);
     gnome_print_config_set(config, GNOME_PRINT_KEY_PAPER_SIZE, 
                            balsa_app.paper_size);
+    gnome_print_config_unref(config);
     
-    ci.dialog = print_dialog(master, &ci);
-    set_dialog_buttons_sensitive(&ci);
+    ci->dialog = print_dialog(ci);
+    set_dialog_buttons_sensitive(ci);
+    g_signal_connect(G_OBJECT(ci->dialog), "response",
+                     G_CALLBACK(print_response_cb), ci);
 
-    switch (gtk_dialog_run(GTK_DIALOG(ci.dialog))) {
-    case GNOME_PRINT_DIALOG_RESPONSE_PRINT:
-        preview = FALSE;
-	break;
-    case GNOME_PRINT_DIALOG_RESPONSE_PREVIEW:
-	preview = TRUE;
-	break;
-    case GTK_RESPONSE_CANCEL:
-	gtk_widget_destroy(GTK_WIDGET(ci.dialog));
-    default:
-	return;
-    }
-    gtk_widget_destroy(GTK_WIDGET(ci.dialog));
-
-    g_free(balsa_app.paper_size);
-    balsa_app.paper_size =
-        gnome_print_config_get(config, GNOME_PRINT_KEY_PAPER_SIZE); 
-    pi = print_info_new(msg, master, &ci);
-
-    /* do the Real Job */
-    print_message(pi);
-    BALSA_GNOME_PRINT_UI_CLOSE(master);
-    if (preview) {
-	GtkWidget *preview_widget =
-	    BALSA_GNOME_PRINT_UI_PREVIEW_NEW(master,
-		 			   _("Balsa: message print preview"));
-        gtk_window_set_wmclass(GTK_WINDOW(preview_widget), "print-preview",
-                               "Balsa");
-	gtk_widget_show(preview_widget);
-    } else
-	BALSA_GNOME_PRINT_UI_PRINT(master);
-
-    print_info_destroy(pi);
-    common_info_cleanup(&ci);
-    g_object_unref(G_OBJECT(master));
+    gtk_widget_show_all(ci->dialog);
 }

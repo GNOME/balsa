@@ -1504,8 +1504,6 @@ attach_clicked(GtkWidget * widget, gpointer data)
                              GTK_OBJECT(fsw));
 
     gtk_widget_show(fsw);
-
-    return;
 }
 
 /* attach_message:
@@ -3395,8 +3393,7 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *msg = bsmsg2message(bsmsg);
     message_print(msg);
-    gtk_object_destroy(GTK_OBJECT(msg));
-    return;
+    g_object_unref(msg);
 }
 
 static void

@@ -26,7 +26,6 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-    void message_print_cb(GtkWidget * widget, gpointer cbdata);
     void message_print(LibBalsaMessage * msg);
 
 #ifdef __cplusplus

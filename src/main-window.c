@@ -137,6 +137,7 @@ static void show_about_box(void);
 /* callbacks */
 static void send_outbox_messages_cb(GtkWidget *, gpointer data);
 static void send_receive_messages_cb(GtkWidget *, gpointer data);
+static void message_print_cb(GtkWidget * widget, gpointer data);
 
 static void new_message_cb(GtkWidget * widget, gpointer data);
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
@@ -311,7 +312,7 @@ static GnomeUIInfo file_menu[] = {
      GNOMEUIINFO_SEPARATOR,
 #define MENU_FILE_PRINT_POS 7
     { GNOME_APP_UI_ITEM, N_("_Print..."), 
-      N_("Print currently selected messages"),
+      N_("Print current message"),
       message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       BALSA_PIXMAP_MENU_PRINT, 'P', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
@@ -1903,6 +1904,25 @@ send_outbox_messages_cb(GtkWidget * widget, gpointer data)
     libbalsa_process_queue(balsa_app.outbox, balsa_app.encoding_style,
                            balsa_app.send_rfc2646_format_flowed);
 #endif
+}
+
+/* Callback for `Print current message' item on the `File' menu, 
+ * and the toolbar button. */
+static void
+message_print_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index;
+    LibBalsaMessage *msg;
+
+    g_return_if_fail(data);
+
+    index = balsa_window_find_current_index(BALSA_WINDOW(data));
+    if (!index)
+        return;
+
+    msg = BALSA_INDEX(index)->current_message;
+    if (msg)
+        message_print(msg);
 }
 
 /* this one is called only in the threaded code */

@@ -1085,7 +1085,10 @@ add_local_mailbox(GNode *root, const gchar * name, const gchar * path)
 		LIBBALSA_MAILBOX(libbalsa_mailbox_maildir_new(path, FALSE));
 	} else {
 	    /* type is not a valid local mailbox type. */
-	    g_assert_not_reached(); mailbox = NULL;
+	    balsa_information(LIBBALSA_INFORMATION_WARNING,
+			      _("The path \"%s\" does not lead to a mailbox."),
+			      path);
+	    mailbox = NULL;
 	}
 	if(!mailbox) {/* local mailbox could not be created; privileges? */
 	    printf("Not accessible mailbox %s\n", path);

@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 0.4\n"
-"POT-Creation-Date: 2000-06-14 21:48+0000\n"
-"PO-Revision-Date: 2000-06-14 21:51+00:00\n"
+"POT-Creation-Date: 2000-06-16 12:23+0000\n"
+"PO-Revision-Date: 2000-06-16 12:26+00:00\n"
 "Last-Translator: Valek Filippov <frob@df.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -184,7 +184,7 @@ msgstr "Добавить новый адрес"
 msgid "E-Mail Address:"
 msgstr "Электронный адрес:"
 
-#: src/address-book.c:291 src/balsa-index-page.c:860
+#: src/address-book.c:291 src/balsa-index-page.c:865
 #, c-format
 msgid ""
 "Unable to open ~/.gnome/GnomeCard.gcrd for read.\n"
@@ -213,7 +213,7 @@ msgstr "Имя"
 msgid "E-Mail Address"
 msgstr "Электронный адрес"
 
-#: src/address-book.c:420 src/address-book.c:458 src/main-window.c:174
+#: src/address-book.c:420 src/address-book.c:458 src/main-window.c:177
 msgid "Address Book"
 msgstr "Адресная книга"
 
@@ -254,16 +254,16 @@ msgstr "Черновики"
 msgid "Trash"
 msgstr "Мусорная корзина"
 
-#: src/balsa-index-page.c:292
+#: src/balsa-index-page.c:293
 msgid "Mailbox password:"
 msgstr "Пароль для почтового ящика:"
 
 #. password field
-#: src/balsa-index-page.c:300 src/mailbox-conf.c:991 src/mailbox-conf.c:1090
+#: src/balsa-index-page.c:301 src/mailbox-conf.c:991 src/mailbox-conf.c:1090
 msgid "Password:"
 msgstr "Пароль:"
 
-#: src/balsa-index-page.c:326
+#: src/balsa-index-page.c:327
 msgid ""
 "Unable to Open Mailbox!\n"
 "Please check the mailbox settings."
@@ -271,48 +271,48 @@ msgstr ""
 "Невозможно открыть почтовый ящик!\n"
 "Проверьте его настройки."
 
-#: src/balsa-index-page.c:603 src/filter-edit-dialog.c:222
+#: src/balsa-index-page.c:608 src/filter-edit-dialog.c:222
 msgid "New"
 msgstr "Новый"
 
-#: src/balsa-index-page.c:606 src/main-window.c:382
+#: src/balsa-index-page.c:611 src/main-window.c:405
 msgid "Reply"
 msgstr "Ответить"
 
-#: src/balsa-index-page.c:609 src/main-window.c:385
+#: src/balsa-index-page.c:614 src/main-window.c:408
 msgid "Reply to all"
 msgstr "Ответить всем"
 
-#: src/balsa-index-page.c:612 src/main-window.c:388
+#: src/balsa-index-page.c:617 src/main-window.c:411
 msgid "Forward"
 msgstr "Переслать"
 
-#: src/balsa-index-page.c:615 src/filter-edit-dialog.c:228
-#: src/main-window.c:375 src/pref-manager.c:886
+#: src/balsa-index-page.c:620 src/filter-edit-dialog.c:228
+#: src/main-window.c:398 src/pref-manager.c:886
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/balsa-index-page.c:618
+#: src/balsa-index-page.c:623
 msgid "Undelete"
 msgstr "Восстановить"
 
-#: src/balsa-index-page.c:622 src/balsa-index-page.c:1176
+#: src/balsa-index-page.c:627 src/balsa-index-page.c:1181
 msgid "Store Address"
 msgstr "Сохранить адрес"
 
-#: src/balsa-index-page.c:625
+#: src/balsa-index-page.c:630
 msgid "Transfer"
 msgstr "Передать"
 
-#: src/balsa-index-page.c:828
+#: src/balsa-index-page.c:833
 msgid "No ;'s!\n"
 msgstr ""
 
-#: src/balsa-index-page.c:865
+#: src/balsa-index-page.c:870
 msgid "The Card Name field must be non-empty.\n"
 msgstr "Поле \"Название карточки\" не должно быть пустым.\n"
 
-#: src/balsa-index-page.c:871
+#: src/balsa-index-page.c:876
 #, c-format
 msgid ""
 "There is already an address book entry for %s.\n"
@@ -321,39 +321,39 @@ msgstr ""
 "Для %s уже есть запись в адресной книге.\n"
 "Запустить GnomeCard если хотите отредактировать записи в адресной книге.\n"
 
-#: src/balsa-index-page.c:1088
+#: src/balsa-index-page.c:1093
 msgid "Card Name:"
 msgstr "Название карточки:"
 
-#: src/balsa-index-page.c:1088
+#: src/balsa-index-page.c:1093
 msgid "First Name:"
 msgstr "Имя:"
 
-#: src/balsa-index-page.c:1089
+#: src/balsa-index-page.c:1094
 msgid "Last Name:"
 msgstr "Фамилия:"
 
-#: src/balsa-index-page.c:1089
+#: src/balsa-index-page.c:1094
 msgid "Organization:"
 msgstr "Организация:"
 
-#: src/balsa-index-page.c:1090
+#: src/balsa-index-page.c:1095
 msgid "Email Address:"
 msgstr "Эл.адрес:"
 
-#: src/balsa-index-page.c:1105
+#: src/balsa-index-page.c:1110
 msgid "In order to store an address, you must select a message.\n"
 msgstr "Для того чтобы сохранить адрес, вы должны выбрать сообщение.\n"
 
-#: src/balsa-index-page.c:1115
+#: src/balsa-index-page.c:1120
 msgid "You may only store one address at a time.\n"
 msgstr "Вы можете сохранить только один адрес за раз.\n"
 
-#: src/balsa-index-page.c:1128
+#: src/balsa-index-page.c:1133
 msgid "This message doesn't contain an e-mail address.\n"
 msgstr "Это сообщение не содержит эл.адресов.\n"
 
-#: src/balsa-index-page.c:1179
+#: src/balsa-index-page.c:1184
 msgid "Contact Information"
 msgstr "Контактная информация"
 
@@ -390,105 +390,96 @@ msgstr "Всего"
 msgid "Shown mailbox: %s with %ld messages, %ld new"
 msgstr "Показан почтовый ящик: %s c %ld сообщениями, %ld новых"
 
-#: src/balsa-message.c:165 src/balsa-message.c:170
+#: src/balsa-message.c:213 src/balsa-message.c:217
 msgid "Save MIME Part"
 msgstr "Сохранить MIME-закодированную часть"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226
+#: src/balsa-message.c:214 src/balsa-message.c:1087
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/balsa-message.c:166 src/balsa-message.c:226 src/mailbox-conf.c:670
-#: src/sendmsg-window.c:130 src/sendmsg-window.c:429 src/sendmsg-window.c:1101
+#: src/balsa-message.c:214 src/mailbox-conf.c:670 src/sendmsg-window.c:130
+#: src/sendmsg-window.c:429 src/sendmsg-window.c:1101
 #: src/sendmsg-window.c:1408 src/sendmsg-window.c:1431
 msgid "Cancel"
 msgstr "Отменить"
 
-#: src/balsa-message.c:168 src/balsa-message.c:228
+#: src/balsa-message.c:215
 msgid "Please choose a filename to save this part of the message as:"
 msgstr "Выберите имя файла для сохранения этой части изображения:"
 
-#: src/balsa-message.c:225 src/balsa-message.c:230
-msgid "Save Text"
-msgstr "Сохранить текст"
-
-#: src/balsa-message.c:301 src/balsa-message.c:315
+#: src/balsa-message.c:263 src/balsa-message.c:283
 #, c-format
 msgid " Open of %s failed:%s "
 msgstr "Не удалось открыть %s:%s"
 
-#: src/balsa-message.c:302 src/balsa-message.c:317
+#: src/balsa-message.c:266
+msgid "Error"
+msgstr "Ошибка"
+
+#: src/balsa-message.c:266 src/balsa-message.c:285
 msgid "Ok"
 msgstr "Ok"
 
-#: src/balsa-message.c:644
+#: src/balsa-message.c:531
 msgid "Date:"
 msgstr "Дата:"
 
 #. From:
-#: src/balsa-message.c:648 src/filter-edit-dialog.c:337
+#: src/balsa-message.c:535 src/filter-edit-dialog.c:337
 #: src/sendmsg-window.c:601
 msgid "From:"
 msgstr "От:"
 
 #. To:
-#: src/balsa-message.c:652 src/filter-edit-dialog.c:325
+#: src/balsa-message.c:539 src/filter-edit-dialog.c:325
 #: src/sendmsg-window.c:603
 msgid "To:"
 msgstr "Кому:"
 
-#: src/balsa-message.c:653
+#: src/balsa-message.c:540
 msgid "Cc:"
 msgstr "Официальные копии (Сс):"
 
-#: src/balsa-message.c:654
+#: src/balsa-message.c:541
 msgid "Bcc:"
 msgstr "Скрытые копии:"
 
-#: src/balsa-message.c:657
+#: src/balsa-message.c:544
 msgid "Fcc:"
 msgstr "Fcc:"
 
 #. Subject:
-#: src/balsa-message.c:658 src/sendmsg-window.c:609
+#: src/balsa-message.c:545 src/sendmsg-window.c:609
 msgid "Subject:"
 msgstr "Тема:"
 
-#: src/balsa-message.c:734
+#: src/balsa-message.c:603
+msgid "Couldn't render image\n"
+msgstr "Не удалось отрисовать изображение\n"
+
+#: src/balsa-message.c:651
+msgid "Balsa does not know how to display this message part"
+msgstr "Balsa не может отобразить эту часть сообщения"
+
+#: src/balsa-message.c:656
 #, c-format
-msgid "other part: error writing to temporary file %s: %s"
-msgstr "другая часть: ошибка записи во временный файл %s: %s"
+msgid "Content Type: %s/%s"
+msgstr "Тип содержимого: %s/%s"
 
-#: src/balsa-message.c:788
-msgid ""
-"<tr><td bgcolor=\"#f0f0f0\"> You received an encoded file of type "
-"application/"
-msgstr ""
-"<tr><td bgcolor=\\\"#f0f0f0\\\"> Вы получили закодированный файл типа "
-"application/"
-
-#: src/balsa-message.c:792
-msgid "<P>The parameters of this message are:<BR>"
-msgstr "<P>Параметры этого сообщения:<BR>"
-
-#: src/balsa-message.c:793
-msgid "<table border=0><tr><th>Attribute</th><th>Value</th></tr>\n"
-msgstr "<table border=0><tr><th>Атрибут</th><th>Значение</th></tr>\n"
-
-#: src/balsa-message.c:827
+#: src/balsa-message.c:658
 #, c-format
-msgid "image: error writing to temporary file: %s"
-msgstr "изображение: ошибка записи во временный файл: %s"
+msgid "Content Type: %s"
+msgstr "Тип содержимого: %s"
 
-#: src/balsa-message.c:1106
+#: src/balsa-message.c:665
 #, c-format
-msgid "text part: error writing to temporary file %s: %s"
-msgstr "текстовая часть: ошибка записи во временный файл %s: %s"
+msgid "Filename: %s"
+msgstr "Имя файла: %s"
 
-#: src/balsa-message.c:1251
-#, c-format
-msgid "Open of %s failed. Errno = %d, "
-msgstr "Не удалось открыть %s. Номер ошибки = %d, "
+#: src/balsa-message.c:672
+msgid "Save part"
+msgstr "Сохранить часть"
 
 #: src/filter-edit-dialog.c:30
 msgid "Inbound"
@@ -799,7 +790,7 @@ msgid "Username:"
 msgstr "Имя пользоватеся:"
 
 #. toggle for check
-#: src/mailbox-conf.c:1006 src/main-window.c:371
+#: src/mailbox-conf.c:1006 src/main-window.c:394
 msgid "Check"
 msgstr "Проверить"
 
@@ -812,248 +803,272 @@ msgstr "Удалить с сервера"
 msgid "Folder path:"
 msgstr "Путь к папке:"
 
-#: src/main-window.c:168
+#: src/main-window.c:171
 msgid "_Get new mail"
 msgstr "Проверить почту"
 
-#: src/main-window.c:168
+#: src/main-window.c:171
 msgid "Fetch new incoming mail"
 msgstr "Взять вновь пришедшую почту"
 
-#: src/main-window.c:174
+#: src/main-window.c:177
 msgid "Opens the address book"
 msgstr "Открыть адресную книгу"
 
-#: src/main-window.c:181
+#: src/main-window.c:184
 msgid "Pr_int"
 msgstr "Напечатать"
 
-#: src/main-window.c:181
+#: src/main-window.c:184
 msgid "Print current mail"
 msgstr "Напечатать текущее письмо"
 
-#: src/main-window.c:206
+#: src/main-window.c:209 src/message-window.c:54
 msgid "N_o headers"
 msgstr "Без заголовков"
 
-#: src/main-window.c:208
+#: src/main-window.c:211 src/message-window.c:56
 msgid "_Selected headers"
 msgstr "Выбранные заголовки"
 
-#: src/main-window.c:210
+#: src/main-window.c:213 src/message-window.c:58
 msgid "All _headers"
 msgstr "Все заголовки"
 
-#: src/main-window.c:219 src/main-window.c:401
+#: src/main-window.c:222 src/main-window.c:424
 msgid "Next"
 msgstr "След."
 
-#: src/main-window.c:219
+#: src/main-window.c:222
 msgid "Next Message"
 msgstr "Следущее письмо"
 
-#: src/main-window.c:225 src/main-window.c:396
+#: src/main-window.c:228 src/main-window.c:419
 msgid "Previous"
 msgstr "Пред."
 
-#: src/main-window.c:225
+#: src/main-window.c:228
 msgid "Preivous Message"
 msgstr "Предыдущее письмо"
 
-#: src/main-window.c:231 src/main-window.c:406
+#: src/main-window.c:234 src/main-window.c:429
 msgid "Next Unread"
 msgstr "След. непрочитанное"
 
-#: src/main-window.c:231
+#: src/main-window.c:234
 msgid "Next Unread Message"
 msgstr "След. непрочитанное письмо"
 
-#: src/main-window.c:239
+#: src/main-window.c:241 src/message-window.c:93
+msgid "Next Part"
+msgstr "След. часть"
+
+#: src/main-window.c:241 src/message-window.c:93
+msgid "Next Part in Message"
+msgstr "Следующая часть сообщения"
+
+#: src/main-window.c:247 src/message-window.c:98
+msgid "Previous Part"
+msgstr "Пред. часть"
+
+#: src/main-window.c:247 src/message-window.c:98
+msgid "Previous Part in Message"
+msgstr "Предыдущая часть сообщения"
+
+#: src/main-window.c:253 src/message-window.c:103
+msgid "Save Current Part"
+msgstr "Сохранить текущую часть"
+
+#: src/main-window.c:254 src/message-window.c:104
+msgid "Save Current Part in Message"
+msgstr "Сохранить текущую часть сообщения"
+
+#: src/main-window.c:262
 msgid "_New"
 msgstr "Новое"
 
-#: src/main-window.c:239
+#: src/main-window.c:262
 msgid "Compose a new message"
 msgstr "Составить новое письмо"
 
-#: src/main-window.c:246 src/message-window.c:54
+#: src/main-window.c:269 src/message-window.c:74
 msgid "_Reply"
 msgstr "Ответить"
 
-#: src/main-window.c:246
+#: src/main-window.c:269
 msgid "Reply to the current message"
 msgstr "Ответить на текущее письмо"
 
-#: src/main-window.c:253 src/message-window.c:60
+#: src/main-window.c:276 src/message-window.c:80
 msgid "Reply to _all"
 msgstr "Ответить всем"
 
-#: src/main-window.c:254
+#: src/main-window.c:277
 msgid "Reply to all recipients of the current message"
 msgstr "Ответить всем адресатам текущего письма"
 
-#: src/main-window.c:261 src/message-window.c:67
+#: src/main-window.c:284 src/message-window.c:87
 msgid "_Forward"
 msgstr "Переслать"
 
-#: src/main-window.c:261
+#: src/main-window.c:284
 msgid "Forward the current message"
 msgstr "Переслать текущее письмо"
 
-#: src/main-window.c:268
+#: src/main-window.c:291
 msgid "_Continue"
 msgstr "Продолжить"
 
-#: src/main-window.c:268
+#: src/main-window.c:291
 msgid "Continue editing current message"
 msgstr "Продолжить редактирование текущего письма"
 
-#: src/main-window.c:276 src/main-window.c:322
+#: src/main-window.c:299 src/main-window.c:345
 msgid "_Delete"
 msgstr "Уничтожить"
 
-#: src/main-window.c:276
+#: src/main-window.c:299
 msgid "Delete the current message"
 msgstr "Уничтожить текущее письмо"
 
-#: src/main-window.c:283
+#: src/main-window.c:306
 msgid "_Undelete"
 msgstr "Восстановить"
 
-#: src/main-window.c:283
+#: src/main-window.c:306
 msgid "Undelete the message"
 msgstr "Восстановить письмо"
 
-#: src/main-window.c:291
+#: src/main-window.c:314
 msgid "_Store Address"
 msgstr "Сохранить адрес"
 
-#: src/main-window.c:291
+#: src/main-window.c:314
 msgid "Store address of sender in addressbook"
 msgstr "Сохранить адрес отправителя в записной книжке"
 
-#: src/main-window.c:297
+#: src/main-window.c:320 src/message-window.c:110
 msgid "_Wrap"
 msgstr "Перенос"
 
-#: src/main-window.c:314
+#: src/main-window.c:337
 msgid "List"
 msgstr "Список"
 
-#: src/main-window.c:318
+#: src/main-window.c:341
 msgid "_Add"
 msgstr "Добавить"
 
-#: src/main-window.c:318
+#: src/main-window.c:341
 msgid "Add a new mailbox"
 msgstr "Добавить ещё один почтовый ящик"
 
-#: src/main-window.c:320
+#: src/main-window.c:343
 msgid "_Edit"
 msgstr "Правка"
 
-#: src/main-window.c:320
+#: src/main-window.c:343
 msgid "Edit the selected mailbox"
 msgstr "Редактировать выбранный почтовый ящик"
 
-#: src/main-window.c:322
+#: src/main-window.c:345
 msgid "Delete the selected mailbox"
 msgstr "Уничтожить выбранный почтовый ящик"
 
-#: src/main-window.c:325
+#: src/main-window.c:348
 msgid "Co_mmit current"
 msgstr "Подтвердить изменения"
 
-#: src/main-window.c:325
+#: src/main-window.c:348
 msgid "Commit the changes in the currently opened mailbox"
 msgstr "Сделать необратимыми изменения в текущем почтовом ящике"
 
-#: src/main-window.c:327
+#: src/main-window.c:350
 msgid "_Close"
 msgstr "Закрыть"
 
-#: src/main-window.c:327
+#: src/main-window.c:350
 msgid "Close mailbox"
 msgstr "Закрыть почтовый ящик"
 
-#: src/main-window.c:330
+#: src/main-window.c:353
 msgid "Empty _Trash"
 msgstr "Очистить мусорную корзину"
 
-#: src/main-window.c:330
+#: src/main-window.c:353
 msgid "Delete Messages from the trash mailbox"
 msgstr "Удалить сообщения из мусорной корзины"
 
-#: src/main-window.c:336
+#: src/main-window.c:359
 msgid "_Filters..."
 msgstr "Фильтры..."
 
-#: src/main-window.c:336
+#: src/main-window.c:359
 msgid "Manage filters"
 msgstr "Управление фильтрами"
 
-#: src/main-window.c:345
+#: src/main-window.c:368
 msgid "_Show mailbox tree"
 msgstr "Показать дерево почтового ящика"
 
-#: src/main-window.c:348
+#: src/main-window.c:371
 msgid "Show mailbox _tabs"
 msgstr "Показать метки почтового ящика"
 
-#: src/main-window.c:362
+#: src/main-window.c:385
 msgid "_Message"
 msgstr "Письмо"
 
-#: src/main-window.c:363
+#: src/main-window.c:386
 msgid "Mail_box"
 msgstr "Почтовый ящик"
 
-#: src/main-window.c:371
+#: src/main-window.c:394
 msgid "Check Email"
 msgstr "Проверить почту"
 
-#: src/main-window.c:375
+#: src/main-window.c:398
 msgid "Delete Message"
 msgstr "Уничтожить письмо"
 
-#: src/main-window.c:379
+#: src/main-window.c:402
 msgid "Compose"
 msgstr "Составить"
 
-#: src/main-window.c:379
+#: src/main-window.c:402
 msgid "Compose Message"
 msgstr "Составить письмо"
 
-#: src/main-window.c:391
+#: src/main-window.c:414
 msgid "Continue"
 msgstr "Продолжить"
 
-#: src/main-window.c:396
+#: src/main-window.c:419
 msgid "Open Previous message"
 msgstr "Открыть предыдущее письмо"
 
-#: src/main-window.c:401
+#: src/main-window.c:424
 msgid "Open Next message"
 msgstr "Открыть следующее письмо"
 
-#: src/main-window.c:406
+#: src/main-window.c:429
 msgid "Open Next Unread Message"
 msgstr "Открыть следующее непрочитанное письмо"
 
-#: src/main-window.c:411 src/print.c:82 src/sendmsg-window.c:127
+#: src/main-window.c:434 src/print.c:82 src/sendmsg-window.c:127
 #: src/sendmsg-window.c:155
 msgid "Print"
 msgstr "Напечатать"
 
-#: src/main-window.c:411
+#: src/main-window.c:434
 msgid "Print current message"
 msgstr "Напечатать текущее письмо"
 
-#: src/main-window.c:897
+#: src/main-window.c:892
 msgid "Copyright (C) 1997-2000"
 msgstr "Авторское право (С) 1997-2000"
 
-#: src/main-window.c:899
+#: src/main-window.c:894
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://www.balsa.net/\n"
@@ -1065,10 +1080,11 @@ msgstr ""
 "Сообщить об обнаруженных ошибках можно по адресу "
 "http://www.gnome.org/cgi-bin/bugs"
 
-#: src/main-window.c:1421
+#: src/main-window.c:1443
 msgid ""
 "In order to store an address, you must open a mailbox and select a message.\n"
-msgstr "Чтобы сохранить адрес, вы должны открыть почтовый ящик и выбрать сообщение.\n"
+msgstr ""
+"Чтобы сохранить адрес, вы должны открыть почтовый ящик и выбрать сообщение.\n"
 
 #: src/main.c:78
 msgid "Get new mail on startup"
@@ -1131,15 +1147,15 @@ msgstr "Пометить как черновики"
 msgid "No mailbox selected."
 msgstr "Почтовый ящик не выбран."
 
-#: src/message-window.c:54
+#: src/message-window.c:74
 msgid "Reply to this message"
 msgstr "Ответить на это письмо"
 
-#: src/message-window.c:61
+#: src/message-window.c:81
 msgid "Reply to all recipients of this message"
 msgstr "Ответить всем адресатам этого письма"
 
-#: src/message-window.c:67
+#: src/message-window.c:87
 msgid "Forward this message"
 msgstr "Переслать это письмо"
 

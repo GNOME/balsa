@@ -295,20 +295,27 @@ sendmsg_window_new (GtkWidget * widget, BalsaIndex * bindex, gint type)
 
   if (type == 1)
     {
-      if (message->reply_to->personal)
+      Address *addr = NULL;
+      if (message->reply_to)
+	addr = message->reply_to;
+      else
+	addr = message->from;
+
+      if (addr->personal)
 	{
-	  tmp = g_malloc (strlen (message->from->personal) + 1 + 1 + strlen (message->from->mailbox) + 1 + 1);
-	  sprintf (tmp, "%s <>", message->from->personal, message->from->mailbox);
+	  tmp = g_malloc (strlen (addr->personal) + 1 + 1 + strlen (addr->mailbox) + 1 + 1);
+	  sprintf (tmp, "%s <>", addr->personal, addr->mailbox);
 	  gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
 	  g_free (tmp);
 	}
       else
 	{
-	  tmp = g_malloc (strlen (message->from->mailbox) + 1);
-	  sprintf (tmp, "%s", message->from->mailbox);
+	  tmp = g_malloc (strlen (addr->mailbox) + 1);
+	  sprintf (tmp, "%s", addr->mailbox);
 	  gtk_entry_set_text (GTK_ENTRY (msg->to), tmp);
 	  g_free (tmp);
 	}
+
     }
 
 

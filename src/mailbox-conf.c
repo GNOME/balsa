@@ -816,17 +816,18 @@ mailbox_conf_update(MailboxConfWindow *mcw)
     mailbox_conf_view_check(mcw->view_info, mailbox);
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
+	BalsaMailboxNode *mbnode;
 	gchar *filename;
 	gchar *path;
+	gchar *name;
 
+	mbnode = balsa_find_mailbox(mailbox);
 	filename = gnome_file_entry_get_full_path(mcw->mb_data.local.path,
 						  FALSE);
 	path = g_strdup(libbalsa_mailbox_local_get_path(mailbox));
         if (strcmp(filename, path)) {
             /* rename */
 	    gchar *file_dir, *path_dir;
-	    BalsaMailboxNode *mbnode;
-	    gchar *name;
 
             i = libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
                                                 (mailbox), filename);
@@ -841,7 +842,6 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 
 	    file_dir = g_path_get_dirname(filename);
 	    path_dir = g_path_get_dirname(path);
-	    mbnode = balsa_find_mailbox(mailbox);
             if (strcmp(file_dir, path_dir)) {
 		/* Actual move. */
 		balsa_mblist_mailbox_node_remove(mbnode);
@@ -854,19 +854,23 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 		balsa_mailbox_node_rescan(mbnode);
             } 
 
+            g_free(file_dir);
+            g_free(path_dir);
+	}
+
+        name = mcw->mailbox_name ?
+            gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0, -1)
+            : g_path_get_basename(filename);
+	if (strcmp(name, mailbox->name)) {
 	    /* Change name. */
-            name = mcw->mailbox_name ?
-                gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0,
-                                       -1) : g_path_get_basename(filename);
             g_free(mailbox->name);
 	    mailbox->name = name;
 	    balsa_mblist_mailbox_node_redraw(mbnode);
 	    balsa_window_update_tab(mbnode);
+	} else
+	    g_free(name);
 
-	    g_object_unref(mbnode);
-            g_free(file_dir);
-            g_free(path_dir);
-	}
+	g_object_unref(mbnode);
         g_free(filename);
 	g_free(path);
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {

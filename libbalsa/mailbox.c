@@ -362,6 +362,8 @@ mailbox_new(MailboxType type)
     default:
       return NULL;
     }
+
+  mailbox->type = type;
   
   return GTK_OBJECT(mailbox);
 }

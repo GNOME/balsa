@@ -1308,6 +1308,8 @@ send_progress_notify_cb( )
 		gtk_widget_destroy( send_dialog );
 		send_dialog = NULL;
 	      }
+	    if(balsa_app.compose_email)
+	      balsa_exit(); 
 	                 
 	    break; 
 	     

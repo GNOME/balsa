@@ -66,7 +66,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/balsa
 /usr/share/gnome/apps/Internet/balsa.desktop
 %{prefix}/share/gnome/help/balsa/*
-/usr/share/locale/*
+/usr/share/locale/*/LC_MESSAGES/balsa.mo
 /usr/share/pixmaps/*
 /usr/share/sounds/balsa/*
 %{prefix}/man/*
@@ -74,6 +74,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Sep 18 2000 Pawel Salek <pawsa@theochem.kth.se>
+
+- include only translation files, not whole directories, to aviod
+  misleading messages when removing the package.
+
 * Tue Aug 15 2000 Pawel Salek <pawsa@theochem.kth.se>
 
 - added --disable-more-warning option - libmutt configure fails without it.

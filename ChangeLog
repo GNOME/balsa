@@ -1,3 +1,12 @@
+2000-09-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: fix the multithreaded mode compose-only 
+	execution.
+	* src/main-window.c: second part of the fix.
+	* NEWS, README, configure.in: updated for balsa-0.9.5
+	* balsa.spec.in: include translation files only, not the whole
+	directories. 
+
 2000-09-17  Matthew Guenther <guentherm@asme.org>
 
 	* src/balsa-index.c (balsa_index_select_next_unread): Fixed so it

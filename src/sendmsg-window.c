@@ -372,8 +372,10 @@ balsa_sendmsg_destroy (BalsaSendmsg * bsm)
        gtk_object_unref( GTK_OBJECT(bsm->orig_message) );
    }
 
+#ifndef BALSA_USE_THREADS
    if(balsa_app.compose_email)
-       balsa_exit();
+     balsa_exit(); 
+#endif
 }
 
 /* remove_attachment - right mouse button callback */

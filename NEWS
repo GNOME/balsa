@@ -1,4 +1,18 @@
-Balsa-0.9.3 development release. Release date 2000-08-28.
+* Balsa-0.9.5 development release. Release date 2000-09-18.
+
+We are in a feature freeze state. The features implemented since 0.9.4
+are:
+
+- improved multi-threading.
+- new warning/error reporting code.
+- LDAP support.
+- spell check (pspell package required tu compile and use balsa).
+- gnome-config used for storing/reading configuration.
+- multiple address book support. vCard- and LDAP-types implemented.
+- manual updates
+- gnome-print used for printing.
+
+* Balsa-0.9.3 development release. Release date 2000-08-28.
 
 This is a developement release with unfinished features.
 

@@ -96,8 +96,8 @@ msgid ""
 "If you wish to use IMAP for these\n"
 "please change them inside Balsa\n"
 msgstr ""
-"Als u hiervoor IMAP wilt gebruiken, wijzig "
-"dit dan binnen Balsa"
+"Als u hiervoor IMAP wilt gebruiken,\n"
+"wijzig dit dan binnen Balsa\n"
 
 #: src/balsa-init.c:533
 msgid "Finish"

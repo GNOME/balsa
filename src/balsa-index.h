@@ -59,6 +59,7 @@ extern "C" {
         BalsaMailboxNode* mailbox_node;
         LibBalsaMessage* first_new_message;
         LibBalsaMessage* current_message;
+	gboolean current_message_is_deleted;
         gboolean prev_message;
         gboolean next_message;
 	GArray *selected;

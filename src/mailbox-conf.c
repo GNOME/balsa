@@ -19,6 +19,26 @@
  * 02111-1307, USA.
  */
 
+/* GENERAL NOTES:
+   A. treatment of special mailboxes.
+
+   Generally, the displayed mailbox name is same as the file/directory
+   name of the mailbox. There is though en exception for special
+   mailboxes that have their designated function: Inbox, Sendbox,
+   Draftbox, Outbox.  Their default names are translated to a
+   localized version. The file on disk should never have a localized
+   names to avoid mess when user switches locale.
+
+   - if user modifies the "file name" entry of the special mailbox
+   modification dialog, it means it wants to rename the underlying
+   file, not that he/she wants to use another file. User can use "Set
+   as Inbox" etc to achieve this goal.
+   See thread:
+   http://mail.gnome.org/archives/balsa-list/2002-June/msg00044.html
+
+   The mailbox_name field is displayed only for special mailboxes
+   and POP3 mailboxes.
+*/
 #include "config.h"
 
 #include <gnome.h>
@@ -238,10 +258,11 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 	cancel_button = 1;
 	g_free(msg);
     } else { /* deleting other remote mailbox */
-	msg = g_strdup_printf(_("This will remove the mailbox %s from the list of mailboxes\n"
-				"You may use \"Add Mailbox\" later to access this mailbox again\n"
-				"What would you like to do?"),
-			      mailbox->name);
+	msg = g_strdup_printf(
+            _("This will remove the mailbox %s from the list of mailboxes\n"
+              "You may use \"Add Mailbox\" later to access this mailbox again\n"
+              "What would you like to do?"),
+             mailbox->name);
 	ask = gnome_message_box_new(msg, GNOME_MESSAGE_BOX_QUESTION,
 				    _("Remove from list"),
 				    _("Cancel"),
@@ -364,12 +385,8 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
     gtk_box_pack_start(GTK_BOX(mcw->window->vbox),
 		       page, TRUE, TRUE, 0);
 
-    if(mbnode) {
-	mailbox_conf_set_values(mcw);
-	if(mbnode->parent && LIBBALSA_IS_MAILBOX_LOCAL(mbnode->mailbox))
-	    gtk_widget_set_sensitive(mcw->mb_data.local.path, FALSE);
-    }
-    gtk_widget_grab_focus(mcw->mailbox_name);
+    if(mbnode)
+        mailbox_conf_set_values(mcw);
 
     gtk_signal_connect(GTK_OBJECT(mcw->window), "clicked", 
                        conf_clicked_cb, mcw);
@@ -412,7 +429,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    if (mailbox->name)
+    if (mcw->mailbox_name && mailbox->name)
 	gtk_entry_set_text(GTK_ENTRY(mcw->mailbox_name),
 			   mailbox->name);
 
@@ -503,7 +520,7 @@ check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 {
     gboolean sensitive = TRUE;
 
-    if (!*gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)))
+    if (mcw->mailbox_name &&!*gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)))
 	sensitive = FALSE;
     else if ( gtk_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
 	if (!*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.path)))
@@ -536,7 +553,7 @@ fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
     fos =
 	gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.folderpath));
 
-    if (!(*name =
+    if (mcw->mailbox_name && !(*name =
 	  g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name))))
 	|| *(g_strstrip(*name)) == '\0') {
 	if (*name)
@@ -642,11 +659,8 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 {
     LibBalsaMailbox *mailbox;
     int i;
-    gboolean update_config;
-    
-    mailbox = mcw->mailbox;
 
-    update_config = mailbox->config_prefix != NULL;
+    mailbox = mcw->mailbox;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	gchar *filename, *name;
@@ -664,41 +678,22 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 			      filename, strerror(i));
 	    return;
 	}
-	/* update mailbox data */
-	update_config = balsa_app.local_mail_directory == NULL
-	    || strncmp(balsa_app.local_mail_directory, filename,
-		       strlen(balsa_app.local_mail_directory)) != 0;
-	/* change mailbox name */
-	if (update_config)
-	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
-	else {
-	    if (strcmp
-		(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)),
-		 mailbox->name) != 0) {
-		balsa_information(LIBBALSA_INFORMATION_WARNING,
-				  _
-				  ("This is a mailbox in your local directory.\n"
-				   "Change the path instead.\n"
-				   "Mailbox not Updated.\n"));
-		return;
-	    } else {
-		gchar *ptr = strrchr(filename, '/');
-		name = ptr ? ptr + 1 : filename;
-	    }
-	}
-	g_free(mailbox->name);
-	mailbox->name = g_strdup(name);
+        if(mcw->mailbox_name) {
+ 	    name = gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name));
+            g_free(mailbox->name);
+            mailbox->name = g_strdup(name);
+        } else { /* shortcut: this will destroy mailbox */
+            balsa_mailbox_local_rescan_parent(mailbox); 
+            balsa_mblist_repopulate(BALSA_MBLIST(balsa_app.mblist));
+            return;
+        }
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	update_pop_mailbox(mcw);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	update_imap_mailbox(mcw);
     }
 
-    if (balsa_app.debug)
-	g_print("Updating configuration data: %s\n",
-		update_config ? "yes" : "no");
-
-    if (update_config)
+    if (mailbox->config_prefix)
 	config_mailbox_update(mailbox);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
@@ -716,10 +711,9 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 {
     GNode *node;
     BalsaMailboxNode * mbnode;
-    gboolean update_config = 1;
+    gboolean save_to_config = TRUE;
 
     mcw->mailbox = gtk_type_new(mcw->mailbox_type);
-    mcw->mailbox->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)));
 
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
@@ -733,11 +727,11 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	    return;
 	}
 
-	update_config = balsa_app.local_mail_directory == NULL
+	save_to_config = balsa_app.local_mail_directory == NULL
 	    || strncmp(balsa_app.local_mail_directory, path,
 		       strlen(balsa_app.local_mail_directory)) != 0;
 
-	if(update_config) {
+	if(save_to_config) {
 	    node =g_node_new(mbnode);
 	    g_node_append(balsa_app.mailbox_nodes, node);
 	}
@@ -756,24 +750,10 @@ mailbox_conf_add(MailboxConfWindow *mcw)
 	g_assert_not_reached();
     }
 
-    if(update_config)
+    if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);
-    else {
-	gchar *dir; 
-        GNode* parent = NULL;
-        for(dir = g_strdup(libbalsa_mailbox_local_get_path(mcw->mailbox));
-            strlen(dir)>1 /* i.e dir != "/" */ &&
-                !(parent = balsa_find_dir(balsa_app.mailbox_nodes,dir));
-            ) {
-            gchar* tmp =  g_dirname(dir); g_free(dir);
-            dir = tmp;
-            printf("dir: %s\n", dir);
-        }
-	if(parent)
-            balsa_mailbox_node_rescan(BALSA_MAILBOX_NODE(parent->data)); 
-        else g_warning("parent for %s not found.\n", mcw->mailbox);
-	g_free(dir);
-    }
+    else 
+        balsa_mailbox_local_rescan_parent(mcw->mailbox);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */
@@ -807,10 +787,13 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     table = gtk_table_new(2, 2, FALSE);
 
     /* mailbox name */
-    create_label(_("Mailbox _Name:"), table, 0, &keyval);
-    mcw->mailbox_name = create_entry(mcw->window, table,
-				     GTK_SIGNAL_FUNC(check_for_blank_fields),
-				     mcw, 0, NULL, keyval);
+    if(mcw->mailbox && BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox)) {
+        create_label(_("Mailbox _Name:"), table, 0, &keyval);
+        mcw->mailbox_name = 
+            create_entry(mcw->window, table,
+                         GTK_SIGNAL_FUNC(check_for_blank_fields),
+                         mcw, 0, NULL, keyval);
+    } else mcw->mailbox_name = NULL;
 
     /* path to file */
     create_label(_("Mailbox _Path:"), table, 1, &keyval);
@@ -837,6 +820,8 @@ create_local_mailbox_page(MailboxConfWindow *mcw)
     gtk_table_attach(GTK_TABLE(table), file, 1, 2, 1, 2,
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 10);
 
+    gtk_widget_grab_focus(mcw->mailbox_name ? 
+                          mcw->mailbox_name : mcw->mb_data.local.path);
     return table;
 }
 
@@ -851,8 +836,8 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     /* mailbox name */
     create_label(_("Mailbox _Name:"), table, 0, &keyval);
     mcw->mailbox_name = create_entry(mcw->window, table,
-				     GTK_SIGNAL_FUNC(check_for_blank_fields),
-				     mcw, 0, NULL, keyval);
+                                     GTK_SIGNAL_FUNC(check_for_blank_fields),
+                                     mcw, 0, NULL, keyval);
 
     /* pop server */
     create_label(_("_Server:"), table, 1, &keyval);
@@ -907,6 +892,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
                        pop3_use_ssl_cb, mcw);
 #endif
 
+    gtk_widget_grab_focus(mcw->mailbox_name);
     return table;
 }
 
@@ -928,10 +914,13 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     table = gtk_table_new(7, 2, FALSE);
 
     /* mailbox name */
-    create_label(_("Mailbox _Name:"), table, 0, &keyval);
-    mcw->mailbox_name = create_entry(mcw->window, table,
-				     GTK_SIGNAL_FUNC(check_for_blank_fields),
-				     mcw, 0, NULL, keyval);
+    if(mcw->mailbox && BALSA_IS_MAILBOX_SPECIAL(mcw->mailbox)) {
+        create_label(_("Mailbox _Name:"), table, 0, &keyval);
+        mcw->mailbox_name = 
+            create_entry(mcw->window, table,
+                         GTK_SIGNAL_FUNC(check_for_blank_fields),
+                         mcw, 0, NULL, keyval);
+    } else mcw->mailbox_name = NULL;
 
     /* imap server */
     create_label(_("_Server:"), table, 1, &keyval);
@@ -993,6 +982,8 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
                        imap_use_ssl_cb, mcw);
 #endif
 
+    gtk_widget_grab_focus(mcw->mailbox_name? 
+                          mcw->mailbox_name : mcw->mb_data.imap.server);
     return table;
 }
 

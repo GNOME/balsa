@@ -296,7 +296,6 @@ balsa_mailbox_node_new_from_config(const gchar* prefix)
     /* take over the ownership */
     gtk_object_ref(GTK_OBJECT(folder->server)); 
     gtk_object_sink(GTK_OBJECT(folder->server)); 
-    printf("Loading its configuration...\n");
     libbalsa_server_load_config(folder->server);
 
 #ifdef USE_SSL  
@@ -408,6 +407,27 @@ balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix)
 {
     gtk_signal_emit(GTK_OBJECT(mn),
 		    balsa_mailbox_node_signals[SAVE_CONFIG], prefix);
+}
+
+void
+balsa_mailbox_local_rescan_parent(LibBalsaMailbox* mbx)
+{
+    gchar *dir; 
+    GNode* parent = NULL;
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mbx));
+
+    for(dir = g_strdup(libbalsa_mailbox_local_get_path(mbx));
+        strlen(dir)>1 /* i.e dir != "/" */ &&
+            !(parent = balsa_find_dir(balsa_app.mailbox_nodes,dir));
+        ) {
+        gchar* tmp =  g_dirname(dir); g_free(dir);
+        dir = tmp;
+    }
+    if(parent)
+        balsa_mailbox_node_rescan(BALSA_MAILBOX_NODE(parent->data)); 
+    else g_warning("parent for %s not found.\n", mbx->name);
+    g_free(dir);
 }
 
 /* balsa_mailbox_node_rescan:
@@ -624,14 +644,12 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 	    add_menu_entry(menu, NULL, NULL, mbnode);
 	}
 	
-	if(mbnode->mailbox != balsa_app.inbox)
-	    add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,    mbnode);
-	if(mbnode->mailbox != balsa_app.sentbox)
-	    add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb,  mbnode);
-	if(mbnode->mailbox != balsa_app.trash)
-	    add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,    mbnode);
-	if(mbnode->mailbox != balsa_app.draftbox)
-	    add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mbnode);
+	if(!BALSA_IS_MAILBOX_SPECIAL(mbnode->mailbox)) {
+	    add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,   mbnode);
+	    add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb, mbnode);
+	    add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,   mbnode);
+	    add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb,mbnode);
+        }
 	/* FIXME : No test on mailbox type is made yet, should we ? */
 	add_menu_entry(menu, _("Edit/Apply filters"), mb_filter_cb, mbnode);
     } else {

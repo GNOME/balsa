@@ -580,8 +580,12 @@ clean_cache(LibBalsaMailbox* mailbox)
     for(lst = remove_list; lst; lst = lst->next) {
         unsigned uid = GPOINTER_TO_UINT(lst->data);
         gchar *fn = g_strdup_printf("%s/%u-%u", fname, uid_validity, uid);
-        unlink(fn);
-        printf("Unlinked %s\n", fn);
+        if(unlink(fn))
+            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 "Unlinked %s\n", fn);
+        else
+            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                                 "Could not unlink %s\n", fn);
         g_free(fn);
     }
     g_list_free(remove_list);
@@ -887,11 +891,16 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     libbalsa_mailbox_imap_update_url(LIBBALSA_MAILBOX_IMAP(mailbox));
 }
 
-void libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
+gboolean
+libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
 				     gboolean subscribe)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
-    imap_subscribe(LIBBALSA_MAILBOX(mailbox)->url, subscribe);
+    gboolean res;
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
+    libbalsa_lock_mutt();
+    res = (imap_subscribe(LIBBALSA_MAILBOX(mailbox)->url, subscribe) == 0);
+    libbalsa_unlock_mutt();
+    return res;
 }
 
 /* imap_close_all_connections:
@@ -907,21 +916,17 @@ libbalsa_imap_close_all_connections(void)
    dir+parent determine current name. 
    folder - new name.
  */
-void
-libbalsa_imap_rename_subfolder(const gchar *dir, const gchar *parent,
-			       const gchar *folder, gboolean subscribe, 
-			       LibBalsaServer *server)
+gboolean
+libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* mbox,
+                               const gchar *new_parent, const gchar *folder, 
+                               gboolean subscribe)
 {
-    gchar *imap_prefix =  g_strdup_printf("imap%s://%s/  ", 
-#ifdef USE_SSL
-					  server->use_ssl ? "s" : "",
-#else
-					  "",
-#endif
-					  server->host);
-
-    imap_mailbox_rename(imap_prefix, dir, parent, folder, subscribe);
-    g_free(imap_prefix);
+    int res;
+    LibBalsaMailbox* m = LIBBALSA_MAILBOX(mbox);
+    libbalsa_lock_mutt();
+    res = (imap_mailbox_rename(m->url, new_parent, folder, subscribe)==0);
+    libbalsa_unlock_mutt();
+    return res;
 }
 
 void

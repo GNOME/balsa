@@ -69,8 +69,10 @@ typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 struct _LibBalsaMailbox {
     GtkObject object;
 
-    gchar *config_prefix;	/* unique string identifying mailbox in the config file */
-    gchar *name;
+    gchar *config_prefix;       /* unique string identifying mailbox */
+                                /* in the config file                */
+    gchar *name;                /* displayed name for a special mailbox; */
+                                /* Isn't it a GUI thing?                 */
     gchar *url; /* Unique resource locator, file://, imap:// etc */
     /* context refers libmutt internal data.           * 
      * AVOID ACCESSING ITS CONTENT SINCE THE STRUCTURE *

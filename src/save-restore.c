@@ -188,6 +188,8 @@ load_toolbars(void)
    allows to set given mailboxe as one of the special mailboxes
    PS: I am not sure if I should add outbox to the list.
    specialNames must be in sync with the specialType definition.
+
+   WARNING: may destroy mailbox.
 */
 static gchar *specialNames[] = {
     "Inbox", "Sentbox", "Trash", "Draftbox", "Outbox"
@@ -195,7 +197,7 @@ static gchar *specialNames[] = {
 void
 config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 {
-    LibBalsaMailbox **special;
+    LibBalsaMailbox **special, *do_rescan_for = NULL;
 
     g_return_if_fail(mailbox != NULL);
 
@@ -218,7 +220,13 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     if (*special) {
 	g_free((*special)->config_prefix); 
 	(*special)->config_prefix = NULL;
-	config_mailbox_add(*special, NULL);
+        if(balsa_app.local_mail_directory == NULL
+           || !LIBBALSA_IS_MAILBOX_LOCAL(*special)
+           || strncmp(balsa_app.local_mail_directory, 
+                      libbalsa_mailbox_local_get_path(*special),
+                      strlen(balsa_app.local_mail_directory)) != 0) 
+            config_mailbox_add(*special, NULL);
+        else do_rescan_for = *special;
 	gtk_object_unref(GTK_OBJECT(*special));
     }
     config_mailbox_delete(mailbox);
@@ -226,6 +234,7 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 
     *special = mailbox;
     gtk_object_ref(GTK_OBJECT(mailbox));
+    if(do_rescan_for) balsa_mailbox_local_rescan_parent(do_rescan_for);
 }
 
 void

@@ -1359,7 +1359,7 @@ int imap_parse_list_response(IMAP_DATA* idata, char **name, int *noselect,
   return 0;
 }
 
-int imap_subscribe (char *path, int subscribe)
+int imap_subscribe (const char *path, int subscribe)
 {
   CONNECTION *conn;
   IMAP_DATA *idata;

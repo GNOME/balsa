@@ -368,7 +368,7 @@ extern struct BalsaApplication {
 
 } balsa_app;
 
-#define BALSA_IS_MAILBOX_SPECIAL(a) ((a)==balsa_app.inbox || (a)==balsa_app.trash || (a)==balsa_app.outbox||(a)==balsa_app.draftbox)
+#define BALSA_IS_MAILBOX_SPECIAL(a) ((a)==balsa_app.inbox || (a)==balsa_app.trash || (a)==balsa_app.outbox||(a)==balsa_app.draftbox || (a)==balsa_app.sentbox)
 
 void balsa_app_init(void);
 gboolean do_load_mailboxes(void);

@@ -101,6 +101,8 @@ void balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
 
+/* applicable only to local mailboxes (mailbox collections) */
+void balsa_mailbox_local_rescan_parent(LibBalsaMailbox* mbx);
 /* applicable only to folders (mailbox collections) */
 void balsa_mailbox_node_rescan(BalsaMailboxNode* mn);
 

@@ -135,6 +135,7 @@ static void balsa_window_unselect_all_messages_cb (GtkWidget* widget,
 static void check_mailbox_list(GList * list);
 static void mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node,
 			       gpointer data);
+static gboolean imap_check_test(const gchar * path);
 
 static void enable_mailbox_menus(BalsaMailboxNode * mbnode);
 static void enable_message_menus(LibBalsaMessage * message);
@@ -1489,6 +1490,22 @@ mailbox_check_func(GtkCTree * ctree, GtkCTreeNode * node, gpointer data)
 }
 
 /*
+ * Callback for testing whether to check an IMAP mailbox
+ * Called from mutt_buffy_check
+ */
+static gboolean
+imap_check_test(const gchar * path)
+{
+    if (balsa_app.check_imap && balsa_app.check_imap_inbox) {
+	/* `path' is a url */
+	gchar *tmp = strrchr(path, '/');
+	g_return_val_if_fail(tmp, FALSE);
+	return strcmp(++tmp, "INBOX") == 0;
+    } else
+	return balsa_app.check_imap;
+}
+
+/*
  * Callbacks
  */
 
@@ -1574,7 +1591,7 @@ check_new_messages_real(GtkWidget *widget, gpointer data, int type)
     pthread_detach(get_mail_thread);
 #else
     fill_mailbox_passwords(balsa_app.inbox_input);
-    libbalsa_notify_start_check();
+    libbalsa_notify_start_check(imap_check_test);
     check_mailbox_list(balsa_app.inbox_input);
 
     gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
@@ -1635,7 +1652,7 @@ check_messages_thread(gpointer data)
 
     MSGMAILTHREAD(threadmessage, MSGMAILTHREAD_SOURCE, NULL,
 		  "Local Mail", 0, 0);
-    libbalsa_notify_start_check();
+    libbalsa_notify_start_check(imap_check_test);
 
     gtk_ctree_post_recursive(GTK_CTREE(balsa_app.mblist), NULL, 
 			     mailbox_check_func, NULL);

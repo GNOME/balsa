@@ -31,7 +31,7 @@ void libbalsa_notify_register_mailbox(LibBalsaMailbox * mailbox);
 void libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox);
 
 /* Call libbalsa_notify_start_check before checking each mailbox */
-void libbalsa_notify_start_check(void);
+void libbalsa_notify_start_check(gboolean imap_check_test(const gchar *path));
 
 /* Used by the mailboxes. */
 gint libbalsa_notify_check_mailbox(LibBalsaMailbox * mailbox);

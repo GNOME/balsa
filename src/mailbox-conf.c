@@ -224,6 +224,11 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
 	BalsaMailboxNode *parent = mbnode->parent;
 	libbalsa_imap_delete_folder(LIBBALSA_MAILBOX_IMAP(mailbox));
+	/* a chain of folders might go away, so we'd better rescan from
+	 * higher up
+	 */
+	while (!parent->mailbox && parent->parent)
+		parent = parent->parent;
 	balsa_mailbox_node_rescan(parent); /* see it as server sees it */
 	return;
     }
@@ -799,7 +804,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 
     /* toggle for check */
     mcw->mb_data.pop3.check = 
-	create_check(mcw->window, _("_Check this mailbox for new mail"), 
+	create_check(mcw->window, _("_Enable check for new mail"), 
 		     table, 8, TRUE);
 
     return table;

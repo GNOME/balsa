@@ -120,13 +120,13 @@ libbalsa_notify_unregister_mailbox(LibBalsaMailbox * mailbox)
 }
 
 void
-libbalsa_notify_start_check(void)
+libbalsa_notify_start_check(gboolean imap_check_test(const gchar *path))
 {
     /* Might as well use check rather than notify. All notify does is */
     /* write messages for each mailbox */
     libbalsa_lock_mutt();
     set_option (OPTIMAPPASSIVE);
-    mutt_buffy_check(FALSE);
+    mutt_buffy_check(FALSE, imap_check_test);
     libbalsa_unlock_mutt();
 }
 

@@ -257,7 +257,11 @@ int mutt_parse_mailboxes (BUFFER *path, BUFFER *s, unsigned long data, BUFFER *e
 #define STAT_CHECK (sb.st_mtime > sb.st_atime || (tmp->newly_created && sb.st_ctime == sb.st_mtime && sb.st_ctime == sb.st_atime))
 #endif /* BUFFY_SIZE */
 
+#ifdef LIBMUTT
+int mutt_buffy_check (int force, int imap_check_test(const char*))
+#else
 int mutt_buffy_check (int force)
+#endif
 {
   BUFFY *tmp;
   struct stat sb;
@@ -385,7 +389,11 @@ int mutt_buffy_check (int force)
 #ifdef USE_IMAP
       case M_IMAP:
         /* poll on do_imap_check, else return cached value */
+#ifdef LIBMUTT
+        if (do_imap_check && imap_check_test(tmp->path))
+#else
         if (do_imap_check)
+#endif
         {
 	  char * old_user = ImapUser, *old_passwd = ImapPass;
 	  int res;
@@ -427,6 +435,7 @@ int mutt_buffy_check (int force)
   return (BuffyCount);
 }
 
+#ifndef LIBMUTT
 int mutt_buffy_notify (void)
 {
   BUFFY *tmp;
@@ -514,3 +523,4 @@ void mutt_buffy (char *s)
     break;
   }
 }
+#endif

@@ -828,6 +828,7 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
 	pi->paper = gnome_paper_with_name((char *)papers->data);
     }
     pi->master = gnome_print_master_new_from_dialog(dlg);
+    gnome_print_master_set_paper(pi->master, pi->paper);
     pi->pc = gnome_print_master_get_context(pi->master);
 
     pi->page_width = gnome_paper_pswidth(pi->paper);
@@ -966,6 +967,48 @@ message_print_cb(GtkWidget * widget, gpointer cbdata)
     message_print(msg);
 }
 
+/* callback to read new paper selection */
+static void 
+paper_changed (GtkEntry *paper_selector, gchar *paper_size)
+{
+    g_free(paper_size);
+    paper_size = g_strdup(gtk_entry_get_text(paper_selector));
+}
+
+/*
+ * Adds combo with paper list to print dialog
+ */
+static void
+print_paper_select_new(GtkWidget * dialog)
+{
+    GtkWidget  *frame;
+    GtkWidget  *combo;
+    GtkEntry   *entry;
+    const GnomePaper   *gpaper;
+
+    if ((gpaper = gnome_paper_with_name(balsa_app.paper_size)) == NULL) {
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  _("Balsa could not find paper type \"%s\", using"
+			    " system default.\n"), balsa_app.paper_size);
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+			  _("Check your paper type configuration or balsa preferences\n"));
+	balsa_app.paper_size = g_strdup(gnome_paper_name_default());
+    }
+    frame = gtk_frame_new(_("Paper"));
+    gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(dialog)->vbox), GTK_WIDGET(frame),
+		       FALSE, FALSE, 3);
+    combo = gtk_combo_new();
+    gtk_container_set_border_width(GTK_CONTAINER(combo), 3);
+    entry = GTK_ENTRY(GTK_COMBO(combo)->entry);
+    gtk_combo_set_popdown_strings(GTK_COMBO(combo), 
+				  g_list_copy(gnome_paper_name_list()));
+    gtk_entry_set_text(entry, balsa_app.paper_size);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed",
+		       GTK_SIGNAL_FUNC(paper_changed), balsa_app.paper_size);
+    gtk_container_add (GTK_CONTAINER(frame), combo);
+    gtk_widget_show_all(frame);
+}
+
 void
 message_print(LibBalsaMessage * msg)
 {
@@ -980,6 +1023,10 @@ message_print(LibBalsaMessage * msg)
 
     dialog = gnome_print_dialog_new(_("Print message"),
 				    GNOME_PRINT_DIALOG_COPIES);
+    /*
+     * add paper selection combo to print dialog
+     */
+    print_paper_select_new(dialog);
     gnome_dialog_set_parent(GNOME_DIALOG(dialog),
 			    GTK_WINDOW(balsa_app.main_window));
     gtk_window_set_wmclass(GTK_WINDOW(dialog), "print", "Balsa");

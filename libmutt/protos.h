@@ -212,7 +212,13 @@ int mutt_addr_is_user (ADDRESS *);
 int mutt_alias_complete (char *, size_t);
 int mutt_alloc_color (int fg, int bg);
 int mutt_any_key_to_continue (const char *);
+#if 1
+/* BALSA: second argument is a callback for testing whether to really
+ * check the mailbox */
+int mutt_buffy_check (int, int(const char *));
+#else
 int mutt_buffy_check (int);
+#endif
 int mutt_buffy_notify (void);
 int mutt_builtin_editor (const char *, HEADER *, HEADER *);
 int mutt_can_decode (BODY *);

@@ -1,5 +1,11 @@
 2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* buffy.c: use callback to check, if given IMAP mailbox should be
+	checked for new mail, or not.
+	* libmutt/protos.h: mutt_buffy_check() prototype changed apriopriately.
+
+2001-08-06  Pawel Salek  <pawsa@theochem.kth.se>
+
 	* imap/browse.c: quoted namespaces fix.
 
 2001-08-03  Pawel Salek  <pawsa@theochem.kth.se>

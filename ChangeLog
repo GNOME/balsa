@@ -1,3 +1,15 @@
+2001-08-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	PeterBloomfield@MindSpring.com>:
+	* src/mailbox-conf.c: rescan from higher up the tree after deleting 
+	an IMAP mailbox.
+	* libbalsa/notify.[hc]: use a callback to test if a mailbox should be
+	checked for mail or not.
+	* src/main-window.c: provide imap_check_test() determining if
+	given IMAP mailbox should be checked for new mail.
+
+	* src/print.c: Paper selection implemented (Albrecht Dreﬂ).
+	
 2001-08-13  Pawel Salek  <pawsa@theochem.kth.se>
 
 	Take care of #53566. Stephen P. Wall <Steve_Wall@redcom.com>.

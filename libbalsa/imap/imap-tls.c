@@ -28,7 +28,9 @@
 
 #ifdef USE_TLS
 
+#include <string.h>
 #include <openssl/ssl.h>
+#include <openssl/x509v3.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -40,7 +42,114 @@
 static SSL_CTX *global_ssl_context = NULL;
 #ifdef BALSA_USE_THREADS
 static pthread_mutex_t global_tls_lock = PTHREAD_MUTEX_INITIALIZER;
-#endif
+
+/* provide support only for _POSIX_THREADS */
+#define MUTEX_TYPE pthread_mutex_t
+#define MUTEX_SETUP(m)   pthread_mutex_init (&(m), NULL)
+#define MUTEX_CLEANUP(m) pthread_mutex_destroy(&(m))
+#define MUTEX_LOCK(m)    pthread_mutex_lock(&(m))
+#define MUTEX_UNLOCK(m)  pthread_mutex_unlock(&(m))
+#define THREAD_ID        pthread_self()
+
+/* OpenSSL static locks */
+static MUTEX_TYPE *mutexes = NULL;
+
+static void
+locking_function(int mode, int n, const char *file, int line)
+{
+  if(mode & CRYPTO_LOCK)
+    MUTEX_LOCK(mutexes[n]);
+  else
+    MUTEX_UNLOCK(mutexes[n]);
+}
+
+static unsigned long
+id_function(void)
+{
+  return (unsigned long)THREAD_ID;
+}
+
+/* OpenSSL dynamic locks */
+struct CRYPTO_dynlock_value {
+  MUTEX_TYPE mutex;
+};
+
+static struct CRYPTO_dynlock_value*
+dyn_create_function(const char *file, int line)
+{
+  struct CRYPTO_dynlock_value *value =
+    (struct CRYPTO_dynlock_value*)malloc(sizeof(struct CRYPTO_dynlock_value));
+
+  if(!value)
+    return NULL;
+  MUTEX_SETUP(value->mutex);
+  return value;
+}
+
+static void
+dyn_lock_function(int mode, struct CRYPTO_dynlock_value *l,
+                  const char *file, int line)
+{
+  if(mode & CRYPTO_LOCK)
+    MUTEX_LOCK(l->mutex);
+  else
+    MUTEX_UNLOCK(l->mutex);
+}
+
+static void
+dyn_destroy_function(struct CRYPTO_dynlock_value *l,
+                     const char *file, int line)
+{
+  MUTEX_CLEANUP(l->mutex);
+  free(l);
+}
+
+static int
+imaptls_thread_setup(void)
+{
+  int i, mutex_cnt = CRYPTO_num_locks();
+
+  mutexes = (MUTEX_TYPE*)malloc(mutex_cnt*sizeof(MUTEX_TYPE));
+  if(!mutexes)
+    return 0;
+  for(i=0; i<mutex_cnt; i++)
+    MUTEX_SETUP(mutexes[i]);
+  CRYPTO_set_id_callback(id_function);
+  CRYPTO_set_locking_callback(locking_function);
+  
+  /* dynamic locking for future releases of OpenSSL */
+  CRYPTO_set_dynlock_create_callback (dyn_create_function);
+  CRYPTO_set_dynlock_lock_callback   (dyn_lock_function);
+  CRYPTO_set_dynlock_destroy_callback(dyn_destroy_function);
+  return 1;
+}
+
+#if defined(DO_PROPER_OPENSSL_CLEANUP)
+static int
+imaptls_thread_cleanup(void)
+{
+  int i, mutex_cnt = CRYPTO_num_locks();
+  if(!mutexes)
+    return 0;
+  CRYPTO_set_id_callback(NULL);
+  CRYPTO_set_locking_callback(NULL);
+  CRYPTO_set_dynlock_create_callback(NULL);
+  CRYPTO_set_dynlock_lock_callback(NULL);
+  CRYPTO_set_dynlock_destroy_callback(NULL);
+  for(i=0; i<mutex_cnt; i++)
+    MUTEX_CLEANUP(mutexes[i]);
+  free(mutexes); mutexes = NULL;
+  return 1;
+}
+#endif /* DO_PROPER_OPENSSL_CLEANUP */
+
+#else /* BALSA_USE_THREADS */
+static void
+imaptls_init_threads(void)
+{
+}
+#endif /* BALSA_USE_THREADS */
+
 static SSL*
 create_ssl(void)
 {
@@ -50,14 +159,22 @@ create_ssl(void)
   pthread_mutex_lock(&global_tls_lock);
 #endif
   if(!global_ssl_context) {
-    SSL_load_error_strings();
+    /* Initialize OpenSSL library, follow "Network Security with
+       OpenSSL", ISBN 0-596-00270-X, guidelines. Example 4-2. */
+    imaptls_thread_setup();
     SSL_library_init();
+    SSL_load_error_strings();
     global_ssl_context = SSL_CTX_new (TLSv1_client_method ());
     /* no client certificate password support yet
      * SSL_CTX_set_default_passwd_cb (ctx, ctx_password_cb);
      * SSL_CTX_set_default_passwd_cb_userdata (ctx, ctx_password_cb_arg); 
      */
-    /* Load the trusted CAs here */
+
+    /* Load the trusted CAs here. We just trust the system CA for the
+       moment but we could try to be compatible with libESMTP in this
+       respect.
+    */
+   SSL_CTX_set_default_verify_paths (global_ssl_context);
   }
 #ifdef BALSA_USE_THREADS
   pthread_mutex_unlock(&global_tls_lock);
@@ -69,46 +186,89 @@ create_ssl(void)
   return ssl;
 }
 
+/* check_server_identity() follows example 5-8 in the OpenSSL book. */
+static int
+host_matches_domain(const char* host, const char*domain)
+{ /* domain can contain wildcards but for the moment, we do not care */
+  return g_ascii_strcasecmp(host, domain) == 0;
+}
 
 static int
 check_server_identity(ImapMboxHandle *handle, SSL *ssl)
 {
   long vfy_result;
   X509 *cert;
-  int ok;
+  X509_NAME *subj;
+  int ok, extcount, i, j, stack_len;
 
-  vfy_result = SSL_get_verify_result (ssl);
+  if(!handle->host)
+    return 0;
+  /* Check whether the certificate matches the server. */
+  cert = SSL_get_peer_certificate(ssl);
+  if(!cert)
+    return 0;
+
+  ok = 0;
+  extcount = X509_get_ext_count(cert);
+  for(i=0; i<extcount; i++) {
+    const char *extstr;
+    X509_EXTENSION *ext = X509_get_ext(cert, i);
+
+    extstr = OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
+
+    if(strcmp(extstr, "subjectAltName") == 0) {
+      unsigned char *data;
+      STACK_OF(CONF_VALUE) *val;
+      CONF_VALUE           *nval;
+      X509V3_EXT_METHOD    *meth;
+
+      if( !(meth = X509V3_EXT_get(ext)) )
+        break;
+      data = ext->value->data;
+
+      val = meth->i2v(meth,
+                      meth->d2i(NULL, &data, ext->value->length),
+                      NULL);
+
+      stack_len = sk_CONF_VALUE_num(val);
+      for(j=0; j<stack_len; j++) {
+        nval = sk_CONF_VALUE_value(val, j);
+        if(strcmp(nval->name, "DNS") == 0 &&
+           host_matches_domain(handle->host, nval->value)) {
+          ok = 1;
+          break;
+        }
+      }
+    }
+    if(ok)
+      break;
+  }
+  if(!ok) { /* matching by subjectAltName failed, try commonName */
+    char data[256];
+    if( (subj = X509_get_subject_name(cert)) &&
+        X509_NAME_get_text_by_NID(subj, NID_commonName, data, sizeof(data))>0){
+      data[sizeof(data)-1] = 0;
+      if(g_ascii_strcasecmp(data, handle->host) == 0)
+        ok =1;
+    }
+  }
+  X509_free(cert);
+  if(ok)
+    vfy_result = SSL_get_verify_result(ssl);
+  else
+    vfy_result = X509_V_ERR_APPLICATION_VERIFICATION;
+
   if(vfy_result == X509_V_OK)
     return 1;
   /* There was a problem with the verification, one has to leave it up to the
    * application what to do with this.
    */
-   ok = 0;
-   if(handle->user_cb)
-     handle->user_cb(handle, IME_TLS_VERIFY_ERROR, handle->user_arg, &ok, 
-                vfy_result, ssl);
-  if(!ok)
-    return ok;
+  ok = 0;
+  if(handle->user_cb)
+    handle->user_cb(handle, IME_TLS_VERIFY_ERROR, handle->user_arg, &ok, 
+                    vfy_result, ssl);
 
-  /* Check whether the certificate matches the server. */
-  cert = SSL_get_peer_certificate(ssl);
-  if (cert == NULL) {
-    ok = 0;
-    if(handle->user_cb)
-      handle->user_cb(handle, IME_TLS_NO_PEER_CERT, handle->user_arg,
-                      &ok, ssl);
-    if(!ok)
-      return ok;
-  }
-#if 0
-  nm = X509_get_subject_name(cert);
-  lastpos = -1;
-  do {
-    lastpos = X509_NAME_get_index_by_NID(nm, NID_commonName, lastpos);
-  }
-#endif
-  X509_free (cert);
-  return 1;
+  return ok;
 }
 
 static int

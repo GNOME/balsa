@@ -334,20 +334,51 @@ libbalsa_assure_balsa_dir(void)
 }
 
 
-#if defined(USE_SSL) && defined(ask_cert_real_fixed)
+#if defined(USE_SSL)
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <openssl/err.h>
-char *asn1time_to_string (ASN1_UTCTIME *tm);
-char *x509_get_part (char *line, const char *ndx);
-void x509_fingerprint (char *s, int l, X509 * cert);
+static char*
+asn1time_to_string(ASN1_UTCTIME *tm)
+{
+    return g_strdup("FIXME");
+}
 
-/* libmutt_ask_for_cert_acceptance:
+static char*
+x509_get_part (char *line, const char *ndx)
+{
+    static char ret[256];
+    char *c, *c2;
+    
+    strncpy (ret, _("Unknown"), sizeof (ret));
+    
+    c = strstr(line, ndx);
+    if (c) {
+        c += strlen (ndx);
+        c2 = strchr (c, '/');
+        if (c2)
+            *c2 = '\0';
+        strncpy (ret, c, sizeof (ret));
+        if (c2)
+            *c2 = '/';
+    }
+    
+    return ret;
+}
+static void
+x509_fingerprint (char *s, int l, X509 * cert)
+{
+    s[0] = '\0';
+}
+
+
+/* libbalsa_ask_for_cert_acceptance():
    returns:
    OP_EXIT on reject.
    OP_SAVE - on accept and save.
    OP_MAX - on accept once.
    TODO: check treading issues.
+
 */
 static int
 ask_cert_real(X509 *cert)
@@ -355,7 +386,7 @@ ask_cert_real(X509 *cert)
 
     char *part[] =
         {"/CN=", "/Email=", "/O=", "/OU=", "/L=", "/ST=", "/C="};
-    char buf[SHORT_STRING];
+    char buf[256];
     char *name = NULL, *c, *valid_from;
     GtkWidget* dialog, *label;
     unsigned i;
@@ -377,7 +408,7 @@ ask_cert_real(X509 *cert)
 
     buf[0] = '\0';
     x509_fingerprint (buf, sizeof (buf), cert);
-    valid_from = g_strdup(asn1time_to_string(X509_get_notBefore(cert)));
+    valid_from = asn1time_to_string(X509_get_notBefore(cert));
     c = g_strdup_printf(_("<b>This certificate is valid</b>\n"
                           "from %s\n"
                           "to %s\n"
@@ -436,9 +467,8 @@ ask_cert_idle(gpointer data)
    executed with GDK UNLOCKED. see mailbox_imap_open() and
    imap_dir_cb()/imap_folder_imap_dir().
 */
-int libmutt_ask_for_cert_acceptance(X509 *cert);
 int
-libmutt_ask_for_cert_acceptance(X509 *cert)
+libbalsa_ask_for_cert_acceptance(X509 *cert)
 {
     static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
     AskCertData acd;
@@ -459,7 +489,7 @@ libmutt_ask_for_cert_acceptance(X509 *cert)
 }
 #else /* BALSA_USE_THREADS */
 int
-libmutt_ask_for_cert_acceptance(X509 *cert)
+libbalsa_ask_for_cert_acceptance(X509 *cert)
 {
     return ask_cert_real(cert);
 }

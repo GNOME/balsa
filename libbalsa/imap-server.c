@@ -280,8 +280,18 @@ is_user_cb(ImapMboxHandle *h, ImapUserEventType ue, void *arg, ...)
         break;
     }
     case IME_TLS_VERIFY_ERROR:  {
-        ok = va_arg(alist, int*); *ok = 1;
-        g_warning("IMAP:TLS: continues despite failed cert verification.");
+        long vfy_result;
+        SSL *ssl;
+        X509 *cert;
+        ok = va_arg(alist, int*);
+        vfy_result = va_arg(alist, long);
+        ssl = va_arg(alist, SSL*);
+        cert = SSL_get_peer_certificate(ssl);
+        *ok  = libbalsa_ask_for_cert_acceptance(cert);
+        X509_free(cert);
+        g_warning("IMAP:TLS: continues despite failed cert verification:\n"
+                  "%ld : %s.", vfy_result,
+                  X509_verify_cert_error_string(vfy_result));
         break;
     }
     case IME_TLS_NO_PEER_CERT: {

@@ -93,6 +93,11 @@ gboolean libbalsa_ldap_exists(const gchar *server);
 
 void libbalsa_assure_balsa_dir(void);
 
+#ifdef BALSA_USE_THREADS
+#include <openssl/ssl.h>
+int libbalsa_ask_for_cert_acceptance(X509 *cert);
+#endif
+
 void libbalsa_message(const char *fmt, ...);
 gchar * libbalsa_rot(const gchar * pass);
 

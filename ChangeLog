@@ -1,3 +1,9 @@
+2004-02-01  Pawel Salek
+
+	* libbalsa/imap-server.c: try harder on failed cert verification.
+	* libbalsa/libbalsa.[ch]: convert UI of cert v-fy to the new code.
+	* libbalsa/imap/imap-tls.c: fix SSL threading. Improve server v-fy.
+
 2004-02-01  Robert Sedak  <robert.sedak@sk.htnet.hr>
 
         * configure.in: Added "hr" (Croatian) to ALL_LINGUAS.

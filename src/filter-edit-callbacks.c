@@ -49,6 +49,7 @@ static void fe_regexs_selection_changed(GtkTreeSelection * selection,
                                         gpointer user_data);
 static void fe_free_associated_filters(void);
 static void fe_free_associated_conditions(void);
+static GtkWidget *fe_date_sample(void);
 
 /* The dialog widget (we need it to be able to close dialog on error) */
 
@@ -730,12 +731,8 @@ condition_dialog_response(GtkWidget * dialog, gint response,
                     libbalsa_condition_free(cond);
                 }
             } else {
-                gchar *str[] = { "" };
-
                 /* It was a new condition, so add it to the list */
                 gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-                gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, str,
-                                   -1);
                 gtk_tree_selection_select_iter(selection, &iter);
                 /* We make the buttons sensitive */
                 gtk_widget_set_sensitive(fe_condition_delete_button, TRUE);
@@ -893,6 +890,11 @@ static void build_type_notebook()
     gtk_table_attach(GTK_TABLE(page),
                      button,
                      0, 5, 2, 3,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+
+    gtk_table_attach(GTK_TABLE(page),
+                     fe_date_sample(),
+                     0, 5, 3, 4,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
 
     /* The flag page of the notebook */
@@ -1865,3 +1867,22 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     set_button_sensitivities(FALSE);
     fe_enable_right_page(TRUE);
 }                      /* end fe_filters_list_selection_changed */
+
+static GtkWidget *
+fe_date_sample(void)
+{
+    struct tm tm;
+    gchar fmt[20];
+    char xfmt[] = "%x";    /* to avoid gcc whining */
+    gchar *tmp;
+    GtkWidget *label;
+
+    strptime("2000-12-31", "%Y-%m-%d", &tm);
+    strftime(fmt, sizeof fmt, xfmt, &tm);
+    tmp = g_strdup_printf(_("(Example: write December 31, 2000, as %s)"),
+                          fmt);
+    label = gtk_label_new(tmp);
+    g_free(tmp);
+
+    return label;
+}                               /* end fe_date_sample */

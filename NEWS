@@ -1,3 +1,11 @@
+* Balsa-2.0.3 release. Release date 2002-09-15
+
+- preference manager adapted to HIG.
+- new translations.
+- IMAP and LDAP fixes.
+- filter fixes.
+- printing fixes.
+
 * Balsa-2.0.2 release. Release date 2002-09-15
 
 - lot of deprected coe removed.

@@ -629,8 +629,6 @@ config_global_load(void)
     if (balsa_app.pgdown_percent < 10)
 	balsa_app.pgdown_percent = 10;
 
-    /* ... style */
-    balsa_app.toolbar_style = d_get_gint("ToolbarStyle", GTK_TOOLBAR_BOTH);
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
     balsa_app.drag_default_is_move = d_get_gint("DragDefaultIsMove", 0);
@@ -960,7 +958,6 @@ gint config_save(void)
     gnome_config_set_bool("ShowPreviewPane", balsa_app.previewpane);
     gnome_config_set_bool("ShowMailboxList", balsa_app.show_mblist);
     gnome_config_set_bool("ShowTabs", balsa_app.show_notebook_tabs);
-    gnome_config_set_int("ToolbarStyle", balsa_app.toolbar_style);
     gnome_config_set_int("ProgressWindow", balsa_app.pwindow_option);
     gnome_config_set_bool("AlternativeLayout", balsa_app.alternative_layout);
     gnome_config_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);

@@ -1,3 +1,18 @@
+2002-10-28  Pawel Salek <pawsa@theochem.kth.se>
+
+	* NEWS, configure.in: release balsa-2.0.3
+
+2002-10-28  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/filter-edit-callbacks.c: explain Filter date format.
+	* src/mailbox-node.c: use user name in imap URL.
+
+	* src/balsa-app.[ch], src/main-window.c, src/pref-manager.c:
+	* src/save-restore.c, src/sendmsg-window.c:
+	* src/toolbar-factory.c: Remove balsa_app.toolbar_style.
+	* src/pref-manager.c: Replace deprecated items; implement 
+	HIG-recommended style.
+	
 2002-10-27  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/sendmsg-window.c: added Hebrew and UTF-8 

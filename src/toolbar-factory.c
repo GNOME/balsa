@@ -585,7 +585,7 @@ get_toolbar(GtkWidget *window, BalsaToolbarType toolbar)
 	toolbar_data[toolbar][i]=tmpdata[i];
     
     gtk_widget_show_all(GTK_WIDGET(bar));
-    gtk_toolbar_set_style(bar, balsa_app.toolbar_style);
+
     return bar;
 }
 

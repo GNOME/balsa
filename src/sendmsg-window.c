@@ -2721,19 +2721,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     else
 	fillBody(msg, message, type);
 
-    /* set the toolbar so we are consistant with the rest of balsa */
-    {
-	BonoboDockItem *item;
-	GtkWidget *toolbar;
-
-	item = gnome_app_get_dock_item_by_name(GNOME_APP(window),
-					       GNOME_APP_TOOLBAR_NAME);
-	toolbar = bonobo_dock_item_get_child(item);
-
-	gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),
-			      balsa_app.toolbar_style);
-    }
-
     /* set the menus  - and charset index - and display the window */
     /* FIXME: this will also reset the font, copying the text back and 
        forth which is sub-optimal.

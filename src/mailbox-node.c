@@ -964,13 +964,14 @@ imap_scan_create_mbnode(GNode*root, const char* fn, char delim,
 
     g_return_val_if_fail(parent, NULL);
 
-    url = g_strdup_printf("imap%s://%s/%s",
+    url = g_strdup_printf("imap%s://%s@%s/%s",
 #ifdef USE_SSL
 			  BALSA_MAILBOX_NODE(root->data)->server->use_ssl 
                           ? "s" : "",
 #else
 			  "",
 #endif
+			  BALSA_MAILBOX_NODE(root->data)->server->user,
 			  BALSA_MAILBOX_NODE(root->data)->server->host,
 			  fn);
     node = remove_special_mailbox_by_url(url);

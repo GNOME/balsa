@@ -257,7 +257,6 @@ extern struct BalsaApplication {
     /* label color of bad addresses */
     GdkColor bad_address_color;
 
-    GtkToolbarStyle toolbar_style;
     guint pwindow_option;
     gboolean wordwrap;
     gint wraplength;

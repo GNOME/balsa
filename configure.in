@@ -8,7 +8,7 @@ dnl ###########################################################################
 SCROLLKEEPER_REQUIRED=0.1.4
 BALSA_MAJOR=2
 BALSA_REVISION=0
-BALSA_PATCHLEVEL=2
+BALSA_PATCHLEVEL=3
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
@@ -168,6 +168,7 @@ dnl   The way prefix et al are defined makes us jump through some hoops.
 dnl ###########################################################################
 
 dnl datadir='${prefix}/share', so we must eval it or something. This works
+echo "prefix=$prefix"
 BALSA_STD_PREFIX=`eval "echo ${prefix}"`
 BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`
 
@@ -181,7 +182,7 @@ EOF
 
 dnl Better way to do this?
 AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX",
-                   [Directory for all balsa fils.] )
+                   [Directory for all balsa files.] )
 AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX",
 	           [Directory for storing balsa data files.] )
 AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES`,

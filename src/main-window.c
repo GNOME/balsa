@@ -1499,12 +1499,6 @@ balsa_window_destroy(GtkObject * object)
 void
 balsa_window_refresh(BalsaWindow * window)
 {
-#if BALSA_MAJOR < 2
-    GnomeDockItem *item;
-#else
-    BonoboDockItem *item;
-#endif                          /* BALSA_MAJOR < 2 */
-    GtkWidget *toolbar;
     GtkWidget *index;
     GtkWidget *paned;
 
@@ -1534,19 +1528,6 @@ balsa_window_refresh(BalsaWindow * window)
 	gtk_paned_set_position(GTK_PANED(paned), G_MAXINT);
     }
 
-    /*
-     * set the toolbar style
-     */
-    item = gnome_app_get_dock_item_by_name(GNOME_APP(window),
-                                           GNOME_APP_TOOLBAR_NAME);
-    if(item) {
-#if BALSA_MAJOR < 2
-        toolbar = gnome_dock_item_get_child(item);
-#else
-        toolbar = bonobo_dock_item_get_child(item);
-#endif                          /* BALSA_MAJOR < 2 */
-        gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), balsa_app.toolbar_style);
-    }
     /* I don't know if this is a bug of gtk or not but if this is not here
        it doesn't properly resize after a toolbar style change */
     gtk_widget_queue_resize(GTK_WIDGET(window));

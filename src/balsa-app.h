@@ -21,7 +21,7 @@
 
 #include <gnome.h>
 #include "libbalsa.h"
-#include "balsa-mblist.h"
+/* #include "balsa-mblist.h" */
 #include "balsa-index-page.h"
 
 /* Work around nonprivileged installs so we can find icons */
@@ -92,6 +92,8 @@ struct stPrinting{
     gchar *PrintCommand;
 };
 
+#define __TYPEDEF_BALSA_MBLIST__
+typedef struct _BalsaMBList BalsaMBList;
 
 enum ShownHeaders {
    HEADERS_NONE = 0,

@@ -2,6 +2,13 @@ CFLAGS += -Wall -Wmissing-prototypes -Wpointer-arith
 
 bin_PROGRAMS = balsa
 
+GOB_OUTPUTS = \
+	balsa-mblist.c \
+	balsa-mblist.h
+
+GOBFILES = \
+	balsa-mblist.gob
+
 balsa_SOURCES =	\
 	address-book.c		\
 	address-book.h		\
@@ -13,8 +20,6 @@ balsa_SOURCES =	\
 	balsa-index.h		\
 	balsa-index-page.c	\
 	balsa-index-page.h	\
-	balsa-mblist.c		\
-	balsa-mblist.h		\
 	balsa-message.c		\
 	balsa-message.h		\
 	filter-edit.h		\
@@ -42,11 +47,14 @@ balsa_SOURCES =	\
 	cfg-balsa.c		\
 	cfg-balsa.h		\
 	cfg-memory-widgets.c	\
-	cfg-memory-widgets.h
+	cfg-memory-widgets.h	\
+	$(GOB_OUTPUTS)
 
 #	index-child.h		\
 #	spell-check.c		\
 #	spell-check.h		\
+#	balsa-mblist.c		\
+#	balsa-mblist.h		\
 
 INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
@@ -60,7 +68,7 @@ INCLUDES = \
 
 @BALSA_OFFSET_MAKERULES@
 
-BUILT_SOURCES = cfg-offsets.h Makefile.offset
+BUILT_SOURCES = cfg-offsets.h Makefile.offset $(GOB_OUTPUTS)
 
 #libbalsa appearing twice is not a bug -- it is mutually dependent with libmutt
 balsa_LDADD = \
@@ -82,6 +90,13 @@ balsa_DEPENDENCIES = \
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.xpm $(distdir)/pixmaps
+
+%.c %.h: %.gob
+	gob --no-private-header $<
+
+EXTRA_DIST = \
+	$(GOBFILES)		\
+	$(BUILT_SOURCES)
 
 # test_cfg_SOURCES = cfg-backend.c test-cfg.c
 # test_cfg_LDADD = $(GNOME_LIBDIR) $(GNOMEGNORBA_LIBS) $(INTLLIBS)

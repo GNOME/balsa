@@ -21,6 +21,7 @@
 
 #include <gnome.h>
 #include "balsa-app.h"
+#include "balsa-mblist.h"
 #include "balsa-index.h"
 #include "balsa-message.h"
 #include "main-window.h"

@@ -21,6 +21,7 @@
 
 #include <gnome.h>
 #include "balsa-app.h"
+#include "balsa-mblist.h"
 #include "pref-manager.h"
 #include "mailbox-conf.h"
 #include "main-window.h"
@@ -477,7 +478,7 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 	 * close window and free memory
 	 */
 	cfg_save();
-        balsa_mblist_redraw (balsa_app.mblist);
+        balsa_mblist_rebuild (balsa_app.mblist);
         balsa_window = GTK_WIDGET (gtk_object_get_data (GTK_OBJECT (pbox), "balsawindow"));
         balsa_window_refresh (BALSA_WINDOW (balsa_window));
 }

@@ -96,7 +96,7 @@ balsa_init (int argc, char **argv)
 {
   CORBA_ORB orb;
   CORBA_Environment ev;
-  balsa_mail_send balsa_servant;
+  Balsa_SendMail balsa_servant;
   PortableServer_POA root_poa;
   PortableServer_POAManager pm;
   static struct poptOption options[] = {
@@ -120,7 +120,7 @@ balsa_init (int argc, char **argv)
 							    "RootPOA", &ev);
   Exception (&ev);
 
-  balsa_servant = impl_balsa_mail_send__create (root_poa, &ev);
+  balsa_servant = impl_Balsa_SendMail__create (root_poa, &ev);
   Exception (&ev);
 
   pm = PortableServer_POA__get_the_POAManager (root_poa, &ev);
@@ -130,7 +130,7 @@ balsa_init (int argc, char **argv)
   Exception (&ev);
 
   goad_server_register (CORBA_OBJECT_NIL,
-			balsa_servant, "balsa_mail_send", "server", &ev);
+			balsa_servant, "Balsa_SendMail", "server", &ev);
 }
 
 static void
@@ -449,7 +449,7 @@ static void __lame_hack_to_avoid_unused_warnings( void );
 typedef void (*__lame_funcptr)( void );
 static void __lame_hack_to_avoid_unused_warnings( void ) 
 {
-	__lame_funcptr i_b_m_i__c = (__lame_funcptr) impl_balsa_mailbox_info__create;
+	__lame_funcptr i_b_m_i__c = (__lame_funcptr) impl_Balsa_MailboxInfo__create;
 	__lame_funcptr self = (__lame_funcptr) __lame_hack_to_avoid_unused_warnings;
 
 	i_b_m_i__c();

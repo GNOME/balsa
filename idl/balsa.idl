@@ -1,10 +1,10 @@
-module balsa {
-  interface mail_send {
-    boolean to(in string to);
-    boolean attachment(in string to, in string filename);
+module Balsa {
+  interface SendMail {
+    boolean To(in string to);
+    boolean Attachment(in string to, in string filename);
   };
-  interface mailbox_info {
-    boolean newmail(in string path);
-    long num_msgs (in string path);
+  interface MailboxInfo {
+    boolean NewMail(in string path);
+    long NumMsgs (in string path);
   };
 };

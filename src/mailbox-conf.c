@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "balsa-app.h"
+#include "balsa-mblist.h"
 #include "mailbox-conf.h"
 #include "main-window.h"
 #include "misc.h"
@@ -213,7 +214,7 @@ mailbox_conf_delete (Mailbox * mailbox)
   if (mailbox->type == MAILBOX_POP3)
     update_pop3_servers ();
   else
-    balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
+    balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));
 }
 
 
@@ -780,7 +781,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 	  return_value != -1)                /* redraw the pop3 server list */
 	update_pop3_servers ();
       else                                   /* redraw the main mailbox list */
-	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));	
+	balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));	
 
       if(return_value != -1) {
 	gtk_widget_destroy (mcw->window);
@@ -805,7 +806,7 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
       if (mailbox->type == MAILBOX_POP3)
 	update_pop3_servers ();
       else
-	balsa_mblist_redraw (BALSA_MBLIST (balsa_app.mblist));
+	balsa_mblist_rebuild (BALSA_MBLIST (balsa_app.mblist));
     }
 
   /* close the new mailbox window */

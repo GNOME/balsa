@@ -1,3 +1,47 @@
+2000-05-20  Peter Williams  <peter@beta.newton.cx>
+
+	* idl/balsa.idl: No underscores in identifiers as ORBit
+	nags us.
+	
+	* idl/balsa-impl.c: Renamed to work with new IDL file.
+
+	* src/main.c (__lame_hack_to_avoid_unused_warnings): Update
+	to work with new IDL files
+
+
+2000-05-19  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-mblist.gob: New file. Gobified
+	version of balsa-mblist.{c,h}. Some code
+	cleanups, renamed balsa_mblist_redraw to
+	balsa_mblist_rebuild.
+
+	* src/balsa-app.h: Don't include balsa-mblist.h,
+	too many crazy rebuilds and dependency problems.
+
+	* src/balsa-index-page.c: Include mblist.h now
+	that balsa-app.h doesn't.
+
+	* src/mailbox-conf.c: Ditto.
+
+	* src/pref-manager.c: Ditto.
+	
+	* src/Makefile.am: Build balsa-mblist.{c,h} with
+	GOB; include them in EXTRA_DIST; etc.
+
+	* libbalsa/Makefile.am (INCLUDES): Change to support
+	new balsa-mblist.h in builddir, not srcdir.
+
+	* po/POTFILES.in: Reference balsa-mblist.gob instead
+	of balsa-mblist.c
+
+	* src/mailbox-conf.c (mailbox_conf_delete): Use the renamed
+	balsa_mblist_rebuild instead of _redraw.
+	(mailbox_conf_close): Ditto.
+	(mailbox_conf_close): Ditto.
+
+	* src/pref-manager.c (apply_prefs): Ditto.
+
 2000-05-17  Peter Williams  <peter@beta.newton.cx>
 
 	* libinit_balsa/Makefile.am: Change the target of the

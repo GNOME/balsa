@@ -11,7 +11,7 @@ libmutt/pager.h
 src/address-book.c
 src/balsa-index-page.c
 src/balsa-index.c
-src/balsa-mblist.c
+src/balsa-mblist.gob
 src/balsa-message.c
 src/filter-edit-dialog.c
 src/mailbox-conf.c

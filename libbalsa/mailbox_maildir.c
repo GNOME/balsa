@@ -268,40 +268,20 @@ libbalsa_mailbox_maildir_finalize(GObject * object)
 }
 
 static GMimeStream *
-libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox *mailbox, 
-                                       LibBalsaMessage *message)
+libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox * mailbox,
+					    LibBalsaMessage * message)
 {
-    GMimeStream *stream = NULL;
     struct message_info *msg_info;
-    gchar *filename;
-    const gchar *path;
-    int fd;
 
-    g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), NULL);
-    g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), NULL);
+    g_return_val_if_fail(MAILBOX_OPEN(mailbox), NULL);
 
     msg_info = message_info_from_msgno(mailbox, message->msgno);
     if (!msg_info)
 	return NULL;
 
-    path = libbalsa_mailbox_local_get_path(mailbox);
-    filename = g_build_filename(path, msg_info->subdir,
-				msg_info->filename, NULL);
-
-    fd = open(filename, O_RDONLY);
-    if (fd == -1)
-	return NULL;
-
-    stream = g_mime_stream_fs_new(fd);
-    if (!stream) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
-			     _("Open of %s failed. Errno = %d, "),
-			     filename, errno);
-	g_free(filename);
-	return NULL;
-    }
-    g_free(filename);
-    return stream;
+    return _libbalsa_mailbox_local_get_message_stream(mailbox,
+						      msg_info->subdir,
+						      msg_info->filename);
 }
 
 static void
@@ -443,19 +423,10 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
     path = libbalsa_mailbox_local_get_path(mailbox);
 
-    if (MAILBOX_OPEN(mailbox)) {
-	/* increment the reference count */
-	mailbox->open_ref++;
-	UNLOCK_MAILBOX(mailbox);
-	return TRUE;
-    }
-
     if (stat(path, &st) == -1) {
-	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
 
@@ -478,16 +449,13 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     mailbox->messages = 0;
     mailbox->unread_messages = 0;
     mailbox->new_messages = 0;
-    mailbox->open_ref++;
     parse_mailbox_subdirs(mailbox);
-    UNLOCK_MAILBOX(mailbox);
     libbalsa_mailbox_local_load_messages(mailbox);
 
     /* We run the filters here also because new could have been put
        in the mailbox with another mechanism than Balsa */
     libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 
-    /* increment the reference count */
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMaildir", mailbox->name, mailbox->open_ref);
@@ -495,62 +463,47 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-static void libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
+/* Called with mailbox open and locked. */
+static void
+libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 {
-    g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
-    
-    if (mailbox->open_ref == 0) {
-	if (libbalsa_notify_check_mailbox(mailbox))
-	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-    } else {
-	struct stat st, st_cur, st_new;
-	const gchar *path;
-	int modified = 0;
-	LibBalsaMailboxMaildir *mdir;
+    struct stat st, st_cur, st_new;
+    const gchar *path;
+    int modified = 0;
+    LibBalsaMailboxMaildir *mdir;
 
-	LOCK_MAILBOX(mailbox);
-	
-	mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
+    g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
-	path = libbalsa_mailbox_local_get_path(mailbox);
-	if (stat(path, &st) == -1)
-	{
-	    UNLOCK_MAILBOX(mailbox);
-	    return;
-	}
+    mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
-	if (st.st_mtime != mdir->mtime)
-	    modified = 1;
+    path = libbalsa_mailbox_local_get_path(mailbox);
 
-	if (stat(mdir->curdir, &st_cur) == -1) {
-	    UNLOCK_MAILBOX(mailbox);
-	    return;
-	}
-	if (st_cur.st_mtime != mdir->mtime_cur)
-	    modified = 1;
+    if (stat(path, &st) == -1)
+	return;
+    if (st.st_mtime != mdir->mtime)
+	modified = 1;
 
-	if (stat(mdir->newdir, &st_new) == -1) {
-	    UNLOCK_MAILBOX(mailbox);
-	    return;
-	}
-	if (st_new.st_mtime != mdir->mtime_new)
-	    modified = 1;
+    if (stat(mdir->curdir, &st_cur) == -1)
+	return;
+    if (st_cur.st_mtime != mdir->mtime_cur)
+	modified = 1;
 
-	if (!modified) {
-	    UNLOCK_MAILBOX(mailbox);
-	    return;
-	}
+    if (stat(mdir->newdir, &st_new) == -1)
+	return;
+    if (st_new.st_mtime != mdir->mtime_new)
+	modified = 1;
 
-	mdir->mtime = st.st_mtime;
-	mdir->mtime_cur = st_cur.st_mtime;
-	mdir->mtime_new = st_new.st_mtime;
+    if (!modified)
+	return;
 
-	parse_mailbox_subdirs(mailbox);
-	UNLOCK_MAILBOX(mailbox);
+    mdir->mtime = st.st_mtime;
+    mdir->mtime_cur = st_cur.st_mtime;
+    mdir->mtime_new = st_new.st_mtime;
 
-	libbalsa_mailbox_local_load_messages(mailbox);
-	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-    }
+    parse_mailbox_subdirs(mailbox);
+
+    libbalsa_mailbox_local_load_messages(mailbox);
+    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 }
 
 static void
@@ -578,10 +531,6 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox)
     LibBalsaMailboxMaildir *mdir;
 
     g_return_if_fail (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
-
-    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
-    if (MAILBOX_OPEN(mailbox))
-	return;
 
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 

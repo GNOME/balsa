@@ -111,7 +111,6 @@ static void libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 
-static gboolean libbalsa_mailbox_imap_close_backend(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox,
                                            gboolean expunge);
 static LibBalsaMessage* libbalsa_mailbox_imap_get_message(LibBalsaMailbox*
@@ -223,8 +222,6 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
     libbalsa_mailbox_class->load_config =
 	libbalsa_mailbox_imap_load_config;
     libbalsa_mailbox_class->sync = libbalsa_mailbox_imap_sync;
-    libbalsa_mailbox_class->close_backend =
-	libbalsa_mailbox_imap_close_backend;
     libbalsa_mailbox_class->get_message = libbalsa_mailbox_imap_get_message;
     libbalsa_mailbox_class->prepare_threading =
         libbalsa_mailbox_imap_prepare_threading;
@@ -656,15 +653,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
-
-    if (MAILBOX_OPEN(mailbox)) {
-	/* increment the reference count */
-	mailbox->open_ref++;
-	UNLOCK_MAILBOX(mailbox);
-	return TRUE;
-    }
-
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
@@ -672,7 +660,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
     mimap->handle = libbalsa_mailbox_imap_get_selected_handle(mimap);
     if (!mimap->handle) {
 	mailbox->disconnected = TRUE;
-	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
 
@@ -688,12 +675,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox)
 	g_array_append_val(mimap->messages_info, a);
     }
 
-    if(mailbox->open_ref == 0)
-	    libbalsa_notify_unregister_mailbox(mailbox);
-    /* increment the reference count */
-    mailbox->open_ref++;
-
-    UNLOCK_MAILBOX(mailbox);
     run_filters_on_reception(mimap);
 
 #ifdef DEBUG
@@ -723,29 +704,24 @@ free_messages_info(LibBalsaMailboxImap * mbox)
 static void
 libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox)
 {
-    if(mailbox->open_ref == 1) { /* about to close */
-        /* FIXME: save headers differently: save_to_cache(mailbox); */
-        clean_cache(mailbox);
-    }
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-	(*LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox) 
-	    (LIBBALSA_MAILBOX(mailbox));
-    if(mailbox->open_ref == 0) {
-	LibBalsaMailboxImap * mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
+    LibBalsaMailboxImap *mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
 
-	libbalsa_notify_register_mailbox(mailbox);
-	if (mbox->matching_messages) {
-	    g_hash_table_destroy(mbox->matching_messages);
-	    mbox->matching_messages = NULL;
-	}
-	if (mbox->conditions) {
-	    libbalsa_conditions_free(mbox->conditions);
-	    mbox->conditions = NULL;
-	    mbox->op = FILTER_NOOP;
-	}
-	free_messages_info(mbox);
-	libbalsa_mailbox_imap_release_handle(mbox);
+    /* FIXME: save headers differently: save_to_cache(mailbox); */
+    clean_cache(mailbox);
+
+    mbox->opened = FALSE;
+
+    if (mbox->matching_messages) {
+	g_hash_table_destroy(mbox->matching_messages);
+	mbox->matching_messages = NULL;
     }
+    if (mbox->conditions) {
+	libbalsa_conditions_free(mbox->conditions);
+	mbox->conditions = NULL;
+	mbox->op = FILTER_NOOP;
+    }
+    free_messages_info(mbox);
+    libbalsa_mailbox_imap_release_handle(mbox);
 }
 
 static FILE*
@@ -807,29 +783,21 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 
 /* libbalsa_mailbox_imap_check:
    checks imap mailbox for new messages.
-   Only open mailboxes are checked, although closed can be checked too
-   with OPTIMAPPASIVE option set.
-   NOTE: mx_check_mailbox can close mailbox(). Be cautious.
+   Called with the mailbox open and locked.
 */
 static void
 libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
-    
-    if (mailbox->open_ref == 0) {
-	if (libbalsa_notify_check_mailbox(mailbox) )
-	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-    } else {
-        LOCK_MAILBOX(mailbox);
-        if(LIBBALSA_MAILBOX_IMAP(mailbox)->handle)
-            libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
-        else 
-            g_warning("mailbox has open_ref>0 but no handle!\n");
-        UNLOCK_MAILBOX(mailbox);
+    g_assert(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
 
-	run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));
-    }
+    if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle)
+	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
+    else
+	g_warning("mailbox has open_ref>0 but no handle!\n");
+
+    run_filters_on_reception(LIBBALSA_MAILBOX_IMAP(mailbox));
 }
+
 typedef struct {
     GHashTable * uids;
     GHashTable * res;
@@ -1254,14 +1222,6 @@ libbalsa_imap_url(LibBalsaServer * server, const gchar * path)
     g_free(enc);
 
     return url;
-}
-
-gboolean libbalsa_mailbox_imap_close_backend(LibBalsaMailbox * mailbox)
-{
-    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    mimap->opened=FALSE;
-    
-    return TRUE;
 }
 
 gboolean

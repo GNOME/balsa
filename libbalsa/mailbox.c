@@ -50,7 +50,6 @@ static void libbalsa_mailbox_init(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_dispose(GObject * object);
 static void libbalsa_mailbox_finalize(GObject * object);
 
-static void libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_real_set_unread_messages_flag(LibBalsaMailbox
 							   * mailbox,
 							   gboolean flag);
@@ -220,7 +219,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     object_class->finalize = libbalsa_mailbox_finalize;
 
     klass->open_mailbox = NULL;
-    klass->close_mailbox = libbalsa_mailbox_real_close;
+    klass->close_mailbox = NULL;
     klass->set_unread_messages_flag =
 	libbalsa_mailbox_real_set_unread_messages_flag;
     klass->progress_notify = NULL;
@@ -376,10 +375,27 @@ libbalsa_mailbox_new_from_config(const gchar * prefix)
 gboolean
 libbalsa_mailbox_open(LibBalsaMailbox * mailbox)
 {
+    gboolean retval;
+
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox);
+    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
+
+    if (mailbox->open_ref > 0) {
+	mailbox->open_ref++;
+	retval = TRUE;
+    } else {
+	mailbox->open_ref++;
+	retval =
+	    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox);
+	if (!retval)
+	    mailbox->open_ref = 0;
+    }
+
+    UNLOCK_MAILBOX(mailbox);
+
+    return retval;
 }
 
 /* libbalsa_mailbox_is_valid:
@@ -409,8 +425,14 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox)
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(MAILBOX_OPEN(mailbox));
 
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox);
+    LOCK_MAILBOX(mailbox);
+
+    if (--mailbox->open_ref == 0)
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox);
+
+    UNLOCK_MAILBOX(mailbox);
 }
 
 void
@@ -446,7 +468,15 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
+    LOCK_MAILBOX(mailbox);
+
+    if (MAILBOX_OPEN(mailbox))
+	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
+    else if (libbalsa_notify_check_mailbox(mailbox))
+	libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+
+    UNLOCK_MAILBOX(mailbox);
+
 #ifdef BALSA_USE_THREADS
     pthread_testcancel();
 #endif
@@ -574,50 +604,6 @@ libbalsa_mailbox_load_config(LibBalsaMailbox * mailbox,
     gnome_config_push_prefix(prefix);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_config(mailbox, prefix);
     gnome_config_pop_prefix();
-}
-
-static void
-libbalsa_mailbox_real_close(LibBalsaMailbox * mailbox)
-{
-    static const struct timespec req = { 0, 50000000 }; 
-    static const int RETRIES_COUNT = 50;
-    int check, cnt;
-#ifdef DEBUG
-    g_print("LibBalsaMailbox: Closing %s Refcount: %d\n", mailbox->name,
-	    mailbox->open_ref);
-#endif
-    LOCK_MAILBOX(mailbox);
-
-    if (mailbox->open_ref == 0) {
-	UNLOCK_MAILBOX(mailbox);
-	return;
-    }
-
-    mailbox->open_ref--;
-
-    if (mailbox->open_ref == 0) {
-	/* now close the mail stream and expunge deleted
-	 * messages -- the expunge may not have to be done */
-	/* We are careful to take/release locks in the correct order here */
-	cnt = 0;
-	while( cnt < RETRIES_COUNT &&
-	       (check = libbalsa_mailbox_close_backend(mailbox)) == FALSE) {
-	    UNLOCK_MAILBOX(mailbox);
-	    g_print("libbalsa_mailbox_real_close: %d trial failed.\n", cnt);
-            nanosleep(&req, NULL); /* wait tenth second */
-	    libbalsa_mailbox_check(mailbox);
-	    LOCK_MAILBOX(mailbox);
-	    cnt++;
-	}
-	if(cnt>=RETRIES_COUNT)
-	    g_print("libbalsa_mailbox_real_close: changes to %s lost.\n",
-		    mailbox->name);
-#if 0
-	libbalsa_mailbox_free_messages(mailbox);
-#endif
-    }
-
-    UNLOCK_MAILBOX(mailbox);
 }
 
 static void

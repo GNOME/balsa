@@ -308,46 +308,29 @@ static void free_messages_info(GArray *messages_info)
     messages_info->len=0;
 }
 
-/* libbalsa_mailbox_local_open:
-   THREADING: It should never touch gdk lock.
-*/
 static gboolean
 libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     struct stat st;
-    LibBalsaMailboxMbox *mbox;
     const gchar* path;
     int fd;
     GMimeStream *gmime_stream;
 
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox), FALSE);
-
-    LOCK_MAILBOX_RETURN_VAL(mailbox, FALSE);
-    mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     path = libbalsa_mailbox_local_get_path(mailbox);
 
-    if (MAILBOX_OPEN(mailbox)) {
-	/* increment the reference count */
-	mailbox->open_ref++;
-	UNLOCK_MAILBOX(mailbox);
-	return TRUE;
-    }
-
     if (stat(path, &st) == -1) {
-	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
 
-    fd = open(path, O_RDONLY);
+    fd = open(path, O_RDWR);
     if (fd == -1) {
-	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
     gmime_stream = g_mime_stream_fs_new(fd);
 
     if (mbox_lock(mailbox, gmime_stream)) {
 	g_mime_stream_unref(gmime_stream);
-	UNLOCK_MAILBOX(mailbox);
 	return FALSE;
     }
 
@@ -365,16 +348,13 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     mailbox->unread_messages = 0;
     if (st.st_size != 0)
 	parse_mailbox(mailbox);
-    mailbox->open_ref++;
     mbox_unlock(mailbox, NULL);
-    UNLOCK_MAILBOX(mailbox);
     libbalsa_mailbox_local_load_messages(mailbox);
 
     /* We run the filters here also because new could have been put
        in the mailbox with another mechanism than Balsa */
     libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
 
-    /* increment the reference count */
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMbox", mailbox->name, mailbox->open_ref);
@@ -382,89 +362,73 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     return TRUE;
 }
 
-static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
+/* Called with mailbox open and locked. */
+static void
+libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 {
-    g_return_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox));
+    struct stat st;
+    gchar buffer[10];
+    const gchar *path;
+    LibBalsaMailboxMbox *mbox;
 
-    if (mailbox->open_ref == 0) {
-	if (libbalsa_notify_check_mailbox(mailbox))
-	    libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-    } else {
-	struct stat st;
-	gchar buffer[10];
-	const gchar *path;
-	LibBalsaMailboxMbox *mbox;
+    g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
-	LOCK_MAILBOX(mailbox);
-		
-	mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
-	path = libbalsa_mailbox_local_get_path(mailbox);
-	if (stat(path, &st) == 0)
-	{
-	    if (st.st_mtime == mbox->mtime && st.st_size == mbox->size) {
-		UNLOCK_MAILBOX(mailbox);
-		return;
-	    }
-	    if (st.st_size == mbox->size)
-	    {
-		mbox->mtime = st.st_mtime;
-		UNLOCK_MAILBOX(mailbox);
-		return;
-	    }
-	    if (mbox_lock(mailbox, NULL) != 0) {
-		/* we couldn't lock the mailbox, but nothing serious happened:
-		 * probably the new mail arrived: no reason to wait till we can
-		 * parse it: we'll get it on the next pass
-		 */
-		UNLOCK_MAILBOX(mailbox);
-		return;
-	    }
-
-	    /*
-	     * Check to make sure that the only change to the mailbox is that 
-	     * message(s) were appended to this file.  The heuristic here is
-	     * that we should see the message separator at *exactly* what used
-	     * to be the end of the folder.
-	     */
-	    if (g_mime_stream_seek(mbox->gmime_stream, mbox->size,
-				   GMIME_STREAM_SEEK_SET) == -1)
-		g_message("libbalsa_notify_check_mailbox: "
-			  "g_mime_stream_seek() failed\n");
-	    if (g_mime_stream_read(mbox->gmime_stream, buffer,
-				   sizeof(buffer)) == -1)
-	    {
-		g_message("libbalsa_notify_check_mailbox: "
-			  "g_mime_stream_read() failed\n");
-	    } else {
-		if (strncmp ("From ", buffer, 5) == 0)
-		{
-		    if (g_mime_stream_seek(mbox->gmime_stream, mbox->size,
-					   GMIME_STREAM_SEEK_SET) == -1)
-			g_message("libbalsa_notify_check_mailbox: "
-				  "g_mime_stream_seek() failed\n");
-		    parse_mailbox(mailbox);
-		    mbox->size = g_mime_stream_tell(mbox->gmime_stream);
-		    mbox_unlock(mailbox, NULL);
-		    UNLOCK_MAILBOX(mailbox);
-		    libbalsa_mailbox_local_load_messages(mailbox);
-		    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
-		    return;
-		}
-	    }
-	    free_messages_info(mbox->messages_info);
-	    mailbox->messages=0;
-	    g_mime_stream_reset(mbox->gmime_stream);
-	    parse_mailbox(mailbox);
-	    mbox->size = g_mime_stream_tell(mbox->gmime_stream);
-	    mbox_unlock(mailbox, NULL);
-	    UNLOCK_MAILBOX(mailbox);
-	    libbalsa_mailbox_local_load_messages(mailbox);
-	    libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+    mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+    path = libbalsa_mailbox_local_get_path(mailbox);
+    if (stat(path, &st) == 0) {
+	if (st.st_mtime == mbox->mtime && st.st_size == mbox->size)
+	    return;
+	if (st.st_size == mbox->size) {
+	    mbox->mtime = st.st_mtime;
 	    return;
 	}
-	/* fatal error */
-	g_warning("Mailbox was corrupted!");
+	if (mbox_lock(mailbox, NULL) != 0)
+	    /* we couldn't lock the mailbox, but nothing serious happened:
+	     * probably the new mail arrived: no reason to wait till we can
+	     * parse it: we'll get it on the next pass
+	     */
+	    return;
+
+	/*
+	 * Check to make sure that the only change to the mailbox is that 
+	 * message(s) were appended to this file.  The heuristic here is
+	 * that we should see the message separator at *exactly* what used
+	 * to be the end of the folder.
+	 */
+	if (g_mime_stream_seek(mbox->gmime_stream, mbox->size,
+			       GMIME_STREAM_SEEK_SET) == -1)
+	    g_message("libbalsa_mailbox_mbox_check: "
+		      "g_mime_stream_seek() failed\n");
+	if (g_mime_stream_read(mbox->gmime_stream, buffer,
+			       sizeof(buffer)) == -1) {
+	    g_message("libbalsa_mailbox_mbox_check: "
+		      "g_mime_stream_read() failed\n");
+	} else {
+	    if (strncmp("From ", buffer, 5) == 0) {
+		if (g_mime_stream_seek(mbox->gmime_stream, mbox->size,
+				       GMIME_STREAM_SEEK_SET) == -1)
+		    g_message("libbalsa_mailbox_mbox_check: "
+			      "g_mime_stream_seek() failed\n");
+		parse_mailbox(mailbox);
+		mbox->size = g_mime_stream_tell(mbox->gmime_stream);
+		mbox_unlock(mailbox, NULL);
+		libbalsa_mailbox_local_load_messages(mailbox);
+		libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+		return;
+	    }
+	}
+	free_messages_info(mbox->messages_info);
+	mailbox->messages = 0;
+	g_mime_stream_reset(mbox->gmime_stream);
+	parse_mailbox(mailbox);
+	mbox->size = g_mime_stream_tell(mbox->gmime_stream);
+	mbox_unlock(mailbox, NULL);
+	libbalsa_mailbox_local_load_messages(mailbox);
+	libbalsa_mailbox_run_filters_on_reception(mailbox, NULL);
+	return;
     }
+    /* fatal error */
+    g_warning("Mailbox was corrupted!");
 }
 
 static gboolean lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
@@ -474,15 +438,7 @@ static gboolean lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 static void
 libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox)
 {
-    LibBalsaMailboxMbox *mbox;
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
-
-    LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox);
-    if (MAILBOX_OPEN(mailbox))
-	return;
-
-    mbox = (LibBalsaMailboxMbox *) mailbox;
+    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
     if (mbox->messages_info) {
 	lbm_mbox_sync_real(mailbox, TRUE, TRUE);
@@ -727,6 +683,8 @@ lbm_mbox_sync_real(LibBalsaMailbox * mailbox,
 		msg_info->end = g_mime_parser_tell(gmime_parser);
 		msg_info->orig_flags = msg_info->flags;
 		msg_info->message->mime_msg = msg_info->mime_message;
+		g_assert(msg_info->message->mime_msg != NULL);
+		g_assert(msg_info->message->mime_msg->mime_part != NULL);
 		j++;
 		if (msg_info->message->body_list) {
 		    /*
@@ -821,6 +779,8 @@ libbalsa_mailbox_mbox_load_message(LibBalsaMailbox *mailbox,
     message = libbalsa_message_new();
     msg_info->message = message;
     message->mime_msg = msg_info->mime_message;
+    g_assert(message->mime_msg != NULL);
+    g_assert(message->mime_msg->mime_part != NULL);
 
 #ifdef MESSAGE_COPY_CONTENT
     header =
@@ -963,14 +923,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
 
     flen = strlen (from);
-    if ( g_mime_stream_write (dest, from, flen) < flen ) {
-        libbalsa_information ( LIBBALSA_INFORMATION_ERROR,
-			       _("Error copying message to mailbox %s!\n"
-				 "Mailbox might have be corrupted!"),
-			       mailbox->name );
-        goto AMCLEANUP;
-    }
-    if (g_mime_stream_write_to_stream (orig, dest) < 0) {
+    if ( g_mime_stream_write (dest, from, flen) < flen ||
+	 g_mime_stream_write_to_stream (orig, dest) < 0) {
         libbalsa_information ( LIBBALSA_INFORMATION_ERROR,
 			       _("Error copying message to mailbox %s!\n"
 				 "Mailbox might have be corrupted!"),

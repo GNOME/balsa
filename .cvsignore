@@ -1,5 +1,6 @@
 ABOUT-NLS
 COPYING
+GNOME_Balsa.server
 Makefile
 Makefile.in
 aclocal.m4

@@ -5,3 +5,4 @@ config.log
 config.cache
 config.status
 aclocal.m4
+website/autom4te-*

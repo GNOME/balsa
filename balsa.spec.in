@@ -104,6 +104,8 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %doc README COPYING ChangeLog NEWS TODO AUTHORS HACKING docs/mh-mail-HOWTO
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
+%{_libdir}/bonobo/servers/GNOME_Balsa.server
+%{_datadir}/idl/Balsa.idl
 %{_datadir}/applications/balsa.desktop
 %{_datadir}/pixmaps/gnome-balsa2.png
 %{_datadir}/gnome/help/balsa/*

@@ -191,13 +191,17 @@ balsa_ab_window_list(BalsaAbWindow * ab, GCallback row_activated_cb)
 static void
 balsa_ab_window_init(BalsaAbWindow *ab)
 {
+#if GTK_CHECK_VERSION(2, 4, 0)
+    GtkWidget *combo_box;
+#else
+    GtkWidget *ab_option, *ab_menu, *menu_item,
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     GtkWidget *find_label,
 	*vbox, *vbox2,
 	*w,
 	*hbox,
 	*box2,
 	*scrolled_window,
-	*ab_option, *ab_menu, *menu_item,
 	*frame, *label;
     GList *ab_list;
     LibBalsaAddressBook *address_book;
@@ -226,7 +230,13 @@ balsa_ab_window_init(BalsaAbWindow *ab)
                                 (balsa_ab_window_select_recipient));
 
     /* The address book selection menu */
+#if GTK_CHECK_VERSION(2, 4, 0)
+    combo_box = gtk_combo_box_new_text();
+    g_signal_connect(combo_box, "changed",
+                     G_CALLBACK(balsa_ab_window_menu_changed), ab);
+#else
     ab_menu = gtk_menu_new();
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     ab->current_address_book = balsa_app.default_address_book;
 
@@ -236,6 +246,13 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	if (ab->current_address_book == NULL)
 	    ab->current_address_book = address_book;
 	
+#if GTK_CHECK_VERSION(2, 4, 0)
+	gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
+                                  address_book->name);
+	if (address_book == balsa_app.default_address_book)
+	    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
+                                     default_offset);
+#else
 	menu_item = gtk_menu_item_new_with_label(address_book->name);
 	gtk_widget_show(menu_item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(ab_menu), menu_item);
@@ -247,11 +264,19 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	
 	if (address_book == balsa_app.default_address_book)
 	    gtk_menu_set_active(GTK_MENU(ab_menu), default_offset);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 	
 	default_offset++;
 	
 	ab_list = g_list_next(ab_list);
     }
+#if GTK_CHECK_VERSION(2, 4, 0)
+    if (balsa_app.address_book_list->next)
+	/* More than one address book. */
+	gtk_widget_show(combo_box);
+
+    gtk_box_pack_start(GTK_BOX(vbox), combo_box, FALSE, FALSE, 0);
+#else
     gtk_widget_show(ab_menu);
 
     ab_option = gtk_option_menu_new();
@@ -260,6 +285,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
         gtk_widget_show(ab_option);
 
     gtk_box_pack_start(GTK_BOX(vbox), ab_option, FALSE, FALSE, 0);
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
 
     /* Entry widget for finding an address */
     find_label = gtk_label_new_with_mnemonic(_("_Search for Name:"));
@@ -816,8 +842,16 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 {
     LibBalsaAddressBook *addr;
 
+#if GTK_CHECK_VERSION(2, 4, 0)
+    addr =
+        LIBBALSA_ADDRESS_BOOK(g_list_nth_data
+                              (balsa_app.address_book_list,
+                               gtk_combo_box_get_active(GTK_COMBO_BOX
+                                                        (widget))));
+#else
     addr = LIBBALSA_ADDRESS_BOOK(g_object_get_data
                                  (G_OBJECT(widget), "address-book"));
+#endif /* GTK_CHECK_VERSION(2, 4, 0) */
     g_assert(addr != NULL);
 
     ab->current_address_book = addr;

@@ -38,5 +38,5 @@ INCLUDES=-I. -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
 	-I$(top_srcdir)/src
 
-@MAINT@%.c %.h %-private.h: %.gob
-@MAINT@	@GOB@ --no-private-header $<
+%.c %.h %-private.h: %.gob
+	@GOB@ --no-private-header $<

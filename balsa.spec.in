@@ -25,6 +25,19 @@ IMAP.
 %prep
 %setup
 
+patch -b -p1 <<EOF
+--- balsa-0.6.0.orig/po/Makefile.in.in
++++ balsa-0.6.0/po/Makefile.in.in
+@@ -17,6 +17,6 @@
+ VPATH = @srcdir@
+
+-prefix = @prefix@
++prefix = \$(DESTDIR)/usr
+ exec_prefix = @exec_prefix@
+ datadir = \$(prefix)/@DATADIRNAME@
+ localedir = \$(datadir)/locale
+EOF
+
 %build
 # Needed for snapshot releases.
 if [ ! -f configure ]; then
@@ -53,9 +66,6 @@ fi
 %install
 rm -rf "$RPM_BUILD_ROOT"
 
-make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc\
-     DESTDIR="$RPM_BUILD_ROOT" install
-
 make sysconfdir=/etc  DESTDIR="$RPM_BUILD_ROOT" install
 
 %clean
@@ -65,9 +75,15 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root)
 %doc README COPYING ChangeLog NEWS TODO
 %{prefix}/bin/balsa
-%{prefix}/share/*
+/usr/share/gnome/apps/Internet/balsa.desktop
+%{prefix}/share/gnome/help/balsa/*
+%{prefix}/share/idl/balsa.idl
+/usr/share/locale/*
+/usr/share/pixmaps/*
+/usr/share/sounds/balsa/*
 %{prefix}/man/*
-%config /etc/*
+%config /etc/CORBA/servers/balsa.gnorba
+%config /etc/sound/events/*
 
 
 %changelog

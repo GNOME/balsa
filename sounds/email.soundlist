@@ -2,5 +2,5 @@
 description=E-mail
 
 [newmail]
-file=newmail.wav
+file=balsa/newmail.wav
 description=New mail notification

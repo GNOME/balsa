@@ -1,4 +1,4 @@
-balsa_SOUNDS = startup.wav
+balsa_SOUNDS = startup.wav newmail.wav
 
 EXTRA_DIST =	$(balsa_SOUNDS)
 

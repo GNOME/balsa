@@ -297,16 +297,16 @@ balsa_index_init (BalsaIndex * bindex)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
 
-  sw = gtk_scrolled_window_new(NULL,NULL);
+  sw = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_set_parent (sw, GTK_WIDGET (bindex));
-  
+
   /* create the clist */
   GTK_BIN (bindex)->child = sw;
 
   bindex->clist = gtk_clist_new_with_titles (6, titles);
-  clist = GTK_CLIST(bindex->clist);
+  clist = GTK_CLIST (bindex->clist);
 
-  gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(clist));
+  gtk_container_add (GTK_CONTAINER (sw), GTK_WIDGET (clist));
 
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
@@ -315,9 +315,9 @@ balsa_index_init (BalsaIndex * bindex)
 		      GTK_SIGNAL_FUNC (clist_click_column),
 		      NULL);
 
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(sw),
-		  GTK_POLICY_AUTOMATIC,
-		  GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+				  GTK_POLICY_AUTOMATIC,
+				  GTK_POLICY_AUTOMATIC);
 
   gtk_clist_set_selection_mode (clist, GTK_SELECTION_EXTENDED);
   gtk_clist_set_column_justification (clist, 0, GTK_JUSTIFY_RIGHT);

@@ -45,8 +45,7 @@ extern struct BalsaApplication
   {
     proplist_t proplist;
     /* personal information */
-    gchar *real_name;
-    gchar *email;
+    Address *address;
     gchar *replyto;
 
     gchar *local_mail_directory;
@@ -83,8 +82,8 @@ extern struct BalsaApplication
     gboolean previewpane;
     gboolean debug;
 
-  /* arp --- string to prefix "replied to" messages. */
-  gchar *quote_str;
+    /* arp --- string to prefix "replied to" messages. */
+    gchar *quote_str;
   }
 balsa_app;
 

@@ -151,7 +151,7 @@ balsa_mblist_class_init (BalsaMBListClass * klass)
 }
 
 static void
-imlib_magic_stuff(gchar **data, GdkPixmap **pmap, GdkBitmap **bmap)
+imlib_magic_stuff (gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
 {
   GdkImlibImage *im;
   im = gdk_imlib_create_image_from_xpm_data (data);
@@ -165,13 +165,13 @@ imlib_magic_stuff(gchar **data, GdkPixmap **pmap, GdkBitmap **bmap)
 static void
 balsa_mblist_init (BalsaMBList * tree)
 {
-  imlib_magic_stuff(mini_dir_open_xpm, &open_folder, &open_mask);
-  imlib_magic_stuff(mini_dir_closed_xpm, &closed_folder, &closed_mask);
-  imlib_magic_stuff(plain_folder_xpm, &tray_empty, &tray_empty_mask);
-  imlib_magic_stuff(full_folder_xpm, &tray_full, &tray_full_mask);
-  imlib_magic_stuff(inbox_xpm, &inboxpix, &inbox_mask);
-  imlib_magic_stuff(outbox_xpm, &outboxpix, &outbox_mask);
-  imlib_magic_stuff(trash_xpm, &trashpix, &trash_mask);
+  imlib_magic_stuff (mini_dir_open_xpm, &open_folder, &open_mask);
+  imlib_magic_stuff (mini_dir_closed_xpm, &closed_folder, &closed_mask);
+  imlib_magic_stuff (plain_folder_xpm, &tray_empty, &tray_empty_mask);
+  imlib_magic_stuff (full_folder_xpm, &tray_full, &tray_full_mask);
+  imlib_magic_stuff (inbox_xpm, &inboxpix, &inbox_mask);
+  imlib_magic_stuff (outbox_xpm, &outboxpix, &outbox_mask);
+  imlib_magic_stuff (trash_xpm, &trashpix, &trash_mask);
 
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
@@ -217,19 +217,19 @@ balsa_mblist_redraw (BalsaMBList * bmbl)
   /* inbox */
   text[0] = "Inbox";
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, inboxpix,
-			     inbox_mask, inboxpix, inbox_mask, FALSE, FALSE);
+			    inbox_mask, inboxpix, inbox_mask, FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.inbox);
 
   /* outbox */
   text[0] = "Outbox";
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, outboxpix,
-			  outbox_mask, outboxpix, outbox_mask, FALSE, FALSE);
+			 outbox_mask, outboxpix, outbox_mask, FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.outbox);
 
   /* trash */
   text[0] = "Trash";
   ctnode = gtk_ctree_insert_node (ctree, NULL, NULL, text, 5, trashpix,
-			     trash_mask, trashpix, trash_mask, FALSE, FALSE);
+			    trash_mask, trashpix, trash_mask, FALSE, FALSE);
   gtk_ctree_node_set_row_data (ctree, ctnode, balsa_app.trash);
 
   if (balsa_app.mailbox_nodes)

@@ -591,16 +591,16 @@ config_global_load (void)
   /* user's real name */
   if ((field = pl_dict_get_str (globals, "RealName")) == NULL)
     return FALSE;
-  balsa_app.real_name = g_strdup (field);
+  balsa_app.address->personal = g_strdup (field);
 
   /* user's email address */
   if ((field = pl_dict_get_str (globals, "Email")) == NULL)
     return FALSE;
-  balsa_app.email = g_strdup (field);
+  balsa_app.address->mailbox = g_strdup (field);
 
   /* users's replyto address */
   if ((field = pl_dict_get_str (globals, "ReplyTo")) == NULL)
-    balsa_app.replyto = g_strdup (balsa_app.email);
+    balsa_app.replyto = g_strdup (balsa_app.address->mailbox);
   else
     balsa_app.replyto = g_strdup (field);
 
@@ -689,10 +689,10 @@ config_global_save (void)
   PLRelease (temp_str);
 
   /* Create a new dictionary of global configurations */
-  if (balsa_app.real_name != NULL)
-    globals = pl_dict_add_str_str (NULL, "RealName", balsa_app.real_name);
-  if (balsa_app.email != NULL)
-    pl_dict_add_str_str (globals, "Email", balsa_app.email);
+  if (balsa_app.address->personal != NULL)
+    globals = pl_dict_add_str_str (NULL, "RealName", balsa_app.address->personal);
+  if (balsa_app.address->mailbox != NULL)
+    pl_dict_add_str_str (globals, "Email", balsa_app.address->mailbox);
   if (balsa_app.replyto != NULL)
     pl_dict_add_str_str (globals, "ReplyTo", balsa_app.replyto);
 

@@ -41,12 +41,14 @@ static void close_window (GtkWidget *, gpointer);
 static void balsa_sendmsg_destroy (BalsaSendmsg * bsm);
 
 /* Standard DnD types */
-enum {
-	TARGET_URI_LIST,
-};
+enum
+  {
+    TARGET_URI_LIST,
+  };
 
-static GtkTargetEntry drop_types [] = {
-	{ "text/uri-list", 0, TARGET_URI_LIST }
+static GtkTargetEntry drop_types[] =
+{
+  {"text/uri-list", 0, TARGET_URI_LIST}
 };
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
@@ -69,19 +71,19 @@ static GnomeUIInfo main_toolbar[] =
 static GnomeUIInfo file_menu[] =
 {
   {
-   GNOME_APP_UI_ITEM, N_ ("_Send"), NULL, send_message_cb, NULL,
-       NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_SND, 'Y', 0, NULL
-   },
-   {
-   GNOME_APP_UI_ITEM, N_ ("_Attach file..."), NULL, attach_clicked, NULL,
-       NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH, 'H', 0, NULL
-   },
-   GNOMEUIINFO_SEPARATOR,
-   {
-   GNOME_APP_UI_ITEM, N_ ("E_xit"), NULL, close_window, NULL,
-       NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_EXIT, 'Q', 0, NULL
-   },
-   GNOMEUIINFO_END
+    GNOME_APP_UI_ITEM, N_ ("_Send"), NULL, send_message_cb, NULL,
+    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_MAIL_SND, 'Y', 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_ ("_Attach file..."), NULL, attach_clicked, NULL,
+    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH, 'H', 0, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+  {
+    GNOME_APP_UI_ITEM, N_ ("E_xit"), NULL, close_window, NULL,
+    NULL, GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_EXIT, 'Q', 0, NULL
+  },
+  GNOMEUIINFO_END
 };
 
 static GnomeUIInfo main_menu[] =
@@ -95,7 +97,7 @@ close_window (GtkWidget * widget, gpointer data)
 {
   BalsaSendmsg *bsm;
   bsm = data;
-  balsa_sendmsg_destroy(bsm);
+  balsa_sendmsg_destroy (bsm);
 }
 
 
@@ -146,15 +148,15 @@ select_attachment (GnomeIconList * ilist, gint num, GdkEventButton * event)
 }
 
 static void
-add_attachment (GnomeIconList *iconlist, char *filename)
+add_attachment (GnomeIconList * iconlist, char *filename)
 {
-	gint pos;
-	
-	pos = gnome_icon_list_append (
-		iconlist,
-		gnome_unconditional_pixmap_file ("balsa/attachment.png"),
-		g_basename (filename));
-	gnome_icon_list_set_icon_data (iconlist, pos, filename);
+  gint pos;
+
+  pos = gnome_icon_list_append (
+				 iconlist,
+		   gnome_unconditional_pixmap_file ("balsa/attachment.png"),
+				 g_basename (filename));
+  gnome_icon_list_set_icon_data (iconlist, pos, filename);
 }
 
 static void
@@ -190,7 +192,7 @@ attach_clicked (GtkWidget * widget, gpointer data)
   GnomeIconList *iconlist;
   GtkFileSelection *fs;
   BalsaSendmsg *bsm;
-  
+
   bsm = data;
 
   iconlist = GNOME_ICON_LIST (bsm->attachments);
@@ -211,24 +213,25 @@ attach_clicked (GtkWidget * widget, gpointer data)
 }
 
 static void
-attachments_add (GtkWidget          *widget,
-		 GdkDragContext     *context,
-		 gint                x,
-		 gint                y,
-		 GtkSelectionData   *selection_data,
-		 guint               info,
-		 guint32             time,
-		 GnomeIconList       *iconlist)
+attachments_add (GtkWidget * widget,
+		 GdkDragContext * context,
+		 gint x,
+		 gint y,
+		 GtkSelectionData * selection_data,
+		 guint info,
+		 guint32 time,
+		 GnomeIconList * iconlist)
 {
-	GList *names, *l;
-	
-	names = gnome_uri_list_extract_uris (selection_data->data);
-	for (l = names; l; l = l->next){
-		char *name = l->data;
-		
-		add_attachment (GNOME_ICON_LIST (widget), name);
-	}
-	gnome_uri_list_free_strings (names);
+  GList *names, *l;
+
+  names = gnome_uri_list_extract_uris (selection_data->data);
+  for (l = names; l; l = l->next)
+    {
+      char *name = l->data;
+
+      add_attachment (GNOME_ICON_LIST (widget), name);
+    }
+  gnome_uri_list_free_strings (names);
 }
 
 static GtkWidget *
@@ -339,16 +342,16 @@ create_info_pane (BalsaSendmsg * msg, SendType type)
   gtk_widget_push_visual (gdk_imlib_get_visual ());
   gtk_widget_push_colormap (gdk_imlib_get_colormap ());
   /* create icon list */
-  sw = gtk_scrolled_window_new(NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(sw),
-		                    GTK_POLICY_AUTOMATIC,
-	                      GTK_POLICY_AUTOMATIC);
+  sw = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+				  GTK_POLICY_AUTOMATIC,
+				  GTK_POLICY_AUTOMATIC);
 
   msg->attachments = gnome_icon_list_new (100, NULL, FALSE);
   gtk_signal_connect (GTK_OBJECT (msg->attachments), "drag_data_received",
-		      GTK_SIGNAL_FUNC(attachments_add), NULL);
+		      GTK_SIGNAL_FUNC (attachments_add), NULL);
   gtk_drag_dest_set (GTK_WIDGET (msg->attachments), GTK_DEST_DEFAULT_ALL,
-		     drop_types, ELEMENTS(drop_types),
+		     drop_types, ELEMENTS (drop_types),
 		     GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
   gtk_widget_pop_visual ();
@@ -480,7 +483,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   /* From: */
   {
     gchar *from;
-    from = g_strdup_printf ("%s <%s>", balsa_app.real_name, balsa_app.email);
+    from = g_strdup_printf ("%s <%s>", balsa_app.address->personal, balsa_app.address->mailbox);
     gtk_entry_set_text (GTK_ENTRY (msg->from), from);
     g_free (from);
   }
@@ -560,8 +563,8 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
 
   gnome_app_set_contents (GNOME_APP (window), vbox);
 
-  gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, msg);
-  gnome_app_create_toolbar_with_data(GNOME_APP(window), main_toolbar, msg);
+  gnome_app_create_menus_with_data (GNOME_APP (window), main_menu, msg);
+  gnome_app_create_toolbar_with_data (GNOME_APP (window), main_toolbar, msg);
 
 
   gtk_text_freeze (GTK_TEXT (msg->text));
@@ -617,7 +620,7 @@ sendmsg_window_new (GtkWidget * widget, Message * message, SendType type)
   gtk_text_set_point (GTK_TEXT (msg->text), 0);
   gtk_text_thaw (GTK_TEXT (msg->text));
   /* set the toolbar so we are consistant with the rest of balsa */
-  gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP(window)->toolbar), balsa_app.toolbar_style);
+  gtk_toolbar_set_style (GTK_TOOLBAR (GNOME_APP (window)->toolbar), balsa_app.toolbar_style);
 
   /* display the window */
   gtk_widget_show_all (window);
@@ -653,9 +656,10 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message = message_new ();
 
+  /* we should just copy balsa_app.address */
   message->from = address_new ();
-  message->from->personal = g_strdup (balsa_app.real_name);
-  message->from->mailbox = g_strdup (balsa_app.email);
+  message->from->personal = g_strdup (balsa_app.address->personal);
+  message->from->mailbox = g_strdup (balsa_app.address->mailbox);
   message->subject = g_strdup (gtk_entry_get_text (GTK_ENTRY (bsmsg->subject)));
 
   message->to_list = make_list_from_string (gtk_entry_get_text (GTK_ENTRY (bsmsg->to)));
@@ -663,7 +667,7 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   message->reply_to = address_new ();
 
-  message->reply_to->personal = g_strdup (balsa_app.real_name);
+  message->reply_to->personal = g_strdup (balsa_app.address->personal);
   message->reply_to->mailbox = g_strdup (balsa_app.replyto);
 
 
@@ -697,4 +701,3 @@ send_message_cb (GtkWidget * widget, BalsaSendmsg * bsmsg)
   message_free (message);
   balsa_sendmsg_destroy (bsmsg);
 }
-

@@ -29,7 +29,7 @@
  */
 #ifndef MAX_PROPLIST_KEY_LEN
 /* NB!!! This includes space for the terminating \0! */
-#   define MAX_PROPLIST_KEY_LEN    32
+#define MAX_PROPLIST_KEY_LEN    32
 #endif
 
 

@@ -73,9 +73,9 @@ balsa_init (int argc, char **argv)
   CORBA_exception_init (&ev);
 
   orb = gnome_CORBA_init ("balsa", VERSION,
-		  &argc, argv,
-		  GNORBA_INIT_SERVER_FUNC,
-		  &ev);
+			  &argc, argv,
+			  GNORBA_INIT_SERVER_FUNC,
+			  &ev);
 
   Exception (&ev);
 
@@ -157,7 +157,7 @@ main (int argc, char *argv[])
   config_mailboxes_init ();
   mailboxes_init ();
 
-  gnome_triggers_do("", "program", "balsa", "startup", NULL);
+  gnome_triggers_do ("", "program", "balsa", "startup", NULL);
 
   main_window_init ();
 

@@ -571,11 +571,11 @@ complete_cb (GtkWidget * widget, gpointer data)
   Mailbox *mailbox;
   MailboxType type;
 
-  g_free (balsa_app.real_name);
-  balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->real_name)));
+  g_free (balsa_app.address->personal);
+  balsa_app.address->personal = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->real_name)));
 
-  g_free (balsa_app.email);
-  balsa_app.email = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->email)));
+  g_free (balsa_app.address->mailbox);
+  balsa_app.address->mailbox = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->email)));
 
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (prefs->smtp_server)));

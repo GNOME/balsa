@@ -201,7 +201,7 @@ open_preferences_manager (void)
 
   /* arp */
   gtk_signal_connect (GTK_OBJECT (pui->quote_str), "changed",
-		      GTK_SIGNAL_FUNC (properties_modified_cb), 
+		      GTK_SIGNAL_FUNC (properties_modified_cb),
 		      pui->pbox);
 
   /* set data and show the whole thing */
@@ -229,11 +229,11 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
   /*
    * identity page
    */
-  g_free (balsa_app.real_name);
-  balsa_app.real_name = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->real_name)));
+  g_free (balsa_app.address->personal);
+  balsa_app.address->personal = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->real_name)));
 
-  g_free (balsa_app.email);
-  balsa_app.email = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email)));
+  g_free (balsa_app.address->mailbox);
+  balsa_app.address->mailbox = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->email)));
 
   g_free (balsa_app.smtp_server);
   balsa_app.smtp_server = g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->smtp_server)));
@@ -263,7 +263,7 @@ apply_prefs (GnomePropertyBox * pbox, gint page, PropertyUI * pui)
 
   /* arp */
   g_free (balsa_app.quote_str);
-  balsa_app.quote_str = 
+  balsa_app.quote_str =
     g_strdup (gtk_entry_get_text (GTK_ENTRY (pui->quote_str)));
 
 
@@ -298,9 +298,9 @@ set_prefs (void)
 	break;
       }
 #endif
-  gtk_entry_set_text (GTK_ENTRY (pui->real_name), balsa_app.real_name);
+  gtk_entry_set_text (GTK_ENTRY (pui->real_name), balsa_app.address->personal);
 
-  gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.email);
+  gtk_entry_set_text (GTK_ENTRY (pui->email), balsa_app.address->mailbox);
   gtk_entry_set_text (GTK_ENTRY (pui->replyto), balsa_app.replyto);
 
   gtk_entry_set_text (GTK_ENTRY (pui->signature), balsa_app.signature_path);
@@ -435,13 +435,13 @@ create_mailservers_page ()
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
 
-  sw = gtk_scrolled_window_new(NULL, NULL);
+  sw = gtk_scrolled_window_new (NULL, NULL);
   pui->pop3servers = gtk_clist_new (1);
-  gtk_container_add(GTK_CONTAINER(sw), pui->pop3servers);
+  gtk_container_add (GTK_CONTAINER (sw), pui->pop3servers);
 
-  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
-		  GTK_POLICY_AUTOMATIC,
-		  GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+				  GTK_POLICY_AUTOMATIC,
+				  GTK_POLICY_AUTOMATIC);
 
   gtk_box_pack_start (GTK_BOX (hbox), sw, TRUE, TRUE, 2);
 

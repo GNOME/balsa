@@ -906,8 +906,8 @@ mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data)
   clist = gtk_clist_new_with_titles (2, titles);
   gtk_clist_set_column_width (GTK_CLIST (clist), 1, 16);
 /*
-  gtk_clist_set_policy (GTK_CLIST (clist), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-*/
+   gtk_clist_set_policy (GTK_CLIST (clist), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+ */
   gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (window)->vbox), clist, TRUE, TRUE, 0);
   gtk_widget_show (clist);
 
@@ -915,7 +915,7 @@ mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data)
   titles[1] = "INBOX";
   gtk_clist_append (GTK_CLIST (clist), titles);
 
-  gtk_window_set_modal(GTK_WINDOW(window), TRUE);
+  gtk_window_set_modal (GTK_WINDOW (window), TRUE);
   clicked_button = gnome_dialog_run (GNOME_DIALOG (window));
   if (clicked_button == 0)
     {

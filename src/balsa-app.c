@@ -85,8 +85,7 @@ balsa_app_init (void)
    * initalize application structure before ALL ELSE 
    * to some reasonable defaults
    */
-  balsa_app.real_name = NULL;
-  balsa_app.email = NULL;
+  balsa_app.address = address_new ();
   balsa_app.replyto = NULL;
 
   balsa_app.local_mail_directory = NULL;

@@ -298,7 +298,13 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     g_object_unref(G_OBJECT(tmp_mailbox));	
     if(remove_tmp) { 
 	unlink(mhs);
-	unlink(tmp_path); /* if there are messages left over this fails */
+	if (rmdir(tmp_path)) {
+	    /* Probably some file was left behind... */
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				 _("POP3 temp mailbox %s was not removed "
+				   "(system error message: %s)"),
+				   tmp_path, g_strerror(errno));
+	}
     }
     g_free(tmp_path);
     g_free(mhs);

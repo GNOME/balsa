@@ -1,3 +1,8 @@
+2002-06-26  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-mblist.c: use "pixbuf" property of
+	GtkCellRendererPixbuf instead of "stock-id"
+
 2002-06-26  Pawel Salek <pawsa@theochem.kth.se>
 
 	* src/Makefile.am, balsa.spec.in: remove last gdbm experiment traces.

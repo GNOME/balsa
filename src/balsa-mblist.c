@@ -324,7 +324,7 @@ bmbl_init(BalsaMBList * mblist)
     renderer = gtk_cell_renderer_pixbuf_new();
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
-                                        "stock-id", ICON_COLUMN,
+                                        "pixbuf", ICON_COLUMN,
                                         NULL);
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
@@ -418,7 +418,7 @@ bmbl_get_store(void)
         balsa_app.mblist_tree_store =
             gtk_tree_store_new(N_COLUMNS,
                                G_TYPE_POINTER,    /* MBNODE_COLUMN */
-                               G_TYPE_STRING,     /* ICON_COLUMN   */
+                               GDK_TYPE_PIXBUF,   /* ICON_COLUMN   */
                                G_TYPE_STRING,     /* NAME_COLUMN   */
                                GDK_TYPE_COLOR,    /* COLOR_COLUMN  */
                                PANGO_TYPE_WEIGHT, /* WEIGHT_COLUMN */
@@ -1167,7 +1167,10 @@ bmbl_store_add_mbnode(GtkTreeStore * store, GtkTreeIter * iter,
 
     gtk_tree_store_set(store, iter,
                        MBNODE_COLUMN, mbnode,
-                       ICON_COLUMN,   in,
+                       ICON_COLUMN,   
+                       gtk_widget_render_icon
+                           (GTK_WIDGET(balsa_app.main_window), in,
+                            GTK_ICON_SIZE_MENU, NULL),
                        NAME_COLUMN,   name,
                        COLOR_COLUMN,  NULL,
                        WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
@@ -1436,7 +1439,11 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
              * last style update */
             icon = BALSA_PIXMAP_MBOX_TRAY_FULL;
             gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                               ICON_COLUMN, BALSA_PIXMAP_MBOX_TRAY_FULL,
+                               ICON_COLUMN,
+                               gtk_widget_render_icon
+                                   (GTK_WIDGET(balsa_app.main_window),
+                                    BALSA_PIXMAP_MBOX_TRAY_FULL,
+                                    GTK_ICON_SIZE_MENU, NULL),
                                COLOR_COLUMN,
                                &balsa_app.mblist_unread_color,
                                WEIGHT_COLUMN, PANGO_WEIGHT_BOLD, -1);
@@ -1468,7 +1475,10 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
                     icon = BALSA_PIXMAP_MBOX_TRAY_EMPTY;
 
                 gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                                   ICON_COLUMN, icon,
+                                   ICON_COLUMN,
+                                   gtk_widget_render_icon
+                                       (GTK_WIDGET(balsa_app.main_window),
+                                        icon, GTK_ICON_SIZE_MENU, NULL),
                                    COLOR_COLUMN, NULL,
                                    WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL, -1);
                 bmbl_mbnode_tab_style(mbnode, 0);

@@ -1094,9 +1094,10 @@ msgstr "Nga"
 msgid "To:"
 msgstr "Për:"
 
+#. GRUT modified this item
 #: libbalsa/send.c:866 src/balsa-index.c:814
 msgid "To"
-msgstr ""
+msgstr "Për"
 
 #. GRUT modified this item
 #: libbalsa/send.c:902
@@ -2881,9 +2882,10 @@ msgid "Send and Receive messages"
 msgstr ""
 
 #. GRUT modified this item
+#. GRUT modified this item
 #: src/main-window.c:339 src/sendmsg-window.c:237
 msgid "_Print..."
-msgstr "_Printo..."
+msgstr "_Printim..."
 
 #: src/main-window.c:340 src/toolbar-factory.c:119
 msgid "Print current message"

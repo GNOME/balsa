@@ -351,7 +351,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
  	}
     }
     update_mail_servers();
-    gtk_object_destroy(GTK_OBJECT(mbnode));
+    g_object_unref(G_OBJECT(mbnode));
 }
 
 static void

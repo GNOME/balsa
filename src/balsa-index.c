@@ -870,6 +870,7 @@ bndx_select_row(BalsaIndex * index, GtkTreePath * path)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     gtk_tree_selection_unselect_all(selection);
     /* select path, and make sure this path gets the keyboard focus */
+    gtk_tree_selection_select_path(selection, path);
     gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
 
     bndx_scroll_to_row(index, path);
@@ -1377,20 +1378,10 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
             && bndx_row_is_viewable(tree_view, current_path)) {
             gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), current_path,
                                      NULL, FALSE);
-        } else {
-            gtk_tree_path_free(current_path);
-            current_path = NULL;
+            bndx_scroll_to_row(index, current_path);
         }
+        gtk_tree_path_free(current_path);
     }
-
-    /* scroll to current message if it became viewable, or to child of
-     * expanded row otherwise */
-    if (!current_path) {
-        current_path = gtk_tree_path_copy(path);
-        gtk_tree_path_down(current_path);
-    }
-    bndx_scroll_to_row(index, current_path);
-    gtk_tree_path_free(current_path);
 
     bndx_set_style(index, path);
     bndx_changed_find_row(index);
@@ -2185,13 +2176,13 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     bndx_set_style_recursive(index, path);     /* chbm */
     gtk_tree_path_free(path);
 
-    if (bndx_find_message(index, &path, &iter, index->current_message)) {
-        if (!expand)           /* Re-expand msg_node's thread; cf. Remarks */
-            bndx_expand_to_row_and_select(index, &iter);
-        else
-            bndx_scroll_to_row(index, path);
-        gtk_tree_path_free(path);
-    }
+    /* Re-expand msg_node's thread; cf. Remarks */
+    /* expand_to_row is redundant in the expand_all case, but the
+     * overhead is slight
+     * select is needed in both cases, as a previous collapse could have
+     * deselected the current message */
+    if (bndx_find_message(index, NULL, &iter, index->current_message))
+        bndx_expand_to_row_and_select(index, &iter);
 
     g_signal_handlers_unblock_by_func(G_OBJECT(index),
                                       G_CALLBACK(expand ?

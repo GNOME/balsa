@@ -654,7 +654,7 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
                                          mbnode);
 	g_node_unlink(gnode);
 	g_node_destroy(gnode);
-	gtk_object_destroy(GTK_OBJECT(mbnode));
+	g_object_unref(G_OBJECT(mbnode));
 	update_mail_servers();
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mbnode->name, mbnode);

@@ -1,5 +1,8 @@
-2004-07-21 10:23  PeterB
+2004-07-21 12:28  PeterB
 
+	* src/main-window.c: switch Message and Mailbox menu positions; add
+	accelerators `del' for `toggle deleted' and F9 for `show mailbox
+	tree'.
 	* src/folder-conf.c: fix problems in creating an imap folder; plug
 	memory leak.
 	* src/: balsa-message.c, sendmsg-window.c: do not try to change

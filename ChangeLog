@@ -1,5 +1,8 @@
-2003-11-13 14:48  PeterB
+2003-11-13 21:45  PeterB
 
+	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c: Fix pop3 checking, broken in change
+	on 2003-11-11.
 	* libbalsa/send.c: Attach the created GMimeMessage to the
 	LibBalsaMessage; don't grab the gdk lock while enumerating smtp
 	messages.

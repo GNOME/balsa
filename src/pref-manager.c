@@ -53,6 +53,9 @@ typedef struct _PropertyUI {
     GtkRadioButton *encoding_type[NUM_ENCODING_MODES];
     GtkWidget *check_mail_auto;
     GtkWidget *check_mail_minutes;
+#ifdef BALSA_MDN_REPLY
+    GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
+#endif
 
     GtkWidget *close_mailbox_auto;
     GtkWidget *close_mailbox_minutes;
@@ -134,6 +137,9 @@ static GtkWidget *create_spelling_option_menu(const gchar * names[],
 static GtkWidget *create_address_book_page(gpointer);
 
 static GtkWidget *create_information_message_menu(void);
+#ifdef BALSA_MDN_REPLY
+static GtkWidget *create_mdn_reply_menu(void);
+#endif
 
 static GtkWidget *incoming_page(gpointer);
 static GtkWidget *outgoing_page(gpointer);
@@ -597,6 +603,14 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
     balsa_app.check_mail_timer =
 	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
 					 (pui->check_mail_minutes));
+#ifdef BALSA_MDN_REPLY
+    menu_item = gtk_menu_get_active(GTK_MENU(pui->mdn_reply_clean_menu));
+    balsa_app.mdn_reply_clean =
+	GPOINTER_TO_INT(gtk_object_get_user_data(GTK_OBJECT(menu_item)));
+    menu_item = gtk_menu_get_active(GTK_MENU(pui->mdn_reply_notclean_menu));
+    balsa_app.mdn_reply_notclean =
+	GPOINTER_TO_INT(gtk_object_get_user_data(GTK_OBJECT(menu_item)));
+#endif
 
     if (balsa_app.check_mail_auto)
 	update_timer(TRUE, balsa_app.check_mail_timer);
@@ -817,6 +831,13 @@ set_prefs(void)
 				 balsa_app.check_mail_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->check_mail_minutes),
 			      (float) balsa_app.check_mail_timer);
+
+#ifdef BALSA_MDN_REPLY
+    gtk_menu_set_active(GTK_MENU(pui->mdn_reply_clean_menu),
+			balsa_app.mdn_reply_clean);
+    gtk_menu_set_active(GTK_MENU(pui->mdn_reply_notclean_menu),
+			balsa_app.mdn_reply_notclean);
+#endif
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->close_mailbox_auto),
 				 balsa_app.close_mailbox_auto);
@@ -1354,6 +1375,13 @@ incoming_page(gpointer data)
     GtkWidget *regex_frame;
     GtkWidget *regex_hbox;
     GtkWidget *regex_label;
+#ifdef BALSA_MDN_REPLY
+    GtkWidget *mdn_frame;
+    GtkWidget *mdn_vbox;
+    GtkWidget *mdn_label;
+    GtkWidget *mdn_table;
+    GtkWidget *mdn_optionmenu;
+#endif
 
     vbox1 = gtk_vbox_new(FALSE, 0);
 
@@ -1384,7 +1412,7 @@ incoming_page(gpointer data)
 
     /* Quoted text regular expression */
     regex_frame = gtk_frame_new(_("Quoted Text"));
-    gtk_container_set_border_width(GTK_CONTAINER(regex_frame), 2);
+    gtk_container_set_border_width(GTK_CONTAINER(regex_frame), 5);
     gtk_box_pack_start(GTK_BOX(vbox1), regex_frame, FALSE, FALSE, 0);
 
     regex_hbox = gtk_hbox_new(FALSE, 0);
@@ -1396,6 +1424,59 @@ incoming_page(gpointer data)
 
     pui->quote_pattern = gnome_entry_new("quote-regex-history");
     gtk_box_pack_start(GTK_BOX(regex_hbox),pui->quote_pattern, FALSE,FALSE,0);
+
+#ifdef BALSA_MDN_REPLY
+    /* How to handle received MDN requests */
+    mdn_frame = gtk_frame_new (_("Message Disposition Notification requests"));
+    gtk_container_set_border_width (GTK_CONTAINER(mdn_frame), 5);
+    gtk_box_pack_start(GTK_BOX(vbox1), mdn_frame, FALSE, FALSE, 0);
+
+    mdn_vbox = gtk_vbox_new (FALSE, 0);
+    gtk_container_add (GTK_CONTAINER(mdn_frame), mdn_vbox);
+    gtk_container_set_border_width (GTK_CONTAINER(mdn_vbox), 5);
+
+    mdn_label = gtk_label_new (_("When I receive a message and its sender requested to return a\nMessage Disposition Notification (MDN), send it in the following cases:"));
+    gtk_box_pack_start (GTK_BOX (mdn_vbox), mdn_label, FALSE, FALSE, 0);
+    gtk_label_set_justify (GTK_LABEL (mdn_label), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment (GTK_MISC (mdn_label), 0, 0.5);
+
+    mdn_table = gtk_table_new(2, 2, FALSE);
+    gtk_box_pack_start (GTK_BOX (mdn_vbox), mdn_table, FALSE, FALSE, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(mdn_table), 10);
+    gtk_table_set_row_spacings(GTK_TABLE(mdn_table), 5);
+    gtk_table_set_col_spacings(GTK_TABLE(mdn_table), 10);
+
+    mdn_label = gtk_label_new (_("the message header looks clean\n(the notify-to address is equal to the return path, I am in the to or cc list)"));
+    gtk_label_set_justify (GTK_LABEL (mdn_label), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment (GTK_MISC (mdn_label), 0, 0.5);
+    gtk_table_attach (GTK_TABLE (mdn_table), mdn_label, 0, 1, 0, 1,
+		      GTK_FILL, 0, 0, 0);
+
+    mdn_optionmenu = gtk_option_menu_new ();
+    pui->mdn_reply_clean_menu = create_mdn_reply_menu();
+    gtk_option_menu_set_menu (GTK_OPTION_MENU (mdn_optionmenu),
+			      pui->mdn_reply_clean_menu);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (mdn_optionmenu),
+				 balsa_app.mdn_reply_clean);
+    gtk_table_attach (GTK_TABLE (mdn_table), mdn_optionmenu, 1, 2, 0, 1,
+		      GTK_FILL | GTK_EXPAND, 0, 0, 0);
+ 
+    mdn_label = gtk_label_new (_("the message header looks suspicious"));
+    gtk_label_set_justify (GTK_LABEL (mdn_label), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment (GTK_MISC (mdn_label), 0, 0.5);
+    gtk_table_attach (GTK_TABLE (mdn_table), mdn_label, 0, 1, 1, 2,
+		      (GtkAttachOptions) (GTK_FILL), (GtkAttachOptions) (0), 0, 0);
+    gtk_misc_set_alignment (GTK_MISC (mdn_label), 0, 0.5);
+
+    mdn_optionmenu = gtk_option_menu_new ();
+    pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
+    gtk_option_menu_set_menu (GTK_OPTION_MENU (mdn_optionmenu), 
+			      pui->mdn_reply_notclean_menu);
+    gtk_option_menu_set_history (GTK_OPTION_MENU (mdn_optionmenu),
+				 balsa_app.mdn_reply_notclean);
+    gtk_table_attach (GTK_TABLE (mdn_table), mdn_optionmenu, 1, 2, 1, 2,
+		      GTK_FILL | GTK_EXPAND, 0, 0, 0);
+#endif
 
     return vbox1;
 }
@@ -2249,6 +2330,18 @@ create_information_message_menu(void)
     add_show_menu(_("Print to console"), BALSA_INFORMATION_SHOW_STDERR, menu);
     return menu;
 }
+
+#ifdef BALSA_MDN_REPLY
+static GtkWidget *
+create_mdn_reply_menu(void)
+{
+    GtkWidget *menu = gtk_menu_new();
+    add_show_menu(_("Never"),  BALSA_MDN_REPLY_NEVER,  menu);
+    add_show_menu(_("Ask me"), BALSA_MDN_REPLY_ASKME,  menu);
+    add_show_menu(_("Always"), BALSA_MDN_REPLY_ALWAYS, menu);
+    return menu;
+}
+#endif
 
 void
 mailbox_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)

@@ -18,6 +18,7 @@
 	* src/balsa-app.h : add MDN configuration fields.
 	* src/balsa-message.c: fundamental MDN support & UI.
 	* src/save-restore.c: read & save MDN configuration.
+	* src/pref-manager.c: MDN configuration.
 	
 2001-03-21  Pawel Salek  <pawsa@theochem.kth.se>
 

@@ -1,0 +1,3788 @@
+2000-11-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/mailbox-conf.c: fix #30890: Adding POP mail box doesn't
+	appear until after refresh.
+	* libbalsa/send.c: save fcc (NOTE: append mode of
+	libbalsa_mailbox_open() does not work sensibly, redesign this
+	part).
+	
+2000-11-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.c: forgotten patch for changing IMAP mailbox's icon.
+
+2000-11-07  Gediminas Paulauskas  <menesis@delfi.lt>
+
+	* src/sendmsg-window.c: (create_text_area) put text widget in scrolled
+	window instead of table+scrollbars. Do not show useless hor. scrollbar.
+
+2000-11-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: fix message multiplication in threaded code on
+	failed relaying. Plug memory leak in local MTA mode.
+	* src/balsa-app.h: change default date format.
+	* src/balsa-message.c: release selection, fix  #29362 and #30395.
+	* src/main-window.c: remove deprecated code message deletion on sending
+	* src/sendmsg-window.c: fix Slovak locale.
+	* src/expand-alias.c: fix #30977 (Alt ignored when expansion on).
+	
+2000-11-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: don't postfix BALSA_COMMON_PREFIXES with a comma.
+	Add sk to ALL_LINUGAS.
+	* libbalsa/files.c: change appriopriately.
+	
+2000-11-05  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-index-page.c (close_if_transferred_cb): Remove
+	"transferredp" data to allow for repeat transfers.
+
+2000-11-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README,INSTALL,help/C/README: build instructions for RH-7.0. 
+	Some comments and pointers on package dependences, building doc.
+	* balsa.spec.in: include files, not whole directories.
+	* libbalsa/body.c: include forgotten <string.h>
+	
+2000-11-05  Zbigniew Chyla  <cyba@gnome.pl>
+
+	* sounds/*.soundlist: Added Polish translations.
+
+2000-11-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: bump version to 1.0.pre5
+	
+2000-11-02  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/Makefile.am: Distribute README with tar.gz.
+	
+	* src/balsa-message.c (balsa_get_font_by_charset): Memory leak
+	fix.
+
+2000-11-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main-window.c(balsa_window_enable_continue): try to
+	enable continue menu/button in fast and reasonable way.
+
+2000-11-02  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-index-page.c (create_menu): Wrap the transfer submenu
+	in a scrolled window, do some magic to retain a sensible size for
+	the menu. Fixes bug 18083.
+
+	* src/balsa-message.c (balsa_message_set): Check for messages with
+	no parts and don't crash.
+
+2000-10-31  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/balsa.sgml: Manual updates.
+
+	* help/C/images/main-window.png: Update to reflect new menus.
+
+2000-10-31  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/sendmsg-window.c (add_attachment): Remove
+	g_print("POO\n"). Don't ask, I don't know.
+	* libinit_balsa/balsa-initdruid.gob: If there is a GnomeCard
+	address book in ~/.gnome/ then add it to the list of address
+	books.
+	* libbalsa/address-book-vcard.c: Report a warning if we can't
+	open the mailbox.
+
+2000-10-31  Pawel Salek <pawsa@theochem.kth.se>
+
+	* INSTALL, README: update install requirements and version numbers.
+	* src/main-window.c: update the contributors list in about dialog.
+
+	* src/balsa-message.c: place there unified i18n support. The only
+	piece that is missing is charset support in headers but balsa has
+	no information about the proper charset that should be used there.
+	Older versions of GtkText are buggy and use wide characters for
+	single byte charsets. gtk+-1.2.8 seems to work OK.
+
+	* src/balsa-message.h: i18n api changes.
+	* src/sendmsg-window.c: use new i18n api. Implement the changing
+	of charset in messages in The Right Way - by changing styles.
+	* libbalsa/body.c: rfc2047-decode attachment names.
+	
+2000-10-30  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* configure.in: Added a check for gnome-libs >= 1.2.1, since there
+	are bugs in gnome-config prior to this which we are hitting.
+
+2000-10-29  Matthew Guenther  <guentherm@asme.org>
+
+	* TODO: More stuff to do
+
+	* src/balsa-icons.[ch]: Move register_balsa_pixmap stuff here, add
+	flagged pixmap to registered pixmaps as BALSA_PIXMAP_FLAGGED so we
+	can use it in menus.  Removed BALSA_ICON_FLAGGED stuff.
+
+	* src/balsa-index.c (clist_set_col_img_from_flag): Use gnome_stock
+	version of flagged pixmap instead of manually loaded one.
+
+	* src/balsa-index-page.c (idle_handler_cb, create_menu): Safeguard
+	to reduce idle handler calls, again attempting to reduce selection
+	delays.  Also add flagged icon to popup menu.
+
+	* src/main-window.c: Remove register_balsa_pixmap* functions and
+	accessories.  Add icon to Toggle Flagged menu item.  Move
+	Preferences menu item to Settings menu, every other GNOME program
+	I looked at has it this way.
+
+	* pixmaps/flagged.xpm: Changed width to 16 so it didn't get
+	mangled by gnome-stock stuff.
+	
+2000-10-26  Matthew Guenther  <guentherm@asme.org>
+
+	* TODO: Add some future projects (after 1.0).
+	* src/balsa-message.c: Plug memory leaks
+	* src/main-window.c: Enable continue button using
+	->has_unread_messages instead of opening and closing the mailbox.
+	Fixes long delays when selecting large numbers of messages.
+
+2000-10-26  Dan Damian  <dand@dnttm.ro>
+
+	* balsa.desktop: added Romanian translations.
+
+	* configure.in: Added "ro" to ALL_LINGUAS.
+
+2000-10-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* help/C/Makefile.am: include win-config-gen script in the 
+	distribution.
+	
+2000-10-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: bump version to 1.0.pre4
+	* TODO: clean up a bit, remove old, DONE stuff.
+	
+2000-10-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* balsa.spec.in: don't build rpm with GSS.
+	* src/mailbox-conf.c: do not depend on mblist-window.c
+	* src/main-window.[hc]: remove old set_cursor stuff, I haven't seen it
+	working. Clear up the mailbox/message referencing code.
+	* src/print.c: (int) conversion in isspace() - this function is
+	implemented as macro on Solaris and doesn't like char parameters.
+	* src/sendmsg-window.c: add Russian KOI support thrown away earlier 
+	by mistake.
+	* src/balsa-message.[hc]: korean language support fixed.
+	* INSTALL, README: warn about the libgnome bug and RH 7.0 gcc issues.
+	* src/mblist-window.c: mailbox reference cleaning.
+	
+2000-10-18  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: fix SECOND bug in right-button menu 
+ 	generation. One too many bugs in single part of the frozen code.
+
+2000-10-17  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: stop if LDAP enabled but not found. Bump version
+	to pre3.
+	* src/address-book-config.c: parent dialog window
+	* src/address-book.c: open compose window on double clicking
+	* src/main-window.c: remove not needed X11/Xutil.h include
+	* src/balsa-message.c: fix a bug in right-button menu generation.
+	
+2000-10-16  Pawel Salek <pawsa@theochem.kth.se>
+ 
+	* libbalsa/mailbox.c: allow ref'ing messages to make idle_handler
+	work properly.
+	* src/balsa-index-page.c,src/balsa-mblist.c: some extra tests
+	on function arguments.
+	* src/sendmsg-window.c: warn if the file to be attached is unreadable.
+	* src/address-book-config.c: fix #26292 (crash on address book entry
+	creation with empty file name).
+
+2000-10-17  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* src/pref-manager.c: marked two strings for translation.
+
+2000-10-15  Matthew Guenther  <guentherm@asme.org>
+
+	* src/balsa-message.c: Changed attachment handling routine to
+	check for both "view" and "open" keys.  Made context menu
+	dynamically generated depending on attachment mime type actions.
+
+2000-10-14  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* configure.in: Added "nn" to configure.in.
+	
+2000-10-13  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/.cvsignore: Ignore balsa.rtf, balsa.pdf
+	* help/C/images/.cvsignore: Ignore .eps images
+	* src/sendmsg-window.c: Fix print menu icon
+
+2000-10-13  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/files.[ch]: New function libbalsa_icon_finder, which
+	finds an icon for a part, based on filename or mime
+	type. Contributed by Timothy Alan Chandler
+	<fusion@heavywater.net>.
+	* src/balsa-message.c: Use libbalsa_icon_finder to find
+	icons. Based in parts on a patch from James A Laska
+	<james_laska@yahoo.com>
+	* src/sendmsg-window.c: Use libbalsa_icon_finder to find icons.
+
+2000-10-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: fix #27784 (crash on replying a message that
+	has no message-id field). Internationalization fixes from
+	Nerijus Baliunas <nerijus@users.sourceforge.net>
+
+2000-10-11  Matthew Guenther  <guentherm@asme.org>
+
+	* src/Makefile.am: Add link to libltdl on command line to improve
+	pspell support on Sun platform.
+	* src/main-window.c: Add new next unread message icon, try using
+	newlines in toolbar descriptions to narrow toolbar width.
+	* src/main-window.c (register_balsa_pixmap): Add parameters to
+	pass to unction indicating the size of the pixmap to register.
+	This prevents uglification of menu icons through multiple resizes
+	by gnome-libs.
+	* src/pixmaps/next_unread.xpm:
+	* src/pixmaps/next_unread_menu.xpm: New next unread message icon.
+
+2000-10-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-index-page.c: fixed bug 26372 - delete from right click 
+	on trash folder didn't work 
+	* src/balsa-index-page.c: fixed typo that broke compilation. 
+
+2000-10-09  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-index-page.c: Disconnect signals from the mailbox when
+	destroying the index page. Spotted by Atsuhiko Yamanaka
+	<ymnk@jcraft.com>
+
+2000-10-08  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-app.h: define DEFAULT_SUBJECT_FONT as the bold verison
+	of DEFAULT_MESSAGE_FONT.
+	* src/save-restore.c: Use DEFAULT_SUBJECT_FONT.
+	* src/pref-manager.c: Fix subject font selection to actually
+	work. Also fixup both font selectors so they get initialized
+	with the correct values.
+
+2000-10-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* docs/vconvert.awk, docs/pine2vcard: the contributed address book
+	converters by Stewart Evans <stewart@lutris.com> and 
+	Jean-Marc Wislez <jmw@pandora.be>, respectively.
+	* Makefile.am: add these files to the tarball...
+	* balsa.spec.in: and to the rpm
+	* libbalsa/send.c: formatting touched.
+	
+2000-10-06  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/*: Fixed some places where indent didn't handle long lines
+	nicely.
+	* src/*: (forgot which files - sorry): Allow the subject to be
+	displayed in another font (ie bold)
+
+2000-10-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS,README,configure.in: release balsa-1.0.pre2
+	* help/C/Makefile.am: use old-style db2html if db2html with style 
+	sheets fails.
+
+2000-10-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_local.[ch]: libbalsa_mailbox_local_set_path() impl.
+	* libinit_balsa/balsa-druid-page-user.gob: don't corrupt 
+	balsa_app.address
+	* src/mailbox-conf.c: use new renaming code.
+	* HACKING: the indentation settled to 4.
+	* src/balsa-mblist.c: don't highlight special mailboxes, fix #26836.
+
+2000-10-05  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/send.c, src/main-window.c: Call pthread_detach on new
+	threads, so we don't need to pthread_join them.
+	* src/main-window.c: Make the reply to all pixmaps use the
+	gnome-stock stuff. This means they will grayout properly. Initial
+	patch was from James A . Laska <james_laska@yahoo.com> (again!)
+
+2000-10-05  Szabolcs Ban  <shooby@gnome.hu>
+
+	* balsa.desktop: added Hungarian translations
+
+2000-10-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mime.c,libbalsa/misc.c: don't crash on replying empty mails.
+	
+2000-10-04  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/Makefile.am: Don't need to include $(top_builddir)/libmutt.
+	* src/main-window.[ch]: Enable/disable the continue toolbar button
+	and menu items. Export balsa_window_enable_continue. Initial patch 
+	was from James A . Laska <james_laska@yahoo.com>. Also Some random
+	indentation cleanups.
+	* src/balsa-index-page.c: Call balsa_window_enable_continue when a
+	send message window is destroyed.
+
+2000-10-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c (mailbox_open): fix memory leak.
+	* libbalsa/server.c: set sensible default for user field.
+	* src/balsa-app.[hc],src/main.c: fix --open-mailbox option.
+	* src/balsa-mblist.c: fix_get_bold_font(), hopefully right this time.
+	* src/save-restore.c: connect get-password signal on mailbox creation.
+	
+2000-10-03  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libinit_balsa/Makefile.am: Fix GOB related rules. The generated
+	files will now only be deleted by maintainer-clean, and not clean
+	or dist-clean. The rule to build the x.[ch] from x.gob is now
+	included all the time, not just with
+	--enable-maintainer-mode.
+
+2000-10-03  Matthew Guenther  <guentherm@asme.org>
+
+	* src/spell-check.c: Fixed cancelled spell check outputting
+	garbage bug.
+	* help/C/Makefile.am: GDP stylesheet now explicitly required to
+	build sgml, will fail without it.  Also build eps images for pdf
+	manual automatically.
+	* help/C/balsa.sgml: Remove extra <tip> tag.
+	
+2000-10-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/address-book-config.c: grab the focus to the name field.
+	* src/sendmsg-window.c: many people set language to C (for yet
+	unknown to me reason) when they mean English. Guess their intentions.
+	
+2000-10-02  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* configure.in: Set gnomedatadir and gnomeconfdir to ${datadir}
+	and ${sysconfdir} when building with system install disabled,
+	rather than evaluating ${datadir} to get it's value. This allows
+	'make install prefix=xxx' to work properly.
+
+2000-10-01  Matthew Guenther  <guentherm@asme.org>
+
+	* help/C/Makefile.am: Change number of win-config redirects
+	created.
+	* help/C/win-config-gen: Small counter fix.
+	* help/C/balsa.sgml: Major changes to bring up to date, new
+	address book stuff, new menus, preferences dialog.  More glossary
+	terms and extensive interlinking.
+	* help/C/images/*:  New images for updated program.
+	* src/balsa-index.c: Selected message scrolls to center of index.
+	* src/main-window.c, src/sendmsg-window.c, src/balsa-index-page.c:
+	Menu items properly capitalized.
+	* src/spell-check.c, src/sendmsg-window.c: Moved calls to
+	gtk_editable_set_position outside gtk_text_freeze/thaw.  Causes
+	random crashes on my machine, possibly a gtk+ bug.  Memory leak
+	fix.
+	
+2000-10-01  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/message.c: libbalsa_message_move,
+	libbalsa_message_copy, add errro checking and reporting if source
+	and/or destination mailboxes are not writable. Fixes bug #18348.
+
+	* src/sendmsg-window.c: Include locale.h. Fixes solaris build.
+
+2000-09-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* NEWS,README,configure.in: balsa-1.0.pre1 release.
+	
+2000-09-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: glib is MT-safe now, use g_new/g_free pair 
+	(+Ian's safe_free fix).
+	* src/main-window.c: use g_malloc/g_free.
+	* src/threads.h: use g_new/g_free pair, use strncpy properly.
+	* src/sendmsg-window.c: print warnings with balsa_information.
+	* src/expand-alias.c: fix the hideous memory release bug.
+
+2000-09-29  Christophe Merlet  <christophe@merlet.net>
+
+	* src/balsa-message.c,src/local-mailbox.c,src/main-window.c,
+	src/mblist-window.c,src/message-window.c,src/pref-manager.c,
+	src/sendmsg-window.c: Fixed marking of strings. Use _( not _ (
+	to mark strings for translation.
+
+2000-09-28  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c: Don't swap the message between clists if we are in
+	 browse	mode. Credit for the dbl-click in address book stuff
+	 applied on 2000-09-27 should have gone to James A . Laska
+	 <james_laska@yahoo.com> but I forgot. He fixed this too.
+	* src/expand-alias.c: Initialise the lists of data to NULL.
+
+2000-09-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* Makefile.am: add bzdist target (is it the right way of doing it?)
+	* balsa.spec.in: include bzipped tarball.
+	* help/C/balsa.sgml: add missing closing tag.
+	* libbalsa/message.[ch]: be cautious on message copy and move, 
+	return status.
+	* libbalsa/send.c: use malloc() to allocate structures to be 
+	freed by free(). (doesn't matter /most/ of the time; sometimes does).
+	* src/balsa-message.c: add missing charsets.
+	* src/sendmsg-window.c: use user's language, if this does 
+	not conflict with the message's charset.
+	* src/pref-manager.c: fix deferred crash on default address book 
+	deletion.
+	* src/address-book-config.c: show 'expand aliases' checkbox on 
+	adding mailbox.
+	
+2000-09-27  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c: Move addresses on double click.
+	* src/balsa-index-page.c:
+	* src/balsa-message.c:
+	* src/main-window.c:
+	* src/mblist-window.c:
+	* src/message-window.c:
+	       Add ... to menu items which lead to a dialog.
+
+2000-09-26  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/send.c: compute correctly the sent data percentage.
+	* src/main-window.c: print the percentage correctly (actually, the
+	checking code is redundant..)
+	* src/sendmsg-window.c: updates to the language selection
+	code. setlocale() calls led to really weird hangs (X-server
+	dependent?), got rid of them for this release.
+	* src/mailbox-conf.c: KISS and armour mailbox creation/edition code.
+		
+2000-09-26  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/main-window.c: simplify select_part_cb.
+	* src/message-window.c: Connect up Copy and Select All menu items.
+	
+	* src/balsa-message.[ch]: New signal 'select_part', emitted when you
+	select a part (odd that). Implemented
+	balsa_message_{can_select,_select_all,_copy} to support menu
+	items.
+	* src/main-window.c: Connect the copy and select all menu items up.
+
+2000-09-25  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-index-page.c, src/mblist-window.c: Made context menu
+	context sensitive.	
+	* src/main-window.c, src/message-window.c: Rearrange menus, some
+	items still need to be hooked up (copy and select all)
+
+2000-09-25  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* src/spell-check.c: Fixed marking of strings. Use _( not _ (
+	to mark strings for translation.
+	
+2000-09-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c(message_set): show headers only when asked to.
+	* src/main-window.c (balsa_window_refresh): remove the deangerous 
+	black magic.
+	* src/pref-manager.c: don't call balsa_window_refresh(NULL)
+	* src/sendmsg-window.c: do the font change the old traditional
+	way. The new one via style change led to mysterious occasional
+	hangs in gtk_text code (although this way seems to be the Right
+	Way).
+	* src/mime.c: add the prefix only once when message body wrapping 
+	is disabled.
+	
+2000-09-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalse/send.c: anihillate as many balsa-app dependences 
+	as possible (only libbalsa_message_send() depends on it now).
+	* libbalsa/message.h: ditto.
+	* src/main-window.c: use API updated by above.
+	* src/balsa-app.[ch]: remove unused balsa_app.checkbox field.
+	* src/balsa-index.c: kill the message sorting issue (see
+	discussion ad the beginning of the file).
+	* libmutt/pop.c: use LAST if UIDL fails (patch contributed by 
+	James A . Laska <james_laska@yahoo.com>).
+	
+2000-09-24  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-app.c: Kill a reference to proplist.h
+
+2000-09-23  Carlos Morgado <chbm@chbm.nu>
+
+	* proplisttognome.pl: never got anywhere, and got removed. anyone
+	cares ?
+
+2000-09-23  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/information.c: idle functions must unregister
+	themselves. this somehow worked on linux but failed on FreeBSD.
+	* libbalsa/address.c(libbalsa_address_new_from_string): never add
+	NULL to the address list.
+	* libbalsa/mailbox_local.c: don't assume that if the file exists,
+	it is readable.
+	* src/balsa-index-page.c: make the message index not focusable in
+	order to simplify the keyboard navigation (next and prev ara
+	available through shortcuts anyway).
+	* src/balsa-index.c: enable auto_sort so incoming messages are put
+	in right place. 'prev' moves to the first message when no messages
+	selected, and 'next' - to the last.
+	* src/balsa-message.c: grab focus to the message so the keyboard
+	scrolling is possible. New language&charset selection.
+	* src/balsa-message.h: new api of get_font_name()
+	* src/local-mailbox.c: don't crash on damaged configuration, when 
+	balsa_app.local_mail_directory=NULL
+	* src/mblist-window.c: implement keyboard handler, 'Enter' opens
+	selected mailbox.
+	* src/pref-manager.c: handle missing balsa_app.{replyto,domain}
+	configuration entries correctly (led to lock-up).
+	* src/print.c: achieve gnome-print-0.22 compatibility, fix #25570.
+	* src/sendmsg-window.[hc]: implement new language selection, don't
+	refer fields of deleted structure in the _destroy method.
+
+2000-09-21  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-message.c: Patch from Timothy Alan Chandler
+	<fusion@heavywater.net> to only render a part when needed. I made
+	this non optional, since that seems reasonable.
+	* src/expand-alias.c: Implement case-insensitive
+	expansion. Non-optional for now. Fix a couple of leaks.
+	* src/message.c: 
+	* src/save-restore.c:
+	* src/spell-check.c:
+	* src/balsa-app.[ch]:
+	  Fix leaks shown up by memprof.
+	
+	* libmutt/parse.c: Pass user_hdrs=1 to mutt_read_rfc822_header.
+	
+2000-09-20  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/message.[ch]: Change return type of
+	libbalsa_message_has_attachment() from gint to gboolean.
+	* src/balsa-index.c, src/main-window.c: Set Sensitivity of menu
+	items andtoolbar buttons depending on open mailbox, selected
+	message etc. The context menus still need to be updated to do
+	something similar.
+
+2000-09-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.[hc]: libbalsa_message_get_text_content() added
+	to be able to print composed messages that are not in any mailbox.
+	* src/print.[hc]: modified accordingly. don't print when preview is
+	selected. Export message_print(LibBalsaMessage*).
+	* src/sendmsg-window.c: fix printing composed messages with
+	gnome-print. 
+	
+2000-09-19  Matthew Guenther <guentherm@asme.org>
+
+	* README: Add (another!) note about pspell library dependency.
+	* src/balsa-app.h: Add check_sig, check_quoted, default to FALSE.
+	* src/pref-manager.c: Add preference whether to check the
+	signature and quoted text when spell checking messages.
+	* src/save-restore.c: Save signature, quoted text checking
+	preference.
+	* src/spell-check.c: Signature checking disabling, quoted text
+	checking preference, fix problem with selecting next word.
+	
+2000-09-19  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/main.c, src/sendmsg-window.c: quit when -m option launch
+	was cancelled. Strip mailto: if present.
+	* libbalsa/{mailbox_imap.c,mailbox_local.c}: don't access
+	CONTEXT->readonly before checking that the mailbox open was really
+	successful.
+	
+2000-09-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: fix the multithreaded mode compose-only 
+	execution.
+	* src/main-window.c: second part of the fix.
+	* NEWS, README, INSTALL: updated for balsa-0.9.5
+	* configure.in: updated for balsa-0.9.5, removed
+	hopefully last dependences on libPropList.
+	* balsa.spec.in: include translation files only, not the whole
+	directories. 
+
+2000-09-17  Matthew Guenther <guentherm@asme.org>
+
+	* src/balsa-index.c (balsa_index_select_next_unread): Fixed so it
+	properly wraps the search around the index.
+	* src/balsa-index.c: Added function balsa_index_select_row,
+	replaced relevent sections of balsa_index_select_next, _prev, and
+	_next_unread.
+	
+2000-09-17  Carlos Morgado  <chbm@chbm.nu>
+
+	* Makefile.am: made 'make dist' work without balsa.idl 
+	* src/Makefile.am: made 'make dist' work without balsa.idl
+
+2000-09-16  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/print.c: wrap headers too.
+	
+2000-09-15  Pawel Salek  <pawsa@theochem.kth.se>
+	use gnome-print if available.
+	* acconfig.h: HAVE_GNOME_PRINT added.
+	* configure.in: search for gnome-print.
+	* libbalsa/mailbox.c: fix message->references double free hang.
+	* libbalsa/mailbox_pop3.c: fix compilation with disabled threads.
+	* libbalsa/message.c: double free problem fixed.
+	* libbalsa/mime.c: fix some special cases of line wrapping 
+	(hopefully I got it right this time, third time).
+	* libbalsa/misc.c: ditto.
+	* libbalsa/misc.h: change libbalsa_make_string_from_list() to have 
+	const argument.
+	* src/main-window.c: print API updated.
+	* src/print.[hc]: new gnome-print code. Multiple copies handled.
+	* src/pref-manager.c: connect properly modification signal.
+	disable unused sections when gnome-print is in action.
+	* src/Makefile.am: gnome-print libraries added.
+	
+2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c (ab_switch_cb): Fix crash when multiple
+	addresses were selected.
+
+2000-09-15  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README: added comment on dotlocking and new mail sound.
+	* src/Makefile.am: removed linking against PropList
+	* Makefile.am: added idl/balsa.idl to EXTRA_DIST (dist test).
+	* src/balsa-mblist.c: fix get_bold_font() crash.
+	* libbalsa/address.[hc]: implement libbalsa_address_get_name()
+	that returns person's name if available, or his first email
+	otherwise.
+	* libbalsa/mime.[hc]: proper reply wrapping, pass wrapping length
+	to content2reply().
+	* libbalsa/misc.c(libbalsa_wrap_string): nice wrapping.
+	* src/print.c: change to new content2reply()
+	* src/sendmsg-window.c: the same.
+	
+2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox.[ch], libbalsa/mailbox_local.c,
+	libbalsa/mailbox_imap.c: Add readonly flag.
+	* src/main-window.c: Set titlebar using the readonly flag.
+	* src/store-address.c: Fix for when there is no default address
+	book.
+
+2000-09-14  Matthew Guenther  <guentherm@asme.org>
+	
+	* help/C/balsa.sgml: Some updates to reflect changed features.
+	Fixed screenshot graphic tags, they should _not_ include the .png
+	extension.  It gets taken care of by the stylesheet and is
+	essential for portability to postscript.  The stylesheet to use is
+	not the default cygnus one, but the Gnome Documentation Project
+	one, gdp-both.dsl.
+	* help/C/win-config-gen: Shell script to generate HTML redirect
+	files to get around GNOME's broken context sensitive help.
+	* help/C/Makefile.am: Add call to win-config-gen
+	* help/C/README: Instructions for properly building the
+	documentation from SGML and recommendations for modifying the
+	manual.
+	* help/C/images/*: Updated and new images for manual.  Screenshots
+	fixed to conform with GDP standards (Sawfish, microGUI, Default
+	Gtk+ theme).
+	* libbalsa/mailbox.c: Load references header properly.
+	* libbalsa/message.[ch]: Changed References header to be a list of
+	message id's, not just one.  
+	* libbalsa/send.c: Use list of references instead of single entry.
+	* src/balsa-app.[ch]: Added function set_tooltip, should be used
+	everywhere to add easy tooltips to most widgets.
+	* src/sendmsg-window.c: Changed toolbar button from "Spelling" to
+	"Check Spelling", for clarity.  Fixed References: header
+	implementation.
+	* src/spell-check.c (balsa_spell_check_init): Added tooltips to
+	the control buttons.
+
+2000-09-14  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/address-book.c: set parent properly when called from
+	compose window.
+	* src/expand-alias.c: handle lack of address book quietly.
+	* src/sendmsg-window.c: don't allocate space for spell-checker
+	when it's not active.
+	* src/spell-check.c: don't quit on pspell configuration error:
+	imagine you wrote so long and important e-mail that you think it
+	is worth to spell check it...
+	
+2000-09-14  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/address-book.c: Fix crash if there is no default address
+	book (also fixed potential problem if there are no address books).
+	* src/pref-manager.c: Connect the properties_modified_cb to the
+	set as default address book button.
+
+2000-09-13  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/address.[ch]: Make into a proper Gtk object.
+	* libbalsa/address-book.[ch]: Implement LibBalsaAddressBook.
+	* libbalsa/contact.[ch]: Removed. Functionality now in
+	LibBalsaAddress.
+	* libbalsa/libbalsa.[ch]: Register address book types. Add
+	includes for address books.
+	* libbalsa/mailbox.c: Fix spelling, save config_prefix when
+	loading.
+	* libbalsa/message.c: Free addresses with gtk_object_destroy.
+	* libbalsa/Makefile.am: Add new files.
+	* libinit_balsa/balsa-druid-page-user.gob: Update for
+	LibBalsaAddressBook.
+	* src/address-book.[ch]: Update for LibBalsaAddressBook, select
+	mailbox. Remove AddressData - functionality now in LibBalsaAddress.
+	* src/Makefile.am: Add new files.
+	* src/balsa-app.[ch]: Replace addressbook related fields with
+	address_book_list and default_address_book.
+	* src/store_dialog.[ch]: Move store dialog here, implement address
+	book selection.
+	* src/balsa-index-page.[ch]: Remove store dialog.
+	* src/expand-alias.c: Use all address books which have there
+	expand_alias flag setto look for completions in.
+	* src/main-window.c: Update for moved store dialog.
+	* src/main.c: Update for LibBalsaAddressBook.
+	* src/pref-manager.c: Add address book configuration page.
+	* src/address-book-config.[ch]: New address book configuration
+	dialog.
+	* src/save-restore.[ch]: Save and restore address book list.
+	* src/sendmsg-window.c: Update for LibBalsaAddressBook.
+
+2000-09-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/save-restore.c: fixed a couple of off-by-1 errors in 
+	config_get_unused_section that caused config corruption
+
+2000-09-11  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/contact.c: Missing #include <string.h>
+
+2000-09-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/server.c: host and port made not private on server_load
+
+2000-09-11  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/Makefile.am: balsa_SOURCE -> balsa_BASE_SOURCE, make way for 
+	balsa_IDL_SOURCE (inactive ATM)
+
+2000-09-11  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/body.c: Close the file after saving. Fixes bug #24055.
+
+	* libbalsa/mailbox_local.c: When loading from config, setup
+	local->type correctly.
+
+2000-09-10  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/mailbox.[ch], src/mailbox_*.c, src/server.[ch]: Implement
+	loading config as a function of the mailbox alongside saving. Push
+	saving of relavent properties into the parent classes and make
+	sure to chain the save_config and load_config calls. Use
+	non-private settings where appropriate. Add a function
+	libbalsa_mailbox_new_from_config which will create a mailbox from
+	a config section.
+	* src/libbalsa.c: Register mailbox types at intialization, to be
+	sure they exist when we try to load the mailboxes.
+	* src/Makefile.am: Don't need libmutt twice in LDADD.
+	* src/main.c: Save configuration before exiting.
+	* src/save-restore.c: Take advantage of mailboxes loading
+	themselves. Use non-private settings where appropriate. Split the
+	large Global section into smaller ones. Rename some keys to not be abbriviated.
+	
+2000-09-10  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: SelectAll by Michael Duelli <m.duelli@web.de>
+
+2000-09-10  Carlos Morgado  <chbm@chbm.nu>
+
+	* proplisttognome.pl: utility to convert old style config to new.
+	not nearly done
+
+2000-09-09  Matthew Guenther <guentherm@asme.org>
+
+	* src/spell-check.c (next_word): Fix next word heuristics, switch
+	all debug and informational messages to balsa_information calls.
+	* src/information-dialog.c (balsa_information_list): Make list of
+	messages scroll as new messages are appended.
+	* src/pref-manager.c: Moved quoted text regex to incoming mail
+	options pane.
+
+2000-09-09  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_*.c: Use gnome_config_set_bool instead of
+	g_c_set_int. Use the actual classnames as the type when saving.
+	* src/balsa-app.c: parse the mblist color.
+	* src/balsa-app.h: Define default colors as an rgb:xxxx/xxxx/xxxx string
+	rather than as 3 numbers. Make open_mailbox field into a GList of
+	pointers to mailboxes, rename it open_mailbox_list.
+	* src/main-window.c: Use open_mailbox_list.
+	* src/main.c: --open-mailbox cmdline option needed fixing.
+	* src/save-restore.c: Save and load colors as a single string, instead of
+	as three numbers. Split global into sections. directly use some
+	gnome_config functions where appropriate. For strings pass
+	defaults in a key=default rather than checking ourselves. Use bool
+	types where appropriate.
+
+2000-09-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/server.[hc]: load configuration on its own.
+	* src/save-restore.c: changed apriopriately.
+	
+2000-09-09  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.[hc]: implement save-config signal and
+	libbalsa_mailbox_save_config() method. add pkey configuration field.
+	* libbalsa/mailbox_imap.c: implement save-config signal.
+	* libbalsa/mailbox_pop3.c: implement save-config signal.
+	* libbalsa/mailbox_local.c: implement save-config signal.
+	* libbalsa/misc.[ch]: ind_mailbox_func() moved from src/mailbox-conf.c
+	* libbalsa/server.[ch]: rot() moved from mailbox-conf.c,
+	libbalsa_server_save_conf() implemented
+	* libinit_balsa/balsa-druid-page-finish.gob: new conf hooked in.
+	* libinit_balsa/balsa-druid-page-directory.gob: initialize
+	created mailboxes.
+	* libinit_balsa/balsa-initdruid.gob: new configuration hooked in.
+	* src/balsa-app.[ch]: new configuration hooked in.
+	* src/mailbox-conf.[ch]: new configuration hooked in.
+	* src/main-window.c: new pop config update hooked in.
+	* src/main.c: new configuration hooked in.
+	* src/pref-manager.c:  new configuration hooked in.
+	* src/save-restore.[ch]:  new configuration code implemented.
+
+2000-09-08  Matthew Guenther  <guentherm@asme.org>
+
+	* INSTALL: Added comment about pspell dependency
+	* configure.in: Check for pspell library
+	* src/spell-check.[ch]: Complete rewrite to use pspell for spell
+	checking.  Could be improved but pretty good for now.
+	* src/send-message.[ch]: Add BalsaSpellCheck widget and callbacks,
+	disable most menus and toolbar buttons when spell check is
+	running.  Not elegant but it works.
+	* src/balsa-app.[ch]: Added spell check settings, which pspell
+	module to use, what spelling mode, and a minimum word size to
+	check.  Also moved the quoted text regular expression here.
+	* src/balsa-message.c: Allow regular expression defining quoted
+	text to be defined by the user, in the preferences dialog.
+	* src/pref-manager.c, src/save-restore.c: Create settings for
+	spell checking and quoted text regex.
+
+2000-09-07  Carlos Morgado <chbm@chbm.nu>
+	
+	* idl/balsa.idl: Gnome::Balsa::App, new Attachment
+
+2000-09-07  Berend De Schouwer  <bds@jhb.ucs.co.za>
+	LDAP directory lookup.
+	* acconfig.h: add ENABLE_LDAP
+	* configure.in: add --enable-ldap configuration option.
+	* src/Makefile.am: ldap-addressbook.[hc] added to the source list.
+	* src/address-book.[hc]: Restructure and generalize the code.
+	* src/balsa-app.[hc]: declare initialize LDAP variables.
+	* src/expand-alias.c: move AdressData code to address-book.c
+	* src/main.c: close LDAP on exit.
+	* src/pref-manager.c: add LDAP page.
+	* src/save-restore.c: save and read LDAP data.
+	* src/ldap-addressbook.[hc]: LDAP support files.
+	
+2000-09-07  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/mailbox-conf.c: Make sure that the path has ben filled in for
+	a local mailbox. Remove some commented out checks on the password
+	fields, which aren't needed now.
+
+	* src/information-dialog.c: Fix stupid mistake by me.
+
+2000-09-07  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-index-page.c: bug fix for the idle_handler_cb() crashes.
+
+2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/threads.h: Sync the definition of MailThreadMessage to
+	the one in src/threads.h (really there should only be one of
+	these...)
+	* libbalsa/mailbox_pop3.c: Define a callback for
+	mutt_fetchPopMail. Unlock the mutt_lock while writing to the
+	message pipe. Prevents lockups.
+
+2000-09-06  Carlos Morgado  <chbm@chbm.nu>
+
+	* idl/balsa.idl: added new idl
+
+	* src/orbit-glue.c: preliminary orbit glue functions
+	
+2000-09-06  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libinit_balsa/libinit.c: Add gdk_threads_{enter,leave} calls
+	around the gtk_main here. Prevents a lock up when we do the
+	gtk_main for the main body of the application.
+	* libbalsa/Makefile.am, libbalsa/information.[ch]: Implement a
+	libbalsa_information function which will call a callback provided
+	when libbalsa is initialised. The message can include a severity
+	level.
+	* libbalsa/libbalsa.[ch]: Setup balsa_information from libbalsa_init,
+	route mutt_message, mutt_yesno and mutt_error through
+	balsa_information.
+	* src/balsa-app.[ch], src/information-dialog.[ch]: Implement a
+	balsa_information to pass to libbalsa as a callback, provide
+	options of displaying certain types of message not at all, in a
+	dialog or in a list of messages. balsa_information also replaces
+	balsa_error and balsa_warning.
+	* save-restore.c, src/pref-manager.c: Prefs for the above.
+	* src/balsa-message.c, src/main-window.c: Use balsa_information
+	instead of balsa_warning.
+
+2000-09-06  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/Makefile.am: include libimap.a only once - and it still works!
+	* src/balsa-index-page.c: allow expanding mailbox tree in transfer menu
+	
+2000-09-05  Pawel Salek  <pawsa@theochem.kth.se>
+        (post-0.9.4, it's pity)
+	* libbalsa/mailbox.c: drop dead rereading on commit, too slow.
+	* src/balsa-app.h: MAX_QUOTE_LEVEL to 4, who reads older quotes anyway?
+	* src/balsa-index.c: next_unread and sort function don't hide selected
+	* src/balsa-message.c: fix regexp (thanks to Berend De Schouwer
+	<bds@jhb.ucs.co.za>).
+	* src/expand-alias.c: fix misbehavior when NumLock is on (BDS, too).
+	* src/sendmsg-window.c: connect copy, cut&paste shortcuts.
+
+2000-09-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/pref-manager.c: renamed quoted colours to primary and secondary.
+	* configure.in: bumed version number to 0.9.4
+	
+2000-09-04  Carlos Morgado <chbm@chbm.nu>
+
+	* libmutt/Makefile.am: removed socket.c from files list (replaced
+	by imap/socket.c)
+
+2000-09-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* configure.in: Fixed GSS configuration issue (I wonder how come
+	it worked before): CPPFLAGS set in libmutt/configure.in was
+	overwriteen by a value set in libmutt/Makefile.am. CFLAGS is now
+	set instead but I don't think this is the cleanest way of doing
+	it.
+	* balsa.spec.in: compile with GSS enabled.
+	* libbalsa/mailbox.c: use '-' instead of '_' in signal names;
+	first approach to fixing libbalsa_mailbox_commit_changes, return 
+	the commit's result.
+	* libbalsa/mailbox_imap.c(mailbox_check): allow_reopen. disable
+	checking closing mailboxes before buffy code gets fixed.
+	* libbalsa/notify.c: disable registering imap mailboxes.
+	* libmutt/Makefile.am: use DEFS for defining compilation constants.
+	* libmutt/flags.c: sync with mutt 1.2.5.
+	* libmutt/mutt.h: add M_NEW_SSL_SOCKET constant as in mutt-1.2.5.
+	* libmutt/imap/Makefile.am: use DEFS instaed of CPPFLAGS.
+	* libmutt/imap/imap_ssl.c: first approach. It requires more work
+	because the code includes user interface.
+	* src/main-window.c: check commit_changes return value.
+	* src/balsa-message.c: don't crash on corrupted images.
+	* src/mailbox-conf.c(conf_update_mailbox): double g_free().
+	* libmutt/{Makefile.am,socket.c}: removed old socket.c
+
+2000-09-02  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README: added a comment on GSS
+	* configure.in:  use --with-gss option
+	* libbalsa/mailbox_imap.c: set ImapCRAMKey, too.
+	* libbalsa/message.c: imap code cleanup.
+	* libbalsa/send.c: fix deadlock on mail postpone.
+	* libmutt/configure.in: make imap default in a right way.
+	* libmutt-imap/Makefile.am: define LIBMUTT
+	* libmutt/imap/auth.c: be as verbose as the original code was.
+	* libmutt/imap/auth_gss.c: compile it.
+	* libmutt/imap/message.c: include <string.h>
+	* src/save-restore.c: major code cleanup.
+	
+2000-09-01  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox_imap.c(open): ask for password if unknown.
+	* libbalsa/message.c: standard input test in message_move.
+	* libbalsa/server.[hc]: get-password signal implemented.
+	* libmutt/imap/Makefile.am: browse.c added.
+	* src/balsa-app.[ch]: ask_password helper function implemented,
+	initial mailbox opening moved to an idle function.
+	* src/balsa-index-page.c: no special exceptions for IMAP and POP3 
+	passwords.
+	* src/save-restore.c: connect get-password signals.
+	* src/mailbox-conf.c: same.
+	
+2000-08-29  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/libbalsa.c: Reimplement libbalsa_error to be callable
+	from any thread, by defering the real callback to an idle
+	function (which will be called from the main thread..)
+	* libbalsa/mailbox_pop3.c: We can safely release the gdk_lock for
+	the duration of the mutt_FetchPop call (now the balsa_error is
+	safely callable from threads). We can also remove the hack of
+	replacing mutt_error with a non-GUI version.
+	* libinit_balsa/Makefile.am: Tell GOB not to bother with the
+	private headers
+	* src/balsa-app.c: Rewrite balsa_warning to display a list of
+	warnings, rather than popping up a new message box for each
+	warning (which could lead to hundreds of windows if a mail server
+	was down while you are away).
+	* src/main.c: initialize libbalsa with balsa_warning rather than
+	balsa_error.
+	
+	* libbalsa/send.c: Add #include <sys/socket.h> to fix solaris
+	build.
+
+2000-08-29  Pawel Salek <pawsa@theochem.kth.se>
+
+	Plugged in new IMAP code. Basic testing done. IMAP folders broken,
+	require code rewrite.
+	* libbalsa/mailbox_imap.c(libbalsa_mailbox_imap_get_message_stream):
+	new imap has caching encasulated, ask it to provide cached or fresh
+	message stream. 
+	* libmutt/base64.c: added.
+	* libbalsa/misc.c: store temporarily not used imap folder stuff.
+	* libmutt/Makefile.am: added base64.c,removed old imap.[hc]
+	* libmutt/buffy.c:imap_buffy_check->imap_mailbox_check
+	* libmutt/mime.h: Base64_chars->B64Chars
+	* libmutt/protos.h: base64 decls.
+	* libmutt/imap/Makefile.am: fixed file list for distribution.
+	* libmutt/imap/auth.c: removed localization translations..
+	* libmutt/imap/socket.c: commented out mutt_message
+	* src/Makefile.am: linking with libimap.a - FIXME!
+	* src/balsa-message.c: more sensible IO tests.
+	* balsa.spec.in: apply rpm-po.patch in a better way.
+
+2000-08-28 Pawel Salek <pawsa@theochem.kth.se>
+        Importing IMAP from mutt-1.2.5i
+	* docs/README.SSL, libmutt/imap/*: added (see libmutt/ChangeLog 
+	for other details)
+	
+2000-08-27  Pawel Salek <pawsa@theochem.kth.se>
+
+	* README, NEWS, configure.in: updated for balsa-0.9.3
+	* docs/mh-mail-HOWTO: added.
+
+2000-08-27  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/save-restore.c, src/mailbox-conf.c: apop support (lacking GUI)
+	* libmutt/pop.c: apop support merged from mutt 1.2
+	* libmutt/init.h, libmutt/mutt.h: APOP option 
+	* libmutt/md5c.c, libmutt/md5.h: added from mutt for apop
+	* libbalsa/mailbox_pop3.[ch]: support for use_apop 
+
+2000-08-26  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/*.[ch]: Implemented a mutex around all libmutt
+	calls. Updated copyright in all files.
+	* HACKING: Add a section describing how locking should work.
+	* balsa.spec.in: Add AUTHORS and HACKING to %doc.
+	* src/balsa-message.c, src/print.c, src/sendmsg-window.c:
+	make_string_from_list->libbalsa_make_string_from_list and
+	readfile->libbalsa_readfile.
+	* src/main.c: Initialize libbalsa earlier, so the libmutt mutes is
+	created early on.
+	
+
+2000-08-25  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.[hc]: add attach_dir field to remember last
+	directory files were attached from.
+	* src/balsa-message.c: grab focus in save MIME part.
+	* src/sendmsg-window.c: use attach_dir.
+	
+2000-08-22  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libmutt/send.c: Add locking for threading.
+	* src/main-window.c: Add gdk_threads_enter() to calls to LibBalsa
+	within the thread.
+	* src/main.c: call g_thread_init before calling gtk_init so the
+	GTK sets up its threading stuff correctly.
+	
+	* libbalsa/mailbox.c(libbalsa_mailbox_set_unread_messages_flag):
+	Always emit the signal, since it allows balsa-mblist to update
+	when a second new message arrives.
+	* src/main-window.c: Check all mailboxes even in non-threaded mode.
+
+2000-08-22  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/quote-color.[hc]: rewrite is_a_quote() to use regexp's
+	and allow for flexible quote prefixes.
+	* src/balsa-message.c: use new regexp quote stuff.
+	
+2000-08-21  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/send.c: Dont send MSGSENDTHEADLOAD messages to main
+	thread, these are done by libbalsa_mailbox_check now.
+	* libbalsa/threads.h, src/threads.h: Remove MSGMAILTHREAD_LOAD and
+	MSGSENDTHREADLOAD. They are no longer needed.
+	* src/balsa-index-page.c: Remove lots of cruft.
+	* src/balsa-index.h: Remove unused field from struct.
+	* src/main-window.c: Don't handle MSSENDTHREADLOAD messages. This
+	removes an include of libbalsa_private - which is nice. Remove
+	cruft.
+	* src/mblist-window.c: Remove cruft, cast some fields properly.
+	* src/Makefile.am: We don't need to include libbalsa.a twice.
+
+2000-08-21  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox.c(libbalsa_mailbox_load_messages):
+	Clear the unread messages flag if there are no unread messages.
+
+2000-08-21  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libmutt/pop.c: fix the scary POP bug by closing spool mailbox.
+	
+2000-08-20  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/*.[ch]: Re-indent all files in libbalsa to use 8 space
+	indentation.
+
+2000-08-20  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* acconfig.h: 
+	* configure.in: 
+	* src/balsa-app.c: 
+	* src/balsa-app.h: 
+	* src/balsa-mblist.c:
+	* src/balsa-mblist.h: 
+	* src/mblist-window.c: 
+	* src/pref-manager.c: 
+	* src/save-restore.c: 
+	* src/sendmsg-window.c: 
+	Remove the --enable-info build-time option, always build this
+	functionality in. There is still a runtime option.
+
+2000-08-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-index.c: workaround for gtk_clist_sort() bug
+	(the bug fix has been yesterday included to gtk sources but it will 
+	take some time before people upgrade libraries).
+
+2000-08-17  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_imap.[ch]: Implement
+	libbalsa_mailbox_imap_check properly. Implement
+	libbalsa_mailbox_imap_set_path.
+	* libbalsa/notify.c: Fix an eronious cast.
+
+	* src/balsa-index-page.c(idle_handler_cb): 
+	* src/balsa-index.c(moveto_handler): Use
+	gdk_threads_{enter/leave}.
+
+	* src/mailbox_conf.c:
+	* src/save-restore.c: Use libbalsa_mailbox_imap_set_path instead
+	of setting directly.
+
+2000-08-16  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/message.c (libbalsa_message_body_ref): Add support for
+	message/rfc822, fixes bug #21128, probably some others too.
+
+2000-08-16  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c, libbalsa/mailbox_local.c: fixed mailbox
+	mutex locking.  
+	* src/main-window.c: we use (BalsaIndex*) instead
+	of BALSA_INDEX because we don't want ugly conversion warning
+	when balsa_window_find_current_index() returns NULL.
+	
+2000-08-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/Makefile.am: Add notify.[ch]. A wrapper for the mutt
+	buffy module. 
+	* libbalsa/libbalsa.c(libbalsa_init): Call libbalsa_notify_init()
+	* libbalsa/libbalsa.h: Include notify.h
+	* libbalsa/mailbox.[ch]: Add two new signals, check and
+	set_unread_messages_flag. check is a virtual function which
+	abstracts the operation of checking a mailbox. Remove
+	libbalsa_mailbox_check_for_new_messages and libbalsa_mailbox_
+	replaced both with libbalsa_mailbox_check.
+	* libbalsa/mailbox_local.c, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_pop.c: implement the check function, make use of
+	libbalsa_notify where appropriate. Mailboxes now handle adding
+	themselves for notification internally, so
+	add_mailbox_for_checking() is no longer needed.
+	* libbalsa/message.c: Use
+	libbalsa_mailbox_set_unread_messages_flag instead of modifying the
+	flag directly - emits signal.
+	* libbalsa/send.c: Use libbalsa_mailbox_check().
+	* src/balsa-mblist.c: Use the set-unread-messages-flag signal instead
+	of directly polling each mailbox on update. This also removes the
+	need for a separate thread, since expensive work happens in the
+	same thread as checking is done.
+	* src/main-window.c: Update check_messages thread to work with new
+	checking system.
+	* src/save-restore.c: Don't put POP3 mailboxes in the list with
+	the others, they live in balsa_app.inbox_input. Use
+	libbalsa_set_charset not mutt_set_charset.
+	
+2000-08-15  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* src/balsa-index-page.c: Fix mailbox updating, AppBar stuff.
+	* src/balsa-mblist.c (balsa_mblist_have_new): change
+	...appbar_set_default to ...appbar_push.
+	* src/balsa-mblist.c (balsa_mblist_update_mailbox): remove mailbox
+	re-focusing code from here, move to balsa_mblist_focus_mailbox.
+	* src/main-window.c: Install Appbar menu hints, add some menu item
+	tooltips.
+	* src/main-window.c: (balsa_window_real_close_mailbox): Add call
+	to balsa_mblist_focus_mailbox.
+	* src/main.c: Init Appbar progressbar lock.
+	* src/quote-color.c: Change colormap to use one allocated at startup.
+	* src/threads.h: Appbar progressbar lock defined.
+
+2000-08-15  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/main.c: Patch from Timothy Alan Chandler
+	<fusion@heavywater.net> to initialize GConf if needed for the
+	experimental GtkHTML support.
+	* configure.in: Mark GtkHTML support as experimental.
+
+2000-08-15  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in,po/wa.po: added Walloon file
+	* configure.in,po.zh_CN*.po: moved zh_CN to zh_CN.GB2312; for better
+	standardisation (po files for simplified chinese on other modules
+	use zh_CN.GB2312)
+	* src/main-window.c: corrected English typo
+	* src/sendmsg-window.c: improved the heading phrase of replies
+	(you can't translate "you" alone; most languages require it to
+	adapt gramatically depending on the context)
+
+2000-08-15  Pawel Salek <pawsa@theochem.kth.se>
+	* AUTHORS, NEWS, README, configure.in: updates for 0.9.2
+	* balsa.spec.in: require gnome-libs >= 1.2.0
+	* libbalsa/send.c: MessageQueueItem constructors/destructors,
+	handle sending errors nicely.
+	* libmutt/pop.c(mutt_fetchPopMail): fix for _some_ POP problems.
+	* src/balsa-app.c(balsa_warning): shouldn't set wmclass after 
+	window is realized.
+	* src/main-window.c: pop up a warning box on sending error.
+	* src/sendmsg-window.c: strdup dragged file name before handing it
+	over to add_attachment().
+	
+2000-08-14  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* HACKING: Added some guidelines.
+
+2000-08-12  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* configure.in: Make --enable-more-warnings and --enable-threads
+	default to yes.
+
+2000-08-11  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* INSTALL: Add warning about older versions of egcs causing
+	problems with Balsa.
+
+	* TODO: Clean up formatting, update some items.
+
+2000-08-11  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* libbalsa/libbalsa.c: Set OPTCHECKNEW option.
+	* src/balsa-app.[hc]: Add application colormap, visual variables.
+
+	* src/balsa-index.c (balsa_index_init): Added a default sorting
+	style; Descending by date.
+
+	* src/balsa-index.[hc]: Added balsa_index_refresh for updating
+	mailbox indexes when new messages are loaded.  
+
+	* src/balsa-mblist.[hc]: Added support for threaded updating of
+	mailbox list.  New function balsa_mblist_thread.  Extensive
+	changes to balsa_mblist_have_new, balsa_mblist_check_new,
+	balsa_mblist_update_mailbox.
+
+	* src/balsa-mblist.c (balsa_mblist_init): Removed setting of
+	expander and line style, this should be set by the theme or
+	library.  Should look more consistent in HeliX Code installations.
+
+	* src/main-window.c: (mail_progress_notify_cb): Removed call to
+	balsa_mblist_have_new, doesn't work due to thread locking now.
+
+	* src/main.c (main): Added calls to gdk_threads_enter/leave, moved
+	colormap stuff around to avoid a warning.  Added thread variables
+	for mailbox updating thread.
+
+	* src/threads.h: Added mblist_thread thread, updating_mblist
+	semaphore.
+
+2000-08-10  Ian Campbell  <ijc25@cam.ac.uk>
+ 
+	* src/balsa-message.c: Fix save_part to properly destroy dialogs
+	on error. Fix a memory leak in find_body_font.
+
+2000-08-10  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-message.c: Removed obsolete FIXME 
+	* src/pref-manager.c: Use libbalsa_set_charset instead of
+	mutt_set_charset.
+	
+2000-08-09  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox.c: Make the libbalsa_mailbox_get_message_stream
+	a proper GTK+ signal instead of messing with the class ourselves.
+	
+2000-08-09  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/libbalsa.c, libbalsa/libbalsa.h:
+	* libbalsa/misc.c, libbalsa/misc.h:
+	libbalsa/misc.h: Don't pass the spoolfile to libbalsa_init
+	anymore, instead provide libbalsa_set_spool. This is because
+	libbalsa_init needs to be called before the mailbox information is
+	loaded and they are created, and the Inbox isn't known until
+	after. Move libbalsa_guess_mailspool to libbalsa.[ch] from
+	misc.[ch] too.
+
+	* src/balsa-app.c: make balsa_warning and balsa_error use
+	gnome_warning_dialog and gnome_warning_dialog. Also format the
+	input string using g_strdup_vprintf not vsprintf. Got rid of
+	error_exit_cb since gnome_dialog_run_and_close() will block until
+	the dialog is closed and we can call balsa_exit()
+	then. balsa_error_toggle_fatality() is not needed any more since
+	balsa_warning does non fatal messages.
+
+	* src/balsa-app.h: Export balsa_error() - might be usefull..
+	
+	* src/balsa-app.c: Don't call libbalsa_init from do_load_mailboxes
+	but do call libbalsa_set_spool. Use balsa_warning instead of
+	cantfind_notice().
+	
+	* src/main.c: Call libbalsa_init.
+	
+	* src/save-restore.c(config_mailbox_init): Use
+	libbalsa_server_set_* instead of filling in the fields ourselves.
+	
+2000-08-09  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-message.c: Remove two unused variables to allow
+	-Werror compilation.
+
+2000-08-08  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: allow external message viewers as defined in 
+	gnome MIME.
+	* libbalsa/send.c(balsa_smtp_protocol): handle properly lines
+	beginning with dot.
+
+2000-08-08  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_remote.c:
+	* libbalsa/mailbox_remote.h: Put LibBalsaMailboxRemote into it's
+	own file. It is a trivial object, but it helps to keep things
+	organised if they are kept separate.
+
+	* configure.in: Check for proplist.h as well as the library itself.
+
+2000-08-08  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* configure.in: Add check for libgnomeui/gnome-window-icon.h
+	* src/main.c: Only use the gnome-window-icon stuff if we have it.
+
+2000-08-08  Pawel Salek <pawsa@theochem.kth.se>
+	* libbalsa/mailbox_local.c(libbalsa_mailbox_local_new):	fix
+	mailbox creation code and be more verbose on error.
+	* libinit_balsa/balsa-druid-page-directory.gob(unconditional_mailbox):
+	get rid of a conversion that generated confusing warnings on error.
+	* src/save-restore.c(config_mailbox_init): same.
+	* src/sendmsg-window.c(attachments_add): accept attachment drops to
+	entire compose window.
+
+	* src/address-book.[hc],src/expand-alias.c: multiple compose window
+	alias expansion bug fix from Berend De Schouwer <bds@jhb.ucs.co.za>
+	
+2000-08-07  Ian Campbell  <ijc25@cam.ac.uk>
+	* src/main-window.c: Set progress_dialog and friends to NULL in
+	progress_dialog_destroy_cb. This solves a crash when checking
+	after pressing the `Hide' button, fixes bug #14861.
+	
+
+2000-08-07  Pawel Salek  <pawsa@theochem.kth.se>		
+
+	* src/sendmsg-window.c: use mutt_set_charset() for setting charset.
+	* libbalsa/send.c: add_mutt_body_plain () accepts charset as parameter
+	
+2000-08-06  Ian Campbell  <ijc25@cam.ac.uk>
+	* libbalsa/server.c: Emit signals properly. This fixes the problem
+	with adding/updating POP3 mailboxes.
+	* src/balsa-mblist.c: Cast paramter to gtk_idle_add to allow
+	compile with full warnings.
+
+2000-08-06  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-mblist.c: use main_window as colormap source, needed for 
+	right mouse button menu.
+	* help/C/balsa.sgml,help/C/images/example-alias.png: alias doc 
+	from Berend De Schouwer.
+	* configure.in: increased version number to 0.9.1
+	
+2000-08-03  Berend De Schouwer  <bds@jhb.ucs.co.za>
+	Address alias expansion.
+	* src/Makefile.am: added expand-alias.[ch]
+	* expand-alias.[ch]: alias expansion code
+	* src/address-book.[ch]:ab_load_addresses() added
+	* src/balsa-app.[ch]: balsa_warning() added
+	* src/balsa-message.c: set_wmclass(save_dialog, "save")
+	* src/pref-manager.c,src/save-restore.c: configuration code.
+	* src/sendmsg-window.c: alias expansion hooked.
+	* src/balsa-message.c: quoted text marking, part1.
+	* src/balsa-mblist.[hc]: check mailboxes only when idle.
+	* src/pref-manager.c: use gdk_window_get_colormap() instead of
+	gdk_colormap_get_system() which is not apriopriate in this context.
+	
+2000-08-03  Ian Campbell  <ijc25@cam.ac.uk>
+
+	Window close bug fix.  Renamed balsa_message_create ->
+	balsa_message_new which is conventional - this involved renaming
+	another balsa_message_new which sent a new message and making it
+	static.
+	* src/balsa-index-page.[hc]: renaming
+	* src/balsa-message.[hc]: added destructor balsa_message_destroy()
+	* src/main-window.c,src/message-window.c: renaming.
+	
+2000-08-03  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: tested against gtkHTML 0.5 and enabled it.
+	* src/main-window.c(send_outbox_messages_cb): menu entry and callback
+	for sending messages queued in outbox.
+	
+2000-08-01  Peter Williams  <peterw@helixcode.com>
+
+	* libbalsa/mailbox.c (check_all_pop3_hosts): Compile fix for
+	threads and Stuart's patch.
+
+2000-07-26  Stuart Parmenter <pavlov@netscape.com>
+	* libbalsa/Makefile.am:
+	* libbalsa/libbalsa.h:
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_imap.h:
+	* libbalsa/mailbox_pop3.c:
+	* libbalsa/mailbox_pop3.h:
+	* libbalsa/misc.c:
+	* libbalsa/server.c:
+	* libbalsa/server.h:
+	* src/balsa-index-page.c:
+	* src/mailbox-conf.c:
+	* src/save-restore.c:
+
+	Added LibBalsaServer object and LibBalsaMailboxRemote.  IMAP and
+ 	POP3 are now LibBalsaMailboxRemotes which contain a
+ 	LibBalsaServer.  This keeps the server information seperate from
+ 	the mailbox information.  Multiple mailboxes on an IMAP server for
+ 	example should point to the same server (they currently create
+ 	their own server object..  this should be fixed.  I will add a
+ 	hashtable to do this later.)  This abstraction should help in
+ 	added a server to the mailbox list and make things a bit more
+ 	simple.  LibBalsaServers should have a GNode tree of their
+ 	mailboxes, but they do not currently.  This will happen when I
+ 	remove the current MailboxNode stuff.
+
+2000-07-25  Stuart Parmenter <pavlov@netscape.com>
+	* src/mailbox-conf.c
+
+	Fixed crash when you cancel out of creating a mailbox due to an
+	uninitialized pointer.
+
+2000-07-15  Robert Brady  <rwb197@zepler.org>
+
+	* configure.in: added en_GB.po to ALL_LINGUAS
+
+2000-07-12  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/libbalsa.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_local.c:
+	* libbalsa/mailbox_pop3.c:
+	* src/mailbox-conf.c:
+	* src/mailbox-conf.h:
+	* src/mblist-window.c:
+	* src/pref-manager.c:
+
+	Fix bug where mailbox configuration warns that certain fields have
+	not been filled in when they have. Also allow password to be
+	blank, since there is code to check for this and prompt at
+	runtime.
+
+	Initialize fields of some mailbox types.
+	
+2000-07-11  Ian Campbell  <ijc25@cam.ac.uk>
+	* libbalsa/body.c:
+	* libbalsa/body.h:
+	* libbalsa/libbalsa.c:
+	* libbalsa/libbalsa.h:
+	* libbalsa/libbalsa_private.h:
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_local.c:
+	* libbalsa/mailbox_local.h:
+	* libbalsa/mailbox_pop3.c:
+	* libbalsa/message.c:
+	* libbalsa/message.h:
+	* libbalsa/mime.c:
+	* libbalsa/misc.c:
+	* libbalsa/misc.h:
+	* libbalsa/send.c:
+	* libinit_balsa/balsa-druid-page-directory.gob:
+	* src/balsa-app.c:
+	* src/balsa-app.h:
+	* src/balsa-index-page.c:
+	* src/balsa-mblist.c:
+	* src/balsa-message.c:
+	* src/local-mailbox.c:
+	* src/mailbox-conf.c:
+	* src/main-window.c:
+	* src/mblist-window.c:
+	* src/pref-manager.c:
+	* src/save-restore.c:
+	* src/save-restore.h:
+	* src/sendmsg-window.c:
+
+	Continued API cleanup, plus partial removal of balsa's dependency
+	on libmutt. This involved many new functions to various classes,
+	and lots of small changes.
+
+	Changed several dialog boxes to use standard gnome dialogs.
+
+	Also added an experimental GtkHTML based text/html part viewer.
+	Configure with --enable-gtkhtml to use. Tested with GtkHTML 0.4.
+	
+2000-07-10  Matthew Guenther <mguenthe@attcanada.ca>
+
+	Applied IRIX compatibility patch by David Kaelbling
+	<drk@owl.hudson.sgi.com> to fix bug #16873
+	* changed to use C comments in code only, not C++ style comments
+	* avoid use of gcc-specific switches and extensions
+	* include neccessary system headers for threading	
+
+2000-07-08  Peter Williams  <peter@beta.newton.cx>
+
+	* src/mailbox-conf.c: Set the page manually for new
+	POP3 boxes as this cannot use the set_the_page "clicked"
+	signal thingie.
+
+2000-07-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	API clean up by Ian Campbell <ijc25@cam.ac.uk>:
+	- removed dependencies of libbalsa on balsa.
+	- removed all the mailbox watcher stuff and replaced it with signals
+	- made LibBalsaMailbox make better use of the hierarchy of classes.
+	Almost all the files are affected. I hope it will work :-).
+	* libbalsa/send.c(libbalsa_send_message_real): quick bug fix against
+	the original patch.
+	
+2000-07-04  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/save-restore.c: renaming 'special' mboxes fixed 
+	(PLGetString() value of later PLRelease'd Dict was used)
+	
+2000-07-03  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/{contact.h,mailbox.c}(contact_store): pass address book 
+	file name.
+	* src/address-book.c: allow for configurable address book file,
+	import data in two modes.
+	* src/balsa-app.{c,h}: address book configuration: ab_location and
+	ab_dist_list_mode.
+	* src/balsa-index-page.c:allow for configurable address book file,
+	* src/pref-manager.c: configurable ab_location
+	* src/save-restore.c: saving and restoring address book settings.
+	* src/mailbox-conf.c(conf_update_mailbox): interpret correctly
+	check_for_blank_fields() return code.
+	
+2000-06-30  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: use updated mutt API. 
+	mx_open_unref - do check the mx_close_mailbox return code.
+
+2000-06-29  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c: don't free Spoolfile.
+	
+2000-06-28  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c(real_destroy): leave object in sane state.
+	* src/sendmsg-window.c: don't crash on replying deleted message.
+	
+2000-06-27  Peter Williams  <peterw@helixcode.com>
+
+	* libbalsa/Makefile.am (libbalsa_a_SOURCES): Add imapdir.h
+	to our sources so it goes into the dist.
+
+2000-06-26  Peter Williams  <peter@beta.newton.cx>
+
+	* src/save-restore.c (config_global_save): Check for null when
+	saving balsa_app.open_mailbox. I squash bugs bad.
+
+2000-06-26  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/address-book.c: show all e-mail adresses.
+	
+	Ian Campbell <ijc25@cam.ac.uk> message browsing patch:
+	The 'save as' dialog wasn't going away properly after clicking OK
+	or Cancel. Some error dialogs were given parents. The problem with
+	headers not being shown properly in the separate message window at
+	first has been fixed. emacs mode hints to the top of touched
+	files.
+	* src/balsa-index-page.c,src/balsa-message.c,
+	src/main-window.c,src/message-window.c
+
+2000-06-24  Peter Williams  <peter@newton.cx>
+
+	* libbalsa/misc.c: Add proper path for 'imap.h' so we can find it.
+
+2000-06-23  Peter Williams  <peter@beta.newton.cx>
+
+	* libmutt/parse.c (mutt_parse_date): Add a check
+	to provide Y2K compliancy. No shit :-) We assume
+	messages with two-digit dates that are less than 70
+	are in 2000, I don't think anyone has email from before
+	1970....
+
+2000-06-21  Peter Williams  <peterw@curious-george.helixcode.com>
+
+	* libinit_balsa/balsa-druid-page-*.gob: Whoops, don't just
+	construct for the parent class, consturct for our class as
+	well!
+
+	* libmutt/mx.c (mx_get_magic): Make this a little more forgiving
+	of mailboxes with newlines at the beginning
+
+	* Makefile.am: put our pixmaps in gnomepixmapdir so that we
+	can find it in the pixmap browser -- if --disable-system-install,
+	no loss.
+
+	* help/C/Makefile.am: Put our help in gnomedatadir as well.
+	
+2000-06-21  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Safe quitting and general clean up.
+	* libbalsa/mailbox.c,src/sendmsg-window.c: use
+	balsa_find_mbox_by_name(p)
+	* src/balsa-app.[hc]: balsa_find_mbox_by_name(p) generalized,
+	moved from src/mblist-window.c
+	* src/main-window.c: recreate list of open mailboxes on change.
+	* src/main.c: code clean up, use force_close_mailbox(), empty trash()
+	doesn't try to refer to nonexisting objects.
+	* src/save-restore.c: use pre-created open mailboxes string.
+	* src/mailbox-conf.c: guess if the path points to dir or single folder.
+	
+	IMAPDir II: old mbox-conf single IMAP folder deprecated.
+	only GUI for update is missing and IMAP speparator handling
+	* libbalsa/imapdir.h: ignore_hidden field
+	* libbalsa/misc.c: handle deep depth trees right.
+	* libmutt/buffy.c: don't fail if the only watched mbox is wrong IMAP.
+	* libmutt/imap.c: list directories only (SEPARATOR!)
+		
+2000-06-20  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* README: local mailbox locking configure switches explained.
+	
+2000-06-18  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Terence Haddock's <haddock@tripi.com> flagging patch.
+	* libbalsa/mailbox.{h,c}: send_watcher_mark_flag_message() implemented,
+	MESSAGE_MARK_FLAGGED/MESSAGE_MARK_FLAGGED_MASK enums aded.
+	* libbalsa/message.{h,c}: set_flagged signal implemented.
+	* src/balsa-icons.{h,c}: pixmaps/flagged.xpm added.
+	* src/balsa-index-page.{h,c}: Toggle flagged popup menu entry,
+	balsa_message_toggle_flagged() callback.
+	* src/balsa-index.c: flag displaying code.
+	* src/main-window.c: main menu toggle flag entry
+
+	Ian Campbell's <ijc25@cam.ac.uk> new message window bug fix.
+	* src/message-window.c: adjusted to the new code.
+	
+2000-06-17  Pawel Salek  <pawsa@theochem.kth.se>
+
+	IMAP directory stuff, usable version. Terminology needs polishing.
+	
+	* libbalsa/{libbalsa.h,imapdir.h}: ImapDir structure definition
+	* libbalsa/misc.c: imapdir_* functions.
+	* libmutt/imap.[hc]: imap_browse_foreach() added.
+	* src/mailbox-conf.c: adding IMAP folder sets.
+	* src/save-restore.[ch]: saving/reading IMAP folder sets.
+	
+2000-06-16  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-index-page.c (store_address_dialog_button_clicked_cb): Ditto
+	here -- the completely confusing "No ;'s" to something more meaningful.
+
+	* src/filter-edit-dialog.c (fe_run_on): Change the confusing
+	string "Pre-Send" to "Before Sending" for the translators.
+
+2000-06-15  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-message.c (part_info_init_unknown): Increase
+	the padding for the "save part" button, aesthetic reasons.
+
+2000-06-15  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* libbalsa/send.c: Changed balsa_lookup_mime_type to use
+	gnome_mime_type_or_default instead of
+	gnome_mime_type_or_default_of_file because it was having trouble
+	with certain PDF and postscript files.  
+
+2000-06-15  Pawel Salek <pawsa@theochem.kth.se>
+	* libbalsa/Makefile.am: added contact.h to the list of files.
+
+	New era approaching: large patch from Ian Campbell <ijc25@cam.ac.uk>
+	* src/balsa-app.h: some defs.
+	* src/balsa-index-page.c: chaining destructors.
+	* src/balsa-message.[hc]: rewritten.
+	* src/main-window.c, src/message-window.c: extra menu options.
+	
+2000-06-14  Pawel Salek <pawsa@theochem.kth.se>
+
+	Contributed by Thomas Fitzsimmons  <fitzsim@ecf.utoronto.ca>
+	* libbalsa/{mailbox.c, contact.h}: Contact data structure handling.
+	* src/balsa-index-page.c: Popup menu entry for Storing address,
+	contact dialog box implemented.
+	* src/main-window.c: Menu entry for storing addresses.
+	
+2000-06-12  Fatih Demir	<kabalak@gmx.net>
+	
+	* src/sendmsg-window.c ('iso_charset_menu): Removed the 
+		wrong GNOMEUIINFO_END macro call as another 
+		 GNOMEUIINFO element follows up to the Russian
+		  one ( the Ukrainian one ).
+
+2000-06-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c: redundant resetting of Spoolfile removed.
+	* src/balsa-app.c: use balsa_guess_mail_spool for setting Spoolfile.
+	* src/address-book.c: armoured the code against the unexpected.
+	* libbalsa/send.c, libmutt/sendlib.c: #13708 bug fix (sending
+	messages that contain a single dot in a line).
+	
+2000-06-11  Peter Williams  <peter@beta.newton.cx>
+
+	* src/mblist-window.c (mblist_create_context_menu): Fix typo
+	(to draftbox was to sentbox in context menu).
+
+	* libbalsa/send.c (balsa_lookup_mime_type): Constify
+	a pointer to quiet a compiler warning.
+
+	* libbalsa/misc.{c,h}: New function, balsa_guess_mail_spool,
+	that tries to determine the filename of the user's local
+	mail spool.
+
+2000-06-10  Peter Williams  <peter@beta.newton.cx>
+
+	* libmutt/pop.c: Open the spoolbox and make sure that it works
+	BEFORE we waste time connecting to the server, a report an error
+	if the mailbox doesn't work.
+	
+	* libinit_balsa/balsa-druid-page-{user,finish,error}.gob:
+	Fix nasty crash-causing typo (can't class an object to its class....)
+
+2000-06-10  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.[hc]: handling IMAP mboxes.
+	* libbalsa/mailbox_imap.[hc]: disabled deprecated 
+	mailbox_imap_has_new_messages.
+	* libinit_balsa/balsa-druid-page-directory.gob,
+	* libmutt/buffy.[hc]: handling IMAP mailboxes.
+	* src/balsa-mblist.c: call mutt_buffy_notify() less often (big win
+	for remote mailboxes). unify handling of non- and IMAP mailboxes.
+	* src/local-mailbox.c: code clean up.
+	* src/mailbox-conf.c,src/save-restore.c: code clean up, IMAP watching.
+	* src/main-window.c: simplify mailbox checking.
+	
+2000-06-08  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libmutt/mbox.c(mbox_sync_mailbox): first approach to fix the
+	silly mbox sync problem.
+	
+2000-06-05  Matthew Guenther <mguenthe@attcanada.ca>
+
+	Contributed by Alexey Kakunin <small@arcadia.spb.ru>:
+	* src/balsa-message.[hc]: add get_koi_font_name to use alternate
+	(non ISO) Cyrillic character set.  
+	* src/sendmsg-window.c: add KOi8-R to character set menu,
+	set_koi8_charset function.
+	
+
+2000-06-05  Pawel Salek <pawsa@theochem.kth.se>
+	* libbalsa/send.c,src/main-window.c: don't delete loose messages
+	* src/sendmsg-window.c: replying a message from a closed mailbox
+	crashed balsa.
+	
+2000-06-02  Peter Williams  <peter@beta.newton.cx>
+
+	* src/Makefile.am: s/GNOMEGNORBA_LIBS/GNOMEUI_LIBS/
+
+	* libinit_balsa/Makefile.am: generate the private headers now.
+	It *should* work now :-)
+
+2000-06-01  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libinit_balsa/Makefile.am: removed private header files from the
+	depedency list.
+	* src/balsa-index-page.c: corrected translation macros:
+	use '_(' not '_ ('  to make marked strings show up in the .pot file.
+	redundant string allocation, double object destroying, missing 
+	personal name, translations of VCARD keywords.
+	* src/balsa-index.c: the index From/To information depends on the
+	mailbox (rewritten Stephen Waters' <swaters@amicus.com> patch).
+	
+2000-06-01  Peter Williams  <peter@newton.cx>
+	Remove the totally ignored IDL stuff
+
+	* idl/*: Die!
+	* configure.in: Don't check for ORBit, don't build
+	idl/Makefile
+	* balsa.spec.in: Don't check for installed gnorba data
+	* Makefile.am: idl out of SUBDIRS
+	* src/Makefile.am: Don't link with the servant libraries
+	and don't include $(root)/idl stuff
+	* src/main.c: Don't use ORBit init stuff
+	* po/*.po: Sync with new gobfiles et al
+	* libinit_balsa/balsa-druid-page-{error,finish,user}.gob:
+	Properly access the 'construct' class function
+	* libinit_balsa/Makefile.am: Work around gob ignoring
+	the '--no-private-header' option; put built sources in
+	srcdir as this is what we're supposed to do (according to
+	people on automake-list)
+
+2000-06-01  Peter Williams  <peter@newton.cx>
+
+	* libinit_balsa/balsa-druid-page-directory.gob:
+	Use new GOB 1.0.0 stuff and arrays as we should. Also
+	give away the GOB easter egg, I guess.
+
+2000-05-30  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* help/C/Makefile.am:  Use stylesheet images directory.
+	* help/C/balsa.sgml:  Correct copyright dates.
+
+2000-05-30  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/address-book.c: bug #12535 fix.
+	* src/balsa-message.c: bug #11949 fix
+	* src/balsa-index-page.c: bug #12606 fix.
+	
+2000-05-28  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* src/balsa-index-page.[ch]: patch to add "Store Address" menu
+	item to right-click menu in index, stores message From address in
+	address book.  From Thomas Fitzsimmons <fitzsim@ecf.utoronto.ca>.
+
+2000-05-28  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* help/C/balsa.sgml: Fixed section levels and ids so that the
+	Preferences dialog context-sensitive help will work properly.
+
+	
+2000-05-27  Fatih Demir	<kabalak@gmx.net>
+	
+	* sounds/balsa.soundlist : Corrected a typo
+		in the [tr]-sections.
+
+2000-05-25  Pawel Salek <pawsa@theochem.kth.se>
+
+	* help/C/balsa.sgml: Preperties window help started.
+	* src/mailbox-conf.c(conf_add_mailbox): plug a memory leak
+	* src/main-window.c(send_progress_notify_cb): free properly messages 
+	sent from outbox in the MT mode.
+	
+2000-05-24  Peter Williams  <peter@beta.newton.cx>
+
+	* help/C/balsa.sgml: Add FAQ about address book not
+	importing.
+
+2000-05-24  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in (BALSA_REVISION): This is now
+	development version 0.9.0.
+
+2000-05-22  Matthew Guenther  <mguenthe@attcanada.ca>
+	* src/main.c: added session management to Balsa, functions 
+	balsa_save_session and balsa_kill_session.
+
+2000-05-22  Matthew Guenther  <mguenthe@attcanada.ca>
+	* src/balsa-mblist.c (balsa_mblist_mailbox_style): mailbox 
+	counter fix.
+	* src/pref-manager.c (create_misc_page): cleaned up look of color 
+	picker.
+
+2000-05-22  Peter Williams  <peter@beta.newton.cx>
+
+	* libinit_balsa/balsa-druid-page.gob, 
+	libinit_balsa/balsa-druid-page-welcome.gob: Enable
+	multibyte fontsets when appropriate. I have no clue
+	what it all means, but Yukihiro Nakai <ynakai@redhat.com>
+	seems to know what he's talking about.
+
+2000-05-20  Peter Williams  <peter@beta.newton.cx>
+
+	* libinit_balsa/Makefile.am: @MAINT@ the gob rule,
+	add a nasty dist-hook thing to pick up the generated
+	sources.
+
+	* AUTHORS README TODO INSTALL NEWS balsa.1.in
+	help/C/balsa.sgml: Documentation updates to
+	make this the official 0.8.0
+	
+	* configure.in (BALSA_RELEASE): No longer pre1!
+
+	* Makefile.am: RPM target updated to be just peachy.
+	
+	* Makefile.am: New balsa-dcheck target to not forget
+	the BALSA_DISTCHECK_HACK=yes thingie. @MAINT@ some
+	of those targets.
+	
+	* libinit_balsa/Makefile.am (gob rule): Put %.h in the
+	gob mathcing rule for include dependencies.
+
+2000-05-17  Pawel Salek <pawsa@theochem.kth.se>
+
+	Infamous safe_free bug fix.	
+	* libmutt/protos.h, libmutt/lib.c: mutt_copy_body() func added.
+	The hdr parameter is most likely redundant.
+	* libbalsa/send.c: copy the bodies instead of plain linking to them.
+	delete sent messages from outbox.
+	*libbalsa/message.c(message_delete): handle loose messages.
+	
+2000-05-16  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: Celtic language support fixed.
+	* libbalsa/send.c: code cleanup on the way to fix the safe_free bug.
+	* src/balsa-message.c: safe handling of broken images.
+	
+2000-05-15  Pawel Salek <pawsa@theochem.kth.se>
+
+	* configure.in: added pt_PT.po to ALL_LINGUAS
+	
+2000-05-15  Kjartan Maraas  <kmaraas@online.no>
+
+	* TRANSLATABLE_FILES: Added list of files containing
+	translatable strings.
+	
+2000-05-12  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-message.c (part2canvas): Only print "part end: multipart"
+	  in debug mode.
+
+2000-05-07  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* src/address-book.c,src/filter-edit-dialog.c: i18n fixes from
+	  Gediminas Paulauskas <menesis@delfi.lt>
+
+2000-05-12  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: #9422 bug fix.
+	
+2000-05-09  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/address-book.c: preleminary handling of gcard address lists.
+	
+2000-05-07  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/save-restore.c (config_mailbox_update): safe local mailbox
+	properties update.
+
+2000-05-07  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* src/balsa-mblist.c: small i18n fix
+
+2000-05-06  Peter Williams  <peter@beta.newton.cx>
+
+	* src/balsa-app.[ch]: Allow toggling of whether to
+	exit when balsa_error is called. Defaults to YES; turned
+	off for mailbox checking. We actually need a mutex for this,
+	but we can get away without one.
+	
+	* src/main.c (balsa_exit): Remove unused var.
+
+	* src/main-window.c (mail_progress_notify_cb): g_free
+	the mailbox pkey now. Include save-restore.h
+
+	* src/mailbox-conf.c (mailbox_conf_close): Don't 
+	g_strdup the mailbox pkey; that is done for us now.
+
+	* libbalsa/mailbox.h (struct _Server): Remove Server.name
+	field, which is unused.
+
+	* src/save-restore.[ch] (mailbox_get_pkey): Return a g_strdup
+	string; don't user server->name, which is unused. Remove
+	the const return type. Misc changes to accomodate this.
+
+	* src/balsa-mblist.c (balsa_mblist_redraw): Check for
+	NULL return value from gtk_ctree_insert_node (caused 
+	warnings with POP3 mailboxes)
+
+2000-05-06 Pawel Salek <pawsa@theochem.kth.se>
+	* libbalsa/mailbox.c, src/save-restore.c:
+	Carlos Morgado's <chbm@chbm.nu> fix for storing the POP port number.
+
+2000-05-06 Pawel Salek <pawsa@theochem.kth.se>
+
+	* libmutt/configure.in: disabled fcntl locks, enabled flock.
+	* README: pointers to locking method discussions.
+	
+2000-05-05 Pawel Salek <pawsa@theochem.kth.se>
+	Mailboxes in the configuration are not referred by name only any more.
+
+	* libbalsa/mailbox.c,src/main-window.c,src/mailbox-conf.c: use
+	mailbox_get_pkey() instead of mbox name.
+	* src/balsa-app.c,src/main.c: code cleanup.
+	* src/save-restore.c: mailbox_get_pkey() and config_get_pkey() impl'd
+
+2000-05-04 Pawel Salek <pawsa@theochem.kth.se>:
+	IMAP mailbox polling to fix auto-logout bug.
+
+	* libbalsa/mailbox_imap.[hc]: mailbox_imap_has_new_messages added.
+	* libmutt/imap.c: do check the NOOP server response.
+	* src/balsa-mblist.c: actual mailbox polling.
+	
+2000-05-03  Peter Williams  <peter@beta.newton.cx>
+
+	* libbalsa/mailbox.c (error_in_thread): New function to
+	  replace the usual mutt_error, cause it makes GTK+ calls,
+	  which in this case happens in another thread, which
+	  makes GTK+ barf.
+	  (check_all_pop3_hosts): Fix to change mutt_error.
+	* src/main-window.c (mail_progress_notify_cb): Handle
+	  the _ERROR message by displaying a dialog box.
+	
+2000-05-02 Pawel Salek <pawsa@theochem.kth.se>:
+	* libinit_balsa/balsa-druid-page-directory.gob:
+	handle lack of MAIL environment variable properly.
+
+2000-05-02  Pawel Salek <pawsa@theochem.kth.se>
+	* src/balsa-message.c, src/sendmsg-window.c:
+	Martynas Kunigëlis <mkunigelis@alna.lt> patch for Baltic language
+	support.
+
+2000-05-01  Matthew Guenther <mguenthe@attcanada.ca>
+	* libbalsa/send.c (balsa_lookup_mime_type): fixed GNOME mime 
+	type lookup 
+
+2000-04-27  Pawel Salek <pawsa@theochem.kth.se>
+	* src/sendmsg-window.c: one g_free() too much.
+	* src/main.c: code cleanup.
+	
+2000-04-26  Kjartan Maraas  <kmaraas@online.no>
+
+	* libbalsa/mailbox.c: Use '_(' not '_ (' to make marked
+	strings show up in the .pot file.
+	* src/balsa-index.c: Same here
+
+2000-04-25 Pawel Salek <pawsa@theochem.kth.se>
+	* src/save-restore.c: bug fix for remembering open mboxes
+	between sessions.
+	
+2000-04-25 Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: pasting texts containing \n to subject 
+	field lead to wrong mail headers.
+	
+2000-04-24  Pawel Salek <pawsa@theochem.kth.se>
+	* src/balsa-app.h,src/save-restore.c,src/main.c: remembering
+	open mailboxes between sessions.
+	* src/mblist-window.c: open-mailbox CLO bug fix.
+	
+2000-04-24  Fatih Demir	<kabalak@gmx.net>
+
+	* sounds/balsa.soundlist & sounds/email.soundlist : 
+		Added [tr] sections ..
+
+2000-04-23  Mikael Hermansson <mikeh@bahnhof.se>
+
+	* src/sendmsg-window.c, src/main.c: show only compose window and
+	quit immediately after sending mail when called with --compose
+	option.
+	
+2000-04-23  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* src/pref-manager.c: Fixed a litte spellerror.
+
+2000-04-21  Peter Williams  <peter@beta.newton.cx>
+
+	* src/Makefile.am (INCLUDES): Include $(top_builddir)/idl
+	  for the generated headers (when srcdir != builddir)
+
+2000-04-21  Matthew Guenther <mguenthe@attcanada.ca>
+	* libbalsa/message.c (message_is_multipart): changed to 
+	message_has_attachment and modified to a better way to determine
+	message attachment status.
+	
+2000-04-20  Matthew Guenther <mguenthe@attcanada.ca>
+	* libbalsa/message.c: added function message_is_multipart
+	* src/balsa-index.c (balsa_index_add): 
+	add icon to attachment column when message is multipart.
+
+	* src/address-book.c: parented gnome dialogs to main and send-message
+	windows.
+	* src/balsa-app.h: added main_window to BalsaApplication.
+	* src/balsa-index-page.c: 
+	* src/balsa-message.c: 
+	* src/mailbox-conf.c:
+	* src/main-window.c: parented gnome dialogs to main window 
+	(fixes bug #4809).
+
+2000-04-20  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added Lithuanian language
+
+2000-04-20  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/pref-manager.c: #8601 bug fix.
+	
+2000-04-19  Peter Williams  <peter@beta.newton.cx>
+
+	* libmutt/mx.c, libbalsa/send.c: Remove
+	  some leftover stderr output.
+	
+	* TODO, README, INSTALL: Documentation updates.
+	
+	* configure.in: Made this look all pretty, and
+	  added some extra 'checking' messages.
+
+	* src/main-window.c (show_about_box): Added some
+	  authors.
+
+2000-04-18  Peter Williams  <peter@beta.newton.cx>
+
+	* balsa.spec.in: Fixes to make RPMs work. Now I understand
+	  why people say RPM sucks.
+
+	* configure.in (BALSA_VERSION): Changed to
+	  reflet preview release, and to placate RPM.
+	
+	* README: Same.
+
+2000-04-18  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added Catalan
+
+2000-04-18  Pawel Salek <pawsa@theochem.kth.se>
+	* IMAP authentication error bug fix.
+	
+2000-04-17  Fatih Demir	<kabalak@gmx.net>
+
+	* configure.in : Added tr to ALL_LINGUAS .
+
+2000-04-16  Matthew Guenther <mguenthe@attcanada.ca>
+	* libbalsa/send.c (balsa_create_msg): Added balsa mime lookup
+	function balsa_lookup_mime_type to fix bug #4821
+			 
+2000-04-12  Peter Williams  <peter@beta.newton.cx>
+
+	* src/mailbox-conf.c (conf_update_mailbox): Address
+	  bug #8915 hopefully (check for NULL before g_frees)
+
+	* src/balsa-mblist.c (balsa_widget_get_bold_font): Change
+	  function behavior to reference font, and checking for
+	  NULL font again... hopefully this ensures a nonnull
+	  style->font (see bug #7356)
+
+	* src/mblist-window.c (size_allocate_cb): Fix size
+	  calculation ( + 18... yeah right ).
+
+2000-04-12 Pawel Salek <pawsa@theochem.kth.se>
+
+	* sounds/Makefile.am, balsa.spec.in: 
+	packaging on RedHat failed.
+	
+2000-04-11  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c: handle 'references' header properly
+	* libbalsa/misc.c: wrapping misalignment
+	* src/balsa-message.c: ':' to headers, memory leak
+	* src/sendmsg-window.c: multiple attachment bug fix.
+	
+2000-04-10  Peter Williams  <peter@beta.newton.cx>
+
+	* configure.in: Add check for gob when using CVS source.
+
+2000-04-09  Matthew Guenther <mguenthe@attcanada.ca>
+	* src/address-book.c (ab_load): fix memory allocation bug, use more 
+	glib string functions, set ->name to ->id if no Id is present in the 
+	vcard.
+	* src/address-book.c (ab_clist_clear): g_free'd id.
+			     (ab_okay_cb): g_free'd id.
+
+2000-04-08  Peter Williams  <peter@beta.newton.cx>
+
+	* AUTHORS: Made this make more sense and reflect
+	  the changes in development team over the lifecycle
+	  of Balsa.
+
+	* configure.in: Print a little warning if
+	  the source is CVS source.
+
+2000-04-08  Matthew Guenther <mguenthe@attcanada.ca>
+	* src/balsa-mblist.c (balsa_mblist_insert_mailbox): Fixed bug with 
+	mailbox info.
+
+2000-04-08  Fatih Demir	<kabalak@gmx.net>
+
+	* balsa.desktop : Added the Turkish translation .
+
+2000-04-07  Peter Williams  <peter@beta.newton.cx>
+
+	* libbalsa/misc.c (wrap_string): Aborting when
+	  the input string is null is a bit excessive...
+
+	* configure.in, Makefile.am: Whoopsie, forgot
+	  to remove the stuff for the website from these
+	  files.
+
+2000-04-07 Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c: multiple attachment selection.
+
+2000-04-07 Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c,libbalsa/misc.[hc],src/balsa-message.c:
+	showing all and selected headers completed.
+	
+2000-04-06  Peter Williams  <peter@newton.cx>
+
+	* help/C/Makefile.am: better target for index.html;
+	help now works with readonly srcdir.
+
+2000-04-05 Pawel Salek <pawsa@theochem.kth.se>
+
+	* libmutt/socket.c,src/mblist-window.c: trying to open
+	IMAP folder on non-existing server should not crash balsa any more.
+
+2000-04-04 Pawel Salek <pawsa@theochem.kth.se>
+
+	*  libmutt/imap.c,src/balsa-index-page.c:
+	non-existing IMAP mailbox bug fix.
+
+2000-04-04 Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.[hc]: postpone works now with empty To field.
+
+2000-04-04 Pawel Salek <pawsa@theochem.kth.se>
+	
+	* src/address-book.c: Fellmann Joaquim's <joaquim@hrnet.fr>
+	patch (with minor changes) - lookup fix.
+	* src/balsa-index.c: removed old crust.
+	* src/main-window.c: fix a memory leak.
+	
+2000-04-04 Ian Campbell <ijc25@cam.ac.uk>
+	
+	* libbalsa/misc.[ch]: Added function 'mailbox_node_destroy'
+	* libbalsa/send.c: Removed some unused variables
+	* src/balsa-index-page.c: Added some #ifdef MSG_STATUS_USED 
+	  around functions which are only used inside similar #ifdefs
+	* src/balsa-mblist.c: Use mailbox_node_destory as the handler
+	  in set_row_data, fixes a memory leak
+	* src/local-mailbox.c: Fix a memory leak
+	* src/mblist-window.h: Fix a prototype.
+	* src/save-restore.c: Fix memory leak.
+	
+2000-04-03  Peter Williams  <peter@beta.newton.cx>
+
+	* src/main-window.c (wrap_message_cb): Fixed
+	  cast to GTK_WIDGET to be after test for NULL
+	  to silence GTK+ warning on startup.
+
+	* libbalsa/misc.c (find_word): Fixed really
+	  nasty-looking logic and a bug where the 'to'
+	  field wouldn't show up in the compose window
+	  as a default.
+
+	* src/balsa-app.c (cantfind_notice): Made Balsa
+	  gracefully handle a missing 'special mailbox'
+
+2000-03-30  Matthew Guenther <mguenthe@attcanada.ca>
+	* src/main-window.c: changed reply to all to use reply_to_all.xpm, 
+	and reply_to_all_menu.xpm, pointer casting bug.
+	* src/pref-manager.c: fixed pointer casting bug.
+
+2000-03-30  Peter Williams <peter@newton.cx>
+	* src/arrow.xpm: moved to src/pixmaps/
+	* src/balsa-icons.{c,h}: added new arrow
+	  pixmap; but pointless because it's currently
+	  unused!
+	* src/Makefile.am: arrow.xpm from EXTRA_DIST
+	
+2000-03-28  Peter Williams <peter@newton.cx>
+	* libbalsa/files.{c,h}: created balsa_file_finder,
+	  a *working* version of gnome_xxxx_file()
+	* configure.in: Added system install check, testing
+	  for installs into Gnome's prefix that may require
+	  root privileges. Added website options, to generate
+	  the website files and give them a root and prefix.
+	* src/mailbox-conf.c, src/main-windows.c, src/sendmsg-window.c,
+	  libinit-balsa/helper.c, libbalsa/mailbox.c: Use balsa_file_finder
+	* images/Makefile.am, sounds/Makefile.am: Use appropriate
+	  installation prefex depending on sysinstall option
+	* po/POTFILES.in: Remove src/spell-check.c, which does
+	  not compile and is not built
+	* libbalsa/Makefile.am: Added files.{c,h} to libbalsa
+	* website: Added directory for the Balsa website in CVS,
+	  buildable and installable with specifiable prefixes.
+	
+2000-03-27  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c: auto-check explicitly checks Inbox.
+	* src/balsa-index-page.c: bug #4805 fix
+	* src/balsa-mblist.c: mail check bug fix.
+	* src/main-window.c: bug #4805, #4806 fix, mail check bug fix,
+	title bar.
+	* src/mblist-window.c: resize mblist rehashed
+
+2000-03-26 Pawel Salek <pawsa@theochem.kth.se>
+
+	* main.c: reorganized the initial mailbox opening code.
+	* configure.in:  mailbox info switch on by default.
+	
+2000-03-25  Matthew Guenther <mguenthe@attcanada.ca>
+
+	* src/main-window.c: fixed opening of mailboxes on startup.
+	* src/balsa-mblist.[hc]: added balsa_mblist_open_inital() and 
+	startup_mailbox_open_list.
+	(mailbox_nodes_to_ctree): fixed opening of mailboxes on startup.
+	(balsa_mblist_insert_mailbox): allow for mailboxes to be opened
+	at startup.
+	
+2000-03-24  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/mailbox.c, src/balsa-mblist.c, src/balsa-message.c:
+	* src/main-window.c: bug hunting - message counting.
+	
+2000-03-24  Matthew Guenther <mguenthe@attcanada.ca>
+	* src/main-window.c: add next_unread_message_cb, associated menu 
+	and toolbar items.
+	* src/balsa-index.[hc]: add balsa_message_next_unread
+	* src/balsa-index-page.[hc]: add balsa_index_select_next_unread
+
+
+2000-03-23  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/balsa-message.c: handling msgs w/o respective fonts
+	* src/main-window.c: forwarding/replying multiple msgs
+	* src/sendmsg-window.[hc]: handling multiple open compose wnds.
+	
+2000-03-22  Joaquim Fellmann  <joaquim@hrnet.fr>
+
+	* src/balsa-mblist.c: i18n and i12n update
+
+2000-03-22  Fellmann Joaquim <joaquim@hrnet.fr>
+
+	* src/balsa-mblist.c: make a string i18n comp. for mbox stats
+	
+2000-03-20 Pawel Salek <pawsa@theochem.kth.se>
+	
+	* libbalsa/libbalsa_private.h: less verbose threaded mbox locking
+	* libmutt/rfc822.c: de-quotation handles commas in comments
+	* src/sendmsg-window.c: forward subject clarified.
+	
+2000-03-17 Matthew Guenther <mguenthe@attcanada.ca>
+	* src/sendmsg-window.c (bsmsg2message): enable In-Reply-To and 
+	References headers
+	* libbalsa/send.c (balsa_create_message): enable In-Reply-To and
+	References headers
+	* libbalsa/message.h: Added references var to Message struct
+	* libbalsa/message.c: Init and destruction of references variable
+	* src/balsa-mblist.c: cleaner style setting, add colour
+	* src/pref-manager.c: add colour picker for mblist unread mailbox 
+	color
+	* src/save-restore.c: save/load colour for mblist
+	* src/balsa-app.c: field to store colour and defaults
+	* configure.in: change --enable-info do default yes, better (less 
+	broken) option description
+
+2000-03-15  Pawel Salek<pawsa@theochem.kth.se>
+	
+	* src/balsa-app.[hc], src/pref-manager.c,src/save-restore.c,
+	* src/sendmsg-window.c: signature separator handling.
+	* src/local-mailbox.c: compilation warning removed.
+	
+2000-03-14  Pawel Salek <pawsa@theochem.kth.se>
+
+	* src/sendmsg-window.c, src/balsa-app.c, src/balsa-mblist.c, 
+	* src/mailbox-conf.c, src/main-window.c:
+	The deleting mailboxes via Balsa is expected to work properly now.
+	Some minor bug fixes.
+
+2000-03-14  Pawel Salek <pawsa@theochem.kth.se>
+	* src/balsa-app.c: handles lack of trash nicely
+	* src/mailbox-conf.c: ultimate solution of the mailbox 
+	deletion command. Should work for any combination.
+	* src/main-window.c: close mailbox command restored
+	* src/sendmsg-window.c: fixed some shortcuts
+	
+2000-03-14  Pawel Salek <pawsa@theochem.kth.se>
+	
+	* src/balsa-message.c, libbalsa/filter-file.c:
+	* libbalsa/misc.c, libbalsa/mime.c: 
+	readfile() allocates place for ending '\0' character - 
+	last character of a text body in multipart message used to be eaten.
+	* src/main.c: used to assume that balsa_app.notebook exists 
+	when empting trash.
+	* src/main-window.c: status bar message removed when closing last 
+	mailbox.
+	* src/sendmsg-window.c: major code clean up (uff!), finished 
+	function documentation.
+	
+2000-03-13  Alastair McKinstry <mckinstry@computer.org>
+
+	* po/ChangeLog, po/ga.po: Updates
+
+2000-03-13  hectorg  <hector@scouts-es.org>
+
+	* libbalsa/send.c, src/main-window.c:
+	Some minor bugs fixed in send code
+
+2000-03-12  birger  <birger.langkjer@image.dk>
+
+	* po/da.po:
+	 Modified Files:
+	 	balsa/po/da.po
+
+2000-03-12  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* src/balsa-app.c, src/balsa-index-page.c, src/balsa-index.c, 
+	* src/balsa-mblist.c, src/local-mailbox.c, src/main-window.c,
+	* src/mblist-window.c, src/mblist-window.h:
+	Fix for duplicate local mailboxes that were located in the local
+	mail directory and were added at the same time to the cofiguration.
+	Fixes also local mailbox deletion problem.
+
+2000-03-11  alastairmck  
+
+	* balsa.desktop: Irish translations
+
+2000-03-11  Matthew Guenther <mguenthe@attcanada.ca>
+	* libbalsa/misc.c:  Added style to MailboxNode
+	* src/mblist-window.c: Update mailbox style when changing 
+	mailboxes
+	* src/balsa-mblist.c:  Mailboxes with unread messages are now 
+	displayed without having to load the mailboxes.  
+	* src/main-window.c:  Mailbox appearence are now updated when 
+	the "Check New Messages" button is pressed.
+
+2000-03-11 Alastair McKinstry <mckinstry@computer.org>
+
+	* balsa.desktop: Added Irish translation.
+
+2000-03-08  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c, libbalsa/message.h: Selection of shown
+	headers: none, user selected or (almost) all.
+
+	* libbalsa/misc.c: make_string_from_list didn't handle NULL elements.
+	* libbalsa/misc.h:
+
+2000-03-06  Peter Williams  <peter@beta.newton.cx>
+
+	* libbalsa/mailbox.c (translate_message): On tip
+	  from Birger Langkjer, increase size of date
+	  buffer from an unreasonable-small 27 characters
+	  to 128.
+
+2000-03-05  Pawel Salek  <pawsa@theochem.kth.se>
+
+	* libbalsa/message.c, libbalsa/message.h:
+	I18n support in the message window and automatic charset selection
+	for replying and forwarding. Wrapping for message view widget.
+
+2000-03-05  Morten Welinder  <terra@diku.dk>
+
+	* libbalsa/misc.c (make_string_from_list): Plug leak.
+
+	* libbalsa/message.c (message_body_unref): Use body_free.
+
+	* src/balsa-mblist.c (mailbox_nodes_to_ctree): Plug leak.
+
+	* src/balsa-message.c: Include <ctype.h> for isspace.
+	(reflow_string): Use isspace properly.
+	(mimetext2canvas): Initialise flags.
+
+	* src/local-mailbox.c (is_mh_message): Use isdigit properly.
+
+2000-03-03  Peter Williams  <peter@newton.cx>
+
+	* libbalsa/mailbox.c (translate_message): Uses user's
+	  preferred time format now.
+	
+	* src/save-restore.c, src/balsa-app.h, src/prefs-manager.c:
+ 	  Changes to support the new preference.
+
+2000-2-28  Héctor García Álvarez <hector@scouts-es.org>
+	* Some changes in SMTP to make it work right with the queue
+
+2000-2-26  Peter Williams <peter@newton.cx>
+	* Allowed the user to save the text in any message by clicking.
+	
+2000-2-26   Birger Langkjer <birger.langkjer@image.dk>
+	* Integrated a patch from Mikael Hermansson <mikeh@bahnhof.se>
+
+2000-2-25   Matthew Guenther <mguenthe@attcanada.ca>
+	* src/mblist-window.c:
+	* src/balsa-mblist.c: Added ability to display total number of 
+	messages and number of unread messages in the mailbox list.  Mailboxes
+	with unread messages are displayed in bold, and with different icon.  
+	Mailbox list is updated when mailbox contents change (through user 
+	action).  Can now sort mailboxes by name, number of unread messages, 
+	or total number of messages, in ascending or descending order. 
+	Mailbox info column width is saved between sessions.  Fixed mailbox 
+	tree expand/collapse to save between sessions.
+	* src/balsa-index-page.c: Reading messages in index will decrement 
+	message unread_messages count and update mailbox list display.
+	* src/save-restore.c: Code to save all the mailbox list stuff.
+	* libbalsa/mailbox.c: Fixed mailbox loading code to increment mailbox 
+	messages counter.
+	* libbalsa/message.c: Flag changing fixed to prevent double decrement 
+	of message count.  
+	
+2000-2-14   Birger Langkjer <birger.langkjer@image.dk>
+
+	* src/sendmsg-window.c: fixed spelling error: Cyrylic->Cyrillic
+
+2000-2-11   Tomasz K³oczko <kloczek@pld.org.pl>
+
+	* balsa.desktop: moved desktop file from gnome-core,
+	* gnome-balsa2.png: moved icon file from gnome-core.
+
+2000-2-9    Tomasz K³oczko <kloczek@pld.org.pl>
+
+	* balsa.desktop:
+	* Makefile.am: added desktop file for balsa.
+
+2000-2-1   Matthew Guenther <mguenthe@attcanada.ca>
+	* src/mblist-window.c: Column size saving code cleaned up, better
+	  implementation using notebook selection.  Good to go.
+	
+2000-1-29   Matthew Guenther <mguenthe@attcanada.ca>
+	
+	* src/balsa-app.h:
+	* src/balsa-app.c:
+	* src/save-restore.c:
+	* src/balsa-index.c: Added the ability to save index column sizes
+	  between mailboxes and sessions.  Rough. 
+
+2000-1-18  Joaquim Fellmann <joaquim@hrnet.fr>
+	
+	* src/pref-manager.c: i18n a forgotten string.
+
+2000-1-14   Yun-Chung Cheng <platin@linux.org.tw>
+
+	* /po/zh_CN.po: Added po file from TurboLinux Chinese Develop Team.
+	* configure.in: Added zh_CN.po entry
+
+2000-1-3    Ragnar Henriksen <ragnar@juniks.org>
+	* src/pref-manager.c: Changed the helpfile location.	
+
+2000-1-1    Héctor García Álvarez  <hector@scouts-es.org>
+        * libbalsa/send.c: Added deletion on sended queued messages. 
+	SMTP support should now work properly. No known bugs in STMP 
+	support yet.
+
+1999-12-31  Ragnar Henriksen <ragnar@juniks.org>
+        * src/pref-manager.c: The help button are now working.
+
+1999-12-31  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* .cvsignore: Removed the ABOUT-NLS from CVS because gettext adds
+	it when the autogen.sh is called.
+
+1999-12-30  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* libbalsa/mailbox.c (translate_message):
+	* src/sendmsg-window.c:
+	* libbalsa/send.h:
+	* libbalsa/send.c: Added the code necessary to save the message ID
+	of the replyed message. The mailbox name where the message is
+	located is also saved. Added also the code to read the saved
+	stuff. Left a TODO to find the message and set it answered.
+
+	* libbalsa/mailbox.c (translate_message): Include set message_id
+	on the Message.
+
+	* src/main-window.c (continue_message_cb): Only continue on the
+	draft mailbox.
+
+	* src/sendmsg-window.c: The mailbox where the message was erased
+	because it was sent or continued should be immediately
+	committed. Remove the direct names of the mailboxes (like Sentbox)
+	and put the current name instead (like balsa_app.sentbox->name).
+
+	* balsa.spec.in: Improved the spec file by adding a
+	sysconfdir=/etc, removing the man instalation because balsa does
+	it now and adding the files on the /etc to the distribution.
+
+	* Makefile.am:
+	* .cvsignore:
+	* balsa.1.in:
+	* balsa.1: Removed balsa.1 and add balsa.1.in with 0.6.0 replaced
+	by @VERSION@. The configure file now generated the balsa.1. Also
+	made the Makefile.am install the man file.
+
+	* help/C/Makefile.am:
+	* images/Makefile.am: Removed the use_sys_install stuff and make it
+	right.
+
+	* configure.in:
+	* acconfig.h: Normal users don't need gob to build the system so
+	we don't check for is presence. Also removed the use_sys_install
+	stuff because it makes no sence.
+
+	* libinit_balsa/*.gob: Made the gob files compatible with the
+	latest version 0.91.2.
+
+	* libinit_balsa/Makefile.am: The built files go with the
+	distribution and the GOB variable is gone. Also added the option
+	--no-private-header to gob command. This way we avoing adding a
+	lot of header files.
+
+	* libinit_balsa/.cvsignore: Ignore generated files.
+
+	* src/balsa-message.c: The fcc shows up if exists for postponed
+	messages.
+
+	* libbalsa/mailbox.c (translate_message):
+	* src/sendmsg-window.c:
+	* libbalsa/send.h:
+	* libbalsa/send.c (balsa_postpone_message): The fcc is saved in
+	postponed messages.
+
+1999-12-30  Ragnar Henriksne <ragnar@juniks.org>
+	* src/pref-manager.c - total rewrite of the layout, and new features.
+	* src/balsa-app.h new stuff to balsa_app. (new features)
+	* src/arrow.xpm - new file ( a dummy arrow ) until we manage to
+	create some real stuff...
+	* src/main.c - added the functionallity "empty trash".
+	* src/save-restore.c - save and restore of new features.
+
+1999-12-29  Martin Norbäck  <d95mback@dtek.chalmers.se>
+
+	* configure.in: added "sv" to ALL_LINGUAS.
+
+1999-12-28  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* src/balsa-app.h, src/balsa-app.c, src/sendmsg-window.c: Changed
+	to read signature file every time it is needed, to let the user
+	edit the signature without restarting Balsa. (Patch from Sverre
+	H. Huseby  <sverrehu@online.no>)
+
+	* src/balsa-app.h, src/save-restore.c, src/balsa-app.c,
+	src/sendmsg-window.c, src/pref-manager.c: Added user settable
+	default Bcc field for outgoing mails. (Patch from Sverre H. Huseby
+	<sverrehu@online.no>)
+
+	* configure.in: Removed the detection of docbook since it is not
+	needed now.
+
+	* help/C/Makefile.am:
+	* help/C/topic.dat: I don't know how the .htm files show up but my
+	system generates .html files. Peter also put some section names so
+	the files changed their names. All fixed now. Also removed the
+	generated files from CVS and they are put on the distributed
+	tar.gz file when the file is built.
+
+	* help/C/balsa.sgml: Corrected the file. A > was missing and a
+	. was out of a paragraph. Also changed the file from version 3.1
+	to 3.0. More people have the old version and I think Peter doesn't
+	use any new feature off 3.1.
+
+	* help/C/.cvsignore: Makefile.am was ignored instead of Makefile.in.
+
+1999-12-27  Yuri Syrota <rasta@renome.rovno.ua>
+
+	* configure.in: added "uk" to ALL_LINGUAS.
+
+1999-12-24  Héctor García Álvarez <hector@scouts-es.org>
+	* libbalsa/send.c: Now Balsa send queued messages as it should.
+ 
+1999-12-21  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* src/main-window.c (balsa_window_refresh):
+	* src/pref-manager.c (apply_prefs): Added code to really change
+	the toolbar style right after the preferences manager change it
+	and not when balsa is restarted.
+
+1999-12-21  Stuart Parmenter  <pavlov@netscape.com>
+
+	* TODO, INSTALL, AUTHORS, configure.in: Add people to AUTHORS, etc
+	bump version to 0.6.0
+
+1999-12-21  Héctor García Álvarez <hector@scouts-es.org>
+	* libbalsa/send.c: Made some changes to make balsa send queued 
+	messages. Still have the bug when trying to send queued messages 
+	from a Mailbox format outbox.
+ 	
+1999-12-21  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* src/main-window.c: When the notebook changes the message preview
+	should change accordly and when the last mailbox is closed the
+	message preview must be cleared.
+
+	* src/balsa-index-page.h:
+	* src/balsa-index-page.c: Added function to change the message
+	preview to the focus message of the Balsa Index given. Also when
+	the message is unselected it is necessary to clear the message
+	preview. 
+
+	* src/balsa-index.c:
+	* src/balsa-index.h: Added new signal: unselect message.
+
+	* src/balsa-message.c: Added the code for balsa_message_clear.
+
+1999-12-20  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* src/balsa-message.c (headers2canvas): Changed the From field to
+	be right after Date field.
+
+	* src/pref-manager.c: Removed two warnings due to repeated gtk
+	instructions.
+
+	* src/Makefile.am: Rearranged the file.
+
+	* libmutt/*:
+	* libbalsa/message.c:
+	* libbalsa/mailbox.c:
+	* libbalsa/send.c: Updated libmutt to the version 1.0i with last
+	ChangeLog entry on Wed Oct 20 14:51:57 1999.
+
+1999-12-17  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* libinit_balsa/balsa-druid-page-user.gob: Changed default
+	  local mail directory to ~/mail, not ~/balsa.
+
+	* src/balsa-index-page.c (transfer_messages_cb): Prevent
+	  transferring a message to its own folder, which was a
+	  coredump.
+
+1999-12-16  Peter Williams <peter@newton.cx>
+	* macros/Makefile.am: uncommented "if INSIDE_GNOME_COMMON"
+	  as mentioned by Jules Bean.
+	
+1999-12-14  Peter Williams <peter@newton.cx>
+	* configure.in, libinit_balsa/Makefile.am,
+	  src/Makefile.am, src/main.c, po/POTFILES.in
+	  src/main-window.c, src/balsa-init.[ch]: Made 
+	    libinit_balsa mandatory and removed old init
+	    code.
+
+1999-12-14  Ragnar Henriksen <ragnar@juniks.org>
+	* removed a newline tag after name in addressbook.
+	  It could cause strange things, I didn't see this the
+	  first time I updated address-book.c. But after upgrading
+	  to the latest gnome-pim it showed. (Maybe they did something
+	  with the layout of GnomeGard.gcrd?)
+
+1999-12-12  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* libbalsa/filter-file.c: Removed compile warnings
+	  libbalsa/libbalsa.c: Ditto
+	  libbalsa/mailbox.[ch]: Ditto
+	  libbalsa/message.c: Ditto
+	  src/balsa-index-page.[ch]: Ditto
+	  src/balsa-mblist.c: Ditto
+	  src/filter-edit.h: Ditto (moved static definitions)
+	  src/filter-edit-dialog.c: Ditto
+	  src/mailbox-conf.c: Ditto
+	  src/main-window.[ch]: Ditto
+	  src/main.c: Ditto (added evil ugly uncalled hack function)
+	  src/mblist-window.c: Ditto
+	  src/pref-manager.c: Ditto
+	  src/print.c: Ditto
+	  libinit_balsa/balsa-druid-page-finish.gob: Ditto
+	  libinit_balsa/balsa-initdruid.gob: Fixed absentminded 
+	      coredump on cancel
+
+1999-12-09  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/save-restore.h: Added necessary #include libbalsa.h
+	* libinit-balsa/*.gob: Finished alpha revision.
+
+1999-12-09  Lauris Kaplinski <lauris@ariman.ee>
+	* configure.in: added et to ALL_LINGUAS.
+
+1999-12-08  David Pickens <dsp@iAesthetic.com>
+	* libbalsa/mailbox.c, mailbox.h, message.c, send.c, threads.h, 
+	  src/main-window.c, main-window.h, main.c, threads.h
+	Added messaging system for sending thread to communicate
+	w/ main thread.  Outbox/Sentbox now update on send.
+
+1999-12-07  Peter Williams <peter@newton.cx>
+	* libinit_balsa/balsa-druid-page-error.gob: Added nice
+	  error page
+	* libinit_balsa/balsa-druid-page-user.gob: First real
+	  page, user settings (mailroot added to this page)
+	
+1999-12-07  David Pickens <dsp@iAesthetic.com>
+	* Added multi-threaded send mail (if --enable-threads):
+	  libbalsa/send.c, libbalsa/threads.h,
+	  src/main.c, src/threads.h
+
+1999-12-05  David Pickens  <dsp@iAesthetic.com>
+
+	* /cvs/gnome/balsa/src/balsa-app.c, 
+	* /cvs/gnome/balsa/src/balsa-app.h, 
+	* /cvs/gnome/balsa/src/main-window.c, 
+	* /cvs/gnome/balsa/src/pref-manager.c, 
+	* /cvs/gnome/balsa/src/save-restore.c: Added progress dialog options
+
+1999-12-05  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-init.c (balsa_init_window_new, druid_destroy_cb):
+	  Destroy the window owning the druid as well.
+
+1999-12-05  Héctor García Álvarez <hector@scouts-es.org>
+        * Rewrited send and SMTP funtions
+	* libbalsa/send.c: Added ofline message writing funcionality
+
+1999-12-04  David Pickens  <dsp@iAesthetic.com>
+	* Added mail check every x minutes option
+
+1999-12-02  David Pickens  <dsp@iAesthetic.com>
+	* added ability to compile w/out threads (see 11-29)
+	* src/main-window.c: fixed progress window
+
+1999-12-01  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/address-book.c: Fixed stray reference to MDI
+
+1999-11-29  David Pickens <dsp@iAesthetic.com>
+
+	*src/main.c, main-window.c, main-window.h:  
+	added multi-threaded mail checking, progress window.
+	*libbalsa/mailbox.c, mailbox.h, libbalsa-priv.h:
+	same
+	*libmutt/pop.c:  same
+
+1999-11-29  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-index.c (balsa_index_set_mailbox): Fixed to make
+		message status icons work.
+	(mailbox_listener): Same.
+	* libbalsa/mailbox.c: Same.
+	* libbalsa/message.c: Same.
+	* src/balsa-index-page.c: Same.
+	
+1999-11-28  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/main-window.c: Proper recording of the
+	main window's size now. Fixed compile warnings
+	by commenting out some unused things (search for
+	(FIXME unused)
+
+	* acconfig.h, configure.in: Updated with dummy
+	--enable-threads argument (does nothing except define
+	BALSA_USE_THREADS)
+	
+1999-11-28  Hector Garcia Alvarez <hector@scouts-es.org>
+
+        * Added SMTP funtionalty. This should be consider
+	alpha software. It has only been probe by me. 
+
+        * src/balsa-app.h : Added balsa_app.smtp to struct
+
+	* src/save-restore.c : Added support to read and write
+	config parameter about using smtp or local mail delivery
+
+	* libbalsa/send.c : Added funtions balsa_smtp_send and
+	smtp_answer.
+				
+1999-11-28  Bruno Pires Marinho  <bapm@camoes.rnl.ist.utl.pt>
+
+	* idl/Makefile.am: The auxiliary library libbalsasrv.a was
+	installed on the system instead of the balsa.idl file. When you
+	change the ORBit version this could break and with the balsa.idl
+	that doesn't happen.
+
+	* .cvsignore:
+	* ABOUT-NLS:
+	* acinclude.m4:
+	* configure.in:
+	* po/.cvsignore: To remove the intl module from being checked out
+	when you check out balsa I had to change a couple of things.
+
+1999-11-25   Ragnar Henriksen <ragnar@juniks.org>
+	
+	Added config parameter: 
+	* The users may now select when to include signature.
+
+1999-11-23   Ragnar Henriksen <ragnar@juniks.org>
+
+	* new file: address-book.h
+	* rewrote ab_load().
+	* added name search.
+	* removed al comp. warningsi for address-book.c.
+
+1999-11-22  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-app.h (DEFAULT_MESSAGE_FONT): This
+	font should now exist.
+
+	* src/balsa-init.c (generic_back_cb): Fixed problem
+	with buttons disabled? Problem even existed?
+
+1999-11-21  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-init.c: Complete rewrite with GnomeDruid! Yahoo!
+	* src/balsa-init.c: Fixed it so it really works :-)
+	
+1999-11-20  Ragnar Henriksen <ragnar@juniks.org>
+        * new files: print.h print.c -> the beginning of printing.
+        * save-restore.c added saveing and loading of print setup.
+	* pref-manager.c added print notebook.
+	* balsa-app.h/c  added print setup to balsa struct.
+	* main-window.c added print icon.
+
+1999-11-18  Stuart Parmenter  <pavlov@netscape.com>
+
+	* libbalsa/mailbox.[ch]  Changed mailbox code to act as GtkObjects
+	* libbalsa/mailbox_local.[ch]
+	  libbalsa/mailbox_pop3.[ch]
+	  libbalsa/mailbox_imap.[ch] added new files
+
+	* libbalsa/mailbox.c (mailbox_new): now returns a GtkObject instead of a Mailbox
+                             (mailbox_free) removed.
+
+	* src/* wrap mailbox_new in BALSA_MESSAGE()
+          src/* change mailbox_free to gtk_object_destroy()
+
+1999-11-15  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/balsa-index-page.c (create_menu): Fixed size
+	of Transfer mblist; now that balsa_app.mblist_width
+	means something, we use it for the usize.
+
+	* src/sendmsg-window.c (add_attachment): Clean up
+	attachment code a little bit.
+
+	* configure.in, images/Makefile.am: Fixed to install pixmaps
+	in the correct location.
+
+	* src/main-window.c (balsa_window_new): Added callback
+	to record changes in 'notebook_height' and set the
+	default position.
+
+	* src/balsa-app.h, src/save-restore.c (config_global_load):
+	Changed from deprecated 'mblist_height' to shiny new 'notebook_height'.
+
+1999-11-14  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/main-window.c (balsa_window_new), src/balsa-index-page.c,
+	balsa-mblist.c: Replaced gtk_widget_set_usize()'s with code that
+	properly sets the position of the large paned widget.
+
+	* src/mblist-window.c (balsa_mailbox_list_window_new): Added
+	signal handle on size_allocate to set balsa_app.mblist_width.
+
+	* src/balsa-mblist.c (balsa_mblist_destroy): Fixed erroneous
+	setting mblist_width/height to 1x1
+
+1999-11-13  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/mailbox-conf.c (mailbox_conf_set_values): Fixed typo in
+	IMAP configuration.
+
+	* src/save-restore.c (rot): Fixed bad assertions.
+
+1999-11-12  Peter Williams  <peter@wgwill.ne.mediaone.net>
+
+	* src/main-window.c (balsa_window_real_close_mailbox): Implemented
+	real_close_mailbox().
+
+	* src/balsa-index-page.[ch] (balsa_index_page_close_and_destroy): 
+	Added a delete function for BalsaIndexPage. Hooks up to destroy
+	signal so you should call gtk_object_destroy() on it.
+
+	* src/mblist-window.c (mblist_open_mailbox): Prevent multiple 
+	windows of the same MB opened.
+
+	* src/main-window.c (file_menu): Add the 'Exit' menu item back, 
+	hooked to balsa_exit().
+
+	* src/balsa-app.c (read_signature): Fix off-by-one on .signature loading.
+
+1999-07-28 Tomasz K³oczko <kloczek@pld.org.pl>
+
+	* po/pl.po, configure.in
+	Sync with PLD cvs tree:
+	- added pl translation (translation by Pawe³ Dziekoñski
+	<dziekons@pld.org.pl> and fixes by Zbigniew Chyla <cyba@pld.org.pl>)
+
+1999-04-08 Jesse Sightler <jsight@pair.com>
+
+	* src/balsa-message.c: Added keyboard navigation.
+	* src/sendmsg-window.c: Improved general layout and added drag'n'drop
+	of addresses from Gnomecard.
+	* libbalsa/mime.c: Fixed failure to traverse all nodes of multipart msg.
+
+Wed Mar 31 18:14:00 1999  Manish Vachharajani <mvachhar@vger.rutgers.edu>
+
+	* src/mailbox_conf.c: Show the config notebook widget before
+	changing pages so pages actually change.  Is this a gtk+ bug?
+	
+Fri Mar 19 03:32:49 1999  Timur Bakeyev  <mc@bat.ru>
+
+	* src/Makefile.am: Change set of "GNOMEUI_LIBS -lgnorba ORB_LIBS" to 
+	GNOMEGNORBA_LIBS, which is more correct and clean. And prevent from 
+	linker errors.
+
+1999-02-24  Sergey Panov  <sipan@mit.edu>
+
+        * src/filter-edit-dialog.c, src/pref-manager.c:
+        added missed _() macros
+
+1999-02-11  Sergey Panov  <sipan@mit.edu>
+
+	* src/main.c, src/Makefile.am: turn on internationalization
+
+1999-02-01  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/filter-edit-dialog.c (build_left_side): pass it a
+	GtkWidget ** parameter to get the clist pointer in.
+	(build_right_side): accept a GtkWidget * parameter in order
+	to pass it a clist for apply/revert callbacks userdata.
+	(filter_edit_dialog): utilize the above.
+	* src/filter-edit-callbacks.c (unique_filter_name): actually
+	increment row.
+	
+1999-01-20  Nat Friedman  <nat@nat.org>
+
+	* src/pref-manager.c (open_preferences_manager): Connect the help
+ 	signal of the GnomePropertyBox to gnome_help_pbox_display.
+
+1999-01-19  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/balsa-app.c, src/balsa-init.c, src/filter-edit-dialog.c,
+	  src/index-child.c, src/mailbox-conf.c:
+	Renamed deprecated Gtk+ functions.
+
+1999-01-18  bertrand <Bertrand.Guiheneuf@inria.fr>
+
+	* src/save-restore.c: add a new property key
+	("ShowMailboxContentInfo")
+
+	* src/pref-manager.c: add a preference item
+	(show/hide mailbox content information)
+
+	* src/balsa-mblist.c (balsa_mblist_redraw): 
+	(balsa_mblist_init): 
+	show/hide the clist colums titles depending on the pref 
+	setting.
+	
+	* src/balsa-mblist.c (balsa_mblist_class_init): cntent
+	information disabled for the moment. 
+	New argument ("show_content_info") to th emblist 
+	object. Have to store it in the prop list. 
+
+1999-01-15 bertrand <Bertrand.Guiheneuf@inria.fr>
+
+	* src/index-child.c (index_button_press_cb): new function
+	to handle double click properly regarding to new gtk+ 
+	code.
+	(index_select_cb): no more double click handling code.
+	(index_child_create_view): connect scrolled windows
+	adjustments to the canvas adjustments.
+	Set the step increment.
+
+1999-01-14  bertrand <Bertrand.Guiheneuf@inria.fr>
+
+	* src/mblist-window.c (mblist_open_window): take the 
+	"MailboxListHeight" into account.
+	* src/save-restore.c (config_global_save): new property:
+	"MailboxListHeight"
+	(config_global_load): idem.
+	* src/balsa-app.h: new kember to store the mailbox list height.
+	(useful only when the window is floatting)
+
+	* src/mblist-window.c 
+	(mblist_menu_open_cb): 
+	(mblist_menu_close_cb): 
+	src/main-window.c (mailbox_menu): two new items to open/close 
+	a selected mailbox from the menubar.
+
+1999-01-14  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/mblist-window.c (mb_close_cb): new func
+	(mblist_create_context_menu): new context menu item: close the mb.
+
+	* src/mblist-window.c (mblist_create_context_menu): 
+	s/mblist_create_menu/mblist_create_context_menu
+	(mblist_create_context_menu): new context menu item (open mailbox)
+	(mb_open_cb): corresponding callback.
+	(mblist_open_mailbox): new func. Use this to open a mailbox.
+	
+	* src/mblist-window.c (mblist_button_press_cb): 
+	removed the mblist_clicked_cb function and replaced it by this new one.
+	All mouse press events are handled in this callback now. Before this, 
+	things were not very clear. For example, the double-click left button
+	was handled in the mailbox_select callback. 
+	
+
+1999-01-13  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/mailbox-conf.c (mailbox_conf_delete): bug when removing 
+	the firts pop mailbox. Fix submitted by Ian Campbell <ijc25@cam.ac.uk>
+
+	* src/main.c (config_init): commented out the return keyword after
+	.balsarc initialisation. It prevented the config to be loaded and
+	in particular the mailbox list window size to be set correctly
+	when a .balsarc did not exist.
+
+	* src/mblist-window.c (mblist_clicked_cb): new function to handle 
+	contextual menus more precisely and in particular, allowing the menu
+	to appear even when the mouse does not click on one mailbox row.
+
+1999-01-12  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/filter-edit-callbacks.c 
+	* src/mailbox-conf.c 
+	* src/pref-manager.c : 
+	s/gtk_toggle_button_set_state/gtk_toggle_button_set_active/
+	to conform to changes in gtk+.
+	
+1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	
+	* src/mblist-window.c (mblist_drag_data_received): check if the source
+	mailbox is not the dest mailbox.
+	(mblist_drag_motion): when the drag pointer is not on a valid row, 
+	deselect all.
+	(mblist_drag_leave): when the drag pointer leave the window, unselect all
+
+	* removed the dnd trace
+	
+	* src/index-child.c (index_child_setup_dnd): changed the drag icon
+	(index_child_create_view): unset "use_drag_icons" & "reorderable"
+	clist flags. 
+
+	* src/pref-manager.c (apply_prefs): replyto field chages were
+	not saved. fixed.
+
+	* src/index-child.c src/mblist-window.c : add some dnd trace code
+	cause dnd does not work anymore.
+
+	* src/sendmsg-window.c (sendmsg_window_new): bugfix when replying
+	to a message with subject begining with Re:
+
+1999-01-11  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	added the code to commit the changes which are flagged (generally
+	deletion). The code is OK, but some general issues remain to be fixed.
+	(in particular, the problem which open_unref automatically syncing
+	mailboxes and thus freeing delete-flagged messages )
+	
+	* src/main-window.c (mailbox_commit_changes): new menu for this
+	("Mailboxes" -> "commit current")
+	
+	* libbalsa/mailbox.c (mailbox_commit_flagged_changes): new function to 
+	commit the changes which are only flagged.
+
+	* src/balsa-index.c (balsa_index_del): new functino to delete a message
+	from the index list.
+	(mailbox_listener): proper answer to the delete watcher message.
+
+1999-01-10  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	added the code to view infos about the mailboxes in the mailbox list
+	it roughly works but the possibility to show or not show info fields
+	must still be added.
+	
+	* src/balsa-mblist.c (balsa_mblist_set_row_info_fields): new function
+	to display informations about a mailbox.
+	(balsa_mblist_release_watchers): free the list of mailbox the mailbox
+	list is watching.
+	(balsa_mblist_add_watched_mailbox): add a mailbox to the list of
+	watched mailboxes.
+	(balsa_mblist_redraw): when creating the mailbox row, add the info fields
+	(mailbox_nodes_to_ctree): idem on normal mailboxes.
+	(mailbox_listener): when notified there is a change, upadte the
+	information field of the concerned row.
+
+	* libbalsa/mailbox.c: new function (mailbox_gather_content_info)
+	the name tells everything about it.
+	(message_copy): update the mailbox info fields
+	(message_move): idem
+	(message_read): idem
+	(message_unread): idem
+	(mailbox_check_new_messages): idem
+
+	* libbalsa/mailbox.h: added the unread_message field.
+	also added the total_messages field.
+	
+1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/balsa-mblist.c (balsa_mblist_redraw): start to add 
+	mailbox info in the mailbox list window (number of  messages, 
+	number of unread messages). This should be configurable cause
+	I guess not everybody likes this. 
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (settings_menu): No separator before
+ 	Preferences.
+
+	(main_menu): Added N_() around "Message" and "Mailboxes"
+
+1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/index-child.c (index_child_new): when the mailbox
+	already exists, set it as the active view. 
+
+1999-01-08  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	messages can be moved even when the destination is already 
+	opened :-))
+	
+	* libbalsa/mailbox.h: added a new mailbox watcher message 
+	to tell a watcher a message has been appended but that it is 
+	not a new message.
+
+	* libbalsa/mailbox.c (send_watcher_append_message): new function 
+	to send an APEND message.
+	(message_copy): send an append message to the dest mailbox
+	(message_move): idem.
+	(_mailbox_open_ref): when the mailbox was already opened but not
+	in append mode, close it first.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* src/message-window.c (forward_message_cb): Get the messagewindow
+ 	from the window's gtk data.
+	(replytoall_message_cb): Likewise.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* src/sendmsg-window.c (file_menu): Standardized.
+
+	(close_window): Fixed signature.
+	(send_message_cb): Likewise.
+	(attach_clicked): Likewise.
+	(close_window): Likewise.
+	(attach_dialog_cancel): Likewise.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* src/message-window.c: Include sendmsg-window.h and message-window.h
+	Added a prototype for destroy_message_window.
+
+	(message_menu): A new menu.
+	(replyto_message_cb): Calback for the new menu.
+	(replytoall_message_cb): Likewise.
+	(forward_message_cb): Likewise.
+
+	(message_window_new): gtk_object_set_data stores the
+ 	MessageWindow, not the window.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (APPBAR_KEY): Changed the PROGRESSBAR_KEY to
+ 	APPBAR_KEY.
+	(main_window_set_cursor): Use the GnomeAppBar's progress meter.
+	(main_window_init): Removed all the code to create a
+ 	GtkProgressBar.  Use the GnomeAppBar progress meter instead.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* src/index-child.c: Updated the copyright
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* src/message-window.c: Updated the menu items for the message
+ 	window to reflect the standard.
+
+	Added the 'message' field to the MessageWindow structure.
+
+	Added the 'displayed_messages' hash table.
+
+	(message_window_new): Check to see if the specified message is
+ 	already displayed, and if so, gdk_window_raise() the window
+ 	containing it.  If not, add it to the hash table.
+	
+	(destroy_message_window): Remove the hash-table entry
+ 	corresponding to this message window.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (main_menu): Updated to use the SETTINGS
+ 	standard menu, and moved Preferences back to there.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (app_created): Use the GnomeAppBar instead of
+ 	the GtkStatusBar.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (file_menu): Use GNOMEUIINFO_MENU_PREFERENCES_ITEM.
+	(mailbox_menu): Added menu hints to the custom menu items.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (main_window_init): Install the menu hints.
+	(show_about_box): Updated the copyright dates.
+
+	Move the preferences menu item to the File menu.
+
+1999-01-07  bertrand   <Bertrand.Guiheneuf@inria.fr>
+
+	* libbalsa/mailbox.c (_mailbox_open_ref): unlock the mailbox even if
+	it was already opened before.
+	(message_move): test if we actually opened the mailbox or
+	if it was opened before. When it was already opened, don't
+	unref it.
+	--> the dnd move works now, yeepeeh !
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (help_menu): Use GNOMEUIINFO_MENU_ABOUT_ITEM
+ 	and the standard GNOMEUIINFO menu trees.
+
+1999-01-06  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (file_menu): Use the GNOMEUIINFO standard menu
+ 	item for exit.
+
+1999-01-06  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (file_menu): Use the gnome-uidefs.h macros.
+
+1999-01-06  Nat Friedman  <nat@nat.org>
+
+	* src/main-window.c (file_menu): Use Ctrl-Q as the exit-app
+ 	accelerator.
+
+1998-12-28  bertrand  <Bertrand.Guiheneuf@inria.fr>
+
+	* src/mblist-window.c (mblist_open_window): added the dnd reception
+	callback.
+	(mblist_drag_data_received): handle the received messages. For the 
+	moment, when a list of messages is dropped on a mailbox, it is moved
+	to that mailbox. Other actions should be easy to add.
+
+	* src/index-child.c (index_child_create_view): moved the dnd code to
+	a specific function : index_child_setup_dnd()
+	(index_child_setup_dnd): new function.
+	(index_child_drag_data_get): new function, pass the selected messages
+	in the clist to the X selection mechanism. This should be reviewed by 
+	a gtk+ expert. However, this does not work with the current version
+	of gtk+ (1.1.9). I had to remove the dnd class functions in gtkclist
+	to make all this work correctly.
+
+	* src/balsa-index.c (balsa_index_get_selected_rows): added this function
+	to get the currently selected messages. This is useful to the dnd stuff.
+
+	* src/main-window.c (main_window_set_cursor): removed a warning
+
+1998-12-27  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/main-window.c (destroy_window_cb): only save window size.
+	attached to destroy signal of each app in app_create().
+	(destroy_mdi_cb): call balsa_exit(). attached to mdi destroy signal.
+	savin window size here makes no sense as mdi might not have an
+	active_window on destruction!
+	(app_created): set the pointer to pbar as data to each GnomeApp with
+	key PROCESSBAR_KEY.
+	(main_window_set_cursor): use the pbar set as data to the GnomeApp.
+	using a global static var won't work if someone drags a page out
+	to create multiple notebooks.
+
+1998-12-26  bertrand <bertrand.guiheneuf@inria.fr>
+
+	* src/mblist-window.[ch]: new files.
+	* src/main-windo.c: moved the mailbox list window
+	code to the new two above files.
+
+	* src/balsa-message.c (balsa_message_new): corrected the bug
+	that made some widget background white instead of their
+	normal background.
+	
+	* src/sendmsg-window.c (create_info_pane): idem as above. 
+	
+
+1998-12-19  Joel Becker  <jlbec@ocala.cs.miami.edu>
+
+	* src/filter-edit-dialog.c: Enabled the neat new dnd
+ 	reordering of the filter clist.  Yay.
+
+1998-12-19  pavlov@pavlov.net
+
+	Modified files:
+
+        libbalsa       : misc.c misc.h 
+        src            : balsa-mblist.c main-window.c 
+
+	Log message:
+
+	make mailbox folders closed by default.. will do saving of
+	their status shortly
+
+1998-12-18  Jeff Garzik  <jgarzik@pobox.com>
+
+	* po/de.po: big update from Michael Glauche <glauche@plum.de>
+
+1998-12-18  Jeff Garzik  <jgarzik@pobox.com>
+
+	* libbalsa/mailbox.c, libmutt/commands.c, libmutt/curs_main.c,
+	  libmutt/flaglib.c, libmutt/flags.c, libmutt/mutt.h,
+	  libmutt/mx.c, libmutt/pager.c, libmutt/pattern.c:
+	s/M_READ/MFLAG_READ/ - Solaris system defines M_READ
+
+	* libbalsa/misc.c: call g_malloc instead of malloc, because we
+	call g_free in the allocated memory later on.
+	From wmorgan@syntony.org.
+ 
+1998-12-17  Jeff Garzik  <jgarzik@pobox.com>
+
+	* libmutt/sendlib.c:
+	one-liner from wmorgan@syntony.org that fixes msg bodies w/o
+	a trailing newline
+
+1998-12-16  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/pref-manager.c:
+	Outgoing mail is now a table, allowing you to select
+	'remote smtp server' or 'local mail agent' for mail delivery.
+	Greyed out because it doesn't actually work yet.
+
+1998-12-16  Joel Becker  <jlbec@ocala.cs.miami.edu>
+
+	* libbalsa/filter-error.c, libbalsa/filter-file.c,
+        libbalsa/filter-funcs.c, libbalsa/filter-private.h,
+	src/filter-edit-callbacks.c, src/filter-edit-dialog.c:
+	Lots of little things, especially gui workings.  It's not perfect yet.
+	Nor is it working.  But it compiles clean, and should cause no harm.
+
+1998-12-15  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/pref-manager.c:
+	Added protocol column to server list.
+
+	* src/spell-check.[ch]:
+	Spell checking module for mail compose window.
+
+1998-12-15  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* src/main-window.c (refresh_main_window): Retrieve the toolbar
+ 	with `gnome_app_get_dock_widget_by_name()'.
+	(mblist_open_window): Make the behavior of the dock item
+ 	`EXCLUSIVE'.  Use `gnome_app_add_dock_item' instead of
+ 	`gnome_dock_add_item()'.
+
+	* src/sendmsg-window.c (sendmsg_window_new): Likewise.
+
+1998-12-14  Stuart Parmenter  <pavlov@pavlov.net>
+
+        ./	  : INSTALL README balsa.1 balsa.spec configure.in,
+        po/	  : de.po es.po fi.po fr.po ga.po ko.po no.po,
+        libbalsa/ : Makefile.am libbalsa.c mime.c send.c,
+        idl/Makefile.am, sounds/Makefile.am, src/Makefile.am:
+	- Now passes 'make distcheck'
+
+        it.po:
+	- added the italian translation.
+
+1998-12-14  Jeff Garzik <jgarzik@pobox.com>
+
+	* src/main-window.c:
+	- Re-enabled Mailbox/Delete menu item; it takes into account lack
+	  of selection now.
+	- Updated for new gnome-dock-item-new args.
+
+	* src/message-window.c:
+	- Continued futile efforts to close the message window via
+	  File/Close.
+
+1998-12-14  Jeff Garzik <jgarzik@pobox.com>
+
+	* libbalsa/mailbox.[ch]:
+	Added simple IMAP support stubs.
+
+	* src/main-window.c:
+	- include mailbox-conf.h to avoid warnings.
+	- Added menu items to add, edit, and delete mailboxes.
+	- Corrected typo.
+	- Pop up error dialogs if no item is selected, and edit/delete
+	  is chosen.
+
+	* src/message-window.c:
+	- added menu to message window, just File|Close right now.
+
+1998-12-13  Jeff Garzik <jgarzik@pobox.com>
+
+	* src/main-window.c:
+	- Exported 'mdi' var, so we can grab it from other modules.
+	- Reordered check-new-mail action to check regardless of whether
+	  we check locally or not.
+
+	* src/pref-manager.c:
+	- Properly parent the prop box, so it minimizes when other
+	  windows are minimized.
+	- Select first item in POP3 server list.
+	  FIXME: needs to select "proper" item based on previous action, 
+	  add, delete, and modify.
+	- Internationalize a few strings.
+	  Rename "POP3 Servers" frame to "Remote Mailbox Servers"
+
+	* src/sendmsg-window.c:
+	Change menu item "Exit" to "Close".  We do not exit the app.
+
+1998-12-09  Herbert Valerio Riedel  <hvr@phoenix.twisted.hvrlab.ml.org>
+
+	* src/filter-edit.h, libbalsa/filter-funcs.h: added missing prototypes
+	* libbalsa/filter-funcs.c (filter_init): initialize var to shut up
+	compiler
+
+1998-12-12  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/main-window.c (app_created): connected set_icon() to
+	realize signal handler for app as MDI does not explicitly
+	realize GnomeApps anymore.
+	
+1998-12-10  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/sendmsg-window.c (attachments_add): Add drag and drop
+	support for the attachments.
+
+1998-12-09  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/balsa-message.c, src/index-child.c:
+	Fixed gnome-dialog-run-and-close breakage.
+
+1998-12-08  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* src/index-child.c, src/balsa-message.c: changed gnome_dialog_set_modal()
+	to gtk_window_set_modal() and use gnome_dialog_run_close() instead of
+	gnome_dialog_run_and_hide() and gtk_widget_destroy(). 
+	* main-window.c (refresh_main_window): DON'T use gnome_mdi_set_mode() to
+	refresh display. this gets you into trouble and would look butt ugly anyway.
+	
+1998-11-29  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/sendmsg-window.c (create_info_pane): GnomeIconList no longer
+	starts in frozen state.
+
+1998-11-29  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* src/balsa-index.c (balsa_index_init): fixed superflous re-allocation
+ 	of scrolled window
+
+	* src/main-window.c (create_toolbar): added GTK_WINDOW()-cast
+
+1998-11-28  Michael Lausch  <mla@gams.at>
+
+	* changed gtk_container_border_with to gtk_container_set_border_width
+
+1998-11-25  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* src/sendmsg-window.c: add #include <ctype.h> and cast-macros
+
+	* src/pref-manager.c: added cast-macros
+
+	* src/main.c: fixed declaration of balsa_init()
+
+	* src/main-window.c: added cast-macros
+
+	* src/local-mailbox.c: added #include <ctype.h>
+
+	* src/index-child.c: see next
+
+	* src/filter-edit-dialog.c: see next
+
+	* src/balsa-index.c: added cast-macros
+
+	* src/balsa-app.c: added const modifier to balsa_error()
+
+	* libbalsa/misc.c: fixed return value checking of malloc in readfile()
+
+1998-11-18  Richard Hestilow  <hestgray@ionet.net>
+
+	* src/main-window.c: Added underscore accelerators, no longer right
+	justify "Help" menu either.
+
+1998-09-23  Michael Lausch  <mla@gams.at>
+
+	*  libbalse/mime.c (Mailbox): reorganized the translation of MIME 
+	messages into HTML. Some things in gtkXmHTML aren't working, so i
+	use a table approach now. Better multipart handling which is
+	necessary for PGP support.
+
+1998-09-15  Robert Wilhelm  <robert@alpha.physiol.med.tu-muenchen.de>
+
+	* src/balsa-index.c (numeric_compare): new function to
+	get sorting by message number right.
+        (clist_click_column): use it here.
+	
+1998-09-11  Michael Lausch  <mla@gams.at>
+
+	* src/balsa-message.c: Start of saving MIME parts (aka
+	Attachments) to files. More on this topic will follow.
+
+1998-09-02  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* src/Makefile.am (INCLUDES): Added ${top_builddir}/libmutt so
+	that muttconfig.h is found when srcdir != builddir.
+
+	* libbalsa/Makefile.am (INCLUDES): Likewise.
+
+1998-08-25  Nat Friedman  <ndf@retrans.mit.edu>
+
+	* src/balsa-init.c (next_cb): Try to create the specified
+	mailboxes if they do not exist
+	(create_mailbox_if_not_present): new function to do the above
+
+1998-08-23  Nat Friedman  <ndf@retrans.mit.edu>
+
+	* src/save-restore.c: This file has been completely rewritten.
+	libPropList based configuration loading and storing is now
+	functional.
+
+	The configuration function names have all been made sane, also,
+	and several files, including balsa-app.c, balsa-init.c, main.c,
+	and pref-manager.c had to be modified to call the new routines.
+
+	* src/mailbox-conf.c: Added some casts to the gtk_signal_connect()
+	calls so that passing non-pointer closures doesn't generate a warning.
+
+
+1998-08-07  Michael Lausch  <mla@gams.co.at>
+
+	* src/main.c (balsa_exit): fix crash when exiting without
+	selecting a mailbox.
+
+1998-08-06  Michael Lausch  <mla@gams.co.at>
+
+	* libbalsa/mailbox.c (content_type2str): new function. Returns
+	String representation of MIME content.
+	(text2html): Temproarily moved to mailbox.c from
+	balsa-message. Will be moved back when MIME part handling is
+	fixed.
+	(other2html): new function. Formats an unknown MIME part into
+	HTML. Should use a <A> tag, currently prints the part as text which
+	is _wrong_.
+	(audio2html): new function. Formats a `audio' part in HTML. Should 
+	use a <A> tag. Currently just prints AUDIO
+	(application2html): new function. Formats an `applicaton' in
+	HTML. Should use a <A> tag. Currently just prints APPLICATION.
+	(image2html): new function. Formats a `image' part in HTML. Should 
+	use a <A> tag or a <IMG> tag. Currently just prints IMAGE.
+	(message2html): new function. Formats a `message' in HTML. Should
+	render the message like a top level message. Currently just prints 
+	MESSAGE. 
+	(multipart2html): new function. Should render a MULITPART
+	part. Currently just prints MULTIPART.
+	(video2html): new function. Formats a `video' in
+	HTML. Should use a <A> tag. Currently just prints VIDEO.
+	(mimetext2html): new function. Renders a text message into
+	HTML. subtype html is unchanged, all oethers are passed to
+	text2html. 
+	(part2html): calls one of the part formatting functions depending
+	on the type attribute of the MIME part. Subtype handling is done
+	by the correspodning functions.
+	(message_body_ref): Now renders the message in HTML with MIME
+	handling. THIS WILL CHANGE. Next version will only put the
+	type/subtype attributes into the balsa message structure.
+
+	* src/balsa-message.c (message2html): message body is already
+	HTML'ized. not further formating necessary. THIS WILL BE CHANGED
+	very soon.
+
+	temporarily moved ther text2html function into the mailbox file. 
+
+	* libmutt/mx.c (mx_get_magic): fixed M_MH recognition
+	semantics. .xmhcache file only exists of exmh was used. 
+
+	* libbalsa/misc.c (readfile): fixed readfile function.
+	
+
+1998-08-03  Michael Lausch  <mla@gams.co.at>
+
+	* src/local-mailbox.c (read_dir): changed isnumname to
+	is_mh_message. MH messages filenames are a lot more variable then
+	expected.
+	(read_folders_from_file): new function. Reads the folder cache
+	file and add mailboxes.
+	(is_mh_message): new function. Applies some heuristics on the
+	filename to find out if it is a MH message name (,[0-9]+ and
+	[0-9].~[0-9]+~) are considered to be MH messages.
+	
+	new variable folder_cache_name.
+	
+Sat Aug 01 20:25:23 1998  George Lebl  <jirka@5z.com>
+
+	* src/index-child.c: fixed up the destroy handler
+
+	* src/main-window.c: user remove instead of destroy to close
+	  a child
+
+Thu Jul 30 21:26:22 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* libmutt/configure.in, mx.c, parse.c, pop.c, send.c
+
+	Updated to mutt v0.93.2
+	
+	* libbalsa/mailbox.c, src/index-child.c
+
+	Initial work on IMAP and POP3 support with mutt.  It doesn't seem to
+	work very well right now.  I am still working on this.
+
+
+Thu Jul 30 17:21:32 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* libbalsa/mailbox.c, src/local-mailbox.c
+
+	Balsa now should read in mailboxes properly.  i.e. check to make sure
+	its valid, as well as check its type.  I believe it should load mh
+	folders now as well, although I havn't tested this yet, since I don't
+	have any mh folders.  Balsa will not open any files with characters
+	that are all numbers (i.e. mh messages), nor any files that start with
+	a '.'.
+
+
+Wed Jul 29 08:05:28 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* src/balsa-init.c
+
+	Changed Balsa Init to use a gtk_dialog instead of a gnome_app window.
+	I'll probibly change this to a gnome_dialog later.  This should make
+	it look a little bit nicer.
+
+	*src/pref-manager.c
+
+	Changed the button box layout to SPREAD instead of END
+
+
+Tue Jul 28 21:43:58 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* src/balsa-init.c
+
+	More work, should save your settings now.  Mailbox addition inside the
+	balsa-init still not there.  Balsa-app now uses balsa-init.c since its
+	pretty:)
+
+
+Tue Jul 28 21:19:38 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* src/balsa-init.c
+
+	Started making balsa-init do something useful.  It is almost complete.  Once
+	complete, it will be what is started when Balsa is run for the first time.  It 
+	will setup all the information that Balsa needs to run correctly.
+
+
+Tue Jul 28 14:00:35 EDT 1998 Stuart Parmenter <pavlov@innerx.net>
+
+        * src/pref-manager.c
+
+	Removed open_main_window() call from pref manager if
+	balsa_app.current_index_child was NULL.  This was causing lots of
+	opened windows on startup.
+
+
+Tue Jul 28 04:01:40 1998 Stuart Parmenter <pavlov@innerx.net>
+
+	* TODO, INSTALL, README:
+
+	Update of the documentation (or sad excuse for that).  Added the INSTALL file
+	to replace the one thats automagically generated if it doesn't exist.  This
+	way we get a file that accually applies to the installation of balsa, and not
+	generic stuff.  This should help, not that its hard to do now that c-client is
+	removed.
+
+	Updated the TODO file to note that local mailbox dir recursion now is
+	implimented but lacks a way to store the mailboxes in something other than a
+	list currently.  This will be GForest's use.
+
+	Updated README to remove INSTALL file info, and such.  Added a description,
+	etc.
+
+

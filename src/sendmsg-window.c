@@ -457,8 +457,10 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
     entry = GTK_ENTRY(gtk_object_get_data(GTK_OBJECT(widget), "address-entry-widget"));
 
     ab = balsa_address_book_new(TRUE);
-    gnome_dialog_set_parent(GNOME_DIALOG(ab), GTK_WINDOW(snd_msg_wind->window));
+    gnome_dialog_set_parent(GNOME_DIALOG(ab), 
+			    GTK_WINDOW(snd_msg_wind->window));
 
+    gnome_dialog_close_hides (GNOME_DIALOG(ab), TRUE);
     button = gnome_dialog_run(GNOME_DIALOG(ab));
     if ( button == 0 ) {
 	gchar *t;
@@ -473,7 +475,6 @@ address_book_cb(GtkWidget *widget, BalsaSendmsg *snd_msg_wind)
 static gint
 delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
-    g_message("delete_event_cb(): Start.");
     balsa_sendmsg_destroy((BalsaSendmsg *) data);
     g_message("delete_event_cb(): Stop.");
     return TRUE;

@@ -69,6 +69,30 @@ static GnomeUIInfo file_menu[] =
   GNOMEUIINFO_END
 };
 
+static GnomeUIInfo edit_menu[] =
+{
+  /* FIXME: Features to hook up... */
+  /*  GNOMEUIINFO_MENU_UNDO_ITEM(NULL, NULL); */
+  /*  GNOMEUIINFO_MENU_REDO_ITEM(NULL, NULL); */
+  /*  GNOMEUIINFO_SEPARATOR, */
+  GNOMEUIINFO_MENU_COPY_ITEM(NULL, NULL),
+  GNOMEUIINFO_MENU_SELECT_ALL_ITEM(NULL, NULL),
+  /*  GNOMEUINFO_SEPARATOR, */
+  /*  GNOMEUIINFO_MENU_FIND_ITEM(NULL, NULL); */
+  /*  GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(NULL, NULL); */
+  /*  GNOMEUIINFO_MENU_REPLACE_ITEM(NULL, NULL); */
+  GNOMEUIINFO_END
+};
+
+static GnomeUIInfo view_menu[] =
+{
+#define MENU_VIEW_WRAP_POS 0
+  GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
+  GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
+  GNOMEUIINFO_END
+};
+
 static GnomeUIInfo message_menu[] =
 {
     /* R */
@@ -107,19 +131,15 @@ static GnomeUIInfo message_menu[] =
     save_current_part_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
     GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL
   },
-  GNOMEUIINFO_SEPARATOR,
-#define MENU_MESSAGE_WRAP_POS 8
-  GNOMEUIINFO_TOGGLEITEM( N_ ("_Wrap"), NULL, wrap_message_cb, NULL),
-  GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_RADIOLIST(shown_hdrs_menu),
   GNOMEUIINFO_END
 };
 
 static GnomeUIInfo main_menu[] =
 {
   GNOMEUIINFO_MENU_FILE_TREE(file_menu),
-  GNOMEUIINFO_SUBTREE ("_Message", message_menu),
-  
+  GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
+  GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
+  GNOMEUIINFO_SUBTREE ("_Message", message_menu),  
   GNOMEUIINFO_END
 };
 
@@ -202,7 +222,7 @@ message_window_new (LibBalsaMessage * message)
       TRUE);
 
   gtk_check_menu_item_set_active
-    (GTK_CHECK_MENU_ITEM(message_menu[MENU_MESSAGE_WRAP_POS].widget), 
+    (GTK_CHECK_MENU_ITEM(view_menu[MENU_VIEW_WRAP_POS].widget), 
      balsa_app.browse_wrap);
 
   /* FIXME: set it to the size of the canvas, unless it is

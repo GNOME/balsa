@@ -264,7 +264,6 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
     } 
   else /* not on_mailbox */
     { 
-      
       if (event->type == GDK_BUTTON_PRESS && event->button == 3)
 	{
 	  /* simple click on right button */
@@ -272,7 +271,7 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
 			  NULL, NULL, NULL, NULL, event->button, event->time);
 	  return TRUE;
 	}
-      
+
       return FALSE;
     }
 
@@ -412,10 +411,16 @@ add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
 	       LibBalsaMailbox * mailbox)
 {
     GtkWidget *menuitem;
-    
-    menuitem = gtk_menu_item_new_with_label (label);
-    gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
-			GTK_SIGNAL_FUNC (cb), mailbox);
+ 
+    if ( label ) 
+      menuitem = gtk_menu_item_new_with_label (label);
+    else
+      menuitem = gtk_menu_item_new ();
+
+    if ( cb ) 
+      gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
+			  GTK_SIGNAL_FUNC (cb), mailbox);
+
     gtk_menu_append (GTK_MENU (menu), menuitem);
     gtk_widget_show (menuitem);
 }
@@ -425,25 +430,33 @@ mblist_create_context_menu (GtkCTree * ctree, LibBalsaMailbox * mailbox)
 {
   GtkWidget *menu;
 
+  /*  g_return_val_if_fail(mailbox != NULL, NULL); */
+
   menu = gtk_menu_new ();
 
-  if (mailbox)
-    {
-      add_menu_entry(menu, _("Open Mailbox"), mb_open_cb, mailbox);
-      add_menu_entry(menu, _("Close Mailbox"), mb_close_cb, mailbox);
-    }
-  
   add_menu_entry(menu, _("Add New Mailbox"), mb_add_cb, mailbox);
+
+  /* If we didn't click on a mailbox then there is only one option. */
+  if ( mailbox == NULL )
+    return menu;
+
+  add_menu_entry(menu, NULL, NULL, mailbox);
+
+  if ( mailbox->open_ref == 0 ) 
+    add_menu_entry(menu, _("Open"), mb_open_cb, mailbox);
+  else
+    add_menu_entry(menu, _("Close"), mb_close_cb, mailbox);
   
-  if (mailbox)
-    {
-      add_menu_entry(menu, _("Edit Mailbox Properties"), mb_conf_cb, mailbox);
-      add_menu_entry(menu, _("Delete Mailbox"),   mb_del_cb,     mailbox);
-      add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,   mailbox);
-      add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb, mailbox);
-      add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,   mailbox);
-      add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mailbox);
-    }
+  add_menu_entry(menu, _("Properties"), mb_conf_cb, mailbox);
+
+  add_menu_entry(menu, _("Delete"),   mb_del_cb, mailbox);
+  
+  add_menu_entry(menu, NULL, NULL, mailbox);
+
+  add_menu_entry(menu, _("Mark as Inbox"),    mb_inbox_cb,   mailbox);
+  add_menu_entry(menu, _("Mark as Sentbox"),  mb_sentbox_cb, mailbox);
+  add_menu_entry(menu, _("Mark as Trash"),    mb_trash_cb,   mailbox);
+  add_menu_entry(menu, _("Mark as Draftbox"), mb_draftbox_cb, mailbox);
 
   return menu;
 }

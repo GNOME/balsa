@@ -86,6 +86,10 @@ extern "C"
 					   ShownHeaders sh);
   void balsa_message_set_wrap(BalsaMessage *bmessage, gboolean wrap);
 
+  /* FIXME: Implement - and hook to menu items. */
+  /* void balsa_message_copy_clipboard(BalsaMessage *bmessage); */
+  /* void balsa_message_select_all(BalsaMessage *bmessage); */
+
   void reflow_string(gchar* str, gint mode, gint *cur_pos, int width);
 
    /* a helper functions; FIXME: find more proper location for them.  */

@@ -1,3 +1,10 @@
+2000-09-25  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* src/balsa-index-page.c, src/mblist-window.c: Made context menu
+	context sensitive.	
+	* src/main-window.c, src/message-window.c: Rearrange menus, some
+	items still need to be hooked up (copy and select all)
+
 2000-09-25  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* src/spell-check.c: Fixed marking of strings. Use _( not _ (

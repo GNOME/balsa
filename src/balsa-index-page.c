@@ -71,8 +71,6 @@ static void balsa_index_page_init(BalsaIndexPage *page);
 void balsa_index_page_window_init(BalsaIndexPage *page);
 void balsa_index_page_close_and_destroy( GtkObject *obj );
 
-static void send_new_message (GtkWidget * widget);
-
 GtkType
 balsa_index_page_get_type (void)
 {
@@ -458,9 +456,10 @@ index_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer data)
 
 static void
 create_stock_menu_item(GtkWidget *menu, const gchar* type, const gchar* label,
-		       GtkSignalFunc cb, gpointer data)
+		       GtkSignalFunc cb, gpointer data, gboolean sensitive)
 {
     GtkWidget * menuitem = gnome_stock_menu_item (type, label); 
+    gtk_widget_set_sensitive(menuitem, sensitive);
     gtk_signal_connect (GTK_OBJECT (menuitem),
 			"activate",
 			(GtkSignalFunc) cb, data);
@@ -478,36 +477,40 @@ create_menu (BalsaIndex * bindex)
   
   menu = gtk_menu_new ();
   
-  create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_NEW, _("New"),
-			 send_new_message, NULL);
-
   create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply"),
-			 balsa_message_reply, bindex);
+			 balsa_message_reply, bindex, TRUE);
 
   create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_RPL, _("Reply to all"),
-			 balsa_message_replytoall, bindex);
+			 balsa_message_replytoall, bindex, TRUE);
 
   create_stock_menu_item(menu, GNOME_STOCK_MENU_MAIL_FWD, _("Forward"),
-			 balsa_message_forward, bindex);
+			 balsa_message_forward, bindex, TRUE);
 
-  create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH, _("Delete"),
-			 balsa_message_delete, bindex);
-  create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE, _("Undelete"),
-			 balsa_message_undelete, bindex);
+  if ( bindex->mailbox == balsa_app.trash ) {
+    create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE, _("Undelete"),
+			   balsa_message_undelete, bindex, !bindex->mailbox->readonly);
+    create_stock_menu_item(menu, GNOME_STOCK_MENU_UNDELETE, _("Delete"),
+			   balsa_message_undelete, bindex, !bindex->mailbox->readonly);
+  } else {
+    create_stock_menu_item(menu, GNOME_STOCK_MENU_TRASH, _("Move to Trash"),
+			   balsa_message_delete, bindex, !bindex->mailbox->readonly);
+  }
 
   create_stock_menu_item(menu, GNOME_STOCK_MENU_BOOK_RED, 
 			 _("Store Address"),
-			 balsa_store_address, bindex);
+			 balsa_store_address, bindex, TRUE);
 
   menuitem = gtk_menu_item_new_with_label(_("Toggle flagged"));
+  gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
   gtk_signal_connect(GTK_OBJECT(menuitem),
 		     "activate",
 		     (GtkSignalFunc) balsa_message_toggle_flagged,
 		     bindex);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
-
+  
   menuitem = gtk_menu_item_new_with_label (_("Transfer"));
+  gtk_widget_set_sensitive(menuitem, !bindex->mailbox->readonly);
   submenu = gtk_menu_new ();
   smenuitem = gtk_menu_item_new ();
   gtk_signal_connect (GTK_OBJECT (smenuitem), "button_release_event",
@@ -517,7 +520,7 @@ create_menu (BalsaIndex * bindex)
   gtk_signal_connect (GTK_OBJECT (bmbl), "select_mailbox",
 		      (GtkSignalFunc) transfer_messages_cb,
 		      (gpointer) bindex); 
- 
+  
   gtk_widget_set_usize (GTK_WIDGET (bmbl), balsa_app.mblist_width, -1);
   gtk_container_add (GTK_CONTAINER (smenuitem), bmbl);
   gtk_menu_append (GTK_MENU (submenu), smenuitem);
@@ -526,7 +529,7 @@ create_menu (BalsaIndex * bindex)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), submenu);
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
-
+    
   return menu;
 }
 
@@ -667,16 +670,6 @@ index_child_drag_data_get (GtkWidget *widget, GdkDragContext *context,
   
 }
 #endif /*DND_USED*/
-
-/* New Stuff */
-
-static void
-send_new_message (GtkWidget * widget)
-{
-  g_return_if_fail (widget != NULL);
-  sendmsg_window_new (widget, NULL, SEND_NORMAL);
-}
-
 
 void
 balsa_message_reply (GtkWidget * widget, gpointer index)

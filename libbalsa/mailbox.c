@@ -811,6 +811,9 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
     GtkTreePath *path;
     gboolean unlock;
 
+    if (!mailbox->msg_tree)
+	return;
+
     unlock = lbm_threads_enter();
 
     iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
@@ -833,6 +836,9 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
     GtkTreePath *path;
     gboolean unlock;
     guint *added;
+
+    if (!mailbox->msg_tree)
+	return;
 
     unlock = lbm_threads_enter();
 
@@ -860,6 +866,9 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     GtkTreeIter iter;
     GtkTreePath *path;
     gboolean unlock;
+
+    if (!mailbox->msg_tree)
+	return;
 
     unlock = lbm_threads_enter();
 
@@ -898,6 +907,9 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gboolean unlock;
     GNode *child;
     GNode *parent;
+
+    if (!mailbox->msg_tree)
+	return;
 
     unlock = lbm_threads_enter();
 
@@ -969,6 +981,9 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     GtkTreePath *path;
     gboolean unlock;
     GNode *child, *parent, *node;
+
+    if (!mailbox->msg_tree)
+	return;
 
     unlock = lbm_threads_enter();
 

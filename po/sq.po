@@ -86,9 +86,10 @@ msgstr ""
 msgid "_Last Name:"
 msgstr "_Mbiemri:"
 
+#. GRUT modified this item
 #: libbalsa/address.c:379
 msgid "_Nickname:"
-msgstr "_Nickname:"
+msgstr "_Pseudonimi:"
 
 #: libbalsa/address.c:380
 msgid "O_rganization:"
@@ -1372,9 +1373,10 @@ msgid ""
 "%s"
 msgstr ""
 
+#. GRUT modified this item
 #: src/address-book-config.c:147
 msgid "Add Address Book"
-msgstr ""
+msgstr "Shto Rubrikë"
 
 #: src/address-book-config.c:155
 msgid "Modify Address Book"
@@ -2052,11 +2054,12 @@ msgid "A_dd"
 msgstr "Sh_to"
 
 #. GRUT modified this item
+#. GRUT modified this item
 #. Left/Remove button
 #: src/filter-edit-callbacks.c:876 src/filter-edit-dialog.c:310
 #: src/filter-run-dialog.c:318
 msgid "_Remove"
-msgstr "_Hiqe"
+msgstr "_Hiq"
 
 #: src/filter-edit-callbacks.c:880
 msgid "One _Matches/None Matches"
@@ -2368,9 +2371,10 @@ msgstr "_Krijo"
 msgid "_Basic"
 msgstr ""
 
+#. GRUT modified this item
 #: src/folder-conf.c:267 src/mailbox-conf.c:1020 src/mailbox-conf.c:1124
 msgid "_Advanced"
-msgstr ""
+msgstr "_Mjeshtër"
 
 #. INPUT FIELD CREATION
 #: src/folder-conf.c:270
@@ -2730,9 +2734,10 @@ msgid "_Open"
 msgstr "_Hap"
 
 #. GRUT modified this item
+#. GRUT modified this item
 #: src/mailbox-node.c:958 src/main-window.c:707
 msgid "_Close"
-msgstr "_Mbylle"
+msgstr "_Mbyll"
 
 #. GRUT modified this item
 #: src/mailbox-node.c:964
@@ -5047,9 +5052,10 @@ msgid "Empty Trash"
 msgstr "Zbraz Koshin"
 
 #. GRUT modified this item
+#. GRUT modified this item
 #: src/toolbar-factory.c:142
 msgid "Close"
-msgstr "Mbylle"
+msgstr "Mbyll"
 
 #: src/toolbar-factory.c:143
 msgid "Close current mailbox"

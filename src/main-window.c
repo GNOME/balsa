@@ -1093,8 +1093,10 @@ mail_progress_notify_cb( )
 	      }
 	    break;
 	  case MSGMAILTHREAD_UPDATECONFIG:
-	    config_mailbox_update( threadmessage->mailbox, 
-		      MAILBOX_POP3(threadmessage->mailbox)->mailbox.name ); 
+	      config_mailbox_update( 
+		  threadmessage->mailbox, 
+		  mailbox_get_pkey(
+		      MAILBOX_POP3(threadmessage->mailbox)->mailbox) ); 
 	    break;
 	  case MSGMAILTHREAD_LOAD:
 	    LOCK_MAILBOX(threadmessage->mailbox);

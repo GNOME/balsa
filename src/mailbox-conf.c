@@ -148,7 +148,7 @@ void
 mailbox_conf_delete (Mailbox * mailbox)
 {
   GNode *gnode;
-  gchar *msg;
+  gchar *msg, *msg1;
   gint clicked_button;
   GtkWidget *ask;
 
@@ -156,20 +156,21 @@ mailbox_conf_delete (Mailbox * mailbox)
       || mailbox->type == MAILBOX_MAILDIR
       || mailbox->type == MAILBOX_MBOX)
     {
-      msg = _("This will remove the mailbox and it's files permanently from your system.\n"
+      msg = _("This will remove the mailbox %s and it's files permanently from your system.\n"
 	       "Are you sure you want to remove this mailbox?");
     }
   else
     {
-      msg = _("This will remove the mailbox from the list of mailboxes\n"
+      msg = _("This will remove the mailbox %s from the list of mailboxes\n"
 	  "You may use \"Add Mailbox\" later to access this mailbox again\n"
 	       "Are you sure you want to remove this mailbox?");
     }
 
-
-  ask = gnome_message_box_new (msg,
+  msg1 = g_strdup_printf(msg, mailbox->name);
+  ask = gnome_message_box_new (msg1,
 			       GNOME_MESSAGE_BOX_QUESTION,
 		       GNOME_STOCK_BUTTON_YES, GNOME_STOCK_BUTTON_NO, NULL);
+  g_free(msg1);
 
   gnome_dialog_set_default (GNOME_DIALOG (ask), 1);
   gtk_window_set_modal (GTK_WINDOW (ask), TRUE);
@@ -198,7 +199,7 @@ mailbox_conf_delete (Mailbox * mailbox)
 	}
     }
   /* Delete it from the config file and internal nodes */
-  config_mailbox_delete (mailbox->name);
+  config_mailbox_delete (mailbox);
 
   /* Close the mailbox, in case it was open */
   if (mailbox->type != MAILBOX_POP3)
@@ -507,7 +508,7 @@ check_for_blank_fields(Mailbox *mailbox)
 }
 
 static int
-conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
+conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_pkey)
 {
   int field_check;
 
@@ -536,7 +537,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
 	    GTK_ENTRY (mcw->local_mailbox_name)));
 	MAILBOX_LOCAL (mailbox)->path = g_strdup (filename);
 
-	config_mailbox_update (mailbox, old_mbox_name);
+	config_mailbox_update (mailbox, old_mbox_pkey);
       }
       break;
 
@@ -561,7 +562,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_POP3 (mailbox)->check = GTK_TOGGLE_BUTTON (mcw->pop_check)->active;
       MAILBOX_POP3 (mailbox)->delete_from_server = GTK_TOGGLE_BUTTON (mcw->pop_delete_from_server)->active;
 
-      config_mailbox_update (mailbox, old_mbox_name);
+      config_mailbox_update (mailbox, old_mbox_pkey);
       break;
 
     case MAILBOX_IMAP:
@@ -621,7 +622,7 @@ conf_update_mailbox (Mailbox * mailbox, gchar * old_mbox_name)
       MAILBOX_IMAP (mailbox)->server->port = strtol (
 	  gtk_entry_get_text (GTK_ENTRY (mcw->imap_port)), (char **) NULL, 10);
 
-      config_mailbox_update (mailbox, old_mbox_name);
+      config_mailbox_update (mailbox, old_mbox_pkey);
       break;
 
     case MAILBOX_UNKNOWN:
@@ -772,9 +773,9 @@ mailbox_conf_close (GtkWidget * widget, gboolean save)
 
   if (mailbox && save)		/* we are updating the mailbox */
     {
-      gchar *old_mbox_name = g_strdup (mailbox->name);
-      return_value = conf_update_mailbox (mcw->mailbox, old_mbox_name);
-      g_free (old_mbox_name);
+      gchar *old_mbox_pkey = g_strdup ( mailbox_get_pkey(mailbox) );
+      return_value = conf_update_mailbox (mcw->mailbox, old_mbox_pkey);
+      g_free (old_mbox_pkey);
 
       if (mailbox->type == MAILBOX_POP3 &&
 	  return_value != -1)                /* redraw the pop3 server list */

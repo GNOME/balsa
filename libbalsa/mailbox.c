@@ -286,7 +286,8 @@ check_all_pop3_hosts (Mailbox *to, GList *mailboxes)
 	/*  MAILBOX_POP3(mailbox)->mailbox.name */
         write( mail_thread_pipes[1], (void *) &threadmsg, sizeof(void *) );
 #else
-	config_mailbox_update( mailbox, MAILBOX_POP3(mailbox)->mailbox.name);
+	config_mailbox_update( 
+	    mailbox, mailbox_get_pkey(mailbox) );
 #endif
       }
     }

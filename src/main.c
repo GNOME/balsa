@@ -160,22 +160,9 @@ static void
 mailboxes_init (void)
 {
   /* initalize our mailbox access crap */
-  if (do_load_mailboxes () == FALSE)
+  if ( !do_load_mailboxes () )
     {
       fprintf (stderr, "*** error loading mailboxes\n");
-      balsa_init_begin ();
-      return;
-    }
-
-  /* At this point, if inbox/outbox/trash are still null, then we
-     were not able to locate the settings for them anywhere in our
-     configuartion and should run balsa-init. */
-  if (balsa_app.inbox == NULL || balsa_app.outbox == NULL ||
-      balsa_app.sentbox == NULL || balsa_app.trash == NULL ||
-      balsa_app.draftbox == NULL)
-    {
-      fprintf (stderr, 
-               "*** One of inbox/outbox/sentbox/draftbox/trash is NULL\n");
       balsa_init_begin ();
       return;
     }

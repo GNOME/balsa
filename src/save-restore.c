@@ -41,7 +41,9 @@
 static proplist_t pl_dict_add_str_str (proplist_t dict_arg, gchar * string1,
 				       gchar * string2);
 static gchar *pl_dict_get_str (proplist_t dict, gchar * str);
-static proplist_t config_mailbox_get_by_name (gchar * name);
+static const gchar* config_get_pkey(proplist_t mbox);
+static proplist_t config_mailbox_get_by_name (const gchar * name);
+static proplist_t config_mailbox_get_by_pkey (const gchar * pkey);
 static proplist_t config_mailbox_get_key (proplist_t mailbox);
 static gint config_mailbox_init (proplist_t mbox, gchar * key);
 static gint config_mailbox_get_highest_number (proplist_t accounts);
@@ -333,14 +335,15 @@ config_mailbox_add (Mailbox * mailbox, char *key_arg)
   return config_save (BALSA_CONFIG_FILE);
 }				/* config_mailbox_add */
 
-/* Remove the specified mailbox from the list of accounts.  Note that
-   the mailbox is referenced by its 'Name' field here, so you had
-   better make sure those stay unique.  Returns TRUE if the mailbox
-   was succesfully deleted and FALSE otherwise. */
+/* Remove the specified mailbox from the list of accounts: check
+   mailbox_get_pkey and config_get_pkey functions to understand how
+   mailboxes are distinguished. Returns TRUE if the mailbox was
+   succesfully deleted and FALSE otherwise. */
 gint
-config_mailbox_delete (gchar * name)
+config_mailbox_delete (const Mailbox * mailbox)
 {
   proplist_t accounts, mbox, mbox_key, temp_str;
+  const gchar * pkey;
 
   if (balsa_app.proplist == NULL)
     {
@@ -356,7 +359,8 @@ config_mailbox_delete (gchar * name)
     return FALSE;
 
   /* Grab the specified mailbox */
-  mbox = config_mailbox_get_by_name (name);
+  pkey = mailbox_get_pkey(mailbox);
+  mbox = config_mailbox_get_by_pkey (pkey);
   if (mbox == NULL)
     return FALSE;
 
@@ -373,13 +377,13 @@ config_mailbox_delete (gchar * name)
 
 /* Update the configuration information for the specified mailbox. */
 gint
-config_mailbox_update (Mailbox * mailbox, gchar * old_mbox_name)
+config_mailbox_update (Mailbox * mailbox, const gchar * old_pkey)
 {
   proplist_t mbox, mbox_key;
   gchar key[MAX_PROPLIST_KEY_LEN];
 
 
-  mbox = config_mailbox_get_by_name (old_mbox_name);
+  mbox = config_mailbox_get_by_pkey (old_pkey);
   mbox_key = config_mailbox_get_key (mbox);
 
   if (mbox_key == NULL)
@@ -391,9 +395,8 @@ config_mailbox_update (Mailbox * mailbox, gchar * old_mbox_name)
       strcpy (key, PLGetString (mbox_key));
     }
 
-  config_mailbox_delete (old_mbox_name);
+  config_mailbox_delete (mailbox);
   config_mailbox_add (mailbox, key);
-
 
   return config_save (BALSA_CONFIG_FILE);
 }				/* config_mailbox_update */
@@ -1255,11 +1258,95 @@ pl_dict_get_str (proplist_t dict, gchar * str)
   return PLGetString (elem);
 }				/* pl_dict_get_str */
 
+/* mailbox_get_pkey:
+   returns a string - primary key (pkey) identifing the mailbox.
+   note that the mailbox name does not fulfill pkey conditions.
+   FIXME: the present implementation leaves room for improvement.
+*/
+const gchar*
+mailbox_get_pkey(const Mailbox * mailbox)
+{
+    gchar *pkey;
+
+    g_assert(mailbox != NULL);
+
+    switch(mailbox->type) {
+    case MAILBOX_POP3:
+	pkey = MAILBOX_POP3 (mailbox)->server->name; break;
+    case MAILBOX_MBOX:
+    case MAILBOX_MAILDIR:
+    case MAILBOX_MH:
+	pkey = MAILBOX_LOCAL (mailbox)->path; break;
+    case MAILBOX_IMAP:
+	pkey = MAILBOX_IMAP (mailbox)->path; break;
+    default: /* MAILBOX_UNKNOWN */
+	pkey = mailbox->name;
+    }
+    return pkey;
+}
+
+static const gchar*
+config_get_pkey(proplist_t mbox)
+{
+    gchar *type;
+
+    type = pl_dict_get_str (mbox, "Type");
+    
+    if (strcasecmp (type, "local") == 0)	/* Local mailbox */
+	return pl_dict_get_str(mbox, "Path");
+    else if(strcasecmp(type,"POP3") == 0)
+	return pl_dict_get_str(mbox, "Server");
+    else if(g_strcasecmp(type,"IMAP") == 0)
+	return pl_dict_get_str(mbox, "Path");
+    else return NULL;
+}
+
+static proplist_t
+config_mailbox_get_by_pkey (const gchar * pkey)
+{
+  proplist_t temp_str, accounts, mbox, mbox_key;
+  int num_elements, i;
+  const gchar * key;
+
+  g_assert (balsa_app.proplist != NULL);
+
+  /* Grab the list of accounts */
+  temp_str = PLMakeString ("Accounts");
+  accounts = PLGetDictionaryEntry (balsa_app.proplist, temp_str);
+  PLRelease (temp_str);
+
+  if (accounts == NULL)
+    return NULL;
+
+  /* Walk the list of all mailboxes until one with a matching "Name" field
+     is found. */
+  num_elements = PLGetNumberOfElements (accounts);
+  for (i = 0; i < num_elements; i++)
+    {
+      mbox_key = PLGetArrayElement (accounts, i);
+      if (mbox_key == NULL)
+	continue;
+
+      mbox = PLGetDictionaryEntry (accounts, mbox_key);
+      if (mbox == NULL)
+	continue;
+
+      key = config_get_pkey(mbox);
+
+      if (key && strcmp (key, pkey) == 0)
+	  return mbox;
+    }
+
+  return NULL;
+}				/* config_mailbox_get_by_pkey */
+
+#if 0
+/* section disabled on 2000.05.05 */
 /* Grab the mailbox whose 'Name' field's string value matches 'name'.
    Returns a handle to the proplist_t for the mailbox if it exists and
    NULL otherwise. */
 static proplist_t
-config_mailbox_get_by_name (gchar * name)
+config_mailbox_get_by_name (const gchar * name)
 {
   proplist_t temp_str, accounts, mbox, name_prop, mbox_key;
   int num_elements, i;
@@ -1303,6 +1390,7 @@ config_mailbox_get_by_name (gchar * name)
 
   return NULL;
 }				/* config_mailbox_get_by_name */
+#endif
 
 static proplist_t
 config_mailbox_get_key (proplist_t mailbox)

@@ -179,16 +179,10 @@ balsa_app_init (void)
 gint
 do_load_mailboxes (void)
 {
-	if( check_special_mailboxes () )
-		return FALSE;
+  if( check_special_mailboxes () )
+	return FALSE;
 
-  /* load_local_mailboxes does not work well without trash */
-  if (!balsa_app.trash) 
-    return FALSE;
   load_local_mailboxes ();
-
-  if (!balsa_app.inbox)
-    return FALSE;
 
   switch (balsa_app.inbox->type)
     {
@@ -206,7 +200,7 @@ do_load_mailboxes (void)
     case MAILBOX_POP3:
       break;
     default:
-      fprintf (stderr, "do_load_mailboxes: Unknown mailbox type\n");
+      fprintf (stderr, "do_load_mailboxes: Unknown inbox mailbox type\n");
       break;
     }
 

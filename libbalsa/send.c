@@ -800,8 +800,14 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
                 libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
             const gchar **fccurl = fcclist ? fcclist->data : NULL;
 
+	    messages = g_list_prepend(NULL, mqi->orig);
 	    if (mqi->orig->mailbox && fccurl) {
                 LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
+                libbalsa_messages_change_flag
+                    (messages, LIBBALSA_MESSAGE_FLAG_NEW, FALSE);
+                libbalsa_messages_change_flag
+                    (messages, LIBBALSA_MESSAGE_FLAG_FLAGGED, FALSE);
+		libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
                 remove = libbalsa_mailbox_copy_message(mqi->orig, fccbox)>=0;
                 if(!remove) 
                     libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
@@ -811,7 +817,6 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
             /* If copy failed, mark the message again as flagged -
                otherwise it will get resent again. And again, and
                again... */
-            messages = g_list_prepend(NULL, mqi->orig);
             libbalsa_messages_change_flag
                 (messages, 
                  remove ? LIBBALSA_MESSAGE_FLAG_DELETED : 
@@ -1064,11 +1069,15 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
     if (mqi->orig->mailbox) {
         gboolean remove = TRUE;
 	GList * messages = g_list_prepend(NULL, mqi->orig);
-        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                  FALSE);
         GList* fcclist =
             libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
         const gchar **fccurl = fcclist ? fcclist->data : NULL;
+
+        libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                  FALSE);
+	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
+		                      FALSE);
+	libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
 
         if (mqi->orig->mailbox && fccurl) {
             LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
@@ -1777,8 +1786,17 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
 {
     mqi->orig = message;
     g_object_ref(mqi->orig);
-    mqi->stream = libbalsa_mailbox_get_message_stream(message->mailbox,
-						      message);
+    if (message->mime_msg) {
+        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+                                    "Status");
+        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+                                    "X-Status");
+	mqi->stream = g_mime_stream_mem_new();
+	g_mime_message_write_to_stream(message->mime_msg, mqi->stream);
+	g_mime_stream_reset(mqi->stream);
+    } else
+	mqi->stream = libbalsa_mailbox_get_message_stream(message->mailbox,
+                                                          message);
     if (mqi->stream == NULL)
 	return LIBBALSA_MESSAGE_CREATE_ERROR;
   

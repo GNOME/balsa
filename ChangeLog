@@ -1,3 +1,10 @@
+2003-10-02  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter.c: support for setting message flags by filters.
+	* libbalsa/filter-funcs.c: add no-op there
+	* libbalsa/filter.h: add FILTER_CHFLAG action type.
+	* libbalsa/message.h: add {UN,}SET_FLAGS helper macros.
+
 2003-10-31  Pawel Salek  <pawsa theochem.kth.se>
 
 	* libbalsa/server.c: make sure LibBalsaServer::host field is set.

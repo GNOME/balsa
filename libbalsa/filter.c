@@ -575,6 +575,8 @@ libbalsa_filter_apply(GSList * filter_list)
     LibBalsaFilter * filt=NULL;
     gboolean result=FALSE;
     LibBalsaMailbox *mbox;
+    gchar * p;
+    guint set_mask, unset_mask;
 
     g_return_val_if_fail(url_to_mailbox_mapper, FALSE);
     if (!filter_list) return FALSE;
@@ -623,6 +625,20 @@ libbalsa_filter_apply(GSList * filter_list)
         case FILTER_RUN:
             /* FIXME : to be implemented */
             break;
+	case FILTER_CHFLAG:
+	    p = filt->action_string;
+	    set_mask = g_ascii_strtoull (filt->action_string, &p, 10);
+	    if (*p++ != '*') {
+		g_warning("Malformed message flags mask");
+		unset_mask = 0;
+	    }
+	    else unset_mask =  g_ascii_strtoull(p, &p, 10);
+	    for (lst_messages = filt->matching_messages; lst_messages; 
+		 lst_messages++) {
+		LIBBALSA_MESSAGE_SET_FLAGS(lst_messages->data, set_mask);
+		LIBBALSA_MESSAGE_UNSET_FLAGS(lst_messages->data, unset_mask);
+	    }
+	    break;
         case FILTER_NOTHING:
             /* Nothing to do */
             break;

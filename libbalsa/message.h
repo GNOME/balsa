@@ -197,6 +197,11 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_IS_FLAGGED(message) \
     LIBBALSA_MESSAGE_HAS_FLAG(message, LIBBALSA_MESSAGE_FLAG_FLAGGED)
 
+#define LIBBALSA_MESSAGE_SET_FLAGS(message, mask) \
+    LIBBALSA_MESSAGE(message)->flags |= mask
+#define LIBBALSA_MESSAGE_UNSET_FLAGS(message, mask) \
+    LIBBALSA_MESSAGE(message)->flags &= ~mask
+
 struct _LibBalsaMessageClass {
     GObjectClass parent_class;
 

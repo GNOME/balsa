@@ -89,12 +89,13 @@ typedef struct _LibBalsaCondition {
  */
 
 typedef enum {
-    FILTER_NOTHING,
-    FILTER_COPY,
-    FILTER_MOVE,
-    FILTER_PRINT,
-    FILTER_RUN,
-    FILTER_TRASH              /* Must be the last one */
+    FILTER_NOTHING,          /* Do nothing */
+    FILTER_COPY,             /* Copy the matching message */
+    FILTER_MOVE,             /* Move the matching message */
+    FILTER_PRINT,            /* Print the matching message */
+    FILTER_RUN,              /* Not used for now */
+    FILTER_CHFLAG,           /* Alter flags of the matching message */
+    FILTER_TRASH             /* Must be the last one */
 } FilterActionType;
 
 typedef enum {
@@ -151,6 +152,8 @@ typedef struct _LibBalsaFilter {
      *   for different parts, attachments and so on?)
      * - if action is FILTER_TRASH it's NULL
      * - FIXME if action is FILTER_PRINT it could be the print command ?
+     * - For FILTER_CHFLAG : mask fo the flags to be set "*" mask of
+     * those to be unset; example : "1 * 4"
      */
     gchar * action_string;
 

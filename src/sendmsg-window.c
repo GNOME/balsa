@@ -66,10 +66,12 @@ static GnomeUIInfo main_toolbar[] =
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Attach"), N_ ("Add attachments to this message"), attach_clicked, GNOME_STOCK_PIXMAP_ATTACH),
   GNOMEUIINFO_SEPARATOR,
+#ifdef BALSA_SHOW_INFO
   GNOMEUIINFO_ITEM_STOCK (N_ ("Spelling"), N_ ("Check Spelling"), NULL, GNOME_STOCK_PIXMAP_SPELLCHECK),
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_ITEM_STOCK (N_ ("Print"), N_ ("Print"), NULL, GNOME_STOCK_PIXMAP_PRINT),
   GNOMEUIINFO_SEPARATOR,
+#endif
   GNOMEUIINFO_ITEM_STOCK (N_ ("Cancel"), N_ ("Cancel"), close_window, GNOME_STOCK_PIXMAP_CLOSE),
   GNOMEUIINFO_END
 };

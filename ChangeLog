@@ -1,3 +1,8 @@
+2000-05-20  Peter Williams  <peter@beta.newton.cx>
+
+	* libinit_balsa/Makefile.am (gob rule): Put %.h in the
+	gob mathcing rule for include dependencies.
+
 2000-05-17  Pawel Salek <pawsa@theochem.kth.se>
 
 	Infamous safe_free bug fix.	

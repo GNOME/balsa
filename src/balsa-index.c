@@ -1697,6 +1697,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     g_signal_handler_block(selection, index->selection_changed_id);
     libbalsa_mailbox_set_threading(mailbox, thtype);
+    balsa_index_update_tree(index, balsa_app.expand_tree);
     g_signal_handler_unblock(selection, index->selection_changed_id);
 }
 

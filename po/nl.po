@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.nl\n"
-"POT-Creation-Date: 2003-05-28 03:45+0200\n"
-"PO-Revision-Date: 2003-05-28 10:45+0100\n"
+"POT-Creation-Date: 2003-05-30 03:49+0200\n"
+"PO-Revision-Date: 2003-05-30 11:31+0100\n"
 "Last-Translator: Vincent van Adrighem <V.vanAdrighem@dirck.mine.nu>\n"
 "Language-Team: Dutch <vertaling@nl.linux.org>\n"
 "MIME-Version: 1.0\n"
@@ -106,29 +106,29 @@ msgstr "Een ongeldig filter wordt geprobeerd"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Ongeldige filters %s voor postbus %s"
 
-#: libbalsa/filter.c:201 libbalsa/filter.c:277
+#: libbalsa/filter.c:202 libbalsa/filter.c:279
 msgid "Unable to load message body to match filter"
 msgstr "Kan berichtinhoud niet laden om te filteren"
 
-#: libbalsa/filter.c:477
+#: libbalsa/filter.c:479
 #, c-format
 msgid "Invalid filter: %s"
 msgstr "Ongeldig filter: %s"
 
-#: libbalsa/filter.c:591 libbalsa/filter.c:610
+#: libbalsa/filter.c:593 libbalsa/filter.c:612
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "Verkeerde postbusnaam voor filter: %s"
 
-#: libbalsa/filter.c:595
+#: libbalsa/filter.c:597
 msgid "Error when copying messages"
 msgstr "Fout bij kopiëren van berichten"
 
-#: libbalsa/filter.c:603
+#: libbalsa/filter.c:605
 msgid "Error when trashing messages"
 msgstr "Fout bij verwijderen van berichten"
 
-#: libbalsa/filter.c:614
+#: libbalsa/filter.c:616
 msgid "Error when moving messages"
 msgstr "Fout bij verplaatsen van berichten"
 
@@ -906,7 +906,7 @@ msgstr ""
 "Niet in staat Verzonden items te openen - kan geen informatie krijgen van "
 "IMAP server"
 
-#: libbalsa/send.c:794
+#: libbalsa/send.c:797
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -917,7 +917,7 @@ msgstr ""
 "%d: %s\n"
 "Het bericht staat nog in de wachtrij.\n"
 
-#: libbalsa/send.c:836
+#: libbalsa/send.c:839
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -928,7 +928,7 @@ msgstr ""
 "%d: %s\n"
 "Uw bericht is in de wachtrij achtergebleven.\n"
 
-#: libbalsa/send.c:846
+#: libbalsa/send.c:849
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -936,33 +936,33 @@ msgstr ""
 "Fout tijdens versturen bericht, bericht wordt in de wachtrij geplaatst.\n"
 "Systeem zal bericht opnieuw proberen te versturen totdat u het verwijdert."
 
-#: libbalsa/send.c:876
+#: libbalsa/send.c:879
 msgid "Connected to MTA"
 msgstr "Verbinden met MTA"
 
-#: libbalsa/send.c:883 src/balsa-message.c:1191 src/print.c:356
-#: src/sendmsg-window.c:780 src/sendmsg-window.c:2219 src/store-address.c:322
+#: libbalsa/send.c:886 src/balsa-message.c:1196 src/print.c:356
+#: src/sendmsg-window.c:777 src/sendmsg-window.c:2219 src/store-address.c:322
 msgid "From:"
 msgstr "Van:"
 
-#: libbalsa/send.c:886 src/balsa-index.c:360
+#: libbalsa/send.c:889 src/balsa-index.c:360
 msgid "From"
 msgstr "Van"
 
-#: libbalsa/send.c:894 src/balsa-message.c:1200 src/print.c:366
-#: src/sendmsg-window.c:779 src/sendmsg-window.c:2225 src/store-address.c:323
+#: libbalsa/send.c:897 src/balsa-message.c:1205 src/print.c:366
+#: src/sendmsg-window.c:776 src/sendmsg-window.c:2225 src/store-address.c:323
 msgid "To:"
 msgstr "Aan:"
 
-#: libbalsa/send.c:897 src/balsa-index.c:845
+#: libbalsa/send.c:900 src/balsa-index.c:845
 msgid "To"
 msgstr "Aan"
 
-#: libbalsa/send.c:933
+#: libbalsa/send.c:936
 msgid "Disconnected"
 msgstr "Verbinding verbroken"
 
-#: libbalsa/send.c:1126
+#: libbalsa/send.c:1129
 msgid ""
 "SMTP server refused connection.\n"
 "Balsa by default uses submission service (587).\n"
@@ -976,7 +976,7 @@ msgstr ""
 "dan expliciet aan via: \"host:smtp\".\n"
 "Het bericht wordt in de Wachtrij gelaten."
 
-#: libbalsa/send.c:1136
+#: libbalsa/send.c:1139
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -985,7 +985,7 @@ msgstr ""
 "SMTP serverprobleem (%d): %s\n"
 "Uw bericht is in de wachtrij achtergebleven."
 
-#: libbalsa/send.c:1547 libbalsa/send.c:1766
+#: libbalsa/send.c:1551 libbalsa/send.c:1770
 msgid "This message will not be encrpyted for the BCC: recipient(s)."
 msgstr "Dit bericht zal niet gecodeerd worden voor de BCC:-ontvanger(s)."
 
@@ -1463,7 +1463,7 @@ msgstr "Uitschrijven van %s..."
 msgid "Unable to fetch headers from this IMAP server version."
 msgstr "Niet in staat kopregels op te vragen van deze IMAP server versie."
 
-#: libmutt/imap/message.c:89 src/balsa-message.c:2716
+#: libmutt/imap/message.c:89 src/balsa-message.c:2724
 #, c-format
 msgid "Could not create temporary file %s"
 msgstr "Kan geen tijdelijk bestand %s aanmaken"
@@ -2217,12 +2217,17 @@ msgstr "%s MIME-deel opslaan"
 msgid "Save selected..."
 msgstr "Geselecteerde opslaan..."
 
-#: src/balsa-message.c:816 src/balsa-message.c:2026
+#: src/balsa-message.c:798 src/balsa-message.c:942 src/balsa-message.c:1995
+#: src/balsa-message.c:2041
+msgid "(No sender)"
+msgstr "(Geen afzender)"
+
+#: src/balsa-message.c:818 src/balsa-message.c:2033
 msgid "detected a good signature"
 msgstr "correcte handtekening gevonden"
 
-#: src/balsa-message.c:823 src/balsa-message.c:832 src/balsa-message.c:2042
-#: src/balsa-message.c:2051
+#: src/balsa-message.c:825 src/balsa-message.c:834 src/balsa-message.c:2050
+#: src/balsa-message.c:2059
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2233,7 +2238,7 @@ msgstr ""
 "gaf:\n"
 "%s"
 
-#: src/balsa-message.c:839
+#: src/balsa-message.c:841
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2242,7 +2247,7 @@ msgstr ""
 "Controle van handtekening van bericht gestuurd door %s met onderwerp \"%s\" "
 "gaf een fout!"
 
-#: src/balsa-message.c:844
+#: src/balsa-message.c:846
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a \"multipart/signed\" "
@@ -2253,7 +2258,7 @@ msgstr ""
 "berichtdeel, maar de structuur is ongeldig. De ondertekening, als deze er al "
 "is, kan niet gecontroleerd worden."
 
-#: src/balsa-message.c:944
+#: src/balsa-message.c:949
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a \"multipart/encrypted"
@@ -2263,129 +2268,129 @@ msgstr ""
 "\"multipart/encrypted\" gecodeerd berichtdeel. De structuur is echter "
 "ongeldig."
 
-#: src/balsa-message.c:1182 src/print.c:338 src/sendmsg-window.c:785
+#: src/balsa-message.c:1187 src/print.c:338 src/sendmsg-window.c:782
 #: src/sendmsg-window.c:2214
 msgid "Subject:"
 msgstr "Onderwerp:"
 
-#: src/balsa-message.c:1186 src/print.c:345 src/sendmsg-window.c:2208
+#: src/balsa-message.c:1191 src/print.c:345 src/sendmsg-window.c:2208
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:1197 src/sendmsg-window.c:781
+#: src/balsa-message.c:1202 src/sendmsg-window.c:778
 msgid "Reply-To:"
 msgstr "Antwoord naar:"
 
 #. cc:
-#: src/balsa-message.c:1201 src/print.c:367 src/sendmsg-window.c:783
-#: src/sendmsg-window.c:1938 src/sendmsg-window.c:2231 src/store-address.c:324
+#: src/balsa-message.c:1206 src/print.c:367 src/sendmsg-window.c:780
+#: src/sendmsg-window.c:1935 src/sendmsg-window.c:2231 src/store-address.c:324
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: src/balsa-message.c:1202 src/print.c:368 src/sendmsg-window.c:782
-#: src/sendmsg-window.c:1943 src/store-address.c:325
+#: src/balsa-message.c:1207 src/print.c:368 src/sendmsg-window.c:779
+#: src/sendmsg-window.c:1940 src/store-address.c:325
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: src/balsa-message.c:1205 src/print.c:369
+#: src/balsa-message.c:1210 src/print.c:369
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: src/balsa-message.c:1210 src/print.c:375
+#: src/balsa-message.c:1215 src/print.c:375
 msgid "Disposition-Notification-To:"
 msgstr "Disposition-Notification-To:"
 
-#: src/balsa-message.c:1359 src/balsa-message.c:1375 src/balsa-message.c:1405
-#: src/balsa-message.c:1458
+#: src/balsa-message.c:1364 src/balsa-message.c:1380 src/balsa-message.c:1410
+#: src/balsa-message.c:1463
 msgid "Content Type: external-body\n"
 msgstr "Type inhoud: externe-inhoud\n"
 
-#: src/balsa-message.c:1360
+#: src/balsa-message.c:1365
 msgid "Access type: local-file\n"
 msgstr "Toegangstype: lokaal-bestand\n"
 
-#: src/balsa-message.c:1361 src/balsa-message.c:1412 src/balsa-message.c:1545
+#: src/balsa-message.c:1366 src/balsa-message.c:1417 src/balsa-message.c:1550
 #, c-format
 msgid "File name: %s"
 msgstr "Bestands naam: %s"
 
-#: src/balsa-message.c:1376
+#: src/balsa-message.c:1381
 msgid "Access type: URL\n"
 msgstr "Toegangstype: URL\n"
 
-#: src/balsa-message.c:1377
+#: src/balsa-message.c:1382
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: src/balsa-message.c:1406
+#: src/balsa-message.c:1411
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Toegangstype: %s\n"
 
-#: src/balsa-message.c:1409
+#: src/balsa-message.c:1414
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "FTP site: %s\n"
 
-#: src/balsa-message.c:1411
+#: src/balsa-message.c:1416
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Map: %s\n"
 
-#: src/balsa-message.c:1459
+#: src/balsa-message.c:1464
 msgid "Access type: mail-server\n"
 msgstr "Toegangstype: mail-server\n"
 
-#: src/balsa-message.c:1460
+#: src/balsa-message.c:1465
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Mail Server: %s\n"
 
-#: src/balsa-message.c:1462
+#: src/balsa-message.c:1467
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Onderwerp: %s\n"
 
-#: src/balsa-message.c:1473
+#: src/balsa-message.c:1478
 msgid "Send message to obtain this part"
 msgstr "Stuur bericht om dit deel te verkrijgen"
 
-#: src/balsa-message.c:1553
+#: src/balsa-message.c:1558
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Type: %s (%s)"
 
-#: src/balsa-message.c:1556
+#: src/balsa-message.c:1561
 #, c-format
 msgid "Content Type: %s"
 msgstr "Type inhoud: %s"
 
-#: src/balsa-message.c:1567
+#: src/balsa-message.c:1572
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr "Geen open- of toonactie gedefinieerd in GNOME MIME voor dit type"
 
-#: src/balsa-message.c:1573
+#: src/balsa-message.c:1578
 msgid "Save part"
 msgstr "Bewaar deel"
 
-#: src/balsa-message.c:1597 src/balsa-message.c:1622
+#: src/balsa-message.c:1602 src/balsa-message.c:1627
 #, c-format
 msgid "View part with %s"
 msgstr "Deel weergeven met %s"
 
-#: src/balsa-message.c:1912
+#: src/balsa-message.c:1917
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Lezen URL %s...."
 
-#: src/balsa-message.c:1921 src/balsa-message.c:2635 src/balsa-message.c:3256
+#: src/balsa-message.c:1926 src/balsa-message.c:2643 src/balsa-message.c:3264
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Fout bij weergeven %s: %s\n"
 
-#: src/balsa-message.c:1945
+#: src/balsa-message.c:1950
 #, c-format
 msgid ""
 "Error writing to temporary file %s.\n"
@@ -2394,12 +2399,12 @@ msgstr ""
 "Fout bij gschrijven naar tijdelijk bestand %s.\n"
 "Controleer de rechten van de map."
 
-#: src/balsa-message.c:1953
+#: src/balsa-message.c:1958
 #, c-format
 msgid "Cannot open temporary file %s."
 msgstr "Kan tijdelijk bestand niet openen %s."
 
-#: src/balsa-message.c:1994
+#: src/balsa-message.c:2001
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -2408,42 +2413,42 @@ msgstr ""
 "Het door %s verstuurde bericht met het onderwerp \"%s\" bevat 8-bit tekens, "
 "maar geen header waarin de tekenset beschreven wordt (geconverteerd naar %s)"
 
-#: src/balsa-message.c:2299
+#: src/balsa-message.c:2307
 msgid "mixed parts"
 msgstr "gemengde delen"
 
-#: src/balsa-message.c:2301
+#: src/balsa-message.c:2309
 msgid "alternative parts"
 msgstr "alternatieve delen"
 
-#: src/balsa-message.c:2303
+#: src/balsa-message.c:2311
 msgid "signed parts"
 msgstr "ondertekende delen"
 
-#: src/balsa-message.c:2305
+#: src/balsa-message.c:2313
 msgid "encrypted parts"
 msgstr "versleutelde delen"
 
-#: src/balsa-message.c:2307
+#: src/balsa-message.c:2315
 #, c-format
 msgid "\"%s\" parts"
 msgstr "\"%s\" delen"
 
-#: src/balsa-message.c:2409
+#: src/balsa-message.c:2417
 #, c-format
 msgid "Open with %s"
 msgstr "Openen met %s"
 
-#: src/balsa-message.c:2547
+#: src/balsa-message.c:2555
 msgid "Save..."
 msgstr "Bewaren..."
 
-#: src/balsa-message.c:2761
+#: src/balsa-message.c:2769
 #, c-format
 msgid "could not create temporary file %s"
 msgstr "Kan geen tijdelijk bestand %s aanmaken!"
 
-#: src/balsa-message.c:3524
+#: src/balsa-message.c:3532
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2454,7 +2459,7 @@ msgstr ""
 "Bericht Afleveringsnotificatie (MDN) verzocht naar `%s'.\n"
 "Wilt u deze notificatie versturen?"
 
-#: src/balsa-message.c:3531
+#: src/balsa-message.c:3539
 msgid "Reply to MDN?"
 msgstr "MDN beantwoorden? "
 
@@ -2582,17 +2587,17 @@ msgstr "_alles"
 msgid "C_lear"
 msgstr "_Legen"
 
-#: src/filter-edit-callbacks.c:990 src/main-window.c:2705
+#: src/filter-edit-callbacks.c:990 src/main-window.c:2707
 msgid "_Body"
 msgstr "_Inhoud"
 
 #. To:
-#: src/filter-edit-callbacks.c:997 src/main-window.c:2706
-#: src/sendmsg-window.c:1927
+#: src/filter-edit-callbacks.c:997 src/main-window.c:2708
+#: src/sendmsg-window.c:1924
 msgid "_To:"
 msgstr "_Aan:"
 
-#: src/filter-edit-callbacks.c:1004 src/main-window.c:2707
+#: src/filter-edit-callbacks.c:1004 src/main-window.c:2709
 msgid "_From:"
 msgstr "_Van:"
 
@@ -2600,7 +2605,7 @@ msgstr "_Van:"
 msgid "_Subject"
 msgstr "_Onderwerp"
 
-#: src/filter-edit-callbacks.c:1019 src/main-window.c:2709
+#: src/filter-edit-callbacks.c:1019 src/main-window.c:2711
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -3063,7 +3068,7 @@ msgstr "_Verwijderen uit lijst"
 msgid "Oooop! mailbox not found in balsa_app.mailbox nodes?\n"
 msgstr "Oooop! postbus niet gevonden in balsa_app.mailbox nodes?\n"
 
-#: src/mailbox-conf.c:406 src/sendmsg-window.c:923
+#: src/mailbox-conf.c:406 src/sendmsg-window.c:920
 msgid "Select Identity"
 msgstr "Identiteit"
 
@@ -3720,55 +3725,55 @@ msgstr "Stuur fout: %s"
 msgid "Balsa: New mail"
 msgstr "Balsa: Nieuwe e-mail"
 
-#: src/main-window.c:2253
+#: src/main-window.c:2255
 #, c-format
 msgid "You have received %d new messages."
 msgstr "U heeft %d nieuwe berichten."
 
-#: src/main-window.c:2254
+#: src/main-window.c:2256
 msgid "You have received 1 new message."
 msgstr "U heeft 1 nieuw bericht."
 
-#: src/main-window.c:2665
+#: src/main-window.c:2667
 msgid "Search mailbox"
 msgstr "Postbus doorzoeken"
 
-#: src/main-window.c:2678
+#: src/main-window.c:2680
 msgid "_Reverse search"
 msgstr "_Achterstevoren zoeken"
 
-#: src/main-window.c:2681
+#: src/main-window.c:2683
 msgid "_Search for:"
 msgstr "_Zoek naar:"
 
-#: src/main-window.c:2694
+#: src/main-window.c:2696
 msgid "In:"
 msgstr "In:"
 
-#: src/main-window.c:2708
+#: src/main-window.c:2710
 msgid "S_ubject"
 msgstr "_Onderwerp"
 
-#: src/main-window.c:2823
+#: src/main-window.c:2825
 msgid "You can apply filters only on mailbox\n"
 msgstr "U kunt alleen filters toepassen op postbussen\n"
 
-#: src/main-window.c:2867 src/main-window.c:2886
+#: src/main-window.c:2869 src/main-window.c:2888
 #, c-format
 msgid "Commiting mailbox %s failed."
 msgstr "Vastleggen van postbus %s mislukt."
 
-#: src/main-window.c:3079
+#: src/main-window.c:3081
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (alleen lezen)."
 
-#: src/main-window.c:3081
+#: src/main-window.c:3083
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: src/main-window.c:3179
+#: src/main-window.c:3181
 msgid "Cannot access the message's body\n"
 msgstr "Kan berichttekst niet benaderen\n"
 
@@ -4938,11 +4943,11 @@ msgstr ""
 "Bericht opslaan in de map concepten?"
 
 #. Comments:
-#: src/sendmsg-window.c:784 src/sendmsg-window.c:2031
+#: src/sendmsg-window.c:781 src/sendmsg-window.c:2028
 msgid "Comments:"
 msgstr "Commentaar:"
 
-#: src/sendmsg-window.c:1230
+#: src/sendmsg-window.c:1227
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4957,43 +4962,43 @@ msgstr ""
 "\n"
 "Weet u zeker dat u het bestand toe wilt voegen als verwijzing?"
 
-#: src/sendmsg-window.c:1241
+#: src/sendmsg-window.c:1238
 msgid "Attach as Reference?"
 msgstr "Toevoegen als verwijzing?"
 
-#: src/sendmsg-window.c:1332
+#: src/sendmsg-window.c:1329
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: src/sendmsg-window.c:1343
+#: src/sendmsg-window.c:1340
 msgid "attach as reference"
 msgstr "toevoegen als verwijzing"
 
-#: src/sendmsg-window.c:1349
+#: src/sendmsg-window.c:1346
 msgid "attach as file"
 msgstr "toevoegen als bestand"
 
-#: src/sendmsg-window.c:1497
+#: src/sendmsg-window.c:1494
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Info over bestand '%s' kan niet verkregen worden: %s"
 
-#: src/sendmsg-window.c:1502
+#: src/sendmsg-window.c:1499
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Bijlage '%s' is geen regulier bestand."
 
-#: src/sendmsg-window.c:1505
+#: src/sendmsg-window.c:1502
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Bestand %s kan niet worden gelezen\n"
 
-#: src/sendmsg-window.c:1559
+#: src/sendmsg-window.c:1556
 msgid "Attach file"
 msgstr "Bestand als bijlage"
 
-#: src/sendmsg-window.c:1653 src/sendmsg-window.c:1715
-#: src/sendmsg-window.c:2897
+#: src/sendmsg-window.c:1650 src/sendmsg-window.c:1712
+#: src/sendmsg-window.c:2890
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5002,36 +5007,36 @@ msgstr ""
 "Mogelijke reden: niet genoeg tijdelijke ruimte"
 
 #. From:
-#: src/sendmsg-window.c:1922
+#: src/sendmsg-window.c:1919
 msgid "F_rom:"
 msgstr "Af_zender:"
 
 #. Subject:
-#: src/sendmsg-window.c:1934
+#: src/sendmsg-window.c:1931
 msgid "S_ubject:"
 msgstr "Onder_werp:"
 
 #. fcc:
-#: src/sendmsg-window.c:1948
+#: src/sendmsg-window.c:1945
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1977
+#: src/sendmsg-window.c:1974
 msgid "_Reply To:"
 msgstr "_Antwoord naar:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1984
+#: src/sendmsg-window.c:1981
 msgid "_Attachments:"
 msgstr "_Bijlagen:"
 
 #. Keywords:
-#: src/sendmsg-window.c:2034
+#: src/sendmsg-window.c:2031
 msgid "Keywords:"
 msgstr "Sleutelwoorden:"
 
-#: src/sendmsg-window.c:2189
+#: src/sendmsg-window.c:2193
 msgid "you"
 msgstr "u"
 
@@ -5059,11 +5064,11 @@ msgstr "Op %s schreef %s:\n"
 msgid "%s wrote:\n"
 msgstr "%s schreef:\n"
 
-#: src/sendmsg-window.c:3059
+#: src/sendmsg-window.c:3052
 msgid "Choose charset"
 msgstr "Kies tekenset"
 
-#: src/sendmsg-window.c:3066
+#: src/sendmsg-window.c:3059
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -5071,16 +5076,16 @@ msgstr ""
 "Dit bestand is niet in US-ASCII of UTF-8 formaat.\n"
 "Kies de te gebruiken tekenset voor het bericht."
 
-#: src/sendmsg-window.c:3132
+#: src/sendmsg-window.c:3125
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kan bestand '%s' niet openen.\n"
 
-#: src/sendmsg-window.c:3153
+#: src/sendmsg-window.c:3146
 msgid "Include file"
 msgstr "Bestand invoegen"
 
-#: src/sendmsg-window.c:3409
+#: src/sendmsg-window.c:3404
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5089,7 +5094,7 @@ msgstr ""
 "Het bericht kan niet gecodeerd worden met de tekenset %s.\n"
 "Kies alstublieft een andere taal voor dit bericht."
 
-#: src/sendmsg-window.c:3428
+#: src/sendmsg-window.c:3423
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5100,27 +5105,27 @@ msgstr ""
 "methode moeten gebruiken om het hele bericht te beschermen. Wilt u doorgaan "
 "met de OpenPGP methode?"
 
-#: src/sendmsg-window.c:3441
+#: src/sendmsg-window.c:3436
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "bericht wordt verzonden met gpg-stand %d"
 
-#: src/sendmsg-window.c:4283
+#: src/sendmsg-window.c:4271
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Antwoord naar %s: %s"
 
-#: src/sendmsg-window.c:4288
+#: src/sendmsg-window.c:4276
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Bericht doorsturen naar %s: %s"
 
-#: src/sendmsg-window.c:4292
+#: src/sendmsg-window.c:4280
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Verder gaan aan bericht naar %s: %s"
 
-#: src/sendmsg-window.c:4296
+#: src/sendmsg-window.c:4284
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nieuw bericht naar %s: %s"

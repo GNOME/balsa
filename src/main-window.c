@@ -140,10 +140,11 @@ main_window_init (void)
   gtk_signal_connect (GTK_OBJECT (mdi), "app_created",GTK_SIGNAL_FUNC (app_created), NULL);
   gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
 
-  gnome_mdi_set_toolbar_creator(mdi, create_toolbar);
   create_menu(mdi);
+  gnome_mdi_set_toolbar_creator(mdi, create_toolbar);
   
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
+  gnome_mdi_open_toplevel(mdi);
 }
 
 static gint

@@ -4375,9 +4375,9 @@ balsa_window_idle_cb(BalsaWindow * window)
 
     gdk_threads_enter();
 
-    /* Check that we still have a message, and that the message still
-     * has a mailbox; if the mailbox was closed, this test will fail. */
-    if (window->current_message && window->current_message->mailbox)
+    /* If we have a message, check that the message still has a mailbox;
+     * if the mailbox was closed, this test will fail. */
+    if (!window->current_message || window->current_message->mailbox)
 	balsa_message_set(BALSA_MESSAGE(window->preview),
                           window->current_message);
 

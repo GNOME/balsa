@@ -253,7 +253,6 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
   g_string_truncate (gs, 0);
   g_string_sprintf (gs, "%s <%s@%s>", balsa_app.real_name, balsa_app.username, balsa_app.hostname);
   gtk_entry_set_text (GTK_ENTRY (msg->from), gs->str);
-  printf (gs->str);
   gtk_widget_show (msg->from);
 
   label = gtk_label_new ("Subject:");
@@ -318,20 +317,6 @@ sendmsg_window_new (GtkWidget * widget, gpointer data)
  * C-client stuff below! LOOK OUT! :)
  */
 
-
-
-static char *hostlist[] =
-{				/* SMTP server host list */
-  "localhost",
-  NIL
-};
-
-static char *newslist[] =
-{				/* Netnews server host list */
-  "news",
-  NIL
-};
-
 static GString *
 gtk_text_to_email (char *buff)
 {
@@ -365,6 +350,14 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
 
   GString *text;
   gchar *textbuf;
+
+  char *hostlist[] =
+  {				/* SMTP server host list */
+    NULL,
+    "localhost",
+    NIL
+  };
+  hostlist[0] = balsa_app.smtp_server;
 
   msg->from = mail_newaddr ();
   msg->from->personal = g_strdup (balsa_app.real_name);

@@ -1,3 +1,12 @@
+1999-12-30  Ragnar Henriksne <ragnar@juniks.org>
+	* src/pref-manager.c - total rewrite of the layout, and new features.
+	* src/balsa-app.h new stuff to balsa_app. (new features)
+	* src/arrow.xpm - new file ( a dummy arrow ) until we manage to
+          create some real stuff...
+        * src/main.c - added the functionallity "empty trash".
+	* src/save-restore.c - save and restore of new features.
+
+
 1999-12-29  Martin Norbäck  <d95mback@dtek.chalmers.se>
 
 	* configure.in: added "sv" to ALL_LINGUAS.

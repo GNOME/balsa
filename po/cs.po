@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
-"POT-Creation-Date: 2003-04-10 11:41+0200\n"
-"PO-Revision-Date: 2003-04-10 19:49+0200\n"
+"POT-Creation-Date: 2003-04-13 11:32+0200\n"
+"PO-Revision-Date: 2003-04-13 13:33+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -143,12 +143,12 @@ msgstr "Chyba při přesunování zpráv"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:88 src/balsa-index-threading.c:547
-#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2331
-#: src/sendmsg-window.c:2332
+#: src/balsa-index-threading.c:549 src/sendmsg-window.c:2341
+#: src/sendmsg-window.c:2342
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:89 src/sendmsg-window.c:2360 src/sendmsg-window.c:2361
+#: libbalsa/identity.c:89 src/sendmsg-window.c:2370 src/sendmsg-window.c:2371
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -468,6 +468,10 @@ msgstr "Nelze otevřít cílovou poštovní schránku (%s) pro zápis"
 #, c-format
 msgid "Couldn't open destination mailbox (%s) for copying"
 msgstr "Nelze otevřít cílovou poštovní schránku (%s) pro kopírování"
+
+#: libbalsa/message.c:1134
+msgid "(No subject)"
+msgstr "(Žádný předmět)"
 
 #: libbalsa/pop3.c:57
 msgid "connection error"
@@ -867,7 +871,7 @@ msgid "Connected to MTA"
 msgstr "Připojeno k MTA"
 
 #: libbalsa/send.c:851 src/balsa-message.c:896 src/print.c:353
-#: src/sendmsg-window.c:777 src/sendmsg-window.c:2155 src/store-address.c:322
+#: src/sendmsg-window.c:778 src/sendmsg-window.c:2165 src/store-address.c:322
 msgid "From:"
 msgstr "Od:"
 
@@ -876,7 +880,7 @@ msgid "From"
 msgstr "Od"
 
 #: libbalsa/send.c:862 src/balsa-message.c:905 src/print.c:363
-#: src/sendmsg-window.c:776 src/sendmsg-window.c:2161 src/store-address.c:323
+#: src/sendmsg-window.c:777 src/sendmsg-window.c:2171 src/store-address.c:323
 msgid "To:"
 msgstr "Pro:"
 
@@ -2174,28 +2178,28 @@ msgstr ""
 "Zpráva odeslaná %s s předmětem \"%s\" obsahuje část \"multipart/encrypted\", "
 "ale její struktura je neplatná."
 
-#: src/balsa-message.c:887 src/print.c:336 src/sendmsg-window.c:782
-#: src/sendmsg-window.c:2151
+#: src/balsa-message.c:887 src/print.c:336 src/sendmsg-window.c:783
+#: src/sendmsg-window.c:2161
 msgid "Subject:"
 msgstr "Předmět:"
 
-#: src/balsa-message.c:891 src/print.c:342 src/sendmsg-window.c:2147
+#: src/balsa-message.c:891 src/print.c:342 src/sendmsg-window.c:2157
 msgid "Date:"
 msgstr "Datum:"
 
-#: src/balsa-message.c:902 src/sendmsg-window.c:778
+#: src/balsa-message.c:902 src/sendmsg-window.c:779
 msgid "Reply-To:"
 msgstr "Odpověď kam:"
 
 #. cc:
-#: src/balsa-message.c:906 src/print.c:364 src/sendmsg-window.c:780
-#: src/sendmsg-window.c:1895 src/sendmsg-window.c:2167 src/store-address.c:324
+#: src/balsa-message.c:906 src/print.c:364 src/sendmsg-window.c:781
+#: src/sendmsg-window.c:1897 src/sendmsg-window.c:2177 src/store-address.c:324
 msgid "Cc:"
 msgstr "Kopie:"
 
 #. bcc:
-#: src/balsa-message.c:907 src/print.c:365 src/sendmsg-window.c:779
-#: src/sendmsg-window.c:1900 src/store-address.c:325
+#: src/balsa-message.c:907 src/print.c:365 src/sendmsg-window.c:780
+#: src/sendmsg-window.c:1902 src/store-address.c:325
 msgid "Bcc:"
 msgstr "Skrytá kopie:"
 
@@ -2479,7 +2483,7 @@ msgstr "_Těle"
 
 #. To:
 #: src/filter-edit-callbacks.c:993 src/main-window.c:2709
-#: src/sendmsg-window.c:1884
+#: src/sendmsg-window.c:1886
 msgid "_To:"
 msgstr "_Pro:"
 
@@ -2487,7 +2491,7 @@ msgstr "_Pro:"
 msgid "_From:"
 msgstr "_Od:"
 
-#: src/filter-edit-callbacks.c:1008 src/sendmsg-window.c:293
+#: src/filter-edit-callbacks.c:1008 src/sendmsg-window.c:294
 msgid "_Subject"
 msgstr "Pře_dmět"
 
@@ -2780,7 +2784,7 @@ msgstr "Použít SS_L (IMAPS)"
 msgid "Select parent folder"
 msgstr "Vybrat rodičovskou složku"
 
-#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:920
+#: src/folder-conf.c:530 src/mailbox-conf.c:407 src/sendmsg-window.c:921
 msgid "Select Identity"
 msgstr "Vyberte identitu"
 
@@ -3333,7 +3337,7 @@ msgstr "Přepnout zobrazování záložek poštovních schránek"
 msgid "_Wrap"
 msgstr "_Zalomit text"
 
-#: src/main-window.c:402 src/sendmsg-window.c:241
+#: src/main-window.c:402 src/sendmsg-window.c:242
 msgid "Wrap message lines"
 msgstr "Zalomit text zprávy"
 
@@ -4522,143 +4526,143 @@ msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "Volba požadovat MDN je nyní v menu Volby editačního okna."
 
-#: src/sendmsg-window.c:188
+#: src/sendmsg-window.c:189
 msgid "_Include File..."
 msgstr "Vlož_it soubor..."
 
-#: src/sendmsg-window.c:191
+#: src/sendmsg-window.c:192
 msgid "_Attach File..."
 msgstr "_Připojit soubor..."
 
-#: src/sendmsg-window.c:194
+#: src/sendmsg-window.c:195
 msgid "_Include Message(s)"
 msgstr "Vlož_it zprávu(y)"
 
 #
-#: src/sendmsg-window.c:197
+#: src/sendmsg-window.c:198
 msgid "Attach _Message(s)"
 msgstr "Připojit _zprávu(y)"
 
-#: src/sendmsg-window.c:203
+#: src/sendmsg-window.c:204
 msgid "_Send"
 msgstr "Po_slat"
 
 #
-#: src/sendmsg-window.c:204 src/toolbar-factory.c:121
+#: src/sendmsg-window.c:205 src/toolbar-factory.c:121
 msgid "Send this message"
 msgstr "Poslat tuto zprávu"
 
-#: src/sendmsg-window.c:208
+#: src/sendmsg-window.c:209
 msgid "_Queue"
 msgstr "_Zařadit"
 
 #
-#: src/sendmsg-window.c:209
+#: src/sendmsg-window.c:210
 msgid "Queue this message in Outbox for sending"
 msgstr "Zařadit tuto zprávu do schránky 'Pošta k odeslání'"
 
-#: src/sendmsg-window.c:213
+#: src/sendmsg-window.c:214
 msgid "_Postpone"
 msgstr "_Odložit"
 
-#: src/sendmsg-window.c:216
+#: src/sendmsg-window.c:217
 msgid "_Save"
 msgstr "_Uložit"
 
 #
-#: src/sendmsg-window.c:217
+#: src/sendmsg-window.c:218
 msgid "Save this message"
 msgstr "Uložit tuto zprávu"
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:222
 msgid "Print..."
 msgstr "Tisk..."
 
-#: src/sendmsg-window.c:221
+#: src/sendmsg-window.c:222
 msgid "Print the edited message"
 msgstr "Vytisknout tuto zprávu"
 
-#: src/sendmsg-window.c:241
+#: src/sendmsg-window.c:242
 msgid "_Wrap Body"
 msgstr "_Zalomit text"
 
-#: src/sendmsg-window.c:246
+#: src/sendmsg-window.c:247
 msgid "Insert Si_gnature"
 msgstr "V_ložit podpis"
 
-#: src/sendmsg-window.c:250
+#: src/sendmsg-window.c:251
 msgid "_Quote Message(s)"
 msgstr "_Citovat zprávu(y)"
 
-#: src/sendmsg-window.c:255
+#: src/sendmsg-window.c:256
 msgid "_Reflow Paragraph"
 msgstr "Přefo_rmátovat odstavec"
 
-#: src/sendmsg-window.c:259
+#: src/sendmsg-window.c:260
 msgid "R_eflow Message"
 msgstr "Př_eformátovat zprávu"
 
-#: src/sendmsg-window.c:264
+#: src/sendmsg-window.c:265
 msgid "C_heck Spelling"
 msgstr "_Kontrola pravopisu"
 
-#: src/sendmsg-window.c:265
+#: src/sendmsg-window.c:266
 msgid "Check the spelling of the message"
 msgstr "Kontrolovat pravopis v této zprávě"
 
-#: src/sendmsg-window.c:270
+#: src/sendmsg-window.c:271
 msgid "Select _Identity..."
 msgstr "Vybrat _identitu..."
 
-#: src/sendmsg-window.c:271
+#: src/sendmsg-window.c:272
 msgid "Select the Identity to use for the message"
 msgstr "Vybrat identitu pro tuto zprávu"
 
-#: src/sendmsg-window.c:276
+#: src/sendmsg-window.c:277
 msgid "_Edit with Gnome-Editor"
 msgstr "Upravit pomocí programu GNOME-_Editor"
 
-#: src/sendmsg-window.c:277
+#: src/sendmsg-window.c:278
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Upravit tuto zprávu pomocí výchozího editoru prostředí GNOME"
 
-#: src/sendmsg-window.c:289
+#: src/sendmsg-window.c:290
 msgid "Fr_om"
 msgstr "_Od"
 
-#: src/sendmsg-window.c:291
+#: src/sendmsg-window.c:292
 msgid "_To"
 msgstr "_Pro"
 
-#: src/sendmsg-window.c:295
+#: src/sendmsg-window.c:296
 msgid "_Cc"
 msgstr "_Kopie"
 
-#: src/sendmsg-window.c:297
+#: src/sendmsg-window.c:298
 msgid "_Bcc"
 msgstr "_Skrytá kopie"
 
-#: src/sendmsg-window.c:299
+#: src/sendmsg-window.c:300
 msgid "_Fcc"
 msgstr "_Automatická kopie"
 
-#: src/sendmsg-window.c:301
+#: src/sendmsg-window.c:302
 msgid "_Reply To"
 msgstr "Odpověď p_ro"
 
-#: src/sendmsg-window.c:303
+#: src/sendmsg-window.c:304
 msgid "_Attachments"
 msgstr "Pří_lohy"
 
-#: src/sendmsg-window.c:306
+#: src/sendmsg-window.c:307
 msgid "_Comments"
 msgstr "Ko_mentáře"
 
-#: src/sendmsg-window.c:309
+#: src/sendmsg-window.c:310
 msgid "_Keywords"
 msgstr "Klíčo_vá slova"
 
-#: src/sendmsg-window.c:326 src/sendmsg-window.c:397
+#: src/sendmsg-window.c:327 src/sendmsg-window.c:398
 msgid "Brazilian"
 msgstr "brazilsky"
 
@@ -4666,193 +4670,193 @@ msgstr "brazilsky"
 # the beginning in Czech and hence doesn't belong to A-J (not to
 # mention the alphabetical order); the same for English ("Angličtina"
 # in czech) and other languages
-#: src/sendmsg-window.c:328 src/sendmsg-window.c:399
+#: src/sendmsg-window.c:329 src/sendmsg-window.c:400
 msgid "Catalan"
 msgstr "katalánsky"
 
-#: src/sendmsg-window.c:330 src/sendmsg-window.c:401
+#: src/sendmsg-window.c:331 src/sendmsg-window.c:402
 msgid "Chinese Simplified"
 msgstr "zjednodušená čínština"
 
-#: src/sendmsg-window.c:332 src/sendmsg-window.c:403
+#: src/sendmsg-window.c:333 src/sendmsg-window.c:404
 msgid "Chinese Traditional"
 msgstr "tradiční čínština"
 
-#: src/sendmsg-window.c:334 src/sendmsg-window.c:405
+#: src/sendmsg-window.c:335 src/sendmsg-window.c:406
 msgid "Czech"
 msgstr "česky"
 
-#: src/sendmsg-window.c:336 src/sendmsg-window.c:407
+#: src/sendmsg-window.c:337 src/sendmsg-window.c:408
 msgid "Danish"
 msgstr "dánsky"
 
-#: src/sendmsg-window.c:338 src/sendmsg-window.c:419
+#: src/sendmsg-window.c:339 src/sendmsg-window.c:420
 msgid "German"
 msgstr "německy"
 
-#: src/sendmsg-window.c:340 src/sendmsg-window.c:409
+#: src/sendmsg-window.c:341 src/sendmsg-window.c:410
 msgid "Dutch"
 msgstr "holandsky"
 
 #. English -> American English, argh...
-#: src/sendmsg-window.c:343 src/sendmsg-window.c:411
+#: src/sendmsg-window.c:344 src/sendmsg-window.c:412
 msgid "English"
 msgstr "anglicky"
 
-#: src/sendmsg-window.c:345 src/sendmsg-window.c:413
+#: src/sendmsg-window.c:346 src/sendmsg-window.c:414
 msgid "Esperanto"
 msgstr "esperanto"
 
-#: src/sendmsg-window.c:347
+#: src/sendmsg-window.c:348
 msgid "Estonian"
 msgstr "estonsky"
 
-#: src/sendmsg-window.c:349 src/sendmsg-window.c:415
+#: src/sendmsg-window.c:350 src/sendmsg-window.c:416
 msgid "Finnish"
 msgstr "finsky"
 
-#: src/sendmsg-window.c:351 src/sendmsg-window.c:417
+#: src/sendmsg-window.c:352 src/sendmsg-window.c:418
 msgid "French"
 msgstr "francouzsky"
 
-#: src/sendmsg-window.c:353 src/sendmsg-window.c:421
+#: src/sendmsg-window.c:354 src/sendmsg-window.c:422
 msgid "Greek"
 msgstr "řecky"
 
-#: src/sendmsg-window.c:355 src/sendmsg-window.c:423
+#: src/sendmsg-window.c:356 src/sendmsg-window.c:424
 msgid "Hebrew"
 msgstr "hebrejsky"
 
-#: src/sendmsg-window.c:357 src/sendmsg-window.c:425
+#: src/sendmsg-window.c:358 src/sendmsg-window.c:426
 msgid "Hungarian"
 msgstr "maďarsky"
 
-#: src/sendmsg-window.c:359 src/sendmsg-window.c:427
+#: src/sendmsg-window.c:360 src/sendmsg-window.c:428
 msgid "Italian"
 msgstr "italsky"
 
-#: src/sendmsg-window.c:361 src/sendmsg-window.c:429
+#: src/sendmsg-window.c:362 src/sendmsg-window.c:430
 msgid "Japanese"
 msgstr "japonsky"
 
-#: src/sendmsg-window.c:363 src/sendmsg-window.c:435
+#: src/sendmsg-window.c:364 src/sendmsg-window.c:436
 msgid "Korean"
 msgstr "korejsky"
 
-#: src/sendmsg-window.c:365 src/sendmsg-window.c:437
+#: src/sendmsg-window.c:366 src/sendmsg-window.c:438
 msgid "Latvian"
 msgstr "lotyšsky"
 
-#: src/sendmsg-window.c:367 src/sendmsg-window.c:439
+#: src/sendmsg-window.c:368 src/sendmsg-window.c:440
 msgid "Lithuanian"
 msgstr "litevsky"
 
-#: src/sendmsg-window.c:369 src/sendmsg-window.c:441
+#: src/sendmsg-window.c:370 src/sendmsg-window.c:442
 msgid "Norwegian"
 msgstr "norsky"
 
-#: src/sendmsg-window.c:371 src/sendmsg-window.c:443
+#: src/sendmsg-window.c:372 src/sendmsg-window.c:444
 msgid "Polish"
 msgstr "polsky"
 
-#: src/sendmsg-window.c:373 src/sendmsg-window.c:445
+#: src/sendmsg-window.c:374 src/sendmsg-window.c:446
 msgid "Portugese"
 msgstr "portugalsky"
 
-#: src/sendmsg-window.c:375 src/sendmsg-window.c:447
+#: src/sendmsg-window.c:376 src/sendmsg-window.c:448
 msgid "Romanian"
 msgstr "rumunsky"
 
-#: src/sendmsg-window.c:377 src/sendmsg-window.c:449
+#: src/sendmsg-window.c:378 src/sendmsg-window.c:450
 msgid "Russian (ISO)"
 msgstr "rusky (ISO)"
 
-#: src/sendmsg-window.c:379 src/sendmsg-window.c:451
+#: src/sendmsg-window.c:380 src/sendmsg-window.c:452
 msgid "Russian (KOI)"
 msgstr "rusky (KOI)"
 
-#: src/sendmsg-window.c:381 src/sendmsg-window.c:453
+#: src/sendmsg-window.c:382 src/sendmsg-window.c:454
 msgid "Slovak"
 msgstr "slovensky"
 
-#: src/sendmsg-window.c:383 src/sendmsg-window.c:455
+#: src/sendmsg-window.c:384 src/sendmsg-window.c:456
 msgid "Spanish"
 msgstr "španělsky"
 
-#: src/sendmsg-window.c:385 src/sendmsg-window.c:457
+#: src/sendmsg-window.c:386 src/sendmsg-window.c:458
 msgid "Swedish"
 msgstr "švédsky"
 
-#: src/sendmsg-window.c:387 src/sendmsg-window.c:459
+#: src/sendmsg-window.c:388 src/sendmsg-window.c:460
 msgid "Turkish"
 msgstr "turecky"
 
-#: src/sendmsg-window.c:389 src/sendmsg-window.c:461
+#: src/sendmsg-window.c:390 src/sendmsg-window.c:462
 msgid "Ukrainian"
 msgstr "ukrajinsky"
 
-#: src/sendmsg-window.c:391
+#: src/sendmsg-window.c:392
 msgid "Generic UTF-8"
 msgstr "obecné UTF-8"
 
-#: src/sendmsg-window.c:463
+#: src/sendmsg-window.c:464
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: src/sendmsg-window.c:471
+#: src/sendmsg-window.c:472
 msgid "_A-J"
 msgstr "_A-J"
 
-#: src/sendmsg-window.c:472
+#: src/sendmsg-window.c:473
 msgid "_K-Z"
 msgstr "_K-Z"
 
-#: src/sendmsg-window.c:482
+#: src/sendmsg-window.c:483
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG používá režim MIME"
 
-#: src/sendmsg-window.c:488
+#: src/sendmsg-window.c:489
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG používá starý režim OpenPGP"
 
-#: src/sendmsg-window.c:499
+#: src/sendmsg-window.c:500
 msgid "_Request Disposition Notification"
 msgstr "Vyžadovat oznámení o do_ručení"
 
-#: src/sendmsg-window.c:502
+#: src/sendmsg-window.c:503
 msgid "_Format = Flowed"
 msgstr "_Format = Flowed"
 
-#: src/sendmsg-window.c:507
+#: src/sendmsg-window.c:508
 msgid "_Sign Message"
 msgstr "_Podepsat zprávu"
 
-#: src/sendmsg-window.c:508
+#: src/sendmsg-window.c:509
 msgid "signs the message using GnuPG"
 msgstr "podepíše zprávu pomocí GnuPG"
 
-#: src/sendmsg-window.c:511
+#: src/sendmsg-window.c:512
 msgid "_Encrypt Message"
 msgstr "Za_šifrovat zprávu"
 
-#: src/sendmsg-window.c:512
+#: src/sendmsg-window.c:513
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "podepíše zprávu pomocí GnuPG pro všechny příjemce Pro: nebo Kopie:"
 
-#: src/sendmsg-window.c:557
+#: src/sendmsg-window.c:558
 msgid "_Show"
 msgstr "_Zobrazit"
 
-#: src/sendmsg-window.c:559
+#: src/sendmsg-window.c:560
 msgid "_Language"
 msgstr "_Jazyk"
 
 #
-#: src/sendmsg-window.c:561
+#: src/sendmsg-window.c:562
 msgid "_Options"
 msgstr "V_olby"
 
-#: src/sendmsg-window.c:644
+#: src/sendmsg-window.c:645
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -4862,11 +4866,11 @@ msgstr ""
 "Uložit zprávu do Rozepsané pošty?"
 
 #. Comments:
-#: src/sendmsg-window.c:781 src/sendmsg-window.c:1988
+#: src/sendmsg-window.c:782 src/sendmsg-window.c:1990
 msgid "Comments:"
 msgstr "Komentáře:"
 
-#: src/sendmsg-window.c:1220
+#: src/sendmsg-window.c:1221
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -4881,43 +4885,43 @@ msgstr ""
 "\n"
 "Opravdu chcete tento soubor připojit jako odkaz?"
 
-#: src/sendmsg-window.c:1231
+#: src/sendmsg-window.c:1232
 msgid "Attach as Reference?"
 msgstr "Připojit jako odkaz?"
 
-#: src/sendmsg-window.c:1322
+#: src/sendmsg-window.c:1323
 msgid "Remove"
 msgstr "Odstranit"
 
-#: src/sendmsg-window.c:1333
+#: src/sendmsg-window.c:1334
 msgid "attach as reference"
 msgstr "připojit jako odkaz"
 
-#: src/sendmsg-window.c:1339
+#: src/sendmsg-window.c:1340
 msgid "attach as file"
 msgstr "připojit jako soubor"
 
-#: src/sendmsg-window.c:1487
+#: src/sendmsg-window.c:1488
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Nelze získat informace o souboru '%s': %s"
 
-#: src/sendmsg-window.c:1492
+#: src/sendmsg-window.c:1493
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Příloha %s není obyčejný soubor."
 
-#: src/sendmsg-window.c:1495
+#: src/sendmsg-window.c:1496
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Nelze přečíst soubor %s\n"
 
-#: src/sendmsg-window.c:1549
+#: src/sendmsg-window.c:1550
 msgid "Attach file"
 msgstr "Připojit soubor"
 
-#: src/sendmsg-window.c:1643 src/sendmsg-window.c:1680
-#: src/sendmsg-window.c:2791
+#: src/sendmsg-window.c:1644 src/sendmsg-window.c:1681
+#: src/sendmsg-window.c:2803
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -4926,69 +4930,69 @@ msgstr ""
 "Možný důvod: nedostatek místa pro dočasné soubory na disku"
 
 #. From:
-#: src/sendmsg-window.c:1879
+#: src/sendmsg-window.c:1881
 msgid "F_rom:"
 msgstr "_Od:"
 
 #. Subject:
-#: src/sendmsg-window.c:1891
+#: src/sendmsg-window.c:1893
 msgid "S_ubject:"
 msgstr "_Předmět:"
 
 #. fcc:
-#: src/sendmsg-window.c:1905
+#: src/sendmsg-window.c:1907
 msgid "F_cc:"
 msgstr "_Automatická kopie:"
 
 #. Reply To:
-#: src/sendmsg-window.c:1934
+#: src/sendmsg-window.c:1936
 msgid "_Reply To:"
 msgstr "Odpověď ka_m:"
 
 #. Attachment list
-#: src/sendmsg-window.c:1941
+#: src/sendmsg-window.c:1943
 msgid "_Attachments:"
 msgstr "Příl_ohy:"
 
 #. Keywords:
-#: src/sendmsg-window.c:1991
+#: src/sendmsg-window.c:1993
 msgid "Keywords:"
 msgstr "Klíčová slova:"
 
-#: src/sendmsg-window.c:2134
+#: src/sendmsg-window.c:2144
 msgid "you"
 msgstr "Vy"
 
-#: src/sendmsg-window.c:2141
+#: src/sendmsg-window.c:2151
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------přeposlaná zpráva od %s------\n"
 
 #
-#: src/sendmsg-window.c:2171
+#: src/sendmsg-window.c:2181
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID zprávy: %s\n"
 
-#: src/sendmsg-window.c:2177
+#: src/sendmsg-window.c:2187
 msgid "References:"
 msgstr "Odkazy:"
 
-#: src/sendmsg-window.c:2187
+#: src/sendmsg-window.c:2197
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Dne %s napsal %s:\n"
 
-#: src/sendmsg-window.c:2189
+#: src/sendmsg-window.c:2199
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s napsal:\n"
 
-#: src/sendmsg-window.c:2953
+#: src/sendmsg-window.c:2965
 msgid "Choose charset"
 msgstr "Vyberte znakovou sadu"
 
-#: src/sendmsg-window.c:2960
+#: src/sendmsg-window.c:2972
 msgid ""
 "This file is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
@@ -4996,16 +5000,16 @@ msgstr ""
 "Tento soubor není kódován v US-ASCII nebo UTF-8.\n"
 "Vyberte prosím znakovou sadu, ve které je soubor kódován."
 
-#: src/sendmsg-window.c:3026
+#: src/sendmsg-window.c:3038
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nelze otevřít soubor %s.\n"
 
-#: src/sendmsg-window.c:3047
+#: src/sendmsg-window.c:3059
 msgid "Include file"
 msgstr "Vložit soubor"
 
-#: src/sendmsg-window.c:3303
+#: src/sendmsg-window.c:3315
 #, c-format
 msgid ""
 "The message cannot be encoded in charset %s.\n"
@@ -5014,7 +5018,7 @@ msgstr ""
 "Tuto zprávu nelze kódovat ve znakové sadě %s.\n"
 "Vyberte prosím pro tuto zprávu jazyk."
 
-#: src/sendmsg-window.c:3322
+#: src/sendmsg-window.c:3334
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5024,27 +5028,27 @@ msgstr ""
 "podepsána a/nebo zašifrována jen první část. Pokud má být chráněna celá "
 "zpráva, měli byste zvolit režim MIME. Chcete opravdu pokračovat?"
 
-#: src/sendmsg-window.c:3335
+#: src/sendmsg-window.c:3347
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "odesílám zprávu s režimem gpg %d"
 
-#: src/sendmsg-window.c:4101
+#: src/sendmsg-window.c:4112
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpověď pro %s: %s"
 
-#: src/sendmsg-window.c:4106
+#: src/sendmsg-window.c:4117
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Přeposlat zprávu pro %s: %s"
 
-#: src/sendmsg-window.c:4110
+#: src/sendmsg-window.c:4121
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovat v psaní zprávy pro %s: %s"
 
-#: src/sendmsg-window.c:4114
+#: src/sendmsg-window.c:4125
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová zpráva pro %s: %s"

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-03-03 19:23+0100\n"
+"POT-Creation-Date: 2004-04-20 12:51+0200\n"
 "PO-Revision-Date: 2003-07-27 23:38+0100\n"
 "Last-Translator: Gnome PL Team <translators@gnome.pl>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
@@ -676,157 +676,162 @@ msgstr ""
 "\n"
 "ID łańcucha: %s"
 
-#: libbalsa/rfc3156.c:402 libbalsa/rfc3156.c:655 libbalsa/rfc3156.c:941
-#: libbalsa/rfc3156.c:1050 libbalsa/rfc3156.c:1175 libbalsa/rfc3156.c:1298
-#: libbalsa/rfc3156.c:2491 libbalsa/rfc3156.c:2589
+#: libbalsa/rfc3156.c:401 libbalsa/rfc3156.c:650 libbalsa/rfc3156.c:949
+#: libbalsa/rfc3156.c:1058 libbalsa/rfc3156.c:1183 libbalsa/rfc3156.c:1306
+#: libbalsa/rfc3156.c:2499 libbalsa/rfc3156.c:2597
 #, c-format
 msgid "%s: could not create context: %s"
 msgstr "%s: nie można utworzyć kontekstu: %s"
 
-#: libbalsa/rfc3156.c:427 libbalsa/rfc3156.c:446 libbalsa/rfc3156.c:674
+#: libbalsa/rfc3156.c:426 libbalsa/rfc3156.c:682
 #, c-format
 msgid "%s: could not get data from mailbox file: %s"
 msgstr "%s: nie można pobrać danych z pliku skrzynki: %s"
 
-#: libbalsa/rfc3156.c:459 libbalsa/rfc3156.c:1091
+#: libbalsa/rfc3156.c:443 libbalsa/rfc3156.c:2522 libbalsa/rfc3156.c:2616
+#, c-format
+msgid "%s: could not get data from file: %s"
+msgstr "%s: nie można pobrać danych z pliku: %s"
+
+#: libbalsa/rfc3156.c:455 libbalsa/rfc3156.c:1099
 #, c-format
 msgid "%s: signature verification failed: %s"
 msgstr "%s: weryfikacja podpisu nie powiodła się: %s"
 
-#: libbalsa/rfc3156.c:665
+#: libbalsa/rfc3156.c:660
 msgid "Enter passphrase to decrypt message"
 msgstr "Wprowadź hasło deszyfrujące list"
 
-#: libbalsa/rfc3156.c:684 libbalsa/rfc3156.c:974 libbalsa/rfc3156.c:1081
-#: libbalsa/rfc3156.c:1219 libbalsa/rfc3156.c:1320
+#: libbalsa/rfc3156.c:692 libbalsa/rfc3156.c:982 libbalsa/rfc3156.c:1089
+#: libbalsa/rfc3156.c:1227 libbalsa/rfc3156.c:1328
 #, c-format
 msgid "%s: could not create new data object: %s"
 msgstr "%s: nie można utworzyć nowego obiektu danych: %s"
 
-#: libbalsa/rfc3156.c:696
+#: libbalsa/rfc3156.c:704
 #, c-format
 msgid "%s: decryption failed: %s"
 msgstr "%s: odszyfrowanie nie powiodło się: %s"
 
-#: libbalsa/rfc3156.c:710
+#: libbalsa/rfc3156.c:718
 #, c-format
 msgid "%s: could not get decrypted data: %s"
 msgstr "%s: nie można pobrać odszyfrowanych danych: %s"
 
 # valid to w sumie ważny, ale to jakoś mi nie pasuje
-#: libbalsa/rfc3156.c:845
+#: libbalsa/rfc3156.c:853
 msgid "The signature is valid."
 msgstr "Podpis jest poprawny."
 
-#: libbalsa/rfc3156.c:847
+#: libbalsa/rfc3156.c:855
 msgid "The signature is valid but expired."
 msgstr "Podpis jest poprawny lecz stracił ważność."
 
-#: libbalsa/rfc3156.c:849
+#: libbalsa/rfc3156.c:857
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "Podpis jest poprawny, ale klucz użyty do jego weryfikacji stracił ważność."
 
-#: libbalsa/rfc3156.c:851
+#: libbalsa/rfc3156.c:859
 msgid "The signature is invalid."
 msgstr "Podpis jest niepoprawny."
 
-#: libbalsa/rfc3156.c:853
+#: libbalsa/rfc3156.c:861
 msgid "The signature could not be verified due to a missing key."
 msgstr "Nie można zweryfikować podpisu z powodu braku klucza."
 
-#: libbalsa/rfc3156.c:855
+#: libbalsa/rfc3156.c:863
 msgid "This part is not a real PGP signature."
 msgstr "Ten element nie jest prawdziwym podpisem PGP."
 
-#: libbalsa/rfc3156.c:857
+#: libbalsa/rfc3156.c:865
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 "Nie można zweryfikować podpisu z powodu niepoprawnego silnika szyfrowania."
 
 # FIXME - a może zamiast depozytów to baza kluczy?
-#: libbalsa/rfc3156.c:859 libbalsa/rfc3156.c:2714
+#: libbalsa/rfc3156.c:867 libbalsa/rfc3156.c:2722
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "Pogram GnuPG przebudowywuje bazę depozytów i jest obecnie niedostepny."
 
-#: libbalsa/rfc3156.c:861
+#: libbalsa/rfc3156.c:869
 msgid "An error prevented the signature verification."
 msgstr "Nie można zweryfikować podpisu z powodu błędu."
 
-#: libbalsa/rfc3156.c:871
+#: libbalsa/rfc3156.c:879
 msgid "The user ID is of unknown validity."
 msgstr "Niepotwierdzona ważność identyfikatora użytkownika."
 
-#: libbalsa/rfc3156.c:873
+#: libbalsa/rfc3156.c:881
 msgid "The validity of the user ID is undefined."
 msgstr "Ważność identyfikatora użytkownika nie jest określona."
 
-#: libbalsa/rfc3156.c:875
+#: libbalsa/rfc3156.c:883
 msgid "The user ID is never valid."
 msgstr "Identyfikator użytkownika jest nieważny."
 
-#: libbalsa/rfc3156.c:877
+#: libbalsa/rfc3156.c:885
 msgid "The user ID is marginally valid."
 msgstr "Identyfikator użytkownika jest częściowo potwierdzony."
 
-#: libbalsa/rfc3156.c:879
+#: libbalsa/rfc3156.c:887
 msgid "The user ID is fully valid."
 msgstr "Identyfikator użytkownika jest ważny."
 
 # co za bezssens z tymi podpisami
-#: libbalsa/rfc3156.c:881
+#: libbalsa/rfc3156.c:889
 msgid "The user ID is ultimately valid."
 msgstr "Identyfikator użytkownika jest ostatecznie ważny."
 
 # to jest naprawdę pokręcone
 # terminologia kryptologiczna rodem z prokomu :/
-#: libbalsa/rfc3156.c:883 libbalsa/rfc3156.c:1578
+#: libbalsa/rfc3156.c:891 libbalsa/rfc3156.c:1586
 msgid "bad validity"
 msgstr "błąd stwierdzenia ważności"
 
-#: libbalsa/rfc3156.c:960 libbalsa/rfc3156.c:1199
+#: libbalsa/rfc3156.c:968 libbalsa/rfc3156.c:1207
 msgid "Enter passsphrase to OpenPGP sign the first message part"
 msgstr ""
 "Wprowadź hasło w celu podpisania pierwszej części listu za pomocą OpenPGP"
 
-#: libbalsa/rfc3156.c:967 libbalsa/rfc3156.c:1071 libbalsa/rfc3156.c:1211
-#: libbalsa/rfc3156.c:1311
+#: libbalsa/rfc3156.c:975 libbalsa/rfc3156.c:1079 libbalsa/rfc3156.c:1219
+#: libbalsa/rfc3156.c:1319
 #, c-format
 msgid "%s: could not get data from buffer: %s"
 msgstr "%s: nie można pobrać danych z bufora: %s"
 
-#: libbalsa/rfc3156.c:983 libbalsa/rfc3156.c:2530
+#: libbalsa/rfc3156.c:991 libbalsa/rfc3156.c:2538
 #, c-format
 msgid "%s: signing failed: %s"
 msgstr "%s: podpisanie nie powiodło się: %s"
 
-#: libbalsa/rfc3156.c:995 libbalsa/rfc3156.c:1118 libbalsa/rfc3156.c:1251
-#: libbalsa/rfc3156.c:1363 libbalsa/rfc3156.c:2547 libbalsa/rfc3156.c:2640
+#: libbalsa/rfc3156.c:1003 libbalsa/rfc3156.c:1126 libbalsa/rfc3156.c:1259
+#: libbalsa/rfc3156.c:1371 libbalsa/rfc3156.c:2555 libbalsa/rfc3156.c:2648
 #, c-format
 msgid "%s: could not get data: %s"
 msgstr "%s: nie można pobrać danych: %s"
 
-#: libbalsa/rfc3156.c:1233
+#: libbalsa/rfc3156.c:1241
 #, c-format
 msgid "%s: signing and encryption failed: %s"
 msgstr "%s: podpisanie i szyfrowanie nie powiodło się: %s"
 
-#: libbalsa/rfc3156.c:1237 libbalsa/rfc3156.c:2626
+#: libbalsa/rfc3156.c:1245 libbalsa/rfc3156.c:2634
 #, c-format
 msgid "%s: encryption failed: %s"
 msgstr "%s: szyfrowanie nie powiodło się: %s"
 
-#: libbalsa/rfc3156.c:1327
+#: libbalsa/rfc3156.c:1335
 msgid "Enter passsphrase to decrypt message part"
 msgstr "Wprowadź hasło deszyfrujące list"
 
-#: libbalsa/rfc3156.c:1334
+#: libbalsa/rfc3156.c:1342
 #, c-format
 msgid "%s: decryption and signature verification failed: %s"
 msgstr "%s: rozszyfrowanie i weryfikacja podpisu nie powiodły się: %s"
 
-#: libbalsa/rfc3156.c:1380
+#: libbalsa/rfc3156.c:1388
 #, c-format
 msgid ""
 "The OpenPGP encrypted message part contains 8-bit characters, but no header "
@@ -835,12 +840,12 @@ msgstr ""
 "List zaszyfrowany za pomocą OpenPGP zawiera ośmiobitowe znaki, ale brak "
 "nagłówka opisującego użyty zestaw znaków (zmieniono na %s)"
 
-#: libbalsa/rfc3156.c:1455
+#: libbalsa/rfc3156.c:1463
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "Nie można uruchomić %s by pobrać klucz publiczny %s."
 
-#: libbalsa/rfc3156.c:1503
+#: libbalsa/rfc3156.c:1511
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -849,7 +854,7 @@ msgstr ""
 "Uruchomienie gpg nie powiodło się, zwrócona wartość %d:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1510
+#: libbalsa/rfc3156.c:1518
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -858,87 +863,87 @@ msgstr ""
 "Uruchomienie gpg powiodło się:\n"
 "%s"
 
-#: libbalsa/rfc3156.c:1566
+#: libbalsa/rfc3156.c:1574
 msgid "unknown"
 msgstr "nieznany"
 
-#: libbalsa/rfc3156.c:1568
+#: libbalsa/rfc3156.c:1576
 msgid "undefined"
 msgstr "niezdefiniowany"
 
-#: libbalsa/rfc3156.c:1570
+#: libbalsa/rfc3156.c:1578
 msgid "never"
 msgstr "nigdy"
 
-#: libbalsa/rfc3156.c:1572
+#: libbalsa/rfc3156.c:1580
 msgid "marginal"
 msgstr "marginalny"
 
-#: libbalsa/rfc3156.c:1574
+#: libbalsa/rfc3156.c:1582
 msgid "full"
 msgstr "pełny"
 
-#: libbalsa/rfc3156.c:1576
+#: libbalsa/rfc3156.c:1584
 msgid "ultimate"
 msgstr "ostateczny"
 
-#: libbalsa/rfc3156.c:1641
+#: libbalsa/rfc3156.c:1649
 msgid "User ID"
 msgstr "ID użytkownika"
 
-#: libbalsa/rfc3156.c:1641
+#: libbalsa/rfc3156.c:1649
 msgid "Key ID"
 msgstr "ID Klucza"
 
-#: libbalsa/rfc3156.c:1641
+#: libbalsa/rfc3156.c:1649
 msgid "Validity"
 msgstr "Ważność"
 
-#: libbalsa/rfc3156.c:1641
+#: libbalsa/rfc3156.c:1649
 msgid "Owner trust"
 msgstr "Zaufanie właściciela"
 
 # Albo czas trwania, bo może to o certyfikat idzie
-#: libbalsa/rfc3156.c:1642
+#: libbalsa/rfc3156.c:1650
 msgid "Length"
 msgstr "Długość"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/rfc3156.c:1679
+#: libbalsa/rfc3156.c:1687
 msgid "Select key"
 msgstr "Wybór klucza"
 
-#: libbalsa/rfc3156.c:1689
+#: libbalsa/rfc3156.c:1697
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Wybierz klucz prywatny dla podpisującego %s"
 
-#: libbalsa/rfc3156.c:1692
+#: libbalsa/rfc3156.c:1700
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Wybierz klucz publiczny dla odbiorcy %s"
 
-#: libbalsa/rfc3156.c:1784
+#: libbalsa/rfc3156.c:1792
 #, c-format
 msgid "%s: could not list keys for %s: %s"
 msgstr "%s: nie można uzyskać listy kluczy dla: %s: %s"
 
-#: libbalsa/rfc3156.c:1793
+#: libbalsa/rfc3156.c:1801
 #, c-format
 msgid "%s: could not retrieve key for %s: %s"
 msgstr "%s: nie można pobrać klucza dla %s: %s"
 
-#: libbalsa/rfc3156.c:1829
+#: libbalsa/rfc3156.c:1837
 #, c-format
 msgid "could not get a private key for %s"
 msgstr "nie można pobrać prywatnego klucza dla %s"
 
-#: libbalsa/rfc3156.c:1859
+#: libbalsa/rfc3156.c:1867
 #, c-format
 msgid "could not get a public key for %s"
 msgstr "nie można pobrać klucza publicznego dla %s"
 
-#: libbalsa/rfc3156.c:2277
+#: libbalsa/rfc3156.c:2285
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -949,7 +954,7 @@ msgstr ""
 "\n"
 "Klucz: %s"
 
-#: libbalsa/rfc3156.c:2281
+#: libbalsa/rfc3156.c:2289
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -960,30 +965,25 @@ msgstr ""
 "\n"
 "Klucz: %s"
 
-#: libbalsa/rfc3156.c:2293
+#: libbalsa/rfc3156.c:2301
 msgid "remember passphrase for"
 msgstr "zapamiętanie hasła dla"
 
-#: libbalsa/rfc3156.c:2298 src/pref-manager.c:1684 src/pref-manager.c:2514
+#: libbalsa/rfc3156.c:2306 src/pref-manager.c:1684 src/pref-manager.c:2514
 #: src/pref-manager.c:2535
 msgid "minutes"
 msgstr "minut"
 
-#: libbalsa/rfc3156.c:2510
+#: libbalsa/rfc3156.c:2518
 msgid "Enter passsphrase to sign message"
 msgstr "Wprowadź hasło w celu podpisania listu"
 
-#: libbalsa/rfc3156.c:2514 libbalsa/rfc3156.c:2608
-#, c-format
-msgid "%s: could not get data from file: %s"
-msgstr "%s: nie można pobrać danych z pliku: %s"
-
-#: libbalsa/rfc3156.c:2521 libbalsa/rfc3156.c:2616
+#: libbalsa/rfc3156.c:2529 libbalsa/rfc3156.c:2624
 #, c-format
 msgid "%s: could not create new data: %s"
 msgstr "%s: nie można utworzyć nowych danych: %s"
 
-#: libbalsa/rfc3156.c:2715
+#: libbalsa/rfc3156.c:2723
 msgid "Try again later."
 msgstr "Spróbuj później."
 
@@ -2464,7 +2464,7 @@ msgstr "Wyświetl część za pomocą %s"
 msgid "Calling URL %s..."
 msgstr "Otwieranie URL-a %s..."
 
-#: src/balsa-message.c:1931 src/balsa-message.c:2635 src/balsa-message.c:3259
+#: src/balsa-message.c:1931 src/balsa-message.c:2635 src/balsa-message.c:3270
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Błąd przy wyświetlaniu %s: %s\n"
@@ -2540,7 +2540,7 @@ msgstr "Zapisz..."
 msgid "could not create temporary file %s"
 msgstr "Nie można utworzyć pliku tymczasowego %s"
 
-#: src/balsa-message.c:3510
+#: src/balsa-message.c:3521
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2551,11 +2551,11 @@ msgstr ""
 "powiadomienie o otrzymaniu listu (MDN, Message Disposition Notification).\n"
 "Czy chcesz wysłać to powiadomienie?"
 
-#: src/balsa-message.c:3517
+#: src/balsa-message.c:3528
 msgid "Reply to MDN?"
 msgstr "Czy odpowiedzieć na MDN?"
 
-#: src/balsa-message.c:3731
+#: src/balsa-message.c:3742
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but it's "
@@ -2565,15 +2565,15 @@ msgstr ""
 "struktura jest niepoprawna. Podpis, o ile takowy istnieje nie może zostać "
 "sprawdzony."
 
-#: src/balsa-message.c:3747 src/balsa-message.c:3968
+#: src/balsa-message.c:3758 src/balsa-message.c:3976
 msgid "detected a good signature"
 msgstr "wykryto dobry podpis"
 
-#: src/balsa-message.c:3752 src/balsa-message.c:3977
+#: src/balsa-message.c:3763 src/balsa-message.c:3985
 msgid "detected a good signature with insufficient validity/trust"
 msgstr "wykryto dobry podpis z niewystarczającą ważnością/zaufaniem"
 
-#: src/balsa-message.c:3757 src/balsa-message.c:3992
+#: src/balsa-message.c:3768 src/balsa-message.c:4000
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2584,7 +2584,7 @@ msgstr ""
 "wyniku:\n"
 "%s"
 
-#: src/balsa-message.c:3764
+#: src/balsa-message.c:3775
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2593,7 +2593,7 @@ msgstr ""
 "Sprawdzenie podpisu listu wysłanego przez %s z tematem \"%s\" zakończyło się "
 "błędem!"
 
-#: src/balsa-message.c:3769
+#: src/balsa-message.c:3780
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME signed part, "
@@ -2602,7 +2602,7 @@ msgstr ""
 "List wysłany przez %s o temacie \"%s\" zawiera podpisaną część S/MIME, ale "
 "balsa nie potrafi (jeszcze) obłużyć tego formatu."
 
-#: src/balsa-message.c:3810
+#: src/balsa-message.c:3821
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2611,7 +2611,7 @@ msgstr ""
 "List wysłany przez %s o temacie \"%s\" zawiera zaszyfrowaną część, ale jej "
 "struktura jest niepoprawna."
 
-#: src/balsa-message.c:3818
+#: src/balsa-message.c:3829
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2620,11 +2620,11 @@ msgstr ""
 "List wysłany przez %s o temacie \"%s\" zawiera zaszyfrowaną część S/MIME, "
 "ale balsa nie potrafi (jeszcze) obłużyć tego formatu."
 
-#: src/balsa-message.c:3905 src/balsa-message.c:4113
+#: src/balsa-message.c:3913 src/balsa-message.c:4121
 msgid "run gpg to import this key"
 msgstr "uruchom gpg aby zaimportować ten klucz"
 
-#: src/balsa-message.c:4078
+#: src/balsa-message.c:4086
 #, c-format
 msgid "PGP signature: %s"
 msgstr "Podpis PGP: %s"

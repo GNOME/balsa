@@ -387,7 +387,10 @@ idle_handler_cb(GtkWidget * widget)
       if (BALSA_MESSAGE(bmsg)) {
           if (message) {
               balsa_message_set(BALSA_MESSAGE(bmsg), message);
-              message_read( message );
+              /* [MBG]: Why does this appear here?  It gets called in
+               * the above function as well. */
+              /* message_read( message ); */
+              balsa_mblist_update_mailbox (balsa_app.mblist, message->mailbox);
           } else
               balsa_message_clear (BALSA_MESSAGE (bmsg));
       }

@@ -472,9 +472,11 @@ balsa_postpone_message (Message * message, Message * reply_message,
   msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
   g_free (tmp);
 
-  tmp = address_to_gchar (message->reply_to);
-  msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
-  g_free (tmp);
+  if(message->reply_to) {
+     tmp = address_to_gchar (message->reply_to);
+     msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
+     g_free (tmp);
+  }
 
   msg->env->subject = g_strdup (message->subject);
 
@@ -899,9 +901,11 @@ gboolean balsa_create_msg (Message *message, HEADER *msg, char *tmpfile, int que
   msg->env->from = rfc822_parse_adrlist (msg->env->from, tmp);
   g_free (tmp);
 
-  tmp = address_to_gchar (message->reply_to);
-  msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
-  g_free (tmp);
+  if(message->reply_to) {
+     tmp = address_to_gchar (message->reply_to);
+     msg->env->reply_to = rfc822_parse_adrlist (msg->env->reply_to, tmp);
+     g_free (tmp);
+  }
 
   msg->env->subject = g_strdup (message->subject);
 

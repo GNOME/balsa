@@ -40,11 +40,19 @@
 
 /* column width settings */
 #define NUM_DEFAULT_WIDTH 40
-#define UNREAD_DEFAULT_WIDTH 16
-#define FLAG_DEFAULT_WIDTH 16
+#define STATUS_DEFAULT_WIDTH 16
+#define ATTACHMENT_DEFAULT_WIDTH 16
 #define FROM_DEFAULT_WIDTH 170
 #define SUBJECT_DEFAULT_WIDTH 260
 #define DATE_DEFAULT_WIDTH 138
+
+/* default width settings for the mailbox list columns, not fully utilized yet */
+#define MBNAME_DEFAULT_WIDTH 80
+#ifdef BALSA_SHOW_INFO
+#define NEWMSGCOUNT_DEFAULT_WIDTH 45
+#define TOTALMSGCOUNT_DEFAULT_WIDTH 45
+#define INFO_FIELD_LENGTH 10
+#endif
 
 #define MAILBOX_MANAGER_WIDTH 350
 #define MAILBOX_MANAGER_HEIGHT 400
@@ -85,7 +93,7 @@ extern struct BalsaApplication
   gchar *local_mail_directory;
   gchar *smtp_server;
 
-	/* signature stuff */
+  /* signature stuff */
   gboolean sig_sending;
   gboolean sig_whenforward;
   gboolean sig_whenreply;
@@ -118,17 +126,21 @@ extern struct BalsaApplication
   
   /* Column width settings */
   gint index_num_width;
-  gint index_unread_width;
-  gint index_flag_width;
+  gint index_status_width;
+  gint index_attachment_width;
   gint index_from_width;
   gint index_subject_width;
   gint index_date_width;
   
-/*  gint mblist_height; PKGW: unused */
-    gint notebook_height; /* PKGW: used :-) */
+/*gint mblist_height; PKGW: unused */
+  gint notebook_height; /* PKGW: used :-) */
 
+/* Column width settings for mailbox list window, not fully implemented yet */
+  gint mblist_name_width;
 #ifdef BALSA_SHOW_INFO
   gboolean mblist_show_mb_content_info;
+  gint mblist_newmsg_width;
+  gint mblist_totalmsg_width;
 #endif
 
   GtkToolbarStyle toolbar_style;

@@ -16,10 +16,11 @@ balsa_help_DATA = \
 
 all: 
 
-balsa.html: balsa/balsa.html
-	-cd $(srcdir) && cp balsa/balsa.html .
+balsa.html: balsa/balsa.htm
+	-cd $(srcdir) && cp balsa/balsa.htm balsa.html
 
-balsa/balsa.html: $(SGML_FILES)
+#balsa/balsa.html: $(SGML_FILES)
+balsa/balsa.htm: balsa.sgml
 	-cd $(srcdir) && db2html balsa.sgml
 
 dist-hook:

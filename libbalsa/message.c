@@ -179,35 +179,25 @@ message_new(void)
 static void
 libbalsa_message_real_destroy(GtkObject *object)
 {
-  GList* list;
-  Message *message;
+	GList *list;
+	Message *message;
 
-  g_return_if_fail(object != NULL);
-  g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
+	g_return_if_fail(object != NULL);
+	g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
+	
+	message = LIBBALSA_MESSAGE(object);
 
-  message = LIBBALSA_MESSAGE(object);
-
-  g_free (message->remail);
-  g_free (message->date);
-  address_free (message->from);
-  address_free (message->sender);
-  address_free (message->reply_to);
-  g_free (message->subject);
-
-  for (list = g_list_first (message->to_list); list; list = g_list_next (list))
-    address_free (list->data);
-  g_list_free (message->to_list);
-
-  for (list = g_list_first (message->cc_list); list; list = g_list_next (list))
-    address_free (list->data);
-  g_list_free (message->cc_list);
-
-  for (list = g_list_first (message->bcc_list); list; list = g_list_next (list))
-    address_free (list->data);
-  g_list_free (message->bcc_list);
-
-  g_free (message->in_reply_to);
-  g_free (message->message_id); 
+	g_free (message->remail);
+	g_free (message->date);
+	address_free (message->from);
+	address_free (message->sender);
+	address_free (message->reply_to);
+	address_list_free(message->to_list);
+	address_list_free(message->cc_list);
+	address_list_free(message->bcc_list);
+	g_free (message->subject);
+	g_free (message->in_reply_to);
+	g_free (message->message_id); 
 }
 
 void

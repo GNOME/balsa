@@ -31,5 +31,6 @@ struct _Address
 
 Address *address_new(void);
 void address_free(Address *address);
+void address_list_free(GList *address_list);
 
 #endif /* __ADDRESS_H__ */

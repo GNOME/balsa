@@ -22,7 +22,6 @@
 #include "mblist-window.h"
 
 /* mailbox list code */
-
 #include "config.h"
 
 #include <string.h>
@@ -39,6 +38,7 @@
 #include "main.h"
 #include "main-window.h"
 #include "mailbox-conf.h"
+#include "../libbalsa/mailbox.h"
 
 typedef struct _MBListWindow MBListWindow;
 struct _MBListWindow
@@ -67,7 +67,7 @@ static GtkTargetEntry dnd_mb_target[] =
 void mblist_open_mailbox (Mailbox * mailbox);
 void mblist_close_mailbox (Mailbox * mailbox);
 static void mailbox_select_cb (BalsaMBList *, Mailbox *, GtkCTreeNode *, GdkEventButton *);
-static gint mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+static gboolean mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 /*PKGW*/
 static void size_allocate_cb( GtkWidget *widget, GtkAllocation *alloc );
 
@@ -144,8 +144,12 @@ GtkWidget *balsa_mailbox_list_window_new(BalsaWindow *window)
   return widget;
 }
 
-
-
+/* mblist_open_mailbox
+ * 
+ * Description: This checks to see if the mailbox is already open and
+ * just on a different mailbox page, or if a new page needs to be
+ * created and the mailbox parsed.
+ * */
 void
 mblist_open_mailbox (Mailbox * mailbox)
 {
@@ -169,6 +173,18 @@ mblist_open_mailbox (Mailbox * mailbox)
 	page = gtk_object_get_data(GTK_OBJECT(page),"indexpage");
 	g_get_current_time(&BALSA_INDEX_PAGE(page)->last_use);
 
+/* This nasty looking piece of code is for the column resizing patch, it needs
+   to change the size of the columns before they get displayed.  To do this we
+   need to get the reference to the index page, which gives us a reference to
+   the index, which gives us the clist, which we then reference.  Looks ugly
+   but works well. */
+	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 0, balsa_app.index_num_width);
+	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 1, balsa_app.index_status_width);
+	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 2, balsa_app.index_attachment_width);
+	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 3, balsa_app.index_from_width);
+	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 4, balsa_app.index_subject_width);
+	gtk_clist_set_column_width (GTK_CLIST(&(BALSA_INDEX(BALSA_INDEX_PAGE(page)->index)->clist)), 5, balsa_app.index_date_width);
+
 	return;
       }
   }
@@ -177,6 +193,11 @@ mblist_open_mailbox (Mailbox * mailbox)
 
   balsa_window_set_cursor(BALSA_WINDOW(mblw->window), NULL);
     
+#ifdef BALSA_SHOW_INFO
+  if (balsa_app.mblist->display_content_info){
+    balsa_mblist_update_mailbox (balsa_app.mblist, mailbox);
+  }
+#endif
   /* I don't know what is the purpose of that code, so I put
      it in comment until somebody tells me waht it  is useful 
      for.      -Bertrand 
@@ -209,7 +230,7 @@ mblist_close_mailbox (Mailbox * mailbox)
 }
  
 
-static gint
+static gboolean
 mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
   BalsaMBList * bmbl;
@@ -218,29 +239,30 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
 
   gint row, column;
   gint on_mailbox;
-  GtkObject *data;
-  Mailbox *mailbox = NULL;
+  MailboxNode *mbnode;
+  Mailbox *mailbox;
   GtkCTreeNode *node;
 
   bmbl = BALSA_MBLIST (widget);
   clist = GTK_CLIST (widget);
   ctree = GTK_CTREE (widget);
-  
+
   on_mailbox = gtk_clist_get_selection_info (clist, event->x, event->y, &row, &column);
   
   if (on_mailbox)
     {
-      data = gtk_clist_get_row_data(clist, row);
-
-      if (BALSA_IS_MAILBOX(data)) {
-        mailbox = BALSA_MAILBOX(data);
-      } else {
-        return FALSE;
-      }
-
       node = gtk_ctree_node_nth( ctree, row );
+      mbnode = gtk_ctree_node_get_row_data(ctree, node);
+      mailbox = mbnode->mailbox;
       
+      /* FIXME: The BALSA_IS_MAILBOX below causes segfaults, when
+       * clicking on non-mailboxes, but this works until the problem
+       * is fixed */
+      if (mbnode->IsDir)
+        return FALSE;
       
+      g_return_val_if_fail (BALSA_IS_MAILBOX(mailbox), FALSE);
+            
       if (event->button == 1) // && event->type == GDK_2BUTTON_PRESS)
 	
 	{
@@ -253,8 +275,7 @@ mblist_button_press_cb (GtkWidget *widget, GdkEventButton *event, gpointer user_
       if (event && event->button == 3)
 	{
 	  if (node) gtk_ctree_select(ctree, node);
-	  gtk_menu_popup (GTK_MENU (mblist_create_context_menu (GTK_CTREE (bmbl), mailbox)), 
-			  NULL, NULL, NULL, NULL, event->button, event->time);
+	  gtk_menu_popup (GTK_MENU (mblist_create_context_menu (GTK_CTREE (bmbl), mailbox)), NULL, NULL, NULL, NULL, event->button, event->time);
 	}
 
       return FALSE;
@@ -466,7 +487,8 @@ Mailbox *
 mblist_get_selected_mailbox (void)
 {
   GtkCTreeNode *node;
-
+  MailboxNode *mbnode;
+  
   g_assert (mblw != NULL);
   g_assert (mblw->ctree != NULL);
 
@@ -475,7 +497,8 @@ mblist_get_selected_mailbox (void)
 
   node = GTK_CTREE_NODE (GTK_CLIST (mblw->ctree)->selection->data);
 
-  return gtk_ctree_node_get_row_data (GTK_CTREE (mblw->ctree), node);
+  mbnode = gtk_ctree_node_get_row_data (GTK_CTREE (mblw->ctree), node);
+  return mbnode->mailbox;
 }
 
 

@@ -1395,7 +1395,13 @@ address_free (Address * address)
   g_free (address);
 }
 
-
+void address_list_free(GList * address_list)
+{
+  GList *list;
+  for (list = g_list_first (address_list); list; list = g_list_next (list))
+    if(list->data) address_free (list->data);
+  g_list_free (address_list);
+}
 
 static Address *
 translate_address (ADDRESS * caddr)
@@ -1426,9 +1432,21 @@ make_list_from_string (gchar * the_str)
       list = g_list_append (list, addr);
       address = address->next;
     }
+  rfc822_free_address( &address );
   return list;
 }
 
+/* returns only first address on the list; ignores remaining ones */
+Address*
+make_address_from_string(gchar* str) {
+  ADDRESS *address = NULL;
+  Address *addr = NULL;
+
+  address = rfc822_parse_adrlist (address, str);
+  addr = translate_address (address);
+  rfc822_free_address (&address);
+  return addr;
+}
 
 
 /*

@@ -177,8 +177,8 @@ static GnomeUIInfo file_menu[] =
   GNOMEUIINFO_SEPARATOR,
   #endif
 
-  // XXX 
-  // GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), 
+  /* XXX 
+     GNOMEUIINFO_MENU_EXIT_ITEM(close_main_window, NULL), */
   GNOMEUIINFO_MENU_EXIT_ITEM(balsa_exit, NULL),
 
   GNOMEUIINFO_END
@@ -416,15 +416,15 @@ balsa_window_class_init (BalsaWindowClass *klass)
 
   gtk_timeout_add(30000, (GtkFunction) balsa_close_mailbox_on_timer, NULL);
 
-  //  widget_class->draw = gtk_window_draw;
+/* widget_class->draw = gtk_window_draw; */
 }
 
 static void
 balsa_window_init (BalsaWindow *window)
 {
-  //  window->modal = FALSE;
+  /* window->modal = FALSE; */
   
-  //  gtk_container_register_toplevel (GTK_CONTAINER (window));
+  /* gtk_container_register_toplevel (GTK_CONTAINER (window)); */
 }
 
 GtkWidget*
@@ -517,11 +517,11 @@ static void
 balsa_window_real_set_cursor (BalsaWindow *window,
 			      GdkCursor *cursor)
 {
-  // XXX fixme to work with NULL cursors
-  //  gtk_widget_set_sensitive (GTK_WIDGET(window->progress_bar), FALSE);
-  //  gtk_progress_set_activity_mode (GTK_WIDGET(window->progress_bar), FALSE);
-  //  gtk_timeout_remove (pbar_timeout);
-  //  gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);
+  /* XXX fixme to work with NULL cursors
+     gtk_widget_set_sensitive (GTK_WIDGET(window->progress_bar), FALSE);
+     gtk_progress_set_activity_mode (GTK_WIDGET(window->progress_bar), FALSE);
+     gtk_timeout_remove (pbar_timeout);
+     gtk_progress_set_value (GTK_PROGRESS (pbar), 0.0);*/
   gdk_window_set_cursor (GTK_WIDGET(window)->window, cursor);
 }
 

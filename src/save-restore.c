@@ -738,7 +738,25 @@ config_global_load (void)
     balsa_app.previewpane = TRUE;
   else
     balsa_app.previewpane = atoi (field);
+
+  
+  /* column width settings */
+  if ((field = pl_dict_get_str (globals, "MBListNameWidth")) == NULL)
+    balsa_app.mblist_name_width = MBNAME_DEFAULT_WIDTH;
+  else
+    balsa_app.mblist_name_width = atoi(field);
+  
 #ifdef BALSA_SHOW_INFO
+  if ((field = pl_dict_get_str (globals, "MBListNewMsgWidth")) == NULL)
+    balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
+  else
+    balsa_app.mblist_newmsg_width = atoi(field);
+
+  if ((field = pl_dict_get_str (globals, "MBListTotalMsgWidth")) == NULL)
+    balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
+  else
+    balsa_app.mblist_totalmsg_width = atoi(field);
+
   /* show mailbox content info */
   if ((field = pl_dict_get_str (globals, "ShowMailboxContentInfo")) == NULL)
     balsa_app.mblist_show_mb_content_info = TRUE;
@@ -773,15 +791,15 @@ config_global_load (void)
   else
     balsa_app.index_num_width = atoi (field);
 
-  if ((field = pl_dict_get_str (globals, "IndexUnreadWidth")) == NULL)
-    balsa_app.index_unread_width = UNREAD_DEFAULT_WIDTH;
+  if ((field = pl_dict_get_str (globals, "IndexStatusWidth")) == NULL)
+    balsa_app.index_status_width = STATUS_DEFAULT_WIDTH;
   else
-    balsa_app.index_unread_width = atoi (field);
+    balsa_app.index_status_width = atoi (field);
 
-  if ((field = pl_dict_get_str (globals, "IndexFlagWidth")) == NULL)
-    balsa_app.index_flag_width = FLAG_DEFAULT_WIDTH;
+  if ((field = pl_dict_get_str (globals, "IndexAttachmentWidth")) == NULL)
+    balsa_app.index_attachment_width = ATTACHMENT_DEFAULT_WIDTH;
   else
-    balsa_app.index_flag_width = atoi (field);
+    balsa_app.index_attachment_width = atoi (field);
 
   if ((field = pl_dict_get_str (globals, "IndexFromWidth")) == NULL)
     balsa_app.index_from_width = FROM_DEFAULT_WIDTH;
@@ -937,7 +955,16 @@ config_global_save (void)
       pl_dict_add_str_str (globals, "SMTP", tmp);
     }
 
+    snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_name_width);
+    pl_dict_add_str_str (globals, "MBListNameWidth", tmp);
+
 #ifdef BALSA_SHOW_INFO
+    snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_newmsg_width);
+    pl_dict_add_str_str (globals, "MBListNewMsgWidth", tmp);
+
+    snprintf (tmp, sizeof(tmp), "%d", balsa_app.mblist_totalmsg_width);
+    pl_dict_add_str_str (globals, "MBListTotalMsgWidth", tmp);
+
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_show_mb_content_info);
     pl_dict_add_str_str (globals, "ShowMailboxContentInfo", tmp);
 #endif
@@ -947,7 +974,10 @@ config_global_save (void)
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_height);
     pl_dict_add_str_str (globals, "MainWindowHeight", tmp);
 
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
+/* We need to add 18 to the mailbox list width to prevent it from changing
+   after the exit (not sure why but possibly because of difference between
+   paned width and the ctree width. */
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width + 18);
     pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.notebook_height);
@@ -956,11 +986,11 @@ config_global_save (void)
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_num_width);
     pl_dict_add_str_str (globals, "IndexNumWidth", tmp);
 
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_unread_width);
-    pl_dict_add_str_str (globals, "IndexUnreadWidth", tmp);
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_status_width);
+    pl_dict_add_str_str (globals, "IndexStatusWidth", tmp);
 
-    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_flag_width);
-    pl_dict_add_str_str (globals, "IndexFlagWidth", tmp);
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_attachment_width);
+    pl_dict_add_str_str (globals, "IndexAttachmentWidth", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.index_from_width);
     pl_dict_add_str_str (globals, "IndexFromWidth", tmp);

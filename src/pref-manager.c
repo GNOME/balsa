@@ -57,6 +57,7 @@
 #define COL_SPACING     (1 * HIG_PADDING)
 
 #define BALSA_PAGE_SIZE_GROUP_KEY  "balsa-page-size-group"
+#define BALSA_TABLE_PAGE_KEY  "balsa-table-page"
 typedef struct _PropertyUI {
     GtkWidget *address_books;
 
@@ -260,6 +261,7 @@ static GtkWidget* create_pref_option_menu(const gchar* names[], gint size,
 static GtkWidget *pm_page_new(void);
 static void pm_page_add(GtkWidget * page, GtkWidget * child);
 static GtkSizeGroup * pm_page_get_size_group(GtkWidget * page);
+static void pm_page_add_to_size_group(GtkWidget * page, GtkWidget * child);
 static GtkWidget *pm_group_new(const gchar * text);
 static void pm_group_add(GtkWidget * group, GtkWidget * child);
 static GtkWidget *pm_group_get_vbox(GtkWidget * group);
@@ -1383,15 +1385,14 @@ attach_entry_full(const gchar * label, gint row, GtkTable * table,
                   gint col_left, gint col_middle, gint col_right)
 {
     GtkWidget * res, *lw;
-    GtkSizeGroup *size_group;
-    
+    GtkWidget *page;
+
     res = gtk_entry_new();
     lw = gtk_label_new(label);
     gtk_misc_set_alignment(GTK_MISC(lw), 0, 0.5);
 
-    size_group =
-        g_object_get_data(G_OBJECT(table), BALSA_PAGE_SIZE_GROUP_KEY);
-    gtk_size_group_add_widget(size_group, lw);
+    page = g_object_get_data(G_OBJECT(table), BALSA_TABLE_PAGE_KEY);
+    pm_page_add_to_size_group(page, lw);
 
     gtk_table_attach(GTK_TABLE(table), lw,
                      col_left, col_middle,
@@ -1491,7 +1492,6 @@ create_mailserver_page(gpointer data)
 static GtkWidget *
 remote_mailbox_servers_group(GtkWidget * page)
 {
-    GtkSizeGroup *size_group = pm_page_get_size_group(page);
     GtkWidget *group;
     GtkWidget *hbox;
     GtkWidget *vbox;
@@ -1510,7 +1510,7 @@ remote_mailbox_servers_group(GtkWidget * page)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_size_request(scrolledwindow, -1, 150);
-    gtk_size_group_add_widget(size_group, scrolledwindow);
+    pm_page_add_to_size_group(page, scrolledwindow);
 
     store = gtk_list_store_new(MS_N_COLUMNS, 
                                G_TYPE_STRING,   /* MS_PROT_COLUMN */
@@ -1651,7 +1651,6 @@ incoming_subpage(gpointer data)
 static GtkWidget *
 checking_group(GtkWidget * page)
 {
-    GtkSizeGroup *size_group = pm_page_get_size_group(page);
     GtkWidget *group;
     GtkWidget *table;
     GtkObject *spinbutton_adj;
@@ -1665,7 +1664,7 @@ checking_group(GtkWidget * page)
 	_("_Check mail automatically every:"));
     gtk_table_attach(GTK_TABLE(table), pui->check_mail_auto, 0, 1, 0, 1,
                      GTK_FILL, 0, 0, 0);
-    gtk_size_group_add_widget(size_group, pui->check_mail_auto);
+    pm_page_add_to_size_group(page, pui->check_mail_auto);
 
     spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
     pui->check_mail_minutes =
@@ -1682,7 +1681,7 @@ checking_group(GtkWidget * page)
 	_("Check _IMAP mailboxes"));
     gtk_table_attach(GTK_TABLE(table), pui->check_imap, 0, 1, 1, 2,
                      GTK_FILL, 0, 0, 0);
-    gtk_size_group_add_widget(size_group, pui->check_imap);
+    pm_page_add_to_size_group(page, pui->check_imap);
     
     pui->check_imap_inbox = gtk_check_button_new_with_mnemonic(
 	_("Check INBOX _only"));
@@ -1705,7 +1704,6 @@ checking_group(GtkWidget * page)
 static GtkWidget *
 quoted_group(GtkWidget * page)
 {
-    GtkSizeGroup *size_group = pm_page_get_size_group(page);
     GtkWidget *group;
     GtkWidget *table;
     GtkObject *spinbutton_adj;
@@ -1722,7 +1720,7 @@ quoted_group(GtkWidget * page)
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label,
                      0, 1, 0, 1, GTK_FILL, 0, 0, 0);
-    gtk_size_group_add_widget(size_group, label);
+    pm_page_add_to_size_group(page, label);
 
     pui->quote_pattern = gnome_entry_new("quote-regex-history");
     gtk_table_attach(GTK_TABLE(table), pui->quote_pattern,
@@ -1732,7 +1730,7 @@ quoted_group(GtkWidget * page)
 	gtk_check_button_new_with_label(_("Wrap Incoming Text at:"));
     gtk_table_attach(GTK_TABLE(table), pui->browse_wrap,
                      0, 1, 1, 2, GTK_FILL, 0, 0, 0);
-    gtk_size_group_add_widget(size_group, pui->browse_wrap);
+    pm_page_add_to_size_group(page, pui->browse_wrap);
 
     spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 200.0, 1.0, 5.0, 0.0);
     pui->browse_wrap_length =
@@ -1757,7 +1755,6 @@ quoted_group(GtkWidget * page)
 static GtkWidget *
 alternative_group(GtkWidget * page)
 {
-    GtkSizeGroup *size_group = pm_page_get_size_group(page);
     GtkWidget *group;
 
     /* handling of multipart/alternative */
@@ -1767,7 +1764,7 @@ alternative_group(GtkWidget * page)
     pui->display_alt_plain =
 	gtk_check_button_new_with_label(_("prefer text/plain over html"));
     pm_group_add(group, pui->display_alt_plain);
-    gtk_size_group_add_widget(size_group, pui->display_alt_plain);
+    pm_page_add_to_size_group(page, pui->display_alt_plain);
 
     return group;
 }
@@ -1847,7 +1844,6 @@ outgoing_subpage(gpointer data)
 static GtkWidget *
 word_wrap_group(GtkWidget * page)
 {
-    GtkSizeGroup *size_group = pm_page_get_size_group(page);
     GtkWidget *group;
     GtkWidget *table;
     GtkObject *spinbutton_adj;
@@ -1862,7 +1858,7 @@ word_wrap_group(GtkWidget * page)
     gtk_table_attach(GTK_TABLE(table), pui->wordwrap, 0, 1, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
-    gtk_size_group_add_widget(size_group, pui->wordwrap);
+    pm_page_add_to_size_group(page, pui->wordwrap);
 
     spinbutton_adj =
         gtk_adjustment_new(1.0, 40.0,
@@ -2334,14 +2330,12 @@ add_pref_menu(const gchar* label, const gchar *names[], gint size,
 static GtkWidget *
 create_table(gint rows, gint cols, GtkWidget * page)
 {
-    GtkSizeGroup *size_group = pm_page_get_size_group(page);
     GtkWidget *table;
 
     table = gtk_table_new(rows, cols, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table), ROW_SPACING);
     gtk_table_set_col_spacings(GTK_TABLE(table), COL_SPACING);
-    g_object_set_data(G_OBJECT(table), BALSA_PAGE_SIZE_GROUP_KEY,
-                      size_group);
+    g_object_set_data(G_OBJECT(table), BALSA_TABLE_PAGE_KEY, page);
 
     return table;
 }
@@ -2466,6 +2460,7 @@ misc_group(GtkWidget * page)
                                           "if unused more than"));
     gtk_box_pack_start(GTK_BOX(hbox1), pui->close_mailbox_auto,
                        FALSE, FALSE, 0);
+    pm_page_add_to_size_group(page, pui->close_mailbox_auto);
 
     close_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
     pui->close_mailbox_minutes =
@@ -2487,6 +2482,7 @@ misc_group(GtkWidget * page)
                                           "if unused more than"));
     gtk_box_pack_start(GTK_BOX(hbox2), pui->commit_mailbox_auto,
                        FALSE, FALSE, 0);
+    pm_page_add_to_size_group(page, pui->commit_mailbox_auto);
 
     commit_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
     pui->commit_mailbox_minutes =
@@ -3108,6 +3104,15 @@ pm_page_get_size_group(GtkWidget * page)
 {
     return (GtkSizeGroup *) g_object_get_data(G_OBJECT(page),
                                               BALSA_PAGE_SIZE_GROUP_KEY);
+}
+
+static void
+pm_page_add_to_size_group(GtkWidget * page, GtkWidget * child)
+{
+    GtkSizeGroup *size_group;
+
+    size_group = pm_page_get_size_group(page);
+    gtk_size_group_add_widget(size_group, child);
 }
 
 /* pm_group: methods for making groups of controls, to be added to a

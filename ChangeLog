@@ -1,3 +1,7 @@
+2001-10-19  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.c: automatic thread expansion on next unread #62737.
+
 2001-10-20  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/libbalsa.h: libbalsa_wait_for_sending_thread().

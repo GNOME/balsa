@@ -880,99 +880,103 @@ balsa_index_select_next(BalsaIndex * bindex)
 }
 
 /* balsa_index_select_next_unread:
+ * balsa_index_select_next_flagged:
  * 
- * search for the next unread in the current mailbox.
+ * search for the next unread/flagged in the current mailbox.
  * wraps over if the selected message was the last one.
  * */
-void
-balsa_index_select_next_unread(BalsaIndex * bindex)
-{
-    GtkCList *clist;
+struct balsa_index_scan_info {
+    LibBalsaMessageFlag flag;
+    GtkCTreeNode *first_match;
+    LibBalsaMessage *first_match_message;
+    GtkCTreeNode *next_match;
+    LibBalsaMessage *next_match_message;
+    GtkCTreeNode *node;
+    gboolean looking;
     LibBalsaMessage *message;
-    gint h, start_row;
+};
 
-    g_return_if_fail(bindex != NULL);
-    clist = GTK_CLIST(bindex->ctree);
-
-    if ((h = balsa_index_get_largest_selected(clist) + 1) <= 0)
-	h = 0;
-
-    if (h >= clist->rows)
-	h = 0;
-
-    start_row = h;
-
-    while (h < clist->rows) {
-	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-	    balsa_index_select_row(bindex, h);
-	    return;
-	}
-	++h;
+static void
+balsa_index_scan_for_flag(GtkCTree *ctree, GtkCTreeNode *node,
+                          struct balsa_index_scan_info *b)
+{
+    LibBalsaMessage *message
+        = LIBBALSA_MESSAGE(gtk_ctree_node_get_row_data(ctree, node));
+    if (message->flags & b->flag) {
+        if (!b->first_match) {
+            b->first_match = node;
+            b->first_match_message = message;
+        }
+        if (b->looking && !b->next_match) {
+            b->next_match = node;
+            b->next_match_message = message;
+        }
     }
-
-    /* We couldn't find it below our start position, try starting from
-     * the beginning.
-     * */
-    h = 0;
-
-    while (h < start_row) {
-	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
-
-	if (message->flags & LIBBALSA_MESSAGE_FLAG_NEW) {
-	    balsa_index_select_row(bindex, h);
-	    return;
-	}
-	++h;
+    if (message == b->message) {
+        b->node = node;
+        b->looking = TRUE;
     }
 }
 
-/* balsa_index_select_next_flagged:
- * 
- * search for the next flagged in the current mailbox.
- * wraps over if the selected message was the last one.
- * */
-void
-balsa_index_select_next_flagged(BalsaIndex * bindex)
+static void
+balsa_index_select_next_by_flag(BalsaIndex * bindex,
+                                LibBalsaMessageFlag flag)
 {
     GtkCList *clist;
     LibBalsaMessage *message;
-    gint h, start_row;
-    
+    gint h;
+    struct balsa_index_scan_info bi;
+    GtkCTreeNode *node;
+
     g_return_if_fail(bindex != NULL);
     clist = GTK_CLIST(bindex->ctree);
-    
+
     if ((h = balsa_index_get_largest_selected(clist) + 1) <= 0)
 	h = 0;
-    
+
     if (h >= clist->rows)
 	h = 0;
-    
-    start_row = h;
-    
-    while (h < clist->rows) {
-	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
-	if (LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
-	    balsa_index_select_row(bindex, h);
-	    return;
-	}
-	++h;
+
+    /* search the ctree for a matching message */
+    bi.flag = flag;
+    bi.first_match = NULL;
+    bi.next_match = NULL;
+    bi.looking = FALSE;
+    bi.message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
+    gtk_ctree_pre_recursive(bindex->ctree, NULL, (GtkCTreeFunc)
+                            balsa_index_scan_for_flag, &bi);
+    if (bi.next_match) {
+        node = bi.next_match;
+        message = bi.next_match_message;
+    } else if (bi.first_match) {
+        node = bi.first_match;
+        message = bi.first_match_message;
+    } else 
+        return;
+
+    while (!gtk_ctree_is_viewable(bindex->ctree, node)) {
+        node = GTK_CTREE_ROW(node)->parent;
+        gtk_ctree_expand(bindex->ctree, node);
+        balsa_index_set_style(bindex, node);
     }
 
-    /* We couldn't find it below our start position, try starting from
-     * the beginning.
-     * */
-    h = 0;
-    
-    while (h < start_row) {
-	message = LIBBALSA_MESSAGE(gtk_clist_get_row_data(clist, h));
-	
-	if (LIBBALSA_MESSAGE_IS_FLAGGED(message)) {
-	    balsa_index_select_row(bindex, h);
-	    return;
-	}
-	++h;
-    }
+    balsa_index_select_row(bindex,
+                           gtk_clist_find_row_from_data(clist,
+                                                        message));
+}
+
+void
+balsa_index_select_next_unread(BalsaIndex * bindex)
+{
+    balsa_index_select_next_by_flag(bindex,
+                                    LIBBALSA_MESSAGE_FLAG_NEW);
+}
+
+void
+balsa_index_select_next_flagged(BalsaIndex * bindex)
+{
+    balsa_index_select_next_by_flag(bindex,
+                                    LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
 
@@ -1990,9 +1994,9 @@ idle_handler_cb(GtkWidget * widget)
         return FALSE;
 
     gdk_threads_enter();
+    handler = 0;
     
     if (!widget) {
-	handler = 0;
 	gdk_threads_leave();
 	return FALSE;
     }
@@ -2014,7 +2018,6 @@ idle_handler_cb(GtkWidget * widget)
 	    balsa_message_clear(BALSA_MESSAGE (bmsg));
     }
 
-    handler = 0;
     /* replace_attached_data (GTK_OBJECT (widget), "message", NULL); */
     if (message != NULL) {
         gtk_object_remove_data (GTK_OBJECT (widget), "message");

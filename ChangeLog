@@ -1,3 +1,9 @@
+2001-09-17  Carlos Morgado  <chbm@chbm.nu>
+
+	* src/balsa-mblist.c: Peter Bloomfield - when dnding
+	selection goes back to source mailbox
+
+
 2001-09-15  Peter Bloomfield <PeterBloomfield@MindSpring.com>
 
 	* src/balsa-index.c: re-enable D&D target highlighting.

@@ -1543,7 +1543,17 @@ mblist_drag_cb (GtkWidget* widget, GdkDragContext* context,
 	    balsa_mblist_update_mailbox(balsa_app.mblist, mailbox);
         }
     }
-
+    
+    
+    gtk_signal_handler_block_by_func(GTK_OBJECT(widget),
+				     GTK_SIGNAL_FUNC(select_mailbox),
+				     NULL);
+    gtk_ctree_select(ctree, gtk_ctree_find_by_row_data_custom
+		     (ctree, NULL, orig_mailbox, mblist_mbnode_compare));
+    gtk_signal_handler_unblock_by_func(GTK_OBJECT(widget),
+				       GTK_SIGNAL_FUNC(select_mailbox),
+				       NULL);
+ 
     g_list_free (messages);
 }
 

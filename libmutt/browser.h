@@ -52,6 +52,7 @@ struct browser_state
   int marked : 1;
   int unmarked : 1;
   /*BALSA data begin */
+  int scanned : 1;
   void * rnode;        /* points to a GNode */
   void * server;       /* points to a LibBalsaServer */
   void (*mailbox_handler)();

@@ -612,17 +612,35 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
     gchar cr[] = "\n";
     gchar *line_start, *line_end;
     gchar *wrapped_value;
+    const gchar *msgcharset;
 
     if (!(bm->shown_headers == HEADERS_ALL || libbalsa_find_word(header, balsa_app.selected_headers))) 
 	return;
 
+    /* always display the label in the predefined font */
     if (strcmp(header, "subject") != 0)
 	fnt = gdk_font_load(balsa_app.message_font);
     else
 	fnt = gdk_font_load(balsa_app.subject_font);
 
     gtk_text_insert(GTK_TEXT(bm->header_text), fnt, NULL, NULL, label, -1);
-
+    gdk_font_unref(fnt);
+    
+    /* select the font for the value according to the msg charset */
+    if ((msgcharset = libbalsa_message_charset(bm->message))) {
+	if (strcmp(header, "subject") != 0)
+	    fnt = balsa_get_font_by_charset(balsa_app.message_font, 
+					    msgcharset);
+	else
+	    fnt = balsa_get_font_by_charset(balsa_app.subject_font,
+					    msgcharset);
+    } else {
+	if (strcmp(header, "subject") != 0)
+	    fnt = gdk_font_load(balsa_app.message_font);
+	else
+	    fnt = gdk_font_load(balsa_app.subject_font);
+    }
+	
     if (value && *value != '\0') {
 	if (strlen(label) < 15)
 	    gtk_text_insert(GTK_TEXT(bm->header_text), fnt, NULL, NULL,
@@ -659,6 +677,7 @@ add_header_gchar(BalsaMessage * bm, const gchar *header, const gchar *label,
 	gtk_text_insert(GTK_TEXT(bm->header_text), fnt, NULL, NULL, cr,
 			-1);
     }
+    gdk_font_unref(fnt);
 }
 
 static void

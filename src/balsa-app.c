@@ -354,6 +354,7 @@ balsa_app_init(void)
     /* IMAP */
     balsa_app.check_imap = 1;
     balsa_app.check_imap_inbox = 0;
+    balsa_app.imap_scan_depth = 1;
 
     /* RFC2646 format=flowed */
     balsa_app.recognize_rfc2646_format_flowed = TRUE;

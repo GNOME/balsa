@@ -1,4 +1,19 @@
-2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
+2001-11-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	#61263, attachment 6161
+	* help/C/balsa.sgml: update doc.
+	* libbalsa/folder-scanners.[ch]: depth-limited scanning.
+	* src/balsa-app.[ch]: add  imap_scan_depth field (default: 1).
+	* src/balsa-mblist.[ch]: implement mblist_scan_mailbox_node() and
+	balsa_mblist_scan_children().  Rescan on tree_expand.
+	* src/mailbox-node.[ch]: add scanned field. Limited depth
+	scanning.
+	* src/pref-manager.c: UI for imap_scan_depth.
+	* src/save-restore.c: IO for imap_scan_depth.
+	
+	* src/balsa-message.c: use more apriopriate charset (Albrecht, #65934)
+	
+	2001-12-03  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* help/C/balsa.sgml: & ->&amp; (Jelmer)
 	* libbalsa/libbalsa.c: check system SSL certificates (TL, #66032).

@@ -69,6 +69,8 @@ static void balsa_mblist_unread_messages_changed_cb(LibBalsaMailbox *
 static void balsa_mblist_disconnect_mailbox_signals(GtkCTree * tree,
 						    GtkCTreeNode * node,
 						    gpointer data);
+static void balsa_mblist_scan_children(GtkCTree * tree,
+                                       GtkCTreeNode * node);
 
 /* callbacks */
 static gboolean mailbox_nodes_to_ctree(GtkCTree *, guint, GNode *,
@@ -477,8 +479,8 @@ balsa_mblist_init(BalsaMBList * tree)
 
     gtk_ctree_construct(GTK_CTREE(tree), 3, 0, titles);
 
-    gtk_signal_connect(GTK_OBJECT(tree), "tree_expand",
-		       GTK_SIGNAL_FUNC(mailbox_tree_expand), NULL);
+    gtk_signal_connect_after(GTK_OBJECT(tree), "tree_expand",
+                             GTK_SIGNAL_FUNC(mailbox_tree_expand), NULL);
     gtk_signal_connect(GTK_OBJECT(tree), "tree_collapse",
 		       GTK_SIGNAL_FUNC(mailbox_tree_collapse), NULL);
 
@@ -645,26 +647,22 @@ balsa_mblist_disconnect_mailbox_signals(GtkCTree * tree,
 void
 balsa_mblist_repopulate(BalsaMBList * bmbl)
 {
-    GtkCTree *ctree;
-
     g_return_if_fail(BALSA_IS_MBLIST(bmbl));
-
-    ctree = GTK_CTREE(bmbl);
 
     gtk_ctree_post_recursive(GTK_CTREE(bmbl), NULL,
 			     balsa_mblist_disconnect_mailbox_signals,
 			     NULL); 
 
-    gtk_clist_freeze(GTK_CLIST(ctree));
-    gtk_clist_clear(GTK_CLIST(ctree));
+    gtk_clist_freeze(GTK_CLIST(bmbl));
+    gtk_clist_clear(GTK_CLIST(bmbl));
 
     if (bmbl->display_info)
-	gtk_clist_column_titles_show(GTK_CLIST(ctree));
+	gtk_clist_column_titles_show(GTK_CLIST(bmbl));
     else 
-	gtk_clist_column_titles_hide(GTK_CLIST(ctree));
+	gtk_clist_column_titles_hide(GTK_CLIST(bmbl));
 
-    gtk_clist_set_column_visibility(GTK_CLIST(ctree), 1, bmbl->display_info);
-    gtk_clist_set_column_visibility(GTK_CLIST(ctree), 2, bmbl->display_info);
+    gtk_clist_set_column_visibility(GTK_CLIST(bmbl), 1, bmbl->display_info);
+    gtk_clist_set_column_visibility(GTK_CLIST(bmbl), 2, bmbl->display_info);
 
     if (balsa_app.mailbox_nodes) {
 	GNode *walk;
@@ -673,14 +671,14 @@ balsa_mblist_repopulate(BalsaMBList * bmbl)
 	for(walk = g_node_last_child(balsa_app.mailbox_nodes);
 	    walk; walk = walk->prev) {
 	    node =
-		gtk_ctree_insert_gnode(ctree, NULL, NULL, walk,
+		gtk_ctree_insert_gnode(GTK_CTREE(bmbl), NULL, NULL, walk,
 				       mailbox_nodes_to_ctree, NULL);
 
 	}
     }
-    gtk_ctree_sort_recursive(ctree, NULL);
+    gtk_ctree_sort_recursive(GTK_CTREE(bmbl), NULL);
     balsa_mblist_have_new(bmbl);
-    gtk_clist_thaw(GTK_CLIST(ctree));
+    gtk_clist_thaw(GTK_CLIST(bmbl));
 }
 
 /* mailbox_nodes_to_ctree
@@ -762,6 +760,7 @@ mailbox_tree_expand(GtkCTree * ctree, GList * node, gpointer data)
 
     mbnode = gtk_ctree_node_get_row_data(ctree, GTK_CTREE_NODE(node));
     mbnode->expanded = TRUE;
+    balsa_mblist_scan_children(ctree, GTK_CTREE_NODE(node));
 }
 
 static void
@@ -1595,4 +1594,58 @@ mblist_drag_motion_cb(GtkWidget * mblist, GdkDragContext * context,
                          GDK_ACTION_COPY) ? GDK_ACTION_COPY :
                         GDK_ACTION_MOVE, time);
     return FALSE;
+}
+
+/* mblist_scan_mailbox_node:
+ * public interface for checking whether a mailbox node's children need
+ * scanning.
+ */
+
+void
+mblist_scan_mailbox_node(BalsaMBList * mblist, BalsaMailboxNode * mbnode)
+{
+    GtkCTreeNode *node =
+        gtk_ctree_find_by_row_data(GTK_CTREE(mblist), NULL, mbnode);
+    balsa_mblist_scan_children(GTK_CTREE(mblist), node);
+}
+
+/* balsa_mblist_scan_children:
+ * called by mailbox_tree_expand, after the tree has been expanded, and
+ * by mblist_scan_mailbox_node, the public interface.
+ */
+
+static void
+balsa_mblist_scan_children(GtkCTree * ctree, GtkCTreeNode * node)
+{
+    GList *list = NULL;
+
+    for (node = GTK_CTREE_ROW(node)->children; node;
+         node = GTK_CTREE_ROW(node)->sibling) {
+        BalsaMailboxNode *mbnode =
+            BALSA_MAILBOX_NODE(gtk_ctree_node_get_row_data(ctree, node));
+        if (mbnode && (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)
+                       || (!mbnode->mailbox && mbnode->server
+                           && mbnode->server->type ==
+                           LIBBALSA_SERVER_IMAP))
+            && !mbnode->scanned) {
+            list = g_list_append(list, mbnode);
+        }
+    }
+
+    if (list) {
+        GList *l = list;
+
+        gtk_clist_freeze(GTK_CLIST(ctree));
+        while (list) {
+            BalsaMailboxNode *mbnode = list->data;
+            balsa_mailbox_node_rescan(mbnode);
+            mbnode->scanned = TRUE;
+            list = g_list_next(list);
+        }
+        gtk_clist_thaw(GTK_CLIST(ctree));
+
+        g_list_free(l);
+        if (BALSA_MBLIST(ctree) != balsa_app.mblist)
+            balsa_mblist_repopulate(BALSA_MBLIST(ctree));
+    }
 }

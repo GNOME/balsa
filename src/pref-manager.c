@@ -138,6 +138,9 @@ typedef struct _PropertyUI {
     GtkWidget *spell_check_sig;
     GtkWidget *spell_check_quoted;
 
+    /* IMAP folder scanning */
+    GtkWidget *imap_scan_depth;
+
 } PropertyUI;
 
 
@@ -439,6 +442,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
 
+    gtk_signal_connect(GTK_OBJECT(pui->imap_scan_depth), "changed",
+		       GTK_SIGNAL_FUNC(properties_modified_cb),
+		       property_box);
+
     gtk_signal_connect(GTK_OBJECT(pui->empty_trash), "toggled",
 		       GTK_SIGNAL_FUNC(properties_modified_cb),
 		       property_box);
@@ -674,6 +681,9 @@ apply_prefs(GnomePropertyBox * pbox, gint page_num)
 	GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
     balsa_app.remember_open_mboxes =
 	GTK_TOGGLE_BUTTON(pui->remember_open_mboxes)->active;
+    balsa_app.imap_scan_depth =
+	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
+					 (pui->imap_scan_depth));
     balsa_app.empty_trash_on_exit =
 	GTK_TOGGLE_BUTTON(pui->empty_trash)->active;
 
@@ -929,6 +939,8 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
 				 (pui->remember_open_mboxes),
 				 balsa_app.remember_open_mboxes);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->imap_scan_depth),
+			      balsa_app.imap_scan_depth);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->empty_trash),
 				 balsa_app.empty_trash_on_exit);
 
@@ -2105,7 +2117,6 @@ create_startup_page(gpointer data)
     GtkWidget *frame;
     GtkWidget *vb1;
     GtkObject *scan_adj;
-    GtkWidget *scan_spin;
     GtkWidget *hbox;
     const guint padding = 5;
 
@@ -2130,6 +2141,37 @@ create_startup_page(gpointer data)
 	    _("Remember open mailboxes between sessions"));
     gtk_box_pack_start(GTK_BOX(vb1), pui->remember_open_mboxes,
 		       FALSE, FALSE, 0);
+
+    /* do the IMAP scan depth */
+    frame = gtk_frame_new(_("IMAP Folder Scanning"));
+    gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
+    gtk_box_pack_start(GTK_BOX(vbox1), frame, FALSE, FALSE, 0);
+    vb1 = vbox_in_container(frame);
+
+    hbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vb1), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox),
+                       gtk_label_new(_("Choose depth 1 for fast startup; "
+                                       "this defers scanning some folders.")),
+                       FALSE, FALSE, 0);
+    hbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vb1), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox),
+                       gtk_label_new(_("To see more of the tree at startup, "
+                                       "choose a greater depth.")),
+                       FALSE, FALSE, 0);
+
+    hbox = gtk_hbox_new(FALSE, padding);
+    gtk_box_pack_start(GTK_BOX(vb1), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox),
+                       gtk_label_new(_("Scan tree to depth")),
+                       FALSE, FALSE, 0);
+    scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
+    pui->imap_scan_depth =
+        gtk_spin_button_new(GTK_ADJUSTMENT(scan_adj), 1, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->imap_scan_depth,
+                       FALSE, FALSE, 0);
+
 
     return vbox1;
 

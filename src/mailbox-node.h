@@ -73,6 +73,7 @@ struct _BalsaMailboxNode {
     LibBalsaServer * server; /* Used only by remote; is referenced */
     gboolean subscribed;     /* Used only by remote */
     gboolean list_inbox;     /* Used only by remote */
+    gboolean scanned;        /* IMAP flag */
 };
 
 struct _BalsaMailboxNodeClass {

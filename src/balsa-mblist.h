@@ -75,4 +75,6 @@ void mblist_remove_mblist_node(BalsaMBList * mblist,
 			       GtkCTreeNode * cnode);
 gboolean mblist_remove_mailbox_node(BalsaMBList *mblist,
 				    BalsaMailboxNode* mbnode);
+void mblist_scan_mailbox_node(BalsaMBList *mblist,
+                                  BalsaMailboxNode* mbnode);
 #endif

@@ -54,8 +54,10 @@ static void balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn,
 static GNode* add_local_mailbox(GNode*root, const char*d_name, const char* fn);
 static GNode* add_local_folder(GNode*root, const char*d_name, const char* fn);
 
-static GNode* add_imap_mailbox(GNode*root, const char* fn, char delim);
-static GNode* add_imap_folder(GNode*root, const char* fn, char delim);
+static GNode *add_imap_mailbox(GNode * root, const char *fn, char delim,
+			       gboolean scanned);
+static GNode *add_imap_folder(GNode * root, const char *fn, char delim,
+			      gboolean scanned);
 
 enum {
     SAVE_CONFIG,
@@ -145,6 +147,7 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->sort_type = GTK_SORT_DESCENDING;
     mn->sort_field = BALSA_SORT_NO;
     mn->subscribed = FALSE;
+    mn->scanned = FALSE;
 }
 
 static void
@@ -233,7 +236,8 @@ imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
 {
     g_return_if_fail(mb->server);
     libbalsa_scanner_imap_dir(r, mb->server, mb->dir, mb->subscribed,
-                              mb->list_inbox, 7,
+                              mb->list_inbox, 
+                              balsa_app.imap_scan_depth,
 			      add_imap_folder, add_imap_mailbox);
     /* register whole tree */
     printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
@@ -418,8 +422,6 @@ void balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 {
     GNode *gnode;
 
-    g_return_if_fail(mn->mailbox == NULL);
-
     gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
 
     if(gnode) {
@@ -430,6 +432,9 @@ void balsa_mailbox_node_rescan(BalsaMailboxNode* mn)
 	balsa_mailbox_node_append_subtree(mn, gnode);
 	mn->expanded = expanded;
 	balsa_mblist_repopulate(balsa_app.mblist);
+        if (expanded)
+            /* if this is an IMAP node, we must scan the children */
+	    mblist_scan_mailbox_node(balsa_app.mblist, mn);
     } else g_warning("folder node %s (%p) not found in hierarchy.\n",
 		     mn->name, mn);
 }
@@ -826,7 +831,7 @@ get_parent_folder_name(const gchar* path, char delim)
  * Finds the node if it exists, and creates one if it doesn't.
  */
 static GNode* 
-add_imap_entry(GNode*root, const char* fn, char delim)
+add_imap_entry(GNode*root, const char* fn, char delim, gboolean scanned)
 { 
     GNode* node;
     gchar * parent_name;
@@ -870,6 +875,7 @@ add_imap_entry(GNode*root, const char* fn, char delim)
 	mbnode->name = g_strdup(basename);
 	mbnode->parent = BALSA_MAILBOX_NODE(parent->data);
 	mbnode->subscribed = mbnode->parent->subscribed;
+	mbnode->scanned = scanned;
 	node = g_node_new(mbnode);
     }
 
@@ -890,7 +896,7 @@ add_imap_entry(GNode*root, const char* fn, char delim)
    
 */
 static GNode*
-add_imap_mailbox(GNode*root, const char* fn, char delim)
+add_imap_mailbox(GNode*root, const char* fn, char delim, gboolean scanned)
 { 
     LibBalsaMailboxImap* m;
     const gchar *basename;
@@ -905,7 +911,7 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 	    return NULL; 
     }
 
-    node = add_imap_entry(root, fn, delim);
+    node = add_imap_entry(root, fn, delim, scanned);
     mbnode = BALSA_MAILBOX_NODE(node->data);
     if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
 	/* it already has a mailbox */
@@ -932,10 +938,10 @@ add_imap_mailbox(GNode*root, const char* fn, char delim)
 }
 
 static GNode*
-add_imap_folder(GNode*root, const char* fn, char delim)
+add_imap_folder(GNode*root, const char* fn, char delim, gboolean scanned)
 { 
     if(balsa_app.debug) 
 	printf("add_imap_folder: Adding folder of path %s\n", fn);
-    return add_imap_entry(root, fn, delim);
+    return add_imap_entry(root, fn, delim, scanned);
 }
 

@@ -179,13 +179,16 @@ libbalsa_scanner_imap_dir(GNode *rnode, LibBalsaServer * server,
 
     if (list_inbox)
         /* force INBOX into the mailbox list
-         * delim doesn't matter, so we'll give it '/' */
-        mailbox_handler(rnode, "INBOX", '/');
+         * delim doesn't matter, so we'll give it '/'
+         * and we'll mark it as not scanned, in case it
+         * has any subfolders */
+        mailbox_handler(rnode, "INBOX", '/', FALSE);
 
     state.subfolders = g_list_append(NULL, g_strdup(path));
     state.folder = NULL;
 
     for(i=0; state.subfolders && i<depth; i++) {
+	state.scanned = (i < depth - 1);
 	list = state.subfolders;
 	state.subfolders = NULL;
 	printf("Deph: %i -------------------------------------------\n", i);
@@ -248,7 +251,7 @@ void imap_add_folder (char delim, char *folder, int noselect,
 	++isFolder;
     }
     if (isMailbox)
-	state->mailbox_handler(state->rnode, folder, delim);
+	state->mailbox_handler(state->rnode, folder, delim, state->scanned);
     else if (isFolder)
-	state->folder_handler(state->rnode, folder, delim);
+	state->folder_handler(state->rnode, folder, delim, state->scanned);
 }

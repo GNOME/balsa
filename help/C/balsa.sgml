@@ -2392,10 +2392,18 @@ align="center"></graphic>
 
 <variablelist>
 <varlistentry>
+  <term><guilabel>Open Inbox upon Startup</guilabel></term>
+  <listitem>
+    <para>If set, &Balsa; will open your system inbox upon startup.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
   <term><guilabel>Check Mail at Startup</guilabel></term>
   <listitem>
     <para>If set, &Balsa; will automatically attempt to download mail
-      from the &POP3; mail server upon startup.</para>
+      from the &POP3; mail server upon startup, and will check for new
+      mail on an &IMAP; server.</para>
   </listitem>
 </varlistentry>
 
@@ -2407,6 +2415,22 @@ align="center"></graphic>
       were open when &Balsa; was last quit.</para>
   </listitem>
 </varlistentry>
+
+<varlistentry>
+  <term><guilabel>IMAP Folder Scan Depth</guilabel></term>
+  <listitem>
+    <para>Opening an &IMAP; folder can be time-consuming, because of the
+    need to explore an entire tree of subfolders. You can defer scanning
+    the tree by setting the scan depth to 1. &Balsa; will then descend
+    into the tree only far enough to discover whether any folders that
+    you can see have subfolders. The first time you expand any subtree,
+    &Balsa; will explore more of the tree.</para> <para>If you prefer
+    to have the whole tree available from startup, choose a depth as
+    great as that of your folder tree. Intermediate settings may also
+    be used.</para>
+  </listitem>
+</varlistentry>
+
 </variablelist>
 </sect1>
 
@@ -2467,25 +2491,36 @@ align="center"></graphic>
 
 <itemizedlist mark="bullet">
 
-  <listitem><para>&quot;Folder name&quot; is how the folder is shown
+  <listitem><para><quote>Folder name</quote> is how the folder is shown
   in the mailbox tree on the left side.</para></listitem>
 
-  <listitem><para>``Subfolder of'' indicates the immediate parent of
+  <listitem><para><quote>Subfolder of</quote> indicates the immediate parent of
   the folder.</para></listitem>
 </itemizedlist>
 
 <para>
-  When the dialog is opened from the ``File->New->Remote IMAP
-  subfolder'' menu item, you can enter the folder name and browse IMAP
+  When the dialog is opened from
+  <menuchoice>
+  <guimenu>File</guimenu>
+  <guisubmenu>New</guisubmenu>
+  <guimenuitem>Remote IMAP subfolder</guimenuitem>
+  </menuchoice>,
+  you can enter the folder name and browse IMAP
   trees to find the parent folder. If you had already selected a
   mailbox in an IMAP tree, only that tree is shown for browsing;
   otherwise, all IMAP trees will be shown.
 </para>
 
 <para>
-  When the dialog is opened from the ``Mailbox->Edit'' menu item
+  When the dialog is opened from
+  <menuchoice>
+  <guimenu>Mailbox</guimenu>
+  <guimenuitem>Edit</guimenuitem>
+  </menuchoice>
   with an IMAP folder selected, or by right-clicking on an IMAP
-  mailbox and selecting ``Properties...'', the mailbox may be:
+  mailbox and selecting
+  <guimenuitem>Properties...</guimenuitem>,
+  the mailbox may be:
 
   <itemizedlist mark="bullet">
     <listitem><para>Renamed, by editing the folder name;</para></listitem>
@@ -2984,7 +3019,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     &Balsa; searches for objects having <property>mail</property>
     attribute. The search is done on the <property>cn</property>
     attribute and the search filter has a form
-    <quote>(&(mail=*)(cn=John D))</quote>.  &Balsa; uses
+    <quote>(&amp;(mail=*)(cn=John D))</quote>.  &Balsa; uses
     <property>cn</property> (common name),
     <property>givenName</property> (given name),
     <property>sn</property> (surname) and <property>mail</property>

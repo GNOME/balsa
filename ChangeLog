@@ -1,3 +1,9 @@
+2004-02-04 08:35  PeterB
+
+	* libbalsa/imap-server.c, libbalsa/imap-server.h, src/main.c:
+	implement --debug-imap (-D) switch to control monitoring imap
+	server dialog.
+
 2004-02-03  Pawel Salek
 
 	* libbalsa/imap-server.c: store accepted certificates.

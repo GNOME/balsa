@@ -1,68 +1,69 @@
-A hopelessly out-of-date...
-
 TODO LIST:
 
-/-------------\
-|key:         |
-| * = TODO    |
-| D = DONE    |
-| M = MOSTLY  |
-| P = PARTIAL |
-\-------------/
-
-Things needed for Balsa v0.5 (I said it was out-of-date)
+Things needed for Balsa 1.0 :
 
 Fix/update/make-sure-they-work:
 -------------------------------
- M POP3
- P IMAP
- M balsa-init
+- [MOSTLY] POP3
+- [PARTIAL] IMAP
+- [MOSTLY] balsa-init
+
 
 New features/unfinished things:
 -------------------------------
- * Filters
- * CORBA
- M update libmutt
+- Filters
+- CORBA
+- [MOSTLY] update libmutt
+- Check mail using external programs such as fetchmail
+
 
 UI:
 ---
- D Remove use of GNOME MDI
-   D Same look as now, except mailbox list in a splitter and not a handlebox
 
- D Mailbox list in the main window
-     D Allow the mailbox tree to be resized
+- Message threading
 
- P finish move and copy
+- Incorporate use of GNOME Docklet to indicate status of unread mail,
+status, etc.
 
- D put deleted items in the trash and remove them from the current clist
+- [DONE] Remove use of GNOME MDI
+	- [DONE] Same look as now, except mailbox list in a splitter
+ 	  and not a handlebox
 
- D mailboxes with new mail should have bold text
+- [DONE] Mailbox list in the main window
+ 	- [DONE] Allow the mailbox tree to be resized
 
- P DND messages into mailboxes
-     P Attachments in new mail
-     P move/copy messages via DND
-       D move
-       * copy
+- [PARTIAL] finish move and copy
 
- * MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
+- [DONE] put deleted items in the trash and remove them from the
+  current clist
 
- P New mail notification
-     P via sound
-     * change icon window in case Balsa is minimized to a different icon
+- [DONE] mailboxes with new mail should have bold text
 
- M sending mail (code is awful, redo.  make useful for corba idl, support
-     external editors)
+- [PARTIAL] DND messages into mailboxes
+ 	- [PARTIAL] Attachments in new mail
+     	- [PARTIAL] move/copy messages via DND
+       		- move
+       		- copy
 
- D auto-open mailboxes on startup
+- MIME supporting icons.  use the new gnome metadata stuff that gmc uses?
 
- P Make things optional:
-     - inline images (on by default)
-     D check for new mail every xx minutes
-     - load mail from local mail directory
+- [PARTIAL] New mail notification
+	- [PARTIAL] via sound
+     	- change icon window in case Balsa is minimized to a different icon
 
- P spell checking in the send window
+- [MOSTLY] sending mail (code is awful, redo.  make useful for corba
+  idl, support external editors)
 
- D menu and toolbar for message-window
+- [DONE] auto-open mailboxes on startup
+
+- [PARTIAL] Make things optional:
+	- inline images (on by default)
+     	- [DONE] check for new mail every xx minutes
+     	- load mail from local mail directory
+
+- [PARTIAL] spell checking in the send window
+
+- [DONE] menu and toolbar for message-window
 
 
 ----------------------------------

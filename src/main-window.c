@@ -50,7 +50,7 @@ static gint progress_timeout (gpointer data);
 static void create_menu (GnomeMDI *);
 
 static void app_created (GnomeMDI *, GnomeApp * app);
-static GtkToolbar *create_toolbar (GnomeMDI *, GtkWidget * app);
+static GtkToolbar *create_toolbar (GnomeMDI *, GnomeApp * app);
 
 
 /* dialogs */
@@ -136,16 +136,14 @@ main_window_init (void)
 		      NULL);
 
   /* meubar and toolbar */
-  gtk_signal_connect (GTK_OBJECT (mdi), "create_toolbar", GTK_SIGNAL_FUNC (create_toolbar), NULL);
   gtk_signal_connect (GTK_OBJECT (mdi), "child_changed", GTK_SIGNAL_FUNC (index_child_changed), NULL);
-  gtk_signal_connect (GTK_OBJECT (mdi), "app_created", GTK_SIGNAL_FUNC (app_created), NULL);
+  gtk_signal_connect (GTK_OBJECT (mdi), "app_created",GTK_SIGNAL_FUNC (app_created), NULL);
   gnome_mdi_set_child_list_path (mdi, _ ("Mailboxes/<Separator>"));
 
+  gnome_mdi_set_toolbar_creator(mdi, create_toolbar);
   create_menu(mdi);
   
   gnome_mdi_set_mode (mdi, balsa_app.mdi_style);
-
-  refresh_main_window ();
 }
 
 static gint
@@ -189,6 +187,8 @@ app_created (GnomeMDI * mdi, GnomeApp * app)
   gtk_window_set_policy (GTK_WINDOW (app), TRUE, TRUE, FALSE);
   gtk_widget_set_usize (GTK_WIDGET (app), balsa_app.mw_width, balsa_app.mw_height);
 
+
+  refresh_main_window();
 }
 
 /*
@@ -281,7 +281,7 @@ create_menu (GnomeMDI * mdi)
     GNOMEUIINFO_END
   };
 
-  gnome_mdi_set_menu_template(mdi, main_menu);
+  gnome_mdi_set_menubar_template(mdi, main_menu);
 }
 
 
@@ -291,7 +291,7 @@ create_menu (GnomeMDI * mdi)
  * the toolbar for the main window
  */
 static GtkToolbar *
-create_toolbar (GnomeMDI * mdi, GtkWidget * app)
+create_toolbar (GnomeMDI * mdi, GnomeApp * app)
 {
   GtkWidget *window;
   GtkWidget *toolbar;

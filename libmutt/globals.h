@@ -61,6 +61,7 @@ WHERE char *PipeSep;
 WHERE char *PopHost;
 WHERE char *PopPass;
 WHERE char *PopUser;
+WHERE char *PopUID;
 #endif
 WHERE char *PostIndentString;
 WHERE char *Postponed;

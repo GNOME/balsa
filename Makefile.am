@@ -1,12 +1,12 @@
 #intl dir needed for tarball --disable-nls build.
-SUBDIRS = intl po sounds images help libmutt libbalsa libinit_balsa src
+SUBDIRS = intl po sounds images doc libmutt libbalsa libinit_balsa src
 
 man_MANS=balsa.1
 
 pixmapdir = $(datadir)/balsa/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
-desktopdir = $(datadir)/gnome/apps/Internet
+desktopdir = $(datadir)/applications
 desktop_DATA = balsa.desktop
 
 EXTRA_DIST = \
@@ -49,7 +49,7 @@ dist-hook: balsa.spec
 ## `macros/' change
 bzdist: distdir
 	-chmod -R a+r $(distdir)
-	$(TAR) chojf $(distdir).tar.bz2 $(distdir)
+	$(AMTAR) chojf $(distdir).tar.bz2 $(distdir)
 	-rm -rf $(distdir)
 
 ACLOCAL_AMFLAGS = -I m4  

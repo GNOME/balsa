@@ -77,13 +77,22 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 %clean
 [ -n "$RPM_BUILD_DIR/%{name}-%{version}" ] && rm -rf "$RPM_BUILD_DIR/%{name}-%{version}"
 
+%post
+if which scrollkeeper-update>/dev/null 2>&1; then
+    scrollkeeper-update -q -o %{_datadir}/omf/balsa
+fi
+
+%postun
+which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update -q
+
 %files -f %{name}.lang
 %defattr(-, root, root)
 %doc README COPYING ChangeLog NEWS TODO AUTHORS HACKING docs/mh-mail-HOWTO
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
-%{_datadir}/gnome/apps/Internet/balsa.desktop
-%{_datadir}/gnome/help/balsa-manual/*
+%{_datadir}/applications/balsa.desktop
+%{_datadir}/balsa/doc/balsa-manual/*
+%{_datadir}/omf/balsa/*
 %{_datadir}/balsa/pixmaps/*
 %{_datadir}/sounds/balsa/*
 %{_mandir}/man1/balsa.1*

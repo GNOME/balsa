@@ -39,7 +39,6 @@ typedef struct _MessageWindow MessageWindow;
 
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, MessageWindow * mw);
-static void mw_bmessage_weak_notify(MessageWindow * mw, GObject * obj);
 static void close_message_window(GtkWidget * widget, gpointer data);
 
 static void replyto_message_cb(GtkWidget * widget, gpointer data);
@@ -374,6 +373,14 @@ mw_set_message(MessageWindow *mw, LibBalsaMessage * message)
         g_idle_add((GSourceFunc) message_window_idle_handler, mw);
 }
 
+static void
+bindex_closed_cb(gpointer data, GObject *bindex)
+{
+    MessageWindow *mw = data;
+    mw->bindex = NULL;
+    gtk_widget_destroy(mw->window);
+}
+
 void
 message_window_new(LibBalsaMessage * message)
 {
@@ -425,9 +432,7 @@ message_window_new(LibBalsaMessage * message)
                      G_CALLBACK(size_alloc_cb), NULL);
     
     mw->bindex = balsa_find_index_by_mailbox(message->mailbox);
-    g_object_weak_ref(G_OBJECT(mw->bindex),
-		      (GWeakNotify) gtk_widget_destroy, mw->window);
-    g_object_add_weak_pointer(G_OBJECT(mw->bindex), (gpointer) &mw->bindex);
+    g_object_weak_ref(G_OBJECT(mw->bindex), bindex_closed_cb, mw);
     g_signal_connect_swapped(G_OBJECT(mw->bindex), "index-changed",
 			     G_CALLBACK(mw_set_buttons_sensitive), mw);
 
@@ -457,8 +462,6 @@ message_window_new(LibBalsaMessage * message)
 	gtk_widget_set_sensitive(move_menu, FALSE);
     mw->bmessage = balsa_message_new();
     balsa_message_set_close(BALSA_MESSAGE(mw->bmessage), TRUE);
-    g_object_weak_ref(G_OBJECT(mw->bmessage), 
-		      (GWeakNotify) mw_bmessage_weak_notify, mw);
     
     gnome_app_set_contents(GNOME_APP(mw->window), mw->bmessage);
 
@@ -505,27 +508,16 @@ mw_clear_message(MessageWindow * mw)
 static void
 destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 {
-    if (mw->bindex)
-	g_signal_handlers_disconnect_matched(G_OBJECT(mw->bindex),
-					     G_SIGNAL_MATCH_DATA, 0, 0,
-					     NULL, NULL, mw);
-
-    if (mw->bmessage) {
-	g_object_weak_unref(G_OBJECT(mw->bmessage),
-			    (GWeakNotify) mw_bmessage_weak_notify, mw);
-	mw->bmessage = NULL;
+    if (mw->bindex) { /* BalsaIndex still exists */
+        g_object_weak_unref(G_OBJECT(mw->bindex), bindex_closed_cb, mw);
+        g_signal_handlers_disconnect_matched(G_OBJECT(mw->bindex),
+                                             G_SIGNAL_MATCH_DATA, 0, 0,
+                                             NULL, NULL, mw);
     }
+
     mw_clear_message(mw);
 
     g_free(mw);
-}
-
-/* GWeakNotify for mw->bmessage. */
-static void
-mw_bmessage_weak_notify(MessageWindow * mw, GObject *obj)
-{
-    mw->bmessage = NULL;
-    gtk_widget_destroy(mw->window);
 }
 
 static void
@@ -651,7 +643,7 @@ show_selected_cb(GtkWidget * widget, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
 
-	mw->headers_shown=HEADERS_SELECTED;
+    mw->headers_shown=HEADERS_SELECTED;
 
     reset_show_all_headers(mw);
     balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),

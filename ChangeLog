@@ -9,6 +9,7 @@
 
 	* libbalsa/mailbox_imap.c, libbalsa/imap/pop3.c
 	* src/information-dialog.c, src/main-window.c: format fixes.
+	* src/message-window.c: unregister weak references in proper order.
 
 2004-05-08  Pawel Salek
 

@@ -628,7 +628,7 @@ libbalsa_mailbox_real_get_matching(LibBalsaMailbox* mailbox,
     printf("real op=%d list=%p\n", op, conditions);
     for(msgs = mailbox->message_list; msgs; msgs = msgs->next) {
         LibBalsaMessage* msg = LIBBALSA_MESSAGE(msgs->data);
-        if(match_conditions(op, conditions, msg))
+        if(match_conditions(op, conditions, msg, FALSE))
             g_hash_table_insert(ret, msg, msg);
     }
     return ret;

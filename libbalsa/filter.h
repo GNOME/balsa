@@ -165,9 +165,12 @@ typedef struct _LibBalsaFilter {
  * functions, virtual folders..., not only filtering
  */
 
-gint match_condition(LibBalsaCondition* cond,LibBalsaMessage* message);
+gint match_condition(LibBalsaCondition* cond,LibBalsaMessage* message,
+		     gboolean mbox_locked);
 
-gint match_conditions(FilterOpType op,GSList* cond,LibBalsaMessage* message);
+gint match_conditions(FilterOpType op,GSList* cond,LibBalsaMessage* message,
+		      gboolean mbox_locked);
+
 gchar* libbalsa_filter_build_imap_query(FilterOpType, GSList* conditions);
 
 /* Filtering functions */
@@ -189,7 +192,8 @@ gint filters_prepare_to_run(GSList * filters);
    locking)
  */
 
-void libbalsa_filter_match(GSList * filter_list, GList * messages);
+void libbalsa_filter_match(GSList * filter_list, GList * messages,
+			   gboolean mbox_locked);
 
 /* Same but on mailbox, convenience function that locks the mailbox
    before calling libbalsa_filter_match */

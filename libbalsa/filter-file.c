@@ -97,7 +97,7 @@ libbalsa_condition_new_from_config()
 	    newc->match.interval.date_low=0;
 	else {
 	    (void) strptime("00:00:00","%T",&date);
-	    p=(gchar*)strptime(str,"%x",&date);
+	    p=(gchar*)strptime(str,"%Y-%m-%d",&date);
 	    if (!p || *p!='\0')
 		filter_errno=FILTER_EFILESYN;
 	    else newc->match.interval.date_low=mktime(&date);
@@ -108,7 +108,7 @@ libbalsa_condition_new_from_config()
 	    newc->match.interval.date_high=0;
 	else {
 	    (void) strptime("23:59:59","%T",&date);
-	    p=(gchar *)strptime(str,"%x",&date);
+	    p=(gchar *)strptime(str,"%Y-%m-%d",&date);
 	    if (!p || *p!='\0')
 		filter_errno=FILTER_EFILESYN;
 	    else newc->match.interval.date_high=mktime(&date);
@@ -300,12 +300,12 @@ libbalsa_condition_save_config(LibBalsaCondition * cond)
 	break;
     case CONDITION_DATE:
 	if (cond->match.interval.date_low)
-	    strftime(str,sizeof(str),"%G-%m-%d",
+	    strftime(str,sizeof(str),"%Y-%m-%d",
                      localtime(&cond->match.interval.date_low));
 	else str[0]='\0';
 	gnome_config_set_string("Low-date",str);
 	if (cond->match.interval.date_high)
-	    strftime(str,sizeof(str),"%G-%m-%d",
+	    strftime(str,sizeof(str),"%Y-%m-%d",
                      localtime(&cond->match.interval.date_high));
 	else str[0]='\0';
 	gnome_config_set_string("High-date",str);

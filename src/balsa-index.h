@@ -69,6 +69,11 @@ extern "C" {
         /* idle handler data */
         guint idle_handler_id;
         GSList *update_flag_list;
+
+        /* signal handler ids */
+        gulong selection_changed_id;
+        gulong row_expanded_id;
+        gulong row_collapsed_id;
     };
 
     struct _BalsaIndexClass {

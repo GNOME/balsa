@@ -377,8 +377,9 @@ balsa_index_init(BalsaIndex * index)
 
     /* handle select row signals to display message in the window
      * preview pane */
-    g_signal_connect(selection, "changed",
-		     G_CALLBACK(bndx_selection_changed), index);
+    index->selection_changed_id =
+        g_signal_connect(selection, "changed",
+		         G_CALLBACK(bndx_selection_changed), index);
 
     /* we want to handle button presses to pop up context menus if
      * necessary */
@@ -389,10 +390,12 @@ balsa_index_init(BalsaIndex * index)
 
     /* catch thread expand/collapse events, to set the head node style
      * for unread messages */
-    g_signal_connect_after(tree_view, "row-expanded",
-                           G_CALLBACK(bndx_tree_expand_cb), NULL);
-    g_signal_connect_after(tree_view, "row-collapsed",
-                           G_CALLBACK(bndx_tree_collapse_cb), NULL);
+    index->row_expanded_id =
+        g_signal_connect_after(tree_view, "row-expanded",
+                               G_CALLBACK(bndx_tree_expand_cb), NULL);
+    index->row_collapsed_id =
+        g_signal_connect_after(tree_view, "row-collapsed",
+                               G_CALLBACK(bndx_tree_collapse_cb), NULL);
 
     /* We want to catch column resize attempts to store the new value */
     g_signal_connect_after(tree_view, "size-allocate",
@@ -783,8 +786,11 @@ bndx_find_message(BalsaIndex * index, GtkTreePath ** path,
 static void
 bndx_messages_remove(BalsaIndex * index, GList * messages)
 {
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     GtkTreeModel *model;
     GtkTreeIter iter;
+    GList *remove = g_list_copy(messages);
     GList *children = NULL;
     GList *list;
     LibBalsaMessage *next_message;
@@ -798,39 +804,63 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(index));
 
     if (index->current_message &&
-        !g_list_find(messages, index->current_message))
+        !g_list_find(remove, index->current_message))
         next_message = index->current_message;
     else {
-        bndx_find_row(index, NULL, &iter, 0, FILTER_NOOP, NULL, messages);
+        bndx_find_row(index, NULL, &iter, 0, FILTER_NOOP, NULL, remove);
         if (iter.stamp)
             gtk_tree_model_get(model, &iter,
                                BNDX_MESSAGE_COLUMN, &next_message,
                                -1);
         else {
+            g_signal_handler_block(selection, index->selection_changed_id);
             gtk_tree_store_clear(GTK_TREE_STORE(model));
+            g_signal_handler_unblock(selection, index->selection_changed_id);
+            g_list_free(remove);
             return;
         }
     }
 
-    for (list = messages; list; list = g_list_next(list)) {
+    /* check the list of messages to be removed */
+    list = remove;
+    while (list) {
+        GList *next = g_list_next(list);
+
         if (bndx_find_message(index, NULL, &iter, list->data)) {
+            /* this message is in the index... */
             GtkTreeIter child_iter;
 
-            /* make a list of children that need to be moved up */
             if (gtk_tree_model_iter_children(model, &child_iter, &iter)) {
+                /* ...and it has children */
                 LibBalsaMessage *message;
 
                 do {
+                    GList *link;
+
                     gtk_tree_model_get(model, &child_iter, 
                                        BNDX_MESSAGE_COLUMN, &message,
                                        -1);
-                    if (!g_list_find(messages, message))
+                    link = g_list_find(remove, message);
+                    if (link) {
+                        /* this child is listed for removal, but it will
+                         * be removed anyway with its parent, so we'll
+                         * delete it... */
+                        if (link == next)
+                            /* ...but first we must move the pointer
+                             * forward */
+                            next = g_list_next(next);
+                        remove = g_list_delete_link(remove, link);
+                    } else
+                        /* this child isn't being removed, so we must
+                         * move it up */
                         children = g_list_prepend(children, message);
                 } while (gtk_tree_model_iter_next(model, &child_iter));
             }
         } else
-            /* a NULL message will be ignored */
-            list->data = NULL;
+            /* this message isn't in the index, so we can delete it from
+             * the list */
+            remove = g_list_delete_link(remove, list);
+        list = next;
     }
 
     /* move the children to the top level */
@@ -843,14 +873,15 @@ bndx_messages_remove(BalsaIndex * index, GList * messages)
     g_list_free(children);
 
     /* remove the messages */
-    for (list = messages; list; list = g_list_next(list))
+    g_signal_handler_block(selection, index->selection_changed_id);
+    for (list = remove; list; list = g_list_next(list))
         if (bndx_find_message(index, NULL, &iter, list->data))
             gtk_tree_store_remove(GTK_TREE_STORE(model), &iter);
+    g_signal_handler_unblock(selection, index->selection_changed_id);
+    g_list_free(remove);
 
     /* select next message */
     if (bndx_find_message(index, &path, NULL, next_message)) {
-        GtkTreeSelection *selection =
-            gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
         gtk_tree_selection_unselect_all(selection);
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
         gtk_tree_path_free(path);
@@ -1820,6 +1851,17 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
 {
     BalsaIndex *trash = balsa_find_index_by_mailbox(balsa_app.trash);
     GList *messages = balsa_index_selected_list(index);
+    GList *list = messages;
+
+    while (list) {
+        GList *next = g_list_next(list);
+        LibBalsaMessage * message = list->data;
+
+        if (message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+            messages = g_list_delete_link(messages, list);
+
+        list = next;
+    }
 
     if(messages) {
 	if (move_to_trash && (index != trash)) {
@@ -2187,12 +2229,10 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreePath *path;
     GtkTreeIter iter;
+    gulong handler =
+        expand ? index->row_expanded_id : index->row_collapsed_id;
 
-    g_signal_handlers_block_by_func(GTK_OBJECT(index),
-                                    G_CALLBACK(expand ?
-                                               bndx_tree_expand_cb :
-                                               bndx_tree_collapse_cb),
-                                    NULL);
+    g_signal_handler_block(index, handler);
 
     if (expand)
         gtk_tree_view_expand_all(tree_view);
@@ -2211,11 +2251,7 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     if (bndx_find_message(index, NULL, &iter, index->current_message))
         bndx_expand_to_row_and_select(index, &iter);
 
-    g_signal_handlers_unblock_by_func(G_OBJECT(index),
-                                      G_CALLBACK(expand ?
-                                                 bndx_tree_expand_cb :
-                                                 bndx_tree_collapse_cb),
-                                      NULL);
+    g_signal_handler_unblock(index, handler);
 }
 
 /* balsa_index_set_threading_type:

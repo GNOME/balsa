@@ -1,3 +1,14 @@
+2002-10-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* src/balsa-index.[hc]: streamline message deletion and removal.
+
+2002-10-20  Emmanuel <e.allaud@wanadoo.fr>
+
+	* libbalsa/filter-file.c: date config file format: %Y-%m-%d 
+	* libbalsa/filter.[hc]: fix the locking issues with body filtering;
+	* libbalsa/mailbox.c, libbalsa/mailbox_pop3.c: use new filter 
+	API (API change coming from previous fix).
+
 2002-10-17  Pawel Salek <pawsa@theochem.kth.se>
 
 	* configure.in: added he to the list of languages.

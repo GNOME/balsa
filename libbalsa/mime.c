@@ -85,7 +85,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                  *
                  * we'll assume it's going to the screen */
                 reply =
-                    libbalsa_process_text_rfc2646(res, llen, FALSE, TRUE,
+                    libbalsa_process_text_rfc2646(res, G_MAXINT, FALSE, TRUE,
                                                   reply_prefix_str !=
                                                   NULL);
                 g_free(res);

@@ -56,6 +56,9 @@ GString *libbalsa_process_text_rfc2646(gchar * par, gint width,
                                        gboolean quote);
 gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
                              gboolean from_screen, gboolean to_screen);
+void libbalsa_wrap_view(GtkTextView * view, gint length);
+void libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
+                            gint lines);
 
 const char* libbalsa_set_charset(const gchar * charset);
 const char* libbalsa_set_send_charset(const gchar * charset);
@@ -66,6 +69,14 @@ gchar *libbalsa_expand_path(const gchar *path);
 void libbalsa_contract_path(gchar *path);
 void libbalsa_mktemp(gchar * name);
 void libbalsa_utf8_sanitize(gchar * text);
+void libbalsa_insert_with_url(GtkTextBuffer * buffer,
+                              const char *chars,
+                              GtkTextTag * tag,
+                              void (*callback) (GtkTextBuffer *,
+                                                GtkTextIter *,
+                                                const gchar *,
+                                                gpointer),
+                              gpointer callback_data);
 
 
 #endif				/* __LIBBALSA_MISC_H__ */

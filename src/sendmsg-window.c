@@ -692,6 +692,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsm)
 
     if (bsm->spell_checker)
         gtk_widget_destroy(bsm->spell_checker);
+    if (bsm->wrap_timeout_id)
+        g_source_remove(bsm->wrap_timeout_id);
 
     g_free(bsm);
 
@@ -807,7 +809,7 @@ edit_with_gnome_check(gpointer data) {
     gtk_text_buffer_set_text(buffer, "", 0);
     curposition = 0;
     while(fgets(line, sizeof(line), tmp))
-        gtk_text_buffer_insert_at_cursor(buffer, line, -1);
+        libbalsa_insert_with_url(buffer, line, NULL, NULL, NULL);
     g_free(data_real->filename);
     fclose(tmp);
     unlink(data_real->filename);
@@ -945,7 +947,8 @@ repl_identity_signature(BalsaSendmsg* msg, LibBalsaIdentity* new_ident,
         /* put it at the end of the message */
         gtk_text_buffer_get_end_iter(buffer, &ins);
     }
-    gtk_text_buffer_insert(buffer, &ins, new_sig, newsiglen);
+    gtk_text_buffer_place_cursor(buffer, &ins);
+    libbalsa_insert_with_url(buffer, new_sig, NULL, NULL, NULL);
 }
 
 
@@ -1585,12 +1588,12 @@ insert_selected_messages(BalsaSendmsg *msg, SendType type)
 	    LibBalsaMessage *message = node->data;
 	    GString *body = quoteBody(msg, message, type);
 	    
-            gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
+            libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
 	    g_string_free(body, TRUE);
 	}
         g_list_free(l);
     }
-    
+
     return TRUE;
 }
 
@@ -1968,29 +1971,6 @@ create_info_pane(BalsaSendmsg * msg, SendType type)
     return table;
 }
 
-/*
- * catch user `return' chars, and edit out any previous spaces
- * to make them `hard returns',
- * */
-static void
-insert_text_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
-               gchar *text, gint len, gpointer user_data)
-{
-    GtkTextIter tmp_iter;
-    gunichar c = ' ';
-
-    if (*text != '\n' || len != 1)
-        return;
-
-    tmp_iter = *iter;
-    while (gtk_text_iter_backward_char(&tmp_iter)
-           && (c = gtk_text_iter_get_char(&tmp_iter)) == ' ')
-        /* nothing */;
-    if (c != ' ')
-        gtk_text_iter_forward_char(&tmp_iter);
-    gtk_text_buffer_delete(buffer, &tmp_iter, iter);
-}
-
 /* drag_data_quote - text area D&D callback */
 static void
 drag_data_quote(GtkWidget * widget,
@@ -2011,7 +1991,7 @@ drag_data_quote(GtkWidget * widget,
     
     while (*message_array) {
         GString *body = quoteBody(bsmsg, *message_array++, SEND_REPLY);
-        gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
+        libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
         g_string_free(body, TRUE);
     }
 }
@@ -2022,6 +2002,7 @@ drag_data_quote(GtkWidget * widget,
 static GtkWidget *
 create_text_area(BalsaSendmsg * msg)
 {
+    GtkTextBuffer *buffer;
     GtkWidget *table;
 
     msg->text = gtk_text_view_new();
@@ -2031,12 +2012,9 @@ create_text_area(BalsaSendmsg * msg)
     gtk_widget_modify_font(msg->text,
                            pango_font_description_from_string
                            (balsa_app.message_font));
-    if (msg->flow) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
-        g_signal_connect(G_OBJECT(buffer), "insert-text",
-                         G_CALLBACK(insert_text_cb), NULL);
-    }
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+    gtk_text_buffer_create_tag(buffer, "soft", NULL);
+    gtk_text_buffer_create_tag(buffer, "url", NULL);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(msg->text), TRUE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(msg->text), GTK_WRAP_WORD);
 
@@ -2086,8 +2064,7 @@ continueBody(BalsaSendmsg * msg, LibBalsaMessage * message)
 	    if (!strcmp(body_type, "text/plain") &&
 		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
                                           msg->flow))) {
-                gtk_text_buffer_insert_at_cursor(buffer, rbdy->str,
-                                                 rbdy->len);
+                libbalsa_insert_with_url(buffer, rbdy->str, NULL, NULL, NULL);
 		g_string_free(rbdy, TRUE);
 	    }
 	    g_free(body_type);
@@ -2258,7 +2235,7 @@ fillBody(BalsaSendmsg * msg, LibBalsaMessage * message, SendType type)
 	g_free(signature);
     }
 
-    gtk_text_buffer_set_text(buffer, body->str, body->len);
+    libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
     gtk_text_buffer_get_start_iter(buffer, &start);
     gtk_text_buffer_place_cursor(buffer, &start);
     g_string_free(body, TRUE);
@@ -2279,7 +2256,7 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *msg)
 	    signature = tmp;
 	}
 	
-        gtk_text_buffer_insert_at_cursor(buffer, signature, -1);
+        libbalsa_insert_with_url(buffer, signature, NULL, NULL, NULL);
 	
 	g_free(signature);
     }
@@ -2385,9 +2362,28 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
     g_free(newsubject);
 }
 
-static void
-text_changed(GtkWidget* w, BalsaSendmsg* msg)
+static gboolean
+wrap_body_timeout(BalsaSendmsg * msg)
 {
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text));
+
+    msg->wrap_timeout_id = 0;
+    g_signal_handler_block(buffer, msg->changed_sig_id);
+    wrap_body_cb(NULL, msg);
+    g_signal_handler_unblock(buffer, msg->changed_sig_id);
+
+    return FALSE;
+}
+
+static void
+text_changed(GtkWidget * w, BalsaSendmsg * msg)
+{
+    if (msg->wrap_timeout_id)
+        g_source_remove(msg->wrap_timeout_id);
+    msg->wrap_timeout_id =
+        g_timeout_add(500, (GSourceFunc) wrap_body_timeout, msg);
+
     msg->modified = TRUE;
 }
 
@@ -2590,6 +2586,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 #ifdef HAVE_GPGME
     msg->gpg_mode = 0;
 #endif
+    msg->wrap_timeout_id = 0;
 
     if (message) {
         /* ref message so we don't lose it even if it is deleted */
@@ -2755,9 +2752,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     msg->delete_sig_id = 
 	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
 			 G_CALLBACK(delete_event_cb), msg);
-    g_signal_connect(G_OBJECT
-                     (gtk_text_view_get_buffer(GTK_TEXT_VIEW(msg->text))),
-                     "changed", G_CALLBACK(text_changed), msg);
+    msg->changed_sig_id =
+        g_signal_connect(G_OBJECT(gtk_text_view_get_buffer(GTK_TEXT_VIEW
+                                                           (msg->text))),
+                         "changed", G_CALLBACK(text_changed), msg);
     return msg;
 }
 
@@ -2834,7 +2832,7 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         GtkTextBuffer *buffer =
             gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
-        gtk_text_buffer_insert_at_cursor(buffer, val, -1);
+        libbalsa_insert_with_url(buffer, val, NULL, NULL, NULL);
 
         return;
     } else if (g_ascii_strcasecmp(key, "to")  ==0) entry = bsmsg->to[1];
@@ -2951,7 +2949,7 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
         s=g_convert(string, len, "UTF-8", charset,
                     &bytes_read, &bytes_written, &err);
         if(!err) {
-            gtk_text_buffer_insert_at_cursor(buffer, s, bytes_written);
+            libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
             g_free(s);
             break;
         }
@@ -2986,7 +2984,7 @@ do_insert_file(GtkWidget * selector, GtkFileSelection * fs)
     fclose(fl);
     
     if(g_utf8_validate(string, -1, NULL)) {
-	gtk_text_buffer_insert_at_cursor(buffer, string, len);
+	libbalsa_insert_with_url(buffer, string, NULL, NULL, NULL);
     } else do_insert_string_select_ch(bsmsg, buffer, string, len);
     g_free(string);
     gtk_widget_destroy(GTK_WIDGET(fs));
@@ -3497,30 +3495,30 @@ select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    gint pos;
-    gchar *the_text;
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    GtkTextIter start, end, now;
-
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    the_text = gtk_text_iter_get_text(&start, &end);
+    GtkTextIter now;
 
     gtk_text_buffer_get_iter_at_mark(buffer, &now,
                                      gtk_text_buffer_get_insert(buffer));
-    pos = gtk_text_iter_get_offset(&now);
 
     if (bsmsg->flow) {
-        the_text =
-            libbalsa_wrap_rfc2646(the_text, balsa_app.wraplength, TRUE,
-                                  TRUE);
-    } else
-        libbalsa_wrap_string(the_text, balsa_app.wraplength);
+        libbalsa_unwrap_buffer(buffer, &now, widget ? -1 : 1);
+        libbalsa_wrap_view(GTK_TEXT_VIEW(bsmsg->text), balsa_app.wraplength);
+    } else {
+        gint pos = gtk_text_iter_get_offset(&now);
+        GtkTextIter start, end;
+        gchar *the_text;
 
-    gtk_text_buffer_set_text(buffer, the_text, -1);
-    gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
-    gtk_text_buffer_place_cursor(buffer, &now);
-    g_free(the_text);
+        gtk_text_buffer_get_bounds(buffer, &start, &end);
+        the_text = gtk_text_iter_get_text(&start, &end);
+        libbalsa_wrap_string(the_text, balsa_app.wraplength);
+        gtk_text_buffer_set_text(buffer, "", 0);
+        libbalsa_insert_with_url(buffer, the_text, NULL, NULL, NULL);
+        gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
+        gtk_text_buffer_place_cursor(buffer, &now);
+        g_free(the_text);
+    }
 }
 
 static void
@@ -3540,9 +3538,12 @@ do_reflow(GtkTextView * txt, gint mode)
 
     reflow_string(the_text, mode, &pos, balsa_app.wraplength);
 
-    gtk_text_buffer_set_text(buffer, the_text, -1);
+    gtk_text_buffer_set_text(buffer, "", 0);
+    libbalsa_insert_with_url(buffer, the_text, NULL, NULL, NULL);
     gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
     gtk_text_buffer_place_cursor(buffer, &now);
+    gtk_text_view_scroll_to_mark(txt, gtk_text_buffer_get_insert(buffer),
+                                 0, FALSE, 0, 0);
     g_free(the_text);
 }
 
@@ -3861,7 +3862,7 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
             attach_message(bsmsg, message);
         else if (type == SEND_FORWARD_INLINE) {
             GString *body = quoteBody(bsmsg, message, type);
-            gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
+            libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
         }
     }

@@ -415,7 +415,7 @@ libbalsa_wrap_string(gchar * str, int width)
  * */
 
 #define MAX_WIDTH	997	/* enshrined somewhere */
-#define QUOTE_STRING	">"
+#define QUOTE_CHAR	'>'
 
 /*
  * we'll use one routine to parse text into paragraphs
@@ -448,7 +448,7 @@ unwrap_rfc2646(gchar * str, gboolean from_screen)
             gchar *p;
             gint len;
 
-            for (p = str; *p == '>'; p++)
+            for (p = str; *p == QUOTE_CHAR; p++)
                 /* nothing */;
             len = p - str;
             sig_sep = (strncmp(p, "-- \n", 4) == 0);
@@ -526,7 +526,7 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
 
             /* start of line: emit quote string */
             for (i = 0; i < qd; i++)
-                g_string_append_c(result, '>');
+                g_string_append_c(result, QUOTE_CHAR);
             /* space-stuffing:
              * - for the wire, stuffing is required for lines beginning
              *   with ` ', `>', or `From '
@@ -535,7 +535,7 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
              *   of quoting string and text
              * - ...but we mustn't stuff `-- ' */
             if (((!to_screen
-                  && (*str == ' ' || *str == QUOTE_STRING[0]
+                  && (*str == ' ' || *str == QUOTE_CHAR
                       || !strncmp(str, "From ", 5))) || len > 0)
                 && strcmp(str, "-- ")) {
                 g_string_append_c(result, ' ');
@@ -571,7 +571,7 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                  * and "From ")
                  * */
                 if ((str - start) < max_width && *str
-                    && (*str == QUOTE_STRING[0]
+                    && (*str == QUOTE_CHAR
                         || !strncmp(str, "From ", 5)))
                     continue;
 
@@ -650,6 +650,292 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
 
     return g_string_free(result, FALSE);
 }
+
+/*
+ * libbalsa_wrap_view(GtkTextView * view, gint length)
+ *
+ * Wrap the text in a GtkTextView to the given line length.
+ */
+
+/* Forward references: */
+static GtkTextTag *get_quote_tag(GtkTextIter * iter);
+static gint get_quote_depth(GtkTextIter * iter, gchar ** quote_string);
+static gchar *get_line(GtkTextBuffer * buffer, GtkTextIter * iter);
+static void prepare_log_attrs(PangoLogAttr * log_attrs, gint attrs_len,
+                              GtkWidget * widget, gchar * line);
+static gboolean is_in_url(GtkTextIter * iter, gint offset,
+                          GtkTextTag * url_tag);
+
+void
+libbalsa_wrap_view(GtkTextView * view, gint length)
+{
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(view);
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
+    GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
+    GtkTextIter iter;
+    PangoLogAttr *log_attrs = NULL;
+
+    gtk_text_buffer_get_start_iter(buffer, &iter);
+
+    /* Loop over original lines. */
+    while (!gtk_text_iter_is_end(&iter)) {
+        GtkTextTag *quote_tag;
+        gchar *quote_string;
+        gint quote_len;
+
+        quote_tag = get_quote_tag(&iter);
+        quote_len = get_quote_depth(&iter, &quote_string);
+        if (quote_string && quote_string[quote_len])
+            quote_len++;
+
+        /* Loop over breaks within the original line. */
+        while (!gtk_text_iter_ends_line(&iter)) {
+            gchar *line;
+            gint num_chars;
+            gint attrs_len;
+            gint offset;
+            gint len;
+            gint brk_offset = 0;
+            gunichar c = 0;
+
+            line = get_line(buffer, &iter);
+            num_chars = g_utf8_strlen(line, -1);
+            attrs_len = num_chars + 1;
+            log_attrs = g_renew(PangoLogAttr, log_attrs, attrs_len);
+            prepare_log_attrs(log_attrs, attrs_len, GTK_WIDGET(view),
+                              line);
+            g_free(line);
+
+            for (len = offset = quote_len;
+                 len < length && offset < num_chars; offset++) {
+                gtk_text_iter_set_line_offset(&iter, offset);
+                c = gtk_text_iter_get_char(&iter);
+                if (c == '\t')
+                    len = ((len + 8)/8)*8;
+                else if (g_unichar_isprint(c))
+                    len++;
+
+                if (log_attrs[offset].is_line_break
+                    && !is_in_url(&iter, offset, url_tag))
+                    brk_offset = offset;
+            }
+            if (offset >= num_chars)
+                break;
+
+            if (brk_offset > quote_len && !g_unichar_isspace(c))
+                /* Break at the last break we saw. */
+                gtk_text_iter_set_line_offset(&iter, brk_offset);
+            else {
+                /* Break at the next line break. */
+                if (offset <= quote_len)
+                    offset = quote_len + 1;
+                while (offset < num_chars
+                       && !(log_attrs[offset].is_line_break
+                            && !is_in_url(&iter, offset, url_tag)))
+                    offset++;
+                if (offset >= num_chars)
+                    break;
+            }
+
+            gtk_text_buffer_insert_with_tags(buffer, &iter, "\n", 1,
+                                             soft_tag, NULL);
+            if (quote_string)
+                gtk_text_buffer_insert_with_tags(buffer, &iter,
+                                                 quote_string, -1,
+                                                 quote_tag, NULL);
+        }
+        g_free(quote_string);
+        gtk_text_iter_forward_line(&iter);
+    }
+    g_free(log_attrs);
+}
+
+/* Find the quote tag, if any, at iter; doesn't move iter; returns tag
+ * or NULL. */
+static GtkTextTag *
+get_quote_tag(GtkTextIter * iter)
+{
+    GtkTextTag *quote_tag = NULL;
+    GSList *list;
+    GSList *tag_list = gtk_text_iter_get_tags(iter);
+
+    for (list = tag_list; list; list = g_slist_next(list)) {
+        GtkTextTag *tag = list->data;
+        gchar *name;
+        g_object_get(G_OBJECT(tag), "name", &name, NULL);
+        if (!strncmp(name, "quote-", 6))
+            quote_tag = tag_list->data;
+        g_free(name);
+    }
+    g_slist_free(tag_list);
+
+    return quote_tag;
+}
+
+/* Move the iter over a string of consecutive '>' characters, and an
+ * optional ' ' character; returns the number of '>'s, and, if
+ * quote_string is not NULL, stores an allocated copy of the string
+ * (including the trailing ' ') at quote_string (or NULL, if there were
+ * no '>'s). */
+static gint
+get_quote_depth(GtkTextIter * iter, gchar ** quote_string)
+{
+    gint quote_depth = 0;
+    GtkTextIter start = *iter;
+
+    while (gtk_text_iter_get_char(iter) == QUOTE_CHAR) {
+        quote_depth++;
+        gtk_text_iter_forward_char(iter);
+    }
+    if (quote_depth > 0 && gtk_text_iter_get_char(iter) == ' ')
+        gtk_text_iter_forward_char(iter);
+
+    if (quote_string) {
+        if (quote_depth > 0)
+            *quote_string = gtk_text_iter_get_text(&start, iter);
+        else
+            *quote_string = NULL;
+    }
+
+    return quote_depth;
+}
+
+/* Move the iter to the start of the line it's on; returns an allocated
+ * copy of the line (utf-8, including invisible characters and image
+ * markers). */
+static gchar *
+get_line(GtkTextBuffer * buffer, GtkTextIter * iter)
+{
+    GtkTextIter end;
+    gchar *line;
+
+    gtk_text_iter_set_line_offset(iter, 0);
+    end = *iter;
+    gtk_text_iter_forward_to_line_end(&end);
+    line = gtk_text_buffer_get_slice(buffer, iter, &end, TRUE);
+
+    return line;
+}
+
+static void
+prepare_log_attrs(PangoLogAttr * log_attrs, gint attrs_len,
+                  GtkWidget * widget, gchar * line)
+{
+    /* Use pango_break to find possible breaks. First we need a
+     * PangoAnalysis, which is provided by pango_itemize.
+     * However, to do that we need a PangoAttrList, which
+     * presumably should come from the GtkTextView widget; I
+     * can't see how to do that, so we'll create an empty list
+     * and use that. */
+    PangoContext *context;
+    PangoAttrList *attrs;
+    GList *item_list, *l;
+    gint num_chars = 0;
+
+    context = gtk_widget_get_pango_context(widget);
+    attrs = pango_attr_list_new();
+    item_list = pango_itemize(context, line, 0, strlen(line), attrs, NULL);
+    pango_attr_list_unref(attrs);
+
+    for (l = item_list; l; l = g_list_next(l)) {
+        PangoItem *pango_item = l->data;
+
+        pango_break(&line[pango_item->offset],
+                    pango_item->length, &pango_item->analysis,
+                    &log_attrs[num_chars], attrs_len - num_chars);
+        /* We'll assume that it's OK to break at the start of a new
+         * item. */
+        if (!g_unichar_isspace(g_utf8_get_char(&line[pango_item->offset])))
+            log_attrs[num_chars].is_line_break = TRUE;
+        num_chars += pango_item->num_chars;
+    }
+
+    g_list_foreach(item_list, (GFunc) pango_item_free, NULL);
+    g_list_free(item_list);
+}
+
+/* Move the iter to position offset in the current line, and test
+ * whether it's in an URL. */
+static gboolean
+is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
+{
+    gtk_text_iter_set_line_offset(iter, offset);
+    return url_tag ? (gtk_text_iter_has_tag(iter, url_tag)
+                      && !gtk_text_iter_begins_tag(iter, url_tag)) : FALSE;
+}
+
+/* Remove soft newlines and associated quote strings from num_paras
+ * paragraphs in the buffer, starting at the line before iter; if
+ * num_paras < 0, process the whole buffer. */
+void
+libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
+                       gint num_paras)
+{
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
+    gboolean soft;
+
+    /* Check whether the previous line flowed into this one. */
+    gtk_text_iter_set_line_offset(iter, 0);
+    soft = gtk_text_iter_ends_tag(iter, soft_tag);
+
+    if (gtk_text_iter_backward_line(iter) && !soft
+        && !gtk_text_iter_ends_line(iter)) {
+        /* Remove spaces preceding a hard newline. */
+        GtkTextIter end;
+
+        gtk_text_iter_forward_to_line_end(iter);
+        end = *iter;
+        while (!gtk_text_iter_starts_line(iter)) {
+            gtk_text_iter_backward_char(iter);
+            if (gtk_text_iter_get_char(iter) != ' ') {
+                gtk_text_iter_forward_char(iter);
+                break;
+            }
+        }
+        gtk_text_buffer_delete(buffer, iter, &end);
+        gtk_text_iter_forward_line(iter);
+    }
+
+    for (; num_paras; num_paras--) {
+        gint quote_depth;
+
+        gtk_text_iter_set_line_offset(iter, 0);
+        quote_depth = get_quote_depth(iter, NULL);
+
+        for (;;) {
+            GtkTextIter start;
+            gint qd;
+            gchar *quote_string;
+
+            if (!gtk_text_iter_forward_to_line_end(iter))
+                return;
+            start = *iter;
+            if (!gtk_text_iter_forward_line(iter))
+                return;
+
+            qd = get_quote_depth(iter, &quote_string);
+            if (!gtk_text_iter_has_tag(&start, soft_tag)
+                || qd != quote_depth)
+                break;
+
+            if (qd > 0 && quote_string[qd] != ' ') {
+                /* User deleted the space following the '>' chars; we'll
+                 * delete the space at the end of the previous line, if
+                 * there was one. */
+                gtk_text_iter_backward_char(&start);
+                if (gtk_text_iter_get_char(&start) != ' ')
+                    gtk_text_iter_forward_char(&start);
+            }
+            gtk_text_buffer_delete(buffer, &start, iter);
+        }
+    }
+}
+
+/*
+ * End of wrap/unwrap view.
+ */
 
 /* Delete the contents of a directory (not the directory itself).
    Return TRUE if everything was OK.
@@ -775,4 +1061,132 @@ libbalsa_utf8_sanitize(gchar * text)
 
     while (!g_utf8_validate(text, -1, (const gchar **) &text))
         *text = '?';
+}
+
+/* libbalsa_insert_with_url:
+ * do a gtk_text_buffer_insert, but mark URL's with balsa_app.url_color
+ *
+ * prescanner: 
+ * used to find candidates for lines containing URL's.
+ * Empirially, this approach is faster (by factor of 8) than scanning
+ * entire message with regexec. YMMV.
+ * s - is the line to scan. 
+ * returns TRUE if the line may contain an URL.
+ */
+static gboolean
+prescanner(const gchar * s)
+{
+    gint left = strlen(s) - 6;
+
+    if (left <= 0)
+        return FALSE;
+
+    while (left--) {
+        switch (tolower(*s++)) {
+        case 'f':              /* ftp:/, ftps: */
+            if (tolower(*s) == 't' &&
+                tolower(*(s + 1)) == 'p' &&
+                (*(s + 2) == ':' || tolower(*(s + 2)) == 's') &&
+                (*(s + 3) == ':' || *(s + 3) == '/'))
+                return TRUE;
+            break;
+        case 'h':              /* http:, https */
+            if (tolower(*s) == 't' &&
+                tolower(*(s + 1)) == 't' &&
+                tolower(*(s + 2)) == 'p' &&
+                (*(s + 3) == ':' || tolower(*(s + 3)) == 's'))
+                return TRUE;
+            break;
+        case 'm':              /* mailt */
+            if (tolower(*s) == 'a' &&
+                tolower(*(s + 1)) == 'i' &&
+                tolower(*(s + 2)) == 'l' && tolower(*(s + 3)) == 't')
+                return TRUE;
+            break;
+        case 'n':              /* news:, nntp: */
+            if ((tolower(*s) == 'e' || tolower(*s) == 'n') &&
+                (tolower(*(s + 1)) == 'w' || tolower(*(s + 1)) == 't') &&
+                (tolower(*(s + 2)) == 's' || tolower(*(s + 2)) == 'p') &&
+                *(s + 3) == ':')
+                return TRUE;
+            break;
+        }
+    }
+
+    return FALSE;
+}
+
+void
+libbalsa_insert_with_url(GtkTextBuffer * buffer,
+                         const char *chars,
+                         GtkTextTag * tag,
+                         void (*callback) (GtkTextBuffer *,
+                                           GtkTextIter *,
+                                           const gchar *,
+                                           gpointer),
+                         gpointer callback_data)
+{
+    static regex_t *url_reg = NULL;
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
+    gint match, offset = 0;
+    regmatch_t url_match;
+    gchar *p, *buf;
+    GtkTextIter iter;
+
+    if (!url_reg) {
+        /* one-time compilation of a constant url_str expression */
+        static const char url_str[] =
+#ifdef HAVE_PCRE
+            "\\b((https?|ftps?|nntp)://|(mailto|news):)"
+            "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#\\w])+";
+#else
+            "(((https?|ftps?|nntp)://)|(mailto:|news:))"
+            "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+";
+#endif
+
+        url_reg = g_new(regex_t, 1);
+        if (regcomp(url_reg, url_str, REG_EXTENDED | REG_ICASE) != 0)
+            g_warning("libbalsa_insert_with_url: "
+                      "url regex compilation failed.");
+    }
+
+    buf = p = g_strdup(chars);
+    gtk_text_buffer_get_iter_at_mark(buffer, &iter,
+                                     gtk_text_buffer_get_insert(buffer));
+
+    if (prescanner(p)) {
+        match = regexec(url_reg, p, 1, &url_match, 0);
+        while (!match) {
+            gchar *buf;
+
+            if (url_match.rm_so) {
+                buf = g_strndup(p, url_match.rm_so);
+                gtk_text_buffer_insert_with_tags(buffer, &iter,
+                                                 buf, -1, tag, NULL);
+                g_free(buf);
+            }
+
+            buf = g_strndup(p + url_match.rm_so,
+                            url_match.rm_eo - url_match.rm_so);
+            gtk_text_buffer_insert_with_tags(buffer, &iter, buf, -1,
+                                             url_tag, tag, NULL);
+
+            /* remember the URL and its position within the text */
+            if (callback)
+                callback(buffer, &iter, buf, callback_data);
+            g_free(buf);
+
+            p += url_match.rm_eo;
+            offset += url_match.rm_eo;
+            if (prescanner(p))
+                match = regexec(url_reg, p, 1, &url_match, 0);
+            else
+                match = -1;
+        }
+    }
+
+    if (*p)
+        gtk_text_buffer_insert_with_tags(buffer, &iter, p, -1, tag, NULL);
+    g_free(buf);
 }

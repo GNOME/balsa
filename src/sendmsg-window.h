@@ -75,7 +75,9 @@ extern "C" {
 	gboolean update_config; /* is the window being set up or in normal  */
 	                        /* operation and user actions should update */
 	                        /* the config */
-	guint delete_sig_id;
+	gulong delete_sig_id;
+        gulong changed_sig_id;
+        guint wrap_timeout_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
 	gboolean req_dispnotify; /* send a MDN */ 

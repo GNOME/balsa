@@ -1434,22 +1434,29 @@ check_over_url(GtkWidget * widget, GdkEventMotion * event,
 }
 
 /* store the coordinates at which the button was pressed */
-static gint stored_x=-1, stored_y=-1;
-static GdkModifierType stored_mask=-1;
+static gint stored_x = -1, stored_y = -1;
+static GdkModifierType stored_mask = -1;
+#define STORED_MASK_BITS (  GDK_SHIFT_MASK   \
+                          | GDK_CONTROL_MASK \
+                          | GDK_MOD1_MASK    \
+                          | GDK_MOD2_MASK    \
+                          | GDK_MOD3_MASK    \
+                          | GDK_MOD4_MASK    \
+                          | GDK_MOD5_MASK    )
 
 static gboolean
-store_button_coords(GtkWidget *widget, GdkEventButton *event, gpointer data)
+store_button_coords(GtkWidget * widget, GdkEventButton * event,
+                    gpointer data)
 {
     if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
-        gdk_window_get_pointer(gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                                        GTK_TEXT_WINDOW_TEXT),
-                               &stored_x, &stored_y, &stored_mask);
-       /* Take this button press out of the mask, so it won't interfere
-        * with the comparison in check_call_url()
-        * FIXME Is the mask comparison necessary?  Or should it be
-        * there, but only compare shift, ctrl, and mod1-mod5?
-        */
-       stored_mask &= ~(GDK_BUTTON_PRESS_MASK);
+        GdkWindow *window =
+            gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
+                                     GTK_TEXT_WINDOW_TEXT);
+
+        gdk_window_get_pointer(window, &stored_x, &stored_y, &stored_mask);
+
+        /* compare only shift, ctrl, and mod1-mod5 */
+        stored_mask &= STORED_MASK_BITS;
     }
     return FALSE;
 }
@@ -1468,7 +1475,8 @@ check_call_url(GtkWidget * widget, GdkEventButton * event,
 
     x = event->x;
     y = event->y;
-    if (x == stored_x && y == stored_y && event->state == stored_mask) {
+    if (x == stored_x && y == stored_y
+        && (event->state & STORED_MASK_BITS) == stored_mask) {
         url = find_url(widget, x, y, url_list);
         if (url)
             handle_url(url);
@@ -1636,8 +1644,8 @@ part_info_init_mimetext(BalsaMessage * bm, BalsaPartInfo * info)
         g_signal_connect_after(G_OBJECT(item), "realize",
                                G_CALLBACK(fix_text_widget), url_list);
         if (url_list) {
-            g_signal_connect_after(G_OBJECT(item), "button_press_event",
-                                   G_CALLBACK(store_button_coords), NULL);
+            g_signal_connect(G_OBJECT(item), "button_press_event",
+                             G_CALLBACK(store_button_coords), NULL);
             g_signal_connect(G_OBJECT(item), "button_release_event",
                              G_CALLBACK(check_call_url), url_list);
             g_signal_connect(G_OBJECT(item), "motion-notify-event",

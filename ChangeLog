@@ -1,3 +1,9 @@
+2004-01-31 16:05  PeterB
+
+	* libbalsa/address-entry.c: replace control characters with spaces;
+	fill input after button press event (should fix vanishing
+	addresses).
+
 2004-01-27 23:00  PeterB
 
 	* libbalsa/pop3.c: copy uid to caller's buffer only if it's valid.

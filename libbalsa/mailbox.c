@@ -769,7 +769,10 @@ static void
 libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
                                       LibBalsaMessage * message)
 {
-    /* Default is noop. */
+    if (message->mime_msg) {
+	g_object_unref(message->mime_msg);
+	message->mime_msg = NULL;
+    }
 }
 
 /* libbalsa_mailbox_real_change_msgs_flags() default implementation uses

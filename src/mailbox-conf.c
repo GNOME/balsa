@@ -85,7 +85,7 @@ struct _MailboxConfWindow {
             GtkWidget *remember;
 	    GtkWidget *password;
 	    GtkWidget *folderpath;
-            GtkWidget *enable_persistent;
+            GtkWidget *enable_persistent, *has_bugs;
             BalsaServerConf bsc;
 	} imap;
 
@@ -660,6 +660,11 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
                 (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent),
                  TRUE);
 #endif
+        if(libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
+                                        ISBUG_FETCH))
+            gtk_toggle_button_set_active
+                (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.has_bugs),
+                 TRUE);
         if(!server->remember_passwd)
             gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
                                      FALSE);
@@ -801,6 +806,10 @@ update_imap_mailbox(MailboxConfWindow *mcw)
          gtk_toggle_button_get_active
          GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent));
 #endif
+    libbalsa_imap_server_set_bug
+        (LIBBALSA_IMAP_SERVER(server), ISBUG_FETCH,
+         gtk_toggle_button_get_active
+         GTK_TOGGLE_BUTTON(mcw->mb_data.imap.has_bugs));
     /* Set host after all other server changes, as it triggers
      * save-to-config for any folder or mailbox using this server. */
     libbalsa_server_set_host(server,
@@ -1110,7 +1119,7 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
 
     advanced =
         balsa_server_conf_get_advanced_widget(&mcw->mb_data.pop3.bsc,
-                                              NULL, 1);
+                                              NULL, 2);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
     /* toggle for apop */
@@ -1221,6 +1230,9 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
         balsa_server_conf_add_checkbox(&mcw->mb_data.imap.bsc,
                                        _("Enable _persistent cache"));
 #endif
+    mcw->mb_data.imap.has_bugs = 
+        balsa_server_conf_add_checkbox(&mcw->mb_data.imap.bsc,
+                                       _("Enable _bug workarounds"));
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 

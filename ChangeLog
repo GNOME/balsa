@@ -1,3 +1,12 @@
+2004-08-30  Pawel Salek
+
+	* libbalsa/imap-server.[hc]: some infrastructure for server bugs
+	workarounds (I do not really want to go there...)
+	* libbalsa/mailbox{,_local}.c: move _release_message() from
+	LibBalsaMailboxLocal to LibBalsaMailbox
+	* libbalsa/mailbox_imap.c: reuse full message cache better.
+	* src/{mailbox,folder}-conf.c: configure server bug workarounds.
+
 2004-08-28  Pawel Salek
 
 	* libbalsa/send.c: fix calls to smtp_header_set_option()

@@ -74,10 +74,6 @@ static void libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                                    LibBalsaFetchFlag flags);
 static void libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
                                                  LibBalsaMessage *message);
-static void libbalsa_mailbox_local_release_message(LibBalsaMailbox *
-						   mailbox,
-						   LibBalsaMessage *
-						   message);
 
 static gboolean libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
 						    LibBalsaMessageBody *);
@@ -150,8 +146,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_fetch_structure;
     libbalsa_mailbox_class->fetch_headers = 
         libbalsa_mailbox_local_fetch_headers;
-    libbalsa_mailbox_class->release_message =
-	        libbalsa_mailbox_local_release_message;
     libbalsa_mailbox_class->get_message_part = 
         libbalsa_mailbox_local_get_msg_part;
     klass->load_message = NULL;
@@ -549,8 +543,8 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox,
 
 static void
 libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
-                                      LibBalsaMessage *message,
-                                      LibBalsaFetchFlag flags)
+                                       LibBalsaMessage *message,
+                                       LibBalsaFetchFlag flags)
 {
     GMimeMessage *mime_message = message->mime_msg;
     g_assert(mime_message != NULL);
@@ -571,16 +565,6 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
 }
 
 static void
-libbalsa_mailbox_local_release_message(LibBalsaMailbox * mailbox,
-				       LibBalsaMessage * message)
-{
-    if (message->mime_msg) {
-	g_object_unref(message->mime_msg);
-	message->mime_msg = NULL;
-    }
-}
-
-static void
 libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox * mailbox,
 				     LibBalsaMessage * message)
 {
@@ -592,7 +576,7 @@ libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox * mailbox,
     else {
 	libbalsa_mailbox_fetch_message_structure(mailbox, message,
 						 LB_FETCH_RFC822_HEADERS);
-	libbalsa_mailbox_local_release_message(mailbox, message);
+	libbalsa_mailbox_release_message(mailbox, message);
     }
 }
 

@@ -35,6 +35,10 @@
 #include <dirent.h>
 #include <string.h>
 
+/* for open() */
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 #endif
@@ -935,10 +939,8 @@ get_cache_stream(LibBalsaMailbox *mailbox, unsigned uid)
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *stream;
     gchar **pair, *path;
-    unsigned uidval;
 
     g_assert(mimap->handle);
-    uidval = imap_mbox_handle_get_validity(mimap->handle);
     pair = get_cache_name_pair(mimap, "body", uid);
     path = g_strconcat(pair[0], "/", pair[1], NULL);
     stream = fopen(path, "rb");
@@ -1746,6 +1748,52 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     }
 }
 
+static gboolean
+get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
+                      LibBalsaFetchFlag flags)
+{
+    gchar **pair, *filename;
+    int fd;
+    GMimeStream *stream = NULL;
+    GMimeParser *mime_parser;
+
+    g_return_val_if_fail(message->mime_msg == NULL, FALSE);
+
+    pair =  get_cache_name_pair(LIBBALSA_MAILBOX_IMAP(mailbox), "body", 
+                                IMAP_MESSAGE_UID(message));
+
+    filename = g_build_filename(pair[0], pair[1], NULL);
+    g_strfreev(pair);
+    fd = open(filename, O_RDONLY);
+    g_free(filename);
+    if(fd == -1) return FALSE;
+
+    stream = g_mime_stream_fs_new(fd);
+
+    mime_parser = g_mime_parser_new_with_stream(stream);
+    g_mime_parser_set_scan_from(mime_parser, FALSE);
+    message->mime_msg = g_mime_parser_construct_message(mime_parser);
+    g_object_unref(mime_parser);
+    g_mime_stream_unref(stream);
+    
+    /* follow libbalsa_mailbox_local_fetch_structure here;
+     * perhaps create common helper */
+    if(flags & LB_FETCH_STRUCTURE) {
+        LibBalsaMessageBody *body = libbalsa_message_body_new(message);
+        libbalsa_message_body_set_mime_body(body,
+                                            message->mime_msg->mime_part);
+        libbalsa_message_append_part(message, body);
+        libbalsa_message_headers_from_gmime(message->headers,
+                                            message->mime_msg);
+    }
+    if(flags & LB_FETCH_RFC822_HEADERS) {
+        message->headers->user_hdrs = 
+            libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
+        message->has_all_headers = 1;
+    }
+    return TRUE;
+}
+
 static void
 libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
                                       LibBalsaMessage *message,
@@ -1753,8 +1801,25 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
 {
     ImapResponse rc;
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    LibBalsaServer *server;
     ImapFetchType ift = 0;
     g_return_if_fail(mimap->opened);
+
+    /* work around some server bugs... */
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    if(libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
+                                    ISBUG_FETCH)){
+        /* we could optimize this part a little bit: we do not need to
+         * keep reopening the stream. */
+        GMimeStream *stream = 
+            libbalsa_mailbox_imap_get_message_stream(mailbox, message);
+        if(stream)
+            g_object_unref(stream);
+    }
+
+    if(get_struct_from_cache(mailbox, message, flags))
+        return;
+
     if(flags & LB_FETCH_RFC822_HEADERS) ift |= IMFETCH_RFC822HEADERS_SELECTED;
     if(flags & LB_FETCH_STRUCTURE)      ift |= IMFETCH_BODYSTRUCT;
 
@@ -1863,99 +1928,101 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 {
     GMimeStream *partstream = NULL;
 
-    if(!part->mime_part) { /* !part->mime_part */
-	gchar **pair,  *part_name;
-	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
-	FILE *fp;
-	gchar *section = get_section_for(msg, part);
+    gchar **pair,  *part_name;
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
+    FILE *fp;
+    gchar *section;
 
-	pair = get_cache_name_pair(mimap, "part", IMAP_MESSAGE_UID(msg));
-	part_name   = g_strconcat(pair[0], "/", pair[1], "-", section, NULL);
-	fp = fopen(part_name,"rb+");
+    if(part->mime_part)
+        return GMIME_IS_PART(part->mime_part);
 
-	if(!fp) { /* no cache element */
-	    struct part_data dt;
-	    GMimePart *prefilt;
-	    GMimeStream *gms;
-	    GMimePartEncodingType gmt;
-	    LibBalsaMailboxImap* mimap;
-	    ImapMessage *im;
-	    ImapResponse rc;
-
-	    libbalsa_lock_mailbox(msg->mailbox);
-	    mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
-	    im = mi_get_imsg(mimap, msg->msgno);
-
-	    dt.body  = imap_message_get_body_from_section(im, section);
-	    dt.block = g_malloc(dt.body->octets+1);
-	    dt.pos   = 0;
-            II(rc,mimap->handle,
-               imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
-                                           section, append_str, &dt));
-	    if(rc != IMR_OK)
-		g_error("FIXME: error handling here!\n");
-	    
-	    libbalsa_unlock_mailbox(msg->mailbox);
-		
-	    prefilt = g_mime_part_new_with_type (dt.body->media_basic_name,
-						 dt.body->media_subtype);
-	    gmt = dt.body->encoding == IMBENC_OTHER ?
-		GMIME_PART_ENCODING_DEFAULT : dt.body->encoding;
-	    g_mime_part_set_pre_encoded_content ( prefilt,
-						  dt.block,
-						  dt.body->octets,
-						  gmt );
-	    g_free(dt.block);
-	    
-	    libbalsa_assure_balsa_dir();
-	    mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
-            /* printf("%s path: %s\n", __FUNCTION__, part_name); */
-	    fp = fopen(part_name, "wb+");
-	    if(!fp) {
-                g_free(section); 
-                g_strfreev(pair);
-                g_free(part_name);
-		return FALSE; /* something better ? */
-            }
-	    if( (dt.body->media_basic == IMBMEDIA_TEXT) &&
-		!g_ascii_strcasecmp( "plain", dt.body->media_subtype ) ) {
-		GMimeFilter *crlffilter; 	    
-
-		gms = g_mime_stream_file_new (fp);
-		crlffilter = 	    
-		    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
-					      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
-		partstream = g_mime_stream_filter_new_with_stream (gms);
-		g_mime_stream_filter_add (GMIME_STREAM_FILTER(partstream)
-, crlffilter);
-		g_object_unref (gms);
-		g_object_unref (crlffilter);
-	    } else 
-		partstream = g_mime_stream_file_new (fp);
-	
-	    g_mime_part_set_encoding (prefilt, GMIME_PART_ENCODING_8BIT );
-	    g_mime_part_write_to_stream (prefilt, partstream );
-	    g_mime_stream_flush (partstream);
-	    
-	    g_object_unref (prefilt);
-	    /* aparently the parser doesn't like the stream_filters .. */
-	    g_object_unref (partstream);
-	    fp = fopen(part_name, "r");
-	    partstream = g_mime_stream_file_new (fp);
-	} else 
-	    partstream = g_mime_stream_file_new (fp);
+   /* look for a part cache */
+    section = get_section_for(msg, part);
+    pair = get_cache_name_pair(mimap, "part", IMAP_MESSAGE_UID(msg));
+    part_name   = g_strconcat(pair[0], "/", pair[1], "-", section, NULL);
+    fp = fopen(part_name,"rb+");
     
-	{
-	    GMimeParser *parser =  
-		g_mime_parser_new_with_stream (partstream);
-	    part->mime_part = g_mime_parser_construct_part (parser);
-	    g_object_unref (parser);
-	}
-	g_object_unref (partstream);
-	g_free(section); 
-        g_strfreev(pair);
-        g_free(part_name);
+    if(!fp) { /* no cache element */
+        struct part_data dt;
+        GMimePart *prefilt;
+        GMimeStream *gms;
+        GMimePartEncodingType gmt;
+        LibBalsaMailboxImap* mimap;
+        ImapMessage *im;
+        ImapResponse rc;
+        
+        libbalsa_lock_mailbox(msg->mailbox);
+        mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
+        im = mi_get_imsg(mimap, msg->msgno);
+        
+        dt.body  = imap_message_get_body_from_section(im, section);
+        dt.block = g_malloc(dt.body->octets+1);
+        dt.pos   = 0;
+        II(rc,mimap->handle,
+           imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
+                                       section, append_str, &dt));
+        if(rc != IMR_OK)
+            g_error("FIXME: error handling here!\n");
+        
+        libbalsa_unlock_mailbox(msg->mailbox);
+        
+        prefilt = g_mime_part_new_with_type (dt.body->media_basic_name,
+                                             dt.body->media_subtype);
+        gmt = dt.body->encoding == IMBENC_OTHER ?
+            GMIME_PART_ENCODING_DEFAULT : dt.body->encoding;
+        g_mime_part_set_pre_encoded_content ( prefilt,
+                                              dt.block,
+                                              dt.body->octets,
+                                              gmt );
+        g_free(dt.block);
+        
+        libbalsa_assure_balsa_dir();
+        mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+        /* printf("%s path: %s\n", __FUNCTION__, part_name); */
+        fp = fopen(part_name, "wb+");
+        if(!fp) {
+            g_free(section); 
+            g_strfreev(pair);
+            g_free(part_name);
+            return FALSE; /* something better ? */
+        }
+        if( (dt.body->media_basic == IMBMEDIA_TEXT) &&
+            !g_ascii_strcasecmp( "plain", dt.body->media_subtype ) ) {
+            GMimeFilter *crlffilter; 	    
+
+            gms = g_mime_stream_file_new (fp);
+            crlffilter = 	    
+                g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
+                                          GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
+            partstream = g_mime_stream_filter_new_with_stream (gms);
+            g_mime_stream_filter_add (GMIME_STREAM_FILTER(partstream)
+                                      , crlffilter);
+            g_object_unref (gms);
+            g_object_unref (crlffilter);
+        } else 
+            partstream = g_mime_stream_file_new (fp);
+
+        g_mime_part_set_encoding (prefilt, GMIME_PART_ENCODING_8BIT );
+        g_mime_part_write_to_stream (prefilt, partstream );
+        g_mime_stream_flush (partstream);
+
+        g_object_unref (prefilt);
+        /* aparently the parser doesn't like the stream_filters .. */
+        g_object_unref (partstream);
+        fp = fopen(part_name, "r");
     }
+    partstream = g_mime_stream_file_new (fp);
+
+    {
+        GMimeParser *parser =  
+            g_mime_parser_new_with_stream (partstream);
+        part->mime_part = g_mime_parser_construct_part (parser);
+        g_object_unref (parser);
+    }
+    g_object_unref (partstream);
+    g_free(section); 
+    g_strfreev(pair);
+    g_free(part_name);
 
     return GMIME_IS_PART(part->mime_part);
 }

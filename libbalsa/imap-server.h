@@ -62,5 +62,15 @@ gboolean libbalsa_imap_server_is_offline(LibBalsaImapServer *server);
 void libbalsa_imap_server_set_offline_mode(LibBalsaImapServer *server,
                                            gboolean offline);
 
+typedef enum {
+    ISBUG_FETCH /* Some servers cannot fetch message parts properly
+                 * we will fetch entire messages instead. */
+} LibBalsaImapServerBug;
+
+void libbalsa_imap_server_set_bug(LibBalsaImapServer *server,
+                                  LibBalsaImapServerBug bug, gboolean hasp);
+
+gboolean libbalsa_imap_server_has_bug(LibBalsaImapServer *server,
+                                      LibBalsaImapServerBug bug);
 extern gint ImapDebug;
 #endif /* __IMAP_SERVER_H__ */

@@ -54,7 +54,7 @@ struct _FolderDialogData {
     GtkWidget *folder_name, *port, *username, *remember,
         *password, *subscribed, *list_inbox, *prefix;
     GtkWidget *use_ssl, *tls_mode;
-    GtkWidget *connection_limit, *enable_persistent;
+    GtkWidget *connection_limit, *enable_persistent, *has_bugs;
 };
 
 /* FIXME: identity_name will leak on cancelled folder edition */
@@ -185,6 +185,9 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         (LIBBALSA_IMAP_SERVER(s),
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent)));
 #endif
+    libbalsa_imap_server_set_bug
+        (LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH,
+         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->has_bugs)));
     libbalsa_server_set_username(s, username);
     s->remember_passwd =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
@@ -289,7 +292,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     table = gtk_table_new(9, 2, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
                              gtk_label_new_with_mnemonic(_("_Basic")));
-    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 2);
+    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 3);
     /* Limit number of connections */
     fcw->connection_limit = 
         balsa_server_conf_add_spinner
@@ -306,6 +309,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent),
                                      TRUE);
 #endif
+    fcw->has_bugs = 
+        balsa_server_conf_add_checkbox(&fcw->bsc,
+                                       _("Enable _bug workarounds"));
+    if(!s || 
+       libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH))
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->has_bugs),
+                                     TRUE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 

@@ -31,15 +31,16 @@ struct LibBalsaImapServer_ {
     gchar *key;
     guint max_connections;
     gboolean offline_mode;
-    gboolean persistent_cache; /* if TRUE, messages will be cached in
-                                  $HOME and preserved between
-                                  sessions. If FALSE, messages will be
-                                  kept in /tmp and cleaned on exit. */
     
     GMutex *lock; /* protects the following members */
     guint used_connections;
     GList *used_handles;
     GList *free_handles;
+    unsigned persistent_cache:1; /* if TRUE, messages will be cached in
+                                    $HOME and preserved between
+                                    sessions. If FALSE, messages will be
+                                    kept in /tmp and cleaned on exit. */
+    unsigned has_fetch_bug:1;
 };
 
 typedef struct LibBalsaImapServerClass_ {
@@ -457,7 +458,9 @@ libbalsa_imap_server_new_from_config(void)
     conn_limit = gnome_config_get_int_with_default("ConnectionLimit", &d);
     if(!d) imap_server->max_connections = conn_limit;
     d1 = gnome_config_get_bool_with_default("PersistentCache", &d);
-    if(!d) imap_server->persistent_cache = d1;
+    if(!d) imap_server->persistent_cache = !!d1;
+    d1 = gnome_config_get_bool_with_default("HasFetchBug", &d);
+    if(!d) imap_server->has_fetch_bug = !!d1;
     if (!server->passwd) {
         server->remember_passwd = gnome_config_get_bool("RememberPasswd=false");
         if(server->remember_passwd)
@@ -482,6 +485,7 @@ libbalsa_imap_server_save_config(LibBalsaImapServer *server)
     libbalsa_server_save_config(LIBBALSA_SERVER(server));
     gnome_config_set_int("ConnectionLimit", server->max_connections);
     gnome_config_set_bool("PersistentCache", server->persistent_cache);
+    gnome_config_set_bool("HasFetchBug", server->has_fetch_bug);
 }
 
 /**
@@ -728,7 +732,7 @@ void
 libbalsa_imap_server_enable_persistent_cache(LibBalsaImapServer *server,
                                              gboolean enable)
 {
-    server->persistent_cache = enable;
+    server->persistent_cache = !!enable;
 }
 gboolean
 libbalsa_imap_server_has_persistent_cache(LibBalsaImapServer *srv)
@@ -826,4 +830,18 @@ void libbalsa_imap_server_set_offline_mode(LibBalsaImapServer *server,
     server->offline_mode = offline;
     if (offline)
         libbalsa_imap_server_force_disconnect(server);
+}
+
+void
+libbalsa_imap_server_set_bug(LibBalsaImapServer *server,
+                             LibBalsaImapServerBug bug, gboolean hasp)
+{
+    server->has_fetch_bug = !! hasp;
+}
+
+gboolean
+libbalsa_imap_server_has_bug(LibBalsaImapServer *server,
+                             LibBalsaImapServerBug bug)
+{
+    return server->has_fetch_bug;
 }

@@ -75,6 +75,7 @@ balsa_LDADD = \
 	$(top_builddir)/libmutt/libmutt.a	\
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	-lpspell \
+	-lltdl \
 	@LIBESD_LIB@ \
 	$(GNOME_LIBDIR) \
 	$(GNOMEUI_LIBS) \

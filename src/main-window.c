@@ -62,9 +62,14 @@
 
 #include "pixmaps/reply_to_all.xpm"
 #include "pixmaps/reply_to_all_menu.xpm"
+#include "pixmaps/next_unread.xpm"
+#include "pixmaps/next_unread_menu.xpm"
 
 #define BALSA_PIXMAP_MAIL_RPL_ALL 	"reply_to_all"
 #define BALSA_PIXMAP_MAIL_RPL_ALL_MENU	"reply_to_all_menu"
+
+#define BALSA_PIXMAP_NEXT_UNREAD "next_unread"
+#define BALSA_PIXMAP_NEXT_UNREAD_MENU "next_unread_menu"
 
 #define MAILBOX_DATA "mailbox_data"
 
@@ -189,7 +194,7 @@ static void notebook_switch_page_cb(GtkWidget * notebook,
 				    guint page_num);
 static void send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
 static void register_balsa_pixmaps(void);
-static void register_balsa_pixmap(gchar * name, gchar ** data);
+static void register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize);
 
 static GnomeUIInfo file_new_menu[] = {
 #define MENU_FILE_NEW_MESSAGE_POS 0
@@ -392,7 +397,7 @@ static GnomeUIInfo mailbox_menu[] = {
      GNOME_APP_UI_ITEM, N_("Next Unread Message"),
      N_("Next Unread Message"),
      next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_MENU_FORWARD, 'N', GDK_CONTROL_MASK, NULL},
+     BALSA_PIXMAP_NEXT_UNREAD_MENU, 'N', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_EDIT_POS 4
     GNOMEUIINFO_ITEM_STOCK(N_("_Edit..."), N_("Edit the selected mailbox"),
@@ -461,7 +466,7 @@ static GnomeUIInfo main_toolbar[] = {
 			   replyto_message_cb,
 			   GNOME_STOCK_PIXMAP_MAIL_RPL),
 #define TOOLBAR_REPLY_ALL_POS 7
-    GNOMEUIINFO_ITEM_STOCK(N_("Reply To All"), N_("Reply to all"),
+    GNOMEUIINFO_ITEM_STOCK(N_("Reply\nTo All"), N_("Reply to all"),
 			   replytoall_message_cb,
 			   BALSA_PIXMAP_MAIL_RPL_ALL),
 #define TOOLBAR_FORWARD_POS 8
@@ -480,10 +485,8 @@ static GnomeUIInfo main_toolbar[] = {
      next_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL},
 #define TOOLBAR_NEXT_UNREAD_POS 12
-    {
-     GNOME_APP_UI_ITEM, N_("Next Unread"), N_("Open Next Unread Message"),
-     next_unread_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-     GNOME_STOCK_PIXMAP_FORWARD, 0, 0, NULL},
+    GNOMEUIINFO_ITEM_STOCK(N_("Next\nUnread"), N_("Open Next Unread Message"),
+     next_unread_message_cb, BALSA_PIXMAP_NEXT_UNREAD),
     GNOMEUIINFO_SEPARATOR,
 #define TOOLBAR_PRINT_POS 14
     GNOMEUIINFO_ITEM_STOCK(N_("Print"), N_("Print current message"),
@@ -2097,15 +2100,15 @@ select_part_cb(BalsaMessage * bm, gpointer data)
 }
 
 static void
-register_balsa_pixmap(gchar * name, gchar ** data)
+register_balsa_pixmap(gchar * name, gchar ** data, guint xsize, guint ysize)
 {
     GnomeStockPixmapEntryData *entry;
     entry = g_malloc0(sizeof(*entry));
 
     entry->type = GNOME_STOCK_PIXMAP_TYPE_DATA;
     entry->xpm_data = data;
-    entry->width = 24;
-    entry->height = 24;
+    entry->width = xsize;
+    entry->height = ysize;
     gnome_stock_pixmap_register(name, GNOME_STOCK_PIXMAP_REGULAR,
 				(GnomeStockPixmapEntry *) entry);
 }
@@ -2113,9 +2116,12 @@ register_balsa_pixmap(gchar * name, gchar ** data)
 static void
 register_balsa_pixmaps(void)
 {
-    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm);
+    register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL, reply_to_all_xpm, 24, 24);
     register_balsa_pixmap(BALSA_PIXMAP_MAIL_RPL_ALL_MENU,
-			  reply_to_all_menu_xpm);
+			  reply_to_all_menu_xpm, 16, 15);
+    register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD, next_unread_xpm, 24, 24);
+    register_balsa_pixmap (BALSA_PIXMAP_NEXT_UNREAD_MENU, 
+                           next_unread_menu_xpm, 16, 15);
 }
 
 static void

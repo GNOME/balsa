@@ -1,3 +1,16 @@
+2000-10-11  Matthew Guenther  <guentherm@asme.org>
+
+	* src/Makefile.am: Add link to libltdl on command line to improve
+	pspell support on Sun platform.
+	* src/main-window.c: Add new next unread message icon, try using
+	newlines in toolbar descriptions to narrow toolbar width.
+	* src/main-window.c (register_balsa_pixmap): Add parameters to
+	pass to unction indicating the size of the pixmap to register.
+	This prevents uglification of menu icons through multiple resizes
+	by gnome-libs.
+	* src/pixmaps/next_unread.xpm:
+	* src/pixmaps/next_unread_menu.xpm: New next unread message icon.
+
 2000-10-11  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-index-page.c: fixed bug 26372 - delete from right click 

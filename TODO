@@ -19,7 +19,6 @@ New features/unfinished things:
 
 UI:
 ---
-
 - Message threading
 
 - Incorporate use of GNOME Docklet to indicate status of unread mail,
@@ -78,6 +77,14 @@ status, etc.
 
 - [DONE] menu and toolbar for message-window
 
+- [PARTIAL] Filtering
+	- Filter upon receipt of messages
+	- Filter can be applied manually to contents of mailbox at any
+	time (for fetchmail setups).
+	- Message search code should be able to share filter code.
+	- Virtual folders?  Probably require some form of mailbox
+	indexing system
+	
 
 ----------------------------------
 Old list.. may or may not be in above list

@@ -99,13 +99,14 @@ read_signature ()
   fd = open (path, O_RDONLY);
   if (fd == -1)
     {
-      perror ("error opening signature file:");
+      perror ("error opening signature file");
       return FALSE;
     }
   ret = fstat (fd, &stats);
   if (ret != 0)
     {
-      perror ("error doing fstat on signature:");
+      perror ("error doing fstat on signature");
+      close (fd);
       return FALSE;
     }
   balsa_app.signature = g_new (gchar, stats.st_size);

@@ -50,6 +50,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->charset = NULL;
 
 #ifdef HAVE_GPGME
+    body->was_encrypted = FALSE;
     body->sig_info = NULL;
 #endif
 

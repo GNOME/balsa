@@ -66,6 +66,7 @@ struct _LibBalsaMessageBody {
     GMimeObject *mime_part;	/* mime body */
 
 #ifdef HAVE_GPGME
+    gboolean was_encrypted;
     GMimeGpgmeSigstat* sig_info;  /* info about a pgp signature body */
 #endif
 

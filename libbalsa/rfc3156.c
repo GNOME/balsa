@@ -565,13 +565,18 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 	g_object_unref(session);
 	return body;
     }
-    g_object_unref(ctx);
-    g_object_unref(session);
     message = body->message;
     libbalsa_message_body_free(body);
     body = libbalsa_message_body_new(message);
+    body->was_encrypted = TRUE;  /* remember that is was encrypted */
     libbalsa_message_body_set_mime_body(body, mime_obj);
     g_object_unref(G_OBJECT(mime_obj));
+    if (ctx->sig_state && ctx->sig_state->status != GPG_ERR_NOT_SIGNED) {
+	g_object_ref(ctx->sig_state);
+	body->sig_info = ctx->sig_state;
+    }
+    g_object_unref(ctx);
+    g_object_unref(session);
 
     return body;
 }
@@ -697,6 +702,12 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
     /* paranoia checks */
     g_return_val_if_fail(part != NULL, FALSE);
 
+    /* free any old signature */
+    if (sig_info && *sig_info) {
+	g_object_unref(*sig_info);
+	*sig_info = NULL;
+    }
+
     /* check if gpg is currently available */
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
@@ -741,8 +752,6 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 
     /* return the signature info if requested */
     if (sig_info) {
-	if (*sig_info)
-	    g_object_unref(*sig_info);
 	g_object_ref(ctx->sig_state);
 	*sig_info = ctx->sig_state;
     }
@@ -773,6 +782,12 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     /* paranoia checks */
     g_return_val_if_fail(part != NULL, FALSE);
 
+    /* free any old signature */
+    if (sig_info && *sig_info) {
+	g_object_unref(*sig_info);
+	*sig_info = NULL;
+    }
+
     /* check if gpg is currently available */
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
@@ -792,7 +807,7 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("creating a gpgme context failed"));
 	g_object_unref(session);
-	return FALSE;
+	return GPG_ERR_GENERAL;
     }
 
     /* set the callback for the passphrase */
@@ -829,14 +844,9 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     if (ctx->sig_state) {
 	retval = ctx->sig_state->status;
 	/* return the signature info if requested & available */
-	if (sig_info) {
-	    if (*sig_info)
-		g_object_unref(*sig_info);
-	    if (ctx->sig_state->status != GPG_ERR_NOT_SIGNED) {
-		g_object_ref(ctx->sig_state);
-		*sig_info = ctx->sig_state;
-	    } else
-		*sig_info = NULL;
+	if (sig_info && ctx->sig_state->status != GPG_ERR_NOT_SIGNED) {
+	    g_object_ref(ctx->sig_state);
+	    *sig_info = ctx->sig_state;
 	}
     }
 

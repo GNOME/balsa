@@ -1,3 +1,13 @@
+2004-08-07  Albrecht Dreß
+
+	* libbalsa/address.h: remove duplicate function prototype.
+	* libbalsa/body.[hc]: add a "was_encrypted" flag to the body structure.
+	* libbalsa/rfc3156.c: remember if a rfc 3156 body has been
+	encrypted, recognise combined signed, fix bad return value.
+	* src/balsa-message.c: MDN fixes to make it fully (hopefully) rfc
+	3798 compliant.
+	* src/information-dialog.c: sanitize messages.
+
 2004-08-07  Pawel Salek
 
 	* libbalsa/imap-server.c: only IMAP_CONNECT_FAILED is a network error.

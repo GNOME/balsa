@@ -64,6 +64,9 @@ balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
                        const char *msg)
 {
     BalsaInformationShow show;
+    gchar * show_msg = strdup(msg);
+    
+    libbalsa_utf8_sanitize(&show_msg, balsa_app.convert_unknown_8bit, NULL);
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:
 	show = balsa_app.information_message;
@@ -87,18 +90,19 @@ balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
     case BALSA_INFORMATION_SHOW_NONE:
 	break;
     case BALSA_INFORMATION_SHOW_DIALOG:
-	balsa_information_dialog(parent, type, msg);
+	balsa_information_dialog(parent, type, show_msg);
 	break;
     case BALSA_INFORMATION_SHOW_LIST:
-	balsa_information_list(parent, type, msg);
+	balsa_information_list(parent, type, show_msg);
 	break;
     case BALSA_INFORMATION_SHOW_BAR:
-	balsa_information_bar(parent, type, msg);
+	balsa_information_bar(parent, type, show_msg);
 	break;
     case BALSA_INFORMATION_SHOW_STDERR:
-	balsa_information_stderr(type, msg);
+	balsa_information_stderr(type, show_msg);
 	break;
     }
+    g_free(show_msg);
 
     if (type == LIBBALSA_INFORMATION_FATAL)
 	gtk_main_quit();

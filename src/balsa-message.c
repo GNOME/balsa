@@ -27,6 +27,7 @@
 #include <ctype.h>
 #include <iconv.h>
 #include <libgnomevfs/gnome-vfs-mime-info.h>
+#include <sys/utsname.h>
 
 #include "balsa-app.h"
 #include "balsa-message.h"
@@ -3962,7 +3963,10 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
     gchar *date, *dummy;
+    GString *report;
     gchar **params;
+    struct utsname uts_name;
+    GList *original_rcpt;
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
@@ -3994,23 +3998,38 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
         date, dummy, LIBBALSA_MESSAGE_GET_SUBJECT(for_msg));
     g_free (date);
     g_free (dummy);
+    libbalsa_utf8_sanitize(&body->buffer, balsa_app.convert_unknown_8bit, NULL);
     if (balsa_app.wordwrap)
         libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
-    body->charset = g_strdup ("ISO-8859-1");
+    dummy = (gchar *)g_mime_charset_best(body->buffer, strlen(body->buffer));
+    body->charset = g_strdup(dummy ? dummy : "us-ascii");
     libbalsa_message_append_part(message, body);
     
-    /* the second part is a rfc2298 compliant
+    /* the second part is a rfc3798 compliant
        message/disposition-notification */
     body = libbalsa_message_body_new(message);
-    dummy = libbalsa_address_to_gchar(balsa_app.current_ident->address, -1);
-    body->buffer = g_strdup_printf("Reporting-UA: %s;" PACKAGE " " VERSION "\n"
-                                   "Final-Recipient: rfc822;%s\n"
-                                   "Original-Message-ID: %s\n"
-                                   "Disposition: %s-action/MDN-sent-%sly;displayed",
-                                   dummy, dummy, for_msg->message_id, 
-                                   manual ? "manual" : "automatic",
-                                   manual ? "manual" : "automatical");
-    g_free (dummy);
+    report = g_string_new("");
+    uname(&uts_name);
+    g_string_printf(report, "Reporting-UA: %s; " PACKAGE " " VERSION "\n",
+		    uts_name.nodename);
+    /* see rfc 3798, sections 2.3 and 3.2.3 */
+    if ((original_rcpt =
+	 libbalsa_message_find_user_hdr(for_msg, "original-recipient"))) {
+	gchar **header_pair = (gchar **)original_rcpt->data;
+
+	g_string_append_printf(report, "Original-Recipient: %s\n",
+			       header_pair[1]);	
+    }
+    g_string_append_printf(report, "Final-Recipient: rfc822; %s\n",
+			   (gchar *)balsa_app.current_ident->address->address_list->data);
+    g_string_append_printf(report, "Original-Message-ID: %s\n",
+			   for_msg->message_id);
+    g_string_append_printf(report,
+			   "Disposition: %s-action/MDN-sent-%sly; displayed",
+			   manual ? "manual" : "automatic",
+			   manual ? "manual" : "automatical");
+    body->buffer = report->str;
+    g_string_free(report, FALSE);
     body->content_type = g_strdup("message/disposition-notification");
     body->charset = g_strdup ("US-ASCII");
     libbalsa_message_append_part(message, body);

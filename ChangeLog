@@ -1,3 +1,8 @@
+2004-08-17 22:14  PeterB
+
+	* src/: balsa-app.h, main.c, pref-manager.c, save-restore.c: make
+	periodic expunge configurable.
+
 2004-08-16  Pawel Salek
 
 	* libbalsa/address-book.c: expand aliases by default.

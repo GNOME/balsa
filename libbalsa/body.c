@@ -374,8 +374,9 @@ libbalsa_message_body_is_inline(LibBalsaMessageBody * body)
 	disposition = body->content_dsp;
 
     return (disposition
-	    && g_ascii_strcasecmp(disposition,
-				  GMIME_DISPOSITION_INLINE) == 0);
+	    && g_ascii_strncasecmp(disposition,
+				   GMIME_DISPOSITION_INLINE,
+				   strlen(GMIME_DISPOSITION_INLINE)) == 0);
 }
 
 /* libbalsa_message_body_is_flowed:

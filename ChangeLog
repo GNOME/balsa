@@ -1,5 +1,7 @@
-2004-10-15 13:16  PeterB
+2004-10-15 15:06  PeterB
 
+	* src/main-window.c: add mnemonics for next/previous part menu
+	items.
 	* src/message-window.c: manage sensitivity of next/previous part
 	controls, and of move-to-trash controls.
 	* src/: balsa-message.c, balsa-message.h, main-window.c: manage

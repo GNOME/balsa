@@ -208,7 +208,7 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
 }
 
 void
-balsa_mailbox_show_prop_dialog(BalsaMailboxNode* mn)
+balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode* mn)
 {
     gtk_signal_emit(GTK_OBJECT(mn),
 		    balsa_mailbox_node_signals[SHOW_PROP_DIALOG]);
@@ -224,7 +224,7 @@ balsa_mailbox_node_append_subtree(BalsaMailboxNode * mn, GNode *r)
 void 
 balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_mailbox_show_prop_dialog((BalsaMailboxNode*)data);
+    balsa_mailbox_node_show_prop_dialog((BalsaMailboxNode*)data);
 }
 
 static void
@@ -262,7 +262,7 @@ mb_close_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 static void
 mb_conf_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
-    balsa_mailbox_show_prop_dialog(mbnode);
+    balsa_mailbox_node_show_prop_dialog(mbnode);
     /* mailbox_conf_edit (mbnode); */
 }
 

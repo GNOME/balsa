@@ -1161,7 +1161,6 @@ numeric_compare(GtkCList * clist, gconstpointer ptr1, gconstpointer ptr2)
 {
     LibBalsaMailbox *m1;
     LibBalsaMailbox *m2;
-    glong t1, t2;
 
     GtkCListRow *row1 = (GtkCListRow *) ptr1;
     GtkCListRow *row2 = (GtkCListRow *) ptr2;

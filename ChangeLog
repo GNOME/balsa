@@ -1,5 +1,14 @@
-2001-01-01  Pawel Salek  <pawsa@theochem.kth.se>
+2001-01-06  Pawel Salek  <pawsa@theochem.kth.se>
 
+	Make the  MailboxNode code proper and compile without warnings
+	(thanks to Ian Campbell; blame RH 7.0)
+	* src/balsa-mblist.c: remove unused variables.
+	* src/local-mailbox.c(traverse_find_path): return a value.
+	* src/mailbox-node.c: rename functions to the declared in header file.
+	* src/main-window.c: add missing header include.
+	
+2001-01-01  Pawel Salek  <pawsa@theochem.kth.se>
+ 
 	* src/sendmsg-window.c: initialize glist.
 	* src/mailbox-node.[hc] : finish restructuring the MailboxNode code,
 	separate folder subtree expansion.

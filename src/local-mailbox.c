@@ -36,6 +36,7 @@
 #include "mailbox-node.h"
 
 
+#if 0
 static gboolean
 traverse_find_dirname(GNode * node, gpointer* d)
 {
@@ -68,7 +69,7 @@ find_node_by_dirname(GNode * root, GTraverseType order,
 
     return d[1];
 }
-
+#endif
 static gboolean
 traverse_find_path(GNode * node, gpointer * d)
 {
@@ -114,34 +115,33 @@ static GNode*
 add_mailbox(GNode *rnode, const gchar * name, const gchar * path, GtkType type)
 {
     LibBalsaMailbox *mailbox;
-    char *dirname;
     GNode *node;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.inbox))
 	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.inbox)->path) ==
-	    0) return;
+	    0) return NULL;
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.outbox))
 	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.outbox)->path) ==
-	    0) return;
+	    0) return NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.sentbox))
 	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.sentbox)->path)
 	    == 0)
-	    return;
+	    return NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.draftbox))
 	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.draftbox)->path)
 	    == 0)
-	    return;
+	    return NULL;
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(balsa_app.trash))
 	if (strcmp(path, LIBBALSA_MAILBOX_LOCAL(balsa_app.trash)->path) ==
-	    0) return;
+	    0) return NULL;
 
     /* don't add if the mailbox is already in the configuration */
     if (find_by_path(balsa_app.mailbox_nodes, G_LEVEL_ORDER, 
 		     G_TRAVERSE_ALL, path))
-	return;
+	return NULL;
 
     if (type == 0) {
 	node = g_node_new(balsa_mailbox_node_new_from_dir(path));
@@ -231,7 +231,6 @@ read_dir(GNode *rnode, const gchar * prefix)
 	    } else {
 		name = g_basename(prefix);
 		current_node = add_mailbox(rnode, name, prefix, 0);
-		g_free(name);
 		read_dir(current_node, filename);
 	    }
 	} else {

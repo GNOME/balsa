@@ -51,6 +51,7 @@
 #include "print.h"
 #include "sendmsg-window.h"
 #include "store-address.h"
+#include "save-restore.h"
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"

@@ -1,3 +1,7 @@
+2002-10-15  Carlos Morgado  <chbm@chbm.nu>
+
+	* imap/message.c (imap_append_message): read last line
+
 2002-10-01  Emmanuel <e.allaud@wanadoo.fr>
 
 	* imap/imap.c (imap_uid_search): add search type (seq no/UID) param.

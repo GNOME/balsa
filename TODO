@@ -16,9 +16,6 @@ later stuff:
      we have a full mail tray and an empty one.  full should be used to show
      messages with new mail.  the mailbox name should also be in bold.
 
- * fix it under solaris.  test under aix, hpux, and osf (digital unix i fink?)
-     UPDATE: solaris seems to be ok now.  need to test other platforms.
-
  * digest/undigest mail.
 
  * add mutt keybindings
@@ -44,9 +41,6 @@ Nat's ideas:
    flexible enough to allow the user to select their quote
    character(s).
 
- * A "get new mail" button on the main toolbar would be nice.  It
-   should be smart enough to grab POP3 mail if appropriate.
-
  * An important one: by default, for IMAP and POP mailboxes, Balsa stores the
    user's password in the config file.  The file is mode 0600, however a lot
    of people won't feel so good about this, myself included.  Add an option
@@ -63,8 +57,4 @@ Nat's ideas:
 
  * It would be nice if the mailboxes in the mailbox list were always
    in some sort of consistent order.
-
- * It would be nice if the mailbox list had a little more information about
-   the mailboxes; e.g. a full tray icon if there are unread messages in
-   the mailbox, and an empty tray icon otherwise.
 

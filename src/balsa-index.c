@@ -328,7 +328,9 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
   if (mailbox == NULL)
     return;
 
-  mailbox_open_ref (mailbox);
+  if (mailbox->open_ref == 0)
+    mailbox_open_ref (mailbox);
+
   bindex->watcher_id =
     mailbox_watcher_set (mailbox,
 			 (MailboxWatcherFunc) mailbox_listener,
@@ -342,7 +344,6 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 			 MESSAGE_FLAGGED_MASK |
 			 MESSAGE_REPLIED_MASK,
 			 (gpointer) bindex);
-
 
   /* here we play a little trick on clist; in GTK_SELECTION_BROWSE mode
    * (the default for this index), the first row appended automagicly gets
@@ -365,14 +366,14 @@ balsa_index_set_mailbox (BalsaIndex * bindex, Mailbox * mailbox)
 				GTK_SELECTION_BROWSE);
 
   if (first_new_message != 0)
-  {
-    g_print ("balsa-index.c: moving to row %i\n", first_new_message);
-    gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_message, 0, 0.0, 0.0);
-  }
+    {
+      g_print ("balsa-index.c: moving to row %i\n", first_new_message);
+      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), first_new_message, 0, 0.0, 0.0);
+    }
   else
     {
       g_print ("balsa-index.c: moving to row %i\n", i);
-      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i -2, 0, 1.0, 0.0);
+      gtk_clist_moveto (GTK_CLIST (GTK_BIN (bindex)->child), i - 2, 0, 1.0, 0.0);
     }
   first_new_message = 0;
 }
@@ -500,7 +501,7 @@ clist_set_col_img_from_flag (BalsaIndex * bindex, gint row, Message * message)
   else if (message->flags & MESSAGE_FLAG_NEW)
     gtk_clist_set_pixmap (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, new_pix, new_mask);
   else
-    gtk_clist_set_text(GTK_CLIST(GTK_BIN(bindex)->child), row, 1, NULL);
+    gtk_clist_set_text (GTK_CLIST (GTK_BIN (bindex)->child), row, 1, NULL);
 }
 
 
@@ -571,10 +572,10 @@ mailbox_listener (MailboxWatcherMessage * mw_message)
       balsa_index_update_flag (bindex, mw_message->message);
       break;
 /*
-    case MESSAGE_NEW:
-      balsa_index_add (bindex, mw_message->message);
-      break;
-*/
+   case MESSAGE_NEW:
+   balsa_index_add (bindex, mw_message->message);
+   break;
+ */
     case MESSAGE_DELETE:
       break;
 

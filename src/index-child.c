@@ -102,7 +102,6 @@ index_child_new (GnomeMDI * mdi, Mailbox * mailbox)
       gtk_widget_show (messagebox);
       return NULL;
     }
-  mailbox_open_unref (mailbox);
 
   mdichild = gnome_mdi_find_child (mdi, mailbox->name);
   if (mdichild)

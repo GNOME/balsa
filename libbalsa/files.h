@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include <glib.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 
 /* filename is the filename (naw!)
  * splice is what to put in between the prefix and the filename, if desired
@@ -41,7 +42,11 @@ gchar *balsa_file_finder(const gchar * filename, const gchar * splice,
 #define balsa_pixmap_finder_no_warn(filename) \
     (balsa_file_finder((filename), "pixmaps", NULL, FALSE))
 
-gchar *libbalsa_icon_finder(const char *mime_type, const char *filename,
-                            gchar** used_type);
+GdkPixbuf *libbalsa_icon_finder(const char *mime_type, const char *filename,
+				gchar** used_type, GtkIconSize size);
+
+void libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu,
+					    const gchar * content_type,
+					    GCallback callback, gpointer data);
 
 #endif

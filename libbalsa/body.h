@@ -48,6 +48,14 @@ enum _LibBalsaMessageBodyType {
     LIBBALSA_MESSAGE_BODY_TYPE_VIDEO
 };
 
+typedef enum _LibBalsaAttachMode LibBalsaAttachMode;
+
+enum _LibBalsaAttachMode {
+    LIBBALSA_ATTACH_AS_ATTACHMENT = 1,
+    LIBBALSA_ATTACH_AS_INLINE,
+    LIBBALSA_ATTACH_AS_EXTBODY
+};
+
 struct _LibBalsaMessageBody {
     LibBalsaMessage *message;	/* The message of which this is a part */
     /* FIXME: remove buffer and buf_len to decrease memory usage. */
@@ -61,7 +69,7 @@ struct _LibBalsaMessageBody {
     const gchar *content_dsp;	/* content-disposition */ 
     const gchar *content_id;    /* content-id */
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
-    gboolean attach_as_extbody; /* if an attachment shall be appended as external-body (sending) */
+    LibBalsaAttachMode attach_mode; /* attachment mode for sending */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */
     gchar *charset;		/* the charset, used for sending, replying. */
     GMimeObject *mime_part;	/* mime body */

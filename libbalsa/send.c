@@ -1490,7 +1490,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		g_free(mt);
 	    }
 
-	    if (body->attach_as_extbody) {
+	    if (body->attach_mode == LIBBALSA_ATTACH_AS_EXTBODY) {
 		GMimeContentType *content_type =
 		    g_mime_content_type_new("message", "external-body");
 		mime_part=g_mime_object_new_type("message", "external-body");
@@ -1560,7 +1560,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 		    GMIME_OBJECT(g_mime_part_new_with_type(mime_type[0],
 				                           mime_type[1]));
 		g_mime_part_set_content_disposition(GMIME_PART(mime_part),
-			GMIME_DISPOSITION_ATTACHMENT);
+			body->attach_mode == LIBBALSA_ATTACH_AS_INLINE ?
+			GMIME_DISPOSITION_INLINE : GMIME_DISPOSITION_ATTACHMENT);
 		if(strcasecmp(mime_type[0],"text") != 0)
 		{
 		    g_mime_part_set_encoding(GMIME_PART(mime_part),

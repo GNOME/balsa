@@ -960,9 +960,8 @@ static void
 prepare_default(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 {
     DefaultInfo *pdata;
-    gchar *icon_name, *conttype;
+    gchar *conttype;
     gint hdr = 0, lines;
-    GError* err = NULL;
 
     pdata = g_malloc(sizeof(DefaultInfo));
     pdata->id_tag = BALSA_PRINT_TYPE_DEFAULT;
@@ -970,12 +969,10 @@ prepare_default(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
     conttype = libbalsa_message_body_get_mime_type(body);
 
     /* get a pixbuf according to the mime type */
-    icon_name = libbalsa_icon_finder(conttype, NULL, NULL);
-    pdata->pixbuf = gdk_pixbuf_new_from_file(icon_name, &err);
-    if(err) { g_warning("error loading pixbuf."); g_error_free(err); }
+    pdata->pixbuf = libbalsa_icon_finder(conttype, NULL, NULL,
+					 GTK_ICON_SIZE_DND);
     pdata->image_width = gdk_pixbuf_get_width (pdata->pixbuf);
     pdata->image_height = gdk_pixbuf_get_height (pdata->pixbuf);
-    g_free(icon_name);
 
     /* gather some info about this part */
     pdata->labels = g_new0(gchar *, 5); /* four fields, one terminator */

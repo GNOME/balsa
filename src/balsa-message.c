@@ -204,10 +204,6 @@ static void part_context_menu_vfs_cb(GtkWidget * menu_item,
                                      BalsaPartInfo * info);
 static void part_create_menu (BalsaPartInfo* info);
 
-static void fill_part_menu_by_content_type(BalsaPartInfo *info,
-                                           GtkMenu * menu, 
-					   const gchar * content_type);
-
 static gboolean img_check_size(GtkImage **widget_p);
 
 static GtkNotebookClass *parent_class = NULL;
@@ -635,7 +631,6 @@ balsa_message_init(BalsaMessage * bm)
                                 GDK_TYPE_PIXBUF,
                                 G_TYPE_STRING);
     bm->treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL(model));
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (bm->treeview), TRUE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (bm->treeview));
     g_signal_connect(bm->treeview, "row-activated",
                      G_CALLBACK(tree_activate_row_cb), bm);    
@@ -2319,13 +2314,22 @@ static void
 text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
                          BalsaPartInfo * info)
 {
+    GtkWidget *menu_item;
+
     gtk_widget_hide_all(GTK_WIDGET(menu));
 
     gtk_container_foreach(GTK_CONTAINER(menu),
                           (GtkCallback)gtk_widget_destroy_insensitive, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu),
 			  gtk_separator_menu_item_new ());
-    fill_part_menu_by_content_type(info, GTK_MENU(menu), "text/plain");
+    libbalsa_fill_vfs_menu_by_content_type(menu, "text/plain",
+					   G_CALLBACK (part_context_menu_vfs_cb),
+					   (gpointer)info);
+
+    menu_item = gtk_menu_item_new_with_label (_("Save..."));
+    g_signal_connect (G_OBJECT (menu_item), "activate",
+                      G_CALLBACK (part_context_menu_save), (gpointer) info);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
     gtk_widget_show_all(GTK_WIDGET(menu));
 }
@@ -2539,8 +2543,14 @@ balsa_gtk_html_popup(BalsaMessage * bm)
     menuitem = gtk_separator_menu_item_new ();
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    fill_part_menu_by_content_type(bm->current_part, GTK_MENU(menu),
-                                   "text/html");
+    libbalsa_fill_vfs_menu_by_content_type(GTK_MENU(menu), "text/html",
+					   G_CALLBACK (part_context_menu_vfs_cb),
+					   (gpointer)bm->current_part);
+
+    menuitem = gtk_menu_item_new_with_label (_("Save..."));
+    g_signal_connect (G_OBJECT (menuitem), "activate",
+                      G_CALLBACK (part_context_menu_save), (gpointer)bm->current_part);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
 
     gtk_widget_show_all(menu);
     g_object_ref(menu);
@@ -2663,20 +2673,6 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
     return;
 }
 
-static GdkPixbuf *
-gdk_pixbuf_new_from_file_scaled(const gchar *filename, gint width, gint height,
-                                GdkInterpType interp_type, GError **error)
-{
-    GdkPixbuf *tmp, *dest;
-
-    if (!(tmp = gdk_pixbuf_new_from_file(filename, error)))
-        return NULL;
-
-    dest = gdk_pixbuf_scale_simple(tmp, width, height, interp_type);
-    g_object_unref(tmp);
-    return dest;
-}
-
 static inline gchar *
 mpart_content_name(const gchar *content_type)
 {
@@ -2725,13 +2721,10 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
              GtkTreeModel * model, GtkTreeIter * iter, gchar * part_id)
 {
     BalsaPartInfo *info = NULL;
-    gchar *pix = NULL;
     gchar *content_type = libbalsa_message_body_get_mime_type(body);
     gchar *icon_title = NULL;
     gboolean is_multipart=libbalsa_message_body_is_multipart(body);
     GdkPixbuf *content_icon;
-
-    pix = libbalsa_icon_finder(content_type, body->filename, NULL);
 
     if(!is_multipart ||
        g_ascii_strcasecmp(content_type, "message/rfc822")==0 ||
@@ -2804,10 +2797,17 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 #else
 	content_icon = NULL;
 #endif
-        if (!content_icon)
-            content_icon =
-                gdk_pixbuf_new_from_file_scaled(pix, 16, 16,
-                                                GDK_INTERP_BILINEAR, NULL);
+        if (!content_icon) {
+	    if (body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
+		content_icon = 
+		    gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+					   BALSA_PIXMAP_FORWARD,
+					   GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
+	    else
+		content_icon = 
+		    libbalsa_icon_finder(content_type, body->filename, NULL,
+					 GTK_ICON_SIZE_LARGE_TOOLBAR);
+	}
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, info,
 			    PART_NUM_COLUMN, part_id,
@@ -2817,9 +2817,15 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         g_object_unref(info);
         g_free(icon_title);
     } else {
-        content_icon =
-            gdk_pixbuf_new_from_file_scaled(pix, 16, 16,
-                                            GDK_INTERP_BILINEAR, NULL);
+	if (body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
+	    content_icon = 
+		gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+				       BALSA_PIXMAP_FORWARD,
+				       GTK_ICON_SIZE_MENU, NULL);
+	else
+	    content_icon =
+		libbalsa_icon_finder(content_type, body->filename, NULL,
+				     GTK_ICON_SIZE_MENU);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, NULL,
 			    PART_NUM_COLUMN, part_id,
@@ -2827,8 +2833,8 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
                             MIME_TYPE_COLUMN, content_type, -1);
     }
         
-    g_object_unref(G_OBJECT(content_icon));
-    g_free(pix);
+    if (content_icon)
+	g_object_unref(G_OBJECT(content_icon));
     g_free(content_type);
 }
 
@@ -2876,169 +2882,6 @@ display_content(BalsaMessage * bm)
     gtk_tree_view_expand_all(GTK_TREE_VIEW(bm->treeview));
 }
 
-static void add_vfs_menu_item(BalsaPartInfo *info, GtkMenu * menu,
-                              const GnomeVFSMimeApplication *app)
-{
-    gchar *menu_label = g_strdup_printf(_("Open with %s"), app->name);
-    GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
-    
-    g_object_set_data_full(G_OBJECT (menu_item), "mime_action", 
-                         g_strdup(app->id), g_free);
-    g_signal_connect (G_OBJECT (menu_item), "activate",
-                        GTK_SIGNAL_FUNC (part_context_menu_vfs_cb),
-                        (gpointer) info);
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-    g_free (menu_label);
-}
-
-#if !GTK_CHECK_VERSION(2, 4, 0)
-static gboolean in_gnome_vfs(const GnomeVFSMimeApplication *default_app, 
-                             const GList *short_list, const gchar *cmd) 
-{
-    gchar *cmd_base=g_strdup(cmd), *arg=strchr(cmd_base, '%');
-    
-    /* Note: Tries to remove the entrire argument containing %f etc., so that
-             we e.g. get rid of the whole "file:%f", not just "%f" */
-    if(arg) {
-        while(arg!=cmd && *arg!=' ')
-            arg--;
-        
-        *arg='\0';
-    }
-    g_strstrip(cmd_base);
-    
-    if(default_app && default_app->command &&
-       strcmp(default_app->command, cmd_base)==0) {
-        g_free(cmd_base);
-        return TRUE;
-    } else {
-        const GList *item;
-
-        for(item=short_list; item; item=g_list_next(item)) {
-            GnomeVFSMimeApplication *app=item->data;
-            
-            if(app->command && strcmp(app->command, cmd_base)==0) {
-                g_free(cmd_base);
-                return TRUE;
-            }
-        }
-    }
-    g_free(cmd_base);
-    
-    return FALSE;
-}
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-
-/* helper: fill the passed menu with vfs items */
-static void
-fill_part_menu_by_content_type(BalsaPartInfo *info, GtkMenu * menu,
-                               const gchar * content_type)
-{
-    GtkWidget* menu_item;
-    GList* list;
-#if GTK_CHECK_VERSION(2, 4, 0)
-    GnomeVFSMimeApplication *def_app;
-    GList *app_list;
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    GList* key_list, *app_list;
-    gchar* key;
-    const gchar* cmd;
-    gchar* menu_label;
-    gchar** split_key;
-    gint i;
-    GnomeVFSMimeApplication *def_app, *app;
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-    
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    key_list = list = gnome_vfs_mime_get_key_list(content_type);
-    /* gdk_threads_leave(); releasing GDK lock was necessary for broken
-     * gnome-vfs versions */
-    app_list = gnome_vfs_mime_get_short_list_applications(content_type);
-    /* gdk_threads_enter(); */
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-
-    if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
-        add_vfs_menu_item(info, menu, def_app);
-    }
-    
-
-#if GTK_CHECK_VERSION(2, 4, 0)
-    app_list = gnome_vfs_mime_get_all_applications(content_type);
-    for (list = app_list; list; list = list->next) {
-        GnomeVFSMimeApplication *app = list->data;
-        if (app && (!def_app || strcmp(app->name, def_app->name) != 0))
-            add_vfs_menu_item(info, menu, app);
-    }
-#else /* GTK_CHECK_VERSION(2, 4, 0) */
-    while (list) {
-        key = list->data;
-
-        if (key && g_ascii_strcasecmp (key, "icon-filename") 
-            && g_ascii_strncasecmp (key, "fm-", 3)
-	    && g_ascii_strncasecmp (key, "category", 8)
-            /* Get rid of additional GnomeVFS entries: */
-            && (!strstr(key, "_") || strstr(key, "."))
-            && g_ascii_strncasecmp(key, "description", 11)) {
-            
-            if ((cmd = gnome_vfs_mime_get_value (content_type, key)) != NULL &&
-                !in_gnome_vfs(def_app, app_list, cmd)) {
-                if (g_ascii_strcasecmp (key, "open") == 0 || 
-                    g_ascii_strcasecmp (key, "view") == 0 || 
-                    g_ascii_strcasecmp (key, "edit") == 0 ||
-                    g_ascii_strcasecmp (key, "ascii-view") == 0) {
-                    /* uppercase first letter, make label */
-                    menu_label = g_strdup_printf ("%s (\"%s\")", key, cmd);
-                    *menu_label = toupper (*menu_label);
-                } else {
-                    split_key = g_strsplit (key, ".", -1);
-
-                    i = 0;
-                    while (split_key[i+1] != NULL) {
-                        ++i;
-                    }
-                    menu_label = split_key[i];
-                    menu_label = g_strdup (menu_label);
-                    g_strfreev (split_key);
-                }
-                menu_item = gtk_menu_item_new_with_label (menu_label);
-                g_object_set_data (G_OBJECT (menu_item), "mime_action", 
-                                   key);
-                g_signal_connect (G_OBJECT (menu_item), "activate",
-                                  G_CALLBACK (part_context_menu_cb),
-                                  (gpointer) info);
-                gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-                g_free (menu_label);
-            }
-        }
-        list = g_list_next (list);
-    }
-
-    list=app_list;
-
-    while (list) {
-        app=list->data;
-
-        if(app && (!def_app || strcmp(app->name, def_app->name)!=0)) {
-            add_vfs_menu_item(info, menu, app);
-        }
-
-        list = g_list_next (list);
-    }
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-    gnome_vfs_mime_application_free(def_app);
-    
-
-    menu_item = gtk_menu_item_new_with_label (_("Save..."));
-    g_signal_connect (G_OBJECT (menu_item), "activate",
-                      G_CALLBACK (part_context_menu_save), (gpointer) info);
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-
-#if !GTK_CHECK_VERSION(2, 4, 0)
-    g_list_free (key_list);
-#endif /* GTK_CHECK_VERSION(2, 4, 0) */
-    gnome_vfs_mime_application_list_free (app_list);
-}
-
 static void
 part_create_menu (BalsaPartInfo* info) 
 /* Remarks: Will add items in the following order:
@@ -3048,6 +2891,7 @@ part_create_menu (BalsaPartInfo* info)
             3) GnomeVFS shortlist applications, with the default one (sometimes
                included on shortlist, sometimes not) excluded. */ 
 {
+    GtkWidget* menu_item;
     gchar* content_type;
     
     info->popup_menu = gtk_menu_new ();
@@ -3055,8 +2899,16 @@ part_create_menu (BalsaPartInfo* info)
     gtk_object_sink(GTK_OBJECT(info->popup_menu));
     
     content_type = libbalsa_message_body_get_mime_type (info->body);
-    fill_part_menu_by_content_type(info, GTK_MENU(info->popup_menu),
-                                   content_type);
+    libbalsa_fill_vfs_menu_by_content_type(GTK_MENU(info->popup_menu),
+					   content_type,
+					   G_CALLBACK (part_context_menu_vfs_cb),
+					   (gpointer)info);
+
+    menu_item = gtk_menu_item_new_with_label (_("Save..."));
+    g_signal_connect (G_OBJECT (menu_item), "activate",
+                      G_CALLBACK (part_context_menu_save), (gpointer) info);
+    gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
+
     gtk_widget_show_all (info->popup_menu);
     g_free (content_type);
 }
@@ -4542,23 +4394,23 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
         LIBBALSA_PROTECT_ENCRYPT)
         return gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
                                       BALSA_PIXMAP_INFO_ENCR,
-                                      GTK_ICON_SIZE_MENU, NULL);
+                                      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
 
     switch (gpgme_sigstat_to_protect_state(body)) {
     case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
 	icon = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
 				      BALSA_PIXMAP_INFO_SIGN_GOOD,
-				      GTK_ICON_SIZE_MENU, NULL);
+				      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
 	break;
     case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
 	icon = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
 				      BALSA_PIXMAP_INFO_SIGN_NOTRUST,
-				      GTK_ICON_SIZE_MENU, NULL);
+				      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
 	break;
     case LIBBALSA_MSG_PROTECT_SIGN_BAD:
 	icon = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
 				      BALSA_PIXMAP_INFO_SIGN_BAD,
-				      GTK_ICON_SIZE_MENU, NULL);
+				      GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
 	break;
     default:
 	return NULL;

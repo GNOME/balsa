@@ -53,6 +53,21 @@ validate_folder(GtkWidget *w, FolderDialogData * fcw)
     gnome_dialog_set_sensitive(fcw->dialog, 0, sensitive);
 }
 
+#ifdef USE_SSL
+static void imap_use_ssl_cb(GtkWidget * w, FolderDialogData * fcw);
+
+static void
+imap_use_ssl_cb(GtkWidget * w, FolderDialogData * fcw)
+{
+    gint zero = 0;
+    GtkEditable *port = GTK_EDITABLE(fcw->port);
+    GtkToggleButton *button = GTK_TOGGLE_BUTTON(fcw->use_ssl);
+    gboolean use_ssl = gtk_toggle_button_get_active(button);
+    gtk_editable_delete_text(port, 0, -1);
+    gtk_editable_insert_text(port, use_ssl ? "993" : "143", 3, &zero);
+}
+#endif
+
 /* folder_conf_imap_node:
    show the IMAP Folder configuration dialog for given mailbox node.
    If mn is NULL, setup it with default values for folder creation.
@@ -103,30 +118,31 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	fcw.port = create_entry(fcw.dialog, table, NULL, NULL, 2, tmp, keyval);
 	g_free(tmp);
     } else fcw.port = 
-	       create_entry(fcw.dialog, table, NULL, NULL, 2, "143", keyval);
+	       create_entry(fcw.dialog, table, NULL, NULL, 3, "143", keyval);
 
 
-    create_label(_("_User name:"), table, 3, &keyval);
-    fcw.username = create_entry(fcw.dialog, table, validate_folder, &fcw, 3, 
+    create_label(_("_User name:"), table, 4, &keyval);
+    fcw.username = create_entry(fcw.dialog, table, validate_folder, &fcw, 4, 
 			    s ? s->user : g_get_user_name(), 
 			    keyval);
 
-    create_label(_("_Password:"), table, 4, &keyval);
-    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 4,
+    create_label(_("_Password:"), table, 5, &keyval);
+    fcw.password = create_entry(fcw.dialog, table, NULL, NULL, 5,
 				s ? s->passwd : NULL, 
 				keyval);
     gtk_entry_set_visibility(GTK_ENTRY(fcw.password), FALSE);
 
     fcw.subscribed = create_check(fcw.dialog, _("_Subscribed folders only"), 
-				  table, 5, FALSE);
-    create_label(_("_Prefix"), table, 6, &keyval);
-    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 6, 
+				  table, 6, FALSE);
+    create_label(_("_Prefix"), table, 7, &keyval);
+    fcw.prefix = create_entry(fcw.dialog, table, NULL, NULL, 7, 
 			      mn ? mn->dir : NULL, keyval);
     
 #ifdef USE_SSL
     fcw.use_ssl = create_check(fcw.dialog,
 			       _("Use SSL (IMAPS)"),
-			       table, 7, s->use_ssl);
+			       table, 8, s ? s->use_ssl : FALSE);
+    gtk_signal_connect(GTK_OBJECT(fcw.use_ssl), "toggled", imap_use_ssl_cb, &fcw);
 #endif
 
     gtk_widget_show_all(GTK_WIDGET(fcw.dialog));

@@ -101,6 +101,34 @@ static GtkWidget *create_imap_mailbox_page(MailboxConfWindow *mcw);
 void mailbox_conf_edit_imap_server(GtkWidget * widget, gpointer data);
 #endif
 
+
+#ifdef USE_SSL
+static void imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
+static void pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw);
+
+static void
+imap_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
+{
+    gint zero = 0;
+    GtkEditable *port = GTK_EDITABLE(mcw->mb_data.imap.port);
+    GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.imap.use_ssl);
+    gboolean use_ssl = gtk_toggle_button_get_active(button);
+    gtk_editable_delete_text(port, 0, -1);
+    gtk_editable_insert_text(port, use_ssl ? "993" : "143", 3, &zero);
+}
+
+static void
+pop3_use_ssl_cb(GtkWidget * w, MailboxConfWindow * mcw)
+{
+    gint zero = 0;
+    GtkEditable *port = GTK_EDITABLE(mcw->mb_data.pop3.port);
+    GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.use_ssl);
+    gboolean use_ssl = gtk_toggle_button_get_active(button);
+    gtk_editable_delete_text(port, 0, -1);
+    gtk_editable_insert_text(port, use_ssl ? "995" : "110", 3, &zero);
+}
+#endif
+
 /* BEGIN OF COMMONLY USED CALLBACKS SECTION ---------------------- */
 
 void
@@ -831,11 +859,14 @@ create_pop_mailbox_page(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.check = 
 	create_check(mcw->window, _("_Enable check for new mail"), 
 		     table, 8, TRUE);
+
 #ifdef USE_SSL
     /* toggle for ssl */
     mcw->mb_data.pop3.use_ssl = 
 	create_check(mcw->window, _("_Use SSL (pop3s)"), 
-		     table, 9, TRUE);
+		     table, 9, FALSE);
+    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.pop3.use_ssl), "toggled", pop3_use_ssl_cb, mcw);
+
 #endif
 
     return table;
@@ -908,11 +939,13 @@ create_imap_mailbox_page(MailboxConfWindow *mcw)
     gnome_entry_append_history(GNOME_ENTRY(entry), 1,
 			       "INBOX.outbox");
 
+
 #ifdef USE_SSL
     /* toggle for SSL */
     mcw->mb_data.imap.use_ssl = create_check(mcw->window, 
 					     _("Use SSL (imaps)"),
 					     table, 6, FALSE);
+    gtk_signal_connect(GTK_OBJECT(mcw->mb_data.imap.use_ssl), "toggled", imap_use_ssl_cb, mcw);
 #endif
 
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 5, 6,

@@ -1,5 +1,12 @@
 2001-08-19  Carlos Morgado  <chbm@chbm.nu>
 
+	* src/folder-conf.c: 
+	* src/mailbox-conf.c: 
+	(based on Peter Bloomfield's patch) change port when SSL
+	is toogled
+	
+2001-08-19  Carlos Morgado  <chbm@chbm.nu>
+
 	* libbalsa/server.c: fix to signal marshaller when not using SSL
 	spoted by Manuel A. McLure <manuel@mclure.org>
 

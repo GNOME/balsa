@@ -2373,6 +2373,9 @@ lbae_entry_changed(GtkEntry * entry, gpointer data)
     GtkEntryCompletion *completion;
     LibBalsaAddressEntryInfo *info;
 
+    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(entry)))
+	return;
+
     completion = gtk_entry_get_completion(entry);
     info = g_object_get_data(G_OBJECT(completion),
                              LIBBALSA_ADDRESS_ENTRY_INFO);

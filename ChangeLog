@@ -4,8 +4,11 @@
 	* libbalsa/source-viewer.c: compile on RH9.
 	* src/mailbox-conf.c: do not crash on POP3 mailbox configuration.
 	
-2003-06-04 06:01  PeterB
+2003-06-04 20:56  PeterB
 
+	* src/: sendmsg-window.c, sendmsg-window.h, toolbar-factory.c:
+	Implement Undo and Redo options on the compose window's View menu,
+	and corresponding toolbar buttons.
 	* libbalsa/source-viewer.c: Include "misc.h" (Miquel van
 	Smoorenburg <miquels@cistron.nl>); weak ref the message.
 

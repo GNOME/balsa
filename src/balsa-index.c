@@ -152,6 +152,7 @@ static void hide_deleted(BalsaIndex * bindex, gboolean hide);
 /* Callbacks */
 static gint mru_search_cb(GNode *node, struct FolderMRUEntry *entry);
 static void mru_select_cb(GtkWidget *widget, struct FolderMRUEntry *entry);
+static void show_bmbl(GtkMenuItem * menuitem, BalsaIndex * bindex);
 
 /* formerly balsa-index-page stuff */
 enum {
@@ -184,8 +185,6 @@ static void create_stock_menu_item(GtkWidget * menu, const gchar * type,
 
 /* menu item callbacks */
 
-static gint close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
-				    BalsaIndex * bi);
 static void transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, 
 				 gint column, gpointer data);
 
@@ -1361,8 +1360,8 @@ button_event_press_cb(GtkWidget * ctree, GdkEventButton * event,
             gtk_menu_popup(GTK_MENU(create_menu(bindex)),
                            NULL, NULL, NULL, NULL,
                            event->button, event->time);
+            return TRUE;
         }
-        return TRUE;
     }
     return FALSE;
 }
@@ -2058,9 +2057,7 @@ create_menu(BalsaIndex * bindex)
           GTK_SIGNAL_FUNC(balsa_message_forward_inline) },
         { GNOME_STOCK_MENU_BOOK_RED,     N_("Store Address..."), 
           GTK_SIGNAL_FUNC(balsa_store_address) } };
-    GtkWidget *menu, *menuitem, *submenu, *smenuitem, *mrumenu, *mruitem;
-    GtkWidget *bmbl, *scroll;
-    GtkRequisition req;
+    GtkWidget *menu, *menuitem, *submenu, *mrumenu, *mruitem;
     LibBalsaMailbox* mailbox;
     unsigned i;
     GList *list;
@@ -2127,7 +2124,7 @@ create_menu(BalsaIndex * bindex)
     g_list_free(mru_list);
     mru_list=NULL;
 
-    menuitem = gtk_menu_item_new_with_label(_("Move"));
+    menuitem = gtk_menu_item_new_with_label(_("Move to"));
     gtk_widget_set_sensitive(menuitem, !mailbox->readonly);
     gtk_menu_append(GTK_MENU(menu), menuitem);
 
@@ -2136,45 +2133,58 @@ create_menu(BalsaIndex * bindex)
 
     populate_mru(mrumenu, bindex);
 
-    mruitem = gtk_menu_item_new_with_label(_("Folder"));
-
+    gtk_menu_append(GTK_MENU(mrumenu), gtk_separator_menu_item_new());
+    mruitem = gtk_menu_item_new_with_label(_("Other..."));
+    gtk_signal_connect(GTK_OBJECT(mruitem), "activate",
+                       GTK_SIGNAL_FUNC(show_bmbl), bindex);
     gtk_menu_append(GTK_MENU(mrumenu), mruitem);
 
-    submenu = gtk_menu_new();
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(mruitem), submenu);
+    gtk_widget_show_all(menu);
 
-    smenuitem = gtk_menu_item_new();
-    gtk_signal_connect (GTK_OBJECT(smenuitem), "button_release_event",
-                        (GtkSignalFunc) close_if_transferred_cb,
-                        (gpointer) bindex);
+    return menu;
+}
+
+static void
+show_bmbl(GtkMenuItem * menuitem, BalsaIndex * bindex)
+{
+    GtkWidget *dialog = 
+        gtk_dialog_new_with_buttons(_("Choose destination folder"),
+                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_DIALOG_MODAL,
+                                    GTK_STOCK_CANCEL, 
+                                    GTK_RESPONSE_CANCEL,
+                                    NULL);
+    GtkWidget *scroll;
+    GtkWidget *bmbl = balsa_mblist_new();
+    GtkRequisition req;
 
     scroll = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scroll), 
                                     GTK_POLICY_AUTOMATIC, 
                                     GTK_POLICY_AUTOMATIC);
 
-    bmbl = balsa_mblist_new();
     gtk_signal_connect(GTK_OBJECT(bmbl), "tree_select_row",
 		       (GtkSignalFunc) transfer_messages_cb,
 		       (gpointer) bindex);
 
     /* Force the mailbox list to be a reasonable size. */
+    gtk_clist_set_column_visibility(GTK_CLIST(bmbl), 1, FALSE);
+    gtk_clist_set_column_visibility(GTK_CLIST(bmbl), 2, FALSE);
     gtk_widget_size_request(bmbl, &req);
     if ( req.height > balsa_app.mw_height )
 	req.height = balsa_app.mw_height;
-	/* For the mailbox list width, we use the one used on the main window
-	 * This is the user choice and required because the mblist widget
-	 *  save the size in balsa_app.mblist_width */
-	req.width=balsa_app.mblist_width;
+    /* For the mailbox list width, we use the one used on the main window
+     * This is the user choice and required because the mblist widget
+     *  save the size in balsa_app.mblist_width */
+    req.width=balsa_app.mblist_width;
     gtk_widget_set_usize(GTK_WIDGET(bmbl), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), bmbl);
-    gtk_container_add(GTK_CONTAINER(smenuitem), scroll);
-    gtk_menu_append(GTK_MENU(submenu), smenuitem);
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), scroll);
+    gtk_widget_show_all(scroll);
 
-    gtk_widget_show_all(menu);
-
-    return menu;
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 }
 
 
@@ -2198,19 +2208,6 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 		       "activate", (GtkSignalFunc) cb, data);
 
     gtk_menu_append(GTK_MENU(menu), menuitem);
-}
-
-
-static gint
-close_if_transferred_cb(BalsaMBList * bmbl, GdkEvent * event,
-			BalsaIndex * bi)
-{
-    if (gtk_object_get_data(GTK_OBJECT(bi), "transferredp") == NULL) {
-        return TRUE;
-    } else {
-        gtk_object_remove_data (GTK_OBJECT (bi), "transferredp");
-        return FALSE;
-    }
 }
 
 static void
@@ -2243,7 +2240,6 @@ balsa_index_transfer_messages(BalsaIndex * bindex,
    
     balsa_remove_from_folder_mru(mailbox->url);
     balsa_add_to_folder_mru(mailbox->url);
-    gtk_object_set_data(GTK_OBJECT(bindex), "transferredp", (gpointer) 1);
 }
 
 static void
@@ -2258,6 +2254,11 @@ transfer_messages_cb(GtkCTree * ctree, GtkCTreeNode * row, gint column,
     bindex = BALSA_INDEX (data);
     mbnode = gtk_ctree_node_get_row_data(ctree, row);
     balsa_index_transfer_messages(bindex, mbnode->mailbox);
+
+    gtk_dialog_response(GTK_DIALOG
+                        (gtk_widget_get_ancestor
+                         (GTK_WIDGET(ctree), GTK_TYPE_DIALOG)),
+                        GTK_RESPONSE_OK);
 }
 
 static void

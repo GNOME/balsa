@@ -215,7 +215,7 @@ imap_write_key_string(ImapMboxHandle *handle, ImapSearchKey *k,
      life! */
   if(use_literal)
     sio_printf(handle->sio, "{%u+}\r\n%s",
-               strlen(k->d.string.s), k->d.string.s);
+               (unsigned)strlen(k->d.string.s), k->d.string.s);
   else { /* No literal+ suppport, do it the old way */
     for (s = k->d.string.s; *s && (*s & 0x80) == 0; s++)
       ;
@@ -274,8 +274,8 @@ imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
 static void
 imap_write_key_size(ImapMboxHandle *handle, gboolean negate, size_t size)
 {
-  if(negate) sio_printf(handle->sio, "NOT LARGER %u", size);
-  else       sio_printf(handle->sio, "LARGER %u", size);
+  if(negate) sio_printf(handle->sio, "NOT LARGER %u", (unsigned)size);
+  else       sio_printf(handle->sio, "LARGER %u", (unsigned)size);
 }
 
 /* private.  */

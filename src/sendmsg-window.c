@@ -3915,7 +3915,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         case LIBBALSA_MESSAGE_QUEUE_ERROR:
             msg = _("Message could not be queued in outbox"); break;
         case LIBBALSA_MESSAGE_SAVE_ERROR:
-            msg = _("Message could not be saved in senbox"); break;
+            msg = _("Message could not be saved in sentbox"); break;
         case LIBBALSA_MESSAGE_SEND_ERROR:
             msg = _("Message could not be sent"); break;
         }

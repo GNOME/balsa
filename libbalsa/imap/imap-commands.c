@@ -434,10 +434,11 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
 
   if(flags) {
     gchar *str = enum_flag_to_str(flags);
-    cmd = g_strdup_printf("APPEND \"%s\" (%s) {%u%s}", mbx7, str, sz, litstr);
+    cmd = g_strdup_printf("APPEND \"%s\" (%s) {%u%s}", mbx7, str,
+                          (unsigned)sz, litstr);
     g_free(str);
   } else 
-    cmd = g_strdup_printf("APPEND \"%s\" {%u%s}", mbx7, sz, litstr);
+    cmd = g_strdup_printf("APPEND \"%s\" {%u%s}", mbx7, (unsigned)sz, litstr);
 
   c = imap_cmd_start(handle, cmd, &cmdno);
   g_free(mbx7); g_free(cmd);

@@ -1,3 +1,9 @@
+2004-08-23 23:04  Pawel Salek
+
+	* libbalsa/imap/imap-{commands,search}.c:Debian report #266298.
+	* src/main-window.c: 
+	* src/sendmsg-window.c: fix misspellings pointed out by Kelemen Gábor.
+	
 2004-08-23 16:38  PeterB
 
 	* src/folder-conf.c: add weak pointer to avoid critical warning

@@ -1064,7 +1064,7 @@ static GnomeUIInfo tu_tools_filters_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Manage..."), N_("Manage filters"),
                            filter_dlg_cb, GTK_STOCK_PROPERTIES),
 #define TOOLS_SELECT_FILTER_POS 1
-    GNOMEUIINFO_ITEM_STOCK(N_("_Select _Filters"),
+    GNOMEUIINFO_ITEM_STOCK(N_("_Select Filters"),
                            N_("Select filters to be applied automatically to current mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
     GNOMEUIINFO_ITEM_STOCK(N_("_Export Filters"),

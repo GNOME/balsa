@@ -95,7 +95,6 @@ void libbalsa_lock_mutt(void);
 void libbalsa_unlock_mutt(void);
 #endif 
 
-void libbalsa_mktemp (char *);
 void libbalsa_assure_balsa_dir(void);
 
 void libbalsa_message(const char *fmt, ...);

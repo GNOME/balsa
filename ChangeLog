@@ -1,8 +1,22 @@
 2003-09-08  Carlos Morgado  <chbm chbm.net>
 
+	* libbalsa/libbalsa.c (Repository): 
+	* libbalsa/url.h (Repository): 
+	* libbalsa/url.c (Repository): 
+	* libbalsa/misc.c (Repository): 
+	* libbalsa/mailbox_pop3.c (Repository): 
+	* libbalsa/mailbox.c (Repository): 
+	* libbalsa/libbalsa.h (Repository): 
+	* libbalsa/filter.c (Repository): 
+	* libbalsa/body.c (Repository): 
+	* libbalsa/Makefile.am (Repository): 
 	* src/Makefile.am: 
 	* configure.in: 
 	* Makefile.am: 
+	further demuttification
+
+2003-09-08  Carlos Morgado  <chbm chbm.net>
+
 	* libbalsa/filter-file.c: 
 	* libbalsa/filter-private.h: 
 	* libbalsa/mailbackend.h: 

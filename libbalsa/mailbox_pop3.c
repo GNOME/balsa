@@ -24,6 +24,10 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <errno.h>
 #include <gtk/gtk.h>
 #include "libbalsa.h"
@@ -245,7 +249,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
     do {
 	tmp_path = g_strdup("/tmp/pop-XXXXXX");
-	tmp_file = mkstemp(tmp_path);
+	tmp_file = g_mkstemp(tmp_path);
     } while ((tmp_file < 0) && (errno == EEXIST));
 
     /* newer glibc does this for us */

@@ -99,7 +99,7 @@ getdnsdomainname (char *s, size_t l)
   while (fgets (tmp, sizeof (tmp) - 1, f) != NULL)
   {
     p = tmp;
-    while (ISSPACE (*p)) p++;
+    while ( g_ascii_isspace (*p)) p++;
     if (strncmp ("domain", p, 6) == 0 || strncmp ("search", p, 6) == 0)
     {
       p += 6;

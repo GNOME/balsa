@@ -103,55 +103,8 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     uname(&utsname);
 
-#if 0 
-    /* FIXME: remove mutt vars */
-    Spoolfile = libbalsa_guess_mail_spool();
-
-    MhFlagged = "flagged";
-    MhReplied = "replied";
-    MhUnseen  = "unseen";
-
-    /* Username, Homedir etc. are really const char* */
-    Username   = (char*)g_get_user_name();
-    Homedir    = (char*)g_get_home_dir();
-    Realname   = (char*)g_get_real_name();
-    Hostname   = (char*)libbalsa_get_hostname();
-    Domainname = (char*)libbalsa_get_domainname();
-#ifdef USE_SSL
-    SslCertFile = gnome_util_prepend_user_home(".balsa/certificates");
-#endif
     libbalsa_real_information_func = information_callback;
 
-    mutt_error = libbalsa_mutt_error;
-
-    Fqdn = qualified_hostname(Hostname);
-
-    Sendmail = SENDMAIL;
-
-    Shell   = g_strdup((p = g_getenv("SHELL")) ? p : "/bin/sh");
-    Tempdir = (char*)g_get_tmp_dir();
-
-    set_option(OPTSAVEEMPTY);
-    set_option(OPTCHECKNEW);
-    set_option(OPTMHPURGE);
-#ifdef USE_SSL
-    set_option(OPTSSLSYSTEMCERTS);
-#endif /* USE_SSL */
-    /* FIXME : I want libmutt to keep track of "new" messages 
-       We use this to know which messages have been just appended
-       to the mailbox, this way we can do automatic filtering
-       on incoming mails only */
-    set_option(OPTMARKOLD);
-
-    FileMask.rx = (regex_t *) safe_malloc (sizeof (regex_t));
-    REGCOMP(FileMask.rx,"!^\\.[^.]",0);
-    ReplyRegexp.rx = (regex_t *) safe_malloc (sizeof (regex_t));
-    REGCOMP(ReplyRegexp.rx,"^(re([\\[0-9\\]+])*|aw):[ \t]*",0);
-
-    Charset = "UTF-8";
-    /* more likely to least likely or something: order *is* relevant!  */
-    SendCharset = "us-ascii:iso-8859-1:iso-8859-15:iso-8859-2:iso-8859-9:iso-8859-13:KOI8-R:iso-8859-5:euc-kr:euc-jp:UTF-8";    
-#endif
     libbalsa_notify_init();
     g_mime_init(0);
 

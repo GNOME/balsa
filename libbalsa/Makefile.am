@@ -79,7 +79,9 @@ libbalsa_a_SOURCES = 		\
 	send.h			\
 	server.c		\
 	server.h		\
-	source-viewer.c
+	source-viewer.c		\
+	url.c			\
+	url.h
 
 
 EXTRA_DIST = \

@@ -1,5 +1,5 @@
 #intl dir needed for tarball --disable-nls build.
-SUBDIRS = po sounds images doc  libbalsa libinit_balsa src
+SUBDIRS = po sounds images doc libmutt libbalsa libinit_balsa src
 # set tar in case it is not set by automake or make
 
 man_MANS=balsa.1

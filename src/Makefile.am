@@ -72,9 +72,9 @@ INCLUDES = \
 	$(BALSA_CFLAGS)
 
 balsa_LDADD = \
+	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libbalsa/imap/libimap.a	\
-	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	-lltdl	\
 	$(INTLLIBS) \
         $(BALSA_LIBS)

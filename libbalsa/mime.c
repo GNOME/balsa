@@ -94,6 +94,7 @@ process_mime_multipart (LibBalsaMessage * message, LibBalsaMessageBody * body,
 
 	for (part = body->parts; part; part = part->next) {
 		s = process_mime_part (message, part, reply_prefix_str, llen);
+		if(!s) continue;
 		if(res) {
 			res =  g_string_append(res, s->str);
 			g_string_free(s, TRUE);
@@ -111,6 +112,7 @@ content2reply (LibBalsaMessage * message, gchar *reply_prefix_str, gint llen)
 	body = message->body_list;
 	while ( body ) {
 		res = process_mime_part(message, body, reply_prefix_str, llen);
+		if(!res) continue;
 		if(reply) {
 			reply =  g_string_append(reply, res->str);
 			g_string_free(res, TRUE);

@@ -81,6 +81,7 @@ balsa_LDADD = \
 	$(GNOMEUI_LIBS) \
 	$(INTLLIBS) \
 	$(PTHREAD_LIB) \
+	$(GNOME_PRINT_LIBS) \
 	$(GTKHTML_LIBS)	
 
 balsa_DEPENDENCIES = \

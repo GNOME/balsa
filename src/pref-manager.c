@@ -82,11 +82,12 @@ typedef struct _PropertyUI {
 
 	GtkWidget *selected_headers;
 
+#ifndef HAVE_GNOME_PRINT
 	/* printing */
 	GtkWidget *PrintCommand;
 	GtkWidget *PrintBreakline;
 	GtkWidget *PrintLinesize;
-
+#endif
         /* colours */
         GtkWidget *unread_color;
 	GtkWidget *quoted_color_start;
@@ -114,7 +115,6 @@ static GtkWidget *create_signature_page ( void );
 static GtkWidget *create_mailserver_page ( void );
 static GtkWidget *create_mailoptions_page ( void );
 static GtkWidget *create_display_page ( void );
-static GtkWidget *create_printing_page ( void );
 static GtkWidget *create_encondig_page ( void );
 static GtkWidget *create_misc_page ( void );
 static GtkWidget *create_startup_page ( void );
@@ -141,10 +141,14 @@ static void address_book_edit_cb (GtkWidget * widget, gpointer data);
 static void address_book_add_cb (GtkWidget * widget, gpointer data);
 static void address_book_delete_cb (GtkWidget * widget, gpointer data);
 static void timer_modified_cb( GtkWidget *widget, GtkWidget *pbox);
-static void print_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void wrap_modified_cb( GtkWidget *widget, GtkWidget *pbox);
 static void spelling_optionmenu_cb (GtkItem* menuitem, gpointer data);
 static void set_default_address_book_cb(GtkWidget *button , gpointer data);
+
+#ifndef HAVE_GNOME_PRINT
+static GtkWidget *create_printing_page ( void );
+static void print_modified_cb( GtkWidget *widget, GtkWidget *pbox);
+#endif
 
 guint toolbar_type[NUM_TOOLBAR_MODES] =
 {
@@ -242,9 +246,10 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	page = create_display_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Display")) );
 
+#ifndef HAVE_GNOME_PRINT
 	page = create_printing_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Printing")) );
-
+#endif
         page = create_spelling_page ();
         gnome_property_box_append_page (GNOME_PROPERTY_BOX (property_box), GTK_WIDGET (page), gtk_label_new (_ ("Spelling")));
 
@@ -346,6 +351,7 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 				    properties_modified_cb, property_box);
 	}
 
+#ifndef HAVE_GNOME_PRINT
 	/* printing */
 	gtk_signal_connect (GTK_OBJECT (pui->PrintCommand), "changed",
 			    GTK_SIGNAL_FUNC (print_modified_cb),
@@ -356,6 +362,7 @@ open_preferences_manager(GtkWidget *widget, gpointer data)
 	gtk_signal_connect (GTK_OBJECT (pui->PrintLinesize), "changed",
 			    GTK_SIGNAL_FUNC (print_modified_cb),
 			    property_box);
+#endif
 
 	gtk_signal_connect (GTK_OBJECT (pui->check_mail_upon_startup), "toggled",
 			    GTK_SIGNAL_FUNC (properties_modified_cb), property_box);
@@ -530,13 +537,14 @@ apply_prefs (GnomePropertyBox* pbox, gint page_num)
 			break;
 		}
 
+#ifndef HAVE_GNOME_PRINT
 	/* printing */
 	g_free (balsa_app.PrintCommand.PrintCommand);
 	balsa_app.PrintCommand.PrintCommand = g_strdup( gtk_entry_get_text(GTK_ENTRY (pui->PrintCommand)));
 
 	balsa_app.PrintCommand.linesize = atoi(gtk_entry_get_text(GTK_ENTRY( pui->PrintLinesize)));
 	balsa_app.PrintCommand.breakline =  GTK_TOGGLE_BUTTON(pui->PrintBreakline)->active;
-
+#endif
 
 	balsa_app.check_mail_upon_startup = GTK_TOGGLE_BUTTON(pui->check_mail_upon_startup)->active;
 	balsa_app.remember_open_mboxes = GTK_TOGGLE_BUTTON(pui->remember_open_mboxes)->active;
@@ -600,7 +608,6 @@ void
 set_prefs (void)
 {
         GtkWidget* entry_widget;
-	gchar tmp[10];
 	gint i;
 
 	for (i = 0; i < NUM_TOOLBAR_MODES; i++)
@@ -683,12 +690,17 @@ set_prefs (void)
 			break;
 		}
 
+#ifndef HAVE_GNOME_PRINT
 	/*printing */
+	{		
+	gchar tmp[10];
 	gtk_entry_set_text(GTK_ENTRY(pui->PrintCommand), balsa_app.PrintCommand.PrintCommand);
 	sprintf(tmp, "%d", balsa_app.PrintCommand.linesize);
 	gtk_entry_set_text(GTK_ENTRY(pui->PrintLinesize), tmp);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pui->PrintBreakline),
 				      balsa_app.PrintCommand.breakline);
+	}
+#endif
 
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
                 pui->check_mail_upon_startup), balsa_app.check_mail_upon_startup);
@@ -734,7 +746,7 @@ set_prefs (void)
 static void
 update_address_books(void)
 {
-	gchar *text[2];
+	gchar *text[3];
 	GList *list = balsa_app.address_book_list;
 	LibBalsaAddressBook *address_book;
 	gint row;
@@ -764,13 +776,12 @@ update_address_books(void)
 		} else {
 			text[1] = g_strdup(address_book->name);
 		}
-
+		text[2] = address_book->expand_aliases ? _("Yes") : "";
 		row = gtk_clist_append(clist, text);
 
 		g_free(text[1]);
 
 		gtk_clist_set_row_data(clist, row, address_book);
-
 		list = g_list_next(list);
 	}
 	gtk_clist_select_row(clist, 0, 0);
@@ -1482,6 +1493,7 @@ create_display_page ( )
 	return vbox2;
 }
 
+#ifndef HAVE_GNOME_PRINT
 static GtkWidget *
 create_printing_page ( )
 {	
@@ -1552,7 +1564,7 @@ create_printing_page ( )
 	return vbox1;
 
 }
-
+#endif
 
 static GtkWidget* create_spelling_page (void)
 {
@@ -1929,11 +1941,12 @@ static GtkWidget *create_address_book_page ( void )
 	gtk_container_set_border_width (GTK_CONTAINER (scrolledwindow), 5);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 	
-	pui->address_books = gtk_clist_new (2);
+	pui->address_books = gtk_clist_new (3);
 	gtk_widget_show (pui->address_books);
 	gtk_container_add (GTK_CONTAINER (scrolledwindow), pui->address_books);
 	gtk_clist_set_column_width (GTK_CLIST (pui->address_books), 0, 48);
-	gtk_clist_set_column_width (GTK_CLIST (pui->address_books), 1, 80);
+	gtk_clist_set_column_width (GTK_CLIST (pui->address_books), 1, 200);
+	gtk_clist_set_column_width (GTK_CLIST (pui->address_books), 2, 20);
 	gtk_clist_column_titles_show (GTK_CLIST (pui->address_books));
 	
 	label = gtk_label_new (_("Type"));
@@ -1944,6 +1957,10 @@ static GtkWidget *create_address_book_page ( void )
 	gtk_widget_show (label);
 	gtk_clist_set_column_widget (GTK_CLIST (pui->address_books), 1, label);
 	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+
+	label = gtk_label_new (_("Expand aliases"));
+	gtk_widget_show (label);
+	gtk_clist_set_column_widget (GTK_CLIST (pui->address_books), 2, label);
 
 	update_address_books ();
 	
@@ -1974,7 +1991,8 @@ static GtkWidget *create_address_book_page ( void )
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			   GTK_SIGNAL_FUNC(set_default_address_book_cb), NULL);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   GTK_SIGNAL_FUNC(properties_modified_cb), NULL);
+			   GTK_SIGNAL_FUNC(properties_modified_cb), 
+			   property_box);
 	gtk_widget_show(button);
 	gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 
@@ -2068,9 +2086,7 @@ set_default_address_book_cb(GtkWidget *button , gpointer data)
 	address_book = LIBBALSA_ADDRESS_BOOK(gtk_clist_get_row_data (clist, row));
 
 	g_assert(address_book != NULL);
-
 	balsa_app.default_address_book = address_book;
-
 	update_address_books();
 }
 
@@ -2169,6 +2185,7 @@ wrap_modified_cb( GtkWidget *widget, GtkWidget *pbox)
 	properties_modified_cb( widget, pbox );
 }
 
+#ifndef HAVE_GNOME_PRINT
 static void 
 print_modified_cb( GtkWidget *widget, GtkWidget *pbox)
 {
@@ -2180,9 +2197,8 @@ print_modified_cb( GtkWidget *widget, GtkWidget *pbox)
 					  FALSE );
 	
 	properties_modified_cb( widget, pbox );
-
 }
-
+#endif
 
 static void spelling_optionmenu_cb (GtkItem* menuitem, gpointer data) 
 {

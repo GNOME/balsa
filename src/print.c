@@ -288,13 +288,12 @@ static guint linecount(const gchar *str)
 }
 
 static PrintInfo* 
-print_info_new(const gchar* papername, LibBalsaMessage *msg)
+print_info_new(const gchar* paper, LibBalsaMessage *msg, GnomePrintDialog *dlg)
 {
   GString * str;
   PrintInfo * pi = g_new0(PrintInfo, 1);
-  pi->paper = gnome_paper_with_name(papername);
-  pi->master = gnome_print_master_new();
-  gnome_print_master_set_paper(pi->master, pi->paper);
+  pi->paper = gnome_paper_with_name(paper);
+  pi->master = gnome_print_master_new_from_dialog(dlg);
   pi->pc = gnome_print_master_get_context(pi->master);
 
   pi->font_name        = g_strdup(BALSA_PRINT_BODY_FONT);
@@ -337,15 +336,15 @@ static void
 print_info_destroy(PrintInfo *pi)
 {
   /* ... */
-  g_free(pi->line_buf);                          pi->line_buf   = NULL;
-  g_free(pi->buff);                              pi->buff       = NULL;
-  g_free(pi->font_name);                         pi->font_name  = NULL;
-  gtk_object_destroy( GTK_OBJECT(pi->pc) );      pi->pc         = NULL;
-  gtk_object_destroy( GTK_OBJECT(pi->master) );  pi->master     = NULL;
+  g_free(pi->line_buf);                        pi->line_buf   = NULL;
+  g_free(pi->buff);                            pi->buff       = NULL;
+  g_free(pi->font_name);                       pi->font_name  = NULL;
+  if(pi->pc) { gtk_object_unref( GTK_OBJECT(pi->pc) ); pi->pc = NULL; }
+  gtk_object_unref( GTK_OBJECT(pi->master) );  pi->master     = NULL; 
   g_free(pi);
 }
 
-static void print_message(PrintInfo *pi, GnomePrinter *printer);
+static void print_message(PrintInfo *pi);
 static void print_start_job(PrintInfo *pi);
 static void print_line(PrintInfo *pi, int line_on_page);
 static void print_header(PrintInfo *pi, guint page);
@@ -364,16 +363,14 @@ is_font_ok(const gchar *font_name)
   gtk_object_unref( GTK_OBJECT(test_font) );
   return TRUE;
 }
- 
+
 void message_print_cb(GtkWidget *widget, gpointer cbdata)
 {
   GtkWidget * dialog;
   PrintInfo* pi;
-  GnomePrinter *printer = NULL;
   GtkWidget *index;
   GList *list;
   LibBalsaMessage *msg;
-  int copies, collate;
   gboolean preview = FALSE;
 
   g_return_if_fail(cbdata);
@@ -388,13 +385,11 @@ void message_print_cb(GtkWidget *widget, gpointer cbdata)
   
   if(!is_font_ok(BALSA_PRINT_HEAD_FONT) || !is_font_ok(BALSA_PRINT_BODY_FONT))
     return;
-  pi = print_info_new("A4", msg);
   dialog = gnome_print_dialog_new (_("Print mesage"),
 				   GNOME_PRINT_DIALOG_COPIES);
   gnome_dialog_set_parent(GNOME_DIALOG(dialog), 
 			  GTK_WINDOW(balsa_app.main_window));
   gtk_window_set_wmclass (GTK_WINDOW (dialog), "print", "Balsa");
-  //gnome_dialog_set_sensitive(GNOME_DIALOG(dialog), GNOME_PRINT_PREVIEW, FALSE);
 
   switch( gnome_dialog_run(GNOME_DIALOG(dialog)) ) {
   case GNOME_PRINT_PRINT:
@@ -404,27 +399,22 @@ void message_print_cb(GtkWidget *widget, gpointer cbdata)
     break;
   case GNOME_PRINT_CANCEL: 
     gnome_dialog_close(GNOME_DIALOG(dialog)); 
-  default: print_info_destroy(pi); return;
+  default: return;
   }
-
-  printer = gnome_print_dialog_get_printer(GNOME_PRINT_DIALOG(dialog));
-  gnome_print_dialog_get_copies(GNOME_PRINT_DIALOG(dialog), &copies, &collate);
+  pi = print_info_new("A4", msg, GNOME_PRINT_DIALOG(dialog));
   gnome_dialog_close(GNOME_DIALOG(dialog));
 
   /* do the Real Job */
-  gnome_print_master_set_printer(pi->master, printer);
-  print_message(pi, printer);
+  print_message(pi);
   gnome_print_master_print(pi->master);
 
   if(preview) {
     GnomePrintMasterPreview * preview_widget = gnome_print_master_preview_new(
       pi->master, _("Balsa: message print preview"));
+    /* gtk_signal_connect(GTK_OBJECT(preview_widget), "destroy_event",
+       GTK_SIGNAL_FUNC(destroy_printinfo), pi); */
     gtk_widget_show(GTK_WIDGET(preview_widget));
   } 
-
-  if(printer)  
-    gtk_object_unref(GTK_OBJECT(printer)); /* FIXME: make sure it's alright */
-
   print_info_destroy(pi);
 }
 
@@ -432,7 +422,7 @@ void message_print_cb(GtkWidget *widget, gpointer cbdata)
    prints given message
 */
 static void
-print_message(PrintInfo *pi, GnomePrinter *printer)
+print_message(PrintInfo *pi)
 { 
   guint current_page, current_line;
   char buf[20];
@@ -458,7 +448,7 @@ print_message(PrintInfo *pi, GnomePrinter *printer)
   }
   
   /* print_end_job(pi); */
-  gnome_print_context_close(pi->pc);
+  gnome_print_context_close(pi->pc); pi->pc = NULL;
   gnome_print_master_close(pi->master);
   gtk_object_unref( GTK_OBJECT(font) );
 }
@@ -565,4 +555,3 @@ print_header(PrintInfo *pi, guint page)
 }
 
 #endif
-

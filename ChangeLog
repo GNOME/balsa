@@ -6,12 +6,15 @@
 	* libbalsa/mailbox_pop3.c: fix compilation with disabled threads.
 	* libbalsa/message.c: double free problem fixed.
 	* libbalsa/mime.c: fix some special cases of line wrapping 
-	(hopefully I got it right this time).
+	(hopefully I got it right this time, third time).
 	* libbalsa/misc.c: ditto.
 	* libbalsa/misc.h: change libbalsa_make_string_from_list() to have 
 	const argument.
 	* src/main-window.c: print API updated.
-	* src/print.[hc]: new gnome-print code.
+	* src/print.[hc]: new gnome-print code. Multiple copies handled.
+	* src/pref-manager.c: connect properly modification signal.
+	disable unused sections when gnome-print is in action.
+	* src/Makefile.am: gnome-print libraries added.
 	
 2000-09-15  Ian Campbell  <ijc25@cam.ac.uk>
 

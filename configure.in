@@ -109,7 +109,7 @@ dnl ############################################################################
 dnl All the linguas, all the time.
 dnl ######################################################################################
 
-ALL_LINGUAS="ca da de en_GB el es es_ES et fi fr ga hu it ja ko lt nl no nn pl pt pt_BR ro ru sl sv tr uk wa zh_CN.GB2312"
+ALL_LINGUAS="ca da de en_GB el es es_ES et fi fr ga hu it ja ko lt nl no nn pl pt pt_BR ro ru sk sl sv tr uk wa zh_CN.GB2312"
 LINGUAS="$ALL_LINGUAS"
 AM_GNU_GETTEXT
 
@@ -327,12 +327,13 @@ GNOME_LIB_PREFIX=`${GNOME_CONFIG} --libdir`
 GNOME_DATA_PREFIX=`${GNOME_CONFIG} --datadir`
 
 dnl Consolidate them!
-BALSA_COMMON_PREFIXES=`cat <<EOF |sort |uniq
-"${BALSA_STD_PREFIX}",
-"${BALSA_DATA_PREFIX}",
-"${GNOME_STD_PREFIX}",
-"${GNOME_DATA_PREFIX}",
-"${GNOME_LIB_PREFIX}",
+AC_PROG_AWK
+BALSA_COMMON_PREFIXES=`sort<<EOF|uniq|${AWK} '{if(l!~/^$/)print l ",";l=$0}END{print l}'
+"${BALSA_STD_PREFIX}"
+"${BALSA_DATA_PREFIX}"
+"${GNOME_STD_PREFIX}"
+"${GNOME_DATA_PREFIX}"
+"${GNOME_LIB_PREFIX}"
 EOF
 `
 

@@ -31,7 +31,8 @@ static const gchar *permanent_prefixes[] = {
 	GNOME_DATA_PREFIX
 	GNOME_STD_PREFIX,
 	GNOME_LIB_PREFIX,*/
-    BALSA_COMMON_PREFIXES NULL
+    BALSA_COMMON_PREFIXES,
+    NULL
 };
 
 /* filename is the filename (naw!)

@@ -446,7 +446,7 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
     }
 
     mdir->messages_info = g_hash_table_new_full(g_str_hash, g_str_equal,
-				  g_free, (GDestroyNotify)free_message_info);
+				  NULL, (GDestroyNotify)free_message_info);
     mdir->msgno_2_msg_info = g_ptr_array_new();
 
     mdir->mtime = st.st_mtime;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-8 Michael R. Elkins <me@cs.hmc.edu>
  * 
  *     This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,7 @@ static int getLine (int fd, char *s, int len)
   *s = 0;
   return (-1);
 }
+
 #ifndef LIBMUTT
 static int getPass (void)
 {
@@ -69,7 +70,7 @@ static int getPass (void)
     char tmp[SHORT_STRING];
     tmp[0] = '\0';
     if (mutt_get_password ("POP Password: ", tmp, sizeof (tmp)) != 0
-       || *tmp == '\0')
+	|| *tmp == '\0')
       return 0;
     PopPass = safe_strdup (tmp);
   }
@@ -87,14 +88,10 @@ void mutt_fetchPopMail (void)
   struct hostent *he;
   char buffer[2048];
   char msgbuf[SHORT_STRING];
-  char uid[80], last_uid[80];
-  char threadbuf[160];
 #ifdef BALSA_USE_THREADS
   MailThreadMessage *threadmsg;
 #endif
-  int s, i, msgs, bytes, tmp, total, err = 0;
-  int first_msg;
-  int tot_bytes, num_bytes;
+  int s, i, last = 0, msgs, bytes, err = 0;
   CONTEXT ctx;
   MESSAGE *msg = NULL;
 
@@ -117,7 +114,6 @@ void mutt_fetchPopMail (void)
   memset ((char *) &sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
   sin.sin_port = htons (PopPort);
-
 
   if ((n = inet_addr (NONULL(PopHost))) == -1)
   {
@@ -143,24 +139,20 @@ void mutt_fetchPopMail (void)
   if (getLine (s, buffer, sizeof (buffer)) == -1)
     goto fail;
 
-  if (strncmp (buffer, "+OK", 3) != 0)
+  if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
-    if(PopPass)
-       memset(PopPass, 0, strlen(PopPass));
-
-    safe_free((void **) &PopPass); /* void the given password */
     mutt_remove_trailing_ws (buffer);
     mutt_error (buffer);
     goto finish;
   }
 
   snprintf (buffer, sizeof(buffer), "user %s\r\n", PopUser);
-  write (s, buffer, strlen (buffer));
+  write (s, buffer, mutt_strlen (buffer));
 
   if (getLine (s, buffer, sizeof (buffer)) == -1)
     goto fail;
 
-  if (strncmp (buffer, "+OK", 3) != 0)
+  if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
     mutt_remove_trailing_ws (buffer);
     mutt_error (buffer);
@@ -168,13 +160,16 @@ void mutt_fetchPopMail (void)
   }
   
   snprintf (buffer, sizeof(buffer), "pass %s\r\n", NONULL(PopPass));
-  write (s, buffer, strlen (buffer));
+  write (s, buffer, mutt_strlen (buffer));
   
   if (getLine (s, buffer, sizeof (buffer)) == -1)
     goto fail;
 
-  if (strncmp (buffer, "+OK", 3) != 0)
+  if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
+    if(PopPass)
+      memset(PopPass, 0, mutt_strlen(PopPass));
+    
     safe_free((void **) &PopPass); /* void the given password */
     mutt_remove_trailing_ws (buffer);
     mutt_error (buffer[0] ? buffer : "Server closed connection!");
@@ -187,7 +182,7 @@ void mutt_fetchPopMail (void)
   if (getLine (s, buffer, sizeof (buffer)) == -1)
     goto fail;
 
-  if (strncmp (buffer, "+OK", 3) != 0)
+  if (mutt_strncmp (buffer, "+OK", 3) != 0)
   {
     mutt_remove_trailing_ws (buffer);
     mutt_error (buffer);
@@ -205,92 +200,32 @@ void mutt_fetchPopMail (void)
   if (mx_open_mailbox (NONULL(Spoolfile), M_APPEND, &ctx) == NULL)
     goto finish;
 
- first_msg = 1;
-
-
-/*  
- *  If Messages are left on the server, be sure that we don't retrieve
- *  them a second time.  Do this by checking Unique IDs backward from the
- *  last message, until a previously downloaded message is found.
- */
- 
- if ( !option (OPTPOPDELETE) )
- {
-
-  for( i = msgs; i > 0 ; i--) 
+  /* only get unread messages */
+  if(option(OPTPOPLAST))
   {
-  	snprintf( buffer, sizeof(buffer), "uidl %d\r\n", i);
-  	write( s, buffer, strlen(buffer) );
-
-  	getLine (s, buffer, sizeof (buffer));
-  	
-  	if (strncmp (buffer, "+OK", 3) != 0)
-  	{
-  		mutt_remove_trailing_ws( buffer);
-  		mutt_error (buffer);
-  		goto finish; 
-          /* I'm following the convention of libmutt, not my coding style */
-  	}
-  	sscanf( buffer, "+OK %d %s", &tmp, uid );
-
-	if( i == msgs )  
-	{
-	   strcpy( last_uid, uid ); // save uid of the last message for exit
-	   if( PopUID[0] == 0 )
-	     break;  /* no previous UID set */
-	 }
-
-    if( *PopUID && strcmp( uid, PopUID ) == 0 )  
-	{
-	  /* 
-	   * this message seen, so start w/ next in queue           *
-	   * This will be larger than 'msgs' if no new messages     *
-	   * forcing the for loop below to skip retrieving messages *
-	   */
-	    
-      first_msg = i + 1; 
-      break;
-    }
-
-   }
-  } 
-    	 
-
-  total = msgs - first_msg + 1; /* will be used for display later */
- 
-
-  /*  Check for the total amount of bytes mail to be received */
-  tot_bytes=0;
-  for (i = first_msg ; i <= msgs ; i++)
-  {
-    snprintf(buffer, sizeof(buffer), "list %d\r\n", i);
-    write (s, buffer, strlen(buffer));
-    if ( getLine (s, buffer, sizeof(buffer)) == -1) 
-    {
-      mx_fastclose_mailbox (&ctx);
+    write (s, "last\r\n", 6);
+    if (getLine (s, buffer, sizeof (buffer)) == -1)
       goto fail;
-    }
     
-    if (sscanf (buffer,"+OK %d %d",&i,&num_bytes) != 2) 
-    {
-      tot_bytes=-1;
-      break;
-    }
-    tot_bytes += num_bytes;
+    if (mutt_strncmp (buffer, "+OK", 3) == 0)
+      sscanf (buffer, "+OK %d", &last);
+    else
+      /* ignore an error here and assume all messages are new */
+      last = 0;
   }
+  
+  snprintf (msgbuf, sizeof (msgbuf),
+	    msgs > 1 ? "Reading %d new message (%d bytes)..." :
+		    "Reading %d new messages (%d bytes)...", msgs - last, bytes);
+  mutt_message (msgbuf);
 
-
-  num_bytes=0;  
-  for (i = first_msg ; i <= msgs ; i++)
+  for (i = last + 1 ; i <= msgs ; i++)
   {
     snprintf (buffer, sizeof(buffer), "retr %d\r\n", i);
-    write (s, buffer, strlen (buffer));
-
-    sprintf( threadbuf, "Retrieving Message %d of %d", 
-	     i - first_msg + 1, total );
 #ifdef BALSA_USE_THREADS
     MSGMAILTHREAD( threadmsg, MSGMAILTHREAD_MSGINFO, threadbuf,0,0 );
 #endif
+    write (s, buffer, mutt_strlen (buffer));
 
     if (getLine (s, buffer, sizeof (buffer)) == -1)
     {
@@ -298,7 +233,7 @@ void mutt_fetchPopMail (void)
       goto fail;
     }
 
-    if (strncmp (buffer, "+OK", 3) != 0)
+    if (mutt_strncmp (buffer, "+OK", 3) != 0)
     {
       mutt_remove_trailing_ws (buffer);
       mutt_error (buffer);
@@ -323,21 +258,18 @@ void mutt_fetchPopMail (void)
 	err = 1;
 	break;
       }
-      
-      sprintf( threadbuf,"Received %d bytes of %d",num_bytes,tot_bytes);
 #ifdef BALSA_USE_THREADS
       MSGMAILTHREAD(threadmsg, MSGMAILTHREAD_PROGRESS, threadbuf, num_bytes,tot_bytes); 
 #endif
+
       /* check to see if we got a full line */
       if (buffer[chunk-2] == '\r' && buffer[chunk-1] == '\n')
       {
-	if (strcmp(".\r\n", buffer) == 0)
+	if (mutt_strcmp(".\r\n", buffer) == 0)
 	{
 	  /* end of message */
 	  break;
 	}
-
-	num_bytes += chunk;
 
 	/* change CRLF to just LF */
 	buffer[chunk-2] = '\n';
@@ -355,16 +287,17 @@ void mutt_fetchPopMail (void)
       }
       else
 	p = buffer;
-     
-
+      
       fwrite (p, 1, chunk, msg->fp);
     }
 
-    if (mx_close_message (&msg) != 0)
+    if (mx_commit_message (msg, &ctx) != 0)
     {
       mutt_error ("Error while writing mailbox!");
       err = 1;
     }
+
+    mx_close_message (&msg);
 
     if (err)
       break;
@@ -373,11 +306,11 @@ void mutt_fetchPopMail (void)
     {
       /* delete the message on the server */
       snprintf (buffer, sizeof(buffer), "dele %d\r\n", i);
-      write (s, buffer, strlen (buffer));
+      write (s, buffer, mutt_strlen (buffer));
 
       /* eat the server response */
       getLine (s, buffer, sizeof (buffer));
-      if (strncmp (buffer, "+OK", 3) != 0)
+      if (mutt_strncmp (buffer, "+OK", 3) != 0)
       {
 	err = 1;
         mutt_remove_trailing_ws (buffer);
@@ -390,7 +323,10 @@ void mutt_fetchPopMail (void)
   }
 
   if (msg)
+  {
+    mx_commit_message (msg, &ctx);
     mx_close_message (&msg);
+  }
   mx_close_mailbox (&ctx);
 
   if (err)
@@ -406,7 +342,6 @@ finish:
   write (s, "quit\r\n", 6);
   getLine (s, buffer, sizeof (buffer)); /* snarf the response */
   close (s);
-  strcpy( PopUID, last_uid );
   return;
 
   /* not reached */

@@ -940,6 +940,7 @@ print_info_new(const gchar * paper, LibBalsaMessage * msg,
 			      the_charset);
 	    pi->conv_data = iconv_open("UTF-8", "US-ASCII");
 	}
+        g_free(the_charset);
     } else
 	pi->conv_data = iconv_open("UTF-8", "ISO-8859-1");
 

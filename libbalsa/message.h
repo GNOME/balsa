@@ -222,7 +222,7 @@ gchar *libbalsa_message_title(LibBalsaMessage * message,
 gchar **libbalsa_create_hdr_pair(const gchar * name, gchar * value);
 
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
-const gchar *libbalsa_message_charset(LibBalsaMessage * message);
+gchar *libbalsa_message_charset(LibBalsaMessage * message);
 const gchar *libbalsa_message_body_charset(LibBalsaMessageBody * body);
 gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);

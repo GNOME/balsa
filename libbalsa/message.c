@@ -317,21 +317,29 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
     return charset;
 }
 
-/* Note: libbalsa_message_charset returns a pointer to the charset field or
- * NULL, but does NOT make a copy of an existing string! */
-const gchar *
+/* Note: libbalsa_message_charset returns a pointer to a newly allocated
+ * string containing the canonical form of the charset field, or NULL.
+ * When the pointer is nonNULL, the string must be deallocated with
+ * g_free. */
+gchar *
 libbalsa_message_charset(LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
+    const gchar *charset;
+    char tmp[SHORT_STRING];    /* SHORT_STRING = 128 */
 
     g_return_val_if_fail(message != NULL, NULL);
     body = message->body_list;
     g_return_val_if_fail(body != NULL, NULL);
 
-    if (body->charset)
-	return body->charset;
-    else
-	return libbalsa_message_body_charset(body);
+    charset = body->charset;
+    if (!charset) {
+        charset = libbalsa_message_body_charset(body);
+        if (!charset)
+            return NULL;
+    }
+    mutt_canonical_charset(tmp, sizeof tmp, charset);
+    return g_strdup(tmp);
 }
 
 /* message_user_hdrs:

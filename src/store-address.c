@@ -429,9 +429,9 @@ store_address_add_address(struct store_address_info * info,
     text = libbalsa_address_to_gchar(address, 0);
     label_text = g_strconcat(lab, text, NULL);
     g_free(text);
-    if (strlen(label_text) > 10)
+    if (g_utf8_strlen(label_text, -1) > 10)
         /* truncate to an arbitrary length: */
-        label_text[10] = '\0';
+        *g_utf8_offset_to_pointer(label_text, 10) = '\0';
     gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), vbox,
                              gtk_label_new(label_text));
     g_free(label_text);

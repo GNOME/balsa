@@ -1,3 +1,9 @@
+2003-09-28 09:02  PeterB
+
+	* libbalsa/mailbox.c: Set mailbox->has_unread_messages when adding
+	unread messages.
+	* libbalsa/mailbox_pop3.c: Mark mail delivered to inbox as new.
+
 2003-09-26 18:25  PeterB
 
 	* libbalsa/gmime-gpgme-context.c: Include "config.h" without

@@ -469,6 +469,8 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox)
 			     || access(mdir->tmpdir, W_OK)) ? TRUE : FALSE;
     mailbox->unread_messages = 0;
     parse_mailbox_subdirs(mailbox);
+    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = 0;
+    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_cnt  = 1;
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMaildir", mailbox->name, mailbox->open_ref);

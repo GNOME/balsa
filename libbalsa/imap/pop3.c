@@ -24,6 +24,8 @@
  */
 #include "config.h"
 
+#include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 #if defined(USE_TLS)
@@ -514,6 +516,7 @@ pop_destroy(PopHandle *pop, GError **err)
 
   if(pop->sio) {
     sio_detach(pop->sio); pop->sio = NULL;
+    close(pop->sd);
   }
   if(pop->uids) {
     while(pop->uids->len) {

@@ -167,13 +167,22 @@ balsa_toolbar_remove_all(GtkWidget * widget)
     GtkToolbar *toolbar = GTK_TOOLBAR(widget);
     GList *children;
     
+    /* we must be extremely careful here. unparenting used in original
+     * code modifies the children list with gtk+2.4 so we have to
+     * do toolbar cleanup differently. */
     for (children = toolbar->children; children; children = children->next) {
 	GtkToolbarChild *child = children->data;
-	
-	if (child->type != GTK_TOOLBAR_CHILD_SPACE)
-	    gtk_widget_unparent(child->widget);
-	g_free(child);
+	/* child can be null if the child was removed */
+	if (child->type != GTK_TOOLBAR_CHILD_SPACE) {
+	    gtk_container_remove(GTK_CONTAINER(widget), child->widget);
+	    children = toolbar->children; /* restart loop */
+	}
     }
+    while(toolbar->children &&
+	  ((GtkToolbarChild*)toolbar->children->data)->type ==
+	  GTK_TOOLBAR_CHILD_SPACE)
+	gtk_toolbar_remove_space(toolbar, 0);
+    /* g_list_foreach(toolbar->children, (GFunc)g_free, NULL); */
     g_list_free(toolbar->children);
     toolbar->children = NULL;
 }

@@ -438,7 +438,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
             pop_delete_message(pop, i, NULL);
         g_free(msg_path);
     }
-    /* FIXME: replace old uids with current uids */
     if(err) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 error: %s."), 

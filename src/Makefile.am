@@ -105,5 +105,4 @@ dist-hook:
 	cp $(srcdir)/pixmaps/*.{xpm,png} $(distdir)/pixmaps
 
 
-DEFS = -DG_DISABLE_DEPRECATED   \
-       -DGNOME_DISABLE_DEPRECATED
+DEFS = -DG_DISABLE_DEPRECATED 

@@ -473,6 +473,8 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox)
     mailbox->unread_messages = 0;
     lbm_mh_parse_both(mh);
 
+    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = 0;
+    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_cnt  = 1;
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMh", mailbox->name, mailbox->open_ref);

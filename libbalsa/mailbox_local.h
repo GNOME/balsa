@@ -47,7 +47,12 @@ typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 struct _LibBalsaMailboxLocal {
     LibBalsaMailbox mailbox;
 
-    guint sync_id;
+    guint sync_id;  /* id of the idle mailbox sync job  */
+    guint sync_time; /* estimated time of sync job execution (in seconds),
+                      * used to  throttle frequency of large mbox syncing. */
+    guint sync_cnt; /* we do not want to rely on the time of last sync since
+                     * some sync can be faster than others. Instead, we
+                     * average the syncing time for mailbox. */
 };
 
 struct _LibBalsaMailboxLocalClass {

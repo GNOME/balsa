@@ -8,7 +8,7 @@ dnl ###########################################################################
 SCROLLKEEPER_REQUIRED=0.1.4
 BALSA_MAJOR=2
 BALSA_REVISION=1
-BALSA_PATCHLEVEL=1
+BALSA_PATCHLEVEL=2
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
@@ -223,7 +223,8 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
                    [The gettext package name.])
 
 AM_GLIB_GNU_GETTEXT
-AC_PROG_INTLTOOL
+dnl balsa does not need intltool yet so we keep it simple.
+dnl AC_PROG_INTLTOOL
 
 dnl ###########################################################################
 dnl More checks

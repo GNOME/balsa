@@ -154,7 +154,9 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 static void
 libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
 {
-    mailbox->sync_id = 0;
+    mailbox->sync_id   = 0;
+    mailbox->sync_time = 0;
+    mailbox->sync_cnt  = 0;
 }
 
 GObject *
@@ -1156,12 +1158,16 @@ _libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox * mailbox,
 static void
 lbml_sync_real(LibBalsaMailboxLocal * local)
 {
+    time_t tstart;
+    time(&tstart);
     if (MAILBOX_OPEN(LIBBALSA_MAILBOX(local))
 	&& !libbalsa_mailbox_sync_storage(LIBBALSA_MAILBOX(local), FALSE))
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Failed to sync mailbox \"%s\""),
 			     LIBBALSA_MAILBOX(local)->name);
     local->sync_id = 0;
+    local->sync_time += time(NULL)-tstart;
+    local->sync_cnt++;
     g_object_unref(local);
 }
 
@@ -1183,10 +1189,17 @@ lbml_sync_idle(LibBalsaMailboxLocal * local)
 void
 libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local)
 {
+    guint schedule_delay;
     if (!local->sync_id)
 	g_object_ref(local);
     else
         g_source_remove(local->sync_id);
-    local->sync_id = g_timeout_add(3000, (GSourceFunc) lbml_sync_idle,
-				   local);
+    /* queue sync job so that the delay is at least five times longer
+     * than the syncing time. Otherwise large mailbox owners will be
+     * annnoyed. */
+    schedule_delay = (local->sync_time*5000)/local->sync_cnt;
+    printf("sync job scheduled with delay %u ms.\n", schedule_delay);
+    local->sync_id = g_timeout_add_full(G_PRIORITY_LOW, schedule_delay,
+                                        (GSourceFunc)lbml_sync_idle,
+                                        local, NULL);
 }

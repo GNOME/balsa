@@ -366,6 +366,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
     const gchar* path;
     int fd;
     GMimeStream *gmime_stream;
+    time_t t0;
 
     path = libbalsa_mailbox_local_get_path(mailbox);
 
@@ -394,8 +395,12 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox)
 	g_array_new(FALSE, FALSE, sizeof(struct message_info));
 
     mailbox->unread_messages = 0;
+    time(&t0);
     if (st.st_size != 0)
 	parse_mailbox(mbox);
+    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = time(NULL) - t0;
+    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_cnt  = 1;
+
     mbox_unlock(mailbox, NULL);
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),

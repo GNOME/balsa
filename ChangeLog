@@ -1,3 +1,12 @@
+2004-03-29  Pawel Salek
+
+	* configure.in: do not bother checking for intltool - we do not use it.
+	* libbalsa/mailbox_local.[hc]: adaptive syncing delay.
+	* libbalsa/mailbox_{mbox,maildir,mh}.c: matching changes.
+	* libbalsa/imap/pop3.c: close the descriptor.
+	* src/Makefile.am: test compilation on GNOME-2.6
+	* src/toolbar-factory.c: toolbar modification on gtk2.4
+
 2004-03-28 14:33  PeterB
 
 	* libbalsa/libbalsa.c: lock the mutex before waiting on the

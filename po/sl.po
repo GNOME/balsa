@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "POT-Creation-Date: 2001-07-27 23:37+0200\n"
-"PO-Revision-Date: 2000-07-07 12:30+0200\n"
+"PO-Revision-Date: 2001-07-29 12:32+0200\n"
 "Last-Translator: Andraz Tori <andraz.tori1@guest.arnes.si>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr ""
 #: libbalsa/address-book-ldap.c:261 libbalsa/address-book-ldap.c:517
 #, c-format
 msgid "Failed to do a search: %sCheck that the base name is valid."
-msgstr "Nisem mogel izvesti iskanja: %s Preverite, da je ime baze pravilno."
+msgstr "Nisem mogel izvesti iskanja: %s Preverite,fsafdsa\t baze pravilno."
 
 #: libbalsa/address-book-ldap.c:328 libbalsa/address-book-vcard.c:274
 msgid "No-Id"
@@ -189,7 +189,9 @@ msgstr "Napaka: Identiteta s tem imenom ¾e obstaja"
 
 #: libbalsa/identity.c:973
 msgid "Cannot delete default profile, please make another default first."
-msgstr "Ne morem zbrisati privzetega profila, najprej nastavite drugega kot privzetega."
+msgstr ""
+"Ne morem zbrisati privzetega profila, najprej nastavite drugega kot "
+"privzetega."
 
 #: libbalsa/identity.c:980
 msgid "Do you really want to delete the selected identity?"
@@ -1833,8 +1835,8 @@ msgstr "Preklièi"
 
 #: src/folder-conf.c:504
 msgid ""
-"This folder is not stored in configuration.I do not yet know how to remove "
-"it from remote server."
+"This folder is not stored in configuration.I do not yet know how to remove it "
+"from remote server."
 msgstr ""
 "Ta mapa ni shranjena v nastavitvah. Ne vem ¹e kako naj jo odstranim z "
 "oddaljenega stre¾nika."
@@ -1847,8 +1849,8 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "To bo odstranilo predal %s s seznama.\n"
-"Èe ¾elite predal kasneje spet dodati, lahko uporabite \"Dodaj predal IMAP\"."
-"Ste preprièani, da si tega ¾elite?"
+"Èe ¾elite predal kasneje spet dodati, lahko uporabite \"Dodaj predal "
+"IMAP\".Ste preprièani, da si tega ¾elite?"
 
 #: src/folder-conf.c:517 src/mailbox-conf.c:173 src/mailbox-conf.c:197
 msgid "Remove from list"
@@ -1896,8 +1898,8 @@ msgid ""
 msgstr ""
 "To bo odstranilo predal %s iz seznama po¹tnih predalov.\n"
 "Lahko se odstrani tudi datoteka ali datoteke povezane s tem predalom.\n"
-"Èe ne odstranite datoteke z diska, lahko kasneje uporabite  \"Dodaj predal"
-"\"za vnovièen dostop do predala\n"
+"Èe ne odstranite datoteke z diska, lahko kasneje uporabite  \"Dodaj "
+"predal\"za vnovièen dostop do predala\n"
 "Ste preprièani, da si tega ¾elite?"
 
 #: src/mailbox-conf.c:174
@@ -1913,7 +1915,8 @@ msgid ""
 msgstr ""
 "To bo z stre¾nika IMAP odstranilo predal %s in vsa njegova sporoèila.\n"
 "Èe ima %s podmape, bodo ¹e vedno vidne kot  vozli¹èe v drevesu map.\n"
-"Kasneje lahko uporabite \"Dodaj novo podmapo IMAP\" za dodajanje predalov s tem imenom.\n"
+"Kasneje lahko uporabite \"Dodaj novo podmapo IMAP\" za dodajanje predalov s "
+"tem imenom.\n"
 "Kaj ¾elite narediti?"
 
 #: src/mailbox-conf.c:187
@@ -2422,13 +2425,13 @@ msgstr "Avtorske pravice pridr¾ane (C) 1997-2001"
 
 #: src/main-window.c:1395
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://www.balsa.net/\n"
+"The Balsa email client is part of the GNOME desktop environment.  Information "
+"on Balsa can be found at http://www.balsa.net/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"Odjemalec elektronske po¹te Balsa je del namizja GNOME. Podatke o Balsi "
-"lahko najdete na http://www.balsa.net/\n"
+"Odjemalec elektronske po¹te Balsa je del namizja GNOME. Podatke o Balsi lahko "
+"najdete na http://www.balsa.net/\n"
 "\n"
 "Èe ¾elite sporoèiti hro¹èa, to prosimo storite na http://bugzilla.gnome.org/"
 
@@ -2847,7 +2850,7 @@ msgstr "Barve predala"
 
 #: src/pref-manager.c:1579
 msgid "Mailbox with unread messages color"
-msgstr "Barva predala z neprebranimi sporoèili"
+msgstr "Barva predala z neprebranimi spodsadasroèili6"
 
 #: src/pref-manager.c:1581
 msgid "Message Colors"
@@ -3387,7 +3390,8 @@ msgid "Replace the current word with the selected suggestion"
 msgstr "Zamenjaj trenutno besedo z izbranim predlogom"
 
 #: src/spell-check.c:499
-msgid "Replace all occurences of the current word with the selected suggestion"
+msgid ""
+"Replace all occurences of the current word with the selected suggestion"
 msgstr "Zamenjaj vse pojavitve trenutne besede z izbranim predlogom"
 
 #: src/spell-check.c:506
@@ -3490,7 +3494,9 @@ msgstr "Odgovori"
 msgid ""
 "Reply\n"
 "to all"
-msgstr "Odgovori\nvsem"
+msgstr ""
+"Odgovori\n"
+"vsem"
 
 #: src/toolbar-prefs.c:83
 msgid "Reply to all recipients"
@@ -3584,7 +3590,9 @@ msgstr "Preklièi to sporoèilo"
 msgid ""
 "Toggle\n"
 "new"
-msgstr "Preklopi\nnovo"
+msgstr ""
+"Preklopi\n"
+"novo"
 
 #: src/toolbar-prefs.c:109
 msgid "Toggle new message flag"
@@ -3602,7 +3610,9 @@ msgstr "Oznaèi vsa sporoèila v trenutnem predalu"
 msgid ""
 "All\n"
 "headers"
-msgstr "Vse\nglave"
+msgstr ""
+"Vse\n"
+"glave"
 
 #: src/toolbar-prefs.c:113
 msgid "Show all headers"
@@ -3646,388 +3656,3 @@ msgstr "-"
 msgid "+"
 msgstr "+"
 
-#~ msgid "Check Email"
-#~ msgstr "Preveri e-po¹to"
-
-#~ msgid "Move to Trash or Delete the current message"
-#~ msgstr "Prestavi v smeti ali zbri¹i trenutno sporoèilo"
-
-#~ msgid ""
-#~ "Reply\n"
-#~ "to All"
-#~ msgstr ""
-#~ "Odgovori\n"
-#~ "vsem"
-
-#~ msgid "Postpone"
-#~ msgstr "Odlo¾i"
-
-#~ msgid "Continue this message later"
-#~ msgstr "Nadaljuj s tem sporoèilom kasneje"
-
-#~ msgid "Run a spell check on the current message"
-#~ msgstr "Po¾eni preverjanje èrkovanja na trenutnem sporoèilu"
-
-#~ msgid ""
-#~ "SMTP protocol error. Cannot relay.\n"
-#~ "Your message is left in Outbox."
-#~ msgstr ""
-#~ "Napaka protokola SMTP. Ne morem posredovati.\n"
-#~ "Va¹e sporoèilo je bilo pu¹èeno v odhodnem predalu."
-
-#~ msgid "Error: Could not find address for host %s."
-#~ msgstr "Napaka: Nisem mogel najti naslova za stre¾nik %s."
-
-#~ msgid "One of IMAP connections has been closed: %s"
-#~ msgstr "Ena od IMAP povezav je bila prekinjena: %s"
-
-#~ msgid "Please choose a filename to save this part of the message as:"
-#~ msgstr ""
-#~ "Prosim izberite ime datoteke v katero naj se shrani ta del sporoèila:"
-
-#~ msgid "Delete message"
-#~ msgstr "Zbri¹i sporoèilo"
-
-#~ msgid "Your name:"
-#~ msgstr "Va¹e ime:"
-
-#~ msgid "E-mail address:"
-#~ msgstr "E-po¹tni naslov:"
-
-#~ msgid "Reply-to address:"
-#~ msgstr "Naslov za odgovor:"
-
-#~ msgid "Default domain:"
-#~ msgstr "Privzeta domena:"
-
-#~ msgid "Use signature file when:"
-#~ msgstr "Uporabi datoteko s podpisom kadar:"
-
-#~ msgid "sending mail"
-#~ msgstr "po¹iljam po¹to"
-
-#~ msgid "replying to mail"
-#~ msgstr "odgovarjam na po¹to"
-
-#~ msgid "forwarding mail"
-#~ msgstr "posredujem po¹to"
-
-#~ msgid "Signature file:"
-#~ msgstr "Datoteka s podpisom:"
-
-#~ msgid "Select your signature file"
-#~ msgstr "Izberite datoteko z va¹im podpisom"
-
-#~ msgid "Insert signature before quoted messages"
-#~ msgstr "Vrini podpis pred citiranimi sporoèili"
-
-#~ msgid "Port"
-#~ msgstr "Vrata"
-
-#~ msgid "Local mail transport agent"
-#~ msgstr "Krajevni po¹tni agent"
-
-#~ msgid "Quoted text primary color"
-#~ msgstr "Osnovna barva citiranega besedila"
-
-#~ msgid "Printing"
-#~ msgstr "Tiskanje"
-
-#~ msgid "characters"
-#~ msgstr "znaki"
-
-#~ msgid "Print command:"
-#~ msgstr "Ukaz za tiskanje:"
-
-#~ msgid "Break line at:"
-#~ msgstr "Prelomi vrstico pri:"
-
-#~ msgid "Cannot execute print command."
-#~ msgstr "Ne morem izvr¹iti ukaza za tiskanje."
-
-#~ msgid "Error executing lpr"
-#~ msgstr "Napaka ob izvajanju lpr (programa za tiskanje)"
-
-#~ msgid "Sorry. Balsa doesn't (yet) know how to create a maildir mailbox"
-#~ msgstr "Oprostite. Balsa (¹e) ne zna ustvarjati maildir po¹tnih predalov"
-
-#~ msgid "Sorry. Balsa doesn't (yet) know how to create a mh mailbox"
-#~ msgstr "Oprostite. Balsa (¹e) ne zna ustvariti Mh predala"
-
-#~ msgid "Delete this remote IMAP folder requested"
-#~ msgstr "Zahtevano je bilo brisanje te oddaljene mape IMAP"
-
-#~ msgid "Anonymous authentication not supported."
-#~ msgstr "Anonimna avtentifikacija ni podprta."
-
-#~ msgid "Skipping CRAM-MD5 authentication."
-#~ msgstr "Preskakujem CRAM-MD5 avtentifikacijo."
-
-#~ msgid ""
-#~ "Enter print command below\n"
-#~ "Remember to include '%s'"
-#~ msgstr ""
-#~ "Vnesite ukaz za tiskanje\n"
-#~ "Ne pozabite na '%s'"
-
-#~ msgid "Print Command:"
-#~ msgstr "Ukaz za tiskanje:"
-
-#~ msgid "Local Mbox Mailbox..."
-#~ msgstr "Krajevni po¹tni predal 'Mbox'..."
-
-#~ msgid "Local Maildir Mailbox..."
-#~ msgstr "Krajevni po¹tni predal 'Maildir'..."
-
-#~ msgid "Local MH Mailbox..."
-#~ msgstr "Krajevni po¹tni predal 'MH'..."
-
-#~ msgid "Remote IMAP Mailbox..."
-#~ msgstr "Oddaljen po¹tni predal IMAP..."
-
-#~ msgid "_Toggle Flagged"
-#~ msgstr "_Preklopi oznaèbo"
-
-#~ msgid "N_o headers"
-#~ msgstr "_Brez glav"
-
-#~ msgid "_Selected headers"
-#~ msgstr "_Izbrane glave"
-
-#~ msgid "Reply to _all..."
-#~ msgstr "Odgovori _vsem..."
-
-#~ msgid "Informational Messages"
-#~ msgstr "Informativna sporoèila "
-
-#~ msgid "cc:"
-#~ msgstr "cc:"
-
-#~ msgid "bcc:"
-#~ msgstr "bcc:"
-
-#~ msgid "fcc:"
-#~ msgstr "fcc:"
-
-#~ msgid "Add New Address"
-#~ msgstr "Dodaj nov naslov"
-
-#~ msgid "Import first address only"
-#~ msgstr "Uvozi le prvi naslov"
-
-#~ msgid "Import all adresses"
-#~ msgstr "Uvozi vse naslove"
-
-#~ msgid ""
-#~ "This will remove the mailbox %s and it's files permanently from your "
-#~ "system.\n"
-#~ "Are you sure you want to remove this mailbox?"
-#~ msgstr ""
-#~ "To bo permanentno odstranilo po¹tni predal %s in njegove datoteke iz "
-#~ "sistema.\n"
-#~ "Ste preprièani, da ¾elite odstraniti ta predal?"
-
-#~ msgid "You need to fill in the Mailbox Name field."
-#~ msgstr "Vpisati morate ime predala."
-
-#~ msgid "You need to fill in the Mailbox Path field."
-#~ msgstr "Vpisati morate pot do predala."
-
-#~ msgid "You need to fill in the folderpath field."
-#~ msgstr "Vpisati morate imenik mape."
-
-#~ msgid "You need to fill in the IMAP Server field"
-#~ msgstr "Vpisati morate stre¾nik IMAP"
-
-#~ msgid "You need to fill in the username field"
-#~ msgstr "Vpisati morate uporabni¹ko ime"
-
-#~ msgid "You need to fill in the port field"
-#~ msgstr "Vpisati morate vrata"
-
-#~ msgid "You need to fill in the user field."
-#~ msgstr "Vpisati morate polje uporabnik."
-
-#~ msgid "You need to fill in the server field."
-#~ msgstr "Vpisati morate stre¾nik."
-
-#~ msgid "You need to fill in the port field."
-#~ msgstr "Vpisati morate vrata."
-
-#~ msgid "Some of the fields are blank."
-#~ msgstr "Nekatera polja so prazna."
-
-#~ msgid "Could not access mailbox '%s'"
-#~ msgstr "Ne morem dostopati do po¹tnega predala '%s'"
-
-#~ msgid "New mailbox type:"
-#~ msgstr "Vrsta novega predala:"
-
-#~ msgid "Use APOP"
-#~ msgstr "UporabI APOP"
-
-#~ msgid "_Mailbox..."
-#~ msgstr "_Po¹tni predal..."
-
-#~ msgid "Add New Mailbox..."
-#~ msgstr "Dodaj nov predal..."
-
-#~ msgid ">"
-#~ msgstr ">"
-
-#~ msgid "Charset"
-#~ msgstr "Nabor znakov"
-
-#~ msgid "Colour of quoted text"
-#~ msgstr "Barva citiranega besedila"
-
-#~ msgid "Path"
-#~ msgstr "Pot"
-
-#~ msgid ""
-#~ "Failed to do a search: %s\n"
-#~ "Check that the base name is valid."
-#~ msgstr ""
-#~ "Nisem uspel izvesti iskanja: %s\n"
-#~ "Preverite ali je ime baze veljavno."
-
-#~ msgid ""
-#~ "Connection to server established.\n"
-#~ "No e-mail addresses were found.\n"
-#~ "Check the base domain name."
-#~ msgstr ""
-#~ "Povezava s stre¾nikom vzpostavljena.\n"
-#~ "E-po¹tnih naslovov ni bilo najdenih.\n"
-#~ "Preverite ime baze."
-
-#~ msgid "LDAP tested OK."
-#~ msgstr "LDAP preizku¹en v redu."
-
-#~ msgid "Baltic"
-#~ msgstr "Balt¹èina"
-
-#~ msgid "Pr_int"
-#~ msgstr "Na_tisni"
-
-#~ msgid "Print current mail"
-#~ msgstr "Natisni trenutno sporoèilo"
-
-#~ msgid "_Add"
-#~ msgstr "_Dodaj"
-
-#~ msgid ""
-#~ "In order to store an address, you must open a mailbox and select a "
-#~ "message.\n"
-#~ msgstr ""
-#~ "Èe ¾elite shraniti naslov, morate odpreti predal in izbrati sporoèilo.\n"
-
-#~ msgid "Open Mailbox"
-#~ msgstr "Odpri predal"
-
-#~ msgid "Close Mailbox"
-#~ msgstr "Zapri predal"
-
-#~ msgid "Edit Mailbox Properties"
-#~ msgstr "Uredi lastnosti predala"
-
-#~ msgid "Delete Mailbox"
-#~ msgstr "Zbri¹i predal"
-
-#~ msgid "_Western (ISO-8859-1)"
-#~ msgstr "_Zahodno (ISO-8859-1)"
-
-#~ msgid "W_estern (ISO-8859-15)"
-#~ msgstr "Z_ahodno (ISO-8859-15)"
-
-#~ msgid "_Central European (ISO-8859-2)"
-#~ msgstr "_Centralno evropsko (ISO-8859-2)"
-
-#~ msgid "_South European (ISO-8859-3)"
-#~ msgstr "_Ju¾no evropsko (ISO-8859-3)"
-
-#~ msgid "_Baltic (ISO-8859-13)"
-#~ msgstr "_Balti¹ko (ISO-8859-13)"
-
-#~ msgid "Cy_rillic (ISO-8859-5)"
-#~ msgstr "_Cirilica (ISO-8859-5)"
-
-#~ msgid "_Hebrew (ISO-8859-8)"
-#~ msgstr "_Hebrej¹èina (ISO-8859-8)"
-
-#~ msgid "_Turkish (ISO-8859-9)"
-#~ msgstr "_Tur¹èina (ISO-8859-9)"
-
-#~ msgid "Ce_ltic (ISO-8859-14)"
-#~ msgstr "_Keltsko (ISO-8859-14)"
-
-#~ msgid "_ISO Charset"
-#~ msgstr "_ISO nabor znakov"
-
-#~ msgid ""
-#~ "Unable to open address book %s for reading.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Ne morem odpreti adresarja %s za branje.\n"
-#~ " - %s\n"
-
-#~ msgid "Balsa Warning"
-#~ msgstr "Balsa opozorilo"
-
-#~ msgid ""
-#~ "Unable to open %s for read.\n"
-#~ " - %s\n"
-#~ msgstr ""
-#~ "Ne morem odpreti %s za branje.\n"
-#~ " - %s\n"
-
-#~ msgid "The Card Name field must be non-empty.\n"
-#~ msgstr "Ime Kartice mora biti vpisano.\n"
-
-#~ msgid ""
-#~ "There is already an address book entry for %s.\n"
-#~ "Run GnomeCard if you would like to edit your address book entries.\n"
-#~ msgstr ""
-#~ "Vnos v adresar za %s ¾e obstaja.\n"
-#~ "Po¾enite GnomeCard èe ¾elite urediti va¹e naslove.\n"
-
-#~ msgid "Mailbox name"
-#~ msgstr "Ime predala"
-
-#~ msgid "Select your address book file"
-#~ msgstr "Izberite va¹o datoteko adresarja"
-
-#~ msgid "On %s you wrote:\n"
-#~ msgstr "%s ste napisali:\n"
-
-#~ msgid "You wrote:\n"
-#~ msgstr "Ste napisali:\n"
-
-#~ msgid "List"
-#~ msgstr "Seznam"
-
-#~ msgid "Error: "
-#~ msgstr "Napaka: "
-
-#~ msgid "Balsa does not know how to display this message part"
-#~ msgstr "Balsa ne zna predstaviti tega dela sporoèila"
-
-#~ msgid "You need to fill in the password field"
-#~ msgstr "Vpisati morate geslo"
-
-#~ msgid "You need to fill in the password field."
-#~ msgstr "Vpisati morate geslo."
-
-#~ msgid "An error occurred when attempting to creat(2) the file \"%s\"."
-#~ msgstr "Zgodila se je napaka ob poskusu ukaza creat(2) na datoteki \"%s\"."
-
-#~ msgid "Error"
-#~ msgstr "Napaka"
-
-#~ msgid "Ok"
-#~ msgstr "V redu"
-
-#~ msgid "Content Type: %s/%s"
-#~ msgstr "Vrsta vsebine: %s/%s"
-
-#~ msgid "Mailbox: Opening %s Refcount: %d\n"
-#~ msgstr "Malbox: Odpiram %s ©tevec referenc: %d\n"

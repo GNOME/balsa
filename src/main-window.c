@@ -29,10 +29,6 @@
 #include "addrbook-manager.h"
 #include "../config.h"
 
-
-/* pixmaps for the toolbar */
-#include "pixmaps/tb_mail_compose.xpm"
-
 GtkWidget *bottom_pbar;
 
 void show_about_box (GtkWidget *, gpointer);
@@ -66,7 +62,10 @@ create_main_window ()
   /* main window */
   mw->window = gnome_app_new ("balsa", "Balsa");
   gtk_window_set_wmclass (GTK_WINDOW (mw->window), "balsa_app", "Balsa");
-  gtk_widget_set_usize (mw->window, 630, 400);
+  if (gdk_screen_width() > 640 && gdk_screen_height() > 480)
+    gtk_widget_set_usize (mw->window, 700, 600);
+  else
+    gtk_widget_set_usize (mw->window, 630, 400);
   gtk_signal_connect (GTK_OBJECT (mw->window),
 		      "destroy",
 		      (GtkSignalFunc) balsa_exit,
@@ -226,16 +225,16 @@ create_toolbar (MainWindow * mw)
 			     mw);
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
 /*
-  toolbarbutton =
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
-			     "UnDelete",
-			     "UnDelete Message",
-			     NULL,
-	       gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
-			     GTK_SIGNAL_FUNC (index_undelete_message),
-			     mw);
-  GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
-*/
+   toolbarbutton =
+   gtk_toolbar_append_item (GTK_TOOLBAR (toolbar),
+   "UnDelete",
+   "UnDelete Message",
+   NULL,
+   gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_TRASH),
+   GTK_SIGNAL_FUNC (index_undelete_message),
+   mw);
+   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);
+ */
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
   toolbarbutton =
@@ -243,7 +242,7 @@ create_toolbar (MainWindow * mw)
 			     "Compose",
 			     "Compose Message",
 			     NULL,
-			     new_icon (tb_mail_compose_xpm, window),
+	    gnome_stock_pixmap_widget (window, GNOME_STOCK_PIXMAP_MAIL_NEW),
 			     GTK_SIGNAL_FUNC (new_message),
 			     "Compose Message");
   GTK_WIDGET_UNSET_FLAGS (toolbarbutton, GTK_CAN_FOCUS);

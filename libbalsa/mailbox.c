@@ -2072,9 +2072,11 @@ lbm_get_index_entry(LibBalsaMailbox *lmm, unsigned msgno)
         g_ptr_array_index(lmm->mindex, msgno-1);
     if(entry == NULL) {
         LibBalsaMessage *msg = libbalsa_mailbox_get_message(lmm, msgno);
-        entry = libbalsa_mailbox_index_entry_new_from_msg(msg);
-        g_ptr_array_index(lmm->mindex, msgno-1) = entry;
-        g_object_unref(msg);
+        if (msg) {
+	    entry = libbalsa_mailbox_index_entry_new_from_msg(msg);
+	    g_ptr_array_index(lmm->mindex, msgno-1) = entry;
+	    g_object_unref(msg);
+	}
     }
     return entry;
 }
@@ -2504,8 +2506,6 @@ static gint
 mbox_compare_size(LibBalsaMailboxIndexEntry * message_a,
                   LibBalsaMailboxIndexEntry * message_b)
 {
-    g_return_val_if_fail(message_a && message_b, 0);
-
     return message_a->size - message_b->size;
 }
 
@@ -2528,6 +2528,9 @@ mbox_compare_func(const SortTuple * a,
 
 	message_a = lbm_get_index_entry(mbox, msgno_a);
 	message_b = lbm_get_index_entry(mbox, msgno_b);
+
+	if (!(message_a && message_b))
+	    return 0;
 
 	switch (mbox->view->sort_field) {
 	case LB_MAILBOX_SORT_SENDER:
@@ -3084,14 +3087,14 @@ LibBalsaMessageStatus
 libbalsa_mailbox_msgno_get_status(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxIndexEntry *entry = lbm_get_index_entry(mailbox, msgno);
-    return entry->status_icon;
+    return entry ? entry->status_icon : LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
 }
 
 const gchar *
 libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxIndexEntry *entry = lbm_get_index_entry(mailbox, msgno);
-    return entry->subject;
+    return entry ? entry->subject : NULL;
 }
 
 /* Update icons, but only if entry has been allocated. */
@@ -3100,6 +3103,7 @@ libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 				     guint msgno, LibBalsaMessage * message)
 {
     LibBalsaMailboxIndexEntry *entry;
+    LibBalsaMessageAttach attach_icon;
 
     if (!mailbox || !mailbox->mindex || mailbox->mindex->len < msgno)
 	return;
@@ -3108,7 +3112,9 @@ libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
     if (!entry)
 	return;
 
-    entry->attach_icon = libbalsa_message_get_attach_icon(message);
-
-    lbm_msgno_changed(mailbox, msgno);
+    attach_icon = libbalsa_message_get_attach_icon(message);
+    if (entry->attach_icon != attach_icon) {
+	entry->attach_icon = attach_icon;
+	lbm_msgno_changed(mailbox, msgno);
+    }
 }

@@ -1558,7 +1558,8 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 	} else 
             g_object_unref(G_OBJECT(msg));
     }
-    g_object_ref(msg_info->message); /* we want to keep one copy */
+    if (msg_info->message)
+	g_object_ref(msg_info->message); /* we want to keep one copy */
     return msg_info->message;
 }
 

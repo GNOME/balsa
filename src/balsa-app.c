@@ -132,7 +132,12 @@ init_balsa_app (int argc, char *argv[])
     }
 
   /* initalize our mailbox access crap */
-  do_load_mailboxes ();
+  if (do_load_mailboxes () == FALSE)
+    {
+      fprintf(stderr, "*** error loading mailboxes\n");
+      initialize_balsa (argc, argv);
+      return;
+    }
 
   /* At this point, if inbox/outbox/trash are still null, then we
      were not able to locate the settings for them anywhere in our
@@ -154,11 +159,13 @@ init_balsa_app (int argc, char *argv[])
 #endif
 }
 
-void
+gint
 do_load_mailboxes (void)
 {
   read_signature ();
-  mailboxes_init ();
+
+  if (mailboxes_init () == FALSE)
+    return FALSE;
 
   switch (balsa_app.inbox->type)
     {
@@ -181,6 +188,8 @@ do_load_mailboxes (void)
   load_local_mailboxes ();
   read_signature ();
   special_mailboxes ();
+
+  return TRUE;
 }
 
 static gint
@@ -226,7 +235,16 @@ check_for_new_messages ()
 static gint
 mailboxes_init (void)
 {
-  return config_mailboxes_init ();
+  gint retval;
+
+  retval = config_mailboxes_init ();
+
+  if (balsa_app.inbox == NULL ||
+      balsa_app.outbox == NULL ||
+      balsa_app.trash == NULL)
+    return FALSE;
+
+  return retval;
 }
 
 static void

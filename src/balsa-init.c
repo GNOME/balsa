@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gnome.h>
+#include <string.h>
 #include "mailbox.h"
 #include "main.h"
 #include "misc.h"
@@ -218,6 +219,7 @@ create_general_page (void)
   GtkWidget *label;
 
   GString *str;
+  char * name;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_border_width (GTK_CONTAINER (vbox), 10);
@@ -279,7 +281,19 @@ create_general_page (void)
   gtk_entry_set_text (GTK_ENTRY (prefs->email), str->str);
   g_string_free (str, TRUE);
 
-  gtk_entry_set_text (GTK_ENTRY (prefs->real_name), g_get_real_name ());
+  name = g_get_real_name ();
+  if (name != NULL)
+    {
+      char * p;
+
+      /* Don't include other fields of the GECOS */
+      p = strchr(name, ',');
+      if (p != NULL)
+	*p = '\0';
+
+      gtk_entry_set_text (GTK_ENTRY (prefs->real_name), name);
+    }
+
   gtk_entry_set_text (GTK_ENTRY (prefs->smtp_server), "localhost");
 
   return vbox;

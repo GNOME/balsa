@@ -328,7 +328,7 @@ dnl  Check for LDAP if available.
 dnl  For now, only look for OpenLDAP?
 dnl #########################################################################
 
-AC_ARG_ENABLE([ldap], [  --enable-ldap Use OpenLDAP if available (experimental) [default=no]],[
+AC_ARG_ENABLE([ldap], [  --enable-ldap Use OpenLDAP if available [default=no]],[
 	use_ldap=$enableval
 ],[
 	use_ldap=no
@@ -336,7 +336,7 @@ AC_ARG_ENABLE([ldap], [  --enable-ldap Use OpenLDAP if available (experimental) 
 AC_MSG_CHECKING(whether to use LDAP)
 if test x"$use_ldap" = xyes ; then
 	AC_MSG_RESULT([yes])
-	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber)
+	AC_CHECK_LIB(ldap, ldap_search, AC_DEFINE(ENABLE_LDAP) LIBS="-lldap -llber -lresolv $LIBS", AC_MSG_ERROR([*** You enabled LDAP but ldap library is not found.]), -llber -lresolv)
 else
 	AC_MSG_RESULT([no])
 fi

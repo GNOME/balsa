@@ -223,7 +223,8 @@ mblist_get_selected_node(BalsaMBList *mbl)
 
     g_assert(mbl != NULL);
 
-    node = mbl->currently_selected_ctree_node;
+    node =
+        GTK_CLIST(mbl)->selection ? GTK_CLIST(mbl)->selection->data : NULL;
     return gtk_ctree_node_get_row_data(GTK_CTREE(mbl), node);
 }
 
@@ -540,7 +541,6 @@ select_mailbox(GtkCTree * ctree, GtkCTreeNode * row, gint column)
 
     g_return_if_fail(mbnode != NULL);
 
-    balsa_app.mblist->currently_selected_ctree_node = row; /* row is a node! */
     if(mbnode->mailbox)
 	mblist_open_mailbox(mbnode->mailbox);
 }
@@ -1345,9 +1345,10 @@ balsa_mblist_focus_mailbox(BalsaMBList * bmbl, LibBalsaMailbox * mailbox)
     node = gtk_ctree_find_by_row_data_custom(GTK_CTREE(&bmbl->ctree), NULL,
 					     mailbox,
 					     mblist_mbnode_compare);
-    if ((node != NULL) && (node != bmbl->currently_selected_ctree_node)) {
+    if ((node != NULL)
+        && (GTK_CLIST(bmbl)->selection == NULL
+            || node != GTK_CLIST(bmbl)->selection->data)) {
 	gtk_ctree_select(GTK_CTREE(&bmbl->ctree), node);
-	bmbl->currently_selected_ctree_node = node;
 	/* moving selection to the respective mailbox.
 	   this is neccessary when the previous mailbox was closed and
 	   redundant if the mailboxes were switched (notebook_switch_page)

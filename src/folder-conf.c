@@ -335,7 +335,7 @@ browse_button_cb(GtkWidget * widget, gpointer data)
 
     gtk_widget_show(ctree);
     gtk_widget_show(scroll);
-    gnome_dialog_run(GNOME_DIALOG(dialog));
+    gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
 }
 
 static void

@@ -36,9 +36,6 @@ typedef struct _BalsaMBListClass BalsaMBListClass;
 struct _BalsaMBList {
     GtkCTree ctree;
 
-    /* ugly, but there's no way to know this with the ctree itself ... */
-    GtkCTreeNode *currently_selected_ctree_node;
-    
     /* store the style of unread mailboxes */
     GtkStyle *unread_mailbox_style;
     /* shall the number of messages be displayed ? */

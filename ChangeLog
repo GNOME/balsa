@@ -1,4 +1,11 @@
-2001-11-20  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+2001-12-06  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
+
+	* configure.in: some ldap libraries refer -lresolv (PS).
+	* help/C/balsa.sgml: Mail Options doc page update.
+	* src/balsa-mblist.[hc]: get rid of currently_selected_ctree_node.
+	* src/folder-conf.c: close browse dialog on cancel.
+
+2001-12-05  Peter Bloomfield  <PeterBloomfield@MindSpring.com>
 
 	#61263, attachment 6161
 	* help/C/balsa.sgml: update doc.

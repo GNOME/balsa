@@ -2081,6 +2081,38 @@ align="center"></graphic>
   </varlistentry>
 
   <varlistentry>
+    <term><guilabel>Check IMAP mailboxes</guilabel></term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        include your <acronym>IMAP</acronym> mailboxes when
+        checking for mail. You can also specify that INBOX is
+        the only mailbox to be checked.</para>
+      <para>Checking IMAP mailboxes can take some time; these
+        options give you extra control over how long the mailbox
+        check will take.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>Display message if new mail has arrived</guilabel>
+    </term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        alert you when mail has arrived.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Do background check quietly</guilabel></term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        give you no indication that a background mail check is
+        in progress.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term><guilabel>Quoted Text Regular Expression</guilabel></term>
 
     <listitem>
@@ -2100,6 +2132,60 @@ align="center"></graphic>
 	page.</para>
     </listitem>
   </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Wrap Incoming Text</guilabel></term>
+    <listitem>
+      <para>If selected, <application>Balsa</application> will
+        wrap text of incoming messages at the specified line
+        length.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>
+        Reflow messages of type `text/plain;format=flowed'
+      </guilabel>
+    </term>
+    <listitem>
+      <para>The `format' parameter distinguishes two ways of
+        representing paragraphs in messages of type `text/plain' (that
+        is, simple text). The value `flowed' indicates that paragraphs
+        have been broken into lines ended with `soft' line breaks: a
+        space is left at the end of the line. A `hard' line break (one
+        that is not preceded by a space) indicates the end of a
+        paragraph.</para>
+      <para><application>Balsa</application> can reflow the paragraphs,
+        quoted or otherwise, in a message of this type.  Reflowing
+        eliminates the line fragments that are left when text is first
+        wrapped at one length and then rewrapped to a shorter length,
+        which are often misquoted.</para>
+      <para>The only other value of `format' is `fixed', which is the
+        value assumed by default when `format' is not specified, as with
+        older mailers. In this case, all line breaks must be respected.
+        If you do not select the `Reflow...' option,
+        <application>Balsa</application> will treat all messages of type
+        `text/plain' as if they were `format=fixed'. Long lines will
+        still be wrapped, if the `Wrap Incoming Messages' option is
+        selected, but this will usually leave unquoted line
+        fragments.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>Message Disposition Notification request</guilabel>
+    </term>
+    <listitem>
+      <para>You will sometimes receive a message whose sender has asked
+        for notification that you have received or seen the message. You
+        can specify how <application>Balsa</application> responds to
+        these requests.</para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>
 </sect2>
 
@@ -2119,9 +2205,106 @@ align="center"></graphic>
   </varlistentry>
 
   <varlistentry>
-    <term><guilabel>Default Bcc</guilabel></term>
+    <term>
+      <guilabel>
+        Send message as type `text/plain; format=flowed'
+      </guilabel>
+    </term>
     <listitem>
-      <para>An address to send Blind Carbon Copy to on all emails.</para>
+      <para>The `format' parameter distinguishes two ways of
+        representing paragraphs in messages of type `text/plain'
+        (that is, simple text). The value `flowed' indicates
+        that paragraphs have been broken into lines ended with
+        `soft' line breaks: a space is left at the end of the
+        line. A `hard' line break (one that is not preceded by a
+        space) indicates the end of a paragraph.</para>
+      <para><application>Balsa</application> can prepare the message
+        using this convention, and a flowed-aware mailer
+        receiving it can then reflow its paragraphs to fit its display
+        without leaving misquoted line fragments. If you do not select
+        this option, <application>Balsa</application> will use
+        hard line breaks to end lines, and no receiving mailer
+        will be able to identify paragraphs.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Reply prefix</guilabel></term>
+    <listitem>
+      <para>The string that <application>Balsa</application>
+        should use as a prefix when quoting a message. Note: if
+        you select `Send message as type text/plain;
+        format=flowed', <application>Balsa</application> is
+        required to use the one-character string ">".
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>Automatically quote original when replying</guilabel>
+    </term>
+    <listitem>
+      <para>Have <application>Balsa</application> include the
+        text of a message in the reply. The text will be
+        prefixed as shown above.</para>
+      <para>You can instead include the original message using an
+        option on the `Edit' menu, or by dragging the message
+        from the message index into the text area of the reply.
+        If you prefer to include text this way, do not select
+        the `Automatically quote...' option.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>
+        Don't include HTML parts as text when replying or forwarding
+        mail
+      </guilabel>
+    </term>
+    <listitem>
+      <para>Tell <application>Balsa</application> to be sensible.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>
+      <guilabel>
+        Forward a mail as attachment instead of quoting it
+      </guilabel>
+    </term>
+    <listitem>
+      <para>If this option is selected, messages that are
+        `Automatically quoted' will actually be attached
+        unmodified, instead of included in the text of the reply,
+        prefixed by the reply string.</para>
+      <para>You can also attach any message to a new message 
+        by dragging it from the message index into
+        the attachment area of the new message (or, in fact, any
+        part of the new message window except the text area or
+        the address lines).</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry> 
+    <term>
+      <guilabel>
+        Send button always queues outgoing mail in outbox
+      </guilabel>
+    </term>
+    <listitem>
+      <para>This option gives you control over when
+        <application>Balsa</application> connects to a server to
+        send messages.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry> 
+    <term><guilabel>Copy outgoing messages to sentbox</guilabel></term>
+    <listitem>
+      <para>Have <application>Balsa</application> save a copy of
+        each message you send in the mailbox marked as the `Sentbox'.</para>
     </listitem>
   </varlistentry>
 

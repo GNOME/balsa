@@ -451,7 +451,8 @@ libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
 		  0, type, prog, tot, msg);
 }
 
-#define LIBBALSA_MAILBOX_COUNT "libbalsa-mailbox-count"
+#define LIBBALSA_MAILBOX_ADDED    "libbalsa-mailbox-added"
+#define LIBBALSA_MAILBOX_PROMOTED "libbalsa-mailbox-promoted"
 
 static gboolean
 lbm_rethread(LibBalsaMailbox*m)
@@ -475,9 +476,9 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 
     LOCK_MAILBOX(mailbox);
 
-    g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT, &added);
+    g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_ADDED, &added);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT, NULL);
+    g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_ADDED, NULL);
     if (added) {
         g_object_ref(G_OBJECT(mailbox));
         g_idle_add((GSourceFunc)lbm_rethread, mailbox);
@@ -530,11 +531,10 @@ libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
 /* Helper function to run the "on reception" filters on a mailbox */
 
 void
-libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
-                                          GSList * filters)
+libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 {
+    GSList *filters;
     GSList *lst;
-    gboolean free_filters = FALSE;
     static LibBalsaCondition cond_recent =
     {
 	FALSE,
@@ -553,32 +553,28 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    if (!filters) {
-	if (!mailbox->filters)
-	    config_mailbox_filters_load(mailbox);
+    if (!mailbox->filters)
+	config_mailbox_filters_load(mailbox);
 	
-	filters = libbalsa_mailbox_filters_when(mailbox->filters,
-						FILTER_WHEN_INCOMING);
-	free_filters = TRUE;
-    }
+    filters = libbalsa_mailbox_filters_when(mailbox->filters,
+					    FILTER_WHEN_INCOMING);
 
     if (!filters)
 	return;
     if (!filters_prepare_to_run(filters)) {
-	if (free_filters)
-	    g_slist_free(filters);
+	g_slist_free(filters);
 	return;
     }
 
     g_assert(HAVE_MAILBOX_LOCKED(mailbox));
+    cond_and.match.andor.left = &cond_recent;
     for (lst = filters; lst; lst = g_slist_next(lst)) {
 	LibBalsaFilter *filter = lst->data;
 	LibBalsaMailboxSearchIter *search_iter;
 	guint msgno;
 	GArray *msgnos;
 
-	cond_and.match.andor.left  = filter->condition;
-	cond_and.match.andor.right = &cond_recent;
+	cond_and.match.andor.right  = filter->condition;
 	search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
 
 	msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
@@ -594,8 +590,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
 	g_array_free(msgnos, TRUE);
     }
 
-    if (free_filters)
-	g_slist_free(filters);
+    g_slist_free(filters);
 }
 
 void
@@ -906,12 +901,11 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno)
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
     g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_INSERTED], 0,
 		  path, &iter);
-    mailbox->stamp++;
     gtk_tree_path_free(path);
 
     lbm_threads_leave(unlock);
 
-    added = g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT);
+    added = g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_ADDED);
     if (added)
 	++*added;
 }
@@ -1010,7 +1004,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 	gtk_tree_path_next(path);
 
 	promoted =
-	    g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT);
+	    g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_PROMOTED);
 	if (promoted)
 	    ++*promoted;
     }
@@ -1358,11 +1352,11 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
     if (MAILBOX_OPEN(mailbox)) {
 	guint promoted = 0;
 
-	g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT,
+	g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_PROMOTED,
 			  &promoted);
 	retval =
 	    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->sync(mailbox, expunge);
-	g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_COUNT, NULL);
+	g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_PROMOTED, NULL);
 	if (promoted)
 	    lbm_set_threading(mailbox, mailbox->view->threading_type);
 	else
@@ -1378,7 +1372,6 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
 LibBalsaMessage *
 libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
-    g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
     g_return_val_if_fail(msgno > 0 && msgno <=
 			 libbalsa_mailbox_total_messages(mailbox), NULL);
@@ -1553,8 +1546,6 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
     if (mailbox->msg_tree->children)
 	mbox_sort_helper(mailbox, mailbox->msg_tree);
 
-    /* invalidate iterators */
-    mailbox->stamp++;
     g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED], 0);
 
     lbm_threads_leave(unlock);
@@ -2815,20 +2806,6 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 
     g_ptr_array_free(partials, TRUE);
     g_list_free(messages);
-}
-
-/* Increment the mailbox stamp; get the gdk lock first, to avoid
- * invalidating iters in the middle of an event. */
-void
-libbalsa_mailbox_invalidate_iters(LibBalsaMailbox * mailbox)
-{
-    gboolean unlock;
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-    unlock = lbm_threads_enter();
-    mailbox->stamp++;
-    lbm_threads_leave(unlock);
 }
 
 /* Use "message-expunged" signal to update an array of msgnos. */

@@ -351,8 +351,7 @@ void libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * iter);
 /* Default filtering function (on reception)
    It is ONLY FOR INTERNAL USE
 */
-void libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox,
-					       GSList * filters);
+void libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox);
 
 void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
@@ -444,9 +443,6 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
 /* Partial messages */
 void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 				     const gchar * id);
-
-/* Helper */
-void libbalsa_mailbox_invalidate_iters(LibBalsaMailbox * mailbox);
 
 /* Message number arrays */
 void libbalsa_mailbox_register_msgnos(LibBalsaMailbox * mailbox,

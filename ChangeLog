@@ -1,3 +1,7 @@
+2002-09-18  Pawel Salek <pawsa@theochem.kth.se>
+
+	* libbalsa/pop3.c: msg count instead of byte count (HEAD:20020623)
+
 2002-09-17  Carlos Morgado  <chbm@chbm.nu>
 
 	* src/balsa-mblist.c: port #91445 (edit->filter crash) from

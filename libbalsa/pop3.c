@@ -415,8 +415,7 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 		 int *num_bytes, int tot_bytes, ProgressCallback prog_cb) {
     char buffer[2048];
 #ifdef BALSA_USE_THREADS
-    static const int GUI_PROGRESS_STEP = 2048;
-    int last_update_size = 0;
+    time_t last_update_time = time(NULL);
     char threadbuf[160];
     
     sprintf(threadbuf, _("Retrieving Message %d of %d"), msgno, msgs);
@@ -432,11 +431,11 @@ fetch_single_msg(int s, FILE *msg, int msgno, int first_msg, int msgs,
 	if ((chunk = getLine (s, buffer, sizeof (buffer))) == -1) 
 	    return POP_CONN_ERR;
 #ifdef BALSA_USE_THREADS
-	if(last_update_size<*num_bytes) {
+	if(last_update_time+2<time(NULL)) {
 	    sprintf(threadbuf,_("Received %d bytes of %d"), 
 		    *num_bytes, tot_bytes);
 	    prog_cb (threadbuf, *num_bytes, tot_bytes);
-	    last_update_size += GUI_PROGRESS_STEP;
+	    last_update_time = time(NULL);
 	}
 #endif
 	/* check to see if we got a full line */
@@ -634,6 +633,7 @@ fetch_pop_mail (const gchar *pop_host, const gchar *pop_user,
     }
     close (s);
 
+    prog_cb ("", 0, -1); /* Finished */
     return status;
 }
 

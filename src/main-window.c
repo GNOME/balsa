@@ -292,13 +292,16 @@ static GnomeUIInfo settings_menu[] =
 #ifdef BALSA_SHOW_ALL
   GNOMEUIINFO_ITEM_STOCK (N_ ("_Filters..."), N_("Manage filters"),
 			  filter_dlg_cb, GNOME_STOCK_MENU_PROP),
+#define MENU_SETTINGS_PREFS_POS 1
+#else
+#define MENU_SETTINGS_PREFS_POS 0
 #endif
   GNOMEUIINFO_MENU_PREFERENCES_ITEM(open_preferences_manager, NULL),
   GNOMEUIINFO_SEPARATOR,
-#define MENU_SETTINGS_MBLIST_POS 3
+#define MENU_SETTINGS_MBLIST_POS (MENU_SETTINGS_PREFS_POS+2)
   GNOMEUIINFO_TOGGLEITEM( N_ ("_Show mailbox tree"), NULL, 
 			  show_mbtree_cb, NULL),
-#define MENU_SETTINGS_TABS_POS 4
+#define MENU_SETTINGS_TABS_POS (MENU_SETTINGS_PREFS_POS+3)
   GNOMEUIINFO_TOGGLEITEM( N_ ("Show mailbox _tabs"), NULL, 
 			  show_mbtabs_cb, NULL),
   GNOMEUIINFO_END

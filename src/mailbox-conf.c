@@ -173,7 +173,7 @@ mailbox_conf_delete (Mailbox * mailbox)
 		       GNOME_STOCK_BUTTON_YES, GNOME_STOCK_BUTTON_NO, NULL);
 
   gnome_dialog_set_default (GNOME_DIALOG (ask), 1);
-  gnome_dialog_set_modal (GNOME_DIALOG (ask));
+  gtk_window_set_modal (GTK_WINDOW (ask), TRUE);
   clicked_button = gnome_dialog_run (GNOME_DIALOG (ask));
   if (clicked_button == 1)
     {
@@ -480,7 +480,7 @@ conf_add_mailbox ()
 		ptr = g_strdup_printf (_ ("Cannot create mailbox '%s': %s\n"), filename, strerror (errno));
 		msgbox = gnome_message_box_new (ptr, GNOME_MESSAGE_BOX_ERROR, _ ("Cancel"), NULL);
 		free (ptr);
-		gnome_dialog_set_modal (GNOME_DIALOG (msgbox));
+		gtk_window_set_modal (GTK_WINDOW (msgbox), TRUE);
 		gnome_dialog_run (GNOME_DIALOG (msgbox));
 		return NULL;
 	      }
@@ -916,5 +916,10 @@ mailbox_conf_edit_imap_server (GtkWidget * widget, gpointer data)
   titles[1] = "INBOX";
   gtk_clist_append (GTK_CLIST (clist), titles);
 
-  clicked_button = gnome_dialog_run_and_destroy (GNOME_DIALOG (window));
+  gtk_window_set_modal(GTK_WINDOW(window), TRUE);
+  clicked_button = gnome_dialog_run (GNOME_DIALOG (window));
+  if (clicked_button == 0)
+    {
+      return;
+    }
 }

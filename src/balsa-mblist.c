@@ -205,10 +205,10 @@ balsa_mblist_init (BalsaMBList * tree)
   gtk_widget_pop_colormap ();
   gtk_widget_pop_visual ();
 
-  gtk_ctree_show_stub (GTK_CTREE (tree), FALSE);
+  gtk_ctree_set_show_stub (GTK_CTREE (tree), FALSE);
   gtk_ctree_set_line_style (GTK_CTREE (tree), GTK_CTREE_LINES_DOTTED);
-/*  gtk_clist_set_policy (GTK_CLIST (tree), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-*/  gtk_clist_set_row_height (GTK_CLIST (tree), 16);
+  gtk_ctree_set_expander_style (GTK_CTREE (tree), GTK_CTREE_EXPANDER_CIRCULAR);
+  gtk_clist_set_row_height (GTK_CLIST (tree), 16);
 
   gtk_signal_connect (GTK_OBJECT (tree), "tree_select_row",
 		      GTK_SIGNAL_FUNC (select_mailbox),

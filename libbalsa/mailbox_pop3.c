@@ -295,17 +295,13 @@ static void progress_cb ( char *msg, int prog, int tot )
 
 static void libbalsa_mailbox_pop3_save_conf (LibBalsaMailbox *mailbox)
 {
-    gnome_config_private_set_string("type", "POP3");
+    gnome_config_private_set_string("type", "LibBalsaMailboxPop3");
     gnome_config_private_set_string("name", mailbox->name);
     libbalsa_server_save_conf(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
-    gnome_config_private_set_int(
-	    "check", LIBBALSA_MAILBOX_POP3(mailbox)->check); 
-    gnome_config_private_set_int(
-	    "delete", LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server);
-    gnome_config_private_set_int(
-	    "apop", LIBBALSA_MAILBOX_POP3(mailbox)->use_apop);
+
+    gnome_config_private_set_bool("check", LIBBALSA_MAILBOX_POP3(mailbox)->check); 
+    gnome_config_private_set_bool("delete", LIBBALSA_MAILBOX_POP3(mailbox)->delete_from_server);
+    gnome_config_private_set_bool("apop", LIBBALSA_MAILBOX_POP3(mailbox)->use_apop);
     
-    if ((LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid) != NULL)
-       gnome_config_private_set_string(
-	       "lastuid", LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid);
+    gnome_config_private_set_string("lastuid", LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid);
 }

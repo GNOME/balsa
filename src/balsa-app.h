@@ -54,18 +54,14 @@
 #define INFO_FIELD_LENGTH 10
 
 /* Default colour for mailboxes with unread messages */
-#define MBLIST_UNREAD_COLOR_RED 0
-#define MBLIST_UNREAD_COLOR_BLUE 65535
-#define MBLIST_UNREAD_COLOR_GREEN 0
+#define MBLIST_UNREAD_COLOR "rgb:0000/FFFF/0000"
 
 /*
  * Default colour for quoted text
  * oh no, I used the US spelling.
  */
 #define MAX_QUOTED_COLOR 4
-#define QUOTED_COLOR_RED 0
-#define QUOTED_COLOR_BLUE 20480
-#define QUOTED_COLOR_GREEN 20480
+#define DEFAULT_QUOTED_COLOR "rgb:0000/5000/5000"
 #define DEFAULT_QUOTE_REGEX "^(([ \t]|[A-Z])*[|>:}#])+"
 
 #define MAILBOX_MANAGER_WIDTH 350
@@ -97,7 +93,7 @@ enum
 
 typedef struct stPrinting Printing_t;
 struct stPrinting{
-    gint  breakline;
+    gboolean  breakline;
     gint  linesize;
     gchar *PrintCommand;
 };
@@ -236,7 +232,7 @@ extern struct BalsaApplication
   gint check_mail_upon_startup;
   gint remember_open_mboxes;
   gint open_unread_mailbox;
-  gchar *open_mailbox; /* ';'-separated, from last session or command line */
+  GList *open_mailbox_list; /* data is a pointer to the mailbox */     
   gchar* compose_email;
 
   /* font used to display messages */

@@ -98,7 +98,6 @@ static void balsa_window_destroy(GtkObject * object);
 GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
 void       balsa_window_open_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
 void       balsa_window_close_mailbox( BalsaWindow *window, LibBalsaMailbox *mailbox );
-static gchar * get_open_mailboxes_string(void);
 
 static void check_mailbox_list (GList *list);
 static gint mailbox_check_func ( GNode *mbox, gpointer data );
@@ -676,30 +675,7 @@ static void balsa_window_real_open_mailbox(BalsaWindow *window, LibBalsaMailbox 
 	    gtk_notebook_page_num(GTK_NOTEBOOK(window->notebook), 
 				  GTK_WIDGET(BALSA_INDEX_PAGE(page)->sw)));
 
-	g_free(balsa_app.open_mailbox);
-	balsa_app.open_mailbox = get_open_mailboxes_string();
-}
-
-static void cat_mbox_name(GtkWidget * w, gpointer data) {
-    gchar ** str = data;
-    GtkWidget * page = gtk_object_get_data(GTK_OBJECT(w),"indexpage");
-    if(*str) {
-	gchar *ns = g_strconcat(*str,";",
-				BALSA_INDEX_PAGE(page)->mailbox->name,
-				NULL);
-	g_free(*str);
-	*str = ns;
-    } else *str = g_strdup(BALSA_INDEX_PAGE(page)->mailbox->name);
-}
-
-static gchar *
-get_open_mailboxes_string()
-{
-    gchar * res = NULL;
-    if(balsa_app.notebook)
-	gtk_container_foreach(GTK_CONTAINER(balsa_app.notebook), cat_mbox_name,
-			      &res);
-    return res ? res : g_strdup("");
+	balsa_app.open_mailbox_list = g_list_prepend(balsa_app.open_mailbox_list, mailbox);
 }
 
 
@@ -732,8 +708,7 @@ static void balsa_window_real_close_mailbox(BalsaWindow *window, LibBalsaMailbox
       gnome_appbar_set_default (balsa_app.appbar, "Mailbox closed");
     }
 
-    g_free(balsa_app.open_mailbox);
-    balsa_app.open_mailbox = get_open_mailboxes_string();
+    balsa_app.open_mailbox_list = g_list_remove(balsa_app.open_mailbox_list, mailbox);
   }
   
   /* we use (BalsaIndex*) instead of BALSA_INDEX because we don't want

@@ -93,6 +93,7 @@ static gint balsa_save_session (GnomeClient* client, gint phase,
                                 GnomeInteractStyle interact_style, 
                                 gint is_fast, gpointer client_data);
 static gboolean initial_open_mailboxes(gchar* mboxstr);
+static gchar* cmd_line_open_mailboxes;
 
 static void
 balsa_init (int argc, char **argv)
@@ -101,7 +102,7 @@ balsa_init (int argc, char **argv)
          {"checkmail", 'c', POPT_ARG_NONE, &(balsa_app.check_mail_upon_startup), 0, N_("Get new mail on startup"), NULL},
          {"compose", 'm', POPT_ARG_STRING, &(balsa_app.compose_email), 
 	  0, N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
-         {"open-mailbox", 'o', POPT_ARG_STRING, &(balsa_app.open_mailbox), 
+         {"open-mailbox", 'o', POPT_ARG_STRING, &(cmd_line_open_mailboxes), 
 	  0, N_("Opens MAILBOXNAME"),N_("MAILBOXNAME")},
          {"open-unread-mailbox", 'u', POPT_ARG_NONE, &(balsa_app.open_unread_mailbox), 0, N_("Opens first unread mailbox"), NULL},
          {NULL, '\0', 0, NULL, 0} /* end the list */
@@ -295,7 +296,8 @@ main (int argc, char *argv[])
 
 
   gtk_idle_add((GtkFunction)initial_open_mailboxes, 
-	       g_strdup(balsa_app.open_mailbox));
+	       cmd_line_open_mailboxes);
+
   gdk_threads_enter();
   gtk_main();
   gdk_threads_leave();
@@ -329,7 +331,7 @@ initial_open_mailboxes(gchar* mboxstr) {
 
   if (mboxstr) {
     gint i =0;
-    gchar** names= g_strsplit(balsa_app.open_mailbox,";",20);
+    gchar** names= g_strsplit(mboxstr,";",20);
     while(names[i]) {
       LibBalsaMailbox *mbox = balsa_find_mbox_by_name(names[i]);
       if(balsa_app.debug)
@@ -345,7 +347,6 @@ initial_open_mailboxes(gchar* mboxstr) {
     gtk_notebook_set_page( GTK_NOTEBOOK(balsa_app.notebook), 0);
   gdk_threads_leave();
 
-  if(mboxstr) g_free(mboxstr);
   return FALSE;
 }
 static void
@@ -471,6 +472,11 @@ balsa_save_session (GnomeClient* client, gint phase, GnomeSaveStyle save_style,
                 argc++;
         }
 
+	/* FIXME: I don't think this is needed?
+	 * We already save the open mailboes in save-restore.c 
+	 * so we should just open them when loading prefs...
+	 */
+#if 0
         if (balsa_app.open_mailbox) {
                 argv[argc] = g_strdup ("--open-mailbox");
                 argc++;
@@ -478,6 +484,7 @@ balsa_save_session (GnomeClient* client, gint phase, GnomeSaveStyle save_style,
                 argv[argc] = g_strconcat ("'", balsa_app.open_mailbox, "'", NULL);
                 argc++;
         }
+#endif
 
         if (balsa_app.compose_email) {
                 argv[argc] = g_strdup ("--compose");

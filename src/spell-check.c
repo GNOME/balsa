@@ -457,7 +457,6 @@ balsa_spell_check_init (BalsaSpellCheck* spell_check)
         
         done = gnome_stock_button_with_label (GNOME_STOCK_BUTTON_OK, 
                                               "Done");
-        gnome_button_can_default (GTK_BUTTON (done), TRUE);
         gtk_box_pack_end (GTK_BOX (vbox1), done, FALSE, FALSE, 0);
 
         cancel = gnome_stock_button (GNOME_STOCK_BUTTON_CANCEL);

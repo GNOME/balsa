@@ -1,3 +1,19 @@
+2000-09-09  Ian Campbell  <ijc25@cam.ac.uk>
+
+	* libbalsa/mailbox_*.c: Use gnome_config_set_bool instead of
+	g_c_set_int. Use the actual classnames as the type when saving.
+	* src/balsa-app.c: parse the mblist color.
+	* src/balsa-app.h: Define default colors as an rgb:xxxx/xxxx/xxxx string
+	rather than as 3 numbers. Make open_mailbox field into a GList of
+	pointers to mailboxes, rename it open_mailbox_list.
+	* src/main-window.c: Use open_mailbox_list.
+	* src/main.c: --open-mailbox cmdline option needed fixing.
+	* src/save-restore.c: Save and load colors as a single string, instead of
+	as three numbers. Split global into sections. directly use some
+	gnome_config functions where appropriate. For strings pass
+	defaults in a key=default rather than checking ourselves. Use bool
+	types where appropriate.
+
 2000-09-09  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/server.[hc]: load configuration on its own.

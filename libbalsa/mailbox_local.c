@@ -300,7 +300,7 @@ static void libbalsa_mailbox_local_check (LibBalsaMailbox *mailbox)
 
 static void libbalsa_mailbox_local_save_conf (LibBalsaMailbox *mailbox)
 {
-    gnome_config_private_set_string ("type", "local");
+    gnome_config_private_set_string ("type", "LibBalsaMailboxLocal");
     gnome_config_private_set_string ("name", mailbox->name);
     gnome_config_private_set_string ("path", 
 				     LIBBALSA_MAILBOX_LOCAL (mailbox)->path);

@@ -151,9 +151,7 @@ balsa_app_init (void)
   balsa_app.visual = NULL;
   balsa_app.colormap = NULL;
 
-  balsa_app.mblist_unread_color.red = MBLIST_UNREAD_COLOR_RED;
-  balsa_app.mblist_unread_color.blue = MBLIST_UNREAD_COLOR_BLUE;
-  balsa_app.mblist_unread_color.green = MBLIST_UNREAD_COLOR_GREEN;
+  gdk_color_parse(MBLIST_UNREAD_COLOR, &balsa_app.mblist_unread_color);
 
   /* arp */
   balsa_app.quote_str = NULL;

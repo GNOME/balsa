@@ -34,13 +34,22 @@
 #include "save-restore.h"
 #include "quote-color.h"
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 static gchar * MboxSectionPrefix = "mailbox-";
 
 static gint config_mailboxes_init (void);
 static gint config_global_load (void);
 static gint config_mailbox_init (const gchar * key);
 static gchar* config_mailbox_get_free_pkey (void);
+
+static gchar **mailbox_list_to_vector(GList *mailbox_list);
+static void save_color(gchar *key, GdkColor *color);
+static void load_color(gchar *key, GdkColor *color);
+
+static void config_address_books_load(void);
+static void config_address_books_save(void);
+
+static void config_identities_load(void);
+static void config_identities_save(void);
 
 gint
 config_load(void) {
@@ -56,14 +65,6 @@ static gint d_get_gint (const gchar * key, gint def_val)
   return def ? def_val : res;
 }
 
-static gchar* d_get_string (const gchar * key, const gchar * def_val)
-{
-  gint def;
-  gchar* res = gnome_config_private_get_string_with_default(key, &def);
-  return def ? g_strdup(def_val) : res;
-}
-
-#define d_set_gint(key, val) gnome_config_private_set_int((key), (val))
 #define mailbox_section_path(mbox)\
     g_strconcat("balsa/", MboxSectionPrefix, (mbox)->pkey, "/",NULL);
 
@@ -150,7 +151,6 @@ config_mailbox_update (LibBalsaMailbox * mailbox)
 
   key = mailbox_section_path(mailbox);
   res = gnome_config_private_has_section(key);
-  gnome_config_private_clean_section(key);
   gnome_config_push_prefix(key);
   libbalsa_mailbox_save_config(mailbox);
   gnome_config_pop_prefix();
@@ -168,7 +168,6 @@ config_mailboxes_init (void)
   int pref_len =   strlen(MboxSectionPrefix);
 
   iterator = gnome_config_private_init_iterator_sections("balsa");
-  g_print("config_mailboxes_init\n");
   while( (iterator = gnome_config_iterator_next(iterator, &key, &val)) ) {
     if(strncmp(key, MboxSectionPrefix, pref_len) == 0) {
       tmp = g_strconcat("balsa/", key, "/",NULL);
@@ -180,32 +179,6 @@ config_mailboxes_init (void)
   }
   return TRUE; /* hm... check_basic_mailboxes? */
 }				/* config_mailboxes_init */
-
-#if 0
-static gboolean
-get_raw_imap_data(gchar ** username, gchar **passwd, 
-                  gchar ** server,  gint * port, gchar **path)
-{
-    gchar *field;
-    if ((field =  gnome_config_private_get_string("Username")) == NULL)
-        return FALSE;
-    else *username = g_strdup(field);
-
-    if( (field = gnome_config_private_get_string ("Password")) != NULL)
-      *passwd = field; /* rot (field); */
-    else *passwd = NULL;
-    if ((field = gnome_config_private_get_string("Server")) == NULL)
-        return FALSE;
-    else *server = g_strdup(field);
-    *port = d_get_gint ("Port", 143);
-
-    if( (field = gnome_config_private_get_string ("Path")) == NULL)
-        return FALSE;
-    else *path = g_strdup(field);
-
-    return TRUE;
-}
-#endif
 
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
@@ -233,7 +206,7 @@ config_mailbox_init (const gchar * key)
     mailbox_name = g_strdup ("Friendly Mailbox Name");
 
   /* Now grab the mailbox-type-specific fields */
-  if (!strcasecmp (type, "local"))	/* Local mailbox */
+  if (!strcasecmp (type, "LibBalsaMailboxLocal"))	/* Local mailbox */
     {
       gchar *path;
 
@@ -250,7 +223,7 @@ config_mailbox_init (const gchar * key)
       mailbox->name = mailbox_name;
 
     }
-  else if (!strcasecmp (type, "POP3"))	/* POP3 mailbox */
+  else if (!strcasecmp (type, "LibBalsaMailboxPop3"))	/* POP3 mailbox */
     {
       LibBalsaServer *server;
       mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_pop3_new ());
@@ -262,16 +235,16 @@ config_mailbox_init (const gchar * key)
       if(!libbalsa_server_load_conf(server, 110))
 	return FALSE;
 
-      LIBBALSA_MAILBOX_POP3 (mailbox)->check = d_get_gint ("Check",FALSE);
+      LIBBALSA_MAILBOX_POP3 (mailbox)->check = gnome_config_private_get_bool ("Check=false");
       LIBBALSA_MAILBOX_POP3 (mailbox)->delete_from_server =
-	d_get_gint ("Delete", FALSE);
+	gnome_config_private_get_bool ("Delete=false");
 
       if ((field =  gnome_config_private_get_string ("LastUID")) == NULL)
 	LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = NULL;
       else
 	LIBBALSA_MAILBOX_POP3 (mailbox)->last_popped_uid = g_strdup (field);
 
-      LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop = d_get_gint ("Apop", FALSE);
+      LIBBALSA_MAILBOX_POP3 (mailbox)->use_apop = gnome_config_private_get_bool ("Apop=false");
 
       balsa_app.inbox_input =
 	g_list_append (balsa_app.inbox_input, mailbox);
@@ -279,7 +252,7 @@ config_mailbox_init (const gchar * key)
       mailbox->pkey = g_strdup(key);
       return TRUE; /* Don't put POP mailbox in mailbox nodes */
     }
-  else if (!strcasecmp (type, "IMAP"))	/* IMAP Mailbox */
+  else if (!strcasecmp (type, "LibBalsaMailboxImap"))	/* IMAP Mailbox */
     {
       LibBalsaMailboxImap * m;
       LibBalsaServer *s;
@@ -296,7 +269,7 @@ config_mailbox_init (const gchar * key)
 	return FALSE;
       }
 
-      path = d_get_string("Path", "INBOX");
+      path = gnome_config_private_get_string("Path=INBOX");
       libbalsa_mailbox_imap_set_path(m, path);
       gtk_signal_connect(GTK_OBJECT(s), "get-password", 
 			 GTK_SIGNAL_FUNC(ask_password), m);
@@ -352,239 +325,188 @@ config_mailbox_init (const gchar * key)
 static gint
 config_global_load (void)
 {
-  gchar *field;
+  gchar **open_mailbox_vector;
+  gint open_mailbox_count;
 
-  gnome_config_push_prefix("balsa/globals/");
+  config_address_books_load();
+  config_identities_load();
 
-  /* user's real name */
-  g_free (balsa_app.address->personal);
-  balsa_app.address->personal = gnome_config_private_get_string("RealName");
+  /* Section for the balsa_information() settings... */
+  gnome_config_push_prefix("balsa/InformationMessages/");
 
-  /* user's email address */
-  g_free (balsa_app.address->mailbox);
-  balsa_app.address->mailbox = gnome_config_private_get_string("Email");
+  balsa_app.information_message = d_get_gint ("ShowInformationMessages", BALSA_INFORMATION_SHOW_NONE);
+  balsa_app.warning_message = d_get_gint ("ShowWarningMessages", BALSA_INFORMATION_SHOW_LIST);
+  balsa_app.error_message = d_get_gint ("ShowErrorMessages", BALSA_INFORMATION_SHOW_DIALOG);
+  balsa_app.debug_message = d_get_gint ("ShowDebugMessages", BALSA_INFORMATION_SHOW_NONE);
 
-  /* users's replyto address */
-  g_free (balsa_app.replyto);
-  balsa_app.replyto =  gnome_config_private_get_string("ReplyTo");
+  gnome_config_pop_prefix();
 
-  /* users's domain */
-  g_free (balsa_app.domain);
-  balsa_app.domain = gnome_config_private_get_string("Domain");
+  /* Section for geometry ... */
+  gnome_config_push_prefix("balsa/Geometry/");
 
-  /* bcc field for outgoing mails; optional */
-  g_free (balsa_app.bcc);
-  balsa_app.bcc = gnome_config_private_get_string("Bcc");
+  /* ... column width settings */
+  balsa_app.mblist_name_width      = d_get_gint ("MailboxListNameWidth", MBNAME_DEFAULT_WIDTH);
+  balsa_app.mblist_newmsg_width    = d_get_gint ("MailboxListNewMsgWidth", NEWMSGCOUNT_DEFAULT_WIDTH);
+  balsa_app.mblist_totalmsg_width  = d_get_gint ("MailboxListTotalMsgWidth", TOTALMSGCOUNT_DEFAULT_WIDTH);
+  balsa_app.index_num_width        = d_get_gint ("IndexNumWidth", NUM_DEFAULT_WIDTH);
+  balsa_app.index_status_width     = d_get_gint ("IndexStatusWidth", STATUS_DEFAULT_WIDTH);
+  balsa_app.index_attachment_width = d_get_gint ("IndexAttachmentWidth", ATTACHMENT_DEFAULT_WIDTH);
+  balsa_app.index_from_width       = d_get_gint ("IndexFromWidth",FROM_DEFAULT_WIDTH);
+  balsa_app.index_subject_width    = d_get_gint ("IndexSubjectWidth", SUBJECT_DEFAULT_WIDTH);
+  balsa_app.index_date_width       = d_get_gint ("IndexDateWidth",DATE_DEFAULT_WIDTH);
+
+  /* ... window sizes */
+  balsa_app.mw_width     = gnome_config_private_get_int ("MainWindowWidth=640");
+  balsa_app.mw_height    = gnome_config_private_get_int ("MainWindowHeight=480");
+  balsa_app.mblist_width = gnome_config_private_get_int ("MailboxListWidth=100");
+  /* FIXME: PKGW: why comment this out? Breaks my Transfer context menu. */
+  if (balsa_app.mblist_width < 100)
+      balsa_app.mblist_width = 170;
+
+  balsa_app.notebook_height = gnome_config_private_get_int ("NotebookHeight=170");
+  /*FIXME: Why is this here?? */
+  if (balsa_app.notebook_height < 100)
+    balsa_app.notebook_height = 200;
+
+  gnome_config_pop_prefix();
+
+  /* Message View options ... */
+  gnome_config_push_prefix("balsa/MessageDisplay/");
+
+  /* ... How we format dates */
+  g_free(balsa_app.date_string);
+  balsa_app.date_string = gnome_config_private_get_string ("DateFormat=" DEFAULT_DATE_FORMAT);
+
+  /* ... Headers to show */
+  balsa_app.shown_headers    = d_get_gint ("ShownHeaders", HEADERS_SELECTED);
+
+  g_free(balsa_app.selected_headers);
+  balsa_app.selected_headers = gnome_config_private_get_string("SelectedHeaders=" DEFAULT_SELECTED_HDRS);
+  g_strdown(balsa_app.selected_headers);
+
+  /* ... Quote colouring */
+  g_free (balsa_app.quote_regex);
+  balsa_app.quote_regex = gnome_config_private_get_string("QuoteRegex=" DEFAULT_QUOTE_REGEX);
+  load_color("QuotedColorStart=" DEFAULT_QUOTED_COLOR, &balsa_app.quoted_color[0]);
+  load_color("QuotedColorEnd=" DEFAULT_QUOTED_COLOR, &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1]);
+  make_gradient (balsa_app.quoted_color, 0, MAX_QUOTED_COLOR - 1);
+
+  /* ... font used to display messages */
+  g_free(balsa_app.message_font);
+  balsa_app.message_font = gnome_config_private_get_string("MessageFont=" DEFAULT_MESSAGE_FONT);
+  
+  /* ... wrap words */
+  balsa_app.browse_wrap   = gnome_config_private_get_bool ("WordWrap=true");
+
+  gnome_config_pop_prefix();
+
+  /* Interface Options ... */
+  gnome_config_push_prefix("balsa/Interface/");
+
+  /* ... interface elements to show */
+  balsa_app.previewpane = gnome_config_private_get_bool ("ShowPreviewPane=true");
+  balsa_app.show_mblist = gnome_config_private_get_bool ("ShowMailboxList=true");
+  balsa_app.show_notebook_tabs = gnome_config_private_get_bool ("ShowTabs=false");
+
+  /* ... style */
+  balsa_app.toolbar_style = d_get_gint("ToolbarStyle",GTK_TOOLBAR_BOTH);
+  /* ... Progress Window Dialog */
+  balsa_app.pwindow_option = d_get_gint ("ProgressWindow", WHILERETR);
+
+  gnome_config_pop_prefix();
+
+  /* Printing options ... */
+  gnome_config_push_prefix("balsa/Printing/");
+
+  g_free(balsa_app.PrintCommand.PrintCommand);
+  balsa_app.PrintCommand.PrintCommand = gnome_config_private_get_string("PrintCommand=a2ps -d -q %s");
+  balsa_app.PrintCommand.linesize = d_get_gint ("PrintLinesize", DEFAULT_LINESIZE);
+  balsa_app.PrintCommand.breakline = gnome_config_private_get_bool ("PrintBreakline=false");
+
+  gnome_config_pop_prefix();
+
+  /* Spelling options ... */
+  gnome_config_push_prefix("balsa/Spelling/");
+
+  balsa_app.module = d_get_gint ("PspellModule", DEFAULT_PSPELL_MODULE);
+  balsa_app.suggestion_mode = d_get_gint ("PspellSuggestMode", DEFAULT_PSPELL_SUGGEST_MODE);
+  balsa_app.ignore_size = d_get_gint ("PspellIgnoreSize", DEFAULT_PSPELL_IGNORE_SIZE);
+
+  gnome_config_pop_prefix();
+
+  /* Mailbox checking ... */
+  gnome_config_push_prefix("balsa/MailboxList/");
+
+  /* ... color */
+  load_color("UnreadColor=" MBLIST_UNREAD_COLOR, &balsa_app.mblist_unread_color);
+  /* ... show mailbox content info */
+  balsa_app.mblist_show_mb_content_info = gnome_config_private_get_bool ("ShowMailboxContentInfo=true");
+
+  gnome_config_pop_prefix();
+      
+  /* Maibox checking options ... */
+  gnome_config_push_prefix ("balsa/MailboxChecking/");
+
+  balsa_app.check_mail_upon_startup = gnome_config_private_get_bool ("OnStartup=false");
+  balsa_app.check_mail_auto = gnome_config_private_get_bool ("Auto=false");
+  balsa_app.check_mail_timer = gnome_config_private_get_int ("AutoDelay=10");
+  if (balsa_app.check_mail_timer < 1 )
+    balsa_app.check_mail_timer = 10;
+  if( balsa_app.check_mail_auto )
+    update_timer(TRUE, balsa_app.check_mail_timer );
+
+  gnome_config_pop_prefix();
+
+  /* Sending options ... */
+  gnome_config_push_prefix("balsa/Sending/");
+
+  /* ... SMTP server */
+  balsa_app.smtp_server = gnome_config_private_get_string("SMTPServer");
+  balsa_app.smtp        = gnome_config_private_get_bool("SMTP=false");
+
+  /* ... outgoing mail */
+  balsa_app.encoding_style = gnome_config_private_get_int("EncodingStyle=2");
+  g_free(balsa_app.charset);
+  balsa_app.charset = gnome_config_private_get_string("Charset=" DEFAULT_CHARSET);
+  libbalsa_set_charset (balsa_app.charset);
+  balsa_app.wordwrap   = gnome_config_private_get_bool ("WordWrap=true");
+  balsa_app.wraplength = gnome_config_private_get_int ("WrapLength=75");
+  if (balsa_app.wraplength < 40)
+    balsa_app.wraplength = 40;
+
+  gnome_config_pop_prefix();
+
+  /* Compose window ... */
+  gnome_config_push_prefix("balsa/Compose/");
+
+  g_free (balsa_app.quote_str);
+  balsa_app.quote_str = gnome_config_private_get_string("QuoteString=> ");
+  g_free (balsa_app.compose_headers);
+  balsa_app.compose_headers = gnome_config_private_get_string ("ComposeHeaders=to subject cc");
+  
+  gnome_config_pop_prefix();
+
+  /* Global config options ... */
+  gnome_config_push_prefix("balsa/Globals/");
 
   /* directory */
   g_free (balsa_app.local_mail_directory);
   balsa_app.local_mail_directory = gnome_config_private_get_string("MailDir");
 
-  /* signature file path */
-  g_free (balsa_app.signature_path);
-  if ((balsa_app.signature_path = 
-       gnome_config_private_get_string("SignaturePath")) == NULL)  {
-      balsa_app.signature_path = g_malloc (strlen (g_get_home_dir ()) + 12);
-      sprintf (balsa_app.signature_path, "%s/.signature", g_get_home_dir ());
-  }
-
-  balsa_app.sig_sending     = d_get_gint ("SigSending",   TRUE);
-  balsa_app.sig_whenreply   = d_get_gint ("SigReply",     TRUE);
-  balsa_app.sig_whenforward = d_get_gint ("SigForward",   TRUE);
-  balsa_app.sig_separator   = d_get_gint ("SigSeparator", TRUE);
-
-  balsa_app.information_message = d_get_gint ("ShowInformationMsgs", 
-					      BALSA_INFORMATION_SHOW_NONE);
-  balsa_app.warning_message = d_get_gint ("ShowWarningMsgs", 
-					  BALSA_INFORMATION_SHOW_LIST);
-  balsa_app.error_message = d_get_gint ("ShowErrorMsgs", 
-					BALSA_INFORMATION_SHOW_DIALOG);
-  balsa_app.debug_message = d_get_gint ("ShowDebugMsgs", 
-					BALSA_INFORMATION_SHOW_NONE);
-
-  /* smtp server */
-  balsa_app.smtp_server = gnome_config_private_get_string("SMTPServer");
-  balsa_app.smtp        = d_get_gint("SMTP", FALSE);
- 
-  /* Check mail timer */
-  balsa_app.check_mail_auto =  d_get_gint ("CheckMailAuto", FALSE);
-  balsa_app.check_mail_timer = d_get_gint ("CheckMailMinutes", 10);
-
-  if (balsa_app.check_mail_timer < 1 )
-    balsa_app.check_mail_timer = 10;
-
-  if( balsa_app.check_mail_auto )
-    update_timer(TRUE, balsa_app.check_mail_timer );
-
-  /* Word Wrap */
-  balsa_app.wordwrap   = d_get_gint ("WordWrap",TRUE);
-  balsa_app.wraplength = d_get_gint ("WrapLength",75);
-
-  if (balsa_app.wraplength < 40)
-    balsa_app.wraplength = 40;
-
-  balsa_app.browse_wrap   = d_get_gint ("BrowseWrap",   TRUE);
-  balsa_app.shown_headers = d_get_gint ("ShownHeaders", HEADERS_SELECTED);
-
-  balsa_app.selected_headers = d_get_string("SelectedHeaders",
-					    DEFAULT_SELECTED_HDRS);
-  g_strdown(balsa_app.selected_headers);
-
-  balsa_app.show_mblist        = d_get_gint ("ShowMbList",TRUE);
-  balsa_app.show_notebook_tabs = d_get_gint ("ShowTabs",  FALSE);
-
-  /* toolbar style */
-  balsa_app.toolbar_style =d_get_gint("ToolbarStyle",GTK_TOOLBAR_BOTH);
-
-  /* Progress Window Dialog */
-  balsa_app.pwindow_option = d_get_gint ("ProgressWnd", WHILERETR);
-
-  /* use the preview pane */
-  balsa_app.previewpane = d_get_gint ("UsePreviewPane",TRUE);
-  
-  /* column width settings */
-  balsa_app.mblist_name_width = d_get_gint ("MBListNameWidth",
-					    MBNAME_DEFAULT_WIDTH);
-  balsa_app.mblist_newmsg_width = d_get_gint ("MBListNewMsgWidth",
-					      NEWMSGCOUNT_DEFAULT_WIDTH);
-  balsa_app.mblist_totalmsg_width = d_get_gint ("MBListTotalMsgWidth",
-						TOTALMSGCOUNT_DEFAULT_WIDTH);
-
-  /* show mailbox content info */
-  balsa_app.mblist_show_mb_content_info = d_get_gint ("ShowMailboxContentInfo",
-						      TRUE);
-
   /* debugging enabled */
-  balsa_app.debug = d_get_gint ("Debug",FALSE);
+  balsa_app.debug = gnome_config_private_get_bool ("Debug=false");
 
-  /* window sizes */
-  balsa_app.mw_width     = d_get_gint ("MainWindowWidth",640);
-  balsa_app.mw_height    = d_get_gint ("MainWindowHeight",480);
-  balsa_app.mblist_width = d_get_gint ("MailboxListWidth",100);
-
-  /* restore column sizes from previous session */
-  balsa_app.index_num_width = d_get_gint ("IndexNumWidth",NUM_DEFAULT_WIDTH);
-  balsa_app.index_status_width = d_get_gint ("IndexStatusWidth",
-					     STATUS_DEFAULT_WIDTH);
-  balsa_app.index_attachment_width = d_get_gint ("IndexAttachmentWidth",
-						 ATTACHMENT_DEFAULT_WIDTH);
-  balsa_app.index_from_width = d_get_gint("IndexFromWidth",FROM_DEFAULT_WIDTH);
-  balsa_app.index_subject_width = d_get_gint ("IndexSubjectWidth",
-					      SUBJECT_DEFAULT_WIDTH);
-  balsa_app.index_date_width = d_get_gint("IndexDateWidth",DATE_DEFAULT_WIDTH);
-
-  /* PKGW: why comment this out? Breaks my Transfer context menu. */
-  if (balsa_app.mblist_width < 100)
-      balsa_app.mblist_width = 170;
-
-  balsa_app.notebook_height = d_get_gint ("NotebookHeight",170);
-  /* FIXME this can be removed later */
-  /* PKGW see above */
-  if (balsa_app.notebook_height < 100)
-      balsa_app.notebook_height = 200;
-
-  /* arp --- LeadinStr for "reply to" leadin. */
-  g_free (balsa_app.quote_str);
-  balsa_app.quote_str = d_get_string("LeadinStr", "> ");
-
-  /* regular expression used in determining quoted text */
-  g_free (balsa_app.quote_regex);
-  balsa_app.quote_regex = d_get_string("QuoteRegex", DEFAULT_QUOTE_REGEX);
-
-  /* font used to display messages */
-  g_free(balsa_app.message_font);
-  balsa_app.message_font = d_get_string("MessageFont", DEFAULT_MESSAGE_FONT);
-
-  /* more here */
-  g_free(balsa_app.charset);
-  balsa_app.charset = d_get_string("Charset", DEFAULT_CHARSET);
-  libbalsa_set_charset (balsa_app.charset);
-  balsa_app.encoding_style = d_get_gint("EncodingStyle", 2);
-
-  /* shown headers in the compose window */
-  g_free (balsa_app.compose_headers);
-  balsa_app.compose_headers = d_get_string ("ComposeHeaders", "to subject cc");
-
-  g_free(balsa_app.PrintCommand.PrintCommand);
-  balsa_app.PrintCommand.PrintCommand = d_get_string("PrintCommand", 
-						     "a2ps -d -q %s");
-  balsa_app.PrintCommand.linesize = d_get_gint ("PrintLinesize",
-						DEFAULT_LINESIZE);
-  balsa_app.PrintCommand.breakline = d_get_gint ("PrintBreakline", FALSE);
-  balsa_app.check_mail_upon_startup = d_get_gint("CheckMailUponStartup",FALSE);
-  balsa_app.remember_open_mboxes =  d_get_gint ("RememberOpenMailboxes",FALSE);
-
-  if ( balsa_app.remember_open_mboxes &&
-       ( field = gnome_config_private_get_string ("OpenMailboxes")) != NULL &&
-       strlen(field)>0 ) {
-    if(balsa_app.open_mailbox) {
-      gchar * str = g_strconcat(balsa_app.open_mailbox, ";", field,NULL);
-      g_free(balsa_app.open_mailbox);
-      balsa_app.open_mailbox = str;
-    } else balsa_app.open_mailbox = g_strdup(field);
+  balsa_app.remember_open_mboxes =  gnome_config_private_get_bool ("RememberOpenMailboxes=false");
+  gnome_config_private_get_vector("OpenMailboxes", &open_mailbox_count, &open_mailbox_vector);
+  if ( balsa_app.remember_open_mboxes && open_mailbox_count > 0 ) {
+    /* FIXME: Open the mailboxes.... */
   }
+  g_strfreev(open_mailbox_vector);
 
-  balsa_app.empty_trash_on_exit = d_get_gint ("EmptyTrash", FALSE);
+  balsa_app.empty_trash_on_exit = gnome_config_private_get_bool("EmptyTrash=false");
+  balsa_app.ab_dist_list_mode = gnome_config_private_get_bool("AddressBookDistMode=false");
+  balsa_app.alias_find_flag = gnome_config_private_get_bool ("AliasFlag=false");
 
-  /* Here we load the unread mailbox colour for the mailbox list */
-  balsa_app.mblist_unread_color.red = d_get_gint ("MBListUnreadColorRed",
-						  MBLIST_UNREAD_COLOR_RED);
-  balsa_app.mblist_unread_color.green = d_get_gint ("MBListUnreadColorGreen",
-						    MBLIST_UNREAD_COLOR_GREEN);
-  balsa_app.mblist_unread_color.blue = d_get_gint ("MBListUnreadColorBlue",
-						   MBLIST_UNREAD_COLOR_BLUE);
-
-  /*
-   * Here we load the quoted text colour for the mailbox list.
-   * We load two colours, and recalculate the gradient.
-   */
-  balsa_app.quoted_color[0].red = d_get_gint ("QuotedColorStartRed",
-					      QUOTED_COLOR_RED);
-  balsa_app.quoted_color[0].green = d_get_gint ("QuotedColorStartGreen",
-						QUOTED_COLOR_GREEN);
-  balsa_app.quoted_color[0].blue = d_get_gint ("QuotedColorStartBlue",
-					       QUOTED_COLOR_BLUE);
-
-  balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].red = 
-    d_get_gint ("QuotedColorEndRed",QUOTED_COLOR_RED);
-  balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].green = 
-    d_get_gint ("QuotedColorEndGreen",QUOTED_COLOR_GREEN);
-  balsa_app.quoted_color[MAX_QUOTED_COLOR - 1].blue = 
-    d_get_gint ("QuotedColorEndBlue",QUOTED_COLOR_BLUE);
-  make_gradient (balsa_app.quoted_color, 0, MAX_QUOTED_COLOR - 1);
-
-
-  /* address book location */
-  balsa_app.ab_dist_list_mode =  d_get_gint ("AddressBookDistMode", FALSE);
-
-  g_free (balsa_app.ab_location);
-  balsa_app.ab_location = d_get_string("AddressBookFile", 
-				       DEFAULT_ADDRESS_BOOK_PATH);
-  balsa_app.alias_find_flag = d_get_gint ("AliasFlag",FALSE);
-
-  /* spell checking */
-  balsa_app.module = d_get_gint ("PspellModule", DEFAULT_PSPELL_MODULE);
-  balsa_app.suggestion_mode = d_get_gint ("PspellSuggestMode", 
-                                          DEFAULT_PSPELL_SUGGEST_MODE);
-  balsa_app.ignore_size = d_get_gint ("PspellIgnoreSize", 
-                                      DEFAULT_PSPELL_IGNORE_SIZE);
-
-
-  /* How we format dates */
-  g_free(balsa_app.date_string);
-  balsa_app.date_string = d_get_string("DateFormat", DEFAULT_DATE_FORMAT);
-
-#ifdef ENABLE_LDAP
-  /*
-   * LDAP can set a host, and a base Domain name.
-   */
-  g_free (balsa_app.ldap_host);
-  balsa_app.ldap_host = gnome_config_private_get_string("LDAPHost");
-
-  g_free (balsa_app.ldap_base_dn);
-  balsa_app.ldap_base_dn =gnome_config_private_get_string("BaseDN");
-#endif /* ENABLE_LDAP */
-  
   gnome_config_pop_prefix();
   return TRUE;
 }				/* config_global_load */
@@ -592,153 +514,139 @@ config_global_load (void)
 gint
 config_save (void)
 {
+  gchar **open_mailboxes_vector;
 
-  /* Out with the old */
-  gnome_config_private_clean_section("balsa/globals");
-  gnome_config_push_prefix("balsa/globals/");
+  config_address_books_save();
+  config_identities_save();
 
-  /* In with the new */
-  gnome_config_private_set_string ("RealName", balsa_app.address->personal);
-  if (balsa_app.address->mailbox != NULL)
-    gnome_config_private_set_string("Email", balsa_app.address->mailbox);
-  if (balsa_app.replyto != NULL)
-    gnome_config_private_set_string("ReplyTo", balsa_app.replyto);
-  if (balsa_app.domain != NULL)
-    gnome_config_private_set_string("Domain", balsa_app.domain);
-  if (balsa_app.bcc != NULL)
-    gnome_config_private_set_string("Bcc", balsa_app.bcc);
+  /* Section for the balsa_information() settings... */
+  gnome_config_push_prefix("balsa/InformationMessages/");
+  gnome_config_private_set_int ("ShowInformationMessages", balsa_app.information_message );
+  gnome_config_private_set_int ("ShowWarningMessages", balsa_app.warning_message );
+  gnome_config_private_set_int ("ShowErrorMessages", balsa_app.error_message );
+  gnome_config_private_set_int ("ShowDebugMessages", balsa_app.debug_message );
+  gnome_config_pop_prefix();
 
-  if (balsa_app.local_mail_directory != NULL)
-    gnome_config_private_set_string("MailDir", balsa_app.local_mail_directory);
+  /* Section for geometry ... */ /* FIXME: Saving window sizes is the WM's job?? */
+  gnome_config_push_prefix("balsa/Geometry/");
 
-  if (balsa_app.smtp) d_set_gint ("SMTP", balsa_app.smtp);
-  if (balsa_app.smtp_server != NULL)
-    gnome_config_private_set_string("SMTPServer", balsa_app.smtp_server);
+  /* ... column width settings */
+  gnome_config_private_set_int ("MailboxListNameWidth",   balsa_app.mblist_name_width);
+  gnome_config_private_set_int ("MailboxListNewMsgWidth", balsa_app.mblist_newmsg_width);
+  gnome_config_private_set_int ("MailboxListTotalMsgWidth",balsa_app.mblist_totalmsg_width);
+  gnome_config_private_set_int ("IndexNumWidth",    balsa_app.index_num_width);
+  gnome_config_private_set_int ("IndexStatusWidth", balsa_app.index_status_width);
+  gnome_config_private_set_int ("IndexAttachmentWidth", balsa_app.index_attachment_width);
+  gnome_config_private_set_int ("IndexFromWidth",    balsa_app.index_from_width);
+  gnome_config_private_set_int ("IndexSubjectWidth", balsa_app.index_subject_width);
+  gnome_config_private_set_int ("IndexDateWidth",    balsa_app.index_date_width);
+  gnome_config_private_set_int ("MainWindowWidth",  balsa_app.mw_width);
+  gnome_config_private_set_int ("MainWindowHeight", balsa_app.mw_height);
+  gnome_config_private_set_int ("MailboxListWidth", balsa_app.mblist_width);
+  gnome_config_private_set_int ("NotebookHeight",   balsa_app.notebook_height);
 
-  if (balsa_app.signature_path != NULL)
-    gnome_config_private_set_string("SignaturePath", balsa_app.signature_path);
+  gnome_config_pop_prefix();
 
-  d_set_gint ("SigSending", balsa_app.sig_sending);
-  d_set_gint ("SigForward", balsa_app.sig_whenforward);
-  d_set_gint ("SigReply",   balsa_app.sig_whenreply);
-  d_set_gint ("SigSeparator", balsa_app.sig_separator);
+  /* Message View options ... */
+  gnome_config_push_prefix("balsa/MessageDisplay/");
 
-  d_set_gint ("ShowInformationMsgs", balsa_app.information_message );
-  d_set_gint ("ShowWarningMsgs", balsa_app.warning_message );
-  d_set_gint ("ShowErrorMsgs", balsa_app.error_message );
-  d_set_gint ("ShowDebugMsgs", balsa_app.debug_message );
+  gnome_config_private_set_string ("DateFormat", balsa_app.date_string);
+  gnome_config_private_set_int ("ShownHeaders", balsa_app.shown_headers );
+  gnome_config_private_set_string ("SelectedHeaders", balsa_app.selected_headers);
+  gnome_config_private_set_string ("QuoteRegex", balsa_app.quote_regex);
+  gnome_config_private_set_string ("MessageFont", balsa_app.message_font);
+  gnome_config_private_set_bool ("WordWrap", balsa_app.browse_wrap );
+  save_color("QuotedColorStart", &balsa_app.quoted_color[0]);
+  save_color("QuotedColorEnd", &balsa_app.quoted_color[MAX_QUOTED_COLOR - 1]);
 
-  d_set_gint ("ToolbarStyle", balsa_app.toolbar_style);
-  d_set_gint ("ProgressWnd", balsa_app.pwindow_option);
-  d_set_gint ("Debug", balsa_app.debug);
-  d_set_gint ("UsePreviewPane", balsa_app.previewpane);
+  gnome_config_pop_prefix();
 
-  d_set_gint ("MBListNameWidth",   balsa_app.mblist_name_width);
-  d_set_gint ("MBListNewMsgWidth", balsa_app.mblist_newmsg_width);
-  d_set_gint ("MBListTotalMsgWidth",balsa_app.mblist_totalmsg_width);
-  d_set_gint ("ShowMailboxContentInfo", balsa_app.mblist_show_mb_content_info);
+  /* Interface Options ... */
+  gnome_config_push_prefix("balsa/Interface/");
+
+  gnome_config_private_set_bool ("ShowPreviewPane", balsa_app.previewpane);
+  gnome_config_private_set_bool ("ShowMailboxList", balsa_app.show_mblist);
+  gnome_config_private_set_bool ("ShowTabs", balsa_app.show_notebook_tabs);
+  gnome_config_private_set_int ("ToolbarStyle", balsa_app.toolbar_style);
+  gnome_config_private_set_int ("ProgressWindow", balsa_app.pwindow_option);
+
+  gnome_config_pop_prefix();
+
+  /* Printing options ... */
+  gnome_config_push_prefix("balsa/Printing/");
+
+  gnome_config_private_set_string("PrintCommand", balsa_app.PrintCommand.PrintCommand);
+  gnome_config_private_set_int ("PrintLinesize", balsa_app.PrintCommand.linesize);
+  gnome_config_private_set_bool ("PrintBreakline", balsa_app.PrintCommand.breakline);
+
+  gnome_config_pop_prefix();
+
+  /* Spelling options ... */
+  gnome_config_push_prefix("balsa/Spelling/");
+
+  gnome_config_private_set_int ("PspellModule", balsa_app.module);
+  gnome_config_private_set_int ("PspellSuggestMode", balsa_app.suggestion_mode);
+  gnome_config_private_set_int ("PspellIgnoreSize", balsa_app.ignore_size);
+
+  gnome_config_pop_prefix();
+
+  /* Mailbox list options */
+  gnome_config_push_prefix("balsa/MailboxList/");
+
+  save_color("UnreadColor", &balsa_app.mblist_unread_color);
+  gnome_config_private_set_bool ("ShowMailboxContentInfo", balsa_app.mblist_show_mb_content_info);
+
+  gnome_config_pop_prefix();
+
+  /* Maibox checking options ... */
+  gnome_config_push_prefix ("balsa/MailboxChecking/");
+
+  gnome_config_private_set_bool ("OnStartup", balsa_app.check_mail_upon_startup);
+  gnome_config_private_set_bool ("Auto", balsa_app.check_mail_auto);
+  gnome_config_private_set_int ("AutoDelay",  balsa_app.check_mail_timer);
+
+  gnome_config_pop_prefix();
+
+  /* Sending options ... */
+  gnome_config_push_prefix("balsa/Sending/");
+
+  gnome_config_private_set_bool("SMTP", balsa_app.smtp);
+  gnome_config_private_set_string("SMTPServer", balsa_app.smtp_server);
+  gnome_config_private_set_int ("EncodingStyle",balsa_app.encoding_style);
+  gnome_config_private_set_string ("Charset", balsa_app.charset);
+  gnome_config_private_set_bool ("WordWrap", balsa_app.wordwrap );
+  gnome_config_private_set_int ("WrapLength", balsa_app.wraplength);
+
+  gnome_config_pop_prefix();
+
+  /* Compose window ... */
+  gnome_config_push_prefix("balsa/Compose/");
+
+  gnome_config_private_set_string("ComposeHeaders", balsa_app.compose_headers);
+  gnome_config_private_set_string("QuoteString", balsa_app.quote_str);
+
+  gnome_config_pop_prefix();
+
+  /* Global config options ... */
+  gnome_config_push_prefix("balsa/Globals/");
+
+  gnome_config_private_set_string("MailDir", balsa_app.local_mail_directory);
+
+  gnome_config_private_set_bool ("Debug", balsa_app.debug);
+
+  open_mailboxes_vector = mailbox_list_to_vector(balsa_app.open_mailbox_list);
+  gnome_config_private_set_vector("OpenMailboxes", g_list_length(balsa_app.open_mailbox_list), 
+				  (const char **)open_mailboxes_vector);
+  g_strfreev(open_mailboxes_vector);
+
+  gnome_config_private_set_bool ("RememberOpenMailboxes", balsa_app.remember_open_mboxes); 
+  gnome_config_private_set_bool ("EmptyTrash",            balsa_app.empty_trash_on_exit);
   
-  d_set_gint ("MainWindowWidth",  balsa_app.mw_width);
-  d_set_gint ("MainWindowHeight", balsa_app.mw_height);
-  
-  d_set_gint ("MailboxListWidth", balsa_app.mblist_width);
-  d_set_gint ("NotebookHeight",   balsa_app.notebook_height);
-  d_set_gint ("IndexNumWidth",    balsa_app.index_num_width);
-  d_set_gint ("IndexStatusWidth", balsa_app.index_status_width);
-  d_set_gint ("IndexAttachmentWidth", balsa_app.index_attachment_width);
-  
-  d_set_gint ("IndexFromWidth",    balsa_app.index_from_width);
-  d_set_gint ("IndexSubjectWidth", balsa_app.index_subject_width);
-  d_set_gint ("IndexDateWidth",    balsa_app.index_date_width);
-  d_set_gint ("EncodingStyle",     balsa_app.encoding_style);
-  d_set_gint ("CheckMailAuto",     balsa_app.check_mail_auto);
-  d_set_gint ("CheckMailMinutes",  balsa_app.check_mail_timer);
-  d_set_gint ("WordWrap",          balsa_app.wordwrap );
-  d_set_gint ("WrapLength",        balsa_app.wraplength);
-  d_set_gint ("BrowseWrap",        balsa_app.browse_wrap );
-  d_set_gint ("ShownHeaders",      balsa_app.shown_headers );
-
-  if(balsa_app.selected_headers)
-     gnome_config_private_set_string("SelectedHeaders", 
-				     balsa_app.selected_headers);
-
-  d_set_gint ("ShowMBList", balsa_app.show_mblist);
-  d_set_gint ("ShowTabs", balsa_app.show_notebook_tabs);
-
-  /* arp --- "LeadinStr" into cfg. */
-  if (balsa_app.quote_str)
-    gnome_config_private_set_string("LeadinStr", balsa_app.quote_str);
-
-  /* quoted text regular expression */
-  if (balsa_app.quote_regex)
-    gnome_config_private_set_string ("QuoteRegex", balsa_app.quote_regex);
-
-  /* message font */
-  if (balsa_app.message_font)
-    gnome_config_private_set_string("MessageFont", balsa_app.message_font);
-
-  /* encoding */
-  if (balsa_app.charset)
-      gnome_config_private_set_string("Charset", balsa_app.charset);
-
-  if (balsa_app.compose_headers)
-     gnome_config_private_set_string("ComposeHeaders",
-				     balsa_app.compose_headers);
-
-  if (balsa_app.PrintCommand.PrintCommand)
-      gnome_config_private_set_string("PrintCommand", 
-				      balsa_app.PrintCommand.PrintCommand);
-
-  d_set_gint ("PrintLinesize",        balsa_app.PrintCommand.linesize);
-  d_set_gint ("PrintBreakline",       balsa_app.PrintCommand.breakline);
-  d_set_gint ("CheckMailUponStartup", balsa_app.check_mail_upon_startup);
-
-  if( balsa_app.open_mailbox)
-	  gnome_config_private_set_string("OpenMailboxes", 
-					  balsa_app.open_mailbox);
-
-  d_set_gint ("RememberOpenMailboxes", balsa_app.remember_open_mboxes); 
-  d_set_gint ("EmptyTrash",            balsa_app.empty_trash_on_exit);
-  
-  d_set_gint ("MBListUnreadColorR",    balsa_app.mblist_unread_color.red);
-  d_set_gint ("MBListUnreadColorG",    balsa_app.mblist_unread_color.green);
-  d_set_gint ("MBListUnreadColorB",    balsa_app.mblist_unread_color.blue);
-
-  /*
-   * Quoted color - we only save the first and last, and recalculate
-   * the gradient when Balsa starts.
-   */
-  d_set_gint("QuotedColorStartRed",  balsa_app.quoted_color[0].red);
-  d_set_gint("QuotedColorStartGreen",balsa_app.quoted_color[0].green);
-  d_set_gint("QuotedColorStartBlue", balsa_app.quoted_color[0].blue);
-  d_set_gint("QuotedColorEndRed",    
-	     balsa_app.quoted_color[MAX_QUOTED_COLOR-1].red);
-  d_set_gint("QuotedColorEndGreen", 
-	     balsa_app.quoted_color[MAX_QUOTED_COLOR-1].green);
-  d_set_gint("QuotedColorEndBlue", 
-	     balsa_app.quoted_color[MAX_QUOTED_COLOR-1].blue);
-
   /* address book */
-  d_set_gint ("AddressBookDistMode", balsa_app.ab_dist_list_mode);
+  gnome_config_private_set_bool ("AddressBookDistMode", balsa_app.ab_dist_list_mode);
 
-  if (balsa_app.ab_location)
-    gnome_config_private_set_string("AddressBookFile", balsa_app.ab_location);
-  d_set_gint ("AliasFlag", balsa_app.alias_find_flag);
+  gnome_config_private_set_bool ("AliasFlag", balsa_app.alias_find_flag);
   
-  if(balsa_app.date_string)
-    gnome_config_private_set_string ("DateFormat", balsa_app.date_string);
-
-  /* spell checking */
-  d_set_gint ("PspellModule", balsa_app.module);
-  d_set_gint ("PspellSuggestMode", balsa_app.suggestion_mode);
-  d_set_gint ("PspellIgnoreSize", balsa_app.ignore_size);
-
-#ifdef ENABLE_LDAP
-  if (balsa_app.ldap_host)
-    gnome_config_private_set_string ("LDAPHost", balsa_app.ldap_host);
-  if (balsa_app.ldap_base_dn)
-    gnome_config_private_set_string ("BaseDN", balsa_app.ldap_base_dn);
-#endif /* ENABLE_LDAP */
 
   gnome_config_sync();
   return TRUE;
@@ -758,7 +666,6 @@ config_mailbox_get_free_pkey ()
 
   max = 0;
   while( (iterator = gnome_config_iterator_next(iterator, &key, &val)) ) {
-    printf("Trying %s\n", key);
     if(strncmp(key, MboxSectionPrefix, pref_len) == 0) {
       if(strlen(key+pref_len)>1 && (curr = atoi(key+pref_len+1)) && curr>max)
 	max = curr;
@@ -770,3 +677,150 @@ config_mailbox_get_free_pkey ()
   return name;
 }
 
+static void
+config_address_books_load(void)
+{
+  gnome_config_push_prefix("balsa/address-book-default-vcard/");
+
+  g_free (balsa_app.ab_location);
+  balsa_app.ab_location = gnome_config_private_get_string("Path=" DEFAULT_ADDRESS_BOOK_PATH);
+
+  gnome_config_pop_prefix();
+
+#ifdef ENABLE_LDAP
+  gnome_config_push_prefix("balsa/address-book-default-LDAP/");
+
+  /*
+   * LDAP can set a host, and a base Domain name.
+   */
+  g_free (balsa_app.ldap_host);
+  balsa_app.ldap_host = gnome_config_private_get_string("Host");
+
+  g_free (balsa_app.ldap_base_dn);
+  balsa_app.ldap_base_dn = gnome_config_private_get_string("BaseDN");
+
+  gnome_config_pop_prefix();
+#endif /* ENABLE_LDAP */
+
+}
+
+static void
+config_address_books_save(void)
+{
+  gnome_config_push_prefix("balsa/address-book-default-vcard/");
+
+  gnome_config_private_set_string("Type", "Vcard");
+
+  gnome_config_private_set_string("Path", balsa_app.ab_location);
+
+  gnome_config_pop_prefix();
+
+#ifdef ENABLE_LDAP
+  gnome_config_push_prefix("balsa/address-book-default-LDAP/");
+
+  gnome_config_private_set_string ("Host", balsa_app.ldap_host);
+  gnome_config_private_set_string ("BaseDN", balsa_app.ldap_base_dn);
+
+  gnome_config_pop_prefix();
+
+#endif /* ENABLE_LDAP */
+}
+
+static void
+config_identities_load(void)
+{
+  gnome_config_push_prefix("balsa/identity-default/");
+
+  /* user's real name */
+  g_free (balsa_app.address->personal);
+  balsa_app.address->personal = gnome_config_private_get_string("FullName");
+
+  /* user's email address */
+  g_free (balsa_app.address->mailbox);
+  balsa_app.address->mailbox = gnome_config_private_get_string("Address");
+
+  /* users's replyto address */
+  g_free (balsa_app.replyto);
+  balsa_app.replyto =  gnome_config_private_get_string("ReplyTo");
+
+  /* users's domain */
+  g_free (balsa_app.domain);
+  balsa_app.domain = gnome_config_private_get_string("Domain");
+
+  /* bcc field for outgoing mails; optional */
+  g_free (balsa_app.bcc);
+  balsa_app.bcc = gnome_config_private_get_string("Bcc");
+
+  /* signature file path */
+  g_free (balsa_app.signature_path);
+  balsa_app.signature_path = gnome_config_private_get_string("SignaturePath");
+  if ( balsa_app.signature_path == NULL ) {
+    balsa_app.signature_path = gnome_util_prepend_user_home(".signature");
+  }
+
+  balsa_app.sig_sending     = gnome_config_private_get_bool ("SigSending=true");
+  balsa_app.sig_whenreply   = gnome_config_private_get_bool ("SigReply=true");
+  balsa_app.sig_whenforward = gnome_config_private_get_bool ("SigForward=true");
+  balsa_app.sig_separator   = gnome_config_private_get_bool ("SigSeparator=true");
+
+  gnome_config_pop_prefix();
+}
+
+static void
+config_identities_save(void)
+{
+  gnome_config_push_prefix("balsa/identity-default/");
+
+  gnome_config_private_set_string ("FullName", balsa_app.address->personal);
+  gnome_config_private_set_string("Address", balsa_app.address->mailbox);
+  gnome_config_private_set_string("ReplyTo", balsa_app.replyto);
+  gnome_config_private_set_string("Domain", balsa_app.domain);
+  gnome_config_private_set_string("Bcc", balsa_app.bcc);
+  gnome_config_private_set_string("SignaturePath", balsa_app.signature_path);
+
+  gnome_config_private_set_bool ("SigSending", balsa_app.sig_sending);
+  gnome_config_private_set_bool ("SigForward", balsa_app.sig_whenforward);
+  gnome_config_private_set_bool ("SigReply",   balsa_app.sig_whenreply);
+  gnome_config_private_set_bool ("SigSeparator", balsa_app.sig_separator);
+
+  gnome_config_pop_prefix();
+
+}
+
+static gchar **mailbox_list_to_vector(GList *mailbox_list)
+{
+  GList *list;
+  gchar **res;
+  gint i;
+  
+  i = g_list_length(mailbox_list)+1;
+  res = g_new0(gchar*, i);
+
+  i = 0;
+  list = mailbox_list;
+  while ( list ) {
+    res[i] = g_strdup(LIBBALSA_MAILBOX(list->data)->name);
+    i++;
+    list = g_list_next(list);
+  }
+  res[i] = NULL;
+  return res;
+}
+
+static void save_color(gchar *key, GdkColor *color)
+{
+  gchar *str;
+
+  str = g_strdup_printf("rgb:%04x/%04x/%04x", color->red, color->green, color->blue);
+  gnome_config_private_set_string(key, str);
+  g_free(str);
+}
+
+static void load_color(gchar *key, GdkColor *color)
+{
+  gchar *str;
+
+  str = gnome_config_private_get_string(key);
+  gdk_color_parse(str, color);
+  g_free(str);
+}

@@ -308,7 +308,7 @@ static void libbalsa_mailbox_imap_check (LibBalsaMailbox *mailbox)
 
 static void libbalsa_mailbox_imap_save_conf (LibBalsaMailbox *mailbox)
 {
-    gnome_config_private_set_string("type", "IMAP");
+    gnome_config_private_set_string("type", "LibBalsaMailboxImap");
     gnome_config_private_set_string("name", mailbox->name);
     gnome_config_private_set_string(
 	    "path",  LIBBALSA_MAILBOX_IMAP(mailbox)->path);

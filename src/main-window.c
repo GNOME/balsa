@@ -28,6 +28,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "html.h"
 
 #include "ab-window.h"
 #include "balsa-app.h"
@@ -914,11 +915,13 @@ balsa_window_new()
 
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
 
+#ifdef HAVE_GTKHTML
     /* Use Ctrl+= as an alternative accelerator for zoom-in, because
      * Ctrl++ is a 3-key combination. */
     gtk_widget_add_accelerator(view_menu[MENU_VIEW_ZOOM_IN].widget,
 			       "activate", GNOME_APP(window)->accel_group,
 			       '=', GDK_CONTROL_MASK, (GtkAccelFlags) 0);
+#endif				/* HAVE_GTKHTML */
 
     model = balsa_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);
@@ -2479,6 +2482,10 @@ copy_cb(GtkWidget * widget, BalsaWindow * bw)
                                 G_TYPE_FROM_INSTANCE(focus_widget));
     if (signal_id)
         g_signal_emit(focus_widget, signal_id, (GQuark) 0);
+#ifdef HAVE_GTKHTML
+    else if (libbalsa_html_can_select(focus_widget))
+	libbalsa_html_copy(focus_widget);
+#endif /* HAVE_GTKHTML */
 }
 
 static void

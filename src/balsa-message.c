@@ -98,6 +98,73 @@ char *urls [] = {
 	"exec:foo_bar", "internal"
 };
 
+struct balsa_save_to_file_info
+{
+  GtkWidget* file_entry;
+  Message*   msg;
+  BODY*      body;
+};
+
+static void
+save_MIME_part(GtkObject* o, struct balsa_save_to_file_info* info)
+{
+  gchar* filename;
+  GtkWidget* file_entry = info->file_entry;
+  char msg_filename[PATH_MAX+1];
+  STATE s;
+
+  switch(info->msg->mailbox->type)
+    {
+    case MAILBOX_MH:
+    case MAILBOX_MAILDIR:
+      {
+	snprintf (msg_filename, PATH_MAX, "%s/%s", MAILBOX_LOCAL (info->msg->mailbox)->path, message_pathname (info->msg));
+	s.fpin = fopen (msg_filename, "r");
+	break;
+      }
+    case MAILBOX_IMAP:
+    case MAILBOX_POP3:
+      s.fpin = fopen (MAILBOX_IMAP (info->msg->mailbox)->tmp_file_path, "r");
+      break;
+    default:
+      s.fpin = fopen (MAILBOX_LOCAL (info->msg->mailbox)->path, "r");
+      break;
+    }
+  
+  if (!s.fpin || ferror (s.fpin))
+    {
+      char msg[1024];
+      GtkWidget* msgbox;
+      
+      snprintf(msg,1023,_(" Open of %s failed:%s "), msg_filename, strerror(errno));
+      msgbox = gnome_message_box_new(msg, "Error", _("Ok"), NULL);
+      gnome_dialog_set_modal(GNOME_DIALOG(msgbox));
+      gnome_dialog_run(GNOME_DIALOG(msgbox));
+      return;
+    }
+  filename = gtk_entry_get_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(file_entry))));
+  s.prefix = 0;
+  s.fpout = fopen(filename,"w");
+  fseek(s.fpin, info->body->offset, 0);
+  if (!s.fpout)
+    {
+      char msg[1024];
+      GtkWidget* msgbox;
+      
+      snprintf(msg,1023,_(" Open of %s failed:%s "), filename, strerror(errno));
+      msgbox = gnome_message_box_new(msg, "Error", _("Ok"), NULL);
+      gnome_dialog_set_modal(GNOME_DIALOG(msgbox));
+      gnome_dialog_run(GNOME_DIALOG(msgbox));
+      return;
+    }
+  mutt_decode_attachment(info->body, &s);
+  fclose(s.fpin);
+  fclose(s.fpout);
+}
+
+
+
+
 static void
 balsa_message_handle_mime_part(GtkObject* xmhtml_widget, gpointer data)
 {
@@ -106,28 +173,54 @@ balsa_message_handle_mime_part(GtkObject* xmhtml_widget, gpointer data)
   BODY*    body = 0;
   char*    ptr;
   int rc;
-
-  printf ("click!\n");
-  printf ("URLtype: %d, %s\n", cbs->url_type, urls [cbs->url_type]);
-  printf ("line:    %d\n", cbs->line);
-  printf ("href:    %s\n", cbs->href);
-  printf ("target:  %s\n", cbs->target);
-  printf ("rel:     %s\n", cbs->rel);
-  printf ("rev:     %s\n", cbs->rev);
-  printf ("title:   %s\n", cbs->title);
-  printf ("doit:    %d\n", cbs->doit);
-  printf ("visited: %d\n", cbs->visited);
+  GtkWidget* save_dialog;
+  GtkWidget* file_entry;
+  struct balsa_save_to_file_info info;
+  
   ptr = strchr(cbs->href,':');
   if (!ptr)
     {
-      g_warning("Malformed URL '%s' in message\n", cbs->href);
+      char msg[1024];
+      GtkWidget* msgbox;
+      
+      snprintf(msg,1023,_("Invalif balsa internal URL fomt '%s' detected"), cbs->href);
+      msgbox = gnome_message_box_new(msg, "Error", _("Ok"), NULL);
+      gnome_dialog_set_modal(GNOME_DIALOG(msgbox));
+      gnome_dialog_run(GNOME_DIALOG(msgbox));
       return;
     }
   rc = sscanf(ptr+3, "%p:%p", &message, &body);
-  printf("sscanf returns %d, ptr = '%s', message is at %p, body is at %p\n", rc, ptr+3, message, body);
-
-  printf("Save a '%s/%s'?\n", mime_content_type2str(body->type), body->subtype);
+  if (rc != 2)
+    {
+      char msg[1024];
+      GtkWidget* msgbox;
+      
+      snprintf(msg,1023,_("Invalif balsa internal URL fomt '%s' detected"), cbs->href);
+      msgbox = gnome_message_box_new(msg, "Error", _("Ok"), NULL);
+      gnome_dialog_set_modal(GNOME_DIALOG(msgbox));
+      gnome_dialog_run(GNOME_DIALOG(msgbox));
+      return;
+    }
+  save_dialog = gnome_dialog_new(_("Save MIME Part"),
+					      _("Save"), _("Cancel"), NULL);
+  file_entry = gnome_file_entry_new("Balsa_MIME_Saver",
+						 _("Save MIME Part"));
+  info.file_entry = file_entry;
+  info.msg = message;
+  info.body = body;
+  
+  if (body->filename)
+    {
+      gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(file_entry))), body->filename);
+    }
+  gtk_box_pack_start(GTK_BOX(GNOME_DIALOG(save_dialog)->vbox), file_entry, FALSE, FALSE, 10);
+  gtk_widget_show(file_entry);
+  gnome_dialog_button_connect(GNOME_DIALOG(save_dialog), 0, save_MIME_part, &info);
+  gnome_dialog_set_modal(GNOME_DIALOG(save_dialog));
+  gnome_dialog_run_and_hide(GNOME_DIALOG(save_dialog));
+  gtk_widget_destroy(save_dialog);
 }
+
 
 
 

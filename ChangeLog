@@ -1,3 +1,8 @@
+1998-09-11  Michael Lausch  <mla@gams.at>
+
+	* src/balsa-message.c: Start of saving MIME parts (aka
+	Attachments) to files. More on this topic will follow.
+
 1998-09-02  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
 
 	* src/Makefile.am (INCLUDES): Added ${top_builddir}/libmutt so

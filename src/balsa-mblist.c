@@ -532,7 +532,7 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
         do {
             gtk_tree_model_get(model, &child_iter,
                                MBNODE_COLUMN, &mbnode, -1);
-            if (mbnode && mbnode->mailbox)
+            if (mbnode && mbnode->mailbox && mbnode->mailbox->view)
                 mbnode->mailbox->view->exposed = TRUE;
         } while (gtk_tree_model_iter_next(model, &child_iter));
     }

@@ -901,7 +901,7 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox), FALSE);
     g_return_val_if_fail(CLIENT_CONTEXT(message->mailbox)->hdrs, FALSE);
 
-    LOCK_MAILBOX(message->mailbox);
+    LOCK_MAILBOX_RETURN_VAL(message->mailbox, FALSE);
     msg_header = message->header;
 
     /* FIXME: This is wrong, but less so than earlier versions; a message

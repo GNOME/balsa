@@ -1050,6 +1050,30 @@ static void update_message_status_headers(GMimeMessage *message,
     g_string_free(new_header, TRUE);
 }
 
+/* Crlf-filter the stream, and return a clean stream-mem (the filtered
+ * stream is apparently misparsed, but the stream-mem isn't). */
+static GMimeStream *
+lbm_mbox_crlf_filter(GMimeStream * stream)
+{
+    GMimeStream *fstream;
+    GMimeFilter *filter;
+
+    fstream = g_mime_stream_filter_new_with_stream(stream);
+    g_mime_stream_unref(stream);
+
+    filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+				    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
+    g_object_unref(filter);
+
+    stream = g_mime_stream_mem_new(); /* Could be a scratch file. */
+    g_mime_stream_write_to_stream(fstream, stream);
+    g_object_unref(fstream);
+
+    g_mime_stream_reset(stream);
+    return stream;
+}
+
 /* Encode text parts as quoted-printable, and armor any "From " lines.
  */
 static void
@@ -1111,11 +1135,6 @@ lbm_mbox_armor_part(GMimeObject ** part)
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
 
-    filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-				    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
-    g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
-    g_object_unref(filter);
-
     parser = g_mime_parser_new_with_stream(fstream);
     g_mime_stream_unref(fstream);
 
@@ -1131,6 +1150,7 @@ lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
     GMimeStream *mem;
 
     parser = g_mime_parser_new_with_stream(stream);
+    g_object_unref(stream);
     message = g_mime_parser_construct_message(parser);
     g_object_unref(parser);
 
@@ -1141,7 +1161,7 @@ lbm_mbox_armor_stream(GMimeStream * stream, LibBalsaMessageFlag flags)
      * update them in place later, if necessary. */
     update_message_status_headers(message, flags);
     g_mime_message_write_to_stream(message, mem);
-    g_mime_object_unref(GMIME_OBJECT(message));
+    g_object_unref(message);
 
     g_mime_stream_reset(mem);
     return mem;
@@ -1160,7 +1180,6 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     int fd;
     GMimeStream *orig;
     GMimeStream *dest;
-    GMimeStream *tmp;
     gint retval = 1;
 
     ctime_r(&(message->headers->date), date_string);
@@ -1201,8 +1220,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
     mbox_lock ( mailbox, dest );
 
-    tmp = libbalsa_mailbox_get_message_stream( message->mailbox, message );
-    if (!tmp) {
+    orig = libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    if (!orig) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
 			     _("%s: could not get message stream."),
 			     "MBOX");
@@ -1212,8 +1231,8 @@ static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     }
 
-    orig = lbm_mbox_armor_stream(tmp, message->flags);
-    g_mime_stream_unref(tmp);
+    orig = lbm_mbox_crlf_filter(orig);
+    orig = lbm_mbox_armor_stream(orig, message->flags);
 
     if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
 	|| g_mime_stream_write_to_stream (orig, dest) < 0) {

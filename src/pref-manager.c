@@ -151,6 +151,9 @@ typedef struct _PropertyUI {
     GtkWidget *browse_wrap_length;
     GtkWidget *recognize_rfc2646_format_flowed;
 
+    /* how to display multipart/alternative */
+    GtkWidget *display_alt_plain;
+
     /* spell checking */
     GtkWidget *module;
     gint module_index;
@@ -187,7 +190,6 @@ static GtkWidget *create_mail_options_page(gpointer);
 
 static GtkWidget *incoming_subpage(gpointer);
 static GtkWidget *checking_group(GtkWidget * page);
-static GtkWidget *quoted_group(GtkWidget * page);
 static GtkWidget *mdn_group(GtkWidget * page);
 
 static GtkWidget *outgoing_subpage(gpointer);
@@ -212,9 +214,10 @@ static GtkWidget *message_colors_group(GtkWidget * page);
 static GtkWidget *link_color_group(GtkWidget * page);
 static GtkWidget *composition_window_group(GtkWidget * page);
 
-static GtkWidget *fonts_subpage(gpointer data);
+static GtkWidget *message_subpage(gpointer data);
 static GtkWidget *preview_font_group(GtkWidget * page);
-static GtkWidget *subject_header_font_group(GtkWidget * page);
+static GtkWidget *quoted_group(GtkWidget * page);
+static GtkWidget *alternative_group(GtkWidget * page);
 
 static GtkWidget *threading_subpage(gpointer data);
 static GtkWidget *threading_group(GtkWidget * page);
@@ -531,6 +534,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 		     "toggled", G_CALLBACK(properties_modified_cb),
 		     property_box);
 
+    /* multipart/alternative */
+    g_signal_connect(G_OBJECT(pui->display_alt_plain), "toggled",
+		     G_CALLBACK(properties_modified_cb), property_box);
+
     /* message font */
     g_signal_connect(G_OBJECT(pui->message_font), "changed",
 		     G_CALLBACK(font_changed_cb), property_box);
@@ -808,6 +815,9 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.recognize_rfc2646_format_flowed =
 	GTK_TOGGLE_BUTTON(pui->recognize_rfc2646_format_flowed)->active;
 
+    balsa_app.display_alt_plain =
+	GTK_TOGGLE_BUTTON(pui->display_alt_plain)->active;
+
     balsa_app.open_inbox_upon_startup =
 	GTK_TOGGLE_BUTTON(pui->open_inbox_upon_startup)->active;
     balsa_app.check_mail_upon_startup =
@@ -1081,6 +1091,11 @@ set_prefs(void)
     gtk_widget_set_sensitive(pui->recognize_rfc2646_format_flowed,
 			     balsa_app.browse_wrap);
 
+    /* how to treat multipart/alternative */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+				 (pui->display_alt_plain),
+				  balsa_app.display_alt_plain);
+    
     /* message font */
     gtk_entry_set_text(GTK_ENTRY(pui->message_font),
 		       balsa_app.message_font);
@@ -1606,7 +1621,6 @@ incoming_subpage(gpointer data)
     GtkWidget *page = pm_page_new();
 
     pm_page_add(page, checking_group(page));
-    pm_page_add(page, quoted_group(page));
     pm_page_add(page, mdn_group(page));
 
     return page;
@@ -1714,6 +1728,24 @@ quoted_group(GtkWidget * page)
 					  "`text/plain; format=flowed'"));
     gtk_table_attach(GTK_TABLE(table), pui->recognize_rfc2646_format_flowed,
                      0, 3, 2, 3, GTK_FILL, 0, 0, 0);
+
+    return group;
+}
+
+static GtkWidget *
+alternative_group(GtkWidget * page)
+{
+    GtkSizeGroup *size_group = pm_page_get_size_group(page);
+    GtkWidget *group;
+
+    /* handling of multipart/alternative */
+
+    group = pm_group_new(_("Display of Multipart/Alternative Parts"));
+
+    pui->display_alt_plain =
+	gtk_check_button_new_with_label(_("prefer text/plain over html"));
+    pm_group_add(group, pui->display_alt_plain);
+    gtk_size_group_add_widget(size_group, pui->display_alt_plain);
 
     return group;
 }
@@ -1913,8 +1945,8 @@ create_display_page(gpointer data)
                               gtk_label_new (_("Status Messages")));
     gtk_notebook_append_page(GTK_NOTEBOOK(note), colors_subpage(data),
                              gtk_label_new(_("Colors")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(note), fonts_subpage(data),
-                             gtk_label_new(_("Fonts")));
+    gtk_notebook_append_page(GTK_NOTEBOOK(note), message_subpage(data),
+                             gtk_label_new(_("Message")));
     gtk_notebook_append_page(GTK_NOTEBOOK(note), threading_subpage(data),
                              gtk_label_new(_("Threading")));
 
@@ -2151,12 +2183,13 @@ composition_window_group(GtkWidget * page)
 }
 
 static GtkWidget *
-fonts_subpage(gpointer data)
+message_subpage(gpointer data)
 {
     GtkWidget *page = pm_page_new();
 
     pm_page_add(page, preview_font_group(page));
-    pm_page_add(page, subject_header_font_group(page));
+    pm_page_add(page, quoted_group(page));
+    pm_page_add(page, alternative_group(page));
 
     return page;
 }
@@ -2168,8 +2201,8 @@ preview_font_group(GtkWidget * page)
     GtkWidget *table;
     GtkWidget *label;
 
-    group = pm_group_new(_("Preview Font"));
-    table = create_table(2, 2, page);
+    group = pm_group_new(_("Fonts"));
+    table = create_table(4, 2, page);
     pm_group_add(group, table);
 
     pui->message_font = gtk_entry_new();
@@ -2193,30 +2226,16 @@ preview_font_group(GtkWidget * page)
 		      GTK_OBJECT(pui->message_font));
     g_object_set_data(G_OBJECT(pui->message_font), "balsa-data",
 		      GTK_OBJECT(pui->font_picker));
-    label = gtk_label_new(_("Preview pane"));
+    label = gtk_label_new(_("Message Font"));
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
 
-    return group;
-}
-
-static GtkWidget *
-subject_header_font_group(GtkWidget * page)
-{
-    GtkWidget *group;
-    GtkWidget *table;
-    GtkWidget *label;
-
-    group = pm_group_new(_("Subject Header Font"));
-    table = create_table(2, 2, page);
-    pm_group_add(group, table);
-
     pui->subject_font = gtk_entry_new();
-    gtk_table_attach(GTK_TABLE(table), pui->subject_font, 0, 1, 1, 2,
+    gtk_table_attach(GTK_TABLE(table), pui->subject_font, 0, 1, 3, 4,
 		     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
 		     (GtkAttachOptions) (GTK_FILL), 0, 0);
     pui->font_picker2 = gnome_font_picker_new();
-    gtk_table_attach(GTK_TABLE(table), pui->font_picker2, 1, 2, 1, 2,
+    gtk_table_attach(GTK_TABLE(table), pui->font_picker2, 1, 2, 3, 4,
 		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
     gnome_font_picker_set_font_name(GNOME_FONT_PICKER(pui->font_picker2),
 				    balsa_app.subject_font);
@@ -2233,8 +2252,8 @@ subject_header_font_group(GtkWidget * page)
     g_object_set_data(G_OBJECT(pui->subject_font), "balsa-data",
 			     GTK_OBJECT(pui->font_picker2));
 
-    label = gtk_label_new(_("Preview pane"));
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
+    label = gtk_label_new(_("Message Subject Font"));
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
 
     return group;

@@ -2258,7 +2258,7 @@ preferred_part(LibBalsaMessageBody *parts)
 {
     /* TODO: Consult preferences and/or previous selections */
 
-    LibBalsaMessageBody *body;
+    LibBalsaMessageBody *body, *html_body = NULL;
     gchar *content_type;
 
 #ifdef HAVE_GTKHTML
@@ -2266,8 +2266,12 @@ preferred_part(LibBalsaMessageBody *parts)
 	content_type = libbalsa_message_body_get_content_type(body);
 
 	if(g_ascii_strcasecmp(content_type, "text/html")==0) {
-	    g_free(content_type);
-	    return body;
+	    if (balsa_app.display_alt_plain)
+		html_body = body;
+	    else {
+		g_free(content_type);
+		return body;
+	    }
 	}
 	g_free(content_type);
     }
@@ -2283,8 +2287,10 @@ preferred_part(LibBalsaMessageBody *parts)
 	g_free(content_type);
     }
 
-
-    return parts;
+    if (html_body)
+	return html_body;
+    else
+	return parts;
 }
 
 

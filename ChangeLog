@@ -1,4 +1,12 @@
-2003-01-11  Pawel Salek  <pawsa@theochem.kth.se>
+2003-01-13  Pawel Salek  <pawsa@theochem.kth.se>
+
+	Albrecht Dreß's patch to ignore alternative HTML parts.
+	* src/balsa-app.h: add a new gboolean config variable display_alt_plain
+	* src/balsa-message.c: modify scanning of multipart/alternative msgs.
+	* src/pref-manager.c: add a check button in Display->Message.
+	* src/save-restore.c: save & restore the config variable.
+
+2003-01-12  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* src/balsa-message.c: fix gtkhtml2 space requisition (bug 103156).
 

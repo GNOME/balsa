@@ -694,6 +694,10 @@ config_global_load(void)
     if (balsa_app.browse_wrap_length < 40)
 	balsa_app.browse_wrap_length = 40;
 
+    /* ... handling of Multipart/Alternative */
+    balsa_app.display_alt_plain = 
+	gnome_config_get_bool("DisplayAlternativeAsPlain=false");
+
     gnome_config_pop_prefix();
 
     /* Interface Options ... */
@@ -1032,6 +1036,10 @@ config_save(void)
 
     save_color("UrlColor", &balsa_app.url_color);
     save_color("BadAddressColor", &balsa_app.bad_address_color);
+
+    /* ... handling of Multipart/Alternative */
+    gnome_config_set_bool("DisplayAlternativeAsPlain",
+			  balsa_app.display_alt_plain);
 
     gnome_config_pop_prefix();
 

@@ -449,7 +449,7 @@ send_smtp_message (GtkWidget * widget, BalsaSendmsg * bsmsg)
   rfc822_parse_adrlist (&msg->to,
 			gtk_entry_get_text (GTK_ENTRY (bsmsg->to)),
 			balsa_app.hostname);
-  if (msg->to)
+  if (strlen(gtk_entry_get_text(GTK_ENTRY(bsmsg->cc))) > 4 )
     {
       rfc822_parse_adrlist (&msg->cc,
 			    gtk_entry_get_text (GTK_ENTRY (bsmsg->cc)),

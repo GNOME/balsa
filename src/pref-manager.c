@@ -24,31 +24,31 @@
 
 typedef struct _PreferencesManagerWindow PreferencesManagerWindow;
 struct _PreferencesManagerWindow
-{
-  GtkWidget *window;
-  
-  /* identity */
-  GtkWidget *real_name;
+  {
+    GtkWidget *window;
 
-  GtkWidget *username;
-  GtkWidget *hostname;
+    /* identity */
+    GtkWidget *real_name;
 
-  GtkWidget *organization;
-  
-  /* local */
-  GtkWidget *mail_directory;
-  
-  /* servers */
-  GtkWidget *smtp_server;
-  
-};
+    GtkWidget *username;
+    GtkWidget *hostname;
+
+    GtkWidget *organization;
+
+    /* local */
+    GtkWidget *mail_directory;
+
+    /* servers */
+    GtkWidget *smtp_server;
+
+  };
 
 static PreferencesManagerWindow *pmw = NULL;
 
 
 
 /* notebook pages */
-static GtkWidget * create_identity_page ();
+static GtkWidget *create_identity_page ();
 
 
 /* callbacks */
@@ -82,7 +82,7 @@ open_preferences_manager ()
 			PREFERENCES_MANAGER_WIDTH,
 			PREFERENCES_MANAGER_HEIGHT);
   gtk_window_set_title (GTK_WINDOW (pmw->window), "Preferences");
-  gtk_window_set_wmclass (GTK_WINDOW (pmw->window), 
+  gtk_window_set_wmclass (GTK_WINDOW (pmw->window),
 			  "preferences_manager",
 			  "Balsa");
   gtk_window_position (GTK_WINDOW (pmw->window), GTK_WIN_POS_CENTER);
@@ -146,7 +146,7 @@ open_preferences_manager ()
 
   gtk_signal_connect_object (GTK_OBJECT (button),
 			     "clicked",
-			     (GtkSignalFunc) gtk_widget_destroy,
+			     (GtkSignalFunc) cancel_preferences_manager,
 			     GTK_OBJECT (pmw->window));
 
   gtk_widget_show (button);
@@ -157,20 +157,49 @@ open_preferences_manager ()
   gtk_widget_show (pmw->window);
 }
 
-
-static void
-ok_preferences_manager ()
-{
-}
-
-
 static void
 cancel_preferences_manager ()
 {
+  gtk_widget_destroy (pmw->window);
   g_free (pmw);
   pmw = NULL;
 }
 
+
+/*
+ * update data from the preferences window
+ */
+void
+ok_preferences_manager ()
+{
+  gnome_config_push_prefix ("/balsa/Global/");
+
+  gnome_config_set_string ("real name", gtk_entry_get_text (GTK_ENTRY (pmw->real_name)));
+  balsa_app.real_name = gtk_entry_get_text (GTK_ENTRY (pmw->real_name));
+
+  /* we're gonna display this as  USERNAME @ HOSTNAME 
+   * for the From: header */
+  gnome_config_set_string ("user name", gtk_entry_get_text (GTK_ENTRY (pmw->username)));
+  balsa_app.username = gtk_entry_get_text (GTK_ENTRY (pmw->username));
+  gnome_config_set_string ("host name", gtk_entry_get_text (GTK_ENTRY (pmw->hostname)));
+  balsa_app.hostname = gtk_entry_get_text (GTK_ENTRY (pmw->hostname));
+
+  gnome_config_set_string ("organization", gtk_entry_get_text (GTK_ENTRY (pmw->organization)));
+  balsa_app.organization = gtk_entry_get_text (GTK_ENTRY (pmw->organization));
+
+  gnome_config_set_string ("smtp server", gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server)));
+  balsa_app.smtp_server = gtk_entry_get_text (GTK_ENTRY (pmw->smtp_server));
+
+  gnome_config_set_string ("local mail directory", gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory)));
+  balsa_app.local_mail_directory = gtk_entry_get_text (GTK_ENTRY (pmw->mail_directory));
+
+  gtk_widget_destroy (pmw->window);
+  g_free (pmw);
+  pmw = NULL;
+
+  gnome_config_pop_prefix ();
+  gnome_config_sync ();
+}
 
 
 /*
@@ -246,16 +275,16 @@ create_identity_page ()
 
   pmw->username = gtk_entry_new ();
   pmw->hostname = gtk_entry_new ();
-  hbox=gtk_hbox_new(FALSE, 0);
-  gtk_widget_show(hbox);
+  hbox = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox);
   gtk_box_pack_start (GTK_BOX (hbox), pmw->username, TRUE, TRUE, 0);
-  gtk_widget_show(pmw->username);
+  gtk_widget_show (pmw->username);
   label = gtk_label_new ("@");
   gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
-  gtk_widget_show(label);
+  gtk_widget_show (label);
   gtk_box_pack_start (GTK_BOX (hbox), pmw->hostname, TRUE, TRUE, 0);
-  gtk_widget_show(pmw->hostname);
-  
+  gtk_widget_show (pmw->hostname);
+
   gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 1, 2,
 		    GTK_EXPAND | GTK_FILL, GTK_FILL,
 		    0, 10);
@@ -292,7 +321,7 @@ create_identity_page ()
 		    0, 10);
   gtk_widget_show (pmw->smtp_server);
 
-  
+
   /* local mail dir */
   label = gtk_label_new ("Local mail directory:");
   gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);

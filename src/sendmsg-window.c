@@ -121,7 +121,7 @@ static void address_book_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
 static void address_book_response(GtkWidget * ab, gint response,
                                   LibBalsaAddressEntry * address_entry);
 
-static gint set_locale(GtkWidget *, BalsaSendmsg *, gint);
+static gint set_locale(BalsaSendmsg *, gint);
 
 static void edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg);
 static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
@@ -344,7 +344,6 @@ struct SendLocales {
     {"cs_CZ", "ISO-8859-2",    N_("_Czech")},
     {"da_DK", "ISO-8859-1",    N_("_Danish")},
     {"nl_NL", "ISO-8859-15",   N_("_Dutch")},
-#define LOC_AM_ENGLISH_POS 7
     {"en_US", "ISO-8859-1",    N_("_English (American)")}, 
     {"en_UK", "ISO-8859-1",    N_("_English (British)")}, 
     {"eo_XX", "UTF-8",         N_("_Esperanto")},
@@ -641,13 +640,13 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
    the questions (OTOH, I am afraid that people will start claiming "but
    balsa can recognize my language!" on failures in other software.
 */
-static gint
+static unsigned
 find_locale_index_by_locale(const gchar * locale)
 {
     unsigned i, j, maxfit = 0, maxpos = 0;
 
     if (!locale || strcmp(locale, "C") == 0)
-	return LOC_AM_ENGLISH_POS;
+        locale = "en_US";
     for (i = 0; i < ELEMENTS(locales); i++) {
 	for (j = 0; locale[j] && locales[i].locale[j] == locale[j]; j++);
 	if (j > maxfit) {
@@ -2518,9 +2517,10 @@ comp_send_locales(const void* a, const void* b)
 static void
 create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
 {
-    unsigned i;
+    unsigned i, selected_pos;
     GtkWidget* langs = gtk_menu_item_get_submenu(GTK_MENU_ITEM(parent));
     static gboolean locales_sorted = FALSE;
+    GSList *group = NULL;
 
     if(!locales_sorted) {
         for(i=0; i<ELEMENTS(locales); i++)
@@ -2529,9 +2529,30 @@ create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
               comp_send_locales);
         locales_sorted = TRUE;
     }
+    /* find the preferred charset... */
+    selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+    if (bsmsg->charset
+	&& g_ascii_strcasecmp(locales[selected_pos].charset, 
+                              bsmsg->charset) != 0) {
+	for(i=0; 
+	    i<ELEMENTS(locales) && 
+		g_ascii_strcasecmp(locales[i].charset, bsmsg->charset) != 0;
+	    i++)
+	    ;
+        selected_pos = (i == ELEMENTS(locales)) ?
+            find_locale_index_by_locale("en_US") : i;
+    }
+    
+    set_locale(bsmsg, selected_pos);
+
     for(i=0; i<ELEMENTS(locales); i++) {
         GtkWidget *w = 
-            gtk_check_menu_item_new_with_mnemonic(locales[i].lang_name);
+            gtk_radio_menu_item_new_with_mnemonic(group,
+                                                  locales[i].lang_name);
+        group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
+        if(i==selected_pos)
+            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
+
         g_signal_connect(G_OBJECT(w), "activate", 
                          G_CALLBACK(lang_set_cb), bsmsg);
         g_object_set_data(G_OBJECT(w), GNOMEUIINFO_KEY_UIDATA, 
@@ -3967,34 +3988,17 @@ init_menus(BalsaSendmsg * bsmsg)
 	}
     }
 
-    /* set the charset... */
-    i = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
-    if (bsmsg->charset
-	&& g_ascii_strcasecmp(locales[i].charset, bsmsg->charset) != 0) {
-	for(i=0; 
-	    i<ELEMENTS(locales) && 
-		g_ascii_strcasecmp(locales[i].charset, bsmsg->charset) != 0;
-	    i++)
-	    ;
-    }
-    if (i == ELEMENTS(locales))
-	i = LOC_AM_ENGLISH_POS;
-    
-    set_locale(NULL, bsmsg, i);
-
     /* gray 'send' and 'postpone' */
     check_readiness(bsmsg);
 }
 
 /* set_locale:
-   w - menu widget that has been changed. if the even is generated during 
-   menu initialization, w is NULL.
    bsmsg is the compose window,
-   idx - corresponding entry index in locale_names.
+   idx - corresponding entry index in locales.
 */
 
 static gint
-set_locale(GtkWidget * w, BalsaSendmsg * bsmsg, gint idx)
+set_locale(BalsaSendmsg * bsmsg, gint idx)
 {
     g_free(bsmsg->charset);
     bsmsg->charset = g_strdup(locales[idx].charset);
@@ -4062,7 +4066,7 @@ lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
     gint i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
                                                GNOMEUIINFO_KEY_UIDATA));
-    set_locale(w, bsmsg, i);
+    set_locale(bsmsg, i);
 }
 
 /* sendmsg_window_new_from_list:

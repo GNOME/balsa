@@ -2130,17 +2130,24 @@ balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 {
     guint total_messages = libbalsa_mailbox_total_messages(mailbox);
     gchar *desc;
+    gchar *desc1, *desc2;
 
-    desc =
-	g_strdup_printf(ngettext
-			("Shown mailbox: %s with %d message, %ld new",
-			 "Shown mailbox: %s with %d messages, %ld new",
-			 total_messages),
-			mailbox->name, total_messages,
-			mailbox->unread_messages);
+    desc1 = g_strdup_printf(ngettext("Shown mailbox: %s with %d message, ",
+				     "Shown mailbox: %s with %d messages, ",
+				     total_messages),
+			    mailbox->name, total_messages);
+    /* xgettext: this is the second part of the message
+     * "Shown mailbox: %s with %d messages, %ld new". */
+    desc2 = g_strdup_printf(ngettext("%ld new", "%ld new",
+				     mailbox->unread_messages),
+			    mailbox->unread_messages);
+    desc = g_strconcat(desc1, desc2, NULL);
 
     gnome_appbar_set_default(balsa_app.appbar, desc);
+
     g_free(desc);
+    g_free(desc1);
+    g_free(desc2);
 }
 
 static void

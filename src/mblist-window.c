@@ -169,9 +169,8 @@ mblist_open_window (GnomeMDI * mdi)
   mblist_redraw ();
 
   height = GTK_CLIST (mblw->ctree)->rows * GTK_CLIST (mblw->ctree)->row_height;
-  if (height > 300)
-    height = 300;
-  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), -1, height);
+
+  gtk_widget_set_usize (GTK_WIDGET (mblw->ctree), balsa_app.mblist_width, balsa_app.mblist_height);
 
   gtk_signal_connect (GTK_OBJECT (mblw->ctree), "tree_select_row",
 		      (GtkSignalFunc) mailbox_select_cb,
@@ -426,6 +425,8 @@ mblist_close_mailbox (Mailbox * mailbox)
 static void
 close_mblist_window (GtkWidget * widget)
 {
+  gdk_window_get_size (widget->window,
+		       &balsa_app.mblist_width, &balsa_app.mblist_height);
   gtk_widget_destroy (mblw->window);
   gtk_widget_destroy (GTK_WIDGET (mblw->ctree));
 }

@@ -57,7 +57,7 @@ error_exit_cb (GtkWidget * widget, gpointer data)
 }
 
 static void
-balsa_error (char *fmt, ...)
+balsa_error (char *fmt,...)
 {
   GtkWidget *messagebox;
   va_list ap;
@@ -106,10 +106,10 @@ init_balsa_app (int argc, char *argv[])
   balsa_app.new_messages = 0;
 
   balsa_app.check_mail_timer = 0;
-#if 0
+
   balsa_app.debug = FALSE;
   balsa_app.previewpane = TRUE;
-#endif
+
   /* GUI settings */
   balsa_app.mw_width = MW_DEFAULT_WIDTH;
   balsa_app.mw_height = MW_DEFAULT_HEIGHT;
@@ -137,7 +137,7 @@ init_balsa_app (int argc, char *argv[])
   /* initalize our mailbox access crap */
   if (do_load_mailboxes () == FALSE)
     {
-      fprintf(stderr, "*** error loading mailboxes\n");
+      fprintf (stderr, "*** error loading mailboxes\n");
       initialize_balsa (argc, argv);
       return;
     }

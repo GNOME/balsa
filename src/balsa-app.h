@@ -71,6 +71,8 @@ extern struct BalsaApplication
   /* GUI settings */
   gint mw_width;
   gint mw_height;
+  gint mblist_width;
+  gint mblist_height;
 
   GtkToolbarStyle toolbar_style;
   GnomeMDIMode mdi_style;

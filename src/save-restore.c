@@ -583,6 +583,16 @@ config_global_load (void)
   else
     balsa_app.mw_height = atoi (field);
 
+  if ((field = pl_dict_get_str (globals, "MailboxListWidth")) == NULL)
+    balsa_app.mblist_width = 200;
+  else
+    balsa_app.mblist_width = atoi (field);
+
+  if ((field = pl_dict_get_str (globals, "MailboxListHeight")) == NULL)
+    balsa_app.mblist_height = 300;
+  else
+    balsa_app.mblist_height = atoi (field);
+
   return TRUE;
 }				/* config_global_load */
 
@@ -630,10 +640,16 @@ config_global_save (void)
     pl_dict_add_str_str (globals, "UsePreviewPane", tmp);
 
     snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_width);
-  pl_dict_add_str_str (globals, "MainWindowWidth", tmp);
+    pl_dict_add_str_str (globals, "MainWindowWidth", tmp);
 
-  snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_height);
-  pl_dict_add_str_str (globals, "MainWindowHeight", tmp);
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mw_height);
+    pl_dict_add_str_str (globals, "MainWindowHeight", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_width);
+    pl_dict_add_str_str (globals, "MailboxListWidth", tmp);
+
+    snprintf (tmp, sizeof (tmp), "%d", balsa_app.mblist_height);
+    pl_dict_add_str_str (globals, "MailboxListHeight", tmp);
   }
 
   /* Add it to configuration file */

@@ -349,7 +349,6 @@ libbalsa_mailbox_imap_append(LibBalsaMailbox * mailbox)
 	res = NULL;
     }
     libbalsa_unlock_mutt();
-    g_print("libbalsa_mailbox_imap_append: returning %p\n", res);
     return res;
 }
 

@@ -35,6 +35,8 @@ extern GIOChannel             *mail_thread_msg_send;
 extern GIOChannel             *mail_thread_msg_receive;
 extern GIOChannel             *send_thread_msg_send;
 extern GIOChannel             *send_thread_msg_receive;
+extern GtkWidget              *send_progress;
+extern GtkWidget              *send_progress_message;
 
 typedef struct
 {
@@ -63,23 +65,26 @@ typedef struct
 {
   int message_type;
   char message_string[256];
-  HEADER *msg;
+  Message *msg;
   Mailbox *mbox;
+  uint of_total;
 } SendThreadMessage;
 
-#define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox) \
+#define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
   t_message = malloc( sizeof( SendThreadMessage )); \
   t_message->message_type = type; \
   strncpy(t_message->message_string, string, sizeof(t_message->message_string)); \
   t_message->msg = s_msg; \
   t_message->mbox = s_mbox; \
+  t_message->of_total = messof; \
   write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) );
 
 enum {
   MSGSENDTHREADERROR,
+  MSGSENDTHREADPROGRESS,
   MSGSENDTHREADPOSTPONE,
-  MSGSENDTHREADLOAD
+  MSGSENDTHREADLOAD,
+  MSGSENDTHREADDELETE
 };
 
 #endif /* __THREADS_H__ */
-

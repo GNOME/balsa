@@ -260,7 +260,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
 	mailbox_check_new_messages(balsa_app.outbox);
 #ifdef BALSA_USE_THREADS
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, "Load Sent/Outbox", 
-		      NULL, balsa_app.outbox );
+		      NULL, balsa_app.outbox, 0);
 #endif
       }
 
@@ -279,7 +279,7 @@ balsa_send_message_real(MessageQueueItem *first_message)
 	  mailbox_check_new_messages( current_message->fcc );
 #ifdef BALSA_USE_THREADS
 	  MSGSENDTHREAD(threadmsg, MSGSENDTHREADLOAD, "Load Sent/Outbox", 
-			NULL, current_message->fcc );
+			NULL, current_message->fcc, 0);
 #endif
 	}
 
@@ -621,7 +621,7 @@ int balsa_smtp_send (MessageQueueItem *current_message, char *server)
     {
 #ifdef BALSA_USE_THREADS
      sprintf(error_msg,"Error: Could not find address for host %s.",server);
-     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL); 
+     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL, 0); 
 #else
      fprintf(stderr,"Error: Could not find address for host %s.\n", server);
 #endif
@@ -638,7 +638,7 @@ int balsa_smtp_send (MessageQueueItem *current_message, char *server)
   {
 #ifdef BALSA_USE_THREADS
      sprintf(error_msg,"Error connecting to %s.",server);
-     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL);
+     MSGSENDTHREAD(error_message, MSGSENDTHREADERROR,error_msg,NULL,NULL,0);
 #else
     fprintf(stderr,"Error connecting to host\n\n");
 #endif

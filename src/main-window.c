@@ -75,6 +75,8 @@ enum {
   GtkWidget *progress_dialog_source = NULL;
   GtkWidget *progress_dialog_message = NULL;
   GtkWidget *progress_dialog_bar = NULL;
+  GtkWidget *send_progress = NULL;
+  GtkWidget *send_progress_message = NULL;
 
 extern void load_messages (Mailbox * mailbox, gint emit);
 extern void config_mailbox_update(Mailbox * mailbox, char * name);
@@ -1073,6 +1075,12 @@ send_progress_notify_cb( )
 	  case MSGSENDTHREADPOSTPONE:
 	    fprintf(stderr, "Send Postpone %s\n", 
 		    threadmessage->message_string);
+	    break;
+	  case MSGSENDTHREADPROGRESS:
+            /* display progress x of y, y = of_total */
+	    break;
+	  case MSGSENDTHREADDELETE:
+	    /* passes message to be deleted */
 	    break;
 	  default:
 	    fprintf ( stderr, " Unknown: %s \n", 

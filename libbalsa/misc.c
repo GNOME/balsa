@@ -33,7 +33,7 @@
 #include "libbalsa.h"
 #include "misc.h"
 #include "../libmutt/mailbox.h"
-#include "imap.h"
+#include "../libmutt/imap.h"
 
 MailboxNode *
 mailbox_node_new (const gchar * name, Mailbox * mb, gint i)

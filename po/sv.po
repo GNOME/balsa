@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-12-07 02:17+0100\n"
-"PO-Revision-Date: 2001-12-07 02:17+0100\n"
+"POT-Creation-Date: 2001-12-09 16:09+0100\n"
+"PO-Revision-Date: 2001-12-09 16:09+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -246,7 +246,7 @@ msgstr "Ny"
 
 #: libbalsa/identity.c:1061 src/balsa-index.c:2091
 #: src/filter-edit-dialog.c:255 src/mailbox-node.c:612 src/pref-manager.c:1285
-#: src/pref-manager.c:2227
+#: src/pref-manager.c:2223
 msgid "Delete"
 msgstr "Ta bort"
 
@@ -1402,7 +1402,7 @@ msgid "_Base Domain Name"
 msgstr "_Basdomännamn"
 
 #: src/address-book-config.c:652 src/mailbox-conf.c:379
-#: src/pref-manager.c:1283 src/pref-manager.c:2225
+#: src/pref-manager.c:1283 src/pref-manager.c:2221
 msgid "Add"
 msgstr "Lägg till"
 
@@ -2184,11 +2184,11 @@ msgstr "Lokal epostkatalogsbrevlåda..."
 msgid "Local MH mailbox..."
 msgstr "Lokal MH-brevlåda..."
 
-#: src/mailbox-node.c:580 src/main-window.c:285 src/pref-manager.c:2380
+#: src/mailbox-node.c:580 src/main-window.c:285 src/pref-manager.c:2376
 msgid "Remote IMAP mailbox..."
 msgstr "IMAP-fjärrbrevlåda..."
 
-#: src/mailbox-node.c:583 src/main-window.c:291 src/pref-manager.c:2385
+#: src/mailbox-node.c:583 src/main-window.c:291 src/pref-manager.c:2381
 msgid "Remote IMAP folder..."
 msgstr "IMAP-fjärrmapp..."
 
@@ -2862,7 +2862,7 @@ msgstr "När meddelanden hämtas"
 msgid "Until Closed"
 msgstr "Fram till stängning"
 
-#: src/pref-manager.c:227 src/pref-manager.c:2527 src/pref-manager.c:2563
+#: src/pref-manager.c:227 src/pref-manager.c:2523 src/pref-manager.c:2559
 msgid "Never"
 msgstr "Aldrig"
 
@@ -2886,7 +2886,7 @@ msgstr "Inställningar för Balsa"
 msgid "Mail Servers"
 msgstr "E-postservrar"
 
-#: src/pref-manager.c:271 src/pref-manager.c:2192
+#: src/pref-manager.c:271 src/pref-manager.c:2188
 msgid "Address Books"
 msgstr "Adressböcker"
 
@@ -2918,7 +2918,7 @@ msgstr "Ja"
 msgid "Remote Mailbox Servers"
 msgstr "Fjärrbrevlådeservrar"
 
-#: src/pref-manager.c:1273 src/pref-manager.c:2214
+#: src/pref-manager.c:1273 src/pref-manager.c:2210
 msgid "Type"
 msgstr "Typ"
 
@@ -2926,7 +2926,7 @@ msgstr "Typ"
 msgid "Mailbox Name"
 msgstr "Brevlådenamn"
 
-#: src/pref-manager.c:1284 src/pref-manager.c:2226
+#: src/pref-manager.c:1284 src/pref-manager.c:2222
 msgid "Modify"
 msgstr "Modifera"
 
@@ -3270,86 +3270,85 @@ msgstr "Stäng brevlådan automatiskt om den varit oanvänd mer än"
 msgid "Drag-and-drop moves messages by default"
 msgstr "Dra-och-släpp flyttar meddelanden som standard"
 
-#: src/pref-manager.c:2125
+#: src/pref-manager.c:2126
 msgid "Options"
 msgstr "Alternativ"
 
-#: src/pref-manager.c:2132
+#: src/pref-manager.c:2133
 msgid "Open Inbox upon startup"
 msgstr "Öppna inkorgen vid uppstart"
 
-#: src/pref-manager.c:2136
+#: src/pref-manager.c:2137
 msgid "Check mail upon startup"
 msgstr "Hämta e-post vid uppstart"
 
-#: src/pref-manager.c:2141
+#: src/pref-manager.c:2142
 msgid "Remember open mailboxes between sessions"
 msgstr "Kom ihåg öppna brevlådor mellan sessionerna"
 
 #. do the IMAP scan depth
-#: src/pref-manager.c:2146
+#: src/pref-manager.c:2147
 msgid "IMAP Folder Scanning"
 msgstr "Genomsökning av IMAP-mapp"
 
-#: src/pref-manager.c:2154
-msgid "Choose depth 1 for fast startup; this defers scanning some folders."
+#: src/pref-manager.c:2152
+msgid ""
+"Choose depth 1 for fast startup; this defers scanning some folders.\n"
+"To see more of the tree at startup, choose a greater depth."
 msgstr ""
 "Välj djupet 1 för snabb uppstart; detta förhindrar genomsökning av en del "
-"mappar."
+"mappar.\n"
+"För att se mer av trädet vid uppstart väljer du ett större djup."
 
-#: src/pref-manager.c:2160
-msgid "To see more of the tree at startup, choose a greater depth."
-msgstr "För att se mer av trädet vid uppstart väljer du ett större djup."
-
-#: src/pref-manager.c:2167
+#: src/pref-manager.c:2163
 msgid "Scan tree to depth"
 msgstr "Genomsök trädet på djupet"
 
-#: src/pref-manager.c:2217
+#: src/pref-manager.c:2213
 msgid "Address Book Name"
 msgstr "Adressboksnamn"
 
-#: src/pref-manager.c:2221
+#: src/pref-manager.c:2217
 msgid "Expand aliases"
 msgstr "Expandera alias"
 
-#: src/pref-manager.c:2228
+#: src/pref-manager.c:2224
 msgid "Set as default"
 msgstr "Sätt som standard"
 
-#: src/pref-manager.c:2376
+#: src/pref-manager.c:2372
 msgid "Remote POP3 mailbox..."
 msgstr "POP3-fjärrbrevlåda..."
 
-#: src/pref-manager.c:2516
+#: src/pref-manager.c:2512
 msgid "Show nothing"
 msgstr "Visa ingenting"
 
-#: src/pref-manager.c:2517
+#: src/pref-manager.c:2513
 msgid "Show dialog"
 msgstr "Visa dialogfönster"
 
-#: src/pref-manager.c:2518
+#: src/pref-manager.c:2514
 msgid "Show in list"
 msgstr "Visa i listan"
 
-#: src/pref-manager.c:2519
+#: src/pref-manager.c:2515
 msgid "Print to console"
 msgstr "Skriv ut på konsoll"
 
-#: src/pref-manager.c:2528
+#: src/pref-manager.c:2524
 msgid "Ask me"
 msgstr "Fråga mig"
 
-#: src/pref-manager.c:2529
+#: src/pref-manager.c:2525
 msgid "Always"
 msgstr "Alltid"
 
-#: src/pref-manager.c:2564
+#: src/pref-manager.c:2560
 msgid "If Possible"
 msgstr "Om möjligt"
 
-#: src/pref-manager.c:2565
+#: src/pref-manager.c:2561
 msgid "Required"
 msgstr "Krävs"
 
@@ -4012,6 +4011,9 @@ msgstr "+"
 #: src/toolbar-prefs.c:834
 msgid "Down"
 msgstr "Ner"
+
+#~ msgid "To see more of the tree at startup, choose a greater depth."
+#~ msgstr "För att se mer av trädet vid uppstart väljer du ett större djup."
 
 #~ msgid "Inbound"
 #~ msgstr "Inkommande"

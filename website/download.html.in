@@ -73,6 +73,23 @@
 	<td colspan="2"><hr></td>
 </tr>
 <tr>
+	<th colspan="2" align=left><big>Experimental release</big></th>
+</tr>
+<tr>
+<td colspan="2"><b>2000.06.21</b>: This is pretty much all we have in CVS: new
+message browser, improved address book handling, more reliable mailbox
+backend. The code has however some experimental and unfinished
+features enabled so be warned! The POP problems some people
+experienced have not been really addressed yet.</p>
+<ul>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.0.tar.gz">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.0.tar.gz</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.0-1.src.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.0-1.src.rpm</a>
+<li><a href="http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.0-1.i386.rpm">http://www.theochem.kth.se/~pawsa/balsa/balsa-0.9.0-1.i386.rpm</a>
+</ul>
+</td>
+</tr>
+
+<tr>
 	<th colspan="2" align="left"><big>CVS source</big></th>
 </tr>
 <tr>

@@ -993,6 +993,10 @@ libbalsa_create_msg(LibBalsaMessage * message, HEADER * msg, char *tmpfile,
 		mime_type =
 		    libbalsa_lookup_mime_type((const gchar *) body->
 					      filename);
+		/* use BASE64 encoding for non-text mime types */
+		if(strcasecmp(mime_type[0],"text") != 0)
+		    newbdy->encoding = ENCBASE64;
+		newbdy->type = mutt_check_mime_type(mime_type[0]);
 		newbdy->type = mutt_check_mime_type(mime_type[0]);
 		g_free(newbdy->subtype);
 		newbdy->subtype = g_strdup(mime_type[1]);

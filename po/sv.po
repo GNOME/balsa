@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2001-12-02 13:14+0100\n"
-"PO-Revision-Date: 2001-12-02 13:15+0100\n"
+"POT-Creation-Date: 2001-12-04 13:56+0100\n"
+"PO-Revision-Date: 2001-12-04 13:56+0100\n"
 "Last-Translator: Christian Rose <menthos@menthos.com>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -40,16 +40,32 @@ msgstr ""
 msgid "Failed to do a search: %s.Check that the base name is valid."
 msgstr "Misslyckades med att söka: %s.Kontrollera att basnamnet är giltigt."
 
-#: libbalsa/address-book-ldap.c:379 libbalsa/address-book-ldif.c:267
-#: libbalsa/address-book-vcard.c:262
+#. The externq database doesn't support Id's, sorry!
+#: libbalsa/address-book-extern.c:237 libbalsa/address-book-ldap.c:379
+#: libbalsa/address-book-ldif.c:267 libbalsa/address-book-vcard.c:262
 msgid "No-Id"
 msgstr "Inget-Id"
 
-#: libbalsa/address-book-ldap.c:383 libbalsa/address-book-ldif.c:270
-#: libbalsa/address-book-ldif.c:545 libbalsa/address-book-ldif.c:549
-#: libbalsa/address-book-vcard.c:271
+#: libbalsa/address-book-extern.c:241 libbalsa/address-book-ldap.c:383
+#: libbalsa/address-book-ldif.c:270 libbalsa/address-book-ldif.c:545
+#: libbalsa/address-book-ldif.c:549 libbalsa/address-book-vcard.c:271
 msgid "No-Name"
 msgstr "Namnlös"
+
+#: libbalsa/address-book-extern.c:215
+#, c-format
+msgid ""
+"Could not open external query address book %s while trying to parse output "
+"from: %s"
+msgstr ""
+"Kunde inte öppna en extern frågeadressbok %s vid försök att tolka utdata "
+"från: %s"
+
+#: libbalsa/address-book-extern.c:266
+#, c-format
+msgid "Could not add address to address book %s while trying to execute: %s"
+msgstr ""
+"Kunde inte lägga till adress till adressboken %s vid försök att köra: %s"
 
 #: libbalsa/address-book-vcard.c:181
 #, c-format
@@ -1093,95 +1109,95 @@ msgstr "SSL är avstängt på grund av entropibrist"
 msgid "Unable to get certificate from peer"
 msgstr "Kunde inte hämta certifikat från peer"
 
-#: libmutt/mutt_ssl.c:398 libmutt/mutt_ssl.c:401
+#: libmutt/mutt_ssl.c:397
 #, c-format
 msgid "SSL connection using %s (%s)"
 msgstr "SSL-anslutning som använder %s (%s)"
 
-#: libmutt/mutt_ssl.c:431
+#: libmutt/mutt_ssl.c:428
 msgid "Unknown"
 msgstr "Okänd"
 
-#: libmutt/mutt_ssl.c:456
+#: libmutt/mutt_ssl.c:453
 msgid "[unable to calculate]"
 msgstr "[kunde inte beräkna]"
 
-#: libmutt/mutt_ssl.c:474
+#: libmutt/mutt_ssl.c:471
 msgid "[invalid date]"
 msgstr "[ogiltigt datum]"
 
-#: libmutt/mutt_ssl.c:549
+#: libmutt/mutt_ssl.c:546
 msgid "Server certificate is not yet valid"
 msgstr "Servercertifikatet är ännu inte giltigt"
 
-#: libmutt/mutt_ssl.c:556
+#: libmutt/mutt_ssl.c:553
 msgid "Server certificate has expired"
 msgstr "Servercertifikatet har gått ut"
 
-#: libmutt/mutt_ssl.c:627
+#: libmutt/mutt_ssl.c:624
 msgid "This certificate accepted but not verified !!!"
 msgstr "Detta certifikat är accepterat men inte verifierat!!!"
 
-#: libmutt/mutt_ssl.c:638
+#: libmutt/mutt_ssl.c:635
 msgid "This certificate belongs to:"
 msgstr "Detta certifikat tillhör:"
 
-#: libmutt/mutt_ssl.c:648
+#: libmutt/mutt_ssl.c:645
 msgid "This certificate was issued by:"
 msgstr "Detta certifikat utfärdades av:"
 
-#: libmutt/mutt_ssl.c:658
+#: libmutt/mutt_ssl.c:655
 msgid "This certificate is valid"
 msgstr "Detta certifikat är giltigt"
 
-#: libmutt/mutt_ssl.c:659
+#: libmutt/mutt_ssl.c:656
 #, c-format
 msgid "   from %s"
 msgstr "   från %s"
 
-#: libmutt/mutt_ssl.c:661
+#: libmutt/mutt_ssl.c:658
 #, c-format
 msgid "     to %s"
 msgstr "     till %s"
 
-#: libmutt/mutt_ssl.c:667
+#: libmutt/mutt_ssl.c:664
 #, c-format
 msgid "Fingerprint: %s"
 msgstr "Fingeravtryck: %s"
 
-#: libmutt/mutt_ssl.c:669
+#: libmutt/mutt_ssl.c:666
 msgid "SSL Certificate check"
 msgstr "SSL-certifikatkontroll"
 
-#: libmutt/mutt_ssl.c:672
+#: libmutt/mutt_ssl.c:669
 msgid "(r)eject, accept (o)nce, (a)ccept always"
 msgstr "(n)eka, godkänn (e)n gång, godkänn (a)lltid"
 
-#: libmutt/mutt_ssl.c:673
+#: libmutt/mutt_ssl.c:670
 msgid "roa"
 msgstr "nea"
 
-#: libmutt/mutt_ssl.c:677
+#: libmutt/mutt_ssl.c:674
 msgid "(r)eject, accept (o)nce"
 msgstr "(n)eka, godkänn (e)n gång"
 
-#: libmutt/mutt_ssl.c:678
+#: libmutt/mutt_ssl.c:675
 msgid "ro"
 msgstr "ne"
 
-#: libmutt/mutt_ssl.c:682
+#: libmutt/mutt_ssl.c:679
 msgid "Exit  "
 msgstr "Avsluta  "
 
-#: libmutt/mutt_ssl.c:684
+#: libmutt/mutt_ssl.c:681
 msgid "Help"
 msgstr "Hjälp"
 
-#: libmutt/mutt_ssl.c:708
+#: libmutt/mutt_ssl.c:705
 msgid "Warning: Couldn't save certificate"
 msgstr "Varning: Kunde inte spara certifikat"
 
-#: libmutt/mutt_ssl.c:713
+#: libmutt/mutt_ssl.c:710
 msgid "Certificate saved"
 msgstr "Certifikat sparat"
 

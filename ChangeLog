@@ -1,3 +1,8 @@
+2001-02-28  Carlos Morgado  <chbm@chbm.nu>
+
+	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_set_path)
+	fixed silly bug introduced 3 days ago (my bad)
+
 2001-02-27  Pawel Salek  <pawsa@theochem.kth.se>
 
 	* libbalsa/address-book-ldap.c: RFC2254 compatibility patch from 

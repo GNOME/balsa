@@ -26,6 +26,8 @@
 #include "balsa-message.h"
 #include "index-child.h"
 #include "main-window.h"
+#include "main-window.h"
+#include "mblist-window.h"
 #include "misc.h"
 
 typedef struct _MBListWindow MBListWindow;
@@ -56,8 +58,7 @@ mblist_open_window (GnomeMDI * mdi)
   GtkWidget *bbox;
   GtkWidget *button;
   gchar *text[] =
-  {"Balsa", NULL};
-  gint i=0;
+  {"Balsa"};
 
   if (mblw)
     return;
@@ -89,6 +90,10 @@ mblist_open_window (GnomeMDI * mdi)
 
   gtk_clist_freeze (GTK_CLIST (mblw->ctree));
 
+  mblist_add_mailbox (balsa_app.inbox);
+  mblist_add_mailbox (balsa_app.outbox);
+  mblist_add_mailbox (balsa_app.trash);
+
   if (balsa_app.mailbox_nodes)
     {
       GNode *walk;
@@ -97,7 +102,7 @@ mblist_open_window (GnomeMDI * mdi)
       while (walk)
 	{
 	  gtk_ctree_insert_gnode (mblw->ctree, mblw->parent, NULL,
-				  walk, mailbox_nodes_to_ctree, &i);
+				  walk, mailbox_nodes_to_ctree, NULL);
 	  walk = walk->prev;
 	}
     }
@@ -149,7 +154,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
       if (mbnode->mailbox->type == MAILBOX_IMAP ||
 	  mbnode->mailbox->type == MAILBOX_POP3)
 	return FALSE;
-      
+
       if (mbnode->mailbox && mbnode->name)
 	{
 	  if (!strcmp (MAILBOX_LOCAL (mbnode->mailbox)->path, mbnode->name))
@@ -158,7 +163,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
 				       NULL, NULL, NULL,
 				       G_NODE_IS_LEAF (gnode), TRUE);
-	      gtk_ctree_set_row_data(ctree,cnode,mbnode->mailbox);
+	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	  else
 	    {
@@ -166,7 +171,7 @@ mailbox_nodes_to_ctree (GtkCTree * ctree,
 	      gtk_ctree_set_node_info (ctree, cnode, mbnode->mailbox->name, 2, NULL,
 				       NULL, NULL, NULL,
 				       FALSE, TRUE);
-	      gtk_ctree_set_row_data(ctree,cnode,mbnode->mailbox);
+	      gtk_ctree_set_row_data (ctree, cnode, mbnode->mailbox);
 	    }
 	}
     }
@@ -227,15 +232,17 @@ void
 mblist_add_mailbox (Mailbox * mailbox)
 {
   GtkCTreeNode *sibling;
-  gchar *text[2];
-/*
-   if (mailbox)
-   {
-   sibling = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, NULL,
-   NULL, NULL, NULL, TRUE, TRUE);
-   gtk_ctree_set_row_data (mblw->ctree, sibling, mailbox);
-   }
- */
+  gchar *text[] = {NULL};
+  
+  text[0]=mailbox->name;
+
+  if (mailbox)
+    {
+      sibling = gtk_ctree_insert (mblw->ctree, mblw->parent, NULL, text, 0, NULL,
+				  NULL, NULL, NULL, TRUE, TRUE);
+      gtk_ctree_set_row_data (mblw->ctree, sibling, mailbox);
+    }
+
 }
 
 void

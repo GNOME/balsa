@@ -632,10 +632,6 @@ mblist_window_cb (GtkWidget * widget)
   Mailbox *mailbox;
 
   mblist_open_window (mdi);
-
-  mblist_add_mailbox (balsa_app.inbox);
-  mblist_add_mailbox (balsa_app.outbox);
-  mblist_add_mailbox (balsa_app.trash);
 }
 
 static void

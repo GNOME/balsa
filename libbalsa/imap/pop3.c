@@ -676,7 +676,7 @@ pop_delete_message(PopHandle *pop, unsigned msgno,
 void
 pop_complete_pending_requests(PopHandle *pop)
 {
-  unsigned i, current_mark, cnt=0;
+  unsigned i, current_mark;
   if(pop->completing_requests || pop->state != IMHS_AUTHENTICATED)
     return;
   pop->completing_requests = 1;

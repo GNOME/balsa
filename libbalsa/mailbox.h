@@ -154,7 +154,7 @@ typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
 struct _LibBalsaMailboxView {
-    LibBalsaAddress *mailing_list_address;
+    InternetAddressList *mailing_list_address;
     gchar *identity_name;
     LibBalsaMailboxThreadingType threading_type;
     /** filter is a frontend-specific code determining used view
@@ -487,8 +487,8 @@ gboolean libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 					  LibBalsaChkCryptoMode gpg_chk_mode);
 #endif
 
-LibBalsaAddress *libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox
-							   * mailbox);
+InternetAddressList
+    *libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox);
 const gchar *libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox);
 LibBalsaMailboxThreadingType
 libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox);

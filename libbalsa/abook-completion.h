@@ -27,15 +27,16 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_COMPLETION_H__
 #define __LIBBALSA_ADDRESS_BOOK_COMPLETION_H__
 
-#include "address-book.h"
+#include "address.h"
 
 typedef struct _CompletionData CompletionData;
 struct _CompletionData {
 	gchar *string;
-	LibBalsaAddress *address;
+	InternetAddress *ia;
 };
 
-CompletionData *completion_data_new(LibBalsaAddress * address);
+CompletionData *completion_data_new(InternetAddress * ia,
+                                    const gchar * nick_name);
 void completion_data_free(CompletionData * data);
 gchar *completion_data_extract(CompletionData * data);
 gint address_compare(LibBalsaAddress *a, LibBalsaAddress *b);

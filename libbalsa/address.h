@@ -91,31 +91,14 @@ struct _LibBalsaAddressClass {
 GType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
-LibBalsaAddress *libbalsa_address_new_from_string(const gchar * address);
-void libbalsa_address_set_copy_member(LibBalsaAddress * dest,
-                                      LibBalsaAddress * src,
-                                      const gchar * mailbox);
 void libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src);
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
-GList *libbalsa_address_new_list_from_gmime(const InternetAddressList *
-                                            address_list);
-GList *libbalsa_address_new_list_from_string(const gchar * address);
 
-/* get pointer to descriptive name (full name if available, or e-mail) */
-const gchar *libbalsa_address_get_name(const LibBalsaAddress * addr);
-
-/* libbalsa_address_get_mailbox and libbalsa_address_get_phrase
-   are used to create the ESMTP envelope of the message. Note that
-   they have different semantics than libbalsa_addres_to_gchar() 
-   when the address is a group. get_mailbox() must return all addresses
-   while address_to_gchar() may return empty list.
-*/
-/* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
-const gchar *libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n);
-#if ENABLE_ESMTP
-/* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
-const gchar *libbalsa_address_get_phrase(LibBalsaAddress * address);
-#endif
+const gchar *libbalsa_address_get_name_from_list(const InternetAddressList
+                                                 * address_list);
+const gchar *libbalsa_address_get_mailbox_from_list(const
+                                                    InternetAddressList *
+                                                    address_list);
 
 /* =================================================================== */
 /*                                UI PART                              */

@@ -207,35 +207,6 @@ libbalsa_urldecode(const gchar * str)
     return retval;
 }
 
-/* FIXME: Move to address.c and change name to
- *   libbalsa_address_list_to_string or something */
-gchar *
-libbalsa_make_string_from_list(const GList * the_list)
-{
-    return libbalsa_make_string_from_list_p(the_list);
-}
-/* private to libbalsa: */
-gchar *
-libbalsa_make_string_from_list_p(const GList * the_list)
-{
-    const GList *list;
-    GString *gs = g_string_new(NULL);
-
-    for (list = the_list; list; list = list->next) {
-        LibBalsaAddress *addy = list->data;
-        gchar *str = libbalsa_address_to_gchar_p(addy, -1);
-        if (str) {
-            if (gs->len > 0)
-                g_string_append(gs, ", ");
-            g_string_append(gs, str);
-            g_free(str);
-        }
-    }
-
-    return g_string_free(gs, FALSE);
-}
-
-
 /* readfile allocates enough space for the ending '\0' characeter as well.
    returns the number of read characters.
 */

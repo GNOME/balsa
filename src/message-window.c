@@ -361,7 +361,7 @@ message_window_idle_handler(MessageWindow* mw)
     }
 
     /* set window title */
-    from = libbalsa_address_to_gchar(message->headers->from, 0);
+    from = internet_address_list_to_string(message->headers->from, FALSE);
     title = g_strdup_printf(_("Message from %s: %s"), from,
                             LIBBALSA_MESSAGE_GET_SUBJECT(message));
     g_free(from);

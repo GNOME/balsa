@@ -321,7 +321,7 @@ print_header_string(GList **header_list, const gchar *field_id,
 
 static void
 print_header_list(GList **header_list, const gchar *field_id,
-		  const gchar *label, GList *values)
+		  const gchar *label, InternetAddressList * values)
 {
     gchar **hdr_pair;
 
@@ -333,7 +333,7 @@ print_header_list(GList **header_list, const gchar *field_id,
 
     hdr_pair = g_new0(gchar *, 3);
     hdr_pair[0] = g_strdup(label);
-    hdr_pair[1] = libbalsa_make_string_from_list(values);
+    hdr_pair[1] = internet_address_list_to_string(values, FALSE);
     *header_list = g_list_append(*header_list, hdr_pair);
 }
 
@@ -366,7 +366,7 @@ prepare_header_real(PrintInfo * pi, LibBalsaMessageBody * sig_body,
     g_free(date);
 
     if (headers->from) {
-	gchar *from = libbalsa_address_to_gchar(headers->from, 0);
+	gchar *from = internet_address_list_to_string(headers->from, FALSE);
 	print_header_string (&pdata->headers, "from", _("From:"), from);
 	g_free(from);
     }
@@ -377,7 +377,8 @@ prepare_header_real(PrintInfo * pi, LibBalsaMessageBody * sig_body,
     print_header_string (&pdata->headers, "fcc", _("Fcc:"), headers->fcc_url);
 
     if (headers->dispnotify_to) {
-	gchar *mdn_to = libbalsa_address_to_gchar(headers->dispnotify_to, 0);
+	gchar *mdn_to =
+	    internet_address_list_to_string(headers->dispnotify_to, FALSE);
 	print_header_string (&pdata->headers, "disposition-notification-to", 
 			     _("Disposition-Notification-To:"), mdn_to);
 	g_free(mdn_to);
@@ -491,7 +492,9 @@ prepare_message_header(PrintInfo * pi, LibBalsaMessageBody * body)
     g_free(date);
 
     if (pi->message->headers->from) {
-	gchar *from = libbalsa_address_to_gchar(pi->message->headers->from, 0);
+	gchar *from =
+	    internet_address_list_to_string(pi->message->headers->from,
+		                            FALSE);
 	if (footer_string) {
 	    footer_string = g_string_prepend(footer_string, " - ");
 	    footer_string = g_string_prepend(footer_string, from);

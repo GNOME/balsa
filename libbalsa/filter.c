@@ -131,14 +131,18 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
         }
         /* do the work */
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
-	    str=libbalsa_make_string_from_list(message->headers->to_list);
+            str =
+                internet_address_list_to_string(message->headers->to_list,
+                                                FALSE);
 	    match=libbalsa_utf8_strstr(str,cond->match.string.string);
 	    g_free(str);
             if(match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)
             && message->headers->from) {
-	    str=libbalsa_address_to_gchar(message->headers->from,0);
+            str =
+                internet_address_list_to_string(message->headers->from,
+                                                FALSE);
 	    match=libbalsa_utf8_strstr(str,cond->match.string.string);
 	    g_free(str);
 	    if (match) break;
@@ -151,7 +155,9 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
             }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
-	    str=libbalsa_make_string_from_list(message->headers->cc_list);
+            str =
+                internet_address_list_to_string(message->headers->cc_list,
+                                                FALSE);
 	    match=libbalsa_utf8_strstr(str,cond->match.string.string);
 	    g_free(str);
 	    if (match) break;

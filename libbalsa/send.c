@@ -482,27 +482,19 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
 
 static void
 add_recipients(smtp_message_t message, smtp_message_t bcc_message, 
-               GList *recipient_list, const char *header)
+               InternetAddressList *recipient_list, const char *header)
 {
-    for(;recipient_list; recipient_list = recipient_list->next) {
-        LibBalsaAddress *addy = recipient_list->data;
-        const gchar *mailbox;
-        int i;
-#ifdef LIBESMTP_ADDS_HEADERS
-        const gchar *phrase = libbalsa_address_get_phrase(addy);
-#endif
+    for (; recipient_list; recipient_list = recipient_list->next) {
+        InternetAddress *ia = recipient_list->address;
 
-        for(i=0; (mailbox = libbalsa_address_get_mailbox(addy, i)); i++) {
-            smtp_add_recipient (message, mailbox);
+	if (ia->type == INTERNET_ADDRESS_NAME)
+	    smtp_add_recipient (message, ia->value.addr);
+	else if (ia->type == INTERNET_ADDRESS_GROUP)
+	    add_recipients(message, bcc_message, ia->value.members, header);
+
             /* XXX  - this is where to add DSN requests.  It would be
                cool if LibBalsaAddress could contain DSN options
                for a particular recipient. */
-#ifdef LIBESMTP_ADDS_HEADERS
-            smtp_set_header (message, "To", phrase, mailbox);
-            if (bcc_message)
-                smtp_set_header (bcc_message, "To", phrase, mailbox);
-#endif
-        }
     }
 }
 
@@ -523,7 +515,6 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 {
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
-    GList *recip, *bcc_recip;
     LibBalsaMessage *msg;
     smtp_session_t session;
     smtp_message_t message, bcc_message;
@@ -587,6 +578,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
+	    InternetAddress *ia;
+
 	    lbs_change_flags(msg, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	    /*
 	       The message needs to be filtered and the newlines converted to
@@ -631,12 +624,11 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	       the Bcc: header.  The BCC copy of the message recipient
 	       list is taken from the Bcc recipient list and the Bcc:
 	       header is preserved in the message. */
-	    bcc_recip = g_list_first((GList *) msg->headers->bcc_list);
-	    if (!bcc_recip)
+	    if (!msg->headers->bcc_list)
 		bcc_message = NULL;
 	    else
 		bcc_message = smtp_add_message (session);
-            new_message->refcount = bcc_recip ? 2 : 1;
+            new_message->refcount = bcc_message ? 2 : 1;
 
 	    /* Add this after the Bcc: copy. */
 	    message = smtp_add_message (session);
@@ -671,9 +663,13 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	    }
 
 	    /* Add the sender info */
-            if (msg->headers->from) {
-	        phrase = libbalsa_address_get_phrase(msg->headers->from);
-	        mailbox = libbalsa_address_get_mailbox(msg->headers->from, 0);
+            if (msg->headers->from
+		&& (ia = msg->headers->from->address)
+		&& ia->type != INTERNET_ADDRESS_NONE) {
+	        phrase = ia->name;
+		while (ia->type == INTERNET_ADDRESS_GROUP)
+		    ia = ia->value.members->address;
+	        mailbox = ia->value.addr;
             } else
                 phrase = mailbox = "";
 	    smtp_set_reverse_path (message, mailbox);
@@ -683,17 +679,25 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	        smtp_set_header (bcc_message, "From", phrase, mailbox);
 	    }
 
-	    if (msg->headers->reply_to) {
-		phrase = libbalsa_address_get_phrase(msg->headers->reply_to);
-		mailbox = libbalsa_address_get_mailbox(msg->headers->reply_to, 0);
+	    if (msg->headers->reply_to
+		&& (ia = msg->headers->reply_to->address)
+                && ia->type != INTERNET_ADDRESS_NONE) {
+		phrase = ia->name;
+		while (ia->type == INTERNET_ADDRESS_GROUP)
+		    ia = ia->value.members->address;
+	        mailbox = ia->value.addr;
 		smtp_set_header (message, "Reply-To", phrase, mailbox);
 		if (bcc_message)
 		    smtp_set_header (bcc_message, "Reply-To", phrase, mailbox);
 	    }
 
-	    if (msg->headers->dispnotify_to) {
-		phrase = libbalsa_address_get_phrase(msg->headers->dispnotify_to);
-		mailbox = libbalsa_address_get_mailbox(msg->headers->dispnotify_to, 0);
+	    if (msg->headers->dispnotify_to
+		&& (ia = msg->headers->dispnotify_to->address)
+		&& ia->type != INTERNET_ADDRESS_NONE) {
+		phrase = ia->name;
+		while (ia->type == INTERNET_ADDRESS_GROUP)
+		    ia = ia->value.members->address;
+	        mailbox = ia->value.addr;
 		smtp_set_header (message, "Disposition-Notification-To",
 				 phrase, mailbox);
 		if (bcc_message)
@@ -706,12 +710,10 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	       copy of the message gets the To and Cc recipient list.
 	       The bcc copy gets the Bcc recipients.  */
 
-	    recip = g_list_first(msg->headers->to_list);
-            add_recipients(message, bcc_message, recip, "To");
-	    recip = g_list_first(msg->headers->cc_list);
-            add_recipients(message, bcc_message, recip, "Cc");
+            add_recipients(message, bcc_message, msg->headers->to_list, "To");
+            add_recipients(message, bcc_message, msg->headers->cc_list, "Cc");
 
-            add_recipients(bcc_message, NULL, bcc_recip, "Cc");
+            add_recipients(bcc_message, NULL, msg->headers->bcc_list, "Cc");
 
 	    /* Prohibit status headers. */
 	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT, 1);
@@ -1259,8 +1261,7 @@ balsa_send_message_real(SendMessageInfo* info)
     while ( (mqi = get_msg2send()) != NULL) {
 	GPtrArray *args = g_ptr_array_new();
 	LibBalsaMessage *msg = LIBBALSA_MESSAGE(mqi->orig);
-	GList *recip;
-	LibBalsaAddress *addy;
+	InternetAddressList *list;
 	const gchar *mailbox;
 	gchar *cmd;
 	FILE *sendmail;
@@ -1268,26 +1269,17 @@ balsa_send_message_real(SendMessageInfo* info)
 
 	g_ptr_array_add(args, SENDMAIL);
 	g_ptr_array_add(args, "--");
-	recip = g_list_first((GList *) msg->headers->to_list);
-	while (recip) {
-	    addy = recip->data;
-	    mailbox = libbalsa_address_get_mailbox(addy, 0);
+	for (list = msg->headers->to_list; list; list = list->next) {
+	    mailbox = libbalsa_address_get_mailbox_from_list(list);
 	    g_ptr_array_add(args, (char*)mailbox);
-	    recip = recip->next;
 	}
-	recip = g_list_first((GList *) msg->headers->cc_list);
-	while (recip) {
-	    addy = recip->data;
-	    mailbox = libbalsa_address_get_mailbox(addy, 0);
+	for (list = msg->headers->cc_list; list; list = list->next) {
+	    mailbox = libbalsa_address_get_mailbox_from_list(list);
 	    g_ptr_array_add(args, (char*)mailbox);
-	    recip = recip->next;
 	}
-	recip = g_list_first((GList *) msg->headers->bcc_list);
-	while (recip) {
-	    addy = recip->data;
-	    mailbox = libbalsa_address_get_mailbox(addy, 0);
+	for (list = msg->headers->bcc_list; list; list = list->next) {
+	    mailbox = libbalsa_address_get_mailbox_from_list(list);
 	    g_ptr_array_add(args, (char*)mailbox);
-	    recip = recip->next;
 	}
 	g_ptr_array_add(args, NULL);
 	cmd = g_strjoinv(" ", (gchar**)args->pdata);
@@ -1364,17 +1356,15 @@ message_add_references(LibBalsaMessage * message, GMimeMessage * msg)
 
 #ifdef HAVE_GPGME
 static GList *
-get_mailbox_names(GList *list, GList *address_list)
+get_mailbox_names(GList *list, const InternetAddressList *address_list)
 {
-    GList *recip;
-    LibBalsaAddress *addy; 
-    recip = g_list_first(address_list);
-    while (recip) {
-	char *mailbox;
-	addy = recip->data;
-	mailbox = (char*)libbalsa_address_get_mailbox(addy, 0);
-	list = g_list_append(list, mailbox);
-	recip = recip->next;
+    for (; address_list; address_list = address_list->next) {
+	InternetAddress *ia = address_list->address;
+
+	if (ia->type == INTERNET_ADDRESS_NAME)
+	    list = g_list_append(list, g_strdup(ia->value.addr));
+	else if (ia->type == INTERNET_ADDRESS_GROUP)
+	    list = get_mailbox_names(list, ia->value.members);
     }
 
     return list;
@@ -1585,14 +1575,16 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
     message_add_references(message, mime_message);
 
     if (message->headers->from) {
-	tmp = libbalsa_address_to_gchar(message->headers->from, -1);
+	tmp = internet_address_list_to_string(message->headers->from,
+		                              TRUE);
 	if (tmp) {
 	    g_mime_message_set_sender(mime_message, tmp);
 	    g_free(tmp);
 	}
     }
     if (message->headers->reply_to) {
-	tmp = libbalsa_address_to_gchar(message->headers->reply_to, -1);
+	tmp = internet_address_list_to_string(message->headers->reply_to,
+		                              TRUE);
 	if (tmp) {
 	    g_mime_message_set_reply_to(mime_message, tmp);
 	    g_free(tmp);
@@ -1605,23 +1597,24 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gint encoding,
 
     g_mime_message_set_date(mime_message, message->headers->date, 0); /* FIXME: Set GMT offset */
 
-    tmp = libbalsa_make_string_from_list(message->headers->to_list);
+    tmp = internet_address_list_to_string(message->headers->to_list, TRUE);
     g_mime_message_add_recipients_from_string(mime_message,
 					      GMIME_RECIPIENT_TYPE_TO, tmp);
     g_free(tmp);
 
-    tmp = libbalsa_make_string_from_list(message->headers->cc_list);
+    tmp = internet_address_list_to_string(message->headers->cc_list, TRUE);
     g_mime_message_add_recipients_from_string(mime_message,
 					      GMIME_RECIPIENT_TYPE_CC, tmp);
     g_free(tmp);
 
-    tmp = libbalsa_make_string_from_list(message->headers->bcc_list);
+    tmp = internet_address_list_to_string(message->headers->bcc_list, TRUE);
     g_mime_message_add_recipients_from_string(mime_message,
 					      GMIME_RECIPIENT_TYPE_BCC, tmp);
     g_free(tmp);
 
     if (message->headers->dispnotify_to) {
-	tmp = libbalsa_address_to_gchar(message->headers->dispnotify_to, 0);
+        tmp = internet_address_to_string(message->headers->dispnotify_to->
+                                         address, TRUE);
 	if (tmp) {
 	    g_mime_message_add_header(mime_message,
 				      "Disposition-Notification-To", tmp);
@@ -1758,6 +1751,23 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
 
 
 #ifdef HAVE_GPGME
+static const gchar *
+lb_send_from(LibBalsaMessage *message)
+{
+    InternetAddress *ia = message->headers->from->address;
+    
+    if (ia->type == INTERNET_ADDRESS_NONE)
+	return NULL;
+    
+    while (ia->type == INTERNET_ADDRESS_GROUP)
+	ia = ia->value.members->address;
+
+    if (ia->type == INTERNET_ADDRESS_NONE)
+	return NULL;
+
+    return ia->value.addr;
+}
+
 static gint
 libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 {
@@ -1768,7 +1778,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 	{
 	case LIBBALSA_PROTECT_SIGN:   /* sign only */
 	    if (!libbalsa_rfc2440_sign_encrypt(mime_part, 
-					       message->headers->from->address_list->data,
+					       lb_send_from(message),
 					       NULL, NULL))
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
 	    break;
@@ -1781,10 +1791,12 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 		/* build a list containing the addresses of all to:, cc:
 		   and the from: address. Note: don't add bcc: addresses
 		   as they would be visible in the encrypted block. */
-		encrypt_for = get_mailbox_names(encrypt_for, message->headers->to_list);
-		encrypt_for = get_mailbox_names(encrypt_for, message->headers->cc_list);
-		encrypt_for = g_list_append(encrypt_for,
-					    message->headers->from->address_list->data);
+		encrypt_for = get_mailbox_names(encrypt_for,
+			                        message->headers->to_list);
+		encrypt_for = get_mailbox_names(encrypt_for,
+			                        message->headers->cc_list);
+		encrypt_for = get_mailbox_names(encrypt_for,
+					        message->headers->from);
 		if (message->headers->bcc_list)
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					 _("This message will not be encrypted for the BCC: recipient(s)."));
@@ -1792,7 +1804,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 		if (mode & LIBBALSA_PROTECT_SIGN)
 		    result = 
 			libbalsa_rfc2440_sign_encrypt(mime_part, 
-						      message->headers->from->address_list->data,
+					              lb_send_from(message),
 						      encrypt_for,
 						      NULL);
 		else
@@ -1801,6 +1813,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part)
 						      NULL,
 						      encrypt_for,
 						      NULL);
+		g_list_foreach(encrypt_for, (GFunc) g_free, NULL);
 		g_list_free(encrypt_for);
 		if (!result)
 		    return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
@@ -1842,7 +1855,7 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
 	{
 	case LIBBALSA_PROTECT_SIGN:   /* sign message */
 	    if (!libbalsa_sign_mime_object(mime_root,
-					   message->headers->from->address_list->data,
+					   lb_send_from(message),
 					   protocol, NULL))
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
 	    break;
@@ -1860,7 +1873,7 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
 		encrypt_for = get_mailbox_names(encrypt_for,
 						message->headers->cc_list);
 		encrypt_for = g_list_append(encrypt_for,
-					    message->headers->from->address_list->data);
+					    g_strdup(lb_send_from(message)));
 		if (message->headers->bcc_list)
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					 _("This message will not be encrypted for the BCC: recipient(s)."));
@@ -1868,7 +1881,7 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root)
 		if (message->gpg_mode & LIBBALSA_PROTECT_SIGN)
 		    success = 
 			libbalsa_sign_encrypt_mime_object(mime_root,
-							  message->headers->from->address_list->data,
+							  lb_send_from(message),
 							  encrypt_for, protocol,
 							  NULL);
 		else

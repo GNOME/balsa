@@ -268,6 +268,43 @@ validate_vcard_string(gchar * vcstr)
     return utf8res;
 }
 
+/* To create distribution lists based on the ORG field:
+ * #define MAKE_GROUP_BY_ORGANIZATION TRUE
+ */
+#if MAKE_GROUP_BY_ORGANIZATION
+static void
+group_address(const gchar * group_name, GSList * group_addresses,
+              GList ** completion_list)
+{
+    GSList *l;
+    CompletionData *cmp_data;
+    InternetAddress *ia;
+
+    if (!group_addresses || !group_addresses->next)
+        return;
+
+    ia = internet_address_new_group(group_name);
+    for (l = group_addresses; l; l = l->next) {
+        GList *mailbox;
+        LibBalsaAddress *address = LIBBALSA_ADDRESS(l->data);
+
+        for (mailbox = address->address_list; mailbox;
+             mailbox = mailbox->next) {
+            InternetAddress *member =
+                internet_address_new_name(address->full_name,
+                                          mailbox->data);
+            internet_address_add_member(ia, member);
+            internet_address_unref(member);
+        }
+    }
+    g_slist_free(group_addresses);
+
+    cmp_data = completion_data_new(ia, NULL);
+    internet_address_unref(ia);
+    *completion_list = g_list_prepend(*completion_list, cmp_data);
+}
+#endif                          /* MAKE_GROUP_BY_ORGANIZATION */
+
 /* FIXME: Could stat the file to see if it has changed since last time
    we read it */
 static gboolean
@@ -275,12 +312,15 @@ load_vcard_file(LibBalsaAddressBook *ab)
 {
     FILE *gc;
     gchar string[LINE_LEN];
-    gchar *name = NULL, *id = NULL;
+    gchar *name = NULL, *id = NULL, *org = NULL;
     gint in_vcard = FALSE;
     GList *list = NULL;
     GList *completion_list = NULL;
     GList *address_list = NULL;
     CompletionData *cmp_data;
+#if MAKE_GROUP_BY_ORGANIZATION
+    GHashTable *group_table;
+#endif                          /* MAKE_GROUP_BY_ORGANIZATION */
 
     LibBalsaAddressBookVcard *addr_vcard;
 
@@ -328,17 +368,20 @@ load_vcard_file(LibBalsaAddressBook *ab)
 		else
 		    address->full_name = g_strdup(_("No-Name"));
 
-
 		/* FIXME: Split into Firstname, Middlename and Lastname... */
+
+		address->organization = org;
 
 		list = g_list_prepend(list, address);
 		address_list = NULL;
 	    } else {		/* record without e-mail address, ignore */
 		g_free(name);
 		g_free(id);
+		g_free(org);
 	    }
 	    name = NULL;
 	    id = NULL;
+	    org = NULL;
 	    in_vcard = FALSE;
 	    continue;
 	}
@@ -357,6 +400,12 @@ load_vcard_file(LibBalsaAddressBook *ab)
 	if (g_ascii_strncasecmp(string, "N:", 2) == 0) {
 	    name = extract_name(string + 2);
 	    name = validate_vcard_string(name);
+	    continue;
+	}
+
+	if (g_ascii_strncasecmp(string, "ORG:", 4) == 0) {
+	    org = g_strdup(string + 4);
+	    org = validate_vcard_string(org);
 	    continue;
 	}
 
@@ -380,27 +429,69 @@ load_vcard_file(LibBalsaAddressBook *ab)
     addr_vcard->address_list = list;
 
     completion_list = NULL;
+#if MAKE_GROUP_BY_ORGANIZATION
+    group_table =
+	g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+#endif                          /* MAKE_GROUP_BY_ORGANIZATION */
     for (;list; list = list->next) {
 	LibBalsaAddress *address = list->data;
+#if MAKE_GROUP_BY_ORGANIZATION
+	gchar **groups, **group;
+#endif                          /* MAKE_GROUP_BY_ORGANIZATION */
+	GList *l;
 
-	if (address->address_list->next && !ab->dist_list_mode) {
-	    /* Create multiple LibBalsaAddress objects. */
+	if (address->address_list->next && ab->dist_list_mode) {
+	    /* Create a group address. */
+	    InternetAddress *ia =
+		internet_address_new_group(address->full_name);
+
+	    for (l = address->address_list; l; l = l->next) {
+		InternetAddress *member =
+		    internet_address_new_name(NULL, l->data);
+		internet_address_add_member(ia, member);
+		internet_address_unref(member);
+	    }
+	    cmp_data = completion_data_new(ia, address->nick_name);
+	    completion_list = g_list_prepend(completion_list, cmp_data);
+	    internet_address_unref(ia);
+	} else {
+	    /* Create name addresses. */
 	    GList *l;
 
 	    for (l = address->address_list; l; l = l->next) {
-		LibBalsaAddress *member;
-
-		member = libbalsa_address_new();
-		libbalsa_address_set_copy_member(member, address, l->data);
-		cmp_data = completion_data_new(member);
-		g_object_unref(member);
+		InternetAddress *ia =
+		    internet_address_new_name(address->full_name, l->data);
+		cmp_data = completion_data_new(ia, address->nick_name);
 		completion_list = g_list_prepend(completion_list, cmp_data);
+		internet_address_unref(ia);
 	    }
-	} else {
-	    cmp_data = completion_data_new(address);
-	    completion_list = g_list_prepend(completion_list, cmp_data);
 	}
+
+#if MAKE_GROUP_BY_ORGANIZATION
+	if (!address->organization || !*address->organization)
+	    continue;
+	groups = g_strsplit(address->organization, ";", 0);
+	for (group = groups; *group; group++) {
+	    gchar *group_name;
+	    GSList *group_addresses;
+
+	    g_strstrip(*group);
+            group_name = group == groups ? g_strdup(*group) :
+                g_strconcat(*groups, " ", *group, NULL);
+	    group_addresses = g_hash_table_lookup(group_table, group_name);
+	    group_addresses = g_slist_prepend(group_addresses, address);
+	    g_hash_table_replace(group_table, group_name, group_addresses);
+	}
+	g_strfreev(groups);
+#endif                          /* MAKE_GROUP_BY_ORGANIZATION */
     }
+
+#if MAKE_GROUP_BY_ORGANIZATION
+    g_hash_table_foreach(group_table, (GHFunc) group_address,
+	                 &completion_list);
+    g_hash_table_destroy(group_table);
+#endif                          /* MAKE_GROUP_BY_ORGANIZATION */
+
     completion_list = g_list_reverse(completion_list);
     g_completion_add_items(addr_vcard->name_complete, completion_list);
     g_list_free(completion_list);
@@ -583,10 +674,9 @@ libbalsa_address_book_vcard_alias_complete(LibBalsaAddressBook * ab,
     for (list = g_completion_complete(vc->name_complete, (gchar *) prefix,
                                       new_prefix);
          list; list = list->next) {
-        LibBalsaAddress *address =
-	    ((CompletionData *) list->data)->address;
-        g_object_ref(address);
-        res = g_list_prepend(res, address);
+	InternetAddress *ia = ((CompletionData *) list->data)->ia;
+	internet_address_ref(ia);
+        res = g_list_prepend(res, ia);
     }
 
     return g_list_reverse(res);

@@ -65,6 +65,10 @@ typedef struct {
     GSList *active;
     gchar *domain;
     GHashTable *table;
+    /* InternetAddress is not a GObject class, so we must keep track of
+     * the addresses in the GtkListStore and unref them when we're done.
+     */
+    InternetAddressList *address_list;
 } LibBalsaAddressEntryInfo;
 
 #define LIBBALSA_ADDRESS_ENTRY_INFO "libbalsa-address-entry-info"
@@ -72,6 +76,7 @@ typedef struct {
 /*************************************************************
  *     Deallocate LibBalsaAddressEntryInfo.
  *************************************************************/
+
 static void
 lbae_info_free(LibBalsaAddressEntryInfo * info)
 {
@@ -79,6 +84,7 @@ lbae_info_free(LibBalsaAddressEntryInfo * info)
     g_slist_free(info->list);
     g_free(info->domain);
     g_hash_table_destroy(info->table);
+    internet_address_list_destroy(info->address_list);
     g_free(info);
 }
 
@@ -197,23 +203,26 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
     GtkTreeIter iter;
     gchar *name;
 
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
     store = GTK_LIST_STORE(gtk_entry_completion_get_model(completion));
     gtk_list_store_clear(store);
     /* Synchronize the filtered model. */
     gtk_entry_completion_complete(completion);
 
+    internet_address_list_destroy(info->address_list);
+    info->address_list = NULL;
     for (; match; match = match->next) {
-        LibBalsaAddress *address = match->data;
+	InternetAddress *ia = match->data;
 
-	name = libbalsa_address_to_gchar(address, -1);
+	name = internet_address_to_string(ia, FALSE);
         gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, NAME_COL, name, ADDRESS_COL,
-                           address, -1);
+        gtk_list_store_set(store, &iter, NAME_COL, name, ADDRESS_COL, ia, -1);
+	info->address_list =
+	    internet_address_list_append(info->address_list, ia);
         g_free(name);
     }
 
-    info = g_object_get_data(G_OBJECT(completion),
-                             LIBBALSA_ADDRESS_ENTRY_INFO);
     if (info->domain && *info->domain && !strpbrk(prefix, "@%!")) {
         /* No domain in the user's entry, and the current identity has a
          * default domain, so we'll add user@domain as a possible
@@ -225,21 +234,23 @@ lbae_append_addresses(GtkEntryCompletion * completion, GList * match,
     }
 }
 
+/*************************************************************
+ *     Fetch a GList of addresses matching the active entry and update
+ *     the GtkEntryCompletion's list.
+ *************************************************************/
 static void
 lbae_entry_setup_matches(GtkEntry * entry, GtkEntryCompletion * completion,
                          LibBalsaAddressEntryInfo * info,
                          LibBalsaAddressEntryMatchType type)
 {
     const gchar *prefix;
-    GList *match;
+    GList *match = NULL;
 
     prefix = info->active->data;
-    if (!*prefix)
-        return;
-
-    match = lbae_get_matching_addresses(prefix, type);
+    if (*prefix)
+	match = lbae_get_matching_addresses(prefix, type);
     lbae_append_addresses(completion, match, prefix);
-    g_list_foreach(match, (GFunc) g_object_unref, NULL);
+    g_list_foreach(match, (GFunc) internet_address_unref, NULL);
     g_list_free(match);
 }
 
@@ -283,7 +294,7 @@ lbae_completion_match_selected(GtkEntryCompletion * completion,
                                gpointer user_data)
 {
     LibBalsaAddressEntryInfo *info;
-    LibBalsaAddress *address;
+    InternetAddress *ia;
     gchar *name;
     GSList *list;
     GtkEditable *editable;
@@ -293,11 +304,12 @@ lbae_completion_match_selected(GtkEntryCompletion * completion,
                              LIBBALSA_ADDRESS_ENTRY_INFO);
 
     /* Replace the partial address with the selected one. */
-    gtk_tree_model_get(model, iter, NAME_COL, &name, ADDRESS_COL, &address,
+    gtk_tree_model_get(model, iter, NAME_COL, &name, ADDRESS_COL, &ia,
                        -1);
+    internet_address_ref(ia);
+    g_hash_table_insert(info->table, g_strdup(name), ia);
     g_free(info->active->data);
     info->active->data = name;
-    g_hash_table_insert(info->table, g_strdup(name), address);
 
     /* Rewrite the entry. */
     editable = GTK_EDITABLE(gtk_entry_completion_get_entry(completion));
@@ -340,7 +352,7 @@ libbalsa_address_entry_new()
     GtkListStore *store;
     LibBalsaAddressEntryInfo *info;
 
-    store = gtk_list_store_new(2, G_TYPE_STRING, LIBBALSA_TYPE_ADDRESS);
+    store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
 
     completion = gtk_entry_completion_new();
     gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(store));
@@ -354,7 +366,8 @@ libbalsa_address_entry_new()
 
     info = g_new0(LibBalsaAddressEntryInfo, 1);
     info->table = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-                                        g_object_unref);
+                                        (GDestroyNotify)
+					internet_address_unref);
     g_object_set_data_full(G_OBJECT(completion),
                            LIBBALSA_ADDRESS_ENTRY_INFO, info,
                            (GDestroyNotify) lbae_info_free);
@@ -380,44 +393,43 @@ libbalsa_address_entry_set_address_book_list(GList * list)
 }
 
 /*************************************************************
- *     Create list of LibBalsaAddress objects corresponding to the entry
- *     content. If possible, references objects from the address books.
- *     if not, creates new ones.  The objects must be dereferenced later
- *     and the list disposed, eg.  g_list_foreach(l, g_object_unref,
- *     NULL); g_list_free(l);
+ *     Create InternetAddressList corresponding to the entry content. 
+ *     The list must be destroyed using internet_address_list_destroy().
  *************************************************************/
-GList *
+InternetAddressList *
 libbalsa_address_entry_get_list(GtkEntry * address_entry)
 {
     GtkEntryCompletion *completion;
     LibBalsaAddressEntryInfo *info;
-    GtkTreeModel *model;
+    InternetAddressList *address_list = NULL;
     GSList *list;
-    GList *res;
 
     g_return_val_if_fail(GTK_IS_ENTRY(address_entry), NULL);
+
     completion = gtk_entry_get_completion(address_entry);
     g_return_val_if_fail(GTK_IS_ENTRY_COMPLETION(completion), NULL);
     info = g_object_get_data(G_OBJECT(completion),
                              LIBBALSA_ADDRESS_ENTRY_INFO);
     g_return_val_if_fail(info != NULL, NULL);
 
-    model = gtk_entry_completion_get_model(completion);
-
-    for (list = info->list, res = NULL; list; list = list->next) {
+    for (list = info->list; list; list = list->next) {
 	const gchar *name = list->data;
-        LibBalsaAddress *address;
+	InternetAddress *ia;
+	InternetAddressList *tmp_list = NULL;
 
-	address = g_hash_table_lookup(info->table, name);
-        if (address)
-	    g_object_ref(address);
-	else
-            address = libbalsa_address_new_from_string(name);
-        if (address)
-            res = g_list_prepend(res, address);
+	if (!name || !*name)
+	    continue;
+	ia = g_hash_table_lookup(info->table, name);
+        if (!ia) {
+	    tmp_list = internet_address_parse_string(name);
+	    ia = internet_address_list_get_address(tmp_list);
+	}
+        if (ia)
+            address_list = internet_address_list_append(address_list, ia);
+	internet_address_list_destroy(tmp_list);
     }
 
-    return g_list_reverse(res);
+    return address_list;
 }
 
 /*************************************************************
@@ -469,7 +481,9 @@ libbalsa_address_entry_show_matches(GtkEntry * entry)
 }
 
 /*************************************************************
- *     Number of complete addresses.
+ *     Number of complete addresses, or -1 if any is incomplete.
+ *
+ *     First a helper:
  *************************************************************/
 static void
 lbae_count_addresses(InternetAddressList * list, gint * addresses)
@@ -489,11 +503,33 @@ lbae_count_addresses(InternetAddressList * list, gint * addresses)
 gint
 libbalsa_address_entry_addresses(GtkEntry * entry)
 {
-    gint addresses = 0;
-    InternetAddressList *list =
-	internet_address_parse_string(gtk_entry_get_text(entry));
-    lbae_count_addresses(list, &addresses);
-    internet_address_list_destroy(list);
+    GtkEntryCompletion *completion;
+    LibBalsaAddressEntryInfo *info;
+    GSList *list;
+    gint items;
+    InternetAddressList *address_list;
+    gint addresses;
+
+    g_return_val_if_fail(GTK_IS_ENTRY(entry), -1);
+
+    completion = gtk_entry_get_completion(entry);
+    if (!completion
+        || !(info = g_object_get_data(G_OBJECT(completion),
+                                      LIBBALSA_ADDRESS_ENTRY_INFO)))
+        return -1;
+
+    /* Count non-empty items in the entry. */
+    for (list = info->list, items = 0; list; list = list->next)
+        if (*(gchar *) list->data)
+            ++items;
+
+    address_list = libbalsa_address_entry_get_list(entry);
+    if (internet_address_list_length(address_list) == items) {
+        addresses = 0;
+        lbae_count_addresses(address_list, &addresses);
+    } else
+        addresses = -1;
+    internet_address_list_destroy(address_list);
 
     return addresses;
 }

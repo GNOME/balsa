@@ -139,14 +139,14 @@ struct _LibBalsaMessageHeaders {
     gchar *subject;
 
     /* from, reply, and disposition notification addresses */
-    LibBalsaAddress *from;
-    LibBalsaAddress *reply_to;
-    LibBalsaAddress *dispnotify_to;
+    InternetAddressList *from;
+    InternetAddressList *reply_to;
+    InternetAddressList *dispnotify_to;
 
     /* primary, secondary, and blind recipent lists */
-    GList *to_list;
-    GList *cc_list;
-    GList *bcc_list;
+    InternetAddressList *to_list;
+    InternetAddressList *cc_list;
+    InternetAddressList *bcc_list;
 
     /* Mime type */
     GMimeContentType *content_type;
@@ -178,7 +178,7 @@ struct _LibBalsaMessage {
     GMimeMessage *mime_msg;
 
     /* sender address */
-    LibBalsaAddress *sender;
+    InternetAddressList *sender;
 
     /* subject line; we still need it here for sending;
      * although _SET_SUBJECT might resolve it(?) 
@@ -326,7 +326,7 @@ GMimeStream *libbalsa_message_get_part_by_id(LibBalsaMessage * message,
                                              const gchar * id);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
-				     LibBalsaAddress *address);
+				     InternetAddress *ia);
 
 /* use LIBBALSA_MESSAGE_GET_SUBJECT() macro, we may optimize this
    function out if we find a way.

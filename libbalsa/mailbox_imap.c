@@ -1685,44 +1685,48 @@ libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     return res;
 }
 
-static LibBalsaAddress *
-libbalsa_address_new_from_imap_address(ImapAddress *addr)
+static InternetAddress *
+internet_address_new_from_imap_address(ImapAddress *addr)
 {
-    LibBalsaAddress *address;
+    InternetAddress *address;
 
     if (!addr || (addr->name==NULL && addr->addr_spec==NULL))
        return NULL;
 
-    address = libbalsa_address_new();
+    address = internet_address_new();
 
     /* it will be owned by the caller */
 
-    if (addr->name)
-	address->full_name = g_mime_utils_header_decode_text(addr->name);
-    if (addr->addr_spec)
-	address->address_list =
-	    g_list_append(address->address_list,
-			  g_mime_utils_header_decode_text(addr->
-							  addr_spec));
-    else { /* FIXME: is that a right thing? */
-        g_object_unref(G_OBJECT(address));
+    if (addr->name) {
+	gchar *tmp = g_mime_utils_header_decode_text(addr->name);
+	internet_address_set_name(address, tmp);
+	g_free(tmp);
+    }
+    if (addr->addr_spec) {
+	gchar *tmp = g_mime_utils_header_decode_text(addr->addr_spec);
+	internet_address_set_addr(address, tmp);
+	g_free(tmp);
+    } else { /* FIXME: is that a right thing? */
+        internet_address_unref(address);
         address = NULL;
     }
     return address;
 }
 
-static GList*
-libbalsa_address_new_list_from_imap_address_list(ImapAddress *list)
+static InternetAddressList *
+internet_address_new_list_from_imap_address_list(ImapAddress *list)
 {
-    LibBalsaAddress* addr;
-    GList *res = NULL;
+    InternetAddress *addr;
+    InternetAddressList *res = NULL;
 
     for (; list; list = list->next) {
-       addr = libbalsa_address_new_from_imap_address(list);
-       if (addr)
-           res = g_list_prepend(res, addr);
+       addr = internet_address_new_from_imap_address(list);
+       if (addr) {
+           res = internet_address_list_append(res, addr);
+	   internet_address_unref(addr);
+       }
     }
-    return g_list_reverse(res);
+    return res;
 }
 
 static void
@@ -1730,15 +1734,16 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
                gboolean is_embedded)
 {
     headers->date = envelope->date;
-    headers->from = libbalsa_address_new_from_imap_address(envelope->from);
+    headers->from =
+	internet_address_new_list_from_imap_address_list(envelope->from);
     headers->reply_to =
-        libbalsa_address_new_from_imap_address(envelope->replyto);
+        internet_address_new_list_from_imap_address_list(envelope->replyto);
     headers->to_list =
-	libbalsa_address_new_list_from_imap_address_list(envelope->to);
+	internet_address_new_list_from_imap_address_list(envelope->to);
     headers->cc_list =
-	libbalsa_address_new_list_from_imap_address_list(envelope->cc);
+	internet_address_new_list_from_imap_address_list(envelope->cc);
     headers->bcc_list =
-	libbalsa_address_new_list_from_imap_address_list(envelope->bcc);
+	internet_address_new_list_from_imap_address_list(envelope->bcc);
 
     if(is_embedded) {
         headers->subject = 
@@ -1772,7 +1777,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     message->subj   = g_mime_utils_header_decode_text(envelope->subject);
     libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
     message->sender =
-	libbalsa_address_new_from_imap_address(envelope->sender);
+	internet_address_new_list_from_imap_address_list(envelope->sender);
     libbalsa_message_set_in_reply_to_from_string(message,
 						 envelope->in_reply_to);
     if (envelope->message_id) {

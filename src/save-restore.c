@@ -1595,7 +1595,7 @@ config_views_load_with_prefix(const gchar * prefix, gboolean compat)
                     gnome_config_get_string_with_default
                     ("MailingListAddress", &def);
                 view->mailing_list_address =
-                    def ? NULL : libbalsa_address_new_from_string(address);
+                    def ? NULL : internet_address_parse_string(address);
                 g_free(address);
 
                 view->identity_name = gnome_config_get_string("Identity");
@@ -1673,7 +1673,9 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 
     if (view->mailing_list_address !=
 	libbalsa_mailbox_get_mailing_list_address(NULL)) {
-       gchar* tmp = libbalsa_address_to_gchar(view->mailing_list_address, 0);
+       gchar* tmp =
+	   internet_address_list_to_string(view->mailing_list_address,
+		                           FALSE);
        gnome_config_set_string("MailingListAddress", tmp);
        g_free(tmp);
     }

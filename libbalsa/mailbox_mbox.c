@@ -1476,7 +1476,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     ctime_r(&(message->headers->date), date_string);
 
     sender = message->headers->from ?
-	libbalsa_address_to_gchar(message->headers->from, 0) :
+	internet_address_list_to_string(message->headers->from, FALSE) :
 	g_strdup("none");
     if ( (brack = strrchr( sender, '<' )) ) {
         gchar * a = strrchr ( brack , '>' );

@@ -279,22 +279,20 @@ get_from_field(LibBalsaMessage *message)
     gboolean append_dots = FALSE;
     const gchar *name_str = NULL;
     gchar *from;
-    LibBalsaAddress *addy = NULL;
+    const InternetAddressList *address_list = NULL;
 
     g_return_val_if_fail(message->mailbox, NULL);
     if (message->mailbox->view &&
         message->mailbox->view->show == LB_MAILBOX_SHOW_TO) {
         if (message->headers && message->headers->to_list) {
-            GList *list = g_list_first(message->headers->to_list);
-            addy = list->data;
-            append_dots = list->next != NULL;
+            address_list = message->headers->to_list;
+            append_dots = internet_address_list_length(address_list) > 1;
         }
     } else {
         if (message->headers && message->headers->from)
-            addy = message->headers->from;
+            address_list = message->headers->from;
     }
-    if (addy)
-        name_str = libbalsa_address_get_name(addy);
+    name_str = libbalsa_address_get_name_from_list(address_list);
     if(!name_str)           /* !addy, or addy contained no name/address */
         name_str = "";
     
@@ -1786,7 +1784,7 @@ void
 libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
 {
     if (view->mailing_list_address)
-        g_object_unref(view->mailing_list_address);
+        internet_address_list_destroy(view->mailing_list_address);
     g_free(view->identity_name);
     g_free(view);
 }
@@ -1965,7 +1963,7 @@ libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 
 /* Get methods; NULL mailbox is valid, and returns the default value. */
 
-LibBalsaAddress *
+InternetAddressList *
 libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox)
 {
     return (mailbox && mailbox->view) ?

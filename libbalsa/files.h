@@ -26,6 +26,7 @@
 #include "config.h"
 #include <glib.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#include <gtk/gtk.h>
 
 /* filename is the filename (naw!)
  * splice is what to put in between the prefix and the filename, if desired

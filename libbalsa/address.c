@@ -113,122 +113,31 @@ libbalsa_address_new(void)
     return g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
 }
 
-
-/* returns only first address on the list; ignores remaining ones */
-LibBalsaAddress *
-libbalsa_address_new_from_string(const gchar * str)
-{
-    LibBalsaAddress *addr = NULL;
-    GList *lst;
-
-    lst = libbalsa_address_new_list_from_string(str);
-    if (lst) {
-	addr = lst->data;
-	g_object_ref(addr);
-	g_list_foreach(lst, (GFunc) g_object_unref, NULL);
-	g_list_free(lst);
-    }
-
-    return addr;
-}
-
 void
-libbalsa_address_set_copy_member(LibBalsaAddress *dest,
-                                 LibBalsaAddress *src,
-				 const gchar * mailbox)
+libbalsa_address_set_copy(LibBalsaAddress * dest, LibBalsaAddress * src)
 {
-    if(dest == src) /* safety check */
+    GList *src_al, *dst_al;
+
+    if (dest == src)            /* safety check */
         return;
-    g_free(dest->nick_name); dest->nick_name = g_strdup(src->nick_name);
-    g_free(dest->full_name); dest->full_name = g_strdup(src->full_name);
-    g_free(dest->middle_name); dest->middle_name = g_strdup(src->middle_name);
-    g_free(dest->last_name); dest->last_name = g_strdup(src->last_name);
+
+    g_free(dest->nick_name);
+    dest->nick_name = g_strdup(src->nick_name);
+    g_free(dest->full_name);
+    dest->full_name = g_strdup(src->full_name);
+    g_free(dest->middle_name);
+    dest->middle_name = g_strdup(src->middle_name);
+    g_free(dest->last_name);
+    dest->last_name = g_strdup(src->last_name);
     g_free(dest->organization);
     dest->organization = g_strdup(src->organization);
-    g_list_foreach(dest->address_list, (GFunc)g_free, NULL);
+    g_list_foreach(dest->address_list, (GFunc) g_free, NULL);
     g_list_free(dest->address_list);
 
-    dest->address_list = NULL;
-    if (mailbox)
-        dest->address_list =
-            g_list_prepend(dest->address_list, g_strdup(mailbox));
-    else {
-        GList *src_al;
-
-        for (src_al = src->address_list; src_al; src_al = src_al->next)
-            dest->address_list =
-                g_list_prepend(dest->address_list, g_strdup(src_al->data));
-        dest->address_list = g_list_reverse(dest->address_list);
-    }
-}
-
-void
-libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src)
-{
-    libbalsa_address_set_copy_member(dest, src, NULL);
-}
-
-GList *
-libbalsa_address_new_list_from_gmime(const InternetAddressList *
-                                     address_list)
-{
-    const InternetAddressList *list;
-    GList *lst = NULL;
-
-    for (list = address_list; list; list = list->next) {
-        InternetAddress *internet_address = list->address;
-        LibBalsaAddress *addr;
-
-        if (internet_address->type == INTERNET_ADDRESS_NONE)
-            continue;
-
-        addr = libbalsa_address_new();
-        addr->full_name = g_strdup(internet_address->name);
-        if (internet_address->type == INTERNET_ADDRESS_NAME)
-            addr->address_list =
-                g_list_append(addr->address_list,
-                              g_strdup(internet_address->value.addr));
-        else if (internet_address->type == INTERNET_ADDRESS_GROUP) {
-            InternetAddressList *member;
-
-            for (member = internet_address->value.members; member;
-                 member = member->next) {
-                InternetAddress *member_address = member->address;
-
-                if (member_address->type != INTERNET_ADDRESS_NAME) {
-                    g_message("Ignoring non-name address");
-                    continue;
-                }
-                addr->address_list =
-                    g_list_append(addr->address_list,
-                                  g_strdup(member_address->value.addr));
-            }
-        }                       /* else not reached */
-        lst = g_list_prepend(lst, addr);
-    }
-
-    return g_list_reverse(lst);
-}
-
-GList *
-libbalsa_address_new_list_from_string(const gchar * str)
-{
-    gchar *tmp;
-    InternetAddressList *address_list;
-    GList *lst;
-
-    if (!str || !*str)
-	return NULL;
-
-    tmp = g_strdup(str);
-    libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
-    address_list = internet_address_parse_string(tmp);
-    g_free(tmp);
-
-    lst = libbalsa_address_new_list_from_gmime(address_list);
-    internet_address_list_destroy(address_list);
-
-    return lst;
+    dst_al = NULL;
+    for (src_al = src->address_list; src_al; src_al = src_al->next)
+        dst_al = g_list_prepend(dst_al, g_strdup(src_al->data));
+    dest->address_list = g_list_reverse(dst_al);
 }
 
 static gchar *
@@ -244,8 +153,6 @@ rfc2822_mailbox(const gchar * full_name, const gchar * address)
     return new_str;
 }
 
-
-#if 1
 static gchar*
 rfc2822_group(const gchar *full_name, GList *addr_list)
 {
@@ -265,44 +172,20 @@ rfc2822_group(const gchar *full_name, GList *addr_list)
 
     return res;
 }
-#endif
 
-#if 0
-static gchar*
-rfc2822_list(GList *list)
-{
-    gchar *retc = NULL; 
-    GString *str;
-    GList *addr_entry;
-    
-    g_return_val_if_fail(list!=NULL, NULL);
+/* 
+   Get a string version of this address.
 
-    str=g_string_new((gchar *)list->data);
-
-    for(addr_entry=g_list_next(list); addr_entry; 
-	addr_entry=g_list_next(addr_entry)) {
-	g_string_append_printf(str, ", %s", (gchar *)addr_entry->data);
-    }
-    retc=str->str;
-    g_string_free(str, FALSE);
-
-    return retc;
-}
-#endif
-
-/* private version */
+   If n == -1 then return all addresses, else return the n'th one.
+   If n > the number of addresses, will cause an error.
+*/
 gchar *
-libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n);
-gchar *
-libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
+libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 {
     gchar *retc = NULL;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
-    /* FIXME: for n==-1, we should be returning nice rfc822_group but
-     * the entry widgets have not proper support for group string format
-     * so we drop this idea for a while. */
     if(!address->address_list)
         return NULL;
     if(n==-1) {
@@ -321,59 +204,50 @@ libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n)
     return retc;
 }
 
-/* 
-   Get a string version of this address.
-
-   If n == -1 then return all addresses, else return the n'th one.
-   If n > the number of addresses, will cause an error.
-*/
-gchar *
-libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
+/* Helper */
+static const gchar *
+lba_get_name_or_mailbox(const InternetAddressList * address_list,
+                        gboolean get_name, gboolean in_group)
 {
-    return libbalsa_address_to_gchar_p(address, n);
+    const gchar *retval = NULL;
+
+    for (; address_list; address_list = address_list->next) {
+        InternetAddress *ia = address_list->address;
+
+        if (get_name && ia->name)
+            return ia->name;
+
+        if (ia->type == INTERNET_ADDRESS_NAME)
+            retval = ia->value.addr;
+        else if (ia->type == INTERNET_ADDRESS_GROUP) {
+            if (in_group)
+                g_message("Ignoring nested group address");
+            else
+                retval = lba_get_name_or_mailbox(ia->value.members,
+			get_name, TRUE);
+        }
+        if (retval)
+            break;
+    }
+
+    return retval;
 }
 
+/* Get either a name or a mailbox from an InternetAddressList. */
 const gchar *
-libbalsa_address_get_name(const LibBalsaAddress * addr)
+libbalsa_address_get_name_from_list(const InternetAddressList *
+                                    address_list)
 {
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(addr), NULL);
-
-    return addr->full_name ? addr->full_name :
-	(addr->address_list ? addr->address_list->data : NULL);
+    return lba_get_name_or_mailbox(address_list, TRUE, FALSE);
 }
 
-#if ENABLE_ESMTP
-
-/* XXX - added by Brian Stafford <brian@stafford.uklinux.net> */
-
-/* libESMTP works with the RFC 821 mailbox and the RFC 822 phrase and 
-   mailbox as seperate entities.  Because of this it is useful to add
-   these extra methods. */
-
-/* Extract the RFC 822 phrase from the address.  Almost the same
-   as libbalsa_address_get_name() except returns NULL if no phrase. */
+/* Get a mailbox from an InternetAddressList. */
 const gchar *
-libbalsa_address_get_phrase(LibBalsaAddress * address)
+libbalsa_address_get_mailbox_from_list(const InternetAddressList *
+                                       address_list)
 {
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
-
-    return address->full_name;
+    return lba_get_name_or_mailbox(address_list, FALSE, FALSE);
 }
-
-#endif
-/* Extract the nth RFC 821/RFC 822 mailbox from the address. */
-const gchar *
-libbalsa_address_get_mailbox(LibBalsaAddress * address, gint n)
-{
-    GList *nth_address;
-
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
-
-    nth_address = g_list_nth(address->address_list, n);
-    if(nth_address == NULL) return NULL;
-    return (const gchar*)nth_address->data;
-}
-
 
 /* =================================================================== */
 /*                                UI PART                              */

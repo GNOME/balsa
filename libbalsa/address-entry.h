@@ -24,7 +24,7 @@
 #ifndef __LIBBALSA_ADDRESS_ENTRY_H__
 #define __LIBBALSA_ADDRESS_ENTRY_H__
 
-#include "address.h"
+#include <gmime/gmime.h>
 
 typedef GtkEntry LibBalsaAddressEntry;
 #define LIBBALSA_ADDRESS_ENTRY(obj) GTK_ENTRY(obj)
@@ -35,5 +35,6 @@ gboolean libbalsa_address_entry_show_matches(GtkEntry * address_entry);
 gint libbalsa_address_entry_addresses(GtkEntry * entry);
 GtkWidget *libbalsa_address_entry_new(void);
 void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);
-GList *libbalsa_address_entry_get_list(LibBalsaAddressEntry *address_entry);
+InternetAddressList *libbalsa_address_entry_get_list(LibBalsaAddressEntry *
+                                                     address_entry);
 #endif

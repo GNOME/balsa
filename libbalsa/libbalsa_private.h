@@ -25,13 +25,6 @@
 
 #include <unistd.h>
 
-
-/* private interfaces to avoid the libbalsa API */
-/* address.c: */
-gchar *libbalsa_address_to_gchar_p(LibBalsaAddress * address, gint n);
-/* misc.c: */
-gchar *libbalsa_make_string_from_list_p(const GList * the_list);
-
 /* LibBalsaMailboxEntry handling code which is to be used for message
  * intex caching.  Mailbox index entry used for caching (almost) all
  * columns provided by GtkTreeModel interface. Size matters. */

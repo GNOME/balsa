@@ -407,7 +407,9 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                                              cond->match.string.string);
             else {
                 g_return_val_if_fail(message, FALSE);
-                str=libbalsa_make_string_from_list(message->headers->to_list);
+                str =
+                    internet_address_list_to_string(message->headers->
+                                                    to_list, FALSE);
                 match = libbalsa_utf8_strstr(str,cond->match.string.string);
                 g_free(str);
             }
@@ -419,7 +421,9 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                                              cond->match.string.string);
             else if(message->headers->from) {
                 g_return_val_if_fail(message, FALSE);
-                str = libbalsa_address_to_gchar(message->headers->from,0);
+                str =
+                    internet_address_list_to_string(message->headers->
+                                                    from, FALSE);
                 match = libbalsa_utf8_strstr(str,cond->match.string.string);
                 g_free(str);
             }
@@ -434,7 +438,9 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
             g_return_val_if_fail(is_refed, FALSE);
-	    str = libbalsa_make_string_from_list(message->headers->cc_list);
+            str =
+                internet_address_list_to_string(message->headers->cc_list,
+                                                FALSE);
 	    match = libbalsa_utf8_strstr(str,cond->match.string.string);
 	    g_free(str);
 	    if (match) break;

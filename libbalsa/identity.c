@@ -85,7 +85,7 @@ static void
 libbalsa_identity_init(LibBalsaIdentity* ident)
 {
     ident->identity_name = NULL;
-    ident->address = libbalsa_address_new();
+    ident->ia = internet_address_new();
     ident->replyto = NULL;
     ident->domain = NULL;
     ident->bcc = NULL;
@@ -113,7 +113,7 @@ libbalsa_identity_finalize(GObject * object)
 {
     LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
-    g_object_unref(ident->address);
+    internet_address_unref(ident->ia);
     g_free(ident->identity_name);
     g_free(ident->replyto);
     g_free(ident->domain);
@@ -167,12 +167,13 @@ libbalsa_identity_set_identity_name(LibBalsaIdentity* ident, const gchar* name)
 
 
 void
-libbalsa_identity_set_address(LibBalsaIdentity* ident, LibBalsaAddress* ad)
+libbalsa_identity_set_address(LibBalsaIdentity * ident,
+                              InternetAddress * ia)
 {
     g_return_if_fail(ident != NULL);
-    
-    g_object_unref(ident->address);
-    ident->address = ad;
+
+    internet_address_unref(ident->ia);
+    ident->ia = ia;
 }
 
 
@@ -964,7 +965,7 @@ ident_dialog_update(GtkDialog* dlg)
 {
     LibBalsaIdentity* id;
     LibBalsaIdentity* exist_ident;
-    LibBalsaAddress* address;
+    InternetAddress *ia;
     GtkWidget *tree;
     GList **identities, *list;
     gchar* text;
@@ -1001,12 +1002,14 @@ ident_dialog_update(GtkDialog* dlg)
 
     text = ident_dialog_get_text(dlg, "identity-fullname");
     g_return_val_if_fail(text != NULL, FALSE);
-    address = libbalsa_address_new();
-    address->full_name = text;
+    ia = internet_address_new();
+    internet_address_set_name(ia, text);
+    g_free(text);
     
     text = ident_dialog_get_text(dlg, "identity-address");
-    address->address_list = g_list_append(address->address_list, text);
-    libbalsa_identity_set_address(id, address);
+    internet_address_set_addr(ia, text);
+    g_free(text);
+    libbalsa_identity_set_address(id, ia);
 
     g_free(id->replyto);
     id->replyto         = ident_dialog_get_text(dlg, "identity-replyto");
@@ -1305,11 +1308,10 @@ display_frame_update(GtkDialog * dialog, LibBalsaIdentity* ident)
 
     ident_dialog_update(dialog);
     display_frame_set_field(dialog, "identity-name", ident->identity_name);
-    display_frame_set_field(dialog, "identity-fullname", 
-                            ident->address->full_name);
-    if (ident->address->address_list)
+    display_frame_set_field(dialog, "identity-fullname", ident->ia->name);
+    if (ident->ia->type == INTERNET_ADDRESS_NAME)
         display_frame_set_field(dialog, "identity-address", 
-                                (gchar*)ident->address->address_list->data);
+                                ident->ia->value.addr);
     else
         display_frame_set_field(dialog, "identity-address", NULL);
     
@@ -1382,10 +1384,15 @@ libbalsa_identity_new_config(const gchar* prefix, const gchar* name)
     gnome_config_push_prefix(prefix);
 
     ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name(name));
-    ident->address->full_name = gnome_config_get_string("FullName");
-    ident->address->address_list = 
-        g_list_append(ident->address->address_list, 
-                      gnome_config_get_string("Address"));
+
+    tmpstr = gnome_config_get_string("FullName");
+    internet_address_set_name(ident->ia, tmpstr);
+    g_free(tmpstr);
+
+    tmpstr = gnome_config_get_string("Address");
+    internet_address_set_addr(ident->ia, tmpstr);
+    g_free(tmpstr);
+
     ident->replyto = gnome_config_get_string("ReplyTo");
     ident->domain = gnome_config_get_string("Domain");
     ident->bcc = gnome_config_get_string("Bcc");
@@ -1429,10 +1436,10 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* prefix)
     g_return_if_fail(ident);
 
     gnome_config_push_prefix(prefix);
-    gnome_config_set_string("FullName", ident->address->full_name);
+    gnome_config_set_string("FullName", ident->ia->name);
     
-    if (ident->address->address_list != NULL)
-        gnome_config_set_string("Address", ident->address->address_list->data);
+    if (ident->ia->type == INTERNET_ADDRESS_NAME)
+        gnome_config_set_string("Address", ident->ia->value.addr);
 
     gnome_config_set_string("ReplyTo", ident->replyto);
     gnome_config_set_string("Domain", ident->domain);

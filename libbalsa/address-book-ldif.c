@@ -590,7 +590,25 @@ load_ldif_file(LibBalsaAddressBook *ab)
 
     completion_list = NULL;
     for (;list; list = list->next) {
-	cmp_data = completion_data_new(LIBBALSA_ADDRESS(list->data));
+	LibBalsaAddress *address = LIBBALSA_ADDRESS(list->data);
+	InternetAddress *ia;
+
+        if (address->address_list->next) {
+            GList *l;
+
+            ia = internet_address_new_group(address->full_name);
+            for (l = address->address_list; l; l = l->next) {
+                InternetAddress *member =
+                    internet_address_new_name(NULL, l->data);
+                internet_address_add_member(ia, member);
+                internet_address_unref(member);
+            }
+        } else {
+            ia = internet_address_new_name(address->full_name,
+                                           address->address_list->data);
+        }
+	cmp_data = completion_data_new(ia, address->nick_name);
+	internet_address_unref(ia);
 	completion_list = g_list_prepend(completion_list, cmp_data);
     }
     completion_list = g_list_reverse(completion_list);
@@ -784,10 +802,9 @@ libbalsa_address_book_ldif_alias_complete(LibBalsaAddressBook * ab,
     for (list = g_completion_complete(vc->name_complete, (gchar *) prefix,
                                       new_prefix);
          list; list = list->next) {
-        LibBalsaAddress *address =
-            ((CompletionData *) list->data)->address;
-        g_object_ref(address);
-        res = g_list_prepend(res, address);
+	InternetAddress *ia = ((CompletionData *) list->data)->ia;
+	internet_address_ref(ia);
+        res = g_list_prepend(res, ia);
     }
 
     return g_list_reverse(res);

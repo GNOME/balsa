@@ -88,7 +88,6 @@ LibBalsaTextAttribute libbalsa_text_attr_file(const gchar * filename);
 const gchar *libbalsa_file_get_charset(const gchar * filename);
 
 gchar *libbalsa_lookup_mime_type(const gchar * path);
-gchar *libbalsa_make_string_from_list(const GList *);
 
 size_t libbalsa_readfile(FILE * fp, char **buf);
 size_t libbalsa_readfile_nostat(FILE * fp, char **buf);

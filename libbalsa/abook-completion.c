@@ -34,10 +34,10 @@
  * Create a new CompletionData
  */
 CompletionData *
-completion_data_new(LibBalsaAddress * address)
+completion_data_new(InternetAddress * ia, const gchar * nick_name)
 {
     GString *string;
-    GList *list;
+    gchar *address_string;
 #ifdef CASE_INSENSITIVE_NAME
     gchar *string_n;
 #endif
@@ -45,19 +45,15 @@ completion_data_new(LibBalsaAddress * address)
 
     ret = g_new0(CompletionData, 1);
 
-    g_object_ref(address);
-    ret->address = address;
+    internet_address_ref(ia);
+    ret->ia = ia;
 
-    string = g_string_new(address->full_name);
-    if (address->nick_name
-        && strcmp(address->nick_name, address->full_name)) {
-        g_string_append_c(string, ' ');
-        g_string_append(string, address->nick_name);
-    }
-    for (list = address->address_list; list; list = list->next) {
+    string = g_string_new(nick_name);
+    if (string->len > 0)
 	g_string_append_c(string, ' ');
-	g_string_append(string, list->data);
-    }
+    address_string = internet_address_to_string(ia, FALSE);
+    g_string_append(string, address_string);
+    g_free(address_string);
 #ifdef CASE_INSENSITIVE_NAME
     string_n = g_utf8_normalize(string->str, -1, G_NORMALIZE_ALL);
     g_string_free(string, TRUE);
@@ -76,7 +72,7 @@ completion_data_new(LibBalsaAddress * address)
 void
 completion_data_free(CompletionData * data)
 {
-    g_object_unref(data->address);
+    internet_address_unref(data->ia);
     g_free(data->string);
     g_free(data);
 }

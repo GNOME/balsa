@@ -27,6 +27,7 @@
 
 #include <glib.h>
 #include <gmime/gmime.h>
+#include <gdk/gdk.h>
 
 #include "config.h"
 

@@ -58,9 +58,11 @@ static void store_address_book_menu_cb(GtkWidget * widget,
                                        StoreAddressInfo * info);
 static void store_address_add_address(StoreAddressInfo * info,
                                       const gchar * label,
-                                      LibBalsaAddress * address);
-static void store_address_add_glist(StoreAddressInfo * info,
-                                    const gchar * label, GList * list);
+                                      const InternetAddress * address,
+                                      const InternetAddress * group);
+static void store_address_add_list(StoreAddressInfo * info,
+                                   const gchar * label,
+				   const InternetAddressList * list);
 
 /* 
  * public interface: balsa_store_address
@@ -296,14 +298,13 @@ store_address_note_frame(StoreAddressInfo *info)
     gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 5);
     gtk_container_add(GTK_CONTAINER(frame), info->notebook);
 
-    for (list = info->message_list; list; list = g_list_next(list)) {
+    for (list = info->message_list; list; list = list->next) {
         message = LIBBALSA_MESSAGE(list->data);
 	if (message->headers) {
-	    if (message->headers->from)
-		store_address_add_address(info, _("From:"), message->headers->from);
-	    store_address_add_glist(info, _("To:"), message->headers->to_list);
-	    store_address_add_glist(info, _("Cc:"), message->headers->cc_list);
-	    store_address_add_glist(info, _("Bcc:"), message->headers->bcc_list);
+	    store_address_add_list(info, _("From:"), message->headers->from);
+	    store_address_add_list(info, _("To:"), message->headers->to_list);
+	    store_address_add_list(info, _("Cc:"), message->headers->cc_list);
+	    store_address_add_list(info, _("Bcc:"), message->headers->bcc_list);
 	}
     }
 
@@ -326,20 +327,28 @@ store_address_book_menu_cb(GtkWidget * widget,
  * make a new page in the notebook */
 static void
 store_address_add_address(StoreAddressInfo * info,
-                          const gchar * lab, LibBalsaAddress * address)
+                          const gchar * lab, const InternetAddress * ia,
+			  const InternetAddress * group)
 {
     gchar *text;
+    LibBalsaAddress *address;
     gchar *label_text;
     GtkWidget **entries, *ew;
 
-    if (address == NULL)
+    if (ia == NULL)
         return;
 
     entries = g_new(GtkWidget *, NUM_FIELDS);
     info->entries_list = g_list_append(info->entries_list, entries);
-    ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
 
-    text = libbalsa_address_to_gchar(address, 0);
+    text = internet_address_to_string(ia, FALSE);
+    address = libbalsa_address_new();
+    address->full_name =
+        g_strdup(ia->name ? ia->name : group ? group->name : NULL);
+    address->address_list = g_list_prepend(NULL, g_strdup(ia->value.addr));
+    ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
+    g_object_unref(address);
+
     label_text = g_strconcat(lab, text, NULL);
     g_free(text);
     if (g_utf8_strlen(label_text, -1) > 10)
@@ -350,15 +359,29 @@ store_address_add_address(StoreAddressInfo * info,
     g_free(label_text);
 }
 
-/* store_address_add_glist:
- * take a GList of addresses and pass them one at a time to
+/* store_address_add_list:
+ * take a list of addresses and pass them one at a time to
  * store_address_add_address */
 static void
-store_address_add_glist(StoreAddressInfo * info,
-                        const gchar * label, GList * list)
+store_address_add_list(StoreAddressInfo * info,
+                       const gchar * label,
+                       const InternetAddressList * list)
 {
-    while (list) {
-        store_address_add_address(info, label, list->data);
-        list = g_list_next(list);
+    for (; list; list = list->next) {
+        InternetAddress *ia = list->address;
+
+        if (ia->type == INTERNET_ADDRESS_NAME)
+            store_address_add_address(info, label, ia, NULL);
+        else if (ia->type == INTERNET_ADDRESS_GROUP) {
+            InternetAddressList *member;
+
+            for (member = ia->value.members; member; member = member->next) {
+                InternetAddress *member_address = member->address;
+
+                if (member_address->type == INTERNET_ADDRESS_NAME)
+                    store_address_add_address(info, label, member_address,
+                                              ia);
+            }
+        }
     }
 }

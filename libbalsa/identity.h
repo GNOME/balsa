@@ -26,7 +26,6 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
-#include <address.h>
 
 #ifdef __cpluscplus
 extern "C" 
@@ -58,7 +57,7 @@ extern "C"
         
         gchar* identity_name;
         
-        LibBalsaAddress* address;
+        InternetAddress *ia;
         gchar* replyto;
         gchar* domain;
         gchar* bcc;
@@ -91,7 +90,7 @@ extern "C"
     GObject* libbalsa_identity_new_with_name(const gchar* ident_name);
     
     void libbalsa_identity_set_identity_name(LibBalsaIdentity*, const gchar*);
-    void libbalsa_identity_set_address(LibBalsaIdentity*, LibBalsaAddress*);
+    void libbalsa_identity_set_address(LibBalsaIdentity*, InternetAddress*);
     void libbalsa_identity_set_replyto(LibBalsaIdentity*, const gchar*);
     void libbalsa_identity_set_domain(LibBalsaIdentity*, const gchar*);
     void libbalsa_identity_set_bcc(LibBalsaIdentity*, const gchar*);

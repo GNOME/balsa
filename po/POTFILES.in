@@ -1,17 +1,19 @@
+# List of source files containing translatable strings.
+# Please keep this list in alphabetical order.
 # src/orbit-glue.c : disabled because it is excluded from the dist file
-libbalsa/address-book-ldap.c
 libbalsa/address-book-extern.c
-libbalsa/address-book-vcard.c
+libbalsa/address-book-ldap.c
 libbalsa/address-book-ldif.c
+libbalsa/address-book-vcard.c
 libbalsa/address-book.c
 libbalsa/address-entry.c
 libbalsa/filter-error.c
 libbalsa/filter-file.c
 libbalsa/filter.c
 libbalsa/folder-scanners.c
+libbalsa/identity.c
 libbalsa/libbalsa.c
 libbalsa/libbalsa_private.h
-libbalsa/identity.c
 libbalsa/mailbox.c
 libbalsa/mailbox_imap.c
 libbalsa/mailbox_local.c
@@ -31,6 +33,7 @@ libinit_balsa/balsa-initdruid.gob
 libinit_balsa/helper.c
 libinit_balsa/init_balsa.c
 libmutt/account.c
+libmutt/commands.c
 libmutt/handler.c
 libmutt/imap/auth.c
 libmutt/imap/auth_anon.c
@@ -51,12 +54,13 @@ libmutt/mx.c
 src/address-book-config.c
 src/address-book.c
 src/balsa-app.c
-src/balsa-index.c
 src/balsa-index-threading.c
+src/balsa-index.c
 src/balsa-mblist.c
 src/balsa-message.c
-src/filter-edit-dialog.c
 src/filter-edit-callbacks.c
+src/filter-edit-dialog.c
+src/filter-export-callbacks.c
 src/filter-export-dialog.c
 src/filter-run-callbacks.c
 src/filter-run-dialog.c

@@ -227,7 +227,7 @@ AC_ARG_WITH([gpgme],
 AC_ARG_ENABLE([smime],
 	AC_HELP_STRING([--enable-smime],
                        [include S/MIME support (needs gpgme and gpgsm, experimental) (default=no)]),
-	[ have_smime=$withval ], [ have_smime=no ])
+	[ have_smime=$enableval ], [ have_smime=no ])
 
 if test x"$gpgmecfg" = xyes ; then
 	AC_MSG_RESULT(yes)

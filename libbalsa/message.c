@@ -34,6 +34,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 #include <fcntl.h>
 
 #include <glib.h>
@@ -713,12 +714,10 @@ libbalsa_message_clear_recent(LibBalsaMessage * message)
     GList * messages;
 
     g_return_if_fail(message->mailbox);
-    LOCK_MAILBOX(message->mailbox);
     RETURN_IF_MAILBOX_CLOSED(message->mailbox);
 
     libbalsa_message_set_flag(message, 0, LIBBALSA_MESSAGE_FLAG_RECENT);
 
-    UNLOCK_MAILBOX(message->mailbox);
     messages = g_list_prepend(NULL, message);
     libbalsa_mailbox_messages_status_changed(message->mailbox, messages,
 					     LIBBALSA_MESSAGE_FLAG_REPLIED);

@@ -8,6 +8,8 @@
 
 2001-05-25  Pawel Salek  <pawsa@theochem.kth.se>
 
+	* help/C/balsa.sgml: use PNG V1.1 DTD, 1.0 is deprecated.
+	* src/spell-check.c: fix #54123: 0.12 compatibility.
 	* src/balsa-app.[hc]: add save_dir field storing the last
 	directory path, an attachment or other message par was saved to.
 

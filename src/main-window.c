@@ -41,7 +41,7 @@ static GtkWidget *create_toolbar (MainWindow *);
 static GtkWidget *create_menu (MainWindow *);
 
 extern void balsa_exit ();
-static GtkWidget *menu_items[18];
+static GtkWidget *menu_items[14];
 
 
 MainWindow *
@@ -135,8 +135,6 @@ create_main_window ()
   gnome_app_set_menus (GNOME_APP (mw->window),
 		       GTK_MENU_BAR (create_menu (mw)));
   gnome_app_set_toolbar (GNOME_APP (mw->window), GTK_TOOLBAR (mw->toolbar));
-
-
 
   gtk_widget_show (mw->window);
   return mw;
@@ -436,6 +434,16 @@ create_menu (MainWindow * mw)
 			     GTK_SIGNAL_FUNC (index_delete_message),
 			     NULL);
   gtk_widget_install_accelerator (w, accel, "activate", 'D', GDK_CONTROL_MASK);
+  gtk_menu_append (GTK_MENU (menu), w);
+  menu_items[i++] = w;
+
+  w = gnome_stock_menu_item (GNOME_STOCK_MENU_BLANK, _ ("Undelete"));
+  gtk_widget_show (w);
+  gtk_signal_connect_object (GTK_OBJECT (w),
+			     "activate",
+			     GTK_SIGNAL_FUNC (index_undelete_message),
+			     NULL);
+  /* gtk_widget_install_accelerator (w, accel, "activate", 'D', GDK_CONTROL_MASK); */
   gtk_menu_append (GTK_MENU (menu), w);
   menu_items[i++] = w;
 

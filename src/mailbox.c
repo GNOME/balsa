@@ -429,7 +429,7 @@ mailbox_open (Mailbox * mailbox)
       sprintf (buffer, "{%s/imap}%s", imap->server, imap->path);
 
       imap->stream = mail_open (NIL, buffer, NIL);
-      if (pop3->stream == NIL)
+      if (imap->stream == NIL)
 	{
 	  balsa_app.current_mailbox = old_mailbox;
 	  return FALSE;

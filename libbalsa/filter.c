@@ -404,3 +404,56 @@ libbalsa_condition_can_match(LibBalsaCondition * cond,
 	return TRUE;
     }
 }
+
+/* Check whether a condition looks only at flags; if it does, test
+ * whether the given message's flags match it, and return the result in
+ * *match; used by mailbox backends to decide when the full
+ * LibBalsaMessage is needed. */
+gboolean
+libbalsa_condition_is_flag_only(LibBalsaCondition * cond,
+                                LibBalsaMailbox * mailbox,
+                                guint msgno,
+				gboolean * match)
+{
+    gboolean retval;
+    gboolean left_match, right_match;
+
+    switch (cond->type) {
+    case CONDITION_FLAG:
+        if (match)
+            *match =
+                libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                                 cond->match.flags, 0);
+        retval = TRUE;
+        break;
+    case CONDITION_AND:
+        retval =
+            libbalsa_condition_is_flag_only(cond->match.andor.left,
+                                            mailbox, msgno,
+					    &left_match)
+            && libbalsa_condition_is_flag_only(cond->match.andor.right,
+                                               mailbox, msgno,
+                                               &right_match);
+        if (retval && match)
+            *match = left_match && right_match;
+        break;
+    case CONDITION_OR:
+        retval =
+            libbalsa_condition_is_flag_only(cond->match.andor.left,
+                                            mailbox, msgno,
+					    &left_match)
+            && libbalsa_condition_is_flag_only(cond->match.andor.right,
+                                               mailbox, msgno,
+                                               &right_match);
+        if (retval && match)
+            *match = left_match || right_match;
+        break;
+    default:
+        return FALSE;
+    }
+
+    if (retval && match && cond->negate)
+        *match = !*match;
+
+    return retval;
+}

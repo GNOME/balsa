@@ -1072,52 +1072,56 @@ static void
 part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
 {
     GtkWidget *vbox;
-    GtkWidget *button;
+    GtkWidget *hbox;
+    GtkWidget *button = NULL;
     gchar *msg;
-    const gchar *cmd, *content_desc;
+    const gchar *content_desc;
     gchar *content_type;
-    
 
-    vbox = gtk_vbox_new(FALSE, 1);
+
+    vbox = gtk_vbox_new(FALSE, 2);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
-    content_type = libbalsa_message_body_get_content_type(info->body);
-    if((button=part_info_mime_button_vfs(info, content_type))) {
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
-    } else if ((cmd = gnome_vfs_mime_get_value(content_type, "view")) != NULL) {
-        button = part_info_mime_button (info, content_type, "view");
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
-    } else if ((cmd = gnome_vfs_mime_get_value (content_type, "open")) != NULL) {
-        button = part_info_mime_button (info, content_type, "open");
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 2);
-    } else {
-	gtk_box_pack_start(GTK_BOX(vbox),
-			   gtk_label_new(_("No open or view action defined in GNOME MIME for this content type")),
-			   FALSE, FALSE, 1);
+    if (info->body->filename) {
+        msg = g_strdup_printf(_("Filename: %s"), info->body->filename);
+        gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg), FALSE, FALSE,
+                           0);
+        g_free(msg);
     }
 
-    if((content_desc=gnome_vfs_mime_get_description(content_type)))
-	msg = g_strdup_printf(_("Type: %s (%s)"), content_desc, content_type);
+    content_type = libbalsa_message_body_get_content_type(info->body);
+    if ((content_desc = gnome_vfs_mime_get_description(content_type)))
+        msg = g_strdup_printf(_("Type: %s (%s)"), content_desc,
+                              content_type);
     else
-    msg = g_strdup_printf(_("Content Type: %s"), content_type);
-
-    gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg), FALSE, FALSE, 1);
+        msg = g_strdup_printf(_("Content Type: %s"), content_type);
+    gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg), FALSE, FALSE, 0);
     g_free(msg);
 
-    if (info->body->filename) {
-	msg = g_strdup_printf(_("Filename: %s"), info->body->filename);
-	gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(msg), FALSE, FALSE,
-			   1);
-	g_free(msg);
+    hbox = gtk_hbox_new(TRUE, 6);
+    if ((button = part_info_mime_button_vfs(info, content_type))) {
+        gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+    } else if ((button = part_info_mime_button(info, content_type,
+                                               "view"))) {
+        gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+    } else if ((button = part_info_mime_button(info, content_type,
+                                               "open"))) {
+        gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+    } else {
+        gtk_box_pack_start(GTK_BOX(vbox),
+                           gtk_label_new(_("No open or view action "
+                                           "defined in GNOME MIME "
+                                           "for this content type")),
+                           FALSE, FALSE, 0);
     }
-
     g_free(content_type);
 
     button = gtk_button_new_with_label(_("Save part"));
-    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     g_signal_connect(G_OBJECT(button), "clicked",
-		     G_CALLBACK(part_context_menu_save), (gpointer) info);
+                     G_CALLBACK(part_context_menu_save), (gpointer) info);
 
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 2);
     gtk_widget_show_all(vbox);
 
     info->focus_widget = vbox;
@@ -1126,23 +1130,25 @@ part_info_init_unknown(BalsaMessage * bm, BalsaPartInfo * info)
 }
 
 
-static GtkWidget*
-part_info_mime_button (BalsaPartInfo* info, const gchar* content_type, 
-		       const gchar* key)
+static GtkWidget *
+part_info_mime_button(BalsaPartInfo * info, const gchar * content_type,
+                      const gchar * key)
 {
-    GtkWidget* button;
-    gchar* msg;
-    const gchar* cmd;
-    
+    GtkWidget *button = NULL;
+    gchar *msg;
+    const gchar *cmd =
+        gnome_vfs_mime_get_value(content_type, (char *) key);
 
-    cmd = gnome_vfs_mime_get_value (content_type, (char*) key);
-    msg = g_strdup_printf(_("View part with %s"), cmd);
-    button = gtk_button_new_with_label(msg);
-    g_object_set_data (G_OBJECT (button), "mime_action",  (gpointer) key);
-    g_free(msg);
+    if (cmd) {
+        msg = g_strdup_printf(_("View part with %s"), cmd);
+        button = gtk_button_new_with_label(msg);
+        g_object_set_data(G_OBJECT(button), "mime_action", (gpointer) key);
+        g_free(msg);
 
-    g_signal_connect(G_OBJECT(button), "clicked",
-                     G_CALLBACK(part_context_menu_cb), (gpointer) info);
+        g_signal_connect(G_OBJECT(button), "clicked",
+                         G_CALLBACK(part_context_menu_cb),
+                         (gpointer) info);
+    }
 
     return button;
 }

@@ -1,5 +1,7 @@
-2004-05-06 13:23  PeterB
+2004-05-06 17:25  PeterB
 
+	* src/message-window.c: keep the message reffed, to hold the window
+	open until the mailbox is closed.
 	* libbalsa/source-viewer.c: ref the message instead of weak-ref.
 	* src/balsa-index.c: clean up selected list when closing.
 	* libbalsa/mailbox_mbox.c: use weak-ref, not weak-pointer--Pawel

@@ -97,12 +97,12 @@ msgstr "%s típusú postafiók létrehozása sikertelen."
 #: libbalsa/mailbox_imap.c:284
 #, c-format
 msgid "LibBalsaMailboxImap: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxImap: nyitás %s hivatkozások száma: %d\n"
+msgstr "LibBalsaMailboxImap: %s megnyitása, hivatkozások száma: %d\n"
 
 #: libbalsa/mailbox_local.c:265
 #, c-format
 msgid "LibBalsaMailboxLocal: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxLocal: nyitás %s hivatkozások száma: %d\n"
+msgstr "LibBalsaMailboxLocal: %s megnyitás, hivatkozások száma: %d\n"
 
 #: libbalsa/mailbox_maildir.c:120
 #, c-format
@@ -154,7 +154,7 @@ msgstr "Elnézést, a Balsa (még) nem tud mh postafiókot létrehozni."
 #: libbalsa/mailbox_pop3.c:200
 #, c-format
 msgid "LibBalsaMailboxPop3: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: nyitás %s hivatkozások száma: %d\n"
+msgstr "LibBalsaMailboxPop3: %s megynitása, hivatkozások száma: %d\n"
 
 #: libbalsa/mailbox_pop3.c:250
 #, c-format
@@ -704,7 +704,7 @@ msgstr "Név"
 
 #: src/address-book.c:160
 msgid "E-Mail Address"
-msgstr "E-Mail cím"
+msgstr "Elektromos levélcím"
 
 #: src/address-book.c:163
 msgid "Address Book"
@@ -1433,7 +1433,7 @@ msgstr "Az aktuális levél folytatása"
 
 #: src/main-window.c:245
 msgid "_Get New Mail"
-msgstr "_Új levél lekérdezése"
+msgstr "_Új levelek fogadása"
 
 #: src/main-window.c:245
 msgid "Fetch new incoming mail"
@@ -1661,11 +1661,11 @@ msgstr "_Postafiók"
 
 #: src/main-window.c:485
 msgid "Check"
-msgstr "Lekérdez"
+msgstr "Fogadás"
 
 #: src/main-window.c:485
 msgid "Check Email"
-msgstr "Email-ek ellenõrzése"
+msgstr "Levelek fogadása"
 
 #: src/main-window.c:490
 msgid "Delete Message"
@@ -1673,15 +1673,15 @@ msgstr "Levél törlése"
 
 #: src/main-window.c:495
 msgid "Compose"
-msgstr "Ír"
+msgstr "Új levél"
 
 #: src/main-window.c:495
 msgid "Compose Message"
-msgstr "Levél írása"
+msgstr "Új levél írása"
 
 #: src/main-window.c:499
 msgid "Continue"
-msgstr "Folytat"
+msgstr "Folytatás"
 
 #: src/main-window.c:503
 msgid "Reply"
@@ -1693,15 +1693,15 @@ msgid ""
 "To All"
 msgstr ""
 "Válasz\n"
-"Mindenkinek"
+"mindenkinek"
 
 #: src/main-window.c:507
 msgid "Reply to all"
-msgstr "Mindenkinek"
+msgstr "Válasz mindenkinek"
 
 #: src/main-window.c:511
 msgid "Forward"
-msgstr "Tovább"
+msgstr "Továbbítás"
 
 #: src/main-window.c:517
 msgid "Previous"
@@ -1709,7 +1709,7 @@ msgstr "Elõzõ"
 
 #: src/main-window.c:517
 msgid "Open Previous message"
-msgstr "Elõzõ levél nyitása"
+msgstr "Elõzõ levél megnyitása"
 
 #: src/main-window.c:522
 msgid "Next"
@@ -1717,7 +1717,7 @@ msgstr "Következõ"
 
 #: src/main-window.c:522
 msgid "Open Next message"
-msgstr "Következõ levél nyitása"
+msgstr "Következõ levél megnyitása"
 
 #: src/main-window.c:526
 msgid ""
@@ -1725,15 +1725,15 @@ msgid ""
 "Unread"
 msgstr ""
 "Következõ\n"
-"Olvasatlan"
+"olvasatlan"
 
 #: src/main-window.c:526
 msgid "Open Next Unread Message"
-msgstr "Következõ olvasatlan levél nyitása "
+msgstr "Következõ olvasatlan levél megnyitása "
 
 #: src/main-window.c:530 src/print.c:60 src/sendmsg-window.c:156
 msgid "Print"
-msgstr "Nyomtat"
+msgstr "Nyomtatás"
 
 #: src/main-window.c:530
 msgid "Print current message"
@@ -1750,11 +1750,9 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugs.gnome.org/"
 msgstr ""
-"A Balsa a GNOME környezet levelezõprogramja. Informació a Balsárol a "
-"http://www.balsa.net cimen található.\n"
+"A Balsa a GNOME környezet levelezõprogramja. Informació a Balsárol a http://www.balsa.net címen található.\n"
 "\n"
-"Ha hibát találtál akkor azt a http://bugs.gnome.org  címen jelentheted.\n"
-"Fordítási munkák : Sebi <jaques@freemailhu> és Gab <h9gab@freemail.hu>"
+"Ha hibát találtál akkor azt a http://bugs.gnome.org  címen jelentheted."
 
 #: src/main-window.c:1522
 #, c-format
@@ -1778,7 +1776,7 @@ msgstr "Balsa: %s"
 
 #: src/main.c:107
 msgid "Get new mail on startup"
-msgstr "Indításkor levelek ellenõrzése"
+msgstr "Levelek letöltése indításkor"
 
 #: src/main.c:109
 msgid "Compose a new email to EMAIL@ADDRESS"
@@ -1786,7 +1784,7 @@ msgstr "Új levél írása az EMAIL@ADRESS címre"
 
 #: src/main.c:111
 msgid "Opens MAILBOXNAME"
-msgstr "POSTAFIÓKNÉV nyitása"
+msgstr "POSTAFIÓKNÉV megnyitása"
 
 #: src/main.c:111
 msgid "MAILBOXNAME"
@@ -1794,7 +1792,7 @@ msgstr "POSTAFIÓKNÉV"
 
 #: src/main.c:114
 msgid "Opens first unread mailbox"
-msgstr "Az elsõ olvasatlan postafiók nyitása"
+msgstr "Az elsõ olvasatlan postafiók megnyitása"
 
 #: src/main.c:132 src/main.c:137 src/main.c:143 src/main.c:149 src/main.c:155
 #, c-format
@@ -1903,7 +1901,7 @@ msgstr "Balsa beállitások"
 
 #: src/pref-manager.c:239 src/pref-manager.c:1114
 msgid "Identity"
-msgstr "Azonosító"
+msgstr "Azonosítás"
 
 #: src/pref-manager.c:243 src/pref-manager.c:1137
 msgid "Signature"
@@ -1911,7 +1909,7 @@ msgstr "Aláírás"
 
 #: src/pref-manager.c:247
 msgid "Mail Servers"
-msgstr "Mail szerverek"
+msgstr "Levelezõ-kiszolgáló"
 
 #: src/pref-manager.c:251 src/pref-manager.c:1961
 msgid "Address Books"
@@ -1919,7 +1917,7 @@ msgstr "Címjegyzékek"
 
 #: src/pref-manager.c:255
 msgid "Mail Options"
-msgstr "Mail opciók"
+msgstr "Levelezés beállításai"
 
 #: src/pref-manager.c:259
 msgid "Display"
@@ -1939,7 +1937,7 @@ msgstr "Egyéb"
 
 #: src/pref-manager.c:276
 msgid "Startup"
-msgstr "Indítas"
+msgstr "Indítás"
 
 #: src/pref-manager.c:964
 msgid "Yes"
@@ -1947,15 +1945,15 @@ msgstr "Igen"
 
 #: src/pref-manager.c:1118
 msgid "Your name:"
-msgstr "Neved:"
+msgstr "Megjelenített név:"
 
 #: src/pref-manager.c:1119
 msgid "E-mail address:"
-msgstr "E-mail címed:"
+msgstr "Elektronikus levélcím:"
 
 #: src/pref-manager.c:1120
 msgid "Reply-to address:"
-msgstr "Válaszcímed:"
+msgstr "Válaszcím:"
 
 #: src/pref-manager.c:1121
 msgid "Default domain:"
@@ -1963,7 +1961,7 @@ msgstr "Alapértelmezett tartomány:"
 
 #: src/pref-manager.c:1142
 msgid "Use signature file when:"
-msgstr "Aláíró fájl használata:"
+msgstr "Aláírásfájl használata:"
 
 #: src/pref-manager.c:1146
 msgid "sending mail"
@@ -1999,7 +1997,7 @@ msgstr "aláírás beszúrása az idézett levél elé"
 
 #: src/pref-manager.c:1194
 msgid "Remote Mailbox Servers"
-msgstr "Távoli postafiók szerverek"
+msgstr "Távoli postafiók kiszolgálók"
 
 #: src/pref-manager.c:1216 src/pref-manager.c:1983
 msgid "Type"
@@ -2031,7 +2029,7 @@ msgstr "Port"
 
 #: src/pref-manager.c:1276
 msgid "Remote SMTP Server"
-msgstr "Távoli SMTP szerver"
+msgstr "Távoli SMTP kiszolgáló"
 
 #: src/pref-manager.c:1285
 msgid "Local mail user agent"
@@ -2051,11 +2049,11 @@ msgstr "Ellenõrzés"
 
 #: src/pref-manager.c:1340 src/pref-manager.c:1815
 msgid "Minutes"
-msgstr "Percenként"
+msgstr "percenként"
 
 #: src/pref-manager.c:1352
 msgid "Check mail automatically every:"
-msgstr "Levelek autómatikus ellenõrzése:"
+msgstr "Levelek automatikus fogadása:"
 
 #. Quoted text regular expression
 #: src/pref-manager.c:1358
@@ -2068,7 +2066,7 @@ msgstr "Idézett szöveg reguláris kifejezés"
 
 #: src/pref-manager.c:1390
 msgid "Word Wrap"
-msgstr "Szótörés"
+msgstr "Sortörés"
 
 #: src/pref-manager.c:1400
 msgid "Wrap Outgoing Text at:"
@@ -2076,7 +2074,7 @@ msgstr "Kimenõ szöveg törése:"
 
 #: src/pref-manager.c:1413
 msgid "Characters"
-msgstr "Karakter"
+msgstr "karakter"
 
 #: src/pref-manager.c:1417
 msgid "Other options"
@@ -2253,7 +2251,7 @@ msgstr "Beállítások"
 
 #: src/pref-manager.c:1936
 msgid "Check mail upon startup"
-msgstr "Levelek ellenõrzése indításkor"
+msgstr "Levelek fogadása indításkor"
 
 #: src/pref-manager.c:1941
 msgid "Remember open mailboxes between sessions"

@@ -1994,25 +1994,22 @@ mbox_model_get_iter(GtkTreeModel *tree_model,
 static GtkTreePath *
 mbox_model_get_path_helper(GNode * node, GNode * msg_tree)
 {
-    GtkTreePath *path;
-    gint i;
+    GtkTreePath *path = gtk_tree_path_new();
 
-    if (!node->parent)
-        return node == msg_tree ? gtk_tree_path_new() : NULL;
-
-    path = mbox_model_get_path_helper(node->parent, msg_tree);
-    if (!path)
-        return NULL;
-
-    i = g_node_child_position(node->parent, node);
-    if (i < 0) {
-        gtk_tree_path_free(path);
-        return NULL;
+    while (node->parent) {
+	gint i = g_node_child_position(node->parent, node);
+	if (i < 0) {
+	    gtk_tree_path_free(path);
+	    return NULL;
+	}
+	gtk_tree_path_prepend_index(path, i);
+	node = node->parent;
     }
 
-    gtk_tree_path_append_index(path, i);
-
-    return path;
+    if (node == msg_tree)
+	return path;
+    gtk_tree_path_free(path);
+    return NULL;
 }
 
 static GtkTreePath *

@@ -69,4 +69,10 @@ LibBalsaMessage *libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox,
                                                      guint msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);
 
+/* Helper for maildir and mh. */
+GMimeMessage *_libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox *
+						       mailbox,
+						       const gchar * name1,
+						       const gchar * name2);
+
 #endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */

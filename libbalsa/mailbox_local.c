@@ -594,6 +594,10 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox,
     g_warning("%s not implemented yet.\n", __func__);
 }
 
+/* Default method for local mailboxes; maildir and mh have their own
+ * methods, which ensure that message->mime_msg != NULL, then chain up
+ * to this one.
+ */
 static void
 libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *mailbox,
                                       LibBalsaMessage *message,
@@ -1139,4 +1143,35 @@ lbml_thread_message(GNode * node, ThreadingInfo * ti)
 	g_node_prepend(parent, lbml_unlink(node));
 
     return FALSE;
+}
+
+/* Helper for maildir and mh. */
+GMimeMessage *
+_libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox * mailbox,
+					 const gchar * name1,
+					 const gchar * name2)
+{
+    const gchar *path;
+    gchar *filename;
+    GMimeStream *mime_stream;
+    GMimeParser *mime_parser;
+    GMimeMessage *mime_message;
+    gint fd;
+
+    path = libbalsa_mailbox_local_get_path(mailbox);
+    filename = g_build_filename(path, name1, name2, NULL);
+    fd = open(filename, O_RDONLY);
+    g_free(filename);
+    if (fd == -1)
+	return NULL; /* FIXME with a warning? */
+
+    mime_stream = g_mime_stream_fs_new(fd);
+    mime_parser = g_mime_parser_new_with_stream(mime_stream);
+    g_mime_parser_set_scan_from(mime_parser, FALSE);
+    mime_message = g_mime_parser_construct_message(mime_parser);
+
+    g_object_unref(mime_parser);
+    g_mime_stream_unref(mime_stream);
+
+    return mime_message;
 }

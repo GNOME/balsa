@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"POT-Creation-Date: 2002-03-21 09:52+0100\n"
-"PO-Revision-Date: 2002-03-21 10:10+0100\n"
+"POT-Creation-Date: 2002-03-31 22:25+0200\n"
+"PO-Revision-Date: 2002-03-31 22:29+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -936,11 +936,11 @@ msgid "CRAM-MD5 authentication failed."
 msgstr "Overovanie toto¾nosti CRAM-MD5 zlyhalo."
 
 #. now begin login
-#: libmutt/imap/auth_gss.c:104
+#: libmutt/imap/auth_gss.c:112
 msgid "Authenticating (GSSAPI)..."
 msgstr "Overovanie toto¾nosti (GSSAPI)..."
 
-#: libmutt/imap/auth_gss.c:267
+#: libmutt/imap/auth_gss.c:275
 msgid "GSSAPI authentication failed."
 msgstr "Overovanie toto¾nosti GSSAPI zlyhalo."
 
@@ -1072,16 +1072,16 @@ msgstr "Vymazávam správy zo servera..."
 msgid "CLOSE failed"
 msgstr "ZATVORENIE zlyhalo"
 
-#: libmutt/imap/imap.c:1368
+#: libmutt/imap/imap.c:1373
 msgid "Bad mailbox name"
 msgstr "Zlý názov po¹tovej schránky"
 
-#: libmutt/imap/imap.c:1380
+#: libmutt/imap/imap.c:1385
 #, c-format
 msgid "Subscribing to %s..."
 msgstr "Prihlasujem sa k %s..."
 
-#: libmutt/imap/imap.c:1382
+#: libmutt/imap/imap.c:1387
 #, c-format
 msgid "Unsubscribing to %s..."
 msgstr "Odhlasujem sa od %s..."
@@ -3853,10 +3853,10 @@ msgstr "Strana: %i/%i"
 #: src/print.c:613 src/print.c:962
 #, c-format
 msgid ""
-"Can not convert %s, falling back to us-ascii.\n"
+"Can not convert %s, falling back to US-ASCII.\n"
 "Some characters may be printed incorrectly."
 msgstr ""
-"Nemô¾em konvertova» %s, vraciam sa spä» do us-ascii.\n"
+"Nemô¾em konvertova» %s, vraciam sa spä» do US-ASCII.\n"
 "Niektoré znaky mô¾u by» vytlaèené nesprávne."
 
 #. gather some info about this part

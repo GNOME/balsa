@@ -238,9 +238,10 @@ imap_dir_cb(BalsaMailboxNode* mb, GNode* r)
                               balsa_app.imap_scan_depth,
 			      add_imap_folder, add_imap_mailbox);
     /* register whole tree */
-    printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
-	   BALSA_MAILBOX_NODE(r->data)->name, 
-	   BALSA_MAILBOX_NODE(r->data)->mailbox);
+    if(BALSA_MAILBOX_NODE(r->data)->name)
+        printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
+               BALSA_MAILBOX_NODE(r->data)->name, 
+               BALSA_MAILBOX_NODE(r->data)->mailbox);
     g_node_traverse(r, G_IN_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) register_mailbox, NULL);
 }

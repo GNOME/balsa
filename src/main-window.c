@@ -1192,11 +1192,6 @@ balsa_window_set_threading_menu(int option)
     gtk_signal_handler_unblock_by_func(GTK_OBJECT(threading_menu[pos].widget),
                                        threading_menu[pos].moreinfo,
                                        balsa_app.main_window);
-
-    /* FIXME: the print below reveals that the threading is reset on
-       every message preview change. It means: much too often. */
-    /* printf("balsa_window_set_threading_menu::Threading set to %d\n", 
-       balsa_app.threading_type); */
 }
 
 /* balsa_window_open_mbnode: 
@@ -2997,7 +2992,6 @@ balsa_window_select_message_cb(GtkWidget * widget,
     index = 
         BALSA_INDEX(balsa_window_find_current_index(balsa_app.main_window));
     g_return_if_fail(index);
-    enable_mailbox_menus(index->mailbox_node);
     enable_message_menus(message);
 }
 
@@ -3011,7 +3005,6 @@ balsa_window_unselect_message_cb(GtkWidget * widget,
     index = 
         BALSA_INDEX(balsa_window_find_current_index(balsa_app.main_window));
     g_return_if_fail(index);
-    enable_mailbox_menus(index->mailbox_node);
     /* we need to disable menus in case there was no other message selected */
     if(GTK_CLIST(index->ctree)->selection == NULL) {
         enable_message_menus(NULL);
@@ -3358,12 +3351,17 @@ balsa_window_clear_progress(BalsaWindow* window)
 }
 
 
+#ifndef BALSA_USE_THREADS
 /* balsa_window_increment_progress
  *
  * If the progress bar has been initialized using
  * balsa_window_setup_progress, this function increments the
  * adjustment by one and executes any pending gtk events.  So the
  * progress bar will be shown as updated even if called within a loop.
+ * 
+ * NOTE: This does not work with threads because a thread cannot
+ * process events by itself and it holds the GDK lock preventing the
+ * main thread from processing events.
  **/
 void
 balsa_window_increment_progress(BalsaWindow* window)
@@ -3391,18 +3389,11 @@ balsa_window_increment_progress(BalsaWindow* window)
     }
     
     gtk_adjustment_set_value(adj, new_val);
-#ifdef BALSA_USE_THREADS
-    /* run some gui events to make sure the progress bar gets drawn to
-     * screen; it's not needed when we compile in MT-enabled mode because
-     * the events will be processed by the main thread as soon as it gets
-     * the gdk_lock. Or so I believed. */
-#else
     while (gtk_events_pending()) {
         gtk_main_iteration_do(FALSE);
     }
-#endif
 }
-
+#endif
 
 static void
 ident_manage_dialog_cb(GtkWidget* widget, gpointer user_data)

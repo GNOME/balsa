@@ -2487,7 +2487,7 @@ ir_body (struct siobuf *sio, int c, ImapBody * body,
 static ImapResponse
 ir_body_section(struct siobuf *sio, ImapFetchBodyCb body_cb, void *arg)
 {
-  char buf[12], *str;
+  char buf[12 + 5], *str;
   int c = imap_get_atom(sio, buf, sizeof(buf));
   if(c != ']') { puts("] expected"); return IMR_PROTOCOL; }
   if(sio_getc(sio) != ' ') { puts("space expected"); return IMR_PROTOCOL;}

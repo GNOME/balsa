@@ -1942,16 +1942,17 @@ append_str(const char *buf, int buflen, void *arg)
 
     if(dt->pos + buflen > dt->body->octets) {
         fprintf(stderr, "IMAP server sends too much data but we just "
-                "ignore that looser.\n");
-        buflen = dt->body->octets-dt->pos;
+                "reallocate the block.\n");
+	dt->body->octets = dt->pos + buflen;
+	dt->block = g_realloc(dt->block, dt->body->octets);
     }
     memcpy(dt->block + dt->pos, buf, buflen);
     dt->pos += buflen;
 }
 
 static gboolean
-libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
-                                   LibBalsaMessageBody *part)
+lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
+                                 LibBalsaMessageBody * part)
 {
     GMimeStream *partstream = NULL;
 
@@ -1959,9 +1960,6 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
     FILE *fp;
     gchar *section;
-
-    if(part->mime_part)
-        return GMIME_IS_PART(part->mime_part);
 
    /* look for a part cache */
     section = get_section_for(msg, part);
@@ -1971,10 +1969,6 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
     
     if(!fp) { /* no cache element */
         struct part_data dt;
-        GMimePart *prefilt;
-        GMimeStream *gms;
-        GMimePartEncodingType gmt;
-        GMimeContentType *type;
         LibBalsaMailboxImap* mimap;
         ImapMessage *im;
         ImapResponse rc;
@@ -1986,6 +1980,9 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
         dt.body  = imap_message_get_body_from_section(im, section);
         dt.block = g_malloc(dt.body->octets+1);
         dt.pos   = 0;
+	/* Imap_mbox_handle_fetch_body fetches the MIME headers of
+	 * the section, followed by the text. We write this unfiltered
+	 * to the cache. */
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
                                        section, append_str, &dt));
@@ -1993,16 +1990,6 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
             g_error("FIXME: error handling here!\n");
         
         libbalsa_unlock_mailbox(msg->mailbox);
-        
-        prefilt = g_mime_part_new_with_type (dt.body->media_basic_name,
-                                             dt.body->media_subtype);
-        gmt = dt.body->encoding == IMBENC_OTHER ?
-            GMIME_PART_ENCODING_DEFAULT : dt.body->encoding;
-        g_mime_part_set_pre_encoded_content ( prefilt,
-                                              dt.block,
-                                              dt.body->octets,
-                                              gmt );
-        g_free(dt.block);
         
         libbalsa_assure_balsa_dir();
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
@@ -2014,32 +2001,8 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
             g_free(part_name);
             return FALSE; /* something better ? */
         }
-        if( (dt.body->media_basic == IMBMEDIA_TEXT) &&
-            !g_ascii_strcasecmp( "plain", dt.body->media_subtype ) ) {
-            GMimeFilter *crlffilter; 	    
-
-            gms = g_mime_stream_file_new (fp);
-            crlffilter = 	    
-                g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
-                                          GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
-            partstream = g_mime_stream_filter_new_with_stream (gms);
-            g_mime_stream_filter_add (GMIME_STREAM_FILTER(partstream)
-                                      , crlffilter);
-            g_object_unref (gms);
-            g_object_unref (crlffilter);
-        } else 
-            partstream = g_mime_stream_file_new (fp);
-
-        g_mime_part_set_encoding (prefilt, GMIME_PART_ENCODING_8BIT );
-        type = g_mime_content_type_new_from_string(part->content_type);
-        g_mime_part_set_content_type(prefilt, type);
-        g_mime_part_write_to_stream (prefilt, partstream );
-        g_mime_stream_flush (partstream);
-
-        g_object_unref (prefilt);
-        /* aparently the parser doesn't like the stream_filters .. */
-        g_object_unref (partstream);
-        fp = fopen(part_name, "r");
+	fwrite(dt.block, dt.body->octets, 1, fp);
+	fseek(fp, 0, SEEK_SET);
     }
     partstream = g_mime_stream_file_new (fp);
 
@@ -2054,7 +2017,72 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
     g_strfreev(pair);
     g_free(part_name);
 
+    return TRUE;
+}
+
+/* Recursive helper for libbalsa_mailbox_imap_get_msg_part: ensure that
+ * we have a mime_part, and if we are in a multipart/signed or
+ * multipart/encrypted, ensure that all needed children are also
+ * created. */
+static gboolean
+lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
+                      gboolean need_children, GMimeObject * parent_part)
+{
+    if (!part)
+        return FALSE;
+
+    if (!part->mime_part) {
+        GMimeContentType *type =
+            g_mime_content_type_new_from_string(part->content_type);
+        if (g_mime_content_type_is_type(type, "multipart", "*")) {
+            if (g_mime_content_type_is_type(type, "multipart", "signed"))
+                part->mime_part =
+                    GMIME_OBJECT(g_mime_multipart_signed_new());
+            else if (g_mime_content_type_is_type(type, "multipart",
+                                                 "encrypted"))
+                part->mime_part =
+                    GMIME_OBJECT(g_mime_multipart_encrypted_new());
+            else
+                part->mime_part = GMIME_OBJECT(g_mime_multipart_new());
+            g_mime_object_set_content_type(part->mime_part, type);
+        } else {
+            g_mime_content_type_destroy(type);
+            if (!lbm_imap_get_msg_part_from_cache(msg, part))
+                return FALSE;
+        }
+    }
+
+    if (parent_part) {
+        /* GMime will unref and so will we. */
+        g_object_ref(part->mime_part);
+	g_mime_multipart_add_part(GMIME_MULTIPART(parent_part),
+                                  part->mime_part);
+    }
+
+    if (GMIME_IS_MULTIPART_SIGNED(part->mime_part)
+        || GMIME_IS_MULTIPART_ENCRYPTED(part->mime_part))
+        need_children = TRUE;
+
+    if (need_children) {
+	/* Get the children, if any,... */
+        if (GMIME_IS_MULTIPART(part->mime_part))
+            lbm_imap_get_msg_part(msg, part->parts, TRUE, part->mime_part);
+	/* ...and siblings. */
+        lbm_imap_get_msg_part(msg, part->next, TRUE, parent_part);
+	/* FIXME if GMIME_IS_MESSAGE_PART? */
+    }
+
     return GMIME_IS_PART(part->mime_part);
+}
+
+static gboolean
+libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
+                                   LibBalsaMessageBody *part)
+{
+    if (part->mime_part)
+        return GMIME_IS_PART(part->mime_part);
+
+    return lbm_imap_get_msg_part(msg, part, FALSE, NULL);
 }
 
 /* libbalsa_mailbox_imap_add_message: 

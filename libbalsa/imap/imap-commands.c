@@ -773,11 +773,17 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                             ImapFetchBodyCb body_cb, void *arg)
 {
   char cmd[40];
+  ImapResponse rc;
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
-  snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]", seqno, section);
-  return imap_cmd_exec(handle, cmd);
+  snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s.MIME]", seqno, section);
+  rc = imap_cmd_exec(handle, cmd);
+  if(rc == IMR_OK) {
+    snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]", seqno, section);
+    rc = imap_cmd_exec(handle, cmd);
+  }
+  return rc;
 }
 
 /* 6.4.6 STORE Command */

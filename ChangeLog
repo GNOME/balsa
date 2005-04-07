@@ -1,3 +1,7 @@
+2005-04-07 11:18  PeterB
+
+	* src/sendmsg-window.c: check for NULL charset.
+
 2005-04-06 16:45  PeterB
 
 	* libbalsa/body.c: ensure stream is a filter-stream.

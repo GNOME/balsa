@@ -3031,10 +3031,12 @@ sw_prepend_charset(BalsaSendmsg * bsmsg, const gchar * charset)
 {
     const gchar *charset_iconv;
 
+    if (!charset || g_ascii_strcasecmp(charset, "UTF-8") == 0)
+	return;
+
     charset_iconv = g_mime_charset_iconv_name(charset);
-    if (g_ascii_strcasecmp(charset, "UTF-8") != 0
-        && !g_slist_find_custom(bsmsg->charsets, charset_iconv,
-                                (GCompareFunc) strcmp))
+    if (!g_slist_find_custom(bsmsg->charsets, charset_iconv,
+                             (GCompareFunc) strcmp))
         bsmsg->charsets =
             g_slist_prepend(bsmsg->charsets, g_strdup(charset_iconv));
 }

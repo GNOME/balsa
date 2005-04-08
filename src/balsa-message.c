@@ -197,6 +197,7 @@ static GtkWidget* part_info_mime_button (BalsaPartInfo* info,
                                          const gchar* content_type,
                                          const gchar* key);
 static void part_context_save_all_cb(GtkWidget * menu_item, GList * info_list);
+static void part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list);
 static void part_context_menu_call_url(GtkWidget * menu_item,
                                        BalsaPartInfo * info);
 static void part_context_menu_mail(GtkWidget * menu_item,
@@ -991,16 +992,21 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
     } else if (selected > 1) {
         GtkWidget *menu_item;
         
-	if (bm->save_all_popup)
-	    g_object_unref(bm->save_all_popup);
         bm->save_all_popup = gtk_menu_new ();
 	g_object_ref(bm->save_all_popup);
 	gtk_object_sink(GTK_OBJECT(bm->save_all_popup));
         menu_item = 
-            gtk_menu_item_new_with_label (_("Save selected..."));
+            gtk_menu_item_new_with_label (_("Save selected as..."));
         gtk_widget_show(menu_item);
         g_signal_connect (G_OBJECT (menu_item), "activate",
                           GTK_SIGNAL_FUNC (part_context_save_all_cb),
+                          (gpointer) bm->save_all_list);
+        gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
+        menu_item = 
+            gtk_menu_item_new_with_label (_("Save selected to folder..."));
+        gtk_widget_show(menu_item);
+        g_signal_connect (G_OBJECT (menu_item), "activate",
+                          GTK_SIGNAL_FUNC (part_context_dump_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
         if (event)
@@ -3016,6 +3022,94 @@ part_context_save_all_cb(GtkWidget * menu_item, GList * info_list)
         save_part(BALSA_PART_INFO(info_list->data));
         info_list = g_list_next(info_list);
     }
+}
+
+/*
+ * Let the user select a folder and save all message parts form info_list in
+ * this folder, either with their name (if defined) or as localised "content-
+ * type message part". The function protects files from being overwritten by
+ * appending "(1)", "(2)", ... to the name to make it unique.
+ * Sets balsa_app::save_dir to the selected folder.
+ */
+static void
+part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
+{
+    GtkWidget *dump_dialog;
+
+    g_return_if_fail(info_list);
+
+    dump_dialog =
+        gtk_file_chooser_dialog_new(_("Select folder for saving selected parts"),
+                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(dump_dialog),
+                                    GTK_RESPONSE_CANCEL);
+
+    if (balsa_app.save_dir)
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dump_dialog),
+                                            balsa_app.save_dir);
+
+    if (gtk_dialog_run(GTK_DIALOG(dump_dialog)) == GTK_RESPONSE_OK) {
+	gchar *dirname =
+	    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dump_dialog));
+
+	/* remember the folder */
+	g_free(balsa_app.save_dir);
+	balsa_app.save_dir = g_strdup(dirname);
+
+	/* save all parts without further user interaction */
+	info_list = g_list_first(info_list);
+	while (info_list) {
+	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
+	    gchar *save_name;
+	    gboolean result;
+
+	    if (info->body->filename)
+		save_name =
+		    g_build_filename(dirname, info->body->filename, NULL);
+	    else {
+		gchar *cont_type =
+		    libbalsa_message_body_get_mime_type(info->body);
+		gchar *p;
+
+		/* be sure to have no '/' in the file name */
+		g_strdelimit(cont_type, G_DIR_SEPARATOR_S, '-');
+		p = g_strdup_printf(_("%s message part"), cont_type);
+		g_free(cont_type);
+		save_name = g_build_filename(dirname, p, NULL);
+		g_free(p);
+	    }
+
+	    /* don't overwrite existing files, append (1), (2), ... instead */
+	    if (access(save_name, F_OK) == 0) {
+		gint n = 1;
+		gchar *base_name = save_name;
+
+		save_name = NULL;
+		do {
+		    g_free(save_name);
+		    save_name = g_strdup_printf("%s (%d)", base_name, n++);
+		} while (access(save_name, F_OK) == 0);
+		g_free(base_name);
+	    }
+
+	    /* try to save the file */
+            result =
+                libbalsa_message_body_save(info->body, save_name,
+                                           info->body->body_type ==
+                                           LIBBALSA_MESSAGE_BODY_TYPE_TEXT);
+	    if (!result)
+		balsa_information(LIBBALSA_INFORMATION_ERROR,
+				  _("Could not save %s: %s"),
+				  save_name, strerror(errno));
+	    g_free(save_name);
+	    info_list = g_list_next(info_list);
+	}
+	g_free(dirname);
+    }
+    gtk_widget_destroy(dump_dialog);
 }
 
 

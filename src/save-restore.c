@@ -1715,8 +1715,15 @@ save_color(gchar * key, GdkColor * color)
 static gboolean
 config_filter_load(const gchar * key, const gchar * value, gpointer data)
 {
+    char *endptr;
     guint *save = data;
     LibBalsaFilter *fil;
+
+    strtol(value, &endptr, 10);
+    if (*endptr) {              /* Bad format. */
+        libbalsa_conf_remove_group(key);
+        return FALSE;
+    }
 
     libbalsa_conf_push_group(key);
 
@@ -1775,7 +1782,7 @@ config_filters_save(void)
 
     for(list = balsa_app.filters; list; list = list->next) {
 	fil = (LibBalsaFilter*)(list->data);
-	i=snprintf(tmp,tmp_len,"%d/",nb++);
+	i=snprintf(tmp,tmp_len,"%d",nb++);
 	libbalsa_conf_push_group(buffer);
 	libbalsa_filter_save_config(fil);
 	libbalsa_conf_pop_group();

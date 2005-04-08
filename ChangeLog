@@ -1,3 +1,8 @@
+2005-04-08 14:30  PeterB
+
+	* src/save-restore.c: use correct filter group name; remove filter
+	groups with malformed names.
+
 2005-04-07 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/balsa-message.c: save multiple parts.

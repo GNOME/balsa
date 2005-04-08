@@ -1,3 +1,7 @@
+2005-04-07 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/balsa-message.c: save multiple parts.
+
 2005-04-07 11:18  PeterB
 
 	* src/sendmsg-window.c: check for NULL charset.

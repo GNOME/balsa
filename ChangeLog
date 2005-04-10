@@ -1,3 +1,7 @@
+2005-04-10 08:07  PeterB
+
+	* libbalsa/mailbox_maildir.c: remember correct file name.
+
 2005-04-08 14:30  PeterB
 
 	* src/save-restore.c: use correct filter group name; remove filter

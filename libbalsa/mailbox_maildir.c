@@ -423,9 +423,13 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	msg_info = g_hash_table_lookup(messages_info, key);
 	if (msg_info) {
 	    g_free(key);
+	    g_free(msg_info->filename);
+	    msg_info->filename = g_strdup(filename);
 	    if (FLAGS_REALLY_DIFFER(msg_info->orig_flags, flags)) {
+#ifdef DEBUG
 		g_message("Message flags for \"%s\" changed\n",
                           msg_info->key);
+#endif
 		msg_info->orig_flags = flags;
 	    }
 	} else {
@@ -697,8 +701,13 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
     if (strcmp(orig, new)) {
 	if (rename(orig, new) >= 0) /* FIXME: change to safe_rename??? */
 	    msg_info->subdir = subdir;
-	else
+	else {
+#ifdef DEBUG
+            g_print("%s rename \"%s\" \"%s\": %s\n", __func__, orig, new,
+                    g_strerror(errno));
+#endif
 	    retval = FALSE;
+	}
     }
     g_free(orig);
     g_free(new);

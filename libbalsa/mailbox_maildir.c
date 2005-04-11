@@ -426,6 +426,7 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	    g_free(msg_info->filename);
 	    msg_info->filename = g_strdup(filename);
 	    if (FLAGS_REALLY_DIFFER(msg_info->orig_flags, flags)) {
+#define DEBUG TRUE
 #ifdef DEBUG
 		g_message("Message flags for \"%s\" changed\n",
                           msg_info->key);
@@ -647,16 +648,26 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox,
                                                             expunge);
 }
 
-static int libbalsa_mailbox_maildir_open_temp (const gchar *dest_path,
-					  char **name_used)
+static gchar *
+lbm_mdir_get_key(void)
+{
+    static int counter;
+
+    return g_strdup_printf("%s-%d-%d", g_get_user_name(), getpid(),
+                           counter++);
+}
+
+static int
+libbalsa_mailbox_maildir_open_temp(const gchar *dest_path,
+                                   char **name_used)
 {
     int fd;
-    static int counter;
     gchar *filename;
 
     do {
-	filename = g_strdup_printf("%s/tmp/%s-%d-%d", dest_path,
-	   		      g_get_user_name(), getpid (), counter++);
+	gchar *key = lbm_mdir_get_key();
+	filename = g_build_filename(dest_path, "tmp", key, NULL);
+	g_free(key);
 	fd = open (filename, O_WRONLY | O_EXCL | O_CREAT, 0600);
 	if (fd == -1)
 	{
@@ -676,6 +687,7 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
     gchar new_flags[10];
     int len;
     const gchar *subdir;
+    gchar *filename;
     gchar *new;
     gchar *orig;
     gboolean retval = TRUE;
@@ -694,27 +706,39 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
     new_flags[len] = '\0';
 
     subdir = msg_info->flags & LIBBALSA_MESSAGE_FLAG_RECENT ? "new" : "cur";
-    new = g_strdup_printf("%s/%s/%s%s%s", path, subdir, msg_info->key,
-			  (len ? ":2," : ""), new_flags);
-    orig = g_strdup_printf("%s/%s/%s", path, msg_info->subdir,
-			   msg_info->filename);
+    filename =
+        g_strconcat(msg_info->key, (len ? ":2," : ""), new_flags, NULL);
+    new = g_build_filename(path, subdir, filename, NULL);
+    orig =
+        g_build_filename(path, msg_info->subdir, msg_info->filename, NULL);
     if (strcmp(orig, new)) {
+        while (g_file_test(new, G_FILE_TEST_EXISTS)) {
+#ifdef DEBUG
+	    g_message("File \"%s\" exists, requesting new key.\n", new);
+#endif
+            g_free(msg_info->key);
+            msg_info->key = lbm_mdir_get_key();
+            g_free(filename);
+            filename =
+                g_strconcat(msg_info->key, (len ? ":2," : ""), new_flags,
+                            NULL);
+            g_free(new);
+            new = g_build_filename(path, subdir, filename, NULL);
+        }
 	if (rename(orig, new) >= 0) /* FIXME: change to safe_rename??? */
 	    msg_info->subdir = subdir;
 	else {
 #ifdef DEBUG
-            g_print("%s rename \"%s\" \"%s\": %s\n", __func__, orig, new,
-                    g_strerror(errno));
+            g_message("Rename \"%s\" \"%s\": %s\n", orig, new,
+                      g_strerror(errno));
 #endif
 	    retval = FALSE;
 	}
     }
     g_free(orig);
     g_free(new);
-    new = g_strdup_printf("%s%s%s", msg_info->key, (len ? ":2," : ""),
-			  new_flags);
     g_free(msg_info->filename);
-    msg_info->filename = new;
+    msg_info->filename = filename;
     msg_info->orig_flags = REAL_FLAGS(msg_info->flags);
 
     return retval;

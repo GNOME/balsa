@@ -116,10 +116,21 @@ lbh_new(const gchar * text, size_t len,
     if (len > 0) {
         if (charset && g_ascii_strcasecmp(charset, "us-ascii") != 0
             && g_ascii_strcasecmp(charset, "utf-8") != 0) {
+            const gchar *charset_iconv;
+            gchar *s;
             gsize bytes_written;
-            gchar *s = g_convert(text, len, "utf-8", charset, NULL,
-                                 &bytes_written, NULL);
-            gtk_html_write(GTK_HTML(html), stream, s, bytes_written);
+            GError *error = NULL;
+
+            charset_iconv = g_mime_charset_iconv_name(charset);
+            s = g_convert(text, len, "utf-8", charset_iconv, NULL,
+                          &bytes_written, &error);
+            if (error) {
+                g_message("(%s) error converting from %s to utf-8:\n%s\n",
+                          __func__, charset_iconv, error->message);
+                g_error_free(error);
+                gtk_html_write(GTK_HTML(html), stream, text, len);
+            } else
+                gtk_html_write(GTK_HTML(html), stream, s, bytes_written);
             g_free(s);
         } else
             gtk_html_write(GTK_HTML(html), stream, text, len);

@@ -1,3 +1,7 @@
+2005-04-12 12:31  PeterB
+
+	* libbalsa/html.c: convert charset more carefully.
+
 2005-04-10 20:28  PeterB
 
 	* libbalsa/mailbox_maildir.c: do not overwrite message when

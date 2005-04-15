@@ -1,3 +1,14 @@
+2005-04-15 17:28  PeterB
+
+	* libbalsa/Makefile.am, libbalsa/identity.c, libbalsa/identity.h,
+	libbalsa/libbalsa.h, libbalsa/message.c, libbalsa/send.c,
+	libbalsa/send.h, libbalsa/server.h, libbalsa/smtp-server.c,
+	libbalsa/smtp-server.h, libinit_balsa/balsa-druid-page-user.c,
+	src/balsa-app.c, src/balsa-app.h, src/balsa-message.c,
+	src/main-window.c, src/pref-manager.c, src/save-restore.c,
+	src/sendmsg-window.c: implement LibBalsaSmtpServer; use it for
+	per-identity server.
+
 2005-04-12 12:31  PeterB
 
 	* libbalsa/html.c: convert charset more carefully.

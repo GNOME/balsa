@@ -115,6 +115,8 @@ libbalsa_a_SOURCES = 		\
 	send.h			\
 	server.c		\
 	server.h		\
+	smtp-server.c		\
+	smtp-server.h		\
 	source-viewer.c		\
 	url.c			\
 	url.h			\

@@ -168,13 +168,9 @@ extern struct BalsaApplication {
     GSList* filters;
 
     gchar *local_mail_directory;
+
 #if ENABLE_ESMTP
-    gchar *smtp_server;
-    gchar *smtp_user;
-    gchar *smtp_passphrase;
-    auth_context_t smtp_authctx;
-    gint smtp_tls_mode;
-    gchar *smtp_certificate_passphrase;
+    GSList *smtp_servers;
 #endif
 
     /* folder scanning */

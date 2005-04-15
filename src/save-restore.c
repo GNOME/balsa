@@ -41,12 +41,17 @@
 #include "threads.h"
 #endif
 
+#if ENABLE_ESMTP
+#include "smtp-server.h"
+#endif                          /* ENABLE_ESMTP */
+
 #define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 #define IDENTITY_SECTION_PREFIX "identity-"
 #define VIEW_SECTION_PREFIX "view-"
 #define VIEW_BY_URL_SECTION_PREFIX "viewByUrl-"
+#define SMTP_SERVER_SECTION_PREFIX "smtp-server-"
 
 static gint config_global_load(void);
 static gint config_folder_init(const gchar * group);
@@ -586,6 +591,22 @@ config_warning_idle(const gchar * text)
     return FALSE;
 }
 
+#if ENABLE_ESMTP
+static gboolean
+config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
+{
+    GSList **smtp_servers = data;
+    LibBalsaSmtpServer *smtp_server;
+
+    libbalsa_conf_push_group(key);
+    smtp_server = libbalsa_smtp_server_new_from_config(value);
+    libbalsa_conf_pop_group();
+    *smtp_servers = g_slist_prepend(*smtp_servers, smtp_server);
+
+    return FALSE;
+}
+#endif                          /* ENABLE_ESMTP */
+
 static gint
 config_global_load(void)
 {
@@ -593,6 +614,10 @@ config_global_load(void)
     guint tmp;
 
     config_address_books_load();
+    /* Load SMTP servers before identities. */
+    libbalsa_conf_foreach_group(SMTP_SERVER_SECTION_PREFIX,
+	                        config_load_smtp_server,
+	                        &balsa_app.smtp_servers);
     config_identities_load();
 
     /* We must load filters before mailboxes, because they refer to the filters list */
@@ -916,52 +941,50 @@ config_global_load(void)
     libbalsa_conf_push_group("Sending");
 
 #if ENABLE_ESMTP
-    /* ... SMTP server */
-    g_free(balsa_app.smtp_server);
-    balsa_app.smtp_server =
-	libbalsa_conf_get_string_with_default("ESMTPServer=localhost:25", 
-					     &def_used);
-    if(def_used) {
-	/* we need to check for old format, 1.1.4-compatible settings and
-	   convert them if needed.
-	*/
-	gchar* old_server = libbalsa_conf_get_string("SMTPServer");
-	if(old_server) {
-	    int port = libbalsa_conf_get_int("SMTPPort=25");
-	    g_free(balsa_app.smtp_server);
-	    balsa_app.smtp_server = g_strdup_printf("%s:%d",
-						    old_server, port);
-	    g_free(old_server);
-	g_warning("Converted old SMTP server config to ESMTP format. Verify the correctness.");
-	}
-    }
-    g_free(balsa_app.smtp_user);
-    balsa_app.smtp_user = libbalsa_conf_get_string("ESMTPUser");
-    g_free(balsa_app.smtp_passphrase);
-    balsa_app.smtp_passphrase = 
-        libbalsa_conf_private_get_string("ESMTPPassphrase");
-    if(balsa_app.smtp_passphrase) {
-        gchar* tmp = libbalsa_rot(balsa_app.smtp_passphrase);
-        g_free(balsa_app.smtp_passphrase); 
-        balsa_app.smtp_passphrase = tmp;
-    }
-#ifndef BREAK_BACKWARD_COMPATIBILITY_AT_14
-    if(!balsa_app.smtp_passphrase)
-        balsa_app.smtp_passphrase = 
-            libbalsa_conf_get_string("ESMTPPassphrase");
-#endif
-    /* default set to "Use TLS if possible" */
-    balsa_app.smtp_tls_mode = libbalsa_conf_get_int("ESMTPTLSMode=1");
+    /* ... SMTP servers */
+    if (!balsa_app.smtp_servers) {
+	/* Transition code */
+	LibBalsaSmtpServer *smtp_server;
+	LibBalsaServer *server;
+	gchar *passphrase;
+
+	smtp_server = libbalsa_smtp_server_new();
+	libbalsa_smtp_server_set_name(smtp_server,
+		libbalsa_smtp_server_get_name(NULL));
+	balsa_app.smtp_servers =
+	    g_slist_prepend(NULL, smtp_server);
+	server = LIBBALSA_SERVER(smtp_server);
+
+	libbalsa_server_set_host
+	(server,
+	 libbalsa_conf_get_string_with_default("ESMTPServer=localhost:25", 
+					     &def_used),
+	 FALSE);
+	libbalsa_server_set_username(server,
+		libbalsa_conf_get_string("ESMTPUser"));
+
+        passphrase = libbalsa_conf_private_get_string("ESMTPPassphrase");
+	if (passphrase) {
+            gchar* tmp = libbalsa_rot(passphrase);
+            g_free(passphrase); 
+            libbalsa_server_set_password(server, tmp);
+	    g_free(tmp);
+        }
+
+        /* default set to "Use TLS if possible" */
+	server->tls_mode = libbalsa_conf_get_int("ESMTPTLSMode=1");
+
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    balsa_app.smtp_certificate_passphrase = 
-        libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
-    if(balsa_app.smtp_certificate_passphrase) {
-        gchar* tmp = libbalsa_rot(balsa_app.smtp_certificate_passphrase);
-        g_free(balsa_app.smtp_certificate_passphrase);
-        balsa_app.smtp_certificate_passphrase = tmp;
+	passphrase =
+	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
+	if (passphrase) {
+            gchar* tmp = libbalsa_rot(passphrase);
+            g_free(passphrase);
+	    libbalsa_smtp_server_set_cert_passphrase(smtp_server, tmp);
+	}
+#endif
     }
-#endif
-#endif
+#endif                          /* ENABLE_ESMTP */
     /* ... outgoing mail */
     balsa_app.wordwrap = libbalsa_conf_get_bool("WordWrap=true");
     balsa_app.wraplength = libbalsa_conf_get_int("WrapLength=72");
@@ -1080,6 +1103,9 @@ gint
 config_save(void)
 {
     gint i;
+#if ENABLE_ESMTP
+    GSList *list;
+#endif                          /* ENABLE_ESMTP */
 
     config_address_books_save();
     config_identities_save();
@@ -1276,26 +1302,24 @@ config_save(void)
     libbalsa_conf_pop_group();
 
     /* Sending options ... */
+#if ENABLE_ESMTP
+    for (list = balsa_app.smtp_servers; list; list = list->next) {
+        LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(list->data);
+        gchar *group;
+
+        group =
+            g_strconcat(SMTP_SERVER_SECTION_PREFIX,
+                        libbalsa_smtp_server_get_name(smtp_server), NULL);
+        libbalsa_conf_push_group(group);
+	g_free(group);
+        libbalsa_smtp_server_save_config(smtp_server);
+        libbalsa_conf_pop_group();
+    }
+#endif                          /* ENABLE_ESMTP */
+
     libbalsa_conf_remove_group("Sending");
     libbalsa_conf_private_remove_group("Sending");
     libbalsa_conf_push_group("Sending");
-#if ENABLE_ESMTP
-    libbalsa_conf_set_string("ESMTPServer", balsa_app.smtp_server);
-    libbalsa_conf_set_string("ESMTPUser", balsa_app.smtp_user);
-    if(balsa_app.smtp_passphrase) {
-        gchar* tmp = libbalsa_rot(balsa_app.smtp_passphrase);
-        libbalsa_conf_private_set_string("ESMTPPassphrase", tmp);
-        g_free(tmp);
-    }
-    libbalsa_conf_set_int("ESMTPTLSMode", balsa_app.smtp_tls_mode);
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    if(balsa_app.smtp_certificate_passphrase) {
-        gchar* tmp = libbalsa_rot(balsa_app.smtp_certificate_passphrase);
-        libbalsa_conf_private_set_string("ESMTPCertificatePassphrase", tmp);
-        g_free(tmp);
-    }
-#endif 
-#endif 
     libbalsa_conf_set_bool("WordWrap", balsa_app.wordwrap);
     libbalsa_conf_set_int("WrapLength", balsa_app.wraplength);
     libbalsa_conf_set_bool("AutoQuote", balsa_app.autoquote);
@@ -1473,13 +1497,54 @@ config_address_books_save(void)
                    (GFunc) config_address_book_save, NULL);
 }
 
+#if ENABLE_ESMTP
+static LibBalsaSmtpServer *
+find_smtp_server_by_name(const gchar * name)
+{
+    GSList *list;
+
+    if (name) {
+        for (list = balsa_app.smtp_servers; list; list = list->next) {
+            LibBalsaSmtpServer *smtp_server =
+                LIBBALSA_SMTP_SERVER(list->data);
+            if (strcmp(name,
+                       libbalsa_smtp_server_get_name(smtp_server)) == 0)
+                return smtp_server;
+        }
+    }
+
+    /* Try the default. */
+    name = libbalsa_smtp_server_get_name(NULL);
+    for (list = balsa_app.smtp_servers; list; list = list->next) {
+        LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(list->data);
+        if (strcmp(name, libbalsa_smtp_server_get_name(smtp_server)) == 0)
+            return smtp_server;
+    }
+
+    /* Use the first in the list. */
+    return LIBBALSA_SMTP_SERVER(balsa_app.smtp_servers->data);
+}
+#endif                          /* ESMTP */
+
 static gboolean
 config_identity_load(const gchar * key, const gchar * value, gpointer data)
 {
     const gchar *default_ident = data;
     LibBalsaIdentity *ident;
+#if ENABLE_ESMTP
+    gchar *smtp_server_name;
+#endif                          /* ENABLE_ESMTP */
 
-    ident = libbalsa_identity_new_config(key, value);
+    libbalsa_conf_push_group(key);
+    ident = libbalsa_identity_new_config(value);
+#if ENABLE_ESMTP
+    smtp_server_name = libbalsa_conf_get_string("SmtpServer");
+    libbalsa_identity_set_smtp_server(ident,
+                                      find_smtp_server_by_name
+                                      (smtp_server_name));
+    g_free(smtp_server_name);
+#endif                          /* ENABLE_ESMTP */
+    libbalsa_conf_pop_group();
     balsa_app.identities = g_list_prepend(balsa_app.identities, ident);
     if (g_ascii_strcasecmp(default_ident, ident->identity_name) == 0)
         balsa_app.current_ident = ident;
@@ -1505,11 +1570,13 @@ config_identities_load()
                                 config_identity_load,
                                 default_ident);
 
-    if (!balsa_app.identities)
+    if (!balsa_app.identities) {
+	libbalsa_conf_push_group("identity-default");
         balsa_app.identities =
             g_list_prepend(NULL,
-                           libbalsa_identity_new_config("identity-default",
-                                                        "default"));
+                           libbalsa_identity_new_config("default"));
+	libbalsa_conf_pop_group();
+    }
 
     if (balsa_app.current_ident == NULL)
         balsa_app.current_ident =

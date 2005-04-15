@@ -35,31 +35,35 @@ enum _LibBalsaMsgCreateResult {
     LIBBALSA_MESSAGE_CREATE_ERROR,
     LIBBALSA_MESSAGE_QUEUE_ERROR,
     LIBBALSA_MESSAGE_SAVE_ERROR,
-    LIBBALSA_MESSAGE_SEND_ERROR
+    LIBBALSA_MESSAGE_SEND_ERROR,
+    LIBBALSA_MESSAGE_SERVER_ERROR
 };
+
+#if ENABLE_ESMTP
+#include <libesmtp.h>
+
+LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
+					       LibBalsaMailbox* outbox,
+                                               LibBalsaMailbox* fccbox,
+                                               LibBalsaSmtpServer *
+                                               smtp_server,
+					       gboolean flow);
+LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage * message,
+                                              LibBalsaMailbox * outbox,
+                                              LibBalsaMailbox * fccbox,
+                                              LibBalsaFccboxFinder finder,
+                                              LibBalsaSmtpServer *
+                                              smtp_server, gboolean flow,
+                                              gboolean debug);
+gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
+                                LibBalsaFccboxFinder finder,
+                                GSList * smtp_servers, gboolean debug);
+#else
 
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
 					       LibBalsaMailbox* outbox,
                                                LibBalsaMailbox* fccbox,
 					       gboolean flow);
-#if ENABLE_ESMTP
-#include <libesmtp.h>
-
-LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
-					      LibBalsaMailbox* outbox,  
-					      LibBalsaMailbox* fccbox,
-                                              LibBalsaFccboxFinder finder, 
-                                              gchar* smtp_server,
-					      auth_context_t smtp_authctx,
-					      gint tls_mode, gboolean flow,
-                                              gboolean debug);
-gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
-                                LibBalsaFccboxFinder finder, 
-                                gchar * smtp_server,
-                                auth_context_t smtp_authctx,
-                                gint tls_mode, gboolean debug);
-#else
-
 LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
 					      LibBalsaMailbox* outbox,  
 					      LibBalsaMailbox* fccbox,

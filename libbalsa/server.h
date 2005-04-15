@@ -44,6 +44,7 @@ typedef struct _LibBalsaServerClass LibBalsaServerClass;
 typedef enum {
     LIBBALSA_SERVER_POP3,
     LIBBALSA_SERVER_IMAP,
+    LIBBALSA_SERVER_SMTP,
     LIBBALSA_SERVER_UNKNOWN
 } LibBalsaServerType;
 

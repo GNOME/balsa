@@ -345,11 +345,12 @@ prepend_header_misc(const char *name, const char *value,
     /* Standard Headers*/
     for(i=0; name[i] && i<sizeof(lcname)-1; i++)
         lcname[i] = tolower(name[i]);
-    if(name[i]) /* too long to be on the ignored-headers list */
-        return;
-    lcname[i] = '\0';
-    if(strstr(ignored_headers, lcname))
-        return;
+    if (i < sizeof(lcname)) {
+	/* short enough to be on the ignored-headers list */
+        lcname[i] = '\0';
+        if(strstr(ignored_headers, lcname))
+            return;
+    }
 
     res = g_list_prepend(res, libbalsa_create_hdr_pair(name, g_strdup(value)));
     *(GList **)user_data = res;

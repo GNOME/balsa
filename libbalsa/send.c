@@ -43,11 +43,13 @@
 #include "information.h"
 
 #if ENABLE_ESMTP
+#include "smtp-server.h"
 #include <stdarg.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#endif
+#endif /* ESMTP */
+
 #include <sys/utsname.h>
 
 #include "i18n.h"
@@ -383,6 +385,9 @@ static void dump_queue(const char*msg)
 LibBalsaMsgCreateResult
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       LibBalsaMailbox * fccbox,
+#if ENABLE_ESMTP
+                       LibBalsaSmtpServer * smtp_server,
+#endif /* ESMTP */
 		       gboolean flow)
 {
     LibBalsaMsgCreateResult result;
@@ -396,6 +401,10 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     if (fccbox)
         g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc",
                                   fccbox->url);
+#if ENABLE_ESMTP
+    g_mime_message_set_header(message->mime_msg, "X-Balsa-SmtpServer",
+	                      libbalsa_smtp_server_get_name(smtp_server));
+#endif /* ESMTP */
     if(libbalsa_mailbox_copy_message( message, outbox, NULL) < 0)
         return LIBBALSA_MESSAGE_QUEUE_ERROR;
     return LIBBALSA_MESSAGE_CREATE_OK;
@@ -406,23 +415,32 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
    in given outbox.
 */
 #if ENABLE_ESMTP
+static gboolean lbs_process_queue(LibBalsaMailbox * outbox,
+                                  LibBalsaFccboxFinder finder,
+                                  LibBalsaSmtpServer * smtp_server,
+                                  gboolean debug);
+
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
-                      LibBalsaMailbox *fccbox,
+                      LibBalsaMailbox * fccbox,
                       LibBalsaFccboxFinder finder,
-                      gchar * smtp_server, auth_context_t smtp_authctx,
-                      gint tls_mode, gboolean flow, gboolean debug)
+                      LibBalsaSmtpServer * smtp_server,
+                      gboolean flow, gboolean debug)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
+    g_return_val_if_fail(smtp_server != NULL,
+                         LIBBALSA_MESSAGE_SERVER_ERROR);
+
     if (message != NULL)
-        result = libbalsa_message_queue(message, outbox, fccbox, flow);
-     if (result == LIBBALSA_MESSAGE_CREATE_OK)
-	 if (!libbalsa_process_queue(outbox, finder, smtp_server,
-				     smtp_authctx, tls_mode, debug))
-	     return LIBBALSA_MESSAGE_SEND_ERROR;
- 
-     return result;
+        result = libbalsa_message_queue(message, outbox, fccbox,
+                                        smtp_server, flow);
+
+    if (result == LIBBALSA_MESSAGE_CREATE_OK
+        && !lbs_process_queue(outbox, finder, smtp_server, debug))
+            return LIBBALSA_MESSAGE_SEND_ERROR;
+
+    return result;
 }
 #else
 LibBalsaMsgCreateResult
@@ -508,12 +526,11 @@ add_recipients(smtp_message_t message, smtp_message_t bcc_message,
 /* This version uses libESMTP. It has slightly different semantics than
    sendmail version so don't get fooled by similar variable names.
  */
-gboolean
-libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
-                       gchar * smtp_server,
-                       auth_context_t smtp_authctx, gint tls_mode,
-                       gboolean debug)
+static gboolean
+lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
+		  LibBalsaSmtpServer * smtp_server, gboolean debug)
 {
+    LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     MessageQueueItem *new_message;
     SendMessageInfo *send_message_info;
     LibBalsaMessage *msg;
@@ -541,17 +558,18 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
        messages to the session. */
 
     /* FIXME - check for failure returns in the smtp_xxx() calls */
-    host_with_port = strchr(smtp_server, ':') 
-        ? g_strdup(smtp_server) : g_strconcat(smtp_server, ":smtp", NULL);
+    host_with_port = strchr(server->host, ':') ?
+        g_strdup(server->host) : g_strconcat(server->host, ":smtp", NULL);
     session = smtp_create_session ();
     smtp_set_server (session, host_with_port);
     g_free(host_with_port);
 
     /* Tell libESMTP how to use the SMTP STARTTLS extension.  */
-    smtp_starttls_enable (session, tls_mode);
+    smtp_starttls_enable (session, server->tls_mode);
 
     /* Now tell libESMTP it can use the SMTP AUTH extension.  */
-    smtp_auth_set_context (session, smtp_authctx);
+    smtp_auth_set_context(session,
+                          libbalsa_smtp_server_get_authctx(smtp_server));
  
     /* At present Balsa can't handle one recipient only out of many
        failing.  Make libESMTP require all specified recipients to
@@ -560,6 +578,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 
     for (msgno = libbalsa_mailbox_total_messages(outbox);
 	 msgno > 0; msgno--) {
+	GList *smtp_server_list;
+	const gchar *smtp_server_name;
         LibBalsaMsgCreateResult created;
 
 	msg = libbalsa_mailbox_get_message(outbox, msgno);
@@ -570,8 +590,19 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
             continue;
 	}
 
-        libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need 
-                                                     * all headers? */
+        libbalsa_message_body_ref(msg, TRUE, TRUE);
+        smtp_server_list =
+            libbalsa_message_find_user_hdr(msg, "X-Balsa-SmtpServer");
+        smtp_server_name = smtp_server_list ?
+            ((gchar **) smtp_server_list->data)[1] :
+            libbalsa_smtp_server_get_name(NULL);
+        if (strcmp(smtp_server_name,
+                   libbalsa_smtp_server_get_name(smtp_server)) != 0) {
+            libbalsa_message_body_unref(msg);
+            g_object_unref(msg);
+            continue;
+        }
+
 	new_message = msg_queue_item_new(finder);
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
         libbalsa_message_body_unref(msg);
@@ -721,6 +752,8 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	    smtp_set_header_option(message, "X-Status", Hdr_PROHIBIT, 1);
             /* ... and FCC header. */
             smtp_set_header_option(message, "X-Balsa-Fcc", Hdr_PROHIBIT, 1);
+            smtp_set_header_option(message, "X-Balsa-SmtpServer",
+		                   Hdr_PROHIBIT, 1);
 
 
 	    /* Estimate the size of the message.  This need not be exact
@@ -772,6 +805,22 @@ libbalsa_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 #else				/*non-threaded code */
     balsa_send_message_real(send_message_info);
 #endif
+    return TRUE;
+}
+
+gboolean
+libbalsa_process_queue(LibBalsaMailbox * outbox,
+                       LibBalsaFccboxFinder finder,
+                       GSList * smtp_servers,
+		       gboolean debug)
+{
+    for (; smtp_servers; smtp_servers = smtp_servers->next) {
+        LibBalsaSmtpServer *smtp_server =
+		LIBBALSA_SMTP_SERVER(smtp_servers->data);
+        if (!lbs_process_queue(outbox, finder, smtp_server, debug))
+            return FALSE;
+    }
+
     return TRUE;
 }
 
@@ -1023,8 +1072,10 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
 
     ensure_send_progress_dialog();
     if (!libbalsa_mailbox_open(outbox, NULL)) {
+#ifdef BALSA_USE_THREADS
 	sending_threads--;
 	send_unlock();
+#endif
 	return FALSE;
     }
     for (msgno = libbalsa_mailbox_total_messages(outbox);
@@ -1735,6 +1786,8 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                     "X-Status");
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
                                     "X-Balsa-Fcc");
+        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+                                    "X-Balsa-SmtpServer");
 	mqi->stream = g_mime_stream_mem_new();
 	g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
                                       mqi->stream);

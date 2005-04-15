@@ -4589,6 +4589,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     if(!is_charset_ok(bsmsg))
         return FALSE;
+
 #ifdef HAVE_GPGME
     if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0 &&
         (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
@@ -4622,20 +4623,21 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 		      message->gpg_mode);
 #endif
 
+#if ENABLE_ESMTP
+    if(queue_only)
+	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
+					bsmsg->ident->smtp_server,
+					bsmsg->flow);
+    else 
+        result = libbalsa_message_send(message, balsa_app.outbox, fcc,
+                                       balsa_find_sentbox_by_url,
+				       bsmsg->ident->smtp_server,
+                                       bsmsg->flow, balsa_app.debug);
+#else
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
 					bsmsg->flow);
     else 
-#if ENABLE_ESMTP
-	result = libbalsa_message_send
-            (message, balsa_app.outbox, fcc,
-             balsa_find_sentbox_by_url,
-             balsa_app.smtp_server,
-             (balsa_app.smtp_user && *balsa_app.smtp_user)
-             ? balsa_app.smtp_authctx : NULL,
-             balsa_app.smtp_tls_mode,
-             bsmsg->flow, balsa_app.debug);
-#else
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
                                        balsa_find_sentbox_by_url,
 				       bsmsg->flow, balsa_app.debug); 

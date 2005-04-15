@@ -2746,15 +2746,11 @@ static void
 send_receive_messages_cb(GtkWidget * widget, gpointer data)
 {
     check_new_messages_real(widget, data, TYPE_CALLBACK);
+    libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
 #if ENABLE_ESMTP
-    libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
-                           balsa_app.smtp_server,
-                           balsa_app.smtp_authctx,
-                           balsa_app.smtp_tls_mode, balsa_app.debug);
-#else
-    libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
-                           balsa_app.debug);
-#endif
+                           balsa_app.smtp_servers,
+#endif /* ENABLE_ESMTP */
+			   balsa_app.debug);
 }
 
 void
@@ -2804,15 +2800,11 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
 static void
 send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 {
+    libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
 #if ENABLE_ESMTP
-    libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
-                           balsa_app.smtp_server,
-                           balsa_app.smtp_authctx,
-                           balsa_app.smtp_tls_mode, balsa_app.debug);
-#else
-    libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
-                           balsa_app.debug);
-#endif
+                           balsa_app.smtp_servers,
+#endif /* ENABLE_ESMTP */
+			   balsa_app.debug);
 }
 
 /* Callback for `Print current message' item on the `File' menu, 
@@ -4836,6 +4828,9 @@ ident_manage_dialog_cb(GtkWidget * widget, gpointer user_data)
     libbalsa_identity_config_dialog(GTK_WINDOW(user_data),
                                     &balsa_app.identities,
                                     &balsa_app.current_ident,
+#if ENABLE_ESMTP
+				    balsa_app.smtp_servers,
+#endif /* ENABLE_ESMTP */
                                     (void(*)(gpointer))
                                     balsa_identities_changed);
 }

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2005 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@
 
 #include "filter-funcs.h"
 #include "misc.h"
+#include "smtp-server.h"
 #include "balsa-app.h"
 #include "save-restore.h"
 
@@ -246,51 +247,11 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 static void
 authapi_exit (void)
 {
-    if (balsa_app.smtp_authctx != NULL)
-        auth_destroy_context (balsa_app.smtp_authctx);
+    g_slist_foreach(balsa_app.smtp_servers, (GFunc) g_object_unref, NULL);
+    g_slist_free(balsa_app.smtp_servers);
+    balsa_app.smtp_servers = NULL;
     auth_client_exit ();
 }
-
-
-/* Callback to get user/password info from SMTP server preferences.
-   This is adequate for simple username / password requests but does
-   not adequately cope with all SASL mechanisms.  */
-static int
-authinteract (auth_client_request_t request, char **result, int fields,
-              void *arg)
-{
-    int i;
-
-    for (i = 0; i < fields; i++) {
-	if (request[i].flags & AUTH_PASS)
-	    result[i] = balsa_app.smtp_passphrase;
-	else if (request[i].flags & AUTH_USER)
-	    result[i] = (balsa_app.smtp_user && *balsa_app.smtp_user)
-                ? balsa_app.smtp_user : NULL;
-
-    	/* Fail the AUTH exchange if something was requested
-    	   but not supplied. */
-    	if (result[i] == NULL)
-    	    return 0;
-    }
-    return 1;
-}
-
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-static int
-tlsinteract (char *buf, int buflen, int rwflag, void *arg)
-{
-  char *pw;
-  int len;
-
-  pw = balsa_app.smtp_certificate_passphrase;
-  len = strlen (pw);
-  if (len + 1 > buflen)
-    return 0;
-  strcpy (buf, pw);
-  return len;
-}
-#endif
 #endif /* ESMTP */
 
 void
@@ -305,24 +266,12 @@ balsa_app_init(void)
     balsa_app.local_mail_directory = NULL;
 
 #if ENABLE_ESMTP
-    balsa_app.smtp_server = NULL;
-    balsa_app.smtp_user = NULL;
-    balsa_app.smtp_passphrase = NULL;
+    balsa_app.smtp_servers = NULL;
 
     /* Do what's needed at application level to allow libESMTP
        to use authentication.  */
     auth_client_init ();
     atexit (authapi_exit);
-    balsa_app.smtp_authctx = auth_create_context ();
-    auth_set_mechanism_flags (balsa_app.smtp_authctx, AUTH_PLUGIN_PLAIN, 0);
-    auth_set_interact_cb (balsa_app.smtp_authctx, authinteract, NULL);
-
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    /* Use our callback for X.509 certificate passwords.  If STARTTLS is
-       not in use or disabled in configure, the following is harmless. */
-    balsa_app.smtp_certificate_passphrase = NULL;
-    smtp_starttls_set_password_cb (tlsinteract, NULL);
-#endif
 #endif
 
     balsa_app.inbox = NULL;

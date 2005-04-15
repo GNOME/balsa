@@ -3178,10 +3178,8 @@ part_context_menu_mail(GtkWidget * menu_item, BalsaPartInfo * info)
     libbalsa_message_append_part(message, body);
 #if ENABLE_ESMTP
     libbalsa_message_send(message, balsa_app.outbox, NULL,
-                          balsa_find_sentbox_by_url, balsa_app.smtp_server,
-                          (balsa_app.smtp_user && *balsa_app.smtp_user)
-                          ? balsa_app.smtp_authctx : NULL,
-                          balsa_app.smtp_tls_mode,
+                          balsa_find_sentbox_by_url,
+			  balsa_app.current_ident->smtp_server,
                           FALSE, balsa_app.debug);
 #else
     libbalsa_message_send(message, balsa_app.outbox, NULL,
@@ -4030,10 +4028,8 @@ handle_mdn_request(LibBalsaMessage *message)
 #if ENABLE_ESMTP
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
                               balsa_find_sentbox_by_url,
-                              balsa_app.smtp_server,
-                              (balsa_app.smtp_user && *balsa_app.smtp_user)
-                              ? balsa_app.smtp_authctx : NULL,
-                              balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
+			      balsa_app.current_ident->smtp_server,
+                              TRUE, balsa_app.debug);
 #else
         libbalsa_message_send(mdn, balsa_app.outbox, NULL,
                               balsa_find_sentbox_by_url,
@@ -4159,10 +4155,8 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
 #if ENABLE_ESMTP
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                               balsa_find_sentbox_by_url,
-                              balsa_app.smtp_server,
-                              (balsa_app.smtp_user && *balsa_app.smtp_user)
-                              ? balsa_app.smtp_authctx : NULL,
-                              balsa_app.smtp_tls_mode, TRUE, balsa_app.debug);
+			      balsa_app.current_ident->smtp_server,
+                              TRUE, balsa_app.debug);
 #else
         libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                               balsa_find_sentbox_by_url,

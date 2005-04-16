@@ -539,21 +539,23 @@ static void md_name_changed(GtkEntry * name, GtkTreeView * tree);
 static void md_sig_path_changed(GtkEntry * sig_path, GObject * dialog);
 
 #ifdef HAVE_GPGME
-static void add_show_menu(const char *label, gpointer data,
-                          GtkWidget * menu);
 static void ident_dialog_add_option_menu(GtkWidget * table, gint row,
                                          GtkDialog * dialog,
                                          const gchar * label_name,
                                          const gchar * menu_key);
-static gpointer ident_dialog_get_menu(GtkDialog * dialog,
-                                      const gchar * key);
 static void display_frame_set_menu(GtkDialog * dialog, const gchar* key,
                                    gint * value);
+#endif /* HAVE_GPGME */
+
+#if ENABLE_ESMTP
+static void add_show_menu(const char *label, gpointer data,
+                          GtkWidget * menu);
+static gpointer ident_dialog_get_menu(GtkDialog * dialog,
+                                      const gchar * key);
 static void display_frame_set_server(GtkDialog * dialog,
                                      const gchar * key,
                                      LibBalsaSmtpServer * smtp_server);
-#endif /* HAVE_GPGME */
-
+#endif /* ENABLE_ESMTP */
 
 /* Callback for the "toggled" signal of the "Default" column. */
 static void
@@ -1578,6 +1580,23 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 }
 
 
+/* add_show_menu, ident_dialog_free_values: helper functions */
+static void
+add_show_menu(const char *label, gpointer data, GtkWidget * menu)
+{
+    GPtrArray *values =
+        g_object_get_data(G_OBJECT(menu), "identity-value");
+
+    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+    g_ptr_array_add(values, data);
+}
+
+static void
+ident_dialog_free_values(GPtrArray * values)
+{
+    g_ptr_array_free(values, TRUE);
+}
+
 #ifdef HAVE_GPGME
 /* collected helper stuff for GPGME support */
 
@@ -1605,27 +1624,11 @@ libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint protocol)
 }
 
 
-static void
-add_show_menu(const char *label, gpointer data, GtkWidget * menu)
-{
-    GPtrArray *values =
-        g_object_get_data(G_OBJECT(menu), "identity-value");
-
-    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
-    g_ptr_array_add(values, data);
-}
-
-
 /*
  * Add an option menu to the given dialog with a label next to it
  * explaining the contents.  A reference to the entry is stored as
  * object data attached to the dialog with the given key.
  */
-static void
-ident_dialog_free_values(GPtrArray * values)
-{
-    g_ptr_array_free(values, TRUE);
-}
 
 static void
 ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
@@ -1655,6 +1658,30 @@ ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
                   GINT_TO_POINTER(LIBBALSA_PROTECT_SMIMEV3), opt_menu);
 #endif
 }
+
+
+static void
+display_frame_set_menu(GtkDialog * dialog, const gchar* key, gint * value)
+{
+    GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
+ 
+    switch (*value)
+        {
+        case LIBBALSA_PROTECT_OPENPGP:
+	    gtk_combo_box_set_active(opt_menu, 1);
+            break;
+#ifdef HAVE_SMIME
+        case LIBBALSA_PROTECT_SMIMEV3:
+	    gtk_combo_box_set_active(opt_menu, 2);
+            break;
+#endif
+        case LIBBALSA_PROTECT_RFC3156:
+        default:
+	    gtk_combo_box_set_active(opt_menu, 0);
+            *value = LIBBALSA_PROTECT_RFC3156;
+        }
+}
+#endif  /* HAVE_GPGME */
 
 #if ENABLE_ESMTP
 static void
@@ -1686,7 +1713,6 @@ ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
                       smtp_server, combo_box);
     }
 }
-#endif                          /* ENABLE_ESMTP */
 
 /*
  * Get the value of the active option menu item
@@ -1705,30 +1731,6 @@ ident_dialog_get_menu(GtkDialog * dialog, const gchar * key)
     return g_ptr_array_index(values, value);
 }
 
-static void
-display_frame_set_menu(GtkDialog * dialog, const gchar* key, gint * value)
-{
-    GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
- 
-    switch (*value)
-        {
-        case LIBBALSA_PROTECT_OPENPGP:
-	    gtk_combo_box_set_active(opt_menu, 1);
-            break;
-#ifdef HAVE_SMIME
-        case LIBBALSA_PROTECT_SMIMEV3:
-	    gtk_combo_box_set_active(opt_menu, 2);
-            break;
-#endif
-        case LIBBALSA_PROTECT_RFC3156:
-        default:
-	    gtk_combo_box_set_active(opt_menu, 0);
-            *value = LIBBALSA_PROTECT_RFC3156;
-        }
-}
-#endif  /* HAVE_GPGME */
-
-#if ENABLE_ESMTP
 static void
 display_frame_set_server(GtkDialog * dialog, const gchar * key,
                          LibBalsaSmtpServer * smtp_server)

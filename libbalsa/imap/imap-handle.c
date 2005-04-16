@@ -261,22 +261,16 @@ idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
   ImapMboxHandle *h = (ImapMboxHandle*)data;
   ImapResponse rc;
   int retval;
-
+  g_return_val_if_fail(h, FALSE);
   while( (retval = sio_poll(h->sio, TRUE, FALSE, TRUE)) != -1 &&
          (retval & SIO_READ) != 0) {
     if ( (rc=imap_cmd_step(h, 0)) == IMR_UNKNOWN ||
          rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
          rc  == IMR_BAD) {
       printf("idle_process() got unexpected response %i!\n"
-             "Last message was: \"%s\" - shutting down idle listener\n",
+             "Last message was: \"%s\" - shutting down connection.\n",
              rc, h->last_msg);
-      if(h->idle_enable_id) {
-          g_source_remove(h->idle_enable_id);
-          h->idle_enable_id = 0;
-      }
-      g_source_remove(h->idle_watch_id);
-      h->idle_watch_id = 0;
-      /* FIXME: consider aborting connection here. */
+      imap_handle_disconnect(h);
       return FALSE;
     }
   }
@@ -338,8 +332,9 @@ imap_handle_idle_disable(ImapMboxHandle *h)
   if(h->idle_watch_id) {
     g_source_remove(h->idle_watch_id);
     h->idle_watch_id = 0;
-    sio_write(h->sio,"DONE\r\n",6); sio_flush(h->sio);
-    /* tagged OK will be ignored */
+    if(h->sio) { /* we might have been disconnected before */
+      sio_write(h->sio,"DONE\r\n",6); sio_flush(h->sio);
+    }
   }
   return TRUE;
 }

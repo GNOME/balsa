@@ -618,7 +618,6 @@ config_global_load(void)
     libbalsa_conf_foreach_group(SMTP_SERVER_SECTION_PREFIX,
 	                        config_load_smtp_server,
 	                        &balsa_app.smtp_servers);
-    config_identities_load();
 
     /* We must load filters before mailboxes, because they refer to the filters list */
     config_filters_load();
@@ -1096,6 +1095,12 @@ config_global_load(void)
     load_mru(&balsa_app.fcc_mru);
     libbalsa_conf_pop_group();
 
+    /* We load identities at the end because they may refer to SMTP
+     * servers. This is also critical when handling damaged config
+     * files with no smtp server defined (think switching from
+     * --without-esmtp build). */
+    config_identities_load();
+
     return TRUE;
 }				/* config_global_load */
 
@@ -1503,25 +1508,20 @@ find_smtp_server_by_name(const gchar * name)
 {
     GSList *list;
 
-    if (name) {
-        for (list = balsa_app.smtp_servers; list; list = list->next) {
-            LibBalsaSmtpServer *smtp_server =
-                LIBBALSA_SMTP_SERVER(list->data);
-            if (strcmp(name,
-                       libbalsa_smtp_server_get_name(smtp_server)) == 0)
-                return smtp_server;
-        }
-    }
+    if (!name)
+        name = libbalsa_smtp_server_get_name(NULL);
 
-    /* Try the default. */
-    name = libbalsa_smtp_server_get_name(NULL);
     for (list = balsa_app.smtp_servers; list; list = list->next) {
-        LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(list->data);
-        if (strcmp(name, libbalsa_smtp_server_get_name(smtp_server)) == 0)
+        LibBalsaSmtpServer *smtp_server =
+            LIBBALSA_SMTP_SERVER(list->data);
+        if (strcmp(name,
+                   libbalsa_smtp_server_get_name(smtp_server)) == 0)
             return smtp_server;
     }
 
-    /* Use the first in the list. */
+    /* Use the first in the list, if any (there really must be one by
+     * construction). */
+    g_return_val_if_fail(balsa_app.smtp_servers, NULL);
     return LIBBALSA_SMTP_SERVER(balsa_app.smtp_servers->data);
 }
 #endif                          /* ESMTP */

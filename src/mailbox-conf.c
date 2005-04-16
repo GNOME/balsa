@@ -1320,12 +1320,9 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
     for (list = balsa_app.identities, active = 0; list;
          list = list->next, ++active) {
         LibBalsaIdentity *ident = list->data;
-        gchar *from;
         gchar *name;
 
-        from = internet_address_to_string(ident->ia, FALSE);
-        name = g_strconcat(ident->identity_name, " (", from, ")", NULL);
-        g_free(from);
+        name = internet_address_to_string(ident->ia, FALSE);
         gtk_combo_box_append_text(GTK_COMBO_BOX
                                   (view_info->identity_combo_box), name);
         g_free(name);

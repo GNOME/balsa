@@ -1,3 +1,8 @@
+2005-04-16 08:01  PeterB
+
+	* libbalsa/i18n.h: comment that this header must be included last.
+	* libbalsa/smtp-server.c: include "i18n.h" last.
+
 2005-04-15 17:28  PeterB
 
 	* libbalsa/Makefile.am, libbalsa/identity.c, libbalsa/identity.h,

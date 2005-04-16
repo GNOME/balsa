@@ -19,6 +19,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
+/* 
+ * Define the _() and N_() macros.
+ *
+ * Include this header last, because other headers may define these
+ * macros without testing whether they are already defined.
+ */
 
 #ifndef LIBBALSA_I18N_H
 

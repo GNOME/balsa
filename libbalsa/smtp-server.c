@@ -27,14 +27,14 @@
 
 #include <string.h>
 #include <libesmtp.h>
+#ifdef HAVE_GNOME
+#include <gnome.h>
+#endif                          /* HAVE_GNOME */
+
 
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
 #include "i18n.h"
-
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif                          /* HAVE_GNOME */
 
 static LibBalsaServerClass *parent_class = NULL;
 

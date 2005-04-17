@@ -2680,7 +2680,9 @@ smtp_server_update(LibBalsaSmtpServer * smtp_server,
 
     if (old_name) {
         /* We were editing an existing server. */
-        if (strcmp(old_name, new_name) != 0) {
+        if (strcmp(old_name, new_name) == 0)
+	    return;
+	else {
             /* Name was changed. */
             group =
                 g_strconcat(SMTP_SERVER_SECTION_PREFIX, old_name, NULL);
@@ -2689,14 +2691,12 @@ smtp_server_update(LibBalsaSmtpServer * smtp_server,
         }
     } else {
         /* Populating a new server. */
-        if (response != GTK_RESPONSE_OK) {
-            /*  The user killed the dialog. */
+        if (response == GTK_RESPONSE_OK)
             balsa_app.smtp_servers =
-                g_slist_remove(balsa_app.smtp_servers, smtp_server);
+                g_slist_append(balsa_app.smtp_servers, smtp_server);
+        else {
+            /*  The user killed the dialog. */
             g_object_unref(smtp_server);
-
-            update_smtp_servers();
-
             return;
         }
     }
@@ -2724,8 +2724,6 @@ smtp_server_add_cb(GtkWidget * widget, gpointer data)
     LibBalsaSmtpServer *smtp_server;
 
     smtp_server = libbalsa_smtp_server_new();
-    balsa_app.smtp_servers =
-        g_slist_append(balsa_app.smtp_servers, smtp_server);
     libbalsa_smtp_server_dialog(smtp_server,
                                 GTK_WINDOW(property_box),
                                 smtp_server_update);

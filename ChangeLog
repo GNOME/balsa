@@ -1,3 +1,8 @@
+2005-04-17 10:57  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_local.c: don't keep
+	selected message displayed when changing view filter.
+
 2005-04-16 22:37  PeterB
 
 	* src/save-restore.c, libbalsa/identity.c: compile with gpgme but

@@ -1209,9 +1209,17 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     lbm_threads_leave(mailbox);
 }
 
+/*
+ * Check whether to filter the message in or out of the view:
+ * - if it's in the view and doesn't match the condition, filter it out,
+ *   unless it's selected and we don't want to filter out selected
+ *   messages;
+ * - if it isn't in the view and it matches the condition, filter it in.
+ */
 void
 libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
-                                  LibBalsaMailboxSearchIter * search_iter)
+                                  LibBalsaMailboxSearchIter * search_iter,
+                                  gboolean hold_selected)
 {
     gboolean match;
 
@@ -1224,10 +1232,14 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
     if (g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                     GUINT_TO_POINTER(seqno))) {
-        if (!match &&
-	    libbalsa_mailbox_msgno_has_flags(mailbox, seqno, 0,
-                                             LIBBALSA_MESSAGE_FLAG_SELECTED))
-            libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
+        if (!match) {
+            gboolean filt_out = hold_selected ?
+                libbalsa_mailbox_msgno_has_flags(mailbox, seqno, 0,
+                                                 LIBBALSA_MESSAGE_FLAG_SELECTED)
+                : TRUE;
+            if (filt_out)
+                libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
+        }
     } else {
         if (match)
             libbalsa_mailbox_msgno_filt_in(mailbox, seqno);
@@ -1570,7 +1582,8 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
             libbalsa_mailbox_search_iter_view(mailbox);
         for (i = 0; i < msgnos->len; i++) {
             guint msgno = g_array_index(msgnos, guint, i);
-            libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view);
+            libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view,
+                                              TRUE);
         }
         libbalsa_mailbox_search_iter_free(iter_view);
     }

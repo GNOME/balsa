@@ -513,7 +513,8 @@ void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox,
 				       guint seqno,
 				       LibBalsaMailboxSearchIter
-				       * search_iter);
+				       * search_iter,
+				       gboolean hold_selected);
 
 /* Search */
 gboolean libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox,

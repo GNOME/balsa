@@ -614,10 +614,12 @@ config_global_load(void)
     guint tmp;
 
     config_address_books_load();
+#if ENABLE_ESMTP
     /* Load SMTP servers before identities. */
     libbalsa_conf_foreach_group(SMTP_SERVER_SECTION_PREFIX,
 	                        config_load_smtp_server,
 	                        &balsa_app.smtp_servers);
+#endif                          /* ENABLE_ESMTP */
 
     /* We must load filters before mailboxes, because they refer to the filters list */
     config_filters_load();

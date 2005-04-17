@@ -507,11 +507,6 @@ static void ident_dialog_add_checkbutton(GtkWidget *, gint, GtkDialog *,
 static void ident_dialog_add_entry(GtkWidget *, gint, GtkDialog *,
                                    const gchar *, const gchar *);
 #if ENABLE_ESMTP
-static void ident_dialog_add_smtp_menu(GtkWidget * table, gint row,
-                                       GtkDialog * dialog,
-                                       const gchar * label_name,
-                                       const gchar * menu_key,
-				       GSList * smtp_servers);
 #endif /* ENABLE_ESMTP */
 static gchar *ident_dialog_get_text(GtkDialog *, const gchar *);
 static gboolean ident_dialog_get_bool(GtkDialog *, const gchar *);
@@ -539,23 +534,31 @@ static void md_name_changed(GtkEntry * name, GtkTreeView * tree);
 static void md_sig_path_changed(GtkEntry * sig_path, GObject * dialog);
 
 #ifdef HAVE_GPGME
-static void ident_dialog_add_option_menu(GtkWidget * table, gint row,
-                                         GtkDialog * dialog,
-                                         const gchar * label_name,
-                                         const gchar * menu_key);
-static void display_frame_set_menu(GtkDialog * dialog, const gchar* key,
-                                   gint * value);
+static void ident_dialog_add_gpg_menu(GtkWidget * table, gint row,
+                                      GtkDialog * dialog,
+                                      const gchar * label_name,
+                                      const gchar * menu_key);
+static void display_frame_set_gpg_mode(GtkDialog * dialog,
+                                       const gchar * key, gint * value);
 #endif /* HAVE_GPGME */
 
 #if ENABLE_ESMTP
-static void add_show_menu(const char *label, gpointer data,
-                          GtkWidget * menu);
-static gpointer ident_dialog_get_menu(GtkDialog * dialog,
-                                      const gchar * key);
+static void ident_dialog_add_smtp_menu(GtkWidget * table, gint row,
+                                       GtkDialog * dialog,
+                                       const gchar * label_name,
+                                       const gchar * menu_key,
+				       GSList * smtp_servers);
 static void display_frame_set_server(GtkDialog * dialog,
                                      const gchar * key,
                                      LibBalsaSmtpServer * smtp_server);
 #endif /* ENABLE_ESMTP */
+
+#if defined(HAVE_GPGME) || ENABLE_ESMTP
+static void add_show_menu(const char *label, gpointer data,
+                          GtkWidget * menu);
+static gpointer ident_dialog_get_value(GtkDialog * dialog,
+                                       const gchar * key);
+#endif /* defined(HAVE_GPGME) || ENABLE_ESMTP */
 
 /* Callback for the "toggled" signal of the "Default" column. */
 static void
@@ -902,7 +905,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("encrypt messages by default"),
                                  "identity-gpgencrypt", TRUE);
-    ident_dialog_add_option_menu(table, row++, dialog,
+    ident_dialog_add_gpg_menu(table, row++, dialog,
 				 _("default protocol"),
 				 "identity-crypt-protocol");
     ident_dialog_add_checkbutton(table, row++, dialog,
@@ -1094,7 +1097,7 @@ ident_dialog_update(GtkDialog* dlg)
     id->forward_string  = ident_dialog_get_text(dlg, "identity-forwardstring");
 #if ENABLE_ESMTP
     g_object_unref(id->smtp_server);
-    id->smtp_server = ident_dialog_get_menu(dlg, "identity-smtp-server");
+    id->smtp_server = ident_dialog_get_value(dlg, "identity-smtp-server");
     g_object_ref(id->smtp_server);
 #endif /* ENABLE_ESMTP */
 
@@ -1112,7 +1115,7 @@ ident_dialog_update(GtkDialog* dlg)
     id->gpg_sign        = ident_dialog_get_bool(dlg, "identity-gpgsign");
     id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
     id->always_trust    = ident_dialog_get_bool(dlg, "identity-trust-always");
-    id->crypt_protocol  = GPOINTER_TO_INT(ident_dialog_get_menu
+    id->crypt_protocol  = GPOINTER_TO_INT(ident_dialog_get_value
                                           (dlg, "identity-crypt-protocol"));
 #endif
    
@@ -1455,7 +1458,7 @@ display_frame_update(GtkDialog * dialog, LibBalsaIdentity* ident)
                               ident->gpg_encrypt);    
     display_frame_set_boolean(dialog, "identity-trust-always", 
                               ident->always_trust);    
-    display_frame_set_menu(dialog, "identity-crypt-protocol",
+    display_frame_set_gpg_mode(dialog, "identity-crypt-protocol",
 			   &ident->crypt_protocol);
 #endif
 }
@@ -1580,16 +1583,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 }
 
 
-/* add_show_menu, ident_dialog_free_values: helper functions */
-static void
-add_show_menu(const char *label, gpointer data, GtkWidget * menu)
-{
-    GPtrArray *values =
-        g_object_get_data(G_OBJECT(menu), "identity-value");
-
-    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
-    g_ptr_array_add(values, data);
-}
+/* ident_dialog_free_values: helper function */
 
 static void
 ident_dialog_free_values(GPtrArray * values)
@@ -1631,8 +1625,8 @@ libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint protocol)
  */
 
 static void
-ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
-                             const gchar * label_name, const gchar * menu_key)
+ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
+                          const gchar * label_name, const gchar * menu_key)
 {
     GtkWidget *label;
     GtkWidget *opt_menu;
@@ -1661,7 +1655,7 @@ ident_dialog_add_option_menu(GtkWidget * table, gint row, GtkDialog * dialog,
 
 
 static void
-display_frame_set_menu(GtkDialog * dialog, const gchar* key, gint * value)
+display_frame_set_gpg_mode(GtkDialog * dialog, const gchar* key, gint * value)
 {
     GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
  
@@ -1714,23 +1708,6 @@ ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     }
 }
 
-/*
- * Get the value of the active option menu item
- */
-static gpointer
-ident_dialog_get_menu(GtkDialog * dialog, const gchar * key)
-{
-    GtkWidget * menu;
-    gint value;
-    GPtrArray *values;
-
-    menu = g_object_get_data(G_OBJECT(dialog), key);
-    value = gtk_combo_box_get_active(GTK_COMBO_BOX(menu));
-    values = g_object_get_data(G_OBJECT(menu), "identity-value");
-    
-    return g_ptr_array_index(values, value);
-}
-
 static void
 display_frame_set_server(GtkDialog * dialog, const gchar * key,
                          LibBalsaSmtpServer * smtp_server)
@@ -1748,3 +1725,33 @@ display_frame_set_server(GtkDialog * dialog, const gchar * key,
 }
 
 #endif                          /* ENABLE_ESMTP */
+
+#if defined(HAVE_GPGME) || ENABLE_ESMTP
+/* add_show_menu: helper function */
+static void
+add_show_menu(const char *label, gpointer data, GtkWidget * menu)
+{
+    GPtrArray *values =
+        g_object_get_data(G_OBJECT(menu), "identity-value");
+
+    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+    g_ptr_array_add(values, data);
+}
+
+/*
+ * Get the value of the active option menu item
+ */
+static gpointer
+ident_dialog_get_value(GtkDialog * dialog, const gchar * key)
+{
+    GtkWidget * menu;
+    gint value;
+    GPtrArray *values;
+
+    menu = g_object_get_data(G_OBJECT(dialog), key);
+    value = gtk_combo_box_get_active(GTK_COMBO_BOX(menu));
+    values = g_object_get_data(G_OBJECT(menu), "identity-value");
+    
+    return g_ptr_array_index(values, value);
+}
+#endif /* defined(HAVE_GPGME) || ENABLE_ESMTP */

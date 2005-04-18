@@ -37,6 +37,7 @@ libbalsa/misc.c
 libbalsa/rfc3156.c
 libbalsa/send.c
 libbalsa/server.c
+libbalsa/smtp-server.c
 libbalsa/source-viewer.c
 libinit_balsa/balsa-druid-page-defclient.c
 libinit_balsa/balsa-druid-page-directory.c

@@ -1683,7 +1683,7 @@ sw_charset_combo_box_changed(GtkComboBox * combo_box,
 
 static LibBalsaCodeset
 sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
-                    const gchar * mime_type)
+                    const gchar * mime_type, const char *fname)
 {
     GtkWidget *combo_box = NULL;
     gint codeset = -1;
@@ -1694,11 +1694,14 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
-    GtkWidget *info =
-        gtk_label_new(_("This file is not encoded in US-ASCII or UTF-8.\n"
-                        "Please choose the charset used to encode the file."));
+    gchar *msg = g_strdup_printf
+        (_("File\n%s\nis not encoded in US-ASCII or UTF-8.\n"
+           "Please choose the charset used to encode the file."),
+         fname);
+    GtkWidget *info = gtk_label_new(msg);
     GtkWidget *charset_button = libbalsa_charset_button_new();
 
+    g_free(msg);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), info,
                        FALSE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), charset_button,
@@ -1753,7 +1756,7 @@ sw_set_charset(BalsaSendmsg * bsmsg, const gchar * filename,
     else {
         LibBalsaCodesetInfo *info;
         LibBalsaCodeset codeset =
-            sw_get_user_codeset(bsmsg, change_type, content_type);
+            sw_get_user_codeset(bsmsg, change_type, content_type, filename);
         if (*change_type)
             return TRUE;
         if (codeset == (LibBalsaCodeset) (-1))
@@ -4143,7 +4146,8 @@ read_signature(BalsaSendmsg *bsmsg)
 
 static void
 do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
-                           const gchar* string, size_t len)
+                           const gchar* string, size_t len,
+                           const gchar* fname)
 {
     const gchar *charset = NULL;
     LibBalsaTextAttribute attr = libbalsa_text_attr_string(string);
@@ -4153,7 +4157,7 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
 	LibBalsaCodesetInfo *info;
 	gchar* s;
 
-        if ((codeset = sw_get_user_codeset(bsmsg, NULL, NULL))
+        if ((codeset = sw_get_user_codeset(bsmsg, NULL, NULL, fname))
             == (LibBalsaCodeset) (-1))
             break;
         info = &libbalsa_codeset_info[codeset];
@@ -4199,7 +4203,6 @@ insert_file_response(GtkWidget * selector, gint response,
 	g_free(fname);
 	return;
     }
-    g_free(fname);
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     sw_buffer_save(bsmsg);
@@ -4229,7 +4232,7 @@ insert_file_response(GtkWidget * selector, gint response,
 	    g_free(s);
 	} else
 	    /* ...and can't be decoded from any current charset. */
-            do_insert_string_select_ch(bsmsg, buffer, string, len);
+            do_insert_string_select_ch(bsmsg, buffer, string, len, fname);
     }
     g_free(string);
 
@@ -4238,6 +4241,7 @@ insert_file_response(GtkWidget * selector, gint response,
     balsa_app.attach_dir = gtk_file_chooser_get_current_folder(fc);
 
     gtk_widget_destroy(selector);
+    g_free(fname);
 }
 
 static gint
@@ -5613,13 +5617,14 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
 
     gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
     str = g_strdup_printf
-        ("This file is currently in the %s's own format.\n"
+        ("File %s is currently in the %s's own format.\n"
          "If you need to send it to people who use %s, "
          "then open the file in the %s, use \"Save As\" "
          "on the \"File\" menu, and select the \"%s\" format. "
          "When you click \"OK\" it will save a new "
          "\"%s\" version of the file, with \"%s\" on the end "
          "of the document name, which you can then attach instead.",
+         filename,
          compatibility_table[i].linux_program,
          compatibility_table[i].other_program,
          compatibility_table[i].linux_program,

@@ -1393,8 +1393,8 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
     rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);
 
-  if (rc != IMR_OK) /* we should be silent here */
-    printf("cmd '%6s' failed, rc=%d.\n", cmd, rc);
+  /* if (rc != IMR_OK) we should be silent here
+    printf("cmd '%6s' failed, rc=%d.\n", cmd, rc); */
 
   imap_handle_idle_enable(handle, 30);
 

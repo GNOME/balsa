@@ -1,3 +1,10 @@
+2005-04-18  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: silence output on the terminal.
+	* src/balsa-icons.c: silence icon debugging.
+	* src/sendmsg-window.c: specify exactly file names in messages -
+	important when attaching multiple messages at once.
+
 2005-04-17 10:57  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h, mailbox_local.c: don't keep

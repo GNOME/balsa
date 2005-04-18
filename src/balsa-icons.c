@@ -31,7 +31,7 @@
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 /* comment out the next line to suppress info about loading images */
-#define BICONS_VERBOSE
+/* #define BICONS_VERBOSE */
 
 #ifdef BICONS_VERBOSE
 #  define BICONS_LOG(...)   g_message(__VA_ARGS__)

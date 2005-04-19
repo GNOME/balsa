@@ -70,13 +70,17 @@ struct _BalsaMailboxNode {
     /* folder data */
     gchar* config_prefix;
     gchar* dir;      
-    int remote:1;   /* is dirname or server field used in data union.
-		     * If there is a need for more types, make a subclass. */
-    /* mailbox data */
     LibBalsaServer * server; /* Used only by remote; is referenced */
-    gboolean subscribed;     /* Used only by remote */
-    gboolean list_inbox;     /* Used only by remote */
-    gboolean scanned;        /* IMAP flag */
+    char delim; /* IMAP delimiter so that we do not need to check it
+		 * too often. */
+
+
+    unsigned remote:1;/* is dirname or server field used in data union.
+		       * If there is a need for more types, make a subclass. */
+
+    unsigned subscribed:1;     /* Used only by remote */
+    unsigned list_inbox:1;     /* Used only by remote */
+    unsigned scanned:1;        /* IMAP flag */
 };
 
 struct _BalsaMailboxNodeClass {

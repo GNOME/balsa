@@ -198,7 +198,7 @@ struct browser_state
 {
   ImapHandler* handle_imap_path;
   ImapMark* mark_imap_path;
-  GList* subfolders;
+  GHashTable* subfolders;
   gboolean subscribed;
   int delim;
   void* cb_data;       /* data passed to {mailbox,folder}_handlers */
@@ -211,16 +211,15 @@ libbalsa_imap_add_folder(char *folder, int delim, int noselect, int noscan,
     if (folder[strlen(folder) - 1] == delim)
         return;
 
-    state->delim = delim;
-
     /* this extra check is needed for subscribed folder handling. 
      * Read RFC when in doubt. */
-    if (!g_list_find_custom(state->subfolders, folder,
-                            (GCompareFunc) strcmp)
-        && !noscan)
-        state->subfolders =
-            g_list_append(state->subfolders, g_strdup(folder));
-
+    if (!noscan) {
+	gchar *f;
+	if(*folder && folder[strlen(folder)-1] != delim)
+	    f = g_strdup_printf("%s%c", folder, delim);
+	else f = g_strdup(folder);
+	g_hash_table_insert(state->subfolders, f, NULL);
+    }
     state->handle_imap_path(folder, delim, noselect, noscan, marked,
                             state->cb_data);
 }
@@ -235,6 +234,7 @@ libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
 
     g_return_if_fail(folder && *folder);
 
+    if(delim) state->delim = delim;
     noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
     /* These flags are different, but both mean that we don't need to
      * scan the folder: */
@@ -259,6 +259,7 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
 
     g_return_if_fail(folder && *folder);
 
+    if(delim) state->delim = delim;
     noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
     noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
               || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
@@ -271,7 +272,19 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
 /* executed with GDK lock OFF.
  * see HACKING file for proper locking order description.
  */
-
+static gboolean
+steal_key(gpointer key, gpointer value, GList **res)
+{
+    *res = g_list_prepend(*res, key);
+    return TRUE;
+}
+static GList*
+steal_keys_to_list(GHashTable *h)
+{
+    GList *res = NULL;
+    g_hash_table_foreach_steal(h, (GHRFunc)steal_key, &res);
+    return res;
+}
 /* libbalsa_imap_browse: recursive helper.
  *
  * path:                the imap path to be browsed;
@@ -294,11 +307,14 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     ImapResponse rc = IMR_OK;
     gboolean ret = TRUE;
     
-    state->subfolders = NULL;
-
-    if(*path && path[strlen(path) - 1] != state->delim)
-        imap_path = g_strdup_printf("%s%c", path, state->delim);
-    else 
+    if(*path) {
+	if(!state->delim)
+	    state->delim = imap_mbox_handle_get_delim(handle, path);
+	if(path[strlen(path) - 1] != state->delim)
+	    imap_path = g_strdup_printf("%s%c", path, state->delim);
+	else
+	    imap_path = g_strdup(path);
+    } else 
         imap_path = g_strdup(path);
 
     /* Send LSUB command if we're in subscribed mode, to find paths.
@@ -333,8 +349,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     /* Mark this path as scanned, without changing its selectable state. */
     state->mark_imap_path(path, -1, TRUE, state->cb_data);
 
-    list = state->subfolders;
-    state->subfolders = NULL;
+    list = steal_keys_to_list(state->subfolders);
 
     ++*depth;
     browse = FALSE;
@@ -358,8 +373,8 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
 
 void
 libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server, 
-                          const gchar* path, gboolean subscribed, 
-                          gboolean list_inbox,
+                          const gchar* path, int delim,
+                          gboolean subscribed, gboolean list_inbox,
                           ImapCheck check_imap_path,
                           ImapMark mark_imap_path,
                           ImapHandler handle_imap_path,
@@ -388,7 +403,9 @@ libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server,
     state.mark_imap_path   = mark_imap_path;
     state.cb_data          = cb_data;
     state.subscribed       = subscribed;
-    state.delim            = imap_mbox_handle_get_delim(handle, path);
+    state.delim            = delim;
+    state.subfolders = g_hash_table_new_full(g_str_hash, g_str_equal,
+ 					     g_free, NULL);
 
     list_handler_id =
         g_signal_connect(G_OBJECT(handle), "list-response",
@@ -411,6 +428,7 @@ libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server,
     i = 0;
     libbalsa_imap_browse(path, &state, handle, server,
                          check_imap_path, &i, error);
+    g_hash_table_destroy(state.subfolders);
 
     g_signal_handler_disconnect(G_OBJECT(handle), list_handler_id);
     if (lsub_handler_id)

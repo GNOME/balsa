@@ -23,8 +23,6 @@
 
 #if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
 #include <pthread.h>
-/* for sched_yield() prototype */
-#include <sched.h>
 #endif
 
 #include <unistd.h>
@@ -68,7 +66,7 @@ static void balsa_mailbox_node_real_load_config(BalsaMailboxNode* mn,
 
 static BalsaMailboxNode *imap_scan_create_mbnode(BalsaMailboxNode * root,
 						 imap_scan_item * isi,
-						 char delim);
+						 int delim);
 static gboolean imap_scan_attach_mailbox(BalsaMailboxNode * mbnode,
                                          imap_scan_item * isi);
 static gboolean bmbn_scan_children_idle(BalsaMailboxNode ** mn);
@@ -420,9 +418,8 @@ imap_dir_cb_real(void* r)
     imap_scan_tree imap_tree = { NULL, '.' };
 
     g_return_val_if_fail(mb->server, NULL);
-
-    libbalsa_scanner_imap_dir(mb, mb->server, mb->dir, mb->subscribed,
-                              mb->list_inbox, 
+    libbalsa_scanner_imap_dir(mb, mb->server, mb->dir, mb->delim,
+			      mb->subscribed, mb->list_inbox, 
                               check_imap_path,
                               mark_imap_path,
                               handle_imap_path,
@@ -1147,7 +1144,7 @@ get_parent_folder_name(const gchar* path, char delim)
  */
 static BalsaMailboxNode *
 imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
-			char delim)
+			int delim)
 {
     gchar *parent_name;
     BalsaMailboxNode *mbnode;
@@ -1189,6 +1186,7 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     else
         basename++;
     mbnode->name = g_strdup(basename);
+    mbnode->delim = delim;
     mbnode->parent = parent;
     mbnode->subscribed = parent->subscribed;
     mbnode->scanned = isi->scanned;

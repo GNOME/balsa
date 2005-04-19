@@ -1,3 +1,9 @@
+2005-04-19  Pawel Salek
+
+	* libbalsa/folder-scanners.[hc]: avoid redundant queries for IMAP
+	hierarchy delimiters.
+	* src/mailbox-node.[ch]: ... because we store earlier answers.
+
 2005-04-18  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: silence output on the terminal.

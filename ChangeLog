@@ -1,3 +1,8 @@
+2005-04-20 11:07  PeterB
+
+	* libbalsa/libbalsa-conf.c: preserve blank lines between sections
+	in the config file.
+
 2005-04-19  Pawel Salek
 
 	* libbalsa/folder-scanners.[hc]: avoid redundant queries for IMAP

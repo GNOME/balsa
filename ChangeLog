@@ -1,5 +1,10 @@
-2005-04-20 11:07  PeterB
+2005-04-20 12:49  PeterB
 
+	* libbalsa/mailbox.c, libbalsa/mailbox.h,
+	libbalsa/mailbox_maildir.c, libbalsa/mailbox_mbox.c,
+	libbalsa/mailbox_mh.c, src/balsa-mblist.c, src/save-restore.c: add
+	unread and total members to LibBalsaMailboxView, and save them in
+	the config file.
 	* libbalsa/libbalsa-conf.c: preserve blank lines between sections
 	in the config file.
 

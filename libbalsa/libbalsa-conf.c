@@ -151,7 +151,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     libbalsa_assure_balsa_dir();
     error = NULL;
     if (!g_key_file_load_from_file
-        (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
+        (conf->key_file, conf->path, G_KEY_FILE_KEEP_COMMENTS, &error)) {
         gchar *old_path;
         gchar *buf;
         static gboolean warn = TRUE;
@@ -168,7 +168,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
         buf = lbc_readfile(old_path);
         if (buf) {
             g_key_file_load_from_data(conf->key_file, buf, -1,
-                                      G_KEY_FILE_NONE, &error);
+                                      G_KEY_FILE_KEEP_COMMENTS, &error);
             g_free(buf);
         }
         if (!buf || error) {

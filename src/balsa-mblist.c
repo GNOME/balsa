@@ -122,8 +122,7 @@ static void bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode,
 					      GtkTreeModel * model);
 static gboolean bmbl_store_redraw_mbnode(GtkTreeIter * iter,
 					 BalsaMailboxNode * mbnode);
-static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter,
-			    gint total_messages);
+static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
 static void bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
                           GdkEventButton * event);
@@ -599,13 +598,13 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
         break;
 
     case BMBL_TREE_COLUMN_UNREAD:
-        ret_val = ((m1 ? m1->unread_messages : 0)
-                   - (m2 ? m2->unread_messages : 0));
+        ret_val = (libbalsa_mailbox_get_unread(m1)
+                   - libbalsa_mailbox_get_unread(m2));
         break;
 
     case BMBL_TREE_COLUMN_TOTAL:
-        ret_val = ((m1 ? libbalsa_mailbox_total_messages(m1) : 0)
-                   - (m2 ? libbalsa_mailbox_total_messages(m2) : 0));
+        ret_val = (libbalsa_mailbox_get_total(m1)
+                   - libbalsa_mailbox_get_total(m2));
         break;
     }
 
@@ -892,12 +891,10 @@ bmbl_row_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
 
 struct update_mbox_data {
     LibBalsaMailbox *mailbox;
-    gint total_messages; /* to be compatible with update_mailbox() arg. */
     gboolean notify;
 };
 static void bmbl_update_mailbox(GtkTreeStore * store,
-				LibBalsaMailbox * mailbox,
-				gint total_messages);
+				LibBalsaMailbox * mailbox);
 static gboolean
 update_mailbox_idle(struct update_mbox_data *umd)
 {
@@ -906,8 +903,7 @@ update_mailbox_idle(struct update_mbox_data *umd)
         g_object_remove_weak_pointer(G_OBJECT(umd->mailbox),
                                      (gpointer) & umd->mailbox);
         if (balsa_app.mblist_tree_store) {
-            bmbl_update_mailbox(balsa_app.mblist_tree_store, umd->mailbox,
-                                umd->total_messages);
+            bmbl_update_mailbox(balsa_app.mblist_tree_store, umd->mailbox);
             check_new_messages_count(umd->mailbox, umd->notify);
         }
         g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
@@ -922,18 +918,10 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 {
     struct update_mbox_data *umd;
     g_return_if_fail(mailbox);
-    if( (umd = g_object_get_data(G_OBJECT(mailbox), "mblist-update")) ) {
-        if(!MAILBOX_CLOSED(mailbox))
-            umd->total_messages = libbalsa_mailbox_total_messages(mailbox);
-        return;
-    }
     umd = g_new(struct update_mbox_data,1);
     g_object_set_data(G_OBJECT(mailbox), "mblist-update", umd);
     umd->mailbox = mailbox;
     g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &umd->mailbox);
-    umd->total_messages = 
-        !MAILBOX_CLOSED(mailbox) 
-        ? (gint)libbalsa_mailbox_total_messages(mailbox) : -1;
     umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
                    || mailbox->state == LB_MAILBOX_STATE_CLOSED);
     g_idle_add((GSourceFunc)update_mailbox_idle, umd);
@@ -961,15 +949,14 @@ balsa_mblist_get_selected_node(BalsaMBList * mbl)
    find all nodes and translate them to mailbox list 
 */
 static gboolean
-bmbl_find_all_unread_mboxes_func(GtkTreeModel * model,
-                                   GtkTreePath * path, GtkTreeIter * iter,
-                                   gpointer data)
+bmbl_find_all_unread_mboxes_func(GtkTreeModel * model, GtkTreePath * path,
+                                 GtkTreeIter * iter, gpointer data)
 {
     GList **r = data;
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
-    if (mbnode->mailbox && mbnode->mailbox->has_unread_messages)
+    if (libbalsa_mailbox_get_unread(mbnode->mailbox) > 0)
         *r = g_list_prepend(*r, mbnode->mailbox);
     g_object_unref(mbnode);
 
@@ -1235,7 +1222,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 	    bmbl_expand_to_row(balsa_app.mblist, path);
 	    gtk_tree_path_free(path);
 	}
-	bmbl_node_style(model, iter, -1);
+	bmbl_node_style(model, iter);
     }
 
     return TRUE;
@@ -1253,8 +1240,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
  * was closed).
  * */
 static void
-bmbl_update_mailbox(GtkTreeStore * store, LibBalsaMailbox * mailbox,
-		    gint total_messages)
+bmbl_update_mailbox(GtkTreeStore * store, LibBalsaMailbox * mailbox)
 {
     GtkTreeModel *model = GTK_TREE_MODEL(store);
     GtkTreeIter iter;
@@ -1264,7 +1250,7 @@ bmbl_update_mailbox(GtkTreeStore * store, LibBalsaMailbox * mailbox,
     if (!balsa_find_iter_by_data(&iter, mailbox))
         return;
 
-    bmbl_node_style(model, &iter, total_messages);
+    bmbl_node_style(model, &iter);
 
     bindex = balsa_window_find_current_index(balsa_app.main_window);
     if (!bindex || mailbox != BALSA_INDEX(bindex)->mailbox_node->mailbox)
@@ -1277,7 +1263,7 @@ void
 balsa_mblist_update_mailbox(GtkTreeStore * store,
 			    LibBalsaMailbox * mailbox)
 {
-    bmbl_update_mailbox(store, mailbox, -1);
+    bmbl_update_mailbox(store, mailbox);
 }
 
 /* bmbl_node_style [MBG]
@@ -1291,26 +1277,28 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
  * NOTES: ignore special mailboxes.
  * */
 static void
-bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter, gint total_messages)
+bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
 {
     BalsaMailboxNode * mbnode;
     LibBalsaMailbox *mailbox;
-    const gchar *icon;
-    gchar *text;
+    gint unread_messages;
+    gint total_messages;
     GtkTreeIter parent;
     gboolean has_unread_child;
+    gchar *text_unread = NULL;
+    gchar *text_total = NULL;
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     mailbox = mbnode->mailbox;
+    unread_messages = libbalsa_mailbox_get_unread(mailbox);
+    total_messages = libbalsa_mailbox_get_total(mailbox);
 
     /* SHOW UNREAD for special mailboxes? */
     if (!(mailbox == balsa_app.sentbox || mailbox == balsa_app.outbox ||
           mailbox == balsa_app.draftbox || mailbox == balsa_app.trash)) {
-        if (mailbox->has_unread_messages) {
+        const gchar *icon;
 
-            /* set the style of the unread maibox list, even if it's already 
-             * set... in case the user has changed the colour or font since the
-             * last style update */
+        if (unread_messages > 0) {
             icon = BALSA_PIXMAP_MBOX_TRAY_FULL;
             gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                                ICON_COLUMN,
@@ -1321,21 +1309,8 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter, gint total_messages)
                                WEIGHT_COLUMN, PANGO_WEIGHT_BOLD, -1);
 
             mbnode->style |= MBNODE_STYLE_NEW_MAIL;
-
-            /* If we have a count of the unread messages, and we are showing
-             * columns, put the number in the unread column */
-            if (mailbox->unread_messages > 0) {
-                text = g_strdup_printf("%ld", mailbox->unread_messages);
-                gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                                   UNREAD_COLUMN, text, -1);
-                g_free(text);
-
-                mbnode->style |= MBNODE_STYLE_UNREAD_MESSAGES;
-            } else
-                gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                                   UNREAD_COLUMN, "", -1);
         } else {
-            /* If the clist entry currently has the unread messages icon, set
+            /* If the entry currently has the unread messages icon, set
              * it back, otherwise we can ignore this. */
             if (mbnode->style & MBNODE_STYLE_NEW_MAIL) {
                 if (mailbox == balsa_app.inbox)
@@ -1353,34 +1328,23 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter, gint total_messages)
 
                 mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
             }
-
-            /* If we're showing unread column info, get rid of whatever's
-             * there Also set the flag */
-            gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                               UNREAD_COLUMN, "0", -1);
-            mbnode->style &= ~MBNODE_STYLE_UNREAD_MESSAGES;
-        }
-    }
-    /* We only want to do this if the mailbox is open, otherwise leave
-     * the message numbers untouched in the display */
-    if (total_messages >= 0 || MAILBOX_OPEN(mailbox)) {
-	if (total_messages < 0)
-	    total_messages = libbalsa_mailbox_total_messages(mailbox);
-        if (total_messages > 0) {
-            text =
-		g_strdup_printf("%d", total_messages);
-            gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                               TOTAL_COLUMN, text, -1);
-            g_free(text);
-
-            mbnode->style |= MBNODE_STYLE_TOTAL_MESSAGES;
-        } else {
-            gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                               TOTAL_COLUMN, "0", -1);
-            mbnode->style &= ~MBNODE_STYLE_TOTAL_MESSAGES;
         }
     }
     g_object_unref(mbnode);
+
+    if (total_messages >= 0) {
+        /* Both counts are valid. */
+        text_unread = g_strdup_printf("%d", unread_messages);
+        text_total  = g_strdup_printf("%d", total_messages);
+    } else if (unread_messages == 0)
+        /* Total is unknown, and unread is unknown unless it's 0. */
+        text_unread = g_strdup("0");
+    gtk_tree_store_set(GTK_TREE_STORE(model), iter,
+                       UNREAD_COLUMN, text_unread,
+                       TOTAL_COLUMN, text_total,
+                       -1);
+    g_free(text_unread);
+    g_free(text_total);
 
     /* Do the folder styles as well */
     has_unread_child = mailbox->has_unread_messages;

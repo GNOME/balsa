@@ -639,7 +639,7 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox,
     }
     if (mdir->msgno_2_msg_info) {
 	if (mdir->msgno_2_msg_info->len != len)
-	    g_signal_emit_by_name(mailbox, "changed");
+	    libbalsa_mailbox_changed(mailbox);
 	g_ptr_array_free(mdir->msgno_2_msg_info, TRUE);
 	mdir->msgno_2_msg_info = NULL;
     }

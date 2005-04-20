@@ -536,7 +536,7 @@ libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     mailbox->has_unread_messages = (has_unread != FALSE);
-    g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED], 0);
+    libbalsa_mailbox_changed(mailbox);
 }
 
 /* libbalsa_mailbox_progress_notify:
@@ -595,6 +595,30 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 #ifdef BALSA_USE_THREADS
     pthread_testcancel();
 #endif
+}
+
+void
+libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
+{
+    if (!g_signal_has_handler_pending
+        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE))
+        /* No one cares, so don't set any message counts--that might
+         * cause mailbox->view to be created. */
+        return;
+
+    if (MAILBOX_OPEN(mailbox)) {
+        /* Both counts are valid. */
+        libbalsa_mailbox_set_total(mailbox,
+                                   libbalsa_mailbox_total_messages
+                                   (mailbox));
+        libbalsa_mailbox_set_unread(mailbox, mailbox->unread_messages);
+    } else {
+        /* Total is unknown, but mailbox->has_unread_messages is valid. */
+        libbalsa_mailbox_set_total(mailbox, -1);
+        libbalsa_mailbox_set_unread(mailbox,
+                                    mailbox->has_unread_messages ? 1 : 0);
+    }
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
 }
 
 /* libbalsa_mailbox_message_match:
@@ -1440,8 +1464,7 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
             g_object_set_data(G_OBJECT(mailbox),
                               LIBBALSA_MAILBOX_UNTHREADED, NULL);
         } else
-            g_signal_emit(G_OBJECT(mailbox),
-                          libbalsa_mailbox_signals[CHANGED], 0);
+            libbalsa_mailbox_changed(mailbox);
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -1592,8 +1615,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
 	libbalsa_unlock_mailbox(mailbox);
 
     if (set & LIBBALSA_MESSAGE_FLAG_DELETED && retval)
-        g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED],
-                      0);
+        libbalsa_mailbox_changed(mailbox);
 
     return retval;
 }
@@ -1751,7 +1773,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 		    (GNodeTraverseFunc) lbm_check_unseen_child, mailbox);
 #endif /* CACHE_UNSEEN_CHILD */
 
-    g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[CHANGED], 0);
+    libbalsa_mailbox_changed(mailbox);
 
     mailbox->state = saved_state;
     lbm_threads_leave(mailbox);
@@ -1786,9 +1808,12 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     0,				/* open                 */
     1,				/* in_sync              */
     0,				/* frozen		*/
+    0,				/* used 		*/
 #ifdef HAVE_GPGME
-    LB_MAILBOX_CHK_CRYPT_MAYBE  /* gpg_chk_mode         */
+    LB_MAILBOX_CHK_CRYPT_MAYBE, /* gpg_chk_mode         */
 #endif
+    -1,                         /* total messages	*/
+    -1                          /* unread messages	*/
 };
 
 LibBalsaMailboxView *
@@ -1981,6 +2006,41 @@ libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 }
 #endif
 
+void
+libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread)
+{
+    LibBalsaMailboxView *view;
+
+    /* Changing the default is not allowed. */
+    g_return_if_fail(mailbox != NULL);
+
+    view = lbm_get_view(mailbox);
+    view->used = 1;
+
+    if (!view->frozen && view->unread != unread) {
+	view->unread = unread;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_total(LibBalsaMailbox * mailbox, gint total)
+{
+    LibBalsaMailboxView *view;
+
+    /* Changing the default is not allowed. */
+    g_return_if_fail(mailbox != NULL);
+
+    view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->total != total) {
+	view->total = total;
+	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
 /* End of set methods. */
 
 /* Get methods; NULL mailbox is valid, and returns the default value. */
@@ -2069,6 +2129,23 @@ libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox)
 	libbalsa_mailbox_view_default.gpg_chk_mode;
 }
 #endif
+
+gint
+libbalsa_mailbox_get_unread(LibBalsaMailbox * mailbox)
+{
+    if (mailbox && mailbox->view) {
+        mailbox->view->used = 1;
+	return mailbox->view->unread;
+    } else 
+        return libbalsa_mailbox_view_default.unread;
+}
+
+gint
+libbalsa_mailbox_get_total(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->total : libbalsa_mailbox_view_default.total;
+}
 
 /* End of get methods. */
 
@@ -2939,7 +3016,7 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
 
     mbox_sort(mbox);
 
-    g_signal_emit(mbox, libbalsa_mailbox_signals[CHANGED], 0);
+    libbalsa_mailbox_changed(mbox);
 }
 
 static void
@@ -3343,8 +3420,7 @@ lbm_check_real(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
     g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
                       GUINT_TO_POINTER(0));
-    if (MAILBOX_OPEN(mailbox))
-        libbalsa_mailbox_check(mailbox);
+    libbalsa_mailbox_check(mailbox);
     libbalsa_unlock_mailbox(mailbox);
     g_object_unref(mailbox);
 }

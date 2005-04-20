@@ -687,7 +687,7 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox,
     }
     if (mh->msgno_2_msg_info) {
 	if (mh->msgno_2_msg_info->len != len)
-	    g_signal_emit_by_name(mailbox, "changed");
+	    libbalsa_mailbox_changed(mailbox);
 	g_ptr_array_free(mh->msgno_2_msg_info, TRUE);
 	mh->msgno_2_msg_info = NULL;
     }

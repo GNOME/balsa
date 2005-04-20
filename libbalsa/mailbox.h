@@ -171,10 +171,21 @@ struct _LibBalsaMailboxView {
     unsigned open:1;
     unsigned in_sync:1;		/* view is in sync with config */
     unsigned frozen:1;		/* don't update view if set    */
+    unsigned used:1;		/* keep track of usage         */
 
 #ifdef HAVE_GPGME
     LibBalsaChkCryptoMode gpg_chk_mode;
 #endif
+
+    /* Display statistics:
+     * - total >= 0                both counts are valid;
+     * - total <  0 && unread == 0 unread is known to be zero;
+     * - total <  0 && unread >  0 unread is known to be > 0,
+     *                             but the count is not valid;
+     * - total <  0 && unread <  0 both are unknown.
+     */
+    int unread;
+    int total;
 };
 
 struct _LibBalsaMailbox {
@@ -303,6 +314,7 @@ gboolean libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge);
 
 void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_changed(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 					       gboolean has_unread);
 void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
@@ -485,6 +497,8 @@ void libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen);
 gboolean libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 					  LibBalsaChkCryptoMode gpg_chk_mode);
 #endif
+void libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread);
+void libbalsa_mailbox_set_total (LibBalsaMailbox * mailbox, gint total);
 
 InternetAddressList
     *libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox);
@@ -503,6 +517,8 @@ gboolean libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox);
 #ifdef HAVE_GPGME
 LibBalsaChkCryptoMode libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox);
 #endif
+gint libbalsa_mailbox_get_unread(LibBalsaMailbox * mailbox);
+gint libbalsa_mailbox_get_total (LibBalsaMailbox * mailbox);
 
 /** force update of given msgno */
 void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);

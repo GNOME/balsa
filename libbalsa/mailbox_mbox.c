@@ -769,7 +769,7 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
 	len = mbox->messages_info->len;
         libbalsa_mailbox_mbox_sync(mailbox, expunge);
 	if (mbox->messages_info->len != len)
-	    g_signal_emit_by_name(mailbox, "changed");
+	    libbalsa_mailbox_changed(mailbox);
 	free_messages_info(mbox->messages_info);
 	mbox->messages_info = NULL;
     }

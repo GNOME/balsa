@@ -1686,6 +1686,14 @@ config_view_load(const gchar * key, const gchar * value, gpointer data)
         if (!def)
             view->gpg_chk_mode = tmp;
 #endif
+
+        tmp = libbalsa_conf_get_int_with_default("Total", &def);
+        if (!def)
+            view->total = tmp;
+
+        tmp = libbalsa_conf_get_int_with_default("Unread", &def);
+        if (!def)
+            view->unread = tmp;
     }
 
     libbalsa_conf_pop_group();
@@ -1757,6 +1765,14 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
     if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))
 	libbalsa_conf_set_int("CryptoMode",  view->gpg_chk_mode);
 #endif
+    /* To avoid accumulation of config entries with only message counts,
+     * we save them only if used in this session. */
+    if (view->used 
+        && view->unread      != libbalsa_mailbox_get_unread(NULL))
+	libbalsa_conf_set_int("Unread",      view->unread);
+    if (view->used
+        && view->total       != libbalsa_mailbox_get_total(NULL))
+	libbalsa_conf_set_int("Total",       view->total);
 
     libbalsa_conf_pop_group();
 }

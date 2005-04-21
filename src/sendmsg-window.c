@@ -3534,8 +3534,7 @@ guess_identity(BalsaSendmsg* bsmsg)
     const gchar *tmp;
 
 
-    if( !message  || !message->headers || !message->headers->to_list ||
-	!balsa_app.identities)
+    if (!message  || !message->headers || !balsa_app.identities)
         return FALSE; /* use default */
 
     if (bsmsg->type == SEND_CONTINUE) {
@@ -4406,14 +4405,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 #if !defined(ENABLE_TOUCH_UI)
     const gchar *ctmp;
 #endif
-    gint active;
-    LibBalsaIdentity *ident;
+    LibBalsaIdentity *ident = bsmsg->ident;
 
-    g_assert(bsmsg != NULL);
     message = libbalsa_message_new();
 
-    active = gtk_combo_box_get_active(GTK_COMBO_BOX(bsmsg->from[1]));
-    ident = g_list_nth_data(balsa_app.identities, active);
     message->headers->from = internet_address_list_prepend(NULL, ident->ia);
 
     tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
@@ -4441,7 +4436,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 #endif
 
     if (bsmsg->req_dispnotify)
-	libbalsa_message_set_dispnotify(message, bsmsg->ident->ia);
+	libbalsa_message_set_dispnotify(message, ident->ia);
 
     if (bsmsg->orig_message != NULL) {
 

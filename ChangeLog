@@ -1,5 +1,8 @@
-2005-04-20 12:49  PeterB
+2005-04-20 20:20  PeterB
 
+	* libbalsa/imap-server.c, libbalsa/mailbox_pop3.c,
+	libbalsa/server.c, libbalsa/server.h, libbalsa/smtp-server.c,
+	src/folder-conf.c, src/pref-manager.c: lose LibBalsaServer::type.
 	* libbalsa/mailbox.c, libbalsa/mailbox.h,
 	libbalsa/mailbox_maildir.c, libbalsa/mailbox_mbox.c,
 	libbalsa/mailbox_mh.c, src/balsa-mblist.c, src/save-restore.c: add

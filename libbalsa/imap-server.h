@@ -72,5 +72,9 @@ void libbalsa_imap_server_set_bug(LibBalsaImapServer *server,
 
 gboolean libbalsa_imap_server_has_bug(LibBalsaImapServer *server,
                                       LibBalsaImapServerBug bug);
+void libbalsa_imap_server_set_use_status(LibBalsaImapServer *server,
+                                         gboolean use_status);
+gboolean libbalsa_imap_server_get_use_status(LibBalsaImapServer *server);
+
 extern gint ImapDebug;
 #endif /* __IMAP_SERVER_H__ */

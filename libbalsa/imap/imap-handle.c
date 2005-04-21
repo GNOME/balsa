@@ -143,6 +143,8 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
 #endif
   handle->tls_mode = IMAP_TLS_ENABLED;
   handle->cmd_queue = g_hash_table_new(NULL, NULL);
+  handle->status_resps = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                               NULL, NULL);
 
   handle->info_cb  = NULL;
   handle->info_arg = NULL;
@@ -723,6 +725,7 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_free(handle->last_msg);handle->last_msg = NULL;
 
   g_hash_table_destroy(handle->cmd_queue); handle->cmd_queue = NULL;
+  g_hash_table_destroy(handle->status_resps); handle->status_resps = NULL;
 
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
@@ -1789,12 +1792,45 @@ ir_lsub(ImapMboxHandle *h)
   return ir_list_lsub(h, LSUB_RESPONSE);
 }
 
+/* 7.2.4 STATUS Response */
+const char* imap_status_item_names[5] = {
+  "MESSAGES", "RECENT", "UIDNEXT", "UIDVALIDITY", "UNSEEN" };
 static ImapResponse
 ir_status(ImapMboxHandle *h)
 {
-  /* FIXME: implement! */
-  int c; while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
-  return IMR_OK;
+  int c;
+  char *name;
+  struct ImapStatusResult *resp;
+
+  name = imap_get_astring(h->sio, &c);
+  resp = g_hash_table_lookup(h->status_resps, name);
+  if(c                != ' ') return IMR_PROTOCOL;
+  if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
+  do {
+    char item[13], count[13]; /* longest than UIDVALIDITY */
+    c = imap_get_atom(h->sio, item, sizeof(item));
+    if(c == ')') break;
+    if(c != ' ') return IMR_PROTOCOL;
+    c = imap_get_atom(h->sio, count, sizeof(count));
+    /* FIXME: process the response */
+    if(resp) {
+      unsigned idx, i;
+      for(idx=0; idx<ELEMENTS(imap_status_item_names); idx++)
+        if(g_ascii_strcasecmp(item, imap_status_item_names[idx]) == 0)
+          break;
+      for(i= 0; resp[i].item != IMSTAT_NONE; i++) {
+        if(resp[i].item == idx) {
+          sscanf(count, "%u", &resp[i].result);
+          printf("%s: set status for %s to %u\n",
+                 name, item, resp[i].result);
+          break;
+        }
+      }
+    }
+  } while(c == ' ');
+  g_free(name);
+  /* g_return_val_if-fail(c == ')', IMR_BAD) */
+  return ir_check_crlf(h, sio_getc(h->sio));
 }
 
 static ImapResponse

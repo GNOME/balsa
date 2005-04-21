@@ -83,6 +83,8 @@ struct _ImapMboxHandle {
   ImapSearchCb search_cb;
   void *search_arg;
 
+  GHashTable *status_resps; /* A hash of STATUS responses that we wait for */
+
   GIOChannel *iochannel; /* IO channel used for monitoring the connection */
   guint idle_enable_id; /* callback to issue IDLE after a period of
                            inactivity */
@@ -152,5 +154,5 @@ void mbox_view_append_no(MboxView *mv, unsigned seqno);
 
 int imap_socket_open(const char* host, const char *def_port);
 
-
+extern const char* imap_status_item_names[5];
 #endif /* __IMAP_PRIVATE_H__ */

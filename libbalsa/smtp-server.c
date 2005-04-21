@@ -240,6 +240,8 @@ libbalsa_smtp_server_new_from_config(const gchar * name)
 void
 libbalsa_smtp_server_save_config(LibBalsaSmtpServer * smtp_server)
 {
+    /* FIXME: isn't it a bit of a brute force? */
+    LIBBALSA_SERVER(smtp_server)->remember_passwd = TRUE;
     libbalsa_server_save_config(LIBBALSA_SERVER(smtp_server));
 
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE

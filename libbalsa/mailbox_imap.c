@@ -70,10 +70,10 @@ struct _LibBalsaMailboxImap {
     ImapUID      uid_validity;
 
     GArray* messages_info;
-    gboolean opened;
 
     GArray *sort_ranks;
     LibBalsaMailboxSortFields sort_field;
+    unsigned opened:1;
 };
 
 struct _LibBalsaMailboxImapClass {
@@ -1102,27 +1102,39 @@ static gboolean
 lbm_imap_check(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     ImapMboxHandle *handle;
     gulong id;
-    struct mark_info info;
 
     handle = libbalsa_mailbox_imap_get_handle(mimap, NULL);
     if (!handle)
 	return FALSE;
 
-    info.path = mimap->path;
-    info.marked = FALSE;
-
-    id = g_signal_connect(G_OBJECT(handle), "list-response",
-                          G_CALLBACK(lbm_imap_list_cb), &info);
-
-    if (imap_mbox_list(handle, mimap->path) != IMR_OK)
+    if(libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(server))) {
+        static struct ImapStatusResult info[] = {
+            { IMSTAT_RECENT, 0 }, { IMSTAT_NONE, 0 } };
+        /* cannot do status on an open mailbox */
+        g_return_val_if_fail(!mimap->opened, FALSE);
+        if(imap_mbox_status(handle, mimap->path, info) != IMR_OK)
+            return FALSE;
+        libbalsa_mailbox_imap_release_handle(mimap);
+        return info[0].result > 0;
+    } else {
+        struct mark_info info;
+        info.path = mimap->path;
         info.marked = FALSE;
 
-    g_signal_handler_disconnect(G_OBJECT(handle), id);
-    libbalsa_mailbox_imap_release_handle(mimap);
+        id = g_signal_connect(G_OBJECT(handle), "list-response",
+                              G_CALLBACK(lbm_imap_list_cb), &info);
 
-    return info.marked;
+        if (imap_mbox_list(handle, mimap->path) != IMR_OK)
+            info.marked = FALSE;
+
+        g_signal_handler_disconnect(G_OBJECT(handle), id);
+        libbalsa_mailbox_imap_release_handle(mimap);
+
+        return info.marked;
+    }
 }
 
 static void

@@ -1,3 +1,14 @@
+2005-04-21  Pawel Salek
+
+	* libbalsa/folder-scanners.c: block list-response when asking
+	for a delimiter.
+	* libbalsa/imap-server.[ch]: allow checking for new mail with STATUS.
+	* libbalsa/smtp-server.c: keep old behavior and always save passwd.
+	* libbalsa/imap/imap-commands.[ch]: implement imap_mbox_status().
+	* libbalsa/imap/imap-handle.c: handle its response.
+	* libbalsa/imap/imap_private.h: even for several issued in parallel.
+	* src/folder-conf.c: configure it.
+
 2005-04-20 21:26  PeterB
 
 	* src/sendmsg-window.c: simplify setting identity.

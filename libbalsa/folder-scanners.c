@@ -308,8 +308,13 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     gboolean ret = TRUE;
     
     if(*path) {
-	if(!state->delim)
+	if(!state->delim) {
+            g_signal_handlers_block_by_func(handle, libbalsa_imap_list_cb,
+                                            state);
 	    state->delim = imap_mbox_handle_get_delim(handle, path);
+            g_signal_handlers_unblock_by_func(handle, libbalsa_imap_list_cb,
+                                              state);
+        }
 	if(path[strlen(path) - 1] != state->delim)
 	    imap_path = g_strdup_printf("%s%c", path, state->delim);
 	else

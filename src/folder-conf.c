@@ -55,7 +55,7 @@ struct _FolderDialogData {
     GtkWidget *folder_name, *port, *username, *remember,
         *password, *subscribed, *list_inbox, *prefix;
     GtkWidget *use_ssl, *tls_mode;
-    GtkWidget *connection_limit, *enable_persistent, *has_bugs;
+    GtkWidget *connection_limit, *enable_persistent, *has_bugs, *use_status;
 };
 
 /* FIXME: identity_name will leak on cancelled folder edition */
@@ -190,6 +190,9 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     libbalsa_imap_server_set_bug
         (LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH,
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->has_bugs)));
+    libbalsa_imap_server_set_use_status
+        (LIBBALSA_IMAP_SERVER(s),
+         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_status)));
     libbalsa_server_set_username(s, username);
     s->remember_passwd =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
@@ -318,6 +321,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     if(s &&
        libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH))
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->has_bugs),
+                                     TRUE);
+    fcw->use_status = 
+        balsa_server_conf_add_checkbox(&fcw->bsc,
+                                       _("Use STATUS for mailbox checking"));
+    if(s &&
+       libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(s)))
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->use_status),
                                      TRUE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));

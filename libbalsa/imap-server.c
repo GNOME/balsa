@@ -40,6 +40,7 @@ struct LibBalsaImapServer_ {
                                     sessions. If FALSE, messages will be
                                     kept in /tmp and cleaned on exit. */
     unsigned has_fetch_bug:1;
+    unsigned use_status:1; /* server has fast STATUS command */
 };
 
 typedef struct LibBalsaImapServerClass_ {
@@ -461,6 +462,8 @@ libbalsa_imap_server_new_from_config(void)
     if(!d) imap_server->persistent_cache = !!d1;
     d1 = libbalsa_conf_get_bool_with_default("HasFetchBug", &d);
     if(!d) imap_server->has_fetch_bug = !!d1;
+    d1 = libbalsa_conf_get_bool_with_default("UseStatus", &d);
+    if(!d) imap_server->use_status = !!d1;
     if (!server->passwd) {
         server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
         if(server->remember_passwd)
@@ -486,6 +489,7 @@ libbalsa_imap_server_save_config(LibBalsaImapServer *server)
     libbalsa_conf_set_int("ConnectionLimit", server->max_connections);
     libbalsa_conf_set_bool("PersistentCache", server->persistent_cache);
     libbalsa_conf_set_bool("HasFetchBug", server->has_fetch_bug);
+    libbalsa_conf_set_bool("UseStatus",   server->use_status);
 }
 
 /* handle_connection_error() releases handle_info data, clears password
@@ -850,4 +854,16 @@ libbalsa_imap_server_has_bug(LibBalsaImapServer *server,
                              LibBalsaImapServerBug bug)
 {
     return server->has_fetch_bug;
+}
+
+void
+libbalsa_imap_server_set_use_status(LibBalsaImapServer *server, 
+                                    gboolean use_status)
+{
+    server->use_status = !!use_status;
+}
+gboolean
+libbalsa_imap_server_get_use_status(LibBalsaImapServer *server)
+{
+    return server->use_status;
 }

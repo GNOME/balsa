@@ -400,9 +400,36 @@ imap_mbox_lsub(ImapMboxHandle *handle, const char* what)
 
 
 /* 6.3.10 STATUS Command */
-/* FIXME: implement */
 
-
+ImapResponse
+imap_mbox_status(ImapMboxHandle *r, const char*what,
+                 struct ImapStatusResult *res)
+{
+  const char *item_arr[ELEMENTS(imap_status_item_names)+1];
+  ImapResponse rc = IMR_OK;
+  unsigned i, ipos;
+  
+  for(ipos = i= 0; res[i].item != IMSTAT_NONE; i++) {
+    /* repeated items? */
+    g_return_val_if_fail(i<ELEMENTS(imap_status_item_names), IMR_BAD);
+    /* invalid item? */
+    g_return_val_if_fail(res[i].item>=IMSTAT_MESSAGES &&
+                         res[i].item<=IMSTAT_UNSEEN, IMR_BAD);
+    item_arr[ipos++] = imap_status_item_names[res[i].item];
+  }
+  item_arr[ipos] = NULL;
+  if(ipos>0) {
+    gchar *mbx7 = imap_utf8_to_mailbox(what);
+    gchar *items = g_strjoinv(" ", (gchar**)&item_arr[0]);
+    gchar *cmd = g_strdup_printf("STATUS \"%s\" (%s)", mbx7, items);
+    g_hash_table_insert(r->status_resps, (gpointer)what, res);
+    rc = imap_cmd_exec(r, cmd);
+    g_hash_table_remove(r->status_resps, what);
+    g_free(mbx7); g_free(cmd);
+    g_free(items);
+  }
+  return IMR_OK; 
+}
 /* 6.3.11 APPEND Command */
 static gchar*
 enum_flag_to_str(ImapMsgFlags flg)

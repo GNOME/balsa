@@ -41,6 +41,20 @@ ImapResponse imap_mbox_subscribe(ImapMboxHandle* handle,
                                  const char* mbox, gboolean subscribe);
 ImapResponse imap_mbox_list(ImapMboxHandle *r, const char*what);
 ImapResponse imap_mbox_lsub(ImapMboxHandle *r, const char*what);
+typedef enum {
+  IMSTAT_MESSAGES = 0,
+  IMSTAT_RECENT,
+  IMSTAT_UIDNEXT,
+  IMSTAT_UIDVALIDITY,
+  IMSTAT_UNSEEN,
+  IMSTAT_NONE
+} ImapStatusItem;
+struct ImapStatusResult {
+  ImapStatusItem item;
+  unsigned       result;
+};
+ImapResponse imap_mbox_status(ImapMboxHandle *r, const char*what, 
+                              struct ImapStatusResult *res);
 typedef size_t (*ImapAppendFunc)(char*, size_t, void*);
 ImapResponse imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, 

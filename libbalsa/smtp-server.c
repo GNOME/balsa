@@ -151,9 +151,6 @@ tlsinteract(char *buf, int buflen, int rwflag, void *arg)
 static void
 libbalsa_smtp_server_init(LibBalsaSmtpServer * smtp_server)
 {
-    LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
-    server->type = LIBBALSA_SERVER_SMTP;
-
     smtp_server->authctx = auth_create_context();
     auth_set_mechanism_flags(smtp_server->authctx, AUTH_PLUGIN_PLAIN, 0);
     auth_set_interact_cb(smtp_server->authctx, authinteract, smtp_server);

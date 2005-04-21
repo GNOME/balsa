@@ -134,8 +134,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     mailbox->filter = FALSE;
     mailbox->filter_cmd = NULL;
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
-    remote->server =
-	LIBBALSA_SERVER(libbalsa_server_new(LIBBALSA_SERVER_POP3));
+    remote->server = libbalsa_server_new();
 }
 
 static void

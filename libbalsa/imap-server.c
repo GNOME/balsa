@@ -159,8 +159,6 @@ libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)
 static void
 libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
 {
-    LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
-    server->type = LIBBALSA_SERVER_IMAP;
     imap_server->key = NULL;
     imap_server->lock = g_mutex_new();
     imap_server->max_connections = MAX_CONNECTIONS_PER_SERVER;

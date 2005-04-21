@@ -180,17 +180,14 @@ libbalsa_server_finalize(GObject * object)
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-GObject *
-libbalsa_server_new(LibBalsaServerType type)
+LibBalsaServer *
+libbalsa_server_new(void)
 {
     LibBalsaServer *server;
-    if (type == LIBBALSA_SERVER_IMAP)
-	g_warning("Creating a LibBalsaServer with type LIBBALSA_SERVER_IMAP,"
-		  "please use libbalsa_imap_server_new");
-    server = g_object_new(LIBBALSA_TYPE_SERVER, NULL);
-    server->type = type;
 
-    return G_OBJECT(server);
+    server = g_object_new(LIBBALSA_TYPE_SERVER, NULL);
+
+    return server;
 }
 
 void

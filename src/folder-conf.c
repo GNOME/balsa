@@ -391,8 +391,7 @@ validate_sub_folder(GtkWidget * w, SubfolderDialogData * sdd)
      * Allow typing in the parent_folder entry box only if we already
      * have the server information in mn:
      */
-    gboolean have_server = (mn && mn->server
-			    && mn->server->type == LIBBALSA_SERVER_IMAP);
+    gboolean have_server = (mn && LIBBALSA_IS_IMAP_SERVER(mn->server));
     gtk_editable_set_editable(GTK_EDITABLE(sdd->parent_folder),
 			      have_server);
     /*
@@ -472,8 +471,7 @@ folder_selection_func(GtkTreeSelection * selection, GtkTreeModel * model,
 
     gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-    retval = (mbnode->server
-	      && mbnode->server->type == LIBBALSA_SERVER_IMAP
+    retval = (LIBBALSA_IS_IMAP_SERVER(mbnode->server)
 	      && (sdd->mbnode == NULL
 		  || sdd->mbnode->server == mbnode->server));
     g_object_unref(mbnode);

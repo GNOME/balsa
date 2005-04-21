@@ -42,13 +42,6 @@ GType libbalsa_server_get_type(void);
 typedef struct _LibBalsaServerClass LibBalsaServerClass;
 
 typedef enum {
-    LIBBALSA_SERVER_POP3,
-    LIBBALSA_SERVER_IMAP,
-    LIBBALSA_SERVER_SMTP,
-    LIBBALSA_SERVER_UNKNOWN
-} LibBalsaServerType;
-
-typedef enum {
     LIBBALSA_TLS_DISABLED,
     LIBBALSA_TLS_ENABLED,
     LIBBALSA_TLS_REQUIRED
@@ -56,8 +49,6 @@ typedef enum {
 
 struct _LibBalsaServer {
     GObject object;
-
-    LibBalsaServerType type;
 
     gchar *host;
     gchar *user;
@@ -80,7 +71,7 @@ struct _LibBalsaServerClass {
     gchar *(*get_password) (LibBalsaServer * server);
 };
 
-GObject *libbalsa_server_new(LibBalsaServerType type);
+LibBalsaServer *libbalsa_server_new(void);
 
 void libbalsa_server_set_username(LibBalsaServer * server,
 				  const gchar * username);

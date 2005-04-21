@@ -41,6 +41,7 @@
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 #include <string.h>
+#include "imap-server.h"
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
 #endif                          /* ENABLE_ESMTP */
@@ -1206,8 +1207,7 @@ add_other_server(BalsaMailboxNode * mbnode, GtkTreeModel * model)
                 append = TRUE;
             }
         } else
-            if (mbnode->server
-                && mbnode->server->type == LIBBALSA_SERVER_IMAP) {
+            if (LIBBALSA_IS_IMAP_SERVER(mbnode->server)) {
             protocol = "IMAP";
             name = mbnode->name;
             append = TRUE;

@@ -1,5 +1,6 @@
-2005-04-20 20:20  PeterB
+2005-04-20 21:26  PeterB
 
+	* src/sendmsg-window.c: simplify setting identity.
 	* libbalsa/imap-server.c, libbalsa/mailbox_pop3.c,
 	libbalsa/server.c, libbalsa/server.h, libbalsa/smtp-server.c,
 	src/folder-conf.c, src/pref-manager.c: lose LibBalsaServer::type.

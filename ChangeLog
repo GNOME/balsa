@@ -1,3 +1,8 @@
+2005-04-26 14:08  PeterB
+
+	* libbalsa/identity.c, src/pref-manager.c: compile --without-esmtp
+	and --without-gpgme.
+
 2005-04-21  Pawel Salek
 
 	* libbalsa/folder-scanners.c: block list-response when asking

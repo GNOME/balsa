@@ -558,7 +558,8 @@ static void add_show_menu(const char *label, gpointer data,
                           GtkWidget * menu);
 static gpointer ident_dialog_get_value(GtkDialog * dialog,
                                        const gchar * key);
-#endif /* defined(HAVE_GPGME) || ENABLE_ESMTP */
+static void ident_dialog_free_values(GPtrArray * values);
+#endif                          /* defined(HAVE_GPGME) || ENABLE_ESMTP */
 
 /* Callback for the "toggled" signal of the "Default" column. */
 static void
@@ -1583,14 +1584,6 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 }
 
 
-/* ident_dialog_free_values: helper function */
-
-static void
-ident_dialog_free_values(GPtrArray * values)
-{
-    g_ptr_array_free(values, TRUE);
-}
-
 #ifdef HAVE_GPGME
 /* collected helper stuff for GPGME support */
 
@@ -1753,5 +1746,12 @@ ident_dialog_get_value(GtkDialog * dialog, const gchar * key)
     values = g_object_get_data(G_OBJECT(menu), "identity-value");
     
     return g_ptr_array_index(values, value);
+}
+
+/* ident_dialog_free_values: helper function */
+static void
+ident_dialog_free_values(GPtrArray * values)
+{
+    g_ptr_array_free(values, TRUE);
 }
 #endif /* defined(HAVE_GPGME) || ENABLE_ESMTP */

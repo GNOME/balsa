@@ -36,15 +36,16 @@
 #include "address-book-config.h"
 #include "quote-color.h"
 #include "misc.h"
-#include "i18n.h"
+#include "imap-server.h"
 
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 #include <string.h>
-#include "imap-server.h"
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
 #endif                          /* ENABLE_ESMTP */
+
+#include "i18n.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 

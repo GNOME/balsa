@@ -165,8 +165,11 @@ libbalsa_scanner_local_dir_helper(gpointer rnode, const gchar * prefix,
             --*depth;
         } else {
             mailbox_type = libbalsa_mailbox_type_from_path(filename);
-            if (mailbox_type != 0)
-                mailbox_handler(rnode, de->d_name, filename, mailbox_type);
+            if (mailbox_type != 0) {
+                mark_local_path(mailbox_handler
+                                (rnode, de->d_name, filename,
+                                 mailbox_type));
+            }
         }
     }
     closedir(dpc);
@@ -205,48 +208,54 @@ struct browser_state
 };
 
 static void
-libbalsa_imap_add_folder(char *folder, int delim, int noselect, int noscan,
-                         int marked, struct browser_state *state)
-{
-    if (folder[strlen(folder) - 1] == delim)
-        return;
-
-    /* this extra check is needed for subscribed folder handling. 
-     * Read RFC when in doubt. */
-    if (!noscan) {
-	gchar *f;
-	if(*folder && folder[strlen(folder)-1] != delim)
-	    f = g_strdup_printf("%s%c", folder, delim);
-	else f = g_strdup(folder);
-	g_hash_table_insert(state->subfolders, f, NULL);
-    }
-    state->handle_imap_path(folder, delim, noselect, noscan, marked,
-                            state->cb_data);
-}
-
-static void
 libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
                       ImapMboxFlags * flags, char *folder,
                       struct browser_state *state)
 {
     gboolean noselect, marked;
     gboolean noscan;
+    gchar *f;
 
     g_return_if_fail(folder && *folder);
 
     if(delim) state->delim = delim;
+
+    f = folder[strlen(folder) - 1] == delim ?
+        g_strdup(folder) : g_strdup_printf("%s%c", folder, delim);
+
+    /* RFC 3501 states that the flags in the LIST response are "more
+     * authoritative" than those in the LSUB response, except that a
+     * \noselect flag in the LSUB response means that the mailbox isn't
+     * subscribed, so we should respect it. */
     noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
+    if (state->subscribed) {
+        gpointer tmp;
+        ImapMboxFlags lsub_flags;
+
+        if (!g_hash_table_lookup_extended
+            (state->subfolders, f, NULL, &tmp)) {
+            /* This folder wasn't listed in the LSUB responses. */
+            g_free(f);
+            return;
+        }
+        lsub_flags = GPOINTER_TO_INT(tmp);
+        noselect = (IMAP_MBOX_HAS_FLAG(lsub_flags, IMLIST_NOSELECT) != 0);
+    }
+
     /* These flags are different, but both mean that we don't need to
      * scan the folder: */
     noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
               || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
         && !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
+    if (noscan) {
+        g_hash_table_remove(state->subfolders, f);
+        g_free(f);
+    } else
+        g_hash_table_insert(state->subfolders, f, NULL);
+
     marked = IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED);
-    if (state->subscribed)
-        state->mark_imap_path(folder, noselect, noscan, state->cb_data);
-    else
-        libbalsa_imap_add_folder(folder, delim, noselect, noscan,
-                                 marked, state);
+    state->handle_imap_path(folder, delim, noselect, noscan, marked,
+                            state->cb_data);
 }
 
 static void
@@ -254,19 +263,16 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
                       ImapMboxFlags * flags, char *folder,
                       struct browser_state *state)
 {
-    gboolean noselect, marked;
-    gboolean noscan;
+    gchar *f;
 
     g_return_if_fail(folder && *folder);
 
     if(delim) state->delim = delim;
-    noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
-    noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
-              || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
-        && !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
-    marked = IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED);
 
-    libbalsa_imap_add_folder(folder, delim, noselect, noscan, marked, state);
+    f = folder[strlen(folder) - 1] == delim ?
+        g_strdup(folder) : g_strdup_printf("%s%c", folder, delim);
+
+    g_hash_table_insert(state->subfolders, f, GINT_TO_POINTER(*flags));
 }
 
 /* executed with GDK lock OFF.
@@ -306,6 +312,8 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     gboolean browse;
     ImapResponse rc = IMR_OK;
     gboolean ret = TRUE;
+    gint i;
+    gchar *tmp;
     
     if(*path) {
 	if(!state->delim) {
@@ -325,15 +333,16 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
     /* Send LSUB command if we're in subscribed mode, to find paths.
      * Note that flags in the LSUB response aren't authoritative
      * (UW-Imap is the only server thought to give incorrect flags). */
-    if (state->subscribed) 
+    if (state->subscribed) {
         rc = imap_mbox_lsub(handle, imap_path);
-    if(rc != IMR_OK) {
-        g_free(imap_path);
-        g_set_error(error,
-                    LIBBALSA_SCANNER_ERROR,
-                    LIBBALSA_SCANNER_ERROR_IMAP,
-                    "%d", rc);
-        return FALSE;
+        if (rc != IMR_OK) {
+            g_free(imap_path);
+            g_set_error(error,
+                        LIBBALSA_SCANNER_ERROR,
+                        LIBBALSA_SCANNER_ERROR_IMAP,
+                        "%d", rc);
+            return FALSE;
+        }
     }
 
     /* Send LIST command if either:
@@ -341,7 +350,7 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
      * - we are, and the LSUB command gave any responses, to get
      *   authoritative flags.
      */
-    if (!state->subscribed || state->subfolders)
+    if (!state->subscribed || g_hash_table_size(state->subfolders) > 0)
         rc = imap_mbox_list(handle, imap_path);
     g_free(imap_path);
     if(rc != IMR_OK) {
@@ -352,17 +361,24 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
         return FALSE;
     }
     /* Mark this path as scanned, without changing its selectable state. */
-    state->mark_imap_path(path, -1, TRUE, state->cb_data);
+    i = strlen(path) - 1;
+    tmp = g_strndup(path, i >= 0 && path[i] == state->delim ? i : i + 1);
+    state->mark_imap_path(tmp, state->cb_data);
+    g_free(tmp);
 
     list = steal_keys_to_list(state->subfolders);
 
     ++*depth;
-    browse = FALSE;
-    for (el = list; el && !browse; el = g_list_next(el))
-        browse = check_imap_path(el->data, server, *depth);
+    for (el = list, browse = FALSE; el && !browse; el = el->next) {
+        const gchar *fn = el->data;
+        i = strlen(fn) - 1;
+        tmp = g_strndup(fn, i >= 0 && fn[i] == state->delim ? i : i + 1);
+        browse = check_imap_path(tmp, server, *depth);
+        g_free(tmp);
+    }
 
     if (browse)
-        for (el = list; el; el = g_list_next(el)) {
+        for (el = list; el; el = el->next) {
             ret = libbalsa_imap_browse(el->data, state, handle, server,
                                        check_imap_path, depth, error);
             if(!ret)

@@ -83,8 +83,7 @@ static void handle_imap_path(const char *fn, char delim, int noselect,
 			     int noscan, int marked, void *data);
 static gint check_imap_path(const char *fn, LibBalsaServer * server,
 			    guint depth);
-static void mark_imap_path(const gchar * fn, gint noselect, gint noscan,
-			   gpointer data);
+static void mark_imap_path(const gchar * fn, gpointer data);
 
 enum {
     SAVE_CONFIG,
@@ -768,19 +767,25 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
     list = g_object_get_data(G_OBJECT(*mbnode), BALSA_MAILBOX_NODE_LIST_KEY);
     for (l = list; l; l = g_slist_next(l)) {
         BalsaMailboxNode *mn;
-        gboolean has_unread_messages = FALSE;
         
         if (!l->data)
             continue;
         mn = l->data;
-        if (mn->mailbox)
-            has_unread_messages = mn->mailbox->has_unread_messages;
-        balsa_mailbox_node_rescan(mn);
-        if (!l->data)
-            continue;
-        if (mn->mailbox)
-            mn->mailbox->has_unread_messages = has_unread_messages;
-        mn->scanned = TRUE;
+        if (!mn->scanned) {
+            gboolean has_unread_messages = FALSE;
+
+            if (mn->mailbox)
+                has_unread_messages = mn->mailbox->has_unread_messages;
+            balsa_mailbox_node_rescan(mn);
+            if (!l->data)
+                continue;
+            if (mn->mailbox)
+                mn->mailbox->has_unread_messages = has_unread_messages;
+            mn->scanned = TRUE;
+        } else if (balsa_app.debug)
+            g_print("%s: %s \"%s\" was already scanned\n", __func__,
+                    mn->mailbox ? "mailbox" : "folder",
+                    mn->mailbox ? mn->mailbox->name : mn->name);
         g_object_remove_weak_pointer(G_OBJECT(mn), & l->data);
     }
     g_slist_free(list);
@@ -1284,15 +1289,10 @@ check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
 
 /* mark_imap_path:
  *
- * find the imap_scan_item for fn and set flags.
- *
- * noselect may be -1, 0, or 1; -1 means no change, 0 or 1
- * mean set accordingly.
- *
- * noscan is always set
+ * find the imap_scan_item for fn and set scanned.
  */
 static void
-mark_imap_path(const gchar * fn, gint noselect, gint noscan, gpointer data)
+mark_imap_path(const gchar * fn, gpointer data)
 {
     imap_scan_tree *tree = data;
     GSList *list;
@@ -1302,11 +1302,7 @@ mark_imap_path(const gchar * fn, gint noselect, gint noscan, gpointer data)
     for (list = tree->list; list; list = list->next) {
         imap_scan_item *item = list->data;
         if (!strcmp(item->fn, fn)) {
-            if (noselect >= 0)
-        	item->selectable = !noselect;
-            item->scanned = noscan;
-            if (balsa_app.debug)
-        	printf(" noselect %d, noscan %d.\n", noselect, noscan);
+            item->scanned = TRUE;
             break;
         }
     }

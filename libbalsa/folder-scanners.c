@@ -165,7 +165,7 @@ libbalsa_scanner_local_dir_helper(gpointer rnode, const gchar * prefix,
             --*depth;
         } else {
             mailbox_type = libbalsa_mailbox_type_from_path(filename);
-            if (mailbox_type != 0) {
+            if (mailbox_type != G_TYPE_OBJECT) {
                 mark_local_path(mailbox_handler
                                 (rnode, de->d_name, filename,
                                  mailbox_type));
@@ -202,6 +202,7 @@ struct browser_state
   ImapHandler* handle_imap_path;
   ImapMark* mark_imap_path;
   GHashTable* subfolders;
+  gchar *imap_path;
   gboolean subscribed;
   int delim;
   void* cb_data;       /* data passed to {mailbox,folder}_handlers */
@@ -223,6 +224,10 @@ libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
     f = folder[strlen(folder) - 1] == delim ?
         g_strdup(folder) : g_strdup_printf("%s%c", folder, delim);
 
+    if(strcmp(f, state->imap_path) == 0) {
+        g_free(f);
+        return;
+    }
     /* RFC 3501 states that the flags in the LIST response are "more
      * authoritative" than those in the LSUB response, except that a
      * \noselect flag in the LSUB response means that the mailbox isn't
@@ -307,7 +312,6 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
                      ImapCheck check_imap_path, guint * depth,
                      GError **error)
 {
-    gchar *imap_path;
     GList *list, *el;
     gboolean browse;
     ImapResponse rc = IMR_OK;
@@ -324,19 +328,19 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
                                               state);
         }
 	if(path[strlen(path) - 1] != state->delim)
-	    imap_path = g_strdup_printf("%s%c", path, state->delim);
+	    state->imap_path = g_strdup_printf("%s%c", path, state->delim);
 	else
-	    imap_path = g_strdup(path);
+	    state->imap_path = g_strdup(path);
     } else 
-        imap_path = g_strdup(path);
+        state->imap_path = g_strdup(path);
 
     /* Send LSUB command if we're in subscribed mode, to find paths.
      * Note that flags in the LSUB response aren't authoritative
      * (UW-Imap is the only server thought to give incorrect flags). */
     if (state->subscribed) {
-        rc = imap_mbox_lsub(handle, imap_path);
+        rc = imap_mbox_lsub(handle, state->imap_path);
         if (rc != IMR_OK) {
-            g_free(imap_path);
+            g_free(state->imap_path);
             g_set_error(error,
                         LIBBALSA_SCANNER_ERROR,
                         LIBBALSA_SCANNER_ERROR_IMAP,
@@ -351,8 +355,8 @@ libbalsa_imap_browse(const gchar * path, struct browser_state *state,
      *   authoritative flags.
      */
     if (!state->subscribed || g_hash_table_size(state->subfolders) > 0)
-        rc = imap_mbox_list(handle, imap_path);
-    g_free(imap_path);
+        rc = imap_mbox_list(handle, state->imap_path);
+    g_free(state->imap_path);
     if(rc != IMR_OK) {
         g_set_error(error,
                     LIBBALSA_SCANNER_ERROR,

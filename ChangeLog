@@ -1,3 +1,8 @@
+2005-04-27 20:17  PeterB
+
+	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,
+	src/mailbox-node.c: simplify folder scanning.
+
 2005-04-26 14:08  PeterB
 
 	* libbalsa/identity.c, src/pref-manager.c: compile --without-esmtp

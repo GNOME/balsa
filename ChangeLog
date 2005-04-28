@@ -1,3 +1,7 @@
+2005-04-28  Pawel Salek
+
+	* libbalsa/folder-scanners.c: don't break with uw-imap server.
+
 2005-04-27 20:17  PeterB
 
 	* libbalsa/folder-scanners.c, libbalsa/folder-scanners.h,

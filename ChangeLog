@@ -1,3 +1,8 @@
+2005-04-30 19:57  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_local.c,
+	src/main-window.c: restore remove-duplicates functionality.
+
 2005-04-28  Pawel Salek
 
 	* libbalsa/folder-scanners.c: don't break with uw-imap server.

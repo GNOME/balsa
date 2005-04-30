@@ -82,6 +82,9 @@ static void libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
 static gboolean libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
 						    LibBalsaMessageBody *);
 
+static GArray *libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox *
+                                                       mailbox);
+
 GType
 libbalsa_mailbox_local_get_type(void)
 {
@@ -152,6 +155,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_fetch_headers;
     libbalsa_mailbox_class->get_message_part = 
         libbalsa_mailbox_local_get_msg_part;
+    libbalsa_mailbox_class->duplicate_msgnos =
+        libbalsa_mailbox_local_duplicate_msgnos;
     klass->load_message = NULL;
     klass->remove_files = NULL;
 }
@@ -1507,4 +1512,52 @@ libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local)
     local->sync_id = g_timeout_add_full(G_PRIORITY_LOW, schedule_delay,
                                         (GSourceFunc)lbml_sync_idle,
                                         local, NULL);
+}
+
+static GArray *
+libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxLocal *local = (LibBalsaMailboxLocal *) mailbox;
+    GHashTable *table;
+    guint i;
+    GArray *msgnos;
+
+    if (!local->threading_info)
+        return NULL;
+
+    table = g_hash_table_new(g_str_hash, g_str_equal);
+    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
+
+    for (i = 0; i < local->threading_info->len; i++) {
+        LibBalsaMailboxLocalInfo *info;
+        gpointer tmp;
+        guint master, msgno = i + 1;
+
+        if (libbalsa_mailbox_msgno_has_flags
+            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_DELETED, 0))
+            continue;
+
+        info =
+            &g_array_index(local->threading_info, LibBalsaMailboxLocalInfo,
+                           i);
+        if (!info->message_id)
+            continue;
+
+        tmp = g_hash_table_lookup(table, info->message_id);
+        master = tmp ? GPOINTER_TO_UINT(tmp) : 0;
+        if (!master ||
+            libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                             LIBBALSA_MESSAGE_FLAG_REPLIED,
+                                             0)) {
+            g_hash_table_insert(table, info->message_id,
+                                GUINT_TO_POINTER(msgno));
+            msgno = master;
+        }
+
+        if (msgno)
+            g_array_append_val(msgnos, msgno);
+    }
+    g_hash_table_destroy(table);
+
+    return msgnos;
 }

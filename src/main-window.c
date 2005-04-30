@@ -231,6 +231,7 @@ static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
 static void filter_run_cb(GtkWidget * widget, gpointer data);
+static void remove_duplicates_cb(GtkWidget * widget, gpointer data);
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
@@ -758,8 +759,16 @@ static GnomeUIInfo mailbox_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define MENU_MAILBOX_APPLY_FILTERS (MENU_MAILBOX_EMPTY_TRASH_POS+2)
     GNOMEUIINFO_ITEM_STOCK(N_("Select _Filters"),
-                           N_("Select filters to be applied automatically to current mailbox"),
+                           N_("Select filters to be applied "
+                              "automatically to current mailbox"),
                            filter_run_cb, GTK_STOCK_PROPERTIES),
+    GNOMEUIINFO_SEPARATOR,
+#define MENU_MAILBOX_REMOVE_DUPLICATES (MENU_MAILBOX_APPLY_FILTERS+2)
+    GNOMEUIINFO_ITEM_STOCK(N_("_Remove Duplicates"),
+                           N_("Remove duplicated messages "
+                              "from the selected mailbox"),
+                           remove_duplicates_cb, GTK_STOCK_REMOVE),
+        
     GNOMEUIINFO_END
 };
 #define NEXT_MSG_WIDGET mailbox_menu[MENU_MAILBOX_NEXT_POS].widget
@@ -1731,6 +1740,13 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     gtk_widget_set_sensitive(PREV_MSG_WIDGET, index && index->prev_message);
     gtk_widget_set_sensitive(NEXT_UNREAD_WIDGET, 
                              mailbox  && mailbox->unread_messages > 0);
+#if !defined(ENABLE_TOUCH_UI)
+    gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_REMOVE_DUPLICATES].
+                             widget,
+                             mailbox &&
+                             libbalsa_mailbox_can_move_duplicates
+                             (mailbox));
+#endif
 
     if (mailbox) {
 #if defined(ENABLE_TOUCH_UI)
@@ -4044,6 +4060,24 @@ filter_run_cb(GtkWidget * widget, gpointer data)
 	   of the filter action (eg a copy)). So let's see that later :) */
 	balsa_information(LIBBALSA_INFORMATION_WARNING, 
                           _("You can apply filters only on mailbox\n"));
+}
+
+static void
+remove_duplicates_cb(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
+    if (index) {
+        LibBalsaMailbox *mailbox =
+            BALSA_INDEX(index)->mailbox_node->mailbox;
+        GError *err = NULL;
+        libbalsa_mailbox_move_duplicates(mailbox, balsa_app.trash, &err);
+        if (err) {
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Removing duplicates failed: %s"),
+                              err->message);
+            g_error_free(err);
+        }
+    }
 }
 
 static void

@@ -298,6 +298,7 @@ struct _LibBalsaMailboxClass {
     void (*sort) (LibBalsaMailbox * mailbox, GArray *sort_array);
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
     guint (*total_messages)(LibBalsaMailbox * mailbox);
+    GArray *(*duplicate_msgnos) (LibBalsaMailbox * mailbox);
 };
 
 GType libbalsa_mailbox_get_type(void);
@@ -439,6 +440,10 @@ gboolean libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
 GType libbalsa_mailbox_type_from_path(const gchar * filename);
 
 guint libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_can_move_duplicates(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
+                                      LibBalsaMailbox * dest,
+                                      GError ** err);
 
 /*
  * Mailbox views-related functions.

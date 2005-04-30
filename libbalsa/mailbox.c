@@ -226,6 +226,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->load_config  = libbalsa_mailbox_real_load_config;
     klass->close_backend  = libbalsa_mailbox_real_close_backend;
     klass->total_messages = NULL;
+    klass->duplicate_msgnos = NULL;
 }
 
 static void
@@ -3512,4 +3513,37 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 	INVALIDATE_ITER(iter);
 
     return retval;
+}
+
+/* Remove duplicates */
+
+gboolean
+libbalsa_mailbox_can_move_duplicates(LibBalsaMailbox * mailbox)
+{
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->duplicate_msgnos != NULL;
+}
+
+void
+libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
+                                 LibBalsaMailbox * dest, GError ** err)
+{
+    GArray *msgnos = NULL;
+
+    if (libbalsa_mailbox_can_move_duplicates(mailbox))
+        msgnos =
+            LIBBALSA_MAILBOX_GET_CLASS(mailbox)->duplicate_msgnos(mailbox);
+
+    if (!msgnos)
+        return;
+
+    if (msgnos->len > 0) {
+        if (mailbox != dest)
+            libbalsa_mailbox_messages_move(mailbox, msgnos, dest, err);
+        else
+            libbalsa_mailbox_messages_change_flags(mailbox, msgnos,
+                                                   LIBBALSA_MESSAGE_FLAG_DELETED,
+                                                   0);
+    }
+
+    g_array_free(msgnos, TRUE);
 }

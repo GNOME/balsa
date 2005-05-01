@@ -70,6 +70,7 @@ struct _LibBalsaMailboxImap {
     ImapUID      uid_validity;
 
     GArray* messages_info;
+    GPtrArray *msgids; /* message-ids */
 
     GArray *sort_ranks;
     LibBalsaMailboxSortFields sort_field;
@@ -135,6 +136,8 @@ static void libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
                                                 LibBalsaMessage *message);
 static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 						   LibBalsaMessageBody *);
+static GArray *libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *
+						      mailbox);
 
 static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
 					     LibBalsaMessage * message,
@@ -259,6 +262,8 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
         libbalsa_mailbox_imap_get_msg_part;
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_imap_get_message_stream;
+    libbalsa_mailbox_class->duplicate_msgnos =
+        libbalsa_mailbox_imap_duplicate_msgnos;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_imap_add_message;
     libbalsa_mailbox_class->messages_change_flags =
 	lbm_imap_messages_change_flags;
@@ -580,7 +585,7 @@ struct collect_seq_data {
     unsigned has_it;
 };
 
-static const unsigned MAX_CHUNK_LENGTH = 40; 
+static const unsigned MAX_CHUNK_LENGTH = 35; 
 static gboolean
 collect_seq_cb(GNode *node, gpointer data)
 {
@@ -747,11 +752,15 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
                __func__, mimap->messages_info->len, cnt);
         while(cnt<mimap->messages_info->len) {
             unsigned seqno = mimap->messages_info->len;
+	    gchar *msgid;
             struct message_info *msg_info =
                 message_info_from_msgno(mimap, seqno);
-                if(msg_info->message)
+	    if(msg_info->message)
                 g_object_unref(msg_info->message);
             g_array_remove_index(mimap->messages_info, seqno-1);
+	    msgid = g_ptr_array_index(mimap->msgids, seqno-1);
+	    if(msgid) g_free(msgid);
+            g_ptr_array_remove_index(mimap->msgids, seqno-1);
         }
         ++mimap->search_stamp;
     } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
@@ -764,6 +773,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 	i=mimap->messages_info->len+1;
         do {
             g_array_append_val(mimap->messages_info, a);
+            g_ptr_array_add(mimap->msgids, NULL);
 	    /* dummy entry in mindex for now */
 	    g_ptr_array_add(mailbox->mindex, NULL);
             libbalsa_mailbox_msgno_inserted(mailbox, i);
@@ -787,6 +797,7 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
 {
     ImapMessage *imsg;
     guint i;
+    gchar *msgid;
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
@@ -812,6 +823,9 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     if(msg_info->message)
         g_object_unref(msg_info->message);
     g_array_remove_index(mimap->messages_info, seqno-1);
+    msgid = g_ptr_array_index(mimap->msgids, seqno-1);
+    if(msgid) g_free(msgid);
+    g_ptr_array_remove_index(mimap->msgids, seqno-1);
 
     for (i = seqno - 1; i < mimap->messages_info->len; i++) {
 	struct message_info *msg_info =
@@ -951,9 +965,11 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
     mimap->messages_info = g_array_sized_new(FALSE, TRUE, 
 					     sizeof(struct message_info),
 					     total_messages);
+    mimap->msgids = g_ptr_array_sized_new(total_messages);
     for(i=0; i < total_messages; i++) {
 	struct message_info a = {0};
 	g_array_append_val(mimap->messages_info, a);
+	g_ptr_array_add(mimap->msgids, NULL);
         /* dummy entry in mindex for now */
         g_ptr_array_add(mailbox->mindex, NULL);
     }
@@ -982,16 +998,23 @@ free_messages_info(LibBalsaMailboxImap * mbox)
     guint i;
     GArray *messages_info = mbox->messages_info;
 
+    if(messages_info->len != mbox->msgids->len)
+	g_warning("free_messages_info: array sizes do not match.");
     for (i = 0; i < messages_info->len; i++) {
+	gchar *msgid;
 	struct message_info *msg_info =
 	    &g_array_index(messages_info, struct message_info, i);
 	if (msg_info->message) {
 	    msg_info->message->mailbox = NULL;
 	    g_object_unref(msg_info->message);
 	}
+	msgid = g_ptr_array_index(mbox->msgids, i);
+	if(msgid) g_free(msgid);
     }
     g_array_free(mbox->messages_info, TRUE);
     mbox->messages_info = NULL;
+    g_ptr_array_free(mbox->msgids, TRUE);
+    mbox->msgids = NULL;
 }
 
 static void
@@ -2098,7 +2121,7 @@ get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
 }
 struct part_data { char *block; unsigned pos; ImapBody *body; };
 static void
-append_str(const char *buf, int buflen, void *arg)
+append_str(unsigned seqno, const char *buf, int buflen, void *arg)
 {
     struct part_data *dt = (struct part_data*)arg;
 
@@ -2295,6 +2318,65 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
         return GMIME_IS_PART(part->mime_part);
 
     return lbm_imap_get_msg_part(msg, part, FALSE, NULL);
+}
+
+/* libbalsa_mailbox_imap_duplicate_msgnos: identify messages with same
+   non-empty message-ids. An efficient implementation requires that a
+   list of msgids is maintained client side. The algorithm consists of
+   four phases:
+   a). identify x=largest UID in the message-id hash.
+   b). complete the message-id hash from (possibly new) envelopes.
+   c). check for any missing message-ids by fetching the header for 
+   UID>x.
+   d). identify duplicates in the message hash. When a duplicate 
+   is encountered, keep the one with lower MSGNO/UID.
+*/
+static GArray*
+libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
+{
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    unsigned first_to_fetch = 0;
+    GHashTable *dupes;
+    GArray     *res;
+    unsigned i;
+    /* a+b. */
+    for(i=mimap->msgids->len; i>=1; i--) {
+	ImapMessage *imsg;
+	gchar *msg_id = g_ptr_array_index(mimap->msgids, i-1);
+	if(msg_id) {
+	    if(!first_to_fetch)
+		first_to_fetch = i+1;
+	} else {
+	    imsg = imap_mbox_handle_get_msg(mimap->handle, i);
+	    if(imsg && imsg->envelope)
+		g_ptr_array_index(mimap->msgids, i-1) =
+		    g_strdup(imsg->envelope->message_id);
+	}
+    }
+    /* c. */
+    if(imap_mbox_complete_msgids(mimap->handle, mimap->msgids,
+				 first_to_fetch) != IMR_OK)
+	return NULL;
+    /* d. */
+    dupes = g_hash_table_new(g_str_hash, g_str_equal);
+    res   = g_array_new(FALSE, FALSE, sizeof(unsigned));
+    for(i=1; i<=mimap->msgids->len; i++) {
+	gchar *msg_id = g_ptr_array_index(mimap->msgids, i-1);
+	if(!msg_id) { /* g_warning("msgid not completed %u", i); */continue; }
+	if(!*msg_id) continue;
+	if(!g_hash_table_lookup(dupes, msg_id))
+	    g_hash_table_insert(dupes, msg_id, GINT_TO_POINTER(1));
+	else {
+	    g_array_append_val(res, i);
+	    printf("(IMAP) Found duplicate: %u\n", i);
+	}
+    }
+    g_hash_table_destroy(dupes);
+    printf("total elements: %d\n", res->len);
+    for(i=0; i<res->len; i++)
+	printf("%u ", GPOINTER_TO_UINT(g_array_index(res, unsigned, i)));
+    puts("");
+    return res;
 }
 
 /* libbalsa_mailbox_imap_add_message: 

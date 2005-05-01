@@ -1,3 +1,10 @@
+2005-05-01  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: implement remove-duplicates for imap too.
+	* libbalsa/imap/imap-commands.c: FetchBodyCb callbacks get seqno now.
+	* libbalsa/imap/imap-commands.h: add imap_mbox_complete_msgids.
+	* libbalsa/imap/imap-handle.c: handle arbitrary header fetches.
+
 2005-04-30 19:57  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_local.c,

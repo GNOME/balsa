@@ -899,7 +899,7 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
 }
 
 static void
-write_nstring(const char *str, int len, void *fl)
+write_nstring(unsigned seqno, const char *str, int len, void *fl)
 {
   fwrite(str, 1, len, (FILE*)fl);
 }
@@ -909,11 +909,18 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle, unsigned seqno,
                               FILE *fl)
 {
   char cmd[40];
+  ImapFetchBodyCb cb = handle->body_cb;
+  void          *arg = handle->body_arg;
+  ImapResponse rc;
+
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = write_nstring;
   handle->body_arg = fl;
   sprintf(cmd, "FETCH %u RFC822", seqno);
-  return imap_cmd_exec(handle, cmd);
+  rc = imap_cmd_exec(handle, cmd);
+  handle->body_cb  = cb;
+  handle->body_arg = arg;
+  return rc;
 }
 
 ImapResponse
@@ -921,11 +928,18 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
                               FILE *fl)
 {
   char cmd[40];
+  ImapFetchBodyCb cb = handle->body_cb;
+  void          *arg = handle->body_arg;
+  ImapResponse rc;
+
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = write_nstring;
   handle->body_arg = fl;
   sprintf(cmd, "UID FETCH %u RFC822", uid);
-  return imap_cmd_exec(handle, cmd);
+  rc = imap_cmd_exec(handle, cmd);
+  handle->body_cb  = cb;
+  handle->body_arg = arg;
+  return rc;
 }
 
 ImapResponse
@@ -936,6 +950,10 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
 {
   char cmd[160];
   ImapMessage *msg;
+  ImapFetchBodyCb fcb = handle->body_cb;
+  void          *farg = handle->body_arg;
+  ImapResponse rc;
+
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
@@ -963,7 +981,10 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
     snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s] BODY[%s])",
              seqno, prefix, section);
   }
-  return imap_cmd_exec(handle, cmd);
+  rc = imap_cmd_exec(handle, cmd);
+  handle->body_cb  = fcb;
+  handle->body_arg = farg;
+  return rc;
 }
 
 /* 6.4.6 STORE Command */
@@ -1290,4 +1311,50 @@ imap_mbox_filter_msgnos(ImapMboxHandle *handle, ImapSearchKey *filter,
 {
   return imap_search_exec(handle, filter, (ImapSearchCb)make_msgno_table,
                           msgnos);
+}
+
+/* imap_mbox_complete_msgids:
+   finds which msgnos are missing from the supplied table and
+   completes them if needed.
+*/
+static unsigned
+need_msgid(unsigned seqno, GPtrArray* msgids)
+{
+  return g_ptr_array_index(msgids, seqno-1) ? 0 : seqno;
+}
+
+static void
+msgid_cb(unsigned seqno, const char *buf, int buflen, void* arg)
+{
+  GPtrArray *arr = (GPtrArray*)arg;
+  g_return_if_fail(seqno>=1 && seqno<=arr->len);
+  g_ptr_array_index(arr, seqno-1) = g_strdup(buf);
+}
+
+ImapResponse
+imap_mbox_complete_msgids(ImapMboxHandle *h,
+			  GPtrArray *msgids,
+			  unsigned first_seqno_to_fetch)
+{
+  gchar *seq, *cmd;
+  ImapResponse rc = IMR_OK;
+  ImapFetchBodyCb cb;
+  void *arg;
+
+  IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
+  seq = coalesce_seq_range(first_seqno_to_fetch, msgids->len,
+			   (CoalesceFunc)need_msgid, msgids);
+  if(seq) {
+    cmd = g_strdup_printf("FETCH %s BODY.PEEK[HEADER.FIELDS (message-id)]",
+			  seq);
+    g_free(seq);
+
+    cb = h->body_cb;   h->body_cb = msgid_cb;
+    arg = h->body_arg; h->body_arg = msgids;
+    rc = imap_cmd_exec(h, cmd);
+    h->body_cb  = cb;
+    h->body_arg = arg;
+    g_free(cmd);
+  }
+  return rc;
 }

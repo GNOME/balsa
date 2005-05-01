@@ -96,7 +96,8 @@ ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
                                            unsigned seqno, FILE *fl);
 ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,
                                                unsigned uid, FILE *fl);
-typedef void (*ImapFetchBodyCb)(const char *buf, int buflen, void* arg);
+typedef void (*ImapFetchBodyCb)(unsigned seqno, const char *buf,
+				int buflen, void* arg);
 ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
                                          unsigned seqno, 
                                          const char *section,
@@ -124,5 +125,9 @@ ImapResponse imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key,
 ImapResponse imap_mbox_filter_msgnos(ImapMboxHandle * handle,
                                      ImapSearchKey *filter,
                                      GHashTable * msgnos);
+
+ImapResponse imap_mbox_complete_msgids(ImapMboxHandle *handle,
+				       GPtrArray *msgids,
+				       unsigned first_seqno_to_fetch);
 
 #endif /* __IMAP_COMMANDS_H__ */

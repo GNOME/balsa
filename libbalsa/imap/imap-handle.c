@@ -1920,14 +1920,20 @@ flags_tasklet(ImapMboxHandle *h, void *data)
     h->flags_cb(1, &seqno, h->flags_arg);
 }
 
+#define CREATE_IMSG_IF_NEEDED(h,seqno) \
+  if((h)->msg_cache[seqno-1] == NULL) \
+     (h)->msg_cache[(seqno)-1] = imap_message_new();
+
 static ImapResponse
 ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
 {
   unsigned i;
-  ImapMessage *msg = h->msg_cache[seqno-1];
+  ImapMessage *msg;
   ImapFlagCache *flags;
 
   if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
+  CREATE_IMSG_IF_NEEDED(h, seqno);
+  msg = h->msg_cache[seqno-1];
   msg->flags = 0;
 
   do {
@@ -2160,9 +2166,11 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
 static ImapResponse
 ir_msg_att_envelope(ImapMboxHandle *h, int c, unsigned seqno)
 {
-  ImapMessage *msg = h->msg_cache[seqno-1];
+  ImapMessage *msg;
   ImapEnvelope *env;
 
+  CREATE_IMSG_IF_NEEDED(h, seqno);
+  msg = h->msg_cache[seqno-1];
   if(msg->envelope) env = NULL;
   else {
     msg->envelope = env = imap_envelope_new();
@@ -2180,7 +2188,7 @@ ir_msg_att_rfc822(ImapMboxHandle *h, int c, unsigned seqno)
 {
   gchar *str = imap_get_nstring(h->sio);
   if(h->body_cb)
-    h->body_cb(str, strlen(str), h->body_arg);
+    h->body_cb(seqno, str, strlen(str), h->body_arg);
   g_free(str);
   return IMR_OK;
 }
@@ -2199,11 +2207,15 @@ static ImapResponse
 ir_msg_att_rfc822_size(ImapMboxHandle *h, int c, unsigned seqno)
 {
   char buf[12];
-  ImapMessage *msg = h->msg_cache[seqno-1];
-  
+  ImapMessage *msg;
+
   c = imap_get_atom(h->sio, buf, sizeof(buf));
 
   if(c!= -1) sio_ungetc(h->sio);
+
+  CREATE_IMSG_IF_NEEDED(h, seqno);
+  msg = h->msg_cache[seqno-1];
+  
   msg->rfc822size = atoi(buf);  
   return IMR_OK;
 }
@@ -2817,7 +2829,8 @@ ir_body (struct siobuf *sio, int c, ImapBody * body,
 
 /* read [section] and following string. FIXME: other kinds of body. */ 
 static ImapResponse
-ir_body_section(struct siobuf *sio, ImapFetchBodyCb body_cb, void *arg)
+ir_body_section(struct siobuf *sio, unsigned seqno,
+		ImapFetchBodyCb body_cb, void *arg)
 {
   char buf[80], *str;
   int c = imap_get_atom(sio, buf, sizeof(buf));
@@ -2825,37 +2838,47 @@ ir_body_section(struct siobuf *sio, ImapFetchBodyCb body_cb, void *arg)
   if(sio_getc(sio) != ' ') { puts("space expected"); return IMR_PROTOCOL;}
   str = imap_get_nstring(sio);
   if(body_cb)
-    body_cb(str, strlen(str), arg);
+    body_cb(seqno, str, strlen(str), arg);
   g_free(str);
   return IMR_OK;
 }
 
 static ImapResponse
-ir_body_header_fields(struct siobuf* sio, ImapMessage *msg)
+ir_body_header_fields(ImapMboxHandle *h, unsigned seqno)
 {
+  ImapMessage *msg;
   char *tmp;
   int c;
 
-  if(sio_getc(sio) != '(') return IMR_PROTOCOL;
+  if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
 
-  while ((tmp = imap_get_astring(sio, &c))) {
+  while ((tmp = imap_get_astring(h->sio, &c))) {
       /* nothing (yet?) */;
     g_free(tmp);
     if (c == ')')
       break;
   }
   if(c != ')') return IMR_PROTOCOL;
-  if(sio_getc(sio) != ']') return IMR_PROTOCOL;
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
-  g_free(msg->fetched_header_fields);
-  msg->fetched_header_fields = imap_get_nstring(sio);
+  if(sio_getc(h->sio) != ']') return IMR_PROTOCOL;
+  if(sio_getc(h->sio) != ' ') return IMR_PROTOCOL;
+
+  tmp = imap_get_nstring(h->sio);
+  if(h->body_cb) {
+    h->body_cb(seqno, tmp, strlen(tmp), h->body_arg);
+    g_free(tmp);
+  } else {
+    CREATE_IMSG_IF_NEEDED(h, seqno);
+    msg = h->msg_cache[seqno-1];
+    g_free(msg->fetched_header_fields);
+    msg->fetched_header_fields = tmp;
+  }
   return IMR_OK;
 }
 
 static ImapResponse
 ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
 {
-  ImapMessage *msg = h->msg_cache[seqno-1];
+  ImapMessage *msg;
   ImapResponse rc;
   char buf[19];	/* Just large enough to hold "HEADER.FIELDS.NOT". */
 
@@ -2864,24 +2887,26 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
     c = sio_getc (h->sio);
     sio_ungetc (h->sio);
     if(isdigit (c)) {
-      rc = ir_body_section(h->sio, h->body_cb, h->body_arg);
+      rc = ir_body_section(h->sio, seqno, h->body_cb, h->body_arg);
       break;
     }
     c = imap_get_atom(h->sio, buf, sizeof buf);
     if (c == ']' &&
         g_ascii_strcasecmp(buf, "HEADER") == 0) {
       sio_ungetc (h->sio); /* put the ']' back */
-      rc = ir_body_section(h->sio, h->body_cb, h->body_arg);
+      rc = ir_body_section(h->sio, seqno, h->body_cb, h->body_arg);
     } else {
       if (c == ' ' && 
           (g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0 ||
            g_ascii_strcasecmp(buf, "HEADER.FIELDS.NOT") == 0))
-        rc = ir_body_header_fields(h->sio, msg);
+        rc = ir_body_header_fields(h, seqno);
       else
         rc = IMR_PROTOCOL;
     }
     break;
   case ' ':
+    CREATE_IMSG_IF_NEEDED(h, seqno);
+    msg = h->msg_cache[seqno-1];
     rc = ir_body(h->sio, sio_getc(h->sio),
                  msg->body ? NULL : (msg->body = imap_body_new()), 
 		 IMB_NON_EXTENSIBLE);
@@ -2894,11 +2919,13 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
 static ImapResponse
 ir_msg_att_bodystructure(ImapMboxHandle *h, int c, unsigned seqno)
 {
-  ImapMessage *msg = h->msg_cache[seqno-1];
+  ImapMessage *msg;
   ImapResponse rc;
 
   switch(c) {
   case ' ':
+    CREATE_IMSG_IF_NEEDED(h, seqno);
+    msg = h->msg_cache[seqno-1];
     rc = ir_body(h->sio, sio_getc(h->sio),
                  msg->body ? NULL : (msg->body = imap_body_new()), 
 		 IMB_EXTENSIBLE);
@@ -2912,11 +2939,11 @@ static ImapResponse
 ir_msg_att_uid(ImapMboxHandle *h, int c, unsigned seqno)
 {
   char buf[12];
-  ImapMessage *msg = h->msg_cache[seqno-1];
   c = imap_get_atom(h->sio, buf, sizeof(buf));
 
   if(c!= -1) sio_ungetc(h->sio);
-  msg->uid = atoi(buf);
+  CREATE_IMSG_IF_NEEDED(h, seqno);
+  h->msg_cache[seqno-1]->uid = atoi(buf);
   return IMR_OK;
 }
 
@@ -2946,8 +2973,6 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
 
   if(seqno<1 || seqno > h->exists) return IMR_PROTOCOL;
   if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
-  if(h->msg_cache[seqno-1] == NULL)
-    h->msg_cache[seqno-1] = imap_message_new();
   do {
     for(i=0; (c = sio_getc(h->sio)) != -1; i++) {
       c = toupper(c);

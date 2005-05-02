@@ -2363,12 +2363,12 @@ libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
     for(i=1; i<=mimap->msgids->len; i++) {
 	gchar *msg_id = g_ptr_array_index(mimap->msgids, i-1);
 	if(!msg_id) { /* g_warning("msgid not completed %u", i); */continue; }
-	if(!*msg_id) continue;
+	if(!*msg_id || *msg_id == '\r' || *msg_id == '\n') continue;
 	if(!g_hash_table_lookup(dupes, msg_id))
 	    g_hash_table_insert(dupes, msg_id, GINT_TO_POINTER(1));
 	else {
 	    g_array_append_val(res, i);
-	    printf("(IMAP) Found duplicate: %u\n", i);
+	    printf("(IMAP) Found duplicate: %u for '%s'\n", i, msg_id);
 	}
     }
     g_hash_table_destroy(dupes);

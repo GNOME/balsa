@@ -1,3 +1,16 @@
+* Balsa-2.3.1 release. Release date 2005-05-02
+
+- build with GNOME-2.10, OSX, SuSE, gcc4.
+- omit self from cc addresses.
+- cache message counts between sessions.
+- allow sending messages through a pipe to an external program.
+- support for multiple esmtp servers.
+- allow using STATUS for checking IMAP mailboxes.
+- reimplement message duplicate deletion.
+- bugs fixed 123765, 153386, 168732, 168733, 168353, 171388, 170456,
+  170512, 171415, 172005, 172145.
+
+
 * Balsa-2.3.0 release. Release date 2005-02-23
 
 - require GTK+ >= 2.4.0

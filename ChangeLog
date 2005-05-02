@@ -1,5 +1,6 @@
 2005-05-02  Pawel Salek
 
+	* NEWS, configure.in: release 2.3.1.
 	* libbalsa/mailbox_imap.c: handle empty msg-id over imap right.
 
 2005-05-01  Pawel Salek

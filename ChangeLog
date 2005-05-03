@@ -1,3 +1,13 @@
+2005-05-03 10:35  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_maildir.c, libbalsa/mailbox_mbox.c,
+	libbalsa/mailbox_mh.c, libbalsa/message.c, libbalsa/message.h,
+	libbalsa/send.c, libbalsa/source-viewer.c, src/main-window.c:
+	replace message argumentof libbalsa_mailbox_get_message_stream with
+	msgno; implement and use libbalsa_message_stream(LibBalsaMessage *
+	message).
+
 2005-05-02 23:58  PeterB
 
 	* libinit_balsa/balsa-druid-page-user.c: fix bug 302782.

@@ -292,12 +292,11 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
     } else {
         ident = balsa_app.current_ident;
     }
-    g_free(ident->ia->name);
-    ident->ia->name = gtk_editable_get_chars(GTK_EDITABLE(user->name), 0, -1);
-    g_assert(ident->ia->type == INTERNET_ADDRESS_NAME);
-    g_free(ident->ia->value.addr);
-    ident->ia->value.addr =
-        gtk_editable_get_chars(GTK_EDITABLE(user->email), 0, -1);
+    internet_address_set_name(ident->ia,
+                              gtk_entry_get_text(GTK_ENTRY(user->name)));
+    internet_address_set_addr(ident->ia,
+                              gtk_entry_get_text(GTK_ENTRY(user->email)));
+
     /* outgoing mail */
 #if ENABLE_ESMTP
     if (balsa_app.smtp_servers == NULL) {

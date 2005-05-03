@@ -55,8 +55,7 @@ static void libbalsa_mailbox_mh_finalize(GObject * object);
 
 static GMimeStream *libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *
 							   mailbox,
-							   LibBalsaMessage *
-							   message);
+							   guint msgno);
 static void libbalsa_mailbox_mh_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox,
@@ -248,7 +247,7 @@ libbalsa_mailbox_mh_finalize(GObject * object)
 
 static GMimeStream *
 libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox * mailbox,
-				       LibBalsaMessage * message)
+				       guint msgno)
 {
     GMimeStream *stream;
     struct message_info *msg_info;
@@ -257,7 +256,7 @@ libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(MAILBOX_OPEN(mailbox), NULL);
 
     msg_info = lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
-					      message->msgno);
+					      msgno);
     tmp = MH_BASENAME(msg_info);
     stream = libbalsa_mailbox_local_get_message_stream(mailbox, tmp, NULL);
     g_free(tmp);
@@ -1085,7 +1084,7 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     }
     out_stream = g_mime_stream_fs_new(fd);
     {
-	GMimeStream *tmp = libbalsa_mailbox_get_message_stream( message->mailbox, message );
+	GMimeStream *tmp = libbalsa_message_stream(message);
 	GMimeFilter *crlffilter = 
 	    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
 				      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );

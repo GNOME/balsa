@@ -1793,8 +1793,7 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                       mqi->stream);
 	g_mime_stream_reset(mqi->stream);
     } else
-	mqi->stream = libbalsa_mailbox_get_message_stream(message->mailbox,
-                                                          message);
+	mqi->stream = libbalsa_message_stream(message);
     if (mqi->stream == NULL)
 	return LIBBALSA_MESSAGE_CREATE_ERROR;
   

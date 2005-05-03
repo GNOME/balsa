@@ -1552,26 +1552,14 @@ libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
 }
 
 GMimeStream *
-libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
-                                    LibBalsaMessage * message)
+libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox, guint msgno)
 {
-    GMimeStream *mime_stream;
-
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
-    g_return_val_if_fail(mailbox != NULL || message->mime_msg != NULL,
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+    g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
                          NULL);
 
-    if (mailbox)
-        mime_stream = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
-            get_message_stream(mailbox, message);
-    else {
-        mime_stream = g_mime_stream_mem_new();
-        g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
-                                      mime_stream);
-        g_mime_stream_reset(mime_stream);
-    }
-
-    return mime_stream;
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message_stream(mailbox,
+                                                                   msgno);
 }
 
 /* libbalsa_mailbox_change_msgs_flags() changes stored message flags
@@ -3267,7 +3255,7 @@ lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage * msg)
         GMimeStream *stream;
         GMimeParser *parser;
 
-        stream = libbalsa_mailbox_get_message_stream(mailbox, msg);
+        stream = libbalsa_mailbox_get_message_stream(mailbox, msg->msgno);
         parser = g_mime_parser_new_with_stream(stream);
         g_object_unref(stream);
         mime_msg = g_mime_parser_construct_message(parser);

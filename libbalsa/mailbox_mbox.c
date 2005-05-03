@@ -66,8 +66,7 @@ static void libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mailbox);
 
 static GMimeStream *libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *
 							     mailbox,
-							     LibBalsaMessage *
-							     message);
+							     guint msgno);
 static void libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox,
@@ -320,19 +319,18 @@ lbm_mbox_seek_to_message(LibBalsaMailboxMbox * mbox, off_t offset)
 
 static GMimeStream *
 libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *mailbox,
-                                         LibBalsaMessage *message)
+                                         guint msgno)
 {
 	GMimeStream *stream = NULL;
 	struct message_info *msg_info;
 	LibBalsaMailboxMbox *mbox;
 
 	g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
-	g_return_val_if_fail (LIBBALSA_IS_MESSAGE(message), NULL);
 
 	mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
 
 	msg_info = &g_array_index(mbox->messages_info,
-				  struct message_info, message->msgno - 1);
+				  struct message_info, msgno - 1);
 	if (!lbm_mbox_seek_to_message(mbox, msg_info->start))
 	    return NULL;
 	stream = g_mime_stream_substream(mbox->gmime_stream,
@@ -784,13 +782,13 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
 
 static GMimeMessage *
 lbm_mbox_get_mime_message(LibBalsaMailbox * mailbox,
-			  LibBalsaMessage * message)
+			  guint msgno)
 {
     GMimeStream *stream;
     GMimeParser *parser;
     GMimeMessage *mime_message;
 
-    stream = libbalsa_mailbox_mbox_get_message_stream(mailbox, message);
+    stream = libbalsa_mailbox_mbox_get_message_stream(mailbox, msgno);
     if (!stream)
 	return NULL;
     parser = g_mime_parser_new_with_stream(stream);
@@ -1415,7 +1413,7 @@ libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
 					      LibBalsaFetchFlag flags)
 {
     if (!message->mime_msg)
-	message->mime_msg = lbm_mbox_get_mime_message(mailbox, message);
+	message->mime_msg = lbm_mbox_get_mime_message(mailbox, message->msgno);
 
     return LIBBALSA_MAILBOX_CLASS(parent_class)->
         fetch_message_structure(mailbox, message, flags);
@@ -1641,7 +1639,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
     mbox_lock ( mailbox, dest );
 
-    orig = libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    orig = libbalsa_message_stream(message);
     if (!orig) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,

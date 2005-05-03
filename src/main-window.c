@@ -3266,8 +3266,7 @@ pipe_message_cb(GtkWidget * widget, gpointer data)
     } else {
         char buf[4096];
         ssize_t l;
-        GMimeStream *stream = 
-            libbalsa_mailbox_get_message_stream(message->mailbox, message);
+        GMimeStream *stream = libbalsa_message_stream(message);
         g_return_if_fail(stream);
 
         while( (l=g_mime_stream_read(stream, buf, sizeof(buf))) >0) 

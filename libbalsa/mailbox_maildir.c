@@ -63,8 +63,7 @@ static void libbalsa_mailbox_maildir_load_config(LibBalsaMailbox * mailbox,
 
 static GMimeStream *libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox *
 							   mailbox,
-							   LibBalsaMessage *
-							   message);
+							   guint msgno);
 static void libbalsa_mailbox_maildir_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox,
@@ -312,13 +311,13 @@ libbalsa_mailbox_maildir_load_config(LibBalsaMailbox * mailbox,
 
 static GMimeStream *
 libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox * mailbox,
-					    LibBalsaMessage * message)
+					    guint msgno)
 {
     struct message_info *msg_info;
 
     g_return_val_if_fail(MAILBOX_OPEN(mailbox), NULL);
 
-    msg_info = message_info_from_msgno(mailbox, message->msgno);
+    msg_info = message_info_from_msgno(mailbox, msgno);
     if (!msg_info)
 	return NULL;
 
@@ -907,8 +906,7 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     out_stream = g_mime_stream_fs_new(fd);
 
-    tmp_stream =
-        libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    tmp_stream = libbalsa_message_stream(message);
     if (!tmp_stream) {
         g_object_unref(out_stream);
         unlink(tmp);

@@ -102,8 +102,7 @@ static void libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox,
                                         gboolean expunge);
 static GMimeStream *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 							     mailbox,
-							     LibBalsaMessage *
-							     message);
+							     guint msgno);
 static void libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox);
 
 static void
@@ -188,9 +187,10 @@ static struct message_info *message_info_from_msgno(
     return msg_info;
 }
 
+#define IMAP_MSGNO_UID(mailbox, msgno) \
+        (mi_get_imsg(LIBBALSA_MAILBOX_IMAP(mailbox), (msgno))->uid)
 #define IMAP_MESSAGE_UID(msg) \
-        (mi_get_imsg(LIBBALSA_MAILBOX_IMAP((msg)->mailbox),\
-                 (msg)->msgno)->uid)
+        IMAP_MSGNO_UID((msg)->mailbox, (msg)->msgno)
 
 #define IMAP_MAILBOX_UID_VALIDITY(mailbox) (LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity)
 
@@ -1040,9 +1040,9 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 }
 
 static FILE*
-get_cache_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *msg)
+get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
 {
-    unsigned uid = IMAP_MESSAGE_UID(msg);
+    unsigned uid = IMAP_MSGNO_UID(mailbox, msgno);
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *stream;
     gchar **pair, *path;
@@ -1057,10 +1057,12 @@ get_cache_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *msg)
 
         libbalsa_assure_balsa_dir();
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+#if 0
         if(msg->length>(signed)SizeMsgThreshold)
             libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
                                  _("Downloading %ld kB"),
                                  msg->length/1024);
+#endif
         cache = fopen(path, "wb");
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache));
@@ -1080,12 +1082,11 @@ get_cache_stream(LibBalsaMailbox *mailbox, LibBalsaMessage *msg)
 */
 static GMimeStream *
 libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
-					 LibBalsaMessage * message)
+					 guint msgno)
 {
     FILE *stream;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
 
     libbalsa_lock_mailbox(mailbox);
     /* this may get called when the mailbox is being opened ie,
@@ -1095,7 +1096,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
         return NULL;
     }
 
-    stream = get_cache_stream(mailbox, message);
+    stream = get_cache_stream(mailbox, msgno);
     libbalsa_unlock_mailbox(mailbox);
 
     return g_mime_stream_file_new(stream);
@@ -1986,7 +1987,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
         /* we could optimize this part a little bit: we do not need to
          * keep reopening the stream. */
         GMimeStream *stream = 
-            libbalsa_mailbox_imap_get_message_stream(mailbox, message);
+            libbalsa_mailbox_imap_get_message_stream(mailbox, message->msgno);
         if(stream)
             g_object_unref(stream);
     }
@@ -2429,7 +2430,7 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     if ( LIBBALSA_MESSAGE_IS_REPLIED(message) )
 	IMSG_FLAG_SET(imap_flags,IMSGF_ANSWERED);
 
-    stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    stream = libbalsa_message_stream(message);
     tmpstream = g_mime_stream_filter_new_with_stream(stream);
     g_object_unref(stream);
 

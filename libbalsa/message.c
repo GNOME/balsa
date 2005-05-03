@@ -447,7 +447,7 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
     if( (outfile = fopen(filename, "w")) == NULL) return FALSE;
     g_return_val_if_fail(outfile, FALSE);
 
-    msg_stream = libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    msg_stream = libbalsa_message_stream(message);
     if (msg_stream == NULL)
 	return FALSE;
     out_stream = g_mime_stream_file_new(outfile);
@@ -1149,8 +1149,7 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
     guchar lookahead;
     gboolean ret = FALSE;
 
-    gmime_stream =
-	libbalsa_mailbox_get_message_stream(message->mailbox, message);
+    gmime_stream = libbalsa_message_stream(message);
     if (!gmime_stream)
 	return;
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
@@ -1192,4 +1191,27 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
     }
     g_object_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
+}
+
+GMimeStream *
+libbalsa_message_stream(LibBalsaMessage * message)
+{
+    LibBalsaMailbox *mailbox;
+    GMimeStream *mime_stream;
+
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
+    mailbox = message->mailbox;
+    g_return_val_if_fail(mailbox != NULL || message->mime_msg != NULL,
+                         NULL);
+
+    if (mailbox)
+        return libbalsa_mailbox_get_message_stream(mailbox,
+                                                   message->msgno);
+
+    mime_stream = g_mime_stream_mem_new();
+    g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
+                                  mime_stream);
+    g_mime_stream_reset(mime_stream);
+
+    return mime_stream;
 }

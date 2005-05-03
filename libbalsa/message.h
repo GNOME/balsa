@@ -349,4 +349,5 @@ void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 						 const gchar *str);
 void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
 						  const gchar *str);
+GMimeStream *libbalsa_message_stream(LibBalsaMessage * message);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

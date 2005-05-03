@@ -263,7 +263,7 @@ struct _LibBalsaMailboxClass {
     gboolean (*get_message_part) (LibBalsaMessage *message,
 				  LibBalsaMessageBody *part);
     GMimeStream *(*get_message_stream) (LibBalsaMailbox * mailbox,
-					LibBalsaMessage * message);
+                                        guint msgno);
 
     void (*check) (LibBalsaMailbox * mailbox);
 
@@ -362,8 +362,8 @@ void libbalsa_mailbox_release_message(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_set_msg_headers(LibBalsaMailbox * mailbox,
 				      LibBalsaMessage * message);
 
-/** libbalsa_mailbox_get_message_stream() returns an allocated block containing
-    selected, single part of the message.
+/** libbalsa_mailbox_get_message_part() ensures that a selected, single
+    part of the message is loaded.
 */
 gboolean libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
 					   LibBalsaMessageBody *part);
@@ -372,7 +372,7 @@ gboolean libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
     with full RFC822 text of the message.
 */
 GMimeStream *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
-						 LibBalsaMessage * message);
+						 guint msgno);
 
 
 /** libbalsa_mailbox_sync_storage() asks the mailbox to synchronise

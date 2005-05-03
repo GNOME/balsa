@@ -1,3 +1,7 @@
+2005-05-02 23:58  PeterB
+
+	* libinit_balsa/balsa-druid-page-user.c: fix bug 302782.
+
 2005-05-02  Pawel Salek
 
 	* NEWS, configure.in: release 2.3.1.

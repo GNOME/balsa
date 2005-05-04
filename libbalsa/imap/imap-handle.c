@@ -348,6 +348,9 @@ imap_handle_disconnect(ImapMboxHandle *h)
   if(h->sio) {
     sio_detach(h->sio); h->sio = NULL;
   }
+  if(h->iochannel) {
+    g_io_channel_unref(h->iochannel); h->iochannel = NULL;
+  }
   close(h->sd);
   h->state = IMHS_DISCONNECTED;
 }

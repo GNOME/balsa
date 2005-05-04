@@ -1,10 +1,13 @@
-2005-05-03 10:35  PeterB
+2005-05-03 22:43  PeterB
 
+	* src/: balsa-app.h, balsa-index.c, balsa-index.h, main-window.c,
+	save-restore.c: add a drop-down list of most recently used pipe
+	commands; pipe all selected messages through command.
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
 	libbalsa/mailbox_maildir.c, libbalsa/mailbox_mbox.c,
 	libbalsa/mailbox_mh.c, libbalsa/message.c, libbalsa/message.h,
 	libbalsa/send.c, libbalsa/source-viewer.c, src/main-window.c:
-	replace message argumentof libbalsa_mailbox_get_message_stream with
+	replace message argument of libbalsa_mailbox_get_message_stream with
 	msgno; implement and use libbalsa_message_stream(LibBalsaMessage *
 	message).
 

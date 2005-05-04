@@ -165,6 +165,9 @@ extern "C" {
     guint balsa_index_previous_msgno(BalsaIndex * index,
                                      guint current_msgno);
 
+    /* Pipe messages */
+    void balsa_index_pipe(BalsaIndex * index);
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

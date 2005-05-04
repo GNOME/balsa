@@ -3232,49 +3232,9 @@ forward_message_default_cb(GtkWidget * widget, gpointer data)
 static void
 pipe_message_cb(GtkWidget * widget, gpointer data)
 {
-    FILE *fprog;
-    GtkWidget *l, *e;
-    GtkWidget *d;
-    LibBalsaMessage *message = BALSA_WINDOW(data)->current_message;
-
-    g_return_if_fail(message);
-    d = gtk_dialog_new_with_buttons
-        (_("Pipe message through a program"), GTK_WINDOW(data),
-         GTK_DIALOG_MODAL,
-         _("_Run"),        GTK_RESPONSE_OK,
-         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-         NULL);
-
-    gtk_container_add(GTK_CONTAINER (GTK_DIALOG(d)->vbox),
-                      l = gtk_label_new(_("Specify the program to run:")));
-    gtk_container_add(GTK_CONTAINER (GTK_DIALOG(d)->vbox),
-                      e = gtk_entry_new());
-    gtk_entry_set_text(GTK_ENTRY(e), balsa_app.pipe_cmd 
-                       ? balsa_app.pipe_cmd : "sa-learn --spam");
-    gtk_widget_show(l); gtk_widget_show(e);
-    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_OK);
-
-    if(gtk_dialog_run(GTK_DIALOG(d)) == GTK_RESPONSE_OK) {
-        g_free(balsa_app.pipe_cmd);
-        balsa_app.pipe_cmd = g_strdup(gtk_entry_get_text(GTK_ENTRY(e)));
-    }
-    gtk_widget_destroy(d);
-    if(!balsa_app.pipe_cmd) return;
-
-    if( (fprog=popen(balsa_app.pipe_cmd, "w")) == 0) {
-        fprintf(stderr, "popen failed\n");
-    } else {
-        char buf[4096];
-        ssize_t l;
-        GMimeStream *stream = libbalsa_message_stream(message);
-        g_return_if_fail(stream);
-
-        while( (l=g_mime_stream_read(stream, buf, sizeof(buf))) >0) 
-            fwrite(buf, 1, l, fprog);
-	g_object_unref(stream);
-        if(pclose(fprog) == -1)
-            fprintf(stderr, "pclose failed\n");
-    }
+    balsa_index_pipe(BALSA_INDEX
+                     (balsa_window_find_current_index
+                      (BALSA_WINDOW(data))));
 }
 
 static void

@@ -1763,6 +1763,12 @@ mru_menu_cb(gchar * url, BalsaIndex * index)
 /*
  * bndx_popup_menu_create: create the popup menu at init time
  */
+static void
+bndx_pipe_message(GtkWidget *widget, gpointer user_data)
+{
+    balsa_index_pipe(BALSA_INDEX(user_data));
+}
+
 static GtkWidget *
 bndx_popup_menu_create(BalsaIndex * index)
 {
@@ -1781,6 +1787,8 @@ bndx_popup_menu_create(BalsaIndex * index)
                 GTK_SIGNAL_FUNC(balsa_message_forward_attached)}, {
         BALSA_PIXMAP_FORWARD, N_("Forward _Inline..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_inline)}, {
+        NULL,                 N_("_Pipe through..."),
+                GTK_SIGNAL_FUNC(bndx_pipe_message)}, {
         BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."),
                 GTK_SIGNAL_FUNC(bndx_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
@@ -2288,4 +2296,105 @@ balsa_index_previous_msgno(BalsaIndex * index, guint current_msgno)
 {
     return bndx_next_msgno(index, current_msgno, index->search_iter,
                            BNDX_SEARCH_DIRECTION_PREV);
+}
+
+static void
+bndx_pipe(LibBalsaMailbox * mailbox, guint msgno, const gchar * pipe_cmd)
+{
+    FILE *fprog;
+
+    if ((fprog = popen(pipe_cmd, "w")) == 0) {
+        fprintf(stderr, "popen failed\n");
+    } else {
+        char buf[4096];
+        ssize_t l;
+        GMimeStream *stream =
+            libbalsa_mailbox_get_message_stream(mailbox, msgno);
+        g_return_if_fail(stream);
+
+        while ((l = g_mime_stream_read(stream, buf, sizeof(buf))) > 0)
+            fwrite(buf, 1, l, fprog);
+        g_object_unref(stream);
+        if (pclose(fprog) == -1)
+            fprintf(stderr, "pclose failed\n");
+    }
+}
+
+#define HIG_PADDING 6
+
+void
+balsa_index_pipe(BalsaIndex * index)
+{
+    GtkWidget *label, *entry;
+    GtkWidget *dialog;
+    GtkWidget *vbox;
+    GList *list;
+    gchar *pipe_cmd = NULL;
+    guint i;
+
+    dialog =
+        gtk_dialog_new_with_buttons(_("Pipe message through a program"),
+                                    GTK_WINDOW(balsa_app.main_window),
+                                    GTK_DIALOG_MODAL,
+                                    _("_Run"), GTK_RESPONSE_OK,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    NULL);
+
+    vbox = GTK_DIALOG(dialog)->vbox;
+    gtk_box_set_spacing(GTK_BOX(vbox), HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(vbox), label =
+                      gtk_label_new(_("Specify the program to run:")));
+
+    entry = gtk_combo_box_entry_new_text();
+    for (list = balsa_app.pipe_cmds; list; list = list->next)
+        gtk_combo_box_append_text(GTK_COMBO_BOX(entry), list->data);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(entry), 0);
+    gtk_container_add(GTK_CONTAINER(vbox), entry);
+
+    gtk_widget_show(label);
+    gtk_widget_show(entry);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+        gint active = gtk_combo_box_get_active(GTK_COMBO_BOX(entry));
+        GList *active_cmd = g_list_nth(balsa_app.pipe_cmds, active);
+
+        pipe_cmd =
+            gtk_editable_get_chars(GTK_EDITABLE(GTK_BIN(entry)->child), 0,
+                                   -1);
+        if (active < 0) {
+            /* User changed the entry. */
+            if (!g_list_find_custom
+                (balsa_app.pipe_cmds, pipe_cmd, (GCompareFunc) strcmp))
+                balsa_app.pipe_cmds =
+                    g_list_prepend(balsa_app.pipe_cmds,
+                                   g_strdup(pipe_cmd));
+        } else if (active > 0) {
+            balsa_app.pipe_cmds =
+                g_list_remove_link(balsa_app.pipe_cmds, active_cmd);
+            balsa_app.pipe_cmds =
+                g_list_concat(active_cmd, balsa_app.pipe_cmds);
+        }
+    }
+    gtk_widget_destroy(dialog);
+
+    if (pipe_cmd) {
+        LibBalsaMailbox *mailbox;
+        GArray *msgnos;
+
+        mailbox = index->mailbox_node->mailbox;
+        msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
+        g_array_append_vals(msgnos, index->selected->data,
+                            index->selected->len);
+        libbalsa_mailbox_register_msgnos(mailbox, msgnos);
+        for (i = 0; i < msgnos->len; i++) {
+            guint msgno = g_array_index(msgnos, guint, i);
+            if (msgno)
+                bndx_pipe(mailbox, msgno, pipe_cmd);
+        }
+        libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
+        g_array_free(msgnos, TRUE);
+        g_free(pipe_cmd);
+    }
 }

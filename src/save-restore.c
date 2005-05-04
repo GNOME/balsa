@@ -60,8 +60,8 @@ static gchar *config_get_unused_group(const gchar * group);
 
 static void save_color(gchar * key, GdkColor * color);
 static void load_color(gchar * key, GdkColor * color);
-static void save_mru(GList *mru);
-static void load_mru(GList **mru);
+static void save_mru(GList  *mru, const gchar * group);
+static void load_mru(GList **mru, const gchar * group);
 
 static void config_address_books_load(void);
 static void config_address_books_save(void);
@@ -1083,19 +1083,18 @@ config_global_load(void)
     balsa_app.attach_dir = libbalsa_conf_get_string("AttachDir");
     g_free(balsa_app.save_dir);
     balsa_app.save_dir = libbalsa_conf_get_string("SavePartDir");
-    g_free(balsa_app.pipe_cmd);
-    balsa_app.pipe_cmd = libbalsa_conf_get_string("PipeCmd");
     libbalsa_conf_pop_group();
 
 	/* Folder MRU */
-    libbalsa_conf_push_group("FolderMRU");
-    load_mru(&balsa_app.folder_mru);
-    libbalsa_conf_pop_group();
+    load_mru(&balsa_app.folder_mru, "FolderMRU");
 
 	/* FCC MRU */
-    libbalsa_conf_push_group("FccMRU");
-    load_mru(&balsa_app.fcc_mru);
-    libbalsa_conf_pop_group();
+    load_mru(&balsa_app.fcc_mru, "FccMRU");
+
+    /* Pipe commands */
+    load_mru(&balsa_app.pipe_cmds, "PipeCommands");
+    if (!balsa_app.pipe_cmds)
+        balsa_app.pipe_cmds = g_list_prepend(NULL, g_strdup("sa --learn"));
 
     /* We load identities at the end because they may refer to SMTP
      * servers. This is also critical when handling damaged config
@@ -1380,18 +1379,11 @@ config_save(void)
 	libbalsa_conf_set_string("AttachDir", balsa_app.attach_dir);
     if(balsa_app.save_dir)
 	libbalsa_conf_set_string("SavePartDir", balsa_app.save_dir);
-    if(balsa_app.pipe_cmd)
-	libbalsa_conf_set_string("PipeCmd", balsa_app.pipe_cmd);
     libbalsa_conf_pop_group();
 
-	
-    libbalsa_conf_push_group("FolderMRU");
-    save_mru(balsa_app.folder_mru);
-    libbalsa_conf_pop_group();
-
-    libbalsa_conf_push_group("FccMRU");
-    save_mru(balsa_app.fcc_mru);
-    libbalsa_conf_pop_group();
+    save_mru(balsa_app.folder_mru, "FolderMRU");
+    save_mru(balsa_app.fcc_mru,    "FccMRU");
+    save_mru(balsa_app.pipe_cmds,  "PipeCommands");
 
     libbalsa_conf_sync();
     return TRUE;
@@ -1929,11 +1921,12 @@ load_color(gchar * key, GdkColor * color)
 }
 
 static void
-load_mru(GList **mru)
+load_mru(GList **mru, const gchar * group)
 {
     int count, i;
     char tmpkey[32];
     
+    libbalsa_conf_push_group(group);
     count=d_get_gint("MRUCount", 0);
     for(i=0;i<count;i++) {
         gchar *val;
@@ -1941,21 +1934,24 @@ load_mru(GList **mru)
         if( (val = libbalsa_conf_get_string(tmpkey)) != NULL )
             (*mru)=g_list_append((*mru), val);
     }
+    libbalsa_conf_pop_group();
 }
 
 static void
-save_mru(GList * mru)
+save_mru(GList * mru, const gchar * group)
 {
     int i;
     char tmpkey[32];
     GList *ltmp;
 
+    libbalsa_conf_push_group(group);
     for (ltmp = mru, i = 0; ltmp; ltmp = ltmp->next, i++) {
         sprintf(tmpkey, "MRU%d", i + 1);
         libbalsa_conf_set_string(tmpkey, (gchar *) (ltmp->data));
     }
 
     libbalsa_conf_set_int("MRUCount", i);
+    libbalsa_conf_pop_group();
 }
 
 /* check_for_old_sigs:

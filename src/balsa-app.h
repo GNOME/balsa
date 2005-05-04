@@ -238,7 +238,6 @@ extern struct BalsaApplication {
     /* file paths */
     gchar *attach_dir;
     gchar *save_dir;
-    gchar *pipe_cmd;
 
     /* Column width settings */
     gint index_num_width;
@@ -393,8 +392,11 @@ extern struct BalsaApplication {
     gboolean has_smime;
 #endif 
 
+    /* Most recently used lists */
     GList *folder_mru;
     GList *fcc_mru;
+    GList *pipe_cmds;
+
     gboolean expunge_on_close;
 
     /* use as default email client for GNOME */

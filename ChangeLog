@@ -1,3 +1,8 @@
+2005-05-06 18:52  PeterB
+
+	* src/: filter-edit-callbacks.c, filter-edit-dialog.c,
+	filter-edit.h: manage button sensitivity better.
+
 2005-05-06  Pawel Salek
 
 	* src/mailbox-conf.c: do not attempt opening closed mailboxes just

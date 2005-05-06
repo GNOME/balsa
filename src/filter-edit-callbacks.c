@@ -2015,3 +2015,13 @@ fe_date_sample(void)
 
     return label;
 }                               /* end fe_date_sample */
+
+#if GTK_CHECK_VERSION(2, 6, 0)
+/* Callback for the sound file-chooser-button's dialog. */
+void
+fe_sound_response(GtkDialog * dialog, gint response)
+{
+    if (response == GTK_RESPONSE_ACCEPT)
+        set_button_sensitivities(TRUE);
+}
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */

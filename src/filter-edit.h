@@ -94,5 +94,10 @@ void fe_button_toggled(GtkWidget * widget, gpointer data);
 void fe_action_changed(GtkWidget * widget, gpointer data);
 void fe_enable_right_page(gboolean enabled);
 
+#if GTK_CHECK_VERSION(2, 6, 0)
+/* Callback for the sound file-chooser-button's dialog. */
+void fe_sound_response(GtkDialog * dialog, gint response);
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
+
 void fe_add_new_user_header(const gchar *);
 #endif /*__FILTER_EDIT_H__ */

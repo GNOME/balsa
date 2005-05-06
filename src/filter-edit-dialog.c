@@ -333,6 +333,9 @@ build_action_page(GtkWindow * window)
 {
     GtkWidget *page, *frame, *table;
     GtkWidget *box;
+#if GTK_CHECK_VERSION(2, 6, 0)
+    GtkWidget *dialog;
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 
     page = gtk_vbox_new(TRUE, 5);
 
@@ -354,9 +357,18 @@ build_action_page(GtkWindow * window)
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
 
 #if GTK_CHECK_VERSION(2, 6, 0)
-    fe_sound_entry =
-        gtk_file_chooser_button_new(_("Use Sound..."),
-                                    GTK_FILE_CHOOSER_ACTION_OPEN);
+    dialog =
+        gtk_file_chooser_dialog_new(_("Use Sound..."), NULL,
+                                    GTK_FILE_CHOOSER_ACTION_OPEN,
+                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                    NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+                                    GTK_RESPONSE_ACCEPT);
+    gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+                                            GTK_RESPONSE_ACCEPT,
+                                            GTK_RESPONSE_CANCEL, -1);
+    fe_sound_entry = gtk_file_chooser_button_new_with_dialog(dialog);
 #else /* GTK_CHECK_VERSION(2, 6, 0) */
     fe_sound_entry =
 	gnome_file_entry_new("filter_sounds", _("Use Sound..."));
@@ -369,8 +381,8 @@ build_action_page(GtkWindow * window)
     g_signal_connect(G_OBJECT(fe_sound_button), "toggled",
                      G_CALLBACK(fe_button_toggled), fe_sound_entry);
 #if GTK_CHECK_VERSION(2, 6, 0)
-    g_signal_connect(G_OBJECT(fe_sound_entry), "selection-changed",
-                     G_CALLBACK(fe_action_changed), NULL);
+    g_signal_connect(G_OBJECT(dialog), "response",
+                     G_CALLBACK(fe_sound_response), NULL);
 #else /* GTK_CHECK_VERSION(2, 6, 0) */
     g_signal_connect(G_OBJECT
                      (gnome_file_entry_gtk_entry

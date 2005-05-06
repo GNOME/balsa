@@ -1094,7 +1094,8 @@ config_global_load(void)
     /* Pipe commands */
     load_mru(&balsa_app.pipe_cmds, "PipeCommands");
     if (!balsa_app.pipe_cmds)
-        balsa_app.pipe_cmds = g_list_prepend(NULL, g_strdup("sa --learn"));
+        balsa_app.pipe_cmds = g_list_prepend(NULL, 
+                                             g_strdup("sa-learn --spam"));
 
     /* We load identities at the end because they may refer to SMTP
      * servers. This is also critical when handling damaged config

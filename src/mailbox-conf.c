@@ -1445,10 +1445,18 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
     if (!changed || !libbalsa_mailbox_get_open(mailbox))
 	return;
 
-    /* Redraw the mailbox; we temporarily increase its open_ref to keep
-     * the backend open. */
-    libbalsa_mailbox_open(mailbox, NULL);
-    balsa_mblist_close_mailbox(mailbox);
-    balsa_mblist_open_mailbox(mailbox);
-    libbalsa_mailbox_close(mailbox, FALSE);
+    /* Redraw the mailbox if it is open already - we MUST NOT attempt
+     * opening closed mailboxes for both performance and security
+     * reasons. Performance is obvious. Security is relevant here too:
+     * the user might have realized that the password must be sent
+     * encrypted and clicked on "Use SSL". we should not attempt to
+     * open the connection with old settings requesting unencrypted
+     * connection. We temporarily increase its open_ref to keep the
+     * backend open. */
+    if(MAILBOX_OPEN(mailbox)) {
+        libbalsa_mailbox_open(mailbox, NULL);
+        balsa_mblist_close_mailbox(mailbox);
+        balsa_mblist_open_mailbox(mailbox);
+        libbalsa_mailbox_close(mailbox, FALSE);
+    }
 }

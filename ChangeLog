@@ -1,5 +1,8 @@
-2005-05-06 18:52  PeterB
+2005-05-06 23:19  PeterB
 
+	* src/save-restore.c: slightly more 2.0.x compatibility.
+	* libbalsa/mailbox_mbox.c: use a separate pthread_mutex_t for
+	lbm_mbox_mime_stream_lock().
 	* src/: filter-edit-callbacks.c, filter-edit-dialog.c,
 	filter-edit.h: manage button sensitivity better.
 

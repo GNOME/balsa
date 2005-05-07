@@ -251,37 +251,38 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
  * Paranoia lock: must be held while repositioning mbox->gmime_stream,
  * to ensure that we can seek and read or write without interruption.
  */
-static pthread_cond_t mbox_cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t mbox_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  mbox_cond  = PTHREAD_COND_INITIALIZER;
 
 static void
 lbm_mbox_mime_stream_lock(LibBalsaMailboxMbox * mbox)
 {
     pthread_t thread_id;
 
-    pthread_mutex_lock(&mailbox_lock);
+    pthread_mutex_lock(&mbox_mutex);
 
     thread_id = pthread_self();
     if (mbox->thread_id != thread_id) {
 	while (mbox->lock)
-	    pthread_cond_wait(&mbox_cond, &mailbox_lock);
+	    pthread_cond_wait(&mbox_cond, &mbox_mutex);
 	mbox->thread_id = thread_id;
     }
 
     mbox->lock++;
 
-    pthread_mutex_unlock(&mailbox_lock);
+    pthread_mutex_unlock(&mbox_mutex);
 }
 
 static void
 lbm_mbox_mime_stream_unlock(LibBalsaMailboxMbox * mbox)
 {
-    pthread_mutex_lock(&mailbox_lock);
+    pthread_mutex_lock(&mbox_mutex);
 
     if (!--mbox->lock)
         pthread_cond_broadcast(&mbox_cond);
     /* No need to clear mbox->thread_id. */
 
-    pthread_mutex_unlock(&mailbox_lock);
+    pthread_mutex_unlock(&mbox_mutex);
 }
 #else /* BALSA_USE_THREADS */
 #define lbm_mbox_mime_stream_lock(m)

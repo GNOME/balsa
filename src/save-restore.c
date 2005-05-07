@@ -1812,8 +1812,13 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
         ConditionMatchType cmt =
             op == FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
         fil->condition = libbalsa_condition_new_2_0(key, cmt);
-        if (fil->condition)
+        if (fil->condition) {
+            if (fil->action > FILTER_TRASH)
+                /* Some 2.0.x versions had a new action code which
+                 * changed the value of FILTER_TRASH. */
+                fil->action = FILTER_TRASH;
             ++save;
+        }
     }
     if (!fil->condition) {
         g_idle_add((GSourceFunc) config_warning_idle,

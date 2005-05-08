@@ -107,7 +107,7 @@ static LibBalsaConf lbc_conf_priv;
 static GSList *lbc_groups;
 
 #define BALSA_KEY_FILE "config"
-#define DEBUG TRUE
+#define DEBUG FALSE
 #define LBC_KEY_FILE(priv) \
     ((priv) ? lbc_conf_priv.key_file : lbc_conf.key_file)
 #define LBC_CHANGED(priv) \

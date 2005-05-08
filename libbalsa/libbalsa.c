@@ -682,7 +682,7 @@ static pthread_cond_t mailbox_cond = PTHREAD_COND_INITIALIZER;
 /* Lock/unlock a mailbox; no argument checking--we'll assume the caller
  * took care of that. 
  */
-#define LIBBALSA_DEBUG_THREADS TRUE
+#define LIBBALSA_DEBUG_THREADS FALSE
 void
 libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {

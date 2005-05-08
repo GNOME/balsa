@@ -1,3 +1,7 @@
+* Balsa-2.3.2 release. Release date 2005-05-08
+
+- fix bugs 302782, 303421, 303422.
+
 * Balsa-2.3.1 release. Release date 2005-05-02
 
 - build with GNOME-2.10, OSX, SuSE, gcc4.

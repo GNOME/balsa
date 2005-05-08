@@ -967,7 +967,7 @@ GList *
 balsa_mblist_find_all_unread_mboxes(void)
 {
     GList *res = NULL;
-    GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist);
+    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(balsa_app.mblist));
 
     gtk_tree_model_foreach(model, bmbl_find_all_unread_mboxes_func, &res);
 

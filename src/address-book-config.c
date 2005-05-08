@@ -76,7 +76,7 @@ static GtkWidget *create_gpe_dialog(AddressBookConfig * abc);
 static void help_button_cb(AddressBookConfig * abc);
 static gboolean handle_close(AddressBookConfig * abc);
 static gboolean bad_path(gchar * path, GtkWindow * window, gint type);
-static void create_book(AddressBookConfig * abc);
+static gboolean create_book(AddressBookConfig * abc);
 static void modify_book(AddressBookConfig * abc);
 
 /*
@@ -514,7 +514,7 @@ handle_close(AddressBookConfig * abc)
     }
 
     if (abc->address_book == NULL)
-        create_book(abc);
+        return create_book(abc);
     else
         modify_book(abc);
 
@@ -534,11 +534,11 @@ bad_path(gchar * path, GtkWindow * window, gint type)
     GtkWidget *ask;
     gint clicked_button;
 
-#if GTK_CHECK_VERSION(2, 6, 0)
     if (path) {
         g_free(path);
         return FALSE;
     }
+#if GTK_CHECK_VERSION(2, 6, 0)
     ask = gtk_message_dialog_new(window,
 				 GTK_DIALOG_MODAL|
 				 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -576,7 +576,7 @@ bad_path(gchar * path, GtkWindow * window, gint type)
     return clicked_button == GTK_RESPONSE_YES;
 }
 
-static void
+static gboolean
 create_book(AddressBookConfig * abc)
 {
     LibBalsaAddressBook *address_book = NULL;
@@ -590,22 +590,14 @@ create_book(AddressBookConfig * abc)
         g_free(path);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
 #if GTK_CHECK_VERSION(2, 6, 0)
-        gchar *load =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-                                           (abc->ab_specific.externq.load));
-        gchar *save =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-                                           (abc->ab_specific.externq.save));
+#define GET_FILENAME(chooser) \
+  gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser))
 #else /* GTK_CHECK_VERSION(2, 6, 0) */
-        gchar *load =
-            gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
-                                           (abc->ab_specific.externq.load),
-                                           FALSE);
-        gchar *save =
-            gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
-                                           (abc->ab_specific.externq.save),
-                                           FALSE);
+#define GET_FILENAME(entry) \
+  gnome_file_entry_get_full_path(GNOME_FILE_ENTRY(entry), FALSE)
 #endif /* GTK_CHECK_VERSION(2, 6, 0) */
+        gchar *load = GET_FILENAME(abc->ab_specific.externq.load);
+        gchar *save = GET_FILENAME(abc->ab_specific.externq.save);
         if (load != NULL && save != NULL)
             address_book =
                 libbalsa_address_book_externq_new(name, load, save);
@@ -645,6 +637,7 @@ create_book(AddressBookConfig * abc)
                                          (abc->expand_aliases_button));
         abc->callback(address_book, TRUE);
     }
+    return address_book != NULL;
 }
 
 static void

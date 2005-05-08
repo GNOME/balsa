@@ -202,7 +202,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	*frame, *label;
     GList *ab_list;
     LibBalsaAddressBook *address_book;
-    guint default_offset = 0;
+    guint default_offset = 0, offset = 0;
 
     ab->current_address_book = NULL;
     gtk_window_set_title(GTK_WINDOW(ab), _("Address Book"));
@@ -231,22 +231,21 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     ab->current_address_book = balsa_app.default_address_book;
 
-    ab_list = balsa_app.address_book_list;
-    while (ab_list) {
+    for(ab_list = balsa_app.address_book_list;
+        ab_list;
+	ab_list = g_list_next(ab_list)) {
 	address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
 	if (ab->current_address_book == NULL)
 	    ab->current_address_book = address_book;
 	
 	gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
                                   address_book->name);
-	if (address_book == balsa_app.default_address_book)
-	    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
-                                     default_offset);
-	
-	default_offset++;
-	
-	ab_list = g_list_next(ab_list);
+	if (address_book == ab->current_address_book)
+            default_offset = offset;	
+	offset++;
     }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
+                             default_offset);
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(balsa_ab_window_menu_changed), ab);
     if (balsa_app.address_book_list->next)

@@ -150,12 +150,6 @@ balsa_handle_automation_options() {
            printf("Unread: %ld Unsent: %ld\n", (long)unread, (long)unsent);
        }
 
-       if (cmd_get_stats) {
-           CORBA_long unread = 0, unsent = 0;
-	   GNOME_Balsa_Application_getStats (app, &unread, &unsent, &ev);
-           printf("Unread: %ld Unsent: %ld\n", (long)unread, (long)unsent);
-       }
-
        if (cmd_line_open_mailboxes)
 	   GNOME_Balsa_Application_openMailbox (app,
 					       cmd_line_open_mailboxes,
@@ -187,12 +181,13 @@ balsa_handle_automation_options() {
 
 	   GNOME_Balsa_Composer_sendMessage(server,
 					    "",
-					    opt_compose_email,
+					    opt_compose_email ? opt_compose_email : "",
 					    "",
 					    "",
 					    attachs,
 					    0, 
 					    &ev );
+           CORBA_exception_free( &ev );
        }
 
        exit(0);
@@ -391,8 +386,7 @@ initial_open_unread_mailboxes()
     if (gl) {
         for (i = g_list_first(gl); i; i = g_list_next(i)) {
             printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
-            if(0)
-                balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+            balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
         }
         g_list_free(gl);
     }

@@ -1,3 +1,15 @@
+2005-05-07  Pawel Salek
+
+	* balsa.1.in: merge patch in DBTS #269787, bugzilla 303422.
+	* libbalsa/address-book-extern.c: fix DBTS#306556, bugzilla 303421.
+	* libbalsa/address-book-gpe.c: remove duplicates from the returned list.
+	* src/ab-window.c: select initially displayed list in the combo.
+	* src/address-book-config.c: fix bad_path() for gtk < 2.6.0.
+	* src/pref-manager.c: Display type of extern address book.
+	* src/balsa-app.c: do not crash when non-existing mailbox specified with -o.
+	* src/balsa-mblist.c: fix -u command line option.
+	* src/main.c: ditto + fix -a when passing it via bonobo.
+
 2005-05-06 23:19  PeterB
 
 	* src/save-restore.c: slightly more 2.0.x compatibility.

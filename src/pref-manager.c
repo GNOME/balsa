@@ -1153,6 +1153,8 @@ update_address_books(void)
             type = "VCARD";
         else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book))
             type = "LDIF";
+        else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERN(address_book))
+            type = "Extern";
 #if ENABLE_LDAP
         else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book))
             type = "LDAP";

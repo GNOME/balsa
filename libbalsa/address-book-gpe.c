@@ -526,33 +526,25 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     struct gpe_completion_closure *gc = arg;
     LibBalsaAddress * a= libbalsa_address_new();
     InternetAddress *ia;
+    GList *l;
     guint uid = atoi(argv[0]);
-    gchar *tag = argv[1];
 
     /* follow read_entry_data. FIXME: error reporting */
-    if(strstr(tag, "EMAIL") != NULL) { /* be extra cautious - return just one address */
-        sqlite_exec_printf
-            (gc->db,
-             "select tag,value from contacts where urn=%d"
-             " and (upper(tag)='FAMILY_NAME' or upper(tag)='GIVEN_NAME' or "
-             "upper(tag)='NAME' or "
-             "(upper(tag)='%q' and value LIKE '%q%%'))",
-             gpe_read_attr, a, NULL, uid, tag, gc->prefix);
-    } else {
-        sqlite_exec_printf(gc->db,
-                            "select tag,value from contacts where urn=%d",
-                            gpe_read_attr, a, NULL, uid);
-    }
+    sqlite_exec_printf(gc->db,
+                       "select tag,value from contacts where urn=%d",
+                       gpe_read_attr, a, NULL, uid);
     if(!a->address_list) { /* entry without address: ignore! */
         g_object_unref(a);
         return 0;
     }
     if(!a->full_name)
         a->full_name = create_name(a->first_name, a->last_name);
-    ia = internet_address_new_name(a->full_name, a->address_list->data);
+    for(l=a->address_list; l; l = l->next) {
+        ia = internet_address_new_name(a->full_name, l->data);
+        gc->res = g_list_prepend(gc->res, ia);
+    }
     if(gc->new_prefix && !*gc->new_prefix)
         *gc->new_prefix = libbalsa_address_to_gchar(a, 0);
-    gc->res = g_list_prepend(gc->res, ia);
     g_object_unref(G_OBJECT(a));
     return 0;
 }
@@ -563,7 +555,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 					  gchar ** new_prefix)
 {
     static const char *query = 
-        "select distinct urn,tag from contacts where "
+        "select distinct urn from contacts where "
         "(upper(tag)='FAMILY_NAME' or upper(tag)='GIVEN_NAME' or "
         "upper(tag)='NAME' or "
         "upper(tag)='WORK.EMAIL' or upper(tag)='HOME.EMAIL') "

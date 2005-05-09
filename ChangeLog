@@ -1,3 +1,7 @@
+2005-05-09 08:32  PeterB
+
+	* src/balsa-index.c: non-modal pipe-message dialog.
+
 2005-05-07  Pawel Salek
 
 	* libbalsa/libbalsa{,-conf}.c: disable debugging output.

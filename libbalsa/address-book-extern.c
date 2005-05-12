@@ -391,7 +391,7 @@ libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
     if(!parse_externq_file(ex, (gchar *)prefix, lbe_expand_cb, &res))
         return NULL;
 	
-    g_list_reverse(res);
+    res = g_list_reverse(res);
 
     if(res != NULL && new_prefix)
         *new_prefix = internet_address_to_string(res->data, FALSE);

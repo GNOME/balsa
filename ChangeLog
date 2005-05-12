@@ -1,5 +1,7 @@
-2005-05-12 14:32  PeterB
+2005-05-12 18:08  PeterB
 
+	* libbalsa/mailbox_mbox.c: use light-weight parser at get-message
+	time.
 	* src/save-restore.c: really remove unused mailbox views.
 	* libbalsa/address-book-extern.c: fix last part of bug 155382.
 

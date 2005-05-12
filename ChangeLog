@@ -1,6 +1,7 @@
-2005-05-12 12:09  PeterB
+2005-05-12 14:32  PeterB
 
-	* libbalsa/address-book-extern.c: fix part of bug 155382.
+	* src/save-restore.c: really remove unused mailbox views.
+	* libbalsa/address-book-extern.c: fix last part of bug 155382.
 
 2005-05-09 08:32  PeterB
 

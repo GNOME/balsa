@@ -1716,7 +1716,7 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
     gchar *url_enc;
     gchar *prefix;
 
-    if (!view || view->in_sync)
+    if (!view || (view->in_sync && view->used))
 	return;
     view->in_sync = TRUE;
 
@@ -1724,6 +1724,8 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
     prefix = g_strconcat(VIEW_BY_URL_SECTION_PREFIX, url_enc, NULL);
     g_free(url_enc);
 
+    /* Remove the view--it will be recreated if any member needs to be
+     * saved. */
     libbalsa_conf_remove_group(prefix);
     libbalsa_conf_push_group(prefix);
     g_free(prefix);

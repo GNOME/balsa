@@ -1382,26 +1382,12 @@ libbalsa_mailbox_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     msg_info = &g_array_index(mbox->messages_info,
 			      struct message_info, msgno-1);
     if(!msg_info->message) {
-	GMimeParser *gmime_parser;
-	GMimeMessage *mime_message;
-
-	gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
-	g_mime_parser_set_scan_from(gmime_parser, TRUE);
-	g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
-
-	lbm_mbox_mime_stream_lock(mbox);
-	g_mime_stream_seek(mbox->gmime_stream, msg_info->start,
-			   GMIME_STREAM_SEEK_SET);
-	mime_message = g_mime_parser_construct_message(gmime_parser);
-	lbm_mbox_mime_stream_unlock(mbox);
-
-	msg_info->message = lbm_mbox_message_new(mime_message, msg_info);
+	msg_info->message = libbalsa_message_new();
 	msg_info->message->mailbox = mailbox;
 	msg_info->message->msgno   = msgno;
 	msg_info->message->flags   =
 	    msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
-	g_object_unref(mime_message);
-	g_object_unref(gmime_parser);
+        libbalsa_message_load_envelope(msg_info->message);
 	g_object_weak_ref(G_OBJECT(msg_info->message), mbox_msg_unref,
 			  mbox);
     } else g_object_ref(msg_info->message);

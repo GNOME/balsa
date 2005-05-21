@@ -1,3 +1,8 @@
+2005-05-21 09:41  PeterB
+
+	* src/save-restore.c: save message counts only when they are
+	time-stamped.
+
 2005-05-20 23:56  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h,

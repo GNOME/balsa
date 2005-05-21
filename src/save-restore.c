@@ -1766,7 +1766,7 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 #endif
     /* To avoid accumulation of config entries with only message counts,
      * we save them only if used in this session. */
-    if (view->used) {
+    if (view->used && view->mtime != 0) {
         gboolean save_mtime = FALSE;
         if (view->unread     != libbalsa_mailbox_get_unread(NULL)) {
             libbalsa_conf_set_int("Unread",  view->unread);

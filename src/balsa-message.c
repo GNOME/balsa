@@ -1170,9 +1170,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     gboolean has_focus;
     GtkTreeIter iter;
     BalsaPartInfo *info;
-#ifdef HAVE_GPGME
-    LibBalsaMsgProtectState prot_state;
-#endif
 
     g_return_val_if_fail(bm != NULL, FALSE);
 
@@ -1222,13 +1219,14 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     balsa_message_perform_crypto(bm->message, 
 				 libbalsa_mailbox_get_crypto_mode(bm->message->mailbox),
 				 FALSE, 1);
-
-    /* calculate the signature summary state */
-    prot_state = 
-        balsa_message_scan_signatures(message->body_list, message);
-    /* update the icon if necessary */
-    if (message->prot_state != prot_state)
-        message->prot_state = prot_state;
+    /* calculate the signature summary state if not set earlier */
+    if(message->prot_state == LIBBALSA_MSG_PROTECT_NONE) {
+        LibBalsaMsgProtectState prot_state =
+            balsa_message_scan_signatures(message->body_list, message);
+        /* update the icon if necessary */
+        if (message->prot_state != prot_state)
+            message->prot_state = prot_state;
+    }
 #endif
 
     libbalsa_mailbox_msgno_update_attach(bm->message->mailbox,

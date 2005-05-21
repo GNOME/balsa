@@ -2187,6 +2187,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         ImapFetchBodyOptions ifbo;
         ImapMessage *im;
         ImapResponse rc;
+        LibBalsaMessageBody *parent;
 
         libbalsa_lock_mailbox(msg->mailbox);
         mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
@@ -2205,11 +2206,10 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
          * which has no headers. In this case, we have to fake them.
          * We could and probably should dump there first the headers 
          * that we have already fetched... */
-        if(strcmp(section, "1") == 0)
+        parent = get_parent(msg->body_list, part, NULL);
+        if(parent == NULL)
             ifbo = IMFB_NONE;
         else {
-            LibBalsaMessageBody *parent =
-                get_parent(msg->body_list, part, NULL);
             if(parent->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE)
                 ifbo = IMFB_HEADER;
             else

@@ -1687,6 +1687,10 @@ config_view_load(const gchar * key, const gchar * value, gpointer data)
         tmp = libbalsa_conf_get_int_with_default("Unread", &def);
         if (!def)
             view->unread = tmp;
+
+        tmp = libbalsa_conf_get_int_with_default("ModTime", &def);
+        if (!def)
+            view->mtime = tmp;
     }
 
     libbalsa_conf_pop_group();
@@ -1751,23 +1755,30 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
     /* initial value for show is UNSET, but that's always replaced, 
      * and we want it to default to FROM. */
     if (view->show           != LB_MAILBOX_SHOW_FROM)
-	libbalsa_conf_set_int("Show",	    view->show);
+	libbalsa_conf_set_int("Show",        view->show);
     if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
 	libbalsa_conf_set_bool("Exposed",    view->exposed);
     if (view->open           != libbalsa_mailbox_get_open(NULL))
-	libbalsa_conf_set_bool("Open",	    view->open);
+	libbalsa_conf_set_bool("Open",       view->open);
 #ifdef HAVE_GPGME
     if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))
 	libbalsa_conf_set_int("CryptoMode",  view->gpg_chk_mode);
 #endif
     /* To avoid accumulation of config entries with only message counts,
      * we save them only if used in this session. */
-    if (view->used 
-        && view->unread      != libbalsa_mailbox_get_unread(NULL))
-	libbalsa_conf_set_int("Unread",      view->unread);
-    if (view->used
-        && view->total       != libbalsa_mailbox_get_total(NULL))
-	libbalsa_conf_set_int("Total",       view->total);
+    if (view->used) {
+        gboolean save_mtime = FALSE;
+        if (view->unread     != libbalsa_mailbox_get_unread(NULL)) {
+            libbalsa_conf_set_int("Unread",  view->unread);
+            save_mtime = TRUE;
+        }
+        if (view->total      != libbalsa_mailbox_get_total(NULL)) {
+            libbalsa_conf_set_int("Total",   view->total);
+            save_mtime = TRUE;
+        }
+        if (save_mtime)
+            libbalsa_conf_set_int("ModTime", view->mtime);
+    }
 
     libbalsa_conf_pop_group();
 }

@@ -1802,7 +1802,8 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     LB_MAILBOX_CHK_CRYPT_MAYBE, /* gpg_chk_mode         */
 #endif
     -1,                         /* total messages	*/
-    -1                          /* unread messages	*/
+    -1,                         /* unread messages	*/
+    0                           /* mod time             */
 };
 
 LibBalsaMailboxView *
@@ -2008,8 +2009,7 @@ libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread)
 
     if (!view->frozen && view->unread != unread) {
 	view->unread = unread;
-	if (mailbox)
-	    view->in_sync = 0;
+        view->in_sync = 0;
     }
 }
 
@@ -2025,8 +2025,23 @@ libbalsa_mailbox_set_total(LibBalsaMailbox * mailbox, gint total)
 
     if (!view->frozen && view->total != total) {
 	view->total = total;
-	if (mailbox)
-	    view->in_sync = 0;
+        view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_mtime(LibBalsaMailbox * mailbox, time_t mtime)
+{
+    LibBalsaMailboxView *view;
+
+    /* Changing the default is not allowed. */
+    g_return_if_fail(mailbox != NULL);
+
+    view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->mtime != mtime) {
+	view->mtime = mtime;
+        view->in_sync = 0;
     }
 }
 
@@ -2134,6 +2149,13 @@ libbalsa_mailbox_get_total(LibBalsaMailbox * mailbox)
 {
     return (mailbox && mailbox->view) ?
 	mailbox->view->total : libbalsa_mailbox_view_default.total;
+}
+
+time_t
+libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->mtime : libbalsa_mailbox_view_default.mtime;
 }
 
 /* End of get methods. */

@@ -109,7 +109,6 @@ struct _LibBalsaMailboxMbox {
     GArray* messages_info;
     GMimeStream *gmime_stream;
     gint size;
-    time_t mtime;
 #ifdef BALSA_USE_THREADS
     /* For locking the GMimeStream: */
     pthread_t thread_id;
@@ -554,7 +553,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     }
 
     mbox->size = st.st_size;
-    mbox->mtime = st.st_mtime;
+    libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     mbox->gmime_stream = gmime_stream;
 
     mbox->messages_info =
@@ -668,6 +667,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     const gchar *path;
     LibBalsaMailboxMbox *mbox;
     guint msgno;
+    time_t mtime;
 
     g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
@@ -680,16 +680,17 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	return;
     }
 
-    if (mbox->mtime == 0) {
+    mtime = libbalsa_mailbox_get_mtime(mailbox);
+    if (mtime == 0) {
 	/* First check--just cache the mtime and size. */
-	mbox->mtime = st.st_mtime;
+        libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 	mbox->size = st.st_size;
 	return;
     }
-    if (st.st_mtime == mbox->mtime && st.st_size == mbox->size)
+    if (st.st_mtime == mtime && st.st_size == mbox->size)
 	return;
 
-    mbox->mtime = st.st_mtime;
+    libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 
     if (!MAILBOX_OPEN(mailbox)) {
 	libbalsa_mailbox_set_unread_messages_flag(mailbox,
@@ -1130,7 +1131,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	if (fstat(GMIME_STREAM_FS(mbox_stream)->fd, &st))
 	    g_warning("can't stat \"%s\"", path);
 	else
-	    mbox->mtime = st.st_mtime;
+            libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 	mbox_unlock(mailbox, mbox_stream);
 	return TRUE;
     }

@@ -476,14 +476,8 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
 				  NULL, (GDestroyNotify)free_message_info);
     mdir->msgno_2_msg_info = g_ptr_array_new();
 
-    mdir->mtime_cur = 0;
-    mdir->mtime_new = 0;
-    if (stat(mdir->curdir, &st) != -1) {
-	mdir->mtime_cur = st.st_mtime;
-    }
-    if (stat(mdir->newdir, &st) != -1) {
-	mdir->mtime_new = st.st_mtime;
-    }
+    if (stat(mdir->tmpdir, &st) != -1)
+	libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 
     mailbox->readonly = 
 	!(access(mdir->curdir, W_OK) == 0 &&
@@ -530,38 +524,29 @@ lbm_maildir_check(const gchar * subdir)
 static void
 libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 {
-    struct stat st_cur, st_new;
-    int modified = 0;
+    struct stat st;
     LibBalsaMailboxMaildir *mdir;
     guint renumber, msgno;
     struct message_info *msg_info;
     const gchar *path;
+    time_t mtime;
 
     g_assert(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
 
-    if (stat(mdir->curdir, &st_cur) == -1)
+    if (stat(mdir->tmpdir, &st) == -1)
 	return;
-    if (mdir->mtime_cur == 0)
+
+    if ((mtime = libbalsa_mailbox_get_mtime(mailbox)) == 0) {
 	/* First check--just cache the mtime. */
-	mdir->mtime_cur = st_cur.st_mtime;
-    else if (st_cur.st_mtime > mdir->mtime_cur)
-	modified = 1;
-
-    if (stat(mdir->newdir, &st_new) == -1)
-	return;
-    if (mdir->mtime_new == 0)
-	/* First check--just cache the mtime. */
-	mdir->mtime_new = st_new.st_mtime;
-    else if (st_new.st_mtime > mdir->mtime_new)
-	modified = 1;
-
-    if (!modified)
+	libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
+        return;
+    }
+    if (st.st_mtime <= mtime)
 	return;
 
-    mdir->mtime_cur = st_cur.st_mtime;
-    mdir->mtime_new = st_new.st_mtime;
+    libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 
     if (!MAILBOX_OPEN(mailbox)) {
 	libbalsa_mailbox_set_unread_messages_flag(mailbox,
@@ -815,13 +800,11 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    msg_info->message->msgno = msgno;
     }
 
-    if (changes) {              /* Record mtime of dirs. */
+    if (changes) {              /* Record mtime of dir. */
         struct stat st;
 
-        stat(mdir->curdir, &st);
-        mdir->mtime_cur = st.st_mtime;
-        stat(mdir->newdir, &st);
-        mdir->mtime_new = st.st_mtime;
+        if (stat(mdir->tmpdir, &st) == 0)
+            libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     }
 
     return TRUE;
@@ -898,6 +881,7 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     struct message_info *msg_info;
     gint retval;
     LibBalsaMailboxMaildir *mdir;
+    time_t mtime;
 
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
@@ -954,11 +938,11 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     g_free(tmp);
 
     mdir = (LibBalsaMailboxMaildir *) mailbox;
-    if (mdir->mtime_new)
+    if ((mtime = libbalsa_mailbox_get_mtime(mailbox)) != 0)
 	/* If we checked or synced the mailbox less than 1 second ago,
 	 * the cached modification time could be the same as the new
 	 * modification time, so we'll invalidate the cached time. */
-	--mdir->mtime_new;
+	libbalsa_mailbox_set_mtime(mailbox, --mtime);
 
     return retval;
 }

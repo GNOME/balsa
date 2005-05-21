@@ -44,8 +44,6 @@ struct _LibBalsaMailboxMaildir {
 
     GHashTable* messages_info;
     GPtrArray* msgno_2_msg_info;
-    time_t mtime_cur;
-    time_t mtime_new;
     gchar *curdir;
     gchar *newdir;
     gchar *tmpdir;

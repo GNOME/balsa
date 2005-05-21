@@ -496,7 +496,7 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox, GError **err)
 	return FALSE;
     }
 
-    mh->mtime = st.st_mtime;
+    libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 
     mh->messages_info =
 	g_hash_table_new_full(NULL, NULL, NULL,
@@ -590,6 +590,7 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     int modified = 0;
     guint renumber, msgno;
     struct message_info *msg_info;
+    time_t mtime;
 
     if (stat(path, &st) == -1)
 	return;
@@ -612,10 +613,11 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 	    modified = 1;
     }
 
-    if (mh->mtime == 0)
+    mtime = libbalsa_mailbox_get_mtime(mailbox);
+    if (mtime == 0)
 	/* First check--just cache the mtime. */
-	mh->mtime = st.st_mtime;
-    else if (st.st_mtime > mh->mtime)
+        libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
+    else if (st.st_mtime > mtime)
 	modified = 1;
 
     if (mh->mtime_sequences == 0)
@@ -627,7 +629,7 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     if (!modified)
 	return;
 
-    mh->mtime = st.st_mtime;
+    libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     mh->mtime_sequences = st_sequences.st_mtime;
 
     if (!MAILBOX_OPEN(mailbox)) {
@@ -955,7 +957,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     /* Record the mtimes; we'll just use the current time--someone else
      * might have changed something since we did, despite the file
      * locking, but we'll find out eventually. */
-    mh->mtime = mh->mtime_sequences = time(NULL);
+    libbalsa_mailbox_set_mtime(mailbox, mh->mtime_sequences = time(NULL));
 
     libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
     return retval;

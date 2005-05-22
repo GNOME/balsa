@@ -1,3 +1,12 @@
+2005-05-22 17:11  PeterB
+
+	* libbalsa/: Makefile.am, body.c, gmime-part-rfc2440.c, html.c,
+	mailbox_imap.c, mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c,
+	message.c, mime-stream-shared.c, mime-stream-shared.h, rfc3156.c,
+	send.c: implement LibBalsaMimeStreamShared, a subclass of
+	GMimeStreamFs with a lock; use it in LibBalsaMailboxMbox in place
+	of the fine-grained mailbox lock.
+
 2005-05-21  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: get properly signed parts.

@@ -43,6 +43,7 @@
 #include "misc.h"
 /* for mx_lock_file and mx_unlock_file */
 #include "mailbackend.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct message_info {
@@ -109,11 +110,6 @@ struct _LibBalsaMailboxMbox {
     GArray* messages_info;
     GMimeStream *gmime_stream;
     gint size;
-#ifdef BALSA_USE_THREADS
-    /* For locking the GMimeStream: */
-    pthread_t thread_id;
-    guint lock;
-#endif /* BALSA_USE_THREADS */
 };
 
 GType libbalsa_mailbox_mbox_get_type(void)
@@ -187,10 +183,6 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
 static void
 libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mbox)
 {
-#ifdef BALSA_USE_THREADS
-    mbox->thread_id = 0;
-    mbox->lock = 0;
-#endif /* BALSA_USE_THREADS */
 }
 
 gint
@@ -245,49 +237,6 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
     return G_OBJECT(mailbox);
 }
 
-#ifdef BALSA_USE_THREADS
-/* 
- * Paranoia lock: must be held while repositioning mbox->gmime_stream,
- * to ensure that we can seek and read or write without interruption.
- */
-static pthread_mutex_t mbox_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  mbox_cond  = PTHREAD_COND_INITIALIZER;
-
-static void
-lbm_mbox_mime_stream_lock(LibBalsaMailboxMbox * mbox)
-{
-    pthread_t thread_id;
-
-    pthread_mutex_lock(&mbox_mutex);
-
-    thread_id = pthread_self();
-    if (mbox->thread_id != thread_id) {
-	while (mbox->lock)
-	    pthread_cond_wait(&mbox_cond, &mbox_mutex);
-	mbox->thread_id = thread_id;
-    }
-
-    mbox->lock++;
-
-    pthread_mutex_unlock(&mbox_mutex);
-}
-
-static void
-lbm_mbox_mime_stream_unlock(LibBalsaMailboxMbox * mbox)
-{
-    pthread_mutex_lock(&mbox_mutex);
-
-    if (!--mbox->lock)
-        pthread_cond_broadcast(&mbox_cond);
-    /* No need to clear mbox->thread_id. */
-
-    pthread_mutex_unlock(&mbox_mutex);
-}
-#else /* BALSA_USE_THREADS */
-#define lbm_mbox_mime_stream_lock(m)
-#define lbm_mbox_mime_stream_unlock(m)
-#endif /* BALSA_USE_THREADS */
-
 /* Helper: seek to offset, and return TRUE if the seek succeeds and a
  * message begins there. */
 static gboolean
@@ -310,9 +259,9 @@ lbm_mbox_seek_to_message(LibBalsaMailboxMbox * mbox, off_t offset)
 {
     gboolean retval;
     
-    lbm_mbox_mime_stream_lock(mbox);
+    libbalsa_mime_stream_shared_lock(mbox->gmime_stream);
     retval = lbm_mbox_stream_seek_to_message(mbox->gmime_stream, offset);
-    lbm_mbox_mime_stream_unlock(mbox);
+    libbalsa_mime_stream_shared_unlock(mbox->gmime_stream);
 
     return retval;
 }
@@ -356,22 +305,14 @@ libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox)
 static int mbox_lock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 {
     const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
-    int fd;
-    if (stream)
-	fd = GMIME_STREAM_FS(stream)->fd;
-    else
-	fd = GMIME_STREAM_FS(LIBBALSA_MAILBOX_MBOX(mailbox)->gmime_stream)->fd;
+    int fd = GMIME_STREAM_FS(stream)->fd;
     return libbalsa_lock_file(path, fd, FALSE, TRUE, 1);
 }
 
 static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 {
     const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
-    int fd;
-    if (stream)
-	fd = GMIME_STREAM_FS(stream)->fd;
-    else
-	fd = GMIME_STREAM_FS(LIBBALSA_MAILBOX_MBOX(mailbox)->gmime_stream)->fd;
+    int fd = GMIME_STREAM_FS(stream)->fd;
     libbalsa_unlock_file(path, fd, 1);
 }
 
@@ -534,10 +475,12 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 		    _("Cannot open mailbox."));
 	return FALSE;
     }
-    gmime_stream = g_mime_stream_fs_new(fd);
+    gmime_stream = libbalsa_mime_stream_shared_new(fd);
 
+    libbalsa_mime_stream_shared_lock(gmime_stream);
     if (st.st_size > 0
         && !lbm_mbox_stream_seek_to_message(gmime_stream, 0)) {
+        libbalsa_mime_stream_shared_unlock(gmime_stream);
         g_object_unref(gmime_stream);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_OPEN_ERROR,
@@ -546,6 +489,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     }
 
     if (mbox_lock(mailbox, gmime_stream)) {
+        libbalsa_mime_stream_shared_unlock(gmime_stream);
 	g_object_unref(gmime_stream);
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
 		    _("Cannot lock mailbox."));
@@ -566,7 +510,8 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = time(NULL) - t0;
     LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_cnt  = 1;
 
-    mbox_unlock(mailbox, NULL);
+    mbox_unlock(mailbox, gmime_stream);
+    libbalsa_mime_stream_shared_unlock(gmime_stream);
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
 	    "LibBalsaMailboxMbox", mailbox->name, mailbox->open_ref);
@@ -666,6 +611,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     struct stat st;
     const gchar *path;
     LibBalsaMailboxMbox *mbox;
+    GMimeStream *mbox_stream;
     guint msgno;
     time_t mtime;
 
@@ -701,7 +647,8 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	return;
     }
 
-    if (mbox_lock(mailbox, NULL) != 0)
+    mbox_stream = mbox->gmime_stream;
+    if (mbox_lock(mailbox, mbox_stream) != 0)
 	/* we couldn't lock the mailbox, but nothing serious happened:
 	 * probably the new mail arrived: no reason to wait till we can
 	 * parse it: we'll get it on the next pass
@@ -718,13 +665,13 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
      * parse_mailbox assumes that the stream is positioned at the first
      * message to be parsed.
      */
-    lbm_mbox_mime_stream_lock(mbox);
+    libbalsa_mime_stream_shared_lock(mbox_stream);
     while ((msgno = mbox->messages_info->len) > 0) {
 	off_t offset;
         struct message_info *msg_info =
             &g_array_index(mbox->messages_info, struct message_info,
                            msgno - 1);
-        if (lbm_mbox_seek_to_message(mbox, msg_info->end))
+        if (lbm_mbox_stream_seek_to_message(mbox_stream, msg_info->end))
 	    /* A message begins at the end of this one, so it must(?) be
 	     * in its original position--start parsing here. */
             break;
@@ -739,21 +686,21 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	 * gdk lock to emit gtk signals; we save and restore the current
 	 * stream position, in case someone changes it while we're not
 	 * holding the lock. */
-	offset = g_mime_stream_tell(mbox->gmime_stream);
-	lbm_mbox_mime_stream_unlock(mbox);
+        offset = g_mime_stream_tell(mbox_stream);
+        libbalsa_mime_stream_shared_unlock(mbox_stream);
         libbalsa_mailbox_local_msgno_removed(mailbox, msgno);
-	lbm_mbox_mime_stream_lock(mbox);
-        g_mime_stream_seek(mbox->gmime_stream, offset, GMIME_STREAM_SEEK_SET);
+        libbalsa_mime_stream_shared_lock(mbox_stream);
+        g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET);
 
         free_message_info(msg_info);
         g_array_remove_index(mbox->messages_info, msgno - 1);
     }
     if(msgno == 0)
-        g_mime_stream_seek(mbox->gmime_stream, 0, GMIME_STREAM_SEEK_SET);
+        g_mime_stream_seek(mbox_stream, 0, GMIME_STREAM_SEEK_SET);
     parse_mailbox(mbox);
-    mbox->size = g_mime_stream_tell(mbox->gmime_stream);
-    lbm_mbox_mime_stream_unlock(mbox);
-    mbox_unlock(mailbox, NULL);
+    mbox->size = g_mime_stream_tell(mbox_stream);
+    libbalsa_mime_stream_shared_unlock(mbox_stream);
+    mbox_unlock(mailbox, mbox_stream);
     libbalsa_mailbox_local_load_messages(mailbox, msgno);
 }
 
@@ -793,11 +740,13 @@ lbm_mbox_get_mime_message(LibBalsaMailbox * mailbox,
     stream = libbalsa_mailbox_mbox_get_message_stream(mailbox, msgno);
     if (!stream)
 	return NULL;
+    libbalsa_mime_stream_shared_lock(stream);
     parser = g_mime_parser_new_with_stream(stream);
-    g_object_unref(stream);
 
     mime_message = g_mime_parser_construct_message(parser);
     g_object_unref(parser);
+    libbalsa_mime_stream_shared_unlock(stream);
+    g_object_unref(stream);
 
     return mime_message;
 }
@@ -968,7 +917,7 @@ lbm_mbox_line_len(LibBalsaMailboxMbox * mbox, off_t offset)
     GMimeStream *stream = mbox->gmime_stream;
     gint retval = -1;
 
-    lbm_mbox_mime_stream_lock(mbox);
+    libbalsa_mime_stream_shared_lock(mbox->gmime_stream);
     if (g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET) >= 0) {
         gint old = 0;
         while (retval < 0) {
@@ -989,7 +938,7 @@ lbm_mbox_line_len(LibBalsaMailboxMbox * mbox, off_t offset)
             old += len;
         }
     }
-    lbm_mbox_mime_stream_unlock(mbox);
+    libbalsa_mime_stream_shared_unlock(mbox->gmime_stream);
 
     return retval;
 }
@@ -1005,9 +954,9 @@ lbm_mbox_copy_stream(LibBalsaMailboxMbox * mbox, off_t start, off_t end,
 	return TRUE;
 
     substream = g_mime_stream_substream(mbox->gmime_stream, start, end);
-    lbm_mbox_mime_stream_lock(mbox);
+    libbalsa_mime_stream_shared_lock(substream);
     retval = g_mime_stream_write_to_stream(substream, dest) == end - start;
-    lbm_mbox_mime_stream_unlock(mbox);
+    libbalsa_mime_stream_shared_unlock(substream);
     g_object_unref(substream);
 
     return retval;
@@ -1109,10 +1058,10 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
             & LIBBALSA_MESSAGE_FLAGS_REAL) {
 	    gboolean can_rewrite_in_place;
 
-	    lbm_mbox_mime_stream_lock(mbox);
+	    libbalsa_mime_stream_shared_lock(mbox_stream);
 	    can_rewrite_in_place =
 		lbm_mbox_rewrite_in_place(msg_info, mbox_stream);
-	    lbm_mbox_mime_stream_unlock(mbox);
+	    libbalsa_mime_stream_shared_unlock(mbox_stream);
 	    if (!can_rewrite_in_place)
 		break;
 	    ++j;
@@ -1236,21 +1185,22 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     }
 
     save_failed = TRUE;
-    lbm_mbox_mime_stream_lock(mbox);
+    libbalsa_mime_stream_shared_lock(mbox_stream);
     if (g_mime_stream_reset(temp_stream) == -1) {
         g_warning("mbox_sync: can't rewind temporary copy.\n");
-    } else if (!lbm_mbox_seek_to_message(mbox, offset))
+    } else if (!lbm_mbox_stream_seek_to_message(mbox_stream, offset))
         g_warning("mbox_sync: message not in expected position.\n");
     else if (g_mime_stream_write_to_stream(temp_stream, mbox_stream) != -1) {
         save_failed = FALSE;
         mbox->size = g_mime_stream_tell(mbox_stream);
         ftruncate(GMIME_STREAM_FS(mbox_stream)->fd, mbox->size);
     }
-    lbm_mbox_mime_stream_unlock(mbox);
     g_object_unref(temp_stream);
     mbox_unlock(mailbox, mbox_stream);
-    if (g_mime_stream_flush(mbox_stream) == -1 || save_failed)
-    {
+    if (g_mime_stream_flush(mbox_stream) == -1)
+        save_failed = TRUE;
+    libbalsa_mime_stream_shared_unlock(mbox_stream);
+    if (save_failed) {
 	/*
 	 * error occured while writing the mailbox back,
 	 * so keep the temp copy around
@@ -1299,11 +1249,11 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     }
 
     /* update the rewritten messages */
-    lbm_mbox_mime_stream_lock(mbox);
+    libbalsa_mime_stream_shared_lock(mbox_stream);
     if (g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET)
 	== -1) {
 	g_warning("Can't update message info");
-	lbm_mbox_mime_stream_unlock(mbox);
+	libbalsa_mime_stream_shared_unlock(mbox_stream);
 	return FALSE;
     }
     gmime_parser = g_mime_parser_new_with_stream(mbox_stream);
@@ -1325,9 +1275,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	     * current file position, in case someone changes it while
 	     * we're not holding the lock. */
 	    offset = g_mime_stream_tell(mbox_stream);
-	    lbm_mbox_mime_stream_unlock(mbox);
+	    libbalsa_mime_stream_shared_unlock(mbox_stream);
 	    libbalsa_mailbox_local_msgno_removed(mailbox, j + 1);
-	    lbm_mbox_mime_stream_lock(mbox);
+	    libbalsa_mime_stream_shared_lock(mbox_stream);
 	    g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET);
 	    free_message_info(msg_info);
 	    g_array_remove_index(mbox->messages_info, j);
@@ -1367,7 +1317,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 						mime_msg->mime_part);
 	}
     }
-    lbm_mbox_mime_stream_unlock(mbox);
+    libbalsa_mime_stream_shared_unlock(mbox_stream);
     mbox->messages_info->len = j;
     g_object_unref(G_OBJECT(gmime_parser));
 
@@ -1640,8 +1590,8 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
 
     /* From_ armor */
+    libbalsa_mime_stream_shared_lock(orig);
     armored_object = lbm_mbox_armored_object(orig);
-    g_object_unref(orig);
     /* Make sure we have "Status" and "X-Status" headers, so we can
      * update them in place later, if necessary. */
     update_message_status_headers(GMIME_MESSAGE(armored_object),
@@ -1658,6 +1608,8 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
     g_free(from);
     g_object_unref(armored_object);
+    libbalsa_mime_stream_shared_unlock(orig);
+    g_object_unref(orig);
     g_object_unref(armored_dest);
 
     if (retval > 0)

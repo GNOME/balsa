@@ -47,6 +47,7 @@
 #  include "misc.h"
 #endif
 
+#include "mime-stream-shared.h"
 #include "padlock-keyhole.xpm"
 #include "i18n.h"
 
@@ -487,6 +488,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     GMimeCipherContext *ctx;
     GMimeSignatureValidity *valid;
     GError *error = NULL;
+    GMimeStream *stream;
 
     /* paranoia checks */
     g_return_val_if_fail(body, FALSE);
@@ -536,8 +538,14 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     }
 
     /* verify the signature */
+
+    stream = libbalsa_message_stream(body->message);
+    libbalsa_mime_stream_shared_lock(stream);
     valid = g_mime_multipart_signed_verify(GMIME_MULTIPART_SIGNED
 					   (body->mime_part), ctx, &error);
+    libbalsa_mime_stream_shared_unlock(stream);
+    g_object_unref(stream);
+
     if (valid == NULL) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",

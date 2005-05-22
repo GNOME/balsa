@@ -24,6 +24,7 @@
 
 #include <gmime/gmime.h>
 #include "gmime-part-rfc2440.h"
+#include "mime-stream-shared.h"
 
 
 #define RFC2440_BUF_LEN    4096
@@ -42,8 +43,13 @@ g_mime_part_check_rfc2440(GMimePart * part)
     g_return_val_if_fail(wrapper, GMIME_PART_RFC2440_NONE);
     stream = g_mime_data_wrapper_get_stream(wrapper);
     g_object_unref(wrapper);
-    if (!stream || (slen = g_mime_stream_length(stream)) == -1)
+    if (!stream)
+        return retval;
+    libbalsa_mime_stream_shared_lock(stream);
+    if ((slen = g_mime_stream_length(stream)) == -1) {
+        libbalsa_mime_stream_shared_unlock(stream);
 	return retval;
+    }
     g_mime_stream_reset(stream);
 
     /* check if the complete stream fits in the buffer */
@@ -83,6 +89,7 @@ g_mime_part_check_rfc2440(GMimePart * part)
 	}
     }
 
+    libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(stream);
     return retval;
 }

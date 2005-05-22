@@ -58,6 +58,7 @@
 #include "imap-commands.h"
 #include "imap-server.h"
 #include "libbalsa-conf.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct _LibBalsaMailboxImap {
@@ -2448,7 +2449,9 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     }
 
     outstream = g_mime_stream_fs_new(outfd);
+    libbalsa_mime_stream_shared_lock(tmpstream);
     g_mime_stream_write_to_stream(tmpstream, outstream);
+    libbalsa_mime_stream_shared_unlock(tmpstream);
     g_object_unref(tmpstream);
 
     len = g_mime_stream_tell(outstream);

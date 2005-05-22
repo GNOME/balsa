@@ -43,6 +43,7 @@
 
 /* needed for truncate_string */
 #include "misc.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 #include <gmime/gmime.h>
@@ -1152,9 +1153,9 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
     gmime_stream = libbalsa_message_stream(message);
     if (!gmime_stream)
 	return;
+    libbalsa_mime_stream_shared_lock(gmime_stream);
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
 					GMIME_STREAM_BUFFER_BLOCK_READ);
-    g_object_unref(gmime_stream);
 
     line = g_byte_array_new();
     do {
@@ -1190,6 +1191,8 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
 	/* calculate size */
     }
     g_object_unref(gmime_stream_buffer);
+    libbalsa_mime_stream_shared_unlock(gmime_stream);
+    g_object_unref(gmime_stream);
     g_byte_array_free(line, TRUE);
 }
 

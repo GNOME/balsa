@@ -48,6 +48,7 @@
  * directly gets into some kind of circular #include problem, whereas
  * including it indirectly through "libbalsa.h" doesn't! */
 #include "libbalsa.h"
+#include "mime-stream-shared.h"
 
 /* Forward reference. */
 static gboolean libbalsa_html_url_requested(GtkWidget * html,
@@ -475,7 +476,10 @@ libbalsa_html_url_requested(GtkWidget * html, const gchar * url,
 	    return FALSE;
     }
 
+    libbalsa_mime_stream_shared_lock(mime_stream);
+    g_mime_stream_reset(mime_stream);
     libbalsa_html_write_mime_stream(stream, mime_stream);
+    libbalsa_mime_stream_shared_unlock(mime_stream);
 
     g_object_unref(mime_stream);
 

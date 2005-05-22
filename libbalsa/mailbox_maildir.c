@@ -36,6 +36,7 @@
 #include "libbalsa-conf.h"
 #include "misc.h"
 #include "libbalsa_private.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct message_info {
@@ -425,7 +426,7 @@ static void parse_mailbox(LibBalsaMailbox * mailbox, const gchar *subdir)
 	    g_free(msg_info->filename);
 	    msg_info->filename = g_strdup(filename);
 	    if (FLAGS_REALLY_DIFFER(msg_info->orig_flags, flags)) {
-#define DEBUG TRUE
+#undef DEBUG /* #define DEBUG TRUE */
 #ifdef DEBUG
 		g_message("Message flags for \"%s\" changed\n",
                           msg_info->key);
@@ -909,8 +910,10 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(in_stream), crlffilter);
     g_object_unref(crlffilter);
  
+    libbalsa_mime_stream_shared_lock(in_stream);
     if (g_mime_stream_write_to_stream( in_stream, out_stream) == -1)
     {
+        libbalsa_mime_stream_shared_unlock(in_stream);
 	g_object_unref(in_stream);
 	g_object_unref(out_stream);
 	unlink (tmp);
@@ -920,6 +923,7 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
                     _("Data copy error"));
 	return -1;
     }
+    libbalsa_mime_stream_shared_unlock(in_stream);
     g_object_unref(in_stream);
     g_object_unref(out_stream);
 

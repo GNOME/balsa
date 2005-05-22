@@ -52,6 +52,8 @@
 
 #include <sys/utsname.h>
 
+#include "mime-stream-shared.h"
+
 #include "i18n.h"
 
 typedef struct _MessageQueueItem MessageQueueItem;
@@ -1780,6 +1782,8 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
     mqi->orig = message;
     g_object_ref(mqi->orig);
     if (message->mime_msg) {
+        GMimeStream *tmp;
+
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
                                     "Status");
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
@@ -1789,8 +1793,12 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
                                     "X-Balsa-SmtpServer");
 	mqi->stream = g_mime_stream_mem_new();
+        tmp = libbalsa_message_stream(message);
+        libbalsa_mime_stream_shared_lock(tmp);
 	g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
                                       mqi->stream);
+        libbalsa_mime_stream_shared_unlock(tmp);
+        g_object_unref(tmp);
 	g_mime_stream_reset(mqi->stream);
     } else
 	mqi->stream = libbalsa_message_stream(message);

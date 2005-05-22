@@ -107,6 +107,8 @@ libbalsa_a_SOURCES = 		\
 	message.h		\
 	mime.c			\
 	mime.h			\
+	mime-stream-shared.c    \
+	mime-stream-shared.h    \
 	misc.c			\
 	misc.h			\
 	rfc3156.c		\

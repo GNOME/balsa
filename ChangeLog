@@ -1,5 +1,8 @@
-2005-05-23 07:46  PeterB
+2005-05-23 19:36  PeterB
 
+	* configure.in, libbalsa/address-book-gpe.c,
+	libbalsa/address-book-gpe.h, src/address-book-config.c: support
+	SQLite Version 3--fixes bug 305152.
 	* libbalsa/libbalsa-conf.c: compile on systems where gsize !=
 	guint.
 

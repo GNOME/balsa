@@ -29,7 +29,11 @@
 
 #ifdef HAVE_SQLITE
 
+#ifdef HAVE_SQLITE3
+#include <sqlite3.h>
+#else                           /* HAVE_SQLITE3 */
 #include <sqlite.h>
+#endif                          /* HAVE_SQLITE3 */
 
 #include "address-book.h"
 
@@ -44,7 +48,11 @@ typedef struct _LibBalsaAddressBookGpeClass LibBalsaAddressBookGpeClass;
 
 struct _LibBalsaAddressBookGpe {
     LibBalsaAddressBook parent;
+#ifdef HAVE_SQLITE3
+    sqlite3 *db;
+#else                           /* HAVE_SQLITE3 */
     sqlite *db;
+#endif                          /* HAVE_SQLITE3 */
 };
 
 struct _LibBalsaAddressBookGpeClass {

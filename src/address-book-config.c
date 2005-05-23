@@ -826,7 +826,7 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
 #endif /* ENABLE_LDAP */
 
 #ifdef HAVE_SQLITE
-    menuitem = gtk_menu_item_new_with_label(_("LDAP Address Book"));
+    menuitem = gtk_menu_item_new_with_label(_("GPE Address Book"));
     g_signal_connect(G_OBJECT(menuitem), "activate",
                      G_CALLBACK(add_gpe_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);

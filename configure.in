@@ -347,13 +347,18 @@ fi
 #
 AC_MSG_CHECKING(whether to use SQLite)
 if test x$with_sqlite != xno ; then
-	AC_MSG_RESULT([yes])
+    AC_MSG_RESULT([yes])
+    if $PKG_CONFIG --exists sqlite3 ; then
+        PKG_CHECK_MODULES(SQLITE, [sqlite3])
+        AC_DEFINE(HAVE_SQLITE3,1,[If defined, use sqlite3 api.])
+    else
         PKG_CHECK_MODULES(SQLITE, [sqlite >= 2.8])
-        AC_DEFINE(HAVE_SQLITE,1,[If defined, enable GPE address book support.])
-        BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE_CFLAGS"
-        BALSA_LIBS="$BALSA_LIBS $SQLITE_LIBS"
+    fi
+    AC_DEFINE(HAVE_SQLITE,1,[If defined, enable GPE address book support.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $SQLITE_LIBS"
 else
-	AC_MSG_RESULT([no])
+    AC_MSG_RESULT([no])
 fi
 
 # LibESMTP configuration.

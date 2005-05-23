@@ -432,7 +432,7 @@ libbalsa_conf_get_vector_with_default_(const char *path, gint * argcp,
                                        gboolean priv)
 {
     GError *error = NULL;
-    guint len;
+    gsize len;
 
     *argvp =
         g_key_file_get_string_list(LBC_KEY_FILE(priv), lbc_groups->data,

@@ -1,3 +1,7 @@
+2005-05-24 09:09  PeterB
+
+	* libbalsa/gmime-part-rfc2440.c: lock a GMimeStream.
+
 2005-05-24 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/gmime-gpgme-signature.c: fix the signature verification

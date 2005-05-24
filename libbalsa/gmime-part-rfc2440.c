@@ -212,7 +212,7 @@ GMimeSignatureValidity *
 g_mime_part_rfc2440_verify(GMimePart * part,
 			   GMimeGpgmeContext * ctx, GError ** err)
 {
-    GMimeStream *stream, *plainstream;
+    GMimeStream *stream, *plainstream, *wrapper_stream;
     GMimeDataWrapper * wrapper;
     GMimeSignatureValidity *valid;
 
@@ -223,8 +223,12 @@ g_mime_part_rfc2440_verify(GMimePart * part,
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(GMIME_PART(part));
+    wrapper_stream = g_mime_data_wrapper_get_stream(wrapper);
+    libbalsa_mime_stream_shared_lock(wrapper_stream);
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
+    libbalsa_mime_stream_shared_unlock(wrapper_stream);
+    g_object_unref(wrapper_stream);
     g_mime_stream_reset(stream);
     g_object_unref(wrapper);
 

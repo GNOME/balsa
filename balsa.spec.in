@@ -1,38 +1,41 @@
-#redhat and mdk are exclusive
-%define redhat 1
+#fedora and mdk are exclusive
+%define fedora 1
 %define mdk    0
 %define gmimever 2.1.14
-%if %redhat
+%if %fedora
 %define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --with-ssl --with-gss
 %endif
 %if %mdk
 %define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings
 %endif
 
-Summary:   Balsa Mail Client
-Name:      balsa
-Version:   @BALSA_VERSION@
-Release:   1
-Copyright: GPL
-Group:     Applications/Internet
-Source0:   %{name}-%{version}.tar.bz2
-Source1:   gmime-%{gmimever}.tar.bz2
-URL:       http://balsa.gnome.org/
-BuildRoot: %{_tmppath}/%{name}-%{version}-root
+Name:           balsa
+Version:        @BALSA_VERSION@
+Release:        1
+Summary:        Balsa Mail Client
+
+Group:          Applications/Internet
+License:        GPL
+URL:            http://balsa.gnome.org/
+Source0:        http://balsa.gnome.org/%{name}-%{version}.tar.bz2
+Source1:        http://balsa.gnome.org/gmime-%{gmimever}.tar.bz2
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
 Requires: libesmtp >= 1.0.3
 Requires: aspell
-Provides: balsa
-
-BuildRequires:  libesmtp-devel >= 1.0.3
-%if %redhat
+%if %fedora
 Requires: gtk2 >= 2.0.0
 Requires: libgnome >= 2.0.0
 Requires: libgnomeui >= 2.0.0
 Requires: gnome-vfs2 >= 2.0.0
+Requires:  libgnomeprint22 >= 2.2.0
+Requires:  libgnomeprintui22 >= 2.2.0
 BuildRequires:  gtk2-devel >= 2.0.0
 BuildRequires:  libgnome-devel >= 2.0.0
 BuildRequires:  libgnomeui-devel >= 2.0.0
 BuildRequires:  gnome-vfs2-devel >= 2.0.0
+BuildRequires:  libgnomeprint22-devel >= 2.2.0
+BuildRequires:  libgnomeprintui22-devel >= 2.2.0
 BuildRequires:  aspell-devel
 %endif
 %if %mdk
@@ -53,51 +56,28 @@ BuildRequires:  libpcre0-devel
 Balsa is an e-mail reader.  This client is part of the GNOME
 desktop environment.  It supports local mailboxes, POP3 and
 IMAP.
- 
+
 %prep
-%setup -D -a 1
+%setup -q -D -a 1
 
 %build
-# Needed for snapshot releases.
-%ifarch alpha
-  ARCHFLAG="--host=alpha-redhat-linux"
-%endif
 
 dir=`pwd`; cd gmime-%{gmimever} && ./configure --prefix=`pwd` --disable-shared && make install; cd $dir
+export PKG_CONFIG_PATH="gmime-%{gmimever}:$PKG_CONFIG_PATH"
 
-if [ ! -f configure ]; then
-  CFLAGS="$RPM_OPT_FLAGS" \
-  PKG_CONFIG_PATH="gmime-%{gmimever}:$PKG_CONFIG_PATH" \
-  ./autogen.sh $ARCHFLAG %{config_opts}
-else
-  CFLAGS="$RPM_OPT_FLAGS" \
-  PKG_CONFIG_PATH="gmime-%{gmimever}:$PKG_CONFIG_PATH" \
-  ./configure $ARCHFLAG %{config_opts}
-fi
+%configure
+make %{?_smp_mflags}
 
-
-
-if [ "$SMP" != "" ]; then
-  (make "MAKE=make -k -j $SMP"; exit 0)
-  make
-else
-  make
-fi
 
 %install
-rm -rf "$RPM_BUILD_ROOT"
-
-make DESTDIR="$RPM_BUILD_ROOT" install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR="$RPM_BUILD_ROOT"
 rm "$RPM_BUILD_ROOT%{_bindir}"/balsa-ab
-#desktop-file-install --vendor gnome --delete-original       \
-#  --dir $RPM_BUILD_ROOT%{_datadir}/applications             \
-#  $RPM_BUILD_ROOT%{_datadir}/applications/*
 
 %find_lang %{name}
 
-
 %clean
-[ -n "$RPM_BUILD_DIR/%{name}-%{version}" ] && rm -rf "$RPM_BUILD_DIR/%{name}-%{version}"
+rm -rf $RPM_BUILD_ROOT
 
 %post
 which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
@@ -114,7 +94,7 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 # no need to update cache - it will be removed.
 
 %files -f %{name}.lang
-%defattr(-, root, root)
+%defattr(-,root,root,-)
 %doc README COPYING ChangeLog NEWS TODO AUTHORS HACKING docs/mh-mail-HOWTO
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
@@ -131,10 +111,14 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %{_datadir}/pixmaps/gnome-balsa2.png
 %{_datadir}/sounds/balsa/*
 %{_mandir}/man1/balsa.1*
-%config %{_sysconfdir}/sound/events/*
+%config(noreplace) %{_sysconfdir}/sound/events/balsa.soundlist
 
 
 %changelog
+* Fri May 20 2005 Pawel Salek <pawsa@theochem.kth.se> - 2.3.2-1
+- adapt to Fedora Extras template.
+
+
 * Sat Jul 26 2003 Misu Moldovan <dumol@go.ro>
 - further split the Red Hat and Mandrake sections
 - fix Mandrake 9.x dependencies
@@ -146,51 +130,3 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 - remove all defined paths to user-specified. 
 - update configures, locales, update esmtp as a requires/buildrequires 
 
-* Fri Nov 03 2000 Pawel Salek <pawsa@theochem.kth.se>
-- use %{_mandir} for location of the manual.
-
-* Fri Oct 20 2000 Pawel Salek <pawsa@theochem.kth.se>
-- require gtk+>= 1.2.7, not gnome-libs. 
-
-* Fri Oct 20 2000 Pawel Salek <pawsa@theochem.kth.se>
-- require gnome-libs >= 1.2.7, earlier versions are buggy. drop building GSS.
-
-* Mon Sep 18 2000 Pawel Salek <pawsa@theochem.kth.se>
-- include only translation files, not whole directories, to aviod
-  misleading messages when removing the package.
-
-* Tue Aug 15 2000 Pawel Salek <pawsa@theochem.kth.se>
-- added --disable-more-warning option - libmutt configure fails without it.
-
-* Thu Jun  1 2000 Peter Williams <peter@newton.cx>
-- Don't try to install IDL stuff as we have deleted it :-)
-
-* Thu Dec 30 1999 Bruno Pires Marinho <bapm@camoes.rnl.ist.utl.pt>
-- Improved the spec file by adding a sysconfdir=/etc, removing the man
-  instalation because balsa does it now and adding the files on the /etc
-  to the distribution
-
-* Tue Oct  5 1999 Jan Nieuwenhuizen <janneke@gnu.org>
-- Fixed man install
-
-* Sun Sep 26 1999 Stuart Parmenter <pavlov@balsa.net>
-- Updated to version 0.5.0
-
-* Mon Dec 14 1998 Stuart Parmenter <pavlov@pavlov.net>
-- Updated to version 0.4.8.
-
-* Sun Sep 09 1998 Stuart Parmenter <pavlov@pavlov.net>
-- Updated to version 0.4.7.
-
-* Sun Aug 23 1998 Stuart Parmenter <pavlov@pavlov.net>
-- Updated to version 0.4.5.
-
-* Mon Aug  3 1998 Stuart Parmenter <pavlov@pavlov.net>
-- Updated to version 0.4.0.
-
-* Sun Jul 26 1998 Stuart Parmenter <pavlov@pavlov.net>
-- Updated RPM file to reflect recent changes with the
-  removal of c-client.
-
-* Thu Apr 02 1998 Michael Fulbright <msf@redhat.com>
-- First try at an RPM

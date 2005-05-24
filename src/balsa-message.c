@@ -4686,7 +4686,8 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	    return;
 
 	/* force loading the missing part */
-	libbalsa_mailbox_get_message_part(message, body);
+        if(!libbalsa_mailbox_get_message_part(message, body))
+            return;
     }
 	
     /* check which type of protection we've got */

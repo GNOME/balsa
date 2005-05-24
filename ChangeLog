@@ -1,3 +1,11 @@
+2005-05-24 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/gmime-gpgme-signature.c: fix the signature verification
+	output.
+	* src/balsa-message.c: check the result of
+	libbalsa_mailbox_get_message_part().
+	* balsa.spec.in: clean up and fedora extras adaptation.
+
 2005-05-23 19:36  PeterB
 
 	* configure.in, libbalsa/address-book-gpe.c,

@@ -1084,11 +1084,11 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 	strftime(buf, sizeof(buf), date_string, &date);
 	g_string_append_printf(msg, _("\nSigned on: %s"), buf);
     }
-    g_string_append_printf(msg, _("\nValidity: %s"),
+    g_string_append_printf(msg, _("\nUser ID validity: %s"),
 			   libbalsa_gpgme_validity_to_gchar(info->
 							    validity));
     if (info->protocol == GPGME_PROTOCOL_OpenPGP)
-	g_string_append_printf(msg, _("\nOwner trust: %s"),
+	g_string_append_printf(msg, _("\nKey owner trust: %s"),
 			       libbalsa_gpgme_validity_to_gchar_short
 			       (info->trust));
     if (info->fingerprint)
@@ -1097,12 +1097,12 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     if (info->key_created) {
 	localtime_r(&info->key_created, &date);
 	strftime(buf, sizeof(buf), date_string, &date);
-	g_string_append_printf(msg, _("\nKey created on: %s"), buf);
+	g_string_append_printf(msg, _("\nSubkey created on: %s"), buf);
     }
     if (info->key_expires) {
 	localtime_r(&info->key_expires, &date);
 	strftime(buf, sizeof(buf), date_string, &date);
-	g_string_append_printf(msg, _("\nKey expires on: %s"), buf);
+	g_string_append_printf(msg, _("\nSubkey expires on: %s"), buf);
     }
     if (info->key_revoked || info->key_expired || info->key_disabled ||
        info->key_invalid) {
@@ -1129,9 +1129,9 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
            attrs = g_string_append(attrs, _(" invalid"));
        }
        if (count > 1)
-           g_string_append_printf(msg, _("\nKey attributes:%s"), attrs->str);
+           g_string_append_printf(msg, _("\nSubkey attributes:%s"), attrs->str);
        else
-           g_string_append_printf(msg, _("\nKey attribute:%s"), attrs->str);
+           g_string_append_printf(msg, _("\nSubkey attribute:%s"), attrs->str);
        g_string_free(attrs, TRUE);
     }
     if (info->issuer_name) {

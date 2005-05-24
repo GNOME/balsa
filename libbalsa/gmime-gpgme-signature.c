@@ -80,6 +80,7 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     GMimeGpgmeSigstat *sig_stat;
     gpgme_verify_result_t result;
     gpgme_key_t key;
+    gpgme_subkey_t subkey;
     gpgme_user_id_t uid;
 
     g_return_val_if_fail(ctx, NULL);
@@ -98,9 +99,8 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     sig_stat->fingerprint = g_strdup(result->signatures->fpr);
     sig_stat->sign_time = result->signatures->timestamp;
     sig_stat->status = gpgme_err_code(result->signatures->status);
-    sig_stat->validity = result->signatures->validity;
 
-    /* try to get the relates key */
+    /* try to get the related key */
     gpgme_get_key(ctx, sig_stat->fingerprint, &key, 0);
     if (key == NULL)
 	return sig_stat;
@@ -112,24 +112,32 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     sig_stat->chain_id = g_strdup(key->chain_id);
     sig_stat->trust = key->owner_trust;
     uid = key->uids;
+
+    /* Note: there is no way to determine which user id has been used to
+     * create the signature. We therefore pick the validity of the primary
+     * one and scan uid's to get useable name, email and uid strings */
+    sig_stat->validity = uid->validity;
     while (uid) {
 	if (!sig_stat->sign_name && uid->name && strlen(uid->name))
 	    sig_stat->sign_name = g_strdup(uid->name);
-	if (!sig_stat->sign_email && uid->email && strlen(uid->email))
-	    sig_stat->sign_email = g_strdup(uid->email);
 	if (!sig_stat->sign_email && uid->email && strlen(uid->email))
 	    sig_stat->sign_email = g_strdup(uid->email);
 	if (!sig_stat->sign_uid && uid->uid && strlen(uid->uid))
 	    sig_stat->sign_uid = fix_EMail_info(g_strdup(uid->uid));
 	uid = uid->next;
     }
-    if (key->subkeys) {
-	sig_stat->key_created = key->subkeys->timestamp;
-	sig_stat->key_expires = key->subkeys->expires;
-	sig_stat->key_revoked = key->subkeys->revoked;
-	sig_stat->key_expired = key->subkeys->expired;
-	sig_stat->key_disabled = key->subkeys->disabled;
-	sig_stat->key_invalid = key->subkeys->invalid;
+
+    /* get the subkey which can sign */
+    subkey = key->subkeys;
+    while (subkey && !subkey->can_sign)
+	subkey = subkey->next;
+    if (subkey) {
+	sig_stat->key_created = subkey->timestamp;
+	sig_stat->key_expires = subkey->expires;
+	sig_stat->key_revoked = subkey->revoked;
+	sig_stat->key_expired = subkey->expired;
+	sig_stat->key_disabled = subkey->disabled;
+	sig_stat->key_invalid = subkey->invalid;
     }
     gpgme_key_unref(key);
 

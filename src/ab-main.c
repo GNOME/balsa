@@ -47,6 +47,7 @@ struct ABMainWindow {
     GtkWidget *edit_box, *apply_button, *remove_button, *cancel_button;
     GtkWidget *edit_widget;
     GtkWidget *entries[NUM_FIELDS];
+    GtkRadioAction *first_radio_action;
 
     GList *address_book_list;
     LibBalsaAddressBook* address_book;
@@ -159,19 +160,19 @@ bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list,
 
 static void
 select_address_book_cb(GtkRadioAction * action, GtkRadioAction * current,
-                       gpointer callback_data)
+                       GtkWindow * window)
 {
     GList *l;
 
-    if (action != current)
-        return;
     l = g_list_nth(contacts_app.address_book_list,
-                   GPOINTER_TO_INT(callback_data));
+                   gtk_radio_action_get_current_value(action));
     if (!l)
         return;
+
     ab_set_edit_widget(NULL, FALSE);
     bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
                          contacts_app.entry_list, NULL);
+    gtk_window_set_title(window, LIBBALSA_ADDRESS_BOOK(l->data)->name);
 }
 
 static void
@@ -285,15 +286,17 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
         radio_action = gtk_radio_action_new(address_book->name, label,
                                             NULL, NULL, cnt - 1);
 	g_free(label);
+
+
         if (group)
             gtk_radio_action_set_group(radio_action, group);
         else {
-            group = gtk_radio_action_get_group(radio_action);
-	    gtk_action_activate(GTK_ACTION(radio_action));
-	}
-        g_signal_connect(G_OBJECT(radio_action), "changed",
-                         G_CALLBACK(select_address_book_cb),
-                         GINT_TO_POINTER(cnt - 1));
+            g_signal_connect(G_OBJECT(radio_action), "changed",
+                             G_CALLBACK(select_address_book_cb),
+                             window);
+            contacts_app.first_radio_action = radio_action;
+        }
+        group = gtk_radio_action_get_group(radio_action);
 
         accelerator =
             cnt <= 9 ? g_strdup_printf("<control>%d", cnt) : NULL;
@@ -531,7 +534,6 @@ bab_window_new()
 {
     GtkWidget* menubar = NULL, *main_vbox, *cont_box, *vbox, *scroll;
     GtkWidget *wnd = gnome_app_new("Contacts", "Contacts");
-    GList *first_ab;
 
     get_main_menu(GTK_WIDGET(wnd), &menubar, contacts_app.address_book_list);
     if (menubar)
@@ -570,10 +572,9 @@ bab_window_new()
     gtk_window_set_default_size(GTK_WINDOW(wnd), 500, 400);
     gnome_app_set_contents(GNOME_APP(wnd), main_vbox);
 
-    first_ab = g_list_first(contacts_app.address_book_list);
-    if(first_ab)
-        bab_set_address_book(LIBBALSA_ADDRESS_BOOK(first_ab->data),
-                             contacts_app.entry_list, NULL);
+    if (contacts_app.first_radio_action)
+        gtk_action_activate(GTK_ACTION(contacts_app.first_radio_action));
+
     return wnd;
 }
 

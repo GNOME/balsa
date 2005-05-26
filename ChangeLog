@@ -1,3 +1,7 @@
+2005-05-26 08:21  PeterB
+
+	* libbalsa/source-viewer.c: lock a GMimeStream.
+
 2005-05-24 09:09  PeterB
 
 	* libbalsa/gmime-part-rfc2440.c: lock a GMimeStream.

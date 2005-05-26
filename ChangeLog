@@ -1,5 +1,7 @@
-2005-05-26 08:21  PeterB
+2005-05-26 16:13  PeterB
 
+	* src/ab-main.c: make radio list work; set window title to be
+	address book name.
 	* libbalsa/source-viewer.c: lock a GMimeStream.
 
 2005-05-24 09:09  PeterB

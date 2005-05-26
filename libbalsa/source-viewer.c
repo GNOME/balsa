@@ -30,6 +30,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 static void close_cb(GtkAction * action, gpointer data);
@@ -159,7 +160,9 @@ lsv_escape_cb(GtkAction * action, gpointer data)
 	return;
 
     mem_stream = g_mime_stream_mem_new();
+    libbalsa_mime_stream_shared_lock(msg_stream);
     g_mime_stream_write_to_stream(msg_stream, mem_stream);
+    libbalsa_mime_stream_shared_unlock(msg_stream);
     g_mime_stream_write(mem_stream, "", 1); /* close string */
     raw_message = (char *) GMIME_STREAM_MEM(mem_stream)->buffer->data;
 

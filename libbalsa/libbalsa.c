@@ -182,8 +182,8 @@ libbalsa_guess_mail_spool(void)
     gchar *env;
     gchar *spool;
     static const gchar *guesses[] = {
-	"/var/spool/mail/",
 	"/var/mail/",
+	"/var/spool/mail/",
 	"/usr/spool/mail/",
 	"/usr/mail/",
 	NULL

@@ -913,12 +913,20 @@ mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 	g_print("You can apply filters only on mailbox\n");
 }
 
+static void
+mb_empty_trash_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+{
+    empty_trash(balsa_app.main_window);
+}
+
 GtkWidget *
 balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 {
     GtkWidget *menu;
     GtkWidget *submenu;
     GtkWidget *menuitem;
+    LibBalsaMailbox *mailbox;
+    gboolean special;
 
     /*  g_return_val_if_fail(mailbox != NULL, NULL); */
 
@@ -955,56 +963,65 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 	return menu;
     }
     /* If we didn't click on a mailbox node then there is only one option. */
-    add_menu_entry(menu, NULL, NULL, mbnode);
+    add_menu_entry(menu, NULL, NULL, NULL);
 
-    if (mbnode->mailbox) {
-	if (!MAILBOX_OPEN(mbnode->mailbox))
-	    add_menu_entry(menu, _("_Open"),
-                           G_CALLBACK(mb_open_cb), mbnode);
-	else
-	    add_menu_entry(menu, _("_Close"),
-                           G_CALLBACK(mb_close_cb), mbnode);
-    }
     if (g_signal_has_handler_pending(G_OBJECT(mbnode),
                                      balsa_mailbox_node_signals
                                      [SHOW_PROP_DIALOG], 0, FALSE))
         add_menu_entry(menu, _("_Properties..."),
                        G_CALLBACK(mb_conf_cb), mbnode);
-    if (mbnode->mailbox || mbnode->config_prefix)
-	add_menu_entry(menu, _("_Delete"), 
-                       G_CALLBACK(mb_del_cb),  mbnode);
+
     if (g_signal_has_handler_pending(G_OBJECT(mbnode),
 		                     balsa_mailbox_node_signals
 				     [APPEND_SUBTREE], 0, FALSE))
 	add_menu_entry(menu, _("_Rescan"),
 		       GTK_SIGNAL_FUNC(mb_rescan_cb), mbnode);
 
-    
-    if (mbnode->mailbox) {
-	add_menu_entry(menu, NULL, NULL, mbnode);
-	if(LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox)) {
-	    add_menu_entry(menu, _("_Subscribe"),   
-                           GTK_SIGNAL_FUNC(mb_subscribe_cb),   mbnode);
-	    add_menu_entry(menu, _("_Unsubscribe"), 
-                           GTK_SIGNAL_FUNC(mb_unsubscribe_cb), mbnode);
-	}
-	
-	if(mbnode->mailbox != balsa_app.inbox)
-	    add_menu_entry(menu, _("Mark as _Inbox"),    
-                           GTK_SIGNAL_FUNC(mb_inbox_cb),    mbnode);
-	if(mbnode->mailbox != balsa_app.sentbox)
-	    add_menu_entry(menu, _("_Mark as Sentbox"), 
-                           GTK_SIGNAL_FUNC(mb_sentbox_cb),  mbnode);
-	if(mbnode->mailbox != balsa_app.trash)
-	    add_menu_entry(menu, _("Mark as _Trash"),    
-                           GTK_SIGNAL_FUNC(mb_trash_cb),    mbnode);
-	if(mbnode->mailbox != balsa_app.draftbox)
-	    add_menu_entry(menu, _("Mark as D_raftbox"),
-                           GTK_SIGNAL_FUNC(mb_draftbox_cb), mbnode);
-	/* FIXME : No test on mailbox type is made yet, should we ? */
-	add_menu_entry(menu, _("_Edit/Apply filters"), 
-                       GTK_SIGNAL_FUNC(mb_filter_cb), mbnode);
+    if (mbnode->config_prefix)
+	add_menu_entry(menu, _("_Delete"), G_CALLBACK(mb_del_cb),  mbnode);
+
+    if (!(mailbox = mbnode->mailbox))
+        return menu;
+
+    if (!MAILBOX_OPEN(mailbox))
+        add_menu_entry(menu, _("_Open"),  G_CALLBACK(mb_open_cb),  mbnode);
+    else
+        add_menu_entry(menu, _("_Close"), G_CALLBACK(mb_close_cb), mbnode);
+
+    special = (   mailbox == balsa_app.inbox
+               || mailbox == balsa_app.sentbox
+               || mailbox == balsa_app.draftbox
+               || mailbox == balsa_app.outbox
+               || mailbox == balsa_app.trash);
+    if (!special && !mbnode->config_prefix)
+	add_menu_entry(menu, _("_Delete"), G_CALLBACK(mb_del_cb),  mbnode);
+
+    if(LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+        add_menu_entry(menu, NULL, NULL, NULL);
+        add_menu_entry(menu, _("_Subscribe"),   
+                       GTK_SIGNAL_FUNC(mb_subscribe_cb),   mbnode);
+        add_menu_entry(menu, _("_Unsubscribe"), 
+                       GTK_SIGNAL_FUNC(mb_unsubscribe_cb), mbnode);
     }
+
+    if (!special) {
+        add_menu_entry(menu, NULL, NULL, NULL);
+        add_menu_entry(menu, _("Mark as _Inbox"),    
+                       GTK_SIGNAL_FUNC(mb_inbox_cb),    mbnode);
+        add_menu_entry(menu, _("_Mark as Sentbox"), 
+                       GTK_SIGNAL_FUNC(mb_sentbox_cb),  mbnode);
+        add_menu_entry(menu, _("Mark as _Trash"),    
+                       GTK_SIGNAL_FUNC(mb_trash_cb),    mbnode);
+        add_menu_entry(menu, _("Mark as D_raftbox"),
+                       GTK_SIGNAL_FUNC(mb_draftbox_cb), mbnode);
+    } else if (mailbox == balsa_app.trash)
+        add_menu_entry(menu, _("_Empty trash"),    
+                       GTK_SIGNAL_FUNC(mb_empty_trash_cb), mbnode);
+
+    /* FIXME : No test on mailbox type is made yet, should we ? */
+    add_menu_entry(menu, NULL, NULL, NULL);
+    add_menu_entry(menu, _("_Edit/Apply filters"), 
+                   GTK_SIGNAL_FUNC(mb_filter_cb), mbnode);
 
     return menu;
 }

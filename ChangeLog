@@ -1,3 +1,10 @@
+2005-05-28 23:12  PeterB
+
+	* libbalsa/libbalsa.c: look for /var/mail/$USER before
+	/var/spool/mail/$USER: fixes bug 305659.
+	* src/mailbox-node.c: make popup menu more appropriate: fixes
+	bug 305668.
+
 2005-05-26 16:13  PeterB
 
 	* src/ab-main.c: make radio list work; set window title to be

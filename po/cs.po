@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-05-29 02:49+0000\n"
-"PO-Revision-Date: 2005-05-29 12:26+0200\n"
+"POT-Creation-Date: 2005-05-31 10:49+0000\n"
+"PO-Revision-Date: 2005-05-31 13:03+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1093,14 +1093,18 @@ msgstr ""
 msgid ""
 "\n"
 "User ID validity: %s"
-msgstr "\nPlatnost ID uživatele: %s"
+msgstr ""
+"\n"
+"Platnost ID uživatele: %s"
 
 #: ../libbalsa/rfc3156.c:1091
 #, c-format
 msgid ""
 "\n"
 "Key owner trust: %s"
-msgstr "\nDůvěra vlastníkovi klíče: %s"
+msgstr ""
+"\n"
+"Důvěra vlastníkovi klíče: %s"
 
 #: ../libbalsa/rfc3156.c:1095
 #, c-format
@@ -1116,14 +1120,18 @@ msgstr ""
 msgid ""
 "\n"
 "Subkey created on: %s"
-msgstr "\nPodklíč vytvořen dne: %s"
+msgstr ""
+"\n"
+"Podklíč vytvořen dne: %s"
 
 #: ../libbalsa/rfc3156.c:1105
 #, c-format
 msgid ""
 "\n"
 "Subkey expires on: %s"
-msgstr "\nPodklíč vyprší dne: %s"
+msgstr ""
+"\n"
+"Podklíč vyprší dne: %s"
 
 #: ../libbalsa/rfc3156.c:1114
 msgid " revoked"
@@ -1146,14 +1154,18 @@ msgstr " neplatný"
 msgid ""
 "\n"
 "Subkey attributes:%s"
-msgstr "\nAtributy podklíče:%s"
+msgstr ""
+"\n"
+"Atributy podklíče:%s"
 
 #: ../libbalsa/rfc3156.c:1134
 #, c-format
 msgid ""
 "\n"
 "Subkey attribute:%s"
-msgstr "\nAtribut podklíče:%s"
+msgstr ""
+"\n"
+"Atribut podklíče:%s"
 
 #: ../libbalsa/rfc3156.c:1140
 #, c-format
@@ -1445,7 +1457,7 @@ msgid "C_ertificate Pass Phrase"
 msgstr "Heslo _certifikátu"
 
 #. Items
-#: ../libbalsa/source-viewer.c:48 ../src/mailbox-node.c:965
+#: ../libbalsa/source-viewer.c:48 ../src/mailbox-node.c:989
 #: ../src/main-window.c:752 ../src/main-window.c:857
 msgid "_Close"
 msgstr "_Zavřít"
@@ -1982,8 +1994,9 @@ msgid "_Store Address..."
 msgstr "_Uložit adresu..."
 
 #: ../src/balsa-index.c:1807 ../src/filter-edit-dialog.c:221
-#: ../src/mailbox-node.c:974 ../src/pref-manager.c:1460
-#: ../src/pref-manager.c:1549 ../src/pref-manager.c:2594
+#: ../src/mailbox-node.c:981 ../src/mailbox-node.c:997
+#: ../src/pref-manager.c:1460 ../src/pref-manager.c:1549
+#: ../src/pref-manager.c:2594
 msgid "_Delete"
 msgstr "_Odstranit"
 
@@ -2744,7 +2757,7 @@ msgstr "A"
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: ../src/filter-edit-dialog.c:215 ../src/mailbox-node.c:946
+#: ../src/filter-edit-dialog.c:215 ../src/mailbox-node.c:954
 #: ../src/main-window.c:371 ../src/main-window.c:430
 msgid "_New"
 msgstr "_Nová"
@@ -3295,83 +3308,86 @@ msgstr "Zkoumání %s selhalo: %s"
 msgid "Scanning %s. Please wait..."
 msgstr "Zkoumá se poštovní schránka %s. Čekejte, prosím..."
 
-#: ../src/mailbox-node.c:931
+#: ../src/mailbox-node.c:939
 msgid "Local _mbox mailbox..."
 msgstr "Místní poštovní schránka typu _Mbox..."
 
-#: ../src/mailbox-node.c:933
+#: ../src/mailbox-node.c:941
 msgid "Local Mail_dir mailbox..."
 msgstr "Místní poštovní schránka typu Mail_dir..."
 
-#: ../src/mailbox-node.c:935
+#: ../src/mailbox-node.c:943
 msgid "Local M_H mailbox..."
 msgstr "Místní poštovní schránka typu M_H..."
 
-#: ../src/mailbox-node.c:937
+#: ../src/mailbox-node.c:945
 msgid "Remote _IMAP mailbox..."
 msgstr "Vzdálená poštovní schránka typu _IMAP..."
 
-#: ../src/mailbox-node.c:940
+#: ../src/mailbox-node.c:948
 msgid "Remote IMAP _folder..."
 msgstr "_Vzdálená složka typu IMAP..."
 
-#: ../src/mailbox-node.c:942
+#: ../src/mailbox-node.c:950
 msgid "Remote IMAP _subfolder..."
 msgstr "Vzdálená pod_složka typu IMAP..."
 
 #. clicked on the empty space
-#: ../src/mailbox-node.c:953 ../src/mailbox-node.c:979
+#: ../src/mailbox-node.c:961 ../src/mailbox-node.c:977
 msgid "_Rescan"
 msgstr "_Přezkoumat"
-
-#: ../src/mailbox-node.c:962
-msgid "_Open"
-msgstr "_Otevřít"
 
 #: ../src/mailbox-node.c:971
 msgid "_Properties..."
 msgstr "Vlas_tnosti..."
 
-#: ../src/mailbox-node.c:986
+#: ../src/mailbox-node.c:987
+msgid "_Open"
+msgstr "_Otevřít"
+
+#: ../src/mailbox-node.c:1001
 msgid "_Subscribe"
 msgstr "Přihlá_sit se"
 
-#: ../src/mailbox-node.c:988
+#: ../src/mailbox-node.c:1003
 msgid "_Unsubscribe"
 msgstr "_Odhlásit se"
 
-#: ../src/mailbox-node.c:993
+#: ../src/mailbox-node.c:1009
 msgid "Mark as _Inbox"
 msgstr "Označ_it jako 'Doručená pošta'"
 
-#: ../src/mailbox-node.c:996
+#: ../src/mailbox-node.c:1011
 msgid "_Mark as Sentbox"
 msgstr "Označit _jako 'Odeslaná pošta'"
 
-#: ../src/mailbox-node.c:999
+#: ../src/mailbox-node.c:1013
 msgid "Mark as _Trash"
 msgstr "Označi_t jako 'Koš'"
 
-#: ../src/mailbox-node.c:1002
+#: ../src/mailbox-node.c:1015
 msgid "Mark as D_raftbox"
 msgstr "Označit jako '_Rozepsaná pošta'"
 
-#. FIXME : No test on mailbox type is made yet, should we ?
-#: ../src/mailbox-node.c:1005
+#: ../src/mailbox-node.c:1018
+msgid "_Empty trash"
+msgstr "Vy_sypat koš"
+
+#: ../src/mailbox-node.c:1023
 msgid "_Edit/Apply filters"
 msgstr "U_pravit/Aplikovat filtry"
 
-#: ../src/mailbox-node.c:1086
+#: ../src/mailbox-node.c:1103
 #, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
 msgstr "Cesta \"%s\" nevede k poštovní schránce."
 
-#: ../src/mailbox-node.c:1099
+#: ../src/mailbox-node.c:1116
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Místní poštovní schránka %s načtena jako: %s\n"
 
-#: ../src/mailbox-node.c:1126
+#: ../src/mailbox-node.c:1143
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Místní složka %s\n"

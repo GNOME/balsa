@@ -452,7 +452,9 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
     if (msg_stream == NULL)
 	return FALSE;
     out_stream = g_mime_stream_file_new(outfile);
+    libbalsa_mime_stream_shared_lock(msg_stream);
     res = g_mime_stream_write_to_stream(msg_stream, out_stream);
+    libbalsa_mime_stream_shared_unlock(msg_stream);
 
     g_object_unref(msg_stream);
     g_object_unref(out_stream);

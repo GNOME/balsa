@@ -23,6 +23,11 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Requires: libesmtp >= 1.0.3
 Requires: aspell
+Requires: openssl
+BuildRequires: libesmtp-devel >= 1.0.3
+BuildRequires: aspell-devel
+BuildRequires: openssl-devel
+
 %if %fedora
 Requires: gtk2 >= 2.0.0
 Requires: libgnome >= 2.0.0
@@ -36,7 +41,6 @@ BuildRequires:  libgnomeui-devel >= 2.0.0
 BuildRequires:  gnome-vfs2-devel >= 2.0.0
 BuildRequires:  libgnomeprint22-devel >= 2.2.0
 BuildRequires:  libgnomeprintui22-devel >= 2.2.0
-BuildRequires:  aspell-devel
 %endif
 %if %mdk
 Requires: gtk+2.0
@@ -65,7 +69,8 @@ IMAP.
 dir=`pwd`; cd gmime-%{gmimever} && ./configure --prefix=`pwd` --disable-shared && make install; cd $dir
 export PKG_CONFIG_PATH="gmime-%{gmimever}:$PKG_CONFIG_PATH"
 
-%configure
+%configure %{config_opts}
+
 make %{?_smp_mflags}
 
 

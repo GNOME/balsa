@@ -1399,9 +1399,6 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
     rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);
 
-  /* if (rc != IMR_OK) we should be silent here
-    printf("cmd '%6s' failed, rc=%d.\n", cmd, rc); */
-
   imap_handle_idle_enable(handle, 30);
 
   return rc;
@@ -1777,7 +1774,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
   mbx = imap_mailbox_to_utf8(s);
   rc = ir_check_crlf(h, c);
   g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[signal],
-                0, delim, &flags, mbx);
+                0, delim, flags, mbx);
   g_free(s);
   g_free(mbx);
   return rc;
@@ -1824,8 +1821,6 @@ ir_status(ImapMboxHandle *h)
       for(i= 0; resp[i].item != IMSTAT_NONE; i++) {
         if(resp[i].item == idx) {
           sscanf(count, "%u", &resp[i].result);
-          printf("%s: set status for %s to %u\n",
-                 name, item, resp[i].result);
           break;
         }
       }

@@ -210,7 +210,7 @@ struct browser_state
 
 static void
 libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
-                      ImapMboxFlags * flags, char *folder,
+                      ImapMboxFlags flags, char *folder,
                       struct browser_state *state)
 {
     gboolean noselect, marked;
@@ -232,7 +232,7 @@ libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
      * authoritative" than those in the LSUB response, except that a
      * \noselect flag in the LSUB response means that the mailbox isn't
      * subscribed, so we should respect it. */
-    noselect = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOSELECT) != 0);
+    noselect = (IMAP_MBOX_HAS_FLAG(flags, IMLIST_NOSELECT) != 0);
     if (state->subscribed) {
         gpointer tmp;
         ImapMboxFlags lsub_flags;
@@ -249,23 +249,23 @@ libbalsa_imap_list_cb(ImapMboxHandle * handle, int delim,
 
     /* These flags are different, but both mean that we don't need to
      * scan the folder: */
-    noscan = (IMAP_MBOX_HAS_FLAG(*flags, IMLIST_NOINFERIORS)
-              || IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASNOCHILDREN))
-        && !IMAP_MBOX_HAS_FLAG(*flags, IMLIST_HASCHILDREN);
+    noscan = (IMAP_MBOX_HAS_FLAG(flags, IMLIST_NOINFERIORS)
+              || IMAP_MBOX_HAS_FLAG(flags, IMLIST_HASNOCHILDREN))
+        && !IMAP_MBOX_HAS_FLAG(flags, IMLIST_HASCHILDREN);
     if (noscan) {
         g_hash_table_remove(state->subfolders, f);
         g_free(f);
     } else
         g_hash_table_insert(state->subfolders, f, NULL);
 
-    marked = IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED);
+    marked = IMAP_MBOX_HAS_FLAG(flags, IMLIST_MARKED);
     state->handle_imap_path(folder, delim, noselect, noscan, marked,
                             state->cb_data);
 }
 
 static void
 libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
-                      ImapMboxFlags * flags, char *folder,
+                      ImapMboxFlags flags, char *folder,
                       struct browser_state *state)
 {
     gchar *f;
@@ -277,7 +277,7 @@ libbalsa_imap_lsub_cb(ImapMboxHandle * handle, int delim,
     f = folder[strlen(folder) - 1] == delim ?
         g_strdup(folder) : g_strdup_printf("%s%c", folder, delim);
 
-    g_hash_table_insert(state->subfolders, f, GINT_TO_POINTER(*flags));
+    g_hash_table_insert(state->subfolders, f, GINT_TO_POINTER(flags));
 }
 
 /* executed with GDK lock OFF.

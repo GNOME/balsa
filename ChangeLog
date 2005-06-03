@@ -1,3 +1,11 @@
+2005-06-02  Pawel Salek
+
+	* balsa.spec.in: extend list of dependencies.
+	* libbalsa/folder-scanners.c: flags are passed by value.
+	* libbalsa/imap/auth-gssapi.c: continue authentication on invalid key.
+	* libbalsa/imap/imap-handle.c: pass flags by value - address was
+	truncated by the marshaller on 64-bit machines.
+
 2005-06-01 20:54  PeterB
 
 	* libbalsa/message.c: lock a GMimeStream.

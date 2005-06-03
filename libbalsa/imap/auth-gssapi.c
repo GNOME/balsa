@@ -169,7 +169,7 @@ imap_auth_gssapi(ImapMboxHandle* handle)
     
     /* get security flags and buffer size */
     WAIT_FOR_PROMPT(rc,handle,cmdno,client_token,sizeof(client_token));
-    if (rc != IMR_RESPOND) return IMAP_AUTH_FAILURE;
+    if (rc != IMR_RESPOND) return IMAP_AUTH_UNAVAIL;
 
     if(!ag_negotiate_parameters(handle, user, cmdno, context, &rc))
         goto negotiation_aborted;
@@ -179,7 +179,7 @@ imap_auth_gssapi(ImapMboxHandle* handle)
     if (state != GSS_S_COMPLETE)
         g_warning("gss_delete_sec_context() failed");
     gss_release_buffer (&min_stat, &request);
-    return rc == IMR_OK ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
+    return rc == IMR_OK ? IMAP_SUCCESS : IMAP_AUTH_UNAVAIL;
  negotiation_aborted:
     sio_write(handle->sio, "*\r\n", 3); imap_handle_flush(handle);
     WAIT_FOR_PROMPT(rc,handle,cmdno,client_token, sizeof(client_token));

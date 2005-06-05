@@ -1113,13 +1113,13 @@ struct mark_info {
 };
 
 static void
-lbm_imap_list_cb(ImapMboxHandle * handle, int delim, ImapMboxFlags * flags,
+lbm_imap_list_cb(ImapMboxHandle * handle, int delim, ImapMboxFlags flags,
                  char *folder, gpointer data)
 {
     struct mark_info *info = data;
 
     if (strcmp(folder, info->path) == 0
-        && IMAP_MBOX_HAS_FLAG(*flags, IMLIST_MARKED))
+        && IMAP_MBOX_HAS_FLAG(flags, IMLIST_MARKED))
         info->marked = TRUE;
 }
 

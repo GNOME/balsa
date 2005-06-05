@@ -1,3 +1,11 @@
+* Balsa-2.3.3 release. Release date 2005-06-05
+
+- preserve local mailbox statistics between sessions.
+- SQLite v.3 support (#305152).
+- default inbox location (#305659).
+- better mailbox popup menu (#305668).
+- fix imap scanning on 64-bit machines.
+
 * Balsa-2.3.2 release. Release date 2005-05-08
 
 - fix bugs 302782, 303421, 303422.

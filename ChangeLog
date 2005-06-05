@@ -1,4 +1,9 @@
-2005-06-02  Pawel Salek
+2005-06-05  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: Peter found one more fault in imap scanning.
+	* NEWS, configure.in: release 2.3.3
+
+2005-06-04  Pawel Salek
 
 	* balsa.spec.in: extend list of dependencies.
 	* libbalsa/folder-scanners.c: flags are passed by value.

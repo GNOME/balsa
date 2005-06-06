@@ -5,6 +5,7 @@
 	* libbalsa/send.c: allow the user to check certificates w/o threads.
 	* src/main-window.c: mbnode->name can be NULL - do not use it
 	and perhaps fix 306636.
+	* NEWS: update for real 2.3.3 release this time.
 
 2005-06-05  Pawel Salek
 

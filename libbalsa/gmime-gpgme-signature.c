@@ -103,8 +103,12 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
 
     /* try to get the related key */
     err = gpgme_get_key(ctx, sig_stat->fingerprint, &key, 0);
-    if (err != GPG_ERR_NO_ERROR)
-         return sig_stat;
+    if (err != GPG_ERR_NO_ERROR) {
+          g_message("could not retreive the key with fingerprint %s: %s: %s",
+                    sig_stat->fingerprint, gpgme_strsource(err),
+                    gpgme_strerror(err));
+	return sig_stat;
+    }
     if (key == NULL)
 	return sig_stat;
 
@@ -121,11 +125,11 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
      * one and scan uid's to get useable name, email and uid strings */
     sig_stat->validity = uid->validity;
     while (uid) {
-	if (!sig_stat->sign_name && uid->name && strlen(uid->name))
+	if (!sig_stat->sign_name && uid->name && *uid->name)
 	    sig_stat->sign_name = g_strdup(uid->name);
-	if (!sig_stat->sign_email && uid->email && strlen(uid->email))
+	if (!sig_stat->sign_email && uid->email && *uid->email)
 	    sig_stat->sign_email = g_strdup(uid->email);
-	if (!sig_stat->sign_uid && uid->uid && strlen(uid->uid))
+	if (!sig_stat->sign_uid && uid->uid && *uid->uid)
 	    sig_stat->sign_uid = fix_EMail_info(g_strdup(uid->uid));
 	uid = uid->next;
     }

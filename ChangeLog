@@ -1,7 +1,15 @@
+2005-06-06  Pawel Salek
+
+	* libbalsa/gmime-gpgme-signature.c: check gpgme_get_key() result.
+	* libbalsa/libbalsa.c: fix bug 306666.
+	* libbalsa/send.c: allow the user to check certificates w/o threads.
+	* src/main-window.c: mbnode->name can be NULL - do not use it
+	and perhaps fix 306636.
+
 2005-06-05  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: Peter found one more fault in imap scanning.
-	* NEWS, configure.in: release 2.3.3
+	* NEWS, configure.in: update for release 2.3.3
 
 2005-06-04  Pawel Salek
 

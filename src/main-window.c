@@ -2851,11 +2851,8 @@ balsa_window_mailbox_check(LibBalsaMailbox * mailbox)
     gchar *string = NULL;
 
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-	BalsaMailboxNode *mbnode = balsa_find_mailbox(mailbox);
-	while (mbnode->parent)
-	    mbnode = mbnode->parent;
-	string = g_strdup_printf(_("IMAP Server %s: %s"), mbnode->name,
-                                 mailbox->name);
+	string = g_strdup_printf(_("IMAP mailbox: %s"), mailbox->url);
+        puts(string);
     } else if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox))
 	string = g_strdup_printf(_("Local mailbox: %s"), mailbox->name);
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, string, 0, 0);

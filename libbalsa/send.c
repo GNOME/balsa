@@ -412,6 +412,18 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     return LIBBALSA_MESSAGE_CREATE_OK;
 }
 
+static void
+lbs_change_flags(LibBalsaMessage * msg, LibBalsaMessageFlag set,
+                 LibBalsaMessageFlag clear)
+{
+    GArray *array = g_array_new(FALSE, FALSE, sizeof(guint));
+
+    g_array_append_val(array, msg->msgno);
+    libbalsa_mailbox_messages_change_flags(msg->mailbox, array, set,
+                                           clear);
+    g_array_free(array, TRUE);
+}
+
 /* libbalsa_message_send:
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
@@ -444,7 +456,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 
     return result;
 }
-#else
+#else /* ENABLE_ESMTP */
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, LibBalsaFccboxFinder finder,
@@ -460,19 +472,7 @@ libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
  
     return result;
 }
-#endif
-
-static void
-lbs_change_flags(LibBalsaMessage * msg, LibBalsaMessageFlag set,
-                 LibBalsaMessageFlag clear)
-{
-    GArray *array = g_array_new(FALSE, FALSE, sizeof(guint));
-
-    g_array_append_val(array, msg->msgno);
-    libbalsa_mailbox_messages_change_flags(msg->mailbox, array, set,
-                                           clear);
-    g_array_free(array, TRUE);
-}
+#endif /* ENABLE_ESMTP */
 
 #if ENABLE_ESMTP
 /* [BCS] - libESMTP uses a callback function to read the message from the
@@ -1039,6 +1039,49 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
     }
     va_end (ap);
 }
+#else /* BALSA: USE_THREADS */
+static void
+libbalsa_smtp_event_cb_serial(smtp_session_t session, int event_no,
+                              void *arg, ...)
+{
+    va_list ap;
+
+    va_start (ap, arg);
+    switch (event_no) {
+#ifdef USE_TLS
+        /* SMTP_TLS related things. Observe that we need to have SSL
+	 * enabled in balsa to properly interpret libesmtp
+	 * messages. */
+    case SMTP_EV_INVALID_PEER_CERTIFICATE: {
+        long vfy_result;
+	SSL  *ssl;
+	X509 *cert;
+        int *ok;
+        vfy_result = va_arg(ap, long); ok = va_arg(ap, int*);
+	ssl = va_arg(ap, SSL*);
+	cert = SSL_get_peer_certificate(ssl);
+	if(cert) {
+	    *ok = libbalsa_is_cert_known(cert, vfy_result);
+	    X509_free(cert);
+	}
+        break;
+    }
+    case SMTP_EV_NO_PEER_CERTIFICATE:
+    case SMTP_EV_WRONG_PEER_CERTIFICATE:
+#if LIBESMTP_1_0_3_AVAILABLE
+    case SMTP_EV_NO_CLIENT_CERTIFICATE:
+#endif
+    {
+	int *ok;
+	printf("SMTP-TLS event_no=%d\n", event_no);
+	ok = va_arg(ap, int*);
+	*ok = 1;
+	break;
+    }
+#endif /* USE_TLS */
+    }
+    va_end (ap);
+}
 #endif /* BALSA_USE_THREADS */
 
 #else /* ESMTP */
@@ -1214,6 +1257,8 @@ balsa_send_message_real(SendMessageInfo* info)
        feedback in non-MT version.
     */
     smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
+#else
+    smtp_set_eventcb (info->session, libbalsa_smtp_event_cb_serial, NULL);
 #endif
 
     /* Add a protocol monitor when debugging is enabled. */

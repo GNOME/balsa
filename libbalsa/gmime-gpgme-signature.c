@@ -82,6 +82,7 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     gpgme_key_t key;
     gpgme_subkey_t subkey;
     gpgme_user_id_t uid;
+    gpgme_error_t err;
 
     g_return_val_if_fail(ctx, NULL);
     if (!(sig_stat = g_mime_gpgme_sigstat_new()))
@@ -101,7 +102,9 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     sig_stat->status = gpgme_err_code(result->signatures->status);
 
     /* try to get the related key */
-    gpgme_get_key(ctx, sig_stat->fingerprint, &key, 0);
+    err = gpgme_get_key(ctx, sig_stat->fingerprint, &key, 0);
+    if (err != GPG_ERR_NO_ERROR)
+         return sig_stat;
     if (key == NULL)
 	return sig_stat;
 

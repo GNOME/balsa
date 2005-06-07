@@ -584,6 +584,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 #ifdef HAVE_SMIME
     gboolean smime_signed = FALSE;
 #endif
+    GMimeStream *stream;
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, body);
@@ -646,6 +647,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 			  _("Enter passphrase to decrypt message"));
     }
 
+    stream = libbalsa_message_stream(body->message);
+    libbalsa_mime_stream_shared_lock(stream);
     if (protocol == GPGME_PROTOCOL_OpenPGP)
 	mime_obj =
 	    g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
@@ -668,6 +671,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 					       GMIME_CIPHER_CONTEXT(ctx),
 					       &error);
 #endif
+    libbalsa_mime_stream_shared_unlock(stream);
+    g_object_unref(stream);
 
     /* check the result */
     if (mime_obj == NULL) {

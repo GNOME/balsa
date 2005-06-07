@@ -1,3 +1,7 @@
+2005-06-07 11:56  PeterB
+
+	* libbalsa/: rfc3156.c, gmime-part-rfc2440.c: lock GMimeStreams.
+
 2005-06-06  Pawel Salek
 
 	* libbalsa/gmime-gpgme-signature.c: check gpgme_get_key() result.

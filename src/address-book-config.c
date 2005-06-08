@@ -172,12 +172,7 @@ create_local_dialog(AddressBookConfig * abc)
                      ab ? ab->expand_aliases : TRUE);
 
     if (ab) {
-        const gchar *path;
-
-        if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD)
-            path = LIBBALSA_ADDRESS_BOOK_VCARD(ab)->path;
-        else
-            path = LIBBALSA_ADDRESS_BOOK_LDIF(ab)->path;
+        const gchar *path = LIBBALSA_ADDRESS_BOOK_TEXT(ab)->path;
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), path);
     }
     g_signal_connect(G_OBJECT(dialog), "response",
@@ -649,15 +644,16 @@ modify_book(AddressBookConfig * abc)
     address_book->name =
         g_strdup(gtk_entry_get_text(GTK_ENTRY(abc->name_entry)));
 
-    if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
-        LibBalsaAddressBookVcard *vcard;
+    if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD
+        || abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
+        LibBalsaAddressBookText *ab_text =
+            LIBBALSA_ADDRESS_BOOK_TEXT(address_book);
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
 
-        vcard = LIBBALSA_ADDRESS_BOOK_VCARD(address_book);
         if (path) {
-            g_free(vcard->path);
-            vcard->path = path;
+            g_free(ab_text->path);
+            ab_text->path = path;
         }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
         LibBalsaAddressBookExtern *externq;
@@ -687,16 +683,6 @@ modify_book(AddressBookConfig * abc)
         if (save) {
             g_free(externq->save);
             externq->save = save;
-        }
-    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
-        LibBalsaAddressBookLdif *ldif;
-        gchar *path =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
-
-        ldif = LIBBALSA_ADDRESS_BOOK_LDIF(address_book);
-        if (path) {
-            g_free(ldif->path);
-            ldif->path = path;
         }
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {

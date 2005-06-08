@@ -4,6 +4,10 @@
 
 2005-06-08 14:13  PeterB
 
+	* src/balsa-message.c, src/print.c, src/sendmsg-window.c,
+	libbalsa/libbalsa.c, libbalsa/libbalsa.h, libbalsa/mailbox.c,
+	libbalsa/message.h: rename libbalsa_date_to_gchar as
+	libbalsa_date_to_utf8, and return a UTF-8 string.
 	* src/ab-main.c: reuse edit widget for smoother update; reload
 	address book after changing it.
 	* src/address-book-config.c: use new LibBalsaAddressBook subclass

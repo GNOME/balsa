@@ -123,6 +123,8 @@ libbalsa_address_set_copy(LibBalsaAddress * dest, LibBalsaAddress * src)
     dest->nick_name = g_strdup(src->nick_name);
     g_free(dest->full_name);
     dest->full_name = g_strdup(src->full_name);
+    g_free(dest->first_name);
+    dest->first_name = g_strdup(src->first_name);
     g_free(dest->last_name);
     dest->last_name = g_strdup(src->last_name);
     g_free(dest->organization);
@@ -249,25 +251,13 @@ libbalsa_address_get_mailbox_from_list(const InternetAddressList *
 /*                                UI PART                              */
 /* =================================================================== */
 
-/** libbalsa_address_get_edit_widget() returns an widget adapted
-    for a LibBalsaAddress edition, with initial values set if address
-    is provided. The edit entries are set in entries array 
-    and enumerated with LibBalsaAddressField constants
+/** libbalsa_address_set_edit_entries() initializes the GtkEntry widgets
+    in entries with values from address
 */
-GtkWidget*
-libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
-                                 GCallback changed_cb, gpointer changed_data)
+void
+libbalsa_address_set_edit_entries(LibBalsaAddress * address,
+                                  GtkWidget **entries)
 {
-    const static gchar *labels[NUM_FIELDS] = {
-	N_("_Displayed Name:"),
-	N_("_First Name:"),
-	N_("_Last Name:"),
-	N_("_Nickname:"),
-	N_("O_rganization:"),
-	N_("_Email Address:")
-    };
-
-    GtkWidget *table, *label;
     gchar *new_name = NULL;
     gchar *new_email = NULL;
     gchar *new_organization = NULL;
@@ -341,17 +331,130 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
     if (last_name == NULL)
 	last_name = g_strdup("");
 
+    /* Full name must be set after first and last names. */
+    gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
+
+    if (address) {
+        GtkListStore *store =
+            GTK_LIST_STORE(gtk_tree_view_get_model
+                           (GTK_TREE_VIEW(entries[EMAIL_ADDRESS])));
+        GList *list;
+
+        gtk_list_store_clear(store);
+        for (list = address->address_list; list; list = list->next) {
+            GtkTreeIter iter;
+            gtk_list_store_append(store, &iter);
+            gtk_list_store_set(store, &iter, 0, list->data, -1);
+        }
+    }
+
+    gtk_editable_select_region(GTK_EDITABLE(entries[FULL_NAME]), 0, -1);
+
+    for (cnt = FULL_NAME + 1; cnt < NUM_FIELDS; cnt++)
+        if (GTK_IS_EDITABLE(entries[cnt]))
+            gtk_editable_set_position(GTK_EDITABLE(entries[cnt]), 0);
+
+    g_free(new_name);
+    g_free(first_name);
+    g_free(last_name);
+    g_free(new_email);
+    g_free(new_organization);
+    gtk_widget_grab_focus(entries[FULL_NAME]);
+}
+
+/** libbalsa_address_get_edit_widget() returns an widget adapted
+    for a LibBalsaAddress edition, with initial values set if address
+    is provided. The edit entries are set in entries array 
+    and enumerated with LibBalsaAddressField constants
+*/
+static void
+lba_entry_changed(GtkEntry * entry, GtkEntry ** entries)
+{
+    gchar *full_name =
+        g_strconcat(gtk_entry_get_text(entries[FIRST_NAME]), " ",
+                    gtk_entry_get_text(entries[LAST_NAME]), NULL);
+    gtk_entry_set_text(entries[FULL_NAME], full_name);
+    g_free(full_name);
+}
+
+static void
+lba_cell_edited(GtkCellRendererText * cell, const gchar * path_string,
+                const gchar * new_text, GtkListStore * store)
+{
+    GtkTreeIter iter;
+
+    if (gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(store),
+                                            &iter, path_string))
+        gtk_list_store_set(store, &iter, 0, new_text, -1);
+}
+
+static GtkWidget *
+lba_address_list_widget(GCallback changed_cb, gpointer changed_data)
+{
+    GtkListStore *store;
+    GtkWidget *tree_view;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+
+    store = gtk_list_store_new(1, G_TYPE_STRING);
+    tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), FALSE);
+
+    renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "editable", TRUE, NULL);
+    g_signal_connect(renderer, "edited", G_CALLBACK(lba_cell_edited),
+                     store);
+    if (changed_cb)
+        g_signal_connect_swapped(renderer, "edited",
+                                 changed_cb, changed_data);
+
+    column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+                                                      "text", 0, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+
+    return tree_view;
+}
+
+GtkWidget*
+libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
+                                 GCallback changed_cb, gpointer changed_data)
+{
+    const static gchar *labels[NUM_FIELDS] = {
+	N_("_Displayed Name:"),
+	N_("_First Name:"),
+	N_("_Last Name:"),
+	N_("_Nickname:"),
+	N_("O_rganization:"),
+        N_("_Email Address:")
+    };
+
+    GtkWidget *table, *label;
+    gint cnt;
 
     table = gtk_table_new(NUM_FIELDS, 2, FALSE);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 3);
+#define HIG_PADDING 6
+    gtk_table_set_row_spacings(GTK_TABLE(table), HIG_PADDING);
+    gtk_table_set_col_spacings(GTK_TABLE(table), HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(table), HIG_PADDING);
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
+        if (!labels[cnt])
+            continue;
 	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
-	gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-        entries[cnt] = gtk_entry_new();
-        if(changed_cb)
-            g_signal_connect(G_OBJECT(entries[cnt]), "changed",
-                             changed_cb, changed_data);
+	gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.0);
+        if (cnt == EMAIL_ADDRESS)
+            entries[cnt] = lba_address_list_widget(changed_cb,
+                                                   changed_data);
+        else {
+            entries[cnt] = gtk_entry_new();
+            if (changed_cb)
+                g_signal_connect_swapped(entries[cnt], "changed",
+                                         changed_cb, changed_data);
+        }
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
 
 	gtk_table_attach(GTK_TABLE(table), label, 0, 1, cnt + 1, cnt + 2,
@@ -363,28 +466,18 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
 			 cnt + 2, GTK_FILL | GTK_EXPAND,
 			 GTK_FILL | GTK_EXPAND, 2, 2);
     }
+    g_signal_connect(entries[FIRST_NAME], "changed",
+                     G_CALLBACK(lba_entry_changed), entries);
+    g_signal_connect(entries[LAST_NAME], "changed",
+                     G_CALLBACK(lba_entry_changed), entries);
 
-    gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
-    gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
-    gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
-    gtk_entry_set_text(GTK_ENTRY(entries[EMAIL_ADDRESS]), new_email);
-    gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
+    libbalsa_address_set_edit_entries(address, entries);
 
-    gtk_editable_select_region(GTK_EDITABLE(entries[FULL_NAME]), 0, -1);
-
-    for (cnt = FULL_NAME + 1; cnt < NUM_FIELDS; cnt++)
-        gtk_editable_set_position(GTK_EDITABLE(entries[cnt]), 0);
-
-    g_free(new_name);
-    g_free(first_name);
-    g_free(last_name);
-    g_free(new_email);
-    g_free(new_organization);
     return table;
 }
 
-LibBalsaAddress*
-libbalsa_address_new_from_edit_entries(GtkWidget **entries)
+LibBalsaAddress *
+libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
 {
 #define SET_FIELD(f,e)\
   do{ (f) = g_strstrip(gtk_editable_get_chars(GTK_EDITABLE(e), 0, -1));\
@@ -392,7 +485,12 @@ libbalsa_address_new_from_edit_entries(GtkWidget **entries)
  else { while( (p=strchr(address->full_name,';'))) *p = ','; }  } while(0)
 
     LibBalsaAddress *address;
-    char *p, *addr;
+    char *p;
+    GList *list = NULL;
+    GtkTreeModel *model;
+    gboolean valid;
+    GtkTreeIter iter;
+
     /* FIXME: This problem should be solved in the VCard
        implementation in libbalsa: semicolons mess up how GnomeCard
        processes the fields, so disallow them and replace them
@@ -404,9 +502,17 @@ libbalsa_address_new_from_edit_entries(GtkWidget **entries)
     SET_FIELD(address->last_name,   entries[LAST_NAME]);
     SET_FIELD(address->nick_name,   entries[NICK_NAME]);
     SET_FIELD(address->organization,entries[ORGANIZATION]);
-    SET_FIELD(addr,                 entries[EMAIL_ADDRESS]);
 
-    if(addr)
-        address->address_list = g_list_append(address->address_list,addr);
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(entries[EMAIL_ADDRESS]));
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        gchar *email;
+
+        gtk_tree_model_get(model, &iter, 0, &email, -1);
+        if (email && *email)
+            list = g_list_prepend(list, email);
+    }
+    address->address_list = g_list_reverse(list);
+
     return address;
 }

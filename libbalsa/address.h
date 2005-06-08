@@ -99,6 +99,11 @@ const gchar *libbalsa_address_get_mailbox_from_list(const
 /*                                UI PART                              */
 /* =================================================================== */
 
+/** libbalsa_address_set_edit_entries() initializes the GtkEntry widgets
+    in entries with values from address
+*/
+void libbalsa_address_set_edit_entries(LibBalsaAddress * address,
+                                       GtkWidget ** entries);
 /** libbalsa_address_get_edit_widget() returns an widget adapted
     for a LibBalsaAddress edition, with initial values set if address
     is provided. The edit entries are set in entries array 

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2005 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,7 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_LDIF_H__
 #define __LIBBALSA_ADDRESS_BOOK_LDIF_H__
 
-#include <time.h>
-#include "address-book.h"
+#include "address-book-text.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_LDIF			(libbalsa_address_book_ldif_get_type())
 #define LIBBALSA_ADDRESS_BOOK_LDIF(obj)			(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_LDIF, LibBalsaAddressBookLdif))
@@ -41,25 +40,16 @@ typedef struct _LibBalsaAddressBookLdifClass
     LibBalsaAddressBookLdifClass;
 
 struct _LibBalsaAddressBookLdif {
-    LibBalsaAddressBook parent;
-
-    gchar *path;
-
-    GList *address_list;
-
-    time_t mtime;
-
-    GCompletion *name_complete;
+    LibBalsaAddressBookText parent;
 };
 
 struct _LibBalsaAddressBookLdifClass {
-    LibBalsaAddressBookClass parent_class;
+    LibBalsaAddressBookTextClass parent_class;
 };
 
 GType libbalsa_address_book_ldif_get_type(void);
 
 LibBalsaAddressBook *libbalsa_address_book_ldif_new(const gchar * name,
-						     const gchar * path);
+                                                    const gchar * path);
 
-
-#endif
+#endif /* __LIBBALSA_ADDRESS_BOOK_LDIF_H__ */

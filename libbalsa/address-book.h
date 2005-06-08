@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2005 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,9 @@
 #define LIBBALSA_ADDRESS_BOOK_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK, LibBalsaAddressBookClass))
 #define LIBBALSA_IS_ADDRESS_BOOK(obj)			(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK))
 #define LIBBALSA_IS_ADDRESS_BOOK_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK))
+#define LIBBALSA_ADDRESS_BOOK_GET_CLASS(obj) \
+    (G_TYPE_INSTANCE_GET_CLASS ((obj), LIBBALSA_TYPE_ADDRESS_BOOK, \
+				LibBalsaAddressBookClass))
 
 typedef enum {
     LBABERR_OK = 0,
@@ -37,7 +40,8 @@ typedef enum {
     LBABERR_CANNOT_WRITE,
     LBABERR_CANNOT_CONNECT,
     LBABERR_CANNOT_SEARCH,
-    LBABERR_DUPLICATE
+    LBABERR_DUPLICATE,
+    LBABERR_ADDRESS_NOT_FOUND
 } LibBalsaABErr;
     
 typedef struct _LibBalsaAddressBook LibBalsaAddressBook;

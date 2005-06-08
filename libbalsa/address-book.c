@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2005 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,19 +44,6 @@ static void libbalsa_address_book_real_load_config(LibBalsaAddressBook *
 						   ab,
 						   const gchar * group);
 
-enum {
-    LOAD,
-    ADD_ADDRESS,
-    REMOVE_ADDRESS,
-    MODIFY_ADDRESS,
-    SAVE_CONFIG,
-    LOAD_CONFIG,
-    ALIAS_COMPLETE,
-    LAST_SIGNAL
-};
-
-static guint libbalsa_address_book_signals[LAST_SIGNAL];
-
 GType libbalsa_address_book_get_type(void)
 {
     static GType address_book_type = 0;
@@ -91,76 +78,6 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
     parent_class = g_type_class_peek_parent(klass);
 
     object_class = G_OBJECT_CLASS(klass);
-
-    libbalsa_address_book_signals[LOAD] =
-	g_signal_new("load",
-		       G_TYPE_FROM_CLASS(object_class),
-		       G_SIGNAL_RUN_LAST,
-		       G_STRUCT_OFFSET(LibBalsaAddressBookClass, load),
-                       NULL, NULL,
-		       libbalsa_INT__POINTER_POINTER_POINTER,
-                       G_TYPE_INT, 3,
-		       G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_POINTER);
-    libbalsa_address_book_signals[ADD_ADDRESS] =
-	g_signal_new("add-address",
-		       G_TYPE_FROM_CLASS(object_class),
-		       G_SIGNAL_RUN_LAST,
-		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
-                                       add_address),
-                       NULL, NULL,
-		       libbalsa_INT__OBJECT,
-                       G_TYPE_INT, 1,
-		       G_TYPE_OBJECT);
-    libbalsa_address_book_signals[REMOVE_ADDRESS] =
-	g_signal_new("remove-address",
-		       G_TYPE_FROM_CLASS(object_class),
-		       G_SIGNAL_RUN_LAST,
-		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
-                                       remove_address),
-                       NULL, NULL,
-		       libbalsa_INT__OBJECT,
-                       G_TYPE_INT, 1,
-		       G_TYPE_OBJECT);
-    libbalsa_address_book_signals[MODIFY_ADDRESS] =
-	g_signal_new("modify-address",
-		       G_TYPE_FROM_CLASS(object_class),
-		       G_SIGNAL_RUN_LAST,
-		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
-                                       modify_address),
-                       NULL, NULL,
-		       libbalsa_INT__OBJECT_OBJECT,
-                       G_TYPE_INT, 2,
-		       G_TYPE_OBJECT, G_TYPE_OBJECT);
-    libbalsa_address_book_signals[SAVE_CONFIG] =
-	g_signal_new("save-config",
-                       G_TYPE_FROM_CLASS(object_class),
-                       G_SIGNAL_RUN_FIRST,
-		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
-					 save_config),
-                       NULL, NULL,
-		       g_cclosure_marshal_VOID__POINTER,
-                       G_TYPE_NONE, 1,
-		       G_TYPE_POINTER);
-    libbalsa_address_book_signals[LOAD_CONFIG] =
-	g_signal_new("load-config",
-                       G_TYPE_FROM_CLASS(object_class),
-                       G_SIGNAL_RUN_FIRST, 
-		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
-					 load_config),
-                       NULL, NULL,
-		       g_cclosure_marshal_VOID__POINTER,
-                       G_TYPE_NONE, 1,
-		       G_TYPE_POINTER);
-    libbalsa_address_book_signals[ALIAS_COMPLETE] =
-	g_signal_new("alias-complete",
-                       G_TYPE_FROM_CLASS(object_class),
-                       G_SIGNAL_RUN_LAST, 
-		       G_STRUCT_OFFSET(LibBalsaAddressBookClass,
-					 alias_complete),
-                       NULL, NULL,
-		       libbalsa_POINTER__POINTER_POINTER, 
-                       G_TYPE_POINTER, 2,
-		       G_TYPE_POINTER, G_TYPE_POINTER);
 
     klass->load = NULL;
     klass->add_address = NULL;
@@ -237,61 +154,53 @@ libbalsa_address_book_new_from_config(const gchar * group)
 
 LibBalsaABErr
 libbalsa_address_book_load(LibBalsaAddressBook * ab,
-                           const gchar *filter,
+                           const gchar * filter,
                            LibBalsaAddressBookLoadFunc callback,
                            gpointer closure)
 {
-    LibBalsaABErr res;
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
 
-    g_signal_emit(G_OBJECT(ab), libbalsa_address_book_signals[LOAD], 0,
-                  filter, callback, closure, &res);
-
-    return res;
+    return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->load(ab, filter, callback,
+                                                     closure);
 }
 
 LibBalsaABErr
-libbalsa_address_book_add_address(LibBalsaAddressBook *ab,
-                                  LibBalsaAddress *address)
+libbalsa_address_book_add_address(LibBalsaAddressBook * ab,
+                                  LibBalsaAddress * address)
 {
-    LibBalsaABErr res;
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
 
-    g_signal_emit(G_OBJECT(ab),
-                  libbalsa_address_book_signals[ADD_ADDRESS], 0,
-                  address, &res);
-    return res;
+    return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->add_address(ab, address);
 }
 
 LibBalsaABErr
-libbalsa_address_book_remove_address(LibBalsaAddressBook *ab,
-                                     LibBalsaAddress *address)
+libbalsa_address_book_remove_address(LibBalsaAddressBook * ab,
+                                     LibBalsaAddress * address)
 {
-    LibBalsaABErr res;
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
 
-    g_signal_emit(G_OBJECT(ab),
-                  libbalsa_address_book_signals[REMOVE_ADDRESS], 0,
-                  address, &res);
-    return res;
+    return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->remove_address(ab,
+                                                               address);
 }
 
 LibBalsaABErr
-libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
-                                     LibBalsaAddress *address,
-                                     LibBalsaAddress *newval)
+libbalsa_address_book_modify_address(LibBalsaAddressBook * ab,
+                                     LibBalsaAddress * address,
+                                     LibBalsaAddress * newval)
 {
     LibBalsaABErr res;
+
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
 
-    g_signal_emit(G_OBJECT(ab),
-                  libbalsa_address_book_signals[MODIFY_ADDRESS], 0,
-                  address, newval, &res);
-    if(res == LBABERR_OK)
+    res =
+        LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->modify_address(ab, address,
+                                                            newval);
+    if (res == LBABERR_OK)
         libbalsa_address_set_copy(address, newval);
+
     return res;
 }
 
@@ -312,11 +221,9 @@ libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 
     libbalsa_conf_private_remove_group(group);
     libbalsa_conf_remove_group(group);
-    libbalsa_conf_push_group(group);
 
-    g_signal_emit(G_OBJECT(ab),
-                  libbalsa_address_book_signals[SAVE_CONFIG], 0,
-                  group);
+    libbalsa_conf_push_group(group);
+    LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->save_config(ab, group);
     libbalsa_conf_pop_group();
 }
 
@@ -327,26 +234,19 @@ libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
     libbalsa_conf_push_group(group);
-    g_signal_emit(G_OBJECT(ab),
-		  libbalsa_address_book_signals[LOAD_CONFIG], 0,
-                  group);
+    LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->load_config(ab, group);
     libbalsa_conf_pop_group();
 }
 
 GList *
-libbalsa_address_book_alias_complete(LibBalsaAddressBook *ab,
-				     const gchar * prefix,
-				     gchar ** new_prefix)
+libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
+                                     const gchar * prefix,
+                                     gchar ** new_prefix)
 {
-    GList *res = NULL;
-
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), NULL);
 
-    g_signal_emit(G_OBJECT(ab),
-                  libbalsa_address_book_signals[ALIAS_COMPLETE], 0,
-                  prefix, new_prefix, &res);
-    return res;
-
+    return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->alias_complete(ab, prefix,
+                                                               new_prefix);
 }
 
 
@@ -405,6 +305,8 @@ libbalsa_address_book_strerror(LibBalsaAddressBook * ab, LibBalsaABErr err)
     case LBABERR_CANNOT_SEARCH:  s= _("Cannot search in the address book"); 
         break;
     case LBABERR_DUPLICATE:      s= _("Cannot add duplicate entry");    break;
+    case LBABERR_ADDRESS_NOT_FOUND:
+        s= _("Cannot find address in address book"); break;
     default: s= _("Unknown error"); break;
     }
     return s;

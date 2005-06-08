@@ -1,3 +1,23 @@
+2005-06-08 Andrew Lau
+
+	* libbalsa/address-book-ldap.c: include "i18n.h".
+
+2005-06-08 14:13  PeterB
+
+	* src/ab-main.c: reuse edit widget for smoother update; reload
+	address book after changing it.
+	* src/address-book-config.c: use new LibBalsaAddressBook subclass
+	structure.
+	* libbalsa/Makefile.am: add dependencies.
+	* libbalsa/: address.c, address.h: use an editable GtkTreeView to
+	edit email addresses; implement libbalsa_address_set_edit_entries
+	to reuse an edit widget.
+	* libbalsa/: address-book-ldif.c, address-book-ldif.h,
+	address-book-text.c, address-book-text.h, address-book-vcard.c,
+	address-book-vcard.h, address-book.c, address-book.h: new class
+	LibBalsaAddressBookText, subclass of LibBalsaAddressBook, with
+	LibBalsaAddressBook{Ldif,Vcard} as subclasses.
+
 2005-06-07 11:56  PeterB
 
 	* libbalsa/: rfc3156.c, gmime-part-rfc2440.c: lock GMimeStreams.

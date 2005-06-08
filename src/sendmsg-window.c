@@ -3134,8 +3134,8 @@ quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message, SendType type)
         personStr = g_strdup(_("you"));
 
     if (message->headers->date)
-        date = libbalsa_message_date_to_gchar(message,
-                                              balsa_app.date_string);
+        date = libbalsa_message_date_to_utf8(message,
+                                             balsa_app.date_string);
 
     if (type == SEND_FORWARD_ATTACH) {
 	gchar *subject;

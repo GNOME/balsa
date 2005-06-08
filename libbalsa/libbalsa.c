@@ -343,7 +343,7 @@ libbalsa_assure_balsa_dir(void)
 }
 
 gchar*
-libbalsa_date_to_gchar(const time_t *date, const gchar *date_string)
+libbalsa_date_to_utf8(const time_t *date, const gchar *date_string)
 {
     struct tm footime;
     gchar rettime[128];
@@ -355,7 +355,7 @@ libbalsa_date_to_gchar(const time_t *date, const gchar *date_string)
 
     strftime(rettime, sizeof(rettime), date_string, &footime);
 
-    return g_strdup(rettime);
+    return g_locale_to_utf8(rettime, -1, NULL, NULL, NULL);
 }
 
 LibBalsaMessageStatus

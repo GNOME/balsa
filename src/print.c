@@ -352,7 +352,7 @@ prepare_header_real(PrintInfo * pi, LibBalsaMessageBody * sig_body,
     }
     g_free(subject);
 
-    date = libbalsa_message_headers_date_to_gchar(headers, balsa_app.date_string);
+    date = libbalsa_message_headers_date_to_utf8(headers, balsa_app.date_string);
     print_header_string (&pdata->headers, "date", _("Date:"), date);
     g_free(date);
 
@@ -473,7 +473,7 @@ prepare_message_header(PrintInfo * pi, LibBalsaMessageBody * body)
 	footer_string = g_string_new(subject);
     g_free(subject);
 
-    date = libbalsa_message_date_to_gchar(pi->message, balsa_app.date_string);
+    date = libbalsa_message_date_to_utf8(pi->message, balsa_app.date_string);
     if (footer_string) {
 	footer_string = g_string_append(footer_string, " - ");
 	footer_string = g_string_append(footer_string, date);

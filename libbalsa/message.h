@@ -337,8 +337,8 @@ glong libbalsa_message_get_length(LibBalsaMessage* msg);
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
 LibBalsaMessageAttach libbalsa_message_get_attach_icon(LibBalsaMessage *
 						       message);
-#define libbalsa_message_date_to_gchar(m, f) libbalsa_date_to_gchar(&(m)->headers->date, (f))
-#define libbalsa_message_headers_date_to_gchar(h, f) libbalsa_date_to_gchar(&(h)->date, (f))
+#define libbalsa_message_date_to_utf8(m, f) libbalsa_date_to_utf8(&(m)->headers->date, (f))
+#define libbalsa_message_headers_date_to_utf8(h, f) libbalsa_date_to_utf8(&(h)->date, (f))
 
 GList *libbalsa_message_refs_for_threading(LibBalsaMessage* msg);
 

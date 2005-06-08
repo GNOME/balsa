@@ -1467,7 +1467,7 @@ display_headers_real(BalsaMessage * bm, LibBalsaMessageHeaders * headers,
 
     add_header_gchar(bm, view, "subject", _("Subject:"), subject);
 
-    date = libbalsa_message_headers_date_to_gchar(headers,
+    date = libbalsa_message_headers_date_to_utf8(headers,
                                                   balsa_app.date_string);
     add_header_gchar(bm, view, "date", _("Date:"), date);
     g_free(date);
@@ -4070,7 +4070,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     
     /* the first part of the body is an informational note */
     body = libbalsa_message_body_new(message);
-    date = libbalsa_message_date_to_gchar(for_msg, balsa_app.date_string);
+    date = libbalsa_message_date_to_utf8(for_msg, balsa_app.date_string);
     dummy = internet_address_list_to_string(for_msg->headers->to_list, FALSE);
     body->buffer = g_strdup_printf(
         "The message sent on %s to %s with subject \"%s\" has been displayed.\n"

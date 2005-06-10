@@ -1365,7 +1365,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   }
 
   rc = ir_handle_response(handle);
-  if(cmdno == lastcmd)
+  if(cmdno == lastcmd || cmdno == 0) /* never insert cmdno==0 */
     return rc;
   else {
     g_hash_table_insert(handle->cmd_queue,

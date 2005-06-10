@@ -5,6 +5,7 @@
 	header caches more aggresively.
 	* libbalsa/imap/imap-commands.c: use UID search support.
 	* libbalsa/imap/imap-handle.h: allow searching ranges of messages.
+	* libbalsa/imap/imap-handle.c: never insert cmd==0 to response queue.
 	* libbalsa/imap/imap-search.c: implement it.
 	* src/ab-window.c: Fix "No-address-book" case (bug 158939).
 	* src/main-window.[hc]: ditto.

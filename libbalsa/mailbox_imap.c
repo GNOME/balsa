@@ -752,6 +752,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 
     mimap->sort_field = -1;	/* Invalidate. */
     if(cnt == mimap->messages_info->len)
+	return;
     if(cnt<mimap->messages_info->len) {
         /* remove messages; we probably missed some EXPUNGE responses
            - the only sensible scenario is that the connection was
@@ -760,18 +761,29 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
         printf("%s: expunge ignored? Had %u messages and now only %u. "
                "Bug in the program or broken connection\n",
                __func__, mimap->messages_info->len, cnt);
-        while(0<mimap->messages_info->len) {
-            unsigned seqno = mimap->messages_info->len;
+        for(i=0; i<mimap->messages_info->len; i++) {
 	    gchar *msgid;
             struct message_info *msg_info =
-                message_info_from_msgno(mimap, seqno);
+                message_info_from_msgno(mimap, i+1);
 	    if(msg_info->message)
                 g_object_unref(msg_info->message);
-            g_array_remove_index(mimap->messages_info, seqno-1);
-	    msgid = g_ptr_array_index(mimap->msgids, seqno-1);
-	    if(msgid) g_free(msgid);
-            g_ptr_array_remove_index(mimap->msgids, seqno-1);
+            msg_info->message = NULL;
+	    msgid = g_ptr_array_index(mimap->msgids, i);
+	    if(msgid) { 
+		g_free(msgid);
+		g_ptr_array_index(mimap->msgids, i) = NULL;
+	    }
+	    libbalsa_mailbox_index_entry_free(g_ptr_array_index(mailbox->mindex,
+                                                        i));
+	    g_ptr_array_index(mailbox->mindex, i) = NULL;
+	    libbalsa_mailbox_msgno_changed(mailbox, i+1);
         }
+	for(i=mimap->messages_info->len; i>cnt; i--) {
+	    g_array_remove_index(mimap->messages_info, i-1);
+	    g_ptr_array_remove_index(mimap->msgids, i-1);
+	    /* msgno_remove will modify mailbox->mindex */
+	    libbalsa_mailbox_msgno_removed(mailbox, i);
+	}
     } 
 
     /* EXISTS response may result from any IMAP action. */

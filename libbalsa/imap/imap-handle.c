@@ -552,8 +552,9 @@ imap_mbox_connect(ImapMboxHandle* handle)
     sio_set_monitorcb(handle->sio, handle->monitor_cb, handle->monitor_arg);
 
   handle->state = IMHS_CONNECTED;
-  if (imap_cmd_step(handle, 0) != IMR_UNTAGGED) {
-    g_message("imap_mbox_connect:unexpected initial response\n");
+  if ( (resp=imap_cmd_step(handle, 0)) != IMR_UNTAGGED) {
+    g_message("imap_mbox_connect:unexpected initial response(%d):\n%s\n",
+	      resp, handle->last_msg);
     imap_handle_disconnect(handle);
     return IMAP_PROTOCOL_ERROR;
   }

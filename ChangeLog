@@ -1,3 +1,15 @@
+2005-06-08  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: survive better cases
+	when number of messages changed in the broken connection. Resync
+	header caches more aggresively.
+	* libbalsa/imap/imap-commands.c: use UID search support.
+	* libbalsa/imap/imap-handle.h: allow searching ranges of messages.
+	* libbalsa/imap/imap-search.c: implement it.
+	* src/ab-window.c: Fix "No-address-book" case (bug 158939).
+	* src/main-window.[hc]: ditto.
+	* src/pref-manager.c: ditto.
+
 2005-06-08 Andrew Lau
 
 	* libbalsa/address-book-ldap.c: include "i18n.h".

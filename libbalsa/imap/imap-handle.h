@@ -190,11 +190,13 @@ ImapSearchKey *imap_search_key_new_string(unsigned negated,
 ImapSearchKey* imap_search_key_new_size_greater(unsigned negated, size_t sz);
 ImapSearchKey* imap_search_key_new_date(ImapSearchDateRange range,
                                         int internal, time_t tm);
+ImapSearchKey* imap_search_key_new_range(unsigned negated, int uid,
+                                         unsigned lo, unsigned hi);
 
 void imap_search_key_free(ImapSearchKey *s);
 void imap_search_key_set_next(ImapSearchKey *list, ImapSearchKey *next);
-ImapResponse imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
-                              ImapSearchCb cb, void *cb_arg);
+ImapResponse imap_search_exec(ImapMboxHandle *h, gboolean uid, 
+                              ImapSearchKey *s, ImapSearchCb cb, void *cb_arg);
 /* ================ END OF SEARCH FUNCTIONS ============================ */
 
 /* ================ BEGIN OF MBOX_VIEW FUNCTIONS ======================= */

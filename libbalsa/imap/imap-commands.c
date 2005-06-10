@@ -1241,7 +1241,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
       handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
                                       * we should not be doing such 
                                       * low level manipulations here */
-      rc = imap_search_exec(handle, filter, append_no, NULL);
+      rc = imap_search_exec(handle, FALSE, filter, append_no, NULL);
     } else {
       if(handle->thread_root)
         g_node_destroy(handle->thread_root);
@@ -1309,8 +1309,8 @@ ImapResponse
 imap_mbox_filter_msgnos(ImapMboxHandle *handle, ImapSearchKey *filter,
 			GHashTable *msgnos)
 {
-  return imap_search_exec(handle, filter, (ImapSearchCb)make_msgno_table,
-                          msgnos);
+  return imap_search_exec(handle, FALSE, filter,
+                          (ImapSearchCb)make_msgno_table, msgnos);
 }
 
 /* imap_mbox_complete_msgids:

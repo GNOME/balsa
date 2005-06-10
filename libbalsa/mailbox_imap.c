@@ -512,9 +512,16 @@ static ImapResult
 mi_reconnect(ImapMboxHandle *h)
 {
     struct ImapCacheManager *icm = icm_store_cached_data(h);
-    ImapResult r = imap_mbox_handle_reconnect(h, NULL);
+    ImapResult r;
+    unsigned old_cnt = imap_mbox_handle_get_exists(h);
+    unsigned old_next = imap_mbox_handle_get_uidnext(h);
+
+    r = imap_mbox_handle_reconnect(h, NULL);
     if(r==IMAP_SUCCESS) icm_restore_from_cache(h, icm);
     icm_destroy(icm);
+    if(imap_mbox_handle_get_exists(h) != old_cnt ||
+       imap_mbox_handle_get_uidnext(h) != old_next)
+	g_signal_emit_by_name(h, "exists-notify", 0);
     return r;
 }
 /* ImapIssue macro handles reconnecting. We might issue a
@@ -740,18 +747,20 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 {
     unsigned cnt = imap_mbox_handle_get_exists(mimap->handle);
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+    unsigned i;
+    struct message_info a = {0};
 
     mimap->sort_field = -1;	/* Invalidate. */
+    if(cnt == mimap->messages_info->len)
     if(cnt<mimap->messages_info->len) {
         /* remove messages; we probably missed some EXPUNGE responses
            - the only sensible scenario is that the connection was
            severed. Still, we need to recover from this somehow... -
-           be aware, w are just guessing. In principle, we should
-           invalidate all the cache now. */
+           We invalidate all the cache now. */
         printf("%s: expunge ignored? Had %u messages and now only %u. "
                "Bug in the program or broken connection\n",
                __func__, mimap->messages_info->len, cnt);
-        while(cnt<mimap->messages_info->len) {
+        while(0<mimap->messages_info->len) {
             unsigned seqno = mimap->messages_info->len;
 	    gchar *msgid;
             struct message_info *msg_info =
@@ -763,33 +772,28 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 	    if(msgid) g_free(msgid);
             g_ptr_array_remove_index(mimap->msgids, seqno-1);
         }
-        ++mimap->search_stamp;
-    } else if (cnt > mimap->messages_info->len) { /* new messages arrived */
-        unsigned i;
-	struct message_info a = {0};
+    } 
 
-	/* EXISTS response may result from any IMAP action. */
-	libbalsa_lock_mailbox(mailbox);
-
-	i=mimap->messages_info->len+1;
-        do {
-            g_array_append_val(mimap->messages_info, a);
-            g_ptr_array_add(mimap->msgids, NULL);
-	    /* dummy entry in mindex for now */
-	    g_ptr_array_add(mailbox->mindex, NULL);
-            libbalsa_mailbox_msgno_inserted(mailbox, i);
-        } while (++i <= cnt);
-	++mimap->search_stamp;
-
-        /* we run filters and get unseen messages in a idle callback:
-         * these things do not need to be done immediately and we do 
-         * not want to issue too many new overlapping IMAP requests.
-         */
-        g_object_ref(G_OBJECT(mailbox));
-        g_idle_add(update_counters_and_filter, mailbox);
-
-	libbalsa_unlock_mailbox(mailbox);
+    /* EXISTS response may result from any IMAP action. */
+    libbalsa_lock_mailbox(mailbox);
+    
+    for(i=mimap->messages_info->len+1; i <= cnt; i++) {
+        g_array_append_val(mimap->messages_info, a);
+        g_ptr_array_add(mimap->msgids, NULL);
+        /* dummy entry in mindex for now */
+        g_ptr_array_add(mailbox->mindex, NULL);
+        libbalsa_mailbox_msgno_inserted(mailbox, i);
     }
+    ++mimap->search_stamp;
+    
+    /* we run filters and get unseen messages in a idle callback:
+     * these things do not need to be done immediately and we do 
+     * not want to issue too many new overlapping IMAP requests.
+     */
+    g_object_ref(G_OBJECT(mailbox));
+    g_idle_add(update_counters_and_filter, mailbox);
+    
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 static void
@@ -2867,9 +2871,15 @@ icm_destroy(struct ImapCacheManager *icm)
    a). uidvalidity different - entire cache has to be invalidated.
    b). cache->exists == h->exists && cache->uidnext == h->uidnext:
    nothing has changed - feed entire cache.
-   else fetch the message numbers for the UIDs in cache (not yet handled).
-   Problem: what to do about UID fragmentation?
+   else fetch the message numbers for the UIDs in cache.
 */
+static void
+set_uid(ImapMboxHandle *handle, unsigned seqno, void *arg)
+{
+    GArray *a = (GArray*)arg;
+    g_array_append_val(a, seqno);
+}
+
 static void
 icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
 {
@@ -2882,17 +2892,45 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
     exists  = imap_mbox_handle_get_exists(h);
     uidnext = imap_mbox_handle_get_uidnext(h);
     if(icm->uidvalidity != uidvalidity) {
-        printf("different validities %u %u- cache invalidated\n",
+        printf("Different validities old: %u new: %u - cache invalidated\n",
                icm->uidvalidity, uidvalidity);
         return;
     }
 
-    /* detect unhandled "else" case */
+    /* There were some modifications to the mailbox but the situation
+     * is not hopeless, we just need to get the seqnos of messages in
+     * the cache. */
     if(exists - icm->exists !=  uidnext - icm->uidnext) {
-        printf("mailbox modified exists: %u %u uidnext: %u %u\n",
-               icm->exists, exists, icm->uidnext, uidnext);
-        return;
+        ImapResponse rc;
+        GArray *uidmap = g_array_sized_new(FALSE, TRUE,
+                                           sizeof(uint32_t), icm->exists);
+        ImapSearchKey *k;
+        unsigned lo = icm->uidmap->len, hi = 0, i;
+        printf("searching range [1:%u]\n", icm->uidmap->len);
+        for(i=1; i<=icm->uidmap->len; i++)
+            if(g_array_index(icm->uidmap, uint32_t, i-1)) {lo=i; break; }
+        for(i=icm->uidmap->len; i>=lo; i--)
+            if(g_array_index(icm->uidmap, uint32_t, i-1)) {hi=i; break; }
+
+        k = imap_search_key_new_range(FALSE, FALSE, lo, hi);
+        printf("Mailbox modified. exists: %u %u uidnext: %u %u "
+               "- syncing uid map for [%u:%u].\n",
+               icm->exists, exists, icm->uidnext, uidnext, lo, hi);
+        if(k) {
+            uidmap->len = lo-1;
+            rc = imap_search_exec(h, TRUE, k, set_uid, uidmap);
+            imap_search_key_free(k);
+        } else rc = IMR_NO;
+        if(rc != IMR_OK) {
+            g_array_free(uidmap, TRUE);
+            return;
+        }
+        g_array_free(icm->uidmap, TRUE); icm->uidmap = uidmap;
+        printf("new uidmap has length: %u\n", icm->uidmap->len);
     }
+    /* One way or another, we have a valid uid->seqno map now;
+     * The mailbox data can be resynced easily. */
+
     for(i=1; i<=icm->exists; i++) {
         uint32_t uid = g_array_index(icm->uidmap, uint32_t, i-1);
         void *data = g_hash_table_lookup(icm->headers,
@@ -2914,15 +2952,17 @@ icm_store_cached_data(ImapMboxHandle *handle)
     icm = imap_cache_manager_new(cnt);
     icm->uidvalidity = imap_mbox_handle_get_validity(handle);
     icm->uidnext     = imap_mbox_handle_get_uidnext(handle);
-    for(i=1; i<=cnt; i++) {
+
+    for(i=0; i<cnt; i++) {
         void *ptr;
-        uint32_t *uid = &g_array_index(icm->uidmap, uint32_t, i-1);
-        ImapMessage *imsg = imap_mbox_handle_get_msg(handle, i);
+        ImapMessage *imsg = imap_mbox_handle_get_msg(handle, i+1);
+        unsigned uid;
         if(imsg && (ptr = imap_message_serialize(imsg)) != NULL) {
             g_hash_table_insert(icm->headers,
                                 GUINT_TO_POINTER(imsg->uid), ptr);
-            *uid = imsg->uid;
-        } else *uid = 0;
+            uid = imsg->uid;
+        } else uid = 0;
+        g_array_append_val(icm->uidmap, uid);
     }
     return icm;
 }

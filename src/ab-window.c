@@ -205,6 +205,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     guint default_offset = 0, offset = 0;
 
     ab->current_address_book = NULL;
+
+    g_return_if_fail(balsa_app.address_book_list);
     gtk_window_set_title(GTK_WINDOW(ab), _("Address Book"));
 
     g_signal_connect(G_OBJECT(ab), "response",

@@ -463,7 +463,7 @@ static GnomeUIInfo file_menu[] = {
       message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_PRINT, 'P', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-/* #define MENU_FILE_ADDRESS_POS 9 */
+#define MENU_FILE_ADDRESS_POS 9
     {
 	GNOME_APP_UI_ITEM, N_("_Address Book..."),
 	N_("Open the address book"),
@@ -1606,6 +1606,7 @@ balsa_window_new()
 #endif
 
     /* Disable menu items at start up */
+    balsa_window_update_book_menus(window);
     balsa_window_enable_mailbox_menus(window, NULL);
     enable_message_menus(window, NULL);
     enable_edit_menus(NULL);
@@ -1764,6 +1765,19 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     enable_expand_collapse(mailbox);
 }
 
+void
+balsa_window_update_book_menus(BalsaWindow *window)
+{
+    gboolean has_books = balsa_app.address_book_list != NULL;
+    gtk_widget_set_sensitive(file_menu[MENU_FILE_ADDRESS_POS].widget,
+       	                     has_books);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
+                             .widget, has_books &&
+			     window->current_index &&
+			     BALSA_INDEX(window->current_index)
+			     ->current_message);
+}
+
 /*
  * Enable or disable menu items/toolbar buttons which depend 
  * on if there is a message selected. 
@@ -1805,7 +1819,6 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
         &message_menu[MENU_MESSAGE_FORWARD_ATTACH_POS],
         &message_menu[MENU_MESSAGE_FORWARD_INLINE_POS],
         &message_menu[MENU_MESSAGE_PIPE_POS],
-        &message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 #else /* ENABLE_TOUCH_UI */
         &tu_message_menu[MENU_MESSAGE_SAVE_PART_POS],
         &tu_message_menu[MENU_MESSAGE_MORE_POS],
@@ -1813,7 +1826,6 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
         &tu_message_menu[MENU_MESSAGE_REPLY_ALL_POS],
         &tu_message_menu[MENU_MESSAGE_FORWARD_POS],
         &tu_message_more_menu[MENU_MESSAGE_SOURCE_POS],
-        &tu_message_more_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 #endif
     };
     gboolean enable, enable_mod;
@@ -1838,6 +1850,10 @@ enable_message_menus(BalsaWindow * window, LibBalsaMessage * message)
         balsa_toolbar_set_button_sensitive(toolbar, tools[i], enable);
 
     balsa_window_enable_continue(window);
+    gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
+			     .widget,
+			     enable && balsa_app.address_book_list);
+
 }
 
 /*

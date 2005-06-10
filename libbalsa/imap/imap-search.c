@@ -31,7 +31,8 @@ struct ImapSearchKey_ {
   struct ImapSearchKey_ *next; /* message must match all the conditions 
                                 * on the list. */
   enum {
-    IMSE_NOT, IMSE_OR, IMSE_FLAG, IMSE_STRING, IMSE_DATE, IMSE_SIZE
+    IMSE_NOT, IMSE_OR, IMSE_FLAG, IMSE_STRING, IMSE_DATE, IMSE_SIZE,
+    IMSE_SEQUENCE
   } type;
   union {
     /* IMSE_NOT */
@@ -51,6 +52,8 @@ struct ImapSearchKey_ {
     struct { time_t dt; unsigned internal_date:1; unsigned range:2; } date;
     /* IMSE_SIZE */
     size_t size;
+    /* IMSE_SEQENCE */
+      struct { gchar *string;  int uid; } seq;
   } d;
   unsigned negated:1;
 };
@@ -137,6 +140,27 @@ imap_search_key_new_date(ImapSearchDateRange range, int internal, time_t tm)
   return s;
 }
 
+
+ImapSearchKey*
+imap_search_key_new_range(unsigned negated, int uid,
+                          unsigned lo, unsigned hi)
+
+{
+  if(lo<=hi) {
+    ImapSearchKey *s = g_new(ImapSearchKey,1);
+    s->next = NULL;
+    s->type = IMSE_SEQUENCE;
+    s->negated = negated;
+    s->d.seq.uid = uid;
+    s->d.seq.string = lo<hi 
+      ? g_strdup_printf("%u:%u", lo, hi)
+      : g_strdup_printf("%u", lo);
+    return s;
+  } else { /* always false */
+    return NULL;
+  }
+}
+
 void
 imap_search_key_free(ImapSearchKey *s)
 {
@@ -157,6 +181,9 @@ imap_search_key_free(ImapSearchKey *s)
       break;
     case IMSE_DATE:
     case IMSE_SIZE: break;
+    case IMSE_SEQUENCE:
+        g_free(s->d.seq.string); 
+        break;
     }
     s = s->next;
     g_free(t);
@@ -280,6 +307,14 @@ imap_write_key_size(ImapMboxHandle *handle, gboolean negate, size_t size)
   else       sio_printf(handle->sio, "LARGER %u", (unsigned)size);
 }
 
+static void
+imap_write_key_sequence(ImapMboxHandle *handle, gboolean negate,
+                        gboolean uid, const gchar *seq)
+{
+    if(negate) sio_write(handle->sio, "NOT ", 4);
+    if(uid)    sio_write(handle->sio, "UID ", 4);
+    sio_write(handle->sio, seq, strlen(seq));
+}
 /* private.  */
 ImapResponse
 imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
@@ -322,6 +357,10 @@ imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
     case IMSE_SIZE:
       imap_write_key_size(handle, s->negated, s->d.size);
       break;
+    case IMSE_SEQUENCE:
+      imap_write_key_sequence(handle, s->negated,
+                              s->d.seq.uid, s->d.seq.string);
+      break;
     }
     s = s->next;
     if(s) sio_write(handle->sio, " ", 1);
@@ -336,7 +375,7 @@ execute_flag_only_search(ImapMboxHandle *h, ImapSearchKey *s,
                          ImapResponse *rc);
 
 ImapResponse
-imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
+imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
                  ImapSearchCb cb, void *cb_arg)
 {
   int can_do_literals =
@@ -360,7 +399,7 @@ imap_search_exec(ImapMboxHandle *h, ImapSearchKey *s,
   
   imap_handle_idle_disable(h);
   cmdno = imap_make_tag(tag);
-  sio_printf(h->sio, "%s Search ", tag);
+  sio_printf(h->sio, "%s%s Search ", tag, uid ? " UID" : "");
   if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
     sio_write(h->sio, "\r\n", 2);
     imap_handle_flush(h);
@@ -393,6 +432,9 @@ collect_needed_flags(ImapSearchKey *s, ImapMsgFlag *flag)
     break;
   case IMSE_FLAG:
     *flag |= s->d.flag.sys_flag; res = TRUE; break;
+  case IMSE_SEQUENCE:
+      if(s->d.seq.uid) /* we do not collect uids yet */
+          return FALSE;
   default:
     return FALSE;
   }

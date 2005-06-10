@@ -2803,9 +2803,11 @@ smtp_server_changed(GtkTreeSelection * selection, gpointer user_data)
 static void
 address_book_change(LibBalsaAddressBook * address_book, gboolean append)
 {
-    if (append)
+    if (append) {
         balsa_app.address_book_list =
             g_list_append(balsa_app.address_book_list, address_book);
+	balsa_window_update_book_menus(balsa_app.main_window);
+    }
     config_address_book_save(address_book);
     update_address_books();
 }
@@ -2883,6 +2885,7 @@ address_book_delete_cb(GtkWidget * widget, gpointer data)
     config_address_book_delete(address_book);
     balsa_app.address_book_list =
 	g_list_remove(balsa_app.address_book_list, address_book);
+    balsa_window_update_book_menus(balsa_app.main_window);
     if (balsa_app.default_address_book == address_book)
 	balsa_app.default_address_book = NULL;
 

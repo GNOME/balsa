@@ -1,4 +1,8 @@
-2005-06-08  Pawel Salek
+2005-06-11  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: fix trivial bug introduced yesterday.
+
+2005-06-10  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: survive better cases
 	when number of messages changed in the broken connection. Resync

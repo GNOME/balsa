@@ -1365,12 +1365,13 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   }
 
   rc = ir_handle_response(handle);
-  if(cmdno == lastcmd || cmdno == 0) /* never insert cmdno==0 */
+  if(cmdno == lastcmd)
     return rc;
   else {
-    g_hash_table_insert(handle->cmd_queue,
-                        GUINT_TO_POINTER(cmdno),
-                        GINT_TO_POINTER(rc));
+    if(cmdno)
+      g_hash_table_insert(handle->cmd_queue,
+                          GUINT_TO_POINTER(cmdno),
+                          GINT_TO_POINTER(rc));
     return IMR_UNTAGGED;
   }
 }

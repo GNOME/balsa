@@ -7,18 +7,18 @@
 # Welther José O. Esteves <weltherjoe@yahoo.com.br>, 2004.
 # Luiz Guaraldo <software.livre@terra.com.br>, 2004.
 # Raphael Higino <raphaelh@uai.com.br>, 2004.
+# Marcus Moreira de Souza <marcus@frb.br>, 2005.
 # Afonso Celso Medina <medina@maua.br>, 2004, 2005.
-# Marcus Moreira de Souza <marcus@frb.br>, 2005Afonso Celso Medina <medina@maua.br>, 2005.
 # 
-# 
+
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.pt_BR\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-05-26 02:49+0000\n"
-"PO-Revision-Date: 2005-05-28 14:27-0300\n"
+"POT-Creation-Date: 2005-06-08 10:48+0000\n"
+"PO-Revision-Date: 2005-06-08 15:37-0300\n"
 "Last-Translator: Marcus Moreira de Souza <marcus@frb.br>\n"
-"Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
+"Language-Team: GNOME-BR <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -74,7 +74,7 @@ msgid "Cannot add duplicate entry"
 msgstr "Não é possível adicionar entrada duplicada"
 
 #: ../libbalsa/address-book.c:408 ../src/main-window.c:2212
-#: ../src/main-window.c:4237 ../src/sendmsg-window.c:4774
+#: ../src/main-window.c:4234 ../src/sendmsg-window.c:4774
 msgid "Unknown error"
 msgstr "Erro desconhecido"
 
@@ -103,7 +103,7 @@ msgid "_Email Address:"
 msgstr "Endereço de _email:"
 
 #: ../libbalsa/body.c:116 ../libbalsa/mailbox_local.c:1163
-#: ../libbalsa/message.c:801
+#: ../libbalsa/message.c:803
 msgid "(No subject)"
 msgstr "(Sem assunto)"
 
@@ -168,7 +168,7 @@ msgstr "Erro quando movia mensagens: %s"
 msgid "Failed to decrypt MIME part: parse error"
 msgstr "Falha ao descriptografar a parte MIME: erro de interpretação"
 
-#: ../libbalsa/gmime-gpgme-context.c:279 ../libbalsa/rfc3156.c:1598
+#: ../libbalsa/gmime-gpgme-context.c:279 ../libbalsa/rfc3156.c:1603
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -179,7 +179,7 @@ msgstr ""
 "\n"
 "Chave: %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:284 ../libbalsa/rfc3156.c:1603
+#: ../libbalsa/gmime-gpgme-context.c:284 ../libbalsa/rfc3156.c:1608
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -794,7 +794,7 @@ msgstr "Erro de POP3: não é possível fechar %s."
 msgid "POP3 error: %s."
 msgstr "Erro de POP3: %s."
 
-#: ../libbalsa/message.c:522 ../libbalsa/message.c:562
+#: ../libbalsa/message.c:524 ../libbalsa/message.c:564
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
@@ -932,147 +932,147 @@ msgstr ""
 #: ../libbalsa/rfc3156.c:257 ../libbalsa/rfc3156.c:262
 #: ../libbalsa/rfc3156.c:349 ../libbalsa/rfc3156.c:354
 #: ../libbalsa/rfc3156.c:517 ../libbalsa/rfc3156.c:522
-#: ../libbalsa/rfc3156.c:629 ../libbalsa/rfc3156.c:634
-#: ../libbalsa/rfc3156.c:741 ../libbalsa/rfc3156.c:746
-#: ../libbalsa/rfc3156.c:854 ../libbalsa/rfc3156.c:859
-#: ../libbalsa/rfc3156.c:934 ../libbalsa/rfc3156.c:939
+#: ../libbalsa/rfc3156.c:630 ../libbalsa/rfc3156.c:635
+#: ../libbalsa/rfc3156.c:746 ../libbalsa/rfc3156.c:751
+#: ../libbalsa/rfc3156.c:859 ../libbalsa/rfc3156.c:864
+#: ../libbalsa/rfc3156.c:939 ../libbalsa/rfc3156.c:944
 msgid "creating a gpgme context failed"
 msgstr "falha ao criar um contexto gpgme"
 
-#: ../libbalsa/rfc3156.c:275 ../libbalsa/rfc3156.c:759
+#: ../libbalsa/rfc3156.c:275 ../libbalsa/rfc3156.c:764
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr "Digite a frase secreta para destravar a chave secreta para assinar"
 
 #: ../libbalsa/rfc3156.c:296 ../libbalsa/rfc3156.c:300
-#: ../libbalsa/rfc3156.c:791
+#: ../libbalsa/rfc3156.c:796
 msgid "signing failed"
 msgstr "falha na assinatura"
 
 #: ../libbalsa/rfc3156.c:403 ../libbalsa/rfc3156.c:408
-#: ../libbalsa/rfc3156.c:794
+#: ../libbalsa/rfc3156.c:799
 msgid "encryption failed"
 msgstr "falha na criptografia"
 
 #: ../libbalsa/rfc3156.c:552 ../libbalsa/rfc3156.c:557
-#: ../libbalsa/rfc3156.c:870 ../libbalsa/rfc3156.c:876
+#: ../libbalsa/rfc3156.c:875 ../libbalsa/rfc3156.c:881
 msgid "signature verification failed"
 msgstr "falha na verificação da assinatura"
 
-#: ../libbalsa/rfc3156.c:646 ../libbalsa/rfc3156.c:950
+#: ../libbalsa/rfc3156.c:647 ../libbalsa/rfc3156.c:955
 msgid "Enter passphrase to decrypt message"
 msgstr "Digite a frase secreta para descriptografar a mensagem"
 
-#: ../libbalsa/rfc3156.c:677 ../libbalsa/rfc3156.c:682
+#: ../libbalsa/rfc3156.c:682 ../libbalsa/rfc3156.c:687
 msgid "decryption failed"
 msgstr "falha na descriptografia"
 
-#: ../libbalsa/rfc3156.c:787 ../libbalsa/rfc3156.c:801
+#: ../libbalsa/rfc3156.c:792 ../libbalsa/rfc3156.c:806
 msgid "signing and encryption failed"
 msgstr "falha na assinatura e criptografia"
 
-#: ../libbalsa/rfc3156.c:804
+#: ../libbalsa/rfc3156.c:809
 #, c-format
 msgid "signing failed: %s"
 msgstr "falha na assinatura: %s"
 
-#: ../libbalsa/rfc3156.c:807
+#: ../libbalsa/rfc3156.c:812
 #, c-format
 msgid "encryption failed: %s"
 msgstr "falha na criptografia: %s"
 
-#: ../libbalsa/rfc3156.c:959 ../libbalsa/rfc3156.c:966
+#: ../libbalsa/rfc3156.c:964 ../libbalsa/rfc3156.c:971
 msgid "decryption and signature verification failed"
 msgstr "falha na descriptografia e na verificação da assinatura"
 
-#: ../libbalsa/rfc3156.c:997
+#: ../libbalsa/rfc3156.c:1002
 msgid "The signature is valid."
 msgstr "A assinatura é válida."
 
-#: ../libbalsa/rfc3156.c:999
+#: ../libbalsa/rfc3156.c:1004
 msgid "The signature is valid but expired."
 msgstr "A assinatura é válida mas expirou."
 
-#: ../libbalsa/rfc3156.c:1002
+#: ../libbalsa/rfc3156.c:1007
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr "A assinatura é válida mas a chave usada para verificá-la expirou."
 
-#: ../libbalsa/rfc3156.c:1005
+#: ../libbalsa/rfc3156.c:1010
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr ""
 "A assinatura é válida, mas a chave usada para verificá-la foi revogada."
 
-#: ../libbalsa/rfc3156.c:1008
+#: ../libbalsa/rfc3156.c:1013
 msgid "The signature is invalid."
 msgstr "A assinatura é inválida."
 
-#: ../libbalsa/rfc3156.c:1011
+#: ../libbalsa/rfc3156.c:1016
 msgid "The signature could not be verified due to a missing key."
 msgstr "A assinatura não pôde ser verificada devido a falta da chave."
 
-#: ../libbalsa/rfc3156.c:1013
+#: ../libbalsa/rfc3156.c:1018
 msgid "This part is not a real PGP signature."
 msgstr "Esta parte não é uma assinatura PGP verdadeira."
 
-#: ../libbalsa/rfc3156.c:1016
+#: ../libbalsa/rfc3156.c:1021
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 "A assinatura não pôde ser verificada devido a um mecanismo de criptografia "
 "inválido."
 
-#: ../libbalsa/rfc3156.c:1019 ../libbalsa/rfc3156.c:1758
+#: ../libbalsa/rfc3156.c:1024 ../libbalsa/rfc3156.c:1763
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr ""
 "GnuPG está refazendo o banco de dados de confiança e está atualmente "
 "indisponível."
 
-#: ../libbalsa/rfc3156.c:1022
+#: ../libbalsa/rfc3156.c:1027
 msgid "An error prevented the signature verification."
 msgstr "Um erro impediu a verificação da assinatura."
 
-#: ../libbalsa/rfc3156.c:1030
+#: ../libbalsa/rfc3156.c:1035
 msgid "The user ID is of unknown validity."
 msgstr "A validade do ID do usuário é desconhecida."
 
-#: ../libbalsa/rfc3156.c:1032
+#: ../libbalsa/rfc3156.c:1037
 msgid "The validity of the user ID is undefined."
 msgstr "A validade do ID do usuário está indefinida."
 
-#: ../libbalsa/rfc3156.c:1034
+#: ../libbalsa/rfc3156.c:1039
 msgid "The user ID is never valid."
 msgstr "O ID do usuário nunca é válido."
 
-#: ../libbalsa/rfc3156.c:1036
+#: ../libbalsa/rfc3156.c:1041
 msgid "The user ID is marginally valid."
 msgstr "O ID do usuário é válida em parte."
 
-#: ../libbalsa/rfc3156.c:1038
+#: ../libbalsa/rfc3156.c:1043
 msgid "The user ID is fully valid."
 msgstr "O ID do usuário é totalmente válido."
 
-#: ../libbalsa/rfc3156.c:1040
+#: ../libbalsa/rfc3156.c:1045
 msgid "The user ID is ultimately valid."
 msgstr "O ID do usuário é totalmente válido."
 
-#: ../libbalsa/rfc3156.c:1042 ../libbalsa/rfc3156.c:1287
+#: ../libbalsa/rfc3156.c:1047 ../libbalsa/rfc3156.c:1292
 msgid "bad validity"
 msgstr "validade ruim"
 
-#: ../libbalsa/rfc3156.c:1050
+#: ../libbalsa/rfc3156.c:1055
 msgid "PGP signature: "
 msgstr "Assinatura PGP: "
 
-#: ../libbalsa/rfc3156.c:1052
+#: ../libbalsa/rfc3156.c:1057
 msgid "S/MIME signature: "
 msgstr "Assinatura S/MIME: "
 
-#: ../libbalsa/rfc3156.c:1054
+#: ../libbalsa/rfc3156.c:1059
 msgid "(unknown protocol) "
 msgstr "(protocolo desconhecido) "
 
-#: ../libbalsa/rfc3156.c:1073
+#: ../libbalsa/rfc3156.c:1078
 #, c-format
 msgid ""
 "\n"
@@ -1081,7 +1081,7 @@ msgstr ""
 "\n"
 "ID de Usuário: %s"
 
-#: ../libbalsa/rfc3156.c:1076
+#: ../libbalsa/rfc3156.c:1081
 #, c-format
 msgid ""
 "\n"
@@ -1090,7 +1090,7 @@ msgstr ""
 "\n"
 "Assinado por: %s"
 
-#: ../libbalsa/rfc3156.c:1080
+#: ../libbalsa/rfc3156.c:1085
 #, c-format
 msgid ""
 "\n"
@@ -1099,7 +1099,7 @@ msgstr ""
 "\n"
 "Endereço de email: %s"
 
-#: ../libbalsa/rfc3156.c:1085
+#: ../libbalsa/rfc3156.c:1090
 #, c-format
 msgid ""
 "\n"
@@ -1108,7 +1108,7 @@ msgstr ""
 "\n"
 "Assinado em: %s"
 
-#: ../libbalsa/rfc3156.c:1087
+#: ../libbalsa/rfc3156.c:1092
 #, c-format
 msgid ""
 "\n"
@@ -1117,7 +1117,7 @@ msgstr ""
 "\n"
 "Validade do ID do usuário: %s"
 
-#: ../libbalsa/rfc3156.c:1091
+#: ../libbalsa/rfc3156.c:1096
 #, c-format
 msgid ""
 "\n"
@@ -1126,7 +1126,7 @@ msgstr ""
 "\n"
 "Confiança do proprietário da chave: %s"
 
-#: ../libbalsa/rfc3156.c:1095
+#: ../libbalsa/rfc3156.c:1100
 #, c-format
 msgid ""
 "\n"
@@ -1135,7 +1135,7 @@ msgstr ""
 "\n"
 "Impressão digital da chave: %s"
 
-#: ../libbalsa/rfc3156.c:1100
+#: ../libbalsa/rfc3156.c:1105
 #, c-format
 msgid ""
 "\n"
@@ -1144,7 +1144,7 @@ msgstr ""
 "\n"
 "Subchave criada em: %s"
 
-#: ../libbalsa/rfc3156.c:1105
+#: ../libbalsa/rfc3156.c:1110
 #, c-format
 msgid ""
 "\n"
@@ -1153,23 +1153,23 @@ msgstr ""
 "\n"
 "A subchave expira em: %s"
 
-#: ../libbalsa/rfc3156.c:1114
+#: ../libbalsa/rfc3156.c:1119
 msgid " revoked"
 msgstr " revogada"
 
-#: ../libbalsa/rfc3156.c:1119
+#: ../libbalsa/rfc3156.c:1124
 msgid " expired"
 msgstr " expirou"
 
-#: ../libbalsa/rfc3156.c:1124
+#: ../libbalsa/rfc3156.c:1129
 msgid " disabled"
 msgstr " desabilitada"
 
-#: ../libbalsa/rfc3156.c:1129
+#: ../libbalsa/rfc3156.c:1134
 msgid " invalid"
 msgstr " inválida"
 
-#: ../libbalsa/rfc3156.c:1132
+#: ../libbalsa/rfc3156.c:1137
 #, c-format
 msgid ""
 "\n"
@@ -1178,7 +1178,7 @@ msgstr ""
 "\n"
 "Atributos da subchave: %s"
 
-#: ../libbalsa/rfc3156.c:1134
+#: ../libbalsa/rfc3156.c:1139
 #, c-format
 msgid ""
 "\n"
@@ -1187,7 +1187,7 @@ msgstr ""
 "\n"
 "Atributo da subchave:%s"
 
-#: ../libbalsa/rfc3156.c:1140
+#: ../libbalsa/rfc3156.c:1145
 #, c-format
 msgid ""
 "\n"
@@ -1196,7 +1196,7 @@ msgstr ""
 "\n"
 "Nome do emissor: %s"
 
-#: ../libbalsa/rfc3156.c:1144
+#: ../libbalsa/rfc3156.c:1149
 #, c-format
 msgid ""
 "\n"
@@ -1205,7 +1205,7 @@ msgstr ""
 "\n"
 "Número de série do emissor: %s"
 
-#: ../libbalsa/rfc3156.c:1147
+#: ../libbalsa/rfc3156.c:1152
 #, c-format
 msgid ""
 "\n"
@@ -1214,12 +1214,12 @@ msgstr ""
 "\n"
 "ID da corrente: %s"
 
-#: ../libbalsa/rfc3156.c:1194
+#: ../libbalsa/rfc3156.c:1199
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "Não foi possível iniciar %s para obter a chave pública %s."
 
-#: ../libbalsa/rfc3156.c:1244
+#: ../libbalsa/rfc3156.c:1249
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -1228,7 +1228,7 @@ msgstr ""
 "A execução do gpg falhou e retornou o valor %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1251
+#: ../libbalsa/rfc3156.c:1256
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -1237,82 +1237,82 @@ msgstr ""
 "Sucesso na execução do gpg:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1275
+#: ../libbalsa/rfc3156.c:1280
 msgid "unknown"
 msgstr "desconhecido"
 
-#: ../libbalsa/rfc3156.c:1277
+#: ../libbalsa/rfc3156.c:1282
 msgid "undefined"
 msgstr "indefinido"
 
-#: ../libbalsa/rfc3156.c:1279
+#: ../libbalsa/rfc3156.c:1284
 msgid "never"
 msgstr "nunca"
 
-#: ../libbalsa/rfc3156.c:1281
+#: ../libbalsa/rfc3156.c:1286
 msgid "marginal"
 msgstr "limite"
 
-#: ../libbalsa/rfc3156.c:1283
+#: ../libbalsa/rfc3156.c:1288
 msgid "full"
 msgstr "completo"
 
-#: ../libbalsa/rfc3156.c:1285
+#: ../libbalsa/rfc3156.c:1290
 msgid "ultimate"
 msgstr "atualizado"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1353
 msgid "User ID"
 msgstr "ID do usuário"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1353
 msgid "Key ID"
 msgstr "Key ID"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1353
 msgid "Length"
 msgstr "Tamanho"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1353
 msgid "Validity"
 msgstr "Validade"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/rfc3156.c:1392
+#: ../libbalsa/rfc3156.c:1397
 msgid "Select key"
 msgstr "Selecionar chave"
 
-#: ../libbalsa/rfc3156.c:1403
+#: ../libbalsa/rfc3156.c:1408
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Selecione a chave privada para o assinante %s"
 
-#: ../libbalsa/rfc3156.c:1407
+#: ../libbalsa/rfc3156.c:1412
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Selecione a chave pública para o destinatário %s"
 
-#: ../libbalsa/rfc3156.c:1538
+#: ../libbalsa/rfc3156.c:1543
 #, c-format
 msgid "Insufficient trust for recipient %s"
 msgstr "Confiança insuficiente para o recipiente %s"
 
-#: ../libbalsa/rfc3156.c:1540
+#: ../libbalsa/rfc3156.c:1545
 #, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "A validade da chave com o usuário ID \"%s\" é \"%s\"."
 
-#: ../libbalsa/rfc3156.c:1551
+#: ../libbalsa/rfc3156.c:1556
 msgid "Use this key anyway?"
 msgstr "Utilizar esta chave mesmo assim?"
 
-#: ../libbalsa/rfc3156.c:1759
+#: ../libbalsa/rfc3156.c:1764
 msgid "Try again later."
 msgstr "Tente novamente depois."
 
 #: ../libbalsa/send.c:244 ../libbalsa/send.c:251
 msgid "Sending Mail..."
-msgstr "Enviando mensagem..."
+msgstr "Enviando a Mensagem..."
 
 #: ../libbalsa/send.c:247 ../src/main-window.c:2669
 msgid "_Hide"
@@ -1380,7 +1380,7 @@ msgstr "Para"
 msgid "Disconnected"
 msgstr "Desconectado"
 
-#: ../libbalsa/send.c:1232
+#: ../libbalsa/send.c:1277
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -1388,7 +1388,7 @@ msgstr ""
 "O servidor SMTP recusou a conexão.\n"
 "Verifique sua conexão com a Internet."
 
-#: ../libbalsa/send.c:1237
+#: ../libbalsa/send.c:1282
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -1396,11 +1396,11 @@ msgstr ""
 "O servidor SMTP não pode ser alcançado.\n"
 "Verifique sua conexão com a Internet."
 
-#: ../libbalsa/send.c:1246
+#: ../libbalsa/send.c:1291
 msgid "Message left in Outbox (try again later)"
 msgstr "A mensagem ficou na Caixa de Saída (tente novamente mais tarde)"
 
-#: ../libbalsa/send.c:1250
+#: ../libbalsa/send.c:1295
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1409,14 +1409,14 @@ msgstr ""
 "Problema no servido SMTP (%d): %s\n"
 "A mensagem ficou na caixa de saída."
 
-#: ../libbalsa/send.c:1527
+#: ../libbalsa/send.c:1572
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 "Não é possível determinar o conjunto de caracteres para o arquivo texto '%"
 "s'; enviar como o tipo mime '%s'"
 
-#: ../libbalsa/send.c:1864 ../libbalsa/send.c:1946
+#: ../libbalsa/send.c:1909 ../libbalsa/send.c:1991
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Essa mensagem não será criptografada para o(s) destinatário(s) CCO."
 
@@ -1476,44 +1476,44 @@ msgid "C_ertificate Pass Phrase"
 msgstr "Senha do C_ertificado"
 
 #. Items
-#: ../libbalsa/source-viewer.c:47 ../src/mailbox-node.c:965
+#: ../libbalsa/source-viewer.c:48 ../src/mailbox-node.c:989
 #: ../src/main-window.c:752 ../src/main-window.c:857
 msgid "_Close"
 msgstr "_Fechar"
 
-#: ../libbalsa/source-viewer.c:48
+#: ../libbalsa/source-viewer.c:49
 msgid "Close the window"
 msgstr "Fecha a janela"
 
-#: ../libbalsa/source-viewer.c:49
+#: ../libbalsa/source-viewer.c:50
 msgid "_Copy"
 msgstr "_Copiar"
 
-#: ../libbalsa/source-viewer.c:50
+#: ../libbalsa/source-viewer.c:51
 msgid "Copy text"
 msgstr "Copia o texto"
 
-#: ../libbalsa/source-viewer.c:51 ../src/main-window.c:661
+#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:661
 msgid "_Select Text"
 msgstr "_Selecionar Texto"
 
-#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:662
+#: ../libbalsa/source-viewer.c:53 ../src/main-window.c:662
 msgid "Select entire mail"
 msgstr "Selecione e-mail completo"
 
-#: ../libbalsa/source-viewer.c:57
+#: ../libbalsa/source-viewer.c:58
 msgid "_Escape Special Characters"
 msgstr "Descartar Caracteres _Especiais"
 
-#: ../libbalsa/source-viewer.c:58
+#: ../libbalsa/source-viewer.c:59
 msgid "Escape special and non-ASCII characters"
 msgstr "Descartar caracteres especiais e não-ASCII"
 
-#: ../libbalsa/source-viewer.c:154
+#: ../libbalsa/source-viewer.c:155
 msgid "Mailbox closed"
 msgstr "Caixa de mensagens fechada"
 
-#: ../libbalsa/source-viewer.c:255
+#: ../libbalsa/source-viewer.c:258
 msgid "Message Source"
 msgstr "Código Fonte da Mensagem"
 
@@ -1577,7 +1577,7 @@ msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:240
 msgid "Mail Files"
-msgstr "Arquivos de mensagem"
+msgstr "Arquivos de Mensagens"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:343
 #: ../libinit_balsa/balsa-druid-page-directory.c:377
@@ -1586,7 +1586,7 @@ msgid ""
 "Problem Creating Mailboxes\n"
 "%s"
 msgstr ""
-"Problema ao criar caixas de mensagem\n"
+"Problema ao Criar Caixas de Mensagens\n"
 "%s"
 
 #: ../libinit_balsa/balsa-druid-page-finish.c:41
@@ -1765,13 +1765,13 @@ msgstr "Notificação de novas mensagens"
 msgid "Program startup"
 msgstr "Inicialização do programa"
 
-#: ../src/ab-main.c:384 ../src/ab-window.c:168 ../src/filter-edit-dialog.c:198
+#: ../src/ab-main.c:387 ../src/ab-window.c:168 ../src/filter-edit-dialog.c:198
 #: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:221
 #: ../src/filter-run-dialog.c:293
 msgid "Name"
 msgstr "Nome"
 
-#: ../src/ab-main.c:503
+#: ../src/ab-main.c:506
 msgid "F_ilter:"
 msgstr "F_iltro:"
 
@@ -1846,7 +1846,8 @@ msgstr "Localização do programa de carregamento"
 
 #: ../src/address-book-config.c:283 ../src/address-book-config.c:288
 msgid "Select load program for address book"
-msgstr "Selecione o programa que carrega o seu arquivo do catálogo de endereços"
+msgstr ""
+"Selecione o programa que carrega o seu arquivo do catálogo de endereços"
 
 #: ../src/address-book-config.c:295
 msgid "Save program location"
@@ -1880,7 +1881,7 @@ msgstr "Habilitar _TLS"
 msgid "GPE Address Book"
 msgstr "Catálogo de Endereços GPE"
 
-#: ../src/address-book-config.c:445 ../src/main-window.c:3936
+#: ../src/address-book-config.c:445 ../src/main-window.c:3933
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Erro ao exibir a ajuda: %s\n"
@@ -2012,8 +2013,9 @@ msgid "_Store Address..."
 msgstr "Arma_zenar Endereço..."
 
 #: ../src/balsa-index.c:1807 ../src/filter-edit-dialog.c:221
-#: ../src/mailbox-node.c:974 ../src/pref-manager.c:1460
-#: ../src/pref-manager.c:1549 ../src/pref-manager.c:2594
+#: ../src/mailbox-node.c:981 ../src/mailbox-node.c:997
+#: ../src/pref-manager.c:1460 ../src/pref-manager.c:1549
+#: ../src/pref-manager.c:2594
 msgid "_Delete"
 msgstr "_Excluir"
 
@@ -2664,17 +2666,17 @@ msgstr "_Todos"
 msgid "C_lear"
 msgstr "_Limpar"
 
-#: ../src/filter-edit-callbacks.c:1066 ../src/main-window.c:3815
+#: ../src/filter-edit-callbacks.c:1066 ../src/main-window.c:3812
 msgid "_Body"
 msgstr "_Corpo"
 
 #. To:
-#: ../src/filter-edit-callbacks.c:1073 ../src/main-window.c:3816
+#: ../src/filter-edit-callbacks.c:1073 ../src/main-window.c:3813
 #: ../src/sendmsg-window.c:2708
 msgid "_To:"
 msgstr "_Para:"
 
-#: ../src/filter-edit-callbacks.c:1080 ../src/main-window.c:3817
+#: ../src/filter-edit-callbacks.c:1080 ../src/main-window.c:3814
 msgid "_From:"
 msgstr "_De:"
 
@@ -2682,7 +2684,7 @@ msgstr "_De:"
 msgid "_Subject"
 msgstr "_Assunto"
 
-#: ../src/filter-edit-callbacks.c:1095 ../src/main-window.c:3819
+#: ../src/filter-edit-callbacks.c:1095 ../src/main-window.c:3816
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -2779,7 +2781,7 @@ msgstr "E"
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: ../src/filter-edit-dialog.c:215 ../src/mailbox-node.c:946
+#: ../src/filter-edit-dialog.c:215 ../src/mailbox-node.c:954
 #: ../src/main-window.c:371 ../src/main-window.c:430
 msgid "_New"
 msgstr "_Nova"
@@ -2884,7 +2886,8 @@ msgid ""
 "You can't associate it with the same mailbox (that causes recursion)."
 msgstr ""
 "A caixa de mensagens de destino do filtro \"%s\" é \"%s\".\n"
-"Você não pode associá-lo com a mesma caixa de mensagens (isto causa recursão)."
+"Você não pode associá-lo com a mesma caixa de mensagens (isto causa "
+"recursão)."
 
 #: ../src/filter-run-callbacks.c:250
 #, c-format
@@ -2894,10 +2897,11 @@ msgid ""
 "mailboxes, it is done by a very slow method; if possible, use substring "
 "match instead."
 msgstr ""
-"O filtro \"%s\" não é compatível com o tipo de caixa de mensagens de \"%s\".\n"
+"O filtro \"%s\" não é compatível com o tipo de caixa de mensagens de \"%s"
+"\".\n"
 "Isso ocorre, por exemplo, quando você usa expressões regulares para comparar "
-"caixas de mensagens IMAP, isto é feito por um método muito lento; se possível, "
-"use sub strings para a comparação."
+"caixas de mensagens IMAP, isto é feito por um método muito lento; se "
+"possível, use sub strings para a comparação."
 
 #: ../src/filter-run-dialog.c:189
 msgid "Balsa Filters of Mailbox: "
@@ -3177,8 +3181,8 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "Isso removerá a caixa de mensagens \"%s\" e todas as suas mensagens do "
-"servidor IMAP. Se %s for uma subpasta, ainda aparecerá como um nó na "
-"árvore de pastas.\n"
+"servidor IMAP. Se %s for uma subpasta, ainda aparecerá como um nó na árvore "
+"de pastas.\n"
 "Você deve usar \"Nova Subpasta IMAP\" depois para adicionar uma caixa de "
 "mensagens com esse nome.\n"
 "O que você deseja fazer?"
@@ -3331,85 +3335,88 @@ msgstr "A busca de %s falhou: %s"
 msgid "Scanning %s. Please wait..."
 msgstr "Buscando %s. Por favor, aguarde..."
 
-#: ../src/mailbox-node.c:931
+#: ../src/mailbox-node.c:939
 msgid "Local _mbox mailbox..."
 msgstr "Caixa de mensagens _mbox local..."
 
-#: ../src/mailbox-node.c:933
+#: ../src/mailbox-node.c:941
 msgid "Local Mail_dir mailbox..."
 msgstr "Caixa de mensagens Mail_dir local..."
 
-#: ../src/mailbox-node.c:935
+#: ../src/mailbox-node.c:943
 msgid "Local M_H mailbox..."
 msgstr "Caixa de mensagens M_H local..."
 
-#: ../src/mailbox-node.c:937
+#: ../src/mailbox-node.c:945
 msgid "Remote _IMAP mailbox..."
 msgstr "Caixa de mensagens _IMAP remota..."
 
-#: ../src/mailbox-node.c:940
+#: ../src/mailbox-node.c:948
 msgid "Remote IMAP _folder..."
 msgstr "_Pasta IMAP remota..."
 
-#: ../src/mailbox-node.c:942
+#: ../src/mailbox-node.c:950
 msgid "Remote IMAP _subfolder..."
 msgstr "_Subpasta IMAP remota..."
 
 #. clicked on the empty space
-#: ../src/mailbox-node.c:953 ../src/mailbox-node.c:979
+#: ../src/mailbox-node.c:961 ../src/mailbox-node.c:977
 msgid "_Rescan"
 msgstr "Procurar _novamente"
-
-# 15
-#: ../src/mailbox-node.c:962
-msgid "_Open"
-msgstr "_Abrir"
 
 #: ../src/mailbox-node.c:971
 msgid "_Properties..."
 msgstr "_Propriedades..."
 
-#: ../src/mailbox-node.c:986
+# 15
+#: ../src/mailbox-node.c:987
+msgid "_Open"
+msgstr "_Abrir"
+
+#: ../src/mailbox-node.c:1001
 msgid "_Subscribe"
 msgstr "In_screver"
 
-#: ../src/mailbox-node.c:988
+#: ../src/mailbox-node.c:1003
 msgid "_Unsubscribe"
 msgstr "_Desinscrever"
 
-#: ../src/mailbox-node.c:993
+#: ../src/mailbox-node.c:1009
 msgid "Mark as _Inbox"
 msgstr "Marcar como Caixa de _Entrada"
 
-#: ../src/mailbox-node.c:996
+#: ../src/mailbox-node.c:1011
 msgid "_Mark as Sentbox"
 msgstr "_Marcar como Enviadas"
 
-#: ../src/mailbox-node.c:999
+#: ../src/mailbox-node.c:1013
 msgid "Mark as _Trash"
 msgstr "Marcar como _Lixeira"
 
-#: ../src/mailbox-node.c:1002
+#: ../src/mailbox-node.c:1015
 msgid "Mark as D_raftbox"
 msgstr "Marcar como _Rascunhos"
 
-#. FIXME : No test on mailbox type is made yet, should we ?
-#: ../src/mailbox-node.c:1005
+#: ../src/mailbox-node.c:1018
+msgid "_Empty trash"
+msgstr "_Esvaziar lixeira"
+
+#: ../src/mailbox-node.c:1023
 msgid "_Edit/Apply filters"
 msgstr "_Editar/Aplicar filtros"
 
-#: ../src/mailbox-node.c:1086
+#: ../src/mailbox-node.c:1103
 #, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
 msgstr "O caminho \"%s\" não leva à caixa de mensagens."
 
 # 13
-#: ../src/mailbox-node.c:1099
+#: ../src/mailbox-node.c:1116
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Caixa de mensagens local %s carregada como: %s\n"
 
-#: ../src/mailbox-node.c:1126
+#: ../src/mailbox-node.c:1143
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Pasta local %s\n"
@@ -4070,7 +4077,7 @@ msgstr ""
 "O Balsa está enviando uma mensagem agora.\n"
 "Abortar o envio?"
 
-#: ../src/main-window.c:1398 ../src/main-window.c:4928
+#: ../src/main-window.c:1398 ../src/main-window.c:4925
 msgid "Subject or Sender _Contains:"
 msgstr "Assunto ou Rementente _Contém:"
 
@@ -4111,101 +4118,101 @@ msgstr ""
 msgid "Checking Mail..."
 msgstr "Verificando Mensagem..."
 
-#: ../src/main-window.c:2857
+#: ../src/main-window.c:2854
 #, c-format
-msgid "IMAP Server %s: %s"
-msgstr "Servidor IMAP %s: %s"
+msgid "IMAP mailbox: %s"
+msgstr "Caixa de mensagens IMAP: %s"
 
-#: ../src/main-window.c:2860
+#: ../src/main-window.c:2857
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Caixa de mensagens local: %s"
 
-#: ../src/main-window.c:2997
+#: ../src/main-window.c:2994
 msgid "Finished Checking."
 msgstr "Verificação Concluída."
 
-#: ../src/main-window.c:3059
+#: ../src/main-window.c:3056
 #, c-format
 msgid "Sending error: %s"
 msgstr "Erro no envio: %s"
 
-#: ../src/main-window.c:3144
+#: ../src/main-window.c:3141
 msgid "Balsa: New mail"
 msgstr "Balsa: Nova mensagem"
 
-#: ../src/main-window.c:3156
+#: ../src/main-window.c:3153
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "Você recebeu %d mensagem nova."
 msgstr[1] "Você recebeu %d mensagens novas."
 
-#: ../src/main-window.c:3159
+#: ../src/main-window.c:3156
 msgid "You have new mail."
 msgstr "Você recebeu mensagens novas."
 
-#: ../src/main-window.c:3777
+#: ../src/main-window.c:3774
 msgid "Search mailbox"
 msgstr "Procurar caixa de mensagens"
 
-#: ../src/main-window.c:3794
+#: ../src/main-window.c:3791
 msgid "_Search for:"
 msgstr "_Procurar por:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:3807
+#: ../src/main-window.c:3804
 msgid "In:"
 msgstr "Em:"
 
-#: ../src/main-window.c:3818
+#: ../src/main-window.c:3815
 msgid "S_ubject"
 msgstr "Ass_unto"
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:3823
+#: ../src/main-window.c:3820
 msgid "Show only matching messages"
 msgstr "Mostrar apenas mensagens correspondentes"
 
 #. Frame with OK button
-#: ../src/main-window.c:3844
+#: ../src/main-window.c:3841
 msgid "Open next matching message"
 msgstr "Abrir a próxima mensagem correspondente"
 
-#: ../src/main-window.c:3855
+#: ../src/main-window.c:3852
 msgid "_Reverse search"
 msgstr "Busca _inversa"
 
-#: ../src/main-window.c:3860
+#: ../src/main-window.c:3857
 msgid "_Wrap around"
 msgstr "_Voltar ao início"
 
-#: ../src/main-window.c:4021
+#: ../src/main-window.c:4018
 msgid "You can apply filters only on mailbox\n"
 msgstr "Você pode aplicar filtros apenas na caixa de mensagens\n"
 
-#: ../src/main-window.c:4035
+#: ../src/main-window.c:4032
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Remover duplicadas falhou: %s"
 
-#: ../src/main-window.c:4236
+#: ../src/main-window.c:4233
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Impossível abrir a pasta de lixeira: %s"
 
-#: ../src/main-window.c:4365
+#: ../src/main-window.c:4362
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (somente leitura)"
 
-#: ../src/main-window.c:4367
+#: ../src/main-window.c:4364
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: ../src/main-window.c:4927
+#: ../src/main-window.c:4924
 msgid "Subject or Receiver _Contains:"
 msgstr "Assunto ou o Rementente _Contém:"
 
@@ -4293,7 +4300,7 @@ msgstr "Cabeçalhos _Selecionados"
 
 #: ../src/message-window.c:148
 msgid "Reply to this message"
-msgstr "Responder esta mensagem"
+msgstr "Responder a esta mensagem"
 
 #: ../src/message-window.c:154
 msgid "Reply to all recipients of this message"
@@ -4479,7 +4486,7 @@ msgstr "minutos"
 
 #: ../src/pref-manager.c:1617
 msgid "Check _IMAP mailboxes"
-msgstr "Verificar caixas de mensagem _IMAP"
+msgstr "Verificar caixas de mensagens _IMAP"
 
 #: ../src/pref-manager.c:1623
 msgid "Check INBOX _only"
@@ -4487,9 +4494,8 @@ msgstr "Verificar a_penas a Caixa de Entrada"
 
 #: ../src/pref-manager.c:1628
 msgid "Display message if new mail has arrived in an open mailbox"
-msgstr ""
-"Mostrar mensagem se um novo e-mail for recebido em uma caixa de mensagens "
-"aberta"
+msgstr "Mostrar a mensagem se um novo e-mail for recebido em uma "
+"caixa de mensagens aberta"
 
 #: ../src/pref-manager.c:1633
 msgid "Do background check quietly (no messages in status bar)"
@@ -4841,7 +4847,7 @@ msgstr "Abrir a Caixa de Entrada ao iniciar"
 
 #: ../src/pref-manager.c:2463
 msgid "Check mail upon startup"
-msgstr "Verificar mensagem ao iniciar"
+msgstr "Verificar mensagens ao iniciar"
 
 #: ../src/pref-manager.c:2465
 msgid "Remember open mailboxes between sessions"
@@ -5028,7 +5034,8 @@ msgstr ""
 
 #: ../src/save-restore.c:744
 msgid "The option not to recognize \"format=flowed\" text has been removed."
-msgstr "A opção para não reconhecer o texto \"formato=preenchido\" foi removida."
+msgstr ""
+"A opção para não reconhecer o texto \"formato=preenchido\" foi removida."
 
 #: ../src/save-restore.c:1000
 msgid ""
@@ -6072,6 +6079,9 @@ msgstr "Acima"
 #: ../src/toolbar-prefs.c:495
 msgid "Down"
 msgstr "Abaixo"
+
+#~ msgid "IMAP Server %s: %s"
+#~ msgstr "Servidor IMAP %s: %s"
 
 #~ msgid ""
 #~ "\n"

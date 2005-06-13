@@ -85,13 +85,13 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
-#define DEFAULT_MESSAGE_FONT "monospace 10"
-#define DEFAULT_SUBJECT_FONT "helvetica Bold 10"
+#define DEFAULT_MESSAGE_FONT "Monospace 10"
+#define DEFAULT_SUBJECT_FONT "Monospace Bold 10"
 #define DEFAULT_DATE_FORMAT "%x %X"
 #define DEFAULT_PAPER_SIZE "A4"
-#define DEFAULT_PRINT_HEADER_FONT "Bitstream Charter Bold 12"
-#define DEFAULT_PRINT_BODY_FONT "Courier Regular 11"
-#define DEFAULT_PRINT_FOOTER_FONT "Bitstream Charter Bold Italic 8"
+#define DEFAULT_PRINT_HEADER_FONT "Monospace Regular 10"
+#define DEFAULT_PRINT_BODY_FONT "Monospace Regular 10"
+#define DEFAULT_PRINT_FOOTER_FONT "Sans Regular 8"
 #define DEFAULT_SELECTED_HDRS "from to date cc subject"
 #define DEFAULT_MESSAGE_TITLE_FORMAT "Message from %F: %s"
 #define DEFAULT_ENCODING ENC8BIT

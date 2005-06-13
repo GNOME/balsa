@@ -1,3 +1,7 @@
+2005-06-13 12:31  PeterB
+
+	* src/balsa-app.h: use only Monospace and Sans as default fonts.
+
 2005-06-11  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: fix trivial bug introduced yesterday.

@@ -742,22 +742,22 @@ libbalsa_wrap_view(GtkTextView * view, gint length)
 		/* Break at the last break we saw. */
 		gtk_text_iter_set_line_offset(&iter, brk_offset);
 	    else {
+                GtkTextIter start = iter;
 		/* Break at the next line break. */
 		if (offset <= quote_len)
 		    offset = quote_len + 1;
 		while (offset < num_chars
 		       && (is_in_url(&iter, offset, url_tag)
-			   || !log_attrs[offset].is_line_break)) {
-		    gboolean next_is_space =
-			g_unichar_isspace(gtk_text_iter_get_char(&iter));
-		    if (FALSE && in_space && !next_is_space)
-			break;
-		    in_space = next_is_space;
+			   || !log_attrs[offset].is_line_break))
 		    offset++;
-		}
+
 		if (offset >= num_chars)
 		    /* No next line break. */
 		    break;
+
+                /* Trim extra trailing whitespace */
+                gtk_text_iter_forward_char(&start);
+                gtk_text_buffer_delete(buffer, &start, &iter);
 	    }
 
 	    gtk_text_buffer_insert_with_tags(buffer, &iter, "\n", 1,

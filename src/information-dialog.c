@@ -194,7 +194,7 @@ balsa_information_list_new(void)
     gtk_text_view_set_left_margin(view, 2);
     gtk_text_view_set_indent(view, -12);
     gtk_text_view_set_right_margin(view, 2);
-    gtk_text_view_set_wrap_mode(view, GTK_WRAP_WORD);
+    gtk_text_view_set_wrap_mode(view, GTK_WRAP_WORD_CHAR);
 
     return GTK_WIDGET(view);
 }

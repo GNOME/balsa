@@ -1,5 +1,9 @@
-2005-06-13 12:31  PeterB
+2005-06-13 14:10  PeterB
 
+	* src/: balsa-message.c, information-dialog.c: use
+	GTK_WRAP_WORD_CHAR instead of GTK_WRAP_WORD, to allow wrapping of
+	long words.
+	* libbalsa/misc.c: trim trailing whitespace beyond the wrap length.
 	* src/balsa-app.h: use only Monospace and Sans as default fonts.
 
 2005-06-11  Pawel Salek

@@ -3797,6 +3797,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
              || (type != SEND_NORMAL && message != NULL));
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
+    bsmsg->in_reply_to = NULL;
     bsmsg->charset  = NULL;
     bsmsg->charsets  = NULL;
     bsmsg->locale   = NULL;

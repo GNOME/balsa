@@ -1,5 +1,6 @@
-2005-06-14 07:16  PeterB
+2005-06-14 12:48  PeterB
 
+	* src/sendmsg-window.c: clear BalsaSendmsg::in_reply_to.
 	* src/sendmsg-window.h: omitted from yesterday's commit.
 
 2005-06-13 23:59  PeterB

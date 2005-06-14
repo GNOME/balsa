@@ -61,6 +61,7 @@ extern "C" {
         BalsaSendmsgAddress reply_to_info;
 #endif
 	GtkWidget *attachments[4];
+        gchar *in_reply_to;
 	GtkWidget *text;
 	GtkWidget *spell_checker;
 	GtkWidget *notebook;

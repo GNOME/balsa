@@ -1,3 +1,7 @@
+2005-06-14 07:16  PeterB
+
+	* src/sendmsg-window.h: omitted from yesterday's commit.
+
 2005-06-13 23:59  PeterB
 
 	* src/sendmsg-window.c: create in-reply-to string when we begin a

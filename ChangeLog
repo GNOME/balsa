@@ -1,5 +1,8 @@
-2005-06-13 14:10  PeterB
+2005-06-13 23:59  PeterB
 
+	* src/sendmsg-window.c: create in-reply-to string when we begin a
+	reply, so we can save and restore it without reference to the
+	original message.
 	* src/: balsa-message.c, information-dialog.c: use
 	GTK_WRAP_WORD_CHAR instead of GTK_WRAP_WORD, to allow wrapping of
 	long words.

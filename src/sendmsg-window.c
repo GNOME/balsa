@@ -941,6 +941,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->charset);
+    g_free(bsmsg->in_reply_to);
     g_slist_foreach(bsmsg->charsets, (GFunc) g_free, NULL);
     g_slist_free(bsmsg->charsets);
 
@@ -3831,6 +3832,23 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	 */
 	if (message->mailbox)
 	    libbalsa_mailbox_open(message->mailbox, NULL);
+        if (message->message_id && type != SEND_CONTINUE) {
+            tmp = g_strconcat("<", message->message_id, ">", NULL);
+            if (message->headers && message->headers->from) {
+                gchar recvtime[50];
+
+                ctime_r(&bsmsg->orig_message->headers->date, recvtime);
+                if (recvtime[0]) /* safety check; remove trailing '\n' */
+                    recvtime[strlen(recvtime)-1] = '\0';
+                bsmsg->in_reply_to =
+                    g_strconcat(tmp, " (from ",
+                                libbalsa_address_get_mailbox_from_list
+                                (message->headers->from),
+                                " on ", recvtime, ")", NULL);
+                g_free(tmp);
+            } else
+                bsmsg->in_reply_to = tmp;
+        }
     }
 
     g_signal_connect(G_OBJECT(bsmsg->window), "delete-event",
@@ -3942,6 +3960,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	    g_free(tmp);
 	}
 #endif
+        if (message->in_reply_to)
+            bsmsg->in_reply_to = g_strdup(message->in_reply_to->data);
     }
 
     if (type == SEND_REPLY_ALL) {
@@ -4400,7 +4420,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     LibBalsaMessageBody *body;
     GList *list;
     gchar *tmp;
-    gchar recvtime[50];
     GtkTextIter start, end;
 #if !defined(ENABLE_TOUCH_UI)
     const gchar *ctmp;
@@ -4449,26 +4468,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	    }
 	    message->references = g_list_reverse(message->references);
 	}
-	ctime_r(&bsmsg->orig_message->headers->date, recvtime);
-        if(recvtime[0]) /* safety check; remove trailing '\n' */
-            recvtime[strlen(recvtime)-1] = '\0';
-	if (bsmsg->orig_message->message_id) {
-	    message->references =
-		g_list_append(message->references,
-			       g_strdup(bsmsg->orig_message->message_id));
-	    message->in_reply_to =
-		g_list_prepend(NULL,
-		    bsmsg->orig_message->headers->from
-		    ? g_strconcat("<", bsmsg->orig_message->message_id,
-				  "> (from ",
-				  libbalsa_address_get_mailbox_from_list
-				  (bsmsg->orig_message-> headers->from),
-				  " on ", recvtime, ")",
-				  NULL)
-		    : g_strconcat("<", bsmsg->orig_message->message_id, ">",
-				  NULL));
-	}
     }
+    if (bsmsg->in_reply_to)
+        message->in_reply_to =
+            g_list_prepend(NULL, g_strdup(bsmsg->in_reply_to));
 
     body = libbalsa_message_body_new(message);
 

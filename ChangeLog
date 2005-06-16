@@ -1,3 +1,7 @@
+2005-06-16  Pawel Salek
+
+	* libbalsa/imap/auth-gssapi.c: 6th parameter to gss_{un,}wrap is int*.
+
 2005-06-14 12:48  PeterB
 
 	* src/sendmsg-window.c: clear BalsaSendmsg::in_reply_to.

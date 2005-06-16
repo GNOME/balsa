@@ -258,7 +258,7 @@ ag_negotiate_parameters(ImapMboxHandle *handle, const char * user,
     gss_buffer_desc request_buf, send_token;
     char buf[LONG_STRING];
     gss_qop_t quality;
-    unsigned cflags;
+    int cflags;
     char server_conf_flags;
     unsigned char *t;
     unsigned long buf_size;

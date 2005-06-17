@@ -1,3 +1,10 @@
+2005-06-17 08:31  PeterB
+
+	* libbalsa/address-book-vcard.c, libbalsa/address.c,
+	src/Makefile.am, src/ab-main.c, src/address-book-config.c,
+	src/address-book-config.h: implement File->New and File->Properties
+	in balsa-ab.
+
 2005-06-16  Pawel Salek
 
 	* libbalsa/imap/auth-gssapi.c: 6th parameter to gss_{un,}wrap is int*.

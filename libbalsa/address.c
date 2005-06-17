@@ -263,7 +263,10 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
     gchar *new_organization = NULL;
     gchar *first_name = NULL;
     gchar *last_name = NULL;
+    gchar *nick_name = NULL;
     gint cnt;
+    GtkListStore *store;
+    GtkTreeIter iter;
 
     new_email = g_strdup(address
                          && address->address_list
@@ -330,25 +333,31 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
 	first_name = g_strdup("");
     if (last_name == NULL)
 	last_name = g_strdup("");
+    if (!address || address->nick_name == NULL)
+	nick_name = g_strdup("");
+    else
+	nick_name = g_strdup(address->nick_name);
 
     /* Full name must be set after first and last names. */
     gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
     gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
     gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
+    gtk_entry_set_text(GTK_ENTRY(entries[NICK_NAME]), nick_name);
     gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
 
-    if (address) {
-        GtkListStore *store =
-            GTK_LIST_STORE(gtk_tree_view_get_model
+    store = GTK_LIST_STORE(gtk_tree_view_get_model
                            (GTK_TREE_VIEW(entries[EMAIL_ADDRESS])));
+    gtk_list_store_clear(store);
+    if (address) {
         GList *list;
 
-        gtk_list_store_clear(store);
         for (list = address->address_list; list; list = list->next) {
-            GtkTreeIter iter;
             gtk_list_store_append(store, &iter);
             gtk_list_store_set(store, &iter, 0, list->data, -1);
         }
+    } else {
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, 0, "", -1);
     }
 
     gtk_editable_select_region(GTK_EDITABLE(entries[FULL_NAME]), 0, -1);
@@ -498,6 +507,10 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
 
     address = libbalsa_address_new();
     SET_FIELD(address->full_name,   entries[FULL_NAME]);
+    if (!address->full_name) {
+        g_object_unref(address);
+        return NULL;
+    }
     SET_FIELD(address->first_name,  entries[FIRST_NAME]);
     SET_FIELD(address->last_name,   entries[LAST_NAME]);
     SET_FIELD(address->nick_name,   entries[NICK_NAME]);

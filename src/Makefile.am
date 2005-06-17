@@ -101,7 +101,9 @@ balsa_LDADD = \
 
 
 
-balsa_ab_SOURCES =	ab-main.c
+balsa_ab_SOURCES =	ab-main.c		\
+			address-book-config.c	\
+			address-book-config.h	
 
 balsa_ab_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\

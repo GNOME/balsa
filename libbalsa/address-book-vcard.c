@@ -361,8 +361,8 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
 	    continue;
 	}
 
-	if (g_ascii_strncasecmp(string, "NICKNAME:", 3) == 0) {
-	    nick_name = g_strdup(string + 3);
+	if (g_ascii_strncasecmp(string, "NICKNAME:", 9) == 0) {
+	    nick_name = g_strdup(string + 9);
 	    nick_name = validate_vcard_string(nick_name);
             if (stream_out) {
                 lbab_vcard_write_nickname(stream_out, address_out);

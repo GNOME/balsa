@@ -111,6 +111,22 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     gtk_widget_show_all(GTK_WIDGET(abc->window));
 }
 
+void
+balsa_address_book_config_new_from_type(GType type,
+                                        BalsaAddressBookCallback callback,
+                                        GtkWindow* parent)
+{
+    AddressBookConfig *abc;
+
+    abc = g_new0(AddressBookConfig, 1);
+    abc->address_book = NULL;
+    abc->callback = callback;
+    abc->type = type;
+    abc->window = create_dialog_from_type(abc);
+
+    gtk_widget_show_all(GTK_WIDGET(abc->window));
+}
+
 static void
 edit_book_response(GtkWidget * dialog, gint response,
                    AddressBookConfig * abc)
@@ -130,6 +146,77 @@ edit_book_response(GtkWidget * dialog, gint response,
 
     gtk_widget_destroy(dialog);
     g_free(abc);
+}
+
+/* Duplicated from balsa-app.c, for use in balsa-ab. */
+/* abc_create_label:
+   Create a label and add it to a table in the first column of given row,
+   setting the keyval to found accelerator value, that can be later used 
+   in abc_create_entry.
+*/
+static GtkWidget *
+abc_create_label(const gchar * label, GtkWidget * table, gint row)
+{
+    GtkWidget *w = gtk_label_new_with_mnemonic(label);
+
+    gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+    gtk_widget_show(w);
+    return w;
+}
+
+/* abc_create_check:
+   creates a checkbox with a given label and places them in given array.
+*/
+static GtkWidget *
+abc_create_check(GtkDialog *mcw, const gchar *label, GtkWidget *table, gint row,
+             gboolean initval)
+{
+    GtkWidget *cb, *l;
+    
+    cb = gtk_check_button_new();
+
+    l = gtk_label_new_with_mnemonic(label);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(l), cb);
+    gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
+    gtk_widget_show(l);
+
+    gtk_container_add(GTK_CONTAINER(cb), l);
+
+    gtk_table_attach(GTK_TABLE(table), cb, 1, 2, row, row+1,
+		     GTK_FILL, GTK_FILL, 5, 5);
+
+    if(initval) 	
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(cb), TRUE);
+
+    return cb;
+}
+
+/* Create a text entry and add it to the table */
+static GtkWidget *
+abc_create_entry(GtkDialog *mcw, GtkWidget * table, 
+	     GtkSignalFunc changed_func, gpointer data, gint row, 
+	     const gchar * initval, GtkWidget* hotlabel)
+{
+    GtkWidget *entry = gtk_entry_new();
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
+		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+    if (initval) {
+        gint zero = 0;
+        
+        gtk_editable_insert_text(GTK_EDITABLE(entry), initval, -1, &zero);
+    }
+
+    gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
+
+    /* Watch for changes... */
+    if(changed_func)
+	g_signal_connect(G_OBJECT(entry), "changed", 
+			 G_CALLBACK(changed_func), data);
+
+    gtk_widget_show(entry);
+    return entry;
 }
 
 static GtkWidget *
@@ -164,11 +251,11 @@ create_local_dialog(AddressBookConfig * abc)
 
     table = gtk_table_new(2, 2, FALSE);
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), table);
-    label = create_label(_("A_ddress Book Name"), table, 0);
+    label = abc_create_label(_("A_ddress Book Name"), table, 0);
     abc->name_entry =
-        create_entry(NULL, table, NULL, NULL, 0, name, label);
+        abc_create_entry(NULL, table, NULL, NULL, 0, name, label);
     abc->expand_aliases_button =
-        create_check(NULL, _("_Expand aliases as you type"), table, 1,
+        abc_create_check(NULL, _("_Expand aliases as you type"), table, 1,
                      ab ? ab->expand_aliases : TRUE);
 
     if (ab) {
@@ -263,8 +350,8 @@ create_externq_dialog(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("A_ddress Book Name"), table, 0);
-    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+    label = abc_create_label(_("A_ddress Book Name"), table, 0);
+    abc->name_entry = abc_create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : NULL, 
 				   label);
 
@@ -307,7 +394,7 @@ create_externq_dialog(AddressBookConfig * abc)
                                   abc->ab_specific.externq.save);
     
     abc->expand_aliases_button =
-	create_check(mcw, _("_Expand aliases as you type"), table, 3,
+	abc_create_check(mcw, _("_Expand aliases as you type"), table, 3,
 		     ab ? abc->address_book->expand_aliases : TRUE);
 
     if (ab) {
@@ -353,38 +440,38 @@ create_ldap_dialog(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("A_ddress Book Name"), table, 0);
-    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+    label = abc_create_label(_("A_ddress Book Name"), table, 0);
+    abc->name_entry = abc_create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : name, 
 				   label);
 
-    label = create_label(_("_Host Name"), table, 1);
+    label = abc_create_label(_("_Host Name"), table, 1);
     abc->ab_specific.ldap.host_name = 
-	create_entry(mcw, table, NULL, NULL, 1, 
+	abc_create_entry(mcw, table, NULL, NULL, 1, 
 		     ab ? ab->host : host, label);
 
-    label = create_label(_("Base Domain _Name"), table, 2);
+    label = abc_create_label(_("Base Domain _Name"), table, 2);
     abc->ab_specific.ldap.base_dn = 
-	create_entry(mcw, table, NULL, NULL, 2, 
+	abc_create_entry(mcw, table, NULL, NULL, 2, 
 		     ab ? ab->base_dn : base, label);
 
-    label = create_label(_("_User Name (Bind DN)"), table, 3);
+    label = abc_create_label(_("_User Name (Bind DN)"), table, 3);
     abc->ab_specific.ldap.bind_dn = 
-	create_entry(mcw, table, NULL, NULL, 3, 
+	abc_create_entry(mcw, table, NULL, NULL, 3, 
 		     ab ? ab->bind_dn : "", label);
 
-    label = create_label(_("_Password"), table, 4);
+    label = abc_create_label(_("_Password"), table, 4);
     abc->ab_specific.ldap.passwd = 
-	create_entry(mcw, table, NULL, NULL, 4, 
+	abc_create_entry(mcw, table, NULL, NULL, 4, 
 		     ab ? ab->passwd : "", label);
     gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.ldap.passwd), FALSE);
 
     abc->ab_specific.ldap.enable_tls =
-	create_check(mcw, _("Enable _TLS"), table, 5,
+	abc_create_check(mcw, _("Enable _TLS"), table, 5,
 		     ab ? ab->enable_tls : FALSE);
 
     abc->expand_aliases_button =
-	create_check(mcw, _("_Expand aliases as you type"), table, 6,
+	abc_create_check(mcw, _("_Expand aliases as you type"), table, 6,
 		     ab ? abc->address_book->expand_aliases : TRUE);
 
     gtk_widget_show(table);
@@ -414,12 +501,12 @@ create_gpe_dialog(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = create_label(_("A_ddress Book Name"), table, 0);
-    abc->name_entry = create_entry(mcw, table, NULL, NULL, 0, 
+    label = abc_create_label(_("A_ddress Book Name"), table, 0);
+    abc->name_entry = abc_create_entry(mcw, table, NULL, NULL, 0, 
 				   ab ? ab->name : _("GPE Address Book"), 
 				   label);
     abc->expand_aliases_button =
-	create_check(mcw, _("_Expand aliases as you type"), table, 3,
+	abc_create_check(mcw, _("_Expand aliases as you type"), table, 3,
 		     ab ? ab->expand_aliases : TRUE);
 
     dialog = create_generic_dialog(abc);
@@ -436,9 +523,9 @@ help_button_cb(AddressBookConfig * abc)
     gnome_help_display("balsa", "preferences-1", &err);
 
     if (err) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-		_("Error displaying help: %s\n"),
-		err->message);
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error displaying help: %s\n"),
+                             err->message);
         g_error_free(err);
     }
 }
@@ -708,6 +795,9 @@ modify_book(AddressBookConfig * abc)
         ldap->enable_tls = enable_tls;
         libbalsa_address_book_ldap_close_connection(ldap);
 #endif
+#if HAVE_SQLITE
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
+#endif /* HAVE_SQLITE */
     } else
         g_assert_not_reached();
 
@@ -725,7 +815,7 @@ add_vcard_cb(GtkWidget * widget, AddressBookConfig * abc)
     g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
                         (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
-    abc->window = create_local_dialog(abc);
+    abc->window = create_vcard_dialog(abc);
     gtk_widget_show_all(abc->window);
 }
 
@@ -745,7 +835,7 @@ add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
     g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
                         (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
-    abc->window = create_local_dialog(abc);
+    abc->window = create_ldif_dialog(abc);
     gtk_widget_show_all(abc->window);
 }
 

@@ -39,12 +39,14 @@
 #endif
 #include "address-book-vcard.h"
 #include "address-book-gpe.h"
+#include "address-book-config.h"
 #include "libbalsa-conf.h"
 #include "libbalsa.h"
 #include "i18n.h"
 
 struct ABMainWindow {
-    GtkWidget *entry_list; /* GtkListView widget */
+    GtkWindow *window;
+    GtkWidget *entry_list; /* GtkTreeView widget */
     GtkWidget *apply_button, *remove_button, *cancel_button;
     GtkWidget *edit_widget;
     GtkWidget *entries[NUM_FIELDS];
@@ -53,6 +55,8 @@ struct ABMainWindow {
     GList *address_book_list;
     LibBalsaAddressBook* address_book;
     LibBalsaAddress *displayed_address;
+    GtkActionGroup *action_group;
+    GtkUIManager *ui_manager;
 } contacts_app;
     
 
@@ -165,17 +169,17 @@ static void
 select_address_book_cb(GtkRadioAction * action, GtkRadioAction * current,
                        GtkWindow * window)
 {
-    GList *l;
+    LibBalsaAddressBook *address_book;
 
-    l = g_list_nth(contacts_app.address_book_list,
-                   gtk_radio_action_get_current_value(action));
-    if (!l)
+    address_book =
+        g_list_nth_data(contacts_app.address_book_list,
+                        gtk_radio_action_get_current_value(action));
+    if (!address_book)
         return;
 
     ab_clear_edit_widget();
-    bab_set_address_book(LIBBALSA_ADDRESS_BOOK(l->data),
-                         contacts_app.entry_list, NULL);
-    gtk_window_set_title(window, LIBBALSA_ADDRESS_BOOK(l->data)->name);
+    bab_set_address_book(address_book, contacts_app.entry_list, NULL);
+    gtk_window_set_title(window, address_book->name);
 }
 
 static void
@@ -185,6 +189,142 @@ address_changed_cb(struct ABMainWindow *aw)
     gtk_widget_set_sensitive(aw->cancel_button, TRUE);
 }
 
+/* File menu callback helpers */
+
+static void
+add_address_book(LibBalsaAddressBook * address_book, gint pos)
+{
+    gchar *label;
+    GtkRadioAction *radio_action;
+    gchar *accelerator;
+    guint merge_id;
+
+    label = g_strdup_printf("_%d:%s", pos, address_book->name);
+    radio_action = gtk_radio_action_new(address_book->name, label,
+                                        NULL, NULL, pos - 1);
+    g_free(label);
+
+    if (contacts_app.first_radio_action) {
+        GSList *group =
+            gtk_radio_action_get_group(contacts_app.first_radio_action);
+        gtk_radio_action_set_group(radio_action, group);
+    } else {
+        g_signal_connect(G_OBJECT(radio_action), "changed",
+                         G_CALLBACK(select_address_book_cb),
+                         contacts_app.window);
+        contacts_app.first_radio_action = radio_action;
+    }
+
+    accelerator = pos <= 9 ? g_strdup_printf("<control>%d", pos) : NULL;
+    gtk_action_group_add_action_with_accel(contacts_app.action_group,
+                                           GTK_ACTION(radio_action),
+                                           accelerator);
+    g_free(accelerator);
+
+    /* FIXME: if we want to add File -> Delete, we'll need to save 
+     * merge_id, so that we can use gtk_ui_manager_remove_ui. */
+    merge_id = gtk_ui_manager_new_merge_id(contacts_app.ui_manager);
+    gtk_ui_manager_add_ui(contacts_app.ui_manager, merge_id,
+                          "/ui/MainMenu/FileMenu/",
+                          address_book->name, address_book->name,
+                          GTK_UI_MANAGER_AUTO, FALSE);
+}
+
+static gboolean
+get_used_group(const gchar * key, const gchar * value, gpointer data)
+{
+    gint *max = data;
+    gint curr;
+
+    if (*value && (curr = atoi(value)) > *max)
+        *max = curr;
+
+    return FALSE;
+}
+
+static gchar *
+get_unused_group(const gchar * prefix)
+{
+    gint max = 0;
+
+    libbalsa_conf_foreach_group(prefix, get_used_group, &max);
+
+    return g_strdup_printf("%s%d", prefix, ++max);
+}
+
+static void
+address_book_change(LibBalsaAddressBook * address_book, gboolean append)
+{
+    gchar *group;
+
+    if (append) {
+        contacts_app.address_book_list =
+            g_list_append(contacts_app.address_book_list, address_book);
+        add_address_book(address_book,
+                         g_list_length(contacts_app.address_book_list));
+    }
+
+    group = address_book->config_prefix ?
+        g_strdup(address_book->config_prefix) :
+        get_unused_group(ADDRESS_BOOK_SECTION_PREFIX);
+    libbalsa_address_book_save_config(address_book, group);
+    g_free(group);
+
+    libbalsa_conf_sync();
+}
+
+static void
+new_vcard_cb(GtkAction * action, gpointer user_data)
+{
+    balsa_address_book_config_new_from_type
+        (LIBBALSA_TYPE_ADDRESS_BOOK_VCARD, address_book_change,
+         contacts_app.window);
+}
+
+static void
+new_extern_cb(GtkAction * action, gpointer user_data)
+{
+    balsa_address_book_config_new_from_type
+        (LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, address_book_change,
+         contacts_app.window);
+}
+
+static void
+new_ldif_cb(GtkAction * action, gpointer user_data)
+{
+    balsa_address_book_config_new_from_type
+        (LIBBALSA_TYPE_ADDRESS_BOOK_LDIF, address_book_change,
+         contacts_app.window);
+}
+
+#if ENABLE_LDAP
+static void
+new_ldap_cb(GtkAction * action, gpointer user_data)
+{
+    balsa_address_book_config_new_from_type
+        (LIBBALSA_TYPE_ADDRESS_BOOK_LDAP, address_book_change,
+         contacts_app.window);
+}
+#endif /* ENABLE_LDAP */
+
+#if HAVE_SQLITE
+static void
+new_gpe_cb(GtkAction * action, gpointer user_data)
+{
+    balsa_address_book_config_new_from_type
+        (LIBBALSA_TYPE_ADDRESS_BOOK_GPE, address_book_change,
+         contacts_app.window);
+}
+#endif /* HAVE_SQLITE */
+
+static void
+properties_cb(GtkAction * action, gpointer user_data)
+{
+    if (contacts_app.address_book)
+        balsa_address_book_config_new(contacts_app.address_book,
+                                      address_book_change,
+                                      contacts_app.window);
+}
 
 static void
 edit_new_person_cb(GtkAction * action, gpointer user_data)
@@ -206,11 +346,23 @@ static GtkActionEntry entries[] = {
     {"FileMenu", NULL, "_File"},
     {"EntryMenu", NULL, "_Entry"},
     {"HelpMenu", NULL, "_Help"},
-    {"New", GTK_STOCK_NEW, "_New", NULL, "New file", NULL},
-    {"Open", GTK_STOCK_OPEN, "_Open", NULL, "Open a file", NULL},
-    {"Save", GTK_STOCK_SAVE, "_Save", NULL, "Save file", NULL},
-    {"SaveAs", GTK_STOCK_SAVE_AS, "Save _As", "<shift><control>S",
-     "Save file as", NULL},
+    {"New", GTK_STOCK_NEW, "_New"},
+    {"NewVcard", NULL, N_("VCard Address Book (GnomeCard)"), NULL, NULL,
+     G_CALLBACK(new_vcard_cb)},
+    {"NewExtern", NULL, N_("External query (a program)"), NULL, NULL,
+     G_CALLBACK(new_extern_cb)},
+    {"NewLdif", NULL, N_("LDIF Address Book"), NULL, NULL,
+     G_CALLBACK(new_ldif_cb)},
+#if ENABLE_LDAP
+    {"NewLdap", NULL, N_("LDAP Address Book"), NULL, NULL,
+     G_CALLBACK(new_ldap_cb)},
+#endif /* ENABLE_LDAP */
+#if HAVE_SQLITE
+    {"NewGpe", NULL, N_("GPE Address Book"), NULL, NULL,
+     G_CALLBACK(new_gpe_cb)},
+#endif /* HAVE_SQLITE */
+    {"Properties", GTK_STOCK_PROPERTIES, "_Properties", NULL,
+     "Edit address book properties", G_CALLBACK(properties_cb)},
     {"Quit", GTK_STOCK_QUIT, "_Quit", NULL, "Exit the program",
      gtk_main_quit},
     {"NewPerson", GTK_STOCK_NEW, "_New Person", "<shift><control>N",
@@ -230,10 +382,18 @@ static const char *ui_description =
 "<ui>"
 "  <menubar name='MainMenu'>"
 "    <menu action='FileMenu'>"
-"      <menuitem action='New'/>"
-"      <menuitem action='Open'/>"
-"      <menuitem action='Save'/>"
-"      <menuitem action='SaveAs'/>"
+"      <menu action='New'>"
+"        <menuitem action='NewVcard'/>"
+"        <menuitem action='NewExtern'/>"
+"        <menuitem action='NewLdif'/>"
+#if ENABLE_LDAP
+"        <menuitem action='NewLdap'/>"
+#endif /* ENABLE_LDAP */
+#if HAVE_SQLITE
+"        <menuitem action='NewGpe'/>"
+#endif /* HAVE_SQLITE */
+"      </menu>"
+"      <menuitem action='Properties'/>"
 "      <separator/>"
 "      <menuitem action='Quit'/>"
 "      <separator/>"
@@ -260,11 +420,12 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
     int cnt;
     GSList *group = NULL;
 
-    action_group = gtk_action_group_new("MenuActions");
+    contacts_app.action_group = action_group =
+        gtk_action_group_new("MenuActions");
     gtk_action_group_add_actions(action_group, entries,
                                  G_N_ELEMENTS(entries), window);
 
-    ui_manager = gtk_ui_manager_new();
+    contacts_app.ui_manager = ui_manager = gtk_ui_manager_new();
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
@@ -310,6 +471,8 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
                                                accelerator);
         g_free(accelerator);
 
+        /* FIXME: if we want to add File -> Delete, we'll need to save 
+         * merge_id, so that we can use gtk_ui_manager_remove_ui. */
         merge_id = gtk_ui_manager_new_merge_id(ui_manager);
         gtk_ui_manager_add_ui(ui_manager, merge_id,
                               "/ui/MainMenu/FileMenu/",
@@ -409,15 +572,25 @@ bab_window_list_new(gpointer cb_data)
 static void
 apply_button_cb(GtkWidget * w, gpointer data)
 {
-    LibBalsaAddress * newval =
-        libbalsa_address_new_from_edit_entries(contacts_app.entries);
-    LibBalsaABErr err = 
-        contacts_app.displayed_address 
-        ? libbalsa_address_book_modify_address(contacts_app.address_book,
-                                               contacts_app.displayed_address,
-                                               newval)
-        : libbalsa_address_book_add_address(contacts_app.address_book,
-                                            newval);
+    LibBalsaAddress *newval;
+    LibBalsaABErr err;
+
+    newval = libbalsa_address_new_from_edit_entries(contacts_app.entries);
+    if (!newval) {
+        /* Some error--no full_name? */
+        ab_warning(contacts_app.displayed_address ?
+                   "Cannot modify: %s\n" : "Cannot add: %s\n",
+                   "no displayed name");
+        gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
+        return;
+    }
+
+    err = contacts_app.displayed_address ?
+        libbalsa_address_book_modify_address(contacts_app.address_book,
+                                             contacts_app.displayed_address,
+                                             newval) :
+        libbalsa_address_book_add_address(contacts_app.address_book,
+                                          newval);
 
     if(err == LBABERR_OK) {
         GtkTreeSelection *selection;
@@ -456,7 +629,9 @@ apply_button_cb(GtkWidget * w, gpointer data)
 static void
 remove_button_cb(GtkWidget *w, gpointer data)
 {
-    LibBalsaABErr err = 
+    LibBalsaABErr err = LBABERR_OK;
+
+    if (contacts_app.displayed_address)
         libbalsa_address_book_remove_address(contacts_app.address_book,
                                              contacts_app.displayed_address);
     if(err == LBABERR_OK) {
@@ -580,13 +755,13 @@ bab_window_new()
     gtk_widget_show(scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(cont_box), scroll, TRUE,TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(cont_box), scroll, TRUE, TRUE, 1);
     
     contacts_app.entry_list = bab_window_list_new(&contacts_app);
     gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
 
     vbox = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(cont_box), vbox, TRUE,TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(cont_box), vbox, FALSE, FALSE, 1);
     edit_box = gtk_vbox_new(FALSE, 1);
     contacts_app.edit_widget = 
         libbalsa_address_get_edit_widget(NULL, contacts_app.entries,
@@ -605,6 +780,7 @@ bab_window_new()
     gtk_window_set_default_size(GTK_WINDOW(wnd), 500, 400);
     gnome_app_set_contents(GNOME_APP(wnd), main_vbox);
 
+    /* FIXME: select default address book */
     if (contacts_app.first_radio_action)
         gtk_action_activate(GTK_ACTION(contacts_app.first_radio_action));
 
@@ -694,6 +870,7 @@ main(int argc, char *argv[])
                                 &contacts_app.address_book_list);
 
     ab_window = bab_window_new();
+    contacts_app.window = GTK_WINDOW(ab_window);
     g_signal_connect(G_OBJECT(ab_window), "destroy",
                      G_CALLBACK(bab_cleanup), NULL);
     g_signal_connect(G_OBJECT(ab_window), "delete-event",

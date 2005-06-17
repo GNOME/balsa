@@ -28,6 +28,9 @@ typedef void BalsaAddressBookCallback(LibBalsaAddressBook * address_book,
 void balsa_address_book_config_new(LibBalsaAddressBook * address_book,
 				   BalsaAddressBookCallback callback,
                                    GtkWindow * parent);
+void balsa_address_book_config_new_from_type(GType type,
+                                             BalsaAddressBookCallback
+                                             callback, GtkWindow * parent);
 GtkWidget *balsa_address_book_add_menu(BalsaAddressBookCallback callback,
                                        GtkWindow * parent);
 

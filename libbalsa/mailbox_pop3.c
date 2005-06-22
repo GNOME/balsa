@@ -555,6 +555,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     mailbox->name, err->message);
         g_error_free(err);
 	g_free(tmp_path); g_free(mhs);
+        g_object_unref(G_OBJECT(tmp_mailbox));
 	return;
     }
 

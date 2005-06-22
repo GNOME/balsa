@@ -1,3 +1,13 @@
+2005-06-22  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: fix date searching when only upper
+	limit is present.
+	* libbalsa/mailbox_pop3.c: fix memory leak.
+	* libbalsa/imap/imap-search.c: date::range must be signed.
+	* src/filter-edit-callbacks.c: clean up filter dialog.
+	* src/filter-run-{callbacks,dialog}.c: fix "run filters".
+	* src/filter-run.h: add fr_apply_pressed() prototype.
+
 2005-06-17 08:31  PeterB
 
 	* libbalsa/address-book-vcard.c, libbalsa/address.c,

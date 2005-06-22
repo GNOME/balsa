@@ -76,7 +76,6 @@ extern GtkWidget *fe_name_label;
 extern GtkWidget *fe_name_entry;
     
 /* widgets for the matching fields */
-GtkWidget *fe_match_frame;
 GtkWidget *fe_matching_fields_body;
 GtkWidget *fe_matching_fields_to;
 GtkWidget *fe_matching_fields_from;
@@ -291,11 +290,6 @@ fe_typesmenu_cb(GtkWidget* widget, gpointer data)
     condition_has_changed=TRUE;
     gtk_notebook_set_current_page(GTK_NOTEBOOK(fe_type_notebook),
                                   type - 1);
-    /* For certain types (date, flag)
-     * match fields have no meaning so we disable them
-     */
-    gtk_widget_set_sensitive(fe_match_frame,
-                             (type!=CONDITION_DATE && type!=CONDITION_FLAG));
 }                       /* end fe_typesmenu_cb() */
 
 typedef struct {
@@ -609,7 +603,7 @@ condition_validate(LibBalsaCondition* new_cnd)
         for (row=0;row<2;row++)
             for (col=0;col<2;col++)
                 new_cnd->match.flags|=
-                    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_type_flag_buttons[row*2+col])) ? 1 << (row*2+col+1): 0;
+                    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_type_flag_buttons[row*2+col])) ? 1 << (row*2+col): 0;
 
     case CONDITION_NONE:
     case CONDITION_AND: /*FIXME: verify this! */
@@ -688,7 +682,6 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     /* First update matching fields
      * but if type is date or flag, these are meaning less so we disable them */
     andmask = (cnd->type!=CONDITION_FLAG && cnd->type!=CONDITION_DATE);
-    gtk_widget_set_sensitive(fe_match_frame,andmask);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_body),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_BODY) && andmask);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_to),
@@ -754,7 +747,7 @@ fill_condition_widgets(LibBalsaCondition* cnd)
         for (row=0;row<2;row++)
             for (col=0;col<2;col++)
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_type_flag_buttons[row*2+col]),
-                                             cnd->match.flags & (1 << (row*2+col+1)));
+                                             cnd->match.flags & (1 << (row*2+col)));
         fe_update_label(fe_type_flag_label,   &flags_label);
         break;
     case CONDITION_NONE:
@@ -842,15 +835,85 @@ condition_dialog_response(GtkWidget * dialog, gint response,
     gtk_widget_set_sensitive(fe_window, TRUE);
 }
 
-/* build_type_notebook
- * build the notebook containing one page for each condition type (simple, regex, date, flag)
+/* build_type_notebook() builds the notebook containing one page for each
+ * condition type (simple, regex, date, flag)
  */
-static void build_type_notebook()
+static void
+add_button(GtkWidget *table, const char *label, int row,
+           GCallback action, int p)
+{
+    GtkWidget* button = gtk_button_new_with_mnemonic(label);
+    gtk_table_attach(GTK_TABLE(table),
+                     button,
+                     row, row+1, 4, 5,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2); 
+    g_signal_connect(G_OBJECT(button), "clicked",
+                     action,
+                     GINT_TO_POINTER(p));
+}
+static GtkWidget*
+add_check(GtkWidget *table, const char *label, int col, int row)
+{
+    GtkWidget* res = gtk_check_button_new_with_mnemonic(label);
+    gtk_table_attach(GTK_TABLE(table), res,
+                     col, col+1, row, row+1,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    g_signal_connect(G_OBJECT(res), "toggled",
+                     G_CALLBACK(fe_condition_changed_cb), NULL);
+    return res;
+}
+
+static GtkWidget*
+get_field_frame(void)
+{
+    GtkWidget *table;
+    GtkWidget *frame = gtk_frame_new(_("Match Fields"));
+    GList *list;
+
+    gtk_frame_set_label_align(GTK_FRAME(frame), 
+                              GTK_POS_LEFT, GTK_POS_TOP);
+    gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
+    
+    table = gtk_table_new(5, 2, TRUE);
+    gtk_container_add(GTK_CONTAINER(frame), table);
+
+    add_button(table, _("_All"),  0,G_CALLBACK(fe_match_fields_buttons_cb),1);
+    add_button(table, _("C_lear"),1,G_CALLBACK(fe_match_fields_buttons_cb),3);
+
+    fe_matching_fields_body    = add_check(table, _("_Body"),    0,0);
+    fe_matching_fields_to      = add_check(table, _("_To:"),     0,1);
+    fe_matching_fields_from    = add_check(table, _("_From:"),   1,1);
+    fe_matching_fields_subject = add_check(table, _("_Subject"), 0,2);
+    fe_matching_fields_cc      = add_check(table,  _("_Cc:"),    1,2);
+    fe_matching_fields_us_head =
+        gtk_check_button_new_with_mnemonic(_("_User header:"));
+    gtk_table_attach(GTK_TABLE(table),
+                     fe_matching_fields_us_head,
+                     0, 1, 3, 4,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    g_signal_connect(G_OBJECT(fe_matching_fields_us_head), "toggled",
+                     G_CALLBACK(fe_match_field_user_header_cb), NULL);
+
+    fe_user_header = gtk_combo_box_entry_new_text();
+    for (list = fe_user_headers_list; list; list = list->next)
+        gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
+                                  list->data);
+    g_signal_connect(G_OBJECT(fe_user_header), "changed",
+                     G_CALLBACK(fe_condition_changed_cb), NULL);
+    gtk_table_attach(GTK_TABLE(table),
+                     fe_user_header,
+                     1, 2, 3, 4,
+                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    return frame;
+}
+
+static void
+build_type_notebook()
 {
     GtkWidget *page,*frame;
     GtkWidget *scroll;
     GtkWidget *box;
-    GtkWidget *button;
+    GtkWidget *button, *table;
     gint row,col;
     static gchar * flag_names[]=
         {N_("Unread"), N_("Deleted"), N_("Replied"), N_("Flagged")};
@@ -863,19 +926,21 @@ static void build_type_notebook()
 
     /* The simple page of the notebook */
 
-    page = gtk_table_new(5, 3, FALSE);
-    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
+    box = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start_defaults(GTK_BOX(box), get_field_frame());
+    table = gtk_table_new(7, 2, FALSE);
+    gtk_box_pack_start_defaults(GTK_BOX(box), table);
 
     fe_type_simple_label = 
 	gtk_label_new_with_mnemonic(_("One of the specified f_ields contains"));
-    gtk_table_attach(GTK_TABLE(page),
+    gtk_table_attach(GTK_TABLE(table),
                      fe_type_simple_label,
                      0, 5, 0, 1,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
     fe_type_simple_entry = gtk_entry_new();
     g_signal_connect(G_OBJECT(fe_type_simple_entry), "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    gtk_table_attach(GTK_TABLE(page),
+    gtk_table_attach(GTK_TABLE(table),
                      fe_type_simple_entry,
                      0, 5, 1, 2,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
@@ -885,15 +950,21 @@ static void build_type_notebook()
     button = gtk_button_new_with_mnemonic(_("Contain/Does _Not Contain"));
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
-    gtk_table_attach(GTK_TABLE(page),
+    gtk_table_attach(GTK_TABLE(table),
                      button,
                      0, 5, 2, 3,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+
+    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
     
     /* The regex page of the type notebook */
+    box = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start_defaults(GTK_BOX(box), get_field_frame());
 
     page = gtk_table_new(5, 6, FALSE);
-    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
+    gtk_box_pack_start_defaults(GTK_BOX(box), page);
+
+    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
 
     fe_type_regex_label = 
         gtk_label_new_with_mnemonic(_("_One of the regular expressions matches"));
@@ -948,7 +1019,7 @@ static void build_type_notebook()
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
 
     fe_type_date_label = 
-        gtk_label_new(_("Match when date is in the interval:"));
+        gtk_label_new(_("Match when message date is in the interval:"));
     gtk_table_attach(GTK_TABLE(page),
                      fe_type_date_label,
                      0, 5, 0, 1,
@@ -1027,102 +1098,11 @@ static void build_type_notebook()
 static
 void build_condition_dialog(GtkWidget * condition_dialog)
 {
-    GtkWidget * table,* label,* button,* page,* box;
-    GList *list;
+    GtkWidget *label,* box;
 
-    page = gtk_table_new(7, 2, FALSE);
-    /* builds the toggle buttons to specify fields concerned by the conditions of
-     * the filter */
-    
-    fe_match_frame = gtk_frame_new(_("Match In"));
-    gtk_frame_set_label_align(GTK_FRAME(fe_match_frame), 
-                              GTK_POS_LEFT, GTK_POS_TOP);
-    gtk_frame_set_shadow_type(GTK_FRAME(fe_match_frame), GTK_SHADOW_ETCHED_IN);
-    gtk_table_attach(GTK_TABLE(page),
-                     fe_match_frame,
-                     0, 2, 0, 2,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
-    
-    table = gtk_table_new(5, 2, TRUE);
-    gtk_container_add(GTK_CONTAINER(fe_match_frame), table);
-    
-    button = gtk_button_new_with_mnemonic(_("_All"));
-    gtk_table_attach(GTK_TABLE(table),
-                     button,
-                     0, 1, 4, 5,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2); 
-    g_signal_connect(G_OBJECT(button), "clicked",
-                     G_CALLBACK(fe_match_fields_buttons_cb),
-                     GINT_TO_POINTER(1));
-    button = gtk_button_new_with_mnemonic(_("C_lear"));
-    gtk_table_attach(GTK_TABLE(table),
-                     button,
-                     1, 2, 4, 5,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    g_signal_connect(G_OBJECT(button), "clicked",
-                     G_CALLBACK(fe_match_fields_buttons_cb),
-                     GINT_TO_POINTER(3));
-    
-    fe_matching_fields_body = gtk_check_button_new_with_mnemonic(_("_Body"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_matching_fields_body,
-                     0, 1, 0, 1,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    g_signal_connect(G_OBJECT(fe_matching_fields_body), "toggled",
-                     G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_to = gtk_check_button_new_with_mnemonic(_("_To:"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_matching_fields_to,
-                     0, 1, 1, 2,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    g_signal_connect(G_OBJECT(fe_matching_fields_to), "toggled",
-                     G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_from = gtk_check_button_new_with_mnemonic(_("_From:"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_matching_fields_from,
-                     1, 2, 1, 2,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    g_signal_connect(G_OBJECT(fe_matching_fields_from), "toggled",
-                     G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_subject = 
-	gtk_check_button_new_with_mnemonic(_("_Subject"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_matching_fields_subject,
-                     0, 1, 2, 3,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    g_signal_connect(G_OBJECT(fe_matching_fields_subject), "toggled",
-                     G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_cc = gtk_check_button_new_with_mnemonic(_("_Cc:"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_matching_fields_cc,
-                     1, 2, 2, 3,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    g_signal_connect(G_OBJECT(fe_matching_fields_cc), "toggled",
-                     G_CALLBACK(fe_condition_changed_cb), NULL);
-    fe_matching_fields_us_head = gtk_check_button_new_with_mnemonic(_("_User header:"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_matching_fields_us_head,
-                     0, 1, 3, 4,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    g_signal_connect(G_OBJECT(fe_matching_fields_us_head), "toggled",
-                     G_CALLBACK(fe_match_field_user_header_cb), NULL);
-    fe_user_header = gtk_combo_box_entry_new_text();
-    for (list = fe_user_headers_list; list; list = list->next)
-        gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
-                                  list->data);
-    g_signal_connect(G_OBJECT(fe_user_header), "changed",
-                     G_CALLBACK(fe_condition_changed_cb), NULL);
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_user_header,
-                     1, 2, 3, 4,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
-    
+    /* builds the toggle buttons to specify fields concerned by the
+     * conditions of the filter */
     box = gtk_hbox_new(FALSE, 5);
-    gtk_table_attach(GTK_TABLE(page),
-                     box,
-                     0, 2, 2, 3,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
-
     label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
     fe_search_option_menu = 
@@ -1130,14 +1110,12 @@ void build_condition_dialog(GtkWidget * condition_dialog)
                              G_CALLBACK(fe_typesmenu_cb));
     gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),
+                       box, FALSE, FALSE, 2);
 
     build_type_notebook();
-    gtk_table_attach(GTK_TABLE(page),
-                     fe_type_notebook,
-                     0, 2, 3, 7,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, 5, 5);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),page,FALSE,FALSE,2);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),
+                       fe_type_notebook, FALSE, FALSE, 2);
 }
 
 /*
@@ -1673,7 +1651,7 @@ fe_new_pressed(GtkWidget * widget, gpointer data)
 
     /* Adds "New Filter" to the list of actual new filters names */
     new_filters_names=g_list_prepend(new_filters_names,g_strdup(new_item));
-    gtk_widget_grab_focus(fe_name_label);
+    gtk_widget_grab_focus(fe_name_entry);
 }                       /* end fe_new_pressed() */
 
 /*

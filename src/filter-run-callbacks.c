@@ -88,9 +88,23 @@ build_selected_filters_list(GtkTreeView * filter_list, gboolean to_run)
 static gboolean
 run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
 {
-    GSList *filters = build_selected_filters_list(filter_list, TRUE);
+    GSList *filters = NULL; build_selected_filters_list(filter_list, TRUE);
     GSList *lst;
+    GtkTreeIter iter;
     guint sent_to_trash;
+    GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
+    gboolean valid;
+
+    /* Construct list of selected filters */
+    for (valid = gtk_tree_model_get_iter_first(model, &iter);
+         valid;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        LibBalsaFilter *fil;
+
+        gtk_tree_model_get(model, &iter, DATA_COLUMN, &fil, -1);
+        filters =
+            g_slist_prepend(filters, fil);
+    }
 
     if (!filters)
 	return TRUE;
@@ -170,12 +184,6 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
     switch (response) {
-    case GTK_RESPONSE_APPLY:    /* Apply button */
-	if (!run_filters_on_mailbox(p->selected_filters,p->mbox))
-	    balsa_information_parented(GTK_WINDOW(widget),
-		    LIBBALSA_INFORMATION_ERROR,
-		    _("Error when applying filters"));
-	return;
     case GTK_RESPONSE_OK:       /* OK button */
 	save_filters(p);
 	break;
@@ -205,9 +213,23 @@ void fr_dialog_response(GtkWidget * widget, gint response,
     gtk_widget_destroy(GTK_WIDGET(p));
 }
 
+
 /* 
- *Callbacks for left/right buttons
+ *Callbacks for apply/left/right buttons
  */
+
+void
+fr_apply_pressed(BalsaFilterRunDialog* p)
+{
+    if (!run_filters_on_mailbox(p->available_filters, p->mbox))
+        balsa_information_parented(GTK_WINDOW(p),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Error when applying filters"));
+    else
+        balsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                          _("Filter applied to \"%s\"."),
+                          p->mbox->name);
+}
 
 static void
 fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
@@ -228,6 +250,7 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
         GtkTreeIter sel_iter;
 
         mf->actual_filter = fil;
+        printf("fr_add_presed adds fil=%p\n", fil);
         mf->when = FILTER_WHEN_NEVER;
         gtk_list_store_append(GTK_LIST_STORE(sel_model), &sel_iter);
         gtk_list_store_set(GTK_LIST_STORE(sel_model), &sel_iter,

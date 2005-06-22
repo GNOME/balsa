@@ -49,7 +49,7 @@ struct ImapSearchKey_ {
       ImapSearchHeader hdr;
     } string;
     /* IMSE_DATE: FIXME */
-    struct { time_t dt; unsigned internal_date:1; unsigned range:2; } date;
+    struct { time_t dt; unsigned internal_date:1; int range:2; } date;
     /* IMSE_SIZE */
     size_t size;
     /* IMSE_SEQENCE */

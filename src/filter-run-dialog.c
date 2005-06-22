@@ -273,7 +273,6 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
      */
 
     gtk_dialog_add_buttons(GTK_DIALOG(p),
-                           GTK_STOCK_APPLY,  GTK_RESPONSE_APPLY,
                            GTK_STOCK_OK,     GTK_RESPONSE_OK,
                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                            GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
@@ -308,8 +307,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 
-    /* FIXME : I saw a lot of different ways to create button with
-       pixmaps, hope this one is correct*/
+    button = balsa_stock_button_with_label(GTK_STOCK_APPLY,
+                                           _("A_pply Now!"));
+    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                             G_CALLBACK(fr_apply_pressed), G_OBJECT(p));
+    gtk_container_add(GTK_CONTAINER(bbox), button);
+
     /* Right/Add button */
     button = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, _("A_dd"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",

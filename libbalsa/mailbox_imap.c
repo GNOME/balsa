@@ -1328,14 +1328,15 @@ lbmi_build_imap_query(const LibBalsaCondition* cond,
         imap_search_key_set_next(query, next);
         break;
     case CONDITION_DATE: {
-        ImapSearchKey *slo = NULL, *shi = NULL;
+        ImapSearchKey *slo = NULL;
         if (cond->match.date.date_low)
             query  = slo = imap_search_key_new_date
                 (IMSE_D_SINCE, FALSE, cond->match.date.date_low);
         if (cond->match.date.date_high) {
-            shi = imap_search_key_new_date
+            query = imap_search_key_new_date
                 (IMSE_D_BEFORE, FALSE, cond->match.date.date_high);
-            imap_search_key_set_next(query, shi);
+            if(slo)
+                imap_search_key_set_next(query, slo);
         }
         /* this might be redundant if only one limit was specified. */
         if(query)

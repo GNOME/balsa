@@ -95,8 +95,9 @@ void fr_destroy_window_cb(GtkWidget * widget,gpointer throwaway);
 /* Dialog box button callbacks */
 void fr_dialog_response(GtkWidget * widget, gint response, gpointer data);
 /* 
- *Callbacks for left/right buttons
+ *Callbacks for apply/left/right buttons
  */
+void fr_apply_pressed(BalsaFilterRunDialog* dialog);
 void fr_add_pressed(BalsaFilterRunDialog* dialog);
 void fr_remove_pressed(BalsaFilterRunDialog* dialog);
 

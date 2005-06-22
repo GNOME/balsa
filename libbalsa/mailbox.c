@@ -268,7 +268,6 @@ libbalsa_mailbox_dispose(GObject * object)
     while (mailbox->open_ref > 0)
         libbalsa_mailbox_close(mailbox, FALSE);
 
-    g_hash_table_remove(libbalsa_mailbox_view_table, mailbox->url);
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
 

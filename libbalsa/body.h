@@ -119,5 +119,9 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      body,
                                                      const gchar * id);
 
+#ifdef HAVE_GPGME
+LibBalsaMsgProtectState libbalsa_message_body_protect_state(LibBalsaMessageBody *body);
+#endif
+
 
 #endif				/* __LIBBALSA_BODY_H__ */

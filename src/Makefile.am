@@ -17,6 +17,20 @@ balsa_BASE_SRCLIST =	\
 	balsa-mblist.h		\
 	balsa-message.c		\
 	balsa-message.h		\
+	balsa-mime-widget.c	\
+	balsa-mime-widget.h	\
+	balsa-mime-widget-callbacks.c	\
+	balsa-mime-widget-callbacks.h	\
+	balsa-mime-widget-crypto.c	\
+	balsa-mime-widget-crypto.h	\
+	balsa-mime-widget-image.c	\
+	balsa-mime-widget-image.h	\
+	balsa-mime-widget-message.c	\
+	balsa-mime-widget-message.h	\
+	balsa-mime-widget-multipart.c	\
+	balsa-mime-widget-multipart.h	\
+	balsa-mime-widget-text.c	\
+	balsa-mime-widget-text.h	\
 	filter-edit-callbacks.c	\
 	filter-edit-dialog.c	\
 	filter-edit.h		\

@@ -41,19 +41,21 @@ typedef struct _BalsaMessageClass BalsaMessageClass;
 
 typedef struct _BalsaPartInfo BalsaPartInfo;
 
+typedef struct _BalsaMimeWidget BalsaMimeWidget;
+
 struct _BalsaMessage {
 	GtkNotebook parent;
 
-	/* Widget to hold headers */
-	GtkWidget *header_container;
+        /* Top-level MIME widget */
+        BalsaMimeWidget *bm_widget;
+
+	/* header-related information */
 	ShownHeaders shown_headers;
 	gboolean show_all_headers;
 
 	/* Widgets to hold content */
         GtkWidget *cont_viewport;
-	GtkWidget *content;
 	GtkWidget *scroll;
-	gboolean content_has_focus;
 
         /* Widget to hold structure tree */
         GtkWidget *treeview;
@@ -63,7 +65,7 @@ struct _BalsaMessage {
     
 	gboolean wrap_text;
 
-	BalsaPartInfo *current_part;
+        BalsaPartInfo *current_part;
         GtkWidget *parts_popup;
 
 	LibBalsaMessage *message;
@@ -97,8 +99,9 @@ void balsa_message_set_wrap(BalsaMessage * bmessage, gboolean wrap);
 
 gboolean balsa_message_can_select(BalsaMessage * bmessage);
 gboolean balsa_message_grab_focus(BalsaMessage * bmessage);
+gchar * balsa_message_sender_to_gchar(InternetAddressList * list, gint which);
+GtkWidget *balsa_message_current_part_widget(BalsaMessage * bmessage);
 
-void reflow_string(gchar * str, gint mode, gint * cur_pos, int width);
 #ifdef HAVE_GTKHTML
 #define BALSA_MESSAGE_ZOOM_KEY "balsa-message-zoom"
 gboolean balsa_message_can_zoom(BalsaMessage * bm);

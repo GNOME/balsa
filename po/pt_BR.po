@@ -8,16 +8,17 @@
 # Luiz Guaraldo <software.livre@terra.com.br>, 2004.
 # Raphael Higino <raphaelh@uai.com.br>, 2004.
 # Marcus Moreira de Souza <marcus@frb.br>, 2005.
-# Afonso Celso Medina <medina@maua.br>, 2004, 2005.
+# Afonso Celso Medina <afmedina@uol.com.br>, 2004, 2005.
+# 
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.pt_BR\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-06-20 18:48+0000\n"
-"PO-Revision-Date: 2005-06-20 17:08-0300\n"
-"Last-Translator: Marcus Moreira de Souza <marcus@frb.br>\n"
-"Language-Team: GNOME-BR <gnome-l10n-br@listas.cipsga.org.br>\n"
+"POT-Creation-Date: 2005-06-23 10:48+0000\n"
+"PO-Revision-Date: 2005-06-23 16:46-0300\n"
+"Last-Translator: Afonso Celso Medina <afmedina@uol.com.br>\n"
+"Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -572,12 +573,12 @@ msgstr "O servidor IMAP encerrou a conexão: %s Reconectando..."
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Abrindo %s Refcount: %d\n"
 
-#: ../libbalsa/mailbox_imap.c:1080 ../libbalsa/mailbox_imap.c:2218
+#: ../libbalsa/mailbox_imap.c:1080 ../libbalsa/mailbox_imap.c:2219
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Recebendo %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:1459
+#: ../libbalsa/mailbox_imap.c:1460
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -586,22 +587,22 @@ msgstr ""
 "O comando IMAP SEARCH falhou para a caixa de mensagens %s\n"
 "retornando ao método de procura padrão"
 
-#: ../libbalsa/mailbox_imap.c:1519
+#: ../libbalsa/mailbox_imap.c:1520
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr ""
 "Nenhum caminho encontrado para a caixa de mensagens \"%s\", usando \"%s\""
 
-#: ../libbalsa/mailbox_imap.c:1608 ../libbalsa/mailbox_imap.c:1649
+#: ../libbalsa/mailbox_imap.c:1609 ../libbalsa/mailbox_imap.c:1650
 msgid "Cannot get IMAP handle"
 msgstr "Impossível obter o manipulador IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2478
+#: ../libbalsa/mailbox_imap.c:2479
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Enviando %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:2665
+#: ../libbalsa/mailbox_imap.c:2666
 msgid "Server-side threading not supported."
 msgstr "O encadeamento usado pelo servidor não é suportado."
 
@@ -778,22 +779,22 @@ msgstr "Erro de caixa postal temporária na caixa de mensagens POP3 %s:\n"
 msgid "POP3 mailbox %s error: %s\n"
 msgstr "Erro na caixa de mensagens POP3 %s: %s\n"
 
-#: ../libbalsa/mailbox_pop3.c:587
+#: ../libbalsa/mailbox_pop3.c:588
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
 msgstr "A mensagem POP3 %d excedeu o tamanho: %d kB - ignorada."
 
-#: ../libbalsa/mailbox_pop3.c:598
+#: ../libbalsa/mailbox_pop3.c:599
 #, c-format
 msgid "POP3 error: cannot open %s for writing."
 msgstr "Erro de POP3: não é possível abrir %s para gravação."
 
-#: ../libbalsa/mailbox_pop3.c:606
+#: ../libbalsa/mailbox_pop3.c:607
 #, c-format
 msgid "POP3 error: cannot close %s."
 msgstr "Erro de POP3: não é possível fechar %s."
 
-#: ../libbalsa/mailbox_pop3.c:635
+#: ../libbalsa/mailbox_pop3.c:636
 #, c-format
 msgid "POP3 error: %s."
 msgstr "Erro de POP3: %s."
@@ -1792,7 +1793,7 @@ msgstr "Catálogo de Endereços GPE"
 
 #: ../src/ab-main.c:556 ../src/ab-window.c:168 ../src/filter-edit-dialog.c:198
 #: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:221
-#: ../src/filter-run-dialog.c:293
+#: ../src/filter-run-dialog.c:292
 msgid "Name"
 msgstr "Nome"
 
@@ -2538,204 +2539,204 @@ msgstr ""
 "Por favor, feche as outras janelas que exibem essa mensagem e tente "
 "novamente."
 
-#: ../src/filter-edit-callbacks.c:305
+#: ../src/filter-edit-callbacks.c:299
 msgid "One of the specified fields contains:"
 msgstr "Um dos campos especificados contém:"
 
-#: ../src/filter-edit-callbacks.c:306
+#: ../src/filter-edit-callbacks.c:300
 msgid "None of the specified fields contains:"
 msgstr "Nenhum dos campos especificados contém:"
 
-#: ../src/filter-edit-callbacks.c:308
+#: ../src/filter-edit-callbacks.c:302
 msgid "One of the regular expressions matches"
 msgstr "Uma das expressões regular combina"
 
-#: ../src/filter-edit-callbacks.c:309
+#: ../src/filter-edit-callbacks.c:303
 msgid "None of the regular expressions matches"
 msgstr "Nenhuma das expressões regular combina"
 
-#: ../src/filter-edit-callbacks.c:311 ../src/filter-edit-callbacks.c:951
+#: ../src/filter-edit-callbacks.c:305
 msgid "Match when date is in the interval:"
 msgstr "Comparar se data estiver dentro do intervalo:"
 
-#: ../src/filter-edit-callbacks.c:312
+#: ../src/filter-edit-callbacks.c:306
 msgid "Match when date is outside the interval:"
 msgstr "Comparar se data estiver fora do intervalo:"
 
-#: ../src/filter-edit-callbacks.c:314 ../src/filter-edit-callbacks.c:989
+#: ../src/filter-edit-callbacks.c:308 ../src/filter-edit-callbacks.c:1060
 msgid "Match when one of these flags is set:"
 msgstr "Comparar se uma dessas flags estiver marcada:"
 
-#: ../src/filter-edit-callbacks.c:315
+#: ../src/filter-edit-callbacks.c:309
 msgid "Match when none of these flags is set:"
 msgstr "Comparar se nenhuma dessas flags estiver marcada:"
 
-#: ../src/filter-edit-callbacks.c:506
+#: ../src/filter-edit-callbacks.c:500
 msgid "You must specify the name of the user header to match on"
 msgstr "Você deve especificar o nome do usuário do cabeçalho para comparação"
 
-#: ../src/filter-edit-callbacks.c:517
+#: ../src/filter-edit-callbacks.c:511
 msgid "You must specify at least one field for matching"
 msgstr "Você deve especificar pelo menos um campo para comparação"
 
-#: ../src/filter-edit-callbacks.c:527
+#: ../src/filter-edit-callbacks.c:521
 msgid "You must provide a string"
 msgstr "Você deve fornecer uma string"
 
-#: ../src/filter-edit-callbacks.c:534
+#: ../src/filter-edit-callbacks.c:528
 msgid "You must provide at least one regular expression"
 msgstr "Você deve fornecer pelo menos uma expressão regular"
 
-#: ../src/filter-edit-callbacks.c:546
+#: ../src/filter-edit-callbacks.c:540
 msgid "Low date is incorrect"
 msgstr "A data inferior está incorreta"
 
-#: ../src/filter-edit-callbacks.c:557
+#: ../src/filter-edit-callbacks.c:551
 msgid "High date is incorrect"
 msgstr "A data superior está incorreta"
 
-#: ../src/filter-edit-callbacks.c:565
+#: ../src/filter-edit-callbacks.c:559
 msgid "Low date is greater than high date"
 msgstr "A data inferior é maior que a data superior"
 
-#: ../src/filter-edit-callbacks.c:836
+#: ../src/filter-edit-callbacks.c:829
 #, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr "Ajuda do erro de exibição da condição: %s\n"
 
-#: ../src/filter-edit-callbacks.c:856
-msgid "Unread"
-msgstr "Não lida"
-
-#: ../src/filter-edit-callbacks.c:856
-msgid "Deleted"
-msgstr "Excluída"
-
-#: ../src/filter-edit-callbacks.c:856
-msgid "Replied"
-msgstr "Respondida"
-
-#: ../src/filter-edit-callbacks.c:856
-msgid "Flagged"
-msgstr "Marcada"
-
 #: ../src/filter-edit-callbacks.c:870
-msgid "One of the specified f_ields contains"
-msgstr "Um dos campos espec_ificados contém"
+msgid "Match Fields"
+msgstr "Campos de Comparação"
 
-#: ../src/filter-edit-callbacks.c:885
-msgid "Contain/Does _Not Contain"
-msgstr "Contém/_Não Contém"
-
-#: ../src/filter-edit-callbacks.c:899
-msgid "_One of the regular expressions matches"
-msgstr "_Uma das expressões regulares combina"
-
-#. FIXME : I saw a lot of different ways to create button with
-#. pixmaps, hope this one is correct
-#. Right/Add button
-#: ../src/filter-edit-callbacks.c:926 ../src/filter-run-dialog.c:314
-msgid "A_dd"
-msgstr "A_dicionar"
-
-#. Left/Remove button
-#: ../src/filter-edit-callbacks.c:930 ../src/filter-edit-dialog.c:315
-#: ../src/filter-run-dialog.c:319
-msgid "_Remove"
-msgstr "_Remover"
-
-#: ../src/filter-edit-callbacks.c:934
-msgid "One _Matches/None Matches"
-msgstr "Uma Igualdade/Nenhu_ma Igualdade"
-
-#: ../src/filter-edit-callbacks.c:971
-msgid "Inside/outside the date interval"
-msgstr "Dentro/fora de intervalo de data"
-
-#: ../src/filter-edit-callbacks.c:1018
-msgid "Match when one flag is set/when no flag is set"
-msgstr ""
-"Comparar quando uma das flags estiver marcada/nenhuma flag estiver marcada"
-
-#. builds the toggle buttons to specify fields concerned by the conditions of
-#. * the filter
-#: ../src/filter-edit-callbacks.c:1037
-msgid "Match In"
-msgstr "Comparar Em"
-
-#: ../src/filter-edit-callbacks.c:1049
+#: ../src/filter-edit-callbacks.c:880
 msgid "_All"
 msgstr "_Todos"
 
-#: ../src/filter-edit-callbacks.c:1057
+#: ../src/filter-edit-callbacks.c:881
 msgid "C_lear"
 msgstr "_Limpar"
 
-#: ../src/filter-edit-callbacks.c:1066 ../src/main-window.c:3828
+#: ../src/filter-edit-callbacks.c:883 ../src/main-window.c:3828
 msgid "_Body"
 msgstr "_Corpo"
 
 #. To:
-#: ../src/filter-edit-callbacks.c:1073 ../src/main-window.c:3829
+#: ../src/filter-edit-callbacks.c:884 ../src/main-window.c:3829
 #: ../src/sendmsg-window.c:2709
 msgid "_To:"
 msgstr "_Para:"
 
-#: ../src/filter-edit-callbacks.c:1080 ../src/main-window.c:3830
+#: ../src/filter-edit-callbacks.c:885 ../src/main-window.c:3830
 msgid "_From:"
 msgstr "_De:"
 
-#: ../src/filter-edit-callbacks.c:1088
+#: ../src/filter-edit-callbacks.c:886
 msgid "_Subject"
 msgstr "_Assunto"
 
-#: ../src/filter-edit-callbacks.c:1095 ../src/main-window.c:3832
+#: ../src/filter-edit-callbacks.c:887 ../src/main-window.c:3832
 msgid "_Cc:"
 msgstr "_Cc:"
 
-#: ../src/filter-edit-callbacks.c:1102
+#: ../src/filter-edit-callbacks.c:889
 msgid "_User header:"
 msgstr "Cabeçalho do _usuário:"
 
-#: ../src/filter-edit-callbacks.c:1126
+#: ../src/filter-edit-callbacks.c:919
+msgid "Unread"
+msgstr "Não lida"
+
+#: ../src/filter-edit-callbacks.c:919
+msgid "Deleted"
+msgstr "Excluída"
+
+#: ../src/filter-edit-callbacks.c:919
+msgid "Replied"
+msgstr "Respondida"
+
+#: ../src/filter-edit-callbacks.c:919
+msgid "Flagged"
+msgstr "Marcada"
+
+#: ../src/filter-edit-callbacks.c:935
+msgid "One of the specified f_ields contains"
+msgstr "Um dos campos espec_ificados contém"
+
+#: ../src/filter-edit-callbacks.c:950
+msgid "Contain/Does _Not Contain"
+msgstr "Contém/_Não Contém"
+
+#: ../src/filter-edit-callbacks.c:970
+msgid "_One of the regular expressions matches"
+msgstr "_Uma das expressões regulares combina"
+
+#. Right/Add button
+#: ../src/filter-edit-callbacks.c:997 ../src/filter-run-dialog.c:317
+msgid "A_dd"
+msgstr "A_dicionar"
+
+#. Left/Remove button
+#: ../src/filter-edit-callbacks.c:1001 ../src/filter-edit-dialog.c:315
+#: ../src/filter-run-dialog.c:322
+msgid "_Remove"
+msgstr "_Remover"
+
+#: ../src/filter-edit-callbacks.c:1005
+msgid "One _Matches/None Matches"
+msgstr "Uma Igualdade/Nenhu_ma Igualdade"
+
+#: ../src/filter-edit-callbacks.c:1022
+msgid "Match when message date is in the interval:"
+msgstr "Comparar se data da mensagem estiver dentro do intervalo:"
+
+#: ../src/filter-edit-callbacks.c:1042
+msgid "Inside/outside the date interval"
+msgstr "Dentro/fora de intervalo de data"
+
+#: ../src/filter-edit-callbacks.c:1089
+msgid "Match when one flag is set/when no flag is set"
+msgstr ""
+"Comparar quando uma das flags estiver marcada/nenhuma flag estiver marcada"
+
+#: ../src/filter-edit-callbacks.c:1106
 msgid "Search T_ype:"
 msgstr "T_ipo da busca:"
 
-#: ../src/filter-edit-callbacks.c:1200
+#: ../src/filter-edit-callbacks.c:1178
 msgid "Edit condition for filter: "
 msgstr "Editar condição para filtro: "
 
-#: ../src/filter-edit-callbacks.c:1440
+#: ../src/filter-edit-callbacks.c:1418
 #, c-format
 msgid "Error displaying filter help: %s\n"
 msgstr "Ajuda do erro de exibição de filtro: %s\n"
 
-#: ../src/filter-edit-callbacks.c:1630
+#: ../src/filter-edit-callbacks.c:1608
 msgid "New filter"
 msgstr "Novo filtro"
 
-#: ../src/filter-edit-callbacks.c:1760
+#: ../src/filter-edit-callbacks.c:1738
 msgid "No filter name specified."
 msgstr "Nenhum nome de filtro especificado."
 
-#: ../src/filter-edit-callbacks.c:1765
+#: ../src/filter-edit-callbacks.c:1743
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Filtro \"%s\" já existe."
 
-#: ../src/filter-edit-callbacks.c:1775
+#: ../src/filter-edit-callbacks.c:1753
 msgid "Filter must have conditions."
 msgstr "Filtro deve ter condições."
 
-#: ../src/filter-edit-callbacks.c:1832
+#: ../src/filter-edit-callbacks.c:1810
 msgid "Filter has matched"
 msgstr "Filtro combinou"
 
-#: ../src/filter-edit-callbacks.c:1857
+#: ../src/filter-edit-callbacks.c:1835
 msgid "You must provide a sound to play"
 msgstr "Você deve especificar um som para tocar"
 
-#: ../src/filter-edit-callbacks.c:2011
+#: ../src/filter-edit-callbacks.c:1989
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Exemplo: escreva 31 de Dezembro de 2000 como %s)"
@@ -2875,16 +2876,21 @@ msgstr ""
 msgid "Balsa Filters Export"
 msgstr "Exportar Filtros do Balsa"
 
-#: ../src/filter-run-callbacks.c:177
-msgid "Error when applying filters"
-msgstr "Erro ao aplicar filtros"
-
-#: ../src/filter-run-callbacks.c:195
+#: ../src/filter-run-callbacks.c:203
 #, c-format
 msgid "Error displaying run filters help: %s\n"
 msgstr "Erro ao mostrar ajuda de executar filtros: %s\n"
 
-#: ../src/filter-run-callbacks.c:242
+#: ../src/filter-run-callbacks.c:227
+msgid "Error when applying filters"
+msgstr "Erro ao aplicar filtros"
+
+#: ../src/filter-run-callbacks.c:230
+#, c-format
+msgid "Filter applied to \"%s\"."
+msgstr "Filtro aplicado a \"%s\"."
+
+#: ../src/filter-run-callbacks.c:265
 #, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
@@ -2894,7 +2900,7 @@ msgstr ""
 "Você não pode associá-lo com a mesma caixa de mensagens (isto causa "
 "recursão)."
 
-#: ../src/filter-run-callbacks.c:250
+#: ../src/filter-run-callbacks.c:273
 #, c-format
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
@@ -2920,17 +2926,21 @@ msgstr "Ao receber"
 msgid "On exit"
 msgstr "Ao sair"
 
+#: ../src/filter-run-dialog.c:311
+msgid "A_pply Now!"
+msgstr "A_plicar Agora!"
+
 #. up button
-#: ../src/filter-run-dialog.c:351
+#: ../src/filter-run-dialog.c:354
 msgid "_Up"
 msgstr "A_cima"
 
 #. down button
-#: ../src/filter-run-dialog.c:356
+#: ../src/filter-run-dialog.c:359
 msgid "Do_wn"
 msgstr "A_baixo"
 
-#: ../src/filter-run-dialog.c:400
+#: ../src/filter-run-dialog.c:403
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
@@ -6085,6 +6095,9 @@ msgstr "Acima"
 #: ../src/toolbar-prefs.c:495
 msgid "Down"
 msgstr "Abaixo"
+
+#~ msgid "Match In"
+#~ msgstr "Comparar Em"
 
 #~ msgid "IMAP Server %s: %s"
 #~ msgstr "Servidor IMAP %s: %s"

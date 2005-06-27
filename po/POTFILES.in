@@ -68,6 +68,12 @@ src/mailbox-node.c
 src/main-window.c
 src/main.c
 src/message-window.c
+src/balsa-mime-widget-callbacks.c
+src/balsa-mime-widget-crypto.c
+src/balsa-mime-widget-image.c
+src/balsa-mime-widget-message.c
+src/balsa-mime-widget-text.c
+src/balsa-mime-widget.c
 src/pref-manager.c
 src/print.c
 src/save-restore.c

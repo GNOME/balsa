@@ -4655,7 +4655,7 @@ balsa_window_increase_activity(BalsaWindow* window)
                           GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
 
         /* add a timeout to make the activity bar move */
-        activity_handler = g_timeout_add(100, balsa_window_progress_timeout,
+        activity_handler = g_timeout_add(50, balsa_window_progress_timeout,
                                          progress_bar);
         g_object_set_data(G_OBJECT(progress_bar), "activity_handler", 
                           GINT_TO_POINTER(activity_handler));

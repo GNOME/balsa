@@ -98,7 +98,9 @@ libbalsa_conf_has_group(const char *group)
 typedef struct {
     GKeyFile *key_file;
     gchar *path;
+#if !GLIB_CHECK_VERSION(2, 7, 0)
     gchar *new_path;
+#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     guint changes;
 } LibBalsaConf;
 
@@ -147,7 +149,9 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     g_key_file_set_list_separator(conf->key_file, ' ');
     conf->path =
         g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
+#if !GLIB_CHECK_VERSION(2, 7, 0)
     conf->new_path = g_strconcat(conf->path, ".new", NULL);
+#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     libbalsa_assure_balsa_dir();
     error = NULL;
     if (!g_key_file_load_from_file
@@ -452,8 +456,10 @@ lbc_drop_all(LibBalsaConf * conf)
     conf->key_file = NULL;
     g_free(conf->path);
     conf->path = NULL;
+#if !GLIB_CHECK_VERSION(2, 7, 0)
     g_free(conf->new_path);
     conf->new_path = NULL;
+#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     conf->changes = 0;
 }
 
@@ -472,7 +478,9 @@ lbc_sync(LibBalsaConf * conf)
     gchar *buf;
     gsize len;
     GError *error;
+#if !GLIB_CHECK_VERSION(2, 7, 0)
     gint fd;
+#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
 
     if (!conf->changes)
         return;
@@ -489,6 +497,24 @@ lbc_sync(LibBalsaConf * conf)
         return;
     }
 
+#if GLIB_CHECK_VERSION(2, 7, 0)
+    if (!g_file_set_contents(conf->path, buf, len, &error)) {
+        if (error) {
+#if DEBUG
+            g_message("Failed to rewrite config file \"%s\": %s\n"
+                      " changes not saved", conf->path, error->message);
+#endif                          /* DEBUG */
+            g_error_free(error);
+#if DEBUG
+        } else {
+                g_message("Failed to rewrite config file \"%s\";"
+                          " changes not saved", conf->path);
+#endif                          /* DEBUG */
+        }
+    }
+
+    g_free(buf);
+#else                           /* GLIB_CHECK_VERSION(2, 7, 0) */
     fd = g_open(conf->new_path, O_WRONLY | O_CREAT | O_TRUNC,
                 S_IRUSR | S_IWUSR);
     if (fd < 0) {
@@ -531,6 +557,7 @@ lbc_sync(LibBalsaConf * conf)
 #endif                          /* DEBUG */
         return;
     }
+#endif                          /* GLIB_CHECK_VERSION(2, 7, 0) */
 }
 
 void

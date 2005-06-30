@@ -1,8 +1,15 @@
+2005-06-30 12:24  PeterB
+
+	* src/main-window.c: make progress bar faster than a snail.
+	* libbalsa/libbalsa-conf.c: use g_file_set_contents to rewrite
+	config files.
+
 2005-06-24 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/body.[hc]: implement libbalsa_message_body_protect_state().
 	* src/Makefile.am: add 7+7 balsa-mime-widget source files.
 	* src/balsa-message.[ch]: use the cleaner design from balsa-mime-widget.
+
 2005-06-22  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: fix date searching when only upper

@@ -35,7 +35,6 @@ static gchar*
 coalesce_seq_range(int lo, int hi, CoalesceFunc incl, void *data)
 {
   GString * res = g_string_sized_new(16);
-  char buf[10], *str;
   enum { BEGIN, LASTOUT, LASTIN, RANGE } mode = BEGIN;
   int seq;
   unsigned prev =0, num = 0;
@@ -44,11 +43,11 @@ coalesce_seq_range(int lo, int hi, CoalesceFunc incl, void *data)
     if(seq<=hi && (num=incl(seq, data)) != 0) {
       switch(mode) {
       case BEGIN: 
-        sprintf(buf, "%u", num); g_string_append(res, buf); 
+        g_string_append_printf(res, "%u", num);
         mode = LASTIN; break;
       case RANGE:
         if(num!=prev+1) {
-          sprintf(buf, ":%u,%u", prev, num); g_string_append(res, buf); 
+          g_string_append_printf(res, ":%u,%u", prev, num);
           mode = LASTIN;
         }
         break;
@@ -58,7 +57,7 @@ coalesce_seq_range(int lo, int hi, CoalesceFunc incl, void *data)
           break;
         } /* else fall through */
       case LASTOUT: 
-        sprintf(buf, ",%u", num); g_string_append(res, buf); 
+        g_string_append_printf(res, ",%u", num);
         mode = LASTIN; break;
       }
     } else {
@@ -67,21 +66,14 @@ coalesce_seq_range(int lo, int hi, CoalesceFunc incl, void *data)
       case LASTOUT: break;
       case LASTIN: mode = LASTOUT; break;
       case RANGE: 
-        sprintf(buf, ":%u", prev); g_string_append(res, buf); 
+        g_string_append_printf(res, ":%u", prev);
         mode = LASTOUT;
         break;
       }
     }
     prev = num;
   }
-  if(mode == BEGIN) {
-    str = NULL;
-    g_string_free(res, TRUE);
-  } else {
-    str = res->str;
-    g_string_free(res, FALSE);
-  }
-  return str;
+  return g_string_free(res, mode == BEGIN);
 }
 
 static unsigned

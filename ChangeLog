@@ -1,5 +1,6 @@
-2005-06-30 21:30  PeterB
+2005-06-30 21:41  PeterB
 
+	* libbalsa/imap/imap-commands.c: use more of the GString api.
 	* src/address-book-config.c: make sure filename is shown for
 	LibBalsaAddressBookText.
 	* src/ab-main.c: show address book type in window title; implement

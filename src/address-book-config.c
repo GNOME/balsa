@@ -260,7 +260,17 @@ create_local_dialog(AddressBookConfig * abc)
 
     if (ab) {
         const gchar *path = LIBBALSA_ADDRESS_BOOK_TEXT(ab)->path;
+        gchar *folder;
+        gchar *utf8name;
+
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), path);
+        /* Name entry will be blank unless we set it. */
+        folder = g_path_get_basename(path);
+        utf8name = g_filename_to_utf8(folder, -1, NULL, NULL, NULL);
+        g_free(folder);
+        gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog),
+                                          utf8name);
+        g_free(utf8name);
     }
     g_signal_connect(G_OBJECT(dialog), "response",
                      G_CALLBACK(edit_book_response), abc);

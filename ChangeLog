@@ -1,3 +1,8 @@
+2005-07-01 16:14  PeterB
+
+	* libbalsa/mailbox_pop3.c: destroy LibBalsaMailboxView for POP
+	temporary mailbox.
+
 2005-07-01  Pawel Salek
 
 	* libbalsa/imap/pop3.c: fix handling rejected POP3 TLS certs #308932.

@@ -587,6 +587,9 @@ libbalsa_address_book_text_add_address(LibBalsaAddressBook * ab,
     lbab_text_unlock_book(ab_text, stream);
     fclose(stream);
 
+    /* Invalidate the time stamp, so the book will be reloaded. */
+    ab_text->mtime = 0;
+
     return res;
 }
 
@@ -659,6 +662,9 @@ libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
                   " changes not saved", path);
 #endif                          /* DEBUG */
     g_free(path);
+
+    /* Invalidate the time stamp, so the book will be reloaded. */
+    ab_text->mtime = 0;
 
     return res;
 }

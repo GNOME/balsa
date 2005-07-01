@@ -106,6 +106,7 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %{_libdir}/bonobo/servers/GNOME_Balsa.server
 %{_datadir}/applications/balsa.desktop
 %{_datadir}/balsa
+@HICOLOR_ICON_DIR@/*
 %{_datadir}/gnome/help/balsa/*
 %{_datadir}/idl/Balsa.idl
 %{_datadir}/omf/balsa/*

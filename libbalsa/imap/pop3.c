@@ -175,7 +175,7 @@ pop_check_status(PopHandle *pop, GError **err)
     pop->state = IMHS_DISCONNECTED;
     sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
     g_set_error(err, IMAP_ERROR, IMAP_POP_SEVERED_ERROR,
-                "Connection severed");
+                "POP3 Connection severed");
     return FALSE;
   }
      
@@ -238,7 +238,7 @@ pop_get_capa(PopHandle *pop, GError **err)
     pop->state = IMHS_DISCONNECTED;
     sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
     g_set_error(err, IMAP_ERROR, IMAP_POP_SEVERED_ERROR,
-                "Connection severed");
+                "POP3 Connection severed");
     return FALSE;
   }
   return TRUE;
@@ -418,9 +418,11 @@ pop_stls(PopHandle *pop, GError **err)
     pop->tls_enabled = 1;
     return TRUE;
   } else {
-    SSL_free(ssl);
+    /* this will destroy ssl, too */
     sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
     pop->state = IMHS_DISCONNECTED;
+    g_set_error(err, IMAP_ERROR, IMAP_POP_SEVERED_ERROR,
+                "TLS setup failed");
     return FALSE;
   }
 }
@@ -523,7 +525,8 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   
 #ifdef USE_TLS
   if(pop->tls_mode != IMAP_TLS_DISABLED && pop_can_do(pop, POP_CAP_STLS)) {
-    pop_stls(pop, err); /* Try... */
+    if(!pop_stls(pop, err)) /* TLS negotiation attempted.. */
+      return FALSE;         /* .. but failed. */
   }
 #endif
   if(pop->tls_mode == IMAP_TLS_REQUIRED && 

@@ -1,3 +1,7 @@
+2005-07-01  Pawel Salek
+
+	* libbalsa/imap/pop3.c: fix handling rejected POP3 TLS certs #308932.
+
 2005-06-30 21:41  PeterB
 
 	* libbalsa/imap/imap-commands.c: use more of the GString api.

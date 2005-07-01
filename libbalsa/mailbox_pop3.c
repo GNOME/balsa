@@ -209,6 +209,9 @@ move_from_msgdrop(LibBalsaMailbox *tmp_mailbox, LibBalsaMailbox *dest,
             g_array_free(messages, TRUE);
         }
         libbalsa_mailbox_close(tmp_mailbox, TRUE);
+        /* Kill any view that was created. */
+        g_hash_table_remove(libbalsa_mailbox_view_table, tmp_mailbox->url);
+        tmp_mailbox->view = NULL;
     }
     if(!success)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,

@@ -1,5 +1,12 @@
-2005-06-30 12:24  PeterB
+2005-06-30 21:30  PeterB
 
+	* src/address-book-config.c: make sure filename is shown for
+	LibBalsaAddressBookText.
+	* src/ab-main.c: show address book type in window title; implement
+	File->delete.
+	* libbalsa/address-book-text.c: invalidate time stamp when we
+	change the address book.
+	* libbalsa/address-book-ldif.c: ensure blank line before new entry.
 	* src/main-window.c: make progress bar faster than a snail.
 	* libbalsa/libbalsa-conf.c: use g_file_set_contents to rewrite
 	config files.

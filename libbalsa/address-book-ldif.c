@@ -374,23 +374,19 @@ lbab_ldif_write_dn(FILE * stream, LibBalsaAddress * address)
     g_free(cn);
 }
 
-static LibBalsaABErr
+static void
 lbab_ldif_write_addresses(FILE * stream, LibBalsaAddress * address)
 {
     GList *list;
-    LibBalsaABErr res = LBABERR_OK;
 
     for (list = address->address_list; list; list = list->next) {
         const gchar *mail = list->data;
         if (mail && *mail) {
             gchar *value_spec = string_to_value_spec(mail);
-            if (fprintf(stream, "mail:%s\n", value_spec) < 0)
-                res = LBABERR_CANNOT_WRITE;
+            fprintf(stream, "mail:%s\n", value_spec);
             g_free(value_spec);
         }
     }
-
-    return res;
 }
 
 static void
@@ -587,10 +583,15 @@ static LibBalsaABErr
 libbalsa_address_book_ldif_save_address(FILE * stream,
                                         LibBalsaAddress * address)
 {
+    if (fseek(stream, -2, SEEK_END) == 0
+        && (fgetc(stream) != '\n' || fgetc(stream) != '\n'))
+        fputc('\n', stream);
+
     lbab_ldif_write_dn(stream, address);
     lbab_ldif_write_givenname(stream, address);
     lbab_ldif_write_surname(stream, address);
     lbab_ldif_write_nickname(stream, address);
     lbab_ldif_write_organization(stream, address);
-    return lbab_ldif_write_addresses(stream, address);
+    lbab_ldif_write_addresses(stream, address);
+    return fprintf(stream, "\n") < 0 ? LBABERR_CANNOT_WRITE : LBABERR_OK;
 }

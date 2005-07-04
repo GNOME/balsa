@@ -1,3 +1,10 @@
+* Balsa-2.3.4 release. Release date 2005-07-06
+
+- fixed regression in message encryption.
+- working address book edition.
+- possible buffer overflow in IMAP code fixed.
+- double free occuring when user rejects POP3 TLS certificate fixed.
+
 * Balsa-2.3.3 release. Release date 2005-06-06
 
 - preserve local mailbox statistics between sessions.

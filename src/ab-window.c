@@ -401,7 +401,7 @@ balsa_ab_window_class_init(BalsaAbWindowClass *klass)
 static void
 balsa_ab_window_run_gnomecard(GtkWidget * widget, gpointer data)
 {
-    char *argv[] = { "gnomecard" };
+    char *argv[] = { "balsa-ab" };
 
     gnome_execute_async(NULL, 1, argv);
 }

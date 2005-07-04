@@ -66,7 +66,7 @@ IMAP.
 
 %build
 
-dir=`pwd`; cd gmime-%{gmimever} && ./configure --prefix=`pwd` --disable-shared && make install; cd $dir
+dir=`pwd`; cd gmime-%{gmimever} && ./configure --prefix=`pwd` --disable-gtk-doc --disable-shared && make install; cd $dir
 export PKG_CONFIG_PATH="gmime-%{gmimever}:$PKG_CONFIG_PATH"
 
 %configure %{config_opts}
@@ -77,7 +77,6 @@ make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR="$RPM_BUILD_ROOT"
-rm "$RPM_BUILD_ROOT%{_bindir}"/balsa-ab
 
 %find_lang %{name}
 
@@ -103,6 +102,7 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %doc README COPYING ChangeLog NEWS AUTHORS docs/mh-mail-HOWTO
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
+%{_bindir}/balsa-ab
 %{_libdir}/bonobo/servers/GNOME_Balsa.server
 %{_datadir}/applications/balsa.desktop
 %{_datadir}/balsa

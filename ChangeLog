@@ -1,3 +1,7 @@
+2005-07-06 Jens Granseuer
+
+	* src/filter-run-callbacks.c: fix bug 309574.
+
 2005-07-06 Pawel Salek
 
 	* src/ab-window.c: use our address book editor.

@@ -88,12 +88,15 @@ build_selected_filters_list(GtkTreeView * filter_list, gboolean to_run)
 static gboolean
 run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
 {
-    GSList *filters = NULL; build_selected_filters_list(filter_list, TRUE);
+    GSList *filters = NULL;
     GSList *lst;
     GtkTreeIter iter;
     guint sent_to_trash;
-    GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
+    GtkTreeModel *model;
     gboolean valid;
+
+    build_selected_filters_list(filter_list, TRUE);
+    model = gtk_tree_view_get_model(filter_list);
 
     /* Construct list of selected filters */
     for (valid = gtk_tree_model_get_iter_first(model, &iter);

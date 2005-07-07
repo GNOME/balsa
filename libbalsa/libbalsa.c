@@ -37,7 +37,6 @@
 #include <ldap.h>
 #endif
 
-#include "address-book-gpe.h"
 #include "libbalsa.h"
 #include "misc.h"
 #include "i18n.h"

@@ -32,13 +32,15 @@
 #endif
 
 #include "address-book.h"
+#include "address-book-vcard.h"
 #include "address-book-extern.h"
 #include "address-book-ldif.h"
 #if ENABLE_LDAP
 #include "address-book-ldap.h"
-#endif
-#include "address-book-vcard.h"
+#endif /* ENABLE_LDAP */
+#if HAVE_SQLITE
 #include "address-book-gpe.h"
+#endif /* HAVE_SQLITE */
 #include "address-book-config.h"
 #include "libbalsa-conf.h"
 #include "libbalsa.h"
@@ -53,6 +55,8 @@ struct ABMainWindow {
     GtkRadioAction *first_radio_action;
 
     GList *address_book_list;
+    gchar *default_address_book_prefix;
+    LibBalsaAddressBook *default_address_book;
     LibBalsaAddressBook* address_book;
     LibBalsaAddress *displayed_address;
     GtkActionGroup *action_group;
@@ -77,12 +81,17 @@ static gboolean
 bab_config_init(const gchar * group, const gchar * value, gpointer data)
 {
     LibBalsaAddressBook *address_book;
-    GList **address_book_list = data;
 
     address_book = libbalsa_address_book_new_from_config(group);
-    if (address_book)
-        *address_book_list =
-            g_list_append(*address_book_list, address_book);
+    if (address_book) {
+        contacts_app.address_book_list =
+            g_list_append(contacts_app.address_book_list, address_book);
+
+        if (contacts_app.default_address_book_prefix
+            && strcmp(group,
+                      contacts_app.default_address_book_prefix) == 0)
+            contacts_app.default_address_book = address_book;
+    }
 
     return FALSE;
 }
@@ -241,8 +250,11 @@ add_address_book(LibBalsaAddressBook * address_book)
         GSList *group =
             gtk_radio_action_get_group(contacts_app.first_radio_action);
         gtk_radio_action_set_group(radio_action, group);
+        if (address_book == contacts_app.default_address_book)
+            contacts_app.first_radio_action = radio_action;
     } else
         contacts_app.first_radio_action = radio_action;
+
     g_signal_connect(G_OBJECT(radio_action), "changed",
                      G_CALLBACK(select_address_book_cb), NULL);
 
@@ -932,9 +944,12 @@ main(int argc, char *argv[])
     libbalsa_init((LibBalsaInformationFunc) information_real);
 
     /* load address book data */
+    libbalsa_conf_push_group("Globals");
+    contacts_app.default_address_book_prefix =
+        libbalsa_conf_get_string("DefaultAddressBook");
+    libbalsa_conf_pop_group();
     libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
-                                bab_config_init,
-                                &contacts_app.address_book_list);
+                                bab_config_init, NULL);
 
     ab_window = bab_window_new();
     contacts_app.window = GTK_WINDOW(ab_window);
@@ -953,7 +968,6 @@ main(int argc, char *argv[])
     gtk_widget_show_all(ab_window);
     gtk_widget_hide(contacts_app.edit_widget);
 
-    /* FIXME: select default address book */
     if (contacts_app.first_radio_action)
         gtk_action_activate(GTK_ACTION(contacts_app.first_radio_action));
 

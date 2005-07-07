@@ -26,6 +26,7 @@
 #include "i18n.h"
 #include "balsa-app.h"
 #include "sendmsg-window.h"
+#include "save-restore.h"
 #include "ab-window.h"
 
 enum {
@@ -52,8 +53,7 @@ static void balsa_ab_window_dist_mode_toggled(GtkWidget * w,
 						 BalsaAbWindow *ab);
 static void balsa_ab_window_menu_changed(GtkWidget * widget, 
 					    BalsaAbWindow *ab);
-static void balsa_ab_window_run_gnomecard(GtkWidget * widget,
-                                             gpointer data);
+static void balsa_ab_window_run_editor(GtkWidget * widget, gpointer data);
 static void balsa_ab_window_response_cb(BalsaAbWindow *ab, gint resp);
 static void balsa_ab_window_find(GtkWidget * group_entry,
                                     BalsaAbWindow *ab);
@@ -190,6 +190,26 @@ balsa_ab_window_list(BalsaAbWindow * ab, GCallback row_activated_cb)
 }
 
 static void
+balsa_ab_window_load_books(BalsaAbWindow * ab)
+{
+    GList *ab_list;
+    guint offset;
+
+    for (ab_list = balsa_app.address_book_list, offset = 0; ab_list;
+         ab_list = ab_list->next, ++offset) {
+        LibBalsaAddressBook *address_book = ab_list->data;
+
+        gtk_combo_box_append_text(GTK_COMBO_BOX(ab->combo_box),
+                                  address_book->name);
+
+        if (ab->current_address_book == NULL)
+            ab->current_address_book = address_book;
+        if (address_book == ab->current_address_book)
+            gtk_combo_box_set_active(GTK_COMBO_BOX(ab->combo_box), offset);
+    }
+}
+
+static void
 balsa_ab_window_init(BalsaAbWindow *ab)
 {
     GtkWidget *find_label,
@@ -198,11 +218,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	*hbox,
 	*box2,
 	*scrolled_window,
-	*combo_box,
 	*frame, *label;
-    GList *ab_list;
-    LibBalsaAddressBook *address_book;
-    guint default_offset = 0, offset = 0;
 
     ab->current_address_book = NULL;
 
@@ -229,32 +245,19 @@ balsa_ab_window_init(BalsaAbWindow *ab)
                                 (balsa_ab_window_select_recipient));
 
     /* The address book selection menu */
-    combo_box = gtk_combo_box_new_text();
+    ab->combo_box = gtk_combo_box_new_text();
 
     ab->current_address_book = balsa_app.default_address_book;
 
-    for(ab_list = balsa_app.address_book_list;
-        ab_list;
-	ab_list = g_list_next(ab_list)) {
-	address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
-	if (ab->current_address_book == NULL)
-	    ab->current_address_book = address_book;
-	
-	gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
-                                  address_book->name);
-	if (address_book == ab->current_address_book)
-            default_offset = offset;	
-	offset++;
-    }
-    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
-                             default_offset);
-    g_signal_connect(combo_box, "changed",
+    balsa_ab_window_load_books(ab);
+
+    g_signal_connect(ab->combo_box, "changed",
                      G_CALLBACK(balsa_ab_window_menu_changed), ab);
     if (balsa_app.address_book_list->next)
 	/* More than one address book. */
-	gtk_widget_show(combo_box);
+	gtk_widget_show(ab->combo_box);
 
-    gtk_box_pack_start(GTK_BOX(vbox), combo_box, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), ab->combo_box, FALSE, FALSE, 0);
 
     /* Entry widget for finding an address */
     find_label = gtk_label_new_with_mnemonic(_("_Search for Name:"));
@@ -337,10 +340,9 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_show(GTK_WIDGET(hbox));
 
     w = balsa_stock_button_with_label(GTK_STOCK_OPEN,
-                                      _("Run GnomeCard"));
-    g_signal_connect(G_OBJECT(w), "clicked",
-		     G_CALLBACK(balsa_ab_window_run_gnomecard),
-                       NULL);
+                                      _("Run Editor"));
+    g_signal_connect(w, "clicked",
+                     G_CALLBACK(balsa_ab_window_run_editor), NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
@@ -399,7 +401,7 @@ balsa_ab_window_class_init(BalsaAbWindowClass *klass)
   Runs gnome card
 */
 static void
-balsa_ab_window_run_gnomecard(GtkWidget * widget, gpointer data)
+balsa_ab_window_run_editor(GtkWidget * widget, gpointer data)
 {
     char *argv[] = { "balsa-ab" };
 
@@ -639,13 +641,63 @@ balsa_ab_window_remove_from_recipient_list(GtkWidget *widget, BalsaAbWindow *ab)
 static void
 balsa_ab_window_reload(GtkWidget *w, BalsaAbWindow *ab)
 {
+    gchar *name;
+    GList *list;
+
+    for (list = balsa_app.address_book_list; list; list = list->next)
+        gtk_combo_box_remove_text(GTK_COMBO_BOX(ab->combo_box), 0);
+
+    name = g_strdup(ab->current_address_book->name);
+    ab->current_address_book = NULL;
+
+    config_address_books_load();
+
+    for (list = balsa_app.address_book_list; list; list = list->next) {
+        LibBalsaAddressBook *address_book = list->data;
+
+        if (strcmp(address_book->name, name) == 0) {
+            ab->current_address_book = address_book;
+            break;
+        }
+    }
+    g_free(name);
+
+    balsa_ab_window_load_books(ab);
+
     balsa_ab_window_load(ab);
 }
 
-
 /*
- * Loads the addressbooks into a clist.  
+ * Load the current addressbook.
  */
+static void
+balsa_ab_window_set_title(BalsaAbWindow *ab)
+{
+    LibBalsaAddressBook *address_book = ab->current_address_book;
+    const gchar *type = "";
+    gchar *title;
+
+    if (LIBBALSA_IS_ADDRESS_BOOK_VCARD(address_book))
+        type = "vCard";
+    else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERN(address_book))
+        type = "External query";
+    else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book))
+        type = "LDIF";
+#if ENABLE_LDAP
+    else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book))
+        type = "LDAP";
+#endif
+#if HAVE_SQLITE
+    else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
+        type = "GPE";
+#endif
+
+    title =
+        g_strconcat(type, _(" address book: "), address_book->name, NULL);
+    gtk_window_set_title(GTK_WINDOW(ab), title);
+    g_free(title);
+}
+
 static void
 balsa_ab_window_load(BalsaAbWindow *ab)
 {
@@ -673,6 +725,7 @@ balsa_ab_window_load(BalsaAbWindow *ab)
 				   _("Error opening address book '%s':\n%s"),
 				   ab->current_address_book->name, desc);
     }
+    balsa_ab_window_set_title(ab);
 }
 
 /*

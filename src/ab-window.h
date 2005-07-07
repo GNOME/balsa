@@ -59,6 +59,9 @@ struct _BalsaAbWindow
     /* Stuff to hide when not in compose mode */
     GtkWidget *send_to_box;
     GtkWidget *arrow_box;
+
+    /* The address book list */
+    GtkWidget *combo_box;
 };
 
 GtkType balsa_ab_window_get_type(void);

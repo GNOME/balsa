@@ -63,7 +63,6 @@ static void load_color(gchar * key, GdkColor * color);
 static void save_mru(GList  *mru, const gchar * group);
 static void load_mru(GList **mru, const gchar * group);
 
-static void config_address_books_load(void);
 static void config_address_books_save(void);
 static void config_identities_load(void);
 
@@ -1467,7 +1466,7 @@ config_address_book_load(const gchar * key, const gchar * value,
     return FALSE;
 }
 
-static void
+void
 config_address_books_load(void)
 {
     gchar *default_address_book_prefix;

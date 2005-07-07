@@ -426,7 +426,7 @@ imap_dir_cb_real(void* r)
                               &error);
     
     if(error) {
-        libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              error->code == LIBBALSA_MAILBOX_NETWORK_ERROR
                              ? _("Scanning of %s failed: %s\n"
                                  "Check network connectivity.")

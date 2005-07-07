@@ -36,7 +36,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-static gchar *init_mbnames[NUM_EDs] = {
+static const gchar * const init_mbnames[NUM_EDs] = {
 #if defined(ENABLE_TOUCH_UI)
     "_In:", "_Out:", "_Sent:", "_Drafts:", "_Trash:"
 #else
@@ -208,15 +208,18 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
 
         dir->ed[i].master = &(dir->emaster);
 
-        init_mbnames[i] = _(init_mbnames[i]);
-
         if (init_presets[i])
             preset = init_presets[i];
         else
             preset = g_strdup("[Dummy value]");
 
+#if defined(ENABLE_TOUCH_UI)
         balsa_init_add_table_entry(table, i, init_mbnames[i], preset,
                                    &(dir->ed[i]), druid, init_widgets[i]);
+#else
+        balsa_init_add_table_entry(table, i, _(init_mbnames[i]), preset,
+                                   &(dir->ed[i]), druid, init_widgets[i]);
+#endif
 
         g_free(preset);
     }

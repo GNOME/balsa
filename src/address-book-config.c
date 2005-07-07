@@ -29,7 +29,6 @@
 
 #include "balsa-app.h"
 #include "address-book-config.h"
-#include "address-book-gpe.h"
 #include "i18n.h"
 
 typedef struct _AddressBookConfig AddressBookConfig;

@@ -534,7 +534,7 @@ fi
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
-	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
+	BALSA_CFLAGS="$BALSA_CFLAGS -Wdeclaration-after-statement -Wall -Werror"
 else
 	BALSA_FROM_CVS=no
 fi

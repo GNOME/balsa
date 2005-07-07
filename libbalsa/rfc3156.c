@@ -1501,7 +1501,7 @@ select_key_from_list(const gchar * name, gboolean is_secret,
 
 	renderer = gtk_cell_renderer_text_new();
 	column =
-	    gtk_tree_view_column_new_with_attributes(col_titles[i],
+	    gtk_tree_view_column_new_with_attributes(_(col_titles[i]),
 						     renderer, "text", i,
 						     NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);

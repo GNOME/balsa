@@ -23,9 +23,6 @@
 #include "config.h"
 
 #include <gnome.h>
-#ifdef HAVE_SQLITE
-#include "address-book-gpe.h"
-#endif
 #include "balsa-app.h"
 #include "pref-manager.h"
 #include "mailbox-conf.h"
@@ -3009,7 +3006,7 @@ create_pref_option_menu(const gchar * names[], gint size, gint * index)
                      G_CALLBACK(option_menu_cb), index);
 
     for (i = 0; i < size; i++)
-	add_show_menu(names[i], i, combo_box);
+	add_show_menu(_(names[i]), i, combo_box);
 
     return combo_box;
 }

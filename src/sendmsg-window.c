@@ -652,7 +652,7 @@ enum {
 typedef struct _BalsaAttachInfo BalsaAttachInfo;
 typedef struct _BalsaAttachInfoClass BalsaAttachInfoClass;
 
-static gchar * attach_modes[] =
+static const gchar * const attach_modes[] =
     {NULL, N_("Attachment"), N_("Inline"), N_("Reference") };
 
 struct _BalsaAttachInfo {
@@ -1948,7 +1948,8 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     /* only real text/... and image/... parts may be inlined */
     if (can_inline) {
 	menu_item = 
-	    gtk_menu_item_new_with_label(attach_modes[LIBBALSA_ATTACH_AS_INLINE]);
+	    gtk_menu_item_new_with_label(_(attach_modes
+                                           [LIBBALSA_ATTACH_AS_INLINE]));
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_INLINE));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
@@ -1961,7 +1962,8 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     /* all real files can be attachments */
     if (can_inline || !is_a_temp_file) {
 	menu_item = 
-	    gtk_menu_item_new_with_label(attach_modes[LIBBALSA_ATTACH_AS_ATTACHMENT]);
+	    gtk_menu_item_new_with_label(_(attach_modes
+                                           [LIBBALSA_ATTACH_AS_ATTACHMENT]));
 	gtk_widget_set_sensitive(menu_item, FALSE);
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_ATTACHMENT));
@@ -1975,7 +1977,8 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     /* real files may be references (external body) */
     if (!is_a_temp_file) {
 	menu_item = 
-	    gtk_menu_item_new_with_label(attach_modes[LIBBALSA_ATTACH_AS_EXTBODY]);
+	    gtk_menu_item_new_with_label(_(attach_modes
+                                           [LIBBALSA_ATTACH_AS_EXTBODY]));
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_EXTBODY));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
@@ -2650,7 +2653,7 @@ render_attach_mode(GtkTreeViewColumn *column, GtkCellRenderer *cell,
     gint mode;
 
     gtk_tree_model_get(model, iter, ATTACH_MODE_COLUMN, &mode, -1);
-    g_object_set(cell, "text", attach_modes[mode], NULL);
+    g_object_set(cell, "text", _(attach_modes[mode]), NULL);
 }
 
 

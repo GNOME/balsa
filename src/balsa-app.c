@@ -423,7 +423,10 @@ balsa_app_destroy(void)
     config_save();
 
     g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
-    g_slist_foreach(balsa_app.filters,          (GFunc)libbalsa_filter_free, 
+    g_list_free(balsa_app.address_book_list);
+    balsa_app.address_book_list = NULL;
+
+    g_slist_foreach(balsa_app.filters, (GFunc)libbalsa_filter_free, 
 		    GINT_TO_POINTER(TRUE));
     g_slist_free(balsa_app.filters);
     balsa_app.filters = NULL;

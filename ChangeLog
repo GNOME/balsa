@@ -1,3 +1,22 @@
+2005-07-07 11:07  PeterB
+
+	* src/: save-restore.c, save-restore.h: export
+	config_address_books_load.
+	* src/mailbox-node.c: downgrade scanning problem from error to
+	warning.
+	* src/balsa-app.c: clean up.
+	* src/address-book-config.c: no need to include address-book-gpe.h.
+	* src/: ab-window.c, ab-window.h: reimport all address books after
+	editing.
+	* src/ab-main.c: show default address book initially.
+	* libbalsa/rfc3156.c, src/pref-manager.c, src/sendmsg-window.c:
+	translate strings marked for translation.
+	* libbalsa/: libbalsa.c, libbalsa.h: include address-book-gpe.h in
+	libbalsa.h.
+	* libbalsa/libbalsa-conf.c: detect external modification of config
+	file.
+	* configure.in: catch declaration-after-statement.
+
 2005-07-06 Jens Granseuer
 
 	* src/filter-run-callbacks.c: fix bug 309574.

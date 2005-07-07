@@ -102,6 +102,7 @@ typedef struct {
     gchar *new_path;
 #endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     guint changes;
+    time_t mtime;
 } LibBalsaConf;
 
 static LibBalsaConf lbc_conf;
@@ -140,15 +141,21 @@ static void
 lbc_init(LibBalsaConf * conf, const gchar * filename,
          const gchar * old_dir)
 {
+    struct stat buf;
     GError *error;
 
-    if (conf->key_file)
+    if (!conf->path)
+        conf->path =
+            g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
+    if (stat(conf->path, &buf) < 0)
         return;
+    if (!conf->key_file)
+        conf->key_file = g_key_file_new();
+    else if (buf.st_mtime <= conf->mtime)
+        return;
+    conf->mtime = buf.st_mtime;
 
-    conf->key_file = g_key_file_new();
     g_key_file_set_list_separator(conf->key_file, ' ');
-    conf->path =
-        g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
 #if !GLIB_CHECK_VERSION(2, 7, 0)
     conf->new_path = g_strconcat(conf->path, ".new", NULL);
 #endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */

@@ -1,5 +1,6 @@
-2005-07-07 11:07  PeterB
+2005-07-07 23:27  PeterB
 
+	* src/balsa-index.c: lock a GMimeStream.
 	* src/: save-restore.c, save-restore.h: export
 	config_address_books_load.
 	* src/mailbox-node.c: downgrade scanning problem from error to

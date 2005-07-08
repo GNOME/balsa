@@ -512,7 +512,7 @@ AC_STDC_HEADERS
 #
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
-	for option in -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized -Wmissing-prototypes -Wreturn-type; do
+	for option in -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized -Wmissing-prototypes -Wreturn-type -Wdeclaration-after-statement; do
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])
@@ -534,7 +534,7 @@ fi
 
 if test -d "${srcdir}/CVS" ; then
 	BALSA_FROM_CVS=yes
-	BALSA_CFLAGS="$BALSA_CFLAGS -Wdeclaration-after-statement -Wall -Werror"
+	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
 else
 	BALSA_FROM_CVS=no
 fi

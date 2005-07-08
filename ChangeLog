@@ -1,3 +1,7 @@
+2005-07-08 Pawel Salek
+
+	* configure.in: -Wdeclare-after-statement is gcc>=4.0 specific.
+
 2005-07-07 23:27  PeterB
 
 	* src/balsa-index.c: lock a GMimeStream.

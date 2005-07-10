@@ -1,3 +1,8 @@
+2005-07-09 23:33  PeterB
+
+	* src/information-dialog.c: use only single-line messages in status
+	bar.
+
 2005-07-08 Pawel Salek
 
 	* configure.in: -Wdeclare-after-statement is gcc>=4.0 specific.

@@ -975,12 +975,12 @@ balsa_spell_check_learn(BalsaSpellCheck * spell_check,
     /* If result is 0, the learn operation failed */
     if (!result) {
 	if (pspell_manager_error_number(spell_check->spell_manager) != 0) {
-	    balsa_information(BALSA_INFORMATION_SHOW_DIALOG,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      "BalsaSpellCheck: Learn operation failed;\n%s\n",
 			      pspell_manager_error_message
 			      (spell_check->spell_manager));
 	} else {
-	    balsa_information(BALSA_INFORMATION_SHOW_DIALOG,
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      "BalsaSpellCheck: Learn operation failed.\n");
 	}
     }
@@ -1277,7 +1277,7 @@ static gboolean
 check_pspell_errors(PspellManager * manager)
 {
     if (pspell_manager_error_number(manager) != 0) {
-	balsa_information(BALSA_INFORMATION_SHOW_LIST,
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  "BalsaSpellCheck: Pspell Error: %s\n",
 			  pspell_manager_error_message(manager));
 	return TRUE;

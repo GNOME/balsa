@@ -1,3 +1,12 @@
+2005-07-11 12:32  PeterB
+
+	* src/store-address.c: use balsa_information instead of writing in
+	appbar.
+	* src/spell-check.c: use values from correct enum.
+	* src/mailbox-node.c: use consistent return sequence.
+	* src/: filter-edit-callbacks.c, filter-edit-dialog.c,
+	filter-edit.h: use a single field-frame.
+
 2005-07-09 23:33  PeterB
 
 	* src/information-dialog.c: use only single-line messages in status

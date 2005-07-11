@@ -100,8 +100,8 @@ balsa_store_address(GList * messages)
     info->dialog = store_address_dialog(info);
 
     if (!info->entries_list) {
-        gnome_appbar_set_status(balsa_app.appbar,
-                                _("Store address: no addresses"));
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Store address: no addresses"));
         store_address_free(info);
         return;
     }

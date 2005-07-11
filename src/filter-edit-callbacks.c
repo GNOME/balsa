@@ -282,15 +282,27 @@ fe_combo_box_get_value(GtkWidget * combo_box)
  * When they are toggled, the notebook page must change
  */
 static void
-fe_typesmenu_cb(GtkWidget* widget, gpointer data)
+fe_typesmenu_cb(GtkWidget * widget, GtkWidget * field_frame)
 {
     ConditionMatchType type =
-	(ConditionMatchType) fe_combo_box_get_value(widget);
+        (ConditionMatchType) fe_combo_box_get_value(widget);
 
-    condition_has_changed=TRUE;
+    condition_has_changed = TRUE;
     gtk_notebook_set_current_page(GTK_NOTEBOOK(fe_type_notebook),
                                   type - 1);
-}                       /* end fe_typesmenu_cb() */
+
+    switch (type) {
+    case CONDITION_STRING:
+    case CONDITION_REGEX:
+        gtk_widget_show(field_frame);
+        break;
+    case CONDITION_DATE:
+    case CONDITION_FLAG:
+        gtk_widget_hide(field_frame);
+    default:
+        break;
+    }
+}                               /* end fe_typesmenu_cb() */
 
 typedef struct {
     const gchar * normal_str, *negate_str;
@@ -927,7 +939,6 @@ build_type_notebook()
     /* The simple page of the notebook */
 
     box = gtk_vbox_new(FALSE, 5);
-    gtk_box_pack_start_defaults(GTK_BOX(box), get_field_frame());
     table = gtk_table_new(7, 2, FALSE);
     gtk_box_pack_start_defaults(GTK_BOX(box), table);
 
@@ -959,7 +970,6 @@ build_type_notebook()
     
     /* The regex page of the type notebook */
     box = gtk_vbox_new(FALSE, 5);
-    gtk_box_pack_start_defaults(GTK_BOX(box), get_field_frame());
 
     page = gtk_table_new(5, 6, FALSE);
     gtk_box_pack_start_defaults(GTK_BOX(box), page);
@@ -1099,6 +1109,7 @@ static
 void build_condition_dialog(GtkWidget * condition_dialog)
 {
     GtkWidget *label,* box;
+    GtkWidget *field_frame = get_field_frame();
 
     /* builds the toggle buttons to specify fields concerned by the
      * conditions of the filter */
@@ -1107,11 +1118,13 @@ void build_condition_dialog(GtkWidget * condition_dialog)
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
     fe_search_option_menu = 
         fe_build_option_menu(fe_search_type, ELEMENTS(fe_search_type),
-                             G_CALLBACK(fe_typesmenu_cb));
+                             G_CALLBACK(fe_typesmenu_cb), field_frame);
     gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),
                        box, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),
+                       field_frame, FALSE, FALSE, 2);
 
     build_type_notebook();
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),

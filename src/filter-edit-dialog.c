@@ -120,7 +120,8 @@ fe_enable_right_page(gboolean enabled)
  * Arguments:
  *    option_list[] options - array of options
  *    gint num - number of options
- *    GCallback func - callback function (will get data of i)
+ *    GCallback func - callback function
+ *    gpointer cb_data - user-data for func
  *
  * Returns:
  *    GtkOptionMenu - the menu created
@@ -134,7 +135,8 @@ fe_combo_box_info_free(struct fe_combo_box_info * info)
 }
 
 GtkWidget *
-fe_build_option_menu(option_list options[], gint num, GCallback func)
+fe_build_option_menu(option_list options[], gint num, GCallback func,
+                     gpointer cb_data)
 {
     GtkWidget *combo_box;
     struct fe_combo_box_info *info;
@@ -155,7 +157,7 @@ fe_build_option_menu(option_list options[], gint num, GCallback func)
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
     if (func)
-	g_signal_connect(G_OBJECT(combo_box), "changed", func, NULL);
+	g_signal_connect(G_OBJECT(combo_box), "changed", func, cb_data);
     g_object_set_data_full(G_OBJECT(combo_box), BALSA_FE_COMBO_BOX_INFO,
                            info, (GDestroyNotify) fe_combo_box_info_free);
 
@@ -274,7 +276,7 @@ build_match_page()
 
     fe_op_codes_option_menu = fe_build_option_menu(fe_op_codes,
 						ELEMENTS(fe_op_codes),
-						NULL);
+						NULL, NULL);
     gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu, FALSE, FALSE,
 		       2);
 
@@ -422,7 +424,7 @@ build_action_page(GtkWindow * window)
 
     fe_action_option_menu =
         fe_build_option_menu(fe_actions, ELEMENTS(fe_actions),
-                             G_CALLBACK(fe_action_selected));
+                             G_CALLBACK(fe_action_selected), NULL);
     gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu,
                        TRUE, FALSE, 1);
 

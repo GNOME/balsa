@@ -58,7 +58,7 @@ void fe_dialog_response(GtkWidget * widget, gint response,
 
 /* helper */
 GtkWidget *fe_build_option_menu(option_list options[], gint num,
-                                GCallback func);
+                                GCallback func, gpointer cb_data);
 
 /*---------------- Left side of hbox ----------------*/
 

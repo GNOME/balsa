@@ -464,8 +464,8 @@ imap_dir_cb_real(void* r)
     if(balsa_app.debug && mb->name)
         printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
                mb->name, mb->mailbox);
-    gnome_appbar_pop(balsa_app.appbar);
     if(balsa_app.debug) printf("%d: Scanning done.\n", (int)time(NULL));
+    gnome_appbar_pop(balsa_app.appbar);
     return NULL;
 }
 

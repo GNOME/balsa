@@ -1,3 +1,12 @@
+2005-07-12 13:32  PeterB
+
+	* src/save-restore.c: fix typo; clean up old filters correctly.
+	* src/filter-edit-dialog.c: set button sensitivity when filter name
+	is changed.
+	* libbalsa/: libbalsa-conf.c, libbalsa-conf.h: use default GKeyFile
+	list separator; implement libbalsa_conf_get_vector_with_default
+	directly instead of as a macro.
+
 2005-07-11 12:32  PeterB
 
 	* src/store-address.c: use balsa_information instead of writing in

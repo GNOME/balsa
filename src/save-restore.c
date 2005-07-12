@@ -1829,7 +1829,7 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
                 /* Some 2.0.x versions had a new action code which
                  * changed the value of FILTER_TRASH. */
                 fil->action = FILTER_TRASH;
-            ++save;
+            ++*save;
         }
     }
     if (!fil->condition) {
@@ -1885,7 +1885,7 @@ config_filters_save(void)
     libbalsa_conf_sync();
     /* This loop takes care of cleaning up old filter sections */
     while (TRUE) {
-	i=snprintf(tmp,tmp_len,"%d/",nb++);
+	i=snprintf(tmp,tmp_len,"%d",nb++);
 	if (libbalsa_conf_has_group(buffer)) {
 	    libbalsa_conf_remove_group(buffer);
 	}

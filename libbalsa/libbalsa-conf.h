@@ -124,14 +124,10 @@ void libbalsa_conf_set_vector                (const char *path,
 	                                      int argc,
                                               const char *const argv[]);
 
-void libbalsa_conf_get_vector_with_default_  (const char *path,
-	                                      gint * argcp,
+void libbalsa_conf_get_vector_with_default   (const char *path,
+                                              gint * argcp,
                                               char ***argvp,
-                                              gboolean * def,
-					      gboolean priv);
-#define libbalsa_conf_get_vector_with_default(path, argcp, argvp, def) \
-        (libbalsa_conf_get_vector_with_default_((path),(argcp),(argvp), \
-                                                (def),FALSE))
+                                              gboolean * def);
 
 void libbalsa_conf_drop_all                  (void);
 void libbalsa_conf_sync                      (void);

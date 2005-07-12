@@ -155,7 +155,6 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
         return;
     conf->mtime = buf.st_mtime;
 
-    g_key_file_set_list_separator(conf->key_file, ' ');
 #if !GLIB_CHECK_VERSION(2, 7, 0)
     conf->new_path = g_strconcat(conf->path, ".new", NULL);
 #endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
@@ -178,9 +177,14 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
 
         buf = lbc_readfile(old_path);
         if (buf) {
+            /* GnomeConfig used ' ' as the list separator... */
+            g_key_file_set_list_separator(conf->key_file, ' ');
             g_key_file_load_from_data(conf->key_file, buf, -1,
                                       G_KEY_FILE_KEEP_COMMENTS, &error);
             g_free(buf);
+            /* ...but GKeyFile doesn't handle it properly, so we'll
+             * revert to the default ';'. */
+            g_key_file_set_list_separator(conf->key_file, ';');
         }
         if (!buf || error) {
 #if DEBUG
@@ -438,15 +442,14 @@ libbalsa_conf_set_vector(const char *path, int argc,
 }
 
 void
-libbalsa_conf_get_vector_with_default_(const char *path, gint * argcp,
-                                       char ***argvp, gboolean * def,
-                                       gboolean priv)
+libbalsa_conf_get_vector_with_default(const char *path, gint * argcp,
+                                      char ***argvp, gboolean * def)
 {
     GError *error = NULL;
     gsize len;
 
     *argvp =
-        g_key_file_get_string_list(LBC_KEY_FILE(priv), lbc_groups->data,
+        g_key_file_get_string_list(lbc_conf.key_file, lbc_groups->data,
                                    path, &len, &error);
     *argcp = len;
     if (error)

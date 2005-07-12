@@ -259,6 +259,8 @@ build_match_page()
 		     2, 10, 0, 1,
 		     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(fe_name_label), fe_name_entry);
+    g_signal_connect(fe_name_entry, "changed",
+                     G_CALLBACK(fe_action_changed), NULL);
 
     /* The filter op-code : "OR" or "AND" all the conditions */ 
 

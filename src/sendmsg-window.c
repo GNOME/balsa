@@ -3355,6 +3355,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
 				     ident->reply_string, 
 				     tmp);
 	g_strchomp(newsubject);
+	g_strdelimit(newsubject, "\r\n", ' ');
 	break;
 
     case SEND_FORWARD_ATTACH:

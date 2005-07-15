@@ -1,3 +1,8 @@
+2005-07-15 10:53  PeterB
+
+	* src/sendmsg-window.c: replace CR and LF in subject header with
+	spaces.
+
 2005-07-12 13:32  PeterB
 
 	* src/save-restore.c: fix typo; clean up old filters correctly.

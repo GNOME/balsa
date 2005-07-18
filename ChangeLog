@@ -1,3 +1,8 @@
+2005-07-18 08:04  PeterB
+
+	* src/sendmsg-window.c: make References header according to RFC
+	2822.
+
 2005-07-15 10:53  PeterB
 
 	* src/sendmsg-window.c: replace CR and LF in subject header with

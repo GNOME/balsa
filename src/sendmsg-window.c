@@ -3966,7 +3966,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	}
 #endif
         if (message->in_reply_to)
-            bsmsg->in_reply_to = g_strdup(message->in_reply_to->data);
+            bsmsg->in_reply_to =
+                g_strconcat("<", message->in_reply_to->data, ">", NULL);
     }
 
     if (type == SEND_REPLY_ALL) {
@@ -4463,16 +4464,32 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	libbalsa_message_set_dispnotify(message, ident->ia);
 
     if (bsmsg->orig_message != NULL) {
+        GList *refs = NULL;
 
-	if (bsmsg->orig_message->references != NULL) {
-	    for (list = bsmsg->orig_message->references; list;
-		 list = list->next) {
-		message->references =
-		    g_list_prepend(message->references,
-				  g_strdup(list->data));
-	    }
-	    message->references = g_list_reverse(message->references);
-	}
+        for (list = bsmsg->orig_message->references; list;
+             list = list->next)
+            refs = g_list_prepend(refs, g_strdup(list->data));
+
+        if (bsmsg->type != SEND_CONTINUE) {
+            /* We're replying to orig_message, so construct the
+             * references according to RFC 2822. */
+            GList *in_reply_to;
+
+            if (!refs
+                    /* Parent message has no References header... */
+                && (in_reply_to = bsmsg->orig_message->in_reply_to)
+                && !in_reply_to->next)
+                /* ...but it has an In-Reply-To header with a single
+                 * message identifier. */
+                refs = g_list_prepend(refs, g_strdup(in_reply_to->data));
+    
+            if (bsmsg->orig_message->message_id)
+                refs = g_list_prepend(refs,
+                                      g_strdup(bsmsg->orig_message->
+                                               message_id));
+        }
+
+        message->references = g_list_reverse(refs);
     }
     if (bsmsg->in_reply_to)
         message->in_reply_to =

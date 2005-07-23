@@ -1,3 +1,7 @@
+2005-07-23  Pawan Chitrakar  <pawan@nplinux.org>
+
+	* configure.in: Added ne in ALL_LINGUAS
+
 2005-07-18 08:04  PeterB
 
 	* src/sendmsg-window.c: make References header according to RFC

@@ -1676,9 +1676,10 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
 {
     GMimeGpgmeContext *context;
     gchar *passwd = NULL;
+    int foo;
 
     if (!opaque || !GMIME_IS_GPGME_CONTEXT(opaque)) {
-	write(fd, "\n", 1);
+	foo = write(fd, "\n", 1);
 	return GPG_ERR_USER_1;
     }
     context = GMIME_GPGME_CONTEXT(opaque);
@@ -1689,8 +1690,8 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
 
     /* check if we have the passphrase already cached... */
     if ((passwd = check_cache(pcache, uid_hint, prev_was_bad))) {
-	write(fd, passwd, strlen(passwd));
-	write(fd, "\n", 1);
+	foo = write(fd, passwd, strlen(passwd));
+	foo = write(fd, "\n", 1);
 	wipe_string(passwd);
 	g_free(passwd);
 	return GPG_ERR_NO_ERROR;
@@ -1728,15 +1729,15 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
 #endif				/* BALSA_USE_THREADS */
 
     if (!passwd) {
-	write(fd, "\n", 1);
+	foo = write(fd, "\n", 1);
 	return GPG_ERR_CANCELED;
     }
 
     /* send the passphrase and erase the string */
-    write(fd, passwd, strlen(passwd));
+    foo = write(fd, passwd, strlen(passwd));
     wipe_string(passwd);
     g_free(passwd);
-    write(fd, "\n", 1);
+    foo = write(fd, "\n", 1);
     return GPG_ERR_NO_ERROR;
 }
 

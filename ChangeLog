@@ -1,3 +1,7 @@
+2005-07-24  Carlos Morgado  <chbm chbm.net>
+
+	* libbalsa/rfc3156.c: fix FC4 build
+
 2005-07-24 09:03  PeterB
 
 	* configure.in, src/save-restore.c, src/threads.h,

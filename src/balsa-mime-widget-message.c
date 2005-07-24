@@ -615,8 +615,10 @@ balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
     add_header_address_list(bm, view, "cc", _("Cc:"), headers->cc_list);
     add_header_address_list(bm, view, "bcc", _("Bcc:"), headers->bcc_list);
 
+#if BALSA_SHOW_FCC_AS_WELL_AS_X_BALSA_FCC
     if (headers->fcc_url)
 	add_header_gchar(bm, view, "fcc", _("Fcc:"), headers->fcc_url);
+#endif
 
     if (headers->dispnotify_to) {
 	gchar *mdn_to =

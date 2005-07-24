@@ -262,11 +262,12 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
     if (gc == NULL) 
         return FALSE;
 
-    fgets(string, sizeof(string), gc);
+    if (fgets(string, sizeof(string), gc)) {
     /* The first line should be junk, just debug output */
 #ifdef DEBUG
-    printf("%s\n", string);
+        printf("%s\n", string);
 #endif
+    }  /* FIXME check error */
 	
     while (fgets(string, sizeof(string), gc)) {
         int i=sscanf(string, "%[^\t]\t%[^\t]%[^\n]", email, name, tmp);

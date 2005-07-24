@@ -59,6 +59,8 @@ typedef struct {
   message->message_string[sizeof(message->message_string)-1]='\0';\
   message->num_bytes=num;\
   message->tot_bytes=tot;\
-  write( mail_thread_pipes[1], (void *) &message, sizeof(void *) );
+  if (write( mail_thread_pipes[1], (void *) &message, sizeof(void *) ) \
+      != sizeof(void *)) \
+    g_warning("pipe error");
 
 #endif				/* __THREADS_H__ */

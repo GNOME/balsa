@@ -331,7 +331,8 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 	if (lbm_mh_check_filename(filename) == FALSE)
 	    continue;
 
-	sscanf(filename, "%d", &fileno);
+	if (sscanf(filename, "%d", &fileno) != 1)
+            break;     /* FIXME report error? */
 	if (fileno > mh->last_fileno)
 	    mh->last_fileno = fileno;
 
@@ -412,9 +413,11 @@ lbm_mh_handle_seq_line(LibBalsaMailboxMh * mh, gchar * line)
 	line = strchr(*seq, '-');
 	if (line) {
 	    *line++ = '\0';
-	    sscanf(line, "%d", &end);
+	    if (sscanf(line, "%d", &end) != 1)
+                break; /* FIXME report error? */
 	}
-	sscanf(*seq, "%d", &fileno);
+	if (sscanf(*seq, "%d", &fileno) != 1)
+            break;     /* FIXME report error? */
 	do
 	    lbm_mh_set_flag(mh, fileno, flag);
 	while (++fileno <= end);
@@ -557,9 +560,11 @@ lbm_mh_check(LibBalsaMailboxMh * mh, const gchar * path)
 		p = strchr(*seq, '-');
 		if (p) {
 		    *p++ = '\0';
-		    sscanf(p, "%d", &end);
+		    if (sscanf(p, "%d", &end) != 1)
+                        break; /* FIXME report error? */
 		}
-		sscanf(*seq, "%d", &fileno);
+		if (sscanf(*seq, "%d", &fileno) != 1)
+                    break; /* FIXME report error? */
 		do {
 		    p = g_strdup_printf("%s/%d", path, fileno);
 		    if (access(p, F_OK) == 0)

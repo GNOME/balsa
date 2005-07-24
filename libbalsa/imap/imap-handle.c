@@ -1806,13 +1806,13 @@ ir_status(ImapMboxHandle *h)
 
   name = imap_get_astring(h->sio, &c);
   resp = g_hash_table_lookup(h->status_resps, name);
-  if(c                != ' ') return IMR_PROTOCOL;
-  if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
+  if(c                != ' ') {g_free(name); return IMR_PROTOCOL;}
+  if(sio_getc(h->sio) != '(') {g_free(name); return IMR_PROTOCOL;}
   do {
     char item[13], count[13]; /* longest than UIDVALIDITY */
     c = imap_get_atom(h->sio, item, sizeof(item));
     if(c == ')') break;
-    if(c != ' ') return IMR_PROTOCOL;
+    if(c != ' ') {g_free(name); return IMR_PROTOCOL;}
     c = imap_get_atom(h->sio, count, sizeof(count));
     /* FIXME: process the response */
     if(resp) {
@@ -1822,7 +1822,10 @@ ir_status(ImapMboxHandle *h)
           break;
       for(i= 0; resp[i].item != IMSTAT_NONE; i++) {
         if(resp[i].item == idx) {
-          sscanf(count, "%u", &resp[i].result);
+          if (sscanf(count, "%u", &resp[i].result) != 1) {
+            g_free(name);
+            return IMR_PROTOCOL;
+          }
           break;
         }
       }

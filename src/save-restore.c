@@ -170,6 +170,8 @@ load_toolbars(void)
     GSList **list;
     guint changed = 0;
 
+    tmpkey[sizeof tmpkey - 1] = '\0';
+
     libbalsa_conf_push_group("Toolbars");
     balsa_app.toolbar_wrap_button_text = d_get_gint("WrapButtonText", 1);
     libbalsa_conf_pop_group();
@@ -209,14 +211,14 @@ load_toolbars(void)
     for (i = 0; i < ELEMENTS(toolbars); i++) {
         guint type;
 
-        sprintf(tmpkey, "Toolbar%dID", i);
+        snprintf(tmpkey, sizeof tmpkey - 1, "Toolbar%dID", i);
         type = d_get_gint(tmpkey, -1);
 
         if (type >= ELEMENTS(toolbars)) {
             continue;
         }
 
-        sprintf(tmpkey, "Toolbar%dItemCount", i);
+        snprintf(tmpkey, sizeof tmpkey - 1, "Toolbar%dItemCount", i);
         items = d_get_gint(tmpkey, 0);
 
         list = toolbars[type].current;
@@ -224,7 +226,7 @@ load_toolbars(void)
             gchar *item;
 	    const gchar *real_item;
 
-            sprintf(tmpkey, "Toolbar%dItem%d", i, j);
+            snprintf(tmpkey, sizeof tmpkey - 1, "Toolbar%dItem%d", i, j);
             item = libbalsa_conf_get_string(tmpkey);
  	    if ((real_item = balsa_toolbar_sanitize_id(item))) {
  		*list = g_slist_append(*list, g_strdup(real_item));
@@ -474,7 +476,9 @@ pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
        * blocking on the mutt_lock, andthe pipe filling up.
        * This would give us a deadlock.
      */
-    write(mail_thread_pipes[1], (void *) &message, sizeof(void *));
+    if (write(mail_thread_pipes[1], (void *) &message, sizeof(void *))
+        != sizeof(void *))
+        g_warning("pipe error");
 #else
     while(gtk_events_pending())
         gtk_main_iteration_do(FALSE);
@@ -490,8 +494,9 @@ pop3_config_updated(LibBalsaMailboxPop3* mailbox)
     threadmsg->message_type = LIBBALSA_NTFY_UPDATECONFIG;
     threadmsg->mailbox = (void *) mailbox;
     threadmsg->message_string[0] = '\0';
-    write(mail_thread_pipes[1], (void *) &threadmsg,
-          sizeof(void *));
+    if (write(mail_thread_pipes[1], (void *) &threadmsg,
+          sizeof(void *)) != sizeof(void *))
+        g_warning("pipe error");
 #else
     config_mailbox_update(LIBBALSA_MAILBOX(mailbox));
 #endif
@@ -1808,8 +1813,9 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
     char *endptr;
     guint *save = data;
     LibBalsaFilter *fil;
+    long int dummy;
 
-    strtol(value, &endptr, 10);
+    dummy = strtol(value, &endptr, 10);
     if (*endptr) {              /* Bad format. */
         libbalsa_conf_remove_group(key);
         return FALSE;
@@ -1944,11 +1950,13 @@ load_mru(GList **mru, const gchar * group)
     int count, i;
     char tmpkey[32];
     
+    tmpkey[sizeof tmpkey - 1] = '\0';
+
     libbalsa_conf_push_group(group);
     count=d_get_gint("MRUCount", 0);
     for(i=0;i<count;i++) {
         gchar *val;
-	sprintf(tmpkey, "MRU%d", i+1);
+	snprintf(tmpkey, sizeof tmpkey - 1, "MRU%d", i + 1);
         if( (val = libbalsa_conf_get_string(tmpkey)) != NULL )
             (*mru)=g_list_append((*mru), val);
     }
@@ -1962,9 +1970,11 @@ save_mru(GList * mru, const gchar * group)
     char tmpkey[32];
     GList *ltmp;
 
+    tmpkey[sizeof tmpkey - 1] = '\0';
+
     libbalsa_conf_push_group(group);
     for (ltmp = mru, i = 0; ltmp; ltmp = ltmp->next, i++) {
-        sprintf(tmpkey, "MRU%d", i + 1);
+	snprintf(tmpkey, sizeof tmpkey - 1, "MRU%d", i + 1);
         libbalsa_conf_set_string(tmpkey, (gchar *) (ltmp->data));
     }
 

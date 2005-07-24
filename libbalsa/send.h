@@ -95,7 +95,9 @@ typedef struct {
   t_message->msg = s_msg; \
   t_message->mbox = s_mbox; \
   t_message->of_total = messof; \
-  write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) );
+  if (write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) ) \
+      < (ssize_t) sizeof(void *)) \
+    g_warning("pipe error");
 
 enum {
     MSGSENDTHREADERROR,

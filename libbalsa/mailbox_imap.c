@@ -2255,7 +2255,13 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                     part->content_type ? part->content_type : "text/plain",
                     encoding_names(dt.body->encoding));
         }
-	fwrite(dt.block, dt.body->octets, 1, fp);
+	if (fwrite(dt.block, dt.body->octets, 1, fp) != 1) {
+            fclose(fp);
+            g_free(section); 
+            g_strfreev(pair);
+            g_free(part_name);
+            return FALSE; /* something better ? */
+        }
 	fseek(fp, 0, SEEK_SET);
     }
     partstream = g_mime_stream_file_new (fp);

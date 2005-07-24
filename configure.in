@@ -512,7 +512,10 @@ AC_STDC_HEADERS
 #
 
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
-	for option in -Wsign-compare -Wpointer-arith -Wnested-externs -Wchar-subscripts -Wuninitialized -Wmissing-prototypes -Wreturn-type -Wdeclaration-after-statement; do
+	for option in -Wsign-compare -Wpointer-arith -Wnested-externs \
+            -Wchar-subscripts -Wuninitialized -Wmissing-prototypes    \
+            -Wreturn-type -Wdeclaration-after-statement               \
+            -D_FORTIFY_SOURCE=2 ; do
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])

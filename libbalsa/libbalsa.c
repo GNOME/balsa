@@ -148,15 +148,14 @@ libbalsa_guess_email_address(void)
     /* Q: Find this location with configure? or at run-time? */
     static const gchar* MAILNAME_FILE = "/etc/mailname";
     char hostbuf[512];
-    FILE *mailname_in;
+    FILE *mailname_in = NULL;
 
     gchar* preset, *domain;
     if(g_getenv("EMAIL") != NULL){                  /* 1. */
         preset = g_strdup(g_getenv("EMAIL"));
-    } else if( (mailname_in = fopen(MAILNAME_FILE, "r")) != NULL){ /* 2. */
-        fgets(hostbuf, sizeof(hostbuf)-1, mailname_in);
+    } else if( (mailname_in = fopen(MAILNAME_FILE, "r")) != NULL
+              && fgets(hostbuf, sizeof(hostbuf)-1, mailname_in)){ /* 2. */
         hostbuf[sizeof(hostbuf)-1] = '\0';
-        fclose(mailname_in);
         preset = g_strconcat(g_get_user_name(), "@", hostbuf, NULL);
         
     }else if((domain = libbalsa_get_domainname())){ /* 3. */
@@ -166,6 +165,8 @@ libbalsa_guess_email_address(void)
         gethostname(hostbuf, 511);
         preset = g_strconcat(g_get_user_name(), "@", hostbuf, NULL);
     }
+    if (mailname_in)
+        fclose(mailname_in);
     return preset;
 }
 

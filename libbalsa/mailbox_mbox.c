@@ -1191,9 +1191,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     } else if (!lbm_mbox_stream_seek_to_message(mbox_stream, offset))
         g_warning("mbox_sync: message not in expected position.\n");
     else if (g_mime_stream_write_to_stream(temp_stream, mbox_stream) != -1) {
-        save_failed = FALSE;
         mbox->size = g_mime_stream_tell(mbox_stream);
-        ftruncate(GMIME_STREAM_FS(mbox_stream)->fd, mbox->size);
+        if (ftruncate(GMIME_STREAM_FS(mbox_stream)->fd, mbox->size) == 0)
+            save_failed = FALSE;
     }
     g_object_unref(temp_stream);
     mbox_unlock(mailbox, mbox_stream);
@@ -1615,8 +1615,8 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     if (retval > 0)
 	retval = lbm_mbox_newline(dest);
 
-    if(retval<0)
-        truncate(path, orig_length);
+    if (retval < 0 && truncate(path, orig_length) < 0)
+        retval = -2;
     mbox_unlock (mailbox, dest);
     g_object_unref(dest);
 

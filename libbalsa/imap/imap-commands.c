@@ -893,7 +893,8 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
 static void
 write_nstring(unsigned seqno, const char *str, int len, void *fl)
 {
-  fwrite(str, 1, len, (FILE*)fl);
+  if (fwrite(str, 1, len, (FILE*)fl) != (size_t) len)
+    perror("write_nstring");
 }
 
 ImapResponse

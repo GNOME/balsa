@@ -1225,12 +1225,14 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
   if (writing == SMTP_CB_HEADERS)
     {
       fputs ("H: ", fp);
-      fwrite (buf, 1, buflen, fp);
+      if (fwrite (buf, 1, buflen, fp) != (size_t) buflen)
+        /* FIXME */ return;
       return;
     }
 
  fputs (writing ? "C: " : "S: ", fp);
- fwrite (buf, 1, buflen, fp);
+ if (fwrite (buf, 1, buflen, fp) != (size_t) buflen)
+   /* FIXME */ return;
  if (buf[buflen - 1] != '\n')
    putc ('\n', fp);
 }

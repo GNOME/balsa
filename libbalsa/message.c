@@ -313,15 +313,14 @@ GList *
 libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
 {
     GList* list;
-    gchar** tmp;
     LibBalsaMessageHeaders *headers = message->headers;
     
     g_return_val_if_fail(headers, NULL);
     if (!headers->user_hdrs && message->mailbox) 
         libbalsa_mailbox_set_msg_headers(message->mailbox, message);
 
-    for (list = headers->user_hdrs; list; list = g_list_next(list)) {
-        tmp = list->data;
+    for (list = headers->user_hdrs; list; list = list->next) {
+        const gchar * const *tmp = list->data;
         
         if (g_ascii_strncasecmp(tmp[0], find, strlen(find)) == 0) 
             return list;
@@ -388,6 +387,7 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
     */
     value = g_mime_message_get_header(message, "References");
     if (value) {
+#if BALSA_NEEDS_SEPARATE_USER_HEADERS
 	GMimeReferences *references, *reference;
 	reference = references = g_mime_references_decode(value);
 	while (reference) {
@@ -401,6 +401,11 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
 	    reference = reference->next;
 	}
 	g_mime_references_clear(&references);
+#else
+        res = g_list_prepend(res,
+                             libbalsa_create_hdr_pair("References",
+                                                      g_strdup(value)));
+#endif
     }
 
     value = g_mime_message_get_header(message, "In-Reply-To");

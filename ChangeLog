@@ -1,3 +1,17 @@
+2005-07-24 09:03  PeterB
+
+	* configure.in, src/save-restore.c, src/threads.h,
+	libbalsa/address-book-extern.c, libbalsa/libbalsa.c,
+	libbalsa/mailbox_imap.c, libbalsa/mailbox_mbox.c,
+	libbalsa/mailbox_mh.c, libbalsa/send.c, libbalsa/send.h,
+	libbalsa/imap/imap-commands.c, libbalsa/imap/imap-handle.c: compile
+	with -D_FORTIFY_SOURCE=2.
+	* src/balsa-mime-widget-message.c: do not create separate Fcc
+	header.
+	* libbalsa/message.c: make a single References user-header.
+	* libbalsa/abook-completion.c: match quoted names and
+	angle-bracketed mailboxes.
+
 2005-07-23  Pawan Chitrakar  <pawan@nplinux.org>
 
 	* configure.in: Added ne in ALL_LINGUAS

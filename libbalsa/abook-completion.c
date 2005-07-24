@@ -38,6 +38,7 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
 {
     GString *string;
     gchar *address_string;
+    gchar *p, *q;
 #ifdef CASE_INSENSITIVE_NAME
     gchar *string_n;
 #endif
@@ -52,6 +53,11 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
     if (string->len > 0)
 	g_string_append_c(string, ' ');
     address_string = internet_address_to_string(ia, FALSE);
+    /* Remove '"' and '<'. */
+    for (p = q = address_string; *p; p++)
+        if (*p != '"' && *p != '<')
+            *q++ = *p;
+    *q = '\0';
     g_string_append(string, address_string);
     g_free(address_string);
 #ifdef CASE_INSENSITIVE_NAME

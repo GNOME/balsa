@@ -287,12 +287,14 @@ g_mime_session_passphrase(void *HOOK, const char *UID_HINT,
 	g_mime_session_request_passwd(session, PASSPHRASE_INFO, TRUE, msg,
 				      NULL);
     if (passphrase) {
-	write(FD, passphrase, strlen(passphrase));
-	write(FD, "\n", 1);
+	if (write(FD, passphrase, strlen(passphrase)) < 0
+	    || write(FD, "\n", 1) < 0)
+            perror(__func__);
 	g_mime_session_forget_passwd(session, msg, NULL);
 	return GPG_ERR_NO_ERROR;
     } else {
-	write(FD, "\n", 1);
+	if (write(FD, "\n", 1) < 0)
+            perror(__func__);
 	return GPG_ERR_CANCELED;
     }
 }

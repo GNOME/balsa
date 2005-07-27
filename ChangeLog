@@ -1,3 +1,7 @@
+2005-07-27 10:25  PeterB
+
+	* libbalsa/gmime-gpgme-context.c: compile with -D_FORTIFY_SOURCE=2.
+
 2005-07-24  Carlos Morgado  <chbm chbm.net>
 
 	* libbalsa/rfc3156.c: fix FC4 build

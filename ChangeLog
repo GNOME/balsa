@@ -1,5 +1,7 @@
-2005-07-27 10:25  PeterB
+2005-07-27 18:54  PeterB
 
+	* libbalsa/libbalsa-conf.c: use blank comment lines only to
+	separate groups.
 	* libbalsa/gmime-gpgme-context.c: compile with -D_FORTIFY_SOURCE=2.
 
 2005-07-24  Carlos Morgado  <chbm chbm.net>

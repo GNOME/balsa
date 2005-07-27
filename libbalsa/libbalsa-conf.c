@@ -161,7 +161,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     libbalsa_assure_balsa_dir();
     error = NULL;
     if (!g_key_file_load_from_file
-        (conf->key_file, conf->path, G_KEY_FILE_KEEP_COMMENTS, &error)) {
+        (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
         gchar *old_path;
         gchar *buf;
         static gboolean warn = TRUE;
@@ -485,6 +485,7 @@ libbalsa_conf_drop_all(void)
 static void
 lbc_sync(LibBalsaConf * conf)
 {
+    gchar **groups;
     gchar *buf;
     gsize len;
     GError *error;
@@ -494,6 +495,15 @@ lbc_sync(LibBalsaConf * conf)
 
     if (!conf->changes)
         return;
+
+    groups = g_key_file_get_groups(conf->key_file, NULL);
+    if (*groups) {
+        gchar **group;
+
+        for (group = &groups[1]; *group; group++)
+            g_key_file_set_comment(conf->key_file, *group, NULL, "", NULL);
+    }
+    g_strfreev(groups);
 
     error = NULL;
     buf = g_key_file_to_data(conf->key_file, &len, &error);

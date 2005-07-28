@@ -6430,7 +6430,7 @@ msgstr "Alas"
 #~ msgstr "%s [%s]\n"
 
 #~ msgid "Reading %s... %d (%d%%)"
-#~ msgstr "Luetaan %s... %d (%d&&)"
+#~ msgstr "Luetaan %s... %d (%d %%)"
 
 #~ msgid "Mailbox is corrupt!"
 #~ msgstr "Laatikko korruptoitunut!"
@@ -6450,7 +6450,7 @@ msgstr "Alas"
 #~ "virheestä)"
 
 #~ msgid "Writing messages... %d (%d%%)"
-#~ msgstr "Kirjoitetaan viestejä... %d (%d%%)"
+#~ msgstr "Kirjoitetaan viestejä... %d (%d %%)"
 
 #~ msgid "Write failed!  Saved partial mailbox to %s"
 #~ msgstr "Kirjoitus epäonnistui! Tallennettu osittain laatikkoon: %s"

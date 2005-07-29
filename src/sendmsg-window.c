@@ -2977,8 +2977,8 @@ create_text_area(BalsaSendmsg * bsmsg)
     buffer = gtk_text_view_get_buffer(text_view);
     bsmsg->buffer2 =
          gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
-    gtk_text_buffer_create_tag(buffer, "soft", NULL);
-    gtk_text_buffer_create_tag(buffer, "url", NULL);
+    gtk_text_buffer_create_tag(buffer, "soft", NULL, NULL);
+    gtk_text_buffer_create_tag(buffer, "url", NULL, NULL);
     gtk_text_view_set_editable(text_view, TRUE);
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
 

@@ -1,3 +1,7 @@
+2005-07-31 18:52  PeterB
+
+	* src/sendmsg-window.c: fix bug 312091.
+
 2005-07-29 09:52  PeterB
 
 	* src/: balsa-mime-widget-text.c, sendmsg-window.c: fix some gcc

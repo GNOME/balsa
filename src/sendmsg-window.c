@@ -4211,8 +4211,6 @@ insert_file_response(GtkWidget * selector, gint response,
     GtkTextBuffer *buffer;
     gchar * string;
     size_t len;
-    LibBalsaTextAttribute attr;
-    GSList *list;
 
     if (response != GTK_RESPONSE_OK) {
 	gtk_widget_destroy(selector);
@@ -4234,32 +4232,38 @@ insert_file_response(GtkWidget * selector, gint response,
     string = NULL;
     len = libbalsa_readfile(fl, &string);
     fclose(fl);
-    
-    attr = libbalsa_text_attr_string(string);
-    if (!attr || attr & LIBBALSA_TEXT_HI_UTF8)
-	/* Ascii or utf-8 */
-        libbalsa_insert_with_url(buffer, string, NULL, NULL, NULL);
-    else {
-	/* Neither ascii nor utf-8... */
-	gchar *s = NULL;
 
-        for (list = bsmsg->charsets; list; list = list->next) {
-            if (sw_can_convert
-                (string, -1, "UTF-8", (const gchar *) list->data, &s))
-                break;
-            g_free(s);
-	    s = NULL;
+    if (string) {
+        LibBalsaTextAttribute attr;
+        GSList *list;
+
+        attr = libbalsa_text_attr_string(string);
+        if (!attr || attr & LIBBALSA_TEXT_HI_UTF8)
+            /* Ascii or utf-8 */
+            libbalsa_insert_with_url(buffer, string, NULL, NULL, NULL);
+        else {
+            /* Neither ascii nor utf-8... */
+            gchar *s = NULL;
+
+            for (list = bsmsg->charsets; list; list = list->next) {
+                if (sw_can_convert
+                    (string, -1, "UTF-8", (const gchar *) list->data, &s))
+                    break;
+                g_free(s);
+                s = NULL;
+            }
+
+            if (s) {
+                /* ...but seems to be in a current charset. */
+                libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
+                g_free(s);
+            } else
+                /* ...and can't be decoded from any current charset. */
+                do_insert_string_select_ch(bsmsg, buffer, string, len,
+                                           fname);
         }
-
-	if (s) {
-	    /* ...but seems to be in a current charset. */
-            libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
-	    g_free(s);
-	} else
-	    /* ...and can't be decoded from any current charset. */
-            do_insert_string_select_ch(bsmsg, buffer, string, len, fname);
+        g_free(string);
     }
-    g_free(string);
 
     /* Use the same folder as for attachments. */
     g_free(balsa_app.attach_dir);

@@ -1,5 +1,6 @@
-2005-07-31 18:52  PeterB
+2005-07-31 22:26  PeterB
 
+	* src/sendmsg-window.c: fix bug 312105.
 	* src/sendmsg-window.c: fix bug 312091.
 
 2005-07-29 09:52  PeterB

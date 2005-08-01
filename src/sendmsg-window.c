@@ -2012,7 +2012,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 		       ATTACH_ICON_COLUMN, pixbuf,
 		       ATTACH_TYPE_COLUMN, content_type,
 		       ATTACH_MODE_COLUMN, attach_data->mode,
-		       ATTACH_SIZE_COLUMN, attach_stat.st_size,
+		       ATTACH_SIZE_COLUMN, (glong) attach_stat.st_size,
 		       ATTACH_DESC_COLUMN, utf8name,
 		       -1);
     g_object_unref(attach_data);
@@ -2662,7 +2662,7 @@ render_attach_size(GtkTreeViewColumn *column, GtkCellRenderer *cell,
 		   GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
     gint mode;
-    gint size;
+    glong size;
     gchar *sstr;
 
     gtk_tree_model_get(model, iter, ATTACH_MODE_COLUMN, &mode,
@@ -2677,7 +2677,7 @@ render_attach_size(GtkTreeViewColumn *column, GtkCellRenderer *cell,
     else if (size > 1200)
 	sstr = g_strdup_printf("%.2fkB", (gfloat)size / (gfloat)1024);
     else
-	sstr = g_strdup_printf("%dB", size);
+	sstr = g_strdup_printf("%ldB", size);
     g_object_set(cell, "text", sstr, NULL);
 }
 
@@ -2783,7 +2783,7 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
 			       GDK_TYPE_PIXBUF,
 			       G_TYPE_STRING,
 			       G_TYPE_INT,
-			       G_TYPE_INT,
+			       G_TYPE_LONG,
 			       G_TYPE_STRING);
 
     bsmsg->attachments[1] = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));

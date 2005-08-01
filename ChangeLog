@@ -1,3 +1,8 @@
+2005-08-01 09:35  PeterB
+
+	* src/sendmsg-window.c: better fix for bug 312105; plug memory
+	leak.
+
 2005-07-31 22:26  PeterB
 
 	* src/sendmsg-window.c: fix bug 312105.

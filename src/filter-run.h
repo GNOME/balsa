@@ -75,6 +75,9 @@ struct _BalsaFilterRunDialog {
 
     /* Mailbox the filters of which are edited */
     LibBalsaMailbox * mbox;
+
+    /* Temporary list variable */
+    GSList *filters;
 };
 
 struct _BalsaFilterRunDialogClass {
@@ -97,7 +100,8 @@ void fr_dialog_response(GtkWidget * widget, gint response, gpointer data);
 /* 
  *Callbacks for apply/left/right buttons
  */
-void fr_apply_pressed(BalsaFilterRunDialog* dialog);
+void fr_apply_selected_pressed(BalsaFilterRunDialog* dialog);
+void fr_apply_now_pressed(BalsaFilterRunDialog* dialog);
 void fr_add_pressed(BalsaFilterRunDialog* dialog);
 void fr_remove_pressed(BalsaFilterRunDialog* dialog);
 

@@ -86,39 +86,16 @@ build_selected_filters_list(GtkTreeView * filter_list, gboolean to_run)
  * Returns TRUE if OK, or FALSE if errors occured
  */
 static gboolean
-run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
+run_filters_on_mailbox(GSList * filters, LibBalsaMailbox * mbox)
 {
-    GSList *filters = NULL;
-    GSList *lst;
-    GtkTreeIter iter;
     guint sent_to_trash;
-    GtkTreeModel *model;
-    gboolean valid;
 
-    build_selected_filters_list(filter_list, TRUE);
-    model = gtk_tree_view_get_model(filter_list);
-
-    /* Construct list of selected filters */
-    for (valid = gtk_tree_model_get_iter_first(model, &iter);
-         valid;
-         valid = gtk_tree_model_iter_next(model, &iter)) {
-        LibBalsaFilter *fil;
-
-        gtk_tree_model_get(model, &iter, DATA_COLUMN, &fil, -1);
-        filters =
-            g_slist_prepend(filters, fil);
-    }
-
-    if (!filters)
-	return TRUE;
-    if (!filters_prepare_to_run(filters)) {
-	g_slist_free(filters);
+    if (!filters_prepare_to_run(filters))
 	return FALSE;
-    }
 
     sent_to_trash = 0;
-    for (lst = filters; lst; lst = g_slist_next(lst)) {
-	LibBalsaFilter *filter = lst->data;
+    for (; filters; filters = filters->next) {
+	LibBalsaFilter *filter = filters->data;
 	LibBalsaMailboxSearchIter *search_iter;
 	guint msgno;
 	GArray *messages;
@@ -150,7 +127,6 @@ run_filters_on_mailbox(GtkTreeView * filter_list, LibBalsaMailbox * mbox)
 	libbalsa_mailbox_unregister_msgnos(mbox, messages);
 	g_array_free(messages, TRUE);
     }
-    g_slist_free(filters);
 
     if (sent_to_trash)
 	enable_empty_trash(balsa_app.main_window, TRASH_FULL);
@@ -221,10 +197,56 @@ void fr_dialog_response(GtkWidget * widget, gint response,
  *Callbacks for apply/left/right buttons
  */
 
-void
-fr_apply_pressed(BalsaFilterRunDialog* p)
+static void
+fr_apply_selected_pressed_func(GtkTreeModel * model, GtkTreePath * path,
+                               GtkTreeIter * iter, gpointer data)
 {
-    if (!run_filters_on_mailbox(p->available_filters, p->mbox))
+    LibBalsaFilter *fil;
+    BalsaFilterRunDialog *p = data;
+
+    gtk_tree_model_get(model, iter, DATA_COLUMN, &fil, -1);
+    /* Check for move to self: */
+    if (fil->action == FILTER_RUN || fil->action == FILTER_TRASH ||
+        strcmp(fil->action_string, p->mbox->url) != 0)
+        p->filters = g_slist_append(p->filters, fil);
+}
+
+void
+fr_apply_selected_pressed(BalsaFilterRunDialog * p)
+{
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(p->available_filters);
+
+    p->filters = NULL;
+    gtk_tree_selection_selected_foreach(selection,
+                                        fr_apply_selected_pressed_func, p);
+
+    if (!p->filters)
+        return;
+
+    if (!run_filters_on_mailbox(p->filters, p->mbox))
+        balsa_information_parented(GTK_WINDOW(p),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Error when applying filters"));
+    else
+        balsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                          _("Filter applied to \"%s\"."),
+                          p->mbox->name);
+
+    g_slist_free(p->filters);
+}
+
+void
+fr_apply_now_pressed(BalsaFilterRunDialog* p)
+{
+    GSList *filters;
+
+    filters = build_selected_filters_list(p->selected_filters, TRUE);
+
+    if (!filters)
+        return;
+
+    if (!run_filters_on_mailbox(filters, p->mbox))
         balsa_information_parented(GTK_WINDOW(p),
                                    LIBBALSA_INFORMATION_ERROR,
                                    _("Error when applying filters"));
@@ -253,7 +275,9 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
         GtkTreeIter sel_iter;
 
         mf->actual_filter = fil;
+#if DEBUG
         printf("fr_add_presed adds fil=%p\n", fil);
+#endif
         mf->when = FILTER_WHEN_NEVER;
         gtk_list_store_append(GTK_LIST_STORE(sel_model), &sel_iter);
         gtk_list_store_set(GTK_LIST_STORE(sel_model), &sel_iter,
@@ -441,20 +465,11 @@ selected_list_activated(GtkTreeView * treeview, GtkTreePath * path,
  *
  * Callback for the "Down" button
  */ 
-static void
-fr_pressed_func(GtkTreeModel * model, GtkTreePath * path,
-                GtkTreeIter * iter, gpointer data)
-{
-    GtkTreeIter *new_iter = data;
-    *new_iter = *iter;
-}
-
 void
 fr_down_pressed(GtkWidget * widget, gpointer data)
 {
     BalsaFilterRunDialog *p = data;
-    GtkTreeModel *model =
-        gtk_tree_view_get_model(p->selected_filters);
+    GtkTreeModel *model;
     GtkTreeSelection *selection =
         gtk_tree_view_get_selection(p->selected_filters);
     GtkTreeIter iter1, iter2;
@@ -462,9 +477,7 @@ fr_down_pressed(GtkWidget * widget, gpointer data)
     gboolean incoming1, closing1;
     gboolean incoming2, closing2;
 
-    iter1.stamp = 0;
-    gtk_tree_selection_selected_foreach(selection, fr_pressed_func, &iter1);
-    if (iter1.stamp) {
+    if (gtk_tree_selection_get_selected(selection, &model, &iter1)) {
         iter2 = iter1;
         if (gtk_tree_model_iter_next(model, &iter2)) {
             gtk_tree_model_get(model, &iter1,
@@ -503,8 +516,7 @@ void
 fr_up_pressed(GtkWidget * widget, gpointer data)
 {
     BalsaFilterRunDialog *p = data;
-    GtkTreeModel *model =
-        gtk_tree_view_get_model(p->selected_filters);
+    GtkTreeModel *model;
     GtkTreeSelection *selection =
         gtk_tree_view_get_selection(p->selected_filters);
     GtkTreeIter iter1, iter2;
@@ -512,9 +524,7 @@ fr_up_pressed(GtkWidget * widget, gpointer data)
     gboolean incoming1, closing1;
     gboolean incoming2, closing2;
 
-    iter1.stamp = 0;
-    gtk_tree_selection_selected_foreach(selection, fr_pressed_func, &iter1);
-    if (iter1.stamp) {
+    if (gtk_tree_selection_get_selected(selection, &model, &iter1)) {
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter1);
 
         if (gtk_tree_path_prev(path)) {

@@ -74,12 +74,12 @@ populate_available_filters_list(GtkTreeView * filter_list,
     GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
     GtkTreeIter iter;
 
-    for (source=balsa_app.filters;source;source=g_slist_next(source)) {
+    for (source=balsa_app.filters;source;source=source->next) {
 	fil=(LibBalsaFilter *)source->data;
 	/* We look for each filter in the mailbox list */
 	for (lst=mailbox_filters;
              lst && fil!=((LibBalsaMailboxFilter*)lst->data)->actual_filter;
-             lst=g_slist_next(lst));
+             lst=lst->next);
 	/* If it's not in mailbox list we can add it to available filters */
 	if (!lst) {
             gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
@@ -105,7 +105,7 @@ populate_selected_filters_list(GtkTreeView * filter_list,
     GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
     GtkTreeIter iter;
 
-    for (; filters_list; filters_list = g_slist_next(filters_list)) {
+    for (; filters_list; filters_list = filters_list->next) {
         mf = g_new(LibBalsaMailboxFilter, 1);
         fil = (LibBalsaMailboxFilter *) filters_list->data;
         *mf = *fil;
@@ -288,6 +288,9 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(p)->vbox),
 		       hbox, TRUE, TRUE, 0);
 
+    vbox = gtk_vbox_new(FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+
     p->available_filters =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
                                  NULL, TRUE);
@@ -300,18 +303,25 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 				   GTK_POLICY_AUTOMATIC);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->available_filters));
-    gtk_box_pack_start(GTK_BOX(hbox), sw, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 0);
+
+    /* To keep a consistent look, make a button box for a single button. */
+    bbox = gtk_hbutton_box_new();
+    gtk_box_set_spacing(GTK_BOX(bbox), 2);
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
+    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
+
+    /* "Apply selected" button */
+    button = balsa_stock_button_with_label(GTK_STOCK_APPLY,
+                                           _("Apply Selected"));
+    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                             G_CALLBACK(fr_apply_selected_pressed), p);
+    gtk_container_add(GTK_CONTAINER(bbox), button);
  
     /* Buttons between the 2 lists */
     bbox = gtk_vbutton_box_new();
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-
-    button = balsa_stock_button_with_label(GTK_STOCK_APPLY,
-                                           _("A_pply Now!"));
-    g_signal_connect_swapped(G_OBJECT(button), "clicked",
-                             G_CALLBACK(fr_apply_pressed), G_OBJECT(p));
-    gtk_container_add(GTK_CONTAINER(bbox), button);
 
     /* Right/Add button */
     button = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, _("A_dd"));
@@ -359,6 +369,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     button = balsa_stock_button_with_label(GTK_STOCK_GO_DOWN, _("Do_wn"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_down_pressed), p);
+    gtk_container_add(GTK_CONTAINER(bbox), button);
+
+    button = balsa_stock_button_with_label(GTK_STOCK_APPLY,
+                                           _("A_pply Now!"));
+    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                             G_CALLBACK(fr_apply_now_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     p->filters_modified=FALSE;

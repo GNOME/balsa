@@ -1,3 +1,9 @@
+2005-08-04 14:14  PeterB
+
+	* src/filter-run-callbacks.c, src/filter-run-dialog.c,
+	src/filter-run.h, doc/C/balsa.xml: use separate "apply" buttons for
+	selected available filters and for mailbox filters.
+
 2005-08-01 09:35  PeterB
 
 	* src/sendmsg-window.c: better fix for bug 312105; plug memory

@@ -50,7 +50,7 @@ General advices:
 * Use entities to make the source more readable.
 -->
 
-<article>
+<article id="index" lang="en">
 
 <title>Balsa User's Guide</title>
 
@@ -3826,6 +3826,11 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       The "Apply Now" button applies all filters of the right list to the
       entire mailbox immediately (be patient, this can take a quite a
       long time on big mailboxes or remote ones).
+  </para>
+  <para>
+  You can also use this dialog to apply a filter to a mailbox without 
+  actually attaching it to the mailbox.  Select one or more filters in the 
+  left hand list, and click the "Apply Selected" button below that list.
   </para>
   <para>
     There are three buttons betlow the filters lists:

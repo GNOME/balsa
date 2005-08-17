@@ -1,3 +1,8 @@
+2005-08-17 19:03  PeterB
+
+	* src/balsa-app.c: free filters after destroying mailboxes (fixes a
+	crash-on-exit).
+
 2005-08-04 14:14  PeterB
 
 	* src/filter-run-callbacks.c, src/filter-run-dialog.c,

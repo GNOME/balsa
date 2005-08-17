@@ -426,13 +426,15 @@ balsa_app_destroy(void)
     g_list_free(balsa_app.address_book_list);
     balsa_app.address_book_list = NULL;
 
+    /* close all mailboxes */
+    gtk_widget_destroy(balsa_app.notebook);
+
+    /* now free filters */
     g_slist_foreach(balsa_app.filters, (GFunc)libbalsa_filter_free, 
 		    GINT_TO_POINTER(TRUE));
     g_slist_free(balsa_app.filters);
     balsa_app.filters = NULL;
 
-    /* close all mailboxes */
-    gtk_widget_destroy(balsa_app.notebook);
     /* g_slist_free(opt_attach_list); */
     g_object_unref(balsa_app.colormap);
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");

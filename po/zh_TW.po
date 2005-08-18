@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.3.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-16 09:20+0800\n"
-"PO-Revision-Date: 2005-07-15 06:55+0800\n"
-"Last-Translator: Chao-Hsiung Liao <j_h_liau@yahoo.com.tw>\n"
+"POT-Creation-Date: 2005-08-18 02:47+0000\n"
+"PO-Revision-Date: 2005-08-18 13:35+0800\n"
+"Last-Translator: Chao-Hsiung Liao <pesder.liao@msa.hinet.net>\n"
 "Language-Team: Chinese (traditional) <community@linuxhall.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,15 +27,20 @@ msgid "E-Mail utility"
 msgstr "電子郵件公用程式"
 
 #. The externq database doesn't support Id's, sorry!
-#: ../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:418
+#: ../libbalsa/address-book-extern.c:210
+#: ../libbalsa/address-book-ldap.c:418
 #: ../libbalsa/address-book-ldif.c:329
 msgid "No-Id"
 msgstr "沒有編號"
 
-#: ../libbalsa/address-book-extern.c:215 ../libbalsa/address-book-extern.c:369
-#: ../libbalsa/address-book-ldap.c:424 ../libbalsa/address-book-ldif.c:309
-#: ../libbalsa/address-book-ldif.c:332 ../libbalsa/address-book-ldif.c:351
-#: ../libbalsa/address-book-ldif.c:355 ../libbalsa/address-book-vcard.c:158
+#: ../libbalsa/address-book-extern.c:215
+#: ../libbalsa/address-book-extern.c:370
+#: ../libbalsa/address-book-ldap.c:424
+#: ../libbalsa/address-book-ldif.c:309
+#: ../libbalsa/address-book-ldif.c:332
+#: ../libbalsa/address-book-ldif.c:351
+#: ../libbalsa/address-book-ldif.c:355
+#: ../libbalsa/address-book-vcard.c:158
 #: ../libbalsa/address-book-vcard.c:312
 msgid "No-Name"
 msgstr "沒有名稱"
@@ -44,7 +49,8 @@ msgstr "沒有名稱"
 msgid "TLS requested but not compiled in"
 msgstr "要求使用 TLS，但編譯本程式時沒有加入 TLS 支援"
 
-#: ../libbalsa/address-book.c:301 ../libbalsa/filter-error.c:45
+#: ../libbalsa/address-book.c:301
+#: ../libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "沒有錯誤"
 
@@ -72,8 +78,10 @@ msgstr "無法新增重複的內容"
 msgid "Cannot find address in address book"
 msgstr "無法在通訊錄中找到位址"
 
-#: ../libbalsa/address-book.c:310 ../src/main-window.c:2228
-#: ../src/main-window.c:4250 ../src/sendmsg-window.c:4782
+#: ../libbalsa/address-book.c:310
+#: ../src/main-window.c:2228
+#: ../src/main-window.c:4250
+#: ../src/sendmsg-window.c:4801
 msgid "Unknown error"
 msgstr "不明的錯誤"
 
@@ -102,8 +110,9 @@ msgid "_Email Address:"
 msgstr "郵件地址(_E):"
 
 # FIXME: Should this be translated? -- Abel
-#: ../libbalsa/body.c:116 ../libbalsa/mailbox_local.c:1163
-#: ../libbalsa/message.c:803
+#: ../libbalsa/body.c:116
+#: ../libbalsa/mailbox_local.c:1163
+#: ../libbalsa/message.c:808
 msgid "(No subject)"
 msgstr "(No subject)"
 
@@ -133,7 +142,8 @@ msgstr "嘗試使用無效的過濾條件"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "無效的過濾條件 %s 於郵件箱 %s"
 
-#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:406
+#: ../libbalsa/filter.c:132
+#: ../libbalsa/mailbox_local.c:406
 msgid "Unable to load message body to match filter"
 msgstr "無法讀取郵件內文供過濾條件比對"
 
@@ -142,7 +152,8 @@ msgstr "無法讀取郵件內文供過濾條件比對"
 msgid "Invalid filter: %s"
 msgstr "過濾條件無效：%s"
 
-#: ../libbalsa/filter.c:279 ../libbalsa/filter.c:302
+#: ../libbalsa/filter.c:279
+#: ../libbalsa/filter.c:302
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr "錯誤的郵件箱名稱於過濾條件: %s"
@@ -167,7 +178,8 @@ msgstr "移動郵件時發生錯誤: %s"
 msgid "Failed to decrypt MIME part: parse error"
 msgstr "解碼 MIME 部分失敗：分析錯誤"
 
-#: ../libbalsa/gmime-gpgme-context.c:279 ../libbalsa/rfc3156.c:1603
+#: ../libbalsa/gmime-gpgme-context.c:279
+#: ../libbalsa/rfc3156.c:1603
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -177,7 +189,8 @@ msgstr ""
 "此金鑰的密語不正確，請再試一次！\n"
 "金鑰： %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:284 ../libbalsa/rfc3156.c:1608
+#: ../libbalsa/gmime-gpgme-context.c:284
+#: ../libbalsa/rfc3156.c:1608
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -188,96 +201,103 @@ msgstr ""
 "\n"
 "金鑰： %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:402 ../libbalsa/gmime-gpgme-context.c:484
-#: ../libbalsa/gmime-gpgme-context.c:495 ../libbalsa/gmime-gpgme-context.c:610
-#: ../libbalsa/gmime-gpgme-context.c:701
+#: ../libbalsa/gmime-gpgme-context.c:404
+#: ../libbalsa/gmime-gpgme-context.c:486
+#: ../libbalsa/gmime-gpgme-context.c:497
+#: ../libbalsa/gmime-gpgme-context.c:612
+#: ../libbalsa/gmime-gpgme-context.c:703
 #, c-format
 msgid "%s: could not get data from stream: %s"
 msgstr "%s ：無法從串流讀取資料：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:410 ../libbalsa/gmime-gpgme-context.c:619
-#: ../libbalsa/gmime-gpgme-context.c:709
+#: ../libbalsa/gmime-gpgme-context.c:412
+#: ../libbalsa/gmime-gpgme-context.c:621
+#: ../libbalsa/gmime-gpgme-context.c:711
 #, c-format
 msgid "%s: could not create new data object: %s"
 msgstr "%s ：無法建立新的資料物件：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:420
+#: ../libbalsa/gmime-gpgme-context.c:422
 #, c-format
 msgid "%s: signing failed: %s"
 msgstr "%s ：簽署失敗：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:509
+#: ../libbalsa/gmime-gpgme-context.c:511
 #, c-format
 msgid "%s: signature verification failed: %s"
 msgstr "%s ：簽署及驗證程序失敗：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:574
+#: ../libbalsa/gmime-gpgme-context.c:576
 msgid "combined signing and encryption is only defined for RFC 2440"
 msgstr "結合簽署及加密程序只有 RFC 2440 有定義"
 
-#: ../libbalsa/gmime-gpgme-context.c:645
+#: ../libbalsa/gmime-gpgme-context.c:647
 #, c-format
 msgid "%s: signing and encryption failed: %s"
 msgstr "%s ：簽署及加密程序失敗：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:649
+#: ../libbalsa/gmime-gpgme-context.c:651
 #, c-format
 msgid "%s: encryption failed: %s"
 msgstr "%s ：加密失敗：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:721
+#: ../libbalsa/gmime-gpgme-context.c:723
 #, c-format
 msgid "%s: decryption failed: %s"
 msgstr "%s ：解密失敗：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:756
+#: ../libbalsa/gmime-gpgme-context.c:758
 #, c-format
 msgid "%s: could not create context: %s"
 msgstr "%s ：無法建立上下文： %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:812
+#: ../libbalsa/gmime-gpgme-context.c:814
 msgid "the crypto engine for protocol OpenPGP is not available"
 msgstr "OpenPGP 協定的加密引擎無法使用"
 
-#: ../libbalsa/gmime-gpgme-context.c:822
+#: ../libbalsa/gmime-gpgme-context.c:824
 msgid "the crypto engine for protocol CMS is not available"
 msgstr "CMS 協定的加密引擎無法使用"
 
-#: ../libbalsa/gmime-gpgme-context.c:829
+#: ../libbalsa/gmime-gpgme-context.c:831
 #, c-format
 msgid "invalid crypto engine %d"
 msgstr "無效的加密引擎 %d"
 
-#: ../libbalsa/gmime-gpgme-context.c:860 ../libbalsa/gmime-gpgme-context.c:882
+#: ../libbalsa/gmime-gpgme-context.c:862
+#: ../libbalsa/gmime-gpgme-context.c:884
 #, c-format
 msgid "%s: could not list keys for %s: %s"
 msgstr "%s：無法列出 %s 的金鑰：%s"
 
-#: ../libbalsa/gmime-gpgme-context.c:894
+#: ../libbalsa/gmime-gpgme-context.c:896
 #, c-format
 msgid "%s: could not find a key for %s"
 msgstr "%s：找不到 %s 的金鑰"
 
-#: ../libbalsa/gmime-gpgme-context.c:906
+#: ../libbalsa/gmime-gpgme-context.c:908
 #, c-format
 msgid "%s: multiple keys for %s"
 msgstr "%s：%s 有多個金鑰"
 
-#: ../libbalsa/gmime-gpgme-context.c:951
+#: ../libbalsa/gmime-gpgme-context.c:953
 #, c-format
 msgid "%s: insufficient validity for uid %s"
 msgstr "%s：對 uid %s 的效力不足"
 
 # Don't translate Re: and Fwd: -- Abel
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:101 ../libbalsa/mailbox_local.c:1282
-#: ../libbalsa/mailbox_local.c:1284 ../src/sendmsg-window.c:3344
-#: ../src/sendmsg-window.c:3345
+#: ../libbalsa/identity.c:101
+#: ../libbalsa/mailbox_local.c:1282
+#: ../libbalsa/mailbox_local.c:1284
+#: ../src/sendmsg-window.c:3342
+#: ../src/sendmsg-window.c:3343
 msgid "Re:"
 msgstr "Re:"
 
-#: ../libbalsa/identity.c:102 ../src/sendmsg-window.c:3375
-#: ../src/sendmsg-window.c:3376
+#: ../libbalsa/identity.c:102
+#: ../src/sendmsg-window.c:3373
+#: ../src/sendmsg-window.c:3374
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -289,7 +309,8 @@ msgstr "新身分"
 msgid "Current"
 msgstr "目前的"
 
-#: ../libbalsa/identity.c:646 ../libbalsa/smtp-server.c:267
+#: ../libbalsa/identity.c:646
+#: ../libbalsa/smtp-server.c:267
 msgid "Default"
 msgstr "預設"
 
@@ -461,21 +482,22 @@ msgstr "超過連線數每伺服器 %s"
 msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
 msgstr "您的 Balsa 組態現在儲存於“~/.balsa/config”"
 
-#: ../libbalsa/libbalsa.c:284
+#: ../libbalsa/libbalsa.c:285
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "%s 的 LDAP 目錄"
 
-#: ../libbalsa/libbalsa.c:390
+#: ../libbalsa/libbalsa.c:391
 msgid "Invalid date"
 msgstr "日期無效"
 
-#: ../libbalsa/libbalsa.c:406 ../src/pref-manager.c:1164
+#: ../libbalsa/libbalsa.c:407
+#: ../src/pref-manager.c:1164
 #: ../src/pref-manager.c:1259
 msgid "Unknown"
 msgstr "不詳"
 
-#: ../libbalsa/libbalsa.c:545
+#: ../libbalsa/libbalsa.c:546
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -486,7 +508,7 @@ msgstr ""
 "<b>原因：</b> %s\n"
 "<b>此憑證屬於：</b>\n"
 
-#: ../libbalsa/libbalsa.c:557
+#: ../libbalsa/libbalsa.c:558
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -494,7 +516,7 @@ msgstr ""
 "\n"
 "<b>此憑證的發行者為：</b>\n"
 
-#: ../libbalsa/libbalsa.c:568
+#: ../libbalsa/libbalsa.c:569
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -507,19 +529,19 @@ msgstr ""
 "發給 %s\n"
 "<b>指紋檔(Fingerprint):</b> %s"
 
-#: ../libbalsa/libbalsa.c:577
+#: ../libbalsa/libbalsa.c:578
 msgid "SSL/TLS certificate"
 msgstr "SSL/TLS 憑證"
 
-#: ../libbalsa/libbalsa.c:579
+#: ../libbalsa/libbalsa.c:580
 msgid "_Accept Once"
 msgstr "只接受一次(_A)"
 
-#: ../libbalsa/libbalsa.c:580
+#: ../libbalsa/libbalsa.c:581
 msgid "Accept&_Save"
 msgstr "接受及儲存(_S)"
 
-#: ../libbalsa/libbalsa.c:581
+#: ../libbalsa/libbalsa.c:582
 msgid "_Reject"
 msgstr "拒絕(_R)"
 
@@ -555,13 +577,16 @@ msgstr "IMAP 連線已分離。重新連線中..."
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr "IMAP 伺服器已關閉此連線： %s 重新連線巾..."
 
-#: ../libbalsa/mailbox_imap.c:1006 ../libbalsa/mailbox_maildir.c:493
-#: ../libbalsa/mailbox_mbox.c:516 ../libbalsa/mailbox_mh.c:515
+#: ../libbalsa/mailbox_imap.c:1006
+#: ../libbalsa/mailbox_maildir.c:493
+#: ../libbalsa/mailbox_mbox.c:516
+#: ../libbalsa/mailbox_mh.c:518
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s： 開啟郵件箱 %s 參考編號：%d\n"
 
-#: ../libbalsa/mailbox_imap.c:1080 ../libbalsa/mailbox_imap.c:2219
+#: ../libbalsa/mailbox_imap.c:1080
+#: ../libbalsa/mailbox_imap.c:2219
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "下載 %ld kB"
@@ -580,16 +605,17 @@ msgstr ""
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "找不到郵件箱“%s”的路徑，使用“%s”"
 
-#: ../libbalsa/mailbox_imap.c:1609 ../libbalsa/mailbox_imap.c:1650
+#: ../libbalsa/mailbox_imap.c:1609
+#: ../libbalsa/mailbox_imap.c:1650
 msgid "Cannot get IMAP handle"
 msgstr "不能取得 IMAP 處理權"
 
-#: ../libbalsa/mailbox_imap.c:2479
+#: ../libbalsa/mailbox_imap.c:2485
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "上傳 %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:2666
+#: ../libbalsa/mailbox_imap.c:2672
 msgid "Server-side threading not supported."
 msgstr "不支援伺服器端的執行緒。"
 
@@ -613,13 +639,15 @@ msgstr "%s 並不是 Maildir 格式的郵件箱。"
 msgid "Could not create a MailDir directory at %s (%s)"
 msgstr "無法在 %s 下建立 MailDir 目錄 (%s)"
 
-#: ../libbalsa/mailbox_maildir.c:221 ../libbalsa/mailbox_maildir.c:229
+#: ../libbalsa/mailbox_maildir.c:221
+#: ../libbalsa/mailbox_maildir.c:229
 #: ../libbalsa/mailbox_maildir.c:239
 #, c-format
 msgid "Could not create a MailDir at %s (%s)"
 msgstr "無法在 %s 下建立 MailDir (%s)"
 
-#: ../libbalsa/mailbox_maildir.c:340 ../libbalsa/mailbox_mh.c:277
+#: ../libbalsa/mailbox_maildir.c:340
+#: ../libbalsa/mailbox_mh.c:277
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -628,7 +656,8 @@ msgstr ""
 "無法移除 %s 的內容：\n"
 "%s"
 
-#: ../libbalsa/mailbox_maildir.c:346 ../libbalsa/mailbox_mbox.c:300
+#: ../libbalsa/mailbox_maildir.c:346
+#: ../libbalsa/mailbox_mbox.c:300
 #: ../libbalsa/mailbox_mh.c:283
 #, c-format
 msgid ""
@@ -638,8 +667,9 @@ msgstr ""
 "無法移除 %s：\n"
 "%s"
 
-#: ../libbalsa/mailbox_maildir.c:472 ../libbalsa/mailbox_mbox.c:467
-#: ../libbalsa/mailbox_mh.c:496
+#: ../libbalsa/mailbox_maildir.c:472
+#: ../libbalsa/mailbox_mbox.c:467
+#: ../libbalsa/mailbox_mh.c:499
 msgid "Mailbox does not exist."
 msgstr "郵件箱不存在。"
 
@@ -647,8 +677,9 @@ msgstr "郵件箱不存在。"
 msgid "Cannot read message"
 msgstr "無法讀取郵件"
 
-#: ../libbalsa/mailbox_maildir.c:923 ../libbalsa/mailbox_mbox.c:1606
-#: ../libbalsa/mailbox_mh.c:1109
+#: ../libbalsa/mailbox_maildir.c:923
+#: ../libbalsa/mailbox_mbox.c:1606
+#: ../libbalsa/mailbox_mh.c:1114
 msgid "Data copy error"
 msgstr "資料複製錯誤"
 
@@ -704,11 +735,11 @@ msgstr "無法在 %s 下建立 MH 目錄 (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "無法在 %s 下建立 MH 結構 (%s)"
 
-#: ../libbalsa/mailbox_mh.c:1085
+#: ../libbalsa/mailbox_mh.c:1090
 msgid "Cannot create message"
 msgstr "無法建立郵件"
 
-#: ../libbalsa/mailbox_mh.c:1135
+#: ../libbalsa/mailbox_mh.c:1140
 msgid "Message rename error"
 msgstr "郵件更名錯誤"
 
@@ -742,7 +773,8 @@ msgstr "儲存 POP 郵件至 %s 失敗。"
 msgid "Transfering POP message to %s failed."
 msgstr "傳送 POP 郵件至 %s 失敗。"
 
-#: ../libbalsa/mailbox_pop3.c:508 ../libbalsa/mailbox_pop3.c:519
+#: ../libbalsa/mailbox_pop3.c:508
+#: ../libbalsa/mailbox_pop3.c:519
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
@@ -781,7 +813,8 @@ msgstr "POP3 錯誤：無法關閉 %s 。"
 msgid "POP3 error: %s."
 msgstr "POP3 錯誤：%s"
 
-#: ../libbalsa/message.c:524 ../libbalsa/message.c:564
+#: ../libbalsa/message.c:529
+#: ../libbalsa/message.c:569
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr "來源郵件箱 (%s) 是唯讀的：無法變更標記。"
@@ -790,7 +823,8 @@ msgstr "來源郵件箱 (%s) 是唯讀的：無法變更標記。"
 msgid "west european"
 msgstr "西歐"
 
-#: ../libbalsa/misc.c:1239 ../libbalsa/misc.c:1273
+#: ../libbalsa/misc.c:1239
+#: ../libbalsa/misc.c:1273
 msgid "east european"
 msgstr "東歐"
 
@@ -802,19 +836,23 @@ msgstr "南歐"
 msgid "north european"
 msgstr "北歐"
 
-#: ../libbalsa/misc.c:1245 ../libbalsa/misc.c:1275
+#: ../libbalsa/misc.c:1245
+#: ../libbalsa/misc.c:1275
 msgid "cyrillic"
 msgstr "西里爾語"
 
-#: ../libbalsa/misc.c:1247 ../libbalsa/misc.c:1281
+#: ../libbalsa/misc.c:1247
+#: ../libbalsa/misc.c:1281
 msgid "arabic"
 msgstr "阿拉伯文"
 
-#: ../libbalsa/misc.c:1249 ../libbalsa/misc.c:1277
+#: ../libbalsa/misc.c:1249
+#: ../libbalsa/misc.c:1277
 msgid "greek"
 msgstr "希臘文"
 
-#: ../libbalsa/misc.c:1251 ../libbalsa/misc.c:1279
+#: ../libbalsa/misc.c:1251
+#: ../libbalsa/misc.c:1279
 msgid "hebrew"
 msgstr "希伯來文"
 
@@ -830,7 +868,8 @@ msgstr "北歐"
 msgid "thai"
 msgstr "泰文"
 
-#: ../libbalsa/misc.c:1259 ../libbalsa/misc.c:1283
+#: ../libbalsa/misc.c:1259
+#: ../libbalsa/misc.c:1283
 msgid "baltic"
 msgstr "波羅的海語系"
 
@@ -888,9 +927,7 @@ msgstr "加密引擎 %s 並未正確安裝。"
 
 #: ../libbalsa/rfc3156.c:99
 #, c-format
-msgid ""
-"Crypto engine %s version %s is installed, but at least version %s is "
-"required."
+msgid "Crypto engine %s version %s is installed, but at least version %s is required."
 msgstr "加密引擎 %s 版本 %s 已安裝，但至少需要版本 %s 。"
 
 #: ../libbalsa/rfc3156.c:106
@@ -912,44 +949,59 @@ msgstr ""
 "\n"
 "停用對 %s 協定的支援。"
 
-#: ../libbalsa/rfc3156.c:257 ../libbalsa/rfc3156.c:262
-#: ../libbalsa/rfc3156.c:349 ../libbalsa/rfc3156.c:354
-#: ../libbalsa/rfc3156.c:517 ../libbalsa/rfc3156.c:522
-#: ../libbalsa/rfc3156.c:630 ../libbalsa/rfc3156.c:635
-#: ../libbalsa/rfc3156.c:746 ../libbalsa/rfc3156.c:751
-#: ../libbalsa/rfc3156.c:859 ../libbalsa/rfc3156.c:864
-#: ../libbalsa/rfc3156.c:939 ../libbalsa/rfc3156.c:944
+#: ../libbalsa/rfc3156.c:257
+#: ../libbalsa/rfc3156.c:262
+#: ../libbalsa/rfc3156.c:349
+#: ../libbalsa/rfc3156.c:354
+#: ../libbalsa/rfc3156.c:517
+#: ../libbalsa/rfc3156.c:522
+#: ../libbalsa/rfc3156.c:630
+#: ../libbalsa/rfc3156.c:635
+#: ../libbalsa/rfc3156.c:746
+#: ../libbalsa/rfc3156.c:751
+#: ../libbalsa/rfc3156.c:859
+#: ../libbalsa/rfc3156.c:864
+#: ../libbalsa/rfc3156.c:939
+#: ../libbalsa/rfc3156.c:944
 msgid "creating a gpgme context failed"
 msgstr "建立 gpgme 上下文失敗"
 
-#: ../libbalsa/rfc3156.c:275 ../libbalsa/rfc3156.c:764
+#: ../libbalsa/rfc3156.c:275
+#: ../libbalsa/rfc3156.c:764
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr "請輸入密語解除私密金鑰的鎖定以利簽署"
 
-#: ../libbalsa/rfc3156.c:296 ../libbalsa/rfc3156.c:300
+#: ../libbalsa/rfc3156.c:296
+#: ../libbalsa/rfc3156.c:300
 #: ../libbalsa/rfc3156.c:796
 msgid "signing failed"
 msgstr "簽署失敗"
 
-#: ../libbalsa/rfc3156.c:403 ../libbalsa/rfc3156.c:408
+#: ../libbalsa/rfc3156.c:403
+#: ../libbalsa/rfc3156.c:408
 #: ../libbalsa/rfc3156.c:799
 msgid "encryption failed"
 msgstr "加密失敗"
 
-#: ../libbalsa/rfc3156.c:552 ../libbalsa/rfc3156.c:557
-#: ../libbalsa/rfc3156.c:875 ../libbalsa/rfc3156.c:881
+#: ../libbalsa/rfc3156.c:552
+#: ../libbalsa/rfc3156.c:557
+#: ../libbalsa/rfc3156.c:875
+#: ../libbalsa/rfc3156.c:881
 msgid "signature verification failed"
 msgstr "認證簽署失敗"
 
-#: ../libbalsa/rfc3156.c:647 ../libbalsa/rfc3156.c:955
+#: ../libbalsa/rfc3156.c:647
+#: ../libbalsa/rfc3156.c:955
 msgid "Enter passphrase to decrypt message"
 msgstr "請輸入將郵件解密所需的密語"
 
-#: ../libbalsa/rfc3156.c:682 ../libbalsa/rfc3156.c:687
+#: ../libbalsa/rfc3156.c:682
+#: ../libbalsa/rfc3156.c:687
 msgid "decryption failed"
 msgstr "解密失敗"
 
-#: ../libbalsa/rfc3156.c:792 ../libbalsa/rfc3156.c:806
+#: ../libbalsa/rfc3156.c:792
+#: ../libbalsa/rfc3156.c:806
 msgid "signing and encryption failed"
 msgstr "簽署及加密程序失敗"
 
@@ -963,7 +1015,8 @@ msgstr "簽署失敗：%s"
 msgid "encryption failed: %s"
 msgstr "加密失敗：%s"
 
-#: ../libbalsa/rfc3156.c:964 ../libbalsa/rfc3156.c:971
+#: ../libbalsa/rfc3156.c:964
+#: ../libbalsa/rfc3156.c:971
 msgid "decryption and signature verification failed"
 msgstr "解碼與簽署驗證失敗"
 
@@ -976,14 +1029,11 @@ msgid "The signature is valid but expired."
 msgstr "這個簽署是有效的，但已逾期。"
 
 #: ../libbalsa/rfc3156.c:1007
-msgid ""
-"The signature is valid but the key used to verify the signature has expired."
+msgid "The signature is valid but the key used to verify the signature has expired."
 msgstr "這個簽署是有效的，但是用來驗證簽署的金鑰已經過期。"
 
 #: ../libbalsa/rfc3156.c:1010
-msgid ""
-"The signature is valid but the key used to verify the signature has been "
-"revoked."
+msgid "The signature is valid but the key used to verify the signature has been revoked."
 msgstr "這個簽署是有效的，但是用來驗證簽署的金鑰已經被註銷。"
 
 #: ../libbalsa/rfc3156.c:1013
@@ -1002,7 +1052,8 @@ msgstr "此部分並非真實的 PGP 簽署。"
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "無法驗證此簽署，因為加密引擎不正確。"
 
-#: ../libbalsa/rfc3156.c:1024 ../libbalsa/rfc3156.c:1763
+#: ../libbalsa/rfc3156.c:1024
+#: ../libbalsa/rfc3156.c:1764
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "GnuPG 正在重建信任資料庫，因此目前無法使用。"
 
@@ -1034,7 +1085,8 @@ msgstr "此使用者 ID 完全有效。"
 msgid "The user ID is ultimately valid."
 msgstr "此使用者 ID 無限制地有效。"
 
-#: ../libbalsa/rfc3156.c:1047 ../libbalsa/rfc3156.c:1292
+#: ../libbalsa/rfc3156.c:1047
+#: ../libbalsa/rfc3156.c:1292
 msgid "bad validity"
 msgstr "不正確的效力"
 
@@ -1284,15 +1336,17 @@ msgstr "使用者 ID 為“%s”的金鑰效力為“%s”。"
 msgid "Use this key anyway?"
 msgstr "無論如何都要使用此金鑰？"
 
-#: ../libbalsa/rfc3156.c:1764
+#: ../libbalsa/rfc3156.c:1765
 msgid "Try again later."
 msgstr "請稍後再試一次。"
 
-#: ../libbalsa/send.c:244 ../libbalsa/send.c:251
+#: ../libbalsa/send.c:244
+#: ../libbalsa/send.c:251
 msgid "Sending Mail..."
 msgstr "正在傳送郵件..."
 
-#: ../libbalsa/send.c:247 ../src/main-window.c:2685
+#: ../libbalsa/send.c:247
+#: ../src/main-window.c:2685
 msgid "_Hide"
 msgstr "隱藏(_H)"
 
@@ -1335,22 +1389,30 @@ msgstr ""
 msgid "Connected to MTA"
 msgstr "已連接郵件傳送程式"
 
-#: ../libbalsa/send.c:950 ../src/balsa-mime-widget-message.c:604
-#: ../src/print.c:361 ../src/sendmsg-window.c:3166 ../src/store-address.c:305
+#: ../libbalsa/send.c:950
+#: ../src/balsa-mime-widget-message.c:604
+#: ../src/print.c:361
+#: ../src/sendmsg-window.c:3164
+#: ../src/store-address.c:305
 msgid "From:"
 msgstr "寄件者："
 
-#: ../libbalsa/send.c:953 ../src/balsa-index.c:357
+#: ../libbalsa/send.c:953
+#: ../src/balsa-index.c:357
 msgid "From"
 msgstr "寄件者"
 
-#: ../libbalsa/send.c:962 ../src/balsa-mime-widget-message.c:614
-#: ../src/print.c:365 ../src/sendmsg-window.c:997 ../src/sendmsg-window.c:3174
+#: ../libbalsa/send.c:962
+#: ../src/balsa-mime-widget-message.c:614
+#: ../src/print.c:365
+#: ../src/sendmsg-window.c:997
+#: ../src/sendmsg-window.c:3172
 #: ../src/store-address.c:306
 msgid "To:"
 msgstr "收件者："
 
-#: ../libbalsa/send.c:965 ../src/balsa-index.c:1032
+#: ../libbalsa/send.c:965
+#: ../src/balsa-index.c:1032
 msgid "To"
 msgstr "到"
 
@@ -1358,7 +1420,7 @@ msgstr "到"
 msgid "Disconnected"
 msgstr "已斷線"
 
-#: ../libbalsa/send.c:1277
+#: ../libbalsa/send.c:1279
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -1366,7 +1428,7 @@ msgstr ""
 "SMTP 伺服器拒絕連線。\n"
 "請檢查您的網路連線。"
 
-#: ../libbalsa/send.c:1282
+#: ../libbalsa/send.c:1284
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -1374,11 +1436,11 @@ msgstr ""
 "無法連接到 SMTP 伺服器。\n"
 "請檢查您的網路連線。"
 
-#: ../libbalsa/send.c:1291
+#: ../libbalsa/send.c:1293
 msgid "Message left in Outbox (try again later)"
 msgstr "郵件尚留在寄件匣中(稍後再試一次)"
 
-#: ../libbalsa/send.c:1295
+#: ../libbalsa/send.c:1297
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1387,12 +1449,13 @@ msgstr ""
 "SMTP 伺服器問題 (%d):%s\n"
 "郵件仍保留在寄件匣。"
 
-#: ../libbalsa/send.c:1572
+#: ../libbalsa/send.c:1574
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr "不能判斷純文字檔“%s”的字元編碼；傳送為 MIME 類型“%s”"
 
-#: ../libbalsa/send.c:1909 ../libbalsa/send.c:1991
+#: ../libbalsa/send.c:1911
+#: ../libbalsa/send.c:1993
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "此郵件對密件副本(BCC:)收件者將不予加密。"
 
@@ -1402,22 +1465,27 @@ msgstr "此郵件對密件副本(BCC:)收件者將不予加密。"
 msgid "Logging in to %s using %s"
 msgstr "使用 %2$s 登入 %1$s"
 
-#: ../libbalsa/smtp-server.c:348 ../src/mailbox-conf.c:198
-#: ../src/mailbox-conf.c:1360 ../src/pref-manager.c:356
+#: ../libbalsa/smtp-server.c:348
+#: ../src/mailbox-conf.c:198
+#: ../src/mailbox-conf.c:1360
+#: ../src/pref-manager.c:356
 #: ../src/pref-manager.c:3048
 msgid "Never"
 msgstr "永不"
 
-#: ../libbalsa/smtp-server.c:349 ../src/mailbox-conf.c:199
+#: ../libbalsa/smtp-server.c:349
+#: ../src/mailbox-conf.c:199
 #: ../src/mailbox-conf.c:1361
 msgid "If Possible"
 msgstr "需要時"
 
-#: ../libbalsa/smtp-server.c:350 ../src/mailbox-conf.c:200
+#: ../libbalsa/smtp-server.c:350
+#: ../src/mailbox-conf.c:200
 msgid "Required"
 msgstr "必須"
 
-#: ../libbalsa/smtp-server.c:387 ../src/folder-conf.c:104
+#: ../libbalsa/smtp-server.c:387
+#: ../src/folder-conf.c:104
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "顯示 %s 時發生錯誤：%s\n"
@@ -1442,7 +1510,8 @@ msgstr "使用者名稱(_U)"
 msgid "_Pass Phrase"
 msgstr "密語(_P)"
 
-#: ../libbalsa/smtp-server.c:537 ../src/mailbox-conf.c:212
+#: ../libbalsa/smtp-server.c:537
+#: ../src/mailbox-conf.c:212
 msgid "Use _TLS"
 msgstr "使用 _TLS"
 
@@ -1451,8 +1520,10 @@ msgid "C_ertificate Pass Phrase"
 msgstr "憑證的密語(_E)"
 
 #. Items
-#: ../libbalsa/source-viewer.c:48 ../src/mailbox-node.c:989
-#: ../src/main-window.c:752 ../src/main-window.c:857
+#: ../libbalsa/source-viewer.c:48
+#: ../src/mailbox-node.c:989
+#: ../src/main-window.c:752
+#: ../src/main-window.c:857
 msgid "_Close"
 msgstr "關閉(_C)"
 
@@ -1468,11 +1539,13 @@ msgstr "複製(_C)"
 msgid "Copy text"
 msgstr "複製文字"
 
-#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:661
+#: ../libbalsa/source-viewer.c:52
+#: ../src/main-window.c:661
 msgid "_Select Text"
 msgstr "選擇文字(_S)"
 
-#: ../libbalsa/source-viewer.c:53 ../src/main-window.c:662
+#: ../libbalsa/source-viewer.c:53
+#: ../src/main-window.c:662
 msgid "Select entire mail"
 msgstr "選取郵件的全部內容"
 
@@ -1530,9 +1603,7 @@ msgstr "垃圾桶(_T):"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:71
 #, c-format
-msgid ""
-"The pathname \"%s\" must be specified canonically -- it must start with a "
-"'/'."
+msgid "The pathname \"%s\" must be specified canonically -- it must start with a '/'."
 msgstr "“%s”必須是完整的目錄路徑 (以‘/’為起首字元)。"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:135
@@ -1579,27 +1650,18 @@ msgid "GnomeCard Address Book"
 msgstr "GnomeCard 通訊錄"
 
 #: ../libinit_balsa/balsa-druid-page-finish.c:84
-#: ../libinit_balsa/balsa-druid-page-finish.c:92 ../src/ab-window.c:226
+#: ../libinit_balsa/balsa-druid-page-finish.c:92
+#: ../src/ab-window.c:226
 msgid "Address Book"
 msgstr "通訊錄"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:71
-msgid ""
-"The following settings are also needed (and you can find them later, if need "
-"be, in the Email application in the 'Preferences' and 'Identities' commands "
-"on the 'Tools' menu)"
-msgstr ""
-"下列設定值也是需要的(而您可以在稍後找到它們，如果有需要，可使用電子郵件程式"
-"的“工具”選單中的“偏好設定”與“身分”命令)"
+msgid "The following settings are also needed (and you can find them later, if need be, in the Email application in the 'Preferences' and 'Identities' commands on the 'Tools' menu)"
+msgstr "下列設定值也是需要的(而您可以在稍後找到它們，如果有需要，可使用電子郵件程式的“工具”選單中的“偏好設定”與“身分”命令)"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:76
-msgid ""
-" Whoever provides your email account should be able to give you the "
-"following information (if you have a Network Administrator, they may already "
-"have set this up for you):"
-msgstr ""
-" 提供您電子郵件帳號的人應該能夠給您下列資訊(如果您有網路管理員，他們可能已經"
-"為您做好下列設定):"
+msgid " Whoever provides your email account should be able to give you the following information (if you have a Network Administrator, they may already have set this up for you):"
+msgstr " 提供您電子郵件帳號的人應該能夠給您下列資訊(如果您有網路管理員，他們可能已經為您做好下列設定):"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
 msgid "Yes, remember it"
@@ -1675,17 +1737,13 @@ msgstr "歡迎使用 Balsa！"
 msgid ""
 "Before you can send or receive email:\n"
 "\n"
-"-- either you should already have Internet access and an email account, "
-"provided by an Internet Service Provider, and you should have made that "
-"Internet connection on your computer\n"
+"-- either you should already have Internet access and an email account, provided by an Internet Service Provider, and you should have made that Internet connection on your computer\n"
 "\n"
-"-- or your Network Administrator at your place of work/study/similar may "
-"have set up your computer to connect to the network."
+"-- or your Network Administrator at your place of work/study/similar may have set up your computer to connect to the network."
 msgstr ""
 "在您可以傳送或接收電子郵件之前：\n"
 "\n"
-"-- 您應該已經擁有一組由網路提供者所給的電子郵件帳號，同時您也應該將電腦連上網"
-"際網路\n"
+"-- 您應該已經擁有一組由網路提供者所給的電子郵件帳號，同時您也應該將電腦連上網際網路\n"
 "\n"
 "-- 或者在您工作/學習/類似場所的網路管理員也應該將您的電腦連接到網路上。"
 
@@ -1705,12 +1763,14 @@ msgstr "載入 %s 時發生錯誤：%s\n"
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr "%s 必須是完整的目錄路徑 (以 / 為起首字元)。"
 
-#: ../libinit_balsa/helper.c:215 ../libinit_balsa/helper.c:239
+#: ../libinit_balsa/helper.c:215
+#: ../libinit_balsa/helper.c:239
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr "無法新增目錄“%s”。調用 mkdir() 時發生錯誤。"
 
-#: ../libinit_balsa/helper.c:225 ../libinit_balsa/helper.c:248
+#: ../libinit_balsa/helper.c:225
+#: ../libinit_balsa/helper.c:248
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "路徑“%s”並不是目錄。"
@@ -1731,34 +1791,43 @@ msgstr "新郵件通知"
 msgid "Program startup"
 msgstr "程式啟動"
 
-#: ../src/ab-main.c:199 ../src/ab-window.c:696
+#: ../src/ab-main.c:199
+#: ../src/ab-window.c:696
 msgid " address book: "
 msgstr "通訊錄:"
 
-#: ../src/ab-main.c:470 ../src/address-book-config.c:890
+#: ../src/ab-main.c:470
+#: ../src/address-book-config.c:890
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard 通訊錄 (GnomeCard)"
 
-#: ../src/ab-main.c:472 ../src/address-book-config.c:896
+#: ../src/ab-main.c:472
+#: ../src/address-book-config.c:896
 msgid "External query (a program)"
 msgstr "外部查詢(一種程式)"
 
-#: ../src/ab-main.c:474 ../src/address-book-config.c:901
+#: ../src/ab-main.c:474
+#: ../src/address-book-config.c:901
 msgid "LDIF Address Book"
 msgstr "LDIF 通訊錄"
 
-#: ../src/ab-main.c:477 ../src/address-book-config.c:907
+#: ../src/ab-main.c:477
+#: ../src/address-book-config.c:907
 msgid "LDAP Address Book"
 msgstr "LDAP 通訊錄"
 
-#: ../src/ab-main.c:481 ../src/address-book-config.c:515
+#: ../src/ab-main.c:481
+#: ../src/address-book-config.c:515
 #: ../src/address-book-config.c:914
 msgid "GPE Address Book"
 msgstr "GPE 通訊錄"
 
-#: ../src/ab-main.c:639 ../src/ab-window.c:168 ../src/filter-edit-dialog.c:200
-#: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:221
-#: ../src/filter-run-dialog.c:292
+#: ../src/ab-main.c:639
+#: ../src/ab-window.c:168
+#: ../src/filter-edit-dialog.c:200
+#: ../src/filter-export-dialog.c:90
+#: ../src/filter-run-dialog.c:221
+#: ../src/filter-run-dialog.c:295
 msgid "Name"
 msgstr "名稱"
 
@@ -1809,24 +1878,30 @@ msgstr ""
 "開啟‘%s’通訊錄時發生錯誤：\n"
 "%s"
 
-#: ../src/address-book-config.c:234 ../src/address-book-config.c:327
+#: ../src/address-book-config.c:234
+#: ../src/address-book-config.c:327
 msgid "Modify Address Book"
 msgstr "修改通訊錄"
 
-#: ../src/address-book-config.c:238 ../src/address-book-config.c:331
+#: ../src/address-book-config.c:238
+#: ../src/address-book-config.c:331
 msgid "Add Address Book"
 msgstr "加入通訊錄"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: ../src/address-book-config.c:253 ../src/address-book-config.c:362
-#: ../src/address-book-config.c:452 ../src/address-book-config.c:513
+#: ../src/address-book-config.c:253
+#: ../src/address-book-config.c:362
+#: ../src/address-book-config.c:452
+#: ../src/address-book-config.c:513
 msgid "A_ddress Book Name"
 msgstr "通訊錄名稱(_D)"
 
-#: ../src/address-book-config.c:257 ../src/address-book-config.c:406
-#: ../src/address-book-config.c:483 ../src/address-book-config.c:518
+#: ../src/address-book-config.c:257
+#: ../src/address-book-config.c:406
+#: ../src/address-book-config.c:483
+#: ../src/address-book-config.c:518
 msgid "_Expand aliases as you type"
 msgstr "自動補齊電郵地址(_E)"
 
@@ -1834,7 +1909,8 @@ msgstr "自動補齊電郵地址(_E)"
 msgid "Load program location"
 msgstr "讀取程式位置"
 
-#: ../src/address-book-config.c:374 ../src/address-book-config.c:379
+#: ../src/address-book-config.c:374
+#: ../src/address-book-config.c:379
 msgid "Select load program for address book"
 msgstr "選擇通訊錄讀取程式"
 
@@ -1842,7 +1918,8 @@ msgstr "選擇通訊錄讀取程式"
 msgid "Save program location"
 msgstr "儲存程式位置"
 
-#: ../src/address-book-config.c:393 ../src/address-book-config.c:398
+#: ../src/address-book-config.c:393
+#: ../src/address-book-config.c:398
 msgid "Select save program for address book"
 msgstr "選擇通訊錄儲存程式"
 
@@ -1866,7 +1943,8 @@ msgstr "密碼(_P)"
 msgid "Enable _TLS"
 msgstr "啟用 _TLS"
 
-#: ../src/address-book-config.c:536 ../src/main-window.c:3949
+#: ../src/address-book-config.c:536
+#: ../src/main-window.c:3949
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "顯示說明時發生錯誤：%s\n"
@@ -1917,25 +1995,29 @@ msgstr "%s@%s 的郵件箱密碼(_P):"
 msgid "Password needed"
 msgstr "需要密碼"
 
-#: ../src/balsa-app.c:98 ../src/folder-conf.c:357
+#: ../src/balsa-app.c:98
+#: ../src/folder-conf.c:357
 msgid "_Remember password"
 msgstr "記住密碼(_R)"
 
-#: ../src/balsa-app.c:536
+#: ../src/balsa-app.c:538
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "無法開啟“%s”郵件箱"
 
-#: ../src/balsa-index.c:370 ../src/pref-manager.c:368
+#: ../src/balsa-index.c:370
+#: ../src/pref-manager.c:368
 msgid "Subject"
 msgstr "主旨"
 
-#: ../src/balsa-index.c:384 ../src/pref-manager.c:369
+#: ../src/balsa-index.c:384
+#: ../src/pref-manager.c:369
 msgid "Date"
 msgstr "日期"
 
-#: ../src/balsa-index.c:396 ../src/pref-manager.c:370
-#: ../src/sendmsg-window.c:2825
+#: ../src/balsa-index.c:396
+#: ../src/pref-manager.c:370
+#: ../src/sendmsg-window.c:2823
 msgid "Size"
 msgstr "大小"
 
@@ -1950,8 +2032,10 @@ msgid "Move to Trash failed: %s"
 msgstr "丟進垃圾桶失敗： %s"
 
 #. R
-#: ../src/balsa-index.c:1781 ../src/main-window.c:584
-#: ../src/main-window.c:1047 ../src/message-window.c:148
+#: ../src/balsa-index.c:1781
+#: ../src/main-window.c:584
+#: ../src/main-window.c:1047
+#: ../src/message-window.c:148
 msgid "_Reply..."
 msgstr "回覆(_R)..."
 
@@ -1971,18 +2055,23 @@ msgstr "附件形式轉寄(_F)..."
 msgid "Forward _Inline..."
 msgstr "回函形式轉寄(_I)..."
 
-#: ../src/balsa-index.c:1791 ../src/main-window.c:623
+#: ../src/balsa-index.c:1791
+#: ../src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "使用管線連結(_P)..."
 
-#: ../src/balsa-index.c:1793 ../src/main-window.c:682
+#: ../src/balsa-index.c:1793
+#: ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "記錄郵址(_S)..."
 
-#: ../src/balsa-index.c:1808 ../src/filter-edit-dialog.c:223
-#: ../src/mailbox-node.c:981 ../src/mailbox-node.c:997
-#: ../src/pref-manager.c:1457 ../src/pref-manager.c:1546
+#: ../src/balsa-index.c:1808
+#: ../src/filter-edit-dialog.c:223
+#: ../src/mailbox-node.c:981
+#: ../src/mailbox-node.c:997
+#: ../src/pref-manager.c:1457
+#: ../src/pref-manager.c:1546
 #: ../src/pref-manager.c:2591
 msgid "_Delete"
 msgstr "刪除(_D)"
@@ -1999,7 +2088,9 @@ msgstr "丟進垃圾桶(_T)"
 msgid "T_oggle"
 msgstr "切換(_O)"
 
-#: ../src/balsa-index.c:1826 ../src/main-window.c:331 ../src/main-window.c:360
+#: ../src/balsa-index.c:1826
+#: ../src/main-window.c:331
+#: ../src/main-window.c:360
 msgid "_Flagged"
 msgstr "已有標記(_F)"
 
@@ -2056,7 +2147,8 @@ msgstr "指定要執行的程式:"
 msgid "Mailbox"
 msgstr "郵件箱"
 
-#: ../src/balsa-mblist.c:992 ../src/balsa-mblist.c:1030
+#: ../src/balsa-mblist.c:992
+#: ../src/balsa-mblist.c:1030
 msgid "Failed to find mailbox"
 msgstr "找不到郵件箱"
 
@@ -2068,7 +2160,8 @@ msgstr "其它(_O)..."
 msgid "Choose destination folder"
 msgstr "選取目的地資料夾"
 
-#: ../src/balsa-mblist.c:1881 ../src/balsa-mblist.c:1884
+#: ../src/balsa-mblist.c:1881
+#: ../src/balsa-mblist.c:1884
 msgid "Other..."
 msgstr "其它..."
 
@@ -2169,7 +2262,8 @@ msgstr "部分 %s：%s"
 msgid "encrypted: "
 msgstr "已加密:"
 
-#: ../src/balsa-message.c:1254 ../src/balsa-mime-widget-text.c:338
+#: ../src/balsa-message.c:1254
+#: ../src/balsa-mime-widget-text.c:338
 #: ../src/balsa-mime-widget-text.c:643
 msgid "Save..."
 msgstr "儲存..."
@@ -2183,7 +2277,8 @@ msgstr "選擇用來儲存選定部分的資料夾"
 msgid "%s message part"
 msgstr "%s 郵件部分"
 
-#: ../src/balsa-message.c:1393 ../src/balsa-mime-widget-callbacks.c:196
+#: ../src/balsa-message.c:1393
+#: ../src/balsa-mime-widget-callbacks.c:196
 #, c-format
 msgid "Could not save %s: %s"
 msgstr " 無法儲存 %s：%s"
@@ -2205,8 +2300,7 @@ msgstr "回傳讀取回條(MDN)？"
 
 #: ../src/balsa-message.c:2296
 msgid ""
-"The decryption cannot be performed because this message is displayed more "
-"than once.\n"
+"The decryption cannot be performed because this message is displayed more than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
 "由於同時開啟多個視窗顯示此郵件，使得解密無法進行。\n"
@@ -2214,55 +2308,41 @@ msgstr ""
 
 #: ../src/balsa-message.c:2323
 #, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains an encrypted part, but "
-"it's structure is invalid."
+msgid "The message sent by %s with subject \"%s\" contains an encrypted part, but it's structure is invalid."
 msgstr "此封由 %s 傳送主旨為“%s”的郵件包含了加密的部分，但其結構是不合規定的。"
 
 #: ../src/balsa-message.c:2331
 #, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
-"but this crypto protocol is not available."
-msgstr ""
-"此封由 %s 傳送主旨為“%s”的郵件包含了 PGP 加密的部分，但此加密協定尚無法使用。"
+msgid "The message sent by %s with subject \"%s\" contains a PGP encrypted part, but this crypto protocol is not available."
+msgstr "此封由 %s 傳送主旨為“%s”的郵件包含了 PGP 加密的部分，但此加密協定尚無法使用。"
 
 #: ../src/balsa-message.c:2344
 #, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
-"but this crypto protocol is not available."
-msgstr ""
-"此封由 %s 傳送主旨為“%s”的郵件包含了 S/MIME 加密的部分，但此加密協定尚無法使"
-"用。"
+msgid "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, but this crypto protocol is not available."
+msgstr "此封由 %s 傳送主旨為“%s”的郵件包含了 S/MIME 加密的部分，但此加密協定尚無法使用。"
 
 #: ../src/balsa-message.c:2402
 #, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a signed part, but its "
-"structure is invalid. The signature, if there is any, cannot be checked."
-msgstr ""
-"此封由 %s 傳送主旨為“%s”的郵件包含了簽署的部分，但其結構是不合規定的。任何這"
-"類簽署是無法檢驗的。"
+msgid "The message sent by %s with subject \"%s\" contains a signed part, but its structure is invalid. The signature, if there is any, cannot be checked."
+msgstr "此封由 %s 傳送主旨為“%s”的郵件包含了簽署的部分，但其結構是不合規定的。任何這類簽署是無法檢驗的。"
 
 #: ../src/balsa-message.c:2415
 #, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains a %s signed part, but "
-"this crypto protocol is not available."
-msgstr ""
-"此封由 %s 傳送主旨為“%s”的郵件包含了 %s 簽署的部分，但此加密協定尚無法使用。"
+msgid "The message sent by %s with subject \"%s\" contains a %s signed part, but this crypto protocol is not available."
+msgstr "此封由 %s 傳送主旨為“%s”的郵件包含了 %s 簽署的部分，但此加密協定尚無法使用。"
 
 #: ../src/balsa-message.c:2418
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2418 ../src/balsa-mime-widget-crypto.c:72
+#: ../src/balsa-message.c:2418
+#: ../src/balsa-mime-widget-crypto.c:72
 #: ../src/print.c:1296
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: ../src/balsa-message.c:2437 ../src/balsa-message.c:2552
+#: ../src/balsa-message.c:2437
+#: ../src/balsa-message.c:2552
 msgid "Detected a good signature"
 msgstr "偵測到良好的簽署"
 
@@ -2270,15 +2350,16 @@ msgstr "偵測到良好的簽署"
 msgid "Detected a good signature with insufficient validity"
 msgstr "偵測到良好的簽署但其效力不足"
 
-#: ../src/balsa-message.c:2448 ../src/balsa-message.c:2556
+#: ../src/balsa-message.c:2448
+#: ../src/balsa-message.c:2556
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "偵測到良好的簽署但其效力/信任不足"
 
-#: ../src/balsa-message.c:2455 ../src/balsa-message.c:2562
+#: ../src/balsa-message.c:2455
+#: ../src/balsa-message.c:2562
 #, c-format
 msgid ""
-"Checking the signature of the message sent by %s with subject \"%s\" "
-"returned:\n"
+"Checking the signature of the message sent by %s with subject \"%s\" returned:\n"
 "%s"
 msgstr ""
 "檢查由 %s 傳送主旨為“%s”的郵件簽署傳回：\n"
@@ -2286,23 +2367,16 @@ msgstr ""
 
 #: ../src/balsa-message.c:2467
 #, c-format
-msgid ""
-"Checking the signature of the message sent by %s with subject \"%s\" failed "
-"with an error!"
+msgid "Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"
 msgstr "檢查由 %s 傳送主旨為“%s”的郵件簽署因錯誤而失敗！"
 
 #: ../src/balsa-message.c:2516
-msgid ""
-"The decryption cannot be performed because this message is displayed more "
-"than once."
+msgid "The decryption cannot be performed because this message is displayed more than once."
 msgstr "由於同時開啟多個視窗顯示此郵件，使得解密無法進行。"
 
 #: ../src/balsa-message.c:2518
-msgid ""
-"The signature check and removal of the OpenPGP armor cannot be performed "
-"because this message is displayed more than once."
-msgstr ""
-"無法進行 OpenPGP 防護的簽章檢查與移除，因為同時開啟多個視窗顯示此郵件。"
+msgid "The signature check and removal of the OpenPGP armor cannot be performed because this message is displayed more than once."
+msgstr "無法進行 OpenPGP 防護的簽章檢查與移除，因為同時開啟多個視窗顯示此郵件。"
 
 #: ../src/balsa-message.c:2521
 msgid "Please close the other instances of this message and try again."
@@ -2332,7 +2406,8 @@ msgstr "比對日期於此間隔:"
 msgid "Match when date is outside the interval:"
 msgstr "比對日期超過此間隔:"
 
-#: ../src/filter-edit-callbacks.c:320 ../src/filter-edit-callbacks.c:1070
+#: ../src/filter-edit-callbacks.c:320
+#: ../src/filter-edit-callbacks.c:1070
 msgid "Match when one of these flags is set:"
 msgstr "比對是否設定其中一個標記:"
 
@@ -2385,17 +2460,20 @@ msgstr "全部(_A)"
 msgid "C_lear"
 msgstr "清除(_L)"
 
-#: ../src/filter-edit-callbacks.c:895 ../src/main-window.c:3828
+#: ../src/filter-edit-callbacks.c:895
+#: ../src/main-window.c:3828
 msgid "_Body"
 msgstr "內容(_B)"
 
 #. To:
-#: ../src/filter-edit-callbacks.c:896 ../src/main-window.c:3829
-#: ../src/sendmsg-window.c:2712
+#: ../src/filter-edit-callbacks.c:896
+#: ../src/main-window.c:3829
+#: ../src/sendmsg-window.c:2710
 msgid "_To:"
 msgstr "收件者(_T):"
 
-#: ../src/filter-edit-callbacks.c:897 ../src/main-window.c:3830
+#: ../src/filter-edit-callbacks.c:897
+#: ../src/main-window.c:3830
 msgid "_From:"
 msgstr "寄件者(_F):"
 
@@ -2403,7 +2481,8 @@ msgstr "寄件者(_F):"
 msgid "_Subject"
 msgstr "主旨(_S)"
 
-#: ../src/filter-edit-callbacks.c:899 ../src/main-window.c:3832
+#: ../src/filter-edit-callbacks.c:899
+#: ../src/main-window.c:3832
 msgid "_Cc:"
 msgstr "副本(_C):"
 
@@ -2440,13 +2519,15 @@ msgid "_One of the regular expressions matches"
 msgstr "其中一個正規表示式符合(_O)"
 
 #. Right/Add button
-#: ../src/filter-edit-callbacks.c:1007 ../src/filter-run-dialog.c:317
+#: ../src/filter-edit-callbacks.c:1007
+#: ../src/filter-run-dialog.c:327
 msgid "A_dd"
 msgstr "加入(_D)"
 
 #. Left/Remove button
-#: ../src/filter-edit-callbacks.c:1011 ../src/filter-edit-dialog.c:319
-#: ../src/filter-run-dialog.c:322
+#: ../src/filter-edit-callbacks.c:1011
+#: ../src/filter-edit-dialog.c:319
+#: ../src/filter-run-dialog.c:332
 msgid "_Remove"
 msgstr "移除(_R)"
 
@@ -2509,7 +2590,8 @@ msgstr "您必須指定準備播放的音效檔"
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(範例：寫於十二月 31 日,2000, %s)"
 
-#: ../src/filter-edit-dialog.c:89 ../src/pref-manager.c:376
+#: ../src/filter-edit-dialog.c:89
+#: ../src/pref-manager.c:376
 msgid "Simple"
 msgstr "正常"
 
@@ -2555,8 +2637,10 @@ msgstr "及"
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
-#: ../src/filter-edit-dialog.c:217 ../src/mailbox-node.c:954
-#: ../src/main-window.c:371 ../src/main-window.c:430
+#: ../src/filter-edit-dialog.c:217
+#: ../src/mailbox-node.c:954
+#: ../src/main-window.c:371
+#: ../src/main-window.c:430
 msgid "_New"
 msgstr "新增(_N)"
 
@@ -2588,7 +2672,8 @@ msgstr "通知："
 msgid "Play sound:"
 msgstr "播放音效："
 
-#: ../src/filter-edit-dialog.c:365 ../src/filter-edit-dialog.c:378
+#: ../src/filter-edit-dialog.c:365
+#: ../src/filter-edit-dialog.c:378
 msgid "Use Sound..."
 msgstr "使用音效..."
 
@@ -2632,30 +2717,30 @@ msgid "Unable to export filter %s, an error occured."
 msgstr " 無法匯出過濾條件 %s ，有錯誤產生。"
 
 #: ../src/filter-export-dialog.c:63
-msgid ""
-"There are opened filter run dialogs, close them before you can modify "
-"filters."
+msgid "There are opened filter run dialogs, close them before you can modify filters."
 msgstr "有已開啟的過濾條件執行對話盒，在您修改過濾條件之前請先將它們關閉。"
 
 #: ../src/filter-export-dialog.c:75
 msgid "Balsa Filters Export"
 msgstr "匯出 Balsa 郵件過濾條件"
 
-#: ../src/filter-run-callbacks.c:206
+#: ../src/filter-run-callbacks.c:182
 #, c-format
 msgid "Error displaying run filters help: %s\n"
 msgstr "顯示執行過濾條件說明時發生錯誤：%s\n"
 
 #: ../src/filter-run-callbacks.c:230
+#: ../src/filter-run-callbacks.c:252
 msgid "Error when applying filters"
 msgstr "當套用過濾條件時發生錯誤"
 
 #: ../src/filter-run-callbacks.c:233
+#: ../src/filter-run-callbacks.c:255
 #, c-format
 msgid "Filter applied to \"%s\"."
 msgstr "套用過濾條件到“%s”。"
 
-#: ../src/filter-run-callbacks.c:268
+#: ../src/filter-run-callbacks.c:292
 #, c-format
 msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
@@ -2664,17 +2749,14 @@ msgstr ""
 "過濾條件“%s”的目的郵件箱為“%s”。\n"
 "您不能將它關連到同一個郵件箱（那樣會造成循環）。"
 
-#: ../src/filter-run-callbacks.c:276
+#: ../src/filter-run-callbacks.c:300
 #, c-format
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
-"This happens for example when you use regular expressions match with IMAP "
-"mailboxes, it is done by a very slow method; if possible, use substring "
-"match instead."
+"This happens for example when you use regular expressions match with IMAP mailboxes, it is done by a very slow method; if possible, use substring match instead."
 msgstr ""
 "過濾條件“%s”與“%s”類型的郵件箱不相容。\n"
-"它的影響是例如當您使用正規表示式比對 IMAP 郵件箱時，可能會以相當緩慢的方式進"
-"行；如果可能，請使用子字串比對來代替。"
+"它的影響是例如當您使用正規表示式比對 IMAP 郵件箱時，可能會以相當緩慢的方式進行；如果可能，請使用子字串比對來代替。"
 
 #: ../src/filter-run-dialog.c:189
 msgid "Balsa Filters of Mailbox: "
@@ -2688,24 +2770,26 @@ msgstr "收到郵件時"
 msgid "On exit"
 msgstr "程式結束時"
 
-#: ../src/filter-run-dialog.c:311
-msgid "A_pply Now!"
-msgstr "馬上套用！(_P)"
+#: ../src/filter-run-dialog.c:316
+msgid "Apply Selected"
+msgstr "套用選擇的"
 
 #. up button
-#: ../src/filter-run-dialog.c:354
+#: ../src/filter-run-dialog.c:364
 msgid "_Up"
 msgstr "上移(_U)"
 
 #. down button
-#: ../src/filter-run-dialog.c:359
+#: ../src/filter-run-dialog.c:369
 msgid "Do_wn"
 msgstr "下移(_W)"
 
-#: ../src/filter-run-dialog.c:403
-msgid ""
-"The filters dialog is opened, close it before you can run filters on any "
-"mailbox"
+#: ../src/filter-run-dialog.c:375
+msgid "A_pply Now!"
+msgstr "馬上套用！(_P)"
+
+#: ../src/filter-run-dialog.c:419
+msgid "The filters dialog is opened, close it before you can run filters on any mailbox"
 msgstr "過濾條件對話盒已開啟，在您於任何郵件箱執行過濾條件之前請先將它關閉。"
 
 #: ../src/folder-conf.c:275
@@ -2713,7 +2797,9 @@ msgid "Remote IMAP folder"
 msgstr "遠端 IMAP 資料夾"
 
 #. must NOT be modal
-#: ../src/folder-conf.c:278 ../src/folder-conf.c:736 ../src/mailbox-conf.c:522
+#: ../src/folder-conf.c:278
+#: ../src/folder-conf.c:736
+#: ../src/mailbox-conf.c:522
 msgid "_Update"
 msgstr "更新(_U)"
 
@@ -2721,7 +2807,8 @@ msgstr "更新(_U)"
 msgid "C_reate"
 msgstr "建立(_R)"
 
-#: ../src/folder-conf.c:300 ../src/mailbox-conf.c:1102
+#: ../src/folder-conf.c:300
+#: ../src/mailbox-conf.c:1102
 #: ../src/mailbox-conf.c:1197
 msgid "_Basic"
 msgstr "基礎(_B)"
@@ -2730,11 +2817,13 @@ msgstr "基礎(_B)"
 msgid "_Max number of connections"
 msgstr "最大連線數(_M)"
 
-#: ../src/folder-conf.c:312 ../src/mailbox-conf.c:1254
+#: ../src/folder-conf.c:312
+#: ../src/mailbox-conf.c:1254
 msgid "Enable _persistent cache"
 msgstr "啟用持續快取(_P)"
 
-#: ../src/folder-conf.c:320 ../src/mailbox-conf.c:1258
+#: ../src/folder-conf.c:320
+#: ../src/mailbox-conf.c:1258
 msgid "Enable _bug workarounds"
 msgstr "啟用錯誤迴避(_B)"
 
@@ -2742,7 +2831,8 @@ msgstr "啟用錯誤迴避(_B)"
 msgid "Use STATUS for mailbox checking"
 msgstr "使用郵件箱檢查的 STATUS"
 
-#: ../src/folder-conf.c:333 ../src/mailbox-conf.c:1156
+#: ../src/folder-conf.c:333
+#: ../src/mailbox-conf.c:1156
 #: ../src/mailbox-conf.c:1260
 msgid "_Advanced"
 msgstr "進階(_A)"
@@ -2754,13 +2844,15 @@ msgstr "描述名稱(_N):"
 
 #. pop server
 #. imap server
-#: ../src/folder-conf.c:343 ../src/mailbox-conf.c:1110
+#: ../src/folder-conf.c:343
+#: ../src/mailbox-conf.c:1110
 #: ../src/mailbox-conf.c:1206
 msgid "_Server:"
 msgstr "伺服器(_S):"
 
 #. username
-#: ../src/folder-conf.c:351 ../src/mailbox-conf.c:1118
+#: ../src/folder-conf.c:351
+#: ../src/mailbox-conf.c:1118
 msgid "Use_r name:"
 msgstr "帳號名稱(_R):"
 
@@ -2863,9 +2955,7 @@ msgid "_Subfolder of:"
 msgstr "主資料夾(_S):"
 
 #: ../src/folder-conf.c:814
-msgid ""
-"This folder is not stored in configuration. I do not yet know how to remove "
-"it from remote server."
+msgid "This folder is not stored in configuration. I do not yet know how to remove it from remote server."
 msgstr "組態中找不到這個資料夾。無法從伺服器內移除這個資料夾。"
 
 #: ../src/folder-conf.c:823
@@ -2922,14 +3012,11 @@ msgstr ""
 #: ../src/mailbox-conf.c:389
 #, c-format
 msgid ""
-"This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
-"also delete the disk file or files associated with this mailbox.\n"
-"If you do not remove the file on disk you may \"Add  Mailbox\" to access the "
-"mailbox again.\n"
+"This will remove the mailbox \"%s\" from the list of mailboxes.  You may also delete the disk file or files associated with this mailbox.\n"
+"If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"郵件箱“%s”將會從郵件箱清單內移除。您亦可將儲存在硬碟內的檔案及此郵件箱的有關"
-"資料移除。\n"
+"郵件箱“%s”將會從郵件箱清單內移除。您亦可將儲存在硬碟內的檔案及此郵件箱的有關資料移除。\n"
 "若您沒有移除硬碟上的檔案，日後可使用“新增郵件箱”重新加入這個郵件箱。\n"
 "您希望怎麼做？"
 
@@ -2944,14 +3031,11 @@ msgstr "從清單及磁碟中移除(_D)"
 #: ../src/mailbox-conf.c:410
 #, c-format
 msgid ""
-"This will remove the mailbox \"%s\" and all its messages from your IMAP "
-"server.  If %s has subfolders, it will still appear as a node in the folder "
-"tree.\n"
+"This will remove the mailbox \"%s\" and all its messages from your IMAP server.  If %s has subfolders, it will still appear as a node in the folder tree.\n"
 "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
 "What would you like to do?"
 msgstr ""
-"這將會從您的 IMAP 伺服器內移除郵件箱“%s”及內存的全部郵件。若 %s 具有副資料"
-"夾，它仍會在這裡顯示為一個郵件箱。\n"
+"這將會從您的 IMAP 伺服器內移除郵件箱“%s”及內存的全部郵件。若 %s 具有副資料夾，它仍會在這裡顯示為一個郵件箱。\n"
 "日後可使用“新增 IMAP 副資料夾”重新加入這個名稱的郵件箱。\n"
 "您想要怎麼做？"
 
@@ -2979,8 +3063,10 @@ msgstr "從清單中移除(_R)"
 msgid "Folder deletion failed. Reason: %s"
 msgstr "刪除資料夾失敗。原因：%s"
 
-#: ../src/mailbox-conf.c:526 ../src/pref-manager.c:1455
-#: ../src/pref-manager.c:1540 ../src/pref-manager.c:2587
+#: ../src/mailbox-conf.c:526
+#: ../src/pref-manager.c:1455
+#: ../src/pref-manager.c:1540
+#: ../src/pref-manager.c:2587
 msgid "_Add"
 msgstr "新增(_A)"
 
@@ -2999,7 +3085,8 @@ msgstr ""
 "%s"
 
 #. mailbox name
-#: ../src/mailbox-conf.c:1046 ../src/mailbox-conf.c:1105
+#: ../src/mailbox-conf.c:1046
+#: ../src/mailbox-conf.c:1105
 #: ../src/mailbox-conf.c:1200
 msgid "Mailbox _Name:"
 msgstr "郵件箱名稱(_N):"
@@ -3013,7 +3100,8 @@ msgid "Remote Mailbox Configurator"
 msgstr "移除郵件箱設定"
 
 #. password field
-#: ../src/mailbox-conf.c:1124 ../src/mailbox-conf.c:1228
+#: ../src/mailbox-conf.c:1124
+#: ../src/mailbox-conf.c:1228
 msgid "Pass_word:"
 msgstr "密碼(_W):"
 
@@ -3066,7 +3154,8 @@ msgstr "寄件者(_F)"
 msgid "_To"
 msgstr "收件者(_T)"
 
-#: ../src/mailbox-conf.c:1362 ../src/pref-manager.c:3050
+#: ../src/mailbox-conf.c:1362
+#: ../src/pref-manager.c:3050
 msgid "Always"
 msgstr "一定"
 
@@ -3126,7 +3215,8 @@ msgid "Remote IMAP _subfolder..."
 msgstr "遠端 IMAP 副資料夾(_S)..."
 
 #. clicked on the empty space
-#: ../src/mailbox-node.c:961 ../src/mailbox-node.c:977
+#: ../src/mailbox-node.c:961
+#: ../src/mailbox-node.c:977
 msgid "_Rescan"
 msgstr "重新整理(_R)"
 
@@ -3189,7 +3279,8 @@ msgstr "本機資料夾 %s\n"
 msgid "Balsa closes files and connections. Please wait..."
 msgstr "Balsa 關閉檔案與連線。請稍候..."
 
-#: ../src/main-window.c:319 ../src/main-window.c:365
+#: ../src/main-window.c:319
+#: ../src/main-window.c:365
 msgid "_Deleted"
 msgstr "刪除(_D)"
 
@@ -3209,7 +3300,8 @@ msgstr "未讀(_R)"
 msgid "Un_flagged"
 msgstr "未標記(_F)"
 
-#: ../src/main-window.c:337 ../src/main-window.c:377
+#: ../src/main-window.c:337
+#: ../src/main-window.c:377
 msgid "_Answered"
 msgstr "已回應(_A)"
 
@@ -3233,7 +3325,8 @@ msgstr "部分標頭(_E)"
 msgid "Display selected headers"
 msgstr "只顯示指定的郵件標頭資料"
 
-#: ../src/main-window.c:351 ../src/message-window.c:90
+#: ../src/main-window.c:351
+#: ../src/message-window.c:90
 msgid "All _Headers"
 msgstr "所有標頭(_H)"
 
@@ -3261,7 +3354,8 @@ msgstr "切換已回應"
 msgid "_Message..."
 msgstr "郵件(_M)..."
 
-#: ../src/main-window.c:392 ../src/main-window.c:1041
+#: ../src/main-window.c:392
+#: ../src/main-window.c:1041
 msgid "Compose a new message"
 msgstr "撰寫一封新郵件"
 
@@ -3271,7 +3365,8 @@ msgstr "撰寫一封新郵件"
 msgid "Local mbox mailbox..."
 msgstr "本機 mbox 郵件箱..."
 
-#: ../src/main-window.c:400 ../src/main-window.c:813
+#: ../src/main-window.c:400
+#: ../src/main-window.c:813
 msgid "Add a new mbox style mailbox"
 msgstr "新增一個 mbox 格式的郵件箱"
 
@@ -3279,7 +3374,8 @@ msgstr "新增一個 mbox 格式的郵件箱"
 msgid "Local Maildir mailbox..."
 msgstr "本機 Maildir 郵件箱..."
 
-#: ../src/main-window.c:404 ../src/main-window.c:818
+#: ../src/main-window.c:404
+#: ../src/main-window.c:818
 msgid "Add a new Maildir style mailbox"
 msgstr "新增一個 Maildir 格式的郵件箱"
 
@@ -3287,33 +3383,40 @@ msgstr "新增一個 Maildir 格式的郵件箱"
 msgid "Local MH mailbox..."
 msgstr "本機 MH 郵件箱..."
 
-#: ../src/main-window.c:408 ../src/main-window.c:822
+#: ../src/main-window.c:408
+#: ../src/main-window.c:822
 msgid "Add a new MH style mailbox"
 msgstr "新增一個 MH 格式的郵件箱"
 
-#: ../src/main-window.c:411 ../src/main-window.c:825
+#: ../src/main-window.c:411
+#: ../src/main-window.c:825
 #: ../src/pref-manager.c:2912
 msgid "Remote IMAP mailbox..."
 msgstr "遠端 IMAP 郵件箱..."
 
-#: ../src/main-window.c:412 ../src/main-window.c:826
+#: ../src/main-window.c:412
+#: ../src/main-window.c:826
 msgid "Add a new IMAP mailbox"
 msgstr "新增一個 IMAP 郵件箱"
 
-#: ../src/main-window.c:416 ../src/main-window.c:830
+#: ../src/main-window.c:416
+#: ../src/main-window.c:830
 #: ../src/pref-manager.c:2917
 msgid "Remote IMAP folder..."
 msgstr "遠端 IMAP 資料夾..."
 
-#: ../src/main-window.c:417 ../src/main-window.c:831
+#: ../src/main-window.c:417
+#: ../src/main-window.c:831
 msgid "Add a new IMAP folder"
 msgstr "新增一個 IMAP 資料夾"
 
-#: ../src/main-window.c:420 ../src/main-window.c:834
+#: ../src/main-window.c:420
+#: ../src/main-window.c:834
 msgid "Remote IMAP subfolder..."
 msgstr "遠端 IMAP 副資料夾..."
 
-#: ../src/main-window.c:421 ../src/main-window.c:835
+#: ../src/main-window.c:421
+#: ../src/main-window.c:835
 msgid "Add a new IMAP subfolder"
 msgstr "新增一個 IMAP 副資料夾"
 
@@ -3326,48 +3429,59 @@ msgid "Continue editing current message"
 msgstr "繼續撰寫尚未完成的郵件"
 
 #. Ctrl-M
-#: ../src/main-window.c:442 ../src/main-window.c:877
+#: ../src/main-window.c:442
+#: ../src/main-window.c:877
 msgid "_Get New Mail"
 msgstr "接收新的郵件(_G)"
 
-#: ../src/main-window.c:442 ../src/main-window.c:877
+#: ../src/main-window.c:442
+#: ../src/main-window.c:877
 msgid "Fetch new incoming mail"
 msgstr "接收新的郵件"
 
 #. Ctrl-S
-#: ../src/main-window.c:448 ../src/main-window.c:872
+#: ../src/main-window.c:448
+#: ../src/main-window.c:872
 msgid "_Send Queued Mail"
 msgstr "寄出郵件(_S)"
 
-#: ../src/main-window.c:449 ../src/main-window.c:873
+#: ../src/main-window.c:449
+#: ../src/main-window.c:873
 msgid "Send messages from the outbox"
 msgstr "將儲存在寄件箱內的郵件寄出"
 
 #. Ctrl-B
-#: ../src/main-window.c:455 ../src/main-window.c:867
+#: ../src/main-window.c:455
+#: ../src/main-window.c:867
 msgid "Send and _Receive Mail"
 msgstr "寄出及接收郵件(_R)"
 
-#: ../src/main-window.c:456 ../src/main-window.c:868
+#: ../src/main-window.c:456
+#: ../src/main-window.c:868
 #: ../src/toolbar-factory.c:113
 msgid "Send and Receive messages"
 msgstr "寄出及接收郵件"
 
-#: ../src/main-window.c:461 ../src/main-window.c:882
-#: ../src/sendmsg-window.c:331 ../src/sendmsg-window.c:492
+#: ../src/main-window.c:461
+#: ../src/main-window.c:882
+#: ../src/sendmsg-window.c:331
+#: ../src/sendmsg-window.c:492
 msgid "_Print..."
 msgstr "列印(_P)..."
 
-#: ../src/main-window.c:462 ../src/main-window.c:883
+#: ../src/main-window.c:462
+#: ../src/main-window.c:883
 #: ../src/toolbar-factory.c:109
 msgid "Print current message"
 msgstr "列印目前的郵件"
 
-#: ../src/main-window.c:468 ../src/main-window.c:1100
+#: ../src/main-window.c:468
+#: ../src/main-window.c:1100
 msgid "_Address Book..."
 msgstr "通訊錄(_A)..."
 
-#: ../src/main-window.c:469 ../src/main-window.c:1101
+#: ../src/main-window.c:469
+#: ../src/main-window.c:1101
 msgid "Open the address book"
 msgstr "開啟通訊錄"
 
@@ -3375,15 +3489,18 @@ msgstr "開啟通訊錄"
 msgid "F_ilters..."
 msgstr "過濾條件(_I)..."
 
-#: ../src/main-window.c:493 ../src/main-window.c:1087
+#: ../src/main-window.c:493
+#: ../src/main-window.c:1087
 msgid "Manage filters"
 msgstr "管理過濾條件"
 
-#: ../src/main-window.c:495 ../src/main-window.c:1093
+#: ../src/main-window.c:495
+#: ../src/main-window.c:1093
 msgid "_Export Filters"
 msgstr "匯出過濾條件(_E)"
 
-#: ../src/main-window.c:495 ../src/main-window.c:1094
+#: ../src/main-window.c:495
+#: ../src/main-window.c:1094
 msgid "Export filters as Sieve scripts"
 msgstr "將過濾條件匯出為 Sieve 命令稿"
 
@@ -3427,48 +3544,59 @@ msgstr "顯示郵件箱分頁標籤(_T)"
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "切換是否顯示郵件箱分頁的標籤"
 
-#: ../src/main-window.c:536 ../src/main-window.c:952
+#: ../src/main-window.c:536
+#: ../src/main-window.c:952
 #: ../src/message-window.c:121
 msgid "_Wrap"
 msgstr "自動換行(_W)"
 
-#: ../src/main-window.c:536 ../src/main-window.c:952
-#: ../src/sendmsg-window.c:360 ../src/sendmsg-window.c:517
+#: ../src/main-window.c:536
+#: ../src/main-window.c:952
+#: ../src/sendmsg-window.c:360
+#: ../src/sendmsg-window.c:517
 msgid "Wrap message lines"
 msgstr "自動換行"
 
-#: ../src/main-window.c:545 ../src/main-window.c:958
+#: ../src/main-window.c:545
+#: ../src/main-window.c:958
 msgid "E_xpand All"
 msgstr "全部展開(_X)"
 
-#: ../src/main-window.c:546 ../src/main-window.c:959
+#: ../src/main-window.c:546
+#: ../src/main-window.c:959
 msgid "Expand all threads"
 msgstr "展開所有相關主題"
 
-#: ../src/main-window.c:550 ../src/main-window.c:963
+#: ../src/main-window.c:550
+#: ../src/main-window.c:963
 msgid "_Collapse All"
 msgstr "全部摺疊(_C)"
 
-#: ../src/main-window.c:551 ../src/main-window.c:964
+#: ../src/main-window.c:551
+#: ../src/main-window.c:964
 msgid "Collapse all expanded threads"
 msgstr "摺疊所有展開的相關主題"
 
-#: ../src/main-window.c:557 ../src/main-window.c:994
+#: ../src/main-window.c:557
+#: ../src/main-window.c:994
 #: ../src/message-window.c:127
 msgid "Zoom _In"
 msgstr "放大(_I)"
 
-#: ../src/main-window.c:557 ../src/main-window.c:994
+#: ../src/main-window.c:557
+#: ../src/main-window.c:994
 #: ../src/message-window.c:127
 msgid "Increase magnification"
 msgstr "增加放大率"
 
-#: ../src/main-window.c:561 ../src/main-window.c:998
+#: ../src/main-window.c:561
+#: ../src/main-window.c:998
 #: ../src/message-window.c:131
 msgid "Zoom _Out"
 msgstr "縮小(_O)"
 
-#: ../src/main-window.c:561 ../src/main-window.c:998
+#: ../src/main-window.c:561
+#: ../src/main-window.c:998
 #: ../src/message-window.c:131
 msgid "Decrease magnification"
 msgstr "減少放大率"
@@ -3476,42 +3604,50 @@ msgstr "減少放大率"
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
 #. * format specifier:
-#: ../src/main-window.c:567 ../src/main-window.c:1004
+#: ../src/main-window.c:567
+#: ../src/main-window.c:1004
 #: ../src/message-window.c:138
 #, no-c-format
 msgid "Zoom _100%"
 msgstr "縮放為 _100%"
 
-#: ../src/main-window.c:567 ../src/main-window.c:1004
+#: ../src/main-window.c:567
+#: ../src/main-window.c:1004
 #: ../src/message-window.c:138
 msgid "No magnification"
 msgstr "不放大"
 
-#: ../src/main-window.c:585 ../src/main-window.c:1048
+#: ../src/main-window.c:585
+#: ../src/main-window.c:1048
 #: ../src/toolbar-factory.c:85
 msgid "Reply to the current message"
 msgstr "回覆這封郵件的寄件者"
 
 #. A
-#: ../src/main-window.c:592 ../src/main-window.c:1054
+#: ../src/main-window.c:592
+#: ../src/main-window.c:1054
 #: ../src/message-window.c:153
 msgid "Reply to _All..."
 msgstr "全部回覆(_A)..."
 
-#: ../src/main-window.c:593 ../src/main-window.c:1055
+#: ../src/main-window.c:593
+#: ../src/main-window.c:1055
 msgid "Reply to all recipients of the current message"
 msgstr "回覆這封郵件的所有收件者"
 
-#: ../src/main-window.c:600 ../src/message-window.c:159
+#: ../src/main-window.c:600
+#: ../src/message-window.c:159
 msgid "Reply to _Group..."
 msgstr "群組回覆(_G)..."
 
-#: ../src/main-window.c:601 ../src/message-window.c:160
+#: ../src/main-window.c:601
+#: ../src/message-window.c:160
 #: ../src/toolbar-factory.c:89
 msgid "Reply to mailing list"
 msgstr "回覆郵件給電郵論壇"
 
-#: ../src/main-window.c:608 ../src/message-window.c:165
+#: ../src/main-window.c:608
+#: ../src/message-window.c:165
 msgid "_Forward attached..."
 msgstr "附件形式轉寄(_F)..."
 
@@ -3535,7 +3671,8 @@ msgstr "使用管線將郵件傳給其他程式"
 msgid "_Next Part"
 msgstr "下一部分(_N)"
 
-#: ../src/main-window.c:631 ../src/message-window.c:177
+#: ../src/main-window.c:631
+#: ../src/message-window.c:177
 msgid "Next part in message"
 msgstr "顯示郵件的下一部分"
 
@@ -3543,63 +3680,80 @@ msgstr "顯示郵件的下一部分"
 msgid "_Previous Part"
 msgstr "上一部分(_P)"
 
-#: ../src/main-window.c:638 ../src/message-window.c:183
+#: ../src/main-window.c:638
+#: ../src/message-window.c:183
 msgid "Previous part in message"
 msgstr "顯示郵件的上一部分"
 
-#: ../src/main-window.c:644 ../src/main-window.c:1068
+#: ../src/main-window.c:644
+#: ../src/main-window.c:1068
 #: ../src/message-window.c:187
 msgid "Save Current Part..."
 msgstr "儲存目前部分..."
 
-#: ../src/main-window.c:645 ../src/main-window.c:1069
+#: ../src/main-window.c:645
+#: ../src/main-window.c:1069
 msgid "Save currently displayed part of message"
 msgstr "儲存郵件目前顯示的部分"
 
-#: ../src/main-window.c:651 ../src/main-window.c:1021
+#: ../src/main-window.c:651
+#: ../src/main-window.c:1021
 #: ../src/message-window.c:192
 msgid "_View Source..."
 msgstr "顯示原始內容(_V)..."
 
-#: ../src/main-window.c:652 ../src/main-window.c:1022
+#: ../src/main-window.c:652
+#: ../src/main-window.c:1022
 #: ../src/message-window.c:193
 msgid "View source form of the message"
 msgstr "顯示目前郵件的原始內容"
 
-#: ../src/main-window.c:670 ../src/message-window.c:228
+#: ../src/main-window.c:670
+#: ../src/message-window.c:228
 msgid "_Move to Trash"
 msgstr "丟進垃圾桶(_M)"
 
-#: ../src/main-window.c:671 ../src/main-window.c:1076
+#: ../src/main-window.c:671
+#: ../src/main-window.c:1076
 msgid "Move the current message to Trash mailbox"
 msgstr "將目前的郵件丟進垃圾桶郵件箱"
 
 #. !
-#: ../src/main-window.c:677 ../src/main-window.c:1027
+#: ../src/main-window.c:677
+#: ../src/main-window.c:1027
 msgid "_Toggle flag"
 msgstr "切換標記(_T)"
 
-#: ../src/main-window.c:683 ../src/main-window.c:1032
+#: ../src/main-window.c:683
+#: ../src/main-window.c:1032
 msgid "Store address of sender in addressbook"
 msgstr "將寄件者的郵址儲存到通訊錄"
 
-#: ../src/main-window.c:694 ../src/main-window.c:985
+#: ../src/main-window.c:694
+#: ../src/main-window.c:985
 msgid "Next Message"
 msgstr "下一封郵件"
 
-#: ../src/main-window.c:700 ../src/main-window.c:989
+#: ../src/main-window.c:700
+#: ../src/main-window.c:989
 #: ../src/message-window.c:207
 msgid "Previous Message"
 msgstr "上一封郵件"
 
-#: ../src/main-window.c:706 ../src/main-window.c:707 ../src/main-window.c:979
-#: ../src/main-window.c:980 ../src/message-window.c:213
+#: ../src/main-window.c:706
+#: ../src/main-window.c:707
+#: ../src/main-window.c:979
+#: ../src/main-window.c:980
+#: ../src/message-window.c:213
 #: ../src/message-window.c:214
 msgid "Next Unread Message"
 msgstr "下一封新郵件"
 
-#: ../src/main-window.c:713 ../src/main-window.c:714 ../src/main-window.c:944
-#: ../src/main-window.c:945 ../src/message-window.c:220
+#: ../src/main-window.c:713
+#: ../src/main-window.c:714
+#: ../src/main-window.c:944
+#: ../src/main-window.c:945
+#: ../src/message-window.c:220
 #: ../src/message-window.c:221
 msgid "Next Flagged Message"
 msgstr "下一封標記郵件"
@@ -3624,19 +3778,23 @@ msgstr "全選(_S)"
 msgid "Select all messages in current mailbox"
 msgstr "選取這個郵件箱內的全部郵件"
 
-#: ../src/main-window.c:735 ../src/main-window.c:845
+#: ../src/main-window.c:735
+#: ../src/main-window.c:845
 msgid "_Edit..."
 msgstr "編輯(_E)..."
 
-#: ../src/main-window.c:735 ../src/main-window.c:845
+#: ../src/main-window.c:735
+#: ../src/main-window.c:845
 msgid "Edit the selected mailbox"
 msgstr "編輯目前選定的郵件箱的內容"
 
-#: ../src/main-window.c:739 ../src/main-window.c:840
+#: ../src/main-window.c:739
+#: ../src/main-window.c:840
 msgid "_Delete..."
 msgstr "刪除(_D)..."
 
-#: ../src/main-window.c:740 ../src/main-window.c:841
+#: ../src/main-window.c:740
+#: ../src/main-window.c:841
 msgid "Delete the selected mailbox"
 msgstr "刪除目前選定的郵件箱"
 
@@ -3644,19 +3802,23 @@ msgstr "刪除目前選定的郵件箱"
 msgid "E_xpunge Deleted Messages"
 msgstr "清理刪除的郵件(_X)"
 
-#: ../src/main-window.c:747 ../src/main-window.c:852
+#: ../src/main-window.c:747
+#: ../src/main-window.c:852
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr "清理目前開啟的郵件箱中標示為已刪除的郵件"
 
-#: ../src/main-window.c:752 ../src/main-window.c:858
+#: ../src/main-window.c:752
+#: ../src/main-window.c:858
 msgid "Close mailbox"
 msgstr "關閉郵件箱"
 
-#: ../src/main-window.c:756 ../src/main-window.c:1105
+#: ../src/main-window.c:756
+#: ../src/main-window.c:1105
 msgid "Empty _Trash"
 msgstr "清空垃圾桶(_T)"
 
-#: ../src/main-window.c:757 ../src/main-window.c:1106
+#: ../src/main-window.c:757
+#: ../src/main-window.c:1106
 #: ../src/toolbar-factory.c:131
 msgid "Delete messages from the Trash mailbox"
 msgstr "將垃圾桶郵件箱內的所有郵件移除"
@@ -3665,7 +3827,8 @@ msgstr "將垃圾桶郵件箱內的所有郵件移除"
 msgid "Select _Filters"
 msgstr "選擇過濾條件(_F)"
 
-#: ../src/main-window.c:762 ../src/main-window.c:1091
+#: ../src/main-window.c:762
+#: ../src/main-window.c:1091
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr "選擇的過濾條件會自動套用到目前的郵件箱"
 
@@ -3685,11 +3848,13 @@ msgstr "工具列(_T)..."
 msgid "Customize toolbars"
 msgstr "更改工具列"
 
-#: ../src/main-window.c:787 ../src/main-window.c:1109
+#: ../src/main-window.c:787
+#: ../src/main-window.c:1109
 msgid "_Identities..."
 msgstr "身分(_I)..."
 
-#: ../src/main-window.c:788 ../src/main-window.c:1110
+#: ../src/main-window.c:788
+#: ../src/main-window.c:1110
 msgid "Create and set current identities"
 msgstr "建立身分及設定目前的身分"
 
@@ -3697,7 +3862,8 @@ msgstr "建立身分及設定目前的身分"
 msgid "Mail_box"
 msgstr "郵件箱(_B)"
 
-#: ../src/main-window.c:800 ../src/main-window.c:1123
+#: ../src/main-window.c:800
+#: ../src/main-window.c:1123
 #: ../src/message-window.c:245
 msgid "_Message"
 msgstr "郵件(_M)"
@@ -3790,8 +3956,10 @@ msgstr "檢示過濾條件(_V)"
 msgid "Enable quick message index filter"
 msgstr "啟用快速郵件索引過濾條件"
 
-#: ../src/main-window.c:1008 ../src/main-window.c:1082
-#: ../src/sendmsg-window.c:494 ../src/sendmsg-window.c:552
+#: ../src/main-window.c:1008
+#: ../src/main-window.c:1082
+#: ../src/sendmsg-window.c:494
+#: ../src/sendmsg-window.c:552
 #: ../src/sendmsg-window.c:612
 msgid "_More"
 msgstr "更多(_M)"
@@ -3805,7 +3973,8 @@ msgstr "新增(_N)..."
 msgid "_Forward..."
 msgstr "轉寄(_F)..."
 
-#: ../src/main-window.c:1062 ../src/toolbar-factory.c:91
+#: ../src/main-window.c:1062
+#: ../src/toolbar-factory.c:91
 msgid "Forward the current message"
 msgstr "轉寄目前的郵件"
 
@@ -3826,7 +3995,8 @@ msgstr "選擇過濾條件(_S)"
 msgid "_Filters"
 msgstr "過濾條件(_F)"
 
-#: ../src/main-window.c:1124 ../src/sendmsg-window.c:628
+#: ../src/main-window.c:1124
+#: ../src/sendmsg-window.c:628
 msgid "_Tools"
 msgstr "工具(_T)"
 
@@ -3838,7 +4008,8 @@ msgstr ""
 "正在傳送郵件。\n"
 "是否要取消？"
 
-#: ../src/main-window.c:1398 ../src/main-window.c:4941
+#: ../src/main-window.c:1398
+#: ../src/main-window.c:4941
 msgid "Subject or Sender _Contains:"
 msgstr "主旨或寄件者包含(_C):"
 
@@ -3862,19 +4033,19 @@ msgstr ""
 "Abel Cheung <abel@oaka.org>, 2003\n"
 "Joe Man <trmetal@yahoo.com.hk>, 2001"
 
-#: ../src/main-window.c:2551 ../src/main-window.c:2578
+#: ../src/main-window.c:2551
+#: ../src/main-window.c:2578
 msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://balsa.gnome.org/\n"
+"The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://balsa.gnome.org/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"Balsa 郵件收發程式屬於 GNOME 桌面的一部分。您可以在 http://balsa.gnome.org/ "
-"找到有關 Balsa 的資訊。\n"
+"Balsa 郵件收發程式屬於 GNOME 桌面的一部分。您可以在 http://balsa.gnome.org/ 找到有關 Balsa 的資訊。\n"
 "\n"
 "如果有需要，請在 http://bugzilla.gnome.org/ 匯報錯誤。"
 
-#: ../src/main-window.c:2682 ../src/main-window.c:2695
+#: ../src/main-window.c:2682
+#: ../src/main-window.c:2695
 msgid "Checking Mail..."
 msgstr "正在接收郵件..."
 
@@ -4020,7 +4191,10 @@ msgstr "對 IMAP 連線進行偵錯"
 msgid "The Balsa E-Mail Client"
 msgstr "Balsa 電子郵件客戶端程式"
 
-#: ../src/main.c:272 ../src/main.c:277 ../src/main.c:283 ../src/main.c:289
+#: ../src/main.c:272
+#: ../src/main.c:277
+#: ../src/main.c:283
+#: ../src/main.c:289
 #: ../src/main.c:295
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
@@ -4143,7 +4317,8 @@ msgstr ""
 "這是一個使用行內 %s 簽署的 %s 郵件部分：\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:72 ../src/print.c:1296
+#: ../src/balsa-mime-widget-crypto.c:72
+#: ../src/print.c:1296
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
@@ -4151,7 +4326,8 @@ msgstr "OpenPGP"
 msgid "_Run gpg to import this key"
 msgstr "執行 gpg 以匯入此金鑰(_R)"
 
-#: ../src/balsa-mime-widget-image.c:51 ../src/balsa-mime-widget-image.c:156
+#: ../src/balsa-mime-widget-image.c:51
+#: ../src/balsa-mime-widget-image.c:156
 #, c-format
 msgid "Error loading attached image: %s\n"
 msgstr "載入附加的影像時發生錯誤：%s\n"
@@ -4168,7 +4344,8 @@ msgid "Access type: local-file\n"
 msgstr "讀取方式：本機檔案\n"
 
 #: ../src/balsa-mime-widget-message.c:166
-#: ../src/balsa-mime-widget-message.c:213 ../src/balsa-mime-widget.c:235
+#: ../src/balsa-mime-widget-message.c:213
+#: ../src/balsa-mime-widget.c:235
 #, c-format
 msgid "File name: %s"
 msgstr "檔案名稱：%s"
@@ -4215,58 +4392,67 @@ msgstr "主旨：%s\n"
 msgid "Se_nd message to obtain this part"
 msgstr "傳送郵件以獲得此部分(_N)"
 
-#: ../src/balsa-mime-widget-message.c:300 ../src/balsa-mime-widget-text.c:562
-#: ../src/balsa-mime-widget-text.c:687 ../src/sendmsg-window.c:1653
+#: ../src/balsa-mime-widget-message.c:300
+#: ../src/balsa-mime-widget-text.c:562
+#: ../src/balsa-mime-widget-text.c:687
+#: ../src/sendmsg-window.c:1653
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "顯示 %s 時發生錯誤：%s\n"
 
-#: ../src/balsa-mime-widget-message.c:594 ../src/print.c:350
-#: ../src/sendmsg-window.c:1003 ../src/sendmsg-window.c:3159
+#: ../src/balsa-mime-widget-message.c:594
+#: ../src/print.c:350
+#: ../src/sendmsg-window.c:1003
+#: ../src/sendmsg-window.c:3157
 msgid "Subject:"
 msgstr "主旨："
 
-#: ../src/balsa-mime-widget-message.c:598 ../src/print.c:356
-#: ../src/sendmsg-window.c:3153
+#: ../src/balsa-mime-widget-message.c:598
+#: ../src/print.c:356
+#: ../src/sendmsg-window.c:3151
 msgid "Date:"
 msgstr "日期："
 
 #. Cannot edit the new "From:" header.
 #. { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
-#: ../src/balsa-mime-widget-message.c:611 ../src/sendmsg-window.c:1000
+#: ../src/balsa-mime-widget-message.c:611
+#: ../src/sendmsg-window.c:1000
 msgid "Reply-To:"
 msgstr "回郵地址："
 
 #. cc:
-#: ../src/balsa-mime-widget-message.c:615 ../src/print.c:366
-#: ../src/sendmsg-window.c:1002 ../src/sendmsg-window.c:2723
-#: ../src/sendmsg-window.c:3182 ../src/store-address.c:307
+#: ../src/balsa-mime-widget-message.c:615
+#: ../src/print.c:366
+#: ../src/sendmsg-window.c:1002
+#: ../src/sendmsg-window.c:2721
+#: ../src/sendmsg-window.c:3180
+#: ../src/store-address.c:307
 msgid "Cc:"
 msgstr "副本："
 
 #. bcc:
-#: ../src/balsa-mime-widget-message.c:616 ../src/print.c:367
-#: ../src/sendmsg-window.c:1001 ../src/sendmsg-window.c:2728
+#: ../src/balsa-mime-widget-message.c:616
+#: ../src/print.c:367
+#: ../src/sendmsg-window.c:1001
+#: ../src/sendmsg-window.c:2726
 #: ../src/store-address.c:308
 msgid "Bcc:"
 msgstr "密件副本："
 
-#: ../src/balsa-mime-widget-message.c:619 ../src/print.c:368
+#: ../src/balsa-mime-widget-message.c:620
+#: ../src/print.c:368
 msgid "Fcc:"
 msgstr "備份副本："
 
-#: ../src/balsa-mime-widget-message.c:625 ../src/print.c:374
+#: ../src/balsa-mime-widget-message.c:627
+#: ../src/print.c:374
 msgid "Disposition-Notification-To:"
 msgstr "回傳讀取回條："
 
 #: ../src/balsa-mime-widget-text.c:129
 #, c-format
-msgid ""
-"The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
-"header describing the used codeset (converted to %s)"
-msgstr ""
-"由 %s 傳送，主旨為“%s”的郵件包含 8 位元字元，但標頭中並未描述使用的字集(轉換"
-"為 %s)"
+msgid "The message sent by %s with subject \"%s\" contains 8-bit characters, but no header describing the used codeset (converted to %s)"
+msgstr "由 %s 傳送，主旨為“%s”的郵件包含 8 位元字元，但標頭中並未描述使用的字集(轉換為 %s)"
 
 #: ../src/balsa-mime-widget-text.c:552
 #, c-format
@@ -4291,7 +4477,8 @@ msgstr "這種內容類型的檔案尚未於 GNOME MIME 內定義開啟或顯示
 msgid "S_ave part"
 msgstr "儲存附件(_A)"
 
-#: ../src/balsa-mime-widget.c:310 ../src/balsa-mime-widget.c:334
+#: ../src/balsa-mime-widget.c:310
+#: ../src/balsa-mime-widget.c:334
 #, c-format
 msgid "View _part with %s"
 msgstr "使用 %s 顯示附件(_P)"
@@ -4341,7 +4528,8 @@ msgstr "Balsa 偏好設定"
 msgid "Mail Servers"
 msgstr "郵件伺服器"
 
-#: ../src/pref-manager.c:424 ../src/pref-manager.c:2537
+#: ../src/pref-manager.c:424
+#: ../src/pref-manager.c:2537
 msgid "Address Books"
 msgstr "通訊錄"
 
@@ -4349,11 +4537,13 @@ msgstr "通訊錄"
 msgid "Mail Options"
 msgstr "郵件選項"
 
-#: ../src/pref-manager.c:432 ../src/pref-manager.c:1899
+#: ../src/pref-manager.c:432
+#: ../src/pref-manager.c:1899
 msgid "Display"
 msgstr "版面配置"
 
-#: ../src/pref-manager.c:436 ../src/toolbar-factory.c:120
+#: ../src/pref-manager.c:436
+#: ../src/toolbar-factory.c:120
 msgid "Spelling"
 msgstr "拼字"
 
@@ -4374,8 +4564,9 @@ msgstr "%s (預設)"
 msgid "Remote Mailbox Servers"
 msgstr "遠端郵件伺服器"
 
-#: ../src/pref-manager.c:1435 ../src/pref-manager.c:2558
-#: ../src/sendmsg-window.c:2807
+#: ../src/pref-manager.c:1435
+#: ../src/pref-manager.c:2558
+#: ../src/sendmsg-window.c:2805
 msgid "Type"
 msgstr "類別"
 
@@ -4383,7 +4574,8 @@ msgstr "類別"
 msgid "Mailbox Name"
 msgstr "郵件箱名稱"
 
-#: ../src/pref-manager.c:1456 ../src/pref-manager.c:1542
+#: ../src/pref-manager.c:1456
+#: ../src/pref-manager.c:1542
 #: ../src/pref-manager.c:2589
 msgid "_Modify"
 msgstr "修改(_M)"
@@ -4392,7 +4584,8 @@ msgstr "修改(_M)"
 msgid "Local Mail"
 msgstr "本機郵件箱"
 
-#: ../src/pref-manager.c:1471 ../src/pref-manager.c:1479
+#: ../src/pref-manager.c:1471
+#: ../src/pref-manager.c:1479
 msgid "Select your local mail directory"
 msgstr "選取本機郵件箱目錄"
 
@@ -4420,7 +4613,8 @@ msgstr "接收郵件"
 msgid "_Check mail automatically every:"
 msgstr "每隔指定時間自動接收新郵件(_C):"
 
-#: ../src/pref-manager.c:1608 ../src/pref-manager.c:2354
+#: ../src/pref-manager.c:1608
+#: ../src/pref-manager.c:2354
 #: ../src/pref-manager.c:2405
 msgid "minutes"
 msgstr "分鐘"
@@ -4455,7 +4649,8 @@ msgstr "MB"
 msgid "Quoted and Flowed Text"
 msgstr "引用前文"
 
-#: ../src/pref-manager.c:1664 ../src/sendmsg-window.c:4972
+#: ../src/pref-manager.c:1664
+#: ../src/sendmsg-window.c:4991
 msgid "Quoted Text Regular Expression"
 msgstr "視為前文的起首字元 (正規表示式)"
 
@@ -4463,7 +4658,8 @@ msgstr "視為前文的起首字元 (正規表示式)"
 msgid "Wrap Incoming Text at:"
 msgstr "顯示內送郵件時自動換行，當字句長度超過："
 
-#: ../src/pref-manager.c:1686 ../src/pref-manager.c:1849
+#: ../src/pref-manager.c:1686
+#: ../src/pref-manager.c:1849
 msgid "characters"
 msgstr "字元"
 
@@ -4616,7 +4812,8 @@ msgstr "日期 (strftime 格式):"
 msgid "Selected headers:"
 msgstr "指定的標頭："
 
-#: ../src/pref-manager.c:2022 ../src/pref-manager.c:2027
+#: ../src/pref-manager.c:2022
+#: ../src/pref-manager.c:2027
 msgid "Information Messages"
 msgstr "資訊訊息"
 
@@ -4863,7 +5060,8 @@ msgstr "關閉郵件視窗"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "顯示連結 _id %s 發生錯誤：%s\n"
 
-#: ../src/print.c:246 ../src/print.c:721
+#: ../src/print.c:246
+#: ../src/print.c:721
 #, c-format
 msgid "Page: %i/%i"
 msgstr "第 %i/%i 頁"
@@ -4951,11 +5149,11 @@ msgstr ""
 msgid "Balsa: message print preview"
 msgstr "Balsa：郵件預覽列印"
 
-#: ../src/save-restore.c:626
+#: ../src/save-restore.c:631
 msgid "Error during filters loading: "
 msgstr "載入過濾條件時發生錯誤："
 
-#: ../src/save-restore.c:628
+#: ../src/save-restore.c:633
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
@@ -4964,30 +5162,28 @@ msgstr ""
 "載入過濾條件時發生錯誤：%s\n"
 "過濾條件可能有錯。"
 
-#: ../src/save-restore.c:743
+#: ../src/save-restore.c:748
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "無法辨識 \"format=flowed\" 選項文字已被移除。"
 
-#: ../src/save-restore.c:999
-msgid ""
-"The option not to send \"format=flowed\" is now on the Options menu of the "
-"compose window."
+#: ../src/save-restore.c:1004
+msgid "The option not to send \"format=flowed\" is now on the Options menu of the compose window."
 msgstr "不要傳送 \"format=flowed\" 選項目前位於撰寫視窗的 選項 選單。"
 
-#: ../src/save-restore.c:1031
-msgid ""
-"The option to request a MDN is now on the Options menu of the compose window."
+#: ../src/save-restore.c:1036
+msgid "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "要求 MDN 的選項目前位於撰寫視窗的 選項 選單。"
 
-#: ../src/save-restore.c:1837
+#: ../src/save-restore.c:1843
 msgid "Filter with no condition was ignored"
 msgstr "忽略沒有內容的過濾條件"
 
-#: ../src/save-restore.c:2030
+#: ../src/save-restore.c:2040
 msgid "Error opening GConf database\n"
 msgstr "開啟 GConf 資料庫時發生錯誤\n"
 
-#: ../src/save-restore.c:2038 ../src/save-restore.c:2049
+#: ../src/save-restore.c:2048
+#: ../src/save-restore.c:2059
 #, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "設定 GConf 欄位時發生錯誤：%s\n"
@@ -5148,27 +5344,33 @@ msgstr "_GnuPG 使用舊式 OpenPGP 模式"
 msgid "_S/MIME mode (GpgSM)"
 msgstr "_S/MIME 模式 (GpgSM)"
 
-#: ../src/sendmsg-window.c:298 ../src/sendmsg-window.c:470
+#: ../src/sendmsg-window.c:298
+#: ../src/sendmsg-window.c:470
 msgid "_Include File..."
 msgstr "在內文加入檔案(_I)..."
 
-#: ../src/sendmsg-window.c:301 ../src/sendmsg-window.c:483
+#: ../src/sendmsg-window.c:301
+#: ../src/sendmsg-window.c:483
 msgid "_Attach File..."
 msgstr "附加檔案(_A)..."
 
-#: ../src/sendmsg-window.c:304 ../src/sendmsg-window.c:472
+#: ../src/sendmsg-window.c:304
+#: ../src/sendmsg-window.c:472
 msgid "I_nclude Message(s)"
 msgstr "包含郵件(_N)"
 
-#: ../src/sendmsg-window.c:307 ../src/sendmsg-window.c:475
+#: ../src/sendmsg-window.c:307
+#: ../src/sendmsg-window.c:475
 msgid "Attach _Message(s)"
 msgstr "附加郵件(_M)"
 
-#: ../src/sendmsg-window.c:313 ../src/sendmsg-window.c:500
+#: ../src/sendmsg-window.c:313
+#: ../src/sendmsg-window.c:500
 msgid "Sen_d"
 msgstr "傳送(_D)"
 
-#: ../src/sendmsg-window.c:314 ../src/sendmsg-window.c:501
+#: ../src/sendmsg-window.c:314
+#: ../src/sendmsg-window.c:501
 #: ../src/toolbar-factory.c:111
 msgid "Send this message"
 msgstr "寄出這封郵件"
@@ -5177,7 +5379,8 @@ msgstr "寄出這封郵件"
 msgid "_Queue"
 msgstr "等候傳送(_Q)"
 
-#: ../src/sendmsg-window.c:319 ../src/sendmsg-window.c:506
+#: ../src/sendmsg-window.c:319
+#: ../src/sendmsg-window.c:506
 msgid "Queue this message in Outbox for sending"
 msgstr "將郵件儲存至寄件匣等候傳送"
 
@@ -5185,47 +5388,58 @@ msgstr "將郵件儲存至寄件匣等候傳送"
 msgid "_Postpone"
 msgstr "暫停(_P)"
 
-#: ../src/sendmsg-window.c:326 ../src/sendmsg-window.c:487
+#: ../src/sendmsg-window.c:326
+#: ../src/sendmsg-window.c:487
 msgid "_Save"
 msgstr "儲存(_S)"
 
-#: ../src/sendmsg-window.c:327 ../src/sendmsg-window.c:488
+#: ../src/sendmsg-window.c:327
+#: ../src/sendmsg-window.c:488
 msgid "Save this message"
 msgstr "儲存這封郵件"
 
-#: ../src/sendmsg-window.c:331 ../src/sendmsg-window.c:492
+#: ../src/sendmsg-window.c:331
+#: ../src/sendmsg-window.c:492
 msgid "Print the edited message"
 msgstr "列印目前正在撰寫的郵件"
 
-#: ../src/sendmsg-window.c:360 ../src/sendmsg-window.c:517
+#: ../src/sendmsg-window.c:360
+#: ../src/sendmsg-window.c:517
 msgid "_Wrap Body"
 msgstr "自動換行(_W)"
 
-#: ../src/sendmsg-window.c:364 ../src/sendmsg-window.c:521
+#: ../src/sendmsg-window.c:364
+#: ../src/sendmsg-window.c:521
 msgid "_Reflow Selected Text"
 msgstr "重新整理選擇的文字(_R)"
 
-#: ../src/sendmsg-window.c:369 ../src/sendmsg-window.c:549
+#: ../src/sendmsg-window.c:369
+#: ../src/sendmsg-window.c:549
 msgid "Insert Si_gnature"
 msgstr "在郵件中加入簽名檔(_G)"
 
-#: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:525
+#: ../src/sendmsg-window.c:373
+#: ../src/sendmsg-window.c:525
 msgid "_Quote Message(s)"
 msgstr "引用原文(_Q)"
 
-#: ../src/sendmsg-window.c:378 ../src/sendmsg-window.c:598
+#: ../src/sendmsg-window.c:378
+#: ../src/sendmsg-window.c:598
 msgid "C_heck Spelling"
 msgstr "拼字檢查(_H)"
 
-#: ../src/sendmsg-window.c:379 ../src/sendmsg-window.c:599
+#: ../src/sendmsg-window.c:379
+#: ../src/sendmsg-window.c:599
 msgid "Check the spelling of the message"
 msgstr "檢查郵件內文的拼字是否正確"
 
-#: ../src/sendmsg-window.c:384 ../src/sendmsg-window.c:605
+#: ../src/sendmsg-window.c:384
+#: ../src/sendmsg-window.c:605
 msgid "Select _Identity..."
 msgstr "選取寄件者身分(_I)..."
 
-#: ../src/sendmsg-window.c:385 ../src/sendmsg-window.c:606
+#: ../src/sendmsg-window.c:385
+#: ../src/sendmsg-window.c:606
 msgid "Select the Identity to use for the message"
 msgstr "選取這封郵件的寄件者身分"
 
@@ -5237,19 +5451,23 @@ msgstr "以 GNOM_E 文字編輯器編輯"
 msgid "Edit the current message with the default Gnome editor"
 msgstr "使用預設的 GNOME 文字編輯器來編輯目前的郵件"
 
-#: ../src/sendmsg-window.c:403 ../src/sendmsg-window.c:562
+#: ../src/sendmsg-window.c:403
+#: ../src/sendmsg-window.c:562
 msgid "Fr_om"
 msgstr "寄件者(_O)"
 
-#: ../src/sendmsg-window.c:405 ../src/sendmsg-window.c:564
+#: ../src/sendmsg-window.c:405
+#: ../src/sendmsg-window.c:564
 msgid "_Cc"
 msgstr "副本(_C)"
 
-#: ../src/sendmsg-window.c:407 ../src/sendmsg-window.c:566
+#: ../src/sendmsg-window.c:407
+#: ../src/sendmsg-window.c:566
 msgid "_Bcc"
 msgstr "密件副本(_B)"
 
-#: ../src/sendmsg-window.c:409 ../src/sendmsg-window.c:568
+#: ../src/sendmsg-window.c:409
+#: ../src/sendmsg-window.c:568
 msgid "_Fcc"
 msgstr "郵件箱副本(_F)"
 
@@ -5257,35 +5475,43 @@ msgstr "郵件箱副本(_F)"
 msgid "_Reply To"
 msgstr "回覆(_R)"
 
-#: ../src/sendmsg-window.c:417 ../src/sendmsg-window.c:610
+#: ../src/sendmsg-window.c:417
+#: ../src/sendmsg-window.c:610
 msgid "_Request Disposition Notification"
 msgstr "要求讀取回條(_R)"
 
-#: ../src/sendmsg-window.c:420 ../src/sendmsg-window.c:580
+#: ../src/sendmsg-window.c:420
+#: ../src/sendmsg-window.c:580
 msgid "_Format = Flowed"
 msgstr "_Format = Flowed"
 
-#: ../src/sendmsg-window.c:425 ../src/sendmsg-window.c:585
+#: ../src/sendmsg-window.c:425
+#: ../src/sendmsg-window.c:585
 msgid "_Sign Message"
 msgstr "簽署郵件(_S)"
 
-#: ../src/sendmsg-window.c:426 ../src/sendmsg-window.c:586
+#: ../src/sendmsg-window.c:426
+#: ../src/sendmsg-window.c:586
 msgid "signs the message using GnuPG"
 msgstr "使用 GnuPG 簽署郵件"
 
-#: ../src/sendmsg-window.c:429 ../src/sendmsg-window.c:589
+#: ../src/sendmsg-window.c:429
+#: ../src/sendmsg-window.c:589
 msgid "_Encrypt Message"
 msgstr "將郵件加密(_E)"
 
-#: ../src/sendmsg-window.c:430 ../src/sendmsg-window.c:590
+#: ../src/sendmsg-window.c:430
+#: ../src/sendmsg-window.c:590
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "使用 GnuPG 為此郵件的所有 To: 與 CC: 收件者簽署"
 
-#: ../src/sendmsg-window.c:450 ../src/sendmsg-window.c:626
+#: ../src/sendmsg-window.c:450
+#: ../src/sendmsg-window.c:626
 msgid "_Show"
 msgstr "顯示(_S)"
 
-#: ../src/sendmsg-window.c:452 ../src/sendmsg-window.c:603
+#: ../src/sendmsg-window.c:452
+#: ../src/sendmsg-window.c:603
 msgid "_Language"
 msgstr "語言(_L)"
 
@@ -5333,14 +5559,11 @@ msgstr "選取身分"
 #: ../src/sendmsg-window.c:1568
 #, c-format
 msgid ""
-"Saying yes will not send the file `%s' itself, but just a MIME message/"
-"external-body reference.  Note that the recipient must have proper "
-"permissions to see the `real' file.\n"
+"Saying yes will not send the file `%s' itself, but just a MIME message/external-body reference.  Note that the recipient must have proper permissions to see the `real' file.\n"
 "\n"
 "Do you really want to attach this file as reference?"
 msgstr ""
-"附件“%s”將會以 MIME message/external-body 參考的方式附加於郵件上，而非寄出檔"
-"案本身。請注意，收件者必須有足夠權限才可讀取“實際”的檔案。\n"
+"附件“%s”將會以 MIME message/external-body 參考的方式附加於郵件上，而非寄出檔案本身。請注意，收件者必須有足夠權限才可讀取“實際”的檔案。\n"
 "\n"
 "是否確定將附件以參考的方式附加於郵件上？"
 
@@ -5393,7 +5616,8 @@ msgstr "來自 %s 的郵件，主旨：“%s”"
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "轉換“%s”為 UTF-8 時發生錯誤：%s\n"
 
-#: ../src/sendmsg-window.c:1993 ../src/sendmsg-window.c:2064
+#: ../src/sendmsg-window.c:1993
+#: ../src/sendmsg-window.c:2064
 msgid "Remove"
 msgstr "移除"
 
@@ -5424,8 +5648,9 @@ msgstr "無法讀取檔案 %s\n"
 msgid "Attach file"
 msgstr "附加檔案"
 
-#: ../src/sendmsg-window.c:2253 ../src/sendmsg-window.c:2362
-#: ../src/sendmsg-window.c:4017
+#: ../src/sendmsg-window.c:2253
+#: ../src/sendmsg-window.c:2362
+#: ../src/sendmsg-window.c:4016
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5438,169 +5663,164 @@ msgid "F_rom:"
 msgstr "寄件者(_R):"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2719
+#: ../src/sendmsg-window.c:2717
 msgid "S_ubject:"
 msgstr "主旨(_U):"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: ../src/sendmsg-window.c:2733
+#: ../src/sendmsg-window.c:2731
 msgid "F_cc:"
 msgstr "備份副本(_C):"
 
 #. Reply To:
-#: ../src/sendmsg-window.c:2764
+#: ../src/sendmsg-window.c:2762
 msgid "_Reply To:"
 msgstr "回覆(_R):"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2769
+#: ../src/sendmsg-window.c:2767
 msgid "_Attachments:"
 msgstr "附件(_A):"
 
-#: ../src/sendmsg-window.c:2814
+#: ../src/sendmsg-window.c:2812
 msgid "Mode"
 msgstr "模式"
 
-#: ../src/sendmsg-window.c:2837
+#: ../src/sendmsg-window.c:2835
 msgid "Description"
 msgstr "描述"
 
-#: ../src/sendmsg-window.c:3138
+#: ../src/sendmsg-window.c:3136
 msgid "you"
 msgstr "您"
 
-#: ../src/sendmsg-window.c:3147
+#: ../src/sendmsg-window.c:3145
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------轉寄自 %s 的郵件------\n"
 
-#: ../src/sendmsg-window.c:3186
+#: ../src/sendmsg-window.c:3184
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "郵件編號：%s\n"
 
-#: ../src/sendmsg-window.c:3192
+#: ../src/sendmsg-window.c:3190
 msgid "References:"
 msgstr "連結參考附件:"
 
 # FIXME: Don't translate it, any non-Chinese would not understand it -- Abel
-#: ../src/sendmsg-window.c:3203
+#: ../src/sendmsg-window.c:3201
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "On %s, %s wrote:\n"
 
 # FIXME: Same as above -- Abel
-#: ../src/sendmsg-window.c:3205
+#: ../src/sendmsg-window.c:3203
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s wrote:\n"
 
-#: ../src/sendmsg-window.c:3303
+#: ../src/sendmsg-window.c:3301
 msgid "No signature found!"
 msgstr "找不到簽署！"
 
-#: ../src/sendmsg-window.c:4135
+#: ../src/sendmsg-window.c:4134
 #, c-format
 msgid "Error executing signature generator %s"
 msgstr "執行簽署產生器 %s 時發生錯誤"
 
-#: ../src/sendmsg-window.c:4147
+#: ../src/sendmsg-window.c:4146
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
 msgstr "不能開啟簽名檔“%s”以供讀取"
 
-#: ../src/sendmsg-window.c:4157
+#: ../src/sendmsg-window.c:4156
 #, c-format
 msgid "Error reading signature from %s"
 msgstr "讀取來自 %s 的簽名檔時發生錯誤"
 
-#: ../src/sendmsg-window.c:4161
+#: ../src/sendmsg-window.c:4160
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "%s 中的簽署並非 UTF-8 格式。"
 
-#: ../src/sendmsg-window.c:4226
+#: ../src/sendmsg-window.c:4223
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "無法開啟檔案 %s。\n"
 
-#: ../src/sendmsg-window.c:4277
+#: ../src/sendmsg-window.c:4280
 msgid "Include file"
 msgstr "包含檔案"
 
-#: ../src/sendmsg-window.c:4613
-msgid ""
-"You selected OpenPGP mode for a message with attachments. In this mode, only "
-"the first part will be signed and/or encrypted. You should select MIME mode "
-"if the complete message shall be protected. Do you really want to proceed?"
-msgstr ""
-"您為此封具附加檔案的郵件選擇了 Open PGP 模式。在此模式中，只有第一個部分會被"
-"簽署和/或加密。如果要保護整個郵件，您應該使用 MIME 模式。您確定要繼續？"
+#: ../src/sendmsg-window.c:4632
+msgid "You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"
+msgstr "您為此封具附加檔案的郵件選擇了 Open PGP 模式。在此模式中，只有第一個部分會被簽署和/或加密。如果要保護整個郵件，您應該使用 MIME 模式。您確定要繼續？"
 
-#: ../src/sendmsg-window.c:4629
+#: ../src/sendmsg-window.c:4648
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "以 gpg 模式 %d 傳送郵件"
 
-#: ../src/sendmsg-window.c:4675
+#: ../src/sendmsg-window.c:4694
 msgid "Message could not be created"
 msgstr "無法建立郵件"
 
-#: ../src/sendmsg-window.c:4677
+#: ../src/sendmsg-window.c:4696
 msgid "Message could not be queued in outbox"
 msgstr "無法將郵件排入寄件匣的佇列"
 
-#: ../src/sendmsg-window.c:4679
+#: ../src/sendmsg-window.c:4698
 msgid "Message could not be saved in sentbox"
 msgstr "郵件無法儲存於寄件備份"
 
-#: ../src/sendmsg-window.c:4681
+#: ../src/sendmsg-window.c:4700
 msgid "Message could not be sent"
 msgstr "郵件無法寄出"
 
-#: ../src/sendmsg-window.c:4685
+#: ../src/sendmsg-window.c:4704
 #, c-format
 msgid "Send failed: %s"
 msgstr "傳送失敗：%s"
 
-#: ../src/sendmsg-window.c:4751
+#: ../src/sendmsg-window.c:4770
 msgid "Could not postpone message."
 msgstr "無法延緩處理郵件。"
 
-#: ../src/sendmsg-window.c:4765
+#: ../src/sendmsg-window.c:4784
 msgid "Message postponed."
 msgstr "延緩處理郵件。"
 
-#: ../src/sendmsg-window.c:4781
+#: ../src/sendmsg-window.c:4800
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "無法開啟草稿： %s"
 
-#: ../src/sendmsg-window.c:4803
+#: ../src/sendmsg-window.c:4822
 msgid "Message saved."
 msgstr "郵件已儲存。"
 
-#: ../src/sendmsg-window.c:4971
+#: ../src/sendmsg-window.c:4990
 #, c-format
 msgid "Could not compile %s"
 msgstr "無法編譯 %s"
 
-#: ../src/sendmsg-window.c:5464
+#: ../src/sendmsg-window.c:5483
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "回覆 %s：%s"
 
-#: ../src/sendmsg-window.c:5469
+#: ../src/sendmsg-window.c:5488
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "轉寄郵件給 %s：%s"
 
-#: ../src/sendmsg-window.c:5473
+#: ../src/sendmsg-window.c:5492
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "繼續撰寫未完成的郵件給 %s：%s"
 
-#: ../src/sendmsg-window.c:5477
+#: ../src/sendmsg-window.c:5496
 #, c-format
 msgid "New message to %s: %s"
 msgstr "撰寫新郵件給 %s：%s"
@@ -5857,7 +6077,8 @@ msgstr "指定這封郵件的寄件者身分"
 msgid "Run a spell check"
 msgstr "執行拼字檢查"
 
-#: ../src/toolbar-factory.c:122 ../src/toolbar-factory.c:132
+#: ../src/toolbar-factory.c:122
+#: ../src/toolbar-factory.c:132
 msgid "Close"
 msgstr "關閉"
 
@@ -6006,9 +6227,8 @@ msgstr "下"
 
 #~ msgid "Run GnomeCard"
 #~ msgstr "啟動 GnomeCard"
-
 #~ msgid "Match In"
 #~ msgstr "搜尋範圍"
-
 #~ msgid "IMAP Server %s: %s"
 #~ msgstr "IMAP 伺服器%s：%s"
+

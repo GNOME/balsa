@@ -2717,7 +2717,7 @@ msgstr "आपके फिल्टर की निम्न स्थित�
 
 #: src/filter-export-callbacks.c:55
 #, fuzzy, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "%s फिल्टर को निर्यात करने में असफल त्रुटि हो गई है"
 
 #: src/filter-export-dialog.c:61

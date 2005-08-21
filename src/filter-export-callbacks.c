@@ -55,7 +55,7 @@ fex_dialog_response_func(GtkTreeModel * model, GtkTreePath * path,
     if (!libbalsa_filter_export_sieve(fil, str))
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("Unable to export filter %s, "
-                            "an error occured."), fil->name);
+                            "an error occurred."), fil->name);
     g_free(str);
 }
 

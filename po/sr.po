@@ -2705,7 +2705,7 @@ msgstr "Филтер мора да има услове."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Не могу да извезем филтер %s, дошло је до грешке."
 
 #: src/filter-export-dialog.c:61

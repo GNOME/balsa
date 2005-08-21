@@ -2706,7 +2706,7 @@ msgstr "\"%s\" filtril ei ole tingimust."
 
 #: ../src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Ei saa eksportida filtrit %s, sest tekkis viga."
 
 #: ../src/filter-export-dialog.c:63

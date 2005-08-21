@@ -2711,7 +2711,7 @@ msgstr "Filtrin şərtləri olmalıdır."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "%s filtri ixrac edilə bilmədi, namə'lum xəta yarandı."
 
 #: src/filter-export-dialog.c:61

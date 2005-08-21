@@ -1415,7 +1415,7 @@ imap_matched(unsigned uid, ImapSearchData* data)
 }
 
 /* Gets the messages matching the conditions via the IMAP search command
-   error is put to TRUE if an error occured
+   error is put to TRUE if an error occurred
 */
 
 GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,

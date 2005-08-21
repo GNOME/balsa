@@ -2459,7 +2459,7 @@ msgstr "Filteret «%s» har ingen betingelse."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Kan ikke eksportere filter %s. En feil oppsto."
 
 #: src/filter-export-dialog.c:61

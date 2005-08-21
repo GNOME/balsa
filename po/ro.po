@@ -2798,7 +2798,7 @@ msgstr "Fitrul „%s” necesită anumite condiţii."
 
 #: src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Nu pot exporta filtrul %s, a intervenit o eroare."
 
 #: src/filter-export-dialog.c:63

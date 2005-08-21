@@ -2713,7 +2713,7 @@ msgstr "過濾條件“%s”沒有內容。"
 
 #: ../src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr " 無法匯出過濾條件 %s ，有錯誤產生。"
 
 #: ../src/filter-export-dialog.c:63

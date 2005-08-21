@@ -2715,7 +2715,7 @@ msgstr "Filtret \"%s\" har inget villkor."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Kan inte exportera filtret %s, ett fel inträffade."
 
 #: src/filter-export-dialog.c:61
@@ -7502,7 +7502,7 @@ msgstr "Ned"
 #~ msgid "All headers"
 #~ msgstr "Alla brevhuvuden"
 
-#~ msgid "Unable to export filter %s,an error occured."
+#~ msgid "Unable to export filter %s,an error occurred."
 #~ msgstr "Kan inte exportera filtret %s, ett fel inträffade."
 
 #~ msgid "Memory allocation error"

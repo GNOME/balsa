@@ -2683,7 +2683,7 @@ msgstr "Филтърът \"%s\" няма условие."
 
 #: ../src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr ""
 
 #: ../src/filter-export-dialog.c:63
@@ -4593,7 +4593,7 @@ msgstr "Цветове за писмата"
 #: ../src/pref-manager.c:2118
 #, c-format
 msgid "Quote level %d color"
-msgstr "Цвят за ниво на цитат %s"
+msgstr "Цвят за ниво на цитат %d"
 
 #: ../src/pref-manager.c:2131
 #, fuzzy

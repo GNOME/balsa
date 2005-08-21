@@ -83,7 +83,7 @@ build_selected_filters_list(GtkTreeView * filter_list, gboolean to_run)
 
 /*
  * Run the selected filters on the mailbox
- * Returns TRUE if OK, or FALSE if errors occured
+ * Returns TRUE if OK, or FALSE if errors occurred
  */
 static gboolean
 run_filters_on_mailbox(GSList * filters, LibBalsaMailbox * mbox)

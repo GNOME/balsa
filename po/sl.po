@@ -2662,7 +2662,7 @@ msgstr "Filter mora vsebovati pogoje."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Nisem mogel izvoziti filtra %s, zgodila se je napaka."
 
 #: src/filter-export-dialog.c:61

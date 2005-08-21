@@ -131,7 +131,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
-                return FALSE;  /* We don't want to match if an error occured */
+                return FALSE;  /* We don't want to match if an error occurred */
             }
         }
         /* do the work */
@@ -186,7 +186,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
 	    if (!message->mailbox)
-		return FALSE; /* We don't want to match if an error occured */
+		return FALSE; /* We don't want to match if an error occurred */
             body =
                 content2reply(message, NULL, 0, FALSE, FALSE, NULL, NULL);
 	    if (body) {

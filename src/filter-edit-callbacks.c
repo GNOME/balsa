@@ -792,7 +792,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
                 return;
             }
 
-            /* No error occured, condition is valid, so change/add it
+            /* No error occurred, condition is valid, so change/add it
              * based on is_new_condition and only if something has
              * changed of course */
             selection = gtk_tree_view_get_selection(fe_conditions_list);

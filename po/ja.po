@@ -2711,7 +2711,7 @@ msgstr "フィルタには条件が必要です。"
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "フィルタ %s をエキスポートできません。エラーが発生しました。"
 
 #: src/filter-export-dialog.c:61

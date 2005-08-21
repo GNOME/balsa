@@ -2772,7 +2772,7 @@ msgstr "Filtri jo."
 
 #: src/filter-export-callbacks.c:55
 #, fuzzy, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "eksporto filtro gabim."
 
 #: src/filter-export-dialog.c:61

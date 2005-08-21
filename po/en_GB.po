@@ -2805,8 +2805,8 @@ msgstr "Filter \"%s\" has no condition."
 
 #: ../src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
-msgstr "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
+msgstr "Unable to export filter %s, an error occurred."
 
 #: ../src/filter-export-dialog.c:63
 msgid ""

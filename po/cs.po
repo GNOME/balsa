@@ -2663,7 +2663,7 @@ msgstr "Filtr \"%s\" nemá podmínku."
 
 #: ../src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Nelze exportovat filtr %s, vyskytla se chyba."
 
 #: ../src/filter-export-dialog.c:63

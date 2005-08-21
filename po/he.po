@@ -2698,7 +2698,7 @@ msgstr "למסנן חייבים להיות תנאים."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "עקב שגיאה לא ניתן לייצא את המסנן %s."
 
 #: src/filter-export-dialog.c:61

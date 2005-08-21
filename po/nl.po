@@ -2673,7 +2673,7 @@ msgstr "Het filter \"%s\" heeft geen voorwaarderegel"
 
 #: ../src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Fout opgetreden bij exporteren van filter %s."
 
 #: ../src/filter-export-dialog.c:63

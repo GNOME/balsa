@@ -209,7 +209,7 @@ libbalsa_mailbox_mbox_create(const gchar * path, gboolean create)
 	    return(-1);
 
 	if ((fd = creat(path, S_IRUSR | S_IWUSR)) == -1) {
-	    g_warning("An error:\n%s\n occured while trying to "
+	    g_warning("An error:\n%s\n occurred while trying to "
 		      "create the mailbox \"%s\"\n",
 		      strerror(errno), path);
 	    return -1;
@@ -1202,7 +1202,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     libbalsa_mime_stream_shared_unlock(mbox_stream);
     if (save_failed) {
 	/*
-	 * error occured while writing the mailbox back,
+	 * error occurred while writing the mailbox back,
 	 * so keep the temp copy around
 	 */
 	char *savefile;

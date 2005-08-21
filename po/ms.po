@@ -2669,7 +2669,7 @@ msgstr "Tapisan anda mesti mempunyai syarat-syarat."
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Tak dapat mengeksport tapisan %s,ralat telah berlaku."
 
 #: src/filter-export-dialog.c:61

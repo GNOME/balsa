@@ -2695,7 +2695,7 @@ msgstr "फिल्टर \"%s\" मा कुनै अवस्था छै�
 
 #: src/filter-export-callbacks.c:57
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "फिल्टर %s निर्यात गर्न असक्ष, गल्ती आयो."
 
 #: src/filter-export-dialog.c:63

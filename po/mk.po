@@ -1,9 +1,4 @@
 # translation of balsa.HEAD.po to Macedonian
-# translation of balsa.HEAD.po to
-# translation of balsa.HEAD.po to
-# translation of balsa.HEAD.po to
-# translation of balsa.HEAD.po to
-# translation of balsa.HEAD.po to
 # This file is distributed under the same license as the PACKAGE package.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER, 2003
 # Ime Prezime <email@adresa.com>, 2003
@@ -2802,7 +2797,7 @@ msgstr "Balsa филтри"
 
 #: src/filter-export-callbacks.c:55
 #, c-format
-msgid "Unable to export filter %s, an error occured."
+msgid "Unable to export filter %s, an error occurred."
 msgstr "Не сум во можност да го извезам филтерот %s, настана грешка."
 
 #: src/filter-export-dialog.c:61

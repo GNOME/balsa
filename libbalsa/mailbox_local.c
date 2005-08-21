@@ -405,7 +405,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
-                return FALSE;   /* We don't want to match if an error occured */
+                return FALSE;   /* We don't want to match if an error occurred */
             }
         }
 
@@ -487,7 +487,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             GString *body;
             g_assert(is_refed);
 	    if (!message->mailbox)
-		return FALSE; /* We don't want to match if an error occured */
+		return FALSE; /* We don't want to match if an error occurred */
             body =
                 content2reply(message, NULL, 0, FALSE, FALSE, NULL, NULL);
 	    if (body) {

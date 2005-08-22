@@ -1,9 +1,22 @@
+2005-08-22 07:46  PeterB
+
+	* doc/C/balsa.xml: cleanup.
+	* src/toolbar-factory.c: set button label and tooltip
+	appropriately.
+
 2005-08-21  Jens Seidel  <jseidel@cvs.gnome.org>
 
 	* src/filter-export-callbacks.c:
 	* macros/gnome-bonobo-check.m4:
 	* libbalsa/mailbox_mbox.c: Fixed the typo "occured"
 	(also in all effected PO files to avoid fuzzyness)
+
+2005-08-21 09:04  PeterB
+
+	* doc/C/: balsa.xml, figures/message-window.png,
+	figures/msg-part-select.png: message window documentation
+	contributed by Craig Routledge <webstuff at craigroutledge dot
+	cm,dom>; fix "unmatched element" warnings.
 
 2005-08-17 19:03  PeterB
 

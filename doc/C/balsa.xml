@@ -92,7 +92,7 @@ General advices:
 </legalnotice>
 
 <releaseinfo> 
-This is version 2.719 of the Balsa manual.
+This is version 2.719 of the &Balsa; manual.
 </releaseinfo>
 
 <revhistory><revision><date>28 May 2004</date></revision></revhistory>
@@ -314,7 +314,7 @@ This is version 2.719 of the Balsa manual.
 			    
 	    Open a dialog box to create a new mailbox.  There are
 	    various items like this, corresponding to the different
-	    types of mailbox that Balsa supports. See the <link
+	    types of mailbox that &Balsa; supports. See the <link
 	    linkend="mbox-formats">discussion of different mailbox
 	    formats</link> and their advantages and disadvantages.
 	  </para>
@@ -1731,7 +1731,10 @@ This is version 2.719 of the Balsa manual.
   <listitem>
     <para>
       Send the current message.  Only available if the message is
-      legal to be sent (i.e. proper email addresses).
+      legal to be sent (i.e. proper email addresses).  This button may
+      also be configured to queue the message in the outbox to be sent
+      later (see the
+      <link linkend="mail-options-outgoing">Preferences</link> dialog).
     </para>
   </listitem>
 </varlistentry>
@@ -1759,8 +1762,9 @@ This is version 2.719 of the Balsa manual.
   <term><guibutton>Check Spelling</guibutton></term>
   <listitem>
     <para>
-      Start a spell check on the current message.  Balsa can currently
-      use either the standard ispell or the newer aspell to do the
+      Start a spell check on the current message.  &Balsa; can currently
+      use either the standard <application>ispell</application> or the
+      newer <application>aspell</application> to do the
       spell checking.  Settings for this can be found in the <link
       linkend="preferences-4">Preferences</link> dialog.
     </para>
@@ -1805,9 +1809,9 @@ This is version 2.719 of the Balsa manual.
   <listitem>
     <para>
       <literal>From</literal> is used to indicate the origin of the
-      message, Balsa automatically fills this in for you if you have
+      message, &Balsa; automatically fills this in for you if you have
       entered your name and email address in the <link
-      linkend="identities">identites</link> window.
+      linkend="identities">identities</link> window.
     </para>
   </listitem>
 </varlistentry>
@@ -1816,7 +1820,7 @@ This is version 2.719 of the Balsa manual.
   <term><guilabel>To</guilabel></term>
   <listitem>
     <para>The <literal>To</literal> header is used to indicate
-      the intended recipient of the message; Balsa automatically
+      the intended recipient of the message; &Balsa; automatically
       fills this in for you if you are replying to a
       message.
     </para>
@@ -1920,7 +1924,7 @@ This is version 2.719 of the Balsa manual.
 
 <tip>
   <para>
-    Also, Balsa supports alias expansion.  As you type a name, Balsa
+    Also, &Balsa; supports alias expansion.  As you type a name, &Balsa;
     will guess the e-mail address from all the entries in the
     &GnomeCard; application.  To enable this feature, read the section
     on <link linkend="ct-alias-expansion">Alias Expansion</link>.  In
@@ -2135,7 +2139,7 @@ This is version 2.719 of the Balsa manual.
   up the &GnomeCard; application, allowing you to easily manipulate
   your contact list.  After any changes have been made using the
   address book, they can be forced to show up in the left hand pane by
-  clicking on the <application>Re-Import</application> button.
+  clicking on the <guibutton>Re-Import</guibutton> button.
 </para>
 </sect2>
 </sect1>
@@ -2356,7 +2360,7 @@ This is version 2.719 of the Balsa manual.
   &Balsa; supports the use of multiple address books, both local
   <glossterm linkend="glossary-vcard">VCARD</glossterm> and remote
   &LDAP; address books, both of which can be configured here.
-  &GnomeCard; also uses VCARD address books, so this allows Balsa to
+  &GnomeCard; also uses VCARD address books, so this allows &Balsa; to
   share address books with other GNOME applications.
 </para>
 
@@ -2501,7 +2505,7 @@ This is version 2.719 of the Balsa manual.
   <varlistentry>
     <term><guilabel>Check IMAP mailboxes</guilabel></term>
     <listitem>
-      <para>If selected, <application>Balsa</application> will
+      <para>If selected, &Balsa; will
         include your <acronym>IMAP</acronym> mailboxes when
         checking for mail. You can also specify that INBOX is
         the only mailbox to be checked.</para>
@@ -2516,7 +2520,7 @@ This is version 2.719 of the Balsa manual.
       <guilabel>Display message if new mail has arrived</guilabel>
     </term>
     <listitem>
-      <para>If selected, <application>Balsa</application> will
+      <para>If selected, &Balsa; will
         alert you when mail has arrived.</para>
     </listitem>
   </varlistentry>
@@ -2524,7 +2528,7 @@ This is version 2.719 of the Balsa manual.
   <varlistentry>
     <term><guilabel>Do background check quietly</guilabel></term>
     <listitem>
-      <para>If selected, <application>Balsa</application> will
+      <para>If selected, &Balsa; will
         give you no indication that a background mail check is
         in progress.</para>
     </listitem>
@@ -2554,7 +2558,7 @@ This is version 2.719 of the Balsa manual.
   <varlistentry>
     <term><guilabel>Wrap Incoming Text</guilabel></term>
     <listitem>
-      <para>If selected, <application>Balsa</application> will
+      <para>If selected, &Balsa; will
         wrap text of incoming messages at the specified line
         length.
       </para>
@@ -2575,7 +2579,7 @@ This is version 2.719 of the Balsa manual.
         space is left at the end of the line. A `hard' line break (one
         that is not preceded by a space) indicates the end of a
         paragraph.</para>
-      <para><application>Balsa</application> can reflow the paragraphs,
+      <para>&Balsa; can reflow the paragraphs,
         quoted or otherwise, in a message of this type.  Reflowing
         eliminates the line fragments that are left when text is first
         wrapped at one length and then rewrapped to a shorter length,
@@ -2584,7 +2588,7 @@ This is version 2.719 of the Balsa manual.
         value assumed by default when `format' is not specified, as with
         older mailers. In this case, all line breaks must be respected.
         If you do not select the `Reflow...' option,
-        <application>Balsa</application> will treat all messages of type
+        &Balsa; will treat all messages of type
         `text/plain' as if they were `format=fixed'. Long lines will
         still be wrapped, if the `Wrap Incoming Messages' option is
         selected, but this will usually leave unquoted line
@@ -2599,7 +2603,7 @@ This is version 2.719 of the Balsa manual.
     <listitem>
       <para>You will sometimes receive a message whose sender has asked
         for notification that you have received or seen the message. You
-        can specify how <application>Balsa</application> responds to
+        can specify how &Balsa; responds to
         these requests.</para>
     </listitem>
   </varlistentry>
@@ -2636,11 +2640,11 @@ This is version 2.719 of the Balsa manual.
         `soft' line breaks: a space is left at the end of the
         line. A `hard' line break (one that is not preceded by a
         space) indicates the end of a paragraph.</para>
-      <para><application>Balsa</application> can prepare the message
+      <para>&Balsa; can prepare the message
         using this convention, and a flowed-aware mailer
         receiving it can then reflow its paragraphs to fit its display
         without leaving misquoted line fragments. If you do not select
-        this option, <application>Balsa</application> will use
+        this option, &Balsa; will use
         hard line breaks to end lines, and no receiving mailer
         will be able to identify paragraphs.</para>
     </listitem>
@@ -2649,10 +2653,10 @@ This is version 2.719 of the Balsa manual.
   <varlistentry>
     <term><guilabel>Reply prefix</guilabel></term>
     <listitem>
-      <para>The string that <application>Balsa</application>
+      <para>The string that &Balsa;
         should use as a prefix when quoting a message. Note: if
         you select `Send message as type text/plain;
-        format=flowed', <application>Balsa</application> is
+        format=flowed', &Balsa; is
         required to use the one-character string ">".
       </para>
     </listitem>
@@ -2663,7 +2667,7 @@ This is version 2.719 of the Balsa manual.
       <guilabel>Automatically quote original when replying</guilabel>
     </term>
     <listitem>
-      <para>Have <application>Balsa</application> include the
+      <para>Have &Balsa; include the
         text of a message in the reply. The text will be
         prefixed as shown above.</para>
       <para>You can instead include the original message using an
@@ -2682,7 +2686,7 @@ This is version 2.719 of the Balsa manual.
       </guilabel>
     </term>
     <listitem>
-      <para>Tell <application>Balsa</application> to be sensible.</para>
+      <para>Tell &Balsa; to be sensible.</para>
     </listitem>
   </varlistentry>
 
@@ -2713,7 +2717,7 @@ This is version 2.719 of the Balsa manual.
     </term>
     <listitem>
       <para>This option gives you control over when
-        <application>Balsa</application> connects to a server to
+        &Balsa; connects to a server to
         send messages.</para>
     </listitem>
   </varlistentry>
@@ -2721,7 +2725,7 @@ This is version 2.719 of the Balsa manual.
   <varlistentry> 
     <term><guilabel>Copy outgoing messages to sentbox</guilabel></term>
     <listitem>
-      <para>Have <application>Balsa</application> save a copy of
+      <para>Have &Balsa; save a copy of
         each message you send in the mailbox marked as the `Sentbox'.</para>
     </listitem>
   </varlistentry>
@@ -2865,12 +2869,12 @@ This is version 2.719 of the Balsa manual.
 <title>Spelling</title>
 
 <para>
-  The pane to setup Balsa spell check options.  Balsa uses the
+  The pane to setup &Balsa; spell check options.  &Balsa; uses the
   Portable Spell Checking library (<ulink
   url="http://pspell.sourceforge.net">pspell</ulink>) to do provide an
   interface to the spell checking program of your choice.  Currently
   there are modules for ispell or aspell, both of which can be found
-  at the pspell website.  For more information visit the Balsa
+  at the pspell website.  For more information visit the &Balsa;
   homepage.
 </para>
 
@@ -2887,8 +2891,10 @@ This is version 2.719 of the Balsa manual.
     </para>
 
     <para>
-      Ispell is most likely available on your system as it is a Unix
-      standard, however Aspell is more advanced as it uses an advanced
+        <application>Ispell</application>
+        is most likely available on your system as it is a Unix
+        standard; however <application>Aspell</application>
+        is more advanced as it uses an advanced
       phonetics engine and adaptive techniques to learn how you tend
       to misspell words.  More information is available at the <ulink
       url="http://aspell.sourceforge.net">Aspell
@@ -2896,7 +2902,7 @@ This is version 2.719 of the Balsa manual.
     </para>
 
     <para>
-      Balsa will attempt to use whatever module you specify here,
+      &Balsa; will attempt to use whatever module you specify here,
       however if the module is not installed it will not work and
       generate an error.
     </para>
@@ -2917,7 +2923,7 @@ This is version 2.719 of the Balsa manual.
 
 	<listitem>
 	  <para>This mode quickly scans for replacements, which means
-	    it might be used by a good speller who occaisonally makes
+	    it might be used by a good speller who occasionally makes
 	    typographical errors.</para>
 	</listitem>
       </varlistentry>
@@ -2926,7 +2932,7 @@ This is version 2.719 of the Balsa manual.
 	<term><guilabel>Normal</guilabel></term>
 	<listitem>
 	  <para>The Normal mode is probably good enough for most
-	    people, it should produce the correct suggestion in the
+	    people; it should produce the correct suggestion in the
 	    majority of cases.</para>
 	</listitem>
       </varlistentry>
@@ -2935,7 +2941,7 @@ This is version 2.719 of the Balsa manual.
 	<term><guilabel>Bad Spellers</guilabel></term>
 	<listitem>
 	  <para>The Bad Spellers mode is the most thorough and
-	    accurate mode, however it also takes the longest to find a
+	    accurate mode; however, it also takes the longest to find a
 	    list of suggestions.</para>
 	</listitem>
       </varlistentry>
@@ -3023,7 +3029,7 @@ This is version 2.719 of the Balsa manual.
 	  <menuchoice>
 	      <guimenu>Mailbox</guimenu>
 	      <guimenuitem>Expunge deleted messages</guimenuitem>
-	  </menuchoice>
+	  </menuchoice>,
 	  or you can set &Balsa; to expunge deleted messages when the
 	  mailbox is closed (all mailboxes are closed when you exit
 	  &Balsa;).
@@ -3093,7 +3099,7 @@ This is version 2.719 of the Balsa manual.
 <title>Customizing Toolbars</title>
 
 <para>
-  Balsa allows you to change the layout of the toolbars on the three
+  &Balsa; allows you to change the layout of the toolbars on the three
   main types of window: the main window, message windows, and compose
   windows. You open the dialog with the
   <menuchoice>
@@ -3105,9 +3111,9 @@ This is version 2.719 of the Balsa manual.
 <para>
   The dialog contains a notebook with a page for each type of window. On
   each page, you'll see a Preview of the toolbar, which changes as you
-  change the layout. The list of <quote>Available buttons</quote> shows
+  change the layout. The list of <guilabel>Available buttons</guilabel> shows
   buttons that may be used on the toolbar, but aren't currently used,
-  and the <quote>Current toolbar</quote> list shows the current layout,
+  and the <guilabel>Current toolbar</guilabel> list shows the current layout,
   including both buttons and separators. You can add buttons to the
   current toolbar, remove them, or move them up or down in the list,
   using the controls in the central button box.
@@ -3187,22 +3193,23 @@ Advanced IMAP folder configuration tab.</para>
 
 <itemizedlist mark="bullet">
 <listitem>
-<para><quote>Use SSL</quote> check box should be active is the connection
+  <para>The <guilabel>Use SSL</guilabel> check box should be active if
+    the connection
 is to be made to IMAPS service on port 993. Connection to this port
 will be encrypted from the start. Not all servers provide this service
 - many provide only negotiated TLS encryption.</para>
 </listitem>
 
 <listitem>
-<para><quote>Use TLS</quote> option list determines instruct balsa how
-to negotiate the TLS encryption. Balsa can never attempt to negotiate
+<para>The <guilabel>Use TLS</guilabel> option list determines instruct balsa how
+to negotiate the TLS encryption. &Balsa; can never attempt to negotiate
 it, can start TLS encryption whenever it is supported by server, or
 can abort the connection if TLS is inavailable or fails for some
 reason.</para>
 </listitem>
 
 <listitem>
-<para><quote>Max. number of connections</quote> limits the number of
+<para><guilabel>Max. number of connections</guilabel> limits the number of
 concurrent connections open to the IMAP server. A number around 15-40
 is a sane option as it avoids time-consuming and load-creating
 reselections of imap mailboxes. Some IMAP servers -- notably Courier
@@ -3212,7 +3219,7 @@ accordingly.</para>
 </listitem>
 
 <listitem>
-<para><quote>Enable persistent cache</quote> check box chooses whether
+<para>The <guilabel>Enable persistent cache</guilabel> check box chooses whether
 &Balsa; should try to store downloaded messages between sessions or
 throw them away when it is closed. The optimal choice depends on the
 local configuration. If the connection to the IMAP server is slow and
@@ -3237,10 +3244,11 @@ persistent cache becomes just a burden and should be disabled.</para>
 
 <itemizedlist mark="bullet">
 
-  <listitem><para><quote>Folder name</quote> is how the folder is shown
+  <listitem><para><guilabel>Folder name</guilabel> is how the folder is shown
   in the mailbox tree on the left side.</para></listitem>
 
-  <listitem><para><quote>Subfolder of</quote> indicates the immediate parent of
+  <listitem><para><guilabel>Subfolder of</guilabel> indicates
+  the immediate parent of
   the folder.</para></listitem>
 </itemizedlist>
 
@@ -3326,7 +3334,7 @@ addressbook, big brother database, ldap database.
 <sect3 id="extern-load-scripts">
 <title>Writing your own load scripts</title>
 
-<para>Balsa ignores the first line of output from your program. You
+<para>&Balsa; ignores the first line of output from your program. You
 might want to write comments or debug output on this line. The
 remaining lines should have this format:</para>
 <para><computeroutput>
@@ -3337,7 +3345,7 @@ e-mail address	full name	nickname
 currently not used by balsa, but might be in the future. It is also
 kept to ensure compatibility with mutt. </para>
 
-<para>Balsa executes your script with one argument: the pattern to
+<para>&Balsa; executes your script with one argument: the pattern to
 search for. A space (" ") is used as the first argument when creating
 a list of all users.</para>
 
@@ -3488,7 +3496,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
          <listitem>
            <para>
-             A named pipe or FIFO.  In this case, to Balsa, the file
+             A named pipe or FIFO.  In this case, to &Balsa;, the file
              looks normal, but in reality, it is a pipe to a program
              that is generating the content.  List the path to the pipe.
            </para>
@@ -3496,10 +3504,10 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
          <listitem>
            <para>
-             An executable program. Balsa will execute the program and
+             An executable program. &Balsa; will execute the program and
              read its output, appending that text to the message.  List
-             the path to the program with a "|" prepended to it.  For
-             example:
+             the path to the program with a <quote>|</quote> prepended to it.
+             For example:
            </para>
            <para><quote>|/home/user/dynsig.pl</quote></para>
          </listitem>
@@ -3636,13 +3644,9 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   <para>
     This window is divided in two parts: the left part is the list of all
     filters. When you select one of them, the right part displays its
-    properties. The right part is a two pages notebook
-    (<link linkend="wf-match-page">
-       <guilabel>the match page</guilabel>
-     </link>, and 
-     <link linkend="wf-action-page">
-       <guilabel>the action page</guilabel>
-     </link>);
+    properties. The right part is a two-page notebook
+    (the <link linkend="wf-match-page">match page</link>, and the
+     <link linkend="wf-action-page">action page</link>);
      their descriptions follow.
   </para>
   <para>
@@ -3650,18 +3654,21 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <itemizedlist>
       <listitem>  
         <para>
-          The New button: you click on it to create a new filter, it is
+            The <guibutton>New</guibutton> button:
+            you click on it to create a new filter; the filter is
+            initially
           named "New Filter", and contains no condition. Then you fill in
           the different fields in the notebook pages (in particular remember
           to change the name of the filter), add the conditions that will
           describe how this filters matches a message, and to confirm
-          the modifications push the Apply button on the right hand side
+          the modifications push the <guibutton>Apply</guibutton> button on the right hand side
           of the Filters window.
         </para>
       </listitem>
       <listitem>
         <para>
-          The Remove button: removes the currently selected filter.
+            The <guibutton>Remove</guibutton> button:
+            removes the currently selected filter.
         </para>
       </listitem>
     </itemizedlist>
@@ -3693,46 +3700,52 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <itemizedlist>
         <listitem>
 	  <para>
-            Simple: the match is done by a simple substring test.
+              <guilabel>Simple</guilabel>:
+              the match is done by a simple substring test.
 	  </para>
         </listitem>
         <listitem>
         <para>
-          Regular expression: the match uses regular expressions on the
+            <guilabel>Regular expression</guilabel>:
+            the match uses regular expressions on the
           message headers.
         </para>
         </listitem>
         <listitem>
           <para>
-            Date interval: the match is done by checking if the date of the
+              <guilabel>Date interval</guilabel>:
+              the match is done by checking if the date of the
             message is within certain bounds.
           </para>
         </listitem>
         <listitem>
           <para>
-            Flag condition: the match is done by checking the flags of the
+              <guilabel>Flag condition</guilabel>:
+              the match is done by checking the flags of the
             message: unread, replied, deleted, flagged.
           </para>
         </listitem>
       </itemizedlist>
       The three buttons under the list allows you to edit the selected
-      condition, add a new one, or remove one. Edition or creation of a 
+      condition, add a new one, or remove one. Editing or creating a 
       condition is done in the
-      <link linkend="win-condition">
-        <guilabel>condition window</guilabel>
-      </link>,
-      that pops up when you click on the Edit or the New button.
+      <link linkend="win-condition">condition window</link>,
+      which pops up when you click on the <guibutton>Edit</guibutton> or
+      the <guibutton>New</guibutton> button.
     </para>
     <para>
       The two buttons under the notebook at the right hand side of the window
-      lets you manipulate the currently selected filter. The Apply button
+      lets you manipulate the currently selected filter. The
+      <guibutton>Apply</guibutton> button
       is used to confirm the modifications you have made on any field. If you
       make changes and select another filter without first clicking on the
-      Apply button, all your changes will be lost.
+      <guibutton>Apply</guibutton> button, all your changes will be lost.
     </para>
     <para>
-      The Revert button cancels all previous changes: the current filter
-      is reverted to its state just before the last click on the Apply button.
+        The <guibutton>Revert</guibutton> button cancels all previous changes:
+        the current filter
+        is reverted to its state just before the last click on the
+        <guibutton>Apply</guibutton> button.
     </para>
   </sect2>
   <sect2 id="wf-action-page">
@@ -3741,7 +3754,8 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <para>
       This page describes the actions to take in case the filter matches. First
       you specify the notification to inform you that the one or several messages
-      has matched the filter in the Notification frame. Then in the Action frame
+      has matched the filter in the <guilabel>Notification</guilabel> frame.
+      Then in the <guilabel>Action</guilabel> frame
       you tell what to do with the matching messages. You can ask &Balsa; to copy
       or move them to any mailbox, or to send them to the trash can. The other
       actions are not yet implemented.
@@ -3752,27 +3766,30 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <para>
       This window is used to edit an existing condition or to create a new
       one. It displays all the information needed to describe the condition,
-      it is launched when you click on the Edit or New buttons under the
+      it is launched when you click on the <guibutton>Edit</guibutton>
+      or <guibutton>New</guibutton> buttons under the
       conditions list in the match page of the notebook in the right part
       of the
-      <link linkend="win-filters">
-        <guilabel>filters window</guilabel>
-      </link>.
+      <link linkend="win-filters">filters window</link>.
     </para>
     <para>
       This window is made of three frames:
       <itemizedlist>
         <listitem>
 	  <para>
-            The "Match in" frame: it's a set of check boxes, one per match
+              The <guilabel>Match in</guilabel> frame:
+              it's a set of check boxes, one per match
             field. For example if you want to match all messages that was
-            sent by hotmail users, you just have to check the From box, or
-            if you want to match all messages about balsa, check the Subject
+            sent by hotmail users, you just have to check the
+            <guilabel>From</guilabel> box, or
+            if you want to match all messages about &Balsa;, check the
+            <guilabel>Subject</guilabel>
             box.
 	  </para>
 	  <warning>
 	    <para>
-	      Be careful with Body match, this can take time for large messages.
+                Be careful with <guilabel>Body</guilabel> match,
+                this can take time for large messages.
             </para>
 	  </warning>
 	  <para>
@@ -3781,24 +3798,33 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
             to your message by the MUAs with their name and versions.
           </para>
 	  <para>
-            The All button will check all boxes, whereas the Clear button will
-            uncheck all boxes as you might have guessed.
+              The <guibutton>All</guibutton> button will check all
+              boxes, whereas the <guibutton>Clear</guibutton> button will
+            uncheck all boxes (as you might have guessed).
           </para>
 	  <para>
             If you specify several headers, a message will match this condition
             if one of the header matches. For example if you want to filter all
-            messages talking about Balsa, you should check the Body and the Subject
-            boxes, so that all mails with the word "Balsa" in its subject or its
-            body will match. You can also, if you're fed up with Balsa ;-), match
-            all mails that does NOT contain the word Balsa in their subject and in
+            messages talking about &Balsa;, you should check the
+            <guilabel>Body</guilabel> and the
+            <guilabel>Subject</guilabel>
+            boxes, so that all mails with the word <quote>Balsa</quote>
+            in its subject or its
+            body will match. You can also, if you're fed up with &Balsa; ;-), match
+            all mails that does NOT contain the word
+            <quote>Balsa</quote> in their subject and in
             their body neither. See the description of the search types to see
             how to do this.
           </para>
         </listitem>
         <listitem>
         <para>
-          The "Search Type" frame: it's a list of the different condition types.
-          You choose Simple, Regular expression, Date interval, flag condition.
+            The <guilabel>Search Type</guilabel> frame:
+            it's a list of the different condition types.
+            You choose <guimenuitem>Simple</guimenuitem>,
+            <guimenuitem>Regular expression</guimenuitem>,
+            <guimenuitem>Date interval</guimenuitem>, or
+            <guimenuitem>flag condition</guimenuitem>.
           Your choice will change the third frame so that it displays the fields
           needed by the type of match chosen.
         </para>
@@ -3809,7 +3835,8 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
             <itemizedlist>
               <listitem>
 	        <para>
-                  Simple type: a text entry lets you input the string to look
+                    <guimenuitem>Simple</guimenuitem> type:
+                    a text entry lets you input the string to look
                   for (case does not matter, the search is case-insensitive).
                   The button lets you specify if a message matches when the string
                   is or is NOT a substring of the specified headers, the sentence
@@ -3819,11 +3846,14 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
               <listitem>
 	        <para>
-                  Regular expression: you can input a list of regular expressions.
+                    <guimenuitem>Regular expression</guimenuitem>:
+                    you can input a list of regular expressions.
                   You type your regular expression in the text entry, then you click
-                  on the Add button to put it into the list. Of course the Remove
+                  on the <guibutton>Add</guibutton> button to put it into the
+                  list. Of course the <guibutton>Remove</guibutton>
                   button destroys the selected regular expression in the list. The
-                  Last button "One matches/None matches" let you specify when a message
+                  last button <guibutton>One matches/None matches</guibutton>
+                  lets you specify when a message
                   matches the condition: when one of the regular expression matches
                   or when none matches. The sentence above te list will be updated
                   accordingly.
@@ -3832,7 +3862,8 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
               <listitem>
 	        <para>
-                  Date interval: you can input the interval by the mean of the two
+                    <guimenuitem>Date</guimenuitem> interval:
+                    you can input the interval by the mean of the two
                   text entries. A blank entry means no bound. The button tells to
                   match when the message date is within the bounds or not. The 
                   sentence above the text entries will be updated accordingly.
@@ -3841,13 +3872,15 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
               <listitem>
 	        <para>
-                  Flag condition: the four check boxes let you select which messages
+                    <guimenuitem>Flag condition</guimenuitem>:
+                    the four check boxes let you select which messages
                   will match this condition. If you want to match all replied OR
                   unread messages, check the corresponding boxes. The button let you
                   specify that the match will be done when none of the specified flags
                   are set, the sentence above the check boxes will be updated accordingly.
                   For example if you want to filter all read and replied messages, check
-                  the "unread" and "replied" boxes, and click on the button.
+                  the <guilabel>unread</guilabel> and
+                  <guilabel>replied</guilabel> boxes, and click on the button.
                 </para>
 	      </listitem>
 
@@ -3866,7 +3899,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
         available filters, and the right part displays all filters to be
         applied on the mailbox (the name of which is shown in the window
         title).  See the
-        <link linkend="win-filters"><guilabel>filters window</guilabel></link>
+        <link linkend="win-filters">filters window</link>
         section to see how to set up filters.
     </para>
     <para>
@@ -3874,20 +3907,22 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
         The first one contains the filters name.
         The two others tells you if the filter will be automatically
         applied: e.g. if a dot is displayed in the second column
-        ("On reception"), this tells you that whenever new messages
+        (<guilabel>On reception</guilabel>),
+        this tells you that whenever new messages
         arrived in this mailbox, they will be filtered by the
         corresponding filter (Note: the filter is applied only on
         the new messages, not the entire mailbox;
         this is similar to the use of procmail).
         In the same way, if a dot is displayed in the third column
-        ("On exit"), the filter will be applied to the entire mailbox
-        when you exit Balsa.
+        (<guilabel>On exit</guilabel>),
+        the filter will be applied to the entire mailbox
+        when you exit &Balsa;.
     </para>
     <para>
-        Note: the "On exit" feature is not yet implemented.
+        Note: the <guilabel>On exit</guilabel> feature is not yet implemented.
     </para>
     <para>
-        When you tell Balsa to apply several filters on the same mailbox
+        When you tell &Balsa; to apply several filters on the same mailbox
         (i.e. when you put several filters in the right list),
         only the first match counts: the filters are applied in the
         specified order and the first that matches on the current
@@ -3898,53 +3933,62 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <itemizedlist>
       <listitem>  
         <para>
-          The Add button: moves the selected filters from the left list to the
+            The <guibutton>Add</guibutton> button:
+            moves the selected filters from the left list to the
 	  right one, adding more filters to be applied to the mailbox.
         </para>
       </listitem>
       <listitem>
         <para>
-          The Remove button: removes the currently selected filter in the right
+            The <guibutton>Remove</guibutton> button:
+            removes the currently selected filter in the right
 	  list and puts it back in the left list.
         </para>
       </listitem>
     </itemizedlist>
   </para>
   <para>
-      The "Up" and "Down" buttons under the right list serve to reorder
+      The <guibutton>Up</guibutton> and <guibutton>Down</guibutton>
+      buttons under the right list serve to reorder
       the filters that are to be applied. This is a sort of priority
       between filters, because if several filters could match the
       current message, only the first one will be applied.
-      The "Apply Now" button applies all filters of the right list to the
+      The <guibutton>Apply Now</guibutton>
+      button applies all filters of the right list to the
       entire mailbox immediately (be patient, this can take a quite a
       long time on big mailboxes or remote ones).
   </para>
   <para>
   You can also use this dialog to apply a filter to a mailbox without 
   actually attaching it to the mailbox.  Select one or more filters in the 
-  left hand list, and click the "Apply Selected" button below that list.
+  left hand list, and click the <guibutton>Apply Selected</guibutton>
+  button below that list.
   </para>
   <para>
-    There are three buttons betlow the filters lists:
+    There are three buttons below the filters lists:
     <itemizedlist>
       <listitem>
         <para>
-          The OK button: saves the list of filters associated to the mailbox.
+            The <guibutton>OK</guibutton> button:
+            saves the list of filters associated to the mailbox.
 	  Note that this does not apply the filters to the mailbox. It is useful
 	  only when you have set up automatic filters, or when you have to manually
-	  apply a lot of filters frequently to this mailbox: the next time Balsa
-	  will reload the saved filters and you will only have to press the "Apply"
+	  apply a lot of filters frequently to this mailbox: the next
+          time &Balsa;
+	  will reload the saved filters and you will only have to press
+          the <guibutton>Apply</guibutton>
 	  button.
         </para>
       </listitem>
       <listitem>
          <para>
-          The Cancel button: this discards any changes and closes the dialog box.
+             The <guibutton>Cancel</guibutton> button:
+             this discards any changes and closes the dialog box.
         </para>
       </listitem>
       <listitem>
          <para>
-          The Help button: opens this help window.
+             The <guibutton>Help</guibutton> button: opens this help window.
         </para>
       </listitem>
     </itemizedlist>
@@ -3958,7 +4002,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 <sect1 id="mbox-formats">
 <title>Available mailbox formats</title>
 <para>
-  Balsa handles several mailbox formats, including mbox.
+  &Balsa; handles several mailbox formats, including mbox.
 </para>
 <para>
   The further information can be found in the following
@@ -4099,14 +4143,15 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   <title>I want one of the main folders to be IMAP</title>
 
   <para>First, create the IMAP folder as you want it configured. Then,
-  press right mouse button on the mailbox entry and select <quote>Mark
-  as Inbox</quote>. That is all!</para>
+  press right mouse button on the mailbox entry and select <guimenuitem>Mark
+  as Inbox</guimenuitem>. That is all!</para>
 </sect2>
 	 
 <sect2 id="ct-alias-expansion">
   <title>I want Balsa to guess my friends</title>
 
-  <para>Balsa can expand the names of your contacts it finds in Balsa
+  <para>&Balsa; can expand the names of your contacts it finds in
+      &Balsa;
   addressbooks.  It will do this by both the Card Name (unique alias)
   and the Full Name.</para>
 
@@ -4258,10 +4303,10 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <sect2 id="inw-address-book">
       <title>The address book doesn't import my addresses.</title>
 
-      <para>Balsa attempts to open the file 
+      <para>&Balsa; attempts to open the file 
         <filename>~/.gnome/GnomeCard.gcrd</filename>. If
 	you're not using this file, you may need to create a symlink so that
-	Balsa can open it.</para>
+	&Balsa; can open it.</para>
 
     <para>There have been slight changes in &GnomeCard;'s file format
       between its various versions. &Balsa; is known to work with at
@@ -4363,7 +4408,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
   Please send all comments and suggestions regarding the manual to the
   <acronym>GNOME</acronym> Documentation Project at
-  <email>docs@gnome.org</email> and the Balsa Discussion List
+  <email>docs@gnome.org</email> and the &Balsa; Discussion List
   <email>balsa-list@gnome.org</email>. You can also add your comments
   online by using <ulink url="http://www.gnome.org/gdp/doctable/"
   type="http"><acronym>GNOME</acronym> Documentation Status
@@ -4504,7 +4549,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <glossterm>SMTP</glossterm>
       <glossdef>
 	<para>An acronym that stands for &quot;Simple Mail Transfer
-	Protocol&quot;, it is excatly that.  A standard that defines a
+	Protocol&quot;, it is exactly that.  A standard that defines a
 	simple an reliable way to transfer messages between computers
 	on a network.  It is used by most, if not all, mail programs
 	to transfer mail.</para>
@@ -4515,9 +4560,9 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <glossterm>VCARD</glossterm>
       <glossdef>
 	<para>VCARD is a standard method of storing contact
-	information for easy exchange between programs.  Balsa
-	supports VCARD addressbooks, as does GnomeCard and the
-	upcoming Evolution.  Many other programs are capable of
+	information for easy exchange between programs.  &Balsa;
+	supports VCARD addressbooks, as does GnomeCard and 
+	Evolution.  Many other programs are capable of
 	exporting their contact lists in VCARD format as well.</para>
       </glossdef>
     </glossentry>

@@ -310,6 +310,9 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
             continue;
 
         tmp = _(toolbar_buttons[button].button_text);
+        if (toolbar_buttons[button].pixmap_id == BALSA_PIXMAP_SEND
+            && balsa_app.always_queue_sent_mail)
+            tmp = _("Queue");
         if (balsa_app.toolbar_wrap_button_text) {
             /* Make sure all buttons have the same number of lines of
              * text (1 or 2), to keep icons aligned */
@@ -341,16 +344,21 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
             break;
         }
 	gtk_tool_button_set_label(GTK_TOOL_BUTTON(tool_item), text);
+        g_free(text);
+
+        text = _(toolbar_buttons[button].help_text);
+        if (toolbar_buttons[button].pixmap_id == BALSA_PIXMAP_SEND
+            && balsa_app.always_queue_sent_mail)
+            text = _("Queue this message for sending");
         gtk_tool_item_set_tooltip(tool_item,
                                   GTK_TOOLBAR(toolbar)->tooltips,
-                                  _(toolbar_buttons[button].help_text),
-                                  _(toolbar_buttons[button].help_text));
+                                  text, text);
+
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 	bti->widget = GTK_WIDGET(tool_item);
 	g_object_add_weak_pointer(G_OBJECT(bti->widget),
 				  (gpointer) &bti->widget);
         GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(bti->widget), GTK_CAN_FOCUS);
-        g_free(text);
         gtk_widget_set_sensitive(bti->widget, bti->sensitive);
     }
 

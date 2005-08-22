@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE article PUBLIC "-//OASIS/DTD DocBookXML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!-- <!ENTITY mdash ";"> ?? -->
 <!-- replace with actual application  version number-->
-<!ENTITY mdash ";">
-<!ENTITY version "1.2.3"> 
+<!ENTITY version "2.2"> 
 <!ENTITY Balsa "<application>Balsa</application>"> 
 <!ENTITY Mutt "<application>Mutt</application>"> 
 <!ENTITY GnomeCard "<application>GnomeCard</application>"> 
@@ -193,14 +193,14 @@ This is version 2.719 of the Balsa manual.
 </para>
 
 <para>
-  There are many more settings in &Balsa;'s <link
-  linkend="preferences">preferences window</link>, but most of them do
+  There are many more settings in &Balsa;'s
+  <link linkend="preferences">preferences window</link>, but most of them do
   not need to be changed.
 </para>
 
 <para>
-  Once &Balsa; is configured, you will proceed on to the <link
-  linkend="win-main">main window</link>.
+  Once &Balsa; is configured, you will proceed on to the
+  <link linkend="win-main">main window</link>.
 </para>
 </sect1> <!-- id=getting-started -->
 
@@ -223,12 +223,13 @@ This is version 2.719 of the Balsa manual.
 
 <para>
   &Balsa;'s main window has three major areas. To the left is the
-  <link linkend="subwin-mblist"><interface>mailbox list</interface>
-  </link>. This displays all the mailboxes
+  <link linkend="subwin-mblist">mailbox list</link>.
+  This displays all the mailboxes
   &Balsa; knows about; it will scan for ones in your local mail
   directory. (This means &Balsa; works well with &procmail;.)  It will
   also list &IMAP; or &POP3; mailboxes that you have configured.  If
-  the "Show Mailbox Info" preference is set, two columns will also be
+  the <guilabel>Show Mailbox Info</guilabel> preference is set,
+  two columns will also be
   displayed next to the mailbox names containing the number of unread
   and total messages in each mailbox that has unread messages.  (The
   other mailboxes will not have their contents probed.) Also, any
@@ -265,8 +266,8 @@ This is version 2.719 of the Balsa manual.
   </figure>
 
   <para>
-    The menu bar, located at the top of the <interface>Main
-    Window</interface> provides the following commands:
+    The menu bar, located at the top of the Main Window,
+    provides the following commands:
   </para>
 
   <variablelist>
@@ -1001,7 +1002,7 @@ This is version 2.719 of the Balsa manual.
 			    
 	  Marks the message as set for deletion.  The message will be
 	  actually removed from the backing mailstore when it is
-	  "expunged" either manually, or as specified in the
+          <quote>expunged</quote> either manually, or as specified in the
 	  <link linkend="preferences">Preferences</link>.
 	  The icon is a small trash can.
 	  </para>
@@ -1136,15 +1137,16 @@ This is version 2.719 of the Balsa manual.
 <para>
   The message index displays the messages in the current folder, and
   lets you choose which messages to view. Click on the notebook tabs,
-  or click on a folder in the <link linkend="subwin-mblist"><interface>
-  mailbox list</interface></link> to bring it to the front.
+  or click on a folder in the <link linkend="subwin-mblist">mailbox list</link>
+  to bring it to the front.
 </para>
       
 <para>
   From the message index you can do a lot. Clicking on a message will
   cause it to be displayed in the message view. Right-clicking on it
   will give a pop-up menu letting you reply to the message (or forward
-  it, etc.) and move it to another folder (using the "Move to" menu
+  it, etc.) and move it to another folder (using the
+  <guimenuitem>Move to</guimenuitem> menu
   item).  Double-clicking on a message will open it in a separate
   window.  Also, it is possible to drag and drop messages from the
   index to other mailboxes in the mailbox list and open mailbox
@@ -1249,7 +1251,7 @@ This is version 2.719 of the Balsa manual.
   When the <guibutton>New Message</guibutton> or
   <guibutton>Reply</guibutton> or <guibutton>Forward</guibutton>
   action is selected, the message to be sent is brought up in the
-  <interface>Message Composer</interface>.  This window is where you
+  Message Composer.  This window is where you
   can type the text of the message, attach files, and specify
   recipients.  The window also provides an interface to spell check
   the message.  In the near future, it will be possible to perform
@@ -1264,11 +1266,11 @@ This is version 2.719 of the Balsa manual.
 </para>
 
 <itemizedlist>
-  <listitem><para><interface>The menu bar</interface></para></listitem>
-  <listitem><para><interface>Toolbar</interface></para></listitem>
-  <listitem><para><interface>Mail headers</interface></para></listitem>
-  <listitem><para><interface>The attachment box</interface></para></listitem>
-  <listitem><para><interface>The message body</interface></para></listitem>
+  <listitem><para>The menu bar</para></listitem>
+  <listitem><para>Toolbar</para></listitem>
+  <listitem><para>Mail headers</para></listitem>
+  <listitem><para>The attachment box</para></listitem>
+  <listitem><para>The message body</para></listitem>
 </itemizedlist>
 
 <para>These will each be covered in depth below:</para>
@@ -1323,8 +1325,18 @@ This is version 2.719 of the Balsa manual.
 	    <guimenuitem>Send</guimenuitem>
 	  </menuchoice> &mdash; 
 
-	  Send the message. (does it depend on "Always queue sent mail?").
-	  dialog.
+          Send the message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
+	    <guimenuitem>Queue</guimenuitem>
+	  </menuchoice> &mdash; 
+
+          Queue the message in the outbox for sending later.
 	</para>
       </listitem>
 
@@ -1348,7 +1360,7 @@ This is version 2.719 of the Balsa manual.
 	    <guimenuitem>Print...</guimenuitem>
 	  </menuchoice> &mdash; 
 	  
-	  Print a hard-copy of the current message out.</para>
+	  Print a hard-copy of the current message.</para>
       </listitem>
 
       <listitem>
@@ -1631,12 +1643,13 @@ This is version 2.719 of the Balsa manual.
       the character set in use. 
     </para>
 
-    <para>The available languages consist of:</para>
+    <para>The available languages include:</para>
 
     <itemizedlist>
-      <listitem><para>Baltic</para></listitem>
-      <listitem><para>Brazillian</para></listitem>
+      <listitem><para>Brazilian</para></listitem>
       <listitem><para>Catalan</para></listitem>
+      <listitem><para>Chinese</para></listitem>
+      <listitem><para>Czech</para></listitem>
       <listitem><para>Danish</para></listitem>
       <listitem><para>Dutch</para></listitem>
       <listitem><para>English</para></listitem>
@@ -1659,6 +1672,7 @@ This is version 2.719 of the Balsa manual.
       <listitem><para>Turkish</para></listitem>
       <listitem><para>Ukranian</para></listitem>
     </itemizedlist>
+    <para>and more may have been added.</para>
 
   </listitem>
 </varlistentry>
@@ -1894,13 +1908,13 @@ This is version 2.719 of the Balsa manual.
   &Balsa; supports many different methods of selecting email addresss.
   All of the headers that can contain addresses have a small coloured
   book to the right of them that will open up &Balsa;'s
-  <interface>address book</interface>. 
+  address book. 
 </para>
 
 <para>
   However, &Balsa; will also attempt to guess what the headers should
-  contain depending on what context the <interface>composition
-  window</interface> is opened in, so it may not be neccessary to fill
+  contain depending on what context the composition window is opened in,
+  so it may not be neccessary to fill
   them in most of the time.
 </para>
 
@@ -2135,14 +2149,15 @@ This is version 2.719 of the Balsa manual.
 <para>
   In addition to the preview pane, &Balsa; can display messages in
   separate windows.  Simply double-click on the desired message from
-  the message index in the main window.  Any number of windows may be
+  the message index in the main window, or select the message and press
+  the space bar.  Any number of windows may be
   opened, although only one per unique message.
 </para>
 
 <para>
   The message window has a menu and toolbar containing commands
   pertinent to an individual message.  Commands are as described in
-  the <link linkend="win-main"><interface>main window</interface></link>.
+  the <link linkend="win-main">main window</link>.
   Below the menu and toolbar are the message headers in a box,
   followed by the message body.
 </para>
@@ -2187,7 +2202,8 @@ This is version 2.719 of the Balsa manual.
 </figure>
 
 <para>
-  The "complete message" selection will do it's best to render all
+  The <guimenuitem>complete message</guimenuitem> selection will 
+  do its best to render all
   parts at once, but some may have to be selected individually or
   opened in an external program.  Parts which cannot be rendered
   within &Balsa; will instead display a list of options for opening
@@ -2200,8 +2216,7 @@ This is version 2.719 of the Balsa manual.
   index in the main window.  Next unread being quite useful for
   checking all new mail.  Deleting the current message will
   automatically display the next unread one.  This behavior can be
-  changed in the <link linkend="preferences">
-  <interface>preferences</interface></link>.
+  changed in the <link linkend="preferences">preferences</link>.
 </para>
 
 </sect1>

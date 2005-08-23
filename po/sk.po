@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-08-05 21:02+0200\n"
-"PO-Revision-Date: 2005-08-05 21:02+0200\n"
+"POT-Creation-Date: 2005-08-23 23:21+0200\n"
+"PO-Revision-Date: 2005-08-23 23:22+0200\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -1936,7 +1936,7 @@ msgstr "Je potrebné heslo"
 msgid "_Remember password"
 msgstr "_Zapamätať heslo"
 
-#: ../src/balsa-app.c:536
+#: ../src/balsa-app.c:538
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Nepodarilo sa otvoriť poštovú schránku \"%s\""
@@ -6001,6 +6001,14 @@ msgstr "Opakovať poslednú vrátenú zmenu"
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Neznáma ikona lišty nástrojov \"%s\""
+
+#: ../src/toolbar-factory.c:315
+msgid "Queue"
+msgstr "Zaradiť"
+
+#: ../src/toolbar-factory.c:352
+msgid "Queue this message for sending"
+msgstr "Zaradiť túto správu na odoslanie"
 
 #: ../src/toolbar-prefs.c:123
 msgid "Customize Toolbars"

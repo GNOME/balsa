@@ -170,6 +170,7 @@ libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab)
     ab->host = NULL;
     ab->base_dn = NULL;
     ab->bind_dn = NULL;
+    ab->priv_book_dn = NULL;
     ab->passwd  = NULL;
     ab->enable_tls = FALSE;
     ab->directory = NULL;
@@ -188,6 +189,7 @@ libbalsa_address_book_ldap_finalize(GObject * object)
     g_free(addr_ldap->host);    addr_ldap->host = NULL;
     g_free(addr_ldap->base_dn); addr_ldap->base_dn = NULL;
     g_free(addr_ldap->bind_dn); addr_ldap->bind_dn = NULL;
+    g_free(addr_ldap->priv_book_dn); addr_ldap->priv_book_dn = NULL;
     g_free(addr_ldap->passwd);  addr_ldap->passwd  = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -196,7 +198,8 @@ libbalsa_address_book_ldap_finalize(GObject * object)
 LibBalsaAddressBook *
 libbalsa_address_book_ldap_new(const gchar *name, const gchar *host,
                                const gchar *base_dn, const gchar *bind_dn,
-                               const gchar *passwd, gboolean enable_tls)
+                               const gchar *passwd, const gchar *priv_book_dn,
+                               gboolean enable_tls)
 {
     LibBalsaAddressBookLdap *ldap;
     LibBalsaAddressBook *ab;
@@ -211,6 +214,7 @@ libbalsa_address_book_ldap_new(const gchar *name, const gchar *host,
     ldap->host = g_strdup(host);
     ldap->base_dn = g_strdup(base_dn);
     ldap->bind_dn = g_strdup(bind_dn);
+    ldap->priv_book_dn = g_strdup(priv_book_dn ? priv_book_dn : bind_dn);
     ldap->passwd = g_strdup(passwd);
     ldap->enable_tls = enable_tls;
 
@@ -273,7 +277,6 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 #endif /* HAVE_LDAP_TLS */
     }
 
-    printf("Binding as: %s\n", ab->bind_dn ? ab->bind_dn : "anonymous");
     result = ldap_simple_bind_s(ab->directory, 
                                 ab->bind_dn,
                                 ab->passwd);
@@ -528,7 +531,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
 
     dn = g_strdup_printf("mail=%s,%s",
                          (char*)address->address_list->data,
-                         ldap_ab->bind_dn);
+                         ldap_ab->priv_book_dn);
     mods[0] = &modarr[0];
     modarr[0].mod_op = LDAP_MOD_ADD;
     modarr[0].mod_type = "objectClass";
@@ -605,7 +608,7 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
 
     dn = g_strdup_printf("mail=%s,%s",
                          (char*)address->address_list->data,
-                         ldap_ab->bind_dn);
+                         ldap_ab->priv_book_dn);
     cnt = 0;
     do {
         rc = ldap_delete_s(ldap_ab->directory, dn);
@@ -672,7 +675,7 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
 
     dn = g_strdup_printf("mail=%s,%s",
                          (char*)address->address_list->data,
-                         ldap_ab->bind_dn);
+                         ldap_ab->priv_book_dn);
     cnt = 0;
 
     if(!STREQ(address->full_name,newval->full_name)) {
@@ -753,6 +756,8 @@ libbalsa_address_book_ldap_save_config(LibBalsaAddressBook * ab,
     if(ldap->base_dn) libbalsa_conf_set_string("BaseDN", ldap->base_dn);
     if(ldap->bind_dn) libbalsa_conf_private_set_string("BindDN", ldap->bind_dn);
     if(ldap->passwd)  libbalsa_conf_private_set_string("Passwd", ldap->passwd);
+    if(ldap->priv_book_dn)
+        libbalsa_conf_set_string("BookDN", ldap->priv_book_dn);
     libbalsa_conf_set_bool("EnableTLS", ldap->enable_tls);
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->save_config(ab, prefix);
@@ -781,6 +786,10 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
     ldap->passwd = libbalsa_conf_private_get_string("Passwd");
     if(ldap->passwd && *ldap->passwd == 0) { 
 	g_free(ldap->passwd); ldap->passwd = NULL; 
+    }
+    ldap->priv_book_dn = libbalsa_conf_get_string("BookDN");
+    if(ldap->priv_book_dn && *ldap->priv_book_dn == 0) { 
+	g_free(ldap->priv_book_dn); ldap->priv_book_dn = NULL; 
     }
     ldap->enable_tls = libbalsa_conf_get_bool("EnableTLS");
 

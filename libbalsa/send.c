@@ -832,7 +832,7 @@ disp_recipient_status(smtp_recipient_t recipient,
 {
   const smtp_status_t *status = smtp_recipient_status (recipient);
 
-  if(status->code != 0) {
+  if(status->code != 0 && status->code != 250) {
       libbalsa_information(
                            LIBBALSA_INFORMATION_WARNING, 
                            _("Could not send the message to %s:\n"
@@ -896,10 +896,10 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
 	/* XXX - Show the poor user the status codes and message. */
         if(*(gboolean*)be_verbose) {
             int cnt = 0;
-            status = smtp_reverse_path_status(message);
-            if(status->code != 250) {
+            /* status = smtp_reverse_path_status(message); */
+            if(status->code != 250 && status->code != 0) {
                 libbalsa_information(
-                                     LIBBALSA_INFORMATION_ERROR, 
+                                     LIBBALSA_INFORMATION_WARNING,
                                      _("Relaying refused:\n"
                                        "%d: %s\n"
                                        "Message left in your outbox.\n"), 
@@ -1020,7 +1020,6 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 	    *ok = libbalsa_is_cert_known(cert, vfy_result);
 	    X509_free(cert);
 	}
-	printf("vfy_result: %ld ok=%d\n", vfy_result, *ok);
         break;
     }
     case SMTP_EV_NO_PEER_CERTIFICATE:
@@ -1073,7 +1072,6 @@ libbalsa_smtp_event_cb_serial(smtp_session_t session, int event_no,
 #endif
     {
 	int *ok;
-	printf("SMTP-TLS event_no=%d\n", event_no);
 	ok = va_arg(ap, int*);
 	*ok = 1;
 	break;

@@ -75,6 +75,11 @@ Specify the kerberos directory as the argument.
 mutt's native code (in the future, the native code will most likely be
 phased out in favour of SASL library).
 
+--with-gtkhtml=version
+        Choose preferred version of the GtkHtml library. Sensible
+choices for the version are 2 or 3. Version 3 supports eg. printing
+but does not support CSS formatting.
+
 --with-ldap
         Use ldap libraries for a read-only address book. The read/write
 address book is in the works but needs some finishing touches.

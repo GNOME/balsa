@@ -1,3 +1,14 @@
+2005-08-25 Pawel Salek
+
+	* configure.in: support selection of the preferred GtkHtml widget.
+	* README: matching description.
+	* libbalsa/address-book-ldap.[ch]: support arbitrary locations of
+	the private address book.
+	* libbalsa/send.c: handle informatively errors of DATA command.
+	* src/ab-window.c: fix reload action.
+	* src/address-book-config.c: support extended LDAP config.
+	* src/balsa-index.c: "Run" is the default action of "Pipe through"
+	
 2005-08-22 07:46  PeterB
 
 	* doc/C/balsa.xml: cleanup.

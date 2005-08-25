@@ -641,29 +641,6 @@ balsa_ab_window_remove_from_recipient_list(GtkWidget *widget, BalsaAbWindow *ab)
 static void
 balsa_ab_window_reload(GtkWidget *w, BalsaAbWindow *ab)
 {
-    gchar *name;
-    GList *list;
-
-    for (list = balsa_app.address_book_list; list; list = list->next)
-        gtk_combo_box_remove_text(GTK_COMBO_BOX(ab->combo_box), 0);
-
-    name = g_strdup(ab->current_address_book->name);
-    ab->current_address_book = NULL;
-
-    config_address_books_load();
-
-    for (list = balsa_app.address_book_list; list; list = list->next) {
-        LibBalsaAddressBook *address_book = list->data;
-
-        if (strcmp(address_book->name, name) == 0) {
-            ab->current_address_book = address_book;
-            break;
-        }
-    }
-    g_free(name);
-
-    balsa_ab_window_load_books(ab);
-
     balsa_ab_window_load(ab);
 }
 
@@ -863,12 +840,9 @@ static void
 balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 {
     LibBalsaAddressBook *addr;
-
-    addr =
-        LIBBALSA_ADDRESS_BOOK(g_list_nth_data
-                              (balsa_app.address_book_list,
-                               gtk_combo_box_get_active(GTK_COMBO_BOX
-                                                        (widget))));
+    int active = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+    addr = LIBBALSA_ADDRESS_BOOK(g_list_nth_data
+                                 (balsa_app.address_book_list, active));
     g_assert(addr != NULL);
 
     ab->current_address_book = addr;

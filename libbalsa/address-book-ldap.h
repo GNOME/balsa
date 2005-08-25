@@ -47,6 +47,7 @@ struct _LibBalsaAddressBookLdap {
     gchar *host;
     gchar *base_dn;
     gchar *bind_dn;
+    gchar *priv_book_dn; /* location of user-writeable entries */
     gchar *passwd;
     gboolean enable_tls;
 
@@ -64,6 +65,7 @@ LibBalsaAddressBook *libbalsa_address_book_ldap_new(const gchar *name,
 						    const gchar *base_dn,
 						    const gchar *bind_dn,
 						    const gchar *passwd,
+                                                    const gchar *priv_book_dn,
                                                     gboolean enable_tls);
 void libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap *ab);
 

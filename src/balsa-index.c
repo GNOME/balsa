@@ -2437,6 +2437,7 @@ balsa_index_pipe(BalsaIndex * index)
                                     _("_Run"), GTK_RESPONSE_OK,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
     vbox = GTK_DIALOG(dialog)->vbox;
     gtk_box_set_spacing(GTK_BOX(vbox), HIG_PADDING);

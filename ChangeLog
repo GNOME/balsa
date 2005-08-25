@@ -1,3 +1,7 @@
+2005-08-25 19:55  PeterB
+
+	* src/pref-manager.c: fix spacing.
+
 2005-08-25 Pawel Salek
 
 	* configure.in: support selection of the preferred GtkHtml widget.

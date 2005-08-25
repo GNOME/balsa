@@ -2420,8 +2420,8 @@ moving_messages_group(GtkWidget * page)
     label = gtk_label_new(_("Action after moving/trashing a message"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 
-    table = create_table(4, 2, page);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 3, 4,
+    table = create_table(1, 2, page);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
     pm_group_add(group, table);
@@ -2429,7 +2429,7 @@ moving_messages_group(GtkWidget * page)
     pui->action_after_move_menu = create_action_after_move_menu();
     pm_combo_box_set_level(pui->action_after_move_menu,
                            balsa_app.mw_action_after_move);
-    gtk_table_attach(GTK_TABLE(table), pui->action_after_move_menu, 1, 2, 3, 4,
+    gtk_table_attach(GTK_TABLE(table), pui->action_after_move_menu, 1, 2, 0, 1,
            (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
 

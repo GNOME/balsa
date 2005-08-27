@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-08-04 19:13-0400\n"
-"PO-Revision-Date: 2005-08-08 16:41-0400\n"
+"POT-Creation-Date: 2005-08-27 17:16-0400\n"
+"PO-Revision-Date: 2005-08-27 16:41-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: Canadian English <adamw@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,20 +26,20 @@ msgid "E-Mail utility"
 msgstr "E-Mail utility"
 
 #. The externq database doesn't support Id's, sorry!
-#: libbalsa/address-book-extern.c:210 libbalsa/address-book-ldap.c:418
+#: libbalsa/address-book-extern.c:210 libbalsa/address-book-ldap.c:421
 #: libbalsa/address-book-ldif.c:329
 msgid "No-Id"
 msgstr "No-Id"
 
 #: libbalsa/address-book-extern.c:215 libbalsa/address-book-extern.c:370
-#: libbalsa/address-book-ldap.c:424 libbalsa/address-book-ldif.c:309
+#: libbalsa/address-book-ldap.c:427 libbalsa/address-book-ldif.c:309
 #: libbalsa/address-book-ldif.c:332 libbalsa/address-book-ldif.c:351
 #: libbalsa/address-book-ldif.c:355 libbalsa/address-book-vcard.c:158
 #: libbalsa/address-book-vcard.c:312
 msgid "No-Name"
 msgstr "No-Name"
 
-#: libbalsa/address-book-ldap.c:271
+#: libbalsa/address-book-ldap.c:275
 msgid "TLS requested but not compiled in"
 msgstr "TLS requested but not compiled in"
 
@@ -1353,7 +1353,7 @@ msgstr "To"
 msgid "Disconnected"
 msgstr "Disconnected"
 
-#: libbalsa/send.c:1279
+#: libbalsa/send.c:1277
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -1361,7 +1361,7 @@ msgstr ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
 
-#: libbalsa/send.c:1284
+#: libbalsa/send.c:1282
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -1369,11 +1369,11 @@ msgstr ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
 
-#: libbalsa/send.c:1293
+#: libbalsa/send.c:1291
 msgid "Message left in Outbox (try again later)"
 msgstr "Message left in Outbox (try again later)"
 
-#: libbalsa/send.c:1297
+#: libbalsa/send.c:1295
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1382,12 +1382,12 @@ msgstr ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 
-#: libbalsa/send.c:1574
+#: libbalsa/send.c:1572
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 
-#: libbalsa/send.c:1911 libbalsa/send.c:1993
+#: libbalsa/send.c:1909 libbalsa/send.c:1991
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "This message will not be encrypted for the BCC: recipient(s)."
 
@@ -1732,28 +1732,28 @@ msgstr "New mail notification"
 msgid "Program startup"
 msgstr "Program startup"
 
-#: src/ab-main.c:199 src/ab-window.c:696
+#: src/ab-main.c:199 src/ab-window.c:673
 msgid " address book: "
 msgstr " address book: "
 
-#: src/ab-main.c:470 src/address-book-config.c:890
+#: src/ab-main.c:470 src/address-book-config.c:903
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard Address Book (GnomeCard)"
 
-#: src/ab-main.c:472 src/address-book-config.c:896
+#: src/ab-main.c:472 src/address-book-config.c:909
 msgid "External query (a program)"
 msgstr "External query (a program)"
 
-#: src/ab-main.c:474 src/address-book-config.c:901
+#: src/ab-main.c:474 src/address-book-config.c:914
 msgid "LDIF Address Book"
 msgstr "LDIF Address Book"
 
-#: src/ab-main.c:477 src/address-book-config.c:907
+#: src/ab-main.c:477 src/address-book-config.c:920
 msgid "LDAP Address Book"
 msgstr "LDAP Address Book"
 
-#: src/ab-main.c:481 src/address-book-config.c:515
-#: src/address-book-config.c:914
+#: src/ab-main.c:481 src/address-book-config.c:521
+#: src/address-book-config.c:927
 msgid "GPE Address Book"
 msgstr "GPE Address Book"
 
@@ -1801,7 +1801,7 @@ msgstr "alternative addresses for the same person"
 msgid "a distribution list"
 msgstr "a distribution list"
 
-#: src/ab-window.c:725
+#: src/ab-window.c:702
 #, c-format
 msgid ""
 "Error opening address book '%s':\n"
@@ -1810,93 +1810,97 @@ msgstr ""
 "Error opening address book '%s':\n"
 "%s"
 
-#: src/address-book-config.c:234 src/address-book-config.c:327
+#: src/address-book-config.c:235 src/address-book-config.c:328
 msgid "Modify Address Book"
 msgstr "Modify Address Book"
 
-#: src/address-book-config.c:238 src/address-book-config.c:331
+#: src/address-book-config.c:239 src/address-book-config.c:332
 msgid "Add Address Book"
 msgstr "Add Address Book"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: src/address-book-config.c:253 src/address-book-config.c:362
-#: src/address-book-config.c:452 src/address-book-config.c:513
+#: src/address-book-config.c:254 src/address-book-config.c:363
+#: src/address-book-config.c:453 src/address-book-config.c:519
 msgid "A_ddress Book Name"
 msgstr "A_ddress Book Name"
 
-#: src/address-book-config.c:257 src/address-book-config.c:406
-#: src/address-book-config.c:483 src/address-book-config.c:518
+#: src/address-book-config.c:258 src/address-book-config.c:407
+#: src/address-book-config.c:489 src/address-book-config.c:524
 msgid "_Expand aliases as you type"
 msgstr "_Expand aliases as you type"
 
-#: src/address-book-config.c:367
+#: src/address-book-config.c:368
 msgid "Load program location"
 msgstr "Load program location"
 
-#: src/address-book-config.c:374 src/address-book-config.c:379
+#: src/address-book-config.c:375 src/address-book-config.c:380
 msgid "Select load program for address book"
 msgstr "Select load program for address book"
 
-#: src/address-book-config.c:386
+#: src/address-book-config.c:387
 msgid "Save program location"
 msgstr "Save program location"
 
-#: src/address-book-config.c:393 src/address-book-config.c:398
+#: src/address-book-config.c:394 src/address-book-config.c:399
 msgid "Select save program for address book"
 msgstr "Select save program for address book"
 
-#: src/address-book-config.c:457
+#: src/address-book-config.c:458
 msgid "_Host Name"
 msgstr "_Host Name"
 
-#: src/address-book-config.c:462
+#: src/address-book-config.c:463
 msgid "Base Domain _Name"
 msgstr "Base Domain _Name"
 
-#: src/address-book-config.c:467
+#: src/address-book-config.c:468
 msgid "_User Name (Bind DN)"
 msgstr "_User Name (Bind DN)"
 
-#: src/address-book-config.c:472
+#: src/address-book-config.c:473
 msgid "_Password"
 msgstr "_Password"
 
 #: src/address-book-config.c:479
+msgid "_User Address Book DN"
+msgstr "_User Address Book DN"
+
+#: src/address-book-config.c:485
 msgid "Enable _TLS"
 msgstr "Enable _TLS"
 
-#: src/address-book-config.c:536 src/main-window.c:3949
+#: src/address-book-config.c:542 src/main-window.c:3949
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Error displaying help: %s\n"
 
-#: src/address-book-config.c:637
+#: src/address-book-config.c:643
 msgid "No path found.  Do you want to give one?"
 msgstr "No path found.  Do you want to give one?"
 
-#: src/address-book-config.c:643
+#: src/address-book-config.c:649
 #, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr "The address book file path \"%s\" is not correct. %s"
 
-#: src/address-book-config.c:646
+#: src/address-book-config.c:652
 #, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "The load program path \"%s\" is not correct. %s"
 
-#: src/address-book-config.c:649
+#: src/address-book-config.c:655
 #, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "The save program path \"%s\" is not correct. %s"
 
-#: src/address-book-config.c:652
+#: src/address-book-config.c:658
 #, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "The path \"%s\" is not correct. %s"
 
-#: src/address-book-config.c:655
+#: src/address-book-config.c:661
 msgid "Do you want to correct the path?"
 msgstr "Do you want to correct the path?"
 
@@ -1922,7 +1926,7 @@ msgstr "Password needed"
 msgid "_Remember password"
 msgstr "_Remember password"
 
-#: src/balsa-app.c:536
+#: src/balsa-app.c:538
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Couldn't open mailbox \"%s\""
@@ -2046,7 +2050,7 @@ msgstr "Pipe message through a program"
 msgid "_Run"
 msgstr "_Run"
 
-#: src/balsa-index.c:2445
+#: src/balsa-index.c:2446
 msgid "Specify the program to run:"
 msgstr "Specify the program to run:"
 
@@ -5931,6 +5935,14 @@ msgstr "Redo most recent change"
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Unknown toolbar icon \"%s\""
+
+#: src/toolbar-factory.c:315
+msgid "Queue"
+msgstr "Queue"
+
+#: src/toolbar-factory.c:352
+msgid "Queue this message for sending"
+msgstr "Queue this message for sending"
 
 #: src/toolbar-prefs.c:123
 msgid "Customize Toolbars"

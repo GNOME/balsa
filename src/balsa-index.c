@@ -505,20 +505,10 @@ bndx_deselected_idle(BalsaIndex * index)
                                            LIBBALSA_MESSAGE_FLAG_SELECTED);
 
     if (current_message) {
-	/* We had a message... */
-	if (!index->current_message) {
-	    /* ...but we don't any more; restore it... */
-	    index->current_message = current_message;
-            /* ...and redisplay it. */
-            bndx_changed_find_row(index);
-        } else
-	    /* Discard. */
-	    g_object_unref(current_message);
-    }
-
-    if (index->current_message) {
+        /* Make sure it's selected. */
         GtkTreePath *path;
-        if (bndx_find_message(index, &path, NULL, index->current_message)) {
+
+        if (bndx_find_message(index, &path, NULL, current_message)) {
             GtkTreeSelection *selection =
                 gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
             if (!gtk_tree_selection_path_is_selected(selection, path)) {
@@ -526,11 +516,8 @@ bndx_deselected_idle(BalsaIndex * index)
                 bndx_select_row(index, path);
             }
             gtk_tree_path_free(path);
-        } else {
-	    /* Can this happen? */
-	    g_object_unref(index->current_message);
-	    index->current_message = NULL;
-	}
+        }
+        g_object_unref(current_message);
     }
 
     g_object_set_data(G_OBJECT(index), BALSA_INDEX_DESELECTED_ARRAY, NULL);

@@ -506,10 +506,12 @@ bndx_deselected_idle(BalsaIndex * index)
 
     if (current_message) {
 	/* We had a message... */
-	if (!index->current_message)
-	    /* ...but we don't any more; restore it. */
+	if (!index->current_message) {
+	    /* ...but we don't any more; restore it... */
 	    index->current_message = current_message;
-	else
+            /* ...and redisplay it. */
+            bndx_changed_find_row(index);
+        } else
 	    /* Discard. */
 	    g_object_unref(current_message);
     }

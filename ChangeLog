@@ -1,5 +1,6 @@
-2005-08-28 11:04  PeterB
+2005-08-28 11:29  PeterB
 
+	* src/balsa-index.c: simpler fix.
 	* src/balsa-index.c: redisplay current message if filtering cleared
 	it.
 

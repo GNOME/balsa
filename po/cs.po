@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-08-05 02:47+0000\n"
-"PO-Revision-Date: 2005-08-05 11:50+0200\n"
+"POT-Creation-Date: 2005-08-29 18:47+0000\n"
+"PO-Revision-Date: 2005-08-29 21:58+0200\n"
 "Last-Translator: Miloslav Trmac <mitr@volny.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -31,20 +31,20 @@ msgid "E-Mail utility"
 msgstr "Nástroj pro e-mail"
 
 #. The externq database doesn't support Id's, sorry!
-#: ../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:418
+#: ../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:421
 #: ../libbalsa/address-book-ldif.c:329
 msgid "No-Id"
 msgstr "Bez identifikátoru"
 
 #: ../libbalsa/address-book-extern.c:215 ../libbalsa/address-book-extern.c:370
-#: ../libbalsa/address-book-ldap.c:424 ../libbalsa/address-book-ldif.c:309
+#: ../libbalsa/address-book-ldap.c:427 ../libbalsa/address-book-ldif.c:309
 #: ../libbalsa/address-book-ldif.c:332 ../libbalsa/address-book-ldif.c:351
 #: ../libbalsa/address-book-ldif.c:355 ../libbalsa/address-book-vcard.c:158
 #: ../libbalsa/address-book-vcard.c:312
 msgid "No-Name"
 msgstr "Beze jména"
 
-#: ../libbalsa/address-book-ldap.c:271
+#: ../libbalsa/address-book-ldap.c:275
 msgid "TLS requested but not compiled in"
 msgstr "Vyžadováno TLS, ale není zakompilováno"
 
@@ -1357,7 +1357,7 @@ msgstr "Od"
 msgid "To:"
 msgstr "Pro:"
 
-#: ../libbalsa/send.c:965 ../src/balsa-index.c:1032
+#: ../libbalsa/send.c:965 ../src/balsa-index.c:1021
 msgid "To"
 msgstr "Pro"
 
@@ -1365,7 +1365,7 @@ msgstr "Pro"
 msgid "Disconnected"
 msgstr "Odpojeno"
 
-#: ../libbalsa/send.c:1279
+#: ../libbalsa/send.c:1277
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -1373,7 +1373,7 @@ msgstr ""
 "Server SMTP odmítl spojení.\n"
 "Zkontrolujte vaše připojení k internetu."
 
-#: ../libbalsa/send.c:1284
+#: ../libbalsa/send.c:1282
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -1381,13 +1381,13 @@ msgstr ""
 "Nelze kontaktovat server SMTP.\n"
 "Zkontrolujte vaše připojení k internetu."
 
-#: ../libbalsa/send.c:1293
+#: ../libbalsa/send.c:1291
 msgid "Message left in Outbox (try again later)"
 msgstr ""
 "Zpráva zůstala v poštovní schránce 'Pošta k odeslání' (zkuste to znovu "
 "později)"
 
-#: ../libbalsa/send.c:1297
+#: ../libbalsa/send.c:1295
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1396,14 +1396,14 @@ msgstr ""
 "Problém se serverem SMTP (%d): %s\n"
 "Vaše zpráva zůstala v poštovní schránce 'Pošta k odeslání'"
 
-#: ../libbalsa/send.c:1574
+#: ../libbalsa/send.c:1572
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 "Nemohu určit znakovou sadu textového souboru `%s'; odesílám jako typ mime `%"
 "s'"
 
-#: ../libbalsa/send.c:1911 ../libbalsa/send.c:1993
+#: ../libbalsa/send.c:1909 ../libbalsa/send.c:1991
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Tato zpráva nebude šifrována pro příjemce skrytých kopií."
 
@@ -1753,28 +1753,28 @@ msgstr "Upozornění na novou poštu"
 msgid "Program startup"
 msgstr "Spouštění programu"
 
-#: ../src/ab-main.c:199 ../src/ab-window.c:696
+#: ../src/ab-main.c:199 ../src/ab-window.c:673
 msgid " address book: "
 msgstr " adresář: "
 
-#: ../src/ab-main.c:470 ../src/address-book-config.c:890
+#: ../src/ab-main.c:470 ../src/address-book-config.c:903
 msgid "VCard Address Book (GnomeCard)"
 msgstr "Adresář typu vCard (GnomeCard)"
 
-#: ../src/ab-main.c:472 ../src/address-book-config.c:896
+#: ../src/ab-main.c:472 ../src/address-book-config.c:909
 msgid "External query (a program)"
 msgstr "Externí dotaz (na program)"
 
-#: ../src/ab-main.c:474 ../src/address-book-config.c:901
+#: ../src/ab-main.c:474 ../src/address-book-config.c:914
 msgid "LDIF Address Book"
 msgstr "Adresář typu LDIF"
 
-#: ../src/ab-main.c:477 ../src/address-book-config.c:907
+#: ../src/ab-main.c:477 ../src/address-book-config.c:920
 msgid "LDAP Address Book"
 msgstr "Adresář typu LDAP"
 
-#: ../src/ab-main.c:481 ../src/address-book-config.c:515
-#: ../src/address-book-config.c:914
+#: ../src/ab-main.c:481 ../src/address-book-config.c:521
+#: ../src/address-book-config.c:927
 msgid "GPE Address Book"
 msgstr "Adresář GPE"
 
@@ -1822,7 +1822,7 @@ msgstr "další adresy pro tutéž osobu"
 msgid "a distribution list"
 msgstr "distribuční seznam"
 
-#: ../src/ab-window.c:725
+#: ../src/ab-window.c:702
 #, c-format
 msgid ""
 "Error opening address book '%s':\n"
@@ -1831,94 +1831,98 @@ msgstr ""
 "Chyba při otevírání adresáře '%s':\n"
 "%s"
 
-#: ../src/address-book-config.c:234 ../src/address-book-config.c:327
+#: ../src/address-book-config.c:235 ../src/address-book-config.c:328
 msgid "Modify Address Book"
 msgstr "Upravit adresář"
 
-#: ../src/address-book-config.c:238 ../src/address-book-config.c:331
+#: ../src/address-book-config.c:239 ../src/address-book-config.c:332
 msgid "Add Address Book"
 msgstr "Přidat adresář"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: ../src/address-book-config.c:253 ../src/address-book-config.c:362
-#: ../src/address-book-config.c:452 ../src/address-book-config.c:513
+#: ../src/address-book-config.c:254 ../src/address-book-config.c:363
+#: ../src/address-book-config.c:453 ../src/address-book-config.c:519
 msgid "A_ddress Book Name"
 msgstr "Název _adresáře"
 
-#: ../src/address-book-config.c:257 ../src/address-book-config.c:406
-#: ../src/address-book-config.c:483 ../src/address-book-config.c:518
+#: ../src/address-book-config.c:258 ../src/address-book-config.c:407
+#: ../src/address-book-config.c:489 ../src/address-book-config.c:524
 msgid "_Expand aliases as you type"
 msgstr "_Doplňovat přezdívky při psaní adresy"
 
-#: ../src/address-book-config.c:367
+#: ../src/address-book-config.c:368
 msgid "Load program location"
 msgstr "Umístění programu pro načtení"
 
-#: ../src/address-book-config.c:374 ../src/address-book-config.c:379
+#: ../src/address-book-config.c:375 ../src/address-book-config.c:380
 msgid "Select load program for address book"
 msgstr "Vyberte program pro načtení adresáře"
 
-#: ../src/address-book-config.c:386
+#: ../src/address-book-config.c:387
 msgid "Save program location"
 msgstr "Umístění programu pro uložení"
 
-#: ../src/address-book-config.c:393 ../src/address-book-config.c:398
+#: ../src/address-book-config.c:394 ../src/address-book-config.c:399
 msgid "Select save program for address book"
 msgstr "Vyberte program pro uložení adresáře"
 
-#: ../src/address-book-config.c:457
+#: ../src/address-book-config.c:458
 msgid "_Host Name"
 msgstr "Název _hostitele"
 
 # ???
-#: ../src/address-book-config.c:462
+#: ../src/address-book-config.c:463
 msgid "Base Domain _Name"
 msgstr "Název zákla_dní domény"
 
-#: ../src/address-book-config.c:467
+#: ../src/address-book-config.c:468
 msgid "_User Name (Bind DN)"
 msgstr "_Jméno uživatele (Bind DN)"
 
-#: ../src/address-book-config.c:472
+#: ../src/address-book-config.c:473
 msgid "_Password"
 msgstr "_Heslo"
 
 #: ../src/address-book-config.c:479
+msgid "_User Address Book DN"
+msgstr "_DN adresáře uživatelů"
+
+#: ../src/address-book-config.c:485
 msgid "Enable _TLS"
 msgstr "Povolit _TLS"
 
-#: ../src/address-book-config.c:536 ../src/main-window.c:3949
+#: ../src/address-book-config.c:542 ../src/main-window.c:3949
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Chyba při zobrazování nápovědy: %s\n"
 
-#: ../src/address-book-config.c:637
+#: ../src/address-book-config.c:643
 msgid "No path found.  Do you want to give one?"
 msgstr "Cesta nenalezena. Chcete ji zadat?"
 
-#: ../src/address-book-config.c:643
+#: ../src/address-book-config.c:649
 #, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr "Cesta k souboru s adresářem \"%s\" je chybná. %s"
 
-#: ../src/address-book-config.c:646
+#: ../src/address-book-config.c:652
 #, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "Cesta k programu pro načtení \"%s\" není správná. %s"
 
-#: ../src/address-book-config.c:649
+#: ../src/address-book-config.c:655
 #, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "Cesta k programu pro uložení \"%s\" není správná. %s"
 
-#: ../src/address-book-config.c:652
+#: ../src/address-book-config.c:658
 #, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "Cesta \"%s\" není správná. %s"
 
-#: ../src/address-book-config.c:655
+#: ../src/address-book-config.c:661
 msgid "Do you want to correct the path?"
 msgstr "Chcete opravit cestu?"
 
@@ -1944,7 +1948,7 @@ msgstr "Je třeba heslo"
 msgid "_Remember password"
 msgstr "_Pamatovat heslo"
 
-#: ../src/balsa-app.c:536
+#: ../src/balsa-app.c:538
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Nelze otevřít poštovní schránku \"%s\""
@@ -1962,116 +1966,116 @@ msgstr "Datum"
 msgid "Size"
 msgstr "Velikost"
 
-#: ../src/balsa-index.c:995
+#: ../src/balsa-index.c:984
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Otevírá se poštovní schránka %s. Čekejte, prosím..."
 
-#: ../src/balsa-index.c:1627
+#: ../src/balsa-index.c:1616
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Přesun do koše selhal: %s"
 
 #. R
-#: ../src/balsa-index.c:1781 ../src/main-window.c:584
+#: ../src/balsa-index.c:1770 ../src/main-window.c:584
 #: ../src/main-window.c:1047 ../src/message-window.c:148
 msgid "_Reply..."
 msgstr "_Odpovědět..."
 
-#: ../src/balsa-index.c:1783
+#: ../src/balsa-index.c:1772
 msgid "Reply To _All..."
 msgstr "Odpovědět vš_em..."
 
-#: ../src/balsa-index.c:1785
+#: ../src/balsa-index.c:1774
 msgid "Reply To _Group..."
 msgstr "Odpovědět _skupině..."
 
-#: ../src/balsa-index.c:1787
+#: ../src/balsa-index.c:1776
 msgid "_Forward Attached..."
 msgstr "Přeposlat _jako přílohu..."
 
-#: ../src/balsa-index.c:1789
+#: ../src/balsa-index.c:1778
 msgid "Forward _Inline..."
 msgstr "Přeposlat uvn_itř..."
 
-#: ../src/balsa-index.c:1791 ../src/main-window.c:623
+#: ../src/balsa-index.c:1780 ../src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "_Filtrovat programem..."
 
-#: ../src/balsa-index.c:1793 ../src/main-window.c:682
+#: ../src/balsa-index.c:1782 ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "_Uložit adresu..."
 
-#: ../src/balsa-index.c:1808 ../src/filter-edit-dialog.c:223
+#: ../src/balsa-index.c:1797 ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:981 ../src/mailbox-node.c:997
 #: ../src/pref-manager.c:1457 ../src/pref-manager.c:1546
 #: ../src/pref-manager.c:2591
 msgid "_Delete"
 msgstr "_Odstranit"
 
-#: ../src/balsa-index.c:1813
+#: ../src/balsa-index.c:1802
 msgid "_Undelete"
 msgstr "O_bnovit smazané"
 
-#: ../src/balsa-index.c:1818
+#: ../src/balsa-index.c:1807
 msgid "Move To _Trash"
 msgstr "Přesunout do _koše"
 
-#: ../src/balsa-index.c:1822
+#: ../src/balsa-index.c:1811
 msgid "T_oggle"
 msgstr "_Označit"
 
-#: ../src/balsa-index.c:1826 ../src/main-window.c:331 ../src/main-window.c:360
+#: ../src/balsa-index.c:1815 ../src/main-window.c:331 ../src/main-window.c:360
 msgid "_Flagged"
 msgstr "O_značena"
 
-#: ../src/balsa-index.c:1829
+#: ../src/balsa-index.c:1818
 msgid "_Unread"
 msgstr "_Nepřečtené"
 
-#: ../src/balsa-index.c:1837
+#: ../src/balsa-index.c:1826
 msgid "_Move to"
 msgstr "_Přesunout do"
 
-#: ../src/balsa-index.c:1845
+#: ../src/balsa-index.c:1834
 msgid "_View Source"
 msgstr "Zobrazit zdro_j"
 
-#: ../src/balsa-index.c:2127
+#: ../src/balsa-index.c:2116
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Nemohu zkopírovat zprávy do poštovní schránky \"%s\": %s"
 
-#: ../src/balsa-index.c:2128
+#: ../src/balsa-index.c:2117
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Nemohu zkopírovat zprávu do poštovní schránky \"%s\": %s"
 
-#: ../src/balsa-index.c:2140
+#: ../src/balsa-index.c:2129
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Zkopírováno do \"%s\"."
 
-#: ../src/balsa-index.c:2141
+#: ../src/balsa-index.c:2130
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Přesunuto do \"%s\"."
 
-#: ../src/balsa-index.c:2261
+#: ../src/balsa-index.c:2250
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Potvrzení změn v poštovní schránce %s selhalo."
 
-#: ../src/balsa-index.c:2434
+#: ../src/balsa-index.c:2423
 msgid "Pipe message through a program"
 msgstr "Filtrovat zprávu přes program"
 
-#: ../src/balsa-index.c:2437
+#: ../src/balsa-index.c:2426
 msgid "_Run"
 msgstr "_Spustit"
 
-#: ../src/balsa-index.c:2445
+#: ../src/balsa-index.c:2435
 msgid "Specify the program to run:"
 msgstr "Určete program, který spustit:"
 
@@ -6033,6 +6037,15 @@ msgstr "Zopakovat poslední vrácenou změnu"
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Neznámá ikona lišty nástrojů \"%s\""
+
+#: ../src/toolbar-factory.c:315
+msgid "Queue"
+msgstr "Zařadit"
+
+#
+#: ../src/toolbar-factory.c:352
+msgid "Queue this message for sending"
+msgstr "Zařadit tuto zprávu pro odeslání"
 
 #: ../src/toolbar-prefs.c:123
 msgid "Customize Toolbars"

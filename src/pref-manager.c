@@ -378,6 +378,37 @@ const gchar *threading_type_label[NUM_THREADING_STYLES] = {
 };
 
     /* and now the important stuff: */
+#if GTK_CHECK_VERSION(2, 6, 0)
+static gboolean
+open_preferences_manager_idle(void)
+{
+    gchar *name;
+
+    gdk_threads_enter();
+
+    if (pui == NULL) {
+        gdk_threads_leave();
+        return FALSE;
+    }
+
+    name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+                                         (pui->mail_directory));
+    if (!name || strcmp(name, balsa_app.local_mail_directory) != 0) {
+        /* Chooser still hasn't been initialized. */
+        g_free(name);
+        gdk_threads_leave();
+        return TRUE;
+    }
+    g_free(name);
+
+    g_signal_connect(pui->mail_directory, "selection-changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    gdk_threads_leave();
+    return FALSE;
+}                               /* open_preferences_manager_idle */
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
+
 void
 open_preferences_manager(GtkWidget * widget, gpointer data)
 {
@@ -478,8 +509,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      G_CALLBACK(properties_modified_cb), property_box);
 
 #if GTK_CHECK_VERSION(2, 6, 0)
-    g_signal_connect(G_OBJECT(pui->mail_directory), "selection-changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
+    /* Connect signal in an idle handler, after the file chooser has
+     * been initialized. */
+    g_idle_add_full(G_PRIORITY_LOW,
+                    (GSourceFunc) open_preferences_manager_idle,
+                    NULL, NULL);
 #else                           /* GTK_CHECK_VERSION(2, 6, 0) */
     g_signal_connect(G_OBJECT(pui->mail_directory), "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
@@ -674,6 +708,7 @@ apply_prefs(GtkDialog * pbox)
     gint i;
     GtkWidget *balsa_window;
     const gchar *tmp;
+    gboolean save_setting;
 
     /*
      * Before changing the default mailbox view, update any current
@@ -703,17 +738,19 @@ apply_prefs(GtkDialog * pbox)
 
     balsa_app.debug = GTK_TOGGLE_BUTTON(pui->debug)->active;
     balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
+
+    save_setting = balsa_app.alternative_layout;
     balsa_app.alternative_layout =
         GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
+    if (balsa_app.alternative_layout != save_setting)
+        balsa_change_window_layout(balsa_app.main_window);
+
     balsa_app.view_message_on_open =
         GTK_TOGGLE_BUTTON(pui->view_message_on_open)->active;
     balsa_app.pgdownmod = GTK_TOGGLE_BUTTON(pui->pgdownmod)->active;
     balsa_app.pgdown_percent =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                          (pui->pgdown_percent));
-
-    /* if (balsa_app.alt_layout_is_active != balsa_app.alternative_layout)  */
-    balsa_change_window_layout(balsa_app.main_window);
 
     if (balsa_app.mblist_show_mb_content_info !=
         GTK_TOGGLE_BUTTON(pui->mblist_show_mb_content_info)->active) {
@@ -756,8 +793,13 @@ apply_prefs(GtkDialog * pbox)
         GTK_TOGGLE_BUTTON(pui->reply_strip_html_parts)->active;
     balsa_app.forward_attached =
         GTK_TOGGLE_BUTTON(pui->forward_attached)->active;
+
+    save_setting = balsa_app.always_queue_sent_mail;
     balsa_app.always_queue_sent_mail =
         GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
+    if (balsa_app.always_queue_sent_mail != save_setting)
+        update_all_toolbars();
+
     balsa_app.copy_to_sentbox =
         GTK_TOGGLE_BUTTON(pui->copy_to_sentbox)->active;
 

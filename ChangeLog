@@ -1,3 +1,9 @@
+2005-09-01 11:04  PeterB
+
+	* src/pref-manager.c: connect file-chooser signal in an idle
+	handler, after the chooser is initialized; test whether user
+	changed window-layout; update toolbars if necessary.
+
 2005-08-28 11:29  PeterB
 
 	* src/balsa-index.c: simpler fix.

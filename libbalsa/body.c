@@ -273,7 +273,7 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
    allocates a temporary file name and saves the body there.
 */
 gboolean
-libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
+libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 {
     if (body->temp_filename == NULL) {
 	gint count = 100; /* Magic number, same as in g_mkstemp. */
@@ -286,17 +286,17 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 	    gint fd;
 	    gchar *tmp_file_name;
 	    gchar *dotpos = NULL;
-	    GError *err = NULL;
 
 	    fd = g_file_open_tmp("balsa-body-XXXXXX", &tmp_file_name,
-				 &err);
-	    if (err) {
-		printf("libbalsa_message_body_save_temporary:\n %s\n",
-		       err->message);
-		g_error_free(err);
-	    }
+				 err);
 	    if (fd < 0)
 		return FALSE;
+	    if (err && *err  &&  /* We should have returned by now! */
+                (*err)->message) {
+		printf("libbalsa_message_body_save_temporary:\n %s\n",
+		       (*err)->message);
+		g_clear_error(err);
+	    }
 	    close(fd);
 	    unlink(tmp_file_name);
 
@@ -313,7 +313,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 		body->temp_filename = tmp_file_name;
 	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT, 0600);
 	    if (fd >= 0)
-		return libbalsa_message_body_save_fd(body, fd, FALSE);
+		return libbalsa_message_body_save_fd(body, fd, FALSE, err);
 	} while (errno == EEXIST && --count > 0);
 
 	/* Either we hit a real error, or we used up 100 attempts. */
@@ -329,7 +329,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 	    return TRUE;
 	else
 	    return libbalsa_message_body_save(body, body->temp_filename,
-                                              FALSE);
+                                              FALSE, err);
     }
 }
 
@@ -339,7 +339,8 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body)
 */
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body,
-			   const gchar * filename, gboolean filter_crlf)
+			   const gchar * filename, gboolean filter_crlf,
+                           GError **err)
 {
     int fd;
     int flags = O_CREAT | O_EXCL | O_WRONLY;
@@ -350,7 +351,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 
     if ((fd=libbalsa_safe_open(filename, flags)) < 0)
 	return FALSE;
-    return libbalsa_message_body_save_fd(body, fd, filter_crlf);
+    return libbalsa_message_body_save_fd(body, fd, filter_crlf, err);
 }
 
 static GMimeStream *
@@ -371,7 +372,7 @@ libbalsa_message_body_stream_add_filter(GMimeStream * stream,
 }
 
 GMimeStream *
-libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
+libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
 {
     GMimeStream *stream;
     GMimeFilter *filter;
@@ -381,10 +382,12 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
     g_return_val_if_fail(body != NULL, NULL);
     g_return_val_if_fail(body->message != NULL, NULL);
 
-    if (body->message->mailbox
-        && libbalsa_mailbox_get_message_part(body->message, body)) {
+    if (body->message->mailbox) {
         GMimeDataWrapper *wrapper;
         GMimePartEncodingType encoding;
+
+        if(!libbalsa_mailbox_get_message_part(body->message, body, err))
+            return NULL;
 
         wrapper =
             g_mime_part_get_content_object(GMIME_PART(body->mime_part));
@@ -431,8 +434,11 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
         libbalsa_mime_stream_shared_unlock(tmp);
         g_object_unref(tmp);
         g_object_unref(object);
-    } else
+    } else {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+                    "Internal error in get_stream");
         return NULL;
+    }
 
     /* convert text bodies but HTML - gtkhtml does conversion on its own. */
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
@@ -475,7 +481,8 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body)
 }
 
 gssize
-libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf)
+libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf,
+                                  GError **err)
 {
     GMimeStream *stream, *stream_mem;
     GByteArray *array;
@@ -486,7 +493,7 @@ libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf)
     g_return_val_if_fail(buf != NULL, -1);
 
     *buf = NULL;
-    stream = libbalsa_message_body_get_stream(body);
+    stream = libbalsa_message_body_get_stream(body, err);
     if (!stream)
         return -1;
 
@@ -523,7 +530,7 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
     gchar buf[4096];
     GdkPixbuf *pixbuf = NULL;
 
-    stream = libbalsa_message_body_get_stream(body);
+    stream = libbalsa_message_body_get_stream(body, err);
     if (!stream)
         return pixbuf;
     libbalsa_mime_stream_shared_lock(stream);
@@ -553,12 +560,14 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 
 gboolean
 libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
-                              gboolean filter_crlf)
+                              gboolean filter_crlf, GError **err)
 {
     GMimeStream *stream, *stream_fs;
     gboolean retval = TRUE;
 
-    stream = libbalsa_message_body_get_stream(body);
+    stream = libbalsa_message_body_get_stream(body, err);
+    if(!stream)
+        return FALSE;
     libbalsa_mime_stream_shared_lock(stream);
     g_mime_stream_reset(stream);
     stream_fs = g_mime_stream_fs_new(fd);

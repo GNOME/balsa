@@ -79,7 +79,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	if (ignore_html && html_type)
 	    break;
 
-	allocated = libbalsa_message_body_get_content(body, &res);
+	allocated = libbalsa_message_body_get_content(body, &res, NULL);
 	if (!res)
 	    return NULL;
 

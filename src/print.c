@@ -645,6 +645,7 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
     gchar *html_text;
     gchar *conttype;
     LibBalsaHTMLType html_type;
+    GError *err = NULL;
 
     conttype = libbalsa_message_body_get_mime_type(body);
     html_type = libbalsa_html_type(conttype);
@@ -668,9 +669,14 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
 	return;
     }
 
-    len = libbalsa_message_body_get_content(body, &html_text);
-    if (!html_text)
+    len = libbalsa_message_body_get_content(body, &html_text, &err);
+    if (!html_text) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Could not get part: %s"),
+                          err ? err->message : "Unknown error");
+        g_clear_error(&err);
 	return;
+    }
 
     len = libbalsa_html_filter(html_type, &html_text, len);
 
@@ -867,7 +873,7 @@ prepare_plaintext(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
     if (body->buffer)
 	textbuf = g_strdup(body->buffer);
     else
-	libbalsa_message_body_get_content(body, &textbuf);
+	libbalsa_message_body_get_content(body, &textbuf, NULL);
 
     /* fake an empty buffer if textbuf is NULL */
     if (!textbuf)

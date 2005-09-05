@@ -243,21 +243,32 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     if ((content_type == NULL ||
 	 g_ascii_strcasecmp(content_type, "application/octet-stream") == 0)
 	&& LIBBALSA_IS_MAILBOX_LOCAL(mime_body->message->mailbox)) {
-	GMimeStream *stream = libbalsa_message_body_get_stream(mime_body);
+        GError *err = NULL;
 	ssize_t length = 1024 /* g_mime_stream_length(stream) */ ;
-	gpointer buffer = g_malloc(length);
-	ssize_t size = g_mime_stream_read(stream, buffer, length);
-	g_object_unref(stream);
-	use_content_type =
-	    g_strdup(gnome_vfs_get_mime_type_for_data(buffer, size));
-	if (g_ascii_strncasecmp(use_content_type, "text", 4) == 0
-	    && libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT) {
-	    /* Hmmm...better stick with application/octet-stream. */
-	    g_free(use_content_type);
-	    use_content_type = g_strdup("application/octet-stream");
-	}
-
-	g_free(buffer);
+	gpointer buffer;
+	ssize_t size;
+	GMimeStream *stream = 
+            libbalsa_message_body_get_stream(mime_body, &err);
+        if(!stream) {
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                             _("Error reading message part: %s"),
+                             err ? err->message : "Unknown error");
+            g_clear_error(&err);
+            use_content_type = g_strdup(content_type);
+        } else {
+            buffer = g_malloc(length);
+            size = g_mime_stream_read(stream, buffer, length);
+            g_object_unref(stream);
+            use_content_type =
+                g_strdup(gnome_vfs_get_mime_type_for_data(buffer, size));
+            if (g_ascii_strncasecmp(use_content_type, "text", 4) == 0
+                && libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT) {
+                /* Hmmm...better stick with application/octet-stream. */
+                g_free(use_content_type);
+                use_content_type = g_strdup("application/octet-stream");
+            }
+            g_free(buffer);
+        }
     } else
 	use_content_type = g_strdup(content_type);
 

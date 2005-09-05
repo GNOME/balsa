@@ -80,7 +80,8 @@ static void libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
                                                  LibBalsaMessage *message);
 
 static gboolean libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
-						    LibBalsaMessageBody *);
+						    LibBalsaMessageBody *,
+                                                    GError **err);
 
 static GArray *libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox *
                                                        mailbox);
@@ -747,7 +748,8 @@ libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox * mailbox,
 
 static gboolean
 libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
-                                    LibBalsaMessageBody *part)
+                                    LibBalsaMessageBody *part,
+                                    GError **err)
 {
     g_return_val_if_fail(part->mime_part, FALSE);
 

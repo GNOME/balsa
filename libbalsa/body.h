@@ -93,18 +93,20 @@ LibBalsaMessageBodyType libbalsa_message_body_type(LibBalsaMessageBody *
 void libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
 					 GMimeObject * mime_part);
 
-GMimeStream *libbalsa_message_body_get_stream(LibBalsaMessageBody * body);
+GMimeStream *libbalsa_message_body_get_stream(LibBalsaMessageBody * body,
+                                              GError **err);
 gssize libbalsa_message_body_get_content(LibBalsaMessageBody * body,
-                                         gchar ** buf);
+                                         gchar ** buf, GError **err);
 GdkPixbuf *libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body,
                                             GError ** err);
 
 gboolean libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
-                                       gboolean filter_crlf);
+                                       gboolean filter_crlf, GError **err);
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
                                     const gchar * filename,
-                                    gboolean filter_crlf);
-gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body);
+                                    gboolean filter_crlf, GError **err);
+gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
+                                              GError **err);
 
 gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 					   const gchar * param);

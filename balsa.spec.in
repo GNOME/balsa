@@ -1,12 +1,16 @@
-#fedora and mdk are exclusive
-%define fedora 1
+#fedora, suse and mdk are exclusive
+%define fedora 0
 %define mdk    0
+%define suse   1
 %define gmimever 2.1.14
 %if %fedora
 %define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --with-ssl --with-gss
 %endif
 %if %mdk
 %define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings
+%endif
+%if %suse
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --with-ssl --with-gss
 %endif
 
 Name:           balsa
@@ -54,6 +58,20 @@ BuildRequires:  libgnome-vfs2_0-devel
 BuildRequires:  libpspell4-devel
 BuildRequires:  libltdl3-devel
 BuildRequires:  libpcre0-devel
+%endif
+%if %suse
+Requires: gtk2 >= 2.0.0
+Requires: libgnome >= 2.0.0
+Requires: libgnomeui >= 2.0.0
+Requires: gnome-vfs2 >= 2.0.0
+Requires:  libgnomeprint >= 2.2.0
+Requires:  libgnomeprintui >= 2.2.0
+BuildRequires:  gtk2-devel >= 2.0.0
+BuildRequires:  libgnome-devel >= 2.0.0
+BuildRequires:  libgnomeui-devel >= 2.0.0
+BuildRequires:  gnome-vfs2-devel >= 2.0.0
+BuildRequires:  libgnomeprint-devel >= 2.2.0
+BuildRequires:  libgnomeprintui-devel >= 2.2.0
 %endif
 
 %description

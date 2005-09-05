@@ -308,6 +308,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
     gchar *data;
+    GError *err = NULL;
 
     /* create a message */
     message = libbalsa_message_new();
@@ -326,7 +327,13 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     /* the original body my have some data to be returned as commands... */
     body = libbalsa_message_body_new(message);
 
-    libbalsa_message_body_get_content(mime_body, &data);
+    if(libbalsa_message_body_get_content(mime_body, &data, &err)<0) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Could not get a part: %s"),
+                          err ? err->message : "Unknown error");
+        g_clear_error(&err);
+    }
+
     if (data) {
 	gchar *p;
 

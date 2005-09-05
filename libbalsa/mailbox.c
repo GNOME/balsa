@@ -1540,7 +1540,8 @@ libbalsa_mailbox_set_msg_headers(LibBalsaMailbox *mailbox,
 
 gboolean
 libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
-                                  LibBalsaMessageBody *part)
+                                  LibBalsaMessageBody *part,
+                                  GError **err)
 {
     g_return_val_if_fail(message != NULL, FALSE);
     g_return_val_if_fail(message->mailbox != NULL, FALSE);
@@ -1548,7 +1549,7 @@ libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
     g_return_val_if_fail(part != NULL, FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(message->mailbox)
-        ->get_message_part(message, part);
+        ->get_message_part(message, part, err);
 }
 
 GMimeStream *

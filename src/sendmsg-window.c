@@ -3092,16 +3092,24 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	while (body) {
 	    gchar *name, *body_type, *tmp_file_name;
 	    int fd;
-
+            GError *err = NULL;
+            gboolean res;
 	    if (body->filename) {
 		libbalsa_mktempdir(&tmp_file_name);
 		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
 		g_free(tmp_file_name);
-		libbalsa_message_body_save(body, name, FALSE);
+		res = libbalsa_message_body_save(body, name, FALSE, &err);
 	    } else {
 		fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL);
-		libbalsa_message_body_save_fd(body, fd, FALSE);
+		res = libbalsa_message_body_save_fd(body, fd, FALSE, &err);
 	    }
+            if(!res) {
+                balsa_information(LIBBALSA_INFORMATION_ERROR,
+                                  _("Could not save attachment: %s"),
+                                  err ? err->message : "Unknown error");
+                g_clear_error(&err);
+                /* FIXME: do not try any further? */
+            }
 	    body_type = libbalsa_message_body_get_mime_type(body);
 	    add_attachment(bsmsg, name, TRUE, body_type);
 	    g_free(body_type);

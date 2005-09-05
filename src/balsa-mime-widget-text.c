@@ -88,14 +88,20 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     regex_t rex;
     GList *url_list = NULL;
     const gchar *target_cs;
+    GError *err = NULL;
 
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
 
-    alloced = libbalsa_message_body_get_content(mime_body, &ptr);
-    if (!ptr)
+    alloced = libbalsa_message_body_get_content(mime_body, &ptr, &err);
+    if (!ptr) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Could not save a text part: %s"),
+                          err ? err->message : "Unknown error");
+        g_clear_error(&err);
         return NULL;
+    }
 
     /* handle HTML if possible */
     html_type = libbalsa_html_type(content_type);

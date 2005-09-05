@@ -434,7 +434,7 @@ libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
     LibBalsaMessageBody* body = 
 	libbalsa_message_body_get_by_id(msg->body_list,	id);
     if(!body) return NULL;
-    return libbalsa_message_body_get_stream(body);
+    return libbalsa_message_body_get_stream(body, NULL); /*provide more info?*/
 }
 
 /* libbalsa_message_save:

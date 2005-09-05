@@ -37,7 +37,7 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
     gchar *content_type, *fpos;
     const gchar *cmd;
     gchar *key;
-
+    GError *err = NULL;
     g_return_if_fail(mime_body != NULL);
 
     content_type = libbalsa_message_body_get_mime_type(mime_body);
@@ -45,10 +45,12 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
 
     if (key != NULL
 	&& (cmd = gnome_vfs_mime_get_value(content_type, key)) != NULL) {
-	if (!libbalsa_message_body_save_temporary(mime_body)) {
+	if (!libbalsa_message_body_save_temporary(mime_body, &err)) {
 	    balsa_information(LIBBALSA_INFORMATION_WARNING,
-			      _("Could not create temporary file %s"),
-			      mime_body->temp_filename);
+			      _("Could not create temporary file %s: "),
+			      mime_body->temp_filename,
+                              err ? err->message : "Unknown error");
+            g_clear_error(&err);
 	    g_free(content_type);
 	    return;
 	}
@@ -76,6 +78,7 @@ balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
     gchar *id;
 
     if ((id = g_object_get_data(G_OBJECT(menu_item), "mime_action"))) {
+        GError *err = NULL;
 #if HAVE_GNOME_VFS29
 	GnomeVFSMimeApplication *app =
 	    gnome_vfs_mime_application_new_from_desktop_id(id);
@@ -84,7 +87,7 @@ balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
 	    gnome_vfs_mime_application_new_from_id(id);
 #endif				/* HAVE_GNOME_VFS29 */
 	if (app) {
-	    if (libbalsa_message_body_save_temporary(mime_body)) {
+	    if (libbalsa_message_body_save_temporary(mime_body, &err)) {
 #if HAVE_GNOME_VFS29
 		gchar *uri =
 		    g_strconcat("file://", mime_body->temp_filename,
@@ -108,8 +111,9 @@ balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
 #endif				/* HAVE_GNOME_VFS29 */
 	    } else {
 		balsa_information(LIBBALSA_INFORMATION_WARNING,
-				  _("could not create temporary file %s"),
-				  mime_body->temp_filename);
+				  _("could not create temporary file %s: %s"),
+				  mime_body->temp_filename,
+                                  err ? err->message : "Unknown error");
 	    }
 	    gnome_vfs_mime_application_free(app);
 	} else {
@@ -128,6 +132,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * menu_item,
     GtkWidget *save_dialog;
     gchar *filename;
     gboolean do_save;
+    GError *err = NULL;
 
     g_return_if_fail(mime_body != NULL);
 
@@ -191,10 +196,10 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * menu_item,
     if (do_save)
 	if (!libbalsa_message_body_save(mime_body, filename,
 					mime_body->body_type ==
-					LIBBALSA_MESSAGE_BODY_TYPE_TEXT))
+					LIBBALSA_MESSAGE_BODY_TYPE_TEXT, &err))
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("Could not save %s: %s"),
-			      filename, strerror(errno));
+			      filename, err ? err->message : "Unknown error");
     g_free(filename);
 }
 

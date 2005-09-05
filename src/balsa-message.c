@@ -1353,6 +1353,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
 	    gchar *save_name;
 	    gboolean result;
+            GError *err = NULL;
 
 	    if (info->body->filename)
 		save_name =
@@ -1387,11 +1388,15 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             result =
                 libbalsa_message_body_save(info->body, save_name,
                                            info->body->body_type ==
-                                           LIBBALSA_MESSAGE_BODY_TYPE_TEXT);
+                                           LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                           &err);
 	    if (!result)
 		balsa_information(LIBBALSA_INFORMATION_ERROR,
 				  _("Could not save %s: %s"),
-				  save_name, strerror(errno));
+				  save_name,
+                                  err->message ? 
+                                  err->message : "Unknown error");
+            g_clear_error(&err);
 	    g_free(save_name);
 	    info_list = g_list_next(info_list);
 	}
@@ -2306,11 +2311,18 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	/* check if the gmime part is present and force loading it if we are
 	   in "always" mode */
 	if (!this_body->mime_part) {
+            GError *err = NULL;
 	    if (chk_crypto->chk_mode != LB_MAILBOX_CHK_CRYPT_ALWAYS)
 		return this_body;
 
 	    /* force loading the missing part */
-	    libbalsa_mailbox_get_message_part(message, this_body);
+	    if(!libbalsa_mailbox_get_message_part(message, this_body, &err)) {
+		libbalsa_information
+		    (LIBBALSA_INFORMATION_ERROR,
+                     _("Parsing a message part failed: %s"),
+                     err ? err->message : _("Possible disk space problem."));
+                g_clear_error(&err);
+            }
 	}
 
 	encrres = libbalsa_message_body_protection(this_body);
@@ -2381,12 +2393,18 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
     /* check if the gmime part is present and force loading it if we are in
        "always" mode */
     if (!body->mime_part) {
+        GError *err = NULL;
 	if (chk_crypto->chk_mode != LB_MAILBOX_CHK_CRYPT_ALWAYS)
 	    return;
 
 	/* force loading the missing part */
-        if(!libbalsa_mailbox_get_message_part(message, body))
-            return;
+        if(!libbalsa_mailbox_get_message_part(message, body, &err)) {
+            libbalsa_information
+                (LIBBALSA_INFORMATION_ERROR,
+                 _("Parsing a message part failed: %s"),
+                 err ? err->message : _("Possible disk space problem."));
+            g_clear_error(&err);
+        }
     }
 	
     /* check which type of protection we've got */
@@ -2487,6 +2505,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	return;
 
     if (!body->mime_part) {
+        GError *err = NULL;
 	/* if the user requested to always check everything or if the part is
 	   text (and therefore likely to be displayed anyway) force loading
 	   the missing part */
@@ -2494,7 +2513,13 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    body->body_type != LIBBALSA_MESSAGE_BODY_TYPE_TEXT)
 	    return;
 
-	libbalsa_mailbox_get_message_part(message, body);
+        if(!libbalsa_mailbox_get_message_part(message, body, &err)) {
+            libbalsa_information
+                (LIBBALSA_INFORMATION_ERROR,
+                 _("Parsing a message part failed: %s"),
+                 err ? err->message : _("Possible disk space problem."));
+            g_clear_error(&err);
+        }
     }
 
     /* check if this is a RFC2440 part */

@@ -135,7 +135,8 @@ static gboolean libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *
 static void libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
                                                 LibBalsaMessage *message);
 static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
-						   LibBalsaMessageBody *);
+						   LibBalsaMessageBody *,
+                                                   GError **err);
 static GArray *libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *
 						      mailbox);
 
@@ -471,7 +472,7 @@ clean_dir(const char *dir_name, off_t cache_size)
         struct file_info *fi = (struct file_info*)(lst->data);
         sz += fi->size;
         if(sz>cache_size) {
-            printf("removing %s\n", fi->name);
+            /* printf("removing %s\n", fi->name); */
             unlink(fi->name);
         }
         g_free(fi->name);
@@ -2184,7 +2185,8 @@ get_parent(LibBalsaMessageBody *root, LibBalsaMessageBody *part,
 }
 static gboolean
 lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
-                                 LibBalsaMessageBody * part)
+                                 LibBalsaMessageBody * part,
+                                 GError **err)
 {
     GMimeStream *partstream = NULL;
 
@@ -2247,7 +2249,10 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             g_free(section); 
             g_strfreev(pair);
             g_free(part_name);
-            return FALSE; /* something better ? */
+            g_set_error(err,
+                        LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        _("Cannot create temporary file"));
+            return FALSE;
         }
         if(ifbo == IMFB_NONE) {
             fprintf(fp,"MIME-version: 1.0\r\ncontent-type: %s\r\n"
@@ -2255,12 +2260,22 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                     part->content_type ? part->content_type : "text/plain",
                     encoding_names(dt.body->encoding));
         }
-	if (fwrite(dt.block, dt.body->octets, 1, fp) != 1) {
+	if (dt.body->octets) {
+            if(fwrite(dt.block, 1, dt.body->octets, fp) != dt.body->octets
+               || fflush(fp) != 0) {
             fclose(fp);
+            /* we do not want to have an incomplete part in the cache
+               so that the user still can try again later when the
+               problem with writing (disk space?) is removed */
+            unlink(part_name);
+            g_set_error(err,
+                        LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        _("Cannot write to temporary file %s"), part_name);
             g_free(section); 
             g_strfreev(pair);
             g_free(part_name);
             return FALSE; /* something better ? */
+            }
         }
 	fseek(fp, 0, SEEK_SET);
     }
@@ -2286,9 +2301,10 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
  * created. */
 static gboolean
 lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
-                      gboolean need_children, GMimeObject * parent_part)
+                      gboolean need_children, GMimeObject * parent_part,
+                      GError **err)
 {
-    if (!part)
+    if (!part) /* FIXME: internal error? */
         return FALSE;
 
     if (!part->mime_part) {
@@ -2307,7 +2323,7 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
             g_mime_object_set_content_type(part->mime_part, type);
         } else {
             g_mime_content_type_destroy(type);
-            if (!lbm_imap_get_msg_part_from_cache(msg, part))
+            if (!lbm_imap_get_msg_part_from_cache(msg, part, err))
                 return FALSE;
         }
     }
@@ -2325,10 +2341,14 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
 
     if (need_children) {
 	/* Get the children, if any,... */
-        if (GMIME_IS_MULTIPART(part->mime_part))
-            lbm_imap_get_msg_part(msg, part->parts, TRUE, part->mime_part);
+        if (GMIME_IS_MULTIPART(part->mime_part)) {
+            if(!lbm_imap_get_msg_part(msg, part->parts, TRUE,
+                                      part->mime_part, err))
+                return FALSE;
+        }
 	/* ...and siblings. */
-        lbm_imap_get_msg_part(msg, part->next, TRUE, parent_part);
+        if(!lbm_imap_get_msg_part(msg, part->next, TRUE, parent_part, err))
+            return FALSE;
 	/* FIXME if GMIME_IS_MESSAGE_PART? */
     }
 
@@ -2337,12 +2357,13 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
 
 static gboolean
 libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
-                                   LibBalsaMessageBody *part)
+                                   LibBalsaMessageBody *part,
+                                   GError **err)
 {
     if (part->mime_part)
         return GMIME_IS_PART(part->mime_part);
 
-    return lbm_imap_get_msg_part(msg, part, FALSE, NULL);
+    return lbm_imap_get_msg_part(msg, part, FALSE, NULL, err);
 }
 
 /* libbalsa_mailbox_imap_duplicate_msgnos: identify messages with same

@@ -1,3 +1,18 @@
+2005-09-05 Pawel Salek
+
+	* configure.in: merge SuSE kerberos path fixes.
+	* libbalsa/body.[hc]: provide more info on error in save(),
+	save_fd(), save_temporary(), get_content() and get_stream().
+	* libbalsa/libbalsa.h: add MAILBOX_ACCESS_ERROR code.
+	* libbalsa/mailbox.[ch]: get_message_part() sets GError.
+	* libbalsa/mailbox_{imap,local}.c: modify implementation accordingly.
+	* libbalsa/{message,mime}.c: adjust to changed API.
+	* src/balsa-message.c: ditto.
+	* src/balsa-mime-widget-{callbacks,message,text}.c: 
+	* src/balsa-mime-widget.c: ditto.
+	* src/print.c: 
+	* src/sendmsg-window.c: ditto when forwarding message.
+
 2005-09-01 11:04  PeterB
 
 	* src/pref-manager.c: connect file-chooser signal in an idle

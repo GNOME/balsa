@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-09-05 20:20+0300\n"
+"POT-Creation-Date: 2005-09-07 07:32+0300\n"
 "PO-Revision-Date: 2005-09-05 21:20+0300\n"
 "Last-Translator: Ilkka Tuohela <hile@iki.fi>\n"
 "Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
@@ -66,7 +66,7 @@ msgstr "Osoitekirjasta ei voida hakea"
 
 #: ../libbalsa/address-book.c:307
 msgid "Cannot add duplicate entry"
-msgstr ""
+msgstr "Kaksoiskappaletta ei voida lisätä"
 
 #: ../libbalsa/address-book.c:309
 msgid "Cannot find address in address book"
@@ -213,8 +213,8 @@ msgstr "%s: allekirjoituksen tarkistus epäonnistui: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:576
 msgid "combined signing and encryption is only defined for RFC 2440"
-msgstr "Yhdistetty allekirjoitus ja salaus on määritelty vain RFC "
-"2440-viestelle"
+msgstr ""
+"Yhdistetty allekirjoitus ja salaus on määritelty vain RFC 2440-viestelle"
 
 #: ../libbalsa/gmime-gpgme-context.c:647
 #, c-format
@@ -892,6 +892,8 @@ msgid ""
 "Crypto engine %s version %s is installed, but at least version %s is "
 "required."
 msgstr ""
+"Salausmoottorin %s versio %s on asennettu, mutta vaaditaan vähintään "
+"versio %s."
 
 #: ../libbalsa/rfc3156.c:106
 #, c-format
@@ -1398,8 +1400,9 @@ msgstr ""
 #: ../libbalsa/send.c:1572
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
-msgstr "Tekstitiedoston \"%s\" merkistöä ei voitu päätellä, lähetetään "
-"MIME-tyypillä \"%s\""
+msgstr ""
+"Tekstitiedoston \"%s\" merkistöä ei voitu päätellä, lähetetään MIME-tyypillä "
+"\"%s\""
 
 #: ../libbalsa/send.c:1909 ../libbalsa/send.c:1991
 msgid "This message will not be encrypted for the BCC: recipient(s)."
@@ -1609,15 +1612,15 @@ msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
 msgid "Yes, remember it"
-msgstr ""
+msgstr "Muista aina"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
 msgid "No, type it in every time"
-msgstr ""
+msgstr "Ei, syötä joka kerta"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:114
 msgid "Name of mail server for incoming _mail:"
-msgstr ""
+msgstr "Saapuvan _sähköpostin postipalvelin:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:119
 msgid "_Type of mail server:"
@@ -1646,7 +1649,7 @@ msgstr "Koko _nimesi:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:148
 msgid "Your _Email Address, for this email account:"
-msgstr ""
+msgstr "Sähköpostiosoitteesi tälle tilille:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:153
 msgid "_Remember your password:"
@@ -1743,7 +1746,7 @@ msgstr "VCard-osoitekirja (GNOME-Kortit)"
 
 #: ../src/ab-main.c:472 ../src/address-book-config.c:909
 msgid "External query (a program)"
-msgstr ""
+msgstr "Ulkoinen kysely (sovellus)"
 
 #: ../src/ab-main.c:474 ../src/address-book-config.c:914
 msgid "LDIF Address Book"
@@ -1834,7 +1837,7 @@ msgstr "_Yritä arvata nimi kirjoittaessa"
 
 #: ../src/address-book-config.c:368
 msgid "Load program location"
-msgstr ""
+msgstr "Latausohjelman sijainti"
 
 #: ../src/address-book-config.c:375 ../src/address-book-config.c:380
 msgid "Select load program for address book"
@@ -1842,11 +1845,11 @@ msgstr "Valitse ohjelma, jolla osoitekirja avataan"
 
 #: ../src/address-book-config.c:387
 msgid "Save program location"
-msgstr ""
+msgstr "Tallennusohjelman sijainti"
 
 #: ../src/address-book-config.c:394 ../src/address-book-config.c:399
 msgid "Select save program for address book"
-msgstr ""
+msgstr "Valitse ohjelma, jolla osoitekirja tallennetaan"
 
 #: ../src/address-book-config.c:458
 msgid "_Host Name"
@@ -1877,11 +1880,11 @@ msgstr "Käytä _TLS-yhteyttä"
 #: ../src/address-book-config.c:542 ../src/main-window.c:3949
 #, c-format
 msgid "Error displaying help: %s\n"
-msgstr ""
+msgstr "Virhe näytettäessä ohjetta: %s\n"
 
 #: ../src/address-book-config.c:643
 msgid "No path found.  Do you want to give one?"
-msgstr ""
+msgstr "Polkua ei annettu. Haluatko syöttää polun?"
 
 #: ../src/address-book-config.c:649
 #, c-format
@@ -1905,7 +1908,7 @@ msgstr "Polku \"%s\" ei ole oikein. %s"
 
 #: ../src/address-book-config.c:661
 msgid "Do you want to correct the path?"
-msgstr ""
+msgstr "Haluatko korjata annetun polun?"
 
 #: ../src/balsa-app.c:76
 #, c-format
@@ -1981,7 +1984,7 @@ msgstr "Välitä _viestissä..."
 
 #: ../src/balsa-index.c:1780 ../src/main-window.c:623
 msgid "_Pipe through..."
-msgstr ""
+msgstr "_Putkita ohjelmalle..."
 
 #: ../src/balsa-index.c:1782 ../src/main-window.c:682
 #: ../src/main-window.c:1031
@@ -2050,7 +2053,7 @@ msgstr ""
 
 #: ../src/balsa-index.c:2423
 msgid "Pipe message through a program"
-msgstr ""
+msgstr "Putkita viesti ohjelman läpi"
 
 #: ../src/balsa-index.c:2426
 msgid "_Run"
@@ -2127,7 +2130,7 @@ msgstr "(ei lähettäjää)"
 #: ../src/balsa-message.c:856
 #, c-format
 msgid "Could not access message %ld in mailbox \"%s\"."
-msgstr ""
+msgstr "Viestiä %ld ei voitu avata kansiosta \"%s\"."
 
 #: ../src/balsa-message.c:1038
 msgid "mixed parts"
@@ -2152,7 +2155,7 @@ msgstr "rfc822-viesti"
 #: ../src/balsa-message.c:1048
 #, c-format
 msgid "\"%s\" parts"
-msgstr ""
+msgstr "\"%s\" osaa"
 
 #: ../src/balsa-message.c:1101
 #, c-format
@@ -2166,7 +2169,7 @@ msgstr "koko viesti"
 #: ../src/balsa-message.c:1125
 #, c-format
 msgid "part %s: %s (file %s)"
-msgstr ""
+msgstr "osa %s: %s (tiedosto %s)"
 
 #: ../src/balsa-message.c:1136
 #, c-format
@@ -2184,7 +2187,7 @@ msgstr "Tallenna..."
 
 #: ../src/balsa-message.c:1330
 msgid "Select folder for saving selected parts"
-msgstr ""
+msgstr "Valitse kansio, johon valitut osat tallennetaan"
 
 #: ../src/balsa-message.c:1367
 #, c-format
@@ -2256,12 +2259,12 @@ msgstr ""
 
 #: ../src/balsa-message.c:2418
 msgid "PGP"
-msgstr ""
+msgstr "PGP"
 
 #: ../src/balsa-message.c:2418 ../src/balsa-mime-widget-crypto.c:72
 #: ../src/print.c:1296
 msgid "S/MIME"
-msgstr ""
+msgstr "S/MIME"
 
 #: ../src/balsa-message.c:2437 ../src/balsa-message.c:2552
 msgid "Detected a good signature"
@@ -2304,19 +2307,19 @@ msgstr ""
 
 #: ../src/balsa-message.c:2521
 msgid "Please close the other instances of this message and try again."
-msgstr ""
+msgstr "Valitse viestin muut näkymät ja yritä uudestaan."
 
 #: ../src/filter-edit-callbacks.c:311
 msgid "One of the specified fields contains:"
-msgstr ""
+msgstr "Yksi annetuista kentistä sisältää:"
 
 #: ../src/filter-edit-callbacks.c:312
 msgid "None of the specified fields contains:"
-msgstr ""
+msgstr "Yksikään annetuista viesteisti ei sisällä:"
 
 #: ../src/filter-edit-callbacks.c:314
 msgid "One of the regular expressions matches"
-msgstr ""
+msgstr "Yksi säännöllisistä lausekkeista vastaa"
 
 #: ../src/filter-edit-callbacks.c:315
 msgid "None of the regular expressions matches"
@@ -2324,19 +2327,19 @@ msgstr "Mikään säännöllisistä lausekkeista ei täsmää"
 
 #: ../src/filter-edit-callbacks.c:317
 msgid "Match when date is in the interval:"
-msgstr ""
+msgstr "Osuma, kun päiväys on väliltä:"
 
 #: ../src/filter-edit-callbacks.c:318
 msgid "Match when date is outside the interval:"
-msgstr ""
+msgstr "Osuma, kun päiväys ei ole väliltä:"
 
 #: ../src/filter-edit-callbacks.c:320 ../src/filter-edit-callbacks.c:1070
 msgid "Match when one of these flags is set:"
-msgstr ""
+msgstr "Osuma, kun joku näistä lipuista ei ole asetettu:"
 
 #: ../src/filter-edit-callbacks.c:321
 msgid "Match when none of these flags is set:"
-msgstr ""
+msgstr "Osuma, kun mikään näistä lipuista ei ole asetettu:"
 
 #: ../src/filter-edit-callbacks.c:512
 msgid "You must specify the name of the user header to match on"
@@ -2858,25 +2861,25 @@ msgid "_Subfolder of:"
 msgstr "_Yläkansio:"
 
 #: ../src/folder-conf.c:814
-#, fuzzy
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
-msgstr "Tätä kansiota ei löydy asetuksista. En vielä tiedä miten poistaa se."
+msgstr ""
+"Tätä kansiota ei löydy asetuksista. En vielä tiedä, kuinka se poistetaan "
+"etäpalvelimelta."
 
 #: ../src/folder-conf.c:823
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr ""
-"Tämä poistaa kansion %s listalta.\n"
-"Voit \"Lisää IMAP-kansio\"-toiminnolla lisätä kansion myöhemmin uudestaan.\n"
-"Mitä haluaisit tehdä?"
+"Tämä poistaa kansion \"%s\" listalta.\n"
+"Voit käyttää toimintoa \"Lisää IMAP-kansio\" ja lisätä kansion takaisin.\n"
 
 #: ../src/folder-conf.c:828
 msgid "Confirm"
-msgstr ""
+msgstr "Varmista"
 
 #: ../src/information-dialog.c:222
 msgid "Information - Balsa"
@@ -2906,14 +2909,14 @@ msgid "No mailbox selected."
 msgstr "Ei valittuja kansioita."
 
 #: ../src/mailbox-conf.c:379
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
 "If you really want to remove it, assign its function\n"
 "to some other mailbox."
 msgstr ""
 "Kansio \"%s\" on Balsan käytössä, eikä sitä voida poistaa.\n"
-"Jos todella haluat poistaa sen, siirrä sen tehtävät\n"
+"Jos todella haluat poistaa sen, siirrä siihen liitetyt tehtävät\n"
 "johonkin toiseen kansioon."
 
 #: ../src/mailbox-conf.c:389
@@ -3648,19 +3651,16 @@ msgid "Select _Filters"
 msgstr "Valitse _suodattimet"
 
 #: ../src/main-window.c:762 ../src/main-window.c:1091
-#, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Valitse kaikki valitun kansion viestit"
+msgstr "Valitse nykyiseen kansioon automaattisesti käytettävät suodattimet"
 
 #: ../src/main-window.c:767
-#, fuzzy
 msgid "_Remove Duplicates"
-msgstr "Poista listalta"
+msgstr "Poista kaksoiskappaleet"
 
 #: ../src/main-window.c:768
-#, fuzzy
 msgid "Remove duplicated messages from the selected mailbox"
-msgstr "Poista viestit roskakorista"
+msgstr "Poista kansiosta viestit, jotka ovat siellä kahteen kertaan"
 
 #: ../src/main-window.c:783
 msgid "_Toolbars..."
@@ -3832,7 +3832,8 @@ msgstr "Aihe tai lähettäjä _sisältää:"
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
-msgstr "Kansiota ei voitu avata!\n"
+msgstr ""
+"Kansiota ei voitu avata!\n"
 "%s."
 
 #: ../src/main-window.c:2538
@@ -3840,18 +3841,17 @@ msgid "translator-credits"
 msgstr ""
 
 #: ../src/main-window.c:2551 ../src/main-window.c:2578
-#, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"Sähköpostiohjelma Balsa on osa GNOME-työpöytää.\n"
-"Lisätietoja Balsasta löytyy osoitteesta http://www.balsa.net/\n"
+"Balsa-Sähköpostiohjelma on osa Gnome-työpöytää.\n"
+"Lisätietoja Balsasta löytyy osoitteesta http://balsa.gnome.org/\n"
 "\n"
-"Raportit ohjelmistovirheistä osoitteeseen: http://bugs.gnome.org/\n"
-"Suomennos: http://gnome-fi.sourceforge.net/"
+"Vikailmoitukset voit antaa osoitteessa http://bugzilla.gnome.org/\n"
+"Suomennos: http://gnome.fi/"
 
 #: ../src/main-window.c:2682 ../src/main-window.c:2695
 msgid "Checking Mail..."
@@ -3932,12 +3932,12 @@ msgid "You can apply filters only on mailbox\n"
 msgstr ""
 
 #: ../src/main-window.c:4048
-#, fuzzy, c-format
+#, c-format
 msgid "Removing duplicates failed: %s"
-msgstr "Lähetysvirhe: %s"
+msgstr "Kaksoiskappaleiden poist epäonnistui: %s"
 
 #: ../src/main-window.c:4249
-#, fuzzy, c-format
+#, c-format
 msgid "Could not open trash: %s"
 msgstr "Roskakoria ei voitu avata: %s"
 
@@ -4466,9 +4466,8 @@ msgstr ""
 
 #. How to handle received MDN requests
 #: ../src/pref-manager.c:1809
-#, fuzzy
 msgid "Message Disposition Notification Requests"
-msgstr "Message Disposition Notification-vaatimukset"
+msgstr "Message Disposition Notification-pyynnöt"
 
 #: ../src/pref-manager.c:1811
 msgid ""
@@ -4479,17 +4478,18 @@ msgstr ""
 "lähetä se seuraavissa tapauksissa:"
 
 #: ../src/pref-manager.c:1822
-#, fuzzy
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
 "I am in the \"To:\" or \"Cc:\" list)."
-msgstr "viestin otsikko näyttää puhtaalta"
+msgstr ""
+"Viestin otsakkeet näyttävät kelvollisilta\n"
+"(pyynnön osoite on sama kuin paluuosoite ja oma osoittesi on jossain "
+"otsakkeista \"To:\" tai \"Cc:\")."
 
 #: ../src/pref-manager.c:1837
-#, fuzzy
 msgid "The message header looks suspicious."
-msgstr "viestin otsikko näyttää epäilyttävältä"
+msgstr "Viestin otsakkeet näyttävät epäilyttäviltä"
 
 #: ../src/pref-manager.c:1872
 msgid "Word Wrap"
@@ -4504,13 +4504,12 @@ msgid "Other Options"
 msgstr "Muita asetuksia"
 
 #: ../src/pref-manager.c:1910
-#, fuzzy
 msgid "Reply Prefix:"
 msgstr "Lainauksen etuliite:"
 
 #: ../src/pref-manager.c:1913
 msgid "Edit headers in external editor"
-msgstr ""
+msgstr "Muokkaa otsakkeita ulkoisella ohjelmalla"
 
 #: ../src/pref-manager.c:1915
 msgid "Automatically quote original when replying"
@@ -4683,7 +4682,6 @@ msgid "Ignore words shorter than"
 msgstr "Ohita sanat, jotka ovat lyhyempiä kuin"
 
 #: ../src/pref-manager.c:2345
-#, fuzzy
 msgid "Miscellaneous Spelling Settings"
 msgstr "Muut oikolukuasetukset"
 
@@ -5124,7 +5122,6 @@ msgid "_Attach File..."
 msgstr "Liitä _tiedosto..."
 
 #: ../src/sendmsg-window.c:304 ../src/sendmsg-window.c:472
-#, fuzzy
 msgid "I_nclude Message(s)"
 msgstr "_Sisällytä viesti(t)"
 
@@ -5170,9 +5167,8 @@ msgid "_Wrap Body"
 msgstr "_Rivitä viesti"
 
 #: ../src/sendmsg-window.c:364 ../src/sendmsg-window.c:521
-#, fuzzy
 msgid "_Reflow Selected Text"
-msgstr "_Valitse teksti"
+msgstr "_Rivitä valittu teksti uudestaan"
 
 #: ../src/sendmsg-window.c:369 ../src/sendmsg-window.c:549
 msgid "Insert Si_gnature"
@@ -5248,7 +5244,8 @@ msgstr "_Salaaa viesti"
 
 #: ../src/sendmsg-window.c:430 ../src/sendmsg-window.c:590
 msgid "signs the message using GnuPG for all To: and CC: recipients"
-msgstr "Allekirjoittaa viestin GnuPG:llä kaikille To: ja Cc: kenttien "
+msgstr ""
+"Allekirjoittaa viestin GnuPG:llä kaikille To: ja Cc: kenttien "
 "vastaanottajille"
 
 #: ../src/sendmsg-window.c:450 ../src/sendmsg-window.c:626
@@ -5345,9 +5342,9 @@ msgid "forwarded message"
 msgstr "välitetty viesti"
 
 #: ../src/sendmsg-window.c:1905
-#, fuzzy, c-format
+#, c-format
 msgid "Message from %s, subject: \"%s\""
-msgstr "Message-ID: %s\n"
+msgstr "Viesti lähettäjältä %s aiheena \"%s\""
 
 #: ../src/sendmsg-window.c:1923
 #, c-format
@@ -5575,9 +5572,8 @@ msgid "Skip the current word"
 msgstr "Ohita sana"
 
 #: ../src/spell-check.c:537
-#, fuzzy
 msgid "Skip all occurrences of the current word"
-msgstr "Ohita sanan kaikki ilmentymät."
+msgstr "Ohita valitun sanan kaikki ilmentymät"
 
 #: ../src/spell-check.c:547
 msgid "Add the current word to your personal dictionary"
@@ -5592,14 +5588,12 @@ msgid "Revert all changes and finish spell checking"
 msgstr "Peruuta muutokset ja lopeta oikoluku"
 
 #: ../src/spell-check.c:592
-#, fuzzy
 msgid "Spell check"
-msgstr "Suorita oikoluku"
+msgstr "Oikoluku"
 
 #: ../src/store-address.c:104
-#, fuzzy
 msgid "Store address: no addresses"
-msgstr "Tallenna lähettäjän osoite osoitekirjaan."
+msgstr "Tallenna osoite: ei osoitteita"
 
 #: ../src/store-address.c:181
 msgid "Store Address"
@@ -5614,32 +5608,28 @@ msgid "No address book selected...."
 msgstr "Ei valittuja osoitekirjoja..."
 
 #: ../src/store-address.c:230
-#, fuzzy
 msgid "Address could not be written to this address book."
-msgstr "Ei voida avata LDF-osoitekirjaa %s."
+msgstr "Osoitetta ei voida lisätä tähän osoitekirjaan."
 
 #: ../src/store-address.c:233
 msgid "Address book could not be accessed."
-msgstr ""
+msgstr "Osoitekirjaa ei voitu käyttää."
 
 #: ../src/store-address.c:235
-#, fuzzy
 msgid "This mail address is already in this address book."
-msgstr "%s on jo osoitekirjassa."
+msgstr "Sähköpostiosoite on jo tässä osoitekirjassa."
 
 #: ../src/store-address.c:238
 msgid "Unexpected address book error. Report it."
 msgstr ""
 
 #: ../src/store-address.c:254
-#, fuzzy
 msgid "Choose Address Book"
-msgstr "Osoitekirja"
+msgstr "Valitse osoitekirja"
 
 #: ../src/store-address.c:293
-#, fuzzy
 msgid "Choose Address"
-msgstr "Tallenna osoite"
+msgstr "Valitse osoite"
 
 #: ../src/toolbar-factory.c:77
 msgid "Separator"
@@ -5738,28 +5728,28 @@ msgid "Open next flagged message"
 msgstr "Avaa seuraava liputettu viesti"
 
 #: ../src/toolbar-factory.c:100
-#, fuzzy
 msgid ""
 "Previous\n"
 "part"
-msgstr "Edellinen osa"
+msgstr ""
+"Edellinen\n"
+"osa"
 
 #: ../src/toolbar-factory.c:101
-#, fuzzy
 msgid "View previous part of message"
-msgstr "Viestin edellinen viesti"
+msgstr "Näytä viestin edellinen osa"
 
 #: ../src/toolbar-factory.c:102
-#, fuzzy
 msgid ""
 "Next\n"
 "part"
-msgstr "Seuraava osa"
+msgstr ""
+"Seuraava\n"
+"osa"
 
 #: ../src/toolbar-factory.c:103
-#, fuzzy
 msgid "View next part of message"
-msgstr "Viestin seuraava osa"
+msgstr "Näytä viestin seuraava osa"
 
 #: ../src/toolbar-factory.c:104
 msgid ""
@@ -5774,14 +5764,12 @@ msgid "Move the current message to trash"
 msgstr "Siirrä valittu viesti roskiin"
 
 #: ../src/toolbar-factory.c:106
-#, fuzzy
 msgid "Postpone"
-msgstr "_Jatka myöhemmin"
+msgstr "Jatka myöhemmin"
 
 #: ../src/toolbar-factory.c:107
-#, fuzzy
 msgid "Postpone current message"
-msgstr "Tulosta tämä viesti"
+msgstr "Jatka viestin lähetystä myöhemmin"
 
 #: ../src/toolbar-factory.c:108
 msgid "Print"
@@ -5812,9 +5800,8 @@ msgid "Save the current item"
 msgstr "Tallenna valittu kohde"
 
 #: ../src/toolbar-factory.c:118
-#, fuzzy
 msgid "Identity"
-msgstr "Muokkaa henkilöllisyyttyä"
+msgstr "Henkilöllisyys"
 
 #: ../src/toolbar-factory.c:119
 msgid "Set identity to use for this message"
@@ -5829,9 +5816,8 @@ msgid "Close"
 msgstr "Sulje"
 
 #: ../src/toolbar-factory.c:123
-#, fuzzy
 msgid "Close the compose window"
-msgstr "Suljetaan kirjoitusikkuna"
+msgstr "Sulje kirjoitusikkuna"
 
 #: ../src/toolbar-factory.c:124
 msgid ""
@@ -5874,9 +5860,8 @@ msgid "Close current mailbox"
 msgstr "Sulje kansio"
 
 #: ../src/toolbar-factory.c:134
-#, fuzzy
 msgid "Msg Preview"
-msgstr "Esikatselu"
+msgstr "Viestin esikatselu"
 
 #: ../src/toolbar-factory.c:135
 msgid "Show preview pane"
@@ -5884,58 +5869,52 @@ msgstr "Näytä esikatseluruutu"
 
 #: ../src/toolbar-factory.c:137
 msgid "Sign"
-msgstr ""
+msgstr "Allekirjoita"
 
 #: ../src/toolbar-factory.c:138
 msgid "Sign message using GPG"
-msgstr ""
+msgstr "Allekirjoita viesti digitaalisesti GPG:llä"
 
 #: ../src/toolbar-factory.c:139
 msgid "Encrypt"
-msgstr ""
+msgstr "Salaa"
 
 #: ../src/toolbar-factory.c:140
-#, fuzzy
 msgid "Encrypt message using GPG"
-msgstr "Rivitä viestin rivit"
+msgstr "Salaa viesti digitaalisesti GPG:llä"
 
 #: ../src/toolbar-factory.c:142
-#, fuzzy
 msgid "Undo"
-msgstr "Ei luettu"
+msgstr "Peru"
 
 #: ../src/toolbar-factory.c:143
 msgid "Undo most recent change"
-msgstr ""
+msgstr "Peru viimeisin muutos"
 
 #: ../src/toolbar-factory.c:144
-#, fuzzy
 msgid "Redo"
-msgstr "Poista"
+msgstr "Tee uudestaan"
 
 #: ../src/toolbar-factory.c:145
 msgid "Redo most recent change"
-msgstr ""
+msgstr "Tee viimeisin muutos uudestaan"
 
 #: ../src/toolbar-factory.c:233
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
-msgstr ""
+msgstr "Tuntematon työkalupalkin kuvake \"%s\""
 
 #: ../src/toolbar-factory.c:315
-#, fuzzy
 msgid "Queue"
-msgstr "_Jono"
+msgstr "Laita jonoon"
 
 #: ../src/toolbar-factory.c:352
-#, fuzzy
 msgid "Queue this message for sending"
-msgstr "Listää viesti jonoon"
+msgstr "Lisää viesti lähetysjonoon"
 
 #: ../src/toolbar-prefs.c:123
-#, fuzzy
 msgid "Customize Toolbars"
-msgstr "Muuntele työkalupalkkeja ja valikoita"
+msgstr "Muokkaa työkalupalkkeja"
 
 #: ../src/toolbar-prefs.c:144
 msgid "Main window"
@@ -5950,19 +5929,17 @@ msgid "Message window"
 msgstr "Viesti-ikkuna"
 
 #: ../src/toolbar-prefs.c:154
-#, fuzzy
 msgid "Toolbar options"
-msgstr "Työkalurivi"
+msgstr "Työkalurivin asetukset"
 
 #: ../src/toolbar-prefs.c:164
-#, fuzzy
 msgid "_Wrap button labels"
-msgstr "Rivitä kuvatekstit"
+msgstr "Rivitä _kuvatekstit"
 
 #: ../src/toolbar-prefs.c:363
 #, c-format
 msgid "Error displaying toolbar help: %s\n"
-msgstr ""
+msgstr "Virhe näytettäessä työkalupalkin ohjetta: %s\n"
 
 #. Preview display
 #: ../src/toolbar-prefs.c:399

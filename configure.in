@@ -463,7 +463,7 @@ fi
 # KRB5/GSSAPI configuration.
 #
 if test "x$with_gss" != xno  ; then
-   AC_PATH_PROG(KRB5_CONFIG, krb5-config,no,[/usr/bin:/usr/lib/mit/bin])
+   AC_PATH_PROG(KRB5_CONFIG, krb5-config,no,[${PATH}:/usr/kerberos/bin:/usr/lib/mit/bin])
    if test "x$KRB5_CONFIG" != xno ; then 
       AC_DEFINE(HAVE_GSSAPI,1,[Defined when GSSAPI support is to be compiled.])
       BALSA_CFLAGS="$BALSA_CFLAGS `$KRB5_CONFIG --cflags gssapi`"

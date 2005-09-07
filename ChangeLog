@@ -1,3 +1,7 @@
+2005-09-06 Pawel Salek
+
+	* configure.in: SuSE changes broke FC. Negotiate a common solution.
+
 2005-09-05 Pawel Salek
 
 	* configure.in: merge SuSE kerberos path fixes.

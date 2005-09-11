@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-08-10 00:05+0200\n"
+"POT-Creation-Date: 2005-09-11 15:21+0100\n"
 "PO-Revision-Date: 2005-08-19 00:05+0200\n"
 "Last-Translator: Jens Seidel <jseidel@cvs.gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
@@ -33,20 +33,20 @@ msgid "E-Mail utility"
 msgstr "E-Mail-Programm"
 
 #. The externq database doesn't support Id's, sorry!
-#: ../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:418
+#: ../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:421
 #: ../libbalsa/address-book-ldif.c:329
 msgid "No-Id"
 msgstr "Keine Kennung"
 
 #: ../libbalsa/address-book-extern.c:215 ../libbalsa/address-book-extern.c:370
-#: ../libbalsa/address-book-ldap.c:424 ../libbalsa/address-book-ldif.c:309
+#: ../libbalsa/address-book-ldap.c:427 ../libbalsa/address-book-ldif.c:309
 #: ../libbalsa/address-book-ldif.c:332 ../libbalsa/address-book-ldif.c:351
 #: ../libbalsa/address-book-ldif.c:355 ../libbalsa/address-book-vcard.c:158
 #: ../libbalsa/address-book-vcard.c:312
 msgid "No-Name"
 msgstr "Kein Name"
 
-#: ../libbalsa/address-book-ldap.c:271
+#: ../libbalsa/address-book-ldap.c:275
 msgid "TLS requested but not compiled in"
 msgstr "TLS-Unterstützung wurde angefragt, ist aber nicht eingebaut"
 
@@ -79,7 +79,7 @@ msgid "Cannot find address in address book"
 msgstr "Die Adresse konnte nicht im Adressbuch gefunden werden"
 
 #: ../libbalsa/address-book.c:310 ../src/main-window.c:2228
-#: ../src/main-window.c:4250 ../src/sendmsg-window.c:4801
+#: ../src/main-window.c:4250 ../src/sendmsg-window.c:4809
 msgid "Unknown error"
 msgstr "Unbekannter Fehler"
 
@@ -107,7 +107,7 @@ msgstr "_Organisation:"
 msgid "_Email Address:"
 msgstr "_E-Mail-Adresse:"
 
-#: ../libbalsa/body.c:116 ../libbalsa/mailbox_local.c:1163
+#: ../libbalsa/body.c:116 ../libbalsa/mailbox_local.c:1165
 #: ../libbalsa/message.c:808
 msgid "(No subject)"
 msgstr "(Kein Betreff)"
@@ -138,7 +138,7 @@ msgstr "Es wurde versucht einen ungültigen Filter anzuwenden"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Ungültige Filter %s für das Postfach %s"
 
-#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:406
+#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:407
 msgid "Unable to load message body to match filter"
 msgstr "Nachrichtrumpf konnte nicht zum Filtern geladen werden"
 
@@ -281,14 +281,14 @@ msgid "%s: insufficient validity for uid %s"
 msgstr "%s: unzureichende Gültigkeit für Benutzerkennung %s"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:101 ../libbalsa/mailbox_local.c:1282
-#: ../libbalsa/mailbox_local.c:1284 ../src/sendmsg-window.c:3342
-#: ../src/sendmsg-window.c:3343
+#: ../libbalsa/identity.c:101 ../libbalsa/mailbox_local.c:1284
+#: ../libbalsa/mailbox_local.c:1286 ../src/sendmsg-window.c:3350
+#: ../src/sendmsg-window.c:3351
 msgid "Re:"
 msgstr "AW:"
 
-#: ../libbalsa/identity.c:102 ../src/sendmsg-window.c:3373
-#: ../src/sendmsg-window.c:3374
+#: ../libbalsa/identity.c:102 ../src/sendmsg-window.c:3381
+#: ../src/sendmsg-window.c:3382
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -483,8 +483,8 @@ msgstr "LDAP Verzeichnis für %s"
 msgid "Invalid date"
 msgstr "Ungültiges Datum"
 
-#: ../libbalsa/libbalsa.c:407 ../src/pref-manager.c:1164
-#: ../src/pref-manager.c:1259
+#: ../libbalsa/libbalsa.c:407 ../src/pref-manager.c:1206
+#: ../src/pref-manager.c:1301
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -559,27 +559,27 @@ msgstr "Postfach des Typs %s konnte nicht angelegt werden"
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
-#: ../libbalsa/mailbox_imap.c:537
+#: ../libbalsa/mailbox_imap.c:538
 msgid "IMAP connection has been severed. Reconnecting..."
 msgstr "Die IMAP-Verbindung wurde getrennt. Wiederherstellen..."
 
-#: ../libbalsa/mailbox_imap.c:540
+#: ../libbalsa/mailbox_imap.c:541
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgstr "Der IMAP-Server hat die Verbindung geschlossen: %s wiederherstellen..."
 
-#: ../libbalsa/mailbox_imap.c:1006 ../libbalsa/mailbox_maildir.c:493
+#: ../libbalsa/mailbox_imap.c:1007 ../libbalsa/mailbox_maildir.c:493
 #: ../libbalsa/mailbox_mbox.c:516 ../libbalsa/mailbox_mh.c:518
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: %s wird geöffnet; Ref.-Zähler: %d\n"
 
-#: ../libbalsa/mailbox_imap.c:1080 ../libbalsa/mailbox_imap.c:2219
+#: ../libbalsa/mailbox_imap.c:1081 ../libbalsa/mailbox_imap.c:2221
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "%ld KB heruntergeladen"
 
-#: ../libbalsa/mailbox_imap.c:1460
+#: ../libbalsa/mailbox_imap.c:1461
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -588,30 +588,40 @@ msgstr ""
 "Der Befehl »IMAP SEARCH« ist für das Postfach %s fehlgeschlagen\n"
 "Daher wird auf die voreingestellte Suchmethode zurückgegriffen."
 
-#: ../libbalsa/mailbox_imap.c:1520
+#: ../libbalsa/mailbox_imap.c:1521
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "Für das Postfach »%s« wurde kein Pfad gefunden, es wird »%s« verwendet"
 
-#: ../libbalsa/mailbox_imap.c:1609 ../libbalsa/mailbox_imap.c:1650
+#: ../libbalsa/mailbox_imap.c:1610 ../libbalsa/mailbox_imap.c:1651
 msgid "Cannot get IMAP handle"
 msgstr "Das IMAP-Handle konnte nicht ermittelt werden"
 
-#: ../libbalsa/mailbox_imap.c:2485
+#: ../libbalsa/mailbox_imap.c:2254
+#, fuzzy
+msgid "Cannot create temporary file"
+msgstr "Die temporäre Datei %s konnte nicht erstellt werden"
+
+#: ../libbalsa/mailbox_imap.c:2273
+#, fuzzy, c-format
+msgid "Cannot write to temporary file %s"
+msgstr "Die temporäre Datei %s konnte nicht erstellt werden"
+
+#: ../libbalsa/mailbox_imap.c:2506
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "%ld KB hochgeladen"
 
-#: ../libbalsa/mailbox_imap.c:2672
+#: ../libbalsa/mailbox_imap.c:2693
 msgid "Server-side threading not supported."
 msgstr "Server-seitiges Threading wird nicht unterstützt."
 
-#: ../libbalsa/mailbox_local.c:1448
+#: ../libbalsa/mailbox_local.c:1450
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Öffnen von %s fehlgeschlagen. Fehlernummer = %d, "
 
-#: ../libbalsa/mailbox_local.c:1470
+#: ../libbalsa/mailbox_local.c:1472
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Postfach »%s« konnte nicht synchronisiert werden"
@@ -1368,8 +1378,8 @@ msgstr ""
 msgid "Connected to MTA"
 msgstr "Verbunden mit dem MTA"
 
-#: ../libbalsa/send.c:950 ../src/balsa-mime-widget-message.c:604
-#: ../src/print.c:361 ../src/sendmsg-window.c:3164 ../src/store-address.c:305
+#: ../libbalsa/send.c:950 ../src/balsa-mime-widget-message.c:611
+#: ../src/print.c:361 ../src/sendmsg-window.c:3172 ../src/store-address.c:305
 msgid "From:"
 msgstr "Von:"
 
@@ -1377,13 +1387,13 @@ msgstr "Von:"
 msgid "From"
 msgstr "Von"
 
-#: ../libbalsa/send.c:962 ../src/balsa-mime-widget-message.c:614
-#: ../src/print.c:365 ../src/sendmsg-window.c:997 ../src/sendmsg-window.c:3172
+#: ../libbalsa/send.c:962 ../src/balsa-mime-widget-message.c:621
+#: ../src/print.c:365 ../src/sendmsg-window.c:997 ../src/sendmsg-window.c:3180
 #: ../src/store-address.c:306
 msgid "To:"
 msgstr "An:"
 
-#: ../libbalsa/send.c:965 ../src/balsa-index.c:1032
+#: ../libbalsa/send.c:965 ../src/balsa-index.c:1021
 msgid "To"
 msgstr "An"
 
@@ -1391,7 +1401,7 @@ msgstr "An"
 msgid "Disconnected"
 msgstr "Nicht verbunden"
 
-#: ../libbalsa/send.c:1279
+#: ../libbalsa/send.c:1277
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -1399,7 +1409,7 @@ msgstr ""
 "Der SMTP-Server hat den Verbindungsaufbau verweigert.\n"
 "Bitte überprüfen Sie Ihre Internet-Verbindung."
 
-#: ../libbalsa/send.c:1284
+#: ../libbalsa/send.c:1282
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -1407,13 +1417,13 @@ msgstr ""
 "Der SMTP-Server wurde nicht erreicht.\n"
 "Bitte überprüfen Sie Ihre Internet-Verbindung."
 
-#: ../libbalsa/send.c:1293
+#: ../libbalsa/send.c:1291
 msgid "Message left in Outbox (try again later)"
 msgstr ""
 "Einige Nachrichten befinden sich noch im Postausgang - bitte versuchen Sie "
 "es später noch einmal"
 
-#: ../libbalsa/send.c:1297
+#: ../libbalsa/send.c:1295
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1422,14 +1432,14 @@ msgstr ""
 "SMTP-Server-Problem (%d): %s\n"
 "Nachricht verbleibt im Ausgang."
 
-#: ../libbalsa/send.c:1574
+#: ../libbalsa/send.c:1572
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 "Der Zeichensatz für die Textdatei »%s« konnte nicht ermittelt werden, sie "
 "wird als MIME-Typ »%s« gesendet"
 
-#: ../libbalsa/send.c:1911 ../libbalsa/send.c:1993
+#: ../libbalsa/send.c:1909 ../libbalsa/send.c:1991
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr ""
 "Diese Nachricht wird für die Empfänger einer Blindkopie nicht verschlüsselt."
@@ -1442,7 +1452,7 @@ msgstr "Anmelden an %s unter Verwendung von %s"
 
 #: ../libbalsa/smtp-server.c:348 ../src/mailbox-conf.c:198
 #: ../src/mailbox-conf.c:1360 ../src/pref-manager.c:356
-#: ../src/pref-manager.c:3048
+#: ../src/pref-manager.c:3090
 msgid "Never"
 msgstr "Nie"
 
@@ -1781,28 +1791,28 @@ msgstr "Neue E-Mail eingetroffen"
 msgid "Program startup"
 msgstr "Programmstart"
 
-#: ../src/ab-main.c:199 ../src/ab-window.c:696
+#: ../src/ab-main.c:199 ../src/ab-window.c:673
 msgid " address book: "
 msgstr "Adressbuch: "
 
-#: ../src/ab-main.c:470 ../src/address-book-config.c:890
+#: ../src/ab-main.c:470 ../src/address-book-config.c:903
 msgid "VCard Address Book (GnomeCard)"
 msgstr "vCard-Adressbuch (GnomeCard)"
 
-#: ../src/ab-main.c:472 ../src/address-book-config.c:896
+#: ../src/ab-main.c:472 ../src/address-book-config.c:909
 msgid "External query (a program)"
 msgstr "Externe Anfrage (ein Programm)"
 
-#: ../src/ab-main.c:474 ../src/address-book-config.c:901
+#: ../src/ab-main.c:474 ../src/address-book-config.c:914
 msgid "LDIF Address Book"
 msgstr "LDIF-Adressbuch"
 
-#: ../src/ab-main.c:477 ../src/address-book-config.c:907
+#: ../src/ab-main.c:477 ../src/address-book-config.c:920
 msgid "LDAP Address Book"
 msgstr "LDAP-Adressbuch"
 
-#: ../src/ab-main.c:481 ../src/address-book-config.c:515
-#: ../src/address-book-config.c:914
+#: ../src/ab-main.c:481 ../src/address-book-config.c:521
+#: ../src/address-book-config.c:927
 msgid "GPE Address Book"
 msgstr "GPE-Adressbuch"
 
@@ -1850,7 +1860,7 @@ msgstr "verschiedene Adressen für dieselbe Person"
 msgid "a distribution list"
 msgstr "einen Postverteiler"
 
-#: ../src/ab-window.c:725
+#: ../src/ab-window.c:702
 #, c-format
 msgid ""
 "Error opening address book '%s':\n"
@@ -1859,93 +1869,98 @@ msgstr ""
 "Fehler beim Öffnen des Adressbuchs »%s«:\n"
 "%s"
 
-#: ../src/address-book-config.c:234 ../src/address-book-config.c:327
+#: ../src/address-book-config.c:235 ../src/address-book-config.c:328
 msgid "Modify Address Book"
 msgstr "Adressbuch bearbeiten"
 
-#: ../src/address-book-config.c:238 ../src/address-book-config.c:331
+#: ../src/address-book-config.c:239 ../src/address-book-config.c:332
 msgid "Add Address Book"
 msgstr "Adressbuch hinzufügen"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: ../src/address-book-config.c:253 ../src/address-book-config.c:362
-#: ../src/address-book-config.c:452 ../src/address-book-config.c:513
+#: ../src/address-book-config.c:254 ../src/address-book-config.c:363
+#: ../src/address-book-config.c:453 ../src/address-book-config.c:519
 msgid "A_ddress Book Name"
 msgstr "A_dressbuchname"
 
-#: ../src/address-book-config.c:257 ../src/address-book-config.c:406
-#: ../src/address-book-config.c:483 ../src/address-book-config.c:518
+#: ../src/address-book-config.c:258 ../src/address-book-config.c:407
+#: ../src/address-book-config.c:489 ../src/address-book-config.c:524
 msgid "_Expand aliases as you type"
 msgstr "Kürzel bei der Eingabe _vervollständigen"
 
-#: ../src/address-book-config.c:367
+#: ../src/address-book-config.c:368
 msgid "Load program location"
 msgstr "Pfad des Programms zum Laden"
 
-#: ../src/address-book-config.c:374 ../src/address-book-config.c:379
+#: ../src/address-book-config.c:375 ../src/address-book-config.c:380
 msgid "Select load program for address book"
 msgstr "Programm zum Laden des Adressbuchs auswählen"
 
-#: ../src/address-book-config.c:386
+#: ../src/address-book-config.c:387
 msgid "Save program location"
 msgstr "Pfad des Programms zum Speichern"
 
-#: ../src/address-book-config.c:393 ../src/address-book-config.c:398
+#: ../src/address-book-config.c:394 ../src/address-book-config.c:399
 msgid "Select save program for address book"
 msgstr "Programm zum Speichern des Adressbuchs auswählen"
 
-#: ../src/address-book-config.c:457
+#: ../src/address-book-config.c:458
 msgid "_Host Name"
 msgstr "Rec_hnername"
 
-#: ../src/address-book-config.c:462
+#: ../src/address-book-config.c:463
 msgid "Base Domain _Name"
 msgstr "_Name der Basisdomäne"
 
-#: ../src/address-book-config.c:467
+#: ../src/address-book-config.c:468
 msgid "_User Name (Bind DN)"
 msgstr "_Benutzername (Bind-DN)"
 
-#: ../src/address-book-config.c:472
+#: ../src/address-book-config.c:473
 msgid "_Password"
 msgstr "_Passwort"
 
 #: ../src/address-book-config.c:479
+#, fuzzy
+msgid "_User Address Book DN"
+msgstr "Wählen Sie ein Adressbuch"
+
+#: ../src/address-book-config.c:485
 msgid "Enable _TLS"
 msgstr "_TLS aktivieren"
 
-#: ../src/address-book-config.c:536 ../src/main-window.c:3949
+#: ../src/address-book-config.c:542 ../src/main-window.c:3949
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Fehler beim Anzeigen der Hilfe: %s\n"
 
-#: ../src/address-book-config.c:637
+#: ../src/address-book-config.c:643
 msgid "No path found.  Do you want to give one?"
 msgstr "Es wurde kein Pfad gefunden. Möchten Sie einen angeben?"
 
-#: ../src/address-book-config.c:643
+#: ../src/address-book-config.c:649
 #, c-format
 msgid "The address book file path \"%s\" is not correct. %s"
 msgstr "Der Adressbuch-Dateipfad »%s« ist ungültig. %s"
 
-#: ../src/address-book-config.c:646
+#: ../src/address-book-config.c:652
 #, c-format
 msgid "The load program path \"%s\" is not correct. %s"
 msgstr "Der Laden-Programmpfad »%s« ist ungültig. %s"
 
-#: ../src/address-book-config.c:649
+#: ../src/address-book-config.c:655
 #, c-format
 msgid "The save program path \"%s\" is not correct. %s"
 msgstr "Der Speichern-Programmpfad »%s« ist ungültig. %s"
 
-#: ../src/address-book-config.c:652
+#: ../src/address-book-config.c:658
 #, c-format
 msgid "The path \"%s\" is not correct. %s"
 msgstr "Der Pfad »%s« ist ungültig. %s"
 
-#: ../src/address-book-config.c:655
+#: ../src/address-book-config.c:661
 msgid "Do you want to correct the path?"
 msgstr "Soll der Pfad korrigiert werden?"
 
@@ -1971,7 +1986,7 @@ msgstr "Passwort benötigt"
 msgid "_Remember password"
 msgstr "An Passwort _erinnern"
 
-#: ../src/balsa-app.c:536
+#: ../src/balsa-app.c:538
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Postfach »%s« konnte nicht geöffnet werden!"
@@ -1989,116 +2004,116 @@ msgstr "Datum"
 msgid "Size"
 msgstr "Größe"
 
-#: ../src/balsa-index.c:995
+#: ../src/balsa-index.c:984
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Postfach %s wird geöffnet. Bitte warten..."
 
-#: ../src/balsa-index.c:1627
+#: ../src/balsa-index.c:1616
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Verschieben in den Müll ist fehlgeschlagen: %s"
 
 #. R
-#: ../src/balsa-index.c:1781 ../src/main-window.c:584
+#: ../src/balsa-index.c:1770 ../src/main-window.c:584
 #: ../src/main-window.c:1047 ../src/message-window.c:148
 msgid "_Reply..."
 msgstr "_Antworten..."
 
-#: ../src/balsa-index.c:1783
+#: ../src/balsa-index.c:1772
 msgid "Reply To _All..."
 msgstr "Antwort an a_lle..."
 
-#: ../src/balsa-index.c:1785
+#: ../src/balsa-index.c:1774
 msgid "Reply To _Group..."
 msgstr "Antwort an _Gruppe..."
 
-#: ../src/balsa-index.c:1787
+#: ../src/balsa-index.c:1776
 msgid "_Forward Attached..."
 msgstr "Als A_nlage weiterleiten..."
 
-#: ../src/balsa-index.c:1789
+#: ../src/balsa-index.c:1778
 msgid "Forward _Inline..."
 msgstr "_Inline weiterleiten..."
 
-#: ../src/balsa-index.c:1791 ../src/main-window.c:623
+#: ../src/balsa-index.c:1780 ../src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "_Leiten durch..."
 
-#: ../src/balsa-index.c:1793 ../src/main-window.c:682
+#: ../src/balsa-index.c:1782 ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "Adresse _speichern..."
 
-#: ../src/balsa-index.c:1808 ../src/filter-edit-dialog.c:223
+#: ../src/balsa-index.c:1797 ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:981 ../src/mailbox-node.c:997
-#: ../src/pref-manager.c:1457 ../src/pref-manager.c:1546
-#: ../src/pref-manager.c:2591
+#: ../src/pref-manager.c:1499 ../src/pref-manager.c:1588
+#: ../src/pref-manager.c:2633
 msgid "_Delete"
 msgstr "_Löschen"
 
-#: ../src/balsa-index.c:1813
+#: ../src/balsa-index.c:1802
 msgid "_Undelete"
 msgstr "_Wiederherstellen"
 
-#: ../src/balsa-index.c:1818
+#: ../src/balsa-index.c:1807
 msgid "Move To _Trash"
 msgstr "In den _Müll verschieben"
 
-#: ../src/balsa-index.c:1822
+#: ../src/balsa-index.c:1811
 msgid "T_oggle"
 msgstr "_Markieren"
 
-#: ../src/balsa-index.c:1826 ../src/main-window.c:331 ../src/main-window.c:360
+#: ../src/balsa-index.c:1815 ../src/main-window.c:331 ../src/main-window.c:360
 msgid "_Flagged"
 msgstr "_Markiert"
 
-#: ../src/balsa-index.c:1829
+#: ../src/balsa-index.c:1818
 msgid "_Unread"
 msgstr "_Ungelesen"
 
-#: ../src/balsa-index.c:1837
+#: ../src/balsa-index.c:1826
 msgid "_Move to"
 msgstr "_Verschieben nach"
 
-#: ../src/balsa-index.c:1845
+#: ../src/balsa-index.c:1834
 msgid "_View Source"
 msgstr "_Quelltext anzeigen"
 
-#: ../src/balsa-index.c:2127
+#: ../src/balsa-index.c:2116
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Nachrichten konnten nicht in das Postfach »%s« kopiert werden: %s"
 
-#: ../src/balsa-index.c:2128
+#: ../src/balsa-index.c:2117
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Nachricht konnte nicht in das Postfach »%s« kopiert werden: %s"
 
-#: ../src/balsa-index.c:2140
+#: ../src/balsa-index.c:2129
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Kopiert nach »%s«."
 
-#: ../src/balsa-index.c:2141
+#: ../src/balsa-index.c:2130
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Nach »%s« verschoben."
 
-#: ../src/balsa-index.c:2261
+#: ../src/balsa-index.c:2250
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Abgleichen von Postfach %s fehlgeschlagen."
 
-#: ../src/balsa-index.c:2434
+#: ../src/balsa-index.c:2423
 msgid "Pipe message through a program"
 msgstr "Die Nachricht durch ein Programm leiten"
 
-#: ../src/balsa-index.c:2437
+#: ../src/balsa-index.c:2426
 msgid "_Run"
 msgstr "A_usführen"
 
-#: ../src/balsa-index.c:2445
+#: ../src/balsa-index.c:2435
 msgid "Specify the program to run:"
 msgstr "Auszuführendes Programm festlegen:"
 
@@ -2221,8 +2236,8 @@ msgstr "Teil %s: %s"
 msgid "encrypted: "
 msgstr "verschlüsselt: "
 
-#: ../src/balsa-message.c:1254 ../src/balsa-mime-widget-text.c:338
-#: ../src/balsa-mime-widget-text.c:643
+#: ../src/balsa-message.c:1254 ../src/balsa-mime-widget-text.c:344
+#: ../src/balsa-mime-widget-text.c:649
 msgid "Save..."
 msgstr "Speichern..."
 
@@ -2230,17 +2245,17 @@ msgstr "Speichern..."
 msgid "Select folder for saving selected parts"
 msgstr "Ordner zum Abspeichern der markierten Teile auswählen"
 
-#: ../src/balsa-message.c:1367
+#: ../src/balsa-message.c:1368
 #, c-format
 msgid "%s message part"
 msgstr "Nachrichtenteil %s"
 
-#: ../src/balsa-message.c:1393 ../src/balsa-mime-widget-callbacks.c:196
+#: ../src/balsa-message.c:1395 ../src/balsa-mime-widget-callbacks.c:201
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "%s konnte nicht gespeichert werden: %s"
 
-#: ../src/balsa-message.c:2094
+#: ../src/balsa-message.c:2099
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2251,11 +2266,11 @@ msgstr ""
 "Empfangsbestätigung angefordert, die an »%s« zurückgeschickt werden soll.\n"
 "Soll diese Bestätigung abgeschickt werden?"
 
-#: ../src/balsa-message.c:2101
+#: ../src/balsa-message.c:2106
 msgid "Reply to MDN?"
 msgstr "Auf Empfangsbestätigung antworten?"
 
-#: ../src/balsa-message.c:2296
+#: ../src/balsa-message.c:2301
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -2266,7 +2281,18 @@ msgstr ""
 "Bitte schließen Sie zunächst alle anderen Ansichten dieser Nachricht und "
 "versuchen Sie es dann erneut."
 
-#: ../src/balsa-message.c:2323
+#: ../src/balsa-message.c:2322 ../src/balsa-message.c:2404
+#: ../src/balsa-message.c:2519
+#, fuzzy, c-format
+msgid "Parsing a message part failed: %s"
+msgstr "Abspeichern der gesendeten Nachricht in %s ist fehlgeschlagen: %s"
+
+#: ../src/balsa-message.c:2323 ../src/balsa-message.c:2405
+#: ../src/balsa-message.c:2520
+msgid "Possible disk space problem."
+msgstr ""
+
+#: ../src/balsa-message.c:2335
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2275,7 +2301,7 @@ msgstr ""
 "Die von %s verschickte Nachricht mit Betreff »%s« enthält einen "
 "verschlüsselten Teil, dessen Struktur jedoch ungültig ist."
 
-#: ../src/balsa-message.c:2331
+#: ../src/balsa-message.c:2343
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2285,7 +2311,7 @@ msgstr ""
 "verschlüsselten Teil, jedoch ist dieses Verschlüsselungsprotokoll nicht "
 "verfügbar."
 
-#: ../src/balsa-message.c:2344
+#: ../src/balsa-message.c:2356
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2295,7 +2321,7 @@ msgstr ""
 "verschlüsselten Teil, jedoch ist dieses Verschlüsselungsprotokoll nicht "
 "verfügbar."
 
-#: ../src/balsa-message.c:2402
+#: ../src/balsa-message.c:2420
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
@@ -2305,7 +2331,7 @@ msgstr ""
 "verschlüsselten Teil, dessen Struktur jedoch ungültig ist. Falls eine "
 "Signatur existiert, kann diese nicht überprüft werden."
 
-#: ../src/balsa-message.c:2415
+#: ../src/balsa-message.c:2433
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2315,31 +2341,31 @@ msgstr ""
 "verschlüsselten Teil, jedoch ist das Verschlüsselungsprotokoll nicht "
 "verfügbar."
 
-#: ../src/balsa-message.c:2418
+#: ../src/balsa-message.c:2436
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2418 ../src/balsa-mime-widget-crypto.c:72
-#: ../src/print.c:1296
+#: ../src/balsa-message.c:2436 ../src/balsa-mime-widget-crypto.c:72
+#: ../src/print.c:1302
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: ../src/balsa-message.c:2437 ../src/balsa-message.c:2552
+#: ../src/balsa-message.c:2455 ../src/balsa-message.c:2577
 msgid "Detected a good signature"
 msgstr "Gültige Signatur erkannt"
 
-#: ../src/balsa-message.c:2443
+#: ../src/balsa-message.c:2461
 msgid "Detected a good signature with insufficient validity"
 msgstr ""
 "Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit erkannt"
 
-#: ../src/balsa-message.c:2448 ../src/balsa-message.c:2556
+#: ../src/balsa-message.c:2466 ../src/balsa-message.c:2581
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
 "Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit oder "
 "unzureichendem Vertrauen erkannt"
 
-#: ../src/balsa-message.c:2455 ../src/balsa-message.c:2562
+#: ../src/balsa-message.c:2473 ../src/balsa-message.c:2587
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2350,7 +2376,7 @@ msgstr ""
 "lieferte:\n"
 "%s"
 
-#: ../src/balsa-message.c:2467
+#: ../src/balsa-message.c:2485
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2359,7 +2385,7 @@ msgstr ""
 "Die Überprüfung der von %s mit dem Betreff »%s« verschickten Nachricht "
 "schlug fehl und lieferte einen Fehler!"
 
-#: ../src/balsa-message.c:2516
+#: ../src/balsa-message.c:2541
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
@@ -2367,7 +2393,7 @@ msgstr ""
 "Die Entschlüsselung konnte nicht ausgeführt werden, das diese Nachricht mehr "
 "als einmal angezeigt wird."
 
-#: ../src/balsa-message.c:2518
+#: ../src/balsa-message.c:2543
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -2375,7 +2401,7 @@ msgstr ""
 "Die Signaturüberprüfung und das Entfernen des OpenPGP-Schutzes konnte nicht "
 "nicht durchgeführt werden, da diese Nachricht mehr als einmal angezeigt wird."
 
-#: ../src/balsa-message.c:2521
+#: ../src/balsa-message.c:2546
 msgid "Please close the other instances of this message and try again."
 msgstr ""
 "Bitte schließen Sie alle anderen Ansichten dieser Nachricht und versuchen "
@@ -3075,8 +3101,8 @@ msgstr "Aus Liste _entfernen"
 msgid "Folder deletion failed. Reason: %s"
 msgstr "Löschen des Ordners war nicht möglich. Ursache: %s"
 
-#: ../src/mailbox-conf.c:526 ../src/pref-manager.c:1455
-#: ../src/pref-manager.c:1540 ../src/pref-manager.c:2587
+#: ../src/mailbox-conf.c:526 ../src/pref-manager.c:1497
+#: ../src/pref-manager.c:1582 ../src/pref-manager.c:2629
 msgid "_Add"
 msgstr "_Hinzufügen"
 
@@ -3162,7 +3188,7 @@ msgstr "_Von"
 msgid "_To"
 msgstr "_An"
 
-#: ../src/mailbox-conf.c:1362 ../src/pref-manager.c:3050
+#: ../src/mailbox-conf.c:1362 ../src/pref-manager.c:3092
 msgid "Always"
 msgstr "Immer"
 
@@ -3388,7 +3414,7 @@ msgid "Add a new MH style mailbox"
 msgstr "Ein neues Postfach im MH-Stil anlegen"
 
 #: ../src/main-window.c:411 ../src/main-window.c:825
-#: ../src/pref-manager.c:2912
+#: ../src/pref-manager.c:2954
 msgid "Remote IMAP mailbox..."
 msgstr "IMAP-Postfach im Netz..."
 
@@ -3397,7 +3423,7 @@ msgid "Add a new IMAP mailbox"
 msgstr "Ein neues IMAP-Postfach anlegen"
 
 #: ../src/main-window.c:416 ../src/main-window.c:830
-#: ../src/pref-manager.c:2917
+#: ../src/pref-manager.c:2959
 msgid "Remote IMAP folder..."
 msgstr "IMAP-Ordner im Netz..."
 
@@ -4211,21 +4237,21 @@ msgid "Message from %s: %s"
 msgstr "Nachricht von %s: %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:50
-#, c-format
-msgid "Could not create temporary file %s"
+#, fuzzy, c-format
+msgid "Could not create temporary file %s: "
 msgstr "Die temporäre Datei %s konnte nicht erstellt werden"
 
-#: ../src/balsa-mime-widget-callbacks.c:111
-#, c-format
-msgid "could not create temporary file %s"
+#: ../src/balsa-mime-widget-callbacks.c:114
+#, fuzzy, c-format
+msgid "could not create temporary file %s: %s"
 msgstr "die temporäre Datei %s konnte nicht erstellt werden"
 
-#: ../src/balsa-mime-widget-callbacks.c:135
+#: ../src/balsa-mime-widget-callbacks.c:140
 #, c-format
 msgid "Save %s MIME Part"
 msgstr "MIME-Teil von %s speichern"
 
-#: ../src/balsa-mime-widget-callbacks.c:182
+#: ../src/balsa-mime-widget-callbacks.c:187
 msgid "File already exists. Overwrite?"
 msgstr "Die Datei existiert bereits. Möchten Sie diese überschreiben?"
 
@@ -4238,7 +4264,7 @@ msgstr ""
 "Dies ist ein integrierter %s signierter %s Nachrichtenteil:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:72 ../src/print.c:1296
+#: ../src/balsa-mime-widget-crypto.c:72 ../src/print.c:1302
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
@@ -4310,51 +4336,61 @@ msgstr "Betreff: %s\n"
 msgid "Se_nd message to obtain this part"
 msgstr "_Nachrichten verschicken, um diesen Teil zu erhalten"
 
-#: ../src/balsa-mime-widget-message.c:300 ../src/balsa-mime-widget-text.c:562
-#: ../src/balsa-mime-widget-text.c:687 ../src/sendmsg-window.c:1653
+#: ../src/balsa-mime-widget-message.c:300 ../src/balsa-mime-widget-text.c:568
+#: ../src/balsa-mime-widget-text.c:693 ../src/sendmsg-window.c:1653
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Fehler beim Anzeigen %s: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:594 ../src/print.c:350
-#: ../src/sendmsg-window.c:1003 ../src/sendmsg-window.c:3157
+#: ../src/balsa-mime-widget-message.c:332
+#, fuzzy, c-format
+msgid "Could not get a part: %s"
+msgstr "%s konnte nicht gespeichert werden: %s"
+
+#: ../src/balsa-mime-widget-message.c:601 ../src/print.c:350
+#: ../src/sendmsg-window.c:1003 ../src/sendmsg-window.c:3165
 msgid "Subject:"
 msgstr "Betreff:"
 
-#: ../src/balsa-mime-widget-message.c:598 ../src/print.c:356
-#: ../src/sendmsg-window.c:3151
+#: ../src/balsa-mime-widget-message.c:605 ../src/print.c:356
+#: ../src/sendmsg-window.c:3159
 msgid "Date:"
 msgstr "Datum:"
 
 #. Cannot edit the new "From:" header.
 #. { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
-#: ../src/balsa-mime-widget-message.c:611 ../src/sendmsg-window.c:1000
+#: ../src/balsa-mime-widget-message.c:618 ../src/sendmsg-window.c:1000
 msgid "Reply-To:"
 msgstr "Antwort an:"
 
 #. cc:
-#: ../src/balsa-mime-widget-message.c:615 ../src/print.c:366
+#: ../src/balsa-mime-widget-message.c:622 ../src/print.c:366
 #: ../src/sendmsg-window.c:1002 ../src/sendmsg-window.c:2721
-#: ../src/sendmsg-window.c:3180 ../src/store-address.c:307
+#: ../src/sendmsg-window.c:3188 ../src/store-address.c:307
 msgid "Cc:"
 msgstr "Kopie an:"
 
 #. bcc:
-#: ../src/balsa-mime-widget-message.c:616 ../src/print.c:367
+#: ../src/balsa-mime-widget-message.c:623 ../src/print.c:367
 #: ../src/sendmsg-window.c:1001 ../src/sendmsg-window.c:2726
 #: ../src/store-address.c:308
 msgid "Bcc:"
 msgstr "Blindkopie an:"
 
-#: ../src/balsa-mime-widget-message.c:620 ../src/print.c:368
+#: ../src/balsa-mime-widget-message.c:627 ../src/print.c:368
 msgid "Fcc:"
 msgstr "Durchschlag in:"
 
-#: ../src/balsa-mime-widget-message.c:627 ../src/print.c:374
+#: ../src/balsa-mime-widget-message.c:634 ../src/print.c:374
 msgid "Disposition-Notification-To:"
 msgstr "Empfangsbestätigung an:"
 
-#: ../src/balsa-mime-widget-text.c:129
+#: ../src/balsa-mime-widget-text.c:100
+#, fuzzy, c-format
+msgid "Could not save a text part: %s"
+msgstr "%s konnte nicht gespeichert werden: %s"
+
+#: ../src/balsa-mime-widget-text.c:135
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -4364,32 +4400,37 @@ msgstr ""
 "der Kopfzeile wurde jedoch nicht angegeben, welcher Zeichensatz verwendet "
 "wurde (umgewandelt zu %s)"
 
-#: ../src/balsa-mime-widget-text.c:552
+#: ../src/balsa-mime-widget-text.c:558
 #, c-format
 msgid "Calling URL %s..."
 msgstr "URL %s wird angefordert..."
 
-#: ../src/balsa-mime-widget.c:265
+#: ../src/balsa-mime-widget.c:254
+#, fuzzy, c-format
+msgid "Error reading message part: %s"
+msgstr "Fehler beim Löschen von Nachrichten: %s"
+
+#: ../src/balsa-mime-widget.c:276
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:268
+#: ../src/balsa-mime-widget.c:279
 #, c-format
 msgid "Content Type: %s"
 msgstr "Inhaltstyp: %s"
 
-#: ../src/balsa-mime-widget.c:282
+#: ../src/balsa-mime-widget.c:293
 msgid "No open or view action defined in GNOME MIME for this content type"
 msgstr ""
 "Mit diesem Inhaltstyp ist in der MIME-Verwaltung von GNOME keine Aktion "
 "verknüpft"
 
-#: ../src/balsa-mime-widget.c:288
+#: ../src/balsa-mime-widget.c:299
 msgid "S_ave part"
 msgstr "Teil s_peichern"
 
-#: ../src/balsa-mime-widget.c:310 ../src/balsa-mime-widget.c:334
+#: ../src/balsa-mime-widget.c:321 ../src/balsa-mime-widget.c:345
 #, c-format
 msgid "View _part with %s"
 msgstr "_Teil mit %s ansehen"
@@ -4431,173 +4472,173 @@ msgid "JWZ"
 msgstr "JWZ"
 
 #. must NOT be modal
-#: ../src/pref-manager.c:397
+#: ../src/pref-manager.c:428
 msgid "Balsa Preferences"
 msgstr "Balsa Einstellungen"
 
-#: ../src/pref-manager.c:420
+#: ../src/pref-manager.c:451
 msgid "Mail Servers"
 msgstr "Mail-Server"
 
-#: ../src/pref-manager.c:424 ../src/pref-manager.c:2537
+#: ../src/pref-manager.c:455 ../src/pref-manager.c:2579
 msgid "Address Books"
 msgstr "Adressbücher"
 
-#: ../src/pref-manager.c:428
+#: ../src/pref-manager.c:459
 msgid "Mail Options"
 msgstr "E-Mail-Einstellungen"
 
-#: ../src/pref-manager.c:432 ../src/pref-manager.c:1899
+#: ../src/pref-manager.c:463 ../src/pref-manager.c:1941
 msgid "Display"
 msgstr "Ansicht"
 
-#: ../src/pref-manager.c:436 ../src/toolbar-factory.c:120
+#: ../src/pref-manager.c:467 ../src/toolbar-factory.c:120
 msgid "Spelling"
 msgstr "Rechtschreibung"
 
-#: ../src/pref-manager.c:440
+#: ../src/pref-manager.c:471
 msgid "Misc"
 msgstr "Diverses"
 
-#: ../src/pref-manager.c:444
+#: ../src/pref-manager.c:475
 msgid "Startup"
 msgstr "Start"
 
-#: ../src/pref-manager.c:1167
+#: ../src/pref-manager.c:1209
 #, c-format
 msgid "%s (default)"
 msgstr "%s (Vorgabe)"
 
-#: ../src/pref-manager.c:1414
+#: ../src/pref-manager.c:1456
 msgid "Remote Mailbox Servers"
 msgstr "Postfachserver im Netz"
 
-#: ../src/pref-manager.c:1435 ../src/pref-manager.c:2558
+#: ../src/pref-manager.c:1477 ../src/pref-manager.c:2600
 #: ../src/sendmsg-window.c:2805
 msgid "Type"
 msgstr "Typ"
 
-#: ../src/pref-manager.c:1443
+#: ../src/pref-manager.c:1485
 msgid "Mailbox Name"
 msgstr "Postfachname"
 
-#: ../src/pref-manager.c:1456 ../src/pref-manager.c:1542
-#: ../src/pref-manager.c:2589
+#: ../src/pref-manager.c:1498 ../src/pref-manager.c:1584
+#: ../src/pref-manager.c:2631
 msgid "_Modify"
 msgstr "_Bearbeiten"
 
-#: ../src/pref-manager.c:1468
+#: ../src/pref-manager.c:1510
 msgid "Local Mail"
 msgstr "Lokale E-Mails"
 
-#: ../src/pref-manager.c:1471 ../src/pref-manager.c:1479
+#: ../src/pref-manager.c:1513 ../src/pref-manager.c:1521
 msgid "Select your local mail directory"
 msgstr "Wählen Sie Ihren lokalen Mail-Ordner"
 
-#: ../src/pref-manager.c:1507
+#: ../src/pref-manager.c:1549
 msgid "Outgoing Mail Servers"
 msgstr "Server für ausgehende E-Mails"
 
-#: ../src/pref-manager.c:1529
+#: ../src/pref-manager.c:1571
 msgid "Server Name"
 msgstr "Server-Name"
 
-#: ../src/pref-manager.c:1566
+#: ../src/pref-manager.c:1608
 msgid "Incoming"
 msgstr "Eingehend"
 
-#: ../src/pref-manager.c:1568
+#: ../src/pref-manager.c:1610
 msgid "Outgoing"
 msgstr "Ausgehend"
 
-#: ../src/pref-manager.c:1592
+#: ../src/pref-manager.c:1634
 msgid "Checking"
 msgstr "Prüfen"
 
-#: ../src/pref-manager.c:1597
+#: ../src/pref-manager.c:1639
 msgid "_Check mail automatically every:"
 msgstr "Automatisch auf neue E-Mails _prüfen alle:"
 
-#: ../src/pref-manager.c:1608 ../src/pref-manager.c:2354
-#: ../src/pref-manager.c:2405
+#: ../src/pref-manager.c:1650 ../src/pref-manager.c:2396
+#: ../src/pref-manager.c:2447
 msgid "minutes"
 msgstr "Minuten"
 
-#: ../src/pref-manager.c:1614
+#: ../src/pref-manager.c:1656
 msgid "Check _IMAP mailboxes"
 msgstr "_IMAP-Postfächer überprüfen"
 
-#: ../src/pref-manager.c:1620
+#: ../src/pref-manager.c:1662
 msgid "Check INBOX _only"
 msgstr "_Nur Eingang überprüfen"
 
-#: ../src/pref-manager.c:1625
+#: ../src/pref-manager.c:1667
 msgid "Display message if new mail has arrived in an open mailbox"
 msgstr ""
 "Nachricht anzeigen, wenn neue E-Mail in einem geöffneten Postfach "
 "eingetroffen ist"
 
-#: ../src/pref-manager.c:1630
+#: ../src/pref-manager.c:1672
 msgid "Do background check quietly (no messages in status bar)"
 msgstr ""
 "Überprüfung im Hintergrund leise ausführen (keine Meldungen in der "
 "Statusanzeige)"
 
-#: ../src/pref-manager.c:1634
+#: ../src/pref-manager.c:1676
 msgid "_POP message size limit:"
 msgstr "Größenbeschränkung bei _POP-Nachrichten:"
 
-#: ../src/pref-manager.c:1641
+#: ../src/pref-manager.c:1683
 msgid "MB"
 msgstr "MB"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: ../src/pref-manager.c:1660
+#: ../src/pref-manager.c:1702
 msgid "Quoted and Flowed Text"
 msgstr "Zitierter und geflossener Text"
 
-#: ../src/pref-manager.c:1664 ../src/sendmsg-window.c:4991
+#: ../src/pref-manager.c:1706 ../src/sendmsg-window.c:4999
 msgid "Quoted Text Regular Expression"
 msgstr "Regulärer Ausdruck, auf den zitierter Text passt"
 
-#: ../src/pref-manager.c:1675
+#: ../src/pref-manager.c:1717
 msgid "Wrap Incoming Text at:"
 msgstr "Eingehenden Text umbrechen bei:"
 
-#: ../src/pref-manager.c:1686 ../src/pref-manager.c:1849
+#: ../src/pref-manager.c:1728 ../src/pref-manager.c:1891
 msgid "characters"
 msgstr "Zeichen"
 
 #. handling of multipart/alternative
-#: ../src/pref-manager.c:1701
+#: ../src/pref-manager.c:1743
 msgid "Display of Multipart/Alternative Parts"
 msgstr "Anzeige von Nachrichten mit mehreren Teilen (Multipart)"
 
-#: ../src/pref-manager.c:1704
+#: ../src/pref-manager.c:1746
 msgid "prefer text/plain over html"
 msgstr "Klartext (text/plain) gegenüber HTML bevorzugen"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: ../src/pref-manager.c:1720
+#: ../src/pref-manager.c:1762
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 "Nationale (8-Bit-)Zeichen in defekten Nachrichten ohne Zeichensatz-Kopfzeilen"
 
-#: ../src/pref-manager.c:1726
+#: ../src/pref-manager.c:1768
 msgid "display as \"?\""
 msgstr "als »?« anzeigen"
 
-#: ../src/pref-manager.c:1735
+#: ../src/pref-manager.c:1777
 msgid "display using codeset"
 msgstr "Unter Verwendung des Zeichensatzes anzeigen"
 
 #. How to handle received MDN requests
-#: ../src/pref-manager.c:1767
+#: ../src/pref-manager.c:1809
 msgid "Message Disposition Notification Requests"
 msgstr "Bitte um Empfangsbestätigung"
 
-#: ../src/pref-manager.c:1769
+#: ../src/pref-manager.c:1811
 msgid ""
 "When I receive a message and its sender requested to return a\n"
 "Message Disposition Notification (MDN), send it in the following cases:"
@@ -4606,7 +4647,7 @@ msgstr ""
 "Empfangsbestätigung\n"
 "gebeten hat, diese in folgenden Fällen verschicken:"
 
-#: ../src/pref-manager.c:1780
+#: ../src/pref-manager.c:1822
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is equal to the return path,\n"
@@ -4616,233 +4657,233 @@ msgstr ""
 "(die Bestätigungsadresse ist gleich dem Antwortpfad,\n"
 "Sie sind in der »An:«- oder »Kopie«-Liste)"
 
-#: ../src/pref-manager.c:1795
+#: ../src/pref-manager.c:1837
 msgid "The message header looks suspicious."
 msgstr "Wenn der Nachrichtenkopf verdächtig aussieht:"
 
-#: ../src/pref-manager.c:1830
+#: ../src/pref-manager.c:1872
 msgid "Word Wrap"
 msgstr "Zeilenumbruch"
 
-#: ../src/pref-manager.c:1835
+#: ../src/pref-manager.c:1877
 msgid "Wrap Outgoing Text at:"
 msgstr "Ausgehenden Text umbrechen bei:"
 
-#: ../src/pref-manager.c:1863
+#: ../src/pref-manager.c:1905
 msgid "Other Options"
 msgstr "Weitere Einstellungen"
 
-#: ../src/pref-manager.c:1868
+#: ../src/pref-manager.c:1910
 msgid "Reply Prefix:"
 msgstr "Antwortpräfix:"
 
-#: ../src/pref-manager.c:1871
+#: ../src/pref-manager.c:1913
 msgid "Edit headers in external editor"
 msgstr "Kopfzeilen im externen Editor bearbeiten"
 
-#: ../src/pref-manager.c:1873
+#: ../src/pref-manager.c:1915
 msgid "Automatically quote original when replying"
 msgstr "Automatisch beim Antworten das Original zitieren"
 
-#: ../src/pref-manager.c:1876
+#: ../src/pref-manager.c:1918
 msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgstr "Beim Antworten oder Weiterleiten keine HTML-Teile als Text einfügen"
 
-#: ../src/pref-manager.c:1879
+#: ../src/pref-manager.c:1921
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Mail als Anlage weiterleiten anstatt sie zu zitieren"
 
-#: ../src/pref-manager.c:1882
+#: ../src/pref-manager.c:1924
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "Verschicken-Knopf stellt Mails immer in die Warteschlange"
 
-#: ../src/pref-manager.c:1885
+#: ../src/pref-manager.c:1927
 msgid "Copy outgoing messages to sentbox"
 msgstr "Ausgehende Nachrichten in den Verschickt-Ordner kopieren"
 
-#: ../src/pref-manager.c:1902
+#: ../src/pref-manager.c:1944
 msgid "Status Messages"
 msgstr "Statusmeldungen"
 
-#: ../src/pref-manager.c:1904
+#: ../src/pref-manager.c:1946
 msgid "Colors"
 msgstr "Farben"
 
-#: ../src/pref-manager.c:1906
+#: ../src/pref-manager.c:1948
 msgid "Message"
 msgstr "Nachricht"
 
-#: ../src/pref-manager.c:1908
+#: ../src/pref-manager.c:1950
 msgid "Sort and Thread"
 msgstr "Sortierung und Themen"
 
-#: ../src/pref-manager.c:1933
+#: ../src/pref-manager.c:1975
 msgid "Main Window"
 msgstr "Hauptfenster"
 
-#: ../src/pref-manager.c:1936
+#: ../src/pref-manager.c:1978
 msgid "Use preview pane"
 msgstr "Vorschaufläche verwenden"
 
-#: ../src/pref-manager.c:1938
+#: ../src/pref-manager.c:1980
 msgid "Show mailbox statistics in left pane"
 msgstr "Postfach-Statistiken im linken Feld anzeigen"
 
-#: ../src/pref-manager.c:1940
+#: ../src/pref-manager.c:1982
 msgid "Use alternative main window layout"
 msgstr "Alternatives Layout für Hauptfenster verwenden"
 
-#: ../src/pref-manager.c:1942
+#: ../src/pref-manager.c:1984
 msgid "Automatically view message when mailbox opened"
 msgstr "Nachricht automatisch anzeigen, wenn Postfach geöffnet wird"
 
-#: ../src/pref-manager.c:1948
+#: ../src/pref-manager.c:1990
 msgid "PageUp/PageDown keys scroll message by:"
 msgstr "BildAuf/BildAb-Tasten rollen Nachrichten um:"
 
-#: ../src/pref-manager.c:1959
+#: ../src/pref-manager.c:2001
 msgid "percent"
 msgstr "Prozent"
 
-#: ../src/pref-manager.c:1974
+#: ../src/pref-manager.c:2016
 msgid "Display Progress Dialog"
 msgstr "Fortschrittsdialog anzeigen"
 
-#: ../src/pref-manager.c:1994
+#: ../src/pref-manager.c:2036
 msgid "Encoding"
 msgstr "Kodierung"
 
-#: ../src/pref-manager.c:1999
+#: ../src/pref-manager.c:2041
 msgid "Date encoding (for strftime):"
 msgstr "Datumsformat (für strftime):"
 
-#: ../src/pref-manager.c:2001
+#: ../src/pref-manager.c:2043
 msgid "Selected headers:"
 msgstr "Ausgewählte Kopfzeilen:"
 
-#: ../src/pref-manager.c:2022 ../src/pref-manager.c:2027
+#: ../src/pref-manager.c:2064 ../src/pref-manager.c:2069
 msgid "Information Messages"
 msgstr "Informationsmeldungen"
 
-#: ../src/pref-manager.c:2031
+#: ../src/pref-manager.c:2073
 msgid "Warning Messages"
 msgstr "Warnmeldungen"
 
-#: ../src/pref-manager.c:2035
+#: ../src/pref-manager.c:2077
 msgid "Error Messages"
 msgstr "Fehlermeldungen"
 
-#: ../src/pref-manager.c:2039
+#: ../src/pref-manager.c:2081
 msgid "Fatal Error Messages"
 msgstr "Schwerwiegende Fehlermeldungen"
 
-#: ../src/pref-manager.c:2043
+#: ../src/pref-manager.c:2085
 msgid "Debug Messages"
 msgstr "Diagnosemeldungen"
 
-#: ../src/pref-manager.c:2069
+#: ../src/pref-manager.c:2111
 msgid "Message Colors"
 msgstr "Nachrichtenfarben"
 
-#: ../src/pref-manager.c:2074
+#: ../src/pref-manager.c:2116
 #, c-format
 msgid "Quote level %d color"
 msgstr "Farbe für Zitatebene %d"
 
-#: ../src/pref-manager.c:2087
+#: ../src/pref-manager.c:2129
 msgid "Link Color"
 msgstr "Link-Farbe"
 
-#: ../src/pref-manager.c:2089
+#: ../src/pref-manager.c:2131
 msgid "Hyperlink color"
 msgstr "Hyperlink-Farbe"
 
-#: ../src/pref-manager.c:2100
+#: ../src/pref-manager.c:2142
 msgid "Composition Window"
 msgstr "Editor-Fenster"
 
-#: ../src/pref-manager.c:2104
+#: ../src/pref-manager.c:2146
 msgid "Invalid or incomplete address label color"
 msgstr "Ungültige oder unvollständige Farbe für Adress-Etikett"
 
-#: ../src/pref-manager.c:2129
+#: ../src/pref-manager.c:2171
 msgid "Fonts"
 msgstr "Schriften"
 
-#: ../src/pref-manager.c:2133
+#: ../src/pref-manager.c:2175
 msgid "Message Font"
 msgstr "Nachrichtenschrift"
 
-#: ../src/pref-manager.c:2145
+#: ../src/pref-manager.c:2187
 msgid "Message Subject Font"
 msgstr "Schrift für Nachrichtenbetreff"
 
-#: ../src/pref-manager.c:2176
+#: ../src/pref-manager.c:2218
 msgid "Sorting and Threading"
 msgstr "Sortierung und Themen"
 
-#: ../src/pref-manager.c:2180
+#: ../src/pref-manager.c:2222
 msgid "Default sort column"
 msgstr "Standardsortierspalte"
 
-#: ../src/pref-manager.c:2184
+#: ../src/pref-manager.c:2226
 msgid "Default threading style"
 msgstr "Voreingestellte Themendarstellung"
 
-#: ../src/pref-manager.c:2189
+#: ../src/pref-manager.c:2231
 msgid "Expand threads on open"
 msgstr "Nachrichtenthemen beim Öffnen ausklappen"
 
-#: ../src/pref-manager.c:2265
+#: ../src/pref-manager.c:2307
 msgid "Pspell Settings"
 msgstr "Pspell-Einstellungen"
 
-#: ../src/pref-manager.c:2271
+#: ../src/pref-manager.c:2313
 msgid "Spell Check Module"
 msgstr "Rechtschreibmodul"
 
-#: ../src/pref-manager.c:2277
+#: ../src/pref-manager.c:2319
 msgid "Suggestion Level"
 msgstr "Empfehlungsstufe"
 
 #. do the ignore length
-#: ../src/pref-manager.c:2282
+#: ../src/pref-manager.c:2324
 msgid "Ignore words shorter than"
 msgstr "Wörter ignorieren, die kürzer sind als"
 
-#: ../src/pref-manager.c:2303
+#: ../src/pref-manager.c:2345
 msgid "Miscellaneous Spelling Settings"
 msgstr "Verschiedene Einstellungen der Rechtschreibprüfung"
 
-#: ../src/pref-manager.c:2305
+#: ../src/pref-manager.c:2347
 msgid "Check signature"
 msgstr "Signatur überprüfen"
 
-#: ../src/pref-manager.c:2306
+#: ../src/pref-manager.c:2348
 msgid "Check quoted"
 msgstr "Zitate überprüfen"
 
-#: ../src/pref-manager.c:2331
+#: ../src/pref-manager.c:2373
 msgid "Miscellaneous"
 msgstr "Weitere Einstellungen"
 
-#: ../src/pref-manager.c:2333
+#: ../src/pref-manager.c:2375
 msgid "Debug"
 msgstr "Fehlerdiagnose"
 
-#: ../src/pref-manager.c:2334
+#: ../src/pref-manager.c:2376
 msgid "Empty Trash on exit"
 msgstr "Müll beim Beenden leeren"
 
-#: ../src/pref-manager.c:2340
+#: ../src/pref-manager.c:2382
 msgid "Automatically close mailbox if unused more than"
 msgstr "Postfach automatisch schließen, wenn länger ungenutzt als"
 
-#: ../src/pref-manager.c:2368
+#: ../src/pref-manager.c:2410
 msgid "Deleting Messages"
 msgstr "Nachrichten löschen"
 
-#: ../src/pref-manager.c:2370
+#: ../src/pref-manager.c:2412
 msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
@@ -4850,53 +4891,53 @@ msgstr ""
 "Die folgende Einstellung ist global, kann jedoch für ein ausgewähltes "
 "Postfach durch »Postfach -> Verstecken« überschrieben werden:"
 
-#: ../src/pref-manager.c:2378
+#: ../src/pref-manager.c:2420
 msgid "Hide messages marked as deleted"
 msgstr "Als gelöscht markierte Nachrichten verbergen"
 
-#: ../src/pref-manager.c:2380
+#: ../src/pref-manager.c:2422
 msgid "The following settings are global."
 msgstr "Die folgenden Einstellungen sind global."
 
-#: ../src/pref-manager.c:2385
+#: ../src/pref-manager.c:2427
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr ""
 "Als gelöscht markierte Nachrichten endgültig entfernen, wenn Postfach "
 "geschlossen wird"
 
-#: ../src/pref-manager.c:2392
+#: ../src/pref-manager.c:2434
 msgid " ...and if mailbox is unused more than"
 msgstr " ... und falls das Postfach länger ungenutzt war als"
 
-#: ../src/pref-manager.c:2418
+#: ../src/pref-manager.c:2460
 msgid "Message Window"
 msgstr "Nachrichtenfenster"
 
-#: ../src/pref-manager.c:2420
+#: ../src/pref-manager.c:2462
 msgid "Action after moving/trashing a message"
 msgstr "Aktion nachdem eine Nachricht verschoben oder gelöscht wurde"
 
-#: ../src/pref-manager.c:2455
+#: ../src/pref-manager.c:2497
 msgid "Options"
 msgstr "Einstellungen"
 
-#: ../src/pref-manager.c:2458
+#: ../src/pref-manager.c:2500
 msgid "Open Inbox upon startup"
 msgstr "Beim Start Eingang öffnen"
 
-#: ../src/pref-manager.c:2460
+#: ../src/pref-manager.c:2502
 msgid "Check mail upon startup"
 msgstr "Beim Start auf neue Mail prüfen"
 
-#: ../src/pref-manager.c:2462
+#: ../src/pref-manager.c:2504
 msgid "Remember open mailboxes between sessions"
 msgstr "Geöffnete Postfächer während den Sitzungen merken"
 
-#: ../src/pref-manager.c:2476
+#: ../src/pref-manager.c:2518
 msgid "Folder Scanning"
 msgstr "Abtasten der Ordner"
 
-#: ../src/pref-manager.c:2478
+#: ../src/pref-manager.c:2520
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.\n"
 "To see more of the tree at startup, choose a greater depth."
@@ -4905,77 +4946,77 @@ msgstr ""
 "einiger Ordner. Um mehr Ordnerbäume beim Start zu sehen, wählen\n"
 "Sie eine höhere Tiefe."
 
-#: ../src/pref-manager.c:2488
+#: ../src/pref-manager.c:2530
 msgid "Scan local folders to depth"
 msgstr "Lokale Ordner tief abtasten"
 
-#: ../src/pref-manager.c:2501
+#: ../src/pref-manager.c:2543
 msgid "Scan IMAP folders to depth"
 msgstr "IMAP-Ordner tief abtasten"
 
-#: ../src/pref-manager.c:2566
+#: ../src/pref-manager.c:2608
 msgid "Address Book Name"
 msgstr "Adressbuchname"
 
-#: ../src/pref-manager.c:2574
+#: ../src/pref-manager.c:2616
 msgid "Expand aliases"
 msgstr "Kürzel vervollständigen"
 
-#: ../src/pref-manager.c:2593
+#: ../src/pref-manager.c:2635
 msgid "_Set as default"
 msgstr "Zur _Vorgabe machen"
 
-#: ../src/pref-manager.c:2907
+#: ../src/pref-manager.c:2949
 msgid "Remote POP3 mailbox..."
 msgstr "POP3-Postfach im Netz..."
 
-#: ../src/pref-manager.c:3030
+#: ../src/pref-manager.c:3072
 msgid "Show nothing"
 msgstr "Nichts anzeigen"
 
-#: ../src/pref-manager.c:3032
+#: ../src/pref-manager.c:3074
 msgid "Show dialog"
 msgstr "Dialog anzeigen"
 
-#: ../src/pref-manager.c:3034
+#: ../src/pref-manager.c:3076
 msgid "Show in list"
 msgstr "In Liste anzeigen"
 
-#: ../src/pref-manager.c:3036
+#: ../src/pref-manager.c:3078
 msgid "Show in status bar"
 msgstr "In der Statusleiste anzeigen"
 
-#: ../src/pref-manager.c:3038
+#: ../src/pref-manager.c:3080
 msgid "Print to console"
 msgstr "Im Terminal ausgeben"
 
-#: ../src/pref-manager.c:3049
+#: ../src/pref-manager.c:3091
 msgid "Ask me"
 msgstr "Nachfragen"
 
-#: ../src/pref-manager.c:3126
+#: ../src/pref-manager.c:3168
 msgid "Show next unread message"
 msgstr "Nächste ungelesene Nachricht anzeigen"
 
-#: ../src/pref-manager.c:3127
+#: ../src/pref-manager.c:3169
 msgid "Show next message"
 msgstr "Nächste Nachricht anzeigen"
 
-#: ../src/pref-manager.c:3128
+#: ../src/pref-manager.c:3170
 msgid "Close message window"
 msgstr "Nachrichtenfenster schließen"
 
-#: ../src/pref-manager.c:3152
+#: ../src/pref-manager.c:3194
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Fehler beim Anzeigen der Link-Kennung %s: %s\n"
 
-#: ../src/print.c:246 ../src/print.c:721
+#: ../src/print.c:246 ../src/print.c:727
 #, c-format
 msgid "Page: %i/%i"
 msgstr "Seite: %i/%i"
 
-#: ../src/print.c:661
+#: ../src/print.c:662
 msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
@@ -4983,69 +5024,74 @@ msgstr ""
 "Es wird ein HTML-Teil aufbereitet, welcher auf einer neuen Seite startet.\n"
 "Soll die aktuelle Seite jetzt gedruckt werden?"
 
+#: ../src/print.c:675
+#, fuzzy, c-format
+msgid "Could not get part: %s"
+msgstr "%s konnte nicht gespeichert werden: %s"
+
 #. gather some info about this part
 #. four fields, one terminator
-#: ../src/print.c:975
+#: ../src/print.c:981
 msgid "Type:"
 msgstr "Typ:"
 
-#: ../src/print.c:978
+#: ../src/print.c:984
 msgid "File name:"
 msgstr "Dateiname:"
 
-#: ../src/print.c:1294
+#: ../src/print.c:1300
 #, c-format
 msgid "This is an inline %s signed %s message part:"
 msgstr "Dies ist ein integrierter %s signierter %s Nachrichtenteil:"
 
-#: ../src/print.c:1541
+#: ../src/print.c:1547
 msgid "Font available for printing"
 msgstr "Zum Drucken verfügbare Schriften"
 
-#: ../src/print.c:1547
+#: ../src/print.c:1553
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
 msgstr "Die Schrift ist <b>nicht</b> zum Drucken verfügbar. Ähnlichste: %s"
 
-#: ../src/print.c:1560
+#: ../src/print.c:1566
 msgid "Select Font"
 msgstr "Wählen Sie eine Schrift"
 
-#: ../src/print.c:1593
+#: ../src/print.c:1599
 msgid "Change..."
 msgstr "Ändern..."
 
-#: ../src/print.c:1628
+#: ../src/print.c:1634
 msgid "Print message"
 msgstr "Nachricht drucken"
 
 #. create a 2nd notebook page for the fonts
-#: ../src/print.c:1639
+#: ../src/print.c:1645
 msgid "_Fonts"
 msgstr "_Schriften"
 
-#: ../src/print.c:1642
+#: ../src/print.c:1648
 msgid "Header font"
 msgstr "Schrift für Kopfzeilen"
 
-#: ../src/print.c:1644
+#: ../src/print.c:1650
 msgid "Body font"
 msgstr "Schrift für Rumpf"
 
-#: ../src/print.c:1646
+#: ../src/print.c:1652
 msgid "Footer font"
 msgstr "Schrift für Fußzeilen"
 
 #. highlight cited stuff
-#: ../src/print.c:1650
+#: ../src/print.c:1656
 msgid "Highlight cited text"
 msgstr "Zitate hervorheben"
 
-#: ../src/print.c:1654
+#: ../src/print.c:1660
 msgid "_Enable highlighting of cited text"
 msgstr "Zitate _hervorheben"
 
-#: ../src/print.c:1680
+#: ../src/print.c:1686
 #, c-format
 msgid ""
 "Balsa could not find font \"%s\".\n"
@@ -5055,7 +5101,7 @@ msgstr ""
 "Sie können sie im »Nachricht drucken«-Dialog unter dem Reiter »Schriften«  "
 "verändern."
 
-#: ../src/print.c:1781
+#: ../src/print.c:1787
 msgid "Balsa: message print preview"
 msgstr "Balsa: Druckvorschau für Meldung"
 
@@ -5543,7 +5589,7 @@ msgid "Attach file"
 msgstr "Datei beilegen"
 
 #: ../src/sendmsg-window.c:2253 ../src/sendmsg-window.c:2362
-#: ../src/sendmsg-window.c:4016
+#: ../src/sendmsg-window.c:4024
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5583,68 +5629,73 @@ msgstr "Modus"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: ../src/sendmsg-window.c:3136
+#: ../src/sendmsg-window.c:3108
+#, fuzzy, c-format
+msgid "Could not save attachment: %s"
+msgstr "%s konnte nicht gespeichert werden: %s"
+
+#: ../src/sendmsg-window.c:3144
 msgid "you"
 msgstr "Sie"
 
-#: ../src/sendmsg-window.c:3145
+#: ../src/sendmsg-window.c:3153
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------weitergeleitete Nachricht von %s------\n"
 
-#: ../src/sendmsg-window.c:3184
+#: ../src/sendmsg-window.c:3192
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Nachrichtenkennung: %s\n"
 
-#: ../src/sendmsg-window.c:3190
+#: ../src/sendmsg-window.c:3198
 msgid "References:"
 msgstr "Referenzen:"
 
-#: ../src/sendmsg-window.c:3201
+#: ../src/sendmsg-window.c:3209
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Am %s schrieb(en) %s:\n"
 
-#: ../src/sendmsg-window.c:3203
+#: ../src/sendmsg-window.c:3211
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s schrieb(en):\n"
 
-#: ../src/sendmsg-window.c:3301
+#: ../src/sendmsg-window.c:3309
 msgid "No signature found!"
 msgstr "Es wurde keine Signatur gefunden!"
 
-#: ../src/sendmsg-window.c:4134
+#: ../src/sendmsg-window.c:4142
 #, c-format
 msgid "Error executing signature generator %s"
 msgstr "Fehler beim Ausführen des Signaturgenerators %s"
 
-#: ../src/sendmsg-window.c:4146
+#: ../src/sendmsg-window.c:4154
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
 msgstr "Signaturdatei »%s« konnte nicht zum Lesen geöffnet werden"
 
-#: ../src/sendmsg-window.c:4156
+#: ../src/sendmsg-window.c:4164
 #, c-format
 msgid "Error reading signature from %s"
 msgstr "Fehler beim Lesen der Signatur von %s"
 
-#: ../src/sendmsg-window.c:4160
+#: ../src/sendmsg-window.c:4168
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "Die Signatur in %s ist kein UTF-8-Unicode-Text."
 
-#: ../src/sendmsg-window.c:4223
+#: ../src/sendmsg-window.c:4231
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Die Datei %s konnte nicht geöffnet werden.\n"
 
-#: ../src/sendmsg-window.c:4280
+#: ../src/sendmsg-window.c:4288
 msgid "Include file"
 msgstr "Datei einfügen"
 
-#: ../src/sendmsg-window.c:4632
+#: ../src/sendmsg-window.c:4640
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5655,70 +5706,70 @@ msgstr ""
 "werden. Sie sollten den MIME-Modus verwenden, falls die gesamte Nachricht "
 "geschützt werden soll. Wollen Sie wirklich fortfahren?"
 
-#: ../src/sendmsg-window.c:4648
+#: ../src/sendmsg-window.c:4656
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "Verschicken der Nachricht mit gpg-Modus %d"
 
-#: ../src/sendmsg-window.c:4694
+#: ../src/sendmsg-window.c:4702
 msgid "Message could not be created"
 msgstr "Nachricht konnte nicht erstellt werden"
 
-#: ../src/sendmsg-window.c:4696
+#: ../src/sendmsg-window.c:4704
 msgid "Message could not be queued in outbox"
 msgstr "Die Nachricht konnte nicht zum Verschicken vorgemerkt werden"
 
-#: ../src/sendmsg-window.c:4698
+#: ../src/sendmsg-window.c:4706
 msgid "Message could not be saved in sentbox"
 msgstr "Nachricht konnte nicht im Postausgang gespeichert werden"
 
-#: ../src/sendmsg-window.c:4700
+#: ../src/sendmsg-window.c:4708
 msgid "Message could not be sent"
 msgstr "Die Nachricht konnte nicht verschickt werden"
 
-#: ../src/sendmsg-window.c:4704
+#: ../src/sendmsg-window.c:4712
 #, c-format
 msgid "Send failed: %s"
 msgstr "Verschicken fehlgeschlagen: %s"
 
-#: ../src/sendmsg-window.c:4770
+#: ../src/sendmsg-window.c:4778
 msgid "Could not postpone message."
 msgstr "Nachricht konnte nicht aufgeschoben werden."
 
-#: ../src/sendmsg-window.c:4784
+#: ../src/sendmsg-window.c:4792
 msgid "Message postponed."
 msgstr "Nachricht aufgeschoben."
 
-#: ../src/sendmsg-window.c:4800
+#: ../src/sendmsg-window.c:4808
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Entwurfsordner konnte nicht geöffnet werden: %s"
 
-#: ../src/sendmsg-window.c:4822
+#: ../src/sendmsg-window.c:4830
 msgid "Message saved."
 msgstr "Nachricht gespeichert."
 
-#: ../src/sendmsg-window.c:4990
+#: ../src/sendmsg-window.c:4998
 #, c-format
 msgid "Could not compile %s"
 msgstr "%s konnte nicht übersetzt werden"
 
-#: ../src/sendmsg-window.c:5483
+#: ../src/sendmsg-window.c:5491
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Antwort an %s: %s"
 
-#: ../src/sendmsg-window.c:5488
+#: ../src/sendmsg-window.c:5496
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Nachricht an %s weiterleiten: %s"
 
-#: ../src/sendmsg-window.c:5492
+#: ../src/sendmsg-window.c:5500
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Nachricht an %s fortsetzen: %s"
 
-#: ../src/sendmsg-window.c:5496
+#: ../src/sendmsg-window.c:5504
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nachricht an %s verfassen: %s"
@@ -6065,6 +6116,16 @@ msgstr "Die letzte Änderung wiederholen"
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Unbekanntes Werkzeugleisten-Symbol »%s«"
+
+#: ../src/toolbar-factory.c:315
+#, fuzzy
+msgid "Queue"
+msgstr "_Ablegen"
+
+#: ../src/toolbar-factory.c:352
+#, fuzzy
+msgid "Queue this message for sending"
+msgstr "Diese Nachricht zum Verschicken in den Postausgang legen"
 
 #: ../src/toolbar-prefs.c:123
 msgid "Customize Toolbars"

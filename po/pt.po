@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-09-11 15:21+0100\n"
-"PO-Revision-Date: 2004-09-05 01:03+0100\n"
+"PO-Revision-Date: 2005-09-03 22:38+0100\n"
 "Last-Translator: Carlos Morgado <chbm@chbm.nu>\n"
 "Language-Team:\n"
 "MIME-Version: 1.0\n"
@@ -67,9 +67,8 @@ msgid "Cannot add duplicate entry"
 msgstr "Não consegui duplicar"
 
 #: ../libbalsa/address-book.c:309
-#, fuzzy
 msgid "Cannot find address in address book"
-msgstr "Não consigo procurar no livro de endereços"
+msgstr "Não consigo encontrar endereço no livro de endereços"
 
 #: ../libbalsa/address-book.c:310 ../src/main-window.c:2228
 #: ../src/main-window.c:4250 ../src/sendmsg-window.c:4809
@@ -146,24 +145,24 @@ msgid "Bad mailbox name for filter: %s"
 msgstr "Caixa de correio errada para o filtro: %s"
 
 #: ../libbalsa/filter.c:283
-#, fuzzy, c-format
+#, c-format
 msgid "Error when copying messages: %s"
-msgstr "Erro a copiar as mensagens"
+msgstr "Erro a copiar as mensagens: %s"
 
 #: ../libbalsa/filter.c:293
-#, fuzzy, c-format
+#, c-format
 msgid "Error when trashing messages: %s"
-msgstr "Erro a pôr as mensagens no lixo"
+msgstr "Erro a pôr as mensagens no lixo: %s"
 
 #: ../libbalsa/filter.c:306
-#, fuzzy, c-format
+#, c-format
 msgid "Error when moving messages: %s"
-msgstr "Erro a mover mensagens"
+msgstr "Erro a mover mensagens: %s"
 
 #: ../libbalsa/gmime-application-pkcs7.c:237
 #: ../libbalsa/gmime-application-pkcs7.c:380
 msgid "Failed to decrypt MIME part: parse error"
-msgstr ""
+msgstr "Falha a descifrar parte MIME: erro de interpretação"
 
 #: ../libbalsa/gmime-gpgme-context.c:279 ../libbalsa/rfc3156.c:1603
 #, c-format
@@ -265,7 +264,7 @@ msgstr "%s: chaves multiplas para %s"
 #: ../libbalsa/gmime-gpgme-context.c:953
 #, c-format
 msgid "%s: insufficient validity for uid %s"
-msgstr ""
+msgstr "%s: validade insuficiente para uid %s"
 
 #. should "re" be localized ?
 #: ../libbalsa/identity.c:101 ../libbalsa/mailbox_local.c:1284
@@ -293,9 +292,8 @@ msgstr "Por omissão"
 
 #. create the "General" tab
 #: ../libbalsa/identity.c:852
-#, fuzzy
 msgid "General"
-msgstr "Enviar"
+msgstr "Geral"
 
 #: ../libbalsa/identity.c:854
 msgid "_Identity Name:"
@@ -330,15 +328,13 @@ msgid "F_orward String:"
 msgstr "Assunto dos Reenvios:"
 
 #: ../libbalsa/identity.c:871
-#, fuzzy
 msgid "SMT_P Server"
-msgstr "Servidor _SMTP:"
+msgstr "Servidor SMT_P"
 
 #. create the "Signature" tab
 #: ../libbalsa/identity.c:876
-#, fuzzy
 msgid "Signature"
-msgstr "Ficheiro de Assinatura:"
+msgstr "Assinatura"
 
 #: ../libbalsa/identity.c:878
 msgid "Signature _Path:"
@@ -371,7 +367,7 @@ msgstr "Acrescentar Assinatura antes do texto"
 #. create the "Security" tab
 #: ../libbalsa/identity.c:901
 msgid "Security"
-msgstr ""
+msgstr "Segurança"
 
 #: ../libbalsa/identity.c:904
 msgid "sign messages by default"
@@ -382,13 +378,12 @@ msgid "encrypt messages by default"
 msgstr "cifrar as mensagens"
 
 #: ../libbalsa/identity.c:910
-#, fuzzy
 msgid "default protocol"
-msgstr "protocolo de cifragem por omissão"
+msgstr "protocolo por omissão"
 
 #: ../libbalsa/identity.c:913
 msgid "always trust GnuPG keys when encrypting"
-msgstr ""
+msgstr "confiar sempre nas chaves GnuPG quando se descifra"
 
 #: ../libbalsa/identity.c:1059
 msgid "Error: The identity does not have a name"
@@ -412,28 +407,25 @@ msgid "Manage Identities"
 msgstr "Gerir Identidades"
 
 #: ../libbalsa/identity.c:1639
-#, fuzzy
 msgid "GnuPG MIME mode"
-msgstr "GnuPG usa modo MIME"
+msgstr "GnuPG em modo MIME"
 
 #: ../libbalsa/identity.c:1641
-#, fuzzy
 msgid "GnuPG OpenPGP mode"
-msgstr "GnuPG usa o modo OpenPGP"
+msgstr "GnuPG em modo OpenPGP"
 
 #: ../libbalsa/identity.c:1644
-#, fuzzy
 msgid "GpgSM S/MIME mode"
-msgstr "mode S/MIME"
+msgstr "GpgSM em modo S/MIME"
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:256
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "IMAP server %s alert:\n"
 "%s"
 msgstr ""
-"Problema com o servidor IMAP %s: \n"
+"Problema com o servidor IMAP %s:\n"
 "%s"
 
 #. IMAP host name + message
@@ -454,9 +446,8 @@ msgid "Cannot connect to the server: %s"
 msgstr "Não consigo ligar ao servidor: %s"
 
 #: ../libbalsa/imap-server.c:511
-#, fuzzy
 msgid "Cannot connect to the server"
-msgstr "Não consigo ligar ao servidor: %s"
+msgstr "Não consigo ligar ao servidor"
 
 #: ../libbalsa/imap-server.c:659
 #, c-format
@@ -465,7 +456,7 @@ msgstr "Número de ligações por servidor excedido para %s"
 
 #: ../libbalsa/libbalsa-conf.c:204
 msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
-msgstr ""
+msgstr "A sua configuração do Balsa agora é guardada em \"~/.balsa/config\"."
 
 #: ../libbalsa/libbalsa.c:285
 #, c-format
@@ -473,9 +464,8 @@ msgid "LDAP Directory for %s"
 msgstr "Directório LDAP para %s"
 
 #: ../libbalsa/libbalsa.c:391
-#, fuzzy
 msgid "Invalid date"
-msgstr "[data inválida]"
+msgstr "data inválida"
 
 #: ../libbalsa/libbalsa.c:407 ../src/pref-manager.c:1206
 #: ../src/pref-manager.c:1301
@@ -515,9 +505,8 @@ msgstr ""
 "<b>Fingerprint:</b> %s"
 
 #: ../libbalsa/libbalsa.c:578
-#, fuzzy
 msgid "SSL/TLS certificate"
-msgstr "Certificado IMAP TLS"
+msgstr "Certificado SSL/TLS"
 
 #: ../libbalsa/libbalsa.c:580
 msgid "_Accept Once"
@@ -555,25 +544,24 @@ msgstr "Não consegui consegui criar uma caixa de correio do tipo %s"
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
 #: ../libbalsa/mailbox_imap.c:538
-#, fuzzy
 msgid "IMAP connection has been severed. Reconnecting..."
-msgstr "Uma das ligações IMAP foi fechada: %s"
+msgstr "Uma das ligações IMAP foi fechada. A ligar de novo..."
 
 #: ../libbalsa/mailbox_imap.c:541
-#, fuzzy, c-format
+#, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
-msgstr "Uma das ligações IMAP foi fechada: %s"
+msgstr "O servidor IMAP fechou uma das ligações: %s A ligar de novo..."
 
 #: ../libbalsa/mailbox_imap.c:1007 ../libbalsa/mailbox_maildir.c:493
 #: ../libbalsa/mailbox_mbox.c:516 ../libbalsa/mailbox_mh.c:518
-#, fuzzy, c-format
+#, c-format
 msgid "%s: Opening %s Refcount: %d\n"
-msgstr "LibBalsaMailboxPop3: Abrindo %s Refcount: %d\n"
+msgstr "%s: Abrindo %s Refcount: %d\n"
 
 #: ../libbalsa/mailbox_imap.c:1081 ../libbalsa/mailbox_imap.c:2221
 #, c-format
 msgid "Downloading %ld kB"
-msgstr ""
+msgstr "Puxando %ld KB"
 
 #: ../libbalsa/mailbox_imap.c:1461
 #, c-format
@@ -591,7 +579,7 @@ msgstr "Caminho da caixa \"%s\" não encontrado, usando \"%s\""
 
 #: ../libbalsa/mailbox_imap.c:1610 ../libbalsa/mailbox_imap.c:1651
 msgid "Cannot get IMAP handle"
-msgstr ""
+msgstr "Cannot get IMAP handle"
 
 #: ../libbalsa/mailbox_imap.c:2254
 #, fuzzy
@@ -606,12 +594,11 @@ msgstr "Não consegui criar o ficheiro temporário %s."
 #: ../libbalsa/mailbox_imap.c:2506
 #, c-format
 msgid "Uploading %ld kB"
-msgstr ""
+msgstr "Enviando %ld kB"
 
 #: ../libbalsa/mailbox_imap.c:2693
-#, fuzzy
 msgid "Server-side threading not supported."
-msgstr "Método de autenticação anónimo não suportado."
+msgstr "Encadeamento no servidor não suportado."
 
 #: ../libbalsa/mailbox_local.c:1450
 #, c-format
@@ -619,9 +606,9 @@ msgid "Open of %s failed. Errno = %d, "
 msgstr "Abertura de %s falhou. Errno = %d, "
 
 #: ../libbalsa/mailbox_local.c:1472
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to sync mailbox \"%s\""
-msgstr "Incapaz de encontrar a caixa da correio"
+msgstr "Problema a escrever a caixa da correio \"%s\""
 
 #: ../libbalsa/mailbox_maildir.c:205
 #, c-format
@@ -660,20 +647,17 @@ msgstr ""
 
 #: ../libbalsa/mailbox_maildir.c:472 ../libbalsa/mailbox_mbox.c:467
 #: ../libbalsa/mailbox_mh.c:499
-#, fuzzy
 msgid "Mailbox does not exist."
-msgstr "Caixa de correio criada."
+msgstr "Caixa de correio não existe."
 
 #: ../libbalsa/mailbox_maildir.c:901
-#, fuzzy
 msgid "Cannot read message"
-msgstr "Não consigo escrever a mensagem"
+msgstr "Não consigo lêr a mensagem"
 
 #: ../libbalsa/mailbox_maildir.c:923 ../libbalsa/mailbox_mbox.c:1606
 #: ../libbalsa/mailbox_mh.c:1114
-#, fuzzy
 msgid "Data copy error"
-msgstr "Nenhum erro"
+msgstr "Erro a copiar dados"
 
 #: ../libbalsa/mailbox_mbox.c:204
 #, c-format
@@ -681,39 +665,36 @@ msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "A caixa de correio %s parece não ser uma Mbox válida."
 
 #: ../libbalsa/mailbox_mbox.c:475
-#, fuzzy
 msgid "Cannot open mailbox."
-msgstr "Não foi possível carregar a caixa de correio %s"
+msgstr "Problema a abrir a caixa de correio."
 
 #: ../libbalsa/mailbox_mbox.c:487
-#, fuzzy
 msgid "Mailbox is not in mbox format."
-msgstr "Caixa de correio criada."
+msgstr "A caixa de correio não está em formato mbox."
 
 #: ../libbalsa/mailbox_mbox.c:495
-#, fuzzy
 msgid "Cannot lock mailbox."
-msgstr "Não foi possível carregar a caixa de correio %s"
+msgstr "Problema a bloquear caixa de correio."
 
 #: ../libbalsa/mailbox_mbox.c:1554
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not open %s."
-msgstr "Não consegui abrir %s."
+msgstr "%s: não consegui abrir %s."
 
 #: ../libbalsa/mailbox_mbox.c:1564
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get new mime stream."
-msgstr "could not get gpgme data: %s"
+msgstr "%s: could not get new mime stream."
 
 #: ../libbalsa/mailbox_mbox.c:1572
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s is not in mbox format."
-msgstr "%s não é uma caixa de correio."
+msgstr "%s: %s não está em formato mbox."
 
 #: ../libbalsa/mailbox_mbox.c:1584
-#, fuzzy, c-format
+#, c-format
 msgid "%s: could not get message stream."
-msgstr "Não consigo escrever a mensagem"
+msgstr "%s: could not get message stream."
 
 #: ../libbalsa/mailbox_mh.c:184
 #, c-format
@@ -731,24 +712,22 @@ msgid "Could not create MH structure at %s (%s)"
 msgstr "Não consegui criar uma estrutura MH em %s (%s)"
 
 #: ../libbalsa/mailbox_mh.c:1090
-#, fuzzy
 msgid "Cannot create message"
-msgstr "Não consigo escrever a mensagem"
+msgstr "Não consigo criar a mensagem"
 
 #: ../libbalsa/mailbox_mh.c:1140
-#, fuzzy
 msgid "Message rename error"
-msgstr "Mensagem completa"
+msgstr "Problema a renomear a mensagem"
 
 #: ../libbalsa/mailbox_pop3.c:204
-#, fuzzy, c-format
+#, c-format
 msgid "Error setting flags on messages in mailbox %s"
-msgstr "Não consegui reabrir a caixa de correio \"%s\""
+msgstr "Erro a aplicar as etiquetas nas mensagens da caixa de correio %s"
 
 #: ../libbalsa/mailbox_pop3.c:218
-#, fuzzy, c-format
+#, c-format
 msgid "Error appending message %d from %s to %s: %s"
-msgstr "Erro ao enviar a mensagem, processo filho - %d (%s)."
+msgstr "Erro adicionando mensagem %d de %s a %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:380
 #, c-format
@@ -756,14 +735,14 @@ msgid "Retrieving Message %d of %d"
 msgstr "Recebendo mensagem %d de %d"
 
 #: ../libbalsa/mailbox_pop3.c:403
-#, fuzzy, c-format
+#, c-format
 msgid "Received %ld kB of %ld"
-msgstr "Recebidos %d bytes de %d"
+msgstr "Recebidos %ld kB de %ld"
 
 #: ../libbalsa/mailbox_pop3.c:417
-#, fuzzy, c-format
+#, c-format
 msgid "Saving POP message to %s failed."
-msgstr "Movendo mensagens lidas para %s..."
+msgstr "Problema a gravar as mensagens POP em %s."
 
 #: ../libbalsa/mailbox_pop3.c:427
 #, c-format
@@ -785,11 +764,9 @@ msgid "POP3 mailbox %s temp mailbox error:\n"
 msgstr "Erro ao criar temporario para a caixa POP3 %s:\n"
 
 #: ../libbalsa/mailbox_pop3.c:557
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 mailbox %s error: %s\n"
-msgstr ""
-"Erro no acesso à caixa de correio POP3 %s:\n"
-"%s"
+msgstr "Erro na caixa de correio POP3 %s: %s\n"
 
 #: ../libbalsa/mailbox_pop3.c:591
 #, c-format
@@ -835,7 +812,7 @@ msgstr "europa norte"
 
 #: ../libbalsa/misc.c:1245 ../libbalsa/misc.c:1275
 msgid "cyrillic"
-msgstr ""
+msgstr "cirilico"
 
 #: ../libbalsa/misc.c:1247 ../libbalsa/misc.c:1281
 msgid "arabic"
@@ -1326,7 +1303,7 @@ msgstr "Escolha a chave publica para o destinatario %s"
 #: ../libbalsa/rfc3156.c:1543
 #, c-format
 msgid "Insufficient trust for recipient %s"
-msgstr ""
+msgstr "Confiança insuficiente para destinatário %s"
 
 #: ../libbalsa/rfc3156.c:1545
 #, fuzzy, c-format
@@ -1335,7 +1312,7 @@ msgstr "A validade do ID do utilizador não está definida."
 
 #: ../libbalsa/rfc3156.c:1556
 msgid "Use this key anyway?"
-msgstr ""
+msgstr "Usar mesmo esta chave ?"
 
 #: ../libbalsa/rfc3156.c:1765
 msgid "Try again later."
@@ -1423,10 +1400,12 @@ msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
 msgstr ""
+"Não consigo chegar ao servidor SMTP.\n"
+"Verifique a sua ligação à Internet."
 
 #: ../libbalsa/send.c:1291
 msgid "Message left in Outbox (try again later)"
-msgstr ""
+msgstr "A mensagem ficou na Caixa de Saída (tente de novo mais tarde)"
 
 #: ../libbalsa/send.c:1295
 #, c-format
@@ -1717,7 +1696,7 @@ msgstr "Lembrar senha (password)"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:156
 msgid "_Refer to this account as:"
-msgstr ""
+msgstr "_Referir-se a esta conta como:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:164
 msgid "_Local mail directory:"
@@ -1857,7 +1836,7 @@ msgstr "Enviar"
 
 #: ../src/ab-window.c:343
 msgid "Run Editor"
-msgstr ""
+msgstr "Executar Editor"
 
 #: ../src/ab-window.c:350
 #, fuzzy
@@ -1955,7 +1934,7 @@ msgstr "Erro apresentando %s: %s\n"
 
 #: ../src/address-book-config.c:643
 msgid "No path found.  Do you want to give one?"
-msgstr ""
+msgstr "Caminho não encontado. Quer especificar um ?"
 
 #: ../src/address-book-config.c:649
 #, c-format
@@ -2060,7 +2039,7 @@ msgstr "Reenviar..."
 
 #: ../src/balsa-index.c:1780 ../src/main-window.c:623
 msgid "_Pipe through..."
-msgstr ""
+msgstr "_Passar através de ..."
 
 #: ../src/balsa-index.c:1782 ../src/main-window.c:682
 #: ../src/main-window.c:1031
@@ -2134,11 +2113,11 @@ msgstr "_Filtrar mensabens via procmail"
 
 #: ../src/balsa-index.c:2426
 msgid "_Run"
-msgstr ""
+msgstr "_Executar"
 
 #: ../src/balsa-index.c:2435
 msgid "Specify the program to run:"
-msgstr ""
+msgstr "Especifique o programa a executar:"
 
 #: ../src/balsa-mblist.c:278
 msgid "Mailbox"
@@ -2270,7 +2249,7 @@ msgstr "Gravar..."
 
 #: ../src/balsa-message.c:1330
 msgid "Select folder for saving selected parts"
-msgstr ""
+msgstr "Escolha a pasta para gravar as partes seleccionadas"
 
 #: ../src/balsa-message.c:1368
 #, fuzzy, c-format
@@ -2303,6 +2282,9 @@ msgid ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
+"A descifragem não pode ser executada porque esta mensagem está a ser "
+"mostrada mais que uma vez.\n"
+"Por favor feche as outras janelas com esta mensagem e tente de novo."
 
 #: ../src/balsa-message.c:2322 ../src/balsa-message.c:2404
 #: ../src/balsa-message.c:2519
@@ -2410,16 +2392,20 @@ msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
+"A descifragem não pode ser executada porque esta mensagem está ser mostrada "
+"mais que uma vez."
 
 #: ../src/balsa-message.c:2543
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
 msgstr ""
+"Não é possível verificar a assinatura e retirar a armadura OpenPGP porque "
+"esta mensagem está a ser mostrada mais que uma vez."
 
 #: ../src/balsa-message.c:2546
 msgid "Please close the other instances of this message and try again."
-msgstr ""
+msgstr "Por favor feche as outras janelas com esta mensagem e tente de novo."
 
 #: ../src/filter-edit-callbacks.c:311
 msgid "One of the specified fields contains:"
@@ -2807,7 +2793,7 @@ msgstr "Na saída"
 
 #: ../src/filter-run-dialog.c:316
 msgid "Apply Selected"
-msgstr ""
+msgstr "Aplicar seleccionados"
 
 #. up button
 #: ../src/filter-run-dialog.c:364
@@ -2866,7 +2852,7 @@ msgstr "Tentar evitar problemas do servidor"
 
 #: ../src/folder-conf.c:327
 msgid "Use STATUS for mailbox checking"
-msgstr ""
+msgstr "Utilizar 'STATUS' para verificar a caixa de correio"
 
 #: ../src/folder-conf.c:333 ../src/mailbox-conf.c:1156
 #: ../src/mailbox-conf.c:1260
@@ -2942,7 +2928,7 @@ msgstr "Cancelar"
 #: ../src/folder-conf.c:626
 #, c-format
 msgid "Folder rename failed. Reason: %s"
-msgstr ""
+msgstr "Falhou a renomeação da pasta. Razão: %s"
 
 #: ../src/folder-conf.c:678
 #, fuzzy, c-format
@@ -2980,7 +2966,7 @@ msgstr "Nome da pasta:"
 
 #: ../src/folder-conf.c:771
 msgid "Host:"
-msgstr ""
+msgstr "Servidor:"
 
 #: ../src/folder-conf.c:777
 msgid "_Browse..."
@@ -4472,7 +4458,7 @@ msgstr "Chamando URL %s..."
 #: ../src/balsa-mime-widget.c:254
 #, fuzzy, c-format
 msgid "Error reading message part: %s"
-msgstr "Erro a pôr as mensagens no lixo"
+msgstr "Erro a pôr as mensagens no lixo: %s"
 
 #: ../src/balsa-mime-widget.c:276
 #, c-format
@@ -4779,7 +4765,7 @@ msgstr "Mensagem"
 
 #: ../src/pref-manager.c:1950
 msgid "Sort and Thread"
-msgstr ""
+msgstr "Ordenar e encadear"
 
 #: ../src/pref-manager.c:1975
 msgid "Main Window"
@@ -4987,7 +4973,7 @@ msgstr "Janela de Mensagens"
 
 #: ../src/pref-manager.c:2462
 msgid "Action after moving/trashing a message"
-msgstr ""
+msgstr "Acção depois de mover/apagar uma mensagem"
 
 #: ../src/pref-manager.c:2497
 msgid "Options"
@@ -5546,18 +5532,16 @@ msgid "Send _Later"
 msgstr "Enviar mais tarde"
 
 #: ../src/sendmsg-window.c:656
-#, fuzzy
 msgid "Attachment"
-msgstr "Anexos:"
+msgstr "Anexo"
 
 #: ../src/sendmsg-window.c:656
 msgid "Inline"
-msgstr ""
+msgstr "Em linha"
 
 #: ../src/sendmsg-window.c:656
-#, fuzzy
 msgid "Reference"
-msgstr "Referências:"
+msgstr "Referência"
 
 #: ../src/sendmsg-window.c:871
 #, c-format
@@ -5612,12 +5596,12 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:1715
 msgid "Attach as MIME type:"
-msgstr ""
+msgstr "Anexar como tipo MIME:"
 
 #: ../src/sendmsg-window.c:1771
 #, c-format
 msgid "Character set for file %s changed from \"%s\" to \"%s\"."
-msgstr ""
+msgstr "Conjunto de caracteres para ficheiro %s mudou de \"%s\" para \"%s\"."
 
 #: ../src/sendmsg-window.c:1814
 #, fuzzy
@@ -5650,7 +5634,7 @@ msgstr "_Abrir"
 
 #: ../src/sendmsg-window.c:2088
 msgid "(URL)"
-msgstr ""
+msgstr "(URL)"
 
 #: ../src/sendmsg-window.c:2109
 #, c-format
@@ -5755,7 +5739,7 @@ msgstr "Verificar assinatura"
 #: ../src/sendmsg-window.c:4142
 #, c-format
 msgid "Error executing signature generator %s"
-msgstr ""
+msgstr "Erro a executar o gerador de assinaturas %s"
 
 #: ../src/sendmsg-window.c:4154
 #, fuzzy, c-format
@@ -5770,7 +5754,7 @@ msgstr "Erro falando com %s: %s\n"
 #: ../src/sendmsg-window.c:4168
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
-msgstr ""
+msgstr "Assinatura em %s não é um texto UTF-8"
 
 #: ../src/sendmsg-window.c:4231
 #, c-format

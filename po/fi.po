@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-09-07 07:32+0300\n"
-"PO-Revision-Date: 2005-09-05 21:20+0300\n"
+"PO-Revision-Date: 2005-09-10 11:30+0300\n"
 "Last-Translator: Ilkka Tuohela <hile@iki.fi>\n"
 "Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -1490,11 +1490,11 @@ msgstr "Valitse koko viesti"
 
 #: ../libbalsa/source-viewer.c:58
 msgid "_Escape Special Characters"
-msgstr ""
+msgstr "_Käsittele erikoismerkit"
 
 #: ../libbalsa/source-viewer.c:59
 msgid "Escape special and non-ASCII characters"
-msgstr ""
+msgstr "Käsittele erikseen erikois- ja muut kuin ASCII-merkit"
 
 #: ../libbalsa/source-viewer.c:155
 msgid "Mailbox closed"
@@ -1602,6 +1602,8 @@ msgid ""
 "be, in the Email application in the 'Preferences' and 'Identities' commands "
 "on the 'Tools' menu)"
 msgstr ""
+"Seuraavat asetukset vaaditaan lisäksi. Voit muuttaa niitä myöhemmin "
+"valikon \"Asetukset\" kohdista \"Asetukset\" ja \"Henkilöllisyydet\"."
 
 #: ../libinit_balsa/balsa-druid-page-user.c:76
 msgid ""
@@ -1609,6 +1611,9 @@ msgid ""
 "following information (if you have a Network Administrator, they may already "
 "have set this up for you):"
 msgstr ""
+"Sähköpostin palveluntarjoajasi kautta saat seuraavassa kohdassa tarvittavat "
+"tiedot. Jos verkollasi on verkon ylläpitäjä, voi olla että nämä asetukset "
+"on jo tehty puolestasi:" 
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
 msgid "Yes, remember it"
@@ -1689,6 +1694,13 @@ msgid ""
 "-- or your Network Administrator at your place of work/study/similar may "
 "have set up your computer to connect to the network."
 msgstr ""
+"Sähköpostin lähetys ja vastaanotto on mahdollista, kun:\n"
+"\n"
+"- Olet määritellyt Internet-yhteytesi ja sähköpostitilisi asetukset, "
+"jotka saat tietää Internet-palveluntarjoajaltasi, tälle tietokoneelle"
+"\n"
+"- Verkkosi ylläpito, jos sellainen esimerkiksi työ- tai opiskelupaikan "
+"puolesta on olemassa, on tehnyt verkkoasetukset tietokoneelle valmiiksi."
 
 #: ../libinit_balsa/balsa-initdruid.c:81
 msgid ""
@@ -1856,9 +1868,8 @@ msgid "_Host Name"
 msgstr "_Isäntänimi"
 
 #: ../src/address-book-config.c:463
-#, fuzzy
 msgid "Base Domain _Name"
-msgstr "_Perusverkkotunnus"
+msgstr "Haun juuri_nimi"
 
 #: ../src/address-book-config.c:468
 msgid "_User Name (Bind DN)"
@@ -1869,9 +1880,8 @@ msgid "_Password"
 msgstr "_Salasana"
 
 #: ../src/address-book-config.c:479
-#, fuzzy
 msgid "_User Address Book DN"
-msgstr "Osoitekirja"
+msgstr "Osoitekirjan DN"
 
 #: ../src/address-book-config.c:485
 msgid "Enable _TLS"
@@ -2049,7 +2059,7 @@ msgstr "Siirretty kohteeseen \"%s\"."
 #: ../src/balsa-index.c:2250
 #, c-format
 msgid "Committing mailbox %s failed."
-msgstr ""
+msgstr "Postikansion %s muutosten toteuttaminen epäonnistui."
 
 #: ../src/balsa-index.c:2423
 msgid "Pipe message through a program"
@@ -2087,8 +2097,8 @@ msgstr "_Muut..."
 #, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
-msgstr[0] "Näytetty kansio: %s - %d viesti, "
-msgstr[1] "Näytetty kansio: %s - %d viestiä, "
+msgstr[0] "Näkyvä kansio: %s - %d viesti, "
+msgstr[1] "Näkyvä kansio: %s - %d viestiä, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
@@ -2221,6 +2231,9 @@ msgid ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
+"Salauksen purkua ei voida suorittaa, koska viesti on avattu näytettäväksi "
+"useammin kuin kerran.\n"
+"Sulje viestin näyttävät muut ikkunat ja yritä uudestaan."
 
 #: ../src/balsa-message.c:2323
 #, c-format
@@ -2228,6 +2241,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
 "it's structure is invalid."
 msgstr ""
+"Lähettäjän %s viesti aiheesta \"%s\" sisältää salatun osan, mutta tämän osan "
+"rakenne on virheellinen."
 
 #: ../src/balsa-message.c:2331
 #, c-format
@@ -2235,6 +2250,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
+"Lähettäjän %s viesti aiheesta \"%s\" sisältää PGP-salatun osan, mutta "
+"tämä salausmenetelmä ei ole käytettävissä."
 
 #: ../src/balsa-message.c:2344
 #, c-format
@@ -2242,6 +2259,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
+"Lähettäjän %s viesti aiheesta \"%s\" sisältää S/MIME-salatun osan, mutta "
+"tämä salausmenetelmä ei ole käytettävissä."
 
 #: ../src/balsa-message.c:2402
 #, c-format
@@ -2249,6 +2268,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
 "structure is invalid. The signature, if there is any, cannot be checked."
 msgstr ""
+"Lähettäjän %s viesti aiheesta \"%s\" sisältää allekirjoitetun osan, mutta "
+"allekirjoituksen rakenne on virheellinen. Allekirjoitusta ei voida tarkistaa."
 
 #: ../src/balsa-message.c:2415
 #, c-format
@@ -2256,6 +2277,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr ""
+"Lähettäjän %s viesti aiheesta \"%s\" sisältää %s-salatun osan, mutta tämä "
+"salausmenetelmä ei ole käytettävissä."
 
 #: ../src/balsa-message.c:2418
 msgid "PGP"
@@ -2272,11 +2295,12 @@ msgstr "Havaittiin kelvollinen allekirjoitus"
 
 #: ../src/balsa-message.c:2443
 msgid "Detected a good signature with insufficient validity"
-msgstr ""
+msgstr "Havaittiin oikea allekirjoitus, jonka kelvollisuus on riittämätön"
 
 #: ../src/balsa-message.c:2448 ../src/balsa-message.c:2556
 msgid "Detected a good signature with insufficient validity/trust"
-msgstr ""
+msgstr "Havaittiin oikea allekirjoitus, jonka kelvollisuus tai luottamus "
+"ei ole riittävä"
 
 #: ../src/balsa-message.c:2455 ../src/balsa-message.c:2562
 #, c-format
@@ -2285,6 +2309,9 @@ msgid ""
 "returned:\n"
 "%s"
 msgstr ""
+"Allekirjoituksen tarkistus lähettäjän %s viestistä aiheesta \"%s\" "
+"palautti arvon:\n"
+"%s"
 
 #: ../src/balsa-message.c:2467
 #, c-format
@@ -2292,18 +2319,24 @@ msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 msgstr ""
+"Allekirjoituksen tarkistus lähettäjän %s viestistä aiheesta \"%s\" "
+"palautti virheen!"
 
 #: ../src/balsa-message.c:2516
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
+"Salauksen purkua ei voida suorittaa, koska viesti on auki monessa eri "
+"ikkunassa."
 
 #: ../src/balsa-message.c:2518
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
 msgstr ""
+"Allekirjoituksen tarkistusta OpenPGP-esityksen poistoa ei voida suorittaa, "
+"koska viesti on auki monessa eri ikkunassa."
 
 #: ../src/balsa-message.c:2521
 msgid "Please close the other instances of this message and try again."
@@ -2665,6 +2698,8 @@ msgid ""
 "The destination mailbox of the filter \"%s\" is \"%s\".\n"
 "You can't associate it with the same mailbox (that causes recursion)."
 msgstr ""
+"Suodattimen \"%s\" kohdekansio on \"%s\".\n"
+"Et voi liittää sitä samaan kansioon uudestaan."
 
 #: ../src/filter-run-callbacks.c:300
 #, c-format
@@ -2674,6 +2709,10 @@ msgid ""
 "mailboxes, it is done by a very slow method; if possible, use substring "
 "match instead."
 msgstr ""
+"Suodatin \"%s\" ei ole yhteensopiva kansiotyypin \"%s\" kanssa.\n"
+"Tämä voi tapahtua, jos käytät säännöllisiä lausekkeita IMAP-kansion "
+"kanssa, jolloin tämä tapahtuu hyvin hitaasti. Tällöin tulisi käyttää "
+"mieluummin alimerkkijonon täsmäämistä."
 
 #: ../src/filter-run-dialog.c:189
 msgid "Balsa Filters of Mailbox: "
@@ -2741,7 +2780,7 @@ msgstr "Käytä _pysyvää välimuistia"
 
 #: ../src/folder-conf.c:320 ../src/mailbox-conf.c:1258
 msgid "Enable _bug workarounds"
-msgstr "Käytä _bugien kiertoteitä"
+msgstr "Käytä _korjauksia tunnettuihin palvelinongelmiin"
 
 #: ../src/folder-conf.c:327
 msgid "Use STATUS for mailbox checking"
@@ -2806,7 +2845,7 @@ msgstr ""
 
 #: ../src/folder-conf.c:598
 msgid "Question"
-msgstr ""
+msgstr "Kysymys"
 
 #: ../src/folder-conf.c:603
 msgid "Rename INBOX"
@@ -2831,6 +2870,8 @@ msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 msgstr ""
+"IMAP-kansiolla, joka ei ole sähköpostikansio,\n"
+"ei ole muutettavia ominaisuuksia."
 
 #: ../src/folder-conf.c:733
 msgid "Remote IMAP subfolder"
@@ -2933,6 +2974,11 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
+"Kansio \"%s\" poistetaan postikansioiden listasta. Voit myös poistaa "
+"kansioon liittyvät tiedostot tiedostot tiedostojärjestelmästä pysyvästi.\n"
+"Jos et poista tiedostoja tiedostojärjestelmästä, voit käyttää komentoa "
+"\"Lisää kansio\" saman kansion avaamiseksi uudestaan.\n"
+"Mitä haluat tehdä?"
 
 #: ../src/mailbox-conf.c:401
 msgid "Remove from _list"
@@ -2951,6 +2997,11 @@ msgid ""
 "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
 "What would you like to do?"
 msgstr ""
+"Kansio \"%s\" ja kaikki sen viestit poistetaan IMAP-palvelimelta. Jos "
+"kansiolla %s on alikansioita, se näkyy edelleen kansiopuun osana.\n"
+"Voit käyttää komentoa \"Uusi IMAP-kansio\" ja lisätä kansion tällä nimellä "
+"uudestaan\n."
+"Mitä haluat tehdä?"
 
 #: ../src/mailbox-conf.c:423
 msgid "_Remove from server"
@@ -2963,6 +3014,9 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again.\n"
 "What would you like to do?"
 msgstr ""
+"Kansio \"%s\" poistetaan postikansioiden listasta.\n"
+"Voit käyttää komentoa \"Lisää kansio\" lukeaksesi tätä kansiota uudestaan.\n"
+"Mitä haluat tehdä?"
 
 #: ../src/mailbox-conf.c:439
 msgid "_Remove from list"
@@ -3046,7 +3100,7 @@ msgstr "K_ansion polku:"
 
 #: ../src/mailbox-conf.c:1317
 msgid "Identity:"
-msgstr "Tunniste::"
+msgstr "Henkilöllisyys:"
 
 #: ../src/mailbox-conf.c:1338
 msgid "Show address:"
@@ -3407,11 +3461,11 @@ msgstr "Monimutkainen JWZ-säikeistys"
 
 #: ../src/main-window.c:526
 msgid "_Show Mailbox Tree"
-msgstr "Näytä postikansioiden puu"
+msgstr "Näytä kansiopuu"
 
 #: ../src/main-window.c:527
 msgid "Toggle display of mailbox and folder tree"
-msgstr "Näytetäänkö sähköpostikansioiden ja kansioiden puu"
+msgstr "Näytetäänkö postikansioiden ja muiden kansioiden puu"
 
 #: ../src/main-window.c:531
 msgid "Show Mailbox _Tabs"
@@ -3899,8 +3953,8 @@ msgstr "Balsa: uutta sähköpostia"
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Saapui %d uusi viesti."
+msgstr[1] "Saapui %d uutta viestiä."
 
 #: ../src/main-window.c:3172
 msgid "You have new mail."
@@ -3918,7 +3972,7 @@ msgstr "_Hae:"
 #. * the search.
 #: ../src/main-window.c:3820
 msgid "In:"
-msgstr ""
+msgstr "Kentässä:"
 
 #: ../src/main-window.c:3831
 msgid "S_ubject"
@@ -4260,7 +4314,7 @@ msgid ""
 "header describing the used codeset (converted to %s)"
 msgstr ""
 "Viesti lähettäjältä %s aiheesta \"%s\" sisältää 8-bittisiä merkkejä, mutta "
-"ei otsaketta, joka kuvaa käytetyn koodijoukon (muutettu muotoon %s)"
+"ei otsaketta, joka kertoo käytetyn merkistön (muutettu muotoon %s)"
 
 #: ../src/balsa-mime-widget-text.c:552
 #, c-format
@@ -4341,11 +4395,11 @@ msgstr "Osoitekirjat"
 
 #: ../src/pref-manager.c:459
 msgid "Mail Options"
-msgstr "Postin asetukset"
+msgstr "Sähköpostin asetukset"
 
 #: ../src/pref-manager.c:463 ../src/pref-manager.c:1941
 msgid "Display"
-msgstr "Ulkonäkö"
+msgstr "Ulkoasu"
 
 #: ../src/pref-manager.c:467 ../src/toolbar-factory.c:120
 msgid "Spelling"
@@ -4408,7 +4462,7 @@ msgstr "Menevä"
 
 #: ../src/pref-manager.c:1634
 msgid "Checking"
-msgstr "Tarkistaminen"
+msgstr "Uudet viestit"
 
 #: ../src/pref-manager.c:1639
 msgid "_Check mail automatically every:"
@@ -4433,11 +4487,11 @@ msgstr "Näytä viesti, jos uutta postia on saapunut avoimeen kansioon"
 
 #: ../src/pref-manager.c:1672
 msgid "Do background check quietly (no messages in status bar)"
-msgstr "Hoida tarkistaminen hiljaisesti (ei viestejä tilarivillä)"
+msgstr "Tarkista huomaamattomasti taustalla (ei viestejä tilarivillä)"
 
 #: ../src/pref-manager.c:1676
 msgid "_POP message size limit:"
-msgstr "_POP-viestin kokoraja:"
+msgstr "_POP-viestien enimmäiskoko:"
 
 #: ../src/pref-manager.c:1683
 msgid "MB"
@@ -4468,21 +4522,21 @@ msgstr "Multipart/Alternative-osien näyttö"
 
 #: ../src/pref-manager.c:1746
 msgid "prefer text/plain over html"
-msgstr "Suosi text/plain-muotoa HTML:n sijassta"
+msgstr "Suosi text/plain-muotoa HTML:n sijasta"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
 #: ../src/pref-manager.c:1762
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr "Kansallisia (8-bittiset) merkkejä rikkinäisessä viestissä ilman "
-"koodijoukon otsaketta"
+"merkistön otsaketta"
 
 #: ../src/pref-manager.c:1768
 msgid "display as \"?\""
-msgstr "näytä käyttäen\"?\""
+msgstr "näytä muodossa \"?\""
 
 #: ../src/pref-manager.c:1777
 msgid "display using codeset"
-msgstr "näytä käyttäen koodijoukkoa"
+msgstr "näytä käyttäen merkistöä:"
 
 #. How to handle received MDN requests
 #: ../src/pref-manager.c:1809
@@ -4504,8 +4558,8 @@ msgid ""
 "I am in the \"To:\" or \"Cc:\" list)."
 msgstr ""
 "Viestin otsakkeet näyttävät kelvollisilta\n"
-"(pyynnön osoite on sama kuin paluuosoite ja oma osoittesi on jossain "
-"otsakkeista \"To:\" tai \"Cc:\")."
+"(kysyjän osoite on sama kuin paluuosoite ja\n"
+"oma osoite on otsakkeessa \"To:\" tai \"Cc:\")."
 
 #: ../src/pref-manager.c:1837
 msgid "The message header looks suspicious."
@@ -4553,7 +4607,7 @@ msgstr "Kopioi lähtevät viestit Lähteneet-kansioon"
 
 #: ../src/pref-manager.c:1944
 msgid "Status Messages"
-msgstr "Tilanneviestit"
+msgstr "Tilaviestit"
 
 #: ../src/pref-manager.c:1946
 msgid "Colors"
@@ -4654,7 +4708,7 @@ msgstr "Kirjoitusikkuna"
 
 #: ../src/pref-manager.c:2146
 msgid "Invalid or incomplete address label color"
-msgstr "Virheellinen osoitteen nimiön väri"
+msgstr "Virheellisen tai keskeneräisen kohdeosoitteen väri"
 
 #: ../src/pref-manager.c:2171
 msgid "Fonts"
@@ -4739,7 +4793,7 @@ msgid ""
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
 "Seuraava asetus vaikuttaa kaikkiin kansioihin, mutta\n"
-"voidaan ohittaa kansiokohtaisesti kohdasta Kansio -> Piilota viestit:" 
+"voidaan ohittaa kansiokohtaisesti kohdasta \"Kansio -> Piilota viestit\"" 
 
 #: ../src/pref-manager.c:2420
 msgid "Hide messages marked as deleted"
@@ -4747,7 +4801,7 @@ msgstr "Piilota poistettavaksi merkityt viestit"
 
 #: ../src/pref-manager.c:2422
 msgid "The following settings are global."
-msgstr "Seuraavat asetukset vaikuttavat kaikkialla."
+msgstr "Seuraavat asetukset vaikuttavat kaikkiin kansioihin"
 
 #: ../src/pref-manager.c:2427
 msgid "Expunge deleted messages when mailbox is closed"
@@ -4755,7 +4809,7 @@ msgstr "Siivoa poistetut viestit, kun kansio suljetaan"
 
 #: ../src/pref-manager.c:2434
 msgid " ...and if mailbox is unused more than"
-msgstr "... ja jos kansio on käyttämättä pidempään kuin"
+msgstr "ja jos kansio on käyttämättä pidempään kuin"
 
 #: ../src/pref-manager.c:2460
 msgid "Message Window"
@@ -4923,7 +4977,7 @@ msgstr "Viestin kirjasin"
 
 #: ../src/print.c:1646
 msgid "Footer font"
-msgstr ""
+msgstr "Alaviitteen kirjasin"
 
 #. highlight cited stuff
 #: ../src/print.c:1650
@@ -5829,7 +5883,7 @@ msgstr "Lähetä"
 
 #: ../src/toolbar-factory.c:112
 msgid "Exchange"
-msgstr ""
+msgstr "Hae ja lähetä viestit"
 
 #: ../src/toolbar-factory.c:114
 msgid "Attach"
@@ -6013,3 +6067,4 @@ msgstr "Ylös"
 #: ../src/toolbar-prefs.c:495
 msgid "Down"
 msgstr "Alas"
+

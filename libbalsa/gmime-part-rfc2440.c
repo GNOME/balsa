@@ -24,7 +24,6 @@
 
 #include <gmime/gmime.h>
 #include "gmime-part-rfc2440.h"
-#include "mime-stream-shared.h"
 
 
 #define RFC2440_BUF_LEN    4096
@@ -45,9 +44,8 @@ g_mime_part_check_rfc2440(GMimePart * part)
     g_object_unref(wrapper);
     if (!stream)
         return retval;
-    libbalsa_mime_stream_shared_lock(stream);
     if ((slen = g_mime_stream_length(stream)) == -1) {
-        libbalsa_mime_stream_shared_unlock(stream);
+        g_object_unref(stream);
 	return retval;
     }
     g_mime_stream_reset(stream);
@@ -89,7 +87,6 @@ g_mime_part_check_rfc2440(GMimePart * part)
 	}
     }
 
-    libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(stream);
     return retval;
 }
@@ -224,10 +221,8 @@ g_mime_part_rfc2440_verify(GMimePart * part,
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(GMIME_PART(part));
     wrapper_stream = g_mime_data_wrapper_get_stream(wrapper);
-    libbalsa_mime_stream_shared_lock(wrapper_stream);
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
-    libbalsa_mime_stream_shared_unlock(wrapper_stream);
     g_object_unref(wrapper_stream);
     g_mime_stream_reset(stream);
     g_object_unref(wrapper);
@@ -274,7 +269,6 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
     GMimeDataWrapper * wrapper;
     gint result;
     gchar *headbuf = g_malloc0(1024);
-    GMimeStream *wrapper_stream;
 
     g_return_val_if_fail(GMIME_IS_PART(part), -1);
     g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), -1);
@@ -283,12 +277,8 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(part);
-    wrapper_stream = g_mime_data_wrapper_get_stream(wrapper);
-    libbalsa_mime_stream_shared_lock(wrapper_stream);
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
-    libbalsa_mime_stream_shared_unlock(wrapper_stream);
-    g_object_unref(wrapper_stream);
     g_object_unref(wrapper);
 
     g_mime_stream_reset(stream);

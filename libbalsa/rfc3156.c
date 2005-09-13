@@ -47,7 +47,6 @@
 #  include "misc.h"
 #endif
 
-#include "mime-stream-shared.h"
 #include "padlock-keyhole.xpm"
 #include "i18n.h"
 
@@ -488,7 +487,6 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     GMimeCipherContext *ctx;
     GMimeSignatureValidity *valid;
     GError *error = NULL;
-    GMimeStream *stream;
 
     /* paranoia checks */
     g_return_val_if_fail(body, FALSE);
@@ -539,12 +537,10 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 
     /* verify the signature */
 
-    stream = libbalsa_message_stream(body->message);
-    libbalsa_mime_stream_shared_lock(stream);
+    libbalsa_mailbox_lock_store(body->message->mailbox);
     valid = g_mime_multipart_signed_verify(GMIME_MULTIPART_SIGNED
 					   (body->mime_part), ctx, &error);
-    libbalsa_mime_stream_shared_unlock(stream);
-    g_object_unref(stream);
+    libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     if (valid == NULL) {
 	if (error) {
@@ -584,7 +580,6 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 #ifdef HAVE_SMIME
     gboolean smime_signed = FALSE;
 #endif
-    GMimeStream *stream;
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, body);
@@ -647,8 +642,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 			  _("Enter passphrase to decrypt message"));
     }
 
-    stream = libbalsa_message_stream(body->message);
-    libbalsa_mime_stream_shared_lock(stream);
+    libbalsa_mailbox_lock_store(body->message->mailbox);
     if (protocol == GPGME_PROTOCOL_OpenPGP)
 	mime_obj =
 	    g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
@@ -671,8 +665,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 					       GMIME_CIPHER_CONTEXT(ctx),
 					       &error);
 #endif
-    libbalsa_mime_stream_shared_unlock(stream);
-    g_object_unref(stream);
+    libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     /* check the result */
     if (mime_obj == NULL) {

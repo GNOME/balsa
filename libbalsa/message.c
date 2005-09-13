@@ -43,7 +43,6 @@
 
 /* needed for truncate_string */
 #include "misc.h"
-#include "mime-stream-shared.h"
 #include "i18n.h"
 
 #include <gmime/gmime.h>
@@ -457,9 +456,9 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
     if (msg_stream == NULL)
 	return FALSE;
     out_stream = g_mime_stream_file_new(outfile);
-    libbalsa_mime_stream_shared_lock(msg_stream);
+    libbalsa_mailbox_lock_store(message->mailbox);
     res = g_mime_stream_write_to_stream(msg_stream, out_stream);
-    libbalsa_mime_stream_shared_unlock(msg_stream);
+    libbalsa_mailbox_unlock_store(message->mailbox);
 
     g_object_unref(msg_stream);
     g_object_unref(out_stream);
@@ -1160,7 +1159,7 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
     gmime_stream = libbalsa_message_stream(message);
     if (!gmime_stream)
 	return;
-    libbalsa_mime_stream_shared_lock(gmime_stream);
+    libbalsa_mailbox_lock_store(message->mailbox);
     gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
 					GMIME_STREAM_BUFFER_BLOCK_READ);
 
@@ -1198,7 +1197,7 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
 	/* calculate size */
     }
     g_object_unref(gmime_stream_buffer);
-    libbalsa_mime_stream_shared_unlock(gmime_stream);
+    libbalsa_mailbox_unlock_store(message->mailbox);
     g_object_unref(gmime_stream);
     g_byte_array_free(line, TRUE);
 }

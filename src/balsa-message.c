@@ -2525,7 +2525,9 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     /* check if this is a RFC2440 part */
     if (!GMIME_IS_PART(body->mime_part))
 	return;
+    libbalsa_mailbox_lock_store(body->message->mailbox);
     rfc2440mode = g_mime_part_check_rfc2440(GMIME_PART(body->mime_part));
+    libbalsa_mailbox_unlock_store(body->message->mailbox);
        
     /* if not, or if we have more than one instance of this message open, eject
        (see remark for libbalsa_msg_try_decrypt above) - remember that
@@ -2552,6 +2554,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     }
 
     /* do the rfc2440 stuff */
+    libbalsa_mailbox_lock_store(body->message->mailbox);
     if (rfc2440mode == GMIME_PART_RFC2440_SIGNED)
         sig_res = 
             libbalsa_rfc2440_verify(GMIME_PART(body->mime_part), 
@@ -2569,6 +2572,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    body->charset = NULL;
 	}
     }
+    libbalsa_mailbox_unlock_store(body->message->mailbox);
         
     if (sig_res == GPG_ERR_NO_ERROR) {
         if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&

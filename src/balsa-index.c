@@ -49,7 +49,6 @@
 
 #include "filter-funcs.h"
 #include "misc.h"
-#include "mime-stream-shared.h"
 #include "i18n.h"
 
 /* TREE_VIEW_FIXED_HEIGHT enables hight-performance mode of GtkTreeView
@@ -2306,9 +2305,9 @@ bndx_pipe(LibBalsaMailbox * mailbox, guint msgno, const gchar * pipe_cmd)
 
         pipe = g_mime_stream_file_new(fprog);
         g_mime_stream_file_set_owner(GMIME_STREAM_FILE(pipe), FALSE);
-        libbalsa_mime_stream_shared_lock(stream);
+        libbalsa_mailbox_lock_store(mailbox);
         g_mime_stream_write_to_stream(stream, pipe);
-        libbalsa_mime_stream_shared_unlock(stream);
+        libbalsa_mailbox_unlock_store(mailbox);
         g_object_unref(pipe);
         g_object_unref(stream);
         if (pclose(fprog) == -1)

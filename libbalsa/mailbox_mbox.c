@@ -99,6 +99,8 @@ libbalsa_mailbox_mbox_msgno_has_flags(LibBalsaMailbox * mailbox,
                                       LibBalsaMessageFlag unset);
 static guint
 libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox);
+static void libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox,
+                                             gboolean lock);
 
 struct _LibBalsaMailboxMboxClass {
     LibBalsaMailboxLocalClass klass;
@@ -170,6 +172,7 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
 	libbalsa_mailbox_mbox_msgno_has_flags;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mbox_total_messages;
+    libbalsa_mailbox_class->lock_store = libbalsa_mailbox_mbox_lock_store;
 
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mbox_remove_files;
@@ -1590,7 +1593,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
 
     /* From_ armor */
-    libbalsa_mime_stream_shared_lock(orig);
+    libbalsa_mailbox_lock_store(message->mailbox);
     armored_object = lbm_mbox_armored_object(orig);
     /* Make sure we have "Status" and "X-Status" headers, so we can
      * update them in place later, if necessary. */
@@ -1608,7 +1611,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
     g_free(from);
     g_object_unref(armored_object);
-    libbalsa_mime_stream_shared_unlock(orig);
+    libbalsa_mailbox_unlock_store(message->mailbox);
     g_object_unref(orig);
     g_object_unref(armored_dest);
 
@@ -1691,4 +1694,16 @@ libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox)
     LibBalsaMailboxMbox *mbox = (LibBalsaMailboxMbox *) mailbox;
 
     return mbox->messages_info ? mbox->messages_info->len : 0;
+}
+
+static void
+libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
+{
+    LibBalsaMailboxMbox *mbox = (LibBalsaMailboxMbox *) mailbox;
+    GMimeStream *stream = mbox->gmime_stream;
+
+    if (lock)
+        libbalsa_mime_stream_shared_lock(stream);
+    else
+        libbalsa_mime_stream_shared_unlock(stream);
 }

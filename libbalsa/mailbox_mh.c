@@ -38,7 +38,6 @@
 #include "libbalsa.h"
 #include "misc.h"
 #include "libbalsa_private.h"
-#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct message_info {
@@ -1101,10 +1100,10 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	g_object_unref (crlffilter);
 	g_object_unref (tmp);
     }    
-    libbalsa_mime_stream_shared_lock(in_stream);
+    libbalsa_mailbox_lock_store(message->mailbox);
     if (g_mime_stream_write_to_stream( in_stream, out_stream) == -1)
     {
-        libbalsa_mime_stream_shared_unlock(in_stream);
+        libbalsa_mailbox_unlock_store(message->mailbox);
         g_object_unref(in_stream);
 	g_object_unref(out_stream);
 	unlink (tmp);
@@ -1115,7 +1114,7 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	return -1;
     }
     g_object_unref(out_stream);
-    libbalsa_mime_stream_shared_unlock(in_stream);
+    libbalsa_mailbox_unlock_store(message->mailbox);
     g_object_unref(in_stream);
 
     fileno = mh->last_fileno; 

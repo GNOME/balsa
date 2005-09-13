@@ -36,7 +36,6 @@
 #include "libbalsa-conf.h"
 #include "misc.h"
 #include "libbalsa_private.h"
-#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct message_info {
@@ -910,22 +909,20 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(in_stream), crlffilter);
     g_object_unref(crlffilter);
  
-    libbalsa_mime_stream_shared_lock(in_stream);
-    if (g_mime_stream_write_to_stream( in_stream, out_stream) == -1)
-    {
-        libbalsa_mime_stream_shared_unlock(in_stream);
-	g_object_unref(in_stream);
-	g_object_unref(out_stream);
+    libbalsa_mailbox_lock_store(message->mailbox);
+    retval = g_mime_stream_write_to_stream(in_stream, out_stream);
+    libbalsa_mailbox_unlock_store(message->mailbox);
+    g_object_unref(in_stream);
+    g_object_unref(out_stream);
+
+    if (retval < 0) {
 	unlink (tmp);
 	g_free(tmp);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_COPY_ERROR,
                     _("Data copy error"));
-	return -1;
+	return retval;
     }
-    libbalsa_mime_stream_shared_unlock(in_stream);
-    g_object_unref(in_stream);
-    g_object_unref(out_stream);
 
     new_filename = strrchr(tmp, '/');
     if (new_filename)

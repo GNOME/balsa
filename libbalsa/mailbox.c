@@ -62,6 +62,8 @@ static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
                                               const gchar * group);
 static gboolean libbalsa_mailbox_real_close_backend (LibBalsaMailbox *
                                                      mailbox);
+static void libbalsa_mailbox_real_lock_store(LibBalsaMailbox * mailbox,
+                                             gboolean lock);
 
 /* SIGNALS MEANINGS :
    - CHANGED: notification signal sent by the mailbox to allow the
@@ -227,6 +229,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->close_backend  = libbalsa_mailbox_real_close_backend;
     klass->total_messages = NULL;
     klass->duplicate_msgnos = NULL;
+    klass->lock_store  = libbalsa_mailbox_real_lock_store;
 }
 
 static void
@@ -828,6 +831,12 @@ static gboolean
 libbalsa_mailbox_real_close_backend(LibBalsaMailbox * mailbox)
 {
     return TRUE;                /* Default is noop. */
+}
+
+static void
+libbalsa_mailbox_real_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
+{
+    /* Default is noop. */
 }
 
 GType
@@ -3557,4 +3566,19 @@ libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
     }
 
     g_array_free(msgnos, TRUE);
+}
+
+/* Lock and unlock the mail store. NULL mailbox is not an error. */
+void 
+libbalsa_mailbox_lock_store(LibBalsaMailbox * mailbox)
+{
+    if (mailbox)
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->lock_store(mailbox, TRUE);
+}
+
+void 
+libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox)
+{
+    if (mailbox)
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->lock_store(mailbox, FALSE);
 }

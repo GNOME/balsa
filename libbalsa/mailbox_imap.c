@@ -2303,8 +2303,7 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
                       gboolean need_children, GMimeObject * parent_part,
                       GError **err)
 {
-    if (!part) /* FIXME: internal error? */
-        return FALSE;
+    g_return_val_if_fail(part, FALSE);
 
     if (!part->mime_part) {
         GMimeContentType *type =
@@ -2346,12 +2345,13 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
                 return FALSE;
         }
 	/* ...and siblings. */
-        if(!lbm_imap_get_msg_part(msg, part->next, TRUE, parent_part, err))
+        if(part->next &&
+           !lbm_imap_get_msg_part(msg, part->next, TRUE, parent_part, err))
             return FALSE;
 	/* FIXME if GMIME_IS_MESSAGE_PART? */
     }
-
-    return GMIME_IS_PART(part->mime_part);
+    return GMIME_IS_PART(part->mime_part)
+        || GMIME_IS_MULTIPART(part->mime_part);
 }
 
 static gboolean

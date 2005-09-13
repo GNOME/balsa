@@ -1329,7 +1329,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   }
 #endif
   if( imap_cmd_get_tag(handle->sio, tag, sizeof(tag))<0) {
-    printf("connection severed.\n");
+    printf("imap connection severed.\n");
     imap_handle_disconnect(handle);
     return IMR_SEVERED;
   }

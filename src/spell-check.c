@@ -807,7 +807,7 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
 
     if (pspell_error_number(spell_error) != 0) {
 	/* quit without breaking things */
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
 			  pspell_error_message(spell_error));
 
 	/* Generate a response signal. */

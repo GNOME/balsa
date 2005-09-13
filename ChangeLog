@@ -1,3 +1,8 @@
+2005-09-13 Pawel Salek
+
+	* libbalsa/mailbox_imap.c: return correctly TRUE/FALSE on success.
+	* src/spell-check.c: unavailable word list is a critical error.
+
 2005-09-13 09:36  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h, mailbox_mbox.c: implement

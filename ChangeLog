@@ -1,3 +1,14 @@
+2005-09-13 09:36  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_mbox.c: implement
+	lock_store class method and public functions.
+	* src/balsa-index.c, libbalsa/body.c,
+	libbalsa/gmime-part-rfc2440.c, libbalsa/html.c, libbalsa/message.c,
+	mailbox_imap.c, mailbox_maildir.c, mailbox_mh.c,
+	libbalsa/rfc3156.c, libbalsa/send.c, libbalsa/source-viewer.c,
+	src/balsa-message.c: lock the mail store instead of a GMimeStream,
+	to avoid unnecessary IMAP fetches.
+
 2005-09-11  Carlos Morgado  <chbm gnome.org>
 
 	* po (Module): update for stats

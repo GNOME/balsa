@@ -57,7 +57,7 @@ General advices:
 <title>Balsa User's Guide</title>
 
 <copyright>
-  <year>1997-2004</year>
+  <year>1997-2005</year>
   <holder>Stuart Parmenter and others, see AUTHORS for a list of people
   </holder>
 </copyright>
@@ -92,10 +92,10 @@ General advices:
 </legalnotice>
 
 <releaseinfo> 
-This is version 2.719 of the &Balsa; manual.
+This is version 2.720 of the &Balsa; manual.
 </releaseinfo>
 
-<revhistory><revision><date>28 May 2004</date></revision></revhistory>
+<revhistory><revision><date>9 September 2005</date></revision></revhistory>
 
 </articleinfo>
 
@@ -1950,17 +1950,23 @@ This is version 2.719 of the &Balsa; manual.
 </figure>
 
 <para>
-  At the base of the message composer window may be a large box
-  displaying attachments; this view can be toggled in the
-  <guimenu>Show</guimenu> menu.  They show up as small icons that look
-  like a piece of paper, with the name of the file displayed beneath
-  them.
+  Below the headers may be a large box displaying a list of
+  attachments;  this view can be toggled in the
+  <guimenu>Show</guimenu> menu.
 </para>
 
 <para>
-  When there are attachments displayed, it is possible to right-click
-  on the icon to access a menu to manipulate the menu.  Currently it
-  is only possible to remove it from the message.
+  When there are attachments displayed, it is possible to
+  right-click on one of them to access an option menu.
+  <guimenuitem>Inline</guimenuitem> and
+  <guimenuitem>Attachment</guimenuitem>
+  are mutually exclusive options that will display to the recipient
+  either the attachment inline with the rest of the message,
+  or separately as an attachment.  Selecting
+  <guimenuitem>Reference</guimenuitem> will send a MIME external
+  part reference (a kind of link) in lieu of the actual file.
+  <guimenuitem>Remove</guimenuitem>, and any available
+  <guimenuitem>Open with</guimenuitem> options are also available.
 </para>
 
 </sect2>

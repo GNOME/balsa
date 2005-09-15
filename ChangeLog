@@ -1,3 +1,8 @@
+2005-09-15 10:12  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_mbox.c: fix unthreaded
+	build.
+
 2005-09-14  Craig Routledge
 
 	* doc/C/balsa.xml: update compose window file attaching doc.

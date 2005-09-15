@@ -301,7 +301,9 @@ struct _LibBalsaMailboxClass {
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
     guint (*total_messages)(LibBalsaMailbox * mailbox);
     GArray *(*duplicate_msgnos) (LibBalsaMailbox * mailbox);
+#if BALSA_USE_THREADS
     void (*lock_store) (LibBalsaMailbox * mailbox, gboolean lock);
+#endif                          /* BALSA_USE_THREADS */
 };
 
 GType libbalsa_mailbox_get_type(void);
@@ -588,10 +590,19 @@ void libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 					  guint msgno,
 					  LibBalsaMessage * message);
 
+#if BALSA_USE_THREADS
+
 /* Lock and unlock the mail store--currently, a no-op except for mbox.
  */
 void libbalsa_mailbox_lock_store  (LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox);
+
+#else                           /* BALSA_USE_THREADS */
+
+#define libbalsa_mailbox_lock_store(mailbox)
+#define libbalsa_mailbox_unlock_store(mailbox)
+
+#endif                          /* BALSA_USE_THREADS */
 
 /* columns ids */
 typedef enum {

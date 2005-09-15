@@ -99,8 +99,10 @@ libbalsa_mailbox_mbox_msgno_has_flags(LibBalsaMailbox * mailbox,
                                       LibBalsaMessageFlag unset);
 static guint
 libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox);
+#if BALSA_USE_THREADS
 static void libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox,
                                              gboolean lock);
+#endif                          /* BALSA_USE_THREADS */
 
 struct _LibBalsaMailboxMboxClass {
     LibBalsaMailboxLocalClass klass;
@@ -172,7 +174,9 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
 	libbalsa_mailbox_mbox_msgno_has_flags;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mbox_total_messages;
+#if BALSA_USE_THREADS
     libbalsa_mailbox_class->lock_store = libbalsa_mailbox_mbox_lock_store;
+#endif                          /* BALSA_USE_THREADS */
 
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mbox_remove_files;
@@ -1696,6 +1700,7 @@ libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox)
     return mbox->messages_info ? mbox->messages_info->len : 0;
 }
 
+#if BALSA_USE_THREADS
 static void
 libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
 {
@@ -1707,3 +1712,4 @@ libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
     else
         libbalsa_mime_stream_shared_unlock(stream);
 }
+#endif                          /* BALSA_USE_THREADS */

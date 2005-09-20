@@ -1,3 +1,8 @@
+2005-09-20 Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: handle lack of headers.
+	* NEWS, configure.in: release 2.3.5
+
 2005-09-15 10:12  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h, mailbox_mbox.c: fix unthreaded

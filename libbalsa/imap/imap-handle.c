@@ -2190,7 +2190,7 @@ static ImapResponse
 ir_msg_att_rfc822(ImapMboxHandle *h, int c, unsigned seqno)
 {
   gchar *str = imap_get_nstring(h->sio);
-  if(h->body_cb)
+  if(str && h->body_cb)
     h->body_cb(seqno, str, strlen(str), h->body_arg);
   g_free(str);
   return IMR_OK;
@@ -2500,7 +2500,7 @@ ir_body_extension (struct siobuf *sio, ImapBody * body)
     }
   else
     /* nstring */
-    imap_get_nstring (sio);
+    g_free(imap_get_nstring(sio));
 
   return IMR_OK;
 }
@@ -2840,9 +2840,11 @@ ir_body_section(struct siobuf *sio, unsigned seqno,
   if(c != ']') { puts("] expected"); return IMR_PROTOCOL; }
   if(sio_getc(sio) != ' ') { puts("space expected"); return IMR_PROTOCOL;}
   str = imap_get_nstring(sio);
-  if(body_cb)
-    body_cb(seqno, str, strlen(str), arg);
-  g_free(str);
+  if(str) {
+    if(body_cb)
+      body_cb(seqno, str, strlen(str), arg);
+    g_free(str);
+  }
   return IMR_OK;
 }
 
@@ -2867,7 +2869,7 @@ ir_body_header_fields(ImapMboxHandle *h, unsigned seqno)
 
   tmp = imap_get_nstring(h->sio);
   if(h->body_cb) {
-    h->body_cb(seqno, tmp, strlen(tmp), h->body_arg);
+    if(tmp) h->body_cb(seqno, tmp, strlen(tmp), h->body_arg);
     g_free(tmp);
   } else {
     CREATE_IMSG_IF_NEEDED(h, seqno);

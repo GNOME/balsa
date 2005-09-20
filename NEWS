@@ -1,3 +1,10 @@
+* Balsa-2.3.5 release. Release date 2005-09-20
+
+- improve error handling.
+- doc updates.
+- bugs fixes: 309574, 312091 and 312105.
+
+
 * Balsa-2.3.4 release. Release date 2005-07-06
 
 - fixed regression in message encryption.

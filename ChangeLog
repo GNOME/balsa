@@ -1,3 +1,10 @@
+2005-09-20 23:05  PeterB
+
+	* libbalsa/: mailbox.c, mailbox_mbox.c, send.c: implement message
+	fragmentation and reconstruction using "message/partial" mime type.
+	* libbalsa/: smtp-server.c, smtp-server.h: add guint
+	LibBalsaSmtpServer::big_message and manage it in the dialog.
+
 2005-09-20 Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: handle lack of headers.

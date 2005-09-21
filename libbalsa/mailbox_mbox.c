@@ -1459,7 +1459,7 @@ lbm_mbox_prepare_object(GMimeObject * mime_part)
                                  message));
     else if (GMIME_IS_MESSAGE(mime_part))
         lbm_mbox_prepare_object(((GMimeMessage *) mime_part)->mime_part);
-    else {
+    else if (!GMIME_IS_MESSAGE_PARTIAL(mime_part)) {
         GMimePartEncodingType encoding;
         const GMimeContentType *mime_type;
 

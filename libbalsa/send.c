@@ -382,6 +382,7 @@ static void dump_queue(const char*msg)
 /* libbalsa_message_queue:
    places given message in the outbox.
 */
+static void libbalsa_set_message_id(GMimeMessage * mime_message);
 LibBalsaMsgCreateResult
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       LibBalsaMailbox * fccbox,
@@ -391,6 +392,10 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       gboolean flow)
 {
     LibBalsaMsgCreateResult result;
+#if ENABLE_ESMTP
+    guint big_message;
+#endif /* ESMTP */
+    gint rc;
 
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
@@ -404,10 +409,42 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 #if ENABLE_ESMTP
     g_mime_message_set_header(message->mime_msg, "X-Balsa-SmtpServer",
 	                      libbalsa_smtp_server_get_name(smtp_server));
-#endif /* ESMTP */
-    if(libbalsa_mailbox_copy_message( message, outbox, NULL) < 0)
-        return LIBBALSA_MESSAGE_QUEUE_ERROR;
-    return LIBBALSA_MESSAGE_CREATE_OK;
+
+    big_message = libbalsa_smtp_server_get_big_message(smtp_server);
+    if (big_message > 0) {
+        GMimeMessage *mime_msg;
+        GMimeMessage **mime_msgs;
+        size_t nparts;
+        guint i;
+
+        mime_msg = message->mime_msg;
+        mime_msgs =
+            g_mime_message_partial_split_message(mime_msg, big_message,
+                                                 &nparts);
+        for (i = rc = 0; i < nparts; ++i) {
+            if (nparts > 1) {
+                /* RFC 2046, 5.2.2: "...it is specified that entities of
+                 * type "message/partial" must always have a content-
+                 * transfer-encoding of 7bit (the default)" */
+                g_mime_part_set_encoding(GMIME_PART
+                                         (mime_msgs[i]->mime_part),
+                                         GMIME_PART_ENCODING_7BIT);
+                libbalsa_set_message_id(mime_msgs[i]);
+            }
+            message->mime_msg = mime_msgs[i];
+            if (rc >= 0)
+                rc = libbalsa_mailbox_copy_message(message, outbox, NULL);
+            g_object_unref(mime_msgs[i]);
+        }
+        g_free(mime_msgs);
+        message->mime_msg = mime_msg;
+    } else
+        rc = libbalsa_mailbox_copy_message(message, outbox, NULL);
+#else                           /* ESMTP */
+    rc = libbalsa_mailbox_copy_message(message, outbox, NULL);
+#endif                          /* ESMTP */
+
+    return rc < 0 ? LIBBALSA_MESSAGE_QUEUE_ERROR : LIBBALSA_MESSAGE_CREATE_OK;
 }
 
 static void

@@ -56,6 +56,9 @@ const gchar *libbalsa_smtp_server_get_cert_passphrase(LibBalsaSmtpServer *
                                                       smtp_server);
 auth_context_t libbalsa_smtp_server_get_authctx(LibBalsaSmtpServer *
                                                 smtp_server);
+guint libbalsa_smtp_server_get_big_message(LibBalsaSmtpServer *
+                                           smtp_server);
+
 typedef void (*LibBalsaSmtpServerUpdate) (LibBalsaSmtpServer * smtp_server,
                                           GtkResponseType response,
                                           const gchar * old_name);

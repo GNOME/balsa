@@ -46,6 +46,7 @@ struct _LibBalsaSmtpServer {
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     gchar *cert_passphrase;
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
+    guint big_message; /* size of partial messages; in kB */
 };
 
 typedef struct _LibBalsaSmtpServerClass {
@@ -234,6 +235,8 @@ libbalsa_smtp_server_new_from_config(const gchar * name)
     }
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 
+    smtp_server->big_message = libbalsa_conf_get_int("BigMessage=0");
+
     return smtp_server;
 }
 
@@ -251,6 +254,7 @@ libbalsa_smtp_server_save_config(LibBalsaSmtpServer * smtp_server)
         g_free(tmp);
     }
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
+    libbalsa_conf_set_int("BigMessage", smtp_server->big_message);
 }
 
 void
@@ -287,6 +291,14 @@ libbalsa_smtp_server_get_authctx(LibBalsaSmtpServer * smtp_server)
     return smtp_server->authctx;
 }
 
+guint
+libbalsa_smtp_server_get_big_message(LibBalsaSmtpServer * smtp_server)
+{
+    /* big_message is stored in kB, but we want the value in bytes. */
+    return smtp_server->big_message * 1024;
+}
+
+
 /* SMTP server dialog */
 
 #define LIBBALSA_SMTP_SERVER_DIALOG_KEY "libbalsa-smtp-server-dialog"
@@ -304,6 +316,8 @@ struct smtp_server_dialog_info {
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     GtkWidget *cert;
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
+    GtkWidget *split_button;
+    GtkWidget *big_message;
 };
 
 /* GDestroyNotify for smtp_server_dialog_info. */
@@ -421,6 +435,14 @@ smtp_server_response(GtkDialog * dialog, gint response,
                                                  gtk_entry_get_text
                                                  (GTK_ENTRY(sdi->cert)));
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
+        if (gtk_toggle_button_get_active
+            (GTK_TOGGLE_BUTTON(sdi->split_button)))
+            /* big_message is stored in kB, but the widget is in MB. */
+            LIBBALSA_SMTP_SERVER(server)->big_message =
+                gtk_spin_button_get_value(GTK_SPIN_BUTTON
+                                          (sdi->big_message)) * 1024;
+        else
+            LIBBALSA_SMTP_SERVER(server)->big_message = 0;
         break;
     default:
         break;
@@ -453,6 +475,16 @@ smtp_server_changed(GtkWidget * widget,
                                     GTK_RESPONSE_CANCEL);
 }
 
+static void
+smtp_server_split_button_changed(GtkWidget * button,
+                                 struct smtp_server_dialog_info *sdi)
+{
+    gtk_widget_set_sensitive(sdi->big_message,
+                             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                                          (button)));
+    smtp_server_changed(button, sdi);
+}
+
 void
 libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                             GtkWindow * parent,
@@ -463,6 +495,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     GtkWidget *dialog;
     GtkWidget *table;
     gint row;
+    GtkWidget *label, *hbox;
 
     /* Show only one dialog at a time. */
     sdi = g_object_get_data(G_OBJECT(smtp_server),
@@ -549,6 +582,35 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     g_signal_connect(sdi->cert, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
+
+    ++row;
+    sdi->split_button =
+        gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
+    gtk_table_attach_defaults(GTK_TABLE(table), sdi->split_button,
+                              0, 1, row, row + 1);
+    hbox = gtk_hbox_new(FALSE, 6);
+    sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
+    gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message, TRUE, TRUE, 0);
+    label = gtk_label_new(_("MB"));
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+    if (smtp_server->big_message > 0) {
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button),
+                                     TRUE);
+        /* The widget is in MB, but big_message is stored in kB. */
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(sdi->big_message),
+                                  ((float) smtp_server->big_message) /
+                                  1024);
+    } else {
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button),
+                                     FALSE);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(sdi->big_message), 1);
+        gtk_widget_set_sensitive(sdi->big_message, FALSE);
+    }
+    g_signal_connect(sdi->split_button, "toggled",
+                     G_CALLBACK(smtp_server_split_button_changed), sdi);
+    g_signal_connect(sdi->big_message, "changed",
+                     G_CALLBACK(smtp_server_changed), sdi);
+    gtk_table_attach_defaults(GTK_TABLE(table), hbox, 1, 2, row, row + 1);
 
     gtk_widget_show_all(dialog);
 }

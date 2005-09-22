@@ -703,7 +703,6 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
 
 	    libbalsa_mailbox_index_set_flags(mailbox, seqno[i],
 					     msg_info->message->flags);
-            libbalsa_mailbox_msgno_changed(mailbox, seqno[i]);
 	    ++mimap->search_stamp;
 
             was_unread_undeleted = (flags & LIBBALSA_MESSAGE_FLAG_NEW)

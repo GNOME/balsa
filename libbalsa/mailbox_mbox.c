@@ -1659,7 +1659,6 @@ libbalsa_mailbox_mbox_messages_change_flags(LibBalsaMailbox * mailbox,
 		msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 
         libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
-        libbalsa_mailbox_msgno_changed(mailbox, msgno);
 
         was_unread_undeleted = (old_flags & LIBBALSA_MESSAGE_FLAG_NEW)
             && !(old_flags & LIBBALSA_MESSAGE_FLAG_DELETED);

@@ -345,6 +345,7 @@ libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
         entry->status_icon = 
             libbalsa_get_icon_from_flags(f);
         entry->unseen = f & LIBBALSA_MESSAGE_FLAG_NEW;
+        libbalsa_mailbox_msgno_changed(mailbox, msgno);
     }
 }
 
@@ -982,23 +983,25 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
 #endif /* CACHE_UNSEEN_CHILD */
 
 static void
-lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
+lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
+                  GtkTreeIter * iter)
 {
-    GtkTreeIter iter;
     GtkTreePath *path;
 
-    iter.user_data = g_node_find(mailbox->msg_tree, G_PRE_ORDER,
-                                 G_TRAVERSE_ALL, GUINT_TO_POINTER(seqno));
+    if (iter->user_data == NULL)
+        iter->user_data =
+            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                        GUINT_TO_POINTER(seqno));
     /* trying to modify seqno that is not in the tree?  Possible for
      * filtered views... Perhaps there is nothing to worry about.
      */
-    if (iter.user_data == NULL)
+    if (iter->user_data == NULL)
 	return;
 
-    iter.stamp = mailbox->stamp;
-    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+    iter->stamp = mailbox->stamp;
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), iter);
     g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_CHANGED], 0,
-                  path, &iter);
+                  path, iter);
     gtk_tree_path_free(path);
 
 #if CACHE_UNSEEN_CHILD
@@ -1023,11 +1026,20 @@ lbm_threads_leave(LibBalsaMailbox * mailbox)
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
+    GtkTreeIter iter;
+
     if (!mailbox->msg_tree)
         return;
 
+    iter.user_data = NULL;
     lbm_threads_enter(mailbox);
-    lbm_msgno_changed(mailbox, seqno);
+    lbm_msgno_changed(mailbox, seqno, &iter);
+
+    /* Parents' style may need to be changed also. */
+    while ((iter.user_data = ((GNode *) iter.user_data)->parent))
+        if ((seqno = GPOINTER_TO_UINT(((GNode *) iter.user_data)->data)))
+            lbm_msgno_changed(mailbox, seqno, &iter);
+
     lbm_threads_leave(mailbox);
 }
 
@@ -3488,8 +3500,11 @@ libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 
     attach_icon = libbalsa_message_get_attach_icon(message);
     if (entry->attach_icon != attach_icon) {
+        GtkTreeIter iter;
+
 	entry->attach_icon = attach_icon;
-	lbm_msgno_changed(mailbox, msgno);
+        iter.user_data = NULL;
+	lbm_msgno_changed(mailbox, msgno, &iter);
     }
 }
 

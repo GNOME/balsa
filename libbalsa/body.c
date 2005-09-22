@@ -556,40 +556,56 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 
 gboolean
 libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
-                              gboolean filter_crlf, GError **err)
+                              gboolean filter_crlf, GError ** err)
 {
     GMimeStream *stream, *stream_fs;
-    gboolean retval = TRUE;
+    ssize_t len;
 
     stream = libbalsa_message_body_get_stream(body, err);
-    if(!stream)
+    if (!body->mime_part)
         return FALSE;
-    libbalsa_mailbox_lock_store(body->message->mailbox);
-    g_mime_stream_reset(stream);
+
     stream_fs = g_mime_stream_fs_new(fd);
+    libbalsa_mailbox_lock_store(body->message->mailbox);
 
-    if (filter_crlf) {
-        GMimeFilter *filter;
+    if (stream) {
+        g_mime_stream_reset(stream);
 
-        if (!GMIME_IS_STREAM_FILTER(stream)) {
-            GMimeStream *stream_filter =
-                g_mime_stream_filter_new_with_stream(stream);
-            g_object_unref(stream);
-            stream = stream_filter;
+        if (filter_crlf) {
+            GMimeFilter *filter;
+
+            if (!GMIME_IS_STREAM_FILTER(stream)) {
+                GMimeStream *stream_filter =
+                    g_mime_stream_filter_new_with_stream(stream);
+                g_object_unref(stream);
+                stream = stream_filter;
+            }
+
+            filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+                                            GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+            g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
+            g_object_unref(filter);
         }
-        filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-                                        GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
-        g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
-        g_object_unref(filter);
+
+        len = g_mime_stream_write_to_stream(stream, stream_fs);
+        g_object_unref(stream);
+    } else {
+        /* body->mime_part is not a GMimePart. */
+        GMimeObject *mime_part = body->mime_part;
+
+        if (GMIME_IS_MESSAGE_PART(mime_part))
+            /* The user probably wants the message without the part's
+             * mime headers. */
+            mime_part =
+                GMIME_OBJECT(GMIME_MESSAGE_PART(mime_part)->message);
+
+        len = g_mime_object_write_to_stream(mime_part, stream_fs);
     }
 
-    if (g_mime_stream_write_to_stream(stream, stream_fs) < 0)
-	retval = FALSE;
     libbalsa_mailbox_unlock_store(body->message->mailbox);
-    g_object_unref(stream);
     g_object_unref(stream_fs);
 
-    return retval;
+    return len >= 0;
 }
 
 gchar *

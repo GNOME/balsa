@@ -1,5 +1,8 @@
-2005-09-22 08:06  PeterB
+2005-09-22 10:28  PeterB
 
+	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c: update parent style when child is
+	read.
 	* libbalsa/body.c: allow saving non-GMimePart message parts.
 
 2005-09-20 23:05  PeterB

@@ -230,6 +230,9 @@ struct _LibBalsaMailbox {
 
     LibBalsaMailboxView *view;
     LibBalsaMailboxState state;
+
+    /* Whether to reassemble a message from its parts. */
+    gboolean no_reassemble;
 };
 
 /* Search iter */

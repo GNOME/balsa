@@ -1,3 +1,16 @@
+2005-09-27 11:56  PeterB
+
+	* src/main-window.c: hide irrelevant scrollbar--thanks to Sebastian
+	Zerbe.
+	* src/mailbox-node.c, src/save-restore.c, libbalsa/mailbox.c:
+	manage and use LibBalsaMailbox::no_reassemble; check for a
+	message/partial part that has been wrapped in a multipart/*
+	message.
+	* libbalsa/mailbox.h: new member LibBalsaMailbox::no_reassemble,
+	used to distinguish outbox.
+	* libbalsa/rfc3156.c: check that a GMimeMultipartSigned has both
+	its subparts.
+
 2005-09-22 10:28  PeterB
 
 	* libbalsa/: mailbox.c, mailbox_imap.c, mailbox_maildir.c,

@@ -1606,8 +1606,11 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
                                   LIBBALSA_MESSAGE_FLAG_RECENT);
     armored_dest = lbm_mbox_armored_stream(dest);
 
-    g_mime_stream_seek(dest, 0, GMIME_STREAM_SEEK_END);
-    if (g_mime_stream_write_string(dest, from) < (gint) strlen(from)
+    retval = g_mime_stream_seek(dest, 0, GMIME_STREAM_SEEK_END);
+    if (retval > 0)
+        retval = lbm_mbox_newline(dest);
+    if (retval < 0
+        || g_mime_stream_write_string(dest, from) < (gint) strlen(from)
 	|| g_mime_object_write_to_stream(armored_object, armored_dest) < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR, _("Data copy error"));
@@ -1618,9 +1621,6 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     libbalsa_mailbox_unlock_store(message->mailbox);
     g_object_unref(orig);
     g_object_unref(armored_dest);
-
-    if (retval > 0)
-	retval = lbm_mbox_newline(dest);
 
     if (retval < 0 && truncate(path, orig_length) < 0)
         retval = -2;

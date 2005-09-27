@@ -1,7 +1,11 @@
-2005-09-27 11:56  PeterB
+2005-09-27 12:07  PeterB
 
 	* src/main-window.c: hide irrelevant scrollbar--thanks to Sebastian
 	Zerbe.
+	* libbalsa/mailbox_mbox.c: write separating newline before
+	appending new message, not after.
+	* libinit_balsa/balsa-druid-page-directory.c: manage
+	LibBalsaMailbox::no_reassemble.
 	* src/mailbox-node.c, src/save-restore.c, libbalsa/mailbox.c:
 	manage and use LibBalsaMailbox::no_reassemble; check for a
 	message/partial part that has been wrapped in a multipart/*

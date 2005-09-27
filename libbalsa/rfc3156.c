@@ -501,8 +501,10 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	return FALSE;
 
     /* check if the body is really a multipart/signed */
-    if (!GMIME_IS_MULTIPART_SIGNED(body->mime_part))
-	return FALSE;
+    if (!GMIME_IS_MULTIPART_SIGNED(body->mime_part)
+        || (g_mime_multipart_get_number
+            (((GMimeMultipart *) body->mime_part))) < 2)
+        return FALSE;
     if (body->parts->next->sig_info)
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
 

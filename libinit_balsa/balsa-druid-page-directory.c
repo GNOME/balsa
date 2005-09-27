@@ -140,6 +140,9 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
     (*box)->name = g_strdup(gettext(prettyname));
 
     config_mailbox_add(*box, (char *) prettyname);
+
+    if (box == &balsa_app.outbox)
+        (*box)->no_reassemble = TRUE;
 }
 
 /* here are local prototypes */

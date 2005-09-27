@@ -541,9 +541,10 @@ config_mailbox_init(const gchar * prefix)
 	mbnode = balsa_mailbox_node_new_from_mailbox(mailbox);
 	if (strcmp(INBOX_NAME, key) == 0)
 	    special = &balsa_app.inbox;
-	else if (strcmp(OUTBOX_NAME, key) == 0)
+	else if (strcmp(OUTBOX_NAME, key) == 0) {
 	    special = &balsa_app.outbox;
-	else if (strcmp(SENTBOX_NAME, key) == 0)
+            mailbox->no_reassemble = TRUE;
+        } else if (strcmp(SENTBOX_NAME, key) == 0)
 	    special = &balsa_app.sentbox;
 	else if (strcmp(DRAFTS_NAME, key) == 0)
 	    special = &balsa_app.draftbox;

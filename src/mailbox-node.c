@@ -381,6 +381,8 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
 					 (gpointer) isi->special);
         *isi->special = LIBBALSA_MAILBOX(m);
 	g_object_add_weak_pointer(G_OBJECT(m), (gpointer) isi->special);
+        if (isi->special == &balsa_app.outbox)
+            LIBBALSA_MAILBOX(m)->no_reassemble = TRUE;
     }
 
     return TRUE;

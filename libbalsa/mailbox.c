@@ -259,6 +259,8 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     /* mailbox->stamp is incremented before we use it, so it won't be
      * zero for a long, long time... */
     mailbox->stamp = g_random_int() / 2;
+
+    mailbox->no_reassemble = FALSE;
 }
 
 /*
@@ -3320,21 +3322,32 @@ lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage * msg)
 /* Try to reassemble messages of type message/partial with the given id;
  * if successful, delete the parts, so we don't keep creating the whole
  * message. */
+
+static void
+lbm_try_reassemble_func(GMimeObject * mime_part, gpointer data)
+{
+    if (GMIME_IS_MESSAGE_PART(mime_part))
+        mime_part = ((GMimeMessagePart *) mime_part)->message->mime_part;
+    if (GMIME_IS_MESSAGE_PARTIAL(mime_part)) {
+        const GMimeMessagePartial **partial = data;
+        *partial = (GMimeMessagePartial *) mime_part;
+    }
+}
+
 static void
 lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
 {
     guint msgno;
-    LibBalsaMessage *message;
-    GMimeMessage *mime_message;
     GPtrArray *partials = g_ptr_array_new();
     guint total = (guint) - 1;
     GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
 
-    for (msgno = 1; msgno <= libbalsa_mailbox_total_messages(mailbox);
-         msgno++) {
+    for (msgno = libbalsa_mailbox_total_messages(mailbox); msgno > 0;
+         --msgno) {
+        LibBalsaMessage *message =
+            libbalsa_mailbox_get_message(mailbox, msgno);
         gchar *tmp_id;
 
-        message = libbalsa_mailbox_get_message(mailbox, msgno);
         if (!message)
             continue;
 
@@ -3345,10 +3358,10 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
         }
 
         if (strcmp(tmp_id, id) == 0) {
-            GMimeMessagePartial *partial;
+            GMimeMessage *mime_message = lbm_get_mime_msg(mailbox, message);
+            GMimeMessagePartial *partial =
+                (GMimeMessagePartial *) mime_message->mime_part;
 
-            mime_message = lbm_get_mime_msg(mailbox, message);
-            partial = GMIME_MESSAGE_PARTIAL(mime_message->mime_part);
             g_ptr_array_add(partials, partial);
             if (g_mime_message_partial_get_total(partial) > 0)
                 total = g_mime_message_partial_get_total(partial);
@@ -3362,11 +3375,53 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
         g_object_unref(message);
     }
 
+    if (partials->len < total) {
+        /* Someone might have wrapped a message/partial in a
+         * message/multipart. */
+        for (msgno = libbalsa_mailbox_total_messages(mailbox); msgno > 0;
+             --msgno) {
+            LibBalsaMessage *message =
+                libbalsa_mailbox_get_message(mailbox, msgno);
+            GMimeMessage *mime_message;
+            GMimeMessagePartial *partial;
+
+            if (!message)
+                continue;
+
+            if (LIBBALSA_MESSAGE_IS_DELETED(message)
+                || !libbalsa_message_is_multipart(message)) {
+                g_object_unref(message);
+                continue;
+            }
+
+            mime_message = lbm_get_mime_msg(mailbox, message);
+            partial = NULL;
+            g_mime_multipart_foreach((GMimeMultipart *)
+                                     mime_message->mime_part,
+                                     (GMimePartFunc)
+                                     lbm_try_reassemble_func, &partial);
+            if (partial
+                && strcmp(g_mime_message_partial_get_id(partial), id) == 0) {
+                g_ptr_array_add(partials, partial);
+                if (g_mime_message_partial_get_total(partial) > 0)
+                    total = g_mime_message_partial_get_total(partial);
+                g_object_ref(partial);
+                /* We will leave  this message undeleted, as it may have
+                 * some warning content.
+                 * g_array_append_val(messages, msgno); */
+            }
+            g_object_unref(mime_message);
+            g_object_unref(message);
+        }
+    }
+
     if (partials->len == total) {
-        message = libbalsa_message_new();
+        LibBalsaMessage *message = libbalsa_message_new();
         libbalsa_message_set_msg_flags(message, LIBBALSA_MESSAGE_FLAG_NEW,
                                        0);
 
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                             _("Reconstructing message"));
         libbalsa_mailbox_lock_store(mailbox);
         message->mime_msg =
             g_mime_message_partial_reconstruct_message((GMimeMessagePartial
@@ -3398,18 +3453,16 @@ lbm_try_reassemble_idle(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
 
     ids = g_object_get_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS);
-    if (MAILBOX_OPEN(mailbox)
-        && libbalsa_mailbox_get_show(mailbox) != LB_MAILBOX_SHOW_TO)
-        for (id = ids; id; id = id->next) {
-            lbm_try_reassemble(mailbox, id->data);
-            g_free(id->data);
-        }
+    for (id = ids; id; id = id->next)
+        lbm_try_reassemble(mailbox, id->data);
 
+    g_slist_foreach(ids, (GFunc) g_free, NULL);
     g_slist_free(ids);
     g_object_set_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS, NULL);
-    g_object_unref(mailbox);
 
     libbalsa_unlock_mailbox(mailbox);
+
+    g_object_unref(mailbox);
 
     return FALSE;
 }
@@ -3418,9 +3471,12 @@ void
 libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
                                 const gchar * id)
 {
-    GSList *ids =
-        g_object_get_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS);
+    GSList *ids;
 
+    if (mailbox->no_reassemble)
+        return;
+
+    ids = g_object_get_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS);
     if (!ids) {
         g_object_ref(mailbox);
         g_idle_add((GSourceFunc) lbm_try_reassemble_idle, mailbox);

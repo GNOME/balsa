@@ -1575,7 +1575,6 @@ balsa_window_new()
     gtk_widget_show(window->vpaned);
     gtk_widget_show(window->hpaned);
     gtk_widget_show(window->notebook);
-    gtk_widget_show(window->preview);
 
     /* set the toolbar style */
     balsa_window_refresh(window);
@@ -4483,14 +4482,9 @@ balsa_window_idle_cb(BalsaWindow * window)
 
     /* If we have a message, check that the message still has a mailbox;
      * if the mailbox was closed, this test will fail. */
-    if (!window->current_message) {
-        balsa_message_set(BALSA_MESSAGE(window->preview), NULL);
-        gtk_widget_hide(window->preview);
-    } else if (window->current_message->mailbox) {
+    if (!window->current_message || window->current_message->mailbox)
 	balsa_message_set(BALSA_MESSAGE(window->preview),
                           window->current_message);
-        gtk_widget_show(window->preview);
-    }
 
     index = g_object_get_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS);
     if (index) {

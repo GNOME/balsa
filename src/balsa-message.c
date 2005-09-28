@@ -371,7 +371,6 @@ balsa_message_init(BalsaMessage * bm)
     GtkTreeSelection *selection;
 
     gtk_notebook_set_show_border(GTK_NOTEBOOK(bm), FALSE);
-    /* gtk_widget_show(GTK_WIDGET(bm)); */
 
     /* scrolled window for the contents */
     bm->scroll = scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -379,11 +378,10 @@ balsa_message_init(BalsaMessage * bm)
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
     label = gtk_label_new(_("Content"));
-    gtk_widget_show(label);
     gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
-    gtk_widget_show(scroll);
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
+    gtk_widget_show_all(scroll);
     g_signal_connect_after(bm, "style-set",
 			   G_CALLBACK(bm_on_set_style), bm);
     g_signal_connect(bm->cont_viewport, "size-allocate",
@@ -458,11 +456,9 @@ balsa_message_init(BalsaMessage * bm)
 	 (GTK_TREE_VIEW (bm->treeview), MIME_ICON_COLUMN - 1));
     
     label = gtk_label_new(_("Message parts"));
-    gtk_widget_show(label);
     gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
-    gtk_widget_show(scroll);
-    gtk_widget_show(bm->treeview);
     gtk_container_add(GTK_CONTAINER(scroll), bm->treeview);
+    gtk_widget_show_all(scroll);
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
 
     bm->current_part = NULL;
@@ -825,7 +821,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     /* find out whether the content has the keyboard focus */
     has_focus = bm_content_has_focus(bm);
 
-    gtk_widget_hide(bm->cont_viewport);
+    gtk_widget_hide(GTK_WIDGET(bm));
     select_part(bm, NULL);
     if (bm->message != NULL) {
         g_object_weak_unref(G_OBJECT(bm->message),
@@ -878,7 +874,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     display_headers(bm);
     display_content(bm);
-    gtk_widget_show(bm->cont_viewport);
+    gtk_widget_show(GTK_WIDGET(bm));
 
 #if defined(ENABLE_TOUCH_UI)
     /* hide tabs so that they do not confuse keyboard navigation.
@@ -2709,7 +2705,6 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
 
     select_part(bm, NULL);
     balsa_message_clear_tree(bm);
-    gtk_widget_show(bm->cont_viewport);
 
     g_object_ref(G_OBJECT(message));
     if (!libbalsa_message_body_ref(message, TRUE, TRUE)) {

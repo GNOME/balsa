@@ -1,5 +1,7 @@
-2005-09-27 12:07  PeterB
+2005-09-27 20:31  PeterB
 
+	* src/: balsa-message.c, main-window.c: move BalsaMessage show/hide
+	to balsa-message.c; fix a startup visual glitch.
 	* src/main-window.c: hide irrelevant scrollbar--thanks to Sebastian
 	Zerbe.
 	* libbalsa/mailbox_mbox.c: write separating newline before

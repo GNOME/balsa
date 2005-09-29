@@ -1,3 +1,10 @@
+2005-09-29 13:01  PeterB
+
+	* libbalsa/body.c, libbalsa/body.h, libbalsa/misc.c,
+	libbalsa/misc.h, src/balsa-message.c,
+	src/balsa-mime-widget-callbacks.c, src/sendmsg-window.c: fix bug
+	317240: use mode 0666 to save attachments.
+
 2005-09-28 23:06  PeterB
 
 	* doc/C/balsa.xml: update identities doc.

@@ -1,3 +1,9 @@
+2005-09-28 23:06  PeterB
+
+	* doc/C/balsa.xml: update identities doc.
+	* doc/C/balsa.xml: document per-identity SMTP server and message
+	splitting.
+
 2005-09-27 20:31  PeterB
 
 	* src/: balsa-message.c, main-window.c: move BalsaMessage show/hide

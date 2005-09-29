@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE article PUBLIC "-//OASIS/DTD DocBookXML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!-- <!ENTITY mdash ";"> ?? -->
+<!ENTITY mdash "--">
 <!-- replace with actual application  version number-->
 <!ENTITY version "2.2"> 
 <!ENTITY Balsa "<application>Balsa</application>"> 
@@ -2296,11 +2296,18 @@ This is version 2.720 of the &Balsa; manual.
 
 	<listitem><para>Corresponding password.</para></listitem>
 		
-	<listitem><para>What does the check check box mean?</para></listitem>
-
 	<listitem><para>You can select the 'delete from server' button
           to remove the downoladed messages from the
           server.</para></listitem>
+  
+	<listitem><para>You can choose to have messages filtered through
+                <application>procmail</application>.</para></listitem>
+
+        <listitem><para>The <application>procmail</application> command.
+        </para></listitem>
+
+        <listitem><para>Whether to check for new mail.</para></listitem>
+
       </itemizedlist>
     </para>
   </listitem>
@@ -2314,45 +2321,67 @@ This is version 2.720 of the &Balsa; manual.
 </varlistentry>
 
 <varlistentry>
-  <term><guilabel>Remote SMTP Server</guilabel></term>
+    <term id="smtp-server-config">
+        <guilabel>Outgoing Mail Servers</guilabel>
+    </term>
 
   <listitem>
     <para>
+      Most users will need only one outgoing mail server, but you may
+      need to use more than one. &Balsa; allows you to set up as many as
+      you need. The server used for a particular message is controlled
+      by the identity you choose for the message.
+    </para>
+    <para>
+      To view or change the details of a server, select it and click
+      <guibutton>Modify</guibutton>. To create a new server, click
+      <guibutton>Add</guibutton>.
+      A dialog will open, showing the properties of the selected server.
       Specify the domain name and optionally the port for of the SMTP
       server you use for submitting mail.  Please note that the
       default port number is 587.  The syntax is hostname[:port].
       Port can be a decimal number or the name of the service as
       specified in <filename>/etc/services</filename>.  Typically you
       can just set this to <quote>localhost:smtp</quote>.
+      &Balsa; can also break up a large message into fragments, which can
+      be reassembled by &Balsa; or any RFC 2046-compliant mailer. This
+      dialog allows you to set this option, and the size above which a
+      message should be split.
     </para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guilabel>User</guilabel></term>
-
-  <listitem>
     <para>
+        You will be asked to give:
+      <itemizedlist>
+	<listitem><para>A descriptive name that will identify the server
+        </para></listitem>
+
+	<listitem><para>The domain name and port
+	</para></listitem>
+
+	<listitem><para>The user name on the SMTP server.
       If the remote SMTP server requires authentication, enter your
       user name here.  Note that the exact format depends on the MTA
       in use.  For example, some systems expect a user name, others
       may require an email address.
-    </para>
-  </listitem>
-</varlistentry>
+        </para></listitem>
 
-<varlistentry>
-  <term><guilabel>Pass Phrase</guilabel></term>
-
-  <listitem>
-    <para>
+        <listitem><para>Corresponding pass phrase.
       If the remote SMTP server requires authentication, enter your
       pass phrase here.  Some systems refer to the pass phrase as a
       password.  Limitations on the length of the pass phrase depend
       on the SMTP server.
+        </para></listitem>
+		
+	<listitem><para>When you want &Balsa; to use TLS.</para></listitem>
+
+	<listitem><para>The TLS certificate pass phrase.</para></listitem>
+
+	<listitem><para>Whether to split large messages, and the
+                threshhold size.  </para></listitem>
+      </itemizedlist>
     </para>
   </listitem>
 </varlistentry>
+
 </variablelist>
 </sect1>
 

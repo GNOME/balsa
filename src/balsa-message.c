@@ -1383,6 +1383,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 	    /* try to save the file */
             result =
                 libbalsa_message_body_save(info->body, save_name,
+                                           LIBBALSA_MESSAGE_BODY_UNSAFE,
                                            info->body->body_type ==
                                            LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
                                            &err);

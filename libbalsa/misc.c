@@ -1746,12 +1746,12 @@ libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
 #define compare_stat(osb, nsb)  ( (osb.st_dev != nsb.st_dev || osb.st_ino != nsb.st_ino || osb.st_rdev != nsb.st_rdev) ? -1 : 0 )
 
 int 
-libbalsa_safe_open (const char *path, int flags)
+libbalsa_safe_open (const char *path, int flags, mode_t mode)
 {
   struct stat osb, nsb;
   int fd;
  
-  if ((fd = open (path, flags, 0600)) < 0)
+  if ((fd = open (path, flags, mode)) < 0)
     return fd;
  
   /* make sure the file is not symlink */

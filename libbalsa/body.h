@@ -57,6 +57,9 @@ enum _LibBalsaAttachMode {
     LIBBALSA_ATTACH_AS_EXTBODY
 };
 
+#define LIBBALSA_MESSAGE_BODY_SAFE (S_IRUSR | S_IWUSR)
+#define LIBBALSA_MESSAGE_BODY_UNSAFE \
+    (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
 struct _LibBalsaMessageBody {
     LibBalsaMessage *message;	/* The message of which this is a part */
     /* FIXME: remove buffer and buf_len to decrease memory usage. */
@@ -103,7 +106,7 @@ GdkPixbuf *libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body,
 gboolean libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
                                        gboolean filter_crlf, GError **err);
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
-                                    const gchar * filename,
+                                    const gchar * filename, mode_t mode,
                                     gboolean filter_crlf, GError **err);
 gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
                                               GError **err);

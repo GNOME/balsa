@@ -144,7 +144,7 @@ void libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex);
 gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
 			      guint * count, guint * index);
 
-int libbalsa_safe_open (const char *path, int flags);
+int libbalsa_safe_open (const char *path, int flags, mode_t mode);
 int libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout);
 int libbalsa_unlock_file (const char *path, int fd, int dot);
 int libbalsa_safe_rename (const char *src, const char *target);

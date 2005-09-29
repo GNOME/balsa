@@ -3098,7 +3098,9 @@ continueBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 		libbalsa_mktempdir(&tmp_file_name);
 		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
 		g_free(tmp_file_name);
-		res = libbalsa_message_body_save(body, name, FALSE, &err);
+		res = libbalsa_message_body_save(body, name,
+                                                 LIBBALSA_MESSAGE_BODY_SAFE,
+                                                 FALSE, &err);
 	    } else {
 		fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL);
 		res = libbalsa_message_body_save_fd(body, fd, FALSE, &err);

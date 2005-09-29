@@ -195,6 +195,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * menu_item,
 
     if (do_save)
 	if (!libbalsa_message_body_save(mime_body, filename,
+                                        LIBBALSA_MESSAGE_BODY_UNSAFE,
 					mime_body->body_type ==
 					LIBBALSA_MESSAGE_BODY_TYPE_TEXT, &err))
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,

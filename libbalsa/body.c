@@ -310,7 +310,8 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 		g_free(tmp_file_name);
 	    } else
 		body->temp_filename = tmp_file_name;
-	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT, 0600);
+	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT,
+                      LIBBALSA_MESSAGE_BODY_SAFE);
 	    if (fd >= 0)
 		return libbalsa_message_body_save_fd(body, fd, FALSE, err);
 	} while (errno == EEXIST && --count > 0);
@@ -328,6 +329,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 	    return TRUE;
 	else
 	    return libbalsa_message_body_save(body, body->temp_filename,
+                                              LIBBALSA_MESSAGE_BODY_SAFE,
                                               FALSE, err);
     }
 }
@@ -338,7 +340,8 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 */
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body,
-			   const gchar * filename, gboolean filter_crlf,
+			   const gchar * filename, mode_t mode,
+                           gboolean filter_crlf,
                            GError **err)
 {
     int fd;
@@ -348,7 +351,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
     flags |= O_NOFOLLOW;
 #endif
 
-    if ((fd=libbalsa_safe_open(filename, flags)) < 0)
+    if ((fd=libbalsa_safe_open(filename, flags, mode)) < 0)
 	return FALSE;
     return libbalsa_message_body_save_fd(body, fd, filter_crlf, err);
 }

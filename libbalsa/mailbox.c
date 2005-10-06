@@ -647,6 +647,8 @@ libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
 
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
+                         FALSE);
 
     if (libbalsa_condition_is_flag_only(search_iter->condition,
                                         mailbox, msgno, &match))

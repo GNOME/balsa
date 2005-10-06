@@ -279,6 +279,8 @@ build_match_page()
     fe_op_codes_option_menu = fe_build_option_menu(fe_op_codes,
 						ELEMENTS(fe_op_codes),
 						NULL, NULL);
+    g_signal_connect(fe_op_codes_option_menu, "changed",
+                     G_CALLBACK(fe_action_changed), NULL);
     gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu, FALSE, FALSE,
 		       2);
 
@@ -495,6 +497,8 @@ build_right_side(GtkWindow * window)
 static void
 fe_collect_user_headers(LibBalsaCondition * condition)
 {
+    g_return_if_fail(condition != NULL);
+
     switch (condition->type) {
     case CONDITION_STRING:
         if (CONDITION_CHKMATCH(condition, CONDITION_MATCH_US_HEAD)) {
@@ -559,6 +563,8 @@ filters_edit_dialog(void)
 	             G_CALLBACK(fe_destroy_window_cb), NULL);
 
     gtk_window_set_wmclass(GTK_WINDOW (fe_window), "filter-edit", "Balsa");
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(fe_window),
+                                      GTK_RESPONSE_OK, FALSE);
 
     /* main hbox */
     hbox = gtk_hbox_new(FALSE, FILTER_EDIT_PADDING);

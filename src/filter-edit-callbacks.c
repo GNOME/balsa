@@ -652,12 +652,27 @@ clear_condition_widgets()
 static void
 set_button_sensitivities(gboolean sensitive)
 {
+    GtkTreeModel *condition_model =
+        gtk_tree_view_get_model(fe_conditions_list);
+    GtkTreeSelection *filter_selection =
+        gtk_tree_view_get_selection(fe_filters_list);
+    gint n_conditions;
+    gboolean filter_selected;
+    gboolean filter_ok;
+
     gtk_widget_set_sensitive(fe_apply_button, sensitive);
     gtk_widget_set_sensitive(fe_revert_button, sensitive);
-    gtk_widget_set_sensitive(fe_new_button, !sensitive);
+
+    n_conditions = gtk_tree_model_iter_n_children(condition_model, NULL);
+    filter_selected =
+        gtk_tree_selection_get_selected(filter_selection, NULL, NULL);
+    filter_ok = !sensitive && (n_conditions > 0 || !filter_selected);
+
+    gtk_widget_set_sensitive(fe_new_button, filter_ok);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(fe_window),
-                                      GTK_RESPONSE_OK, !sensitive);
-    gtk_widget_set_sensitive(GTK_WIDGET(fe_filters_list), !sensitive);
+                                      GTK_RESPONSE_OK, filter_ok);
+    gtk_widget_set_sensitive(GTK_WIDGET(fe_filters_list), filter_ok);
+    gtk_widget_set_sensitive(fe_op_codes_option_menu, n_conditions > 1);
 }
 
 /* fill_condition_widget : Fill all widget according to condition data
@@ -1402,7 +1417,11 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
             LibBalsaFilter *fil;
 
             gtk_tree_model_get(model, &iter, 1, &fil, -1);
-            balsa_app.filters = g_slist_prepend(balsa_app.filters, fil);
+            if (fil->condition)
+                balsa_app.filters = g_slist_prepend(balsa_app.filters, fil);
+            else
+                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                     _("Filter with no condition was ignored"));
         }
 
         /* Tell the clean-up functions not to free
@@ -1700,9 +1719,6 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
         gtk_tree_selection_select_path(selection, path);
     else {
         /* ...the store is empty: */
-        /* We make the filters delete,revert,apply buttons unsensitive */
-        gtk_widget_set_sensitive(fe_delete_button,FALSE);
-        set_button_sensitivities(FALSE);
         /* We clear all widgets */
         gtk_entry_set_text(GTK_ENTRY(fe_name_entry),"");
         gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),"");
@@ -1715,8 +1731,13 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
                               (fe_conditions_list)));
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),FALSE);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button),FALSE);
+        /* We make the filters delete,revert,apply buttons unsensitive */
+        gtk_widget_set_sensitive(fe_delete_button,FALSE);
+        set_button_sensitivities(FALSE);
     }
     gtk_tree_path_free(path);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(fe_window),
+                                      GTK_RESPONSE_OK, TRUE);
 }                       /* end fe_delete_pressed() */
 
 /*
@@ -1860,6 +1881,8 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                        0, fil->name, 1, fil, -1);
     gtk_tree_selection_select_iter(selection, &iter);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(fe_window),
+                                      GTK_RESPONSE_OK, TRUE);
 }                       /* end fe_apply_pressed */
 
 
@@ -1980,6 +2003,9 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
         gtk_widget_set_sensitive(fe_op_codes_option_menu,
                                  gtk_tree_model_iter_n_children(model,
                                                                 NULL) > 1);
+    } else {
+        gtk_widget_set_sensitive(fe_condition_edit_button, FALSE);
+        gtk_widget_set_sensitive(fe_condition_delete_button, FALSE);
     }
 
     /* We set the filters delete,revert,apply buttons sensitivity */

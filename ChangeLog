@@ -1,3 +1,10 @@
+2005-10-06 19:22  PeterB
+
+	* libbalsa/mailbox.c: sanity check.
+	* src/: filter-edit-callbacks.c, filter-edit-dialog.c: fix various
+	sensitivity problems, including one that blocked deleting the last
+	filter.
+
 2005-09-29 13:01  PeterB
 
 	* libbalsa/body.c, libbalsa/body.h, libbalsa/misc.c,

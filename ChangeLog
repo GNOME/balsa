@@ -1,3 +1,9 @@
+2005-10-07 11:25  PeterB
+
+	* libbalsa/libbalsa-conf.c: fix bug 318171.
+	* src/: filter-edit-callbacks.c, save-restore.c: improve language,
+	per Craig Routledge.
+
 2005-10-06 19:22  PeterB
 
 	* libbalsa/mailbox.c: sanity check.

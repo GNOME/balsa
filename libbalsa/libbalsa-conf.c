@@ -147,13 +147,12 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     if (!conf->path)
         conf->path =
             g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
-    if (stat(conf->path, &buf) < 0)
-        return;
-    if (!conf->key_file)
+    if (conf->key_file) {
+        if (stat(conf->path, &buf) < 0 || buf.st_mtime <= conf->mtime)
+            return;
+        conf->mtime = buf.st_mtime;
+    } else
         conf->key_file = g_key_file_new();
-    else if (buf.st_mtime <= conf->mtime)
-        return;
-    conf->mtime = buf.st_mtime;
 
 #if !GLIB_CHECK_VERSION(2, 7, 0)
     conf->new_path = g_strconcat(conf->path, ".new", NULL);

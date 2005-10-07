@@ -1841,7 +1841,7 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
     }
     if (!fil->condition) {
         g_idle_add((GSourceFunc) config_warning_idle,
-                   _("Filter with no condition was ignored"));
+                   _("Filter with no condition was omitted"));
         libbalsa_filter_free(fil, GINT_TO_POINTER(FALSE));
     } else {
         FILTER_SETFLAG(fil, FILTER_VALID);

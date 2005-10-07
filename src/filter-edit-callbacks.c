@@ -1421,7 +1421,7 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
                 balsa_app.filters = g_slist_prepend(balsa_app.filters, fil);
             else
                 libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                     _("Filter with no condition was ignored"));
+                                     _("Filter with no condition was omitted"));
         }
 
         /* Tell the clean-up functions not to free

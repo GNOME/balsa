@@ -84,7 +84,7 @@ imap_auth_login(ImapMboxHandle* handle)
                     "LOGIN", &user, &pass, &ok);
   if(!ok || user == NULL || pass == NULL) {
     imap_mbox_handle_set_msg(handle, "Authentication cancelled");
-    return IMAP_AUTH_FAILURE;
+    return IMAP_AUTH_CANCELLED;
   }
 
   imap_quote_string(q_user, sizeof (q_user), user);

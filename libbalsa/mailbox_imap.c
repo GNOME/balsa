@@ -2499,11 +2499,17 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     len = g_mime_stream_tell(outstream);
     g_mime_stream_reset(outstream);
 
+    handle = libbalsa_mailbox_imap_get_handle(mimap, err);
+    if(!handle)
+        /* Perhaps the mailbox was closed and the authentication
+           failed or was cancelled? err is set already, we just
+           return. */
+        return -1;
+
     if(len>(signed)SizeMsgThreshold)
         libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
                              _("Uploading %ld kB"),
                              (long)len/1024);
-    handle = libbalsa_mailbox_imap_get_handle(mimap, NULL);
     rc = imap_mbox_append_stream(handle, mimap->path,
 				 imap_flags, outstream, len);
     if(rc != IMR_OK) {

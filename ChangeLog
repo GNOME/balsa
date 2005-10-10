@@ -1,3 +1,13 @@
+2005-10-10 Pawel Salek
+
+	* libbalsa/imap-server.c: distinguish between failed and cancelled
+	authentication.
+	* libbalsa/libbalsa.h: add cancelled authentication error code.
+	* libbalsa/mailbox_imap.c: handle better errors in ::add_message.
+	* libbalsa/imap/imap-auth.c, auth-{cram,gssapi}.c: cancelled vs failed.
+	* libbalsa/imap/libimap.h: add apriopriate error code.
+	* src/balsa-index.c: do not retry if the authentication was cancelled.
+
 2005-10-07 11:25  PeterB
 
 	* libbalsa/libbalsa-conf.c: fix bug 318171.

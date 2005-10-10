@@ -499,17 +499,24 @@ handle_connection_error(int rc, struct handle_info *info,
                         LibBalsaServer *server, GError **err)
 {
     gchar *msg = imap_mbox_handle_get_last_msg(info->handle);
-    if(rc == IMAP_AUTH_FAILURE)
-        libbalsa_server_set_password(server, NULL);
-    if(rc != IMAP_CONNECT_FAILED) {
-        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_AUTH_ERROR,
-                    _("Cannot connect to the server: %s"), msg);
-    } else
+    switch(rc) {
+    case IMAP_AUTH_FAILURE:
+        libbalsa_server_set_password(server, NULL); break;
+    case IMAP_CONNECT_FAILED:
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_NETWORK_ERROR,
                     _("Cannot connect to the server"));
-    
+        break;
+    case IMAP_AUTH_CANCELLED:
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_AUTH_CANCELLED,
+                    _("Cannot connect to the server: %s"), msg);
+        break;
+    default:
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_AUTH_ERROR,
+                    _("Cannot connect to the server: %s"), msg);
+    }    
     g_free(msg);
     lb_imap_server_info_free(info);
 }

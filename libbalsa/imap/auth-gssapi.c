@@ -106,7 +106,7 @@ imap_auth_gssapi(ImapMboxHandle* handle)
                         "GASSAPI", &user, &ok);
     if(!ok || user == NULL) {
         imap_mbox_handle_set_msg(handle, "Authentication cancelled");
-        return IMAP_AUTH_FAILURE;
+        return IMAP_AUTH_CANCELLED;
     }
     
     /* start the negotiation */

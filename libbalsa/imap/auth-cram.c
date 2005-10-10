@@ -60,7 +60,7 @@ imap_auth_cram(ImapMboxHandle* handle)
                     "CRAM-MD5", &user, &pass, &ok);
   if(!ok || user == NULL || pass == NULL) {
     imap_mbox_handle_set_msg(handle, "Authentication cancelled");
-    return IMAP_AUTH_FAILURE;
+    return IMAP_AUTH_CANCELLED;
   }
 
   /* start the interaction */

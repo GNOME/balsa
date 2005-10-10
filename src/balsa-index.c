@@ -992,8 +992,9 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
         gdk_threads_enter();
         if (!balsa_app.main_window)
             return FALSE;
-        if(successp &&
-           !(*err && (*err)->code == LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR))
+
+        if(successp) break;
+        if(*err && (*err)->code != LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR)
             break;
         balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
     } while(try_cnt++<3);

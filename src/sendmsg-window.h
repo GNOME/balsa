@@ -86,6 +86,7 @@ extern "C" {
         gulong changed_sig_id;
         gulong delete_range_sig_id;
         guint wrap_timeout_id;
+        guint autosave_timeout_id;
         gulong identities_changed_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 

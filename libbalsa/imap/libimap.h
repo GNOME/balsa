@@ -37,6 +37,7 @@ typedef enum {
   IMAP_CONNECT_FAILED, /* transport level connect failed */
   IMAP_PROTOCOL_ERROR, /* usually unexpected server response */
   IMAP_AUTH_FAILURE, /* authentication failure */
+  IMAP_AUTH_CANCELLED, /* authentication cancelled, do not retry */
   IMAP_AUTH_UNAVAIL, /* no supported authentication method available */
   IMAP_UNSECURE,     /* secure connection was requested but could not
                       * be established. */

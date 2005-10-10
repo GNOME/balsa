@@ -949,6 +949,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
         gtk_widget_destroy(bsmsg->spell_checker);
     if (bsmsg->wrap_timeout_id)
         g_source_remove(bsmsg->wrap_timeout_id);
+    if (bsmsg->autosave_timeout_id)
+        g_source_remove(bsmsg->autosave_timeout_id);
 
     g_object_unref(bsmsg->buffer2);
 
@@ -3461,6 +3463,18 @@ sw_wrap_timeout_cb(BalsaSendmsg * bsmsg)
     return FALSE;
 }
 
+static gboolean
+sw_autosave_timeout_cb(BalsaSendmsg * bsmsg)
+{
+    if(bsmsg->modified) {
+        gdk_threads_enter();
+        save_message_cb(NULL, bsmsg);
+        bsmsg->modified = FALSE;
+        gdk_threads_leave();
+    }
+    return TRUE; /* do repeat it */
+}
+
 static void
 text_changed(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
@@ -3836,6 +3850,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
 #endif
     bsmsg->wrap_timeout_id = 0;
+    bsmsg->autosave_timeout_id = /* autosave every 5 minutes */
+        g_timeout_add(1000*60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);
 
     if (message) {
         /* ref message so we don't lose it even if it is deleted */
@@ -5297,7 +5313,7 @@ spell_check_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
                      G_CALLBACK(sw_spell_check_response), bsmsg);
     gtk_text_view_set_editable(text_view, FALSE);
 
-    balsa_spell_check_start(sc);
+    balsa_spell_check_start(sc, GTK_WINDOW(bsmsg->window));
 }
 
 static void

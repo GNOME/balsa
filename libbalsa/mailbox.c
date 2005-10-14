@@ -1040,9 +1040,13 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
     lbm_msgno_changed(mailbox, seqno, &iter);
 
     /* Parents' style may need to be changed also. */
-    while ((iter.user_data = ((GNode *) iter.user_data)->parent))
-        if ((seqno = GPOINTER_TO_UINT(((GNode *) iter.user_data)->data)))
+    while (iter.user_data) {
+        GNode *parent = ((GNode *) iter.user_data)->parent;
+
+        iter.user_data = parent;
+        if (parent && (seqno = GPOINTER_TO_UINT(parent->data)) > 0)
             lbm_msgno_changed(mailbox, seqno, &iter);
+    }
 
     lbm_threads_leave(mailbox);
 }

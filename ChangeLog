@@ -1,3 +1,7 @@
+2005-10-14 06:53  PeterB
+
+	* libbalsa/mailbox.c: check for NULL user-data.
+
 2005-10-10 Pawel Salek
 
 	* libbalsa/imap-server.c: distinguish between failed and cancelled

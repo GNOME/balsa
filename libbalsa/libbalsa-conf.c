@@ -352,6 +352,7 @@ libbalsa_conf_get_bool_with_default_(const char *path, gboolean * def,
     retval =
         g_key_file_get_boolean(LBC_KEY_FILE(priv), lbc_groups->data, key,
                                &error);
+    g_free(key);
     if (error) {
         g_error_free(error);
         if (defval)
@@ -377,6 +378,7 @@ libbalsa_conf_get_int_with_default_(const char *path,
     retval =
         g_key_file_get_integer(LBC_KEY_FILE(priv), lbc_groups->data, key,
                                &error);
+    g_free(key);
     if (error) {
         g_error_free(error);
         if (defval)
@@ -419,11 +421,11 @@ libbalsa_conf_get_string_with_default_(const char *path, gboolean * def,
     retval =
         g_key_file_get_string(LBC_KEY_FILE(priv), lbc_groups->data, key,
                               &error);
+    g_free(key);
     if (error) {
         g_error_free(error);
         retval = g_strdup(defval);
     }
-    g_free(key);
 
     if (def)
         *def = error != NULL;

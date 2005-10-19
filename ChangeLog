@@ -1,6 +1,7 @@
 2005-10-19 Pawel Salek
 
 	* libbalsa/imap/imap-tls.c: be compatible with openssl-0.9.8.
+	* libbalsa/libbalsa-conf.c: fix memory leaks.
 
 2005-10-14 06:53  PeterB
 

@@ -252,24 +252,36 @@ imap_check_server_identity(SSL *ssl, const char *host,
   ok = 0;
   extcount = X509_get_ext_count(cert);
   for(i=0; i<extcount; i++) {
-    const char *extstr;
+    const unsigned char *extstr;
     X509_EXTENSION *ext = X509_get_ext(cert, i);
 
     extstr = OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
 
     if(strcmp(extstr, "subjectAltName") == 0) {
+#if (OPENSSL_VERSION_NUMBER > 0x00908000L)
+      const unsigned char *data;
+#else
       unsigned char *data;
+#endif
       STACK_OF(CONF_VALUE) *val;
       CONF_VALUE           *nval;
       X509V3_EXT_METHOD    *meth;
+      void *ext_str = NULL;
 
       if( !(meth = X509V3_EXT_get(ext)) )
         break;
       data = ext->value->data;
 
-      val = meth->i2v(meth,
-                      meth->d2i(NULL, &data, ext->value->length),
-                      NULL);
+#if (OPENSSL_VERSION_NUMBER > 0x00907000L)
+      if (meth->it)
+        ext_str = ASN1_item_d2i (NULL, &data, ext->value->length,
+                                 ASN1_ITEM_ptr (meth->it));
+      else
+        ext_str = meth->d2i (NULL, &data, ext->value->length);
+#else
+      ext_str = meth->d2i(NULL, &data, ext->value->length);
+#endif
+      val = meth->i2v(meth, ext_str, NULL);
 
       stack_len = sk_CONF_VALUE_num(val);
       for(j=0; j<stack_len; j++) {

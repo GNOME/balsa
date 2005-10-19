@@ -252,7 +252,7 @@ imap_check_server_identity(SSL *ssl, const char *host,
   ok = 0;
   extcount = X509_get_ext_count(cert);
   for(i=0; i<extcount; i++) {
-    const unsigned char *extstr;
+    const char *extstr;
     X509_EXTENSION *ext = X509_get_ext(cert, i);
 
     extstr = OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));

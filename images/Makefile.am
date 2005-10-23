@@ -16,10 +16,11 @@ balsabitmapsdir = $(BALSA_DATA_PREFIX)/pixmaps
 
 balsabitmaps_DATA = $(balsa_IMGS)
 
-# the call to $(GTK_UPDATE_ICON_CACHE) updates the icon cache for the icons
-# installed in $(SUBDIRS) (Gtk+-2.6)
-install-data-hook:
-	if test -x "$(GTK_UPDATE_ICON_CACHE)" ; then                    \
-		$(GTK_UPDATE_ICON_CACHE) $(DESTDIR)$(BALSA_DATA_PREFIX)/hicolor ; \
-		$(GTK_UPDATE_ICON_CACHE) $(DESTDIR)$(HICOLOR_ICON_DIR) ;          \
-	fi
+# the call to $(GTK_UPDATE_ICON_CACHE) updates the icon cache for the
+# icons installed in $(SUBDIRS) (Gtk+-2.6) but this breaks lots of
+# stuff: user builds, package creations, so we disable it for now.
+#install-data-hook:
+#	if test -x "$(GTK_UPDATE_ICON_CACHE)" ; then                    \
+#		$(GTK_UPDATE_ICON_CACHE) $(DESTDIR)$(BALSA_DATA_PREFIX)/hicolor ; \
+#		$(GTK_UPDATE_ICON_CACHE) $(DESTDIR)$(HICOLOR_ICON_DIR) ;          \
+#	fi

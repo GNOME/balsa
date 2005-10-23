@@ -1,3 +1,7 @@
+2005-10-23 Pawel Salek
+
+	* NEWS, configure.in: release 2.3.6
+
 2005-10-19 Pawel Salek
 
 	* libbalsa/imap/imap-tls.c: be compatible with openssl-0.9.8.

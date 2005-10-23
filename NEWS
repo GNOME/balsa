@@ -1,3 +1,8 @@
+* Balsa-2.3.6 release. Release date 2005-09-23
+
+- improved support for splitting messages.
+- fix bugs 318171, 317240.
+
 * Balsa-2.3.5 release. Release date 2005-09-20
 
 - improve error handling.

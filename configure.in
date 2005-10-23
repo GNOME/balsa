@@ -12,7 +12,7 @@ dnl ###########################################################################
 SCROLLKEEPER_REQUIRED=0.1.4
 BALSA_MAJOR=2
 BALSA_REVISION=3
-BALSA_PATCHLEVEL=5
+BALSA_PATCHLEVEL=6
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
@@ -593,7 +593,9 @@ dnl ###########################################################################
 
 HICOLOR_ICON_DIR=`$PKG_CONFIG --variable=prefix gtk+-2.0`/share/icons/hicolor
 AC_SUBST(HICOLOR_ICON_DIR)
-AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
+dnl however, we do not mess with the icon caches - it messes up more
+dnl things that it fixes, for eg. user installs, package builds etc.
+dnl AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
 
 dnl #####################################################################
 dnl 8. Output

@@ -550,7 +550,7 @@ config_mailbox_init(const gchar * prefix)
 	    special = &balsa_app.draftbox;
 	else if (strcmp(TRASH_NAME, key) == 0) {
 	    special = &balsa_app.trash;
-            libbalsa_filters_set_trash(balsa_app.trash);
+            libbalsa_filters_set_trash(mailbox);
 	}
 
 	if (special) {

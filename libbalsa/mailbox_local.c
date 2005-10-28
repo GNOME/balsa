@@ -367,10 +367,10 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
 	/* Free the memory owned by local->threading_info, but neither
 	 * free nor truncate the array. */
 	guint i;
-	for (i = 0; i < local->threading_info->len; i++)
+	for (i = local->threading_info->len; i > 0; )
 	    lbm_local_free_info(&g_array_index(local->threading_info,
 					       LibBalsaMailboxLocalInfo,
-					       i));
+					       --i));
     }
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)

@@ -65,7 +65,8 @@ extern "C" {
 	GtkWidget *text;
 	GtkWidget *spell_checker;
 	GtkWidget *notebook;
-	LibBalsaMessage *orig_message;
+	LibBalsaMessage *parent_message; /* to which we're replying     */
+	LibBalsaMessage *draft_message;  /* where the message was saved */
 	SendType type;
 	/* language selection related data */
 	gchar *charset;

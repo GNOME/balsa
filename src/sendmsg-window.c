@@ -925,12 +925,20 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
                                 bsmsg->identities_changed_id);
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy()_handler: Start.");
 
-    if (bsmsg->orig_message) {
-	if (bsmsg->orig_message->mailbox)
-	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox,
+    if (bsmsg->parent_message) {
+	if (bsmsg->parent_message->mailbox)
+	    libbalsa_mailbox_close(bsmsg->parent_message->mailbox,
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
-	g_object_unref(G_OBJECT(bsmsg->orig_message));
+	g_object_unref(G_OBJECT(bsmsg->parent_message));
+    }
+
+    if (bsmsg->draft_message) {
+	if (bsmsg->draft_message->mailbox)
+	    libbalsa_mailbox_close(bsmsg->draft_message->mailbox,
+		    /* Respect pref setting: */
+				   balsa_app.expunge_on_close);
+	g_object_unref(G_OBJECT(bsmsg->draft_message));
     }
 
     if (balsa_app.debug)
@@ -1357,8 +1365,10 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 				  bsmsg->type == SEND_REPLY_GROUP)) ||
 	       ((fwdlen == 0) && (bsmsg->type == SEND_FORWARD_ATTACH ||
 				  bsmsg->type == SEND_FORWARD_INLINE))) {
-	set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), bsmsg->orig_message,
-			     bsmsg->type, ident);
+        set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]),
+                             bsmsg->parent_message ?
+                             bsmsg->parent_message : bsmsg->draft_message,
+                             bsmsg->type, ident);
     }
 
     /* -----------------------------------------------------------
@@ -2746,10 +2756,10 @@ create_info_pane(BalsaSendmsg * bsmsg, SendType type)
         balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
         balsa_app.fcc_mru = g_list_reverse(balsa_app.fcc_mru);
     }
-    if (type == SEND_CONTINUE && bsmsg->orig_message->headers &&
-	bsmsg->orig_message->headers->fcc_url)
+    if (bsmsg->draft_message && bsmsg->draft_message->headers &&
+	bsmsg->draft_message->headers->fcc_url)
         balsa_mblist_mru_add(&balsa_app.fcc_mru,
-                             bsmsg->orig_message->headers->fcc_url);
+                             bsmsg->draft_message->headers->fcc_url);
     bsmsg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
@@ -3523,7 +3533,10 @@ static gboolean
 set_identity_from_mailbox(BalsaSendmsg* bsmsg)
 {
     const gchar *identity;
-    LibBalsaMessage *message = bsmsg->orig_message;
+    LibBalsaMessage *message =
+        bsmsg->parent_message ?
+        bsmsg->parent_message : bsmsg->draft_message;
+
     LibBalsaIdentity* ident;
     GList *ilist;
 
@@ -3554,7 +3567,9 @@ set_identity_from_mailbox(BalsaSendmsg* bsmsg)
 static gboolean
 guess_identity(BalsaSendmsg* bsmsg)
 {
-    LibBalsaMessage *message = bsmsg->orig_message;
+    LibBalsaMessage *message =
+        bsmsg->parent_message ?
+        bsmsg->parent_message : bsmsg->draft_message;
     const gchar *address_string;
     GList *ilist;
     LibBalsaIdentity *ident;
@@ -3831,7 +3846,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->ident = balsa_app.current_ident;
     bsmsg->update_config = FALSE;
     bsmsg->quit_on_close = FALSE;
-    bsmsg->orig_message = message;
+    if (type == SEND_CONTINUE) {
+        bsmsg->draft_message = message;
+        bsmsg->parent_message = NULL;
+    } else {
+        bsmsg->parent_message = message;
+        bsmsg->draft_message = NULL;
+    }
 
     bsmsg->window = window = gnome_app_new("balsa", NULL);
     /*
@@ -3866,7 +3887,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
             if (message->headers && message->headers->from) {
                 gchar recvtime[50];
 
-                ctime_r(&bsmsg->orig_message->headers->date, recvtime);
+                ctime_r(&message->headers->date, recvtime);
                 if (recvtime[0]) /* safety check; remove trailing '\n' */
                     recvtime[strlen(recvtime)-1] = '\0';
                 bsmsg->in_reply_to =
@@ -4459,6 +4480,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     const gchar *ctmp;
 #endif
     LibBalsaIdentity *ident = bsmsg->ident;
+    GList *refs;
 
     message = libbalsa_message_new();
 
@@ -4491,34 +4513,36 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     if (bsmsg->req_dispnotify)
 	libbalsa_message_set_dispnotify(message, ident->ia);
 
-    if (bsmsg->orig_message != NULL) {
-        GList *refs = NULL;
+    refs = NULL;
+    if (bsmsg->parent_message) {
+        GList *in_reply_to;
 
-        for (list = bsmsg->orig_message->references; list;
+        for (list = bsmsg->parent_message->references; list;
              list = list->next)
             refs = g_list_prepend(refs, g_strdup(list->data));
 
-        if (bsmsg->type != SEND_CONTINUE) {
-            /* We're replying to orig_message, so construct the
-             * references according to RFC 2822. */
-            GList *in_reply_to;
+        /* We're replying to parent_message, so construct the
+         * references according to RFC 2822. */
 
-            if (!refs
-                    /* Parent message has no References header... */
-                && (in_reply_to = bsmsg->orig_message->in_reply_to)
-                && !in_reply_to->next)
-                /* ...but it has an In-Reply-To header with a single
-                 * message identifier. */
-                refs = g_list_prepend(refs, g_strdup(in_reply_to->data));
+        if (!refs
+                /* Parent message has no References header... */
+            && (in_reply_to = bsmsg->parent_message->in_reply_to)
+            && !in_reply_to->next)
+            /* ...but it has an In-Reply-To header with a single
+             * message identifier. */
+            refs = g_list_prepend(refs, g_strdup(in_reply_to->data));
     
-            if (bsmsg->orig_message->message_id)
-                refs = g_list_prepend(refs,
-                                      g_strdup(bsmsg->orig_message->
-                                               message_id));
-        }
-
-        message->references = g_list_reverse(refs);
+        if (bsmsg->parent_message->message_id)
+            refs =
+                g_list_prepend(refs,
+                               g_strdup(bsmsg->parent_message->message_id));
+    } else if (bsmsg->draft_message) {
+        for (list = bsmsg->draft_message->references; list;
+             list = list->next)
+            refs = g_list_prepend(refs, g_strdup(list->data));
     }
+    message->references = g_list_reverse(refs);
+
     if (bsmsg->in_reply_to)
         message->in_reply_to =
             g_list_prepend(NULL, g_strdup(bsmsg->in_reply_to));
@@ -4694,14 +4718,13 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                                        balsa_find_sentbox_by_url,
 				       bsmsg->flow, balsa_app.debug); 
 #endif
-    if (result == LIBBALSA_MESSAGE_CREATE_OK && bsmsg->orig_message
-        && bsmsg->orig_message->mailbox
-	&& !bsmsg->orig_message->mailbox->readonly) {
-	if (bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
-	    bsmsg->type == SEND_REPLY_GROUP) {
-	    libbalsa_message_reply(bsmsg->orig_message);
-	} else if (bsmsg->type == SEND_CONTINUE) {
-	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
+    if (result == LIBBALSA_MESSAGE_CREATE_OK) {
+	if (bsmsg->parent_message && bsmsg->parent_message->mailbox
+            && !bsmsg->parent_message->mailbox->readonly)
+	    libbalsa_message_reply(bsmsg->parent_message);
+	if (bsmsg->draft_message && bsmsg->draft_message->mailbox
+            && !bsmsg->draft_message->mailbox->readonly) {
+	    GList * messages = g_list_prepend(NULL, bsmsg->draft_message);
 
 	    libbalsa_messages_change_flag(messages,
                                           LIBBALSA_MESSAGE_FLAG_DELETED,
@@ -4771,7 +4794,7 @@ message_postpone(BalsaSendmsg * bsmsg)
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
         bsmsg->type == SEND_REPLY_GROUP))
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
-                                             bsmsg->orig_message,
+                                             bsmsg->parent_message,
                                              bsmsg->fcc_url,
                                              bsmsg->flow);
     else
@@ -4780,10 +4803,10 @@ message_postpone(BalsaSendmsg * bsmsg)
                                              bsmsg->fcc_url,
                                              bsmsg->flow);
     if(successp) {
-	if (bsmsg->type == SEND_CONTINUE && bsmsg->orig_message
-	    && bsmsg->orig_message->mailbox
-	    && !bsmsg->orig_message->mailbox->readonly) {
-	    GList * messages = g_list_prepend(NULL, bsmsg->orig_message);
+	if (bsmsg->draft_message
+	    && bsmsg->draft_message->mailbox
+	    && !bsmsg->draft_message->mailbox->readonly) {
+	    GList * messages = g_list_prepend(NULL, bsmsg->draft_message);
 
 	    libbalsa_messages_change_flag(messages,
                                           LIBBALSA_MESSAGE_FLAG_DELETED,
@@ -4829,17 +4852,16 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	return;
     }
 
-    if (bsmsg->orig_message) {
-	if (bsmsg->orig_message->mailbox)
-	    libbalsa_mailbox_close(bsmsg->orig_message->mailbox,
+    if (bsmsg->draft_message) {
+	if (bsmsg->draft_message->mailbox)
+	    libbalsa_mailbox_close(bsmsg->draft_message->mailbox,
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
-	g_object_unref(G_OBJECT(bsmsg->orig_message));
+	g_object_unref(G_OBJECT(bsmsg->draft_message));
     }
-    bsmsg->type = SEND_CONTINUE;
     bsmsg->modified = FALSE;
 
-    bsmsg->orig_message =
+    bsmsg->draft_message =
 	libbalsa_mailbox_get_message(balsa_app.draftbox,
 				     libbalsa_mailbox_total_messages
 				     (balsa_app.draftbox));
@@ -5376,7 +5398,9 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
 static void
 set_list_post_address(BalsaSendmsg * bsmsg)
 {
-    LibBalsaMessage *message = bsmsg->orig_message;
+    LibBalsaMessage *message =
+        bsmsg->parent_message ?
+        bsmsg->parent_message : bsmsg->draft_message;
     InternetAddressList *mailing_list_address;
     GList *p;
 

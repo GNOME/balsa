@@ -1,3 +1,8 @@
+2005-10-28 Pawel Salek
+
+	* libbalsa/mailbox_imap.c: fix unread msg counts on concurrent mbox
+	access.
+
 2005-10-28 06:37  PeterB
 
 	* src/: sendmsg-window.c, sendmsg-window.h: use separate members

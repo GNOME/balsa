@@ -1,3 +1,12 @@
+2005-10-28 06:37  PeterB
+
+	* src/: sendmsg-window.c, sendmsg-window.h: use separate members
+	for the message we're replying to, and the draft message we saved.
+	* libbalsa/mailbox_local.c: reverse a loop.
+	* libbalsa/mailbox_mbox.c: look for appended messages in the
+	correct place; always save the from-offset as the start of the
+	message.
+
 2005-10-27 17:56  PeterB
 
 	* src/save-restore.c: set filters-trash-mbox.

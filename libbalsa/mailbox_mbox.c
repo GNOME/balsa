@@ -621,6 +621,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     GMimeStream *mbox_stream;
     guint msgno;
     time_t mtime;
+    off_t start;
 
     g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
@@ -672,18 +673,27 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
      * parse_mailbox assumes that the stream is positioned at the first
      * message to be parsed.
      */
+
     libbalsa_mime_stream_shared_lock(mbox_stream);
+
+    /* If Balsa appended a message, it was prefixed with "\nFrom ", so
+     * we first check one byte beyond the end of the last message: */
+    start = mbox->size + 1;
+
     while ((msgno = mbox->messages_info->len) > 0) {
 	off_t offset;
-        struct message_info *msg_info =
-            &g_array_index(mbox->messages_info, struct message_info,
-                           msgno - 1);
-        if (lbm_mbox_stream_seek_to_message(mbox_stream, msg_info->end))
-	    /* A message begins at the end of this one, so it must(?) be
-	     * in its original position--start parsing here. */
+        struct message_info *msg_info;
+
+        if (lbm_mbox_stream_seek_to_message(mbox_stream, start))
+	    /* A message begins here, so it must(?) be
+	     * the first new message--start parsing here. */
             break;
 
 	/* Back up over this message and try again. */
+        msg_info = &g_array_index(mbox->messages_info, struct message_info,
+                                  msgno - 1);
+        start = msg_info->start;
+
         if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
             && !(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
             --mailbox->unread_messages;
@@ -1294,9 +1304,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    msg_info->message->msgno = j + 1;
 	j++;
 
-	msg_info->start = g_mime_parser_tell(gmime_parser);
 	msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
 	mime_msg = g_mime_parser_construct_message(gmime_parser);
+        msg_info->start = g_mime_parser_get_from_offset(gmime_parser);
 
 	/* Make sure we don't have offsets for any encapsulated headers. */
 	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "Status"))

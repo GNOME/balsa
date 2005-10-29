@@ -1034,7 +1034,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     gdk_threads_leave();
     libbalsa_mailbox_set_view_filter(mailbox,
                                      balsa_window_get_view_filter
-                                     (balsa_app.main_window), FALSE);
+                                     (balsa_app.main_window, TRUE), FALSE);
     libbalsa_mailbox_set_threading(mailbox,
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));

@@ -1,5 +1,10 @@
 2005-10-29 Pawel Salek
 
+	* src/main-window.[ch]: iron out problems with the last patch
+	* src/balsa-index.c:    and switching between different mboxes.
+
+2005-10-29 Pawel Salek
+
 	* libbalsa/mailbox_imap.c: last commit could trigger recursive
 	searches under certain circumstances. Do it differently.
 	* libbalsa/mailbox.c: more information about move errors.

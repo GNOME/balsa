@@ -1675,11 +1675,15 @@ libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(msgnos->len > 0, TRUE);
 
     libbalsa_lock_mailbox(mailbox);
-    if (libbalsa_mailbox_messages_copy(mailbox, msgnos, dest, err))
+    if (libbalsa_mailbox_messages_copy(mailbox, msgnos, dest, err)) {
         retval = libbalsa_mailbox_messages_change_flags
             (mailbox, msgnos, LIBBALSA_MESSAGE_FLAG_DELETED,
              (LibBalsaMessageFlag) 0);
-    else
+	if(!retval)
+	    g_set_error(err,LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_COPY_ERROR,
+			_("Removing messages from source mailbox failed"));
+    } else
         retval = FALSE;
     libbalsa_unlock_mailbox(mailbox);
 

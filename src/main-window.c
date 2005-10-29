@@ -1375,9 +1375,12 @@ bw_filter_entry_activate(GtkWidget *entry, GtkWidget *button)
     GtkWidget *bindex = balsa_window_find_current_index(bw);
 
     if(bindex) {
-        balsa_index_set_sos_filter(BALSA_INDEX(bindex),
-                                   gtk_entry_get_text(GTK_ENTRY(entry)),
-                                   balsa_window_get_view_filter(bw));
+        int filter_no =
+            gtk_combo_box_get_active(GTK_COMBO_BOX(bw->filter_choice));
+        balsa_index_set_view_filter(BALSA_INDEX(bindex),
+                                    filter_no,
+                                    gtk_entry_get_text(GTK_ENTRY(entry)),
+                                    balsa_window_get_view_filter(bw));
         gtk_widget_set_sensitive(button, FALSE);
     }
 }
@@ -1387,19 +1390,82 @@ bw_filter_entry_changed(GtkWidget *entry, GtkWidget *button)
 {
     gtk_widget_set_sensitive(button, TRUE);
 }
+/* FIXME: there should be a more compact way of creating condition
+   trees than via calling special routines... */
+static LibBalsaCondition *filter_sos(const char *str)
+{
+    return libbalsa_condition_new_bool_ptr
+        (FALSE, CONDITION_OR,
+         libbalsa_condition_new_string
+         (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(str), NULL),
+         libbalsa_condition_new_string
+         (FALSE, CONDITION_MATCH_FROM,    g_strdup(str), NULL));
+}
+static LibBalsaCondition *filter_sor(const char *str)
+{
+    return libbalsa_condition_new_bool_ptr
+        (FALSE, CONDITION_OR,
+         libbalsa_condition_new_string
+         (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(str), NULL),
+         libbalsa_condition_new_string
+         (FALSE, CONDITION_MATCH_TO,      g_strdup(str), NULL));
+}
+static LibBalsaCondition *filter_s(const char *str)
+{
+    return libbalsa_condition_new_string
+        (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(str), NULL);
+}
+static LibBalsaCondition *filter_body(const char *str)
+{
+    return libbalsa_condition_new_string
+        (FALSE, CONDITION_MATCH_BODY, g_strdup(str), NULL);
+}
+
+static LibBalsaCondition *filter_old(const char *str)
+{
+    int days = atoi(str);
+    if(sscanf(str, "%d", &days) == 1) {
+        time_t upperbound = time(NULL)-(days-1)*24*3600;
+        return libbalsa_condition_new_date(FALSE, NULL, &upperbound);
+    } else return NULL;
+}
+
+static struct {
+    char *str;
+    LibBalsaCondition *(*filter)(const char *str);
+} view_filters[] = {
+    { N_("Subject or Sender Contains:"),    filter_sos  },
+    { N_("Subject or Recipient Contains:"), filter_sor  },
+    { N_("Subject Contains:"),              filter_s    },
+    { N_("Body Contains:"),                 filter_body },
+    { N_("Older than (days):"),             filter_old  }
+};
+static gboolean view_filters_translated = FALSE;
 
 static GtkWidget*
 bw_create_index_widget(BalsaWindow *bw)
 {
     GtkWidget *vbox, *button;
     GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(hbox),
-                       bw->filter_label = gtk_label_new_with_mnemonic
-                       (_("Subject or Sender _Contains:")),
+    unsigned i;
+
+    if(!view_filters_translated) {
+        for(i=0; i<ELEMENTS(view_filters); i++)
+            view_filters[i].str = _(view_filters[i].str);
+        view_filters_translated = TRUE;
+    }
+
+    bw->filter_choice = gtk_combo_box_new_text();
+    gtk_box_pack_start(GTK_BOX(hbox), bw->filter_choice,
                        FALSE, FALSE, 0);
-    gtk_widget_show(bw->filter_label);
+    for(i=0; i<ELEMENTS(view_filters); i++)
+        gtk_combo_box_insert_text(GTK_COMBO_BOX(bw->filter_choice),
+                                  i, view_filters[i].str);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);
+    gtk_widget_show(bw->filter_choice);
     bw->sos_entry = gtk_entry_new();
-    gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_label), bw->sos_entry);
+    /* gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_choice),
+       bw->sos_entry); */
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_in_event",
                      G_CALLBACK(bw_enable_filter), bw);
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
@@ -4091,7 +4157,7 @@ balsa_window_get_view_filter(BalsaWindow *window)
         { LIBBALSA_MESSAGE_FLAG_REPLIED, -1, 0 }
     };
     unsigned i, j;
-    LibBalsaCondition *filter;
+    LibBalsaCondition *filter, *flag_filter;
     
     for(i=0; i<ELEMENTS(match_flags); i++)
         match_flags[i].setby = -1;
@@ -4118,19 +4184,36 @@ balsa_window_get_view_filter(BalsaWindow *window)
     /* match_flags contains collected information, time to create a
      * LibBalsaCondition data structure.
      */
-    filter = NULL;
+    flag_filter = NULL;
     for(j=0; j<ELEMENTS(match_flags); j++) {
         LibBalsaCondition *lbc;
         if(match_flags[j].setby < 0) continue;
         lbc = libbalsa_condition_new_flag_enum(match_flags[j].state,
                                                match_flags[j].flag);
-        if(filter)
-            filter = 
+        if(flag_filter)
+            flag_filter = 
                 libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
-                                                filter, lbc);
+                                                flag_filter, lbc);
         else
-            filter = lbc;
+            flag_filter = lbc;
     }
+
+    /* add string filter on top of that */
+
+    /* and merge ... */
+    i = gtk_combo_box_get_active(GTK_COMBO_BOX(window->filter_choice));
+    if(i>=0 && i<(signed)ELEMENTS(view_filters)) {
+        const gchar *str = gtk_entry_get_text(GTK_ENTRY(window->sos_entry));
+        filter = view_filters[i].filter(str);
+    } else filter = NULL;
+    if(flag_filter) {
+        if(filter)
+            filter = libbalsa_condition_new_bool_ptr
+                (FALSE, CONDITION_AND, filter, flag_filter);
+        else 
+            filter = flag_filter;
+    }
+
     return filter;
 }
 
@@ -4214,12 +4297,13 @@ static void
 reset_filter_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
-    GtkWidget *bindex = balsa_window_find_current_index(bw);
+    BalsaIndex *bindex = BALSA_INDEX(balsa_window_find_current_index(bw));
 
     /* do it by resetting the sos filder */
     gtk_entry_set_text(GTK_ENTRY(bw->sos_entry), "");
-    balsa_index_set_sos_filter(BALSA_INDEX(bindex),
-                               "", balsa_window_get_view_filter(bw));
+    balsa_index_set_view_filter(bindex,
+                                bindex->filter_no,
+                                "", balsa_window_get_view_filter(bw));
 }
 
 static void
@@ -4390,7 +4474,9 @@ notebook_switch_page_cb(GtkWidget * notebook,
     balsa_window_enable_mailbox_menus(window, index);
 
     gtk_entry_set_text(GTK_ENTRY(window->sos_entry),
-                       index->sos_filter ? index->sos_filter : "");
+                       index->filter_string ? index->filter_string : "");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(window->filter_choice),
+                             index->filter_no);
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
     balsa_mblist_set_status_bar(mailbox);
 
@@ -4934,10 +5020,8 @@ void
 balsa_window_set_filter_label(BalsaWindow * window,
 			      gboolean to_field)
 {
-    gtk_label_set_text_with_mnemonic(GTK_LABEL(window->filter_label),
-				     to_field ? 
-				     _("Subject or Receiver _Contains:") :
-				     _("Subject or Sender _Contains:"));
+    gtk_combo_box_set_active(GTK_COMBO_BOX(window->filter_choice),
+                             to_field ? 1 : 0);
 }
 
 /* Helper for "Select All" callbacks: if the currently focused widget

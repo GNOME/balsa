@@ -50,7 +50,7 @@ struct _BalsaWindow {
     GtkWidget *hpaned;
     GtkWidget *vpaned;
     GtkWidget *current_index;
-    GtkWidget *filter_label;
+    GtkWidget *filter_choice;
     LibBalsaMessage *current_message;
 };
 

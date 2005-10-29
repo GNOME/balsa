@@ -261,7 +261,7 @@ bndx_destroy(GtkObject * obj)
 	index->selected = NULL;
     }
 
-    g_free(index->sos_filter); index->sos_filter = NULL;
+    g_free(index->filter_string); index->filter_string = NULL;
 
     if (GTK_OBJECT_CLASS(parent_class)->destroy)
         (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);
@@ -1986,37 +1986,19 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 }
 
 void
-balsa_index_set_sos_filter(BalsaIndex *bindex, const gchar *sos_filter,
-                           LibBalsaCondition *flag_filter)
+balsa_index_set_view_filter(BalsaIndex *bindex, int filter_no,
+                            const gchar *filter_string,
+                            LibBalsaCondition *filter)
 {
     LibBalsaMailbox * mailbox;
 
     g_return_if_fail(BALSA_IS_INDEX(bindex));
     mailbox = bindex->mailbox_node->mailbox;
 
-    g_free(bindex->sos_filter);
-    bindex->sos_filter = g_strdup(sos_filter);
-
-    if(sos_filter && sos_filter[0] != '\0') {
-	/* Check the To: field for sentbox and From for others */
-        LibBalsaCondition *name = 
-            libbalsa_condition_new_bool_ptr
-            (FALSE, CONDITION_OR,
-             libbalsa_condition_new_string
-             (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(sos_filter), NULL),
-             libbalsa_condition_new_string
-             (FALSE, (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) ? CONDITION_MATCH_TO : CONDITION_MATCH_FROM,
-	      g_strdup(sos_filter), NULL));
-        
-        if(flag_filter)
-            flag_filter = libbalsa_condition_new_bool_ptr
-                (FALSE, CONDITION_AND, name, flag_filter);
-        else 
-            flag_filter = name;
-    }
-
-    libbalsa_mailbox_set_view_filter(mailbox, flag_filter, TRUE);
-
+    g_free(bindex->filter_string);
+    bindex->filter_no = filter_no;
+    bindex->filter_string = g_strdup(filter_string);
+    libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
 }
 
 /* Find messages with the same ID, and remove all but one of them; if

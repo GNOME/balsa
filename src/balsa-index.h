@@ -63,7 +63,8 @@ extern "C" {
         gboolean prev_message;
         gboolean next_message;
 	GArray *selected;
-        gchar *sos_filter; /* SenderOrSubject filter string, if any */
+        int    filter_no;
+        gchar *filter_string; /* Quick view filter string, if any */
 
         /* signal handler ids */
         gulong selection_changed_id;
@@ -107,9 +108,10 @@ extern "C" {
     void balsa_index_scroll_on_open(BalsaIndex *index);
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
-    void balsa_index_set_sos_filter(BalsaIndex *bindex,
-                                    const gchar *sos_filter,
-                                    LibBalsaCondition *flag_filter);
+    void balsa_index_set_view_filter(BalsaIndex *bindex,
+                                     int filter_no,
+                                     const gchar *filter_string,
+                                     LibBalsaCondition *filter);
 
 /* move or copy a list of messages */
     void balsa_index_transfer(BalsaIndex * index, GArray * msgnos,

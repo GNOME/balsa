@@ -60,9 +60,10 @@ typedef enum
   IMCAP_STATUS,
   IMCAP_ACL,			/* RFC 2086: IMAP4 ACL extension */
   IMCAP_NAMESPACE,              /* RFC 2342: IMAP4 Namespace */
+  IMCAP_AANONYMOUS, 	        /* RFC 2245: AUTH=ANONYMOUS */
   IMCAP_ACRAM_MD5,		/* RFC 2195: CRAM-MD5 authentication */
   IMCAP_AGSSAPI,		/* RFC 1731: GSSAPI authentication */
-  IMCAP_AUTH_ANON, 	        /*           AUTH=ANONYMOUS */
+  IMCAP_APLAIN,                 /* RFC 2595: */
   IMCAP_STARTTLS,		/* RFC 2595: STARTTLS */
   IMCAP_LOGINDISABLED,		/*           LOGINDISABLED */
   IMCAP_SORT,                   /* SORT and THREAD described at: */
@@ -80,6 +81,11 @@ typedef enum
                                  * have to detect that. */
   IMCAP_MAX
 } ImapCapability;
+
+typedef enum {
+  IMAP_OPT_ANONYMOUS, /* try anonymous authentication */
+  IMAP_OPT_BINARY     /* enable binary=no-transfer-encoding msg transfer */
+}  ImapOption;
 
 typedef struct _ImapMboxHandleClass ImapMboxHandleClass;
 typedef void (*LBIResponseCallback)(ImapMboxHandle *h, const char* response,
@@ -106,6 +112,7 @@ typedef void(*ImapListCb)(ImapMboxHandle*handle, int delim,
 
 
 ImapMboxHandle *imap_mbox_handle_new(void);
+void imap_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state);
 void imap_handle_set_monitorcb(ImapMboxHandle* h, ImapMonitorCb cb, void*);
 void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
 void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);

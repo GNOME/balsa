@@ -148,6 +148,8 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
 
   handle->info_cb  = NULL;
   handle->info_arg = NULL;
+  handle->enable_anonymous = 0;
+  handle->enable_binary    = 0;
   mbox_view_init(&handle->mbox_view);
 }
 
@@ -208,6 +210,16 @@ imap_mbox_handle_new(void)
 {
   ImapMboxHandle *handle = g_object_new(LIT_TYPE_HANDLE, NULL);
   return handle;
+}
+
+void
+imap_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
+{
+  switch(opt) {
+  case IMAP_OPT_ANONYMOUS: h->enable_anonymous = !!state; break;
+  case IMAP_OPT_BINARY:    h->enable_binary    = !!state; break;
+  default: g_warning("imap_set_option: invalid option\n");
+  }
 }
 
 void
@@ -1565,10 +1577,11 @@ ir_capability_data(ImapMboxHandle *handle)
 {
   /* ordered identically as ImapCapability constants */
   static const char* capabilities[] = {
-    "IMAP4", "IMAP4rev1", "STATUS", "ACL", "NAMESPACE", "AUTH=CRAM-MD5", 
-    "AUTH=GSSAPI", "AUTH=ANONYMOUS", "STARTTLS", "LOGINDISABLED", "SORT",
-    "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES", "UNSELECT", "SCAN",
-    "CHILDREN", "LITERAL+", "IDLE", "SASL-IR"
+    "IMAP4", "IMAP4rev1", "STATUS", "ACL", "NAMESPACE",
+    "AUTH=ANONYMOUS", "AUTH=CRAM-MD5", "AUTH=GSSAPI", "AUTH=PLAIN",
+    "STARTTLS", "LOGINDISABLED", "SORT",
+    "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES",
+    "UNSELECT", "SCAN", "CHILDREN", "LITERAL+", "IDLE", "SASL-IR"
   };
   unsigned x;
   int c;

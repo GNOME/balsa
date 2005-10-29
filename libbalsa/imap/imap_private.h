@@ -90,15 +90,19 @@ struct _ImapMboxHandle {
                            inactivity */
   guint idle_watch_id;  /* callback to process incoming data */
   ImapTlsMode tls_mode; /* disabled, enabled, required */
+  unsigned readonly_mbox:1;
+  unsigned can_fetch_body:1; /* set for servers that always respond
+                              * correctly to FETCH x BODY[y]
+                              * requests. */
+  unsigned enable_anonymous:1; /* try anonymous if possible */
+  unsigned enable_binary:1; /* enable binary extension */
+
+  /* conditional stuff at the end for the safety. */
 #ifdef USE_TLS
   unsigned over_ssl:1; /* transmission is to be made over SSL-protected
                         * connection, usually to imaps port. */
   unsigned using_tls:1;
 #endif
-  unsigned readonly_mbox:1;
-  unsigned can_fetch_body:1; /* set for servers that always respond
-                              * correctly to FETCH x BODY[y]
-                              * requests. */
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)

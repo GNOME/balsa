@@ -73,6 +73,7 @@ struct _LibBalsaMailboxImap {
     GPtrArray *msgids; /* message-ids */
 
     GArray *sort_ranks;
+    guint unread_update_id;
     LibBalsaMailboxSortFields sort_field;
     unsigned opened:1;
 };
@@ -323,6 +324,10 @@ libbalsa_mailbox_imap_finalize(GObject * object)
     }
 
     g_array_free(mailbox->sort_ranks, TRUE); mailbox->sort_ranks = NULL;
+    if(mailbox->unread_update_id) {
+        g_source_remove(mailbox->unread_update_id);
+        mailbox->unread_update_id = 0;
+    }
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -672,19 +677,36 @@ static void lbm_imap_get_unseen(LibBalsaMailboxImap * mimap);
 /** imap_flags_cb() is called by the imap backend when flags are
    fetched. Note that we may not have yet the preprocessed data in
    LibBalsaMessage.  We ignore the info in this case.
-   The only thing at the moment that we do is to update the counts.
+   OBSERVE: it must not trigger any IMAP activity under NO circumstances!
 */
+static gboolean
+idle_unread_update_cb(LibBalsaMailbox *mailbox)
+{
+    glong unread;
+
+    gdk_threads_enter();
+    libbalsa_lock_mailbox(mailbox);
+    unread = mailbox->unread_messages;
+    
+    lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
+    if(unread != mailbox->unread_messages)
+        libbalsa_mailbox_set_unread_messages_flag(mailbox,
+                                                  mailbox->unread_messages>0);
+    libbalsa_unlock_mailbox(mailbox);
+    LIBBALSA_MAILBOX_IMAP(mailbox)->unread_update_id = 0;
+    gdk_threads_leave();
+    return FALSE;
+}
+
 static void
 imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
 {
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    glong old_unread;
     unsigned i;
-    libbalsa_lock_mailbox(mailbox);
 
-    /* update local image of the flags */
+    libbalsa_lock_mailbox(mailbox);
     for(i=0; i<cnt; i++) {
-        struct message_info *msg_info =
+        struct message_info *msg_info = 
             message_info_from_msgno(mimap, seqno[i]);
         if(msg_info->message) {
             LibBalsaMessageFlag flags;
@@ -692,7 +714,7 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
                usually unsolicited flags from the server, we do not
                need to go to great lengths to assure that the
                connection is up. */
-            ImapMessage *imsg =
+            ImapMessage *imsg = 
                 imap_mbox_handle_get_msg(mimap->handle, seqno[i]);
             if(!imsg) continue;
 
@@ -701,18 +723,15 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
             if (flags == msg_info->message->flags)
                 continue;
 
-           libbalsa_mailbox_index_set_flags(mailbox, seqno[i],
-                                            msg_info->message->flags);
-           ++mimap->search_stamp;
+	    libbalsa_mailbox_index_set_flags(mailbox, seqno[i],
+					     msg_info->message->flags);
+	    ++mimap->search_stamp;
         }
     }
-
-    old_unread = mailbox->unread_messages;
-    lbm_imap_get_unseen(mimap);
+    if(!mimap->unread_update_id)
+        mimap->unread_update_id =
+            g_idle_add((GSourceFunc)idle_unread_update_cb, mailbox);
     libbalsa_unlock_mailbox(mailbox);
-    if(old_unread != mailbox->unread_messages)
-        libbalsa_mailbox_set_unread_messages_flag(mailbox,
-                                                  mailbox->unread_messages>0);
 }
 
 static gboolean

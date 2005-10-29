@@ -125,10 +125,11 @@ void
 pop_set_option(PopHandle *pop, PopOption opt, gboolean state)
 {
   switch(opt) {
-  case IMAP_POP_OPT_DISABLE_APOP: pop->disable_apop = state; break;
-  case IMAP_POP_OPT_FILTER_CR   : pop->filter_cr    = state; break;
-  case IMAP_POP_OPT_OVER_SSL    : pop->over_ssl     = state; break;
-  case IMAP_POP_OPT_PIPELINE    : pop->enable_pipe  = state; break;
+  case IMAP_POP_OPT_DISABLE_APOP: pop->disable_apop = !!state; break;
+  case IMAP_POP_OPT_FILTER_CR   : pop->filter_cr    = !!state; break;
+  case IMAP_POP_OPT_OVER_SSL    : pop->over_ssl     = !!state; break;
+  case IMAP_POP_OPT_PIPELINE    : pop->enable_pipe  = !!state; break;
+  default: g_warning("pop_set_option: invalid option\n");
   }
 }
 

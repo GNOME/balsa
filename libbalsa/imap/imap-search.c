@@ -283,9 +283,8 @@ static void
 imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
                     gboolean internal, time_t tm)
 {
-  /* january is there twice - it is not a mispelling! */
   static const char *month[] = 
-    { "Jan", "Jan", "Feb", "Mar", "Apr", "May",
+    { "Jan", "Feb", "Mar", "Apr", "May",
       "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
   struct tm date;
   if(!internal) sio_write(handle->sio, "SENT", 4);

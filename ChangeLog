@@ -1,3 +1,17 @@
+2005-10-29 Pawel Salek
+
+	* libbalsa/mailbox_imap.c: last commit could trigger recursive
+	searches under certain circumstances. Do it differently.
+	* libbalsa/mailbox.c: more information about move errors.
+	* libbalsa/imap/imap-auth.c: AUTH={PLAIN,ANONYMOUS} implemented.
+	* libbalsa/imap/imap-handle.[hc]: anon support.
+	* libbalsa/imap/imap-search.c: fix a bug in searching.
+	* libbalsa/imap/imap_private.h: add enable_anonymous and
+	enable_binary fields.
+	* libbalsa/imap/pop3.c: minor cleanup.
+	* src/balsa-index.[hc]: extend SoS filter.
+	* src/main-window.[hc]: related changes.
+
 2005-10-28 Pawel Salek
 
 	* libbalsa/mailbox_imap.c: fix unread msg counts on concurrent mbox

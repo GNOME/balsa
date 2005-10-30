@@ -1,3 +1,7 @@
+2005-10-30 07:54  PeterB
+
+	* src/sendmsg-window.c: do not mark forwarded message as answered.
+
 2005-10-29 Pawel Salek
 
 	* src/main-window.[ch]: iron out problems with the last patch

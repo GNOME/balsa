@@ -3846,13 +3846,6 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->ident = balsa_app.current_ident;
     bsmsg->update_config = FALSE;
     bsmsg->quit_on_close = FALSE;
-    if (type == SEND_CONTINUE) {
-        bsmsg->draft_message = message;
-        bsmsg->parent_message = NULL;
-    } else {
-        bsmsg->parent_message = message;
-        bsmsg->draft_message = NULL;
-    }
 
     bsmsg->window = window = gnome_app_new("balsa", NULL);
     /*
@@ -3874,31 +3867,17 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->autosave_timeout_id = /* autosave every 5 minutes */
         g_timeout_add(1000*60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);
 
-    if (message) {
-        /* ref message so we don't lose it even if it is deleted */
-	g_object_ref(G_OBJECT(message));
-	/* reference the original mailbox so we don't loose the
-	 * mail even if the mailbox is closed.
-	 */
-	if (message->mailbox)
-	    libbalsa_mailbox_open(message->mailbox, NULL);
-        if (message->message_id && type != SEND_CONTINUE) {
-            tmp = g_strconcat("<", message->message_id, ">", NULL);
-            if (message->headers && message->headers->from) {
-                gchar recvtime[50];
-
-                ctime_r(&message->headers->date, recvtime);
-                if (recvtime[0]) /* safety check; remove trailing '\n' */
-                    recvtime[strlen(recvtime)-1] = '\0';
-                bsmsg->in_reply_to =
-                    g_strconcat(tmp, " (from ",
-                                libbalsa_address_get_mailbox_from_list
-                                (message->headers->from),
-                                " on ", recvtime, ")", NULL);
-                g_free(tmp);
-            } else
-                bsmsg->in_reply_to = tmp;
-        }
+    bsmsg->draft_message = NULL;
+    bsmsg->parent_message = NULL;
+    if (type == SEND_CONTINUE)
+        bsmsg->draft_message = message;
+    else if (type == SEND_REPLY || type == SEND_REPLY_ALL
+             || type == SEND_REPLY_GROUP)
+        bsmsg->parent_message = message;
+    if (bsmsg->draft_message || bsmsg->parent_message) {
+        g_object_ref(message);
+        if (message->mailbox)
+            libbalsa_mailbox_open(message->mailbox, NULL);
     }
 
     g_signal_connect(G_OBJECT(bsmsg->window), "delete-event",
@@ -3964,7 +3943,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 
     /* fill in that info:
      * ref the message so that we have all needed headers */
-    if (message) {
+    if (message && type != SEND_FORWARD_ATTACH) {
 	libbalsa_message_body_ref(message, TRUE, TRUE);
 #ifdef HAVE_GPGME
 	/* scan the message for encrypted parts - this is only possible if
@@ -4013,6 +3992,25 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         if (message->in_reply_to)
             bsmsg->in_reply_to =
                 g_strconcat("<", message->in_reply_to->data, ">", NULL);
+    } else if (type == SEND_REPLY || type == SEND_REPLY_ALL
+               || type == SEND_REPLY_GROUP) {
+        if (message->message_id) {
+            tmp = g_strconcat("<", message->message_id, ">", NULL);
+            if (message->headers && message->headers->from) {
+                gchar recvtime[50];
+
+                ctime_r(&message->headers->date, recvtime);
+                if (recvtime[0]) /* safety check; remove trailing '\n' */
+                    recvtime[strlen(recvtime)-1] = '\0';
+                bsmsg->in_reply_to =
+                    g_strconcat(tmp, " (from ",
+                                libbalsa_address_get_mailbox_from_list
+                                (message->headers->from),
+                                " on ", recvtime, ")", NULL);
+                g_free(tmp);
+            } else
+                bsmsg->in_reply_to = tmp;
+        }
     }
 
     if (type == SEND_REPLY_ALL) {
@@ -4040,7 +4038,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	continueBody(bsmsg, message);
     else
 	fillBody(bsmsg, message, type);
-    if (message)
+    if (message && type != SEND_FORWARD_ATTACH)
 	libbalsa_message_body_unref(message);
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;

@@ -1,3 +1,8 @@
+2005-11-02 Pawel Salek
+
+	* libbalsa/mailbox_pop3.c: no need to update config; fix memory leaks.
+	* src/save-restore.c: "config-updated" signal does not exist any more.
+
 2005-10-30 07:54  PeterB
 
 	* src/sendmsg-window.c: do not mark forwarded message as answered.

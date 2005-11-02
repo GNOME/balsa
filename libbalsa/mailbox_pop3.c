@@ -44,11 +44,9 @@
 int PopDebug = 0;
 
 enum {
-    CONFIG_CHANGED,
     LAST_SIGNAL
 };
 static LibBalsaMailboxClass *parent_class = NULL;
-static guint libbalsa_mailbox_pop3_signals[LAST_SIGNAL];
 
 static void libbalsa_mailbox_pop3_finalize(GObject * object);
 static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
@@ -101,14 +99,6 @@ libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class * klass)
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
     parent_class = g_type_class_peek_parent(klass);
-    libbalsa_mailbox_pop3_signals[CONFIG_CHANGED] =
-	g_signal_new("config-changed",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_LAST | G_SIGNAL_NO_HOOKS,
-                     G_STRUCT_OFFSET(LibBalsaMailboxPop3Class,
-                                     config_changed),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     object_class->finalize = libbalsa_mailbox_pop3_finalize;
 
@@ -158,16 +148,6 @@ libbalsa_mailbox_pop3_new(void)
     return mailbox;
 }
 
-
-static void
-libbalsa_mailbox_pop3_config_changed(LibBalsaMailboxPop3* mailbox)
-{
-    g_return_if_fail(mailbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox));
-
-    g_signal_emit(G_OBJECT(mailbox), 
-                  libbalsa_mailbox_pop3_signals[CONFIG_CHANGED], 0);
-}
 
 static gboolean
 libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, GError **err)
@@ -227,7 +207,8 @@ static GHashTable*
 mp_load_uids(void)
 {
     char line[1024]; /* arbitrary limit of uid len */
-    GHashTable *res = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable *res = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                            g_free, NULL);
     gchar *fname = g_strconcat(g_get_home_dir(), "/.balsa/pop-uids", NULL);
     FILE *f = fopen(fname, "r");
     g_free(fname);
@@ -475,7 +456,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     LibBalsaMailbox *tmp_mailbox;
     LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
     LibBalsaServer *server;
-    gchar *msgbuf, *mhs;
+    gchar *msgbuf;
     GError *err = NULL;
     unsigned msgcnt, i;
     GHashTable *uids = NULL, *current_uids = NULL;
@@ -498,7 +479,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE,0,0,msgbuf);
     g_free(msgbuf);
 
+    tmp_path = NULL;
     do {
+        g_free(tmp_path);
 	tmp_path = g_strdup("/tmp/pop-XXXXXX");
 	tmp_file = g_mkstemp(tmp_path);
     } while ((tmp_file < 0) && (errno == EEXIST));
@@ -512,30 +495,16 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	return;
     }
     close(tmp_file);
-    unlink(tmp_path);
 
-    if( mkdir(tmp_path, 0700) < 0 ) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("POP3 mailbox %s temp file error:\n%s"), 
-			     mailbox->name,
-			     g_strerror(errno));
-	g_free(tmp_path);
-	return;	
-    }
-    
-    mhs = g_strdup_printf ( "%s/.mh_sequences", tmp_path );
-    if( (tmp_file=creat( mhs, 0600)) != -1) close(tmp_file);
-    /* we fake a real mh box - it's good enough */
     tmp_mailbox = (LibBalsaMailbox*)
-        libbalsa_mailbox_mh_new(tmp_path, FALSE);
+        libbalsa_mailbox_mbox_new(tmp_path, FALSE);
     if(!tmp_mailbox)  {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("POP3 mailbox %s temp mailbox error:\n"), 
 			     mailbox->name);
-	g_free(tmp_path); g_free(mhs);
+        unlink(tmp_path); g_free(tmp_path);
 	return;
     }
-    
     pop = pop_new();
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
     pop_set_option(pop, IMAP_POP_OPT_OVER_SSL, server->use_ssl);
@@ -557,8 +526,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     _("POP3 mailbox %s error: %s\n"), 
 			     mailbox->name, err->message);
         g_error_free(err);
-	g_free(tmp_path); g_free(mhs);
+        unlink(tmp_path); g_free(tmp_path);
         g_object_unref(G_OBJECT(tmp_mailbox));
+        pop_destroy(pop, NULL);
 	return;
     }
 
@@ -569,9 +539,11 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     total_size = pop_get_total_size(pop);
     if(!m->delete_from_server) {
         uids = mp_load_uids();
-        current_uids = g_hash_table_new(g_str_hash, g_str_equal);
+        current_uids = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                             g_free, NULL);
         uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
     }
+
     for(i=1; i<=msgcnt; i++) {
         char *msg_path = mode->get_path(dest_path, i);
         unsigned msg_size = pop_get_msg_size(pop, i);
@@ -634,6 +606,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	}
 #endif
     }
+
     if(err) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 error: %s."), 
@@ -657,11 +630,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
      * =================================================================== */
 
     libbalsa_mailbox_local_remove_files(LIBBALSA_MAILBOX_LOCAL(tmp_mailbox));
-    libbalsa_mailbox_pop3_config_changed(m);
-    g_object_unref(G_OBJECT(tmp_mailbox));
-
     g_free(tmp_path);
-    g_free(mhs);
+    g_object_unref(G_OBJECT(tmp_mailbox));
 }
 
 static void

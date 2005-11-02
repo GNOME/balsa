@@ -485,23 +485,6 @@ pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
 #endif
 }
 
-static void
-pop3_config_updated(LibBalsaMailboxPop3* mailbox)
-{
-#ifdef BALSA_USE_THREADS
-    MailThreadMessage *threadmsg;
-    threadmsg = g_new(MailThreadMessage, 1);
-    threadmsg->message_type = LIBBALSA_NTFY_UPDATECONFIG;
-    threadmsg->mailbox = (void *) mailbox;
-    threadmsg->message_string[0] = '\0';
-    if (write(mail_thread_pipes[1], (void *) &threadmsg,
-          sizeof(void *)) != sizeof(void *))
-        g_warning("pipe error");
-#else
-    config_mailbox_update(LIBBALSA_MAILBOX(mailbox));
-#endif
-}
-
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
 static gint
@@ -525,9 +508,6 @@ config_mailbox_init(const gchar * prefix)
     }
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
-        g_signal_connect(G_OBJECT(mailbox),
-                         "config-changed", G_CALLBACK(pop3_config_updated),
-                         mailbox);
         g_signal_connect(G_OBJECT(mailbox),
                          "progress-notify", G_CALLBACK(pop3_progress_notify),
                          mailbox);

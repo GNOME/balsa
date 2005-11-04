@@ -1,3 +1,7 @@
+2005-11-04 18:53  PeterB
+
+	* configure.in: gtkhtml3 has yet another version: 3.8.
+
 2005-11-02 Pawel Salek
 
 	* libbalsa/mailbox_pop3.c: no need to update config; fix memory leaks.

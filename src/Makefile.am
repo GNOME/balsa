@@ -63,8 +63,6 @@ balsa_BASE_SRCLIST =	\
 	save-restore.h		\
 	sendmsg-window.c	\
 	sendmsg-window.h	\
-	spell-check.c		\
-	spell-check.h		\
 	store-address.c		\
 	store-address.h		\
 	threads.h		\
@@ -76,14 +74,17 @@ balsa_BASE_SRCLIST =	\
 balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
 balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
 
-balsa_SOURCES = $(balsa_BASE_SRCLIST)
+balsa_SOURCES =			\
+	$(balsa_BASE_SRCLIST)	\
+	$(balsa_gtkspell_extra)
 
 # see http://sources.redhat.com/automake/dependencies.html
 BUILT_SOURCES = Balsa.h
 
 
-EXTRA_DIST = \
-	Balsa.idl
+EXTRA_DIST =			\
+	Balsa.idl		\
+	$(balsa_gtkspell_extra_dist)
 
 idldir = $(datadir)/idl
 idl_DATA = Balsa.idl
@@ -135,3 +136,15 @@ $(srcdir)/balsa-bonobo.c: Balsa.h
 $(balsa_IDL_SRCLIST): $(srcdir)/$(idl_DATA) 
 	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) \
 	$(srcdir)/$(idl_DATA)
+if BUILD_WITH_GTKSPELL
+	balsa_gtkspell_extra =
+	balsa_gtkspell_extra_dist =	\
+		spell-check.c		\
+		spell-check.h
+else
+	balsa_gtkspell_extra_dist =
+	balsa_gtkspell_extra =		\
+		spell-check.c		\
+		spell-check.h
+endif
+

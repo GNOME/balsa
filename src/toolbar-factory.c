@@ -118,7 +118,11 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_IDENTITY, N_("Identity"),
      N_("Set identity to use for this message"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GTK_STOCK_SPELL_CHECK, N_("Spelling"),
+#if HAVE_GTKSPELL
+     N_("Toggle spell checker"), TOOLBAR_BUTTON_TYPE_TOGGLE},
+#else                           /* HAVE_GTKSPELL */
      N_("Run a spell check"), TOOLBAR_BUTTON_TYPE_BUTTON},
+#endif                          /* HAVE_GTKSPELL */
     {GTK_STOCK_CLOSE, N_("Close"), 
      N_("Close the compose window"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {BALSA_PIXMAP_MARKED_NEW, N_("Toggle\nnew"),

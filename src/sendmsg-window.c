@@ -69,7 +69,11 @@
 #include "ab-window.h"
 #include "address-entry.h"
 #include "print.h"
+#if HAVE_GTKSPELL
+#include "gtkspell/gtkspell.h"
+#else                           /* HAVE_GTKSPELL */
 #include "spell-check.h"
+#endif                          /* HAVE_GTKSPELL */
 #include "toolbar-factory.h"
 
 #define GNOME_MIME_BUG_WORKAROUND 1
@@ -126,8 +130,10 @@ static gboolean bsmsg_check_format_compatibility(GtkWindow *parent,
 #endif /* ENABLE_TOUCH_UI */
 
 static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
+#if !HAVE_GTKSPELL
 static void sw_spell_check_response(BalsaSpellCheck * spell_check,
                                     gint response, BalsaSendmsg * bsmsg);
+#endif                          /* HAVE_GTKSPELL */
 
 static void address_book_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
 static void address_book_response(GtkWidget * ab, gint response,
@@ -375,7 +381,11 @@ static GnomeUIInfo edit_menu[] = {
      0, 0, NULL},
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SPELL_CHECK EDIT_MENU_QUOTE + 2
+#if HAVE_GTKSPELL
+    GNOMEUIINFO_ITEM_STOCK(N_("Toggle Spell C_hecker"), 
+#else                           /* HAVE_GTKSPELL */
     GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
+#endif                          /* HAVE_GTKSPELL */
                            N_("Check the spelling of the message"),
                            spell_check_cb,
                            GTK_STOCK_SPELL_CHECK),
@@ -595,7 +605,11 @@ static GnomeUIInfo opts_menu[] = {
 };
 
 static GnomeUIInfo tu_tools_menu[] = {
+#if HAVE_GTKSPELL
+    GNOMEUIINFO_ITEM_STOCK(N_("Toggle Spell C_hecker"), 
+#else                           /* HAVE_GTKSPELL */
     GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
+#endif                          /* HAVE_GTKSPELL */
                            N_("Check the spelling of the message"),
                            spell_check_cb,
                            GTK_STOCK_SPELL_CHECK),
@@ -953,8 +967,10 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_slist_foreach(bsmsg->charsets, (GFunc) g_free, NULL);
     g_slist_free(bsmsg->charsets);
 
+#if !HAVE_GTKSPELL
     if (bsmsg->spell_checker)
         gtk_widget_destroy(bsmsg->spell_checker);
+#endif                          /* HAVE_GTKSPELL */
     if (bsmsg->wrap_timeout_id)
         g_source_remove(bsmsg->wrap_timeout_id);
     if (bsmsg->autosave_timeout_id)
@@ -3859,7 +3875,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     gtk_widget_show(window);
 
     bsmsg->type = type;
+#if !HAVE_GTKSPELL
     bsmsg->spell_checker = NULL;
+#endif                          /* HAVE_GTKSPELL */
 #ifdef HAVE_GPGME
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
 #endif
@@ -4918,14 +4936,43 @@ static void sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo,
 }
 
 static void
+sw_spell_attach(BalsaSendmsg * bsmsg)
+{
+    GtkSpell *spell;
+    GError *err = NULL;
+
+    spell = gtkspell_new_attach(GTK_TEXT_VIEW(bsmsg->text),
+                                bsmsg->locale, &err);
+    if (!spell) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error starting spell checker: %s"),
+                             err->message);
+        g_error_free(err);
+    }
+}
+
+static void
 sw_buffer_swap(BalsaSendmsg * bsmsg, gboolean undo)
 {
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+#if HAVE_GTKSPELL
+    GtkSpell *spell;
+#endif                          /* HAVE_GTKSPELL */
 
     sw_buffer_signals_disconnect(bsmsg);
     g_object_ref(G_OBJECT(buffer));
+#if HAVE_GTKSPELL
+    /* GtkSpell doesn't seem to handle setting a new buffer... */
+    spell = gtkspell_get_from_text_view(GTK_TEXT_VIEW(bsmsg->text));
+    if (spell)
+        gtkspell_detach(spell);
+#endif                          /* HAVE_GTKSPELL */
     gtk_text_view_set_buffer(GTK_TEXT_VIEW(bsmsg->text), bsmsg->buffer2);
+#if HAVE_GTKSPELL
+    if (spell)
+        sw_spell_attach(bsmsg);
+#endif                          /* HAVE_GTKSPELL */
     g_object_unref(bsmsg->buffer2);
     bsmsg->buffer2 = buffer;
     sw_buffer_signals_connect(bsmsg);
@@ -5291,6 +5338,23 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
     return FALSE;
 }
 
+#if HAVE_GTKSPELL
+/* spell_check_cb
+ * 
+ * Toggle the spell checker
+ * */
+static void
+spell_check_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
+    GtkSpell *spell = gtkspell_get_from_text_view(text_view);
+
+    if (spell)
+        gtkspell_detach(spell);
+    else
+        sw_spell_attach(bsmsg);
+}
+#else                           /* HAVE_GTKSPELL */
 /* spell_check_cb
  * 
  * Start the spell check
@@ -5345,6 +5409,7 @@ sw_spell_check_response(BalsaSpellCheck * spell_check, gint response,
     gtk_text_view_set_editable(GTK_TEXT_VIEW(bsmsg->text), TRUE);
     sw_buffer_signals_connect(bsmsg);
 }
+#endif                          /* HAVE_GTKSPELL */
 
 static void
 lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)

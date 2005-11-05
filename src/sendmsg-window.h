@@ -63,7 +63,9 @@ extern "C" {
 	GtkWidget *attachments[4];
         gchar *in_reply_to;
 	GtkWidget *text;
+#if !HAVE_GTKSPELL
 	GtkWidget *spell_checker;
+#endif                          /* HAVE_GTKSPELL */
 	GtkWidget *notebook;
 	LibBalsaMessage *parent_message; /* to which we're replying     */
 	LibBalsaMessage *draft_message;  /* where the message was saved */

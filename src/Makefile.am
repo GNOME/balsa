@@ -71,6 +71,18 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.c		\
 	toolbar-prefs.h
 
+if BUILD_WITH_GTKSPELL
+	balsa_gtkspell_extra =
+	balsa_gtkspell_extra_dist =	\
+		spell-check.c		\
+		spell-check.h
+else
+	balsa_gtkspell_extra_dist =
+	balsa_gtkspell_extra =		\
+		spell-check.c		\
+		spell-check.h
+endif
+
 balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
 balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
 
@@ -136,15 +148,3 @@ $(srcdir)/balsa-bonobo.c: Balsa.h
 $(balsa_IDL_SRCLIST): $(srcdir)/$(idl_DATA) 
 	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) \
 	$(srcdir)/$(idl_DATA)
-if BUILD_WITH_GTKSPELL
-	balsa_gtkspell_extra =
-	balsa_gtkspell_extra_dist =	\
-		spell-check.c		\
-		spell-check.h
-else
-	balsa_gtkspell_extra_dist =
-	balsa_gtkspell_extra =		\
-		spell-check.c		\
-		spell-check.h
-endif
-

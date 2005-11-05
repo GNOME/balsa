@@ -2151,14 +2151,19 @@ static void
 mailbox_tab_size_request(GtkWidget * widget, GtkRequisition * requisition,
                          gpointer user_data)
 {
-    gint border_width = GTK_CONTAINER(widget)->border_width;
-    GtkRequisition child_requisition;
-    
-    requisition->width = border_width * 2;
-    requisition->height = border_width * 2;
-    gtk_widget_size_request(GTK_BIN(widget)->child, &child_requisition);
-    requisition->width += child_requisition.width;
-    requisition->height += child_requisition.height;
+    gint focus_width;
+    gint focus_pad;
+    gint border_width;
+
+    gtk_widget_size_request(GTK_BIN(widget)->child, requisition);
+
+    gtk_widget_style_get(widget, "focus-line-width", &focus_width,
+                         "focus-padding", &focus_pad, NULL);
+    border_width = (GTK_CONTAINER(widget)->border_width +
+                    focus_width + focus_pad) * 2;
+
+    requisition->width += border_width;
+    requisition->height += border_width;
 }
 
 static void

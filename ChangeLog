@@ -1,5 +1,8 @@
-2005-11-05 11:18  PeterB
+2005-11-05 13:45  PeterB
 
+	* configure.in, src/Makefile.am, src/sendmsg-window.c,
+	src/sendmsg-window.h, src/toolbar-factory.c: new configure option
+	--with-gtkspell, default = no.
 	* src/main-window.c: don't clip close-button icon.
 
 2005-11-04 18:53  PeterB

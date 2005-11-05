@@ -1,5 +1,7 @@
-2005-11-05 13:45  PeterB
+2005-11-05 17:15  PeterB
 
+	* src/Makefile.am: define balsa_gtkspell_extra_dist before using
+	it.
 	* configure.in, src/Makefile.am, src/sendmsg-window.c,
 	src/sendmsg-window.h, src/toolbar-factory.c: new configure option
 	--with-gtkspell, default = no.

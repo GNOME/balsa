@@ -1,3 +1,8 @@
+2005-11-06 21:15 Pawel Salek
+
+	* libbalsa/mailbox_pop3.c: use Mh temporary mailbox until an
+	add_message_from_stream() method is implemented.
+
 2005-11-06 13:42  PeterB
 
 	* libbalsa/mailbox_mh.c: implement load-config method; use

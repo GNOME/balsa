@@ -480,19 +480,13 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE,0,0,msgbuf);
     g_free(msgbuf);
 
-    tmp_path = NULL;
-    do {
-        g_free(tmp_path);
-	tmp_path = g_strdup("/tmp/pop-XXXXXX");
-	tmp_file = g_mkstemp(tmp_path);
-    } while ((tmp_file < 0) && (errno == EEXIST));
-
+    tmp_file = g_file_open_tmp("pop-XXXXXX", &tmp_path, &err);
     if(tmp_file < 0) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("POP3 mailbox %s temp file error:\n%s"), 
 			     mailbox->name,
-			     g_strerror(errno));
-	g_free(tmp_path);
+			     err ? err->message : g_strerror(errno));
+	g_error_free(err);
 	return;
     }
     close(tmp_file);

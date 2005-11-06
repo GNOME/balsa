@@ -1,5 +1,8 @@
-2005-11-06 11:36  PeterB
+2005-11-06 13:42  PeterB
 
+	* libbalsa/mailbox_mh.c: implement load-config method; use
+	g_mkstemp to make temporary files; sync mailbox even if
+	.mh_sequences doesn't exist.
 	* libbalsa/mailbox_pop3.c: use g_file_open_tmp to open the temp
 	file.
 

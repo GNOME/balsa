@@ -1,3 +1,8 @@
+2005-11-06 11:36  PeterB
+
+	* libbalsa/mailbox_pop3.c: use g_file_open_tmp to open the temp
+	file.
+
 2005-11-06 Pawel Salek
 
 	* libbalsa/mailbox_pop3.c: last commit broke direct Pop delivery -

@@ -1,3 +1,10 @@
+2005-11-06 Pawel Salek
+
+	* libbalsa/mailbox_pop3.c: last commit broke direct Pop delivery -
+	fix it.
+	* src/sendmsg-window.c: fix compilation without GtkSpell.
+	* Makefile.am: make variables must start in the first column.
+
 2005-11-05 17:15  PeterB
 
 	* src/Makefile.am: define balsa_gtkspell_extra_dist before using

@@ -72,13 +72,13 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.h
 
 if BUILD_WITH_GTKSPELL
-	balsa_gtkspell_extra =
-	balsa_gtkspell_extra_dist =	\
+balsa_gtkspell_extra =
+balsa_gtkspell_extra_dist =	\
 		spell-check.c		\
 		spell-check.h
 else
-	balsa_gtkspell_extra_dist =
-	balsa_gtkspell_extra =		\
+balsa_gtkspell_extra_dist =
+balsa_gtkspell_extra =		\
 		spell-check.c		\
 		spell-check.h
 endif

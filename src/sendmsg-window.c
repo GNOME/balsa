@@ -4935,6 +4935,7 @@ static void sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo,
     balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_REDO, redo);
 }
 
+#ifdef HAVE_GTKSPELL
 static void
 sw_spell_attach(BalsaSendmsg * bsmsg)
 {
@@ -4950,6 +4951,7 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
         g_error_free(err);
     }
 }
+#endif
 
 static void
 sw_buffer_swap(BalsaSendmsg * bsmsg, gboolean undo)

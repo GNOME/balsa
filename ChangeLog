@@ -1,3 +1,12 @@
+2005-11-09 19:11  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c,
+	mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c, mailbox_pop3.c,
+	message.c, message.h, send.c: change LibBalsaMailbox add-message
+	method to take a GMimeStream and LibBalsaMessageFlag instead of a
+	message; move libbalsa_mailbox_copy_message to message.c and rename
+	libbalsa_message_copy; use new add-message method in mailbox-pop3.
+
 2005-11-06 21:15 Pawel Salek
 
 	* libbalsa/mailbox_pop3.c: use Mh temporary mailbox until an

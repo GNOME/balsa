@@ -782,18 +782,21 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
 static gboolean
 libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
                                     GArray * msgnos,
-                                    LibBalsaMailbox * dest, GError **err)
+                                    LibBalsaMailbox * dest, GError ** err)
 {
     gboolean retval = TRUE;
     guint i;
 
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
-        LibBalsaMessage *message =
+        LibBalsaMessage *message =      /* Just for the flags! */
             libbalsa_mailbox_get_message(mailbox, msgno);
+        GMimeStream *stream =
+            libbalsa_mailbox_get_message_stream(mailbox, msgno);
 
-        if (libbalsa_mailbox_copy_message(message, dest, err) < 0)
-            retval = FALSE;
+        retval = libbalsa_mailbox_add_message(dest, stream, message->flags,
+                                              err);
+        g_object_unref(stream);
         g_object_unref(message);
     }
 
@@ -1428,28 +1431,29 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
 }
 
 static void lbm_queue_check(LibBalsaMailbox * mailbox);
-int
-libbalsa_mailbox_copy_message(LibBalsaMessage * message,
-                              LibBalsaMailbox * dest, GError **err)
+gboolean
+libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
+                             GMimeStream * stream,
+                             LibBalsaMessageFlag flags, GError ** err)
 {
-    int retval;
+    gboolean retval;
 
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), -1);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), -1);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    libbalsa_lock_mailbox(dest);
-    g_object_ref(message);      /* mailbox is locked before calling. */
+    libbalsa_lock_mailbox(mailbox);
 
-    retval = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message(dest, message, err);
-    if (retval > 0) {
-        if (!LIBBALSA_MESSAGE_IS_DELETED(message)
-            && LIBBALSA_MESSAGE_IS_UNREAD(message))
-            libbalsa_mailbox_set_unread_messages_flag(dest, TRUE);
-        lbm_queue_check(dest);
+    retval =
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_message(mailbox, stream,
+                                                         flags, err);
+
+    if (retval) {
+        if (!(flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+            && (flags & LIBBALSA_MESSAGE_FLAG_NEW))
+            libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+        lbm_queue_check(mailbox);
     }
 
-    g_object_unref(message);
-    libbalsa_unlock_mailbox(dest);
+    libbalsa_unlock_mailbox(mailbox);
 
     return retval;
 }
@@ -3437,7 +3441,7 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
             g_mime_message_partial_reconstruct_message((GMimeMessagePartial
                                                         **) partials->
                                                        pdata, total);
-        libbalsa_mailbox_copy_message(message, mailbox, NULL);
+        libbalsa_message_copy(message, mailbox, NULL);
         libbalsa_mailbox_unlock_store(mailbox);
 
         g_object_unref(message);

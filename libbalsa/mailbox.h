@@ -281,8 +281,9 @@ struct _LibBalsaMailboxClass {
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     gboolean (*sync) (LibBalsaMailbox * mailbox, gboolean expunge);
-    int (*add_message) (LibBalsaMailbox * mailbox, LibBalsaMessage * message,
-                        GError **err);
+    gboolean (*add_message) (LibBalsaMailbox * mailbox,
+                             GMimeStream * stream,
+                             LibBalsaMessageFlag flags, GError ** err);
     gboolean (*messages_change_flags) (LibBalsaMailbox * mailbox,
 				       GArray *msgnos,
 				       LibBalsaMessageFlag set,
@@ -426,8 +427,10 @@ void libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 				  const gchar * prefix);
 
-int libbalsa_mailbox_copy_message(LibBalsaMessage *message,
-				  LibBalsaMailbox *dest, GError **err);
+gboolean libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
+                                      GMimeStream * stream,
+                                      LibBalsaMessageFlag flags,
+                                      GError ** err);
 gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 
 /* Message number-list methods */

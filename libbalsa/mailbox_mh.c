@@ -39,6 +39,7 @@
 #include "misc.h"
 #include "libbalsa_private.h"
 #include "libbalsa-conf.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct message_info {
@@ -79,9 +80,10 @@ static gboolean libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox
                                                             * message,
                                                             LibBalsaFetchFlag
                                                             flags);
-static int libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
-					   LibBalsaMessage * message,
-                                           GError **err);
+static gboolean libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
+                                                GMimeStream * stream,
+                                                LibBalsaMessageFlag flags,
+                                                GError ** err);
 static gboolean
 libbalsa_mailbox_mh_messages_change_flags(LibBalsaMailbox * mailbox,
                                           GArray * msgnos,
@@ -1071,15 +1073,18 @@ lbm_mh_update_sequences(LibBalsaMailboxMh * mh, gint fileno,
 }
 
 /* Called with mailbox locked. */
-static int
+static gboolean
 libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
-                                LibBalsaMessage * message, GError **err)
+                                GMimeStream * stream,
+                                LibBalsaMessageFlag flags,
+                                GError ** err)
 {
     LibBalsaMailboxMh *mh;
     const char *path;
     char *tmp;
     int fd;
     GMimeStream *out_stream;
+    GMimeFilter *crlffilter;
     int fileno;
     int retries;
     GMimeStream *in_stream;
@@ -1094,34 +1099,31 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("Cannot create message"));
-	return -1;
+	g_free(tmp);
+	return FALSE;
     }
     out_stream = g_mime_stream_fs_new(fd);
-    {
-	GMimeStream *tmp = libbalsa_message_stream(message);
-	GMimeFilter *crlffilter = 
-	    g_mime_filter_crlf_new (  GMIME_FILTER_CRLF_DECODE,
-				      GMIME_FILTER_CRLF_MODE_CRLF_ONLY );
-	in_stream = g_mime_stream_filter_new_with_stream (tmp);
-	g_mime_stream_filter_add ( GMIME_STREAM_FILTER (in_stream), crlffilter );
-	g_object_unref (crlffilter);
-	g_object_unref (tmp);
-    }    
-    libbalsa_mailbox_lock_store(message->mailbox);
-    if (g_mime_stream_write_to_stream( in_stream, out_stream) == -1)
-    {
-        libbalsa_mailbox_unlock_store(message->mailbox);
+
+    crlffilter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+                                        GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    in_stream = g_mime_stream_filter_new_with_stream(stream);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(in_stream), crlffilter);
+    g_object_unref(crlffilter);
+
+    libbalsa_mime_stream_shared_lock(stream);
+    if (g_mime_stream_write_to_stream(in_stream, out_stream) == -1) {
+        libbalsa_mime_stream_shared_unlock(stream);
         g_object_unref(in_stream);
 	g_object_unref(out_stream);
-	unlink (tmp);
-	g_free(tmp);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("Data copy error"));
-	return -1;
+	unlink(tmp);
+	g_free(tmp);
+	return FALSE;
     }
     g_object_unref(out_stream);
-    libbalsa_mailbox_unlock_store(message->mailbox);
+    libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(in_stream);
 
     fileno = mh->last_fileno; 
@@ -1137,14 +1139,13 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 	if (rename_status != -1)
 	    break;
 	
-	if (errno != EEXIST)
-	{
-	    unlink (tmp);
-	    g_free(tmp);
+	if (errno != EEXIST) {
             g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                         LIBBALSA_MAILBOX_APPEND_ERROR,
                         _("Message rename error"));
-	    return -1;
+	    unlink (tmp);
+	    g_free(tmp);
+	    return FALSE;
 	}
     } while (--retries > 0);
     g_free(tmp);
@@ -1153,14 +1154,14 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     "Too high activity?");
-	return -1;
+	return FALSE;
     }
     mh->last_fileno = fileno;
 
     lbm_mh_update_sequences(mh, fileno,
-			    message->flags | LIBBALSA_MESSAGE_FLAG_RECENT);
+                            flags | LIBBALSA_MESSAGE_FLAG_RECENT);
 
-    return 1;
+    return TRUE;
 }
 
 static gboolean

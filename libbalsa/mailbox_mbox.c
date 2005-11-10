@@ -84,9 +84,11 @@ static gboolean
 libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
                                               LibBalsaMessage * message,
                                               LibBalsaFetchFlag flags);
-static int libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
-                                             LibBalsaMessage *message,
-                                             GError **err);
+static gboolean libbalsa_mailbox_mbox_add_message(LibBalsaMailbox *
+                                                  mailbox,
+                                                  GMimeStream * stream,
+                                                  LibBalsaMessageFlag
+                                                  flags, GError ** err);
 static gboolean
 libbalsa_mailbox_mbox_messages_change_flags(LibBalsaMailbox * mailbox,
                                             GArray * msgnos,
@@ -1526,10 +1528,13 @@ lbm_mbox_armored_stream(GMimeStream * stream)
 }
 
 /* Called with mailbox locked. */
-static int
+static gboolean
 libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
-                                  LibBalsaMessage *message, GError **err)
+                                  GMimeStream * stream,
+                                  LibBalsaMessageFlag flags,
+                                  GError ** err)
 {
+    LibBalsaMessage *message = libbalsa_message_new();
     gchar date_string[27];
     gchar *sender;
     gchar *address;
@@ -1537,18 +1542,23 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     gchar *from = NULL;
     const char *path;
     int fd;
-    GMimeStream *orig;
     GMimeObject *armored_object;
     GMimeStream *armored_dest;
     GMimeStream *dest;
-    gint retval = 1;
+    gint retval;
     off_t orig_length;
+
+    message = libbalsa_message_new();
+    libbalsa_message_load_envelope_from_stream(message, stream);
 
     ctime_r(&(message->headers->date), date_string);
 
     sender = message->headers->from ?
 	internet_address_list_to_string(message->headers->from, FALSE) :
 	g_strdup("none");
+
+    g_object_unref(message);
+
     if ( (brack = strrchr( sender, '<' )) ) {
         gchar * a = strrchr ( brack , '>' );
         if (a)
@@ -1569,51 +1579,39 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("%s: could not open %s."), "MBOX", path);
-        return -1;
+        return FALSE;
     }
     
     orig_length = lseek (fd, 0, SEEK_END);
     lseek (fd, 0, SEEK_SET);
     dest = g_mime_stream_fs_new (fd);
     if (!dest) {
+	g_free(from);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("%s: could not get new mime stream."),
                     "MBOX");
-	g_free(from);
-	return -1;
+	return FALSE;
     }
     if (orig_length > 0 && !lbm_mbox_stream_seek_to_message(dest, 0)) {
+	g_object_unref(dest);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("%s: %s is not in mbox format."),
                     "MBOX", path);
-	g_object_unref(dest);
 	g_free(from);
-	return -1;
+	return FALSE;
     }
     mbox_lock ( mailbox, dest );
 
-    orig = libbalsa_message_stream(message);
-    if (!orig) {
-        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_APPEND_ERROR,
-                    _("%s: could not get message stream."),
-                    "MBOX");
-	mbox_unlock(mailbox, dest);
-	g_object_unref(dest);
-	g_free(from);
-	return -1;
-    }
-
     /* From_ armor */
-    libbalsa_mailbox_lock_store(message->mailbox);
-    armored_object = lbm_mbox_armored_object(orig);
+    libbalsa_mime_stream_shared_lock(stream);
+    g_mime_stream_reset(stream);
+    armored_object = lbm_mbox_armored_object(stream);
     /* Make sure we have "Status" and "X-Status" headers, so we can
      * update them in place later, if necessary. */
     update_message_status_headers(GMIME_MESSAGE(armored_object),
-                                  message->flags |
-                                  LIBBALSA_MESSAGE_FLAG_RECENT);
+                                  flags | LIBBALSA_MESSAGE_FLAG_RECENT);
     armored_dest = lbm_mbox_armored_stream(dest);
 
     retval = g_mime_stream_seek(dest, 0, GMIME_STREAM_SEEK_END);
@@ -1628,8 +1626,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     }
     g_free(from);
     g_object_unref(armored_object);
-    libbalsa_mailbox_unlock_store(message->mailbox);
-    g_object_unref(orig);
+    libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(armored_dest);
 
     if (retval < 0 && truncate(path, orig_length) < 0)
@@ -1637,7 +1634,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     mbox_unlock (mailbox, dest);
     g_object_unref(dest);
 
-    return retval;
+    return retval >= 0;
 }
 
 static gboolean

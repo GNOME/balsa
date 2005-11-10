@@ -58,6 +58,7 @@
 #include "imap-commands.h"
 #include "imap-server.h"
 #include "libbalsa-conf.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct _LibBalsaMailboxImap {
@@ -140,9 +141,11 @@ static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 static GArray *libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *
 						      mailbox);
 
-static int libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
-					     LibBalsaMessage * message,
-                                             GError **err);
+static gboolean libbalsa_mailbox_imap_add_message(LibBalsaMailbox *
+                                                  mailbox,
+                                                  GMimeStream * stream,
+                                                  LibBalsaMessageFlag
+                                                  flags, GError ** err);
 
 static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
                                                GArray * seqno,
@@ -2435,14 +2438,14 @@ libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
    can be called for a closed mailbox.
    Called with mailbox locked.
 */
-int
+static gboolean
 libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
-                                  LibBalsaMessage * message, GError **err)
+                                  GMimeStream * stream,
+                                  LibBalsaMessageFlag flags, GError ** err)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
     ImapResponse rc;
-    GMimeStream *stream;
     GMimeStream *tmpstream;
     GMimeFilter *crlffilter;
     ImapMboxHandle *handle;
@@ -2451,80 +2454,55 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     GMimeStream *outstream;
     gssize len;
 
-    if(message->mailbox &&
-       LIBBALSA_IS_MAILBOX_IMAP(message->mailbox) &&
-       LIBBALSA_MAILBOX_REMOTE(message->mailbox)->server ==
-       LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
-        ImapMboxHandle *handle = mimap->handle;
-        unsigned msgno = message->msgno;
-        g_return_val_if_fail(handle, -1); /* message is there but
-                                           * the source mailbox closed! */
-        /* FIXME: reconnect? The msgno number might have changed.
-         * we should probably reconnect and return a retriable error. */
-        rc = imap_mbox_handle_copy(handle, 1, &msgno, mimap->path);
-        if(rc != IMR_OK) {
-            gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
-            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                        LIBBALSA_MAILBOX_COPY_ERROR,
-                        "%s", msg);
-            g_free(msg);
-        }
-        return rc == IMR_OK ? 1 : -1;
-    }
+    if (!(flags & LIBBALSA_MESSAGE_FLAG_NEW))
+        IMSG_FLAG_SET(imap_flags, IMSGF_SEEN);
+    if (flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+        IMSG_FLAG_SET(imap_flags, IMSGF_DELETED);
+    if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+        IMSG_FLAG_SET(imap_flags, IMSGF_FLAGGED);
+    if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+        IMSG_FLAG_SET(imap_flags, IMSGF_ANSWERED);
 
-    if (!LIBBALSA_MESSAGE_IS_UNREAD(message) )
-	IMSG_FLAG_SET(imap_flags,IMSGF_SEEN);
-    if ( LIBBALSA_MESSAGE_IS_DELETED(message ) ) 
-	IMSG_FLAG_SET(imap_flags,IMSGF_DELETED);
-    if ( LIBBALSA_MESSAGE_IS_FLAGGED(message) )
-	IMSG_FLAG_SET(imap_flags,IMSGF_FLAGGED);
-    if ( LIBBALSA_MESSAGE_IS_REPLIED(message) )
-	IMSG_FLAG_SET(imap_flags,IMSGF_ANSWERED);
-
-    stream = libbalsa_message_stream(message);
     tmpstream = g_mime_stream_filter_new_with_stream(stream);
-    g_object_unref(stream);
 
     crlffilter =
-	g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
-			       GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+        g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
+                               GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
     g_object_unref(crlffilter);
 
     outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, err);
     if (outfd < 0) {
-	g_warning("Could not create temporary file: %s", (*err)->message);
-	g_object_unref(tmpstream);
-	return -1;
+        g_warning("Could not create temporary file: %s", (*err)->message);
+        g_object_unref(tmpstream);
+        return FALSE;
     }
 
     outstream = g_mime_stream_fs_new(outfd);
-    libbalsa_mailbox_lock_store(message->mailbox);
+    libbalsa_mime_stream_shared_lock(stream);
     g_mime_stream_write_to_stream(tmpstream, outstream);
-    libbalsa_mailbox_unlock_store(message->mailbox);
+    libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(tmpstream);
 
     len = g_mime_stream_tell(outstream);
     g_mime_stream_reset(outstream);
 
     handle = libbalsa_mailbox_imap_get_handle(mimap, err);
-    if(!handle)
+    if (!handle)
         /* Perhaps the mailbox was closed and the authentication
            failed or was cancelled? err is set already, we just
            return. */
-        return -1;
+        return FALSE;
 
-    if(len>(signed)SizeMsgThreshold)
-        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
-                             _("Uploading %ld kB"),
-                             (long)len/1024);
+    if (len > (signed) SizeMsgThreshold)
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                             _("Uploading %ld kB"), (long) len / 1024);
     rc = imap_mbox_append_stream(handle, mimap->path,
-				 imap_flags, outstream, len);
-    if(rc != IMR_OK) {
+                                 imap_flags, outstream, len);
+    if (rc != IMR_OK) {
         gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_APPEND_ERROR,
-                    "%s", msg);
+                    LIBBALSA_MAILBOX_APPEND_ERROR, "%s", msg);
         g_free(msg);
     }
     libbalsa_mailbox_imap_release_handle(mimap);
@@ -2533,7 +2511,7 @@ libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
     unlink(outfile);
     g_free(outfile);
 
-    return rc == IMR_OK ? 1 : -1;
+    return rc == IMR_OK;
 }
 
 static void

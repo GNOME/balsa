@@ -395,7 +395,8 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 #if ENABLE_ESMTP
     guint big_message;
 #endif /* ESMTP */
-    gint rc;
+    gboolean rc;
+    GError *err = NULL;
 
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
@@ -421,7 +422,8 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
         mime_msgs =
             g_mime_message_partial_split_message(mime_msg, big_message,
                                                  &nparts);
-        for (i = rc = 0; i < nparts; ++i) {
+        rc = TRUE;
+        for (i = 0; i < nparts; ++i) {
             if (nparts > 1) {
                 /* RFC 2046, 5.2.2: "...it is specified that entities of
                  * type "message/partial" must always have a content-
@@ -431,20 +433,28 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                                          GMIME_PART_ENCODING_7BIT);
                 libbalsa_set_message_id(mime_msgs[i]);
             }
-            message->mime_msg = mime_msgs[i];
-            if (rc >= 0)
-                rc = libbalsa_mailbox_copy_message(message, outbox, NULL);
+            if (rc) {
+                message->mime_msg = mime_msgs[i];
+                rc = libbalsa_message_copy(message, outbox, &err);
+            }
             g_object_unref(mime_msgs[i]);
         }
         g_free(mime_msgs);
         message->mime_msg = mime_msg;
     } else
-        rc = libbalsa_mailbox_copy_message(message, outbox, NULL);
+        rc = libbalsa_message_copy(message, outbox, &err);
 #else                           /* ESMTP */
-    rc = libbalsa_mailbox_copy_message(message, outbox, NULL);
+    rc = libbalsa_message_copy(message, outbox, &err);
 #endif                          /* ESMTP */
 
-    return rc < 0 ? LIBBALSA_MESSAGE_QUEUE_ERROR : LIBBALSA_MESSAGE_CREATE_OK;
+    if (!rc) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Copying message to outbox failed: %s"),
+                             err ? err->message : "?");
+        g_clear_error(&err);
+    }
+
+    return rc ?  LIBBALSA_MESSAGE_CREATE_OK : LIBBALSA_MESSAGE_QUEUE_ERROR;
 }
 
 static void
@@ -911,14 +921,14 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
                 lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW |
                                  LIBBALSA_MESSAGE_FLAG_FLAGGED);
 		libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
-                remove =
-                    libbalsa_mailbox_copy_message(mqi->orig, fccbox, &err)>=0;
-                if(!remove) 
+                remove = libbalsa_message_copy(mqi->orig, fccbox, &err);
+                if(!remove) {
                     libbalsa_information
                         (LIBBALSA_INFORMATION_ERROR, 
                          _("Saving sent message to %s failed: %s"),
                          fccbox->url, err ? err->message : "?");
-                g_clear_error(&err);
+                    g_clear_error(&err);
+                }
             }
             /* If copy failed, mark the message again as flagged -
                otherwise it will get resent again. And again, and
@@ -1782,24 +1792,32 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
  */
 gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
-			  LibBalsaMailbox * draftbox,
-			  LibBalsaMessage * reply_message,
-			  gchar * fcc, gboolean flow)
+                          LibBalsaMailbox * draftbox,
+                          LibBalsaMessage * reply_message,
+                          gchar * fcc, gboolean flow)
 {
-    int thereturn; 
+    gboolean retval;
+    GError *err = NULL;
 
     if (!message->mime_msg
-	&& libbalsa_message_create_mime_message(message, flow,
-						TRUE) !=
-	LIBBALSA_MESSAGE_CREATE_OK)
-	return FALSE;
+        && libbalsa_message_create_mime_message(message, flow,
+                                                TRUE) !=
+        LIBBALSA_MESSAGE_CREATE_OK)
+        return FALSE;
 
     if (fcc)
-	g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc", fcc);
+        g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc", fcc);
 
-    thereturn = libbalsa_mailbox_copy_message( message, draftbox, NULL );
+    retval = libbalsa_message_copy(message, draftbox, &err);
 
-    return thereturn!=-1;
+    if (!retval) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Postponing message failed: %s"),
+                             err ? err->message : "?");
+        g_clear_error(&err);
+    }
+
+    return retval;
 }
 
 

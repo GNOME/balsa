@@ -43,6 +43,8 @@
 
 /* needed for truncate_string */
 #include "misc.h"
+
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 #include <gmime/gmime.h>
@@ -1148,20 +1150,18 @@ libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
 }
 
 void
-libbalsa_message_load_envelope(LibBalsaMessage *message)
+libbalsa_message_load_envelope_from_stream(LibBalsaMessage * message,
+                                           GMimeStream *gmime_stream)
 {
-    GMimeStream *gmime_stream;
     GMimeStream *gmime_stream_buffer;
     GByteArray *line;
     guchar lookahead;
     gboolean ret = FALSE;
 
-    gmime_stream = libbalsa_message_stream(message);
-    if (!gmime_stream)
-	return;
-    libbalsa_mailbox_lock_store(message->mailbox);
-    gmime_stream_buffer = g_mime_stream_buffer_new(gmime_stream,
-					GMIME_STREAM_BUFFER_BLOCK_READ);
+    libbalsa_mime_stream_shared_lock(gmime_stream);
+    gmime_stream_buffer =
+        g_mime_stream_buffer_new(gmime_stream,
+                                 GMIME_STREAM_BUFFER_BLOCK_READ);
 
     line = g_byte_array_new();
     do {
@@ -1197,9 +1197,21 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
 	/* calculate size */
     }
     g_object_unref(gmime_stream_buffer);
-    libbalsa_mailbox_unlock_store(message->mailbox);
-    g_object_unref(gmime_stream);
+    libbalsa_mime_stream_shared_unlock(gmime_stream);
     g_byte_array_free(line, TRUE);
+}
+
+void
+libbalsa_message_load_envelope(LibBalsaMessage *message)
+{
+    GMimeStream *gmime_stream;
+
+    gmime_stream = libbalsa_message_stream(message);
+    if (!gmime_stream)
+	return;
+
+    libbalsa_message_load_envelope_from_stream(message, gmime_stream);
+    g_object_unref(gmime_stream);
 }
 
 GMimeStream *
@@ -1223,4 +1235,33 @@ libbalsa_message_stream(LibBalsaMessage * message)
     g_mime_stream_reset(mime_stream);
 
     return mime_stream;
+}
+
+gboolean
+libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest,
+                      GError ** err)
+{
+    LibBalsaMailbox *mailbox;
+    gboolean retval;
+
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
+    mailbox = message->mailbox;
+    g_return_val_if_fail(mailbox != NULL || message->mime_msg != NULL,
+                         FALSE);
+
+    if (mailbox) {
+        GArray *msgnos = g_array_sized_new(FALSE, FALSE, sizeof(guint), 1);
+        g_array_append_val(msgnos, message->msgno);
+        retval =
+            libbalsa_mailbox_messages_copy(mailbox, msgnos, dest, err);
+        g_array_free(msgnos, TRUE);
+    } else {
+        GMimeStream *mime_stream = libbalsa_message_stream(message);
+        retval = libbalsa_mailbox_add_message(dest, mime_stream,
+                                              message->flags, err);
+        g_object_unref(mime_stream);
+    }
+
+    return retval;
 }

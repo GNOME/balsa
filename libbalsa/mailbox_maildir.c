@@ -36,6 +36,7 @@
 #include "libbalsa-conf.h"
 #include "misc.h"
 #include "libbalsa_private.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 
 struct message_info {
@@ -83,9 +84,11 @@ static gboolean
 libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						 LibBalsaMessage * message,
 						 LibBalsaFetchFlag flags);
-static int libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
-						LibBalsaMessage * message,
-                                                GError **err);
+static gboolean libbalsa_mailbox_maildir_add_message(LibBalsaMailbox *
+                                                     mailbox,
+                                                     GMimeStream * stream,
+                                                     LibBalsaMessageFlag
+                                                     flags, GError ** err);
 static gboolean
 libbalsa_mailbox_maildir_messages_change_flags(LibBalsaMailbox * mailbox,
                                                GArray * msgnos,
@@ -866,15 +869,16 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
 }
 
 /* Called with mailbox locked. */
-static int
+static gboolean
 libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
-                                     LibBalsaMessage * message, GError **err)
+                                     GMimeStream * stream,
+                                     LibBalsaMessageFlag flags,
+                                     GError **err)
 {
     const char *path;
     char *tmp;
     int fd;
     GMimeStream *out_stream;
-    GMimeStream *tmp_stream;
     GMimeStream *in_stream;
     GMimeFilter *crlffilter;
     char *new_filename;
@@ -887,31 +891,19 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     path = libbalsa_mailbox_local_get_path(mailbox);
     fd = libbalsa_mailbox_maildir_open_temp(path, &tmp);
     if (fd == -1)
-	return -1;
+	return FALSE;
     out_stream = g_mime_stream_fs_new(fd);
 
-    tmp_stream = libbalsa_message_stream(message);
-    if (!tmp_stream) {
-        g_object_unref(out_stream);
-        unlink(tmp);
-        g_free(tmp);
-        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_COPY_ERROR,
-                    _("Cannot read message"));
-        return -1;
-    }
-    in_stream = g_mime_stream_filter_new_with_stream(tmp_stream);
-    g_object_unref(tmp_stream);
-
+    in_stream = g_mime_stream_filter_new_with_stream(stream);
     crlffilter =
         g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
                                GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(in_stream), crlffilter);
     g_object_unref(crlffilter);
  
-    libbalsa_mailbox_lock_store(message->mailbox);
+    libbalsa_mime_stream_shared_lock(stream);
     retval = g_mime_stream_write_to_stream(in_stream, out_stream);
-    libbalsa_mailbox_unlock_store(message->mailbox);
+    libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(in_stream);
     g_object_unref(out_stream);
 
@@ -921,7 +913,7 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_COPY_ERROR,
                     _("Data copy error"));
-	return retval;
+	return FALSE;
     }
 
     new_filename = strrchr(tmp, '/');
@@ -933,8 +925,8 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     msg_info->subdir = "tmp";
     msg_info->key = g_strdup(new_filename);
     msg_info->filename = g_strdup(new_filename);
-    msg_info->flags = message->flags | LIBBALSA_MESSAGE_FLAG_RECENT;
-    retval = maildir_sync_add(msg_info, path) ? 1 : -1;
+    msg_info->flags = flags | LIBBALSA_MESSAGE_FLAG_RECENT;
+    retval = maildir_sync_add(msg_info, path);
     free_message_info(msg_info);
     g_free(tmp);
 

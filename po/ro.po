@@ -2,19 +2,20 @@
 # Copyright (C) 2000 - 2005 Free Software Foundation, Inc.
 # Dan Damian <dand@gnome.ro>, 2001.
 # Mişu Moldovan <dumol@gnome.ro>, 2000 - 2005.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Balsa 2.3.2\n"
+"Project-Id-Version: Balsa 2.3.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-09-11 15:21+0100\n"
-"PO-Revision-Date: 2005-05-27 14:56+0300\n"
+"PO-Revision-Date: 2005-10-17 15:36+0300\n"
 "Last-Translator: Mişu Moldovan <dumol@gnome.ro>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Creation-Date: 2000-10-08 10:42+0300\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=3;plural=(n==1?0:(n==0||((n%100)>0&&(n%100)<20))?1:2)\n"
 
 #: ../balsa.desktop.in.h:1
 msgid "Balsa"
@@ -67,9 +68,8 @@ msgid "Cannot add duplicate entry"
 msgstr "Nu pot adăuga o intrare duplicată"
 
 #: ../libbalsa/address-book.c:309
-#, fuzzy
 msgid "Cannot find address in address book"
-msgstr "Nu pot căuta în cartea de adrese"
+msgstr "Nu am găsit adresa în cartea de adrese"
 
 #: ../libbalsa/address-book.c:310 ../src/main-window.c:2228
 #: ../src/main-window.c:4250 ../src/sendmsg-window.c:4809
@@ -583,14 +583,13 @@ msgid "Cannot get IMAP handle"
 msgstr "Nu am reuşit să obţin o conexiune IMAP"
 
 #: ../libbalsa/mailbox_imap.c:2254
-#, fuzzy
 msgid "Cannot create temporary file"
-msgstr "Nu pot crea fişierul temporar %s"
+msgstr "Nu pot crea un fişier temporar"
 
 #: ../libbalsa/mailbox_imap.c:2273
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot write to temporary file %s"
-msgstr "Nu pot crea fişierul temporar %s"
+msgstr "Nu pot scrie în fişierul temporar %s"
 
 #: ../libbalsa/mailbox_imap.c:2506
 #, c-format
@@ -1101,16 +1100,16 @@ msgstr ""
 "Dată semnare: %s"
 
 #: ../libbalsa/rfc3156.c:1092
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "User ID validity: %s"
 msgstr ""
 "\n"
-"ID utilizator: %s"
+"Validitate ID: %s"
 
 #: ../libbalsa/rfc3156.c:1096
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Key owner trust: %s"
@@ -1128,22 +1127,22 @@ msgstr ""
 "Amprentă cheie: %s"
 
 #: ../libbalsa/rfc3156.c:1105
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Subkey created on: %s"
 msgstr ""
 "\n"
-"Dată creare cheie: %s"
+"Dată creare subcheie: %s"
 
 #: ../libbalsa/rfc3156.c:1110
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Subkey expires on: %s"
 msgstr ""
 "\n"
-"Dată expirare cheie: %s"
+"Dată expirare subcheie: %s"
 
 #: ../libbalsa/rfc3156.c:1119
 msgid " revoked"
@@ -1162,22 +1161,22 @@ msgid " invalid"
 msgstr " invalidă"
 
 #: ../libbalsa/rfc3156.c:1137
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Subkey attributes:%s"
 msgstr ""
 "\n"
-"Atribute cheie: %s"
+"Atribute subcheie: %s"
 
 #: ../libbalsa/rfc3156.c:1139
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Subkey attribute:%s"
 msgstr ""
 "\n"
-"Atribut cheie: %s"
+"Atribut subcheie: %s"
 
 #: ../libbalsa/rfc3156.c:1145
 #, c-format
@@ -1632,7 +1631,7 @@ msgstr "Numele serverului pentru primire _mail:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:119
 msgid "_Type of mail server:"
-msgstr "Tip server mail:"
+msgstr "_Tip server mail:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:123
 msgid "Connect using _SSL:"
@@ -1752,9 +1751,8 @@ msgid "Program startup"
 msgstr "Pornire program"
 
 #: ../src/ab-main.c:199 ../src/ab-window.c:673
-#, fuzzy
 msgid " address book: "
-msgstr "Carte de adrese"
+msgstr " carte de adrese: "
 
 #: ../src/ab-main.c:470 ../src/address-book-config.c:903
 msgid "VCard Address Book (GnomeCard)"
@@ -1802,7 +1800,7 @@ msgstr "Trimite-Către"
 
 #: ../src/ab-window.c:343
 msgid "Run Editor"
-msgstr ""
+msgstr "Pornire editor"
 
 #: ../src/ab-window.c:350
 msgid "_Re-Import"
@@ -1884,9 +1882,8 @@ msgid "_Password"
 msgstr "_Parolă"
 
 #: ../src/address-book-config.c:479
-#, fuzzy
 msgid "_User Address Book DN"
-msgstr "Alegeţi cartea de adrese"
+msgstr "DN carte de adrese _utilizator"
 
 #: ../src/address-book-config.c:485
 msgid "Enable _TLS"
@@ -2035,11 +2032,11 @@ msgstr "_Nou"
 
 #: ../src/balsa-index.c:1826
 msgid "_Move to"
-msgstr "M_ută în"
+msgstr "_Mută în"
 
 #: ../src/balsa-index.c:1834
 msgid "_View Source"
-msgstr "Arată sursele"
+msgstr "Arată _sursele"
 
 #: ../src/balsa-index.c:2116
 #, c-format
@@ -2104,6 +2101,7 @@ msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
 msgstr[0] "Căsuţa de mail curentă: %s cu %d mesaj, "
 msgstr[1] "Căsuţa de mail curentă: %s cu %d mesaje, "
+msgstr[2] "Căsuţa de mail curentă: %s cu %d de mesaje, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
@@ -2111,8 +2109,9 @@ msgstr[1] "Căsuţa de mail curentă: %s cu %d mesaje, "
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%ld nou"
+msgstr[1] "%ld noi"
+msgstr[2] "%ld noi"
 
 #: ../src/balsa-message.c:285
 msgid "Check cryptographic signature"
@@ -2240,14 +2239,14 @@ msgstr ""
 
 #: ../src/balsa-message.c:2322 ../src/balsa-message.c:2404
 #: ../src/balsa-message.c:2519
-#, fuzzy, c-format
+#, c-format
 msgid "Parsing a message part failed: %s"
-msgstr "Salvarea mesajul trimis către %s a eşuat: %s"
+msgstr "Procesare unei anexe a eşuat: %s"
 
 #: ../src/balsa-message.c:2323 ../src/balsa-message.c:2405
 #: ../src/balsa-message.c:2520
 msgid "Possible disk space problem."
-msgstr ""
+msgstr "S-ar putea să fie o problemă cu spaţiul liber pe disc."
 
 #: ../src/balsa-message.c:2335
 #, c-format
@@ -2426,9 +2425,8 @@ msgid "Error displaying condition help: %s\n"
 msgstr "Eroare la afişarea ajutorului pentru această condiţie: %s\n"
 
 #: ../src/filter-edit-callbacks.c:882
-#, fuzzy
 msgid "Match Fields"
-msgstr "Fişiere de mail"
+msgstr "Câmpuri potrivire"
 
 #: ../src/filter-edit-callbacks.c:892
 msgid "_All"
@@ -2508,9 +2506,8 @@ msgid "One _Matches/None Matches"
 msgstr "U_na / Niciuna"
 
 #: ../src/filter-edit-callbacks.c:1032
-#, fuzzy
 msgid "Match when message date is in the interval:"
-msgstr "Corespunde dacă data este în intervalul:"
+msgstr "Corespunde dacă data mesajului este în intervalul:"
 
 #: ../src/filter-edit-callbacks.c:1052
 msgid "Inside/outside the date interval"
@@ -2709,9 +2706,9 @@ msgid "Error when applying filters"
 msgstr "Eroare la filtrare"
 
 #: ../src/filter-run-callbacks.c:233 ../src/filter-run-callbacks.c:255
-#, fuzzy, c-format
+#, c-format
 msgid "Filter applied to \"%s\"."
-msgstr "Copiat în „%s”."
+msgstr "Filtrul a fost aplicat în „%s”."
 
 #: ../src/filter-run-callbacks.c:292
 #, c-format
@@ -2749,7 +2746,7 @@ msgstr "La ieşire"
 
 #: ../src/filter-run-dialog.c:316
 msgid "Apply Selected"
-msgstr ""
+msgstr "Aplică selecţia"
 
 #. up button
 #: ../src/filter-run-dialog.c:364
@@ -2762,9 +2759,8 @@ msgid "Do_wn"
 msgstr "_Jos"
 
 #: ../src/filter-run-dialog.c:375
-#, fuzzy
 msgid "A_pply Now!"
-msgstr "_Răspunde către"
+msgstr "A_plică acum!"
 
 #: ../src/filter-run-dialog.c:419
 msgid ""
@@ -3232,9 +3228,8 @@ msgid "Mark as D_raftbox"
 msgstr "Marchează c_a „Neterminate”"
 
 #: ../src/mailbox-node.c:1018
-#, fuzzy
 msgid "_Empty trash"
-msgstr "Goleşte coşul"
+msgstr "_Goleşte coşul"
 
 #: ../src/mailbox-node.c:1023
 msgid "_Edit/Apply filters"
@@ -3943,9 +3938,9 @@ msgid "Checking Mail..."
 msgstr "Verific poşta..."
 
 #: ../src/main-window.c:2870
-#, fuzzy, c-format
+#, c-format
 msgid "IMAP mailbox: %s"
-msgstr "Căsuţă de mail locală: %s"
+msgstr "Căsuţă de mail IMAP: %s"
 
 #: ../src/main-window.c:2873
 #, c-format
@@ -3971,6 +3966,7 @@ msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "Aţi primit un mesaj nou."
 msgstr[1] "Aţi primit %d mesaje noi."
+msgstr[2] "Aţi primit %d de mesaje noi."
 
 #: ../src/main-window.c:3172
 msgid "You have new mail."
@@ -4180,14 +4176,14 @@ msgid "Message from %s: %s"
 msgstr "Mesaj de la %s: %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:50
-#, fuzzy, c-format
+#, c-format
 msgid "Could not create temporary file %s: "
-msgstr "Nu pot crea fişierul temporar %s"
+msgstr "Nu s-a putut crea fişierul temporar %s:"
 
 #: ../src/balsa-mime-widget-callbacks.c:114
-#, fuzzy, c-format
+#, c-format
 msgid "could not create temporary file %s: %s"
-msgstr "nu pot crea fişierul temporar %s"
+msgstr "nu s-a putut crea fişierul temporar %s: %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:140
 #, c-format
@@ -4199,12 +4195,12 @@ msgid "File already exists. Overwrite?"
 msgstr "Fişierul există deja. Îl suprascriu?"
 
 #: ../src/balsa-mime-widget-crypto.c:70
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This is an inline %s signed %s message part:\n"
 "%s"
 msgstr ""
-"Aceasta este o anexă mesaj %s semnată „inline” %s:\n"
+"Aceasta este o anexă mesaj %s semnată %s „inline”:\n"
 "%s"
 
 #: ../src/balsa-mime-widget-crypto.c:72 ../src/print.c:1302
@@ -4286,9 +4282,9 @@ msgid "Error showing %s: %s\n"
 msgstr "Eroare la afişarea %s: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:332
-#, fuzzy, c-format
+#, c-format
 msgid "Could not get a part: %s"
-msgstr "Nu am reuşit să salvez %s: %s"
+msgstr "Nu am reuşit să salvez o anexă: %s"
 
 #: ../src/balsa-mime-widget-message.c:601 ../src/print.c:350
 #: ../src/sendmsg-window.c:1003 ../src/sendmsg-window.c:3165
@@ -4329,9 +4325,9 @@ msgid "Disposition-Notification-To:"
 msgstr "Confirmare-De-Primire-Către:"
 
 #: ../src/balsa-mime-widget-text.c:100
-#, fuzzy, c-format
+#, c-format
 msgid "Could not save a text part: %s"
-msgstr "Nu am reuşit să salvez %s: %s"
+msgstr "Nu am reuşit să salvez o anexă: %s"
 
 #: ../src/balsa-mime-widget-text.c:135
 #, c-format
@@ -4348,9 +4344,9 @@ msgid "Calling URL %s..."
 msgstr "Deschid adresa %s..."
 
 #: ../src/balsa-mime-widget.c:254
-#, fuzzy, c-format
+#, c-format
 msgid "Error reading message part: %s"
-msgstr "Eroare la mutarea mesajelor în coş: %s"
+msgstr "Eroare la citirea anexei mesaj: %s"
 
 #: ../src/balsa-mime-widget.c:276
 #, c-format
@@ -4504,11 +4500,11 @@ msgstr "_Verifică automat poşta la fiecare:"
 #: ../src/pref-manager.c:1650 ../src/pref-manager.c:2396
 #: ../src/pref-manager.c:2447
 msgid "minutes"
-msgstr "minute"
+msgstr "minut(e)"
 
 #: ../src/pref-manager.c:1656
 msgid "Check _IMAP mailboxes"
-msgstr "Verificare căsuţe poştale _IMAP"
+msgstr "Verifică căsuţele poştale _IMAP"
 
 #: ../src/pref-manager.c:1662
 msgid "Check INBOX _only"
@@ -4524,7 +4520,7 @@ msgstr "Verifică în fundal căsuţele poştale fără mesaje în bara de stare
 
 #: ../src/pref-manager.c:1676
 msgid "_POP message size limit:"
-msgstr "Limită mesaj POP3:"
+msgstr "Limită mesaj POP_3:"
 
 #: ../src/pref-manager.c:1683
 msgid "MB"
@@ -4959,9 +4955,9 @@ msgstr ""
 "Tipăresc această parte?"
 
 #: ../src/print.c:675
-#, fuzzy, c-format
+#, c-format
 msgid "Could not get part: %s"
-msgstr "Nu am reuşit să salvez %s: %s"
+msgstr "Nu am reuşit să obţin anexa: %s"
 
 #. gather some info about this part
 #. four fields, one terminator
@@ -5330,23 +5326,23 @@ msgstr "Editează mesajul curent cu editorul implicit din Gnome"
 
 #: ../src/sendmsg-window.c:403 ../src/sendmsg-window.c:562
 msgid "Fr_om"
-msgstr "Expedit_or"
+msgstr "E_xpeditor"
 
 #: ../src/sendmsg-window.c:405 ../src/sendmsg-window.c:564
 msgid "_Cc"
-msgstr "Alţi _destinatari"
+msgstr "_Alţi destinatari"
 
 #: ../src/sendmsg-window.c:407 ../src/sendmsg-window.c:566
 msgid "_Bcc"
-msgstr "Destinatari invizi_bili"
+msgstr "Destinatari _invizibili"
 
 #: ../src/sendmsg-window.c:409 ../src/sendmsg-window.c:568
 msgid "_Fcc"
-msgstr "Căsuţa mesa_jelor trimise"
+msgstr "_Căsuţă mesaje trimise"
 
 #: ../src/sendmsg-window.c:411
 msgid "_Reply To"
-msgstr "_Răspunde către"
+msgstr "_Răspuns către"
 
 #: ../src/sendmsg-window.c:417 ../src/sendmsg-window.c:610
 msgid "_Request Disposition Notification"
@@ -5376,7 +5372,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:450 ../src/sendmsg-window.c:626
 msgid "_Show"
-msgstr "An_tete"
+msgstr "_Antete"
 
 #: ../src/sendmsg-window.c:452 ../src/sendmsg-window.c:603
 msgid "_Language"
@@ -5528,7 +5524,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:2582
 msgid "F_rom:"
-msgstr "_Expeditor:"
+msgstr "E_xpeditor:"
 
 #. Subject:
 #: ../src/sendmsg-window.c:2717
@@ -5538,12 +5534,12 @@ msgstr "_Subiect:"
 #. fcc: mailbox folder where the message copy will be written to
 #: ../src/sendmsg-window.c:2731
 msgid "F_cc:"
-msgstr "Salvea_ză în:"
+msgstr "_Salvează în:"
 
 #. Reply To:
 #: ../src/sendmsg-window.c:2762
 msgid "_Reply To:"
-msgstr "_Răspunde către:"
+msgstr "_Răspunde la:"
 
 #. Attachment list
 #: ../src/sendmsg-window.c:2767
@@ -5559,9 +5555,9 @@ msgid "Description"
 msgstr "Descriere"
 
 #: ../src/sendmsg-window.c:3108
-#, fuzzy, c-format
+#, c-format
 msgid "Could not save attachment: %s"
-msgstr "Nu am reuşit să salvez %s: %s"
+msgstr "Nu am reuşit să salvez anexa: %s"
 
 #: ../src/sendmsg-window.c:3144
 msgid "you"
@@ -6031,12 +6027,10 @@ msgid "Unknown toolbar icon \"%s\""
 msgstr "Iconiţă necunoscută pentru bara cu unelte „%s”"
 
 #: ../src/toolbar-factory.c:315
-#, fuzzy
 msgid "Queue"
-msgstr "Trimite în c_oada de aşteptare"
+msgstr "Încolonează"
 
 #: ../src/toolbar-factory.c:352
-#, fuzzy
 msgid "Queue this message for sending"
 msgstr "Încolonează acest mesaj în coada cu mesaje netrimise"
 

@@ -76,6 +76,8 @@ extern "C"
         gboolean sig_whenreply;
         gboolean sig_separator;
         gboolean sig_prepend;
+        gchar *face;
+        gchar *x_face;
 
 #ifdef HAVE_GPGME
 	gboolean gpg_sign;

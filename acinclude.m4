@@ -1,4 +1,4 @@
-AC_DEFUN(AM_HDR_SIGACTION,
+AC_DEFUN([AM_HDR_SIGACTION],
 [AC_CACHE_CHECK([for sigaction.h], am_cv_hdr_sigaction,
 [AC_TRY_LINK([#include <sigaction.h>],
               [int i = 0;],
@@ -9,7 +9,7 @@ if test $am_cv_hdr_sigaction = yes; then
 fi
 ])
               
-AC_DEFUN(AM_HDR_SIGSET,
+AC_DEFUN([AM_HDR_SIGSET],
 [AC_CACHE_CHECK([for sigset.h], am_cv_hdr_sigset,
 [AC_TRY_LINK([#include <sigset.h>],
               [int i = 0;],

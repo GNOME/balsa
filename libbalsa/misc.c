@@ -34,6 +34,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
+#if HAVE_COMPFACE
+#include <compface.h>
+#endif                          /* HAVE_COMPFACE */
 
 #ifdef HAVE_GNOME
 #include <libgnomevfs/gnome-vfs.h>
@@ -2028,4 +2031,143 @@ libbalsa_ia_rfc2821_equal(const InternetAddress * a,
         return FALSE;
     else
         return TRUE;
+}
+
+/*
+ * Face and X-Face header support.
+ */
+gchar *
+libbalsa_get_header_from_path(const gchar * header, const gchar * path,
+                              gsize * size, GError ** err)
+{
+    gchar *buf, *content;
+    size_t name_len;
+    gchar *p, *q;
+
+    if (!g_file_get_contents(path, &buf, size, err))
+        return NULL;
+
+    content = buf;
+    name_len = strlen(header);
+    if (g_ascii_strncasecmp(content, header, name_len) == 0)
+        /* Skip header and trailing colon: */
+        content += name_len + 1;
+
+    /* Unfold. */
+    for (p = q = content; *p; p++)
+        if (*p != '\r' && *p != '\n')
+            *q++ = *p;
+    *q = '\0';
+
+    content = g_strdup(content);
+    g_free(buf);
+
+    return content;
+}
+
+GtkWidget *
+libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
+{
+    GMimeStream *stream;
+    GMimeStream *stream_filter;
+    GMimeFilter *filter;
+    GByteArray *array;
+    GtkWidget *image = NULL;
+
+    stream = g_mime_stream_mem_new();
+    stream_filter = g_mime_stream_filter_new_with_stream(stream);
+
+    filter = g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter), filter);
+    g_object_unref(filter);
+
+    g_mime_stream_write_string(stream_filter, content);
+    g_object_unref(stream_filter);
+
+    array = GMIME_STREAM_MEM(stream)->buffer;
+    if (array->len == 0)
+        g_set_error(err, LIBBALSA_IMAGE_ERROR,
+                    LIBBALSA_IMAGE_ERROR_NO_DATA, _("No image data"));
+    else {
+        GdkPixbufLoader *loader =
+            gdk_pixbuf_loader_new_with_type("png", NULL);
+
+        gdk_pixbuf_loader_write(loader, array->data, array->len, err);
+        gdk_pixbuf_loader_close(loader, *err ? NULL : err);
+
+        if (!*err)
+            image = gtk_image_new_from_pixbuf(gdk_pixbuf_loader_get_pixbuf
+                                              (loader));
+        g_object_unref(loader);
+    }
+    g_object_unref(stream);
+
+    return image;
+}
+
+#if HAVE_COMPFACE
+GtkWidget *
+libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
+{
+    gchar buf[2048];
+    GdkPixbuf *pixbuf;
+    guchar *pixels;
+    gint lines;
+    const gchar *p;
+    GtkWidget *image = NULL;
+
+    strncpy(buf, content, sizeof buf - 1);
+
+    switch (uncompface(buf)) {
+    case -1:
+        g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_FORMAT,
+                    _("Invalid input format"));
+        return image;
+    case -2:
+        g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_BUFFER,
+                    _("Internal buffer overrun"));
+        return image;
+    }
+
+    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, 48, 48);
+    pixels = gdk_pixbuf_get_pixels(pixbuf);
+
+    p = buf;
+    for (lines = 48; lines > 0; --lines) {
+        guint x[3];
+        gint j, k;
+        guchar *q;
+
+        if (sscanf(p, "%x,%x,%x,", &x[0], &x[1], &x[2]) != 3) {
+            g_set_error(err, LIBBALSA_IMAGE_ERROR,
+                        LIBBALSA_IMAGE_ERROR_BAD_DATA,
+                        _("Bad X-Face data"));
+            g_object_unref(pixbuf);
+            return image;
+        }
+        for (j = 0, q = pixels; j < 3; j++)
+            for (k = 15; k >= 0; --k){
+                guchar c = x[j] & (1 << k) ? 0x00 : 0xff;
+                *q++ = c;       /* red   */
+                *q++ = c;       /* green */
+                *q++ = c;       /* blue  */
+            }
+        p = strchr(p, '\n') + 1;
+        pixels += gdk_pixbuf_get_rowstride(pixbuf);
+    }
+
+    image = gtk_image_new_from_pixbuf(pixbuf);
+    g_object_unref(pixbuf);
+
+    return image;
+}
+#endif                          /* HAVE_COMPFACE */
+
+GQuark
+libbalsa_image_error_quark(void)
+{
+    static GQuark quark = 0;
+    if (quark == 0)
+        quark = g_quark_from_static_string("libbalsa-image-error-quark");
+    return quark;
 }

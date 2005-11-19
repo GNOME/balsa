@@ -157,4 +157,29 @@ gboolean libbalsa_str_has_prefix(const gchar * str, const gchar * prefix);
 gboolean libbalsa_ia_rfc2821_equal(const InternetAddress * a,
 				   const InternetAddress * b);
 
+/*
+ * Face and X-Face header support.
+ */
+gchar *libbalsa_get_header_from_path(const gchar * header,
+                                     const gchar * path, gsize * size,
+                                     GError ** err);
+GtkWidget *libbalsa_get_image_from_face_header(const gchar * content,
+                                               GError ** err);
+#if HAVE_COMPFACE
+GtkWidget *libbalsa_get_image_from_x_face_header(const gchar * content,
+                                                 GError ** err);
+#endif                          /* HAVE_COMPFACE */
+
+GQuark libbalsa_image_error_quark(void);
+#define LIBBALSA_IMAGE_ERROR libbalsa_image_error_quark()
+enum LibBalsaImageError {
+    LIBBALSA_IMAGE_ERROR_NO_DATA
+#if HAVE_COMPFACE
+        ,
+    LIBBALSA_IMAGE_ERROR_FORMAT,
+    LIBBALSA_IMAGE_ERROR_BUFFER,
+    LIBBALSA_IMAGE_ERROR_BAD_DATA
+#endif                          /* HAVE_COMPFACE */
+};
+
 #endif				/* __LIBBALSA_MISC_H__ */

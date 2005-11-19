@@ -1,3 +1,20 @@
+2005-11-19 08:47  PeterB
+
+	* src/balsa-index.c: don't scroll back to current message after
+	mailbox changes.
+	* src/sendmsg-window.c: create Face or X-Face user header from path
+	in identity.
+	* src/balsa-message.c: display face from Face or X-Face header.
+	* libbalsa/send.c: use user-headers correctly.
+	* libbalsa/: misc.c, misc.h: new public methods
+	libbalsa_get_image_from_{,x_}face_header and a corresponding GError
+	domain.
+	* libbalsa/: identity.c, identity.h: port signature-path to
+	GtkFileChooserButton; add Face and X-Face header file paths; change
+	some prototypes to reduce dynamic casting.
+	* configure.in: new configure option --with-compface=no.
+	* acinclude.m4: stop some autotool whining.
+
 2005-11-09 19:11  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c,

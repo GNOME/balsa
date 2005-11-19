@@ -1389,8 +1389,6 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
 	/* The thread containing the current message may have been
 	 * collapsed by rethreading; re-expand it. */
 	bndx_expand_to_row(bindex, path);
-	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(bindex), path, NULL,
-				     FALSE, 0, 0);
         gtk_tree_path_free(path);
     }
 

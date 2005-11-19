@@ -4484,6 +4484,38 @@ attachment2message(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
    contain them. Such characters might screw up message formatting
    (consider moving this code to mutt part).
 */
+
+static void
+sw_set_header_from_path(LibBalsaMessage * message, const gchar * header,
+                        const gchar * path)
+{
+    gchar *content;
+    GError *err = NULL;
+
+    if (!path) {
+        GList *user_hdr = libbalsa_message_find_user_hdr(message, header);
+        if (user_hdr) {
+            g_strfreev(user_hdr->data);
+            message->headers->user_hdrs =
+                g_list_delete_link(message->headers->user_hdrs, user_hdr);
+        }
+        return;
+    }
+
+    if (!(content =
+          libbalsa_get_header_from_path(header, path, NULL, &err))) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Could not load %s header file %s: %s"),
+                             header, path, err->message);
+        g_error_free(err);
+        return;
+    }
+
+    message->headers->user_hdrs =
+        g_list_prepend(message->headers->user_hdrs,
+                       libbalsa_create_hdr_pair(header, content));
+}
+
 static LibBalsaMessage *
 bsmsg2message(BalsaSendmsg * bsmsg)
 {
@@ -4528,6 +4560,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     if (bsmsg->req_dispnotify)
 	libbalsa_message_set_dispnotify(message, ident->ia);
+
+    sw_set_header_from_path(message, "Face", ident->face);
+    sw_set_header_from_path(message, "X-Face", ident->x_face);
 
     refs = NULL;
     if (bsmsg->parent_message) {

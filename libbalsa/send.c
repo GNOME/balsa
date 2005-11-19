@@ -1766,13 +1766,13 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 	}
     }
 
-    for (list = message->headers->user_hdrs; list; list = g_list_next(list)) {
-	gchar **pair;
-	pair = g_strsplit(list->data, ":", 1);
+    for (list = message->headers->user_hdrs; list; list = list->next) {
+	gchar **pair = list->data;
 	g_strchug(pair[1]);
 	g_mime_message_add_header(mime_message, pair[0], pair[1]);
+#if DEBUG_USER_HEADERS
         printf("adding header '%s:%s'\n", pair[0], pair[1]);
-	g_strfreev(pair);
+#endif
     }
 
     tmp = g_strdup_printf("Balsa %s", VERSION);

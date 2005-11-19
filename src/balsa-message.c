@@ -248,6 +248,7 @@ balsa_message_class_init(BalsaMessageClass * klass)
 #define BALSA_MESSAGE_ATTACH_BTN "balsa-message-attach-btn"
 #define bm_header_widget_att_button(balsa_message) \
     g_object_get_data(G_OBJECT(balsa_message), BALSA_MESSAGE_ATTACH_BTN)
+#define BALSA_MESSAGE_FACE_BOX "balsa-message-face-box"
 
 
 static void
@@ -272,9 +273,14 @@ bm_header_tl_buttons(BalsaMessage * bm)
 
     ebox = gtk_event_box_new();
 
-    hbox2 = gtk_hbox_new(TRUE, 6);
+    hbox2 = gtk_hbox_new(FALSE, 6);
     gtk_container_set_border_width(GTK_CONTAINER(hbox2), 6);
     gtk_container_add(GTK_CONTAINER(ebox), hbox2);
+
+    vbox = gtk_vbox_new(FALSE, 0);
+    gtk_widget_hide(vbox);
+    gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
+    g_object_set_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX, vbox);
 
 #ifdef HAVE_GPGME
     vbox = gtk_vbox_new(FALSE, 0);
@@ -1204,6 +1210,56 @@ display_parts(BalsaMessage * bm, LibBalsaMessageBody * body,
     }
 }
 
+/* Display the image in a "Face:" header, if any. */
+static void
+display_face(BalsaMessage * bm)
+{
+    GtkWidget *face_box;
+    GList *face;
+    const gchar **pair;
+    gboolean is_face;
+    const gchar *content;
+    GError *err = NULL;
+    GtkWidget *image;
+
+    face_box = g_object_get_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX);
+    if (!bm->message
+        || !((face = libbalsa_message_find_user_hdr(bm->message, "Face"))
+             || (face =
+                 libbalsa_message_find_user_hdr(bm->message, "X-Face")))) {
+        gtk_widget_hide(face_box);
+        return;
+    }
+
+    pair = face->data;
+    is_face = (g_ascii_strcasecmp(pair[0], "Face") == 0);
+    content = pair[1];
+
+#if HAVE_COMPFACE
+    image = is_face ?
+        libbalsa_get_image_from_face_header(content, &err) :
+        libbalsa_get_image_from_x_face_header(content, &err);
+#else                           /* HAVE_COMPFACE */
+    if (is_face)
+        image = libbalsa_get_image_from_face_header(content, &err);
+    else {
+        gtk_widget_hide(face_box);
+        return;
+    }
+#endif                          /* HAVE_COMPFACE */
+    if (err) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Error loading Face: %s"), err->message);
+        g_error_free(err);
+        return;
+    }
+
+    gtk_container_foreach(GTK_CONTAINER(face_box),
+                          (GtkCallback) gtk_widget_destroy, NULL);
+    gtk_box_pack_start(GTK_BOX(face_box), image, FALSE, FALSE, 0);
+    gtk_widget_show_all(face_box);
+}
+
 static void
 display_content(BalsaMessage * bm)
 {
@@ -1221,6 +1277,7 @@ display_content(BalsaMessage * bm)
     } else
  	gtk_widget_hide
 	    (GTK_WIDGET(bm_header_widget_att_button(bm)));
+    display_face(bm);
     gtk_tree_view_columns_autosize(GTK_TREE_VIEW(bm->treeview));
     gtk_tree_view_expand_all(GTK_TREE_VIEW(bm->treeview));
 }

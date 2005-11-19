@@ -157,6 +157,11 @@ AC_ARG_WITH(gss,
                   [Enable GSS (default=no)]),
                   [with_gss=$withval],[with_gss=no])
 
+AC_ARG_WITH(compface,
+   AC_HELP_STRING([--with-compface],
+                  [Enable Compface (default=no)]),
+                  [with_compface=$withval],[with_compface=no])
+
 AC_ARG_ENABLE(more-warnings,
    AC_HELP_STRING([--enable-more-warnings],
                   [Enable maximum compiler warnings (default=yes)]),
@@ -487,6 +492,21 @@ if test "x$with_gss" != xno  ; then
    fi
 fi
 
+# Compface configuration
+#
+AC_MSG_CHECKING([whether to build Compface support])
+if test "x$with_compface" != xno  ; then
+    AC_MSG_RESULT([yes])
+    test "$with_compface" != yes && LIBS="$LIBS -L$with_compface/lib"
+    AC_CHECK_LIB(compface, uncompface, LIBS="$LIBS -lcompface",
+	AC_MSG_ERROR([*** You enabled Compface but the library is not found.]),)
+    AC_DEFINE(HAVE_COMPFACE, 1, 
+              [Defined when Compface support is requested.])
+    test "$with_compface" != yes && CPPFLAGS="$CPPFLAGS -I$with_compface/include"
+else
+    AC_MSG_RESULT([no])
+fi
+
 dnl #####################################################################
 dnl 5. Headers.
 dnl #####################################################################
@@ -651,6 +671,7 @@ echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
 echo "                   Use SSL: $with_ssl"
 echo "              Use GtkSpell: $with_gtkspell"
+echo "              Use Compface: $with_compface"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""
 

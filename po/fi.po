@@ -3,14 +3,15 @@
 # Tero Pulkkinen <?>, ?
 # Antti Ahvensalmi <aahven@mbnet.fi>, 2001. 
 # Ilkka Tuohela <hile@iki.fi>, 2005.
-# http://gnome.fi/
+#
+# Suomennos: http://gnome.fi/
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-13 11:00+0200\n"
-"PO-Revision-Date: 2005-11-13 11:05+0200\n"
+"POT-Creation-Date: 2005-11-20 09:59+0200\n"
+"PO-Revision-Date: 2005-11-20 10:03+0200\n"
 "Last-Translator: Ilkka Tuohela <hile@iki.fi>\n"
 "Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -73,7 +74,7 @@ msgid "Cannot find address in address book"
 msgstr "Osoitetta ei löydy osoitekirjasta"
 
 #: ../libbalsa/address-book.c:310 ../src/main-window.c:2306
-#: ../src/main-window.c:4347 ../src/sendmsg-window.c:4866
+#: ../src/main-window.c:4347 ../src/sendmsg-window.c:4901
 msgid "Unknown error"
 msgstr "Tuntematon virhe"
 
@@ -281,143 +282,171 @@ msgstr "Re:"
 msgid "Fwd:"
 msgstr "Fwd:"
 
-#: ../libbalsa/identity.c:153
+#: ../libbalsa/identity.c:159
 msgid "New Identity"
 msgstr "Uusi henkilöllisyys"
 
-#: ../libbalsa/identity.c:406
+#: ../libbalsa/identity.c:412
 msgid "Current"
 msgstr "Nykyinen"
 
-#: ../libbalsa/identity.c:646 ../libbalsa/smtp-server.c:271
+#: ../libbalsa/identity.c:663 ../libbalsa/smtp-server.c:271
 msgid "Default"
 msgstr "Oletus"
 
-#. create the "General" tab
-#: ../libbalsa/identity.c:852
-msgid "General"
-msgstr "Yleistä"
-
-#: ../libbalsa/identity.c:854
-msgid "_Identity Name:"
-msgstr "Henkilöllisyyden nimi:"
-
-#: ../libbalsa/identity.c:856
-msgid "_Full Name:"
-msgstr "_Koko nimi:"
-
-#: ../libbalsa/identity.c:858
-msgid "_Mailing Address:"
-msgstr "_Sähköpostiosoite:"
-
-#: ../libbalsa/identity.c:860
-msgid "Reply _To:"
-msgstr "_Vastausosoite:"
-
-#: ../libbalsa/identity.c:862
-msgid "_Domain:"
-msgstr "_Aluenimi:"
-
 #: ../libbalsa/identity.c:864
-msgid "_Bcc:"
-msgstr "_Bcc:"
-
-#: ../libbalsa/identity.c:866
-msgid "Reply _String:"
-msgstr "Vastaus_merkkijono:"
-
-#: ../libbalsa/identity.c:868
-msgid "F_orward String:"
-msgstr "Välitys_merkkijono:"
-
-#: ../libbalsa/identity.c:871
-msgid "SMT_P Server"
-msgstr "SMT_P-palvelin:"
+msgid "Signature _Path"
+msgstr "Allekirjoituksen _polku"
 
 #. create the "Signature" tab
-#: ../libbalsa/identity.c:876
+#: ../libbalsa/identity.c:868 ../libbalsa/identity.c:920
 msgid "Signature"
 msgstr "Allekirjoitus"
 
-#: ../libbalsa/identity.c:878
-msgid "Signature _Path:"
-msgstr "Allekirjoituksen _polku:"
+#: ../libbalsa/identity.c:869
+msgid "_Face Path"
+msgstr "_Kasvotiedoston polku"
 
-#: ../libbalsa/identity.c:881
+#: ../libbalsa/identity.c:874
+msgid "_X-Face Path"
+msgstr "_X-Face-tiedoston polku"
+
+#. create the "General" tab
+#: ../libbalsa/identity.c:896
+msgid "General"
+msgstr "Yleistä"
+
+#: ../libbalsa/identity.c:898
+msgid "_Identity Name:"
+msgstr "Henkilöllisyyden nimi:"
+
+#: ../libbalsa/identity.c:900
+msgid "_Full Name:"
+msgstr "_Koko nimi:"
+
+#: ../libbalsa/identity.c:902
+msgid "_Mailing Address:"
+msgstr "_Sähköpostiosoite:"
+
+#: ../libbalsa/identity.c:904
+msgid "Reply _To:"
+msgstr "_Vastausosoite:"
+
+#: ../libbalsa/identity.c:906
+msgid "_Domain:"
+msgstr "_Aluenimi:"
+
+#: ../libbalsa/identity.c:908
+msgid "_Bcc:"
+msgstr "_Bcc:"
+
+#: ../libbalsa/identity.c:910
+msgid "Reply _String:"
+msgstr "Vastaus_merkkijono:"
+
+#: ../libbalsa/identity.c:912
+msgid "F_orward String:"
+msgstr "Välitys_merkkijono:"
+
+#: ../libbalsa/identity.c:915
+msgid "SMT_P Server"
+msgstr "SMT_P-palvelin:"
+
+#: ../libbalsa/identity.c:925
 msgid "_Execute Signature"
 msgstr "_Suoritettava allekirjoitus"
 
-#: ../libbalsa/identity.c:884
+#: ../libbalsa/identity.c:928
 msgid "Incl_ude Signature"
 msgstr "Lisää _allekirjoitus"
 
-#: ../libbalsa/identity.c:887
+#: ../libbalsa/identity.c:931
 msgid "Include Signature When For_warding"
 msgstr "Liitä allekirjoitus _välitettäessä"
 
-#: ../libbalsa/identity.c:890
+#: ../libbalsa/identity.c:934
 msgid "Include Signature When Rep_lying"
 msgstr "Lisää allekirjoitus vastattaessa"
 
-#: ../libbalsa/identity.c:893
+#: ../libbalsa/identity.c:937
 msgid "_Add Signature Separator"
 msgstr "_Lisää allekirjoituksen erotin"
 
-#: ../libbalsa/identity.c:896
+#: ../libbalsa/identity.c:940
 msgid "Prepend Si_gnature"
 msgstr "Lisää allekirjoitus _alkuun"
 
 #. create the "Security" tab
-#: ../libbalsa/identity.c:901
+#: ../libbalsa/identity.c:952
 msgid "Security"
 msgstr "Turvallisuus"
 
-#: ../libbalsa/identity.c:904
+#: ../libbalsa/identity.c:955
 msgid "sign messages by default"
 msgstr "allekirjoita viestit oletuksena"
 
-#: ../libbalsa/identity.c:907
+#: ../libbalsa/identity.c:958
 msgid "encrypt messages by default"
 msgstr "salaa viestit oletuksena"
 
-#: ../libbalsa/identity.c:910
+#: ../libbalsa/identity.c:961
 msgid "default protocol"
 msgstr "oletusprotokolla"
 
-#: ../libbalsa/identity.c:913
+#: ../libbalsa/identity.c:964
 msgid "always trust GnuPG keys when encrypting"
 msgstr "Luota aina GnuPG-avaimiin salattaessa"
 
-#: ../libbalsa/identity.c:1059
+#: ../libbalsa/identity.c:1069
+#, c-format
+msgid "Error reading file %s: %s"
+msgstr "Virhe luettaessa tiedostoa %s: %s"
+
+#: ../libbalsa/identity.c:1077
+#, c-format
+msgid "Face header file %s is too long (%d bytes)."
+msgstr "Kasvokuvan otsikkotiedosto %s on liian pitkä (%d tavua)."
+
+#: ../libbalsa/identity.c:1085
+#, c-format
+msgid "Face header file %s contains binary data."
+msgstr "Kasvokuvan otsikkotiedost %s sisältää binääritietoa."
+
+#: ../libbalsa/identity.c:1104
+#, c-format
+msgid "Error loading face: %s"
+msgstr "Virhe ladattaessa kasvokuvaa %s"
+
+#: ../libbalsa/identity.c:1274
 msgid "Error: The identity does not have a name"
 msgstr "Virhe: Henkilöllisyydellä ei ole nimeä"
 
-#: ../libbalsa/identity.c:1069
+#: ../libbalsa/identity.c:1284
 msgid "Error: An identity with that name already exists"
 msgstr "Virhe: Henkilöllisyyden nimi on jo varattu"
 
-#: ../libbalsa/identity.c:1240
+#: ../libbalsa/identity.c:1472
 msgid "Do you really want to delete the selected identity?"
 msgstr "Haluatko varmasti poistaa valitun henkilöllisyyden?"
 
-#: ../libbalsa/identity.c:1275
+#: ../libbalsa/identity.c:1507
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "Virhe näytettäessä ohjetta henkilöllisyyksille: %s\n"
 
-#: ../libbalsa/identity.c:1321
+#: ../libbalsa/identity.c:1553
 msgid "Manage Identities"
 msgstr "Henkilöllisyyksien hallinta"
 
-#: ../libbalsa/identity.c:1639
+#: ../libbalsa/identity.c:1906
 msgid "GnuPG MIME mode"
 msgstr "GnuPG:n MIME-tila"
 
-#: ../libbalsa/identity.c:1641
+#: ../libbalsa/identity.c:1908
 msgid "GnuPG OpenPGP mode"
 msgstr "GnpPG:n OpenPGP-tila"
 
-#: ../libbalsa/identity.c:1644
+#: ../libbalsa/identity.c:1911
 msgid "GpgSM S/MIME mode"
 msgstr "GpgSM:n S/MIME-tila"
 
@@ -789,95 +818,111 @@ msgstr "POP3-virhe: %s."
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr "Kansio (%s) on vain luettavissa. Viestin lippuja ei voida muuttaa."
 
-#: ../libbalsa/misc.c:1237
+#: ../libbalsa/misc.c:1240
 msgid "west european"
 msgstr "länsieurooppalainen"
 
-#: ../libbalsa/misc.c:1239 ../libbalsa/misc.c:1273
+#: ../libbalsa/misc.c:1242 ../libbalsa/misc.c:1276
 msgid "east european"
 msgstr "itäeurooppalainen"
 
-#: ../libbalsa/misc.c:1241
+#: ../libbalsa/misc.c:1244
 msgid "south european"
 msgstr "eteläeurooppalainen"
 
-#: ../libbalsa/misc.c:1243
+#: ../libbalsa/misc.c:1246
 msgid "north european"
 msgstr "pohoiseurooppalainen"
 
-#: ../libbalsa/misc.c:1245 ../libbalsa/misc.c:1275
+#: ../libbalsa/misc.c:1248 ../libbalsa/misc.c:1278
 msgid "cyrillic"
 msgstr "kyrillinen"
 
-#: ../libbalsa/misc.c:1247 ../libbalsa/misc.c:1281
+#: ../libbalsa/misc.c:1250 ../libbalsa/misc.c:1284
 msgid "arabic"
 msgstr "arabialainen"
 
-#: ../libbalsa/misc.c:1249 ../libbalsa/misc.c:1277
+#: ../libbalsa/misc.c:1252 ../libbalsa/misc.c:1280
 msgid "greek"
 msgstr "kreikkalainen"
 
-#: ../libbalsa/misc.c:1251 ../libbalsa/misc.c:1279
+#: ../libbalsa/misc.c:1254 ../libbalsa/misc.c:1282
 msgid "hebrew"
 msgstr "heprealainen"
 
-#: ../libbalsa/misc.c:1253
+#: ../libbalsa/misc.c:1256
 msgid "turkish"
 msgstr "turkkilainen"
 
-#: ../libbalsa/misc.c:1255
+#: ../libbalsa/misc.c:1258
 msgid "nordic"
 msgstr "pohjoismaalainen"
 
-#: ../libbalsa/misc.c:1257
+#: ../libbalsa/misc.c:1260
 msgid "thai"
 msgstr "thaimaalainen"
 
-#: ../libbalsa/misc.c:1259 ../libbalsa/misc.c:1283
+#: ../libbalsa/misc.c:1262 ../libbalsa/misc.c:1286
 msgid "baltic"
 msgstr "itämerellinen"
 
-#: ../libbalsa/misc.c:1261
+#: ../libbalsa/misc.c:1264
 msgid "celtic"
 msgstr "kelttiläinen"
 
-#: ../libbalsa/misc.c:1263
+#: ../libbalsa/misc.c:1266
 msgid "west europe (euro)"
 msgstr "länsi-eurooppa (euro)"
 
-#: ../libbalsa/misc.c:1265
+#: ../libbalsa/misc.c:1268
 msgid "russian"
 msgstr "venäläinen"
 
-#: ../libbalsa/misc.c:1267
+#: ../libbalsa/misc.c:1270
 msgid "ukranian"
 msgstr "ukrainalainen"
 
-#: ../libbalsa/misc.c:1269
+#: ../libbalsa/misc.c:1272
 msgid "japanese"
 msgstr "japanilainen"
 
-#: ../libbalsa/misc.c:1271
+#: ../libbalsa/misc.c:1274
 msgid "korean"
 msgstr "korealainen"
 
-#: ../libbalsa/misc.c:1889
+#: ../libbalsa/misc.c:1892
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Aikaraja ylitetty yrittäessä fcntl-lukkoa!"
 
-#: ../libbalsa/misc.c:1896
+#: ../libbalsa/misc.c:1899
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Odotetaan fcntl-lukkoa... %d"
 
-#: ../libbalsa/misc.c:1924
+#: ../libbalsa/misc.c:1927
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Aikaraja yritetty ylittäessä flock-lukkoa!"
 
-#: ../libbalsa/misc.c:1931
+#: ../libbalsa/misc.c:1934
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Odotetaan flock-yritystä... %d"
+
+#: ../libbalsa/misc.c:2090
+msgid "No image data"
+msgstr "Ei kuvatietoa"
+
+#: ../libbalsa/misc.c:2124
+msgid "Invalid input format"
+msgstr "Virheellinen syötteen muoto"
+
+#: ../libbalsa/misc.c:2128
+msgid "Internal buffer overrun"
+msgstr "Sisäisen puskurin ylivuoto"
+
+#: ../libbalsa/misc.c:2144
+msgid "Bad X-Face data"
+msgstr "Virheellistä X-Face-tietoa"
 
 #: ../libbalsa/rfc3156.c:88
 #, c-format
@@ -1985,111 +2030,111 @@ msgstr "Koko"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Avaataan kansiota %s. Odota..."
 
-#: ../src/balsa-index.c:1616
+#: ../src/balsa-index.c:1614
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Siirto roskakoriin epäonnistui: %s"
 
 #. R
-#: ../src/balsa-index.c:1770 ../src/main-window.c:584
+#: ../src/balsa-index.c:1768 ../src/main-window.c:584
 #: ../src/main-window.c:1047 ../src/message-window.c:148
 msgid "_Reply..."
 msgstr "_Vastaa..."
 
-#: ../src/balsa-index.c:1772
+#: ../src/balsa-index.c:1770
 msgid "Reply To _All..."
 msgstr "Vastaa k_aikille..."
 
-#: ../src/balsa-index.c:1774
+#: ../src/balsa-index.c:1772
 msgid "Reply To _Group..."
 msgstr "Vastaa _ryhmälle..."
 
-#: ../src/balsa-index.c:1776
+#: ../src/balsa-index.c:1774
 msgid "_Forward Attached..."
 msgstr "Välitä _liitteenä..."
 
-#: ../src/balsa-index.c:1778
+#: ../src/balsa-index.c:1776
 msgid "Forward _Inline..."
 msgstr "Välitä _viestissä..."
 
-#: ../src/balsa-index.c:1780 ../src/main-window.c:623
+#: ../src/balsa-index.c:1778 ../src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "_Putkita ohjelmalle..."
 
-#: ../src/balsa-index.c:1782 ../src/main-window.c:682
+#: ../src/balsa-index.c:1780 ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "_Tallenna osoite"
 
-#: ../src/balsa-index.c:1797 ../src/filter-edit-dialog.c:223
+#: ../src/balsa-index.c:1795 ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:983 ../src/mailbox-node.c:999
 #: ../src/pref-manager.c:1499 ../src/pref-manager.c:1588
 #: ../src/pref-manager.c:2633
 msgid "_Delete"
 msgstr "_Poista"
 
-#: ../src/balsa-index.c:1802
+#: ../src/balsa-index.c:1800
 msgid "_Undelete"
 msgstr "P_alauta viesti"
 
-#: ../src/balsa-index.c:1807
+#: ../src/balsa-index.c:1805
 msgid "Move To _Trash"
 msgstr "Siirrä _roskakoriin"
 
-#: ../src/balsa-index.c:1811
+#: ../src/balsa-index.c:1809
 msgid "T_oggle"
 msgstr "M_erkitse"
 
-#: ../src/balsa-index.c:1815 ../src/main-window.c:331 ../src/main-window.c:360
+#: ../src/balsa-index.c:1813 ../src/main-window.c:331 ../src/main-window.c:360
 msgid "_Flagged"
 msgstr "_Lipulla"
 
-#: ../src/balsa-index.c:1818
+#: ../src/balsa-index.c:1816
 msgid "_Unread"
 msgstr "Lukematta"
 
-#: ../src/balsa-index.c:1826
+#: ../src/balsa-index.c:1824
 msgid "_Move to"
 msgstr "_Siirrä"
 
-#: ../src/balsa-index.c:1834
+#: ../src/balsa-index.c:1832
 msgid "_View Source"
 msgstr "Näytä _lähdekoodi"
 
-#: ../src/balsa-index.c:2098
+#: ../src/balsa-index.c:2096
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Viestejä ei voitu kopioida kansioon \"%s\": %s"
 
-#: ../src/balsa-index.c:2099
+#: ../src/balsa-index.c:2097
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Viestiä ei voitu kopioida kansioon \"%s\": %s"
 
-#: ../src/balsa-index.c:2111
+#: ../src/balsa-index.c:2109
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Kopioitu kohteeseen \"%s\"."
 
-#: ../src/balsa-index.c:2112
+#: ../src/balsa-index.c:2110
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Siirretty kohteeseen \"%s\"."
 
-#: ../src/balsa-index.c:2232
+#: ../src/balsa-index.c:2230
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Postikansion %s muutosten toteuttaminen epäonnistui."
 
-#: ../src/balsa-index.c:2405
+#: ../src/balsa-index.c:2403
 msgid "Pipe message through a program"
 msgstr "Putkita viesti ohjelman läpi"
 
-#: ../src/balsa-index.c:2408
+#: ../src/balsa-index.c:2406
 msgid "_Run"
 msgstr "Suo_rita"
 
-#: ../src/balsa-index.c:2417
+#: ../src/balsa-index.c:2415
 msgid "Specify the program to run:"
 msgstr "Määrittele suoritettava komento:"
 
@@ -2129,107 +2174,112 @@ msgid_plural "%ld new"
 msgstr[0] "%ld uusi"
 msgstr[1] "%ld uutta"
 
-#: ../src/balsa-message.c:285
+#: ../src/balsa-message.c:291
 msgid "Check cryptographic signature"
 msgstr "Tarkista digitaalinen allekirjoitus"
 
-#: ../src/balsa-message.c:306
+#: ../src/balsa-message.c:312
 msgid "Select message part to display"
 msgstr "Valitse näytettävä viestin osa"
 
-#: ../src/balsa-message.c:380
+#: ../src/balsa-message.c:386
 msgid "Content"
 msgstr "Sisältö"
 
-#: ../src/balsa-message.c:458
+#: ../src/balsa-message.c:464
 msgid "Message parts"
 msgstr "Viestin osat"
 
-#: ../src/balsa-message.c:639
+#: ../src/balsa-message.c:645
 msgid "Save selected as..."
 msgstr "Valitse valinta nimellä..."
 
-#: ../src/balsa-message.c:646
+#: ../src/balsa-message.c:652
 msgid "Save selected to folder..."
 msgstr "Valitse valinta kansioon..."
 
-#: ../src/balsa-message.c:784
+#: ../src/balsa-message.c:790
 msgid "(No sender)"
 msgstr "(ei lähettäjää)"
 
-#: ../src/balsa-message.c:852
+#: ../src/balsa-message.c:858
 #, c-format
 msgid "Could not access message %ld in mailbox \"%s\"."
 msgstr "Viestiä %ld ei voitu avata kansiosta \"%s\"."
 
-#: ../src/balsa-message.c:1034
+#: ../src/balsa-message.c:1040
 msgid "mixed parts"
 msgstr "erityyppiset osat"
 
-#: ../src/balsa-message.c:1036
+#: ../src/balsa-message.c:1042
 msgid "alternative parts"
 msgstr "vaihtoehtoiset osat"
 
-#: ../src/balsa-message.c:1038
+#: ../src/balsa-message.c:1044
 msgid "signed parts"
 msgstr "allekirjoitetut osat"
 
-#: ../src/balsa-message.c:1040
+#: ../src/balsa-message.c:1046
 msgid "encrypted parts"
 msgstr "salatut osat"
 
-#: ../src/balsa-message.c:1042
+#: ../src/balsa-message.c:1048
 msgid "rfc822 message"
 msgstr "rfc822-viesti"
 
-#: ../src/balsa-message.c:1044
+#: ../src/balsa-message.c:1050
 #, c-format
 msgid "\"%s\" parts"
 msgstr "\"%s\" osaa"
 
-#: ../src/balsa-message.c:1097
+#: ../src/balsa-message.c:1103
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "rfc822-viesto (lähettäjä %s, aihe \"%s\")"
 
-#: ../src/balsa-message.c:1104
+#: ../src/balsa-message.c:1110
 msgid "complete message"
 msgstr "koko viesti"
 
-#: ../src/balsa-message.c:1121
+#: ../src/balsa-message.c:1127
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr "osa %s: %s (tiedosto %s)"
 
-#: ../src/balsa-message.c:1132
+#: ../src/balsa-message.c:1138
 #, c-format
 msgid "part %s: %s"
 msgstr "osa %s: %s"
 
-#: ../src/balsa-message.c:1147
+#: ../src/balsa-message.c:1153
 msgid "encrypted: "
 msgstr "salattu:"
 
-#: ../src/balsa-message.c:1250 ../src/balsa-mime-widget-text.c:344
+#: ../src/balsa-message.c:1252
+#, c-format
+msgid "Error loading Face: %s"
+msgstr "Virhe ladattaessa kasvokuvaa: %s"
+
+#: ../src/balsa-message.c:1307 ../src/balsa-mime-widget-text.c:344
 #: ../src/balsa-mime-widget-text.c:649
 msgid "Save..."
 msgstr "Tallenna..."
 
-#: ../src/balsa-message.c:1326
+#: ../src/balsa-message.c:1383
 msgid "Select folder for saving selected parts"
 msgstr "Valitse kansio, johon valitut osat tallennetaan"
 
-#: ../src/balsa-message.c:1364
+#: ../src/balsa-message.c:1421
 #, c-format
 msgid "%s message part"
 msgstr "%s viestin osa"
 
-#: ../src/balsa-message.c:1392 ../src/balsa-mime-widget-callbacks.c:202
+#: ../src/balsa-message.c:1449 ../src/balsa-mime-widget-callbacks.c:202
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "ei voitu tallentaa %s: %s"
 
-#: ../src/balsa-message.c:2096
+#: ../src/balsa-message.c:2153
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2241,11 +2291,11 @@ msgstr ""
 "\"%s\"\n"
 "Lähetetäänkö kuittaus?"
 
-#: ../src/balsa-message.c:2103
+#: ../src/balsa-message.c:2160
 msgid "Reply to MDN?"
 msgstr "Vastataanko kuittauspyyntöön (MDN)?"
 
-#: ../src/balsa-message.c:2298
+#: ../src/balsa-message.c:2355
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -2255,18 +2305,18 @@ msgstr ""
 "useammin kuin kerran.\n"
 "Sulje viestin näyttävät muut ikkunat ja yritä uudestaan."
 
-#: ../src/balsa-message.c:2319 ../src/balsa-message.c:2401
-#: ../src/balsa-message.c:2516
+#: ../src/balsa-message.c:2376 ../src/balsa-message.c:2458
+#: ../src/balsa-message.c:2573
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Viestin osan tulkinta epäonnistui: %s"
 
-#: ../src/balsa-message.c:2320 ../src/balsa-message.c:2402
-#: ../src/balsa-message.c:2517
+#: ../src/balsa-message.c:2377 ../src/balsa-message.c:2459
+#: ../src/balsa-message.c:2574
 msgid "Possible disk space problem."
 msgstr "Levytila saattaa olla vähissä."
 
-#: ../src/balsa-message.c:2332
+#: ../src/balsa-message.c:2389
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2275,7 +2325,7 @@ msgstr ""
 "Lähettäjän %s viesti aiheesta \"%s\" sisältää salatun osan, mutta tämän osan "
 "rakenne on virheellinen."
 
-#: ../src/balsa-message.c:2340
+#: ../src/balsa-message.c:2397
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2284,7 +2334,7 @@ msgstr ""
 "Lähettäjän %s viesti aiheesta \"%s\" sisältää PGP-salatun osan, mutta tämä "
 "salausmenetelmä ei ole käytettävissä."
 
-#: ../src/balsa-message.c:2353
+#: ../src/balsa-message.c:2410
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2293,7 +2343,7 @@ msgstr ""
 "Lähettäjän %s viesti aiheesta \"%s\" sisältää S/MIME-salatun osan, mutta "
 "tämä salausmenetelmä ei ole käytettävissä."
 
-#: ../src/balsa-message.c:2417
+#: ../src/balsa-message.c:2474
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
@@ -2302,7 +2352,7 @@ msgstr ""
 "Lähettäjän %s viesti aiheesta \"%s\" sisältää allekirjoitetun osan, mutta "
 "allekirjoituksen rakenne on virheellinen. Allekirjoitusta ei voida tarkistaa."
 
-#: ../src/balsa-message.c:2430
+#: ../src/balsa-message.c:2487
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2311,30 +2361,30 @@ msgstr ""
 "Lähettäjän %s viesti aiheesta \"%s\" sisältää %s-salatun osan, mutta tämä "
 "salausmenetelmä ei ole käytettävissä."
 
-#: ../src/balsa-message.c:2433
+#: ../src/balsa-message.c:2490
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2433 ../src/balsa-mime-widget-crypto.c:72
+#: ../src/balsa-message.c:2490 ../src/balsa-mime-widget-crypto.c:72
 #: ../src/print.c:1302
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: ../src/balsa-message.c:2452 ../src/balsa-message.c:2578
+#: ../src/balsa-message.c:2509 ../src/balsa-message.c:2635
 msgid "Detected a good signature"
 msgstr "Havaittiin kelvollinen allekirjoitus"
 
-#: ../src/balsa-message.c:2458
+#: ../src/balsa-message.c:2515
 msgid "Detected a good signature with insufficient validity"
 msgstr "Havaittiin oikea allekirjoitus, jonka kelvollisuus on riittämätön"
 
-#: ../src/balsa-message.c:2463 ../src/balsa-message.c:2582
+#: ../src/balsa-message.c:2520 ../src/balsa-message.c:2639
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
 "Havaittiin oikea allekirjoitus, jonka kelvollisuus tai luottamus ei ole "
 "riittävä"
 
-#: ../src/balsa-message.c:2470 ../src/balsa-message.c:2588
+#: ../src/balsa-message.c:2527 ../src/balsa-message.c:2645
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2345,7 +2395,7 @@ msgstr ""
 "arvon:\n"
 "%s"
 
-#: ../src/balsa-message.c:2482
+#: ../src/balsa-message.c:2539
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2354,7 +2404,7 @@ msgstr ""
 "Allekirjoituksen tarkistus lähettäjän %s viestistä aiheesta \"%s\" palautti "
 "virheen!"
 
-#: ../src/balsa-message.c:2540
+#: ../src/balsa-message.c:2597
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
@@ -2362,7 +2412,7 @@ msgstr ""
 "Salauksen purkua ei voida suorittaa, koska viesti on auki monessa eri "
 "ikkunassa."
 
-#: ../src/balsa-message.c:2542
+#: ../src/balsa-message.c:2599
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -2370,7 +2420,7 @@ msgstr ""
 "Allekirjoituksen tarkistusta OpenPGP-esityksen poistoa ei voida suorittaa, "
 "koska viesti on auki monessa eri ikkunassa."
 
-#: ../src/balsa-message.c:2545
+#: ../src/balsa-message.c:2602
 msgid "Please close the other instances of this message and try again."
 msgstr "Valitse viestin muut näkymät ja yritä uudestaan."
 
@@ -4564,7 +4614,7 @@ msgstr "_POP-viestien enimmäiskoko:"
 msgid "Quoted and Flowed Text"
 msgstr "Lainattu ja rivitetty teksti"
 
-#: ../src/pref-manager.c:1706 ../src/sendmsg-window.c:5086
+#: ../src/pref-manager.c:1706 ../src/sendmsg-window.c:5121
 msgid "Quoted Text Regular Expression"
 msgstr "Lainauksen säännöllinen lauseke"
 
@@ -5655,7 +5705,12 @@ msgstr "Tiedoston %s avaaminen ei onnistu.\n"
 msgid "Include file"
 msgstr "Sisällytä tiedosto"
 
-#: ../src/sendmsg-window.c:4698
+#: ../src/sendmsg-window.c:4508
+#, c-format
+msgid "Could not load %s header file %s: %s"
+msgstr "Viestin %s otsikkotiedostoa %s ei voitu ladata: %s"
+
+#: ../src/sendmsg-window.c:4733
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5665,75 +5720,75 @@ msgstr ""
 "viestin ensimmäinen osa allekirjoitetaan tai salataan. Valitse MIME-tila, "
 "jos haluat suojata koko viestin sisällön. Haluatko varmasti jatkaa?"
 
-#: ../src/sendmsg-window.c:4714
+#: ../src/sendmsg-window.c:4749
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "lähetään viesti gpg-tilassa %d"
 
-#: ../src/sendmsg-window.c:4759
+#: ../src/sendmsg-window.c:4794
 msgid "Message could not be created"
 msgstr "Viestiä ei voitu luoda"
 
-#: ../src/sendmsg-window.c:4761
+#: ../src/sendmsg-window.c:4796
 msgid "Message could not be queued in outbox"
 msgstr "Viestiä ei voitu lisätä lähtevien kansioon"
 
-#: ../src/sendmsg-window.c:4763
+#: ../src/sendmsg-window.c:4798
 msgid "Message could not be saved in sentbox"
 msgstr "Viestiä ei voitu tallentaa lähetettyjen kansioon"
 
-#: ../src/sendmsg-window.c:4765
+#: ../src/sendmsg-window.c:4800
 msgid "Message could not be sent"
 msgstr "Viestiä ei voitu lähettää"
 
-#: ../src/sendmsg-window.c:4769
+#: ../src/sendmsg-window.c:4804
 #, c-format
 msgid "Send failed: %s"
 msgstr "Lähetys epäonnistui: %s"
 
-#: ../src/sendmsg-window.c:4835
+#: ../src/sendmsg-window.c:4870
 msgid "Could not postpone message."
 msgstr "Viestin lähetystä ei voitu viivästää."
 
-#: ../src/sendmsg-window.c:4849
+#: ../src/sendmsg-window.c:4884
 msgid "Message postponed."
 msgstr "Viestin lähetys viivästetty."
 
-#: ../src/sendmsg-window.c:4865
+#: ../src/sendmsg-window.c:4900
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Luonnoskansiota ei voitu avata: %s"
 
-#: ../src/sendmsg-window.c:4886
+#: ../src/sendmsg-window.c:4921
 msgid "Message saved."
 msgstr "Viestin tallennettu."
 
-#: ../src/sendmsg-window.c:4949
+#: ../src/sendmsg-window.c:4984
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Virhe käynnistettäessä oikolukijaa: %s"
 
-#: ../src/sendmsg-window.c:5085
+#: ../src/sendmsg-window.c:5120
 #, c-format
 msgid "Could not compile %s"
 msgstr "%s ei voitu kääntää"
 
-#: ../src/sendmsg-window.c:5598
+#: ../src/sendmsg-window.c:5633
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Vastaa osoitteeseen %s: %s"
 
-#: ../src/sendmsg-window.c:5603
+#: ../src/sendmsg-window.c:5638
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Välitä edelleen osoitteeseen %s: %s"
 
-#: ../src/sendmsg-window.c:5607
+#: ../src/sendmsg-window.c:5642
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Jatka viestiä osoitteeseen %s: %s"
 
-#: ../src/sendmsg-window.c:5611
+#: ../src/sendmsg-window.c:5646
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Uusi viesti osoitteeseen %s: %s"

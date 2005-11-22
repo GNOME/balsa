@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-20 19:10+0100\n"
-"PO-Revision-Date: 2005-11-20 19:15+0100\n"
+"POT-Creation-Date: 2005-11-22 23:34+0100\n"
+"PO-Revision-Date: 2005-11-22 23:35+0100\n"
 "Last-Translator: \n"
 "Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -515,7 +515,7 @@ msgstr "El archivo de cabecera de la cara %s contiene datos binarios."
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
 #: ../libbalsa/identity.c:1104
-#, fuzzy, c-format
+#, c-format
 msgid "Error loading face: %s"
 msgstr "Ha ocurrido un error al cargar la cara: %s"
 
@@ -2734,9 +2734,9 @@ msgstr "cifrado:"
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
 #: ../src/balsa-message.c:1252
-#, fuzzy, c-format
+#, c-format
 msgid "Error loading Face: %s"
-msgstr "Ha ocurrido un error al cargar %s: %s\n"
+msgstr "Ha ocurrido un error al cargar la cara: %s"
 
 # src/balsa-message.c:1247
 # src/balsa-message.c:1417

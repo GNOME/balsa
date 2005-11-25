@@ -1017,7 +1017,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) {
         GtkTreeViewColumn *column =
 	    gtk_tree_view_get_column(tree_view, LB_MBOX_FROM_COL);
-
+        index->filter_no = 1; /* FIXME: this is hack! */
         gtk_tree_view_column_set_title(column, _("To"));
     }
 

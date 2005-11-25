@@ -1438,6 +1438,8 @@ static LibBalsaCondition *filter_old(const char *str)
     } else return NULL;
 }
 
+/* Subject or sender must match FILTER_SENDER, and Subject or
+   Recipient must match FILTER_RECIPIENT constant. */
 static struct {
     char *str;
     LibBalsaCondition *(*filter)(const char *str);
@@ -5026,14 +5028,6 @@ balsa_window_update_tab(BalsaMailboxNode * mbnode)
 	gtk_notebook_set_tab_label(GTK_NOTEBOOK(balsa_app.notebook), page,
 				   balsa_notebook_label_new(mbnode));
     }
-}
-
-void
-balsa_window_set_filter_label(BalsaWindow * window,
-			      gboolean to_field)
-{
-    gtk_combo_box_set_active(GTK_COMBO_BOX(window->filter_choice),
-                             to_field ? 1 : 0);
 }
 
 /* Helper for "Select All" callbacks: if the currently focused widget

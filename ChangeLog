@@ -2,6 +2,10 @@
 
 	* libbalsa/identity.c: add missing #include "misc.h"
 	* libbalsa/mailbox_pop3.c: handle procmail-filtered messages.
+	* src/main-window.[hc]: fix a regression: set right default view
+	filter for sentbox.
+	* src/balsa-index.c:
+	* src/balsa-mblist.c: ditto.
 
 2005-11-19 08:47  PeterB
 

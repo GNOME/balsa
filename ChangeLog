@@ -1,3 +1,8 @@
+2005-11-26 Pawel Salek
+
+	* libbalsa/identity.c: add missing #include "misc.h"
+	* libbalsa/mailbox_pop3.c: handle procmail-filtered messages.
+
 2005-11-19 08:47  PeterB
 
 	* src/balsa-index.c: don't scroll back to current message after

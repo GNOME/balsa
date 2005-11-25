@@ -169,7 +169,12 @@ move_from_msgdrop(const gchar *tmp_path, LibBalsaMailbox *dest,
     GMimeStream *stream;
     gboolean success;
     GError *err = NULL;
+    struct stat buf;
 
+    if(stat(tmp_path, &buf) != 0)
+        return FALSE;
+    if(buf.st_size == 0) /* filtered out? Nothing to move in any case */
+        return TRUE;
     fd = open(tmp_path, O_RDWR);
     stream = g_mime_stream_fs_new(fd);
     success =

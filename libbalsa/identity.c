@@ -32,6 +32,7 @@
 #include "information.h"
 #include "libbalsa-conf.h"
 #include "i18n.h"
+#include "misc.h"
 
 #if ENABLE_ESMTP
 #include <string.h>

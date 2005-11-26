@@ -519,14 +519,17 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
             const char *uid = pop_get_uid(pop, i, NULL);
             char *full_uid = g_strconcat(uid_prefix, " ", uid, NULL);
             g_hash_table_insert(current_uids, full_uid, GINT_TO_POINTER(1));
-            if(g_hash_table_lookup(uids, full_uid))
+            if(g_hash_table_lookup(uids, full_uid)) {
+                total_size -= msg_size;
                 continue;
+            }
         }
         if(m->msg_size_limit>0 && msg_size >= (unsigned)m->msg_size_limit) {
             libbalsa_information
                 (LIBBALSA_INFORMATION_WARNING,
                  _("POP3 message %d oversized: %d kB - skipped."),
                  i, msg_size);
+            total_size -= msg_size;
             continue;
         }
 #if POP_SYNC

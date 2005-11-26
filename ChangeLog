@@ -1,3 +1,8 @@
+2005-11-26 16:35  PeterB
+
+	* libbalsa/mailbox_mbox.c: don't leak message.
+	* libbalsa/mailbox_pop3.c: adjust total size for skipped messages.
+
 2005-11-26 Pawel Salek
 
 	* libbalsa/identity.c: add missing #include "misc.h"

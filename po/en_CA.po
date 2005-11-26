@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-17 20:50-0500\n"
+"POT-Creation-Date: 2005-11-25 21:13-0500\n"
 "PO-Revision-Date: 2005-09-06 16:41-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: Canadian English <adamw@gnome.org>\n"
@@ -71,8 +71,8 @@ msgstr "Cannot add duplicate entry"
 msgid "Cannot find address in address book"
 msgstr "Cannot find address in address book"
 
-#: libbalsa/address-book.c:310 src/main-window.c:2306 src/main-window.c:4347
-#: src/sendmsg-window.c:4866
+#: libbalsa/address-book.c:310 src/main-window.c:2308 src/main-window.c:4349
+#: src/sendmsg-window.c:4901
 msgid "Unknown error"
 msgstr "Unknown error"
 
@@ -267,153 +267,181 @@ msgid "%s: insufficient validity for uid %s"
 msgstr "%s: insufficient validity for UID %s"
 
 #. should "re" be localized ?
-#: libbalsa/identity.c:101 libbalsa/mailbox_local.c:1284
+#: libbalsa/identity.c:102 libbalsa/mailbox_local.c:1284
 #: libbalsa/mailbox_local.c:1286 src/sendmsg-window.c:3380
 #: src/sendmsg-window.c:3381
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:102 src/sendmsg-window.c:3411 src/sendmsg-window.c:3412
+#: libbalsa/identity.c:103 src/sendmsg-window.c:3411 src/sendmsg-window.c:3412
 msgid "Fwd:"
 msgstr "Fwd:"
 
-#: libbalsa/identity.c:153
+#: libbalsa/identity.c:160
 msgid "New Identity"
 msgstr "New Identity"
 
-#: libbalsa/identity.c:406
+#: libbalsa/identity.c:413
 msgid "Current"
 msgstr "Current"
 
-#: libbalsa/identity.c:646 libbalsa/smtp-server.c:271
+#: libbalsa/identity.c:664 libbalsa/smtp-server.c:271
 msgid "Default"
 msgstr "Default"
 
-#. create the "General" tab
-#: libbalsa/identity.c:852
-msgid "General"
-msgstr "General"
-
-#: libbalsa/identity.c:854
-msgid "_Identity Name:"
-msgstr "_Identity Name:"
-
-#: libbalsa/identity.c:856
-msgid "_Full Name:"
-msgstr "_Full Name:"
-
-#: libbalsa/identity.c:858
-msgid "_Mailing Address:"
-msgstr "_Mailing Address:"
-
-#: libbalsa/identity.c:860
-msgid "Reply _To:"
-msgstr "Reply _To:"
-
-#: libbalsa/identity.c:862
-msgid "_Domain:"
-msgstr "_Domain:"
-
-#: libbalsa/identity.c:864
-msgid "_Bcc:"
-msgstr "_Bcc:"
-
-#: libbalsa/identity.c:866
-msgid "Reply _String:"
-msgstr "Reply _String:"
-
-#: libbalsa/identity.c:868
-msgid "F_orward String:"
-msgstr "F_orward String:"
-
-#: libbalsa/identity.c:871
-msgid "SMT_P Server"
-msgstr "SMT_P Server"
+#: libbalsa/identity.c:865
+msgid "Signature _Path"
+msgstr "Signature _Path"
 
 #. create the "Signature" tab
-#: libbalsa/identity.c:876
+#: libbalsa/identity.c:869 libbalsa/identity.c:921
 msgid "Signature"
 msgstr "Signature"
 
-#: libbalsa/identity.c:878
-msgid "Signature _Path:"
-msgstr "Signature _Path:"
+#: libbalsa/identity.c:870
+msgid "_Face Path"
+msgstr "_Face Path"
 
-#: libbalsa/identity.c:881
+#: libbalsa/identity.c:875
+msgid "_X-Face Path"
+msgstr "_X-Face Path"
+
+#. create the "General" tab
+#: libbalsa/identity.c:897
+msgid "General"
+msgstr "General"
+
+#: libbalsa/identity.c:899
+msgid "_Identity Name:"
+msgstr "_Identity Name:"
+
+#: libbalsa/identity.c:901
+msgid "_Full Name:"
+msgstr "_Full Name:"
+
+#: libbalsa/identity.c:903
+msgid "_Mailing Address:"
+msgstr "_Mailing Address:"
+
+#: libbalsa/identity.c:905
+msgid "Reply _To:"
+msgstr "Reply _To:"
+
+#: libbalsa/identity.c:907
+msgid "_Domain:"
+msgstr "_Domain:"
+
+#: libbalsa/identity.c:909
+msgid "_Bcc:"
+msgstr "_Bcc:"
+
+#: libbalsa/identity.c:911
+msgid "Reply _String:"
+msgstr "Reply _String:"
+
+#: libbalsa/identity.c:913
+msgid "F_orward String:"
+msgstr "F_orward String:"
+
+#: libbalsa/identity.c:916
+msgid "SMT_P Server"
+msgstr "SMT_P Server"
+
+#: libbalsa/identity.c:926
 msgid "_Execute Signature"
 msgstr "_Execute Signature"
 
-#: libbalsa/identity.c:884
+#: libbalsa/identity.c:929
 msgid "Incl_ude Signature"
 msgstr "Incl_ude Signature"
 
-#: libbalsa/identity.c:887
+#: libbalsa/identity.c:932
 msgid "Include Signature When For_warding"
 msgstr "Include Signature When For_warding"
 
-#: libbalsa/identity.c:890
+#: libbalsa/identity.c:935
 msgid "Include Signature When Rep_lying"
 msgstr "Include Signature When Rep_lying"
 
-#: libbalsa/identity.c:893
+#: libbalsa/identity.c:938
 msgid "_Add Signature Separator"
 msgstr "_Add Signature Separator"
 
-#: libbalsa/identity.c:896
+#: libbalsa/identity.c:941
 msgid "Prepend Si_gnature"
 msgstr "Prepend Si_gnature"
 
 #. create the "Security" tab
-#: libbalsa/identity.c:901
+#: libbalsa/identity.c:953
 msgid "Security"
 msgstr "Security"
 
-#: libbalsa/identity.c:904
+#: libbalsa/identity.c:956
 msgid "sign messages by default"
 msgstr "sign messages by default"
 
-#: libbalsa/identity.c:907
+#: libbalsa/identity.c:959
 msgid "encrypt messages by default"
 msgstr "encrypt messages by default"
 
-#: libbalsa/identity.c:910
+#: libbalsa/identity.c:962
 msgid "default protocol"
 msgstr "default protocol"
 
-#: libbalsa/identity.c:913
+#: libbalsa/identity.c:965
 msgid "always trust GnuPG keys when encrypting"
 msgstr "always trust GnuPG keys when encrypting"
 
-#: libbalsa/identity.c:1059
+#: libbalsa/identity.c:1070
+#, c-format
+msgid "Error reading file %s: %s"
+msgstr "Error reading file %s: %s"
+
+#: libbalsa/identity.c:1078
+#, c-format
+msgid "Face header file %s is too long (%d bytes)."
+msgstr "Face header file %s is too long (%d bytes)."
+
+#: libbalsa/identity.c:1086
+#, c-format
+msgid "Face header file %s contains binary data."
+msgstr "Face header file %s contains binary data."
+
+#: libbalsa/identity.c:1105
+#, c-format
+msgid "Error loading face: %s"
+msgstr "Error loading face: %s"
+
+#: libbalsa/identity.c:1275
 msgid "Error: The identity does not have a name"
 msgstr "Error: The identity does not have a name"
 
-#: libbalsa/identity.c:1069
+#: libbalsa/identity.c:1285
 msgid "Error: An identity with that name already exists"
 msgstr "Error: An identity with that name already exists"
 
-#: libbalsa/identity.c:1240
+#: libbalsa/identity.c:1473
 msgid "Do you really want to delete the selected identity?"
 msgstr "Do you really want to delete the selected identity?"
 
-#: libbalsa/identity.c:1275
+#: libbalsa/identity.c:1508
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "Error displaying help for identities: %s\n"
 
-#: libbalsa/identity.c:1321
+#: libbalsa/identity.c:1554
 msgid "Manage Identities"
 msgstr "Manage Identities"
 
-#: libbalsa/identity.c:1639
+#: libbalsa/identity.c:1907
 msgid "GnuPG MIME mode"
 msgstr "GnuPG MIME mode"
 
-#: libbalsa/identity.c:1641
+#: libbalsa/identity.c:1909
 msgid "GnuPG OpenPGP mode"
 msgstr "GnuPG OpenPGP mode"
 
-#: libbalsa/identity.c:1644
+#: libbalsa/identity.c:1912
 msgid "GpgSM S/MIME mode"
 msgstr "GpgSM S/MIME mode"
 
@@ -715,37 +743,37 @@ msgstr "Cannot create message"
 msgid "Message rename error"
 msgstr "Error renaming message"
 
-#: libbalsa/mailbox_pop3.c:184
+#: libbalsa/mailbox_pop3.c:189
 #, c-format
 msgid "Error appending message %d from %s to %s: %s"
 msgstr "Error appending message %d from %s to %s: %s"
 
-#: libbalsa/mailbox_pop3.c:333
+#: libbalsa/mailbox_pop3.c:338
 #, c-format
 msgid "Saving POP message to %s failed"
 msgstr "Saving POP message to %s failed"
 
-#: libbalsa/mailbox_pop3.c:340
+#: libbalsa/mailbox_pop3.c:345
 #, c-format
 msgid "Retrieving Message %d of %d"
 msgstr "Retrieving Message %d of %d"
 
-#: libbalsa/mailbox_pop3.c:363
+#: libbalsa/mailbox_pop3.c:368
 #, c-format
 msgid "Received %ld kB of %ld"
 msgstr "Received %ld kB of %ld"
 
-#: libbalsa/mailbox_pop3.c:377
+#: libbalsa/mailbox_pop3.c:382
 #, c-format
 msgid "Saving POP message to %s failed."
 msgstr "Saving POP message to %s failed."
 
-#: libbalsa/mailbox_pop3.c:387
+#: libbalsa/mailbox_pop3.c:392
 #, c-format
 msgid "Transfering POP message to %s failed."
 msgstr "Transfering POP message to %s failed."
 
-#: libbalsa/mailbox_pop3.c:463
+#: libbalsa/mailbox_pop3.c:468
 #, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
@@ -754,27 +782,27 @@ msgstr ""
 "POP3 mailbox %s temp file error:\n"
 "%s"
 
-#: libbalsa/mailbox_pop3.c:488
+#: libbalsa/mailbox_pop3.c:493
 #, c-format
 msgid "POP3 mailbox %s error: %s\n"
 msgstr "POP3 mailbox %s error: %s\n"
 
-#: libbalsa/mailbox_pop3.c:523
+#: libbalsa/mailbox_pop3.c:528
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
 msgstr "POP3 message %d oversized: %d kB - skipped."
 
-#: libbalsa/mailbox_pop3.c:534
+#: libbalsa/mailbox_pop3.c:539
 #, c-format
 msgid "POP3 error: cannot open %s for writing."
 msgstr "POP3 error: cannot open %s for writing."
 
-#: libbalsa/mailbox_pop3.c:542
+#: libbalsa/mailbox_pop3.c:547
 #, c-format
 msgid "POP3 error: cannot close %s."
 msgstr "POP3 error: cannot close %s."
 
-#: libbalsa/mailbox_pop3.c:575
+#: libbalsa/mailbox_pop3.c:580
 #, c-format
 msgid "POP3 error: %s."
 msgstr "POP3 error: %s."
@@ -784,95 +812,111 @@ msgstr "POP3 error: %s."
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr "Mailbox (%s) is readonly: cannot change flags."
 
-#: libbalsa/misc.c:1237
+#: libbalsa/misc.c:1240
 msgid "west european"
 msgstr "west european"
 
-#: libbalsa/misc.c:1239 libbalsa/misc.c:1273
+#: libbalsa/misc.c:1242 libbalsa/misc.c:1276
 msgid "east european"
 msgstr "east european"
 
-#: libbalsa/misc.c:1241
+#: libbalsa/misc.c:1244
 msgid "south european"
 msgstr "south european"
 
-#: libbalsa/misc.c:1243
+#: libbalsa/misc.c:1246
 msgid "north european"
 msgstr "north european"
 
-#: libbalsa/misc.c:1245 libbalsa/misc.c:1275
+#: libbalsa/misc.c:1248 libbalsa/misc.c:1278
 msgid "cyrillic"
 msgstr "cyrillic"
 
-#: libbalsa/misc.c:1247 libbalsa/misc.c:1281
+#: libbalsa/misc.c:1250 libbalsa/misc.c:1284
 msgid "arabic"
 msgstr "arabic"
 
-#: libbalsa/misc.c:1249 libbalsa/misc.c:1277
+#: libbalsa/misc.c:1252 libbalsa/misc.c:1280
 msgid "greek"
 msgstr "greek"
 
-#: libbalsa/misc.c:1251 libbalsa/misc.c:1279
+#: libbalsa/misc.c:1254 libbalsa/misc.c:1282
 msgid "hebrew"
 msgstr "hebrew"
 
-#: libbalsa/misc.c:1253
+#: libbalsa/misc.c:1256
 msgid "turkish"
 msgstr "turkish"
 
-#: libbalsa/misc.c:1255
+#: libbalsa/misc.c:1258
 msgid "nordic"
 msgstr "nordic"
 
-#: libbalsa/misc.c:1257
+#: libbalsa/misc.c:1260
 msgid "thai"
 msgstr "thai"
 
-#: libbalsa/misc.c:1259 libbalsa/misc.c:1283
+#: libbalsa/misc.c:1262 libbalsa/misc.c:1286
 msgid "baltic"
 msgstr "baltic"
 
-#: libbalsa/misc.c:1261
+#: libbalsa/misc.c:1264
 msgid "celtic"
 msgstr "celtic"
 
-#: libbalsa/misc.c:1263
+#: libbalsa/misc.c:1266
 msgid "west europe (euro)"
 msgstr "west europe (euro)"
 
-#: libbalsa/misc.c:1265
+#: libbalsa/misc.c:1268
 msgid "russian"
 msgstr "russian"
 
-#: libbalsa/misc.c:1267
+#: libbalsa/misc.c:1270
 msgid "ukranian"
 msgstr "ukranian"
 
-#: libbalsa/misc.c:1269
+#: libbalsa/misc.c:1272
 msgid "japanese"
 msgstr "japanese"
 
-#: libbalsa/misc.c:1271
+#: libbalsa/misc.c:1274
 msgid "korean"
 msgstr "korean"
 
-#: libbalsa/misc.c:1889
+#: libbalsa/misc.c:1892
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Timeout exceeded while attempting fcntl lock!"
 
-#: libbalsa/misc.c:1896
+#: libbalsa/misc.c:1899
 #, c-format
 msgid "Waiting for fcntl lock... %d"
 msgstr "Waiting for fcntl lock... %d"
 
-#: libbalsa/misc.c:1924
+#: libbalsa/misc.c:1927
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Timeout exceeded while attempting flock lock!"
 
-#: libbalsa/misc.c:1931
+#: libbalsa/misc.c:1934
 #, c-format
 msgid "Waiting for flock attempt... %d"
 msgstr "Waiting for flock attempt... %d"
+
+#: libbalsa/misc.c:2090
+msgid "No image data"
+msgstr "No image data"
+
+#: libbalsa/misc.c:2124
+msgid "Invalid input format"
+msgstr "Invalid input format"
+
+#: libbalsa/misc.c:2128
+msgid "Internal buffer overrun"
+msgstr "Internal buffer overrun"
+
+#: libbalsa/misc.c:2144
+msgid "Bad X-Face data"
+msgstr "Bad X-Face data"
 
 #: libbalsa/rfc3156.c:88
 #, c-format
@@ -1291,7 +1335,7 @@ msgstr "Try again later."
 msgid "Sending Mail..."
 msgstr "Sending Mail..."
 
-#: libbalsa/send.c:245 src/main-window.c:2763
+#: libbalsa/send.c:245 src/main-window.c:2765
 msgid "_Hide"
 msgstr "_Hide"
 
@@ -1353,6 +1397,7 @@ msgstr "From"
 msgid "To:"
 msgstr "To:"
 
+#. FIXME: this is hack!
 #: libbalsa/send.c:1010 src/balsa-index.c:1021
 msgid "To"
 msgstr "To"
@@ -1892,7 +1937,7 @@ msgstr "_User Address Book DN"
 msgid "Enable _TLS"
 msgstr "Enable _TLS"
 
-#: src/address-book-config.c:542 src/main-window.c:4027
+#: src/address-book-config.c:542 src/main-window.c:4029
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Error displaying help: %s\n"
@@ -1969,109 +2014,109 @@ msgstr "Size"
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Opening mailbox %s. Please wait..."
 
-#: src/balsa-index.c:1616
+#: src/balsa-index.c:1614
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Move to Trash failed: %s"
 
 #. R
-#: src/balsa-index.c:1770 src/main-window.c:584 src/main-window.c:1047
+#: src/balsa-index.c:1768 src/main-window.c:584 src/main-window.c:1047
 #: src/message-window.c:148
 msgid "_Reply..."
 msgstr "_Reply..."
 
-#: src/balsa-index.c:1772
+#: src/balsa-index.c:1770
 msgid "Reply To _All..."
 msgstr "Reply To _All..."
 
-#: src/balsa-index.c:1774
+#: src/balsa-index.c:1772
 msgid "Reply To _Group..."
 msgstr "Reply To _Group..."
 
-#: src/balsa-index.c:1776
+#: src/balsa-index.c:1774
 msgid "_Forward Attached..."
 msgstr "_Forward Attached..."
 
-#: src/balsa-index.c:1778
+#: src/balsa-index.c:1776
 msgid "Forward _Inline..."
 msgstr "Forward _Inline..."
 
-#: src/balsa-index.c:1780 src/main-window.c:623
+#: src/balsa-index.c:1778 src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "_Pipe through..."
 
-#: src/balsa-index.c:1782 src/main-window.c:682 src/main-window.c:1031
+#: src/balsa-index.c:1780 src/main-window.c:682 src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "_Store Address..."
 
-#: src/balsa-index.c:1797 src/filter-edit-dialog.c:223 src/mailbox-node.c:983
+#: src/balsa-index.c:1795 src/filter-edit-dialog.c:223 src/mailbox-node.c:983
 #: src/mailbox-node.c:999 src/pref-manager.c:1499 src/pref-manager.c:1588
 #: src/pref-manager.c:2633
 msgid "_Delete"
 msgstr "_Delete"
 
-#: src/balsa-index.c:1802
+#: src/balsa-index.c:1800
 msgid "_Undelete"
 msgstr "_Undelete"
 
-#: src/balsa-index.c:1807
+#: src/balsa-index.c:1805
 msgid "Move To _Trash"
 msgstr "Move To _Trash"
 
-#: src/balsa-index.c:1811
+#: src/balsa-index.c:1809
 msgid "T_oggle"
 msgstr "T_oggle"
 
-#: src/balsa-index.c:1815 src/main-window.c:331 src/main-window.c:360
+#: src/balsa-index.c:1813 src/main-window.c:331 src/main-window.c:360
 msgid "_Flagged"
 msgstr "_Flagged"
 
-#: src/balsa-index.c:1818
+#: src/balsa-index.c:1816
 msgid "_Unread"
 msgstr "_Unread"
 
-#: src/balsa-index.c:1826
+#: src/balsa-index.c:1824
 msgid "_Move to"
 msgstr "_Move to"
 
-#: src/balsa-index.c:1834
+#: src/balsa-index.c:1832
 msgid "_View Source"
 msgstr "_View Source"
 
-#: src/balsa-index.c:2098
+#: src/balsa-index.c:2096
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Failed to copy messages to mailbox \"%s\": %s"
 
-#: src/balsa-index.c:2099
+#: src/balsa-index.c:2097
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Failed to copy message to mailbox \"%s\": %s"
 
-#: src/balsa-index.c:2111
+#: src/balsa-index.c:2109
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Copied to \"%s\"."
 
-#: src/balsa-index.c:2112
+#: src/balsa-index.c:2110
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Moved to \"%s\"."
 
-#: src/balsa-index.c:2232
+#: src/balsa-index.c:2230
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Committing mailbox %s failed."
 
-#: src/balsa-index.c:2405
+#: src/balsa-index.c:2403
 msgid "Pipe message through a program"
 msgstr "Pipe message through a program"
 
-#: src/balsa-index.c:2408
+#: src/balsa-index.c:2406
 msgid "_Run"
 msgstr "_Run"
 
-#: src/balsa-index.c:2417
+#: src/balsa-index.c:2415
 msgid "Specify the program to run:"
 msgstr "Specify the program to run:"
 
@@ -2079,23 +2124,23 @@ msgstr "Specify the program to run:"
 msgid "Mailbox"
 msgstr "Mailbox"
 
-#: src/balsa-mblist.c:992 src/balsa-mblist.c:1030
+#: src/balsa-mblist.c:992 src/balsa-mblist.c:1028
 msgid "Failed to find mailbox"
 msgstr "Failed to find mailbox"
 
-#: src/balsa-mblist.c:1590
+#: src/balsa-mblist.c:1588
 msgid "_Other..."
 msgstr "_Other..."
 
-#: src/balsa-mblist.c:1658
+#: src/balsa-mblist.c:1656
 msgid "Choose destination folder"
 msgstr "Choose destination folder"
 
-#: src/balsa-mblist.c:1881 src/balsa-mblist.c:1884
+#: src/balsa-mblist.c:1879 src/balsa-mblist.c:1882
 msgid "Other..."
 msgstr "Other..."
 
-#: src/balsa-mblist.c:2042
+#: src/balsa-mblist.c:2040
 #, c-format
 msgid "Shown mailbox: %s with %d message, "
 msgid_plural "Shown mailbox: %s with %d messages, "
@@ -2104,114 +2149,119 @@ msgstr[1] "Shown mailbox: %s with %d messages, "
 
 #. xgettext: this is the second part of the message
 #. * "Shown mailbox: %s with %d messages, %ld new".
-#: src/balsa-mblist.c:2048
+#: src/balsa-mblist.c:2046
 #, c-format
 msgid "%ld new"
 msgid_plural "%ld new"
 msgstr[0] "%ld new"
 msgstr[1] "%ld new"
 
-#: src/balsa-message.c:285
+#: src/balsa-message.c:291
 msgid "Check cryptographic signature"
 msgstr "Check cryptographic signature"
 
-#: src/balsa-message.c:306
+#: src/balsa-message.c:312
 msgid "Select message part to display"
 msgstr "Select message part to display"
 
-#: src/balsa-message.c:380
+#: src/balsa-message.c:386
 msgid "Content"
 msgstr "Content"
 
-#: src/balsa-message.c:458
+#: src/balsa-message.c:464
 msgid "Message parts"
 msgstr "Message parts"
 
-#: src/balsa-message.c:639
+#: src/balsa-message.c:645
 msgid "Save selected as..."
 msgstr "Save selected as..."
 
-#: src/balsa-message.c:646
+#: src/balsa-message.c:652
 msgid "Save selected to folder..."
 msgstr "Save selected to folder..."
 
-#: src/balsa-message.c:784
+#: src/balsa-message.c:790
 msgid "(No sender)"
 msgstr "(No sender)"
 
-#: src/balsa-message.c:852
+#: src/balsa-message.c:858
 #, c-format
 msgid "Could not access message %ld in mailbox \"%s\"."
 msgstr "Could not access message %ld in mailbox \"%s\"."
 
-#: src/balsa-message.c:1034
+#: src/balsa-message.c:1040
 msgid "mixed parts"
 msgstr "mixed parts"
 
-#: src/balsa-message.c:1036
+#: src/balsa-message.c:1042
 msgid "alternative parts"
 msgstr "alternative parts"
 
-#: src/balsa-message.c:1038
+#: src/balsa-message.c:1044
 msgid "signed parts"
 msgstr "signed parts"
 
-#: src/balsa-message.c:1040
+#: src/balsa-message.c:1046
 msgid "encrypted parts"
 msgstr "encrypted parts"
 
-#: src/balsa-message.c:1042
+#: src/balsa-message.c:1048
 msgid "rfc822 message"
 msgstr "rfc822 message"
 
-#: src/balsa-message.c:1044
+#: src/balsa-message.c:1050
 #, c-format
 msgid "\"%s\" parts"
 msgstr "\"%s\" parts"
 
-#: src/balsa-message.c:1097
+#: src/balsa-message.c:1103
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "rfc822 message (from %s, subject \"%s\")"
 
-#: src/balsa-message.c:1104
+#: src/balsa-message.c:1110
 msgid "complete message"
 msgstr "complete message"
 
-#: src/balsa-message.c:1121
+#: src/balsa-message.c:1127
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr "part %s: %s (file %s)"
 
-#: src/balsa-message.c:1132
+#: src/balsa-message.c:1138
 #, c-format
 msgid "part %s: %s"
 msgstr "part %s: %s"
 
-#: src/balsa-message.c:1147
+#: src/balsa-message.c:1153
 msgid "encrypted: "
 msgstr "encrypted: "
 
-#: src/balsa-message.c:1250 src/balsa-mime-widget-text.c:344
+#: src/balsa-message.c:1252
+#, c-format
+msgid "Error loading Face: %s"
+msgstr "Error loading Face: %s"
+
+#: src/balsa-message.c:1307 src/balsa-mime-widget-text.c:344
 #: src/balsa-mime-widget-text.c:649
 msgid "Save..."
 msgstr "Save..."
 
-#: src/balsa-message.c:1326
+#: src/balsa-message.c:1383
 msgid "Select folder for saving selected parts"
 msgstr "Select folder for saving selected parts"
 
-#: src/balsa-message.c:1364
+#: src/balsa-message.c:1421
 #, c-format
 msgid "%s message part"
 msgstr "%s message part"
 
-#: src/balsa-message.c:1392 src/balsa-mime-widget-callbacks.c:202
+#: src/balsa-message.c:1449 src/balsa-mime-widget-callbacks.c:202
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "Could not save %s: %s"
 
-#: src/balsa-message.c:2096
+#: src/balsa-message.c:2153
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2222,11 +2272,11 @@ msgstr ""
 "a Message Disposition Notification(MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 
-#: src/balsa-message.c:2103
+#: src/balsa-message.c:2160
 msgid "Reply to MDN?"
 msgstr "Reply to MDN?"
 
-#: src/balsa-message.c:2298
+#: src/balsa-message.c:2355
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -2236,16 +2286,16 @@ msgstr ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 
-#: src/balsa-message.c:2319 src/balsa-message.c:2401 src/balsa-message.c:2516
+#: src/balsa-message.c:2376 src/balsa-message.c:2458 src/balsa-message.c:2573
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Parsing a message part failed: %s"
 
-#: src/balsa-message.c:2320 src/balsa-message.c:2402 src/balsa-message.c:2517
+#: src/balsa-message.c:2377 src/balsa-message.c:2459 src/balsa-message.c:2574
 msgid "Possible disk space problem."
 msgstr "Possible disk space problem."
 
-#: src/balsa-message.c:2332
+#: src/balsa-message.c:2389
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2254,7 +2304,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
 "it's structure is invalid."
 
-#: src/balsa-message.c:2340
+#: src/balsa-message.c:2397
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2263,7 +2313,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 
-#: src/balsa-message.c:2353
+#: src/balsa-message.c:2410
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2272,7 +2322,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 
-#: src/balsa-message.c:2417
+#: src/balsa-message.c:2474
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
@@ -2281,7 +2331,7 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
 "structure is invalid. The signature, if there is any, cannot be checked."
 
-#: src/balsa-message.c:2430
+#: src/balsa-message.c:2487
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2290,27 +2340,27 @@ msgstr ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 
-#: src/balsa-message.c:2433
+#: src/balsa-message.c:2490
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:2433 src/balsa-mime-widget-crypto.c:72 src/print.c:1302
+#: src/balsa-message.c:2490 src/balsa-mime-widget-crypto.c:72 src/print.c:1302
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: src/balsa-message.c:2452 src/balsa-message.c:2578
+#: src/balsa-message.c:2509 src/balsa-message.c:2635
 msgid "Detected a good signature"
 msgstr "Detected a good signature"
 
-#: src/balsa-message.c:2458
+#: src/balsa-message.c:2515
 msgid "Detected a good signature with insufficient validity"
 msgstr "Detected a good signature with insufficient validity"
 
-#: src/balsa-message.c:2463 src/balsa-message.c:2582
+#: src/balsa-message.c:2520 src/balsa-message.c:2639
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Detected a good signature with insufficient validity/trust"
 
-#: src/balsa-message.c:2470 src/balsa-message.c:2588
+#: src/balsa-message.c:2527 src/balsa-message.c:2645
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2321,7 +2371,7 @@ msgstr ""
 "returned:\n"
 "%s"
 
-#: src/balsa-message.c:2482
+#: src/balsa-message.c:2539
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2330,7 +2380,7 @@ msgstr ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 
-#: src/balsa-message.c:2540
+#: src/balsa-message.c:2597
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
@@ -2338,7 +2388,7 @@ msgstr ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 
-#: src/balsa-message.c:2542
+#: src/balsa-message.c:2599
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -2346,7 +2396,7 @@ msgstr ""
 "The signature check and removal of the OpenPGP armour cannot be performed "
 "because this message is displayed more than once."
 
-#: src/balsa-message.c:2545
+#: src/balsa-message.c:2602
 msgid "Please close the other instances of this message and try again."
 msgstr "Please close the other instances of this message and try again."
 
@@ -2427,17 +2477,17 @@ msgstr "_All"
 msgid "C_lear"
 msgstr "C_lear"
 
-#: src/filter-edit-callbacks.c:910 src/main-window.c:3906
+#: src/filter-edit-callbacks.c:910 src/main-window.c:3908
 msgid "_Body"
 msgstr "_Body"
 
 #. To:
-#: src/filter-edit-callbacks.c:911 src/main-window.c:3907
+#: src/filter-edit-callbacks.c:911 src/main-window.c:3909
 #: src/sendmsg-window.c:2738
 msgid "_To:"
 msgstr "_To:"
 
-#: src/filter-edit-callbacks.c:912 src/main-window.c:3908
+#: src/filter-edit-callbacks.c:912 src/main-window.c:3910
 msgid "_From:"
 msgstr "_From:"
 
@@ -2445,7 +2495,7 @@ msgstr "_From:"
 msgid "_Subject"
 msgstr "_Subject"
 
-#: src/filter-edit-callbacks.c:914 src/main-window.c:3910
+#: src/filter-edit-callbacks.c:914 src/main-window.c:3912
 msgid "_Cc:"
 msgstr "_Cc:"
 
@@ -3870,27 +3920,27 @@ msgstr ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 
-#: src/main-window.c:1445
+#: src/main-window.c:1447
 msgid "Subject or Sender Contains:"
 msgstr "Subject or Sender Contains:"
 
-#: src/main-window.c:1446
+#: src/main-window.c:1448
 msgid "Subject or Recipient Contains:"
 msgstr "Subject or Recipient Contains:"
 
-#: src/main-window.c:1447
+#: src/main-window.c:1449
 msgid "Subject Contains:"
 msgstr "Subject Contains:"
 
-#: src/main-window.c:1448
+#: src/main-window.c:1450
 msgid "Body Contains:"
 msgstr "Body Contains:"
 
-#: src/main-window.c:1449
+#: src/main-window.c:1451
 msgid "Older than (days):"
 msgstr "Older than (days):"
 
-#: src/main-window.c:2305
+#: src/main-window.c:2307
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -3899,11 +3949,11 @@ msgstr ""
 "Unable to Open Mailbox!\n"
 "%s."
 
-#: src/main-window.c:2616
+#: src/main-window.c:2618
 msgid "translator-credits"
 msgstr "Maintainer: Adam Weinberger <adamw@gnome.org>"
 
-#: src/main-window.c:2629 src/main-window.c:2656
+#: src/main-window.c:2631 src/main-window.c:2658
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -3915,100 +3965,100 @@ msgstr ""
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 
-#: src/main-window.c:2760 src/main-window.c:2773
+#: src/main-window.c:2762 src/main-window.c:2775
 msgid "Checking Mail..."
 msgstr "Checking Mail..."
 
-#: src/main-window.c:2948
+#: src/main-window.c:2950
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr "IMAP mailbox: %s"
 
-#: src/main-window.c:2951
+#: src/main-window.c:2953
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Local mailbox: %s"
 
-#: src/main-window.c:3088
+#: src/main-window.c:3090
 msgid "Finished Checking."
 msgstr "Finished Checking."
 
-#: src/main-window.c:3150
+#: src/main-window.c:3152
 #, c-format
 msgid "Sending error: %s"
 msgstr "Sending error: %s"
 
-#: src/main-window.c:3235
+#: src/main-window.c:3237
 msgid "Balsa: New mail"
 msgstr "Balsa: New mail"
 
-#: src/main-window.c:3247
+#: src/main-window.c:3249
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "You have received %d new message."
 msgstr[1] "You have received %d new messages."
 
-#: src/main-window.c:3250
+#: src/main-window.c:3252
 msgid "You have new mail."
 msgstr "You have new mail."
 
-#: src/main-window.c:3868
+#: src/main-window.c:3870
 msgid "Search mailbox"
 msgstr "Search mailbox"
 
-#: src/main-window.c:3885
+#: src/main-window.c:3887
 msgid "_Search for:"
 msgstr "_Search for:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: src/main-window.c:3898
+#: src/main-window.c:3900
 msgid "In:"
 msgstr "In:"
 
-#: src/main-window.c:3909
+#: src/main-window.c:3911
 msgid "S_ubject"
 msgstr "S_ubject"
 
 #. Frame with Apply and Clear buttons
-#: src/main-window.c:3914
+#: src/main-window.c:3916
 msgid "Show only matching messages"
 msgstr "Show only matching messages"
 
 #. Frame with OK button
-#: src/main-window.c:3935
+#: src/main-window.c:3937
 msgid "Open next matching message"
 msgstr "Open next matching message"
 
-#: src/main-window.c:3946
+#: src/main-window.c:3948
 msgid "_Reverse search"
 msgstr "_Reverse search"
 
-#: src/main-window.c:3951
+#: src/main-window.c:3953
 msgid "_Wrap around"
 msgstr "_Wrap around"
 
-#: src/main-window.c:4112
+#: src/main-window.c:4114
 msgid "You can apply filters only on mailbox\n"
 msgstr "You can apply filters only on mailbox\n"
 
-#: src/main-window.c:4126
+#: src/main-window.c:4128
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Removing duplicates failed: %s"
 
-#: src/main-window.c:4346
+#: src/main-window.c:4348
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Could not open trash: %s"
 
-#: src/main-window.c:4475
+#: src/main-window.c:4477
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (readonly)"
 
-#: src/main-window.c:4477
+#: src/main-window.c:4479
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -4496,7 +4546,7 @@ msgstr "_POP message size limit:"
 msgid "Quoted and Flowed Text"
 msgstr "Quoted and Flowed Text"
 
-#: src/pref-manager.c:1706 src/sendmsg-window.c:5086
+#: src/pref-manager.c:1706 src/sendmsg-window.c:5121
 msgid "Quoted Text Regular Expression"
 msgstr "Quoted Text Regular Expression"
 
@@ -5579,7 +5629,12 @@ msgstr "Could not open the file %s.\n"
 msgid "Include file"
 msgstr "Include file"
 
-#: src/sendmsg-window.c:4698
+#: src/sendmsg-window.c:4508
+#, c-format
+msgid "Could not load %s header file %s: %s"
+msgstr "Could not load %s header file %s: %s"
+
+#: src/sendmsg-window.c:4733
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5589,75 +5644,75 @@ msgstr ""
 "the first part will be signed and/or encrypted. You should select MIME mode "
 "if the complete message shall be protected. Do you really want to proceed?"
 
-#: src/sendmsg-window.c:4714
+#: src/sendmsg-window.c:4749
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "sending message with gpg mode %d"
 
-#: src/sendmsg-window.c:4759
+#: src/sendmsg-window.c:4794
 msgid "Message could not be created"
 msgstr "Message could not be created"
 
-#: src/sendmsg-window.c:4761
+#: src/sendmsg-window.c:4796
 msgid "Message could not be queued in outbox"
 msgstr "Message could not be queued in outbox"
 
-#: src/sendmsg-window.c:4763
+#: src/sendmsg-window.c:4798
 msgid "Message could not be saved in sentbox"
 msgstr "Message could not be saved in sentbox"
 
-#: src/sendmsg-window.c:4765
+#: src/sendmsg-window.c:4800
 msgid "Message could not be sent"
 msgstr "Message could not be sent"
 
-#: src/sendmsg-window.c:4769
+#: src/sendmsg-window.c:4804
 #, c-format
 msgid "Send failed: %s"
 msgstr "Send failed: %s"
 
-#: src/sendmsg-window.c:4835
+#: src/sendmsg-window.c:4870
 msgid "Could not postpone message."
 msgstr "Could not postpone message."
 
-#: src/sendmsg-window.c:4849
+#: src/sendmsg-window.c:4884
 msgid "Message postponed."
 msgstr "Message postponed."
 
-#: src/sendmsg-window.c:4865
+#: src/sendmsg-window.c:4900
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Could not open draftbox: %s"
 
-#: src/sendmsg-window.c:4886
+#: src/sendmsg-window.c:4921
 msgid "Message saved."
 msgstr "Message saved."
 
-#: src/sendmsg-window.c:4949
+#: src/sendmsg-window.c:4984
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Error starting spell checker: %s"
 
-#: src/sendmsg-window.c:5085
+#: src/sendmsg-window.c:5120
 #, c-format
 msgid "Could not compile %s"
 msgstr "Could not compile %s"
 
-#: src/sendmsg-window.c:5598
+#: src/sendmsg-window.c:5633
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Reply to %s: %s"
 
-#: src/sendmsg-window.c:5603
+#: src/sendmsg-window.c:5638
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Forward message to %s: %s"
 
-#: src/sendmsg-window.c:5607
+#: src/sendmsg-window.c:5642
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Continue message to %s: %s"
 
-#: src/sendmsg-window.c:5611
+#: src/sendmsg-window.c:5646
 #, c-format
 msgid "New message to %s: %s"
 msgstr "New message to %s: %s"

@@ -1534,7 +1534,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
                                   LibBalsaMessageFlag flags,
                                   GError ** err)
 {
-    LibBalsaMessage *message = libbalsa_message_new();
+    LibBalsaMessage *message;
     gchar date_string[27];
     gchar *sender;
     gchar *address;

@@ -1043,7 +1043,11 @@ file_chooser_check_cb(GtkToggleButton * button, GtkWidget * chooser)
     gtk_widget_set_sensitive(chooser,
                              gtk_toggle_button_get_active(button));
     /* Force validation of current path, if any. */
+#if GTK_CHECK_VERSION(2, 6, 0)
     g_signal_emit_by_name(chooser, "selection-changed");
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
+    g_signal_emit_by_name(chooser, "changed");
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 }
 
 static void
@@ -1066,10 +1070,13 @@ md_face_path_changed(const gchar * filename, gboolean active,
                                             filename, &size, &err);
 
     if (err) {
+#if GTK_CHECK_VERSION(2, 6, 0)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error reading file %s: %s"), filename,
                              err->message);
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
         g_error_free(err);
+        gtk_widget_hide(face_box);
         return;
     }
 
@@ -1078,6 +1085,7 @@ md_face_path_changed(const gchar * filename, gboolean active,
                              _("Face header file %s is too long "
                                "(%d bytes)."), filename, size);
         g_free(content);
+        gtk_widget_hide(face_box);
         return;
     }
 
@@ -1143,16 +1151,22 @@ md_sig_path_changed(const gchar * filename, gboolean active,
 
 #define LIBBALSA_IDENTITY_INFO "libbalsa-identity-info"
 static void
-file_chooser_cb(GtkFileChooser * chooser, gpointer data)
+file_chooser_cb(GtkWidget * chooser, gpointer data)
 {
     gchar *filename;
     LibBalsaIdentityPathType type;
     GtkToggleButton *check;
     gboolean active;
-    
-    filename = gtk_file_chooser_get_filename(chooser);
-    if (!filename)
+
+#if GTK_CHECK_VERSION(2, 6, 0)
+    filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
+    filename = gtk_editable_get_chars(GTK_EDITABLE(chooser), 0, -1);
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
+    if (!filename || !*filename) {
+        g_free(filename);
         return;
+    }
 
     type = GPOINTER_TO_UINT(g_object_get_data
                             (G_OBJECT(chooser), LIBBALSA_IDENTITY_INFO));
@@ -1172,22 +1186,30 @@ ident_dialog_add_file_chooser_button(GtkWidget * table, gint row,
                                      LibBalsaIdentityPathType type)
 {
     GtkWidget *check;
-    gchar *title;
-    GtkWidget *button;
     gchar *filename;
+#if GTK_CHECK_VERSION(2, 6, 0)
+    gchar *title;
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
+    GtkWidget *button;
 
-    check = gtk_check_button_new_with_mnemonic(_(path_info[type].mnemonic));
-    gtk_table_attach(GTK_TABLE(table), check, 0, 1, row, row + 1,
-                     GTK_FILL, GTK_FILL, 0, 0);
+    check =
+        gtk_check_button_new_with_mnemonic(_(path_info[type].mnemonic));
+    gtk_table_attach(GTK_TABLE(table), check, 0, 1, row, row + 1, GTK_FILL,
+                     GTK_FILL, 0, 0);
 
+    filename =
+        g_build_filename(g_get_home_dir(), path_info[type].basename, NULL);
+#if GTK_CHECK_VERSION(2, 6, 0)
     title = g_strdup_printf("Choose %s file", _(path_info[type].info));
     button = gtk_file_chooser_button_new(title,
                                          GTK_FILE_CHOOSER_ACTION_OPEN);
     g_free(title);
     gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(button), TRUE);
-    filename =
-        g_build_filename(g_get_home_dir(), path_info[type].basename, NULL);
     gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(button), filename);
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
+    button = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(button), filename);
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
     g_free(filename);
 
     gtk_table_attach(GTK_TABLE(table), button, 1, 2, row, row + 1,
@@ -1195,12 +1217,17 @@ ident_dialog_add_file_chooser_button(GtkWidget * table, gint row,
 
     g_object_set_data(G_OBJECT(dialog), path_info[type].path_key, button);
     g_object_set_data(G_OBJECT(button), LIBBALSA_IDENTITY_CHECK, check);
-    g_object_set_data(G_OBJECT(button), LIBBALSA_IDENTITY_INFO, 
+    g_object_set_data(G_OBJECT(button), LIBBALSA_IDENTITY_INFO,
                       GUINT_TO_POINTER(type));
     g_signal_connect(check, "toggled",
                      G_CALLBACK(file_chooser_check_cb), button);
+#if GTK_CHECK_VERSION(2, 6, 0)
     g_signal_connect(button, "selection-changed",
                      G_CALLBACK(file_chooser_cb), dialog);
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
+    g_signal_connect(button, "changed",
+                     G_CALLBACK(file_chooser_cb), dialog);
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 }
 
 static void
@@ -1381,13 +1408,17 @@ ident_dialog_get_bool(GObject* dialog, const gchar* key)
 static gchar *
 ident_dialog_get_path(GObject * dialog, const gchar * key)
 {
-    GtkFileChooser *chooser;
+    GtkWidget *chooser;
 
     chooser = g_object_get_data(dialog, key);
     if (!GTK_WIDGET_SENSITIVE(chooser))
         return NULL;
 
-    return gtk_file_chooser_get_filename(chooser);
+#if GTK_CHECK_VERSION(2, 6, 0)
+    return gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
+    return gtk_editable_get_chars(GTK_EDITABLE(chooser), 0, -1);
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 }
 
 
@@ -1738,12 +1769,16 @@ display_frame_set_path(GObject * dialog,
                        const gchar* value)
 {
     gboolean set = (value && *value);
-    GtkFileChooser *chooser = g_object_get_data(dialog, key);
+    GtkWidget *chooser = g_object_get_data(dialog, key);
     GtkToggleButton *check =
         g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
     
     if (set)
-        gtk_file_chooser_set_filename(chooser, value);
+#if GTK_CHECK_VERSION(2, 6, 0)
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(chooser), value);
+#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
+        gtk_entry_set_text(GTK_ENTRY(chooser), value);
+#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_widget_set_sensitive(GTK_WIDGET(chooser), set);
     gtk_toggle_button_set_active(check, set);
 }

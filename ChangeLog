@@ -1,3 +1,8 @@
+2005-11-27 08:34  PeterB
+
+	* libbalsa/identity.c: GtkFileChooserButton requires gtk version
+	2.6.
+
 2005-11-26 16:35  PeterB
 
 	* libbalsa/mailbox_mbox.c: don't leak message.

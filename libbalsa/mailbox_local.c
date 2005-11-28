@@ -465,24 +465,21 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 	    if (match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
-	    if (cond->match.string.user_header) {
-		GList *header;
+            if (cond->match.string.user_header) {
+                const gchar *header;
 
                 if (!message)
-		    message = libbalsa_mailbox_get_message(mailbox, msgno);
-		header =
-		    libbalsa_message_find_user_hdr(message,
-                                                   cond->match.string
-                                                   .user_header);
-		if (header) {
-		    gchar ** tmp = header->data;
-		    if (libbalsa_utf8_strstr(tmp[1],
-                                             cond->match.string.string)) {
-			match = TRUE;
-			break;
-		    }
-		}
-	    }
+                    message = libbalsa_mailbox_get_message(mailbox, msgno);
+                header =
+                    libbalsa_message_get_user_header(message,
+                                                     cond->match.string.
+                                                     user_header);
+                if (libbalsa_utf8_strstr(header,
+                                         cond->match.string.string)) {
+                    match = TRUE;
+                    break;
+                }
+            }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
             GString *body;

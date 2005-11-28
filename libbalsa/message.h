@@ -305,8 +305,6 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 /*
  * misc message releated functions
  */
-gchar **libbalsa_create_hdr_pair(const gchar * name, gchar * value);
-
 const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 const gchar *libbalsa_message_body_charset(LibBalsaMessageBody * body);
 gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
@@ -318,8 +316,12 @@ gboolean libbalsa_message_is_pgp_signed(LibBalsaMessage * message);
 gboolean libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message);
 #endif
 
-GList *libbalsa_message_find_user_hdr(LibBalsaMessage * message, 
-                                      const gchar * find);
+const gchar *libbalsa_message_get_user_header(LibBalsaMessage * message,
+                                              const gchar * name);
+void libbalsa_message_set_user_header(LibBalsaMessage * message,
+                                      const gchar * name,
+                                      const gchar * value);
+
 GMimeStream *libbalsa_message_get_part_by_id(LibBalsaMessage * message,
                                              const gchar * id);
 

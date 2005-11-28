@@ -1215,38 +1215,30 @@ static void
 display_face(BalsaMessage * bm)
 {
     GtkWidget *face_box;
-    GList *face;
-    const gchar **pair;
-    gboolean is_face;
-    const gchar *content;
+    const gchar *face, *x_face = NULL;
     GError *err = NULL;
     GtkWidget *image;
 
     face_box = g_object_get_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX);
     if (!bm->message
-        || !((face = libbalsa_message_find_user_hdr(bm->message, "Face"))
-             || (face =
-                 libbalsa_message_find_user_hdr(bm->message, "X-Face")))) {
+        || !((face = libbalsa_message_get_user_header(bm->message, "Face"))
+             || (x_face =
+                 libbalsa_message_get_user_header(bm->message,
+                                                  "X-Face")))) {
         gtk_widget_hide(face_box);
         return;
     }
 
-    pair = face->data;
-    is_face = (g_ascii_strcasecmp(pair[0], "Face") == 0);
-    content = pair[1];
-
-#if HAVE_COMPFACE
-    image = is_face ?
-        libbalsa_get_image_from_face_header(content, &err) :
-        libbalsa_get_image_from_x_face_header(content, &err);
-#else                           /* HAVE_COMPFACE */
-    if (is_face)
-        image = libbalsa_get_image_from_face_header(content, &err);
+    if (face)
+        image = libbalsa_get_image_from_face_header(face, &err);
     else {
+#if HAVE_COMPFACE
+        image = libbalsa_get_image_from_x_face_header(x_face, &err);
+#else                           /* HAVE_COMPFACE */
         gtk_widget_hide(face_box);
         return;
-    }
 #endif                          /* HAVE_COMPFACE */
+    }
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Error loading Face: %s"), err->message);
@@ -2069,7 +2061,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     GString *report;
     gchar **params;
     struct utsname uts_name;
-    GList *original_rcpt;
+    const gchar *original_rcpt;
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
@@ -2117,12 +2109,9 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
 		    uts_name.nodename);
     /* see rfc 3798, sections 2.3 and 3.2.3 */
     if ((original_rcpt =
-	 libbalsa_message_find_user_hdr(for_msg, "original-recipient"))) {
-	gchar **header_pair = (gchar **)original_rcpt->data;
-
+	 libbalsa_message_get_user_header(for_msg, "original-recipient")))
 	g_string_append_printf(report, "Original-Recipient: %s\n",
-			       header_pair[1]);	
-    }
+			       original_rcpt);	
     g_string_append_printf(report, "Final-Recipient: rfc822; %s\n",
 			   balsa_app.current_ident->ia->value.addr);
     g_string_append_printf(report, "Original-Message-ID: %s\n",

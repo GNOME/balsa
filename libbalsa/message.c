@@ -295,7 +295,7 @@ canonize_header_value(gchar *value)
    The list has to be freed by the following chunk of code:
     FREE_HEADER_LIST(list);
 */
-gchar **
+static gchar **
 libbalsa_create_hdr_pair(const gchar * name, gchar * value)
 {
     gchar **item = g_new(gchar *, 3);
@@ -310,7 +310,7 @@ libbalsa_create_hdr_pair(const gchar * name, gchar * value)
 /** libbalsa_message_find_user_hdr:
     returns.... list element matching given header.
 */
-GList *
+static GList *
 libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
 {
     GList* list;
@@ -330,9 +330,55 @@ libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
     return NULL;
 }
 
+/* 
+ * Public user header methods
+ */
+const gchar *
+libbalsa_message_get_user_header(LibBalsaMessage * message,
+                                 const gchar * name)
+{
+    GList *header;
+    const gchar *const *pair;
+    
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
+    g_return_val_if_fail(name != NULL, NULL);
+
+    if (!(header = libbalsa_message_find_user_hdr(message, name)))
+        return NULL;
+
+    pair = header->data;
+    return pair[1];
+}
+
+void
+libbalsa_message_set_user_header(LibBalsaMessage * message,
+                                 const gchar * name, const gchar * value)
+{
+    LibBalsaMessageHeaders *headers;
+    GList *header;
+
+    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+    g_return_if_fail(name != NULL);
+
+    headers = message->headers;
+    g_return_if_fail(headers != NULL);
+
+    if ((header = libbalsa_message_find_user_hdr(message, name))) {
+        headers->user_hdrs =
+            g_list_remove_link(headers->user_hdrs, header);
+        FREE_HEADER_LIST(header);
+    }
+
+    if (value && *value)
+        headers->user_hdrs =
+            g_list_prepend(headers->user_hdrs,
+                           libbalsa_create_hdr_pair(name,
+                                                    g_strdup(value)));
+}
+
 static void
 prepend_header_misc(const char *name, const char *value,
-			 gpointer user_data)
+                    gpointer user_data)
 {
     char lcname[17]; /* one byte longer than the longest ignored header */
     static const char ignored_headers[] =
@@ -357,7 +403,7 @@ prepend_header_misc(const char *name, const char *value,
     *(GList **)user_data = res;
 }
 
-/* libbalsa_message_user_hdrs,
+/* 
  * libbalsa_message_user_hdrs_from_gmime:
  * 
  * returns allocated GList containing (header=>value) ALL headers

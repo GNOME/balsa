@@ -157,8 +157,9 @@ static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static GString *quoteBody(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
                           SendType type);
 static void set_list_post_address(BalsaSendmsg * bsmsg);
-static gboolean set_list_post_rfc2369(BalsaSendmsg * bsmsg, GList * p);
-static gchar *rfc2822_skip_comments(gchar * str);
+static gboolean set_list_post_rfc2369(BalsaSendmsg * bsmsg,
+                                      const gchar * url);
+static const gchar *rfc2822_skip_comments(const gchar * str);
 static void address_changed_cb(LibBalsaAddressEntry * address_entry,
                                BalsaSendmsgAddress *sma);
 static void set_ready(LibBalsaAddressEntry * address_entry,
@@ -4489,31 +4490,20 @@ static void
 sw_set_header_from_path(LibBalsaMessage * message, const gchar * header,
                         const gchar * path)
 {
-    gchar *content;
+    gchar *content = NULL;
     GError *err = NULL;
 
-    if (!path) {
-        GList *user_hdr = libbalsa_message_find_user_hdr(message, header);
-        if (user_hdr) {
-            g_strfreev(user_hdr->data);
-            message->headers->user_hdrs =
-                g_list_delete_link(message->headers->user_hdrs, user_hdr);
-        }
-        return;
-    }
-
-    if (!(content =
-          libbalsa_get_header_from_path(header, path, NULL, &err))) {
+    if (path && !(content =
+                  libbalsa_get_header_from_path(header, path, NULL,
+                                                &err))) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Could not load %s header file %s: %s"),
                              header, path, err->message);
         g_error_free(err);
-        return;
     }
 
-    message->headers->user_hdrs =
-        g_list_prepend(message->headers->user_hdrs,
-                       libbalsa_create_hdr_pair(header, content));
+    libbalsa_message_set_user_header(message, header, content);
+    g_free(content);
 }
 
 static LibBalsaMessage *
@@ -5502,7 +5492,7 @@ set_list_post_address(BalsaSendmsg * bsmsg)
         bsmsg->parent_message ?
         bsmsg->parent_message : bsmsg->draft_message;
     InternetAddressList *mailing_list_address;
-    GList *p;
+    const gchar *header;
 
     mailing_list_address =
 	libbalsa_mailbox_get_mailing_list_address(message->mailbox);
@@ -5516,31 +5506,24 @@ set_list_post_address(BalsaSendmsg * bsmsg)
         return;
     }
 
-    if ((p = libbalsa_message_find_user_hdr(message, "list-post"))
-	&& set_list_post_rfc2369(bsmsg, p))
+    if ((header = libbalsa_message_get_user_header(message, "list-post"))
+	&& set_list_post_rfc2369(bsmsg, header))
 	return;
 
     /* we didn't find "list-post", so try some nonstandard
      * alternatives: */
 
-    if ((p = libbalsa_message_find_user_hdr(message, "x-beenthere"))
-	|| (p = libbalsa_message_find_user_hdr(message, "x-mailing-list"))) {
-	gchar **pair = p->data;
-	gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), pair[1]);
-    }
+    if ((header = libbalsa_message_get_user_header(message, "x-beenthere"))
+        || (header =
+            libbalsa_message_get_user_header(message, "x-mailing-list")))
+        gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), header);
 }
 
 /* set_list_post_rfc2369:
  * look for "List-Post:" header, and get the address */
 static gboolean
-set_list_post_rfc2369(BalsaSendmsg * bsmsg, GList * p)
+set_list_post_rfc2369(BalsaSendmsg * bsmsg, const gchar * url)
 {
-    gchar **pair;
-    gchar *url;
-
-    pair = p->data;
-    url = pair[1];
-
     /* RFC 2369: To allow for future extension, client
      * applications MUST follow the following guidelines for
      * handling the contents of the header fields described in
@@ -5562,15 +5545,16 @@ set_list_post_rfc2369(BalsaSendmsg * bsmsg, GList * p)
      * left most protocol that it supports, or knows how to
      * access by a separate application. */
     while (*(url = rfc2822_skip_comments(url)) == '<') {
-	gchar *close = strchr(++url, '>');
+	const gchar *close = strchr(++url, '>');
 	if (!close)
 	    /* broken syntax--break and return FALSE */
 	    break;
 	if (g_ascii_strncasecmp(url, "mailto:", 7) == 0) {
 	    /* we support mailto! */
-	    *close = '\0';
-	    sendmsg_window_process_url(url + 7,
-				       sendmsg_window_set_field, bsmsg);
+            gchar *field = g_strndup(&url[7], close - &url[7]);
+	    sendmsg_window_process_url(field, sendmsg_window_set_field,
+                                       bsmsg);
+            g_free(field);
 	    return TRUE;
 	}
 	if (!(*++close && *(close = rfc2822_skip_comments(close)) == ','))
@@ -5588,8 +5572,8 @@ set_list_post_rfc2369(BalsaSendmsg * bsmsg, GList * p)
  *
  * returns a pointer to the first character following the CFWS,
  * which may point to a '\0' character but is never a NULL pointer */
-static gchar *
-rfc2822_skip_comments(gchar * str)
+static const gchar *
+rfc2822_skip_comments(const gchar * str)
 {
     gint level = 0;
 

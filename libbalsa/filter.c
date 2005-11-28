@@ -168,21 +168,18 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 	    if (match) break;
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
-	    if (cond->match.string.user_header) {
-		GList * header =
-		    libbalsa_message_find_user_hdr(message,
-                                                   cond->match.string
-                                                   .user_header);
+            if (cond->match.string.user_header) {
+                const gchar *header =
+                    libbalsa_message_get_user_header(message,
+                                                     cond->match.string.
+                                                     user_header);
 
-		if (header) {
-		    gchar ** tmp = header->data;
-		    if (libbalsa_utf8_strstr(tmp[1],
-                                             cond->match.string.string)) {
-			match = TRUE;
-			break;
-		    }
-		}
-	    }
+                if (libbalsa_utf8_strstr(header,
+                                         cond->match.string.string)) {
+                    match = TRUE;
+                    break;
+                }
+            }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
 	    if (!message->mailbox)

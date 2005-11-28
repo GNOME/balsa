@@ -625,7 +625,6 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 
     for (msgno = libbalsa_mailbox_total_messages(outbox);
 	 msgno > 0; msgno--) {
-	GList *smtp_server_list;
 	const gchar *smtp_server_name;
         LibBalsaMsgCreateResult created;
 
@@ -638,11 +637,10 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	}
 
         libbalsa_message_body_ref(msg, TRUE, TRUE);
-        smtp_server_list =
-            libbalsa_message_find_user_hdr(msg, "X-Balsa-SmtpServer");
-        smtp_server_name = smtp_server_list ?
-            ((gchar **) smtp_server_list->data)[1] :
-            libbalsa_smtp_server_get_name(NULL);
+        smtp_server_name =
+            libbalsa_message_get_user_header(msg, "X-Balsa-SmtpServer");
+        if (!smtp_server_name)
+            smtp_server_name = libbalsa_smtp_server_get_name(NULL);
         if (strcmp(smtp_server_name,
                    libbalsa_smtp_server_get_name(smtp_server)) != 0) {
             libbalsa_message_body_unref(msg);
@@ -911,12 +909,11 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0 &&
             mqi->orig->mailbox) {
             gboolean remove = TRUE;
-            GList* fcclist =
-                libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
-            const gchar **fccurl = fcclist ? fcclist->data : NULL;
+            const gchar *fccurl =
+                libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
 
 	    if (mqi->orig->mailbox && fccurl) {
-                LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
+                LibBalsaMailbox *fccbox = mqi->finder(fccurl);
                 GError *err = NULL;
                 lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW |
                                  LIBBALSA_MESSAGE_FLAG_FLAGGED);
@@ -1219,16 +1216,15 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
 {
     if (mqi->orig->mailbox) {
         gboolean remove = TRUE;
-        GList* fcclist =
-            libbalsa_message_find_user_hdr(mqi->orig, "X-Balsa-Fcc");
-        const gchar **fccurl = fcclist ? fcclist->data : NULL;
+        const gchar *fccurl =
+            libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
 
         lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW |
                          LIBBALSA_MESSAGE_FLAG_FLAGGED);
 	libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
 
         if (mqi->orig->mailbox && fccurl) {
-            LibBalsaMailbox *fccbox = mqi->finder(fccurl[1]);
+            LibBalsaMailbox *fccbox = mqi->finder(fccurl);
             remove =
                 libbalsa_mailbox_copy_message(mqi->orig, fccbox, NULL)>=0;
         }

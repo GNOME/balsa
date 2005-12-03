@@ -55,20 +55,6 @@ typedef struct _LibBalsaSmtpServerClass {
 
 /* Server class methods */
 
-static void
-libbalsa_smtp_server_set_username(LibBalsaServer * server,
-                                  const gchar * name)
-{
-    (parent_class)->set_username(server, name);
-}
-
-static void
-libbalsa_smtp_server_set_host(LibBalsaServer * server,
-                              const gchar * host, gboolean use_ssl)
-{
-    (parent_class)->set_host(server, host, use_ssl);
-}
-
 /* Object class method */
 
 static void
@@ -101,9 +87,6 @@ libbalsa_smtp_server_class_init(LibBalsaSmtpServerClass * klass)
     parent_class = g_type_class_peek_parent(klass);
 
     object_class->finalize = libbalsa_smtp_server_finalize;
-
-    server_class->set_username = libbalsa_smtp_server_set_username;
-    server_class->set_host = libbalsa_smtp_server_set_host;
 }
 
 /* Callback to get user/password info from SMTP server preferences.

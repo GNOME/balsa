@@ -502,7 +502,7 @@ config_mailbox_init(const gchar * prefix)
 	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
         libbalsa_server_connect_signals(server,
                                         G_CALLBACK(ask_password), mailbox);
-	g_signal_connect_swapped(server, "set-host",
+	g_signal_connect_swapped(server, "config-changed",
                                  G_CALLBACK(config_mailbox_update),
 				 mailbox);
     }
@@ -557,7 +557,7 @@ config_folder_init(const gchar * prefix)
     g_return_val_if_fail(prefix != NULL, FALSE);
 
     if( (folder = balsa_mailbox_node_new_from_config(prefix)) ) {
-	g_signal_connect_swapped(folder->server, "set-host",
+	g_signal_connect_swapped(folder->server, "config-changed",
                                  G_CALLBACK(config_folder_update),
 				 folder);
 	balsa_mblist_mailbox_node_append(NULL, folder);

@@ -54,13 +54,6 @@ const gchar *pspell_suggest_modes[] = {
     "bad-spellers"
 };
 
-static void
-rememb_toggle_cb(GObject* button, LibBalsaServer *s)
-{
-    s->remember_passwd = 
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
-}
-
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
@@ -99,16 +92,21 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), rememb);
     if(server->remember_passwd)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
-    g_signal_connect(G_OBJECT(rememb), "toggled", 
-                     G_CALLBACK(rememb_toggle_cb), server);
 
     gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus (entry);
 
-    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+        unsigned old_rem = server->remember_passwd;
         passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+        server->remember_passwd = 
+            !!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb));
+        libbalsa_server_set_password(server, passwd);
+        if(old_rem != server->remember_passwd)
+            libbalsa_server_config_changed(server);
+    }
     gtk_widget_destroy(dialog);
     return passwd;
 }

@@ -112,7 +112,7 @@ typedef void(*ImapListCb)(ImapMboxHandle*handle, int delim,
 
 
 ImapMboxHandle *imap_mbox_handle_new(void);
-void imap_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state);
+void imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state);
 void imap_handle_set_monitorcb(ImapMboxHandle* h, ImapMonitorCb cb, void*);
 void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
 void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);

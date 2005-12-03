@@ -1,3 +1,20 @@
+2005-12-03 Pawel Salek
+
+	* balsa.spec.in: require gmime-2.1.17.
+	* libbalsa/{imap-,smtp-,}server.c: clean up saving the config,
+	enable anonymous access.
+	* libbalsa/server.h: add try_anonymous field and config-changed
+	signal.
+	* libbalsa/mailbox_imap.c: ditto.
+	* libbalsa/imap/imap-handle.[hc]: respect name space.
+	* src/balsa-app.c: respect "remember password" checkbox in the
+	password dialog.
+	* src/balsa-index.c: remove redundant scroll_to_cell() call.
+	* src/{folder,mailbox}-conf.c: config anonymous access.
+	* src/mailbox-node.c: listen to "config-changed" signal.
+	* src/save-restore.c: the same.
+	* doc/C/balsa.xml: document anonymous access.
+
 2005-11-28 15:19  PeterB
 
 	* src/balsa-message.c, src/sendmsg-window.c, libbalsa/filter.c,

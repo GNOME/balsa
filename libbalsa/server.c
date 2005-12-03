@@ -42,8 +42,6 @@ static void libbalsa_server_finalize(GObject * object);
 
 static void libbalsa_server_real_set_username(LibBalsaServer * server,
 					      const gchar * username);
-static void libbalsa_server_real_set_password(LibBalsaServer * server,
-					      const gchar * passwd);
 static void libbalsa_server_real_set_host(LibBalsaServer * server,
 					  const gchar * host,
                                           gboolean use_ssl);
@@ -51,8 +49,8 @@ static void libbalsa_server_real_set_host(LibBalsaServer * server,
 
 enum {
     SET_USERNAME,
-    SET_PASSWORD,
     SET_HOST,
+    CONFIG_CHANGED,
     GET_PASSWORD,
     LAST_SIGNAL
 };
@@ -106,16 +104,6 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
                      g_cclosure_marshal_VOID__STRING,
                      G_TYPE_NONE, 1,
 		     G_TYPE_STRING);
-    libbalsa_server_signals[SET_PASSWORD] =
-	g_signal_new("set-password",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-		     G_STRUCT_OFFSET(LibBalsaServerClass,
-				     set_password),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__STRING,
-                     G_TYPE_NONE, 1,
-		     G_TYPE_STRING);
     libbalsa_server_signals[SET_HOST] =
 	g_signal_new("set-host",
                      G_TYPE_FROM_CLASS(object_class),
@@ -123,16 +111,19 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 		     G_STRUCT_OFFSET(LibBalsaServerClass,
                                      set_host),
                      NULL, NULL,
-#ifdef USE_SSL
                      libbalsa_VOID__POINTER_INT,
                      G_TYPE_NONE, 2,
                      G_TYPE_POINTER, G_TYPE_INT
-#else /* USE_SSL */
-		     g_cclosure_marshal_VOID__POINTER,
-		     G_TYPE_NONE, 1,
-		     G_TYPE_POINTER
-#endif /* USE_SSL */
 		     );
+    libbalsa_server_signals[CONFIG_CHANGED] =
+	g_signal_new("config-changed",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+		     G_STRUCT_OFFSET(LibBalsaServerClass,
+				     config_changed),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID,
+                     G_TYPE_NONE, 0);
 
 
     libbalsa_server_signals[GET_PASSWORD] =
@@ -147,7 +138,6 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
                      LIBBALSA_TYPE_MAILBOX);
 
     klass->set_username = libbalsa_server_real_set_username;
-    klass->set_password = libbalsa_server_real_set_password;
     klass->set_host = libbalsa_server_real_set_host;
     klass->get_password = NULL;	/* libbalsa_server_real_get_password; */
 }
@@ -202,13 +192,15 @@ libbalsa_server_set_username(LibBalsaServer * server,
 }
 
 void
-libbalsa_server_set_password(LibBalsaServer * server, const gchar * passwd)
+libbalsa_server_set_password(LibBalsaServer * server,
+                             const gchar * passwd)
 {
-    g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    g_signal_emit(G_OBJECT(server),
-		  libbalsa_server_signals[SET_PASSWORD], 0, passwd);
+    g_free(server->passwd);
+    if(passwd && passwd[0])
+	server->passwd = g_strdup(passwd);
+    else server->passwd = NULL;
 }
 
 void
@@ -221,6 +213,16 @@ libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
     g_signal_emit(G_OBJECT(server), libbalsa_server_signals[SET_HOST],
 		  0, host, use_ssl);
 
+}
+
+void
+libbalsa_server_config_changed(LibBalsaServer * server)
+{
+    g_return_if_fail(server != NULL);
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    g_signal_emit(G_OBJECT(server), libbalsa_server_signals[CONFIG_CHANGED],
+                  0);
 }
 
 gchar *
@@ -245,18 +247,6 @@ libbalsa_server_real_set_username(LibBalsaServer * server,
 
     g_free(server->user);
     server->user = g_strdup(username);
-}
-
-static void
-libbalsa_server_real_set_password(LibBalsaServer * server,
-				  const gchar * passwd)
-{
-    g_return_if_fail(LIBBALSA_IS_SERVER(server));
-
-    g_free(server->passwd);
-    if(passwd && passwd[0])
-	server->passwd = g_strdup(passwd);
-    else server->passwd = NULL;
 }
 
 static void
@@ -307,6 +297,7 @@ libbalsa_server_load_config(LibBalsaServer * server)
     server->tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
     if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
     server->user = libbalsa_conf_private_get_string("Username");
+    server->try_anonymous = libbalsa_conf_get_bool("Anonymous=false");
     server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
     if(server->remember_passwd)
         server->passwd = libbalsa_conf_private_get_string("Password");
@@ -336,6 +327,7 @@ libbalsa_server_save_config(LibBalsaServer * server)
 {
     libbalsa_conf_set_string("Server", server->host);
     libbalsa_conf_private_set_string("Username", server->user);
+    libbalsa_conf_set_bool("Anonymous",          server->try_anonymous);
     libbalsa_conf_set_bool("RememberPasswd", 
                           server->remember_passwd && server->passwd != NULL);
 

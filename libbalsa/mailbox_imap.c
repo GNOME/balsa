@@ -375,9 +375,7 @@ libbalsa_mailbox_imap_get_path(LibBalsaMailboxImap * mailbox)
 
 static void
 server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
-#ifdef USE_SSL
-					    gboolean use_ssl,
-#endif
+                                gboolean use_ssl,
 				LibBalsaMailbox * mailbox)
 {
     libbalsa_mailbox_imap_update_url(LIBBALSA_MAILBOX_IMAP(mailbox));
@@ -1535,7 +1533,7 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
-    g_signal_connect(G_OBJECT(remote->server), "set-host",
+    g_signal_connect(G_OBJECT(remote->server), "config-changed",
 		     G_CALLBACK(server_host_settings_changed_cb),
 		     (gpointer) mailbox);
 

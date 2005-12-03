@@ -213,7 +213,7 @@ imap_mbox_handle_new(void)
 }
 
 void
-imap_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
+imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
 {
   switch(opt) {
   case IMAP_OPT_ANONYMOUS: h->enable_anonymous = !!state; break;

@@ -3206,6 +3206,10 @@ part you need to fill in.</para>
   <listitem><para>User name is the name used for authorization on the
   IMAP server.</para></listitem>
 
+  <listitem><para>Some servers allow anonymous access to bulletin
+  boards or mailing list archives. Check this box if you want to use
+  this mode - you will not be asked for password.</para></listitem>
+
   <listitem><para>Password is the password used for authorization on
   the IMAP server.</para></listitem>
 

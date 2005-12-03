@@ -59,15 +59,16 @@ struct _LibBalsaServer {
     LibBalsaTlsMode tls_mode;
     unsigned use_ssl:1;
     unsigned remember_passwd:1;
+    unsigned try_anonymous:1; /* user wants anonymous access */
 };
 
 struct _LibBalsaServerClass {
     GObjectClass parent_class;
 
     void (*set_username) (LibBalsaServer * server, const gchar * name);
-    void (*set_password) (LibBalsaServer * server, const gchar * passwd);
     void (*set_host) (LibBalsaServer * server,
 		      const gchar * host, gboolean use_ssl);
+    void (*config_changed) (LibBalsaServer * server);
     gchar *(*get_password) (LibBalsaServer * server);
 };
 
@@ -82,6 +83,7 @@ void libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
 gchar *libbalsa_server_get_password(LibBalsaServer * server,
 				    LibBalsaMailbox * mbox);
 
+void libbalsa_server_config_changed(LibBalsaServer * server);
 void libbalsa_server_load_config(LibBalsaServer * server);
 void libbalsa_server_save_config(LibBalsaServer * server);
 

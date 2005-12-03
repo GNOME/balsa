@@ -1379,8 +1379,6 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
 	&& libbalsa_mailbox_msgno_find(mailbox, mailbox->first_unread,
 				       &path, NULL)) {
 	bndx_expand_to_row(bindex, path);
-	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(bindex), path, NULL,
-		FALSE, 0, 0);
         gtk_tree_path_free(path);
 	mailbox->first_unread = 0;
     }

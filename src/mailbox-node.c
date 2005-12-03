@@ -545,6 +545,8 @@ balsa_mailbox_node_new_from_config(const gchar* group)
     if(balsa_app.debug)
 	printf("Server loaded, host: %s, %s.\n", folder->server->host,
 	       folder->server->use_ssl ? "SSL" : "no SSL");
+    g_signal_connect_swapped(G_OBJECT(folder->server), "config-changed", 
+                             G_CALLBACK(config_folder_update), folder);
     g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
 		     G_CALLBACK(folder_conf_imap_node), NULL);
     g_signal_connect(G_OBJECT(folder), "append-subtree", 

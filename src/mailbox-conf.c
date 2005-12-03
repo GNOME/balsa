@@ -88,6 +88,7 @@ struct _MailboxConfWindow {
 	struct {
 	    GtkWidget *port;
 	    GtkWidget *username;
+            GtkWidget *anonymous;
             GtkWidget *remember;
 	    GtkWidget *password;
 	    GtkWidget *folderpath;
@@ -646,6 +647,9 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.username),
 			       server->user);
 	gtk_toggle_button_set_active
+            (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.anonymous),
+	     server->try_anonymous);
+	gtk_toggle_button_set_active
             (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.remember),
 	     server->remember_passwd);
 	if (server->passwd)
@@ -668,6 +672,9 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
             gtk_toggle_button_set_active
                 (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.has_bugs),
                  TRUE);
+        if(!server->try_anonymous)
+            gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.anonymous),
+                                     FALSE);
         if(!server->remember_passwd)
             gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
                                      FALSE);
@@ -759,6 +766,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 						(mcw->mb_data.pop3.bsc.server)),
                              balsa_server_conf_get_use_ssl
                              (&mcw->mb_data.pop3.bsc));
+    libbalsa_server_config_changed(server);
     server->tls_mode = balsa_server_conf_get_tls_mode(&mcw->mb_data.pop3.bsc);
     mailbox->check =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
@@ -790,7 +798,7 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 	server = LIBBALSA_SERVER(libbalsa_imap_server_new("",""));
 	libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(mailbox),
 					   server);
-	g_signal_connect_swapped(server, "set-host",
+	g_signal_connect_swapped(server, "config-changed",
                                  G_CALLBACK(config_mailbox_update),
 				 mailbox);
     }
@@ -799,6 +807,9 @@ update_imap_mailbox(MailboxConfWindow *mcw)
     libbalsa_server_set_username(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.username)));
+    server->try_anonymous = 
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
+                                                       mb_data.imap.anonymous));
     server->remember_passwd = 
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
                                                        mb_data.imap.remember));
@@ -823,7 +834,7 @@ update_imap_mailbox(MailboxConfWindow *mcw)
 						(mcw->mb_data.imap.bsc.server)),
                              balsa_server_conf_get_use_ssl
                              (&mcw->mb_data.imap.bsc));
-
+    libbalsa_server_config_changed(server);
     g_signal_connect(G_OBJECT(server), "get-password",
                      G_CALLBACK(ask_password), mailbox);
 
@@ -908,8 +919,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	update_pop_mailbox(mcw);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	update_imap_mailbox(mcw);
-	/* Calling libbalsa_server_set_host already triggered an update,
-	 * so we do not need to here: */
+        /* update_imap_mailbox saved the config so we do not need to here: */
 	return;
     }
 
@@ -1169,6 +1179,12 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 }
 
 static void
+anon_toggle_cb(GtkToggleButton *anon_button, MailboxConfWindow *mcw)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.anonymous),
+                             gtk_toggle_button_get_active(anon_button));
+}
+static void
 remember_toggle_cb(GtkToggleButton *remember_button, MailboxConfWindow *mcw)
 {
     gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
@@ -1192,7 +1208,7 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     gint row = -1;
 
     notebook = gtk_notebook_new();
-    table = gtk_table_new(7, 2, FALSE);
+    table = gtk_table_new(8, 2, FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
                              gtk_label_new_with_mnemonic(_("_Basic")));
 
@@ -1217,6 +1233,12 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
 		     GTK_SIGNAL_FUNC(check_for_blank_fields),
 		     mcw, row, g_get_user_name(), label);
 
+    /* toggle for anonymous password */
+    mcw->mb_data.imap.anonymous = 
+	create_check(mcw->window, _("_Anonymous access"), table, ++row,
+		     FALSE);
+    g_signal_connect(G_OBJECT(mcw->mb_data.imap.anonymous), "toggled",
+                     G_CALLBACK(anon_toggle_cb), mcw);
     /* toggle for remember password */
     mcw->mb_data.imap.remember = 
 	create_check(mcw->window, _("_Remember Password"), table, ++row,

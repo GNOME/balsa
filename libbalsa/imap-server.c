@@ -122,8 +122,9 @@ static void libbalsa_imap_server_set_username(LibBalsaServer * server,
     }
     (parent_class)->set_username(server, name);
 }
-static void libbalsa_imap_server_set_host(LibBalsaServer * server,
-                      const gchar * host, gboolean use_ssl)
+static void
+libbalsa_imap_server_set_host(LibBalsaServer * server,
+                              const gchar * host, gboolean use_ssl)
 {
     if(server->user && host) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
@@ -152,7 +153,6 @@ libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)
     server_class->set_username = libbalsa_imap_server_set_username;
     server_class->set_host = libbalsa_imap_server_set_host;
 #if 0
-    klass->set_password = libbalsa_imap_server_real_set_password;
     klass->get_password = NULL; /* libbalsa_imap_server_real_get_password; */
 #endif
 }
@@ -297,6 +297,7 @@ lb_imap_server_info_new(LibBalsaServer *server)
     case LIBBALSA_TLS_REQUIRED: mode = IMAP_TLS_REQUIRED; break;
     }
     imap_handle_set_tls_mode(handle, mode);
+    imap_handle_set_option(handle, IMAP_OPT_ANONYMOUS, server->try_anonymous);
     return info;
 }
 
@@ -453,6 +454,8 @@ libbalsa_imap_server_new_from_config(void)
         server->user = tmp_server.user;
         server->host = tmp_server.host;
     }
+    d1 = libbalsa_conf_get_bool_with_default("Anonymous", &d);
+    if(!d) server->try_anonymous = !!d1;
     server->use_ssl |= libbalsa_conf_get_bool("SSL=false");
     tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
     if(!d) server->tls_mode = tls_mode;

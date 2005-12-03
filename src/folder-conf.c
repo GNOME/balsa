@@ -52,7 +52,7 @@ struct _CommonDialogData {
 struct _FolderDialogData {
     FOLDER_CONF_COMMON;
     BalsaServerConf bsc;
-    GtkWidget *folder_name, *port, *username, *remember,
+    GtkWidget *folder_name, *port, *username, *anonymous, *remember,
         *password, *subscribed, *list_inbox, *prefix;
     GtkWidget *use_ssl, *tls_mode;
     GtkWidget *connection_limit, *enable_persistent, *has_bugs, *use_status;
@@ -150,6 +150,13 @@ validate_folder(GtkWidget *w, FolderDialogData * fcw)
 }
 
 static void
+anonymous_cb(GtkToggleButton * button, FolderDialogData * fcw)
+{
+    gtk_widget_set_sensitive(fcw->anonymous,
+                             gtk_toggle_button_get_active(button));
+}
+
+static void
 remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
 {
     gtk_widget_set_sensitive(fcw->password,
@@ -194,6 +201,8 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         (LIBBALSA_IMAP_SERVER(s),
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_status)));
     libbalsa_server_set_username(s, username);
+    s->try_anonymous =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->anonymous));
     s->remember_passwd =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
     libbalsa_server_set_password(s,
@@ -220,24 +229,20 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     fcw->mbnode->list_inbox =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
 
-    /* Set host after all other server changes, as it triggers
-     * save-to-config for any folder or mailbox using this server. */
     libbalsa_server_set_host(s, host, 
                              balsa_server_conf_get_use_ssl(&fcw->bsc));
+    libbalsa_server_config_changed(s); /* trigger config save */
 
     if (insert) {
 	balsa_mblist_mailbox_node_append(NULL, fcw->mbnode);
         balsa_mailbox_node_append_subtree(fcw->mbnode);
         config_folder_add(fcw->mbnode, NULL);
-	g_signal_connect_swapped(s, "set-host",
+	g_signal_connect_swapped(s, "config-changed",
 		                 G_CALLBACK(config_folder_update),
 				 fcw->mbnode);
         update_mail_servers();
     } else {
         balsa_mailbox_node_rescan(fcw->mbnode);
-	/* Calling libbalsa_server_set_host already triggered an update,
-	 * so we do not need to here:
-	 * config_folder_update(fcw->mbnode); */
 	balsa_mblist_mailbox_node_redraw(fcw->mbnode);
     }
     return TRUE;
@@ -255,6 +260,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     static FolderDialogData *fcw_new;
     LibBalsaServer *s;
     gchar *default_server;
+    int r = 0;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
@@ -336,41 +342,45 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     label = create_label(_("Descriptive _Name:"), table, 0);
     fcw->folder_name = create_entry(fcw->dialog, table,
                                    GTK_SIGNAL_FUNC(validate_folder),
-                                   fcw, 0, mn ? mn->name : NULL, 
+                                   fcw, r++, mn ? mn->name : NULL, 
 				   label);
 
     default_server = libbalsa_guess_imap_server();
     label = create_label(_("_Server:"), table, 1);
     fcw->bsc.server = create_entry(fcw->dialog, table,
                               GTK_SIGNAL_FUNC(validate_folder),
-                              fcw, 1, s ? s->host : default_server,
+                              fcw, r++, s ? s->host : default_server,
 			      label);
     fcw->bsc.default_ports = IMAP_DEFAULT_PORTS;
     g_free(default_server);
 
-    label= create_label(_("Use_r name:"), table, 3);
+    label= create_label(_("Use_r name:"), table, r);
     fcw->username = create_entry(fcw->dialog, table,
                                 GTK_SIGNAL_FUNC(validate_folder),
-                                fcw, 3, s ? s->user : g_get_user_name(), 
+                                fcw, r++, s ? s->user : g_get_user_name(), 
 			        label);
 
+    fcw->anonymous = create_check(fcw->dialog, _("_Anonymous access"), 
+                                table, r++, s ? s->try_anonymous : FALSE);
+    g_signal_connect(G_OBJECT(fcw->anonymous), "toggled",
+                     G_CALLBACK(anonymous_cb), fcw);
     fcw->remember = create_check(fcw->dialog, _("_Remember password"), 
-                                table, 4, s ? s->remember_passwd : TRUE);
+                                table, r++, s ? s->remember_passwd : TRUE);
     g_signal_connect(G_OBJECT(fcw->remember), "toggled",
                      G_CALLBACK(remember_cb), fcw);
 
-    label = create_label(_("_Password:"), table, 5);
-    fcw->password = create_entry(fcw->dialog, table, NULL, NULL, 5,
+    label = create_label(_("_Password:"), table, r);
+    fcw->password = create_entry(fcw->dialog, table, NULL, NULL, r++,
 				s ? s->passwd : NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
 
     fcw->subscribed = create_check(fcw->dialog, _("Subscribed _folders only"), 
-                                  table, 6, mn ? mn->subscribed : FALSE);
+                                  table, r++, mn ? mn->subscribed : FALSE);
     fcw->list_inbox = create_check(fcw->dialog, _("Always show _INBOX"), 
-                                  table, 7, mn ? mn->list_inbox : TRUE); 
+                                  table, r++, mn ? mn->list_inbox : TRUE); 
 
-    label = create_label(_("Pr_efix"), table, 8);
-    fcw->prefix = create_entry(fcw->dialog, table, NULL, NULL, 8,
+    label = create_label(_("Pr_efix"), table, r);
+    fcw->prefix = create_entry(fcw->dialog, table, NULL, NULL, r++,
 			      mn ? mn->dir : NULL, label);
     
     gtk_widget_show_all(GTK_WIDGET(fcw->dialog));

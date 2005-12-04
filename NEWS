@@ -1,4 +1,11 @@
-* Balsa-2.3.6 release. Release date 2005-09-23
+* Balsa-2.3.7 release. Release date 2005-12-04
+
+- few ready quick filters added to "Subject or Sender" one.
+- optional GtkSpell support.
+- POP3 delivery speedup.
+- Face and X-Face: header support.
+
+* Balsa-2.3.6 release. Release date 2005-10-23
 
 - improved support for splitting messages.
 - fix bugs 318171, 317240.

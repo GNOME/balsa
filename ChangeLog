@@ -1,3 +1,7 @@
+2005-12-07 13:35  PeterB
+
+	* src/filter-run-callbacks.c: fix bug 323442.
+
 2005-12-04 Pawel Salek
 
 	* NEWS: release 2.3.7.

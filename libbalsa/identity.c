@@ -513,7 +513,11 @@ static void ident_dialog_add_checkbutton(GtkWidget *, gint, GtkDialog *,
 					 gboolean sensitive);
 static void ident_dialog_add_entry(GtkWidget *, gint, GtkDialog *,
                                    const gchar *, const gchar *);
-typedef enum LibBalsaIdentityPathType_ LibBalsaIdentityPathType;
+typedef enum LibBalsaIdentityPathType_ {
+    LBI_PATH_TYPE_SIG,
+    LBI_PATH_TYPE_FACE,
+    LBI_PATH_TYPE_XFACE
+} LibBalsaIdentityPathType;
 static void ident_dialog_add_file_chooser_button(GtkWidget * table,
                                                  gint row,
                                                  GtkDialog * dialog,
@@ -850,11 +854,6 @@ append_ident_notebook_page(GtkNotebook *notebook, guint rows,
  * Put the required GtkEntries, Labels, and Checkbuttons in the dialog
  * for creating/editing identities.
  */
-enum LibBalsaIdentityPathType_ {
-    LBI_PATH_TYPE_SIG,
-    LBI_PATH_TYPE_FACE,
-    LBI_PATH_TYPE_XFACE
-};
 struct {
     const gchar *mnemonic;
     const gchar *path_key;

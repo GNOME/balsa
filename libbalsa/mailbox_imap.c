@@ -177,10 +177,6 @@ static gboolean libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox *
                                                     GError **err);
 
 static void server_host_settings_changed_cb(LibBalsaServer * server,
-					    gchar * host,
-#ifdef USE_SSL
-					    gboolean use_ssl,
-#endif
 					    LibBalsaMailbox * mailbox);
 
 static struct message_info *message_info_from_msgno(
@@ -374,8 +370,7 @@ libbalsa_mailbox_imap_get_path(LibBalsaMailboxImap * mailbox)
 }
 
 static void
-server_host_settings_changed_cb(LibBalsaServer * server, gchar * host,
-                                gboolean use_ssl,
+server_host_settings_changed_cb(LibBalsaServer * server,
 				LibBalsaMailbox * mailbox)
 {
     libbalsa_mailbox_imap_update_url(LIBBALSA_MAILBOX_IMAP(mailbox));

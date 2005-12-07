@@ -461,7 +461,37 @@ selected_list_activated(GtkTreeView * treeview, GtkTreePath * path,
  */
 
 /*
- * fe_down_pressed()
+ * helper
+ */
+static void
+fr_swap(GtkTreeModel * model, GtkTreeIter * iter1, GtkTreeIter * iter2)
+{
+    LibBalsaMailboxFilter *fil1, *fil2;
+    gboolean incoming1, closing1;
+    gboolean incoming2, closing2;
+
+    gtk_tree_model_get(model, iter1,
+                       DATA_COLUMN, &fil1,
+                       INCOMING_COLUMN, &incoming1,
+                       CLOSING_COLUMN, &closing1, -1);
+    gtk_tree_model_get(model, iter2,
+                       DATA_COLUMN, &fil2,
+                       INCOMING_COLUMN, &incoming2,
+                       CLOSING_COLUMN, &closing2, -1);
+    gtk_list_store_set(GTK_LIST_STORE(model), iter1,
+                       NAME_COLUMN, fil2->actual_filter->name,
+                       DATA_COLUMN, fil2,
+                       INCOMING_COLUMN, incoming2,
+                       CLOSING_COLUMN, closing2, -1);
+    gtk_list_store_set(GTK_LIST_STORE(model), iter2,
+                       NAME_COLUMN, fil1->actual_filter->name,
+                       DATA_COLUMN, fil1,
+                       INCOMING_COLUMN, incoming1,
+                       CLOSING_COLUMN, closing1, -1);
+}
+
+/*
+ * fr_down_pressed()
  *
  * Callback for the "Down" button
  */ 
@@ -473,35 +503,12 @@ fr_down_pressed(GtkWidget * widget, gpointer data)
     GtkTreeSelection *selection =
         gtk_tree_view_get_selection(p->selected_filters);
     GtkTreeIter iter1, iter2;
-    LibBalsaMailboxFilter *fil1, *fil2;
-    gboolean incoming1, closing1;
-    gboolean incoming2, closing2;
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter1)) {
         iter2 = iter1;
         if (gtk_tree_model_iter_next(model, &iter2)) {
-            gtk_tree_model_get(model, &iter1,
-                               DATA_COLUMN, &fil1,
-                               INCOMING_COLUMN, &incoming1,
-                               CLOSING_COLUMN, &closing1,
-                               -1);
-            gtk_tree_model_get(model, &iter2,
-                               DATA_COLUMN, &fil2,
-                               INCOMING_COLUMN, &incoming2,
-                               CLOSING_COLUMN, &closing2,
-                               -1);
-            gtk_list_store_set(GTK_LIST_STORE(model), &iter1,
-                               NAME_COLUMN, fil2->actual_filter->name,
-                               DATA_COLUMN, fil2,
-                               INCOMING_COLUMN, incoming2,
-                               CLOSING_COLUMN, closing2,
-                               -1);
-            gtk_list_store_set(GTK_LIST_STORE(model), &iter2,
-                               NAME_COLUMN, fil1->actual_filter->name,
-                               DATA_COLUMN, fil1,
-                               INCOMING_COLUMN, incoming1,
-                               CLOSING_COLUMN, closing1,
-                               -1);
+            fr_swap(model, &iter1, &iter2);
+            gtk_tree_selection_select_iter(selection, &iter2);
             p->filters_modified = TRUE;
         }
     }
@@ -520,37 +527,14 @@ fr_up_pressed(GtkWidget * widget, gpointer data)
     GtkTreeSelection *selection =
         gtk_tree_view_get_selection(p->selected_filters);
     GtkTreeIter iter1, iter2;
-    LibBalsaMailboxFilter *fil1, *fil2;
-    gboolean incoming1, closing1;
-    gboolean incoming2, closing2;
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter1)) {
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter1);
 
         if (gtk_tree_path_prev(path)) {
             gtk_tree_model_get_iter(model, &iter2, path);
-            gtk_tree_model_get(model, &iter1,
-                               DATA_COLUMN, &fil1,
-                               INCOMING_COLUMN, &incoming1,
-                               CLOSING_COLUMN, &closing1,
-                               -1);
-            gtk_tree_model_get(model, &iter2,
-                               DATA_COLUMN, &fil2,
-                               INCOMING_COLUMN, &incoming2,
-                               CLOSING_COLUMN, &closing2,
-                               -1);
-            gtk_list_store_set(GTK_LIST_STORE(model), &iter1,
-                               NAME_COLUMN, fil2->actual_filter->name,
-                               DATA_COLUMN, fil2,
-                               INCOMING_COLUMN, incoming2,
-                               CLOSING_COLUMN, closing2,
-                               -1);
-            gtk_list_store_set(GTK_LIST_STORE(model), &iter2,
-                               NAME_COLUMN, fil1->actual_filter->name,
-                               DATA_COLUMN, fil1,
-                               INCOMING_COLUMN, incoming1,
-                               CLOSING_COLUMN, closing1,
-                               -1);
+            fr_swap(model, &iter1, &iter2);
+            gtk_tree_selection_select_path(selection, path);
             p->filters_modified = TRUE;
         }
         gtk_tree_path_free(path);

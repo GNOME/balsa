@@ -1,3 +1,11 @@
+2005-12-08 07:43  PeterB
+
+	* src/: save-restore.c, sendmsg-window.c: remember spell-check
+	state when using GtkSpell (Marcin Deranek, bug 323458).
+	* src/pref-manager.c: no spell-check options when using GtkSpell.
+	* src/: balsa-app.c, balsa-app.h: spell-check members are
+	conditional on HAVE_GTKSPELL.
+
 2005-12-07  Pawel Salek
 
 	* libbalsa/identity.c: fix a warning with gcc-3.4.x

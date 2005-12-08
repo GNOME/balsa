@@ -374,6 +374,9 @@ balsa_app_init(void)
     balsa_app.filters=NULL;
 
     /* spell check */
+#if HAVE_GTKSPELL
+    balsa_app.spell_check = FALSE;
+#else                           /* HAVE_GTKSPELL */
     balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
     balsa_app.suggestion_mode = SPELL_CHECK_SUGGEST_NORMAL;
     balsa_app.ignore_size = 0;
@@ -381,6 +384,7 @@ balsa_app_init(void)
 
     spell_check_modules_name = pspell_modules;
     spell_check_suggest_mode_name = pspell_suggest_modes;
+#endif                          /* HAVE_GTKSPELL */
 
     /* Information messages */
     balsa_app.information_message = 0;

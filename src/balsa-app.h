@@ -121,6 +121,7 @@ enum _ShownHeaders {
 };
 
 
+#if !HAVE_GTKSPELL
 /* The different spell modules available to the program. */
 #define NUM_PSPELL_MODULES 2
 typedef enum _SpellCheckModule SpellCheckModule;
@@ -143,6 +144,7 @@ enum _SpellCheckSuggestMode {
     SPELL_CHECK_SUGGEST_BAD_SPELLERS
 };
 const gchar **spell_check_suggest_mode_name;
+#endif                          /* HAVE_GTKSPELL */
 
 
 typedef enum _BalsaMDNReply BalsaMDNReply;
@@ -359,11 +361,15 @@ extern struct BalsaApplication {
     LibBalsaAddressBook *default_address_book;
 
     /* spell checking */
+#if HAVE_GTKSPELL
+    gboolean spell_check;
+#else                           /* HAVE_GTKSPELL */
     SpellCheckModule module;
     SpellCheckSuggestMode suggestion_mode;
     guint ignore_size;
     gboolean check_sig;
     gboolean check_quoted;
+#endif                          /* HAVE_GTKSPELL */
 
     /* Information messages */
     BalsaInformationShow information_message;

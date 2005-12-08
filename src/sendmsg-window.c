@@ -129,7 +129,8 @@ static gboolean bsmsg_check_format_compatibility(GtkWindow *parent,
                                                  const char *filename);
 #endif /* ENABLE_TOUCH_UI */
 
-static void spell_check_cb(GtkWidget * widget, BalsaSendmsg *);
+static void spell_check_cb(GtkToggleToolButton * button,
+                           BalsaSendmsg * bsmsg);
 #if !HAVE_GTKSPELL
 static void sw_spell_check_response(BalsaSpellCheck * spell_check,
                                     gint response, BalsaSendmsg * bsmsg);
@@ -4086,6 +4087,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->delete_sig_id = 
 	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
 			 G_CALLBACK(delete_event_cb), bsmsg);
+    balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
+                                    balsa_app.spell_check);
     return bsmsg;
 }
 
@@ -5371,15 +5374,20 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
  * Toggle the spell checker
  * */
 static void
-spell_check_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+spell_check_cb(GtkToggleToolButton * button, BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
     GtkSpell *spell = gtkspell_get_from_text_view(text_view);
+    gboolean active = gtk_toggle_tool_button_get_active(button);
 
-    if (spell)
-        gtkspell_detach(spell);
-    else
-        sw_spell_attach(bsmsg);
+    if (active) {
+        if (!spell)
+            sw_spell_attach(bsmsg);
+    } else {
+        if (spell)
+            gtkspell_detach(spell);
+    }
+    balsa_app.spell_check = active;
 }
 #else                           /* HAVE_GTKSPELL */
 /* spell_check_cb

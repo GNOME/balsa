@@ -162,6 +162,7 @@ typedef struct _PropertyUI {
     GtkRadioButton *convert_unknown_8bit[NUM_CONVERT_8BIT_MODES];
     GtkWidget *convert_unknown_8bit_codeset;
 
+#if !HAVE_GTKSPELL
     /* spell checking */
     GtkWidget *module;
     gint module_index;
@@ -170,6 +171,7 @@ typedef struct _PropertyUI {
     GtkWidget *ignore_length;
     GtkWidget *spell_check_sig;
     GtkWidget *spell_check_quoted;
+#endif                          /* HAVE_GTKSPELL */
 
     /* folder scanning */
     GtkWidget *local_scan_depth;
@@ -229,10 +231,12 @@ static GtkWidget *alternative_group(GtkWidget * page);
 static GtkWidget *threading_subpage(gpointer data);
 static GtkWidget *threading_group(GtkWidget * page);
 
+#if !HAVE_GTKSPELL
     /* Spelling page */
 static GtkWidget *create_spelling_page(gpointer);
 static GtkWidget *pspell_settings_group(GtkWidget * page);
 static GtkWidget *misc_spelling_group(GtkWidget * page);
+#endif                          /* HAVE_GTKSPELL */
 
     /* Misc page */
 static GtkWidget *create_misc_page(gpointer);
@@ -251,9 +255,11 @@ static GtkWidget *add_pref_menu(const gchar * label, const gchar * names[],
                                 gint size, gint * index, GtkBox * parent,
                                 gint padding, GtkWidget * page);
 static void add_show_menu(const char *label, gint level, GtkWidget * menu);
+#if !HAVE_GTKSPELL
 static GtkWidget *attach_pref_menu(const gchar * label, gint row,
                                    GtkTable * table, const gchar * names[],
                                    gint size, gint * index);
+#endif                          /* HAVE_GTKSPELL */
 static GtkWidget *attach_entry(const gchar * label, gint row,
                                GtkTable * table);
 static GtkWidget *attach_entry_full(const gchar * label, gint row,
@@ -356,11 +362,13 @@ gchar *pwindow_type_label[NUM_PWINDOW_MODES] = {
     N_("Never")
 };
 
+#if !HAVE_GTKSPELL
 const gchar *spell_check_suggest_mode_label[NUM_SUGGEST_MODES] = {
     N_("Fast"),
     N_("Normal"),
     N_("Bad Spellers")
 };
+#endif                          /* HAVE_GTKSPELL */
 
     /* These labels must match the LibBalsaMailboxSortFields enum. */
 const gchar *sort_field_label[] = {
@@ -462,9 +470,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                              create_display_page(property_box),
                              gtk_label_new(_("Display")));
 
+#if !HAVE_GTKSPELL
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
                              create_spelling_page(property_box),
                              gtk_label_new(_("Spelling")));
+#endif                          /* HAVE_GTKSPELL */
 
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
                              create_misc_page(property_box),
@@ -502,11 +512,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     g_signal_connect(G_OBJECT(pui->mblist_show_mb_content_info), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
+#if !HAVE_GTKSPELL
+    g_signal_connect(G_OBJECT(pui->ignore_length), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->spell_check_sig), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-
     g_signal_connect(G_OBJECT(pui->spell_check_quoted), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
+#endif                          /* HAVE_GTKSPELL */
 
 #if GTK_CHECK_VERSION(2, 6, 0)
     /* Connect signal in an idle handler, after the file chooser has
@@ -616,9 +629,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* threading */
     g_signal_connect(G_OBJECT(pui->tree_expand_check), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->ignore_length), "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
 
@@ -868,6 +878,7 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.empty_trash_on_exit =
         GTK_TOGGLE_BUTTON(pui->empty_trash)->active;
 
+#if !HAVE_GTKSPELL
     /* spell checking */
     balsa_app.module = pui->module_index;
     balsa_app.suggestion_mode = pui->suggestion_mode_index;
@@ -877,6 +888,7 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.check_sig = GTK_TOGGLE_BUTTON(pui->spell_check_sig)->active;
     balsa_app.check_quoted =
         GTK_TOGGLE_BUTTON(pui->spell_check_quoted)->active;
+#endif                          /* HAVE_GTKSPELL */
 
     /* date format */
     g_free(balsa_app.date_string);
@@ -1111,6 +1123,7 @@ set_prefs(void)
     pm_combo_box_set_level(pui->default_threading_type,
                            pui->threading_type_index);
 
+#if !HAVE_GTKSPELL
     /* spelling */
     pui->module_index = balsa_app.module;
     pm_combo_box_set_level(pui->module, balsa_app.module);
@@ -1124,6 +1137,7 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->spell_check_quoted),
                                  balsa_app.check_quoted);
+#endif                          /* HAVE_GTKSPELL */
 
 
     /* date format */
@@ -2266,6 +2280,7 @@ create_table(gint rows, gint cols, GtkWidget * page)
     return table;
 }
 
+#if !HAVE_GTKSPELL
 static GtkWidget *
 attach_pref_menu(const gchar * label, gint row, GtkTable * table,
                  const gchar * names[], gint size, gint * index)
@@ -2349,6 +2364,7 @@ misc_spelling_group(GtkWidget * page)
 
     return group;
 }
+#endif                          /* HAVE_GTKSPELL */
 
 static GtkWidget *
 create_misc_page(gpointer data)

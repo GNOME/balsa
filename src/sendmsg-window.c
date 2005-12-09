@@ -385,12 +385,15 @@ static GnomeUIInfo edit_menu[] = {
 #define EDIT_MENU_SPELL_CHECK EDIT_MENU_QUOTE + 2
 #if HAVE_GTKSPELL
     GNOMEUIINFO_ITEM_STOCK(N_("Toggle Spell C_hecker"), 
-#else                           /* HAVE_GTKSPELL */
-    GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
-#endif                          /* HAVE_GTKSPELL */
                            N_("Check the spelling of the message"),
                            spell_check_cb,
                            GTK_STOCK_SPELL_CHECK),
+#else                           /* HAVE_GTKSPELL */
+    GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
+                           N_("Check the spelling of the message"),
+                           spell_check_cb,
+                           GTK_STOCK_SPELL_CHECK),
+#endif                          /* HAVE_GTKSPELL */
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SELECT_IDENT EDIT_MENU_SPELL_CHECK + 2
     GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
@@ -4087,8 +4090,10 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->delete_sig_id = 
 	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
 			 G_CALLBACK(delete_event_cb), bsmsg);
+#if HAVE_GTKSPELL
     balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
                                     balsa_app.spell_check);
+#endif
     return bsmsg;
 }
 
@@ -5395,7 +5400,7 @@ spell_check_cb(GtkToggleToolButton * button, BalsaSendmsg * bsmsg)
  * Start the spell check
  * */
 static void
-spell_check_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+spell_check_cb(GtkToggleToolButton *button, BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
     BalsaSpellCheck *sc;

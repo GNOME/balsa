@@ -1226,7 +1226,7 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
         if (mqi->orig->mailbox && fccurl) {
             LibBalsaMailbox *fccbox = mqi->finder(fccurl);
             remove =
-                libbalsa_mailbox_copy_message(mqi->orig, fccbox, NULL)>=0;
+                libbalsa_message_copy(mqi->orig, fccbox, NULL)>=0;
         }
         /* If copy failed, mark the message again as flagged -
            otherwise it will get resent again. And again, and

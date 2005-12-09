@@ -1,3 +1,9 @@
+2005-12-09  Jens Granseuer
+
+	* src/sendmsg-window.c: compile with gcc-2.95 (bug 323617).
+	* libbalsa/send.c: compile --without-smtp (bug 323618).
+	* src/sendmsg-window.c: compile --without-gtkspell (PS).
+	
 2005-12-08 07:43  PeterB
 
 	* src/: save-restore.c, sendmsg-window.c: remember spell-check

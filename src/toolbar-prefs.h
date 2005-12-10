@@ -22,13 +22,6 @@
 #ifndef __TOOLBAR_PREFS_H__
 #define __TOOLBAR_PREFS_H__
 
-#define MAXTOOLBARS 10
-#define MAXTOOLBARITEMS 50
-
-#define TOOLBAR_BUTTON_TYPE_BUTTON 0
-#define TOOLBAR_BUTTON_TYPE_TOGGLE 1
-#define TOOLBAR_BUTTON_TYPE_RADIO 2
-
 int get_toolbar_button_index(const char *id);
 
 void customize_dialog_cb(GtkWidget *, gpointer);

@@ -33,11 +33,17 @@ typedef enum {
     STOCK_TOOLBAR_COUNT
 } BalsaToolbarType;
 
+typedef enum {
+    TOOLBAR_BUTTON_TYPE_BUTTON,
+    TOOLBAR_BUTTON_TYPE_TOGGLE,
+    TOOLBAR_BUTTON_TYPE_RADIO
+} BalsaToolbarButtonType;
+
 typedef struct t_button_data {
     char *pixmap_id;   /* not translatable */
     char *button_text; /* translatable */
     char *help_text;   /* translatable */
-    int type;
+    BalsaToolbarButtonType type;
 } button_data;
 
 extern button_data toolbar_buttons[];

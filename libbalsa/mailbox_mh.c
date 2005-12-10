@@ -169,16 +169,21 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
 static void
 libbalsa_mailbox_mh_init(LibBalsaMailboxMh * mailbox)
 {
+    /* mh->sequences_file = NULL; */
 }
 
 gint
-libbalsa_mailbox_mh_create(const gchar * path, gboolean create) 
+libbalsa_mailbox_mh_create(const gchar * path, gboolean create,
+                           LibBalsaMailboxMh * mh) 
 {
     GType magic_type;
     gint exists;
 
     g_return_val_if_fail( path != NULL, -1);
-	
+
+    g_free(mh->sequences_filename);
+    mh->sequences_filename = g_build_filename(path, ".mh_sequences", NULL);
+
     exists = access(path, F_OK);
     if ( exists == 0 ) {
 	/* File exists. Check if it is a mh... */
@@ -191,7 +196,6 @@ libbalsa_mailbox_mh_create(const gchar * path, gboolean create)
 	}
     } else {
 	if(create) {
-	    char tmp[_POSIX_PATH_MAX];
 	    int i;
 
 	    if (mkdir (path, S_IRWXU)) {
@@ -199,8 +203,7 @@ libbalsa_mailbox_mh_create(const gchar * path, gboolean create)
 				     _("Could not create MH directory at %s (%s)"), path, strerror(errno) );
 		return (-1);
 	    } 
-	    snprintf (tmp, sizeof (tmp), "%s/.mh_sequences", path);
-	    if ((i = creat (tmp, S_IRWXU)) == -1) {
+	    if ((i = creat (mh->sequences_filename, S_IRWXU)) == -1) {
 		libbalsa_information
 		    (LIBBALSA_INFORMATION_WARNING, 
 		     _("Could not create MH structure at %s (%s)"),
@@ -219,22 +222,18 @@ GObject *
 libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
-    LibBalsaMailboxMh *mh;
 
-    
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MH, NULL);
-    
+
     mailbox->is_directory = TRUE;
-    
+
     mailbox->url = g_strconcat("file://", path, NULL);
-    
-    if(libbalsa_mailbox_mh_create(path, create) < 0) {
+
+    if (libbalsa_mailbox_mh_create(path, create,
+                                   LIBBALSA_MAILBOX_MH(mailbox)) < 0) {
 	g_object_unref(G_OBJECT(mailbox));
 	return NULL;
     }
-    
-    mh = LIBBALSA_MAILBOX_MH(mailbox);
-    mh->sequences_filename = g_build_filename(path, ".mh_sequences", NULL);
 
     return G_OBJECT(mailbox);
 }
@@ -329,7 +328,7 @@ lbm_mh_compare_fileno(const struct message_info ** a,
 #define INVALID_FLAG ((unsigned) -1)
 
 static void
-lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
+lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh, gboolean add_msg_info)
 {
     const gchar *path;
     GDir *dir;
@@ -356,7 +355,7 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh)
 	if (fileno > mh->last_fileno)
 	    mh->last_fileno = fileno;
 
-	if (mh->messages_info) {
+	if (add_msg_info && mh->messages_info) {
 	    struct message_info *msg_info =
 		g_hash_table_lookup(mh->messages_info,
 				    GINT_TO_POINTER(fileno));
@@ -486,7 +485,7 @@ lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
 static void
 lbm_mh_parse_both(LibBalsaMailboxMh * mh)
 {
-    lbm_mh_parse_mailbox(mh);
+    lbm_mh_parse_mailbox(mh, TRUE);
     if (mh->msgno_2_msg_info)
 	lbm_mh_parse_sequences(mh);
 }
@@ -903,6 +902,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	g_object_unref(recent.line);
         if (sequences_fd >= 0)
             libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
+#ifdef DEBUG
+        g_print("MH sync \"%s\": cannot open temp file.\n", path);
+#endif
 	return retval;
     }
     temp_stream = g_mime_stream_fs_new(fd);
@@ -948,6 +950,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	g_object_unref(recent.line);
         if (sequences_fd >= 0)
             libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
+#ifdef DEBUG
+        g_print("MH sync \"%s\": error finishing sequences line.\n", path);
+#endif
 	return retval;
     }
 
@@ -959,6 +964,10 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     /* rename tempfile to '.mh_sequences' */
     retval = (libbalsa_safe_rename(tmp, sequences_filename) != -1);
+#ifdef DEBUG
+    if (!retval)
+        g_print("MH sync \"%s\": error renaming sequences file.\n", path);
+#endif
     if (!retval)
 	unlink (tmp);
 
@@ -1091,7 +1100,9 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
 
     mh = LIBBALSA_MAILBOX_MH(mailbox);
 
-    lbm_mh_parse_both(mh);
+    /* Make sure we know the highest message number: */
+    lbm_mh_parse_mailbox(mh, FALSE);
+
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
     fd = libbalsa_mailbox_mh_open_temp(path, &tmp);

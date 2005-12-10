@@ -1087,9 +1087,7 @@ void
 libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
 					     const gchar * str)
 {
-    g_return_if_fail(message->in_reply_to == NULL);
-
-    if (str) {
+    if (!message->in_reply_to && str) {
 	/* FIXME for Balsa's old non-compliant header */
 	gchar *p = strrchr(str, ';');
 	p = p ? g_strndup(str, p - str) : g_strdup(str);

@@ -1,5 +1,7 @@
-2005-12-10 10:42  PeterB
+2005-12-10 16:55  PeterB
 
+	* libbalsa/: mailbox_local.c, mailbox_mh.c, mailbox_mh.h,
+	message.c: fix bug 323448.
 	* src/: toolbar-factory.h, toolbar-prefs.h: remove some obsolete
 	defines and replace some others with an enum.
 

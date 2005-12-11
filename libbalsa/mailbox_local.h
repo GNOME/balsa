@@ -60,12 +60,14 @@ struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
     LibBalsaMessage *(*load_message)(LibBalsaMailbox *mb, guint msgno);
+    gint (*check_files)(const gchar * path, gboolean create);
+    void (*set_path)(LibBalsaMailboxLocal * local, const gchar * path);
     void (*remove_files)(LibBalsaMailboxLocal *mb);
 };
 
 GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
-				     const gchar * path);
+				     const gchar * path, gboolean create);
 
 #define libbalsa_mailbox_local_get_path(mbox) \
 	((const gchar *) (LIBBALSA_MAILBOX(mbox))->url+7)

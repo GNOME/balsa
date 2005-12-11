@@ -37,12 +37,6 @@
 #include "i18n.h"
 
 
-enum {
-    REMOVE_FILES,
-    LAST_SIGNAL
-};
-static guint libbalsa_mailbox_local_signals[LAST_SIGNAL];
-
 static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
@@ -124,15 +118,6 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 
     parent_class = g_type_class_peek_parent(klass);
 
-    libbalsa_mailbox_local_signals[REMOVE_FILES] =
-	g_signal_new("remove-files",
-                     G_TYPE_FROM_CLASS(object_class),
-		     G_SIGNAL_RUN_LAST,
-		     G_STRUCT_OFFSET(LibBalsaMailboxLocalClass,
-				     remove_files),
-                     NULL, NULL,
-		     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-
     object_class->finalize = libbalsa_mailbox_local_finalize;
 
     libbalsa_mailbox_class->save_config =
@@ -159,6 +144,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     libbalsa_mailbox_class->duplicate_msgnos =
         libbalsa_mailbox_local_duplicate_msgnos;
     klass->load_message = NULL;
+    klass->check_files  = NULL;
+    klass->set_path     = NULL;
     klass->remove_files = NULL;
 }
 
@@ -200,41 +187,30 @@ libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 */
 gint
 libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
-                                const gchar * path)
+                                const gchar * path, gboolean create)
 {
-    int i = 0;
+    int i;
+    LibBalsaMailboxLocalClass *klass =
+        LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox);
 
-    g_return_val_if_fail(mailbox, -1);
-    g_return_val_if_fail(path, -1);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), -1);
+    g_return_val_if_fail(path != NULL, -1);
 
     if (LIBBALSA_MAILBOX(mailbox)->url != NULL) {
         const gchar *cur_path = libbalsa_mailbox_local_get_path(mailbox);
-        if (g_ascii_strcasecmp(path, cur_path) == 0)
+        if (strcmp(path, cur_path) == 0)
             return 0;
-        else {
-            gint exists = access(path, F_OK);
-            if (exists == 0) {  /* 0 == file does exist */
-                i = -1;
-                errno = EEXIST;
-            } else
-                i = rename(cur_path, path);
-        }
-    } else {
-        if (LIBBALSA_IS_MAILBOX_MAILDIR(mailbox))
-            i = libbalsa_mailbox_maildir_create(path, TRUE,
-                                                LIBBALSA_MAILBOX_MAILDIR
-                                                (mailbox));
-        else if (LIBBALSA_IS_MAILBOX_MH(mailbox))
-            i = libbalsa_mailbox_mh_create(path, TRUE,
-                                           LIBBALSA_MAILBOX_MH
-                                           (mailbox));
-        else if (LIBBALSA_IS_MAILBOX_MBOX(mailbox))
-            i = libbalsa_mailbox_mbox_create(path, TRUE);
-    }
+        else if (access(path, F_OK) == 0)       /* 0 == file does exist */
+            return EEXIST;
+        else
+            i = rename(cur_path, path);
+    } else
+        i = klass->check_files(path, create);
 
     /* update mailbox data */
     if (i == 0) {
+        if (klass->set_path)
+            klass->set_path(mailbox, path);
         g_free(LIBBALSA_MAILBOX(mailbox)->url);
         LIBBALSA_MAILBOX(mailbox)->url =
             g_strconcat("file://", path, NULL);
@@ -244,13 +220,11 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 }
 
 void
-libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox)
+libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal * local)
 {
-    g_return_if_fail (LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(local));
 
-    g_signal_emit(G_OBJECT(mailbox),
-		  libbalsa_mailbox_local_signals[REMOVE_FILES], 0);
-
+    LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->remove_files(local);
 }
 
 static void libbalsa_mailbox_link_message(LibBalsaMailboxLocal * mailbox,
@@ -1505,7 +1479,7 @@ libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local)
     * another, etc. So it is better to do sync bit too often... */
     if (local->sync_id) 
         return;
-    g_object_ref(G_OBJECT(local));
+    g_object_ref(local);
     /* queue sync job so that the delay is at least five times longer
      * than the syncing time. Otherwise large mailbox owners will be
      * annnoyed. */

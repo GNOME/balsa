@@ -505,6 +505,9 @@ conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
         /* fall through */
     default:
         gtk_widget_destroy(GTK_WIDGET(dialog));
+        /* fall through */
+    case 0:
+        break;
     }
 }
 
@@ -872,7 +875,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	    gchar *file_dir, *path_dir;
 
             i = libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL
-                                                (mailbox), filename);
+                                                (mailbox), filename, FALSE);
             if (i != 0) {
                 balsa_information(LIBBALSA_INFORMATION_WARNING,
                                   _("Rename of %s to %s failed:\n%s"),
@@ -950,7 +953,7 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 
         path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
-	res = libbalsa_mailbox_local_set_path(ml, path);
+	res = libbalsa_mailbox_local_set_path(ml, path, TRUE);
 
 	if( res != 0) {
 	    g_object_unref(G_OBJECT(mcw->mailbox));

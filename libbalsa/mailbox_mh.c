@@ -60,6 +60,9 @@ static void libbalsa_mailbox_mh_load_config(LibBalsaMailbox * mailbox,
 static GMimeStream *libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *
 							   mailbox,
 							   guint msgno);
+static gint lbm_mh_check_files(const gchar * path, gboolean create);
+static void lbm_mh_set_path(LibBalsaMailboxLocal * mailbox,
+                            const gchar * path);
 static void libbalsa_mailbox_mh_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox,
@@ -162,6 +165,8 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
 
     libbalsa_mailbox_local_class->load_message =
         libbalsa_mailbox_mh_get_message;
+    libbalsa_mailbox_local_class->check_files  = lbm_mh_check_files;
+    libbalsa_mailbox_local_class->set_path     = lbm_mh_set_path;
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mh_remove_files;
 }
@@ -172,51 +177,62 @@ libbalsa_mailbox_mh_init(LibBalsaMailboxMh * mailbox)
     /* mh->sequences_file = NULL; */
 }
 
-gint
-libbalsa_mailbox_mh_create(const gchar * path, gboolean create,
-                           LibBalsaMailboxMh * mh) 
+static gint
+lbm_mh_check_files(const gchar * path, gboolean create)
 {
-    GType magic_type;
-    gint exists;
+    g_return_val_if_fail(path != NULL, -1);
 
-    g_return_val_if_fail( path != NULL, -1);
+    if (access(path, F_OK) == 0) {
+        /* File exists. Check if it is a mh... */
+        if (libbalsa_mailbox_type_from_path(path) !=
+            LIBBALSA_TYPE_MAILBOX_MH) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Mailbox %s does not appear to be a Mh mailbox."),
+                                 path);
+            return -1;
+        }
+    } else if (create) {
+        gint fd;
+        gchar *sequences_filename;
 
+        if (mkdir(path, S_IRWXU)) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Could not create MH directory at %s (%s)"),
+                                 path, strerror(errno));
+            return -1;
+        }
+
+        sequences_filename = g_build_filename(path, ".mh_sequences", NULL);
+        fd = creat(sequences_filename, S_IRWXU);
+        g_free(sequences_filename);
+
+        if (fd == -1) {
+            libbalsa_information
+                (LIBBALSA_INFORMATION_WARNING,
+                 _("Could not create MH structure at %s (%s)"),
+                 path, strerror(errno));
+            rmdir(path);
+            return -1;
+        } else
+            close(fd);
+    } else
+        return -1;
+
+    return 0;
+}
+
+static void
+lbm_mh_set_sequences_filename(LibBalsaMailboxMh * mh, const gchar * path)
+{
     g_free(mh->sequences_filename);
     mh->sequences_filename = g_build_filename(path, ".mh_sequences", NULL);
-
-    exists = access(path, F_OK);
-    if ( exists == 0 ) {
-	/* File exists. Check if it is a mh... */
-	
-	magic_type = libbalsa_mailbox_type_from_path(path);
-	if ( magic_type != LIBBALSA_TYPE_MAILBOX_MH ) {
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-				 _("Mailbox %s does not appear to be a Mh mailbox."), path);
-	    return(-1);
-	}
-    } else {
-	if(create) {
-	    int i;
-
-	    if (mkdir (path, S_IRWXU)) {
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-				     _("Could not create MH directory at %s (%s)"), path, strerror(errno) );
-		return (-1);
-	    } 
-	    if ((i = creat (mh->sequences_filename, S_IRWXU)) == -1) {
-		libbalsa_information
-		    (LIBBALSA_INFORMATION_WARNING, 
-		     _("Could not create MH structure at %s (%s)"),
-		     path, strerror(errno));
-		rmdir (path);
-		return (-1);
-	    } else close(i);   	    
-	} else 
-	    return(-1);
-    }
-    return(0);
 }
-    
+
+static void
+lbm_mh_set_path(LibBalsaMailboxLocal * local, const gchar * path)
+{
+    lbm_mh_set_sequences_filename(LIBBALSA_MAILBOX_MH(local), path);
+}
 
 GObject *
 libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
@@ -227,11 +243,9 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
 
     mailbox->is_directory = TRUE;
 
-    mailbox->url = g_strconcat("file://", path, NULL);
-
-    if (libbalsa_mailbox_mh_create(path, create,
-                                   LIBBALSA_MAILBOX_MH(mailbox)) < 0) {
-	g_object_unref(G_OBJECT(mailbox));
+    if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
+                                        path, create) != 0) {
+	g_object_unref(mailbox);
 	return NULL;
     }
 
@@ -253,9 +267,8 @@ libbalsa_mailbox_mh_load_config(LibBalsaMailbox * mailbox,
     LibBalsaMailboxMh *mh = LIBBALSA_MAILBOX_MH(mailbox);
     gchar *path;
 
-    g_free(mh->sequences_filename);
     path = libbalsa_conf_get_string("Path");
-    mh->sequences_filename = g_build_filename(path, ".mh_sequences", NULL);
+    lbm_mh_set_sequences_filename(mh, path);
     g_free(path);
 
     LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
@@ -1001,29 +1014,27 @@ static LibBalsaMessage *
 libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
+    LibBalsaMessage *message;
 
-    msg_info =
-	lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
-				       msgno);
+    msg_info = lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
+                                              msgno);
 
-    if (msg_info->message)
-	g_object_ref(msg_info->message);
-    else {
-	LibBalsaMessage *message;
+    message = msg_info->message;
+    if (message)
+        return g_object_ref(message);
 
-	msg_info->message = message = libbalsa_message_new();
-	g_object_add_weak_pointer(G_OBJECT(message),
-				  (gpointer) & msg_info->message);
+    msg_info->message = message = libbalsa_message_new();
+    g_object_add_weak_pointer(G_OBJECT(message),
+                              (gpointer) & msg_info->message);
 
-	if (msg_info->flags == INVALID_FLAG)
-	    msg_info->flags = msg_info->orig_flags;
-	message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
-	message->mailbox = mailbox;
-	message->msgno = msgno;
-	libbalsa_message_load_envelope(message);
-    }
+    if (msg_info->flags == INVALID_FLAG)
+        msg_info->flags = msg_info->orig_flags;
+    message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
+    message->mailbox = mailbox;
+    message->msgno = msgno;
+    libbalsa_message_load_envelope(message);
 
-    return msg_info->message;
+    return message;
 }
 
 static gboolean

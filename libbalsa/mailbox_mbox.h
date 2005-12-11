@@ -41,5 +41,4 @@ typedef struct _LibBalsaMailboxMboxClass LibBalsaMailboxMboxClass;
 
 GType libbalsa_mailbox_mbox_get_type(void);
 GObject *libbalsa_mailbox_mbox_new(const gchar * path, gboolean create);
-gint libbalsa_mailbox_mbox_create(const gchar * path, gboolean create);
 #endif

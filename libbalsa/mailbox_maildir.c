@@ -65,6 +65,9 @@ static void libbalsa_mailbox_maildir_load_config(LibBalsaMailbox * mailbox,
 static GMimeStream *libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox *
 							   mailbox,
 							   guint msgno);
+static gint lbm_maildir_check_files(const gchar * path, gboolean create);
+static void lbm_maildir_set_path(LibBalsaMailboxLocal * mailbox,
+                                 const gchar * path);
 static void libbalsa_mailbox_maildir_remove_files(LibBalsaMailboxLocal *mailbox);
 
 static gboolean libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox,
@@ -174,6 +177,8 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_maildir_total_messages;
 
+    libbalsa_mailbox_local_class->check_files  = lbm_maildir_check_files;
+    libbalsa_mailbox_local_class->set_path     = lbm_maildir_set_path;
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_maildir_remove_files;
     libbalsa_mailbox_local_class->load_message =
@@ -185,99 +190,98 @@ libbalsa_mailbox_maildir_init(LibBalsaMailboxMaildir * mailbox)
 {
 }
 
-static void lbm_maildir_set_subdirs(LibBalsaMailboxMaildir * mdir,
-                                    const gchar * path);
-
-gint
-libbalsa_mailbox_maildir_create(const gchar * path, gboolean create,
-                                LibBalsaMailboxMaildir * mdir)
+static gint
+lbm_maildir_check_files(const gchar * path, gboolean create)
 {
-    gint exists;
-    GType magic_type;
+    g_return_val_if_fail(path != NULL, -1);
 
-    g_return_val_if_fail( path != NULL, -1);
+    if (access(path, F_OK) == 0) {
+        /* File exists. Check if it is a maildir... */
+        if (libbalsa_mailbox_type_from_path(path) !=
+            LIBBALSA_TYPE_MAILBOX_MAILDIR) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Mailbox %s does not appear to be a Maildir mailbox."),
+                                 path);
+            return -1;
+        }
+    } else if (create) {
+        char tmp[_POSIX_PATH_MAX];
 
-    exists = access(path, F_OK);
-    if ( exists == 0 ) {
-	/* File exists. Check if it is a maildir... */
-	
-	magic_type = libbalsa_mailbox_type_from_path(path);
-	if ( magic_type != LIBBALSA_TYPE_MAILBOX_MAILDIR ) {
-	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-				 _("Mailbox %s does not appear to be a Maildir mailbox."), path);
-	    return(-1);
-	}
-    } else {
-	if(create) {    
-	    char tmp[_POSIX_PATH_MAX];
-	    
-	    if (mkdir (path, S_IRWXU)) {
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-				     _("Could not create a MailDir directory at %s (%s)"), path, strerror(errno) );
-		return (-1);
-	    }
-	    
-	    snprintf (tmp, sizeof (tmp), "%s/cur", path);
-	    if (mkdir (tmp, S_IRWXU)) {
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-				     _("Could not create a MailDir at %s (%s)"), path, strerror(errno) );
-		rmdir (path);
-		return (-1);
-	    }
-	    
-	    snprintf (tmp, sizeof (tmp), "%s/new", path);
-	    if (mkdir (tmp, S_IRWXU)) {
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-				     _("Could not create a MailDir at %s (%s)"), path, strerror(errno) );
-		snprintf (tmp, sizeof (tmp), "%s/cur", path);
-		rmdir (tmp);
-		rmdir (path);
-		return (-1);
-	    }
-	    
-	    snprintf (tmp, sizeof (tmp), "%s/tmp", path);
-	    if (mkdir (tmp, S_IRWXU)) {
-		libbalsa_information(LIBBALSA_INFORMATION_WARNING, 
-				     _("Could not create a MailDir at %s (%s)"), path, strerror(errno) );
-		snprintf (tmp, sizeof (tmp), "%s/cur", path);
-		rmdir (tmp);
-		snprintf (tmp, sizeof (tmp), "%s/new", path);
-		rmdir (tmp);
-		rmdir (path);
-		return (-1);
-	    }
-	} else 
-	    return(-1);
-    }
-    lbm_maildir_set_subdirs(mdir, path);
-    return(0);
+        if (mkdir(path, S_IRWXU)) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Could not create a MailDir directory at %s (%s)"),
+                                 path, strerror(errno));
+            return -1;
+        }
+
+        snprintf(tmp, sizeof(tmp), "%s/cur", path);
+        if (mkdir(tmp, S_IRWXU)) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Could not create a MailDir at %s (%s)"),
+                                 path, strerror(errno));
+            rmdir(path);
+            return -1;
+        }
+
+        snprintf(tmp, sizeof(tmp), "%s/new", path);
+        if (mkdir(tmp, S_IRWXU)) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Could not create a MailDir at %s (%s)"),
+                                 path, strerror(errno));
+            snprintf(tmp, sizeof(tmp), "%s/cur", path);
+            rmdir(tmp);
+            rmdir(path);
+            return -1;
+        }
+
+        snprintf(tmp, sizeof(tmp), "%s/tmp", path);
+        if (mkdir(tmp, S_IRWXU)) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Could not create a MailDir at %s (%s)"),
+                                 path, strerror(errno));
+            snprintf(tmp, sizeof(tmp), "%s/cur", path);
+            rmdir(tmp);
+            snprintf(tmp, sizeof(tmp), "%s/new", path);
+            rmdir(tmp);
+            rmdir(path);
+            return -1;
+        }
+    } else
+        return -1;
+
+    return 0;
 }
 
 static void
 lbm_maildir_set_subdirs(LibBalsaMailboxMaildir * mdir, const gchar * path)
 {
-    mdir->curdir = g_strdup_printf("%s/cur", path);
-    mdir->newdir = g_strdup_printf("%s/new", path);
-    mdir->tmpdir = g_strdup_printf("%s/tmp", path);
+    g_free(mdir->curdir);
+    mdir->curdir = g_build_filename(path, "cur", NULL);
+    g_free(mdir->newdir);
+    mdir->newdir = g_build_filename(path, "new", NULL);
+    g_free(mdir->tmpdir);
+    mdir->tmpdir = g_build_filename(path, "tmp", NULL);
+}
+
+static void
+lbm_maildir_set_path(LibBalsaMailboxLocal * local, const gchar * path)
+{
+    lbm_maildir_set_subdirs(LIBBALSA_MAILBOX_MAILDIR(local), path);
 }
 
 GObject *
 libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
-    LibBalsaMailboxMaildir *mdir;
 
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MAILDIR, NULL);
 
     mailbox->is_directory = TRUE;
 
-    LIBBALSA_MAILBOX(mailbox)->url = g_strconcat("file://", path, NULL);
-
-
-    mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
-    if(libbalsa_mailbox_maildir_create(path, create, mdir) < 0) {
-	g_object_unref(G_OBJECT(mailbox));
-	return NULL;
+    if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
+                                        path, create) != 0) {
+        g_object_unref(mailbox);
+        return NULL;
     }
 
     return G_OBJECT(mailbox);
@@ -848,24 +852,23 @@ libbalsa_mailbox_maildir_get_message(LibBalsaMailbox * mailbox,
                                      guint msgno)
 {
     struct message_info *msg_info =
-	message_info_from_msgno(mailbox, msgno);
+        message_info_from_msgno(mailbox, msgno);
+    LibBalsaMessage *message;
 
-    if (msg_info->message)
-	g_object_ref(msg_info->message);
-    else {
-	LibBalsaMessage *message;
+    message = msg_info->message;
+    if (message)
+        return g_object_ref(message);
 
-	msg_info->message = message = libbalsa_message_new();
-	g_object_add_weak_pointer(G_OBJECT(message),
-				  (gpointer) & msg_info->message);
+    msg_info->message = message = libbalsa_message_new();
+    g_object_add_weak_pointer(G_OBJECT(message),
+                              (gpointer) & msg_info->message);
 
-	message->flags = REAL_FLAGS(msg_info->flags);
-	message->mailbox = mailbox;
-	message->msgno = msgno;
-	libbalsa_message_load_envelope(message);
-    }
+    message->flags = REAL_FLAGS(msg_info->flags);
+    message->mailbox = mailbox;
+    message->msgno = msgno;
+    libbalsa_message_load_envelope(message);
 
-    return msg_info->message;
+    return message;
 }
 
 /* Called with mailbox locked. */

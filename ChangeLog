@@ -1,5 +1,14 @@
-2005-12-10 16:55  PeterB
+2005-12-11 18:14  PeterB
 
+	* src/mailbox-conf.c: use new api for
+	libbalsa_mailbox_local_set_path.
+	* libbalsa/: mailbox_maildir.c, mailbox_maildir.h, mailbox_mbox.c,
+	mailbox_mbox.h, mailbox_mh.c, mailbox_mh.h: implement check-files
+	and set-path methods; simplify new and get-message methods;
+	fixes bug 323448.
+	* libbalsa/: mailbox_local.c, mailbox_local.h: new class methods
+	check-files and set-path; change api for
+	libbalsa_Mailbox_local_set_path.
 	* libbalsa/: mailbox_local.c, mailbox_mh.c, mailbox_mh.h,
 	message.c: fix bug 323448.
 	* src/: toolbar-factory.h, toolbar-prefs.h: remove some obsolete

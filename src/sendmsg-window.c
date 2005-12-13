@@ -1020,6 +1020,22 @@ find_locale_index_by_locale(const gchar * locale)
     return maxpos;
 }
 
+static void
+sw_buffer_signals_block(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
+{
+    g_signal_handler_block(buffer, bsmsg->changed_sig_id);
+    g_signal_handler_block(buffer, bsmsg->delete_range_sig_id);
+    g_signal_handler_block(buffer, bsmsg->insert_text_sig_id);
+}
+
+static void
+sw_buffer_signals_unblock(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
+{
+    g_signal_handler_unblock(buffer, bsmsg->changed_sig_id);
+    g_signal_handler_unblock(buffer, bsmsg->delete_range_sig_id);
+    g_signal_handler_unblock(buffer, bsmsg->insert_text_sig_id);
+}
+
 #if !defined(ENABLE_TOUCH_UI)
 static struct {
     gchar *label;
@@ -1081,10 +1097,14 @@ edit_with_gnome_check(gpointer data) {
     }
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(data_real->bsmsg->text));
 
+    sw_buffer_save(data_real->bsmsg);
+    sw_buffer_signals_block(data_real->bsmsg, buffer);
     gtk_text_buffer_set_text(buffer, "", 0);
     curposition = 0;
     while(fgets(line, sizeof(line), tmp))
         libbalsa_insert_with_url(buffer, line, NULL, NULL, NULL);
+    sw_buffer_signals_unblock(data_real->bsmsg, buffer);
+
     g_free(data_real->filename);
     fclose(tmp);
     unlink(data_real->filename);
@@ -1122,7 +1142,6 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
     char **argv;
     int argc;
 
-    sw_buffer_save(bsmsg);
     strcpy(filename, TMP_PATTERN);
     tmpfd = mkstemp(filename);
     app = gnome_vfs_mime_get_default_application ("text/plain");
@@ -2248,7 +2267,6 @@ insert_selected_messages(BalsaSendmsg *bsmsg, SendType type)
     if (index && (l = balsa_index_selected_list(BALSA_INDEX(index)))) {
 	GList *node;
     
-        sw_buffer_save(bsmsg);
 	for (node = l; node; node = g_list_next(node)) {
 	    LibBalsaMessage *message = node->data;
 	    GString *body = quoteBody(bsmsg, message, type);
@@ -3336,7 +3354,9 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 	    signature = tmp;
 	}
 	
+        sw_buffer_signals_block(bsmsg, buffer);
         libbalsa_insert_with_url(buffer, signature, NULL, NULL, NULL);
+        sw_buffer_signals_unblock(bsmsg, buffer);
 	
 	g_free(signature);
     } else
@@ -3452,20 +3472,6 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
     g_free(newsubject);
 }
 
-static void
-sw_buffer_signals_block(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
-{
-    g_signal_handler_block(buffer, bsmsg->changed_sig_id);
-    g_signal_handler_block(buffer, bsmsg->delete_range_sig_id);
-}
-
-static void
-sw_buffer_signals_unblock(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
-{
-    g_signal_handler_unblock(buffer, bsmsg->changed_sig_id);
-    g_signal_handler_unblock(buffer, bsmsg->delete_range_sig_id);
-}
-
 static gboolean
 sw_wrap_timeout_cb(BalsaSendmsg * bsmsg)
 {
@@ -3504,19 +3510,6 @@ sw_autosave_timeout_cb(BalsaSendmsg * bsmsg)
         gdk_threads_leave();
     }
     return TRUE; /* do repeat it */
-}
-
-static void
-text_changed(GtkWidget * w, BalsaSendmsg * bsmsg)
-{
-    if (bsmsg->flow) {
-        if (bsmsg->wrap_timeout_id)
-            g_source_remove(bsmsg->wrap_timeout_id);
-        bsmsg->wrap_timeout_id =
-            g_timeout_add(500, (GSourceFunc) sw_wrap_timeout_cb, bsmsg);
-    }
-
-    bsmsg->modified = TRUE;
 }
 
 static void
@@ -3864,6 +3857,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->charsets  = NULL;
     bsmsg->locale   = NULL;
     bsmsg->fcc_url  = NULL;
+    bsmsg->insert_mark = NULL;
     bsmsg->ident = balsa_app.current_ident;
     bsmsg->update_config = FALSE;
     bsmsg->quit_on_close = FALSE;
@@ -4065,8 +4059,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	libbalsa_message_body_unref(message);
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;
-    /* Save the initial state, so that `undo' will restore it. */
-    sw_buffer_save(bsmsg);
+    sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 
     /* set the initial window title */
     sendmsg_window_set_title(bsmsg);
@@ -4298,7 +4291,6 @@ insert_file_response(GtkWidget * selector, gint response,
     }
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    sw_buffer_save(bsmsg);
     string = NULL;
     len = libbalsa_readfile(fl, &string);
     fclose(fl);
@@ -4930,6 +4922,62 @@ print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 }
 
 /*
+ * Signal handlers for updating the cursor when text is inserted.
+ * The "insert-text" signal is emitted before the insertion, so we
+ * create a mark at the insertion point. 
+ * The "changed" signal is emitted after the insertion, and we move the
+ * cursor to the end of the inserted text.
+ * This achieves nothing if the text was typed, as the cursor is moved
+ * there anyway; if the text is copied by drag and drop or center-click,
+ * this deselects any selected text and places the cursor at the end of
+ * the insertion.
+ */
+static void
+sw_buffer_insert_text(GtkTextBuffer * buffer, GtkTextIter * iter,
+                      const gchar * text, gint len, BalsaSendmsg * bsmsg)
+{
+    bsmsg->insert_mark =
+        gtk_text_buffer_create_mark(buffer, "balsa-insert-mark", iter,
+                                    FALSE);
+    /* If this insertion is not from the keyboard, or if we just undid
+     * something, save the current buffer for undo. */
+    if (len > 1 /* Not keyboard? */
+        || !GTK_WIDGET_IS_SENSITIVE(bsmsg->undo_widget))
+        sw_buffer_save(bsmsg);
+}
+
+static void
+sw_buffer_changed(GtkTextBuffer * buffer, BalsaSendmsg * bsmsg)
+{
+    if (bsmsg->flow) {
+        if (bsmsg->wrap_timeout_id)
+            g_source_remove(bsmsg->wrap_timeout_id);
+        bsmsg->wrap_timeout_id =
+            g_timeout_add(500, (GSourceFunc) sw_wrap_timeout_cb, bsmsg);
+    }
+
+    if (bsmsg->insert_mark) {
+        GtkTextIter iter;
+
+        gtk_text_buffer_get_iter_at_mark(buffer, &iter,
+                                         bsmsg->insert_mark);
+        gtk_text_buffer_place_cursor(buffer, &iter);
+        bsmsg->insert_mark = NULL;
+    }
+
+    bsmsg->modified = TRUE;
+}
+
+static void
+sw_buffer_delete_range(GtkTextBuffer * buffer, GtkTextIter * start,
+                       GtkTextIter * end, BalsaSendmsg * bsmsg)
+{
+    if (gtk_text_iter_get_offset(end) >
+        gtk_text_iter_get_offset(start) + 1)
+        sw_buffer_save(bsmsg);
+}
+
+/*
  * Helpers for the undo and redo buffers.
  */
 static void
@@ -4938,12 +4986,15 @@ sw_buffer_signals_connect(BalsaSendmsg * bsmsg)
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
+    bsmsg->insert_text_sig_id =
+        g_signal_connect(buffer, "insert-text",
+                         G_CALLBACK(sw_buffer_insert_text), bsmsg);
     bsmsg->changed_sig_id =
         g_signal_connect(buffer, "changed",
-                         G_CALLBACK(text_changed), bsmsg);
+                         G_CALLBACK(sw_buffer_changed), bsmsg);
     bsmsg->delete_range_sig_id =
-        g_signal_connect_swapped(buffer, "delete-range",
-                                 G_CALLBACK(sw_buffer_save), bsmsg);
+        g_signal_connect(buffer, "delete-range",
+                         G_CALLBACK(sw_buffer_delete_range), bsmsg);
 }
 
 static void
@@ -4954,10 +5005,11 @@ sw_buffer_signals_disconnect(BalsaSendmsg * bsmsg)
 
     g_signal_handler_disconnect(buffer, bsmsg->changed_sig_id);
     g_signal_handler_disconnect(buffer, bsmsg->delete_range_sig_id);
+    g_signal_handler_disconnect(buffer, bsmsg->insert_text_sig_id);
 }
 
-static void sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo,
-	                       gboolean redo)
+static void
+sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo, gboolean redo)
 {
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
@@ -5064,7 +5116,6 @@ clipboard_helper(BalsaSendmsg * bsmsg, gchar * signal)
 static void
 cut_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    sw_buffer_save(bsmsg);
     clipboard_helper(bsmsg, "cut-clipboard");
 }
 
@@ -5077,7 +5128,6 @@ copy_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    sw_buffer_save(bsmsg);
     clipboard_helper(bsmsg, "paste-clipboard");
 }
 

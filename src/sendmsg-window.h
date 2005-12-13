@@ -88,6 +88,7 @@ extern "C" {
 	gulong delete_sig_id;
         gulong changed_sig_id;
         gulong delete_range_sig_id;
+        gulong insert_text_sig_id;
         guint wrap_timeout_id;
         guint autosave_timeout_id;
         gulong identities_changed_id;
@@ -109,6 +110,9 @@ extern "C" {
         GtkTextBuffer *buffer2;       /* Undo buffer. */
         GtkWidget *undo_widget;
         GtkWidget *redo_widget;
+
+        /* To update cursor after text is inserted. */
+        GtkTextMark *insert_mark;
     };
 
     BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,

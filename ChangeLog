@@ -1,3 +1,8 @@
+2005-12-13 08:03  PeterB
+
+	* src/: sendmsg-window.c, sendmsg-window.h: fix bug 323871; clean
+	up undo/redo.
+
 2005-12-11 18:14  PeterB
 
 	* src/mailbox-conf.c: use new api for

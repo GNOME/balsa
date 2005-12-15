@@ -1,3 +1,9 @@
+2005-12-15  Pawel Salek
+
+	* libbalsa/send.c: use proper time zone in Date: (bug 323871).
+	* src/balsa-index.c: disconnect "selection-changed" handler
+	explicitely - do not trash on mbox close with gtk2-2.8.9.
+
 2005-12-13 08:03  PeterB
 
 	* src/: sendmsg-window.c, sendmsg-window.h: fix bug 323871; clean

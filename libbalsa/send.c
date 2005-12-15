@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
@@ -1529,6 +1530,34 @@ parse_content_type(const char* content_type)
     return ret;
 }
 
+/* get_tz_offset() returns tz offset in minutes. NOTE: not all hours
+   have 60 seconds! Once in a while they get corrected.  */
+#define MIN_SEC		60		/* seconds in a minute */
+#define	HOUR_MIN	60		/* minutes in an hour */
+#define DAY_MIN		(24 * HOUR_MIN)	/* minutes in a day */
+
+static int
+get_tz_offset(time_t *t)
+{
+    struct tm gmt, lt;
+    int off;
+    gmtime_r(t, &gmt);
+    localtime_r(t, &lt);
+
+    off = (lt.tm_hour - gmt.tm_hour) * HOUR_MIN + lt.tm_min - gmt.tm_min;
+    if (lt.tm_year < gmt.tm_year)       off -= DAY_MIN;
+    else if (lt.tm_year > gmt.tm_year)	off += DAY_MIN;
+    else if (lt.tm_yday < gmt.tm_yday)  off -= DAY_MIN;
+    else if (lt.tm_yday > gmt.tm_yday)  off += DAY_MIN;
+
+    /* special case: funny minutes */
+    if (lt.tm_sec <= gmt.tm_sec - MIN_SEC) off -= 1;
+    else if (lt.tm_sec >= gmt.tm_sec + MIN_SEC)	off += 1;
+
+    return (off*100)/60; /* time zone offset in hundreds of hours (funny
+                          * unit required by gmime) */
+}
+
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 				     gboolean postponing)
@@ -1735,7 +1764,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 	g_mime_message_set_subject(mime_message,
 				   LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
-    g_mime_message_set_date(mime_message, message->headers->date, 0); /* FIXME: Set GMT offset */
+    g_mime_message_set_date(mime_message, message->headers->date,
+                            get_tz_offset(&message->headers->date));
 
     tmp = internet_address_list_to_string(message->headers->to_list, TRUE);
     g_mime_message_add_recipients_from_string(mime_message,

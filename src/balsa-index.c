@@ -226,6 +226,12 @@ bndx_destroy(GtkObject * obj)
 
     g_return_if_fail(obj != NULL);
     index = BALSA_INDEX(obj);
+    if(index->selection_changed_id) {
+        GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+        GtkTreeSelection* selection = gtk_tree_view_get_selection(tree_view);
+        g_signal_handler_disconnect(selection, index->selection_changed_id);
+        index->selection_changed_id = 0;
+    }
 
     if (index->mailbox_node) {
 	LibBalsaMailbox* mailbox;

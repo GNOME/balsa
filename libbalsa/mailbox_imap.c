@@ -2383,7 +2383,7 @@ static GArray*
 libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    unsigned first_to_fetch = 0;
+    unsigned first_to_fetch = 1;
     GHashTable *dupes;
     GArray     *res;
     unsigned i;
@@ -2392,8 +2392,8 @@ libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
 	ImapMessage *imsg;
 	gchar *msg_id = g_ptr_array_index(mimap->msgids, i-1);
 	if(msg_id) {
-	    if(!first_to_fetch)
-		first_to_fetch = i+1;
+            first_to_fetch = i+1;
+            break;
 	} else {
 	    imsg = imap_mbox_handle_get_msg(mimap->handle, i);
 	    if(imsg && imsg->envelope)

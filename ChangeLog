@@ -1,3 +1,9 @@
+2005-12-18  Pawel Salek
+
+	* libbalsa/mailbox_imap.c(find_duplicates): do not send UID=0.
+	* libalsa/mailbox.c: attempting to expunge read-only mboxes would
+	be a waste of time.
+
 2005-12-15  Pawel Salek
 
 	* libbalsa/send.c: use proper time zone in Date: (bug 323871).

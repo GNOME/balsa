@@ -525,8 +525,9 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
 
     if (--mailbox->open_ref == 0) {
 	mailbox->state = LB_MAILBOX_STATE_CLOSING;
-        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox,
-                                                           expunge);
+        /* do not try expunging read-only mailboxes, it's a waste of time */
+        expunge = expunge && !mailbox->readonly;
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox, expunge);
         if(mailbox->msg_tree) {
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = NULL;

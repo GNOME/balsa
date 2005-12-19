@@ -1,3 +1,7 @@
+2005-12-19 07:22  PeterB
+
+	* src/balsa-mime-widget.c: lock a GMimeStream.
+
 2005-12-18  Pawel Salek
 
 	* libbalsa/mailbox_imap.c(find_duplicates): do not send UID=0.

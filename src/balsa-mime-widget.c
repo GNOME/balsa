@@ -25,6 +25,7 @@
 #include "config.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
+#include "mime-stream-shared.h"
 #include "i18n.h"
 #include "balsa-mime-widget-image.h"
 #include "balsa-mime-widget-message.h"
@@ -257,7 +258,9 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
             use_content_type = g_strdup(content_type);
         } else {
             buffer = g_malloc(length);
+            libbalsa_mime_stream_shared_lock(stream);
             size = g_mime_stream_read(stream, buffer, length);
+            libbalsa_mime_stream_shared_unlock(stream);
             g_object_unref(stream);
             use_content_type =
                 g_strdup(gnome_vfs_get_mime_type_for_data(buffer, size));

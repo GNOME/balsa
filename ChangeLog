@@ -1,3 +1,9 @@
+2005-12-23 09:27  PeterB
+
+	* src/balsa-message.c, libbalsa/identity.c, libbalsa/misc.c,
+	libbalsa/send.c, src/sendmsg-window.c: fix strings (Mişu Moldovan)
+	and comment them (Jean-Luc Coulon).
+
 2005-12-19 07:22  PeterB
 
 	* src/balsa-mime-widget.c: lock a GMimeStream.

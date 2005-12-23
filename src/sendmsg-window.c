@@ -4488,7 +4488,7 @@ attachment2message(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 
 static void
 sw_set_header_from_path(LibBalsaMessage * message, const gchar * header,
-                        const gchar * path)
+                        const gchar * path, const gchar * error_format)
 {
     gchar *content = NULL;
     GError *err = NULL;
@@ -4497,8 +4497,7 @@ sw_set_header_from_path(LibBalsaMessage * message, const gchar * header,
                   libbalsa_get_header_from_path(header, path, NULL,
                                                 &err))) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Could not load %s header file %s: %s"),
-                             header, path, err->message);
+                             error_format, path, err->message);
         g_error_free(err);
     }
 
@@ -4551,8 +4550,12 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     if (bsmsg->req_dispnotify)
 	libbalsa_message_set_dispnotify(message, ident->ia);
 
-    sw_set_header_from_path(message, "Face", ident->face);
-    sw_set_header_from_path(message, "X-Face", ident->x_face);
+    sw_set_header_from_path(message, "Face", ident->face,
+            /* Translators: please do not translate Face. */
+                            _("Could not load Face header file %s: %s"));
+    sw_set_header_from_path(message, "X-Face", ident->x_face,
+            /* Translators: please do not translate Face. */
+                            _("Could not load X-Face header file %s: %s"));
 
     refs = NULL;
     if (bsmsg->parent_message) {

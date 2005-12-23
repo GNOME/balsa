@@ -866,11 +866,13 @@ struct {
      NULL,
      ".signature",
      N_("Signature")},
+        /* Translators: please do not translate Face. */
     {N_("_Face Path"),
      "identity-facepath",
      "identity-facebox",
      ".face",
      "Face"},
+        /* Translators: please do not translate Face. */
     {N_("_X-Face Path"),
      "identity-xfacepath",
      "identity-xfacebox",
@@ -1081,6 +1083,7 @@ md_face_path_changed(const gchar * filename, gboolean active,
 
     if (size > 998) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                /* Translators: please do not translate Face. */
                              _("Face header file %s is too long "
                                "(%d bytes)."), filename, size);
         g_free(content);
@@ -1090,6 +1093,7 @@ md_face_path_changed(const gchar * filename, gboolean active,
 
     if (libbalsa_text_attr_string(content)) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                /* Translators: please do not translate Face. */
                              _("Face header file %s contains "
                                "binary data."), filename);
         g_free(content);
@@ -1109,7 +1113,8 @@ md_face_path_changed(const gchar * filename, gboolean active,
     }
     if (err) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Error loading face: %s"), err->message);
+                /* Translators: please do not translate Face. */
+                             _("Error loading Face: %s"), err->message);
         g_error_free(err);
         g_free(content);
         return;

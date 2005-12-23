@@ -2141,6 +2141,7 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
         if (sscanf(p, "%x,%x,%x,", &x[0], &x[1], &x[2]) != 3) {
             g_set_error(err, LIBBALSA_IMAGE_ERROR,
                         LIBBALSA_IMAGE_ERROR_BAD_DATA,
+                        /* Translators: please do not translate Face. */
                         _("Bad X-Face data"));
             g_object_unref(pixbuf);
             return image;

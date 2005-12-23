@@ -990,10 +990,13 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
         mailbox = va_arg (ap, const char *);
         message = va_arg (ap, smtp_message_t);
 	status = smtp_reverse_path_status (message);
-	snprintf (buf, sizeof buf, "%s %d <%s>", _("From:"), status->code, mailbox);
+
+        /* status code, mailbox */
+        snprintf (buf, sizeof buf, _("From: %d <%s>"), status->code, mailbox);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
 
-	snprintf (buf, sizeof buf, "%s %s: %d %s", _("From"),
+        /* mailbox, status code, status text */
+        snprintf (buf, sizeof buf, _("From %s: %d %s"), 
 	          mailbox, status->code, status->text);
         g_strchomp(buf);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
@@ -1002,10 +1005,13 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
         mailbox = va_arg (ap, const char *);
         recipient = va_arg (ap, smtp_recipient_t);
 	status = smtp_recipient_status (recipient);
-	snprintf (buf, sizeof buf, "%s %d <%s>", _("To:"), status->code, mailbox);
+
+        /* status code, mailbox */
+        snprintf (buf, sizeof buf, _("To: %d <%s>"),  status->code, mailbox);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
 
-	snprintf (buf, sizeof buf, "%s %s: %d %s", _("To"),
+        /* mailbox, status code, status text */
+        snprintf (buf, sizeof buf, _("To %s: %d %s"),
 	          mailbox, status->code, status->text);
         g_strchomp(buf);
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);

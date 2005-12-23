@@ -1241,6 +1241,7 @@ display_face(BalsaMessage * bm)
     }
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
+                /* Translators: please do not translate Face. */
                           _("Error loading Face: %s"), err->message);
         g_error_free(err);
         return;

@@ -672,7 +672,7 @@ prepare_html(PrintInfo * pi, LibBalsaMessageBody * body, gpointer data)
     len = libbalsa_message_body_get_content(body, &html_text, &err);
     if (!html_text) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Could not get part: %s"),
+                          _("Could not get a part: %s"),
                           err ? err->message : "Unknown error");
         g_clear_error(&err);
 	return;

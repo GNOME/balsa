@@ -47,7 +47,7 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
 	&& (cmd = gnome_vfs_mime_get_value(content_type, key)) != NULL) {
 	if (!libbalsa_message_body_save_temporary(mime_body, &err)) {
 	    balsa_information(LIBBALSA_INFORMATION_WARNING,
-			      _("Could not create temporary file %s: "),
+			      _("Could not create temporary file %s: %s"),
 			      mime_body->temp_filename,
                               err ? err->message : "Unknown error");
             g_clear_error(&err);
@@ -111,7 +111,7 @@ balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
 #endif				/* HAVE_GNOME_VFS29 */
 	    } else {
 		balsa_information(LIBBALSA_INFORMATION_WARNING,
-				  _("could not create temporary file %s: %s"),
+				  _("Could not create temporary file %s: %s"),
 				  mime_body->temp_filename,
                                   err ? err->message : "Unknown error");
 	    }

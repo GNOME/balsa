@@ -301,7 +301,7 @@ libbalsa_address_book_strerror(LibBalsaAddressBook * ab, LibBalsaABErr err)
     case LBABERR_OK:             s= _("No error"); break;
     case LBABERR_CANNOT_READ:    s= _("Cannot read from address book"); break;
     case LBABERR_CANNOT_WRITE:   s= _("Cannot write to address book");  break;
-    case LBABERR_CANNOT_CONNECT: s= _("Cannot connect to server");      break; 
+    case LBABERR_CANNOT_CONNECT: s= _("Cannot connect to the server");  break; 
     case LBABERR_CANNOT_SEARCH:  s= _("Cannot search in the address book"); 
         break;
     case LBABERR_DUPLICATE:      s= _("Cannot add duplicate entry");    break;

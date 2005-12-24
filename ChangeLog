@@ -1,5 +1,7 @@
-2005-12-23 09:27  PeterB
+2005-12-23 22:02  PeterB
 
+	* libbalsa/address-book.c, src/balsa-mime-widget-callbacks.c,
+	src/print.c: harmonize strings.
 	* src/balsa-message.c, libbalsa/identity.c, libbalsa/misc.c,
 	libbalsa/send.c, src/sendmsg-window.c: fix strings (Mişu Moldovan)
 	and comment them (Jean-Luc Coulon).

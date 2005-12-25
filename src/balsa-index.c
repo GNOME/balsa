@@ -731,6 +731,51 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
     g_object_unref(message);
 }
 
+/*
+ * Scroll in an idle handler, otherwise it gets ignored.
+ */
+#define BALSA_INDEX_ROW_REF_KEY "balsa-index-row-ref-key"
+static gboolean
+bndx_scroll_idle(BalsaIndex * index)
+{
+    GtkTreeRowReference *row_ref;
+    GtkTreePath *path;
+
+    gdk_threads_enter();
+
+    row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
+    if (row_ref && (path = gtk_tree_row_reference_get_path(row_ref))) {
+        gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
+                                     FALSE, 0, 0);
+        gtk_tree_path_free(path);
+    }
+
+    g_object_set_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY, NULL);
+    g_object_unref(index);
+
+    gdk_threads_leave();
+
+    return FALSE;
+}
+
+static void
+bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path)
+{
+    GtkTreeRowReference *row_ref;
+
+    row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
+    if (!row_ref) {
+        g_object_ref(index);
+        g_idle_add((GSourceFunc) bndx_scroll_idle, index);
+    }
+
+    row_ref =
+        gtk_tree_row_reference_new(gtk_tree_view_get_model
+                                   (GTK_TREE_VIEW(index)), path);
+    g_object_set_data_full(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY, row_ref,
+                           (GDestroyNotify) gtk_tree_row_reference_free);
+}
+
 /* bndx_tree_expand_cb:
  * callback on expand events
  * set/reset unread style, as appropriate
@@ -761,9 +806,7 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 		    && msgno == (guint) index->current_message->msgno) {
 		    gtk_tree_view_set_cursor(tree_view, current_path,
 			                     NULL, FALSE);
-                    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index),
-                                                 current_path, NULL, FALSE,
-                                                 0, 0);
+                    bndx_scroll_to_row(index, current_path);
                 }
             }
             gtk_tree_path_free(current_path);
@@ -868,8 +911,7 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     if(msgno>0 &&
        libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
         bndx_expand_to_row(index, path);
-	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-				     FALSE, 0, 0);
+	bndx_scroll_to_row(index, path);
         if(balsa_app.view_message_on_open)
             bndx_select_row(index, path);
         gtk_tree_path_free(path);
@@ -1963,10 +2005,55 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
      * deselected the current message */
     if (bndx_find_message(index, NULL, &iter, index->current_message))
         bndx_expand_to_row_and_select(index, &iter);
+    else {
+        /* Collapse can leave the display empty: scroll to one of the
+         * messages that was previously visible. */
+        guint msgno = GPOINTER_TO_UINT(g_object_get_data
+                                       (G_OBJECT(index),
+                                        "balsa-index-scroll-msgno"));
+        GtkTreePath *path;
+        if (msgno 
+            && libbalsa_mailbox_msgno_find(index->mailbox_node->mailbox,
+                                           msgno, &path, NULL)) {
+            bndx_scroll_to_row(index, path);
+            gtk_tree_path_free(path);
+        }
+    }
+    g_object_set_data(G_OBJECT(index), "balsa-index-scroll-msgno", NULL);
+
     bndx_changed_find_row(index);
 }
 
 /* balsa_index_set_threading_type: public method. */
+static void
+bndx_save_scroll_path(BalsaIndex * index)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+    GdkRectangle rect;
+    GtkTreePath *path;
+
+    gtk_tree_view_get_visible_rect(tree_view, &rect);
+    rect.x += rect.width/2;
+    rect.y += rect.height/2;
+    gtk_tree_view_tree_to_widget_coords(tree_view, rect.x, rect.y,
+                                        &rect.x, &rect.y);
+
+    if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
+                                      NULL, NULL, NULL)) {
+        guint msgno;
+
+        GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+        GtkTreeIter iter;
+
+        gtk_tree_model_get_iter(model, &iter, path);
+        gtk_tree_path_free(path);
+
+        gtk_tree_model_get(model, &iter, LB_MBOX_MSGNO_COL, &msgno, -1);
+        g_object_set_data(G_OBJECT(index), "balsa-index-scroll-msgno",
+                          GUINT_TO_POINTER(msgno));
+    }
+}
+
 void
 balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 {
@@ -1978,6 +2065,11 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     mailbox = index->mailbox_node->mailbox;
     g_return_if_fail(mailbox != NULL);
 
+    /* Save a message to scroll back to. */
+    bndx_save_scroll_path(index);
+
+    if (thtype != LB_MAILBOX_THREADING_FLAT) 
+        libbalsa_mailbox_prepare_threading(mailbox, NULL, 0);
     libbalsa_mailbox_set_threading_type(mailbox, thtype);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
@@ -2001,67 +2093,6 @@ balsa_index_set_view_filter(BalsaIndex *bindex, int filter_no,
     bindex->filter_no = filter_no;
     bindex->filter_string = g_strdup(filter_string);
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
-}
-
-/* Find messages with the same ID, and remove all but one of them; if
- * any has the `replied' flag set, make sure the one we keep is one of
- * them.
- *
- * NOTE: assumes that index != NULL. */
-void
-balsa_index_remove_duplicates(BalsaIndex * index)
-{
-#if 1
-    g_warning("balsa_index_remove_duplicates requires knowledge of "
-              "msg-id of of all messages\n which may not be available."
-              "This method should be backend-dependent");
-#else
-    LibBalsaMailbox *mailbox;
-    GHashTable *table;
-    GList *list;
-    GList *messages = NULL;
-
-    mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
-    table = g_hash_table_new(g_str_hash, g_str_equal);
-    for (list = mailbox->message_list; list; list = list->next) {
-        LibBalsaMessage *message = list->data;
-        LibBalsaMessage *master;
-
-        if (LIBBALSA_MESSAGE_IS_DELETED(message) || !message->message_id)
-            continue;
-
-        master =g_hash_table_lookup(table, message->message_id);
-        if (!master || LIBBALSA_MESSAGE_IS_REPLIED(message)) {
-            g_hash_table_insert(table, message->message_id, message);
-            message = master;
-        }
-
-        if (message) {
-            GtkTreePath *path;
-
-            messages = g_list_prepend(messages, message);
-            if (bndx_find_message(index, &path, NULL, message)) {
-                bndx_expand_to_row(index, path);
-                gtk_tree_path_free(path);
-            }
-        }
-    }
-
-    if (messages) {
-	if (mailbox != balsa_app.trash) {
-	    libbalsa_messages_move(messages, balsa_app.trash, NULL);
-	    enable_empty_trash(TRASH_FULL);
-	} else {
-	    libbalsa_messages_change_flag(messages, 
-                                          LIBBALSA_MESSAGE_FLAG_DELETED,
-                                          TRUE);
-            enable_empty_trash(TRASH_CHECK);
-	}
-	g_list_free(messages);
-    }
-
-    g_hash_table_destroy(table);
-#endif
 }
 
 /* Public method. */
@@ -2194,8 +2225,7 @@ static void
 bndx_select_row(BalsaIndex * index, GtkTreePath * path)
 {
     gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
-    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                 FALSE, 0, 0);
+    bndx_scroll_to_row(index, path);
 }
 
 /* Check that all parents are expanded. */

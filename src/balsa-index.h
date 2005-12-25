@@ -156,9 +156,6 @@ extern "C" {
     void balsa_index_refresh_date (BalsaIndex * index);
     void balsa_index_refresh_size (BalsaIndex * index);
 
-    /* Remove duplicate messages. */
-    void balsa_index_remove_duplicates(BalsaIndex * index);
-
     /* Expunge deleted messages. */
     void balsa_index_expunge(BalsaIndex * index);
  

@@ -1064,7 +1064,7 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
 
     if (!mailbox->msg_tree)
         return;
-#define SANITY_CHECK
+#undef SANITY_CHECK
 #ifdef SANITY_CHECK
     g_return_if_fail(!g_node_find(mailbox->msg_tree,
                                   G_PRE_ORDER, G_TRAVERSE_ALL,
@@ -2375,7 +2375,10 @@ mbox_model_get_path_helper(GNode * node, GNode * msg_tree)
 static GtkTreePath *
 mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 {
-    GNode *node, *parent_node;
+    GNode *node;
+#ifdef SANITY_CHECK
+    GNode *parent_node;
+#endif
 
     g_return_val_if_fail(VALID_ITER(iter, tree_model), NULL);
 
@@ -3168,7 +3171,9 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
 
     g_return_if_fail(node != NULL);
     g_return_if_fail(parent != node);
+#ifdef SANITY_CHECK
     g_return_if_fail(!parent || !g_node_is_ancestor(node, parent));
+#endif
 
     iter.stamp = mailbox->stamp;
 

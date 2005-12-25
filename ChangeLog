@@ -1,3 +1,11 @@
+2005-12-24 23:31  PeterB
+
+	* src/: balsa-index.c, balsa-index.h: scroll in an idle handler;
+	use prepare-theading.
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c, mailbox_local.c,
+	mailbox_local.h, mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c:
+	save and restore sorted and threaded view.
+
 2005-12-23 22:02  PeterB
 
 	* libbalsa/address-book.c, src/balsa-mime-widget-callbacks.c,

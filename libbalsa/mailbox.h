@@ -87,7 +87,7 @@ typedef enum {
 typedef struct _SortTuple SortTuple;
 /* Sorting */
 struct _SortTuple {
-    gint offset;
+    guint offset;
     GNode *node;
 };
 
@@ -256,7 +256,8 @@ struct _LibBalsaMailboxClass {
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox, GError **err);
     void (*close_mailbox) (LibBalsaMailbox * mailbox, gboolean expunge);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
-    void (*prepare_threading)(LibBalsaMailbox *mailbox, guint lo, guint hi);
+    void (*prepare_threading)(LibBalsaMailbox *mailbox, guint * msgnos,
+                              guint len);
     gboolean (*fetch_message_structure)(LibBalsaMailbox *mailbox,
                                         LibBalsaMessage * message,
                                         LibBalsaFetchFlag flags);
@@ -344,11 +345,11 @@ LibBalsaMessage *libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox,
 					      guint msgno);
 
 /** libbalsa_mailbox_prepare_threading() requests prefetching of information
-    needed for client-size message threading.
-    lo and hi are related to currently set view.
+    needed for client-side message threading.
+    msgnos are related to currently set view.
 */
 void libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox,
-					guint lo, guint hi);
+					guint * msgnos, guint len);
 
 /** libbalsa_mailbox_fetch_message_structure() fetches detailed
     message structure for given message. It can also fetch all RFC822
@@ -541,7 +542,9 @@ time_t libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox);
 
 /** force update of given msgno */
 void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);
-void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno);
+void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox * mailbox,
+                                     guint seqno, GNode * parent,
+                                     GNode ** sibling);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox * mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
@@ -595,6 +598,8 @@ const gchar *libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 					  guint msgno,
 					  LibBalsaMessage * message);
+void libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
+                                    LibBalsaMessage * message);
 
 #if BALSA_USE_THREADS
 

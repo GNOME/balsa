@@ -53,27 +53,36 @@ struct _LibBalsaMailboxLocal {
     guint sync_cnt; /* we do not want to rely on the time of last sync since
                      * some sync can be faster than others. Instead, we
                      * average the syncing time for mailbox. */
-    GArray *threading_info;
+    guint thread_id;    /* id of the idle mailbox thread job */
+    guint save_tree_id; /* id of the idle mailbox save-tree job */
+    GPtrArray *threading_info;
 };
 
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
-    LibBalsaMessage *(*load_message)(LibBalsaMailbox *mb, guint msgno);
+    LibBalsaMessageFlag (*load_message)(LibBalsaMailbox *mb, guint msgno,
+                                        LibBalsaMessage **msg);
     gint (*check_files)(const gchar * path, gboolean create);
     void (*set_path)(LibBalsaMailboxLocal * local, const gchar * path);
-    void (*remove_files)(LibBalsaMailboxLocal *mb);
+    void (*remove_files)(LibBalsaMailboxLocal * local);
+    guint (*fileno)(LibBalsaMailboxLocal * local, guint msgno);
 };
 
 GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path, gboolean create);
+void libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal *
+                                               local);
 
 #define libbalsa_mailbox_local_get_path(mbox) \
 	((const gchar *) (LIBBALSA_MAILBOX(mbox))->url+7)
 
 void libbalsa_mailbox_local_load_messages(LibBalsaMailbox * mailbox,
 					  guint last_msgno);
+void libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
+                                          guint msgno,
+                                          LibBalsaMessage * message);
 void libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
 					  guint msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);

@@ -126,7 +126,8 @@ static LibBalsaMessage* libbalsa_mailbox_imap_get_message(LibBalsaMailbox*
 							  mailbox,
 							  guint msgno);
 static void libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox, 
-                                                    guint lo, guint hi);
+                                                    guint * msgnos,
+                                                    guint len);
 static gboolean libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *
                                                       mailbox,
                                                       LibBalsaMessage *
@@ -752,6 +753,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     unsigned i;
     struct message_info a = {0};
+    GNode *sibling = NULL;
 
     mimap->sort_field = -1;	/* Invalidate. */
     if(cnt == mimap->messages_info->len)
@@ -792,12 +794,15 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     /* EXISTS response may result from any IMAP action. */
     libbalsa_lock_mailbox(mailbox);
     
+    if (mailbox->msg_tree)
+        sibling = g_node_last_child(mailbox->msg_tree);
     for(i=mimap->messages_info->len+1; i <= cnt; i++) {
         g_array_append_val(mimap->messages_info, a);
         g_ptr_array_add(mimap->msgids, NULL);
         /* dummy entry in mindex for now */
         g_ptr_array_add(mailbox->mindex, NULL);
-        libbalsa_mailbox_msgno_inserted(mailbox, i);
+        libbalsa_mailbox_msgno_inserted(mailbox, i, mailbox->msg_tree,
+                                        &sibling);
     }
     ++mimap->search_stamp;
     
@@ -1877,9 +1882,9 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
 static void
 libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox, 
-                                        guint lo, guint hi)
+                                        guint * msgnos, guint len)
 {
-    g_warning("%s not implemented yet.\n", __func__);
+    /* Nothing to do. */
 }
 
 static void

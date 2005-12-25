@@ -75,8 +75,11 @@ static gboolean libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox,
 static struct message_info *lbm_mh_message_info_from_msgno(
 						  LibBalsaMailboxMh * mailbox,
 						  guint msgno);
-static LibBalsaMessage *libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox,
-						     guint msgno);
+static LibBalsaMessage *lbm_mh_get_message(LibBalsaMailbox * mailbox,
+                                           guint msgno);
+static LibBalsaMessageFlag lbm_mh_load_message(LibBalsaMailbox * mailbox,
+                                               guint msgno,
+                                               LibBalsaMessage **msg);
 static gboolean libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox
                                                             * mailbox,
                                                             LibBalsaMessage
@@ -152,7 +155,7 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     libbalsa_mailbox_class->sync = libbalsa_mailbox_mh_sync;
     libbalsa_mailbox_class->close_mailbox =
 	libbalsa_mailbox_mh_close_mailbox;
-    libbalsa_mailbox_class->get_message = libbalsa_mailbox_mh_get_message;
+    libbalsa_mailbox_class->get_message = lbm_mh_get_message;
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_mh_fetch_message_structure;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mh_add_message;
@@ -163,8 +166,7 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mh_total_messages;
 
-    libbalsa_mailbox_local_class->load_message =
-        libbalsa_mailbox_mh_get_message;
+    libbalsa_mailbox_local_class->load_message = lbm_mh_load_message;
     libbalsa_mailbox_local_class->check_files  = lbm_mh_check_files;
     libbalsa_mailbox_local_class->set_path     = lbm_mh_set_path;
     libbalsa_mailbox_local_class->remove_files = 
@@ -315,6 +317,7 @@ libbalsa_mailbox_mh_remove_files(LibBalsaMailboxLocal *mailbox)
 			     _("Could not remove %s:\n%s"),
 			     path, strerror(errno));
     }
+    LIBBALSA_MAILBOX_LOCAL_CLASS(parent_class)->remove_files(mailbox);
 }
 
 /* Ignore the garbage files.  A valid MH message consists of only
@@ -1011,7 +1014,7 @@ lbm_mh_message_info_from_msgno(LibBalsaMailboxMh * mh, guint msgno)
 }
 
 static LibBalsaMessage *
-libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
+lbm_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     struct message_info *msg_info;
     LibBalsaMessage *message;
@@ -1034,7 +1037,25 @@ libbalsa_mailbox_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
     message->msgno = msgno;
     libbalsa_message_load_envelope(message);
 
+    libbalsa_mailbox_local_cache_message(LIBBALSA_MAILBOX_LOCAL(mailbox),
+                                         msgno, message);
+
     return message;
+}
+
+static LibBalsaMessageFlag
+lbm_mh_load_message(LibBalsaMailbox * mailbox, guint msgno,
+                    LibBalsaMessage ** msg)
+{
+    struct message_info *msg_info =
+        lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
+
+    if (msg_info->message)
+        *msg = g_object_ref(msg_info->message);
+
+    return (msg_info->flags == INVALID_FLAG ?
+            msg_info->orig_flags : msg_info->flags)
+        & LIBBALSA_MESSAGE_FLAGS_REAL;
 }
 
 static gboolean

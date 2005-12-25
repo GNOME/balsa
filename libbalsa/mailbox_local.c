@@ -495,6 +495,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     GError *err = NULL;
     GNode *parent, *sibling;
     LibBalsaMailboxLocalTreeInfo *info;
+    guint8 *seen;
 
     filename = lbm_local_get_cache_filename(local);
 
@@ -514,24 +515,35 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         return FALSE;
     }
 
+    info = (LibBalsaMailboxLocalTreeInfo *) contents;
+    /* Sanity checks: first the file should have > 1 record. */
+    if (length <= sizeof(LibBalsaMailboxLocalTreeInfo)
+            /* First record is (0, total): */
+        || info->msgno != 0
+        /* Total must be > 0 (no file is created for empty tree). */
+        || (*total = info->value.total) == 0
+        || *total > libbalsa_mailbox_total_messages(mailbox)) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Bad cache file \"%s\""), filename);
+        g_free(contents);
+        g_free(filename);
+        return FALSE;
+    }
+
+    seen = g_new0(guint8, *total);
     parent = mailbox->msg_tree;
     sibling = NULL;
-    for (info = (LibBalsaMailboxLocalTreeInfo *) contents;
-         info < (LibBalsaMailboxLocalTreeInfo *) (contents + length);
-         info++) {
-        if (info->msgno == 0) {
-            *total = info->value.total;
-            continue;
-        }
-        if (info->msgno > libbalsa_mailbox_total_messages(mailbox)
-            || g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                           GUINT_TO_POINTER(info->msgno))) {
+    while (++info < (LibBalsaMailboxLocalTreeInfo *) (contents + length)) {
+        if (info->msgno == 0 || info->msgno > *total
+            || seen[info->msgno - 1]) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Bad cache file \"%s\""), filename);
+            g_free(seen);
             g_free(contents);
             g_free(filename);
             return FALSE;
         }
+        seen[info->msgno - 1] = TRUE;
 
         if (sibling
             && info->value.parent == GPOINTER_TO_UINT(sibling->data)) {
@@ -549,6 +561,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                     libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                          _("Bad cache file \"%s\""),
                                          filename);
+                    g_free(seen);
                     g_free(contents);
                     g_free(filename);
                     return FALSE;
@@ -563,6 +576,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
             ++mailbox->unread_messages;
     }
 
+    g_free(seen);
     g_free(contents);
     g_free(filename);
 

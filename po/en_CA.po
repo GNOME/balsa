@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-25 19:11-0500\n"
+"POT-Creation-Date: 2005-12-26 17:22-0500\n"
 "PO-Revision-Date: 2005-09-06 16:41-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: Canadian English <adamw@gnome.org>\n"
@@ -100,7 +100,7 @@ msgstr "O_rganization:"
 msgid "_Email Address:"
 msgstr "_Email Address:"
 
-#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1538
+#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1569
 #: ../libbalsa/message.c:855
 msgid "(No subject)"
 msgstr "(No subject)"
@@ -131,7 +131,7 @@ msgstr "Attempt to apply an invalid filter"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Invalid filters %s for mailbox %s"
 
-#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:700
+#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:731
 msgid "Unable to load message body to match filter"
 msgstr "Unable to load message body to match filter"
 
@@ -268,8 +268,8 @@ msgid "%s: insufficient validity for uid %s"
 msgstr "%s: insufficient validity for UID %s"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1657
-#: ../libbalsa/mailbox_local.c:1659 ../src/sendmsg-window.c:3405
+#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1688
+#: ../libbalsa/mailbox_local.c:1690 ../src/sendmsg-window.c:3405
 #: ../src/sendmsg-window.c:3406
 msgid "Re:"
 msgstr "Re:"
@@ -637,33 +637,38 @@ msgstr "Uploading %ld kB"
 msgid "Server-side threading not supported."
 msgstr "Server-side threading not supported."
 
-#: ../libbalsa/mailbox_local.c:466
+#: ../libbalsa/mailbox_local.c:481
 #, c-format
 msgid "Failed to create temporary file \"%s\": %s"
 msgstr "Failed to create temporary file \"%s\": %s"
 
-#: ../libbalsa/mailbox_local.c:480
+#: ../libbalsa/mailbox_local.c:500
+#, c-format
+msgid "Failed to save cache file \"%s\": %s."
+msgstr "Failed to save cache file \"%s\": %s."
+
+#: ../libbalsa/mailbox_local.c:510
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 
-#: ../libbalsa/mailbox_local.c:511
+#: ../libbalsa/mailbox_local.c:542
 #, c-format
 msgid "Failed to read cache file \"%s\": %s"
 msgstr "Failed to read cache file \"%s\": %s"
 
-#: ../libbalsa/mailbox_local.c:527 ../libbalsa/mailbox_local.c:540
-#: ../libbalsa/mailbox_local.c:562
+#: ../libbalsa/mailbox_local.c:558 ../libbalsa/mailbox_local.c:571
+#: ../libbalsa/mailbox_local.c:593
 #, c-format
 msgid "Bad cache file \"%s\""
 msgstr "Bad cache file \"%s\""
 
-#: ../libbalsa/mailbox_local.c:1818
+#: ../libbalsa/mailbox_local.c:1849
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Open of %s failed. Errno = %d, "
 
-#: ../libbalsa/mailbox_local.c:1840
+#: ../libbalsa/mailbox_local.c:1871
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Failed to sync mailbox \"%s\""

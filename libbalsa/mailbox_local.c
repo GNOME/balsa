@@ -717,7 +717,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
     LibBalsaMailboxIndexEntry *entry =
         g_ptr_array_index(mailbox->mindex, msgno-1);
     LibBalsaMailboxLocalInfo *info =
-        g_ptr_array_index(local->threading_info, msgno - 1);
+        msgno <= local->threading_info->len ?
+        g_ptr_array_index(local->threading_info, msgno - 1) : NULL;
 
     /* We may be able to match the msgno from info cached in entry or
      * info; if those are NULL, we'll need to fetch the message, so we

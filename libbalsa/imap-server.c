@@ -800,9 +800,11 @@ static void close_all_connections_cb(gpointer key, gpointer value,
 void
 libbalsa_imap_server_close_all_connections(void)
 {
+    if (!imap_servers)
+        return;
+
     g_mutex_lock(imap_servers_lock);
-    if(imap_servers) 
-        g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
+    g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
     g_mutex_unlock(imap_servers_lock);
     libbalsa_imap_purge_temp_dir(0);
 }

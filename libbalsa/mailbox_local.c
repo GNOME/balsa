@@ -280,6 +280,7 @@ libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox,
 typedef struct {
     gchar *message_id;
     GList *refs_for_threading;
+    gchar *sender;
 } LibBalsaMailboxLocalInfo;
 
 static void
@@ -289,6 +290,7 @@ lbm_local_free_info(LibBalsaMailboxLocalInfo * info)
         g_free(info->message_id);
         g_list_foreach(info->refs_for_threading, (GFunc) g_free, NULL);
         g_list_free(info->refs_for_threading);
+        g_free(info->sender);
         g_free(info);
     }
 }
@@ -547,9 +549,9 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     }
 
     info = (LibBalsaMailboxLocalTreeInfo *) contents;
-    /* Sanity checks: first the file should have > 1 record. */
-    if (length <= sizeof(LibBalsaMailboxLocalTreeInfo)
-            /* First record is (0, total): */
+    /* Sanity checks: first the file should have >= 1 record. */
+    if (length < sizeof(LibBalsaMailboxLocalTreeInfo)
+        /* First record is (0, total): */
         || info->msgno != 0
         /* Total must be > 0 (no file is created for empty tree). */
         || (*total = info->value.total) == 0
@@ -707,17 +709,23 @@ static gboolean
 message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                    LibBalsaCondition *cond)
 {
+    LibBalsaMailboxLocal *local = (LibBalsaMailboxLocal *) mailbox;
     LibBalsaMessage *message = NULL;
     gboolean match = FALSE;
     gboolean is_refed = FALSE;
     gchar *str;
     LibBalsaMailboxIndexEntry *entry =
         g_ptr_array_index(mailbox->mindex, msgno-1);
+    LibBalsaMailboxLocalInfo *info =
+        g_ptr_array_index(local->threading_info, msgno - 1);
 
-    if (!entry) {
+    /* We may be able to match the msgno from info cached in entry or
+     * info; if those are NULL, we'll need to fetch the message, so we
+     * fetch it here, and that will also populate entry and info. */
+    if (!entry || !info) {
         message = libbalsa_mailbox_get_message(mailbox, msgno);
-        /* entry should now be non-NULL. */
         entry = g_ptr_array_index(mailbox->mindex, msgno-1);
+        info  = g_ptr_array_index(local->threading_info, msgno - 1);
     }
 
     switch (cond->type) {
@@ -745,16 +753,11 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             if(match) break;
 	}
         if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_FROM)) {
-            if (!message)
-                message = libbalsa_mailbox_get_message(mailbox, msgno);
-            if (message->headers->from) {
-                str = internet_address_list_to_string(message->headers->from,
-                                                      FALSE);
-                match = libbalsa_utf8_strstr(str, cond->match.string.string);
-                g_free(str);
-            }
-            if (match)
+	    if (libbalsa_utf8_strstr(info->sender,
+                                     cond->match.string.string)) { 
+                match = TRUE;
                 break;
+            }
         }
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
 	    if (libbalsa_utf8_strstr(entry->subject,
@@ -874,6 +877,8 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local, guint msgno,
     info->message_id = g_strdup(message->message_id);
     info->refs_for_threading =
         libbalsa_message_refs_for_threading(message);
+    info->sender =
+        internet_address_list_to_string(message->headers->from, FALSE);
 
     return TRUE;
 }

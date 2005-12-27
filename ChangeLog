@@ -1,3 +1,8 @@
+2005-12-27 14:50  PeterB
+
+	* libbalsa/mailbox_mbox.c: make sure message is cached at
+	mailbox-local and mailbox levels.
+
 2005-12-27  Pawel Salek
 
 	* configure.in, NEWS: release 2.3.8.

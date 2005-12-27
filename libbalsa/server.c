@@ -370,7 +370,8 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
     }
     case IME_GET_USER:  { /* for eg kerberos */
         gchar **user;
-        va_arg(alist, gchar*); /* Ignore the method */
+        gchar *dummy;
+        dummy = va_arg(alist, gchar*); /* Ignore the method */
         user = va_arg(alist, gchar**);
         ok = va_arg(alist, int*);
         *ok = 1; /* consider popping up a dialog window here */

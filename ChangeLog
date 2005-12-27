@@ -1,5 +1,7 @@
-2005-12-27 14:50  PeterB
+2005-12-27 16:25  PeterB
 
+	* libbalsa/imap-server.c: do not try to lock when no servers have
+	been created.
 	* libbalsa/mailbox_mbox.c: make sure message is cached at
 	mailbox-local and mailbox levels.
 

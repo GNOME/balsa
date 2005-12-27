@@ -1,3 +1,7 @@
+2005-12-27 07:48  PeterB
+
+	* libbalsa/mailbox_local.c: check msgno before accessing array.
+
 2005-12-26 23:22  PeterB
 
 	* src/balsa-index.c: remove unnecessary gdk_threads_{leave,enter};

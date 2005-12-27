@@ -1,5 +1,6 @@
-2005-12-27 07:48  PeterB
+2005-12-27 12:33  PeterB
 
+	* libbalsa/: imap-server.c, server.c: build with gcc-4.1.
 	* libbalsa/mailbox_local.c: check msgno before accessing array.
 
 2005-12-26 23:22  PeterB

@@ -241,6 +241,11 @@ bndx_destroy(GtkObject * obj)
 						 G_SIGNAL_MATCH_DATA,
 						 0, 0, NULL, NULL, index);
 	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
+            /* Undo any temporary filters. */
+            libbalsa_mailbox_set_view_filter(mailbox,
+                                             balsa_window_get_view_filter
+                                             (balsa_app.main_window, TRUE),
+                                             TRUE);
 	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
 
 	    libbalsa_mailbox_search_iter_free(index->search_iter);
@@ -1001,15 +1006,6 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
 
 /* balsa_index_load_mailbox_node:
    open mailbox_node, the opening is done in thread to keep UI alive.
-   NOTES:
-   it uses module-wide is_opening variable. This variable, as well as the
-   mutex should be a property of BalsaIndex but since we cannot open 
-   two indexes at once because of libmutt limits, we get away with this
-   solution. When the backend is changed, feel free to introduce these
-   changes.
-   Also, the waiting list is not a top hack. I mean it is perfectly 
-   functional (and that's MOST important; think long before modifying it)
-   but perhaps we could write it nicer?
 */
 
 gboolean
@@ -1076,18 +1072,12 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 	    	     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
 
     balsa_window_enable_mailbox_menus(balsa_app.main_window, index);
-    /* libbalsa functions must be called with gdk unlocked
-     * but balsa_index - locked!
-     */
-    gdk_threads_leave();
     libbalsa_mailbox_set_view_filter(mailbox,
                                      balsa_window_get_view_filter
                                      (balsa_app.main_window, TRUE), FALSE);
     libbalsa_mailbox_set_threading(mailbox,
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));
-
-    gdk_threads_enter();
 
     /* Set the tree store*/
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS

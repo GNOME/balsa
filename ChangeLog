@@ -1,3 +1,7 @@
+2005-12-27  Pawel Salek
+
+	* configure.in, NEWS: release 2.3.8.
+
 2005-12-27 12:33  PeterB
 
 	* libbalsa/: imap-server.c, server.c: build with gcc-4.1.

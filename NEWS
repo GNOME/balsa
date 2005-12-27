@@ -1,3 +1,9 @@
+* Balsa-2.3.8 release. Release date 2005-12-27
+
+- improved local mailbox opening performance.
+- fix gtk2-2.8.9 compatibility (324516).
+- fixed 323442, 323458, 323618, 323617, 323448, 323871, 323871, 
+
 * Balsa-2.3.7 release. Release date 2005-12-04
 
 - few ready quick filters added to "Subject or Sender" one.

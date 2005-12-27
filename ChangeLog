@@ -1,5 +1,7 @@
-2005-12-26 11:00  PeterB
+2005-12-26 21:33  PeterB
 
+	* libbalsa/mailbox_local.c: cache sender for filtering;
+	save-tree-file with one record is OK.
 	* libbalsa/mailbox_local.c: use g_file_set_contents when available.
 
 2005-12-25 18:50  PeterB

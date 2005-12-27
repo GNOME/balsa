@@ -1,5 +1,8 @@
-2005-12-26 21:33  PeterB
+2005-12-26 23:22  PeterB
 
+	* src/balsa-index.c: remove unnecessary gdk_threads_{leave,enter};
+	undo SOS filter before closing, so we save the tree that we need
+	when reopening.
 	* libbalsa/mailbox_local.c: cache sender for filtering;
 	save-tree-file with one record is OK.
 	* libbalsa/mailbox_local.c: use g_file_set_contents when available.

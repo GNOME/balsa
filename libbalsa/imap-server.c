@@ -62,7 +62,7 @@ static gboolean connection_cleanup(gpointer ptr);
 /* We try to avoid too many connections per server */
 #define MAX_CONNECTIONS_PER_SERVER 20
 
-static GMutex *imap_servers_lock;
+static pthread_mutex_t imap_servers_lock = PTHREAD_MUTEX_INITIALIZER;
 static GHashTable *imap_servers = NULL;
 
 struct handle_info {
@@ -113,12 +113,12 @@ static void libbalsa_imap_server_set_username(LibBalsaServer * server,
     if(server->host && name) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
         
-        g_mutex_lock(imap_servers_lock);
+        pthread_mutex_lock(&imap_servers_lock);
         g_hash_table_steal(imap_servers, imap_server->key);
         g_free(imap_server->key);
         imap_server->key = g_strdup_printf("%s@%s", name, server->host);
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
-        g_mutex_unlock(imap_servers_lock);
+        pthread_mutex_unlock(&imap_servers_lock);
     }
     (parent_class)->set_username(server, name);
 }
@@ -128,12 +128,12 @@ libbalsa_imap_server_set_host(LibBalsaServer * server,
 {
     if(server->user && host) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
-        g_mutex_lock(imap_servers_lock);
+        pthread_mutex_lock(&imap_servers_lock);
         g_hash_table_steal(imap_servers, imap_server->key);
         g_free(imap_server->key);
         imap_server->key = g_strdup_printf("%s@%s", server->user, host);
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
-        g_mutex_unlock(imap_servers_lock);
+        pthread_mutex_unlock(&imap_servers_lock);
     }
     (parent_class)->set_host(server, host, use_ssl);
 }
@@ -188,9 +188,9 @@ libbalsa_imap_server_finalize(GObject * object)
     server = LIBBALSA_SERVER(object);
     imap_server = LIBBALSA_IMAP_SERVER(object);
 
-    g_mutex_lock(imap_servers_lock);
+    pthread_mutex_lock(&imap_servers_lock);
     g_hash_table_remove(imap_servers, imap_server->key);
-    g_mutex_unlock(imap_servers_lock);
+    pthread_mutex_unlock(&imap_servers_lock);
     
     g_source_remove(imap_server->connection_cleanup_id);
 
@@ -384,19 +384,16 @@ static LibBalsaImapServer* get_or_create(const gchar *username,
     LibBalsaImapServer *imap_server;
     gchar *key;
 
-    if (!imap_servers_lock)
-        imap_servers_lock = g_mutex_new();
-
     if (!imap_servers) {
-        g_mutex_lock(imap_servers_lock);
+        pthread_mutex_lock(&imap_servers_lock);
         if (!imap_servers)
             imap_servers = g_hash_table_new(g_str_hash, g_str_equal);
-        g_mutex_unlock(imap_servers_lock);
+        pthread_mutex_unlock(&imap_servers_lock);
     }
 
     /* lookup username@host */
     key = g_strdup_printf("%s@%s", username, host);
-    g_mutex_lock(imap_servers_lock);
+    pthread_mutex_lock(&imap_servers_lock);
     imap_server = g_hash_table_lookup(imap_servers, key);
     if (!imap_server) {
         imap_server = g_object_new(LIBBALSA_TYPE_IMAP_SERVER, NULL);
@@ -406,7 +403,7 @@ static LibBalsaImapServer* get_or_create(const gchar *username,
         g_free(key);
         g_object_ref(imap_server);
     }
-    g_mutex_unlock(imap_servers_lock);
+    pthread_mutex_unlock(&imap_servers_lock);
     return imap_server;
 }
 
@@ -803,9 +800,9 @@ libbalsa_imap_server_close_all_connections(void)
     if (!imap_servers)
         return;
 
-    g_mutex_lock(imap_servers_lock);
+    pthread_mutex_lock(&imap_servers_lock);
     g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
-    g_mutex_unlock(imap_servers_lock);
+    pthread_mutex_unlock(&imap_servers_lock);
     libbalsa_imap_purge_temp_dir(0);
 }
 

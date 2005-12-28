@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-26 00:11+0100\n"
-"PO-Revision-Date: 2005-12-26 00:17+0100\n"
+"POT-Creation-Date: 2005-12-28 13:49+0100\n"
+"PO-Revision-Date: 2005-12-28 13:50+0100\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -100,7 +100,7 @@ msgstr "_Organizácia:"
 msgid "_Email Address:"
 msgstr "Adresa _elektronickej pošty:"
 
-#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1524
+#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1575
 #: ../libbalsa/message.c:855
 msgid "(No subject)"
 msgstr "(Bez predmetu)"
@@ -131,7 +131,7 @@ msgstr "Pokus o aplikáciu neplatného filtra"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Neplatné filtre %s pre poštovú schránku %s"
 
-#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:686
+#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:740
 msgid "Unable to load message body to match filter"
 msgstr "Nemôžem načítať telo správy pre filtráciu"
 
@@ -269,8 +269,8 @@ msgid "%s: insufficient validity for uid %s"
 msgstr "%s: nedostatočná platnosť pre uid %s"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1643
-#: ../libbalsa/mailbox_local.c:1645 ../src/sendmsg-window.c:3405
+#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1694
+#: ../libbalsa/mailbox_local.c:1696 ../src/sendmsg-window.c:3405
 #: ../src/sendmsg-window.c:3406
 msgid "Re:"
 msgstr "Odp:"
@@ -576,7 +576,7 @@ msgstr "Nemôžem vytvoriť poštovú schránku typu %s"
 msgid "Removing messages from source mailbox failed"
 msgstr "Odstránenie správ zo zdrojovej poštovej schránky zlyhalo"
 
-#: ../libbalsa/mailbox.c:3501
+#: ../libbalsa/mailbox.c:3506
 msgid "Reconstructing message"
 msgstr "Rekonštrukcia správy"
 
@@ -639,32 +639,40 @@ msgstr "Odosielam %ld kB"
 msgid "Server-side threading not supported."
 msgstr "Vlákna na serveri nie sú podporované."
 
-#: ../libbalsa/mailbox_local.c:466
+#: ../libbalsa/mailbox_local.c:483
 #, c-format
 msgid "Failed to create temporary file \"%s\": %s"
 msgstr "Zlyhalo vytváranie dočasného súboru \"%s\": %s"
 
-#: ../libbalsa/mailbox_local.c:480
+#: ../libbalsa/mailbox_local.c:502
+#, c-format
+msgid "Failed to save cache file \"%s\": %s."
+msgstr "Zlyhalo ukladanie súboru vyrovnávacej pamäte \"%s\": %s."
+
+#: ../libbalsa/mailbox_local.c:512
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
-msgstr "Zlyhalo ukladanie súboru vyrovnávacej pamäte \"%s\": %s. Nová verzia uložená ako \"%s\""
+msgstr ""
+"Zlyhalo ukladanie súboru vyrovnávacej pamäte \"%s\": %s. Nová verzia uložená "
+"ako \"%s\""
 
-#: ../libbalsa/mailbox_local.c:510
+#: ../libbalsa/mailbox_local.c:544
 #, c-format
 msgid "Failed to read cache file \"%s\": %s"
 msgstr "Zlyhalo čítanie súboru vyrovnávacej pamäte \"%s\": %s"
 
-#: ../libbalsa/mailbox_local.c:530 ../libbalsa/mailbox_local.c:550
+#: ../libbalsa/mailbox_local.c:560 ../libbalsa/mailbox_local.c:573
+#: ../libbalsa/mailbox_local.c:595
 #, c-format
 msgid "Bad cache file \"%s\""
 msgstr "Zlý súbor vyrovnávacej pamäte \"%s\""
 
-#: ../libbalsa/mailbox_local.c:1804
+#: ../libbalsa/mailbox_local.c:1855
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Otváranie %s zlyhalo. Errno = %d, "
 
-#: ../libbalsa/mailbox_local.c:1826
+#: ../libbalsa/mailbox_local.c:1877
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Zlyhala synchronizácia poštovej schránky \"%s\""
@@ -709,7 +717,7 @@ msgstr ""
 msgid "Mailbox does not exist."
 msgstr "Poštová schránka neexistuje."
 
-#: ../libbalsa/mailbox_maildir.c:977 ../libbalsa/mailbox_mbox.c:1645
+#: ../libbalsa/mailbox_maildir.c:977 ../libbalsa/mailbox_mbox.c:1648
 #: ../libbalsa/mailbox_mh.c:1163
 msgid "Data copy error"
 msgstr "Chyba kopírovania dát"
@@ -731,17 +739,17 @@ msgstr "Poštová schránka nie je vo formáte mbox."
 msgid "Cannot lock mailbox."
 msgstr "Nepodarilo sa uzamknúť poštovú schránku."
 
-#: ../libbalsa/mailbox_mbox.c:1602
+#: ../libbalsa/mailbox_mbox.c:1605
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: nepodarilo sa otvoriť %s."
 
-#: ../libbalsa/mailbox_mbox.c:1613
+#: ../libbalsa/mailbox_mbox.c:1616
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: nepodarilo sa získať nový mime prúd."
 
-#: ../libbalsa/mailbox_mbox.c:1621
+#: ../libbalsa/mailbox_mbox.c:1624
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s nie je vo formáte mbox."
@@ -2037,138 +2045,138 @@ msgstr "_Zapamätať heslo"
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Nepodarilo sa otvoriť poštovú schránku \"%s\""
 
-#: ../src/balsa-index.c:362
+#: ../src/balsa-index.c:367
 msgid "From"
 msgstr "Od"
 
-#: ../src/balsa-index.c:375 ../src/pref-manager.c:376
+#: ../src/balsa-index.c:380 ../src/pref-manager.c:376
 msgid "Subject"
 msgstr "Predmet"
 
-#: ../src/balsa-index.c:389 ../src/pref-manager.c:377
+#: ../src/balsa-index.c:394 ../src/pref-manager.c:377
 msgid "Date"
 msgstr "Dátum"
 
-#: ../src/balsa-index.c:401 ../src/pref-manager.c:378
+#: ../src/balsa-index.c:406 ../src/pref-manager.c:378
 #: ../src/sendmsg-window.c:2874
 msgid "Size"
 msgstr "Veľkosť"
 
-#: ../src/balsa-index.c:1031
+#: ../src/balsa-index.c:1027
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Otváram poštovú schránku %s. Prosím čakajte..."
 
 #. FIXME: this is hack!
-#: ../src/balsa-index.c:1069
+#: ../src/balsa-index.c:1065
 msgid "To"
 msgstr "Pre"
 
-#: ../src/balsa-index.c:1660
+#: ../src/balsa-index.c:1650
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Presúvanie do Koša zlyhalo: %s"
 
 #. R
-#: ../src/balsa-index.c:1814 ../src/main-window.c:584
+#: ../src/balsa-index.c:1804 ../src/main-window.c:584
 #: ../src/main-window.c:1047 ../src/message-window.c:148
 msgid "_Reply..."
 msgstr "_Odpovedať..."
 
-#: ../src/balsa-index.c:1816
+#: ../src/balsa-index.c:1806
 msgid "Reply To _All..."
 msgstr "Odpovedať _všetkým..."
 
-#: ../src/balsa-index.c:1818
+#: ../src/balsa-index.c:1808
 msgid "Reply To _Group..."
 msgstr "Odpovedať _skupine..."
 
-#: ../src/balsa-index.c:1820
+#: ../src/balsa-index.c:1810
 msgid "_Forward Attached..."
 msgstr "_Poslať ďalej ako prílohu..."
 
-#: ../src/balsa-index.c:1822
+#: ../src/balsa-index.c:1812
 msgid "Forward _Inline..."
 msgstr "Poslať ďalej _citované..."
 
-#: ../src/balsa-index.c:1824 ../src/main-window.c:623
+#: ../src/balsa-index.c:1814 ../src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "_Presmerovať cez..."
 
-#: ../src/balsa-index.c:1826 ../src/main-window.c:682
+#: ../src/balsa-index.c:1816 ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "_Uložiť adresu..."
 
-#: ../src/balsa-index.c:1841 ../src/filter-edit-dialog.c:223
+#: ../src/balsa-index.c:1831 ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:985 ../src/mailbox-node.c:1001
 #: ../src/pref-manager.c:1513 ../src/pref-manager.c:1602
 #: ../src/pref-manager.c:2649
 msgid "_Delete"
 msgstr "Vy_mazať"
 
-#: ../src/balsa-index.c:1846
+#: ../src/balsa-index.c:1836
 msgid "_Undelete"
 msgstr "O_bnoviť vymazanú"
 
-#: ../src/balsa-index.c:1851
+#: ../src/balsa-index.c:1841
 msgid "Move To _Trash"
 msgstr "Presunúť do _koša"
 
-#: ../src/balsa-index.c:1855
+#: ../src/balsa-index.c:1845
 msgid "T_oggle"
 msgstr "_Označiť"
 
-#: ../src/balsa-index.c:1859 ../src/main-window.c:331 ../src/main-window.c:360
+#: ../src/balsa-index.c:1849 ../src/main-window.c:331 ../src/main-window.c:360
 msgid "_Flagged"
 msgstr "O_značené"
 
-#: ../src/balsa-index.c:1862
+#: ../src/balsa-index.c:1852
 msgid "_Unread"
 msgstr "_Neprečítané"
 
-#: ../src/balsa-index.c:1870
+#: ../src/balsa-index.c:1860
 msgid "_Move to"
 msgstr "_Presunúť do"
 
-#: ../src/balsa-index.c:1878
+#: ../src/balsa-index.c:1868
 msgid "_View Source"
 msgstr "_Zobraziť zdroj"
 
-#: ../src/balsa-index.c:2131
+#: ../src/balsa-index.c:2121
 #, c-format
 msgid "Failed to copy messages to mailbox \"%s\": %s"
 msgstr "Nepodarilo sa skopírovať správy do poštovej schránky \"%s\": %s"
 
-#: ../src/balsa-index.c:2132
+#: ../src/balsa-index.c:2122
 #, c-format
 msgid "Failed to copy message to mailbox \"%s\": %s"
 msgstr "Nepodarilo sa skopírovať správu do poštovej schránky \"%s\": %s"
 
-#: ../src/balsa-index.c:2144
+#: ../src/balsa-index.c:2134
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Skopírované do \"%s\"."
 
-#: ../src/balsa-index.c:2145
+#: ../src/balsa-index.c:2135
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Presunuté do \"%s\"."
 
-#: ../src/balsa-index.c:2264
+#: ../src/balsa-index.c:2254
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Potvrdenie poštovej schránky %s zlyhalo."
 
-#: ../src/balsa-index.c:2437
+#: ../src/balsa-index.c:2427
 msgid "Pipe message through a program"
 msgstr "Presmerovať správu cez program"
 
-#: ../src/balsa-index.c:2440
+#: ../src/balsa-index.c:2430
 msgid "_Run"
 msgstr "_Spustiť"
 
-#: ../src/balsa-index.c:2449
+#: ../src/balsa-index.c:2439
 msgid "Specify the program to run:"
 msgstr "Zadať program, ktorý bude spustený:"
 

@@ -1,3 +1,12 @@
+2005-12-29 20:16  PeterB
+
+	* src/: balsa-app.c, balsa-app.h, save-restore.c, sendmsg-window.c:
+	handle GtkSpell errors; reattach spell-checker when language is
+	changed; spell-checker language persists until spell-checking is
+	disabled.
+	* libbalsa/mailbox_local.c: special-case flags-only view-filter;
+	prepare threading for all messages in the mailbox.
+
 2005-12-28 07:39  PeterB
 
 	* libbalsa/imap-server.c: lock imap-servers before checking for

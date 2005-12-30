@@ -242,24 +242,26 @@ static gboolean message_match_real(LibBalsaMailbox * mailbox, guint msgno,
                                    LibBalsaCondition * cond);
 static LibBalsaMessage *
 libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox,
-                                    GNode **sibling, guint msgno)
+                                    GNode ** sibling, guint msgno)
 {
     LibBalsaMessage *msg = NULL;
     LibBalsaMessageFlag flags;
     LibBalsaMailbox *mbx = LIBBALSA_MAILBOX(mailbox);
-    flags = 
-	LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)->load_message(mailbox,
-								msgno,
+    gboolean match;
+
+    flags =
+        LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox)->load_message(mailbox,
+                                                                msgno,
                                                                 &msg);
 
-    if ( (flags & LIBBALSA_MESSAGE_FLAG_NEW) ) {
-	if(!(flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+    if ((flags & LIBBALSA_MESSAGE_FLAG_NEW)) {
+        if (!(flags & LIBBALSA_MESSAGE_FLAG_DELETED))
             mbx->unread_messages++;
-        if(mbx->first_unread == 0)
+        if (mbx->first_unread == 0)
             mbx->first_unread = msgno;
     }
 
-    if(msg) {
+    if (msg) {
         gchar *id;
         msg->msgno = msgno;
         msg->mailbox = mbx;
@@ -269,9 +271,15 @@ libbalsa_mailbox_local_load_message(LibBalsaMailbox * mailbox,
         }
     }
 
-    if (!mbx->view_filter
-        || message_match_real(mbx, msgno, mbx->view_filter))
-        libbalsa_mailbox_msgno_inserted(mbx, msgno, mbx->msg_tree, sibling);
+    if (!mbx->view_filter)
+        match = TRUE;
+    else if (!libbalsa_condition_is_flag_only(mbx->view_filter,
+                                              mailbox, msgno, &match))
+        match = message_match_real(mailbox, msgno, mbx->view_filter);
+
+    if (match)
+        libbalsa_mailbox_msgno_inserted(mbx, msgno, mbx->msg_tree,
+                                        sibling);
 
     return msg;
 }
@@ -557,7 +565,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         || (*total = info->value.total) == 0
         || *total > libbalsa_mailbox_total_messages(mailbox)) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Bad cache file \"%s\""), filename);
+                             _("Cache file %s will be repaired"),
+                             filename);
         g_free(contents);
         g_free(filename);
         return FALSE;
@@ -570,7 +579,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         if (info->msgno == 0 || info->msgno > *total
             || seen[info->msgno - 1]) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Bad cache file \"%s\""), filename);
+                                 _("Cache file %s will be repaired"),
+                                 filename);
             g_free(seen);
             g_free(contents);
             g_free(filename);
@@ -592,7 +602,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                 if (!parent) {
                     /* We got to the root without finding the parent. */
                     libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                         _("Bad cache file \"%s\""),
+                                         _("Cache file %s will be repaired"),
                                          filename);
                     g_free(seen);
                     g_free(contents);
@@ -1097,7 +1107,8 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
             lbm_local_prepare_msgno(local, *msgnos++);
         while (--len);
     else
-        for (msgno = local->threading_info->len; msgno > 0; --msgno)
+        for (msgno = libbalsa_mailbox_total_messages(mailbox); msgno > 0;
+             --msgno)
             lbm_local_prepare_msgno(local, msgno);
 }
 

@@ -375,7 +375,7 @@ balsa_app_init(void)
 
     /* spell check */
 #if HAVE_GTKSPELL
-    balsa_app.spell_check = FALSE;
+    balsa_app.spell_check_lang = NULL;
 #else                           /* HAVE_GTKSPELL */
     balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
     balsa_app.suggestion_mode = SPELL_CHECK_SUGGEST_NORMAL;

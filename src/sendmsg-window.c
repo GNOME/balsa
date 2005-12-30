@@ -3695,7 +3695,9 @@ create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
         locales_sorted = TRUE;
     }
     /* find the preferred charset... */
-    selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+    selected_pos = find_locale_index_by_locale(balsa_app.spell_check_lang ?
+                                               balsa_app.spell_check_lang :
+                                               setlocale(LC_CTYPE, NULL));
     set_locale(bsmsg, selected_pos);
 
     for(i=0; i<ELEMENTS(locales); i++) {
@@ -4085,7 +4087,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 			 G_CALLBACK(delete_event_cb), bsmsg);
 #if HAVE_GTKSPELL
     balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
-                                    balsa_app.spell_check);
+                                    balsa_app.spell_check_lang != NULL);
 #endif
     return bsmsg;
 }
@@ -5033,13 +5035,39 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
     spell = gtkspell_new_attach(GTK_TEXT_VIEW(bsmsg->text),
                                 bsmsg->locale, &err);
     if (!spell) {
+        gchar *lang;
+        GtkWidget *toolbar =
+            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
+
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error starting spell checker: %s"),
                              err->message);
         g_error_free(err);
+
+        /* No spell checker, so deactivate the button.
+         * First steal the spell-check language. */
+        lang = balsa_app.spell_check_lang;
+        balsa_app.spell_check_lang = NULL;
+        balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
+                                        FALSE);
+        /* Restore balsa_app.spell_check_lang so the spell checker will
+         * be reattached if the user changes the locale. */
+        balsa_app.spell_check_lang = lang;
     }
 }
-#endif
+
+static gboolean
+sw_spell_detach(BalsaSendmsg * bsmsg)
+{
+    GtkSpell *spell;
+
+    spell = gtkspell_get_from_text_view(GTK_TEXT_VIEW(bsmsg->text));
+    if (spell)
+        gtkspell_detach(spell);
+    
+    return spell != NULL;
+}
+#endif                          /* HAVE_GTKSPELL */
 
 static void
 sw_buffer_swap(BalsaSendmsg * bsmsg, gboolean undo)
@@ -5047,20 +5075,17 @@ sw_buffer_swap(BalsaSendmsg * bsmsg, gboolean undo)
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 #if HAVE_GTKSPELL
-    GtkSpell *spell;
+    gboolean had_spell;
+
+    /* GtkSpell doesn't seem to handle setting a new buffer... */
+    had_spell = sw_spell_detach(bsmsg);
 #endif                          /* HAVE_GTKSPELL */
 
     sw_buffer_signals_disconnect(bsmsg);
     g_object_ref(G_OBJECT(buffer));
-#if HAVE_GTKSPELL
-    /* GtkSpell doesn't seem to handle setting a new buffer... */
-    spell = gtkspell_get_from_text_view(GTK_TEXT_VIEW(bsmsg->text));
-    if (spell)
-        gtkspell_detach(spell);
-#endif                          /* HAVE_GTKSPELL */
     gtk_text_view_set_buffer(GTK_TEXT_VIEW(bsmsg->text), bsmsg->buffer2);
 #if HAVE_GTKSPELL
-    if (spell)
+    if (had_spell)
         sw_spell_attach(bsmsg);
 #endif                          /* HAVE_GTKSPELL */
     g_object_unref(bsmsg->buffer2);
@@ -5419,10 +5444,31 @@ init_menus(BalsaSendmsg * bsmsg)
 static gint
 set_locale(BalsaSendmsg * bsmsg, gint idx)
 {
+#if HAVE_GTKSPELL
+    gboolean had_spell;
+
+    had_spell = sw_spell_detach(bsmsg);
+
+#endif                          /* HAVE_GTKSPELL */
     g_free(bsmsg->charset);
     bsmsg->charset = g_strdup(locales[idx].charset);
     sw_prepend_charset(bsmsg, bsmsg->charset);
     bsmsg->locale = locales[idx].locale;
+#if HAVE_GTKSPELL
+
+    if (had_spell) {
+        sw_spell_attach(bsmsg);
+        g_free(balsa_app.spell_check_lang);
+        balsa_app.spell_check_lang = g_strdup(bsmsg->locale);
+    } else {
+        GtkWidget *toolbar =
+            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
+
+        balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
+                                        balsa_app.spell_check_lang != NULL);
+    }
+
+#endif                          /* HAVE_GTKSPELL */
     return FALSE;
 }
 
@@ -5434,18 +5480,14 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
 static void
 spell_check_cb(GtkToggleToolButton * button, BalsaSendmsg * bsmsg)
 {
-    GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
-    GtkSpell *spell = gtkspell_get_from_text_view(text_view);
-    gboolean active = gtk_toggle_tool_button_get_active(button);
+    sw_spell_detach(bsmsg);
+    g_free(balsa_app.spell_check_lang);
 
-    if (active) {
-        if (!spell)
-            sw_spell_attach(bsmsg);
-    } else {
-        if (spell)
-            gtkspell_detach(spell);
-    }
-    balsa_app.spell_check = active;
+    if (gtk_toggle_tool_button_get_active(button)) {
+        sw_spell_attach(bsmsg);
+        balsa_app.spell_check_lang = g_strdup(bsmsg->locale);
+    } else
+        balsa_app.spell_check_lang = NULL;
 }
 #else                           /* HAVE_GTKSPELL */
 /* spell_check_cb

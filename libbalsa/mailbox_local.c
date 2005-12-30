@@ -531,6 +531,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
 {
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
     gchar *filename;
+    gchar *name;
     gchar *contents;
     gsize length;
     GError *err = NULL;
@@ -539,22 +540,30 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     guint8 *seen;
 
     filename = lbm_local_get_cache_filename(local);
+    name = mailbox->name ? g_strdup(mailbox->name) :
+        g_path_get_basename(libbalsa_mailbox_local_get_path(local));
 
     if (!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
         /* No error, but we return FALSE so the caller can grab all the
          * message info needed to rethread from scratch. */
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                             _("Cache file for mailbox %s "
+                               "will be created"), name);
         g_free(filename);
+        g_free(name);
         return FALSE;
     }
 
     if (!g_file_get_contents(filename, &contents, &length, &err)) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Failed to read cache file \"%s\": %s"),
+                             _("Failed to read cache file %s: %s"),
                              filename, err->message);
         g_error_free(err);
         g_free(filename);
+        g_free(name);
         return FALSE;
     }
+    g_free(filename);
 
     info = (LibBalsaMailboxLocalTreeInfo *) contents;
     /* Sanity checks: first the file should have >= 1 record. */
@@ -564,11 +573,11 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         /* Total must be > 0 (no file is created for empty tree). */
         || (*total = info->value.total) == 0
         || *total > libbalsa_mailbox_total_messages(mailbox)) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Cache file %s will be repaired"),
-                             filename);
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                             _("Cache file for mailbox %s "
+                               "will be repaired"), name);
         g_free(contents);
-        g_free(filename);
+        g_free(name);
         return FALSE;
     }
 
@@ -578,12 +587,12 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     while (++info < (LibBalsaMailboxLocalTreeInfo *) (contents + length)) {
         if (info->msgno == 0 || info->msgno > *total
             || seen[info->msgno - 1]) {
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Cache file %s will be repaired"),
-                                 filename);
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                                 _("Cache file for mailbox %s "
+                                   "will be repaired"), name);
             g_free(seen);
             g_free(contents);
-            g_free(filename);
+            g_free(name);
             return FALSE;
         }
         seen[info->msgno - 1] = TRUE;
@@ -601,12 +610,12 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                 parent = parent->parent;
                 if (!parent) {
                     /* We got to the root without finding the parent. */
-                    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                         _("Cache file %s will be repaired"),
-                                         filename);
+                    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                                         _("Cache file for mailbox %s "
+                                           "will be repaired"), name);
                     g_free(seen);
                     g_free(contents);
-                    g_free(filename);
+                    g_free(name);
                     return FALSE;
                 }
             }
@@ -621,7 +630,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
 
     g_free(seen);
     g_free(contents);
-    g_free(filename);
+    g_free(name);
 
     return TRUE;
 }

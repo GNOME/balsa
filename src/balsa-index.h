@@ -57,7 +57,6 @@ extern "C" {
         GtkWidget *move_to_item;
 
         BalsaMailboxNode* mailbox_node;
-        LibBalsaMessage* first_new_message;
         LibBalsaMessage* current_message;
 	gboolean current_message_is_deleted;
         gboolean prev_message;

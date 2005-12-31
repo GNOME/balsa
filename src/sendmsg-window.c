@@ -129,11 +129,16 @@ static gboolean bsmsg_check_format_compatibility(GtkWindow *parent,
                                                  const char *filename);
 #endif /* ENABLE_TOUCH_UI */
 
+#if !HAVE_GTKSPELL
 static void spell_check_cb(GtkToggleToolButton * button,
                            BalsaSendmsg * bsmsg);
-#if !HAVE_GTKSPELL
 static void sw_spell_check_response(BalsaSpellCheck * spell_check,
                                     gint response, BalsaSendmsg * bsmsg);
+#else
+static void spell_check_menu_cb(GtkCheckMenuItem * item,
+				BalsaSendmsg * bsmsg);
+static void spell_check_tb_cb(GtkToggleToolButton * button,
+			      BalsaSendmsg * bsmsg);
 #endif                          /* HAVE_GTKSPELL */
 
 static void address_book_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
@@ -384,10 +389,9 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SPELL_CHECK EDIT_MENU_QUOTE + 2
 #if HAVE_GTKSPELL
-    GNOMEUIINFO_ITEM_STOCK(N_("Toggle Spell C_hecker"), 
+    GNOMEUIINFO_TOGGLEITEM(N_("C_heck spelling"), 
                            N_("Check the spelling of the message"),
-                           spell_check_cb,
-                           GTK_STOCK_SPELL_CHECK),
+                           spell_check_menu_cb, NULL),
 #else                           /* HAVE_GTKSPELL */
     GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
                            N_("Check the spelling of the message"),
@@ -3730,7 +3734,7 @@ static const struct callback_item {
     {GTK_STOCK_SAVE,           BALSA_TOOLBAR_FUNC(save_message_cb)},
     {BALSA_PIXMAP_SEND,        BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
     {GTK_STOCK_CLOSE,          BALSA_TOOLBAR_FUNC(close_window_cb)},
-    {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_cb)},
+    {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_tb_cb)},
 #ifdef HAVE_GPGME
     {BALSA_PIXMAP_GPG_SIGN,    BALSA_TOOLBAR_FUNC(toggle_sign_tb_cb)},
     {BALSA_PIXMAP_GPG_ENCRYPT, BALSA_TOOLBAR_FUNC(toggle_encrypt_tb_cb)},
@@ -3950,6 +3954,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         guess_identity(bsmsg);
 #ifdef HAVE_GPGME
     bsmsg_setup_gpg_ui(bsmsg, toolbar);
+#endif
+#if HAVE_GTKSPELL
+    bsmsg->spell_check_menu_item = edit_menu[EDIT_MENU_SPELL_CHECK].widget;
 #endif
 
     /* create the top portion with the to, from, etc in it */
@@ -5478,17 +5485,34 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
  * Toggle the spell checker
  * */
 static void
-spell_check_cb(GtkToggleToolButton * button, BalsaSendmsg * bsmsg)
+spell_check_menu_cb(GtkCheckMenuItem * item, BalsaSendmsg * bsmsg)
 {
+    gboolean is_active = gtk_check_menu_item_get_active(item);
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
+
+    balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
+                                    is_active);
+
     sw_spell_detach(bsmsg);
     g_free(balsa_app.spell_check_lang);
 
-    if (gtk_toggle_tool_button_get_active(button)) {
+    if (is_active) {
         sw_spell_attach(bsmsg);
         balsa_app.spell_check_lang = g_strdup(bsmsg->locale);
     } else
         balsa_app.spell_check_lang = NULL;
 }
+
+static void
+spell_check_tb_cb(GtkToggleToolButton * button, BalsaSendmsg * bsmsg)
+{
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                   (bsmsg->spell_check_menu_item),
+                                   gtk_toggle_tool_button_get_active
+                                   (button));
+}
+
 #else                           /* HAVE_GTKSPELL */
 /* spell_check_cb
  * 

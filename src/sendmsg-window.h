@@ -65,6 +65,8 @@ extern "C" {
 	GtkWidget *text;
 #if !HAVE_GTKSPELL
 	GtkWidget *spell_checker;
+#else
+	GtkWidget *spell_check_menu_item;
 #endif                          /* HAVE_GTKSPELL */
 	GtkWidget *notebook;
 	LibBalsaMessage *parent_message; /* to which we're replying     */

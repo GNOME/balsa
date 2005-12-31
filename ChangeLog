@@ -1,3 +1,9 @@
+2005-12-31 09:27  PeterB
+
+	* libbalsa/mailbox_local.c: set first-unread when restoring the
+	tree.
+	* src/balsa-index.h: deadwood.
+
 2005-12-31 08:01  Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/: sendmsg-window.c, sendmsg-window.h: keep spell-check

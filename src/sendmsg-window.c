@@ -3734,7 +3734,11 @@ static const struct callback_item {
     {GTK_STOCK_SAVE,           BALSA_TOOLBAR_FUNC(save_message_cb)},
     {BALSA_PIXMAP_SEND,        BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
     {GTK_STOCK_CLOSE,          BALSA_TOOLBAR_FUNC(close_window_cb)},
+#if HAVE_GTKSPELL
     {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_tb_cb)},
+#else
+    {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_cb)},
+#endif
 #ifdef HAVE_GPGME
     {BALSA_PIXMAP_GPG_SIGN,    BALSA_TOOLBAR_FUNC(toggle_sign_tb_cb)},
     {BALSA_PIXMAP_GPG_ENCRYPT, BALSA_TOOLBAR_FUNC(toggle_encrypt_tb_cb)},

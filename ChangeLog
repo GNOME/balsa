@@ -1,3 +1,9 @@
+2006-01-01  Carlos Morgado  <chbm gnome.org>
+
+	* src/sendmsg-window.c, src/balsa-app.h:
+	fix build without GTKSPELL
+	(first commit!!)
+
 2005-12-31 09:27  PeterB
 
 	* libbalsa/mailbox_local.c: set first-unread when restoring the

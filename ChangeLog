@@ -1,3 +1,7 @@
+2006-01-01 14:10  PeterB
+
+	* src/: balsa-app.h, sendmsg-window.c: build without GTKSPELL.
+
 2006-01-01  Carlos Morgado  <chbm gnome.org>
 
 	* src/sendmsg-window.c, src/balsa-app.h:

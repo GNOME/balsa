@@ -3699,9 +3699,13 @@ create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
         locales_sorted = TRUE;
     }
     /* find the preferred charset... */
+#if HAVE_GTKSPELL
     selected_pos = find_locale_index_by_locale(balsa_app.spell_check_lang ?
                                                balsa_app.spell_check_lang :
                                                setlocale(LC_CTYPE, NULL));
+#else                           /* HAVE_GTKSPELL */
+    selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+#endif                          /* HAVE_GTKSPELL */
     set_locale(bsmsg, selected_pos);
 
     for(i=0; i<ELEMENTS(locales); i++) {
@@ -3736,9 +3740,9 @@ static const struct callback_item {
     {GTK_STOCK_CLOSE,          BALSA_TOOLBAR_FUNC(close_window_cb)},
 #if HAVE_GTKSPELL
     {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_tb_cb)},
-#else
+#else                           /* HAVE_GTKSPELL */
     {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_cb)},
-#endif
+#endif                          /* HAVE_GTKSPELL */
 #ifdef HAVE_GPGME
     {BALSA_PIXMAP_GPG_SIGN,    BALSA_TOOLBAR_FUNC(toggle_sign_tb_cb)},
     {BALSA_PIXMAP_GPG_ENCRYPT, BALSA_TOOLBAR_FUNC(toggle_encrypt_tb_cb)},
@@ -5484,10 +5488,10 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
 }
 
 #if HAVE_GTKSPELL
-/* spell_check_cb
- * 
+/* spell_check_menu_cb, spell_check_tb_cb
+ *
  * Toggle the spell checker
- * */
+ */
 static void
 spell_check_menu_cb(GtkCheckMenuItem * item, BalsaSendmsg * bsmsg)
 {

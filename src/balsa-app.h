@@ -361,8 +361,8 @@ extern struct BalsaApplication {
     LibBalsaAddressBook *default_address_book;
 
     /* spell checking */
-    gchar *spell_check_lang;
 #if HAVE_GTKSPELL
+    gchar *spell_check_lang;
 #else                           /* HAVE_GTKSPELL */
     SpellCheckModule module;
     SpellCheckSuggestMode suggestion_mode;

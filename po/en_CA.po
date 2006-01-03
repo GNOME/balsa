@@ -1,14 +1,14 @@
 # Canadian English translation for balsa
-# Copyright (C) 2004-2005 Adam Weinberger and the GNOME Foundation
+# Copyright (C) 2004-2006 Adam Weinberger and the GNOME Foundation
 # This file is distributed under the same licence as the balsa package.
-# Adam Weinberger <adamw@gnome.org>, 2004, 2005.
+# Adam Weinberger <adamw@gnome.org>, 2004, 2005, 2006.
 #
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-30 17:44-0500\n"
+"POT-Creation-Date: 2006-01-02 21:40-0500\n"
 "PO-Revision-Date: 2005-09-06 16:41-0400\n"
 "Last-Translator: Adam Weinberger <adamw@gnome.org>\n"
 "Language-Team: Canadian English <adamw@gnome.org>\n"
@@ -72,7 +72,7 @@ msgid "Cannot find address in address book"
 msgstr "Cannot find address in address book"
 
 #: ../libbalsa/address-book.c:310 ../src/main-window.c:2308
-#: ../src/main-window.c:4349 ../src/sendmsg-window.c:4896
+#: ../src/main-window.c:4349 ../src/sendmsg-window.c:4911
 msgid "Unknown error"
 msgstr "Unknown error"
 
@@ -100,7 +100,7 @@ msgstr "O_rganization:"
 msgid "_Email Address:"
 msgstr "_Email Address:"
 
-#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1595
+#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1599
 #: ../libbalsa/message.c:855
 msgid "(No subject)"
 msgstr "(No subject)"
@@ -131,7 +131,7 @@ msgstr "Attempt to apply an invalid filter"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Invalid filters %s for mailbox %s"
 
-#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:759
+#: ../libbalsa/filter.c:132 ../libbalsa/mailbox_local.c:763
 msgid "Unable to load message body to match filter"
 msgstr "Unable to load message body to match filter"
 
@@ -268,14 +268,14 @@ msgid "%s: insufficient validity for uid %s"
 msgstr "%s: insufficient validity for UID %s"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1714
-#: ../libbalsa/mailbox_local.c:1716 ../src/sendmsg-window.c:3405
-#: ../src/sendmsg-window.c:3406
+#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1718
+#: ../libbalsa/mailbox_local.c:1720 ../src/sendmsg-window.c:3409
+#: ../src/sendmsg-window.c:3410
 msgid "Re:"
 msgstr "Re:"
 
-#: ../libbalsa/identity.c:103 ../src/sendmsg-window.c:3436
-#: ../src/sendmsg-window.c:3437
+#: ../libbalsa/identity.c:103 ../src/sendmsg-window.c:3440
+#: ../src/sendmsg-window.c:3441
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -668,12 +668,12 @@ msgstr "Failed to read cache file %s: %s"
 msgid "Cache file for mailbox %s will be repaired"
 msgstr "Cache file for mailbox %s will be repaired"
 
-#: ../libbalsa/mailbox_local.c:1875
+#: ../libbalsa/mailbox_local.c:1879
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Open of %s failed. Errno = %d, "
 
-#: ../libbalsa/mailbox_local.c:1897
+#: ../libbalsa/mailbox_local.c:1901
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Failed to sync mailbox \"%s\""
@@ -2057,7 +2057,7 @@ msgid "Date"
 msgstr "Date"
 
 #: ../src/balsa-index.c:406 ../src/pref-manager.c:378
-#: ../src/sendmsg-window.c:2874
+#: ../src/sendmsg-window.c:2878
 msgid "Size"
 msgstr "Size"
 
@@ -2540,7 +2540,7 @@ msgstr "_Body"
 
 #. To:
 #: ../src/filter-edit-callbacks.c:911 ../src/main-window.c:3909
-#: ../src/sendmsg-window.c:2761
+#: ../src/sendmsg-window.c:2765
 msgid "_To:"
 msgstr "_To:"
 
@@ -3524,7 +3524,7 @@ msgid "Send and Receive messages"
 msgstr "Send and Receive messages"
 
 #: ../src/main-window.c:461 ../src/main-window.c:882
-#: ../src/sendmsg-window.c:339 ../src/sendmsg-window.c:507
+#: ../src/sendmsg-window.c:344 ../src/sendmsg-window.c:511
 msgid "_Print..."
 msgstr "_Print..."
 
@@ -3603,7 +3603,7 @@ msgid "_Wrap"
 msgstr "_Wrap"
 
 #: ../src/main-window.c:536 ../src/main-window.c:952
-#: ../src/sendmsg-window.c:368 ../src/sendmsg-window.c:532
+#: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:536
 msgid "Wrap message lines"
 msgstr "Wrap message lines"
 
@@ -3961,8 +3961,8 @@ msgid "Enable quick message index filter"
 msgstr "Enable quick message index filter"
 
 #: ../src/main-window.c:1008 ../src/main-window.c:1082
-#: ../src/sendmsg-window.c:509 ../src/sendmsg-window.c:567
-#: ../src/sendmsg-window.c:631
+#: ../src/sendmsg-window.c:513 ../src/sendmsg-window.c:571
+#: ../src/sendmsg-window.c:635
 msgid "_More"
 msgstr "_More"
 
@@ -3996,7 +3996,7 @@ msgstr "_Select Filters"
 msgid "_Filters"
 msgstr "_Filters"
 
-#: ../src/main-window.c:1124 ../src/sendmsg-window.c:647
+#: ../src/main-window.c:1124 ../src/sendmsg-window.c:651
 msgid "_Tools"
 msgstr "_Tools"
 
@@ -4387,7 +4387,7 @@ msgid "Se_nd message to obtain this part"
 msgstr "Se_nd message to obtain this part"
 
 #: ../src/balsa-mime-widget-message.c:300 ../src/balsa-mime-widget-text.c:568
-#: ../src/balsa-mime-widget-text.c:693 ../src/sendmsg-window.c:1705
+#: ../src/balsa-mime-widget-text.c:693 ../src/sendmsg-window.c:1709
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Error showing %s: %s\n"
@@ -4398,42 +4398,42 @@ msgid "Could not get a part: %s"
 msgstr "Could not get a part: %s"
 
 #: ../src/balsa-mime-widget-message.c:601 ../src/print.c:350
-#: ../src/sendmsg-window.c:1050 ../src/sendmsg-window.c:3218
+#: ../src/sendmsg-window.c:1054 ../src/sendmsg-window.c:3222
 msgid "Subject:"
 msgstr "Subject:"
 
 #: ../src/balsa-mime-widget-message.c:605 ../src/print.c:356
-#: ../src/sendmsg-window.c:3212
+#: ../src/sendmsg-window.c:3216
 msgid "Date:"
 msgstr "Date:"
 
 #: ../src/balsa-mime-widget-message.c:611 ../src/print.c:361
-#: ../src/sendmsg-window.c:3225 ../src/store-address.c:305
+#: ../src/sendmsg-window.c:3229 ../src/store-address.c:305
 msgid "From:"
 msgstr "From:"
 
 #. Cannot edit the new "From:" header.
 #. { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
-#: ../src/balsa-mime-widget-message.c:618 ../src/sendmsg-window.c:1047
+#: ../src/balsa-mime-widget-message.c:618 ../src/sendmsg-window.c:1051
 msgid "Reply-To:"
 msgstr "Reply-To:"
 
 #: ../src/balsa-mime-widget-message.c:621 ../src/print.c:365
-#: ../src/sendmsg-window.c:1044 ../src/sendmsg-window.c:3233
+#: ../src/sendmsg-window.c:1048 ../src/sendmsg-window.c:3237
 #: ../src/store-address.c:306
 msgid "To:"
 msgstr "To:"
 
 #. cc:
 #: ../src/balsa-mime-widget-message.c:622 ../src/print.c:366
-#: ../src/sendmsg-window.c:1049 ../src/sendmsg-window.c:2772
-#: ../src/sendmsg-window.c:3241 ../src/store-address.c:307
+#: ../src/sendmsg-window.c:1053 ../src/sendmsg-window.c:2776
+#: ../src/sendmsg-window.c:3245 ../src/store-address.c:307
 msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
 #: ../src/balsa-mime-widget-message.c:623 ../src/print.c:367
-#: ../src/sendmsg-window.c:1048 ../src/sendmsg-window.c:2777
+#: ../src/sendmsg-window.c:1052 ../src/sendmsg-window.c:2781
 #: ../src/store-address.c:308
 msgid "Bcc:"
 msgstr "Bcc:"
@@ -4572,7 +4572,7 @@ msgid "Remote Mailbox Servers"
 msgstr "Remote Mailbox Servers"
 
 #: ../src/pref-manager.c:1491 ../src/pref-manager.c:2616
-#: ../src/sendmsg-window.c:2856
+#: ../src/sendmsg-window.c:2860
 msgid "Type"
 msgstr "Type"
 
@@ -4648,7 +4648,7 @@ msgstr "_POP message size limit:"
 msgid "Quoted and Flowed Text"
 msgstr "Quoted and Flowed Text"
 
-#: ../src/pref-manager.c:1720 ../src/sendmsg-window.c:5197
+#: ../src/pref-manager.c:1720 ../src/sendmsg-window.c:5212
 msgid "Quoted Text Regular Expression"
 msgstr "Quoted Text Regular Expression"
 
@@ -5184,333 +5184,337 @@ msgstr "Error opening GConf database\n"
 msgid "Error setting GConf field: %s\n"
 msgstr "Error setting GConf field: %s\n"
 
-#: ../src/sendmsg-window.c:219
+#: ../src/sendmsg-window.c:224
 msgid "_Brazilian"
 msgstr "_Brazilian"
 
-#: ../src/sendmsg-window.c:220
+#: ../src/sendmsg-window.c:225
 msgid "_Catalan"
 msgstr "_Catalan"
 
-#: ../src/sendmsg-window.c:221
+#: ../src/sendmsg-window.c:226
 msgid "_Chinese Simplified"
 msgstr "_Chinese Simplified"
 
-#: ../src/sendmsg-window.c:222
+#: ../src/sendmsg-window.c:227
 msgid "_Chinese Traditional"
 msgstr "_Chinese Traditional"
 
-#: ../src/sendmsg-window.c:223
+#: ../src/sendmsg-window.c:228
 msgid "_Czech"
 msgstr "_Czech"
 
-#: ../src/sendmsg-window.c:224
+#: ../src/sendmsg-window.c:229
 msgid "_Danish"
 msgstr "_Danish"
 
-#: ../src/sendmsg-window.c:225
+#: ../src/sendmsg-window.c:230
 msgid "_Dutch"
 msgstr "_Dutch"
 
-#: ../src/sendmsg-window.c:226
+#: ../src/sendmsg-window.c:231
 msgid "_English (American)"
 msgstr "_English (American)"
 
-#: ../src/sendmsg-window.c:227
+#: ../src/sendmsg-window.c:232
 msgid "_English (British)"
 msgstr "_English (British)"
 
-#: ../src/sendmsg-window.c:228
+#: ../src/sendmsg-window.c:233
 msgid "_Esperanto"
 msgstr "_Esperanto"
 
-#: ../src/sendmsg-window.c:229
+#: ../src/sendmsg-window.c:234
 msgid "_Estonian"
 msgstr "_Estonian"
 
-#: ../src/sendmsg-window.c:230
+#: ../src/sendmsg-window.c:235
 msgid "_Finnish"
 msgstr "_Finnish"
 
-#: ../src/sendmsg-window.c:231
+#: ../src/sendmsg-window.c:236
 msgid "_French"
 msgstr "_French"
 
-#: ../src/sendmsg-window.c:232
+#: ../src/sendmsg-window.c:237
 msgid "_German"
 msgstr "_German"
 
-#: ../src/sendmsg-window.c:233
+#: ../src/sendmsg-window.c:238
 msgid "_Greek"
 msgstr "_Greek"
 
-#: ../src/sendmsg-window.c:234
+#: ../src/sendmsg-window.c:239
 msgid "_Hebrew"
 msgstr "_Hebrew"
 
-#: ../src/sendmsg-window.c:235
+#: ../src/sendmsg-window.c:240
 msgid "_Hungarian"
 msgstr "_Hungarian"
 
-#: ../src/sendmsg-window.c:236
+#: ../src/sendmsg-window.c:241
 msgid "_Italian"
 msgstr "_Italian"
 
-#: ../src/sendmsg-window.c:237
+#: ../src/sendmsg-window.c:242
 msgid "_Japanese (JIS)"
 msgstr "_Japanese (JIS)"
 
-#: ../src/sendmsg-window.c:238
+#: ../src/sendmsg-window.c:243
 msgid "_Korean"
 msgstr "_Korean"
 
-#: ../src/sendmsg-window.c:239
+#: ../src/sendmsg-window.c:244
 msgid "_Latvian"
 msgstr "_Latvian"
 
-#: ../src/sendmsg-window.c:240
+#: ../src/sendmsg-window.c:245
 msgid "_Lithuanian"
 msgstr "_Lithuanian"
 
-#: ../src/sendmsg-window.c:241
+#: ../src/sendmsg-window.c:246
 msgid "_Norwegian"
 msgstr "_Norwegian"
 
-#: ../src/sendmsg-window.c:242
+#: ../src/sendmsg-window.c:247
 msgid "_Polish"
 msgstr "_Polish"
 
-#: ../src/sendmsg-window.c:243
+#: ../src/sendmsg-window.c:248
 msgid "_Portugese"
 msgstr "_Portugese"
 
-#: ../src/sendmsg-window.c:244
+#: ../src/sendmsg-window.c:249
 msgid "_Romanian"
 msgstr "_Romanian"
 
-#: ../src/sendmsg-window.c:245
+#: ../src/sendmsg-window.c:250
 msgid "_Russian (ISO)"
 msgstr "_Russian (ISO)"
 
-#: ../src/sendmsg-window.c:246
+#: ../src/sendmsg-window.c:251
 msgid "_Russian (KOI)"
 msgstr "_Russian (KOI)"
 
-#: ../src/sendmsg-window.c:247
+#: ../src/sendmsg-window.c:252
 msgid "_Serbian"
 msgstr "_Serbian"
 
-#: ../src/sendmsg-window.c:248
+#: ../src/sendmsg-window.c:253
 msgid "_Serbian (Latin)"
 msgstr "_Serbian (Latin)"
 
-#: ../src/sendmsg-window.c:249
+#: ../src/sendmsg-window.c:254
 msgid "_Slovak"
 msgstr "_Slovak"
 
-#: ../src/sendmsg-window.c:250
+#: ../src/sendmsg-window.c:255
 msgid "_Spanish"
 msgstr "_Spanish"
 
-#: ../src/sendmsg-window.c:251
+#: ../src/sendmsg-window.c:256
 msgid "_Swedish"
 msgstr "_Swedish"
 
-#: ../src/sendmsg-window.c:252
+#: ../src/sendmsg-window.c:257
 msgid "_Turkish"
 msgstr "_Turkish"
 
-#: ../src/sendmsg-window.c:253
+#: ../src/sendmsg-window.c:258
 msgid "_Ukrainian"
 msgstr "_Ukrainian"
 
-#: ../src/sendmsg-window.c:254
+#: ../src/sendmsg-window.c:259
 msgid "_Generic UTF-8"
 msgstr "_Generic UTF-8"
 
-#: ../src/sendmsg-window.c:278
+#: ../src/sendmsg-window.c:283
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG uses MIME mode"
 
-#: ../src/sendmsg-window.c:284
+#: ../src/sendmsg-window.c:289
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG uses old OpenPGP mode"
 
-#: ../src/sendmsg-window.c:291
+#: ../src/sendmsg-window.c:296
 msgid "_S/MIME mode (GpgSM)"
 msgstr "_S/MIME mode (GpgSM)"
 
-#: ../src/sendmsg-window.c:306 ../src/sendmsg-window.c:485
+#: ../src/sendmsg-window.c:311 ../src/sendmsg-window.c:489
 msgid "_Include File..."
 msgstr "_Include File..."
 
-#: ../src/sendmsg-window.c:309 ../src/sendmsg-window.c:498
+#: ../src/sendmsg-window.c:314 ../src/sendmsg-window.c:502
 msgid "_Attach File..."
 msgstr "_Attach File..."
 
-#: ../src/sendmsg-window.c:312 ../src/sendmsg-window.c:487
+#: ../src/sendmsg-window.c:317 ../src/sendmsg-window.c:491
 msgid "I_nclude Message(s)"
 msgstr "I_nclude Message(s)"
 
-#: ../src/sendmsg-window.c:315 ../src/sendmsg-window.c:490
+#: ../src/sendmsg-window.c:320 ../src/sendmsg-window.c:494
 msgid "Attach _Message(s)"
 msgstr "Attach _Message(s)"
 
-#: ../src/sendmsg-window.c:321 ../src/sendmsg-window.c:515
+#: ../src/sendmsg-window.c:326 ../src/sendmsg-window.c:519
 msgid "Sen_d"
 msgstr "Sen_d"
 
-#: ../src/sendmsg-window.c:322 ../src/sendmsg-window.c:516
+#: ../src/sendmsg-window.c:327 ../src/sendmsg-window.c:520
 #: ../src/toolbar-factory.c:111
 msgid "Send this message"
 msgstr "Send this message"
 
-#: ../src/sendmsg-window.c:326
+#: ../src/sendmsg-window.c:331
 msgid "_Queue"
 msgstr "_Queue"
 
-#: ../src/sendmsg-window.c:327 ../src/sendmsg-window.c:521
+#: ../src/sendmsg-window.c:332 ../src/sendmsg-window.c:525
 msgid "Queue this message in Outbox for sending"
 msgstr "Queue this message in Outbox for sending"
 
-#: ../src/sendmsg-window.c:331
+#: ../src/sendmsg-window.c:336
 msgid "_Postpone"
 msgstr "_Postpone"
 
-#: ../src/sendmsg-window.c:334 ../src/sendmsg-window.c:502
+#: ../src/sendmsg-window.c:339 ../src/sendmsg-window.c:506
 msgid "_Save"
 msgstr "_Save"
 
-#: ../src/sendmsg-window.c:335 ../src/sendmsg-window.c:503
+#: ../src/sendmsg-window.c:340 ../src/sendmsg-window.c:507
 msgid "Save this message"
 msgstr "Save this message"
 
-#: ../src/sendmsg-window.c:339 ../src/sendmsg-window.c:507
+#: ../src/sendmsg-window.c:344 ../src/sendmsg-window.c:511
 msgid "Print the edited message"
 msgstr "Print the edited message"
 
-#: ../src/sendmsg-window.c:368 ../src/sendmsg-window.c:532
+#: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:536
 msgid "_Wrap Body"
 msgstr "_Wrap Body"
 
-#: ../src/sendmsg-window.c:372 ../src/sendmsg-window.c:536
+#: ../src/sendmsg-window.c:377 ../src/sendmsg-window.c:540
 msgid "_Reflow Selected Text"
 msgstr "_Reflow Selected Text"
 
-#: ../src/sendmsg-window.c:377 ../src/sendmsg-window.c:564
+#: ../src/sendmsg-window.c:382 ../src/sendmsg-window.c:568
 msgid "Insert Si_gnature"
 msgstr "Insert Si_gnature"
 
-#: ../src/sendmsg-window.c:381 ../src/sendmsg-window.c:540
+#: ../src/sendmsg-window.c:386 ../src/sendmsg-window.c:544
 msgid "_Quote Message(s)"
 msgstr "_Quote Message(s)"
 
-#: ../src/sendmsg-window.c:387 ../src/sendmsg-window.c:614
-msgid "Toggle Spell C_hecker"
-msgstr "Toggle Spell C_hecker"
+#: ../src/sendmsg-window.c:392
+msgid "C_heck spelling"
+msgstr "C_heck spelling"
 
-#: ../src/sendmsg-window.c:388 ../src/sendmsg-window.c:393
-#: ../src/sendmsg-window.c:618
+#: ../src/sendmsg-window.c:393 ../src/sendmsg-window.c:397
+#: ../src/sendmsg-window.c:622
 msgid "Check the spelling of the message"
 msgstr "Check the spelling of the message"
 
-#: ../src/sendmsg-window.c:392 ../src/sendmsg-window.c:616
+#: ../src/sendmsg-window.c:396 ../src/sendmsg-window.c:620
 msgid "C_heck Spelling"
 msgstr "C_heck Spelling"
 
-#: ../src/sendmsg-window.c:399 ../src/sendmsg-window.c:624
+#: ../src/sendmsg-window.c:403 ../src/sendmsg-window.c:628
 msgid "Select _Identity..."
 msgstr "Select _Identity..."
 
-#: ../src/sendmsg-window.c:400 ../src/sendmsg-window.c:625
+#: ../src/sendmsg-window.c:404 ../src/sendmsg-window.c:629
 msgid "Select the Identity to use for the message"
 msgstr "Select the Identity to use for the message"
 
-#: ../src/sendmsg-window.c:405
+#: ../src/sendmsg-window.c:409
 msgid "_Edit with Gnome-Editor"
 msgstr "_Edit with Gnome-Editor"
 
-#: ../src/sendmsg-window.c:406
+#: ../src/sendmsg-window.c:410
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Edit the current message with the default Gnome editor"
 
-#: ../src/sendmsg-window.c:418 ../src/sendmsg-window.c:577
+#: ../src/sendmsg-window.c:422 ../src/sendmsg-window.c:581
 msgid "Fr_om"
 msgstr "Fr_om"
 
-#: ../src/sendmsg-window.c:420 ../src/sendmsg-window.c:579
+#: ../src/sendmsg-window.c:424 ../src/sendmsg-window.c:583
 msgid "_Cc"
 msgstr "_Cc"
 
-#: ../src/sendmsg-window.c:422 ../src/sendmsg-window.c:581
+#: ../src/sendmsg-window.c:426 ../src/sendmsg-window.c:585
 msgid "_Bcc"
 msgstr "_Bcc"
 
-#: ../src/sendmsg-window.c:424 ../src/sendmsg-window.c:583
+#: ../src/sendmsg-window.c:428 ../src/sendmsg-window.c:587
 msgid "_Fcc"
 msgstr "_Fcc"
 
-#: ../src/sendmsg-window.c:426
+#: ../src/sendmsg-window.c:430
 msgid "_Reply To"
 msgstr "_Reply To"
 
-#: ../src/sendmsg-window.c:432 ../src/sendmsg-window.c:629
+#: ../src/sendmsg-window.c:436 ../src/sendmsg-window.c:633
 msgid "_Request Disposition Notification"
 msgstr "_Request Disposition Notification"
 
-#: ../src/sendmsg-window.c:435 ../src/sendmsg-window.c:595
+#: ../src/sendmsg-window.c:439 ../src/sendmsg-window.c:599
 msgid "_Format = Flowed"
 msgstr "_Format = Flowed"
 
-#: ../src/sendmsg-window.c:440 ../src/sendmsg-window.c:600
+#: ../src/sendmsg-window.c:444 ../src/sendmsg-window.c:604
 msgid "_Sign Message"
 msgstr "_Sign Message"
 
-#: ../src/sendmsg-window.c:441 ../src/sendmsg-window.c:601
+#: ../src/sendmsg-window.c:445 ../src/sendmsg-window.c:605
 msgid "signs the message using GnuPG"
 msgstr "signs the message using GnuPG"
 
-#: ../src/sendmsg-window.c:444 ../src/sendmsg-window.c:604
+#: ../src/sendmsg-window.c:448 ../src/sendmsg-window.c:608
 msgid "_Encrypt Message"
 msgstr "_Encrypt Message"
 
-#: ../src/sendmsg-window.c:445 ../src/sendmsg-window.c:605
+#: ../src/sendmsg-window.c:449 ../src/sendmsg-window.c:609
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "signs the message using GnuPG for all To: and CC: recipients"
 
-#: ../src/sendmsg-window.c:465 ../src/sendmsg-window.c:645
+#: ../src/sendmsg-window.c:469 ../src/sendmsg-window.c:649
 msgid "_Show"
 msgstr "_Show"
 
-#: ../src/sendmsg-window.c:467 ../src/sendmsg-window.c:622
+#: ../src/sendmsg-window.c:471 ../src/sendmsg-window.c:626
 msgid "_Language"
 msgstr "_Language"
 
-#: ../src/sendmsg-window.c:469
+#: ../src/sendmsg-window.c:473
 msgid "_Options"
 msgstr "_Options"
 
-#: ../src/sendmsg-window.c:511
+#: ../src/sendmsg-window.c:515
 msgid "Sa_ve and Close"
 msgstr "Sa_ve and Close"
 
-#: ../src/sendmsg-window.c:520
+#: ../src/sendmsg-window.c:524
 msgid "Send _Later"
 msgstr "Send _Later"
 
-#: ../src/sendmsg-window.c:675
+#: ../src/sendmsg-window.c:618
+msgid "Toggle Spell C_hecker"
+msgstr "Toggle Spell C_hecker"
+
+#: ../src/sendmsg-window.c:679
 msgid "Attachment"
 msgstr "Attachment"
 
-#: ../src/sendmsg-window.c:675
+#: ../src/sendmsg-window.c:679
 msgid "Inline"
 msgstr "Inline"
 
-#: ../src/sendmsg-window.c:675
+#: ../src/sendmsg-window.c:679
 msgid "Reference"
 msgstr "Reference"
 
-#: ../src/sendmsg-window.c:890
+#: ../src/sendmsg-window.c:894
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -5519,15 +5523,15 @@ msgstr ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 
-#: ../src/sendmsg-window.c:1190
+#: ../src/sendmsg-window.c:1194
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr "Gnome editor is not defined in your preferred applications."
 
-#: ../src/sendmsg-window.c:1241
+#: ../src/sendmsg-window.c:1245
 msgid "Select Identity"
 msgstr "Select Identity"
 
-#: ../src/sendmsg-window.c:1620
+#: ../src/sendmsg-window.c:1624
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5542,15 +5546,15 @@ msgstr ""
 "\n"
 "Do you really want to attach this file as reference?"
 
-#: ../src/sendmsg-window.c:1631
+#: ../src/sendmsg-window.c:1635
 msgid "Attach as Reference?"
 msgstr "Attach as Reference?"
 
-#: ../src/sendmsg-window.c:1744
+#: ../src/sendmsg-window.c:1748
 msgid "Choose charset"
 msgstr "Choose charset"
 
-#: ../src/sendmsg-window.c:1751
+#: ../src/sendmsg-window.c:1755
 #, c-format
 msgid ""
 "File\n"
@@ -5563,66 +5567,66 @@ msgstr ""
 "is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
 
-#: ../src/sendmsg-window.c:1767
+#: ../src/sendmsg-window.c:1771
 msgid "Attach as MIME type:"
 msgstr "Attach as MIME type:"
 
-#: ../src/sendmsg-window.c:1823
+#: ../src/sendmsg-window.c:1827
 #, c-format
 msgid "Character set for file %s changed from \"%s\" to \"%s\"."
 msgstr "Character set for file %s changed from \"%s\" to \"%s\"."
 
-#: ../src/sendmsg-window.c:1866
+#: ../src/sendmsg-window.c:1870
 msgid "(no subject)"
 msgstr "(no subject)"
 
-#: ../src/sendmsg-window.c:1952
+#: ../src/sendmsg-window.c:1956
 msgid "forwarded message"
 msgstr "forwarded message"
 
-#: ../src/sendmsg-window.c:1957
+#: ../src/sendmsg-window.c:1961
 #, c-format
 msgid "Message from %s, subject: \"%s\""
 msgstr "Message from %s, subject: \"%s\""
 
-#: ../src/sendmsg-window.c:1975
+#: ../src/sendmsg-window.c:1979
 #, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "Error converting \"%s\" to UTF-8: %s\n"
 
-#: ../src/sendmsg-window.c:2045 ../src/sendmsg-window.c:2116
+#: ../src/sendmsg-window.c:2049 ../src/sendmsg-window.c:2120
 msgid "Remove"
 msgstr "Remove"
 
-#: ../src/sendmsg-window.c:2128
+#: ../src/sendmsg-window.c:2132
 msgid "Open..."
 msgstr "Open..."
 
-#: ../src/sendmsg-window.c:2140
+#: ../src/sendmsg-window.c:2144
 msgid "(URL)"
 msgstr "(URL)"
 
-#: ../src/sendmsg-window.c:2161
+#: ../src/sendmsg-window.c:2165
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Cannot get info on file '%s': %s"
 
-#: ../src/sendmsg-window.c:2166
+#: ../src/sendmsg-window.c:2170
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Attachment %s is not a regular file."
 
-#: ../src/sendmsg-window.c:2169
+#: ../src/sendmsg-window.c:2173
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "File %s cannot be read\n"
 
-#: ../src/sendmsg-window.c:2218
+#: ../src/sendmsg-window.c:2222
 msgid "Attach file"
 msgstr "Attach file"
 
-#: ../src/sendmsg-window.c:2304 ../src/sendmsg-window.c:2413
-#: ../src/sendmsg-window.c:4079
+#: ../src/sendmsg-window.c:2308 ../src/sendmsg-window.c:2417
+#: ../src/sendmsg-window.c:4094
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5630,117 +5634,117 @@ msgstr ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 
-#: ../src/sendmsg-window.c:2633
+#: ../src/sendmsg-window.c:2637
 msgid "F_rom:"
 msgstr "F_rom:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2768
+#: ../src/sendmsg-window.c:2772
 msgid "S_ubject:"
 msgstr "S_ubject:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: ../src/sendmsg-window.c:2782
+#: ../src/sendmsg-window.c:2786
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: ../src/sendmsg-window.c:2813
+#: ../src/sendmsg-window.c:2817
 msgid "_Reply To:"
 msgstr "_Reply To:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2818
+#: ../src/sendmsg-window.c:2822
 msgid "_Attachments:"
 msgstr "_Attachments:"
 
-#: ../src/sendmsg-window.c:2863
+#: ../src/sendmsg-window.c:2867
 msgid "Mode"
 msgstr "Mode"
 
-#: ../src/sendmsg-window.c:2886
+#: ../src/sendmsg-window.c:2890
 msgid "Description"
 msgstr "Description"
 
-#: ../src/sendmsg-window.c:3161
+#: ../src/sendmsg-window.c:3165
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Could not save attachment: %s"
 
-#: ../src/sendmsg-window.c:3197
+#: ../src/sendmsg-window.c:3201
 msgid "you"
 msgstr "you"
 
-#: ../src/sendmsg-window.c:3206
+#: ../src/sendmsg-window.c:3210
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------forwarded message from %s------\n"
 
-#: ../src/sendmsg-window.c:3245
+#: ../src/sendmsg-window.c:3249
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Message-ID: %s\n"
 
-#: ../src/sendmsg-window.c:3251
+#: ../src/sendmsg-window.c:3255
 msgid "References:"
 msgstr "References:"
 
-#: ../src/sendmsg-window.c:3262
+#: ../src/sendmsg-window.c:3266
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "On %s, %s wrote:\n"
 
-#: ../src/sendmsg-window.c:3264
+#: ../src/sendmsg-window.c:3268
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s wrote:\n"
 
-#: ../src/sendmsg-window.c:3364
+#: ../src/sendmsg-window.c:3368
 msgid "No signature found!"
 msgstr "No signature found!"
 
-#: ../src/sendmsg-window.c:4201
+#: ../src/sendmsg-window.c:4216
 #, c-format
 msgid "Error executing signature generator %s"
 msgstr "Error executing signature generator %s"
 
-#: ../src/sendmsg-window.c:4213
+#: ../src/sendmsg-window.c:4228
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
 msgstr "Cannot open signature file '%s' for reading"
 
-#: ../src/sendmsg-window.c:4223
+#: ../src/sendmsg-window.c:4238
 #, c-format
 msgid "Error reading signature from %s"
 msgstr "Error reading signature from %s"
 
-#: ../src/sendmsg-window.c:4227
+#: ../src/sendmsg-window.c:4242
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "Signature in %s is not a UTF-8 text."
 
-#: ../src/sendmsg-window.c:4290
+#: ../src/sendmsg-window.c:4305
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Could not open the file %s.\n"
 
-#: ../src/sendmsg-window.c:4346
+#: ../src/sendmsg-window.c:4361
 msgid "Include file"
 msgstr "Include file"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4557
+#: ../src/sendmsg-window.c:4572
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Could not load Face header file %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4560
+#: ../src/sendmsg-window.c:4575
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Could not load X-Face header file %s: %s"
 
-#: ../src/sendmsg-window.c:4728
+#: ../src/sendmsg-window.c:4743
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5750,75 +5754,75 @@ msgstr ""
 "the first part will be signed and/or encrypted. You should select MIME mode "
 "if the complete message shall be protected. Do you really want to proceed?"
 
-#: ../src/sendmsg-window.c:4744
+#: ../src/sendmsg-window.c:4759
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "sending message with gpg mode %d"
 
-#: ../src/sendmsg-window.c:4789
+#: ../src/sendmsg-window.c:4804
 msgid "Message could not be created"
 msgstr "Message could not be created"
 
-#: ../src/sendmsg-window.c:4791
+#: ../src/sendmsg-window.c:4806
 msgid "Message could not be queued in outbox"
 msgstr "Message could not be queued in outbox"
 
-#: ../src/sendmsg-window.c:4793
+#: ../src/sendmsg-window.c:4808
 msgid "Message could not be saved in sentbox"
 msgstr "Message could not be saved in sentbox"
 
-#: ../src/sendmsg-window.c:4795
+#: ../src/sendmsg-window.c:4810
 msgid "Message could not be sent"
 msgstr "Message could not be sent"
 
-#: ../src/sendmsg-window.c:4799
+#: ../src/sendmsg-window.c:4814
 #, c-format
 msgid "Send failed: %s"
 msgstr "Send failed: %s"
 
-#: ../src/sendmsg-window.c:4865
+#: ../src/sendmsg-window.c:4880
 msgid "Could not postpone message."
 msgstr "Could not postpone message."
 
-#: ../src/sendmsg-window.c:4879
+#: ../src/sendmsg-window.c:4894
 msgid "Message postponed."
 msgstr "Message postponed."
 
-#: ../src/sendmsg-window.c:4895
+#: ../src/sendmsg-window.c:4910
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Could not open draftbox: %s"
 
-#: ../src/sendmsg-window.c:4916
+#: ../src/sendmsg-window.c:4931
 msgid "Message saved."
 msgstr "Message saved."
 
-#: ../src/sendmsg-window.c:5043
+#: ../src/sendmsg-window.c:5058
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Error starting spell checker: %s"
 
-#: ../src/sendmsg-window.c:5196
+#: ../src/sendmsg-window.c:5211
 #, c-format
 msgid "Could not compile %s"
 msgstr "Could not compile %s"
 
-#: ../src/sendmsg-window.c:5725
+#: ../src/sendmsg-window.c:5757
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Reply to %s: %s"
 
-#: ../src/sendmsg-window.c:5730
+#: ../src/sendmsg-window.c:5762
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Forward message to %s: %s"
 
-#: ../src/sendmsg-window.c:5734
+#: ../src/sendmsg-window.c:5766
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Continue message to %s: %s"
 
-#: ../src/sendmsg-window.c:5738
+#: ../src/sendmsg-window.c:5770
 #, c-format
 msgid "New message to %s: %s"
 msgstr "New message to %s: %s"

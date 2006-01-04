@@ -1,3 +1,7 @@
+2006-01-03 22:27  PeterB
+
+	* libbalsa/libbalsa.c: more careful mailbox lock.
+
 2006-01-01 14:10  PeterB
 
 	* src/: balsa-app.h, sendmsg-window.c: build without GTKSPELL.

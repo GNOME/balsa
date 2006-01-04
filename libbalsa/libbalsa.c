@@ -687,27 +687,20 @@ void
 libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {
     pthread_t thread_id = pthread_self();
+    gint count = 0;
+
+    while (thread_id == libbalsa_threads_id) {
+        ++count;
+#if LIBBALSA_DEBUG_THREADS
+        g_message("Temporary gdk_threads_leave!!!");
+#endif                          /* LIBBALSA_DEBUG_THREADS */
+        gdk_threads_leave();
+    }
 
     pthread_mutex_lock(&mailbox_lock);
 
-    while (mailbox->lock && mailbox->thread_id != thread_id) {
-        gint count = 0;
-
-        while (thread_id == libbalsa_threads_id) {
-	    ++count;
-#if LIBBALSA_DEBUG_THREADS
-            g_message("Temporary gdk_threads_leave!!!");
-#endif /* LIBBALSA_DEBUG_THREADS */
-            gdk_threads_leave();
-	}
-	pthread_cond_wait(&mailbox_cond, &mailbox_lock);
-        while (--count >= 0) {
-            gdk_threads_enter();
-#if LIBBALSA_DEBUG_THREADS
-            g_message("...and gdk_threads_enter!!!");
-#endif /* LIBBALSA_DEBUG_THREADS */
-        }
-    }
+    while (mailbox->lock && mailbox->thread_id != thread_id)
+        pthread_cond_wait(&mailbox_cond, &mailbox_lock);
 
     /* We'll assume that no-one would destroy a mailbox while we've been
      * trying to lock it. If they have, we have larger problems than
@@ -716,6 +709,13 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
     mailbox->thread_id = thread_id;
 
     pthread_mutex_unlock(&mailbox_lock);
+
+    while (--count >= 0) {
+        gdk_threads_enter();
+#if LIBBALSA_DEBUG_THREADS
+        g_message("...and gdk_threads_enter!!!");
+#endif                          /* LIBBALSA_DEBUG_THREADS */
+    }
 }
 
 void

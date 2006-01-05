@@ -2715,9 +2715,6 @@ static void
 lbm_imap_update_view_filter(LibBalsaMailbox   *mailbox,
                             LibBalsaCondition *view_filter)
 {
-    if(mailbox->view_filter)
-        libbalsa_condition_free(mailbox->view_filter);
-    mailbox->view_filter = view_filter;
 }
 
 /* Sorting

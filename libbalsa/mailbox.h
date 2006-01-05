@@ -233,6 +233,9 @@ struct _LibBalsaMailbox {
 
     /* Whether to reassemble a message from its parts. */
     gboolean no_reassemble;
+
+    /* Whether the tree has been changed since some event. */
+    gboolean msg_tree_changed;
 };
 
 /* Search iter */

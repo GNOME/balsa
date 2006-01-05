@@ -1087,13 +1087,15 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
         gtk_tree_path_free(path);
     }
 
-    lbm_threads_leave(mailbox);
-
     unthreaded =
         g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED);
     if (unthreaded)
         *unthreaded =
             g_slist_prepend(*unthreaded, GUINT_TO_POINTER(seqno));
+
+    mailbox->msg_tree_changed = TRUE;
+
+    lbm_threads_leave(mailbox);
 }
 
 void
@@ -1116,6 +1118,8 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_INSERTED], 0,
                   path, &iter);
     gtk_tree_path_free(path);
+
+    mailbox->msg_tree_changed = TRUE;
 
     lbm_threads_leave(mailbox);
 }
@@ -1212,6 +1216,8 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gtk_tree_path_free(path);
     mailbox->stamp++;
 
+    mailbox->msg_tree_changed = TRUE;
+
     lbm_threads_leave(mailbox);
 }
 
@@ -1279,6 +1285,8 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     
     gtk_tree_path_free(path);
     mailbox->stamp++;
+
+    mailbox->msg_tree_changed = TRUE;
 
     lbm_threads_leave(mailbox);
 }
@@ -1717,15 +1725,17 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
                                  gboolean update_immediately)
 {
     libbalsa_lock_mailbox(mailbox);
-    if(update_immediately) {
+
+    if (update_immediately) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
                                                                 cond);
         lbm_set_threading(mailbox, mailbox->view->threading_type);
-    } else {
-        if(mailbox->view_filter)
-            libbalsa_condition_free(mailbox->view_filter);
-        mailbox->view_filter = cond;
     }
+
+    if (mailbox->view_filter)
+        libbalsa_condition_free(mailbox->view_filter);
+    mailbox->view_filter = cond;
+
     libbalsa_unlock_mailbox(mailbox);
 }
 
@@ -3222,6 +3232,8 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
                           0, path, &iter);
         gtk_tree_path_free(path);
     }
+
+    mailbox->msg_tree_changed = TRUE;
 }
 
 struct lbm_update_msg_tree_info {
@@ -3373,6 +3385,8 @@ libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
         mailbox->msg_tree = new_tree;
         lbm_set_msg_tree(mailbox);
     }
+
+    mailbox->msg_tree_changed = TRUE;
 }
 
 static GMimeMessage *

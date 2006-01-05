@@ -459,8 +459,9 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
     gchar *template;
 #endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 
-    if (!mailbox->msg_tree)
+    if (!mailbox->msg_tree || !mailbox->msg_tree_changed)
         return;
+    mailbox->msg_tree_changed = FALSE;
 
     filename = lbm_local_get_cache_filename(local);
 
@@ -671,7 +672,8 @@ lbm_local_save_tree_idle(LibBalsaMailboxLocal * local)
 static void
 lbm_local_queue_save_tree(LibBalsaMailboxLocal * local)
 {
-    if (!local->save_tree_id) {
+    if (LIBBALSA_MAILBOX(local)->msg_tree_changed
+        && !local->save_tree_id) {
         g_object_ref(local);
         local->save_tree_id =
             g_idle_add((GSourceFunc) lbm_local_save_tree_idle, local);
@@ -1028,6 +1030,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
                  * scratch. */
                 libbalsa_mailbox_prepare_threading(mailbox, NULL, 0);
         }
+        mailbox->msg_tree_changed = FALSE;
         /* If the mailbox has more messages than we restored into the
          * tree, we assume that the remainder are new: */
         libbalsa_mailbox_local_load_messages(mailbox, total);
@@ -1082,9 +1085,7 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
 	libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view, FALSE);
     libbalsa_mailbox_search_iter_free(iter_view);
 
-    if(mailbox->view_filter)
-        libbalsa_condition_free(mailbox->view_filter);
-    mailbox->view_filter = view_filter;
+    lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 
 /*

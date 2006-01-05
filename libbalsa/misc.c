@@ -785,13 +785,15 @@ get_quote_tag(GtkTextIter * iter)
     GSList *list;
     GSList *tag_list = gtk_text_iter_get_tags(iter);
 
-    for (list = tag_list; list; list = g_slist_next(list)) {
+    for (list = tag_list; list; list = list->next) {
         GtkTextTag *tag = list->data;
         gchar *name;
         g_object_get(G_OBJECT(tag), "name", &name, NULL);
-        if (!strncmp(name, "quote-", 6))
-            quote_tag = tag_list->data;
-        g_free(name);
+        if (name) {
+            if (!strncmp(name, "quote-", 6))
+                quote_tag = tag_list->data;
+            g_free(name);
+        }
     }
     g_slist_free(tag_list);
 

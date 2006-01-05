@@ -212,7 +212,7 @@ lba_get_name_or_mailbox(const InternetAddressList * address_list,
     for (; address_list; address_list = address_list->next) {
         InternetAddress *ia = address_list->address;
 
-        if (get_name && ia->name)
+        if (get_name && ia->name && *ia->name)
             return ia->name;
 
         if (ia->type == INTERNET_ADDRESS_NAME)

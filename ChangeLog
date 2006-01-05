@@ -1,3 +1,9 @@
+2006-01-04 20:24  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c, mailbox_local.c:
+	new member LibBalsaMailbox::msg_tree_changed; use it to save tree
+	only when needed; manage mailbox->view_filter in mailbox.c.
+
 2006-01-03 22:27  PeterB
 
 	* libbalsa/libbalsa.c: more careful mailbox lock.

@@ -1,5 +1,7 @@
-2006-01-04 20:24  PeterB
+2006-01-04 20:48  PeterB
 
+	* libbalsa/address.c: don't use InternetAddress::name if it's
+	non-NULL but empty.
 	* libbalsa/: mailbox.c, mailbox.h, mailbox_imap.c, mailbox_local.c:
 	new member LibBalsaMailbox::msg_tree_changed; use it to save tree
 	only when needed; manage mailbox->view_filter in mailbox.c.

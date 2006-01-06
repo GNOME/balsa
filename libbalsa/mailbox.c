@@ -1163,6 +1163,8 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
                                                         seqno-1));
     g_ptr_array_remove_index(mailbox->mindex, seqno-1);
 
+    mailbox->msg_tree_changed = TRUE;
+
     if (!dt.node) {
         /* It's ok, apparently the view did not include this message */
         lbm_threads_leave(mailbox);
@@ -1215,8 +1217,6 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     
     gtk_tree_path_free(path);
     mailbox->stamp++;
-
-    mailbox->msg_tree_changed = TRUE;
 
     lbm_threads_leave(mailbox);
 }

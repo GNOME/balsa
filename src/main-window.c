@@ -2387,7 +2387,8 @@ bw_focus_idle(LibBalsaMailbox ** mailbox)
     gdk_threads_enter();
     if (*mailbox)
 	g_object_remove_weak_pointer(G_OBJECT(*mailbox), (gpointer) mailbox);
-    balsa_mblist_focus_mailbox(balsa_app.mblist, *mailbox);
+    if (balsa_app.mblist_tree_store)
+        balsa_mblist_focus_mailbox(balsa_app.mblist, *mailbox);
     g_free(mailbox);
     gdk_threads_leave();
     return FALSE;

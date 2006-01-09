@@ -1936,15 +1936,12 @@ balsa_message_can_select(BalsaMessage * bmessage)
 gboolean
 balsa_message_grab_focus(BalsaMessage * bmessage)
 {
-    GtkWidget *w;
-
     g_return_val_if_fail(bmessage != NULL, FALSE);
     g_return_val_if_fail(bmessage->current_part != NULL, FALSE);
-    g_return_val_if_fail((w =
-                          bmessage->current_part->mime_widget->widget) != NULL,
+    g_return_val_if_fail(bmessage->current_part->mime_widget->widget != NULL,
                          FALSE);
 
-    gtk_widget_grab_focus(w);
+    gtk_widget_grab_focus(bmessage->current_part->mime_widget->widget);
     return TRUE;
 }
 

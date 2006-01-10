@@ -50,17 +50,6 @@
                                LIBBALSA_TYPE_MIME_STREAM_SHARED,   \
                                LibBalsaMimeStreamSharedClass))
 
-struct _LibBalsaMimeStreamShared {
-    GMimeStreamFs parent_object;
-
-    GThread *thread_self;
-    guint lock_count;
-};
-
-struct _LibBalsaMimeStreamSharedClass {
-    GMimeStreamClass parent_class;
-};
-
 typedef struct _LibBalsaMimeStreamShared      LibBalsaMimeStreamShared;
 typedef struct _LibBalsaMimeStreamSharedClass LibBalsaMimeStreamSharedClass;
 

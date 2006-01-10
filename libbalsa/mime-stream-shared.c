@@ -39,7 +39,21 @@
 #include <gmime/gmime-stream-filter.h>
 #include "mime-stream-shared.h"
 
+typedef struct _LibBalsaMimeStreamSharedLock LibBalsaMimeStreamSharedLock;
+
+struct _LibBalsaMimeStreamShared {
+    GMimeStreamFs parent_object;
+
+    LibBalsaMimeStreamSharedLock *lock;
+};
+
+struct _LibBalsaMimeStreamSharedClass {
+    GMimeStreamClass parent_class;
+};
+
 static void lbmss_stream_class_init(LibBalsaMimeStreamSharedClass * klass);
+
+static void lbmss_finalize(GObject *object);
 
 static ssize_t lbmss_stream_read(GMimeStream * stream, char *buf,
                                  size_t len);
@@ -85,10 +99,13 @@ static void
 lbmss_stream_class_init(LibBalsaMimeStreamSharedClass * klass)
 {
     GMimeStreamClass *stream_class = GMIME_STREAM_CLASS(klass);
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
     parent_class = g_type_class_ref(GMIME_TYPE_STREAM_FS);
     lbmss_mutex  = g_mutex_new();
     lbmss_cond   = g_cond_new();
+
+    object_class->finalize  = lbmss_finalize;
 
     stream_class->read      = lbmss_stream_read;
     stream_class->write     = lbmss_stream_write;
@@ -97,18 +114,62 @@ lbmss_stream_class_init(LibBalsaMimeStreamSharedClass * klass)
     stream_class->substream = lbmss_stream_substream;
 }
 
-static gboolean
-lbmss_thread_has_lock(GMimeStream * stream)
+/* The shared lock. */
+
+struct _LibBalsaMimeStreamSharedLock {
+    GThread *thread;
+    guint count;
+    guint ref_count;
+};
+
+static LibBalsaMimeStreamSharedLock *
+lbmss_lock_new(void)
 {
-    LibBalsaMimeStreamShared *stream_shared;
+    LibBalsaMimeStreamSharedLock *lock;
 
-    while (stream->super_stream)
-        stream = stream->super_stream;
-    stream_shared = LIBBALSA_MIME_STREAM_SHARED(stream);
+    lock = g_new(LibBalsaMimeStreamSharedLock, 1);
+    lock->thread = 0;
+    lock->count = 0;
+    lock->ref_count = 1;
 
-    return stream_shared->lock_count > 0
-        && stream_shared->thread_self == g_thread_self();
+    return lock;
 }
+
+static LibBalsaMimeStreamSharedLock *
+lbmss_lock_ref(LibBalsaMimeStreamSharedLock * lock)
+{
+    ++lock->ref_count;
+
+    return lock;
+}
+
+static void
+lbmss_lock_unref(LibBalsaMimeStreamSharedLock * lock)
+{
+    g_assert(lock->ref_count > 0);
+
+    if (--lock->ref_count == 0)
+        g_free(lock);
+}
+
+/* Object class method. */
+
+static void
+lbmss_finalize(GObject *object)
+{
+    LibBalsaMimeStreamShared *stream_shared =
+        (LibBalsaMimeStreamShared *) object;
+
+    lbmss_lock_unref(stream_shared->lock);
+
+    G_OBJECT_CLASS(parent_class)->finalize(object);
+}
+
+/* Stream class methods. */
+
+#define lbmss_thread_has_lock(stream)                     \
+    (LIBBALSA_MIME_STREAM_SHARED(stream)->lock->count > 0 \
+     && LIBBALSA_MIME_STREAM_SHARED(stream)->lock->thread == g_thread_self())
 
 static ssize_t
 lbmss_stream_read(GMimeStream * stream, char *buf, size_t len)
@@ -147,6 +208,9 @@ lbmss_stream_substream(GMimeStream * stream, off_t start, off_t end)
 
     stream_shared =
         g_object_new(LIBBALSA_TYPE_MIME_STREAM_SHARED, NULL, NULL);
+    stream_shared->lock =
+        lbmss_lock_ref(LIBBALSA_MIME_STREAM_SHARED(stream)->lock);
+
     fstream = GMIME_STREAM_FS(stream_shared);
     fstream->owner = FALSE;
     fstream->fd = GMIME_STREAM_FS(stream)->fd;
@@ -154,6 +218,8 @@ lbmss_stream_substream(GMimeStream * stream, off_t start, off_t end)
 
     return GMIME_STREAM(fstream);
 }
+
+/* Public methods. */
 
 /**
  * libbalsa_mime_stream_shared_new:
@@ -173,6 +239,8 @@ libbalsa_mime_stream_shared_new(int fd)
 
     stream_shared =
         g_object_new(LIBBALSA_TYPE_MIME_STREAM_SHARED, NULL, NULL);
+    stream_shared->lock = lbmss_lock_new();
+
     fstream = GMIME_STREAM_FS(stream_shared);
     fstream->owner = TRUE;
     fstream->eos = FALSE;
@@ -182,22 +250,6 @@ libbalsa_mime_stream_shared_new(int fd)
     g_mime_stream_construct(GMIME_STREAM(fstream), start, -1);
 
     return GMIME_STREAM(fstream);
-}
-
-/* Helper for lock methods */
-static GMimeStream *
-lbmss_real_stream(GMimeStream * stream)
-{
-    for (;;) {
-        if (GMIME_IS_STREAM_FILTER(stream))
-            stream = ((GMimeStreamFilter *) stream)->source;
-        else if (stream->super_stream)
-            stream = stream->super_stream;
-        else
-            break;
-    }
-
-    return stream;
 }
 
 /**
@@ -210,24 +262,26 @@ void
 libbalsa_mime_stream_shared_lock(GMimeStream * stream)
 {
     LibBalsaMimeStreamShared *stream_shared;
+    LibBalsaMimeStreamSharedLock *lock;
     GThread *thread_self;
 
     g_return_if_fail(GMIME_IS_STREAM(stream));
 
-    stream = lbmss_real_stream(stream);
+    if (GMIME_IS_STREAM_FILTER(stream))
+        stream = ((GMimeStreamFilter *) stream)->source;
 
     if (!LIBBALSA_IS_MIME_STREAM_SHARED(stream))
         return;
 
     stream_shared = (LibBalsaMimeStreamShared *) stream;
+    lock = stream_shared->lock;
     thread_self = g_thread_self();
 
     g_mutex_lock(lbmss_mutex);
-    while (stream_shared->lock_count > 0
-           && stream_shared->thread_self != thread_self)
+    while (lock->count > 0 && lock->thread != thread_self)
         g_cond_wait(lbmss_cond, lbmss_mutex);
-    ++stream_shared->lock_count;
-    stream_shared->thread_self = thread_self;
+    ++lock->count;
+    lock->thread = thread_self;
     g_mutex_unlock(lbmss_mutex);
 }
 
@@ -241,18 +295,22 @@ void
 libbalsa_mime_stream_shared_unlock(GMimeStream * stream)
 {
     LibBalsaMimeStreamShared *stream_shared;
+    LibBalsaMimeStreamSharedLock *lock;
 
     g_return_if_fail(GMIME_IS_STREAM(stream));
 
-    stream = lbmss_real_stream(stream);
+    if (GMIME_IS_STREAM_FILTER(stream))
+        stream = ((GMimeStreamFilter *) stream)->source;
+
     if (!LIBBALSA_IS_MIME_STREAM_SHARED(stream))
         return;
 
     stream_shared = (LibBalsaMimeStreamShared *) stream;
-    g_return_if_fail(stream_shared->lock_count > 0);
+    lock = stream_shared->lock;
+    g_return_if_fail(lock->count > 0);
 
     g_mutex_lock(lbmss_mutex);
-    if (--stream_shared->lock_count == 0)
+    if (--lock->count == 0)
         g_cond_signal(lbmss_cond);
     g_mutex_unlock(lbmss_mutex);
 }

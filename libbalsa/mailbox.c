@@ -780,26 +780,58 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
 /* Default method; imap backend replaces with its own method, optimized
  * for server-side copy, but falls back to this one if it's not a
  * server-side copy. */
+static void lbm_queue_check(LibBalsaMailbox * mailbox);
 static gboolean
 libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
                                     GArray * msgnos,
                                     LibBalsaMailbox * dest, GError ** err)
 {
     gboolean retval = TRUE;
+    gboolean any    = FALSE;
     guint i;
+    guint chunksize;
+    gboolean use_progress = FALSE;
+    gboolean (*add_message)(LibBalsaMailbox *, GMimeStream *,
+                            LibBalsaMessageFlag, GError **);
 
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
+    g_return_val_if_fail(dest != mailbox, FALSE);
+
+    chunksize = msgnos->len / 100;      /* 100 increments */
+    if (chunksize > 0)
+        use_progress = libbalsa_progress_set_text(_("Copying"));
+
+    add_message = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message;
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
-        LibBalsaMessage *message =      /* Just for the flags! */
-            libbalsa_mailbox_get_message(mailbox, msgno);
         GMimeStream *stream =
             libbalsa_mailbox_get_message_stream(mailbox, msgno);
+        LibBalsaMessage *message = libbalsa_message_new();
 
-        retval = libbalsa_mailbox_add_message(dest, stream, message->flags,
-                                              err);
-        g_object_unref(stream);
+        /* Just for the flags! */
+        libbalsa_message_load_envelope_from_stream(message, stream);
+        if (add_message(dest, stream, message->flags, err)) {
+            if (!(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+                && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW))
+                libbalsa_mailbox_set_unread_messages_flag(dest, TRUE);
+            any = TRUE;
+        } else
+            retval = FALSE;
+
         g_object_unref(message);
+        g_object_unref(stream);
+        if (use_progress && (i + 1) % chunksize == 0)
+            libbalsa_progress_set_fraction(((gdouble) (i + 1)) /
+                                           ((gdouble) msgnos->len));
     }
+
+    if (use_progress)
+        libbalsa_progress_set_text(NULL);
+
+    if (any)
+        /* Some messages copied. */
+        lbm_queue_check(dest);
 
     return retval;
 }
@@ -1449,7 +1481,6 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
     return TRUE;
 }
 
-static void lbm_queue_check(LibBalsaMailbox * mailbox);
 gboolean
 libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
                              GMimeStream * stream,

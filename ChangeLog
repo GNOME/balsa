@@ -1,5 +1,7 @@
-2006-01-11 08:26  PeterB
+2006-01-11 09:01  PeterB
 
+	* src/: main-window.c, toolbar-factory.c: add optional toolbar
+	button for expunge.
 	* src/pref-manager.c, src/save-restore.c, libbalsa/smtp-server.c,
 	libbalsa/smtp-server.h: implement and use
 	libbalsa_smtp_server_add_to_list--deletes existing server if new

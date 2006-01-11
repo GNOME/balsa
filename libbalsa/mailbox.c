@@ -811,6 +811,7 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
 
         /* Just for the flags! */
         libbalsa_message_load_envelope_from_stream(message, stream);
+        g_mime_stream_reset(stream);
         if (add_message(dest, stream, message->flags, err)) {
             if (!(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
                 && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW))

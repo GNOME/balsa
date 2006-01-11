@@ -388,7 +388,9 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 {
     GtkTextTagTable * table;
     GtkTextTag * tag;
-    gint phrase_hl = (gint)g_object_get_data(G_OBJECT(textview), "phrase-highlight");
+    gint phrase_hl =
+        GPOINTER_TO_INT(g_object_get_data
+                        (G_OBJECT(textview), "phrase-highlight"));
     gboolean new_hl = gtk_check_menu_item_get_active(checkmenuitem);
 
     table = gtk_text_buffer_get_tag_table(gtk_text_view_get_buffer(textview));
@@ -411,7 +413,8 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 		     NULL);
 
     g_object_set_data(G_OBJECT(textview), "phrase-highlight",
-		      (gpointer)(new_hl ? PHRASE_HIGHLIGHT_ON : PHRASE_HIGHLIGHT_OFF));
+                      GINT_TO_POINTER(new_hl ? PHRASE_HIGHLIGHT_ON :
+                                      PHRASE_HIGHLIGHT_OFF));
 }
 
 static void
@@ -436,7 +439,8 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer)mime_body);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
-    phrase_hl = (gint)g_object_get_data(G_OBJECT(textview), "phrase-highlight");
+    phrase_hl = GPOINTER_TO_INT(g_object_get_data
+                                (G_OBJECT(textview), "phrase-highlight"));
     if (phrase_hl != 0) {
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu),
 			      gtk_separator_menu_item_new ());

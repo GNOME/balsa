@@ -1,5 +1,7 @@
-2006-01-11 13:55  PeterB
+2006-01-11 14:57  PeterB
 
+	* src/balsa-mime-widget-text.c: use glib's type conversion macros
+	for gint <=> gpointer.
 	* src/sendmsg-window.c: build with gcc < 4.1.
 	* libbalsa/mailbox_mbox.c: better: use %zd format specifier.
 	* libbalsa/mailbox_mbox.c: cast value to gint for g_print.

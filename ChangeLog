@@ -1,5 +1,15 @@
-2006-01-10 19:27  PeterB
+2006-01-10 20:43  PeterB
 
+	* src/main.c: use g_idle_add and data instead of g_io_add_watch and
+	pipes.
+	* src/main-window.c, src/main-window.h: set progress text in status
+	bar; run main loop only if needed.
+	* libbalsa/mailbox_mbox.c: save and restore message info.
+	* src/balsa-index.c: prepare threading/sorting before setting
+	non-flags-only filter.
+	* libbalsa/mailbox_local.c: cache file is not created for empty
+	mailbox.
+	* libbalsa/mailbox.c: use progess bar when copying messages.
 	* src/balsa-index.c, src/main-window.c, src/main-window.h,
 	src/main.c, libbalsa/libbalsa.c, libbalsa/libbalsa.h: use progress
 	bar to show fractional progress; implement wrappers for libbalsa;

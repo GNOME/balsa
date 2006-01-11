@@ -557,9 +557,9 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
     }
 
 #ifdef DEBUG
-    g_print("%s: %s file has %d messages\n", __func__,
+    g_print("%s: %s file has %zd messages\n", __func__,
             LIBBALSA_MAILBOX(mbox)->name,
-            (gint) (length / sizeof(struct message_info)));
+            length / sizeof(struct message_info));
 #endif
 
     msg_info = (struct message_info *) contents;
@@ -596,9 +596,9 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
     g_array_append_vals(mbox->messages_info, contents,
                         msg_info - (struct message_info *) contents);
 #ifdef DEBUG
-    g_print("%s: %s restored %d messages\n", __func__,
+    g_print("%s: %s restored %zd messages\n", __func__,
             LIBBALSA_MAILBOX(mbox)->name,
-            (gint) (msg_info - (struct message_info *) contents));
+            msg_info - (struct message_info *) contents);
 #endif
 
     mbox_stream = mbox->gmime_stream;

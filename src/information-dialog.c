@@ -272,31 +272,26 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 
     if (balsa_app.appbar) {
         gchar *line = g_strdup(msg);
-        g_strdelimit(line, "\n", ' ');
+        g_strdelimit(line, "\r\n", ' ');
 	gnome_appbar_set_status(balsa_app.appbar, line);
         g_free(line);
     }
 }
 
 static guint bar_timeout_id = 0;
-static unsigned push_cnt = 0;
 static gboolean
 status_bar_refresh(gpointer data)
 {
-    gboolean retval = FALSE;
-
     gdk_threads_enter();
-    if (balsa_app.appbar) {
+
+    if (balsa_app.appbar)
         gnome_appbar_pop(balsa_app.appbar);
-        push_cnt--;
-        if(push_cnt == 0)
-            bar_timeout_id = 0;
-        else
-            retval = TRUE;
-    }
+
+    bar_timeout_id = 0;
+
     gdk_threads_leave();
 
-    return retval;
+    return FALSE;
 }
 
 static void
@@ -308,17 +303,17 @@ balsa_information_bar(GtkWindow *parent, LibBalsaInformationType type,
     if (!balsa_app.appbar)
         return;
 
+    /* First clear any current message. */
+    if (bar_timeout_id) {
+        gnome_appbar_pop(balsa_app.appbar);
+        g_source_remove(bar_timeout_id);
+    }
+
     line = g_strdup(msg);
-    g_strdelimit(line, "\n", ' ');
-    /* we used to have _set_status() here but it got over-written by
-       set_default(). _push() seems to be more persistent. */
-    gnome_appbar_push(balsa_app.appbar, line); push_cnt++;
+    g_strdelimit(line, "\r\n", ' ');
+    gnome_appbar_push(balsa_app.appbar, line);
     g_free(line);
 
-    if (bar_timeout_id)
-        /* Reschedule the refresh, so this message gets its full
-         * 4 seconds. */
-        g_source_remove(bar_timeout_id);
     bar_timeout_id = g_timeout_add(4000, status_bar_refresh, NULL);
 }
 

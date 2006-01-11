@@ -1,3 +1,23 @@
+2006-01-10 19:27  PeterB
+
+	* src/balsa-index.c, src/main-window.c, src/main-window.h,
+	src/main.c, libbalsa/libbalsa.c, libbalsa/libbalsa.h: use progress
+	bar to show fractional progress; implement wrappers for libbalsa;
+	use it when preparing for threading/sorting.
+	* libbalsa/: mailbox.c, mailbox_local.c, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c: simplify local mailbox caching; use
+	progress bar.
+	* src/information-dialog.c: do not stack status-bar messages.
+	* libbalsa/: mime-stream-shared.c, mime-stream-shared.h: shared
+	lock for LibBalsaMimeStreamShared.
+
+2006-01-10 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/misc.c, libbalsa/misc.h, src/balsa-mime-widget-text.c,
+	src/sendmsg-window.c, src/sendmsg-window.h: configure GtkSourceView
+	with default=no; use it for hacker-highlighting and multi-level
+	undo.
+
 2006-01-09 10:49  PeterB
 
 	* src/balsa-message.c: g_return_* argument must not have

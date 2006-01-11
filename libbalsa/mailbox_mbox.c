@@ -477,7 +477,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 #endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 
         msg->flags = msg_info.orig_flags;
-        msg->length = msg_info.end - msg_info.start;
+        msg->length = msg_info.end - (msg_info.start + msg_info.from_len);
         msg->mailbox = LIBBALSA_MAILBOX(mbox);
         msg->msgno = ++msgno;
         g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, 

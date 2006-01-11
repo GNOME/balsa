@@ -1269,7 +1269,8 @@ static const struct callback_item {
     { BALSA_PIXMAP_SHOW_HEADERS,     show_all_headers_tool_cb },
     { BALSA_PIXMAP_TRASH_EMPTY,      empty_trash_cb },
     { GTK_STOCK_CANCEL,              mailbox_close_cb },
-    { BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb }
+    { BALSA_PIXMAP_SHOW_PREVIEW,     show_preview_pane_cb },
+    { GTK_STOCK_CLEAR,               mailbox_expunge_cb}
 };
 
 /* Standard buttons; "" means a separator. */
@@ -1775,8 +1776,12 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     }
     if (mailbox && mailbox->readonly) {
         gtk_widget_set_sensitive(EXPUNGE_WIDGET, FALSE);
+        balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_CLEAR,
+                                           FALSE);
     } else {
         gtk_widget_set_sensitive(EXPUNGE_WIDGET, enable);
+        balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_CLEAR,
+                                           enable);
     }
 #if defined(ENABLE_TOUCH_UI)
     {gboolean can_sort, can_thread;

@@ -147,6 +147,8 @@ button_data toolbar_buttons[]={
     N_("Undo most recent change"), TOOLBAR_BUTTON_TYPE_BUTTON},
     {GTK_STOCK_REDO, N_("Redo"),
     N_("Redo most recent change"), TOOLBAR_BUTTON_TYPE_BUTTON},
+    { GTK_STOCK_CLEAR, N_("Expunge\nDeleted"),
+      N_("Expunge messages marked as deleted"), TOOLBAR_BUTTON_TYPE_BUTTON }
 };
 
 const int toolbar_button_count =

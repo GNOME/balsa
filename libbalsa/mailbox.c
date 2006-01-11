@@ -1812,12 +1812,12 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 
     g_return_if_fail(MAILBOX_OPEN(mailbox)); /* or perhaps it's legal? */
 
-    lbm_threads_enter(mailbox);
     saved_state = mailbox->state;
     mailbox->state = LB_MAILBOX_STATE_TREECLEANING;
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        thread_type);
+    gdk_threads_enter();
     lbm_sort(mailbox, mailbox->msg_tree);
 
 #if CACHE_UNSEEN_CHILD
@@ -1826,9 +1826,9 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 #endif /* CACHE_UNSEEN_CHILD */
 
     libbalsa_mailbox_changed(mailbox);
+    gdk_threads_leave();
 
     mailbox->state = saved_state;
-    lbm_threads_leave(mailbox);
 }
 
 void
@@ -2454,23 +2454,24 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
         guint i;
         GNode *tmp;
 
-        if (msg) {
-            /* Check *entry again: get-message may have initialized it. */
-            if (!*entry)
-                *entry = libbalsa_mailbox_index_entry_new_from_msg(msg);
-            g_object_unref(msg);
-        }
+        if (msg)
+            *entry = libbalsa_mailbox_index_entry_new_from_msg(msg);
+        /* Don't unref msg until after prepare-threading, because
+         * mailbox-local will also get it. */
 
-        p = msgnos = g_new(guint, 2 * LBM_LOOK_AHEAD);
+        p = msgnos = g_new(guint, 2 * LBM_LOOK_AHEAD + 1);
+        *p++ = msgno;
         for (i = LBM_LOOK_AHEAD, tmp = node->prev; --i && tmp;
              tmp = tmp->prev)
             *p++ = GPOINTER_TO_UINT(tmp->data);
         for (i = LBM_LOOK_AHEAD, tmp = node->next; --i && tmp;
              tmp = tmp->next)
             *p++ = GPOINTER_TO_UINT(tmp->data);
-        if (p > msgnos)
-            libbalsa_mailbox_prepare_threading(lmm, msgnos, p - msgnos);
+        libbalsa_mailbox_prepare_threading(lmm, msgnos, p - msgnos);
         g_free(msgnos);
+
+        if (msg)
+            g_object_unref(msg);
     }
 
     return *entry;

@@ -1368,9 +1368,6 @@ lbm_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     message->msgno = msgno;
     libbalsa_message_load_envelope(message);
 
-    libbalsa_mailbox_local_cache_message(LIBBALSA_MAILBOX_LOCAL(mailbox),
-                                         msgno, message);
-
     return message;
 }
 

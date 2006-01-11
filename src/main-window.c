@@ -4865,7 +4865,10 @@ balsa_window_setup_progress(BalsaWindow* window, const gchar * text)
     g_object_set_data(G_OBJECT(progress_bar), "in_use",
                       GINT_TO_POINTER(in_use));
     
-    gtk_progress_bar_set_text(progress_bar, text);
+    if (text)
+        gnome_appbar_push(balsa_app.appbar, text);
+    else
+        gnome_appbar_pop(balsa_app.appbar);
     gtk_progress_bar_set_fraction(progress_bar, 0);
 
     return TRUE;
@@ -4883,7 +4886,8 @@ balsa_window_setup_progress(BalsaWindow* window, const gchar * text)
  * main thread from processing events.
  **/
 void
-balsa_window_increment_progress(BalsaWindow * window, gdouble fraction)
+balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
+                                gboolean flush)
 {
     gint in_use;
     GtkProgressBar *progress_bar;
@@ -4900,7 +4904,7 @@ balsa_window_increment_progress(BalsaWindow * window, gdouble fraction)
 
     gtk_progress_bar_set_fraction(progress_bar, fraction);
 
-    if (TRUE || !libbalsa_am_i_subthread())
+    if (flush)
         while (gtk_events_pending())
             gtk_main_iteration_do(FALSE);
 }

@@ -2750,8 +2750,8 @@ smtp_server_update(LibBalsaSmtpServer * smtp_server,
     } else {
         /* Populating a new server. */
         if (response == GTK_RESPONSE_OK)
-            balsa_app.smtp_servers =
-                g_slist_append(balsa_app.smtp_servers, smtp_server);
+            libbalsa_smtp_server_add_to_list(smtp_server,
+                                             &balsa_app.smtp_servers);
         else {
             /*  The user killed the dialog. */
             g_object_unref(smtp_server);

@@ -586,7 +586,7 @@ config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
     libbalsa_conf_push_group(key);
     smtp_server = libbalsa_smtp_server_new_from_config(value);
     libbalsa_conf_pop_group();
-    *smtp_servers = g_slist_prepend(*smtp_servers, smtp_server);
+    libbalsa_smtp_server_add_to_list(smtp_server, smtp_servers);
 
     return FALSE;
 }

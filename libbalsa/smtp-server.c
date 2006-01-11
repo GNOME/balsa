@@ -281,6 +281,33 @@ libbalsa_smtp_server_get_big_message(LibBalsaSmtpServer * smtp_server)
     return smtp_server->big_message * 1024;
 }
 
+static gint
+smtp_server_compare(gconstpointer a, gconstpointer b)
+{
+    const LibBalsaSmtpServer *smtp_server_a = a;
+    const LibBalsaSmtpServer *smtp_server_b = b;
+
+    if (smtp_server_a->name && smtp_server_b->name)
+        return strcmp(smtp_server_a->name, smtp_server_b->name);
+
+    return smtp_server_a->name - smtp_server_b->name;
+}
+
+void
+libbalsa_smtp_server_add_to_list(LibBalsaSmtpServer * smtp_server,
+                                 GSList ** server_list)
+{
+    GSList *list;
+
+    if ((list =
+         g_slist_find_custom(*server_list, smtp_server,
+                             smtp_server_compare)) != NULL) {
+        g_object_unref(list->data);
+        *server_list = g_slist_delete_link(*server_list, list);
+    }
+
+    *server_list = g_slist_prepend(*server_list, smtp_server);
+}
 
 /* SMTP server dialog */
 

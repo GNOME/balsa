@@ -1,5 +1,7 @@
-2006-01-10 20:43  PeterB
+2006-01-10 23:43  PeterB
 
+	* libbalsa/message.c: set message->size from
+	g_mime_stream_length().
 	* src/main.c: use g_idle_add and data instead of g_io_add_watch and
 	pipes.
 	* src/main-window.c, src/main-window.h: set progress text in status

@@ -1,3 +1,7 @@
+2006-01-11 09:22  PeterB
+
+	* libbalsa/mailbox.c: reset stream before adding message.
+
 2006-01-11 09:01  PeterB
 
 	* src/: main-window.c, toolbar-factory.c: add optional toolbar

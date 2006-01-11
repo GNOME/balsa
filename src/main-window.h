@@ -110,7 +110,7 @@ gboolean balsa_window_setup_progress(BalsaWindow * window,
                                      const gchar * text);
 void balsa_window_clear_progress(BalsaWindow* window);
 void balsa_window_increment_progress(BalsaWindow * window,
-                                     gdouble fraction);
+                                     gdouble fraction, gboolean flush);
 
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__

@@ -547,9 +547,10 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     if (!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
         /* No error, but we return FALSE so the caller can grab all the
          * message info needed to rethread from scratch. */
-        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-                             _("Cache file for mailbox %s "
-                               "will be created"), name);
+        if (libbalsa_mailbox_total_messages(mailbox) > 0)
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                                 _("Cache file for mailbox %s "
+                                   "will be created"), name);
         g_free(filename);
         g_free(name);
         return FALSE;

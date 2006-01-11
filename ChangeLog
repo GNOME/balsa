@@ -1,5 +1,7 @@
-2006-01-11 09:46  PeterB
+2006-01-11 13:25  PeterB
 
+	* src/sendmsg-window.c: build with gcc < 4.1.
+	* libbalsa/mailbox_mbox.c: cast value to gint for g_print.
 	* libbalsa/: mailbox.c, message.c: reset stream after loading
 	envelope.
 	* libbalsa/mailbox.c: reset stream before adding message.

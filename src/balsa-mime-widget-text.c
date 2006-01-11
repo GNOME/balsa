@@ -30,7 +30,15 @@
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-mime-widget-text.h"
 
+#if HAVE_GTKSOURCEVIEW
+#include <gtksourceview/gtksourceview.h>
+#include <gtksourceview/gtksourcebuffer.h>
+#include <gtksourceview/gtksourcelanguage.h>
+#include <gtksourceview/gtksourcelanguagesmanager.h>
+#endif
 
+
+static GtkWidget * create_text_widget(const char * content_type);
 static void bm_modify_font_from_string(GtkWidget * widget, const char *font);
 static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level);
 static gboolean fix_text_widget(GtkWidget *widget, gpointer data);
@@ -74,6 +82,13 @@ static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_
 static void handle_url(const message_url_t* url);
 static void free_url_list(GList * url_list);
 static void balsa_gtk_html_on_url(GtkWidget *html, const gchar *url);
+static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
+			     gunichar tag_char, const gchar * property,
+			     gint value);
+
+
+#define PHRASE_HIGHLIGHT_ON    1
+#define PHRASE_HIGHLIGHT_OFF   2
 
 
 BalsaMimeWidget *
@@ -149,7 +164,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = gtk_text_view_new();
+    mw->widget = create_text_widget(content_type);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget), 2);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), 15);
@@ -237,6 +252,15 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 			       (GDestroyNotify)free_url_list);
     }
 
+    if (!g_ascii_strcasecmp(content_type, "text/plain")) {
+	/* plain-text highlighting */
+	g_object_set_data(G_OBJECT(mw->widget), "phrase-highlight",
+			  (gpointer)PHRASE_HIGHLIGHT_ON);
+	phrase_highlight(buffer, "hp-bold", '*', "weight", PANGO_WEIGHT_BOLD);
+	phrase_highlight(buffer, "hp-underline", '_', "underline", PANGO_UNDERLINE_SINGLE);
+	phrase_highlight(buffer, "hp-italic", '/', "style", PANGO_STYLE_ITALIC);
+    }
+
     /* size allocation may not be correct, so we'll check back later */
     balsa_mime_widget_schedule_resize(mw->widget);
     
@@ -247,6 +271,39 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
 
 /* -- local functions -- */
+static GtkWidget *
+create_text_widget(const char * content_type)
+{
+#if HAVE_GTKSOURCEVIEW
+    static GtkSourceLanguagesManager * lm = NULL;
+    GtkSourceLanguage * lang;
+    GtkSourceBuffer * buffer;
+    GtkWidget * widget;
+
+    /* we use or own highlighting for text/plain */
+    if (!g_ascii_strcasecmp(content_type, "text/plain"))
+	return gtk_text_view_new();
+
+    /* check if GtkSourceView knows our content type */
+    if (!lm)
+	lm = gtk_source_languages_manager_new();
+    if (!lm ||
+	!(lang = gtk_source_languages_manager_get_language_from_mime_type(lm, content_type)))
+	return gtk_text_view_new();
+
+    /* create a GtkSourceView for our content type */
+    buffer = gtk_source_buffer_new_with_language(lang);
+    gtk_source_buffer_set_highlight(buffer, TRUE);
+    // TODO: maybe we want to use (a) our own highlighting styles or (b) use
+    // GEdit-2's here?
+    widget = gtk_source_view_new_with_buffer(buffer);
+    g_object_unref(buffer);
+    return widget;
+#else
+    return gtk_text_view_new();
+#endif
+}
+
 static void
 bm_modify_font_from_string(GtkWidget * widget, const char *font)
 {
@@ -326,10 +383,43 @@ gtk_widget_destroy_insensitive(GtkWidget * widget)
 }
 
 static void
+structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem, 
+			  GtkTextView *textview)
+{
+    GtkTextTagTable * table;
+    GtkTextTag * tag;
+    gint phrase_hl = (gint)g_object_get_data(G_OBJECT(textview), "phrase-highlight");
+    gboolean new_hl = gtk_check_menu_item_get_active(checkmenuitem);
+
+    table = gtk_text_buffer_get_tag_table(gtk_text_view_get_buffer(textview));
+    if (!table || phrase_hl == 0 ||
+	(phrase_hl == PHRASE_HIGHLIGHT_ON && new_hl) ||
+	(!phrase_hl == PHRASE_HIGHLIGHT_OFF && !new_hl))
+	return;
+
+    if ((tag = gtk_text_tag_table_lookup(table, "hp-bold")))
+	g_object_set(G_OBJECT(tag), "weight",
+		     new_hl ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL,
+		     NULL);
+    if ((tag = gtk_text_tag_table_lookup(table, "hp-underline")))
+	g_object_set(G_OBJECT(tag), "underline",
+		     new_hl ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE,
+		     NULL);
+    if ((tag = gtk_text_tag_table_lookup(table, "hp-italic")))
+	g_object_set(G_OBJECT(tag), "style",
+		     new_hl ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL,
+		     NULL);
+
+    g_object_set_data(G_OBJECT(textview), "phrase-highlight",
+		      (gpointer)(new_hl ? PHRASE_HIGHLIGHT_ON : PHRASE_HIGHLIGHT_OFF));
+}
+
+static void
 text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
                          LibBalsaMessageBody * mime_body)
 {
     GtkWidget *menu_item;
+    gint phrase_hl;
 
     gtk_widget_hide_all(GTK_WIDGET(menu));
 
@@ -345,6 +435,19 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer)mime_body);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+
+    phrase_hl = (gint)g_object_get_data(G_OBJECT(textview), "phrase-highlight");
+    if (phrase_hl != 0) {
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+			      gtk_separator_menu_item_new ());
+	menu_item = gtk_check_menu_item_new_with_label (_("Highlight structured phrases"));
+	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item),
+					phrase_hl == PHRASE_HIGHLIGHT_ON);
+	g_signal_connect (G_OBJECT (menu_item), "toggled",
+			  G_CALLBACK (structured_phrases_toggle),
+			  (gpointer)textview);
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+    }
 
     gtk_widget_show_all(GTK_WIDGET(menu));
 }
@@ -584,6 +687,67 @@ free_url_list(GList * url_list)
         g_free(url_data);
     }
     g_list_free(url_list);
+}
+
+/* --- Hacker's Jargon highlighting --- */
+#define UNICHAR_PREV(p)  g_utf8_get_char(g_utf8_prev_char(p))
+
+static void
+phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
+		 const gchar * property, gint value)
+{
+    GtkTextTag *tag = NULL;
+    const gchar * buf_chars;
+    gchar * utf_start;
+    GtkTextIter iter_start;
+    GtkTextIter iter_end;
+
+    /* get the utf8 buffer */
+    gtk_text_buffer_get_start_iter(buffer, &iter_start);
+    gtk_text_buffer_get_end_iter(buffer, &iter_end);
+    buf_chars = gtk_text_buffer_get_text(buffer, &iter_start, &iter_end, TRUE);
+    g_return_if_fail(buf_chars != NULL);
+
+    /* find the tag char in the text and scan the buffer for
+       <buffer start or whitespace><tag char><alnum><any text><alnum><tagchar>
+       <whitespace, punctuation or buffer end> */
+    utf_start = g_utf8_strchr(buf_chars, -1, tag_char);
+    while (utf_start) {
+	gchar * s_next = g_utf8_next_char(utf_start);
+
+	if ((utf_start == buf_chars || g_unichar_isspace(UNICHAR_PREV(utf_start))) &&
+	    *s_next != '\0' && g_unichar_isalnum(g_utf8_get_char(s_next))) {
+	    gchar * utf_end;
+	    gchar * e_next;
+
+	    /* found a proper start sequence - find the end or eject */
+	    if (!(utf_end = g_utf8_strchr(s_next, -1, tag_char)))
+		return;
+	    e_next = g_utf8_next_char(utf_end);
+	    while (!g_unichar_isalnum(UNICHAR_PREV(utf_end)) ||
+		   !(*e_next == '\0' || 
+		     g_unichar_isspace(g_utf8_get_char(e_next)) ||
+		     g_unichar_ispunct(g_utf8_get_char(e_next)))) {
+		if (!(utf_end = g_utf8_strchr(e_next, -1, tag_char)))
+		    return;
+		e_next = g_utf8_next_char(utf_end);
+	    }
+	    
+	    /* insert the tag */
+	    if (!tag)
+		tag = gtk_text_buffer_create_tag(buffer, id, property, value, NULL);
+	    gtk_text_buffer_get_iter_at_offset(buffer, &iter_start,
+					       g_utf8_pointer_to_offset(buf_chars, utf_start));
+	    gtk_text_buffer_get_iter_at_offset(buffer, &iter_end,
+					       g_utf8_pointer_to_offset(buf_chars, e_next));
+	    gtk_text_buffer_apply_tag(buffer, tag, &iter_start, &iter_end);
+
+ 	    /* set the next start properly */
+	    utf_start = *e_next ? g_utf8_strchr(e_next, -1, tag_char) : NULL;
+	} else
+	    /* no start sequence, find the next start tag char */
+	    utf_start = *s_next ? g_utf8_strchr(s_next, -1, tag_char) : NULL;
+    }
 }
 
 /* --- HTML related functions -- */

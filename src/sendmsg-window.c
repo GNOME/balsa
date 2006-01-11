@@ -75,6 +75,9 @@
 #include "spell-check.h"
 #endif                          /* HAVE_GTKSPELL */
 #include "toolbar-factory.h"
+#if HAVE_GTKSOURCEVIEW
+#include <gtksourceview/gtksourceview.h>
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
 #define GNOME_MIME_BUG_WORKAROUND 1
 typedef struct {
@@ -172,13 +175,19 @@ static void set_ready(LibBalsaAddressEntry * address_entry,
                       BalsaSendmsgAddress *sma);
 static void sendmsg_window_set_title(BalsaSendmsg * bsmsg);
 
+#if !HAVE_GTKSOURCEVIEW
 /* Undo/Redo buffer helpers. */
 static void sw_buffer_save(BalsaSendmsg * bsmsg);
 static void sw_buffer_swap(BalsaSendmsg * bsmsg, gboolean undo);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 static void sw_buffer_signals_connect(BalsaSendmsg * bsmsg);
+#if !HAVE_GTKSOURCEVIEW || !HAVE_GTKSPELL
 static void sw_buffer_signals_disconnect(BalsaSendmsg * bsmsg);
+#endif                          /* !HAVE_GTKSOURCEVIEW || !HAVE_GTKSPELL */
+#if !HAVE_GTKSOURCEVIEW
 static void sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo,
 			       gboolean redo);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
 /* Standard DnD types */
 enum {
@@ -985,7 +994,9 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     if (bsmsg->autosave_timeout_id)
         g_source_remove(bsmsg->autosave_timeout_id);
 
+#if !HAVE_GTKSOURCEVIEW
     g_object_unref(bsmsg->buffer2);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     g_free(bsmsg);
 
@@ -1028,7 +1039,9 @@ static void
 sw_buffer_signals_block(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
 {
     g_signal_handler_block(buffer, bsmsg->changed_sig_id);
+#if !HAVE_GTKSOURCEVIEW
     g_signal_handler_block(buffer, bsmsg->delete_range_sig_id);
+#endif                          /* HAVE_GTKSOURCEVIEW */
     g_signal_handler_block(buffer, bsmsg->insert_text_sig_id);
 }
 
@@ -1036,7 +1049,9 @@ static void
 sw_buffer_signals_unblock(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
 {
     g_signal_handler_unblock(buffer, bsmsg->changed_sig_id);
+#if !HAVE_GTKSOURCEVIEW
     g_signal_handler_unblock(buffer, bsmsg->delete_range_sig_id);
+#endif                          /* HAVE_GTKSOURCEVIEW */
     g_signal_handler_unblock(buffer, bsmsg->insert_text_sig_id);
 }
 
@@ -1101,7 +1116,9 @@ edit_with_gnome_check(gpointer data) {
     }
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(data_real->bsmsg->text));
 
+#if !HAVE_GTKSOURCEVIEW
     sw_buffer_save(data_real->bsmsg);
+#endif                          /* HAVE_GTKSOURCEVIEW */
     sw_buffer_signals_block(data_real->bsmsg, buffer);
     gtk_text_buffer_set_text(buffer, "", 0);
     curposition = 0;
@@ -3009,6 +3026,30 @@ drag_data_quote(GtkWidget * widget,
 /* create_text_area 
    Creates the text entry part of the compose window.
 */
+#if HAVE_GTKSOURCEVIEW
+static void
+sw_can_undo_cb(GtkSourceBuffer * source_buffer, gboolean can_undo,
+               BalsaSendmsg * bsmsg)
+{
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
+
+    gtk_widget_set_sensitive(bsmsg->undo_widget, can_undo);
+    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_UNDO, can_undo);
+}
+
+static void
+sw_can_redo_cb(GtkSourceBuffer * source_buffer, gboolean can_redo,
+               BalsaSendmsg * bsmsg)
+{
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
+
+    gtk_widget_set_sensitive(bsmsg->redo_widget, can_redo);
+    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_REDO, can_redo);
+}
+#endif                          /* HAVE_GTKSOURCEVIEW */
+
 static GtkWidget *
 create_text_area(BalsaSendmsg * bsmsg)
 {
@@ -3017,7 +3058,11 @@ create_text_area(BalsaSendmsg * bsmsg)
     GtkTextBuffer *buffer;
     GtkWidget *table;
 
+#if HAVE_GTKSOURCEVIEW
+    bsmsg->text = libbalsa_source_view_new(TRUE, balsa_app.quoted_color);
+#else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->text = gtk_text_view_new();
+#endif                          /* HAVE_GTKSOURCEVIEW */
     text_view = GTK_TEXT_VIEW(bsmsg->text);
     gtk_text_view_set_left_margin(text_view, 2);
     gtk_text_view_set_right_margin(text_view, 2);
@@ -3028,8 +3073,15 @@ create_text_area(BalsaSendmsg * bsmsg)
     pango_font_description_free(desc);
 
     buffer = gtk_text_view_get_buffer(text_view);
+#if HAVE_GTKSOURCEVIEW
+    g_signal_connect(buffer, "can-undo",
+                     G_CALLBACK(sw_can_undo_cb), bsmsg);
+    g_signal_connect(buffer, "can-redo",
+                     G_CALLBACK(sw_can_redo_cb), bsmsg);
+#else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->buffer2 =
          gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
+#endif                          /* HAVE_GTKSOURCEVIEW */
     gtk_text_buffer_create_tag(buffer, "soft", NULL, NULL);
     gtk_text_buffer_create_tag(buffer, "url", NULL, NULL);
     gtk_text_view_set_editable(text_view, TRUE);
@@ -3349,7 +3401,9 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     
     if ((signature = read_signature(bsmsg)) != NULL) {
+#if !HAVE_GTKSOURCEVIEW
         sw_buffer_save(bsmsg);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 	if (bsmsg->ident->sig_separator
 	    && g_ascii_strncasecmp(signature, "--\n", 3)
 	    && g_ascii_strncasecmp(signature, "-- \n", 4)) {
@@ -3476,11 +3530,19 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
     g_free(newsubject);
 }
 
+#if HAVE_GTKSOURCEVIEW
+#define BALSA_FIRST_WRAP "balsa-first-wrap"
+#endif                          /* HAVE_GTKSOURCEVIEW */
+
 static gboolean
 sw_wrap_timeout_cb(BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
+#if HAVE_GTKSOURCEVIEW
+    GtkSourceBuffer *source_buffer;
+    gboolean first_wrap;
+#endif                          /* HAVE_GTKSOURCEVIEW */
     GtkTextIter now;
 
     gdk_threads_enter();
@@ -3492,8 +3554,24 @@ sw_wrap_timeout_cb(BalsaSendmsg * bsmsg)
 
     bsmsg->wrap_timeout_id = 0;
     sw_buffer_signals_block(bsmsg, buffer);
+
+#if HAVE_GTKSOURCEVIEW
+    first_wrap = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(buffer),
+                                                   BALSA_FIRST_WRAP));
+    if (first_wrap) {
+        source_buffer = GTK_SOURCE_BUFFER(buffer);
+        gtk_source_buffer_begin_not_undoable_action(source_buffer);
+    }
+#endif                          /* HAVE_GTKSOURCEVIEW */
     libbalsa_unwrap_buffer(buffer, &now, 1);
     libbalsa_wrap_view(text_view, balsa_app.wraplength);
+#if HAVE_GTKSOURCEVIEW
+    if (first_wrap) {
+        gtk_source_buffer_end_not_undoable_action(source_buffer);
+        g_object_set_data(G_OBJECT(buffer), BALSA_FIRST_WRAP,
+                          GINT_TO_POINTER(FALSE));
+    }
+#endif                          /* HAVE_GTKSOURCEVIEW */
     sw_buffer_signals_unblock(bsmsg, buffer);
     gtk_text_view_scroll_to_mark(text_view,
                                  gtk_text_buffer_get_insert(buffer),
@@ -3861,6 +3939,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     BalsaSendmsg *bsmsg = NULL;
     unsigned i;
     gchar* tmp;
+#if HAVE_GTKSOURCEVIEW
+    GtkSourceBuffer *source_buffer;
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     g_assert((type == SEND_NORMAL && message == NULL)
              || (type != SEND_NORMAL && message != NULL));
@@ -3942,7 +4023,9 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
         g_signal_connect_swapped(balsa_app.main_window, "identities-changed",
                                  (GCallback)bsmsg_identities_changed_cb,
                                  bsmsg);
+#if !HAVE_GTKSOURCEVIEW
     sw_buffer_set_undo(bsmsg, TRUE, FALSE);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     bsmsg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
     bsmsg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
@@ -4068,6 +4151,13 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
      * and wrap it... */
     sw_buffer_signals_connect(bsmsg);
 
+#if HAVE_GTKSOURCEVIEW
+    source_buffer = GTK_SOURCE_BUFFER(gtk_text_view_get_buffer
+                                      (GTK_TEXT_VIEW(bsmsg->text)));
+    g_object_set_data(G_OBJECT(source_buffer), BALSA_FIRST_WRAP,
+                      GINT_TO_POINTER(TRUE));
+    gtk_source_buffer_begin_not_undoable_action(source_buffer);
+#endif                          /* HAVE_GTKSOURCEVIEW */
     if (type == SEND_CONTINUE)
 	continueBody(bsmsg, message);
     else
@@ -4076,7 +4166,15 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	libbalsa_message_body_unref(message);
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;
+#if HAVE_GTKSOURCEVIEW
+    gtk_source_buffer_end_not_undoable_action(source_buffer);
+    gtk_widget_set_sensitive(bsmsg->undo_widget, FALSE);
+    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_UNDO, FALSE);
+    gtk_widget_set_sensitive(bsmsg->redo_widget, FALSE);
+    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_REDO, FALSE);
+#else                           /* HAVE_GTKSOURCEVIEW */
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     /* set the initial window title */
     sendmsg_window_set_title(bsmsg);
@@ -4535,6 +4633,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 #endif
     LibBalsaIdentity *ident = bsmsg->ident;
     GList *refs;
+#if HAVE_GTKSOURCEVIEW
+    GtkTextBuffer *buffer, *buffer2;
+    GtkTextIter iter;
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     message = libbalsa_message_new();
 
@@ -4615,17 +4717,33 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	sw_wrap_body(bsmsg);
     /* Copy it to buffer2, so we can change it without changing the
      * display. */
+#if HAVE_GTKSOURCEVIEW
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    buffer2 =
+         gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    gtk_text_buffer_get_start_iter(buffer2, &iter);
+    gtk_text_buffer_insert_range(buffer2, &iter, &start, &end);
+    if (bsmsg->flow)
+	libbalsa_prepare_delsp(buffer2);
+    gtk_text_buffer_get_bounds(buffer2, &start, &end);
+    body->buffer = gtk_text_iter_get_text(&start, &end);
+    g_object_unref(buffer2);
+#else                           /* HAVE_GTKSOURCEVIEW */
     sw_buffer_save(bsmsg);
     if (bsmsg->flow)
 	libbalsa_prepare_delsp(bsmsg->buffer2);
     gtk_text_buffer_get_bounds(bsmsg->buffer2, &start, &end);
     body->buffer = gtk_text_iter_get_text(&start, &end);
+#endif                          /* HAVE_GTKSOURCEVIEW */
     if (bsmsg->flow)
 	body->buffer =
 	    libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength,
                                   TRUE, FALSE, TRUE);
+#if !HAVE_GTKSOURCEVIEW
     /* Disable undo and redo, because buffer2 was changed. */
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     body->charset = g_strdup(libbalsa_text_attr_string(body->buffer) ?
                              bsmsg->charset : "us-ascii");
@@ -4959,11 +5077,13 @@ sw_buffer_insert_text(GtkTextBuffer * buffer, GtkTextIter * iter,
     bsmsg->insert_mark =
         gtk_text_buffer_create_mark(buffer, "balsa-insert-mark", iter,
                                     FALSE);
+#if !HAVE_GTKSOURCEVIEW
     /* If this insertion is not from the keyboard, or if we just undid
      * something, save the current buffer for undo. */
     if (len > 1 /* Not keyboard? */
         || !GTK_WIDGET_IS_SENSITIVE(bsmsg->undo_widget))
         sw_buffer_save(bsmsg);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 }
 
 static void
@@ -4988,6 +5108,7 @@ sw_buffer_changed(GtkTextBuffer * buffer, BalsaSendmsg * bsmsg)
     bsmsg->modified = TRUE;
 }
 
+#if !HAVE_GTKSOURCEVIEW
 static void
 sw_buffer_delete_range(GtkTextBuffer * buffer, GtkTextIter * start,
                        GtkTextIter * end, BalsaSendmsg * bsmsg)
@@ -4996,6 +5117,7 @@ sw_buffer_delete_range(GtkTextBuffer * buffer, GtkTextIter * start,
         gtk_text_iter_get_offset(start) + 1)
         sw_buffer_save(bsmsg);
 }
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
 /*
  * Helpers for the undo and redo buffers.
@@ -5012,11 +5134,14 @@ sw_buffer_signals_connect(BalsaSendmsg * bsmsg)
     bsmsg->changed_sig_id =
         g_signal_connect(buffer, "changed",
                          G_CALLBACK(sw_buffer_changed), bsmsg);
+#if !HAVE_GTKSOURCEVIEW
     bsmsg->delete_range_sig_id =
         g_signal_connect(buffer, "delete-range",
                          G_CALLBACK(sw_buffer_delete_range), bsmsg);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 }
 
+#if !HAVE_GTKSOURCEVIEW || !HAVE_GTKSPELL
 static void
 sw_buffer_signals_disconnect(BalsaSendmsg * bsmsg)
 {
@@ -5024,10 +5149,14 @@ sw_buffer_signals_disconnect(BalsaSendmsg * bsmsg)
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
     g_signal_handler_disconnect(buffer, bsmsg->changed_sig_id);
+#if !HAVE_GTKSOURCEVIEW
     g_signal_handler_disconnect(buffer, bsmsg->delete_range_sig_id);
+#endif                          /* HAVE_GTKSOURCEVIEW */
     g_signal_handler_disconnect(buffer, bsmsg->insert_text_sig_id);
 }
+#endif                          /* !HAVE_GTKSOURCEVIEW || !HAVE_GTKSPELL */
 
+#if !HAVE_GTKSOURCEVIEW
 static void
 sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo, gboolean redo)
 {
@@ -5039,6 +5168,7 @@ sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo, gboolean redo)
     gtk_widget_set_sensitive(bsmsg->redo_widget, redo);
     balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_REDO, redo);
 }
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
 #ifdef HAVE_GTKSPELL
 static void
@@ -5084,6 +5214,7 @@ sw_spell_detach(BalsaSendmsg * bsmsg)
 }
 #endif                          /* HAVE_GTKSPELL */
 
+#if !HAVE_GTKSOURCEVIEW
 static void
 sw_buffer_swap(BalsaSendmsg * bsmsg, gboolean undo)
 {
@@ -5123,11 +5254,25 @@ sw_buffer_save(BalsaSendmsg * bsmsg)
 
     sw_buffer_set_undo(bsmsg, TRUE, FALSE);
 }
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
 /*
  * Menu and toolbar callbacks.
  */
 
+#if HAVE_GTKSOURCEVIEW
+static void
+sw_undo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    g_signal_emit_by_name(bsmsg->text, "undo");
+}
+
+static void
+sw_redo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    g_signal_emit_by_name(bsmsg->text, "redo");
+}
+#else                           /* HAVE_GTKSOURCEVIEW */
 static void
 sw_undo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
@@ -5139,6 +5284,7 @@ sw_redo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     sw_buffer_swap(bsmsg, FALSE);
 }
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
 /*
  * Cut, copy, and paste callbacks, and a helper.
@@ -5186,7 +5332,9 @@ select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
+#if !HAVE_GTKSOURCEVIEW
     sw_buffer_save(bsmsg);
+#endif                          /* HAVE_GTKSOURCEVIEW */
     sw_wrap_body(bsmsg);
 }
 
@@ -5213,7 +5361,9 @@ reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 	return;
     }
 
+#if !HAVE_GTKSOURCEVIEW
     sw_buffer_save(bsmsg);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     text_view = GTK_TEXT_VIEW(bsmsg->text);
     buffer = gtk_text_view_get_buffer(text_view);

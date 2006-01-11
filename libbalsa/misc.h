@@ -182,4 +182,8 @@ enum LibBalsaImageError {
 #endif                          /* HAVE_COMPFACE */
 };
 
+#if HAVE_GTKSOURCEVIEW
+GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour);
+#endif                          /* HAVE_GTKSOURCEVIEW */
+
 #endif				/* __LIBBALSA_MISC_H__ */

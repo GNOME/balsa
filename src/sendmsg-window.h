@@ -89,7 +89,9 @@ extern "C" {
 	                        /* the config */
 	gulong delete_sig_id;
         gulong changed_sig_id;
+#if !HAVE_GTKSOURCEVIEW
         gulong delete_range_sig_id;
+#endif                          /* HAVE_GTKSOURCEVIEW */
         gulong insert_text_sig_id;
         guint wrap_timeout_id;
         guint autosave_timeout_id;
@@ -109,7 +111,9 @@ extern "C" {
 #endif
         GtkWidget *header_table;
 
+#if !HAVE_GTKSOURCEVIEW
         GtkTextBuffer *buffer2;       /* Undo buffer. */
+#endif                          /* HAVE_GTKSOURCEVIEW */
         GtkWidget *undo_widget;
         GtkWidget *redo_widget;
 

@@ -2293,8 +2293,13 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     index->window = GTK_WIDGET(info->window);
 
     balsa_window_increase_activity(info->window);
+
+    /* Call balsa_index_load_mailbox_node NOT holding the gdk lock. */
+    gdk_threads_leave();
     failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index),
                                              info->mbnode, &err);
+    gdk_threads_enter();
+
     if (info->window) {
 	balsa_window_decrease_activity(info->window);
 	g_object_remove_weak_pointer(G_OBJECT(info->window),
@@ -4716,12 +4721,20 @@ notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
  * bar to move in activity mode.  
  * this routine is called from g_timeout_dispatch() and needs to take care 
  * of GDK locking itself using gdk_threads_{enter,leave}
+ *
+ * Use of the progress bar to show a fraction of a task takes priority.
  **/
 static gint
 balsa_window_progress_timeout(gpointer user_data) 
 {
+    gint in_use;
+
     gdk_threads_enter();
-    gtk_progress_bar_pulse(GTK_PROGRESS_BAR(user_data));
+
+    in_use = GPOINTER_TO_INT(g_object_get_data(user_data, "in_use"));
+    if (in_use != BALSA_PROGRESS_INCREMENT)
+        gtk_progress_bar_pulse(user_data);
+
     gdk_threads_leave();
 
     /* return true so it continues to be called */
@@ -4739,7 +4752,6 @@ balsa_window_progress_timeout(gpointer user_data)
 void 
 balsa_window_increase_activity(BalsaWindow* window)
 {
-    gint in_use = 0;
     gint activity_handler;
     guint activity_counter = 0;
     GtkProgressBar *progress_bar;
@@ -4747,22 +4759,16 @@ balsa_window_increase_activity(BalsaWindow* window)
     progress_bar =
         GTK_PROGRESS_BAR(gnome_appbar_get_progress
                          (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar), 
-                                               "in_use"));
-    
-    if (!in_use) {
-        g_object_set_data(G_OBJECT(progress_bar), "in_use", 
-                          GINT_TO_POINTER(BALSA_PROGRESS_ACTIVITY));
 
+    activity_handler =
+        GPOINTER_TO_INT(g_object_get_data
+                        (G_OBJECT(progress_bar), "activity_handler"));
+    if (!activity_handler) {
         /* add a timeout to make the activity bar move */
         activity_handler = g_timeout_add(50, balsa_window_progress_timeout,
                                          progress_bar);
         g_object_set_data(G_OBJECT(progress_bar), "activity_handler", 
                           GINT_TO_POINTER(activity_handler));
-    } else if (in_use != BALSA_PROGRESS_ACTIVITY) {
-        /* the progress bar is already in use doing something else, so
-         * quit */
-        return;
     }
     
     /* increment the reference counter */
@@ -4784,7 +4790,6 @@ balsa_window_increase_activity(BalsaWindow* window)
 void 
 balsa_window_decrease_activity(BalsaWindow* window)
 {
-    gint in_use;
     gint activity_handler;
     guint activity_counter = 0;
     GtkProgressBar *progress_bar;
@@ -4792,12 +4797,6 @@ balsa_window_decrease_activity(BalsaWindow* window)
     progress_bar =
         GTK_PROGRESS_BAR(gnome_appbar_get_progress
                          (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use = GPOINTER_TO_INT(g_object_get_data
-                             (G_OBJECT(progress_bar), "in_use"));
-
-    /* make sure the progress bar is being used for activity */
-    if (in_use != BALSA_PROGRESS_ACTIVITY)
-        return;
 
     activity_counter =
         GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(progress_bar),
@@ -4833,18 +4832,18 @@ balsa_window_decrease_activity(BalsaWindow* window)
 /* balsa_window_setup_progress
  * 
  * window: BalsaWindow that contains the progressbar 
- * upper_bound: Defines the top of the range to be incremented along
+ * text:   to appear superimposed on the progress bar,
+ *         or NULL to clear and release the progress bar.
  * 
  * returns: true if initialization is successful, otherwise returns
  * false.
  * 
  * Initializes the progress bar for incremental operation with a range
- * from 0 to upper_bound.  If the bar is already in operation, either
- * in activity mode or otherwise, the function returns false, if the
- * initialization is successful it returns true.
+ * from 0 to 1.  If the bar is already in activity mode, the function
+ * returns false; if the initialization is successful it returns true.
  **/
 gboolean
-balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound)
+balsa_window_setup_progress(BalsaWindow* window, const gchar * text)
 {
     gint in_use;
     GtkProgressBar *progress_bar;
@@ -4855,48 +4854,23 @@ balsa_window_setup_progress(BalsaWindow* window, gfloat upper_bound)
     in_use = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar),
                                                "in_use"));
 
-    /* make sure the progress bar is currently unused */
-    if (in_use != BALSA_PROGRESS_NONE) 
-        return FALSE;
+    if (text) {
+        /* make sure the progress bar is currently unused */
+        if (in_use == BALSA_PROGRESS_INCREMENT) 
+            return FALSE;
+        in_use = BALSA_PROGRESS_INCREMENT;
+    } else
+        in_use = BALSA_PROGRESS_NONE;
     
-    in_use = BALSA_PROGRESS_INCREMENT;
     g_object_set_data(G_OBJECT(progress_bar), "in_use",
                       GINT_TO_POINTER(in_use));
     
+    gtk_progress_bar_set_text(progress_bar, text);
+    gtk_progress_bar_set_fraction(progress_bar, 0);
+
     return TRUE;
 }
 
-
-/* balsa_window_clear_progress
- * 
- * Clears the progress bar from incrementing, and makes it availble to
- * be used by another area of the program.
- **/
-void 
-balsa_window_clear_progress(BalsaWindow* window)
-{
-    gint in_use = 0;
-    GtkProgressBar *progress_bar;
-
-    progress_bar =
-        GTK_PROGRESS_BAR(gnome_appbar_get_progress
-                         (GNOME_APPBAR(GNOME_APP(window)->statusbar)));
-    in_use =
-        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar), "in_use"));
-
-    /* make sure we're using it before it is cleared */
-    if (in_use != BALSA_PROGRESS_INCREMENT)
-        return;
-
-    gtk_progress_bar_set_fraction(progress_bar, 0);
-
-    in_use = BALSA_PROGRESS_NONE;
-    g_object_set_data(G_OBJECT(progress_bar), "in_use",
-                      GINT_TO_POINTER(in_use));
-}
-
-
-#ifndef BALSA_USE_THREADS
 /* balsa_window_increment_progress
  *
  * If the progress bar has been initialized using
@@ -4909,7 +4883,7 @@ balsa_window_clear_progress(BalsaWindow* window)
  * main thread from processing events.
  **/
 void
-balsa_window_increment_progress(BalsaWindow* window)
+balsa_window_increment_progress(BalsaWindow * window, gdouble fraction)
 {
     gint in_use;
     GtkProgressBar *progress_bar;
@@ -4924,9 +4898,16 @@ balsa_window_increment_progress(BalsaWindow* window)
     if (in_use != BALSA_PROGRESS_INCREMENT)
         return;
 
-    gtk_progress_bar_pulse(progress_bar);
+    gtk_progress_bar_set_fraction(progress_bar, fraction);
+
+    if (TRUE || !libbalsa_am_i_subthread())
+        while (gtk_events_pending())
+            gtk_main_iteration_do(FALSE);
 }
-#endif
+
+/*
+ * End of progress bar functions.
+ */
 
 static void
 ident_manage_dialog_cb(GtkWidget * widget, gpointer user_data)

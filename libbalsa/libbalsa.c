@@ -721,20 +721,23 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 void
 libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
 {
-#if LIBBALSA_DEBUG_THREADS
     pthread_t self;
 
     self = pthread_self();
 
-    if (self != mailbox->thread_id) {
+    pthread_mutex_lock(&mailbox_lock);
+
+    if (mailbox->lock == 0 || self != mailbox->thread_id) {
 	g_warning("Not holding mailbox lock!!!");
+        pthread_mutex_unlock(&mailbox_lock);
 	return;
     }
 
-#endif /* LIBBALSA_DEBUG_THREADS */
-    pthread_mutex_lock(&mailbox_lock);
-    if(!--mailbox->lock)
+    if(--mailbox->lock == 0) {
         pthread_cond_broadcast(&mailbox_cond);
+        mailbox->thread_id = 0;
+    }
+
     pthread_mutex_unlock(&mailbox_lock);
 }
 
@@ -763,12 +766,11 @@ libbalsa_threads_leave(void)
 
     self = pthread_self();
 
-#if LIBBALSA_DEBUG_THREADS
-    if (self != libbalsa_threads_id) {
+    if (libbalsa_threads_lock == 0 || self != libbalsa_threads_id) {
 	g_warning("Not holding gdk lock!!!");
 	return;
     }
-#endif /* LIBBALSA_DEBUG_THREADS */
+
     if (--libbalsa_threads_lock == 0) {
 	if (self != main_thread_id)
 	    gdk_display_flush(gdk_display_get_default());
@@ -792,3 +794,7 @@ libbalsa_threads_destroy(void)
 }
 
 #endif				/* BALSA_USE_THREADS */
+
+/* Initialized by the front end. */
+gboolean (*libbalsa_progress_set_text) (const gchar * text);
+void (*libbalsa_progress_set_fraction) (gdouble fraction);

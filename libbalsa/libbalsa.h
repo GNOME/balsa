@@ -144,5 +144,7 @@ void libbalsa_threads_destroy(void);
 void libbalsa_message(const char *fmt, ...);
 gchar * libbalsa_rot(const gchar * pass);
 
+extern gboolean (*libbalsa_progress_set_text) (const gchar * text);
+extern void (*libbalsa_progress_set_fraction) (gdouble fraction);
 
 #endif                          /* __LIBBALSA_H__ */

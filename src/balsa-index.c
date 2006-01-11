@@ -1006,6 +1006,9 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
 
 /* balsa_index_load_mailbox_node:
    open mailbox_node, the opening is done in thread to keep UI alive.
+
+   Called NOT holding the gdk lock, so we must wrap gtk calls in
+   gdk_threads_{enter,leave}.
 */
 
 gboolean
@@ -1024,16 +1027,18 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox), TRUE);
 
     mailbox = mbnode->mailbox;
+
     msg = g_strdup_printf(_("Opening mailbox %s. Please wait..."),
 			  mbnode->mailbox->name);
+    gdk_threads_enter();
     gnome_appbar_push(balsa_app.appbar, msg);
+    gdk_threads_leave();
     g_free(msg);
+
     try_cnt = 0;
     do {
         g_clear_error(err);
-        gdk_threads_leave();
         successp = libbalsa_mailbox_open(mailbox, err);
-        gdk_threads_enter();
         if (!balsa_app.main_window)
             return FALSE;
 
@@ -1042,7 +1047,10 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
             break;
         balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
     } while(try_cnt++<3);
+
+    gdk_threads_enter();
     gnome_appbar_pop(balsa_app.appbar);
+    gdk_threads_leave();
 
     if (!successp)
 	return TRUE;
@@ -1057,6 +1065,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     /*
      * rename "from" column to "to" for outgoing mail
      */
+    gdk_threads_enter();
     tree_view = GTK_TREE_VIEW(index);
     if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) {
         GtkTreeViewColumn *column =
@@ -1072,6 +1081,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 	    	     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
 
     balsa_window_enable_mailbox_menus(balsa_app.main_window, index);
+    gdk_threads_leave();
+
     libbalsa_mailbox_set_view_filter(mailbox,
                                      balsa_window_get_view_filter
                                      (balsa_app.main_window, TRUE), FALSE);
@@ -1079,11 +1090,13 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));
 
+    gdk_threads_enter();
     /* Set the tree store*/
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
     g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);
 #endif
     gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(mailbox));
+    gdk_threads_leave();
 
     /* Create a search-iter for SEARCH UNDELETED. */
     index->search_iter = libbalsa_mailbox_search_iter_new(&cond_undeleted);

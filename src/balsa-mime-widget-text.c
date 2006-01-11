@@ -255,7 +255,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     if (!g_ascii_strcasecmp(content_type, "text/plain")) {
 	/* plain-text highlighting */
 	g_object_set_data(G_OBJECT(mw->widget), "phrase-highlight",
-			  (gpointer)PHRASE_HIGHLIGHT_ON);
+			  GINT_TO_POINTER(PHRASE_HIGHLIGHT_ON));
 	phrase_highlight(buffer, "hp-bold", '*', "weight", PANGO_WEIGHT_BOLD);
 	phrase_highlight(buffer, "hp-underline", '_', "underline", PANGO_UNDERLINE_SINGLE);
 	phrase_highlight(buffer, "hp-italic", '/', "style", PANGO_STYLE_ITALIC);

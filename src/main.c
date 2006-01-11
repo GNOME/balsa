@@ -80,14 +80,6 @@ GIOChannel *mail_thread_msg_receive;
 GIOChannel *send_thread_msg_send;
 GIOChannel *send_thread_msg_receive;
 
-static pthread_mutex_t progress_lock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  progress_cond = PTHREAD_COND_INITIALIZER;
-static int progress_thread_pipes[2];
-static GIOChannel *progress_thread_msg_receive;
-
-/* Semaphore to prevent dual use of appbar progressbar */
-int updating_progressbar;
-
 static void threads_init(void);
 static void threads_destroy(void);
 #endif				/* BALSA_USE_THREADS */
@@ -327,24 +319,6 @@ mailboxes_init(gboolean check_only)
 
 #ifdef BALSA_USE_THREADS
 
-static gboolean
-progress_thread_msg_notify_cb(void)
-{
-    gdouble fraction;
-
-    pthread_mutex_lock(&progress_lock);
-    if (read(progress_thread_pipes[0], &fraction, sizeof fraction) ==
-            sizeof fraction) {
-        gdk_threads_enter();
-        balsa_window_increment_progress(balsa_app.main_window, fraction);
-        gdk_threads_leave();
-    }
-    pthread_cond_signal(&progress_cond);
-    pthread_mutex_unlock(&progress_lock);
-
-    return TRUE;
-}
-
 static void
 threads_init(void)
 {
@@ -363,7 +337,6 @@ threads_init(void)
     pthread_mutexattr_destroy(&attr);
     pthread_mutex_init(&send_messages_lock, NULL);
     checking_mail = 0;
-    updating_progressbar = 0;
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
 	      "Error opening pipes.\n");
@@ -383,15 +356,6 @@ threads_init(void)
 	g_io_channel_unix_new(send_thread_pipes[0]);
     g_io_add_watch(send_thread_msg_receive, G_IO_IN,
 		   (GIOFunc) send_progress_notify_cb, NULL);
-    
-    if (pipe(progress_thread_pipes) < 0) {
-	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
-	      "Error opening pipes.\n");
-    }
-    progress_thread_msg_receive =
-	g_io_channel_unix_new(progress_thread_pipes[0]);
-    g_io_add_watch(progress_thread_msg_receive, G_IO_IN,
-		   (GIOFunc) progress_thread_msg_notify_cb, NULL);
 }
 
 static void
@@ -577,19 +541,42 @@ balsa_progress_set_text(const gchar * text)
  * Set the fraction in the progress bar; if called from a subthread, 
  * must be called NOT holding the gdk lock--otherwise THREADLOCK!
  */
+
+#ifdef BALSA_USE_THREADS
+static pthread_mutex_t balsa_progress_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  balsa_progress_cond = PTHREAD_COND_INITIALIZER;
+
+static gboolean
+balsa_progress_idle_cb(gpointer data)
+{
+    guint tmp = GPOINTER_TO_UINT(data);
+    pthread_mutex_lock(&balsa_progress_lock);
+    gdk_threads_enter();
+    balsa_window_increment_progress(balsa_app.main_window,
+                                    ((gdouble) tmp) / G_MAXUINT, FALSE);
+    gdk_threads_leave();
+    pthread_cond_signal(&balsa_progress_cond);
+    pthread_mutex_unlock(&balsa_progress_lock);
+
+    return FALSE;
+}
+#endif
+
 static void
 balsa_progress_set_fraction(gdouble fraction)
 {
     if (libbalsa_am_i_subthread()) {
 #ifdef BALSA_USE_THREADS
-        pthread_mutex_lock(&progress_lock);
-        if (write(progress_thread_pipes[1], &fraction, sizeof fraction) ==
-            (gint) sizeof fraction)
-            pthread_cond_wait(&progress_cond, &progress_lock);
-        pthread_mutex_unlock(&progress_lock);
+        guint tmp = G_MAXUINT * fraction;
+        pthread_mutex_lock(&balsa_progress_lock);
+        g_idle_add((GSourceFunc) balsa_progress_idle_cb,
+                   GUINT_TO_POINTER(tmp));
+        pthread_cond_wait(&balsa_progress_cond, &balsa_progress_lock);
+        pthread_mutex_unlock(&balsa_progress_lock);
 #endif
     } else
-        balsa_window_increment_progress(balsa_app.main_window, fraction);
+        balsa_window_increment_progress(balsa_app.main_window, fraction,
+                                        TRUE);
 }
 
 /* -------------------------- main --------------------------------- */

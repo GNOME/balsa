@@ -3558,10 +3558,9 @@ sw_wrap_timeout_cb(BalsaSendmsg * bsmsg)
 #if HAVE_GTKSOURCEVIEW
     first_wrap = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(buffer),
                                                    BALSA_FIRST_WRAP));
-    if (first_wrap) {
-        source_buffer = GTK_SOURCE_BUFFER(buffer);
+    source_buffer = GTK_SOURCE_BUFFER(buffer);
+    if (first_wrap)
         gtk_source_buffer_begin_not_undoable_action(source_buffer);
-    }
 #endif                          /* HAVE_GTKSOURCEVIEW */
     libbalsa_unwrap_buffer(buffer, &now, 1);
     libbalsa_wrap_view(text_view, balsa_app.wraplength);

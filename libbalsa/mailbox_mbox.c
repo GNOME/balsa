@@ -52,7 +52,7 @@ struct message_info {
     off_t x_status;		/* Offset of the "X-Status:" header. */
     off_t mime_version;		/* Offset of the "MIME-Version:" header. */
     off_t end;
-    char *from;
+    size_t from_len;
     LibBalsaMessage *message; /* registers only referenced messages
 			       * to avoid having two objects refering 
 			       * to a single physical message. */
@@ -119,6 +119,9 @@ struct _LibBalsaMailboxMbox {
     GArray* messages_info;
     GMimeStream *gmime_stream;
     gint size;
+#if GLIB_CHECK_VERSION(2, 8, 0)
+    gboolean messages_info_changed;
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 };
 
 GType libbalsa_mailbox_mbox_get_type(void)
@@ -292,7 +295,7 @@ libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *mailbox,
 	    return NULL;
 	stream = g_mime_stream_substream(mbox->gmime_stream,
 					 msg_info->start
-					 + strlen(msg_info->from) + 1,
+					 + msg_info->from_len,
 					 msg_info->end);
 
 	return stream;
@@ -353,6 +356,64 @@ lbm_mbox_header_cb(GMimeParser * parser, const char *header,
         msg_info->mime_version = offset;
 }
 
+#if GLIB_CHECK_VERSION(2, 8, 0)
+static gchar *
+lbm_mbox_get_cache_filename(LibBalsaMailboxMbox * mbox)
+{
+    gchar *encoded_path;
+    gchar *filename;
+    gchar *basename;
+
+    encoded_path =
+        libbalsa_urlencode(libbalsa_mailbox_local_get_path
+                           (LIBBALSA_MAILBOX_LOCAL(mbox)));
+    basename = g_strconcat("mbox", encoded_path, NULL);
+    g_free(encoded_path);
+    filename =
+        g_build_filename(g_get_home_dir(), ".balsa", basename, NULL);
+    g_free(basename);
+
+    return filename;
+}
+
+static void
+lbm_mbox_save(LibBalsaMailboxMbox * mbox)
+{
+    gchar *filename;
+    GError *err = NULL;
+
+    if (!mbox->messages_info_changed)
+        return;
+
+    mbox->messages_info_changed = FALSE;
+
+    filename = lbm_mbox_get_cache_filename(mbox);
+
+    if (mbox->messages_info->len > 0) {
+        if (!g_file_set_contents(filename, mbox->messages_info->data,
+                                 mbox->messages_info->len
+                                 * sizeof(struct message_info), &err)) {
+            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                                 _("Could not write file %s: %s"),
+                                 filename, err->message);
+            g_error_free(err);
+        }
+    } else if (unlink(filename) < 0)
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Could not unlink file %s: %s"),
+                             filename, strerror(errno));
+
+    g_free(filename);
+#define DEBUG
+#ifdef DEBUG
+    g_print("%s:    %s    saved %d messages\n", __func__, 
+            LIBBALSA_MAILBOX(mbox)->name,
+            mbox->messages_info->len);
+#endif
+}
+
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
+
 static LibBalsaMessage *lbm_mbox_message_new(GMimeMessage * mime_message,
 					     struct message_info
 					     *msg_info);
@@ -364,7 +425,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     GMimeParser *gmime_parser;
     struct message_info msg_info;
     struct message_info * msg_info_p = &msg_info;
-    unsigned msgno = 0;
+    unsigned msgno = mbox->messages_info->len;
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
@@ -379,16 +440,19 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     while (!g_mime_parser_eos(gmime_parser)) {
 	GMimeMessage *mime_message;
         LibBalsaMessage *msg;
+        gchar *from;
 
         msg_info.status = msg_info.x_status = msg_info.mime_version = -1;
         mime_message   = g_mime_parser_construct_message(gmime_parser);
         msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
         msg_info.end   = g_mime_parser_tell(gmime_parser);
         if (msg_info.end <= msg_info.start
-            || !(msg_info.from = g_mime_parser_get_from(gmime_parser))) {
+            || !(from = g_mime_parser_get_from(gmime_parser))) {
 	    g_object_unref(mime_message);
             continue;
 	}
+        msg_info.from_len = strlen(from) + 1;
+        g_free(from);
 
 	/* Make sure we don't have offsets for any encapsulated headers. */
 	if (!g_mime_object_get_header(GMIME_OBJECT(mime_message),
@@ -403,13 +467,14 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
         msg = lbm_mbox_message_new(mime_message, &msg_info);
         g_object_unref(mime_message);
-        if (!msg) {
-            g_free(msg_info.from);
+        if (!msg)
             continue;
-        }
 
         msg_info.flags = msg_info.orig_flags;
         g_array_append_val(mbox->messages_info, msg_info);
+#if GLIB_CHECK_VERSION(2, 8, 0)
+        mbox->messages_info_changed = TRUE;
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 
         msg->flags = msg_info.orig_flags;
         msg->length = msg_info.end - msg_info.start;
@@ -425,6 +490,9 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
     g_object_unref(gmime_parser);
     printf("done, msgcnt=%d\n", message_cnt);
+#if GLIB_CHECK_VERSION(2, 8, 0)
+    lbm_mbox_save(mbox);
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 }
 
 static void
@@ -440,8 +508,6 @@ mbox_msg_unref(gpointer data, GObject *msg)
 static void
 free_message_info(struct message_info *msg_info)
 {
-    g_free(msg_info->from);
-    msg_info->from = NULL;
     if (msg_info->message) {
 	g_object_weak_unref(G_OBJECT(msg_info->message), mbox_msg_unref,
 			    msg_info->message->mailbox);
@@ -463,6 +529,102 @@ free_messages_info(GArray * messages_info)
     }
     g_array_free(messages_info, TRUE);
 }
+
+#if GLIB_CHECK_VERSION(2, 8, 0)
+static void
+lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
+{
+    gchar *filename;
+    gchar *contents;
+    gsize length;
+    gboolean tmp;
+    off_t end;
+    struct message_info *msg_info;
+    GMimeStream *mbox_stream;
+
+    filename = lbm_mbox_get_cache_filename(mbox);
+    tmp = g_file_get_contents(filename, &contents, &length, NULL);
+    g_free(filename);
+
+    if (!tmp)
+        /* Nonexistent file is no error. */
+        return;
+
+    if (length < sizeof(struct message_info)) {
+        /* Error: file always contains at least one record. */
+        g_free(contents);
+        return;
+    }
+
+#ifdef DEBUG
+    g_print("%s: %s file has %d messages\n", __func__,
+            LIBBALSA_MAILBOX(mbox)->name,
+            length / sizeof(struct message_info));
+#endif
+
+    msg_info = (struct message_info *) contents;
+
+    if (msg_info->start != 0) {
+        /* Error: first message should start at 0. */
+        g_free(contents);
+        return;
+    }
+
+    end = 0;
+    do {
+        msg_info->message = NULL;
+        if (msg_info->start < end)
+            /* Error: this message starts before the end of the
+             * previous one. */
+            break;
+        end = msg_info->end;
+        if (msg_info->from_len < 6
+            || (off_t) (msg_info->start + msg_info->from_len) >= end
+            || end > mbox->size)
+            /* Error. */
+            break;
+        tmp = ++msg_info < (struct message_info *) (contents + length);
+        if (tmp && !lbm_mbox_seek_to_message(mbox, msg_info->start)) {
+            /* Error: no message at the next start offset. */
+            --msg_info;
+            break;
+        }
+        /* dummy entry in mindex for now */
+        g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, NULL);
+    } while (tmp);
+
+    g_array_append_vals(mbox->messages_info, contents,
+                        msg_info - (struct message_info *) contents);
+#ifdef DEBUG
+    g_print("%s: %s restored %d messages\n", __func__,
+            LIBBALSA_MAILBOX(mbox)->name,
+            msg_info - (struct message_info *) contents);
+#endif
+
+    mbox_stream = mbox->gmime_stream;
+    libbalsa_mime_stream_shared_lock(mbox_stream);
+    /* Position the stream for parsing; if restoring failed (tmp ==
+     * TRUE), seek to the start of the defective message, else seek to
+     * the end of the last message. */
+    g_mime_stream_seek(mbox_stream,
+                       tmp ? msg_info->start : (--msg_info)->end,
+                       GMIME_STREAM_SEEK_SET);
+
+    /* GMimeParser seems to have issues with a file that contains only
+     * blank lines, so we'll step forward until we find something else. */
+    while (!g_mime_stream_eos(mbox_stream)) {
+        gchar c;
+
+        if (g_mime_stream_read(mbox_stream, &c, 1) == 1 && c != '\n') {
+            g_mime_stream_seek(mbox_stream, -1, GMIME_STREAM_SEEK_CUR);
+            break;
+        }
+    }
+    libbalsa_mime_stream_shared_unlock(mbox_stream);
+
+    g_free(contents);
+}
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 
 static gboolean
 libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
@@ -519,8 +681,14 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 
     mailbox->unread_messages = 0;
     time(&t0);
-    if (st.st_size != 0)
-	parse_mailbox(mbox);
+
+    if (st.st_size > 0) {
+#if GLIB_CHECK_VERSION(2, 8, 0)
+        lbm_mbox_restore(mbox);
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
+        parse_mailbox(mbox);
+    }
+    
     LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = time(NULL) - t0;
     LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_cnt  = 1;
 
@@ -718,9 +886,16 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 
         free_message_info(msg_info);
         g_array_remove_index(mbox->messages_info, msgno - 1);
+#if GLIB_CHECK_VERSION(2, 8, 0)
+        mbox->messages_info_changed = TRUE;
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
     }
     if(msgno == 0)
         g_mime_stream_seek(mbox_stream, 0, GMIME_STREAM_SEEK_SET);
+#ifdef DEBUG
+    g_print("%s: start parsing at msgno %d of %d\n", __func__, msgno,
+            mbox->messages_info->len);
+#endif
     parse_mailbox(mbox);
     mbox->size = g_mime_stream_tell(mbox_stream);
     libbalsa_mime_stream_shared_unlock(mbox_stream);
@@ -1088,6 +1263,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    libbalsa_mime_stream_shared_unlock(mbox_stream);
 	    if (!can_rewrite_in_place)
 		break;
+#if GLIB_CHECK_VERSION(2, 8, 0)
+            mbox->messages_info_changed = TRUE;
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 	    ++j;
 	}
     }
@@ -1105,6 +1283,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    g_warning("can't stat \"%s\"", path);
 	else
             libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
+#if GLIB_CHECK_VERSION(2, 8, 0)
+        lbm_mbox_save(mbox);
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 	mbox_unlock(mailbox, mbox_stream);
 	return TRUE;
     }
@@ -1142,7 +1323,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	} else {
             msg_info->status = msg_info->mime_version >= 0 ?
 		msg_info->mime_version :
-                (off_t) (msg_info->start + strlen(msg_info->from) + 1);
+                (off_t) (msg_info->start + msg_info->from_len);
 	    
 	    status_len = 0;
 	}
@@ -1264,9 +1445,15 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	        libbalsa_mailbox_local_msgno_removed(mailbox, j + 1);
 		free_message_info(msg_info);
 		g_array_remove_index(mbox->messages_info, j);
+#if GLIB_CHECK_VERSION(2, 8, 0)
+                mbox->messages_info_changed = TRUE;
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 	    } else
 		j++;
 	}
+#if GLIB_CHECK_VERSION(2, 8, 0)
+        lbm_mbox_save(mbox);
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 	return TRUE;
     }
 
@@ -1287,6 +1474,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 				   lbm_mbox_header_cb, &msg_info);
     for (j = first; j < mbox->messages_info->len; ) {
 	GMimeMessage *mime_msg;
+        gchar *from;
 
 	msg_info =
 	    &g_array_index(mbox->messages_info, struct message_info, j);
@@ -1303,6 +1491,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET);
 	    free_message_info(msg_info);
 	    g_array_remove_index(mbox->messages_info, j);
+#if GLIB_CHECK_VERSION(2, 8, 0)
+            mbox->messages_info_changed = TRUE;
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 	    continue;
 	}
 	if (msg_info->message)
@@ -1321,8 +1512,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "MIME-Version"))
 	    msg_info->mime_version = -1;
 
-	g_free(msg_info->from);
-	msg_info->from = g_mime_parser_get_from(gmime_parser);
+	from = g_mime_parser_get_from(gmime_parser);
+        msg_info->from_len = strlen(from) + 1;
+        g_free(from);
 	msg_info->end = g_mime_parser_tell(gmime_parser);
 	msg_info->orig_flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
 	g_assert(mime_msg != NULL);
@@ -1342,6 +1534,9 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     libbalsa_mime_stream_shared_unlock(mbox_stream);
     mbox->messages_info->len = j;
     g_object_unref(gmime_parser);
+#if GLIB_CHECK_VERSION(2, 8, 0)
+    lbm_mbox_save(mbox);
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 
     return TRUE;
 }

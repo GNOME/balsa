@@ -1237,10 +1237,10 @@ libbalsa_message_load_envelope_from_stream(LibBalsaMessage * message,
 	line->len = 0;
 	g_byte_array_append(line, &lookahead, 1);
     } while (!g_mime_stream_eos(gmime_stream_buffer));
-    if (ret) {
-	/* calculate size */
-    }
+    if (ret)
+        message->length = g_mime_stream_length(gmime_stream);
     g_object_unref(gmime_stream_buffer);
+    g_mime_stream_reset(gmime_stream);
     libbalsa_mime_stream_shared_unlock(gmime_stream);
     g_byte_array_free(line, TRUE);
 }
@@ -1255,7 +1255,6 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
 	return;
 
     libbalsa_message_load_envelope_from_stream(message, gmime_stream);
-    message->length = g_mime_stream_length(gmime_stream);
     g_object_unref(gmime_stream);
 }
 

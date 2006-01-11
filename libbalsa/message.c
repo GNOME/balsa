@@ -1255,6 +1255,7 @@ libbalsa_message_load_envelope(LibBalsaMessage *message)
 	return;
 
     libbalsa_message_load_envelope_from_stream(message, gmime_stream);
+    message->length = g_mime_stream_length(gmime_stream);
     g_object_unref(gmime_stream);
 }
 

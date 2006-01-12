@@ -1,3 +1,7 @@
+2006-01-12 12:08  PeterB
+
+	* libbalsa/mailbox.c: must use get-message to get the flags.
+
 2006-01-11 15:45  PeterB
 
 	* src/balsa-mime-widget-text.c: one more.

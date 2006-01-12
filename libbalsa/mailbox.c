@@ -805,12 +805,11 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
     add_message = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message;
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
+        LibBalsaMessage *message =      /* Just for the flags! */
+            libbalsa_mailbox_get_message(mailbox, msgno);
         GMimeStream *stream =
             libbalsa_mailbox_get_message_stream(mailbox, msgno);
-        LibBalsaMessage *message = libbalsa_message_new();
 
-        /* Just for the flags! */
-        libbalsa_message_load_envelope_from_stream(message, stream);
         if (add_message(dest, stream, message->flags, err)) {
             if (!(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
                 && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW))

@@ -786,10 +786,13 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
                                     GArray * msgnos,
                                     LibBalsaMailbox * dest, GError ** err)
 {
+    gchar *text;
+    LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
     gboolean retval = TRUE;
-    gboolean any    = FALSE;
+    gboolean any = FALSE;
     guint i;
-    gboolean use_progress = FALSE;
+    gboolean (*msgno_has_flags)(LibBalsaMailbox *, guint,
+                                LibBalsaMessageFlag, LibBalsaMessageFlag);
     gboolean (*add_message)(LibBalsaMailbox *, GMimeStream *,
                             LibBalsaMessageFlag, GError **);
 
@@ -797,34 +800,43 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
     g_return_val_if_fail(dest != mailbox, FALSE);
 
-    if (msgnos->len > 400)
-        use_progress = libbalsa_progress_set_text(_("Copying"));
+    text = g_strdup_printf(_("Copying from %s to %s"), mailbox->name,
+                           dest->name);
+    libbalsa_progress_set_text(&progress, text, msgnos->len);
+    g_free(text);
 
-    add_message = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message;
+    msgno_has_flags = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->msgno_has_flags;
+    add_message     = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message;
+
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
-        LibBalsaMessage *message =      /* Just for the flags! */
-            libbalsa_mailbox_get_message(mailbox, msgno);
+        LibBalsaMessageFlag flags = 0;
         GMimeStream *stream =
             libbalsa_mailbox_get_message_stream(mailbox, msgno);
 
-        if (add_message(dest, stream, message->flags, err)) {
-            if (!(message->flags & LIBBALSA_MESSAGE_FLAG_DELETED)
-                && (message->flags & LIBBALSA_MESSAGE_FLAG_NEW))
+        /* Copy flags. */
+        if (msgno_has_flags(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_NEW, 0))
+            flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+        if (msgno_has_flags
+            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_REPLIED, 0))
+            flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+        if (msgno_has_flags
+            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0))
+            flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+
+        if (add_message(dest, stream, flags, err)) {
+            if (flags & LIBBALSA_MESSAGE_FLAG_NEW)
                 libbalsa_mailbox_set_unread_messages_flag(dest, TRUE);
             any = TRUE;
         } else
             retval = FALSE;
 
-        g_object_unref(message);
         g_object_unref(stream);
-        if (use_progress)
-            libbalsa_progress_set_fraction(((gdouble) (i + 1)) /
-                                           ((gdouble) msgnos->len));
+        libbalsa_progress_set_fraction(&progress, ((gdouble) (i + 1)) /
+                                       ((gdouble) msgnos->len));
     }
 
-    if (use_progress)
-        libbalsa_progress_set_text(NULL);
+    libbalsa_progress_set_text(&progress, NULL, 0);
 
     if (any)
         /* Some messages copied. */
@@ -3462,13 +3474,22 @@ lbm_try_reassemble_func(GMimeObject * mime_part, gpointer data)
 static void
 lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
 {
+    gchar *text;
+    guint total_messages;
+    LibBalsaProgress progress;
     guint msgno;
     GPtrArray *partials = g_ptr_array_new();
-    guint total = (guint) - 1;
+    guint total = G_MAXUINT;
     GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
 
-    for (msgno = libbalsa_mailbox_total_messages(mailbox); msgno > 0;
-         --msgno) {
+    text = g_strdup_printf(_("Searching %s for partial messages"),
+                           mailbox->name);
+    total_messages = libbalsa_mailbox_total_messages(mailbox);
+    libbalsa_progress_set_text(&progress, text, total_messages);
+    g_free(text);
+
+    for (msgno = 1; msgno <= total_messages && partials->len < total;
+         msgno++) {
         LibBalsaMessage *message =
             libbalsa_mailbox_get_message(mailbox, msgno);
         gchar *tmp_id;
@@ -3498,13 +3519,16 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
 
         g_free(tmp_id);
         g_object_unref(message);
+        libbalsa_progress_set_fraction(&progress, ((gdouble) msgno) /
+                                       ((gdouble) total_messages));
     }
 
     if (partials->len < total) {
         /* Someone might have wrapped a message/partial in a
          * message/multipart. */
-        for (msgno = libbalsa_mailbox_total_messages(mailbox); msgno > 0;
-             --msgno) {
+        libbalsa_progress_set_fraction(&progress, 0);
+        for (msgno = 1; msgno <= total_messages && partials->len < total;
+             msgno++) {
             LibBalsaMessage *message =
                 libbalsa_mailbox_get_message(mailbox, msgno);
             GMimeMessage *mime_message;
@@ -3537,6 +3561,8 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
             }
             g_object_unref(mime_message);
             g_object_unref(message);
+            libbalsa_progress_set_fraction(&progress, ((gdouble) msgno) /
+                                           ((gdouble) total_messages));
         }
     }
 
@@ -3564,6 +3590,8 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
     g_ptr_array_foreach(partials, (GFunc) g_object_unref, NULL);
     g_ptr_array_free(partials, TRUE);
     g_array_free(messages, TRUE);
+
+    libbalsa_progress_set_text(&progress, NULL, 0);
 }
 
 #define LBM_TRY_REASSEMBLE_IDS "libbalsa-mailbox-try-reassemble-ids"

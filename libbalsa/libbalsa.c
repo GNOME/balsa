@@ -796,5 +796,7 @@ libbalsa_threads_destroy(void)
 #endif				/* BALSA_USE_THREADS */
 
 /* Initialized by the front end. */
-gboolean (*libbalsa_progress_set_text) (const gchar * text);
-void (*libbalsa_progress_set_fraction) (gdouble fraction);
+void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,
+                                    const gchar * text, guint total);
+void (*libbalsa_progress_set_fraction) (LibBalsaProgress * progress,
+                                        gdouble fraction);

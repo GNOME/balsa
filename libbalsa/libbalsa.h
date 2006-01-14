@@ -144,7 +144,19 @@ void libbalsa_threads_destroy(void);
 void libbalsa_message(const char *fmt, ...);
 gchar * libbalsa_rot(const gchar * pass);
 
-extern gboolean (*libbalsa_progress_set_text) (const gchar * text);
-extern void (*libbalsa_progress_set_fraction) (gdouble fraction);
+typedef enum {
+    LIBBALSA_PROGRESS_NO = 0,
+    LIBBALSA_PROGRESS_YES
+} LibBalsaProgress;
+#define LIBBALSA_PROGRESS_INIT LIBBALSA_PROGRESS_NO
+/* We will not use the progress bar if the number of increments is less
+ * than LIBBALSA_PROGRESS_MIN. */
+#define LIBBALSA_PROGRESS_MIN 400
+
+extern void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,
+                                           const gchar * text,
+                                           guint total);
+extern void (*libbalsa_progress_set_fraction) (LibBalsaProgress * progress,
+                                               gdouble fraction);
 
 #endif                          /* __LIBBALSA_H__ */

@@ -1,3 +1,8 @@
+2006-01-13 19:34  PeterB
+
+	* libbalsa/mailbox_mbox.c: save mailbox info with glib < 2.8;
+	disable debug output.
+
 2006-01-14  Chao-Hsiung Liao  <j_h_liau@yahoo.com.tw>
 
 	* configure.in: Add "zh_HK" to ALL_LINGUAS.

@@ -1,3 +1,13 @@
+2006-01-14 11:45  PeterB
+
+	* libbalsa/mailbox_local.c, src/main.c: use new LibBalsaProgress
+	api.
+	* libbalsa/mailbox.c: copy flags when copying message instead of
+	getting message; show progress when reassembling message/partial;
+	use new LibBalsaProgress api.
+	* libbalsa/: libbalsa.c, libbalsa.h: simplify LibBalsaProgress and
+	make it more opaque.
+
 2006-01-13 22:15  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox_local.c, src/balsa-index.c,

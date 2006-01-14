@@ -1038,25 +1038,17 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                              LibBalsaCondition * view_filter)
 {
     guint total;
-    gboolean use_progress = FALSE;
+    LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
     LibBalsaMailboxSearchIter *iter_view;
     guint msgno;
 
     total = libbalsa_mailbox_total_messages(mailbox);
-    if (total > 400) {
+    if (view_filter
+        && !libbalsa_condition_is_flag_only(view_filter, NULL, 0, NULL)) {
         gchar *text;
 
-        if (mailbox->name)
-            text = g_strdup_printf(_("Filtering %s"), mailbox->name);
-        else {
-            LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-            gchar *name =
-                g_path_get_basename(libbalsa_mailbox_local_get_path
-                                    (local));
-            text = g_strdup_printf(_("Filtering %s"), name);
-            g_free(name);
-        }
-        use_progress = libbalsa_progress_set_text(text);
+        text = g_strdup_printf(_("Filtering %s"), mailbox->name);
+        libbalsa_progress_set_text(&progress, text, total);
         g_free(text);
     }
 
@@ -1064,12 +1056,10 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
     for (msgno = 1; msgno <= total; msgno++) {
         libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view,
                                           FALSE);
-        if (use_progress)
-            libbalsa_progress_set_fraction(((gdouble) msgno) /
-                                           ((gdouble) total));
+        libbalsa_progress_set_fraction(&progress, ((gdouble) msgno) /
+                                       ((gdouble) total));
     }
-    if (use_progress)
-        libbalsa_progress_set_text(NULL);
+    libbalsa_progress_set_text(&progress, NULL, 0);
     libbalsa_mailbox_search_iter_free(iter_view);
 
     lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
@@ -1139,37 +1129,24 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
                 need_thread = TRUE;
         while (--len);
     else {
+        gchar *text;
         guint total;
-        gboolean use_progress = FALSE;
+        LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
 
+        text = g_strdup_printf(_("Preparing %s"), mailbox->name);
         total = libbalsa_mailbox_total_messages(mailbox);
-        if (total > 400) {
-            gchar *text;
-
-            if (mailbox->name)
-                text = g_strdup_printf(_("Preparing %s"), mailbox->name);
-            else {
-                gchar *name =
-                    g_path_get_basename(libbalsa_mailbox_local_get_path
-                                        (local));
-                text = g_strdup_printf(_("Preparing %s"), name);
-                g_free(name);
-            }
-            use_progress = libbalsa_progress_set_text(text);
-            g_free(text);
-        }
+        libbalsa_progress_set_text(&progress, text, total);
+        g_free(text);
 
         for (msgno = 1; msgno <= total; msgno++) {
             if (lbm_local_prepare_msgno(local, msgno)) {
                 need_thread = TRUE;
-                if (use_progress)
-                    libbalsa_progress_set_fraction(((gdouble) msgno) /
+                libbalsa_progress_set_fraction(&progress, ((gdouble) msgno) /
                                                    ((gdouble) total));
             }
         }
 
-        if (use_progress)
-            libbalsa_progress_set_text(NULL);
+        libbalsa_progress_set_text(&progress, NULL, 0);
     }
 
     if (need_thread && !local->thread_id) {

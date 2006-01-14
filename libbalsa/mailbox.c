@@ -789,7 +789,6 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
     gboolean retval = TRUE;
     gboolean any    = FALSE;
     guint i;
-    guint chunksize;
     gboolean use_progress = FALSE;
     gboolean (*add_message)(LibBalsaMailbox *, GMimeStream *,
                             LibBalsaMessageFlag, GError **);
@@ -798,8 +797,7 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
     g_return_val_if_fail(dest != mailbox, FALSE);
 
-    chunksize = msgnos->len / 100;      /* 100 increments */
-    if (chunksize > 0)
+    if (msgnos->len > 400)
         use_progress = libbalsa_progress_set_text(_("Copying"));
 
     add_message = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message;
@@ -820,7 +818,7 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
 
         g_object_unref(message);
         g_object_unref(stream);
-        if (use_progress && (i + 1) % chunksize == 0)
+        if (use_progress)
             libbalsa_progress_set_fraction(((gdouble) (i + 1)) /
                                            ((gdouble) msgnos->len));
     }

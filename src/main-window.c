@@ -4069,6 +4069,12 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                     (FALSE, CONDITION_AND, cnd, filter);
             else 
                 filter = cnd;
+
+            /* All find filters (except body) use the same info as
+             * sorting and threading, so we might as well cache all of
+             * it, in case the user tries another search. */
+            if (!CONDITION_CHKMATCH(cnd, CONDITION_MATCH_BODY))
+                libbalsa_mailbox_prepare_threading(mailbox, NULL, 0);
             libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
             cnd = NULL;
             return;

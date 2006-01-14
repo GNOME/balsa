@@ -1035,16 +1035,41 @@ libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
 
 static void
 lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
-                             LibBalsaCondition *view_filter)
+                             LibBalsaCondition * view_filter)
 {
+    guint total;
+    gboolean use_progress = FALSE;
     LibBalsaMailboxSearchIter *iter_view;
     guint msgno;
 
+    total = libbalsa_mailbox_total_messages(mailbox);
+    if (total > 400) {
+        gchar *text;
+
+        if (mailbox->name)
+            text = g_strdup_printf(_("Filtering %s"), mailbox->name);
+        else {
+            LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+            gchar *name =
+                g_path_get_basename(libbalsa_mailbox_local_get_path
+                                    (local));
+            text = g_strdup_printf(_("Filtering %s"), name);
+            g_free(name);
+        }
+        use_progress = libbalsa_progress_set_text(text);
+        g_free(text);
+    }
+
     iter_view = libbalsa_mailbox_search_iter_new(view_filter);
-    for (msgno = 1;
-	 msgno <= libbalsa_mailbox_total_messages(mailbox);
-	 msgno++)
-	libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view, FALSE);
+    for (msgno = 1; msgno <= total; msgno++) {
+        libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view,
+                                          FALSE);
+        if (use_progress)
+            libbalsa_progress_set_fraction(((gdouble) msgno) /
+                                           ((gdouble) total));
+    }
+    if (use_progress)
+        libbalsa_progress_set_text(NULL);
     libbalsa_mailbox_search_iter_free(iter_view);
 
     lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
@@ -1115,13 +1140,10 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
         while (--len);
     else {
         guint total;
-        guint chunksize;
         gboolean use_progress = FALSE;
 
         total = libbalsa_mailbox_total_messages(mailbox);
-        chunksize = total / 100;        /* 100 increments */
-
-        if (chunksize > 0) {
+        if (total > 400) {
             gchar *text;
 
             if (mailbox->name)
@@ -1140,7 +1162,7 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
         for (msgno = 1; msgno <= total; msgno++) {
             if (lbm_local_prepare_msgno(local, msgno)) {
                 need_thread = TRUE;
-                if (use_progress && msgno % chunksize == 0)
+                if (use_progress)
                     libbalsa_progress_set_fraction(((gdouble) msgno) /
                                                    ((gdouble) total));
             }

@@ -525,6 +525,7 @@ periodic_expunge_cb(void)
 /*
  * Initialize the progress bar and set text.
  */
+static gdouble prev_fraction;
 static gboolean
 balsa_progress_set_text(const gchar * text)
 {
@@ -532,6 +533,7 @@ balsa_progress_set_text(const gchar * text)
 
     gdk_threads_enter();
     retval = balsa_window_setup_progress(balsa_app.main_window, text);
+    prev_fraction = 0;
     gdk_threads_leave();
 
     return retval;
@@ -565,6 +567,11 @@ balsa_progress_idle_cb(gpointer data)
 static void
 balsa_progress_set_fraction(gdouble fraction)
 {
+    if (fraction != 0 && fraction != 1
+        && fraction < prev_fraction + 0.02)
+        return;
+    prev_fraction = fraction;
+
     if (libbalsa_am_i_subthread()) {
 #ifdef BALSA_USE_THREADS
         guint tmp = G_MAXUINT * fraction;

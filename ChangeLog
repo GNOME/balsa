@@ -1,5 +1,8 @@
-2006-01-13 19:34  PeterB
+2006-01-13 22:15  PeterB
 
+	* libbalsa/mailbox.c, libbalsa/mailbox_local.c, src/balsa-index.c,
+	src/main-window.c, src/main.c: simplify progress bar updates; use
+	it for filtering.
 	* libbalsa/mailbox_mbox.c: save mailbox info with glib < 2.8;
 	disable debug output.
 

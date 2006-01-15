@@ -684,12 +684,16 @@ void
 libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 {
     GSList *filters;
+    guint progress_count;
     GSList *lst;
-    static LibBalsaCondition cond_and =
-    {
+    static LibBalsaCondition cond_and = {
         FALSE,
         CONDITION_AND
     };
+    gchar *text;
+    guint total;
+    guint progress_total;
+    LibBalsaProgress progress;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
@@ -697,7 +701,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
         config_mailbox_filters_load(mailbox);
         mailbox->filters_loaded = TRUE;
     }
-        
+
     filters = libbalsa_mailbox_filters_when(mailbox->filters,
                                             FILTER_WHEN_INCOMING);
 
@@ -708,18 +712,37 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
         return;
     }
 
+    progress_count = 0;
+    for (lst = filters; lst; lst = lst->next) {
+        LibBalsaFilter *filter = lst->data;
+
+        if (filter->condition
+            && !libbalsa_condition_is_flag_only(filter->condition, NULL, 0,
+                                                NULL))
+            ++progress_count;
+    }
+
     libbalsa_lock_mailbox(mailbox);
     if (!cond_and.match.andor.left)
-	cond_and.match.andor.left =
-	    libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
-					    libbalsa_condition_new_flag_enum
-					    (FALSE,
-					     LIBBALSA_MESSAGE_FLAG_RECENT),
-					    libbalsa_condition_new_flag_enum
-					    (TRUE,
-					     LIBBALSA_MESSAGE_FLAG_DELETED));
-    for (lst = filters; lst; lst = g_slist_next(lst)) {
+        cond_and.match.andor.left =
+            libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+                                            libbalsa_condition_new_flag_enum
+                                            (FALSE,
+                                             LIBBALSA_MESSAGE_FLAG_RECENT),
+                                            libbalsa_condition_new_flag_enum
+                                            (TRUE,
+                                             LIBBALSA_MESSAGE_FLAG_DELETED));
+
+    text = g_strdup_printf(_("Applying filter rules to %s"), mailbox->name);
+    total = libbalsa_mailbox_total_messages(mailbox);
+    progress_total = progress_count * total;
+        libbalsa_progress_set_text(&progress, text, progress_total);
+    g_free(text);
+
+    progress_count = 0;
+    for (lst = filters; lst; lst = lst->next) {
         LibBalsaFilter *filter = lst->data;
+        gboolean use_progress;
         LibBalsaMailboxSearchIter *search_iter;
         guint msgno;
         GArray *msgnos;
@@ -727,14 +750,22 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
         if (!filter->condition)
             continue;
 
-        cond_and.match.andor.right  = filter->condition;
+        use_progress = !libbalsa_condition_is_flag_only(filter->condition,
+                                                        NULL, 0, NULL);
+
+        cond_and.match.andor.right = filter->condition;
         search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
 
         msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
-        for (msgno = libbalsa_mailbox_total_messages(mailbox);
-             msgno > 0; msgno--)
+        for (msgno = 1; msgno <= total; msgno++) {
             if (libbalsa_mailbox_message_match(mailbox, msgno, search_iter))
                 g_array_append_val(msgnos, msgno);
+            if (use_progress)
+                libbalsa_progress_set_fraction(&progress,
+                                               ((gdouble) ++progress_count)
+                                               /
+                                               ((gdouble) progress_total));
+        }
         libbalsa_mailbox_search_iter_free(search_iter);
 
         libbalsa_mailbox_register_msgnos(mailbox, msgnos);
@@ -742,6 +773,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
         g_array_free(msgnos, TRUE);
     }
+    libbalsa_progress_set_text(&progress, NULL, 0);
     libbalsa_unlock_mailbox(mailbox);
 
     g_slist_free(filters);

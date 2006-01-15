@@ -1826,7 +1826,7 @@ gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
                           LibBalsaMailbox * draftbox,
                           LibBalsaMessage * reply_message,
-                          gchar * fcc, gboolean flow)
+			  gchar ** extra_headers, gboolean flow)
 {
     gboolean retval;
     GError *err = NULL;
@@ -1837,8 +1837,13 @@ libbalsa_message_postpone(LibBalsaMessage * message,
         LIBBALSA_MESSAGE_CREATE_OK)
         return FALSE;
 
-    if (fcc)
-        g_mime_message_set_header(message->mime_msg, "X-Balsa-Fcc", fcc);
+    if (extra_headers) {
+	gint i;
+
+	for (i = 0; extra_headers[i] && extra_headers[i + 1]; i += 2)
+	    g_mime_message_set_header(message->mime_msg, extra_headers[i],
+				      extra_headers[i + 1]);
+    }
 
     retval = libbalsa_message_copy(message, draftbox, &err);
 

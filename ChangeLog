@@ -1,5 +1,8 @@
-2006-01-14 11:45  PeterB
+2006-01-14 19:20  PeterB
 
+	* src/: balsa-index.c, main-window.c: no need to prepare
+	threading--mailbox code takes care of caching info.
+	* libbalsa/mailbox.c: show progress when filtering-on-reception.
 	* libbalsa/mailbox_local.c, src/main.c: use new LibBalsaProgress
 	api.
 	* libbalsa/mailbox.c: copy flags when copying message instead of

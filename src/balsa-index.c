@@ -1444,7 +1444,6 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
     bndx_changed_find_row(bindex);
 }
 
-
 /* bndx_mailbox_changed_cb:
    may be called from a thread. Use idle callback to update the view.
 */
@@ -1452,26 +1451,36 @@ struct index_info {
     BalsaIndex * bindex;
 };
 
+#define BNDX_IDLE_ARG "balsa-index-arg-key"
 static gboolean
 bndx_mailbox_changed_idle(struct index_info* arg)
 {
     gdk_threads_enter();
+
     if(arg->bindex) {
         g_object_remove_weak_pointer(G_OBJECT(arg->bindex),
                                      (gpointer) &arg->bindex);
 	bndx_mailbox_changed_func(arg->bindex);
+        g_object_set_data(G_OBJECT(arg->bindex), BNDX_IDLE_ARG, NULL);
     }
-    gdk_threads_leave();
     g_free(arg);
+
+    gdk_threads_leave();
     return FALSE;
 }
 
 static void
 bndx_mailbox_changed_cb(BalsaIndex * bindex)
 {
-    struct index_info *arg = g_new(struct index_info,1);
-    arg->bindex  = bindex;
+    struct index_info *arg;
+
+    if (g_object_get_data(G_OBJECT(bindex), BNDX_IDLE_ARG))
+        return;
+
+    arg = g_new(struct index_info,1);
+    arg->bindex = bindex;
     g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
+    g_object_set_data(G_OBJECT(bindex), BNDX_IDLE_ARG, arg);
     g_idle_add((GSourceFunc) bndx_mailbox_changed_idle, arg);
 }
 

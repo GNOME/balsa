@@ -150,8 +150,9 @@ typedef enum {
 } LibBalsaProgress;
 #define LIBBALSA_PROGRESS_INIT LIBBALSA_PROGRESS_NO
 /* We will not use the progress bar if the number of increments is less
- * than LIBBALSA_PROGRESS_MIN. */
-#define LIBBALSA_PROGRESS_MIN 400
+ * if it has increased by less than LIBBALSA_PROGRESS_MIN_UPDATE. */
+#define LIBBALSA_PROGRESS_MIN_COUNT  400
+#define LIBBALSA_PROGRESS_MIN_UPDATE 0.02
 
 extern void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,
                                            const gchar * text,

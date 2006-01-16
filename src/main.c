@@ -533,7 +533,7 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
     gboolean rc = FALSE;
 
     gdk_threads_enter();
-    if (!text || total >= LIBBALSA_PROGRESS_MIN)
+    if (!text || total >= LIBBALSA_PROGRESS_MIN_COUNT)
         rc = balsa_window_setup_progress(balsa_app.main_window, text);
     prev_fraction = 0;
     gdk_threads_leave();
@@ -547,6 +547,7 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
  */
 
 #ifdef BALSA_USE_THREADS
+#ifdef THREADS_DO_NOT_LOCK
 static pthread_mutex_t balsa_progress_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t  balsa_progress_cond = PTHREAD_COND_INITIALIZER;
 
@@ -564,6 +565,7 @@ balsa_progress_idle_cb(gpointer data)
 
     return FALSE;
 }
+#endif /* THREADS_DO_NOT_LOCK */
 #endif
 
 static void
@@ -571,18 +573,20 @@ balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
 {
     if (*progress == LIBBALSA_PROGRESS_NO
         || (fraction != 0 && fraction != 1
-            && fraction < prev_fraction + 0.02))
+            && fraction < prev_fraction + LIBBALSA_PROGRESS_MIN_UPDATE))
         return;
     prev_fraction = fraction;
 
     if (libbalsa_am_i_subthread()) {
 #ifdef BALSA_USE_THREADS
+#ifdef THREADS_DO_NOT_LOCK
         guint tmp = G_MAXUINT * fraction;
         pthread_mutex_lock(&balsa_progress_lock);
         g_idle_add((GSourceFunc) balsa_progress_idle_cb,
                    GUINT_TO_POINTER(tmp));
         pthread_cond_wait(&balsa_progress_cond, &balsa_progress_lock);
         pthread_mutex_unlock(&balsa_progress_lock);
+#endif /* THREADS_DO_NOT_LOCK */
 #endif
     } else
         balsa_window_increment_progress(balsa_app.main_window, fraction,

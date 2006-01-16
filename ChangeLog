@@ -1,5 +1,12 @@
-2006-01-16 09:45  PeterB
+2006-01-16 18:09  PeterB
 
+	* src/main.c: re-enable updating progress bar from a subthread,
+	using gdk lock.
+	* libbalsa/mailbox_local.c: downgrade information messages to
+	debug.
+	* libbalsa/libbalsa.h: fix mangled comment.
+	* src/balsa-index.c: schedule only one idle callback when mailbox
+	is changed.
 	* libbalsa/libbalsa.h, src/main.c: use symbolic constants; disable
 	updating progress bar from a subthread.
 

@@ -548,7 +548,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         /* No error, but we return FALSE so the caller can grab all the
          * message info needed to rethread from scratch. */
         if (libbalsa_mailbox_total_messages(mailbox) > 0)
-            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  _("Cache file for mailbox %s "
                                    "will be created"), name);
         g_free(filename);
@@ -575,7 +575,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         /* Total must be > 0 (no file is created for empty tree). */
         || (*total = info->value.total) == 0
         || *total > libbalsa_mailbox_total_messages(mailbox)) {
-        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+        libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                              _("Cache file for mailbox %s "
                                "will be repaired"), name);
         g_free(contents);
@@ -589,7 +589,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     while (++info < (LibBalsaMailboxLocalTreeInfo *) (contents + length)) {
         if (info->msgno == 0 || info->msgno > *total
             || seen[info->msgno - 1]) {
-            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  _("Cache file for mailbox %s "
                                    "will be repaired"), name);
             g_free(seen);
@@ -612,7 +612,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                 parent = parent->parent;
                 if (!parent) {
                     /* We got to the root without finding the parent. */
-                    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                          _("Cache file for mailbox %s "
                                            "will be repaired"), name);
                     g_free(seen);

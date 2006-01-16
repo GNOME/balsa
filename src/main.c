@@ -542,31 +542,8 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
 }
 
 /* 
- * Set the fraction in the progress bar; if called from a subthread, 
- * must be called NOT holding the gdk lock--otherwise THREADLOCK!
+ * Set the fraction in the progress bar.
  */
-
-#ifdef BALSA_USE_THREADS
-#ifdef THREADS_DO_NOT_LOCK
-static pthread_mutex_t balsa_progress_lock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  balsa_progress_cond = PTHREAD_COND_INITIALIZER;
-
-static gboolean
-balsa_progress_idle_cb(gpointer data)
-{
-    guint tmp = GPOINTER_TO_UINT(data);
-    pthread_mutex_lock(&balsa_progress_lock);
-    gdk_threads_enter();
-    balsa_window_increment_progress(balsa_app.main_window,
-                                    ((gdouble) tmp) / G_MAXUINT, FALSE);
-    gdk_threads_leave();
-    pthread_cond_signal(&balsa_progress_cond);
-    pthread_mutex_unlock(&balsa_progress_lock);
-
-    return FALSE;
-}
-#endif /* THREADS_DO_NOT_LOCK */
-#endif
 
 static void
 balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
@@ -577,20 +554,10 @@ balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
         return;
     prev_fraction = fraction;
 
-    if (libbalsa_am_i_subthread()) {
-#ifdef BALSA_USE_THREADS
-#ifdef THREADS_DO_NOT_LOCK
-        guint tmp = G_MAXUINT * fraction;
-        pthread_mutex_lock(&balsa_progress_lock);
-        g_idle_add((GSourceFunc) balsa_progress_idle_cb,
-                   GUINT_TO_POINTER(tmp));
-        pthread_cond_wait(&balsa_progress_cond, &balsa_progress_lock);
-        pthread_mutex_unlock(&balsa_progress_lock);
-#endif /* THREADS_DO_NOT_LOCK */
-#endif
-    } else
-        balsa_window_increment_progress(balsa_app.main_window, fraction,
-                                        TRUE);
+    gdk_threads_enter();
+    balsa_window_increment_progress(balsa_app.main_window, fraction,
+                                    !libbalsa_am_i_subthread());
+    gdk_threads_leave();
 }
 
 /* -------------------------- main --------------------------------- */

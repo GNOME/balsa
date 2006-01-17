@@ -916,7 +916,10 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     if(msgno>0 &&
        libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
         bndx_expand_to_row(index, path);
-	bndx_scroll_to_row(index, path);
+        /* Scroll now, not in the idle handler, to make sure the initial
+         * view is correct. */
+        gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
+                                     FALSE, 0, 0);
         if(balsa_app.view_message_on_open)
             bndx_select_row(index, path);
         gtk_tree_path_free(path);

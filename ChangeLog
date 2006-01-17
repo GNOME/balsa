@@ -1,3 +1,8 @@
+2006-01-17 13:45  PeterB
+
+	* src/balsa-index.c: scroll-on-open immediately, not in idle
+	handler.
+
 2006-01-16 18:09  PeterB
 
 	* src/main.c: re-enable updating progress bar from a subthread,

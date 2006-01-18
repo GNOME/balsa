@@ -1,3 +1,13 @@
+2006-01-18 14:36  PeterB
+
+	* libbalsa/: mailbox_local.c, mailbox_local.h, mailbox_maildir.c,
+	mailbox_mbox.c, mailbox_mh.c: don't set first-unread to a deleted
+	message; check recent messages for message/partial; load-message is
+	a LibBalsaMailboxLocal method; prepare all recent messages for
+	threading.
+	* src/main.c: reset LibBalsaProgress when we're done with the
+	progress bar.
+
 2006-01-17 13:45  PeterB
 
 	* src/balsa-index.c: scroll-on-open immediately, not in idle

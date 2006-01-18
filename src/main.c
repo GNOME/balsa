@@ -538,7 +538,8 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
     prev_fraction = 0;
     gdk_threads_leave();
 
-    *progress = rc ? LIBBALSA_PROGRESS_YES : LIBBALSA_PROGRESS_NO;
+    *progress = (text && rc) ?
+        LIBBALSA_PROGRESS_YES : LIBBALSA_PROGRESS_NO;
 }
 
 /* 

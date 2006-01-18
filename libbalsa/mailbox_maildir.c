@@ -109,12 +109,13 @@ libbalsa_mailbox_maildir_total_messages(LibBalsaMailbox * mailbox);
 
 /* MailboxLocal class methods */
 static gint lbm_maildir_check_files(const gchar * path, gboolean create);
-static void lbm_maildir_set_path(LibBalsaMailboxLocal * mailbox,
+static void lbm_maildir_set_path(LibBalsaMailboxLocal * local,
                                  const gchar * path);
-static void lbm_maildir_remove_files(LibBalsaMailboxLocal *mailbox);
-static LibBalsaMessageFlag lbm_maildir_load_message(LibBalsaMailbox * mailbox,
-						     guint msgno, 
-                                                     LibBalsaMessage **msg);
+static void lbm_maildir_remove_files(LibBalsaMailboxLocal * local);
+static LibBalsaMessageFlag lbm_maildir_load_message(LibBalsaMailboxLocal *
+                                                    local, guint msgno,
+                                                    LibBalsaMessage **
+                                                    msg);
 static guint lbm_maildir_fileno(LibBalsaMailboxLocal * local, guint msgno);
 
 /* util functions */
@@ -901,11 +902,11 @@ lbm_maildir_get_message(LibBalsaMailbox * mailbox, guint msgno)
 }
 
 static LibBalsaMessageFlag
-lbm_maildir_load_message(LibBalsaMailbox * mailbox, guint msgno,
+lbm_maildir_load_message(LibBalsaMailboxLocal * local, guint msgno,
                          LibBalsaMessage ** msg)
 {
     struct message_info *msg_info =
-        message_info_from_msgno((LibBalsaMailboxMaildir *) mailbox, msgno);
+        message_info_from_msgno(LIBBALSA_MAILBOX_MAILDIR(local), msgno);
 
     if (msg_info->message)
         *msg = g_object_ref(msg_info->message);

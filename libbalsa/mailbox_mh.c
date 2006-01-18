@@ -77,7 +77,7 @@ static struct message_info *lbm_mh_message_info_from_msgno(
 						  guint msgno);
 static LibBalsaMessage *lbm_mh_get_message(LibBalsaMailbox * mailbox,
                                            guint msgno);
-static LibBalsaMessageFlag lbm_mh_load_message(LibBalsaMailbox * mailbox,
+static LibBalsaMessageFlag lbm_mh_load_message(LibBalsaMailboxLocal * local,
                                                guint msgno,
                                                LibBalsaMessage **msg);
 static gboolean libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox
@@ -1041,11 +1041,11 @@ lbm_mh_get_message(LibBalsaMailbox * mailbox, guint msgno)
 }
 
 static LibBalsaMessageFlag
-lbm_mh_load_message(LibBalsaMailbox * mailbox, guint msgno,
+lbm_mh_load_message(LibBalsaMailboxLocal * local, guint msgno,
                     LibBalsaMessage ** msg)
 {
     struct message_info *msg_info =
-        lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox), msgno);
+        lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(local), msgno);
 
     if (msg_info->message)
         *msg = g_object_ref(msg_info->message);

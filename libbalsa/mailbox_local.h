@@ -61,8 +61,9 @@ struct _LibBalsaMailboxLocal {
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
-    LibBalsaMessageFlag (*load_message)(LibBalsaMailbox *mb, guint msgno,
-                                        LibBalsaMessage **msg);
+    LibBalsaMessageFlag (*load_message)(LibBalsaMailboxLocal * local,
+                                        guint msgno,
+                                        LibBalsaMessage ** msg);
     gint (*check_files)(const gchar * path, gboolean create);
     void (*set_path)(LibBalsaMailboxLocal * local, const gchar * path);
     void (*remove_files)(LibBalsaMailboxLocal * local);

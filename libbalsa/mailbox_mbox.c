@@ -80,7 +80,7 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox,
                                            gboolean expunge);
 static LibBalsaMessage *lbm_mbox_get_message(LibBalsaMailbox * mailbox,
                                              guint msgno);
-static LibBalsaMessageFlag lbm_mbox_load_message(LibBalsaMailbox * mailbox,
+static LibBalsaMessageFlag lbm_mbox_load_message(LibBalsaMailboxLocal * local,
                                                  guint msgno,
                                                  LibBalsaMessage **msg);
 static gboolean
@@ -1569,10 +1569,10 @@ lbm_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 }
 
 static LibBalsaMessageFlag
-lbm_mbox_load_message(LibBalsaMailbox * mailbox, guint msgno,
+lbm_mbox_load_message(LibBalsaMailboxLocal * local, guint msgno,
                       LibBalsaMessage ** msg)
 {
-    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(local);
     struct message_info *msg_info =
         &g_array_index(mbox->messages_info, struct message_info, msgno - 1);
 

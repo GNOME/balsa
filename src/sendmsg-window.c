@@ -4212,7 +4212,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
 			 G_CALLBACK(delete_event_cb), bsmsg);
     lang = NULL;
-    if (message) {
+    if (type == SEND_CONTINUE) {
         const gchar *postpone_hdr;
 #ifdef HAVE_GPGME
         if ((postpone_hdr =

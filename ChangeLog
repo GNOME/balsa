@@ -1,5 +1,6 @@
-2006-01-20 10:16  PeterB
+2006-01-20 11:15  PeterB
 
+	* src/sendmsg-window.c: restore state only for continued messages.
 	* src/: sendmsg-window.c, sendmsg-window.h: fix saving and
 	restoring spell-checker state when postponing; build
 	--without-gtkspell.

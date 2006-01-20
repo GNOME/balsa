@@ -1,3 +1,9 @@
+2006-01-20 10:16  PeterB
+
+	* src/: sendmsg-window.c, sendmsg-window.h: fix saving and
+	restoring spell-checker state when postponing; build
+	--without-gtkspell.
+
 2006-01-19 23:27  PeterB
 
 	* src/sendmsg-window.c: save format=flowed or fixed, and

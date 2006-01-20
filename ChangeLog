@@ -1,3 +1,8 @@
+2006-01-19 23:27  PeterB
+
+	* src/sendmsg-window.c: save format=flowed or fixed, and
+	spell-check-language, when postponing a message.
+
 2006-01-18 14:36  PeterB
 
 	* libbalsa/: mailbox_local.c, mailbox_local.h, mailbox_maildir.c,

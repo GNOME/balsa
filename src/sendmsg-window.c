@@ -3790,14 +3790,18 @@ create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg, const gchar * lang)
                                                   locales[i].lang_name);
         group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
         if (i == selected_pos) {
+#if HAVE_GTKSPELL
             /* Steal balsa_app.spell_check_lang and restore it. */
             gchar *lang;
 
             lang = balsa_app.spell_check_lang;
             balsa_app.spell_check_lang = NULL;
+#endif                          /* HAVE_GTKSPELL */
             gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
+#if HAVE_GTKSPELL
             g_free(balsa_app.spell_check_lang);
             balsa_app.spell_check_lang = lang;
+#endif                          /* HAVE_GTKSPELL */
         }
 
         g_signal_connect(G_OBJECT(w), "activate", 
@@ -3957,7 +3961,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->in_reply_to = NULL;
     bsmsg->charset  = NULL;
     bsmsg->charsets = NULL;
-    bsmsg->locale   = NULL;
+    bsmsg->spell_check_lang = NULL;
     bsmsg->fcc_url  = NULL;
     bsmsg->insert_mark = NULL;
     bsmsg->ident = balsa_app.current_ident;
@@ -3978,6 +3982,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->type = type;
 #if !HAVE_GTKSPELL
     bsmsg->spell_checker = NULL;
+#else
+    bsmsg->spell_check_error = FALSE;
 #endif                          /* HAVE_GTKSPELL */
 #ifdef HAVE_GPGME
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
@@ -4227,14 +4233,21 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
                                            (opts_menu
                                             [OPTS_MENU_FORMAT_POS].widget),
                                            strcmp(postpone_hdr, "Fixed"));
-    } else
-        lang = balsa_app.spell_check_lang;
+    }
+#if HAVE_GTKSPELL
+    else lang = balsa_app.spell_check_lang;
+#endif                          /* HAVE_GTKSPELL */
 
     create_lang_menu(LANG_MENU_WIDGET, bsmsg, lang);
 
 #if HAVE_GTKSPELL
+    /* Steal balsa_app.spell_check_lang and restore it. */
+    tmp = balsa_app.spell_check_lang;
+    balsa_app.spell_check_lang = NULL;
     balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
-                                    bsmsg->locale != NULL);
+                                    lang != NULL);
+    g_free(balsa_app.spell_check_lang);
+    balsa_app.spell_check_lang = tmp;
 #endif
 
     return bsmsg;
@@ -5001,6 +5014,8 @@ message_postpone(BalsaSendmsg * bsmsg)
     gboolean successp;
     LibBalsaMessage *message;
     GPtrArray *headers;
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
 
     if(!is_charset_ok(bsmsg))
         return FALSE;
@@ -5018,9 +5033,9 @@ message_postpone(BalsaSendmsg * bsmsg)
     g_ptr_array_add(headers, g_strdup("X-Balsa-Crypto"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->gpg_mode));
 #endif
-    if (bsmsg->locale) {
+    if (balsa_toolbar_get_button_active(toolbar, GTK_STOCK_SPELL_CHECK)) {
         g_ptr_array_add(headers, g_strdup("X-Balsa-Lang"));
-        g_ptr_array_add(headers, g_strdup(bsmsg->locale));
+        g_ptr_array_add(headers, g_strdup(bsmsg->spell_check_lang));
     }
     g_ptr_array_add(headers, g_strdup("X-Balsa-Format"));
     g_ptr_array_add(headers, g_strdup(bsmsg->flow ? "Flowed" : "Fixed"));
@@ -5237,11 +5252,14 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
     GError *err = NULL;
 
     spell = gtkspell_new_attach(GTK_TEXT_VIEW(bsmsg->text),
-                                bsmsg->locale, &err);
-    if (!spell) {
+                                bsmsg->spell_check_lang, &err);
+    if (spell)
+        bsmsg->spell_check_error = FALSE;
+    else {
         GtkWidget *toolbar =
             balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
 
+        bsmsg->spell_check_error = TRUE;
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error starting spell checker: %s"),
                              err->message);
@@ -5661,6 +5679,8 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
 {
 #if HAVE_GTKSPELL
     gboolean had_spell;
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
 
     had_spell = sw_spell_detach(bsmsg);
 
@@ -5668,18 +5688,14 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
     g_free(bsmsg->charset);
     bsmsg->charset = g_strdup(locales[idx].charset);
     sw_prepend_charset(bsmsg, bsmsg->charset);
-    bsmsg->locale = locales[idx].locale;
+    bsmsg->spell_check_lang = locales[idx].locale;
 #if HAVE_GTKSPELL
 
     if (had_spell)
         sw_spell_attach(bsmsg);
-    else {
-        GtkWidget *toolbar =
-            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
+    else if (bsmsg->spell_check_error)
         balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
-                                        bsmsg->locale != NULL);
-    }
+                                        TRUE);
 
 #endif                          /* HAVE_GTKSPELL */
     return FALSE;
@@ -5701,9 +5717,13 @@ spell_check_menu_cb(GtkCheckMenuItem * item, BalsaSendmsg * bsmsg)
                                     is_active);
 
     sw_spell_detach(bsmsg);
+    g_free(balsa_app.spell_check_lang);
+    balsa_app.spell_check_lang = NULL;
 
-    if (is_active)
+    if (is_active) {
         sw_spell_attach(bsmsg);
+        balsa_app.spell_check_lang = g_strdup(bsmsg->spell_check_lang);
+    }
 }
 
 static void
@@ -5744,7 +5764,7 @@ spell_check_cb(GtkToggleToolButton *button, BalsaSendmsg * bsmsg)
 
     /* configure the spell checker */
     balsa_spell_check_set_text(sc, text_view);
-    balsa_spell_check_set_language(sc, bsmsg->locale);
+    balsa_spell_check_set_language(sc, bsmsg->spell_check_lang);
 
     balsa_spell_check_set_character_set(sc, "UTF-8");
     balsa_spell_check_set_module(sc,
@@ -5780,8 +5800,10 @@ lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 						   GNOMEUIINFO_KEY_UIDATA));
 	set_locale(bsmsg, i);
     }
+#if HAVE_GTKSPELL
     g_free(balsa_app.spell_check_lang);
-    balsa_app.spell_check_lang = g_strdup(bsmsg->locale);
+    balsa_app.spell_check_lang = g_strdup(bsmsg->spell_check_lang);
+#endif                          /* HAVE_GTKSPELL */
 }
 
 /* sendmsg_window_new_from_list:

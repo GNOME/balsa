@@ -67,6 +67,7 @@ extern "C" {
 	GtkWidget *spell_checker;
 #else
 	GtkWidget *spell_check_menu_item;
+        gboolean   spell_check_error;
 #endif                          /* HAVE_GTKSPELL */
 	GtkWidget *notebook;
 	LibBalsaMessage *parent_message; /* to which we're replying     */
@@ -75,7 +76,7 @@ extern "C" {
 	/* language selection related data */
 	gchar *charset;
 	GSList *charsets;
-	const gchar *locale;
+	const gchar *spell_check_lang;
 	GtkWidget *current_language_menu;
 	/* identity related data */
 	LibBalsaIdentity* ident;

@@ -2522,7 +2522,7 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
 
     if (!*entry) {
         LibBalsaMessage *msg = libbalsa_mailbox_get_message(lmm, msgno);
-        guint *p, *msgnos;
+        GArray *msgnos;
         guint i;
         GNode *tmp;
 
@@ -2531,16 +2531,33 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
         /* Don't unref msg until after prepare-threading, because
          * mailbox-local will also get it. */
 
-        p = msgnos = g_new(guint, 2 * LBM_LOOK_AHEAD + 1);
-        *p++ = msgno;
+        msgnos = g_array_sized_new(FALSE, FALSE, sizeof(guint),
+                                   2 * LBM_LOOK_AHEAD + 1);
+        g_array_append_val(msgnos, msgno);
+
+        for (tmp = node->parent; tmp->parent; tmp = tmp->parent) {
+            msgno = GPOINTER_TO_UINT(tmp->data);
+            if (!g_ptr_array_index(lmm->mindex, msgno - 1))
+                g_array_append_val(msgnos, msgno);
+        }
+
         for (i = LBM_LOOK_AHEAD, tmp = node->prev; --i && tmp;
-             tmp = tmp->prev)
-            *p++ = GPOINTER_TO_UINT(tmp->data);
+             tmp = tmp->prev) {
+            msgno = GPOINTER_TO_UINT(tmp->data);
+            if (!g_ptr_array_index(lmm->mindex, msgno - 1))
+                g_array_append_val(msgnos, msgno);
+        }
+
         for (i = LBM_LOOK_AHEAD, tmp = node->next; --i && tmp;
-             tmp = tmp->next)
-            *p++ = GPOINTER_TO_UINT(tmp->data);
-        libbalsa_mailbox_prepare_threading(lmm, msgnos, p - msgnos);
-        g_free(msgnos);
+             tmp = tmp->next) {
+            msgno = GPOINTER_TO_UINT(tmp->data);
+            if (!g_ptr_array_index(lmm->mindex, msgno - 1))
+                g_array_append_val(msgnos, msgno);
+        }
+
+        libbalsa_mailbox_prepare_threading(lmm, (guint *) msgnos->data,
+                                           msgnos->len);
+        g_array_free(msgnos, TRUE);
 
         if (msg)
             g_object_unref(msg);

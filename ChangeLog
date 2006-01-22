@@ -1,3 +1,14 @@
+2006-01-22 PeterB, Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/sendmsg-window.c: dialogs suggested by Mişu Moldovan <dumol
+	at gnome dot ro>.
+
+2006-01-22 08:53  PeterB
+
+	* libbalsa/mailbox_mbox.c: step to a From_ line before parsing.
+	* libbalsa/mailbox.c: prepare parent messages for threading as well
+	as siblings.
+
 2006-01-20 11:15  PeterB
 
 	* src/sendmsg-window.c: restore state only for continued messages.

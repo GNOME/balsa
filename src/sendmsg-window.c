@@ -4817,6 +4817,86 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     return message;
 }
 
+/*
+ * is_charset_ok and friends.
+ */
+static void
+sw_get_vbox_func(GtkWidget * widget, gpointer data)
+{
+    if (GTK_IS_VBOX(widget))
+        *((GtkWidget **) data) = widget;
+    else if (GTK_IS_CONTAINER(widget))
+        gtk_container_foreach(GTK_CONTAINER(widget), sw_get_vbox_func, data);
+}
+
+static GtkWidget *
+sw_get_vbox(GtkWidget * widget)
+{
+    GtkWidget *vbox = NULL;
+
+    gtk_container_foreach(GTK_CONTAINER(widget), sw_get_vbox_func, &vbox);
+
+    return vbox ? vbox : widget;
+}
+
+static gboolean
+sw_get_message_charset(BalsaSendmsg * bsmsg, const gchar * content)
+{
+    gint codeset;
+    GtkWidget *dialog;
+    GtkWidget *charset_button;
+
+    dialog = gtk_message_dialog_new
+        (GTK_WINDOW(bsmsg->window), 0,
+         GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL,
+         _("Message contains national (8-bit) characters"));
+    gtk_message_dialog_format_secondary_text
+        (GTK_MESSAGE_DIALOG(dialog),
+         _("Please choose the character set to encode the message:"));
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+    charset_button = libbalsa_charset_button_new();
+    gtk_combo_box_append_text(GTK_COMBO_BOX(charset_button), "UTF-8");
+    gtk_widget_show(charset_button);
+    gtk_container_add(GTK_CONTAINER(sw_get_vbox(GTK_DIALOG(dialog)->vbox)),
+                                    charset_button);
+
+    codeset = -1;
+    while (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+        const gchar *charset;
+
+        codeset = gtk_combo_box_get_active(GTK_COMBO_BOX(charset_button));
+
+        if (codeset < LIBBALSA_NUM_CODESETS) {
+            LibBalsaCodesetInfo *codeset_info;
+            GtkWidget *ok_dialog;
+
+            codeset_info = &libbalsa_codeset_info[codeset];
+            charset = codeset_info->std;
+	    if (sw_can_convert(content, -1, charset, "UTF-8", NULL)) {
+                bsmsg->charset = g_strdup(charset);
+                break;
+            }
+
+            codeset = -1;
+            ok_dialog = gtk_message_dialog_new
+                (NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+                 _("Message cannot be encoded in %s"), charset);
+            gtk_message_dialog_format_secondary_text
+                (GTK_MESSAGE_DIALOG(ok_dialog),
+                 _("Please choose a different regional character set, or UTF-8."));
+            gtk_dialog_run(GTK_DIALOG(ok_dialog));
+            gtk_widget_destroy(ok_dialog);
+        } else {
+            bsmsg->charset = g_strdup("UTF-8");
+            break;
+        }
+    }
+
+    gtk_widget_destroy(dialog);
+    return codeset != -1;
+}
+
 static gboolean
 is_charset_ok(BalsaSendmsg *bsmsg)
 {
@@ -4825,6 +4905,7 @@ is_charset_ok(BalsaSendmsg *bsmsg)
     GtkTextIter start, end;
     gchar *tmp;
     GSList *list;
+    gboolean retval;
 
     g_free(bsmsg->charset);
     bsmsg->charset = NULL;
@@ -4867,10 +4948,127 @@ is_charset_ok(BalsaSendmsg *bsmsg)
         }
     }
 
-    bsmsg->charset = g_strdup("UTF-8");
+    retval = sw_get_message_charset(bsmsg, tmp);
     g_free(tmp);
-    return TRUE;
+    
+    return retval;
 }
+
+
+/* ask the user for a subject */
+static gboolean
+subject_not_empty(BalsaSendmsg * bsmsg)
+{
+    const gchar *subj;
+    GtkWidget *no_subj_dialog;
+    GtkWidget *dialog_vbox;
+    GtkWidget *hbox;
+    GtkWidget *image;
+    GtkWidget *vbox;
+    gchar *text_str;
+    GtkWidget *label;
+    GtkWidget *subj_entry;
+    GtkWidget *dialog_action_area;
+    GtkWidget *cnclbutton;
+    GtkWidget *okbutton;
+    GtkWidget *alignment;
+    gint response;
+
+    /* read the subject widget and verify that it is contains something else
+       than spaces */
+    subj = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1]));
+    if (subj) {
+	const gchar *p = subj;
+
+	while (*p && g_unichar_isspace(g_utf8_get_char(p)))
+	    p = g_utf8_next_char(p);
+	if (*p != '\0')
+	    return TRUE;
+    }
+	    
+    /* build the dialog */
+    no_subj_dialog = gtk_dialog_new ();
+    gtk_container_set_border_width (GTK_CONTAINER (no_subj_dialog), 6);
+    gtk_window_set_modal (GTK_WINDOW (no_subj_dialog), TRUE);
+    gtk_window_set_resizable (GTK_WINDOW (no_subj_dialog), FALSE);
+    gtk_window_set_type_hint (GTK_WINDOW (no_subj_dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
+    gtk_dialog_set_has_separator (GTK_DIALOG (no_subj_dialog), FALSE);
+
+    dialog_vbox = GTK_DIALOG (no_subj_dialog)->vbox;
+
+    hbox = gtk_hbox_new (FALSE, 12);
+    gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
+
+    image = gtk_image_new_from_stock ("gtk-dialog-question", GTK_ICON_SIZE_DIALOG);
+    gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
+    gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0);
+
+    vbox = gtk_vbox_new (FALSE, 12);
+    gtk_box_pack_start (GTK_BOX (hbox), vbox, TRUE, TRUE, 0);
+
+    text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
+			       _("You did not specify a subject for this message"),
+			       _("If you would like to provide one, enter it below."));
+    label = gtk_label_new (text_str);
+    g_free(text_str);
+    gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+    gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+
+    hbox = gtk_hbox_new (FALSE, 6);
+    gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+
+    label = gtk_label_new (_("Subject:"));
+    gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+
+    subj_entry = gtk_entry_new ();
+    gtk_entry_set_text(GTK_ENTRY(subj_entry), _("(no subject)"));
+    gtk_box_pack_start (GTK_BOX (hbox), subj_entry, TRUE, TRUE, 0);
+    gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
+
+    dialog_action_area = GTK_DIALOG (no_subj_dialog)->action_area;
+    gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), GTK_BUTTONBOX_END);
+
+    cnclbutton = gtk_button_new_from_stock ("gtk-cancel");
+    gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), cnclbutton, GTK_RESPONSE_CANCEL);
+    GTK_WIDGET_SET_FLAGS (cnclbutton, GTK_CAN_DEFAULT);
+
+    okbutton = gtk_button_new ();
+    gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), okbutton, GTK_RESPONSE_OK);
+    GTK_WIDGET_SET_FLAGS (okbutton, GTK_CAN_DEFAULT);
+    gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
+                                    GTK_RESPONSE_OK);
+
+    alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
+    gtk_container_add (GTK_CONTAINER (okbutton), alignment);
+
+    hbox = gtk_hbox_new (FALSE, 2);
+    gtk_container_add (GTK_CONTAINER (alignment), hbox);
+
+    image = gtk_image_new_from_stock ("balsa_send", GTK_ICON_SIZE_BUTTON);
+    gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
+
+    label = gtk_label_new_with_mnemonic (_("_Send"));
+    gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+    GTK_WIDGET_SET_FLAGS (label, GTK_CAN_FOCUS);
+    GTK_WIDGET_SET_FLAGS (label, GTK_CAN_DEFAULT);
+
+    gtk_widget_grab_focus (subj_entry);
+    gtk_editable_select_region(GTK_EDITABLE(subj_entry), 0, -1);
+    gtk_widget_show_all(dialog_vbox);
+
+    response = gtk_dialog_run(GTK_DIALOG(no_subj_dialog));
+
+    /* always set the current string in the subject entry */
+    gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]),
+		       gtk_entry_get_text(GTK_ENTRY(subj_entry)));
+    gtk_widget_destroy(no_subj_dialog);
+
+    return response == GTK_RESPONSE_OK;
+}
+
 
 /* "send message" menu and toolbar callback.
  */
@@ -4892,6 +5090,9 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
     if(!is_charset_ok(bsmsg))
         return FALSE;
+
+    if(!subject_not_empty(bsmsg))
+	return FALSE;
 
 #ifdef HAVE_GPGME
     if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0 &&
@@ -5085,6 +5286,10 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
                                        LIBBALSA_INFORMATION_MESSAGE,
                                        _("Message postponed."));
             gtk_widget_destroy(bsmsg->window);
+        } else {
+            balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Could not postpone message."));
         }
     }
 }
@@ -5094,8 +5299,14 @@ static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     GError *err = NULL;
-    if (!message_postpone(bsmsg))
+
+    if (!message_postpone(bsmsg)) {
+	balsa_information_parented(GTK_WINDOW(bsmsg->window),
+				   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not save message."));
         return;
+    }
+
     if(!libbalsa_mailbox_open(balsa_app.draftbox, &err)) {
 	balsa_information_parented(GTK_WINDOW(bsmsg->window),
 				   LIBBALSA_INFORMATION_WARNING,

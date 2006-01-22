@@ -629,15 +629,18 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
                        tmp ? msg_info->start : (--msg_info)->end,
                        GMIME_STREAM_SEEK_SET);
 
-    /* GMimeParser seems to have issues with a file that contains only
-     * blank lines, so we'll step forward until we find something else. */
+    /* GMimeParser seems to have issues with a file that has no From_
+     * line, so we'll step forward until we find one. */
     while (!g_mime_stream_eos(mbox_stream)) {
         gchar c;
 
-        if (g_mime_stream_read(mbox_stream, &c, 1) == 1 && c != '\n') {
-            g_mime_stream_seek(mbox_stream, -1, GMIME_STREAM_SEEK_CUR);
+        if (lbm_mbox_stream_seek_to_message(mbox_stream,
+                                            g_mime_stream_tell(mbox_stream)))
             break;
-        }
+
+        while (g_mime_stream_read(mbox_stream, &c, 1) == 1)
+            if (c == '\n')
+                break;
     }
     libbalsa_mime_stream_shared_unlock(mbox_stream);
 

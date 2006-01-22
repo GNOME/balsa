@@ -3,8 +3,9 @@
 	* src/sendmsg-window.c: dialogs suggested by Mişu Moldovan <dumol
 	at gnome dot ro>.
 
-2006-01-22 08:53  PeterB
+2006-01-22 14:30  PeterB
 
+	* libbalsa/mailbox_mbox.c: use our own rdline function.
 	* libbalsa/mailbox_mbox.c: step to a From_ line before parsing.
 	* libbalsa/mailbox.c: prepare parent messages for threading as well
 	as siblings.

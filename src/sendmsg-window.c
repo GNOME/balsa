@@ -887,16 +887,30 @@ address_book_response(GtkWidget * ab, gint response,
     gtk_widget_set_sensitive(GTK_WIDGET(address_entry), TRUE);
 }
 
+static void
+sw_delete_draft(BalsaSendmsg * bsmsg)
+{
+    if (bsmsg->draft_message
+        && bsmsg->draft_message->mailbox
+        && !bsmsg->draft_message->mailbox->readonly) {
+        GList *messages = g_list_prepend(NULL, bsmsg->draft_message);
+        libbalsa_messages_change_flag(messages,
+                                      LIBBALSA_MESSAGE_FLAG_DELETED, TRUE);
+        g_list_free(messages);
+        bsmsg->draft_message = NULL;
+    }
+}
+
 static gint
 delete_handler(BalsaSendmsg* bsmsg)
 {
+    const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
     gint reply;
+    GtkWidget *d;
 
     if(balsa_app.debug) printf("delete_event_cb\n");
     if(bsmsg->modified) {
-        const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
-	GtkWidget* d = 
-            gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+	d = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
                                    GTK_DIALOG_MODAL|
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_QUESTION,
@@ -909,14 +923,36 @@ delete_handler(BalsaSendmsg* bsmsg)
                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
 	reply = gtk_dialog_run(GTK_DIALOG(d));
         gtk_widget_destroy(d);
-	if(reply == GTK_RESPONSE_YES)
+	if (reply == GTK_RESPONSE_YES) {
 	    if(!message_postpone(bsmsg))
                 reply = GTK_RESPONSE_CANCEL;
+        } else if (reply == GTK_RESPONSE_NO
+                   && bsmsg->type != SEND_CONTINUE
+                   && bsmsg->auto_saved
+                   && !bsmsg->user_saved)
+            sw_delete_draft(bsmsg);
 	/* cancel action  when reply = "yes" or "no" */
 	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
+    } 
+   
+    if (bsmsg->auto_saved && !bsmsg->user_saved) {
+	d = gtk_message_dialog_new
+            (GTK_WINDOW(bsmsg->window),
+             GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT,
+             GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+             _("The message to '%s' was saved in Draftbox.\n"
+               "Remove message from Draftbox?"),
+             tmp);
+
+	reply = gtk_dialog_run(GTK_DIALOG(d));
+        gtk_widget_destroy(d);
+	if (reply == GTK_RESPONSE_YES)
+            sw_delete_draft(bsmsg);
     }
+
     return FALSE;
 }
+
 static gint
 delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
@@ -3583,15 +3619,59 @@ sw_wrap_timeout_cb(BalsaSendmsg * bsmsg)
 }
 
 static gboolean
+sw_save_draft(BalsaSendmsg * bsmsg)
+{
+    GError *err = NULL;
+
+    if (!message_postpone(bsmsg)) {
+	balsa_information_parented(GTK_WINDOW(bsmsg->window),
+				   LIBBALSA_INFORMATION_MESSAGE,
+                                   _("Could not save message."));
+        return FALSE;
+    }
+
+    if(!libbalsa_mailbox_open(balsa_app.draftbox, &err)) {
+	balsa_information_parented(GTK_WINDOW(bsmsg->window),
+				   LIBBALSA_INFORMATION_WARNING,
+				   _("Could not open draftbox: %s"),
+				   err ? err->message : _("Unknown error"));
+	g_clear_error(&err);
+	return FALSE;
+    }
+
+    if (bsmsg->draft_message) {
+	if (bsmsg->draft_message->mailbox)
+	    libbalsa_mailbox_close(bsmsg->draft_message->mailbox,
+		    /* Respect pref setting: */
+				   balsa_app.expunge_on_close);
+	g_object_unref(G_OBJECT(bsmsg->draft_message));
+    }
+    bsmsg->modified = FALSE;
+
+    bsmsg->draft_message =
+	libbalsa_mailbox_get_message(balsa_app.draftbox,
+				     libbalsa_mailbox_total_messages
+				     (balsa_app.draftbox));
+    balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                               LIBBALSA_INFORMATION_MESSAGE,
+                               _("Message saved."));
+
+    return TRUE;
+}
+
+static gboolean
 sw_autosave_timeout_cb(BalsaSendmsg * bsmsg)
 {
-    if(bsmsg->modified) {
-        gdk_threads_enter();
-        save_message_cb(NULL, bsmsg);
-        bsmsg->modified = FALSE;
-        gdk_threads_leave();
+    gdk_threads_enter();
+
+    if (bsmsg->modified) {
+        if (sw_save_draft(bsmsg))
+            bsmsg->auto_saved = TRUE;
     }
-    return TRUE; /* do repeat it */
+
+    gdk_threads_leave();
+
+    return TRUE;                /* do repeat it */
 }
 
 static void
@@ -3967,6 +4047,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->ident = balsa_app.current_ident;
     bsmsg->update_config = FALSE;
     bsmsg->quit_on_close = FALSE;
+    bsmsg->auto_saved = FALSE;
+    bsmsg->user_saved = FALSE;
 
     bsmsg->window = window = gnome_app_new("balsa", NULL);
     /*
@@ -4820,81 +4902,26 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 /*
  * is_charset_ok and friends.
  */
-static void
-sw_get_vbox_func(GtkWidget * widget, gpointer data)
-{
-    if (GTK_IS_VBOX(widget))
-        *((GtkWidget **) data) = widget;
-    else if (GTK_IS_CONTAINER(widget))
-        gtk_container_foreach(GTK_CONTAINER(widget), sw_get_vbox_func, data);
-}
-
-static GtkWidget *
-sw_get_vbox(GtkWidget * widget)
-{
-    GtkWidget *vbox = NULL;
-
-    gtk_container_foreach(GTK_CONTAINER(widget), sw_get_vbox_func, &vbox);
-
-    return vbox ? vbox : widget;
-}
-
 static gboolean
-sw_get_message_charset(BalsaSendmsg * bsmsg, const gchar * content)
+sw_confirm_utf8(BalsaSendmsg * bsmsg, const gchar * content)
 {
-    gint codeset;
     GtkWidget *dialog;
-    GtkWidget *charset_button;
+    gint response;
 
     dialog = gtk_message_dialog_new
-        (GTK_WINDOW(bsmsg->window), 0,
-         GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL,
+        (GTK_WINDOW(bsmsg->window), 0, GTK_MESSAGE_INFO,
+         GTK_BUTTONS_OK_CANCEL,
          _("Message contains national (8-bit) characters"));
     gtk_message_dialog_format_secondary_text
         (GTK_MESSAGE_DIALOG(dialog),
-         _("Please choose the character set to encode the message:"));
+         _("Balsa will encode the message in UTF-8.\n"
+           "Cancel the operation to choose a different language."));
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
-    charset_button = libbalsa_charset_button_new();
-    gtk_combo_box_append_text(GTK_COMBO_BOX(charset_button), "UTF-8");
-    gtk_widget_show(charset_button);
-    gtk_container_add(GTK_CONTAINER(sw_get_vbox(GTK_DIALOG(dialog)->vbox)),
-                                    charset_button);
-
-    codeset = -1;
-    while (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-        const gchar *charset;
-
-        codeset = gtk_combo_box_get_active(GTK_COMBO_BOX(charset_button));
-
-        if (codeset < LIBBALSA_NUM_CODESETS) {
-            LibBalsaCodesetInfo *codeset_info;
-            GtkWidget *ok_dialog;
-
-            codeset_info = &libbalsa_codeset_info[codeset];
-            charset = codeset_info->std;
-	    if (sw_can_convert(content, -1, charset, "UTF-8", NULL)) {
-                bsmsg->charset = g_strdup(charset);
-                break;
-            }
-
-            codeset = -1;
-            ok_dialog = gtk_message_dialog_new
-                (NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
-                 _("Message cannot be encoded in %s"), charset);
-            gtk_message_dialog_format_secondary_text
-                (GTK_MESSAGE_DIALOG(ok_dialog),
-                 _("Please choose a different regional character set, or UTF-8."));
-            gtk_dialog_run(GTK_DIALOG(ok_dialog));
-            gtk_widget_destroy(ok_dialog);
-        } else {
-            bsmsg->charset = g_strdup("UTF-8");
-            break;
-        }
-    }
-
+    response = gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
-    return codeset != -1;
+    
+    return response == GTK_RESPONSE_OK;
 }
 
 static gboolean
@@ -4948,7 +4975,11 @@ is_charset_ok(BalsaSendmsg *bsmsg)
         }
     }
 
-    retval = sw_get_message_charset(bsmsg, tmp);
+    if (sw_confirm_utf8(bsmsg, tmp)) {
+        bsmsg->charset = g_strdup("UTF-8");
+        retval = TRUE;
+    }
+
     g_free(tmp);
     
     return retval;
@@ -5150,15 +5181,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	if (bsmsg->parent_message && bsmsg->parent_message->mailbox
             && !bsmsg->parent_message->mailbox->readonly)
 	    libbalsa_message_reply(bsmsg->parent_message);
-	if (bsmsg->draft_message && bsmsg->draft_message->mailbox
-            && !bsmsg->draft_message->mailbox->readonly) {
-	    GList * messages = g_list_prepend(NULL, bsmsg->draft_message);
-
-	    libbalsa_messages_change_flag(messages,
-                                          LIBBALSA_MESSAGE_FLAG_DELETED,
-                                          TRUE);
-	    g_list_free(messages);
-	}
+        sw_delete_draft(bsmsg);
     }
 
     g_object_unref(G_OBJECT(message));
@@ -5256,18 +5279,9 @@ message_postpone(BalsaSendmsg * bsmsg)
     g_ptr_array_foreach(headers, (GFunc) g_free, NULL);
     g_ptr_array_free(headers, TRUE);
 
-    if(successp) {
-	if (bsmsg->draft_message
-	    && bsmsg->draft_message->mailbox
-	    && !bsmsg->draft_message->mailbox->readonly) {
-	    GList * messages = g_list_prepend(NULL, bsmsg->draft_message);
-
-	    libbalsa_messages_change_flag(messages,
-                                          LIBBALSA_MESSAGE_FLAG_DELETED,
-                                          TRUE);
-	    g_list_free(messages);
-	}
-    } else
+    if(successp)
+        sw_delete_draft(bsmsg);
+    else
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
                                    _("Could not postpone message."));
@@ -5288,50 +5302,17 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
             gtk_widget_destroy(bsmsg->window);
         } else {
             balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                       LIBBALSA_INFORMATION_WARNING,
+                                       LIBBALSA_INFORMATION_MESSAGE,
                                        _("Could not postpone message."));
         }
     }
 }
 
-
 static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    GError *err = NULL;
-
-    if (!message_postpone(bsmsg)) {
-	balsa_information_parented(GTK_WINDOW(bsmsg->window),
-				   LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not save message."));
-        return;
-    }
-
-    if(!libbalsa_mailbox_open(balsa_app.draftbox, &err)) {
-	balsa_information_parented(GTK_WINDOW(bsmsg->window),
-				   LIBBALSA_INFORMATION_WARNING,
-				   _("Could not open draftbox: %s"),
-				   err ? err->message : _("Unknown error"));
-	g_clear_error(&err);
-	return;
-    }
-
-    if (bsmsg->draft_message) {
-	if (bsmsg->draft_message->mailbox)
-	    libbalsa_mailbox_close(bsmsg->draft_message->mailbox,
-		    /* Respect pref setting: */
-				   balsa_app.expunge_on_close);
-	g_object_unref(G_OBJECT(bsmsg->draft_message));
-    }
-    bsmsg->modified = FALSE;
-
-    bsmsg->draft_message =
-	libbalsa_mailbox_get_message(balsa_app.draftbox,
-				     libbalsa_mailbox_total_messages
-				     (balsa_app.draftbox));
-    balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                               LIBBALSA_INFORMATION_MESSAGE,
-                               _("Message saved."));
+    if (sw_save_draft(bsmsg))
+        bsmsg->user_saved = TRUE;
 }
 
 static void

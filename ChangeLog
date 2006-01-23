@@ -1,3 +1,9 @@
+2006-01-22 20:49  PeterB
+
+	* src/: sendmsg-window.c, sendmsg-window.h: simpler
+	utf8-confirmation; delete draft message if it was auto-saved but
+	not user-saved.
+
 2006-01-22 PeterB, Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/sendmsg-window.c: dialogs suggested by Mişu Moldovan <dumol

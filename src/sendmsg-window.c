@@ -4932,7 +4932,7 @@ is_charset_ok(BalsaSendmsg *bsmsg)
     GtkTextIter start, end;
     gchar *tmp;
     GSList *list;
-    gboolean retval;
+    gboolean retval = TRUE;
 
     g_free(bsmsg->charset);
     bsmsg->charset = NULL;
@@ -4942,7 +4942,7 @@ is_charset_ok(BalsaSendmsg *bsmsg)
 
     if (!libbalsa_text_attr_string(tmp)) {
 	g_free(tmp);
-	return TRUE;
+	return retval;
     }
 
     for (list = bsmsg->charsets; list; list = list->next) {
@@ -4951,7 +4951,7 @@ is_charset_ok(BalsaSendmsg *bsmsg)
 	if (sw_can_convert(tmp, -1, charset, "UTF-8", NULL)) {
 	    bsmsg->charset = g_strdup(charset);
 	    g_free(tmp);
-	    return TRUE;
+	    return retval;
 	}
     }
 
@@ -4970,15 +4970,15 @@ is_charset_ok(BalsaSendmsg *bsmsg)
 		/* Change the message charset. */
                 bsmsg->charset = g_strdup(iconv_charset);
 		g_free(tmp);
-		return TRUE;
+		return retval;
             }
         }
     }
 
-    if (sw_confirm_utf8(bsmsg, tmp)) {
+    if (sw_confirm_utf8(bsmsg, tmp))
         bsmsg->charset = g_strdup("UTF-8");
-        retval = TRUE;
-    }
+    else
+        retval = FALSE;
 
     g_free(tmp);
     

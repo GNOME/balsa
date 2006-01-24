@@ -592,25 +592,23 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
     end = 0;
     do {
         msg_info->message = NULL;
-        if (msg_info->start < end)
-            /* Error: this message starts before the end of the
+        if (msg_info->start != end)
+            /* Error: this message doesn't start at the end of the
              * previous one. */
             break;
         end = msg_info->end;
         if (msg_info->from_len < 6
             || (off_t) (msg_info->start + msg_info->from_len) >= end
             || end > mbox->size)
-            /* Error. */
+            /* Error: various. */
             break;
-        tmp = ++msg_info < (struct message_info *) (contents + length);
-        if (tmp && !lbm_mbox_seek_to_message(mbox, msg_info->start)) {
-            /* Error: no message at the next start offset. */
-            --msg_info;
+        if (end < mbox->size
+            && !lbm_mbox_seek_to_message(mbox, msg_info->end))
+            /* Error: no message following this one. */
             break;
-        }
         /* dummy entry in mindex for now */
         g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, NULL);
-    } while (tmp);
+    } while (++msg_info < (struct message_info *) (contents + length));
 
     g_array_append_vals(mbox->messages_info, contents,
                         msg_info - (struct message_info *) contents);
@@ -622,11 +620,12 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
 
     mbox_stream = mbox->gmime_stream;
     libbalsa_mime_stream_shared_lock(mbox_stream);
-    /* Position the stream for parsing; if restoring failed (tmp ==
-     * TRUE), seek to the start of the defective message, else seek to
-     * the end of the last message. */
+    /* Position the stream for parsing; msg_info is pointing either one
+     * message beyond the end of the array, or at the offending message,
+     * so we just seek to the end of the previous message. */
     g_mime_stream_seek(mbox_stream,
-                       tmp ? msg_info->start : (--msg_info)->end,
+                       msg_info > (struct message_info *) contents ?
+                       (--msg_info)->end : 0,
                        GMIME_STREAM_SEEK_SET);
 
     /* GMimeParser seems to have issues with a file that has no From_
@@ -721,33 +720,39 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 }
 
 /* Check for new mail in a closed mbox, using a crude parser. */
+typedef struct {
+    ssize_t start;
+    ssize_t end;
+    gchar buf[1024];
+} LbmMboxStreamBuffer;
+
 static void
-lbm_mbox_readln(GMimeStream * stream, GByteArray * line)
+lbm_mbox_readln(GMimeStream * stream, GByteArray * line,
+                LbmMboxStreamBuffer * buffer)
 {
-    gchar buf[80];      /* Long enough for most lines. */
+    gchar *p, *q, *r;
 
-    while (!g_mime_stream_eos(stream)) {
-        ssize_t len;
-        gchar *p;
-        gchar c = 0;
-
-        len = g_mime_stream_read(stream, buf, sizeof buf);
-        if (len <= 0)
-            break;
-
-        p = buf;
-        while (p < buf + len)
-            if ((c = *p++) == '\n')
+    do {
+        if (buffer->start >= buffer->end) {
+            buffer->start = 0;
+            buffer->end = g_mime_stream_read(stream, buffer->buf,
+                                             sizeof buffer->buf);
+            if (buffer->end < 0) {
+                g_warning("%s: Read error", __func__);
                 break;
-
-        g_byte_array_append(line, (guint8 *) buf, p - buf);
-
-        if (c == '\n') {
-            g_mime_stream_seek(stream, p - (buf + len),
-                               GMIME_STREAM_SEEK_CUR);
-            break;
+            }
+            if (buffer->end == 0)
+                break;
         }
-    }
+
+        p = q = buffer->buf + buffer->start;
+        r = buffer->buf + buffer->end;
+        while (p < r && *p++ != '\n')
+            /* Nothing */;
+
+        g_byte_array_append(line, (guint8 *) q, p - q);
+        buffer->start += p - q;
+    } while (*--p != '\n');
 }
 
 static gboolean
@@ -756,8 +761,8 @@ lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
     int fd;
     GMimeStream *gmime_stream;
     GByteArray *line;
+    LbmMboxStreamBuffer buffer = { 0, 0 };
     gboolean retval = FALSE;
-    gboolean eos;
 
     if (!(fd = open(path, O_RDONLY)))
 	return retval;
@@ -769,7 +774,7 @@ lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
 	return FALSE;
     }
 
-    line = (GByteArray *) g_array_sized_new(TRUE, FALSE, 1, 80);
+    line = g_byte_array_sized_new(80);
     do {
 	gboolean new_undeleted;
 	guint content_length;
@@ -779,18 +784,23 @@ lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
 	 * full GMime parse takes too long. */
 	do {
 	    line->len = 0;
-	    lbm_mbox_readln(gmime_stream, line);
-	} while (!(eos = g_mime_stream_eos(gmime_stream))
-		 && !libbalsa_str_has_prefix((gchar *) line->data, "From "));
-	if (eos)
-	    break;
+	    lbm_mbox_readln(gmime_stream, line, &buffer);
+	} while (line->len > 0 
+                 && strncmp((gchar *) line->data, "From ", 5) != 0);
+        if (line->len == 0)
+            break;
 
 	/* Scan headers. */
 	new_undeleted = TRUE;
 	content_length = 0;
 	do {
 	    line->len = 0;
-	    lbm_mbox_readln(gmime_stream, line);
+	    lbm_mbox_readln(gmime_stream, line, &buffer);
+	    /* Blank line ends headers. */
+            if (line->len == 0 || line->data[0] == '\n')
+                break;
+
+            line->data[line->len - 1] = '\0';
 	    if (g_ascii_strncasecmp((gchar *) line->data,
 				    "Status: ", 8) == 0) {
 		if (strchr((gchar *) line->data + 8, 'R'))
@@ -804,9 +814,7 @@ lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
 					"Content-Length: ", 16) == 0) {
 		content_length = atoi((gchar *) line->data + 16);
 	    }
-	    /* Blank line ends headers. */
-	} while (!(eos = g_mime_stream_eos(gmime_stream))
-		 && line->data[0] != '\n');
+	} while (TRUE);
 
 	if (new_undeleted) {
 	    retval = TRUE;
@@ -814,10 +822,18 @@ lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
 	    break;
 	}
 
-	if (content_length)
-	    g_mime_stream_seek(gmime_stream, content_length,
-                               GMIME_STREAM_SEEK_CUR);
-    } while (!eos);
+	if (content_length) {
+            ssize_t remaining;
+
+            buffer.start += content_length;
+            remaining = buffer.end - buffer.start;
+            if (remaining < 0) {
+                g_mime_stream_seek(gmime_stream, -remaining,
+                                   GMIME_STREAM_SEEK_CUR);
+                buffer.start = buffer.end = 0;
+            }
+        }
+    } while (line->len > 0);
 
     mbox_unlock(mailbox, gmime_stream);
     g_object_unref(gmime_stream);

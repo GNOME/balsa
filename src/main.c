@@ -201,9 +201,10 @@ balsa_handle_automation_options() {
 static void
 balsa_init(int argc, char **argv)
 {
-    poptContext context;
-    int opt;
     static char *attachment = NULL;
+#ifndef GNOME_PARAM_GOPTION_CONTEXT
+    int opt;
+    poptContext context;
     static struct poptOption options[] = {
 
 	{"checkmail", 'c', POPT_ARG_NONE,
@@ -251,7 +252,59 @@ balsa_init(int argc, char **argv)
                        GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
 		       GNOME_PARAM_HUMAN_READABLE_NAME, _("The Balsa E-Mail Client"),
                        NULL);
+#else /* USE GOption interface */
+    static gchar **remaining_args = NULL;
+    static GOptionEntry option_entries[] = {
+	{"checkmail", 'c', 0, G_OPTION_ARG_NONE,
+	 &(cmd_check_mail_on_startup),
+	 N_("Get new mail on startup"), NULL},
+	{"compose", 'm', 0, G_OPTION_ARG_STRING, &(opt_compose_email),
+	 N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
+	{"attach", 'a', 0, G_OPTION_ARG_STRING, &(attachment),
+	 N_("Attach file at PATH"), "PATH"},
+	{"open-mailbox", 'o', 0, G_OPTION_ARG_STRING,
+         &(cmd_line_open_mailboxes),
+	 N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
+	{"open-unread-mailbox", 'u', 0, G_OPTION_ARG_NONE,
+	 &(cmd_open_unread_mailbox),
+	 N_("Opens first unread mailbox"), NULL},
+	{"open-inbox", 'i', 0, G_OPTION_ARG_NONE,
+	 &(cmd_open_inbox),
+	 N_("Opens default Inbox on startup"), NULL},
+	{"get-stats", 's', 0, G_OPTION_ARG_NONE,
+	 &(cmd_get_stats),
+	 N_("Prints number unread and unsent messages"), NULL},
+	{"debug-pop", 'd', 0, G_OPTION_ARG_NONE, &PopDebug,
+	 N_("Debug POP3 connection"), NULL},
+	{"debug-imap", 'D', 0, G_OPTION_ARG_NONE, &ImapDebug,
+	 N_("Debug IMAP connection"), NULL},
+        /* last but not least a special option that collects filenames */
+        { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY,
+          &remaining_args,
+          "Special option that collects any remaining arguments for us" },
+        { NULL }
+    };
+    GOptionContext *option_context = g_option_context_new("balsa");
+    GnomeProgram *my_app;
+    g_option_context_add_main_entries(option_context, option_entries, NULL);
 
+    my_app = gnome_program_init(PACKAGE, VERSION,
+                                LIBGNOMEUI_MODULE, argc, argv,
+                                GNOME_PARAM_GOPTION_CONTEXT, option_context,
+                                GNOME_PARAM_NONE);
+
+    if (remaining_args != NULL) {
+        gint i, num_args;
+        
+        num_args = g_strv_length (remaining_args);
+        for (i = 0; i < num_args; ++i) {
+            /* process remaining_args[i] here */
+            /* we do nothing for now */
+        }
+        g_strfreev (remaining_args);
+        remaining_args = NULL;
+    }
+#endif /* OPTION HANDLING */
     balsa_handle_automation_options();  
     
 }

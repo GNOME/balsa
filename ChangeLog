@@ -1,3 +1,8 @@
+2006-01-24  Pawel Salek
+
+	* src/main.c, src/ab-main.c: achieve compatibility with
+	libgnome-devel-2.13.7 (bug 178650).
+
 2006-01-24 12:17  PeterB
 
 	* libbalsa/mailbox.c: update view-filter before setting threading.

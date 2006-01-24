@@ -929,10 +929,15 @@ main(int argc, char *argv[])
     /* FIXME: do we need to allow a non-GUI mode? */
     gtk_init_check(&argc, &argv);
     gnome_program_init(PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv,
+#ifndef GNOME_PARAM_GOPTION_CONTEXT
                        GNOME_PARAM_POPT_TABLE, NULL,
                        GNOME_PARAM_APP_PREFIX,  BALSA_STD_PREFIX,
                        GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
                        NULL);
+#else
+                       GNOME_PARAM_GOPTION_CONTEXT, NULL,
+                       GNOME_PARAM_NONE);
+#endif
 
 #ifdef GTKHTML_HAVE_GCONF
     if (!gconf_init(argc, argv, &gconf_error))

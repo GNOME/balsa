@@ -1,5 +1,7 @@
-2006-01-23 09:32  PeterB
+2006-01-23 19:02  PeterB
 
+	* libbalsa/mailbox_mbox.c: check cache file more carefully; better
+	buffering in readln.
 	* src/sendmsg-window.c: initialize retval.
 
 2006-01-22 20:49  PeterB

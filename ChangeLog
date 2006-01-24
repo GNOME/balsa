@@ -1,5 +1,6 @@
-2006-01-24 06:56  PeterB
+2006-01-24 12:17  PeterB
 
+	* libbalsa/mailbox.c: update view-filter before setting threading.
 	* src/filter-run-callbacks.c: scroll to selected filter.
 
 2006-01-23 19:02  PeterB

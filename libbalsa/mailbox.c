@@ -1798,15 +1798,15 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
 {
     libbalsa_lock_mailbox(mailbox);
 
+    if (mailbox->view_filter)
+        libbalsa_condition_free(mailbox->view_filter);
+    mailbox->view_filter = cond;
+
     if (update_immediately) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
                                                                 cond);
         lbm_set_threading(mailbox, mailbox->view->threading_type);
     }
-
-    if (mailbox->view_filter)
-        libbalsa_condition_free(mailbox->view_filter);
-    mailbox->view_filter = cond;
 
     libbalsa_unlock_mailbox(mailbox);
 }

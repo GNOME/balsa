@@ -464,7 +464,9 @@ selected_list_activated(GtkTreeView * treeview, GtkTreePath * path,
  * helper
  */
 static void
-fr_swap(GtkTreeModel * model, GtkTreeIter * iter1, GtkTreeIter * iter2)
+fr_swap(GtkTreeModel * model, GtkTreeIter * iter1, GtkTreeIter * iter2,
+        GtkTreeSelection * selection, GtkTreePath * path,
+        BalsaFilterRunDialog * p)
 {
     LibBalsaMailboxFilter *fil1, *fil2;
     gboolean incoming1, closing1;
@@ -488,13 +490,18 @@ fr_swap(GtkTreeModel * model, GtkTreeIter * iter1, GtkTreeIter * iter2)
                        DATA_COLUMN, fil1,
                        INCOMING_COLUMN, incoming1,
                        CLOSING_COLUMN, closing1, -1);
+
+    gtk_tree_selection_select_path(selection, path);
+    gtk_tree_view_scroll_to_cell(p->selected_filters, path, NULL,
+                                 FALSE, 0, 0);
+    p->filters_modified = TRUE;
 }
 
 /*
  * fr_down_pressed()
  *
  * Callback for the "Down" button
- */ 
+ */
 void
 fr_down_pressed(GtkWidget * widget, gpointer data)
 {
@@ -507,9 +514,9 @@ fr_down_pressed(GtkWidget * widget, gpointer data)
     if (gtk_tree_selection_get_selected(selection, &model, &iter1)) {
         iter2 = iter1;
         if (gtk_tree_model_iter_next(model, &iter2)) {
-            fr_swap(model, &iter1, &iter2);
-            gtk_tree_selection_select_iter(selection, &iter2);
-            p->filters_modified = TRUE;
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter2);
+            fr_swap(model, &iter1, &iter2, selection, path, p);
+            gtk_tree_path_free(path);
         }
     }
 }                               /* end fe_down_pressed */
@@ -530,12 +537,9 @@ fr_up_pressed(GtkWidget * widget, gpointer data)
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter1)) {
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter1);
-
         if (gtk_tree_path_prev(path)) {
             gtk_tree_model_get_iter(model, &iter2, path);
-            fr_swap(model, &iter1, &iter2);
-            gtk_tree_selection_select_path(selection, path);
-            p->filters_modified = TRUE;
+            fr_swap(model, &iter1, &iter2, selection, path, p);
         }
         gtk_tree_path_free(path);
     }

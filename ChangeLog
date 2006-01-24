@@ -1,3 +1,7 @@
+2006-01-24 06:56  PeterB
+
+	* src/filter-run-callbacks.c: scroll to selected filter.
+
 2006-01-23 19:02  PeterB
 
 	* libbalsa/mailbox_mbox.c: check cache file more carefully; better

@@ -897,7 +897,6 @@ sw_delete_draft(BalsaSendmsg * bsmsg)
         libbalsa_messages_change_flag(messages,
                                       LIBBALSA_MESSAGE_FLAG_DELETED, TRUE);
         g_list_free(messages);
-        bsmsg->draft_message = NULL;
     }
 }
 

@@ -28,8 +28,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <libgnome/libgnome.h>
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "rfc3156.h"

@@ -722,11 +722,13 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
 	if ((utf_start == buf_chars || g_unichar_isspace(UNICHAR_PREV(utf_start))) &&
 	    *s_next != '\0' && g_unichar_isalnum(g_utf8_get_char(s_next))) {
 	    gchar * utf_end;
+	    gchar * line_end;
 	    gchar * e_next;
 
 	    /* found a proper start sequence - find the end or eject */
 	    if (!(utf_end = g_utf8_strchr(s_next, -1, tag_char)))
 		return;
+	    line_end = g_utf8_strchr(s_next, -1, '\n');
 	    e_next = g_utf8_next_char(utf_end);
 	    while (!g_unichar_isalnum(UNICHAR_PREV(utf_end)) ||
 		   !(*e_next == '\0' || 
@@ -737,17 +739,20 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
 		e_next = g_utf8_next_char(utf_end);
 	    }
 	    
-	    /* insert the tag */
-	    if (!tag)
-		tag = gtk_text_buffer_create_tag(buffer, id, property, value, NULL);
-	    gtk_text_buffer_get_iter_at_offset(buffer, &iter_start,
-					       g_utf8_pointer_to_offset(buf_chars, utf_start));
-	    gtk_text_buffer_get_iter_at_offset(buffer, &iter_end,
-					       g_utf8_pointer_to_offset(buf_chars, e_next));
-	    gtk_text_buffer_apply_tag(buffer, tag, &iter_start, &iter_end);
-
- 	    /* set the next start properly */
-	    utf_start = *e_next ? g_utf8_strchr(e_next, -1, tag_char) : NULL;
+	    /* insert the tag if there is no line break */
+	    if (!line_end || line_end >= e_next) {
+		if (!tag)
+		    tag = gtk_text_buffer_create_tag(buffer, id, property, value, NULL);
+		gtk_text_buffer_get_iter_at_offset(buffer, &iter_start,
+						   g_utf8_pointer_to_offset(buf_chars, utf_start));
+		gtk_text_buffer_get_iter_at_offset(buffer, &iter_end,
+						   g_utf8_pointer_to_offset(buf_chars, e_next));
+		gtk_text_buffer_apply_tag(buffer, tag, &iter_start, &iter_end);
+		
+		/* set the next start properly */
+		utf_start = *e_next ? g_utf8_strchr(e_next, -1, tag_char) : NULL;
+	    } else
+		utf_start = *s_next ? g_utf8_strchr(s_next, -1, tag_char) : NULL;
 	} else
 	    /* no start sequence, find the next start tag char */
 	    utf_start = *s_next ? g_utf8_strchr(s_next, -1, tag_char) : NULL;

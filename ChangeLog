@@ -1,3 +1,12 @@
+2006-01-27 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/misc.c: a new attempt for proper quote highlighting
+	re's in the composer.
+	* src/balsa-mime-widget-text.c: fixed the never ending highlighting.
+	* libbalsa/rfc3156.c: remove gnome dependency.
+	* configure.in: mime icon install configuration.
+	* images/Makefile.am: ditto.
+
 2006-01-26 05:42  PeterB
 
 	* src/sendmsg-window.c: leave draft-message nonNULL.

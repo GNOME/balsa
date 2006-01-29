@@ -4933,6 +4933,10 @@ is_charset_ok(BalsaSendmsg *bsmsg)
     GSList *list;
     gboolean retval = TRUE;
 
+    if (strcmp(bsmsg->charset, "UTF-8") == 0)
+        /* User already agreed to use utf-8. */
+        return TRUE;
+
     g_free(bsmsg->charset);
     bsmsg->charset = NULL;
 
@@ -5879,7 +5883,8 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
     g_free(bsmsg->charset);
     bsmsg->charset = g_strdup(locales[idx].charset);
     sw_prepend_charset(bsmsg, bsmsg->charset);
-    bsmsg->spell_check_lang = locales[idx].locale;
+    if (locales[idx].locale && *locales[idx].locale)
+        bsmsg->spell_check_lang = locales[idx].locale;
 #if HAVE_GTKSPELL
 
     if (had_spell)

@@ -44,6 +44,9 @@ struct _BalsaMBList {
 
 struct _BalsaMBListClass {
     GtkTreeViewClass parent_class;
+
+    void (*has_unread_mailbox)(BalsaMBList * mblist,
+                               gboolean has_unread_mailbox);
 };
 
 GtkType balsa_mblist_get_type(void);
@@ -58,7 +61,7 @@ void balsa_mblist_update_mailbox(GtkTreeStore * store,
 gboolean balsa_mblist_focus_mailbox(BalsaMBList * mblist,
                                     LibBalsaMailbox * mailbox);
 
-GList *balsa_mblist_find_all_unread_mboxes(void);
+GList *balsa_mblist_find_all_unread_mboxes(LibBalsaMailbox * mailbox);
 void balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox);
 void balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox);
 /* balsa_mblist_close_lru_peer_mbx closes least recently used mailbox

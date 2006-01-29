@@ -166,6 +166,8 @@ extern "C" {
     /* Pipe messages */
     void balsa_index_pipe(BalsaIndex * index);
 
+#define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

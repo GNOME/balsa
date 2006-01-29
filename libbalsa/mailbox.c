@@ -1928,6 +1928,7 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     LB_MAILBOX_SORT_TYPE_ASC,	/* sort_type            */
     LB_MAILBOX_SORT_NO,         /* sort_field           */
     LB_MAILBOX_SHOW_UNSET,	/* show                 */
+    LB_MAILBOX_SUBSCRIBE_UNSET,	/* subscribe            */
     0,				/* exposed              */
     0,				/* open                 */
     1,				/* in_sync              */
@@ -2056,6 +2057,23 @@ libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox, LibBalsaMailboxShow show)
 	if (mailbox && view->show != LB_MAILBOX_SHOW_UNSET)
 	    view->in_sync = 0;
 	view->show = show;
+	return TRUE;
+    } else
+	return FALSE;
+}
+
+gboolean
+libbalsa_mailbox_set_subscribe(LibBalsaMailbox * mailbox,
+                               LibBalsaMailboxSubscribe subscribe)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (!view->frozen && view->subscribe != subscribe) {
+	/* Don't set not in sync if we're just replacing UNSET with the
+	 * default. */
+	if (mailbox && view->subscribe != LB_MAILBOX_SUBSCRIBE_UNSET)
+	    view->in_sync = 0;
+	view->subscribe = subscribe;
 	return TRUE;
     } else
 	return FALSE;
@@ -2229,6 +2247,13 @@ libbalsa_mailbox_get_show(LibBalsaMailbox * mailbox)
 {
     return (mailbox && mailbox->view) ?
 	mailbox->view->show : libbalsa_mailbox_view_default.show;
+}
+
+LibBalsaMailboxSubscribe
+libbalsa_mailbox_get_subscribe(LibBalsaMailbox * mailbox)
+{
+    return (mailbox && mailbox->view) ?
+	mailbox->view->subscribe : libbalsa_mailbox_view_default.subscribe;
 }
 
 gboolean

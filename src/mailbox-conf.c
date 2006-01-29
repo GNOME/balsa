@@ -60,6 +60,7 @@ struct _BalsaMailboxConfView {
     GtkWidget *identity_combo_box;
     GtkWidget *show_from;
     GtkWidget *show_to;
+    GtkWidget *subscribe;
 #ifdef HAVE_GPGME
     GtkWidget *chk_crypt;
 #endif
@@ -124,6 +125,11 @@ static void fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name,
 static void update_imap_mailbox(MailboxConfWindow *mcw);
 
 static void update_pop_mailbox(MailboxConfWindow *mcw);
+static BalsaMailboxConfView
+    *mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
+                                           GtkWindow * window,
+                                           GtkWidget * table, gint row,
+                                           GtkSizeGroup * size_group);
 
 /* pages */
 static GtkWidget *create_dialog(MailboxConfWindow *mcw);
@@ -362,8 +368,10 @@ mailbox_conf_edit_cb(GtkWidget * widget, gpointer data)
 {
     BalsaMailboxNode *mbnode = 
         balsa_mblist_get_selected_node(balsa_app.mblist);
-    balsa_mailbox_node_show_prop_dialog(mbnode);
-    g_object_unref(mbnode);
+    if (mbnode) {
+        balsa_mailbox_node_show_prop_dialog(mbnode);
+        g_object_unref(mbnode);
+    }
 }
 
 /* END OF COMMONLY USED CALLBACKS SECTION ------------------------ */
@@ -497,6 +505,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 }
 
 #define MCW_RESPONSE 1
+#define BALSA_MAILBOX_CONF_DIALOG "balsa-mailbox-conf-dialog"
 static void
 conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
 {
@@ -504,6 +513,8 @@ conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
     case MCW_RESPONSE: mcw->ok_handler(mcw); 
         /* fall through */
     default:
+        g_object_set_data(G_OBJECT(mcw->mailbox),
+                          BALSA_MAILBOX_CONF_DIALOG, NULL);
         gtk_widget_destroy(GTK_WIDGET(dialog));
         /* fall through */
     case 0:
@@ -561,9 +572,20 @@ mailbox_conf_new(GtkType mailbox_type)
  * Edit an existing mailboxes properties
  */
 void
-mailbox_conf_edit(BalsaMailboxNode *mbnode)
+mailbox_conf_edit(BalsaMailboxNode * mbnode)
 {
+    GtkWidget *dialog;
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
+
+    dialog =
+        g_object_get_data(G_OBJECT(mbnode->mailbox),
+                          BALSA_MAILBOX_CONF_DIALOG);
+    if (dialog) {
+        gdk_window_raise(dialog->window);
+        return;
+    }
+
     run_mailbox_conf(mbnode, G_OBJECT_TYPE(G_OBJECT(mbnode->mailbox)),
                      TRUE);
 }
@@ -1042,6 +1064,17 @@ balsa_get_entry(GtkWidget * widget, GtkWidget ** entry)
                               (GtkCallback) balsa_get_entry, entry);
 }
 
+static void
+mailbox_conf_add_labels_to_size_group(GtkWidget * widget, gpointer data)
+{
+    if (GTK_IS_LABEL(widget) && GTK_IS_TABLE(widget->parent))
+        gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
+    else if (GTK_IS_CONTAINER(widget))
+        gtk_container_foreach(GTK_CONTAINER(widget),
+                              mailbox_conf_add_labels_to_size_group,
+                              data);
+}
+
 static GtkWidget *
 create_local_mailbox_dialog(MailboxConfWindow *mcw)
 {
@@ -1051,12 +1084,24 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
     gint row = -1;
     GtkFileChooserAction action;
     GtkWidget *entry = NULL;
+    GtkSizeGroup *size_group =
+        gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
     table = gtk_table_new(3, 2, FALSE);
+    /* To align our labels and widgets with the file-chooser's, we
+     * should use 12 pel row and column spacings, and remove all extra
+     * spaces, including in create-label--but that's for another day.
+     * We'd have to set the spacings this way for every table that uses
+     * create-label.
+    gtk_table_set_row_spacings(GTK_TABLE(table), 12);
+    gtk_table_set_col_spacings(GTK_TABLE(table), 12);
+    */
 
     /* mailbox name */
     if(mcw->mailbox && mcw->mailbox->config_prefix) {
-        label = create_label(_("Mailbox _Name:"), table, ++row);
+        label = create_label(_("_Mailbox Name:"), table, ++row);
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_size_group_add_widget(size_group, label);
         mcw->mailbox_name = 
             create_entry(mcw->window, table,
                          GTK_SIGNAL_FUNC(check_for_blank_fields),
@@ -1073,6 +1118,9 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                                     mcw->ok_button_name, MCW_RESPONSE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
+    g_object_set_data(G_OBJECT(mcw->mailbox), BALSA_MAILBOX_CONF_DIALOG,
+                      dialog);
+    mailbox_conf_add_labels_to_size_group(dialog, size_group);
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), table);
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),
 	                                balsa_app.local_mail_directory);
@@ -1084,8 +1132,9 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                          G_CALLBACK(check_for_blank_fields), mcw);
 
     mcw->view_info =
-        mailbox_conf_view_new(mcw->mailbox, GTK_WINDOW(dialog), table,
-                              ++row);
+        mailbox_conf_view_new_with_size_group(mcw->mailbox,
+                                              GTK_WINDOW(dialog),
+                                              table, ++row, size_group);
 
     return dialog;
 }
@@ -1323,13 +1372,16 @@ mailbox_conf_view_free(BalsaMailboxConfView *view_info)
  * table:       the table in which to place the widgets;
  * row:         the row of the table in which to start.
  */
-BalsaMailboxConfView *
-mailbox_conf_view_new(LibBalsaMailbox * mailbox,
-                      GtkWindow * window, GtkWidget * table, gint row)
+static BalsaMailboxConfView *
+mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
+                                      GtkWindow * window,
+                                      GtkWidget * table, gint row,
+                                      GtkSizeGroup * size_group)
 {
+    GtkWidget *label;
     BalsaMailboxConfView *view_info;
     GtkWidget *box;
-    GtkWidget *button;
+    GtkWidget *widget;
     GList *list;
     const gchar *identity_name;
     gint active;
@@ -1339,8 +1391,14 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                       (GWeakNotify) mailbox_conf_view_free, view_info);
     view_info->window = window;
 
-    create_label(_("Identity:"), table, row);
-    view_info->identity_combo_box = gtk_combo_box_new_text();
+    label = create_label(_("_Identity:"), table, row);
+    if (size_group) {
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_size_group_add_widget(size_group, label);
+    }
+
+    view_info->identity_combo_box = widget = gtk_combo_box_new_text();
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
     identity_name = libbalsa_mailbox_get_identity_name(mailbox);
     for (list = balsa_app.identities, active = 0; list;
          list = list->next, ++active) {
@@ -1348,35 +1406,14 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
         gchar *name;
 
         name = internet_address_to_string(ident->ia, FALSE);
-        gtk_combo_box_append_text(GTK_COMBO_BOX
-                                  (view_info->identity_combo_box), name);
+        gtk_combo_box_append_text(GTK_COMBO_BOX(widget), name);
         g_free(name);
         if (identity_name
             && strcmp(identity_name, ident->identity_name) == 0)
-            gtk_combo_box_set_active(GTK_COMBO_BOX
-                                     (view_info->identity_combo_box),
-                                     active);
+            gtk_combo_box_set_active(GTK_COMBO_BOX(widget), active);
     }
-    gtk_table_attach(GTK_TABLE(table), view_info->identity_combo_box, 1, 2,
-                     row, row + 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
-
-    create_label(_("Show address:"), table, ++row);
-    box = gtk_hbox_new(FALSE, 12);
-    view_info->show_from = button =
-        gtk_radio_button_new_with_mnemonic(NULL, _("_From"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
-    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
-    view_info->show_to = button =
-        gtk_radio_button_new_with_mnemonic(gtk_radio_button_get_group
-                                           (GTK_RADIO_BUTTON(button)),
-                                           _("_To"));
-    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
-    gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
-                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
-
-    button = (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO ?
-	      view_info->show_to : view_info->show_from);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+    gtk_table_attach(GTK_TABLE(table), widget, 1, 2, row, row + 1,
+                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
 
 #ifdef HAVE_GPGME
     {
@@ -1387,8 +1424,14 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
 	    { N_("Always"),      LB_MAILBOX_CHK_CRYPT_ALWAYS }
 	};
 	
-	create_label(_("Decrypt and check\nsignatures automatically:"), table, ++row);
-	
+        label =
+            create_label(_("Decrypt and check\nsignatures automatically:"),
+                         table, ++row);
+        if (size_group) {
+            gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+            gtk_size_group_add_widget(size_group, label);
+        }
+
         view_info->chk_crypt = gtk_combo_box_new_text();
         mailbox_conf_combo_box_make(GTK_COMBO_BOX(view_info->chk_crypt),
                                     ELEMENTS(chk_crypt_menu),
@@ -1402,7 +1445,57 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
     }
 #endif
 
+    /* Show address radio buttons */
+    label = create_label(_("Show address:"), table, ++row);
+    if (size_group) {
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_size_group_add_widget(size_group, label);
+    }
+
+    box = gtk_hbox_new(FALSE, 12);
+    view_info->show_from = widget =
+        gtk_radio_button_new_with_mnemonic(NULL, _("_From"));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), TRUE);
+    gtk_box_pack_start(GTK_BOX(box), widget, FALSE, FALSE, 0);
+    view_info->show_to = widget =
+        gtk_radio_button_new_with_mnemonic(gtk_radio_button_get_group
+                                           (GTK_RADIO_BUTTON(widget)),
+                                           _("_To"));
+    gtk_box_pack_start(GTK_BOX(box), widget, FALSE, FALSE, 0);
+    gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
+                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+    widget = (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO ?
+	      view_info->show_to : view_info->show_from);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), TRUE);
+
+    /* Subscribe check button */
+    label = create_label(_("_Subscribe for\nnew mail check:"), table, ++row);
+    if (size_group) {
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_size_group_add_widget(size_group, label);
+    }
+
+    box = gtk_hbox_new(FALSE, 12);
+    gtk_table_attach(GTK_TABLE(table), box, 1, 2, row, row + 1,
+                     GTK_FILL, GTK_FILL, 0, 0);
+
+    view_info->subscribe = widget = gtk_check_button_new();
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
+    gtk_box_pack_start(GTK_BOX(box), widget, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget),
+                                 libbalsa_mailbox_get_subscribe(mailbox)
+                                 != LB_MAILBOX_SUBSCRIBE_NO);
+
     return view_info;
+}
+
+BalsaMailboxConfView *
+mailbox_conf_view_new(LibBalsaMailbox * mailbox,
+                      GtkWindow * window, GtkWidget * table, gint row)
+{
+    return mailbox_conf_view_new_with_size_group(mailbox, window, table,
+                                                 row, NULL);
 }
 
 #ifdef HAVE_GPGME
@@ -1454,11 +1547,18 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
         changed = TRUE;
     }
 
-    if (libbalsa_mailbox_set_show(mailbox,
-				  gtk_toggle_button_get_active
-				  (GTK_TOGGLE_BUTTON(view_info->show_from))
-				  ? LB_MAILBOX_SHOW_FROM
-				  : LB_MAILBOX_SHOW_TO))
+    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                          (view_info->show_from));
+    if (libbalsa_mailbox_set_show(mailbox, active ?
+                                  LB_MAILBOX_SHOW_FROM :
+                                  LB_MAILBOX_SHOW_TO))
+        changed = TRUE;
+
+    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                          (view_info->subscribe));
+    if (libbalsa_mailbox_set_subscribe(mailbox, active ?
+				       LB_MAILBOX_SUBSCRIBE_YES :
+				       LB_MAILBOX_SUBSCRIBE_NO))
 	changed = TRUE;
 
 #ifdef HAVE_GPGME

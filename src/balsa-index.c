@@ -915,12 +915,21 @@ balsa_index_scroll_on_open(BalsaIndex *index)
 	msgno = libbalsa_mailbox_total_messages(mailbox);
     if(msgno>0 &&
        libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
+        gpointer view_on_open;
+
         bndx_expand_to_row(index, path);
         /* Scroll now, not in the idle handler, to make sure the initial
          * view is correct. */
         gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
                                      FALSE, 0, 0);
-        if(balsa_app.view_message_on_open)
+
+        view_on_open =
+            g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN);
+        g_object_set_data(G_OBJECT(mailbox),
+                          BALSA_INDEX_VIEW_ON_OPEN,
+                          GINT_TO_POINTER(FALSE));
+        if ((view_on_open && GPOINTER_TO_INT(view_on_open))
+            || balsa_app.view_message_on_open)
             bndx_select_row(index, path);
         gtk_tree_path_free(path);
     }

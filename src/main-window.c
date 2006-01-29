@@ -1538,9 +1538,16 @@ bw_set_panes(BalsaWindow * window)
     }
 }
 
-#if defined(ENABLE_TOUCH_UI)
+static void
+bw_enable_next_unread(BalsaWindow * window, gboolean has_unread_mailbox)
+{
+    GtkWidget *toolbar =
+        balsa_toolbar_get_from_gnome_app(GNOME_APP(window));
 
-#endif
+    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD, 
+                                       has_unread_mailbox); 
+    gtk_widget_set_sensitive(NEXT_UNREAD_WIDGET, has_unread_mailbox);
+}
 
 GtkWidget *
 balsa_window_new()
@@ -1623,6 +1630,8 @@ balsa_window_new()
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     g_signal_connect(G_OBJECT(balsa_app.mblist), "size_allocate",
 		     G_CALLBACK(size_allocate_cb), NULL);
+    g_signal_connect_swapped(balsa_app.mblist, "has-unread-mailbox",
+		             G_CALLBACK(bw_enable_next_unread), window);
     balsa_mblist_default_signal_bindings(balsa_app.mblist);
     gtk_widget_show_all(window->mblist);
 
@@ -1695,6 +1704,9 @@ balsa_window_new()
     balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_SHOW_PREVIEW,
                                     balsa_app.previewpane);
 
+    /* set initial state of next-unread controls */
+    bw_enable_next_unread(window, FALSE);
+
     g_signal_connect(G_OBJECT(window), "size_allocate",
                      G_CALLBACK(mw_size_alloc_cb), NULL);
     g_signal_connect(G_OBJECT (window), "destroy",
@@ -1719,6 +1731,31 @@ enable_expand_collapse(LibBalsaMailbox * mailbox)
         LB_MAILBOX_THREADING_FLAT;
     gtk_widget_set_sensitive(MENU_EXPAND_ALL_WIDGET,   enable);
     gtk_widget_set_sensitive(MENU_COLLAPSE_ALL_WIDGET, enable);
+}
+
+/*
+ * bw_next_unread_mailbox: look for the next mailbox with unread mail,
+ * starting at current_mailbox; if no later mailbox has unread messages
+ * or current_mailbox == NULL, return the first mailbox with unread mail;
+ * never returns current_mailbox if it's nonNULL.
+ */
+
+static LibBalsaMailbox *
+bw_next_unread_mailbox(LibBalsaMailbox * current_mailbox)
+{
+    GList *unread, *list;
+    LibBalsaMailbox *next_mailbox;
+
+    unread = balsa_mblist_find_all_unread_mboxes(current_mailbox);
+    if (!unread)
+        return NULL;
+
+    list = g_list_find(unread, NULL);
+    next_mailbox = list && list->next ? list->next->data : unread->data;
+
+    g_list_free(unread);
+
+    return next_mailbox;
 }
 
 void
@@ -1801,9 +1838,6 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
                                        index && index->prev_message);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT, 
                                        index && index->next_message);
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD, 
-                                       mailbox 
-                                       && mailbox->unread_messages > 0);
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_FLAGGED, 
                                        mailbox
                                        && libbalsa_mailbox_total_messages
@@ -1819,8 +1853,6 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 
     gtk_widget_set_sensitive(NEXT_MSG_WIDGET, index && index->next_message);
     gtk_widget_set_sensitive(PREV_MSG_WIDGET, index && index->prev_message);
-    gtk_widget_set_sensitive(NEXT_UNREAD_WIDGET, 
-                             mailbox  && mailbox->unread_messages > 0);
 #if !defined(ENABLE_TOUCH_UI)
     gtk_widget_set_sensitive(mailbox_menu[MENU_MAILBOX_REMOVE_DUPLICATES].
                              widget,
@@ -1842,6 +1874,11 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 	balsa_window_set_filter_menu(window,
 				     libbalsa_mailbox_get_filter(mailbox));
     }
+
+    bw_enable_next_unread(window, libbalsa_mailbox_get_unread(mailbox) > 0
+                          || (mailbox != balsa_app.trash
+                              && bw_next_unread_mailbox(mailbox) > 0));
+
     enable_expand_collapse(mailbox);
 }
 
@@ -2184,41 +2221,18 @@ bw_notebook_label_style(GtkLabel * lab, gboolean has_unread_messages)
 }
 
 static void
-bw_notebook_label_notify(LibBalsaMailbox * mailbox, GtkLabel * lab)
-{
-    g_signal_handlers_disconnect_by_func(mailbox, bw_notebook_label_style,
-					 lab);
-}
-
-typedef struct {
-    GtkLabel *lab;
-    gboolean has_unread_messages;
-} BalsaWindowMailboxChangedInfo;
-
-static gboolean
-bw_mailbox_changed_idle(BalsaWindowMailboxChangedInfo *bwmci)
+bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
 {
     gdk_threads_enter();
-    if (bwmci->lab) {
-	g_object_remove_weak_pointer(G_OBJECT(bwmci->lab),
-				     (gpointer) &bwmci->lab);
-	bw_notebook_label_style(bwmci->lab, bwmci->has_unread_messages);
-    }
-    g_free(bwmci);
+    bw_notebook_label_style(lab, libbalsa_mailbox_get_unread(mailbox) > 0);
     gdk_threads_leave();
-    return FALSE;
 }
 
 static void
-bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
+bw_notebook_label_notify(LibBalsaMailbox * mailbox, GtkLabel * lab)
 {
-    BalsaWindowMailboxChangedInfo *bwmci =
-	g_new(BalsaWindowMailboxChangedInfo, 1);
-
-    bwmci->lab = lab;
-    g_object_add_weak_pointer(G_OBJECT(bwmci->lab), (gpointer) &bwmci->lab);
-    bwmci->has_unread_messages = mailbox->has_unread_messages;
-    g_idle_add((GSourceFunc) bw_mailbox_changed_idle, bwmci);
+    g_signal_handlers_disconnect_by_func(mailbox, bw_mailbox_changed,
+					 lab);
 }
 
 static GtkWidget *
@@ -2233,7 +2247,7 @@ balsa_notebook_label_new (BalsaMailboxNode* mbnode)
        gtk_event_box_set_visible_window(GTK_EVENT_BOX(ev), FALSE);
 
     bw_notebook_label_style(GTK_LABEL(lab),
-			    mbnode->mailbox->has_unread_messages);
+			    libbalsa_mailbox_get_unread(mbnode->mailbox) > 0);
     g_signal_connect(mbnode->mailbox, "changed",
 		     G_CALLBACK(bw_mailbox_changed), lab);
     g_object_weak_ref(G_OBJECT(lab), (GWeakNotify) bw_notebook_label_notify,
@@ -2957,6 +2971,9 @@ balsa_window_mailbox_check(LibBalsaMailbox * mailbox)
     MailThreadMessage *threadmessage;
     gchar *string = NULL;
 
+    if (libbalsa_mailbox_get_subscribe(mailbox) == LB_MAILBOX_SUBSCRIBE_NO)
+        return;
+
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
 	string = g_strdup_printf(_("IMAP mailbox: %s"), mailbox->url);
         puts(string);
@@ -2964,6 +2981,7 @@ balsa_window_mailbox_check(LibBalsaMailbox * mailbox)
 	string = g_strdup_printf(_("Local mailbox: %s"), mailbox->name);
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, string, 0, 0);
     g_free(string);
+
     libbalsa_mailbox_check(mailbox);
 }
 
@@ -3365,8 +3383,48 @@ next_message_cb(GtkWidget * widget, gpointer data)
 static void
 next_unread_message_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_index_select_next_unread(
-        BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
+    BalsaIndex *index =
+        BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data)));
+    LibBalsaMailbox *mailbox = index ? index->mailbox_node->mailbox : NULL;
+
+    if (libbalsa_mailbox_get_unread(mailbox) > 0) {
+        balsa_index_select_next_unread(index);
+        return;
+    }
+
+    mailbox = bw_next_unread_mailbox(mailbox);
+    if (libbalsa_mailbox_get_unread(mailbox) > 0) {
+#if WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE
+        GtkWidget *dialog;
+        gint response;
+
+        dialog =
+            gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+                                   GTK_MESSAGE_QUESTION,
+                                   GTK_BUTTONS_YES_NO,
+                                   _("The next unread message is in %s"),
+                                   mailbox->name);
+        gtk_message_dialog_format_secondary_text
+            (GTK_MESSAGE_DIALOG(dialog),
+             _("Do you want to switch to %s?"), mailbox->name);
+        gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+                                        GTK_RESPONSE_YES);
+        response = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        if (response != GTK_RESPONSE_YES)
+            return;
+#endif /* WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE */
+
+        balsa_mblist_open_mailbox(mailbox);
+        index = balsa_find_index_by_mailbox(mailbox);
+        if (index)
+            balsa_index_select_next_unread(index);
+        else
+            g_object_set_data(G_OBJECT(mailbox),
+                              BALSA_INDEX_VIEW_ON_OPEN,
+                              GINT_TO_POINTER(TRUE));
+    } /* else we could assert not reached, as this callback should have
+       * been disabled. */
 }
 
 static void

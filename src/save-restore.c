@@ -536,7 +536,8 @@ config_mailbox_init(const gchar * prefix)
 	if (special) {
 	    /* Designate as special before appending to the mblist, so
 	     * that view->show gets set correctly for sentbox, draftbox,
-	     * and outbox. */
+	     * and outbox, and view->subscribe gets set correctly for
+             * trashbox. */
 	    *special = mailbox;
 	    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) special);
 	}
@@ -1664,6 +1665,10 @@ config_view_load(const gchar * key, const gchar * value, gpointer data)
         if (!def)
             view->show = tmp;
 
+        tmp = libbalsa_conf_get_int_with_default("Subscribe", &def);
+        if (!def)
+            view->subscribe = tmp;
+
         tmp = libbalsa_conf_get_bool_with_default("Exposed", &def);
         if (!def)
             view->exposed = tmp;
@@ -1753,6 +1758,10 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
      * and we want it to default to FROM. */
     if (view->show           != LB_MAILBOX_SHOW_FROM)
 	libbalsa_conf_set_int("Show",        view->show);
+    /* initial value for subscribe is UNSET, but that's always replaced, 
+     * and we want it to default to YES. */
+    if (view->subscribe      != LB_MAILBOX_SUBSCRIBE_YES)
+	libbalsa_conf_set_int("Subscribe",   view->subscribe);
     if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
 	libbalsa_conf_set_bool("Exposed",    view->exposed);
     if (view->open           != libbalsa_mailbox_get_open(NULL))

@@ -65,6 +65,14 @@ enum {
     N_COLUMNS
 };
 
+/* signals */
+
+enum {
+    HAS_UNREAD_MAILBOX,
+    LAST_SIGNAL
+};
+static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };
+
 static GtkTargetEntry bmbl_drop_types[] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
@@ -172,6 +180,18 @@ bmbl_class_init(BalsaMBListClass * klass)
     object_class = (GtkObjectClass *) klass;
     widget_class = (GtkWidgetClass *) klass;
 
+    /* HAS_UNREAD_MAILBOX is emitted when the number of mailboxes with
+     * unread mail might have changed. */
+    balsa_mblist_signals[HAS_UNREAD_MAILBOX] =
+        g_signal_new("has-unread-mailbox",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(BalsaMBListClass, has_unread_mailbox),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__INT,
+                     G_TYPE_NONE,
+                     1, G_TYPE_INT);
+
     /* GObject signals */
     o_class->set_property = bmbl_set_property;
     o_class->get_property = bmbl_get_property;
@@ -179,6 +199,9 @@ bmbl_class_init(BalsaMBListClass * klass)
     /* GtkWidget signals */
     widget_class->drag_motion = bmbl_drag_motion;
     widget_class->popup_menu = bmbl_popup_menu;
+
+    /* Signals */
+    klass->has_unread_mailbox = NULL;
 
     /* Properties */
     g_object_class_install_property(o_class, PROP_SHOW_CONTENT_INFO,
@@ -917,14 +940,32 @@ static void
 bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 {
     struct update_mbox_data *umd;
-    g_return_if_fail(mailbox);
-    umd = g_new(struct update_mbox_data,1);
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    umd = g_new(struct update_mbox_data, 1);
     g_object_set_data(G_OBJECT(mailbox), "mblist-update", umd);
     umd->mailbox = mailbox;
-    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &umd->mailbox);
+    g_object_add_weak_pointer(G_OBJECT(mailbox),
+                              (gpointer) & umd->mailbox);
     umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
                    || mailbox->state == LB_MAILBOX_STATE_CLOSED);
-    g_idle_add((GSourceFunc)update_mailbox_idle, umd);
+    g_idle_add((GSourceFunc) update_mailbox_idle, umd);
+
+    if (libbalsa_mailbox_get_subscribe(mailbox) != LB_MAILBOX_SUBSCRIBE_NO
+        && libbalsa_mailbox_get_unread(mailbox) > 0)
+        g_signal_emit(balsa_app.mblist,
+                      balsa_mblist_signals[HAS_UNREAD_MAILBOX],
+                      0, TRUE);
+    else {
+        GList *unread_mailboxes = balsa_mblist_find_all_unread_mboxes(NULL);
+        if (unread_mailboxes)
+            g_list_free(unread_mailboxes);
+        else
+            g_signal_emit(balsa_app.mblist,
+                          balsa_mblist_signals[HAS_UNREAD_MAILBOX],
+                          0, FALSE);
+    }
 }
 
 /* public methods */
@@ -946,32 +987,52 @@ balsa_mblist_get_selected_node(BalsaMBList * mbl)
 }
 
 /* mblist_find_all_unread_mboxes:
-   find all nodes and translate them to mailbox list 
-*/
+ * If mailbox == NULL, returns a list of all mailboxes with unread mail.
+ * If mailbox != NULL, returns a similar list, but including a NULL
+ * marker for the position of mailbox in the list.
+ * Trashbox is excluded.
+ */
+struct bmbl_find_all_unread_mboxes_info {
+    LibBalsaMailbox *mailbox;
+    GList *list;
+};
+
 static gboolean
 bmbl_find_all_unread_mboxes_func(GtkTreeModel * model, GtkTreePath * path,
                                  GtkTreeIter * iter, gpointer data)
 {
-    GList **r = data;
+    struct bmbl_find_all_unread_mboxes_info *info = data;
     BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
-    if (libbalsa_mailbox_get_unread(mbnode->mailbox) > 0)
-        *r = g_list_prepend(*r, mbnode->mailbox);
+    mailbox = mbnode->mailbox;
     g_object_unref(mbnode);
+
+    if (mailbox
+        && (libbalsa_mailbox_get_subscribe(mailbox) !=
+            LB_MAILBOX_SUBSCRIBE_NO)) {
+        if (mailbox == info->mailbox)
+            info->list = g_list_prepend(info->list, NULL);
+        else if (libbalsa_mailbox_get_unread(mailbox) > 0)
+            info->list = g_list_prepend(info->list, mailbox);
+    }
 
     return FALSE;
 }
 
 GList *
-balsa_mblist_find_all_unread_mboxes(void)
+balsa_mblist_find_all_unread_mboxes(LibBalsaMailbox * mailbox)
 {
-    GList *res = NULL;
-    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(balsa_app.mblist));
+    struct bmbl_find_all_unread_mboxes_info info;
 
-    gtk_tree_model_foreach(model, bmbl_find_all_unread_mboxes_func, &res);
+    info.mailbox = mailbox;
+    info.list = NULL;
 
-    return res;
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                           bmbl_find_all_unread_mboxes_func, &info);
+
+    return g_list_reverse(info.list);
 }
 
 /* mblist_open_mailbox
@@ -1175,9 +1236,17 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 		libbalsa_mailbox_set_show(mailbox,
 					  (mailbox == balsa_app.sentbox
 					   || mailbox == balsa_app.draftbox
-					   || mailbox == balsa_app.outbox)
-					  ? LB_MAILBOX_SHOW_TO
-					  : LB_MAILBOX_SHOW_FROM);
+					   || mailbox == balsa_app.outbox) ?
+                                          LB_MAILBOX_SHOW_TO :
+                                          LB_MAILBOX_SHOW_FROM);
+            /* ...and whether to jump to new mail in this mailbox. */
+            if (libbalsa_mailbox_get_subscribe(mailbox) ==
+                LB_MAILBOX_SUBSCRIBE_UNSET)
+                libbalsa_mailbox_set_subscribe(mailbox,
+                                               mailbox ==
+                                               balsa_app.trash ?
+                                               LB_MAILBOX_SUBSCRIBE_NO :
+                                               LB_MAILBOX_SUBSCRIBE_YES);
 	}
 
 	if (!mailbox_changed_signal)
@@ -1189,6 +1258,12 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 	    g_signal_connect(mbnode->mailbox, "changed",
 			     G_CALLBACK(bmbl_mailbox_changed_cb),
 			     NULL);
+            if (libbalsa_mailbox_get_unread(mailbox) > 0
+                && (libbalsa_mailbox_get_subscribe(mailbox) !=
+                    LB_MAILBOX_SUBSCRIBE_NO))
+                g_signal_emit(balsa_app.mblist,
+                              balsa_mblist_signals[HAS_UNREAD_MAILBOX],
+                              0, TRUE);
 	    /* If necessary, expand rows to expose this mailbox after
 	     * setting its mbnode in the tree-store. */
 	    expose = libbalsa_mailbox_get_exposed(mbnode->mailbox);
@@ -1345,7 +1420,7 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
     g_free(text_total);
 
     /* Do the folder styles as well */
-    has_unread_child = mailbox->has_unread_messages;
+    has_unread_child = libbalsa_mailbox_get_unread(mailbox) > 0;
     while (gtk_tree_model_iter_parent(model, &parent, iter)) {
 	*iter = parent;
 	gtk_tree_model_get(model, &parent, 0, &mbnode, -1);

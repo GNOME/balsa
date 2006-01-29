@@ -122,6 +122,12 @@ typedef enum {
 } LibBalsaMailboxShow;
 
 typedef enum {
+    LB_MAILBOX_SUBSCRIBE_NO,
+    LB_MAILBOX_SUBSCRIBE_YES,
+    LB_MAILBOX_SUBSCRIBE_UNSET
+} LibBalsaMailboxSubscribe;
+
+typedef enum {
     LB_FETCH_RFC822_HEADERS = 1<<0, /* prepare all rfc822 headers */
     LB_FETCH_STRUCTURE      = 1<<1  /* prepare message structure */
 } LibBalsaFetchFlag;
@@ -167,11 +173,12 @@ struct _LibBalsaMailboxView {
     LibBalsaMailboxSortType      sort_type;
     LibBalsaMailboxSortFields    sort_field;
     LibBalsaMailboxShow          show;
-    unsigned exposed:1;
-    unsigned open:1;
-    unsigned in_sync:1;		/* view is in sync with config */
-    unsigned frozen:1;		/* don't update view if set    */
-    unsigned used:1;		/* keep track of usage         */
+    LibBalsaMailboxSubscribe     subscribe;
+    gboolean exposed;
+    gboolean open;
+    gboolean in_sync;		/* view is in sync with config */
+    gboolean frozen;		/* don't update view if set    */
+    gboolean used;		/* keep track of usage         */
 
 #ifdef HAVE_GPGME
     LibBalsaChkCryptoMode gpg_chk_mode;
@@ -509,6 +516,9 @@ void libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
 				     LibBalsaMailboxSortFields sort_field);
 gboolean libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox,
 				   LibBalsaMailboxShow show);
+gboolean libbalsa_mailbox_set_subscribe(LibBalsaMailbox * mailbox,
+                                        LibBalsaMailboxSubscribe
+                                        subscribe);
 void libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox,
 				  gboolean exposed);
 void libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open);
@@ -532,6 +542,8 @@ LibBalsaMailboxSortType libbalsa_mailbox_get_sort_type(LibBalsaMailbox *
 LibBalsaMailboxSortFields libbalsa_mailbox_get_sort_field(LibBalsaMailbox *
 							  mailbox);
 LibBalsaMailboxShow libbalsa_mailbox_get_show(LibBalsaMailbox * mailbox);
+LibBalsaMailboxSubscribe libbalsa_mailbox_get_subscribe(LibBalsaMailbox *
+                                                        mailbox);
 gboolean libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox);
 gint libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox);

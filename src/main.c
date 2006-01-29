@@ -430,7 +430,7 @@ initial_open_unread_mailboxes()
 {
     GList *i, *gl;
     gdk_threads_enter();
-    gl = balsa_mblist_find_all_unread_mboxes();
+    gl = balsa_mblist_find_all_unread_mboxes(NULL);
 
     if (gl) {
         for (i = g_list_first(gl); i; i = g_list_next(i)) {

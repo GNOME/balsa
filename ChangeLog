@@ -1,3 +1,13 @@
+2006-01-29 16:22  PeterB
+
+	* src/balsa-index.c, src/balsa-index.h, src/balsa-mblist.c,
+	src/balsa-mblist.h, src/mailbox-conf.c, src/main-window.c,
+	src/main.c, src/save-restore.c, libbalsa/mailbox.c,
+	libbalsa/mailbox.h: next-unread chains to all mailboxes with unread
+	mail.
+	* libbalsa/message.c: encode broken headers before passing them to
+	GMime for decoding.
+
 2006-01-29  Pawel Salek
 
 	* NEWS: release 2.3.10.

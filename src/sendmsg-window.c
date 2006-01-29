@@ -3454,8 +3454,9 @@ static gint insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 	
 	g_free(signature);
     } else
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("No signature found!"));
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("No signature found!"));
     
     return TRUE;
 }

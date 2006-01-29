@@ -1,7 +1,10 @@
 2006-01-29  Pawel Salek
 
 	* NEWS: release 2.3.10.
-	* src/sendmsg-window.c: parent error dialog properly.
+	* src/sendmsg-window.c: parent error dialog properly. gtk-2.4.x
+	compatibility. Do not crash referencing NULL bsmsg->charset in
+	is_charset_ok() when the first entry to this function was
+	cancelled by user.
 	
 2006-01-28 22:14  PeterB
 

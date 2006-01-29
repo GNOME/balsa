@@ -4912,10 +4912,19 @@ sw_confirm_utf8(BalsaSendmsg * bsmsg, const gchar * content)
         (GTK_WINDOW(bsmsg->window), 0, GTK_MESSAGE_INFO,
          GTK_BUTTONS_OK_CANCEL,
          _("Message contains national (8-bit) characters"));
+#if GTK_CHECK_VERSION(2,6,0)
     gtk_message_dialog_format_secondary_text
         (GTK_MESSAGE_DIALOG(dialog),
          _("Balsa will encode the message in UTF-8.\n"
            "Cancel the operation to choose a different language."));
+#else
+    /* Do not miss the space after </b>! */
+    gtk_message_dialog_set_markup
+        (GTK_MESSAGE_DIALOG(dialog),
+         _("<b><big>Message contains national (8-bit) characters.</big></b> "
+           "Balsa will encode the message in UTF-8.\n"
+           "Cancel the operation to choose a different language."));
+#endif
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
     response = gtk_dialog_run(GTK_DIALOG(dialog));
@@ -4934,12 +4943,10 @@ is_charset_ok(BalsaSendmsg *bsmsg)
     GSList *list;
     gboolean retval = TRUE;
 
+    g_assert(bsmsg->charset); /* ... or strcmp below will segfault. */
     if (strcmp(bsmsg->charset, "UTF-8") == 0)
         /* User already agreed to use utf-8. */
         return TRUE;
-
-    g_free(bsmsg->charset);
-    bsmsg->charset = NULL;
 
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     tmp = gtk_text_iter_get_text(&start, &end);
@@ -4953,6 +4960,7 @@ is_charset_ok(BalsaSendmsg *bsmsg)
 	const gchar *charset = list->data;
 
 	if (sw_can_convert(tmp, -1, charset, "UTF-8", NULL)) {
+            g_free(bsmsg->charset);
 	    bsmsg->charset = g_strdup(charset);
 	    g_free(tmp);
 	    return retval;
@@ -4972,6 +4980,7 @@ is_charset_ok(BalsaSendmsg *bsmsg)
 
             if (sw_can_convert(tmp, -1, iconv_charset, "UTF-8", NULL)) {
 		/* Change the message charset. */
+                g_free(bsmsg->charset);
                 bsmsg->charset = g_strdup(iconv_charset);
 		g_free(tmp);
 		return retval;
@@ -4979,9 +4988,10 @@ is_charset_ok(BalsaSendmsg *bsmsg)
         }
     }
 
-    if (sw_confirm_utf8(bsmsg, tmp))
+    if (sw_confirm_utf8(bsmsg, tmp)) {
+        g_free(bsmsg->charset);
         bsmsg->charset = g_strdup("UTF-8");
-    else
+    } else
         retval = FALSE;
 
     g_free(tmp);

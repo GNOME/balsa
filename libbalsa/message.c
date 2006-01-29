@@ -1113,9 +1113,29 @@ static gboolean
 lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
                  const gchar* value, gboolean all)
 {
+    gchar *val = NULL;
+
+    if (libbalsa_text_attr_string(value)) {
+        /* Broken header: force it to utf8 using Balsa's fallback
+         * charset, then rfc2047-encode it for passing to the
+         * appropriate GMime decoder. */
+        gchar *tmp = g_strdup(value);
+        libbalsa_utf8_sanitize(&tmp, TRUE, NULL);
+        val = g_mime_utils_header_encode_text((unsigned char *) tmp);
+        g_free(tmp);
+#ifdef DEBUG
+        g_print("%s: non-ascii \"%s\" header \"%s\" encoded as \"%s\"\n",
+                __func__, name, value, val);
+#endif /* DEBUG */
+        value = val;
+    }
+
     if (g_ascii_strcasecmp(name, "Subject") == 0) {
-	if (!strcmp(value, "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA"))
+	if (!strcmp(value,
+                    "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA")) {
+            g_free(val);
 	    return FALSE;
+        }
 #if MESSAGE_COPY_CONTENT
 	g_free(message->subj);
         message->subj =
@@ -1151,9 +1171,9 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
     } else
 #endif
     if (all)
-	message->headers->user_hdrs =
-	    g_list_append(message->headers->user_hdrs,
-			  libbalsa_create_hdr_pair(name, g_strdup(value)));
+        libbalsa_message_set_user_header(message, name, value);
+
+    g_free(val);
 
     return TRUE;
 }

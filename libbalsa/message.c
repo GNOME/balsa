@@ -1171,7 +1171,10 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
     } else
 #endif
     if (all)
-        libbalsa_message_set_user_header(message, name, value);
+        message->headers->user_hdrs =
+            g_list_prepend(message->headers->user_hdrs,
+                           libbalsa_create_hdr_pair(name,
+                                                    g_strdup(value)));
 
     g_free(val);
 

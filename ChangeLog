@@ -1,5 +1,6 @@
-2006-01-29 16:22  PeterB
+2006-01-29 20:39  PeterB
 
+	* libbalsa/message.c: avoid infinite recursion.
 	* src/balsa-index.c, src/balsa-index.h, src/balsa-mblist.c,
 	src/balsa-mblist.h, src/mailbox-conf.c, src/main-window.c,
 	src/main.c, src/save-restore.c, libbalsa/mailbox.c,

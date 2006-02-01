@@ -720,22 +720,45 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 }
 
 /* Check for new mail in a closed mbox, using a crude parser. */
+/*
+ * Lightweight replacement for GMimeStreamBuffer
+ */
 typedef struct {
     ssize_t start;
     ssize_t end;
     gchar buf[1024];
+    GMimeStream *stream;
 } LbmMboxStreamBuffer;
 
-static void
-lbm_mbox_readln(GMimeStream * stream, GByteArray * line,
-                LbmMboxStreamBuffer * buffer)
+static off_t
+lbm_mbox_seek(LbmMboxStreamBuffer * buffer, off_t offset)
+{
+    if (offset >= 0) {
+        buffer->start =
+            buffer->end - (g_mime_stream_tell(buffer->stream) - offset);
+
+        if (buffer->start < 0 || buffer->start > buffer->end) {
+            offset =
+                g_mime_stream_seek(buffer->stream, offset,
+                                   GMIME_STREAM_SEEK_SET);
+            buffer->start = buffer->end = 0;
+        }
+    }
+
+    return offset;
+}
+
+static guint
+lbm_mbox_readln(LbmMboxStreamBuffer * buffer, GByteArray * line)
 {
     gchar *p, *q, *r;
+
+    line->len = 0;
 
     do {
         if (buffer->start >= buffer->end) {
             buffer->start = 0;
-            buffer->end = g_mime_stream_read(stream, buffer->buf,
+            buffer->end = g_mime_stream_read(buffer->stream, buffer->buf,
                                              sizeof buffer->buf);
             if (buffer->end < 0) {
                 g_warning("%s: Read error", __func__);
@@ -753,91 +776,162 @@ lbm_mbox_readln(GMimeStream * stream, GByteArray * line,
         g_byte_array_append(line, (guint8 *) q, p - q);
         buffer->start += p - q;
     } while (*--p != '\n');
+
+    return line->len;
+}
+
+/*
+ * Look for an unread, undeleted message using the cache file.
+ */
+static gboolean
+lbm_mbox_check_cache(LibBalsaMailboxMbox * mbox,
+                     LbmMboxStreamBuffer * buffer, GByteArray * line)
+{
+    gchar *filename;
+    gboolean tmp;
+    gchar *contents;
+    gsize length;
+    struct message_info *msg_info;
+    gboolean retval = FALSE;
+
+    filename = lbm_mbox_get_cache_filename(mbox);
+    tmp = g_file_get_contents(filename, &contents, &length, NULL);
+    g_free(filename);
+    if (!tmp)
+        return retval;
+
+    for (msg_info = (struct message_info *) contents;
+         msg_info < (struct message_info *) (contents + length);
+         msg_info++) {
+        if (lbm_mbox_seek(buffer, msg_info->status) >= 0
+            && lbm_mbox_readln(buffer, line)) {
+            if (g_ascii_strncasecmp((gchar *) line->data,
+                                    "Status: ", 8) != 0)
+                /* Bad cache. */
+                break;
+            if (strchr((gchar *) line->data + 8, 'R'))
+                /* Message has been read. */
+                continue;
+        }
+        if (lbm_mbox_seek(buffer, msg_info->x_status) >= 0
+            && lbm_mbox_readln(buffer, line)) {
+            if (g_ascii_strncasecmp((gchar *) line->data,
+                                    "X-Status: ", 10) != 0)
+                /* Bad cache. */
+                break;
+            if (strchr((gchar *) line->data + 10, 'D'))
+                /* Message has been read. */
+                continue;
+        }
+        /* Message is unread and undeleted. */
+        retval = TRUE;
+        break;
+    }
+    g_free(contents);
+
+    if (!retval)
+        /* Seek to the end of the last message we checked. */
+        lbm_mbox_seek(buffer, msg_info > (struct message_info *) contents ?
+                      (--msg_info)->end : 0);
+
+    return retval;
+}
+
+/*
+ * Look for an unread, undeleted message in the mbox file, beyond the
+ * messages we found in the cache file.
+ */
+static gboolean
+lbm_mbox_check_file(LibBalsaMailboxMbox * mbox,
+                    LbmMboxStreamBuffer * buffer, GByteArray * line)
+{
+    gboolean retval = FALSE;
+
+    do {
+        guint content_length = 0;
+        guint old_or_deleted = 0;
+
+        /* Find the next From_ line; if it's inside a message, protected
+         * by an embedded Content-Length header, we may be misled, but a
+         * full GMime parse takes too long. */
+        while (lbm_mbox_readln(buffer, line)
+               && strncmp((gchar *) line->data, "From ", 5) != 0)
+            /* Nothing. */ ;
+        if (line->len == 0)
+            break;
+
+        /* Scan headers. */
+        do {
+            /* Blank line ends headers. */
+            if (!lbm_mbox_readln(buffer, line)
+                || line->data[0] == '\n')
+                break;
+
+            line->data[line->len - 1] = '\0';
+            if (g_ascii_strncasecmp((gchar *) line->data,
+                                    "Status: ", 8) == 0) {
+                if (strchr((gchar *) line->data + 8, 'R'))
+                    ++old_or_deleted;
+            } else if (g_ascii_strncasecmp((gchar *) line->data,
+                                           "X-Status: ", 10) == 0) {
+                if (strchr((gchar *) line->data + 10, 'D'))
+                    ++old_or_deleted;
+            } else if (g_ascii_strncasecmp((gchar *) line->data,
+                                           "Content-Length: ", 16) == 0)
+                content_length = atoi((gchar *) line->data + 16);
+        } while (!(old_or_deleted && content_length));
+
+        if (!old_or_deleted) {
+            retval = TRUE;
+            /* One new message is enough. */
+            break;
+        }
+
+        if (content_length) {
+            /* Seek past the content. */
+            ssize_t remaining;
+
+            buffer->start += content_length;
+            remaining = buffer->end - buffer->start;
+            if (remaining < 0) {
+                g_mime_stream_seek(buffer->stream, -remaining,
+                                   GMIME_STREAM_SEEK_CUR);
+                buffer->start = buffer->end = 0;
+            }
+        }
+    } while (line->len > 0);
+
+    return retval;
 }
 
 static gboolean
 lbm_mbox_check(LibBalsaMailbox * mailbox, const gchar * path)
 {
+    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     int fd;
-    GMimeStream *gmime_stream;
-    GByteArray *line;
-    LbmMboxStreamBuffer buffer = { 0, 0 };
     gboolean retval = FALSE;
+    LbmMboxStreamBuffer buffer = { 0, 0 };
+    GByteArray *line;
 
     if (!(fd = open(path, O_RDONLY)))
-	return retval;
+        return retval;
 
-    gmime_stream = g_mime_stream_fs_new(fd);
+    buffer.stream = g_mime_stream_fs_new(fd);
 
-    if (mbox_lock(mailbox, gmime_stream)) {
-	g_object_unref(gmime_stream);
-	return FALSE;
+    if (mbox_lock(mailbox, buffer.stream)) {
+        g_object_unref(buffer.stream);
+        return retval;
     }
 
     line = g_byte_array_sized_new(80);
-    do {
-	gboolean new_undeleted;
-	guint content_length;
 
-	/* Find the next From_ line; if it's inside a message, protected
-	 * by an embedded Content-Length header, we may be misled, but a
-	 * full GMime parse takes too long. */
-	do {
-	    line->len = 0;
-	    lbm_mbox_readln(gmime_stream, line, &buffer);
-	} while (line->len > 0 
-                 && strncmp((gchar *) line->data, "From ", 5) != 0);
-        if (line->len == 0)
-            break;
+    retval = lbm_mbox_check_cache(mbox, &buffer, line);
+    if (!retval)
+        retval = lbm_mbox_check_file(mbox, &buffer, line);
 
-	/* Scan headers. */
-	new_undeleted = TRUE;
-	content_length = 0;
-	do {
-	    line->len = 0;
-	    lbm_mbox_readln(gmime_stream, line, &buffer);
-	    /* Blank line ends headers. */
-            if (line->len == 0 || line->data[0] == '\n')
-                break;
-
-            line->data[line->len - 1] = '\0';
-	    if (g_ascii_strncasecmp((gchar *) line->data,
-				    "Status: ", 8) == 0) {
-		if (strchr((gchar *) line->data + 8, 'R'))
-		    new_undeleted = FALSE;
-	    } else if (g_ascii_strncasecmp((gchar *) line->data,
-				           "X-Status: ", 10) == 0) {
-		if (strchr((gchar *) line->data + 10, 'D'))
-		    new_undeleted = FALSE;
-	    } else
-		if (g_ascii_strncasecmp((gchar *) line->data,
-					"Content-Length: ", 16) == 0) {
-		content_length = atoi((gchar *) line->data + 16);
-	    }
-	} while (TRUE);
-
-	if (new_undeleted) {
-	    retval = TRUE;
-	    /* One new message is enough. */
-	    break;
-	}
-
-	if (content_length) {
-            ssize_t remaining;
-
-            buffer.start += content_length;
-            remaining = buffer.end - buffer.start;
-            if (remaining < 0) {
-                g_mime_stream_seek(gmime_stream, -remaining,
-                                   GMIME_STREAM_SEEK_CUR);
-                buffer.start = buffer.end = 0;
-            }
-        }
-    } while (line->len > 0);
-
-    mbox_unlock(mailbox, gmime_stream);
-    g_object_unref(gmime_stream);
     g_byte_array_free(line, TRUE);
+    mbox_unlock(mailbox, buffer.stream);
+    g_object_unref(buffer.stream);
 
     return retval;
 }

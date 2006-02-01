@@ -1,3 +1,7 @@
+2006-02-01 11:14  PeterB
+
+	* src/mailbox-conf.c: check for NULL mailbox.
+
 2006-01-29 20:39  PeterB
 
 	* libbalsa/message.c: avoid infinite recursion.

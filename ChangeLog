@@ -1,5 +1,9 @@
-2006-02-01 11:14  PeterB
+2006-02-01 14:45  PeterB
 
+	* libbalsa/mailbox_mbox.c: use cache file to speed up
+	mailbox-check.
+	* src/mailbox-conf.c: create only one dialog for new mailbox and to
+	modify POP3 mailbox.
 	* src/mailbox-conf.c: check for NULL mailbox.
 
 2006-01-29 20:39  PeterB

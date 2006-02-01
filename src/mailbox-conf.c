@@ -1118,8 +1118,9 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                                     mcw->ok_button_name, MCW_RESPONSE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
-    g_object_set_data(G_OBJECT(mcw->mailbox), BALSA_MAILBOX_CONF_DIALOG,
-                      dialog);
+    if (mcw->mailbox)
+        g_object_set_data(G_OBJECT(mcw->mailbox),
+                          BALSA_MAILBOX_CONF_DIALOG, dialog);
     mailbox_conf_add_labels_to_size_group(dialog, size_group);
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), table);
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),

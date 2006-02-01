@@ -513,8 +513,9 @@ conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
     case MCW_RESPONSE: mcw->ok_handler(mcw); 
         /* fall through */
     default:
-        g_object_set_data(G_OBJECT(mcw->mailbox),
-                          BALSA_MAILBOX_CONF_DIALOG, NULL);
+        if (mcw->mailbox)
+            g_object_set_data(G_OBJECT(mcw->mailbox),
+                              BALSA_MAILBOX_CONF_DIALOG, NULL);
         gtk_widget_destroy(GTK_WIDGET(dialog));
         /* fall through */
     case 0:
@@ -522,13 +523,14 @@ conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
     }
 }
 
-static void
+static GtkWidget *
 run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type, 
 		 gboolean update)
 {
     MailboxConfWindow* mcw;
 
-    g_return_if_fail(g_type_is_a(mailbox_type, LIBBALSA_TYPE_MAILBOX));
+    g_return_val_if_fail(g_type_is_a(mailbox_type, LIBBALSA_TYPE_MAILBOX),
+                         NULL);
 
     mcw = g_new0(MailboxConfWindow, 1);
 
@@ -557,6 +559,8 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
     g_signal_connect(G_OBJECT(mcw->window), "response", 
                      G_CALLBACK(conf_response_cb), mcw);
     gtk_widget_show_all(GTK_WIDGET(mcw->window));
+
+    return GTK_WIDGET(mcw->window);
 }
 /*
  * Brings up dialog to configure a new mailbox of type mailbox_type.
@@ -565,7 +569,15 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
 void
 mailbox_conf_new(GtkType mailbox_type)
 {
-    run_mailbox_conf(NULL, mailbox_type, FALSE);
+    static GtkWidget *dialog;
+
+    if (dialog) {
+        gdk_window_raise(dialog->window);
+        return;
+    }
+
+    dialog = run_mailbox_conf(NULL, mailbox_type, FALSE);
+    g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer) &dialog);
 }
 
 /*
@@ -578,16 +590,18 @@ mailbox_conf_edit(BalsaMailboxNode * mbnode)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
 
-    dialog =
-        g_object_get_data(G_OBJECT(mbnode->mailbox),
-                          BALSA_MAILBOX_CONF_DIALOG);
+    dialog = g_object_get_data(G_OBJECT(mbnode->mailbox),
+                               BALSA_MAILBOX_CONF_DIALOG);
     if (dialog) {
         gdk_window_raise(dialog->window);
         return;
     }
 
-    run_mailbox_conf(mbnode, G_OBJECT_TYPE(G_OBJECT(mbnode->mailbox)),
-                     TRUE);
+    dialog =
+        run_mailbox_conf(mbnode, G_OBJECT_TYPE(G_OBJECT(mbnode->mailbox)),
+                         TRUE);
+    g_object_set_data(G_OBJECT(mbnode->mailbox), BALSA_MAILBOX_CONF_DIALOG,
+                      dialog);
 }
 
 /*
@@ -1118,9 +1132,6 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                                     mcw->ok_button_name, MCW_RESPONSE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
-    if (mcw->mailbox)
-        g_object_set_data(G_OBJECT(mcw->mailbox),
-                          BALSA_MAILBOX_CONF_DIALOG, dialog);
     mailbox_conf_add_labels_to_size_group(dialog, size_group);
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), table);
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),

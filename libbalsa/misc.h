@@ -186,4 +186,15 @@ enum LibBalsaImageError {
 GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
+GtkWidget *libbalsa_create_table(guint rows, guint columns);
+GtkWidget *libbalsa_create_label(const gchar * label, GtkWidget * table,
+                                 gint row);
+GtkWidget *libbalsa_create_entry(GtkWidget * table, GCallback func,
+                                 gpointer data, gint row,
+                                 const gchar * initval,
+                                 GtkWidget * hotlabel);
+GtkWidget *libbalsa_create_check(const gchar * label, GtkWidget * table,
+                                 gint row, gboolean initval);
+GtkSizeGroup *libbalsa_create_size_group(GtkWidget * chooser);
+
 #endif				/* __LIBBALSA_MISC_H__ */

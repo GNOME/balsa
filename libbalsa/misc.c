@@ -2268,3 +2268,110 @@ libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
     return sview;
 }
 #endif  /* HAVE_GTKSOURCEVIEW */
+
+/*
+ * Utilities for making consistent dialogs.
+ */
+
+#define LB_PADDING 12           /* per HIG */
+
+GtkWidget *
+libbalsa_create_table(guint rows, guint columns)
+{
+    GtkWidget *table;
+
+    table = gtk_table_new(rows, columns, FALSE);
+
+    gtk_table_set_row_spacings(GTK_TABLE(table), LB_PADDING);
+    gtk_table_set_col_spacings(GTK_TABLE(table), LB_PADDING);
+
+    return table;
+}
+
+/* create_label:
+   Create a label and add it to a table in the first column of given row,
+   setting the keyval to found accelerator value, that can be later used 
+   in create_entry.
+*/
+GtkWidget *
+libbalsa_create_label(const gchar * text, GtkWidget * table, gint row)
+{
+    GtkWidget *label = gtk_label_new_with_mnemonic(text);
+
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row + 1,
+                     GTK_FILL, GTK_FILL, 0, 0);
+
+    return label;
+}
+
+/* create_check:
+   creates a checkbox with a given label and places them in given array.
+*/
+GtkWidget *
+libbalsa_create_check(const gchar * text, GtkWidget * table, gint row,
+                      gboolean initval)
+{
+    GtkWidget *check_button;
+
+    check_button = gtk_check_button_new_with_mnemonic(text);
+
+    gtk_table_attach(GTK_TABLE(table), check_button, 0, 2, row, row + 1,
+                     GTK_FILL, 0, 0, 0);
+
+    if (initval)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button),
+                                     TRUE);
+
+    return check_button;
+}
+
+/* Create a text entry and add it to the table */
+GtkWidget *
+libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
+                      gpointer data, gint row, const gchar * initval,
+                      GtkWidget * hotlabel)
+{
+    GtkWidget *entry;
+
+    entry = gtk_entry_new();
+
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
+                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+    if (initval) {
+        gint zero = 0;
+
+        gtk_editable_insert_text(GTK_EDITABLE(entry), initval, -1, &zero);
+    }
+
+    gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
+
+    /* Watch for changes... */
+    if (changed_func)
+        g_signal_connect(entry, "changed", changed_func, data);
+
+    return entry;
+}
+
+static void
+lb_create_size_group_func(GtkWidget * widget, gpointer data)
+{
+    if (GTK_IS_LABEL(widget) && GTK_IS_TABLE(widget->parent))
+        gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
+    else if (GTK_IS_CONTAINER(widget))
+        gtk_container_foreach(GTK_CONTAINER(widget),
+                              lb_create_size_group_func, data);
+}
+
+GtkSizeGroup *
+libbalsa_create_size_group(GtkWidget * chooser)
+{
+    GtkSizeGroup *size_group;
+
+    size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
+    lb_create_size_group_func(chooser, size_group);
+
+    return size_group;
+}

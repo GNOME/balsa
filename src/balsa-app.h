@@ -432,11 +432,4 @@ BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
 void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode);
 
-GtkWidget *create_label(const gchar * label, GtkWidget * table, gint row);
-GtkWidget *create_entry(GtkDialog *mcw, GtkWidget * table, 
-			GtkSignalFunc func, gpointer data, gint row, 
-			const gchar * initval, GtkWidget* hotlabel);
-GtkWidget *create_check(GtkDialog *mcw, const gchar * label, 
-			GtkWidget * table, gint row, gboolean initval);
-
 #endif				/* __BALSA_APP_H__ */

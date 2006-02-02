@@ -325,7 +325,7 @@ libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
 /* Used by both dialogs: */
 
 /* Widget padding: */
-static const guint padding = 4;
+static const guint padding = 12;
 
 /* Forward references: */
 static void identity_list_update_real(GtkTreeView * tree,
@@ -839,9 +839,7 @@ append_ident_notebook_page(GtkNotebook *notebook, guint rows,
     GtkWidget *table;
 
     vbox = gtk_vbox_new(FALSE, 0);
-    table = gtk_table_new(rows, 2, FALSE);
-    gtk_table_set_row_spacings(GTK_TABLE(table), padding);
-    gtk_table_set_col_spacings(GTK_TABLE(table), padding);
+    table = libbalsa_create_table(rows, 2);
     gtk_container_set_border_width(GTK_CONTAINER(table), padding);
     gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
@@ -914,7 +912,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     ident_dialog_add_entry(table, row++, dialog, _("F_orward String:"), 
                            "identity-forwardstring");
 #if ENABLE_ESMTP
-    ident_dialog_add_smtp_menu(table, row++, dialog, _("SMT_P Server"),
+    ident_dialog_add_smtp_menu(table, row++, dialog, _("SMT_P Server:"),
                                "identity-smtp-server", smtp_servers);
 #endif /* ENABLE_ESMTP */
 
@@ -997,8 +995,7 @@ ident_dialog_add_checkbutton(GtkWidget * table, gint row,
 {
     GtkWidget *check;
 
-    check = gtk_check_button_new_with_mnemonic(check_label);
-    gtk_table_attach_defaults(GTK_TABLE(table), check, 0, 2, row, row + 1);
+    check = libbalsa_create_check(check_label, table, row, FALSE);
     g_object_set_data(G_OBJECT(dialog), check_key, check);
     gtk_widget_set_sensitive(check, sensitive);
 }
@@ -1017,17 +1014,13 @@ ident_dialog_add_entry(GtkWidget * table, gint row, GtkDialog * dialog,
     GtkWidget *label;
     GtkWidget *entry;
 
-    label = gtk_label_new_with_mnemonic(label_name);
-    gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
-    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
+    label = libbalsa_create_label(label_name, table, row);
 
-    entry = gtk_entry_new();
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row + 1);
+    entry = libbalsa_create_entry(table, NULL, NULL, row, NULL, label);
 
     g_object_set_data(G_OBJECT(dialog), entry_key, entry);
     if (row == 0)
         gtk_widget_grab_focus(entry);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
 }
 
 /*
@@ -1933,7 +1926,7 @@ ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     GPtrArray *values;
 
     label = gtk_label_new_with_mnemonic(label_name);
-    gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
     opt_menu = gtk_combo_box_new_text();
@@ -1989,7 +1982,7 @@ ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     GPtrArray *values;
 
     label = gtk_label_new_with_mnemonic(label_name);
-    gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
     combo_box = gtk_combo_box_new_text();

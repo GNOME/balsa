@@ -2422,7 +2422,7 @@ bndx_pipe_response(GtkWidget * dialog, gint response,
     g_object_set_data(G_OBJECT(mailbox), BALSA_INDEX_PIPE_INFO, NULL);
 }
 
-#define HIG_PADDING 6
+#define HIG_PADDING 12
 
 void
 balsa_index_pipe(BalsaIndex * index)
@@ -2465,10 +2465,10 @@ balsa_index_pipe(BalsaIndex * index)
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+    gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
 
     vbox = GTK_DIALOG(dialog)->vbox;
     gtk_box_set_spacing(GTK_BOX(vbox), HIG_PADDING);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER(vbox), label =
                       gtk_label_new(_("Specify the program to run:")));
 

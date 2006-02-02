@@ -301,14 +301,15 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     notebook = gtk_notebook_new();
     gtk_box_pack_start(GTK_BOX(fcw->dialog->vbox),
                        notebook, TRUE, TRUE, 0);
-    table = gtk_table_new(9, 2, FALSE);
+    table = libbalsa_create_table(9, 2);
+    gtk_container_set_border_width(GTK_CONTAINER(table), 12);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
                              gtk_label_new_with_mnemonic(_("_Basic")));
     advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 3);
     /* Limit number of connections */
     fcw->connection_limit = 
         balsa_server_conf_add_spinner
-        (&fcw->bsc, _("_Max number of connections"), 1, 40, 1,
+        (&fcw->bsc, _("_Max number of connections:"), 1, 40, 1,
          s 
          ? libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(s))
          : 20);
@@ -339,48 +340,48 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 
     /* INPUT FIELD CREATION */
-    label = create_label(_("Descriptive _Name:"), table, 0);
-    fcw->folder_name = create_entry(fcw->dialog, table,
-                                   GTK_SIGNAL_FUNC(validate_folder),
+    label = libbalsa_create_label(_("Descriptive _Name:"), table, 0);
+    fcw->folder_name = libbalsa_create_entry(table,
+                                   G_CALLBACK(validate_folder),
                                    fcw, r++, mn ? mn->name : NULL, 
 				   label);
 
     default_server = libbalsa_guess_imap_server();
-    label = create_label(_("_Server:"), table, 1);
-    fcw->bsc.server = create_entry(fcw->dialog, table,
-                              GTK_SIGNAL_FUNC(validate_folder),
+    label = libbalsa_create_label(_("_Server:"), table, 1);
+    fcw->bsc.server = libbalsa_create_entry(table,
+                              G_CALLBACK(validate_folder),
                               fcw, r++, s ? s->host : default_server,
 			      label);
     fcw->bsc.default_ports = IMAP_DEFAULT_PORTS;
     g_free(default_server);
 
-    label= create_label(_("Use_r name:"), table, r);
-    fcw->username = create_entry(fcw->dialog, table,
-                                GTK_SIGNAL_FUNC(validate_folder),
+    label= libbalsa_create_label(_("Use_r name:"), table, r);
+    fcw->username = libbalsa_create_entry(table,
+                                G_CALLBACK(validate_folder),
                                 fcw, r++, s ? s->user : g_get_user_name(), 
 			        label);
 
-    fcw->anonymous = create_check(fcw->dialog, _("_Anonymous access"), 
+    label = libbalsa_create_label(_("_Password:"), table, r);
+    fcw->password = libbalsa_create_entry(table, NULL, NULL, r++,
+				s ? s->passwd : NULL, label);
+    gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
+
+    fcw->anonymous = libbalsa_create_check(_("_Anonymous access"), 
                                 table, r++, s ? s->try_anonymous : FALSE);
     g_signal_connect(G_OBJECT(fcw->anonymous), "toggled",
                      G_CALLBACK(anonymous_cb), fcw);
-    fcw->remember = create_check(fcw->dialog, _("_Remember password"), 
+    fcw->remember = libbalsa_create_check(_("_Remember password"), 
                                 table, r++, s ? s->remember_passwd : TRUE);
     g_signal_connect(G_OBJECT(fcw->remember), "toggled",
                      G_CALLBACK(remember_cb), fcw);
 
-    label = create_label(_("_Password:"), table, r);
-    fcw->password = create_entry(fcw->dialog, table, NULL, NULL, r++,
-				s ? s->passwd : NULL, label);
-    gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
-
-    fcw->subscribed = create_check(fcw->dialog, _("Subscribed _folders only"), 
+    fcw->subscribed = libbalsa_create_check(_("Subscribed _folders only"), 
                                   table, r++, mn ? mn->subscribed : FALSE);
-    fcw->list_inbox = create_check(fcw->dialog, _("Always show _INBOX"), 
+    fcw->list_inbox = libbalsa_create_check(_("Always show _INBOX"), 
                                   table, r++, mn ? mn->list_inbox : TRUE); 
 
-    label = create_label(_("Pr_efix"), table, r);
-    fcw->prefix = create_entry(fcw->dialog, table, NULL, NULL, r++,
+    label = libbalsa_create_label(_("Pr_efix:"), table, r);
+    fcw->prefix = libbalsa_create_entry(table, NULL, NULL, r++,
 			      mn ? mn->dir : NULL, label);
     
     gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
@@ -768,17 +769,18 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 			       _("Create subfolder"));
     gtk_box_pack_start(GTK_BOX(sdd->dialog->vbox),
                        frame, TRUE, TRUE, 0);
-    table = gtk_table_new(3, 3, FALSE);
+    table = libbalsa_create_table(3, 3);
+    gtk_container_set_border_width(GTK_CONTAINER(table), 12);
     gtk_container_add(GTK_CONTAINER(frame), table);
  
     /* INPUT FIELD CREATION */
-    label= create_label(_("_Folder name:"), table, 0);
-    sdd->folder_name = create_entry(sdd->dialog, table,
-                                   GTK_SIGNAL_FUNC(validate_sub_folder),
+    label= libbalsa_create_label(_("_Folder name:"), table, 0);
+    sdd->folder_name = libbalsa_create_entry(table,
+                                   G_CALLBACK(validate_sub_folder),
 				   sdd, 0, sdd->old_folder, label);
 
-    subtable = gtk_table_new(1, 3, FALSE);
-    label = create_label(_("Host:"), table, 1);
+    subtable = libbalsa_create_table(1, 3);
+    label = libbalsa_create_label(_("Host:"), table, 1);
     sdd->host_label = 
         gtk_label_new(sdd->mbnode && sdd->mbnode->server
                       ? sdd->mbnode->server->host : "");
@@ -792,9 +794,9 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_table_attach(GTK_TABLE(table), subtable, 1, 2, 1, 2,
 	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
 
-    label = create_label(_("_Subfolder of:"), table, 2);
-    sdd->parent_folder = create_entry(sdd->dialog, table,
-                                     GTK_SIGNAL_FUNC(validate_sub_folder),
+    label = libbalsa_create_label(_("_Subfolder of:"), table, 2);
+    sdd->parent_folder = libbalsa_create_entry(table,
+                                     G_CALLBACK(validate_sub_folder),
 				     sdd, 2, sdd->old_parent, label);
 
 

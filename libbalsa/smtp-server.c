@@ -353,9 +353,7 @@ static void
 smtp_server_add_widget(GtkWidget * table, gint row, const gchar * text,
                        GtkWidget * widget)
 {
-    GtkWidget *label = gtk_label_new_with_mnemonic(text);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
+    GtkWidget *label = libbalsa_create_label(text, table, row);
     gtk_table_attach_defaults(GTK_TABLE(table), widget,
                               1, 2, row, row + 1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
@@ -540,36 +538,34 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK,
                                       FALSE);
 
-#define HIG_PADDING 6
-    table = gtk_table_new(6, 2, FALSE);
-    gtk_table_set_row_spacings(GTK_TABLE(table), HIG_PADDING);
-    gtk_table_set_col_spacings(GTK_TABLE(table), HIG_PADDING);
+#define HIG_PADDING 12
+    table = libbalsa_create_table(6, 2);
     gtk_container_set_border_width(GTK_CONTAINER(table), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
 
     row = 0;
-    smtp_server_add_widget(table, row, _("_Descriptive Name"),
+    smtp_server_add_widget(table, row, _("_Descriptive Name:"),
                            sdi->name = gtk_entry_new());
     if (smtp_server->name)
         gtk_entry_set_text(GTK_ENTRY(sdi->name), smtp_server->name);
     g_signal_connect(sdi->name, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("_Server"),
+    smtp_server_add_widget(table, ++row, _("_Server:"),
                            sdi->host = gtk_entry_new());
     if (server->host)
         gtk_entry_set_text(GTK_ENTRY(sdi->host), server->host);
     g_signal_connect(sdi->host, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("_User Name"),
+    smtp_server_add_widget(table, ++row, _("_User Name:"),
                            sdi->user = gtk_entry_new());
     if (server->user)
         gtk_entry_set_text(GTK_ENTRY(sdi->user), server->user);
     g_signal_connect(sdi->user, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("_Pass Phrase"),
+    smtp_server_add_widget(table, ++row, _("_Pass Phrase:"),
                            sdi->pass = gtk_entry_new());
     gtk_entry_set_visibility(GTK_ENTRY(sdi->pass), FALSE);
     if (server->passwd)
@@ -577,13 +573,13 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     g_signal_connect(sdi->pass, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("Use _TLS"), sdi->tlsm =
+    smtp_server_add_widget(table, ++row, _("Use _TLS:"), sdi->tlsm =
                            smtp_server_tls_widget(smtp_server));
     g_signal_connect(sdi->tlsm, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    smtp_server_add_widget(table, ++row, _("C_ertificate Pass Phrase"),
+    smtp_server_add_widget(table, ++row, _("C_ertificate Pass Phrase:"),
                            sdi->cert = gtk_entry_new());
     gtk_entry_set_visibility(GTK_ENTRY(sdi->cert), FALSE);
     if (smtp_server->cert_passphrase)

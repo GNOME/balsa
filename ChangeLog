@@ -1,5 +1,9 @@
-2006-02-01 14:45  PeterB
+2006-02-01 20:30  PeterB
 
+	* src/address-book-config.c, src/balsa-app.c, src/balsa-app.h,
+	src/balsa-index.c, src/folder-conf.c, src/mailbox-conf.c,
+	libbalsa/identity.c, libbalsa/misc.c, libbalsa/misc.h,
+	libbalsa/smtp-server.c: more consistent dialogs.
 	* libbalsa/mailbox_mbox.c: use cache file to speed up
 	mailbox-check.
 	* src/mailbox-conf.c: create only one dialog for new mailbox and to

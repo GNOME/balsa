@@ -1,3 +1,7 @@
+2006-02-03  Pawel Salek
+
+	* libbalsa/smtp-server.c: include misc.h for libbalsa_create_label.
+
 2006-02-01 20:30  PeterB
 
 	* src/address-book-config.c, src/balsa-app.c, src/balsa-app.h,

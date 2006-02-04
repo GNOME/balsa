@@ -190,7 +190,7 @@ static GtkWidget *property_box;
 static gboolean already_open;
 
     /* Mail Servers page */
-static GtkWidget *mailserver_subpage(GtkTreeStore * store);
+static GtkWidget *mailserver_subpage(void);
 static GtkWidget *remote_mailbox_servers_group(GtkWidget * page);
 static GtkWidget *local_mail_group(GtkWidget * page);
 #if ENABLE_ESMTP
@@ -449,13 +449,16 @@ pm_selection_changed(GtkTreeSelection * selection, gpointer data)
     gtk_tree_model_get(model, &iter,
                        PM_CHILD_COL, &notebook,
                        -1);
-    if (notebook)
+    if (notebook) {
         gtk_notebook_set_current_page(notebook, 0);
+        g_object_unref(notebook);
+    }
 
     do {
         gtk_tree_model_get(model, &iter,
                            PM_NOTEBOOK_COL, &notebook,
-                           PM_PAGE_COL, &page, -1);
+                           PM_PAGE_COL, &page,
+                           -1);
         if (notebook) {
             gtk_notebook_set_current_page(notebook, page);
             g_object_unref(notebook);
@@ -1523,7 +1526,7 @@ mail_servers_cb(GtkTreeView * tree_view, GtkTreePath * path,
 }
 
 static GtkWidget *
-mailserver_subpage(GtkTreeStore * store)
+mailserver_subpage()
 {
     GtkWidget *page = pm_page_new();
 
@@ -1702,7 +1705,7 @@ create_mail_options_page(GtkTreeStore * store)
     gtk_container_set_border_width(GTK_CONTAINER(notebook), HIG_PADDING);
 
     gtk_tree_store_append(store, &iter, NULL);
-    pm_append_page(notebook, mailserver_subpage(store), _("Mail Servers"),
+    pm_append_page(notebook, mailserver_subpage(), _("Mail Servers"),
                    store, &iter);
     pm_append_page(notebook, incoming_subpage(), _("Incoming"),
                    store, &iter);

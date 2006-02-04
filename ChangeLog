@@ -1,5 +1,6 @@
-2006-02-04 11:52  PeterB
+2006-02-04 12:24  PeterB
 
+	* libbalsa/misc.c: plug object leak.
 	* src/pref-manager.c: plug widget leak.
 
 2006-02-03 22:04  PeterB

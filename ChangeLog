@@ -1,3 +1,8 @@
+2006-02-03 22:04  PeterB
+
+	* src/pref-manager.c: use tree control instead of nested notebooks.
+	* src/mailbox-conf.c: less ugly alignment.
+
 2006-02-03  Pawel Salek
 
 	* libbalsa/smtp-server.c: include misc.h for libbalsa_create_label.

@@ -206,10 +206,16 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
         { N_("Required"),    LIBBALSA_TLS_REQUIRED }
     };
     GtkWidget *label;
+    GtkWidget *hbox;
     gboolean use_ssl = s && s->use_ssl;
+
+    hbox = gtk_hbox_new(FALSE, 0);
 
     bsc->table = GTK_TABLE(libbalsa_create_table(3 + extra_rows, 2));
     gtk_container_set_border_width(GTK_CONTAINER(bsc->table), 12);
+    gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(bsc->table),
+                       FALSE, FALSE, 0);
+
     bsc->used_rows = 0;
 
     bsc->use_ssl = balsa_server_conf_add_checkbox(bsc, _("Use _SSL"));
@@ -232,7 +238,8 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     gtk_widget_show_all(GTK_WIDGET(bsc->table));
     bsc->used_rows = 2;
     gtk_widget_set_sensitive(bsc->tls_option, !use_ssl);
-    return (GtkWidget*)bsc->table;
+
+    return hbox;
 }
 
 GtkWidget*

@@ -2355,6 +2355,9 @@ libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
     return entry;
 }
 
+/* Create a GtkSizeGroup and add to it any GtkLabel packed in a GtkTable
+ * inside the chooser widget; size_group will be unreffed when the
+ * chooser widget is finalized. */
 static void
 lb_create_size_group_func(GtkWidget * widget, gpointer data)
 {
@@ -2371,6 +2374,8 @@ libbalsa_create_size_group(GtkWidget * chooser)
     GtkSizeGroup *size_group;
 
     size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
+    g_object_weak_ref(G_OBJECT(chooser), (GWeakNotify) g_object_unref,
+                      size_group);
     lb_create_size_group_func(chooser, size_group);
 
     return size_group;

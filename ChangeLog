@@ -1,3 +1,7 @@
+2006-02-04 11:52  PeterB
+
+	* src/pref-manager.c: plug widget leak.
+
 2006-02-03 22:04  PeterB
 
 	* src/pref-manager.c: use tree control instead of nested notebooks.

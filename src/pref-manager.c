@@ -2411,7 +2411,6 @@ pspell_settings_group(GtkWidget * page)
     GtkWidget *group;
     GtkObject *ignore_adj;
     GtkWidget *table;
-    GtkWidget *label;
     GtkWidget *hbox;
 
     group = pm_group_new(_("Pspell Settings"));

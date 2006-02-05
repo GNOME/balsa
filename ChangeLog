@@ -1,3 +1,7 @@
+2006-02-05  Carlos Morgado  <chbm gnome.org>
+
+	* src/pref-manager.c (pspell_settings_group): fix pedantic pspell build
+
 2006-02-05 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/pref-manager.c: use unicode for special characters; let

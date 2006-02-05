@@ -1462,18 +1462,22 @@ attach_information_menu(const gchar * label, gint row, GtkTable * table,
     return combo_box;
 }
 
-static void
+static GtkWidget *
 attach_label(const gchar * text, GtkWidget * table, gint row,
              GtkWidget * page)
 {
     GtkWidget *label;
 
     label = gtk_label_new(text);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row + 1,
                      GTK_FILL, 0, 0, 0);
     if (page)
         pm_page_add_to_size_group(page, label);
+
+    return label;
 }
 
 static GtkWidget *
@@ -1859,7 +1863,7 @@ broken_8bit_codeset_group(GtkWidget * page)
     /* treatment of messages with 8-bit chars, but without proper MIME encoding */
 
     group =
-        pm_group_new(_("National (8-bit) characters in broken messages\n"
+        pm_group_new(_("National (8-bit) characters in broken messages "
                        "without codeset header"));
     table = create_table(2, 2, page);
     pm_group_add(group, table);
@@ -1910,21 +1914,22 @@ mdn_group(GtkWidget * page)
     group = pm_group_new(_("Message Disposition Notification Requests"));
 
     label = gtk_label_new(_("When I receive a message whose sender "
-                            "requested a\n"
+                            "requested a "
                             "Message Disposition Notification (MDN), "
                             "send it if:"));
-    pm_group_add(group, label);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    pm_group_add(group, label);
 
     table = create_table(2, 2, page);
     pm_group_add(group, table);
 
     label = gtk_label_new(_("The message header looks clean\n"
-                            "(the notify-to address is the "
-                            "return path,\n"
+                            "(the notify-to address is the return path,\n"
                             "and I am in the \"To:\" or \"Cc:\" list)."));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
                      GTK_FILL, 0, 0, 0);
@@ -1937,10 +1942,10 @@ mdn_group(GtkWidget * page)
 
     label = gtk_label_new(_("The message header looks suspicious."));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
                      GTK_FILL, (GtkAttachOptions) (0), 0, 0);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 
     pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
     pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
@@ -2513,10 +2518,11 @@ deleting_messages_group(GtkWidget * page)
     group = pm_group_new(_("Deleting Messages"));
 
     label = gtk_label_new(_("The following setting is global, "
-			    "but may be overridden\n"
+			    "but may be overridden "
 			    "for the selected mailbox "
-			    "using Mailbox -> Hide messages:"));
+			    "using Mailbox \342\226\272 Hide messages:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
     pm_group_add(group, label);
     pui->hide_deleted =
@@ -2524,6 +2530,7 @@ deleting_messages_group(GtkWidget * page)
 
     label = gtk_label_new(_("The following settings are global:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
     pm_group_add(group, label);
     pui->expunge_on_close =
@@ -2615,10 +2622,11 @@ folder_scanning_group(GtkWidget * page)
     group = pm_group_new(_("Folder Scanning"));
 
     label = gtk_label_new(_("Choose depth 1 for fast startup; "
-                            "this defers some scanning.\n"
+                            "this defers scanning some folders.  "
                             "To see more of the tree at startup, "
                             "choose a greater depth."));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
     pm_group_add(group, label);
 
@@ -3386,6 +3394,7 @@ pm_group_new(const gchar * text)
     markup = g_strdup_printf("<b>%s</b>", text);
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 

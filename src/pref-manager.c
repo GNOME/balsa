@@ -2511,16 +2511,23 @@ static GtkWidget *
 deleting_messages_group(GtkWidget * page)
 {
     GtkWidget *group;
+    gchar *text;
     GtkWidget *label;
     GtkWidget *hbox;
     GtkObject *expunge_spinbutton_adj;
 
     group = pm_group_new(_("Deleting Messages"));
 
-    label = gtk_label_new(_("The following setting is global, "
-			    "but may be overridden "
-			    "for the selected mailbox "
-			    "using Mailbox \342\226\272 Hide messages:"));
+    /* Translators: this used to be "using Mailbox -> Hide messages";
+     * the UTF-8 string for the right-arrow symbol is broken out to
+     * avoid msgconv problems. */
+    text = g_strdup_printf(_("The following setting is global, "
+			     "but may be overridden "
+			     "for the selected mailbox "
+			     "using Mailbox %s Hide messages:"),
+			   "\342\226\272");
+    label = gtk_label_new(text);
+    g_free(text);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);

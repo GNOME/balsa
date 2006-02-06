@@ -316,28 +316,28 @@ static const struct {
 
 static GnomeUIInfo mailbox_hide_menu[] = {
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Deleted"),  "",
+    (N_("_Deleted"),    NULL,
      hide_changed_cb, GINT_TO_POINTER(0), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("Un_Deleted"),  "",
+    (N_("Un_Deleted"),  NULL,
      hide_changed_cb, GINT_TO_POINTER(1), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Read"),     "",
+    (N_("_Read"),       NULL,
      hide_changed_cb, GINT_TO_POINTER(2), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("Un_read"),     "",
+    (N_("Un_read"),     NULL,
      hide_changed_cb, GINT_TO_POINTER(3), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Flagged"),  "",
+    (N_("_Flagged"),    NULL,
      hide_changed_cb, GINT_TO_POINTER(4), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("Un_flagged"),  "",
+    (N_("Un_flagged"),  NULL,
      hide_changed_cb, GINT_TO_POINTER(5), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("_Answered"), "",
+    (N_("_Answered"),   NULL,
      hide_changed_cb, GINT_TO_POINTER(6), NULL),
     GNOMEUIINFO_TOGGLEITEM_DATA
-    (N_("Un_answered"), "",
+    (N_("Un_answered"), NULL,
      hide_changed_cb, GINT_TO_POINTER(7), NULL),
     GNOMEUIINFO_END
 };

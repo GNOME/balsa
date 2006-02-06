@@ -1,3 +1,11 @@
+2006-02-06 12:06  PeterB
+
+	* libbalsa/rfc3156.c: fix typo in previous commit.
+	* libbalsa/gmime-gpgme-signature.c, libbalsa/mailbox_pop3.c,
+	libbalsa/misc.c, libbalsa/rfc3156.c, po/POTFILES.in,
+	src/balsa-index.c, src/save-restore.c, src/sendmsg-window.c,
+	src/spell-check.c: fix strings--bug 330085.
+
 2006-02-05 21:18  PeterB
 
 	* src/pref-manager.c: hide notebook borders and remove extra

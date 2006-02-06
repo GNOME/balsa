@@ -1,5 +1,6 @@
-2006-02-06 12:06  PeterB
+2006-02-06 13:36  PeterB
 
+	* src/balsa-index.c: fix another typo in earlier commit.
 	* libbalsa/rfc3156.c: fix typo in previous commit.
 	* libbalsa/gmime-gpgme-signature.c, libbalsa/mailbox_pop3.c,
 	libbalsa/misc.c, libbalsa/rfc3156.c, po/POTFILES.in,

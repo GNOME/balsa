@@ -2152,8 +2152,8 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
     if (!success) {
 	balsa_information
             (LIBBALSA_INFORMATION_WARNING,
-             ngettext("Failed to copy %d messages to mailbox \"%s\": %s",
-                      "Failed to copy %d message to mailbox \"%s\": %s",
+             ngettext("Failed to copy %d message to mailbox \"%s\": %s",
+                      "Failed to copy %d messages to mailbox \"%s\": %s",
                       msgnos->len),
              msgnos->len, to_mailbox->name, e ? e->message : "?");
 	return;

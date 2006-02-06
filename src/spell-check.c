@@ -516,7 +516,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     change_all = balsa_stock_button_with_label(GTK_STOCK_REFRESH,
 					       "Change _All");
     gtk_tooltips_set_tip(balsa_app.tooltips, change_all,
-			 _("Replace all occurences of the current word "
+			 _("Replace all occurrences of the current word "
                            "with the selected suggestion"),
 			 NULL);
     gtk_box_pack_start(GTK_BOX(vbox), change_all, FALSE, FALSE, 0);

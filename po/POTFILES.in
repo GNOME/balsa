@@ -1,3 +1,4 @@
+[encoding: UTF-8]
 # List of source files containing translatable strings.
 # Please keep this list in alphabetical order.
 # src/orbit-glue.c : disabled because it is excluded from the dist file

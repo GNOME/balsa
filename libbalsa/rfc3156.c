@@ -105,7 +105,7 @@ libbalsa_check_crypto_engine(gpgme_protocol_t protocol)
 	} else
 	    g_string_append_printf(message,
 				   _
-				   ("%s: could not retreive crypto engine information: %s."),
+				   ("%s: could not retrieve crypto engine information: %s."),
 				   gpgme_strsource(err),
 				   gpgme_strerror(err));
 	g_string_append_printf(message,
@@ -1126,10 +1126,12 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
                attrs = g_string_append_c(attrs, ',');
            attrs = g_string_append(attrs, _(" invalid"));
        }
-       if (count > 1)
-           g_string_append_printf(msg, _("\nSubkey attributes:%s"), attrs->str);
-       else
-           g_string_append_printf(msg, _("\nSubkey attribute:%s"), attrs->str);
+       /* ngettext: string begins with a single space, so no space after
+        * the colon is correct punctuation (in English). */
+       g_string_append_printf(msg, ngettext("\nSubkey attribute:%s",
+                                            "\nSubkey attributes:%s",
+                                            count),
+                              attrs->string);
        g_string_free(attrs, TRUE);
     }
     if (info->issuer_name) {

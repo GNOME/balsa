@@ -389,7 +389,7 @@ fetch_async_cb(PopReqCode prc, void *arg, ...)
             if(fd->dm->close(fd->f) != 0) {
                 if(!*fd->err)
                     g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
-                                _("Transfering POP message to %s failed."),
+                                _("Transferring POP message to %s failed."),
                                 fd->dest_path);
             } else if(!fd->error_occured &&
                       move_from_msgdrop

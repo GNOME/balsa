@@ -2150,11 +2150,12 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
         libbalsa_mailbox_messages_move(from_mailbox, msgnos, to_mailbox, &e);
 
     if (!success) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  msgnos->len > 1 
-			  ? _("Failed to copy messages to mailbox \"%s\": %s")
-			  : _("Failed to copy message to mailbox \"%s\": %s"),
-			  to_mailbox->name, e ? e->message : "?");
+	balsa_information
+            (LIBBALSA_INFORMATION_WARNING,
+             ngettext("Failed to copy %d messages to mailbox \"%s\": %s",
+                      "Failed to copy %d message to mailbox \"%s\": %s",
+                      msgnos->len),
+             msgnos->len, to_mailbox->name, e ? e->message : "?");
 	return;
     }
 

@@ -231,7 +231,10 @@ static void set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
 struct SendLocales {
     const gchar *locale, *charset, *lang_name;
 } locales[] = {
-    {"pt_BR", "ISO-8859-1",    N_("_Brazilian")},
+    /* Translators: please use the initial letter of each language as
+     * its accelerator; this is a long list, and unique accelerators
+     * cannot be found. */
+    {"pt_BR", "ISO-8859-1",    N_("_Brazilian Portuguese")},
     {"ca_ES", "ISO-8859-15",   N_("_Catalan")},
     {"zh_CN.GB2312", "gb2312", N_("_Chinese Simplified")},
     {"zh_TW.Big5", "big5",     N_("_Chinese Traditional")},
@@ -399,7 +402,7 @@ static GnomeUIInfo edit_menu[] = {
     GNOMEUIINFO_SEPARATOR,
 #define EDIT_MENU_SPELL_CHECK EDIT_MENU_QUOTE + 2
 #if HAVE_GTKSPELL
-    GNOMEUIINFO_TOGGLEITEM(N_("C_heck spelling"), 
+    GNOMEUIINFO_TOGGLEITEM(N_("C_heck Spelling"), 
                            N_("Check the spelling of the message"),
                            spell_check_menu_cb, NULL),
 #else                           /* HAVE_GTKSPELL */

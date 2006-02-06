@@ -1275,7 +1275,7 @@ LibBalsaCodesetInfo libbalsa_codeset_info[LIBBALSA_NUM_CODESETS] = {
      "iso-8859-15"} ,
     {N_("russian"),             /* RUSSIAN              */
      "koi-8r"} ,
-    {N_("ukranian"),            /* UKRAINE              */
+    {N_("ukrainian"),           /* UKRAINE              */
      "koi-8u"} ,
     {N_("japanese"),            /* JAPAN                */
      "iso-2022-jp"} ,

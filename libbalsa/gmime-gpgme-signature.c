@@ -104,7 +104,7 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     /* try to get the related key */
     err = gpgme_get_key(ctx, sig_stat->fingerprint, &key, 0);
     if (err != GPG_ERR_NO_ERROR) {
-          g_message("could not retreive the key with fingerprint %s: %s: %s",
+          g_message("could not retrieve the key with fingerprint %s: %s: %s",
                     sig_stat->fingerprint, gpgme_strsource(err),
                     gpgme_strerror(err));
 	return sig_stat;

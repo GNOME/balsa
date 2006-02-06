@@ -988,7 +988,7 @@ config_global_load(void)
                                        &def_used);
     if (!def_used)
         g_idle_add((GSourceFunc) config_warning_idle,
-                   _("The option not to send \"format=flowed\" is now "
+                   _("The option not to send \"format=flowed\" text is now "
                      "on the Options menu of the compose window."));
 
     balsa_app.autoquote = 

@@ -1131,7 +1131,7 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
        g_string_append_printf(msg, ngettext("\nSubkey attribute:%s",
                                             "\nSubkey attributes:%s",
                                             count),
-                              attrs->string);
+                              attrs->str);
        g_string_free(attrs, TRUE);
     }
     if (info->issuer_name) {

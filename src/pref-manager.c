@@ -524,6 +524,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     notebook = gtk_notebook_new();
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
+    gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
     gtk_container_add(GTK_CONTAINER(hbox), notebook);
     g_object_set_data(G_OBJECT(property_box), "notebook", notebook);
 
@@ -1706,7 +1707,7 @@ create_mail_options_page(GtkTreeStore * store)
 
     notebook = gtk_notebook_new();
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_container_set_border_width(GTK_CONTAINER(notebook), HIG_PADDING);
+    gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
 
     gtk_tree_store_append(store, &iter, NULL);
     pm_append_page(notebook, mailserver_subpage(), _("Mail Servers"),
@@ -2038,28 +2039,28 @@ other_options_group(GtkWidget * page)
 static GtkWidget *
 create_display_page(GtkTreeStore * store)
 {
-    GtkWidget *note;
+    GtkWidget *notebook;
     GtkTreeIter iter;
 
-    note = gtk_notebook_new();
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(note), FALSE);
-    gtk_container_set_border_width(GTK_CONTAINER(note), HIG_PADDING);
+    notebook = gtk_notebook_new();
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
+    gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
 
     gtk_tree_store_append(store, &iter, NULL);
-    pm_append_page(note, display_subpage(), _("Layout"),
+    pm_append_page(notebook, display_subpage(), _("Layout"),
                    store, &iter);
-    pm_append_page(note, threading_subpage(), _("Sort and Thread"),
+    pm_append_page(notebook, threading_subpage(), _("Sort and Thread"),
                    store, &iter);
-    pm_append_page(note, message_subpage(), _("Message"),
+    pm_append_page(notebook, message_subpage(), _("Message"),
                    store, &iter);
-    pm_append_page(note, colors_subpage(), _("Colors"),
+    pm_append_page(notebook, colors_subpage(), _("Colors"),
                    store, &iter);
-    pm_append_page(note, charset_subpage(), _("Character Set"),
+    pm_append_page(notebook, charset_subpage(), _("Character Set"),
                    store, &iter);
-    pm_append_page(note, status_messages_subpage(), _("Status Messages"),
+    pm_append_page(notebook, status_messages_subpage(), _("Status Messages"),
                    store, &iter);
 
-    return note;
+    return notebook;
 }
 
 static GtkWidget *

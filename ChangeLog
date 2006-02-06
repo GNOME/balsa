@@ -1,5 +1,7 @@
-2006-02-06 14:04  PeterB
+2006-02-06 15:46  PeterB
 
+	* src/main-window.c: use NULL instead of empty string when it will
+	be translated.
 	* src/pref-manager.c: move utf8 out of translated string.
 	* src/balsa-index.c: fix another typo in earlier commit.
 	* libbalsa/rfc3156.c: fix typo in previous commit.

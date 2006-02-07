@@ -1,3 +1,9 @@
+2006-02-07 07:29  PeterB
+
+	* src/balsa-mblist.c: schedule only one idle callback at a time;
+	move UI update to idle callback.
+	* libbalsa/mailbox_local.c: clear total when restore-tree fails.
+
 2006-02-06 15:46  PeterB
 
 	* src/main-window.c: use NULL instead of empty string when it will

@@ -984,6 +984,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
             /* Bad or no cache file: start over. */
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = g_node_new(NULL);
+            total = 0;
         }
         mailbox->msg_tree_changed = FALSE;
 

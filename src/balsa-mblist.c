@@ -917,22 +917,43 @@ struct update_mbox_data {
     gboolean notify;
 };
 static void bmbl_update_mailbox(GtkTreeStore * store,
-				LibBalsaMailbox * mailbox);
+                                LibBalsaMailbox * mailbox);
 static gboolean
 update_mailbox_idle(struct update_mbox_data *umd)
 {
     gdk_threads_enter();
+
     if (umd->mailbox) {
         g_object_remove_weak_pointer(G_OBJECT(umd->mailbox),
                                      (gpointer) & umd->mailbox);
+        g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
+
         if (balsa_app.mblist_tree_store) {
             bmbl_update_mailbox(balsa_app.mblist_tree_store, umd->mailbox);
             check_new_messages_count(umd->mailbox, umd->notify);
+
+            if (libbalsa_mailbox_get_subscribe(umd->mailbox) !=
+                LB_MAILBOX_SUBSCRIBE_NO
+                && libbalsa_mailbox_get_unread(umd->mailbox) > 0)
+                g_signal_emit(balsa_app.mblist,
+                              balsa_mblist_signals[HAS_UNREAD_MAILBOX], 0,
+                              TRUE);
+            else {
+                GList *unread_mailboxes =
+                    balsa_mblist_find_all_unread_mboxes(NULL);
+                if (unread_mailboxes)
+                    g_list_free(unread_mailboxes);
+                else
+                    g_signal_emit(balsa_app.mblist,
+                                  balsa_mblist_signals[HAS_UNREAD_MAILBOX],
+                                  0, FALSE);
+            }
         }
-        g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
     }
-    gdk_threads_leave();
     g_free(umd);
+
+    gdk_threads_leave();
+
     return FALSE;
 }
 
@@ -943,29 +964,25 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    umd = g_new(struct update_mbox_data, 1);
-    g_object_set_data(G_OBJECT(mailbox), "mblist-update", umd);
-    umd->mailbox = mailbox;
-    g_object_add_weak_pointer(G_OBJECT(mailbox),
-                              (gpointer) & umd->mailbox);
+    /* Signal may be emitted without holding the gdk lock, so we'd
+     * better grab it. */
+    gdk_threads_enter();
+
+    umd = g_object_get_data(G_OBJECT(mailbox), "mblist-update");
+
+    if (!umd) {
+        umd = g_new(struct update_mbox_data, 1);
+        g_object_set_data(G_OBJECT(mailbox), "mblist-update", umd);
+        umd->mailbox = mailbox;
+        g_object_add_weak_pointer(G_OBJECT(mailbox),
+                                  (gpointer) & umd->mailbox);
+        g_idle_add((GSourceFunc) update_mailbox_idle, umd);
+    }
+
     umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
                    || mailbox->state == LB_MAILBOX_STATE_CLOSED);
-    g_idle_add((GSourceFunc) update_mailbox_idle, umd);
 
-    if (libbalsa_mailbox_get_subscribe(mailbox) != LB_MAILBOX_SUBSCRIBE_NO
-        && libbalsa_mailbox_get_unread(mailbox) > 0)
-        g_signal_emit(balsa_app.mblist,
-                      balsa_mblist_signals[HAS_UNREAD_MAILBOX],
-                      0, TRUE);
-    else {
-        GList *unread_mailboxes = balsa_mblist_find_all_unread_mboxes(NULL);
-        if (unread_mailboxes)
-            g_list_free(unread_mailboxes);
-        else
-            g_signal_emit(balsa_app.mblist,
-                          balsa_mblist_signals[HAS_UNREAD_MAILBOX],
-                          0, FALSE);
-    }
+    gdk_threads_leave();
 }
 
 /* public methods */

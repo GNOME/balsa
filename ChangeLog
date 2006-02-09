@@ -1,3 +1,7 @@
+2006-02-09 13:11  PeterB
+
+	* libbalsa/misc.c: disable bracket-checking.
+
 2006-02-07 07:29  PeterB
 
 	* src/balsa-mblist.c: schedule only one idle callback at a time;

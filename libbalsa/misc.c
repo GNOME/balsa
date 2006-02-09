@@ -2260,6 +2260,7 @@ libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
     sbuffer = gtk_source_buffer_new(tag_table);
     g_object_unref(tag_table);
     gtk_source_buffer_set_highlight(sbuffer, highlight_phrases || q_colour);
+    gtk_source_buffer_set_check_brackets(sbuffer, FALSE);
 
     /* create & return the source view */
     sview = gtk_source_view_new_with_buffer(sbuffer);

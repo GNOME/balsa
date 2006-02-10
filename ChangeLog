@@ -1,3 +1,7 @@
+2006-02-10 08:22  PeterB
+
+	* src/: balsa-app.c, balsa-index.c: check for NULL index.
+
 2006-02-09 13:11  PeterB
 
 	* libbalsa/misc.c: disable bracket-checking.

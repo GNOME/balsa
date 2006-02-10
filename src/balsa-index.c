@@ -1720,7 +1720,7 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
     gint i;
 
     if (!balsa_app.notebook)
-	return -1;
+        return -1;
 
     for (i = 0;
          (page =
@@ -1728,7 +1728,8 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
          i++) {
         GtkWidget *index = gtk_bin_get_child(GTK_BIN(page));
 
-        if (BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
+        if (index && BALSA_INDEX(index)->mailbox_node
+            && BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
             return i;
     }
 

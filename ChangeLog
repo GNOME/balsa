@@ -1,3 +1,8 @@
+2006-02-11 15:32  PeterB
+
+	* src/balsa-mblist.c: show unread count in parentheses when not
+	showing info columns.
+
 2006-02-10 08:22  PeterB
 
 	* src/: balsa-app.c, balsa-index.c: check for NULL index.

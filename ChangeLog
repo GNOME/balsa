@@ -1,3 +1,7 @@
+2006-02-12 07:06  PeterB
+
+	* src/pref-manager.c: try to fill pages, as per HIG.
+
 2006-02-11 15:32  PeterB
 
 	* src/balsa-mblist.c: show unread count in parentheses when not

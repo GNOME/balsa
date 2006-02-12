@@ -1,5 +1,6 @@
-2006-02-12 07:06  PeterB
+2006-02-12 11:05  PeterB
 
+	* src/pref-manager.c: align controls.
 	* src/pref-manager.c: try to fill pages, as per HIG.
 
 2006-02-11 15:32  PeterB

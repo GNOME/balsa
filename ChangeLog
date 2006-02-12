@@ -1,5 +1,6 @@
-2006-02-12 11:05  PeterB
+2006-02-12 15:11  PeterB
 
+	* src/pref-manager.c: let lists expand vertically.
 	* src/pref-manager.c: align controls.
 	* src/pref-manager.c: try to fill pages, as per HIG.
 

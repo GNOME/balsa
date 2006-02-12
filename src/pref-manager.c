@@ -66,7 +66,6 @@
 #define COL_SPACING     (1 * HIG_PADDING)
 
 #define BALSA_PAGE_SIZE_GROUP_KEY  "balsa-page-size-group"
-#define BALSA_PAGE_VBOX_KEY  "balsa-page-vbox"
 #define BALSA_TABLE_PAGE_KEY  "balsa-table-page"
 typedef struct _PropertyUI {
     GtkWidget *address_books;
@@ -1441,7 +1440,7 @@ attach_entry_full(const gchar * label, gint row, GtkWidget * table,
     gtk_table_attach(GTK_TABLE(table), res,
                      col_middle, col_right,
                      row, row + 1,
-                     (GtkAttachOptions) (GTK_FILL),
+                     GTK_EXPAND | GTK_FILL,
                      (GtkAttachOptions) (0), 0, 0);
     return res;
 }
@@ -1459,7 +1458,7 @@ attach_information_menu(const gchar * label, gint row, GtkTable * table,
     combo_box = create_information_message_menu();
     pm_combo_box_set_level(combo_box, defval);
     gtk_table_attach(GTK_TABLE(table), combo_box, 1, 2, row, row + 1,
-                     GTK_FILL, 0, 0, 0);
+                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
     return combo_box;
 }
 
@@ -1753,12 +1752,12 @@ checking_group(GtkWidget * page)
     pui->check_mail_minutes =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->check_mail_minutes, 1, 2, 0, 1,
-                     GTK_FILL, 0, 0, 0);
+                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
     label = gtk_label_new(_("minutes"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 2, 3, 0, 1,
-                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+                     GTK_FILL, 0, 0, 0);
 
     pui->check_imap = gtk_check_button_new_with_mnemonic(
 	_("Check _IMAP mailboxes"));
@@ -1788,11 +1787,11 @@ checking_group(GtkWidget * page)
     pui->msg_size_limit = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), pui->msg_size_limit);
     gtk_table_attach(GTK_TABLE(table), pui->msg_size_limit, 1, 2, 4, 5,
-                     GTK_FILL, 0, 0, 0);
+                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
     label = gtk_label_new(_("MB"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 2, 3, 4, 5,
-                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+                     GTK_FILL, 0, 0, 0);
     
     return group;
 }
@@ -1816,7 +1815,8 @@ quoted_group(GtkWidget * page)
 
     pui->quote_pattern = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table), pui->quote_pattern,
-                     1, 3, 0, 1, GTK_FILL, 0, 0, 0);
+                     1, 3, 0, 1,
+                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
     pui->browse_wrap =
 	gtk_check_button_new_with_label(_("Wrap Text at"));
@@ -1828,7 +1828,8 @@ quoted_group(GtkWidget * page)
     pui->browse_wrap_length =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->browse_wrap_length,
-                     1, 2, 1, 2, GTK_FILL, 0, 0, 0);
+                     1, 2, 1, 2,
+                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
     gtk_widget_set_sensitive(pui->browse_wrap_length, FALSE);
     label = gtk_label_new(_("characters"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
@@ -1891,7 +1892,7 @@ broken_8bit_codeset_group(GtkWidget * page)
                              balsa_app.convert_unknown_8bit_codeset);
     gtk_table_attach(GTK_TABLE(table), pui->convert_unknown_8bit_codeset,
                      1, 2, 1, 2,
-                     (GtkAttachOptions) (GTK_FILL),
+                     GTK_EXPAND | GTK_FILL,
                      (GtkAttachOptions) (0), 0, 0);
 
     pm_page_add_to_size_group(page,
@@ -1939,7 +1940,8 @@ mdn_group(GtkWidget * page)
     pm_combo_box_set_level(pui->mdn_reply_clean_menu,
                            balsa_app.mdn_reply_clean);
     gtk_table_attach(GTK_TABLE(table), pui->mdn_reply_clean_menu,
-                     1, 2, 0, 1, GTK_FILL, 0, 0, 0);
+                     1, 2, 0, 1,
+                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
     label = gtk_label_new(_("The message header looks suspicious."));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
@@ -1952,7 +1954,8 @@ mdn_group(GtkWidget * page)
     pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
                            balsa_app.mdn_reply_notclean);
     gtk_table_attach(GTK_TABLE(table), pui->mdn_reply_notclean_menu,
-                     1, 2, 1, 2, GTK_FILL, 0, 0, 0);
+                     1, 2, 1, 2,
+                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
     return group;
 }
@@ -1992,7 +1995,7 @@ word_wrap_group(GtkWidget * page)
     pui->wraplength =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->wraplength, 1, 2, 0, 1,
-		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+		     GTK_EXPAND | GTK_FILL, (GtkAttachOptions) (0), 0, 0);
     gtk_widget_set_sensitive(pui->wraplength, FALSE);
 
     label = gtk_label_new(_("characters"));
@@ -2286,7 +2289,7 @@ preview_font_group(GtkWidget * page)
 	gtk_font_button_new_with_font(balsa_app.message_font);
     gtk_table_attach(GTK_TABLE(table), pui->message_font_button, 
                      1, 2, 0, 1,
-		     (GtkAttachOptions) (GTK_FILL),
+		     GTK_EXPAND | GTK_FILL,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0);
 
     attach_label(_("Subject Font:"), table, 1, page);
@@ -2294,7 +2297,7 @@ preview_font_group(GtkWidget * page)
 	gtk_font_button_new_with_font(balsa_app.subject_font);
     gtk_table_attach(GTK_TABLE(table), pui->subject_font_button, 
                      1, 2, 1, 2,
-		     (GtkAttachOptions) (GTK_FILL),
+		     GTK_EXPAND | GTK_FILL,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0);
 
     return group;
@@ -2499,7 +2502,7 @@ misc_group(GtkWidget * page)
     gtk_widget_show(pui->close_mailbox_minutes);
     gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox), pui->close_mailbox_minutes,
-                       FALSE, FALSE, 0);
+                       TRUE, TRUE, 0);
 
     label = gtk_label_new(_("minutes"));
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
@@ -2558,7 +2561,8 @@ deleting_messages_group(GtkWidget * page)
 	gtk_spin_button_new(GTK_ADJUSTMENT(expunge_spinbutton_adj), 1, 0);
     gtk_widget_show(pui->expunge_minutes);
     gtk_widget_set_sensitive(pui->expunge_minutes, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_minutes, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_minutes,
+                       TRUE, TRUE, 0);
 
     label = gtk_label_new(_("minutes"));
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
@@ -2582,8 +2586,9 @@ moving_messages_group(GtkWidget * page)
     pui->action_after_move_menu = create_action_after_move_menu();
     pm_combo_box_set_level(pui->action_after_move_menu,
                            balsa_app.mw_action_after_move);
-    gtk_table_attach(GTK_TABLE(table), pui->action_after_move_menu, 1, 2, 0, 1,
-           (GtkAttachOptions) (GTK_FILL),
+    gtk_table_attach(GTK_TABLE(table), pui->action_after_move_menu,
+                     1, 2, 0, 1,
+                     GTK_EXPAND | GTK_FILL,
 		     (GtkAttachOptions) (0), 0, 0);
 
     return group;
@@ -2648,7 +2653,7 @@ folder_scanning_group(GtkWidget * page)
     pui->local_scan_depth =
         gtk_spin_button_new(GTK_ADJUSTMENT(scan_adj), 1, 0);
     gtk_box_pack_start(GTK_BOX(hbox), pui->local_scan_depth,
-                       FALSE, FALSE, 0);
+                       TRUE, TRUE, 0);
 
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
     pm_group_add(group, hbox);
@@ -2661,7 +2666,7 @@ folder_scanning_group(GtkWidget * page)
     pui->imap_scan_depth =
         gtk_spin_button_new(GTK_ADJUSTMENT(scan_adj), 1, 0);
     gtk_box_pack_start(GTK_BOX(hbox), pui->imap_scan_depth,
-                       FALSE, FALSE, 0);
+                       TRUE, TRUE, 0);
 
     return group;
 }
@@ -2693,7 +2698,7 @@ address_books_group(GtkWidget * page)
     pm_group_add(group, hbox);
 
     scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
-    gtk_box_pack_start(GTK_BOX(hbox), scrolledwindow, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), scrolledwindow, TRUE, TRUE, 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_size_request(scrolledwindow, -1, 150);
@@ -3329,15 +3334,10 @@ static GtkWidget *
 pm_page_new(void)
 {
     GtkWidget *page;
-    GtkWidget *vbox;
     GtkSizeGroup *size_group;
 
-    page = gtk_hbox_new(FALSE, 0);
+    page = gtk_vbox_new(FALSE, GROUP_SPACING);
     gtk_container_set_border_width(GTK_CONTAINER(page), BORDER_WIDTH);
-
-    vbox = gtk_vbox_new(FALSE, GROUP_SPACING);
-    gtk_box_pack_start(GTK_BOX(page), vbox, FALSE, FALSE, 0);
-    g_object_set_data(G_OBJECT(page), BALSA_PAGE_VBOX_KEY, vbox);
 
     size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
     g_object_set_data_full(G_OBJECT(page), BALSA_PAGE_SIZE_GROUP_KEY,
@@ -3349,10 +3349,7 @@ pm_page_new(void)
 static void
 pm_page_add(GtkWidget * page, GtkWidget * child)
 {
-    GtkWidget *vbox;
-
-    vbox = g_object_get_data(G_OBJECT(page), BALSA_PAGE_VBOX_KEY);
-    gtk_box_pack_start(GTK_BOX(vbox), child, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(page), child, FALSE, FALSE, 0);
 }
 
 static GtkSizeGroup *

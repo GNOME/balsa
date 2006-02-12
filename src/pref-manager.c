@@ -277,11 +277,13 @@ static GtkWidget *create_pref_option_menu(const gchar * names[], gint size,
 
     /* page and group object methods */
 static GtkWidget *pm_page_new(void);
-static void pm_page_add(GtkWidget * page, GtkWidget * child);
+static void pm_page_add(GtkWidget * page, GtkWidget * child,
+                        gboolean expand);
 static GtkSizeGroup *pm_page_get_size_group(GtkWidget * page);
 static void pm_page_add_to_size_group(GtkWidget * page, GtkWidget * child);
 static GtkWidget *pm_group_new(const gchar * text);
-static void pm_group_add(GtkWidget * group, GtkWidget * child);
+static void pm_group_add(GtkWidget * group, GtkWidget * child,
+                         gboolean expand);
 static GtkWidget *pm_group_get_vbox(GtkWidget * group);
 static GtkWidget *pm_group_add_check(GtkWidget * group,
                                      const gchar * text);
@@ -1534,10 +1536,10 @@ mailserver_subpage()
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, remote_mailbox_servers_group(page));
-    pm_page_add(page, local_mail_group(page));
+    pm_page_add(page, remote_mailbox_servers_group(page), TRUE);
+    pm_page_add(page, local_mail_group(page), FALSE);
 #if ENABLE_ESMTP
-    pm_page_add(page, outgoing_mail_group(page));
+    pm_page_add(page, outgoing_mail_group(page), TRUE);
 #endif                          /* ENABLE_ESMTP */
 
     return page;
@@ -1557,7 +1559,7 @@ remote_mailbox_servers_group(GtkWidget * page)
 
     group = pm_group_new(_("Remote Mailbox Servers"));
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox);
+    pm_group_add(group, hbox, TRUE);
 
     scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_box_pack_start(GTK_BOX(hbox), scrolledwindow, TRUE, TRUE, 0);
@@ -1614,14 +1616,14 @@ local_mail_group(GtkWidget * page)
     pui->mail_directory =
         gtk_file_chooser_button_new(_("Select your local mail directory"),
                                     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
-    pm_group_add(group, pui->mail_directory);
+    pm_group_add(group, pui->mail_directory, FALSE);
 #else                           /* GTK_CHECK_VERSION(2, 6, 0) */
     GtkWidget *fileentry;
 
     fileentry = gnome_file_entry_new("MAIL-DIR",
                                      _
                                      ("Select your local mail directory"));
-    pm_group_add(group, fileentry);
+    pm_group_add(group, fileentry, FALSE);
 
     gnome_file_entry_set_directory_entry(GNOME_FILE_ENTRY(fileentry),
                                          TRUE);
@@ -1650,7 +1652,7 @@ outgoing_mail_group(GtkWidget * page)
 
     group = pm_group_new(_("Outgoing Mail Servers"));
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox);
+    pm_group_add(group, hbox, TRUE);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_box_pack_start(GTK_BOX(hbox), scrolled_window, TRUE, TRUE, 0);
@@ -1724,8 +1726,8 @@ incoming_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, checking_group(page));
-    pm_page_add(page, mdn_group(page));
+    pm_page_add(page, checking_group(page), FALSE);
+    pm_page_add(page, mdn_group(page), FALSE);
 
     return page;
 }
@@ -1740,7 +1742,7 @@ checking_group(GtkWidget * page)
 
     group = pm_group_new(_("Checking"));
     table = create_table(5, 4, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
 	_("_Check mail automatically every"));
@@ -1809,7 +1811,7 @@ quoted_group(GtkWidget * page)
 
     group = pm_group_new(_("Quoted and Flowed Text"));
     table = create_table(3, 3, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     attach_label(_("Quoted Text\n" "Regular Expression:"), table, 0, page);
 
@@ -1850,7 +1852,7 @@ alternative_group(GtkWidget * page)
 
     pui->display_alt_plain =
 	gtk_check_button_new_with_label(_("Prefer text/plain over html"));
-    pm_group_add(group, pui->display_alt_plain);
+    pm_group_add(group, pui->display_alt_plain, FALSE);
 
     return group;
 }
@@ -1868,7 +1870,7 @@ broken_8bit_codeset_group(GtkWidget * page)
         pm_group_new(_("National (8-bit) characters in broken messages "
                        "without codeset header"));
     table = create_table(2, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
     
     pui->convert_unknown_8bit[0] =
 	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
@@ -1922,10 +1924,10 @@ mdn_group(GtkWidget * page)
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    pm_group_add(group, label);
+    pm_group_add(group, label, FALSE);
 
     table = create_table(2, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     label = gtk_label_new(_("The message header looks clean\n"
                             "(the notify-to address is the return path,\n"
@@ -1967,8 +1969,8 @@ outgoing_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, word_wrap_group(page));
-    pm_page_add(page, other_options_group(page));
+    pm_page_add(page, word_wrap_group(page), FALSE);
+    pm_page_add(page, other_options_group(page), FALSE);
 
     return page;
 }
@@ -1983,7 +1985,7 @@ word_wrap_group(GtkWidget * page)
 
     group = pm_group_new(_("Word Wrap"));
     table = create_table(2, 3, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     pui->wordwrap =
 	gtk_check_button_new_with_label(_("Wrap Outgoing Text at"));
@@ -2017,7 +2019,7 @@ other_options_group(GtkWidget * page)
     group = pm_group_new(_("Other Options"));
 
     table = create_table(1, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     pui->quote_str = attach_entry(_("Reply Prefix:"), 0, table);
 
@@ -2073,8 +2075,8 @@ display_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, main_window_group(page));
-    pm_page_add(page, display_formats_group(page));
+    pm_page_add(page, main_window_group(page), FALSE);
+    pm_page_add(page, display_formats_group(page), FALSE);
 
     return page;
 }
@@ -2100,7 +2102,7 @@ main_window_group(GtkWidget * page)
                                     "when mailbox opened"));
 
     table = create_table(1, 3, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
     pui->pgdownmod =
         gtk_check_button_new_with_label(_("PageUp/PageDown keys "
                                           "scroll text by"));
@@ -2135,7 +2137,7 @@ progress_group(GtkWidget * page)
 	pui->pwindow_type[i] =
 	    GTK_RADIO_BUTTON(gtk_radio_button_new_with_label
 			     (radio_group, _(pwindow_type_label[i])));
-	pm_group_add(group, GTK_WIDGET(pui->pwindow_type[i]));
+	pm_group_add(group, GTK_WIDGET(pui->pwindow_type[i]), FALSE);
 	radio_group = gtk_radio_button_get_group(pui->pwindow_type[i]);
     }
 
@@ -2150,7 +2152,7 @@ display_formats_group(GtkWidget * page)
 
     group = pm_group_new(_("Format"));
     table = create_table(2, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
     
     pui->date_format =
         attach_entry(_("Date encoding (for strftime):"), 0, table);
@@ -2165,8 +2167,8 @@ status_messages_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, information_messages_group(page));
-    pm_page_add(page, progress_group(page));
+    pm_page_add(page, information_messages_group(page), FALSE);
+    pm_page_add(page, progress_group(page), FALSE);
 
     return page;
 }
@@ -2179,7 +2181,7 @@ information_messages_group(GtkWidget * page)
 
     group = pm_group_new(_("Information Messages"));
     table = create_table(5, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
     
     pui->information_message_menu = 
 	attach_information_menu(_("Information Messages:"), 0, 
@@ -2210,9 +2212,9 @@ colors_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, message_colors_group(page));
-    pm_page_add(page, link_color_group(page));
-    pm_page_add(page, composition_window_group(page));
+    pm_page_add(page, message_colors_group(page), FALSE);
+    pm_page_add(page, link_color_group(page), FALSE);
+    pm_page_add(page, composition_window_group(page), FALSE);
 
     return page;
 }
@@ -2226,7 +2228,7 @@ message_colors_group(GtkWidget * page)
     
     group = pm_group_new(_("Message Colors"));
     vbox = gtk_vbox_new(TRUE, HIG_PADDING);
-    pm_group_add(group, vbox);
+    pm_group_add(group, vbox, FALSE);
 
     for(i = 0; i < MAX_QUOTED_COLOR; i++) {
         gchar *text = g_strdup_printf(_("Quote level %d color"), i+1);
@@ -2269,9 +2271,9 @@ message_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, preview_font_group(page));
-    pm_page_add(page, quoted_group(page));
-    pm_page_add(page, alternative_group(page));
+    pm_page_add(page, preview_font_group(page), FALSE);
+    pm_page_add(page, quoted_group(page), FALSE);
+    pm_page_add(page, alternative_group(page), FALSE);
 
     return page;
 }
@@ -2284,7 +2286,7 @@ preview_font_group(GtkWidget * page)
 
     group = pm_group_new(_("Fonts"));
     table = create_table(2, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     attach_label(_("Message Font:"), table, 0, page);
     pui->message_font_button =
@@ -2310,7 +2312,7 @@ charset_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, broken_8bit_codeset_group(page));
+    pm_page_add(page, broken_8bit_codeset_group(page), FALSE);
 
     return page;
 }
@@ -2320,7 +2322,7 @@ threading_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, threading_group(page));
+    pm_page_add(page, threading_group(page), FALSE);
 
     return page;
 }
@@ -2405,8 +2407,8 @@ create_spelling_page(GtkTreeStore * store)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, pspell_settings_group(page));
-    pm_page_add(page, misc_spelling_group(page));
+    pm_page_add(page, pspell_settings_group(page), FALSE);
+    pm_page_add(page, misc_spelling_group(page), FALSE);
 
     return page;
 }
@@ -2421,7 +2423,7 @@ pspell_settings_group(GtkWidget * page)
 
     group = pm_group_new(_("Pspell Settings"));
     table = create_table(3, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     /* do the module menu */
     pui->module =
@@ -2468,9 +2470,9 @@ create_misc_page(GtkTreeStore * store)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, misc_group(page));
-    pm_page_add(page, deleting_messages_group(page));
-    pm_page_add(page, moving_messages_group(page));
+    pm_page_add(page, misc_group(page), FALSE);
+    pm_page_add(page, deleting_messages_group(page), FALSE);
+    pm_page_add(page, moving_messages_group(page), FALSE);
 
     return page;
 }
@@ -2489,7 +2491,7 @@ misc_group(GtkWidget * page)
     pui->empty_trash = pm_group_add_check(group, _("Empty Trash on exit"));
 
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox);
+    pm_group_add(group, hbox, FALSE);
 
     pui->close_mailbox_auto =
 	gtk_check_button_new_with_label(_("Close mailbox "
@@ -2536,7 +2538,7 @@ deleting_messages_group(GtkWidget * page)
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-    pm_group_add(group, label);
+    pm_group_add(group, label, FALSE);
     pui->hide_deleted =
         pm_group_add_check(group, _("Hide messages marked as deleted"));
 
@@ -2544,13 +2546,13 @@ deleting_messages_group(GtkWidget * page)
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-    pm_group_add(group, label);
+    pm_group_add(group, label, FALSE);
     pui->expunge_on_close =
         pm_group_add_check(group, _("Expunge deleted messages "
 				    "when mailbox is closed"));
 
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox);
+    pm_group_add(group, hbox, FALSE);
 
     pui->expunge_auto =
 	gtk_check_button_new_with_label(_("...and if unused more than"));
@@ -2581,7 +2583,7 @@ moving_messages_group(GtkWidget * page)
     group = pm_group_new(_("Message Window"));
 
     table = create_table(1, 2, page);
-    pm_group_add(group, table);
+    pm_group_add(group, table, FALSE);
 
     attach_label(_("After moving a message:"), table, 0, NULL);
 
@@ -2601,8 +2603,8 @@ create_startup_page(GtkTreeStore * store)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, options_group(page));
-    pm_page_add(page, folder_scanning_group(page));
+    pm_page_add(page, options_group(page), FALSE);
+    pm_page_add(page, folder_scanning_group(page), FALSE);
 
     return page;
 }
@@ -2642,10 +2644,10 @@ folder_scanning_group(GtkWidget * page)
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-    pm_group_add(group, label);
+    pm_group_add(group, label, FALSE);
 
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox);
+    pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan local folders to depth"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     pm_page_add_to_size_group(page, label);
@@ -2658,7 +2660,7 @@ folder_scanning_group(GtkWidget * page)
                        TRUE, TRUE, 0);
 
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox);
+    pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan IMAP folders to depth"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     pm_page_add_to_size_group(page, label);
@@ -2678,7 +2680,7 @@ create_address_book_page(GtkTreeStore * store)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, address_books_group(page));
+    pm_page_add(page, address_books_group(page), TRUE);
 
     return page;
 }
@@ -2697,7 +2699,7 @@ address_books_group(GtkWidget * page)
 
     group = pm_group_new(_("Address Books"));
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
-    pm_group_add(group, hbox);
+    pm_group_add(group, hbox, TRUE);
 
     scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
     gtk_box_pack_start(GTK_BOX(hbox), scrolledwindow, TRUE, TRUE, 0);
@@ -3349,9 +3351,9 @@ pm_page_new(void)
 }
 
 static void
-pm_page_add(GtkWidget * page, GtkWidget * child)
+pm_page_add(GtkWidget * page, GtkWidget * child, gboolean expand)
 {
-    gtk_box_pack_start(GTK_BOX(page), child, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(page), child, expand, TRUE, 0);
 }
 
 static GtkSizeGroup *
@@ -3405,7 +3407,7 @@ pm_group_new(const gchar * text)
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
     hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(group), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(group), hbox, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new("    "),
                        FALSE, FALSE, 0);
     vbox = gtk_vbox_new(FALSE, ROW_SPACING);
@@ -3423,10 +3425,10 @@ pm_group_get_vbox(GtkWidget * group)
 }
 
 static void
-pm_group_add(GtkWidget * group, GtkWidget * child)
+pm_group_add(GtkWidget * group, GtkWidget * child, gboolean expand)
 {
     gtk_box_pack_start(GTK_BOX(pm_group_get_vbox(group)), child,
-                       FALSE, FALSE, 0);
+                       expand, TRUE, 0);
 }
 
 static GtkWidget *

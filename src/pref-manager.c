@@ -1935,6 +1935,7 @@ mdn_group(GtkWidget * page)
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
                      GTK_FILL, 0, 0, 0);
+    pm_page_add_to_size_group(page, label);
 
     pui->mdn_reply_clean_menu = create_mdn_reply_menu();
     pm_combo_box_set_level(pui->mdn_reply_clean_menu,
@@ -1949,6 +1950,7 @@ mdn_group(GtkWidget * page)
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
                      GTK_FILL, (GtkAttachOptions) (0), 0, 0);
+    pm_page_add_to_size_group(page, label);
 
     pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
     pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
@@ -2110,7 +2112,7 @@ main_window_group(GtkWidget * page)
 	 gtk_spin_button_new(GTK_ADJUSTMENT(scroll_adj), 1, 0);
     gtk_widget_set_sensitive(pui->pgdown_percent, FALSE);
     gtk_table_attach(GTK_TABLE(table), pui->pgdown_percent, 1, 2, 0, 1,
-		     (GtkAttachOptions) (0), (GtkAttachOptions) (0), 0, 0);
+		     GTK_EXPAND | GTK_FILL, (GtkAttachOptions) (0), 0, 0);
     label = gtk_label_new(_("percent"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 2, 3, 0, 1,

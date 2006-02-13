@@ -118,7 +118,7 @@ extern "C" {
 
 /* select up/down the index */
     void balsa_index_select_next(BalsaIndex *);
-    void balsa_index_select_next_unread(BalsaIndex * bindex);
+    gboolean balsa_index_select_next_unread(BalsaIndex * index);
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
     void balsa_index_select(BalsaIndex * index, LibBalsaMessage * message);

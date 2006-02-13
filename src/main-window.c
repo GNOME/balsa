@@ -3388,7 +3388,12 @@ next_unread_message_cb(GtkWidget * widget, gpointer data)
     LibBalsaMailbox *mailbox = index ? index->mailbox_node->mailbox : NULL;
 
     if (libbalsa_mailbox_get_unread(mailbox) > 0) {
-        balsa_index_select_next_unread(index);
+        if (!balsa_index_select_next_unread(index)) {
+            /* All unread messages must be hidden; we assume that the
+             * user wants to see them, and try again. */
+            reset_filter_cb(NULL, data);
+            balsa_index_select_next_unread(index);
+        }
         return;
     }
 

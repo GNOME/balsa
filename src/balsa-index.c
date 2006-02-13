@@ -1311,13 +1311,14 @@ balsa_index_find(BalsaIndex * index,
 				 BNDX_SEARCH_WRAP_NO));
 }
 
-static void
+static gboolean
 bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
 {
     LibBalsaCondition cond_flag, cond_and;
     LibBalsaMailboxSearchIter *search_iter;
+    gboolean retval;
 
-    g_return_if_fail(BALSA_IS_INDEX(index));
+    g_assert(BALSA_IS_INDEX(index));
 
     cond_flag.negate      = FALSE;
     cond_flag.type        = CONDITION_FLAG;
@@ -1328,24 +1329,30 @@ bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
     cond_and.match.andor.right = &cond_undeleted;
     search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
 
-    bndx_search_iter_and_select(index, search_iter,
-				BNDX_SEARCH_DIRECTION_NEXT,
-				BNDX_SEARCH_VIEWABLE_ANY,
-				BNDX_SEARCH_START_ANY,
-				BNDX_SEARCH_WRAP_YES);
+    retval = bndx_search_iter_and_select(index, search_iter,
+                                         BNDX_SEARCH_DIRECTION_NEXT,
+                                         BNDX_SEARCH_VIEWABLE_ANY,
+                                         BNDX_SEARCH_START_ANY,
+                                         BNDX_SEARCH_WRAP_YES);
 
     libbalsa_mailbox_search_iter_free(search_iter);
+
+    return retval;
 }
 
-void
+gboolean
 balsa_index_select_next_unread(BalsaIndex * index)
 {
-    bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_NEW);
+    g_return_val_if_fail(BALSA_IS_INDEX(index), FALSE);
+
+    return bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_NEW);
 }
 
 void
 balsa_index_select_next_flagged(BalsaIndex * index)
 {
+    g_return_if_fail(BALSA_IS_INDEX(index));
+
     bndx_select_next_with_flag(index, LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
@@ -1353,6 +1360,8 @@ void
 balsa_index_select(BalsaIndex * index, LibBalsaMessage * message)
 {
     GtkTreePath *path;
+
+    g_return_if_fail(BALSA_IS_INDEX(index));
 
     if (bndx_find_message(index, &path, NULL, message)) {
         bndx_select_row(index, path);

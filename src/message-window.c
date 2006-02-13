@@ -302,7 +302,8 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
     {
         /* Try selecting the next unread message.
            If there are no more, close the window anyways. */
-        mw_set_selected( mw, balsa_index_select_next_unread );
+        mw_set_selected( mw, ((void (*)(BalsaIndex *)) 
+                              balsa_index_select_next_unread) );
 
         if ( mw->bindex->current_message == original )
             close_message_window(NULL, (gpointer) mw);
@@ -917,7 +918,9 @@ previous_message_cb(GtkWidget * widget, gpointer data)
 static void
 next_unread_cb(GtkWidget * widget, gpointer data)
 {
-    mw_set_selected((MessageWindow *) data, balsa_index_select_next_unread);
+    mw_set_selected((MessageWindow *) data,
+                    ((void (*)(BalsaIndex *))
+                     balsa_index_select_next_unread));
 }
 
 static void

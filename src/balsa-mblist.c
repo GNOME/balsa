@@ -551,18 +551,20 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     balsa_mailbox_node_scan_children(mbnode);
 
-    if (!mbnode->mailbox)
+    if (!mbnode->mailbox) {
+        GdkPixbuf *pixbuf =
+            gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+                                   BALSA_PIXMAP_MBOX_DIR_OPEN,
+                                   GTK_ICON_SIZE_MENU, NULL);
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
 #if ICON_NAME_WORKS && GTK_CHECK_VERSION(2, 8, 0)
                            ICON_COLUMN, BALSA_PIXMAP_MBOX_DIR_OPEN,
 #else                           /* GTK_CHECK_VERSION(2, 8, 0) */
-                           ICON_COLUMN,   
-                           gtk_widget_render_icon
-                           (GTK_WIDGET(balsa_app.main_window),
-                            BALSA_PIXMAP_MBOX_DIR_OPEN,
-                            GTK_ICON_SIZE_MENU, NULL),
+                           ICON_COLUMN, pixbuf,
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
                            -1);
+        g_object_unref(pixbuf);
+    }
     g_object_unref(mbnode);
 
     if (gtk_tree_model_iter_children(model, &child_iter, iter)) {
@@ -630,18 +632,20 @@ bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
 
-    if (!mbnode->mailbox)
+    if (!mbnode->mailbox) {
+        GdkPixbuf *pixbuf =
+            gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+                                   BALSA_PIXMAP_MBOX_DIR_CLOSED,
+                                   GTK_ICON_SIZE_MENU, NULL);
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
 #if ICON_NAME_WORKS && GTK_CHECK_VERSION(2, 8, 0)
                            ICON_COLUMN, BALSA_PIXMAP_MBOX_DIR_CLOSED,
 #else                           /* GTK_CHECK_VERSION(2, 8, 0) */
-                           ICON_COLUMN,   
-                           gtk_widget_render_icon
-                           (GTK_WIDGET(balsa_app.main_window),
-                            BALSA_PIXMAP_MBOX_DIR_CLOSED,
-                            GTK_ICON_SIZE_MENU, NULL),
+                           ICON_COLUMN, pixbuf,
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
                            -1);
+        g_object_unref(pixbuf);
+    }
     g_object_unref(mbnode);
 
     bmbl_tree_collapse_helper(model, iter);
@@ -1286,8 +1290,10 @@ bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode,
 static gboolean
 bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 {
-    const gchar *in;
-    gchar *name;
+    const gchar *icon;
+    const gchar *name;
+    gchar *tmp = NULL;
+    GdkPixbuf *pixbuf;
     gboolean expose = FALSE;
 
     g_return_val_if_fail(mbnode, FALSE);
@@ -1298,25 +1304,25 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 
 	if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	    g_assert_not_reached();
-            in = NULL;
+            icon = NULL;
             name = NULL;
         } else {
 	    if(mailbox == balsa_app.draftbox)
-		in = BALSA_PIXMAP_MBOX_DRAFT;
+		icon = BALSA_PIXMAP_MBOX_DRAFT;
 	    else if(mailbox == balsa_app.inbox)
-		in = BALSA_PIXMAP_MBOX_IN;
+		icon = BALSA_PIXMAP_MBOX_IN;
 	    else if(mailbox == balsa_app.outbox)
-		in = BALSA_PIXMAP_MBOX_OUT;
+		icon = BALSA_PIXMAP_MBOX_OUT;
 	    else if(mailbox == balsa_app.sentbox)
-		in = BALSA_PIXMAP_MBOX_SENT;
+		icon = BALSA_PIXMAP_MBOX_SENT;
 	    else if(mailbox == balsa_app.trash)
-		in = GTK_STOCK_DELETE;
+		icon = GTK_STOCK_DELETE;
 	    else
-		in = (libbalsa_mailbox_total_messages(mailbox) > 0)
+		icon = (libbalsa_mailbox_total_messages(mailbox) > 0)
 		? BALSA_PIXMAP_MBOX_TRAY_FULL
                 : BALSA_PIXMAP_MBOX_TRAY_EMPTY;
 
-            name = g_strdup(mailbox->name);
+            name = mailbox->name;
 
             /* Make sure the show column is set before showing the
              * mailbox in the list. */
@@ -1358,19 +1364,18 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 	}
     } else {
 	/* new directory, but not a mailbox */
-	in = BALSA_PIXMAP_MBOX_DIR_CLOSED;
-        name = g_path_get_basename(mbnode->name);
+	icon = BALSA_PIXMAP_MBOX_DIR_CLOSED;
+        name = tmp = g_path_get_basename(mbnode->name);
     }
 
+    pixbuf = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+                                    icon, GTK_ICON_SIZE_MENU, NULL);
     gtk_tree_store_set(balsa_app.mblist_tree_store, iter,
                        MBNODE_COLUMN, mbnode,
 #if ICON_NAME_WORKS && GTK_CHECK_VERSION(2, 8, 0)
-                       ICON_COLUMN, in,
+                       ICON_COLUMN, icon,
 #else                           /* GTK_CHECK_VERSION(2, 8, 0) */
-                       ICON_COLUMN,   
-                       gtk_widget_render_icon
-                           (GTK_WIDGET(balsa_app.main_window), in,
-                            GTK_ICON_SIZE_MENU, NULL),
+                       ICON_COLUMN, pixbuf,
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
                        NAME_COLUMN,   name,
                        WEIGHT_COLUMN, PANGO_WEIGHT_NORMAL,
@@ -1378,7 +1383,8 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
                        UNREAD_COLUMN, "",
                        TOTAL_COLUMN,  "",
                        -1);
-    g_free(name);
+    g_object_unref(pixbuf);
+    g_free(tmp);
 
     if (mbnode->mailbox) {
 	GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
@@ -1468,6 +1474,7 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
         const gchar *name;
         gchar *tmp = NULL;
         PangoWeight weight;
+        GdkPixbuf *pixbuf;
 
         /* Set the style appropriate for unread_messages; we do this
          * even if the state hasn't changed, because we might be
@@ -1495,18 +1502,18 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
             mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
         }
 
+        pixbuf = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
+                                        icon, GTK_ICON_SIZE_MENU, NULL);
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
 #if ICON_NAME_WORKS && GTK_CHECK_VERSION(2, 8, 0)
                            ICON_COLUMN, icon,
 #else                           /* GTK_CHECK_VERSION(2, 8, 0) */
-                           ICON_COLUMN,
-                           gtk_widget_render_icon
-                               (GTK_WIDGET(balsa_app.main_window),
-                                icon, GTK_ICON_SIZE_MENU, NULL),
+                           ICON_COLUMN, pixbuf,
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
                            NAME_COLUMN, name,
                            WEIGHT_COLUMN, weight,
                            -1);
+        g_object_unref(pixbuf);
         g_free(tmp);
 
     }

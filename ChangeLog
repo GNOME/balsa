@@ -1,3 +1,10 @@
+2006-02-13 14:58  PeterB
+
+	* src/pref-manager.c: move message-window group to display-options
+	page; move format group to character-set page and rename page.
+	* src/balsa-mblist.c: unref pixbufs; dup string only when
+	necessary.
+
 2006-02-12 15:11  PeterB
 
 	* src/pref-manager.c: let lists expand vertically.

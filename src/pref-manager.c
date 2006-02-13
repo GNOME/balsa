@@ -188,55 +188,82 @@ static PropertyUI *pui = NULL;
 static GtkWidget *property_box;
 static gboolean already_open;
 
-    /* Mail Servers page */
+    /* Mail Options page */
+static GtkWidget *create_mail_options_page(GtkTreeStore * store);
+
 static GtkWidget *mailserver_subpage(void);
+
 static GtkWidget *remote_mailbox_servers_group(GtkWidget * page);
 static GtkWidget *local_mail_group(GtkWidget * page);
 #if ENABLE_ESMTP
 static GtkWidget *outgoing_mail_group(GtkWidget * page);
 #endif                          /* ENABLE_ESMTP */
 
-    /* Address Books page */
-static GtkWidget *create_address_book_page(GtkTreeStore * store);
-static GtkWidget *address_books_group(GtkWidget * page);
-
-    /* Mail Options page */
-static GtkWidget *create_mail_options_page(GtkTreeStore * store);
-
 static GtkWidget *incoming_subpage(void);
+
 static GtkWidget *checking_group(GtkWidget * page);
 static GtkWidget *mdn_group(GtkWidget * page);
 
 static GtkWidget *outgoing_subpage(void);
+
 static GtkWidget *word_wrap_group(GtkWidget * page);
 static GtkWidget *other_options_group(GtkWidget * page);
+    /* End of Mail Options page */
 
-    /* Display page */
+    /* Display Options page */
 static GtkWidget *create_display_page(GtkTreeStore * store);
 
 static GtkWidget *display_subpage(void);
+
 static GtkWidget *main_window_group(GtkWidget * page);
-static GtkWidget *progress_group(GtkWidget * page);
-static GtkWidget *display_formats_group(GtkWidget * page);
+static GtkWidget *message_window_group(GtkWidget * page);
 
-static GtkWidget *status_messages_subpage(void);
-static GtkWidget *information_messages_group(GtkWidget * page);
+static GtkWidget *threading_subpage(void);
 
-static GtkWidget *colors_subpage(void);
-static GtkWidget *message_colors_group(GtkWidget * page);
-static GtkWidget *link_color_group(GtkWidget * page);
-static GtkWidget *composition_window_group(GtkWidget * page);
+static GtkWidget *threading_group(GtkWidget * page);
 
 static GtkWidget *message_subpage(void);
+
 static GtkWidget *preview_font_group(GtkWidget * page);
 static GtkWidget *quoted_group(GtkWidget * page);
 static GtkWidget *alternative_group(GtkWidget * page);
 
-static GtkWidget *charset_subpage(void);
+static GtkWidget *colors_subpage(void);
+
+static GtkWidget *message_colors_group(GtkWidget * page);
+static GtkWidget *link_color_group(GtkWidget * page);
+static GtkWidget *composition_window_group(GtkWidget * page);
+
+static GtkWidget *format_subpage(void);
+
+static GtkWidget *display_formats_group(GtkWidget * page);
 static GtkWidget *broken_8bit_codeset_group(GtkWidget * page);
 
-static GtkWidget *threading_subpage(void);
-static GtkWidget *threading_group(GtkWidget * page);
+static GtkWidget *status_messages_subpage(void);
+
+static GtkWidget *information_messages_group(GtkWidget * page);
+static GtkWidget *progress_group(GtkWidget * page);
+    /* End of Display Options page */
+
+    /* Address Books page */
+static GtkWidget *create_address_book_page(GtkTreeStore * store);
+
+static GtkWidget *address_books_group(GtkWidget * page);
+    /* End of Address Books page */
+
+    /* Startup page */
+static GtkWidget *create_startup_page(GtkTreeStore * store);
+
+static GtkWidget *options_group(GtkWidget * page);
+static GtkWidget *folder_scanning_group(GtkWidget * page);
+    /* End of Startup page */
+
+    /* Misc page */
+static GtkWidget *create_misc_page(GtkTreeStore * store);
+
+static GtkWidget *misc_group(GtkWidget * page);
+static GtkWidget *deleting_messages_group(GtkWidget * page);
+    /* End of Misc page */
 
 #if !HAVE_GTKSPELL
     /* Spelling page */
@@ -244,17 +271,6 @@ static GtkWidget *create_spelling_page(GtkTreeStore * store);
 static GtkWidget *pspell_settings_group(GtkWidget * page);
 static GtkWidget *misc_spelling_group(GtkWidget * page);
 #endif                          /* HAVE_GTKSPELL */
-
-    /* Misc page */
-static GtkWidget *create_misc_page(GtkTreeStore * store);
-static GtkWidget *misc_group(GtkWidget * page);
-static GtkWidget *deleting_messages_group(GtkWidget * page);
-static GtkWidget *moving_messages_group(GtkWidget * page);
-
-    /* Startup page */
-static GtkWidget *create_startup_page(GtkTreeStore * store);
-static GtkWidget *options_group(GtkWidget * page);
-static GtkWidget *folder_scanning_group(GtkWidget * page);
 
     /* general helpers */
 static GtkWidget *create_table(gint rows, gint cols, GtkWidget * page);
@@ -1741,7 +1757,7 @@ checking_group(GtkWidget * page)
     GtkWidget *label;
 
     group = pm_group_new(_("Checking"));
-    table = create_table(5, 4, page);
+    table = create_table(5, 3, page);
     pm_group_add(group, table, FALSE);
 
     pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
@@ -1775,12 +1791,12 @@ checking_group(GtkWidget * page)
     pui->notify_new_mail_dialog = gtk_check_button_new_with_label(
 	_("Display message if new mail has arrived"));
     gtk_table_attach(GTK_TABLE(table), pui->notify_new_mail_dialog,
-                     0, 4, 2, 3, GTK_FILL, 0, 0, 0);
+                     0, 3, 2, 3, GTK_FILL, 0, 0, 0);
     
     pui->quiet_background_check = gtk_check_button_new_with_label(
 	_("Do background check quietly (no messages in status bar)"));
     gtk_table_attach(GTK_TABLE(table), pui->quiet_background_check,
-                     0, 4, 3, 4, GTK_FILL, 0, 0, 0);
+                     0, 3, 3, 4, GTK_FILL, 0, 0, 0);
 
     label = gtk_label_new_with_mnemonic(_("_POP message size limit:"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
@@ -1810,7 +1826,7 @@ quoted_group(GtkWidget * page)
     /* and RFC2646-style flowed text  */
 
     group = pm_group_new(_("Quoted and Flowed Text"));
-    table = create_table(3, 3, page);
+    table = create_table(2, 3, page);
     pm_group_add(group, table, FALSE);
 
     attach_label(_("Quoted Text\n" "Regular Expression:"), table, 0, page);
@@ -1876,7 +1892,7 @@ broken_8bit_codeset_group(GtkWidget * page)
 	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
 							 _("display as \"?\"")));
     gtk_table_attach(GTK_TABLE(table), GTK_WIDGET(pui->convert_unknown_8bit[0]),
-		     0, 1, 0, 1,
+		     0, 2, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL), (GtkAttachOptions) (0), 0, 0);
     radio_group = 
 	gtk_radio_button_get_group(GTK_RADIO_BUTTON(pui->convert_unknown_8bit[0]));
@@ -1897,8 +1913,6 @@ broken_8bit_codeset_group(GtkWidget * page)
                      GTK_EXPAND | GTK_FILL,
                      (GtkAttachOptions) (0), 0, 0);
 
-    pm_page_add_to_size_group(page,
-                              GTK_WIDGET(pui->convert_unknown_8bit[0]));
     pm_page_add_to_size_group(page,
                               GTK_WIDGET(pui->convert_unknown_8bit[1]));
     
@@ -1984,7 +1998,7 @@ word_wrap_group(GtkWidget * page)
     GtkWidget *label;
 
     group = pm_group_new(_("Word Wrap"));
-    table = create_table(2, 3, page);
+    table = create_table(1, 3, page);
     pm_group_add(group, table, FALSE);
 
     pui->wordwrap =
@@ -2062,7 +2076,7 @@ create_display_page(GtkTreeStore * store)
                    store, &iter);
     pm_append_page(notebook, colors_subpage(), _("Colors"),
                    store, &iter);
-    pm_append_page(notebook, charset_subpage(), _("Character Set"),
+    pm_append_page(notebook, format_subpage(), _("Format"),
                    store, &iter);
     pm_append_page(notebook, status_messages_subpage(), _("Status Messages"),
                    store, &iter);
@@ -2076,7 +2090,7 @@ display_subpage(void)
     GtkWidget *page = pm_page_new();
 
     pm_page_add(page, main_window_group(page), FALSE);
-    pm_page_add(page, display_formats_group(page), FALSE);
+    pm_page_add(page, message_window_group(page), FALSE);
 
     return page;
 }
@@ -2308,10 +2322,11 @@ preview_font_group(GtkWidget * page)
 }
 
 static GtkWidget *
-charset_subpage(void)
+format_subpage(void)
 {
     GtkWidget *page = pm_page_new();
 
+    pm_page_add(page, display_formats_group(page), FALSE);
     pm_page_add(page, broken_8bit_codeset_group(page), FALSE);
 
     return page;
@@ -2375,7 +2390,7 @@ create_table(gint rows, gint cols, GtkWidget * page)
 {
     GtkWidget *table;
 
-    table = gtk_table_new(rows, cols + 1, FALSE);
+    table = gtk_table_new(rows, cols, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table), ROW_SPACING);
     gtk_table_set_col_spacings(GTK_TABLE(table), COL_SPACING);
     g_object_set_data(G_OBJECT(table), BALSA_TABLE_PAGE_KEY, page);
@@ -2472,7 +2487,6 @@ create_misc_page(GtkTreeStore * store)
 
     pm_page_add(page, misc_group(page), FALSE);
     pm_page_add(page, deleting_messages_group(page), FALSE);
-    pm_page_add(page, moving_messages_group(page), FALSE);
 
     return page;
 }
@@ -2575,7 +2589,7 @@ deleting_messages_group(GtkWidget * page)
 }
 
 static GtkWidget *
-moving_messages_group(GtkWidget * page)
+message_window_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table;
@@ -3517,5 +3531,7 @@ pm_append_page(GtkWidget * notebook, GtkWidget * widget,
         gtk_tree_store_append(store, &iter, parent_iter);
     gtk_tree_store_set(store, &iter,
                        PM_TEXT_COL, text,
-                       PM_NOTEBOOK_COL, notebook, PM_PAGE_COL, page, -1);
+                       PM_NOTEBOOK_COL, notebook,
+                       PM_PAGE_COL, page,
+                       -1);
 }

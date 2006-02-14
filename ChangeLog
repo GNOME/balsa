@@ -1,5 +1,7 @@
-2006-02-13 16:02  PeterB
+2006-02-13 22:42  PeterB
 
+	* src/: balsa-mblist.c, balsa-icons.c, balsa-icons.h: use icon-name
+	GtkTreeViewColumn attribute.
 	* src/: balsa-index.c, balsa-index.h, main-window.c,
 	message-window.c: reset view filter to show unread message.
 	* src/pref-manager.c: move message-window group to display-options

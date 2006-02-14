@@ -88,4 +88,7 @@ void register_balsa_pixmaps(void);
 void register_balsa_pixbufs(GtkWidget * widget);
 void balsa_icon_create(const gchar ** data, GdkPixmap ** pmap,
                        GdkBitmap ** bmap);
+#if GTK_CHECK_VERSION(2, 8, 0)
+const gchar * balsa_icon_id(const gchar * name);
+#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
 #endif

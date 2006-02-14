@@ -58,6 +58,10 @@ balsa_icon_create(const gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
                                          bmap, 0, (gchar **) data);
 }
 
+#if GTK_CHECK_VERSION(2, 8, 0)
+static GHashTable *balsa_icon_table;
+#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
+
 static void
 load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory, 
 		  const balsa_pixmap_t *bpixmap)
@@ -69,6 +73,12 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 
     BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
 	       bpixmap->stock_id);
+
+#if GTK_CHECK_VERSION(2, 8, 0)
+    g_hash_table_insert(balsa_icon_table, g_strdup(bpixmap->name), 
+                        g_strdup(bpixmap->stock_id));
+#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
+
     if (!gtk_icon_size_lookup(bpixmap->sizes[0], &width, &height)) {
 	BICONS_ERR("failed: could not look up default icon size %d",
 		   bpixmap->sizes[0]);
@@ -239,6 +249,10 @@ register_balsa_pixmaps(void)
     GtkIconFactory *factory = gtk_icon_factory_new();
     GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
 
+#if GTK_CHECK_VERSION(2, 8, 0)
+    balsa_icon_table =
+        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
     gtk_icon_factory_add_default(factory);
     gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
 
@@ -276,3 +290,13 @@ register_balsa_pixbufs(GtkWidget * widget)
 						 GTK_ICON_SIZE_MENU,
 						 NULL));
 }
+
+#if GTK_CHECK_VERSION(2, 8, 0)
+const gchar *
+balsa_icon_id(const gchar * name)
+{
+    const gchar *retval = g_hash_table_lookup(balsa_icon_table, name);
+
+    return retval ? retval : name;
+}
+#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */

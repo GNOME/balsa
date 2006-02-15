@@ -1239,7 +1239,7 @@ check_gpg_child(gpointer data)
 	dialog =
 	    gtk_message_dialog_new(spawned_gpg->parent,
 				   GTK_DIALOG_DESTROY_WITH_PARENT,
-				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+				   GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
 				   _
 				   ("Running gpg failed with return value %d:\n%s"),
 				   WEXITSTATUS(status), gpg_message);

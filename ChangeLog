@@ -1,3 +1,9 @@
+2006-02-15  Pawel Salek
+
+	* balsa.desktop.in: Terminal=0 -> Terminal=false
+	* libbalsa/rfc3156.c: failed gpg execution is warning, not just info
+	(Albrecht Dreß).
+
 2006-02-13 22:42  PeterB
 
 	* src/: balsa-mblist.c, balsa-icons.c, balsa-icons.h: use icon-name

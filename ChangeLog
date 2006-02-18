@@ -1,5 +1,9 @@
-2006-02-18 12:37  PeterB
+2006-02-18 15:31  PeterB
 
+	* src/sendmsg-window.c, libbalsa/address-entry.c,
+	libbalsa/address-entry.h: use Escape instead of ctrl+R for manual
+	address completion.
+	* libbalsa/address-book-ldap.c: make LDAP address book expensive.
 	* src/pref-manager.c: edit address book on row-activated; add
 	closure to add_button_to_box.
 

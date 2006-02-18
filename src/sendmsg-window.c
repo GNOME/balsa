@@ -5620,15 +5620,9 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    GtkWidget *focus_widget;
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
     regex_t rex;
-
-    focus_widget = gtk_window_get_focus(GTK_WINDOW(bsmsg->window));
-    if (focus_widget && GTK_IS_ENTRY(focus_widget)
-        && libbalsa_address_entry_show_matches((GtkEntry *) focus_widget))
-        return;
 
     if (!bsmsg->flow)
 	return;

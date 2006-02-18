@@ -31,7 +31,6 @@ typedef GtkEntry LibBalsaAddressEntry;
 #define LIBBALSA_IS_ADDRESS_ENTRY(obj) GTK_IS_ENTRY(obj)
 void libbalsa_address_entry_set_address_book_list(GList *
                                                   address_book_list);
-gboolean libbalsa_address_entry_show_matches(GtkEntry * address_entry);
 gint libbalsa_address_entry_addresses(GtkEntry * entry);
 GtkWidget *libbalsa_address_entry_new(void);
 void libbalsa_address_entry_set_domain(LibBalsaAddressEntry *, void *);

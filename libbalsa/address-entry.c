@@ -24,6 +24,7 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <string.h>
 
 /*
@@ -69,6 +70,7 @@ typedef struct {
      * the addresses in the GtkListStore and unref them when we're done.
      */
     InternetAddressList *address_list;
+    gboolean last_was_escape;
 } LibBalsaAddressEntryInfo;
 
 #define LIBBALSA_ADDRESS_ENTRY_INFO "libbalsa-address-entry-info"
@@ -343,6 +345,37 @@ lbae_entry_notify(GtkEntry * entry, GParamSpec * spec, gpointer data)
     g_signal_emit_by_name(entry, "changed");
 }
 
+/*************************************************************
+ *     Callback for the entry's "key-pressed" event
+ *************************************************************/
+static gboolean
+lbae_key_pressed(GtkEntry * entry, GdkEventKey * event, gpointer data)
+{
+    GtkEntryCompletion *completion;
+    LibBalsaAddressEntryInfo *info;
+
+    if (event->keyval != GDK_Escape)
+        return FALSE;
+
+    completion = gtk_entry_get_completion(entry);
+    info = g_object_get_data(G_OBJECT(completion),
+                             LIBBALSA_ADDRESS_ENTRY_INFO);
+
+    if (info->last_was_escape) {
+        info->last_was_escape = FALSE;
+        return FALSE;
+    }
+    info->last_was_escape = TRUE;
+
+    g_signal_handlers_block_by_func(entry, lbae_entry_changed, NULL);
+    lbae_entry_setup_matches(entry, completion, info,
+                             LIBBALSA_ADDRESS_ENTRY_MATCH_ALL);
+    g_signal_emit_by_name(entry, "changed");
+    g_signal_handlers_unblock_by_func(entry, lbae_entry_changed, NULL);
+
+    return TRUE;
+}
+
 /* Public API. */
 
 /*************************************************************
@@ -381,6 +414,8 @@ libbalsa_address_entry_new()
                      NULL);
     g_signal_connect(entry, "notify::cursor-position",
                      G_CALLBACK(lbae_entry_notify), NULL);
+    g_signal_connect(entry, "key-press-event", G_CALLBACK(lbae_key_pressed),
+                     NULL);
     gtk_entry_set_completion(GTK_ENTRY(entry), completion);
     g_object_unref(completion);
 
@@ -454,34 +489,6 @@ libbalsa_address_entry_set_domain(GtkEntry * address_entry, void *domain)
 
     g_free(info->domain);
     info->domain = g_strdup(domain);
-}
-
-/*************************************************************
- *     Show all matches, even from expensive address books; caller
- *     should check that entry is a GtkEntry, but can use this method to
- *     check that it is an address entry.
- *************************************************************/
-gboolean
-libbalsa_address_entry_show_matches(GtkEntry * entry)
-{
-    GtkEntryCompletion *completion;
-    LibBalsaAddressEntryInfo *info;
-
-    g_return_val_if_fail(GTK_IS_ENTRY(entry), FALSE);
-
-    completion = gtk_entry_get_completion(entry);
-    if (!completion
-        || !(info = g_object_get_data(G_OBJECT(completion),
-                                      LIBBALSA_ADDRESS_ENTRY_INFO)))
-        return FALSE;
-
-    g_signal_handlers_block_by_func(entry, lbae_entry_changed, NULL);
-    lbae_entry_setup_matches(entry, completion, info,
-                             LIBBALSA_ADDRESS_ENTRY_MATCH_ALL);
-    g_signal_emit_by_name(entry, "changed");
-    g_signal_handlers_unblock_by_func(entry, lbae_entry_changed, NULL);
-
-    return TRUE;
 }
 
 /*************************************************************

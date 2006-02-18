@@ -339,28 +339,23 @@ static void destroy_pref_window_cb(void);
 static void update_address_books(void);
 static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
-static void mail_servers_cb(GtkTreeView * tree_view, GtkTreePath * path,
-                            GtkTreeViewColumn * column,
-                            gpointer user_data);
-static void server_edit_cb(GtkWidget * widget, gpointer data);
-static void pop3_add_cb(GtkWidget * widget, gpointer data);
-static void server_add_cb(GtkWidget * widget, gpointer data);
-static void server_del_cb(GtkWidget * widget, gpointer data);
+static void server_edit_cb(GtkTreeView * tree_view);
+static void pop3_add_cb(void);
+static void server_add_cb(void);
+static void server_del_cb(GtkTreeView * tree_view);
 
 #if ENABLE_ESMTP
-static void smtp_servers_cb(GtkTreeView * tree_view, GtkTreePath * path,
-                            GtkTreeViewColumn * column,
-                            gpointer user_data);
-static void smtp_server_edit_cb(GtkWidget * widget, gpointer data);
-static void smtp_server_add_cb(GtkWidget * widget, gpointer data);
-static void smtp_server_del_cb(GtkWidget * widget, gpointer data);
+static void smtp_server_edit_cb(GtkTreeView * tree_view);
+static void smtp_server_add_cb(void);
+static void smtp_server_del_cb(GtkTreeView * tree_view);
 static void smtp_server_changed (GtkTreeSelection * selection,
 				 gpointer user_data);
 #endif                          /* ENABLE_ESMTP */
 
-static void address_book_edit_cb(GtkWidget * widget, gpointer data);
-static void address_book_add_cb(GtkWidget * widget, gpointer data);
-static void address_book_delete_cb(GtkWidget * widget, gpointer data);
+static void address_book_edit_cb(GtkTreeView * tree_view);
+static void address_book_add_cb(void);
+static void address_book_delete_cb(GtkTreeView * tree_view);
+static void address_book_set_default_cb(GtkTreeView * tree_view);
 static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void mailbox_close_timer_modified_cb(GtkWidget * widget,
                                             GtkWidget * pbox);
@@ -369,7 +364,6 @@ static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void option_menu_cb(GtkItem * menuitem, gpointer data);
-static void set_default_address_book_cb(GtkWidget * button, gpointer data);
 static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -1507,10 +1501,11 @@ box_start_check(const gchar * label, GtkWidget * box)
 }
 
 static GtkWidget *
-add_button_to_box(const gchar * label, GCallback cb, GtkWidget * box)
+add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
+                  GtkWidget * box)
 {
     GtkWidget *button = gtk_button_new_with_mnemonic(label);
-    g_signal_connect_swapped(G_OBJECT(button), "clicked", cb, NULL);
+    g_signal_connect_swapped(button, "clicked", cb, cb_data);
     gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
 
     return button;
@@ -1538,13 +1533,6 @@ color_box(GtkBox * parent, const gchar * title)
     gtk_box_pack_start(GTK_BOX(box), gtk_label_new(title), FALSE, FALSE,
                        0);
     return picker;
-}
-
-static void
-mail_servers_cb(GtkTreeView * tree_view, GtkTreePath * path,
-                GtkTreeViewColumn * column, gpointer user_data)
-{
-    server_edit_cb(NULL, NULL);
 }
 
 static GtkWidget *
@@ -1611,12 +1599,15 @@ remote_mailbox_servers_group(GtkWidget * page)
     gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
 
     g_signal_connect(G_OBJECT(pui->mail_servers), "row-activated",
-                     G_CALLBACK(mail_servers_cb), NULL);
+                     G_CALLBACK(server_edit_cb), NULL);
 
     vbox = vbox_in_container(hbox);
-    add_button_to_box(_("_Add"), G_CALLBACK(server_add_cb), vbox);
-    add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb), vbox);
-    add_button_to_box(_("_Delete"), G_CALLBACK(server_del_cb), vbox);
+    add_button_to_box(_("_Add"), G_CALLBACK(server_add_cb),
+                      NULL, vbox);
+    add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb),
+                      tree_view, vbox);
+    add_button_to_box(_("_Delete"), G_CALLBACK(server_del_cb),
+                      tree_view, vbox);
 
     /* fill in data */
     update_mail_servers();
@@ -1696,17 +1687,18 @@ outgoing_mail_group(GtkWidget * page)
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
 
     g_signal_connect(G_OBJECT(pui->smtp_servers), "row-activated",
-                     G_CALLBACK(smtp_servers_cb), NULL);
+                     G_CALLBACK(smtp_server_edit_cb), NULL);
 
     vbox = vbox_in_container(hbox);
-    add_button_to_box(_("_Add"), G_CALLBACK(smtp_server_add_cb), vbox);
+    add_button_to_box(_("_Add"), G_CALLBACK(smtp_server_add_cb),
+                      NULL, vbox);
     pui->smtp_server_edit_button =
         add_button_to_box(_("_Modify"), G_CALLBACK(smtp_server_edit_cb),
-                          vbox);
+                          tree_view, vbox);
     gtk_widget_set_sensitive(pui->smtp_server_edit_button, FALSE);
     pui->smtp_server_del_button =
         add_button_to_box(_("_Delete"), G_CALLBACK(smtp_server_del_cb),
-                          vbox);
+                          tree_view, vbox);
     gtk_widget_set_sensitive(pui->smtp_server_del_button, FALSE);
 
     /* fill in data */
@@ -2758,17 +2750,24 @@ address_books_group(GtkWidget * page)
                                 (GTK_TREE_VIEW(tree_view)),
                                 GTK_SELECTION_BROWSE);
 
+    g_signal_connect(tree_view, "row-activated", 
+                     G_CALLBACK(address_book_edit_cb), NULL);
+
     gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
 
     vbox = vbox_in_container(hbox);
     add_button_to_box(_("_Add"),
-                      G_CALLBACK(address_book_add_cb),         vbox);
+                      G_CALLBACK(address_book_add_cb),
+                      NULL, vbox);
     add_button_to_box(_("_Modify"),
-                      G_CALLBACK(address_book_edit_cb),        vbox);
+                      G_CALLBACK(address_book_edit_cb),
+                      tree_view, vbox);
     add_button_to_box(_("_Delete"),         
-                      G_CALLBACK(address_book_delete_cb),      vbox);
+                      G_CALLBACK(address_book_delete_cb),
+                      tree_view, vbox);
     add_button_to_box(_("_Set as default"), 
-                      G_CALLBACK(set_default_address_book_cb), vbox);
+                      G_CALLBACK(address_book_set_default_cb),
+                      tree_view, vbox);
 
     update_address_books();
 
@@ -2789,9 +2788,8 @@ properties_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 }
 
 static void
-server_edit_cb(GtkWidget * widget, gpointer data)
+server_edit_cb(GtkTreeView * tree_view)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->mail_servers);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -2887,16 +2885,8 @@ smtp_server_update(LibBalsaSmtpServer * smtp_server,
     libbalsa_conf_pop_group();
 }
 
-/* Row activated callback. */
 static void
-smtp_servers_cb(GtkTreeView * tree_view, GtkTreePath * path,
-                GtkTreeViewColumn * column, gpointer user_data)
-{
-    smtp_server_edit_cb(NULL, NULL);
-}
-
-static void
-smtp_server_add_cb(GtkWidget * widget, gpointer data)
+smtp_server_add_cb(void)
 {
     LibBalsaSmtpServer *smtp_server;
 
@@ -2907,9 +2897,8 @@ smtp_server_add_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-smtp_server_edit_cb(GtkWidget * widget, gpointer data)
+smtp_server_edit_cb(GtkTreeView * tree_view)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->smtp_servers);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -2926,9 +2915,8 @@ smtp_server_edit_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-smtp_server_del_cb(GtkWidget * widget, gpointer data)
+smtp_server_del_cb(GtkTreeView * tree_view)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->smtp_servers);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -2987,10 +2975,9 @@ address_book_change(LibBalsaAddressBook * address_book, gboolean append)
 }
 
 static void
-address_book_edit_cb(GtkWidget * widget, gpointer data)
+address_book_edit_cb(GtkTreeView * tree_view)
 {
     LibBalsaAddressBook *address_book;
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->address_books);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -3007,13 +2994,13 @@ address_book_edit_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-set_default_address_book_cb(GtkWidget * button, gpointer data)
+address_book_set_default_cb(GtkTreeView * tree_view)
 {
     LibBalsaAddressBook *address_book;
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->address_books);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
     GtkTreeIter iter;
+    GtkTreePath *path;
 
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
 	return;
@@ -3022,11 +3009,15 @@ set_default_address_book_cb(GtkWidget * button, gpointer data)
 
     g_assert(address_book != NULL);
     balsa_app.default_address_book = address_book;
+
+    path = gtk_tree_model_get_path(model, &iter);
     update_address_books();
+    gtk_tree_selection_select_path(selection, path);
+    gtk_tree_path_free(path);
 }
 
 static void
-address_book_add_cb(GtkWidget * widget, gpointer data)
+address_book_add_cb(void)
 {
 
     GtkWidget *menu =
@@ -3041,10 +3032,9 @@ address_book_add_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-address_book_delete_cb(GtkWidget * widget, gpointer data)
+address_book_delete_cb(GtkTreeView * tree_view)
 {
     LibBalsaAddressBook *address_book;
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->address_books);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -3069,13 +3059,13 @@ address_book_delete_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-pop3_add_cb(GtkWidget * widget, gpointer data)
+pop3_add_cb(void)
 {
     mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_POP3);
 }
 
 static void
-server_add_cb(GtkWidget * widget, gpointer data)
+server_add_cb(void)
 {
     GtkWidget *menu;
     GtkWidget *menuitem;
@@ -3104,9 +3094,8 @@ server_add_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-server_del_cb(GtkWidget * widget, gpointer data)
+server_del_cb(GtkTreeView * tree_view)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->mail_servers);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
     GtkTreeIter iter;

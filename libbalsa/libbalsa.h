@@ -138,8 +138,10 @@ pthread_t libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
 void libbalsa_threads_init(void);
 void libbalsa_threads_destroy(void);
+gboolean libbalsa_threads_has_lock(void);
 #else
 #define libbalsa_am_i_subthread() FALSE
+#define libbalsa_threads_has_lock() TRUE
 #endif /* BALSA_USE_THREADS */
 void libbalsa_message(const char *fmt, ...);
 gchar * libbalsa_rot(const gchar * pass);

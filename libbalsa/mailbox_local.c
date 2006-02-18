@@ -585,6 +585,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     }
     *total = info->value.total;
 
+    gdk_threads_enter();
+
     seen = g_new0(guint8, *total);
     parent = mailbox->msg_tree;
     sibling = NULL;
@@ -639,6 +641,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     g_free(seen);
     g_free(contents);
     g_free(name);
+
+    gdk_threads_leave();
 
     return TRUE;
 }
@@ -922,9 +926,14 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
     GNode *lastn;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
-    if (!mailbox->msg_tree)
+
+    gdk_threads_enter();
+
+    if (!mailbox->msg_tree) {
 	/* Mailbox is closed, or no view has been created. */
+        gdk_threads_leave();
 	return;
+    }
 
     local = (LibBalsaMailboxLocal *) mailbox;
     lastno = libbalsa_mailbox_total_messages(mailbox);
@@ -938,6 +947,8 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
             g_object_unref(msg);
         }
     }
+
+    gdk_threads_leave();
 
     if (new_messages) {
 	libbalsa_mailbox_run_filters_on_reception(mailbox);
@@ -979,11 +990,10 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
                             && libbalsa_mailbox_get_sort_field(mailbox) ==
                             LB_MAILBOX_SORT_NO);
 
-        mailbox->msg_tree = g_node_new(NULL);
+        libbalsa_mailbox_set_msg_tree(mailbox, g_node_new(NULL));
         if (!lbm_local_restore_tree(local, &total)) {
             /* Bad or no cache file: start over. */
-            g_node_destroy(mailbox->msg_tree);
-            mailbox->msg_tree = g_node_new(NULL);
+            libbalsa_mailbox_set_msg_tree(mailbox, g_node_new(NULL));
             total = 0;
         }
         mailbox->msg_tree_changed = FALSE;
@@ -1005,6 +1015,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
             return;
     }
 
+    gdk_threads_enter();
     switch (thread_type) {
     case LB_MAILBOX_THREADING_JWZ:
         lbml_threading_jwz(mailbox);
@@ -1014,6 +1025,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         lbml_threading_simple(mailbox, thread_type);
         break;
     }
+    gdk_threads_leave();
 #if defined(DEBUG_LOADING_AND_THREADING)
     printf("after threading time=%lu\n", (unsigned long) time(NULL));
 #endif
@@ -1271,7 +1283,7 @@ static void
 lbml_info_setup(LibBalsaMailbox * mailbox, ThreadingInfo * ti)
 {
     ti->mailbox = mailbox;
-    ti->root = g_node_new(NULL);
+    ti->root = g_node_new(mailbox->msg_tree);
     ti->id_table = g_hash_table_new(g_str_hash, g_str_equal);
     ti->subject_table = NULL;
     ti->unthreaded =
@@ -1776,7 +1788,7 @@ lbml_construct(GNode * node, ThreadingInfo * ti)
 {
     GNode *msg_node;
 
-    if ((msg_node = node->data)) {
+    if (node->parent && (msg_node = node->data)) {
         GNode *msg_parent = node->parent->data;
 
         if (msg_parent && msg_node->parent != msg_parent

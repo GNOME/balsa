@@ -793,7 +793,9 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 
     /* EXISTS response may result from any IMAP action. */
     libbalsa_lock_mailbox(mailbox);
-    
+
+    gdk_threads_enter();
+
     if (mailbox->msg_tree)
         sibling = g_node_last_child(mailbox->msg_tree);
     for(i=mimap->messages_info->len+1; i <= cnt; i++) {
@@ -805,6 +807,8 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
                                         &sibling);
     }
     ++mimap->search_stamp;
+
+    gdk_threads_leave();
     
     /* we run filters and get unseen messages in a idle callback:
      * these things do not need to be done immediately and we do 
@@ -2705,10 +2709,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     }
     imap_search_key_free(filter);
 
-    if(!mailbox->msg_tree) /* first reference */
-        mailbox->msg_tree = g_node_new(NULL);
-    if (new_tree)
-	libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
+    libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
 }
 
 static void

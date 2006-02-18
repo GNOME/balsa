@@ -220,7 +220,8 @@ struct _LibBalsaMailbox {
     GPtrArray *mindex;  /* the basic message index used for index
                          * displaying/columns of GtkTreeModel interface
                          * and NOTHING else. */
-    GNode *msg_tree; /* the possibly filtered tree of messages */
+    GNode *msg_tree; /* the possibly filtered tree of messages;
+                      * gdk lock MUST BE HELD when accessing. */
     LibBalsaCondition *view_filter; /* to choose a subset of messages
                                      * to be displayed, e.g., only
                                      * undeleted. */

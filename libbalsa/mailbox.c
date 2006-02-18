@@ -528,10 +528,12 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
         /* do not try expunging read-only mailboxes, it's a waste of time */
         expunge = expunge && !mailbox->readonly;
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox, expunge);
+        gdk_threads_enter();
         if(mailbox->msg_tree) {
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = NULL;
         }
+        gdk_threads_leave();
         libbalsa_mailbox_free_mindex(mailbox);
         mailbox->stamp++;
 	mailbox->state = LB_MAILBOX_STATE_CLOSED;
@@ -1062,11 +1064,15 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
 }
 #endif /* CACHE_UNSEEN_CHILD */
 
+/* Called with gdk lock held. */
 static void
 lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
                   GtkTreeIter * iter)
 {
     GtkTreePath *path;
+
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
 
     if (iter->user_data == NULL)
         iter->user_data =
@@ -1092,7 +1098,6 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
 static void 
 lbm_threads_enter(LibBalsaMailbox * mailbox)
 {
-    libbalsa_lock_mailbox(mailbox);
     gdk_threads_enter();
 }
 
@@ -1100,7 +1105,6 @@ static void
 lbm_threads_leave(LibBalsaMailbox * mailbox)
 {
     gdk_threads_leave();
-    libbalsa_unlock_mailbox(mailbox);
 }
 
 void
@@ -1108,11 +1112,13 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
 
-    if (!mailbox->msg_tree)
+    lbm_threads_enter(mailbox);
+    if (!mailbox->msg_tree) {
+        lbm_threads_leave(mailbox);
         return;
+    }
 
     iter.user_data = NULL;
-    lbm_threads_enter(mailbox);
     lbm_msgno_changed(mailbox, seqno, &iter);
 
     /* Parents' style may need to be changed also. */
@@ -1135,6 +1141,8 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
     GtkTreePath *path;
     GSList **unthreaded;
 
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
     if (!mailbox->msg_tree)
         return;
 #undef SANITY_CHECK
@@ -1143,8 +1151,6 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
                                   G_PRE_ORDER, G_TRAVERSE_ALL,
                                   GUINT_TO_POINTER(seqno)));
 #endif
-
-    lbm_threads_enter(mailbox);
 
     /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
@@ -1167,8 +1173,6 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
             g_slist_prepend(*unthreaded, GUINT_TO_POINTER(seqno));
 
     mailbox->msg_tree_changed = TRUE;
-
-    lbm_threads_leave(mailbox);
 }
 
 void
@@ -1177,10 +1181,11 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     GtkTreeIter iter;
     GtkTreePath *path;
 
-    if (!mailbox->msg_tree)
-        return;
-
     lbm_threads_enter(mailbox);
+    if (!mailbox->msg_tree) {
+        lbm_threads_leave(mailbox);
+        return;
+    }
 
     /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
@@ -1222,10 +1227,11 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGE_EXPUNGED],
                   0, seqno);
 
-    if (!mailbox->msg_tree)
-        return;
-
     lbm_threads_enter(mailbox);
+    if (!mailbox->msg_tree) {
+        lbm_threads_leave(mailbox);
+        return;
+    }
 
     dt.seqno = seqno;
     dt.node = NULL;
@@ -1302,10 +1308,11 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     LibBalsaMailboxState saved_state;
     GNode *child, *parent, *node;
 
-    if (!mailbox->msg_tree)
-        return;
-
     lbm_threads_enter(mailbox);
+    if (!mailbox->msg_tree) {
+        lbm_threads_leave(mailbox);
+        return;
+    }
 
     node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, 
                        GUINT_TO_POINTER(seqno));
@@ -1380,8 +1387,12 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    if (!mailbox->msg_tree)
+    gdk_threads_enter();
+
+    if (!mailbox->msg_tree) {
+        gdk_threads_leave();
         return;
+    }
 
     match = search_iter ?
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
@@ -1399,6 +1410,8 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
         if (match)
             libbalsa_mailbox_msgno_filt_in(mailbox, seqno);
     }
+
+    gdk_threads_leave();
 }
 
 /* Search iters */
@@ -1501,6 +1514,8 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
 {
     GtkTreeIter tmp_iter;
 
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(seqno > 0, FALSE);
 
@@ -2487,6 +2502,8 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
     GNode *parent_node;
 #endif
 
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
     g_return_val_if_fail(VALID_ITER(iter, tree_model), NULL);
 
     node = iter->user_data;
@@ -3254,8 +3271,11 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
 
     gtk_tree_sortable_sort_column_changed(sortable);
 
-    if (new_field != LB_MAILBOX_SORT_NO)
+    if (new_field != LB_MAILBOX_SORT_NO) {
+        gdk_threads_leave();
         libbalsa_mailbox_prepare_threading(mbox, NULL, 0);
+        gdk_threads_enter();
+    }
     lbm_sort(mbox, mbox->msg_tree);
 
     libbalsa_mailbox_changed(mbox);
@@ -3294,6 +3314,8 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
     GtkTreePath *path;
     GNode *current_parent;
 
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
     g_return_if_fail(node != NULL);
     g_return_if_fail(parent != node);
 #ifdef SANITY_CHECK
@@ -3468,10 +3490,16 @@ lbm_set_msg_tree(LibBalsaMailbox * mailbox)
     GNode *node;
     GtkTreePath *path;
 
-    path = gtk_tree_path_new();
-    gtk_tree_path_down(path);
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
 
     iter.stamp = ++mailbox->stamp;
+
+    if (!mailbox->msg_tree)
+        return;
+
+    path = gtk_tree_path_new();
+    gtk_tree_path_down(path);
 
     for (node = mailbox->msg_tree->children; node; node = node->next) {
         iter.user_data = node;
@@ -3491,17 +3519,21 @@ lbm_set_msg_tree(LibBalsaMailbox * mailbox)
 void
 libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 {
-    if (mailbox->msg_tree->children) {
+    gdk_threads_enter();
+
+    if (mailbox->msg_tree && mailbox->msg_tree->children) {
         lbm_update_msg_tree(mailbox, new_tree);
         g_node_destroy(new_tree);
-    } else if (new_tree->children) {
-        /* msg_tree has never been populated */
-        g_node_destroy(mailbox->msg_tree);
+    } else {
+        if (mailbox->msg_tree)
+            g_node_destroy(mailbox->msg_tree);
         mailbox->msg_tree = new_tree;
         lbm_set_msg_tree(mailbox);
     }
 
     mailbox->msg_tree_changed = TRUE;
+
+    gdk_threads_leave();
 }
 
 static GMimeMessage *
@@ -3857,7 +3889,8 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
     gboolean retval = FALSE;
     gint total;
 
-    libbalsa_lock_mailbox(mailbox);
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
 
     node = iter->user_data;
     if (!node)
@@ -3883,11 +3916,7 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
         }
     }
 
-    libbalsa_unlock_mailbox(mailbox);
-
     if (retval)
-	/* Revalidate iter, in case mailbox was changed while we were
-	 * locking it. */
         VALIDATE_ITER(iter, mailbox);
     else
 	INVALIDATE_ITER(iter);

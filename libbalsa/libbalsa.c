@@ -689,6 +689,18 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
     pthread_t thread_id = pthread_self();
     gint count = 0;
 
+    if (thread_id == libbalsa_threads_id
+        && thread_id == mailbox->thread_id
+        && mailbox->lock > 0) {
+        /* We already have both locks, so we'll just hold on to both of
+         * them. */
+        ++mailbox->lock;
+#if LIBBALSA_DEBUG_THREADS
+        g_message("Avoided temporary gdk_threads_leave!!!");
+#endif                          /* LIBBALSA_DEBUG_THREADS */
+        return;
+    }
+
     while (thread_id == libbalsa_threads_id) {
         ++count;
 #if LIBBALSA_DEBUG_THREADS
@@ -791,6 +803,13 @@ void
 libbalsa_threads_destroy(void)
 {
     pthread_mutex_destroy(&libbalsa_threads_mutex);
+}
+
+gboolean
+libbalsa_threads_has_lock(void)
+{
+    return libbalsa_threads_lock > 0
+        && libbalsa_threads_id == pthread_self();
 }
 
 #endif				/* BALSA_USE_THREADS */

@@ -174,7 +174,7 @@ libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab)
     ab->passwd  = NULL;
     ab->enable_tls = FALSE;
     ab->directory = NULL;
-    LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = FALSE;
+    LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = TRUE;
 }
 
 static void

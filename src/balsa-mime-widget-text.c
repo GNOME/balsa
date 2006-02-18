@@ -418,6 +418,74 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 }
 
 static void
+url_copy_cb(GtkWidget * menu_item, message_url_t * uri)
+{
+    gtk_clipboard_set_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY),
+			   uri->url, -1);
+}
+
+static void
+url_open_cb(GtkWidget * menu_item, message_url_t * uri)
+{
+    handle_url(uri);
+}
+
+static void
+url_send_cb(GtkWidget * menu_item, message_url_t * uri)
+{
+    BalsaSendmsg * newmsg;
+
+    newmsg = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window),
+				NULL, SEND_NORMAL);
+    sendmsg_window_set_field(newmsg, "body", uri->url);
+}
+
+static gboolean
+text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
+{
+    GList *url_list = g_object_get_data(G_OBJECT(textview), "url-list");
+    message_url_t *url;
+    gint x, y;
+    GdkModifierType mask;
+    GdkWindow *window;
+    GtkWidget *menu_item;
+    
+    /* no url list: no check... */
+    if (!url_list)
+	return FALSE;
+
+    /* check if we are over an url */
+    window = gtk_text_view_get_window(textview, GTK_TEXT_WINDOW_TEXT);
+    gdk_window_get_pointer(window, &x, &y, &mask);
+    url = find_url(GTK_WIDGET(textview), x, y, url_list);
+    if (!url)
+	return FALSE;
+
+    /* build a popup to copy or open the URL */
+    gtk_container_foreach(GTK_CONTAINER(menu),
+                          (GtkCallback)gtk_widget_destroy, NULL);
+
+    menu_item = gtk_menu_item_new_with_label (_("Copy link"));
+    g_signal_connect (G_OBJECT (menu_item), "activate",
+                      G_CALLBACK (url_copy_cb), (gpointer)url);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+
+    menu_item = gtk_menu_item_new_with_label (_("Open link"));
+    g_signal_connect (G_OBJECT (menu_item), "activate",
+                      G_CALLBACK (url_open_cb), (gpointer)url);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+
+    menu_item = gtk_menu_item_new_with_label (_("Send link..."));
+    g_signal_connect (G_OBJECT (menu_item), "activate",
+                      G_CALLBACK (url_send_cb), (gpointer)url);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+
+    gtk_widget_show_all(GTK_WIDGET(menu));
+
+    return TRUE;
+}
+
+static void
 text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
                          LibBalsaMessageBody * mime_body)
 {
@@ -425,6 +493,8 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
     gint phrase_hl;
 
     gtk_widget_hide_all(GTK_WIDGET(menu));
+    if (text_view_url_popup(textview, menu))
+	return;
 
     gtk_container_foreach(GTK_CONTAINER(menu),
                           (GtkCallback)gtk_widget_destroy_insensitive, NULL);
@@ -481,8 +551,6 @@ static gboolean
 check_over_url(GtkWidget * widget, GdkEventMotion * event,
                GList * url_list)
 {
-    gint x, y;
-    GdkModifierType mask;
     static gboolean was_over_url = FALSE;
     static message_url_t *current_url = NULL;
     GdkWindow *window;
@@ -493,6 +561,9 @@ check_over_url(GtkWidget * widget, GdkEventMotion * event,
     if (event->type == GDK_LEAVE_NOTIFY)
         url = NULL;
     else {
+	gint x, y;
+	GdkModifierType mask;
+
         /* FIXME: why can't we just use
          * x = event->x;
          * y = event->y;

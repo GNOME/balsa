@@ -242,11 +242,13 @@ bndx_destroy(GtkObject * obj)
 						 0, 0, NULL, NULL, index);
 	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
             /* Undo any temporary filters. */
+            gdk_threads_leave();
             libbalsa_mailbox_set_view_filter(mailbox,
                                              balsa_window_get_view_filter
                                              (balsa_app.main_window, TRUE),
                                              TRUE);
 	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
+            gdk_threads_enter();
 
 	    libbalsa_mailbox_search_iter_free(index->search_iter);
 	    index->search_iter = NULL;
@@ -2285,6 +2287,7 @@ balsa_index_expunge(BalsaIndex * index)
 {
     LibBalsaMailbox *mailbox;
     GtkTreeSelection *selection;
+    gboolean rc;
 
     g_return_if_fail(index != NULL);
 
@@ -2294,7 +2297,10 @@ balsa_index_expunge(BalsaIndex * index)
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
     g_signal_handler_block(selection, index->selection_changed_id);
-    if (!libbalsa_mailbox_sync_storage(mailbox, TRUE))
+    gdk_threads_leave();
+    rc = libbalsa_mailbox_sync_storage(mailbox, TRUE);
+    gdk_threads_enter();
+    if (!rc)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Committing mailbox %s failed."),
 			  mailbox->name);

@@ -43,6 +43,12 @@ typedef struct _BalsaPartInfo BalsaPartInfo;
 
 typedef struct _BalsaMimeWidget BalsaMimeWidget;
 
+typedef enum {
+    BALSA_MESSAGE_FOCUS_STATE_NO,
+    BALSA_MESSAGE_FOCUS_STATE_YES,
+    BALSA_MESSAGE_FOCUS_STATE_HOLD
+} BalsaMessageFocusState;
+
 struct _BalsaMessage {
 	GtkNotebook parent;
 
@@ -71,6 +77,8 @@ struct _BalsaMessage {
 	LibBalsaMessage *message;
 
 	gboolean close_with_msg;
+
+        BalsaMessageFocusState focus_state;
 };
 
 struct _BalsaMessageClass {

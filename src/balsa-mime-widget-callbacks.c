@@ -205,13 +205,21 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * menu_item,
 }
 
 static void
-scroll_change(GtkAdjustment * adj, gint diff)
+scroll_change(GtkAdjustment * adj, gint diff, BalsaMessage * bm)
 {
-    gfloat upper;
+    gfloat upper = adj->upper - adj->page_size;
+
+    if (bm && adj->value >= upper && diff > 0) {
+        if (balsa_window_next_unread(balsa_app.main_window))
+            /* We're changing mailboxes, and GtkNotebook will grab the
+             * focus, so we want to grab it back the next time we lose
+             * it. */
+            bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_HOLD;
+        return;
+    }
 
     adj->value += diff;
 
-    upper = adj->upper - adj->page_size;
     adj->value = MIN(adj->value, upper);
     adj->value = MAX(adj->value, 0.0);
 
@@ -237,31 +245,31 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
     switch (event->keyval) {
     case GDK_Up:
         scroll_change(viewport->vadjustment,
-                      -viewport->vadjustment->step_increment);
+                      -viewport->vadjustment->step_increment, NULL);
         break;
     case GDK_Down:
         scroll_change(viewport->vadjustment,
-                      viewport->vadjustment->step_increment);
+                      viewport->vadjustment->step_increment, NULL);
         break;
     case GDK_Page_Up:
         scroll_change(viewport->vadjustment,
-                      -page_adjust);
+                      -page_adjust, NULL);
         break;
     case GDK_Page_Down:
         scroll_change(viewport->vadjustment,
-                      page_adjust);
+                      page_adjust, NULL);
         break;
     case GDK_Home:
         if (event->state & GDK_CONTROL_MASK)
             scroll_change(viewport->vadjustment,
-                          -viewport->vadjustment->value);
+                          -viewport->vadjustment->value, NULL);
         else
             return FALSE;
         break;
     case GDK_End:
         if (event->state & GDK_CONTROL_MASK)
             scroll_change(viewport->vadjustment,
-                          viewport->vadjustment->upper);
+                          viewport->vadjustment->upper, NULL);
         else
             return FALSE;
         break;
@@ -275,6 +283,10 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
 		return FALSE;
         } else
             return FALSE;
+        break;
+    case GDK_space:
+        scroll_change(viewport->vadjustment,
+                      page_adjust, bm);
         break;
 
     default:
@@ -293,6 +305,8 @@ balsa_mime_widget_limit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMe
 
     gtk_container_set_focus_chain(GTK_CONTAINER(bm->bm_widget->container), list);
     g_list_free(list);
+    if (bm->focus_state == BALSA_MESSAGE_FOCUS_STATE_NO)
+        bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
     return FALSE;
 }
 
@@ -301,6 +315,13 @@ gint
 balsa_mime_widget_unlimit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm)
 {
     gtk_container_unset_focus_chain(GTK_CONTAINER(bm->bm_widget->container));
+    if (bm->message) {
+        BalsaMessageFocusState focus_state = bm->focus_state;
+        if (focus_state == BALSA_MESSAGE_FOCUS_STATE_HOLD) {
+            balsa_message_grab_focus(bm);
+            bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
+        } else
+            bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_NO;
+    }
     return FALSE;
 }
-

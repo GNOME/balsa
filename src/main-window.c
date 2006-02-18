@@ -1876,8 +1876,7 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     }
 
     bw_enable_next_unread(window, libbalsa_mailbox_get_unread(mailbox) > 0
-                          || (mailbox != balsa_app.trash
-                              && bw_next_unread_mailbox(mailbox) > 0));
+                          || bw_next_unread_mailbox(mailbox));
 
     enable_expand_collapse(mailbox);
 }
@@ -3380,56 +3379,64 @@ next_message_cb(GtkWidget * widget, gpointer data)
         BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
 }
 
-static void
-next_unread_message_cb(GtkWidget * widget, gpointer data)
+/* Select next unread message, changing mailboxes if necessary; 
+ * returns TRUE if mailbox was changed. */
+gboolean
+balsa_window_next_unread(BalsaWindow * window)
 {
     BalsaIndex *index =
-        BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data)));
+        BALSA_INDEX(balsa_window_find_current_index(window));
     LibBalsaMailbox *mailbox = index ? index->mailbox_node->mailbox : NULL;
+#if WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE
+    GtkWidget *dialog;
+    gint response;
+#endif                          /* WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE */
 
     if (libbalsa_mailbox_get_unread(mailbox) > 0) {
         if (!balsa_index_select_next_unread(index)) {
             /* All unread messages must be hidden; we assume that the
              * user wants to see them, and try again. */
-            reset_filter_cb(NULL, data);
+            reset_filter_cb(NULL, window);
             balsa_index_select_next_unread(index);
         }
-        return;
+        return FALSE;
     }
 
     mailbox = bw_next_unread_mailbox(mailbox);
-    if (libbalsa_mailbox_get_unread(mailbox) > 0) {
+    if (!mailbox || libbalsa_mailbox_get_unread(mailbox) == 0)
+        return FALSE;
+
 #if WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE
-        GtkWidget *dialog;
-        gint response;
+    dialog =
+        gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+                               GTK_MESSAGE_QUESTION,
+                               GTK_BUTTONS_YES_NO,
+                               _("The next unread message is in %s"),
+                               mailbox->name);
+    gtk_message_dialog_format_secondary_text
+        (GTK_MESSAGE_DIALOG(dialog),
+         _("Do you want to switch to %s?"), mailbox->name);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_YES);
+    response = gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    if (response != GTK_RESPONSE_YES)
+        return FALSE;
+#endif                          /* WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE */
 
-        dialog =
-            gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
-                                   GTK_MESSAGE_QUESTION,
-                                   GTK_BUTTONS_YES_NO,
-                                   _("The next unread message is in %s"),
-                                   mailbox->name);
-        gtk_message_dialog_format_secondary_text
-            (GTK_MESSAGE_DIALOG(dialog),
-             _("Do you want to switch to %s?"), mailbox->name);
-        gtk_dialog_set_default_response(GTK_DIALOG(dialog),
-                                        GTK_RESPONSE_YES);
-        response = gtk_dialog_run(GTK_DIALOG(dialog));
-        gtk_widget_destroy(dialog);
-        if (response != GTK_RESPONSE_YES)
-            return;
-#endif /* WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE */
+    balsa_mblist_open_mailbox(mailbox);
+    index = balsa_find_index_by_mailbox(mailbox);
+    if (index)
+        balsa_index_select_next_unread(index);
+    else
+        g_object_set_data(G_OBJECT(mailbox),
+                          BALSA_INDEX_VIEW_ON_OPEN, GINT_TO_POINTER(TRUE));
+    return TRUE;
+}
 
-        balsa_mblist_open_mailbox(mailbox);
-        index = balsa_find_index_by_mailbox(mailbox);
-        if (index)
-            balsa_index_select_next_unread(index);
-        else
-            g_object_set_data(G_OBJECT(mailbox),
-                              BALSA_INDEX_VIEW_ON_OPEN,
-                              GINT_TO_POINTER(TRUE));
-    } /* else we could assert not reached, as this callback should have
-       * been disabled. */
+static void
+next_unread_message_cb(GtkWidget * widget, gpointer data)
+{
+    balsa_window_next_unread(BALSA_WINDOW(data));
 }
 
 static void

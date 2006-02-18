@@ -383,6 +383,8 @@ balsa_message_init(BalsaMessage * bm)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
+    g_signal_connect(scroll, "key_press_event",
+		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
     label = gtk_label_new(_("Content"));
     gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
@@ -523,6 +525,7 @@ balsa_message_set_close(BalsaMessage * bm, gboolean close_with_msg)
     bm->close_with_msg = close_with_msg;
 }
 
+/* Returns a BalsaPartInfo with a reference (g_object_unref when done). */
 static BalsaPartInfo *
 tree_next_valid_part_info(GtkTreeModel * model, GtkTreeIter * iter)
 {
@@ -533,10 +536,8 @@ tree_next_valid_part_info(GtkTreeModel * model, GtkTreeIter * iter)
 
         /* check if there is a valid info */
         gtk_tree_model_get(model, iter, PART_INFO_COLUMN, &info, -1);
-        if (info) {
-            g_object_unref(G_OBJECT(info));
+        if (info)
             return info;
-        }
 
         /* if there are children, check the childs */
         if (gtk_tree_model_iter_children (model, &child, iter))
@@ -566,8 +567,6 @@ tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
     if (!gtk_tree_model_get_iter(model, &sel_iter, arg1))
         return;
     gtk_tree_model_get(model, &sel_iter, PART_INFO_COLUMN, &info, -1);
-    if (info)
-        g_object_unref(G_OBJECT(info));
     
     /* if it's not displayable (== no info), get the next one... */
     if (!info) {
@@ -576,15 +575,15 @@ tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
         if (!info) {
             gtk_tree_model_get_iter_first(model, &sel_iter);
             gtk_tree_model_get(model, &sel_iter, PART_INFO_COLUMN, &info, -1);
-            if (info)
-                g_object_unref(G_OBJECT(info));
-            else
+            if (!info)
                 info = tree_next_valid_part_info(model, &sel_iter);
         }
     }
 
     gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
     select_part(bm, info);
+    if (info)
+        g_object_unref(info);
 }
 
 static void
@@ -748,40 +747,6 @@ bm_message_weak_ref_cb(BalsaMessage * bm, LibBalsaMessage * message)
 
 /* Helpers:
  */
-static gboolean
-bm_content_has_focus(BalsaMessage * bm)
-{
-    GList *children, *list;
-    gboolean has_focus = FALSE;
-
-    children = gtk_container_get_children(GTK_CONTAINER(bm->bm_widget->container));
-    for (list = children; list; list = g_list_next(list)) {
-        GtkWidget *child = list->data;
-        if (GTK_WIDGET_HAS_FOCUS(child)) {
-            has_focus = TRUE;
-            break;
-        }
-    }
-    g_list_free(children);
-
-    return has_focus;
-}
-
-static void
-bm_focus_on_first_child(BalsaMessage * bm)
-{
-    GList *children, *list;
-
-    children = gtk_container_get_children(GTK_CONTAINER(bm->bm_widget->container));
-    for (list = children; list; list = g_list_next(list)) {
-        GtkWidget *child = list->data;
-        if (GTK_WIDGET_CAN_FOCUS(child)) {
-            gtk_widget_grab_focus(child);
-            break;
-        }
-    }
-    g_list_free(children);
-}
 
 gchar *
 balsa_message_sender_to_gchar(InternetAddressList * list, gint which)
@@ -813,9 +778,9 @@ gboolean
 balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 {
     gboolean is_new;
-    gboolean has_focus;
     GtkTreeIter iter;
     BalsaPartInfo *info;
+    gboolean has_focus = bm->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
 
     g_return_val_if_fail(bm != NULL, FALSE);
 
@@ -823,9 +788,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
        call message_set with the same messagr */
     /*    if (bm->message == message) */
     /*      return; */
-
-    /* find out whether the content has the keyboard focus */
-    has_focus = bm_content_has_focus(bm);
 
     gtk_widget_hide(GTK_WIDGET(bm));
     select_part(bm, NULL);
@@ -900,25 +862,17 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     if (is_new && message->headers->dispnotify_to)
         handle_mdn_request (message);
 
-    /*
-     * FIXME: This is a workaround for what may or may not be a libmutt bug.
-     *
-     * If the Content-Type: header is  multipart/alternative; boundary="XXX" 
-     * and no parts are found then mutt produces a message with no parts, even 
-     * if there is a single unmarked part (ie a normal email).     */
     if (!gtk_tree_model_get_iter_first (gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
-                                        &iter)) {
-        /* This is really annoying if you are browsing, since you keep
-           getting a dialog... */
-        /* balsa_information(LIBBALSA_INFORMATION_WARNING, _("Message
-           contains no parts!")); */
+                                        &iter))
+        /* Not possible? */
         return TRUE;
-    }
     
     info = 
         tree_next_valid_part_info(gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
                                   &iter);
     select_part(bm, info);
+    if (info)
+        g_object_unref(info);
     /*
      * emit read message
      */
@@ -932,7 +886,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 
     /* restore keyboard focus to the content, if it was there before */
     if (has_focus)
-        bm_focus_on_first_child(bm);
+        balsa_message_grab_focus(bm);
 
     return TRUE;
 }
@@ -1517,12 +1471,20 @@ balsa_message_next_part(BalsaMessage * bmessage)
     gtv = GTK_TREE_VIEW(bmessage->treeview);
     gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(gtv));
     select_part(bmessage, info);
+    g_object_unref(info);
 }
 
 gboolean
 balsa_message_has_next_part(BalsaMessage * bmessage)
 {
-    return bm_next_part_info(bmessage) != NULL;
+    BalsaPartInfo *info = bm_next_part_info(bmessage);
+
+    if (info) {
+        g_object_unref(info);
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 static BalsaPartInfo *
@@ -1563,7 +1525,6 @@ bm_previous_part_info(BalsaMessage * bmessage)
             gtk_tree_model_get(model, &sel.sel_iter, PART_INFO_COLUMN,
                                &info, -1);
         } while (!info);
-        g_object_unref(G_OBJECT(info));
         gtk_tree_path_free(path);
     }
             
@@ -1582,12 +1543,20 @@ balsa_message_previous_part(BalsaMessage * bmessage)
     gtv = GTK_TREE_VIEW(bmessage->treeview);
     gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(gtv));
     select_part(bmessage, info);
+    g_object_unref(info);
 }
 
 gboolean
 balsa_message_has_previous_part(BalsaMessage * bmessage)
 {
-    return bm_previous_part_info(bmessage) != NULL;
+    BalsaPartInfo *info = bm_previous_part_info(bmessage);
+
+    if (info) {
+        g_object_unref(info);
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 static LibBalsaMessageBody*
@@ -1666,11 +1635,11 @@ treeSearch_Func(GtkTreeModel * model, GtkTreePath *path,
 
     gtk_tree_model_get(model, iter, PART_INFO_COLUMN, &info, -1);
     if (info) {
-        if (info->body == search->body)
+        if (info->body == search->body) {
             search->info = info;
-        g_object_unref(G_OBJECT(info));
-        if (search->info)
             return TRUE;
+        } else
+            g_object_unref(info);
     }
 
     return FALSE;    
@@ -1697,9 +1666,10 @@ add_body(BalsaMessage *bm, LibBalsaMessageBody *body)
     if(body) {
         BalsaPartInfo *info = part_info_from_body(bm, body);
         
-        if (info)
+        if (info) {
 	    body = add_part(bm, info);
-        else
+            g_object_unref(info);
+        } else
 	    body = add_multipart(bm, body);
     }
 
@@ -1856,6 +1826,7 @@ hide_all_parts(BalsaMessage * bm)
 			       gtk_tree_hide_func, bm);
 	gtk_tree_selection_unselect_all(gtk_tree_view_get_selection
 					(GTK_TREE_VIEW(bm->treeview)));
+        g_object_unref(bm->current_part);
 	bm->current_part = NULL;
     }
 
@@ -1871,6 +1842,9 @@ static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     hide_all_parts(bm);
+
+    if (bm->current_part)
+        g_object_unref(bm->current_part);
 
     bm->current_part = part_info_from_body(bm, add_part(bm, info));
 
@@ -2738,15 +2712,12 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
     LibBalsaMessage * message;
     GtkTreeIter iter;
     BalsaPartInfo * info;
-    gboolean has_focus;
+    gboolean has_focus = bm->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
 
     g_return_if_fail(bm != NULL);
 
     message = bm->message;
     g_return_if_fail(message != NULL);
-
-    /* find out whether the content has the keyboard focus */
-    has_focus = bm_content_has_focus(bm);
 
     select_part(bm, NULL);
     balsa_message_clear_tree(bm);
@@ -2794,10 +2765,12 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
         tree_next_valid_part_info(gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
                                   &iter);
     select_part(bm, info);
+    if (info)
+        g_object_unref(info);
 
     /* restore keyboard focus to the content, if it was there before */
     if (has_focus)
-        bm_focus_on_first_child(bm);
+        balsa_message_grab_focus(bm);
 
     libbalsa_message_body_unref(message);
     g_object_unref(G_OBJECT(message));

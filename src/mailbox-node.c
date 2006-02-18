@@ -1081,6 +1081,14 @@ remove_special_mailbox_by_url(const gchar* url, LibBalsaMailbox *** special)
     return mailbox ? remove_mailbox_from_nodes(*mailbox) : NULL;
 }
 
+static gboolean
+mailbox_check_idle(LibBalsaMailbox * mailbox)
+{
+    libbalsa_mailbox_check(mailbox);
+    g_object_unref(mailbox);
+    return FALSE;
+}
+
 static BalsaMailboxNode *
 add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 		  const gchar * path, GType type)
@@ -1120,8 +1128,10 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 	    g_print(_("Local mailbox %s loaded as: %s\n"),
 		    mailbox->name,
 		    g_type_name(G_OBJECT_TYPE(mailbox)));
-	if (balsa_app.check_mail_upon_startup)
-	    libbalsa_mailbox_check(mailbox);
+	if (balsa_app.check_mail_upon_startup) {
+            g_object_ref(mailbox);
+            g_idle_add((GSourceFunc) mailbox_check_idle, mailbox);
+        }
     }
     g_free(url);
     /* no type checking, parent is NULL for root */

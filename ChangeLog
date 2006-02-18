@@ -1,3 +1,16 @@
+2006-02-17 21:26  PeterB
+
+	* src/: balsa-message.c, balsa-message.h,
+	balsa-mime-widget-callbacks.c, main-window.c, main-window.h:
+	one-key mail reading using space bar.
+	* src/main.c: drop gdk lock before syncing mailboxes.
+	* src/mailbox-node.c: check mailbox in an idle handler.
+	* src/balsa-index.c: use the gdk lock to control access to
+	LibBalsaMailbox::msg_tree.
+	* libbalsa/: libbalsa.c, libbalsa.h, mailbox.c, mailbox.h,
+	mailbox_imap.c, mailbox_local.c: use the gdk lock to control access
+	to LibBalsaMailbox::msg_tree.
+
 2006-02-15  Pawel Salek
 
 	* balsa.desktop.in: Terminal=0 -> Terminal=false

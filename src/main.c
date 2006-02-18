@@ -533,19 +533,14 @@ scan_mailboxes_idle_cb()
  * principle grow indefinetely. */
 static gboolean
 mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
-                    GtkTreeIter *iter)
+                    GtkTreeIter *iter, GSList ** list)
 {
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);
 
-    if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)) {
-        time_t tm = time(NULL);
-        if(tm-mbnode->last_use > balsa_app.expunge_timeout)
-            libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
-    }
-    g_object_unref(mbnode);
+    *list = g_slist_prepend(*list, mbnode);
 
     return FALSE;
 }
@@ -553,21 +548,35 @@ mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
 static gboolean
 periodic_expunge_cb(void)
 {
+    GSList *list = NULL, *l;
+
 #if !defined(ENABLE_TOUCH_UI)
     /* should we enforce expunging now and then? Perhaps not... */
     if(!balsa_app.expunge_auto) return TRUE;
 #endif
 
+    gdk_threads_enter();
     libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                          _("Compressing mail folders..."));
-    /* make sure it is shown before we continue */
-    gdk_threads_enter();
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc)mbnode_expunge_func,
-			   NULL);
+			   &list);
     gdk_threads_leave();
+
+    for (l = list; l; l = l->next) {
+        BalsaMailboxNode *mbnode = l->data;
+        if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)) {
+            time_t tm = time(NULL);
+            if (tm-mbnode->last_use > balsa_app.expunge_timeout)
+                libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
+        }
+        g_object_unref(mbnode);
+    }
+    g_slist_free(list);
+
     /* purge imap cache? leave 15MB */
     libbalsa_imap_purge_temp_dir(15*1024*1024);
+
     return TRUE; /* do it later as well */
 }
 

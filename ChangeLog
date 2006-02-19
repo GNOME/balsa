@@ -1,3 +1,9 @@
+2006-02-19 12:39  PeterB
+
+	* src/balsa-mblist.c, libbalsa/mailbox.c: show count of hidden
+	messages on status bar; show only non-zero counts.
+	* src/balsa-message.c: make sure widget can focus.
+
 2006-02-18 15:31  PeterB
 
 	* src/sendmsg-window.c, libbalsa/address-entry.c,

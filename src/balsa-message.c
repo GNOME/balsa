@@ -1915,6 +1915,8 @@ balsa_message_grab_focus(BalsaMessage * bmessage)
     g_return_val_if_fail(bmessage->current_part->mime_widget->widget != NULL,
                          FALSE);
 
+    GTK_WIDGET_FLAGS(bmessage->current_part->mime_widget->widget)
+        |= GTK_CAN_FOCUS;
     gtk_widget_grab_focus(bmessage->current_part->mime_widget->widget);
     return TRUE;
 }

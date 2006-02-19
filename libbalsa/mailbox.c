@@ -1198,6 +1198,7 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     gtk_tree_path_free(path);
 
     mailbox->msg_tree_changed = TRUE;
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
 
     lbm_threads_leave(mailbox);
 }
@@ -1367,6 +1368,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     mailbox->stamp++;
 
     mailbox->msg_tree_changed = TRUE;
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
 
     lbm_threads_leave(mailbox);
 }

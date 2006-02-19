@@ -2242,26 +2242,44 @@ balsa_mblist_mru_option_menu_get(GtkWidget * combo_box)
 void
 balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 {
-    guint total_messages = libbalsa_mailbox_total_messages(mailbox);
-    gchar *desc;
-    gchar *desc1, *desc2;
+    gint total_messages = libbalsa_mailbox_total_messages(mailbox);
+    gint unread_messages = mailbox->unread_messages;
+    gint hidden_messages;
+    GString *desc = g_string_new(NULL);
 
-    desc1 = g_strdup_printf(ngettext("Shown mailbox: %s with %d message, ",
-				     "Shown mailbox: %s with %d messages, ",
-				     total_messages),
-			    mailbox->name, total_messages);
-    /* xgettext: this is the second part of the message
-     * "Shown mailbox: %s with %d messages, %ld new". */
-    desc2 = g_strdup_printf(ngettext("%ld new", "%ld new",
-				     mailbox->unread_messages),
-			    mailbox->unread_messages);
-    desc = g_strconcat(desc1, desc2, NULL);
+    hidden_messages =
+        mailbox->msg_tree ? total_messages -
+        (g_node_n_nodes(mailbox->msg_tree, G_TRAVERSE_ALL) - 1) : 0;
 
-    gnome_appbar_set_default(balsa_app.appbar, desc);
+    /* xgettext: this is the first part of the message
+     * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
+    g_string_append_printf(desc, _("Shown mailbox: %s"), mailbox->name);
+    if (total_messages > 0) {
+        /* xgettext: this is the second part of the message
+         * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
+        g_string_append_printf(desc,
+                               ngettext(" with %d message",
+                                        " with %d messages",
+                                        total_messages), total_messages);
+        if (unread_messages > 0)
+            /* xgettext: this is the third part of the message
+             * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
+            g_string_append_printf(desc,
+                                   ngettext(", %d new", ", %d new",
+                                            unread_messages),
+                                   unread_messages);
+        if (hidden_messages > 0)
+            /* xgettext: this is the fourth part of the message
+             * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
+            g_string_append_printf(desc,
+                                   ngettext(", %d hidden", ", %d hidden",
+                                            hidden_messages),
+                                   hidden_messages);
+    }
 
-    g_free(desc);
-    g_free(desc1);
-    g_free(desc2);
+    gnome_appbar_set_default(balsa_app.appbar, desc->str);
+
+    g_string_free(desc, TRUE);
 }
 
 static void

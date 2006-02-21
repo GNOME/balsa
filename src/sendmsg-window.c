@@ -4104,8 +4104,8 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
     bsmsg->redo_widget = edit_menu[EDIT_MENU_REDO].widget;
 
     bsmsg->flow = balsa_app.wordwrap;
-    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_SELECTED].widget,
-                             bsmsg->flow);
+    bsmsg->flow_widget = edit_menu[EDIT_MENU_REFLOW_SELECTED].widget;
+    gtk_widget_set_sensitive(bsmsg->flow_widget, bsmsg->flow);
 
     model = sendmsg_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);
@@ -5743,8 +5743,7 @@ static void
 toggle_format_cb(GtkCheckMenuItem * check_menu_item, BalsaSendmsg * bsmsg)
 {
     bsmsg->flow = gtk_check_menu_item_get_active(check_menu_item);
-    gtk_widget_set_sensitive(edit_menu[EDIT_MENU_REFLOW_SELECTED].widget,
-                             bsmsg->flow);
+    gtk_widget_set_sensitive(bsmsg->flow_widget, bsmsg->flow);
 }
 
 #ifdef HAVE_GPGME

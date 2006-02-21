@@ -101,6 +101,7 @@ extern "C" {
         gulong identities_changed_id;
 	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
+	GtkWidget *flow_widget;
 	gboolean req_dispnotify; /* send a MDN */ 
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */

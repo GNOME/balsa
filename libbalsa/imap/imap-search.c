@@ -219,6 +219,8 @@ imap_write_key_string(ImapMboxHandle *handle, ImapSearchKey *k,
                       unsigned cmdno, int use_literal)
 {
   const char *s;
+
+  g_return_val_if_fail(handle->state != IMHS_DISCONNECTED, IMR_BAD);
   if(k->negated) sio_write(handle->sio, "Not ", 4);
   switch(k->d.string.hdr) {
   case IMSE_S_BCC:     s= "Bcc"; break;
@@ -320,6 +322,8 @@ imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s, unsigned cmdno,
                int use_literal)
 {
   ImapResponse rc;
+
+  g_return_val_if_fail(handle->state != IMHS_DISCONNECTED, IMR_BAD);
   while(s) {
     switch(s->type) {
     case IMSE_NOT:

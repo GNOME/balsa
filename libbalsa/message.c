@@ -83,7 +83,6 @@ libbalsa_message_get_type()
     return libbalsa_message_type;
 }
 
-int message_cnt = 0;
 static void
 libbalsa_message_init(LibBalsaMessage * message)
 {
@@ -103,7 +102,6 @@ libbalsa_message_init(LibBalsaMessage * message)
 #ifdef HAVE_GPGME
     message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
 #endif
-    /* printf("%p message created.\n", message); */ message_cnt++;
 }
 
 
@@ -180,7 +178,6 @@ libbalsa_message_finalize(GObject * object)
 	message->mime_msg = NULL;
     }
     G_OBJECT_CLASS(parent_class)->finalize(object);
-    /* printf("%p message finalized.\n", message); */  message_cnt--;
 }
 
 static void

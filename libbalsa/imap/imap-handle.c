@@ -276,6 +276,8 @@ idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
   ImapResponse rc;
   int retval;
   g_return_val_if_fail(h, FALSE);
+  if(h->state == IMHS_DISCONNECTED)
+    return FALSE;
   while( (retval = sio_poll(h->sio, TRUE, FALSE, TRUE)) != -1 &&
          (retval & SIO_READ) != 0) {
     if ( (rc=imap_cmd_step(h, 0)) == IMR_UNKNOWN ||
@@ -1422,6 +1424,7 @@ int
 imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len)
 {
   g_return_val_if_fail(conn, -1);
+  g_return_val_if_fail(conn->sio, -1);
 
   sio_write(conn->sio, buf, len); /* why it is void? */
   return 0;
@@ -1431,6 +1434,7 @@ void
 imap_handle_flush(ImapMboxHandle *handle)
 {
   g_return_if_fail(handle);
+  g_return_if_fail(handle->sio);
   sio_flush(handle->sio);
 }
 
@@ -1439,6 +1443,7 @@ imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz)
 {
   char* rc;
   g_return_val_if_fail(h, NULL);
+  g_return_val_if_fail(h->sio, NULL);
 
   rc = sio_gets(h->sio, buf, sz);
   if(rc == NULL)
@@ -1614,6 +1619,7 @@ ir_resp_text_code(ImapMboxHandle *h)
   int c = imap_get_atom(h->sio, buf, sizeof(buf));
   ImapResponse rc = IMR_OK;
 
+
   for(o=0; o<ELEMENTS(resp_text_code); o++)
     if(g_ascii_strcasecmp(buf, resp_text_code[o]) == 0) break;
 
@@ -1631,7 +1637,7 @@ ir_resp_text_code(ImapMboxHandle *h)
   case 10:imap_get_atom(h->sio, buf, sizeof(buf)); h->unseen =atoi(buf); break;
   default: while( (c=sio_getc(h->sio)) != EOF && c != ']') ; break;
   }
-  return rc;
+  return c != EOF ? rc : IMR_SEVERED;
 }
 static ImapResponse
 ir_ok(ImapMboxHandle *h)
@@ -3058,6 +3064,7 @@ ir_thread_sub(ImapMboxHandle *h, GNode *parent, int last)
   ImapResponse rc = IMR_OK;
 
   c = imap_get_atom(h->sio, buf, sizeof(buf));
+
   seqno = atoi(buf);
   if(seqno == 0 && c == '(') {
       while (c == '(') {
@@ -3066,6 +3073,7 @@ ir_thread_sub(ImapMboxHandle *h, GNode *parent, int last)
 	      return rc;
 	  }
 	  c=sio_getc(h->sio);
+          if(c<0) return IMR_SEVERED;
       }
       return rc;
   }

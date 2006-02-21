@@ -441,7 +441,6 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
 static LibBalsaMessage *lbm_mbox_message_new(GMimeMessage * mime_message,
 					     struct message_info
 					     *msg_info);
-extern int message_cnt;
 static void
 parse_mailbox(LibBalsaMailboxMbox * mbox)
 {
@@ -511,7 +510,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     }
 
     g_object_unref(gmime_parser);
-    printf("done, msgcnt=%d\n", message_cnt);
     lbm_mbox_save(mbox);
 }
 

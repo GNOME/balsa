@@ -1124,8 +1124,10 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
     sio_printf(h->sio, "%s THREAD %s UTF-8 ", tag, how);
     if(!filter)
       sio_write(h->sio, "ALL", 3);
-    else
-      imap_write_key(h, filter, cmdno, can_do_literals);
+    else {
+      if( (rc = imap_write_key(h, filter, cmdno, can_do_literals)) != IMR_OK)
+        return rc;
+    }
 
     sio_write(h->sio, "\r\n", 2);
     imap_handle_flush(h);
@@ -1270,8 +1272,10 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
                                     * low level manipulations here */
     if(!filter)
       sio_write(handle->sio, "ALL", 3);
-    else
-      imap_write_key(handle, filter, cmdno, can_do_literals);
+    else {
+      if( (rc=imap_write_key(handle, filter, cmdno, can_do_literals)) !=IMR_OK)
+        return rc;
+    }
     sio_write(handle->sio, "\r\n", 2);
     imap_handle_idle_enable(handle, 30);
     imap_handle_flush(handle);

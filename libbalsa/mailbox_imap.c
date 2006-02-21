@@ -2931,7 +2931,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
         GArray *uidmap = g_array_sized_new(FALSE, TRUE,
                                            sizeof(uint32_t), icm->exists);
         ImapSearchKey *k;
-        unsigned lo = icm->uidmap->len, hi = 0, i;
+        unsigned lo = icm->uidmap->len+1, hi = 0, i;
         printf("searching range [1:%u]\n", icm->uidmap->len);
         for(i=1; i<=icm->uidmap->len; i++)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {lo=i; break; }

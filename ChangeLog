@@ -1,3 +1,12 @@
+2006-02-15  Pawel Salek
+
+	* libbalsa/html.c: silence printf().
+	* libbalsa/{message,mailbox_mbox}.c: remove remains of msg counting.
+	* libbalsa/mailbox_imap.c: fix a crash in low index selection on
+	cache restore (spotted by PeterB).
+	* libbalsa/imap/imap-commands.c: check more return codes.
+	* libbalsa/imap/imap-{handle,search}.c: ditto.
+
 2006-02-21 10:53  PeterB
 
 	* src/balsa-mblist.c: hide title and make column natural size when

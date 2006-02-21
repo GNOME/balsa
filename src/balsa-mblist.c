@@ -267,6 +267,13 @@ bmbl_set_property(GObject * object, guint prop_id,
     case PROP_SHOW_CONTENT_INFO:
         display_info = g_value_get_boolean(value);
         mblist->display_info = display_info;
+        gtk_tree_view_set_headers_visible(tree_view, display_info);
+        column = gtk_tree_view_get_column(tree_view, 0);
+        gtk_tree_view_column_set_sizing(column,
+                                        display_info ?
+                                        GTK_TREE_VIEW_COLUMN_FIXED :
+                                        GTK_TREE_VIEW_COLUMN_GROW_ONLY);
+        gtk_tree_view_column_set_resizable(column, display_info);
         column = gtk_tree_view_get_column(tree_view, 1);
         gtk_tree_view_column_set_visible(column, display_info);
         column = gtk_tree_view_get_column(tree_view, 2);

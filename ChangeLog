@@ -1,5 +1,8 @@
-2006-02-25 12:47  PeterB
+2006-02-25 12:54  PeterB
 
+	* libbalsa/address-book-ldap.c, libbalsa/address-book.c,
+	src/address-book-config.c, src/pref-manager.c: give user control
+	over LibBalsaAddressBook::is_expensive.
 	* src/balsa-index.c: try to leave messages showing after changing
 	view filter.
 

@@ -36,7 +36,9 @@ struct _AddressBookConfig {
     GtkWidget *window;
 
     GtkWidget *name_entry;
-    GtkWidget *expand_aliases_button;
+    GtkWidget *as_i_type;
+    GtkWidget *on_request;
+    GtkWidget *never;
 
     GType type;
 
@@ -148,6 +150,52 @@ edit_book_response(GtkWidget * dialog, gint response,
     g_free(abc);
 }
 
+/* Radio buttons */
+static void
+add_radio_buttons(GtkWidget * table, gint row, AddressBookConfig * abc)
+{
+    GtkWidget *label;
+    GSList *radio_group;
+    GtkWidget *button;
+
+    label = gtk_label_new(_("Suggest complete addresses:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), label,
+                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+
+    abc->as_i_type =
+        gtk_radio_button_new_with_label(NULL, _("as I type"));
+    radio_group =
+        gtk_radio_button_get_group(GTK_RADIO_BUTTON(abc->as_i_type));
+    ++row;
+    gtk_table_attach(GTK_TABLE(table), abc->as_i_type,
+                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+
+    abc->on_request =
+        gtk_radio_button_new_with_label(radio_group,
+                                        _("when I hit the Escape key"));
+    radio_group =
+        gtk_radio_button_get_group(GTK_RADIO_BUTTON(abc->on_request));
+    ++row;
+    gtk_table_attach(GTK_TABLE(table), abc->on_request,
+                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+
+    abc->never =
+        gtk_radio_button_new_with_label(radio_group, _("never"));
+    ++row;
+    gtk_table_attach(GTK_TABLE(table), abc->never,
+                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+
+    button = abc->as_i_type;
+    if (abc->address_book) {
+        if (!abc->address_book->expand_aliases)
+            button = abc->never;
+        else if (abc->address_book->is_expensive)
+            button = abc->on_request;
+    }
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+}
+
 static GtkWidget *
 create_local_dialog(AddressBookConfig * abc)
 {
@@ -180,15 +228,14 @@ create_local_dialog(AddressBookConfig * abc)
                                     NULL);
     size_group = libbalsa_create_size_group(dialog);
 
-    table = libbalsa_create_table(2, 2);
+    table = libbalsa_create_table(5, 2);
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), table);
     label = libbalsa_create_label(_("A_ddress Book Name:"), table, 0);
     gtk_size_group_add_widget(size_group, label);
     abc->name_entry =
         libbalsa_create_entry(table, NULL, NULL, 0, name, label);
-    abc->expand_aliases_button =
-        libbalsa_create_check(_("_Expand aliases as you type"), table, 1,
-                     ab ? ab->expand_aliases : TRUE);
+
+    add_radio_buttons(table, 1, abc);
 
     if (ab) {
         const gchar *path = LIBBALSA_ADDRESS_BOOK_TEXT(ab)->path;
@@ -339,9 +386,7 @@ create_externq_dialog(AddressBookConfig * abc)
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
                                   abc->ab_specific.externq.save);
     
-    abc->expand_aliases_button =
-	libbalsa_create_check(_("_Expand aliases as you type"), table, 3,
-		     ab ? abc->address_book->expand_aliases : TRUE);
+    add_radio_buttons(table, 3, abc);
 
     if (ab) {
 #if GTK_CHECK_VERSION(2, 6, 0)
@@ -420,9 +465,7 @@ create_ldap_dialog(AddressBookConfig * abc)
 	libbalsa_create_check(_("Enable _TLS"), table, 6,
 		     ab ? ab->enable_tls : FALSE);
 
-    abc->expand_aliases_button =
-	libbalsa_create_check(_("_Expand aliases as you type"), table, 7,
-		     ab ? abc->address_book->expand_aliases : TRUE);
+    add_radio_buttons(table, 7, abc);
 
     gtk_widget_show(table);
 
@@ -456,9 +499,8 @@ create_gpe_dialog(AddressBookConfig * abc)
     abc->name_entry = libbalsa_create_entry(table, NULL, NULL, 0, 
 				   ab ? ab->name : _("GPE Address Book"), 
 				   label);
-    abc->expand_aliases_button =
-	libbalsa_create_check(_("_Expand aliases as you type"), table, 1,
-		     ab ? ab->expand_aliases : TRUE);
+
+    add_radio_buttons(table, 1, abc);
 
     dialog = create_generic_dialog(abc);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
@@ -667,12 +709,15 @@ create_book(AddressBookConfig * abc)
 #endif
     } else
         g_assert_not_reached();
+
     if (address_book) {
         address_book->expand_aliases =
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                         (abc->expand_aliases_button));
+            !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->never));
+        address_book->is_expensive =
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->on_request));
         abc->callback(address_book, TRUE);
     }
+
     return address_book != NULL;
 }
 
@@ -760,8 +805,10 @@ modify_book(AddressBookConfig * abc)
         g_assert_not_reached();
 
     address_book->expand_aliases =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                     (abc->expand_aliases_button));
+        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->never));
+    address_book->is_expensive =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->on_request));
+
     abc->callback(address_book, FALSE);
 }
 

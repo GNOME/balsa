@@ -1310,7 +1310,8 @@ update_address_books(void)
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            AB_TYPE_COLUMN, type,
                            AB_NAME_COLUMN, name,
-                           AB_XPND_COLUMN, address_book->expand_aliases,
+                           AB_XPND_COLUMN, (address_book->expand_aliases
+                                            && !address_book->is_expensive),
                            AB_DATA_COLUMN, address_book, -1);
 
         g_free(name);

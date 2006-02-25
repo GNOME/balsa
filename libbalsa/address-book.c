@@ -236,6 +236,9 @@ libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
     libbalsa_conf_push_group(group);
     LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->load_config(ab, group);
     libbalsa_conf_pop_group();
+
+    if (ab->is_expensive < 0)
+        ab->is_expensive = FALSE;
 }
 
 GList *
@@ -267,6 +270,7 @@ libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
     libbalsa_conf_set_string("Type", g_type_name(G_OBJECT_TYPE(ab)));
     libbalsa_conf_set_string("Name", ab->name);
     libbalsa_conf_set_bool("ExpandAliases", ab->expand_aliases);
+    libbalsa_conf_set_bool("IsExpensive", ab->is_expensive);
     libbalsa_conf_set_bool("DistListMode", ab->dist_list_mode);
 
     g_free(ab->config_prefix);
@@ -277,12 +281,22 @@ static void
 libbalsa_address_book_real_load_config(LibBalsaAddressBook * ab,
 				       const gchar * group)
 {
+    gboolean def;
+
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
     g_free(ab->config_prefix);
     ab->config_prefix = g_strdup(group);
 
     ab->expand_aliases = libbalsa_conf_get_bool("ExpandAliases=false");
+
+    ab->is_expensive =
+        libbalsa_conf_get_bool_with_default("IsExpensive", &def);
+    if (def)
+        /* Default will be supplied by the backend, or in
+         * libbalsa_address_book_load_config. */
+        ab->is_expensive = -1;
+
     ab->dist_list_mode = libbalsa_conf_get_bool("DistListMode=false");
 
     g_free(ab->name);

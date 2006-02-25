@@ -795,6 +795,9 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
 
     if (LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config)
 	LIBBALSA_ADDRESS_BOOK_CLASS(parent_class)->load_config(ab, prefix);
+
+    if (ab->is_expensive < 0)
+        ab->is_expensive = TRUE;
 }
 
 

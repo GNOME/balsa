@@ -2041,55 +2041,13 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
      * deselected the current message */
     if (bndx_find_message(index, NULL, &iter, index->current_message))
         bndx_expand_to_row_and_select(index, &iter);
-    else {
-        /* Collapse can leave the display empty: scroll to one of the
-         * messages that was previously visible. */
-        guint msgno = GPOINTER_TO_UINT(g_object_get_data
-                                       (G_OBJECT(index),
-                                        "balsa-index-scroll-msgno"));
-        GtkTreePath *path;
-        if (msgno 
-            && libbalsa_mailbox_msgno_find(index->mailbox_node->mailbox,
-                                           msgno, &path, NULL)) {
-            bndx_scroll_to_row(index, path);
-            gtk_tree_path_free(path);
-        }
-    }
-    g_object_set_data(G_OBJECT(index), "balsa-index-scroll-msgno", NULL);
+    else
+        balsa_index_ensure_visible(index);
 
     bndx_changed_find_row(index);
 }
 
 /* balsa_index_set_threading_type: public method. */
-static void
-bndx_save_scroll_path(BalsaIndex * index)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GdkRectangle rect;
-    GtkTreePath *path;
-
-    gtk_tree_view_get_visible_rect(tree_view, &rect);
-    rect.x += rect.width/2;
-    rect.y += rect.height/2;
-    gtk_tree_view_tree_to_widget_coords(tree_view, rect.x, rect.y,
-                                        &rect.x, &rect.y);
-
-    if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
-                                      NULL, NULL, NULL)) {
-        guint msgno;
-
-        GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-        GtkTreeIter iter;
-
-        gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_path_free(path);
-
-        gtk_tree_model_get(model, &iter, LB_MBOX_MSGNO_COL, &msgno, -1);
-        g_object_set_data(G_OBJECT(index), "balsa-index-scroll-msgno",
-                          GUINT_TO_POINTER(msgno));
-    }
-}
-
 void
 balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 {
@@ -2100,9 +2058,6 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     g_return_if_fail(index->mailbox_node != NULL);
     mailbox = index->mailbox_node->mailbox;
     g_return_if_fail(mailbox != NULL);
-
-    /* Save a message to scroll back to. */
-    bndx_save_scroll_path(index);
 
     if (thtype != LB_MAILBOX_THREADING_FLAT) 
         libbalsa_mailbox_prepare_threading(mailbox, NULL, 0);
@@ -2121,7 +2076,6 @@ balsa_index_set_view_filter(BalsaIndex * bindex, int filter_no,
                             LibBalsaCondition * filter)
 {
     LibBalsaMailbox *mailbox;
-    GtkTreePath *path;
 
     g_return_if_fail(BALSA_IS_INDEX(bindex));
     mailbox = bindex->mailbox_node->mailbox;
@@ -2131,27 +2085,7 @@ balsa_index_set_view_filter(BalsaIndex * bindex, int filter_no,
     bindex->filter_string = g_strdup(filter_string);
     libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
 
-    /* GtkTreeView can leave no messages showing after changing the view
-     * filter, even though the view does contain messages.  We scroll to
-     * either the current message, or the last message in the view, if
-     * any. */
-    path = NULL;
-    if (!bndx_find_message(bindex, &path, NULL, bindex->current_message)) {
-        GtkTreeModel *model =
-            gtk_tree_view_get_model(GTK_TREE_VIEW(bindex));
-        gint n_children = gtk_tree_model_iter_n_children(model, NULL);
-
-        if (n_children > 0) {
-            GtkTreeIter iter;
-            gtk_tree_model_iter_nth_child(model, &iter, NULL,
-                                          --n_children);
-            path = gtk_tree_model_get_path(model, &iter);
-        }
-    }
-    if (path) {
-        bndx_scroll_to_row(bindex, path);
-        gtk_tree_path_free(path);
-    }
+    balsa_index_ensure_visible(bindex);
 }
 
 /* Public method. */
@@ -2524,4 +2458,32 @@ balsa_index_pipe(BalsaIndex * index)
     g_signal_connect(dialog, "response", G_CALLBACK(bndx_pipe_response),
                      info);
     gtk_widget_show(dialog);
+}
+
+/* GtkTreeView can leave no messages showing after changing the view
+ * filter, even though the view does contain messages.  We scroll to
+ * either the current message, or the last message in the view, if
+ * any. */
+void
+balsa_index_ensure_visible(BalsaIndex * index) 
+{
+    GtkTreePath *path = NULL;
+
+    if (!bndx_find_message(index, &path, NULL, index->current_message)) {
+        GtkTreeModel *model =
+            gtk_tree_view_get_model(GTK_TREE_VIEW(index));
+        gint n_children = gtk_tree_model_iter_n_children(model, NULL);
+
+        if (n_children > 0) {
+            GtkTreeIter iter;
+            gtk_tree_model_iter_nth_child(model, &iter, NULL,
+                                          --n_children);
+            path = gtk_tree_model_get_path(model, &iter);
+        }
+    }
+
+    if (path) {
+        bndx_scroll_to_row(index, path);
+        gtk_tree_path_free(path);
+    }
 }

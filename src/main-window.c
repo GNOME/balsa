@@ -4211,6 +4211,7 @@ remove_duplicates_cb(GtkWidget * widget, gpointer data)
                               err->message);
             g_error_free(err);
         }
+        balsa_index_ensure_visible(BALSA_INDEX(index));
     }
 }
 
@@ -4580,6 +4581,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
 
     balsa_index_refresh_date(index);
     balsa_index_refresh_size(index);
+    balsa_index_ensure_visible(index);
 
 }
 

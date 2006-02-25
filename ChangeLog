@@ -1,5 +1,7 @@
-2006-02-25 12:58  PeterB
+2006-02-25 13:56  PeterB
 
+	* src/: balsa-index.c, balsa-index.h, main-window.c: implement
+	balsa_index_ensure_visible, and use it.
 	* src/main.c: set GNOME_PARAM_APP_DATADIR.
 	* libbalsa/address-book-ldap.c, libbalsa/address-book.c,
 	src/address-book-config.c, src/pref-manager.c: give user control

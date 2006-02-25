@@ -1,5 +1,6 @@
-2006-02-25 12:54  PeterB
+2006-02-25 12:58  PeterB
 
+	* src/main.c: set GNOME_PARAM_APP_DATADIR.
 	* libbalsa/address-book-ldap.c, libbalsa/address-book.c,
 	src/address-book-config.c, src/pref-manager.c: give user control
 	over LibBalsaAddressBook::is_expensive.

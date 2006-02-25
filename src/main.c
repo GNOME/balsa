@@ -291,6 +291,8 @@ balsa_init(int argc, char **argv)
     my_app = gnome_program_init(PACKAGE, VERSION,
                                 LIBGNOMEUI_MODULE, argc, argv,
                                 GNOME_PARAM_GOPTION_CONTEXT, option_context,
+                                GNOME_PARAM_APP_DATADIR,
+                                BALSA_STD_PREFIX "/share",
                                 GNOME_PARAM_NONE);
 
     if (remaining_args != NULL) {

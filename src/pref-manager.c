@@ -68,6 +68,9 @@
 #define BALSA_PAGE_SIZE_GROUP_KEY  "balsa-page-size-group"
 #define BALSA_TABLE_PAGE_KEY  "balsa-table-page"
 typedef struct _PropertyUI {
+    /* The page index: */
+    GtkWidget *view;
+
     GtkWidget *address_books;
 
     GtkWidget *mail_servers;
@@ -321,7 +324,7 @@ static gint pm_combo_box_get_level(GtkWidget * combo_box);
 static GtkWidget *create_action_after_move_menu(void);
 static GtkWidget *create_information_message_menu(void);
 static GtkWidget *create_mdn_reply_menu(void);
-static void balsa_help_pbox_display(gint page_num);
+static void balsa_help_pbox_display(void);
 
     /* updaters */
 static void set_prefs(void);
@@ -441,9 +444,11 @@ open_preferences_manager_idle(void)
 
 enum {
     PM_TEXT_COL,
+    PM_HELP_COL,
     PM_NOTEBOOK_COL,
     PM_CHILD_COL,
-    PM_PAGE_COL
+    PM_PAGE_COL,
+    PM_NUM_COLS
 };
 
 static void
@@ -512,13 +517,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     hbox = gtk_hbox_new(FALSE, 12);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(property_box)->vbox), hbox);
 
-    store = gtk_tree_store_new(4,
+    store = gtk_tree_store_new(PM_NUM_COLS,
                                G_TYPE_STRING,   /* PM_TEXT_COL     */
+                               G_TYPE_STRING,   /* PM_HELP_COL     */
                                GTK_TYPE_WIDGET, /* PM_NOTEBOOK_COL */
                                GTK_TYPE_WIDGET, /* PM_CHILD_COL    */
                                G_TYPE_INT       /* PM_PAGE_COL     */
             );
-    view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     gtk_container_add(GTK_CONTAINER(hbox), view);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
 
@@ -548,21 +554,21 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* Create the pages */
     pm_append_page(notebook, create_mail_options_page(store),
-                   _("Mail Options"), store, NULL);
+                   N_("Mail Options"), store, NULL);
     pm_append_page(notebook, create_display_page(store),
-                   _("Display Options"), store, NULL);
+                   N_("Display Options"), store, NULL);
     pm_append_page(notebook, create_address_book_page(store),
-                   _("Address Books"), store, NULL);
+                   N_("Address Books"), store, NULL);
 
 #if !HAVE_GTKSPELL
     pm_append_page(notebook, create_spelling_page(store),
-                   _("Spelling"), store, NULL);
+                   N_("Spelling"), store, NULL);
 #endif                          /* HAVE_GTKSPELL */
 
     pm_append_page(notebook, create_startup_page(store),
-                   _("Startup"), store, NULL);
+                   N_("Startup"), store, NULL);
     pm_append_page(notebook, create_misc_page(store),
-                   _("Miscellaneous"), store, NULL);
+                   N_("Miscellaneous"), store, NULL);
 
     gtk_tree_view_expand_all(GTK_TREE_VIEW(view));
 
@@ -749,15 +755,12 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 static void
 response_cb(GtkDialog * dialog, gint response, gpointer data)
 {
-    GtkNotebook *notebook;
-
     switch (response) {
     case GTK_RESPONSE_APPLY:
         apply_prefs(dialog);
         break;
     case GTK_RESPONSE_HELP:
-        notebook = g_object_get_data(G_OBJECT(dialog), "notebook");
-        balsa_help_pbox_display(gtk_notebook_get_current_page(notebook));
+        balsa_help_pbox_display();
         break;
     case GTK_RESPONSE_OK:
         apply_prefs(dialog);
@@ -3308,10 +3311,24 @@ refresh_preferences_manager(void)
 }
 
 static void
-balsa_help_pbox_display(gint page_num)
+balsa_help_pbox_display(void)
 {
-    gchar *link_id = g_strdup_printf("preferences-%d", page_num);
+    GtkTreeSelection *selection;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    gchar *text, *p;
+    gchar *link_id;
     GError *err = NULL;
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
+    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+        return;
+
+    gtk_tree_model_get(model, &iter, PM_HELP_COL, &text, -1);
+    for (p = text; *p; p++)
+        *p = (*p == ' ') ? '-' : g_ascii_tolower(*p);
+    link_id = g_strconcat("preferences-", text, NULL);
+    g_free(text);
 
     gnome_help_display("balsa", link_id, &err);
     if (err) {
@@ -3520,7 +3537,8 @@ pm_append_page(GtkWidget * notebook, GtkWidget * widget,
     } else
         gtk_tree_store_append(store, &iter, parent_iter);
     gtk_tree_store_set(store, &iter,
-                       PM_TEXT_COL, text,
+                       PM_TEXT_COL, _(text),
+                       PM_HELP_COL, text,
                        PM_NOTEBOOK_COL, notebook,
                        PM_PAGE_COL, page,
                        -1);

@@ -28,7 +28,7 @@ The stuff that should always be in separate sections is:
 - main window     (win-main)
 - compose window  (win-composer)
 - message window  (win-message).
-- each page of the preferences. (win-config-{1,2,3,...}
+- each page of the preferences. (preferences-[page-title])
   (when editing/correcting the source, emphasize the page title).
 - mailbox configuration. (folder-config)
 - toolbar customization (toolbars).
@@ -57,7 +57,7 @@ General advices:
 <title>Balsa User's Guide</title>
 
 <copyright>
-  <year>1997-2005</year>
+  <year>1997-2006</year>
   <holder>Stuart Parmenter and others, see AUTHORS for a list of people
   </holder>
 </copyright>
@@ -92,10 +92,10 @@ General advices:
 </legalnotice>
 
 <releaseinfo> 
-This is version 2.720 of the &Balsa; manual.
+This is version 2.721 of the &Balsa; manual.
 </releaseinfo>
 
-<revhistory><revision><date>9 September 2005</date></revision></revhistory>
+<revhistory><revision><date>26 February 2006</date></revision></revhistory>
 
 </articleinfo>
 
@@ -168,7 +168,7 @@ This is version 2.720 of the &Balsa; manual.
   &Balsa;'s basic settings. &Balsa; can guess most of what it needs to
   know about you. It will also create five standard local mailboxes:
   the Inbox, Outbox, Sentbox, Draftbox, and Trash. (These can be
-  changed to be &IMAP; or &POP3; mailboxes later.)
+  changed to be &IMAP; mailboxes later.)
 </para>
 
 <figure>
@@ -227,14 +227,13 @@ This is version 2.720 of the &Balsa; manual.
   This displays all the mailboxes
   &Balsa; knows about; it will scan for ones in your local mail
   directory. (This means &Balsa; works well with &procmail;.)  It will
-  also list &IMAP; or &POP3; mailboxes that you have configured.  If
+  also list &IMAP; mailboxes that you have configured.  If
   the <guilabel>Show Mailbox Info</guilabel> preference is set,
   two columns will also be
   displayed next to the mailbox names containing the number of unread
   and total messages in each mailbox that has unread messages.  (The
   other mailboxes will not have their contents probed.) Also, any
-  mailboxes that contain unread messages will be shown in a different
-  font and colour.
+  mailboxes that contain unread messages will be shown in a bold font.
 </para>
 
 <para>
@@ -1734,7 +1733,7 @@ This is version 2.720 of the &Balsa; manual.
       legal to be sent (i.e. proper email addresses).  This button may
       also be configured to queue the message in the outbox to be sent
       later (see the
-      <link linkend="mail-options-outgoing">Preferences</link> dialog).
+      <link linkend="preferences-outgoing">Preferences</link> dialog).
     </para>
   </listitem>
 </varlistentry>
@@ -1766,7 +1765,7 @@ This is version 2.720 of the &Balsa; manual.
       use either the standard <application>ispell</application> or the
       newer <application>aspell</application> to do the
       spell checking.  Settings for this can be found in the <link
-      linkend="preferences-4">Preferences</link> dialog.
+      linkend="preferences-spelling">Preferences</link> dialog.
     </para>
   </listitem>
 </varlistentry>
@@ -1910,7 +1909,7 @@ This is version 2.720 of the &Balsa; manual.
 	
 <para>
   &Balsa; supports many different methods of selecting email addresss.
-  All of the headers that can contain addresses have a small coloured
+  All of the headers that can contain addresses have a small colored
   book to the right of them that will open up &Balsa;'s
   address book. 
 </para>
@@ -1985,7 +1984,7 @@ This is version 2.720 of the &Balsa; manual.
 <para>
   If the message is a reply or forward, the referenced message will be
   displayed in the body text widget, with the prefix specified in the
-  <link linkend="preferences-2">Preferences</link> dialog.
+  <link linkend="preferences-outgoing">Preferences</link> dialog.
 </para>
 </sect2>
 
@@ -2018,7 +2017,7 @@ This is version 2.720 of the &Balsa; manual.
   the left is re-generated for each incorrect word, with all the
   suggestions the spell check program comes up with.  You can choose
   what program you want to use through loadable modules, selectable in
-  the <link linkend="preferences-4">Preferences</link> dialog.  The
+  the <link linkend="preferences-spelling">Preferences</link> dialog.  The
   entry box above the list is what will be used to replace the current
   word, and usually reflects the current selection in the list, but
   can be edited by hand if you wish to make manual changes.
@@ -2108,7 +2107,7 @@ This is version 2.720 of the &Balsa; manual.
 <title>Address Book</title>
 
 <para>
-   When composing a message, clicking on any of the coloured book
+   When composing a message, clicking on any of the colored book
    icons next to a destination field (To, Cc, Bcc) will bring up the
    &Balsa; address book.  It helps you to select recipients for your
    messages quickly and easily.
@@ -2240,11 +2239,16 @@ This is version 2.720 of the &Balsa; manual.
 <para>
   &Balsa; has many more options than the initial <glossterm
   linkend="glossary-druid">Druid</glossterm> reveals.  To access the
-  configuration window, select <menuchoice><guimenu>Settings</guimenu>
-  <guimenuitem>Preferences</guimenuitem></menuchoice>. You will see a
-  notebook. The tabs and options are explained below.
+  Preferences window, select
+  <menuchoice>
+      <guimenu>Settings</guimenu> <guimenuitem>Preferences</guimenuitem>
+  </menuchoice>.
+  In the Preferences window, options are organized into groups,
+  and related groups are shown on individual pages.
+  The pages and groups are explained below.
 </para>
 
+<!--
 <figure>
   <title>Preferences Window</title>
   <screenshot>
@@ -2255,12 +2259,13 @@ This is version 2.720 of the &Balsa; manual.
 	  </mediaobject>
   </screenshot>
 </figure>
+-->
 </sect1>
 
 <!-- ################################################################# -->
 <!--                 SUBSECTION: PREFERENCES/MAIL SERVERS              -->
 <!-- ################################################################# -->
-<sect1 id="preferences-0">
+<sect1 id="preferences-mail-options">
 <title>Mail Servers</title>
 
 <para>
@@ -2385,148 +2390,19 @@ This is version 2.720 of the &Balsa; manual.
 
 </variablelist>
 </sect1>
-
-<!-- ################################################################# -->
-<!--                 SUBSECTION: PREFERENCES/ADDRESS BOOKS             -->
-<!-- ################################################################# -->
-<sect1 id="preferences-1">
-<title>Address Books</title>
-
-<para>
-  &Balsa; supports the use of multiple address books, both local
-  <glossterm linkend="glossary-vcard">VCARD</glossterm> and remote
-  &LDAP; address books, both of which can be configured here.
-  &GnomeCard; also uses VCARD address books, so this allows &Balsa; to
-  share address books with other GNOME applications.
-</para>
-
-<para>
-  The main portion of the preferences page is occupied by the list of
-  current address books for &Balsa;.  The list shows the type of
-  address book, the name, and whether it is included in automatic
-  alias expansion when typing new messages.  There are also several
-  buttons that manipulate the list of address books:
-</para>
-
-<variablelist>
-<varlistentry>
-  <term><guibutton>Add</guibutton></term>
-  <listitem>
-    <para>Using this adds a new address book for &Balsa; to use to
-    find addresses.  It brings up a series of dialog boxes that step
-    through the process of adding a new address book.</para>
-
-    <figure>
-      <title>Add Address Book Dialog (Step 1)</title>
-      <screenshot>
-	  <mediaobject> 
-	    <imageobject><imagedata
-		fileref="figures/address-book-start.png" format="PNG"/> 
-	    </imageobject>
-	  </mediaobject>
-      </screenshot>
-    </figure>
-
-    <para>If &Balsa; was not compiled with <acronym>LDAP</acronym>
-    support it will not let you choose <acronym>LDAP</acronym> as an
-    addressbook type.  Once the type of address book is selected you
-    must specify the name and location of the address book.</para>
-
-    <figure>
-      <title><acronym>VCARD</acronym> Address Book Dialog
-      (Step 2)</title>
-      <screenshot>
-	  <mediaobject> 
-	    <imageobject><imagedata
-		fileref="figures/address-book-vcard.png" format="PNG"/> 
-	    </imageobject>
-	  </mediaobject>
-      </screenshot>
-    </figure>
-
-    <para>With &LDAP; support, the dialog looks somewhat different,
-    offering options to set the location of the directory instead of a
-    file.</para>
-
-    <figure>
-      <title>&LDAP; Address Book Dialog (Step 2)</title>
-      <screenshot>
-	  <mediaobject> 
-	    <imageobject><imagedata
-		fileref="figures/address-book-ldap.png" format="PNG"/> 
-	    </imageobject>
-	  </mediaobject>
-      </screenshot>
-    </figure>
-
-    <para>In order to use a <acronym>LDAP</acronym> address book, you
-    need to know the host name of the <acronym>LDAP</acronym>
-    server. Depending on the server configuration, you may need also
-    so called Base Domain Name which identifies your particular
-    department. You can always try leaving Base Domain Name field
-    empty and a default value will be used (OpenLDAP stores the
-    default Base Domain Name in
-    <filename>/etc/openldap/ldap.conf</filename>). If this does not
-    work, you may need to ask your administrator for the value of
-    this. The usual values are usually similar to:
-    <quote>dc=theochem,dc=KTH,dc=se</quote> or <quote>o=Theoretical
-    Chemistry, c=SE</quote>.</para>
-
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guibutton>Modify</guibutton></term>
-  <listitem>
-    <para>This enables you to change the properties of the selected
-    address book.</para>
-
-    <figure>
-      <title>Modify an Address Book</title>
-      <screenshot>
-	  <mediaobject> 
-	    <imageobject><imagedata
-		fileref="figures/address-book-modify.png" format="PNG"/> 
-	    </imageobject>
-	  </mediaobject>
-      </screenshot>
-    </figure>
-
-    <para>It is possible to modify both the name and location for any
-    address book.  Also, you can change whether the contents of the
-    address book will be used when attempting to auto-complete an
-    address when sending a message.</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guibutton>Delete</guibutton></term>
-  <listitem>
-    <para>Delete the selected address book.</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guibutton>Set as Default</guibutton></term>
-  <listitem>
-    <para>Set the selected mailbox as default.</para>
-  </listitem>
-</varlistentry>
-</variablelist>
-</sect1>
     
 <!-- ################################################################# -->
 <!--                 SUBSECTION: PREFERENCES/MAIL OPTIONS              -->
 <!-- ################################################################# -->
-<sect1 id="preferences-2">
-<title>Mail Options</title>
+<sect1 id="preferences-incoming-and-outgoing-mail">
+<title>Incoming and Outgoing Mail</title>
 
 <para>
   Use this page to set the &Balsa;'s behaviour regarding incoming and
   outgoing messages.
 </para>
 
-<sect2>
+<sect2 id="preferences-incoming">
 <title>Incoming</title>
 	
   <variablelist>
@@ -2570,26 +2446,6 @@ This is version 2.720 of the &Balsa; manual.
     </listitem>
   </varlistentry>
 
-  <varlistentry>
-    <term><guilabel>Quoted Text Regular Expression</guilabel></term>
-
-    <listitem>
-      <para>The entry box allows you to set a <glossterm
-        linkend="glossary-regular-expression">regular
-        expression</glossterm> you would like to use to identify text
-        that should be considered quoted for incoming messages.  The
-        regular expression should match the beginning of line of
-        quoted text a single level deep, the program will then use
-        this to calculate the depth of quoting and alter the quoted
-        text colours appropriately.  A default <abbrev>regexp</abbrev>
-        is provided that should work in most situations.  </para>
-
-      <para>This regexp affects both highlighting and spell checking,
-	and uses the extended regular expression set.  For more
-	information see the <command>grep</command>(1) manual or info
-	page.</para>
-    </listitem>
-  </varlistentry>
 
   <varlistentry>
     <term><guilabel>Wrap Incoming Text</guilabel></term>
@@ -2650,8 +2506,8 @@ This is version 2.720 of the &Balsa; manual.
 <!-- ################################################################# -->
 <!--             SUBSECTION: PREFERENCES/MAIL OPTIONS/OUTGOING         -->
 <!-- ################################################################# -->
-<sect2 id="mail-options-outgoing">
-<title>Outgoing</title>
+<sect2 id="preferences-outgoing">
+<title>Outgoing</title>"mail-options-outgoing
 
 <variablelist>
   <varlistentry>
@@ -2781,11 +2637,13 @@ This is version 2.720 of the &Balsa; manual.
 <!-- ################################################################# -->
 <!--                 SUBSECTION: PREFERENCES/DISPLAY                   -->
 <!-- ################################################################# -->
-<sect1 id="preferences-3">
-<title>Display</title>
+<sect1 id="preferences-display-options">
+<title>Display Options</title>
       
 <para>This page controls how &Balsa; appears to you.</para>
       
+<sect2>
+<title>Main Window</title>
 <variablelist>
   <varlistentry>
     <term><guilabel>Use Preview Pane</guilabel></term>
@@ -2800,32 +2658,180 @@ This is version 2.720 of the &Balsa; manual.
     <listitem>
       <para>This will allow the number of total and unread messages
       for each mailbox to be shown in the left pane of the &Balsa;
-      main window.</para>
+      main window. You can save space by not showing them; if you choose
+  not to show them, &Balsa; will then show the number of unread
+  messages (in parentheses) after the mailbox name.</para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term><guilabel>Toolbars</guilabel></term>
+    <term><guilabel>Alternative Layout</guilabel></term>
     <listitem>
-      <para>Use this to determine whether &Balsa;'s toolbars display
-      only text, only icons, or both text and icons.</para>
+        <para>
+            &Balsa;'s default layout has a full-height mailbox list on
+            the left, and the message list above the preview pane on the
+            right. You can choose an alternative layout, in which the
+            mailbox list and the message list occupy the upper part of
+            the window, and the preview pane is full-width below them.
+        </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term><guilabel>Display Progress</guilabel></term>
+    <term><guilabel>Automatic View</guilabel></term>
     <listitem>
-      <para>
-        This sets the behaviour of the dialog that is shown when
-        &Balsa; retrieves messages from it's specified &POP3; servers.
-        The dialog can be shown only while the messages are being
-        retrieved, automatically closing after &Balsa; is finished.
-        Or it can be set to stay active until manually closed.
-        Finally, the dialog can not be displayed at all.
+        <para>
+            Select this option if you want &Balsa; to open the first
+            unread message when you open a mailbox. If no message is
+            unread, &Balsa; opens the most recent message.
+        </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Page Up and Page Down</guilabel></term>
+    <listitem>
+        <para>
+            By default, the <keysym>Page Up</keysym> and
+            <keysym>Page Down</keysym> keys scroll the message by whole
+            pages. Use this option to choose a different amount.
+        </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+</sect2>
+
+<sect2>
+<title>Message Window</title>
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Moving a Message</guilabel></term>
+    <listitem>
+        <para>
+            If you are reading a message in its own message window and
+            you move it (to the trash, or another mailbox), &Balsa;
+            can move on the next unread message or the next message in
+            the same mailbox, or simply close the window.
+        </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</sect2>
+
+<sect2 id="preferences-sort-and-thread">
+<title>Sort and Thread</title>
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Default sort column</guilabel></term>
+    <listitem>
+        <para>
+            Choose the column by which you would like a new mailbox to
+            be sorted.
       </para>
     </listitem>
   </varlistentry>
+  <varlistentry>
+    <term><guilabel>Default threading style</guilabel></term>
+    <listitem>
+        <para>
+            Choose the default threading style for a new mailbox.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><guilabel>Expand threads</guilabel></term>
+    <listitem>
+        <para>
+            If you choose a threaded view of a mailbox, you can decide
+            whether the threads should be expanded or collapsed when the
+            mailbox is opened.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</sect2>
 
+<sect2 id="preferences-message">
+<title>Message</title>
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Fonts</guilabel></term>
+    <listitem>
+        <para>
+            Choose the fonts that you want to be used to display a
+            message. You can choose a distinct font for the message's
+            subject line.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><guilabel>Quoted Text Regular Expression</guilabel></term>
+
+    <listitem>
+      <para>The entry box allows you to set a <glossterm
+        linkend="glossary-regular-expression">regular
+        expression</glossterm> you would like to use to identify text
+        that should be considered quoted for incoming messages.  The
+        regular expression should match the beginning of line of
+        quoted text a single level deep, the program will then use
+        this to calculate the depth of quoting and alter the quoted
+        text colors appropriately.  A default <abbrev>regexp</abbrev>
+        is provided that should work in most situations.  </para>
+
+      <para>This regexp affects both highlighting and spell checking,
+	and uses the extended regular expression set.  For more
+	information see the <command>grep</command>(1) manual or info
+	page.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><guilabel>Alternative Parts</guilabel></term>
+    <listitem>
+        <para>
+            You can choose whether &Balsa; should show a text/plain part
+            or a text/html part, when a message contains both.
+        </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</sect2>
+
+<sect2 id="preferences-colors">
+<title>Colors</title>
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Message Colors</guilabel></term>
+    <listitem>
+        <para>
+            Choose the colors for quoted text.
+        </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><guilabel>Link Color</guilabel></term>
+    <listitem>
+        <para>
+            &Balsa; uses this color to highlight a hyperlink in a message.
+        </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><guilabel>Composition Window</guilabel></term>
+    <listitem>
+        <para>
+            When you are composing a message, &Balsa; uses color to
+            show when one of the address fields is incomplete.
+            Choose that color here.
+        </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</sect2>
+
+<sect2 id="preferences-format">
+<title>Format</title>
+<variablelist>
   <varlistentry>
     <term><guilabel>Date Encoding</guilabel></term> 
     <listitem>
@@ -2882,32 +2888,80 @@ This is version 2.720 of the &Balsa; manual.
 	<para>See the <function>strftime</function> manual page for a
 	  full listing of conversion specifiers.</para>
       </tip>
+  </para>
 
-      </para>
     </listitem>
   </varlistentry>
-	
+
   <varlistentry>
-    <term><guilabel>Displayed Headers</guilabel></term>
+    <term><guilabel>Selected Headers</guilabel></term>
     <listitem>
     <para>A space-separated list of the headers to display in the
       message window.</para>
     </listitem>
   </varlistentry>
-	
+
+  <varlistentry>
+    <term><guilabel>Fallback codeset</guilabel></term>
+    <listitem>
+        <para>
+            Some messages contain national characters without
+            specifying how they are encoded. You can choose whether
+            &Balsa; displays such characters as '?', or tries a
+            specific character set to display such messages.
+    </para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>
+</sect2>
+
+<sect2 id="preferences-status-messages">
+<title>Status Messages</title>
+<variablelist>
+  <varlistentry>
+    <term><guilabel>Information Messages</guilabel></term>
+    <listitem>
+      <para>
+          &Balsa; gives you information in the form of five different
+          levels of messages. You can specify how you want all five
+          levels to be presented to you.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><guilabel>Display Progress</guilabel></term>
+    <listitem>
+      <para>
+        This sets the behaviour of the dialog that is shown when
+        &Balsa; retrieves messages from it's specified &POP3; servers.
+        The dialog can be shown only while the messages are being
+        retrieved, automatically closing after &Balsa; is finished.
+        Or it can be set to stay active until manually closed.
+        Finally, the dialog can not be displayed at all.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</sect2>
+
 </sect1>
 
 <!-- ################################################################# -->
 <!--                 SUBSECTION: PREFERENCES/SPELLING                  -->
 <!-- ################################################################# -->
-<sect1 id="preferences-4">
+<sect1 id="preferences-spelling">
 <title>Spelling</title>
+<para>
+    If &Balsa; is using GtkSpell, you can choose to have your spelling
+    checked as you type. &Balsa; uses GtkSpell's default settings.
+</para>
 
 <para>
-  The pane to setup &Balsa; spell check options.  &Balsa; uses the
+    If &Balsa; is not using GtkSpell, you can use
+  this pane to setup &Balsa; spell check options.  &Balsa; uses the
   Portable Spell Checking library (<ulink
-  url="http://pspell.sourceforge.net">pspell</ulink>) to do provide an
+  url="http://pspell.sourceforge.net">pspell</ulink>) to provide an
   interface to the spell checking program of your choice.  Currently
   there are modules for ispell or aspell, both of which can be found
   at the pspell website.  For more information visit the &Balsa;
@@ -2998,19 +3052,201 @@ This is version 2.720 of the &Balsa; manual.
 </sect1>
 
 <!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/ADDRESS BOOKS             -->
+<!-- ################################################################# -->
+<sect1 id="preferences-address-books">
+<title>Address Books</title>
+
+<para>
+  &Balsa; supports the use of multiple address books, both local
+  <glossterm linkend="glossary-vcard">VCARD</glossterm> and remote
+  &LDAP; address books, both of which can be configured here.
+  &GnomeCard; also uses VCARD address books, so this allows &Balsa; to
+  share address books with other GNOME applications.
+</para>
+
+<para>
+  The main portion of the preferences page is occupied by the list of
+  current address books for &Balsa;.  The list shows the type of
+  address book, the name, and whether it is included in automatic
+  alias expansion when typing new messages.  There are also several
+  buttons that manipulate the list of address books:
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><guibutton>Add</guibutton></term>
+  <listitem>
+    <para>Using this adds a new address book for &Balsa; to use to
+    find addresses.  It brings up a series of dialog boxes that step
+    through the process of adding a new address book.</para>
+
+    <figure>
+      <title>Add Address Book Dialog (Step 1)</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-start.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>If &Balsa; was not compiled with <acronym>LDAP</acronym>
+    support it will not let you choose <acronym>LDAP</acronym> as an
+    addressbook type.  Once the type of address book is selected you
+    must specify the name and location of the address book.</para>
+
+    <figure>
+      <title><acronym>VCARD</acronym> Address Book Dialog
+      (Step 2)</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-vcard.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>With &LDAP; support, the dialog looks somewhat different,
+    offering options to set the location of the directory instead of a
+    file.</para>
+
+    <figure>
+      <title>&LDAP; Address Book Dialog (Step 2)</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-ldap.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>In order to use a <acronym>LDAP</acronym> address book, you
+    need to know the host name of the <acronym>LDAP</acronym>
+    server. Depending on the server configuration, you may need also
+    so called Base Domain Name which identifies your particular
+    department. You can always try leaving Base Domain Name field
+    empty and a default value will be used (OpenLDAP stores the
+    default Base Domain Name in
+    <filename>/etc/openldap/ldap.conf</filename>). If this does not
+    work, you may need to ask your administrator for the value of
+    this. The usual values are usually similar to:
+    <quote>dc=theochem,dc=KTH,dc=se</quote> or <quote>o=Theoretical
+    Chemistry, c=SE</quote>.</para>
+
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Modify</guibutton></term>
+  <listitem>
+    <para>This enables you to change the properties of the selected
+    address book.</para>
+
+    <figure>
+      <title>Modify an Address Book</title>
+      <screenshot>
+	  <mediaobject> 
+	    <imageobject><imagedata
+		fileref="figures/address-book-modify.png" format="PNG"/> 
+	    </imageobject>
+	  </mediaobject>
+      </screenshot>
+    </figure>
+
+    <para>It is possible to modify both the name and location for any
+    address book.  Also, you can change whether the contents of the
+    address book will be used when attempting to auto-complete an
+    address when sending a message.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Delete</guibutton></term>
+  <listitem>
+    <para>Delete the selected address book.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guibutton>Set as Default</guibutton></term>
+  <listitem>
+    <para>Set the selected address book as default.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<!-- ################################################################# -->
+<!--                 SUBSECTION: PREFERENCES/STARTUP                   -->
+<!-- ################################################################# -->
+<sect1 id="preferences-startup">
+<title>Startup</title>
+
+<variablelist>
+<varlistentry>
+  <term><guilabel>Open Inbox upon Startup</guilabel></term>
+  <listitem>
+    <para>If set, &Balsa; will open your system inbox upon startup.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Check Mail at Startup</guilabel></term>
+  <listitem>
+    <para>If set, &Balsa; will automatically attempt to download mail
+      from the &POP3; mail server upon startup, and will check for new
+      mail on an &IMAP; server.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Remember Open Mailboxes Between
+      Sessions</guilabel></term>
+  <listitem>
+    <para>When marked, &Balsa; will remember and reopen mailboxes that
+      were open when &Balsa; was last quit.</para>
+  </listitem>
+</varlistentry>
+
+<varlistentry>
+  <term><guilabel>Folder Scanning</guilabel></term>
+  <listitem>
+    <para>Scanning a folder tree can be time-consuming, because of the
+    need to explore an entire tree of subfolders. You can defer scanning
+    the tree by setting the scan depth to 1. &Balsa; will then descend
+    into the tree only far enough to discover whether any folders that
+    you can see have subfolders. The first time you expand any subtree,
+    &Balsa; will explore more of the tree.</para>
+    <para> If you prefer to have the whole tree available from startup,
+    choose a depth as great as that of your folder tree.
+    Intermediate settings may also be used.</para>
+    <para>You may set the depth for initial scanning separately for
+    local and &IMAP; trees.</para>
+  </listitem>
+</varlistentry>
+
+</variablelist>
+</sect1>
+
+<!-- ################################################################# -->
 <!--                 SUBSECTION: PREFERENCES/MISC                      -->
 <!-- ################################################################# -->
 
-<sect1 id="preferences-5">
-<title>Misc</title>
+<sect1 id="preferences-miscellaneous">
+<title>Miscellaneous</title>
       
 <variablelist>
 <varlistentry>
   <term><guilabel>Debug</guilabel></term>
   <listitem>
     <para>Toggle the output of debugging information.  Depending on
-    what notification priority set for it in the <link
-    linkend="preferences-3">Display</link> page, it can show up in
+        what notification priority set for it in the
+        <link linkend="preferences-display-options">Display</link> page,
+    it can show up in
     list or dialog as the program runs.
     </para>
   </listitem>
@@ -3070,58 +3306,6 @@ This is version 2.720 of the &Balsa; manual.
 	  mailbox is closed (all mailboxes are closed when you exit
 	  &Balsa;).
       </para>
-  </listitem>
-</varlistentry>
-
-</variablelist>
-</sect1>
-
-<!-- ################################################################# -->
-<!--                 SUBSECTION: PREFERENCES/STARTUP                   -->
-<!-- ################################################################# -->
-<sect1 id="preferences-6">
-<title>Startup</title>
-
-<variablelist>
-<varlistentry>
-  <term><guilabel>Open Inbox upon Startup</guilabel></term>
-  <listitem>
-    <para>If set, &Balsa; will open your system inbox upon startup.</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guilabel>Check Mail at Startup</guilabel></term>
-  <listitem>
-    <para>If set, &Balsa; will automatically attempt to download mail
-      from the &POP3; mail server upon startup, and will check for new
-      mail on an &IMAP; server.</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guilabel>Remember Open Mailboxes Between
-      Sessions</guilabel></term>
-  <listitem>
-    <para>When marked, &Balsa; will remember and reopen mailboxes that
-      were open when &Balsa; was last quit.</para>
-  </listitem>
-</varlistentry>
-
-<varlistentry>
-  <term><guilabel>Folder Scanning</guilabel></term>
-  <listitem>
-    <para>Scanning a folder tree can be time-consuming, because of the
-    need to explore an entire tree of subfolders. You can defer scanning
-    the tree by setting the scan depth to 1. &Balsa; will then descend
-    into the tree only far enough to discover whether any folders that
-    you can see have subfolders. The first time you expand any subtree,
-    &Balsa; will explore more of the tree.</para>
-    <para> If you prefer to have the whole tree available from startup,
-    choose a depth as great as that of your folder tree.
-    Intermediate settings may also be used.</para>
-    <para>You may set the depth for initial scanning separately for
-    local and &IMAP; trees.</para>
   </listitem>
 </varlistentry>
 
@@ -3483,9 +3667,9 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <para>
         The domain that you wish to append to all e-mail entries where
         you did not specify the domain.  Normally you would use your
-        local domain.  You need to enable <link
-        linkend="preferences-1">Alias Expansion</link> for this to
-        work.  
+        local domain.  You need to enable
+        <link linkend="preferences-address-books">Alias Expansion</link>
+        for this to work.  
       </para>
     </listitem>
   </varlistentry>
@@ -3720,7 +3904,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 		      (or before) the current message.
 		      Then you can use
 		      <menuchoice>
-			  <shortcut><keysym>Ctrl-G</keysym></shortcut>
+                          <shortcut><keycombo><keysym>Ctrl</keysym><keysym>G</keysym></keycombo></shortcut>
 			  <guimenu>Edit</guimenu>
 			  <guimenuitem>Find Next</guimenuitem>
 		      </menuchoice>
@@ -4246,15 +4430,21 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 <sect2 id="ct-alias-expansion">
   <title>I want Balsa to guess my friends</title>
 
-  <para>&Balsa; can expand the names of your contacts it finds in
-      &Balsa;
-  addressbooks.  It will do this by both the Card Name (unique alias)
-  and the Full Name.</para>
+  <para>&Balsa; can expand the names of your contacts it finds in &Balsa;
+      addressbooks. It will do this by any part of the contact's name
+      or email address.
+  </para>
 
   <para>As you type a username in any of the To:, Cc:, or Bcc: entry
   boxes in the <link linkend="win-composer">Compose window</link>, it
   will do a case insensitive search in the addressbook for a matching
-  username, and fill in the best match.  This is best demonstrated
+  username, and pop up a list of matching complete addresses. Press
+  <keysym>Cursor-Down</keysym> to highlight one of the addresses, and
+  <keysym>Enter</keysym> to select it.
+  </para>
+
+  <!--
+  This is best demonstrated
   with the following picture:</para>
  
   <figure>
@@ -4271,25 +4461,16 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   <para>The example shows what it looks like if <quote>Balsa Mailing
   List</quote> is in your address book, and you have typed
   &quot;ba&quot;</para>
-
-  <para>If the match shown is what you want, simply press Enter to
-  move to the next entry, or press Comma or End to type another e-mail
-  address.</para>
-
-  <para>If the match shown is not the one you want, pressing Tab will
-  cycle through all possible matches.  If there is only one match, it
-  will move to the end of the match.  At any point, you can simply
-  continue typing and ignore the matched entry.  To move to the next
-  entry without accepting the shown entry, press the Down
-  arrow.</para>
+-->
 
   <para>
     To enable this feature, you must select which address books you
-    wish to be searched for aliases to expand.  This can be done in
-    the <link linkend="preferences-1">Preferences</link> window, under
-    the <guilabel>Address Books</guilabel> tab. Also, some address
-    books are expensive to lookup. You will need then to press
-    <keysym>Ctrl-R</keysym> to explicitly expand the alias.
+    wish to be searched for aliases to expand.  This can be done in the
+    <link linkend="preferences-address-books">Preferences</link>
+    window, on the <guilabel>Address Books</guilabel> page.
+    Also, some address books are expensive to lookup.
+    You will need then to press
+    <keysym>Escape</keysym> to explicitly expand the alias.
   </para>
 </sect2>
 

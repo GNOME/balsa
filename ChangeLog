@@ -1,3 +1,9 @@
+2006-02-27 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/sendmsg-window.c: explicitly update gpg-mode when identity is
+	changed, as apparently the callback is now called only when the
+	check-button's state is changed.
+
 2006-02-26 19:28  PeterB
 
 	* src/balsa-index.c: scroll to ensure a visible message only if

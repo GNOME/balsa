@@ -2465,20 +2465,37 @@ balsa_index_pipe(BalsaIndex * index)
  * either the current message, or the last message in the view, if
  * any. */
 void
-balsa_index_ensure_visible(BalsaIndex * index) 
+balsa_index_ensure_visible(BalsaIndex * index)
 {
+    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+    GdkRectangle rect;
     GtkTreePath *path = NULL;
 
-    if (!bndx_find_message(index, &path, NULL, index->current_message)) {
-        GtkTreeModel *model =
-            gtk_tree_view_get_model(GTK_TREE_VIEW(index));
-        gint n_children = gtk_tree_model_iter_n_children(model, NULL);
+    gtk_tree_view_get_visible_rect(tree_view, &rect);
+    gtk_tree_view_tree_to_widget_coords(tree_view, rect.x, rect.y,
+                                        &rect.x, &rect.y);
 
-        if (n_children > 0) {
-            GtkTreeIter iter;
-            gtk_tree_model_iter_nth_child(model, &iter, NULL,
-                                          --n_children);
-            path = gtk_tree_model_get_path(model, &iter);
+    if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
+                                      NULL, NULL, NULL)) {
+        /* We have a message in the view, so we do nothing. */
+        gtk_tree_path_free(path);
+        path = NULL;
+    } else {
+        /* Can we get a path to the current message? */
+        if (!bndx_find_message(index, &path, NULL, index->current_message)) {
+            /* No, scroll to the last message. */
+            GtkTreeModel *model;
+            gint n_children;
+
+            model = gtk_tree_view_get_model(tree_view);
+            n_children = gtk_tree_model_iter_n_children(model, NULL);
+
+            if (n_children > 0) {
+                GtkTreeIter iter;
+                gtk_tree_model_iter_nth_child(model, &iter, NULL,
+                                              --n_children);
+                path = gtk_tree_model_get_path(model, &iter);
+            }
         }
     }
 

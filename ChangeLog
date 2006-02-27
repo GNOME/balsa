@@ -1,5 +1,7 @@
-2006-02-26 13:29  PeterB
+2006-02-26 19:28  PeterB
 
+	* src/balsa-index.c: scroll to ensure a visible message only if
+	there isn't one.
 	* doc/C/balsa.xml, src/pref-manager.c: arrange the help file to
 	match the new prefs window; use section titles instead of notebook
 	page numbers to locate help sections.

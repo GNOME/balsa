@@ -6214,8 +6214,12 @@ bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
 	bsmsg->gpg_mode |= LIBBALSA_PROTECT_ALWAYS_TRUST;
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
 				   ident->gpg_sign);
+    if (ident->gpg_sign)
+	bsmsg->gpg_mode |= LIBBALSA_PROTECT_SIGN;
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
 				   ident->gpg_encrypt);
+    if (ident->gpg_encrypt)
+	bsmsg->gpg_mode |= LIBBALSA_PROTECT_ENCRYPT;
     switch (ident->crypt_protocol) {
     case LIBBALSA_PROTECT_OPENPGP:
 	bsmsg->gpg_mode |= LIBBALSA_PROTECT_OPENPGP;

@@ -1,3 +1,9 @@
+2006-02-28  Pawel Salek
+
+	* src/balsa-app.c: check mbnode fetched by gtk_tree_model_get()...
+	* src/balsa-mblist.c: ... fixing bug 332980.
+	* NEWS, configure.in: release 2.3.11.
+
 2006-02-27 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/sendmsg-window.c: explicitly update gpg-mode when identity is

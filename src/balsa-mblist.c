@@ -1101,10 +1101,12 @@ bmbl_find_all_unread_mboxes_func(GtkTreeModel * model, GtkTreePath * path,
                                  GtkTreeIter * iter, gpointer data)
 {
     struct bmbl_find_all_unread_mboxes_info *info = data;
-    BalsaMailboxNode *mbnode;
+    BalsaMailboxNode *mbnode = NULL;
     LibBalsaMailbox *mailbox;
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
+    if(!mbnode) /* this node has no MBNODE associated at this time */
+        return FALSE;
     mailbox = mbnode->mailbox;
     g_object_unref(mbnode);
 
@@ -1564,7 +1566,7 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
     has_unread_child = libbalsa_mailbox_get_unread(mailbox) > 0;
     while (gtk_tree_model_iter_parent(model, &parent, iter)) {
 	*iter = parent;
-	gtk_tree_model_get(model, &parent, 0, &mbnode, -1);
+	gtk_tree_model_get(model, &parent, MBNODE_COLUMN, &mbnode, -1);
 	if (!has_unread_child) {
 	    /* Check all the children of this parent. */
 	    GtkTreeIter child;
@@ -1572,7 +1574,7 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
 	    gtk_tree_model_iter_children(model, &child, &parent);
 	    do {
 		BalsaMailboxNode *mn;
-		gtk_tree_model_get(model, &child, 0, &mn, -1);
+		gtk_tree_model_get(model, &child, MBNODE_COLUMN, &mn, -1);
 		if (mn->style & (MBNODE_STYLE_NEW_MAIL |
 				 MBNODE_STYLE_UNREAD_CHILD))
 		    has_unread_child = TRUE;

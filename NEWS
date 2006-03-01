@@ -1,3 +1,12 @@
+* Balsa-2.3.11 release. Release date 2006-02-28
+
+- assure messages are properly signed after identity change.
+- Ctrl-N goes over unread messages in all mailboxes.
+- Redone Preference Manager.
+- support better slow LDAP servers.
+- use better real estate when displaying message counts.
+- fixed bugs: 330085, 330093, 332980.
+
 * Balsa-2.3.10 release. Release date 2006-01-29
 
 - local mailbox opening acceleration.

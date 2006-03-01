@@ -742,9 +742,11 @@ balsa_find_iter_by_data_func(GtkTreeModel * model, GtkTreePath * path,
 			       GtkTreeIter * iter, gpointer user_data)
 {
     struct balsa_find_iter_by_data_info *bf = user_data;
-    BalsaMailboxNode *mbnode;
+    BalsaMailboxNode *mbnode = NULL;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    if(!mbnode)
+        return FALSE;
     if (mbnode == bf->data || mbnode->mailbox == bf->data) {
 	*bf->iter = *iter;
 	bf->found = TRUE;

@@ -1,3 +1,9 @@
+2006-03-04  Pawel Salek
+
+	* libbalsa/mailbox_mbox.c:  do not reference freed memory.
+	* NEWS, configure.in: release 2.3.12.
+
+
 2006-02-28  Pawel Salek
 
 	* src/balsa-app.c: check mbnode fetched by gtk_tree_model_get()...

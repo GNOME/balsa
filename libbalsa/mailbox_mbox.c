@@ -825,12 +825,12 @@ lbm_mbox_check_cache(LibBalsaMailboxMbox * mbox,
         retval = TRUE;
         break;
     }
-    g_free(contents);
-
     if (!retval)
         /* Seek to the end of the last message we checked. */
         lbm_mbox_seek(buffer, msg_info > (struct message_info *) contents ?
-                      (--msg_info)->end : 0);
+                      (msg_info-1)->end : 0);
+    g_free(contents); /* msg_info points to contents, cannot free too early */
+
 
     return retval;
 }

@@ -1,3 +1,7 @@
+* Balsa-2.3.12 release. Release date 2006-03-04
+
+- do not reference freed memory in mbox driver.
+
 * Balsa-2.3.11 release. Release date 2006-02-28
 
 - assure messages are properly signed after identity change.

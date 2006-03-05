@@ -2083,9 +2083,8 @@ balsa_index_set_view_filter(BalsaIndex * bindex, int filter_no,
     g_free(bindex->filter_string);
     bindex->filter_no = filter_no;
     bindex->filter_string = g_strdup(filter_string);
-    libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
-
-    balsa_index_ensure_visible(bindex);
+    if (libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE))
+        balsa_index_ensure_visible(bindex);
 }
 
 /* Public method. */

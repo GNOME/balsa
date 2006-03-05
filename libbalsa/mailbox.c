@@ -451,8 +451,9 @@ libbalsa_mailbox_free_mindex(LibBalsaMailbox *mailbox)
     }
 }
 
-static void lbm_set_threading(LibBalsaMailbox * mailbox,
-                              LibBalsaMailboxThreadingType thread_type);
+static gboolean lbm_set_threading(LibBalsaMailbox * mailbox,
+                                  LibBalsaMailboxThreadingType
+                                  thread_type);
 gboolean
 libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 {
@@ -1804,15 +1805,19 @@ libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
 /*
  * Mailbox views.
  *
- * NOTE: call to mailbox_filter_view MUST be followed by a call to
- * libbalsa_mailbox_set_threading that will actually create the
+ * NOTE: call to update_view_filter MUST be followed by a call to
+ * lbm_set_threading that will actually create the
  * message tree.
+ *
+ * Returns TRUE if the message tree was updated.
  */
-void
+gboolean
 libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
                                  LibBalsaCondition *cond,
                                  gboolean update_immediately)
 {
+    gboolean retval = update_immediately;
+
     libbalsa_lock_mailbox(mailbox);
 
     if (mailbox->view_filter)
@@ -1822,10 +1827,12 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
     if (update_immediately) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
                                                                 cond);
-        lbm_set_threading(mailbox, mailbox->view->threading_type);
+        retval = lbm_set_threading(mailbox, mailbox->view->threading_type);
     }
 
     libbalsa_unlock_mailbox(mailbox);
+
+    return retval;
 }
 
 /* Test message flags. */
@@ -1893,13 +1900,14 @@ lbm_check_unseen_child(GNode * node, LibBalsaMailbox * mailbox)
 #endif /* CACHE_UNSEEN_CHILD */
 
 static void lbm_sort(LibBalsaMailbox * mbox, GNode * parent);
-static void
+static gboolean
 lbm_set_threading(LibBalsaMailbox * mailbox,
                   LibBalsaMailboxThreadingType thread_type)
 {
     LibBalsaMailboxState saved_state;
 
-    g_return_if_fail(MAILBOX_OPEN(mailbox)); /* or perhaps it's legal? */
+    if (!MAILBOX_OPEN(mailbox))
+        return FALSE;
 
     saved_state = mailbox->state;
     mailbox->state = LB_MAILBOX_STATE_TREECLEANING;
@@ -1918,6 +1926,8 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
     gdk_threads_leave();
 
     mailbox->state = saved_state;
+
+    return TRUE;
 }
 
 void

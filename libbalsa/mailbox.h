@@ -480,9 +480,10 @@ void libbalsa_mailbox_index_entry_set_no(LibBalsaMailboxIndexEntry *entry,
 void libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry);
 void libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
 				      unsigned msgno, LibBalsaMessageFlag f);
-void libbalsa_mailbox_set_view_filter(LibBalsaMailbox   *mailbox,
-                                      LibBalsaCondition *filter_condition,
-                                      gboolean update_immediately);
+gboolean libbalsa_mailbox_set_view_filter(LibBalsaMailbox * mailbox,
+                                          LibBalsaCondition *
+                                          filter_condition,
+                                          gboolean update_immediately);
 
 gboolean libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
                                  enum LibBalsaMailboxCapability cap);

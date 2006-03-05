@@ -1,3 +1,8 @@
+2006-03-05 10:23  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/mailbox.h, src/balsa-index.c: check
+	whether user closed mailbox during long view-filter update.
+
 2006-03-04  Pawel Salek
 
 	* libbalsa/mailbox_mbox.c:  do not reference freed memory.

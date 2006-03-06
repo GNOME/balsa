@@ -1,3 +1,7 @@
+2006-03-06  Ahmad Riza H Nst  <rizahnst@eriagempita.co.id>
+
+	* configure.in: Added "id" (Indonesian) to the ALL_LINGUAS line
+
 2006-03-05 10:23  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, src/balsa-index.c: check

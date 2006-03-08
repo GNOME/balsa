@@ -4140,7 +4140,8 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
             else 
                 filter = cnd;
 
-            libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
+            if (libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE))
+                balsa_index_ensure_visible(BALSA_INDEX(bindex));
             cnd = NULL;
             return;
         }
@@ -4389,7 +4390,8 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
      * some messages might have been removed or added to the view.  We
      * just steal old view filter for the time being to avoid copying
      * it - but we could just as well clone it. */
-    libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE);
+    if (libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE))
+        balsa_index_ensure_visible(BALSA_INDEX(index));
 }
 
 static void

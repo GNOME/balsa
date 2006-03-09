@@ -1339,7 +1339,9 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   if(ERR_peek_error()) {
     fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
     ERR_print_errors_fp(stderr);
-    fprintf(stderr, "\nEnd of print_errors\n");
+    fprintf(stderr, "\nEnd of print_errors - severing the connection...\n");
+    imap_handle_disconnect(handle);
+    return IMR_SEVERED;
   }
 #endif
   if( imap_cmd_get_tag(handle->sio, tag, sizeof(tag))<0) {

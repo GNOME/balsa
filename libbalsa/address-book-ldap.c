@@ -37,6 +37,10 @@
 #include <ldap.h>
 #include <iconv.h>
 
+#ifdef HAVE_CYRUS_SASL
+#include <sasl.h>
+#endif
+
 #include "address-book.h"
 #include "address-book-ldap.h"
 #include "information.h"
@@ -45,7 +49,9 @@
 
 static const int DEBUG_LDAP = 0;
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
-static const unsigned LDAP_MIN_LEN=2;
+static const unsigned ABL_MIN_LEN=2;
+static const int ABL_SIZE_LIMIT = 5000;       /* full list   */
+static const int ABL_SIZE_LIMIT_LOOKUP = 50; /* quick lookup */
 /* Which parameters do we want back? */
 static char* book_attrs[] = {
     "cn",        /* maps to displayed name */
@@ -230,7 +236,7 @@ void
 libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab)
 {
     if (ab->directory) {
-	ldap_unbind(ab->directory);
+	ldap_unbind_ext(ab->directory, NULL, NULL);
 	ab->directory = NULL;
     }
 }
@@ -239,6 +245,47 @@ libbalsa_address_book_ldap_close_connection(LibBalsaAddressBookLdap * ab)
  * Opens the ldap connection, and binds to the server.
  * returns ldap status.
  */
+#ifdef HAVE_CYRUS_SASL
+static int
+abl_interaction(unsigned flags, sasl_interact_t *interact,
+                LibBalsaAddressBookLdap *ab)
+{
+    switch(interact->id) {
+    case SASL_CB_PASS: break;
+    case SASL_CB_GETREALM:
+    case SASL_CB_AUTHNAME:
+    case SASL_CB_USER:   
+    case SASL_CB_NOECHOPROMPT:
+    case SASL_CB_ECHOPROMPT:  
+        printf("unhandled SASL request %d.\n", interact->id);
+        return LDAP_INAVAILABLE;
+    }
+
+    interact->result = ab->passwd;;
+    interact->len = interact->result ? strlen(interact->result) : 0;
+    return LDAP_SUCCESS;
+}
+
+
+int abl_interact(LDAP *ld, unsigned flags, void* defaults, void *interact )
+{
+    if( ld == NULL ) return LDAP_PARAM_ERROR;
+
+    if (flags == LDAP_SASL_INTERACTIVE) {
+        fputs( _("SASL Interaction\n"), stderr );
+    }
+
+    while( interact->id != SASL_CB_LIST_END ) {
+        int rc = lbabl_interaction(flags, interact, defaults);
+
+        if( rc )  return rc;
+        interact++;
+    }
+
+    return LDAP_SUCCESS;
+}
+#endif
+
 static int
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 {
@@ -258,13 +305,13 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
     v3_enabled = 
         ldap_set_option(ab->directory, LDAP_OPT_PROTOCOL_VERSION, &version)
        == LDAP_OPT_SUCCESS;
-    if(!v3_enabled) ldap_perror(ab->directory, "ldap_set_option");
+    if(!v3_enabled) printf("Too old LDAP server - interaction may fail.\n");
     if(v3_enabled && ab->enable_tls) {
 #ifdef HAVE_LDAP_TLS
         /* turn TLS on  but what if we have SSL already on? */
         result = ldap_start_tls_s(ab->directory, NULL, NULL);
         if(result != LDAP_SUCCESS) {
-            ldap_unbind(ab->directory);
+            ldap_unbind_ext(ab->directory, NULL, NULL);
             ab->directory = NULL;
             libbalsa_address_book_set_status
                 (lbab, g_strdup(ldap_err2string(result)));
@@ -277,14 +324,24 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
 #endif /* HAVE_LDAP_TLS */
     }
 
-    result = ldap_simple_bind_s(ab->directory, 
-                                ab->bind_dn,
-                                ab->passwd);
+#ifdef HAVE_CYRUS_SASL
+    result = ldap_sasl_interactive_bind_s(ab->directory, ab->bind_dn, NULL,
+                                          NULL, NULL,
+                                          LDAP_SASL_QUIET, abl_interact, ab);
+#else /* HAVE_CYRUS_SASL */
+    {
+     struct berval   cred;   
+     cred.bv_val = ab->passwd;
+     cred.bv_len = ab->passwd ? strlen(ab->passwd) : 0;
+     result = ldap_sasl_bind_s(ab->directory, ab->bind_dn, NULL, &cred,
+                              NULL, NULL, NULL);
+    }
+#endif /* HAVE_CYRUS_SASL */
 
     if (result != LDAP_SUCCESS) {
         libbalsa_address_book_set_status(lbab,
                                          g_strdup(ldap_err2string(result)));
-	ldap_unbind_s(ab->directory);
+	ldap_unbind_ext(ab->directory, NULL, NULL);
 	ab->directory = NULL;
     }
     return result;
@@ -335,10 +392,10 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
                               "(|(cn=%s*)(sn=%s*)(mail=%s@*)))",
                               filter, filter, filter)
             : g_strdup("(objectClass=inetOrgPerson)");
-        msgid = ldap_search(ldap_ab->directory, ldap_ab->base_dn,
-                            LDAP_SCOPE_SUBTREE, 
-                            ldap_filter, book_attrs, 0);
-        if (msgid == -1) {
+        if(ldap_search_ext(ldap_ab->directory, ldap_ab->base_dn,
+                           LDAP_SCOPE_SUBTREE, 
+                           ldap_filter, book_attrs, 0, NULL, NULL,
+                           NULL, ABL_SIZE_LIMIT, &msgid) != LDAP_SUCCESS) {
             libbalsa_address_book_ldap_close_connection(ldap_ab);
             continue; /* try again */
         }
@@ -382,34 +439,35 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     gchar *first = NULL, *last = NULL;
     LibBalsaAddress *address = NULL;
     char *attr;
-    char **vals;
+    struct berval **vals;
     BerElement *ber = NULL;
     int i;
 
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
 
     for (attr = ldap_first_attribute(ldap_ab->directory, e, &ber);
-	 attr != NULL; attr = ldap_next_attribute(ldap_ab->directory, e, ber)) {
+	 attr != NULL; attr=ldap_next_attribute(ldap_ab->directory, e, ber)) {
 	/*
 	 * For each attribute, get the attribute name and values.
 	 */
-	if ((vals = ldap_get_values(ldap_ab->directory, e, attr)) != NULL) {
+	if ((vals=ldap_get_values_len(ldap_ab->directory, e, attr)) != NULL) {
 	    for (i = 0; vals[i] != NULL; i++) {
 		if ((g_ascii_strcasecmp(attr, "sn") == 0) && (!last))
-		    last = g_strdup(vals[i]);
+		    last = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "cn") == 0) && (!cn))
-		    cn = g_strdup(vals[i]);
+		    cn = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "givenName") == 0) && (!first))
-		    first = g_strdup(vals[i]);
+		    first = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "o") == 0) && (!org))
-		    org = g_strdup(vals[i]);
+		    org = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "uid") == 0) && (!uid))
-		    uid = g_strdup(vals[i]);
+		    uid = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "mail") == 0) && (!email))
-		    email = g_strdup(vals[i]);
+		    email = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 	    }
-	    ldap_value_free(vals);
+	    ldap_value_free_len(vals);
 	}
+        ldap_memfree(attr);
     }
     /*
      * Record will have e-mail (searched)
@@ -440,7 +498,8 @@ lbabl_get_internet_address(LDAP *dir, LDAPMessage * e)
 {
     InternetAddress *ia;
     BerElement *ber = NULL;
-    char *attr, **vals;
+    char *attr;
+    struct berval **vals;
     int i;
     gchar *email = NULL, *sn = NULL, *cn = NULL, *first = NULL;
 
@@ -450,19 +509,20 @@ lbabl_get_internet_address(LDAP *dir, LDAPMessage * e)
 	/*
 	 * For each attribute, get the attribute name and values.
 	 */
-	if ((vals = ldap_get_values(dir, e, attr)) != NULL) {
+	if ((vals = ldap_get_values_len(dir, e, attr)) != NULL) {
 	    for (i = 0; vals[i] != NULL; i++) {
 		if ((g_ascii_strcasecmp(attr, "sn") == 0) && (!sn))
-		    sn = g_strdup(vals[i]);
+		    sn = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "cn") == 0) && (!cn))
-		    cn = g_strdup(vals[i]);
+		    cn = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "givenName") == 0) && (!first))
-		    first = g_strdup(vals[i]);
+		    first = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "mail") == 0) && (!email))
-		    email = g_strdup(vals[i]);
+		    email = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 	    }
-	    ldap_value_free(vals);
+	    ldap_value_free_len(vals);
 	}
+        ldap_memfree(attr);
     }
     /*
      * Record will have e-mail (searched)
@@ -563,7 +623,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
 
     cnt = 0;
     do {
-        int rc = ldap_add_s(ldap_ab->directory, dn, mods);
+        int rc = ldap_add_ext_s(ldap_ab->directory, dn, mods, NULL, NULL);
         switch(rc) {
         case LDAP_SUCCESS: g_free(dn); return LBABERR_OK;
         case LDAP_ALREADY_EXISTS: 
@@ -611,7 +671,7 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
                          ldap_ab->priv_book_dn);
     cnt = 0;
     do {
-        rc = ldap_delete_s(ldap_ab->directory, dn);
+        rc = ldap_delete_ext_s(ldap_ab->directory, dn, NULL, NULL);
         switch(rc) {
         case LDAP_SUCCESS: g_free(dn); return LBABERR_OK;
         case LDAP_SERVER_DOWN:
@@ -720,7 +780,7 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
         return LBABERR_OK; 
     cnt = 0;
     do {
-        rc = ldap_modify_s(ldap_ab->directory, dn, mods);
+        rc = ldap_modify_ext_s(ldap_ab->directory, dn, mods, NULL, NULL);
         switch(rc) {
         case LDAP_SUCCESS: return LBABERR_OK;
         case LDAP_SERVER_DOWN:
@@ -884,7 +944,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 
     ldap_ab = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
 
-    if (!ab->expand_aliases || strlen(prefix)<LDAP_MIN_LEN) return NULL;
+    if (!ab->expand_aliases || strlen(prefix)<ABL_MIN_LEN) return NULL;
     if (ldap_ab->directory == NULL) {
         if( (rc=libbalsa_address_book_ldap_open_connection(ldap_ab))
 	    != LDAP_SUCCESS)
@@ -903,9 +963,10 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 			     ldap, ldap, ldap);
     g_free(ldap);
     result = NULL;
-    rc = ldap_search_st(ldap_ab->directory, ldap_ab->base_dn,
-			LDAP_SCOPE_SUBTREE, filter, complete_attrs, 0, 
-			&timeout, &result);
+    rc = ldap_search_ext_s(ldap_ab->directory, ldap_ab->base_dn,
+                           LDAP_SCOPE_SUBTREE, filter, complete_attrs, 0, 
+                           NULL, NULL, &timeout, ABL_SIZE_LIMIT_LOOKUP,
+                           &result);
     if(DEBUG_LDAP)
         g_print("Sent LDAP request: %s (basedn=%s) res=0x%x\n", 
                 filter, ldap_ab->base_dn, rc);
@@ -934,7 +995,8 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	/*
 	 * Until we know for sure, complain about all other errors.
 	 */
-	ldap_perror(ldap_ab->directory, "alias_complete::ldap_search_st");
+	fprintf(stderr, "alias_complete::ldap_search_st: %s\n",
+                ldap_err2string(rc));
 	break;
     }
 

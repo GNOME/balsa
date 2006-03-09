@@ -322,11 +322,11 @@ gchar *libbalsa_guess_ldif_file()
 gboolean libbalsa_ldap_exists(const gchar *server)
 {
 #if ENABLE_LDAP
-    LDAP *ldap = ldap_open(server, LDAP_PORT);
+    LDAP *ldap;
+    ldap_initialize(&ldap, server);
 
     if(ldap) {
-	ldap_unbind(ldap);
-
+	ldap_unbind_ext(ldap, NULL, NULL);
 	return TRUE;
     }
 #endif /* #if ENABLE_LDAP */

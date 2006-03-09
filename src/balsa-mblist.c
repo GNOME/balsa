@@ -570,7 +570,14 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                            ICON_COLUMN, pixbuf,
                            -1);
-        g_object_unref(pixbuf);
+        if(pixbuf) g_object_unref(pixbuf);
+        else { 
+            static int p=1;
+            if(p){
+                printf("icon %s not found.\n", BALSA_PIXMAP_MBOX_DIR_OPEN);
+                p = 0;
+            }
+        }
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
     }
     g_object_unref(mbnode);
@@ -654,7 +661,14 @@ bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
                            ICON_COLUMN, pixbuf,
                            -1);
-        g_object_unref(pixbuf);
+        if(pixbuf) g_object_unref(pixbuf);
+        else { 
+            static int p=1;
+            if(p){
+                printf("icon %s not found.\n", BALSA_PIXMAP_MBOX_DIR_CLOSED);
+                p = 0;
+            }
+        }
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
     }
     g_object_unref(mbnode);
@@ -1394,6 +1408,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
                        TOTAL_COLUMN,  "",
                        -1);
 #else                           /* GTK_CHECK_VERSION(2, 8, 0) */
+    /* render icon may fail if the installation was incomplete */
     pixbuf = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
                                     icon, GTK_ICON_SIZE_MENU, NULL);
     gtk_tree_store_set(balsa_app.mblist_tree_store, iter,
@@ -1405,7 +1420,11 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
                        UNREAD_COLUMN, "",
                        TOTAL_COLUMN,  "",
                        -1);
-    g_object_unref(pixbuf);
+    if(pixbuf) g_object_unref(pixbuf);
+    else { 
+        static int p=1;
+        if(p){ printf("icon %s not found.\n", icon); p = 0; }
+    }
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
     g_free(tmp);
 
@@ -1541,7 +1560,11 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
                            NAME_COLUMN, name,
                            WEIGHT_COLUMN, weight,
                            -1);
-        g_object_unref(pixbuf);
+        if(pixbuf) g_object_unref(pixbuf);
+        else { 
+            static int p=1;
+            if(p){ printf("icon %s not found.\n", icon); p = 0; }
+        }
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
         g_free(tmp);
 

@@ -1,3 +1,10 @@
+2006-03-09  Pawel Salek
+
+	* libbalsa/address-book-ldap.c: use openldap-2.3.x compatible API.
+	* libbalsa/libbalsa.c: the same.
+	* libbalsa/imap/imap-handle.c: treat OpenSSL errors as critical.
+	* src/balsa-mblist.c: don't be mad if an icon is not found.
+
 2006-03-08 10:40  PeterB
 
 	* src/main-window.c: ensure visible message after changing view

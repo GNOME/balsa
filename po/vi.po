@@ -6,8 +6,8 @@ msgid ""
 ""
 msgstr "Project-Id-Version: balsa HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-28 02:07+0100\n"
-"PO-Revision-Date: 2006-02-28 16:14+1030\n"
+"POT-Creation-Date: 2006-03-10 02:03+0100\n"
+"PO-Revision-Date: 2006-03-10 18:18+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -26,13 +26,13 @@ msgid "E-Mail utility"
 msgstr "Tiện ích thư điện tử"
 
 #.The externq database doesn't support Id's, sorry!
-#:../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:421
+#:../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:479
 #:../libbalsa/address-book-ldif.c:329
 msgid "No-Id"
 msgstr "Không có ID"
 
 #:../libbalsa/address-book-extern.c:215 ../libbalsa/address-book-extern.c:370
-#:../libbalsa/address-book-ldap.c:427 ../libbalsa/address-book-ldif.c:309
+#:../libbalsa/address-book-ldap.c:485 ../libbalsa/address-book-ldif.c:309
 #:../libbalsa/address-book-ldif.c:332 ../libbalsa/address-book-ldif.c:351
 #:../libbalsa/address-book-ldif.c:355 ../libbalsa/address-book-vcard.c:158
 #:../libbalsa/address-book-vcard.c:312
@@ -40,6 +40,10 @@ msgid "No-Name"
 msgstr "Không có tên"
 
 #:../libbalsa/address-book-ldap.c:275
+msgid "SASL Interaction\n"
+msgstr "Tương tác SASL\n"
+
+#:../libbalsa/address-book-ldap.c:322
 msgid "TLS requested but not compiled in"
 msgstr "TLS được yêu cầu còn không biên dịch sẵn."
 
@@ -72,7 +76,7 @@ msgid "Cannot find address in address book"
 msgstr "Không tìm thấy địa chỉ trong sổ địa chỉ"
 
 #:../libbalsa/address-book.c:324 ../src/main-window.c:2331
-#:../src/main-window.c:4432 ../src/sendmsg-window.c:3640
+#:../src/main-window.c:4434 ../src/sendmsg-window.c:3640
 msgid "Unknown error"
 msgstr "Gặp lỗi lạ"
 
@@ -568,26 +572,26 @@ msgstr "Đường dẫn hộp thư cục bộ sai « %s »"
 msgid "Could not create a mailbox of type %s"
 msgstr "Không thể tạo hộp thư kiểu %s"
 
-#:../libbalsa/mailbox.c:738
+#:../libbalsa/mailbox.c:739
 #,c-format
 msgid "Applying filter rules to %s"
 msgstr "Đang áp dụng các quy tắc lọc cho %s..."
 
-#:../libbalsa/mailbox.c:837
+#:../libbalsa/mailbox.c:838
 #,c-format
 msgid "Copying from %s to %s"
 msgstr "Đang sao chép %s sang %s..."
 
-#:../libbalsa/mailbox.c:1796
+#:../libbalsa/mailbox.c:1797
 msgid "Removing messages from source mailbox failed"
 msgstr "Việc gỡ bỏ thư ra hộp thư nguồn bị lỗi."
 
-#:../libbalsa/mailbox.c:3593
+#:../libbalsa/mailbox.c:3603
 #,c-format
 msgid "Searching %s for partial messages"
 msgstr "Đang tìm kiếm trong %s có thư riêng phần..."
 
-#:../libbalsa/mailbox.c:3683
+#:../libbalsa/mailbox.c:3693
 msgid "Reconstructing message"
 msgstr "Đang cấu tạo lại thư..."
 
@@ -2148,36 +2152,36 @@ msgstr "_Chuyển vào"
 msgid "_View Source"
 msgstr "_Xem mã nguồn"
 
-#:../src/balsa-index.c:2124
+#:../src/balsa-index.c:2123
 #,c-format
 msgid "Failed to copy %d message to mailbox \"%s\": %s"
 msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
 msgstr[0] "Việc sao chép %d thư vào hộp thư « %s » bị lỗi: %s"
 
-#:../src/balsa-index.c:2138
+#:../src/balsa-index.c:2137
 #,c-format
 msgid "Copied to \"%s\"."
 msgstr "Đã sao chép vào « %s »."
 
-#:../src/balsa-index.c:2139
+#:../src/balsa-index.c:2138
 #,c-format
 msgid "Moved to \"%s\"."
 msgstr "Đã chuyển vào « %s »."
 
-#:../src/balsa-index.c:2262
+#:../src/balsa-index.c:2261
 #,c-format
 msgid "Committing mailbox %s failed."
 msgstr "Việc gài vào hộp thư %s bị lỗi."
 
-#:../src/balsa-index.c:2435
+#:../src/balsa-index.c:2434
 msgid "Pipe message through a program"
 msgstr "Gởi thư qua ống dẫn đến chương trình"
 
-#:../src/balsa-index.c:2438
+#:../src/balsa-index.c:2437
 msgid "_Run"
 msgstr "_Chạy"
 
-#:../src/balsa-index.c:2447
+#:../src/balsa-index.c:2446
 msgid "Specify the program to run:"
 msgstr "Xác định chương trình cần chạy:"
 
@@ -2185,42 +2189,42 @@ msgstr "Xác định chương trình cần chạy:"
 msgid "Mailbox"
 msgstr "Hộp thư"
 
-#:../src/balsa-mblist.c:1152 ../src/balsa-mblist.c:1188
+#:../src/balsa-mblist.c:1168 ../src/balsa-mblist.c:1204
 msgid "Failed to find mailbox"
 msgstr "Việc tìm hộp thư bị lỗi."
 
-#:../src/balsa-mblist.c:1804
+#:../src/balsa-mblist.c:1829
 msgid "_Other..."
 msgstr "_Khác..."
 
-#:../src/balsa-mblist.c:1872
+#:../src/balsa-mblist.c:1897
 msgid "Choose destination folder"
 msgstr "Chọn thư mục đích"
 
-#:../src/balsa-mblist.c:2095 ../src/balsa-mblist.c:2098
+#:../src/balsa-mblist.c:2120 ../src/balsa-mblist.c:2123
 msgid "Other..."
 msgstr "Khác..."
 
 #.xgettext: this is the first part of the message
 #.* "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#:../src/balsa-mblist.c:2263
+#:../src/balsa-mblist.c:2288
 #,c-format
 msgid "Shown mailbox: %s"
 msgstr "Hộp thư đã hiện : %s"
 
-#:../src/balsa-mblist.c:2268
+#:../src/balsa-mblist.c:2293
 #,c-format
 msgid " with %d message"
 msgid_plural " with %d messages"
 msgstr[0] " chứa %d thư"
 
-#:../src/balsa-mblist.c:2275
+#:../src/balsa-mblist.c:2300
 #,c-format
 msgid ", %d new"
 msgid_plural ", %d new"
 msgstr[0] ", %d mới"
 
-#:../src/balsa-mblist.c:2282
+#:../src/balsa-mblist.c:2307
 #,c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
@@ -4111,27 +4115,27 @@ msgstr "_Đảo hướng tìm kiếm"
 msgid "_Wrap around"
 msgstr "_Cuộn vòng"
 
-#:../src/main-window.c:4196
+#:../src/main-window.c:4197
 msgid "You can apply filters only on mailbox\n"
 msgstr "Có thể áp dụng các bộ lọc chỉ cho hộp thư\n"
 
-#:../src/main-window.c:4210
+#:../src/main-window.c:4211
 #,c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Việc gỡ bỏ thư trùng bị lỗi: %s"
 
-#:../src/main-window.c:4431
+#:../src/main-window.c:4433
 #,c-format
 msgid "Could not open trash: %s"
 msgstr "Không thể mở Rác: %s"
 
-#:../src/main-window.c:4560
+#:../src/main-window.c:4562
 #,c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (chỉ đọc)"
 
 # Name: don't translate / Tên: đừng dịch
-#:../src/main-window.c:4562
+#:../src/main-window.c:4564
 #,c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"

@@ -134,8 +134,7 @@ balsa_ab_SOURCES =	ab-main.c		\
 
 balsa_ab_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
-	$(top_builddir)/libbalsa/imap/libimap.a	\
-	$(BALSA_LIBS)
+	$(BALSA_AB_LIBS)
 
 dist-hook:
 	mkdir $(distdir)/pixmaps

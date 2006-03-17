@@ -236,6 +236,13 @@ gmime-2.0 >= 2.1.9
 $gnome_extras
 ])
 
+PKG_CHECK_MODULES(BALSA_AB, [
+   libgnome-2.0 libgnomeui-2.0 
+   glib-2.0
+   gtk+-2.0 >= 2.4
+   gmime-2.0 >= 2.1.9
+])
+
 dnl ##########################################################################
 dnl Check versions
 dnl ##########################################################################
@@ -261,6 +268,7 @@ AC_SUBST(BONOBO_ACTIVATION_IDL)
 
 AC_SUBST(BALSA_CFLAGS)
 AC_SUBST(BALSA_LIBS)
+AC_SUBST(BALSA_AB_LIBS)
 
 # GtkHtml library.
 #
@@ -310,13 +318,16 @@ if test x"$gpgmecfg" != xno ; then
 		fi
 	fi
 	if test x"$gpgmecfg" != xno ; then
-		AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
-		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
 		if test x"$use_threads" = xyes; then
 			BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
+			if test x"$?" != x0 ; then
+				AC_MSG_ERROR([*** You enabled gpgme and pthread support, but your gpgme installation does not support threads.])
+			fi
 		else
 			BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --libs`"
 		fi
+		AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
+		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
 		gpgmecfg=yes
 		AC_PATH_PROG(gpg_path, gpg)
 		if test x"$gpg_path" != "x" ; then
@@ -374,6 +385,7 @@ if test x$with_sqlite != xno ; then
     AC_DEFINE(HAVE_SQLITE,1,[If defined, enable GPE address book support.])
     BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $SQLITE_LIBS"
+    BALSA_AB_LIBS="$BALSA_AB_LIBS $SQLITE_LIBS"
 else
     AC_MSG_RESULT([no])
 fi
@@ -384,7 +396,7 @@ AC_MSG_CHECKING([whether to build ESMTP support])
 if test "x$with_esmtp" != xno  ; then
     AC_MSG_RESULT([yes])
     test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
-    AC_CHECK_LIB(esmtp, smtp_start_session, LIBS="$LIBS -lesmtp -lpthread",
+    AC_CHECK_LIB(esmtp, smtp_start_session,BALSA_LIBS="$BALSA_LIBS -lesmtp",
 	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]),
                  -lpthread)
     AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, 
@@ -398,7 +410,6 @@ if test "x$with_esmtp" != xno  ; then
 	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
 	         [Defined when libESMTP has TLS support.]))
     test "$with_esmtp" != yes && CPPFLAGS="$CPPFLAGS -I$with_esmtp/include"
-    LIBS="$LIBS -lesmtp"
 else
     AC_MSG_RESULT([no])
 fi
@@ -504,8 +515,8 @@ fi
 AC_MSG_CHECKING([whether to build Compface support])
 if test "x$with_compface" != xno  ; then
     AC_MSG_RESULT([yes])
-    test "$with_compface" != yes && LIBS="$LIBS -L$with_compface/lib"
-    AC_CHECK_LIB(compface, uncompface, LIBS="$LIBS -lcompface",
+    test "$with_compface" != yes && BALSA_LIBS="$BALSA_LIBS -L$with_compface/lib"
+    AC_CHECK_LIB(compface, uncompface, BALSA_LIBS="$BALSA_LIBS -lcompface",
 	AC_MSG_ERROR([*** You enabled Compface but the library is not found.]),)
     AC_DEFINE(HAVE_COMPFACE, 1, 
               [Defined when Compface support is requested.])

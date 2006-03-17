@@ -946,7 +946,17 @@ main(int argc, char *argv[])
 #endif
 
     bab_init();
-    libbalsa_init((LibBalsaInformationFunc) information_real);
+    LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
+    LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN;
+    LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
+#if ENABLE_LDAP
+    LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
+#endif
+#if HAVE_SQLITE
+    LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
+#endif
+    libbalsa_real_information_func = (LibBalsaInformationFunc)information_real;
+    g_mime_init(0);
 
     /* load address book data */
     libbalsa_conf_push_group("Globals");

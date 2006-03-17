@@ -115,14 +115,7 @@ gchar *libbalsa_guess_ldap_server(void);
 
 gchar *libbalsa_guess_imap_inbox(void);
 
-gchar *libbalsa_guess_ldap_base(void);
-gchar *libbalsa_guess_ldap_name(void);
 
-gchar *libbalsa_guess_ldif_file(void);
-
-gboolean libbalsa_ldap_exists(const gchar *server);
-
-void libbalsa_assure_balsa_dir(void);
 gchar* libbalsa_date_to_utf8(const time_t *date, const gchar *date_string);
 LibBalsaMessageStatus libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags);
 

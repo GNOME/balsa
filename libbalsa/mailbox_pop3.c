@@ -37,6 +37,7 @@
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
 #include "pop3.h"
+#include "misc.h"
 #include "mailbox.h"
 #include "mailbox_pop3.h"
 #include "i18n.h"

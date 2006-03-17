@@ -2381,3 +2381,124 @@ libbalsa_create_size_group(GtkWidget * chooser)
 
     return size_group;
 }
+
+void
+libbalsa_assure_balsa_dir(void)
+{
+    gchar* dir = g_strconcat(g_get_home_dir(), "/.balsa", NULL);
+    mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR);
+    g_free(dir);
+}
+
+/* Some more "guess" functions symmetric to libbalsa_guess_mail_spool()... */
+
+#define POP_SERVER "pop"
+#define IMAP_SERVER "mx"
+#define LDAP_SERVER "ldap"
+
+static gchar*
+qualified_hostname(const char *name)
+{
+    gchar *domain=libbalsa_get_domainname();
+
+    if(domain) {
+	gchar *host=g_strdup_printf("%s.%s", name, domain);
+	
+	g_free(domain);
+
+	return host;
+    } else
+	return g_strdup(name);
+}
+
+
+gchar *libbalsa_guess_pop_server()
+{
+    return qualified_hostname(POP_SERVER);
+}
+
+gchar *libbalsa_guess_imap_server()
+{
+    return qualified_hostname(IMAP_SERVER);
+}
+
+gchar *libbalsa_guess_ldap_server()
+{
+    return qualified_hostname(LDAP_SERVER);
+}
+
+gchar *libbalsa_guess_imap_inbox()
+{
+    gchar *server = libbalsa_guess_imap_server();
+
+    if(server) {
+	gchar *url = g_strdup_printf("imap://%s/INBOX", server);
+	
+	g_free(server);
+
+	return url;
+    }
+
+    return NULL;
+}
+
+gchar *libbalsa_guess_ldap_base()
+{
+    gchar *server = libbalsa_guess_ldap_server();
+
+    /* Note: Assumes base dn is "o=<domain name>". Somewhat speculative... */
+    if(server) {
+	gchar *base=NULL, *domain;
+
+	if((domain=strchr(server, '.')))
+	   base = g_strdup_printf("o=%s", domain+1);
+	
+	g_free(server);
+
+	return base;
+    }
+    return NULL;
+}
+
+gchar *libbalsa_guess_ldap_name()
+{
+    gchar *base = libbalsa_guess_ldap_base();
+
+    if(base) {
+	gchar *name = strchr(base, '=');
+	gchar *dir_name = g_strdup_printf(_("LDAP Directory for %s"), 
+					  (name?name+1:base));
+	g_free(base);
+
+	return dir_name;
+    } 
+
+    return NULL;
+}
+
+gchar *libbalsa_guess_ldif_file()
+{
+    int i;
+    gchar *ldif;
+
+    static const gchar *guesses[] = {
+	"address.ldif",
+	".address.ldif",
+	"address-book.ldif",
+	".address-book.ldif",
+	".addressbook.ldif",
+	NULL
+    };
+
+    for (i = 0; guesses[i] != NULL; i++) {
+	ldif =  g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S, 
+			    guesses[i], NULL);
+	if (g_file_test(ldif, G_FILE_TEST_EXISTS))
+	     return ldif;
+	  
+	g_free(ldif);
+    }
+    return g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S, 
+			guesses[i], NULL); /* *** Or NULL */
+    
+}

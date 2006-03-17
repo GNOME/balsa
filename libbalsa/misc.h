@@ -197,4 +197,12 @@ GtkWidget *libbalsa_create_check(const gchar * label, GtkWidget * table,
                                  gint row, gboolean initval);
 GtkSizeGroup *libbalsa_create_size_group(GtkWidget * chooser);
 
+void libbalsa_assure_balsa_dir(void);
+gchar *libbalsa_guess_ldap_base(void);
+gchar *libbalsa_guess_ldap_name(void);
+
+gchar *libbalsa_guess_ldif_file(void);
+
+gboolean libbalsa_ldap_exists(const gchar *server);
+
 #endif				/* __LIBBALSA_MISC_H__ */

@@ -1,3 +1,7 @@
+2006-03-16 19:56  PeterB
+
+	* libbalsa/mailbox.c: notify Gtk when msgno changes.
+
 2006-03-09  Pawel Salek
 
 	* libbalsa/address-book-ldap.c: use openldap-2.3.x compatible API.

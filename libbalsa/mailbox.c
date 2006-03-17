@@ -1204,7 +1204,7 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     lbm_threads_leave(mailbox);
 }
 
-struct remove_data { unsigned seqno; GNode *node; };
+struct remove_data {LibBalsaMailbox *mailbox; unsigned seqno; GNode *node; };
 static gboolean
 decrease_post(GNode *node, gpointer data)
 {
@@ -1212,8 +1212,12 @@ decrease_post(GNode *node, gpointer data)
     unsigned seqno = GPOINTER_TO_UINT(node->data);
     if(seqno == dt->seqno) 
         dt->node = node;
-    else if(seqno>dt->seqno)
+    else if(seqno>dt->seqno) {
+        GtkTreeIter iter; 
         node->data = GUINT_TO_POINTER(seqno-1);
+        iter.user_data = node;
+        lbm_msgno_changed(dt->mailbox, seqno, &iter);
+    }
     return FALSE;
 }
 
@@ -1235,6 +1239,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
         return;
     }
 
+    dt.mailbox = mailbox;
     dt.seqno = seqno;
     dt.node = NULL;
 

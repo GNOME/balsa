@@ -20,6 +20,10 @@
  * 02111-1307, USA.
  */
 
+/* The routines that go here should depend only on common libraries - so that
+   this file can be linked against the address book program balsa-ab
+   without introducing extra dependencies. External library
+   dependencies should go to libbalsa.c */
 #include "config.h"
 
 #define _SVID_SOURCE           1
@@ -34,19 +38,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
-#if HAVE_COMPFACE
-#include <compface.h>
-#endif                          /* HAVE_COMPFACE */
 
 #ifdef HAVE_GNOME
 #include <libgnomevfs/gnome-vfs.h>
-#endif
-
-#if HAVE_GTKSOURCEVIEW
-#include <gtksourceview/gtksourceview.h>
-#include <gtksourceview/gtksourcebuffer.h>
-#include <gtksourceview/gtksourcetag.h>
-#include <gtksourceview/gtksourcetagstyle.h>
 #endif
 
 #include "libbalsa.h"
@@ -2040,235 +2034,6 @@ libbalsa_ia_rfc2821_equal(const InternetAddress * a,
     else
         return TRUE;
 }
-
-/*
- * Face and X-Face header support.
- */
-gchar *
-libbalsa_get_header_from_path(const gchar * header, const gchar * path,
-                              gsize * size, GError ** err)
-{
-    gchar *buf, *content;
-    size_t name_len;
-    gchar *p, *q;
-
-    if (!g_file_get_contents(path, &buf, size, err))
-        return NULL;
-
-    content = buf;
-    name_len = strlen(header);
-    if (g_ascii_strncasecmp(content, header, name_len) == 0)
-        /* Skip header and trailing colon: */
-        content += name_len + 1;
-
-    /* Unfold. */
-    for (p = q = content; *p; p++)
-        if (*p != '\r' && *p != '\n')
-            *q++ = *p;
-    *q = '\0';
-
-    content = g_strdup(content);
-    g_free(buf);
-
-    return content;
-}
-
-GtkWidget *
-libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
-{
-    GMimeStream *stream;
-    GMimeStream *stream_filter;
-    GMimeFilter *filter;
-    GByteArray *array;
-    GtkWidget *image = NULL;
-
-    stream = g_mime_stream_mem_new();
-    stream_filter = g_mime_stream_filter_new_with_stream(stream);
-
-    filter = g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
-    g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter), filter);
-    g_object_unref(filter);
-
-    g_mime_stream_write_string(stream_filter, content);
-    g_object_unref(stream_filter);
-
-    array = GMIME_STREAM_MEM(stream)->buffer;
-    if (array->len == 0)
-        g_set_error(err, LIBBALSA_IMAGE_ERROR,
-                    LIBBALSA_IMAGE_ERROR_NO_DATA, _("No image data"));
-    else {
-        GdkPixbufLoader *loader =
-            gdk_pixbuf_loader_new_with_type("png", NULL);
-
-        gdk_pixbuf_loader_write(loader, array->data, array->len, err);
-        gdk_pixbuf_loader_close(loader, *err ? NULL : err);
-
-        if (!*err)
-            image = gtk_image_new_from_pixbuf(gdk_pixbuf_loader_get_pixbuf
-                                              (loader));
-        g_object_unref(loader);
-    }
-    g_object_unref(stream);
-
-    return image;
-}
-
-#if HAVE_COMPFACE
-GtkWidget *
-libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
-{
-    gchar buf[2048];
-    GdkPixbuf *pixbuf;
-    guchar *pixels;
-    gint lines;
-    const gchar *p;
-    GtkWidget *image = NULL;
-
-    strncpy(buf, content, sizeof buf - 1);
-
-    switch (uncompface(buf)) {
-    case -1:
-        g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_FORMAT,
-                    _("Invalid input format"));
-        return image;
-    case -2:
-        g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_BUFFER,
-                    _("Internal buffer overrun"));
-        return image;
-    }
-
-    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, 48, 48);
-    pixels = gdk_pixbuf_get_pixels(pixbuf);
-
-    p = buf;
-    for (lines = 48; lines > 0; --lines) {
-        guint x[3];
-        gint j, k;
-        guchar *q;
-
-        if (sscanf(p, "%x,%x,%x,", &x[0], &x[1], &x[2]) != 3) {
-            g_set_error(err, LIBBALSA_IMAGE_ERROR,
-                        LIBBALSA_IMAGE_ERROR_BAD_DATA,
-                        /* Translators: please do not translate Face. */
-                        _("Bad X-Face data"));
-            g_object_unref(pixbuf);
-            return image;
-        }
-        for (j = 0, q = pixels; j < 3; j++)
-            for (k = 15; k >= 0; --k){
-                guchar c = x[j] & (1 << k) ? 0x00 : 0xff;
-                *q++ = c;       /* red   */
-                *q++ = c;       /* green */
-                *q++ = c;       /* blue  */
-            }
-        p = strchr(p, '\n') + 1;
-        pixels += gdk_pixbuf_get_rowstride(pixbuf);
-    }
-
-    image = gtk_image_new_from_pixbuf(pixbuf);
-    g_object_unref(pixbuf);
-
-    return image;
-}
-#endif                          /* HAVE_COMPFACE */
-
-GQuark
-libbalsa_image_error_quark(void)
-{
-    static GQuark quark = 0;
-    if (quark == 0)
-        quark = g_quark_from_static_string("libbalsa-image-error-quark");
-    return quark;
-}
-
-#if HAVE_GTKSOURCEVIEW
-GtkWidget *
-libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
-{
-    GtkTextTag * text_tag;
-    GtkSourceTagStyle *tag_style;
-    GtkSourceTagTable *tag_table;
-    GSList *tag_list;
-    GtkSourceBuffer *sbuffer;
-    GtkWidget *sview;
-
-    /* create the tag table */
-    tag_list = NULL;
-    tag_table = gtk_source_tag_table_new();
-
-    /* add highlighting for quoted text if requested */
-    if (q_colour) {
-	int k;
-
-	for (k = 1; k <= 9; k++) {
-	    gchar * tag_id;
-	    gchar * pattern;
-
-	    tag_id = g_strdup_printf("Quote-%d", k);
-	    if (k == 1)
-		pattern = g_strdup("^> ?($|[^|>:}#])");
-	    else
-		pattern = g_strdup_printf("^(> ?){%d}($|[^|>:}#])", k);
-	    printf("%d: %s\n", k, pattern);
-	    text_tag = gtk_line_comment_tag_new(tag_id, tag_id, pattern);
-	    g_free(pattern);
-	    g_free(tag_id);
-	    tag_style = gtk_source_tag_style_new();
-	    tag_style->mask = GTK_SOURCE_TAG_STYLE_USE_FOREGROUND;
-	    tag_style->foreground = q_colour[(k - 1) & 1];
-	    gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	    gtk_source_tag_style_free(tag_style);
-	    tag_list = g_slist_prepend(tag_list, text_tag);
-	}
-    }
-
-    /* if requested create the patterns for bold, italic and underline */
-    if (highlight_phrases) {
-	text_tag = gtk_pattern_tag_new("Bold", "Bold",
-				       "(^|[[:space:]])\\*[[:alnum:]][^*\n]*[[:alnum:]]\\*");
-	tag_style = gtk_source_tag_style_new();
-	tag_style->bold = TRUE;
-	gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	gtk_source_tag_style_free(tag_style);
-	tag_list = g_slist_prepend(tag_list, text_tag);
-
-	text_tag = gtk_pattern_tag_new("Italic", "Italic",
-				       "(^|[[:space:]])/[[:alnum:]][^/\n]*[[:alnum:]]/");
-	tag_style = gtk_source_tag_style_new();
-	tag_style->italic = TRUE;
-	gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	gtk_source_tag_style_free(tag_style);
-	tag_list = g_slist_prepend(tag_list, text_tag);
-
-	text_tag = gtk_pattern_tag_new("Underline", "Underline",
-				       "(^|[[:space:]])_[[:alnum:]][^_\n]*[[:alnum:]]_");
-	tag_style = gtk_source_tag_style_new();
-	tag_style->underline = TRUE;
-	gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	gtk_source_tag_style_free(tag_style);
-	tag_list = g_slist_prepend(tag_list, text_tag);
-    }
-
-    /* add tags to the table if present */
-    if (tag_list) {
-	gtk_source_tag_table_add_tags(tag_table, tag_list);
-	g_slist_foreach(tag_list, (GFunc)g_object_unref, NULL);
-	g_slist_free(tag_list);
-    }
-
-    /* create the source buffer */
-    sbuffer = gtk_source_buffer_new(tag_table);
-    g_object_unref(tag_table);
-    gtk_source_buffer_set_highlight(sbuffer, highlight_phrases || q_colour);
-    gtk_source_buffer_set_check_brackets(sbuffer, FALSE);
-
-    /* create & return the source view */
-    sview = gtk_source_view_new_with_buffer(sbuffer);
-    g_object_unref(sbuffer);
-
-    return sview;
-}
-#endif  /* HAVE_GTKSOURCEVIEW */
 
 /*
  * Utilities for making consistent dialogs.

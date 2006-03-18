@@ -1,3 +1,8 @@
+2006-03-18  Pawel Salek
+
+	* libbalsa/libbalsa.[hc]:
+	* libbalsa/misc.[hc]: move library-dependent stuff to libbalsa.c.
+
 2006-03-17  Pawel Salek
 
 	* configure.in: create separately list of balsa-ab libraries (12

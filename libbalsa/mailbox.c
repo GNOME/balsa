@@ -858,6 +858,9 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
         if (msgno_has_flags
             (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0))
             flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+        if (msgno_has_flags
+            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_DELETED, 0))
+            flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
 
         if (add_message(dest, stream, flags, err)) {
             if (flags & LIBBALSA_MESSAGE_FLAG_NEW)

@@ -1,3 +1,8 @@
+2006-03-21  Pawel Salek
+
+	* libbalsa/mi{me,sc}.c: move PCRE dependency to mime.c
+	* libbalsa/mailbox.c: copy the "deleted" flag as well (Emanuel).
+
 2006-03-18  Pawel Salek
 
 	* libbalsa/libbalsa.[hc]:

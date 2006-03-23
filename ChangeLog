@@ -1,3 +1,7 @@
+2006-03-23  Pawel Salek
+
+	* libbalsa/send.c: report MAIL FROM SMTP command errors.
+
 2006-03-21  Pawel Salek
 
 	* libbalsa/mi{me,sc}.c: move PCRE dependency to mime.c

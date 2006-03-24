@@ -1,3 +1,11 @@
+2006-03-24 08:44  PeterB
+
+	* libbalsa/smtp-server.c: build without
+	HAVE_SMTP_TLS_CLIENT_CERTIFICATE.
+	* libbalsa/mime.c: include ctype header file.
+	* src/balsa-mblist.c: unref the correct object; hold gdk lock while
+	closing mbnode.
+
 2006-03-23  Pawel Salek
 
 	* libbalsa/send.c: report MAIL FROM SMTP command errors.

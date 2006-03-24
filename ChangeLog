@@ -1,3 +1,9 @@
+2006-03-24 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/libbalsa.c: proper regex's for highlighting quoted
+	lines.
+	* configure.in: libesmtp sometimes needs -lpthread.
+
 2006-03-24 08:44  PeterB
 
 	* libbalsa/smtp-server.c: build without

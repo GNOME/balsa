@@ -871,16 +871,17 @@ libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
 
 	for (k = 1; k <= 9; k++) {
 	    gchar * tag_id;
-	    gchar * pattern;
+	    const gchar * pattern;
+            gchar *tmp = NULL;
 
 	    tag_id = g_strdup_printf("Quote-%d", k);
 	    if (k == 1)
-		pattern = g_strdup("^> ?($|[^|>:}#])");
+		pattern = "^> *($|[^ |>:}#\n])";
 	    else
-		pattern = g_strdup_printf("^(> ?){%d}($|[^|>:}#])", k);
-	    printf("%d: %s\n", k, pattern);
+		pattern = tmp =
+                    g_strdup_printf("^(> *){%d}($|[^ |>:}#\n])", k);
 	    text_tag = gtk_line_comment_tag_new(tag_id, tag_id, pattern);
-	    g_free(pattern);
+	    g_free(tmp);
 	    g_free(tag_id);
 	    tag_style = gtk_source_tag_style_new();
 	    tag_style->mask = GTK_SOURCE_TAG_STYLE_USE_FOREGROUND;

@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <ctype.h>
 
 #include "libbalsa.h"
 #include "misc.h"

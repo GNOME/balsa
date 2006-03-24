@@ -405,10 +405,12 @@ if test "x$with_esmtp" != xno  ; then
 	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
 	    'require_all_recipients'. Please get a Balsa aware
 	    libESMTP from http://balsa.gnome.org/main.html or compile
-	    libESMTP with './configure --enable-require-all-recipients'.]))
+	    libESMTP with './configure --enable-require-all-recipients'.]),
+                 -lpthread)
     AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
 	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
-	         [Defined when libESMTP has TLS support.]))
+	         [Defined when libESMTP has TLS support.]),
+		 -lpthread)
     test "$with_esmtp" != yes && CPPFLAGS="$CPPFLAGS -I$with_esmtp/include"
 else
     AC_MSG_RESULT([no])

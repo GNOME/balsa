@@ -1231,7 +1231,7 @@ get_lru_descendant(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
        (!dt->mbnode || (mbnode->last_use < dt->mbnode->last_use)) )
     {
         if (dt->mbnode)
-            g_object_unref(mbnode);
+            g_object_unref(dt->mbnode);
         dt->mbnode = mbnode; 
     }
 
@@ -1259,7 +1259,9 @@ balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
     dt.mbnode = NULL;
     gtk_tree_model_foreach(model, get_lru_descendant, &dt);
     if(dt.mbnode) {
+        gdk_threads_enter();
         balsa_window_close_mbnode(balsa_app.main_window, dt.mbnode);
+        gdk_threads_leave();
         g_object_unref(dt.mbnode);
     }
     return dt.mbnode != NULL;

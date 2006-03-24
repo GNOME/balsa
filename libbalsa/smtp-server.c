@@ -71,7 +71,9 @@ libbalsa_smtp_server_finalize(GObject * object)
 
     auth_destroy_context(smtp_server->authctx);
     g_free(smtp_server->name);
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     g_free(smtp_server->cert_passphrase);
+#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -255,6 +257,7 @@ libbalsa_smtp_server_get_name(LibBalsaSmtpServer * smtp_server)
     return smtp_server ? smtp_server->name : _("Default");
 }
 
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
 void
 libbalsa_smtp_server_set_cert_passphrase(LibBalsaSmtpServer * smtp_server,
                                          const gchar * passphrase)
@@ -268,6 +271,7 @@ libbalsa_smtp_server_get_cert_passphrase(LibBalsaSmtpServer * smtp_server)
 {
     return smtp_server->cert_passphrase;
 }
+#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 
 auth_context_t
 libbalsa_smtp_server_get_authctx(LibBalsaSmtpServer * smtp_server)
@@ -574,8 +578,10 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     g_signal_connect(sdi->pass, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     smtp_server_add_widget(table, ++row, _("Use _TLS:"), sdi->tlsm =
                            smtp_server_tls_widget(smtp_server));
+#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
     g_signal_connect(sdi->tlsm, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 

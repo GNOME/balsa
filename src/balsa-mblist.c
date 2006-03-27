@@ -1025,24 +1025,28 @@ update_mailbox_idle(struct update_mbox_data *umd)
         g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
 
         if (balsa_app.mblist_tree_store) {
+            gboolean subscribed =
+                libbalsa_mailbox_get_subscribe(umd->mailbox) !=
+                LB_MAILBOX_SUBSCRIBE_NO;
             bmbl_update_mailbox(balsa_app.mblist_tree_store, umd->mailbox);
-            check_new_messages_count(umd->mailbox, umd->notify);
+            check_new_messages_count(umd->mailbox, umd->notify
+                                     && subscribed);
 
-            if (libbalsa_mailbox_get_subscribe(umd->mailbox) !=
-                LB_MAILBOX_SUBSCRIBE_NO
-                && libbalsa_mailbox_get_unread(umd->mailbox) > 0)
-                g_signal_emit(balsa_app.mblist,
-                              balsa_mblist_signals[HAS_UNREAD_MAILBOX], 0,
-                              TRUE);
-            else {
-                GList *unread_mailboxes =
-                    balsa_mblist_find_all_unread_mboxes(NULL);
-                if (unread_mailboxes)
-                    g_list_free(unread_mailboxes);
-                else
+            if (subscribed) {
+                if (libbalsa_mailbox_get_unread(umd->mailbox) > 0)
                     g_signal_emit(balsa_app.mblist,
                                   balsa_mblist_signals[HAS_UNREAD_MAILBOX],
-                                  0, FALSE);
+                                  0, TRUE);
+                else {
+                    GList *unread_mailboxes =
+                        balsa_mblist_find_all_unread_mboxes(NULL);
+                    if (unread_mailboxes)
+                        g_list_free(unread_mailboxes);
+                    else
+                        g_signal_emit(balsa_app.mblist,
+                                      balsa_mblist_signals
+                                      [HAS_UNREAD_MAILBOX], 0, FALSE);
+                }
             }
         }
     }

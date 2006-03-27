@@ -1,3 +1,8 @@
+2006-03-27 07:46  PeterB
+
+	* src/balsa-mblist.c: if mailbox isn't subscribed for checking,
+	don't notify user about new mail and don't emit BalsaMBList signal.
+
 2006-03-24 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/libbalsa.c: proper regex's for highlighting quoted

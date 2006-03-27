@@ -1,5 +1,6 @@
-2006-03-27 07:46  PeterB
+2006-03-27 07:55  PeterB
 
+	* src/main-window.c: cut down console messages.
 	* src/balsa-mblist.c: if mailbox isn't subscribed for checking,
 	don't notify user about new mail and don't emit BalsaMBList signal.
 

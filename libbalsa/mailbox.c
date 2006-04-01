@@ -627,11 +627,12 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
                                    libbalsa_mailbox_total_messages
                                    (mailbox));
         libbalsa_mailbox_set_unread(mailbox, mailbox->unread_messages);
-    } else {
-        /* Total is unknown, but mailbox->has_unread_messages is valid. */
+    } else if (mailbox->has_unread_messages
+               && libbalsa_mailbox_get_unread(mailbox) == 0) {
+        /* Mail has arrived in a closed mailbox since our last check;
+         * total is unknown, but mailbox->has_unread_messages is valid. */
         libbalsa_mailbox_set_total(mailbox, -1);
-        libbalsa_mailbox_set_unread(mailbox,
-                                    mailbox->has_unread_messages ? 1 : 0);
+        libbalsa_mailbox_set_unread(mailbox, 1);
     }
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
 }

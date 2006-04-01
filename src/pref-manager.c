@@ -1276,10 +1276,17 @@ update_address_books(void)
     gchar *type, *name;
     GList *list = balsa_app.address_book_list;
     LibBalsaAddressBook *address_book;
-    GtkTreeView *tree_view = GTK_TREE_VIEW(pui->address_books);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeView *tree_view;
+    GtkTreeModel *model;
     GtkTreeIter iter;
 
+    if (!pui)
+        /* Pref window was closed while the address book dialog was
+         * open. */
+        return;
+
+    tree_view = GTK_TREE_VIEW(pui->address_books);
+    model = gtk_tree_view_get_model(tree_view);
     gtk_list_store_clear(GTK_LIST_STORE(model));
 
     while (list) {

@@ -101,7 +101,15 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
 {
     AddressBookConfig *abc;
 
+    abc = g_object_get_data(G_OBJECT(address_book), "balsa-abc");
+    if (abc) {
+        /* Only one dialog per address book. */
+        gdk_window_raise(abc->window->window);
+        return;
+    }
+
     abc = g_new0(AddressBookConfig, 1);
+    g_object_set_data(G_OBJECT(address_book), "balsa-abc", abc);
     abc->address_book = address_book;
     abc->callback = callback;
     abc->type = G_TYPE_FROM_INSTANCE(address_book);
@@ -147,6 +155,7 @@ edit_book_response(GtkWidget * dialog, gint response,
     }
 
     gtk_widget_destroy(dialog);
+    g_object_set_data(G_OBJECT(abc->address_book), "balsa-abc", NULL);
     g_free(abc);
 }
 

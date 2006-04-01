@@ -1,5 +1,9 @@
-2006-04-01 06:54  PeterB
+2006-04-01 09:52  PeterB
 
+	* src/pref-manager.c: do not crash if address book changes are
+	applied after pref manager is closed.
+	* src/address-book-config.c: allow only one dialog per address
+	book.
 	* libbalsa/mailbox.c: don't clear counts until we know they're
 	wrong.
 

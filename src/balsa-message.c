@@ -2088,8 +2088,9 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
 			       original_rcpt);	
     g_string_append_printf(report, "Final-Recipient: rfc822; %s\n",
 			   balsa_app.current_ident->ia->value.addr);
-    g_string_append_printf(report, "Original-Message-ID: %s\n",
-			   for_msg->message_id);
+    if (for_msg->message_id)
+        g_string_append_printf(report, "Original-Message-ID: <%s>\n",
+                               for_msg->message_id);
     g_string_append_printf(report,
 			   "Disposition: %s-action/MDN-sent-%sly; displayed",
 			   manual ? "manual" : "automatic",

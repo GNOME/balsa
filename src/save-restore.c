@@ -1754,13 +1754,9 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 	libbalsa_conf_set_int("SortType",    view->sort_type);
     if (view->sort_field     != libbalsa_mailbox_get_sort_field(NULL))
 	libbalsa_conf_set_int("SortField",   view->sort_field);
-    /* initial value for show is UNSET, but that's always replaced, 
-     * and we want it to default to FROM. */
-    if (view->show           != LB_MAILBOX_SHOW_FROM)
+    if (view->show           == LB_MAILBOX_SHOW_TO)
 	libbalsa_conf_set_int("Show",        view->show);
-    /* initial value for subscribe is UNSET, but that's always replaced, 
-     * and we want it to default to YES. */
-    if (view->subscribe      != LB_MAILBOX_SUBSCRIBE_YES)
+    if (view->subscribe      == LB_MAILBOX_SUBSCRIBE_NO)
 	libbalsa_conf_set_int("Subscribe",   view->subscribe);
     if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
 	libbalsa_conf_set_bool("Exposed",    view->exposed);

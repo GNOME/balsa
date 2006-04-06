@@ -1031,6 +1031,34 @@ add_to_attachments_popup(GtkMenuShell * menu, const gchar * item,
 }
 
 static void
+toggle_all_inline_cb(GtkCheckMenuItem * item, BalsaPartInfo *info)
+{
+    BalsaMessage * bm = g_object_get_data(G_OBJECT(item), "balsa-message");
+
+    g_return_if_fail(bm);
+    g_return_if_fail(info);
+    
+    bm->force_inline = gtk_check_menu_item_get_active(item);
+    
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
+    select_part(bm, info);
+}
+
+static void
+add_toggle_inline_menu_item(GtkMenuShell * menu, BalsaMessage * bm,
+			    BalsaPartInfo *info)
+{
+    GtkWidget * menuitem =
+	gtk_check_menu_item_new_with_label (_("force inline for all parts"));
+    
+    g_object_set_data(G_OBJECT(menuitem), "balsa-message", bm);
+    g_signal_connect(G_OBJECT (menuitem), "activate",
+		     GTK_SIGNAL_FUNC (toggle_all_inline_cb),
+		     (gpointer) info);
+    gtk_menu_shell_append(menu, menuitem);
+}
+
+static void
 display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
              GtkTreeModel * model, GtkTreeIter * iter, gchar * part_id)
 {
@@ -1060,6 +1088,10 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         } else if (is_multipart) {
             icon_title = mpart_content_name(content_type);
 	    if (!strcmp(part_id, "1")) {
+		add_toggle_inline_menu_item(GTK_MENU_SHELL(bm->parts_popup),
+					    bm, info);
+		gtk_menu_shell_append(GTK_MENU_SHELL(bm->parts_popup), 
+				      gtk_separator_menu_item_new ());
 		add_to_attachments_popup(GTK_MENU_SHELL(bm->parts_popup), 
 					 _("complete message"),
 					 bm, info);
@@ -1702,6 +1734,7 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 		g_mime_content_type_new_from_string(body->content_type);
 
             if (libbalsa_message_body_is_inline(body) ||
+		bm->force_inline ||
                 libbalsa_message_body_is_multipart(body) ||
 		g_mime_content_type_is_type(type, "application", "pgp-signature") ||
 		(balsa_app.has_smime && 
@@ -1711,6 +1744,7 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 	    g_mime_content_type_destroy(type);
 #else
             if (libbalsa_message_body_is_inline(body)
+		bm->force_inline ||
                 || libbalsa_message_body_is_multipart(body))
                 add_body(bm, body);
 #endif

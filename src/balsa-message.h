@@ -73,6 +73,7 @@ struct _BalsaMessage {
 
         BalsaPartInfo *current_part;
         GtkWidget *parts_popup;
+        gboolean force_inline;
 
 	LibBalsaMessage *message;
 

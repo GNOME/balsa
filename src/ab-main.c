@@ -447,7 +447,7 @@ file_delete_cb(GtkAction * action, gpointer user_data)
 }
 
 static void
-edit_new_person_cb(GtkAction * action, gpointer user_data)
+edit_new_entry_cb(GtkAction * action, gpointer user_data)
 {
     GtkTreeSelection *selection;
 
@@ -487,10 +487,8 @@ static GtkActionEntry entries[] = {
      "Delete address book", G_CALLBACK(file_delete_cb)},
     {"Quit", GTK_STOCK_QUIT, "_Quit", NULL, "Exit the program",
      gtk_main_quit},
-    {"NewPerson", GTK_STOCK_NEW, "_New Person", "<shift><control>N",
-     "Add new person", G_CALLBACK(edit_new_person_cb)},
-    {"NewGroup", GTK_STOCK_NEW, "New _Group", "<control>G",
-     "Add new group", NULL},
+    {"NewEntry", GTK_STOCK_NEW, "_New Entry", "<shift><control>N",
+     "Add new entry", G_CALLBACK(edit_new_entry_cb)},
     {"About",
 #if GTK_CHECK_VERSION(2, 6, 0)
      GTK_STOCK_ABOUT,
@@ -522,8 +520,7 @@ static const char *ui_description =
 "      <separator/>"
 "    </menu>"
 "    <menu action='EntryMenu'>"
-"      <menuitem action='NewPerson'/>"
-"      <menuitem action='NewGroup'/>"
+"      <menuitem action='NewEntry'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='About'/>"
@@ -569,21 +566,37 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
 }
 
 static void
+list_selection_changed_cb(GtkTreeSelection *selection, gpointer data);
+
+static void
 ab_set_edit_widget(LibBalsaAddress * address, gboolean can_remove)
 {
+    GtkTreeSelection* selection = 
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(contacts_app.entry_list));
+    g_signal_handlers_block_by_func(G_OBJECT(selection),
+                                    list_selection_changed_cb, &contacts_app);
+
     libbalsa_address_set_edit_entries(address, contacts_app.entries);
     gtk_widget_show_all(contacts_app.edit_widget);
     gtk_widget_set_sensitive(contacts_app.apply_button, FALSE);
     gtk_widget_set_sensitive(contacts_app.remove_button, can_remove);
-    gtk_widget_set_sensitive(contacts_app.cancel_button, !address);
+    printf("A: cancel sensitive: %d\n", TRUE);
+    gtk_widget_set_sensitive(contacts_app.cancel_button, TRUE);
 }
 
 static void
 ab_clear_edit_widget(void)
 {
+    GtkTreeSelection* selection = 
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(contacts_app.entry_list));
+    g_signal_handlers_unblock_by_func(G_OBJECT(selection),
+                                      list_selection_changed_cb,
+                                      &contacts_app);
+
     gtk_widget_hide(contacts_app.edit_widget);
     gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
     gtk_widget_set_sensitive(contacts_app.remove_button, FALSE);
+    printf("B: cancel sensitive: %d\n", FALSE);
     gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
 }
 
@@ -608,6 +621,39 @@ list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
     contacts_app.displayed_address = address;
 }
 
+static void 
+addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context, 
+                     GtkSelectionData* sel_data, guint target_type,
+                     guint time, gpointer user_data)
+{ 
+    GtkTreeView *addrlist;
+    GtkTreeModel *model;
+    GtkTreeSelection *selection;
+    GtkTreeIter iter;
+    LibBalsaAddress *address;
+    GValue gv = {0,};
+
+    g_return_if_fail (widget != NULL);
+    addrlist = GTK_TREE_VIEW(widget);
+
+    printf("drag_get: %d\n", target_type);
+    switch (target_type) {
+    case LIBBALSA_ADDRESS_TRG_ADDRESS:
+        selection = gtk_tree_view_get_selection(addrlist);
+        if(!gtk_tree_selection_get_selected(selection, &model, &iter))
+            return;
+        gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
+        address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
+        gtk_selection_data_set(sel_data, sel_data->target, 8,
+                               (const guchar *) &address,
+                               sizeof(LibBalsaAddress*));
+        break;
+    case LIBBALSA_ADDRESS_TRG_STRING:
+        g_print("Text/plain cannot be sent.\n");
+        break;
+    default: g_print("Do not know what to do!\n");
+    }
+}
 
 
 static GtkWidget *
@@ -633,7 +679,14 @@ bab_window_list_new(gpointer cb_data)
 
     tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     g_object_unref(store);
-
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_BROWSE);
+    g_signal_handler_block
+        (G_OBJECT(selection),
+         g_signal_connect(G_OBJECT(selection), "changed", 
+                          G_CALLBACK(list_selection_changed_cb),
+                          cb_data));
+    
     renderer = gtk_cell_renderer_text_new();
     column =
         gtk_tree_view_column_new_with_attributes(_("Name"),
@@ -642,11 +695,13 @@ bab_window_list_new(gpointer cb_data)
                                                  LIST_COLUMN_NAME, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-    gtk_tree_selection_set_mode(selection, GTK_SELECTION_BROWSE);
 
-    g_signal_connect(G_OBJECT(selection), "changed", 
-                     G_CALLBACK(list_selection_changed_cb), cb_data);
+    gtk_drag_source_set(GTK_WIDGET(tree), 
+                        GDK_BUTTON1_MASK,
+                        libbalsa_address_target_list, 2,
+                        GDK_ACTION_COPY);
+    g_signal_connect(G_OBJECT(tree), "drag-data-get",
+                     G_CALLBACK(addrlist_drag_get_cb), NULL);
 
     gtk_widget_show(tree);
     return tree;
@@ -683,7 +738,7 @@ apply_button_cb(GtkWidget * w, gpointer data)
 
         gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
         gtk_widget_set_sensitive(contacts_app.remove_button, TRUE);
-        gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
+        gtk_widget_set_sensitive(contacts_app.cancel_button, TRUE);
 
         /* We need to reload the book; if we modified an existing
          * address, we really need only to reload that one address, but
@@ -736,11 +791,7 @@ remove_button_cb(GtkWidget *w, gpointer data)
 static void
 cancel_button_cb(GtkWidget * w, gpointer data)
 {
-    struct ABMainWindow *abmw = (struct ABMainWindow *) data;
-    if (abmw->displayed_address)
-        ab_set_edit_widget(abmw->displayed_address, TRUE);
-    else
-        ab_clear_edit_widget();
+    ab_clear_edit_widget();
 }
 
 static GtkWidget*

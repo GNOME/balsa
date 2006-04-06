@@ -1,3 +1,12 @@
+2006-04-05 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/balsa-message.c: fix MDN syntax; add option to show all parts
+	inline.
+
+2006-04-05 13:17  PeterB
+
+	* src/save-restore.c: do not save UNSET show or subscribe values.
+
 2006-04-01 09:52  PeterB
 
 	* src/pref-manager.c: do not crash if address book changes are

@@ -1743,9 +1743,9 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
                 add_body(bm, body);
 	    g_mime_content_type_destroy(type);
 #else
-            if (libbalsa_message_body_is_inline(body)
+            if (libbalsa_message_body_is_inline(body) ||
 		bm->force_inline ||
-                || libbalsa_message_body_is_multipart(body))
+		libbalsa_message_body_is_multipart(body)) 
                 add_body(bm, body);
 #endif
         }

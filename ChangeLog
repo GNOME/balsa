@@ -1,3 +1,7 @@
+2006-04-07  Carlos Morgado  <chbm chbm.net>
+
+	* src/balsa-message.c (add_multipart_mixed): fix build without GPGME
+
 2006-04-05 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/balsa-message.c: fix MDN syntax; add option to show all parts

@@ -1,3 +1,8 @@
+2006-04-17  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* configure.in: Remove obsolete no_NO locale.
+	* po/no.po: And the translation.
+
 2006-04-07  Carlos Morgado  <chbm chbm.net>
 
 	* src/balsa-message.c (add_multipart_mixed): fix build without GPGME

@@ -389,7 +389,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
     filename = lbm_mbox_get_cache_filename(mbox);
 
     if (mbox->messages_info->len > 0) {
-#if GLIB_CHECK_VERSION(2, 8, 0)
+#if GLIB_CHECK_VERSION(2, 8, 0) && !defined(__APPLE__)
         if (!g_file_set_contents(filename, mbox->messages_info->data,
                                  mbox->messages_info->len
                                  * sizeof(struct message_info), &err)) {

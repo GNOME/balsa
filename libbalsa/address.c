@@ -307,24 +307,6 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
                 else
                     last_name = g_strdup(names[cnt - 1]);
             }
-#if 0
-	    /* get middle name */
-	    middle_name = g_strdup("");
-
-	    cnt2 = 1;
-	    if (cnt > 2)
-		while (cnt2 != cnt - 1) {
-		    carrier = middle_name;
-		    middle_name = g_strconcat(middle_name, names[cnt2++], NULL);
-		    g_free(carrier);
-
-		    if (cnt2 != cnt - 1) {
-			carrier = middle_name;
-			middle_name = g_strconcat(middle_name, " ", NULL);
-			g_free(carrier);
-		    }
-		}
-#endif
 	    g_strfreev(names);
 	}
     }
@@ -428,12 +410,105 @@ lba_address_list_widget(GCallback changed_cb, gpointer changed_data)
     return tree_view;
 }
 
+static void
+add_row(GtkWidget*button, gpointer data)
+{
+    GtkTreeView *tv = GTK_TREE_VIEW(data);
+    GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(tv));
+    GtkTreeIter iter;
+    GtkTreePath *path;
+    gtk_list_store_insert_with_values(store, &iter, 99999,
+                                      0, "", -1);
+    gtk_widget_grab_focus(GTK_WIDGET(tv));
+    path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+    gtk_tree_view_set_cursor(tv, path, NULL, TRUE);
+    gtk_tree_path_free(path);
+}
+
+GtkTargetEntry libbalsa_address_target_list[2] = {
+    {"text/plain",           0, LIBBALSA_ADDRESS_TRG_STRING },
+    {"x-application/x-addr", GTK_TARGET_SAME_APP,LIBBALSA_ADDRESS_TRG_ADDRESS}
+};
+
+static void
+addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
+                          gint x, gint y, GtkSelectionData * selection_data,
+                          guint target_type, guint32 time, gpointer data)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeIter iter;
+    gboolean dnd_success = FALSE;
+    LibBalsaAddress *addr;
+
+    printf("drag_received:\n");
+    /* Deal with what we are given from source */
+    if((selection_data != NULL) && (selection_data-> length >= 0)) {        
+        switch (target_type) {
+        case LIBBALSA_ADDRESS_TRG_ADDRESS:
+            addr = *(LibBalsaAddress**)selection_data->data;
+            if(addr && addr->address_list) {
+                g_print ("string: %s\n", (gchar*)addr->address_list->data);
+                gtk_list_store_insert_with_values(GTK_LIST_STORE(model),
+                                                  &iter, 99999,
+                                                  0,
+                                                  addr->address_list->data,
+                                                  -1);
+                dnd_success = TRUE;
+            }
+            break;
+        case LIBBALSA_ADDRESS_TRG_STRING:
+            g_print("text/plain target not implemented.\n");
+            break;
+        default: g_print ("nothing good");
+        }
+    }
+    
+    if (!dnd_success)
+        g_print ("DnD data transfer failed!\n");
+        
+    gtk_drag_finish(context, dnd_success, FALSE, time);
+}
+
+static gboolean
+addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
+                      gint x, gint y, guint time, gpointer user_data)
+{
+  gboolean        is_valid_drop_site;
+  GdkAtom         target_type;
+        
+  /* Check to see if (x,y) is a valid drop site within widget */
+  is_valid_drop_site = TRUE;
+        
+  /* If the source offers a target */
+  if (context-> targets) {
+      /* Choose the best target type */
+      target_type = GDK_POINTER_TO_ATOM 
+        (g_list_nth_data (context-> targets, LIBBALSA_ADDRESS_TRG_ADDRESS));
+                
+      /* Request the data from the source. */
+      printf("drag_drop requests target=%d\n", (int)target_type);
+      gtk_drag_get_data 
+        (
+         widget,         /* will receive 'drag-data-received' signal */
+         context,        /* represents the current state of the DnD */
+         target_type,    /* the target type we want */
+         time            /* time stamp */
+         );
+  } else {
+      is_valid_drop_site = FALSE;
+  }
+     
+  return  is_valid_drop_site;
+}
+
+
 GtkWidget*
 libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
                                  GCallback changed_cb, gpointer changed_data)
 {
     const static gchar *labels[NUM_FIELDS] = {
-	N_("_Displayed Name:"),
+	N_("D_isplayed Name:"),
 	N_("_First Name:"),
 	N_("_Last Name:"),
 	N_("_Nickname:"),
@@ -441,7 +516,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
         N_("_Email Address:")
     };
 
-    GtkWidget *table, *label;
+    GtkWidget *table, *label, *lhs;
     gint cnt;
 
     table = gtk_table_new(NUM_FIELDS, 2, FALSE);
@@ -455,18 +530,36 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
             continue;
 	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
 	gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.0);
-        if (cnt == EMAIL_ADDRESS)
+        if (cnt == EMAIL_ADDRESS) {
+            GtkWidget *box = gtk_vbox_new(FALSE, 0);
+            GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
             entries[cnt] = lba_address_list_widget(changed_cb,
                                                    changed_data);
-        else {
+            gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 1);
+            gtk_box_pack_start(GTK_BOX(box), but,   FALSE, FALSE, 1);
+            lhs = box;
+            g_signal_connect(but, "clicked", G_CALLBACK(add_row),
+                             entries[cnt]);
+             gtk_drag_dest_set(entries[cnt],
+                               GTK_DEST_DEFAULT_MOTION |
+                               GTK_DEST_DEFAULT_HIGHLIGHT,
+                               libbalsa_address_target_list,            
+                               2,              /* size of list */
+                               GDK_ACTION_COPY);
+            g_signal_connect(G_OBJECT(entries[cnt]), "drag-data-received",
+                             G_CALLBACK(addrlist_drag_received_cb), NULL);
+            g_signal_connect (G_OBJECT(entries[cnt]), "drag-drop",
+                              G_CALLBACK (addrlist_drag_drop_cb), NULL);
+        } else {
             entries[cnt] = gtk_entry_new();
             if (changed_cb)
                 g_signal_connect_swapped(entries[cnt], "changed",
                                          changed_cb, changed_data);
+            lhs = label;
         }
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
 
-	gtk_table_attach(GTK_TABLE(table), label, 0, 1, cnt + 1, cnt + 2,
+	gtk_table_attach(GTK_TABLE(table), lhs, 0, 1, cnt + 1, cnt + 2,
 			 GTK_FILL, GTK_FILL, 4, 4);
 
 	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
@@ -482,6 +575,16 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
 
     libbalsa_address_set_edit_entries(address, entries);
 
+    if (changed_cb) {
+        GtkTreeModel *model =
+            gtk_tree_view_get_model(GTK_TREE_VIEW(entries[EMAIL_ADDRESS]));
+        g_signal_connect_swapped(G_OBJECT(model), "row-inserted",
+                                 changed_cb, changed_data);
+        g_signal_connect_swapped(G_OBJECT(model), "row-changed",
+                                 changed_cb, changed_data);
+        g_signal_connect_swapped(G_OBJECT(model), "row-deleted",
+                                 changed_cb, changed_data);
+    }
     return table;
 }
 

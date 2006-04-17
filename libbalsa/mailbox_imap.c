@@ -2009,11 +2009,20 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     ImapFetchType ift = 0;
     g_return_val_if_fail(mimap->opened, FALSE);
 
-    /* work around some server bugs... */
+    /* Work around some server bugs by fetching the RFC2822 form of
+       the message. This is used also to save one RTT for one part
+       messages with a part that can certainly be displayed, there is
+       no reason to fetch the structure and the only part
+       separately... Observe, that the only part can be in principle
+       something else, like "audio", "*" - we do not prefetch such parts
+       yet. */
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     if(!imap_mbox_handle_can_do(mimap->handle, IMCAP_FETCHBODY) ||
        libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
-                                    ISBUG_FETCH)){
+                                    ISBUG_FETCH) ||
+       (message->headers &&
+        (!message->headers->content_type ||
+         g_mime_content_type_is_type(message->headers->content_type, "text", "*"))) ){
         /* we could optimize this part a little bit: we do not need to
          * keep reopening the stream. */
         GMimeStream *stream = 

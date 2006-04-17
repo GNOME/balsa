@@ -447,7 +447,7 @@ file_delete_cb(GtkAction * action, gpointer user_data)
 }
 
 static void
-edit_new_person_cb(GtkAction * action, gpointer user_data)
+edit_new_entry_cb(GtkAction * action, gpointer user_data)
 {
     GtkTreeSelection *selection;
 
@@ -487,10 +487,8 @@ static GtkActionEntry entries[] = {
      "Delete address book", G_CALLBACK(file_delete_cb)},
     {"Quit", GTK_STOCK_QUIT, "_Quit", NULL, "Exit the program",
      gtk_main_quit},
-    {"NewPerson", GTK_STOCK_NEW, "_New Person", "<shift><control>N",
-     "Add new person", G_CALLBACK(edit_new_person_cb)},
-    {"NewGroup", GTK_STOCK_NEW, "New _Group", "<control>G",
-     "Add new group", NULL},
+    {"NewEntry", GTK_STOCK_NEW, "_New Entry", "<shift><control>N",
+     "Add new entry", G_CALLBACK(edit_new_entry_cb)},
     {"About",
 #if GTK_CHECK_VERSION(2, 6, 0)
      GTK_STOCK_ABOUT,
@@ -522,8 +520,7 @@ static const char *ui_description =
 "      <separator/>"
 "    </menu>"
 "    <menu action='EntryMenu'>"
-"      <menuitem action='NewPerson'/>"
-"      <menuitem action='NewGroup'/>"
+"      <menuitem action='NewEntry'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='About'/>"
@@ -569,13 +566,16 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
 }
 
 static void
+list_row_activated_cb(GtkTreeView *tview, gpointer data);
+
+static void
 ab_set_edit_widget(LibBalsaAddress * address, gboolean can_remove)
 {
     libbalsa_address_set_edit_entries(address, contacts_app.entries);
     gtk_widget_show_all(contacts_app.edit_widget);
     gtk_widget_set_sensitive(contacts_app.apply_button, FALSE);
     gtk_widget_set_sensitive(contacts_app.remove_button, can_remove);
-    gtk_widget_set_sensitive(contacts_app.cancel_button, !address);
+    gtk_widget_set_sensitive(contacts_app.cancel_button, TRUE);
 }
 
 static void
@@ -585,6 +585,7 @@ ab_clear_edit_widget(void)
     gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
     gtk_widget_set_sensitive(contacts_app.remove_button, FALSE);
     gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
+    contacts_app.displayed_address = NULL;
 }
 
 static void
@@ -594,7 +595,10 @@ list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
     GtkTreeModel *model;
     GValue gv = {0,};
     LibBalsaAddress *address;
-
+    if(contacts_app.edit_widget &&
+       GTK_WIDGET_VISIBLE(contacts_app.edit_widget) &&
+       GTK_WIDGET_IS_SENSITIVE(contacts_app.edit_widget))
+	return;
     if(!gtk_tree_selection_get_selected(selection, &model, &iter))
         return;
     gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
@@ -602,13 +606,69 @@ list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
     if (address) {
         if (address != contacts_app.displayed_address)
             ab_set_edit_widget(address, TRUE);
+	gtk_widget_set_sensitive(contacts_app.edit_widget, FALSE);
     } else
         ab_clear_edit_widget();
     g_value_unset(&gv);
     contacts_app.displayed_address = address;
 }
 
+static void
+list_row_activated_cb(GtkTreeView *tree, gpointer data)
+{
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    GtkTreeSelection *selection;
+    GValue gv = {0,};
+    LibBalsaAddress *address;
 
+    selection = gtk_tree_view_get_selection(tree);
+    if(!gtk_tree_selection_get_selected(selection, &model, &iter))
+        return;
+    gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
+    address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
+    if (address) {
+        if (address != contacts_app.displayed_address)
+            ab_set_edit_widget(address, TRUE);
+	gtk_widget_set_sensitive(contacts_app.edit_widget, TRUE);
+    } else
+        ab_clear_edit_widget();
+    g_value_unset(&gv);
+    contacts_app.displayed_address = address;
+}
+
+static void 
+addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context, 
+                     GtkSelectionData* sel_data, guint target_type,
+                     guint time, gpointer user_data)
+{ 
+    GtkTreeView *addrlist;
+    GtkTreeModel *model;
+    GtkTreeSelection *selection;
+    GtkTreeIter iter;
+    LibBalsaAddress *address;
+    GValue gv = {0,};
+
+    g_return_if_fail (widget != NULL);
+    addrlist = GTK_TREE_VIEW(widget);
+
+    switch (target_type) {
+    case LIBBALSA_ADDRESS_TRG_ADDRESS:
+        selection = gtk_tree_view_get_selection(addrlist);
+        if(!gtk_tree_selection_get_selected(selection, &model, &iter))
+            return;
+        gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
+        address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
+        gtk_selection_data_set(sel_data, sel_data->target, 8,
+                               (const guchar *) &address,
+                               sizeof(LibBalsaAddress*));
+        break;
+    case LIBBALSA_ADDRESS_TRG_STRING:
+        g_print("Text/plain cannot be sent.\n");
+        break;
+    default: g_print("Do not know what to do!\n");
+    }
+}
 
 static GtkWidget *
 bab_window_list_new(gpointer cb_data)
@@ -633,20 +693,28 @@ bab_window_list_new(gpointer cb_data)
 
     tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     g_object_unref(store);
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+    g_signal_connect(G_OBJECT(selection), "changed", 
+                     G_CALLBACK(list_selection_changed_cb), cb_data);
+    g_signal_connect(G_OBJECT(tree), "row-activated", 
+                     G_CALLBACK(list_row_activated_cb), cb_data);
 
     renderer = gtk_cell_renderer_text_new();
     column =
-        gtk_tree_view_column_new_with_attributes(_("Name"),
+        gtk_tree_view_column_new_with_attributes(_("_Name"),
                                                  renderer,
                                                  "text",
                                                  LIST_COLUMN_NAME, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-    gtk_tree_selection_set_mode(selection, GTK_SELECTION_BROWSE);
 
-    g_signal_connect(G_OBJECT(selection), "changed", 
-                     G_CALLBACK(list_selection_changed_cb), cb_data);
+    gtk_drag_source_set(GTK_WIDGET(tree), 
+                        GDK_BUTTON1_MASK,
+                        libbalsa_address_target_list, 2,
+                        GDK_ACTION_COPY);
+    g_signal_connect(G_OBJECT(tree), "drag-data-get",
+                     G_CALLBACK(addrlist_drag_get_cb), NULL);
 
     gtk_widget_show(tree);
     return tree;
@@ -683,7 +751,7 @@ apply_button_cb(GtkWidget * w, gpointer data)
 
         gtk_widget_set_sensitive(contacts_app.apply_button,  FALSE);
         gtk_widget_set_sensitive(contacts_app.remove_button, TRUE);
-        gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
+        gtk_widget_set_sensitive(contacts_app.cancel_button, TRUE);
 
         /* We need to reload the book; if we modified an existing
          * address, we really need only to reload that one address, but
@@ -736,11 +804,7 @@ remove_button_cb(GtkWidget *w, gpointer data)
 static void
 cancel_button_cb(GtkWidget * w, gpointer data)
 {
-    struct ABMainWindow *abmw = (struct ABMainWindow *) data;
-    if (abmw->displayed_address)
-        ab_set_edit_widget(abmw->displayed_address, TRUE);
-    else
-        ab_clear_edit_widget();
+    ab_clear_edit_widget();
 }
 
 static GtkWidget*
@@ -813,6 +877,14 @@ bab_get_filter_box(void)
                              button);
     return search_hbox;
 }
+static gboolean
+ew_key_pressed(GtkEntry * entry, GdkEventKey * event, struct ABMainWindow *abmw)
+{
+    if (event->keyval != GDK_Escape)
+	return FALSE;
+    gtk_button_clicked(GTK_BUTTON(abmw->cancel_button));
+    return TRUE;
+}
 
 static GtkWidget*
 bab_window_new()
@@ -860,6 +932,8 @@ bab_window_new()
     g_signal_connect(G_OBJECT(find_entry), "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
     */
+    g_signal_connect(wnd, "key-press-event",
+		     G_CALLBACK(ew_key_pressed), &contacts_app);
     gtk_window_set_default_size(GTK_WINDOW(wnd), 500, 400);
     gnome_app_set_contents(GNOME_APP(wnd), main_vbox);
 

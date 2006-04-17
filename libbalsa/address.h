@@ -104,11 +104,20 @@ const gchar *libbalsa_address_get_mailbox_from_list(const
 */
 void libbalsa_address_set_edit_entries(LibBalsaAddress * address,
                                        GtkWidget ** entries);
-/** libbalsa_address_get_edit_widget() returns an widget adapted
-    for a LibBalsaAddress edition, with initial values set if address
-    is provided. The edit entries are set in entries array 
-    and enumerated with LibBalsaAddressField constants
+/** libbalsa_address_get_edit_widget() returns an widget adapted for a
+    LibBalsaAddress edition, with initial values set if address is
+    provided. The edit entries are set in entries array and enumerated
+    with LibBalsaAddressField constants. The widget accepts drops of
+    type TARGET_ADDRESS and TARGET_STRING.
 */
+
+enum {
+    LIBBALSA_ADDRESS_TRG_STRING,
+    LIBBALSA_ADDRESS_TRG_ADDRESS
+};
+
+extern GtkTargetEntry libbalsa_address_target_list[2];
+
 GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
                                             GtkWidget **entries,
                                             GCallback changed_cb,

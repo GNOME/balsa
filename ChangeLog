@@ -1,3 +1,12 @@
+2006-04-17  Pawel Salek
+
+	* libbalsa/address.[ch]: address list of edit vidget is now a drop
+	target.
+	* libbalsa/mailbox_imap.c: get rid of one RTT for simple messages.
+	* libbalsa/mailbox_mbox.c: silence spurious warnings on OSX.
+	* libbalsa/send.c: failure to send a message is an error.
+	* src/ab-main.c: support D&D and address lists.
+
 2006-04-17  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* configure.in: Remove obsolete no_NO locale.

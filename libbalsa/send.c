@@ -878,7 +878,7 @@ disp_recipient_status(smtp_recipient_t recipient,
 
   if(status->code != 0 && status->code != 250) {
       libbalsa_information(
-                           LIBBALSA_INFORMATION_WARNING, 
+                           LIBBALSA_INFORMATION_ERROR,
                            _("Could not send the message to %s:\n"
                              "%d: %s\n"
                              "Message left in your outbox.\n"), 

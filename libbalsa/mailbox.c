@@ -3398,6 +3398,7 @@ struct lbm_update_msg_tree_info {
     LibBalsaMailbox *mailbox;
     GNode *new_tree;
     GNode **nodes;
+    guint total;
 };
 
 /* GNodeTraverseFunc for making a reverse lookup array into a tree. */
@@ -3408,9 +3409,9 @@ lbm_update_msg_tree_populate(GNode * node,
     guint msgno;
 
     msgno = GPOINTER_TO_UINT(node->data);
-    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
 
-    mti->nodes[msgno] = node;
+    if (msgno < mti->total)
+        mti->nodes[msgno] = node;
 
     return FALSE;
 }
@@ -3425,8 +3426,7 @@ lbm_update_msg_tree_prune(GNode * node,
     guint msgno;
 
     msgno = GPOINTER_TO_UINT(node->data);
-    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
-    if (!mti->nodes[msgno]) {
+    if (msgno >= mti->total || !mti->nodes[msgno]) {
         /* It's a bottom-up traverse, so the node's remaining children
          * are all in the new tree; we'll promote them to be children of
          * the node's parent, which might even be where they finish up. */
@@ -3458,17 +3458,20 @@ lbm_update_msg_tree_move(GNode * new_node,
         return FALSE;
 
     msgno = GPOINTER_TO_UINT(new_node->data);
-    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
+    if (msgno >= mti->total)
+        return FALSE;
+
     node = mti->nodes[msgno];
     if (!node)
         mti->nodes[msgno] = node = g_node_new(new_node->data);
 
     msgno = GPOINTER_TO_UINT(new_node->parent->data);
-    g_assert(msgno <= libbalsa_mailbox_total_messages(mti->mailbox));
-    parent = mti->nodes[msgno];
-    g_assert(parent != NULL);
+    if (msgno >= mti->total)
+        return FALSE;
 
-    if (parent != node->parent)
+    parent = mti->nodes[msgno];
+
+    if (parent && parent != node->parent)
         libbalsa_mailbox_unlink_and_prepend(mti->mailbox, node, parent);
 
     return FALSE;
@@ -3481,8 +3484,8 @@ lbm_update_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 
     mti.mailbox = mailbox;
     mti.new_tree = new_tree;
-    mti.nodes =
-        g_new0(GNode *, 1 + libbalsa_mailbox_total_messages(mailbox));
+    mti.total = 1 + libbalsa_mailbox_total_messages(mailbox);
+    mti.nodes = g_new0(GNode *, mti.total);
 
     /* Populate the nodes array with nodes in the new tree. */
     g_node_traverse(new_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
@@ -3493,8 +3496,7 @@ lbm_update_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 
     /* Clear the nodes array and repopulate it with nodes in the current
      * tree. */
-    memset(mti.nodes, 0,
-           sizeof(GNode *) * (1 + libbalsa_mailbox_total_messages(mailbox)));
+    memset(mti.nodes, 0, sizeof(GNode *) * mti.total);
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     (GNodeTraverseFunc) lbm_update_msg_tree_populate, &mti);
     /* Check parent-child relationships. */

@@ -1,3 +1,8 @@
+2006-04-21 09:46  PeterB
+
+	* libbalsa/mailbox.c: total message count can change while we're
+	working on the tree, so we save it and remove assertions.
+
 2006-04-17  Pawel Salek
 
 	* libbalsa/address.[ch]: address list of edit vidget is now a drop

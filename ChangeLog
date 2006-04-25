@@ -1,3 +1,7 @@
+2006-04-25  Carlos Morgado  <chbm gnome.org>
+
+	* libbalsa/address.c (addrlist_drag_drop_cb): fix broken cast on 64b
+
 2006-04-21 09:46  PeterB
 
 	* libbalsa/mailbox.c: total message count can change while we're

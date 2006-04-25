@@ -487,7 +487,7 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
         (g_list_nth_data (context-> targets, LIBBALSA_ADDRESS_TRG_ADDRESS));
                 
       /* Request the data from the source. */
-      printf("drag_drop requests target=%d\n", (int)target_type);
+      printf("drag_drop requests target=%p\n", target_type);
       gtk_drag_get_data 
         (
          widget,         /* will receive 'drag-data-received' signal */

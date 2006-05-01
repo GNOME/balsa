@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-12 18:01+0200\n"
-"PO-Revision-Date: 2006-04-15 14:46+0100\n"
+"POT-Creation-Date: 2006-05-01 18:06+0200\n"
+"PO-Revision-Date: 2006-05-01 23:49+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -94,29 +94,36 @@ msgstr "Kan inte hitta adressen i adressboken"
 msgid "Unknown error"
 msgstr "Okänt fel"
 
-#: ../libbalsa/address.c:436
-msgid "_Displayed Name:"
-msgstr "_Visat namn:"
+#: ../libbalsa/address.c:511
+msgid "D_isplayed Name:"
+msgstr "V_isat namn:"
 
-#: ../libbalsa/address.c:437
+#: ../libbalsa/address.c:512
 msgid "_First Name:"
 msgstr "_Förnamn:"
 
-#: ../libbalsa/address.c:438
+#: ../libbalsa/address.c:513
 msgid "_Last Name:"
 msgstr "_Efternamn:"
 
-#: ../libbalsa/address.c:439
+#: ../libbalsa/address.c:514
 msgid "_Nickname:"
 msgstr "_Smeknamn:"
 
-#: ../libbalsa/address.c:440
+#: ../libbalsa/address.c:515
 msgid "O_rganization:"
 msgstr "O_rganisation:"
 
-#: ../libbalsa/address.c:441
+#: ../libbalsa/address.c:516
 msgid "_Email Address:"
 msgstr "_E-postadress:"
+
+#. Right/Add button
+#: ../libbalsa/address.c:535
+#: ../src/filter-edit-callbacks.c:1022
+#: ../src/filter-run-dialog.c:327
+msgid "A_dd"
+msgstr "L_ägg till"
 
 #: ../libbalsa/body.c:115
 #: ../libbalsa/mailbox_local.c:1657
@@ -632,12 +639,12 @@ msgid "Removing messages from source mailbox failed"
 msgstr "Borttagning av meddelanden från källpostlådan misslyckades"
 
 # Osäker på denna.
-#: ../libbalsa/mailbox.c:3612
+#: ../libbalsa/mailbox.c:3614
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Söker i %s efter ej kompletta meddelanden"
 
-#: ../libbalsa/mailbox.c:3702
+#: ../libbalsa/mailbox.c:3704
 msgid "Reconstructing message"
 msgstr "Rekonstruerar meddelande"
 
@@ -662,7 +669,7 @@ msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Öppnar %s Refräknare: %d\n"
 
 #: ../libbalsa/mailbox_imap.c:1092
-#: ../libbalsa/mailbox_imap.c:2232
+#: ../libbalsa/mailbox_imap.c:2241
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Hämtar %ld kB"
@@ -686,21 +693,21 @@ msgstr "Ingen sökväg hittades för postlådan \"%s\", med \"%s\""
 msgid "Cannot get IMAP handle"
 msgstr "Kan inte hämta IMAP-handtag"
 
-#: ../libbalsa/mailbox_imap.c:2265
+#: ../libbalsa/mailbox_imap.c:2274
 msgid "Cannot create temporary file"
 msgstr "Kan inte skapa temporärfil"
 
-#: ../libbalsa/mailbox_imap.c:2284
+#: ../libbalsa/mailbox_imap.c:2293
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Kan inte skriva till temporärfilen %s"
 
-#: ../libbalsa/mailbox_imap.c:2501
+#: ../libbalsa/mailbox_imap.c:2510
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Skickar %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:2685
+#: ../libbalsa/mailbox_imap.c:2694
 msgid "Server-side threading not supported."
 msgstr "Trådning på serversidan stöds inte."
 
@@ -1977,7 +1984,14 @@ msgstr "LDAP-adressbok"
 msgid "GPE Address Book"
 msgstr "GPE-adressbok"
 
-#: ../src/ab-main.c:639
+#: ../src/ab-main.c:705
+msgid "_Name"
+msgstr "_Namn"
+
+#: ../src/ab-main.c:855
+msgid "F_ilter:"
+msgstr "F_ilter:"
+
 #: ../src/ab-window.c:168
 #: ../src/filter-edit-dialog.c:200
 #: ../src/filter-export-dialog.c:90
@@ -1985,10 +1999,6 @@ msgstr "GPE-adressbok"
 #: ../src/filter-run-dialog.c:295
 msgid "Name"
 msgstr "Namn"
-
-#: ../src/ab-main.c:791
-msgid "F_ilter:"
-msgstr "F_ilter:"
 
 #: ../src/ab-window.c:176
 msgid "E-Mail Address"
@@ -2717,12 +2727,6 @@ msgstr "Innehåller/Innehåller i_nte"
 #: ../src/filter-edit-callbacks.c:995
 msgid "_One of the regular expressions matches"
 msgstr "_Ett av de reguljära uttrycken matchar"
-
-#. Right/Add button
-#: ../src/filter-edit-callbacks.c:1022
-#: ../src/filter-run-dialog.c:327
-msgid "A_dd"
-msgstr "L_ägg till"
 
 #. Left/Remove button
 #: ../src/filter-edit-callbacks.c:1026
@@ -6779,8 +6783,6 @@ msgstr "Ned"
 #~ "Detta meddelande kommer inte att krypteras för blindkopiemottagarna."
 #~ msgid "Please enter information about yourself."
 #~ msgstr "Skriv in information om dig själv."
-#~ msgid "_Name:"
-#~ msgstr "_Namn:"
 #~ msgid ""
 #~ "You seem to be running Balsa for the first time. The following steps will "
 #~ "set up Balsa by asking a few simple questions. Once you have completed "

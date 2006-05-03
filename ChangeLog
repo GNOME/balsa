@@ -1,3 +1,9 @@
+2006-05-03 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* libbalsa/mime.c: Improve recognition of multi-line URLs.
+	* libbalsa/misc.h: store a flag whether URL is in a flowed message.
+	* src/balsa-mime-widget-text.c: initialize this flag.
+
 2006-04-25  Carlos Morgado  <chbm gnome.org>
 
 	* libbalsa/address.c (addrlist_drag_drop_cb): fix broken cast on 64b

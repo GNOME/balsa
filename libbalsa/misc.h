@@ -89,6 +89,7 @@ typedef struct _LibBalsaUrlInsertInfo LibBalsaUrlInsertInfo;
 struct _LibBalsaUrlInsertInfo {
     libbalsa_url_cb_t callback;
     gpointer callback_data;
+    gboolean buffer_is_flowed;
     gchar *ml_url;
     GString *ml_url_buffer;
 };

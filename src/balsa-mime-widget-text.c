@@ -201,6 +201,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 				   NULL);
 	url_info.callback = url_found_cb;
 	url_info.callback_data = &url_list;
+	url_info.buffer_is_flowed = libbalsa_message_body_is_flowed(mime_body);
 	url_info.ml_url = NULL;
 	url_info.ml_url_buffer = NULL;
 

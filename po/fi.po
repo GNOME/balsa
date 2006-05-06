@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-08 10:29+0300\n"
-"PO-Revision-Date: 2006-04-08 10:35+0300\n"
+"POT-Creation-Date: 2006-05-06 08:28+0300\n"
+"PO-Revision-Date: 2006-05-06 08:28+0300\n"
 "Last-Translator: Ilkka Tuohela <hile@iki.fi>\n"
 "Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -82,29 +82,35 @@ msgstr "Osoitetta ei löydy osoitekirjasta"
 msgid "Unknown error"
 msgstr "Tuntematon virhe"
 
-#: ../libbalsa/address.c:436
-msgid "_Displayed Name:"
+#: ../libbalsa/address.c:511
+msgid "D_isplayed Name:"
 msgstr "_Näytettävä nimi:"
 
-#: ../libbalsa/address.c:437
+#: ../libbalsa/address.c:512
 msgid "_First Name:"
 msgstr "_Etunimi:"
 
-#: ../libbalsa/address.c:438
+#: ../libbalsa/address.c:513
 msgid "_Last Name:"
 msgstr "_Sukunimi:"
 
-#: ../libbalsa/address.c:439
+#: ../libbalsa/address.c:514
 msgid "_Nickname:"
 msgstr "_Lempiimi:"
 
-#: ../libbalsa/address.c:440
+#: ../libbalsa/address.c:515
 msgid "O_rganization:"
 msgstr "O_rganisaatio:"
 
-#: ../libbalsa/address.c:441
+#: ../libbalsa/address.c:516
 msgid "_Email Address:"
 msgstr "_Sähköpostiosoite:"
+
+#. Right/Add button
+#: ../libbalsa/address.c:535 ../src/filter-edit-callbacks.c:1022
+#: ../src/filter-run-dialog.c:327
+msgid "A_dd"
+msgstr "_Lisää"
 
 #: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1657
 #: ../libbalsa/message.c:852
@@ -603,12 +609,12 @@ msgstr "Kopioidaan kansiosta %s kansioon %s"
 msgid "Removing messages from source mailbox failed"
 msgstr "Viestien poisto lähdekansiosta epäonnistui"
 
-#: ../libbalsa/mailbox.c:3612
+#: ../libbalsa/mailbox.c:3614
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Etsitään osittaisia viestejä kansiosta %s"
 
-#: ../libbalsa/mailbox.c:3702
+#: ../libbalsa/mailbox.c:3704
 msgid "Reconstructing message"
 msgstr "Kootaan viestiä uudestaan"
 
@@ -630,7 +636,7 @@ msgstr "IMAP-palvelin katkaisi yhteyden: %s otetaan uusi yhteys..."
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Avataan %s viitemär: %d\n"
 
-#: ../libbalsa/mailbox_imap.c:1092 ../libbalsa/mailbox_imap.c:2232
+#: ../libbalsa/mailbox_imap.c:1092 ../libbalsa/mailbox_imap.c:2241
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Haetaan %ld kt"
@@ -653,21 +659,21 @@ msgstr "Polkua kansiolle \"%s\" ei löydy, käytetään \"%s\""
 msgid "Cannot get IMAP handle"
 msgstr "IMAP-kahvaa ei voida avata"
 
-#: ../libbalsa/mailbox_imap.c:2265
+#: ../libbalsa/mailbox_imap.c:2274
 msgid "Cannot create temporary file"
 msgstr "Väliaikaistiedostoa ei voida luoda"
 
-#: ../libbalsa/mailbox_imap.c:2284
+#: ../libbalsa/mailbox_imap.c:2293
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Väliaikaistiedostoon %s ei voida kirjoittaa"
 
-#: ../libbalsa/mailbox_imap.c:2501
+#: ../libbalsa/mailbox_imap.c:2510
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Viedään %ld kt"
 
-#: ../libbalsa/mailbox_imap.c:2685
+#: ../libbalsa/mailbox_imap.c:2694
 msgid "Server-side threading not supported."
 msgstr "Palvelimella tapahtuva säikeistys ei ole tuettu"
 
@@ -1915,15 +1921,19 @@ msgstr "LDAP-osoitekirja"
 msgid "GPE Address Book"
 msgstr "GPE-osoitekirja"
 
-#: ../src/ab-main.c:639 ../src/ab-window.c:168 ../src/filter-edit-dialog.c:200
+#: ../src/ab-main.c:705
+msgid "_Name"
+msgstr "_Nimi"
+
+#: ../src/ab-main.c:855
+msgid "F_ilter:"
+msgstr "Su_odatin:"
+
+#: ../src/ab-window.c:168 ../src/filter-edit-dialog.c:200
 #: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:221
 #: ../src/filter-run-dialog.c:295
 msgid "Name"
 msgstr "Nimi"
-
-#: ../src/ab-main.c:791
-msgid "F_ilter:"
-msgstr "Su_odatin:"
 
 #: ../src/ab-window.c:176
 msgid "E-Mail Address"
@@ -2363,8 +2373,8 @@ msgstr "osa %s: %s"
 msgid "encrypted: "
 msgstr "salattu:"
 
-#: ../src/balsa-message.c:1286 ../src/balsa-mime-widget-text.c:507
-#: ../src/balsa-mime-widget-text.c:893
+#: ../src/balsa-message.c:1286 ../src/balsa-mime-widget-text.c:508
+#: ../src/balsa-mime-widget-text.c:894
 msgid "Save..."
 msgstr "Tallenna..."
 
@@ -2657,11 +2667,6 @@ msgstr "Sisältää/_Ei sisällä"
 #: ../src/filter-edit-callbacks.c:995
 msgid "_One of the regular expressions matches"
 msgstr "_Yksi säännöllinen lauseke täsmää"
-
-#. Right/Add button
-#: ../src/filter-edit-callbacks.c:1022 ../src/filter-run-dialog.c:327
-msgid "A_dd"
-msgstr "_Lisää"
 
 #. Left/Remove button
 #: ../src/filter-edit-callbacks.c:1026 ../src/filter-edit-dialog.c:321
@@ -4468,8 +4473,8 @@ msgstr "Aihe: %s\n"
 msgid "Se_nd message to obtain this part"
 msgstr "Lähetä _viesti saadaksesti tämän osan"
 
-#: ../src/balsa-mime-widget-message.c:300 ../src/balsa-mime-widget-text.c:746
-#: ../src/balsa-mime-widget-text.c:937 ../src/sendmsg-window.c:1765
+#: ../src/balsa-mime-widget-message.c:300 ../src/balsa-mime-widget-text.c:747
+#: ../src/balsa-mime-widget-text.c:938 ../src/sendmsg-window.c:1765
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Virhe näytettäessä %s: %s\n"
@@ -4545,23 +4550,23 @@ msgstr ""
 "Viesti lähettäjältä %s aiheesta \"%s\" sisältää 8-bittisiä merkkejä, mutta "
 "ei otsaketta, joka kertoo käytetyn merkistön (muutettu muotoon %s)"
 
-#: ../src/balsa-mime-widget-text.c:468
+#: ../src/balsa-mime-widget-text.c:469
 msgid "Copy link"
 msgstr "Kopioi linkki"
 
-#: ../src/balsa-mime-widget-text.c:473
+#: ../src/balsa-mime-widget-text.c:474
 msgid "Open link"
 msgstr "Avaa linkki"
 
-#: ../src/balsa-mime-widget-text.c:478
+#: ../src/balsa-mime-widget-text.c:479
 msgid "Send link..."
 msgstr "Lähetä linkki..."
 
-#: ../src/balsa-mime-widget-text.c:517
+#: ../src/balsa-mime-widget-text.c:518
 msgid "Highlight structured phrases"
 msgstr "Korosta rakenteelliset lauseet"
 
-#: ../src/balsa-mime-widget-text.c:736
+#: ../src/balsa-mime-widget-text.c:737
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Kutsutaan URL:a %s..."

@@ -1,3 +1,7 @@
+2006-05-07 14:26  PeterB
+
+	* libbalsa/imap/imap-handle.c: add message_id to cache.
+
 2006-05-03 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/mime.c: Improve recognition of multi-line URLs.

@@ -1199,7 +1199,7 @@ struct ImapMsgEnvSerialized {
 void*
 imap_message_serialize(ImapMessage *imsg)
 {
-#define SER_STR_CNT 9
+#define SER_STR_CNT 10
   gchar *strings[SER_STR_CNT];
   int    lengths[SER_STR_CNT], i;
   ssize_t tot_size;
@@ -1216,6 +1216,7 @@ imap_message_serialize(ImapMessage *imsg)
   strings[6] = imap_address_to_string(imsg->envelope->cc);
   strings[7] = imap_address_to_string(imsg->envelope->bcc);
   strings[8] = imsg->envelope->in_reply_to;
+  strings[9] = imsg->envelope->message_id;
   tot_size = sizeof(struct ImapMsgEnvSerialized)-1;
   for(i=0; i<SER_STR_CNT; i++) {
     lengths[i] = strings[i] ? strlen(strings[i]) : 0;
@@ -1278,6 +1279,8 @@ imap_message_deserialize(void *data)
   imsg->envelope->bcc     = *ptr ? imap_address_from_string(ptr) : NULL;
   ptr += strlen(ptr) + 1;
   imsg->envelope->in_reply_to = *ptr ? g_strdup(ptr) : NULL;
+  ptr += strlen(ptr) + 1;
+  imsg->envelope->message_id  = *ptr ? g_strdup(ptr) : NULL;
   return imsg;
 }
 

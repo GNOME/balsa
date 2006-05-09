@@ -201,8 +201,8 @@ balsa_handle_automation_options() {
 static void
 balsa_init(int argc, char **argv)
 {
-    static char *attachment = NULL;
 #ifndef GNOME_PARAM_GOPTION_CONTEXT
+    static char *attachment = NULL;
     int opt;
     poptContext context;
     static struct poptOption options[] = {
@@ -254,13 +254,14 @@ balsa_init(int argc, char **argv)
                        NULL);
 #else /* USE GOption interface */
     static gchar **remaining_args = NULL;
+    static gchar **attach_vect = NULL;
     static GOptionEntry option_entries[] = {
 	{"checkmail", 'c', 0, G_OPTION_ARG_NONE,
 	 &(cmd_check_mail_on_startup),
 	 N_("Get new mail on startup"), NULL},
 	{"compose", 'm', 0, G_OPTION_ARG_STRING, &(opt_compose_email),
 	 N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
-	{"attach", 'a', 0, G_OPTION_ARG_STRING, &(attachment),
+	{"attach", 'a', 0, G_OPTION_ARG_FILENAME_ARRAY, &(attach_vect),
 	 N_("Attach file at PATH"), "PATH"},
 	{"open-mailbox", 'o', 0, G_OPTION_ARG_STRING,
          &(cmd_line_open_mailboxes),
@@ -305,6 +306,16 @@ balsa_init(int argc, char **argv)
         }
         g_strfreev (remaining_args);
         remaining_args = NULL;
+    }
+    if (attach_vect != NULL) {
+        gint i, num_args;
+        
+        num_args = g_strv_length (attach_vect);
+        for (i = 0; i < num_args; ++i) {
+            opt_attach_list = g_slist_append(opt_attach_list, attach_vect[i]);
+        }
+        g_free(attach_vect);
+        attach_vect = NULL;
     }
 #endif /* OPTION HANDLING */
     balsa_handle_automation_options();  

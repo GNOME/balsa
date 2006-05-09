@@ -1,3 +1,7 @@
+2006-05-09  Pawel Salek
+
+	* src/main.c: fix -a handling when GOption API is used.
+	
 2006-05-07 14:26  PeterB
 
 	* libbalsa/imap/imap-handle.c: add message_id to cache.

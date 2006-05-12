@@ -1,3 +1,8 @@
+2006-05-12 09:10  PeterB
+
+	* website/faq.html: restore website/faq.html, with a new entry for
+	format=flowed.
+
 2006-05-09  Pawel Salek
 
 	* src/main.c: fix -a handling when GOption API is used.

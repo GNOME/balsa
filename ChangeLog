@@ -1,3 +1,15 @@
+2006-05-13  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: use async interface for STORE commands.
+	* libbalsa/mailbox_mbox.c: do not use file_set_contents() on OSX.
+	* libbalsa/imap/imap-commands.c: async store_flag_a()
+	* libbalsa/imap/imap-commands.h: proper prototypes.
+	* libbalsa/imap/imap-handle.c: generalize IDLE response handlers
+	to general async command response handlers.
+	* libbalsa/imap/imap_private.h: provide support for handle locking
+	and asynchronous command handling.
+	* src/balsa-index.c: scroll first, fetch messages later.
+
 2006-05-12 09:10  PeterB
 
 	* website/faq.html: restore website/faq.html, with a new entry for

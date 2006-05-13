@@ -121,11 +121,11 @@ static GtkTargetEntry index_drag_types[] = {
 };
 
 static void bndx_drag_cb(GtkWidget* widget,
-                                GdkDragContext* drag_context,
-                                GtkSelectionData* data,
-                                guint info,
-                                guint time,
-                                gpointer user_data);
+                         GdkDragContext* drag_context,
+                         GtkSelectionData* data,
+                         guint info,
+                         guint time,
+                         gpointer user_data);
 
 /* Popup menu */
 static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
@@ -897,10 +897,28 @@ balsa_index_new(void)
 }
 
 /**
- * balsa_index_scroll_on_open()
- * moves to the first unread message in the index, or the
- * last message if none is unread, and selects it.
+ * balsa_index_scroll_on_open() moves to the first unread message in
+ * the index, or the last message if none is unread, and selects
+ * it. Since this routine is usually called from a thread, we have to
+ * take care and and make sure the row is selected from the main
+ * thread only.
  */
+struct view_on_open_data {
+    BalsaIndex *bindex;
+    GtkTreePath *path;
+};
+static gboolean
+bi_view_on_open(struct view_on_open_data *data)
+{
+    gdk_threads_enter();
+    bndx_select_row(data->bindex, data->path);
+    gtk_tree_path_free(data->path);
+    g_object_unref(data->bindex);
+    g_free(data);
+    gdk_threads_leave();
+    return FALSE;
+}
+
 void
 balsa_index_scroll_on_open(BalsaIndex *index)
 {
@@ -931,9 +949,13 @@ balsa_index_scroll_on_open(BalsaIndex *index)
                           BALSA_INDEX_VIEW_ON_OPEN,
                           GINT_TO_POINTER(FALSE));
         if ((view_on_open && GPOINTER_TO_INT(view_on_open))
-            || balsa_app.view_message_on_open)
-            bndx_select_row(index, path);
-        gtk_tree_path_free(path);
+            || balsa_app.view_message_on_open) {
+            struct view_on_open_data *data = g_new(struct view_on_open_data,1);
+            data->bindex = index;
+            data->path = path;
+            g_object_ref(data->bindex);
+            g_idle_add((GSourceFunc)bi_view_on_open, data);
+        } else gtk_tree_path_free(path);
     }
 }
 

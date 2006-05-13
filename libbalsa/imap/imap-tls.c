@@ -357,7 +357,7 @@ imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
     }
     return 1;
   } else {
-    printf("set_tlsclient failed!\n");
+    printf("set_tlsclient failed for %s\n", host);
     return 0;
   }
 }

@@ -48,8 +48,12 @@
 #include "siobuf.h"
 #include "util.h"
 
+#define ASYNC_DEBUG 0
+
 #define LONG_STRING 512
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
+
+#define IDLE_TIMEOUT 30
 
 #define LIT_TYPE_HANDLE \
     (imap_mbox_handle_get_type())
@@ -142,7 +146,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->using_tls = 0;
 #endif
   handle->tls_mode = IMAP_TLS_ENABLED;
-  handle->cmd_queue = g_hash_table_new(NULL, NULL);
+  handle->cmd_info = NULL;
   handle->status_resps = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                NULL, NULL);
 
@@ -151,6 +155,9 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->enable_anonymous = 0;
   handle->enable_binary    = 0;
   mbox_view_init(&handle->mbox_view);
+#if defined(BALSA_USE_THREADS)
+  pthread_mutex_init(&handle->mutex, NULL);
+#endif
 }
 
 static void
@@ -250,6 +257,62 @@ imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void* arg)
   h->flags_arg = arg;
 }
 
+/** CmdInfo structure stores information about asynchronously executed
+    commands. */
+struct CmdInfo {
+  unsigned cmdno; /**< Number of the the command */
+  ImapResponse rc; /**< response code to the command if it already completed */
+  /** complete_cb is executed when the given command is completed.  If
+      complete_cb returns true, the corresponding CmdInfo structure
+      will be removed from the cmd_info hash.*/
+  gboolean (*complete_cb)(ImapMboxHandle *h, void *d);
+  void *cb_data; /**< data to be passed on to complete_cb */
+  unsigned completed; /**< determines whether the complete_cb has been
+                       * executed and rc contains meaningful value. */
+};
+
+/** cmdi_get_pending returns number of any pending command. Returns 0
+    if there is none. */
+static unsigned
+cmdi_get_pending(GList *cmd_info)
+{
+  for(; cmd_info; cmd_info = cmd_info->next) {
+    struct CmdInfo *ci = (struct CmdInfo*)cmd_info->data;
+    if(!ci->completed)
+      return ci->cmdno;
+  }
+  return 0;
+}
+
+static void
+cmdi_add_handler(GList **cmd_info, unsigned cmdno,
+                 gboolean (*handler)(ImapMboxHandle*h, void *d), void *data)
+{
+  struct CmdInfo *ci = g_new0(struct CmdInfo, 1);
+  ci->cmdno = cmdno;
+  ci->complete_cb = handler;
+  ci->cb_data = data;
+  *cmd_info = g_list_prepend(*cmd_info, ci);
+}
+
+static struct CmdInfo*
+cmdi_find_by_no(GList *cmd_info, unsigned lastcmd)
+{
+  for(; cmd_info; cmd_info = cmd_info->next) {
+    struct CmdInfo *ci = (struct CmdInfo*)cmd_info->data;
+    if(ci->cmdno == lastcmd)
+      return ci;
+  }
+  return NULL;
+}
+
+/** fallback handler - consider the command done and remove the
+    corresponding CmdInfo structure from the list of pending
+    commands. */
+static gboolean
+cmdi_empty(ImapMboxHandle *h, void *d)
+{ return TRUE; }
+
 void
 imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
 {
@@ -268,29 +331,55 @@ imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
 2. idle start() sends the IDLE command and registers idle_process() to
    be notified whenever data is available on the specified descriptor.
 
-3. idle_process() processes the data sent from the server. */
+3. async_process() processes the data sent from the server. It is used
+   by IDLE and STORE commands, for example. */
+
 static gboolean
-idle_process(GIOChannel *source, GIOCondition condition, gpointer data)
+async_process(GIOChannel *source, GIOCondition condition, gpointer data)
 {
   ImapMboxHandle *h = (ImapMboxHandle*)data;
-  ImapResponse rc;
+  ImapResponse rc = IMR_UNTAGGED;
   int retval;
+  unsigned async_cmd;
   g_return_val_if_fail(h, FALSE);
-  if(h->state == IMHS_DISCONNECTED)
+
+  if(ASYNC_DEBUG) printf("async_process() ENTER\n");
+  if(h->state == IMHS_DISCONNECTED) {
+    if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
     return FALSE;
+  }
+  async_cmd = cmdi_get_pending(h->cmd_info);
+  if(ASYNC_DEBUG) printf("async_process() enter loop\n");
   while( (retval = sio_poll(h->sio, TRUE, FALSE, TRUE)) != -1 &&
          (retval & SIO_READ) != 0) {
-    if ( (rc=imap_cmd_step(h, 0)) == IMR_UNKNOWN ||
+    if ( (rc=imap_cmd_step(h, async_cmd)) == IMR_UNKNOWN ||
          rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
          rc  == IMR_BAD) {
-      printf("idle_process() got unexpected response %i!\n"
+      printf("async_process() got unexpected response %i!\n"
              "Last message was: \"%s\" - shutting down connection.\n",
              rc, h->last_msg);
       imap_handle_disconnect(h);
       return FALSE;
     }
+    async_cmd = cmdi_get_pending(h->cmd_info);
+    if(ASYNC_DEBUG)
+      printf("async_process() loop iteration finished, next async_cmd=%x\n",
+           async_cmd);
   }
-  return TRUE;
+  if(ASYNC_DEBUG) printf("async_process() loop left\n");
+  if(!h->idle_issued && async_cmd == 0) {
+    if(ASYNC_DEBUG) printf("Last async command completed.\n");
+    if(h->async_watch_id) {
+      g_source_remove(h->async_watch_id);
+      h->async_watch_id = 0;
+    }
+    imap_handle_idle_enable(h, IDLE_TIMEOUT);
+  }
+  if(ASYNC_DEBUG)
+    printf("async_process() sio: %d rc: %d returns %d (%d cmds in queue)\n",
+           retval, rc, !h->idle_issued && async_cmd == 0,
+           g_list_length(h->cmd_info));
+  return h->idle_issued || async_cmd != 0;
 }
 
 static gboolean
@@ -299,19 +388,22 @@ idle_start(gpointer data)
   ImapMboxHandle *h = (ImapMboxHandle*)data;
   ImapResponse rc;
   int c;
+  ImapCmdTag tag;
+  unsigned asyncno;
 
   /* The test below can probably be weaker since it is ok for the
      channel to get disconnected before IDLE gets activated */
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
-
-  sio_write(h->sio, "0 IDLE\r\n", 8); sio_flush(h->sio);
+  asyncno = imap_make_tag(tag); sio_write(h->sio, tag, strlen(tag));
+  sio_write(h->sio, " IDLE\r\n", 7); sio_flush(h->sio);
+  cmdi_add_handler(&h->cmd_info, asyncno, cmdi_empty, NULL);
   do { /* FIXME: we could at this stage just as well watch for
           response instead of polling. */
-    rc = imap_cmd_step (h, 0);
+    rc = imap_cmd_step (h, asyncno);
   } while (rc == IMR_UNTAGGED);
   if(rc != IMR_RESPOND) {
-    g_message("Expected IMR_RESPOND but got %d\n", rc);
+    g_message("idle_start() expected IMR_RESPOND but got %d\n", rc);
     return FALSE;
   }
   while( (c=sio_getc(h->sio)) != -1 && c != '\n');
@@ -319,9 +411,34 @@ idle_start(gpointer data)
     h->iochannel = g_io_channel_unix_new(h->sd);
     g_io_channel_set_encoding(h->iochannel, NULL, NULL);
   }
-  h->idle_watch_id = g_io_add_watch(h->iochannel, G_IO_IN, idle_process, h);
+  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN, async_process, h);
   h->idle_enable_id = 0;
+  h->idle_issued = 1;
   return FALSE;
+}
+
+unsigned
+imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
+{
+  unsigned async_cmd;
+  g_return_val_if_fail(h, IMR_BAD);
+  if (h->state == IMHS_DISCONNECTED)
+    return 0;
+
+  /* create sequence for command */
+  imap_handle_idle_disable(h);
+  if (imap_cmd_start(h, cmd, &async_cmd)<0)
+    return IMR_SEVERED;  /* irrecoverable connection error. */
+
+  sio_flush(h->sio);
+  if(ASYNC_DEBUG) printf("command '%s' issued.\n", cmd);
+  cmdi_add_handler(&h->cmd_info, async_cmd, cmdi_empty, NULL);
+  if(!h->iochannel) {
+    h->iochannel = g_io_channel_unix_new(h->sd);
+    g_io_channel_set_encoding(h->iochannel, NULL, NULL);
+  }
+  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN, async_process, h);
+  return async_cmd;
 }
 
 gboolean
@@ -329,8 +446,8 @@ imap_handle_idle_enable(ImapMboxHandle *h, int seconds)
 {
   if( !imap_mbox_handle_can_do(h, IMCAP_IDLE))
     return FALSE;
-  if(h->idle_watch_id) {
-    fprintf(stderr, "idle already enabled\n");
+  if(h->idle_issued) {
+    fprintf(stderr, "IDLE already enabled\n");
     return FALSE;
   }
   if(!h->idle_enable_id)
@@ -345,11 +462,12 @@ imap_handle_idle_disable(ImapMboxHandle *h)
     g_source_remove(h->idle_enable_id);
     h->idle_enable_id = 0;
   }
-  if(h->idle_watch_id) {
-    g_source_remove(h->idle_watch_id);
-    h->idle_watch_id = 0;
-    if(h->sio) { /* we might have been disconnected before */
+  if(h->async_watch_id) {
+    g_source_remove(h->async_watch_id);
+    h->async_watch_id = 0;
+    if(h->sio && h->idle_issued) {/* we might have been disconnected before */
       sio_write(h->sio,"DONE\r\n",6); sio_flush(h->sio);
+      h->idle_issued = 0;
     }
   }
   return TRUE;
@@ -469,7 +587,7 @@ struct ListData {
 int
 imap_socket_open(const char* host, const char *def_port)
 {
-  static const int USEIPV6 = 0;
+  static const int USEIPV6 = 1;
   int rc, fd = -1;
   
   /* --- IPv4/6 --- */
@@ -511,7 +629,7 @@ imap_socket_open(const char* host, const char *def_port)
     }
   }
   freeaddrinfo (res);
-  return fd;
+  return fd; /* FIXME: provide more info why the connection failed. */
 }
 
 static ImapResult
@@ -742,13 +860,17 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_free(handle->mbox);    handle->mbox   = NULL;
   g_free(handle->last_msg);handle->last_msg = NULL;
 
-  g_hash_table_destroy(handle->cmd_queue); handle->cmd_queue = NULL;
+  g_list_foreach(handle->cmd_info, (GFunc)g_free, NULL);
+  g_list_free(handle->cmd_info); handle->cmd_info = NULL;
   g_hash_table_destroy(handle->status_resps); handle->status_resps = NULL;
 
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
   g_free(handle->msg_cache); handle->msg_cache = NULL;
   g_array_free(handle->flag_cache, TRUE);
+#if defined(BALSA_USE_THREADS)
+  pthread_mutex_destroy(&handle->mutex);
+#endif
 
   G_OBJECT_CLASS(parent_class)->finalize(gobject);  
 }
@@ -1333,6 +1455,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   ImapCmdTag tag;
   ImapResponse rc;
   unsigned cmdno;
+  struct CmdInfo *ci;
 
   /* FIXME: sanity test */
   g_return_val_if_fail(handle, IMR_BAD);
@@ -1347,28 +1470,29 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     return IMR_SEVERED;
   }
 #endif
+  ci = cmdi_find_by_no(handle->cmd_info, lastcmd);
+  if(ci && ci->completed) {
+    /* The response to this command has been encountered earlier,
+       send it. */
+    printf("Sending stored response to %x and removing info.\n",  lastcmd);
+    rc = ci->rc;
+    handle->cmd_info = g_list_remove(handle->cmd_info, ci);
+    g_free(ci);
+    return rc;
+  }
+
   if( imap_cmd_get_tag(handle->sio, tag, sizeof(tag))<0) {
-    printf("imap connection severed.\n");
+    printf("IMAP connection to %s severed.\n", handle->host);
     imap_handle_disconnect(handle);
     return IMR_SEVERED;
   }
   /* handle untagged messages. The caller still gets its shot afterwards. */
   if (strcmp(tag, "*") == 0) {
-    gpointer p;
     rc = ir_handle_response(handle);
     if(rc == IMR_BYE) {
       return handle->doing_logout ? IMR_UNTAGGED : IMR_BYE;
     }
-
-    p = g_hash_table_lookup(handle->cmd_queue,
-                            GUINT_TO_POINTER(lastcmd));
-    if(p==NULL) /* True for initial response only: no command has been
-                 * sent but we get untagged response anyway */
-      return IMR_UNTAGGED;
-    else {
-      g_hash_table_remove(handle->cmd_queue, GUINT_TO_POINTER(lastcmd));
-      return rc;
-    }
+    return IMR_UNTAGGED;
   }
 
   /* server demands a continuation response from us */
@@ -1384,15 +1508,26 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   }
 
   rc = ir_handle_response(handle);
-  if(cmdno == lastcmd)
-    return rc;
-  else {
-    if(cmdno)
-      g_hash_table_insert(handle->cmd_queue,
-                          GUINT_TO_POINTER(cmdno),
-                          GINT_TO_POINTER(rc));
-    return IMR_UNTAGGED;
+  /* We check whether we encountered an response to a another,
+       possibly asynchronous command, not the one we are currently
+       executing. We store the response in the hash table so that we
+       can provide a proper response somebody asks. */
+  ci = cmdi_find_by_no(handle->cmd_info, cmdno);
+  if(lastcmd != cmdno)
+    printf("Looking for %x and encountered response to %x (%p)\n",
+           lastcmd, cmdno, ci);
+  if(ci) {
+    if(ci->complete_cb && !ci->complete_cb(handle, ci->cb_data)) {
+      ci->rc = rc;
+      ci->completed = 1;
+      printf("Cmd %x marked as completed with rc=%d\n", cmdno, rc);
+    } else {
+      printf("CmdInfo for cmd %x removed\n", cmdno);
+      handle->cmd_info = g_list_remove(handle->cmd_info, ci);
+      g_free(ci);
+    }
   }
+  return lastcmd == cmdno ? rc : IMR_UNTAGGED;
 }
 
 /* imap_cmd_exec: 
@@ -1420,7 +1555,7 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
     rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);
 
-  imap_handle_idle_enable(handle, 30);
+  imap_handle_idle_enable(handle, IDLE_TIMEOUT);
 
   return rc;
 }

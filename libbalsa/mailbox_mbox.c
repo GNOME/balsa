@@ -377,7 +377,7 @@ static void
 lbm_mbox_save(LibBalsaMailboxMbox * mbox)
 {
     gchar *filename;
-#if GLIB_CHECK_VERSION(2, 8, 0)
+#if GLIB_CHECK_VERSION(2, 8, 0) && !defined(__APPLE__)
     GError *err = NULL;
 #endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 

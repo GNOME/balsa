@@ -542,6 +542,15 @@ mi_reconnect(ImapMboxHandle *h)
     _("IMAP server has shut the connection: %s Reconnecting..."), msg); \
     g_free(msg);}\
     else break;}while(trials-->0);}
+#define IIA(rc,h,line,cmd)                         \
+   {int trials=2;do{\
+    if(imap_mbox_is_disconnected(h) &&mi_reconnect(h)!=IMAP_SUCCESS)\
+        {rc=0;break;};\
+    rc=line; \
+    if(rc == 0) \
+    libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
+     _("Async IMAP cmd %s on could not be executed. Reconnecting..."),cmd); \
+    else break;}while(trials-->0);}
 
 static ImapMboxHandle *
 libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)
@@ -2581,6 +2590,7 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
     ImapResponse rc = IMR_OK;
     ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
 
+    if(seqno->len == 0) return TRUE;
     lbm_imap_change_user_flags(mailbox, seqno, set, clear);
 
     if (!((set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL))
@@ -2590,16 +2600,16 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
     g_array_sort(seqno, cmp_msgno);
     transform_flags(set, clear, &flag_set, &flag_clr);
     if (flag_set)
-        II(rc, handle,
-           imap_mbox_store_flag(handle,
-                                seqno->len, (guint *) seqno->data,
-                                flag_set, TRUE));
-    if (rc == IMR_OK && flag_clr)
-        II(rc, handle,
-           imap_mbox_store_flag(handle,
-                                seqno->len, (guint *) seqno->data,
-                                flag_clr, FALSE));
-    return rc == IMR_OK;
+        IIA(rc, handle,
+	    imap_mbox_store_flag_a(handle,
+				   seqno->len, (guint *) seqno->data,
+				   flag_set, TRUE),"STORE");
+    if (rc && flag_clr)
+        IIA(rc, handle,
+	    imap_mbox_store_flag_a(handle,
+				   seqno->len, (guint *) seqno->data,
+				   flag_clr, FALSE),"CLEAR");
+    return rc;
 }
 
 static gboolean

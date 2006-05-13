@@ -1,7 +1,7 @@
 #ifndef __IMAP_PRIVATE_H__
 #define __IMAP_PRIVATE_H__
 /* libimap library.
- * Copyright (C) 2003-2004 Pawel Salek.
+ * Copyright (C) 2003-2006 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,16 @@
 
 #include <glib-object.h>
 
-#include <config.h>
+#include "config.h"
+
+#if defined(BALSA_USE_THREADS)
+#include <pthread.h>
+#define HANDLE_LOCK(h)   pthread_mutex_lock(&h->mutex)
+#define HANDLE_UNLOCK(h) pthread_mutex_unlock(&h->mutex)
+#else
+#define HANDLE_LOCK(h) 
+#define HANDLE_UNLOCK(h)
+#endif
 
 #include "imap-commands.h"
 
@@ -58,11 +67,13 @@ struct _ImapMboxHandle {
   ImapMessage **msg_cache;
   GArray       *flag_cache;
   MboxView mbox_view;
-  GHashTable *cmd_queue; /* A hash of commands we received return codes for.
-                          * We use the command number as the key. */
+  /** cmd_info is a list of commands that serves two-fold purpose. It
+      can contain task to execute when certain command completes. It
+      can be also used to store return codes in case they were
+      received asynchronously. */
+  GList *cmd_info;
   GSList *tasks;         /* a list of tasks to be executed after
                           * processing of current line is finished. */
-
   GNode *thread_root; /* deprecated! */
 
   /* BYE handling depends on the state */
@@ -86,10 +97,14 @@ struct _ImapMboxHandle {
   GHashTable *status_resps; /* A hash of STATUS responses that we wait for */
 
   GIOChannel *iochannel; /* IO channel used for monitoring the connection */
+#if defined(BALSA_USE_THREADS)
+  pthread_mutex_t mutex;
+#endif
   guint idle_enable_id; /* callback to issue IDLE after a period of
                            inactivity */
-  guint idle_watch_id;  /* callback to process incoming data */
+  guint async_watch_id;  /* callback to process incoming data */
   ImapTlsMode tls_mode; /* disabled, enabled, required */
+  unsigned idle_issued:1; /*  idle has been issued */
   unsigned readonly_mbox:1;
   unsigned can_fetch_body:1; /* set for servers that always respond
                               * correctly to FETCH x BODY[y]
@@ -127,6 +142,7 @@ extern const char* msg_flags[6];
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 
 ImapResponse imap_cmd_exec(ImapMboxHandle* handle, const char* cmd);
+unsigned imap_cmd_issue(ImapMboxHandle* handle, const char* cmd);
 char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 
 ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,

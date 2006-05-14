@@ -920,6 +920,7 @@ delete_handler(BalsaSendmsg* bsmsg)
                                    _("The message to '%s' is modified.\n"
                                      "Save message to Draftbox?"),
                                    tmp);
+        gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
 
         gtk_dialog_add_button(GTK_DIALOG(d),
                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
@@ -933,7 +934,7 @@ delete_handler(BalsaSendmsg* bsmsg)
                    && bsmsg->auto_saved
                    && !bsmsg->user_saved)
             sw_delete_draft(bsmsg);
-	/* cancel action  when reply = "yes" or "no" */
+	/* cancel action  when reply != "yes" or "no" */
 	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
     } 
    
@@ -945,11 +946,15 @@ delete_handler(BalsaSendmsg* bsmsg)
              _("The message to '%s' was saved in Draftbox.\n"
                "Remove message from Draftbox?"),
              tmp);
+        gtk_dialog_add_button(GTK_DIALOG(d),
+                              GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
 
 	reply = gtk_dialog_run(GTK_DIALOG(d));
         gtk_widget_destroy(d);
 	if (reply == GTK_RESPONSE_YES)
             sw_delete_draft(bsmsg);
+	/* cancel action  when reply != "yes" or "no" */
+	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
     }
 
     return FALSE;

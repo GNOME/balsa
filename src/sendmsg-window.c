@@ -1995,7 +1995,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 	if (!sw_set_charset(bsmsg, filename, content_type,
 			    &change_type, &attach_data->charset)) {
 	    g_free(content_type);
-	    g_free(attach_data);
+	    g_object_unref(attach_data);
 	    g_free(filename);
 	    return FALSE;
 	}

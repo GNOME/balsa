@@ -1,3 +1,7 @@
+2006-05-14 07:42  PeterB
+
+	* src/sendmsg-window.c: unref, not free, a GObject.
+
 2006-05-13  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: use async interface for STORE commands.

@@ -642,6 +642,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   /* reset some handle status */
   handle->has_capabilities = FALSE;
   handle->can_fetch_body = TRUE;
+  handle->idle_issued = FALSE;
   if(handle->sio) {
     sio_detach(handle->sio);
     handle->sio = NULL;
@@ -1163,7 +1164,7 @@ imap_body_get_mime_type(ImapBody *body)
   case IMBMEDIA_AUDIO:          type = "audio"; break;
   case IMBMEDIA_IMAGE:          type = "image"; break;
   case IMBMEDIA_MESSAGE_RFC822: return g_strdup("message/rfc822"); break;
-  case IMBMEDIA_MESSAGE_OTHER:  type = "message_other"; break;
+  case IMBMEDIA_MESSAGE_OTHER:  type = "message"; break;
   case IMBMEDIA_TEXT:           type = "text"; break;
   case IMBMEDIA_OTHER:          type = body->media_basic_name; break;
   }

@@ -417,13 +417,13 @@ idle_start(gpointer data)
   return FALSE;
 }
 
-unsigned
+ImapResponse
 imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
 {
   unsigned async_cmd;
   g_return_val_if_fail(h, IMR_BAD);
   if (h->state == IMHS_DISCONNECTED)
-    return 0;
+    return IMR_SEVERED;
 
   /* create sequence for command */
   imap_handle_idle_disable(h);
@@ -438,7 +438,7 @@ imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
     g_io_channel_set_encoding(h->iochannel, NULL, NULL);
   }
   h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN, async_process, h);
-  return async_cmd;
+  return IMR_OK /* async_cmd */;
 }
 
 gboolean

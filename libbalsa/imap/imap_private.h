@@ -142,7 +142,7 @@ extern const char* msg_flags[6];
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 
 ImapResponse imap_cmd_exec(ImapMboxHandle* handle, const char* cmd);
-unsigned imap_cmd_issue(ImapMboxHandle* handle, const char* cmd);
+ImapResponse imap_cmd_issue(ImapMboxHandle* handle, const char* cmd);
 char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 
 ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,

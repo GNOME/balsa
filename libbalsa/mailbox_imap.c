@@ -547,9 +547,9 @@ mi_reconnect(ImapMboxHandle *h)
     if(imap_mbox_is_disconnected(h) &&mi_reconnect(h)!=IMAP_SUCCESS)\
         {rc=0;break;};\
     rc=line; \
-    if(rc == 0) \
+    if(rc != IMR_OK) \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-     _("Async IMAP cmd %s on could not be executed. Reconnecting..."),cmd); \
+     _("Async IMAP cmd %s could not be executed. Reconnecting..."),cmd); \
     else break;}while(trials-->0);}
 
 static ImapMboxHandle *

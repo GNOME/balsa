@@ -1,3 +1,15 @@
+2006-05-17  Pawel Salek
+
+	* libbalsa/imap/imap-commands.c: fix return codes of async routines.
+	* libbalsa/imap/imap{-handle,_private}.c: ditto.
+	* libbalsa/mailbox_imap.c: use changed return codes.
+
+2006-05-15  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: reset idle_issued flag. handle
+	message-other right, this includes message/delivery-status.
+	* src/balsa-mime-widget.c: display message/delivery-status parts.
+
 2006-05-14 10:46  PeterB
 
 	* src/sendmsg-window.c: make Yes the default response when user

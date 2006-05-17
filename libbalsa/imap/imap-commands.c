@@ -571,10 +571,10 @@ imap_mbox_expunge(ImapMboxHandle *handle)
   return imap_cmd_exec(handle, "EXPUNGE");
 }
 
-unsigned
+ImapResponse
 imap_mbox_expunge_a(ImapMboxHandle *handle)
 {
-  IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, 0);
+  IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
   /* extra care would be required to use this once since no other
      commands that use sequence numbers can be issued before this one
      finishes... */
@@ -1082,16 +1082,16 @@ ImapResponse
 imap_mbox_store_flag_a(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
 		       ImapMsgFlag flg, gboolean state)
 {
-  unsigned res;
   gchar* cmd;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
   cmd = imap_store_prepare(h, msgcnt, seqno, flg, state);
   if(cmd) {
-    res = imap_cmd_issue(h, cmd);
+    unsigned res = imap_cmd_issue(h, cmd);
     g_free(cmd);
-    return res;
-  } else return 0;
+    return res != 0 ? IMR_OK : IMR_NO;
+  } else /* no action to be done, perhaps message has the flag set already? */
+    return IMR_OK;
 }
 
 

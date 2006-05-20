@@ -57,6 +57,8 @@
 #define BALSA_PIXMAP_MBOX_IN                    "balsa_mbox_in"
 #define BALSA_PIXMAP_MBOX_OUT                   "balsa_mbox_out"
 #define BALSA_PIXMAP_MBOX_SENT                  "balsa_mbox_sent"
+#define BALSA_PIXMAP_MBOX_TRASH                 "balsa_mbox_trash"
+#define BALSA_PIXMAP_MBOX_TRASH_FULL            "balsa_mbox_trash_full"
 #define BALSA_PIXMAP_MBOX_TRAY_EMPTY            "balsa_mbox_tray_empty"
 #define BALSA_PIXMAP_MBOX_TRAY_FULL             "balsa_mbox_tray_full"
 #define BALSA_PIXMAP_MBOX_DIR_OPEN              "balsa_mbox_dir_open"

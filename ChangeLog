@@ -1,3 +1,9 @@
+2006-05-20 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/balsa-icons.[hc]: Choose a better icon for the trash mailbox
+	when GNOME_STOCK_TRASH is unavailable.
+	* configure.in: remove stray '-' as reported by Jean-Luc Coulon.
+
 2006-05-17  Pawel Salek
 
 	* libbalsa/imap/imap-commands.c: fix return codes of async routines.

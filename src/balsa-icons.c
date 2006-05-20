@@ -19,6 +19,7 @@
  * 02111-1307, USA.
  */
 
+#include <string.h>
 #include <gnome.h>
 #include <gdk/gdkx.h>
 
@@ -48,6 +49,11 @@ typedef struct {
     const gchar * stock_id;
     GtkIconSize sizes[BALSA_PIXMAP_SIZES];
 } balsa_pixmap_t;
+
+typedef struct {
+    const gchar * def_id;
+    const gchar * fb_id;
+} pixmap_fallback_t;
     
 
 void
@@ -70,13 +76,33 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     GtkIconSet *icon_set;
     GError *error = NULL;
     gint n, width, height;
+    const gchar * use_id;
+    static pixmap_fallback_t fallback_id[] = {
+	{ "user-trash", GTK_STOCK_DELETE },
+	{ "user-trash-full", GTK_STOCK_DELETE },
+	{ NULL, NULL } };
 
     BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
 	       bpixmap->stock_id);
 
+    /* check if the icon theme knows the icon and try to fall back to an
+     * alternative name if not */
+    if (!gtk_icon_theme_has_icon(icon_theme, bpixmap->stock_id)) {
+	pixmap_fallback_t *fb = fallback_id;
+	while (fb->def_id && strcmp(fb->def_id, bpixmap->stock_id))
+	    fb++;
+	if (fb->def_id)
+	    use_id = fb->fb_id;
+	else {
+	    BICONS_ERR("icon %s unknown, no fallback", bpixmap->stock_id);
+	    return;
+	}
+    } else
+	use_id = bpixmap->stock_id;
+
 #if GTK_CHECK_VERSION(2, 8, 0)
     g_hash_table_insert(balsa_icon_table, g_strdup(bpixmap->name), 
-                        g_strdup(bpixmap->stock_id));
+                        g_strdup(use_id));
 #endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
 
     if (!gtk_icon_size_lookup(bpixmap->sizes[0], &width, &height)) {
@@ -86,7 +112,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     }
 
     pixbuf = 
-	gtk_icon_theme_load_icon(icon_theme, bpixmap->stock_id, width,
+	gtk_icon_theme_load_icon(icon_theme, use_id, width,
 				 GTK_ICON_LOOKUP_USE_BUILTIN, &error);
     if (!pixbuf) {
 	BICONS_ERR("default size %d failed: %s", width, error->message);
@@ -102,7 +128,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 	 n++) {
 	if (gtk_icon_size_lookup(bpixmap->sizes[n], &width, &height)) {
 	    pixbuf = 
-		gtk_icon_theme_load_icon(icon_theme, bpixmap->stock_id, width,
+		gtk_icon_theme_load_icon(icon_theme, use_id, width,
 					 GTK_ICON_LOOKUP_USE_BUILTIN, &error);
 	    if (!pixbuf) {
 		BICONS_ERR("additional size %d failed: %s", width,
@@ -225,6 +251,10 @@ register_balsa_pixmaps(void)
         { BALSA_PIXMAP_MBOX_DRAFT,      "balsa-mbox-draft",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
         { BALSA_PIXMAP_MBOX_SENT,       "balsa-mbox-sent",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_TRASH,      "user-trash",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
+        { BALSA_PIXMAP_MBOX_TRASH_FULL, "user-trash-full",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
         { BALSA_PIXMAP_MBOX_TRAY_FULL,  "balsa-mbox-tray-full",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },

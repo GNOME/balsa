@@ -293,7 +293,7 @@ if test x"$use_gtkhtml" != xno ; then
     done
 else
     AC_MSG_CHECKING(whether to use GtkHTML)
-    -AC_MSG_RESULT(disabled)
+    AC_MSG_RESULT(disabled)
 fi
 
 # GPGME detection.

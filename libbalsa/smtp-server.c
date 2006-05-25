@@ -327,8 +327,8 @@ struct smtp_server_dialog_info {
     GtkWidget *host;
     GtkWidget *user;
     GtkWidget *pass;
-    GtkWidget *tlsm;
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
+    GtkWidget *tlsm;
     GtkWidget *cert;
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
     GtkWidget *split_button;
@@ -430,6 +430,7 @@ smtp_server_response(GtkDialog * dialog, gint response,
         libbalsa_server_set_password(server,
                                      gtk_entry_get_text(GTK_ENTRY
                                                         (sdi->pass)));
+#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
         switch (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm))) {
         case 0:
             server->tls_mode = Starttls_DISABLED;
@@ -443,7 +444,6 @@ smtp_server_response(GtkDialog * dialog, gint response,
         default:
             break;
         }
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
         libbalsa_smtp_server_set_cert_passphrase(sdi->smtp_server,
                                                  gtk_entry_get_text
                                                  (GTK_ENTRY(sdi->cert)));
@@ -581,11 +581,9 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     smtp_server_add_widget(table, ++row, _("Use _TLS:"), sdi->tlsm =
                            smtp_server_tls_widget(smtp_server));
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
     g_signal_connect(sdi->tlsm, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     smtp_server_add_widget(table, ++row, _("C_ertificate Pass Phrase:"),
                            sdi->cert = gtk_entry_new());
     gtk_entry_set_visibility(GTK_ENTRY(sdi->cert), FALSE);

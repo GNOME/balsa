@@ -1,3 +1,8 @@
+2006-05-25 11:11  PeterB
+
+	* libbalsa/smtp-server.c: do not crash without
+	HAVE_SMTP_TLS_CLIENT_CERTIFICATE.
+
 2006-05-20 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/balsa-icons.[hc]: Choose a better icon for the trash mailbox

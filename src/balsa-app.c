@@ -104,7 +104,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
         server->remember_passwd = 
             !!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb));
         libbalsa_server_set_password(server, passwd);
-        if(old_rem != server->remember_passwd)
+        if( server->remember_passwd || old_rem )
             libbalsa_server_config_changed(server);
     }
     gtk_widget_destroy(dialog);

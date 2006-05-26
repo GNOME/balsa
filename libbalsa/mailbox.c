@@ -3121,7 +3121,11 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
     gint *new_order;
     GtkTreePath *path;
     gboolean sort_no = mbox->view->sort_field == LB_MAILBOX_SORT_NO;
-
+#if !defined(LOCAL_MAILBOX_SORTED_JUST_ONCE_ON_OPENING)
+    gboolean can_sort_all = sort_no || LIBBALSA_IS_MAILBOX_IMAP(mbox);
+#else
+    gboolean can_sort_all = 1;
+#endif
     node = parent->children;
     if (!node)
         return;
@@ -3137,7 +3141,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
         SortTuple sort_tuple;
         guint msgno = GPOINTER_TO_UINT(tmp_node->data);
 
-	if (sort_no || g_ptr_array_index(mbox->mindex, msgno - 1)) {
+	if (can_sort_all || g_ptr_array_index(mbox->mindex, msgno - 1)) {
             /* We have the sort fields. */
             sort_tuple.offset = node_array->len;
             sort_tuple.node = tmp_node;
@@ -3152,7 +3156,6 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
         lbm_sort(mbox, node);
         return;
     }
-
     LIBBALSA_MAILBOX_GET_CLASS(mbox)->sort(mbox, sort_array);
 
     /* Step through the nodes in original order. */
@@ -3162,7 +3165,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
 
         tmp_node = g_ptr_array_index(node_array, i);
         msgno = GPOINTER_TO_UINT(tmp_node->data);
-	if (sort_no || g_ptr_array_index(mbox->mindex, msgno - 1)) {
+	if (can_sort_all || g_ptr_array_index(mbox->mindex, msgno - 1)) {
             /* This is one of the nodes we sorted: find out which one
              * goes here. */
             g_assert(j < sort_array->len);

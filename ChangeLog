@@ -1,3 +1,10 @@
+2006-05-26  Pawel Salek
+
+	* libbalsa/mailbox.c: sort IMAP mailboxes correctly (part of the
+	information returned by the imap server was ignored at this level).
+	* src/balsa-app.c: really respect the "remember passwd" check box.
+	* src/balsa-index.c: do not re-sort on index close.
+
 2006-05-25 11:11  PeterB
 
 	* libbalsa/smtp-server.c: do not crash without

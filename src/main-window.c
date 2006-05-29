@@ -4393,6 +4393,7 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
      * it - but we could just as well clone it. */
     if (libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE))
         balsa_index_ensure_visible(BALSA_INDEX(index));
+    libbalsa_mailbox_make_view_filter_persistent(mailbox);
 }
 
 static void

@@ -241,17 +241,7 @@ bndx_destroy(GtkObject * obj)
 						 G_SIGNAL_MATCH_DATA,
 						 0, 0, NULL, NULL, index);
 	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
-            /* Undo any temporary filters. */
             gdk_threads_leave();
-#if 0
-            /* do not mess with filters now - it just takes time to
-               set the filter again, it issues the sort commands
-               in case of imap, too. We just want to shut down... */
-            libbalsa_mailbox_set_view_filter(mailbox,
-                                             balsa_window_get_view_filter
-                                             (balsa_app.main_window, TRUE),
-                                             TRUE);
-#endif
 	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
             gdk_threads_enter();
 
@@ -1127,6 +1117,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     libbalsa_mailbox_set_view_filter(mailbox,
                                      balsa_window_get_view_filter
                                      (balsa_app.main_window, TRUE), FALSE);
+    libbalsa_mailbox_make_view_filter_persistent(mailbox);
     libbalsa_mailbox_set_threading(mailbox,
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));

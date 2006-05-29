@@ -372,6 +372,8 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->url = NULL;
     libbalsa_condition_free(mailbox->view_filter);
     mailbox->view_filter = NULL;
+    libbalsa_condition_free(mailbox->persistent_view_filter);
+    mailbox->persistent_view_filter = NULL;
 
     g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
     g_slist_free(mailbox->filters);
@@ -1829,8 +1831,7 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
 
     libbalsa_lock_mailbox(mailbox);
 
-    if (mailbox->view_filter)
-        libbalsa_condition_free(mailbox->view_filter);
+    libbalsa_condition_free(mailbox->view_filter);
     mailbox->view_filter = cond;
 
     if (update_immediately) {
@@ -1842,6 +1843,14 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
     libbalsa_unlock_mailbox(mailbox);
 
     return retval;
+}
+
+void
+libbalsa_mailbox_make_view_filter_persistent(LibBalsaMailbox * mailbox)
+{
+    libbalsa_condition_free(mailbox->persistent_view_filter);
+    mailbox->persistent_view_filter = mailbox->view_filter ?
+        libbalsa_condition_clone(mailbox->view_filter) : NULL;
 }
 
 /* Test message flags. */

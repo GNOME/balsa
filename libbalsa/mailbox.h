@@ -225,6 +225,7 @@ struct _LibBalsaMailbox {
     LibBalsaCondition *view_filter; /* to choose a subset of messages
                                      * to be displayed, e.g., only
                                      * undeleted. */
+    LibBalsaCondition *persistent_view_filter;
 
     /* info fields */
     gboolean has_unread_messages;
@@ -484,6 +485,8 @@ gboolean libbalsa_mailbox_set_view_filter(LibBalsaMailbox * mailbox,
                                           LibBalsaCondition *
                                           filter_condition,
                                           gboolean update_immediately);
+void libbalsa_mailbox_make_view_filter_persistent(LibBalsaMailbox *
+                                                  mailbox);
 
 gboolean libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
                                  enum LibBalsaMailboxCapability cap);

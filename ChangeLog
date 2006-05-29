@@ -1,3 +1,12 @@
+2006-05-29 15:56  PeterB
+
+	* libbalsa/: mailbox.c, mailbox.h: implement
+	LibBalsaMailbox::persistent_view_filter.
+	* src/: balsa-index.c, main-window.c: make flag view-filter
+	persistent, so we can restore it when closing a local mailbox.
+	* libbalsa/mailbox_local.c: restore persistent view-filter before
+	saving the tree when closing.
+
 2006-05-26  Pawel Salek
 
 	* libbalsa/mailbox.c: sort IMAP mailboxes correctly (part of the

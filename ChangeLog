@@ -1,3 +1,7 @@
+2006-05-30 00:22  PeterB
+
+	* src/balsa-mime-widget-text.c: plug leak.
+
 2006-05-29 15:56  PeterB
 
 	* libbalsa/: mailbox.c, mailbox.h: implement

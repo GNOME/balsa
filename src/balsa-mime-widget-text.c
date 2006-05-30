@@ -773,7 +773,7 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
 		 const gchar * property, gint value)
 {
     GtkTextTag *tag = NULL;
-    const gchar * buf_chars;
+    gchar * buf_chars;
     gchar * utf_start;
     GtkTextIter iter_start;
     GtkTextIter iter_end;
@@ -798,16 +798,20 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
 	    gchar * e_next;
 
 	    /* found a proper start sequence - find the end or eject */
-	    if (!(utf_end = g_utf8_strchr(s_next, -1, tag_char)))
+	    if (!(utf_end = g_utf8_strchr(s_next, -1, tag_char))) {
+                g_free(buf_chars);
 		return;
+            }
 	    line_end = g_utf8_strchr(s_next, -1, '\n');
 	    e_next = g_utf8_next_char(utf_end);
 	    while (!g_unichar_isalnum(UNICHAR_PREV(utf_end)) ||
 		   !(*e_next == '\0' || 
 		     g_unichar_isspace(g_utf8_get_char(e_next)) ||
 		     g_unichar_ispunct(g_utf8_get_char(e_next)))) {
-		if (!(utf_end = g_utf8_strchr(e_next, -1, tag_char)))
+		if (!(utf_end = g_utf8_strchr(e_next, -1, tag_char))) {
+                    g_free(buf_chars);
 		    return;
+                }
 		e_next = g_utf8_next_char(utf_end);
 	    }
 	    
@@ -829,6 +833,7 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
 	    /* no start sequence, find the next start tag char */
 	    utf_start = *s_next ? g_utf8_strchr(s_next, -1, tag_char) : NULL;
     }
+    g_free(buf_chars);
 }
 
 /* --- HTML related functions -- */

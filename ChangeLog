@@ -1,3 +1,13 @@
+2006-05-31 09:43  PeterB
+
+	* libbalsa/filter-file.c, libbalsa/filter-funcs.c,
+	libbalsa/filter.c, libbalsa/filter.h, libbalsa/mailbox.c,
+	libbalsa/mailbox_local.c, src/balsa-index.c,
+	src/filter-edit-callbacks.c, src/filter-edit-dialog.c,
+	src/main-window.c: ref-count LibBalsaCondition instead of cloning.
+	* libbalsa/: mailbox_maildir.c, mailbox_mbox.c, mailbox_mh.c: free
+	mailbox info after closing mailbox-local.
+
 2006-05-30 00:22  PeterB
 
 	* src/balsa-mime-widget-text.c: plug leak.

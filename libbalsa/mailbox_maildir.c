@@ -648,9 +648,6 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox,
     LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
     guint len;
 
-    g_assert(mdir->msgno_2_msg_info != NULL);
-    g_assert(mdir->messages_info != NULL);
-
     len = mdir->msgno_2_msg_info->len;
     libbalsa_mailbox_maildir_sync(mailbox, expunge);
     if (mdir->msgno_2_msg_info->len != len)

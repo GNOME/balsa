@@ -1054,24 +1054,25 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
                                     gboolean expunge)
 {
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+    guint len;
 
-    if (mbox->messages_info) {
-	guint len;
+    len = mbox->messages_info->len;
+    libbalsa_mailbox_mbox_sync(mailbox, expunge);
+    if (mbox->messages_info->len != len)
+        libbalsa_mailbox_changed(mailbox);
 
-	len = mbox->messages_info->len;
-        libbalsa_mailbox_mbox_sync(mailbox, expunge);
-	if (mbox->messages_info->len != len)
-	    libbalsa_mailbox_changed(mailbox);
-	free_messages_info(mbox->messages_info);
-	mbox->messages_info = NULL;
-    }
     if (mbox->gmime_stream) {
-	g_object_unref(mbox->gmime_stream);
-	mbox->gmime_stream = NULL;	/* chbm: is this correct? */
+        g_object_unref(mbox->gmime_stream);
+        mbox->gmime_stream = NULL;
     }
+
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
         LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
                                                             expunge);
+
+    /* Now it's safe to free the message info. */
+    free_messages_info(mbox->messages_info);
+    mbox->messages_info = NULL;
 }
 
 static GMimeMessage *

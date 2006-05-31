@@ -717,26 +717,23 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox,
                                   gboolean expunge)
 {
     LibBalsaMailboxMh *mh = LIBBALSA_MAILBOX_MH(mailbox);
-    guint len = 0;
+    guint len;
 
-    if (mh->msgno_2_msg_info)
-	len = mh->msgno_2_msg_info->len;
+    len = mh->msgno_2_msg_info->len;
     libbalsa_mailbox_mh_sync(mailbox, expunge);
+    if (mh->msgno_2_msg_info->len != len)
+        libbalsa_mailbox_changed(mailbox);
 
-    if (mh->messages_info) {
-	g_hash_table_destroy(mh->messages_info);
-	mh->messages_info = NULL;
-    }
-    if (mh->msgno_2_msg_info) {
-	if (mh->msgno_2_msg_info->len != len)
-	    libbalsa_mailbox_changed(mailbox);
-	g_ptr_array_free(mh->msgno_2_msg_info, TRUE);
-	mh->msgno_2_msg_info = NULL;
-    }
+    g_hash_table_destroy(mh->messages_info);
+    mh->messages_info = NULL;
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
         LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
                                                             expunge);
+
+    /* Now it's safe to free the message info. */
+    g_ptr_array_free(mh->msgno_2_msg_info, TRUE);
+    mh->msgno_2_msg_info = NULL;
 }
 
 static int

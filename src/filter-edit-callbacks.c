@@ -194,7 +194,7 @@ fe_free_associated_conditions(void)
         LibBalsaCondition *cond;
 
         gtk_tree_model_get(model, &iter, 1, &cond, -1);
-	libbalsa_condition_free(cond);
+	libbalsa_condition_unref(cond);
     }
 }
 
@@ -820,7 +820,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
                     LibBalsaCondition *cond;
 
                     gtk_tree_model_get(model, &iter, 1, &cond, -1);
-                    libbalsa_condition_free(cond);
+                    libbalsa_condition_unref(cond);
                 }
             } else {
                 /* It was a new condition, so add it to the list */
@@ -1238,7 +1238,7 @@ fe_condition_remove_pressed(GtkWidget * widget, gpointer data)
         return;
 
     gtk_tree_model_get(model, &iter, 1, &cond, -1);
-    libbalsa_condition_free(cond);
+    libbalsa_condition_unref(cond);
     path = gtk_tree_model_get_path(model, &iter);
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
 
@@ -1824,7 +1824,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
         gtk_tree_model_get(cond_model, &cond_iter, 1, &cond, -1);
         libbalsa_filter_prepend_condition(fil,
-                                          libbalsa_condition_clone(cond),
+                                          libbalsa_condition_ref(cond),
                                           condition_op);
     } while (gtk_tree_model_iter_next(cond_model, &cond_iter));
 
@@ -1933,7 +1933,7 @@ fill_condition_list(GtkTreeModel *model, LibBalsaCondition *condition,
     gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                        0, _(fe_search_type[condition->type-1].text),
-                       1, libbalsa_condition_clone(condition),
+                       1, libbalsa_condition_ref(condition),
                        -1);
 }
 

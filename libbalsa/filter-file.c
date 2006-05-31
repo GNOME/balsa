@@ -337,7 +337,7 @@ lbc_new_helper(const gchar * key, const gchar * value, gpointer data)
              */
             info->err = FILTER_EFILESYN;
             filter_errno = FILTER_NOERR;
-            libbalsa_condition_free(cond);
+            libbalsa_condition_unref(cond);
         } else {
             LibBalsaTempCondition *tmp_cond;
 
@@ -373,8 +373,6 @@ libbalsa_condition_new_2_0(const gchar * filter_section_name,
 
     /* We position filter_errno to the last non-critical error */
     if (filter_errno == FILTER_NOERR) {
-        LibBalsaTempCondition *tmp;
-
         filter_errno = info.err;
         /* We sort the list of temp conditions, then
            we create the combined condition. */
@@ -382,10 +380,14 @@ libbalsa_condition_new_2_0(const gchar * filter_section_name,
             g_list_sort(info.tmp_list, compare_conditions_order);
         l = info.tmp_list;
         for (; info.tmp_list; info.tmp_list = info.tmp_list->next) {
-            tmp = (LibBalsaTempCondition *) (info.tmp_list->data);
-            cond_2_0 = cond_2_0 ?
+            LibBalsaTempCondition *tmp =
+                (LibBalsaTempCondition *) (info.tmp_list->data);
+            LibBalsaCondition *res = 
                 libbalsa_condition_new_bool_ptr(FALSE, cmt, tmp->cnd,
-                                                cond_2_0) : tmp->cnd;
+                                                cond_2_0);
+            libbalsa_condition_unref(tmp->cnd);
+            libbalsa_condition_unref(cond_2_0);
+            cond_2_0 = res;
             g_free(tmp);
         }
         g_list_free(l);

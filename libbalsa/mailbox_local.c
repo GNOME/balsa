@@ -696,7 +696,6 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
                                      gboolean expunge)
 {
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-    LibBalsaCondition *view_filter;
 
     if(local->sync_id) {
         g_source_remove(local->sync_id);
@@ -704,9 +703,8 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
     }
 
     /* Restore the persistent view before saving the tree. */
-    view_filter = mailbox->persistent_view_filter ?
-        libbalsa_condition_clone(mailbox->persistent_view_filter) : NULL;
-    libbalsa_mailbox_set_view_filter(mailbox, view_filter, TRUE);
+    libbalsa_mailbox_set_view_filter(mailbox,
+                                     mailbox->persistent_view_filter, TRUE);
 
     if (local->thread_id) {
         /* Rethread immediately. */

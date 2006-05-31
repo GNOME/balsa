@@ -1370,20 +1370,30 @@ bw_disable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
 }
 
 static void
-bw_filter_entry_activate(GtkWidget *entry, GtkWidget *button)
+bw_set_view_filter(BalsaWindow * bw, gint filter_no, GtkWidget * entry)
+{
+    GtkWidget *index = balsa_window_find_current_index(bw);
+    LibBalsaCondition *view_filter;
+
+    if (!index)
+        return;
+
+    view_filter = balsa_window_get_view_filter(bw, FALSE);
+    balsa_index_set_view_filter(BALSA_INDEX(index), filter_no,
+                                gtk_entry_get_text(GTK_ENTRY(entry)),
+                                view_filter);
+    libbalsa_condition_unref(view_filter);
+}
+
+static void
+bw_filter_entry_activate(GtkWidget * entry, GtkWidget * button)
 {
     BalsaWindow *bw = balsa_app.main_window;
-    GtkWidget *bindex = balsa_window_find_current_index(bw);
+    int filter_no =
+        gtk_combo_box_get_active(GTK_COMBO_BOX(bw->filter_choice));
 
-    if(bindex) {
-        int filter_no =
-            gtk_combo_box_get_active(GTK_COMBO_BOX(bw->filter_choice));
-        balsa_index_set_view_filter(BALSA_INDEX(bindex),
-                                    filter_no,
-                                    gtk_entry_get_text(GTK_ENTRY(entry)),
-                                    balsa_window_get_view_filter(bw, FALSE));
-        gtk_widget_set_sensitive(button, FALSE);
-    }
+    bw_set_view_filter(bw, filter_no, entry);
+    gtk_widget_set_sensitive(button, FALSE);
 }
 
 static void
@@ -1391,30 +1401,42 @@ bw_filter_entry_changed(GtkWidget *entry, GtkWidget *button)
 {
     gtk_widget_set_sensitive(button, TRUE);
 }
+
 /* FIXME: there should be a more compact way of creating condition
    trees than via calling special routines... */
+
+static LibBalsaCondition *
+filter_sos_or_sor(const char *str, ConditionMatchType field)
+{
+    LibBalsaCondition *subject, *address, *retval;
+
+    if (!(str && *str))
+        return NULL;
+
+    subject =
+        libbalsa_condition_new_string(FALSE, CONDITION_MATCH_SUBJECT,
+                                      g_strdup(str), NULL);
+    address =
+        libbalsa_condition_new_string(FALSE, field, g_strdup(str), NULL);
+    retval =
+        libbalsa_condition_new_bool_ptr(FALSE, CONDITION_OR, subject,
+                                        address);
+    libbalsa_condition_unref(subject);
+    libbalsa_condition_unref(address);
+
+    return retval;
+}
+
 static LibBalsaCondition *filter_sos(const char *str)
 {
-    return (str && *str) ?
-        libbalsa_condition_new_bool_ptr
-        (FALSE, CONDITION_OR,
-         libbalsa_condition_new_string
-         (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(str), NULL),
-         libbalsa_condition_new_string
-         (FALSE, CONDITION_MATCH_FROM,    g_strdup(str), NULL))
-        : NULL;
+    return  filter_sos_or_sor(str, CONDITION_MATCH_FROM);
 }
+
 static LibBalsaCondition *filter_sor(const char *str)
 {
-    return (str && *str) ?
-        libbalsa_condition_new_bool_ptr
-        (FALSE, CONDITION_OR,
-         libbalsa_condition_new_string
-         (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(str), NULL),
-         libbalsa_condition_new_string
-         (FALSE, CONDITION_MATCH_TO,      g_strdup(str), NULL))
-        : NULL;
+    return  filter_sos_or_sor(str, CONDITION_MATCH_TO);
 }
+
 static LibBalsaCondition *filter_s(const char *str)
 {
     return (str && *str) ?
@@ -4132,18 +4154,17 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
         if(ok == FIND_RESPONSE_FILTER) {
             LibBalsaMailbox *mailbox = 
                 BALSA_INDEX(bindex)->mailbox_node->mailbox;
-            LibBalsaCondition *filter;
+            LibBalsaCondition *filter, *res;
             filter = balsa_window_get_view_filter(window, FALSE);
-            /* steal cnd */
-            if(filter)
-                filter = libbalsa_condition_new_bool_ptr
-                    (FALSE, CONDITION_AND, cnd, filter);
-            else 
-                filter = cnd;
-
-            if (libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE))
-                balsa_index_ensure_visible(BALSA_INDEX(bindex));
+            res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+                                                  filter, cnd);
+            libbalsa_condition_unref(filter);
+            libbalsa_condition_unref(cnd);
             cnd = NULL;
+
+            if (libbalsa_mailbox_set_view_filter(mailbox, res, TRUE))
+                balsa_index_ensure_visible(BALSA_INDEX(bindex));
+            libbalsa_condition_unref(res);
             return;
         }
     }
@@ -4286,16 +4307,15 @@ balsa_window_get_view_filter(BalsaWindow *window, gboolean flags_only)
      */
     flag_filter = NULL;
     for(j=0; j<ELEMENTS(match_flags); j++) {
-        LibBalsaCondition *lbc;
+        LibBalsaCondition *lbc, *res;
         if(match_flags[j].setby < 0) continue;
         lbc = libbalsa_condition_new_flag_enum(match_flags[j].state,
                                                match_flags[j].flag);
-        if(flag_filter)
-            flag_filter = 
-                libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
-                                                flag_filter, lbc);
-        else
-            flag_filter = lbc;
+        res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+                                              lbc, flag_filter);
+        libbalsa_condition_unref(lbc);
+        libbalsa_condition_unref(flag_filter);
+        flag_filter = res;
     }
 
     /* add string filter on top of that */
@@ -4308,11 +4328,12 @@ balsa_window_get_view_filter(BalsaWindow *window, gboolean flags_only)
     } else filter = NULL;
     /* and merge ... */
     if(flag_filter) {
-        if(filter)
-            filter = libbalsa_condition_new_bool_ptr
-                (FALSE, CONDITION_AND, filter, flag_filter);
-        else 
-            filter = flag_filter;
+        LibBalsaCondition *res;
+        res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+                                              flag_filter, filter);
+        libbalsa_condition_unref(flag_filter);
+        libbalsa_condition_unref(filter);
+        filter = res;
     }
 
     return filter;
@@ -4386,13 +4407,12 @@ hide_changed_cb(GtkWidget * widget, gpointer data)
     libbalsa_mailbox_set_filter(mailbox, balsa_window_filter_to_int());
 
     filter = balsa_window_get_view_filter(bw, FALSE);
-    /* libbalsa_mailbox_set_view_filter() will take the ownership of
+    /* libbalsa_mailbox_set_view_filter() will ref the
      * filter.  We need also to rethread to take into account that
-     * some messages might have been removed or added to the view.  We
-     * just steal old view filter for the time being to avoid copying
-     * it - but we could just as well clone it. */
+     * some messages might have been removed or added to the view. */
     if (libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE))
         balsa_index_ensure_visible(BALSA_INDEX(index));
+    libbalsa_condition_unref(filter);
     libbalsa_mailbox_make_view_filter_persistent(mailbox);
 }
 
@@ -4404,9 +4424,7 @@ reset_filter_cb(GtkWidget * widget, gpointer data)
 
     /* do it by resetting the sos filder */
     gtk_entry_set_text(GTK_ENTRY(bw->sos_entry), "");
-    balsa_index_set_view_filter(bindex,
-                                bindex->filter_no,
-                                "", balsa_window_get_view_filter(bw, FALSE));
+    bw_set_view_filter(bw, bindex->filter_no, bw->sos_entry);
 }
 
 static void

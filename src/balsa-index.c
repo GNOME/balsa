@@ -954,16 +954,7 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     }
 }
 
-static LibBalsaCondition cond_undeleted =
-{
-    TRUE,
-    CONDITION_FLAG,
-    {
-       {
-           LIBBALSA_MESSAGE_FLAG_DELETED
-       }
-    }
-};
+static LibBalsaCondition *cond_undeleted;
 
 /* Callback for the mailbox's "row-inserted" signal; queue an idle
  * handler to expand the thread. */
@@ -1051,6 +1042,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     gchar *msg;
     gboolean successp;
     gint try_cnt;
+    LibBalsaCondition *view_filter;
 
     g_return_val_if_fail(BALSA_IS_INDEX(index), TRUE);
     g_return_val_if_fail(index->mailbox_node == NULL, TRUE);
@@ -1114,9 +1106,9 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     balsa_window_enable_mailbox_menus(balsa_app.main_window, index);
     gdk_threads_leave();
 
-    libbalsa_mailbox_set_view_filter(mailbox,
-                                     balsa_window_get_view_filter
-                                     (balsa_app.main_window, TRUE), FALSE);
+    view_filter = balsa_window_get_view_filter(balsa_app.main_window, TRUE);
+    libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
+    libbalsa_condition_unref(view_filter);
     libbalsa_mailbox_make_view_filter_persistent(mailbox);
     libbalsa_mailbox_set_threading(mailbox,
                                    libbalsa_mailbox_get_threading_type
@@ -1131,7 +1123,11 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     gdk_threads_leave();
 
     /* Create a search-iter for SEARCH UNDELETED. */
-    index->search_iter = libbalsa_mailbox_search_iter_new(&cond_undeleted);
+    if (!cond_undeleted)
+        cond_undeleted =
+            libbalsa_condition_new_flag_enum(TRUE,
+                                             LIBBALSA_MESSAGE_FLAG_DELETED);
+    index->search_iter = libbalsa_mailbox_search_iter_new(cond_undeleted);
     /* Note when this mailbox was opened, for use in auto-closing. */
     time(&index->mailbox_node->last_use);
 
@@ -1334,20 +1330,20 @@ balsa_index_find(BalsaIndex * index,
 static gboolean
 bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
 {
-    LibBalsaCondition cond_flag, cond_and;
+    LibBalsaCondition *cond_flag, *cond_and;
     LibBalsaMailboxSearchIter *search_iter;
     gboolean retval;
 
     g_assert(BALSA_IS_INDEX(index));
 
-    cond_flag.negate      = FALSE;
-    cond_flag.type        = CONDITION_FLAG;
-    cond_flag.match.flags = flag;
-    cond_and.negate            = FALSE;
-    cond_and.type              = CONDITION_AND;
-    cond_and.match.andor.left  = &cond_flag;
-    cond_and.match.andor.right = &cond_undeleted;
-    search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
+    cond_flag = libbalsa_condition_new_flag_enum(FALSE, flag);
+    cond_and =
+        libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND, cond_flag,
+                                        cond_undeleted);
+    libbalsa_condition_unref(cond_flag);
+
+    search_iter = libbalsa_mailbox_search_iter_new(cond_and);
+    libbalsa_condition_unref(cond_and);
 
     retval = bndx_search_iter_and_select(index, search_iter,
                                          BNDX_SEARCH_DIRECTION_NEXT,

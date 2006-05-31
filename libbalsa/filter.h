@@ -67,6 +67,7 @@ typedef enum {
 } ConditionMatchType;
 
 struct _LibBalsaCondition {
+    gint ref_count;
     gboolean negate; /* negate the result of the condition. */
     ConditionMatchType type;
 
@@ -120,8 +121,8 @@ LibBalsaCondition* libbalsa_condition_new_bool_ptr(gboolean negated,
                                                    ConditionMatchType cmt,
                                                    LibBalsaCondition *left,
                                                    LibBalsaCondition *right);
-LibBalsaCondition* libbalsa_condition_clone(LibBalsaCondition* cnd);
-void               libbalsa_condition_free (LibBalsaCondition*); 
+LibBalsaCondition* libbalsa_condition_ref(LibBalsaCondition* cnd);
+void               libbalsa_condition_unref(LibBalsaCondition*); 
 
 
 typedef enum {

@@ -370,9 +370,9 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->name = NULL;
     g_free(mailbox->url);
     mailbox->url = NULL;
-    libbalsa_condition_free(mailbox->view_filter);
+    libbalsa_condition_unref(mailbox->view_filter);
     mailbox->view_filter = NULL;
-    libbalsa_condition_free(mailbox->persistent_view_filter);
+    libbalsa_condition_unref(mailbox->persistent_view_filter);
     mailbox->persistent_view_filter = NULL;
 
     g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
@@ -692,10 +692,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     GSList *filters;
     guint progress_count;
     GSList *lst;
-    static LibBalsaCondition cond_and = {
-        FALSE,
-        CONDITION_AND
-    };
+    static LibBalsaCondition *recent_undeleted;
     gchar *text;
     guint total;
     guint progress_total;
@@ -729,8 +726,8 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     }
 
     libbalsa_lock_mailbox(mailbox);
-    if (!cond_and.match.andor.left)
-        cond_and.match.andor.left =
+    if (!recent_undeleted)
+        recent_undeleted =
             libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
                                             libbalsa_condition_new_flag_enum
                                             (FALSE,
@@ -749,6 +746,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     for (lst = filters; lst; lst = lst->next) {
         LibBalsaFilter *filter = lst->data;
         gboolean use_progress;
+        LibBalsaCondition *cond;
         LibBalsaMailboxSearchIter *search_iter;
         guint msgno;
         GArray *msgnos;
@@ -759,8 +757,11 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
         use_progress = !libbalsa_condition_is_flag_only(filter->condition,
                                                         NULL, 0, NULL);
 
-        cond_and.match.andor.right = filter->condition;
-        search_iter = libbalsa_mailbox_search_iter_new(&cond_and);
+        cond = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+                                               recent_undeleted,
+                                               filter->condition);
+        search_iter = libbalsa_mailbox_search_iter_new(cond);
+        libbalsa_condition_unref(cond);
 
         msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
         for (msgno = 1; msgno <= total; msgno++) {
@@ -1440,7 +1441,7 @@ libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
     iter = g_new(LibBalsaMailboxSearchIter, 1);
     iter->mailbox = NULL;
     iter->stamp = 0;
-    iter->condition = libbalsa_condition_clone(condition);
+    iter->condition = libbalsa_condition_ref(condition);
     iter->user_data = NULL;
 
     return iter;
@@ -1467,7 +1468,7 @@ libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * search_iter)
     if (mailbox && LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free)
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(search_iter);
 
-    libbalsa_condition_free(search_iter->condition);
+    libbalsa_condition_unref(search_iter->condition);
     g_free(search_iter);
 }
 
@@ -1831,8 +1832,8 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
 
     libbalsa_lock_mailbox(mailbox);
 
-    libbalsa_condition_free(mailbox->view_filter);
-    mailbox->view_filter = cond;
+    libbalsa_condition_unref(mailbox->view_filter);
+    mailbox->view_filter = libbalsa_condition_ref(cond);
 
     if (update_immediately) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
@@ -1848,9 +1849,9 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
 void
 libbalsa_mailbox_make_view_filter_persistent(LibBalsaMailbox * mailbox)
 {
-    libbalsa_condition_free(mailbox->persistent_view_filter);
-    mailbox->persistent_view_filter = mailbox->view_filter ?
-        libbalsa_condition_clone(mailbox->view_filter) : NULL;
+    libbalsa_condition_unref(mailbox->persistent_view_filter);
+    mailbox->persistent_view_filter =
+        libbalsa_condition_ref(mailbox->view_filter);
 }
 
 /* Test message flags. */

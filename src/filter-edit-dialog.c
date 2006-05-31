@@ -612,7 +612,7 @@ filters_edit_dialog(void)
 	/* Copy conditions */
         if (fil->condition)
             /* Copy conditions */
-            cpfil->condition = libbalsa_condition_clone(fil->condition);
+            cpfil->condition = libbalsa_condition_ref(fil->condition);
         else
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Filter \"%s\" has no condition."),

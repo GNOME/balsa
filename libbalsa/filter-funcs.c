@@ -68,13 +68,26 @@ append_quoted_string(GString *res, const char *str)
     g_string_append_c(res, '"');
 }
 
+static LibBalsaCondition *
+lbcond_new(ConditionMatchType type, gboolean negated)
+{
+    LibBalsaCondition *cond;
+
+    cond = g_new(LibBalsaCondition, 1);
+    cond->type      = type;
+    cond->negate    = negated;
+    cond->ref_count = 1;
+
+    return cond;
+}
+
 #ifndef FIXME
 LibBalsaCondition*
 libbalsa_condition_new(void)
 {
-    LibBalsaCondition *cond = g_new(LibBalsaCondition,1);
-    cond->negate = FALSE;
-    cond->type = CONDITION_STRING;
+    LibBalsaCondition *cond;
+
+    cond = lbcond_new(CONDITION_STRING, FALSE);
     cond->match.string.fields      = 0;
     cond->match.string.string      = NULL;
     cond->match.string.user_header = NULL;
@@ -113,24 +126,23 @@ libbalsa_condition_new_string(gboolean negated, unsigned headers,
                               gchar *str, gchar *user_header)
 {
     LibBalsaCondition *cond;
-    cond = g_new(LibBalsaCondition,1);
-    cond->negate = negated;
-    cond->type = CONDITION_STRING;
+
+    cond = lbcond_new(CONDITION_STRING, negated);
     cond->match.string.fields      = headers;
     cond->match.string.string      = str;
     cond->match.string.user_header = user_header;
+
     return cond;
 }
 LibBalsaCondition*
 libbalsa_condition_new_date(gboolean negated, time_t *from, time_t *to)
 {
     LibBalsaCondition *cond;
-    cond = g_new(LibBalsaCondition,1);
-    cond->negate = negated;
-    cond->type = CONDITION_STRING;
-    cond->type = CONDITION_DATE;
+
+    cond = lbcond_new(CONDITION_DATE, negated);
     cond->match.date.date_low  = from ? *from : 0;
     cond->match.date.date_high = to   ? *to   : 0;
+
     return cond;
 }
 
@@ -172,38 +184,34 @@ libbalsa_condition_new_date_parse(gboolean negated, gchar **string)
         thi = mktime(&date) + 24*3600 - 1 /* 24*3600 - 1 = 23:59:59 */;
     }
         
-    cond = g_new(LibBalsaCondition,1);
-    cond->negate = negated;
-    cond->type = CONDITION_DATE;
+    cond = lbcond_new(CONDITION_DATE, negated);
     cond->match.date.date_low  = tlo;
     cond->match.date.date_high = thi;
     g_free(lo);
     g_free(hi);
+
     return cond;
 }
 
 static LibBalsaCondition*
 libbalsa_condition_new_flag(gboolean negated, gchar **string)
 {
-    LibBalsaCondition *cond;
     int i, flags = atoi(*string);
     for(i=0; (*string)[i] && isdigit((int)(*string)[i]); i++)
         ;
     *string += i;
-    cond = g_new(LibBalsaCondition,1);
-    cond->negate = negated;
-    cond->type = CONDITION_FLAG;
-    cond->match.flags = flags;
-    return cond;
+
+    return libbalsa_condition_new_flag_enum(negated, flags);
 }
 
 LibBalsaCondition*
 libbalsa_condition_new_flag_enum(gboolean negated, LibBalsaMessageFlag flags)
 {
-    LibBalsaCondition *cond = g_new(LibBalsaCondition,1);
-    cond->negate = negated;
-    cond->type = CONDITION_FLAG;
+    LibBalsaCondition *cond;
+
+    cond = lbcond_new(CONDITION_FLAG, negated);
     cond->match.flags = flags;
+
     return cond;
 }
 
@@ -211,24 +219,29 @@ static LibBalsaCondition*
 libbalsa_condition_new_bool(gboolean negated, ConditionMatchType cmt,
                             gchar **string)
 {
-    LibBalsaCondition *cond, *left, *right;
+    LibBalsaCondition *left, *right, *retval;
 
     left = libbalsa_condition_new_from_string(string);
     if(left == NULL)
         return NULL;
     if(*(*string)++ != ' ' || 
        (right = libbalsa_condition_new_from_string(string)) == NULL) {
-        libbalsa_condition_free(left);
+        libbalsa_condition_unref(left);
         return NULL;
     }
-    cond = g_new(LibBalsaCondition,1);
-    cond->negate = negated;
-    cond->type = cmt;
-    cond->match.andor.left  = left;
-    cond->match.andor.right = right;
-    return cond;
+
+    retval = libbalsa_condition_new_bool_ptr(negated, cmt, left, right);
+    libbalsa_condition_unref(left);
+    libbalsa_condition_unref(right);
+
+    return retval;
 }
 
+/* libbalsa_condition_new_bool_ptr
+ *
+ * refs the left and right conditions, so the caller must unref
+ * after calling.
+ */
 LibBalsaCondition*
 libbalsa_condition_new_bool_ptr(gboolean negated, ConditionMatchType cmt,
                                 LibBalsaCondition *left,
@@ -236,13 +249,17 @@ libbalsa_condition_new_bool_ptr(gboolean negated, ConditionMatchType cmt,
 {
     LibBalsaCondition *cond;
 
-    g_return_val_if_fail(left,  NULL);
-    g_return_val_if_fail(right, NULL);
-    cond = g_new(LibBalsaCondition,1);
-    cond->negate = negated;
-    cond->type = cmt;
-    cond->match.andor.left  = left;
-    cond->match.andor.right = right;
+    g_return_val_if_fail(left != NULL || right != NULL,  NULL);
+
+    if (!left)
+        return libbalsa_condition_ref(right);
+    if (!right)
+        return libbalsa_condition_ref(left);
+
+    cond = lbcond_new(cmt, negated);
+    cond->match.andor.left  = libbalsa_condition_ref(left);
+    cond->match.andor.right = libbalsa_condition_ref(right);
+
     return cond;
 }
 
@@ -383,10 +400,16 @@ regexs_free(GSList * regexs)
 }                               /* end condition_free_regexs() */
 
 void 
-libbalsa_condition_free(LibBalsaCondition* cond)
+libbalsa_condition_unref(LibBalsaCondition* cond)
 {
     if(!cond) /* passing NULL is OK */
         return;
+
+    g_return_if_fail(cond->ref_count > 0);
+
+    if (--cond->ref_count > 0)
+        return;
+
     switch (cond->type) {
     case CONDITION_STRING:
 	g_free(cond->match.string.string);
@@ -400,74 +423,30 @@ libbalsa_condition_free(LibBalsaCondition* cond)
         break;
     case CONDITION_AND:
     case CONDITION_OR:
-        libbalsa_condition_free(cond->match.andor.left);
-        libbalsa_condition_free(cond->match.andor.right);
+        libbalsa_condition_unref(cond->match.andor.left);
+        libbalsa_condition_unref(cond->match.andor.right);
         break;
     case CONDITION_NONE:
 	/* to avoid warnings */
 	break;
     }
     g_free(cond);
-}	                       /* end libbalsa_condition_free() */
+}	                       /* end libbalsa_condition_unref() */
 
 
-/* libbalsa_condition_clone(LibBalsaCondition * cnd)
- * Position filter_errno
+/* libbalsa_condition_ref(LibBalsaCondition * cond)
  */
 LibBalsaCondition*
-libbalsa_condition_clone(LibBalsaCondition* cnd)
+libbalsa_condition_ref(LibBalsaCondition* cond)
 {
-    LibBalsaCondition * new_cnd;
+    if(!cond) /* passing NULL is OK */
+        return cond;
 
-    filter_errno = FILTER_NOERR;
-    new_cnd = g_new(LibBalsaCondition,1);
+    g_return_val_if_fail(cond->ref_count > 0, NULL);
 
-    new_cnd->negate = cnd->negate;
-    new_cnd->type    = cnd->type;
-    switch (new_cnd->type) {
-    case CONDITION_STRING:
-        new_cnd->match.string.string  = g_strdup(cnd->match.string.string);
-	new_cnd->match.string.fields = cnd->match.string.fields;
-	new_cnd->match.string.user_header =
-	    (cnd->match.string.user_header)
-	    ? g_strdup(cnd->match.string.user_header) : NULL;
-        break;
-    case CONDITION_REGEX:
-# if 0
-        FIXME!
-        for (regex=cnd->match.regexs;regex && (filter_errno==FILTER_NOERR);
-             regex=g_slist_next(regex)) {
-            new_reg = libbalsa_condition_regex_new();
-            new_reg->string = 
-                g_strdup(((LibBalsaConditionRegex*)regex->data)->string);
-            new_cnd->match.regexs = 
-                g_slist_prepend(new_cnd->match.regexs, new_reg);
-        }
-        new_cnd->match.regexs = g_slist_reverse(new_cnd->match.regexs);
-#endif
-        break;
-    case CONDITION_DATE:
-        new_cnd->match.date.date_low  = cnd->match.date.date_low;
-        new_cnd->match.date.date_high = cnd->match.date.date_high;
-        break;
-    case CONDITION_FLAG:
-        new_cnd->match.flags=cnd->match.flags;
-	break;
-    case CONDITION_AND:
-    case CONDITION_OR:
-        new_cnd->match.andor.left =
-            libbalsa_condition_clone(cnd->match.andor.left);
-        new_cnd->match.andor.right =
-            libbalsa_condition_clone(cnd->match.andor.right);
-        break;
-    case CONDITION_NONE:
-        /* to avoid warnings */
-        break;
-    default:
-        g_assert_not_reached();
-    }
+    ++cond->ref_count;
 
-    return new_cnd;
+    return cond;
 }
 
 /* Helper to compare regexs */
@@ -639,14 +618,14 @@ void
 libbalsa_filter_prepend_condition(LibBalsaFilter* fil, LibBalsaCondition* cond,
                                   ConditionMatchType op)
 {
+    LibBalsaCondition *res;
+
     filter_condition_validity(fil,cond);
 
-    if(fil->condition)
-        fil->condition = libbalsa_condition_new_bool_ptr(FALSE,op,
-                                                         fil->condition,
-                                                         cond);
-    else
-        fil->condition = cond;
+    res = libbalsa_condition_new_bool_ptr(FALSE, op, cond, fil->condition);
+    libbalsa_condition_unref(cond);
+    libbalsa_condition_unref(fil->condition);
+    fil->condition = res;
 }
 
 /*
@@ -709,7 +688,7 @@ libbalsa_filter_free(LibBalsaFilter* fil, gpointer free_conditions)
     g_free(fil->action_string);
 
     if (GPOINTER_TO_INT(free_conditions)) 
-        libbalsa_condition_free(fil->condition);
+        libbalsa_condition_unref(fil->condition);
 
     g_free(fil);
 }				/* end filter_free() */

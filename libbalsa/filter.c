@@ -75,8 +75,6 @@ libbalsa_filters_set_filter_list(GSList** list)
     filter_list = list;
 }
 
-/* FIXME : filtering takes time, we should notify progress to user */
-
 /*------------------------------------------------------------------------
   ---- Helper functions (also exported to have a fine-grained API) -------
 */
@@ -395,10 +393,10 @@ libbalsa_condition_is_flag_only(LibBalsaCondition * cond,
         retval =
             libbalsa_condition_is_flag_only(cond->match.andor.left,
                                             mailbox, msgno,
-					    &left_match)
+					    match ? &left_match : NULL)
             && libbalsa_condition_is_flag_only(cond->match.andor.right,
                                                mailbox, msgno,
-                                               &right_match);
+                                               match ? &right_match : NULL);
         if (retval && match)
             *match = left_match && right_match;
         break;
@@ -406,10 +404,10 @@ libbalsa_condition_is_flag_only(LibBalsaCondition * cond,
         retval =
             libbalsa_condition_is_flag_only(cond->match.andor.left,
                                             mailbox, msgno,
-					    &left_match)
+					    match ? &left_match : NULL)
             && libbalsa_condition_is_flag_only(cond->match.andor.right,
                                                mailbox, msgno,
-                                               &right_match);
+                                               match ? &right_match : NULL);
         if (retval && match)
             *match = left_match || right_match;
         break;

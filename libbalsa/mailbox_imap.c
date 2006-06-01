@@ -505,7 +505,7 @@ clean_cache(LibBalsaMailbox* mailbox)
     return TRUE;
 }
 struct ImapCacheManager;
-static void icm_destroy(struct ImapCacheManager *icm);
+static void imap_cache_manager_free(struct ImapCacheManager *icm);
 static struct ImapCacheManager *icm_store_cached_data(ImapMboxHandle *h);
 static void icm_restore_from_cache(ImapMboxHandle *h,
                                    struct ImapCacheManager *icm);
@@ -520,7 +520,7 @@ mi_reconnect(ImapMboxHandle *h)
 
     r = imap_mbox_handle_reconnect(h, NULL);
     if(r==IMAP_SUCCESS) icm_restore_from_cache(h, icm);
-    icm_destroy(icm);
+    imap_cache_manager_free(icm);
     if(imap_mbox_handle_get_exists(h) != old_cnt ||
        imap_mbox_handle_get_uidnext(h) != old_next)
 	g_signal_emit_by_name(h, "exists-notify", 0);
@@ -1012,8 +1012,10 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
         g_ptr_array_add(mailbox->mindex, NULL);
     }
     icm = g_object_get_data(G_OBJECT(mailbox), "cache-manager");
-    if(icm)
+    if (icm) {
         icm_restore_from_cache(mimap->handle, icm);
+        g_object_set_data(G_OBJECT(mailbox), "cache-manager", NULL);
+    }
 
     mailbox->first_unread = imap_mbox_handle_first_unseen(mimap->handle);
     libbalsa_mailbox_run_filters_on_reception(mailbox);
@@ -1064,8 +1066,9 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     clean_cache(mailbox);
 
     mbox->opened = FALSE;
-    g_object_set_data(G_OBJECT(mailbox), "cache-manager",
-                      icm_store_cached_data(mbox->handle));
+    g_object_set_data_full(G_OBJECT(mailbox), "cache-manager",
+                           icm_store_cached_data(mbox->handle),
+                           (GDestroyNotify) imap_cache_manager_free);
 
     /* we do not attempt to reconnect here */
     if (expunge)
@@ -2905,10 +2908,11 @@ imap_cache_manager_new(guint cnt)
 }
 
 static void
-icm_destroy(struct ImapCacheManager *icm)
+imap_cache_manager_free(struct ImapCacheManager *icm)
 {
     g_hash_table_destroy(icm->headers);
     g_array_free(icm->uidmap, TRUE);
+    g_free(icm);
 }
 
 /* icm_init_on_select_() preloads header cache of the ImapMboxHandle object.

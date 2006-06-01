@@ -2353,6 +2353,20 @@ balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
     gtk_tree_store_append(balsa_app.mblist_tree_store, &iter, parent_iter);
     bmbl_store_redraw_mbnode(&iter, mbnode);
 
+    if (parent_iter) {
+        /* Check whether this node is exposed. */
+        GtkTreePath *parent_path =
+            gtk_tree_model_get_path(model, parent_iter);
+        if (gtk_tree_view_row_expanded(GTK_TREE_VIEW(balsa_app.mblist),
+                                       parent_path)
+            && !mbnode->scanned) {
+            /* Check this node for children. */
+            balsa_mailbox_node_append_subtree(mbnode);
+            mbnode->scanned = TRUE;
+        }
+        gtk_tree_path_free(parent_path);
+    }
+
     /* The tree-store owns mbnode. */
     g_object_unref(mbnode);
 

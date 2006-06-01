@@ -1,3 +1,9 @@
+2006-06-01 10:57  PeterB
+
+	* libbalsa/mailbox_imap.c: free cache-manager.
+	* src/balsa-mblist.c: append subtree when appending exposed
+	unscanned node.
+
 2006-05-31 09:43  PeterB
 
 	* libbalsa/filter-file.c, libbalsa/filter-funcs.c,

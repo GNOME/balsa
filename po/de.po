@@ -7,7 +7,7 @@
 # Manuel Borchers <webmaster@matronix.de>, 2002.
 # Christian Neumair <chris@gnome-de.org>, 2002, 2003, 2004.
 # Hendrik Brandt <heb@gnome-de.org>, 2004-2005.
-# Hendrik Richter <hendi@gnome-de.org>, 2005.
+# Hendrik Richter <hendrikr@gnome.org>, 2005.
 # Jens Seidel <jseidel@cvs.gnome.org>, 2005.
 # Bitte nach der Evolution-Übersetzung richten
 # 
@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: balsa HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-10-07 17:39+0200\n"
-"PO-Revision-Date: 2005-10-07 17:46+0200\n"
-"Last-Translator: Jens Seidel <jseidel@cvs.gnome.org>\n"
+"PO-Revision-Date: 2006-06-15 15:56+0200\n"
+"Last-Translator: Hendrik Richter <hendrikr@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -565,12 +565,12 @@ msgstr "Nachricht wird wiederhergestellt"
 #. login information...
 #: ../libbalsa/mailbox_imap.c:537
 msgid "IMAP connection has been severed. Reconnecting..."
-msgstr "Die IMAP-Verbindung wurde getrennt. Wiederherstellen..."
+msgstr "Die IMAP-Verbindung wurde getrennt. Wiederherstellen …"
 
 #: ../libbalsa/mailbox_imap.c:540
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
-msgstr "Der IMAP-Server hat die Verbindung geschlossen: %s wiederherstellen..."
+msgstr "Der IMAP-Server hat die Verbindung geschlossen: %s wiederherstellen …"
 
 #: ../libbalsa/mailbox_imap.c:1005 ../libbalsa/mailbox_maildir.c:492
 #: ../libbalsa/mailbox_mbox.c:523 ../libbalsa/mailbox_mh.c:517
@@ -1335,7 +1335,7 @@ msgstr "Bitte versuchen Sie es später noch einmal."
 
 #: ../libbalsa/send.c:242 ../libbalsa/send.c:249
 msgid "Sending Mail..."
-msgstr "Verschicken von Mail..."
+msgstr "Verschicken von Mail …"
 
 #: ../libbalsa/send.c:245 ../src/main-window.c:2684
 msgid "_Hide"
@@ -2017,7 +2017,7 @@ msgstr "Größe"
 #: ../src/balsa-index.c:983
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr "Postfach %s wird geöffnet. Bitte warten..."
+msgstr "Postfach %s wird geöffnet. Bitte warten …"
 
 #: ../src/balsa-index.c:1615
 #, c-format
@@ -2028,32 +2028,32 @@ msgstr "Verschieben in den Müll ist fehlgeschlagen: %s"
 #: ../src/balsa-index.c:1769 ../src/main-window.c:584
 #: ../src/main-window.c:1047 ../src/message-window.c:148
 msgid "_Reply..."
-msgstr "_Antworten..."
+msgstr "_Antworten …"
 
 #: ../src/balsa-index.c:1771
 msgid "Reply To _All..."
-msgstr "Antwort an a_lle..."
+msgstr "Antwort an a_lle …"
 
 #: ../src/balsa-index.c:1773
 msgid "Reply To _Group..."
-msgstr "Antwort an _Gruppe..."
+msgstr "Antwort an _Gruppe …"
 
 #: ../src/balsa-index.c:1775
 msgid "_Forward Attached..."
-msgstr "Als A_nlage weiterleiten..."
+msgstr "Als A_nlage weiterleiten …"
 
 #: ../src/balsa-index.c:1777
 msgid "Forward _Inline..."
-msgstr "_Inline weiterleiten..."
+msgstr "_Inline weiterleiten …"
 
 #: ../src/balsa-index.c:1779 ../src/main-window.c:623
 msgid "_Pipe through..."
-msgstr "_Leiten durch..."
+msgstr "_Leiten durch …"
 
 #: ../src/balsa-index.c:1781 ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
-msgstr "Adresse _speichern..."
+msgstr "Adresse _speichern …"
 
 #: ../src/balsa-index.c:1796 ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:983 ../src/mailbox-node.c:999
@@ -2137,7 +2137,7 @@ msgstr "Postfach konnte nicht gefunden werden"
 
 #: ../src/balsa-mblist.c:1590
 msgid "_Other..."
-msgstr "_Weitere..."
+msgstr "_Weitere …"
 
 #: ../src/balsa-mblist.c:1658
 msgid "Choose destination folder"
@@ -2145,7 +2145,7 @@ msgstr "Wählen Sie den Zielordner"
 
 #: ../src/balsa-mblist.c:1881 ../src/balsa-mblist.c:1884
 msgid "Other..."
-msgstr "Weitere..."
+msgstr "Weitere …"
 
 #: ../src/balsa-mblist.c:2042
 #, c-format
@@ -2182,12 +2182,12 @@ msgstr "Nachrichtenteile"
 # Bezieht sich auf Nachrichtenteile
 #: ../src/balsa-message.c:639
 msgid "Save selected as..."
-msgstr "Auswahl speichern unter..."
+msgstr "Auswahl speichern unter …"
 
 # Bezieht sich auf Nachrichtenteile
 #: ../src/balsa-message.c:646
 msgid "Save selected to folder..."
-msgstr "Auswahl in Ordner speichern..."
+msgstr "Auswahl in Ordner speichern …"
 
 #: ../src/balsa-message.c:784
 msgid "(No sender)"
@@ -2249,7 +2249,7 @@ msgstr "verschlüsselt: "
 #: ../src/balsa-message.c:1250 ../src/balsa-mime-widget-text.c:344
 #: ../src/balsa-mime-widget-text.c:649
 msgid "Save..."
-msgstr "Speichern..."
+msgstr "Speichern …"
 
 #: ../src/balsa-message.c:1326
 msgid "Select folder for saving selected parts"
@@ -2705,7 +2705,7 @@ msgstr "Klang abspielen:"
 
 #: ../src/filter-edit-dialog.c:367 ../src/filter-edit-dialog.c:380
 msgid "Use Sound..."
-msgstr "Diesen Klang verwenden..."
+msgstr "Diesen Klang verwenden …"
 
 #: ../src/filter-edit-dialog.c:399
 msgid "Popup text:"
@@ -2984,7 +2984,7 @@ msgstr "Rechner:"
 
 #: ../src/folder-conf.c:777
 msgid "_Browse..."
-msgstr "_Auswählen..."
+msgstr "_Auswählen …"
 
 #: ../src/folder-conf.c:785
 msgid "_Subfolder of:"
@@ -3235,31 +3235,31 @@ msgstr "Abtasten von %s fehlgeschlagen: %s"
 #: ../src/mailbox-node.c:484
 #, c-format
 msgid "Scanning %s. Please wait..."
-msgstr "%s wird abgetastet. Bitte warten..."
+msgstr "%s wird abgetastet. Bitte warten …"
 
 #: ../src/mailbox-node.c:941
 msgid "Local _mbox mailbox..."
-msgstr "Lokales _Mbox-Postfach..."
+msgstr "Lokales _Mbox-Postfach …"
 
 #: ../src/mailbox-node.c:943
 msgid "Local Mail_dir mailbox..."
-msgstr "Lokales Mail_dir-Postfach..."
+msgstr "Lokales Mail_dir-Postfach …"
 
 #: ../src/mailbox-node.c:945
 msgid "Local M_H mailbox..."
-msgstr "Lokales M_H-Postfach..."
+msgstr "Lokales M_H-Postfach …"
 
 #: ../src/mailbox-node.c:947
 msgid "Remote _IMAP mailbox..."
-msgstr "_IMAP-Postfach im Netz..."
+msgstr "_IMAP-Postfach im Netz …"
 
 #: ../src/mailbox-node.c:950
 msgid "Remote IMAP _folder..."
-msgstr "IMAP-_Ordner im Netz..."
+msgstr "IMAP-_Ordner im Netz …"
 
 #: ../src/mailbox-node.c:952
 msgid "Remote IMAP _subfolder..."
-msgstr "IMAP-_Unterordner im Netz..."
+msgstr "IMAP-_Unterordner im Netz …"
 
 #. clicked on the empty space
 #: ../src/mailbox-node.c:963 ../src/mailbox-node.c:979
@@ -3268,7 +3268,7 @@ msgstr "_Neu einlesen"
 
 #: ../src/mailbox-node.c:973
 msgid "_Properties..."
-msgstr "Ei_genschaften..."
+msgstr "Ei_genschaften …"
 
 #: ../src/mailbox-node.c:989
 msgid "_Open"
@@ -3323,7 +3323,7 @@ msgstr "Lokaler Ordner %s\n"
 
 #: ../src/main-window.c:280
 msgid "Balsa closes files and connections. Please wait..."
-msgstr "Valsa schließt alle Dateien und Verbindungen. Bitte warten..."
+msgstr "Valsa schließt alle Dateien und Verbindungen. Bitte warten …"
 
 #: ../src/main-window.c:319 ../src/main-window.c:365
 msgid "_Deleted"
@@ -3395,7 +3395,7 @@ msgstr "Beantwortet ein-/ausschalten"
 
 #: ../src/main-window.c:392
 msgid "_Message..."
-msgstr "_Nachricht..."
+msgstr "_Nachricht …"
 
 #: ../src/main-window.c:392 ../src/main-window.c:1041
 msgid "Compose a new message"
@@ -3405,7 +3405,7 @@ msgstr "Eine neue Nachricht verfassen"
 #. of including at specified position
 #: ../src/main-window.c:399
 msgid "Local mbox mailbox..."
-msgstr "Lokales Mbox-Postfach..."
+msgstr "Lokales Mbox-Postfach …"
 
 #: ../src/main-window.c:400 ../src/main-window.c:813
 msgid "Add a new mbox style mailbox"
@@ -3413,7 +3413,7 @@ msgstr "Ein neues Postfach im Mbox-Stil anlegen"
 
 #: ../src/main-window.c:403
 msgid "Local Maildir mailbox..."
-msgstr "Lokales Maildir-Postfach..."
+msgstr "Lokales Maildir-Postfach …"
 
 #: ../src/main-window.c:404 ../src/main-window.c:818
 msgid "Add a new Maildir style mailbox"
@@ -3421,7 +3421,7 @@ msgstr "Ein neues Postfach im Maildir-Stil anlegen"
 
 #: ../src/main-window.c:407
 msgid "Local MH mailbox..."
-msgstr "Lokales MH-Postfach..."
+msgstr "Lokales MH-Postfach …"
 
 #: ../src/main-window.c:408 ../src/main-window.c:822
 msgid "Add a new MH style mailbox"
@@ -3430,7 +3430,7 @@ msgstr "Ein neues Postfach im MH-Stil anlegen"
 #: ../src/main-window.c:411 ../src/main-window.c:825
 #: ../src/pref-manager.c:2954
 msgid "Remote IMAP mailbox..."
-msgstr "IMAP-Postfach im Netz..."
+msgstr "IMAP-Postfach im Netz …"
 
 #: ../src/main-window.c:412 ../src/main-window.c:826
 msgid "Add a new IMAP mailbox"
@@ -3439,7 +3439,7 @@ msgstr "Ein neues IMAP-Postfach anlegen"
 #: ../src/main-window.c:416 ../src/main-window.c:830
 #: ../src/pref-manager.c:2959
 msgid "Remote IMAP folder..."
-msgstr "IMAP-Ordner im Netz..."
+msgstr "IMAP-Ordner im Netz …"
 
 #: ../src/main-window.c:417 ../src/main-window.c:831
 msgid "Add a new IMAP folder"
@@ -3447,7 +3447,7 @@ msgstr "Einen neuen IMAP-Ordner anlegen"
 
 #: ../src/main-window.c:420 ../src/main-window.c:834
 msgid "Remote IMAP subfolder..."
-msgstr "IMAP-Unterordner im Netz..."
+msgstr "IMAP-Unterordner im Netz …"
 
 #: ../src/main-window.c:421 ../src/main-window.c:835
 msgid "Add a new IMAP subfolder"
@@ -3492,7 +3492,7 @@ msgstr "Nachrichten verschicken und empfangen"
 #: ../src/main-window.c:461 ../src/main-window.c:882
 #: ../src/sendmsg-window.c:331 ../src/sendmsg-window.c:492
 msgid "_Print..."
-msgstr "_Drucken..."
+msgstr "_Drucken …"
 
 #: ../src/main-window.c:462 ../src/main-window.c:883
 #: ../src/toolbar-factory.c:109
@@ -3501,7 +3501,7 @@ msgstr "Die momentan markierte Nachricht drucken"
 
 #: ../src/main-window.c:468 ../src/main-window.c:1100
 msgid "_Address Book..."
-msgstr "_Adressbuch..."
+msgstr "_Adressbuch …"
 
 #: ../src/main-window.c:469 ../src/main-window.c:1101
 msgid "Open the address book"
@@ -3509,7 +3509,7 @@ msgstr "Das Adressbuch öffnen"
 
 #: ../src/main-window.c:493
 msgid "F_ilters..."
-msgstr "_Filter..."
+msgstr "_Filter …"
 
 #: ../src/main-window.c:493 ../src/main-window.c:1087
 msgid "Manage filters"
@@ -3632,7 +3632,7 @@ msgstr "Die momentan markierte Nachricht beantworten"
 #: ../src/main-window.c:592 ../src/main-window.c:1054
 #: ../src/message-window.c:153
 msgid "Reply to _All..."
-msgstr "Antwort an a_lle..."
+msgstr "Antwort an a_lle …"
 
 #: ../src/main-window.c:593 ../src/main-window.c:1055
 msgid "Reply to all recipients of the current message"
@@ -3640,7 +3640,7 @@ msgstr "Antwort an alle Empfänger der aktuellen Nachricht"
 
 #: ../src/main-window.c:600 ../src/message-window.c:159
 msgid "Reply to _Group..."
-msgstr "Antwort an _Gruppe..."
+msgstr "Antwort an _Gruppe …"
 
 #: ../src/main-window.c:601 ../src/message-window.c:160
 #: ../src/toolbar-factory.c:89
@@ -3649,7 +3649,7 @@ msgstr "Antwort an Mailingliste"
 
 #: ../src/main-window.c:608 ../src/message-window.c:165
 msgid "_Forward attached..."
-msgstr "Als A_nlage weiterleiten..."
+msgstr "Als A_nlage weiterleiten …"
 
 #: ../src/main-window.c:609
 msgid "Forward the current message as attachment"
@@ -3657,7 +3657,7 @@ msgstr "Die momentan markierte Nachricht als Anlage weiterleiten"
 
 #: ../src/main-window.c:615
 msgid "Forward _inline..."
-msgstr "_Inline weiterleiten..."
+msgstr "_Inline weiterleiten …"
 
 #: ../src/main-window.c:616
 msgid "Forward the current message inline"
@@ -3686,7 +3686,7 @@ msgstr "Vorheriger Teil der Nachricht"
 #: ../src/main-window.c:644 ../src/main-window.c:1068
 #: ../src/message-window.c:187
 msgid "Save Current Part..."
-msgstr "Diesen Teil speichern..."
+msgstr "Diesen Teil speichern …"
 
 #: ../src/main-window.c:645 ../src/main-window.c:1069
 msgid "Save currently displayed part of message"
@@ -3695,7 +3695,7 @@ msgstr "Den momentan angezeigten Teil der Nachricht speichern"
 #: ../src/main-window.c:651 ../src/main-window.c:1021
 #: ../src/message-window.c:192
 msgid "_View Source..."
-msgstr "_Quelltext anzeigen..."
+msgstr "_Quelltext anzeigen …"
 
 #: ../src/main-window.c:652 ../src/main-window.c:1022
 #: ../src/message-window.c:193
@@ -3762,7 +3762,7 @@ msgstr "Alle Nachrichten im aktuellen Postfach auswählen"
 
 #: ../src/main-window.c:735 ../src/main-window.c:845
 msgid "_Edit..."
-msgstr "_Bearbeiten..."
+msgstr "_Bearbeiten …"
 
 #: ../src/main-window.c:735 ../src/main-window.c:845
 msgid "Edit the selected mailbox"
@@ -3770,7 +3770,7 @@ msgstr "Das gewählte Postfach bearbeiten"
 
 #: ../src/main-window.c:739 ../src/main-window.c:840
 msgid "_Delete..."
-msgstr "_Löschen..."
+msgstr "_Löschen …"
 
 #: ../src/main-window.c:740 ../src/main-window.c:841
 msgid "Delete the selected mailbox"
@@ -3819,7 +3819,7 @@ msgstr "Doppelte Nachrichten aus dem ausgewählten Postfach entfernen"
 
 #: ../src/main-window.c:783
 msgid "_Toolbars..."
-msgstr "_Werkzeugleisten..."
+msgstr "_Werkzeugleisten …"
 
 #: ../src/main-window.c:784
 msgid "Customize toolbars"
@@ -3827,7 +3827,7 @@ msgstr "Werkzeugleisten anpassen"
 
 #: ../src/main-window.c:787 ../src/main-window.c:1109
 msgid "_Identities..."
-msgstr "_Identitäten..."
+msgstr "_Identitäten …"
 
 #: ../src/main-window.c:788 ../src/main-window.c:1110
 msgid "Create and set current identities"
@@ -3844,15 +3844,15 @@ msgstr "_Nachricht"
 
 #: ../src/main-window.c:812
 msgid "New mailbox..."
-msgstr "Neues Postfach..."
+msgstr "Neues Postfach …"
 
 #: ../src/main-window.c:817
 msgid "New \"Maildir\" mailbox..."
-msgstr "Neues »Maildir«-Postfach..."
+msgstr "Neues »Maildir«-Postfach …"
 
 #: ../src/main-window.c:821
 msgid "New \"MH\" mailbox..."
-msgstr "Neues »MH«-Postfach..."
+msgstr "Neues »MH«-Postfach …"
 
 #: ../src/main-window.c:851
 msgid "_Compress Mailbox"
@@ -3938,12 +3938,12 @@ msgstr "_Mehr"
 
 #: ../src/main-window.c:1041
 msgid "_New..."
-msgstr "_Neu..."
+msgstr "_Neu …"
 
 #. F
 #: ../src/main-window.c:1061
 msgid "_Forward..."
-msgstr "_Weiterleiten..."
+msgstr "_Weiterleiten …"
 
 #: ../src/main-window.c:1062 ../src/toolbar-factory.c:91
 msgid "Forward the current message"
@@ -3956,7 +3956,7 @@ msgstr "In den _Müll verschieben"
 
 #: ../src/main-window.c:1087
 msgid "_Manage..."
-msgstr "V_erwalten..."
+msgstr "V_erwalten …"
 
 #: ../src/main-window.c:1090
 msgid "_Select Filters"
@@ -4011,7 +4011,7 @@ msgstr ""
 
 #: ../src/main-window.c:2681 ../src/main-window.c:2694
 msgid "Checking Mail..."
-msgstr "Überprüfe auf neue Mail..."
+msgstr "Überprüfe auf neue Mail …"
 
 #: ../src/main-window.c:2869
 #, c-format
@@ -4183,7 +4183,7 @@ msgstr "Müll"
 
 #: ../src/main.c:513
 msgid "Compressing mail folders..."
-msgstr "Nachrichtenordner werden komprimiert..."
+msgstr "Nachrichtenordner werden komprimiert …"
 
 #: ../src/message-window.c:86
 msgid "N_o Headers"
@@ -4207,7 +4207,7 @@ msgstr "Diese Nachricht als Anlage weiterleiten"
 
 #: ../src/message-window.c:170
 msgid "Forward inline..."
-msgstr "Inline weiterleiten..."
+msgstr "Inline weiterleiten …"
 
 #: ../src/message-window.c:171
 msgid "Forward this message inline"
@@ -4417,7 +4417,7 @@ msgstr ""
 #: ../src/balsa-mime-widget-text.c:558
 #, c-format
 msgid "Calling URL %s..."
-msgstr "URL %s wird angefordert..."
+msgstr "URL %s wird angefordert …"
 
 #: ../src/balsa-mime-widget.c:254
 #, c-format
@@ -4978,7 +4978,7 @@ msgstr "Zur _Vorgabe machen"
 
 #: ../src/pref-manager.c:2949
 msgid "Remote POP3 mailbox..."
-msgstr "POP3-Postfach im Netz..."
+msgstr "POP3-Postfach im Netz …"
 
 #: ../src/pref-manager.c:3072
 msgid "Show nothing"
@@ -5069,7 +5069,7 @@ msgstr "Wählen Sie eine Schrift"
 
 #: ../src/print.c:1599
 msgid "Change..."
-msgstr "Ändern..."
+msgstr "Ändern …"
 
 #: ../src/print.c:1634
 msgid "Print message"
@@ -5314,11 +5314,11 @@ msgstr "_S/MIME-Modus (GpgSM)"
 
 #: ../src/sendmsg-window.c:298 ../src/sendmsg-window.c:470
 msgid "_Include File..."
-msgstr "Datei e_infügen..."
+msgstr "Datei e_infügen …"
 
 #: ../src/sendmsg-window.c:301 ../src/sendmsg-window.c:483
 msgid "_Attach File..."
-msgstr "Datei _beilegen..."
+msgstr "Datei _beilegen …"
 
 #: ../src/sendmsg-window.c:304 ../src/sendmsg-window.c:472
 msgid "I_nclude Message(s)"
@@ -5388,7 +5388,7 @@ msgstr "Rechtschreibung in der Nachricht prüfen"
 
 #: ../src/sendmsg-window.c:384 ../src/sendmsg-window.c:605
 msgid "Select _Identity..."
-msgstr "_Identität auswählen..."
+msgstr "_Identität auswählen …"
 
 #: ../src/sendmsg-window.c:385 ../src/sendmsg-window.c:606
 msgid "Select the Identity to use for the message"
@@ -5569,7 +5569,7 @@ msgstr "Löschen"
 
 #: ../src/sendmsg-window.c:2076
 msgid "Open..."
-msgstr "Öffnen..."
+msgstr "Öffnen …"
 
 #: ../src/sendmsg-window.c:2088
 msgid "(URL)"
@@ -5826,7 +5826,7 @@ msgstr "Diese Adresse speichern und den Dialog schließen?"
 
 #: ../src/store-address.c:217
 msgid "No address book selected...."
-msgstr "Kein Adressbuch ausgewählt..."
+msgstr "Kein Adressbuch ausgewählt …"
 
 #: ../src/store-address.c:230
 msgid "Address could not be written to this address book."
@@ -6184,4 +6184,7 @@ msgstr "Rauf"
 #: ../src/toolbar-prefs.c:495
 msgid "Down"
 msgstr "Runter"
+
+
+
 

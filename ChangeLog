@@ -1,3 +1,7 @@
+2006-06-15 21:55  PeterB
+
+	* libbalsa/mailbox_local.c: drop the gdk lock before returning.
+
 2006-06-01 10:57  PeterB
 
 	* libbalsa/mailbox_imap.c: free cache-manager.

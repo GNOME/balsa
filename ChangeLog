@@ -1,3 +1,7 @@
+2006-06-16 08:17  PeterB
+
+	* libbalsa/mailbox_imap.c: get mailbox lock before gdk lock.
+
 2006-06-15 21:55  PeterB
 
 	* libbalsa/mailbox_local.c: drop the gdk lock before returning.

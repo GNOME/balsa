@@ -690,17 +690,17 @@ idle_unread_update_cb(LibBalsaMailbox *mailbox)
 {
     glong unread;
 
-    gdk_threads_enter();
     libbalsa_lock_mailbox(mailbox);
+    gdk_threads_enter();
     unread = mailbox->unread_messages;
     
     lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
     if(unread != mailbox->unread_messages)
         libbalsa_mailbox_set_unread_messages_flag(mailbox,
                                                   mailbox->unread_messages>0);
-    libbalsa_unlock_mailbox(mailbox);
     LIBBALSA_MAILBOX_IMAP(mailbox)->unread_update_id = 0;
     gdk_threads_leave();
+    libbalsa_unlock_mailbox(mailbox);
     return FALSE;
 }
 
@@ -745,12 +745,12 @@ update_counters_and_filter(void *data)
 {
     LibBalsaMailbox *mailbox= (LibBalsaMailbox*)data;
 
-    gdk_threads_enter();
     libbalsa_lock_mailbox(mailbox);
+    gdk_threads_enter();
     libbalsa_mailbox_run_filters_on_reception(mailbox);
     lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
-    libbalsa_unlock_mailbox(mailbox);
     gdk_threads_leave();
+    libbalsa_unlock_mailbox(mailbox);
     g_object_unref(G_OBJECT(mailbox));
     return FALSE;
 }

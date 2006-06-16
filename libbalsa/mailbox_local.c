@@ -599,6 +599,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
             g_free(seen);
             g_free(contents);
             g_free(name);
+            gdk_threads_leave();
             return FALSE;
         }
         seen[info->msgno - 1] = TRUE;
@@ -622,6 +623,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                     g_free(seen);
                     g_free(contents);
                     g_free(name);
+    		    gdk_threads_leave();
                     return FALSE;
                 }
             }

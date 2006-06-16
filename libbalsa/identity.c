@@ -511,10 +511,11 @@ static void config_frame_button_select_cb(GtkTreeSelection * selection,
 static void ident_dialog_add_checkbutton(GtkWidget *, gint, GtkDialog *,
                                          const gchar *, const gchar *,
 					 gboolean sensitive);
+static void ident_dialog_add_check_and_entry(GtkWidget *, gint, GtkDialog *,
+                                             const gchar *, const gchar *);
 static void ident_dialog_add_entry(GtkWidget *, gint, GtkDialog *,
                                    const gchar *, const gchar *);
 typedef enum LibBalsaIdentityPathType_ {
-    LBI_PATH_TYPE_SIG,
     LBI_PATH_TYPE_FACE,
     LBI_PATH_TYPE_XFACE
 } LibBalsaIdentityPathType;
@@ -541,7 +542,7 @@ static void display_frame_set_field(GObject * dialog, const gchar* key,
 static void display_frame_set_boolean(GObject * dialog, const gchar* key, 
                                       gboolean value);
 static void display_frame_set_path(GObject * dialog, const gchar * key,
-                                   const gchar * value);
+                                   const gchar * value, gboolean use_chooser);
 
 
 static void identity_list_update(GtkTreeView * tree);
@@ -859,11 +860,6 @@ struct {
     const gchar *basename;
     const gchar *info;
 } static const path_info[] = {
-    {N_("Signature _Path"),
-     "identity-sigpath",
-     NULL,
-     ".signature",
-     N_("Signature")},
         /* Translators: please do not translate Face. */
     {N_("_Face Path"),
      "identity-facepath",
@@ -878,6 +874,9 @@ struct {
      "X-Face"}
 };
 
+#define LIBBALSA_IDENTITY_CHECK "libbalsa-identity-check"
+static void md_sig_path_changed_cb(GtkWidget *sig_button, GObject *dialog);
+
 #if ENABLE_ESMTP
 static GtkWidget*
 setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
@@ -891,6 +890,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     GtkWidget *table;
     gint row;
     GObject *name;
+    gpointer path;
 
     /* create the "General" tab */
     table = append_ident_notebook_page(notebook, 8, _("General"));
@@ -919,8 +919,9 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     /* create the "Signature" tab */
     table = append_ident_notebook_page(notebook, 7, _("Signature"));
     row = 0;
-    ident_dialog_add_file_chooser_button(table, row++, dialog,
-                                         LBI_PATH_TYPE_SIG);
+    ident_dialog_add_check_and_entry(table, row++, dialog,
+                                     _("Signature _Path"),
+                                     "identity-sigpath");
     ident_dialog_add_checkbutton(table, row++, dialog,
                                 _("_Execute Signature"),
 				 "identity-sigexecutable", FALSE);
@@ -969,6 +970,12 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     g_signal_connect(name, "changed",
                      G_CALLBACK(md_name_changed), tree);
 
+    path = g_object_get_data(G_OBJECT(dialog), "identity-sigpath");
+    g_signal_connect(g_object_get_data(G_OBJECT(path),
+                                       LIBBALSA_IDENTITY_CHECK),
+                     "toggled",
+                     G_CALLBACK(md_sig_path_changed_cb), dialog);
+
     gtk_notebook_set_current_page(notebook, 0);
 
     return GTK_WIDGET(notebook);
@@ -998,6 +1005,32 @@ ident_dialog_add_checkbutton(GtkWidget * table, gint row,
     check = libbalsa_create_check(check_label, table, row, FALSE);
     g_object_set_data(G_OBJECT(dialog), check_key, check);
     gtk_widget_set_sensitive(check, sensitive);
+}
+
+/*
+ * Create and add a GtkCheckButton to the given dialog with caption
+ * and add a pointer to it stored under the given key, which is
+ * followed by a text entry.  The check button is initialized to the
+ * given value.
+ */
+static void
+ident_dialog_add_check_and_entry(GtkWidget * table, gint row,
+                                 GtkDialog * dialog, const gchar * check_label,
+                                 const gchar * entry_key)
+{
+    GtkWidget *check, *entry;
+
+    check = gtk_check_button_new_with_mnemonic(check_label);
+    entry = gtk_entry_new();
+
+
+    gtk_table_attach(GTK_TABLE(table), check, 0, 1, row, row + 1,
+                     GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
+                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+    g_object_set_data(G_OBJECT(dialog), entry_key, entry);
+    g_object_set_data(G_OBJECT(entry), LIBBALSA_IDENTITY_CHECK, check);
 }
 
 
@@ -1124,10 +1157,8 @@ md_face_path_changed(const gchar * filename, gboolean active,
 /* Callback for the "selection-changed" signal of the signature path
  * file chooser; sets sensitivity of the signature-related buttons. */
 
-#define LIBBALSA_IDENTITY_CHECK "libbalsa-identity-check"
 static void
-md_sig_path_changed(const gchar * filename, gboolean active,
-                    GObject * dialog)
+md_sig_path_changed(gboolean active, GObject * dialog)
 {
     guint i;
     static gchar *button_key[] = {
@@ -1139,11 +1170,17 @@ md_sig_path_changed(const gchar * filename, gboolean active,
         "identity-sigprepend",
     };
 
-
     for (i = 0; i < ELEMENTS(button_key); i++) {
         GtkWidget *button = g_object_get_data(dialog, button_key[i]);
         gtk_widget_set_sensitive(button, active);
     }
+}
+
+static void
+md_sig_path_changed_cb(GtkWidget *sig_button, GObject *dialog)
+{
+    md_sig_path_changed(GTK_TOGGLE_BUTTON(sig_button)->active,
+                        dialog);
 }
 
 #define LIBBALSA_IDENTITY_INFO "libbalsa-identity-info"
@@ -1170,9 +1207,11 @@ file_chooser_cb(GtkWidget * chooser, gpointer data)
     check = g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
     active = gtk_toggle_button_get_active(check);
 
+#if 0
     if (type == LBI_PATH_TYPE_SIG)
         md_sig_path_changed(filename, active, data);
     else
+#endif
         md_face_path_changed(filename, active, type, data);
     g_free(filename);
 }
@@ -1343,7 +1382,7 @@ ident_dialog_update(GObject * dlg)
 #endif /* ENABLE_ESMTP */
 
     g_free(id->signature_path);
-    id->signature_path  = ident_dialog_get_path(dlg, "identity-sigpath");
+    id->signature_path  = ident_dialog_get_text(dlg, "identity-sigpath");
     
     id->sig_executable  = ident_dialog_get_bool(dlg, "identity-sigexecutable");
     id->sig_sending     = ident_dialog_get_bool(dlg, "identity-sigappend");
@@ -1702,7 +1741,8 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                              ident->smtp_server);
 #endif /* ENABLE_ESMTP */
 
-    display_frame_set_path(dialog, "identity-sigpath", ident->signature_path);
+    display_frame_set_path(dialog, "identity-sigpath", 
+                           ident->signature_path, FALSE);
     display_frame_set_boolean(dialog, "identity-sigexecutable", ident->sig_executable);
 
     display_frame_set_boolean(dialog, "identity-sigappend", ident->sig_sending);
@@ -1719,13 +1759,13 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                                  path_info[LBI_PATH_TYPE_FACE].box_key);
     gtk_widget_hide(face_box);
     display_frame_set_path(dialog, path_info[LBI_PATH_TYPE_FACE].path_key,
-                           ident->face);
+                           ident->face, TRUE);
 
     face_box = g_object_get_data(G_OBJECT(dialog),
                                  path_info[LBI_PATH_TYPE_XFACE].box_key);
     gtk_widget_hide(face_box);
     display_frame_set_path(dialog, path_info[LBI_PATH_TYPE_XFACE].path_key,
-                           ident->x_face);
+                           ident->x_face, TRUE);
 
 #ifdef HAVE_GPGME
     display_frame_set_boolean(dialog, "identity-gpgsign", 
@@ -1763,19 +1803,19 @@ display_frame_set_boolean(GObject * dialog,
 static void
 display_frame_set_path(GObject * dialog,
                        const gchar* key,
-                       const gchar* value)
+                       const gchar* value, gboolean use_chooser)
 {
     gboolean set = (value && *value);
     GtkWidget *chooser = g_object_get_data(dialog, key);
     GtkToggleButton *check =
         g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
     
-    if (set)
-#if GTK_CHECK_VERSION(2, 6, 0)
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(chooser), value);
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-        gtk_entry_set_text(GTK_ENTRY(chooser), value);
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
+    if (set) {
+        if(use_chooser)
+            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(chooser), value);
+        else
+            gtk_entry_set_text(GTK_ENTRY(chooser), value);
+    }
     gtk_widget_set_sensitive(GTK_WIDGET(chooser), set);
     gtk_toggle_button_set_active(check, set);
 }

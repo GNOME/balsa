@@ -26,7 +26,7 @@ EXTRA_DIST = \
 	docs/mh-mail-HOWTO	\
 	docs/vconvert.awk	\
 	docs/pine2vcard		\
-	GNOME_Balsa.server GNOME_Balsa.server.in
+	GNOME_Balsa.server.in
 
 serverdir       = $(libdir)/bonobo/servers
 server_in_files = GNOME_Balsa.server

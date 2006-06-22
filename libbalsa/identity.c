@@ -1168,6 +1168,7 @@ md_sig_path_changed(gboolean active, GObject * dialog)
         "identity-whenreply",
         "identity-sigseparator",
         "identity-sigprepend",
+        "identity-sigpath",
     };
 
     for (i = 0; i < ELEMENTS(button_key); i++) {
@@ -1416,8 +1417,12 @@ static gchar*
 ident_dialog_get_text(GObject * dialog, const gchar * key)
 {
     GtkEditable *entry;
+    GtkToggleButton *check;
     
     entry = g_object_get_data(dialog, key);
+    check = g_object_get_data(G_OBJECT(entry), LIBBALSA_IDENTITY_CHECK);
+    if (check && !gtk_toggle_button_get_active(check))
+        return NULL;
     return gtk_editable_get_chars(entry, 0, -1);
 }
 

@@ -376,6 +376,41 @@ lbae_key_pressed(GtkEntry * entry, GdkEventKey * event, gpointer data)
     return TRUE;
 }
 
+/*************************************************************
+ *     Callback for the entry's "insert_text" event -
+ *     replace control chars by spaces
+ *************************************************************/
+static void
+lbae_insert_handler(GtkEditable *editable, const gchar *text, gint length,
+		    gint *position, gpointer data)
+{
+    gchar * p;
+    gchar * ins_text = g_strndup(text, length);
+
+    /* replace non-printable chars by spaces */
+    p = ins_text;
+    while (*p != '\0') { 
+	gchar * next = g_utf8_next_char(p);
+
+	if (g_unichar_isprint(g_utf8_get_char(p)))
+	    p = next;
+	else {
+	    *p++ = ' ';
+	    if (p != next)
+		memmove(p, next, strlen(next) + 1);
+	}
+    }
+
+    /* insert */
+    g_signal_handlers_block_by_func(editable,
+				    (gpointer)lbae_insert_handler, data);
+    gtk_editable_insert_text(editable, ins_text, length, position);
+    g_signal_handlers_unblock_by_func(editable,
+				      (gpointer)lbae_insert_handler, data);
+    g_signal_stop_emission_by_name(editable, "insert_text"); 
+    g_free(ins_text);
+}
+
 /* Public API. */
 
 /*************************************************************
@@ -416,6 +451,8 @@ libbalsa_address_entry_new()
                      G_CALLBACK(lbae_entry_notify), NULL);
     g_signal_connect(entry, "key-press-event", G_CALLBACK(lbae_key_pressed),
                      NULL);
+    g_signal_connect(entry, "insert-text", G_CALLBACK(lbae_insert_handler),
+		     NULL);
     gtk_entry_set_completion(GTK_ENTRY(entry), completion);
     g_object_unref(completion);
 

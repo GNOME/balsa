@@ -1,3 +1,9 @@
+2006-06-22  Pawel Salek
+
+	* libbalsa/identity.c: fix a regression (patch from PB).
+	* libbalsa/address-entry.c: remove non-printable characters on
+	text paste (AD).
+
 2006-06-17  Pawel Salek
 
 	* Makefile.am: do not include GNOME_Balsa.server in the tarball.

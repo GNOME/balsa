@@ -125,13 +125,15 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
                                GTK_STOCK_OK,     GTK_RESPONSE_OK,
                                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                NULL);
-	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_box));
+	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_label));
+	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_list));
 	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
     } else {
 	gtk_dialog_add_buttons(GTK_DIALOG(ret),
                                GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                NULL);
-	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_box));
+	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_label));
+	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_list));
 	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
     }
     if(parent) gtk_window_set_transient_for(GTK_WINDOW(ret), parent);
@@ -213,12 +215,13 @@ static void
 balsa_ab_window_init(BalsaAbWindow *ab)
 {
     GtkWidget *find_label,
-	*vbox, *vbox2,
+	*vbox,
 	*w,
+	*table,
 	*hbox,
 	*box2,
 	*scrolled_window,
-	*frame, *label;
+	*frame;
 
     ab->current_address_book = NULL;
 
@@ -231,6 +234,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     vbox = GTK_DIALOG(ab)->vbox;
 
     gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
+
+    /* hig defaults */
+    gtk_container_set_border_width(GTK_CONTAINER(ab), 6);
+    gtk_dialog_set_has_separator(GTK_DIALOG(ab), FALSE);
+    gtk_box_set_spacing(GTK_BOX(vbox), 12);
+    
 
     /* The main address list */
     ab->address_list =
@@ -259,6 +268,13 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     gtk_box_pack_start(GTK_BOX(vbox), ab->combo_box, FALSE, FALSE, 0);
 
+    /* layout table */
+    table = gtk_table_new(3, 3, FALSE);
+    gtk_table_set_row_spacings(GTK_TABLE(table), 6);
+    gtk_box_pack_start(GTK_BOX(vbox), table, TRUE, TRUE, 0);
+    gtk_widget_show(table);
+    
+    /* -- table column 1 -- */
     /* Entry widget for finding an address */
     find_label = gtk_label_new_with_mnemonic(_("_Search for Name:"));
     gtk_widget_show(find_label);
@@ -268,20 +284,11 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), ab->filter_entry);
     g_signal_connect(G_OBJECT(ab->filter_entry), "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
-    
-    /* Horizontal layout */
-    hbox = gtk_hbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
-    gtk_widget_show(hbox);
 
-    /* Column for address list */
-    vbox2 = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox2, TRUE, TRUE, 1);
-    gtk_widget_show(vbox2);
-
-    /* Pack the find stuff into a box */
+    /* Pack the find stuff into the table */
     box2 = gtk_hbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox2), box2, FALSE, FALSE, 1);
+    gtk_table_attach(GTK_TABLE(table), box2, 0, 1, 0, 1,
+		     GTK_FILL, GTK_FILL, 0, 0);
     gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry, TRUE, TRUE, 0);
     gtk_widget_show(GTK_WIDGET(box2));
@@ -292,51 +299,15 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(vbox2), scrolled_window, TRUE, TRUE, 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), scrolled_window, 0, 1, 1, 2);
     gtk_widget_show(scrolled_window);
     gtk_container_add(GTK_CONTAINER(scrolled_window), ab->address_list);
-    gtk_widget_set_size_request(scrolled_window, 300, 250);
-
-    /* Column for arrows in compose mode */
-    ab->arrow_box = gtk_vbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(hbox), ab->arrow_box, FALSE, FALSE, 1);
-    gtk_widget_show(ab->arrow_box);
-    
-    w = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, "");
-    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
-    gtk_widget_show(w);
-    g_signal_connect(G_OBJECT(w), "clicked",
-		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
-		       ab);
-    
-    w = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, "");
-    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
-    gtk_widget_show(w);
-    g_signal_connect(G_OBJECT(w), "clicked",
-		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
-		       ab);
-    
-    /* Column for selected addresses in compose mode */
-    ab->send_to_box = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(hbox), ab->send_to_box, TRUE, TRUE, 1);
-    
-    label = gtk_label_new(_("Send-To"));
-    gtk_widget_show(label);
-    gtk_box_pack_start(GTK_BOX(ab->send_to_box), label,
-		       FALSE, FALSE, 1);
-    
-    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_show(scrolled_window);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
-				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(ab->send_to_box), scrolled_window, FALSE, FALSE, 0);
-    gtk_container_add(GTK_CONTAINER(scrolled_window), ab->recipient_list);
     gtk_widget_set_size_request(scrolled_window, 300, 250);
 
     /* Buttons ... */
     hbox = gtk_hbutton_box_new();
     gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_SPREAD);
-    gtk_box_pack_start(GTK_BOX(vbox2), hbox, FALSE, FALSE, 0);
+    gtk_table_attach(GTK_TABLE(table), hbox, 0, 1, 2, 3, GTK_FILL, GTK_FILL, 0, 0);
     gtk_widget_show(GTK_WIDGET(hbox));
 
     w = balsa_stock_button_with_label(GTK_STOCK_OPEN,
@@ -355,6 +326,43 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_show(w);
 
     balsa_ab_window_load(ab);
+
+    /* -- table column 2 -- */
+    /* Column for arrows in compose mode */
+    ab->arrow_box = gtk_vbox_new(FALSE, 5);
+    gtk_table_attach(GTK_TABLE(table), ab->arrow_box, 1, 2, 1, 2,
+		     GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 0);
+    gtk_widget_show(ab->arrow_box);
+    
+    w = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, "");
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    gtk_widget_show(w);
+    g_signal_connect(G_OBJECT(w), "clicked",
+		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
+		       ab);
+    
+    w = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, "");
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    gtk_widget_show(w);
+    g_signal_connect(G_OBJECT(w), "clicked",
+		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
+		       ab);
+    
+    /* -- table column 3 -- */
+    /* label for selected addresses in compose mode */
+    ab->send_to_label = gtk_label_new(_("Send-To"));
+    gtk_widget_show(ab->send_to_label);
+    gtk_table_attach(GTK_TABLE(table), ab->send_to_label, 2, 3, 0, 1,
+		     GTK_FILL, GTK_FILL, 0, 0);
+    
+    /* list for selected addresses in compose mode */
+    ab->send_to_list = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_show(ab->send_to_list);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(ab->send_to_list),
+				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_table_attach_defaults(GTK_TABLE(table), ab->send_to_list, 2, 3, 1, 2);
+    gtk_container_add(GTK_CONTAINER(ab->send_to_list), ab->recipient_list);
+    gtk_widget_set_size_request(ab->send_to_list, 300, 250);
 
     /* mode switching stuff */
     frame = gtk_frame_new(_("Treat multiple addresses as:"));

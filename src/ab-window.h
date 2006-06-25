@@ -57,7 +57,8 @@ struct _BalsaAbWindow
     guint      toggle_handler_id;
 
     /* Stuff to hide when not in compose mode */
-    GtkWidget *send_to_box;
+    GtkWidget *send_to_label;
+    GtkWidget *send_to_list;
     GtkWidget *arrow_box;
 
     /* The address book list */

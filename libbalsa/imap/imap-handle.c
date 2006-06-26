@@ -1512,18 +1512,22 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   /* We check whether we encountered an response to a another,
        possibly asynchronous command, not the one we are currently
        executing. We store the response in the hash table so that we
-       can provide a proper response somebody asks. */
+       can provide a proper response when somebody asks. */
   ci = cmdi_find_by_no(handle->cmd_info, cmdno);
+#ifdef DEBUG
   if(lastcmd != cmdno)
     printf("Looking for %x and encountered response to %x (%p)\n",
            lastcmd, cmdno, ci);
+#endif
   if(ci) {
     if(ci->complete_cb && !ci->complete_cb(handle, ci->cb_data)) {
       ci->rc = rc;
       ci->completed = 1;
       printf("Cmd %x marked as completed with rc=%d\n", cmdno, rc);
     } else {
+#ifdef DEBUG
       printf("CmdInfo for cmd %x removed\n", cmdno);
+#endif
       handle->cmd_info = g_list_remove(handle->cmd_info, ci);
       g_free(ci);
     }

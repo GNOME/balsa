@@ -1,6 +1,8 @@
 2006-06-25  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: use the synchronous STORE calls for now.
+	* libbalsa/mailbox_local.c: set first_unread more reliably.
+	* src/balsa-index.c: fix bug 345638.
 	* NEWS: release 2.3.13.
 
 2006-06-25 Albrecht Dreß <albrecht dot dress at arcor dot de>

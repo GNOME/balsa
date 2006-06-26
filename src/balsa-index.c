@@ -920,38 +920,47 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
     GtkTreeIter iter;
     GtkTreePath *path = NULL;
-    unsigned msgno;
+    gpointer view_on_open;
 
     balsa_index_update_tree(index, balsa_app.expand_tree);
     if (mailbox->first_unread) {
-	msgno = mailbox->first_unread;
+	unsigned msgno = mailbox->first_unread;
 	mailbox->first_unread = 0;
-    } else
-	msgno = libbalsa_mailbox_total_messages(mailbox);
-    if(msgno>0 &&
-       libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter)) {
-        gpointer view_on_open;
-
-        bndx_expand_to_row(index, path);
-        /* Scroll now, not in the idle handler, to make sure the initial
-         * view is correct. */
-        gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                     FALSE, 0, 0);
-
-        view_on_open =
-            g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN);
-        g_object_set_data(G_OBJECT(mailbox),
-                          BALSA_INDEX_VIEW_ON_OPEN,
-                          GINT_TO_POINTER(FALSE));
-        if ((view_on_open && GPOINTER_TO_INT(view_on_open))
-            || balsa_app.view_message_on_open) {
-            struct view_on_open_data *data = g_new(struct view_on_open_data,1);
-            data->bindex = index;
-            data->path = path;
-            g_object_ref(data->bindex);
-            g_idle_add((GSourceFunc)bi_view_on_open, data);
-        } else gtk_tree_path_free(path);
+        if(!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter))
+            return; /* Oops! */
+    } else {
+        /* we want to scroll to the last one in current order. The
+           alternative which is to scroll to the most recently
+           delivered does not feel natural when other sorting order is
+           used */
+        int total = gtk_tree_model_iter_n_children
+            (GTK_TREE_MODEL(mailbox), NULL);
+        if(total == 0)
+            return;
+        gtk_tree_model_iter_nth_child (GTK_TREE_MODEL(mailbox), &iter, NULL,
+                                       total - 1);
+        path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
     }
+
+    bndx_expand_to_row(index, path);
+    /* Scroll now, not in the idle handler, to make sure the initial
+     * view is correct. */
+    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
+                                 FALSE, 0, 0);
+
+    view_on_open =
+        g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN);
+    g_object_set_data(G_OBJECT(mailbox),
+                      BALSA_INDEX_VIEW_ON_OPEN,
+                      GINT_TO_POINTER(FALSE));
+    if ((view_on_open && GPOINTER_TO_INT(view_on_open))
+        || balsa_app.view_message_on_open) {
+        struct view_on_open_data *data = g_new(struct view_on_open_data,1);
+        data->bindex = index;
+        data->path = path;
+        g_object_ref(data->bindex);
+        g_idle_add((GSourceFunc)bi_view_on_open, data);
+    } else gtk_tree_path_free(path);
 }
 
 static LibBalsaCondition *cond_undeleted;

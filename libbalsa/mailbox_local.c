@@ -635,7 +635,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                                              LIBBALSA_MESSAGE_FLAG_DELETED))
         {
             ++mailbox->unread_messages;
-            if (mailbox->first_unread == 0)
+            if (mailbox->first_unread == 0 ||
+                mailbox->first_unread > info->msgno)
                 mailbox->first_unread = info->msgno;
         }
     }

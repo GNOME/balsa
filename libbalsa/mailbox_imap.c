@@ -2602,16 +2602,20 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 
     g_array_sort(seqno, cmp_msgno);
     transform_flags(set, clear, &flag_set, &flag_clr);
+    /* Do not use the asynchronous versions until the issues related
+       to unsolicited EXPUNGE responses are resolved. The issues are
+       pretty much of a theoretical character but we do not want to
+       risk the mail store integrity, do we? */
     if (flag_set)
-        IIA(rc, handle,
-	    imap_mbox_store_flag_a(handle,
-				   seqno->len, (guint *) seqno->data,
-				   flag_set, TRUE),"STORE");
+        II(rc, handle,
+           imap_mbox_store_flag(handle,
+                                seqno->len, (guint *) seqno->data,
+                                flag_set, TRUE));
     if (rc && flag_clr)
-        IIA(rc, handle,
-	    imap_mbox_store_flag_a(handle,
-				   seqno->len, (guint *) seqno->data,
-				   flag_clr, FALSE),"CLEAR");
+        II(rc, handle,
+           imap_mbox_store_flag(handle,
+                                seqno->len, (guint *) seqno->data,
+                                flag_clr, FALSE));
     return rc;
 }
 

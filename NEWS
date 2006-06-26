@@ -1,3 +1,8 @@
+* Balsa-2.3.13 release. Release date 2006-05-26
+
+- many small fixes
+- nicer icons.
+
 * Balsa-2.3.12 release. Release date 2006-03-04
 
 - do not reference freed memory in mbox driver.

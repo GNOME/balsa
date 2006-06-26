@@ -1,3 +1,8 @@
+2006-06-25  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: use the synchronous STORE calls for now.
+	* NEWS: release 2.3.13.
+
 2006-06-25 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/: ab-window.c, ab-window.h: use a table to improve layout of

@@ -153,6 +153,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->info_cb  = NULL;
   handle->info_arg = NULL;
   handle->enable_anonymous = 0;
+  handle->enable_client_sort = 0;
   handle->enable_binary    = 0;
   mbox_view_init(&handle->mbox_view);
 #if defined(BALSA_USE_THREADS)
@@ -224,6 +225,7 @@ imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
 {
   switch(opt) {
   case IMAP_OPT_ANONYMOUS: h->enable_anonymous = !!state; break;
+  case IMAP_OPT_CLIENT_SORT: h->enable_client_sort = !!state; break;
   case IMAP_OPT_BINARY:    h->enable_binary    = !!state; break;
   default: g_warning("imap_set_option: invalid option\n");
   }

@@ -110,6 +110,7 @@ struct _ImapMboxHandle {
                               * correctly to FETCH x BODY[y]
                               * requests. */
   unsigned enable_anonymous:1; /* try anonymous if possible */
+  unsigned enable_client_sort:1; /**< client side sorting allowed */
   unsigned enable_binary:1; /* enable binary extension */
 
   /* conditional stuff at the end for the safety. */

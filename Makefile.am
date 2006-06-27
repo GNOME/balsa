@@ -69,4 +69,6 @@ bzdist: distdir
 	$(AMTAR) chojf $(distdir).tar.bz2 $(distdir)
 	-rm -rf $(distdir)
 
-ACLOCAL_AMFLAGS = -I macros
+# macros are not used any more by current configure.in, see also
+# post by Ildar Mulyukov to balsa-list, 2006.06.27
+# ACLOCAL_AMFLAGS = -I macros

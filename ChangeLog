@@ -1,4 +1,13 @@
-2006-06-25  Pawel Salek
+2006-06-27  Pawel Salek
+
+	* Makefile.am: gnome specific macros not used any more.
+	* ibbalsa/imap-server.c: use client-side sorting.
+	* libbalsa/mailbox_imap.c: set first_unread correctly.
+	* libbalsa/imap/imap-commands.c: implement client-side sorting.
+	* libbalsa/imap/imap-handle.[ch]: add CLIENT_SORT option.
+	* libbalsa/imap/imap_private.h: add the bit field to ImapMboxHandle.
+
+2006-06-26  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: use the synchronous STORE calls for now.
 	* libbalsa/mailbox_local.c: set first_unread more reliably.

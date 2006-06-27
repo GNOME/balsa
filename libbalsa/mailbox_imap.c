@@ -61,6 +61,8 @@
 #include "mime-stream-shared.h"
 #include "i18n.h"
 
+#define ENABLE_CLIENT_SIDE_SORT 1
+
 struct _LibBalsaMailboxImap {
     LibBalsaMailboxRemote mailbox;
     ImapMboxHandle *handle;     /* stream that has this mailbox selected */
@@ -968,6 +970,8 @@ lbm_imap_get_unseen(LibBalsaMailboxImap * mimap)
                 mailbox->first_unread = i+1;
         }
     }
+    if(count == 0)
+        mailbox->first_unread = 0;
     mailbox->unread_messages = count;
 
     libbalsa_mailbox_set_unread_messages_flag(mailbox, count > 0);
@@ -2658,8 +2662,10 @@ libbalsa_mailbox_imap_can_do(LibBalsaMailbox* mbox,
         return TRUE;
     mimap = LIBBALSA_MAILBOX_IMAP(mbox);
     switch(c) {
+#if !ENABLE_CLIENT_SIDE_SORT
     case LIBBALSA_MAILBOX_CAN_SORT:
         return imap_mbox_handle_can_do(mimap->handle, IMCAP_SORT);
+#endif
     case LIBBALSA_MAILBOX_CAN_THREAD:
         return imap_mbox_handle_can_do(mimap->handle, IMCAP_THREAD_REFERENCES);
     default:

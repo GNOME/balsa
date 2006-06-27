@@ -1216,16 +1216,19 @@ sort_code_to_string(ImapSortKey key)
   return keystr;
 }
 
-ImapResponse
-imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
-                     int ascending, unsigned int *msgno, unsigned cnt)
+/** executes server side sort. The @param msgno array contains @param
+    cnt message numbers. It is subseqently replaced with a new,
+    altered order */
+static ImapResponse
+imap_mbox_sort_msgno_srv(ImapMboxHandle *handle, ImapSortKey key,
+                         int ascending, unsigned int *msgno, unsigned cnt)
 {
   ImapResponse rc;
   const char *keystr;
   char *seq, *cmd, *cmd1;
   unsigned i;
 
-  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+  /* IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD); */
   if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
     return IMR_NO;
 
@@ -1265,12 +1268,173 @@ imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
   return rc;
 }
 
+static int
+comp_unsigned(const void *a, const void *b)
+{
+  return ((const unsigned*)a) - ((const unsigned*)b);
+}
+
+static int
+comp_imap_address(const ImapAddress *a, const ImapAddress *b)
+{
+  if(a->name) {
+    if(b->name)
+      return g_ascii_strcasecmp(a->name, b->name);
+    else return 1;
+  } else
+    return -1;
+}
+
+struct SortItem {
+  ImapMessage *msg;
+  unsigned no;
+};
+static int
+comp_arrival(const void *a, const void *b)
+{
+  const ImapMessage *x = ((const struct SortItem*)a)->msg;
+  const ImapMessage *y = ((const struct SortItem*)b)->msg;
+  return x->internal_date - y->internal_date;
+}
+static int
+comp_cc(const void *a, const void *b)
+{
+  const ImapMessage *x = ((const struct SortItem*)a)->msg;
+  const ImapMessage *y = ((const struct SortItem*)b)->msg;
+  return comp_imap_address(x->envelope->cc,  y->envelope->cc);
+}
+static int
+comp_date(const void *a, const void *b)
+{
+  const ImapMessage *x = ((const struct SortItem*)a)->msg;
+  const ImapMessage *y = ((const struct SortItem*)b)->msg;
+  return x->envelope->date - y->envelope->date;
+}
+static int
+comp_from(const void *a, const void *b)
+{
+  const ImapMessage *x = ((const struct SortItem*)a)->msg;
+  const ImapMessage *y = ((const struct SortItem*)b)->msg;
+  return comp_imap_address(x->envelope->from,  y->envelope->from);
+}
+static int
+comp_size(const void *a, const void *b)
+{
+  const ImapMessage *x = ((const struct SortItem*)a)->msg;
+  const ImapMessage *y = ((const struct SortItem*)b)->msg;
+  return x->rfc822size - y->rfc822size;
+}
+static int
+comp_subject(const void *a, const void *b)
+{
+  const ImapMessage *x = ((const struct SortItem*)a)->msg;
+  const ImapMessage *y = ((const struct SortItem*)b)->msg;
+  if(!x->envelope->subject) return -1;
+  if(!y->envelope->subject) return  1;
+  return g_ascii_strcasecmp(x->envelope->subject, y->envelope->subject);
+}
+static int
+comp_to(const void *a, const void *b)
+{
+  const ImapMessage *x = ((const struct SortItem*)a)->msg;
+  const ImapMessage *y = ((const struct SortItem*)b)->msg;
+  return comp_imap_address(x->envelope->to,  y->envelope->to);
+}
+
+static ImapResponse
+imap_mbox_sort_msgno_client(ImapMboxHandle *handle, ImapSortKey key,
+                            int ascending, unsigned int *msgno, unsigned cnt)
+{
+  /* FIXME: we possibly do not need content type but I am not sure
+   * about all the impliciations... */
+  static const ImapFetchType fetch_type 
+    = IMFETCH_UID | IMFETCH_ENV | IMFETCH_RFC822SIZE | IMFETCH_CONTENT_TYPE;
+  int (*sortfun)(const void *a, const void *b);
+    
+  unsigned i, fetch_cnt, *seqno_to_fetch;
+  struct SortItem *sort_items;
+
+  if(key == IMSO_MSGNO) {
+    g_warning("IMSO_MSGNO not yet implemented.");
+    return IMR_NO;
+  }
+  seqno_to_fetch = g_new(unsigned, cnt);
+  for(i=fetch_cnt=0; i<cnt; i++) {
+    ImapMessage *imsg = imap_mbox_handle_get_msg(handle, msgno[i]);
+    if(!imsg || !imsg->envelope)
+      seqno_to_fetch[fetch_cnt++] = msgno[i];
+  }
+
+  if(fetch_cnt>0) {
+    ImapResponse rc;
+    qsort(seqno_to_fetch, fetch_cnt, sizeof(unsigned), comp_unsigned);
+    printf("Should the client side sorting code "
+           "be sorry about your bandwidth usage?\n");
+    rc = imap_mbox_handle_fetch_set(handle, seqno_to_fetch,
+                                    fetch_cnt, fetch_type);
+    if(rc != IMR_OK)
+      return rc;
+  }
+  g_free(seqno_to_fetch);
+
+  sort_items = g_new(struct SortItem, cnt);
+  for(i=0; i<cnt; i++) {
+    sort_items[i].msg = imap_mbox_handle_get_msg(handle, msgno[i]);
+    sort_items[i].no  = msgno[i];
+  }
+  switch(key) {
+  default:
+  case IMSO_ARRIVAL: sortfun = comp_arrival; break;
+  case IMSO_CC:      sortfun = comp_cc;      break;
+  case IMSO_DATE:    sortfun = comp_date;    break;
+  case IMSO_FROM:    sortfun = comp_from;    break;
+  case IMSO_SIZE:    sortfun = comp_size;    break;
+  case IMSO_SUBJECT: sortfun = comp_subject; break;
+  case IMSO_TO:      sortfun = comp_to;      break;
+  }
+  qsort(sort_items, cnt, sizeof(struct SortItem), sortfun);
+  if(ascending)
+    for(i=0; i<cnt; i++)
+      msgno[i] = sort_items[i].no;
+  else
+    for(i=0; i<cnt; i++)
+      msgno[i] = sort_items[cnt-i-1].no;
+
+
+  g_free(sort_items);
+  return IMR_OK;
+}
+
+ImapResponse
+imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
+                     int ascending, unsigned int *msgno, unsigned cnt)
+{
+  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+  if(imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
+    return imap_mbox_sort_msgno_srv(handle, key, ascending, msgno, cnt);
+  else {
+    return 
+      handle->enable_client_sort
+      ? imap_mbox_sort_msgno_client(handle, key, ascending, msgno, cnt)
+      : IMR_NO;
+  }
+}
+
 static void
 append_no(ImapMboxHandle *handle, unsigned seqno, void *arg)
 {
   mbox_view_append_no(&handle->mbox_view, seqno);
 }
 
+/** selects a subset of messages specified by given filter and sorts
+    it according to specified order. There are four cases possible,
+    depending whether filtering needs to be done and whether the SORT
+    extension is available.
+    CASE 1a: filtered msgno sort.
+    CASE 1b: full     msgno sort.
+    CASE 2a: other sort when SORT extension is present.
+    CASE 2b: other sort without SORT extension.
+*/
 ImapResponse
 imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
                       ImapSearchKey *filter)
@@ -1281,12 +1445,12 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   if(key == IMSO_MSGNO) {
-    if(filter) {
+    if(filter) { /* CASE 1a */
       handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
                                       * we should not be doing such 
                                       * low level manipulations here */
       rc = imap_search_exec(handle, FALSE, filter, append_no, NULL);
-    } else {
+    } else { /* CASE 1b */
       if(handle->thread_root)
         g_node_destroy(handle->thread_root);
       handle->thread_root = g_node_new(NULL);
@@ -1301,36 +1465,55 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
       }
       return IMR_OK;
     }
-  } else { /* Nontrivial (ie. not over msgno) sort requires an extension */
-    unsigned cmdno;
-    int can_do_literals =
-      imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
-    ImapCmdTag tag;
+  } else { 
+    if(imap_mbox_handle_can_do(handle, IMCAP_SORT)) { /* CASE 2a */
+      unsigned cmdno;
+      int can_do_literals =
+        imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
+      ImapCmdTag tag;
 
-    if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
-      return IMR_NO;
-    
-    cmdno =  imap_make_tag(tag);
-    keystr = sort_code_to_string(key);
-    imap_handle_idle_disable(handle);
-    sio_printf(handle->sio, "%s SORT (%s%s) UTF-8 ", tag,
-               ascending ? "" : "REVERSE ", keystr);
-    
-    handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
-                                    * we should not be doing such 
-                                    * low level manipulations here */
-    if(!filter)
-      sio_write(handle->sio, "ALL", 3);
-    else {
-      if( (rc=imap_write_key(handle, filter, cmdno, can_do_literals)) !=IMR_OK)
+      cmdno =  imap_make_tag(tag);
+      keystr = sort_code_to_string(key);
+      imap_handle_idle_disable(handle);
+      sio_printf(handle->sio, "%s SORT (%s%s) UTF-8 ", tag,
+                 ascending ? "" : "REVERSE ", keystr);
+
+      handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
+                                      * we should not be doing such 
+                                      * low level manipulations here */
+      if(!filter)
+        sio_write(handle->sio, "ALL", 3);
+      else {
+        if( (rc=imap_write_key(handle, filter, cmdno, can_do_literals))
+            != IMR_OK)
+          return rc;
+      }
+      sio_write(handle->sio, "\r\n", 2);
+      imap_handle_idle_enable(handle, 30);
+      imap_handle_flush(handle);
+      do
+        rc = imap_cmd_step(handle, cmdno);
+      while(rc == IMR_UNTAGGED);
+    } else {                                           /* CASE 2b */
+      /* try client-side sorting... */
+      if(!handle->enable_client_sort)
+        return IMR_NO;
+      handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
+                                      * we should not be doing such 
+                                      * low level manipulations here */
+      if(filter)
+        rc = imap_search_exec(handle, FALSE, filter, append_no, NULL);
+      else {
+        rc = IMR_OK;
+        for(i=0; i<handle->exists; i++)
+          mbox_view_append_no(&handle->mbox_view, i+1);
+      }
+      if(rc != IMR_OK)
         return rc;
+      rc = imap_mbox_sort_msgno_client(handle, key, ascending,
+                                       handle->mbox_view.arr,
+                                       handle->mbox_view.entries);
     }
-    sio_write(handle->sio, "\r\n", 2);
-    imap_handle_idle_enable(handle, 30);
-    imap_handle_flush(handle);
-    do
-      rc = imap_cmd_step(handle, cmdno);
-    while(rc == IMR_UNTAGGED);
   }
   if(rc == IMR_OK) {
     if(handle->thread_root)

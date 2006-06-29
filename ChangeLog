@@ -1,3 +1,10 @@
+2006-06-29 10:47  PeterB
+
+	* src/: balsa-index.c, balsa-mblist.c, balsa-message.c,
+	balsa-mime-widget-text.c, balsa-mime-widget.c, pref-manager.c:
+	clear face box instead of hiding it; gtk_object_sink is deprecated
+	in 2.10--use g_object_ref_sink if available.
+
 2006-06-27  Pawel Salek
 
 	* Makefile.am: gnome specific macros not used any more.

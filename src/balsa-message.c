@@ -278,7 +278,6 @@ bm_header_tl_buttons(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(ebox), hbox2);
 
     vbox = gtk_vbox_new(FALSE, 0);
-    gtk_widget_hide(vbox);
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
     g_object_set_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX, vbox);
 
@@ -638,8 +637,12 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
         GtkWidget *menu_item;
         
         bm->save_all_popup = gtk_menu_new ();
-	g_object_ref(bm->save_all_popup);
-	gtk_object_sink(GTK_OBJECT(bm->save_all_popup));
+#if GLIB_CHECK_VERSION(2, 10, 0)
+        g_object_ref_sink(bm->save_all_popup);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
+        g_object_ref(bm->save_all_popup);
+        gtk_object_sink(GTK_OBJECT(bm->save_all_popup));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
         menu_item = 
             gtk_menu_item_new_with_label (_("Save selected as..."));
         gtk_widget_show(menu_item);
@@ -1206,12 +1209,14 @@ display_face(BalsaMessage * bm)
     GtkWidget *image;
 
     face_box = g_object_get_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX);
+    gtk_container_foreach(GTK_CONTAINER(face_box),
+                          (GtkCallback) gtk_widget_destroy, NULL);
+
     if (!bm->message
         || !((face = libbalsa_message_get_user_header(bm->message, "Face"))
              || (x_face =
                  libbalsa_message_get_user_header(bm->message,
                                                   "X-Face")))) {
-        gtk_widget_hide(face_box);
         return;
     }
 
@@ -1221,7 +1226,6 @@ display_face(BalsaMessage * bm)
 #if HAVE_COMPFACE
         image = libbalsa_get_image_from_x_face_header(x_face, &err);
 #else                           /* HAVE_COMPFACE */
-        gtk_widget_hide(face_box);
         return;
 #endif                          /* HAVE_COMPFACE */
     }
@@ -1233,10 +1237,8 @@ display_face(BalsaMessage * bm)
         return;
     }
 
-    gtk_container_foreach(GTK_CONTAINER(face_box),
-                          (GtkCallback) gtk_widget_destroy, NULL);
     gtk_box_pack_start(GTK_BOX(face_box), image, FALSE, FALSE, 0);
-    gtk_widget_show_all(face_box);
+    gtk_widget_show(image);
 }
 
 static void
@@ -1246,8 +1248,12 @@ display_content(BalsaMessage * bm)
     if (bm->parts_popup)
 	g_object_unref(bm->parts_popup);
     bm->parts_popup = gtk_menu_new();
+#if GLIB_CHECK_VERSION(2, 10, 0)
+    g_object_ref_sink(bm->parts_popup);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
     g_object_ref(bm->parts_popup);
     gtk_object_sink(GTK_OBJECT(bm->parts_popup));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     display_parts(bm, bm->message->body_list, NULL, NULL);
     if (bm->info_count > 1) {
  	gtk_widget_show_all(bm->parts_popup);
@@ -1274,8 +1280,12 @@ part_create_menu (BalsaPartInfo* info)
     gchar* content_type;
     
     info->popup_menu = gtk_menu_new ();
+#if GLIB_CHECK_VERSION(2, 10, 0)
+    g_object_ref_sink(info->popup_menu);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
     g_object_ref(info->popup_menu);
     gtk_object_sink(GTK_OBJECT(info->popup_menu));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     
     content_type = libbalsa_message_body_get_mime_type (info->body);
     libbalsa_fill_vfs_menu_by_content_type(GTK_MENU(info->popup_menu),

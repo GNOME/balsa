@@ -181,8 +181,12 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 							    signature);
 	    }
 #endif
-	    g_object_ref(G_OBJECT(mw->widget));
-	    gtk_object_sink(GTK_OBJECT(mw->widget));
+#if GLIB_CHECK_VERSION(2, 10, 0)
+            g_object_ref_sink(mw->widget);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
+            g_object_ref(G_OBJECT(mw->widget));
+            gtk_object_sink(GTK_OBJECT(mw->widget));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
 
 	    if (GTK_IS_LAYOUT(mw->widget)) 
 		g_signal_connect(G_OBJECT(gtk_layout_get_vadjustment(GTK_LAYOUT(mw->widget))),

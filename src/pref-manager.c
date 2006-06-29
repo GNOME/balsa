@@ -3036,8 +3036,12 @@ address_book_add_cb(void)
                                     GTK_WINDOW(property_box));
 
     gtk_widget_show_all(menu);
+#if GLIB_CHECK_VERSION(2, 10, 0)
+    g_object_ref_sink(menu);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
     g_object_ref(menu);
     gtk_object_sink(GTK_OBJECT(menu));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
     g_object_unref(menu);
 }
@@ -3098,8 +3102,12 @@ server_add_cb(void)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_show(menuitem);
     gtk_widget_show(menu);
+#if GLIB_CHECK_VERSION(2, 10, 0)
+    g_object_ref_sink(menu);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
     g_object_ref(menu);
     gtk_object_sink(GTK_OBJECT(menu));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
     g_object_unref(menu);
 }

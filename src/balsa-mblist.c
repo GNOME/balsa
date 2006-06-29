@@ -803,7 +803,12 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
 
     menu = balsa_mailbox_node_get_context_menu(mbnode);
     g_object_ref(menu);
+#if GLIB_CHECK_VERSION(2, 10, 0)
+    g_object_ref_sink(menu);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
+    g_object_ref(menu);
     gtk_object_sink(GTK_OBJECT(menu));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
 		   event_button, event_time);
     g_object_unref(menu);

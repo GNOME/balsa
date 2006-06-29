@@ -415,8 +415,12 @@ bndx_instance_init(BalsaIndex * index)
     /* Initialize some other members */
     index->mailbox_node = NULL;
     index->popup_menu = bndx_popup_menu_create(index);
+#if GLIB_CHECK_VERSION(2, 10, 0)
+    g_object_ref_sink(index->popup_menu);
+#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
     g_object_ref(index->popup_menu);
     gtk_object_sink(GTK_OBJECT(index->popup_menu));
+#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 

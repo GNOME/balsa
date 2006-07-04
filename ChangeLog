@@ -1,3 +1,8 @@
+2006-07-04 12:09  PeterB
+
+	* libbalsa/address.c: gtk_list_store_insert_with_values requires
+	gtk version 2.6.
+
 2006-06-29 10:47  PeterB
 
 	* src/: balsa-index.c, balsa-mblist.c, balsa-message.c,

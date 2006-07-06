@@ -3243,7 +3243,7 @@ msgid ""
 msgstr "Việc này sẽ gỡ bỏ hộp thư « %s » khỏi danh sách các hộp thư.\n"
 "Bạn cũng có thể xoá bỏ tập tin trên đĩa hay tập tin liên quan với hộp thư "
 "này.\n"
-"Nếu không xoá b6o tập tin của nó trên đĩa thì có thể « Thêm hộp thư » để "
+"Nếu không xoá bỏ tập tin của nó trên đĩa thì có thể « Thêm hộp thư » để "
 "truy cập lại nó sau này.\n"
 "Bạn thích làm gì ?"
 

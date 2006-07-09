@@ -4168,7 +4168,7 @@ sendmsg_window_new(GtkWidget * widget, LibBalsaMessage * message,
 #ifdef HAVE_GPGME
 	/* scan the message for encrypted parts - this is only possible if
 	   there is *no* other ref to it */
-	balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_ALWAYS,
+	balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_NEVER,
 				     TRUE, 1);
 #endif
     }

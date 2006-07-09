@@ -1,3 +1,7 @@
+2006-07-09 Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/sendmsg-window.c: do not perform crypto on entire message.
+
 2006-07-04 12:09  PeterB
 
 	* libbalsa/address.c: gtk_list_store_insert_with_values requires

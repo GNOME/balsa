@@ -1914,7 +1914,7 @@ msgstr "Gặp lỗi khi tải %s: %s\n"
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr "Đường dẫn %s phải liên quan đến gốc của hệ thống tập tin (bắt đầu bằng sổ "
-"chếo « / »)."
+"chéo « / »)."
 
 #: ../libinit_balsa/helper.c:215
 #: ../libinit_balsa/helper.c:239

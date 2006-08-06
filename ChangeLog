@@ -1,3 +1,18 @@
+2006-08-06 Pawel Salek
+
+	* src/ab-window.c: use new Sendmsg API with better separation
+	between compose, reply, forward and continue.
+	* src/balsa-bonobo.c: ditto.
+	* src/balsa-index.c: ditto.
+	* src/balsa-mime-widget-message.c: prepare for replying embedded
+	messages.
+	* src/balsa-mime-widget-text.c: use new API.
+	* src/main{-window,}.c: ditto.
+	* src/message-window.c: ditto.
+	* src/sendmsg-window.[ch]: separate better different compose modes
+	so that implementation of replying to embedded messages becomes
+	easier.
+
 2006-07-09 Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/sendmsg-window.c: do not perform crypto on entire message.
@@ -17,7 +32,7 @@
 2006-06-27  Pawel Salek
 
 	* Makefile.am: gnome specific macros not used any more.
-	* ibbalsa/imap-server.c: use client-side sorting.
+	* libbalsa/imap-server.c: use client-side sorting.
 	* libbalsa/mailbox_imap.c: set first_unread correctly.
 	* libbalsa/imap/imap-commands.c: implement client-side sorting.
 	* libbalsa/imap/imap-handle.[ch]: add CLIENT_SORT option.

@@ -438,6 +438,28 @@ bm_modify_font_from_string(GtkWidget * widget, const char *font)
     pango_font_description_free(desc);
 }
 
+static void
+bm_header_ctx_menu_reply(GtkWidget * menu_item,
+                         LibBalsaMessageHeaders *headers)
+{
+    printf("Subject: %s\n", headers->subject);
+}
+
+static void
+bm_header_extend_popup(GtkTextView *textview, GtkMenu *menu, gpointer arg)
+{
+    GtkWidget *menu_item = gtk_menu_item_new_with_label(_("Reply..."));
+    GtkWidget *separator = gtk_separator_menu_item_new();
+
+    g_signal_connect(G_OBJECT(menu_item), "activate",
+                     G_CALLBACK(bm_header_ctx_menu_reply),
+                     arg);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
+    gtk_widget_show(separator);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+    gtk_widget_show(menu_item);
+}
+
 static GtkWidget *
 bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
 {
@@ -660,7 +682,13 @@ balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
 	    add_header_sigstate(view, sig_body->sig_info);
     }
 #endif
-
+    if( !g_object_get_data(G_OBJECT(view), "popup-extended") ) {
+        g_signal_connect(G_OBJECT(view), "populate-popup",
+                         G_CALLBACK(bm_header_extend_popup),
+                         headers);
+        g_object_set_data(G_OBJECT(view), "popup-extended",
+                          GINT_TO_POINTER(1));
+    }
     gtk_widget_queue_resize(GTK_WIDGET(view));
 }
 

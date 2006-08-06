@@ -728,8 +728,8 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
          * instead we'll just use the guts of
          * balsa_message_continue: */
         BalsaSendmsg *sm =
-            sendmsg_window_new(GTK_WIDGET(BALSA_INDEX(tree_view)->window),
-                               message, SEND_CONTINUE);
+            sendmsg_window_continue(GTK_WIDGET(BALSA_INDEX(tree_view)->window),
+                                    message);
         g_signal_connect(G_OBJECT(sm->window), "destroy",
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     } else
@@ -1612,8 +1612,19 @@ bndx_compose_foreach(GtkWidget * w, BalsaIndex * index,
         guint msgno = g_array_index(index->selected, guint, i);
         LibBalsaMessage *message =
             libbalsa_mailbox_get_message(mailbox, msgno);
-        BalsaSendmsg *sm = sendmsg_window_new(NULL, message, send_type);
-
+        BalsaSendmsg *sm;
+        switch(send_type) {
+        case SEND_REPLY:
+        case SEND_REPLY_ALL:
+        case SEND_REPLY_GROUP:
+            sm = sendmsg_window_reply(NULL, message, send_type);
+            break;
+        case SEND_CONTINUE:
+            sm = sendmsg_window_continue(NULL, message);
+            break;
+        default:
+            g_assert_not_reached();
+        }
         g_signal_connect(G_OBJECT(sm->window), "destroy",
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);
         g_object_unref(message);
@@ -1655,11 +1666,10 @@ static void
 bndx_compose_from_list(GtkWidget * w, BalsaIndex * index,
                        SendType send_type)
 {
-    BalsaSendmsg *sm;
     GList *list = balsa_index_selected_list(index);
 
     if (list) {
-        sm = sendmsg_window_new_from_list(w, list, send_type);
+        BalsaSendmsg *sm = sendmsg_window_new_from_list(w, list, send_type);
         g_signal_connect(G_OBJECT(sm->window), "destroy",
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);
 

@@ -3319,7 +3319,7 @@ new_message_cb(GtkWidget * widget, gpointer data)
 {
     BalsaSendmsg *smwindow;
 
-    smwindow = sendmsg_window_new(widget, NULL, SEND_NORMAL);
+    smwindow = sendmsg_window_compose(widget);
 
     g_signal_connect(G_OBJECT(smwindow->window), "destroy",
                      G_CALLBACK(send_msg_window_destroy_cb), data);

@@ -436,8 +436,7 @@ url_send_cb(GtkWidget * menu_item, message_url_t * uri)
 {
     BalsaSendmsg * newmsg;
 
-    newmsg = sendmsg_window_new(GTK_WIDGET(balsa_app.main_window),
-				NULL, SEND_NORMAL);
+    newmsg = sendmsg_window_compose(GTK_WIDGET(balsa_app.main_window));
     sendmsg_window_set_field(newmsg, "body", uri->url);
 }
 
@@ -729,8 +728,7 @@ handle_url(const message_url_t* url)
 {
     if (!g_ascii_strncasecmp(url->url, "mailto:", 7)) {
         BalsaSendmsg *snd = 
-            sendmsg_window_new(GTK_WIDGET(balsa_app.main_window),
-                               NULL, SEND_NORMAL);
+            sendmsg_window_compose(GTK_WIDGET(balsa_app.main_window));
         sendmsg_window_process_url(url->url + 7,
                                    sendmsg_window_set_field, snd);      
     } else {

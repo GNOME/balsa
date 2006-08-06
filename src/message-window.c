@@ -663,7 +663,7 @@ replyto_message_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, SEND_REPLY);
+    sendmsg_window_reply(widget, mw->message, SEND_REPLY);
 }
 
 static void
@@ -674,7 +674,7 @@ replytoall_message_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, SEND_REPLY_ALL);
+    sendmsg_window_reply(widget, mw->message, SEND_REPLY_ALL);
 }
 
 static void
@@ -685,7 +685,7 @@ replytogroup_message_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, SEND_REPLY_GROUP);
+    sendmsg_window_reply(widget, mw->message, SEND_REPLY_GROUP);
 }
 
 static void
@@ -696,7 +696,7 @@ forward_message_attached_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, SEND_FORWARD_ATTACH);
+    sendmsg_window_forward(widget, mw->message, TRUE);
 }
 
 static void
@@ -707,7 +707,7 @@ forward_message_inline_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, SEND_FORWARD_INLINE);
+    sendmsg_window_forward(widget, mw->message, FALSE);
 }
 
 static void
@@ -718,8 +718,7 @@ forward_message_default_cb(GtkWidget * widget, gpointer data)
     g_return_if_fail(widget != NULL);
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_new(widget, mw->message, balsa_app.forward_attached 
-		       ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
+    sendmsg_window_forward(widget, mw->message, balsa_app.forward_attached);
 }
 
 static void

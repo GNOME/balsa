@@ -750,7 +750,7 @@ main(int argc, char *argv[])
         BalsaSendmsg *snd;
         GSList *lst;
         gdk_threads_enter();
-        snd = sendmsg_window_new(window, NULL, SEND_NORMAL);
+        snd = sendmsg_window_compose(window);
         gdk_threads_leave();
         if(opt_compose_email) {
             if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)

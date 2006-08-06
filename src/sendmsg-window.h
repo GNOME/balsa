@@ -27,15 +27,14 @@ extern "C" {
 #endif				/* __cplusplus */
 
     typedef enum {
-	SEND_NORMAL,		/* initialized by Compose */
-	SEND_REPLY,		/* by Reply               */
-	SEND_REPLY_ALL,		/* by Reply All           */
-	SEND_REPLY_GROUP,       /* by Reply to Group      */
-	SEND_FORWARD_ATTACH,    /* by Forward attached    */
-	SEND_FORWARD_INLINE,    /* by Forward inline      */
-	SEND_CONTINUE		/* by Continue postponed  */
+       SEND_NORMAL,            /* initialized by Compose */
+       SEND_REPLY,             /* by Reply               */
+       SEND_REPLY_ALL,         /* by Reply All           */
+       SEND_REPLY_GROUP,       /* by Reply to Group      */
+       SEND_FORWARD_ATTACH,    /* by Forward attached    */
+       SEND_FORWARD_INLINE,    /* by Forward inline      */
+       SEND_CONTINUE           /* by Continue postponed  */
     } SendType;
-
 
 #if defined(ENABLE_TOUCH_UI)
 #define VIEW_MENU_LENGTH 4
@@ -125,8 +124,13 @@ extern "C" {
         GtkTextMark *insert_mark;
     };
 
-    BalsaSendmsg *sendmsg_window_new(GtkWidget *, LibBalsaMessage *,
-                                     SendType);
+    BalsaSendmsg *sendmsg_window_compose(GtkWidget *);
+    BalsaSendmsg *sendmsg_window_reply(GtkWidget *, LibBalsaMessage *,
+                                       SendType rt);
+    BalsaSendmsg *sendmsg_window_forward(GtkWidget *, LibBalsaMessage *,
+                                         gboolean attach);
+    BalsaSendmsg *sendmsg_window_continue(GtkWidget *, LibBalsaMessage *);
+
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
                                   const gchar* val);
 

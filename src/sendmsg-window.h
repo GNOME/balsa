@@ -61,6 +61,7 @@ extern "C" {
 #endif
 	GtkWidget *attachments[4];
         gchar *in_reply_to;
+        GList *references;
 	GtkWidget *text;
 #if !HAVE_GTKSPELL
 	GtkWidget *spell_checker;
@@ -127,6 +128,10 @@ extern "C" {
     BalsaSendmsg *sendmsg_window_compose(GtkWidget *);
     BalsaSendmsg *sendmsg_window_reply(GtkWidget *, LibBalsaMessage *,
                                        SendType rt);
+    BalsaSendmsg *sendmsg_window_reply_embedded(GtkWidget *w,
+                                                LibBalsaMessageBody *part,
+                                                SendType reply_type);
+
     BalsaSendmsg *sendmsg_window_forward(GtkWidget *, LibBalsaMessage *,
                                          gboolean attach);
     BalsaSendmsg *sendmsg_window_continue(GtkWidget *, LibBalsaMessage *);

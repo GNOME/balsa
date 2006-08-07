@@ -35,7 +35,7 @@ GString *process_mime_part(LibBalsaMessage * message,
 			   gboolean ignore_html, gboolean flow,
 			   LibBalsaCharsetFunc charset_cb,
 			   gpointer charset_cb_data);
-GString *content2reply(LibBalsaMessage * message,
+GString *content2reply(LibBalsaMessageBody *root,
 		       gchar * reply_prefix_str, gint llen,
 		       gboolean ignore_html, gboolean flow,
 		       LibBalsaCharsetFunc charset_cb,

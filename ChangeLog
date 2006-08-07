@@ -1,3 +1,16 @@
+2006-08-07 Pawel Salek
+
+	* libbalsa/filter.c: use new content2reply().
+	* libbalsa/mailbox_local.c: ditto.
+	* libbalsa/message.[ch]: extra routines for header manipulation.
+	* libbalsa/mime.[ch]: content2reply accepts a message part now.
+	* src/balsa-message.c: aim at providing common ancestor to
+	LibBalsaMessage and LibBalsaMessageBody.
+	* src/balsa-mime-widget-message.[hc]: call reply to
+	embedded message.
+	* src/sendmsg-window.[hc]: some more related
+	refactoring. Implement reply to embedded message.
+
 2006-08-06 Pawel Salek
 
 	* src/ab-window.c: use new Sendmsg API with better separation

@@ -317,6 +317,10 @@ gboolean libbalsa_message_is_pgp_signed(LibBalsaMessage * message);
 gboolean libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message);
 #endif
 
+const gchar* libbalsa_message_header_get_one(LibBalsaMessageHeaders* headers,
+                                             const gchar *find);
+GList* libbalsa_message_header_get_all(LibBalsaMessageHeaders* headers,
+                                       const gchar *find);
 const gchar *libbalsa_message_get_user_header(LibBalsaMessage * message,
                                               const gchar * name);
 void libbalsa_message_set_user_header(LibBalsaMessage * message,

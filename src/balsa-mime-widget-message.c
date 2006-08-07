@@ -29,7 +29,7 @@
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-mime-widget-message.h"
-
+#include "sendmsg-window.h"
 
 typedef enum _rfc_extbody_t {
     RFC2046_EXTBODY_FTP,
@@ -131,9 +131,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
 	
 	g_object_set_data(G_OBJECT(mw), "header-widget", emb_hdrs);
-	balsa_mime_widget_message_set_headers(bm, mw, mime_body->embhdrs,
-					      mime_body->parts,
-					      mime_body->embhdrs->subject);
+	balsa_mime_widget_message_set_headers(bm, mw, mime_body);
     }
 
     /* return the created widget (may be NULL) */
@@ -440,22 +438,36 @@ bm_modify_font_from_string(GtkWidget * widget, const char *font)
 
 static void
 bm_header_ctx_menu_reply(GtkWidget * menu_item,
-                         LibBalsaMessageHeaders *headers)
+                         LibBalsaMessageBody *part)
 {
-    printf("Subject: %s\n", headers->subject);
+    sendmsg_window_reply_embedded(NULL, part, SEND_REPLY);
+}
+
+static void
+bm_header_ctx_menu_copy(GtkWidget * menu_item,
+                        LibBalsaMessageBody *part)
+{
+    printf("IMplement me!\n");
 }
 
 static void
 bm_header_extend_popup(GtkTextView *textview, GtkMenu *menu, gpointer arg)
 {
-    GtkWidget *menu_item = gtk_menu_item_new_with_label(_("Reply..."));
+    GtkWidget *menu_item;
     GtkWidget *separator = gtk_separator_menu_item_new();
 
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
+    gtk_widget_show(separator);
+    menu_item = gtk_menu_item_new_with_label(_("Reply..."));
     g_signal_connect(G_OBJECT(menu_item), "activate",
                      G_CALLBACK(bm_header_ctx_menu_reply),
                      arg);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
-    gtk_widget_show(separator);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+    gtk_widget_show(menu_item);
+    menu_item = gtk_menu_item_new_with_label(_("Copy to folder..."));
+    g_signal_connect(G_OBJECT(menu_item), "activate",
+                     G_CALLBACK(bm_header_ctx_menu_copy),
+                     arg);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     gtk_widget_show(menu_item);
 }
@@ -595,8 +607,32 @@ add_header_address_list(BalsaMessage * bm, GtkTextView * view,
 
 void
 balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
-				      LibBalsaMessageHeaders * headers,
-				      LibBalsaMessageBody * sig_body, const gchar * subject)
+				      LibBalsaMessageBody * part)
+{
+    GtkWidget *widget;
+    GtkTextView *view;
+
+    balsa_mime_widget_message_set_headers_d(bm, mw, part->embhdrs, part->parts,
+                                            part->embhdrs->subject);
+    if (!(widget =
+	  GTK_WIDGET(g_object_get_data(G_OBJECT(mw), "header-widget"))))
+	return;
+    view = bm_header_widget_get_text_view(widget);
+    if( !g_object_get_data(G_OBJECT(view), "popup-extended") ) {
+        g_signal_connect(G_OBJECT(view), "populate-popup",
+                         G_CALLBACK(bm_header_extend_popup),
+                         part);
+        g_object_set_data(G_OBJECT(view), "popup-extended",
+                          GINT_TO_POINTER(1));
+    }
+}
+
+void
+balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
+                                        BalsaMimeWidget *mw,
+                                        LibBalsaMessageHeaders *headers,
+                                        LibBalsaMessageBody *part,
+                                        const gchar *subject)
 {
     GtkTextView *view;
     GtkTextBuffer *buffer;
@@ -682,13 +718,6 @@ balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
 	    add_header_sigstate(view, sig_body->sig_info);
     }
 #endif
-    if( !g_object_get_data(G_OBJECT(view), "popup-extended") ) {
-        g_signal_connect(G_OBJECT(view), "populate-popup",
-                         G_CALLBACK(bm_header_extend_popup),
-                         headers);
-        g_object_set_data(G_OBJECT(view), "popup-extended",
-                          GINT_TO_POINTER(1));
-    }
     gtk_widget_queue_resize(GTK_WIDGET(view));
 }
 

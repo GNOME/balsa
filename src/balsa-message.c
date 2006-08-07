@@ -913,10 +913,10 @@ balsa_message_set_embedded_hdr(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, PART_INFO_COLUMN, &info, -1);
     if (info) {
  	if (info->body && info->body->embhdrs && info->mime_widget)
- 	    balsa_mime_widget_message_set_headers(bm, info->mime_widget,
- 						  info->body->embhdrs,
- 						  info->body->parts,
- 						  info->body->embhdrs->subject);
+ 	    balsa_mime_widget_message_set_headers_d(bm, info->mime_widget,
+                                                    info->body->embhdrs,
+                                                    info->body->parts,
+                                                    info->body->embhdrs->subject);
 	g_object_unref(G_OBJECT(info));
     }
     
@@ -969,9 +969,10 @@ balsa_message_set_wrap(BalsaMessage * bm, gboolean wrap)
 static void
 display_headers(BalsaMessage * bm)
 {
-    balsa_mime_widget_message_set_headers(bm, bm->bm_widget, 
- 					  bm->message->headers, bm->message->body_list,
- 					  LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
+    balsa_mime_widget_message_set_headers_d(bm, bm->bm_widget, 
+                                            bm->message->headers,
+                                            bm->message->body_list,
+                                            LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 }
 
 

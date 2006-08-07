@@ -304,32 +304,69 @@ libbalsa_create_hdr_pair(const gchar * name, gchar * value)
     return item;
 }
 
-/** libbalsa_message_find_user_hdr:
-    returns.... list element matching given header.
-*/
-static GList *
-libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
+static GList*
+libbalsa_message_header_get_helper(LibBalsaMessageHeaders* headers,
+                                   const gchar *find)
 {
-    GList* list;
-    LibBalsaMessageHeaders *headers = message->headers;
-    
-    g_return_val_if_fail(headers, NULL);
-    if (!headers->user_hdrs && message->mailbox) 
-        libbalsa_mailbox_set_msg_headers(message->mailbox, message);
-
+    GList *list;
     for (list = headers->user_hdrs; list; list = list->next) {
         const gchar * const *tmp = list->data;
         
         if (g_ascii_strncasecmp(tmp[0], find, strlen(find)) == 0) 
             return list;
     }
-    
     return NULL;
+}
+
+/** libbalsa_message_find_user_hdr:
+    returns.... list element matching given header.
+*/
+static GList *
+libbalsa_message_find_user_hdr(LibBalsaMessage * message, const gchar * find)
+{
+    LibBalsaMessageHeaders *headers = message->headers;
+    
+    g_return_val_if_fail(headers, NULL);
+    if (!headers->user_hdrs && message->mailbox) 
+        libbalsa_mailbox_set_msg_headers(message->mailbox, message);
+
+    return libbalsa_message_header_get_helper(headers, find);
 }
 
 /* 
  * Public user header methods
  */
+const gchar*
+libbalsa_message_header_get_one(LibBalsaMessageHeaders* headers,
+                                const gchar *find)
+{
+    GList *header;
+    const gchar *const *pair;
+    
+    if (!(header = libbalsa_message_header_get_helper(headers, find)))
+        return NULL;
+
+    pair = header->data;
+    return pair[1];
+}
+
+GList*
+libbalsa_message_header_get_all(LibBalsaMessageHeaders* headers,
+                                const gchar *find)
+{
+    GList *header;
+    const gchar *const *pair;
+    GList *res = NULL;
+    
+    if (!(header = libbalsa_message_header_get_helper(headers, find)))
+        return NULL;
+    pair = header->data;
+    for(pair++; *pair; pair++)
+        res = g_list_append(res, g_strdup(*pair));
+    
+    return res;
+}
+
 const gchar *
 libbalsa_message_get_user_header(LibBalsaMessage * message,
                                  const gchar * name)

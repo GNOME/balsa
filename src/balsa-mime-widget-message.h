@@ -36,10 +36,18 @@ BalsaMimeWidget *balsa_mime_widget_new_message(BalsaMessage * bm,
 					       const gchar * content_type, gpointer data);
 BalsaMimeWidget *balsa_mime_widget_new_message_tl(BalsaMessage * bm,
 						  GtkWidget * tl_buttons);
-void balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
-					   LibBalsaMessageHeaders * headers,
-					   LibBalsaMessageBody * sig_body,
-					   const gchar * subject);
+void balsa_mime_widget_message_set_headers(BalsaMessage * bm,
+                                           BalsaMimeWidget *mw,
+					   LibBalsaMessageBody *part);
+    /* balsa_mime_widget_message_set_headers_d is called for
+       LibBalsaMessage only and is deprecated. Instead, the object
+       hierarchy should be fixed so that LibBalsaMessage is derived
+       from LibBalsaMessagePart or similar. */
+void balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
+                                             BalsaMimeWidget *mw,
+                                             LibBalsaMessageHeaders *h,
+                                             LibBalsaMessageBody *parts,
+                                             const gchar *subject);
 
 
 #ifdef __cplusplus

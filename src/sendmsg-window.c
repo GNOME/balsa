@@ -163,8 +163,9 @@ static gchar* prep_signature(LibBalsaIdentity* ident, gchar* sig);
 static void update_bsmsg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
-static GString *quote_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
-                           SendType type);
+static GString *quote_message_body(BalsaSendmsg * bsmsg,
+                                   LibBalsaMessage * message,
+                                   SendType type);
 static void set_list_post_address(BalsaSendmsg * bsmsg);
 static gboolean set_list_post_rfc2369(BalsaSendmsg * bsmsg,
                                       const gchar * url);
@@ -220,7 +221,7 @@ static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
 static gint quote_messages_cb(GtkWidget *, BalsaSendmsg *);
 static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
 
-static void set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
+static void set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *body,
                                  SendType p, LibBalsaIdentity* ident);
 
 /* the array of locale names and charset names included in the MIME
@@ -1025,6 +1026,10 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->charset);
     g_free(bsmsg->in_reply_to);
+    if(bsmsg->references) {
+        g_list_foreach(bsmsg->references, (GFunc) g_free, NULL);
+        g_list_free(bsmsg->references);
+    }
     g_slist_foreach(bsmsg->charsets, (GFunc) g_free, NULL);
     g_slist_free(bsmsg->charsets);
 
@@ -1472,10 +1477,10 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     } else {
         if ( (replen == 0 && reply_type) ||
              (fwdlen == 0 && forward_type) ) {
+            LibBalsaMessage *msg = bsmsg->parent_message 
+            ? bsmsg->parent_message : bsmsg->draft_message;
         set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]),
-                             bsmsg->parent_message ?
-                             bsmsg->parent_message : bsmsg->draft_message,
-                             bsmsg->type, ident);
+                             msg->body_list, bsmsg->type, ident);
         }
     }
 
@@ -2331,7 +2336,7 @@ insert_selected_messages(BalsaSendmsg *bsmsg, SendType type)
     
 	for (node = l; node; node = g_list_next(node)) {
 	    LibBalsaMessage *message = node->data;
-	    GString *body = quote_body(bsmsg, message, type);
+	    GString *body = quote_message_body(bsmsg, message, type);
 	    
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
 	    g_string_free(body, TRUE);
@@ -3033,7 +3038,7 @@ drag_data_quote(GtkWidget * widget,
             GString *body;
 
 	    message = libbalsa_mailbox_get_message(mailbox, msgno);
-            body = quote_body(bsmsg, message, SEND_REPLY);
+            body = quote_message_body(bsmsg, message, SEND_REPLY);
 	    g_object_unref(message);
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
@@ -3269,6 +3274,20 @@ continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
     }
 }
 
+static gchar*
+message_part_get_subject(LibBalsaMessageBody *part)
+{
+    gchar *subject = NULL;
+    if(part->embhdrs && part->embhdrs->subject)
+        subject = g_strdup(part->embhdrs->subject);
+    else if(part->message && part->message->subj)
+        subject = g_strdup(part->message->subj);
+    else subject = g_strdup(_("No subject"));
+    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
+			   NULL);
+    return subject;
+}
+
 /* quote_body -----------------------------------------------------------
    quotes properly the body of the message.
    Use GString to optimize memory usage.
@@ -3277,19 +3296,20 @@ continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 */
     
 static GString *
-quote_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
-           SendType type)
+quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
+           const gchar *message_id, GList *references,
+           LibBalsaMessageBody *root, SendType type)
 {
     GString *body;
     gchar *str, *date = NULL;
     gchar *personStr;
     const gchar *orig_address;
 
-    g_return_val_if_fail(message->headers, NULL);
+    g_return_val_if_fail(headers, NULL);
 
-    if (message->headers->from && 
+    if (headers->from && 
 	(orig_address =
-	 libbalsa_address_get_name_from_list(message->headers->from))) {
+	 libbalsa_address_get_name_from_list(headers->from))) {
         personStr = g_strdup(orig_address);
         libbalsa_utf8_sanitize(&personStr,
                                balsa_app.convert_unknown_8bit,
@@ -3297,9 +3317,9 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
     } else
         personStr = g_strdup(_("you"));
 
-    if (message->headers->date)
-        date = libbalsa_message_date_to_utf8(message,
-                                             balsa_app.date_string);
+    if (headers->date)
+        date = libbalsa_message_headers_date_to_utf8(headers,
+                                                     balsa_app.date_string);
 
     if (type == SEND_FORWARD_ATTACH) {
 	gchar *subject;
@@ -3312,46 +3332,44 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
 	if (date)
 	    g_string_append_printf(body, "%s %s\n", _("Date:"), date);
 
-	subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
-	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
-			       NULL);
+	subject = message_part_get_subject(root);
 	if (subject)
 	    g_string_append_printf(body, "%s %s\n", _("Subject:"), subject);
 	g_free(subject);
 
-	if (message->headers->from) {
+	if (headers->from) {
 	    gchar *from =
-		internet_address_list_to_string(message->headers->from,
+		internet_address_list_to_string(headers->from,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("From:"), from);
 	    g_free(from);
 	}
 
-	if (message->headers->to_list) {
+	if (headers->to_list) {
 	    gchar *to_list =
-		internet_address_list_to_string(message->headers->to_list,
+		internet_address_list_to_string(headers->to_list,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("To:"), to_list);
 	    g_free(to_list);
 	}
 
-	if (message->headers->cc_list) {
+	if (headers->cc_list) {
 	    gchar *cc_list = 
-		internet_address_list_to_string(message->headers->cc_list,
+		internet_address_list_to_string(headers->cc_list,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("Cc:"), cc_list);
 	    g_free(cc_list);
 	}
 
 	g_string_append_printf(body, _("Message-ID: %s\n"),
-                               message->message_id);
+                               message_id);
 
-	if (message->references) {
-	    GList *ref_list = message->references;
+	if (references) {
+	    GList *ref_list;
 
 	    g_string_append(body, _("References:"));
 
-	    for (ref_list = message->references; ref_list;
+	    for (ref_list = references; ref_list;
                  ref_list = g_list_next(ref_list))
 		g_string_append_printf(body, " <%s>",
 				       (gchar *) ref_list->data);
@@ -3366,7 +3384,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
 	    str = g_strdup_printf(_("On %s, %s wrote:\n"), date, personStr);
 	else
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
-	body = content2reply(message,
+	body = content2reply(root,
                              quoted ? balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, bsmsg->flow,
@@ -3398,8 +3416,9 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
    Optionally prepends the signature to quoted text.
 */
 static void
-fill_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
-          SendType s_type)
+fill_body_from_part(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
+                    const gchar *message_id, GList *references,
+                    LibBalsaMessageBody *root, SendType s_type)
 {
     GString *body;
     gchar *signature;
@@ -3412,11 +3431,12 @@ fill_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
                           s_type == SEND_REPLY_ALL ||
                           s_type == SEND_REPLY_GROUP);
 
-    g_assert(message);
+    g_assert(headers);
 
     if ( (balsa_app.autoquote && reply_any) ||
          s_type == SEND_FORWARD_INLINE )
-        body = quote_body(bsmsg, message, s_type);
+        body = quote_body(bsmsg, headers, message_id, references,
+                          root, s_type);
     else
 	body = g_string_new("");
 
@@ -3443,6 +3463,24 @@ fill_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message,
     gtk_text_buffer_place_cursor(buffer, &start);
     g_string_free(body, TRUE);
 }
+
+static GString*
+quote_message_body(BalsaSendmsg * bsmsg,
+                   LibBalsaMessage * message,
+                   SendType s_type)
+{
+    return quote_body(bsmsg, message->headers, message->message_id,
+                      message->references, message->body_list, s_type);
+}
+
+static void
+fill_body_from_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message,
+                       SendType s_type)
+{
+    fill_body_from_part(bsmsg, message->headers, message->message_id,
+                        message->references, message->body_list, s_type);
+}
+
 
 static gint
     insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
@@ -3488,18 +3526,17 @@ static gint quote_messages_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
    and the compose type.
 */
 static void
-set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
+set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *part,
                      SendType type, LibBalsaIdentity* ident)
 {
     const gchar *tmp;
     gchar *subject, *newsubject = NULL;
     gint i;
+    LibBalsaMessageHeaders *headers;
 
-    if(!message) return;
-    subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
-    libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
-			   NULL);
-
+    if(!part) return;
+    subject = message_part_get_subject(part);
+    headers = part->embhdrs ? part->embhdrs : part->message->headers;
     switch (type) {
     case SEND_REPLY:
     case SEND_REPLY_ALL:
@@ -3532,11 +3569,11 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
 	if (!subject) {
-	    if (message->headers && message->headers->from)
+	    if (headers && headers->from)
 		newsubject = g_strdup_printf("%s from %s",
 					     ident->forward_string,
 					     libbalsa_address_get_mailbox_from_list
-						 (message->headers->from));
+						 (headers->from));
 	    else
 		newsubject = g_strdup(ident->forward_string);
 	} else {
@@ -3552,13 +3589,13 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessage * message,
 		}
 	    }
 	    while( *tmp && isspace((int)*tmp) ) tmp++;
-	    if (message->headers && message->headers->from)
+	    if (headers && headers->from)
 		newsubject = 
 		    g_strdup_printf("%s %s [%s]",
 				    ident->forward_string, 
 				    tmp,
                                     libbalsa_address_get_mailbox_from_list
-					(message->headers->from));
+					(headers->from));
 	    else {
 		newsubject = 
 		    g_strdup_printf("%s %s", 
@@ -4045,6 +4082,7 @@ sendmsg_window_new(GtkWidget *w)
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
     bsmsg->in_reply_to = NULL;
+    bsmsg->references = NULL;
     bsmsg->charset  = NULL;
     bsmsg->charsets = NULL;
     bsmsg->spell_check_lang = NULL;
@@ -4225,20 +4263,106 @@ bsm_prepare_for_setup(LibBalsaMessage *message)
 }
 
 static void
-bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessage *message)
+bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
 {
-    libbalsa_message_body_unref(message);
+    g_return_if_fail(part->message);
+    libbalsa_message_body_unref(part->message);
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;
-    set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), message, bsmsg->type,
+    set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), part, bsmsg->type,
                          bsmsg->ident);
+}
+
+static void
+set_cc_from_all_recipients(BalsaSendmsg* bsmsg,
+                           LibBalsaMessageHeaders *headers)
+{
+    GString *new_cc = g_string_new("");
+    gchar *tmp;
+
+    sw_cc_add_list(new_cc, headers->to_list);
+    sw_cc_add_list(new_cc, headers->cc_list);
+
+    tmp = g_string_free(new_cc, FALSE);
+    libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+                           NULL);
+    gtk_entry_set_text(GTK_ENTRY(bsmsg->cc[1]), tmp);
+    g_free(tmp);
+}
+
+static void
+set_in_reply_to(BalsaSendmsg *bsmsg, const gchar *message_id,
+                LibBalsaMessageHeaders *headers)
+{
+    gchar *tmp;
+
+    g_assert(message_id);
+    if(message_id[0] == '<')
+        tmp = g_strdup(message_id);
+    else
+        tmp = g_strconcat("<", message_id, ">", NULL);
+    if (headers && headers->from) {
+        gchar recvtime[50];
+
+        ctime_r(&headers->date, recvtime);
+        if (recvtime[0]) /* safety check; remove trailing '\n' */
+            recvtime[strlen(recvtime)-1] = '\0';
+        bsmsg->in_reply_to =
+            g_strconcat(tmp, " (from ",
+                        libbalsa_address_get_mailbox_from_list
+                        (headers->from),
+                        " on ", recvtime, ")", NULL);
+        g_free(tmp);
+    } else
+        bsmsg->in_reply_to = tmp;
+}
+
+static void
+set_to(BalsaSendmsg *bsmsg, LibBalsaMessageHeaders *headers)
+{
+    if (bsmsg->type == SEND_REPLY_GROUP) {
+        set_list_post_address(bsmsg);
+    } else {
+        InternetAddressList *addr = headers->reply_to
+	    ? headers->reply_to : headers->from;
+
+        if (addr) {
+            gchar *tmp = internet_address_list_to_string(addr, FALSE);
+            libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
+                                   NULL);
+            gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
+            g_free(tmp);
+        }
+    }
+}
+
+static void
+set_references_reply(BalsaSendmsg *bsmsg, GList *references,
+                     const gchar *in_reply_to, const gchar *message_id)
+{
+    GList *refs = NULL, *list;
+ 
+    for (list = references; list; list = list->next)
+        refs = g_list_prepend(refs, g_strdup(list->data));
+
+    /* We're replying to parent_message, so construct the
+     * references according to RFC 2822. */
+    if (!references
+        /* Parent message has no References header... */
+        && in_reply_to)
+            /* ...but it has an In-Reply-To header with a single
+             * message identifier. */
+        refs = g_list_prepend(refs, g_strdup(in_reply_to));
+    if (message_id)
+        refs = g_list_prepend(refs, g_strdup(message_id));
+
+    bsmsg->references = g_list_reverse(refs);
 }
 
 BalsaSendmsg*
 sendmsg_window_reply(GtkWidget *w, LibBalsaMessage *message,
                      SendType reply_type)
 {
-    gchar *tmp;
     BalsaSendmsg *bsmsg = sendmsg_window_compose(w);
 
     g_assert(message);
@@ -4251,56 +4375,67 @@ sendmsg_window_reply(GtkWidget *w, LibBalsaMessage *message,
     }
     bsmsg->parent_message = message;
     bsm_prepare_for_setup(message);
+
+    set_to(bsmsg, message->headers);
+
+    if (message->message_id)
+        set_in_reply_to(bsmsg, message->message_id, message->headers);
+    if (reply_type == SEND_REPLY_ALL)
+        set_cc_from_all_recipients(bsmsg, message->headers);
+    set_references_reply(bsmsg, message->references,
+                         message->in_reply_to 
+                         ? message->in_reply_to->data : NULL,
+                         message->message_id);
+
+    fill_body_from_message(bsmsg, message, reply_type);
+    bsm_finish_setup(bsmsg, message->body_list);
+    gtk_widget_grab_focus(bsmsg->text);
+    return bsmsg;
+}
+
+BalsaSendmsg*
+sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
+                              SendType reply_type)
+{
+    BalsaSendmsg *bsmsg = sendmsg_window_compose(w);
+    LibBalsaMessageHeaders *headers;
+
+    g_assert(part);
+    g_return_val_if_fail(part->embhdrs, bsmsg);
+
+    switch(reply_type) {
+    case SEND_REPLY: 
+    case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
+        bsmsg->type = reply_type;       break;
+    default: printf("reply_type: %d\n", reply_type); g_assert_not_reached();
+    }
+    bsm_prepare_for_setup(part->message);
+    headers = part->embhdrs;
     /* To: */
-    if (reply_type == SEND_REPLY_GROUP) {
-        set_list_post_address(bsmsg);
-    } else {
-        InternetAddressList *addr =
-            (message->headers->reply_to) 
-	    ? message->headers->reply_to : message->headers->from;
+    set_to(bsmsg, headers);
 
-        if (addr) {
-            tmp = internet_address_list_to_string(addr, FALSE);
-            libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
-                                   NULL);
-            gtk_entry_set_text(GTK_ENTRY(bsmsg->to[1]), tmp);
-            g_free(tmp);
-        }
+    if(part->embhdrs) {
+        const gchar *message_id = 
+            libbalsa_message_header_get_one(part->embhdrs, "Message-Id");
+        const gchar *in_reply_to =
+            libbalsa_message_header_get_one(part->embhdrs, "In-Reply-To");
+        GList *references = 
+            libbalsa_message_header_get_all(part->embhdrs, "References");
+        if (message_id)
+            set_in_reply_to(bsmsg, message_id, headers);
+        set_references_reply(bsmsg, references,
+                             in_reply_to, message_id);
+        fill_body_from_part(bsmsg, part->embhdrs, message_id, references,
+                            part->parts, reply_type);
+        g_list_foreach(references, (GFunc) g_free, NULL);
+        g_list_free(references);
     }
 
-    if (message->message_id) {
-        gchar *tmp = g_strconcat("<", message->message_id, ">", NULL);
-        if (message->headers && message->headers->from) {
-            gchar recvtime[50];
+    if (reply_type == SEND_REPLY_ALL)
+        set_cc_from_all_recipients(bsmsg, part->embhdrs);
 
-            ctime_r(&message->headers->date, recvtime);
-            if (recvtime[0]) /* safety check; remove trailing '\n' */
-                recvtime[strlen(recvtime)-1] = '\0';
-            bsmsg->in_reply_to =
-                g_strconcat(tmp, " (from ",
-                            libbalsa_address_get_mailbox_from_list
-                                (message->headers->from),
-                            " on ", recvtime, ")", NULL);
-            g_free(tmp);
-        } else
-            bsmsg->in_reply_to = tmp;
-    }
-
-    if (reply_type == SEND_REPLY_ALL) {
-	GString *new_cc = g_string_new("");
-
-	sw_cc_add_list(new_cc, message->headers->to_list);
-	sw_cc_add_list(new_cc, message->headers->cc_list);
-
-	tmp = g_string_free(new_cc, FALSE);
-	libbalsa_utf8_sanitize(&tmp, balsa_app.convert_unknown_8bit,
-			       NULL);
-	gtk_entry_set_text(GTK_ENTRY(bsmsg->cc[1]), tmp);
-	g_free(tmp);
-    }
-
-    fill_body(bsmsg, message, reply_type);
-    bsm_finish_setup(bsmsg, message);
+    bsm_finish_setup(bsmsg, part);
     gtk_widget_grab_focus(bsmsg->text);
     return bsmsg;
 }
@@ -4319,8 +4454,8 @@ sendmsg_window_forward(GtkWidget *w, LibBalsaMessage *message, gboolean attach)
                                    "Possible reason: not enough temporary space"));
     } else {
         bsm_prepare_for_setup(message);
-        fill_body(bsmsg, message, SEND_FORWARD_INLINE);
-        bsm_finish_setup(bsmsg, message);
+        fill_body_from_message(bsmsg, message, SEND_FORWARD_INLINE);
+        bsm_finish_setup(bsmsg, message->body_list);
     }
     gtk_widget_grab_focus(bsmsg->to[1]);
     return bsmsg;
@@ -4331,6 +4466,7 @@ sendmsg_window_continue(GtkWidget *w, LibBalsaMessage * message)
 {
     BalsaSendmsg *bsmsg = sendmsg_window_compose(w);
     const gchar *postpone_hdr;
+    GList *list, *refs = NULL;
 
     g_assert(message);
     bsmsg->type = SEND_CONTINUE;
@@ -4382,8 +4518,12 @@ sendmsg_window_continue(GtkWidget *w, LibBalsaMessage * message)
                                         [OPTS_MENU_FORMAT_POS].widget),
                                        strcmp(postpone_hdr, "Fixed"));
 
+    for (list = message->references; list; list = list->next)
+        refs = g_list_prepend(refs, g_strdup(list->data));
+    bsmsg->references = g_list_reverse(refs);
+
     continue_body(bsmsg, message);
-    bsm_finish_setup(bsmsg, message);
+    bsm_finish_setup(bsmsg, message->body_list);
     gtk_widget_grab_focus(bsmsg->text);
     return bsmsg;
 }
@@ -4808,14 +4948,12 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
-    GList *list;
     gchar *tmp;
     GtkTextIter start, end;
 #if !defined(ENABLE_TOUCH_UI)
     const gchar *ctmp;
 #endif
     LibBalsaIdentity *ident = bsmsg->ident;
-    GList *refs;
 #if HAVE_GTKSOURCEVIEW
     GtkTextBuffer *buffer, *buffer2;
     GtkTextIter iter;
@@ -4859,35 +4997,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
             /* Translators: please do not translate Face. */
                             _("Could not load X-Face header file %s: %s"));
 
-    refs = NULL;
-    if (bsmsg->parent_message) {
-        GList *in_reply_to;
-
-        for (list = bsmsg->parent_message->references; list;
-             list = list->next)
-            refs = g_list_prepend(refs, g_strdup(list->data));
-
-        /* We're replying to parent_message, so construct the
-         * references according to RFC 2822. */
-
-        if (!refs
-                /* Parent message has no References header... */
-            && (in_reply_to = bsmsg->parent_message->in_reply_to)
-            && !in_reply_to->next)
-            /* ...but it has an In-Reply-To header with a single
-             * message identifier. */
-            refs = g_list_prepend(refs, g_strdup(in_reply_to->data));
-    
-        if (bsmsg->parent_message->message_id)
-            refs =
-                g_list_prepend(refs,
-                               g_strdup(bsmsg->parent_message->message_id));
-    } else if (bsmsg->draft_message) {
-        for (list = bsmsg->draft_message->references; list;
-             list = list->next)
-            refs = g_list_prepend(refs, g_strdup(list->data));
-    }
-    message->references = g_list_reverse(refs);
+    message->references = bsmsg->references;
+    bsmsg->references = NULL; /* steal it */
 
     if (bsmsg->in_reply_to)
         message->in_reply_to =
@@ -6091,7 +6202,7 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
         if (type == SEND_FORWARD_ATTACH)
             attach_message(bsmsg, message);
         else if (type == SEND_FORWARD_INLINE) {
-            GString *body = quote_body(bsmsg, message, TRUE);
+            GString *body = quote_message_body(bsmsg, message, TRUE);
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
         }

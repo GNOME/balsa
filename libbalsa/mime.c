@@ -179,16 +179,16 @@ process_mime_multipart(LibBalsaMessage * message,
 }
 
 GString *
-content2reply(LibBalsaMessage * message, gchar * reply_prefix_str,
+content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
 	      gint llen, gboolean ignore_html, gboolean flow,
 	      LibBalsaCharsetFunc charset_cb, gpointer charset_cb_data)
 {
+    LibBalsaMessage *message = root->message;
     LibBalsaMessageBody *body;
     GString *reply = NULL, *res;
 
     libbalsa_message_body_ref(message, FALSE, FALSE);
-    body = message->body_list;
-    for (body = message->body_list; body; body = body->next) {
+    for (body = root; body; body = body->next) {
 	res = process_mime_part(message, body, reply_prefix_str, llen,
                                 ignore_html, flow, charset_cb, 
 				charset_cb_data);

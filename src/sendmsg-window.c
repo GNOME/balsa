@@ -4075,7 +4075,9 @@ sendmsg_window_new(GtkWidget *w)
     GtkWidget *main_box = gtk_vbox_new(FALSE, 0);
     BalsaSendmsg *bsmsg = NULL;
     unsigned i;
+#if HAVE_GTKSPELL
     gchar* tmp;
+#endif
 #if HAVE_GTKSOURCEVIEW
     GtkSourceBuffer *source_buffer;
 #endif                          /* HAVE_GTKSOURCEVIEW */

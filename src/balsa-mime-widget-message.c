@@ -704,18 +704,18 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
     }
 
 #ifdef HAVE_GPGME
-    if (sig_body) {
-	if (sig_body->parts
-	    && sig_body->parts->next
-	    && sig_body->parts->next->sig_info
-	    && sig_body->parts->next->sig_info->status !=
+    if (part) {
+	if (part->parts
+	    && part->parts->next
+	    && part->parts->next->sig_info
+	    && part->parts->next->sig_info->status !=
 	    GPG_ERR_NOT_SIGNED)
 	    /* top-level part is RFC 3156 or RFC 2633 signed */
-	    add_header_sigstate(view, sig_body->parts->next->sig_info);
-	else if (sig_body->sig_info
-		 && sig_body->sig_info->status != GPG_ERR_NOT_SIGNED)
+	    add_header_sigstate(view, part->parts->next->sig_info);
+	else if (part->sig_info
+		 && part->sig_info->status != GPG_ERR_NOT_SIGNED)
 	    /* top-level is OpenPGP (RFC 2440) signed */
-	    add_header_sigstate(view, sig_body->sig_info);
+	    add_header_sigstate(view, part->sig_info);
     }
 #endif
     gtk_widget_queue_resize(GTK_WIDGET(view));

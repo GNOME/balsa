@@ -1,6 +1,7 @@
 2006-08-07 19:46  Pawel Salek
 
-	* src/sendmsg-window.c: add missing mailbox_close() call.
+	* src/sendmsg-window.c: add missing mailbox_close() call. Build fixes.
+	* src/balsa-mime-widget-message.c: Build fixes.
 
 2006-08-07 Pawel Salek
 

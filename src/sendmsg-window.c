@@ -4269,7 +4269,8 @@ bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
 {
     g_return_if_fail(part->message);
     libbalsa_message_body_unref(part->message);
-    if (part->message->mailbox)
+    if (part->message->mailbox &&
+        !bsmsg->parent_message && !bsmsg->draft_message)
         libbalsa_mailbox_close(part->message->mailbox, FALSE);
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;

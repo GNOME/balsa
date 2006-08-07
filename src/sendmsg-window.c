@@ -4267,6 +4267,8 @@ bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
 {
     g_return_if_fail(part->message);
     libbalsa_message_body_unref(part->message);
+    if (part->message->mailbox)
+        libbalsa_mailbox_close(part->message->mailbox, FALSE);
     /* ...but mark it as unmodified. */
     bsmsg->modified = FALSE;
     set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), part, bsmsg->type,

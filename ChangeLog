@@ -1,3 +1,7 @@
+2006-08-10  Pawel Salek
+
+	* src/sendmsg-window.c: do not use released memory.
+
 2006-08-07 19:46  Pawel Salek
 
 	* src/sendmsg-window.c: add missing mailbox_close() call. Build fixes.

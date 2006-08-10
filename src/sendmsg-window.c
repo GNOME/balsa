@@ -4264,11 +4264,12 @@ bsm_prepare_for_setup(LibBalsaMessage *message)
 #endif
 }
 
+/* libbalsa_message_body_unref() may destroy the @param part - this is
+   why body_unref() is done at the end. */
 static void
 bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
 {
     g_return_if_fail(part->message);
-    libbalsa_message_body_unref(part->message);
     if (part->message->mailbox &&
         !bsmsg->parent_message && !bsmsg->draft_message)
         libbalsa_mailbox_close(part->message->mailbox, FALSE);
@@ -4276,6 +4277,7 @@ bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
     bsmsg->modified = FALSE;
     set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), part, bsmsg->type,
                          bsmsg->ident);
+    libbalsa_message_body_unref(part->message);
 }
 
 static void

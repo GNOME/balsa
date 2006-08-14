@@ -3758,12 +3758,9 @@ setup_headers_from_message(BalsaSendmsg* bsmsg, LibBalsaMessage *message)
  * the message.
  **/
 static gboolean
-set_identity_from_mailbox(BalsaSendmsg* bsmsg)
+set_identity_from_mailbox(BalsaSendmsg* bsmsg, LibBalsaMessage * message)
 {
     const gchar *identity;
-    LibBalsaMessage *message =
-        bsmsg->parent_message ?
-        bsmsg->parent_message : bsmsg->draft_message;
 
     LibBalsaIdentity* ident;
     GList *ilist;
@@ -3793,11 +3790,8 @@ set_identity_from_mailbox(BalsaSendmsg* bsmsg)
  * original message needs to be set in order for it to work.
  **/
 static gboolean
-guess_identity(BalsaSendmsg* bsmsg)
+guess_identity(BalsaSendmsg* bsmsg, LibBalsaMessage * message)
 {
-    LibBalsaMessage *message =
-        bsmsg->parent_message ?
-        bsmsg->parent_message : bsmsg->draft_message;
     const gchar *address_string;
     GList *ilist;
     LibBalsaIdentity *ident;
@@ -4169,10 +4163,6 @@ sendmsg_window_new(GtkWidget *w)
                                    (opts_menu[OPTS_MENU_FORMAT_POS].
                                     widget), balsa_app.wordwrap);
 
-    /* Set up the default identity */
-    if(!set_identity_from_mailbox(bsmsg))
-        /* Get the identity from the To: field of the original message */
-        guess_identity(bsmsg);
 #ifdef HAVE_GPGME
     bsmsg_setup_gpg_ui(bsmsg, toolbar);
 #endif
@@ -4187,9 +4177,6 @@ sendmsg_window_new(GtkWidget *w)
     /* create text area for the message */
     gtk_box_pack_start(GTK_BOX(main_box), create_text_area(bsmsg),
                        TRUE, TRUE, 0);
-
-    /* From: */
-    setup_headers_from_identity(bsmsg, bsmsg->ident);
 
     gnome_app_set_contents(GNOME_APP(window), main_box);
 
@@ -4366,6 +4353,17 @@ set_references_reply(BalsaSendmsg *bsmsg, GList *references,
     bsmsg->references = g_list_reverse(refs);
 }
 
+static void
+set_identity(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
+{
+    /* Set up the default identity */
+    if(!set_identity_from_mailbox(bsmsg, message))
+        /* Get the identity from the To: field of the original message */
+        guess_identity(bsmsg, message);
+    /* From: */
+    setup_headers_from_identity(bsmsg, bsmsg->ident);
+}
+
 BalsaSendmsg*
 sendmsg_window_reply(GtkWidget *w, LibBalsaMessage *message,
                      SendType reply_type)
@@ -4381,6 +4379,8 @@ sendmsg_window_reply(GtkWidget *w, LibBalsaMessage *message,
     default: printf("reply_type: %d\n", reply_type); g_assert_not_reached();
     }
     bsmsg->parent_message = message;
+    set_identity(bsmsg, message);
+
     bsm_prepare_for_setup(message);
 
     set_to(bsmsg, message->headers);
@@ -4479,7 +4479,7 @@ sendmsg_window_continue(GtkWidget *w, LibBalsaMessage * message)
     bsmsg->type = SEND_CONTINUE;
     bsm_prepare_for_setup(message);
     bsmsg->draft_message = message;
-
+    set_identity(bsmsg, message);
     setup_headers_from_message(bsmsg, message);
 
 #if !defined(ENABLE_TOUCH_UI)

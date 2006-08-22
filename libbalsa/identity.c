@@ -1377,7 +1377,7 @@ ident_dialog_update(GObject * dlg)
     g_free(id->forward_string);
     id->forward_string  = ident_dialog_get_text(dlg, "identity-forwardstring");
 #if ENABLE_ESMTP
-    g_object_unref(id->smtp_server);
+    if(id->smtp_server) g_object_unref(id->smtp_server);
     id->smtp_server = ident_dialog_get_value(dlg, "identity-smtp-server");
     g_object_ref(id->smtp_server);
 #endif /* ENABLE_ESMTP */

@@ -4227,6 +4227,7 @@ BalsaSendmsg*
 sendmsg_window_compose(GtkWidget *w)
 {
     BalsaSendmsg *bsmsg = sendmsg_window_new(w);
+    setup_headers_from_identity(bsmsg, bsmsg->ident);
     /* set the initial window title */
     bsmsg->type = SEND_NORMAL;
     sendmsg_window_set_title(bsmsg);

@@ -1,3 +1,8 @@
+2006-08-22  Pawel Salek
+
+	* src/sendmsg-window.c: set identity for compose, Peter's way.
+	* libbalsa/identity.c: do not try unreffing NULL when adding new ident.
+
 2006-08-14 13:07  PeterB
 
 	* src/sendmsg-window.c: restore setting identity in reply or

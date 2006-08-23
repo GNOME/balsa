@@ -1,3 +1,10 @@
+2006-08-23 09:49  PeterB
+
+	* src/: sendmsg-window.c, sendmsg-window.h: replace three gbooleans
+	with a state variable, and use it to simplify "message has been
+	modified" dialog.
+	* libbalsa/: body.c, files.c: check for NULL body.
+
 2006-08-22  Pawel Salek
 
 	* src/sendmsg-window.c: set identity for compose, Peter's way.

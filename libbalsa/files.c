@@ -249,6 +249,8 @@ libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu,
     GnomeVFSMimeApplication *def_app;
     GList *app_list;
     
+    g_return_if_fail(data != NULL);
+
     if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
         add_vfs_menu_item(menu, def_app, callback, data);
     }

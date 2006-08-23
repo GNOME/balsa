@@ -274,6 +274,12 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 gboolean
 libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 {
+    if (!body) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+                    "NULL message body");
+        return FALSE;
+    }
+
     if (body->temp_filename == NULL) {
 	gint count = 100; /* Magic number, same as in g_mkstemp. */
 

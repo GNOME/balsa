@@ -904,57 +904,42 @@ sw_delete_draft(BalsaSendmsg * bsmsg)
 }
 
 static gint
-delete_handler(BalsaSendmsg* bsmsg)
+delete_handler(BalsaSendmsg * bsmsg)
 {
     const gchar *tmp = gtk_entry_get_text(GTK_ENTRY(bsmsg->to[1]));
     gint reply;
     GtkWidget *d;
 
-    if(balsa_app.debug) printf("delete_event_cb\n");
-    if(bsmsg->modified) {
-	d = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
-                                   GTK_DIALOG_MODAL|
-                                   GTK_DIALOG_DESTROY_WITH_PARENT,
-                                   GTK_MESSAGE_QUESTION,
-                                   GTK_BUTTONS_YES_NO,
-                                   _("The message to '%s' is modified.\n"
-                                     "Save message to Draftbox?"),
-                                   tmp);
-        gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
+    if (balsa_app.debug)
+        printf("delete_event_cb\n");
 
-        gtk_dialog_add_button(GTK_DIALOG(d),
-                              GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
-	reply = gtk_dialog_run(GTK_DIALOG(d));
-        gtk_widget_destroy(d);
-	if (reply == GTK_RESPONSE_YES) {
-	    if(!message_postpone(bsmsg))
-                reply = GTK_RESPONSE_CANCEL;
-        } else if (reply == GTK_RESPONSE_NO
-                   && bsmsg->type != SEND_CONTINUE
-                   && bsmsg->auto_saved
-                   && !bsmsg->user_saved)
-            sw_delete_draft(bsmsg);
-	/* cancel action  when reply != "yes" or "no" */
-	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
-    } 
-   
-    if (bsmsg->auto_saved && !bsmsg->user_saved) {
-	d = gtk_message_dialog_new
-            (GTK_WINDOW(bsmsg->window),
-             GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT,
-             GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-             _("The message to '%s' was saved in Draftbox.\n"
-               "Remove message from Draftbox?"),
-             tmp);
-        gtk_dialog_add_button(GTK_DIALOG(d),
-                              GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+    if (bsmsg->state == SENDMSG_STATE_CLEAN)
+        return FALSE;
 
-	reply = gtk_dialog_run(GTK_DIALOG(d));
-        gtk_widget_destroy(d);
-	if (reply == GTK_RESPONSE_YES)
+    d = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_QUESTION,
+                               GTK_BUTTONS_YES_NO,
+                               _("The message to '%s' is modified.\n"
+                                 "Save message to Draftbox?"), tmp);
+    gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
+    gtk_dialog_add_button(GTK_DIALOG(d),
+                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+    reply = gtk_dialog_run(GTK_DIALOG(d));
+    gtk_widget_destroy(d);
+
+    switch (reply) {
+    case GTK_RESPONSE_YES:
+        if (bsmsg->state == SENDMSG_STATE_MODIFIED)
+            if (!message_postpone(bsmsg))
+                return TRUE;
+        break;
+    case GTK_RESPONSE_NO:
+        if (bsmsg->type != SEND_CONTINUE)
             sw_delete_draft(bsmsg);
-	/* cancel action  when reply != "yes" or "no" */
-	return (reply != GTK_RESPONSE_YES) && (reply != GTK_RESPONSE_NO);
+        break;
+    default:
+        return TRUE;
     }
 
     return FALSE;
@@ -3698,7 +3683,7 @@ sw_save_draft(BalsaSendmsg * bsmsg)
 				   balsa_app.expunge_on_close);
 	g_object_unref(G_OBJECT(bsmsg->draft_message));
     }
-    bsmsg->modified = FALSE;
+    bsmsg->state = SENDMSG_STATE_CLEAN;
 
     bsmsg->draft_message =
 	libbalsa_mailbox_get_message(balsa_app.draftbox,
@@ -3716,9 +3701,9 @@ sw_autosave_timeout_cb(BalsaSendmsg * bsmsg)
 {
     gdk_threads_enter();
 
-    if (bsmsg->modified) {
+    if (bsmsg->state == SENDMSG_STATE_MODIFIED) {
         if (sw_save_draft(bsmsg))
-            bsmsg->auto_saved = TRUE;
+            bsmsg->state = SENDMSG_STATE_AUTO_SAVED;
     }
 
     gdk_threads_leave();
@@ -4087,8 +4072,7 @@ sendmsg_window_new(GtkWidget *w)
     bsmsg->ident = balsa_app.current_ident;
     bsmsg->update_config = FALSE;
     bsmsg->quit_on_close = FALSE;
-    bsmsg->auto_saved = FALSE;
-    bsmsg->user_saved = FALSE;
+    bsmsg->state = SENDMSG_STATE_CLEAN;
 
     bsmsg->window = window = gnome_app_new("balsa", NULL);
     /*
@@ -4262,7 +4246,7 @@ bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
         !bsmsg->parent_message && !bsmsg->draft_message)
         libbalsa_mailbox_close(part->message->mailbox, FALSE);
     /* ...but mark it as unmodified. */
-    bsmsg->modified = FALSE;
+    bsmsg->state = SENDMSG_STATE_CLEAN;
     set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), part, bsmsg->type,
                          bsmsg->ident);
     libbalsa_message_body_unref(part->message);
@@ -5498,7 +5482,7 @@ static void
 save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
     if (sw_save_draft(bsmsg))
-        bsmsg->user_saved = TRUE;
+        bsmsg->state = SENDMSG_STATE_CLEAN;
 }
 
 static void
@@ -5557,7 +5541,7 @@ sw_buffer_changed(GtkTextBuffer * buffer, BalsaSendmsg * bsmsg)
         bsmsg->insert_mark = NULL;
     }
 
-    bsmsg->modified = TRUE;
+    bsmsg->state = SENDMSG_STATE_MODIFIED;
 }
 
 #if !HAVE_GTKSOURCEVIEW
@@ -5814,7 +5798,7 @@ reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     libbalsa_wrap_view(text_view, balsa_app.wraplength);
     sw_buffer_signals_unblock(bsmsg, buffer);
 
-    bsmsg->modified = TRUE;
+    bsmsg->state = SENDMSG_STATE_MODIFIED;
     gtk_text_view_scroll_to_mark(text_view,
 				 gtk_text_buffer_get_insert(buffer),
 				 0, FALSE, 0, 0);
@@ -6216,7 +6200,7 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
         }
     }
 
-    bsmsg->modified = FALSE;
+    bsmsg->state = SENDMSG_STATE_CLEAN;
 
     return bsmsg;
 }

@@ -36,6 +36,12 @@ extern "C" {
        SEND_CONTINUE           /* by Continue postponed  */
     } SendType;
 
+    typedef enum {
+        SENDMSG_STATE_CLEAN,
+        SENDMSG_STATE_MODIFIED,
+        SENDMSG_STATE_AUTO_SAVED
+    } SendmsgState;
+
 #if defined(ENABLE_TOUCH_UI)
 #define VIEW_MENU_LENGTH 4
 #else
@@ -96,10 +102,8 @@ extern "C" {
         gulong insert_text_sig_id;
         guint wrap_timeout_id;
         guint autosave_timeout_id;
-	gboolean auto_saved;
-	gboolean user_saved;
+        SendmsgState state;
         gulong identities_changed_id;
-	gboolean modified;
 	gboolean flow;          /* send format=flowed */ 
 	GtkWidget *flow_widget;
 	gboolean req_dispnotify; /* send a MDN */ 

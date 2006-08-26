@@ -183,6 +183,9 @@ libbalsa_message_finalize(GObject * object)
 static void
 lb_message_headers_extra_destroy(LibBalsaMessageHeaders * headers)
 {
+    if (!headers)
+	return;
+
     FREE_HEADER_LIST(headers->user_hdrs);
     headers->user_hdrs = NULL;
 

@@ -908,6 +908,9 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
     gpointer *entry;
     LibBalsaMailboxLocalInfo *info;
 
+    if (!message)
+        return;
+
     libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
                                    message);
 
@@ -1114,6 +1117,9 @@ lbm_local_prepare_msgno(LibBalsaMailboxLocal * local, guint msgno)
 
     message =
         libbalsa_mailbox_get_message((LibBalsaMailbox *) local, msgno);
+    if (!message)
+        return FALSE;
+
     libbalsa_mailbox_local_cache_message(local, msgno, message);
     g_object_unref(message);
 

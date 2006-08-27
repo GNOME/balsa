@@ -4017,6 +4017,10 @@ libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
 {
     gpointer *entry;
 
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    if (!mailbox->mindex || !message)
+        return;
+
     while (mailbox->mindex->len < msgno)
         g_ptr_array_add(mailbox->mindex, NULL);
 

@@ -1,3 +1,7 @@
+2006-08-27 16:35  PeterB
+
+	* libbalsa/: mailbox.c, mailbox_local.c: check for NULL message.
+
 2006-08-27  Pawel Salek
 
 	* libbalsa/address.c: gtk_tree_store not updated until

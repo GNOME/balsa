@@ -1,3 +1,11 @@
+2006-08-27  Pawel Salek
+
+	* libbalsa/address.c: gtk_tree_store not updated until
+	gtk_tree_model loses focus (gtk2-2.8.20). Force it.
+	* libbalsa/mailbox.c: ... gtk-2.8 should be smart enough to detect
+	visible cells - no reason to spent time hinting it (hinting's slow
+	on large mailboxes).
+
 2006-08-26 10:08  PeterB
 
 	* libbalsa/message.c: check for NULL headers.

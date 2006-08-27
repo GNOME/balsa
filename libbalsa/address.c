@@ -614,6 +614,9 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
     gboolean valid;
     GtkTreeIter iter;
 
+    /* make sure gtk_tree_model looses focus, otherwise the list does
+     * not get updated (gtk2-2.8.20) */
+    gtk_widget_grab_focus(entries[FULL_NAME]);
     /* FIXME: This problem should be solved in the VCard
        implementation in libbalsa: semicolons mess up how GnomeCard
        processes the fields, so disallow them and replace them

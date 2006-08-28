@@ -2379,6 +2379,10 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     gtk_widget_show(scroll);
     gtk_notebook_append_page(GTK_NOTEBOOK(info->window->notebook),
                              scroll, label);
+#if GTK_CHECK_VERSION(2, 10, 0)
+    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(info->window->notebook),
+                                     scroll, TRUE);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 
     /* change the page to the newly selected notebook item */
     page_num = gtk_notebook_page_num(GTK_NOTEBOOK

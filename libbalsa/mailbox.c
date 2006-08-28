@@ -2665,8 +2665,9 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     /* gtk2-2.3.5 can in principle do it  but we want to be sure.
      */
     g_return_if_fail(msgno<=libbalsa_mailbox_total_messages(lmm));
-#define GTK2_FETCHES_ONLY_VISIBLE_CELLS GTK_CHECK_VERSION(2,8,0)
-#if defined(GTK2_FETCHES_ONLY_VISIBLE_CELLS)
+    /* With gtk-2.8.0, we can finally use fixed-row-height model
+       without workarounds. */
+#if GTK_CHECK_VERSION(2,8,0)
     msg = lbm_get_index_entry(lmm, (GNode *) iter->user_data);
 #else 
     { GdkRectangle a, b, c, d; 

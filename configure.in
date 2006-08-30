@@ -410,6 +410,7 @@ if test "x$with_esmtp" != xno  ; then
     AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
 	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
 	         [Defined when libESMTP has TLS support.]),
+                 ,
 		 -lpthread)
     test "$with_esmtp" != yes && CPPFLAGS="$CPPFLAGS -I$with_esmtp/include"
 else
@@ -631,6 +632,9 @@ fi
 dnl datadir='${prefix}/share', so we must eval it or something. This works
 BALSA_STD_PREFIX=`eval "echo ${prefix}"`
 BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`
+dnl autoconf-2.60 leaves a literal "${prefix}" in BALSA_DATA_PREFIX, so
+dnl we clean it once more.
+BALSA_DATA_PREFIX=`eval "echo ${BALSA_DATA_PREFIX}"`
 AC_SUBST(BALSA_DATA_PREFIX)
 
 dnl Consolidate them!

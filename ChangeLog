@@ -1,4 +1,4 @@
-2006-09-01 11:13  PeterB
+2006-09-01  Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* libbalsa/message.c: collapse whitespace into a single space.
 

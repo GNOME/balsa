@@ -1,3 +1,7 @@
+2006-09-01 11:13  PeterB
+
+	* libbalsa/message.c: collapse whitespace into a single space.
+
 2006-08-30 07:55  PeterB
 
 	* configure.in: build with autoconf-2.60.

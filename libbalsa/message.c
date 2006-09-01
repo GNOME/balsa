@@ -268,25 +268,28 @@ libbalsa_message_body_charset(LibBalsaMessageBody * body)
     return libbalsa_message_body_charset(body->next);
 }
 
+/* UTF-8-aware header cleaning by Albrecht */
 static void
 canonize_header_value(gchar *value)
 {
-#if 0
-    /* there was some unclarity whether we should do it or not. So we
-       do not for now. */
-    int src, dst;
+    gchar *dptr = value;
 
-    /* canonize value: replace multiple spaces, tabs by single space */
-    for(src=dst=0; value[src]; src++) {
-        if( isspace((int)value[src])) {
-            value[dst] = ' ';
-            if(!isspace((int)value[src+1]))
-                dst++;
-        } else
-            value[dst++] = value[src];
+    while (*value) {
+        if (g_unichar_isspace(g_utf8_get_char(value))) {
+            *dptr++ = ' ';
+            do {
+                value = g_utf8_next_char(value);
+            } while (g_unichar_isspace(g_utf8_get_char(value)));
+        } else {
+            gint bytes = g_utf8_next_char(value) - value;
+
+            do {
+                *dptr++ = *value++;
+            } while (--bytes > 0);
+        }
     }
-    value[dst] = '\0';
-#endif
+
+    *dptr = '\0';
 }
 
 /* message_user_hdrs:
@@ -1033,8 +1036,8 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
     if (header) {
         message->subj =
             g_mime_utils_header_decode_text((unsigned char *) header);
-        canonize_header_value(message->subj);
 	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
+        canonize_header_value(message->subj);
     }
 
     header = g_mime_message_get_header(mime_msg, "Content-Length");
@@ -1178,6 +1181,7 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
         message->subj =
 	    g_mime_utils_header_decode_text((unsigned char *) value);
 	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
+        canonize_header_value(message->subj);
 #endif
     } else
     if (g_ascii_strcasecmp(name, "Date") == 0) {

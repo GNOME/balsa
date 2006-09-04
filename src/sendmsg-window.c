@@ -4957,7 +4957,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
     strip_chars(tmp, "\r\n");
-    LIBBALSA_MESSAGE_SET_SUBJECT(message, tmp);
+    libbalsa_message_set_subject(message, tmp);
+    g_free(tmp);
 
     message->headers->to_list =
         libbalsa_address_entry_get_list(LIBBALSA_ADDRESS_ENTRY(bsmsg->to[1]));

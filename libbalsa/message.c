@@ -276,10 +276,10 @@ canonize_header_value(gchar *value)
 
     while (*value) {
         if (g_unichar_isspace(g_utf8_get_char(value))) {
-            *dptr++ = ' ';
             do {
                 value = g_utf8_next_char(value);
             } while (g_unichar_isspace(g_utf8_get_char(value)));
+            *dptr++ = ' ';
         } else {
             gint bytes = g_utf8_next_char(value) - value;
 
@@ -886,9 +886,7 @@ libbalsa_message_get_subject(LibBalsaMessage* msg)
        msg->mime_msg && msg->mailbox) { /* a message in a mailbox... */
         g_return_val_if_fail(MAILBOX_OPEN(msg->mailbox), NULL);
         ret = g_mime_message_get_subject(msg->mime_msg);
-	if (ret)
-	    LIBBALSA_MESSAGE_SET_SUBJECT(msg, (gchar*)
-				 ret = g_mime_utils_header_decode_text(ret));
+        libbalsa_message_set_subject_from_header(msg, ret);
     } else
 	ret = msg->subj;
 
@@ -1033,12 +1031,7 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
 
 #ifdef MESSAGE_COPY_CONTENT
     header = g_mime_message_get_subject(mime_msg);
-    if (header) {
-        message->subj =
-            g_mime_utils_header_decode_text((unsigned char *) header);
-	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
-        canonize_header_value(message->subj);
-    }
+    libbalsa_message_set_subject_from_header(message, header);
 
     header = g_mime_message_get_header(mime_msg, "Content-Length");
     if (header)
@@ -1177,11 +1170,7 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	    return FALSE;
         }
 #if MESSAGE_COPY_CONTENT
-	g_free(message->subj);
-        message->subj =
-	    g_mime_utils_header_decode_text((unsigned char *) value);
-	libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
-        canonize_header_value(message->subj);
+        libbalsa_message_set_subject_from_header(message, value);
 #endif
     } else
     if (g_ascii_strcasecmp(name, "Date") == 0) {
@@ -1372,4 +1361,27 @@ libbalsa_message_copy(LibBalsaMessage * message, LibBalsaMailbox * dest,
     }
 
     return retval;
+}
+
+void
+libbalsa_message_set_subject(LibBalsaMessage * message,
+                             const gchar * subject)
+{
+    g_free(message->subj);
+    message->subj = g_strdup(subject);
+    libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
+    canonize_header_value(message->subj);
+}
+
+void
+libbalsa_message_set_subject_from_header(LibBalsaMessage * message,
+                                         const gchar * header)
+{
+    if (header) {
+        gchar *subject =
+            g_mime_utils_header_decode_text((const unsigned char *)
+                                            header);
+        libbalsa_message_set_subject(message, subject);
+        g_free(subject);
+    }
 }

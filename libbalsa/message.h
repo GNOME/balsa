@@ -191,8 +191,6 @@ struct _LibBalsaMessage {
 #else
 #define LIBBALSA_MESSAGE_GET_SUBJECT(m) libbalsa_message_get_subject(m)
 #endif
-#define LIBBALSA_MESSAGE_SET_SUBJECT(m,s) \
-        do { g_free((m)->subj); (m)->subj = (s); } while (0)
 
     /* replied message ID's */
     GList *references;
@@ -333,6 +331,10 @@ GMimeStream *libbalsa_message_get_part_by_id(LibBalsaMessage * message,
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     InternetAddress *ia);
 
+void libbalsa_message_set_subject(LibBalsaMessage * message,
+                                  const gchar * subject);
+void libbalsa_message_set_subject_from_header(LibBalsaMessage * message,
+                                              const gchar * header);
 /* use LIBBALSA_MESSAGE_GET_SUBJECT() macro, we may optimize this
    function out if we find a way.
 */

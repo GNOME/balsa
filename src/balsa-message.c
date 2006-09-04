@@ -2088,8 +2088,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
     message->headers->from = internet_address_parse_string(dummy);
     g_free (dummy);
     message->headers->date = time(NULL);
-    LIBBALSA_MESSAGE_SET_SUBJECT(message,
-                                 g_strdup("Message Disposition Notification"));
+    libbalsa_message_set_subject(message, "Message Disposition Notification");
     message->headers->to_list =
 	internet_address_list_prepend(NULL, for_msg->headers->
 		                      dispnotify_to->address);

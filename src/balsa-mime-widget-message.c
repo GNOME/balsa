@@ -315,8 +315,10 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     g_free(data);
 
     data = libbalsa_message_body_get_parameter(mime_body, "subject");
-    if (data)
-	LIBBALSA_MESSAGE_SET_SUBJECT(message, data);
+    if (data) {
+	libbalsa_message_set_subject(message, data);
+        g_free(data);
+    }
 
     data = libbalsa_message_body_get_parameter(mime_body, "server");
     message->headers->to_list = internet_address_parse_string(data);

@@ -315,6 +315,7 @@ libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
     LibBalsaMailboxIndexEntry *entry = g_new0(LibBalsaMailboxIndexEntry,1);
     entry->from          = get_from_field(msg);
     entry->subject       = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(msg));
+if (!g_utf8_validate(entry->subject, -1, NULL)) g_warning("invalid");
     entry->msg_date      = msg->headers->date;
     entry->internal_date = 0; /* FIXME */
     entry->status_icon   = libbalsa_get_icon_from_flags(msg->flags);

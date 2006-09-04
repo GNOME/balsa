@@ -1857,9 +1857,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 	libbalsa_message_set_headers_from_string(message, hdr);
     envelope        = imsg->envelope;
     message->length = imsg->rfc822size;
-    message->subj   =
-        g_mime_utils_header_decode_text((unsigned char *) envelope->subject);
-    libbalsa_utf8_sanitize(&message->subj, TRUE, NULL);
+    libbalsa_message_set_subject_from_header(message, envelope->subject);
     message->sender =
 	internet_address_new_list_from_imap_address_list(envelope->sender);
     libbalsa_message_set_in_reply_to_from_string(message,

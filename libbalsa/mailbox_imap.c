@@ -128,8 +128,7 @@ static LibBalsaMessage* libbalsa_mailbox_imap_get_message(LibBalsaMailbox*
 							  mailbox,
 							  guint msgno);
 static void libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox, 
-                                                    guint * msgnos,
-                                                    guint len);
+                                                    guint start);
 static gboolean libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *
                                                       mailbox,
                                                       LibBalsaMessage *
@@ -1899,8 +1898,8 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 }
 
 static void
-libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox *mailbox, 
-                                        guint * msgnos, guint len)
+libbalsa_mailbox_imap_prepare_threading(LibBalsaMailbox * mailbox,
+                                        guint start)
 {
     /* Nothing to do. */
 }

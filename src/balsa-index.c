@@ -2097,7 +2097,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     g_return_if_fail(mailbox != NULL);
 
     if (thtype != LB_MAILBOX_THREADING_FLAT) 
-        libbalsa_mailbox_prepare_threading(mailbox, NULL, 0);
+        libbalsa_mailbox_prepare_threading(mailbox, 0);
     libbalsa_mailbox_set_threading_type(mailbox, thtype);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));

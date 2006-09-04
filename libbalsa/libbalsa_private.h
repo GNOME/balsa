@@ -37,6 +37,7 @@ struct LibBalsaMailboxIndexEntry_ {
     unsigned short attach_icon;
     unsigned long size;
     unsigned unseen:1;
+    unsigned idle_pending:1;
 #define CACHE_UNSEEN_CHILD FALSE
 #if CACHE_UNSEEN_CHILD
     /* Code for managing this cached bit is incomplete; if calculating

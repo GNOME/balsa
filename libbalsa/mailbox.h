@@ -245,6 +245,9 @@ struct _LibBalsaMailbox {
 
     /* Whether the tree has been changed since some event. */
     gboolean msg_tree_changed;
+
+    /* Array of msgnos that need to be displayed. */
+    GArray *msgnos_pending;
 };
 
 /* Search iter */
@@ -268,8 +271,7 @@ struct _LibBalsaMailboxClass {
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox, GError **err);
     void (*close_mailbox) (LibBalsaMailbox * mailbox, gboolean expunge);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
-    void (*prepare_threading)(LibBalsaMailbox *mailbox, guint * msgnos,
-                              guint len);
+    void (*prepare_threading)(LibBalsaMailbox *mailbox, guint start);
     gboolean (*fetch_message_structure)(LibBalsaMailbox *mailbox,
                                         LibBalsaMessage * message,
                                         LibBalsaFetchFlag flags);
@@ -361,7 +363,7 @@ LibBalsaMessage *libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox,
     msgnos are related to currently set view.
 */
 void libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox,
-					guint * msgnos, guint len);
+					guint start);
 
 /** libbalsa_mailbox_fetch_message_structure() fetches detailed
     message structure for given message. It can also fetch all RFC822

@@ -62,8 +62,7 @@ static void lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                                          LibBalsaCondition *view_filter);
 
 static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox, 
-                                                     guint * msgnos,
-                                                     guint len);
+                                                     guint start);
 
 static gboolean libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *
                                                        mailbox,
@@ -1019,7 +1018,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
                 /* Get message info for all messages that weren't restored,
                  * so we can thread and sort them correctly before the
                  * mailbox is displayed. */
-                libbalsa_mailbox_prepare_threading(mailbox, NULL, total);
+                libbalsa_mailbox_prepare_threading(mailbox, total);
             libbalsa_mailbox_local_load_messages(mailbox, total);
         }
 
@@ -1148,45 +1147,36 @@ lbm_local_thread_idle(LibBalsaMailboxLocal * local)
     return FALSE;
 }
 
-/* The class method; prepare messages in the list, or if msgnos == NULL,
- * from len + 1 to the end of the mailbox. */
+/* The class method; prepare messages from start + 1 to the end of the
+ * mailbox. */
 static void
 libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
-                                         guint * msgnos, guint len)
+                                         guint start)
 {
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
     guint msgno;
     gboolean need_thread = FALSE;
+    gchar *text;
+    guint total;
+    LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
 
     libbalsa_mailbox_local_set_threading_info(local);
 
-    if (msgnos) {
-        while (len) {
-            if (lbm_local_prepare_msgno(local, *msgnos++))
-                need_thread = TRUE;
-            --len;
+    text = g_strdup_printf(_("Preparing %s"), mailbox->name);
+    total = libbalsa_mailbox_total_messages(mailbox);
+    libbalsa_progress_set_text(&progress, text, total - start);
+    g_free(text);
+
+    for (msgno = start + 1; msgno <= total; msgno++) {
+        if (lbm_local_prepare_msgno(local, msgno)) {
+            need_thread = TRUE;
+            libbalsa_progress_set_fraction(&progress,
+                                           ((gdouble) msgno) /
+                                           ((gdouble) (total - start)));
         }
-    } else {
-        gchar *text;
-        guint total;
-        LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
-
-        text = g_strdup_printf(_("Preparing %s"), mailbox->name);
-        total = libbalsa_mailbox_total_messages(mailbox);
-        libbalsa_progress_set_text(&progress, text, total - len);
-        g_free(text);
-
-        for (msgno = len + 1; msgno <= total; msgno++) {
-            if (lbm_local_prepare_msgno(local, msgno)) {
-                need_thread = TRUE;
-                libbalsa_progress_set_fraction(&progress,
-                                               ((gdouble) msgno) /
-                                               ((gdouble) (total - len)));
-            }
-        }
-
-        libbalsa_progress_set_text(&progress, NULL, 0);
     }
+
+    libbalsa_progress_set_text(&progress, NULL, 0);
 
     if (need_thread && !local->thread_id) {
         LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
@@ -2044,7 +2034,7 @@ libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox * mailbox)
     msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
 
     /* We need all the message-ids. */
-    libbalsa_mailbox_prepare_threading(mailbox, NULL, 0);
+    libbalsa_mailbox_prepare_threading(mailbox, 0);
 
     for (i = 0; i < local->threading_info->len; i++) {
         LibBalsaMailboxLocalInfo *info;

@@ -246,8 +246,10 @@ struct _LibBalsaMailbox {
     /* Whether the tree has been changed since some event. */
     gboolean msg_tree_changed;
 
+#ifdef BALSA_USE_THREADS
     /* Array of msgnos that need to be displayed. */
     GArray *msgnos_pending;
+#endif                          /* BALSA_USE_THREADS */
 };
 
 /* Search iter */

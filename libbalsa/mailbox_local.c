@@ -769,6 +769,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
     if (!entry || !info) {
         message = libbalsa_mailbox_get_message(mailbox, msgno);
         libbalsa_mailbox_local_cache_message(local, msgno, message);
+        libbalsa_mailbox_cache_message(mailbox, msgno, message);
         entry = g_ptr_array_index(mailbox->mindex, msgno-1);
         info  = g_ptr_array_index(local->threading_info, msgno - 1);
     }
@@ -909,9 +910,6 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
 
     if (!message)
         return;
-
-    libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
-                                   message);
 
     if (!local->threading_info)
         return;

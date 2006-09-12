@@ -322,7 +322,9 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
     entry->attach_icon   = libbalsa_message_get_attach_icon(msg);
     entry->size          = msg->length;
     entry->unseen        = LIBBALSA_MESSAGE_IS_UNREAD(msg);
+#ifdef BALSA_USE_THREADS
     entry->idle_pending  = 0;
+#endif                          /*BALSA_USE_THREADS */
 #if CACHE_UNSEEN_CHILD
     entry->has_unseen_child = 0; /* Find out after threading. */
 #endif /* CACHE_UNSEEN_CHILD */
@@ -336,6 +338,7 @@ libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
     return entry;
 }
 
+#ifdef BALSA_USE_THREADS
 static LibBalsaMailboxIndexEntry*
 lbm_index_entry_new_pending(void)
 {
@@ -343,12 +346,16 @@ lbm_index_entry_new_pending(void)
     entry->idle_pending = 1;
     return entry;
 }
+#endif                          /*BALSA_USE_THREADS */
 
 void
 libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry)
 {
     if(entry) {
-        if (!entry->idle_pending) {
+#ifdef BALSA_USE_THREADS
+        if (!entry->idle_pending)
+#endif                          /*BALSA_USE_THREADS */
+        {
             g_free(entry->from);
             g_free(entry->subject);
         }
@@ -403,10 +410,12 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->filters = NULL;
     mailbox->filters_loaded = FALSE;
 
+#ifdef BALSA_USE_THREADS
     if (mailbox->msgnos_pending) {
         g_array_free(mailbox->msgnos_pending, TRUE);
         mailbox->msgnos_pending = NULL;
     }
+#endif                          /*BALSA_USE_THREADS */
 
     /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
     mailbox->view = NULL;
@@ -1665,13 +1674,19 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
 LibBalsaMessage *
 libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
+    LibBalsaMessage *message;
+
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
     g_return_val_if_fail(msgno > 0 && msgno <=
                          libbalsa_mailbox_total_messages(mailbox), NULL);
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
-                                                            msgno);
+    libbalsa_lock_mailbox(mailbox);
+    message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
+                                                               msgno);
+    libbalsa_unlock_mailbox(mailbox);
+
+    return message;
 }
 
 void
@@ -2607,30 +2622,43 @@ libbalsa_size_to_gchar(glong length)
     return g_strdup(retsize);
 }
 
-static gboolean
-lbm_get_index_entry_idle(LibBalsaMailbox * mailbox)
+#ifdef BALSA_USE_THREADS
+/* Protects access to mailbox->msgnos_pending; may be locked 
+ * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE
+ * HOLDING IT. */
+static pthread_mutex_t get_index_entry_lock = PTHREAD_MUTEX_INITIALIZER;
+
+static void
+lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 {
-    guint i, len;
+    guint i;
 
-    libbalsa_lock_mailbox(mailbox);
-
-    for (i = 0, len = mailbox->msgnos_pending->len; i < len; i++) {
+#define DEBUG TRUE
+#if DEBUG
+    g_print("%s %s %d requested, ", __func__, mailbox->name,
+            mailbox->msgnos_pending->len);
+#endif
+    pthread_mutex_lock(&get_index_entry_lock);
+    for (i = 0; i < mailbox->msgnos_pending->len; i++) {
         guint msgno = g_array_index(mailbox->msgnos_pending, guint, i);
-        LibBalsaMessage *message =
-            libbalsa_mailbox_get_message(mailbox, msgno);
+        LibBalsaMessage *message;
 
+        pthread_mutex_unlock(&get_index_entry_lock);
+        message = libbalsa_mailbox_get_message(mailbox, msgno);
         libbalsa_mailbox_cache_message(mailbox, msgno, message);
         g_object_unref(message);
+        pthread_mutex_lock(&get_index_entry_lock);
     }
 
+#if DEBUG
+    g_print("%d processed\n", mailbox->msgnos_pending->len);
+#endif
     mailbox->msgnos_pending->len = 0;
-
-    libbalsa_unlock_mailbox(mailbox);
+    pthread_mutex_unlock(&get_index_entry_lock);
 
     g_object_unref(mailbox);
-
-    return FALSE;
 }
+#endif                          /*BALSA_USE_THREADS */
 
 static LibBalsaMailboxIndexEntry *
 lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
@@ -2642,22 +2670,40 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
     g_return_val_if_fail(msgno <= lmm->mindex->len, NULL);
 
     entry = g_ptr_array_index(lmm->mindex, msgno - 1);
+#ifdef BALSA_USE_THREADS
     if (entry)
         return entry->idle_pending ? NULL : entry;
 
+    pthread_mutex_lock(&get_index_entry_lock);
     if (!lmm->msgnos_pending)
         lmm->msgnos_pending = g_array_new(FALSE, FALSE, sizeof(guint));
 
     if (!lmm->msgnos_pending->len) {
+        pthread_t get_index_entry_thread;
+
         g_object_ref(lmm);
-        g_idle_add((GSourceFunc) lbm_get_index_entry_idle, lmm);
+        pthread_create(&get_index_entry_thread, NULL,
+                       (void *) lbm_get_index_entry_real, lmm);
+        pthread_detach(get_index_entry_thread);
     }
 
     g_array_append_val(lmm->msgnos_pending, msgno);
+    /* Make sure we have a "pending" index entry before releasing the
+     * lock. */
     g_ptr_array_index(lmm->mindex, msgno - 1) =
         lbm_index_entry_new_pending();
+    pthread_mutex_unlock(&get_index_entry_lock);
+#else                           /*BALSA_USE_THREADS */
+    if (!entry) {
+        LibBalsaMessage *message =
+            libbalsa_mailbox_get_message(lmm, msgno);
+        libbalsa_mailbox_cache_message(lmm, msgno, message);
+        g_object_unref(message);
+        entry = g_ptr_array_index(lmm->mindex, msgno - 1);
+    }
+#endif                          /*BALSA_USE_THREADS */
 
-    return NULL;
+    return entry;
 }
 
 gchar *libbalsa_mailbox_date_format;
@@ -2751,6 +2797,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
             tmp = libbalsa_size_to_gchar(msg->size);
             g_value_take_string(value, tmp);
         }
+        else g_value_set_static_string(value, "          ");
         break;
     case LB_MBOX_MESSAGE_COL:
         g_value_set_pointer(value, 
@@ -4050,8 +4097,10 @@ libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
     if (!entry)
         g_ptr_array_index(mailbox->mindex, msgno - 1) =
             libbalsa_mailbox_index_entry_new_from_msg(message);
+#if BALSA_USE_THREADS
     else if (entry->idle_pending)
         lbm_index_entry_populate_from_msg(entry, message);
+#endif                          /* BALSA_USE_THREADS */
     else
         return;
 

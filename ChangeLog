@@ -1,3 +1,7 @@
+2006-09-12 07:24  PeterB
+
+	* configure.in: remove spaces around '='.
+
 2006-09-11 20:29  PeterB
 
 	* libbalsa/: libbalsa_private.h, mailbox.c, mailbox.h,

@@ -1,3 +1,10 @@
+2006-09-11 20:29  PeterB
+
+	* libbalsa/: libbalsa_private.h, mailbox.c, mailbox.h,
+	mailbox_local.c: use a sub-thread instead of an idle-handler for
+	getting messages; lock mailbox in libbalsa_mailbox_get_message.
+	* configure.in: report version of gtkhtml-3.x.
+
 2006-09-04 00:32  PeterB
 
 	* libbalsa/libbalsa_private.h, libbalsa/mailbox.c,

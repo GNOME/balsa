@@ -769,21 +769,26 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
     if (!entry || !info) {
         message = libbalsa_mailbox_get_message(mailbox, msgno);
         libbalsa_mailbox_local_cache_message(local, msgno, message);
-        libbalsa_mailbox_cache_message(mailbox, msgno, message);
         entry = g_ptr_array_index(mailbox->mindex, msgno-1);
         info  = g_ptr_array_index(local->threading_info, msgno - 1);
     }
+
+    if (entry->idle_pending)
+        return FALSE;   /* Can't match. */
 
     switch (cond->type) {
     case CONDITION_STRING:
         if (CONDITION_CHKMATCH
             (cond, (CONDITION_MATCH_CC | CONDITION_MATCH_BODY))) {
-            message = libbalsa_mailbox_get_message(mailbox, msgno);
+            if (!message)
+                message = libbalsa_mailbox_get_message(mailbox, msgno);
             is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
             if (!is_refed) {
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
+                if (message)
+                    g_object_unref(message);
                 return FALSE;   /* We don't want to match if an error occurred */
             }
         }
@@ -841,8 +846,11 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
             GString *body;
             g_assert(is_refed);
-	    if (!message->mailbox)
+	    if (!message->mailbox) {
+                /* No need to body-unref */
+                g_object_unref(message);
 		return FALSE; /* We don't want to match if an error occurred */
+            }
             body =
                 content2reply(message->body_list, NULL, 
                               0, FALSE, FALSE, NULL, NULL);
@@ -876,6 +884,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             message_match_real(mailbox, msgno, cond->match.andor.left) ||
             message_match_real(mailbox, msgno, cond->match.andor.right);
         break;
+    /* To avoid warnings */
     case CONDITION_NONE:
         break;
     }
@@ -883,7 +892,6 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
         if(is_refed) libbalsa_message_body_unref(message);
         g_object_unref(message);
     }
-    /* To avoid warnings */
     return cond->negate ? !match : match;
 }
 static gboolean
@@ -899,6 +907,10 @@ libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
  * PS: called by mail_progress_notify_cb:
  * loads incrementally new messages, if any.
  *  Mailbox lock MUST BE HELD before calling this function.
+ *
+ *  Caches the message-id, references, and sender,
+ *  and passes the message to libbalsa_mailbox_cache_message for caching
+ *  other info.
  */
 void
 libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
@@ -910,6 +922,9 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
 
     if (!message)
         return;
+
+    libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
+                                   message);
 
     if (!local->threading_info)
         return;
@@ -1574,10 +1589,7 @@ static const gchar *
 lbml_get_subject(GNode * node, ThreadingInfo * ti)
 {
     guint msgno = GPOINTER_TO_UINT(((GNode *) node->data)->data);
-    return msgno <= ti->mailbox->mindex->len
-        && g_ptr_array_index(ti->mailbox->mindex, msgno - 1)
-        ? libbalsa_mailbox_msgno_get_subject(ti->mailbox, msgno)
-        : NULL;
+    return libbalsa_mailbox_msgno_get_subject(ti->mailbox, msgno);
 }
 
 static void

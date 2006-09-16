@@ -459,8 +459,6 @@ static void lbm_maildir_parse(LibBalsaMailboxMaildir * mdir,
 	    msg_info = g_new0(struct message_info, 1);
 	    g_hash_table_insert(messages_info, key, msg_info);
 	    g_ptr_array_add(msgno_2_msg_info, msg_info);
-            /* dummy entry in mindex for now */
-            g_ptr_array_add(mailbox->mindex, NULL);
 	    msg_info->key=key;
 	    msg_info->filename=g_strdup(filename);
 	    msg_info->flags = msg_info->orig_flags = flags;

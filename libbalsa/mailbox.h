@@ -650,7 +650,6 @@ typedef enum {
     LB_MBOX_SIZE_COL,
     LB_MBOX_WEIGHT_COL,
     LB_MBOX_STYLE_COL,
-    LB_MBOX_MESSAGE_COL,
     LB_MBOX_N_COLS
 } LibBalsaMailboxColumn;
 

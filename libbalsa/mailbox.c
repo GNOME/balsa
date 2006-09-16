@@ -363,13 +363,24 @@ libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry)
     }
 }
 
+#ifdef BALSA_USE_THREADS
+#  define VALID_ENTRY(entry) \
+    ((entry) && !((LibBalsaMailboxIndexEntry *) (entry))->idle_pending)
+#else                           /*BALSA_USE_THREADS */
+#  define VALID_ENTRY(entry) (entry)
+#endif                          /*BALSA_USE_THREADS */
+
 void
 libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
                                  unsigned msgno, LibBalsaMessageFlag f)
 {
-    LibBalsaMailboxIndexEntry *entry =
-        g_ptr_array_index(mailbox->mindex, msgno-1);
-    if(entry) {
+    LibBalsaMailboxIndexEntry *entry;
+
+    if (msgno > mailbox->mindex->len)
+        return;
+
+    entry = g_ptr_array_index(mailbox->mindex, msgno-1);
+    if (VALID_ENTRY(entry)) {
         entry->status_icon = 
             libbalsa_get_icon_from_flags(f);
         entry->unseen = f & LIBBALSA_MESSAGE_FLAG_NEW;
@@ -1120,6 +1131,9 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
     if (!libbalsa_threads_has_lock())
         g_warning("Thread is not holding gdk lock");
 
+    if (!mailbox->msg_tree)
+        return;
+
     if (iter->user_data == NULL)
         iter->user_data =
             g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
@@ -1290,9 +1304,12 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     decrease_post, &dt);
-    libbalsa_mailbox_index_entry_free(g_ptr_array_index(mailbox->mindex,
-                                                        seqno-1));
-    g_ptr_array_remove_index(mailbox->mindex, seqno-1);
+
+    if (seqno <= mailbox->mindex->len) {
+        libbalsa_mailbox_index_entry_free(g_ptr_array_index(mailbox->mindex,
+                                                            seqno - 1));
+        g_ptr_array_remove_index(mailbox->mindex, seqno - 1);
+    }
 
     mailbox->msg_tree_changed = TRUE;
 
@@ -2483,7 +2500,6 @@ mbox_model_init(GtkTreeModelIface *iface)
     mbox_model_col_type[LB_MBOX_SIZE_COL]    = G_TYPE_STRING;
     mbox_model_col_type[LB_MBOX_WEIGHT_COL]  = G_TYPE_UINT;
     mbox_model_col_type[LB_MBOX_STYLE_COL]   = G_TYPE_UINT;
-    mbox_model_col_type[LB_MBOX_MESSAGE_COL] = G_TYPE_POINTER;
 
     libbalsa_mbox_model_signals[ROW_CHANGED] =
         g_signal_lookup("row-changed",           GTK_TYPE_TREE_MODEL);
@@ -2666,8 +2682,11 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
     guint msgno = GPOINTER_TO_UINT(node->data);
     LibBalsaMailboxIndexEntry *entry;
 
-    g_return_val_if_fail(lmm->mindex != NULL, NULL);
-    g_return_val_if_fail(msgno <= lmm->mindex->len, NULL);
+    if (!lmm->mindex)
+        return NULL;
+
+    while (lmm->mindex->len < msgno )
+        g_ptr_array_add(lmm->mindex, NULL);
 
     entry = g_ptr_array_index(lmm->mindex, msgno - 1);
 #ifdef BALSA_USE_THREADS
@@ -2756,8 +2775,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
                                             b.y + b.height,
                                             &c.width, &c.height);
         c.width -= c.x; c.height -= c.y;
-        if (gdk_rectangle_intersect(&a, &c, &d)
-            || column == LB_MBOX_MESSAGE_COL)
+        if (gdk_rectangle_intersect(&a, &c, &d))
             msg = lbm_get_index_entry(lmm, (GNode *) iter->user_data);
         gtk_tree_path_free(path);
     }
@@ -2799,9 +2817,6 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         }
         else g_value_set_static_string(value, "          ");
         break;
-    case LB_MBOX_MESSAGE_COL:
-        g_value_set_pointer(value, 
-                            libbalsa_mailbox_get_message(lmm, msgno)); break;
     case LB_MBOX_WEIGHT_COL:
         g_value_set_uint(value, msg && msg->unseen
                          ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
@@ -3153,7 +3168,7 @@ mbox_compare_func(const SortTuple * a,
 	message_a = g_ptr_array_index(mbox->mindex, msgno_a - 1);
 	message_b = g_ptr_array_index(mbox->mindex, msgno_b - 1);
 
-	if (!(message_a && message_b))
+	if (!(VALID_ENTRY(message_a) && VALID_ENTRY(message_b)))
 	    return 0;
 
 	switch (mbox->view->sort_field) {
@@ -3188,6 +3203,19 @@ mbox_compare_func(const SortTuple * a,
  * We may not have the sort fields for all nodes, so we build an array
  * for only the nodes where we do have them.
  */
+static gboolean
+lbm_has_valid_index_entry(LibBalsaMailbox * mailbox, guint msgno)
+{
+    LibBalsaMailboxIndexEntry *entry;
+
+    if (msgno > mailbox->mindex->len)
+        return FALSE;
+
+    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+
+    return VALID_ENTRY(entry);
+}
+
 static void
 lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
 {
@@ -3219,7 +3247,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
         SortTuple sort_tuple;
         guint msgno = GPOINTER_TO_UINT(tmp_node->data);
 
-	if (can_sort_all || g_ptr_array_index(mbox->mindex, msgno - 1)) {
+	if (can_sort_all || lbm_has_valid_index_entry(mbox, msgno)) {
             /* We have the sort fields. */
             sort_tuple.offset = node_array->len;
             sort_tuple.node = tmp_node;
@@ -3243,7 +3271,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
 
         tmp_node = g_ptr_array_index(node_array, i);
         msgno = GPOINTER_TO_UINT(tmp_node->data);
-	if (can_sort_all || g_ptr_array_index(mbox->mindex, msgno - 1)) {
+	if (can_sort_all || lbm_has_valid_index_entry(mbox, msgno)) {
             /* This is one of the nodes we sorted: find out which one
              * goes here. */
             g_assert(j < sort_array->len);
@@ -3267,7 +3295,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
     i = j = 0;
     for (tmp_node = node; tmp_node; tmp_node = tmp_node->next) {
         guint msgno = GPOINTER_TO_UINT(tmp_node->data);
-        new_order[j] = sort_no || g_ptr_array_index(mbox->mindex, msgno - 1)
+        new_order[j] = sort_no || lbm_has_valid_index_entry(mbox, msgno)
             ? g_array_index(sort_array, SortTuple, i++).offset
             : j;
         j++;
@@ -3893,7 +3921,8 @@ libbalsa_mailbox_msgno_get_status(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxIndexEntry *entry =
         g_ptr_array_index(mailbox->mindex, msgno - 1);
-    return entry ? entry->status_icon : LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
+    return VALID_ENTRY(entry) ?
+        entry->status_icon : LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
 }
 
 const gchar *
@@ -3901,7 +3930,7 @@ libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxIndexEntry *entry =
         g_ptr_array_index(mailbox->mindex, msgno - 1);
-    return entry ? entry->subject : NULL;
+    return VALID_ENTRY(entry) ? entry->subject : NULL;
 }
 
 /* Update icons, but only if entry has been allocated. */
@@ -3916,7 +3945,7 @@ libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 	return;
 
     entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
-    if (!entry)
+    if (!VALID_ENTRY(entry))
 	return;
 
     attach_icon = libbalsa_message_get_attach_icon(message);
@@ -4086,23 +4115,29 @@ libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
     GtkTreeIter iter;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    if (!mailbox->mindex || !message)
+    if (!mailbox->mindex)
         return;
 
-    while (mailbox->mindex->len < msgno)
-        g_ptr_array_add(mailbox->mindex, NULL);
+    if (message) {
+        while (mailbox->mindex->len < msgno)
+            g_ptr_array_add(mailbox->mindex, NULL);
 
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+        entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
 
-    if (!entry)
-        g_ptr_array_index(mailbox->mindex, msgno - 1) =
-            libbalsa_mailbox_index_entry_new_from_msg(message);
+        if (!entry)
+            g_ptr_array_index(mailbox->mindex, msgno - 1) =
+                libbalsa_mailbox_index_entry_new_from_msg(message);
 #if BALSA_USE_THREADS
-    else if (entry->idle_pending)
-        lbm_index_entry_populate_from_msg(entry, message);
+        else if (entry->idle_pending)
+            lbm_index_entry_populate_from_msg(entry, message);
 #endif                          /* BALSA_USE_THREADS */
-    else
-        return;
+        else
+            return;
+    } else if (msgno <= mailbox->mindex->len) {
+        libbalsa_mailbox_index_entry_free(g_ptr_array_index
+                                          (mailbox->mindex, msgno - 1));
+        g_ptr_array_index(mailbox->mindex, msgno - 1) = NULL;
+    }
 
     iter.user_data = NULL;
     gdk_threads_enter();

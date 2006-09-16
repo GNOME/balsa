@@ -713,10 +713,12 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
 {
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeIter iter;
-    LibBalsaMessage *message = NULL;
+    guint msgno;
+    LibBalsaMessage *message;
 
     gtk_tree_model_get_iter(model, &iter, path);
-    gtk_tree_model_get(model, &iter, LB_MBOX_MESSAGE_COL, &message, -1);
+    gtk_tree_model_get(model, &iter, LB_MBOX_MSGNO_COL, &msgno, -1);
+    message = libbalsa_mailbox_get_message(LIBBALSA_MAILBOX(model), msgno);
     g_return_if_fail(message);
     /* activate a message means open a message window,
      * unless we're in the draftbox, in which case it means open
@@ -1007,8 +1009,8 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
 
     gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
 	               LB_MBOX_MSGNO_COL,   &msgno,
-		       LB_MBOX_MESSAGE_COL, &message,
 		       -1);
+    message = libbalsa_mailbox_get_message(mailbox, msgno);
 
     if (balsa_app.expand_tree
         || (balsa_app.expand_to_new_unread
@@ -1567,9 +1569,11 @@ balsa_index_selected_list_func(GtkTreeModel * model, GtkTreePath * path,
                         GtkTreeIter * iter, gpointer data)
 {
     GList **list = data;
-    LibBalsaMessage *message = NULL;
+    guint msgno;
+    LibBalsaMessage *message;
 
-    gtk_tree_model_get(model, iter, LB_MBOX_MESSAGE_COL, &message, -1);
+    gtk_tree_model_get(model, iter, LB_MBOX_MSGNO_COL, &msgno, -1);
+    message = libbalsa_mailbox_get_message(LIBBALSA_MAILBOX(model), msgno);
     *list = g_list_prepend(*list, message);
 }
 

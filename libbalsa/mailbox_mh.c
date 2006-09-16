@@ -381,8 +381,6 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh, gboolean add_msg_info)
 		g_hash_table_insert(mh->messages_info,
 				    GINT_TO_POINTER(fileno), msg_info);
 		g_ptr_array_add(mh->msgno_2_msg_info, msg_info);
-                /* dummy entry in mindex for now */
-                g_ptr_array_add(LIBBALSA_MAILBOX(mh)->mindex, NULL);
 		msg_info->fileno = fileno;
 	    }
 	    msg_info->orig_flags = delete_flag;

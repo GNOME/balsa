@@ -788,15 +788,11 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 		g_free(msgid);
 		g_ptr_array_index(mimap->msgids, i) = NULL;
 	    }
-	    libbalsa_mailbox_index_entry_free(g_ptr_array_index(mailbox->mindex,
-                                                        i));
-	    g_ptr_array_index(mailbox->mindex, i) = NULL;
-	    libbalsa_mailbox_msgno_changed(mailbox, i+1);
+            libbalsa_mailbox_cache_message(mailbox, i + 1, NULL);
         }
 	for(i=mimap->messages_info->len; i>cnt; i--) {
 	    g_array_remove_index(mimap->messages_info, i-1);
 	    g_ptr_array_remove_index(mimap->msgids, i-1);
-	    /* msgno_remove will modify mailbox->mindex */
 	    libbalsa_mailbox_msgno_removed(mailbox, i);
 	}
     } 
@@ -811,8 +807,6 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     for(i=mimap->messages_info->len+1; i <= cnt; i++) {
         g_array_append_val(mimap->messages_info, a);
         g_ptr_array_add(mimap->msgids, NULL);
-        /* dummy entry in mindex for now */
-        g_ptr_array_add(mailbox->mindex, NULL);
         libbalsa_mailbox_msgno_inserted(mailbox, i, mailbox->msg_tree,
                                         &sibling);
     }
@@ -1011,8 +1005,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
 	struct message_info a = {0};
 	g_array_append_val(mimap->messages_info, a);
 	g_ptr_array_add(mimap->msgids, NULL);
-        /* dummy entry in mindex for now */
-        g_ptr_array_add(mailbox->mindex, NULL);
     }
     icm = g_object_get_data(G_OBJECT(mailbox), "cache-manager");
     if (icm) {

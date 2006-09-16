@@ -2257,44 +2257,57 @@ bw_notebook_label_notify(LibBalsaMailbox * mailbox, GtkLabel * lab)
 }
 
 static GtkWidget *
-balsa_notebook_label_new (BalsaMailboxNode* mbnode)
+balsa_notebook_label_new(BalsaMailboxNode * mbnode)
 {
-       GtkWidget *close_pix;
-       GtkWidget *box = gtk_hbox_new(FALSE, 4);
-       GtkWidget *lab = gtk_label_new(mbnode->mailbox->name);
-       GtkWidget *but = gtk_button_new();
-       GtkWidget *ev = gtk_event_box_new();
+    GtkWidget *close_pix;
+    GtkWidget *box = gtk_hbox_new(FALSE, 4);
+    GtkWidget *lab = gtk_label_new(mbnode->mailbox->name);
+    GtkWidget *but = gtk_button_new();
+    GtkWidget *ev = gtk_event_box_new();
+    GtkRcStyle *rcstyle;
+    GtkSettings *settings;
+    gint w, h;
 
-       gtk_event_box_set_visible_window(GTK_EVENT_BOX(ev), FALSE);
+    gtk_event_box_set_visible_window(GTK_EVENT_BOX(ev), FALSE);
 
     bw_notebook_label_style(GTK_LABEL(lab),
-			    libbalsa_mailbox_get_unread(mbnode->mailbox) > 0);
+                            libbalsa_mailbox_get_unread(mbnode->mailbox) > 0);
     g_signal_connect(mbnode->mailbox, "changed",
-		     G_CALLBACK(bw_mailbox_changed), lab);
+                     G_CALLBACK(bw_mailbox_changed), lab);
     g_object_weak_ref(G_OBJECT(lab), (GWeakNotify) bw_notebook_label_notify,
-		      mbnode->mailbox);
+                      mbnode->mailbox);
 
-       close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
-                                            GTK_ICON_SIZE_BUTTON);
-       g_signal_connect(G_OBJECT(but), "size-request",
-                        G_CALLBACK(mailbox_tab_size_request), NULL);
+    close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
+                                         GTK_ICON_SIZE_MENU);
 
-       gtk_button_set_relief(GTK_BUTTON (but), GTK_RELIEF_NONE);
-       gtk_container_add(GTK_CONTAINER (but), close_pix);
+    rcstyle = gtk_rc_style_new();
+    rcstyle->xthickness = rcstyle->ythickness = 0;
+    gtk_widget_modify_style(but, rcstyle);
+    gtk_rc_style_unref(rcstyle);
 
-       gtk_box_pack_start(GTK_BOX (box), lab, TRUE, TRUE, 0);
-       gtk_box_pack_start(GTK_BOX (box), but, FALSE, FALSE, 0);
-       gtk_widget_show_all(box);
-       gtk_container_add(GTK_CONTAINER(ev), box);
+    settings = gtk_widget_get_settings(GTK_WIDGET(lab));
+    gtk_icon_size_lookup_for_settings(settings, GTK_ICON_SIZE_MENU, &w, &h);
+    gtk_widget_set_size_request(but, w + 2, h + 2);
 
-       g_signal_connect(G_OBJECT (but), "clicked", 
-                        G_CALLBACK(mailbox_tab_close_cb), mbnode);
+    g_signal_connect(G_OBJECT(but), "size-request",
+                     G_CALLBACK(mailbox_tab_size_request), NULL);
 
-       gtk_tooltips_set_tip(balsa_app.tooltips, 
-			    ev,
-			    mbnode->mailbox->url,
-			    mbnode->mailbox->url);       
-       return ev;
+    gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
+    gtk_container_add(GTK_CONTAINER(but), close_pix);
+
+    gtk_box_pack_start(GTK_BOX(box), lab, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(box), but, FALSE, FALSE, 0);
+    gtk_widget_show_all(box);
+    gtk_container_add(GTK_CONTAINER(ev), box);
+
+    g_signal_connect(G_OBJECT(but), "clicked",
+                     G_CALLBACK(mailbox_tab_close_cb), mbnode);
+
+    gtk_tooltips_set_tip(balsa_app.tooltips,
+                         ev,
+                         mbnode->mailbox->url,
+                         mbnode->mailbox->url);
+    return ev;
 }
 
 struct bw_open_mbnode_info {

@@ -1,3 +1,17 @@
+2006-09-15 21:17  PeterB
+
+	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,
+	libbalsa/mailbox_local.c, libbalsa/mailbox_maildir.c,
+	libbalsa/mailbox_mh.c, src/balsa-index.c: check
+	LibBalsaMailboxIndexEntry for pending idle call; defer adding
+	entries to LibBalsaMailbox::mindex, and modify it only in
+	mailbox.c; drop LB_MBOX_MESSAGE_COL, and use
+	libbalsa_mailbox_get_message instead.
+	* libbalsa/mailbox_mbox.c: do not relocate message_info structures,
+	so we can make msg_info->message a weak pointer; access them with a
+	GPtrArray; do not modify LibBalsaMailbox::mindex.
+	* src/main-window.c: more moderate close-icon on notbook tab.
+
 2006-09-12 07:24  PeterB
 
 	* configure.in: remove spaces around '='.

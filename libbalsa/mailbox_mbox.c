@@ -116,7 +116,7 @@ struct _LibBalsaMailboxMboxClass {
 struct _LibBalsaMailboxMbox {
     LibBalsaMailboxLocal parent;
 
-    GArray* messages_info;
+    GPtrArray *msgno_2_msg_info;
     GMimeStream *gmime_stream;
     gint size;
     gboolean messages_info_changed;
@@ -275,28 +275,34 @@ lbm_mbox_seek_to_message(LibBalsaMailboxMbox * mbox, off_t offset)
     return retval;
 }
 
+static struct message_info *
+message_info_from_msgno(LibBalsaMailboxMbox * mbox, guint msgno)
+{
+    g_assert(msgno > 0 && msgno <= mbox->msgno_2_msg_info->len);
+
+    return (struct message_info *) g_ptr_array_index(mbox->
+                                                     msgno_2_msg_info,
+                                                     msgno - 1);
+}
+
 static GMimeStream *
-libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *mailbox,
+libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox * mailbox,
                                          guint msgno)
 {
-	GMimeStream *stream = NULL;
-	struct message_info *msg_info;
-	LibBalsaMailboxMbox *mbox;
+    LibBalsaMailboxMbox *mbox;
+    struct message_info *msg_info;
 
-	g_return_val_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
 
-	mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+    mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
+    msg_info = message_info_from_msgno(mbox, msgno);
 
-	msg_info = &g_array_index(mbox->messages_info,
-				  struct message_info, msgno - 1);
-	if (!lbm_mbox_seek_to_message(mbox, msg_info->start))
-	    return NULL;
-	stream = g_mime_stream_substream(mbox->gmime_stream,
-					 msg_info->start
-					 + msg_info->from_len,
-					 msg_info->end);
+    if (!msg_info || !lbm_mbox_seek_to_message(mbox, msg_info->start))
+        return NULL;
 
-	return stream;
+    return g_mime_stream_substream(mbox->gmime_stream,
+                                   msg_info->start + msg_info->from_len,
+                                   msg_info->end);
 }
 
 static void
@@ -388,10 +394,25 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
 
     filename = lbm_mbox_get_cache_filename(mbox);
 
-    if (mbox->messages_info->len > 0) {
+    if (mbox->msgno_2_msg_info->len > 0) {
+        GArray *messages_info =
+            g_array_sized_new(FALSE, FALSE, sizeof(struct message_info), 
+                              mbox->msgno_2_msg_info->len);
+        guint msgno;
+#if !GLIB_CHECK_VERSION(2, 8, 0) || defined(__APPLE__)
+        gchar *template;
+        gint fd;
+#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
+
+        for (msgno = 1; msgno <= mbox->msgno_2_msg_info->len; msgno++) {
+            struct message_info *msg_info =
+                message_info_from_msgno(mbox, msgno);
+            g_array_append_val(messages_info, *msg_info);
+        }
+
 #if GLIB_CHECK_VERSION(2, 8, 0) && !defined(__APPLE__)
-        if (!g_file_set_contents(filename, mbox->messages_info->data,
-                                 mbox->messages_info->len
+        if (!g_file_set_contents(filename, messages_info->data,
+                                 messages_info->len
                                  * sizeof(struct message_info), &err)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Could not write file %s: %s"),
@@ -399,21 +420,19 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             g_error_free(err);
         }
 #else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
-        gchar *template;
-        gint fd;
-
         template = g_strconcat(filename, ":XXXXXX", NULL);
         fd = g_mkstemp(template);
-        if (fd < 0 || write(fd, mbox->messages_info->data,
-                            mbox->messages_info->len *
+        if (fd < 0 || write(fd, messages_info->data,
+                            messages_info->len *
                             sizeof(struct message_info)) <
-            (ssize_t) mbox->messages_info->len) {
+            (ssize_t) messages_info->len) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Failed to create temporary file "
                                    "\"%s\": %s"), template,
                                  strerror(errno));
             g_free(template);
             g_free(filename);
+            g_array_free(messages_info, TRUE);
             return;
         }
         if (close(fd) != 0
@@ -425,6 +444,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
                                  filename, strerror(errno), template);
         g_free(template);
 #endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
+        g_array_free(messages_info, TRUE);
     } else if (unlink(filename) < 0)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Could not unlink file %s: %s"),
@@ -434,7 +454,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
 #ifdef DEBUG
     g_print("%s:    %s    saved %d messages\n", __func__, 
             LIBBALSA_MAILBOX(mbox)->name,
-            mbox->messages_info->len);
+            mbox->msgno_2_msg_info->len);
 #endif
 }
 
@@ -448,7 +468,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     GMimeParser *gmime_parser;
     struct message_info msg_info;
     struct message_info * msg_info_p = &msg_info;
-    unsigned msgno = mbox->messages_info->len;
+    unsigned msgno = mbox->msgno_2_msg_info->len;
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
     g_mime_parser_set_scan_from(gmime_parser, TRUE);
@@ -494,16 +514,15 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
             continue;
 
         msg_info.flags = msg_info.orig_flags;
-        g_array_append_val(mbox->messages_info, msg_info);
+        g_ptr_array_add(mbox->msgno_2_msg_info,
+                        g_memdup(&msg_info, sizeof(msg_info)));
         mbox->messages_info_changed = TRUE;
 
         msg->flags = msg_info.orig_flags;
         msg->length = msg_info.end - (msg_info.start + msg_info.from_len);
         msg->mailbox = LIBBALSA_MAILBOX(mbox);
         msg->msgno = ++msgno;
-        g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, 
-                        libbalsa_mailbox_index_entry_new_from_msg(msg));
-
+        libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(mbox), msgno, msg);
         libbalsa_mailbox_local_cache_message(local, msgno, msg);
 
         g_object_unref(msg);
@@ -514,38 +533,29 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 }
 
 static void
-mbox_msg_unref(gpointer data, GObject *msg)
-{
-    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(data);
-    unsigned msgno = LIBBALSA_MESSAGE(msg)->msgno;
-    struct message_info *msg_info =
-	&g_array_index(mbox->messages_info, struct message_info, msgno - 1);
-    msg_info->message = NULL;
-}
-
-static void
 free_message_info(struct message_info *msg_info)
 {
     if (msg_info->message) {
-	g_object_weak_unref(G_OBJECT(msg_info->message), mbox_msg_unref,
-			    msg_info->message->mailbox);
 	msg_info->message->mailbox = NULL;
 	msg_info->message->msgno   = 0;
+        g_object_remove_weak_pointer(G_OBJECT(msg_info->message),
+                                     (gpointer) & msg_info->message);
 	msg_info->message = NULL;
     }
 }
 
 static void
-free_messages_info(GArray * messages_info)
+free_messages_info(GPtrArray * msgno_2_msg_info)
 {
     guint i;
 
-    for (i = 0; i < messages_info->len; i++) {
-	struct message_info *msg_info =
-	    &g_array_index(messages_info, struct message_info, i);
-	free_message_info(msg_info);
+    for (i = 0; i < msgno_2_msg_info->len; i++) {
+        struct message_info *msg_info =
+            g_ptr_array_index(msgno_2_msg_info, i);
+        free_message_info(msg_info);
+        g_free(msg_info);
     }
-    g_array_free(messages_info, TRUE);
+    g_ptr_array_free(msgno_2_msg_info, TRUE);
 }
 
 static void
@@ -604,12 +614,10 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
             && !lbm_mbox_seek_to_message(mbox, msg_info->end))
             /* Error: no message following this one. */
             break;
-        /* dummy entry in mindex for now */
-        g_ptr_array_add(LIBBALSA_MAILBOX(mbox)->mindex, NULL);
+        g_ptr_array_add(mbox->msgno_2_msg_info,
+                        g_memdup(msg_info, sizeof *msg_info));
     } while (++msg_info < (struct message_info *) (contents + length));
 
-    g_array_append_vals(mbox->messages_info, contents,
-                        msg_info - (struct message_info *) contents);
 #ifdef DEBUG
     g_print("%s: %s restored %zd messages\n", __func__,
             LIBBALSA_MAILBOX(mbox)->name,
@@ -694,8 +702,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     mbox->gmime_stream = gmime_stream;
 
-    mbox->messages_info =
-	g_array_new(FALSE, FALSE, sizeof(struct message_info));
+    mbox->msgno_2_msg_info = g_ptr_array_new();
 
     mailbox->unread_messages = 0;
     time(&t0);
@@ -1003,7 +1010,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
      * we first check one byte beyond the end of the last message: */
     start = mbox->size + 1;
 
-    while ((msgno = mbox->messages_info->len) > 0) {
+    while ((msgno = mbox->msgno_2_msg_info->len) > 0) {
 	off_t offset;
         struct message_info *msg_info;
 
@@ -1013,8 +1020,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
             break;
 
 	/* Back up over this message and try again. */
-        msg_info = &g_array_index(mbox->messages_info, struct message_info,
-                                  msgno - 1);
+        msg_info = message_info_from_msgno(mbox, msgno);
         start = msg_info->start;
 
         if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
@@ -1033,14 +1039,14 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
         g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET);
 
         free_message_info(msg_info);
-        g_array_remove_index(mbox->messages_info, msgno - 1);
+        g_ptr_array_remove_index(mbox->msgno_2_msg_info, msgno - 1);
         mbox->messages_info_changed = TRUE;
     }
     if(msgno == 0)
         g_mime_stream_seek(mbox_stream, 0, GMIME_STREAM_SEEK_SET);
 #ifdef DEBUG
     g_print("%s: start parsing at msgno %d of %d\n", __func__, msgno,
-            mbox->messages_info->len);
+            mbox->msgno_2_msg_info->len);
 #endif
     parse_mailbox(mbox);
     mbox->size = g_mime_stream_tell(mbox_stream);
@@ -1056,9 +1062,9 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     guint len;
 
-    len = mbox->messages_info->len;
+    len = mbox->msgno_2_msg_info->len;
     libbalsa_mailbox_mbox_sync(mailbox, expunge);
-    if (mbox->messages_info->len != len)
+    if (mbox->msgno_2_msg_info->len != len)
         libbalsa_mailbox_changed(mailbox);
 
     if (mbox->gmime_stream) {
@@ -1071,8 +1077,8 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
                                                             expunge);
 
     /* Now it's safe to free the message info. */
-    free_messages_info(mbox->messages_info);
-    mbox->messages_info = NULL;
+    free_messages_info(mbox->msgno_2_msg_info);
+    mbox->msgno_2_msg_info = NULL;
 }
 
 static GMimeMessage *
@@ -1364,7 +1370,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
      */
     libbalsa_mailbox_mbox_check(mailbox);
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
-    if (mbox->messages_info->len == 0)
+    if (mbox->msgno_2_msg_info->len == 0)
 	return TRUE;
     mbox_stream = mbox->gmime_stream;
 
@@ -1388,12 +1394,11 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
      * missing either status header, to reduce the chances of multiple
      * rewrites.
      */
-    messages = mbox->messages_info->len;
+    messages = mbox->msgno_2_msg_info->len;
     first = -1;
     for (i = j = 0; i < messages; i++)
     {
-	msg_info = &g_array_index(mbox->messages_info,
-		       struct message_info, i);
+	msg_info = message_info_from_msgno(mbox, i + 1);
 	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
 	    msg_info->flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
@@ -1437,8 +1442,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     if (first < 0)
 	first = i; 
     /* where to start overwriting */
-    offset =
-	g_array_index(mbox->messages_info, struct message_info, first).start;
+    offset = message_info_from_msgno(mbox, first + 1)->start;
 
     /* Create a temporary file to write the new version of the mailbox in. */
     i = g_file_open_tmp("balsa-tmp-mbox-XXXXXX", &tempfile, &error);
@@ -1454,8 +1458,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     for (i = first; i < messages; i++) {
 	guint status_len, x_status_len;
 
-	msg_info = &g_array_index(mbox->messages_info,
-				  struct message_info, i);
+	msg_info = message_info_from_msgno(mbox, i + 1);
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    continue;
 
@@ -1580,14 +1583,13 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     if (mailbox->state == LB_MAILBOX_STATE_CLOSING) {
 	/* Just shorten the msg_info array. */
-	for (j = first; j < mbox->messages_info->len; ) {
-	    msg_info = &g_array_index(mbox->messages_info,
-				      struct message_info, j);
+	for (j = first; j < mbox->msgno_2_msg_info->len; ) {
+	    msg_info = message_info_from_msgno(mbox, j + 1);
 	    if (expunge &&
 		(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	        libbalsa_mailbox_local_msgno_removed(mailbox, j + 1);
 		free_message_info(msg_info);
-		g_array_remove_index(mbox->messages_info, j);
+		g_ptr_array_remove_index(mbox->msgno_2_msg_info, j);
                 mbox->messages_info_changed = TRUE;
 	    } else
 		j++;
@@ -1611,12 +1613,11 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
                                    "^Status|^X-Status|^MIME-Version",
 				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info);
-    for (j = first; j < mbox->messages_info->len; ) {
+    for (j = first; j < mbox->msgno_2_msg_info->len; ) {
 	GMimeMessage *mime_msg;
         gchar *from;
 
-	msg_info =
-	    &g_array_index(mbox->messages_info, struct message_info, j);
+	msg_info = message_info_from_msgno(mbox, j + 1);
 	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	    /* We must drop the mime-stream lock to call
 	     * libbalsa_mailbox_local_msgno_removed(), as it will grab
@@ -1629,7 +1630,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    libbalsa_mime_stream_shared_lock(mbox_stream);
 	    g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET);
 	    free_message_info(msg_info);
-	    g_array_remove_index(mbox->messages_info, j);
+	    g_ptr_array_remove_index(mbox->msgno_2_msg_info, j);
             mbox->messages_info_changed = TRUE;
 	    continue;
 	}
@@ -1669,7 +1670,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	}
     }
     libbalsa_mime_stream_shared_unlock(mbox_stream);
-    mbox->messages_info->len = j;
+    mbox->msgno_2_msg_info->len = j;
     g_object_unref(gmime_parser);
     lbm_mbox_save(mbox);
 
@@ -1683,15 +1684,15 @@ lbm_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     struct message_info *msg_info;
     LibBalsaMessage *message;
 
-    msg_info = &g_array_index(mbox->messages_info, struct message_info,
-                              msgno - 1);
+    msg_info = message_info_from_msgno(mbox, msgno);
 
     message = msg_info->message;
     if (message)
         return g_object_ref(message);
 
     msg_info->message = message = libbalsa_message_new();
-    g_object_weak_ref(G_OBJECT(message), mbox_msg_unref, mbox);
+    g_object_add_weak_pointer(G_OBJECT(message),
+                              (gpointer) & msg_info->message);
 
     message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
     message->mailbox = mailbox;
@@ -1706,8 +1707,7 @@ lbm_mbox_load_message(LibBalsaMailboxLocal * local, guint msgno,
                       LibBalsaMessage ** msg)
 {
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(local);
-    struct message_info *msg_info =
-        &g_array_index(mbox->messages_info, struct message_info, msgno - 1);
+    struct message_info *msg_info = message_info_from_msgno(mbox, msgno);
 
     if (msg_info->message)
         *msg = g_object_ref(msg_info->message);
@@ -2000,8 +2000,7 @@ libbalsa_mailbox_mbox_messages_change_flags(LibBalsaMailbox * mailbox,
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
         struct message_info *msg_info =
-            &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
-                           struct message_info, msgno - 1);
+            message_info_from_msgno(LIBBALSA_MAILBOX_MBOX(mailbox), msgno);
         LibBalsaMessageFlag old_flags = msg_info->flags;
         gboolean was_unread_undeleted, is_unread_undeleted;
 
@@ -2042,8 +2041,7 @@ libbalsa_mailbox_mbox_msgno_has_flags(LibBalsaMailbox * mailbox,
                                       LibBalsaMessageFlag unset)
 {
     struct message_info *msg_info =
-        &g_array_index(LIBBALSA_MAILBOX_MBOX(mailbox)->messages_info,
-                       struct message_info, msgno - 1);
+        message_info_from_msgno(LIBBALSA_MAILBOX_MBOX(mailbox), msgno);
 
     return (msg_info->flags & set) == set
         && (msg_info->flags & unset) == 0;
@@ -2054,7 +2052,7 @@ libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxMbox *mbox = (LibBalsaMailboxMbox *) mailbox;
 
-    return mbox->messages_info ? mbox->messages_info->len : 0;
+    return mbox->msgno_2_msg_info ? mbox->msgno_2_msg_info->len : 0;
 }
 
 #if BALSA_USE_THREADS

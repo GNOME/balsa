@@ -3279,11 +3279,11 @@ message_part_get_subject(LibBalsaMessageBody *part)
    Specifying type explicitly allows for later message quoting when
    eg. a new message is composed.
 */
-    
+typedef enum { QUOTE_HEADERS, QUOTE_ALL, QUOTE_NOPREFIX } QuoteType;
 static GString *
 quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
            const gchar *message_id, GList *references,
-           LibBalsaMessageBody *root, SendType type)
+           LibBalsaMessageBody *root, QuoteType qtype)
 {
     GString *body;
     gchar *str, *date = NULL;
@@ -3306,7 +3306,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
         date = libbalsa_message_headers_date_to_utf8(headers,
                                                      balsa_app.date_string);
 
-    if (type == SEND_FORWARD_ATTACH) {
+    if (qtype == QUOTE_HEADERS) {
 	gchar *subject;
 
 	str = g_strdup_printf(_("------forwarded message from %s------\n"), 
@@ -3362,15 +3362,12 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 	    g_string_append_c(body, '\n');
 	}
     } else {
-        gboolean quoted = (bsmsg->type == SEND_REPLY ||
-                           bsmsg->type == SEND_REPLY_ALL ||
-                           bsmsg->type == SEND_REPLY_GROUP);
 	if (date)
 	    str = g_strdup_printf(_("On %s, %s wrote:\n"), date, personStr);
 	else
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
 	body = content2reply(root,
-                             quoted ? balsa_app.quote_str : NULL,
+                             qtype == QUOTE_ALL ? balsa_app.quote_str : NULL,
 			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
 			     balsa_app.reply_strip_html, bsmsg->flow,
 			     sw_charset_cb, bsmsg);
@@ -3403,48 +3400,26 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 static void
 fill_body_from_part(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
                     const gchar *message_id, GList *references,
-                    LibBalsaMessageBody *root, SendType s_type)
+                    LibBalsaMessageBody *root, QuoteType qtype)
 {
     GString *body;
-    gchar *signature;
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     GtkTextIter start;
-    gboolean forwd_any = (s_type == SEND_FORWARD_INLINE ||
-                          s_type == SEND_FORWARD_ATTACH);
-    gboolean reply_any = (s_type == SEND_REPLY ||
-                          s_type == SEND_REPLY_ALL ||
-                          s_type == SEND_REPLY_GROUP);
 
     g_assert(headers);
 
-    if ( (balsa_app.autoquote && reply_any) ||
-         s_type == SEND_FORWARD_INLINE )
-        body = quote_body(bsmsg, headers, message_id, references,
-                          root, s_type);
-    else
-	body = g_string_new("");
-
-    if ((signature = read_signature(bsmsg)) != NULL) {
-	if ((reply_any && bsmsg->ident->sig_whenreply)
-       || (forwd_any && bsmsg->ident->sig_whenforward)
-       || (s_type == SEND_NORMAL && bsmsg->ident->sig_sending)) {
-
-	    signature = prep_signature(bsmsg->ident, signature);
-
-	    if (bsmsg->ident->sig_prepend && s_type != SEND_NORMAL) {
-	    	g_string_prepend(body, "\n\n");
-	    	g_string_prepend(body, signature);
-	    } else {
-	    	g_string_append(body, signature);
-	    }
-	    g_string_prepend_c(body, '\n');
-	}
-	g_free(signature);
-    }
-
+    body = quote_body(bsmsg, headers, message_id, references,
+                      root, qtype);
+    if(body->len && body->str[body->len] != '\n')
+        g_string_append_c(body, '\n');
     libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
-    gtk_text_buffer_get_start_iter(buffer, &start);
+    
+    if(qtype == QUOTE_HEADERS)
+        gtk_text_buffer_get_end_iter(buffer, &start);
+    else
+        gtk_text_buffer_get_start_iter(buffer, &start);
+
     gtk_text_buffer_place_cursor(buffer, &start);
     g_string_free(body, TRUE);
 }
@@ -3460,15 +3435,15 @@ quote_message_body(BalsaSendmsg * bsmsg,
 
 static void
 fill_body_from_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message,
-                       SendType s_type)
+                       QuoteType qtype)
 {
     fill_body_from_part(bsmsg, message->headers, message->message_id,
-                        message->references, message->body_list, s_type);
+                        message->references, message->body_list, qtype);
 }
 
 
 static gint
-    insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
+insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 {
     gchar *signature;
     GtkTextBuffer *buffer =
@@ -4203,19 +4178,43 @@ sendmsg_window_new(GtkWidget *w)
     g_free(balsa_app.spell_check_lang);
     balsa_app.spell_check_lang = tmp;
 #endif
+    setup_headers_from_identity(bsmsg, bsmsg->ident);
 
     return bsmsg;
+}
+
+static void
+insert_initial_sig(BalsaSendmsg *bsmsg)
+{
+    GtkTextIter sig_pos;
+    GtkTextBuffer *buffer =
+        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkTextMark *m;
+
+    if(bsmsg->ident->sig_prepend)
+        gtk_text_buffer_get_start_iter(buffer, &sig_pos);
+    else
+        gtk_text_buffer_get_end_iter(buffer, &sig_pos);
+    m = gtk_text_buffer_create_mark (buffer, "pos", &sig_pos, TRUE);
+    gtk_text_buffer_insert(buffer, &sig_pos, "\n", 1);
+    insert_signature_cb(NULL, bsmsg);
+    gtk_text_buffer_get_iter_at_mark(buffer, &sig_pos, m);
+    gtk_text_buffer_place_cursor(buffer, &sig_pos);
+    gtk_text_buffer_delete_mark(buffer, m);
 }
 
 BalsaSendmsg*
 sendmsg_window_compose(GtkWidget *w)
 {
     BalsaSendmsg *bsmsg = sendmsg_window_new(w);
-    setup_headers_from_identity(bsmsg, bsmsg->ident);
+
     /* set the initial window title */
     bsmsg->type = SEND_NORMAL;
     sendmsg_window_set_title(bsmsg);
+    if(bsmsg->ident->sig_sending)
+        insert_initial_sig(bsmsg);
     gtk_widget_grab_focus(bsmsg->to[1]);
+    bsmsg->state = SENDMSG_STATE_CLEAN;
     return bsmsg;
 }
 
@@ -4353,7 +4352,7 @@ BalsaSendmsg*
 sendmsg_window_reply(GtkWidget *w, LibBalsaMessage *message,
                      SendType reply_type)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_compose(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
 
     g_assert(message);
     switch(reply_type) {
@@ -4378,8 +4377,10 @@ sendmsg_window_reply(GtkWidget *w, LibBalsaMessage *message,
                          message->in_reply_to 
                          ? message->in_reply_to->data : NULL,
                          message->message_id);
-
-    fill_body_from_message(bsmsg, message, reply_type);
+    if(balsa_app.autoquote)
+        fill_body_from_message(bsmsg, message, QUOTE_ALL);
+    if(bsmsg->ident->sig_whenreply)
+        insert_initial_sig(bsmsg);
     bsm_finish_setup(bsmsg, message->body_list);
     gtk_widget_grab_focus(bsmsg->text);
     return bsmsg;
@@ -4389,7 +4390,7 @@ BalsaSendmsg*
 sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
                               SendType reply_type)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_compose(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
     LibBalsaMessageHeaders *headers;
 
     g_assert(part);
@@ -4419,7 +4420,7 @@ sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
         set_references_reply(bsmsg, references,
                              in_reply_to, message_id);
         fill_body_from_part(bsmsg, part->embhdrs, message_id, references,
-                            part->parts, reply_type);
+                            part->parts, QUOTE_ALL);
         g_list_foreach(references, (GFunc) g_free, NULL);
         g_list_free(references);
     }
@@ -4428,6 +4429,8 @@ sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
         set_cc_from_all_recipients(bsmsg, part->embhdrs);
 
     bsm_finish_setup(bsmsg, part);
+    if(bsmsg->ident->sig_whenreply)
+        insert_initial_sig(bsmsg);
     gtk_widget_grab_focus(bsmsg->text);
     return bsmsg;
 }
@@ -4435,7 +4438,7 @@ sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
 BalsaSendmsg*
 sendmsg_window_forward(GtkWidget *w, LibBalsaMessage *message, gboolean attach)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_compose(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
     g_assert(message);
     
     bsmsg->type = attach ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE;
@@ -4446,9 +4449,21 @@ sendmsg_window_forward(GtkWidget *w, LibBalsaMessage *message, gboolean attach)
                                    "Possible reason: not enough temporary space"));
     } else {
         bsm_prepare_for_setup(message);
-        fill_body_from_message(bsmsg, message, SEND_FORWARD_INLINE);
+        fill_body_from_message(bsmsg, message, QUOTE_NOPREFIX);
         bsm_finish_setup(bsmsg, message->body_list);
     }
+    if(bsmsg->ident->sig_whenforward)
+        insert_initial_sig(bsmsg);
+    if(!attach) {
+        GtkTextBuffer *buffer =
+            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+        GtkTextIter pos;
+        gtk_text_buffer_get_start_iter(buffer, &pos);
+        gtk_text_buffer_place_cursor(buffer, &pos);
+        gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
+        gtk_text_buffer_get_start_iter(buffer, &pos);
+        gtk_text_buffer_place_cursor(buffer, &pos);
+     }
     gtk_widget_grab_focus(bsmsg->to[1]);
     return bsmsg;
 }
@@ -4456,7 +4471,7 @@ sendmsg_window_forward(GtkWidget *w, LibBalsaMessage *message, gboolean attach)
 BalsaSendmsg*
 sendmsg_window_continue(GtkWidget *w, LibBalsaMessage * message)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_compose(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
     const gchar *postpone_hdr;
     GList *list, *refs = NULL;
 

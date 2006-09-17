@@ -1,3 +1,8 @@
+2006-09-17  Pawel Salek
+
+	* src/sendmsg-window.c: cleanup. Compose and forward will insert
+	the signature if requested.
+
 2006-09-15 21:17  PeterB
 
 	* libbalsa/mailbox.c, libbalsa/mailbox.h, libbalsa/mailbox_imap.c,

@@ -420,10 +420,11 @@ static void
 prepend_header_misc(const char *name, const char *value,
                     gpointer user_data)
 {
-    char lcname[17]; /* one byte longer than the longest ignored header */
+    char lcname[28]; /* one byte longer than the longest ignored header */
     static const char ignored_headers[] =
         "subject date from to cc bcc "
-        "message-id references in-reply-to status lines";
+        "message-id references in-reply-to status lines"
+        "disposition-notification-to";
     unsigned i;
     GList *res = *(GList **)user_data;
     if (!*value)
@@ -1194,6 +1195,10 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
     if (g_ascii_strcasecmp(name, "Content-Type") == 0) {
 	message->headers->content_type =
 	    g_mime_content_type_new_from_string(value);
+    } else
+    if (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0) {
+        message->headers->dispnotify_to =
+            internet_address_parse_string(value);
     } else
 #ifdef MESSAGE_COPY_CONTENT
     if (g_ascii_strcasecmp(name, "Content-Length") == 0) {

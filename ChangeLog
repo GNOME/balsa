@@ -1,3 +1,9 @@
+2006-09-18 08:10  PeterB
+
+	* libbalsa/message.c: Disposition-Notification-To is not a user
+	header.
+	* libbalsa/mailbox_mbox.c: more careful check for From_ line.
+
 2006-09-17  Pawel Salek
 
 	* src/sendmsg-window.c: cleanup. Compose and forward will insert

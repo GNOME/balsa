@@ -255,7 +255,7 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
     gboolean retval;
 
     retval = g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET) >= 0
-        && g_mime_stream_read(stream, buffer, sizeof(buffer)) >= 0
+        && g_mime_stream_read(stream, buffer, sizeof buffer) == sizeof buffer
         && strncmp("From ", buffer, 5) == 0;
 
     g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET);

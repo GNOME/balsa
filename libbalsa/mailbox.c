@@ -328,6 +328,7 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
 #if CACHE_UNSEEN_CHILD
     entry->has_unseen_child = 0; /* Find out after threading. */
 #endif /* CACHE_UNSEEN_CHILD */
+    libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
 }
 
 LibBalsaMailboxIndexEntry*
@@ -1128,8 +1129,10 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
 {
     GtkTreePath *path;
 
+#if DEBUG
     if (!libbalsa_threads_has_lock())
         g_warning("Thread is not holding gdk lock");
+#endif
 
     if (!mailbox->msg_tree)
         return;
@@ -4112,7 +4115,6 @@ libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
                                LibBalsaMessage * message)
 {
     LibBalsaMailboxIndexEntry *entry;
-    GtkTreeIter iter;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     if (!mailbox->mindex)
@@ -4137,10 +4139,6 @@ libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
         libbalsa_mailbox_index_entry_free(g_ptr_array_index
                                           (mailbox->mindex, msgno - 1));
         g_ptr_array_index(mailbox->mindex, msgno - 1) = NULL;
+        libbalsa_mailbox_msgno_changed(mailbox, msgno);
     }
-
-    iter.user_data = NULL;
-    gdk_threads_enter();
-    lbm_msgno_changed(mailbox, msgno, &iter);
-    gdk_threads_leave();
 }

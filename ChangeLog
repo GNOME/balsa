@@ -1,3 +1,8 @@
+2006-09-21 18:32  PeterB
+
+	* libbalsa/mailbox.c: notify gdk when message info is cached;
+	disable lock check for normal use.
+
 2006-09-18 08:10  PeterB
 
 	* libbalsa/message.c: Disposition-Notification-To is not a user

@@ -86,6 +86,8 @@ typedef struct {
     BalsaSendmsg *bsmsg;
 } balsa_edit_with_gnome_data;
 
+typedef enum { QUOTE_HEADERS, QUOTE_ALL, QUOTE_NOPREFIX } QuoteType;
+
 static gchar *read_signature(BalsaSendmsg *bsmsg);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
@@ -97,7 +99,7 @@ static void save_message_cb(GtkWidget *, BalsaSendmsg *);
 static void print_message_cb(GtkWidget *, BalsaSendmsg *);
 static void attach_clicked(GtkWidget *, gpointer);
 static gboolean attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message);
-static gint insert_selected_messages(BalsaSendmsg *bsmsg, SendType type);
+static gint insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type);
 static gint attach_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint include_message_cb(GtkWidget *, BalsaSendmsg *);
 static void close_window_cb(GtkWidget *, gpointer);
@@ -165,7 +167,7 @@ static void update_bsmsg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static GString *quote_message_body(BalsaSendmsg * bsmsg,
                                    LibBalsaMessage * message,
-                                   SendType type);
+                                   QuoteType type);
 static void set_list_post_address(BalsaSendmsg * bsmsg);
 static gboolean set_list_post_rfc2369(BalsaSendmsg * bsmsg,
                                       const gchar * url);
@@ -2308,7 +2310,7 @@ attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message)
 }
 
 static gint
-insert_selected_messages(BalsaSendmsg *bsmsg, SendType type)
+insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type)
 {
     GtkTextBuffer *buffer = 
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
@@ -2321,10 +2323,9 @@ insert_selected_messages(BalsaSendmsg *bsmsg, SendType type)
     
 	for (node = l; node; node = g_list_next(node)) {
 	    LibBalsaMessage *message = node->data;
-	    GString *body = quote_message_body(bsmsg, message, type);
-	    
+            GString *body = quote_message_body(bsmsg, message, type);
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
-	    g_string_free(body, TRUE);
+            g_string_free(body, TRUE);
 	}
 	g_list_foreach(l, (GFunc)g_object_unref, NULL);
         g_list_free(l);
@@ -2336,7 +2337,7 @@ insert_selected_messages(BalsaSendmsg *bsmsg, SendType type)
 static gint
 include_message_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 {
-    return insert_selected_messages(bsmsg, SEND_FORWARD_INLINE);
+    return insert_selected_messages(bsmsg, QUOTE_ALL);
 }
 
 
@@ -3023,7 +3024,7 @@ drag_data_quote(GtkWidget * widget,
             GString *body;
 
 	    message = libbalsa_mailbox_get_message(mailbox, msgno);
-            body = quote_message_body(bsmsg, message, SEND_REPLY);
+            body = quote_message_body(bsmsg, message, QUOTE_ALL);
 	    g_object_unref(message);
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
@@ -3279,7 +3280,6 @@ message_part_get_subject(LibBalsaMessageBody *part)
    Specifying type explicitly allows for later message quoting when
    eg. a new message is composed.
 */
-typedef enum { QUOTE_HEADERS, QUOTE_ALL, QUOTE_NOPREFIX } QuoteType;
 static GString *
 quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
            const gchar *message_id, GList *references,
@@ -3427,10 +3427,15 @@ fill_body_from_part(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 static GString*
 quote_message_body(BalsaSendmsg * bsmsg,
                    LibBalsaMessage * message,
-                   SendType s_type)
+                   QuoteType qtype)
 {
-    return quote_body(bsmsg, message->headers, message->message_id,
-                      message->references, message->body_list, s_type);
+    GString *res;
+    if(libbalsa_message_body_ref(message, FALSE, FALSE)) {
+        res = quote_body(bsmsg, message->headers, message->message_id,
+                         message->references, message->body_list, qtype);
+        libbalsa_message_body_unref(message);
+    } else res = g_string_new("");
+    return res;
 }
 
 static void
@@ -3446,10 +3451,12 @@ static gint
 insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 {
     gchar *signature;
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     
+    if(!bsmsg->ident->signature_path || !bsmsg->ident->signature_path[0])
+        return TRUE;
     if ((signature = read_signature(bsmsg)) != NULL) {
+        GtkTextBuffer *buffer =
+            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 #if !HAVE_GTKSOURCEVIEW
         sw_buffer_save(bsmsg);
 #endif                          /* HAVE_GTKSOURCEVIEW */

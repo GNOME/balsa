@@ -3298,7 +3298,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
     i = j = 0;
     for (tmp_node = node; tmp_node; tmp_node = tmp_node->next) {
         guint msgno = GPOINTER_TO_UINT(tmp_node->data);
-        new_order[j] = sort_no || lbm_has_valid_index_entry(mbox, msgno)
+        new_order[j] = can_sort_all || lbm_has_valid_index_entry(mbox, msgno)
             ? g_array_index(sort_array, SortTuple, i++).offset
             : j;
         j++;

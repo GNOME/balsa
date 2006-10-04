@@ -1,5 +1,7 @@
-2006-10-04 06:17  PeterB
+2006-10-04 12:37  PeterB
 
+	* src/sendmsg-window.c: quote message when quoting, and not when
+	inlining.
 	* libbalsa/mailbox.c: construct new order correctly in imap
 	mailbox.
 

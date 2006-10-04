@@ -3484,7 +3484,7 @@ insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 
 static gint quote_messages_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 {
-    return insert_selected_messages(bsmsg, FALSE);
+    return insert_selected_messages(bsmsg, QUOTE_ALL);
 }
 
 
@@ -6217,7 +6217,8 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
         if (type == SEND_FORWARD_ATTACH)
             attach_message(bsmsg, message);
         else if (type == SEND_FORWARD_INLINE) {
-            GString *body = quote_message_body(bsmsg, message, TRUE);
+            GString *body =
+                quote_message_body(bsmsg, message, QUOTE_NOPREFIX);
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
         }

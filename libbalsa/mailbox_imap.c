@@ -1961,29 +1961,30 @@ static gboolean
 get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
                       LibBalsaFetchFlag flags)
 {
-    gchar **pair, *filename;
-    int fd;
-    GMimeStream *stream = NULL;
-    GMimeParser *mime_parser;
+    if (!message->mime_msg) {
+        gchar **pair, *filename;
+        int fd;
+        GMimeStream *stream = NULL;
+        GMimeParser *mime_parser;
 
-    g_return_val_if_fail(message->mime_msg == NULL, FALSE);
+        pair = get_cache_name_pair(LIBBALSA_MAILBOX_IMAP(mailbox), "body",
+                                   IMAP_MESSAGE_UID(message));
 
-    pair =  get_cache_name_pair(LIBBALSA_MAILBOX_IMAP(mailbox), "body", 
-                                IMAP_MESSAGE_UID(message));
+        filename = g_build_filename(pair[0], pair[1], NULL);
+        g_strfreev(pair);
+        fd = open(filename, O_RDONLY);
+        g_free(filename);
+        if (fd == -1)
+            return FALSE;
 
-    filename = g_build_filename(pair[0], pair[1], NULL);
-    g_strfreev(pair);
-    fd = open(filename, O_RDONLY);
-    g_free(filename);
-    if(fd == -1) return FALSE;
+        stream = g_mime_stream_fs_new(fd);
 
-    stream = g_mime_stream_fs_new(fd);
-
-    mime_parser = g_mime_parser_new_with_stream(stream);
-    g_mime_parser_set_scan_from(mime_parser, FALSE);
-    message->mime_msg = g_mime_parser_construct_message(mime_parser);
-    g_object_unref(mime_parser);
-    g_object_unref(stream);
+        mime_parser = g_mime_parser_new_with_stream(stream);
+        g_mime_parser_set_scan_from(mime_parser, FALSE);
+        message->mime_msg = g_mime_parser_construct_message(mime_parser);
+        g_object_unref(mime_parser);
+        g_object_unref(stream);
+    }
     
     /* follow libbalsa_mailbox_local_fetch_structure here;
      * perhaps create common helper */

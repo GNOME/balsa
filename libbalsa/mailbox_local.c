@@ -773,8 +773,10 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
         info  = g_ptr_array_index(local->threading_info, msgno - 1);
     }
 
+#if defined(BALSA_USE_THREADS)
     if (entry->idle_pending)
         return FALSE;   /* Can't match. */
+#endif                  /* defined(BALSA_USE_THREADS) */
 
     switch (cond->type) {
     case CONDITION_STRING:

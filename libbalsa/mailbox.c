@@ -368,7 +368,7 @@ libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry)
 #  define VALID_ENTRY(entry) \
     ((entry) && !((LibBalsaMailboxIndexEntry *) (entry))->idle_pending)
 #else                           /*BALSA_USE_THREADS */
-#  define VALID_ENTRY(entry) (entry)
+#  define VALID_ENTRY(entry) ((entry) != NULL)
 #endif                          /*BALSA_USE_THREADS */
 
 void

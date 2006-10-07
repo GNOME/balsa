@@ -1,3 +1,8 @@
+2006-10-07 11:08  PeterB
+
+	* libbalsa/: mailbox.c, mailbox_local.c: build with
+	--disable-threads.
+
 2006-10-04 12:37  PeterB
 
 	* src/sendmsg-window.c: quote message when quoting, and not when

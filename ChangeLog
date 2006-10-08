@@ -1,3 +1,11 @@
+2006-10-08  Albrecht Dreß <albrecht dot dress at arcor dot de>
+
+	* src/pref-manager.c: add a check button to enable or disable
+	playing a "new mail sound".
+	* src/sendmsg-window.c: German is /not/ always the same.
+	* libbalsa/gmime-gpgme-context.c: make a gpgme (crypto) error more
+	meaningful.
+
 2006-10-07 11:08  PeterB
 
 	* libbalsa/: mailbox.c, mailbox_local.c: build with

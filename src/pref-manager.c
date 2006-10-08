@@ -91,6 +91,7 @@ typedef struct _PropertyUI {
     GtkWidget *check_imap;
     GtkWidget *check_imap_inbox;
     GtkWidget *notify_new_mail_dialog;
+    GtkWidget *notify_new_mail_sound;
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
 
     GtkWidget *close_mailbox_auto;
@@ -639,6 +640,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->notify_new_mail_dialog), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
+    g_signal_connect(G_OBJECT(pui->notify_new_mail_sound), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
     g_signal_connect(G_OBJECT(pui->close_mailbox_auto), "toggled",
                      G_CALLBACK(mailbox_close_timer_modified_cb),
                      property_box);
@@ -870,6 +874,8 @@ apply_prefs(GtkDialog * pbox)
         GTK_TOGGLE_BUTTON(pui->check_imap_inbox)->active;
     balsa_app.notify_new_mail_dialog =
         GTK_TOGGLE_BUTTON(pui->notify_new_mail_dialog)->active;
+    balsa_app.notify_new_mail_sound =
+        GTK_TOGGLE_BUTTON(pui->notify_new_mail_sound)->active;
     balsa_app.mdn_reply_clean =
         pm_combo_box_get_level(pui->mdn_reply_clean_menu);
     balsa_app.mdn_reply_notclean =
@@ -1105,6 +1111,9 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->notify_new_mail_dialog),
                                  balsa_app.notify_new_mail_dialog);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (pui->notify_new_mail_sound),
+                                 balsa_app.notify_new_mail_sound);
     if (!balsa_app.check_imap)
         gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
 
@@ -1760,7 +1769,7 @@ checking_group(GtkWidget * page)
     GtkWidget *label;
 
     group = pm_group_new(_("Checking"));
-    table = create_table(5, 3, page);
+    table = create_table(6, 3, page);
     pm_group_add(group, table, FALSE);
 
     pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
@@ -1796,22 +1805,27 @@ checking_group(GtkWidget * page)
     gtk_table_attach(GTK_TABLE(table), pui->notify_new_mail_dialog,
                      0, 3, 2, 3, GTK_FILL, 0, 0, 0);
     
+    pui->notify_new_mail_sound = gtk_check_button_new_with_label(
+	_("Play sound if new mail has arrived"));
+    gtk_table_attach(GTK_TABLE(table), pui->notify_new_mail_sound,
+                     0, 3, 3, 4, GTK_FILL, 0, 0, 0);
+    
     pui->quiet_background_check = gtk_check_button_new_with_label(
 	_("Do background check quietly (no messages in status bar)"));
     gtk_table_attach(GTK_TABLE(table), pui->quiet_background_check,
-                     0, 3, 3, 4, GTK_FILL, 0, 0, 0);
+                     0, 3, 4, 5, GTK_FILL, 0, 0, 0);
 
     label = gtk_label_new_with_mnemonic(_("_POP message size limit:"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 4, 5,
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 5, 6,
                      GTK_FILL, 0, 0, 0);
     pui->msg_size_limit = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), pui->msg_size_limit);
-    gtk_table_attach(GTK_TABLE(table), pui->msg_size_limit, 1, 2, 4, 5,
+    gtk_table_attach(GTK_TABLE(table), pui->msg_size_limit, 1, 2, 5, 6,
                      GTK_EXPAND | GTK_FILL, 0, 0, 0);
     label = gtk_label_new(_("MB"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 2, 3, 4, 5,
+    gtk_table_attach(GTK_TABLE(table), label, 2, 3, 5, 6,
                      GTK_FILL, 0, 0, 0);
     
     return group;

@@ -250,6 +250,8 @@ struct SendLocales {
     {"fi_FI", "ISO-8859-15",   N_("_Finnish")},
     {"fr_FR", "ISO-8859-15",   N_("_French")},
     {"de_DE", "ISO-8859-15",   N_("_German")},
+    {"de_AT", "ISO-8859-15",   N_("_German (Austrian)")},
+    {"de_CH", "ISO-8859-1",    N_("_German (Swiss)")},
     {"el_GR", "ISO-8859-7",    N_("_Greek")},
     {"he_IL", "UTF-8",         N_("_Hebrew")},
     {"hu_HU", "ISO-8859-2",    N_("_Hungarian")},

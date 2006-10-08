@@ -853,6 +853,7 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
     gpgme_ctx_t gpgme_ctx = ctx->gpgme_ctx;
     gpgme_key_t key;
     gpgme_error_t err;
+    gboolean found_bad;
 
     /* let gpgme list keys */
     if ((err = gpgme_op_keylist_start(gpgme_ctx, name,
@@ -864,6 +865,7 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
 	return NULL;
     }
 
+    found_bad = FALSE;
     while ((err =
 	    gpgme_op_keylist_next(gpgme_ctx, &key)) == GPG_ERR_NO_ERROR)
 	/* check if this key and the relevant subkey are usable */
@@ -876,7 +878,10 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
 
 	    if (subkey && KEY_IS_OK(subkey))
 		keys = g_list_append(keys, key);
-	}
+	    else
+		found_bad = TRUE;
+	} else
+	    found_bad = TRUE;
 
     if (gpg_err_code(err) != GPG_ERR_EOF) {
 	if (error)
@@ -891,10 +896,16 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
     gpgme_op_keylist_end(gpgme_ctx);
 
     if (!keys) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
-			_("%s: could not find a key for %s"),
-			"gmime-gpgme", name);
+	if (error) {
+	    if (found_bad)
+		g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+			    _("%s: a key for %s is present, but it is expired, disabled, revoked or invalid"),
+			    "gmime-gpgme", name);
+	    else
+		g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+			    _("%s: could not find a key for %s"),
+			    "gmime-gpgme", name);
+	}
 	return NULL;
     }
 

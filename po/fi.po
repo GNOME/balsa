@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-15 15:31+0300\n"
-"PO-Revision-Date: 2006-09-15 15:32+0300\n"
+"POT-Creation-Date: 2006-10-14 08:19+0300\n"
+"PO-Revision-Date: 2006-10-14 08:20+0300\n"
 "Last-Translator: Ilkka Tuohela <hile@iki.fi>\n"
 "Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -77,8 +77,8 @@ msgstr "Kaksoiskappaletta ei voida lisätä"
 msgid "Cannot find address in address book"
 msgstr "Osoitetta ei löydy osoitekirjasta"
 
-#: ../libbalsa/address-book.c:324 ../src/main-window.c:2353
-#: ../src/main-window.c:4458 ../src/sendmsg-window.c:3674
+#: ../libbalsa/address-book.c:324 ../src/main-window.c:2366
+#: ../src/main-window.c:4471 ../src/sendmsg-window.c:3658
 msgid "Unknown error"
 msgstr "Tuntematon virhe"
 
@@ -112,8 +112,8 @@ msgstr "_Sähköpostiosoite:"
 msgid "A_dd"
 msgstr "_Lisää"
 
-#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1664
-#: ../libbalsa/message.c:893
+#: ../libbalsa/body.c:115 ../libbalsa/mailbox_local.c:1678
+#: ../libbalsa/message.c:894
 msgid "(No subject)"
 msgstr "(Ei aihetta)"
 
@@ -143,7 +143,7 @@ msgstr "Yritettiin käyttää virheellistä suodatinta"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Virheellisiä suodattimia %s kansiolle %s"
 
-#: ../libbalsa/filter.c:130 ../libbalsa/mailbox_local.c:785
+#: ../libbalsa/filter.c:130 ../libbalsa/mailbox_local.c:790
 msgid "Unable to load message body to match filter"
 msgstr "Viestin runkoa ei voida hakea suodatettavaksi"
 
@@ -260,35 +260,43 @@ msgstr "salausmoottoria protokollalle CMS ei ole käytettävissä"
 msgid "invalid crypto engine %d"
 msgstr "virheellinen salausmoottori %d"
 
-#: ../libbalsa/gmime-gpgme-context.c:862 ../libbalsa/gmime-gpgme-context.c:884
+#: ../libbalsa/gmime-gpgme-context.c:863 ../libbalsa/gmime-gpgme-context.c:889
 #, c-format
 msgid "%s: could not list keys for %s: %s"
 msgstr "%s: käyttäjän %s avaimia ei voi tulostaa: %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:896
+#: ../libbalsa/gmime-gpgme-context.c:902
+#, c-format
+msgid ""
+"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+msgstr ""
+"%s: avain %s on olemassa, mutta se on joko vanhentunut, mitätöity, pois "
+"käytöstä tai virheellinen"
+
+#: ../libbalsa/gmime-gpgme-context.c:906
 #, c-format
 msgid "%s: could not find a key for %s"
 msgstr "%s: avainta käyttäjälle %s ei löytynyt"
 
-#: ../libbalsa/gmime-gpgme-context.c:908
+#: ../libbalsa/gmime-gpgme-context.c:919
 #, c-format
 msgid "%s: multiple keys for %s"
 msgstr "%s: useita avaimia käyttäjälle %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:953
+#: ../libbalsa/gmime-gpgme-context.c:964
 #, c-format
 msgid "%s: insufficient validity for uid %s"
 msgstr "%s: UID %s ei ole tarpeeksi kelvollinen"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1783
-#: ../libbalsa/mailbox_local.c:1785 ../src/sendmsg-window.c:3537
-#: ../src/sendmsg-window.c:3538
+#: ../libbalsa/identity.c:102 ../libbalsa/mailbox_local.c:1797
+#: ../libbalsa/mailbox_local.c:1799 ../src/sendmsg-window.c:3521
+#: ../src/sendmsg-window.c:3522
 msgid "Re:"
 msgstr "Re:"
 
-#: ../libbalsa/identity.c:103 ../src/sendmsg-window.c:3568
-#: ../src/sendmsg-window.c:3569
+#: ../libbalsa/identity.c:103 ../src/sendmsg-window.c:3552
+#: ../src/sendmsg-window.c:3553
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -505,8 +513,8 @@ msgstr "Balsan asetukset on nyt tallennettu tiedostoon \"~/.balsa/config\"."
 msgid "Invalid date"
 msgstr "Virheellinen päivämäärä"
 
-#: ../libbalsa/libbalsa.c:296 ../src/pref-manager.c:1312
-#: ../src/pref-manager.c:1408
+#: ../libbalsa/libbalsa.c:296 ../src/pref-manager.c:1321
+#: ../src/pref-manager.c:1417
 msgid "Unknown"
 msgstr "Tuntematon"
 
@@ -575,54 +583,54 @@ msgstr "Sisäisen puskurin ylivuoto"
 msgid "Bad X-Face data"
 msgstr "Virheellistä X-Face-tietoa"
 
-#: ../libbalsa/mailbox.c:440
+#: ../libbalsa/mailbox.c:452
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Ei voida ladata kansiota %s"
 
-#: ../libbalsa/mailbox.c:447
+#: ../libbalsa/mailbox.c:459
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Viallinen kansiotyyppi: %s"
 
-#: ../libbalsa/mailbox.c:464
+#: ../libbalsa/mailbox.c:476
 #, c-format
 msgid "Bad local mailbox path \"%s\""
 msgstr "Virheellinen paikallisen kansion polku \"%s\""
 
-#: ../libbalsa/mailbox.c:469
+#: ../libbalsa/mailbox.c:481
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Ei voida luoda %s -tyyppistä kansiota"
 
-#: ../libbalsa/mailbox.c:777
+#: ../libbalsa/mailbox.c:789
 #, c-format
 msgid "Applying filter rules to %s"
 msgstr "Toteutetaan suodatinsäännöt kansiolle %s"
 
-#: ../libbalsa/mailbox.c:880
+#: ../libbalsa/mailbox.c:892
 #, c-format
 msgid "Copying from %s to %s"
 msgstr "Kopioidaan kansiosta %s kansioon %s"
 
-#: ../libbalsa/mailbox.c:1851
+#: ../libbalsa/mailbox.c:1871
 msgid "Removing messages from source mailbox failed"
 msgstr "Viestien poisto lähdekansiosta epäonnistui"
 
-#: ../libbalsa/mailbox.c:2781
+#: ../libbalsa/mailbox.c:2802
 msgid "from unknown"
 msgstr "tuntemattomalta lähettäjältä"
 
-#: ../libbalsa/mailbox.c:2783
+#: ../libbalsa/mailbox.c:2804
 msgid "Loading..."
 msgstr "Ladataan..."
 
-#: ../libbalsa/mailbox.c:3695
+#: ../libbalsa/mailbox.c:3726
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Etsitään osittaisia viestejä kansiosta %s"
 
-#: ../libbalsa/mailbox.c:3785
+#: ../libbalsa/mailbox.c:3816
 msgid "Reconstructing message"
 msgstr "Kootaan viestiä uudestaan"
 
@@ -644,18 +652,18 @@ msgid "Async IMAP cmd %s could not be executed. Reconnecting..."
 msgstr ""
 "Asynkronista IMAP-komentoa %s ei voitu suorittaa. Yhdistetään uudestaan..."
 
-#: ../libbalsa/mailbox_imap.c:1032 ../libbalsa/mailbox_maildir.c:527
-#: ../libbalsa/mailbox_mbox.c:714 ../libbalsa/mailbox_mh.c:553
+#: ../libbalsa/mailbox_imap.c:1024 ../libbalsa/mailbox_maildir.c:525
+#: ../libbalsa/mailbox_mbox.c:721 ../libbalsa/mailbox_mh.c:551
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Avataan %s viitemär: %d\n"
 
-#: ../libbalsa/mailbox_imap.c:1107 ../libbalsa/mailbox_imap.c:2254
+#: ../libbalsa/mailbox_imap.c:1099 ../libbalsa/mailbox_imap.c:2247
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Haetaan %ld kt"
 
-#: ../libbalsa/mailbox_imap.c:1487
+#: ../libbalsa/mailbox_imap.c:1479
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -664,34 +672,34 @@ msgstr ""
 "IMAPin komento SEARCH epäonnistui kansiolle %s\n"
 "palataan tavalliseen hakumenetelmään"
 
-#: ../libbalsa/mailbox_imap.c:1547
+#: ../libbalsa/mailbox_imap.c:1539
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "Polkua kansiolle \"%s\" ei löydy, käytetään \"%s\""
 
-#: ../libbalsa/mailbox_imap.c:1636 ../libbalsa/mailbox_imap.c:1677
+#: ../libbalsa/mailbox_imap.c:1628 ../libbalsa/mailbox_imap.c:1669
 msgid "Cannot get IMAP handle"
 msgstr "IMAP-kahvaa ei voida avata"
 
-#: ../libbalsa/mailbox_imap.c:2287
+#: ../libbalsa/mailbox_imap.c:2280
 msgid "Cannot create temporary file"
 msgstr "Väliaikaistiedostoa ei voida luoda"
 
-#: ../libbalsa/mailbox_imap.c:2306
+#: ../libbalsa/mailbox_imap.c:2299
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Väliaikaistiedostoon %s ei voida kirjoittaa"
 
-#: ../libbalsa/mailbox_imap.c:2523
+#: ../libbalsa/mailbox_imap.c:2516
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Viedään %ld kt"
 
-#: ../libbalsa/mailbox_imap.c:2714
+#: ../libbalsa/mailbox_imap.c:2707
 msgid "Server-side threading not supported."
 msgstr "Palvelimella tapahtuva säikeistys ei ole tuettu"
 
-#: ../libbalsa/mailbox_local.c:492 ../libbalsa/mailbox_mbox.c:412
+#: ../libbalsa/mailbox_local.c:492 ../libbalsa/mailbox_mbox.c:430
 #, c-format
 msgid "Failed to create temporary file \"%s\": %s"
 msgstr "Väliaikaistiedostoa \"%s\" ei voi luoda: %s"
@@ -701,7 +709,7 @@ msgstr "Väliaikaistiedostoa \"%s\" ei voi luoda: %s"
 msgid "Failed to save cache file \"%s\": %s."
 msgstr "Välimuistitiedostoa \"%s\" ei voi tallentaa: %s."
 
-#: ../libbalsa/mailbox_local.c:521 ../libbalsa/mailbox_mbox.c:423
+#: ../libbalsa/mailbox_local.c:521 ../libbalsa/mailbox_mbox.c:442
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr ""
@@ -724,22 +732,22 @@ msgstr "Välimuistitiedostoa %s ei voi lukea: %s"
 msgid "Cache file for mailbox %s will be repaired"
 msgstr "Korjataan kansion %s välimuistitiedosto"
 
-#: ../libbalsa/mailbox_local.c:1080
+#: ../libbalsa/mailbox_local.c:1097
 #, c-format
 msgid "Filtering %s"
 msgstr "Suodatetaan %s"
 
-#: ../libbalsa/mailbox_local.c:1163
+#: ../libbalsa/mailbox_local.c:1180
 #, c-format
 msgid "Preparing %s"
 msgstr "Valmistellaan %s"
 
-#: ../libbalsa/mailbox_local.c:1944
+#: ../libbalsa/mailbox_local.c:1958
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "%s:n avaaminen epäonnistui. Errno = %d, "
 
-#: ../libbalsa/mailbox_local.c:1966
+#: ../libbalsa/mailbox_local.c:1980
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Kansion \"%s\" synkronointi epäonnistui"
@@ -769,7 +777,7 @@ msgstr ""
 "Kansion %s sisältöä ei voi poistaa:\n"
 "%s"
 
-#: ../libbalsa/mailbox_maildir.c:366 ../libbalsa/mailbox_mbox.c:309
+#: ../libbalsa/mailbox_maildir.c:366 ../libbalsa/mailbox_mbox.c:315
 #: ../libbalsa/mailbox_mh.c:317
 #, c-format
 msgid ""
@@ -779,13 +787,13 @@ msgstr ""
 "Ei voida poistaa: %s\n"
 "%s"
 
-#: ../libbalsa/mailbox_maildir.c:506 ../libbalsa/mailbox_mbox.c:661
-#: ../libbalsa/mailbox_mh.c:534
+#: ../libbalsa/mailbox_maildir.c:504 ../libbalsa/mailbox_mbox.c:669
+#: ../libbalsa/mailbox_mh.c:532
 msgid "Mailbox does not exist."
 msgstr "Kansiota ei ole olemassa."
 
-#: ../libbalsa/mailbox_maildir.c:972 ../libbalsa/mailbox_mbox.c:1975
-#: ../libbalsa/mailbox_mh.c:1157
+#: ../libbalsa/mailbox_maildir.c:970 ../libbalsa/mailbox_mbox.c:1975
+#: ../libbalsa/mailbox_mh.c:1155
 msgid "Data copy error"
 msgstr "Virhe kopioitaessa tietoja"
 
@@ -794,25 +802,25 @@ msgstr "Virhe kopioitaessa tietoja"
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Kansio %s ei näytä olevan Mbox-muotoinen postikansio."
 
-#: ../libbalsa/mailbox_mbox.c:397
+#: ../libbalsa/mailbox_mbox.c:418
 #, c-format
 msgid "Could not write file %s: %s"
 msgstr "Tiedostoa \"%s\" ei voi kirjoittaa: %s"
 
-#: ../libbalsa/mailbox_mbox.c:430
+#: ../libbalsa/mailbox_mbox.c:450
 #, c-format
 msgid "Could not unlink file %s: %s"
 msgstr "Tiedostoa \"%s\" ei voi poistaa: %s"
 
-#: ../libbalsa/mailbox_mbox.c:669
+#: ../libbalsa/mailbox_mbox.c:677
 msgid "Cannot open mailbox."
 msgstr "Kansiota ei voida avata."
 
-#: ../libbalsa/mailbox_mbox.c:681
+#: ../libbalsa/mailbox_mbox.c:689
 msgid "Mailbox is not in mbox format."
 msgstr "Kansio ei ole mbox-muodossa."
 
-#: ../libbalsa/mailbox_mbox.c:689
+#: ../libbalsa/mailbox_mbox.c:697
 msgid "Cannot lock mailbox."
 msgstr "Kansiota ei voida lukita."
 
@@ -846,11 +854,11 @@ msgstr "Ei voida luoda MH-hakemistoa kohteeseen %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Ei voida luoda MH-rakennetta kohteeseen %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:1138
+#: ../libbalsa/mailbox_mh.c:1136
 msgid "Cannot create message"
 msgstr "Viestiä ei voi luoda"
 
-#: ../libbalsa/mailbox_mh.c:1182
+#: ../libbalsa/mailbox_mh.c:1180
 msgid "Message rename error"
 msgstr "Virhe uudelleennimettäessä viestä"
 
@@ -918,7 +926,7 @@ msgstr "POP3-virhe: %s ei voida sulkea."
 msgid "POP3 error: %s."
 msgstr "POP3-virhe: %s."
 
-#: ../libbalsa/message.c:616 ../libbalsa/message.c:656
+#: ../libbalsa/message.c:617 ../libbalsa/message.c:657
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr "Kansio (%s) on vain luettavissa. Viestin lippuja ei voida muuttaa."
@@ -1439,7 +1447,7 @@ msgstr "Yritä myöhemmin uudestaan."
 msgid "Sending Mail..."
 msgstr "Lähetetään postia..."
 
-#: ../libbalsa/send.c:246 ../src/main-window.c:2815
+#: ../libbalsa/send.c:246 ../src/main-window.c:2828
 msgid "_Hide"
 msgstr "_Piilota"
 
@@ -1567,8 +1575,8 @@ msgid "Logging in to %s using %s"
 msgstr "Kirjaudutaan palvelimelle %s käyttäen %s"
 
 #: ../libbalsa/smtp-server.c:375 ../src/mailbox-conf.c:204
-#: ../src/mailbox-conf.c:1393 ../src/pref-manager.c:387
-#: ../src/pref-manager.c:3233
+#: ../src/mailbox-conf.c:1393 ../src/pref-manager.c:388
+#: ../src/pref-manager.c:3247
 msgid "Never"
 msgstr "Ei koskaan"
 
@@ -1621,7 +1629,7 @@ msgstr "_Varmenteen salalause:"
 msgid "Sp_lit message larger than"
 msgstr "_Jaa viestit joka ovat suurempia kuin"
 
-#: ../libbalsa/smtp-server.c:605 ../src/pref-manager.c:1812
+#: ../libbalsa/smtp-server.c:605 ../src/pref-manager.c:1826
 msgid "MB"
 msgstr "Mt"
 
@@ -2063,7 +2071,7 @@ msgstr "Osoitekirjan DN"
 msgid "Enable _TLS"
 msgstr "Käytä _TLS-yhteyttä"
 
-#: ../src/address-book-config.c:529 ../src/main-window.c:4137
+#: ../src/address-book-config.c:529 ../src/main-window.c:4150
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Virhe näytettäessä ohjetta: %s\n"
@@ -2127,20 +2135,20 @@ msgstr "Kansion \"%s\" avaaminen ei onnistu"
 msgid "From"
 msgstr "Lähettäjä"
 
-#: ../src/balsa-index.c:377 ../src/pref-manager.c:401
+#: ../src/balsa-index.c:377 ../src/pref-manager.c:402
 msgid "Subject"
 msgstr "Aihe"
 
-#: ../src/balsa-index.c:391 ../src/pref-manager.c:402
+#: ../src/balsa-index.c:391 ../src/pref-manager.c:403
 msgid "Date"
 msgstr "Päivämäärä"
 
-#: ../src/balsa-index.c:403 ../src/pref-manager.c:403
-#: ../src/sendmsg-window.c:2927
+#: ../src/balsa-index.c:403 ../src/pref-manager.c:404
+#: ../src/sendmsg-window.c:2930
 msgid "Size"
 msgstr "Koko"
 
-#: ../src/balsa-index.c:1067
+#: ../src/balsa-index.c:1069
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
 msgstr "Avaataan kansiota %s. Odota..."
@@ -2148,112 +2156,112 @@ msgstr "Avaataan kansiota %s. Odota..."
 # src/balsa-message.c#
 # 651 src/filter-edit-dialog.c:325
 #. FIXME: this is hack!
-#: ../src/balsa-index.c:1110
+#: ../src/balsa-index.c:1112
 msgid "To"
 msgstr "Vastaanottaja"
 
-#: ../src/balsa-index.c:1732
+#: ../src/balsa-index.c:1736
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Siirto roskakoriin epäonnistui: %s"
 
 #. R
-#: ../src/balsa-index.c:1887 ../src/main-window.c:584
+#: ../src/balsa-index.c:1891 ../src/main-window.c:584
 #: ../src/main-window.c:1047 ../src/message-window.c:148
 msgid "_Reply..."
 msgstr "_Vastaa..."
 
-#: ../src/balsa-index.c:1889
+#: ../src/balsa-index.c:1893
 msgid "Reply To _All..."
 msgstr "Vastaa k_aikille..."
 
-#: ../src/balsa-index.c:1891
+#: ../src/balsa-index.c:1895
 msgid "Reply To _Group..."
 msgstr "Vastaa _ryhmälle..."
 
-#: ../src/balsa-index.c:1893
+#: ../src/balsa-index.c:1897
 msgid "_Forward Attached..."
 msgstr "Välitä _liitteenä..."
 
-#: ../src/balsa-index.c:1895
+#: ../src/balsa-index.c:1899
 msgid "Forward _Inline..."
 msgstr "Välitä _viestissä..."
 
-#: ../src/balsa-index.c:1897 ../src/main-window.c:623
+#: ../src/balsa-index.c:1901 ../src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "_Putkita ohjelmalle..."
 
-#: ../src/balsa-index.c:1899 ../src/main-window.c:682
+#: ../src/balsa-index.c:1903 ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "_Tallenna osoite"
 
-#: ../src/balsa-index.c:1914 ../src/filter-edit-dialog.c:223
+#: ../src/balsa-index.c:1918 ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:985 ../src/mailbox-node.c:1001
-#: ../src/pref-manager.c:1620 ../src/pref-manager.c:1711
-#: ../src/pref-manager.c:2776
+#: ../src/pref-manager.c:1629 ../src/pref-manager.c:1720
+#: ../src/pref-manager.c:2790
 msgid "_Delete"
 msgstr "_Poista"
 
-#: ../src/balsa-index.c:1919
+#: ../src/balsa-index.c:1923
 msgid "_Undelete"
 msgstr "P_alauta viesti"
 
-#: ../src/balsa-index.c:1924
+#: ../src/balsa-index.c:1928
 msgid "Move To _Trash"
 msgstr "Siirrä _roskakoriin"
 
-#: ../src/balsa-index.c:1928
+#: ../src/balsa-index.c:1932
 msgid "T_oggle"
 msgstr "M_erkitse"
 
-#: ../src/balsa-index.c:1932 ../src/main-window.c:331 ../src/main-window.c:360
+#: ../src/balsa-index.c:1936 ../src/main-window.c:331 ../src/main-window.c:360
 msgid "_Flagged"
 msgstr "_Lipulla"
 
-#: ../src/balsa-index.c:1935
+#: ../src/balsa-index.c:1939
 msgid "_Unread"
 msgstr "Lukematta"
 
-#: ../src/balsa-index.c:1943
+#: ../src/balsa-index.c:1947
 msgid "_Move to"
 msgstr "_Siirrä"
 
-#: ../src/balsa-index.c:1951
+#: ../src/balsa-index.c:1955
 msgid "_View Source"
 msgstr "Näytä _lähdekoodi"
 
-#: ../src/balsa-index.c:2160
+#: ../src/balsa-index.c:2164
 #, c-format
 msgid "Failed to copy %d message to mailbox \"%s\": %s"
 msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
 msgstr[0] "%d viestiä ei voi kopioida kansioon \"%s\": %s"
 msgstr[1] "%d viestiä ei voi kopioida kansioon \"%s\": %s"
 
-#: ../src/balsa-index.c:2174
+#: ../src/balsa-index.c:2178
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Kopioitu kohteeseen \"%s\"."
 
-#: ../src/balsa-index.c:2175
+#: ../src/balsa-index.c:2179
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Siirretty kohteeseen \"%s\"."
 
-#: ../src/balsa-index.c:2298
+#: ../src/balsa-index.c:2302
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Postikansion %s muutosten toteuttaminen epäonnistui."
 
-#: ../src/balsa-index.c:2471
+#: ../src/balsa-index.c:2475
 msgid "Pipe message through a program"
 msgstr "Putkita viesti ohjelman läpi"
 
-#: ../src/balsa-index.c:2474
+#: ../src/balsa-index.c:2478
 msgid "_Run"
 msgstr "Suo_rita"
 
-#: ../src/balsa-index.c:2483
+#: ../src/balsa-index.c:2487
 msgid "Specify the program to run:"
 msgstr "Määrittele suoritettava komento:"
 
@@ -2631,17 +2639,17 @@ msgstr "_Kaikki"
 msgid "C_lear"
 msgstr "_Tyhjennä"
 
-#: ../src/filter-edit-callbacks.c:910 ../src/main-window.c:4016
+#: ../src/filter-edit-callbacks.c:910 ../src/main-window.c:4029
 msgid "_Body"
 msgstr "Viestin _sisältö"
 
 #. To:
-#: ../src/filter-edit-callbacks.c:911 ../src/main-window.c:4017
-#: ../src/sendmsg-window.c:2814
+#: ../src/filter-edit-callbacks.c:911 ../src/main-window.c:4030
+#: ../src/sendmsg-window.c:2817
 msgid "_To:"
 msgstr "_Vastaanottaja:"
 
-#: ../src/filter-edit-callbacks.c:912 ../src/main-window.c:4018
+#: ../src/filter-edit-callbacks.c:912 ../src/main-window.c:4031
 msgid "_From:"
 msgstr "_Lähettäjä:"
 
@@ -2649,7 +2657,7 @@ msgstr "_Lähettäjä:"
 msgid "_Subject"
 msgstr "_Otsikko"
 
-#: ../src/filter-edit-callbacks.c:914 ../src/main-window.c:4020
+#: ../src/filter-edit-callbacks.c:914 ../src/main-window.c:4033
 msgid "_Cc:"
 msgstr "_Kopio:"
 
@@ -2754,7 +2762,7 @@ msgstr "Soitettava ääni täytyy antaa"
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Esimerkki: kirjoita Joulukuun 31, 2000 muodoss %s)"
 
-#: ../src/filter-edit-dialog.c:89 ../src/pref-manager.c:409
+#: ../src/filter-edit-dialog.c:89 ../src/pref-manager.c:410
 msgid "Simple"
 msgstr "Yksinkertainen"
 
@@ -3236,8 +3244,8 @@ msgstr "Poista _listalta"
 msgid "Folder deletion failed. Reason: %s"
 msgstr "Kansion poisto epäonnistui, syy: %s"
 
-#: ../src/mailbox-conf.c:533 ../src/pref-manager.c:1616
-#: ../src/pref-manager.c:1704 ../src/pref-manager.c:2770
+#: ../src/mailbox-conf.c:533 ../src/pref-manager.c:1625
+#: ../src/pref-manager.c:1713 ../src/pref-manager.c:2784
 msgid "_Add"
 msgstr "_Lisää"
 
@@ -3314,7 +3322,7 @@ msgstr "K_ansion polku:"
 msgid "_Identity:"
 msgstr "_Henkilöllisyys:"
 
-#: ../src/mailbox-conf.c:1395 ../src/pref-manager.c:3235
+#: ../src/mailbox-conf.c:1395 ../src/pref-manager.c:3249
 msgid "Always"
 msgstr "Aina"
 
@@ -3548,7 +3556,7 @@ msgid "Add a new MH style mailbox"
 msgstr "Lisää MH-muotoinen kansio"
 
 #: ../src/main-window.c:411 ../src/main-window.c:825
-#: ../src/pref-manager.c:3094
+#: ../src/pref-manager.c:3108
 msgid "Remote IMAP mailbox..."
 msgstr "Ulkoinen IMAP-kansio..."
 
@@ -3557,7 +3565,7 @@ msgid "Add a new IMAP mailbox"
 msgstr "Lisää uusi IMAP-kansio"
 
 #: ../src/main-window.c:416 ../src/main-window.c:830
-#: ../src/pref-manager.c:3099
+#: ../src/pref-manager.c:3113
 msgid "Remote IMAP folder..."
 msgstr "Ulkoinen IMAP-kansio..."
 
@@ -3610,7 +3618,7 @@ msgid "Send and Receive messages"
 msgstr "Lähetä ja vastaanota viestejä"
 
 #: ../src/main-window.c:461 ../src/main-window.c:882
-#: ../src/sendmsg-window.c:357 ../src/sendmsg-window.c:524
+#: ../src/sendmsg-window.c:361 ../src/sendmsg-window.c:528
 msgid "_Print..."
 msgstr "_Tulosta..."
 
@@ -3689,7 +3697,7 @@ msgid "_Wrap"
 msgstr "_Rivitys"
 
 #: ../src/main-window.c:536 ../src/main-window.c:952
-#: ../src/sendmsg-window.c:386 ../src/sendmsg-window.c:549
+#: ../src/sendmsg-window.c:390 ../src/sendmsg-window.c:553
 msgid "Wrap message lines"
 msgstr "Rivitä viestin rivit"
 
@@ -4049,8 +4057,8 @@ msgid "Enable quick message index filter"
 msgstr "Käytä nopeaa viesti-indeksin suodatinta"
 
 #: ../src/main-window.c:1008 ../src/main-window.c:1082
-#: ../src/sendmsg-window.c:526 ../src/sendmsg-window.c:584
-#: ../src/sendmsg-window.c:648
+#: ../src/sendmsg-window.c:530 ../src/sendmsg-window.c:588
+#: ../src/sendmsg-window.c:652
 msgid "_More"
 msgstr "_Lisää"
 
@@ -4084,7 +4092,7 @@ msgstr "_Valitse suodattimet"
 msgid "_Filters"
 msgstr "_Suodattimet..."
 
-#: ../src/main-window.c:1124 ../src/sendmsg-window.c:664
+#: ../src/main-window.c:1124 ../src/sendmsg-window.c:668
 msgid "_Tools"
 msgstr "_Työkalurivi"
 
@@ -4116,7 +4124,7 @@ msgstr "Viesti sisältää:"
 msgid "Older than (days):"
 msgstr "Vanhempi kuin (päiviä):"
 
-#: ../src/main-window.c:2352
+#: ../src/main-window.c:2365
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -4125,7 +4133,7 @@ msgstr ""
 "Kansiota ei voi avata!\n"
 "%s."
 
-#: ../src/main-window.c:2668
+#: ../src/main-window.c:2681
 msgid "translator-credits"
 msgstr ""
 "Ilkka Tuohela, 2005\n"
@@ -4134,7 +4142,7 @@ msgstr ""
 "\n"
 "http://gnome.fi/"
 
-#: ../src/main-window.c:2681 ../src/main-window.c:2708
+#: ../src/main-window.c:2694 ../src/main-window.c:2721
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -4147,110 +4155,110 @@ msgstr ""
 "Vikailmoitukset voit antaa osoitteessa http://bugzilla.gnome.org/\n"
 "Suomennos: http://gnome.fi/"
 
-#: ../src/main-window.c:2812 ../src/main-window.c:2825
+#: ../src/main-window.c:2825 ../src/main-window.c:2838
 msgid "Checking Mail..."
 msgstr "Tarkistetaan postia..."
 
-#: ../src/main-window.c:3003
+#: ../src/main-window.c:3016
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr "IMAP-kansio: %s"
 
-#: ../src/main-window.c:3007
+#: ../src/main-window.c:3020
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Paikallinen postikansio: %s"
 
-#: ../src/main-window.c:3145
+#: ../src/main-window.c:3158
 msgid "Finished Checking."
 msgstr "Tarkistus suoritettu"
 
-#: ../src/main-window.c:3207
+#: ../src/main-window.c:3220
 #, c-format
 msgid "Sending error: %s"
 msgstr "Lähetysvirhe: %s"
 
-#: ../src/main-window.c:3292
+#: ../src/main-window.c:3305
 msgid "Balsa: New mail"
 msgstr "Balsa: uutta sähköpostia"
 
-#: ../src/main-window.c:3304
+#: ../src/main-window.c:3317
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "Saapui %d uusi viesti."
 msgstr[1] "Saapui %d uutta viestiä."
 
-#: ../src/main-window.c:3307
+#: ../src/main-window.c:3320
 msgid "You have new mail."
 msgstr "Sinulla on lukemattomia viestejä"
 
-#: ../src/main-window.c:3441
+#: ../src/main-window.c:3454
 #, c-format
 msgid "The next unread message is in %s"
 msgstr "Seuraava lukematon viesti on kansiossa %s"
 
-#: ../src/main-window.c:3445
+#: ../src/main-window.c:3458
 #, c-format
 msgid "Do you want to switch to %s?"
 msgstr "Haluatko vaihtaa kansioon %s?"
 
-#: ../src/main-window.c:3978
+#: ../src/main-window.c:3991
 msgid "Search mailbox"
 msgstr "Etsi kansiosta"
 
-#: ../src/main-window.c:3995
+#: ../src/main-window.c:4008
 msgid "_Search for:"
 msgstr "_Hae:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:4008
+#: ../src/main-window.c:4021
 msgid "In:"
 msgstr "Kentässä:"
 
-#: ../src/main-window.c:4019
+#: ../src/main-window.c:4032
 msgid "S_ubject"
 msgstr "_Aihe"
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:4024
+#: ../src/main-window.c:4037
 msgid "Show only matching messages"
 msgstr "Lähetä vain vastaavat viestit"
 
 #. Frame with OK button
-#: ../src/main-window.c:4045
+#: ../src/main-window.c:4058
 msgid "Open next matching message"
 msgstr "Avaa seuraava vastaava viesti"
 
-#: ../src/main-window.c:4056
+#: ../src/main-window.c:4069
 msgid "_Reverse search"
 msgstr "_Hae taaksepäin"
 
-#: ../src/main-window.c:4061
+#: ../src/main-window.c:4074
 msgid "_Wrap around"
 msgstr "_Rivitä viesti"
 
-#: ../src/main-window.c:4223
+#: ../src/main-window.c:4236
 msgid "You can apply filters only on mailbox\n"
 msgstr "Voit käyttää suodattimia vain sähköpostikansioille\n"
 
-#: ../src/main-window.c:4237
+#: ../src/main-window.c:4250
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Kaksoiskappaleiden poist epäonnistui: %s"
 
-#: ../src/main-window.c:4457
+#: ../src/main-window.c:4470
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Roskakoria ei voi avata: %s"
 
-#: ../src/main-window.c:4586
+#: ../src/main-window.c:4599
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (vain lukuoikeudet)"
 
-#: ../src/main-window.c:4588
+#: ../src/main-window.c:4601
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
@@ -4491,7 +4499,7 @@ msgid "Se_nd message to obtain this part"
 msgstr "Lähetä _viesti saadaksesti tämän osan"
 
 #: ../src/balsa-mime-widget-message.c:298 ../src/balsa-mime-widget-text.c:745
-#: ../src/balsa-mime-widget-text.c:945 ../src/sendmsg-window.c:1757
+#: ../src/balsa-mime-widget-text.c:945 ../src/sendmsg-window.c:1761
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Virhe näytettäessä %s: %s\n"
@@ -4510,45 +4518,45 @@ msgid "Copy to folder..."
 msgstr "Kopioi kansioon..."
 
 #: ../src/balsa-mime-widget-message.c:661 ../src/print.c:350
-#: ../src/sendmsg-window.c:1102 ../src/sendmsg-window.c:3322
-#: ../src/sendmsg-window.c:5225
+#: ../src/sendmsg-window.c:1106 ../src/sendmsg-window.c:3324
+#: ../src/sendmsg-window.c:5249
 msgid "Subject:"
 msgstr "Aihe:"
 
 #: ../src/balsa-mime-widget-message.c:665 ../src/print.c:356
-#: ../src/sendmsg-window.c:3318
+#: ../src/sendmsg-window.c:3320
 msgid "Date:"
 msgstr "Päivämäärä:"
 
 #: ../src/balsa-mime-widget-message.c:671 ../src/print.c:361
-#: ../src/sendmsg-window.c:3329 ../src/store-address.c:305
+#: ../src/sendmsg-window.c:3331 ../src/store-address.c:305
 msgid "From:"
 msgstr "Lähettäjä:"
 
 #. Cannot edit the new "From:" header.
 #. { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
-#: ../src/balsa-mime-widget-message.c:678 ../src/sendmsg-window.c:1099
+#: ../src/balsa-mime-widget-message.c:678 ../src/sendmsg-window.c:1103
 msgid "Reply-To:"
 msgstr "_Vastausosoite:"
 
 # src/balsa-message.c#
 # 651 src/filter-edit-dialog.c:325
 #: ../src/balsa-mime-widget-message.c:681 ../src/print.c:365
-#: ../src/sendmsg-window.c:1096 ../src/sendmsg-window.c:3337
+#: ../src/sendmsg-window.c:1100 ../src/sendmsg-window.c:3339
 #: ../src/store-address.c:306
 msgid "To:"
 msgstr "Vastaanottaja:"
 
 #. cc:
 #: ../src/balsa-mime-widget-message.c:682 ../src/print.c:366
-#: ../src/sendmsg-window.c:1101 ../src/sendmsg-window.c:2825
-#: ../src/sendmsg-window.c:3345 ../src/store-address.c:307
+#: ../src/sendmsg-window.c:1105 ../src/sendmsg-window.c:2828
+#: ../src/sendmsg-window.c:3347 ../src/store-address.c:307
 msgid "Cc:"
 msgstr "Kopio:"
 
 #. bcc:
 #: ../src/balsa-mime-widget-message.c:683 ../src/print.c:367
-#: ../src/sendmsg-window.c:1100 ../src/sendmsg-window.c:2830
+#: ../src/sendmsg-window.c:1104 ../src/sendmsg-window.c:2833
 #: ../src/store-address.c:308
 msgid "Bcc:"
 msgstr "Toinen kopio:"
@@ -4624,162 +4632,166 @@ msgstr "T_allenna osa"
 msgid "View _part with %s"
 msgstr "Näytä _osa ohjelmalla %s"
 
-#: ../src/pref-manager.c:385
+#: ../src/pref-manager.c:386
 msgid "While Retrieving Messages"
 msgstr "Viestejä ladatessa"
 
-#: ../src/pref-manager.c:386
+#: ../src/pref-manager.c:387
 msgid "Until Closed"
 msgstr "Kunnes suljetaan"
 
-#: ../src/pref-manager.c:392
+#: ../src/pref-manager.c:393
 msgid "Fast"
 msgstr "Nopea"
 
-#: ../src/pref-manager.c:393
+#: ../src/pref-manager.c:394
 msgid "Normal"
 msgstr "Normaali"
 
-#: ../src/pref-manager.c:394
+#: ../src/pref-manager.c:395
 msgid "Bad Spellers"
 msgstr "Huonot kirjoittajat"
 
-#: ../src/pref-manager.c:400
+#: ../src/pref-manager.c:401
 msgid "Message number"
 msgstr "Viestin numero"
 
-#: ../src/pref-manager.c:404
+#: ../src/pref-manager.c:405
 msgid "Sender"
 msgstr "Lähettäjä"
 
-#: ../src/pref-manager.c:408
+#: ../src/pref-manager.c:409
 msgid "Flat"
 msgstr "Litteä"
 
-#: ../src/pref-manager.c:410
+#: ../src/pref-manager.c:411
 msgid "JWZ"
 msgstr "JWZ"
 
 #. must NOT be modal
-#: ../src/pref-manager.c:508
+#: ../src/pref-manager.c:509
 msgid "Balsa Preferences"
 msgstr "Balsan asetukset"
 
-#: ../src/pref-manager.c:557
+#: ../src/pref-manager.c:558
 msgid "Mail Options"
 msgstr "Sähköpostin asetukset"
 
-#: ../src/pref-manager.c:559
+#: ../src/pref-manager.c:560
 msgid "Display Options"
 msgstr "Näyttämisen asetukset"
 
-#: ../src/pref-manager.c:561 ../src/pref-manager.c:2717
+#: ../src/pref-manager.c:562 ../src/pref-manager.c:2731
 msgid "Address Books"
 msgstr "Osoitekirjat"
 
-#: ../src/pref-manager.c:565 ../src/toolbar-factory.c:120
+#: ../src/pref-manager.c:566 ../src/toolbar-factory.c:120
 msgid "Spelling"
 msgstr "Oikeinkirjoitus"
 
-#: ../src/pref-manager.c:569
+#: ../src/pref-manager.c:570
 msgid "Startup"
 msgstr "Käynnistys"
 
-#: ../src/pref-manager.c:571 ../src/pref-manager.c:2505
+#: ../src/pref-manager.c:572 ../src/pref-manager.c:2519
 msgid "Miscellaneous"
 msgstr "Lisäasetukset"
 
-#: ../src/pref-manager.c:1315
+#: ../src/pref-manager.c:1324
 #, c-format
 msgid "%s (default)"
 msgstr "%s (oletus)"
 
-#: ../src/pref-manager.c:1575
+#: ../src/pref-manager.c:1584
 msgid "Remote Mailbox Servers"
 msgstr "Ulkoiset postipalvelimet"
 
-#: ../src/pref-manager.c:1596 ../src/pref-manager.c:2738
-#: ../src/sendmsg-window.c:2909
+#: ../src/pref-manager.c:1605 ../src/pref-manager.c:2752
+#: ../src/sendmsg-window.c:2912
 msgid "Type"
 msgstr "Tyyppi"
 
-#: ../src/pref-manager.c:1604
+#: ../src/pref-manager.c:1613
 msgid "Mailbox Name"
 msgstr "Kansion nimi"
 
-#: ../src/pref-manager.c:1618 ../src/pref-manager.c:1707
-#: ../src/pref-manager.c:2773
+#: ../src/pref-manager.c:1627 ../src/pref-manager.c:1716
+#: ../src/pref-manager.c:2787
 msgid "_Modify"
 msgstr "_Muokkaa"
 
-#: ../src/pref-manager.c:1632
+#: ../src/pref-manager.c:1641
 msgid "Local Mail Directory"
 msgstr "Paikallinen postikansio"
 
-#: ../src/pref-manager.c:1635 ../src/pref-manager.c:1643
+#: ../src/pref-manager.c:1644 ../src/pref-manager.c:1652
 msgid "Select your local mail directory"
 msgstr "Valitse paikallisen postin hakemisto"
 
-#: ../src/pref-manager.c:1671
+#: ../src/pref-manager.c:1680
 msgid "Outgoing Mail Servers"
 msgstr "Lähtevän postin palvelimet"
 
-#: ../src/pref-manager.c:1693
+#: ../src/pref-manager.c:1702
 msgid "Server Name"
 msgstr "Palvelimen nimi"
 
-#: ../src/pref-manager.c:1733
+#: ../src/pref-manager.c:1742
 msgid "Mail Servers"
 msgstr "Postipalvelimet"
 
-#: ../src/pref-manager.c:1735
+#: ../src/pref-manager.c:1744
 msgid "Incoming"
 msgstr "Tuleva"
 
-#: ../src/pref-manager.c:1737
+#: ../src/pref-manager.c:1746
 msgid "Outgoing"
 msgstr "Menevä"
 
-#: ../src/pref-manager.c:1762
+#: ../src/pref-manager.c:1771
 msgid "Checking"
 msgstr "Uudet viestit"
 
-#: ../src/pref-manager.c:1767
+#: ../src/pref-manager.c:1776
 msgid "_Check mail automatically every"
 msgstr "_Tarkista viestit joka:"
 
-#: ../src/pref-manager.c:1778 ../src/pref-manager.c:2528
-#: ../src/pref-manager.c:2588
+#: ../src/pref-manager.c:1787 ../src/pref-manager.c:2542
+#: ../src/pref-manager.c:2602
 msgid "minutes"
 msgstr "minuuttia"
 
-#: ../src/pref-manager.c:1784
+#: ../src/pref-manager.c:1793
 msgid "Check _IMAP mailboxes"
 msgstr "Tarkista _IMAP-kansiot"
 
-#: ../src/pref-manager.c:1790
+#: ../src/pref-manager.c:1799
 msgid "Check INBOX _only"
 msgstr "Tarkista _vain INBOX"
 
-#: ../src/pref-manager.c:1795
+#: ../src/pref-manager.c:1804
 msgid "Display message if new mail has arrived"
 msgstr "Näytä viesti, jos uutta postia on saapunut"
 
-#: ../src/pref-manager.c:1800
+#: ../src/pref-manager.c:1809
+msgid "Play sound if new mail has arrived"
+msgstr "Soita ääni, jos uutta postia on saapunut"
+
+#: ../src/pref-manager.c:1814
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "Tarkista huomaamattomasti taustalla (ei viestejä tilarivillä)"
 
-#: ../src/pref-manager.c:1804
+#: ../src/pref-manager.c:1818
 msgid "_POP message size limit:"
 msgstr "_POP-viestien enimmäiskoko:"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: ../src/pref-manager.c:1831
+#: ../src/pref-manager.c:1845
 msgid "Quoted and Flowed Text"
 msgstr "Lainattu ja rivitetty teksti"
 
-#: ../src/pref-manager.c:1835
+#: ../src/pref-manager.c:1849
 msgid ""
 "Quoted Text\n"
 "Regular Expression:"
@@ -4787,43 +4799,43 @@ msgstr ""
 "Lainatun tekstin\n"
 "säännöllinen lauseke:"
 
-#: ../src/pref-manager.c:1843
+#: ../src/pref-manager.c:1857
 msgid "Wrap Text at"
 msgstr "Rivitä teksti kohdasta "
 
-#: ../src/pref-manager.c:1855 ../src/pref-manager.c:2022
+#: ../src/pref-manager.c:1869 ../src/pref-manager.c:2036
 msgid "characters"
 msgstr "merkkiä"
 
 #. handling of multipart/alternative
-#: ../src/pref-manager.c:1870
+#: ../src/pref-manager.c:1884
 msgid "Display of Multipart/Alternative Parts"
 msgstr "Multipart/Alternative-osien näyttö"
 
-#: ../src/pref-manager.c:1873
+#: ../src/pref-manager.c:1887
 msgid "Prefer text/plain over html"
 msgstr "Suosi text/plain-muotoa HTML:n sijasta"
 
-#: ../src/pref-manager.c:1889
+#: ../src/pref-manager.c:1903
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 "Kansallisia (8-bittiset) merkkejä rikkinäisessä viestissä ilman merkistön "
 "otsaketta"
 
-#: ../src/pref-manager.c:1896
+#: ../src/pref-manager.c:1910
 msgid "display as \"?\""
 msgstr "näytä muodossa \"?\""
 
-#: ../src/pref-manager.c:1905
+#: ../src/pref-manager.c:1919
 msgid "display in codeset"
 msgstr "näytä käyttäen merkistöä"
 
 #. How to handle received MDN requests
-#: ../src/pref-manager.c:1935
+#: ../src/pref-manager.c:1949
 msgid "Message Disposition Notification Requests"
 msgstr "Message Disposition Notification-pyynnöt"
 
-#: ../src/pref-manager.c:1937
+#: ../src/pref-manager.c:1951
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
@@ -4831,7 +4843,7 @@ msgstr ""
 "Kun vastaanotan viestin, jonka lähettäjä vaatii MDN:n palauttamista, lähetä "
 "se seuraavissa tapauksissa:"
 
-#: ../src/pref-manager.c:1949
+#: ../src/pref-manager.c:1963
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is the return path,\n"
@@ -4841,240 +4853,240 @@ msgstr ""
 "(pyytäjän osoite on sama kuin paluuosoite ja\n"
 "oma osoite on otsakkeessa \"To:\" tai \"Cc:\")."
 
-#: ../src/pref-manager.c:1966
+#: ../src/pref-manager.c:1980
 msgid "The message header looks suspicious."
 msgstr "Viestin otsakkeet näyttävät epäilyttäviltä"
 
-#: ../src/pref-manager.c:2003
+#: ../src/pref-manager.c:2017
 msgid "Word Wrap"
 msgstr "Rivitys"
 
-#: ../src/pref-manager.c:2008
+#: ../src/pref-manager.c:2022
 msgid "Wrap Outgoing Text at"
 msgstr "Rivitä lähtevä teksti kohdasta "
 
-#: ../src/pref-manager.c:2036
+#: ../src/pref-manager.c:2050
 msgid "Other Options"
 msgstr "Muita asetuksia"
 
-#: ../src/pref-manager.c:2041
+#: ../src/pref-manager.c:2055
 msgid "Reply Prefix:"
 msgstr "Lainauksen etuliite:"
 
-#: ../src/pref-manager.c:2044
+#: ../src/pref-manager.c:2058
 msgid "Automatically quote original when replying"
 msgstr "Lainaa automaattisesti alkuperäinen vastatessa"
 
-#: ../src/pref-manager.c:2047
+#: ../src/pref-manager.c:2061
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Välitä viesti liitetiedostona sen sijaan, että lainaisit sen"
 
-#: ../src/pref-manager.c:2050
+#: ../src/pref-manager.c:2064
 msgid "Copy outgoing messages to sentbox"
 msgstr "Kopioi lähtevät viestit Lähteneet-kansioon"
 
-#: ../src/pref-manager.c:2052
+#: ../src/pref-manager.c:2066
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "Lähetä-nappi lisää viestit lähtevien jonoon aina."
 
-#: ../src/pref-manager.c:2055
+#: ../src/pref-manager.c:2069
 msgid "Edit headers in external editor"
 msgstr "Muokkaa otsakkeita ulkoisella ohjelmalla"
 
-#: ../src/pref-manager.c:2057
+#: ../src/pref-manager.c:2071
 msgid "Include HTML parts as text when replying or forwarding"
 msgstr "Sisällytä HTML-osat tekstinä vastatessa tai välittäessä"
 
-#: ../src/pref-manager.c:2074
+#: ../src/pref-manager.c:2088
 msgid "Layout"
 msgstr "Asettelu"
 
-#: ../src/pref-manager.c:2076
+#: ../src/pref-manager.c:2090
 msgid "Sort and Thread"
 msgstr "Järjestys ja säikeet"
 
-#: ../src/pref-manager.c:2078
+#: ../src/pref-manager.c:2092
 msgid "Message"
 msgstr "Viesti"
 
-#: ../src/pref-manager.c:2080
+#: ../src/pref-manager.c:2094
 msgid "Colors"
 msgstr "Värit"
 
-#: ../src/pref-manager.c:2082 ../src/pref-manager.c:2170
+#: ../src/pref-manager.c:2096 ../src/pref-manager.c:2184
 msgid "Format"
 msgstr "Muotoilu"
 
-#: ../src/pref-manager.c:2084
+#: ../src/pref-manager.c:2098
 msgid "Status Messages"
 msgstr "Tilaviestit"
 
-#: ../src/pref-manager.c:2109
+#: ../src/pref-manager.c:2123
 msgid "Main Window"
 msgstr "Pääikkuna"
 
-#: ../src/pref-manager.c:2112
+#: ../src/pref-manager.c:2126
 msgid "Use preview pane"
 msgstr "Käytä esikatseluruutua"
 
-#: ../src/pref-manager.c:2114
+#: ../src/pref-manager.c:2128
 msgid "Show mailbox statistics in left pane"
 msgstr "Näytä tilastot vasemmassa ruudussa"
 
-#: ../src/pref-manager.c:2116
+#: ../src/pref-manager.c:2130
 msgid "Use alternative main window layout"
 msgstr "Käytä vaihtoehtoista asettelua"
 
-#: ../src/pref-manager.c:2118
+#: ../src/pref-manager.c:2132
 msgid "Automatically view message when mailbox opened"
 msgstr "Näytä viesti heti, kun kansio valitaan"
 
-#: ../src/pref-manager.c:2124
+#: ../src/pref-manager.c:2138
 msgid "PageUp/PageDown keys scroll text by"
 msgstr "PageUp/PageDown näppäimet vierittävät viestiä"
 
-#: ../src/pref-manager.c:2135
+#: ../src/pref-manager.c:2149
 msgid "percent"
 msgstr "prosentilla"
 
-#: ../src/pref-manager.c:2150
+#: ../src/pref-manager.c:2164
 msgid "Display Progress Dialog"
 msgstr "Näytä edistymisikkuna"
 
-#: ../src/pref-manager.c:2175
+#: ../src/pref-manager.c:2189
 msgid "Date encoding (for strftime):"
 msgstr "Päivämäärän koodaus (strftime):"
 
-#: ../src/pref-manager.c:2177
+#: ../src/pref-manager.c:2191
 msgid "Selected headers:"
 msgstr "Valitut otsikot:"
 
-#: ../src/pref-manager.c:2199
+#: ../src/pref-manager.c:2213
 msgid "Information Messages"
 msgstr "Ilmoitukset"
 
-#: ../src/pref-manager.c:2204
+#: ../src/pref-manager.c:2218
 msgid "Information Messages:"
 msgstr "Ilmoitukset:"
 
-#: ../src/pref-manager.c:2208
+#: ../src/pref-manager.c:2222
 msgid "Warning Messages:"
 msgstr "Varoitukset:"
 
-#: ../src/pref-manager.c:2212
+#: ../src/pref-manager.c:2226
 msgid "Error Messages:"
 msgstr "Virheilmoitukset:"
 
-#: ../src/pref-manager.c:2216
+#: ../src/pref-manager.c:2230
 msgid "Fatal Error Messages:"
 msgstr "Vakavat virheilmoitukset:"
 
-#: ../src/pref-manager.c:2220
+#: ../src/pref-manager.c:2234
 msgid "Debug Messages:"
 msgstr "Vianmääritysviestit:"
 
-#: ../src/pref-manager.c:2246
+#: ../src/pref-manager.c:2260
 msgid "Message Colors"
 msgstr "Viestivärit"
 
-#: ../src/pref-manager.c:2251
+#: ../src/pref-manager.c:2265
 #, c-format
 msgid "Quote level %d color"
 msgstr "%d. tason lainauksen väri"
 
-#: ../src/pref-manager.c:2264
+#: ../src/pref-manager.c:2278
 msgid "Link Color"
 msgstr "Linkin väri"
 
-#: ../src/pref-manager.c:2266
+#: ../src/pref-manager.c:2280
 msgid "Hyperlink color"
 msgstr "Hyperlinkin väri"
 
-#: ../src/pref-manager.c:2277
+#: ../src/pref-manager.c:2291
 msgid "Composition Window"
 msgstr "Kirjoitusikkuna"
 
-#: ../src/pref-manager.c:2281
+#: ../src/pref-manager.c:2295
 msgid "Invalid or incomplete address label color"
 msgstr "Virheellisen tai keskeneräisen kohdeosoitteen väri"
 
-#: ../src/pref-manager.c:2304
+#: ../src/pref-manager.c:2318
 msgid "Fonts"
 msgstr "Kirjasimet"
 
-#: ../src/pref-manager.c:2308
+#: ../src/pref-manager.c:2322
 msgid "Message Font:"
 msgstr "Viestin kirjasin:"
 
-#: ../src/pref-manager.c:2316
+#: ../src/pref-manager.c:2330
 msgid "Subject Font:"
 msgstr "Aiheen kirjasin:"
 
-#: ../src/pref-manager.c:2354
+#: ../src/pref-manager.c:2368
 msgid "Sorting and Threading"
 msgstr "Järjestys ja säikeistys"
 
-#: ../src/pref-manager.c:2358
+#: ../src/pref-manager.c:2372
 msgid "Default sort column:"
 msgstr "Järjestyssarakkeen oletus:"
 
-#: ../src/pref-manager.c:2362
+#: ../src/pref-manager.c:2376
 msgid "Default threading style:"
 msgstr "Säikeistystyylin oletus:"
 
-#: ../src/pref-manager.c:2367
+#: ../src/pref-manager.c:2381
 msgid "Expand threads on open"
 msgstr "Laajenna säikeet avattaessa"
 
-#: ../src/pref-manager.c:2442
+#: ../src/pref-manager.c:2456
 msgid "Pspell Settings"
 msgstr "Pspell -asetukset"
 
-#: ../src/pref-manager.c:2448
+#: ../src/pref-manager.c:2462
 msgid "Spell Check Module"
 msgstr "Oikolukumoduuli"
 
-#: ../src/pref-manager.c:2454
+#: ../src/pref-manager.c:2468
 msgid "Suggestion Level"
 msgstr "Ehdotustaso"
 
 #. do the ignore length
-#: ../src/pref-manager.c:2459
+#: ../src/pref-manager.c:2473
 msgid "Ignore words shorter than"
 msgstr "Ohita sanat, jotka ovat lyhyempiä kuin"
 
-#: ../src/pref-manager.c:2477
+#: ../src/pref-manager.c:2491
 msgid "Miscellaneous Spelling Settings"
 msgstr "Muut oikolukuasetukset"
 
-#: ../src/pref-manager.c:2479
+#: ../src/pref-manager.c:2493
 msgid "Check signature"
 msgstr "Tarkista allekirjoitus"
 
-#: ../src/pref-manager.c:2480
+#: ../src/pref-manager.c:2494
 msgid "Check quoted"
 msgstr "Tarkista lainaus"
 
-#: ../src/pref-manager.c:2507
+#: ../src/pref-manager.c:2521
 msgid "Debug"
 msgstr "Debug-tila"
 
-#: ../src/pref-manager.c:2508
+#: ../src/pref-manager.c:2522
 msgid "Empty Trash on exit"
 msgstr "Tyhjennä roskakori poistuessa"
 
-#: ../src/pref-manager.c:2514
+#: ../src/pref-manager.c:2528
 msgid "Close mailbox if unused more than"
 msgstr "Sulje kansio, jos se on käyttämättä pidempään kuin"
 
-#: ../src/pref-manager.c:2543
+#: ../src/pref-manager.c:2557
 msgid "Deleting Messages"
 msgstr "Poistetaan viestejä"
 
 #. Translators: this used to be "using Mailbox -> Hide messages";
 #. * the UTF-8 string for the right-arrow symbol is broken out to
 #. * avoid msgconv problems.
-#: ../src/pref-manager.c:2548
+#: ../src/pref-manager.c:2562
 #, c-format
 msgid ""
 "The following setting is global, but may be overridden for the selected "
@@ -5083,51 +5095,51 @@ msgstr ""
 "Seuraava asetus vaikuttaa kaikkiin kansioihin, mutta voidaan ohittaa "
 "kansiokohtaisesti kohdasta \"Kansio %s Piilota viestit:\""
 
-#: ../src/pref-manager.c:2560
+#: ../src/pref-manager.c:2574
 msgid "Hide messages marked as deleted"
 msgstr "Piilota poistettavaksi merkityt viestit"
 
-#: ../src/pref-manager.c:2562
+#: ../src/pref-manager.c:2576
 msgid "The following settings are global:"
 msgstr "Seuraavat asetukset vaikuttavat kaikkiin kansioihin:"
 
-#: ../src/pref-manager.c:2568
+#: ../src/pref-manager.c:2582
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "Siivoa poistetut viestit, kun kansio suljetaan"
 
-#: ../src/pref-manager.c:2575
+#: ../src/pref-manager.c:2589
 msgid "...and if unused more than"
 msgstr "ja jos kansio on käyttämättä pidempään kuin"
 
-#: ../src/pref-manager.c:2600
+#: ../src/pref-manager.c:2614
 msgid "Message Window"
 msgstr "Viesti-ikkuna"
 
-#: ../src/pref-manager.c:2605
+#: ../src/pref-manager.c:2619
 msgid "After moving a message:"
 msgstr "Viestin siirron jälkeen:"
 
-#: ../src/pref-manager.c:2634
+#: ../src/pref-manager.c:2648
 msgid "Startup Options"
 msgstr "Käynnistysvalinnat"
 
-#: ../src/pref-manager.c:2637
+#: ../src/pref-manager.c:2651
 msgid "Open Inbox upon startup"
 msgstr "Avaa Inbox käynnistettäessä"
 
-#: ../src/pref-manager.c:2639
+#: ../src/pref-manager.c:2653
 msgid "Check mail upon startup"
 msgstr "Tarkista posti käynnistettäessä"
 
-#: ../src/pref-manager.c:2641
+#: ../src/pref-manager.c:2655
 msgid "Remember open mailboxes between sessions"
 msgstr "Muista avoimet kansiot käyttökertojen välillä"
 
-#: ../src/pref-manager.c:2655
+#: ../src/pref-manager.c:2669
 msgid "Folder Scanning"
 msgstr "Kansioiden haku"
 
-#: ../src/pref-manager.c:2657
+#: ../src/pref-manager.c:2671
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.  To see "
 "more of the tree at startup, choose a greater depth."
@@ -5136,67 +5148,67 @@ msgstr ""
 "joidenkin kansioiden latausta. Valitse suurempi syvyys, jos haluat nähdä "
 "syvemmälle puuhun heti käynnistyksessä."
 
-#: ../src/pref-manager.c:2668
+#: ../src/pref-manager.c:2682
 msgid "Scan local folders to depth"
 msgstr "Paikallisten kansioiden hakusyvyys"
 
-#: ../src/pref-manager.c:2681
+#: ../src/pref-manager.c:2695
 msgid "Scan IMAP folders to depth"
 msgstr "Etsi IMAP-kansioita syvyyteen"
 
-#: ../src/pref-manager.c:2746
+#: ../src/pref-manager.c:2760
 msgid "Address Book Name"
 msgstr "Osoitekirjan nimi"
 
-#: ../src/pref-manager.c:2754
+#: ../src/pref-manager.c:2768
 msgid "Auto-complete"
 msgstr "Automaattinen täydennys"
 
-#: ../src/pref-manager.c:2779
+#: ../src/pref-manager.c:2793
 msgid "_Set as default"
 msgstr "_Aseta oletukseksi"
 
-#: ../src/pref-manager.c:3089
+#: ../src/pref-manager.c:3103
 msgid "Remote POP3 mailbox..."
 msgstr "Ulkoinen POP3-kansio..."
 
-#: ../src/pref-manager.c:3215
+#: ../src/pref-manager.c:3229
 msgid "Show nothing"
 msgstr "Älä näytä mitään"
 
-#: ../src/pref-manager.c:3217
+#: ../src/pref-manager.c:3231
 msgid "Show dialog"
 msgstr "Näytä ikkuna"
 
-#: ../src/pref-manager.c:3219
+#: ../src/pref-manager.c:3233
 msgid "Show in list"
 msgstr "Näytä listalla"
 
-#: ../src/pref-manager.c:3221
+#: ../src/pref-manager.c:3235
 msgid "Show in status bar"
 msgstr "Näytä tilarivillä"
 
-#: ../src/pref-manager.c:3223
+#: ../src/pref-manager.c:3237
 msgid "Print to console"
 msgstr "Tulosta konsoliin"
 
-#: ../src/pref-manager.c:3234
+#: ../src/pref-manager.c:3248
 msgid "Ask me"
 msgstr "Kysy"
 
-#: ../src/pref-manager.c:3311
+#: ../src/pref-manager.c:3325
 msgid "Show next unread message"
 msgstr "Näytä seuraava lukematon viesti"
 
-#: ../src/pref-manager.c:3312
+#: ../src/pref-manager.c:3326
 msgid "Show next message"
 msgstr "Näytä seuraava viesti"
 
-#: ../src/pref-manager.c:3313
+#: ../src/pref-manager.c:3327
 msgid "Close message window"
 msgstr "Suljetaan viesti-ikkuna"
 
-#: ../src/pref-manager.c:3351
+#: ../src/pref-manager.c:3365
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Virhe näytettäessä linkkiä %s: %s\n"
@@ -5334,336 +5346,344 @@ msgstr "Virhe asetettaessa GConf-kenttää: %s\n"
 #. Translators: please use the initial letter of each language as
 #. * its accelerator; this is a long list, and unique accelerators
 #. * cannot be found.
-#: ../src/sendmsg-window.c:237
+#: ../src/sendmsg-window.c:239
 msgid "_Brazilian Portuguese"
 msgstr "_Brasilian Portugali"
 
-#: ../src/sendmsg-window.c:238
+#: ../src/sendmsg-window.c:240
 msgid "_Catalan"
 msgstr "_Katalonialainen"
 
-#: ../src/sendmsg-window.c:239
+#: ../src/sendmsg-window.c:241
 msgid "_Chinese Simplified"
 msgstr "_Kiina (yksinkertaistettu)"
 
-#: ../src/sendmsg-window.c:240
+#: ../src/sendmsg-window.c:242
 msgid "_Chinese Traditional"
 msgstr "_Kiina (perinteinen)"
 
-#: ../src/sendmsg-window.c:241
+#: ../src/sendmsg-window.c:243
 msgid "_Czech"
 msgstr "_Tsekki"
 
-#: ../src/sendmsg-window.c:242
+#: ../src/sendmsg-window.c:244
 msgid "_Danish"
 msgstr "_Tanska"
 
-#: ../src/sendmsg-window.c:243
+#: ../src/sendmsg-window.c:245
 msgid "_Dutch"
 msgstr "_Hollanti"
 
-#: ../src/sendmsg-window.c:244
+#: ../src/sendmsg-window.c:246
 msgid "_English (American)"
 msgstr "_Englanti (Amerikkalainen)"
 
-#: ../src/sendmsg-window.c:245
+#: ../src/sendmsg-window.c:247
 msgid "_English (British)"
 msgstr "_Englanti (Brittiläinen)"
 
-#: ../src/sendmsg-window.c:246
+#: ../src/sendmsg-window.c:248
 msgid "_Esperanto"
 msgstr "_Esperanto"
 
-#: ../src/sendmsg-window.c:247
+#: ../src/sendmsg-window.c:249
 msgid "_Estonian"
 msgstr "_Eesti"
 
-#: ../src/sendmsg-window.c:248
+#: ../src/sendmsg-window.c:250
 msgid "_Finnish"
 msgstr "_Suomi"
 
-#: ../src/sendmsg-window.c:249
+#: ../src/sendmsg-window.c:251
 msgid "_French"
 msgstr "_Ranska"
 
-#: ../src/sendmsg-window.c:250
+#: ../src/sendmsg-window.c:252
 msgid "_German"
 msgstr "_Saksa"
 
-#: ../src/sendmsg-window.c:251
+#: ../src/sendmsg-window.c:253
+msgid "_German (Austrian)"
+msgstr "_Saksa (Itävaltalainen)"
+
+#: ../src/sendmsg-window.c:254
+msgid "_German (Swiss)"
+msgstr "_Saksa (Sveitsiläinen)"
+
+#: ../src/sendmsg-window.c:255
 msgid "_Greek"
 msgstr "_Kreikka"
 
-#: ../src/sendmsg-window.c:252
+#: ../src/sendmsg-window.c:256
 msgid "_Hebrew"
 msgstr "_Heprea"
 
-#: ../src/sendmsg-window.c:253
+#: ../src/sendmsg-window.c:257
 msgid "_Hungarian"
 msgstr "_Unkari"
 
-#: ../src/sendmsg-window.c:254
+#: ../src/sendmsg-window.c:258
 msgid "_Italian"
 msgstr "_Italia"
 
-#: ../src/sendmsg-window.c:255
+#: ../src/sendmsg-window.c:259
 msgid "_Japanese (JIS)"
 msgstr "_Japani (JIS)"
 
-#: ../src/sendmsg-window.c:256
+#: ../src/sendmsg-window.c:260
 msgid "_Korean"
 msgstr "_Korea"
 
-#: ../src/sendmsg-window.c:257
+#: ../src/sendmsg-window.c:261
 msgid "_Latvian"
 msgstr "_Latvia"
 
-#: ../src/sendmsg-window.c:258
+#: ../src/sendmsg-window.c:262
 msgid "_Lithuanian"
 msgstr "_Liettua"
 
-#: ../src/sendmsg-window.c:259
+#: ../src/sendmsg-window.c:263
 msgid "_Norwegian"
 msgstr "_Norja"
 
-#: ../src/sendmsg-window.c:260
+#: ../src/sendmsg-window.c:264
 msgid "_Polish"
 msgstr "_Puola"
 
-#: ../src/sendmsg-window.c:261
+#: ../src/sendmsg-window.c:265
 msgid "_Portugese"
 msgstr "_Portugali"
 
-#: ../src/sendmsg-window.c:262
+#: ../src/sendmsg-window.c:266
 msgid "_Romanian"
 msgstr "_Rooma"
 
-#: ../src/sendmsg-window.c:263
+#: ../src/sendmsg-window.c:267
 msgid "_Russian (ISO)"
 msgstr "_Venäjä (ISO)"
 
-#: ../src/sendmsg-window.c:264
+#: ../src/sendmsg-window.c:268
 msgid "_Russian (KOI)"
 msgstr "_Venäjä (KOI)"
 
-#: ../src/sendmsg-window.c:265
+#: ../src/sendmsg-window.c:269
 msgid "_Serbian"
 msgstr "_Serbia"
 
-#: ../src/sendmsg-window.c:266
+#: ../src/sendmsg-window.c:270
 msgid "_Serbian (Latin)"
 msgstr "_Serbia (Latinalainen)"
 
-#: ../src/sendmsg-window.c:267
+#: ../src/sendmsg-window.c:271
 msgid "_Slovak"
 msgstr "_Slovakia"
 
-#: ../src/sendmsg-window.c:268
+#: ../src/sendmsg-window.c:272
 msgid "_Spanish"
 msgstr "_Espanja"
 
-#: ../src/sendmsg-window.c:269
+#: ../src/sendmsg-window.c:273
 msgid "_Swedish"
 msgstr "_Ruotsi"
 
-#: ../src/sendmsg-window.c:270
+#: ../src/sendmsg-window.c:274
 msgid "_Turkish"
 msgstr "_Turkki"
 
-#: ../src/sendmsg-window.c:271
+#: ../src/sendmsg-window.c:275
 msgid "_Ukrainian"
 msgstr "_Ukraina"
 
-#: ../src/sendmsg-window.c:272
+#: ../src/sendmsg-window.c:276
 msgid "_Generic UTF-8"
 msgstr "_Yleinen UTF-8"
 
-#: ../src/sendmsg-window.c:296
+#: ../src/sendmsg-window.c:300
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG käyttää MIME-tilaa"
 
-#: ../src/sendmsg-window.c:302
+#: ../src/sendmsg-window.c:306
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG käyttää vanhaa OpenPGP-tilaa"
 
-#: ../src/sendmsg-window.c:309
+#: ../src/sendmsg-window.c:313
 msgid "_S/MIME mode (GpgSM)"
 msgstr "_S/MIME-tila (GpgSM)"
 
-#: ../src/sendmsg-window.c:324 ../src/sendmsg-window.c:502
+#: ../src/sendmsg-window.c:328 ../src/sendmsg-window.c:506
 msgid "_Include File..."
 msgstr "_Sisällytä tiedosto..."
 
-#: ../src/sendmsg-window.c:327 ../src/sendmsg-window.c:515
+#: ../src/sendmsg-window.c:331 ../src/sendmsg-window.c:519
 msgid "_Attach File..."
 msgstr "Liitä _tiedosto..."
 
-#: ../src/sendmsg-window.c:330 ../src/sendmsg-window.c:504
+#: ../src/sendmsg-window.c:334 ../src/sendmsg-window.c:508
 msgid "I_nclude Message(s)"
 msgstr "_Sisällytä viesti(t)"
 
-#: ../src/sendmsg-window.c:333 ../src/sendmsg-window.c:507
+#: ../src/sendmsg-window.c:337 ../src/sendmsg-window.c:511
 msgid "Attach _Message(s)"
 msgstr "_Liitä viesti(t)"
 
-#: ../src/sendmsg-window.c:339 ../src/sendmsg-window.c:532
+#: ../src/sendmsg-window.c:343 ../src/sendmsg-window.c:536
 msgid "Sen_d"
 msgstr "_Lähetä"
 
-#: ../src/sendmsg-window.c:340 ../src/sendmsg-window.c:533
+#: ../src/sendmsg-window.c:344 ../src/sendmsg-window.c:537
 #: ../src/toolbar-factory.c:111
 msgid "Send this message"
 msgstr "Lähetä tämä viesti"
 
-#: ../src/sendmsg-window.c:344
+#: ../src/sendmsg-window.c:348
 msgid "_Queue"
 msgstr "_Jono"
 
-#: ../src/sendmsg-window.c:345 ../src/sendmsg-window.c:538
+#: ../src/sendmsg-window.c:349 ../src/sendmsg-window.c:542
 msgid "Queue this message in Outbox for sending"
 msgstr "Listää viesti jonoon"
 
-#: ../src/sendmsg-window.c:349
+#: ../src/sendmsg-window.c:353
 msgid "_Postpone"
 msgstr "_Jatka myöhemmin"
 
-#: ../src/sendmsg-window.c:352 ../src/sendmsg-window.c:519
+#: ../src/sendmsg-window.c:356 ../src/sendmsg-window.c:523
 msgid "_Save"
 msgstr "_Tallenna"
 
-#: ../src/sendmsg-window.c:353 ../src/sendmsg-window.c:520
+#: ../src/sendmsg-window.c:357 ../src/sendmsg-window.c:524
 msgid "Save this message"
 msgstr "Tallenna tämä viesti"
 
-#: ../src/sendmsg-window.c:357 ../src/sendmsg-window.c:524
+#: ../src/sendmsg-window.c:361 ../src/sendmsg-window.c:528
 msgid "Print the edited message"
 msgstr "Tulosta muokattu viesti"
 
-#: ../src/sendmsg-window.c:386 ../src/sendmsg-window.c:549
+#: ../src/sendmsg-window.c:390 ../src/sendmsg-window.c:553
 msgid "_Wrap Body"
 msgstr "_Rivitä viesti"
 
-#: ../src/sendmsg-window.c:390 ../src/sendmsg-window.c:553
+#: ../src/sendmsg-window.c:394 ../src/sendmsg-window.c:557
 msgid "_Reflow Selected Text"
 msgstr "_Rivitä valittu teksti uudestaan"
 
-#: ../src/sendmsg-window.c:395 ../src/sendmsg-window.c:581
+#: ../src/sendmsg-window.c:399 ../src/sendmsg-window.c:585
 msgid "Insert Si_gnature"
 msgstr "Lisää _allekirjoitus"
 
-#: ../src/sendmsg-window.c:399 ../src/sendmsg-window.c:557
+#: ../src/sendmsg-window.c:403 ../src/sendmsg-window.c:561
 msgid "_Quote Message(s)"
 msgstr "_Lainaa viestejä"
 
-#: ../src/sendmsg-window.c:405 ../src/sendmsg-window.c:409
-#: ../src/sendmsg-window.c:633
+#: ../src/sendmsg-window.c:409 ../src/sendmsg-window.c:413
+#: ../src/sendmsg-window.c:637
 msgid "C_heck Spelling"
 msgstr "Tarkista _oikeinkirjoitus"
 
-#: ../src/sendmsg-window.c:406 ../src/sendmsg-window.c:410
-#: ../src/sendmsg-window.c:635
+#: ../src/sendmsg-window.c:410 ../src/sendmsg-window.c:414
+#: ../src/sendmsg-window.c:639
 msgid "Check the spelling of the message"
 msgstr "Tarkista viestin oikeinkirjoitus"
 
-#: ../src/sendmsg-window.c:416 ../src/sendmsg-window.c:641
+#: ../src/sendmsg-window.c:420 ../src/sendmsg-window.c:645
 msgid "Select _Identity..."
 msgstr "Valitse _henkilöllisyys..."
 
-#: ../src/sendmsg-window.c:417 ../src/sendmsg-window.c:642
+#: ../src/sendmsg-window.c:421 ../src/sendmsg-window.c:646
 msgid "Select the Identity to use for the message"
 msgstr "Valitse viestissä käytettävä henkilöllisyys."
 
-#: ../src/sendmsg-window.c:422
+#: ../src/sendmsg-window.c:426
 msgid "_Edit with Gnome-Editor"
 msgstr "_Muokkaa Gnomen editorilla"
 
-#: ../src/sendmsg-window.c:423
+#: ../src/sendmsg-window.c:427
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Muokkaa valittua viestiä Gnomen oletuseditorilla"
 
-#: ../src/sendmsg-window.c:435 ../src/sendmsg-window.c:594
+#: ../src/sendmsg-window.c:439 ../src/sendmsg-window.c:598
 msgid "Fr_om"
 msgstr "_Lähettäjä"
 
-#: ../src/sendmsg-window.c:437 ../src/sendmsg-window.c:596
+#: ../src/sendmsg-window.c:441 ../src/sendmsg-window.c:600
 msgid "_Cc"
 msgstr "_Kopio"
 
-#: ../src/sendmsg-window.c:439 ../src/sendmsg-window.c:598
+#: ../src/sendmsg-window.c:443 ../src/sendmsg-window.c:602
 msgid "_Bcc"
 msgstr "_Toinen kopio"
 
-#: ../src/sendmsg-window.c:441 ../src/sendmsg-window.c:600
+#: ../src/sendmsg-window.c:445 ../src/sendmsg-window.c:604
 msgid "_Fcc"
 msgstr "K_ansio"
 
-#: ../src/sendmsg-window.c:443
+#: ../src/sendmsg-window.c:447
 msgid "_Reply To"
 msgstr "_Vastausosoite"
 
-#: ../src/sendmsg-window.c:449 ../src/sendmsg-window.c:646
+#: ../src/sendmsg-window.c:453 ../src/sendmsg-window.c:650
 msgid "_Request Disposition Notification"
 msgstr "_Pyydä poistamisilmoitus"
 
-#: ../src/sendmsg-window.c:452 ../src/sendmsg-window.c:612
+#: ../src/sendmsg-window.c:456 ../src/sendmsg-window.c:616
 msgid "_Format = Flowed"
 msgstr "_Muotoilu = Rivitetty"
 
-#: ../src/sendmsg-window.c:457 ../src/sendmsg-window.c:617
+#: ../src/sendmsg-window.c:461 ../src/sendmsg-window.c:621
 msgid "_Sign Message"
 msgstr "_Allekirjoita viesti"
 
-#: ../src/sendmsg-window.c:458 ../src/sendmsg-window.c:618
+#: ../src/sendmsg-window.c:462 ../src/sendmsg-window.c:622
 msgid "signs the message using GnuPG"
 msgstr "Allekirjoittaa viestin GnuPG:llä"
 
-#: ../src/sendmsg-window.c:461 ../src/sendmsg-window.c:621
+#: ../src/sendmsg-window.c:465 ../src/sendmsg-window.c:625
 msgid "_Encrypt Message"
 msgstr "_Salaaa viesti"
 
-#: ../src/sendmsg-window.c:462 ../src/sendmsg-window.c:622
+#: ../src/sendmsg-window.c:466 ../src/sendmsg-window.c:626
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr ""
 "Allekirjoittaa viestin GnuPG:llä kaikille To: ja Cc: kenttien "
 "vastaanottajille"
 
-#: ../src/sendmsg-window.c:482 ../src/sendmsg-window.c:662
+#: ../src/sendmsg-window.c:486 ../src/sendmsg-window.c:666
 msgid "_Show"
 msgstr "_Näytä"
 
-#: ../src/sendmsg-window.c:484 ../src/sendmsg-window.c:639
+#: ../src/sendmsg-window.c:488 ../src/sendmsg-window.c:643
 msgid "_Language"
 msgstr "_Kieli"
 
-#: ../src/sendmsg-window.c:486
+#: ../src/sendmsg-window.c:490
 msgid "_Options"
 msgstr "_Asetukset"
 
-#: ../src/sendmsg-window.c:528
+#: ../src/sendmsg-window.c:532
 msgid "Sa_ve and Close"
 msgstr "Tallenna ja _sulje"
 
-#: ../src/sendmsg-window.c:537
+#: ../src/sendmsg-window.c:541
 msgid "Send _Later"
 msgstr "Lähetä _myöhemmin"
 
-#: ../src/sendmsg-window.c:631
+#: ../src/sendmsg-window.c:635
 msgid "Toggle Spell C_hecker"
 msgstr "Käytä/Älä käytä _oikolukua"
 
-#: ../src/sendmsg-window.c:692
+#: ../src/sendmsg-window.c:696
 msgid "Attachment"
 msgstr "Liite"
 
-#: ../src/sendmsg-window.c:692
+#: ../src/sendmsg-window.c:696
 msgid "Inline"
 msgstr "Sisäkkäisesti"
 
-#: ../src/sendmsg-window.c:692
+#: ../src/sendmsg-window.c:696
 msgid "Reference"
 msgstr "Viittaus"
 
-#: ../src/sendmsg-window.c:923
+#: ../src/sendmsg-window.c:927
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -5672,15 +5692,15 @@ msgstr ""
 "Viestiä henkilölle '%s' on muokattu.\n"
 "Tallenna viesti luonnoskansioon?"
 
-#: ../src/sendmsg-window.c:1244
+#: ../src/sendmsg-window.c:1248
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr "Gnomen oletussovelluksissa ei ole valittu tekstieditoria."
 
-#: ../src/sendmsg-window.c:1295
+#: ../src/sendmsg-window.c:1299
 msgid "Select Identity"
 msgstr "Valitse henkilöllisyys"
 
-#: ../src/sendmsg-window.c:1672
+#: ../src/sendmsg-window.c:1676
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -5695,15 +5715,15 @@ msgstr ""
 "\n"
 "Haluatko todella liittää tämän tiedoston viitteenä?"
 
-#: ../src/sendmsg-window.c:1683
+#: ../src/sendmsg-window.c:1687
 msgid "Attach as Reference?"
 msgstr "Liitä viittauksena?"
 
-#: ../src/sendmsg-window.c:1796
+#: ../src/sendmsg-window.c:1800
 msgid "Choose charset"
 msgstr "Valitse merkistö"
 
-#: ../src/sendmsg-window.c:1803
+#: ../src/sendmsg-window.c:1807
 #, c-format
 msgid ""
 "File\n"
@@ -5716,66 +5736,66 @@ msgstr ""
 "sisältö ei ole US-ASCII tai UTF-8 merkistössä.\n"
 "Valitse merkistö, jota käytetään tiedoston koodaukseen."
 
-#: ../src/sendmsg-window.c:1819
+#: ../src/sendmsg-window.c:1823
 msgid "Attach as MIME type:"
 msgstr "Liitä MIME-tyypillä:"
 
-#: ../src/sendmsg-window.c:1875
+#: ../src/sendmsg-window.c:1879
 #, c-format
 msgid "Character set for file %s changed from \"%s\" to \"%s\"."
 msgstr "Tiedoston %s merkistö vaihdettu, \"%s\" -> \"%s\"."
 
-#: ../src/sendmsg-window.c:1918 ../src/sendmsg-window.c:5229
+#: ../src/sendmsg-window.c:1922 ../src/sendmsg-window.c:5253
 msgid "(no subject)"
 msgstr "(ei aihetta)"
 
-#: ../src/sendmsg-window.c:2004
+#: ../src/sendmsg-window.c:2008
 msgid "forwarded message"
 msgstr "välitetty viesti"
 
-#: ../src/sendmsg-window.c:2009
+#: ../src/sendmsg-window.c:2013
 #, c-format
 msgid "Message from %s, subject: \"%s\""
 msgstr "Viesti lähettäjältä %s aiheena \"%s\""
 
-#: ../src/sendmsg-window.c:2027
+#: ../src/sendmsg-window.c:2031
 #, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
 msgstr "Virhe muunnettaessa \"%s\" merkistöön UTF-8: %s\n"
 
-#: ../src/sendmsg-window.c:2097 ../src/sendmsg-window.c:2168
+#: ../src/sendmsg-window.c:2101 ../src/sendmsg-window.c:2172
 msgid "Remove"
 msgstr "Poista"
 
-#: ../src/sendmsg-window.c:2180
+#: ../src/sendmsg-window.c:2184
 msgid "Open..."
 msgstr "Avaa..."
 
-#: ../src/sendmsg-window.c:2192
+#: ../src/sendmsg-window.c:2196
 msgid "(URL)"
 msgstr "(URL)"
 
-#: ../src/sendmsg-window.c:2213
+#: ../src/sendmsg-window.c:2217
 #, c-format
 msgid "Cannot get info on file '%s': %s"
 msgstr "Ei saa tietoja tiedostosta: '%s' : '%s'"
 
-#: ../src/sendmsg-window.c:2218
+#: ../src/sendmsg-window.c:2222
 #, c-format
 msgid "Attachment %s is not a regular file."
 msgstr "Liitetiedosto %s ei ole tavallinen tiedosto."
 
-#: ../src/sendmsg-window.c:2221
+#: ../src/sendmsg-window.c:2225
 #, c-format
 msgid "File %s cannot be read\n"
 msgstr "Tiedostoa %s ei voida lukea\n"
 
-#: ../src/sendmsg-window.c:2270
+#: ../src/sendmsg-window.c:2274
 msgid "Attach file"
 msgstr "Liitä tiedosto"
 
-#: ../src/sendmsg-window.c:2357 ../src/sendmsg-window.c:2466
-#: ../src/sendmsg-window.c:4445
+#: ../src/sendmsg-window.c:2360 ../src/sendmsg-window.c:2469
+#: ../src/sendmsg-window.c:4457
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5783,138 +5803,138 @@ msgstr ""
 "Viestin liittäminen epäonnistui\n"
 "Mahdolinen syy: ei tarpeeksi väliaikaistilaa"
 
-#: ../src/sendmsg-window.c:2686
+#: ../src/sendmsg-window.c:2689
 msgid "F_rom:"
 msgstr "_Lähettäjä:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2821
+#: ../src/sendmsg-window.c:2824
 msgid "S_ubject:"
 msgstr "_Aihe:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: ../src/sendmsg-window.c:2835
+#: ../src/sendmsg-window.c:2838
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: ../src/sendmsg-window.c:2866
+#: ../src/sendmsg-window.c:2869
 msgid "_Reply To:"
 msgstr "_Vastausosoite:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2871
+#: ../src/sendmsg-window.c:2874
 msgid "_Attachments:"
 msgstr "_Liitteet:"
 
-#: ../src/sendmsg-window.c:2916
+#: ../src/sendmsg-window.c:2919
 msgid "Mode"
 msgstr "Tila"
 
-#: ../src/sendmsg-window.c:2939
+#: ../src/sendmsg-window.c:2942
 msgid "Description"
 msgstr "Kuvaus"
 
-#: ../src/sendmsg-window.c:3249
+#: ../src/sendmsg-window.c:3252
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Liitettä ei voi tallentaa: %s"
 
-#: ../src/sendmsg-window.c:3270
+#: ../src/sendmsg-window.c:3273
 msgid "No subject"
 msgstr "Ei aihetta"
 
-#: ../src/sendmsg-window.c:3303
+#: ../src/sendmsg-window.c:3305
 msgid "you"
 msgstr "sinä"
 
-#: ../src/sendmsg-window.c:3312
+#: ../src/sendmsg-window.c:3314
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------välitetty viesti osoitteesta %s------\n"
 
-#: ../src/sendmsg-window.c:3349
+#: ../src/sendmsg-window.c:3351
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Message-ID: %s\n"
 
-#: ../src/sendmsg-window.c:3355
+#: ../src/sendmsg-window.c:3357
 msgid "References:"
 msgstr "Viittaukset:"
 
-#: ../src/sendmsg-window.c:3369
+#: ../src/sendmsg-window.c:3368
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "%s, %s kirjoitti:\n"
 
-#: ../src/sendmsg-window.c:3371
+#: ../src/sendmsg-window.c:3370
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s kirjoitti:\n"
 
-#: ../src/sendmsg-window.c:3497
+#: ../src/sendmsg-window.c:3481
 msgid "No signature found!"
 msgstr "Allekirjoitusta ei löydy!"
 
-#: ../src/sendmsg-window.c:3666
+#: ../src/sendmsg-window.c:3650
 msgid "Could not save message."
 msgstr "Viestin tallennus epäonnistui."
 
-#: ../src/sendmsg-window.c:3673
+#: ../src/sendmsg-window.c:3657
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Luonnoskansiota ei voi avata: %s"
 
-#: ../src/sendmsg-window.c:3694
+#: ../src/sendmsg-window.c:3678
 msgid "Message saved."
 msgstr "Viestin tallennettu."
 
-#: ../src/sendmsg-window.c:4629
+#: ../src/sendmsg-window.c:4653
 #, c-format
 msgid "Error executing signature generator %s"
 msgstr "Virhe suoritettaessa allekirjoituksen luojaa %s"
 
-#: ../src/sendmsg-window.c:4641
+#: ../src/sendmsg-window.c:4665
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
 msgstr "Allekirjoitustiedostoa \"%s\" ei voida avata luettavaksi"
 
-#: ../src/sendmsg-window.c:4651
+#: ../src/sendmsg-window.c:4675
 #, c-format
 msgid "Error reading signature from %s"
 msgstr "Virhe luoettaessa allekirjoitusta tiedostosta %s"
 
-#: ../src/sendmsg-window.c:4655
+#: ../src/sendmsg-window.c:4679
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "Allekirjoitus viestissä %s ei ole UTF-8 koodattua tekstiä."
 
-#: ../src/sendmsg-window.c:4718
+#: ../src/sendmsg-window.c:4742
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Tiedoston %s avaaminen ei onnistu.\n"
 
-#: ../src/sendmsg-window.c:4774
+#: ../src/sendmsg-window.c:4798
 msgid "Include file"
 msgstr "Sisällytä tiedosto"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4988
+#: ../src/sendmsg-window.c:5012
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Otsikon kasvotiedostoa \"%s\" ei voi ladata: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4991
+#: ../src/sendmsg-window.c:5015
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "X-Face-otsikkotiedostoa \"%s\" ei voi ladata: %s"
 
-#: ../src/sendmsg-window.c:5071
+#: ../src/sendmsg-window.c:5095
 msgid "Message contains national (8-bit) characters"
 msgstr "Viesti sisältää kansallisia (8-bittisiä) merkkejä"
 
-#: ../src/sendmsg-window.c:5075
+#: ../src/sendmsg-window.c:5099
 msgid ""
 "Balsa will encode the message in UTF-8.\n"
 "Cancel the operation to choose a different language."
@@ -5922,7 +5942,7 @@ msgstr ""
 "Viesti koodataan UTF-8-merkistöllä.\n"
 "Keskeytä toiminto, jos haluat valita toisen merkistön."
 
-#: ../src/sendmsg-window.c:5081
+#: ../src/sendmsg-window.c:5105
 msgid ""
 "<b><big>Message contains national (8-bit) characters.</big></b> Balsa will "
 "encode the message in UTF-8.\n"
@@ -5932,19 +5952,19 @@ msgstr ""
 "koodaa viestin UTF-8-merkistöllä.\n"
 "Keskeytä toiminto, jos haluat valita toisen kielen."
 
-#: ../src/sendmsg-window.c:5213
+#: ../src/sendmsg-window.c:5237
 msgid "You did not specify a subject for this message"
 msgstr "Viestille ei annettu aihetta"
 
-#: ../src/sendmsg-window.c:5214
+#: ../src/sendmsg-window.c:5238
 msgid "If you would like to provide one, enter it below."
 msgstr "Syötä se alle olevaan kenttään jos haluat."
 
-#: ../src/sendmsg-window.c:5255
+#: ../src/sendmsg-window.c:5279
 msgid "_Send"
 msgstr "_Lähetä"
 
-#: ../src/sendmsg-window.c:5312
+#: ../src/sendmsg-window.c:5336
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -5954,70 +5974,70 @@ msgstr ""
 "viestin ensimmäinen osa allekirjoitetaan tai salataan. Valitse MIME-tila, "
 "jos haluat suojata koko viestin sisällön. Haluatko varmasti jatkaa?"
 
-#: ../src/sendmsg-window.c:5328
+#: ../src/sendmsg-window.c:5352
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "lähetään viesti gpg-tilassa %d"
 
-#: ../src/sendmsg-window.c:5365
+#: ../src/sendmsg-window.c:5389
 msgid "Message could not be created"
 msgstr "Viestiä ei voi luoda"
 
-#: ../src/sendmsg-window.c:5367
+#: ../src/sendmsg-window.c:5391
 msgid "Message could not be queued in outbox"
 msgstr "Viestiä ei voi lisätä lähtevien kansioon"
 
-#: ../src/sendmsg-window.c:5369
+#: ../src/sendmsg-window.c:5393
 msgid "Message could not be saved in sentbox"
 msgstr "Viestiä ei voi tallentaa lähetettyjen kansioon"
 
-#: ../src/sendmsg-window.c:5371
+#: ../src/sendmsg-window.c:5395
 msgid "Message could not be sent"
 msgstr "Viestiä ei voi lähettää"
 
-#: ../src/sendmsg-window.c:5375
+#: ../src/sendmsg-window.c:5399
 #, c-format
 msgid "Send failed: %s"
 msgstr "Lähetys epäonnistui: %s"
 
-#: ../src/sendmsg-window.c:5458 ../src/sendmsg-window.c:5477
+#: ../src/sendmsg-window.c:5482 ../src/sendmsg-window.c:5501
 msgid "Could not postpone message."
 msgstr "Viestin lähetystä ei voi viivästää."
 
-#: ../src/sendmsg-window.c:5472
+#: ../src/sendmsg-window.c:5496
 msgid "Message postponed."
 msgstr "Viestin lähetys viivästetty."
 
-#: ../src/sendmsg-window.c:5627
+#: ../src/sendmsg-window.c:5651
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Virhe käynnistettäessä oikolukijaa: %s"
 
-#: ../src/sendmsg-window.c:5786
+#: ../src/sendmsg-window.c:5810
 #, c-format
 msgid "Could not compile %s"
 msgstr "%s ei voi kääntää"
 
-#: ../src/sendmsg-window.c:5787
+#: ../src/sendmsg-window.c:5811
 msgid "Quoted Text Regular Expression"
 msgstr "Lainauksen säännöllinen lauseke"
 
-#: ../src/sendmsg-window.c:6340
+#: ../src/sendmsg-window.c:6365
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Vastaa osoitteeseen %s: %s"
 
-#: ../src/sendmsg-window.c:6345
+#: ../src/sendmsg-window.c:6370
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Välitä edelleen osoitteeseen %s: %s"
 
-#: ../src/sendmsg-window.c:6349
+#: ../src/sendmsg-window.c:6374
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Jatka viestiä osoitteeseen %s: %s"
 
-#: ../src/sendmsg-window.c:6353
+#: ../src/sendmsg-window.c:6378
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Uusi viesti osoitteeseen %s: %s"

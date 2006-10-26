@@ -1,3 +1,9 @@
+2006-10-26 09:42  PeterB
+
+	* libbalsa/mailbox_mbox.c: drop the mime-stream-shared lock while
+	caching the message--we might grab the gdk lock to update the
+	display.
+
 2006-10-08  Albrecht Dreß <albrecht dot dress at arcor dot de>
 
 	* src/pref-manager.c: add a check button to enable or disable

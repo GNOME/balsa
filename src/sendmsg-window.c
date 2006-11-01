@@ -4620,6 +4620,9 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         libbalsa_insert_with_url(buffer, val, NULL, NULL, NULL);
 
         return;
+    } else if (g_ascii_strcasecmp(key, "attach") == 0) {
+        add_attachment(bsmsg, g_strdup(val), FALSE, NULL);
+        return;
     } else if (g_ascii_strcasecmp(key, "to")  ==0) entry = bsmsg->to[1];
     else if(g_ascii_strcasecmp(key, "subject")==0) entry = bsmsg->subject[1];
     else if(g_ascii_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];

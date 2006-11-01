@@ -1,5 +1,7 @@
-2006-11-01 07:36  PeterB
+2006-11-01 08:46  PeterB
 
+	* src/sendmsg-window.c: disable attach= and bcc= in mailto URLs
+	pending security review.
 	* src/sendmsg-window.c: handle "attach" keyword in mailto URLs,
 	thanks to Johan Brannlund.
 	* src/main.c: do not try to expunge a read-only mailbox.

@@ -4620,13 +4620,17 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         libbalsa_insert_with_url(buffer, val, NULL, NULL, NULL);
 
         return;
+#if defined(NO_SECURITY_ISSUES_WITH_ATTACHMENTS)
     } else if (g_ascii_strcasecmp(key, "attach") == 0) {
         add_attachment(bsmsg, g_strdup(val), FALSE, NULL);
         return;
+#endif
     } else if (g_ascii_strcasecmp(key, "to")  ==0) entry = bsmsg->to[1];
     else if(g_ascii_strcasecmp(key, "subject")==0) entry = bsmsg->subject[1];
     else if(g_ascii_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];
+#if defined(NO_SECURITY_ISSUES_WITH_BCC)
     else if(g_ascii_strcasecmp(key, "bcc")    ==0) entry = bsmsg->bcc[1];
+#endif
 #if !defined(ENABLE_TOUCH_UI)
     else if(g_ascii_strcasecmp(key, "replyto")==0) entry = bsmsg->reply_to[1];
 #endif

@@ -1,3 +1,9 @@
+2006-11-01 07:36  PeterB
+
+	* src/sendmsg-window.c: handle "attach" keyword in mailto URLs,
+	thanks to Johan Brannlund.
+	* src/main.c: do not try to expunge a read-only mailbox.
+
 2006-10-26 09:42  PeterB
 
 	* libbalsa/mailbox_mbox.c: drop the mime-stream-shared lock while

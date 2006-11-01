@@ -578,7 +578,8 @@ periodic_expunge_cb(void)
 
     for (l = list; l; l = l->next) {
         BalsaMailboxNode *mbnode = l->data;
-        if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)) {
+        if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)
+            && !mbnode->mailbox->readonly) {
             time_t tm = time(NULL);
             if (tm-mbnode->last_use > balsa_app.expunge_timeout)
                 libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);

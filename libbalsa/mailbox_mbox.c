@@ -488,6 +488,8 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
         msg_info.status = msg_info.x_status = msg_info.mime_version = -1;
         mime_message   = g_mime_parser_construct_message(gmime_parser);
+        if (!mime_message)
+            continue;
         msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
         msg_info.end   = g_mime_parser_tell(gmime_parser);
         if (msg_info.end <= msg_info.start

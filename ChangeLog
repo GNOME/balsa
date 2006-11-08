@@ -1,5 +1,6 @@
-2006-11-08 10:05  PeterB
+2006-11-08 10:49  PeterB
 
+	* src/sendmsg-window.c: restore bcc= in mailto URLs, with a popup.
 	* libbalsa/mailbox_mbox.c: check for NULL mime_message.
 
 2006-11-01 08:46  PeterB

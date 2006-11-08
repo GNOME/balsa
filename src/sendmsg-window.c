@@ -2556,6 +2556,7 @@ create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
     arr[1] = gtk_entry_new();
     gtk_entry_set_max_length(GTK_ENTRY(arr[1]), 2048);
     create_email_or_string_entry(table, label, y_pos, arr);
+    arr[2] = NULL;
 }
 
 /*
@@ -2687,6 +2688,7 @@ create_from_entry(GtkWidget * table, BalsaSendmsg * bsmsg)
     g_signal_connect(bsmsg->from[1], "changed",
                      G_CALLBACK(sw_combo_box_changed), bsmsg);
     create_email_or_string_entry(table, _("F_rom:"), 0, bsmsg->from);
+    bsmsg->from[2] = NULL;
 }
 
 static gboolean 
@@ -2863,6 +2865,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_container_add(GTK_CONTAINER(align), bsmsg->fcc[1]);
     gtk_table_attach(GTK_TABLE(table), align, 1, 3, 5, 6,
 		     GTK_FILL, GTK_FILL, 0, 0);
+    bsmsg->fcc[2] = NULL;
 
 #if !defined(ENABLE_TOUCH_UI)
     /* Reply To: */
@@ -2896,6 +2899,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_tree_view_set_headers_visible(view, TRUE);
     gtk_tree_view_set_rules_hint(view, TRUE);
     g_object_unref(store);
+    bsmsg->attachments[2] = NULL;
 
     /* column for type icon */
     renderer = gtk_cell_renderer_pixbuf_new();
@@ -4610,7 +4614,7 @@ void
 sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
                          const gchar * val)
 {
-    GtkWidget *entry;
+    GtkWidget **field;
     g_return_if_fail(bsmsg);
 
     if (g_ascii_strcasecmp(key, "body") == 0) {
@@ -4625,18 +4629,39 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         add_attachment(bsmsg, g_strdup(val), FALSE, NULL);
         return;
 #endif
-    } else if (g_ascii_strcasecmp(key, "to")  ==0) entry = bsmsg->to[1];
-    else if(g_ascii_strcasecmp(key, "subject")==0) entry = bsmsg->subject[1];
-    else if(g_ascii_strcasecmp(key, "cc")     ==0) entry = bsmsg->cc[1];
-#if defined(NO_SECURITY_ISSUES_WITH_BCC)
-    else if(g_ascii_strcasecmp(key, "bcc")    ==0) entry = bsmsg->bcc[1];
-#endif
+    } else if (g_ascii_strcasecmp(key, "to")  ==0) field = bsmsg->to;
+    else if(g_ascii_strcasecmp(key, "subject")==0) field = bsmsg->subject;
+    else if(g_ascii_strcasecmp(key, "cc")     ==0) field = bsmsg->cc;
+    else if(g_ascii_strcasecmp(key, "bcc")    ==0) {
+        field = bsmsg->bcc;
+        if (!g_object_get_data(G_OBJECT(bsmsg->window),
+                               "balsa-sendmsg-window-url-bcc")) {
+            GtkWidget *dialog =
+                gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+                                       GTK_DIALOG_DESTROY_WITH_PARENT,
+                                       GTK_MESSAGE_INFO,
+                                       GTK_BUTTONS_OK,
+                                       _("A \"Mailto\" URL "
+                                         "set a \"Bcc\" address.\n"
+                                         "Please check that the address "
+                                         "is appropriate."));
+            g_object_set_data(G_OBJECT(bsmsg->window),
+                              "balsa-sendmsg-window-url-bcc", dialog);
+            g_signal_connect(G_OBJECT(dialog), "response",
+                             G_CALLBACK(gtk_widget_destroy), NULL);
+            gtk_widget_show_all(dialog);
+        }
+    }
 #if !defined(ENABLE_TOUCH_UI)
-    else if(g_ascii_strcasecmp(key, "replyto")==0) entry = bsmsg->reply_to[1];
+    else if(g_ascii_strcasecmp(key, "replyto")==0) field = bsmsg->reply_to;
 #endif
     else return;
 
-    append_comma_separated(GTK_EDITABLE(entry), val);
+    append_comma_separated(GTK_EDITABLE(field[1]), val);
+    gtk_widget_show_all(field[0]);
+    gtk_widget_show_all(field[1]);
+    if (field[2])
+        gtk_widget_show_all(field[2]);
 }
 
 static gchar *

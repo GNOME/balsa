@@ -1,3 +1,7 @@
+2006-11-08 10:05  PeterB
+
+	* libbalsa/mailbox_mbox.c: check for NULL mime_message.
+
 2006-11-01 08:46  PeterB
 
 	* src/sendmsg-window.c: disable attach= and bcc= in mailto URLs

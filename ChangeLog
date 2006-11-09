@@ -1,6 +1,12 @@
+2006-11-09 08:56  PeterB
+
+	* src/sendmsg-window.c: no need for count when toggling entries;
+	simplify dialog language.
+
 2006-11-08 10:49  PeterB
 
-	* src/sendmsg-window.c: restore bcc= in mailto URLs, with a popup.
+	* src/sendmsg-window.c: restore bcc= in mailto URLs, with a
+	popup, and make sure Bcc: header is shown if set.
 	* libbalsa/mailbox_mbox.c: check for NULL mime_message.
 
 2006-11-01 08:46  PeterB

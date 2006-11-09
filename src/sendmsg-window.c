@@ -4637,14 +4637,15 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         if (!g_object_get_data(G_OBJECT(bsmsg->window),
                                "balsa-sendmsg-window-url-bcc")) {
             GtkWidget *dialog =
-                gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
-                                       GTK_DIALOG_DESTROY_WITH_PARENT,
-                                       GTK_MESSAGE_INFO,
-                                       GTK_BUTTONS_OK,
-                                       _("A \"Mailto\" URL "
-                                         "set a \"Bcc\" address.\n"
-                                         "Please check that the address "
-                                         "is appropriate."));
+                gtk_message_dialog_new
+                (GTK_WINDOW(bsmsg->window),
+                 GTK_DIALOG_DESTROY_WITH_PARENT,
+                 GTK_MESSAGE_INFO,
+                 GTK_BUTTONS_OK,
+                 _("The link that you selected created\n"
+                   "a \"Blind copy\" (Bcc) address.\n"
+                   "Please check that the address\n"
+                   "is appropriate."));
             g_object_set_data(G_OBJECT(bsmsg->window),
                               "balsa-sendmsg-window-url-bcc", dialog);
             g_signal_connect(G_OBJECT(dialog), "response",
@@ -5883,17 +5884,17 @@ check_readiness(BalsaSendmsg * bsmsg)
    saves the show header configuration.
  */
 static gint
-toggle_entry(BalsaSendmsg * bsmsg, GtkWidget * entry[], int pos, int cnt)
+toggle_entry(BalsaSendmsg * bsmsg, GtkWidget * entry[], int pos)
 {
     unsigned i;
+    void (*widget_func)(GtkWidget *) =
+        GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[pos])->active ?
+        gtk_widget_show_all : gtk_widget_hide;
 
-    if (GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[pos])->active) {
-	while (cnt--)
-	    gtk_widget_show_all(GTK_WIDGET(entry[cnt]));
-    } else {
-	while (cnt--)
-	    gtk_widget_hide(GTK_WIDGET(entry[cnt]));
-    }
+    widget_func(entry[0]);
+    widget_func(entry[1]);
+    if (entry[2])
+        widget_func(entry[2]);
 
     if(bsmsg->update_config) { /* then save the config */
         GString *str = g_string_new(NULL);
@@ -5914,32 +5915,32 @@ toggle_entry(BalsaSendmsg * bsmsg, GtkWidget * entry[], int pos, int cnt)
 static gint
 toggle_from_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS, 2);
+    return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS);
 }
 
 static gint
 toggle_cc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->cc, MENU_TOGGLE_CC_POS, 3);
+    return toggle_entry(bsmsg, bsmsg->cc, MENU_TOGGLE_CC_POS);
 }
 
 static gint
 toggle_bcc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->bcc, MENU_TOGGLE_BCC_POS, 3);
+    return toggle_entry(bsmsg, bsmsg->bcc, MENU_TOGGLE_BCC_POS);
 }
 
 static gint
 toggle_fcc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->fcc, MENU_TOGGLE_FCC_POS, 2);
+    return toggle_entry(bsmsg, bsmsg->fcc, MENU_TOGGLE_FCC_POS);
 }
 
 #if !defined(ENABLE_TOUCH_UI)
 static gint
 toggle_reply_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->reply_to, MENU_TOGGLE_REPLY_POS, 3);
+    return toggle_entry(bsmsg, bsmsg->reply_to, MENU_TOGGLE_REPLY_POS);
 }
 #endif /* ENABLE_TOUCH_UI */
 

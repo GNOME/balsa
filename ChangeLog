@@ -1,3 +1,7 @@
+2006-11-18  Djihed Afifi  <djihed@gmail.com>
+
+	* configure.in: Added Arabic.
+
 2006-11-09 08:56  PeterB
 
 	* src/sendmsg-window.c: no need for count when toggling entries;

@@ -1782,7 +1782,7 @@ ir_resp_text_code(ImapMboxHandle *h)
   case 8: imap_get_atom(h->sio, buf, sizeof(buf)); h->uidnext=atoi(buf); break;
   case 9: imap_get_atom(h->sio, buf, sizeof(buf)); h->uidval =atoi(buf); break;
   case 10:imap_get_atom(h->sio, buf, sizeof(buf)); h->unseen =atoi(buf); break;
-  default: while( (c=sio_getc(h->sio)) != EOF && c != ']') ; break;
+  default: while( c != ']' && (c=sio_getc(h->sio)) != EOF) ; break;
   }
   return c != EOF ? rc : IMR_SEVERED;
 }
@@ -1797,15 +1797,18 @@ ir_ok(ImapMboxHandle *h)
     /* look for information response codes here: section 7.1 of the draft */
     rc = ir_resp_text_code(h);
     if(sio_getc(h->sio) != ' ') rc = IMR_PROTOCOL;
-    sio_gets(h->sio, line, sizeof(line));
+    if (sio_gets(h->sio, line, sizeof(line)) == NULL)
+      rc = IMR_SEVERED;
   } else {
     line[0] = c;
-    sio_gets(h->sio, line+1, sizeof(line)-1);
-    rc = IMR_OK;
+    if (sio_gets(h->sio, line+1, sizeof(line)-1) == NULL)
+      rc = IMR_SEVERED;
+    else 
+      rc = IMR_OK;
   }
   if(rc == IMR_PARSE)
     rc = IMR_OK;
-  else if( (l=strlen(line))>0) { 
+  else if (rc != IMR_SEVERED && (l=strlen(line))>0 ) {
     line[l-2] = '\0'; 
     imap_mbox_handle_set_msg(h, line);
     if(h->info_cb)
@@ -1814,7 +1817,7 @@ ir_ok(ImapMboxHandle *h)
       printf("INFO : '%s'\n", line);
     rc = IMR_OK; /* in case it was IMR_ALERT */
   }
-  return IMR_OK;
+  return rc;
 }
 
 static ImapResponse

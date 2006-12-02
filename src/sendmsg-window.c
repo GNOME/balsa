@@ -2239,6 +2239,9 @@ attach_dialog_response(GtkWidget * dialog, gint response,
     GSList *files, *list;
     int res = 0;
 
+    g_object_set_data(G_OBJECT(bsmsg->window),
+                      "balsa-sendmsg-window-attach-dialog", NULL);
+
     if (response != GTK_RESPONSE_OK) {
 	gtk_widget_destroy(dialog);
 	return;
@@ -2260,15 +2263,11 @@ attach_dialog_response(GtkWidget * dialog, gint response,
         gtk_widget_destroy(dialog);
 }
 
-/* attach_clicked - menu and toolbar callback */
-static void
-attach_clicked(GtkWidget * widget, gpointer data)
+static GtkFileChooser *
+sw_attach_dialog(BalsaSendmsg * bsmsg)
 {
     GtkWidget *fsw;
     GtkFileChooser *fc;
-    BalsaSendmsg *bsmsg;
-
-    bsmsg = data;
 
     fsw =
         gtk_file_chooser_dialog_new(_("Attach file"),
@@ -2287,6 +2286,15 @@ attach_clicked(GtkWidget * widget, gpointer data)
 		     G_CALLBACK(attach_dialog_response), bsmsg);
 
     gtk_widget_show(fsw);
+
+    return fc;
+}
+
+/* attach_clicked - menu and toolbar callback */
+static void
+attach_clicked(GtkWidget * widget, gpointer data)
+{
+    sw_attach_dialog((BalsaSendmsg *) data);
 }
 
 /* attach_message:
@@ -4610,6 +4618,67 @@ sendmsg_window_process_url(const char *url, field_setter func, void *data)
 /* sendmsg_window_set_field:
    sets given field of the compose window to the specified value.
 */
+
+#define NO_SECURITY_ISSUES_WITH_ATTACHMENTS TRUE
+#if defined(NO_SECURITY_ISSUES_WITH_ATTACHMENTS)
+static void
+sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
+{
+    GtkFileChooser *attach;
+
+    if (!g_path_is_absolute(val)) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not attach the file %s: %s."), val,
+                          _("not an absolute path"));
+        return;
+    }
+    if (!(g_str_has_prefix(val, g_get_home_dir())
+          || g_str_has_prefix(val, g_get_tmp_dir()))) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not attach the file %s: %s."), val,
+                          _("not in your directory"));
+        return;
+    }
+    if (!g_file_test(val, G_FILE_TEST_EXISTS)) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not attach the file %s: %s."), val,
+                          _("does not exist"));
+        return;
+    }
+    if (!g_file_test(val, G_FILE_TEST_IS_REGULAR)) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not attach the file %s: %s."), val,
+                          _("not a regular file"));
+        return;
+    }
+    attach = g_object_get_data(G_OBJECT(bsmsg->window),
+                               "balsa-sendmsg-window-attach-dialog");
+    if (!attach) {
+        attach = sw_attach_dialog(bsmsg);
+        g_object_set_data(G_OBJECT(bsmsg->window),
+                          "balsa-sendmsg-window-attach-dialog", attach);
+        g_object_set_data_full(G_OBJECT(attach),
+                               "balsa-sendmsg-window-attach-dir",
+                               g_path_get_dirname(val), g_free);
+    } else {
+        gchar *dirname = g_object_get_data(G_OBJECT(attach),
+                                           "balsa-sendmsg-window-attach-dir");
+        gchar *valdir = g_path_get_dirname(val);
+        gboolean good = (strcmp(dirname, valdir) == 0);
+
+        g_free(valdir);
+        if (!good) {
+            /* gtk_file_chooser_select_filename will crash */
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Could not attach the file %s: %s."), val,
+                              _("not in current directory"));
+            return;
+        }
+    }
+    gtk_file_chooser_select_filename(attach, val);
+}
+#endif
+
 void
 sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
                          const gchar * val)
@@ -4626,7 +4695,7 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         return;
 #if defined(NO_SECURITY_ISSUES_WITH_ATTACHMENTS)
     } else if (g_ascii_strcasecmp(key, "attach") == 0) {
-        add_attachment(bsmsg, g_strdup(val), FALSE, NULL);
+        sw_attach_file(bsmsg, val);
         return;
 #endif
     } else if (g_ascii_strcasecmp(key, "to")  ==0) field = bsmsg->to;

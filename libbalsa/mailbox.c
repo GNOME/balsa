@@ -2663,9 +2663,10 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
         LibBalsaMessage *message;
 
         pthread_mutex_unlock(&get_index_entry_lock);
-        message = libbalsa_mailbox_get_message(mailbox, msgno);
-        libbalsa_mailbox_cache_message(mailbox, msgno, message);
-        g_object_unref(message);
+        if ( (message = libbalsa_mailbox_get_message(mailbox, msgno)) ) {
+            libbalsa_mailbox_cache_message(mailbox, msgno, message);
+            g_object_unref(message);
+        }
         pthread_mutex_lock(&get_index_entry_lock);
     }
 

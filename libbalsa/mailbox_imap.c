@@ -1837,9 +1837,11 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     g_return_val_if_fail(mimap->opened, FALSE);
     imsg = mi_get_imsg(mimap, message->msgno);
 
-    if(!imsg || !imsg->envelope) /* Connection severed and and restore
-                                 *  failed - deal with it! */
+    if(!imsg || !imsg->envelope) {/* Connection severed and and restore
+                                   *  failed - deal with it! */
+        fprintf(stderr, "load_envelope failed!\n");
         return FALSE;
+    }
 
     lbimap_update_flags(message, imsg);
 

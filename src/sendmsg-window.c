@@ -3502,6 +3502,55 @@ static gint quote_messages_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
 }
 
 
+/** Generates a new subject for forwarded messages based on a message
+    being responded to and identity.
+ */
+static char*
+generate_forwarded_subject(const char *orig_subject,
+                           LibBalsaMessageHeaders *headers,
+                           LibBalsaIdentity       *ident)
+{
+    char *newsubject;
+
+    if (!orig_subject) {
+        if (headers && headers->from)
+            newsubject = g_strdup_printf("%s from %s",
+                                         ident->forward_string,
+                                         libbalsa_address_get_mailbox_from_list
+                                         (headers->from));
+        else
+            newsubject = g_strdup(ident->forward_string);
+    } else {
+        const char *tmp = orig_subject;
+        if (g_ascii_strncasecmp(tmp, "fwd:", 4) == 0) {
+            tmp += 4;
+        } else if (g_ascii_strncasecmp(tmp, _("Fwd:"),
+                                       strlen(_("Fwd:"))) == 0) {
+            tmp += strlen(_("Fwd:"));
+        } else {
+            size_t i = strlen(ident->forward_string);
+            if (g_ascii_strncasecmp(tmp, ident->forward_string, i) == 0) {
+                tmp += i;
+            }
+        }
+        while( *tmp && isspace((int)*tmp) ) tmp++;
+        if (headers && headers->from)
+            newsubject = 
+                g_strdup_printf("%s %s [%s]",
+                                ident->forward_string, 
+                                tmp,
+                                libbalsa_address_get_mailbox_from_list
+                                (headers->from));
+        else {
+            newsubject = 
+                g_strdup_printf("%s %s", 
+                                ident->forward_string, 
+                                tmp);
+            g_strchomp(newsubject);
+        }
+    }
+    return newsubject;
+}
 /* set_entry_to_subject:
    set subject entry based on given replied/forwarded/continued message
    and the compose type.
@@ -3549,42 +3598,7 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *part,
 
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
-	if (!subject) {
-	    if (headers && headers->from)
-		newsubject = g_strdup_printf("%s from %s",
-					     ident->forward_string,
-					     libbalsa_address_get_mailbox_from_list
-						 (headers->from));
-	    else
-		newsubject = g_strdup(ident->forward_string);
-	} else {
-	    tmp = subject;
-	    if (g_ascii_strncasecmp(tmp, "fwd:", 4) == 0) {
-		tmp += 4;
-	    } else if (g_ascii_strncasecmp(tmp, _("Fwd:"), strlen(_("Fwd:"))) == 0) {
-		tmp += strlen(_("Fwd:"));
-	    } else {
-		i = strlen(ident->forward_string);
-		if (g_ascii_strncasecmp(tmp, ident->forward_string, i) == 0) {
-		    tmp += i;
-		}
-	    }
-	    while( *tmp && isspace((int)*tmp) ) tmp++;
-	    if (headers && headers->from)
-		newsubject = 
-		    g_strdup_printf("%s %s [%s]",
-				    ident->forward_string, 
-				    tmp,
-                                    libbalsa_address_get_mailbox_from_list
-					(headers->from));
-	    else {
-		newsubject = 
-		    g_strdup_printf("%s %s", 
-				    ident->forward_string, 
-				    tmp);
-		g_strchomp(newsubject);
-	    }
-	}
+        newsubject = generate_forwarded_subject(subject, headers, ident);
 	break;
     case SEND_CONTINUE:
 	if (subject)
@@ -4468,6 +4482,9 @@ sendmsg_window_forward(GtkWidget *w, LibBalsaMessage *message, gboolean attach)
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Attaching message failed.\n"
                                    "Possible reason: not enough temporary space"));
+        bsmsg->state = SENDMSG_STATE_CLEAN;
+        set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), message->body_list,
+                             bsmsg->type, bsmsg->ident);
     } else {
         bsm_prepare_for_setup(message);
         fill_body_from_message(bsmsg, message, QUOTE_NOPREFIX);

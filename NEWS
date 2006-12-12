@@ -1,4 +1,12 @@
-* Balsa-2.3.13 release. Release date 2006-05-26
+* Balsa-2.3.13 release. Release date 2006-12-12
+
+- deferred population of the mailbox index.
+- client-side IMAP sorting.
+- be compatible with recent gtk2 releases.
+- mailbox tabs reorderable with d&d.
+- enhanced mailto: URL handling.
+
+* Balsa-2.3.13 release. Release date 2006-06-26
 
 - many small fixes
 - nicer icons.

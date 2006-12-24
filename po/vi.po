@@ -6,8 +6,8 @@ msgid ""
 ""
 msgstr "Project-Id-Version: balsa HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-18 02:07+0200\n"
-"PO-Revision-Date: 2006-10-18 16:56+0930\n"
+"POT-Creation-Date: 2006-12-23 19:44+0100\n"
+"PO-Revision-Date: 2006-12-24 13:48+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +85,7 @@ msgstr "Không tìm thấy địa chỉ trong sổ địa chỉ"
 #: ../libbalsa/address-book.c:324
 #: ../src/main-window.c:2366
 #: ../src/main-window.c:4471
-#: ../src/sendmsg-window.c:3658
+#: ../src/sendmsg-window.c:3684
 msgid "Unknown error"
 msgstr "Gặp lỗi lạ"
 
@@ -286,7 +286,8 @@ msgstr "%s: không thể liệt kê khoá cho %s: %s"
 #, c-format
 msgid ""
 "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
-msgstr "%s: có một khoá cho %s, nhưng nó bị hết hạn, bị tắt, bị hủy bỏ hoặc không hợp lệ"
+msgstr "%s: có một khoá cho %s, nhưng nó bị hết hạn, bị tắt, bị hủy bỏ hoặc không "
+"hợp lệ"
 
 #: ../libbalsa/gmime-gpgme-context.c:906
 #, c-format
@@ -307,14 +308,15 @@ msgstr "%s: không có đủ độ hợp lệ cho mã nhận diện người dù
 #: ../libbalsa/identity.c:102
 #: ../libbalsa/mailbox_local.c:1797
 #: ../libbalsa/mailbox_local.c:1799
-#: ../src/sendmsg-window.c:3521
-#: ../src/sendmsg-window.c:3522
+#: ../src/sendmsg-window.c:3582
+#: ../src/sendmsg-window.c:3583
 msgid "Re:"
 msgstr "Về:"
 
 #: ../libbalsa/identity.c:103
-#: ../src/sendmsg-window.c:3552
-#: ../src/sendmsg-window.c:3553
+#: ../src/sendmsg-window.c:3527
+#: ../src/sendmsg-window.c:3528
+#: ../src/sendmsg-window.c:3529
 msgid "Fwd:"
 msgstr "Tiếp:"
 
@@ -636,20 +638,20 @@ msgstr "Đang sao chép %s sang %s..."
 msgid "Removing messages from source mailbox failed"
 msgstr "Việc gỡ bỏ thư ra hộp thư nguồn bị lỗi."
 
-#: ../libbalsa/mailbox.c:2802
+#: ../libbalsa/mailbox.c:2803
 msgid "from unknown"
 msgstr "từ không rõ"
 
-#: ../libbalsa/mailbox.c:2804
+#: ../libbalsa/mailbox.c:2805
 msgid "Loading..."
 msgstr "Đang nạp..."
 
-#: ../libbalsa/mailbox.c:3726
+#: ../libbalsa/mailbox.c:3727
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Đang tìm kiếm trong %s có thư riêng phần..."
 
-#: ../libbalsa/mailbox.c:3816
+#: ../libbalsa/mailbox.c:3817
 msgid "Reconstructing message"
 msgstr "Đang cấu tạo lại thư..."
 
@@ -672,14 +674,14 @@ msgstr "Không thể thực hiện lệnh IMAP %s không đồng bộ. Đang tá
 
 #: ../libbalsa/mailbox_imap.c:1024
 #: ../libbalsa/mailbox_maildir.c:525
-#: ../libbalsa/mailbox_mbox.c:721
+#: ../libbalsa/mailbox_mbox.c:733
 #: ../libbalsa/mailbox_mh.c:551
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Đang mở %s Số đếm tham chiếu : %d\n"
 
 #: ../libbalsa/mailbox_imap.c:1099
-#: ../libbalsa/mailbox_imap.c:2247
+#: ../libbalsa/mailbox_imap.c:2249
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Đang tải về %ld kB..."
@@ -702,21 +704,21 @@ msgstr "Không tìm thấy đường dẫn cho hộp thư « %s », dùng « %s 
 msgid "Cannot get IMAP handle"
 msgstr "Không thể lấy bộ quản lý IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2280
+#: ../libbalsa/mailbox_imap.c:2282
 msgid "Cannot create temporary file"
 msgstr "Không thể tạo tập tin tạm thời."
 
-#: ../libbalsa/mailbox_imap.c:2299
+#: ../libbalsa/mailbox_imap.c:2301
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Không thể ghi vào tập tin tạm thời %s."
 
-#: ../libbalsa/mailbox_imap.c:2516
+#: ../libbalsa/mailbox_imap.c:2518
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Đang tải lên %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:2707
+#: ../libbalsa/mailbox_imap.c:2709
 msgid "Server-side threading not supported."
 msgstr "Khả năng sắp xếp theo nhánh bên máy phục vụ không được hỗ trợ."
 
@@ -812,13 +814,13 @@ msgstr "Không thể gỡ bỏ %s:\n"
 "%s"
 
 #: ../libbalsa/mailbox_maildir.c:504
-#: ../libbalsa/mailbox_mbox.c:669
+#: ../libbalsa/mailbox_mbox.c:681
 #: ../libbalsa/mailbox_mh.c:532
 msgid "Mailbox does not exist."
 msgstr "Hộp thư không tồn tại."
 
 #: ../libbalsa/mailbox_maildir.c:970
-#: ../libbalsa/mailbox_mbox.c:1975
+#: ../libbalsa/mailbox_mbox.c:1987
 #: ../libbalsa/mailbox_mh.c:1155
 msgid "Data copy error"
 msgstr "Lỗi sao chép dữ liệu"
@@ -838,29 +840,29 @@ msgstr "Không thể ghi tập tin %s: %s"
 msgid "Could not unlink file %s: %s"
 msgstr "Không thể bỏ liên kết tập tin %s: %s"
 
-#: ../libbalsa/mailbox_mbox.c:677
+#: ../libbalsa/mailbox_mbox.c:689
 msgid "Cannot open mailbox."
 msgstr "Không thể mở hộp thư."
 
-#: ../libbalsa/mailbox_mbox.c:689
+#: ../libbalsa/mailbox_mbox.c:701
 msgid "Mailbox is not in mbox format."
 msgstr "Hộp thư không phải dạng mbox."
 
-#: ../libbalsa/mailbox_mbox.c:697
+#: ../libbalsa/mailbox_mbox.c:709
 msgid "Cannot lock mailbox."
 msgstr "Không thể khoá hộp thư."
 
-#: ../libbalsa/mailbox_mbox.c:1932
+#: ../libbalsa/mailbox_mbox.c:1944
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: không thể mở %s."
 
-#: ../libbalsa/mailbox_mbox.c:1943
+#: ../libbalsa/mailbox_mbox.c:1955
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: không thể lấy luông MIME mới."
 
-#: ../libbalsa/mailbox_mbox.c:1951
+#: ../libbalsa/mailbox_mbox.c:1963
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s không phải dạng mbox."
@@ -2202,7 +2204,7 @@ msgstr "Ngày"
 
 #: ../src/balsa-index.c:403
 #: ../src/pref-manager.c:404
-#: ../src/sendmsg-window.c:2930
+#: ../src/sendmsg-window.c:2942
 msgid "Size"
 msgstr "Cỡ"
 
@@ -2704,7 +2706,7 @@ msgstr "_Thân"
 #.To:
 #: ../src/filter-edit-callbacks.c:911
 #: ../src/main-window.c:4030
-#: ../src/sendmsg-window.c:2817
+#: ../src/sendmsg-window.c:2827
 msgid "_To:"
 msgstr "Ch_o :"
 
@@ -4678,20 +4680,20 @@ msgstr "Chép vào thư mục..."
 #: ../src/balsa-mime-widget-message.c:661
 #: ../src/print.c:350
 #: ../src/sendmsg-window.c:1106
-#: ../src/sendmsg-window.c:3324
-#: ../src/sendmsg-window.c:5249
+#: ../src/sendmsg-window.c:3336
+#: ../src/sendmsg-window.c:5368
 msgid "Subject:"
 msgstr "Chủ đề:"
 
 #: ../src/balsa-mime-widget-message.c:665
 #: ../src/print.c:356
-#: ../src/sendmsg-window.c:3320
+#: ../src/sendmsg-window.c:3332
 msgid "Date:"
 msgstr "Ngày:"
 
 #: ../src/balsa-mime-widget-message.c:671
 #: ../src/print.c:361
-#: ../src/sendmsg-window.c:3331
+#: ../src/sendmsg-window.c:3343
 #: ../src/store-address.c:305
 msgid "From:"
 msgstr "Từ :"
@@ -4706,7 +4708,7 @@ msgstr "Trả lời:"
 #: ../src/balsa-mime-widget-message.c:681
 #: ../src/print.c:365
 #: ../src/sendmsg-window.c:1100
-#: ../src/sendmsg-window.c:3339
+#: ../src/sendmsg-window.c:3351
 #: ../src/store-address.c:306
 msgid "To:"
 msgstr "Cho :"
@@ -4716,8 +4718,8 @@ msgstr "Cho :"
 #: ../src/balsa-mime-widget-message.c:682
 #: ../src/print.c:366
 #: ../src/sendmsg-window.c:1105
-#: ../src/sendmsg-window.c:2828
-#: ../src/sendmsg-window.c:3347
+#: ../src/sendmsg-window.c:2838
+#: ../src/sendmsg-window.c:3359
 #: ../src/store-address.c:307
 msgid "Cc:"
 msgstr "Cc:"
@@ -4727,7 +4729,7 @@ msgstr "Cc:"
 #: ../src/balsa-mime-widget-message.c:683
 #: ../src/print.c:367
 #: ../src/sendmsg-window.c:1104
-#: ../src/sendmsg-window.c:2833
+#: ../src/sendmsg-window.c:2843
 #: ../src/store-address.c:308
 msgid "Bcc:"
 msgstr "Bcc:"
@@ -4887,7 +4889,7 @@ msgstr "Máy phục vụ hộp thư ở xa"
 
 #: ../src/pref-manager.c:1605
 #: ../src/pref-manager.c:2752
-#: ../src/sendmsg-window.c:2912
+#: ../src/sendmsg-window.c:2924
 msgid "Type"
 msgstr "Kiểu"
 
@@ -5946,7 +5948,7 @@ msgid "Character set for file %s changed from \"%s\" to \"%s\"."
 msgstr "Bộ ký tự cho tập tin %s đã thay đổi từ « %s » sang « %s »."
 
 #: ../src/sendmsg-window.c:1922
-#: ../src/sendmsg-window.c:5253
+#: ../src/sendmsg-window.c:5372
 msgid "(no subject)"
 msgstr "(không có chủ đề)"
 
@@ -5992,158 +5994,199 @@ msgstr "Đính kèm %s không phải là tập tin chuẩn."
 msgid "File %s cannot be read\n"
 msgstr "Tập tin %s không có khả năng đọc.\n"
 
-#: ../src/sendmsg-window.c:2274
+#: ../src/sendmsg-window.c:2273
 msgid "Attach file"
 msgstr "Đính kèm tập tin"
 
-#: ../src/sendmsg-window.c:2360
-#: ../src/sendmsg-window.c:2469
-#: ../src/sendmsg-window.c:4457
+#: ../src/sendmsg-window.c:2368
+#: ../src/sendmsg-window.c:2477
+#: ../src/sendmsg-window.c:4483
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr "Việc đính kèm thư bị lỗi.\n"
 "Lý do có thể: không đủ chỗ tạm thời"
 
-#: ../src/sendmsg-window.c:2689
+#: ../src/sendmsg-window.c:2698
 msgid "F_rom:"
 msgstr "_Từ :"
 
 #.Subject:
-#: ../src/sendmsg-window.c:2824
+#: ../src/sendmsg-window.c:2834
 msgid "S_ubject:"
 msgstr "C_hủ đề:"
 
 #.fcc: mailbox folder where the message copy will be written to
-#: ../src/sendmsg-window.c:2838
+#: ../src/sendmsg-window.c:2848
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #.Reply To:
-#: ../src/sendmsg-window.c:2869
+#: ../src/sendmsg-window.c:2880
 msgid "_Reply To:"
 msgstr "T_rả lời:"
 
 #.Attachment list
-#: ../src/sendmsg-window.c:2874
+#: ../src/sendmsg-window.c:2885
 msgid "_Attachments:"
 msgstr "Đính _kèm:"
 
-#: ../src/sendmsg-window.c:2919
+#: ../src/sendmsg-window.c:2931
 msgid "Mode"
 msgstr "Chế độ"
 
-#: ../src/sendmsg-window.c:2942
+#: ../src/sendmsg-window.c:2954
 msgid "Description"
 msgstr "Mô tả"
 
-#: ../src/sendmsg-window.c:3252
+#: ../src/sendmsg-window.c:3264
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Không thể lưu đính kèm: %s"
 
-#: ../src/sendmsg-window.c:3273
+#: ../src/sendmsg-window.c:3285
 msgid "No subject"
 msgstr "Không có chủ đề"
 
-#: ../src/sendmsg-window.c:3305
+#: ../src/sendmsg-window.c:3317
 msgid "you"
 msgstr "bạn"
 
-#: ../src/sendmsg-window.c:3314
+#: ../src/sendmsg-window.c:3326
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "━━━thư đã chuyển tiếp từ %s━━━\n"
 
-#: ../src/sendmsg-window.c:3351
+#: ../src/sendmsg-window.c:3363
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID thư : %s\n"
 
-#: ../src/sendmsg-window.c:3357
+#: ../src/sendmsg-window.c:3369
 msgid "References:"
 msgstr "Tham chiếu :"
 
-#: ../src/sendmsg-window.c:3368
+#: ../src/sendmsg-window.c:3380
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Vào %s, %s đã viết:\n"
 
-#: ../src/sendmsg-window.c:3370
+#: ../src/sendmsg-window.c:3382
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s đã viết:\n"
 
-#: ../src/sendmsg-window.c:3481
+#: ../src/sendmsg-window.c:3493
 msgid "No signature found!"
 msgstr "• Không tìm thấy chữ ký. •"
 
-#: ../src/sendmsg-window.c:3650
+#: ../src/sendmsg-window.c:3676
 msgid "Could not save message."
 msgstr "Không thể lưu thư."
 
-#: ../src/sendmsg-window.c:3657
+#: ../src/sendmsg-window.c:3683
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Không thể mở hộp thư Nháp: %s"
 
-#: ../src/sendmsg-window.c:3678
+#: ../src/sendmsg-window.c:3704
 msgid "Message saved."
 msgstr "Thư đã được lưu."
 
-#: ../src/sendmsg-window.c:4653
+#: ../src/sendmsg-window.c:4648
+#: ../src/sendmsg-window.c:4655
+#: ../src/sendmsg-window.c:4661
+#: ../src/sendmsg-window.c:4667
+#: ../src/sendmsg-window.c:4690
+#, c-format
+msgid "Could not attach the file %s: %s."
+msgstr "Không thể đính kèm tập tin %s: %s"
+
+#: ../src/sendmsg-window.c:4649
+msgid "not an absolute path"
+msgstr "không phải đường dẫn tuyệt đối"
+
+#: ../src/sendmsg-window.c:4656
+msgid "not in your directory"
+msgstr "không phải nằm trong thư mục của bạn"
+
+#: ../src/sendmsg-window.c:4662
+msgid "does not exist"
+msgstr "không tồn tại"
+
+#: ../src/sendmsg-window.c:4668
+msgid "not a regular file"
+msgstr "không phải tập tin chuẩn"
+
+#: ../src/sendmsg-window.c:4691
+msgid "not in current directory"
+msgstr "không phải nằm trong thư mục hiện có"
+
+#: ../src/sendmsg-window.c:4731
+msgid ""
+"The link that you selected created\n"
+"a \"Blind copy\" (Bcc) address.\n"
+"Please check that the address\n"
+"is appropriate."
+msgstr "Bạn đã chọn một liên kết\n"
+"đã tạo một địa chỉ kiểu BCC\n"
+"(Bí mật Chép Cho).\n"
+"Hãy kiểm tra xem địa chỉ này\n"
+"là thích hợp không."
+
+#: ../src/sendmsg-window.c:4772
 #, c-format
 msgid "Error executing signature generator %s"
 msgstr "Gặp lỗi khi thực hiện bộ tạo ra chữ ký %s"
 
-#: ../src/sendmsg-window.c:4665
+#: ../src/sendmsg-window.c:4784
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
 msgstr "Không thể mở tập tin chữ ký « %s » để đọc."
 
-#: ../src/sendmsg-window.c:4675
+#: ../src/sendmsg-window.c:4794
 #, c-format
 msgid "Error reading signature from %s"
 msgstr "Gặp lỗi khi đọc chữ ký từ %s."
 
-#: ../src/sendmsg-window.c:4679
+#: ../src/sendmsg-window.c:4798
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "Chữ ký trong %s không phải là chuỗi UTF-8."
 
-#: ../src/sendmsg-window.c:4742
+#: ../src/sendmsg-window.c:4861
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Không thể mở tập tin %s.\n"
 
-#: ../src/sendmsg-window.c:4798
+#: ../src/sendmsg-window.c:4917
 msgid "Include file"
 msgstr "Gồm tập tin"
 
 #.Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5012
+#: ../src/sendmsg-window.c:5131
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Không thể mở tập tin phần đầu Face %s: %s"
 
 #.Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5015
+#: ../src/sendmsg-window.c:5134
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Không thể tải tập tin phần đầu Face %s: %s"
 
-#: ../src/sendmsg-window.c:5095
+#: ../src/sendmsg-window.c:5214
 msgid "Message contains national (8-bit) characters"
 msgstr "Thư chứa ký tự thuộc quốc gia (8-bit)."
 
-#: ../src/sendmsg-window.c:5099
+#: ../src/sendmsg-window.c:5218
 msgid ""
 "Balsa will encode the message in UTF-8.\n"
 "Cancel the operation to choose a different language."
 msgstr "Balsa sẽ mã hóa thư bằng UTF-8.\n"
 "Thôi thao tác này để chọn ngôn ngữ khác."
 
-#: ../src/sendmsg-window.c:5105
+#: ../src/sendmsg-window.c:5224
 msgid ""
 "<b><big>Message contains national (8-bit) characters.</big></b> Balsa will "
 "encode the message in UTF-8.\n"
@@ -6152,19 +6195,19 @@ msgstr "<b><big>Thư chứa ký tự thuộc quốc gia (8-bit).</big></b> Balsa
 "bằng UTF-8.\n"
 "Thôi thao tác này để chọn ngôn ngữ khác."
 
-#: ../src/sendmsg-window.c:5237
+#: ../src/sendmsg-window.c:5356
 msgid "You did not specify a subject for this message"
 msgstr "Chưa ghi rõ chủ đề cho thư này."
 
-#: ../src/sendmsg-window.c:5238
+#: ../src/sendmsg-window.c:5357
 msgid "If you would like to provide one, enter it below."
 msgstr "Hãy gõ bên dưới."
 
-#: ../src/sendmsg-window.c:5279
+#: ../src/sendmsg-window.c:5398
 msgid "_Send"
 msgstr "_Gửi"
 
-#: ../src/sendmsg-window.c:5336
+#: ../src/sendmsg-window.c:5455
 msgid ""
 "You selected OpenPGP mode for a message with attachments. In this mode, only "
 "the first part will be signed and/or encrypted. You should select MIME mode "
@@ -6173,71 +6216,71 @@ msgstr "Bạn đã chọn chế độ OpenPGP cho một thư có đính kèm. Tr
 "phần đầu tiên sẽ được ký tên và/hay mật mã. Bạn nên chọn chế độ MIME để bảo "
 "vệ toàn bộ thư. Bạn thật sự muốn tiếp tục không?"
 
-#: ../src/sendmsg-window.c:5352
+#: ../src/sendmsg-window.c:5471
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "đang gửi thư với chế độ GPG %d..."
 
-#: ../src/sendmsg-window.c:5389
+#: ../src/sendmsg-window.c:5508
 msgid "Message could not be created"
 msgstr "Không thể tạo thư."
 
-#: ../src/sendmsg-window.c:5391
+#: ../src/sendmsg-window.c:5510
 msgid "Message could not be queued in outbox"
 msgstr "Không thể sắp hàng thư trong hộp Thư Đi."
 
-#: ../src/sendmsg-window.c:5393
+#: ../src/sendmsg-window.c:5512
 msgid "Message could not be saved in sentbox"
 msgstr "Không thể lưu thư trong hộp Đã Gửi."
 
-#: ../src/sendmsg-window.c:5395
+#: ../src/sendmsg-window.c:5514
 msgid "Message could not be sent"
 msgstr "Không thể gửi thư."
 
-#: ../src/sendmsg-window.c:5399
+#: ../src/sendmsg-window.c:5518
 #, c-format
 msgid "Send failed: %s"
 msgstr "Việc gửi bị lỗi: %s"
 
-#: ../src/sendmsg-window.c:5482
-#: ../src/sendmsg-window.c:5501
+#: ../src/sendmsg-window.c:5601
+#: ../src/sendmsg-window.c:5620
 msgid "Could not postpone message."
 msgstr "Không thể hoãn thư."
 
-#: ../src/sendmsg-window.c:5496
+#: ../src/sendmsg-window.c:5615
 msgid "Message postponed."
 msgstr "Thư đã được hoãn."
 
-#: ../src/sendmsg-window.c:5651
+#: ../src/sendmsg-window.c:5770
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Gặp lỗi khi khởi chạy bộ kiểm tra chính tả: %s"
 
-#: ../src/sendmsg-window.c:5810
+#: ../src/sendmsg-window.c:5929
 #, c-format
 msgid "Could not compile %s"
 msgstr "Không thể biên dịch %s."
 
-#: ../src/sendmsg-window.c:5811
+#: ../src/sendmsg-window.c:5930
 msgid "Quoted Text Regular Expression"
 msgstr "Biểu thức chính quy cho văn bản trích dẫn"
 
-#: ../src/sendmsg-window.c:6365
+#: ../src/sendmsg-window.c:6484
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Trả lời %s: %s"
 
-#: ../src/sendmsg-window.c:6370
+#: ../src/sendmsg-window.c:6489
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Chuyển tiếp thư tới %s: %s"
 
-#: ../src/sendmsg-window.c:6374
+#: ../src/sendmsg-window.c:6493
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Tiếp tục thư cho %s: %s"
 
-#: ../src/sendmsg-window.c:6378
+#: ../src/sendmsg-window.c:6497
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Thư mới cho %s: %s"

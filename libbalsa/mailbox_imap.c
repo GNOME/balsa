@@ -759,68 +759,67 @@ update_counters_and_filter(void *data)
 static void
 imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 {
-    unsigned cnt = imap_mbox_handle_get_exists(mimap->handle);
+    unsigned cnt;
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    unsigned i;
-    struct message_info a = {0};
-    GNode *sibling = NULL;
-
-    mimap->sort_field = -1;	/* Invalidate. */
-    if(cnt == mimap->messages_info->len)
-	return;
-    if(cnt<mimap->messages_info->len) {
-        /* remove messages; we probably missed some EXPUNGE responses
-           - the only sensible scenario is that the connection was
-           severed. Still, we need to recover from this somehow... -
-           We invalidate all the cache now. */
-        printf("%s: expunge ignored? Had %u messages and now only %u. "
-               "Bug in the program or broken connection\n",
-               __func__, mimap->messages_info->len, cnt);
-        for(i=0; i<mimap->messages_info->len; i++) {
-	    gchar *msgid;
-            struct message_info *msg_info =
-                message_info_from_msgno(mimap, i+1);
-	    if(msg_info->message)
-                g_object_unref(msg_info->message);
-            msg_info->message = NULL;
-	    msgid = g_ptr_array_index(mimap->msgids, i);
-	    if(msgid) { 
-		g_free(msgid);
-		g_ptr_array_index(mimap->msgids, i) = NULL;
-	    }
-            libbalsa_mailbox_cache_message(mailbox, i + 1, NULL);
-        }
-	for(i=mimap->messages_info->len; i>cnt; i--) {
-	    g_array_remove_index(mimap->messages_info, i-1);
-	    g_ptr_array_remove_index(mimap->msgids, i-1);
-	    libbalsa_mailbox_msgno_removed(mailbox, i);
-	}
-    } 
-
-    /* EXISTS response may result from any IMAP action. */
     libbalsa_lock_mailbox(mailbox);
 
-    gdk_threads_enter();
+    mimap->sort_field = -1;	/* Invalidate. */
+    cnt = imap_mbox_handle_get_exists(mimap->handle);
+    if(cnt != mimap->messages_info->len) {
+        unsigned i;
+        struct message_info a = {0};
+        GNode *sibling = NULL;
 
-    if (mailbox->msg_tree)
-        sibling = g_node_last_child(mailbox->msg_tree);
-    for(i=mimap->messages_info->len+1; i <= cnt; i++) {
-        g_array_append_val(mimap->messages_info, a);
-        g_ptr_array_add(mimap->msgids, NULL);
-        libbalsa_mailbox_msgno_inserted(mailbox, i, mailbox->msg_tree,
-                                        &sibling);
+        if(cnt<mimap->messages_info->len) {
+            /* remove messages; we probably missed some EXPUNGE responses
+               - the only sensible scenario is that the connection was
+               severed. Still, we need to recover from this somehow... -
+               We invalidate all the cache now. */
+            printf("%s: expunge ignored? Had %u messages and now only %u. "
+                   "Bug in the program or broken connection\n",
+                   __func__, mimap->messages_info->len, cnt);
+            for(i=0; i<mimap->messages_info->len; i++) {
+                gchar *msgid;
+                struct message_info *msg_info =
+                    message_info_from_msgno(mimap, i+1);
+                if(msg_info->message)
+                    g_object_unref(msg_info->message);
+                msg_info->message = NULL;
+                msgid = g_ptr_array_index(mimap->msgids, i);
+                if(msgid) { 
+                    g_free(msgid);
+                    g_ptr_array_index(mimap->msgids, i) = NULL;
+                }
+                libbalsa_mailbox_cache_message(mailbox, i + 1, NULL);
+            }
+            for(i=mimap->messages_info->len; i>cnt; i--) {
+                g_array_remove_index(mimap->messages_info, i-1);
+                g_ptr_array_remove_index(mimap->msgids, i-1);
+                libbalsa_mailbox_msgno_removed(mailbox, i);
+            }
+        } 
+
+        gdk_threads_enter();
+
+        if (mailbox->msg_tree)
+            sibling = g_node_last_child(mailbox->msg_tree);
+        for(i=mimap->messages_info->len+1; i <= cnt; i++) {
+            g_array_append_val(mimap->messages_info, a);
+            g_ptr_array_add(mimap->msgids, NULL);
+            libbalsa_mailbox_msgno_inserted(mailbox, i, mailbox->msg_tree,
+                                            &sibling);
+        }
+        ++mimap->search_stamp;
+        
+        gdk_threads_leave();
+    
+        /* we run filters and get unseen messages in a idle callback:
+         * these things do not need to be done immediately and we do 
+         * not want to issue too many new overlapping IMAP requests.
+         */
+        g_object_ref(G_OBJECT(mailbox));
+        g_idle_add(update_counters_and_filter, mailbox);
     }
-    ++mimap->search_stamp;
-
-    gdk_threads_leave();
-    
-    /* we run filters and get unseen messages in a idle callback:
-     * these things do not need to be done immediately and we do 
-     * not want to issue too many new overlapping IMAP requests.
-     */
-    g_object_ref(G_OBJECT(mailbox));
-    g_idle_add(update_counters_and_filter, mailbox);
-    
     libbalsa_unlock_mailbox(mailbox);
 }
 

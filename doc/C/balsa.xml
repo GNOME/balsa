@@ -3453,6 +3453,34 @@ to enable persistent message cache. If the home directory is slow
 persistent cache becomes just a burden and should be disabled.</para>
 </listitem>
 </itemizedlist>
+
+<listitem>
+<para>The <guilabel>Use IDLE command</guilabel> check box chooses
+whether &Balsa; should try to use IDLE command when available. With
+this command, some servers notify immediately when a new command
+arrives. Also, this command may reduce the amount of network
+traffic. There are some downsides, too: some firewalls do not track
+IMAP connections correctly and will incorrectly interrupt a session in
+an IDLE state. In particular, home-grade network routers with NAT
+translation have notoriously this bug. In such case, it may be safer
+to disable this command. </para> </listitem>
+
+<listitem>
+<para>The <guilabel>Enable bug workarounds</guilabel> check box makes
+ &Balsa; work even with IMAP server that cannot fail to provide
+ selected message parts. &Balsa& in such a case will try to fetch
+ entire messages instead.</para> </listitem>
+
+<listitem>
+<para>The <guilabel>Use STATUS for mailbox checking</guilabel> check
+box enables a more thorough but potentially more expensive way of
+checking mailboxes on IMAP server. This method can be consume many
+resources on the server and should be used <emphasis>only</emphasis>
+on IMAP servers that have optimized STATUS command.</para> </listitem>
+
+
+ </itemizedlist>
+
 </sect2>
 
 <sect2 id="subfolder-config">

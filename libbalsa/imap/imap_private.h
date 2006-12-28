@@ -111,6 +111,7 @@ struct _ImapMboxHandle {
                               * requests. */
   unsigned enable_anonymous:1; /* try anonymous if possible */
   unsigned enable_client_sort:1; /**< client side sorting allowed */
+  unsigned enable_idle:1;    /**< use IDLE - no problem with firewalls */
   unsigned enable_binary:1; /* enable binary extension */
 
   /* conditional stuff at the end for the safety. */

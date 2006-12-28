@@ -1194,15 +1194,14 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
 	/* A mailbox with this url is already in the tree... */
 	BalsaMailboxNode *special =
 	    remove_special_mailbox_by_url(url, &isi->special);
-	if (!special) {
-	    /* ...and it's not special, so we'll return this mbnode. */
-	    g_free(url);
-	    return mbnode;
-	}
+	if (special) {
+            mailbox = special->mailbox;
+            g_object_ref(mailbox);
+            g_object_unref(special);
+	} else {
+            balsa_mblist_mailbox_node_remove(mbnode);
+        }
 	g_object_unref(mbnode);
-	mailbox = special->mailbox;
-	g_object_ref(mailbox);
-	g_object_unref(special);
     }
     g_free(url);
 

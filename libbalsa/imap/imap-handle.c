@@ -155,6 +155,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->enable_anonymous = 0;
   handle->enable_client_sort = 0;
   handle->enable_binary    = 0;
+  handle->enable_idle      = 1;
   mbox_view_init(&handle->mbox_view);
 #if defined(BALSA_USE_THREADS)
   pthread_mutex_init(&handle->mutex, NULL);
@@ -227,6 +228,7 @@ imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
   case IMAP_OPT_ANONYMOUS: h->enable_anonymous = !!state; break;
   case IMAP_OPT_CLIENT_SORT: h->enable_client_sort = !!state; break;
   case IMAP_OPT_BINARY:    h->enable_binary    = !!state; break;
+  case IMAP_OPT_IDLE:      h->enable_idle      = !!state; break;
   default: g_warning("imap_set_option: invalid option\n");
   }
 }
@@ -446,7 +448,7 @@ imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
 gboolean
 imap_handle_idle_enable(ImapMboxHandle *h, int seconds)
 {
-  if( !imap_mbox_handle_can_do(h, IMCAP_IDLE))
+  if( !h->enable_idle || !imap_mbox_handle_can_do(h, IMCAP_IDLE))
     return FALSE;
   if(h->idle_issued) {
     fprintf(stderr, "IDLE already enabled\n");

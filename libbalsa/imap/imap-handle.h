@@ -85,7 +85,8 @@ typedef enum
 typedef enum {
   IMAP_OPT_ANONYMOUS,   /**< try anonymous authentication */
   IMAP_OPT_CLIENT_SORT, /**< allow client-side sorting */
-  IMAP_OPT_BINARY       /**< enable binary=no-transfer-encoding msg transfer */
+  IMAP_OPT_BINARY,      /**< enable binary=no-transfer-encoding msg transfer */
+  IMAP_OPT_IDLE         /**< enable IDLE */
 }  ImapOption;
 
 typedef struct _ImapMboxHandleClass ImapMboxHandleClass;

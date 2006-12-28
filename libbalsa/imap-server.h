@@ -76,5 +76,9 @@ void libbalsa_imap_server_set_use_status(LibBalsaImapServer *server,
                                          gboolean use_status);
 gboolean libbalsa_imap_server_get_use_status(LibBalsaImapServer *server);
 
+void libbalsa_imap_server_set_use_idle(LibBalsaImapServer *server,
+                                       gboolean use_idle);
+gboolean libbalsa_imap_server_get_use_idle(LibBalsaImapServer *server);
+
 extern gint ImapDebug;
 #endif /* __IMAP_SERVER_H__ */

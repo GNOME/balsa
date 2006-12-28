@@ -1628,6 +1628,7 @@ bndx_compose_foreach(GtkWidget * w, BalsaIndex * index,
             break;
         default:
             g_assert_not_reached();
+            sm = NULL; /** silence invalid warnings */
         }
         g_signal_connect(G_OBJECT(sm->window), "destroy",
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);

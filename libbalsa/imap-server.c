@@ -40,7 +40,8 @@ struct LibBalsaImapServer_ {
                                     sessions. If FALSE, messages will be
                                     kept in /tmp and cleaned on exit. */
     unsigned has_fetch_bug:1;
-    unsigned use_status:1; /* server has fast STATUS command */
+    unsigned use_status:1; /**< server has fast STATUS command */
+    unsigned use_idle:1;  /**< IDLE will work: no dummy firewall on the way */
 };
 
 typedef struct LibBalsaImapServerClass_ {
@@ -53,8 +54,8 @@ static void libbalsa_imap_server_init(LibBalsaImapServer * server);
 static void libbalsa_imap_server_finalize(GObject * object);
 static gboolean connection_cleanup(gpointer ptr);
 
-/* Poll every 5 minutes */
-#define CONNECTION_CLEANUP_POLL_PERIOD  (5*60)
+/* Poll every 5 minutes - must be shortest ouf of the times here. */
+#define CONNECTION_CLEANUP_POLL_PERIOD  (2*60)
 /* Cleanup connections more then 10 minutes idle */
 #define CONNECTION_CLEANUP_IDLE_TIME    (10*60)
 /* Send NOOP after 20 minutes to keep a connection alive */
@@ -171,6 +172,7 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
 #else
     imap_server->persistent_cache = TRUE;
 #endif /* ENABLE_TOUCH_UI */
+    imap_server->use_idle = TRUE;
     imap_server->connection_cleanup_id = 
         g_timeout_add(CONNECTION_CLEANUP_POLL_PERIOD*1000,
                       connection_cleanup, imap_server);
@@ -299,6 +301,8 @@ lb_imap_server_info_new(LibBalsaServer *server)
     imap_handle_set_tls_mode(handle, mode);
     imap_handle_set_option(handle, IMAP_OPT_ANONYMOUS, server->try_anonymous);
     imap_handle_set_option(handle, IMAP_OPT_CLIENT_SORT, TRUE);
+    imap_handle_set_option(handle, IMAP_OPT_IDLE,
+                           LIBBALSA_IMAP_SERVER(server)->use_idle);
     return info;
 }
 
@@ -345,8 +349,11 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
 
     for (list = imap_server->used_handles; list; list = list->next) {
         struct handle_info *info = list->data;
-
-        if (info->last_used < idle_marker) {
+        /* We poll selected handles each time (unless IDLE is on
+           already).  Remaining handles are just kept alive. */ 
+        if ( (imap_mbox_is_selected(info->handle) &&
+              !imap_server->use_idle) || 
+            info->last_used < idle_marker) {
             /* ignore errors here - the point is to keep the
                connection alive and if there is no connection, noop
                will be, well, no-op. Other operations may possibly
@@ -468,6 +475,8 @@ libbalsa_imap_server_new_from_config(void)
     if(!d) imap_server->has_fetch_bug = !!d1;
     d1 = libbalsa_conf_get_bool_with_default("UseStatus", &d);
     if(!d) imap_server->use_status = !!d1;
+    d1 = libbalsa_conf_get_bool_with_default("UseIdle", &d);
+    if(!d) imap_server->use_idle = !!d1;
     if (!server->passwd) {
         server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
         if(server->remember_passwd)
@@ -494,6 +503,7 @@ libbalsa_imap_server_save_config(LibBalsaImapServer *server)
     libbalsa_conf_set_bool("PersistentCache", server->persistent_cache);
     libbalsa_conf_set_bool("HasFetchBug", server->has_fetch_bug);
     libbalsa_conf_set_bool("UseStatus",   server->use_status);
+    libbalsa_conf_set_bool("UseIdle",     server->use_idle);
 }
 
 /* handle_connection_error() releases handle_info data, clears password
@@ -877,4 +887,26 @@ gboolean
 libbalsa_imap_server_get_use_status(LibBalsaImapServer *server)
 {
     return server->use_status;
+}
+
+void
+libbalsa_imap_server_set_use_idle(LibBalsaImapServer *server, 
+                                  gboolean use_idle)
+{
+    GList *list;
+
+    server->use_idle = !!use_idle;
+    printf("Server will%s use IDLE\n",
+           server->use_idle ? "" : " NOT");
+    for (list = server->used_handles; list; list = list->next) {
+        struct handle_info *info = list->data;
+        imap_handle_set_option(info->handle, IMAP_OPT_IDLE,
+                               server->use_idle);
+    }
+}
+
+gboolean
+libbalsa_imap_server_get_use_idle(LibBalsaImapServer *server)
+{
+    return server->use_idle;
 }

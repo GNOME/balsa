@@ -55,7 +55,8 @@ struct _FolderDialogData {
     GtkWidget *folder_name, *port, *username, *anonymous, *remember,
         *password, *subscribed, *list_inbox, *prefix;
     GtkWidget *use_ssl, *tls_mode;
-    GtkWidget *connection_limit, *enable_persistent, *has_bugs, *use_status;
+    GtkWidget *connection_limit, *enable_persistent,
+        *use_idle, *has_bugs, *use_status;
 };
 
 /* FIXME: identity_name will leak on cancelled folder edition */
@@ -194,6 +195,9 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         (LIBBALSA_IMAP_SERVER(s),
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent)));
 #endif
+    libbalsa_imap_server_set_use_idle
+        (LIBBALSA_IMAP_SERVER(s), 
+         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_idle)));
     libbalsa_imap_server_set_bug
         (LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH,
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->has_bugs)));
@@ -322,6 +326,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent),
                                      TRUE);
 #endif
+    fcw->use_idle = 
+        balsa_server_conf_add_checkbox(&fcw->bsc,
+                                       _("Use IDLE command"));
+    if(s &&
+       libbalsa_imap_server_get_use_idle(LIBBALSA_IMAP_SERVER(s)))
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->use_idle),
+                                     TRUE);
     fcw->has_bugs = 
         balsa_server_conf_add_checkbox(&fcw->bsc,
                                        _("Enable _bug workarounds"));

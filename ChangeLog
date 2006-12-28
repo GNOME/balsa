@@ -1,3 +1,13 @@
+2006-12-28 Pawel Salek
+
+	* doc/C/balsa.xml: document more advanced IMAP options.
+	* libbalsa/imap-server.[ch]: add ability to disable IDLE.
+	* libbalsa/mailbox_imap.c: fix locking in imap_exists_cb.
+	* libbalsa/imap/imap-handle.[ch]: add ability to disable IDLE.
+	* libbalsa/imap/imap_private.h: ditto.
+	* src/folder-conf.c: UI for IDLE disabling.
+	* src/mailbox-node.c: place mailboxes in scanned locations.
+
 2006-12-12 Pawel Salek
 
 	* src/sendmsg-window.c: set subject for forwarded messages.

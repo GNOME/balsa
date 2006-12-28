@@ -6330,6 +6330,8 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
         break;
     default:
         g_assert_not_reached(); /* since it hardly makes sense... */
+        bsmsg = NULL; /** silence invalid warnings */
+
     }
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-22 11:02+0100\n"
-"PO-Revision-Date: 2006-10-22 11:02-0000\n"
+"POT-Creation-Date: 2007-01-03 20:06+0000\n"
+"PO-Revision-Date: 2007-01-03 20:06-0000\n"
 "Last-Translator: David Lodge <dave@cirt.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,7 @@ msgid "Cannot write to address book"
 msgstr "Cannot write to address book"
 
 #: ../libbalsa/address-book.c:318
-#: ../libbalsa/imap-server.c:512
+#: ../libbalsa/imap-server.c:522
 msgid "Cannot connect to the server"
 msgstr "Cannot connect to the server"
 
@@ -84,7 +84,7 @@ msgstr "Cannot find address in address book"
 #: ../libbalsa/address-book.c:324
 #: ../src/main-window.c:2366
 #: ../src/main-window.c:4471
-#: ../src/sendmsg-window.c:3658
+#: ../src/sendmsg-window.c:3684
 msgid "Unknown error"
 msgstr "Unknown error"
 
@@ -304,14 +304,15 @@ msgstr "%s: insufficient validity for uid %s"
 #: ../libbalsa/identity.c:102
 #: ../libbalsa/mailbox_local.c:1797
 #: ../libbalsa/mailbox_local.c:1799
-#: ../src/sendmsg-window.c:3521
-#: ../src/sendmsg-window.c:3522
+#: ../src/sendmsg-window.c:3582
+#: ../src/sendmsg-window.c:3583
 msgid "Re:"
 msgstr "Re:"
 
 #: ../libbalsa/identity.c:103
-#: ../src/sendmsg-window.c:3552
-#: ../src/sendmsg-window.c:3553
+#: ../src/sendmsg-window.c:3527
+#: ../src/sendmsg-window.c:3528
+#: ../src/sendmsg-window.c:3529
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -491,7 +492,7 @@ msgid "GpgSM S/MIME mode"
 msgstr "GpgSM S/MIME mode"
 
 #. IMAP host name + message
-#: ../libbalsa/imap-server.c:256
+#: ../libbalsa/imap-server.c:258
 #, c-format
 msgid ""
 "IMAP server %s alert:\n"
@@ -501,24 +502,24 @@ msgstr ""
 "%s"
 
 #. IMAP host name + message
-#: ../libbalsa/imap-server.c:260
+#: ../libbalsa/imap-server.c:262
 #, c-format
 msgid "IMAP server %s error: %s"
 msgstr "IMAP server %s error: %s"
 
 #. IMAP host name + message
-#: ../libbalsa/imap-server.c:266
+#: ../libbalsa/imap-server.c:268
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../libbalsa/imap-server.c:517
-#: ../libbalsa/imap-server.c:522
+#: ../libbalsa/imap-server.c:527
+#: ../libbalsa/imap-server.c:532
 #, c-format
 msgid "Cannot connect to the server: %s"
 msgstr "Cannot connect to the server: %s"
 
-#: ../libbalsa/imap-server.c:670
+#: ../libbalsa/imap-server.c:680
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr "Exceeded the number of connections per server %s"
@@ -636,20 +637,20 @@ msgstr "Copying from %s to %s"
 msgid "Removing messages from source mailbox failed"
 msgstr "Removing messages from source mailbox failed"
 
-#: ../libbalsa/mailbox.c:2802
+#: ../libbalsa/mailbox.c:2803
 msgid "from unknown"
 msgstr "from unknown"
 
-#: ../libbalsa/mailbox.c:2804
+#: ../libbalsa/mailbox.c:2805
 msgid "Loading..."
 msgstr "Loading..."
 
-#: ../libbalsa/mailbox.c:3726
+#: ../libbalsa/mailbox.c:3727
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Searching %s for partial messages"
 
-#: ../libbalsa/mailbox.c:3816
+#: ../libbalsa/mailbox.c:3817
 msgid "Reconstructing message"
 msgstr "Reconstructing message"
 
@@ -676,21 +677,21 @@ msgstr "IMAP server has shut the connection: %s Reconnecting..."
 msgid "Async IMAP cmd %s could not be executed. Reconnecting..."
 msgstr "Async IMAP cmd %s could not be executed. Reconnecting..."
 
-#: ../libbalsa/mailbox_imap.c:1024
+#: ../libbalsa/mailbox_imap.c:1023
 #: ../libbalsa/mailbox_maildir.c:525
-#: ../libbalsa/mailbox_mbox.c:721
+#: ../libbalsa/mailbox_mbox.c:733
 #: ../libbalsa/mailbox_mh.c:551
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Opening %s Refcount: %d\n"
 
-#: ../libbalsa/mailbox_imap.c:1099
-#: ../libbalsa/mailbox_imap.c:2247
+#: ../libbalsa/mailbox_imap.c:1098
+#: ../libbalsa/mailbox_imap.c:2248
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Downloading %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:1479
+#: ../libbalsa/mailbox_imap.c:1478
 #, c-format
 msgid ""
 "IMAP SEARCH command failed for mailbox %s\n"
@@ -699,31 +700,31 @@ msgstr ""
 "IMAP SEARCH command failed for mailbox %s\n"
 "falling back to default searching method"
 
-#: ../libbalsa/mailbox_imap.c:1539
+#: ../libbalsa/mailbox_imap.c:1538
 #, c-format
 msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "No path found for mailbox \"%s\", using \"%s\""
 
-#: ../libbalsa/mailbox_imap.c:1628
-#: ../libbalsa/mailbox_imap.c:1669
+#: ../libbalsa/mailbox_imap.c:1627
+#: ../libbalsa/mailbox_imap.c:1668
 msgid "Cannot get IMAP handle"
 msgstr "Cannot get IMAP handle"
 
-#: ../libbalsa/mailbox_imap.c:2280
+#: ../libbalsa/mailbox_imap.c:2281
 msgid "Cannot create temporary file"
 msgstr "Cannot create temporary file"
 
-#: ../libbalsa/mailbox_imap.c:2299
+#: ../libbalsa/mailbox_imap.c:2300
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Cannot write to temporary file %s"
 
-#: ../libbalsa/mailbox_imap.c:2516
+#: ../libbalsa/mailbox_imap.c:2517
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Uploading %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:2707
+#: ../libbalsa/mailbox_imap.c:2708
 msgid "Server-side threading not supported."
 msgstr "Server-side threading not supported."
 
@@ -820,13 +821,13 @@ msgstr ""
 "%s"
 
 #: ../libbalsa/mailbox_maildir.c:504
-#: ../libbalsa/mailbox_mbox.c:669
+#: ../libbalsa/mailbox_mbox.c:681
 #: ../libbalsa/mailbox_mh.c:532
 msgid "Mailbox does not exist."
 msgstr "Mailbox does not exist."
 
 #: ../libbalsa/mailbox_maildir.c:970
-#: ../libbalsa/mailbox_mbox.c:1975
+#: ../libbalsa/mailbox_mbox.c:1987
 #: ../libbalsa/mailbox_mh.c:1155
 msgid "Data copy error"
 msgstr "Data copy error"
@@ -846,29 +847,29 @@ msgstr "Could not write file %s: %s"
 msgid "Could not unlink file %s: %s"
 msgstr "Could not unlink file %s: %s"
 
-#: ../libbalsa/mailbox_mbox.c:677
+#: ../libbalsa/mailbox_mbox.c:689
 msgid "Cannot open mailbox."
 msgstr "Cannot open mailbox."
 
-#: ../libbalsa/mailbox_mbox.c:689
+#: ../libbalsa/mailbox_mbox.c:701
 msgid "Mailbox is not in mbox format."
 msgstr "Mailbox is not in mbox format."
 
-#: ../libbalsa/mailbox_mbox.c:697
+#: ../libbalsa/mailbox_mbox.c:709
 msgid "Cannot lock mailbox."
 msgstr "Cannot lock mailbox."
 
-#: ../libbalsa/mailbox_mbox.c:1932
+#: ../libbalsa/mailbox_mbox.c:1944
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: could not open %s."
 
-#: ../libbalsa/mailbox_mbox.c:1943
+#: ../libbalsa/mailbox_mbox.c:1955
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: could not get new mime stream."
 
-#: ../libbalsa/mailbox_mbox.c:1951
+#: ../libbalsa/mailbox_mbox.c:1963
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s is not in mbox format."
@@ -1647,7 +1648,7 @@ msgid "Required"
 msgstr "Required"
 
 #: ../libbalsa/smtp-server.c:414
-#: ../src/folder-conf.c:104
+#: ../src/folder-conf.c:105
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Error displaying %s: %s\n"
@@ -1663,7 +1664,7 @@ msgstr "_Descriptive Name:"
 #. pop server
 #. imap server
 #: ../libbalsa/smtp-server.c:559
-#: ../src/folder-conf.c:350
+#: ../src/folder-conf.c:361
 #: ../src/mailbox-conf.c:1145
 #: ../src/mailbox-conf.c:1248
 msgid "_Server:"
@@ -2190,7 +2191,7 @@ msgid "Password needed"
 msgstr "Password needed"
 
 #: ../src/balsa-app.c:91
-#: ../src/folder-conf.c:373
+#: ../src/folder-conf.c:384
 msgid "_Remember password"
 msgstr "_Remember password"
 
@@ -2215,7 +2216,7 @@ msgstr "Date"
 
 #: ../src/balsa-index.c:403
 #: ../src/pref-manager.c:404
-#: ../src/sendmsg-window.c:2930
+#: ../src/sendmsg-window.c:2942
 msgid "Size"
 msgstr "Size"
 
@@ -2229,47 +2230,47 @@ msgstr "Opening mailbox %s. Please wait..."
 msgid "To"
 msgstr "To"
 
-#: ../src/balsa-index.c:1736
+#: ../src/balsa-index.c:1737
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Move to Trash failed: %s"
 
 #. R
-#: ../src/balsa-index.c:1891
+#: ../src/balsa-index.c:1892
 #: ../src/main-window.c:584
 #: ../src/main-window.c:1047
 #: ../src/message-window.c:148
 msgid "_Reply..."
 msgstr "_Reply..."
 
-#: ../src/balsa-index.c:1893
+#: ../src/balsa-index.c:1894
 msgid "Reply To _All..."
 msgstr "Reply To _All..."
 
-#: ../src/balsa-index.c:1895
+#: ../src/balsa-index.c:1896
 msgid "Reply To _Group..."
 msgstr "Reply To _Group..."
 
-#: ../src/balsa-index.c:1897
+#: ../src/balsa-index.c:1898
 msgid "_Forward Attached..."
 msgstr "_Forward Attached..."
 
-#: ../src/balsa-index.c:1899
+#: ../src/balsa-index.c:1900
 msgid "Forward _Inline..."
 msgstr "Forward _Inline..."
 
-#: ../src/balsa-index.c:1901
+#: ../src/balsa-index.c:1902
 #: ../src/main-window.c:623
 msgid "_Pipe through..."
 msgstr "_Pipe through..."
 
-#: ../src/balsa-index.c:1903
+#: ../src/balsa-index.c:1904
 #: ../src/main-window.c:682
 #: ../src/main-window.c:1031
 msgid "_Store Address..."
 msgstr "_Store Address..."
 
-#: ../src/balsa-index.c:1918
+#: ../src/balsa-index.c:1919
 #: ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:985
 #: ../src/mailbox-node.c:1001
@@ -2279,67 +2280,67 @@ msgstr "_Store Address..."
 msgid "_Delete"
 msgstr "_Delete"
 
-#: ../src/balsa-index.c:1923
+#: ../src/balsa-index.c:1924
 msgid "_Undelete"
 msgstr "_Undelete"
 
-#: ../src/balsa-index.c:1928
+#: ../src/balsa-index.c:1929
 msgid "Move To _Trash"
 msgstr "Move To _Trash"
 
-#: ../src/balsa-index.c:1932
+#: ../src/balsa-index.c:1933
 msgid "T_oggle"
 msgstr "T_oggle"
 
-#: ../src/balsa-index.c:1936
+#: ../src/balsa-index.c:1937
 #: ../src/main-window.c:331
 #: ../src/main-window.c:360
 msgid "_Flagged"
 msgstr "_Flagged"
 
-#: ../src/balsa-index.c:1939
+#: ../src/balsa-index.c:1940
 msgid "_Unread"
 msgstr "_Unread"
 
-#: ../src/balsa-index.c:1947
+#: ../src/balsa-index.c:1948
 msgid "_Move to"
 msgstr "_Move to"
 
-#: ../src/balsa-index.c:1955
+#: ../src/balsa-index.c:1956
 msgid "_View Source"
 msgstr "_View Source"
 
-#: ../src/balsa-index.c:2164
+#: ../src/balsa-index.c:2165
 #, c-format
 msgid "Failed to copy %d message to mailbox \"%s\": %s"
 msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
 msgstr[0] "Failed to copy %d message to mailbox \"%s\": %s"
 msgstr[1] "Failed to copy %d messages to mailbox \"%s\": %s"
 
-#: ../src/balsa-index.c:2178
+#: ../src/balsa-index.c:2179
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Copied to \"%s\"."
 
-#: ../src/balsa-index.c:2179
+#: ../src/balsa-index.c:2180
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Moved to \"%s\"."
 
-#: ../src/balsa-index.c:2302
+#: ../src/balsa-index.c:2303
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Committing mailbox %s failed."
 
-#: ../src/balsa-index.c:2475
+#: ../src/balsa-index.c:2476
 msgid "Pipe message through a program"
 msgstr "Pipe message through a program"
 
-#: ../src/balsa-index.c:2478
+#: ../src/balsa-index.c:2479
 msgid "_Run"
 msgstr "_Run"
 
-#: ../src/balsa-index.c:2487
+#: ../src/balsa-index.c:2488
 msgid "Specify the program to run:"
 msgstr "Specify the program to run:"
 
@@ -2697,7 +2698,7 @@ msgstr "_Body"
 #. To:
 #: ../src/filter-edit-callbacks.c:911
 #: ../src/main-window.c:4030
-#: ../src/sendmsg-window.c:2817
+#: ../src/sendmsg-window.c:2827
 msgid "_To:"
 msgstr "_To:"
 
@@ -3020,88 +3021,92 @@ msgstr "A_pply Now!"
 msgid "The filters dialog is opened, close it before you can run filters on any mailbox"
 msgstr "The filters dialogue is opened, close it before you can run filters on any mailbox"
 
-#: ../src/folder-conf.c:281
+#: ../src/folder-conf.c:285
 msgid "Remote IMAP folder"
 msgstr "Remote IMAP folder"
 
 #. must NOT be modal
-#: ../src/folder-conf.c:284
-#: ../src/folder-conf.c:747
+#: ../src/folder-conf.c:288
+#: ../src/folder-conf.c:758
 #: ../src/mailbox-conf.c:529
 msgid "_Update"
 msgstr "_Update"
 
-#: ../src/folder-conf.c:284
+#: ../src/folder-conf.c:288
 msgid "C_reate"
 msgstr "C_reate"
 
-#: ../src/folder-conf.c:307
+#: ../src/folder-conf.c:311
 #: ../src/mailbox-conf.c:1137
 #: ../src/mailbox-conf.c:1239
 msgid "_Basic"
 msgstr "_Basic"
 
-#: ../src/folder-conf.c:312
+#: ../src/folder-conf.c:316
 msgid "_Max number of connections:"
 msgstr "_Max number of connections:"
 
-#: ../src/folder-conf.c:319
+#: ../src/folder-conf.c:323
 #: ../src/mailbox-conf.c:1302
 msgid "Enable _persistent cache"
 msgstr "Enable _persistent cache"
 
-#: ../src/folder-conf.c:327
+#: ../src/folder-conf.c:331
+msgid "Use IDLE command"
+msgstr "Use IDLE command"
+
+#: ../src/folder-conf.c:338
 #: ../src/mailbox-conf.c:1306
 msgid "Enable _bug workarounds"
 msgstr "Enable _bug workarounds"
 
-#: ../src/folder-conf.c:334
+#: ../src/folder-conf.c:345
 msgid "Use STATUS for mailbox checking"
 msgstr "Use STATUS for mailbox checking"
 
-#: ../src/folder-conf.c:340
+#: ../src/folder-conf.c:351
 #: ../src/mailbox-conf.c:1191
 #: ../src/mailbox-conf.c:1308
 msgid "_Advanced"
 msgstr "_Advanced"
 
 #. INPUT FIELD CREATION
-#: ../src/folder-conf.c:343
+#: ../src/folder-conf.c:354
 msgid "Descriptive _Name:"
 msgstr "Descriptive _Name:"
 
 #. username
-#: ../src/folder-conf.c:358
+#: ../src/folder-conf.c:369
 #: ../src/mailbox-conf.c:1153
 msgid "Use_r name:"
 msgstr "Use_r name:"
 
-#: ../src/folder-conf.c:364
+#: ../src/folder-conf.c:375
 msgid "_Password:"
 msgstr "_Password:"
 
-#: ../src/folder-conf.c:369
+#: ../src/folder-conf.c:380
 #: ../src/mailbox-conf.c:1264
 msgid "_Anonymous access"
 msgstr "_Anonymous access"
 
-#: ../src/folder-conf.c:378
+#: ../src/folder-conf.c:389
 msgid "Subscribed _folders only"
 msgstr "Subscribed _folders only"
 
-#: ../src/folder-conf.c:380
+#: ../src/folder-conf.c:391
 msgid "Always show _INBOX"
 msgstr "Always show _INBOX"
 
-#: ../src/folder-conf.c:383
+#: ../src/folder-conf.c:394
 msgid "Pr_efix:"
 msgstr "Pr_efix:"
 
-#: ../src/folder-conf.c:529
+#: ../src/folder-conf.c:540
 msgid "Select parent folder"
 msgstr "Select parent folder"
 
-#: ../src/folder-conf.c:603
+#: ../src/folder-conf.c:614
 #, c-format
 msgid ""
 "Renaming INBOX is special!\n"
@@ -3116,29 +3121,29 @@ msgstr ""
 "INBOX and its subfolders will remain.\n"
 "What would you like to do?"
 
-#: ../src/folder-conf.c:609
+#: ../src/folder-conf.c:620
 msgid "Question"
 msgstr "Question"
 
-#: ../src/folder-conf.c:614
+#: ../src/folder-conf.c:625
 msgid "Rename INBOX"
 msgstr "Rename INBOX"
 
-#: ../src/folder-conf.c:616
+#: ../src/folder-conf.c:627
 msgid "Cancel"
 msgstr "Cancel"
 
-#: ../src/folder-conf.c:637
+#: ../src/folder-conf.c:648
 #, c-format
 msgid "Folder rename failed. Reason: %s"
 msgstr "Folder rename failed. Reason: %s"
 
-#: ../src/folder-conf.c:689
+#: ../src/folder-conf.c:700
 #, c-format
 msgid "Folder creation failed. Reason: %s"
 msgstr "Folder creation failed. Reason: %s"
 
-#: ../src/folder-conf.c:729
+#: ../src/folder-conf.c:740
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -3146,44 +3151,44 @@ msgstr ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
 
-#: ../src/folder-conf.c:744
+#: ../src/folder-conf.c:755
 msgid "Remote IMAP subfolder"
 msgstr "Remote IMAP subfolder"
 
-#: ../src/folder-conf.c:747
+#: ../src/folder-conf.c:758
 msgid "_Create"
 msgstr "_Create"
 
-#: ../src/folder-conf.c:768
+#: ../src/folder-conf.c:779
 msgid "Rename or move subfolder"
 msgstr "Rename or move subfolder"
 
-#: ../src/folder-conf.c:769
+#: ../src/folder-conf.c:780
 msgid "Create subfolder"
 msgstr "Create subfolder"
 
 #. INPUT FIELD CREATION
-#: ../src/folder-conf.c:777
+#: ../src/folder-conf.c:788
 msgid "_Folder name:"
 msgstr "_Folder name:"
 
-#: ../src/folder-conf.c:783
+#: ../src/folder-conf.c:794
 msgid "Host:"
 msgstr "Host:"
 
-#: ../src/folder-conf.c:789
+#: ../src/folder-conf.c:800
 msgid "_Browse..."
 msgstr "_Browse..."
 
-#: ../src/folder-conf.c:797
+#: ../src/folder-conf.c:808
 msgid "_Subfolder of:"
 msgstr "_Subfolder of:"
 
-#: ../src/folder-conf.c:826
+#: ../src/folder-conf.c:837
 msgid "This folder is not stored in configuration. I do not yet know how to remove it from remote server."
 msgstr "This folder is not stored in configuration. I do not yet know how to remove it from remote server."
 
-#: ../src/folder-conf.c:835
+#: ../src/folder-conf.c:846
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -3192,7 +3197,7 @@ msgstr ""
 "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 
-#: ../src/folder-conf.c:840
+#: ../src/folder-conf.c:851
 msgid "Confirm"
 msgstr "Confirm"
 
@@ -4664,20 +4669,20 @@ msgstr "Copy to folder..."
 #: ../src/balsa-mime-widget-message.c:661
 #: ../src/print.c:350
 #: ../src/sendmsg-window.c:1106
-#: ../src/sendmsg-window.c:3324
-#: ../src/sendmsg-window.c:5249
+#: ../src/sendmsg-window.c:3336
+#: ../src/sendmsg-window.c:5368
 msgid "Subject:"
 msgstr "Subject:"
 
 #: ../src/balsa-mime-widget-message.c:665
 #: ../src/print.c:356
-#: ../src/sendmsg-window.c:3320
+#: ../src/sendmsg-window.c:3332
 msgid "Date:"
 msgstr "Date:"
 
 #: ../src/balsa-mime-widget-message.c:671
 #: ../src/print.c:361
-#: ../src/sendmsg-window.c:3331
+#: ../src/sendmsg-window.c:3343
 #: ../src/store-address.c:305
 msgid "From:"
 msgstr "From:"
@@ -4692,7 +4697,7 @@ msgstr "Reply-To:"
 #: ../src/balsa-mime-widget-message.c:681
 #: ../src/print.c:365
 #: ../src/sendmsg-window.c:1100
-#: ../src/sendmsg-window.c:3339
+#: ../src/sendmsg-window.c:3351
 #: ../src/store-address.c:306
 msgid "To:"
 msgstr "To:"
@@ -4701,8 +4706,8 @@ msgstr "To:"
 #: ../src/balsa-mime-widget-message.c:682
 #: ../src/print.c:366
 #: ../src/sendmsg-window.c:1105
-#: ../src/sendmsg-window.c:2828
-#: ../src/sendmsg-window.c:3347
+#: ../src/sendmsg-window.c:2838
+#: ../src/sendmsg-window.c:3359
 #: ../src/store-address.c:307
 msgid "Cc:"
 msgstr "Cc:"
@@ -4711,7 +4716,7 @@ msgstr "Cc:"
 #: ../src/balsa-mime-widget-message.c:683
 #: ../src/print.c:367
 #: ../src/sendmsg-window.c:1104
-#: ../src/sendmsg-window.c:2833
+#: ../src/sendmsg-window.c:2843
 #: ../src/store-address.c:308
 msgid "Bcc:"
 msgstr "Bcc:"
@@ -4865,7 +4870,7 @@ msgstr "Remote Mailbox Servers"
 
 #: ../src/pref-manager.c:1605
 #: ../src/pref-manager.c:2752
-#: ../src/sendmsg-window.c:2912
+#: ../src/sendmsg-window.c:2924
 msgid "Type"
 msgstr "Type"
 
@@ -5912,7 +5917,7 @@ msgid "Character set for file %s changed from \"%s\" to \"%s\"."
 msgstr "Character set for file %s changed from \"%s\" to \"%s\"."
 
 #: ../src/sendmsg-window.c:1922
-#: ../src/sendmsg-window.c:5253
+#: ../src/sendmsg-window.c:5372
 msgid "(no subject)"
 msgstr "(no subject)"
 
@@ -5958,13 +5963,13 @@ msgstr "Attachment %s is not a regular file."
 msgid "File %s cannot be read\n"
 msgstr "File %s cannot be read\n"
 
-#: ../src/sendmsg-window.c:2274
+#: ../src/sendmsg-window.c:2273
 msgid "Attach file"
 msgstr "Attach file"
 
-#: ../src/sendmsg-window.c:2360
-#: ../src/sendmsg-window.c:2469
-#: ../src/sendmsg-window.c:4457
+#: ../src/sendmsg-window.c:2368
+#: ../src/sendmsg-window.c:2477
+#: ../src/sendmsg-window.c:4483
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5972,138 +5977,179 @@ msgstr ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 
-#: ../src/sendmsg-window.c:2689
+#: ../src/sendmsg-window.c:2698
 msgid "F_rom:"
 msgstr "F_rom:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2824
+#: ../src/sendmsg-window.c:2834
 msgid "S_ubject:"
 msgstr "S_ubject:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: ../src/sendmsg-window.c:2838
+#: ../src/sendmsg-window.c:2848
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Reply To:
-#: ../src/sendmsg-window.c:2869
+#: ../src/sendmsg-window.c:2880
 msgid "_Reply To:"
 msgstr "_Reply To:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2874
+#: ../src/sendmsg-window.c:2885
 msgid "_Attachments:"
 msgstr "_Attachments:"
 
-#: ../src/sendmsg-window.c:2919
+#: ../src/sendmsg-window.c:2931
 msgid "Mode"
 msgstr "Mode"
 
-#: ../src/sendmsg-window.c:2942
+#: ../src/sendmsg-window.c:2954
 msgid "Description"
 msgstr "Description"
 
-#: ../src/sendmsg-window.c:3252
+#: ../src/sendmsg-window.c:3264
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Could not save attachment: %s"
 
-#: ../src/sendmsg-window.c:3273
+#: ../src/sendmsg-window.c:3285
 msgid "No subject"
 msgstr "No subject"
 
-#: ../src/sendmsg-window.c:3305
+#: ../src/sendmsg-window.c:3317
 msgid "you"
 msgstr "you"
 
-#: ../src/sendmsg-window.c:3314
+#: ../src/sendmsg-window.c:3326
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------forwarded message from %s------\n"
 
-#: ../src/sendmsg-window.c:3351
+#: ../src/sendmsg-window.c:3363
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Message-ID: %s\n"
 
-#: ../src/sendmsg-window.c:3357
+#: ../src/sendmsg-window.c:3369
 msgid "References:"
 msgstr "References:"
 
-#: ../src/sendmsg-window.c:3368
+#: ../src/sendmsg-window.c:3380
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "On %s, %s wrote:\n"
 
-#: ../src/sendmsg-window.c:3370
+#: ../src/sendmsg-window.c:3382
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s wrote:\n"
 
-#: ../src/sendmsg-window.c:3481
+#: ../src/sendmsg-window.c:3493
 msgid "No signature found!"
 msgstr "No signature found!"
 
-#: ../src/sendmsg-window.c:3650
+#: ../src/sendmsg-window.c:3676
 msgid "Could not save message."
 msgstr "Could not save message."
 
-#: ../src/sendmsg-window.c:3657
+#: ../src/sendmsg-window.c:3683
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Could not open draftbox: %s"
 
-#: ../src/sendmsg-window.c:3678
+#: ../src/sendmsg-window.c:3704
 msgid "Message saved."
 msgstr "Message saved."
 
-#: ../src/sendmsg-window.c:4653
+#: ../src/sendmsg-window.c:4648
+#: ../src/sendmsg-window.c:4655
+#: ../src/sendmsg-window.c:4661
+#: ../src/sendmsg-window.c:4667
+#: ../src/sendmsg-window.c:4690
+#, c-format
+msgid "Could not attach the file %s: %s."
+msgstr "Could not attach the file %s: %s."
+
+#: ../src/sendmsg-window.c:4649
+msgid "not an absolute path"
+msgstr "not an absolute path"
+
+#: ../src/sendmsg-window.c:4656
+msgid "not in your directory"
+msgstr "not in your directory"
+
+#: ../src/sendmsg-window.c:4662
+msgid "does not exist"
+msgstr "does not exist"
+
+#: ../src/sendmsg-window.c:4668
+msgid "not a regular file"
+msgstr "not a regular file"
+
+#: ../src/sendmsg-window.c:4691
+msgid "not in current directory"
+msgstr "not in current directory"
+
+#: ../src/sendmsg-window.c:4731
+msgid ""
+"The link that you selected created\n"
+"a \"Blind copy\" (Bcc) address.\n"
+"Please check that the address\n"
+"is appropriate."
+msgstr ""
+"The link that you selected created\n"
+"a \"Blind copy\" (Bcc) address.\n"
+"Please check that the address\n"
+"is appropriate."
+
+#: ../src/sendmsg-window.c:4772
 #, c-format
 msgid "Error executing signature generator %s"
 msgstr "Error executing signature generator %s"
 
-#: ../src/sendmsg-window.c:4665
+#: ../src/sendmsg-window.c:4784
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
 msgstr "Cannot open signature file '%s' for reading"
 
-#: ../src/sendmsg-window.c:4675
+#: ../src/sendmsg-window.c:4794
 #, c-format
 msgid "Error reading signature from %s"
 msgstr "Error reading signature from %s"
 
-#: ../src/sendmsg-window.c:4679
+#: ../src/sendmsg-window.c:4798
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "Signature in %s is not a UTF-8 text."
 
-#: ../src/sendmsg-window.c:4742
+#: ../src/sendmsg-window.c:4861
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Could not open the file %s.\n"
 
-#: ../src/sendmsg-window.c:4798
+#: ../src/sendmsg-window.c:4917
 msgid "Include file"
 msgstr "Include file"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5012
+#: ../src/sendmsg-window.c:5131
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Could not load Face header file %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5015
+#: ../src/sendmsg-window.c:5134
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Could not load X-Face header file %s: %s"
 
-#: ../src/sendmsg-window.c:5095
+#: ../src/sendmsg-window.c:5214
 msgid "Message contains national (8-bit) characters"
 msgstr "Message contains national (8-bit) characters"
 
-#: ../src/sendmsg-window.c:5099
+#: ../src/sendmsg-window.c:5218
 msgid ""
 "Balsa will encode the message in UTF-8.\n"
 "Cancel the operation to choose a different language."
@@ -6111,7 +6157,7 @@ msgstr ""
 "Balsa will encode the message in UTF-8.\n"
 "Cancel the operation to choose a different language."
 
-#: ../src/sendmsg-window.c:5105
+#: ../src/sendmsg-window.c:5224
 msgid ""
 "<b><big>Message contains national (8-bit) characters.</big></b> Balsa will encode the message in UTF-8.\n"
 "Cancel the operation to choose a different language."
@@ -6119,87 +6165,87 @@ msgstr ""
 "<b><big>Message contains national (8-bit) characters.</big></b> Balsa will encode the message in UTF-8.\n"
 "Cancel the operation to choose a different language."
 
-#: ../src/sendmsg-window.c:5237
+#: ../src/sendmsg-window.c:5356
 msgid "You did not specify a subject for this message"
 msgstr "You did not specify a subject for this message"
 
-#: ../src/sendmsg-window.c:5238
+#: ../src/sendmsg-window.c:5357
 msgid "If you would like to provide one, enter it below."
 msgstr "If you would like to provide one, enter it below."
 
-#: ../src/sendmsg-window.c:5279
+#: ../src/sendmsg-window.c:5398
 msgid "_Send"
 msgstr "_Send"
 
-#: ../src/sendmsg-window.c:5336
+#: ../src/sendmsg-window.c:5455
 msgid "You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"
 msgstr "You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"
 
-#: ../src/sendmsg-window.c:5352
+#: ../src/sendmsg-window.c:5471
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "sending message with gpg mode %d"
 
-#: ../src/sendmsg-window.c:5389
+#: ../src/sendmsg-window.c:5508
 msgid "Message could not be created"
 msgstr "Message could not be created"
 
-#: ../src/sendmsg-window.c:5391
+#: ../src/sendmsg-window.c:5510
 msgid "Message could not be queued in outbox"
 msgstr "Message could not be queued in outbox"
 
-#: ../src/sendmsg-window.c:5393
+#: ../src/sendmsg-window.c:5512
 msgid "Message could not be saved in sentbox"
 msgstr "Message could not be saved in sentbox"
 
-#: ../src/sendmsg-window.c:5395
+#: ../src/sendmsg-window.c:5514
 msgid "Message could not be sent"
 msgstr "Message could not be sent"
 
-#: ../src/sendmsg-window.c:5399
+#: ../src/sendmsg-window.c:5518
 #, c-format
 msgid "Send failed: %s"
 msgstr "Send failed: %s"
 
-#: ../src/sendmsg-window.c:5482
-#: ../src/sendmsg-window.c:5501
+#: ../src/sendmsg-window.c:5601
+#: ../src/sendmsg-window.c:5620
 msgid "Could not postpone message."
 msgstr "Could not postpone message."
 
-#: ../src/sendmsg-window.c:5496
+#: ../src/sendmsg-window.c:5615
 msgid "Message postponed."
 msgstr "Message postponed."
 
-#: ../src/sendmsg-window.c:5651
+#: ../src/sendmsg-window.c:5770
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Error starting spell checker: %s"
 
-#: ../src/sendmsg-window.c:5810
+#: ../src/sendmsg-window.c:5929
 #, c-format
 msgid "Could not compile %s"
 msgstr "Could not compile %s"
 
-#: ../src/sendmsg-window.c:5811
+#: ../src/sendmsg-window.c:5930
 msgid "Quoted Text Regular Expression"
 msgstr "Quoted Text Regular Expression"
 
-#: ../src/sendmsg-window.c:6365
+#: ../src/sendmsg-window.c:6486
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Reply to %s: %s"
 
-#: ../src/sendmsg-window.c:6370
+#: ../src/sendmsg-window.c:6491
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Forward message to %s: %s"
 
-#: ../src/sendmsg-window.c:6374
+#: ../src/sendmsg-window.c:6495
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Continue message to %s: %s"
 
-#: ../src/sendmsg-window.c:6378
+#: ../src/sendmsg-window.c:6499
 #, c-format
 msgid "New message to %s: %s"
 msgstr "New message to %s: %s"

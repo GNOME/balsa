@@ -167,9 +167,7 @@ libbalsa_condition_new_date_parse(gboolean negated, gchar **string)
     }
 
     /* strptime with our format will not set time, only date */
-    date.tm_sec = 0;
-    date.tm_min = 0;
-    date.tm_hour = 0;
+    memset(&date, 0, sizeof(date));
 
     if(*lo == '\0')
        tlo = 0;

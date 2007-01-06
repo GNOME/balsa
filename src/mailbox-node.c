@@ -21,12 +21,9 @@
 
 #include "config.h"
 
-#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
-#include <pthread.h>
-#endif
-
 #include <unistd.h>
 #include <string.h>
+
 #include "balsa-app.h"
 #include "folder-scanners.h"
 #include "folder-conf.h"
@@ -70,6 +67,7 @@ static BalsaMailboxNode *imap_scan_create_mbnode(BalsaMailboxNode * root,
 static gboolean imap_scan_attach_mailbox(BalsaMailboxNode * mbnode,
                                          imap_scan_item * isi);
 static gboolean bmbn_scan_children_idle(BalsaMailboxNode ** mn);
+static gboolean restore_children_from_cache(BalsaMailboxNode *mn);
 
 static BalsaMailboxNode *add_local_mailbox(BalsaMailboxNode * root,
 					   const gchar * name,
@@ -211,6 +209,7 @@ balsa_mailbox_node_finalize(GObject * object)
 
     mn = BALSA_MAILBOX_NODE(object);
 
+    balsa_mailbox_node_clear_children_cache(mn);
     mn->parent  = NULL; 
     g_free(mn->name);          mn->name = NULL;
     g_free(mn->dir);           mn->dir = NULL;
@@ -227,8 +226,43 @@ balsa_mailbox_node_finalize(GObject * object)
 }
 
 static void
+balsa_mailboxes_append_children(GtkTreeModel *model, GtkTreeIter *parent,
+                                GPtrArray *children_names)
+{
+    GtkTreeIter child;
+
+    if (!gtk_tree_model_iter_children(model, &child, parent))
+	return;
+    do {
+        BalsaMailboxNode *mbnode;
+        gchar *str;
+
+        gtk_tree_model_get(model, &child, 0, &mbnode, -1);
+        g_return_if_fail(mbnode->server);
+        if(mbnode->mailbox) {
+            const char *path = 
+                libbalsa_mailbox_imap_get_path
+                (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox));
+
+            str = g_strconcat("PXS", path);
+        } else {
+            str = g_strconcat("PXD", mbnode->dir);
+        }
+        str[1] = mbnode->delim;
+        g_ptr_array_add(children_names, str);
+
+        g_object_unref(mbnode);
+
+        balsa_mailboxes_append_children(model, &child, children_names);
+    } while(gtk_tree_model_iter_next(model, &child));
+}
+
+static void
 balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * group)
 {
+    GPtrArray *children_names;
+    GtkTreeIter iter;
+
     if(mn->name)
 	printf("Saving mailbox node %s with group %s\n", mn->name, group);
     libbalsa_imap_server_save_config(LIBBALSA_IMAP_SERVER(mn->server));
@@ -237,6 +271,19 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * group)
     libbalsa_conf_set_bool("Subscribed",  mn->subscribed);
     libbalsa_conf_set_bool("ListInbox",   mn->list_inbox);
     
+    if (balsa_find_iter_by_data(&iter, mn)) {
+        GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+
+        children_names = g_ptr_array_new();
+        balsa_mailboxes_append_children(model, &iter,
+                                        children_names);
+        printf("Saving %d children\n", children_names->len);
+        libbalsa_conf_set_vector("Children", children_names->len,
+                                 (const char*const*)(children_names->pdata));
+        g_ptr_array_foreach(children_names, (GFunc)g_free, NULL);
+        g_ptr_array_free(children_names, TRUE);
+    }
+
     g_free(mn->config_prefix);
     mn->config_prefix = g_strdup(group);
 }
@@ -318,6 +365,8 @@ mark_local_path(BalsaMailboxNode *mbnode)
     mbnode->scanned = TRUE;
 }
 
+/** Read local directory in search for mailboxes. Never does any
+    caching - it is not worth it. */
 static void
 read_dir_cb(BalsaMailboxNode* mb)
 {
@@ -409,16 +458,26 @@ struct imap_scan_tree_ {
 
 static void imap_scan_destroy_tree(imap_scan_tree * tree);
 
-static void*
-imap_dir_cb_real(void* r)
+static void
+imap_dir_cb(BalsaMailboxNode* mb)
 {
+    gchar* msg;
+    BalsaMailboxNode* mroot=mb;
     BalsaMailboxNode *n;
     GSList *list;
-    BalsaMailboxNode*mb = r;
     GError *error = NULL;
     imap_scan_tree imap_tree = { NULL, '.' };
 
-    g_return_val_if_fail(mb->server, NULL);
+    if(restore_children_from_cache(mb))
+        return;
+
+    while(mroot->parent)
+	mroot = mroot->parent;
+    msg = g_strdup_printf(_("Scanning %s. Please wait..."), mroot->name);
+    gnome_appbar_push(balsa_app.appbar, msg);
+    g_free(msg);
+
+    g_return_if_fail(mb->server);
     libbalsa_scanner_imap_dir(mb, mb->server, mb->dir, mb->delim,
 			      mb->subscribed, mb->list_inbox, 
                               check_imap_path,
@@ -438,13 +497,13 @@ imap_dir_cb_real(void* r)
         g_error_free(error);
         imap_scan_destroy_tree(&imap_tree);
         gnome_appbar_pop(balsa_app.appbar);
-        return NULL;
+        return;
     }
 
     if (!balsa_app.mblist_tree_store) {
         /* Quitt'n time! */
         imap_scan_destroy_tree(&imap_tree);
-        return NULL;
+        return;
     }
 
     /* phase b. */
@@ -468,28 +527,9 @@ imap_dir_cb_real(void* r)
                mb->name, mb->mailbox);
     if(balsa_app.debug) printf("%d: Scanning done.\n", (int)time(NULL));
     gnome_appbar_pop(balsa_app.appbar);
-    return NULL;
-}
 
-static void
-imap_dir_cb(BalsaMailboxNode* mb)
-{
-    gchar* msg;
-    BalsaMailboxNode* mroot=mb;
-#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
-    pthread_t scan_th_id;
-#endif
-    while(mroot->parent)
-	mroot = mroot->parent;
-    msg = g_strdup_printf(_("Scanning %s. Please wait..."), mroot->name);
-    gnome_appbar_push(balsa_app.appbar, msg);
-    g_free(msg);
-#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
-    pthread_create(&scan_th_id, NULL, imap_dir_cb_real, mb);
-    pthread_detach(scan_th_id);
-#else
-    imap_dir_cb_real(mb);
-#endif
+    /* We can save the cache now... */
+    config_folder_update(mb);
 }
 
 BalsaMailboxNode *
@@ -537,7 +577,11 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
 BalsaMailboxNode*
 balsa_mailbox_node_new_from_config(const gchar* group)
 {
+    gboolean def;
+    gint n_children;
+    gchar **children;
     BalsaMailboxNode * folder = balsa_mailbox_node_new();
+
     libbalsa_conf_push_group(group);
 
     folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
@@ -560,6 +604,13 @@ balsa_mailbox_node_new_from_config(const gchar* group)
 	libbalsa_conf_get_bool("Subscribed"); 
     folder->list_inbox =
 	libbalsa_conf_get_bool("ListInbox=true"); 
+
+    libbalsa_conf_get_vector_with_default("Children",&n_children,
+                                          &children,&def);
+    if(!def) {
+        g_object_set_data(G_OBJECT(folder), "children-cache", children);
+    }
+
     libbalsa_conf_pop_group();
 
     return folder;
@@ -685,33 +736,56 @@ balsa_mailbox_local_append(LibBalsaMailbox* mbx)
 void
 balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
 {
-#if defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED)
-    GNode *gnode;
-
-    if (!balsa_app.mailbox_nodes)
-        return;
-
-    gnode = balsa_find_mbnode(balsa_app.mailbox_nodes, mn);
-
-    if(gnode) {
-	balsa_remove_children_mailbox_nodes(gnode);
-	balsa_mailbox_node_append_subtree(mn, gnode);
-        mn->scanned = TRUE;
-    } else {
-        g_warning("folder node %s (%p) not found in hierarchy.\n",
-		     mn->name, mn);
-    }
-#else
-
     if (!balsa_app.mblist_tree_store)
         return;
 
+    balsa_mailbox_node_clear_children_cache(mn);
     balsa_remove_children_mailbox_nodes(mn);
     balsa_mailbox_node_append_subtree(mn ? mn : balsa_app.root_node);
-
-#endif  /* defined(BALSA_USE_THREADS) && defined(THREADED_IMAP_SCAN_FIXED) */
 }
 
+void
+balsa_mailbox_node_clear_children_cache(BalsaMailboxNode *mn)
+{
+    gchar **children_cache = g_object_get_data(G_OBJECT(mn), "children-cache");
+
+    if(children_cache) {
+        g_strfreev(children_cache);
+        g_object_set_data(G_OBJECT(mn), "children-cache", NULL);
+    }
+}
+
+static gboolean
+restore_children_from_cache(BalsaMailboxNode *mn)
+{
+    gint i;
+    gchar **children = g_object_get_data(G_OBJECT(mn), "children-cache");
+    imap_scan_item isi;
+
+    if(!children) {
+        printf("No cache for %s - quitting.\n", mn->name);
+        return FALSE;
+    }
+
+    for(i=0; children[i]; i++) {
+        if(children[i][0] == 'P' && strlen(children[i])>3) {
+            BalsaMailboxNode *n;
+            isi.fn = children[i]+3;
+            isi.special = NULL;
+            isi.scanned = TRUE;
+            isi.selectable = children[i][2] == 'S';
+            isi.marked = FALSE;
+            n = imap_scan_create_mbnode(mn, &isi, children[i][1]);
+            if (isi.selectable && imap_scan_attach_mailbox(n, &isi))
+                balsa_mblist_mailbox_node_redraw(n);
+        }
+    }
+    
+    printf("%s's children restored from cache.\n", mn->name);
+    return TRUE;
+}
+
+    
 /* balsa_mailbox_node_scan_children:
  * checks whether a mailbox node's children need scanning. 
  * Note that rescanning local_mail_directory will *not* trigger rescanning

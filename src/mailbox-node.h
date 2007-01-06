@@ -112,6 +112,8 @@ void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
 void balsa_mailbox_local_append(LibBalsaMailbox* mbx);
 /* applicable only to folders (mailbox collections) */
 void balsa_mailbox_node_rescan(BalsaMailboxNode* mn);
+void balsa_mailbox_node_clear_children_cache(BalsaMailboxNode * mbnode);
+
 /* applicable to any mailbox node */
 void balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode);
 

@@ -244,9 +244,9 @@ balsa_mailboxes_append_children(GtkTreeModel *model, GtkTreeIter *parent,
                 libbalsa_mailbox_imap_get_path
                 (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox));
 
-            str = g_strconcat("PXS", path);
+            str = g_strconcat("PXS", path, NULL);
         } else {
-            str = g_strconcat("PXD", mbnode->dir);
+            str = g_strconcat("PXD", mbnode->dir, NULL);
         }
         str[1] = mbnode->delim;
         g_ptr_array_add(children_names, str);

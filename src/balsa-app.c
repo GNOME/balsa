@@ -359,12 +359,20 @@ balsa_app_init(void)
     balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
 
     /* printing */
+#ifdef HAVE_GTK_PRINT
+    balsa_app.print_settings = gtk_print_settings_new();
+    balsa_app.page_setup = gtk_page_setup_new();
+#else
     balsa_app.paper_size = g_strdup(DEFAULT_PAPER_SIZE);
+#endif
 
     balsa_app.print_header_font = g_strdup(DEFAULT_PRINT_HEADER_FONT);
     balsa_app.print_footer_font = g_strdup(DEFAULT_PRINT_FOOTER_FONT);
     balsa_app.print_body_font   = g_strdup(DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited = FALSE;
+#ifdef HAVE_GTK_PRINT
+    balsa_app.print_highlight_phrases = FALSE;
+#endif
 
     /* address book */
     balsa_app.address_book_list = NULL;

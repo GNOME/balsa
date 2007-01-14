@@ -96,6 +96,9 @@ static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
 static gint message_postpone(BalsaSendmsg * bsmsg);
 static void postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static void save_message_cb(GtkWidget *, BalsaSendmsg *);
+#ifdef HAVE_GTK_PRINT
+static void page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+#endif
 static void print_message_cb(GtkWidget *, BalsaSendmsg *);
 static void attach_clicked(GtkWidget *, gpointer);
 static gboolean attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message);
@@ -357,13 +360,22 @@ static GnomeUIInfo file_menu[] = {
       N_("Save this message"),
       save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_SAVE, 'S', GDK_CONTROL_MASK, NULL },
-#define MENU_FILE_PRINT_POS 9
+    GNOMEUIINFO_SEPARATOR,
+#ifdef HAVE_GTK_PRINT
+    { GNOME_APP_UI_ITEM, N_("Page _Setup"), 
+      N_("Set up page for printing"),
+      page_setup_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+      NULL, 'S', GDK_CONTROL_MASK, NULL},
+#define MENU_FILE_PRINT_POS 11
+#else
+#define MENU_FILE_PRINT_POS 10
+#endif
     GNOMEUIINFO_ITEM_STOCK(N_("_Print..."), N_("Print the edited message"),
 			   print_message_cb, GTK_STOCK_PRINT),
-#define MENU_FILE_SEPARATOR2_POS 10
+#define MENU_FILE_SEPARATOR2_POS (MENU_FILE_PRINT_POS + 1)
     GNOMEUIINFO_SEPARATOR,
 
-#define MENU_FILE_CLOSE_POS 11
+#define MENU_FILE_CLOSE_POS (MENU_FILE_PRINT_POS + 2)
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
 
     GNOMEUIINFO_END
@@ -5628,6 +5640,18 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     if (sw_save_draft(bsmsg))
         bsmsg->state = SENDMSG_STATE_CLEAN;
 }
+
+#ifdef HAVE_GTK_PRINT
+static void
+page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+{
+    LibBalsaMessage *message;
+
+    message = bsmsg2message(bsmsg);
+    message_print_page_setup(GTK_WINDOW(bsmsg->window));
+    g_object_unref(message);
+}
+#endif
 
 static void
 print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)

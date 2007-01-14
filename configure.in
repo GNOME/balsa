@@ -51,13 +51,15 @@ AC_ARG_WITH([gnome],
 	with_gnome=yes
 ])
 
+
 if test x$with_gnome != xno; then
    gnome_extras="libgnome-2.0 libgnomeui-2.0 
-   gnome-vfs-2.0 gnome-vfs-module-2.0 libbonobo-2.0 
-   libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
+   gnome-vfs-2.0 gnome-vfs-module-2.0 libbonobo-2.0"
+   gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
    AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
 else
    gnome_extras=""
+   gnome_print_extras=""
 fi
 AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
 
@@ -134,6 +136,14 @@ AC_ARG_WITH([gtksourceview],
 	with_gtksourceview=$withval
 ],[
 	with_gtksourceview=no
+])
+
+AC_ARG_WITH([gtkprint],
+        AC_HELP_STRING([--with-gtkprint],
+                [Use GtkPrint instead of libgnomeprint (default=yes for gtk+ > 2.10.0)]),[
+	with_gtkprint=$withval
+],[
+	with_gtkprint=testme
 ])
 
 AC_ARG_WITH([sqlite],
@@ -224,6 +234,41 @@ if test x"$with_esmtp" = xno; then
 AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
 AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
 		   [Path to sendmail program.])
+fi
+
+dnl #####################################################################
+dnl GtkPrint
+dnl #####################################################################
+
+AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+if test x"$with_gtkprint" = xtestme ; then
+  AC_MSG_CHECKING([for gtk+ >= 2.10])
+  if $PKG_CONFIG --atleast-version=2.10.0 gtk+-2.0 ; then
+    with_gtkprint=yes
+  else
+    with_gtkprint=no
+  fi
+  AC_MSG_RESULT($with_gtkprint)
+elif test x"$with_gtkprint" = xyes ; then
+  AC_MSG_CHECKING([whether gtk+ supports native printing])
+  if $PKG_CONFIG --atleast-version=2.10.0 gtk+-2.0 ; then
+    with_gtkprint=yes
+    AC_MSG_RESULT($with_gtkprint)
+  else
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([gtk+ >= 2.10.0 must be installed to use native printing support])
+  fi
+else
+  with_gtkprint=no
+fi
+
+AM_CONDITIONAL([BUILD_WITH_GTK_PRINT], [test $with_gtkprint = "yes"])
+if test $with_gtkprint = yes ; then
+  AC_DEFINE(HAVE_GTK_PRINT,1,
+	    [Defined when native Gtk+-2.0 printing support is available])
+  gnome_print_extras=""
+else
+  gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
 fi
 
 dnl #####################################################################
@@ -716,6 +761,7 @@ echo "                Use SQLite: $with_sqlite"
 echo "                   Use SSL: $with_ssl"
 echo "              Use GtkSpell: $with_gtkspell"
 echo "         Use GtkSourceView: $with_gtksourceview"
+echo "              Use GtkPrint: $with_gtkprint"
 echo "              Use Compface: $with_compface"
 echo "  Install extra MIME icons: $install_mimeicons"
 dnl echo "                  Use SASL: $need_sasl"

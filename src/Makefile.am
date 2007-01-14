@@ -55,7 +55,6 @@ balsa_BASE_SRCLIST =	\
 	message-window.h	\
 	pref-manager.c		\
 	pref-manager.h		\
-	print.c			\
 	print.h			\
 	quote-color.c		\
 	quote-color.h		\
@@ -70,6 +69,38 @@ balsa_BASE_SRCLIST =	\
 	toolbar-factory.h	\
 	toolbar-prefs.c		\
 	toolbar-prefs.h
+
+if BUILD_WITH_GTK_PRINT
+balsa_print_source = print-gtk.c	\
+	balsa-print-object.c		\
+	balsa-print-object.h		\
+	balsa-print-object-decor.c	\
+	balsa-print-object-decor.h	\
+	balsa-print-object-default.c	\
+	balsa-print-object-default.h	\
+	balsa-print-object-header.c	\
+	balsa-print-object-header.h	\
+	balsa-print-object-image.c	\
+	balsa-print-object-image.h	\
+	balsa-print-object-text.c	\
+	balsa-print-object-text.h
+balsa_print_extra_dist = print.c
+else
+balsa_print_source = print.c
+balsa_print_extra_dist = print-gtk.c	\
+	balsa-print-object.c		\
+	balsa-print-object.h		\
+	balsa-print-object-decor.c	\
+	balsa-print-object-decor.h	\
+	balsa-print-object-default.c	\
+	balsa-print-object-default.h	\
+	balsa-print-object-header.c	\
+	balsa-print-object-header.h	\
+	balsa-print-object-image.c	\
+	balsa-print-object-image.h	\
+	balsa-print-object-text.c	\
+	balsa-print-object-text.h
+endif
 
 if BUILD_WITH_GTKSPELL
 balsa_gtkspell_extra =
@@ -88,7 +119,8 @@ balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
 
 balsa_SOURCES =			\
 	$(balsa_BASE_SRCLIST)	\
-	$(balsa_gtkspell_extra)
+	$(balsa_gtkspell_extra) \
+	$(balsa_print_source)
 
 # see http://sources.redhat.com/automake/dependencies.html
 BUILT_SOURCES = Balsa.h
@@ -96,7 +128,8 @@ BUILT_SOURCES = Balsa.h
 
 EXTRA_DIST =			\
 	Balsa.idl		\
-	$(balsa_gtkspell_extra_dist)
+	$(balsa_gtkspell_extra_dist) \
+	$(balsa_print_extra_dist)
 
 idldir = $(datadir)/idl
 idl_DATA = Balsa.idl

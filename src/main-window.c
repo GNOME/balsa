@@ -147,6 +147,9 @@ static void show_about_box(void);
 /* callbacks */
 static void send_outbox_messages_cb(GtkWidget *, gpointer data);
 static void send_receive_messages_cb(GtkWidget *, gpointer data);
+#ifdef HAVE_GTK_PRINT
+static void page_setup_cb(GtkWidget * widget, gpointer data);
+#endif
 static void message_print_cb(GtkWidget * widget, gpointer data);
 
 static void new_message_cb(GtkWidget * widget, gpointer data);
@@ -457,13 +460,21 @@ static GnomeUIInfo file_menu[] = {
      send_receive_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
      BALSA_PIXMAP_SEND_RECEIVE, 'B', GDK_CONTROL_MASK, NULL},
      GNOMEUIINFO_SEPARATOR,
+#ifdef HAVE_GTK_PRINT
+    { GNOME_APP_UI_ITEM, N_("Page _Setup"), 
+      N_("Set up page for printing"),
+      page_setup_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+      NULL, 'S', GDK_CONTROL_MASK, NULL},
+#define MENU_FILE_PRINT_POS 8
+#else
 #define MENU_FILE_PRINT_POS 7
+#endif
     { GNOME_APP_UI_ITEM, N_("_Print..."), 
       N_("Print current message"),
       message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
       GTK_STOCK_PRINT, 'P', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_ADDRESS_POS 9
+#define MENU_FILE_ADDRESS_POS (MENU_FILE_PRINT_POS + 2)
     {
 	GNOME_APP_UI_ITEM, N_("_Address Book..."),
 	N_("Open the address book"),
@@ -879,6 +890,12 @@ static GnomeUIInfo tu_file_menu[] = {
       BALSA_PIXMAP_RECEIVE, 'M', GDK_CONTROL_MASK, NULL},
     GNOMEUIINFO_SEPARATOR,
     GNOMEUIINFO_SUBTREE(N_("Mail_boxes"), tu_mailbox_menu),
+#ifdef HAVE_GTK_PRINT
+    { GNOME_APP_UI_ITEM, N_("Page _Setup"), 
+      N_("Set up page for printing"),
+      page_setup_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+      NULL, 'S', GDK_CONTROL_MASK, NULL},
+#endif
     { GNOME_APP_UI_ITEM, N_("_Print..."), 
       N_("Print current message"),
       message_print_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
@@ -2961,7 +2978,7 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
             has_new = 0;
 
         if (num_new || has_new)
-            display_new_mail_notification(num_new, has_new);
+	    display_new_mail_notification(num_new, has_new);
     }
 
     info->unread_messages = mailbox->unread_messages;
@@ -2981,6 +2998,15 @@ send_outbox_messages_cb(GtkWidget * widget, gpointer data)
 #endif /* ENABLE_ESMTP */
 			   balsa_app.debug);
 }
+
+#ifdef HAVE_GTK_PRINT
+/* Callback for `Page setup' item on the `File' menu */
+static void
+page_setup_cb(GtkWidget * widget, gpointer data)
+{
+    message_print_page_setup(GTK_WINDOW(balsa_app.main_window));
+}
+#endif
 
 /* Callback for `Print current message' item on the `File' menu, 
  * and the toolbar button. */

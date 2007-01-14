@@ -333,6 +333,10 @@ extern struct BalsaApplication {
     gchar *date_string;
 
     /* printing */
+#ifdef HAVE_GTK_PRINT
+    GtkPageSetup *page_setup;
+    GtkPrintSettings *print_settings;
+#else
     gchar* paper_size; /* A4 or Letter */
     gchar* margin_left;
     gchar* margin_top;
@@ -342,10 +346,14 @@ extern struct BalsaApplication {
     gchar* print_layout;
     gchar* paper_orientation;
     gchar* page_orientation;
+#endif
     gchar* print_header_font;  /* font for printing headers */
     gchar* print_body_font;    /* font for printing text parts */
     gchar* print_footer_font;  /* font for printing footers */
     gboolean print_highlight_cited;
+#ifdef HAVE_GTK_PRINT
+    gboolean print_highlight_phrases;
+#endif
 
     /* compose */
     gchar *compose_headers;

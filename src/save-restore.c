@@ -593,6 +593,75 @@ config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
 }
 #endif                          /* ENABLE_ESMTP */
 
+#ifdef HAVE_GTK_PRINT
+static gboolean
+load_gtk_print_setting(const gchar * key, const gchar * value, gpointer data)
+{
+    g_return_val_if_fail(data != NULL, TRUE);
+    gtk_print_settings_set((GtkPrintSettings *)data, key, value);
+    return FALSE;
+}
+
+static GtkPageSetup *
+restore_gtk_page_setup()
+{
+    GtkPageSetup *page_setup;
+    GtkPaperSize *paper_size = NULL;
+    gdouble width;
+    gdouble height;
+    gchar *name;
+    gchar *ppd_name;
+    gchar *display_name;
+
+    width = libbalsa_conf_get_double("Width");
+    height = libbalsa_conf_get_double("Height");
+
+    name = libbalsa_conf_get_string("PaperName");
+    ppd_name = libbalsa_conf_get_string ("PPDName");
+    display_name = libbalsa_conf_get_string ("DisplayName");
+    page_setup = gtk_page_setup_new();
+
+    if (ppd_name && *ppd_name)
+	paper_size = gtk_paper_size_new_from_ppd(ppd_name, display_name,
+						 width, height);
+    else if (name && *name)
+	paper_size = gtk_paper_size_new_custom(name, display_name,
+					       width, height, GTK_UNIT_MM);
+
+    /* set defaults if no info is available */
+    if (!paper_size) {
+	paper_size = gtk_paper_size_new(GTK_PAPER_NAME_A4);
+	gtk_page_setup_set_paper_size_and_default_margins(page_setup,
+							  paper_size);
+    } else {
+	gtk_page_setup_set_paper_size(page_setup, paper_size);
+
+	gtk_page_setup_set_top_margin(page_setup,
+				      libbalsa_conf_get_double("MarginTop"),
+				      GTK_UNIT_MM);
+	gtk_page_setup_set_bottom_margin(page_setup,
+					 libbalsa_conf_get_double("MarginBottom"),
+					 GTK_UNIT_MM);
+	gtk_page_setup_set_left_margin(page_setup,
+				       libbalsa_conf_get_double("MarginLeft"),
+				       GTK_UNIT_MM);
+	gtk_page_setup_set_right_margin(page_setup,
+					libbalsa_conf_get_double("MarginRight"),
+					GTK_UNIT_MM);
+	gtk_page_setup_set_orientation(page_setup,
+				       (GtkPageOrientation)
+				       libbalsa_conf_get_int("Orientation"));
+    }
+    
+    gtk_paper_size_free(paper_size);
+    g_free(ppd_name);
+    g_free(name);
+    g_free(display_name);
+    
+    return page_setup;
+}
+#endif
+
 static gint
 config_global_load(void)
 {
@@ -831,6 +900,11 @@ config_global_load(void)
     libbalsa_conf_push_group("Printing");
 
     /* ... Printing */
+#ifdef HAVE_GTK_PRINT
+    if (balsa_app.page_setup)
+	g_object_unref(G_OBJECT(balsa_app.page_setup));
+    balsa_app.page_setup = restore_gtk_page_setup();
+#else
     g_free(balsa_app.paper_size);
     balsa_app.paper_size =
 	libbalsa_conf_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
@@ -850,6 +924,7 @@ config_global_load(void)
     balsa_app.paper_orientation  = libbalsa_conf_get_string("PaperOrientation");
     g_free(balsa_app.page_orientation);
     balsa_app.page_orientation   = libbalsa_conf_get_string("PageOrientation");
+#endif
 
     g_free(balsa_app.print_header_font);
     balsa_app.print_header_font =
@@ -865,7 +940,19 @@ config_global_load(void)
                                 DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited =
         libbalsa_conf_get_bool("PrintHighlightCited=false");
+#ifdef HAVE_GTK_PRINT
+    balsa_app.print_highlight_phrases =
+        libbalsa_conf_get_bool("PrintHighlightPhrases=false");
+#endif
     libbalsa_conf_pop_group();
+
+#ifdef HAVE_GTK_PRINT
+    /* GtkPrint printing */
+    libbalsa_conf_push_group("GtkPrint");
+    libbalsa_conf_foreach_keys("GtkPrint", load_gtk_print_setting,
+			       balsa_app.print_settings);
+    libbalsa_conf_pop_group();
+#endif
 
     /* Spelling options ... */
     libbalsa_conf_push_group("Spelling");
@@ -1097,6 +1184,54 @@ config_global_load(void)
     return TRUE;
 }				/* config_global_load */
 
+#ifdef HAVE_GTK_PRINT
+static void
+save_gtk_print_setting(const gchar *key, const gchar *value, gpointer user_data)
+{
+    libbalsa_conf_set_string(key, value);
+}
+
+static void
+save_gtk_page_setup(GtkPageSetup *page_setup)
+{
+    GtkPaperSize *paper_size;
+
+    if (!page_setup)
+	return;
+
+    paper_size = gtk_page_setup_get_paper_size(page_setup);
+    g_assert(paper_size != NULL);
+
+    libbalsa_conf_set_string("PaperName",
+			     gtk_paper_size_get_name (paper_size));
+    libbalsa_conf_set_string("DisplayName",
+			     gtk_paper_size_get_display_name (paper_size));
+    libbalsa_conf_set_string("PPDName",
+			     gtk_paper_size_get_ppd_name (paper_size));
+
+    libbalsa_conf_set_double("Width",
+			     gtk_paper_size_get_width(paper_size,
+						      GTK_UNIT_MM));
+    libbalsa_conf_set_double("Height",
+			     gtk_paper_size_get_height(paper_size,
+						       GTK_UNIT_MM));
+    libbalsa_conf_set_double("MarginTop",
+			     gtk_page_setup_get_top_margin(page_setup,
+							   GTK_UNIT_MM));
+    libbalsa_conf_set_double("MarginBottom",
+			     gtk_page_setup_get_bottom_margin(page_setup,
+							      GTK_UNIT_MM));
+    libbalsa_conf_set_double("MarginLeft",
+			     gtk_page_setup_get_left_margin(page_setup,
+							    GTK_UNIT_MM));
+    libbalsa_conf_set_double("MarginRight",
+			     gtk_page_setup_get_right_margin(page_setup,
+							     GTK_UNIT_MM));
+    libbalsa_conf_set_int("Orientation",
+			  gtk_page_setup_get_orientation(page_setup));
+}
+#endif
+
 gint
 config_save(void)
 {
@@ -1222,6 +1357,9 @@ config_save(void)
 
     /* Printing options ... */
     libbalsa_conf_push_group("Printing");
+#ifdef HAVE_GTK_PRINT
+    save_gtk_page_setup(balsa_app.page_setup);
+#else
     libbalsa_conf_set_string("PaperSize",balsa_app.paper_size);
     if(balsa_app.margin_left)
 	libbalsa_conf_set_string("LeftMargin",   balsa_app.margin_left);
@@ -1240,6 +1378,7 @@ config_save(void)
 				balsa_app.paper_orientation);
     if(balsa_app.margin_bottom)
 	libbalsa_conf_set_string("PageOrientation", balsa_app.page_orientation);
+#endif
 
     libbalsa_conf_set_string("PrintHeaderFont",
                             balsa_app.print_header_font);
@@ -1248,7 +1387,21 @@ config_save(void)
                             balsa_app.print_footer_font);
     libbalsa_conf_set_bool("PrintHighlightCited",
                           balsa_app.print_highlight_cited);
+#ifdef HAVE_GTK_PRINT
+    libbalsa_conf_set_bool("PrintHighlightPhrases",
+                          balsa_app.print_highlight_phrases);
+#endif
     libbalsa_conf_pop_group();
+
+#ifdef HAVE_GTK_PRINT
+    /* GtkPrintSettings stuff */
+    libbalsa_conf_remove_group("GtkPrint");
+    libbalsa_conf_push_group("GtkPrint");
+    if (balsa_app.print_settings)
+	gtk_print_settings_foreach(balsa_app.print_settings,
+				   save_gtk_print_setting, NULL);
+    libbalsa_conf_pop_group();
+#endif
 
     /* Spelling options ... */
     libbalsa_conf_remove_group("Spelling");

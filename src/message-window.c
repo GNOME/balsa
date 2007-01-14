@@ -71,6 +71,9 @@ static void next_message_cb(GtkWidget * widget, gpointer data);
 static void previous_message_cb(GtkWidget * widget, gpointer data);
 static void next_unread_cb(GtkWidget * widget, gpointer);
 static void next_flagged_cb(GtkWidget * widget, gpointer);
+#ifdef HAVE_GTK_PRINT
+static void page_setup_cb(GtkWidget * widget, gpointer data);
+#endif
 static void print_cb(GtkWidget * widget, gpointer);
 static void trash_cb(GtkWidget * widget, gpointer);
 
@@ -93,9 +96,19 @@ static GnomeUIInfo shown_hdrs_menu[] = {
 };
 
 static GnomeUIInfo file_menu[] = {
+#ifdef HAVE_GTK_PRINT
+    { GNOME_APP_UI_ITEM, N_("Page _Setup"), 
+      N_("Set up page for printing"),
+      page_setup_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
+      NULL, 'S', GDK_CONTROL_MASK, NULL},
+#endif
     GNOMEUIINFO_MENU_PRINT_ITEM(print_cb, NULL),
     GNOMEUIINFO_SEPARATOR,
+#ifdef HAVE_GTK_PRINT
+#define MENU_FILE_CLOSE_POS 3
+#else
 #define MENU_FILE_CLOSE_POS 2
+#endif
     GNOMEUIINFO_MENU_CLOSE_ITEM(close_message_window, NULL),
     GNOMEUIINFO_END
 };
@@ -927,6 +940,16 @@ next_flagged_cb(GtkWidget * widget, gpointer data)
 {
     mw_set_selected((MessageWindow *) data, balsa_index_select_next_flagged);
 }
+
+
+#ifdef HAVE_GTK_PRINT
+static void page_setup_cb(GtkWidget * widget, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) (data);
+    
+    message_print_page_setup(GTK_WINDOW(mw->window));
+}
+#endif
 
 
 static void print_cb(GtkWidget * widget, gpointer data)

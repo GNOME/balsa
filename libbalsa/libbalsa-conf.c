@@ -265,6 +265,29 @@ libbalsa_conf_foreach_group(const gchar * prefix,
 }
 
 void
+libbalsa_conf_foreach_keys(const gchar * group,
+			   LibBalsaConfForeachFunc func, gpointer data)
+{
+    gchar **keys, **key;
+
+    lbc_lock();
+
+    if ((keys = g_key_file_get_keys(lbc_conf.key_file, group, NULL, NULL))) {
+	for (key = keys; *key; key++) {
+	    gchar * val = g_key_file_get_value(lbc_conf.key_file, group, *key, NULL);
+	    if (func(*key, val, data)) {
+		g_free(val);
+		break;
+	    }
+	    g_free(val);
+	}
+	g_strfreev(keys);
+    }
+
+    lbc_unlock();
+}
+
+void
 libbalsa_conf_push_group(const gchar * group)
 {
 
@@ -391,11 +414,45 @@ libbalsa_conf_get_int_with_default_(const char *path,
     return retval;
 }
 
+gdouble
+libbalsa_conf_get_double_with_default_(const char *path,
+				       gboolean * def, gboolean priv)
+{
+    gchar *key;
+    const gchar *defval;
+    gdouble retval;
+    GError *error = NULL;
+
+    key = lbc_get_key(path, &defval);
+    retval =
+        g_key_file_get_double(LBC_KEY_FILE(priv), lbc_groups->data, key,
+			      &error);
+    g_free(key);
+    if (error) {
+        g_error_free(error);
+        if (defval)
+            retval = g_ascii_strtod(defval, NULL);
+    }
+
+    if (def)
+        *def = error != NULL;
+
+    return retval;
+}
+
 void
 libbalsa_conf_set_int_(const char *path, int value, gboolean priv)
 {
     g_key_file_set_integer(LBC_KEY_FILE(priv), lbc_groups->data, path,
                            value);
+    LBC_CHANGED(priv);
+}
+
+void
+libbalsa_conf_set_double_(const char *path, double value, gboolean priv)
+{
+    g_key_file_set_double(LBC_KEY_FILE(priv), lbc_groups->data, path,
+			  value);
     LBC_CHANGED(priv);
 }
 

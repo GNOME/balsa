@@ -71,6 +71,10 @@ void libbalsa_conf_foreach_group(const gchar * prefix,
 
 #else                           /* !GLIB_CHECK_VERSION(2, 6, 0) */
 
+void libbalsa_conf_foreach_keys              (const gchar * group,
+					      LibBalsaConfForeachFunc func,
+					      gpointer data);
+
 void libbalsa_conf_pop_group                 (void);
 void libbalsa_conf_clean_key                 (const char *key);
 
@@ -96,11 +100,25 @@ gint libbalsa_conf_get_int_with_default_     (const char *path,
 #define libbalsa_conf_get_int_with_default(path, def) \
         (libbalsa_conf_get_int_with_default_ ((path), (def), FALSE))
 
+gdouble libbalsa_conf_get_double_with_default_ (const char *path,
+	                                      gboolean * def,
+                                              gboolean priv);
+#define libbalsa_conf_get_double(path) \
+        (libbalsa_conf_get_double_with_default_ ((path), NULL, FALSE))
+#define libbalsa_conf_get_double_with_default(path, def) \
+        (libbalsa_conf_get_double_with_default_ ((path), (def), FALSE))
+
 void libbalsa_conf_set_int_                  (const char *path,
 	                                      int value,
 					      gboolean priv);
 #define libbalsa_conf_set_int(path,new_value) \
         (libbalsa_conf_set_int_((path),(new_value),FALSE))
+
+void libbalsa_conf_set_double_               (const char *path,
+	                                      double value,
+					      gboolean priv);
+#define libbalsa_conf_set_double(path,new_value) \
+        (libbalsa_conf_set_double_((path),(new_value),FALSE))
 
 void libbalsa_conf_set_string_               (const char *path,
 	                                      const char *value,

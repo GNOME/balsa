@@ -1,0 +1,405 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1997-2001 Stuart Parmenter and others
+ * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
+
+#include <gtk/gtk.h>
+#include <libbalsa.h>
+#include "config.h"
+#include "balsa-app.h"
+#include "balsa-message.h"
+#include "balsa-print-object-decor.h"
+#include "balsa-print-object-default.h"
+#include "balsa-print-object-header.h"
+#include "balsa-print-object-image.h"
+#include "balsa-print-object-text.h"
+#include "balsa-print-object.h"
+
+
+/* object related functions */
+static void balsa_print_object_init(GTypeInstance * instance,
+				    gpointer g_class);
+static void balsa_print_object_class_init(BalsaPrintObjectClass * klass);
+static void balsa_print_object_destroy(GObject * object);
+
+
+static GObjectClass *parent_class = NULL;
+
+
+GType
+balsa_print_object_get_type()
+{
+    static GType balsa_print_object_type = 0;
+
+    if (!balsa_print_object_type) {
+	static const GTypeInfo balsa_print_object_info = {
+	    sizeof(BalsaPrintObjectClass),
+	    NULL,		/* base_init */
+	    NULL,		/* base_finalize */
+	    (GClassInitFunc) balsa_print_object_class_init,
+	    NULL,		/* class_finalize */
+	    NULL,		/* class_data */
+	    sizeof(BalsaPrintObject),
+	    0,			/* n_preallocs */
+	    (GInstanceInitFunc) balsa_print_object_init
+	};
+
+	balsa_print_object_type =
+	    g_type_register_static(G_TYPE_OBJECT, "BalsaPrintObject",
+				   &balsa_print_object_info, 0);
+    }
+
+    return balsa_print_object_type;
+}
+
+
+static void
+balsa_print_object_init(GTypeInstance * instance, gpointer g_class)
+{
+    BalsaPrintObject *self = (BalsaPrintObject *) instance;
+
+    self->on_page = 0;
+    self->depth = 0;
+    self->c_at_x = 0.0;
+    self->c_at_y = 0.0;
+    self->c_width = 0.0;
+    self->c_height = 0.0;
+}
+
+
+static void
+balsa_print_object_class_init(BalsaPrintObjectClass * klass)
+{
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
+
+    parent_class = g_type_class_ref(G_TYPE_OBJECT);
+    object_class->finalize = balsa_print_object_destroy;
+    klass->draw = balsa_print_object_draw;
+}
+
+
+GList *
+balsa_print_objects_append_from_body(GList * list,
+				     GtkPrintContext * context,
+				     LibBalsaMessageBody * mime_body,
+				     BalsaPrintSetup * psetup)
+{
+    gchar *conttype;
+
+    conttype = libbalsa_message_body_get_mime_type(mime_body);
+
+    if (!g_ascii_strcasecmp("text/html", conttype) ||
+	!g_ascii_strcasecmp("text/enriched", conttype) ||
+	!g_ascii_strcasecmp("text/richtext", conttype))
+// #ifdef HAVE_GTKHTML
+// TODO - print HTML
+// #else
+	return balsa_print_object_default(list, context, mime_body, psetup);
+// #endif
+
+    if (!g_ascii_strncasecmp("text/", conttype, 5))
+	return balsa_print_object_text(list, context, mime_body, psetup);
+
+    if (!g_ascii_strncasecmp("image/", conttype, 6))
+	return balsa_print_object_image(list, context, mime_body, psetup);
+
+    if (!g_ascii_strcasecmp("message/rfc822", conttype)) {
+	list = balsa_print_object_frame_begin(list, NULL, psetup);
+	return balsa_print_object_header_from_body(list, context, mime_body, psetup);
+    }
+
+#ifdef HAVE_GPGME
+    if (!g_ascii_strcasecmp("application/pgp-signature", conttype))
+	return balsa_print_object_header_crypto(list, context, mime_body, NULL, psetup);
+#ifdef HAVE_SMIME
+    if (!g_ascii_strcasecmp("application/pkcs7-signature", conttype) ||
+	!g_ascii_strcasecmp("application/x-pkcs7-signature", conttype))
+	return balsa_print_object_header_crypto(list, context, mime_body, NULL, psetup);
+#endif				/* HAVE_SMIME */
+#endif				/* HAVE_GPGME */
+
+    /* default */
+    return balsa_print_object_default(list, context, mime_body, psetup);
+}
+
+
+void
+balsa_print_object_draw(BalsaPrintObject * self, GtkPrintContext * context,
+			cairo_t * cairo_ctx)
+{
+    guint level;
+
+    BALSA_PRINT_OBJECT_CLASS(G_OBJECT_GET_CLASS(self))->draw(self, context, cairo_ctx);
+
+    /* print borders if the depth is > 0 */
+    if (self->depth == 0)
+	return;
+
+    /* print the requested number of border lines */
+    cairo_save(cairo_ctx);
+    cairo_set_line_width(cairo_ctx, 0.25);
+    cairo_new_path(cairo_ctx);
+    for (level = self->depth; level; level--) {
+	gdouble level_sep = level * C_LABEL_SEP;
+
+	cairo_move_to(cairo_ctx, self->c_at_x - level_sep, self->c_at_y);
+	cairo_line_to(cairo_ctx, self->c_at_x - level_sep,
+		      self->c_at_y + self->c_height);
+	cairo_move_to(cairo_ctx, self->c_at_x + self->c_width + level_sep,
+		      self->c_at_y);
+	cairo_line_to(cairo_ctx, self->c_at_x + self->c_width + level_sep,
+		      self->c_at_y + self->c_height);
+    }
+    cairo_stroke(cairo_ctx);
+    cairo_restore(cairo_ctx);
+}
+
+
+static void
+balsa_print_object_destroy(GObject * object)
+{
+    parent_class->finalize(object);
+}
+
+
+/*  == various print helper functions ==  */
+
+/* return the width of the passed string in Pango units */
+gint
+p_string_width_from_layout(PangoLayout * layout, const gchar * text)
+{
+    gint width;
+
+    pango_layout_set_text(layout, text, -1);
+    pango_layout_get_size(layout, &width, NULL);
+    return width;
+}
+
+
+/* return the height of the passed string in Pango units */
+gint
+p_string_height_from_layout(PangoLayout * layout, const gchar * text)
+{
+    gint height;
+
+    pango_layout_set_text(layout, text, -1);
+    pango_layout_get_size(layout, NULL, &height);
+    return height;
+}
+
+
+/* print a GdkPixbuf to cairo at the specified position and with the
+ * specified scale */
+gboolean
+cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
+		   gdouble c_at_x, gdouble c_at_y, gdouble scale)
+{
+    guchar *raw_image;
+    gint n_chans;
+    guint32 *surface_buf;
+    gint width;
+    gint height;
+    gint rowstride;
+    guint32 *dest;
+    cairo_format_t format;
+    cairo_surface_t *surface;
+    cairo_pattern_t *pattern;
+    cairo_matrix_t matrix;
+
+    /* paranoia checks */
+    g_return_val_if_fail(cairo_ctx && pixbuf, FALSE);
+
+    /* must have 8 bpp */
+    g_return_val_if_fail(gdk_pixbuf_get_bits_per_sample(pixbuf) == 8,
+			 FALSE);
+
+    /* must have 3 (no alpha) or 4 (with alpha) channels */
+    n_chans = gdk_pixbuf_get_n_channels(pixbuf);
+    g_return_val_if_fail(n_chans == 3 || n_chans == 4, FALSE);
+
+    /* allocate a new buffer */
+    /* FIXME: does this work on 64 bit machines if the witdth is odd? */
+    width = gdk_pixbuf_get_width(pixbuf);
+    height = gdk_pixbuf_get_height(pixbuf);
+    if (!(surface_buf = g_new0(guint32, width * height)))
+	return FALSE;
+
+    /* copy pixbuf to a cairo buffer */
+    dest = surface_buf;
+    raw_image = gdk_pixbuf_get_pixels(pixbuf);
+    rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+    if (n_chans == 4) {
+	/* 4 channels: copy 32-bit vals, converting R-G-B-Alpha to
+	 * Alpha-R-G-B... */
+	gint line;
+
+	format = CAIRO_FORMAT_ARGB32;
+	for (line = 0; line < height; line++) {
+	    guint32 *src = (guint32 *) (raw_image + line * rowstride);
+	    gint col;
+
+	    for (col = width; col; col--) {
+		register guint32 val = *src++;
+
+		*dest++ = (val >> 8) | (val << 24);
+	    }
+	}
+    } else {
+	/* 3 channels: copy 3 byte R-G-B to Alpha-R-G-B... */
+	gint line;
+
+	format = CAIRO_FORMAT_RGB24;
+	for (line = 0; line < height; line++) {
+	    guchar *src = raw_image + line * rowstride;
+	    gint col;
+
+	    for (col = width; col; col--, src += 3)
+		*dest++ = (((src[0] << 8) + src[1]) << 8) + src[2];
+	}
+    }
+
+    /* save current state */
+    cairo_save(cairo_ctx);
+
+    /* create the curface */
+    surface =
+	cairo_image_surface_create_for_data((unsigned char *) surface_buf,
+					    format, width, height,
+					    4 * width);
+    cairo_set_source_surface(cairo_ctx, surface, c_at_x, c_at_y);
+
+    /* scale */
+    pattern = cairo_get_source(cairo_ctx);
+    cairo_pattern_get_matrix(pattern, &matrix);
+    matrix.xx /= scale;
+    matrix.yy /= scale;
+    matrix.x0 /= scale;
+    matrix.y0 /= scale;
+    cairo_pattern_set_matrix(pattern, &matrix);
+
+    /* clip around the image */
+    cairo_new_path(cairo_ctx);
+    cairo_move_to(cairo_ctx, c_at_x, c_at_y);
+    cairo_line_to(cairo_ctx, c_at_x + width * scale, c_at_y);
+    cairo_line_to(cairo_ctx, c_at_x + width * scale,
+		  c_at_y + height * scale);
+    cairo_line_to(cairo_ctx, c_at_x, c_at_y + height * scale);
+    cairo_close_path(cairo_ctx);
+    cairo_clip(cairo_ctx);
+
+    /* paint, restore and clean up */
+    cairo_paint(cairo_ctx);
+    cairo_restore(cairo_ctx);
+    cairo_surface_destroy(surface);
+    g_free(surface_buf);
+
+    return TRUE;
+}
+
+
+/* split a text buffer into chunks using the passed Pango layout */
+GList *
+split_for_layout(PangoLayout * layout, const gchar * text,
+		 PangoAttrList * attributes, BalsaPrintSetup * psetup,
+		 gboolean is_header, GArray ** offsets)
+{
+    GList *split_list = NULL;
+    PangoLayoutIter *iter;
+    const gchar *start;
+    gint p_offset;
+    gboolean add_tab;
+    gint p_y0;
+    gint p_y1;
+    gint p_y_pos;
+    gint p_height;
+
+    /* set the text and its attributes, then get an iter */
+    pango_layout_set_text(layout, text, -1);
+    if (attributes)
+	pango_layout_set_attributes(layout, attributes);
+    if (offsets)
+	*offsets = g_array_new(FALSE, FALSE, sizeof(guint));
+    iter = pango_layout_get_iter(layout);
+
+    /* loop over lines */
+    start = text;
+    p_offset = 0;
+    add_tab = FALSE;
+    p_y_pos = C_TO_P(psetup->c_y_pos);
+    p_height = C_TO_P(psetup->c_height);
+    do {
+	pango_layout_iter_get_line_yrange(iter, &p_y0, &p_y1);
+	if (p_y_pos + p_y1 - p_offset > p_height) {
+	    gint index;
+	    gint tr;
+	    gchar *chunk;
+	    gboolean ends_with_nl;
+
+	    if (offsets) {
+		guint offs = start - text;
+
+		*offsets = g_array_append_val(*offsets, offs);
+	    }
+	    pango_layout_xy_to_index(layout, 0, p_y0, &index, &tr);
+	    ends_with_nl = text[index - 1] == '\n';
+	    if (ends_with_nl)
+		index--;
+	    chunk = g_strndup(start, text + index - start);
+	    if (add_tab)
+		split_list =
+		    g_list_append(split_list,
+				  g_strconcat("\t", chunk, NULL));
+	    else
+		split_list = g_list_append(split_list, g_strdup(chunk));
+	    add_tab = is_header && !ends_with_nl;
+	    g_free(chunk);
+	    start = text + index;
+	    if (ends_with_nl)
+		start++;
+	    if (*start == '\0')
+		p_y_pos = p_height;
+	    else
+		p_y_pos = 0;
+	    p_offset = p_y0;
+	    psetup->page_count++;
+	}
+    } while (pango_layout_iter_next_line(iter));
+    pango_layout_iter_free(iter);
+
+    /* append any remaining stuff */
+    if (*start != '\0') {
+	p_y_pos += p_y1 - p_offset;
+	if (offsets) {
+	    guint offs = start - text;
+
+	    *offsets = g_array_append_val(*offsets, offs);
+	}
+	if (add_tab)
+	    split_list =
+		g_list_append(split_list, g_strconcat("\t", start, NULL));
+	else
+	    split_list = g_list_append(split_list, g_strdup(start));
+    }
+
+    /* remember the new y position in cairo units */
+    psetup->c_y_pos = P_TO_C(p_y_pos);
+
+    /* return the list */
+    return split_list;
+}

@@ -1,3 +1,21 @@
+2007-01-14 Albrecht Dreß
+
+	* configure.in: support GtkPrint.
+	* libbalsa/libbalsa-conf.c: (libbalsa_conf_foreach_keys),
+	(libbalsa_conf_get_double_with_default_),
+	(libbalsa_conf_set_double_): add some missing capability.
+	* libbalsa/libbalsa-conf.h: ditto.
+	* src/Makefile.am: support GtkPrint.
+	* src/balsa-app.c: (balsa_app_init): ditto.
+	* src/balsa-app.h: ditto.
+	* src/main-window.c: (page_setup_cb): ditto.
+	* src/message-window.c: (page_setup_cb): ditto.
+	* src/print.h: ditto.
+	* src/save-restore.c: (load_gtk_print_setting),
+	(restore_gtk_page_setup), (config_global_load),
+	(save_gtk_print_setting), (save_gtk_page_setup), (config_save): ditto.
+	* src/sendmsg-window.c: ditto.
+
 2007-01-07 Pawel Salek
 
 	* src/mailbox-node.c: g_strconcat() needs trailing NULL.

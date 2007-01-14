@@ -280,6 +280,7 @@ glib-2.0
 gtk+-2.0 >= 2.4
 gmime-2.0 >= 2.1.9
 $gnome_extras
+$gnome_print_extras
 ])
 
 PKG_CHECK_MODULES(BALSA_AB, [

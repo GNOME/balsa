@@ -1,3 +1,8 @@
+2007-01-14  Pawel Salek
+
+	* configure.in: actually use gnome_print_extras.
+	* libbalsa/libbalsa-conf.c: glib-2.6.8 has no g_key_file_[sg]et_double().
+
 2007-01-14 Albrecht Dreß
 
 	* configure.in: support GtkPrint.

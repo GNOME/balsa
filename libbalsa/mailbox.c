@@ -1129,6 +1129,7 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
 {
     GtkTreePath *path;
 
+#define DEBUG FALSE
 #if DEBUG
     if (!libbalsa_threads_has_lock())
         g_warning("Thread is not holding gdk lock");
@@ -2652,7 +2653,6 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 {
     guint i;
 
-#define DEBUG TRUE
 #if DEBUG
     g_print("%s %s %d requested, ", __func__, mailbox->name,
             mailbox->msgnos_pending->len);

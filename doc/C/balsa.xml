@@ -3452,7 +3452,6 @@ to enable persistent message cache. If the home directory is slow
 (eg. NFS-mounted) and the connection to the imap server - fast,
 persistent cache becomes just a burden and should be disabled.</para>
 </listitem>
-</itemizedlist>
 
 <listitem>
 <para>The <guilabel>Use IDLE command</guilabel> check box chooses
@@ -3468,7 +3467,7 @@ to disable this command. </para> </listitem>
 <listitem>
 <para>The <guilabel>Enable bug workarounds</guilabel> check box makes
  &Balsa; work even with IMAP server that cannot fail to provide
- selected message parts. &Balsa& in such a case will try to fetch
+ selected message parts. &Balsa; in such a case will try to fetch
  entire messages instead.</para> </listitem>
 
 <listitem>

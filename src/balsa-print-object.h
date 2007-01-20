@@ -88,7 +88,7 @@ typedef struct _BalsaPrintObject BalsaPrintObject;
 struct _BalsaPrintObject {
     GObject parent;
 
-    guint on_page;
+    gint on_page;
     guint depth;
 
     gdouble c_at_x;

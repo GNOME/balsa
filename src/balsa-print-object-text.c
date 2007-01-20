@@ -130,7 +130,6 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     regex_t rex;
     gchar *textbuf;
     PangoFontDescription *font;
-    PangoLayout *layout;
     gdouble c_at_x;
     gdouble c_use_width;
     guint first_page;
@@ -178,20 +177,13 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 	g_string_free(flowed, FALSE);
     }
 
-    /* create a layout for splitting the text into pages */
+    /* get the font */
     font = pango_font_description_from_string(balsa_app.print_body_font);
-    layout = gtk_print_context_create_pango_layout(context);
-    pango_layout_set_font_description(layout, font);
-    pango_font_description_free(font);
-
-    /* configure the layout so we can use Pango to split the text into pages */
-    pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
-    pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
 
     /* loop over paragraphs */
     par_start = textbuf;
     eol = strchr(par_start, '\n');
-    par_len = eol ? eol - par_start : strlen(par_start);
+    par_len = eol ? eol - par_start : (gint) strlen(par_start);
     while (*par_start) {
 	GString *level_buf;
 	guint curr_level;
@@ -199,6 +191,7 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 	GList *par_parts;
 	GList *this_par_part;
 	GList *attr_list;
+	PangoLayout *layout;
 	PangoAttrList *pango_attr_list;
 	GArray *attr_offs;
 	gdouble c_at_y;
@@ -236,12 +229,18 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 
 		par_start = eol ? eol + 1 : par_start + par_len;
 		eol = strchr(par_start, '\n');
-		par_len = eol ? eol - par_start : strlen(par_start);
+		par_len = eol ? eol - par_start : (gint) strlen(par_start);
 	    }
 
 	    g_free(thispar);
 	} while (*par_start && (curr_level == cite_level));
 	
+	/* configure the layout so we can use Pango to split the text into pages */
+	layout = gtk_print_context_create_pango_layout(context);
+	pango_layout_set_font_description(layout, font);
+	pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
+	pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
+
 	/* leave place for the citation bars */
 	pango_layout_set_width(layout,
 			       C_TO_P(c_use_width - curr_level * C_LABEL_SEP));
@@ -273,6 +272,7 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 			     psetup, FALSE, &attr_offs);
 	if (pango_attr_list)
 	    pango_attr_list_unref(pango_attr_list);
+	g_object_unref(G_OBJECT(layout));
 	g_string_free(level_buf, TRUE);
 
 	/* each part is a new text object */
@@ -309,7 +309,7 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     }
 
     /* clean up */
-    g_object_unref(G_OBJECT(layout));
+    pango_font_description_free(font);
     g_free(textbuf);
     return list;
 }

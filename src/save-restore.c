@@ -618,7 +618,7 @@ restore_gtk_page_setup()
 
     name = libbalsa_conf_get_string("PaperName");
     ppd_name = libbalsa_conf_get_string ("PPDName");
-    display_name = libbalsa_conf_get_string ("DisplayName");
+    display_name = libbalsa_conf_get_string("DisplayName");
     page_setup = gtk_page_setup_new();
 
     if (ppd_name && *ppd_name)
@@ -904,6 +904,10 @@ config_global_load(void)
     if (balsa_app.page_setup)
 	g_object_unref(G_OBJECT(balsa_app.page_setup));
     balsa_app.page_setup = restore_gtk_page_setup();
+    balsa_app.margin_left = libbalsa_conf_get_double("LeftMargin");
+    balsa_app.margin_top = libbalsa_conf_get_double("TopMargin");
+    balsa_app.margin_right = libbalsa_conf_get_double("RightMargin");
+    balsa_app.margin_bottom = libbalsa_conf_get_double("BottomMargin");
 #else
     g_free(balsa_app.paper_size);
     balsa_app.paper_size =
@@ -1359,6 +1363,10 @@ config_save(void)
     libbalsa_conf_push_group("Printing");
 #ifdef HAVE_GTK_PRINT
     save_gtk_page_setup(balsa_app.page_setup);
+    libbalsa_conf_set_double("LeftMargin", balsa_app.margin_left);
+    libbalsa_conf_set_double("TopMargin", balsa_app.margin_top);
+    libbalsa_conf_set_double("RightMargin", balsa_app.margin_right);
+    libbalsa_conf_set_double("BottomMargin", balsa_app.margin_bottom);
 #else
     libbalsa_conf_set_string("PaperSize",balsa_app.paper_size);
     if(balsa_app.margin_left)

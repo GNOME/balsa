@@ -45,7 +45,9 @@ struct _BalsaPrintObjectHeader {
     BalsaPrintObject parent;
 
     gint p_label_width;
+    gint p_layout_width;
     gchar *headers;
+    GdkPixbuf *face;
 };
 
 

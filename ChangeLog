@@ -1,4 +1,26 @@
-2007-01-15  Peter Bloomfield,,919 515 1913,919 834 5924  <peter@Mercury>
+2007-01-20  Peter Bloomfield, Albrecht Dreß
+
+	* configure.in: check for Subversion instead of CVS; check for
+	langinfo.h.
+	* src/balsa-app.h: GtkPrint fixes and extensions.
+	* src/balsa-print-object-header.c:
+	(balsa_print_object_header_destroy),
+	(balsa_print_object_header_new_real),
+	(balsa_print_object_header_crypto),
+	(balsa_print_object_header_draw): ditto.
+	* src/balsa-print-object-header.h: ditto.
+	* src/balsa-print-object-text.c: (balsa_print_object_text):
+	ditto.
+	* src/balsa-print-object.c: (split_for_layout): ditto.
+	* src/balsa-print-object.h: ditto.
+	* src/print-gtk.c: (begin_print), (draw_page),
+	(get_default_user_units), (add_font_button), (add_margin_spinbtn),
+	(check_margins), (message_prefs_widget), (message_prefs_apply):
+	ditto.
+	* src/save-restore.c: (restore_gtk_page_setup),
+	(config_global_load), (config_save): ditto.
+
+2007-01-15  Peter Bloomfield
 
 	* libbalsa/mailbox.c: (lbm_msgno_changed),
 	(lbm_get_index_entry_real): less noise.

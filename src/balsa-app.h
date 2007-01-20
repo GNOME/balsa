@@ -336,6 +336,10 @@ extern struct BalsaApplication {
 #ifdef HAVE_GTK_PRINT
     GtkPageSetup *page_setup;
     GtkPrintSettings *print_settings;
+    gdouble margin_left;
+    gdouble margin_top;
+    gdouble margin_right;
+    gdouble margin_bottom;
 #else
     gchar* paper_size; /* A4 or Letter */
     gchar* margin_left;

@@ -32,6 +32,9 @@
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-header.h"
 
+#ifdef HAVE_LANGINFO
+#include <langinfo.h>
+#endif
 
 typedef struct {
     GtkWidget *header_font;
@@ -39,6 +42,10 @@ typedef struct {
     GtkWidget *footer_font;
     GtkWidget *highlight_cited;
     GtkWidget *highlight_phrases;
+    GtkWidget *margin_top;
+    GtkWidget *margin_bottom;
+    GtkWidget *margin_left;
+    GtkWidget *margin_right;
 } BalsaPrintPrefs;
 
 
@@ -210,13 +217,21 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
 
     /* initialise the context */
     page_setup = gtk_print_context_get_page_setup(context);
-    // FIXME - make extra margins configurable?
-    pdata->setup.c_x0 = 0.0;
-    pdata->setup.c_y0 = 0.0;
+
+    /* calculate the "real" margins */
+    pdata->setup.c_x0 = balsa_app.margin_left -
+	gtk_page_setup_get_left_margin(page_setup, GTK_UNIT_POINTS);
     pdata->setup.c_width =
-	gtk_page_setup_get_page_width(page_setup, GTK_UNIT_POINTS);
+	gtk_page_setup_get_page_width(page_setup, GTK_UNIT_POINTS) -
+	pdata->setup.c_x0 -(balsa_app.margin_right -
+			    gtk_page_setup_get_right_margin(page_setup, GTK_UNIT_POINTS));
+    pdata->setup.c_y0 = balsa_app.margin_top -
+	gtk_page_setup_get_top_margin(page_setup, GTK_UNIT_POINTS);
     pdata->setup.c_height =
-	gtk_page_setup_get_page_height(page_setup, GTK_UNIT_POINTS);
+	gtk_page_setup_get_page_height(page_setup, GTK_UNIT_POINTS) -
+	pdata->setup.c_y0 -(balsa_app.margin_bottom -
+			    gtk_page_setup_get_bottom_margin(page_setup, GTK_UNIT_POINTS));
+
     pdata->setup.page_count = 1;
 
     /* create a layout so we can do some calculations */
@@ -323,8 +338,6 @@ draw_page(GtkPrintOperation * operation, GtkPrintContext * context,
     cairo_t *cairo_ctx;
     GList * p;
 
-    g_message("print page %d of %d", page_nr + 1, print_data->setup.page_count);
-
     /* emit a warning if we try to print a non-existing page */
     if (page_nr >= print_data->setup.page_count) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -352,6 +365,35 @@ draw_page(GtkPrintOperation * operation, GtkPrintContext * context,
 }
 
 /* setup gui related stuff */
+/* shamelessly stolen from gtk+-2.10.6/gtk/gtkpagesetupunixdialog.c */
+static GtkUnit
+get_default_user_units(void)
+{
+    /* Translate to the default units to use for presenting
+     * lengths to the user. Translate to default:inch if you
+     * want inches, otherwise translate to default:mm.
+     * Do *not* translate it to "predefinito:mm", if it
+     * it isn't default:mm or default:inch it will not work 
+     */
+    gchar *e = _("default:mm");
+  
+#ifdef HAVE_LANGINFO
+    gchar *imperial = NULL;
+  
+    imperial = nl_langinfo(_NL_MEASUREMENT_MEASUREMENT);
+    if (imperial && imperial[0] == 2 )
+	return GTK_UNIT_INCH;  /* imperial */
+    if (imperial && imperial[0] == 1 )
+	return GTK_UNIT_MM;  /* metric */
+#endif
+  
+    if (strcmp(e, "default:inch")==0)
+	return GTK_UNIT_INCH;
+    else if (strcmp(e, "default:mm"))
+	g_warning("Whoever translated default:mm did so wrongly.\n");
+    return GTK_UNIT_MM;
+}
+
 static GtkWidget *
 add_font_button(const gchar * text, const gchar * font, GtkTable * table,
 		gint row)
@@ -359,13 +401,14 @@ add_font_button(const gchar * text, const gchar * font, GtkTable * table,
     GtkWidget *label;
     GtkWidget *font_button;
 
-    label = gtk_label_new(text);
+    label = gtk_label_new_with_mnemonic(text);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(table, label, 0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
 
     font_button = gtk_font_button_new_with_font(font);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), font_button);
     gtk_table_attach(table, font_button, 1, 2, row, row + 1,
 		     GTK_EXPAND | GTK_FILL,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0);
@@ -373,6 +416,56 @@ add_font_button(const gchar * text, const gchar * font, GtkTable * table,
     return font_button;
 }
 
+/* note: min and max are passed in points = 1/72" */
+static GtkWidget *
+add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
+		   GtkTable * table, gint row)
+{
+    GtkWidget *label;
+    GtkWidget *spinbtn;
+    gchar * unit;
+
+    label = gtk_label_new_with_mnemonic(text);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_table_attach(table, label, 0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
+
+    if (get_default_user_units() == GTK_UNIT_INCH) {
+	unit = g_strdup(_("inch"));
+	spinbtn = gtk_spin_button_new_with_range(min / 72.0,
+						 max / 72.0, 0.01);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinbtn), dflt / 72.0);
+	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spinbtn), 2);
+	gtk_spin_button_set_increments(GTK_SPIN_BUTTON(spinbtn), 0.1, 1.0);
+    } else {
+	unit = g_strdup(_("mm"));
+	spinbtn = gtk_spin_button_new_with_range(min / 72.0 * 25.4,
+						 max / 72.0 * 25.4, 0.1);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinbtn), dflt / 72.0 * 25.4);
+	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spinbtn), 1);
+	gtk_spin_button_set_increments(GTK_SPIN_BUTTON(spinbtn), 1.0, 10.0);
+    }
+    gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(spinbtn), TRUE);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
+    gtk_table_attach(table, spinbtn, 1, 2, row, row + 1, GTK_FILL,
+		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+    
+    label = gtk_label_new(unit);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_table_attach(table, label, 2, 3, row, row + 1, GTK_FILL, 0, 0, 0);
+
+    return spinbtn;
+}
+
+static void
+check_margins(GtkAdjustment *adjustment, GtkAdjustment *other)
+{
+    if (adjustment->value + other->value > adjustment->upper)
+	gtk_adjustment_set_value(adjustment, adjustment->upper - other->value);
+}
 
 static GtkWidget *
 message_prefs_widget(GtkPrintOperation * operation,
@@ -384,6 +477,7 @@ message_prefs_widget(GtkPrintOperation * operation,
     GtkWidget *hbox;
     GtkWidget *vbox;
     GtkWidget *table;
+    GtkPageSetup *pg_setup;
     gchar *markup;
 
     gtk_print_operation_set_custom_tab_label(operation, _("Message"));
@@ -416,13 +510,13 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, TRUE, 0);
 
     print_prefs->header_font =
-	add_font_button(_("Header Font:"), balsa_app.print_header_font,
+	add_font_button(_("_Header Font:"), balsa_app.print_header_font,
 			GTK_TABLE(table), 0);
     print_prefs->body_font =
-	add_font_button(_("Body Font:"), balsa_app.print_body_font,
+	add_font_button(_("B_ody Font:"), balsa_app.print_body_font,
 			GTK_TABLE(table), 1);
     print_prefs->footer_font =
-	add_font_button(_("Footer Font:"), balsa_app.print_footer_font,
+	add_font_button(_("_Footer Font:"), balsa_app.print_footer_font,
 			GTK_TABLE(table), 2);
 
     group = gtk_vbox_new(FALSE, 12);
@@ -460,6 +554,68 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_box_pack_start(GTK_BOX(vbox), print_prefs->highlight_phrases,
 		       FALSE, TRUE, 0);
 
+    group = gtk_vbox_new(FALSE, 12);
+    gtk_box_pack_start(GTK_BOX(page), group, FALSE, TRUE, 0);
+
+    label = gtk_label_new(NULL);
+    markup = g_strdup_printf("<b>%s</b>", _("Margins"));
+    gtk_label_set_markup(GTK_LABEL(label), markup);
+    g_free(markup);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
+
+    hbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(group), hbox, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new("    "),
+		       FALSE, FALSE, 0);
+    vbox = gtk_vbox_new(FALSE, 6);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+
+    table = gtk_table_new(4, 3, FALSE);
+    gtk_table_set_row_spacings(GTK_TABLE(table), 6);
+    gtk_table_set_col_spacings(GTK_TABLE(table), 6);
+
+    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, TRUE, 0);
+
+    pg_setup = gtk_print_operation_get_default_page_setup(operation);
+    print_prefs->margin_top =
+	add_margin_spinbtn(_("_Top"),
+			   gtk_page_setup_get_top_margin(pg_setup, GTK_UNIT_POINTS),
+			   gtk_page_setup_get_page_height(pg_setup, GTK_UNIT_POINTS),
+			   balsa_app.margin_top,
+			   GTK_TABLE(table), 0);
+    print_prefs->margin_bottom =
+	add_margin_spinbtn(_("_Bottom"),
+			   gtk_page_setup_get_bottom_margin(pg_setup, GTK_UNIT_POINTS),
+			   gtk_page_setup_get_page_height(pg_setup, GTK_UNIT_POINTS), 
+			   balsa_app.margin_bottom,
+			   GTK_TABLE(table), 1);
+    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_top))),
+		     "value-changed", G_CALLBACK(check_margins),
+		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_bottom)));
+    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_bottom))),
+		     "value-changed", G_CALLBACK(check_margins),
+		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_top)));
+    print_prefs->margin_left =
+	add_margin_spinbtn(_("_Left"),
+			   gtk_page_setup_get_left_margin(pg_setup, GTK_UNIT_POINTS),
+			   gtk_page_setup_get_page_width(pg_setup, GTK_UNIT_POINTS), 
+			   balsa_app.margin_left,
+			   GTK_TABLE(table), 2);
+    print_prefs->margin_right =
+	add_margin_spinbtn(_("_Right"),
+			   gtk_page_setup_get_right_margin(pg_setup, GTK_UNIT_POINTS),
+			   gtk_page_setup_get_page_width(pg_setup, GTK_UNIT_POINTS), 
+			   balsa_app.margin_right,
+			   GTK_TABLE(table), 3);
+    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_left))),
+		     "value-changed", G_CALLBACK(check_margins),
+		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_right)));
+    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_right))),
+		     "value-changed", G_CALLBACK(check_margins),
+		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_left)));
+
     gtk_widget_show_all(page);
 
     return page;
@@ -486,6 +642,22 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
 	GTK_TOGGLE_BUTTON(print_prefs->highlight_cited)->active;
     balsa_app.print_highlight_phrases =
 	GTK_TOGGLE_BUTTON(print_prefs->highlight_phrases)->active;
+
+    balsa_app.margin_top =
+	gtk_spin_button_get_value(GTK_SPIN_BUTTON(print_prefs->margin_top)) * 72.0;
+    balsa_app.margin_bottom =
+	gtk_spin_button_get_value(GTK_SPIN_BUTTON(print_prefs->margin_bottom)) * 72.0;
+    balsa_app.margin_left =
+	gtk_spin_button_get_value(GTK_SPIN_BUTTON(print_prefs->margin_left)) * 72.0;
+    balsa_app.margin_right =
+	gtk_spin_button_get_value(GTK_SPIN_BUTTON(print_prefs->margin_right)) * 72.0;
+    if (get_default_user_units() != GTK_UNIT_INCH) {
+	/* adjust for mm */
+	balsa_app.margin_top /= 25.4;
+	balsa_app.margin_bottom /= 25.4;
+	balsa_app.margin_left /= 25.4;
+	balsa_app.margin_right /= 25.4;
+    }
 }
 
 

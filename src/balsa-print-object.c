@@ -374,10 +374,11 @@ split_for_layout(PangoLayout * layout, const gchar * text,
 		start++;
 	    if (*start == '\0')
 		p_y_pos = p_height;
-	    else
+	    else {
 		p_y_pos = 0;
+		psetup->page_count++;
+	    }
 	    p_offset = p_y0;
-	    psetup->page_count++;
 	}
     } while (pango_layout_iter_next_line(iter));
     pango_layout_iter_free(iter);

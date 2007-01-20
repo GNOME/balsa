@@ -227,6 +227,9 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 
 AC_PROG_INTLTOOL
 AM_GLIB_GNU_GETTEXT
+AC_CHECK_HEADER([langinfo.h],
+                [AC_DEFINE([HAVE_LANGINFO],1,[Defined for langinfo.])],
+                [])
 
 # sendmail
 #
@@ -643,18 +646,18 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
         unset option
 fi
 
-# extra warnings for CVS.
+# extra warnings for Subversion.
 #
 
-if test -d "${srcdir}/CVS" ; then
-	BALSA_FROM_CVS=yes
+if test -d "${srcdir}/.svn" ; then
+	BALSA_FROM_SVN=yes
 	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
 else
-	BALSA_FROM_CVS=no
+	BALSA_FROM_SVN=no
 fi
 
-AC_MSG_CHECKING([for CVS information])
-AC_MSG_RESULT($BALSA_FROM_CVS)
+AC_MSG_CHECKING([for Subversion information])
+AC_MSG_RESULT($BALSA_FROM_SVN)
 
 dnl #####################################################################
 dnl 7. extra functions.
@@ -768,9 +771,9 @@ echo "  Install extra MIME icons: $install_mimeicons"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""
 
-if test x"$BALSA_FROM_CVS" = xyes ; then
+if test x"$BALSA_FROM_SVN" = xyes ; then
 	echo "============================== NOTICE ================================"
-	echo "                 You are using Balsa from CVS source."
+	echo "              You are using Balsa from Subversion source."
 	echo "  The program is likely to be unstable, contain incomplete features,"
 	echo "or just plain not work. Use it at your own risk. You have been warned."
 	echo "======================================================================"

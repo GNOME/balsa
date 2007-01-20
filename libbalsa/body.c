@@ -249,7 +249,7 @@ gchar *
 libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 				    const gchar * param)
 {
-    gchar *res;
+    gchar *res = NULL;
 
     g_return_val_if_fail(body != NULL, NULL);
 
@@ -257,7 +257,7 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 	const GMimeContentType *type =
 	    g_mime_object_get_content_type(body->mime_part);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
-    } else {
+    } else if (body->content_type) {
 	GMimeContentType *type =
 	    g_mime_content_type_new_from_string(body->content_type);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));

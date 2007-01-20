@@ -1,3 +1,8 @@
+2007-01-20  Peter Bloomfield
+
+	* libbalsa/body.c: (libbalsa_message_body_get_parameter): check
+	for NULL content-type.
+
 2007-01-20  Peter Bloomfield, Albrecht Dreß
 
 	* configure.in: check for Subversion instead of CVS; check for

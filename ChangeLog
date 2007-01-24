@@ -1,3 +1,8 @@
+2007-01-23  Peter Bloomfield
+
+	* src/main-window.c: (balsa_window_new): make balsa_app.appbar a
+	weak pointer.
+
 2007-01-20  Peter Bloomfield
 
 	* doc/C/balsa.xml: fix typos.

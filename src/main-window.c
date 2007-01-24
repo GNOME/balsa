@@ -1624,6 +1624,8 @@ balsa_window_new()
     gtk_progress_bar_set_pulse_step(gnome_appbar_get_progress(appbar), 0.01);
     g_object_set_data(G_OBJECT(window), APPBAR_KEY, appbar);
     balsa_app.appbar = appbar;
+    g_object_add_weak_pointer(G_OBJECT(appbar),
+                              (gpointer) &balsa_app.appbar);
     gnome_app_install_appbar_menu_hints(GNOME_APPBAR(balsa_app.appbar),
                                         main_menu);
 

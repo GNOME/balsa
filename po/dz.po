@@ -1,0 +1,6786 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-extras/balsa.head.dz.po\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-01-30 03:28+0000\n"
+"PO-Revision-Date: 2007-02-07 15:22+0530\n"
+"Last-Translator: sonam pelden <sonaa_peldn@yahoo.com>\n"
+"Language-Team: Dzongkha <pgeyleg@dit.gov.bt>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: Dzongkha\n"
+"X-Poedit-Country: Bhutan\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ../balsa.desktop.in.h:1
+msgid "Balsa"
+msgstr "བཱལ་ས་"
+
+#: ../balsa.desktop.in.h:2
+msgid "E-Mail utility"
+msgstr "མཁོ་ཕན་ཆེ་བའི་གློག་འཕྲིན་"
+
+#. The externq database doesn't support Id's, sorry!
+#: ../libbalsa/address-book-extern.c:210
+#: ../libbalsa/address-book-ldap.c:479
+#: ../libbalsa/address-book-ldif.c:329
+msgid "No-Id"
+msgstr "ཨའི་ཌི་-མེད་"
+
+#: ../libbalsa/address-book-extern.c:215
+#: ../libbalsa/address-book-extern.c:370
+#: ../libbalsa/address-book-ldap.c:485
+#: ../libbalsa/address-book-ldif.c:309
+#: ../libbalsa/address-book-ldif.c:332
+#: ../libbalsa/address-book-ldif.c:351
+#: ../libbalsa/address-book-ldif.c:355
+#: ../libbalsa/address-book-vcard.c:158
+#: ../libbalsa/address-book-vcard.c:312
+msgid "No-Name"
+msgstr "མིང་-མེད་"
+
+#: ../libbalsa/address-book-ldap.c:275
+msgid "SASL Interaction\n"
+msgstr "ཨེསི་ཨེ་ཨེསི་ཨེལ་ཕན་ཚུན་འབྲེལ་བ། \n"
+
+#: ../libbalsa/address-book-ldap.c:322
+msgid "TLS requested but not compiled in"
+msgstr "ཊི་ཨེལ་ཨེསི་ཞུ་བ་འབད་ཡོདཔ་ དེ་འབདཝ་ད་  ནང་ན་ཕྱོགས་སྒྲིག་མ་འབད་བས་"
+
+#: ../libbalsa/address-book.c:315
+#: ../libbalsa/filter-error.c:45
+msgid "No error"
+msgstr "འཛོལ་བ་མེད་"
+
+#: ../libbalsa/address-book.c:316
+msgid "Cannot read from address book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ལས་  ལྷག་མ་ཚུགས་"
+
+#: ../libbalsa/address-book.c:317
+msgid "Cannot write to address book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ལུ་འབྲི་མ་ཚུགས་"
+
+#: ../libbalsa/address-book.c:318
+#: ../libbalsa/imap-server.c:522
+msgid "Cannot connect to the server"
+msgstr "སར་བར་ལུ་མཐུད་མ་ཚུགས་"
+
+#: ../libbalsa/address-book.c:319
+msgid "Cannot search in the address book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ནང་ལུ་འཚོལ་ཞིབ་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/address-book.c:321
+msgid "Cannot add duplicate entry"
+msgstr "ཐོ་བཀོད་ངོ་བཤུས་ཁ་སྐོང་བརྐྱབ་མ་ཚུགས་"
+
+#: ../libbalsa/address-book.c:323
+msgid "Cannot find address in address book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ནང་  ཁ་བྱང་ཐོབ་མ་ཚུགས་"
+
+#: ../libbalsa/address-book.c:324
+#: ../src/main-window.c:2385
+#: ../src/main-window.c:4499
+#: ../src/sendmsg-window.c:3696
+msgid "Unknown error"
+msgstr "མ་ཤེས་པའི་འཛོལ་བ་"
+
+#: ../libbalsa/address.c:522
+msgid "D_isplayed Name:"
+msgstr "བཀྲམ་སྟོན་འབད་ཡོད་པའི་མིང་: (_i)"
+
+#: ../libbalsa/address.c:523
+msgid "_First Name:"
+msgstr "མགོའི་མིང་: (_F)"
+
+#: ../libbalsa/address.c:524
+msgid "_Last Name:"
+msgstr "མཇུག་གི་མིང་: (_L)"
+
+#: ../libbalsa/address.c:525
+msgid "_Nickname:"
+msgstr "སྐྱོན་མིང་: (_N)"
+
+#: ../libbalsa/address.c:526
+msgid "O_rganization:"
+msgstr "ཚོགས་སྡེ: (_r)"
+
+#: ../libbalsa/address.c:527
+msgid "_Email Address:"
+msgstr "གློག་འཕྲིན་ཁ་བྱང་: (_E)"
+
+#. Right/Add button
+#: ../libbalsa/address.c:546
+#: ../src/filter-edit-callbacks.c:1022
+#: ../src/filter-run-dialog.c:327
+msgid "A_dd"
+msgstr "ཁ་སྐོང་བརྐྱབ། (_d)"
+
+#: ../libbalsa/body.c:115
+#: ../libbalsa/mailbox_local.c:1678
+#: ../libbalsa/message.c:894
+msgid "(No subject)"
+msgstr "(དོན་ཚན་མེད་)"
+
+#: ../libbalsa/files.c:231
+#, c-format
+msgid "Open with %s"
+msgstr "%s དང་ཅིག་ཁར་ཁ་ཕྱེ་"
+
+#: ../libbalsa/filter-error.c:46
+msgid "Syntax error in the filter configuration file"
+msgstr "ཚགས་མ་རིམ་སྒྲིག་གི་ཡིག་སྣོད་ནང་  ཚིག་སྦྱོར་གྱི་འཛོལ་བ་"
+
+#: ../libbalsa/filter-error.c:47
+msgid "Unable to allocate memory"
+msgstr "དྲན་ཚད་སྤྲོད་མ་ཚུགས་"
+
+#: ../libbalsa/filter-error.c:48
+msgid "Error in regular expression syntax"
+msgstr "དུས་རྒྱུན་གསལ་བརྗོད་གྱི་ཚིག་སྦྱོར་ནང་ལུ་འཛོལ་བ་"
+
+#: ../libbalsa/filter-error.c:49
+msgid "Attempt to apply an invalid filter"
+msgstr "ནུས་ཅན་མེད་པའི་ཚགས་མ་ཅིག་འཇུག་སྤྱོད་འབད་ནི་ལུ་དཔའ་བཅམ་"
+
+#: ../libbalsa/filter-file.c:141
+#, c-format
+msgid "Invalid filters %s for mailbox %s"
+msgstr "ཡིག་སྒྲོམ་ %s གི་དོན་ལུ་  ནུས་ཅན་མེད་པའི་ཚགས་མ་ %s"
+
+#: ../libbalsa/filter.c:130
+#: ../libbalsa/mailbox_local.c:790
+msgid "Unable to load message body to match filter"
+msgstr "ཚགས་མ་འདི་མཐུན་སྒྲིག་འབད་ནི་ལུ་  འཕྲིན་དོན་མ་གཟུགས་མངོན་གསལ་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/filter.c:236
+#, c-format
+msgid "Invalid filter: %s"
+msgstr "ནུས་ཅན་མེད་པའི་ཚགས་མ: %s"
+
+#: ../libbalsa/filter.c:275
+#: ../libbalsa/filter.c:298
+#, c-format
+msgid "Bad mailbox name for filter: %s"
+msgstr "ཚགས་མའི་དོན་ལུ་  ཡིག་སྒྲོམ་མིང་བྱང་ཉེས: %s"
+
+#: ../libbalsa/filter.c:279
+#, c-format
+msgid "Error when copying messages: %s"
+msgstr "འཕྲིན་དོན་ཚུ་འདྲ་བཤུས་བརྐྱབ་ད་གི་འཛོལ་བ: %s"
+
+#: ../libbalsa/filter.c:289
+#, c-format
+msgid "Error when trashing messages: %s"
+msgstr "འཕྲིན་དོན་ཚུ་ཕྱགས་ཧོད་ནང་བཀོག་བའི་བསྒང་གི་འཛོལ་བ: %s"
+
+#: ../libbalsa/filter.c:302
+#, c-format
+msgid "Error when moving messages: %s"
+msgstr "འཕྲིན་དོན་ཚུ་སྤོ་བཤུད་འབདཝ་ད་གི་འཛོལ་བ: %s"
+
+#: ../libbalsa/gmime-application-pkcs7.c:237
+#: ../libbalsa/gmime-application-pkcs7.c:380
+msgid "Failed to decrypt MIME part: parse error"
+msgstr "མ་ཡིམ་ཆ་ཤས་གསང་བཤོལ་འབད་མ་ཚུགས: མིང་དཔྱད་འབད་ནི་ལུ་འཛོལ་བ་"
+
+#: ../libbalsa/gmime-gpgme-context.c:279
+#: ../libbalsa/rfc3156.c:1598
+#, c-format
+msgid ""
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"ལྡེ་མིག་འདི་གི་དོན་ལུ་  ཆོག་ཚིག་འདི་བྱང་ཉེས་ཨིནམ་ལས་  ལོག་འབད་གནང་!\n"
+"\n"
+"ལྡེ་མིག: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:284
+#: ../libbalsa/rfc3156.c:1603
+#, c-format
+msgid ""
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"གསང་བའི་ལྡེ་མིག་གི་དོན་ལུ་  ཆོག་ཚིག་འདི་ཐོ་བཀོད་འབད་གནང་ !\n"
+"\n"
+"ལྡེ་མིག: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:404
+#: ../libbalsa/gmime-gpgme-context.c:486
+#: ../libbalsa/gmime-gpgme-context.c:497
+#: ../libbalsa/gmime-gpgme-context.c:612
+#: ../libbalsa/gmime-gpgme-context.c:703
+#, c-format
+msgid "%s: could not get data from stream: %s"
+msgstr "%s: རྒྱུན་རིམ་ལས་གནས་སྡུད་ཐོབ་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:412
+#: ../libbalsa/gmime-gpgme-context.c:621
+#: ../libbalsa/gmime-gpgme-context.c:711
+#, c-format
+msgid "%s: could not create new data object: %s"
+msgstr "%s: གནས་སྡུད་དངོས་པོ་གསརཔ་ གསར་བསྐྲུན་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:422
+#, c-format
+msgid "%s: signing failed: %s"
+msgstr "%s: མིང་རྟགས་བཀོད་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:511
+#, c-format
+msgid "%s: signature verification failed: %s"
+msgstr "%s: མིང་རྟགས་བདེན་སྦྱོར་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:576
+msgid "combined signing and encryption is only defined for RFC 2440"
+msgstr "མིང་རྟགས་བཀོད་ནི་དང་གསང་བཟོ་མཉམ་མཐུད་འབད་ཡོདཔ་འདི་  RFC 2440 གི་དོན་ལུ་རྐྱངམ་ཅིག་ངོས་འཛིན་འབད་དེ་ཡོདཔ་ཨིན་"
+
+#: ../libbalsa/gmime-gpgme-context.c:647
+#, c-format
+msgid "%s: signing and encryption failed: %s"
+msgstr "%s: མིང་རྟགས་བཀོད་ནི་དང་གསང་བཟོ་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:651
+#, c-format
+msgid "%s: encryption failed: %s"
+msgstr "%s: གསང་བཟོ་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:723
+#, c-format
+msgid "%s: decryption failed: %s"
+msgstr "%s: གསང་བཤོལ་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:758
+#, c-format
+msgid "%s: could not create context: %s"
+msgstr "%s: སྐབས་དོན་གསར་བསྐྲུན་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:814
+msgid "the crypto engine for protocol OpenPGP is not available"
+msgstr "གནད་སྤེལ་ལམ་ལུགས་ པི་ཇི་པི་ཁ་ཕྱེ་ གི་དོན་ལུ་  ཀིརཔ་ཊོ་མ་འཕྲུལ་འདི་ཐོབ་ཚུགས་མེད་"
+
+#: ../libbalsa/gmime-gpgme-context.c:824
+msgid "the crypto engine for protocol CMS is not available"
+msgstr "གནད་སྤེལ་ལམ་ལུགས་ སི་ཨེམ་ཨེསི་གི་དོན་ལུ་  ཀིརཔ་ཊོ་མ་འཕྲུལ་འདི་ཐོབ་ཚུགས་མེད་"
+
+#: ../libbalsa/gmime-gpgme-context.c:831
+#, c-format
+msgid "invalid crypto engine %d"
+msgstr "ནུས་ཅན་མེད་པའི་ཀིརཔ་ཊོ་མ་འཕྲུལ་ %d"
+
+#: ../libbalsa/gmime-gpgme-context.c:863
+#: ../libbalsa/gmime-gpgme-context.c:889
+#, c-format
+msgid "%s: could not list keys for %s: %s"
+msgstr "%s: %s གི་དོན་ལུ་ལྡེ་མིག་ཚུ་ཐོ་ཡིག་བརྐྱབ་མ་ཚུགས: %s"
+
+#: ../libbalsa/gmime-gpgme-context.c:902
+#, c-format
+msgid "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+msgstr "%s: %s གི་དོན་ལུ་ལྡེ་མིག་འདི་ཡོདཔ་ཨིན་  དེ་འབདཝ་ད་  དུས་ཡོལ་སོངམ་  ལྕོགས་ཅན་མེདཔ་ ཆ་མེད་བཏང་གྲུབ་  ཡང་ན་ ནུས་ཅན་མེདཔ་ཨིན་"
+
+#: ../libbalsa/gmime-gpgme-context.c:906
+#, c-format
+msgid "%s: could not find a key for %s"
+msgstr "%s: %s གི་དོན་ལུ་ལྡེ་མིག་ཐོབ་མ་ཚུགས་"
+
+#: ../libbalsa/gmime-gpgme-context.c:919
+#, c-format
+msgid "%s: multiple keys for %s"
+msgstr "%s: %s གི་དོན་ལུ་སྣ་མང་ལྡེ་མིག་ཚུ་"
+
+#: ../libbalsa/gmime-gpgme-context.c:964
+#, c-format
+msgid "%s: insufficient validity for uid %s"
+msgstr "%s: ཡུ་ཨའི་ཌི་%s གི་དོན་ལུ་ མ་ལང་པའི་ནུས་ལྡན་དུས་ཚོད་"
+
+#. should "re" be localized ?
+#: ../libbalsa/identity.c:102
+#: ../libbalsa/mailbox_local.c:1797
+#: ../libbalsa/mailbox_local.c:1799
+#: ../src/sendmsg-window.c:3594
+#: ../src/sendmsg-window.c:3595
+msgid "Re:"
+msgstr "ཡང་བསྐྱར:"
+
+#: ../libbalsa/identity.c:103
+#: ../src/sendmsg-window.c:3539
+#: ../src/sendmsg-window.c:3540
+#: ../src/sendmsg-window.c:3541
+msgid "Fwd:"
+msgstr "གདོང་བསྐྱོད:"
+
+#: ../libbalsa/identity.c:160
+msgid "New Identity"
+msgstr "ངོ་རྟགས་གསརཔ་"
+
+#: ../libbalsa/identity.c:413
+msgid "Current"
+msgstr "ད་ལྟོ་"
+
+#: ../libbalsa/identity.c:669
+#: ../libbalsa/smtp-server.c:257
+msgid "Default"
+msgstr "སྔོན་སྒྲིག་"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:864
+msgid "_Face Path"
+msgstr "བཀོད་རྣམ་འགྲུལ་ལམ། (_F)"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:870
+msgid "_X-Face Path"
+msgstr "ཨེགསི་-བཀོད་རྣམ་གྲུལ་ལམ། (_X)"
+
+#. create the "General" tab
+#: ../libbalsa/identity.c:896
+msgid "General"
+msgstr "ཡོངས་ཁྱབ་"
+
+#: ../libbalsa/identity.c:898
+msgid "_Identity Name:"
+msgstr "ངོ་རྟགས་ཀྱི་མིང་: (_I)"
+
+#: ../libbalsa/identity.c:900
+msgid "_Full Name:"
+msgstr "མིང་ཆ་ཚང: (_F)"
+
+#: ../libbalsa/identity.c:902
+msgid "_Mailing Address:"
+msgstr "ཡིག་འཕྲིན་གཏང་བའི་ཁ་བྱང་: (_M)"
+
+#: ../libbalsa/identity.c:904
+msgid "Reply _To:"
+msgstr "ལན་གསལ: (_T)"
+
+#: ../libbalsa/identity.c:906
+msgid "_Domain:"
+msgstr "ཌོ་མེན: (_D)"
+
+#: ../libbalsa/identity.c:908
+msgid "_Bcc:"
+msgstr "བི་སི་སི: (_B)"
+
+#: ../libbalsa/identity.c:910
+msgid "Reply _String:"
+msgstr "ལན་གསལ་ཡིག་རྒྱུན: (_S)"
+
+#: ../libbalsa/identity.c:912
+msgid "F_orward String:"
+msgstr "ཡིག་རྒྱུན་གདོང་བསྐྱོད་འབད: (_o)"
+
+#: ../libbalsa/identity.c:915
+msgid "SMT_P Server:"
+msgstr "ཨེསི་ཨེམ་ཊི་པི་སར་བར: (_P)"
+
+#. create the "Signature" tab
+#: ../libbalsa/identity.c:920
+msgid "Signature"
+msgstr "མིང་རྟགས་"
+
+#: ../libbalsa/identity.c:923
+msgid "Signature _Path"
+msgstr "མིང་རྟགས་ཀྱི་འགྲུལ་ལམ། (_P)"
+
+#: ../libbalsa/identity.c:926
+msgid "_Execute Signature"
+msgstr "མིང་རྟགས་ལག་ལེན་འཐབ། (_E)"
+
+#: ../libbalsa/identity.c:929
+msgid "Incl_ude Signature"
+msgstr "མིང་རྟགས་གྲངས་སུ་བཙུགས། (_u)"
+
+#: ../libbalsa/identity.c:932
+msgid "Include Signature When For_warding"
+msgstr "གདོང་བསྐྱོད་འབདཝ་ད་  མིང་རྟགས་གྲངས་སུ་བཙུགས། (_w)"
+
+#: ../libbalsa/identity.c:935
+msgid "Include Signature When Rep_lying"
+msgstr "ལན་གསལ་འབདཝ་ད་  མིང་རྟགས་གྲངས་སུ་བཙུགས། (_l)"
+
+#: ../libbalsa/identity.c:938
+msgid "_Add Signature Separator"
+msgstr "མིང་རྟགས་དབྱེ་བྱེད་ཁ་སྐོང་བརྐྱབ། (_A)"
+
+#: ../libbalsa/identity.c:941
+msgid "Prepend Si_gnature"
+msgstr "མིང་རྟགས་པིརི་པེནཌི། (_g)"
+
+#. create the "Security" tab
+#: ../libbalsa/identity.c:953
+msgid "Security"
+msgstr "སྲུང་སྐྱོབ་"
+
+#: ../libbalsa/identity.c:956
+msgid "sign messages by default"
+msgstr "སྔོན་སྒྲིག་གིས་སྦེ་  འཕྲིན་དོན་ཚུ་མིང་རྟགས་བཀོད་"
+
+#: ../libbalsa/identity.c:959
+msgid "encrypt messages by default"
+msgstr "སྔོན་སྒྲིག་གིས་སྦེ་  འཕྲིན་དོན་ཚུ་གསང་བ་བཟོ་"
+
+#: ../libbalsa/identity.c:962
+msgid "default protocol"
+msgstr "སྔོན་སྒྲིག་གནད་སྤེལ་"
+
+#: ../libbalsa/identity.c:965
+msgid "always trust GnuPG keys when encrypting"
+msgstr "གསང་བཟོས་འབདཝ་ད་  ཇི་ཨེན་ཡུ་པི་ཇི་ ལྡེ་མིག་ལུ་ཨ་རྟག་རང་བློ་གཏད་དགོ་"
+
+#: ../libbalsa/identity.c:1102
+#, c-format
+msgid "Error reading file %s: %s"
+msgstr "%s ཡིག་སྣོད་འདི་ལྷགཔ་ད་ འཛོལ་བ: %s"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:1113
+#, c-format
+msgid "Face header file %s is too long (%d bytes)."
+msgstr "བཀོད་རྣམ་མགོ་ཡིག་གི་ཡིག་སྣོད་ %s འདི་གནམ་མེད་ས་མེད་རིངམ་འདུག (%d བཱའིཊིསི་)"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:1123
+#, c-format
+msgid "Face header file %s contains binary data."
+msgstr "བཀོད་རྣམ་མགོ་ཡིག་གི་ཡིག་སྣོད་ %s དེ་གིས་  ཟུང་ལྡན་གནས་སྡུད་ཡོདཔ་ཨིན།"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:1143
+#: ../src/balsa-message.c:1236
+#, c-format
+msgid "Error loading Face: %s"
+msgstr "བཀོད་རྣམ་མངོན་གསལ་འབདཝ་ད་གི་འཛོལ་བ: %s"
+
+#: ../libbalsa/identity.c:1339
+msgid "Error: The identity does not have a name"
+msgstr "འཛོལ་བ: ངོ་རྟགས་དེ་ལུ་མིང་མེདཔ་ཨིན་"
+
+#: ../libbalsa/identity.c:1349
+msgid "Error: An identity with that name already exists"
+msgstr "འཛོལ་བ: མིང་འདི་དང་ཅིག་ཁར་ཡོད་པའི་ངོ་རྟགས་འདི་  ཧེ་མ་ལས་རང་འདུག་"
+
+#: ../libbalsa/identity.c:1545
+msgid "Do you really want to delete the selected identity?"
+msgstr "སེལ་འཐུ་འབད་དེ་ཡོད་པའི་ངོ་རྟགས་འདི་  ཁྱོད་ཀྱིས་ངོ་མ་འབད་རང་བཏོན་གཏང་ནི་ཨིན་ན?"
+
+#: ../libbalsa/identity.c:1580
+#, c-format
+msgid "Error displaying help for identities: %s\n"
+msgstr "ངོ་རྟགས་ཚུ་གི་དོན་ལུ་  གྲོགས་རམ་བཀྲམ་སྟོན་འབདཝ་ད་ འཛོལ་བ: %s\n"
+
+#: ../libbalsa/identity.c:1626
+msgid "Manage Identities"
+msgstr "ངོ་རྟགས་ཚུ་འཛིན་སྐྱོང་འཐབ་"
+
+#: ../libbalsa/identity.c:1984
+msgid "GnuPG MIME mode"
+msgstr "ཇི་ཨེན་ཡུ་པི་ཇི་མ་ཡིམ་གྱི་ཐབས་ལམ་"
+
+#: ../libbalsa/identity.c:1986
+msgid "GnuPG OpenPGP mode"
+msgstr "ཇི༌ཨེན་ཡུ་པི་ཇི་ པི་ཇི་པི་ཁ་ཕྱེ་གི་ཐབས་ལམ་"
+
+#: ../libbalsa/identity.c:1989
+msgid "GpgSM S/MIME mode"
+msgstr "GpgSM S/MIME ཐབས་ལམ་"
+
+#. IMAP host name + message
+#: ../libbalsa/imap-server.c:258
+#, c-format
+msgid ""
+"IMAP server %s alert:\n"
+"%s"
+msgstr ""
+"ཨའི་ཨེམ་ཨེ་པི་ སར་བར་ %s དྲན་བརྡ:\n"
+"%s"
+
+#. IMAP host name + message
+#: ../libbalsa/imap-server.c:262
+#, c-format
+msgid "IMAP server %s error: %s"
+msgstr "ཨའི་ཨེམ་ཨེ་པི་ སར་བར་ %s འཛོལ་བ: %s"
+
+#. IMAP host name + message
+#: ../libbalsa/imap-server.c:268
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../libbalsa/imap-server.c:527
+#: ../libbalsa/imap-server.c:532
+#, c-format
+msgid "Cannot connect to the server: %s"
+msgstr "སར་བར་ལུ་མཐུད་མ་ཚུགས: %s"
+
+#: ../libbalsa/imap-server.c:680
+#, c-format
+msgid "Exceeded the number of connections per server %s"
+msgstr "སར་བར་%sརེ་རེའི་མཐུད་ལམ་གྱི་  ཨང་གྲངས་འདི་ལྷག་ཡོདཔ་"
+
+#: ../libbalsa/libbalsa-conf.c:203
+msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
+msgstr "ཁྱོད་རའི་བཱལ་ས་རིམ་སྒྲིག་འདི་  ད་ལྟོ་\"~/.balsa/config\" ནང་གསོག་འཇོག་འབད་དེ་ཡོདཔ་ཨིན།"
+
+#: ../libbalsa/libbalsa.c:280
+msgid "Invalid date"
+msgstr "ནུས་ཅན་མེད་པའི་ཚེས་གྲངས་"
+
+#: ../libbalsa/libbalsa.c:296
+#: ../src/pref-manager.c:1321
+#: ../src/pref-manager.c:1417
+msgid "Unknown"
+msgstr "མ་ཤེསཔ་"
+
+#: ../libbalsa/libbalsa.c:435
+#, c-format
+msgid ""
+"Authenticity of this certificate could not be verified.\n"
+"<b>Reason:</b> %s\n"
+"<b>This certificate belongs to:</b>\n"
+msgstr ""
+"ལག་ཁྱེར་དེ་གི་བདེན་བཤད་འདི་བདེན་སྦྱོར་འབད་མ་ཚུགས།\n"
+"<b>རྒྱུ་མཚན:</b> %s\n"
+"<b>ལག་ཁྱེར་འདི་བང་མི:</b>\n"
+
+#: ../libbalsa/libbalsa.c:447
+msgid ""
+"\n"
+"<b>This certificate was issued by:</b>\n"
+msgstr ""
+"\n"
+"<b>ལག་ཁྱེར་འདི་སྤྲོད་མི:</b>\n"
+
+#: ../libbalsa/libbalsa.c:458
+#, c-format
+msgid ""
+"<b>This certificate is valid</b>\n"
+"from %s\n"
+"to %s\n"
+"<b>Fingerprint:</b> %s"
+msgstr ""
+"<b>ལག་ཁྱེར་འདི་ནུས་ཅན་</b>\n"
+"ལས་ %s\n"
+"ལུ་ %s\n"
+"<b>མཛུབ་རྗེས:</b> %s"
+
+#: ../libbalsa/libbalsa.c:467
+msgid "SSL/TLS certificate"
+msgstr "ཨེསི་ཨེསི་/ཊི་ཨེལ་ཨེསི་ ལག་ཁྱེར་"
+
+#: ../libbalsa/libbalsa.c:469
+msgid "_Accept Once"
+msgstr "ཚར་ཅིག་དང་ལེན་འབད་ད། (_A)"
+
+#: ../libbalsa/libbalsa.c:470
+msgid "Accept&_Save"
+msgstr "སྲུང་ནི་འདི་དང་ལེན་འབད། (&_S)"
+
+#: ../libbalsa/libbalsa.c:471
+msgid "_Reject"
+msgstr "དང་ལེན་སྤང་། (_R)"
+
+#: ../libbalsa/libbalsa.c:766
+msgid "No image data"
+msgstr "གཟུགས་བརྙན་གནས་སྡུད་མེད་"
+
+#: ../libbalsa/libbalsa.c:810
+msgid "Invalid input format"
+msgstr "ནུས་ཅན་མེད་པའི་ཨིན་པུཊི་གི་རྩ་སྒྲིག་"
+
+#: ../libbalsa/libbalsa.c:814
+msgid "Internal buffer overrun"
+msgstr "ནང་འཁོད་ཀྱི་གནད་ཁོངས་འདི་ཁྱབ་ད་"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/libbalsa.c:831
+msgid "Bad X-Face data"
+msgstr "ཨེགསི་-བཀོད་རྣམ་གནས་སྡུད་བྱང་ཉེས་"
+
+#: ../libbalsa/mailbox.c:452
+#, c-format
+msgid "Cannot load mailbox %s"
+msgstr "ཡིག་སྒྲོམ་  %s འདི་མངོན་གསལ་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox.c:459
+#, c-format
+msgid "No such mailbox type: %s"
+msgstr "ཡིག་སྒྲོམ་དབྱེ་བ་ %s མེད:"
+
+#: ../libbalsa/mailbox.c:476
+#, c-format
+msgid "Bad local mailbox path \"%s\""
+msgstr "ཉེ་གནས་ཡིག་སྒྲོམ་གྱི་འགྲུལ་ལམ་  \"%s\" བྱང་ཉེས་"
+
+#: ../libbalsa/mailbox.c:481
+#, c-format
+msgid "Could not create a mailbox of type %s"
+msgstr "དབྱེ་བ་ %s གི་ཡིག་སྒྲོམ་ཅིག་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox.c:789
+#, c-format
+msgid "Applying filter rules to %s"
+msgstr "%sལུ་  ཚགས་མའི་ལམ་ལུགས་ཚུ་འཇུག་སྤྱོད་འབད་དོ་"
+
+#: ../libbalsa/mailbox.c:892
+#, c-format
+msgid "Copying from %s to %s"
+msgstr "%s ལས་ %s ལུ་འདྲ་བཤུས་བརྐྱབ་དོ་"
+
+#: ../libbalsa/mailbox.c:1872
+msgid "Removing messages from source mailbox failed"
+msgstr "བྱུང་ཁུངས་ཡིག་སྒྲོམ་ལས་འཕྲིན་དོན་རྩ་བསྐྲད་གཏང་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox.c:2803
+msgid "from unknown"
+msgstr "མ་ཤེསཔ་ལས་"
+
+#: ../libbalsa/mailbox.c:2805
+msgid "Loading..."
+msgstr "མངོན་གསལ་འབད་དོ..."
+
+#: ../libbalsa/mailbox.c:3727
+#, c-format
+msgid "Searching %s for partial messages"
+msgstr "ཆ་ཤས་འཕྲིན་དོན་གྱི་དོན་ལུ་  %s འཚོལ་ཞིབ་འབད་དོ་"
+
+#: ../libbalsa/mailbox.c:3817
+msgid "Reconstructing message"
+msgstr "འཕྲིན་དོན་ལོག་བཟོ་བསྐྲུན་འབད་དོ་"
+
+#. ImapIssue macro handles reconnecting. We might issue a
+#. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
+#. login information...
+#: ../libbalsa/mailbox_imap.c:540
+msgid "IMAP connection has been severed. Reconnecting..."
+msgstr "ཨའི་ཨེམ་ཨེ་པི་མཐུད་ལམ་འདི་འབྲེལ་བ་གཅད་ནུག། སླར་མཐུད་དོ..."
+
+#: ../libbalsa/mailbox_imap.c:543
+#, c-format
+msgid "IMAP server has shut the connection: %s Reconnecting..."
+msgstr "ཨའི་ཨེམ་ཨེ་པི་ སར་བར་དེ་གིས་  མཐུད་ལམ་འདི་ཁ་བསྡམ་ནུག: %s སླར་མཐུད་དོ..."
+
+#: ../libbalsa/mailbox_imap.c:553
+#, c-format
+msgid "Async IMAP cmd %s could not be executed. Reconnecting..."
+msgstr "Async ཨའི་ཨེམ་ཨེ་པི་ cmd %s ལག་ལེན་འཐབ་མ་ཚུགས།  སླར་མཐུད་དོ..."
+
+#: ../libbalsa/mailbox_imap.c:1023
+#: ../libbalsa/mailbox_maildir.c:525
+#: ../libbalsa/mailbox_mbox.c:733
+#: ../libbalsa/mailbox_mh.c:551
+#, c-format
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "%s: ཁ་ཕྱེ་དོ་ %s རེཕ་ཀཱའོནཊི་: %d\n"
+
+#: ../libbalsa/mailbox_imap.c:1098
+#: ../libbalsa/mailbox_imap.c:2248
+#, c-format
+msgid "Downloading %ld kB"
+msgstr "%ld kB འདི་ཕབ་ལེན་འབད་དོ་"
+
+#: ../libbalsa/mailbox_imap.c:1478
+#, c-format
+msgid ""
+"IMAP SEARCH command failed for mailbox %s\n"
+"falling back to default searching method"
+msgstr ""
+"སྔོན་སྒྲིག་འཚོལ་ཞིབ་ཐབས་ལམ་ལུ་གློ་བུར་རྒྱབ་ཐག་གི་ཐོག་ལས་  \n"
+"ཨའི་ཨེམ་ཨེ་པི་འཚོལ་ཞིབ་ འདི་ཡིག་སྒྲོམ་ %s དོན་ལུ་  བརྡ་བཀོད་འཐུས་ཤོར་བྱུང་ཡོདཔ།"
+
+#: ../libbalsa/mailbox_imap.c:1538
+#, c-format
+msgid "No path found for mailbox \"%s\", using \"%s\""
+msgstr "\"%s\" ལག་ལེན་འཐབ་སྟེ་  ཡིག་སྒྲོམ་ \"%s\" དོན་ལུ་ འགྲུལ་ལམ་མ་ཐོབ།"
+
+#: ../libbalsa/mailbox_imap.c:1627
+#: ../libbalsa/mailbox_imap.c:1668
+msgid "Cannot get IMAP handle"
+msgstr "ཨའི་ཨེམ་ཨེ་པི་ལེགས་སྐྱོང་འཐབ་ནི་ཐོབ་མ་ཚུགསཔ་"
+
+#: ../libbalsa/mailbox_imap.c:2281
+msgid "Cannot create temporary file"
+msgstr "གནས་སྐབས་ཀྱི་ཡིག་སྣོད་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_imap.c:2300
+#, c-format
+msgid "Cannot write to temporary file %s"
+msgstr "གནས་སྐབས་ཀྱི་ཡིག་སྣོད་ %s ལུ་འབྲི་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_imap.c:2517
+#, c-format
+msgid "Uploading %ld kB"
+msgstr "%ld kB འདི་སྐྱེལ་བཙུགས་འབད་དོ་"
+
+#: ../libbalsa/mailbox_imap.c:2708
+msgid "Server-side threading not supported."
+msgstr "སར་བར་-ཕྱོགས་ཐེ་རེཌི་འདི་རྒྱབ་སྐྱོར་མ་འབད་བས།"
+
+#: ../libbalsa/mailbox_local.c:492
+#: ../libbalsa/mailbox_mbox.c:430
+#, c-format
+msgid "Failed to create temporary file \"%s\": %s"
+msgstr "གནས་སྐབས་ཀྱི་ཡིག་སྣོད་ \"%s\" གསར་བསྐྲུན་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/mailbox_local.c:511
+#, c-format
+msgid "Failed to save cache file \"%s\": %s."
+msgstr "འདྲ་མཛོད་ཡིག་སྣོད་  \"%s\" སྲུང་ནི་ལུ་འཐུས་ཤོར་བྱུང་ཡོདཔ: %s"
+
+#: ../libbalsa/mailbox_local.c:521
+#: ../libbalsa/mailbox_mbox.c:442
+#, c-format
+msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
+msgstr "འདྲ་མཛོད་ཡིག་སྣོད་ \"%s\" སྲུང་ནི་ལུ་འཐུས་ཤོར་བྱུང་ཡོདཔ: %s ཐོན་རིམ་གསརཔ་འདི་ \"%s\" སྦེ་སྲུང་ནུག"
+
+#: ../libbalsa/mailbox_local.c:552
+#, c-format
+msgid "Cache file for mailbox %s will be created"
+msgstr "ཡིག་སྒྲོམ་ %s གི་དོན་ལུ་འདྲ་མཛོད་ཡིག་སྣོད་འདི་  གསར་བསྐྲུན་འབད་འོང་"
+
+#: ../libbalsa/mailbox_local.c:561
+#, c-format
+msgid "Failed to read cache file %s: %s"
+msgstr "འདྲ་མཛོད་ཡིག་སྣོད་ %s ལྷག་ནི་ལུ་འཐུས་ཤོར་བྱུང་ཡོདཔ: %s"
+
+#: ../libbalsa/mailbox_local.c:579
+#: ../libbalsa/mailbox_local.c:596
+#: ../libbalsa/mailbox_local.c:620
+#, c-format
+msgid "Cache file for mailbox %s will be repaired"
+msgstr "ཡིག་སྒྲོམ་ %s གི་དོན་ལུ་འདྲ་མཛོད་ཡིག་སྣོད་འདི་ཉམས་བཅོས་འབད་འོང་"
+
+#: ../libbalsa/mailbox_local.c:1097
+#, c-format
+msgid "Filtering %s"
+msgstr "%sབཙག་དོ་"
+
+#: ../libbalsa/mailbox_local.c:1180
+#, c-format
+msgid "Preparing %s"
+msgstr "%s གྲ་སྒྲིག་འབད་དོ་"
+
+#: ../libbalsa/mailbox_local.c:1958
+#, c-format
+msgid "Open of %s failed. Errno = %d, "
+msgstr "%s ཁ་ཕྱེ་མ་ཚུགས།  Errno = %d,"
+
+#: ../libbalsa/mailbox_local.c:1980
+#, c-format
+msgid "Failed to sync mailbox \"%s\""
+msgstr "ཡིག་སྒྲོམ་ \"%s\" མཉམ་བྱུང་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_maildir.c:216
+#, c-format
+msgid "Mailbox %s does not appear to be a Maildir mailbox."
+msgstr "ཡིག་སྒྲོམ་ %s ཡིག་འཕྲིན་སྣོད་ཐོའི་ཡིག་སྒྲོམ་ཅིག་འབད་ནི་ལུ་  མ་བྱུང་།"
+
+#: ../libbalsa/mailbox_maildir.c:225
+#, c-format
+msgid "Could not create a MailDir directory at %s (%s)"
+msgstr "%s (%s) ལུ་ཡིག་འཕྲིན་སྣོད་ཐོའི་སྣོད་ཐོ་ཅིག་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_maildir.c:233
+#: ../libbalsa/mailbox_maildir.c:242
+#: ../libbalsa/mailbox_maildir.c:253
+#, c-format
+msgid "Could not create a MailDir at %s (%s)"
+msgstr "%s (%s) ལུ་ཡིག་འཕྲིན་སྣོད་ཐོ་ཅིག་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_maildir.c:360
+#: ../libbalsa/mailbox_mh.c:311
+#, c-format
+msgid ""
+"Could not remove contents of %s:\n"
+"%s"
+msgstr ""
+"%s གི་ནང་དོན་ཚུ་རྩ་བསྐྲད་གཏང་མ་ཚུགས:\n"
+"%s"
+
+#: ../libbalsa/mailbox_maildir.c:366
+#: ../libbalsa/mailbox_mbox.c:315
+#: ../libbalsa/mailbox_mh.c:317
+#, c-format
+msgid ""
+"Could not remove %s:\n"
+"%s"
+msgstr ""
+"%sརྩ་བསྐྲད་གཏང་མ་ཚུགས:\n"
+"%s"
+
+#: ../libbalsa/mailbox_maildir.c:504
+#: ../libbalsa/mailbox_mbox.c:681
+#: ../libbalsa/mailbox_mh.c:532
+msgid "Mailbox does not exist."
+msgstr "ཡིག་སྒྲོམ་མེད།"
+
+#: ../libbalsa/mailbox_maildir.c:970
+#: ../libbalsa/mailbox_mbox.c:1987
+#: ../libbalsa/mailbox_mh.c:1155
+msgid "Data copy error"
+msgstr "གནས་སྡུད་འདྲ་བཤུས་ཀྱི་འཛོལ་བ་"
+
+#: ../libbalsa/mailbox_mbox.c:211
+#, c-format
+msgid "Mailbox %s does not appear to be an Mbox mailbox."
+msgstr "ཡིག་སྒྲོམ་ %s འདི་  ཨེམ་སྒྲོམ་ཡིག་སྒྲོམ་སྦེ་མི་བྱུང་།"
+
+#: ../libbalsa/mailbox_mbox.c:418
+#, c-format
+msgid "Could not write file %s: %s"
+msgstr "ཡིག་སྣོད་ %s འབྲི་མ་ཚུགས: %s"
+
+#: ../libbalsa/mailbox_mbox.c:450
+#, c-format
+msgid "Could not unlink file %s: %s"
+msgstr "%sཡིག་སྣོད་འབྲེལ་བ་ཐབས་བཤལ་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/mailbox_mbox.c:689
+msgid "Cannot open mailbox."
+msgstr "ཡིག་སྒྲོམ་ཁ་ཕྱེ་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_mbox.c:701
+msgid "Mailbox is not in mbox format."
+msgstr "ཡིག་སྒྲོམ་འདི་ ཨེམ་སྒྲོམ་རྩ་སྒྲིག་ནང་མིན་འདུག།"
+
+#: ../libbalsa/mailbox_mbox.c:709
+msgid "Cannot lock mailbox."
+msgstr "ཡིག་སྒྲོམ་ལྡེ་མིག་བརྐྱབ་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_mbox.c:1944
+#, c-format
+msgid "%s: could not open %s."
+msgstr "%s: %s ཁ་ཕྱེ་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_mbox.c:1955
+#, c-format
+msgid "%s: could not get new mime stream."
+msgstr "%s: མ་ཡིམ་རྒྱུན་རིམ་གསརཔ་ཐོབ་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_mbox.c:1963
+#, c-format
+msgid "%s: %s is not in mbox format."
+msgstr "%s: %s འདི་ཨེམ་སྒྲོམ་རྩ་སྒྲིག་ནང་མེད།"
+
+#: ../libbalsa/mailbox_mh.c:192
+#, c-format
+msgid "Mailbox %s does not appear to be a Mh mailbox."
+msgstr "ཡིག་སྒྲོམ་ %s འདི་  ཨེམ་ཨེཆ་ཡིག་སྒྲོམ་སྦེ་མི་བྱུང་།"
+
+#: ../libbalsa/mailbox_mh.c:202
+#, c-format
+msgid "Could not create MH directory at %s (%s)"
+msgstr "%s (%s) ལུ་  ཨེམ་ཨེཆ་སྣོད་ཐོ་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_mh.c:214
+#, c-format
+msgid "Could not create MH structure at %s (%s)"
+msgstr "%s (%s)ལུ་ ཨེམ་ཨེཆ་གཞི་བཀོད་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_mh.c:1136
+msgid "Cannot create message"
+msgstr "འཕྲིན་དོན་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/mailbox_mh.c:1180
+msgid "Message rename error"
+msgstr "འཕྲིན་དོན་ཡང་བསྐྱར་མིང་བཏགས་པའི་འཛོལ་བ་"
+
+#: ../libbalsa/mailbox_pop3.c:190
+#, c-format
+msgid "Error appending message %d from %s to %s: %s"
+msgstr "འཕྲིན་དོན་ %d འདི་  %sལས་ %sལུ་མཇུག་བསྣོན་འབདཝ་ད་འཛོལ་བ: %s"
+
+#: ../libbalsa/mailbox_pop3.c:339
+#, c-format
+msgid "Saving POP message to %s failed"
+msgstr "པི་ཨོ་པི་འཕྲིན་དོན་  %s ལུ་སྲུང་བཞག་འབདཝ་ད་འཐུས་ཤོར་བྱུང་ཡོདཔ་"
+
+#: ../libbalsa/mailbox_pop3.c:346
+#, c-format
+msgid "Retrieving Message %d of %d"
+msgstr "%d གི་འཕྲིན་དོན་ %d སླར་འདྲེན་འབད་དོ་"
+
+#: ../libbalsa/mailbox_pop3.c:369
+#, c-format
+msgid "Received %ld kB of %ld"
+msgstr "%ld གི་%ld kB འདི་ཐོབ་ཡོདཔ་"
+
+#: ../libbalsa/mailbox_pop3.c:383
+#, c-format
+msgid "Saving POP message to %s failed."
+msgstr "པི་ཨོ་པི་འཕྲིན་དོན་ %s ལུ་སྲུང་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_pop3.c:393
+#, c-format
+msgid "Transferring POP message to %s failed."
+msgstr "པི་ཨོ་པི་འཕྲིན་དོན་འདི་ %s ལུ་གནས་སོར་འབད་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_pop3.c:469
+#, c-format
+msgid ""
+"POP3 mailbox %s temp file error:\n"
+"%s"
+msgstr ""
+"པི་ཨོ་པི་༣ ཡིག་སྒྲོམ་ %s ཊེམཔི་ ཡིག་སྣོད་ཀྱི་འཛོལ་བ:\n"
+"%s"
+
+#: ../libbalsa/mailbox_pop3.c:494
+#, c-format
+msgid "POP3 mailbox %s error: %s\n"
+msgstr "པི་ཨོ་པི་༣ ཡིག་སྒྲོམ་ %s འཛོལ་བ: %s\n"
+
+#: ../libbalsa/mailbox_pop3.c:531
+#, c-format
+msgid "POP3 message %d oversized: %d kB - skipped."
+msgstr "པི་ཨོ་པི་༣ འཕྲིན་དོན་ %d ཚད་ལྷག་ཡོདཔ: %d kB - གོམ་འགྱོ།"
+
+#: ../libbalsa/mailbox_pop3.c:543
+#, c-format
+msgid "POP3 error: cannot open %s for writing."
+msgstr "པི་ཨོ་པི་༣འཛོལ་བ: འབྲི་ནིའི་དོན་ལུ་ %s ཁ་ཕྱེ་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_pop3.c:551
+#, c-format
+msgid "POP3 error: cannot close %s."
+msgstr "པི་ཨོ་པི་༣ འཛོལ་བ: %s ཁ་བསྡམ་མ་ཚུགས།"
+
+#: ../libbalsa/mailbox_pop3.c:584
+#, c-format
+msgid "POP3 error: %s."
+msgstr "པི་ཨོ་པི་༣ འཛོལ་བ: %s."
+
+#: ../libbalsa/message.c:617
+#: ../libbalsa/message.c:657
+#, c-format
+msgid "Mailbox (%s) is readonly: cannot change flags."
+msgstr "ཡིག་སྒྲོམ་(%s)འདི་ལྷག་ཙམ: ཟུར་རྟགས་ཚུ་བསྒྱུར་བཅོས་འབད་མི་ཚུགས།"
+
+#: ../libbalsa/misc.c:623
+msgid "west european"
+msgstr "ནུབ་ཡུ་རོ་པི་ཡཱན་"
+
+#: ../libbalsa/misc.c:625
+#: ../libbalsa/misc.c:659
+msgid "east european"
+msgstr "ཤར་ཡུ་རོ་པི་ཡཱན་"
+
+#: ../libbalsa/misc.c:627
+msgid "south european"
+msgstr "ལྷོ་ཡུ་རོ་པི་ཡཱན་"
+
+#: ../libbalsa/misc.c:629
+msgid "north european"
+msgstr "བྱང་ཡུ་རོ་པི་ཡཱན་"
+
+#: ../libbalsa/misc.c:631
+#: ../libbalsa/misc.c:661
+msgid "cyrillic"
+msgstr "སི་རི་ལིཀ།"
+
+#: ../libbalsa/misc.c:633
+#: ../libbalsa/misc.c:667
+msgid "arabic"
+msgstr "ཨ་ར་བིཀ།"
+
+#: ../libbalsa/misc.c:635
+#: ../libbalsa/misc.c:663
+msgid "greek"
+msgstr "གི་རིཀ།"
+
+#: ../libbalsa/misc.c:637
+#: ../libbalsa/misc.c:665
+msgid "hebrew"
+msgstr "ཧེབ་བིརིའུ།"
+
+#: ../libbalsa/misc.c:639
+msgid "turkish"
+msgstr "ཊར་ཀིཤ།"
+
+#: ../libbalsa/misc.c:641
+msgid "nordic"
+msgstr "ནོར་ཌིཀ།"
+
+#: ../libbalsa/misc.c:643
+msgid "thai"
+msgstr "ཐཱའི།"
+
+#: ../libbalsa/misc.c:645
+#: ../libbalsa/misc.c:669
+msgid "baltic"
+msgstr "བཱལ་ཊིཀ།"
+
+#: ../libbalsa/misc.c:647
+msgid "celtic"
+msgstr "སེལ་ཊིཀ།"
+
+#: ../libbalsa/misc.c:649
+msgid "west europe (euro)"
+msgstr "ནུབ་ཡུ་རོབ(ཡུ་རོ་)"
+
+#: ../libbalsa/misc.c:651
+msgid "russian"
+msgstr "ར་ཤི་ཡཱན་"
+
+#: ../libbalsa/misc.c:653
+msgid "ukrainian"
+msgstr "ཡུཀ་རའི་ནི་ཡཱན།"
+
+#: ../libbalsa/misc.c:655
+msgid "japanese"
+msgstr "ཇ་པ་ནིསི་"
+
+#: ../libbalsa/misc.c:657
+msgid "korean"
+msgstr "ཀོ་རི་ཡའི་"
+
+#: ../libbalsa/misc.c:982
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr "fcntl ལྡེ་མིག་བརྐྱབ་ནི་ལུ་དཔའ་བཅམ་ད་  དུས་ཡོལ་ལྷག་ཡོདཔ!"
+
+#: ../libbalsa/misc.c:989
+#, c-format
+msgid "Waiting for fcntl lock... %d"
+msgstr "fcntl ལྡེ་མིག་གི་དོན་ལུ་བསྒུག་དོ... %d"
+
+#: ../libbalsa/misc.c:1017
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr "ཕོལོཀ་ལྡེ་མིག་བརྐྱབ་ནི་འབདཝ་ད་  དུས་ཡོལ་ལྷག་ཡོདཔ!"
+
+#: ../libbalsa/misc.c:1024
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr "ཕོ་ལོཀ་དཔར་བཅམ་ནིའི་དོན་ལུ་ བསྒུག་དོ... %d"
+
+#: ../libbalsa/misc.c:1322
+#, c-format
+msgid "LDAP Directory for %s"
+msgstr "%sགི་དོན་ལུ་ཨེལ་ཌི་ཨེ་པི་སྣོད་ཐོ"
+
+#: ../libbalsa/rfc3156.c:86
+#, c-format
+msgid "Gpgme has been compiled without support for protocol %s."
+msgstr "གནད་སྤེལ་ལམ་ལུགས་ %s གི་དོན་ལུ་ རྒྱབ་སྐྱོར་མེད་པར་  ཇི་པི་ཇི་ཨེམ་ཨི་འདི་ཕྱོགས་སྒྲིག་འབད་ཡོདཔ།"
+
+#: ../libbalsa/rfc3156.c:91
+#, c-format
+msgid "Crypto engine %s is not installed properly."
+msgstr "ཀིརཔ་ཊོ་མ་འཕྲུལ་ %s འདི་ ཚུལ་ལྡན་སྦེ་གཞི་བཙུགས་མ་འབད་བས།"
+
+#: ../libbalsa/rfc3156.c:96
+#, c-format
+msgid "Crypto engine %s version %s is installed, but at least version %s is required."
+msgstr "ཀིརཔ་ཊོ་མ་འཕྲུལ་ %s ཐོན་རིམ་ %s འདི་གཞི་བཙུགས་འབད་ཡོདཔ་  དེ་འབདཝ་ད་  ཐོན་རིམ་ %s འདི་དགོས་མཁོ་ཡོད།"
+
+#: ../libbalsa/rfc3156.c:103
+#, c-format
+msgid "Unknown problem with engine for protocol %s."
+msgstr "གནད་སྤེལ་ལམ་ལུགས་ %s གི་དོན་ལུ་ མ་འཕྲུལ་དང་ཅིག་ཁར་མ་ཤེས་པའི་དཀའ་ངལ།"
+
+#: ../libbalsa/rfc3156.c:108
+#, c-format
+msgid "%s: could not retrieve crypto engine information: %s."
+msgstr "%s: ཀིརཔ་ཊོ་མ་འཕྲུལ་གྱི་བརྡ་དོན་སླར་འདྲེན་འབད་མ་ཚུགས: %s."
+
+#: ../libbalsa/rfc3156.c:112
+#, c-format
+msgid ""
+"\n"
+"Disable support for protocol %s."
+msgstr ""
+"\n"
+"གནད་སྤེལ་ལམ་ལུགས་ %s གི་དོན་ལུ་  རྒྱབ་སྐྱོར་ལྕོགས་མིན་བཟོ།"
+
+#: ../libbalsa/rfc3156.c:254
+#: ../libbalsa/rfc3156.c:259
+#: ../libbalsa/rfc3156.c:346
+#: ../libbalsa/rfc3156.c:351
+#: ../libbalsa/rfc3156.c:515
+#: ../libbalsa/rfc3156.c:520
+#: ../libbalsa/rfc3156.c:625
+#: ../libbalsa/rfc3156.c:630
+#: ../libbalsa/rfc3156.c:739
+#: ../libbalsa/rfc3156.c:744
+#: ../libbalsa/rfc3156.c:852
+#: ../libbalsa/rfc3156.c:857
+#: ../libbalsa/rfc3156.c:932
+#: ../libbalsa/rfc3156.c:937
+msgid "creating a gpgme context failed"
+msgstr "ཇི་པི་ཇི་ཨེམ་ཨི་ནང་དོན་ཅིག་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/rfc3156.c:272
+#: ../libbalsa/rfc3156.c:757
+msgid "Enter passphrase to unlock the secret key for signing"
+msgstr "མིང་རྟགས་བཀོད་ནིའི་དོན་ལུ་  གསང་བའི་ལྡེ་མིག་འདི་ལྡེ་མིག་ཕྱེ་ནི་ལུ་ ཆོག་ཚིག་ཐོ་བཀོད་འབད་"
+
+#: ../libbalsa/rfc3156.c:293
+#: ../libbalsa/rfc3156.c:297
+#: ../libbalsa/rfc3156.c:789
+msgid "signing failed"
+msgstr "མིང་རྟགས་བཀོད་མ་ཚུགས་"
+
+#: ../libbalsa/rfc3156.c:400
+#: ../libbalsa/rfc3156.c:405
+#: ../libbalsa/rfc3156.c:792
+msgid "encryption failed"
+msgstr "གསང་བཟོ་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/rfc3156.c:548
+#: ../libbalsa/rfc3156.c:553
+#: ../libbalsa/rfc3156.c:868
+#: ../libbalsa/rfc3156.c:874
+msgid "signature verification failed"
+msgstr "མིང་རྟགས་བདེན་སྦྱོར་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/rfc3156.c:642
+#: ../libbalsa/rfc3156.c:948
+msgid "Enter passphrase to decrypt message"
+msgstr "འཕྲིན་དོན་གསང་བཤོལ་འབད་ནི་ལུ་  ཆོག་ཚིག་ཐོ་བཀོད་འབད་"
+
+#: ../libbalsa/rfc3156.c:675
+#: ../libbalsa/rfc3156.c:680
+msgid "decryption failed"
+msgstr "གསང་བཤོལ་འབད་མ་ཚུགས་"
+
+#: ../libbalsa/rfc3156.c:785
+#: ../libbalsa/rfc3156.c:799
+msgid "signing and encryption failed"
+msgstr "མིང་རྟགས་བཀོད་ནི་དང་  གསང་བཟོ་འབད་ནི་འཐུས་ཤོར་བྱུང་ཡོདཔ་"
+
+#: ../libbalsa/rfc3156.c:802
+#, c-format
+msgid "signing failed: %s"
+msgstr "མིང་རྟགས་བཀོད་མ་ཚུགས: %s"
+
+#: ../libbalsa/rfc3156.c:805
+#, c-format
+msgid "encryption failed: %s"
+msgstr "གསང་བཟོ་འབད་མ་ཚུགས: %s"
+
+#: ../libbalsa/rfc3156.c:957
+#: ../libbalsa/rfc3156.c:964
+msgid "decryption and signature verification failed"
+msgstr "གསང་བཤོལ་དང་མིང་རྟགས་བཀོད་ནིའི་བདེན་སྦྱོར་འཐུས་ཤོར་བྱུང་ཡོདཔ་"
+
+#: ../libbalsa/rfc3156.c:995
+msgid "The signature is valid."
+msgstr "མིང་རྟགས་འདི་ནུས་ཅན་ཡོདཔ།"
+
+#: ../libbalsa/rfc3156.c:997
+msgid "The signature is valid but expired."
+msgstr "མིང་རྟགས་འདི་ནུས་ཅན་ཡོདཔ་  དེ་འབདཝ་ད་དུས་ཡོལ།"
+
+#: ../libbalsa/rfc3156.c:1000
+msgid "The signature is valid but the key used to verify the signature has expired."
+msgstr "མིང་རྟགས་འདི་ནུས་ཅན་ཡོདཔ་  དེ་འབདཝ་ད་  མིང་རྟགས་བདེན་སྦྱོར་འབད་བའི་ལྡེ་མིག་ལག་ལེན་འཐབ་མི་འདི་དུས་ཡོལ།"
+
+#: ../libbalsa/rfc3156.c:1003
+msgid "The signature is valid but the key used to verify the signature has been revoked."
+msgstr "མིང་རྟགས་འདི་ནུས་ཅན་ཡོདཔ་  དེ་འབདཝ་ད་  མིང་རྟགས་བདེན་སྦྱོར་འབད་མི་ལྡེ་མིག་འདི་ ཆ་མེད་གཏང་ནུག།"
+
+#: ../libbalsa/rfc3156.c:1006
+msgid "The signature is invalid."
+msgstr "མིང་རྟགས་འདི་ནུས་ཅན་མེད།"
+
+#: ../libbalsa/rfc3156.c:1009
+msgid "The signature could not be verified due to a missing key."
+msgstr "ལྡེ་མིག་བརླག་སྟོར་ཞུགས་ཡོདཔ་ལས་  མིང་རྟགས་འདི་བདེན་སྦྱོར་འབད་མ་ཚུགས།"
+
+#: ../libbalsa/rfc3156.c:1011
+msgid "This part is not a real PGP signature."
+msgstr "ཆ་ཤས་འདི་ པི་ཇི་པི་མིང་རྟགས་ངོ་མ་ཅིག་མེན།"
+
+#: ../libbalsa/rfc3156.c:1014
+msgid "The signature could not be verified due to an invalid crypto engine."
+msgstr "ནུས་ཅན་མེད་པའི་ཀིརཔ་ཊོ་མ་འཕྲུལ་ལུ་བརྟེན་ཏེ་  མིང་རྟགས་བདེན་སྦྱོར་འབད་མ་ཚུགས།"
+
+#: ../libbalsa/rfc3156.c:1017
+#: ../libbalsa/rfc3156.c:1759
+msgid "GnuPG is rebuilding the trust database and is currently unavailable."
+msgstr "ཇི་ཨེན་ཡུ་པི་ཇི་ དེ་གིས་  བློ་གཏད་གནས་སྡུད་གཞི་རྟེན་ལོག་བཟོ་དོ་ཡོདཔ་དང་  ད་ལྟོ་ཐོབ་ཚུགསཔ་མེད།"
+
+#: ../libbalsa/rfc3156.c:1020
+msgid "An error prevented the signature verification."
+msgstr "འཛོལ་བ་དེ་གིས་  མིང་རྟགས་བདེན་སྦྱོར་འདི་སྔོན་བཀག་འབད་ཡོདཔ།"
+
+#: ../libbalsa/rfc3156.c:1028
+msgid "The user ID is of unknown validity."
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་འདི་ མ་ཤེས་པའི་ནུས་ལྡན་དུས་ཚོད་ཨིན།"
+
+#: ../libbalsa/rfc3156.c:1030
+msgid "The validity of the user ID is undefined."
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་གི་ནུས་ལྡན་དུས་ཚོད་འདི་  ངོས་འཛིན་མ་འབད་བས།"
+
+#: ../libbalsa/rfc3156.c:1032
+msgid "The user ID is never valid."
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་འདི་མ་པ་ལས་རང་ནུས་ཅན་མེད།"
+
+#: ../libbalsa/rfc3156.c:1034
+msgid "The user ID is marginally valid."
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་འདི་  དུམ་གྲ་ཅིག་གིས་ནུས་ཅན་ཡོདཔ།"
+
+#: ../libbalsa/rfc3156.c:1036
+msgid "The user ID is fully valid."
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་འདི་ ཆ་ཚང་ནུས་ཅན་ཡོདཔ།"
+
+#: ../libbalsa/rfc3156.c:1038
+msgid "The user ID is ultimately valid."
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་འདི་ མཐར་ཐུག་ལུ་ནུས་ཅན་ཡོདཔ།"
+
+#: ../libbalsa/rfc3156.c:1040
+#: ../libbalsa/rfc3156.c:1287
+msgid "bad validity"
+msgstr "ནུས་ལྡན་དུས་ཚོད་བྱང་ཉེས་"
+
+#: ../libbalsa/rfc3156.c:1048
+msgid "PGP signature: "
+msgstr "པི་ཇི་པི་གི་མིང་རྟགས:"
+
+#: ../libbalsa/rfc3156.c:1050
+msgid "S/MIME signature: "
+msgstr "ཨེསི་/མ་ཡིམ་ མིང་རྟགས: "
+
+#: ../libbalsa/rfc3156.c:1052
+msgid "(unknown protocol) "
+msgstr "(མ་ཤེས་པའི་གནད་སྤེལ་ལམ་ལུགས) "
+
+#: ../libbalsa/rfc3156.c:1071
+#, c-format
+msgid ""
+"\n"
+"User ID: %s"
+msgstr ""
+"\n"
+"ལག་ལེན་པའི་ཨའི་ཌི: %s"
+
+#: ../libbalsa/rfc3156.c:1074
+#, c-format
+msgid ""
+"\n"
+"Signed by: %s"
+msgstr ""
+"\n"
+"མིང་རྟགས་བཀོད་པ: %s"
+
+#: ../libbalsa/rfc3156.c:1078
+#, c-format
+msgid ""
+"\n"
+"Mail address: %s"
+msgstr ""
+"\n"
+"ཡིག་འཕྲིན་ཁ་བྱང་: %s"
+
+#: ../libbalsa/rfc3156.c:1083
+#, c-format
+msgid ""
+"\n"
+"Signed on: %s"
+msgstr ""
+"\n"
+"མིང་རྟགས་བཀོད་ཡོདཔ: %s"
+
+#: ../libbalsa/rfc3156.c:1085
+#, c-format
+msgid ""
+"\n"
+"User ID validity: %s"
+msgstr ""
+"\n"
+"ལག་ལེན་པའི་ཨའི་ཌི་ནུས་ལྡན་དུས་ཚོད: %s"
+
+#: ../libbalsa/rfc3156.c:1089
+#, c-format
+msgid ""
+"\n"
+"Key owner trust: %s"
+msgstr ""
+"\n"
+"ལྡེ་མིག་བདག་པོའི་བློ་གཏད: %s"
+
+#: ../libbalsa/rfc3156.c:1093
+#, c-format
+msgid ""
+"\n"
+"Key fingerprint: %s"
+msgstr ""
+"\n"
+"ལྡེ་མིག་མཛུབ་རྗེས: %s"
+
+#: ../libbalsa/rfc3156.c:1098
+#, c-format
+msgid ""
+"\n"
+"Subkey created on: %s"
+msgstr ""
+"\n"
+"ཡན་ལག་ལྡེ་མིག་གསར་བསྐྲུན་འབད་ཡོདཔ: %s"
+
+#: ../libbalsa/rfc3156.c:1103
+#, c-format
+msgid ""
+"\n"
+"Subkey expires on: %s"
+msgstr ""
+"\n"
+"ཡན་ལག་ལྡེ་མིག་དུས་ཡོལ: %s"
+
+#: ../libbalsa/rfc3156.c:1112
+msgid " revoked"
+msgstr "ཆ་མེད་གཏང་གྲུབ་"
+
+#: ../libbalsa/rfc3156.c:1117
+msgid " expired"
+msgstr "དུས་ཡོལ་"
+
+#: ../libbalsa/rfc3156.c:1122
+msgid " disabled"
+msgstr "ལྕོགས་མིན་བཟོ་ཡོདཔ་"
+
+#: ../libbalsa/rfc3156.c:1127
+msgid " invalid"
+msgstr "ནུས་ཅན་མེདཔ་"
+
+#. ngettext: string begins with a single space, so no space after
+#. * the colon is correct punctuation (in English).
+#: ../libbalsa/rfc3156.c:1131
+#, c-format
+msgid ""
+"\n"
+"Subkey attribute:%s"
+msgid_plural ""
+"\n"
+"Subkey attributes:%s"
+msgstr[0] ""
+"\n"
+"ཡན་ལག་ལྡེ་མིག་ཁྱད་ཆོས:%s"
+msgstr[1] ""
+"\n"
+"ཡན་ལག་ལྡེ་མིག་ཁྱད་ཆོས་ཚུ:%s"
+
+#: ../libbalsa/rfc3156.c:1140
+#, c-format
+msgid ""
+"\n"
+"Issuer name: %s"
+msgstr ""
+"\n"
+"སྤྲོད་མིའི་མིང་: %s"
+
+#: ../libbalsa/rfc3156.c:1144
+#, c-format
+msgid ""
+"\n"
+"Issuer serial number: %s"
+msgstr ""
+"\n"
+"སྤྲོད་མིའི་ཨང་རིམ་གྱི་ཨང་གྲངས: %s"
+
+#: ../libbalsa/rfc3156.c:1147
+#, c-format
+msgid ""
+"\n"
+"Chain ID: %s"
+msgstr ""
+"\n"
+"རྒྱུན་ཐག་ཨའི་ཌི: %s"
+
+#: ../libbalsa/rfc3156.c:1194
+#, c-format
+msgid "Could not launch %s to get the public key %s."
+msgstr "མི་མང་ལྡེ་མིག་ %s ལེན་ནི་ལུ་ %s གསར་བཙུགས་འབད་མ་ཚུགས།"
+
+#: ../libbalsa/rfc3156.c:1244
+#, c-format
+msgid ""
+"Running gpg failed with return value %d:\n"
+"%s"
+msgstr ""
+"སླར་ལོག་གནས་གོང་ %d དང་ཅིག་ཁར་  ཇི་པི་ཇི་གཡོག་བཀོལ་མ་ཚུགས:\n"
+"%s"
+
+#: ../libbalsa/rfc3156.c:1251
+#, c-format
+msgid ""
+"Running gpg successful:\n"
+"%s"
+msgstr ""
+"ཇི་པི་ཇི་གཡོག་བཀོལ་ཚུགས་ཅི:\n"
+"%s"
+
+#: ../libbalsa/rfc3156.c:1275
+msgid "unknown"
+msgstr "མ་ཤེསཔ་"
+
+#: ../libbalsa/rfc3156.c:1277
+msgid "undefined"
+msgstr "ངོས་འཛིན་འབད་བཤོལ་"
+
+#: ../libbalsa/rfc3156.c:1279
+#: ../src/address-book-config.c:193
+msgid "never"
+msgstr "མ་པ་ལས་རང་"
+
+#: ../libbalsa/rfc3156.c:1281
+msgid "marginal"
+msgstr "དུམ་གྲ་ཅིག"
+
+#: ../libbalsa/rfc3156.c:1283
+msgid "full"
+msgstr "ཆ་ཚང་"
+
+#: ../libbalsa/rfc3156.c:1285
+msgid "ultimate"
+msgstr "མཐར་ཐུག་"
+
+#: ../libbalsa/rfc3156.c:1348
+msgid "User ID"
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་"
+
+#: ../libbalsa/rfc3156.c:1348
+msgid "Key ID"
+msgstr "ལྡེ་མིག་ཨའི་ཌི་"
+
+#: ../libbalsa/rfc3156.c:1348
+msgid "Length"
+msgstr "རིང་ཚད་"
+
+#: ../libbalsa/rfc3156.c:1348
+msgid "Validity"
+msgstr "ནུས་ལྡན་དུས་ཚོད་"
+
+#. FIXME: create dialog according to the Gnome HIG
+#: ../libbalsa/rfc3156.c:1392
+msgid "Select key"
+msgstr "ལྡེ་མིག་སེལ་འཐུ་འབད་"
+
+#: ../libbalsa/rfc3156.c:1403
+#, c-format
+msgid "Select the private key for the signer %s"
+msgstr "མིང་རྟགས་བཀོད་མི་ %s གི་དོན་ལུ་  སྒེར་སྡེའི་ལྡེ་མིག་སེལ་འཐུ་འབད་"
+
+#: ../libbalsa/rfc3156.c:1407
+#, c-format
+msgid "Select the public key for the recipient %s"
+msgstr "ཐོབ་མཁན་ %s གི་དོན་ལུ་  མི་མང་ལྡེ་མིག་སེལ་འཐུ་འབད་"
+
+#: ../libbalsa/rfc3156.c:1538
+#, c-format
+msgid "Insufficient trust for recipient %s"
+msgstr "ཐོབ་མཁན་ %s གི་དོན་ལུ་  མ་ལང་པའི་བློ་གཏད་"
+
+#: ../libbalsa/rfc3156.c:1540
+#, c-format
+msgid "The validity of the key with user ID \"%s\" is \"%s\"."
+msgstr "ལག་ལེན་པའི་ཨའི་ཌི་ \"%s\" is \"%s\"དང་ཅིག་ཁར་  ལྡེ་མིག་གི་ནུས་ཅན་དུས་ཚོད།"
+
+#: ../libbalsa/rfc3156.c:1551
+msgid "Use this key anyway?"
+msgstr "ག་ལས་སྐོར་རུང་ལྡེ་མིག་འདི་ལག་ལེན་འཐབ་ག?"
+
+#: ../libbalsa/rfc3156.c:1760
+msgid "Try again later."
+msgstr "ཤུལ་ལས་ལོག་འབད་ད།"
+
+#: ../libbalsa/send.c:243
+#: ../libbalsa/send.c:250
+msgid "Sending Mail..."
+msgstr "ཡིག་འཕྲིན་གཏང་དོ..."
+
+#: ../libbalsa/send.c:246
+#: ../src/main-window.c:2847
+msgid "_Hide"
+msgstr "སྦ་བཞག། (_H)"
+
+#: ../libbalsa/send.c:453
+#, c-format
+msgid "Copying message to outbox failed: %s"
+msgstr "འཕྲིན་དོན་འདི་ ཨའུཊི་བོགསི་ལུ་འདྲ་བཤུས་བརྐྱབ་མ་ཚུགས: %s"
+
+#: ../libbalsa/send.c:882
+#, c-format
+msgid ""
+"Could not send the message to %s:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+"འཕྲིན་དོན་འདི་ %sལུ་གཏང་མ་ཚུགས:\n"
+"%d: %s\n"
+"འཕྲིན་དོན་འདི་ཁྱོད་རའི་ཨའུཊི་བོགསི་ནང་ལུས་ཡོདཔ།\n"
+
+#: ../libbalsa/send.c:926
+#, c-format
+msgid "Saving sent message to %s failed: %s"
+msgstr "ཡིག་འཕྲིན་གཏང་ཟེར་མི་འདི་ %s ལུ་སྲུང་མ་ཚུགས: %s"
+
+#: ../libbalsa/send.c:945
+#: ../libbalsa/send.c:957
+#, c-format
+msgid ""
+"Relaying refused:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+"བརྒྱུད་སྤྲོད་འབད་མ་བཏུབ:\n"
+"%d: %s\n"
+"འཕྲིན་དོན་འདི་ཁྱོད་རའི་ཨའུཊི་བོགསི་ནང་ལུས་ཡོདཔ།\n"
+
+#: ../libbalsa/send.c:964
+msgid ""
+"Message submission problem, placing it into your outbox.\n"
+"System will attempt to resubmit the message until you delete it."
+msgstr ""
+"ཁྱོད་རའི་ཨའུཊི་བོགསི་ནང་ལུ་བཞགཔ་ད་  འཕྲིན་དོན་ཞུ་འབུལ་གྱི་དཀའ་ངལ། \n"
+"ཁྱོད་ཀྱིས་བཏོན་མ་གཏངམ་ཚུན་ཚོད་  རིམ་ལུགས་དེ་གིས་  འཕྲིན་དོན་འདི་ལོག་ཞུ་འབུལ་འབད་ནི་ལུ་དཔའ་བཅམ་ནུག།"
+
+#: ../libbalsa/send.c:994
+msgid "Connected to MTA"
+msgstr "ཨེམ་ཊི་ཨེ་ལུ་མཐུད་ནུག་"
+
+#. status code, mailbox
+#: ../libbalsa/send.c:1003
+#, c-format
+msgid "From: %d <%s>"
+msgstr "ལས: %d <%s>"
+
+#. mailbox, status code, status text
+#: ../libbalsa/send.c:1007
+#, c-format
+msgid "From %s: %d %s"
+msgstr "ལས %s: %d %s"
+
+#. status code, mailbox
+#: ../libbalsa/send.c:1018
+#, c-format
+msgid "To: %d <%s>"
+msgstr "ལུ: %d <%s>"
+
+#. mailbox, status code, status text
+#: ../libbalsa/send.c:1022
+#, c-format
+msgid "To %s: %d %s"
+msgstr "ལུ་ %s: %d %s"
+
+#: ../libbalsa/send.c:1060
+msgid "Disconnected"
+msgstr "མཐུད་ལམ་བཏོག་ཡོདཔ་"
+
+#: ../libbalsa/send.c:1333
+msgid ""
+"SMTP server refused connection.\n"
+"Check your internet connection."
+msgstr ""
+"ཨེསི་ཨེམ་ཊི་པི་སར་བར་དེ་གིས་  མཐུད་ལམ་འདི་ངོས་ལེན་མི་འབད། \n"
+"ཁྱོད་རའི་ཨིནི་ཊར་ནེཊི་མཐུད་ལམ་འདི་ཞིབ་དཔྱད་འབད།"
+
+#: ../libbalsa/send.c:1338
+msgid ""
+"SMTP server cannot be reached.\n"
+"Check your internet connection."
+msgstr ""
+"ཨེསི་ཨེམ་ཊི་པི་སར་བར་འདི་ལྷོད་མི་ཚུགས། \n"
+"ཁྱོད་རའི་ཨིན་ཊར་ནེཊི་མཐུད་ལམ་འདི་ཞིབ་དཔྱད་འབད།"
+
+#: ../libbalsa/send.c:1347
+msgid "Message left in Outbox (try again later)"
+msgstr "ཨའུཊི་བོགསི་ནང་འཕྲིན་དོན་ལུས་ཡོདཔ་ (ཤུལ་མ་ལོག་འབད་བརྩོལ་བསྐྱེད་ད)"
+
+#: ../libbalsa/send.c:1351
+#, c-format
+msgid ""
+"SMTP server problem (%d): %s\n"
+"Message is left in outbox."
+msgstr ""
+"ཨེསི་ཨེམ་ཊི་པི་སར་བར་གྱི་དཀའ་ངལ་ (%d): %s\n"
+"འཕྲིན་དོན་འདི་ཨའུཊི་བོགསི་ནང་ལུས་ཡོདཔ།"
+
+#: ../libbalsa/send.c:1656
+#, c-format
+msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
+msgstr "ཚིག་ཡིག་ཡིག་སྣོད་ `%s' གི་དོན་ལུ་  ཡིག་འབྲུའི་གཞི་སྒྲིག་གཏན་འབེབས་བཟོ་མ་ཚུགས; མ་ཡིམ་དབྱེ་བ་`%s'གཏང་དོ།"
+
+#: ../libbalsa/send.c:1860
+#, c-format
+msgid "Postponing message failed: %s"
+msgstr "བསྣར་བཞག་འཕྲིན་དོན་འཐུས་ཤོར་བྱུང་ཡོདཔ: %s"
+
+#: ../libbalsa/send.c:2003
+#: ../libbalsa/send.c:2085
+msgid "This message will not be encrypted for the BCC: recipient(s)."
+msgstr "འཕྲིན་དོན་འདི་བི་སི་སི་གི་དོན་ལུ་  གསང་བཟོ་འབདཝ་ཨིན: ཐོབ་མཁན་(ཚུ)"
+
+#. host, authentication method
+#: ../libbalsa/server.c:366
+#, c-format
+msgid "Logging in to %s using %s"
+msgstr "%s ལག་ལེན་འཐབ་ཐོག་ལས་  %s ལུ་ནང་བསྐྱོད་འབདཝ་ཨིན་"
+
+#: ../libbalsa/smtp-server.c:375
+#: ../src/mailbox-conf.c:204
+#: ../src/mailbox-conf.c:1393
+#: ../src/pref-manager.c:388
+#: ../src/pref-manager.c:3247
+msgid "Never"
+msgstr "མ་པ་ལས་རང་"
+
+#: ../libbalsa/smtp-server.c:376
+#: ../src/mailbox-conf.c:205
+#: ../src/mailbox-conf.c:1394
+msgid "If Possible"
+msgstr "སྲིད་པ་ཅིན་"
+
+#: ../libbalsa/smtp-server.c:377
+#: ../src/mailbox-conf.c:206
+msgid "Required"
+msgstr "དགོས་མཁོ་ཡོདཔ་"
+
+#: ../libbalsa/smtp-server.c:414
+#: ../src/folder-conf.c:105
+#, c-format
+msgid "Error displaying %s: %s\n"
+msgstr "%sབཀྲམ་སྟོན་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#: ../libbalsa/smtp-server.c:530
+msgid "SMTP Server"
+msgstr "ཨེསི་ཨེམ་ཊི་པི་སར་བར་"
+
+#: ../libbalsa/smtp-server.c:552
+msgid "_Descriptive Name:"
+msgstr "འགྲེལ་བཤད་འབད་བཏུབ་པའི་མིང་: (_D)"
+
+#. pop server
+#. imap server
+#: ../libbalsa/smtp-server.c:559
+#: ../src/folder-conf.c:361
+#: ../src/mailbox-conf.c:1145
+#: ../src/mailbox-conf.c:1248
+msgid "_Server:"
+msgstr "སར་བར: (_S)"
+
+#: ../libbalsa/smtp-server.c:566
+msgid "_User Name:"
+msgstr "ལག་ལེན་པའི་མིང་: (_U)"
+
+#: ../libbalsa/smtp-server.c:573
+msgid "_Pass Phrase:"
+msgstr "ཆོག་ཚིག: (_P)"
+
+#: ../libbalsa/smtp-server.c:582
+#: ../src/mailbox-conf.c:225
+msgid "Use _TLS:"
+msgstr "ཊི་ཨེལ་ཨེསི་ལག་ལེན་འཐབ: (_T)"
+
+#: ../libbalsa/smtp-server.c:587
+msgid "C_ertificate Pass Phrase:"
+msgstr "ལག་ཁྱེར་ཆོག་ཚིག: (_e)"
+
+#: ../libbalsa/smtp-server.c:599
+msgid "Sp_lit message larger than"
+msgstr "འཕྲིན་དོན་འདི་སྦོམ་སྦེ་གཤག་"
+
+#: ../libbalsa/smtp-server.c:605
+#: ../src/pref-manager.c:1826
+msgid "MB"
+msgstr "ཨེམ་བི་"
+
+#. Items
+#: ../libbalsa/source-viewer.c:47
+#: ../src/mailbox-node.c:1067
+#: ../src/main-window.c:763
+#: ../src/main-window.c:868
+msgid "_Close"
+msgstr "ཁ་བསྡམས། (_C)"
+
+#: ../libbalsa/source-viewer.c:48
+msgid "Close the window"
+msgstr "སྒོ་སྒྲིག་འདི་ཁ་བསྡམས་"
+
+#: ../libbalsa/source-viewer.c:49
+msgid "_Copy"
+msgstr "འདྲ་བཤུས་བརྐྱབ། (_C)"
+
+#: ../libbalsa/source-viewer.c:50
+msgid "Copy text"
+msgstr "ཚིག་ཡིག་འདྲ་བཤུས་བརྐྱབ་"
+
+#: ../libbalsa/source-viewer.c:51
+#: ../src/main-window.c:672
+msgid "_Select Text"
+msgstr "ཚིག་ཡིག་སེལ་འཐུ་འབད། (_S)"
+
+#: ../libbalsa/source-viewer.c:52
+#: ../src/main-window.c:673
+msgid "Select entire mail"
+msgstr "འཕྲིན་དོན་ཆ་ཚང་སེལ་འཐུ་འབད་"
+
+#: ../libbalsa/source-viewer.c:57
+msgid "_Escape Special Characters"
+msgstr "ཡིག་འབྲུ་དམིགས་བསལ་ཚུ་ཐར། (_E)"
+
+#: ../libbalsa/source-viewer.c:58
+msgid "Escape special and non-ASCII characters"
+msgstr "དམིགས་བསལ་དང་ མ་ཡིན་པའི་- ཨེ་ཨེསི་སི་ཨའི་ཨའི་ ཡིག་འབྲུ་ཚུ་ཐར།"
+
+#: ../libbalsa/source-viewer.c:154
+msgid "Mailbox closed"
+msgstr "ཡིག་སྒྲོམ་ཁ་བསྡམས་"
+
+#: ../libbalsa/source-viewer.c:257
+msgid "Message Source"
+msgstr "འཕྲིན་དོན་བྱུང་ཁུངས་"
+
+#: ../libinit_balsa/balsa-druid-page-defclient.c:58
+msgid "Use balsa as default email client?"
+msgstr "བཱལ་ས་འདི་  སྔོན་སྒྲིག་གློག་འཕྲིན་ཞབས་ཏོག་སྤྱོད་མི་སྦེ་ལག་ལེན་འཐབ་ག?"
+
+#: ../libinit_balsa/balsa-druid-page-defclient.c:62
+msgid "_Yes"
+msgstr "ཨིན། (_Y)"
+
+#: ../libinit_balsa/balsa-druid-page-defclient.c:64
+msgid "_No"
+msgstr "མེན། (_N)"
+
+#: ../libinit_balsa/balsa-druid-page-defclient.c:100
+msgid "Default Client"
+msgstr "སྔོན་སྒྲིག་ཞབས་ཏོག་སྤྱོད་མི་"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:43
+msgid "_Inbox:"
+msgstr "ནང་སྒྲོམ: (_I)"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:43
+msgid "_Outbox:"
+msgstr "ཨའུཊི་བོགསི: (_O)"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:43
+msgid "_Sentbox:"
+msgstr "གཏང་སྒྲོམ: (_S)"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:43
+msgid "_Draftbox:"
+msgstr "ཟིན་བྲིས་སྒྲོམ: (_D)"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:44
+msgid "_Trash:"
+msgstr "ཕྱགས་ཧོད: (_T)"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:71
+#, c-format
+msgid "The pathname \"%s\" must be specified canonically -- it must start with a '/'."
+msgstr "འགྲུལ་ལམ་མིང་ \"%s\"འདི་ ཀེ་ནོ་ནི་ཀཱལ་ལི་སྦེ་གསལ་བཀོད་འབད་དགོ -- དེ་ '/' དང་ཅིག་ཁར་འགོ་བཙུགས་དགོ།"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:135
+#, c-format
+msgid "The mailbox \"%s\" does not appear to be valid."
+msgstr "ཡིག་སྒྲོམ་ \"%s\" ནུས་ཅན་སྦེ་མི་བྱུང་།"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:188
+msgid ""
+"Please verify the locations of your default mail files.\n"
+"These will be created if necessary."
+msgstr ""
+"ཁྱོད་རའི་སྔོན་སྒྲིག་ཡིག་འཕྲིན་གྱི་ཡིག་སྣོད་ཚུ་གི་ གནས་ཁོངས་ཚུ་བདེན་སྦྱོར་འབད་གནང་། \n"
+"འདི་དགོས་མཁོ་ཅན་ཡོད་པ་ཅིན་རྐྱངམ་ཅིག་གསར་བསྐྲུན་འབདཝ་ཨིན།"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:246
+msgid "Mail Files"
+msgstr "ཡིག་འཕྲིན་ཡིག་སྣོད་ཚུ་"
+
+#: ../libinit_balsa/balsa-druid-page-directory.c:349
+#: ../libinit_balsa/balsa-druid-page-directory.c:383
+#, c-format
+msgid ""
+"Problem Creating Mailboxes\n"
+"%s"
+msgstr ""
+"ཡིག་འཕྲིན་སྒྲོམ་ཚུ་གསར་བསྐྲུན་འབདཝ་ད་གི་དཀའ་ངལ། \n"
+"%s"
+
+#: ../libinit_balsa/balsa-druid-page-finish.c:41
+msgid ""
+"You've successfully set up Balsa. Have fun!\n"
+"   -- The Balsa development team"
+msgstr ""
+"ཁྱོད་ཀྱིས་བཱལ་ས་འདི་ལེགས་ཤོམ་སྦེ་རང་གཞི་སྒྲིག་འབད་ནུག། སྤྲོ་བ་སྟོན། \n"
+"   -- བཱལ་ས་གོང་འཕེལ་གྱི་རུ་ཚན་"
+
+#: ../libinit_balsa/balsa-druid-page-finish.c:47
+msgid "All Done!"
+msgstr "ཆ་མཉམ་འབད་ཚར!"
+
+#: ../libinit_balsa/balsa-druid-page-finish.c:77
+msgid "GnomeCard Address Book"
+msgstr "ཇི་ནོམ་ཤོག་བྱང་གི་ཁ་བྱང་ཀི་དེབ་"
+
+#: ../libinit_balsa/balsa-druid-page-finish.c:84
+#: ../libinit_balsa/balsa-druid-page-finish.c:92
+#: ../src/ab-window.c:229
+msgid "Address Book"
+msgstr "ཁ་བྱང་ཀི་དེབ་"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:71
+msgid "The following settings are also needed (and you can find them later, if need be, in the Email application in the 'Preferences' and 'Identities' commands on the 'Tools' menu)"
+msgstr "འོག་གི་སྒྲིག་སྟངས་ཚུ་དགོཔ་ཨིན་ (དང་  ཤུལ་མ་ཁྱོད་ཀྱིས་དེ་ཚུ་ཐོབ་པ་ཅིན་  གློག་འཕྲིན་གློག་རིམ་ནང་  'དགའ་གདམ་ཚུ་ནང་' དང་ 'ངོ་རྟགས་ཚུ་ནང་' 'ལག་ཆས་ཚུ་' ནང་བརྡ་བཀོད་དགར་ཆག་ཚུ་ནང་དགོ་པ་ཅིན།)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:76
+msgid " Whoever provides your email account should be able to give you the following information (if you have a Network Administrator, they may already have set this up for you):"
+msgstr "ཁྱོད་རའི་གློག་འཕྲིན་རྩིས་ཐོ་ག་གིས་བྱིནམ་ཅིག་  ཁྱོད་ལུ་  འོག་གི་བརྡ་དོན་ཚུ་བྱིན་ཚུགསཔ་དགོ་  (ཁྱོད་ལུ་ཡོངས་འབྲེལ་བདག་སྐྱོང་པ་ཡོད་པ་ཅིན་ དེ་ཚུ་གི་ཁྱོད་ལུ་འདི་གཞི་སྒྲིག་འབད་དཔ་འོང་):"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:82
+msgid "Yes, remember it"
+msgstr "ཨིན་ སེམས་ཁར་བཞག་"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:82
+msgid "No, type it in every time"
+msgstr "མེན་  ཨ་རྟག་རང་ཡིག་དཔར་བརྐྱབ་"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:114
+msgid "Name of mail server for incoming _mail:"
+msgstr "ནང་འབྱོར་ཡིག་འཕྲིན་གྱི་དོན་ལུ་  ཡིག་འཕྲིན་སར་བར་གྱི་མིང་: ( _m)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:119
+msgid "_Type of mail server:"
+msgstr "ཡིག་འཕྲིན་སར་བར་གྱི་དབྱེ་བ: (_T)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:123
+msgid "Connect using _SSL:"
+msgstr "ཨེསི་ཨེསི་ཨེལ་ལག་ལེན་འཐབ་སྟེ་ མཐུད: (_S)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:126
+msgid "Your email _login name:"
+msgstr "ཁྱོད་རའི་གློག་འཕྲིན་ནང་བསྐྱོད་ཀྱི་མིང་: ( _l)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:129
+msgid "Your _password:"
+msgstr "ཁྱོད་རའི་ཆོག་ཡིག: (_p)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:137
+msgid "_SMTP Server:"
+msgstr "ཨེསི་ཨེམ་ཊི་པི་སར་བར: (_S)"
+
+#. 2.1
+#: ../libinit_balsa/balsa-druid-page-user.c:142
+msgid "Your real _name:"
+msgstr "ཁྱོད་རའི་མིང་ངོ་མ: ( _n)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:148
+msgid "Your _Email Address, for this email account:"
+msgstr "གློག་འཕྲིན་བརྩི་ཐོའི་དོན་ལུ་  ཁྱོད་རའི་གློག་འཕྲིན་གྱི་ཁ་བྱང་: (_E) "
+
+#: ../libinit_balsa/balsa-druid-page-user.c:153
+msgid "_Remember your password:"
+msgstr "ཁྱོད་རའི་ཆོག་ཡིག་སེམས་ཁར་བཞག: (_R)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:156
+msgid "_Refer to this account as:"
+msgstr "བརྩི་ཐོ་འདི་ལུ་གཞི་བསྟུན་འབད: (_R)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:164
+msgid "_Local mail directory:"
+msgstr "ཉེ་གནས་ཡིག་འཕྲིན་གྱི་སྣོད་ཐོ: (_L)"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:181
+msgid "User Settings"
+msgstr "ལག་ལེན་པའི་སྒྲིག་སྟངས་ཚུ་"
+
+#: ../libinit_balsa/balsa-druid-page-user.c:333
+#, c-format
+msgid ""
+"Local Mail Problem\n"
+"%s"
+msgstr ""
+"ཉེ་གནས་ཡིག་འཕྲིན་གྱི་དཀའ་ངལ་ཚུ\n"
+"%s"
+
+#: ../libinit_balsa/balsa-druid-page-welcome.c:32
+msgid "Welcome to Balsa!"
+msgstr "བཱལ་ས་ལུ་བྱོན་པ་ལེགས་སོ!"
+
+#: ../libinit_balsa/balsa-druid-page-welcome.c:35
+msgid ""
+"Before you can send or receive email:\n"
+"\n"
+"-- either you should already have Internet access and an email account, provided by an Internet Service Provider, and you should have made that Internet connection on your computer\n"
+"\n"
+"-- or your Network Administrator at your place of work/study/similar may have set up your computer to connect to the network."
+msgstr ""
+"ཁྱོད་ཀྱིས་ཡིག་འཕྲིན་འདི་མ་ལེན་པའི་ཧེ་མ: \n"
+"\n"
+"-- ཡང་ན་ཁྱོད་ལུ་ཧེ་མ་ལས་རང་  ཨིན་ཊར་ནེཊི་འཛུལ་སྤྱོད་ཡོདཔ་དང་  གློག་འཕྲིན་ཁ་བྱང་ཡོདཔ་  དེ་ཡང་  ཨིན་ཊར་ནེཊི་ཞབས་ཏོག་སྤྱོད་མི་བྱིན་མི་དེ་གིས་བྱིན་ཡོདཔ་དང་  འ་ནི་ཨིན་ཊར་ནེཊི་མཐུད་ལམ་འདི་  ཁྱོད་རའི་གློག་རིག་གུ་བཟོ་ཡོདཔ་དགོ་ \n"
+"\n"
+"-- ཡང་ན་  ཁྱོད་རའི་ཡོངས་འབྲེལ་བདག་སྐྱོང་པ་འདི་  ཁྱོད་རའི་  གནས་ས་ལཱ་/ལྷག་ནི་/ གཅིག་པ་དེ་ཚུ་གིས་  ཁྱོད་རའི་གློག་རིག་འདི་ཡོངས་འབྲེལ་ལུ་མཐུད་ནི་ལུ་གཞི་སྒྲིག་འབད་དེ་ཡོད།"
+
+#: ../libinit_balsa/balsa-initdruid.c:81
+msgid ""
+"This will exit Balsa.\n"
+"Do you really want to do this?"
+msgstr ""
+"འདི་གིས་བཱལ་ས་ཕྱིར་ཐོནམ་ཨིན། \n"
+"འདི་ཁྱོད་ཀྱིས་ངེས་བདེན་རང་འབད་ནི་ཨིན་ན?"
+
+#: ../libinit_balsa/helper.c:66
+#, c-format
+msgid "Error loading %s: %s\n"
+msgstr "%sམངོན་གསལ་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#: ../libinit_balsa/helper.c:202
+#, c-format
+msgid "The path %s must be relative to the filesystem root (start with /)."
+msgstr "འགྲུལ་ལམ་ %s འདི་ ཡིག་སྣོད་རིམ་ལུགས་ཀྱི་རྩ་བ་ལུ་ ( / དང་བཅས་འགོ་བཙུགས་) འབྲེལ་བ་ཡོདཔ་ཨིན།"
+
+#: ../libinit_balsa/helper.c:215
+#: ../libinit_balsa/helper.c:239
+#, c-format
+msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
+msgstr "སྣོད་ཐོ་ཅིག་གསར་བསྐྲུན་འབད་མ་ཚུགས: mkdir() འདི་ འགྲུལ་ལམ་ \"%s\" གུ་འཐུས་ཤོར་བྱུང་ཡོདཔ།"
+
+#: ../libinit_balsa/helper.c:225
+#: ../libinit_balsa/helper.c:248
+#, c-format
+msgid "The file with pathname \"%s\" is not a directory."
+msgstr "འགྲུལ་ལམ་\"%s\" དང་ཅིག་ཁར་ཡོད་པའི་ཡིག་སྣོད་འདི་སྣོད་ཐོ་ཅིག་མེན།"
+
+#: ../libinit_balsa/init_balsa.c:48
+msgid "Configure Balsa"
+msgstr "བཱལ་ས་རིམ་སྒྲིག་འབད་"
+
+#: ../sounds/balsa.soundlist.in.h:1
+msgid "Balsa E-mail reader"
+msgstr "བཱལ་ས་གློག་འཕྲིན་ལྷག་བྱེད་"
+
+#: ../sounds/balsa.soundlist.in.h:2
+msgid "New mail notification"
+msgstr "ཡིག་འཕྲིན་བརྡ་བསྐུལ་གསརཔ་"
+
+#: ../sounds/balsa.soundlist.in.h:3
+msgid "Program startup"
+msgstr "ལས་རིམ་འགོ་བཙུགས་"
+
+#: ../src/ab-main.c:199
+#: ../src/ab-window.c:680
+msgid " address book: "
+msgstr "ཀི་དེབ་ཁ་བྱང་:"
+
+#: ../src/ab-main.c:470
+#: ../src/address-book-config.c:895
+msgid "VCard Address Book (GnomeCard)"
+msgstr "ཝི་ཤོག་བྱང་གི་ཀི་དེབ་ཁ་བྱང་  (ཇི་ནོམ་ཤོག་བྱང་)"
+
+#: ../src/ab-main.c:472
+#: ../src/address-book-config.c:901
+msgid "External query (a program)"
+msgstr "ཕྱིའི་འདྲ་དཔྱད་(ལས་རིམ་ཅིག)"
+
+#: ../src/ab-main.c:474
+#: ../src/address-book-config.c:906
+msgid "LDIF Address Book"
+msgstr "ཨེལ་ཌི་ཨའི་ཨེཕ་ཁ་བྱང་ཀི་དེབ་"
+
+#: ../src/ab-main.c:477
+#: ../src/address-book-config.c:912
+msgid "LDAP Address Book"
+msgstr "ཨེལ་ཌི་ཨེ་པི་ཁ་བྱང་ཀི་དེབ་"
+
+#: ../src/ab-main.c:481
+#: ../src/address-book-config.c:509
+#: ../src/address-book-config.c:919
+msgid "GPE Address Book"
+msgstr "ཇི་པི་ཨི་ཁ་བྱང་ཀི་དེབ་"
+
+#: ../src/ab-main.c:705
+msgid "_Name"
+msgstr "མིང་། (_N)"
+
+#: ../src/ab-main.c:855
+msgid "F_ilter:"
+msgstr "ཚགས་མ: (_i)"
+
+#: ../src/ab-window.c:170
+#: ../src/filter-edit-dialog.c:200
+#: ../src/filter-export-dialog.c:90
+#: ../src/filter-run-dialog.c:221
+#: ../src/filter-run-dialog.c:295
+msgid "Name"
+msgstr "མིང་"
+
+#: ../src/ab-window.c:178
+msgid "E-Mail Address"
+msgstr "གློག་འཕྲིན་ཁ་བྱང་"
+
+#. -- table column 1 --
+#. Entry widget for finding an address
+#: ../src/ab-window.c:279
+msgid "_Search for Name:"
+msgstr "མིང་གི་དོན་ལུ་འཚོལ་ཞིབ: (_S)"
+
+#: ../src/ab-window.c:314
+msgid "Run Editor"
+msgstr "ཞུན་དགཔ་གཡོག་བཀལ་"
+
+#: ../src/ab-window.c:321
+msgid "_Re-Import"
+msgstr "ལོག་-ནང་འདྲེན་འབད། (_R)"
+
+#. -- table column 3 --
+#. label for selected addresses in compose mode
+#: ../src/ab-window.c:353
+msgid "Send-To"
+msgstr "གཏང་-ཡོདཔ་"
+
+#. mode switching stuff
+#: ../src/ab-window.c:368
+msgid "Treat multiple addresses as:"
+msgstr "སྣ་མང་ཁ་བྱང་སྦེ་བརྩི་འཇོག་འབད:"
+
+#: ../src/ab-window.c:372
+msgid "alternative addresses for the same person"
+msgstr "གང་ཟག་གཅིག་པའི་དོན་ལུ་  ཐབས་གཞན་ཁ་བྱང་ཚུ་"
+
+#: ../src/ab-window.c:377
+msgid "a distribution list"
+msgstr "བཀྲམ་སྤེལ་འབད་བའི་ཐོ་ཡིག་ཅིག"
+
+#: ../src/ab-window.c:709
+#, c-format
+msgid ""
+"Error opening address book '%s':\n"
+"%s"
+msgstr ""
+"'%s'ཁ་བྱང་ཀི་དེབ་ཁ་ཕྱེཝ་ད་གི་འཛོལ་བ:\n"
+"%s"
+
+#: ../src/address-book-config.c:170
+msgid "Suggest complete addresses:"
+msgstr "ཁ་བྱང་ཆ་ཚང་བསམ་འཆར་བཀོད:"
+
+#: ../src/address-book-config.c:176
+msgid "as I type"
+msgstr "ང་གི་ཡིག་དཔར་བརྐྱབ་ད་"
+
+#: ../src/address-book-config.c:185
+msgid "when I hit the Escape key"
+msgstr "ང་གི་ཐར་བའི་ལྡེ་མིག་ཨེབ་ད་"
+
+#: ../src/address-book-config.c:222
+#: ../src/address-book-config.c:316
+msgid "Modify Address Book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ལེགས་བཅོས་འབད་"
+
+#: ../src/address-book-config.c:226
+#: ../src/address-book-config.c:320
+msgid "Add Address Book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ཁ་སྐོང་བརྐྱབ་"
+
+#. mailbox name
+#. may be NULL
+#. mailbox name
+#: ../src/address-book-config.c:242
+#: ../src/address-book-config.c:355
+#: ../src/address-book-config.c:442
+#: ../src/address-book-config.c:507
+msgid "A_ddress Book Name:"
+msgstr "ཁ་བྱང་ཀི་དེབ་ཀྱི་མིང་: (_d)"
+
+#: ../src/address-book-config.c:360
+msgid "Load program location:"
+msgstr "ལས་རིམ་གནས་ཁོངས་མངོན་གསལ་འབད:"
+
+#: ../src/address-book-config.c:367
+#: ../src/address-book-config.c:372
+msgid "Select load program for address book"
+msgstr "ཁ་བྱང་ཀི་དེབ་དོན་ལུ་  མངོན་གསལ་ལས་རིམ་སེལ་འཐུ་འབད་"
+
+#: ../src/address-book-config.c:379
+msgid "Save program location:"
+msgstr "ལས་རིམ་གནས་ཁོངས་སྲུང་:"
+
+#: ../src/address-book-config.c:386
+#: ../src/address-book-config.c:391
+msgid "Select save program for address book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ཀྱི་དོན་ལུ་  ལས་རིམ་སྲུང་སེལ་འཐུ་འབད་"
+
+#: ../src/address-book-config.c:447
+msgid "_Host Name"
+msgstr "ཧོསཊི་མིང་། (_H)"
+
+#: ../src/address-book-config.c:452
+msgid "Base Domain _Name"
+msgstr "གཞི་རྟེན་ཌོ་མེན་མིང་། (_N)"
+
+#: ../src/address-book-config.c:457
+msgid "_User Name (Bind DN)"
+msgstr "ལག་ལེན་པའི་མིང་(ཌི་ཨེན་བསྡམས་)(_U)"
+
+#: ../src/address-book-config.c:462
+msgid "_Password"
+msgstr "ཆོག་ཡིག། (_P)"
+
+#: ../src/address-book-config.c:468
+msgid "_User Address Book DN"
+msgstr "ལག་ལེན་པའི་ཁ་བྱང་ཀི་དེབ་ ཌི་ཨེན། (_U)"
+
+#: ../src/address-book-config.c:474
+msgid "Enable _TLS"
+msgstr "ཊི་ཨེལ་ཨེསི་ལྕོགས་ཅན་བཟོ། (_T)"
+
+#: ../src/address-book-config.c:529
+#: ../src/main-window.c:4178
+#, c-format
+msgid "Error displaying help: %s\n"
+msgstr "གྲོགས་རམ་བཀྲམ་སྟོན་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#: ../src/address-book-config.c:630
+msgid "No path found.  Do you want to give one?"
+msgstr "འགྲུལ་ལམ་ཐོབ་མ་ཚུགས། ཁྱོད་ཀྱིས་གཅིག་བྱིན་ནི་ཨིན་ན?"
+
+#: ../src/address-book-config.c:636
+#, c-format
+msgid "The address book file path \"%s\" is not correct. %s"
+msgstr "ཁ་བྱང་ཀི་དེབ་ཀྱི་ཡིག་སྣོད་འགྲུལ་ལམ་ \"%s\" འདི་ནོར་བ་འདུག། %s"
+
+#: ../src/address-book-config.c:639
+#, c-format
+msgid "The load program path \"%s\" is not correct. %s"
+msgstr "མངོན་གསལ་རལས་རིམ་གྱི་འགྲུལ་ལམ་  \"%s\" འདི་ནོར་བ་འདུག། %s"
+
+#: ../src/address-book-config.c:642
+#, c-format
+msgid "The save program path \"%s\" is not correct. %s"
+msgstr "སྲུང་བཞག་ལས་རིམ་འགྲུལ་ལམ་ \"%s\" འདི་ནོར་བ་འདུག། %s"
+
+#: ../src/address-book-config.c:645
+#, c-format
+msgid "The path \"%s\" is not correct. %s"
+msgstr "འགྲུལ་ལམ་  \"%s\" འདི་ནོར་བ་འདུག། %s"
+
+#: ../src/address-book-config.c:648
+msgid "Do you want to correct the path?"
+msgstr "འགྲུལ་ལམ་འདི་ཁྱོད་ཀྱིས་ནོར་བཅོས་འབད་ནི་ཨིན་ན?"
+
+#: ../src/balsa-app.c:69
+#, c-format
+msgid ""
+"Opening remote mailbox %s.\n"
+"The _password for %s@%s:"
+msgstr ""
+"ཐག་རིང་གི་ཡིག་སྒྲོམ་ཁ་ཕྱེ་དོ་ %s.\n"
+"%sགི་དོན་ལུ་ཆོག་ཡིག@%s:(_p)"
+
+#: ../src/balsa-app.c:74
+#, c-format
+msgid "Mailbox _password for %s@%s:"
+msgstr "%sགི་དོན་ལུ་ཡིག་སྒྲོམ་ཆོག་ཡིག@%s: (_p)"
+
+#: ../src/balsa-app.c:77
+msgid "Password needed"
+msgstr "ཆོག་ཡིག་དགོཔ་ཨིན་"
+
+#: ../src/balsa-app.c:91
+#: ../src/folder-conf.c:384
+msgid "_Remember password"
+msgstr "ཆོག་ཡིག་སེམས་ཁར་བཞག། (_R)"
+
+#: ../src/balsa-app.c:548
+#, c-format
+msgid "Couldn't open mailbox \"%s\""
+msgstr "ཡིག་སྒྲོམ་ \"%s\" ཁ་ཕྱེ་མ་ཚུགས་"
+
+#: ../src/balsa-index.c:364
+msgid "From"
+msgstr "ལས་"
+
+#: ../src/balsa-index.c:377
+#: ../src/pref-manager.c:402
+msgid "Subject"
+msgstr "དོན་ཚན་"
+
+#: ../src/balsa-index.c:391
+#: ../src/pref-manager.c:403
+msgid "Date"
+msgstr "ཚེས་གྲངས་"
+
+#: ../src/balsa-index.c:403
+#: ../src/pref-manager.c:404
+#: ../src/sendmsg-window.c:2954
+msgid "Size"
+msgstr "ཚད་"
+
+#: ../src/balsa-index.c:1069
+#, c-format
+msgid "Opening mailbox %s. Please wait..."
+msgstr "ཡིག་སྒྲོམ་ %s ཁ་ཕྱེ་དོ། བསྒུག་གནང་..."
+
+#. FIXME: this is hack!
+#: ../src/balsa-index.c:1112
+msgid "To"
+msgstr "ལུ་"
+
+#: ../src/balsa-index.c:1737
+#, c-format
+msgid "Move to Trash failed: %s"
+msgstr "ཕྱགས་ཧོད་ལུ་སྤོ་བཤུད་འབད་མ་ཚུགས: %s"
+
+#. R
+#: ../src/balsa-index.c:1892
+#: ../src/main-window.c:595
+#: ../src/main-window.c:1064
+#: ../src/message-window.c:161
+msgid "_Reply..."
+msgstr "ལན་གསལ... (_R)"
+
+#: ../src/balsa-index.c:1894
+msgid "Reply To _All..."
+msgstr "ཆ་མཉམ་ལུ་ལན་གསལ་འབད... (_A)"
+
+#: ../src/balsa-index.c:1896
+msgid "Reply To _Group..."
+msgstr "སྡེ་ཚན་ལུ་ལན་གསལ་འབད... (_G)"
+
+#: ../src/balsa-index.c:1898
+msgid "_Forward Attached..."
+msgstr "གདོང་བསྐྱོད་མཉམ་སྦྲགས... (_F)"
+
+#: ../src/balsa-index.c:1900
+msgid "Forward _Inline..."
+msgstr "ནང་ཐིག་གདོང་བསྐྱོད་འབད... (_I)"
+
+#: ../src/balsa-index.c:1902
+#: ../src/main-window.c:634
+msgid "_Pipe through..."
+msgstr "རྒྱུད་དུང་ལས་བརྒྱུད་དེ... (_P)"
+
+#: ../src/balsa-index.c:1904
+#: ../src/main-window.c:693
+#: ../src/main-window.c:1048
+msgid "_Store Address..."
+msgstr "ཁ་བྱང་གསོག་འཇོག་འབད... (_S)"
+
+#: ../src/balsa-index.c:1919
+#: ../src/filter-edit-dialog.c:223
+#: ../src/mailbox-node.c:1059
+#: ../src/mailbox-node.c:1075
+#: ../src/pref-manager.c:1629
+#: ../src/pref-manager.c:1720
+#: ../src/pref-manager.c:2790
+msgid "_Delete"
+msgstr "བཏོན་གཏང་། (_D)"
+
+#: ../src/balsa-index.c:1924
+msgid "_Undelete"
+msgstr "བཏོན་བཤོལ། (_U)"
+
+#: ../src/balsa-index.c:1929
+msgid "Move To _Trash"
+msgstr "ཕྱགས་ཧོད་ལུ་སྤོ་བཤུད་འབད། ( _T)"
+
+#: ../src/balsa-index.c:1933
+msgid "T_oggle"
+msgstr "སོར་སྟོན། (_o)"
+
+#: ../src/balsa-index.c:1937
+#: ../src/main-window.c:334
+#: ../src/main-window.c:363
+msgid "_Flagged"
+msgstr "ཟུར་རྟགས་བཀལ་ཡོདཔ། (_F)"
+
+#: ../src/balsa-index.c:1940
+msgid "_Unread"
+msgstr "མ་ལྷགཔ། (_U)"
+
+#: ../src/balsa-index.c:1948
+msgid "_Move to"
+msgstr "སྤོ་བཤུད་འབད། (_M)"
+
+#: ../src/balsa-index.c:1956
+msgid "_View Source"
+msgstr "བྱུང་ཁུངས་མཐོང་སྣང་། (_V)"
+
+#: ../src/balsa-index.c:2165
+#, c-format
+msgid "Failed to copy %d message to mailbox \"%s\": %s"
+msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
+msgstr[0] "%d འཕྲིན་དོན་འདི་ ཡིག་སྒྲོམ་ \"%s\" ལུ་འདྲ་བཤུས་བརྐྱབ་མ་ཚུགས: %s"
+msgstr[1] "%d འཕྲིན་དོན་ཚུ་ ཡིག་སྒྲོམ་ \"%s\" ལུ་འདྲ་བཤུས་བརྐྱབ་མ་ཚུགས: %s"
+
+#: ../src/balsa-index.c:2179
+#, c-format
+msgid "Copied to \"%s\"."
+msgstr "\"%s\" ལུ་འདྲ་བཤུས་བརྐྱབ་ཡོདཔ།"
+
+#: ../src/balsa-index.c:2180
+#, c-format
+msgid "Moved to \"%s\"."
+msgstr "\"%s\" ལུ་སྤོ་བཤུད་འབད་ཡོདཔ།"
+
+#: ../src/balsa-index.c:2303
+#, c-format
+msgid "Committing mailbox %s failed."
+msgstr "ཡིག་སྒྲོམ་ %s འབྲི་མ་ཚུགས།"
+
+#: ../src/balsa-index.c:2476
+msgid "Pipe message through a program"
+msgstr "ལས་རིམ་ལས་བརྒྱུད་དེ་ རྒྱུད་དུང་འཕྲིན་དོན་"
+
+#: ../src/balsa-index.c:2479
+msgid "_Run"
+msgstr "གཡོག་བཀོལ། (_R)"
+
+#: ../src/balsa-index.c:2488
+msgid "Specify the program to run:"
+msgstr "ལས་རིམ་གཡོག་བཀོལ་ནི་ལུ་གསལ་བཀོད་འབད:"
+
+#: ../src/balsa-mblist.c:357
+msgid "Mailbox"
+msgstr "ཡིག་སྒྲོམ་"
+
+#: ../src/balsa-mblist.c:1177
+#: ../src/balsa-mblist.c:1213
+msgid "Failed to find mailbox"
+msgstr "ཡིག་སྒྲོམ་ཐོབ་མ་ཚུགས་"
+
+#: ../src/balsa-mblist.c:1840
+msgid "_Other..."
+msgstr "གཞན... (_O)"
+
+#: ../src/balsa-mblist.c:1908
+msgid "Choose destination folder"
+msgstr "འགྲོ་ཡུལ་སྣོད་འཛིན་གདམ་ཁ་བརྐྱབ་"
+
+#: ../src/balsa-mblist.c:2131
+#: ../src/balsa-mblist.c:2134
+msgid "Other..."
+msgstr "གཞན..."
+
+#. xgettext: this is the first part of the message
+#. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
+#: ../src/balsa-mblist.c:2299
+#, c-format
+msgid "Shown mailbox: %s"
+msgstr "སྟོན་ཏེ་ཡོད་པའི་ཡིག་སྒྲོམ: %s"
+
+#: ../src/balsa-mblist.c:2304
+#, c-format
+msgid " with %d message"
+msgid_plural " with %d messages"
+msgstr[0] "%d འཕྲིན་དོན་དང་བཅས་"
+msgstr[1] "%d འཕྲིན་དོན་ཚུ་དང་བཅས་"
+
+#: ../src/balsa-mblist.c:2311
+#, c-format
+msgid ", %d new"
+msgid_plural ", %d new"
+msgstr[0] ", %d གསརཔ་"
+msgstr[1] ", %d གསརཔ་"
+
+#: ../src/balsa-mblist.c:2318
+#, c-format
+msgid ", %d hidden"
+msgid_plural ", %d hidden"
+msgstr[0] ", %d སྦ་བཞག་ཡོདཔ་"
+msgstr[1] ", %d སྦ་བཞག་ཡོདཔ་"
+
+#: ../src/balsa-message.c:290
+msgid "Check cryptographic signature"
+msgstr "ཀིརཔ་ཊོ་ཚད་རིས་ཀྱི་མིང་རྟགས་ཞིབ་དཔྱད་འབད་"
+
+#: ../src/balsa-message.c:311
+msgid "Select message part to display"
+msgstr "བཀྲམ་སྟོན་འབད་ནི་ལུ་འཕྲིན་དོན་ཆ་ཤས་སེལ་འཐུ་འབད་"
+
+#: ../src/balsa-message.c:387
+msgid "Content"
+msgstr "ནང་དོན་"
+
+#: ../src/balsa-message.c:465
+msgid "Message parts"
+msgstr "འཕྲིན་དོན་ཆ་ཤས་ཚུ་"
+
+#: ../src/balsa-message.c:647
+msgid "Save selected as..."
+msgstr "དེ་སྦེ་སེལ་འཐུ་འབད་ཡོདཔ་སྲུང་..."
+
+#: ../src/balsa-message.c:654
+msgid "Save selected to folder..."
+msgstr "སྣོད་འཛིན་ལུ་སེལ་འཐུ་འབད་ཡོདཔ་སྲུང་..."
+
+#: ../src/balsa-message.c:758
+msgid "(No sender)"
+msgstr "(གཏང་མི་མེད)"
+
+#: ../src/balsa-message.c:823
+#, c-format
+msgid "Could not access message %ld in mailbox \"%s\"."
+msgstr "འཕྲིན་དོན་ %ld ཡིག་སྒྲོམ་ \"%s\" ནང་ལུ་འཛུལ་སྤྱོད་འབད་མ་ཚུགས།"
+
+#: ../src/balsa-message.c:998
+msgid "mixed parts"
+msgstr "སླ་བསྲེ་ཡོད་པའི་ཆ་ཤས་ཚུ་"
+
+#: ../src/balsa-message.c:1000
+msgid "alternative parts"
+msgstr "ཐབས་གཞན་ཆ་ཤས་ཚུ་"
+
+#: ../src/balsa-message.c:1002
+msgid "signed parts"
+msgstr "མིང་རྟགས་བཀོད་ཡོད་པའི་ཆ་ཤས་ཚུ་"
+
+#: ../src/balsa-message.c:1004
+msgid "encrypted parts"
+msgstr "གསང་བཟོས་འབད་ཡོད་པའི་ཆ་ཤས་ཚུ་"
+
+#: ../src/balsa-message.c:1006
+msgid "rfc822 message"
+msgstr "rfc822 འཕྲིན་དོན་"
+
+#: ../src/balsa-message.c:1008
+#, c-format
+msgid "\"%s\" parts"
+msgstr "\"%s\" ཆ་ཤས་ཚུ་"
+
+#: ../src/balsa-message.c:1056
+msgid "force inline for all parts"
+msgstr "ཆ་ཤས་ཆ་མཉམ་གྱི་དོན་ལུ་གྱལ་རིམ་ནང་བང་བཙོང་འབད་"
+
+#: ../src/balsa-message.c:1089
+#, c-format
+msgid "rfc822 message (from %s, subject \"%s\")"
+msgstr "rfc822 འཕྲིན་དོན་ (ལས་ %s, དོན་ཚན་\"%s\")"
+
+#: ../src/balsa-message.c:1100
+msgid "complete message"
+msgstr "འཕྲིན་དོན་མཇུག་བསྡུ་"
+
+#: ../src/balsa-message.c:1117
+#, c-format
+msgid "part %s: %s (file %s)"
+msgstr "ཆ་ཤས་ %s: %s (ཡིག་སྣོད་ %s)"
+
+#: ../src/balsa-message.c:1128
+#, c-format
+msgid "part %s: %s"
+msgstr "ཆ་ཤས %s: %s"
+
+#: ../src/balsa-message.c:1143
+msgid "encrypted: "
+msgstr "གསང་བཟོས:"
+
+#: ../src/balsa-message.c:1297
+#: ../src/balsa-mime-widget-text.c:507
+#: ../src/balsa-mime-widget-text.c:897
+msgid "Save..."
+msgstr "སྲུང་..."
+
+#: ../src/balsa-message.c:1373
+msgid "Select folder for saving selected parts"
+msgstr "སེལ་འཐུ་འབད་དེ་ཡོད་པའི་ཆ་ཤས་ཚུ་སྲུང་ནིའི་དོན་ལུ་  སྣོད་འཛིན་སེལ་འཐུ་འབད་"
+
+#: ../src/balsa-message.c:1411
+#, c-format
+msgid "%s message part"
+msgstr "%s འཕྲིན་དོན་ཆ་ཤས་"
+
+#: ../src/balsa-message.c:1439
+#: ../src/balsa-mime-widget-callbacks.c:202
+#, c-format
+msgid "Could not save %s: %s"
+msgstr "%sསྲུང་མ་ཚུགས: %s"
+
+#: ../src/balsa-message.c:2161
+#, c-format
+msgid ""
+"The sender of this mail, %s, requested \n"
+"a Message Disposition Notification(MDN) to be returned to `%s'.\n"
+"Do you want to send this notification?"
+msgstr ""
+"ཡིག་འཕྲིན་གཏང་མི་འདི་ %s ཞུ་བ་འབད་ཡོདཔ་ \n"
+"འཕྲིན་དོན་རིམ་བཀོད་བརྡ་བསྐུལ་ (ཨེམ་ཌི་ཨེན) ཅིག་ `%s' ལུ་ལོག་ནི་ཨིན། \n"
+"ཁྱོད་ཀྱིས་བརྡ་བསྐུལ་འདི་གཏང་ནི་ཨིན་ན?"
+
+#: ../src/balsa-message.c:2168
+msgid "Reply to MDN?"
+msgstr "ཨེམ་ཌི་ཨེན་ལུ་ལན་གསལ་འབད་ག?"
+
+#: ../src/balsa-message.c:2363
+msgid ""
+"The decryption cannot be performed because this message is displayed more than once.\n"
+"Please close the other instances of this message and try again."
+msgstr ""
+"གསང་བཤོལ་འདི་ལག་ལེན་འཐབ་མ་ཚུགས་  ག་ཅི་སྦེ་ཟེར་བ་ཅིན་  འཕྲིན་དོན་འདི་ཚར་ཅིག་ལས་ལྷག་སྟེ་བཀྲམ་སྟོན་འབད་ནུག། \n"
+"འཕྲིན་དོན་འདི་གི་གནས་སྐབས་གཞན་མི་ཚུ་ཁ་བསྡམས་ནི་དང་ལོག་འབད་གནང་།"
+
+#: ../src/balsa-message.c:2384
+#: ../src/balsa-message.c:2466
+#: ../src/balsa-message.c:2581
+#, c-format
+msgid "Parsing a message part failed: %s"
+msgstr "འཕྲིན་དོན་གྱི་ཆ་ཤས་ཅིག་མིང་དཔྱད་འབད་མ་ཚུགས: %s"
+
+#: ../src/balsa-message.c:2385
+#: ../src/balsa-message.c:2467
+#: ../src/balsa-message.c:2582
+msgid "Possible disk space problem."
+msgstr "སྲིད་པའི་ཌིཀསི་བར་སྟོང་གི་དགའ་ངལ།"
+
+#: ../src/balsa-message.c:2397
+#, c-format
+msgid "The message sent by %s with subject \"%s\" contains an encrypted part, but it's structure is invalid."
+msgstr "དོན་ཚན་ \"%s\" དང་ཅིག་ཁར་ %s གིས་གཏང་ཡོད་པའི་འཕྲིན་དོན་དེ་ལུ་  གསང་བཟོས་ཆ་ཤས་ཡོདཔ་ཨིན་  དེ་འབདཝ་ད་  དེའི་གཞི་བཀོད་འདི་ནུས་ཅན་མེད།"
+
+#: ../src/balsa-message.c:2405
+#, c-format
+msgid "The message sent by %s with subject \"%s\" contains a PGP encrypted part, but this crypto protocol is not available."
+msgstr "དོན་ཚན་ \"%s\" དང་ཅིག་ཁར་ %s གིས་གཏང་ཡོད་པའི་འཕྲིན་དོན་དེ་ལུ་ པི་ཇི་པི་གསང་བཟོས་ཆ་ཤས་ཡོདཔ་ཨིན་  དེ་འབདཝ་ད་  ཀིརཔ་ཊོ་གནད་སྤེལ་ལམ་ལུགས་འདི་ཐོབ་ཚུགས་མེད།"
+
+#: ../src/balsa-message.c:2418
+#, c-format
+msgid "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, but this crypto protocol is not available."
+msgstr "དོན་ཚན་ \"%s\" དང་ཅིག་ཁར་ %s གཏང་ཡོད་པའི་འཕྲིན་དོན་དེ་ལུ་  ཨེསི་/མ་ཡིམ་ གསང་བཟོས་ཆ་ཤས་ཅིག་ཡོདཔ་ཨིན་  དེ་འབདཝ་ད་  ཀིརཔ་ཊོ་གནད་སྤེལ་འདི་ཐོབ་ཚུགསཔ་མེདཔ་ཨིན།"
+
+#: ../src/balsa-message.c:2482
+#, c-format
+msgid "The message sent by %s with subject \"%s\" contains a signed part, but its structure is invalid. The signature, if there is any, cannot be checked."
+msgstr "དོན་ཚན་ \"%s\" དང་ཅིག་ཁར་ %s གིས་གཏང་ཡོད་པའི་འཕྲིན་དོན་འདི་ལུ་  མིང་རྟགས་བཀོད་ཡོད་པའི་ཆ་ཤས་ཅིག་ཡོདཔ་ཨིན་  དེ་འབདཝ་ད་  གཞི་བཀོད་འདི་ནུས་ཅན་མེདཔ་ཨིན།  མིང་རྟགས་  གང་རུང་ཅིག་ཡོད་པ་ཅིན་  ཞིབ་དཔྱད་འབད་མི་ཚུགས།"
+
+#: ../src/balsa-message.c:2495
+#, c-format
+msgid "The message sent by %s with subject \"%s\" contains a %s signed part, but this crypto protocol is not available."
+msgstr "དོན་ཚན་ \"%s\" དང་ཅིག་ཁར་ %s གིས་འཕྲིན་དོན་གཏང་ཡོད་མི་དེ་ལུ་  %s མིང་རྟགས་བཀོད་ཡོད་པའི་ཆ་ཤས་ཅིག་ཡོདཔ་ཨིན་  དེ་འབདཝ་ད་  ཀིརཔ་ཊོ་གནད་སྤེལ་འདི་ཐོབ་ཚུགསཔ་མེདཔ་ཨིན།"
+
+#: ../src/balsa-message.c:2498
+msgid "PGP"
+msgstr "པི་ཇི་པི་"
+
+#: ../src/balsa-message.c:2498
+#: ../src/balsa-mime-widget-crypto.c:72
+#: ../src/print.c:1302
+#: ../src/print-gtk.c:191
+msgid "S/MIME"
+msgstr "ཨེསི་/མ་ཡིམ་"
+
+#: ../src/balsa-message.c:2517
+#: ../src/balsa-message.c:2643
+msgid "Detected a good signature"
+msgstr "མིང་རྟགས་ལེགས་ཤོམ་ཅིག་སྐྱོན་འཛིན་བྱུང་ཡོདཔ་"
+
+#: ../src/balsa-message.c:2523
+msgid "Detected a good signature with insufficient validity"
+msgstr "མ་ལང་པའི་ནུས་ལྡན་དུས་ཚོད་དང་ཅིག་ཁར་  མིང་རྟགས་ལེགས་ཤོམ་ཅིག་སྐྱོན་འཛིན་བྱུང་ཡོདཔ་"
+
+#: ../src/balsa-message.c:2528
+#: ../src/balsa-message.c:2647
+msgid "Detected a good signature with insufficient validity/trust"
+msgstr "མ་ལང་པའི་ནུས་ལྡན་དུས་ཚོད་/བློ་གཏད་དང་ཅིག་ཁར་  མིང་རྟགས་ལེགས་ཤོམ་ཅིག་སྐྱོན་འཛིན་བྱུང་ཡོདཔ་"
+
+#: ../src/balsa-message.c:2535
+#: ../src/balsa-message.c:2653
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" returned:\n"
+"%s"
+msgstr ""
+"དོན་ཚན་ \"%s\" ལོག་ཡོདཔ་དང་ཅིག་ཁར་ %s གིས་གཏང་ཡོད་པའི་འཕྲིན་དོན་གྱི་ མིང་རྟགས་འདི་ཞིབ་དཔྱད་འབད་དོ: \n"
+"%s"
+
+#: ../src/balsa-message.c:2547
+#, c-format
+msgid "Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"
+msgstr "དོན་ཚན་ \"%s\" དང་ཅིག་ཁར་ %s གིས་གཏང་ཡོད་པའི་འཕྲིན་དོན་གྱི་ མིང་རྟགས་འདི་ཞིབ་དཔྱད་འབད་མི་འདི་  འཛོལ་བ་དང་ཅིག་ཁར་འཐུས་ཤོར་བྱུང་ཡོདཔ!"
+
+#: ../src/balsa-message.c:2605
+msgid "The decryption cannot be performed because this message is displayed more than once."
+msgstr "གསང་བཤོལ་འདི་ལག་ལེན་འཐབ་མི་ཚུགས་  ག་ཅི་སྦེ་ཟེར་བ་ཅིན་  འཕྲིན་དོན་འདི་ཚར་ཅིག་ལས་མངམ་བཀྲམ་སྟོན་འབད་ནུག།"
+
+#: ../src/balsa-message.c:2607
+msgid "The signature check and removal of the OpenPGP armor cannot be performed because this message is displayed more than once."
+msgstr "མིང་རྟགས་ཞིབ་དཔྱད་དང་ པི་ཇི་པི་ཁ་ཕྱེ་ ཨར་མོར་གྱི་རྩ་བསྐྲད་གཏང་ནི་འདི་ལག་ལེན་འཐབ་མི་ཚུགས་  ག་ཅི་སྦེ་ཟེར་བ་ཅིན་  འཕྲིན་དོན་འདི་ཚར་ཅིག་ལས་མངམ་སྦེ་བཀྲམ་སྟོན་འབད་ནུག།"
+
+#: ../src/balsa-message.c:2610
+msgid "Please close the other instances of this message and try again."
+msgstr "འཕྲིན་དོན་འདི་གི་གནས་སྐབས་གཞན་མི་ཚུ་  ཁ་བསྡམས་ནི་དང་ལོག་འབད་གནང་།"
+
+#: ../src/filter-edit-callbacks.c:311
+msgid "One of the specified fields contains:"
+msgstr "གསལ་བཀོད་འབད་ཡོད་པའི་ས་སྒོ་ཅིག་གིས: "
+
+#: ../src/filter-edit-callbacks.c:312
+msgid "None of the specified fields contains:"
+msgstr "གསལ་བཀོད་འབད་ཡོད་པའི་ས་སྒོ་ཅིག་གིས་ཡང་:"
+
+#: ../src/filter-edit-callbacks.c:314
+msgid "One of the regular expressions matches"
+msgstr "དུས་རྒྱུན་གསལ་བརྗོད་གཅིག་ལུ་མཐུན་སྒྲིག་ཡོད་"
+
+#: ../src/filter-edit-callbacks.c:315
+msgid "None of the regular expressions matches"
+msgstr "དུས་རྒྱུན་གསལ་བརྗོད་གཅིག་གིས་ཡང་མཐུན་སྒྲིག་མེདཔ་ཨིན་"
+
+#: ../src/filter-edit-callbacks.c:317
+msgid "Match when date is in the interval:"
+msgstr "ཚེས་གྲངས་འདི་བར་མཚམས་ནང་ཡོདཔ་ད་མཐུན་སྒྲིག་འབད:"
+
+#: ../src/filter-edit-callbacks.c:318
+msgid "Match when date is outside the interval:"
+msgstr "ཚེས་གྲངས་འདི་བར་མཚམས་ཀྱི་ཕྱི་ཁར་ཡོདཔ་ད་མཐུན་སྒྲིག་འབད:"
+
+#: ../src/filter-edit-callbacks.c:320
+#: ../src/filter-edit-callbacks.c:1085
+msgid "Match when one of these flags is set:"
+msgstr "ཟུར་རྟགས་གཅིག་གཞི་སྒྲིག་འབདཝ་ད་མཐུན་སྒྲིག་འབད:"
+
+#: ../src/filter-edit-callbacks.c:321
+msgid "Match when none of these flags is set:"
+msgstr "ཟུར་རྟགས་གཅིག་གཞི་སྒྲིག་འབདཝ་ད་ མཐུན་སྒྲིག་འབད:"
+
+#: ../src/filter-edit-callbacks.c:512
+msgid "You must specify the name of the user header to match on"
+msgstr "མཐུན་སྒྲིག་འབད་ནི་ལུ་  ཁྱོད་ཀྱིས་ ལག་ལེན་པའི་མགོ་ཡིག་གི་མིང་འདི་གསལ་བཀོད་འབད་དགོཔ་ཨིན་"
+
+#: ../src/filter-edit-callbacks.c:523
+msgid "You must specify at least one field for matching"
+msgstr "མཐུན་སྒྲིག་འབད་ནིའི་དོན་ལུ་  ཁྱོད་ཀྱིས་ཉུང་མཐའ་རང་ས་སྒོ་གཅིག་གསལ་བཀོད་འབད་དགོ་"
+
+#: ../src/filter-edit-callbacks.c:533
+msgid "You must provide a string"
+msgstr "ཁྱོད་ཀྱིས་ཡིག་རྒྱུན་ཅིག་བྱིན་དགོ་"
+
+#: ../src/filter-edit-callbacks.c:540
+msgid "You must provide at least one regular expression"
+msgstr "ཁྱོད་ཀྱིས་ཉུང་མཐའ་རང་  དུས་རྒྱུན་གསལ་བརྗོད་གཅིག་བྱིན་དགོ་"
+
+#: ../src/filter-edit-callbacks.c:552
+msgid "Low date is incorrect"
+msgstr "ཚེས་གྲངས་དམའ་ཤོས་འདི་བདེན་མེན་ཨིན་"
+
+#: ../src/filter-edit-callbacks.c:563
+msgid "High date is incorrect"
+msgstr "ཚེས་གྲངས་མཐོ་ཤོས་འདི་བདེན་མེད་ཨིན་"
+
+#: ../src/filter-edit-callbacks.c:571
+msgid "Low date is greater than high date"
+msgstr "ཚེས་གྲངས་དམའ་ཤོས་འདི་ཚེས་གྲངས་ཐོ་ཤོས་ལས་སྦོམ་ཨིན་"
+
+#: ../src/filter-edit-callbacks.c:856
+#, c-format
+msgid "Error displaying condition help: %s\n"
+msgstr "གནས་སྟངས་གྲོགས་རམ་བཀྲམ་སྟོན་འབདཝ་ད་གི་འཛོལ་བ: %s\n"
+
+#: ../src/filter-edit-callbacks.c:897
+msgid "Match Fields"
+msgstr "ས་སྒོ་ཚུ་མཐུན་སྒྲིག་འབད་"
+
+#: ../src/filter-edit-callbacks.c:907
+msgid "_All"
+msgstr "ཆ་མཉམ། (_A)"
+
+#: ../src/filter-edit-callbacks.c:908
+msgid "C_lear"
+msgstr "བསལ། (_l)"
+
+#: ../src/filter-edit-callbacks.c:910
+#: ../src/main-window.c:4057
+msgid "_Body"
+msgstr "མ་གཟུགས། (_B)"
+
+#. To:
+#: ../src/filter-edit-callbacks.c:911
+#: ../src/main-window.c:4058
+#: ../src/sendmsg-window.c:2839
+msgid "_To:"
+msgstr "ལུ: (_T)"
+
+#: ../src/filter-edit-callbacks.c:912
+#: ../src/main-window.c:4059
+msgid "_From:"
+msgstr "ལས: (_F)"
+
+#: ../src/filter-edit-callbacks.c:913
+msgid "_Subject"
+msgstr "དོན་ཚན། (_S)"
+
+#: ../src/filter-edit-callbacks.c:914
+#: ../src/main-window.c:4061
+msgid "_Cc:"
+msgstr "སི་སི: (_C)"
+
+#: ../src/filter-edit-callbacks.c:916
+msgid "_User header:"
+msgstr "ལག་ལེན་པའི་མགོ་ཡིག: (_U)"
+
+#: ../src/filter-edit-callbacks.c:946
+msgid "Unread"
+msgstr "ལྷག་བཤོལ་"
+
+#: ../src/filter-edit-callbacks.c:946
+msgid "Deleted"
+msgstr "བཏོན་གཏང་ཡོདཔ་"
+
+#: ../src/filter-edit-callbacks.c:946
+msgid "Replied"
+msgstr "ལན་གསལ་འབད་ཡོདཔ་"
+
+#: ../src/filter-edit-callbacks.c:946
+msgid "Flagged"
+msgstr "ཟུར་རྟགས་བཀལ་ཡོདཔ་"
+
+#: ../src/filter-edit-callbacks.c:961
+msgid "One of the specified f_ields contains"
+msgstr "གསལ་བཀོད་འབད་ཡོད་པའི་ས་སྒོ་གཅིག་གིས། (_i)"
+
+#: ../src/filter-edit-callbacks.c:976
+msgid "Contain/Does _Not Contain"
+msgstr "གནས་ཡོདཔ/གནས་ཏེ་མེདཔ། (_N)"
+
+#: ../src/filter-edit-callbacks.c:995
+msgid "_One of the regular expressions matches"
+msgstr "དུས་རྒྱུན་གསལ་བརྗོད་གཅིག་གི་མཐུན་སྒྲིག་ཚུ། (_O)"
+
+#. Left/Remove button
+#: ../src/filter-edit-callbacks.c:1026
+#: ../src/filter-edit-dialog.c:321
+#: ../src/filter-run-dialog.c:332
+msgid "_Remove"
+msgstr "རྩ་བསྐྲད་གཏང་། (_R)"
+
+#: ../src/filter-edit-callbacks.c:1030
+msgid "One _Matches/None Matches"
+msgstr "གཅིག་མཐུན་མི་/ཅི་ཡང་མཐུན་སྒྲིག་མེདཔ་"
+
+#: ../src/filter-edit-callbacks.c:1047
+msgid "Match when message date is in the interval:"
+msgstr "འཕྲིན་དོན་ཚེས་གྲངས་འདི་བར་མཚམས་ནང་ཡོདཔ་ད་  མཐུན་སྒྲིག་འབད:"
+
+#: ../src/filter-edit-callbacks.c:1067
+msgid "Inside/outside the date interval"
+msgstr "ནང་ན་/ཕྱི་ཁར་ ཚེས་གྲངས་བར་མཚམས་"
+
+#: ../src/filter-edit-callbacks.c:1114
+msgid "Match when one flag is set/when no flag is set"
+msgstr "ཟུར་རྟགས་གཅིག་གཞི་སྒྲིག་འབད་/ཟུར་རྟགས་གཅིག་ཡང་གཞི་སྒྲིག་མ་འབད་བར་ཡོདཔ་ད་མཐུན་སྒྲིག་འབད་"
+
+#: ../src/filter-edit-callbacks.c:1132
+msgid "Search T_ype:"
+msgstr "དབྱེ་བ་འཚོལ་ཞིབ་འབད: (_y)"
+
+#: ../src/filter-edit-callbacks.c:1206
+msgid "Edit condition for filter: "
+msgstr "ཚགས་མའི་དོན་ལུ་གནས་སྟངས་ཞུན་དག་འབད:"
+
+#: ../src/filter-edit-callbacks.c:1424
+#: ../src/save-restore.c:2002
+msgid "Filter with no condition was omitted"
+msgstr "གནས་སྟངས་མེད་པའི་ཚགས་མ་འདི་སྐྱུར་བཞག་ཡོདཔ་"
+
+#: ../src/filter-edit-callbacks.c:1450
+#, c-format
+msgid "Error displaying filter help: %s\n"
+msgstr "ཚགས་མའི་གྲོགས་རམ་བཀྲམ་སྟོན་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#: ../src/filter-edit-callbacks.c:1640
+msgid "New filter"
+msgstr "ཚགས་མ་གསརཔ་"
+
+#: ../src/filter-edit-callbacks.c:1772
+msgid "No filter name specified."
+msgstr "ཚགས་མའི་མིང་  གསལ་བཀོད་མ་འབད་བས།"
+
+#: ../src/filter-edit-callbacks.c:1777
+#, c-format
+msgid "Filter \"%s\" already exists."
+msgstr "ཚགས་མ་ \"%s\" ཧེ་མ་ལས་རང་འདུག།"
+
+#: ../src/filter-edit-callbacks.c:1787
+msgid "Filter must have conditions."
+msgstr "ཚགས་མ་དེ་ལུ་གནས་སྟངས་འདུག།"
+
+#: ../src/filter-edit-callbacks.c:1844
+msgid "Filter has matched"
+msgstr "ཚགས་མ་འདི་མཐུན་མས་"
+
+#: ../src/filter-edit-callbacks.c:1869
+msgid "You must provide a sound to play"
+msgstr "གཏང་ནིའི་དོན་ལུ་ཁྱོད་ཀྱིས་སྒྲ་སྐད་བྱིན་དགོ་"
+
+#: ../src/filter-edit-callbacks.c:2028
+#, c-format
+msgid "(Example: write December 31, 2000, as %s)"
+msgstr "(དཔེར་ན: %s སྦེ་སྤྱི་ཟླ་བཅུ་གཉིས་པ་ 31, 2000་འབྲི་)"
+
+#: ../src/filter-edit-dialog.c:89
+#: ../src/pref-manager.c:410
+msgid "Simple"
+msgstr "འཇམ་སམ་"
+
+#: ../src/filter-edit-dialog.c:90
+msgid "Regular Expression"
+msgstr "དུས་རྒྱུན་གསལ་བརྗོད་"
+
+#: ../src/filter-edit-dialog.c:91
+msgid "Date interval"
+msgstr "ཚེས་གྲངས་བར་མཚམས་"
+
+#: ../src/filter-edit-dialog.c:92
+msgid "Flag condition"
+msgstr "ཟུར་རྟགས་གནས་སྟངས་"
+
+#: ../src/filter-edit-dialog.c:96
+msgid "Copy to folder:"
+msgstr "སྣོད་འཛིན་ལུ་འདྲ་བཤུས་བརྐྱབ:"
+
+#: ../src/filter-edit-dialog.c:97
+msgid "Move to folder:"
+msgstr "སྣོད་འཛིན་ལུ་སྤོ་བཤུད་འབད:"
+
+#: ../src/filter-edit-dialog.c:98
+msgid "Print on printer:"
+msgstr "དཔར་འཕྲུལ་གུ་དཔར་བསྐྲུན་འབད:"
+
+#: ../src/filter-edit-dialog.c:99
+msgid "Run program:"
+msgstr "ལས་རིམ་གཡོག་བཀོལ:"
+
+#: ../src/filter-edit-dialog.c:100
+msgid "Send to Trash"
+msgstr "ཕྱགས་ཧོད་ལུ་གཏང་"
+
+#: ../src/filter-edit-dialog.c:104
+msgid "OR"
+msgstr "ཡང་ན་"
+
+#: ../src/filter-edit-dialog.c:105
+msgid "AND"
+msgstr "དང་"
+
+#. new button
+#. #define MENU_FILE_NEW_POS 0
+#: ../src/filter-edit-dialog.c:217
+#: ../src/mailbox-node.c:1032
+#: ../src/main-window.c:374
+#: ../src/main-window.c:433
+msgid "_New"
+msgstr "གསརཔ། (_N)"
+
+#. The name entry
+#: ../src/filter-edit-dialog.c:249
+msgid "_Filter name:"
+msgstr "ཚགས་མའི་མིང་: (_F)"
+
+#. The filter op-code : "OR" or "AND" all the conditions
+#: ../src/filter-edit-dialog.c:267
+msgid "Operation between conditions"
+msgstr "གནས་སྟངས་ཚུ་གི་བར་ན་བཀོལ་སྤྱོད་"
+
+#: ../src/filter-edit-dialog.c:312
+msgid "_Edit"
+msgstr "ཞུན་དག། (_E)"
+
+#: ../src/filter-edit-dialog.c:317
+msgid "Ne_w"
+msgstr "གསརཔ། (_w)"
+
+#. The notification area
+#: ../src/filter-edit-dialog.c:350
+msgid "Notification:"
+msgstr "བརྡ་བསྐུལ:"
+
+#. Notification buttons
+#: ../src/filter-edit-dialog.c:360
+msgid "Play sound:"
+msgstr "སྒྲ་སྐད་གཏང་:"
+
+#: ../src/filter-edit-dialog.c:367
+#: ../src/filter-edit-dialog.c:380
+msgid "Use Sound..."
+msgstr "སྒྲ་སྐད་ལག་ལེན་འཐབ..."
+
+#: ../src/filter-edit-dialog.c:399
+msgid "Popup text:"
+msgstr "པོཔ་ཨཔ་ཚིག་ཡིག:"
+
+#. The action area
+#: ../src/filter-edit-dialog.c:420
+msgid "Action to perform:"
+msgstr "ལཱ་འགན་འགྲུབ་ནི་ལུ་བྱ་བ:"
+
+#: ../src/filter-edit-dialog.c:471
+msgid "Match"
+msgstr "མཐུན་སྒྲིག་འབད་"
+
+#: ../src/filter-edit-dialog.c:474
+msgid "Action"
+msgstr "བྱ་བ་"
+
+#: ../src/filter-edit-dialog.c:486
+msgid "Revert"
+msgstr "རྒྱབ་ལོག་"
+
+#: ../src/filter-edit-dialog.c:537
+msgid "A filter run dialog is open.Close it before you can modify filters."
+msgstr "ཚགས་མའི་གཡོག་བཀོལ་ཌའི་ལོག་འདི་ཁ་ཕྱེ་ནུག།  ཁྱོད་ཀྱྀས་ཚགས་མ་ཚུ་ལེགས་བཅོས་འབད་ཚུགས་པའི་ཧེ་མ་ཁ་བསྡམ།"
+
+#: ../src/filter-edit-dialog.c:550
+msgid "Balsa Filters"
+msgstr "བཱལ་ས་ཚགས་མ་ཚུ་"
+
+#: ../src/filter-edit-dialog.c:618
+#, c-format
+msgid "Filter \"%s\" has no condition."
+msgstr "ཚགས་མ་ \"%s\" དེ་ལུ་གནས་སྟངས་མེད།"
+
+#: ../src/filter-export-callbacks.c:57
+#, c-format
+msgid "Unable to export filter %s, an error occurred."
+msgstr "ཚགས་མ་ %s ཕྱིར་འདྲེན་འབད་མ་ཚུགས་ འཛོལ་བ་བྱུང་ཡོདཔ།"
+
+#: ../src/filter-export-dialog.c:63
+msgid "There are opened filter run dialogs, close them before you can modify filters."
+msgstr "འདི་ནང་ཁ་ཕྱེ་ཡོད་པའི་ཚགས་མ་གཡོག་བཀོལ་ཌའི་ལོག་ཚུ་འདུག་  ཁྱོད་ཀྱིས་ཚགས་མ་ཚུ་ལེགས་བཅོས་མ་འབད་བའི་ཧེ་མར་ཁ་བསྡམ།"
+
+#: ../src/filter-export-dialog.c:75
+msgid "Balsa Filters Export"
+msgstr "བཱལ་ས་ཚགས་མ་ཕྱིར་འདྲེན་"
+
+#: ../src/filter-run-callbacks.c:182
+#, c-format
+msgid "Error displaying run filters help: %s\n"
+msgstr "ཚགས་མ་གཡོག་བཀོལ་གྲོགས་རམ་བཀྲམ་སྟོན་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#: ../src/filter-run-callbacks.c:230
+#: ../src/filter-run-callbacks.c:252
+msgid "Error when applying filters"
+msgstr "ཚགས་མ་ཚུ་འཇུག་སྤྱོད་འབདཝ་ད་འཛོལ་བ་"
+
+#: ../src/filter-run-callbacks.c:233
+#: ../src/filter-run-callbacks.c:255
+#, c-format
+msgid "Filter applied to \"%s\"."
+msgstr "\"%s\" ལུ་འཇུག་སྤྱོད་འབད་ཡོད་པའི་ཚགས་མ།"
+
+#: ../src/filter-run-callbacks.c:292
+#, c-format
+msgid ""
+"The destination mailbox of the filter \"%s\" is \"%s\".\n"
+"You can't associate it with the same mailbox (that causes recursion)."
+msgstr ""
+"ཚགས་མ་\"%s\" གི་འགྲོ་ཡུལ་ཡིག་སྒྲོམ་འདི་ \"%s\"ཨིན།\n"
+"ཁྱོད་ཀྱིས་ཡིག་སྒྲོམ་གཅིག་པ་དང་ཅིག་ཁར་མཉམ་འབྲེལ་འབད་མི་ཚུགས་ (དེ་གིས་ རིམ་ལོག་བྱུངམ་ཨིན)"
+
+#: ../src/filter-run-callbacks.c:300
+#, c-format
+msgid ""
+"The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
+"This happens for example when you use regular expressions match with IMAP mailboxes, it is done by a very slow method; if possible, use substring match instead."
+msgstr ""
+"ཚགས་མ་ \"%s\" འདི་  ཡིག་སྒྲོམ་གྱི་དབྱེ་བ་ \"%s\" དང་ཅིག་ཁར་མཐུན་འགྱུར་ཅན་མེན། \n"
+"འདི་ནམ་བྱུངམ་སྨོ་ཟེར་བ་ཅིན་  དཔེར་ན་  ཁྱོད་ཀྱིས་  དུས་རྒྱུན་གསལ་བརྗོད་ ཨའི་ཨེམ་ཨེ་པི་ཡིག་སྒྲོམ་ཚུ་དང་ཅིག་ཁར་མཐུན་སྒྲིག་འབདཝ་ད་ཨིན་  དེ་ ཐབས་ལམ་ལྷོད་ཆ་གིས་འབདཝ་ཨིན; སྲིད་པ་ཅིན་  ཡན་ལག་ཡིག་རྒྱུན་མཐུན་སྒྲིག་འདི་ལག་ལེན་འཐབ།"
+
+#: ../src/filter-run-dialog.c:189
+msgid "Balsa Filters of Mailbox: "
+msgstr "ཡིག་སྒྲོམ་གྱི་བཱལ་ས་ཚགས་མ་ཚུ:"
+
+#: ../src/filter-run-dialog.c:230
+msgid "On reception"
+msgstr "སྒྲ་འབྱོར་གུ་"
+
+#: ../src/filter-run-dialog.c:242
+msgid "On exit"
+msgstr "ཕྱིར་ཐོན་གུ་"
+
+#: ../src/filter-run-dialog.c:316
+msgid "Apply Selected"
+msgstr "སེལ་འཐུ་འབད་ཡོདཔ་འཇུག་སྤྱོད་འབད་"
+
+#. up button
+#: ../src/filter-run-dialog.c:364
+msgid "_Up"
+msgstr "ཡར། (_U)"
+
+#. down button
+#: ../src/filter-run-dialog.c:369
+msgid "Do_wn"
+msgstr "མར། (_w)"
+
+#: ../src/filter-run-dialog.c:375
+msgid "A_pply Now!"
+msgstr "ད་ལྟོ་འཇུག་སྤྱོད་འབད! (_p)"
+
+#: ../src/filter-run-dialog.c:419
+msgid "The filters dialog is opened, close it before you can run filters on any mailbox"
+msgstr "ཚགས་མའི་ཌའི་ལོག་འདི་ཁ་ཕྱེ་ནུག་  ཁྱོད་ཀྱིས་ ཡིག་སྒྲོམ་གང་རུང་ཅིག་གུ་ཚགས་མ་གཡོག་མ་བཀལཝ་ལས་ཁ་བསྡམ་"
+
+#: ../src/folder-conf.c:285
+msgid "Remote IMAP folder"
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་སྣོད་འཛིན་"
+
+#. must NOT be modal
+#: ../src/folder-conf.c:288
+#: ../src/folder-conf.c:758
+#: ../src/mailbox-conf.c:529
+msgid "_Update"
+msgstr "དུས་མཐུན་བཟོ། (_U)"
+
+#: ../src/folder-conf.c:288
+msgid "C_reate"
+msgstr "གསར་བསྐྲུན་འབད། (_r)"
+
+#: ../src/folder-conf.c:311
+#: ../src/mailbox-conf.c:1137
+#: ../src/mailbox-conf.c:1239
+msgid "_Basic"
+msgstr "གཞི་རིམ། (_B)"
+
+#: ../src/folder-conf.c:316
+msgid "_Max number of connections:"
+msgstr "མཐུད་ལམ་ཚུ་གི་ཨང་གྲངས་མང་མཐའ: (_M)"
+
+#: ../src/folder-conf.c:323
+#: ../src/mailbox-conf.c:1302
+msgid "Enable _persistent cache"
+msgstr "ཨུ་ཚུགས་ཅན་གྱི་འདྲ མཛོད་ལྕོགས་ཅན་བཟོ། (_p)"
+
+#: ../src/folder-conf.c:331
+msgid "Use IDLE command"
+msgstr "ལས་མེད་བརྡ་བཀོད་ལག་ལེན་འཐབ་"
+
+#: ../src/folder-conf.c:338
+#: ../src/mailbox-conf.c:1306
+msgid "Enable _bug workarounds"
+msgstr "རྐྱེན་ཝོརོཀ་ཨེ་རའུནཌི་ཚུ་ལྕོགས་ཅན་བཟོ། ( _b)"
+
+#: ../src/folder-conf.c:345
+msgid "Use STATUS for mailbox checking"
+msgstr "ཡིག་སྒྲོམ་ཞིབ་དཔྱད་ཀྱི་དོན་ལུ་ གནས་ཚད་ལག་ལེན་འཐབ་"
+
+#: ../src/folder-conf.c:351
+#: ../src/mailbox-conf.c:1191
+#: ../src/mailbox-conf.c:1308
+msgid "_Advanced"
+msgstr "ཡར་བསྐྱེད་འབད་ཡོད་པའི། (_A)"
+
+#. INPUT FIELD CREATION
+#: ../src/folder-conf.c:354
+msgid "Descriptive _Name:"
+msgstr "འགྲེལ་བཤད་འབད་བཏུབ་པའི་མིང་: (_N)"
+
+#. username
+#: ../src/folder-conf.c:369
+#: ../src/mailbox-conf.c:1153
+msgid "Use_r name:"
+msgstr "ལག་ལེན་པའི་མིང་: (_r )"
+
+#: ../src/folder-conf.c:375
+msgid "_Password:"
+msgstr "ཆོག་ཡིག: (_P)"
+
+#: ../src/folder-conf.c:380
+#: ../src/mailbox-conf.c:1264
+msgid "_Anonymous access"
+msgstr "མིང་མེདཔ་འཛུལ་སྤྱོད། (_A)"
+
+#: ../src/folder-conf.c:389
+msgid "Subscribed _folders only"
+msgstr "མཁོ་མངགས་འབད་ཡོད་པའི་སྣོད་འཛིན་རྐྱངམ་ཅིག། (_f)"
+
+#: ../src/folder-conf.c:391
+msgid "Always show _INBOX"
+msgstr "ཨ་རྟག་རང་ནང་སྒྲོམ་སྟོན། (_I)"
+
+#: ../src/folder-conf.c:394
+msgid "Pr_efix:"
+msgstr "སྔོན་ཚིག: (_e)"
+
+#: ../src/folder-conf.c:540
+msgid "Select parent folder"
+msgstr "རྩ་ལག་སྣོད་འཛིན་སེལ་འཐུ་འབད་"
+
+#: ../src/folder-conf.c:614
+#, c-format
+msgid ""
+"Renaming INBOX is special!\n"
+"You will create a subfolder %s in %s\n"
+"containing the messages from INBOX.\n"
+"INBOX and its subfolders will remain.\n"
+"What would you like to do?"
+msgstr ""
+"ནང་སྒྲོམ་བསྐྱར་མིང་བཏགས་ནི་འདི་དམིགས་བསལ་ཨིན !\n"
+"%sནང་ཁྱོད་ཀྱིས་  ཡན་ལག་སྣོད་འཛིན་%sགསར་བསྐྲུན་འབད་འོང་\n"
+"ནང་སྒྲོམ་ལས་འཕྲིན་དོན་གནས་ཡོདཔ། \n"
+"ནང་སྒྲོམ་དང་དེའི་ཡན་ལག་སྣོད་འཛིན་ཚུ་ལྷག་ལུས་འོང་།\n"
+"ཁྱོད་ཀྱིས་ག་ཅི་འབད་དགོ་མནོཝ་མས?"
+
+#: ../src/folder-conf.c:620
+msgid "Question"
+msgstr "དྲི་བ་"
+
+#: ../src/folder-conf.c:625
+msgid "Rename INBOX"
+msgstr "ནང་སྒྲོམ་བསྐྱར་མིང་བཏགས་"
+
+#: ../src/folder-conf.c:627
+msgid "Cancel"
+msgstr "ཆ་མེད་གཏང་"
+
+#: ../src/folder-conf.c:648
+#, c-format
+msgid "Folder rename failed. Reason: %s"
+msgstr "སྣོད་འཛིན་བསྐྱར་མིང་བཏགས་མ་ཚུགས། རྒྱུ་མཚན: %s"
+
+#: ../src/folder-conf.c:700
+#, c-format
+msgid "Folder creation failed. Reason: %s"
+msgstr "སྣོད་འཛིན་གསར་བསྐྲུན་འབད་མ་ཚུགས། རྒྱུ་མཚན: %s"
+
+#: ../src/folder-conf.c:740
+msgid ""
+"An IMAP folder that is not a mailbox\n"
+"has no properties that can be changed."
+msgstr ""
+"ཡིག་སྒྲོམ་མེན་པའི་ ཨའི་ཨེམ་ཨེ་པི་སྣོད་འཛིན་ \n"
+"དེ་ལུ་བསྒྱུར་བཅོས་འབད་བཏུབ་པའི་རྒྱུ་དངོས་མེད།"
+
+#: ../src/folder-conf.c:755
+msgid "Remote IMAP subfolder"
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་ཡན་ལག་སྣོད་འཛིན་"
+
+#: ../src/folder-conf.c:758
+msgid "_Create"
+msgstr "གསར་བསྐྲུན་འབད། (_C)"
+
+#: ../src/folder-conf.c:779
+msgid "Rename or move subfolder"
+msgstr "ཡན་ལག་སྣོད་འཛིན་བསྐྱར་མིང་བཏགས་ནི་ཡང་ན་སྤོ་བཤུད་འབད་"
+
+#: ../src/folder-conf.c:780
+msgid "Create subfolder"
+msgstr "ཡན་ལག་སྣོད་འཛིན་གསར་བསྐྲུན་འབད་"
+
+#. INPUT FIELD CREATION
+#: ../src/folder-conf.c:788
+msgid "_Folder name:"
+msgstr "སྣོད་འཛིན་མིང་: (_F)"
+
+#: ../src/folder-conf.c:794
+msgid "Host:"
+msgstr "ཧོསཊི:"
+
+#: ../src/folder-conf.c:800
+msgid "_Browse..."
+msgstr "བརྡ་འཚོལ... (_B)"
+
+#: ../src/folder-conf.c:808
+msgid "_Subfolder of:"
+msgstr "སྣོད་འཛིན་གྱི: (_S)"
+
+#: ../src/folder-conf.c:837
+msgid "This folder is not stored in configuration. I do not yet know how to remove it from remote server."
+msgstr "སྣོད་འཛིན་འདི་རིམ་སྒྲིག་འབད་ནི་ནང་ལུ་གསོག་འཇོག་མ་འབད་བས།  ང་གི་ད་ལྟོ་ཡང་ ཐག་རིང་གི་སར་བར་ལས་རྩ་བསྐྲད་གཏང་ནི་ཨིན་ན་མི་ཤེས་པས།"
+
+#: ../src/folder-conf.c:846
+#, c-format
+msgid ""
+"This will remove the folder \"%s\" from the list.\n"
+"You may use \"New IMAP Folder\" later to add this folder again.\n"
+msgstr ""
+"འདི་གིས་  སྣོད་འཛིན་ \"%s\" འདི་ཐོ་ཡིག་ལས་རྩ་བསྐྲད་གཏངམ་ཨིན། \n"
+"སྣོད་འཛིན་འདི་ལོག་ཁ་སྐོང་བརྐྱབ་ནིའི་དོན་ལུ་  ཁྱོད་ཀྱིས་ \"New IMAP Folder\" ལག་ལེན་འཐབ། \n"
+
+#: ../src/folder-conf.c:851
+msgid "Confirm"
+msgstr "ངེས་དཔྱད་འབད་ནི་"
+
+#: ../src/information-dialog.c:222
+msgid "Information - Balsa"
+msgstr "བརྡ་དོན་-བཱལ་ས་"
+
+#: ../src/information-dialog.c:325
+#, c-format
+msgid "WARNING: "
+msgstr "ཉེན་བརྡ:"
+
+#: ../src/information-dialog.c:328
+#, c-format
+msgid "ERROR: "
+msgstr "འཛོལ་བ:"
+
+#: ../src/information-dialog.c:331
+#, c-format
+msgid "FATAL: "
+msgstr "འཚུབ་ཆེན:"
+
+#: ../src/mailbox-conf.c:221
+msgid "Use _SSL"
+msgstr "ཨེསི་ཨེསི་ཨེལ་ལག་ལེན་འཐབ། ( _S)"
+
+#: ../src/mailbox-conf.c:349
+msgid "No mailbox selected."
+msgstr "ཡིག་སྒྲོམ་སེལ་འཐུ་མ་འབད་བས།"
+
+#: ../src/mailbox-conf.c:378
+#, c-format
+msgid ""
+"Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
+"If you really want to remove it, assign its function\n"
+"to some other mailbox."
+msgstr ""
+"ཡིག་སྒྲོམ་ \"%s\" འདི་བཱལ་ས་གིས་ལག་ལེན་འཐབ་ཡོདཔ་དང་  ང་གིས་རྩ་བསྐྲད་གཏང་མི་ཚུགས། \n"
+"ཁྱོད་ཀྱིས་རྩ་བསྐྲད་གཏང་དགོ་པ་ཅིན་  དེའི་ལས་འགན་ཚུ་ཡིག་སྒྲོམ་གཞན་མི་ཅིག་ལུ་\n"
+"འགན་སྤྲོད་འབད།"
+
+#: ../src/mailbox-conf.c:388
+#, c-format
+msgid ""
+"This will remove the mailbox \"%s\" from the list of mailboxes.  You may also delete the disk file or files associated with this mailbox.\n"
+"If you do not remove the file on disk you may \"Add  Mailbox\" to access the mailbox again.\n"
+"What would you like to do?"
+msgstr ""
+"འདི་གིས་ ཡིག་སྒྲོམ་  \"%s\" འདི་ ཡིག་སྒྲོམ་ཚུ་གི་ཐོ་ཡིག་ལས་རྩ་བསྐྲད་གཏང་འོང་། ཡིག་སྒྲོམ་འདི་དང་མཉམ་འབྲེལ་འབད་ཡོད་པའི་ཡིག་སྣོད་ཚུ་ ཡང་ན་ ཌིཀསི་ཡིག་སྣོད་ཚུ་བཏོན་གཏང་།\n"
+"ཁྱོད་ཀྱིས་ཌིཀསི་གུ་ཡོད་པའི་ཡིག་སྣོད་རྩ་བསྐྲད་མ་གཏང་པ་ཅིན་  ཡིག་སྒྲོམ་འདི་ལོག་འཛུལ་སྤྱོད་འབད་ནི་ལུ་ ཁྱོད་ཀྱིས་ \"Add  Mailbox\"འབད་ད།\n"
+"ཁྱོད་རང་ག་ཅི་འབད་དགོ་མནོཝ་མས?"
+
+#: ../src/mailbox-conf.c:400
+msgid "Remove from _list"
+msgstr "ཐོ་ཡིག་ལས་རྩ་བསྐྲད་གཏང་། (_l)"
+
+#: ../src/mailbox-conf.c:401
+msgid "Remove from list and _disk"
+msgstr "ཐོ་ཡིག་དང་ཌིཀསི་ལས་རྩ་བསྐྲད་གཏང་། (_d)"
+
+#: ../src/mailbox-conf.c:409
+#, c-format
+msgid ""
+"This will remove the mailbox \"%s\" and all its messages from your IMAP server.  If %s has subfolders, it will still appear as a node in the folder tree.\n"
+"You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
+"What would you like to do?"
+msgstr ""
+"འདི་གིས་  ཡིག་སྒྲོམ་\"%s\"དང་དེའི་འཕྲིན་དོན་ཆ་མཉམ་ ཁྱོད་རའི་ཨའི་ཨེམ་ཨེ་པི་སར་བར་ལས་རྩ་བསྐྲད་གཏང་འོང་། %s དེ་ལུ་ ཡན་ལག་སྣོད་འཛིན་ཚུ་ཡོད་པ་ཅིན་  དེ་གིས་ སྣོད་འཛིན་རྩ་འབྲེལ་ནང་ལུ་མཐུད་མཚམས་སྦེ་བྱུངམ་ཨིན། \n"
+"མིང་འདི་དང་ཅིག་ཁར་ཡིག་སྒྲོམ་ཅིག་ཁ་སྐོང་བརྐྱབ་ནི་ལུ་  ཁྱོད་ཀྱིས་ ཤུལ་ལས་\"New IMAP subfolder\"ལག་ལེན་འཐབ།\n"
+"ཁྱོད་རང་ག་ཅི་འབད་དགོ་མནོཝ་མས?"
+
+#: ../src/mailbox-conf.c:422
+msgid "_Remove from server"
+msgstr "སར་བར་ལས་རྩ་བསྐྲད་གཏང་། (_R)"
+
+#: ../src/mailbox-conf.c:429
+#, c-format
+msgid ""
+"This will remove the mailbox \"%s\" from the list of mailboxes.\n"
+"You may use \"Add Mailbox\" later to access this mailbox again.\n"
+"What would you like to do?"
+msgstr ""
+"འདི་གིས་ ཡིག་སྒྲོམ་ \"%s\" འདི་ཡིག་སྒྲོམ་ཚུ་གི་ཐོ་ཡིག་ལས་རྩ་བསྐྲད་གཏང་འོང་། \n"
+"ཡིག་སྒྲོམ་འདི་ལོག་འདི་རང་འཛུལ་སྤྱོད་འབད་ནི་ལུ་  ཁྱོད་ཀྱིས་ \"Add Mailbox\" ལག་ལེན་འཐབ།\n"
+"ཁྱོད་ཀྱིས་ག་ཅི་འབད་དགོ་མནོཝ་མས?"
+
+#: ../src/mailbox-conf.c:438
+msgid "_Remove from list"
+msgstr "ཐོ་ཡིག་ལས་རྩ་བསྐྲད་གཏང་། (_R)"
+
+#: ../src/mailbox-conf.c:476
+#, c-format
+msgid "Folder deletion failed. Reason: %s"
+msgstr "སྣོད་འཛིན་བཏོན་གཏང་མ་ཚུགས། རྒྱུ་མཚན: %s"
+
+#: ../src/mailbox-conf.c:533
+#: ../src/pref-manager.c:1625
+#: ../src/pref-manager.c:1713
+#: ../src/pref-manager.c:2784
+msgid "_Add"
+msgstr "ཁ་སྐོང་བརྐྱབ། (_A)"
+
+#: ../src/mailbox-conf.c:753
+#, c-format
+msgid "%s on %s"
+msgstr "%s གུ་ %s"
+
+#: ../src/mailbox-conf.c:895
+#, c-format
+msgid ""
+"Rename of %s to %s failed:\n"
+"%s"
+msgstr ""
+"%sལུ་%s བསྐྱར་མིང་བཏགས་མ་ཚུགས:\n"
+"%s"
+
+#: ../src/mailbox-conf.c:1074
+msgid "_Mailbox Name:"
+msgstr "ཡིག་སྒྲོམ་གྱི་མིང་: (_M)"
+
+#: ../src/mailbox-conf.c:1085
+msgid "Local Mailbox Configurator"
+msgstr "ཉེ་གནས་ཡིག་སྒྲོམ་རིམ་སྒྲིག་འབད་མི་"
+
+#: ../src/mailbox-conf.c:1118
+msgid "Remote Mailbox Configurator"
+msgstr "ཐག་རིང་གི་ཡིག་སྒྲོམ་རིམ་སྒྲིག་འབད་མི་"
+
+#. mailbox name
+#: ../src/mailbox-conf.c:1140
+#: ../src/mailbox-conf.c:1242
+msgid "Mailbox _Name:"
+msgstr "ཡིག་སྒྲོམ་གྱི་མིང་: (_N)"
+
+#. password field
+#: ../src/mailbox-conf.c:1159
+#: ../src/mailbox-conf.c:1276
+msgid "Pass_word:"
+msgstr "ཆོག་ཡིག: (_w)"
+
+#: ../src/mailbox-conf.c:1167
+msgid "_Delete messages from server after download"
+msgstr "ཕབ་ལེན་གྱི་ཤུལ་ལས་འཕྲིན་དོན་ཚུ་བཏོན་གཏང་། (_D)"
+
+#: ../src/mailbox-conf.c:1172
+msgid "_Enable check for new mail"
+msgstr "གློག་འཕྲིན་གསརཔ་གི་དོན་ལུ་ཞིབ་དཔྱད་ལྕོགས་ཅན་བཟོ། (_E)"
+
+#: ../src/mailbox-conf.c:1177
+msgid "_Filter messages through procmail"
+msgstr "ཚགས་མའི་འཕྲིན་དོན་ཚུ་ པོརཀ་ཡིག་འཕྲིན་ལས་བརྒྱུད་དེ། (_F)"
+
+#: ../src/mailbox-conf.c:1181
+msgid "Fi_lter Command:"
+msgstr "ཚགས་མའི་བརྡ་བཀོད: (_l)"
+
+#: ../src/mailbox-conf.c:1195
+msgid "Disable _APOP"
+msgstr "ཨེ་པི་ཨོ་པི་ལྕོགས་མེད་བཟོ། (_A)"
+
+#. username
+#: ../src/mailbox-conf.c:1256
+msgid "_Username:"
+msgstr "ལག་ལེན་པའི་མིང་: (_U)"
+
+#: ../src/mailbox-conf.c:1270
+msgid "_Remember Password"
+msgstr "ཆོག་ཡིག་སེམས་ཁར་བཞག། (_R)"
+
+#: ../src/mailbox-conf.c:1281
+msgid "F_older Path:"
+msgstr "སྣོད་འཛིན་འགྲུལ་ལམ: (_o)"
+
+#: ../src/mailbox-conf.c:1367
+msgid "_Identity:"
+msgstr "ངོ་རྟགས: (_I)"
+
+#: ../src/mailbox-conf.c:1395
+#: ../src/pref-manager.c:3249
+msgid "Always"
+msgstr "ཨ་རྟགས་རང་"
+
+#: ../src/mailbox-conf.c:1399
+msgid ""
+"_Decrypt and check\n"
+"signatures automatically:"
+msgstr ""
+"མིང་རྟགས་ཚུ་རང་བཞིན་གྱིས་སྦེ་\n"
+"གསང་བཟོས་དང་ཞིབ་དཔྱད་འབད:(_D)"
+
+#: ../src/mailbox-conf.c:1420
+msgid "Show _Recipient column instead of Sender"
+msgstr "གཏང་མི་གི་ཚབ་ལུ་ ཐོབ་མཁན་ཀེར་ཐིག་སྟོན། (_R)"
+
+#: ../src/mailbox-conf.c:1427
+msgid "_Subscribe for new mail check"
+msgstr "ཡིག་འཕྲིན་ཞིབ་དཔྱད་གསརཔ་གི་དོན་ལུ་མཁོ་མངགས་འབད། (_S)"
+
+#: ../src/mailbox-node.c:312
+msgid "The folder edition to be written."
+msgstr "འབྲི་ནི་ཨིན་པའི་སྣོད་འཛིན་ཞུན་དག།"
+
+#: ../src/mailbox-node.c:476
+#, c-format
+msgid "Scanning %s. Please wait..."
+msgstr "%s ཞིབ་ལྟ་འབད་དོ། བསྒུག་གནང་..."
+
+#: ../src/mailbox-node.c:492
+#, c-format
+msgid ""
+"Scanning of %s failed: %s\n"
+"Check network connectivity."
+msgstr ""
+"%sཞིབ་ལྟ་འབད་མ་ཚུགས: %s\n"
+"ཡོངས་འབྲེལ་མཐུད་འབྲེལ་ཞིབ་དཔྱད་འབད།"
+
+#: ../src/mailbox-node.c:494
+#, c-format
+msgid "Scanning of %s failed: %s"
+msgstr "%s ཞིབ་ལྟ་འབད་མ་ཚུགས: %s"
+
+#: ../src/mailbox-node.c:1017
+msgid "Local _mbox mailbox..."
+msgstr "ཉེ་གནས་ཨེམ་སྒྲོམ་གྱི་ཡིག་སྒྲོམ... (_m)"
+
+#: ../src/mailbox-node.c:1019
+msgid "Local Mail_dir mailbox..."
+msgstr "ཉེ་གནས་ཡིག་འཕྲིན་སྣོད་ཐོའི་ཡིག་སྒྲོམ... (_d)"
+
+#: ../src/mailbox-node.c:1021
+msgid "Local M_H mailbox..."
+msgstr "ཉེ་གནས་ཨེམ་ཨེཆ་གི་ཡིག་སྒྲོམ... (_H)"
+
+#: ../src/mailbox-node.c:1023
+msgid "Remote _IMAP mailbox..."
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་ཡིག་སྒྲོམ... (_I)"
+
+#: ../src/mailbox-node.c:1026
+msgid "Remote IMAP _folder..."
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་སྣོད་འཛིན... (_f)"
+
+#: ../src/mailbox-node.c:1028
+msgid "Remote IMAP _subfolder..."
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་ཡན་ལག་སྣོད་འཛིན... ( _s)"
+
+#. clicked on the empty space
+#: ../src/mailbox-node.c:1039
+#: ../src/mailbox-node.c:1055
+msgid "_Rescan"
+msgstr "ཡང་བསྐྱར་ཞིབ་ལྟ་འབད་ནི། (_R)"
+
+#: ../src/mailbox-node.c:1049
+msgid "_Properties..."
+msgstr "རྒྱུ་དངོས... (_P)"
+
+#: ../src/mailbox-node.c:1065
+msgid "_Open"
+msgstr "ཁ་ཕྱེ། (_O)"
+
+#: ../src/mailbox-node.c:1079
+msgid "_Subscribe"
+msgstr "མཁོ་མངགས་འབད་ནི། (_S)"
+
+#: ../src/mailbox-node.c:1081
+msgid "_Unsubscribe"
+msgstr "མཁོ་མངགས་འབད་བཤོལ། (_U)"
+
+#: ../src/mailbox-node.c:1087
+msgid "Mark as _Inbox"
+msgstr "ནང་སྒྲོམ་སྦེ་རྟགས་བཀལ། (_I)"
+
+#: ../src/mailbox-node.c:1089
+msgid "_Mark as Sentbox"
+msgstr "གཏང་སྒྲོམ་སྦེ་རྟགས་བཀལ། (_M)"
+
+#: ../src/mailbox-node.c:1091
+msgid "Mark as _Trash"
+msgstr "ཕྱགས་ཧོད་སྦེ་རྟགས་བཀལ། (_T)"
+
+#: ../src/mailbox-node.c:1093
+msgid "Mark as D_raftbox"
+msgstr "ཟིན་བྲིས་སྒྲོམ་སྦེ་རྟགས་བཀལ། (_r)"
+
+#: ../src/mailbox-node.c:1096
+msgid "_Empty trash"
+msgstr "ཕྱགས་ཧོད་སྟོངམ། (_E)"
+
+#: ../src/mailbox-node.c:1101
+msgid "_Edit/Apply filters"
+msgstr "ཚགས་མ་ཚུ་ཞུན་དག་/འཇུག་སྤྱོད་འབད། (_E)"
+
+#: ../src/mailbox-node.c:1189
+#, c-format
+msgid "The path \"%s\" does not lead to a mailbox."
+msgstr "འགྲུལ་ལམ་ \"%s\" ཡིག་སྒྲོམ་ལུ་འགོ་འཁྲིད་མི་འབད།"
+
+#: ../src/mailbox-node.c:1202
+#, c-format
+msgid "Local mailbox %s loaded as: %s\n"
+msgstr "ཉེ་གནས་ཡིག་སྒྲོམ་ %s འདི་%sསྦེ་མངོན་གསལ་འབད་ནུག:\n"
+
+#: ../src/mailbox-node.c:1231
+#, c-format
+msgid "Local folder %s\n"
+msgstr "ཉེ་གནས་སྣོད་འཛིན་ %s\n"
+
+#: ../src/main-window.c:283
+msgid "Balsa closes files and connections. Please wait..."
+msgstr "བཱལ་ས་དེ་གིས་ཡིག་སྣོད་ཚུ་དང་མཐུད་ལམ་བསྡམ་ཨིན། བསྒུག་གནང་..."
+
+#: ../src/main-window.c:322
+#: ../src/main-window.c:368
+msgid "_Deleted"
+msgstr "བཏོན་གཏང་ཡོདཔ། (_D)"
+
+#: ../src/main-window.c:325
+msgid "Un_Deleted"
+msgstr "བཏོན་གཏང་བཤོལ། (_D)"
+
+#: ../src/main-window.c:328
+msgid "_Read"
+msgstr "ལྷག། (_R)"
+
+#: ../src/main-window.c:331
+msgid "Un_read"
+msgstr "ལྷག་བཤོལ། (_r)"
+
+#: ../src/main-window.c:337
+msgid "Un_flagged"
+msgstr "ཟུར་རྟགས་བཀལ་བཤོལ། (_f)"
+
+#: ../src/main-window.c:340
+#: ../src/main-window.c:380
+msgid "_Answered"
+msgstr "ལན་གསལ་འབད་ཡོདཔ། (_A)"
+
+#: ../src/main-window.c:343
+msgid "Un_answered"
+msgstr "ལན་གསལ་འབད་བཤོལ། (_a)"
+
+#: ../src/main-window.c:349
+msgid "_No Headers"
+msgstr "མགོ་ཡིག་མེད། (_N)"
+
+#: ../src/main-window.c:349
+msgid "Display no headers"
+msgstr "མགོ་ཡིག་ཚུ་བཀྲམ་སྟོན་མ་འབད་"
+
+#: ../src/main-window.c:351
+msgid "S_elected Headers"
+msgstr "སེལ་འཐུ་འབད་ཡོད་པའི་མགོ་ཡིག་ཚུ། (_e)"
+
+#: ../src/main-window.c:352
+msgid "Display selected headers"
+msgstr "སེལ་འཐུ་འབད་ཡོད་པའི་མགོ་ཡིག་ཚུ་བཀྲམ་སྟོན་འབད་"
+
+#: ../src/main-window.c:354
+#: ../src/message-window.c:93
+msgid "All _Headers"
+msgstr "མགོ་ཡིག་ཆ་མཉམ། (_H)"
+
+#: ../src/main-window.c:354
+msgid "Display all headers"
+msgstr "མགོ་ཡིག་ཆ་མཉམ་བཀྲམ་སྟོན་འབད་"
+
+#: ../src/main-window.c:363
+msgid "Toggle flagged"
+msgstr "ཟུར་རྟགས་བཀལ་ཡོདཔ་སོར་སྟོན་འབད་"
+
+#: ../src/main-window.c:369
+msgid "Toggle deleted flag"
+msgstr "བཏོན་གཏང་ཡོད་པའི་ཟུར་རྟགས་སོར་སྟོན་འབད་"
+
+#: ../src/main-window.c:374
+msgid "Toggle New"
+msgstr "སོར་སྟོན་གསརཔ་"
+
+#: ../src/main-window.c:380
+msgid "Toggle Answered"
+msgstr "ལན་གསལ་འབད་ཡོད་པའི་སོར་སྟོན་"
+
+#: ../src/main-window.c:395
+msgid "_Message..."
+msgstr "འཕྲིན་དོན... (_M)"
+
+#: ../src/main-window.c:395
+#: ../src/main-window.c:1058
+msgid "Compose a new message"
+msgstr "འཕྲིན་དོན་གསརཔ་ཅིག་བརྩམ་"
+
+#. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
+#. of including at specified position
+#: ../src/main-window.c:402
+msgid "Local mbox mailbox..."
+msgstr "ཉེ་གནས་ཨེམ་སྒྲོམ་གྱི་ཡིག་སྒྲོམ..."
+
+#: ../src/main-window.c:403
+#: ../src/main-window.c:824
+msgid "Add a new mbox style mailbox"
+msgstr "ཨེམ་སྒྲོམ་གསརཔ་གི་བཟོ་རྣམ་ཡིག་སྒྲོམ་ཅིག་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/main-window.c:406
+msgid "Local Maildir mailbox..."
+msgstr "ཉེ་གནས་ཡིག་འཕྲིན་སྣོད་ཐོའི་ཡིག་སྒྲོམ..."
+
+#: ../src/main-window.c:407
+#: ../src/main-window.c:829
+msgid "Add a new Maildir style mailbox"
+msgstr "ཡིག་འཕྲིན་སྣོད་ཐོའི་བཟོ་རྣམ་ཡིག་སྒྲོམ་གསརཔ་ཅིག་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/main-window.c:410
+msgid "Local MH mailbox..."
+msgstr "ཉེ་གནས་ཨེམ་ཨེཆ་ཡིག་སྒྲོམ..."
+
+#: ../src/main-window.c:411
+#: ../src/main-window.c:833
+msgid "Add a new MH style mailbox"
+msgstr "ཨེམ་ཨེཆ་བཟོ་རྣམ་ཡིག་སྒྲོམ་གསརཔ་ཅིག་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/main-window.c:414
+#: ../src/main-window.c:836
+#: ../src/pref-manager.c:3108
+msgid "Remote IMAP mailbox..."
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་ཡིག་སྒྲོམ..."
+
+#: ../src/main-window.c:415
+#: ../src/main-window.c:837
+msgid "Add a new IMAP mailbox"
+msgstr "ཨའི་ཨེམ་ཨེ་པི་ཡིག་སྒྲོམ་གསརཔ་ཅིག་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/main-window.c:419
+#: ../src/main-window.c:841
+#: ../src/pref-manager.c:3113
+msgid "Remote IMAP folder..."
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་སྣོད་འཛིན..."
+
+#: ../src/main-window.c:420
+#: ../src/main-window.c:842
+msgid "Add a new IMAP folder"
+msgstr "ཨའི་ཨེམ་ཨེ་པི་སྣོད་འཛིན་གསརཔ་ཅིག་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/main-window.c:423
+#: ../src/main-window.c:845
+msgid "Remote IMAP subfolder..."
+msgstr "ཐག་རིང་གི་ཨའི་ཨེམ་ཨེ་པི་ཡན་ལག་སྣོད་འཛིན..."
+
+#: ../src/main-window.c:424
+#: ../src/main-window.c:846
+msgid "Add a new IMAP subfolder"
+msgstr "ཨའི་ཨེམ་ཨེ་པི་ཡན་ལག་སྣོད་འཛིན་གསརཔ་ཅིག་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/main-window.c:437
+msgid "_Continue"
+msgstr "འཕྲོ་མཐུད། (_C)"
+
+#: ../src/main-window.c:438
+msgid "Continue editing current message"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་ཞུན་དག་འབད་ནི་ལུ་འཕྲོ་མཐུད་"
+
+#. Ctrl-M
+#: ../src/main-window.c:445
+#: ../src/main-window.c:888
+msgid "_Get New Mail"
+msgstr "ཡིག་འཕྲིན་གསརཔ་ལེན། (_G)"
+
+#: ../src/main-window.c:445
+#: ../src/main-window.c:888
+msgid "Fetch new incoming mail"
+msgstr "ནང་འབྱོར་ཡིག་འཕྲིན་གསརཔ་ལེན་"
+
+#. Ctrl-S
+#: ../src/main-window.c:451
+#: ../src/main-window.c:883
+msgid "_Send Queued Mail"
+msgstr "མི་གྲལ་ཡིག་འཕྲིན་གཏང་། (_S)"
+
+#: ../src/main-window.c:452
+#: ../src/main-window.c:884
+msgid "Send messages from the outbox"
+msgstr "ཨའུཊི་བོགསི་ལས་འཕྲིན་དོན་ཚུ་གཏང་"
+
+#. Ctrl-B
+#: ../src/main-window.c:458
+#: ../src/main-window.c:878
+msgid "Send and _Receive Mail"
+msgstr "ཡིག་འཕྲིན་གཏང་ནི་དང་ལེན། (_R)"
+
+#: ../src/main-window.c:459
+#: ../src/main-window.c:879
+#: ../src/toolbar-factory.c:113
+msgid "Send and Receive messages"
+msgstr "འཕྲིན་དོན་ཚུ་གཏང་ནི་དང་ལེན་"
+
+#: ../src/main-window.c:464
+#: ../src/main-window.c:894
+#: ../src/message-window.c:100
+#: ../src/sendmsg-window.c:365
+msgid "Page _Setup"
+msgstr "ཤོག་ལེབ་གཞི་སྒྲིག།(_S)"
+
+#: ../src/main-window.c:465
+#: ../src/main-window.c:895
+#: ../src/message-window.c:101
+#: ../src/sendmsg-window.c:366
+msgid "Set up page for printing"
+msgstr "དཔར་བསྐྲུན་གྱི་དོན་ལུ་ཤོག་ལེབ་གཞི་སྒྲིག་འབད་"
+
+#: ../src/main-window.c:472
+#: ../src/main-window.c:899
+#: ../src/sendmsg-window.c:373
+#: ../src/sendmsg-window.c:540
+msgid "_Print..."
+msgstr "དཔར་བསྐྲུན... (_P)"
+
+#: ../src/main-window.c:473
+#: ../src/main-window.c:900
+#: ../src/toolbar-factory.c:109
+msgid "Print current message"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་དཔར་བསྐྲུན་འབད་"
+
+#: ../src/main-window.c:479
+#: ../src/main-window.c:1117
+msgid "_Address Book..."
+msgstr "ཁ་བྱང་ཀི་དེབ... (_A)"
+
+#: ../src/main-window.c:480
+#: ../src/main-window.c:1118
+msgid "Open the address book"
+msgstr "ཁ་བྱང་ཀི་དེབ་ཁ་ཕྱེ་"
+
+#: ../src/main-window.c:504
+msgid "F_ilters..."
+msgstr "ཚགས་མ་ཚུ... (_i)"
+
+#: ../src/main-window.c:504
+#: ../src/main-window.c:1104
+msgid "Manage filters"
+msgstr "ཚགས་མ་ཚུ་འཛིན་སྐྱོང་འཐབ་"
+
+#: ../src/main-window.c:506
+#: ../src/main-window.c:1110
+msgid "_Export Filters"
+msgstr "ཚགས་མ་ཚུ་ཕྱིར་འདྲེན་འབད། (_E)"
+
+#: ../src/main-window.c:506
+#: ../src/main-window.c:1111
+msgid "Export filters as Sieve scripts"
+msgstr "ཚགས་མ་ཚུ་སིཕ་ཡིག་ཚུགས་སྦེ་ཕྱིར་འདྲེན་འབད་"
+
+#: ../src/main-window.c:514
+msgid "_Flat index"
+msgstr "ཟུར་ཐོ་ལེབ་ཏེམ། (_F)"
+
+#: ../src/main-window.c:515
+msgid "No threading at all"
+msgstr "ཐེ་རེཊི་མ་པ་ལས་རང་མི་འབད་བས་"
+
+#: ../src/main-window.c:520
+msgid "Si_mple threading"
+msgstr "ཐེ་རེཌི་འབད་ནི་འཇམ་སམ། (_m)"
+
+#: ../src/main-window.c:521
+msgid "Simple threading algorithm"
+msgstr "ཐེ་རེཌ་འབད་ནིའི་ཨཱལ་གོ་རིམ་དམ་འཇམ་སམ་"
+
+#: ../src/main-window.c:526
+msgid "_JWZ threading"
+msgstr "ཇེ་ཌབ་ལུ་ཛེརཌི་ཐེ་རེཌི་འབད་དོ། (_J)"
+
+#: ../src/main-window.c:527
+msgid "Elaborate JWZ threading"
+msgstr "ཇེ་ཌབ་ལུ་ཛེརཌི་ཐེ་རེཌི་འབད་ནི་འདི་ཁ་གསལ་སྦེ་བཀོད་"
+
+#: ../src/main-window.c:537
+msgid "_Show Mailbox Tree"
+msgstr "ཡིག་སྒྲོམ་རྩ་འབྲེལ་སྟོན། (_S)"
+
+#: ../src/main-window.c:538
+msgid "Toggle display of mailbox and folder tree"
+msgstr "ཡིག་སྒྲོམ་དང་སྣོད་འཛིན་རྩ་འབྲེལ་གྱི་སོར་སྟོན་བཀྲམ་སྟོན་"
+
+#: ../src/main-window.c:542
+msgid "Show Mailbox _Tabs"
+msgstr "ཡིག་སྒྲོམ་ཨེབ་ལྡེ་ཚུ་སྟོན། (_T)"
+
+#: ../src/main-window.c:543
+msgid "Toggle display of mailbox notebook tabs"
+msgstr "ཡིག་སྒྲོམ་ཀི་དེབ་ཨེབ་ལྡེ་ཚུ་གི་སོར་སྟོན་བཀྲམ་སྟོན་"
+
+#: ../src/main-window.c:547
+#: ../src/main-window.c:969
+#: ../src/message-window.c:134
+msgid "_Wrap"
+msgstr "ལོག་མཚམས། (_W)"
+
+#: ../src/main-window.c:547
+#: ../src/main-window.c:969
+#: ../src/sendmsg-window.c:402
+#: ../src/sendmsg-window.c:565
+msgid "Wrap message lines"
+msgstr "འཕྲིན་དོན་གྲལ་ཐིག་ཚུ་ལོག་མཚམས་བཟོ་"
+
+#: ../src/main-window.c:556
+#: ../src/main-window.c:975
+msgid "E_xpand All"
+msgstr "ཆ་མཉམ་རྒྱ་འཕར་གཏང་། (_x)"
+
+#: ../src/main-window.c:557
+#: ../src/main-window.c:976
+msgid "Expand all threads"
+msgstr "ཐེ་རེཌི་ཚུ་ཆ་མཉམ་རྒྱ་འཕར་གཏང་"
+
+#: ../src/main-window.c:561
+#: ../src/main-window.c:980
+msgid "_Collapse All"
+msgstr "ཆ་མཉམ་ཧྲམ་ནི། (_C)"
+
+#: ../src/main-window.c:562
+#: ../src/main-window.c:981
+msgid "Collapse all expanded threads"
+msgstr "རྒྱ་འཕར་གཏང་ཡོད་པའི་ཐེ་རེཌི་ཚུ་ཆ་མཉམ་ཧྲམ་ནི་"
+
+#: ../src/main-window.c:568
+#: ../src/main-window.c:1011
+#: ../src/message-window.c:140
+msgid "Zoom _In"
+msgstr "ཕྱིར་རྒྱས། (_I)"
+
+#: ../src/main-window.c:568
+#: ../src/main-window.c:1011
+#: ../src/message-window.c:140
+msgid "Increase magnification"
+msgstr "ཆེར་སྐྱེད་ཡར་འཕར་ནི་"
+
+#: ../src/main-window.c:572
+#: ../src/main-window.c:1015
+#: ../src/message-window.c:144
+msgid "Zoom _Out"
+msgstr "ནང་བཟུམ། (_O)"
+
+#: ../src/main-window.c:572
+#: ../src/main-window.c:1015
+#: ../src/message-window.c:144
+msgid "Decrease magnification"
+msgstr "ཆེར་སྐྱེད་མར་ཕབ་"
+
+#. To warn msgfmt that the % sign isn't a format specifier:
+#. To warn msgfmt that the % sign isn't a
+#. * format specifier:
+#: ../src/main-window.c:578
+#: ../src/main-window.c:1021
+#: ../src/message-window.c:151
+#, no-c-format
+msgid "Zoom _100%"
+msgstr "100%རྒྱས་ཟུམ། ( _1)"
+
+#: ../src/main-window.c:578
+#: ../src/main-window.c:1021
+#: ../src/message-window.c:151
+msgid "No magnification"
+msgstr "ཆེར་སྐྱེད་མེད་"
+
+#: ../src/main-window.c:596
+#: ../src/main-window.c:1065
+#: ../src/toolbar-factory.c:85
+msgid "Reply to the current message"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་ལུ་ལན་གསལ་འབད་"
+
+#. A
+#: ../src/main-window.c:603
+#: ../src/main-window.c:1071
+#: ../src/message-window.c:166
+msgid "Reply to _All..."
+msgstr "ཆ་མཉམ་ལུ་ལན་གསལ... (_A)"
+
+#: ../src/main-window.c:604
+#: ../src/main-window.c:1072
+msgid "Reply to all recipients of the current message"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་གྱི་ཐོབ་མཁན་ཆ་མཉམ་ལུ་ལན་གསལ་"
+
+#: ../src/main-window.c:611
+#: ../src/message-window.c:172
+msgid "Reply to _Group..."
+msgstr "སྡེ་ཚན་ལུ་ལན་གསལ... (_G)"
+
+#: ../src/main-window.c:612
+#: ../src/message-window.c:173
+#: ../src/toolbar-factory.c:89
+msgid "Reply to mailing list"
+msgstr "ཡིག་འཕྲིན་གཏང་བའི་ཐོ་ཡིག་ལུ་ལན་གསལ་"
+
+#: ../src/main-window.c:619
+#: ../src/message-window.c:178
+msgid "_Forward attached..."
+msgstr "གདོང་བསྐྱོད་མཉམ་སྦྲགས... (_F)"
+
+#: ../src/main-window.c:620
+msgid "Forward the current message as attachment"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་འདི་མཉམ་སྦྲགས་སྦེ་གདོང་བསྐྱོད་འབད་"
+
+#: ../src/main-window.c:626
+msgid "Forward _inline..."
+msgstr "གྱལ་རིམ་ནང་གདོང་བསྐྱོད་འབད... (_i)"
+
+#: ../src/main-window.c:627
+msgid "Forward the current message inline"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་གྱལ་རིམ་ནང་འདི་གདོང་བསྐྱོད་འབད་"
+
+#: ../src/main-window.c:635
+msgid "Pipe the message through another program"
+msgstr "འཕྲིན་དོན་འདི་ལས་རིམ་གཞན་མི་ལས་རྒྱུད་དེ་རྒྱུད་དུང་འབད་"
+
+#: ../src/main-window.c:642
+msgid "_Next Part"
+msgstr "ཤུལ་མའི་ཡན་ལག། (_N)"
+
+#: ../src/main-window.c:642
+#: ../src/message-window.c:190
+msgid "Next part in message"
+msgstr "འཕྲིན་དོན་ནང་ཤུལ་མའི་ཡན་ལག་"
+
+#: ../src/main-window.c:648
+msgid "_Previous Part"
+msgstr "ཧེ་མའི་ཆ་ཤས། (_P)"
+
+#: ../src/main-window.c:649
+#: ../src/message-window.c:196
+msgid "Previous part in message"
+msgstr "འཕྲིན་དོན་ནང་ཧེ་མའི་ཆ་ཤས་"
+
+#: ../src/main-window.c:655
+#: ../src/main-window.c:1085
+#: ../src/message-window.c:200
+msgid "Save Current Part..."
+msgstr "ད་ལྟོའི་ཆ་ཤས་སྲུང་..."
+
+#: ../src/main-window.c:656
+#: ../src/main-window.c:1086
+msgid "Save currently displayed part of message"
+msgstr "ད་ལྟོ་བཀྲམ་སྟོན་འབད་དེ་ཡོད་པའི་འཕྲིན་དོན་གྱི་ཆ་ཤས་སྲུང་"
+
+#: ../src/main-window.c:662
+#: ../src/main-window.c:1038
+#: ../src/message-window.c:205
+msgid "_View Source..."
+msgstr "བྱུང་ཁུངས་སྟོན... (_V)"
+
+#: ../src/main-window.c:663
+#: ../src/main-window.c:1039
+#: ../src/message-window.c:206
+msgid "View source form of the message"
+msgstr "འཕྲིན་དོན་གྱི་བྱུང་ཁུངས་རྣམ་པ་འདི་སྟོན་"
+
+#: ../src/main-window.c:681
+#: ../src/message-window.c:241
+msgid "_Move to Trash"
+msgstr "ཕྱགས་ཧོད་ལུ་སྤོ་བཤུད་འབད། (_M)"
+
+#: ../src/main-window.c:682
+#: ../src/main-window.c:1093
+msgid "Move the current message to Trash mailbox"
+msgstr "ཕྱགས་ཧོད་ཡིག་སྒྲོམ་ལུ་ ད་ལྟོའི་འཕྲིན་དོན་འདི་སྤོ་བཤུད་འབད་"
+
+#. !
+#: ../src/main-window.c:688
+#: ../src/main-window.c:1044
+msgid "_Toggle flag"
+msgstr "ཟུར་རྟགས་སོར་སྟོན། (_T)"
+
+#: ../src/main-window.c:694
+#: ../src/main-window.c:1049
+msgid "Store address of sender in addressbook"
+msgstr "གཏང་མི་གི་ཁ་བྱང་འདི་  ཁ་བྱང་ཀི་དེབ་ནང་གསོག་འཇོག་འབད་"
+
+#: ../src/main-window.c:705
+#: ../src/main-window.c:1002
+msgid "Next Message"
+msgstr "ཤུལ་མའི་འཕྲིན་དོན་"
+
+#: ../src/main-window.c:711
+#: ../src/main-window.c:1006
+#: ../src/message-window.c:220
+msgid "Previous Message"
+msgstr "ཧེ་མའི་འཕྲིན་དོན་"
+
+#: ../src/main-window.c:717
+#: ../src/main-window.c:718
+#: ../src/main-window.c:996
+#: ../src/main-window.c:997
+#: ../src/message-window.c:226
+#: ../src/message-window.c:227
+msgid "Next Unread Message"
+msgstr "ཤུལ་མའི་ལྷག་བཤོལ་འཕྲིན་དོན་"
+
+#: ../src/main-window.c:724
+#: ../src/main-window.c:725
+#: ../src/main-window.c:961
+#: ../src/main-window.c:962
+#: ../src/message-window.c:233
+#: ../src/message-window.c:234
+msgid "Next Flagged Message"
+msgstr "ཤུལ་མའི་ཟུར་རྟགས་བཀོད་ཡོད་པའི་འཕྲིན་དོན་"
+
+#: ../src/main-window.c:732
+msgid "_Hide messages"
+msgstr "འཕྲིན་དོན་ཚུ་སྦ་བཞག། (_H)"
+
+#: ../src/main-window.c:734
+msgid "_Reset Filter"
+msgstr "ཚགས་མ་ལོག་གཞི་སྒྲིག་འབད། (_R)"
+
+#: ../src/main-window.c:734
+msgid "Reset mailbox filter"
+msgstr "ཡིག་སྒྲོམ་ཚགས་མ་འདི་ལོག་གཞི་སྒྲིག་འབད་"
+
+#: ../src/main-window.c:739
+msgid "_Select All"
+msgstr "ཆ་མཉམ་སེལ་འཐུ་འབད། (_S)"
+
+#: ../src/main-window.c:740
+msgid "Select all messages in current mailbox"
+msgstr "ད་ལྟོའི་ཡིག་སྒྲོམ་ནང་འཕྲིན་དོན་ཆ་མཉ་སེལ་འཐུ་འབད་"
+
+#: ../src/main-window.c:746
+#: ../src/main-window.c:856
+msgid "_Edit..."
+msgstr "ཞུན་དག... (_E)"
+
+#: ../src/main-window.c:746
+#: ../src/main-window.c:856
+msgid "Edit the selected mailbox"
+msgstr "སེལ་འཐུ་འབད་ཡོད་པའི་ཡིག་སྒྲོམ་འདི་ཞུན་དག་འབད་"
+
+#: ../src/main-window.c:750
+#: ../src/main-window.c:851
+msgid "_Delete..."
+msgstr "བཏོན་གཏང་... (_D)"
+
+#: ../src/main-window.c:751
+#: ../src/main-window.c:852
+msgid "Delete the selected mailbox"
+msgstr "སེལ་འཐུ་འབད་དེ་ཡོད་པའི་ཡིག་སྒྲོམ་འདི་བཏོན་གཏང་"
+
+#: ../src/main-window.c:757
+msgid "E_xpunge Deleted Messages"
+msgstr "བཏོན་གཏང་ཡོད་པའི་འཕྲིན་དོན་ཚུ་ རྩ་མེད་གཏང་ནི། (_x)"
+
+#: ../src/main-window.c:758
+#: ../src/main-window.c:863
+msgid "Expunge messages marked as deleted in the currently opened mailbox"
+msgstr "ད་ལྟོ་ཁ་ཕྱེ་དེ་ཡོད་པའི་ཡིག་སྒྲོམ་ནང་ལུ་  བཏོན་གཏང་ཡོད་ཟེར་རྟགས་བཀལ་ཡོད་པའི་འཕྲིན་དོན་ཚུ་རྩ་མེད་གཏང་"
+
+#: ../src/main-window.c:763
+#: ../src/main-window.c:869
+msgid "Close mailbox"
+msgstr "ཡིག་སྒྲོམ་ཁ་བསྡམ་"
+
+#: ../src/main-window.c:767
+#: ../src/main-window.c:1122
+msgid "Empty _Trash"
+msgstr "ཕྱགས་ཧོད་སྟོངམ་སྟོན། (_T)"
+
+#: ../src/main-window.c:768
+#: ../src/main-window.c:1123
+#: ../src/toolbar-factory.c:135
+msgid "Delete messages from the Trash mailbox"
+msgstr "ཕྱགས་ཧོད་ཡིག་སྒྲོམ་ལས་ འཕྲིན་དོན་ཚུ་བཏོན་གཏང་"
+
+#: ../src/main-window.c:772
+msgid "Select _Filters"
+msgstr "ཚགས་མ་ཚུ་སེལ་འཐུ་འབད། ( _F)"
+
+#: ../src/main-window.c:773
+#: ../src/main-window.c:1108
+msgid "Select filters to be applied automatically to current mailbox"
+msgstr "ད་ལྟོའི་ཡིག་སྒྲོམ་ལུ་རང་བཞིན་གྱིས་འཇུག་སྤྱོད་འབད་ནི་ལུ་ ཚགས་མ་ཚུ་སེལ་འཐུ་འབད་"
+
+#: ../src/main-window.c:778
+msgid "_Remove Duplicates"
+msgstr "རྫུན་མ་ཚུ་རྩ་བསྐྲད་གཏང་། (_R)"
+
+#: ../src/main-window.c:779
+msgid "Remove duplicated messages from the selected mailbox"
+msgstr "སེལ་འཐུ་འབད་དེ་ཡོད་པའི་ཡིག་སྒྲོམ་ལས་  ངོ་བཤུས་འབད་ཡོད་པའི་འཕྲིན་དོན་ཚུ་རྩ བསྐྲད་གཏང་"
+
+#: ../src/main-window.c:794
+msgid "_Toolbars..."
+msgstr "ལག་ཆས་ཕྲ་རིང་ཚུ... (_T)"
+
+#: ../src/main-window.c:795
+msgid "Customize toolbars"
+msgstr "ལག་ཆས་ཕྲ་རིང་ཚུ་སྲོལ་སྒྲིག་འབད་"
+
+#: ../src/main-window.c:798
+#: ../src/main-window.c:1126
+msgid "_Identities..."
+msgstr "ངོ་རྟགས་ཚུ... (_I)"
+
+#: ../src/main-window.c:799
+#: ../src/main-window.c:1127
+msgid "Create and set current identities"
+msgstr "ད་ལྟོའི་ངོ་རྟགས་ཚུ་གསར་བསྐྲུན་འབད་ནི་དང་གཞི་སྒྲིག་འབད་"
+
+#: ../src/main-window.c:810
+msgid "Mail_box"
+msgstr "ཡིག་སྒྲོམ། (_b)"
+
+#: ../src/main-window.c:811
+#: ../src/main-window.c:1140
+#: ../src/message-window.c:258
+msgid "_Message"
+msgstr "འཕྲིན་དོན། (_M)"
+
+#: ../src/main-window.c:823
+msgid "New mailbox..."
+msgstr "ཡིག་སྒྲོམ་གསརཔ..."
+
+#: ../src/main-window.c:828
+msgid "New \"Maildir\" mailbox..."
+msgstr "ཡིག་སྒྲོམ་ \"Maildir\" གསརཔ..."
+
+#: ../src/main-window.c:832
+msgid "New \"MH\" mailbox..."
+msgstr "ཡིག་སྒྲོམ་ \"MH\" གསརཔ..."
+
+#: ../src/main-window.c:862
+msgid "_Compress Mailbox"
+msgstr "ཡིག་སྒྲོམ་ཨེབ་བཙུགས་འབད་ནི། (_C)"
+
+#: ../src/main-window.c:892
+msgid "Mail_boxes"
+msgstr "ཡིག་སྒྲོམ་ཚུ། (_b)"
+
+#: ../src/main-window.c:923
+msgid "By _Arrival"
+msgstr "ལྷོད་པ་གིས། (_A)"
+
+#: ../src/main-window.c:923
+msgid "Arrival order"
+msgstr "ལྷོད་པའི་རིམ་པ་"
+
+#: ../src/main-window.c:927
+msgid "By _Sender"
+msgstr "གཏང་མི་གིས། (_S)"
+
+#: ../src/main-window.c:927
+msgid "Sender order"
+msgstr "གཏང་མིའི་རིམ་པ་"
+
+#: ../src/main-window.c:931
+msgid "By S_ubject"
+msgstr "དོན་ཚན་གྱིས། (_u)"
+
+#: ../src/main-window.c:931
+msgid "Subject order"
+msgstr "དོན་ཚན་རིམ་པ་"
+
+#: ../src/main-window.c:935
+msgid "By Si_ze"
+msgstr "ཚད་གཞི་གིས། (_z)"
+
+#: ../src/main-window.c:935
+msgid "By message size"
+msgstr "འཕྲིན་དོན་ཚད་ཀྱིས་"
+
+#: ../src/main-window.c:939
+msgid "_Threaded"
+msgstr "ཐེ་རེཌི་འབད་ཡོདཔ། (_T)"
+
+#: ../src/main-window.c:939
+msgid "Use message threading"
+msgstr "འཕྲིན་དོན་ཐེ་རེཌི་འབད་ནི་འདི་ལག་ལེན་འཐབ་"
+
+#: ../src/main-window.c:947
+msgid "_Descending"
+msgstr "མར་འབབ། (_D)"
+
+#: ../src/main-window.c:947
+msgid "Sort in a descending order"
+msgstr "མར་འབབ་རིམ་པའི་ནང་དབྱེ་སེལ་འབད་"
+
+#: ../src/main-window.c:968
+msgid "_Headers"
+msgstr "མགོ་ཡིག་ཚུ། (_H)"
+
+#: ../src/main-window.c:971
+msgid "_Sort Mailbox"
+msgstr "ཡིག་སྒྲོམ་དབྱེ་སེལ་འབད། (_S)"
+
+#: ../src/main-window.c:972
+msgid "H_ide messages"
+msgstr "འཕྲིན་དོན་ཚུ་སྦ་བཞག། (_i)"
+
+#: ../src/main-window.c:986
+msgid "_View filter"
+msgstr "ཚགས་མ་སྟོན། (_V)"
+
+#: ../src/main-window.c:987
+msgid "Enable quick message index filter"
+msgstr "མགྱོགས་པའི་འཕྲིན་དོན་ཟུར་ཐོའི་ཚགས་མ་ལྕོགས་ཅན་བཟོ་"
+
+#: ../src/main-window.c:1025
+#: ../src/main-window.c:1099
+#: ../src/sendmsg-window.c:542
+#: ../src/sendmsg-window.c:600
+#: ../src/sendmsg-window.c:664
+msgid "_More"
+msgstr "ཧེང་བཀལ། (_M)"
+
+#: ../src/main-window.c:1058
+msgid "_New..."
+msgstr "གསརཔ... (_N)"
+
+#. F
+#: ../src/main-window.c:1078
+msgid "_Forward..."
+msgstr "གདོང་བསྐྱོད... (_F)"
+
+#: ../src/main-window.c:1079
+#: ../src/toolbar-factory.c:91
+msgid "Forward the current message"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་འདི་གདོང་བསྐྱོད་འབད་"
+
+#. D
+#: ../src/main-window.c:1092
+msgid "_Delete to Trash"
+msgstr "ཕྱགས་ཧོད་ལུ་བཏོན་གཏང་། (_D)"
+
+#: ../src/main-window.c:1104
+msgid "_Manage..."
+msgstr "འཛིན་སྐྱོང་འཐབ... (_M)"
+
+#: ../src/main-window.c:1107
+msgid "_Select Filters"
+msgstr "ཚགས་མ་ཚུ་སེལ་འཐུ་འབད། (_S)"
+
+#: ../src/main-window.c:1125
+msgid "_Filters"
+msgstr "ཚགས་མ་ཚུ། (_F)"
+
+#: ../src/main-window.c:1141
+#: ../src/sendmsg-window.c:680
+msgid "_Tools"
+msgstr "ལག་ཆས་ཚུ། (_T)"
+
+#: ../src/main-window.c:1245
+msgid ""
+"Balsa is sending a mail now.\n"
+"Abort sending?"
+msgstr ""
+"ད་ལྟོ་བཱལ་ས་དེ་གིས་ཡིག་འཕྲིན་གཏང་དོ། \n"
+"གཏང་ནི་འདི་བར་བཤོལ་འབད་ག?"
+
+#: ../src/main-window.c:1487
+msgid "Subject or Sender Contains:"
+msgstr "དོན་ཚན་ཡང་ན་གཏང་མིའི་གནས་ཡོདཔ:"
+
+#: ../src/main-window.c:1488
+msgid "Subject or Recipient Contains:"
+msgstr "དོན་ཚན་ཡང་ན་ཐོབ་མཁན་གནས་ཡོདཔ:"
+
+#: ../src/main-window.c:1489
+msgid "Subject Contains:"
+msgstr "དོན་ཚན་གནས་ཡོདཔ:"
+
+#: ../src/main-window.c:1490
+msgid "Body Contains:"
+msgstr "མ་གཟུགས་གནས་ཡོདཔ:"
+
+#: ../src/main-window.c:1491
+msgid "Older than (days):"
+msgstr "(ཉིནམ་)ལས་རྙིངམ:"
+
+#: ../src/main-window.c:2384
+#, c-format
+msgid ""
+"Unable to Open Mailbox!\n"
+"%s."
+msgstr ""
+"ཡིག་སྒྲོམ་ཁ་ཕྱེ་མ་ཚུགས!\n"
+"%s."
+
+#: ../src/main-window.c:2700
+msgid "translator-credits"
+msgstr "སྐད་བསྒྱུར་པའི་-ངོ་བསྟོད་ཚུ་"
+
+#: ../src/main-window.c:2713
+#: ../src/main-window.c:2740
+msgid ""
+"The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at http://balsa.gnome.org/\n"
+"\n"
+"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+msgstr ""
+"བཱལ་ས་གློག་འཕྲིན་ཞབས་ཏོག་སྤྱོད་མི་འདི་  ཇི་ནོམ་ཌེཀསི་ཊོཔ་མཐའ་འཁོར་གྱི་ཆ་ཤས་ཨིན།  བཱལ་སའི་བརྡ་དོན་འདི་ http://balsa.gnome.org/ གུ་ཐོབ་ཚུགས།\n"
+"\n"
+"ཁྱོད་ཀྱིས་རྐྱེན་ཚུ་སྙན་ཞུ་འབད་ནི་ཨིན་པ་ཅིན་   http://bugzilla.gnome.org/ ལུ་འབད་གནང་:"
+
+#: ../src/main-window.c:2844
+#: ../src/main-window.c:2857
+msgid "Checking Mail..."
+msgstr "ཡིག་འཕྲིན་ཞིབ་དཔྱད་འབད་དོ..."
+
+#: ../src/main-window.c:3044
+#, c-format
+msgid "IMAP mailbox: %s"
+msgstr "ཨའི་ཨེམ་ཨེ་པི་ཡིག་འཕྲིན་སྒྲོམ: %s"
+
+#: ../src/main-window.c:3048
+#, c-format
+msgid "Local mailbox: %s"
+msgstr "ཉེ་གནས་ཡིག་སྒྲོམ: %s"
+
+#: ../src/main-window.c:3186
+msgid "Finished Checking."
+msgstr "ཞིབ་དཔྱད་འབད་ཚར་ནུག།"
+
+#: ../src/main-window.c:3248
+#, c-format
+msgid "Sending error: %s"
+msgstr "འཛོལ་བ་གཏང་དོ: %s"
+
+#: ../src/main-window.c:3333
+msgid "Balsa: New mail"
+msgstr "བཱལ་ས: ཡིག་འཕྲིན་གསརཔ་"
+
+#: ../src/main-window.c:3345
+#, c-format
+msgid "You have received %d new message."
+msgid_plural "You have received %d new messages."
+msgstr[0] "ཁྱོད་ལུ་ %d ཡིག་འཕྲིན་གསརཔ་ཐོབ་ཡོད།"
+msgstr[1] "ཁྱོད་ལུ་ %d ཡིག་འཕྲིན་གསརཔ་ཚུ་ཐོབ་ཡོད།"
+
+#: ../src/main-window.c:3348
+msgid "You have new mail."
+msgstr "ཁྱོད་ལུ་ཡིག་འཕྲིན་གསརཔ་ཡོད།"
+
+#: ../src/main-window.c:3482
+#, c-format
+msgid "The next unread message is in %s"
+msgstr "ཤུལ་མའི་ལྷག་བཤོལ་འཕྲིན་དོན་འདི་ %s ནང་ཡོད་"
+
+#: ../src/main-window.c:3486
+#, c-format
+msgid "Do you want to switch to %s?"
+msgstr "ཁྱོད་ཀྱིས་ %s ལུ་སོར་བསྒྱུར་འབད་ནི་ཨིན་ན?"
+
+#: ../src/main-window.c:4019
+msgid "Search mailbox"
+msgstr "ཡིག་སྒྲོམ་འཚོལ་ཞིབ་འབད་"
+
+#: ../src/main-window.c:4036
+msgid "_Search for:"
+msgstr "དོན་ལུ་འཚོལ་ཞིབ་འབད: (_S)"
+
+#. builds the toggle buttons to specify fields concerned by
+#. * the search.
+#: ../src/main-window.c:4049
+msgid "In:"
+msgstr "ནང་ན:"
+
+#: ../src/main-window.c:4060
+msgid "S_ubject"
+msgstr "དོན་ཚན། (_u)"
+
+#. Frame with Apply and Clear buttons
+#: ../src/main-window.c:4065
+msgid "Show only matching messages"
+msgstr "མཐུན་སྒྲིག་ཡོད་པའི་འཕྲིན་དོན་རྐྱངམ་ཅིག་སྟོན་"
+
+#. Frame with OK button
+#: ../src/main-window.c:4086
+msgid "Open next matching message"
+msgstr "ཤུལ་མའི་མཐུན་སྒྲིག་ཡོད་པའི་འཕྲིན་དོན་ཁ་ཕྱེ་"
+
+#: ../src/main-window.c:4097
+msgid "_Reverse search"
+msgstr "འཚོལ་ཞིབ་རིམ་ལོག་འབད། (_R)"
+
+#: ../src/main-window.c:4102
+msgid "_Wrap around"
+msgstr "མཐའ་སྐོར་ལོག་མཚམས་བཟོ། (_W)"
+
+#: ../src/main-window.c:4264
+msgid "You can apply filters only on mailbox\n"
+msgstr "ཁྱོད་ཀྱིས་ཚགས་མ་ཚུ་ཡིག་སྒྲོམ་གུ་རྐྱངམ་ཅིག་འཇུག་སྤྱོད་འབད་ཚུགས\n"
+
+#: ../src/main-window.c:4278
+#, c-format
+msgid "Removing duplicates failed: %s"
+msgstr "རྫུན་མ་རྩ་བསྐྲད་གཏང་མ་ཚུགས: %s"
+
+#: ../src/main-window.c:4498
+#, c-format
+msgid "Could not open trash: %s"
+msgstr "ཕྱགས་ཧོད་ཁ་ཕྱེ་མ་ཚུགས: %s"
+
+#: ../src/main-window.c:4627
+#, c-format
+msgid "Balsa: %s (readonly)"
+msgstr "བཱལ་ས: %s (ལྷག་ཙམ་)"
+
+#: ../src/main-window.c:4629
+#, c-format
+msgid "Balsa: %s"
+msgstr "བཱལ་ས: %s"
+
+#: ../src/main.c:212
+#: ../src/main.c:261
+msgid "Get new mail on startup"
+msgstr "འགོ་བཙུགས་ཟེར་མི་གུ་ཡིག་འཕྲིན་གསརཔ་ལེན་"
+
+#: ../src/main.c:214
+#: ../src/main.c:263
+msgid "Compose a new email to EMAIL@ADDRESS"
+msgstr "EMAIL@ADDRESS ལུ་གློག་འཕྲིན་གསརཔ་ཅིག་བརྩམ་"
+
+#: ../src/main.c:216
+#: ../src/main.c:265
+msgid "Attach file at PATH"
+msgstr "འགྲུལ་ལམ་ལུ་ཡིག་སྣོད་མཉམ་སྦྲགས་འབད་"
+
+#: ../src/main.c:218
+#: ../src/main.c:268
+msgid "Opens MAILBOXNAME"
+msgstr "MAILBOXNAME ཁ་ཕྱེ་"
+
+#: ../src/main.c:218
+#: ../src/main.c:268
+msgid "MAILBOXNAME"
+msgstr "MAILBOXNAME"
+
+#: ../src/main.c:221
+#: ../src/main.c:271
+msgid "Opens first unread mailbox"
+msgstr "མ་ལྷག་པའི་ཡིག་སྒྲོམ་འདི་དང་པ་ཁ་ཕྱེཝ་ཨིན་"
+
+#: ../src/main.c:224
+#: ../src/main.c:274
+msgid "Opens default Inbox on startup"
+msgstr "འགོ་བཙུགས་གུ་  སྔོན་སྒྲིག་ནང་སྒྲོམ་ཁ་ཕྱེཝ་ཨིན་"
+
+#: ../src/main.c:227
+#: ../src/main.c:277
+msgid "Prints number unread and unsent messages"
+msgstr "མ་ལྷག་པའི་ཨང་གྲངས་དང་མ་གཏང་པའི་འཕྲིན་དོན་ཚུ་དཔར་བསྐྲུན་འབདཝ་ཨིན་"
+
+#: ../src/main.c:229
+#: ../src/main.c:279
+msgid "Debug POP3 connection"
+msgstr "རྐྱེན་སེལ་ པི་ཨོ་པི་༣ མཐུད་ལམ་"
+
+#: ../src/main.c:231
+#: ../src/main.c:281
+msgid "Debug IMAP connection"
+msgstr "རྐྱེན་སེལ་ ཨའི་ཨེམ་ཨེ་པི་མཐུད་ལམ་"
+
+#: ../src/main.c:253
+msgid "The Balsa E-Mail Client"
+msgstr "བཱལ་ས་གློག་འཕྲིན་གྱི་ཞབས་ཏོག་སྤྱོད་མི་"
+
+#: ../src/main.c:335
+#: ../src/main.c:340
+#: ../src/main.c:346
+#: ../src/main.c:352
+#: ../src/main.c:358
+#, c-format
+msgid "Balsa cannot open your \"%s\" mailbox."
+msgstr "བཱལ་ས་དེ་གིས་ ཁྱོད་ཀྱི་ \"%s\" ཡིག་སྒྲོམ་འདི་ཁ་ཕྱེ་མི་ཚུགས།"
+
+#: ../src/main.c:335
+msgid "Inbox"
+msgstr "ནང་སྒྲོམ་"
+
+#: ../src/main.c:341
+msgid "Outbox"
+msgstr "ཨའུཊི་བོགསི་"
+
+#: ../src/main.c:347
+msgid "Sentbox"
+msgstr "གཏང་སྒྲོམ་"
+
+#: ../src/main.c:353
+msgid "Draftbox"
+msgstr "ཟིན་བྲིས་སྒྲོམ་"
+
+#: ../src/main.c:358
+msgid "Trash"
+msgstr "ཕྱགས་ཧོད་"
+
+#: ../src/main.c:573
+msgid "Compressing mail folders..."
+msgstr "ཡིག་འཕྲིན་སྣོད་འཛིན་ཚུ་ཨེབ་བཙུགས་འབད་དོ..."
+
+#: ../src/message-window.c:89
+msgid "N_o Headers"
+msgstr "མགོ་ཡིག་ཚུ་མེད། (_o)"
+
+#: ../src/message-window.c:91
+msgid "_Selected Headers"
+msgstr "སེལ་འཐུ་འབད་ཡོད་པའི་མགོ་ཡིག་ཚུ། (_S)"
+
+#: ../src/message-window.c:161
+msgid "Reply to this message"
+msgstr "འཕྲིན་དོན་འདི་ལུ་ལན་གསལ་འབད་"
+
+#: ../src/message-window.c:167
+msgid "Reply to all recipients of this message"
+msgstr "འཕྲིན་དོན་འདི་གི་ཐོབ་མཁན་ཆ་མཉམ་ལུ་ལན་གསལ་འབད་"
+
+#: ../src/message-window.c:179
+msgid "Forward this message as attachment"
+msgstr "འཕྲིན་དོན་འདི་མཉམ་སྦྲགས་སྦེ་གདོང་བསྐྱོད་འབད་"
+
+#: ../src/message-window.c:183
+msgid "Forward inline..."
+msgstr "གྱལ་རིམ་ནང་གདོང་བསྐྱོད་འབད..."
+
+#: ../src/message-window.c:184
+msgid "Forward this message inline"
+msgstr "འཕྲིན་དོན་འདི་གྱལ་རིམ་ནང་གདོང་བསྐྱོད་འབད་"
+
+#: ../src/message-window.c:190
+msgid "Next Part"
+msgstr "ཤུལ་མའི་འགྲུལ་ལམ་"
+
+#: ../src/message-window.c:195
+msgid "Previous Part"
+msgstr "ཧེ་མའི་ཆ་ཤས་"
+
+#: ../src/message-window.c:201
+msgid "Save current part in message"
+msgstr "འཕྲིན་དོན་ནང་ད་ལྟོའི་ཆ་ཤས་སྲུང་"
+
+#: ../src/message-window.c:213
+msgid "_Next Message"
+msgstr "ཤུལ་མའི་འཕྲིན་དོན། (_N)"
+
+#: ../src/message-window.c:213
+msgid "Next message"
+msgstr "ཤུལ་མའི་འཕྲིན་དོན་"
+
+#: ../src/message-window.c:219
+msgid "_Previous Message"
+msgstr "ཧེ་མའི་འཕྲིན་དོན། (_P)"
+
+#: ../src/message-window.c:242
+msgid "Move the message to Trash mailbox"
+msgstr "འཕྲིན་དོན་འདི་ཕྱགས་ཧོད་ཡིག་སྒྲོམ་ལུ་སྤོ་བཤུད་འབད་"
+
+#: ../src/message-window.c:257
+msgid "M_ove"
+msgstr "སྤོ་བཤུད་འབད། (_o)"
+
+#: ../src/message-window.c:380
+#, c-format
+msgid "Message from %s: %s"
+msgstr "%sལས་འཕྲིན་དོན: %s"
+
+#: ../src/balsa-mime-widget-callbacks.c:50
+#: ../src/balsa-mime-widget-callbacks.c:114
+#, c-format
+msgid "Could not create temporary file %s: %s"
+msgstr "གནས་སྐབས་ཀྱི་ཡིག་སྣོད་ %s འདི་གསར་བསྐྲུན་འབད་མ་ཚུགས: %s"
+
+#: ../src/balsa-mime-widget-callbacks.c:140
+#, c-format
+msgid "Save %s MIME Part"
+msgstr "%s མ་ཡིམ་ཆ་ཤས་འདི་སྲུང་"
+
+#: ../src/balsa-mime-widget-callbacks.c:187
+msgid "File already exists. Overwrite?"
+msgstr "ཡིག་སྣོད་འདི་ཧེ་མ་ལས་རང་གནས་ཏེ་འདུག། ཚབ་བཙུགས་ག?"
+
+#: ../src/balsa-mime-widget-crypto.c:70
+#, c-format
+msgid ""
+"This is an inline %s signed %s message part:\n"
+"%s"
+msgstr ""
+"འདི་གྱལ་རིམ་ %s མིང་རྟགས་བཀལ་ཡོདཔ་ %s འཕྲིན་དོན་ཆ་ཤས་ཨིན:\n"
+"%s"
+
+#: ../src/balsa-mime-widget-crypto.c:72
+#: ../src/print.c:1302
+#: ../src/print-gtk.c:191
+msgid "OpenPGP"
+msgstr "པི་ཇི་པི་ཁ་ཕྱེ་"
+
+#: ../src/balsa-mime-widget-crypto.c:89
+msgid "_Run gpg to import this key"
+msgstr "ལྡེ་མིག་འདི་ནང་འདྲེན་འབད་ནི་ལུ་  ཇི་པི་ཇི་གཡོག་བཀོལ། (_R)"
+
+#: ../src/balsa-mime-widget-image.c:51
+#: ../src/balsa-mime-widget-image.c:156
+#, c-format
+msgid "Error loading attached image: %s\n"
+msgstr "མཉམ་སྦྲགས་འབད་ཡོད་པའི་གཟུགས་བརྙན་མངོན་གསལ་འབད་ནི་ལུ་འཛོལ་བ: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:162
+#: ../src/balsa-mime-widget-message.c:175
+#: ../src/balsa-mime-widget-message.c:203
+#: ../src/balsa-mime-widget-message.c:256
+msgid "Content Type: external-body\n"
+msgstr "ནང་དོན་དབྱེ་བ: ཕྱིའི་-མ་གཟུགས\n"
+
+#: ../src/balsa-mime-widget-message.c:163
+msgid "Access type: local-file\n"
+msgstr "དབྱེ་བ་འཛུལ་སྤྱོད་འབད་ནི: ཉེ་གནས་-ཡིག་སྣོད\n"
+
+#: ../src/balsa-mime-widget-message.c:164
+#: ../src/balsa-mime-widget-message.c:211
+#: ../src/balsa-mime-widget.c:241
+#, c-format
+msgid "File name: %s"
+msgstr "ཡིག་སྣོད་མིང་: %s"
+
+#: ../src/balsa-mime-widget-message.c:176
+msgid "Access type: URL\n"
+msgstr "དབྱེ་བ་འཛུལ་སྤྱོད་འབད་ནི: ཡུ་ཨར་ཨེལ\n"
+
+#: ../src/balsa-mime-widget-message.c:177
+#, c-format
+msgid "URL: %s"
+msgstr "ཡུ་ཨར་ཨེལ: %s"
+
+#: ../src/balsa-mime-widget-message.c:204
+#, c-format
+msgid "Access type: %s\n"
+msgstr "དབྱེ་བའི་འཛུལ་སྤྱོད་འབད་ནི: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:208
+#, c-format
+msgid "FTP site: %s\n"
+msgstr "ཨེཕ་ཊི་པི་ས་ཁོངས: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:210
+#, c-format
+msgid "Directory: %s\n"
+msgstr "སྣོད་ཐོ: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:257
+msgid "Access type: mail-server\n"
+msgstr "དབྱེ་བའི་འཛུལ་སྤྱོད་འབད་ནི་: ཡིག་འཕྲིན་-སར་བར\n"
+
+#: ../src/balsa-mime-widget-message.c:258
+#, c-format
+msgid "Mail server: %s\n"
+msgstr "ཡིག་འཕྲིན་སར་བར: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:260
+#, c-format
+msgid "Subject: %s\n"
+msgstr "དོན་ཚན: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:277
+msgid "Se_nd message to obtain this part"
+msgstr "ཆ་ཤས་འདི་ལེན་ནི་ལུ་  འཕྲིན་དོན་འདི་གཏང་། (_n)"
+
+#: ../src/balsa-mime-widget-message.c:298
+#: ../src/balsa-mime-widget-text.c:745
+#: ../src/balsa-mime-widget-text.c:945
+#: ../src/sendmsg-window.c:1773
+#, c-format
+msgid "Error showing %s: %s\n"
+msgstr "%sསྟོན་ནི་ལུ་འཛོལ་བ: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:332
+#: ../src/print.c:675
+#, c-format
+msgid "Could not get a part: %s"
+msgstr "ཆ་ཤས་ཐོབ་མ་ཚུགས: %s"
+
+#: ../src/balsa-mime-widget-message.c:463
+msgid "Reply..."
+msgstr "ལན་གསལ..."
+
+#: ../src/balsa-mime-widget-message.c:469
+msgid "Copy to folder..."
+msgstr "སྣོད་འཛིན་ལུ་འདྲ་བཤུས་བརྐྱབ..."
+
+#: ../src/balsa-mime-widget-message.c:661
+#: ../src/balsa-print-object-header.c:152
+#: ../src/print.c:350
+#: ../src/sendmsg-window.c:1118
+#: ../src/sendmsg-window.c:3348
+#: ../src/sendmsg-window.c:5380
+msgid "Subject:"
+msgstr "དོན་ཚན:"
+
+#: ../src/balsa-mime-widget-message.c:665
+#: ../src/balsa-print-object-header.c:160
+#: ../src/print.c:356
+#: ../src/sendmsg-window.c:3344
+msgid "Date:"
+msgstr "ཚེས་གྲངས:"
+
+#. addresses
+#: ../src/balsa-mime-widget-message.c:671
+#: ../src/balsa-print-object-header.c:165
+#: ../src/print.c:361
+#: ../src/sendmsg-window.c:3355
+#: ../src/store-address.c:305
+msgid "From:"
+msgstr "ལས:"
+
+#. Cannot edit the new "From:" header.
+#. { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
+#: ../src/balsa-mime-widget-message.c:678
+#: ../src/sendmsg-window.c:1115
+msgid "Reply-To:"
+msgstr "ལན་གསལ་-ལུ:"
+
+#: ../src/balsa-mime-widget-message.c:681
+#: ../src/balsa-print-object-header.c:167
+#: ../src/print.c:365
+#: ../src/sendmsg-window.c:1112
+#: ../src/sendmsg-window.c:3363
+#: ../src/store-address.c:306
+msgid "To:"
+msgstr "ལུ:"
+
+#. cc:
+#: ../src/balsa-mime-widget-message.c:682
+#: ../src/balsa-print-object-header.c:169
+#: ../src/print.c:366
+#: ../src/sendmsg-window.c:1117
+#: ../src/sendmsg-window.c:2850
+#: ../src/sendmsg-window.c:3371
+#: ../src/store-address.c:307
+msgid "Cc:"
+msgstr "སི་སི:"
+
+#. bcc:
+#: ../src/balsa-mime-widget-message.c:683
+#: ../src/balsa-print-object-header.c:171
+#: ../src/print.c:367
+#: ../src/sendmsg-window.c:1116
+#: ../src/sendmsg-window.c:2855
+#: ../src/store-address.c:308
+msgid "Bcc:"
+msgstr "བི་སི་སི:"
+
+#: ../src/balsa-mime-widget-message.c:687
+#: ../src/balsa-print-object-header.c:173
+#: ../src/print.c:368
+msgid "Fcc:"
+msgstr "ཨེཕ་སི་སི:"
+
+#: ../src/balsa-mime-widget-message.c:694
+#: ../src/balsa-print-object-header.c:176
+#: ../src/print.c:374
+msgid "Disposition-Notification-To:"
+msgstr "རིམ་བཀོད་-བརྡ་བསྐུལ་-ལུ:"
+
+#: ../src/balsa-mime-widget-text.c:115
+#, c-format
+msgid "Could not save a text part: %s"
+msgstr "ཚིག་ཡིག་ཆ་ཤས་སྲུང་མ་ཚུགས: %s"
+
+#: ../src/balsa-mime-widget-text.c:150
+#, c-format
+msgid "The message sent by %s with subject \"%s\" contains 8-bit characters, but no header describing the used codeset (converted to %s)"
+msgstr "དོན་ཚན་ \"%s\" དང་ཅིག་ཁར་ %s གིས་གཏང་ཡོད་པའི་འཕྲིན་དོན་དེ་ལུ་  8-བིཊི་ཡིག་འབྲུ་ཚུ་ཡོདཔ་ཨིན་  དེ་འབདཝ་ད་  ལག་ལེན་འཐབ་ཡོད་པའི་ཨང་རྟགས་གཞི་སྒྲིག་ (%sལུ་གཞི་བསྒྱུར་འབ་དཡོདཔ་) འདི་འགྲེལ་བཤད་བརྐྱབ་མི་མགོ་ཡིག་མེད།"
+
+#: ../src/balsa-mime-widget-text.c:468
+msgid "Copy link"
+msgstr "འབྲེལ་ལམ་འདྲ་བཤུས་བརྐྱབ་"
+
+#: ../src/balsa-mime-widget-text.c:473
+msgid "Open link"
+msgstr "འབྲེལ་ལམ་ཁ་ཕྱེ་"
+
+#: ../src/balsa-mime-widget-text.c:478
+msgid "Send link..."
+msgstr "འབྲེལ་ལམ་གཏང་..."
+
+#: ../src/balsa-mime-widget-text.c:517
+msgid "Highlight structured phrases"
+msgstr "གཞི་བཀོད་བཟོ་ཡོད་པའི་ཚིག་ཚན་ཚུ་གཙོ་དམིགས་བཀོད་"
+
+#: ../src/balsa-mime-widget-text.c:735
+#, c-format
+msgid "Calling URL %s..."
+msgstr "ཡུ་ཨར་ཨེལ་%sའབོ་དོ..."
+
+#: ../src/balsa-mime-widget.c:260
+#, c-format
+msgid "Error reading message part: %s"
+msgstr "འཕྲིན་དོན་ཆ་ཤས་ལྷག་པའི་བསྒང་གི་འཛོལ་བ: %s"
+
+#: ../src/balsa-mime-widget.c:284
+#, c-format
+msgid "Type: %s (%s)"
+msgstr "དབྱེ་བ: %s (%s)"
+
+#: ../src/balsa-mime-widget.c:287
+#, c-format
+msgid "Content Type: %s"
+msgstr "ནང་དོན་དབྱེ་བ: %s"
+
+#: ../src/balsa-mime-widget.c:301
+msgid "No open or view action defined in GNOME MIME for this content type"
+msgstr "ནང་དོན་དབྱེ་བ་འདི་གི་དོན་ལུ་  ཇི་ནོམ་མ་ཡིམ་ནང་ངོས་འཛིན་འབད་ཡོད་པའི་བྱ་བའི་མཐོང་སྣང་ཡང་ན་ཁ་ཕྱེ་སྟེ་མེདཔ་ཨིན་"
+
+#: ../src/balsa-mime-widget.c:307
+msgid "S_ave part"
+msgstr "ཆ་ཤས་སྲུང་། (_a)"
+
+#: ../src/balsa-mime-widget.c:329
+#: ../src/balsa-mime-widget.c:353
+#, c-format
+msgid "View _part with %s"
+msgstr "%sདང་ཅིག་ཁར་ཆ་ཤས་འདི་སྟོན། (_p)"
+
+#. gather some info about this part
+#. four fields, one terminator
+#: ../src/balsa-print-object-default.c:154
+#: ../src/balsa-print-object-default.c:157
+#: ../src/balsa-print-object-default.c:161
+#: ../src/print.c:981
+msgid "Type:"
+msgstr "དབྱེ་བ:"
+
+#: ../src/balsa-print-object-default.c:165
+#: ../src/balsa-print-object-default.c:169
+#: ../src/print.c:984
+msgid "File name:"
+msgstr "ཡིག་སྣོད་མིང་:"
+
+#: ../src/pref-manager.c:386
+msgid "While Retrieving Messages"
+msgstr "འཕྲིན་དོན་ཚུ་སླར་འདྲེན་འབདཝ་ད་"
+
+#: ../src/pref-manager.c:387
+msgid "Until Closed"
+msgstr "ཁ་མ་བསྡམ་ཚུན་ཚོད་"
+
+#: ../src/pref-manager.c:393
+msgid "Fast"
+msgstr "མགྱོགས་དྲགས་"
+
+#: ../src/pref-manager.c:394
+msgid "Normal"
+msgstr "སྤྱིར་གཏང་"
+
+#: ../src/pref-manager.c:395
+msgid "Bad Spellers"
+msgstr "ཡིག་སྡེབ་ལྷག་མི་བྱང་ཉེས་"
+
+#: ../src/pref-manager.c:401
+msgid "Message number"
+msgstr "འཕྲིན་དོན་ཨང་གྲངས་"
+
+#: ../src/pref-manager.c:405
+msgid "Sender"
+msgstr "གཏང་མི་"
+
+#: ../src/pref-manager.c:409
+msgid "Flat"
+msgstr "ལེབ་ཏེམ་"
+
+#: ../src/pref-manager.c:411
+msgid "JWZ"
+msgstr "ཇེ་ཌབ་ལུ་ཛེརཌི་"
+
+#. must NOT be modal
+#: ../src/pref-manager.c:509
+msgid "Balsa Preferences"
+msgstr "བཱལ་ས་དགའ་གདམ་ཚུ་"
+
+#: ../src/pref-manager.c:558
+msgid "Mail Options"
+msgstr "ཡིག་འཕྲིན་གདམ་ཁ་ཚུ་"
+
+#: ../src/pref-manager.c:560
+msgid "Display Options"
+msgstr "གདམ་ཁ་ཚུ་བཀྲམ་སྟོན་འབད་"
+
+#: ../src/pref-manager.c:562
+#: ../src/pref-manager.c:2731
+msgid "Address Books"
+msgstr "ཁ་བྱང་ཀི་དེབ་ཚུ་"
+
+#: ../src/pref-manager.c:566
+#: ../src/toolbar-factory.c:120
+msgid "Spelling"
+msgstr "ཡིག་སྡེབ་"
+
+#: ../src/pref-manager.c:570
+msgid "Startup"
+msgstr "འགོ་བཙུགས་"
+
+#: ../src/pref-manager.c:572
+#: ../src/pref-manager.c:2519
+msgid "Miscellaneous"
+msgstr "སྣ་ཚོགས་ཀྱིས་"
+
+#: ../src/pref-manager.c:1324
+#, c-format
+msgid "%s (default)"
+msgstr "%s (སྔོན་སྒྲིག་)"
+
+#: ../src/pref-manager.c:1584
+msgid "Remote Mailbox Servers"
+msgstr "ཐག་རིང་གི་ཡིག་སྒྲོམ་སར་བར་ཚུ་"
+
+#: ../src/pref-manager.c:1605
+#: ../src/pref-manager.c:2752
+#: ../src/sendmsg-window.c:2936
+msgid "Type"
+msgstr "དབྱེ་བ་"
+
+#: ../src/pref-manager.c:1613
+msgid "Mailbox Name"
+msgstr "ཡིག་སྒྲོམ་མིང་"
+
+#: ../src/pref-manager.c:1627
+#: ../src/pref-manager.c:1716
+#: ../src/pref-manager.c:2787
+msgid "_Modify"
+msgstr "ལེགས་བཅོས་འབད། (_M)"
+
+#: ../src/pref-manager.c:1641
+msgid "Local Mail Directory"
+msgstr "ཉེ་གནས་ཡིག་འཕྲིན་སྣོད་ཐོ་"
+
+#: ../src/pref-manager.c:1644
+#: ../src/pref-manager.c:1652
+msgid "Select your local mail directory"
+msgstr "ཁྱོད་རའི་ཉེ་གནས་ཡིག་འཕྲིན་སྣོད་ཐོ་སེལ་འཐུ་འབད་"
+
+#: ../src/pref-manager.c:1680
+msgid "Outgoing Mail Servers"
+msgstr "ཕྱིར་བསྐྱོད་འབད་བའི་ཡིག་འཕྲིན་སར་བར་ཚུ་"
+
+#: ../src/pref-manager.c:1702
+msgid "Server Name"
+msgstr "སར་བར་གྱི་མིང་"
+
+#: ../src/pref-manager.c:1742
+msgid "Mail Servers"
+msgstr "ཡིག་འཕྲིན་སར་བར་ཚུ་"
+
+#: ../src/pref-manager.c:1744
+msgid "Incoming"
+msgstr "ནང་འབྱོར་"
+
+#: ../src/pref-manager.c:1746
+msgid "Outgoing"
+msgstr "ཕྱིར་བསྐྱོད་"
+
+#: ../src/pref-manager.c:1771
+msgid "Checking"
+msgstr "ཞིབ་དཔྱད་འབད་དོ་"
+
+#: ../src/pref-manager.c:1776
+msgid "_Check mail automatically every"
+msgstr "རང་བཞིན་གྱིས་ཡིག་འཕྲིན་ཚུ་ཞིབ་དཔྱད་འབད་ཨ་རྟགས་རང་། (_C)"
+
+#: ../src/pref-manager.c:1787
+#: ../src/pref-manager.c:2542
+#: ../src/pref-manager.c:2602
+msgid "minutes"
+msgstr "སྐར་མ་"
+
+#: ../src/pref-manager.c:1793
+msgid "Check _IMAP mailboxes"
+msgstr "ཨའི་ཨེམ་པི་ཡིག་སྒྲོམ་ཚུ་ཞིབ་དཔྱད་འབད། (_I)"
+
+#: ../src/pref-manager.c:1799
+msgid "Check INBOX _only"
+msgstr "ནང་སྒྲོམ་རྐྱངམ་ཅིག་ཞིབ་དཔྱད་འབད། ( _o)"
+
+#: ../src/pref-manager.c:1804
+msgid "Display message if new mail has arrived"
+msgstr "ཡིག་འཕྲིན་གསརཔ་ལྷོད་དེ་ཡོད་པ་ཅིན་  འཕྲིན་དོན་བཀྲམ་སྟོན་འབད་"
+
+#: ../src/pref-manager.c:1809
+msgid "Play sound if new mail has arrived"
+msgstr "ཡིག་འཕྲིན་གསརཔ་ལྷོད་དེ་ཡོད་པ་ཅིན་  སྒྲ་སྐད་གཏང་"
+
+#: ../src/pref-manager.c:1814
+msgid "Do background check quietly (no messages in status bar)"
+msgstr "རྒྱབ་གཞི་ཞིབ་དཔྱད་ཁུ་སིམ་སི་སྦེ་འབད་ (གནས་ཚད་ཕྲ་རིང་ནང་འཕྲིན་དོན་ཚུ་མེདཔ་ཨིན་)"
+
+#: ../src/pref-manager.c:1818
+msgid "_POP message size limit:"
+msgstr "པི་ཨོ་པི་འཕྲིན་དོན་ཚད་གཞི་གི་ཚད: (_P)"
+
+#. Quoted text regular expression
+#. and RFC2646-style flowed text
+#: ../src/pref-manager.c:1845
+msgid "Quoted and Flowed Text"
+msgstr "ཚིག་ཡིག་འདི་འདྲེན་རྟགས་ནང་བཙུགས་པ་དང་འབྱུང་ཡོདཔ་"
+
+#: ../src/pref-manager.c:1849
+msgid ""
+"Quoted Text\n"
+"Regular Expression:"
+msgstr ""
+"འདྲེན་ཚིག་བཀོད་པའི་ཚིག་ཡིག\n"
+"དུས་རྒྱུན་གསལ་བརྗོད:"
+
+#: ../src/pref-manager.c:1857
+msgid "Wrap Text at"
+msgstr "ཚིག་ཡིག་ལུ་ལོག་མཚམས་བཟོ་"
+
+#: ../src/pref-manager.c:1869
+#: ../src/pref-manager.c:2036
+msgid "characters"
+msgstr "ཡིག་འབྲུ་ཚུ་"
+
+#. handling of multipart/alternative
+#: ../src/pref-manager.c:1884
+msgid "Display of Multipart/Alternative Parts"
+msgstr "སྣ་མང་ཆ་ཤས་/ ཐབས་གཞན་ཆ་ཤས་ཚུ་གི་བཀྲམ་སྟོན་"
+
+#: ../src/pref-manager.c:1887
+msgid "Prefer text/plain over html"
+msgstr "ཚིག་ཡིག་དགའ་གདམ་/ ཨེཆ་ཊི་ཨེམ་ཨེལ་གུ་ལས་ཉག་རྐྱང་"
+
+#: ../src/pref-manager.c:1903
+msgid "National (8-bit) characters in broken messages without codeset header"
+msgstr "ཆག་ཡོད་པའི་འཕྲིན་དོན་མུ་ནང་  ཨང་རྟགས་གཞི་སྒྲིག་གི་མགོ་ཡིག་མེད་པའི་  རྒྱལ་ཡོངས་ཀྱི་ (8-བིཊི་) ཡིག་འབྲུ་ཚུ་"
+
+#: ../src/pref-manager.c:1910
+msgid "display as \"?\""
+msgstr "\"?\"སྦེ་བཀྲམ་སྟོན་འབད་"
+
+#: ../src/pref-manager.c:1919
+msgid "display in codeset"
+msgstr "ཨང་རྟགས་གཞི་སྒྲིག་ནང་བཀྲམ་སྟོན་འབད་"
+
+#. How to handle received MDN requests
+#: ../src/pref-manager.c:1949
+msgid "Message Disposition Notification Requests"
+msgstr "འཕྲིན་དོན་རིམ་བཀོད་བརྡ་བསྐུལ་གྱི་ཞུ་བ་ཚུ་"
+
+#: ../src/pref-manager.c:1951
+msgid "When I receive a message whose sender requested a Message Disposition Notification (MDN), send it if:"
+msgstr "གཏང་མི་དེ་གིས་  འཕྲིན་དོན་རིམ་བཀོད་བརྡ་བསྐུལ་ (ཨེམ་ཌི་ཨེན་) ཞུ་བ་འབད་ཡོད་པའི་འཕྲིན་དོན་ཅིག་  ང་གིས་ཐོབ་པ་ཅིན་  གཏང་ད་  ག་དེམ་ཅིག་སྦེ:"
+
+#: ../src/pref-manager.c:1963
+msgid ""
+"The message header looks clean\n"
+"(the notify-to address is the return path,\n"
+"and I am in the \"To:\" or \"Cc:\" list)."
+msgstr ""
+"འཕྲིན་དོན་མགོ་ཡིག་གཙང་དག་མཐོང་མས་ \n"
+"(ཁ་བྱང་ལུ་བརྡ་བསྐུལ་འདི་འགྲུལ་ལམ་ལོག་མི་ཨིནམ་,\n"
+"དང་ ང་\"To:\" or \"Cc:\" ཐོ་ཡིག་ནང་ལུ་ཡོད།)"
+
+#: ../src/pref-manager.c:1980
+msgid "The message header looks suspicious."
+msgstr "འཕྲིན་དོན་མགོ་ཡིག་འདི་དོགས་པ་མཐོངམ་མས།"
+
+#: ../src/pref-manager.c:2017
+msgid "Word Wrap"
+msgstr "མིང་ཚིག་ལོག་མཚམས་བཟོ་"
+
+#: ../src/pref-manager.c:2022
+msgid "Wrap Outgoing Text at"
+msgstr "ཕྱིར་བསྐྱོད་ཚིག་ཡིག་ལོག་མཚམས་བཟོ་"
+
+#: ../src/pref-manager.c:2050
+msgid "Other Options"
+msgstr "གདམ་ཁ་གཞན་མི་ཚུ་"
+
+#: ../src/pref-manager.c:2055
+msgid "Reply Prefix:"
+msgstr "སྔོན་ཚིག་ལན་གསལ:"
+
+#: ../src/pref-manager.c:2058
+msgid "Automatically quote original when replying"
+msgstr "ལན་གསལ་འབད་བའི་བསྒང་རང་བཞིན་གྱིས་སྦེ་འདྲེན་ཚིག་ངོ་མ་འདི་བཀོད་"
+
+#: ../src/pref-manager.c:2061
+msgid "Forward a mail as attachment instead of quoting it"
+msgstr "ཡིག་འཕྲིན་འདི་ འདྲེན་ཚིག་མ་བཀོད་པར་  མཉམ་སྦྲགས་སྦེ་གདོང་བསྐྱོད་འབད་"
+
+#: ../src/pref-manager.c:2064
+msgid "Copy outgoing messages to sentbox"
+msgstr "ཕྱིར་བསྐྱོད་འཕྲིན་དོན་ཚུ་  གཏང་སྒྲོམ་ལུ་འདྲ་བཤུས་བརྐྱབ་"
+
+#: ../src/pref-manager.c:2066
+msgid "Send button always queues outgoing mail in outbox"
+msgstr "གཏང་བའི་ཨེབ་རྟ་དེ་གིས་  ཕྱིར་བསྐྱོད་ཡིག་འཕྲིན་འདི་ཨའུཊི་བོགསི་ནང་ཨ་རྟག་རང་མི་གྲལ་"
+
+#: ../src/pref-manager.c:2069
+msgid "Edit headers in external editor"
+msgstr "ཕྱིའི་ཞུན་དགཔ་ནང་ མགོ་ཡིག་ཚུ་ཞུན་དག་འབད་"
+
+#: ../src/pref-manager.c:2071
+msgid "Include HTML parts as text when replying or forwarding"
+msgstr "ལན་གསལ་འབདཝ་ད་ཡང་ན་གདོང་བསྐྱོད་འབདཝ་ད་  ཨེཆ་ཊི་ཨེམ་ཨེལ་ཆ་ཤས་ཚུ་  ཚིག་ཡིག་སྦེ་བཙུག་"
+
+#: ../src/pref-manager.c:2088
+msgid "Layout"
+msgstr "སྒྲིག་བཀོད་"
+
+#: ../src/pref-manager.c:2090
+msgid "Sort and Thread"
+msgstr "དབྱེ་སེལ་དང་ཐེ་རེཌི་"
+
+#: ../src/pref-manager.c:2092
+#: ../src/print-gtk.c:483
+msgid "Message"
+msgstr "འཕྲིན་དོན་"
+
+#: ../src/pref-manager.c:2094
+msgid "Colors"
+msgstr "ཚོས་གཞི་ཚུ་"
+
+#: ../src/pref-manager.c:2096
+#: ../src/pref-manager.c:2184
+msgid "Format"
+msgstr "རྩ་སྒྲིག་"
+
+#: ../src/pref-manager.c:2098
+msgid "Status Messages"
+msgstr "གནས་ཚད་ཀྱི་འཕྲིན་དོན་ཚུ་"
+
+#: ../src/pref-manager.c:2123
+msgid "Main Window"
+msgstr "སྒོ་སྒྲིག་ངོ་མ་"
+
+#: ../src/pref-manager.c:2126
+msgid "Use preview pane"
+msgstr "སྔོན་ལྟའི་པེན་ལག་ལེན་འཐབ་"
+
+#: ../src/pref-manager.c:2128
+msgid "Show mailbox statistics in left pane"
+msgstr "པེན་གཡོན་པའི་ནང་  ཡིག་སྒྲོམ་ཚད་རྩིས་སྟོན་"
+
+#: ../src/pref-manager.c:2130
+msgid "Use alternative main window layout"
+msgstr "ཐབས་གཞན་གྱི་སྒོ་སྒྲིག་ངོ་མ་ལག་ལེན་འཐབ་"
+
+#: ../src/pref-manager.c:2132
+msgid "Automatically view message when mailbox opened"
+msgstr "ཡིག་སྒྲོམ་འདི་ཁ་ཕྱེཝ་ཅིག་  འཕྲིན་དོན་འདི་རང་བཞིན་གྱིས་སྦེ་བལྟ་"
+
+#: ../src/pref-manager.c:2138
+msgid "PageUp/PageDown keys scroll text by"
+msgstr "ཤོག་ལེབ་ཡར་/ཤོག་ལེབ་མར་གྱི་ལྡེ་མིག་ཚུ་གི་  བཤུད་སྒྲིལ་ཚིག་ཡིག་གི་ཐོག་ལས་"
+
+#: ../src/pref-manager.c:2149
+msgid "percent"
+msgstr "བརྒྱ་ཆ་"
+
+#: ../src/pref-manager.c:2164
+msgid "Display Progress Dialog"
+msgstr "ཡར་འཕེལ་ཌའི་ལོག་བཀྲམ་སྟོན་འབད་"
+
+#: ../src/pref-manager.c:2189
+msgid "Date encoding (for strftime):"
+msgstr "ཚེས་གྲངས་ཨིན་ཀོ་ཌིང་ ( strftime དོན་ལུ་):"
+
+#: ../src/pref-manager.c:2191
+msgid "Selected headers:"
+msgstr "སེལ་འཐུ་འབད་ཡོད་པའི་མགོ་ཡིག་ཚུ:"
+
+#: ../src/pref-manager.c:2213
+msgid "Information Messages"
+msgstr "བརྡ་དོན་འཕྲིན་དོན་ཚུ་"
+
+#: ../src/pref-manager.c:2218
+msgid "Information Messages:"
+msgstr "བརྡ་དོན་འཕྲིན་དོན་ཚུ:"
+
+#: ../src/pref-manager.c:2222
+msgid "Warning Messages:"
+msgstr "ཉེན་བརྡའི་འཕྲིན་དོན་ཚུ:"
+
+#: ../src/pref-manager.c:2226
+msgid "Error Messages:"
+msgstr "འཛོལ་བའི་འཕྲིན་དོན་ཚུ:"
+
+#: ../src/pref-manager.c:2230
+msgid "Fatal Error Messages:"
+msgstr "འཚུབ་ཆེན་འཛོལ་བའི་འཕྲིན་དོན་ཚུ:"
+
+#: ../src/pref-manager.c:2234
+msgid "Debug Messages:"
+msgstr "རྐྱེན་སེལ་འཕྲིན་དོན་ཚུ:"
+
+#: ../src/pref-manager.c:2260
+msgid "Message Colors"
+msgstr "འཕྲིན་དོན་ཚོས་གཞི་ཚུ་"
+
+#: ../src/pref-manager.c:2265
+#, c-format
+msgid "Quote level %d color"
+msgstr "%d ཚོས་གཞི་གནས་རིམ་འདྲེན་ཚིག་བཀོད་"
+
+#: ../src/pref-manager.c:2278
+msgid "Link Color"
+msgstr "ཚོས་གཞི་འབྲེལ་མཐུད་"
+
+#: ../src/pref-manager.c:2280
+msgid "Hyperlink color"
+msgstr "ཧའི་པར་ལིངཀ་ཚོས་གཞི་"
+
+#: ../src/pref-manager.c:2291
+msgid "Composition Window"
+msgstr "སྒོ་སྒྲིག་སྣ་སྡུད་"
+
+#: ../src/pref-manager.c:2295
+msgid "Invalid or incomplete address label color"
+msgstr "ཁ་བྱང་ཁ་ཡིག་ཚོས་གཞི་  ནུས་ཅན་མེདཔ་ཡང་ན་ ཆ་མ་ཚང་བ་"
+
+#: ../src/pref-manager.c:2318
+#: ../src/print-gtk.c:492
+msgid "Fonts"
+msgstr "ཡིག་གཟུགས་ཚུ་"
+
+#: ../src/pref-manager.c:2322
+msgid "Message Font:"
+msgstr "འཕྲིན་དོན་ཡིག་གཟུགས:"
+
+#: ../src/pref-manager.c:2330
+msgid "Subject Font:"
+msgstr "དོན་ཚན་ཡིག་གཟུགས:"
+
+#: ../src/pref-manager.c:2368
+msgid "Sorting and Threading"
+msgstr "དབྱེ་སེལ་འབད་ནི་དང་ཐེ་རེཌི་འབད་ནི་"
+
+#: ../src/pref-manager.c:2372
+msgid "Default sort column:"
+msgstr "སྔོན་སྒྲིག་དབྱེ་སེལ་ཀེར་ཐིག:"
+
+#: ../src/pref-manager.c:2376
+msgid "Default threading style:"
+msgstr "སྔོན་སྒྲིག་ཐེ་རེཌི་འབད་ནིའི་བཟོ་རྣམ:"
+
+#: ../src/pref-manager.c:2381
+msgid "Expand threads on open"
+msgstr "ཁ་ཕྱེ་ནི་གུ་ཐེ་རེཌི་ཚུ་རྒྱ་འཕར་གཏང་"
+
+#: ../src/pref-manager.c:2456
+msgid "Pspell Settings"
+msgstr "པི་སྡེབ་སྒྲིག་སྟངས་ཚུ་"
+
+#: ../src/pref-manager.c:2462
+msgid "Spell Check Module"
+msgstr "སྡེབ་དཔྱད་ཚད་གཞི་"
+
+#: ../src/pref-manager.c:2468
+msgid "Suggestion Level"
+msgstr "བསམ་འཆར་བཀོད་པའི་གནས་རིམ་"
+
+#. do the ignore length
+#: ../src/pref-manager.c:2473
+msgid "Ignore words shorter than"
+msgstr "མིང་ཚིག་ཐུང་ཀུ་སྣང་མེད་བཞག་"
+
+#: ../src/pref-manager.c:2491
+msgid "Miscellaneous Spelling Settings"
+msgstr "སྣ་ཚོགས་སྡེབ་ཀྱི་སྒྲིག་སྟངས་ཚུ་"
+
+#: ../src/pref-manager.c:2493
+msgid "Check signature"
+msgstr "མིང་རྟགས་ཞིབ་དཔྱད་འབད་"
+
+#: ../src/pref-manager.c:2494
+msgid "Check quoted"
+msgstr "འདྲེན་ཚིག་བཀོད་པ་ཞིབ་དཔྱད་འབད་"
+
+#: ../src/pref-manager.c:2521
+msgid "Debug"
+msgstr "རྐྱེན་སེལ་"
+
+#: ../src/pref-manager.c:2522
+msgid "Empty Trash on exit"
+msgstr "ཕྱིར་ཐོན་གུ་ཕྱགས་ཧོད་སྟོངམ་སྟོན་"
+
+#: ../src/pref-manager.c:2528
+msgid "Close mailbox if unused more than"
+msgstr "མངམ་ལས་ལྷག་སྟེ་ལག་ལེན་མ་འཐབ་པར་ཡོད་པ་ཅིན་  ཡིག་སྒྲོམ་འདི་ཁ་བསྡམ་"
+
+#: ../src/pref-manager.c:2557
+msgid "Deleting Messages"
+msgstr "འཕྲིན་དོན་ཚུ་བཏོན་གཏང་དོ་"
+
+#. Translators: this used to be "using Mailbox -> Hide messages";
+#. * the UTF-8 string for the right-arrow symbol is broken out to
+#. * avoid msgconv problems.
+#: ../src/pref-manager.c:2562
+#, c-format
+msgid "The following setting is global, but may be overridden for the selected mailbox using Mailbox %s Hide messages:"
+msgstr "འོག་གི་སྒྲིག་སྟངས་འདི་སྤྱི་ཁྱབ་ཨིན་མས་  དེ་འབདཝ་ད་  ཡིག་སྒྲོམ་ %s སྦ་བའི་འཕྲིན་དོན་ཚུ་ལག་ལེན་འཐབ་སྟེ་  སེལ་འཐུ་འབད་ཡོད་པའི་ཡིག་སྒྲོམ་གྱི་དོན་ལུ་མེདཔ་གཏང་འོང་:"
+
+#: ../src/pref-manager.c:2574
+msgid "Hide messages marked as deleted"
+msgstr "བཏོན་གཏང་ཡོད་ཟེར་རྟགས་བཀལ་ཡོད་པའི་འཕྲིན་དོན་ཚུ་སྦ་"
+
+#: ../src/pref-manager.c:2576
+msgid "The following settings are global:"
+msgstr "འོག་གི་སྒྲིག་སྟངས་ཚུ་སྤྱི་ཁྱབ་ཨིན:"
+
+#: ../src/pref-manager.c:2582
+msgid "Expunge deleted messages when mailbox is closed"
+msgstr "ཡིག་སྒྲོམ་འདི་ཁ་བསྡམ་ཡོདཔ་ད་  བཏོན་གཏང་པའི་འཕྲིན་དོན་ཚུ་རྩ་མེད་གཏང་"
+
+#: ../src/pref-manager.c:2589
+msgid "...and if unused more than"
+msgstr "...དང་ལྷག་སྟེ་ལག་ལེན་མ་འཐབ་པར་ཡོད་པ་ཅིན་"
+
+#: ../src/pref-manager.c:2614
+msgid "Message Window"
+msgstr "འཕྲིན་དོན་སྒོ་སྒྲིག་"
+
+#: ../src/pref-manager.c:2619
+msgid "After moving a message:"
+msgstr "འཕྲིན་དོན་འདི་ལྷག་པའི་ཤུལ་ལས:"
+
+#: ../src/pref-manager.c:2648
+msgid "Startup Options"
+msgstr "འགོ་བཙུགས་གདམ་ཁ་ཚུ་"
+
+#: ../src/pref-manager.c:2651
+msgid "Open Inbox upon startup"
+msgstr "འགོ་བཙུགས་གུ་ནང་སྒྲོམ་ཁ་ཕྱེ་"
+
+#: ../src/pref-manager.c:2653
+msgid "Check mail upon startup"
+msgstr "འགོ་བཙུགས་གུ་ཡིག་འཕྲིན་ཞིབ་དཔྱད་འབད་"
+
+#: ../src/pref-manager.c:2655
+msgid "Remember open mailboxes between sessions"
+msgstr "ལཱ་ཡུན་ཚུ་གི་བར་ན་  ཁ་ཕྱེ་བའི་ཡིག་སྒྲོམ་ཚུ་སེམས་ཁར་བཞག་"
+
+#: ../src/pref-manager.c:2669
+msgid "Folder Scanning"
+msgstr "སྣོད་འཛིན་པར་ལེན་"
+
+#: ../src/pref-manager.c:2671
+msgid "Choose depth 1 for fast startup; this defers scanning some folders.  To see more of the tree at startup, choose a greater depth."
+msgstr "འགོ་བཙུགས་མགྱོགས་པར་གྱི་དོན་ལུ་  གཏིང་ཚད་ ༡ གདམ་ཁ་བརྐྱབ; འདི་གིས་ སྣོད་འཛིན་ལ་ལོ་ཅིག་པར་ལེན་ནི་ལུ་ཕར་འགྱངས་འབདཝ་ཨིན།  འགོ་བཙུགས་ལུ་རྩ་འབྲེལ་ཧེང་སྐལ་བལྟ་ནི་དོན་ལུ་  གཏིང་ཚད་སྦོམ་གདམ་ཁ་བརྐྱབ།"
+
+#: ../src/pref-manager.c:2682
+msgid "Scan local folders to depth"
+msgstr "གཏིང་ཚད་ལུ་ཉེ་གནས་སྣོད་འཛིན་ཚུ་ཞིབ་ལྟ་འབད་"
+
+#: ../src/pref-manager.c:2695
+msgid "Scan IMAP folders to depth"
+msgstr "ཨའི་ཨེམ་ཨེ་པི་སྣོད་འཛིན་ཚུ་གཏིང་ཚད་ལུ་ཞིབ་ལྟ་འབད་"
+
+#: ../src/pref-manager.c:2760
+msgid "Address Book Name"
+msgstr "ཁ་བྱང་ཀི་དེབ་ཀྱི་མིང་"
+
+#: ../src/pref-manager.c:2768
+msgid "Auto-complete"
+msgstr "རང་བཞིན་-མཇུག་བསྡུ་"
+
+#: ../src/pref-manager.c:2793
+msgid "_Set as default"
+msgstr "སྔོན་སྒྲིག་སྦེ་གཞི་སྒྲིག་འབད། (_S)"
+
+#: ../src/pref-manager.c:3103
+msgid "Remote POP3 mailbox..."
+msgstr "ཐག་རིང་གི་པི་ཨོ་པི་༣ ཡིག་སྒྲོམ..."
+
+#: ../src/pref-manager.c:3229
+msgid "Show nothing"
+msgstr "ག་ནི་ཡང་མ་སྟོན་"
+
+#: ../src/pref-manager.c:3231
+msgid "Show dialog"
+msgstr "ཌའི་ལོག་སྟོན་"
+
+#: ../src/pref-manager.c:3233
+msgid "Show in list"
+msgstr "ཐོ་ཡིག་ནང་སྟོན་"
+
+#: ../src/pref-manager.c:3235
+msgid "Show in status bar"
+msgstr "གནས་ཚད་ཕྲ་རིང་ནང་སྟོན་"
+
+#: ../src/pref-manager.c:3237
+msgid "Print to console"
+msgstr "མ་སྒྲོམ་ལུ་དཔར་བསྐྲུན་འབད་"
+
+#: ../src/pref-manager.c:3248
+msgid "Ask me"
+msgstr "ང་ལུ་འདྲི་"
+
+#: ../src/pref-manager.c:3325
+msgid "Show next unread message"
+msgstr "ཤུལ་མའི་ལྷག་བཤོལ་འཕྲིན་དོན་སྟོན་"
+
+#: ../src/pref-manager.c:3326
+msgid "Show next message"
+msgstr "ཤུལ་མའི་འཕྲིན་དོན་སྟོན་"
+
+#: ../src/pref-manager.c:3327
+msgid "Close message window"
+msgstr "འཕྲིན་དོན་སྒོ་སྒྲིག་ཁ་བསྡམས་"
+
+#: ../src/pref-manager.c:3365
+#, c-format
+msgid "Error displaying link_id %s: %s\n"
+msgstr "འབྲེལ་བའི་%sཨའི་ཌི་བཀྲམ་སྟོན་འབདཝ་ད་འཛོལ་བ: %s(_i)\n"
+
+#: ../src/print.c:246
+#: ../src/print.c:727
+#, c-format
+msgid "Page: %i/%i"
+msgstr "ཤོག་ལེབ: %i/%i"
+
+#: ../src/print.c:662
+msgid ""
+"Preparing an HTML part, which must start on a new page.\n"
+"Print this part?"
+msgstr ""
+"ཤོག་ལེབ་གསརཔ་པའི་གུ་འགོ་བཙུགས་དགོ་པའི་  ཨེཆ་ཊི་ཨེམ་ཨེལ་ཆ་ཤས་ཅིག་གྲ་སྒྲིག་འབད་དོ། \n"
+"ཆ་ཤས་འདི་དཔར་བསྐྲུན་འབད་ག?"
+
+#: ../src/print.c:1300
+#: ../src/print-gtk.c:189
+#, c-format
+msgid "This is an inline %s signed %s message part:"
+msgstr "འདི་གྱལ་རིམ་ནང་ %s མིང་རྟགས་བཀོད་ཡོདཔ་ %s འཕྲིན་དོན་ཆ་ཤས:"
+
+#: ../src/print.c:1547
+msgid "Font available for printing"
+msgstr "དཔར་བསྐྲུན་གྱི་དོན་ལུ་ ཡིག་གཟུགས་ཐོབ་ཚུགསཔ་"
+
+#: ../src/print.c:1553
+#, c-format
+msgid "Font <b>not</b> available for printing. Closest: %s"
+msgstr "དཔར་བསྐྲུན་གྱི་དོན་ལུ་ ཡིག་གཟུགས་<b>ཐོབ་ཚུགསཔ་</b>མེད།  ཐག་ཉེ་ཤོས: %s"
+
+#: ../src/print.c:1566
+msgid "Select Font"
+msgstr "ཡིག་གཟུགས་སེལ་འཐུ་འབད་"
+
+#: ../src/print.c:1599
+msgid "Change..."
+msgstr "བསྒྱུར་བཅོས་འབད..."
+
+#: ../src/print.c:1634
+msgid "Print message"
+msgstr "འཕྲིན་དོན་དཔར་བསྐྲུན་འབད་"
+
+#. create a 2nd notebook page for the fonts
+#: ../src/print.c:1645
+msgid "_Fonts"
+msgstr "ཡིག་གཟུགས་ཚུ། (_F)"
+
+#: ../src/print.c:1648
+msgid "Header font"
+msgstr "མགོ་ཡིག་གི་ཡིག་གཟུགས་"
+
+#: ../src/print.c:1650
+msgid "Body font"
+msgstr "མ་གཟུགས་ཀྱི་ཡིག་གཟུགས་"
+
+#: ../src/print.c:1652
+msgid "Footer font"
+msgstr "མཇུག་ཡིག་གི་ཡིག་གཟུགས་"
+
+#. highlight cited stuff
+#: ../src/print.c:1656
+msgid "Highlight cited text"
+msgstr "བརྗོད་དེ་ཡོད་པའི་ཚིག་ཡིག་གཙོ་དམིགས་བཀོད་"
+
+#: ../src/print.c:1660
+msgid "_Enable highlighting of cited text"
+msgstr "བརྗོད་དེ་ཡོད་པའི་ཚིག་ཡིག་གི་གཙོ་དམིགས་བཀོད་པ་འདི་ལྕོགས་ཅན་བཟོ། (_E)"
+
+#: ../src/print.c:1686
+#, c-format
+msgid ""
+"Balsa could not find font \"%s\".\n"
+"Use the \"Fonts\" page on the \"Print message\" dialog to change it."
+msgstr ""
+"བཱལ་ས་དེ་གིས་ཡིག་གཟུགས་ \"%s\" ཐོབ་མ་ཚུགས། \n"
+"བསྒྱུར་བཅོས་འབད་ནིའི་དོན་ལུ་  \"Print message\" ཌའི་ལོག་གུ་  \"Fonts\" ཤོག་ལེབ་ལག་ལེན་འཐབ།"
+
+#: ../src/print.c:1787
+msgid "Balsa: message print preview"
+msgstr "བཱལ་ས: འཕྲིན་དོན་དཔར་བསྐྲུན་སྔོན་ལྟ་"
+
+#: ../src/print-gtk.c:88
+#: ../src/print-gtk.c:239
+#, c-format
+msgid "Page %d of %d"
+msgstr "%d གི་ %dཤོག་ལེབ་"
+
+#: ../src/print-gtk.c:142
+#: ../src/print-gtk.c:161
+msgid "Signed and encrypted matter"
+msgstr "མིང་རྟགས་བཀོད་ཡོདཔ་དང་གསང་བཟོས་པའི་གནད་དོན་"
+
+#: ../src/print-gtk.c:146
+#: ../src/print-gtk.c:165
+msgid "Signed matter"
+msgstr "མིང་རྟགས་བཀོད་པའི་གནད་དོན་"
+
+#: ../src/print-gtk.c:344
+#, c-format
+msgid "Cannot print page %d because the document has only %d pages."
+msgstr "ཤོག་ལེབ་ %d དཔར་བསྐྲུན་འབད་མི་ཚུགས་  ག་ཅི་སྦེ་ཟེར་བ་ཅིན་  ཡིག་ཆ་དེ་ལུ་  %dཤོག་ལེབ་ཚུ་རྐྱངམ་ཅིག་ཡོད།"
+
+#. Translate to the default units to use for presenting
+#. * lengths to the user. Translate to default:inch if you
+#. * want inches, otherwise translate to default:mm.
+#. * Do *not* translate it to "predefinito:mm", if it
+#. * it isn't default:mm or default:inch it will not work
+#.
+#: ../src/print-gtk.c:378
+msgid "default:mm"
+msgstr "སྔོན་སྒྲིག:ཨེམ་ཨེམ་"
+
+#: ../src/print-gtk.c:435
+msgid "inch"
+msgstr "ཨིནཅི་"
+
+#: ../src/print-gtk.c:442
+msgid "mm"
+msgstr "ཨེམ་ཨེམ་"
+
+#: ../src/print-gtk.c:513
+msgid "_Header Font:"
+msgstr "མགོ་ཡིག་གི་ཡིག་གཟུགས: (_H)"
+
+#: ../src/print-gtk.c:516
+msgid "B_ody Font:"
+msgstr "མ་གཟུགས་ཀྱི་ཡིག་གཟུགས: (_o)"
+
+#: ../src/print-gtk.c:519
+msgid "_Footer Font:"
+msgstr "མཇུག་ཡིག་གི་ཡིག་གཟུགས: (_F)"
+
+#: ../src/print-gtk.c:526
+msgid "Highlighting"
+msgstr "གཙོ་དམིགས་བཀོད་པ་"
+
+#: ../src/print-gtk.c:541
+msgid "Highlight _cited text"
+msgstr "བརྗོད་པའི་ཚིག་ཡིག་གཙོ་དམིགས་བཀོད། (_c)"
+
+#: ../src/print-gtk.c:550
+msgid "Highlight _structured phrases"
+msgstr "གཞི་བཀོད་འབད་ཡོད་པའི་ཚིག་ཚན་ཚུ་གཙོ་དམིགས་བཀོད། (_s)"
+
+#: ../src/print-gtk.c:561
+msgid "Margins"
+msgstr "ས་སྟོངས་ཚུ་"
+
+#: ../src/print-gtk.c:583
+msgid "_Top"
+msgstr "མགོ། (_T)"
+
+#: ../src/print-gtk.c:589
+msgid "_Bottom"
+msgstr "མཇུག། (_B)"
+
+#: ../src/print-gtk.c:601
+msgid "_Left"
+msgstr "གཡོན། (_L)"
+
+#: ../src/print-gtk.c:607
+msgid "_Right"
+msgstr "གཡས། (_R)"
+
+#: ../src/print-gtk.c:731
+#, c-format
+msgid "Error printing message: %s"
+msgstr "འཕྲིན་དོན་དཔར་བསྐྲུན་འབདཝ་ད་འཛོལ་བ: %s"
+
+#: ../src/save-restore.c:682
+msgid "Error during filters loading: "
+msgstr "ཚགས་མ་གི་མངོན་གསལ་འབདཝ་ད་འཛོལ་བ:"
+
+#: ../src/save-restore.c:684
+#, c-format
+msgid ""
+"Error during filters loading: %s\n"
+"Filters may not be correct."
+msgstr ""
+"ཚགས་མའི་མངོན་གསལ་འབདཝ་ད་འཛོལ་བ: %s\n"
+"ཚགས་མ་ཚུ་བདེན་པ་མེདཔ་འོང་།"
+
+#: ../src/save-restore.c:799
+msgid "The option not to recognize \"format=flowed\" text has been removed."
+msgstr "\"format=flowed\" ཚིག་ཡིག་ངོས་འཛིན་མི་འབད་ནི་ཨིན་པའི་གདམ་ཁ་འདི་རྩ་བསྐྲད་གཏང་ཡོདཔ།"
+
+#: ../src/save-restore.c:1082
+msgid "The option not to send \"format=flowed\" text is now on the Options menu of the compose window."
+msgstr "\"format=flowed\" ཚིག་ཡིག་མི་གཏང་ནི་ཨིན་པའི་གདམ་ཁ་འདི་  ད་ལྟོ་བརྩམ་ནིའི་སྒོ་སྒྲིག་གི་གདམ་ཁ་དཀར་ཆག་གུ་ཡོདཔ་ཨིན།"
+
+#: ../src/save-restore.c:1114
+msgid "The option to request a MDN is now on the Options menu of the compose window."
+msgstr "ཨེམ་ཌི་ཨེན་ཅིག་ཞུ་བ་འབད་ནི་ལུ་གདམ་ཁ་འདི་  ད་ལྟོ་སྒོ་སྒྲིག་བརྩམ་པའི་གདམ་ཁ་དཀར་ཆག་གུ་ཡོདཔ་ཨིན།"
+
+#: ../src/save-restore.c:2199
+msgid "Error opening GConf database\n"
+msgstr "GConf གནས་སྡུད་གཞི་རྟེན་ཁ་ཕྱེཝ་ད་འཛོལ་བ\n"
+
+#: ../src/save-restore.c:2207
+#: ../src/save-restore.c:2218
+#, c-format
+msgid "Error setting GConf field: %s\n"
+msgstr "GConf ས་སྒོ་སྒྲིག་སྟངས་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#. Translators: please use the initial letter of each language as
+#. * its accelerator; this is a long list, and unique accelerators
+#. * cannot be found.
+#: ../src/sendmsg-window.c:242
+msgid "_Brazilian Portuguese"
+msgstr "བ་ར་ཛི་ལི་ཡཱན་པོར་ཊུ་གིསི། (_B)"
+
+#: ../src/sendmsg-window.c:243
+msgid "_Catalan"
+msgstr "ཀེ་ཊ་ལཱན། (_C)"
+
+#: ../src/sendmsg-window.c:244
+msgid "_Chinese Simplified"
+msgstr "རྒྱ་ནག་གི་འཇམ་བཟོས། (_C)"
+
+#: ../src/sendmsg-window.c:245
+msgid "_Chinese Traditional"
+msgstr "རྒྱ་ནག་གི་སྔོན་སྲོལ། (_C)"
+
+#: ../src/sendmsg-window.c:246
+msgid "_Czech"
+msgstr "ཅེཛེ། (_C)"
+
+#: ../src/sendmsg-window.c:247
+msgid "_Danish"
+msgstr "ཌེ་ནིཤ། (_D)"
+
+#: ../src/sendmsg-window.c:248
+msgid "_Dutch"
+msgstr "ཌཆ། (_D)"
+
+#: ../src/sendmsg-window.c:249
+msgid "_English (American)"
+msgstr "ཨིང་ལིཤ། (ཨེ་མི་རི་ཀཱན་) (_E)"
+
+#: ../src/sendmsg-window.c:250
+msgid "_English (British)"
+msgstr "ཨིང་ལིཤ། (བིརི་ཊིཤི་) (_E)"
+
+#: ../src/sendmsg-window.c:251
+msgid "_Esperanto"
+msgstr "ཨིསི་པི་རེན་ཊོ། (_E)"
+
+#: ../src/sendmsg-window.c:252
+msgid "_Estonian"
+msgstr "ཨིསི་ཊོ་ནི་ཡཱན། (_E)"
+
+#: ../src/sendmsg-window.c:253
+msgid "_Finnish"
+msgstr "མཇུག་བསྡུ་ནི། (_F)"
+
+#: ../src/sendmsg-window.c:254
+msgid "_French"
+msgstr "ཕེརནཆི། (_F)"
+
+#: ../src/sendmsg-window.c:255
+msgid "_German"
+msgstr "ཇར་མཱན། (_G)"
+
+#: ../src/sendmsg-window.c:256
+msgid "_German (Austrian)"
+msgstr "ཇར་མཱན། (ཨཱསི་ཊི་ཡཱན) (_G)"
+
+#: ../src/sendmsg-window.c:257
+msgid "_German (Swiss)"
+msgstr "ཇར་མཱན། (སུའིསི་) (_G)"
+
+#: ../src/sendmsg-window.c:258
+msgid "_Greek"
+msgstr "གིརིཀ། (_G)"
+
+#: ../src/sendmsg-window.c:259
+msgid "_Hebrew"
+msgstr "ཧེབ་བིརིའུ། (_H)"
+
+#: ../src/sendmsg-window.c:260
+msgid "_Hungarian"
+msgstr "ཧང་ག་རི་ཡཱན། (_H)"
+
+#: ../src/sendmsg-window.c:261
+msgid "_Italian"
+msgstr "ཨའི་ཊ་ལི་ཡཱན། (_I)"
+
+#: ../src/sendmsg-window.c:262
+msgid "_Japanese (JIS)"
+msgstr "ཇ་པ་ནིསི།  (ཇེ་ཨའི་ཨེསི་) (_J)"
+
+#: ../src/sendmsg-window.c:263
+msgid "_Korean"
+msgstr "ཀོ་རི་ཡའི། (_K)"
+
+#: ../src/sendmsg-window.c:264
+msgid "_Latvian"
+msgstr "ལེཊི་བི་ཡཱན། (_L)"
+
+#: ../src/sendmsg-window.c:265
+msgid "_Lithuanian"
+msgstr "ལི་ཐུ་འ་ནི་ཡཱན། (_L)"
+
+#: ../src/sendmsg-window.c:266
+msgid "_Norwegian"
+msgstr "ནོར་ཝེ་ཇི་ཡཱན། (_N)"
+
+#: ../src/sendmsg-window.c:267
+msgid "_Polish"
+msgstr "པོ་ལིཤ། (_P)"
+
+#: ../src/sendmsg-window.c:268
+msgid "_Portugese"
+msgstr "པོར་ཊུ་གིསི། (_P)"
+
+#: ../src/sendmsg-window.c:269
+msgid "_Romanian"
+msgstr "རོ་མ་ནི་ཡཱན། (_R)"
+
+#: ../src/sendmsg-window.c:270
+msgid "_Russian (ISO)"
+msgstr "ར་ཤི་ཡཱན། (ཨའི་ཨེསི་ཨོ་) (_R)"
+
+#: ../src/sendmsg-window.c:271
+msgid "_Russian (KOI)"
+msgstr "ར་ཤི་ཡཱན། (ཀེ་ཨོ་ཨའི་) (_R)"
+
+#: ../src/sendmsg-window.c:272
+msgid "_Serbian"
+msgstr "སར་བི་ཡཱན། (_S)"
+
+#: ../src/sendmsg-window.c:273
+msgid "_Serbian (Latin)"
+msgstr "སར་བི་ཡཱན། (ལེ་ཊིན་) (_S)"
+
+#: ../src/sendmsg-window.c:274
+msgid "_Slovak"
+msgstr "སོལོ་བཱཀ། (_S)"
+
+#: ../src/sendmsg-window.c:275
+msgid "_Spanish"
+msgstr "སིཔེ་ནིཤི། (_S)"
+
+#: ../src/sendmsg-window.c:276
+msgid "_Swedish"
+msgstr "སུའི་ཌིཤི། (_S)"
+
+#: ../src/sendmsg-window.c:277
+msgid "_Turkish"
+msgstr "ཊར་ཀིཤ། (_T)"
+
+#: ../src/sendmsg-window.c:278
+msgid "_Ukrainian"
+msgstr "ཡུཀ་རའི་ནི་ཡཱན། (_U)"
+
+#: ../src/sendmsg-window.c:279
+msgid "_Generic UTF-8"
+msgstr "རིགས་བརྒྱུད་ ཡུ་ཊི་ཨེཕ་-༨། (_G)"
+
+#: ../src/sendmsg-window.c:303
+msgid "_GnuPG uses MIME mode"
+msgstr "GnuPG དེ་གིས་མ་ཡིམ་ཐབས་ལམ་ལག་ལེན་འཐབ་ཨིན། (_G)"
+
+#: ../src/sendmsg-window.c:309
+msgid "_GnuPG uses old OpenPGP mode"
+msgstr "GnuPG དེ་གིས་  པི་ཇི་པི་ཁ་ཕྱེ་རྙིངམ་གྱི་ཐབས་ལམ་འདི་ལག་ལེན་འཐབ་ཨིན། (_G)"
+
+#: ../src/sendmsg-window.c:316
+msgid "_S/MIME mode (GpgSM)"
+msgstr "_S/MIME ཐབས་ལམ་ (GpgSM) (_S)"
+
+#: ../src/sendmsg-window.c:331
+#: ../src/sendmsg-window.c:518
+msgid "_Include File..."
+msgstr "ཡིག་སྣོད་བརྩི... (_I)"
+
+#: ../src/sendmsg-window.c:334
+#: ../src/sendmsg-window.c:531
+msgid "_Attach File..."
+msgstr "ཡིག་སྣོད་མཉམ་སྦྲགས... (_A)"
+
+#: ../src/sendmsg-window.c:337
+#: ../src/sendmsg-window.c:520
+msgid "I_nclude Message(s)"
+msgstr "འཕྲིན་དོན་གྲངས་སུ་བཙུགས་ (ཨེསི་) (_n)"
+
+#: ../src/sendmsg-window.c:340
+#: ../src/sendmsg-window.c:523
+msgid "Attach _Message(s)"
+msgstr "འཕྲིན་དོན་མཉམ་སྦྲགས་ (ཨེསི་) (_M)"
+
+#: ../src/sendmsg-window.c:346
+#: ../src/sendmsg-window.c:548
+msgid "Sen_d"
+msgstr "གཏང་། (_d)"
+
+#: ../src/sendmsg-window.c:347
+#: ../src/sendmsg-window.c:549
+#: ../src/toolbar-factory.c:111
+msgid "Send this message"
+msgstr "འཕྲིན་དོན་འདི་གཏང་"
+
+#: ../src/sendmsg-window.c:351
+msgid "_Queue"
+msgstr "མི་གྲེལ། (_Q)"
+
+#: ../src/sendmsg-window.c:352
+#: ../src/sendmsg-window.c:554
+msgid "Queue this message in Outbox for sending"
+msgstr "འཕྲིན་དོན་འདི་གཏང་ནིའི་དོན་ལུ་  ཨའུཊི་བོགསི་ནང་མི་གྲལ་"
+
+#: ../src/sendmsg-window.c:356
+msgid "_Postpone"
+msgstr "ཕར་འགྱངས། (_P)"
+
+#: ../src/sendmsg-window.c:359
+#: ../src/sendmsg-window.c:535
+msgid "_Save"
+msgstr "སྲུང་། (_S)"
+
+#: ../src/sendmsg-window.c:360
+#: ../src/sendmsg-window.c:536
+msgid "Save this message"
+msgstr "འཕྲིན་དོན་འདི་སྲུང་"
+
+#: ../src/sendmsg-window.c:373
+#: ../src/sendmsg-window.c:540
+msgid "Print the edited message"
+msgstr "ཞུན་དག་འབད་ཡོད་པའི་འཕྲིན་དོན་དཔར་བསྐྲུན་འབད་"
+
+#: ../src/sendmsg-window.c:402
+#: ../src/sendmsg-window.c:565
+msgid "_Wrap Body"
+msgstr "མ་གཟུགས་ལོག་མཚམས་བཟོ། (_W)"
+
+#: ../src/sendmsg-window.c:406
+#: ../src/sendmsg-window.c:569
+msgid "_Reflow Selected Text"
+msgstr "སེལ་འཐུ་འབད་དེ་ཡོད་པའི་ཚིག་ཡིག་ལོག་འབབ་རྒྱུན། (_R)"
+
+#: ../src/sendmsg-window.c:411
+#: ../src/sendmsg-window.c:597
+msgid "Insert Si_gnature"
+msgstr "མིང་རྟགས་བཙུགས། (_g)"
+
+#: ../src/sendmsg-window.c:415
+#: ../src/sendmsg-window.c:573
+msgid "_Quote Message(s)"
+msgstr "འཕྲིན་དོན་(ཚུ་)འདྲེན་ཚིག་བཀོད། (_Q)"
+
+#: ../src/sendmsg-window.c:421
+#: ../src/sendmsg-window.c:425
+#: ../src/sendmsg-window.c:649
+msgid "C_heck Spelling"
+msgstr "སྡེབ་དཔྱད་འབད། (_h)"
+
+#: ../src/sendmsg-window.c:422
+#: ../src/sendmsg-window.c:426
+#: ../src/sendmsg-window.c:651
+msgid "Check the spelling of the message"
+msgstr "འཕྲིན་དོན་གྱི་སྡེབ་ཞིབ་དཔྱད་འབད་"
+
+#: ../src/sendmsg-window.c:432
+#: ../src/sendmsg-window.c:657
+msgid "Select _Identity..."
+msgstr "ངོ་རྟགས་སེལ་འཐུ་འབད... (_I)"
+
+#: ../src/sendmsg-window.c:433
+#: ../src/sendmsg-window.c:658
+msgid "Select the Identity to use for the message"
+msgstr "འཕྲིན་དོན་འདི་གི་དོན་ལུ་  ལག་ལེན་འཐབ་ནི་ལུ་ངོ་རྟགས་འདི་སེལ་འཐུ་འབད་"
+
+#: ../src/sendmsg-window.c:438
+msgid "_Edit with Gnome-Editor"
+msgstr "ཇི་ནོམ་-ཞུན་དགཔ་དང་ཅིག་ཁར་ཞུན་དག་འབད། (_E)"
+
+#: ../src/sendmsg-window.c:439
+msgid "Edit the current message with the default Gnome editor"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་འདི་སྔོན་སྒྲིག་ཇི་ནོམ་ཞུན་དགཔ་དང་ཅིག་ཁར་ ཞུན་དག་འབད་"
+
+#: ../src/sendmsg-window.c:451
+#: ../src/sendmsg-window.c:610
+msgid "Fr_om"
+msgstr "ལས། (_o)"
+
+#: ../src/sendmsg-window.c:453
+#: ../src/sendmsg-window.c:612
+msgid "_Cc"
+msgstr "སི་སི། (_C)"
+
+#: ../src/sendmsg-window.c:455
+#: ../src/sendmsg-window.c:614
+msgid "_Bcc"
+msgstr "བི་སི་སི། (_B)"
+
+#: ../src/sendmsg-window.c:457
+#: ../src/sendmsg-window.c:616
+msgid "_Fcc"
+msgstr "ཨེཕ་སི་སི། (_F)"
+
+#: ../src/sendmsg-window.c:459
+msgid "_Reply To"
+msgstr "ལན་གསལ་ལུ། (_R)"
+
+#: ../src/sendmsg-window.c:465
+#: ../src/sendmsg-window.c:662
+msgid "_Request Disposition Notification"
+msgstr "རིམ་བཀོད་བརྡ་བསྐུལ་ཞུ་བ། (_R)"
+
+#: ../src/sendmsg-window.c:468
+#: ../src/sendmsg-window.c:628
+msgid "_Format = Flowed"
+msgstr "རྩ་སྒྲིག་ = འབབ་རྒྱུན། (_F)"
+
+#: ../src/sendmsg-window.c:473
+#: ../src/sendmsg-window.c:633
+msgid "_Sign Message"
+msgstr "འཕྲིན་དོན་མིང་རྟགས་བཀོད། (_S)"
+
+#: ../src/sendmsg-window.c:474
+#: ../src/sendmsg-window.c:634
+msgid "signs the message using GnuPG"
+msgstr "ཇི་ཨེན་ཡུ་པི་ཇི་ལག་ལེན་འཐབ་ཐོག་ལས་  འཕྲིན་དོན་འདི་མིང་རྟགས་བཀོདཔ་ཨིན་"
+
+#: ../src/sendmsg-window.c:477
+#: ../src/sendmsg-window.c:637
+msgid "_Encrypt Message"
+msgstr "འཕྲིན་དོན་གསང་བ་བཟོ་ནི། (_E)"
+
+#: ../src/sendmsg-window.c:478
+#: ../src/sendmsg-window.c:638
+msgid "signs the message using GnuPG for all To: and CC: recipients"
+msgstr "ཇི་ཨེན་ཡུ་པི་ཇི་ལག་ལེན་འཐབ་སྟེ་ འཕྲིན་དོན་འདི་ཆ་མཉམ་ལུ་མིང་རྟགས་བཀོདཔ་ཨིན: དང་ སི་སི: ཐོབ་མཁན་ཚུ་"
+
+#: ../src/sendmsg-window.c:498
+#: ../src/sendmsg-window.c:678
+msgid "_Show"
+msgstr "སྟོན། (_S)"
+
+#: ../src/sendmsg-window.c:500
+#: ../src/sendmsg-window.c:655
+msgid "_Language"
+msgstr "སྐད་ཡིག། (_L)"
+
+#: ../src/sendmsg-window.c:502
+msgid "_Options"
+msgstr "གདམ་ཁ་ཚུ། (_O)"
+
+#: ../src/sendmsg-window.c:544
+msgid "Sa_ve and Close"
+msgstr "སྲུང་ཞིནམ་ལས་ཁ་བསྡམས། (_v)"
+
+#: ../src/sendmsg-window.c:553
+msgid "Send _Later"
+msgstr "ཤུལ་ལས་གཏང་། (_L)"
+
+#: ../src/sendmsg-window.c:647
+msgid "Toggle Spell C_hecker"
+msgstr "སྡེབ་ཞིབ་དཔྱད་འབད་མི་སོར་སྟོན། (_h)"
+
+#: ../src/sendmsg-window.c:708
+msgid "Attachment"
+msgstr "མཉམ་སྦྲགས་"
+
+#: ../src/sendmsg-window.c:708
+msgid "Inline"
+msgstr "གྱལ་རིམ་ནང་"
+
+#: ../src/sendmsg-window.c:708
+msgid "Reference"
+msgstr "གཞི་བསྟུན་"
+
+#: ../src/sendmsg-window.c:939
+#, c-format
+msgid ""
+"The message to '%s' is modified.\n"
+"Save message to Draftbox?"
+msgstr ""
+"'%s' ལུ་འཕྲིན་དོན་འདི་ལེགས་བཅོས་འབད་དེ་ཡོད། \n"
+"ཟིན་བྲིས་སྒྲོམ་ལུ་སྲུང་ག?"
+
+#: ../src/sendmsg-window.c:1260
+msgid "Gnome editor is not defined in your preferred applications."
+msgstr "ཇི་ནོམ་ཞུན་དགཔ་འདི་ཁྱོད་ཀྱིས་དཀའ་གདམ་བརྐྱབ་ཡོད་པའི་གློག་རིམ་ཚུ་ནང་ངོས་འཛིན་འབད་དེ་མེདཔ་ཨིན།"
+
+#: ../src/sendmsg-window.c:1311
+msgid "Select Identity"
+msgstr "ངོ་རྟགས་སེལ་འཐུ་འབད་"
+
+#: ../src/sendmsg-window.c:1688
+#, c-format
+msgid ""
+"Saying yes will not send the file `%s' itself, but just a MIME message/external-body reference.  Note that the recipient must have proper permissions to see the `real' file.\n"
+"\n"
+"Do you really want to attach this file as reference?"
+msgstr ""
+"བཏུབ་ཟེར་བ་ཙམ་གྱིས་  ཡིག་སྣོད་`%s'འདི་དེ་ཉིད་གཏང་མི་བཏུབ་  དེ་འབདཝ་ད་  མ་ཡིམ་འཕྲིན་དོན་/ཕྱིའི་-མ་གཟུགས་གཞི་བསྟུན་རྐྱངམ་ཅིག།  `real' ཡིག་སྣོད་བལྟ་ནིའི་དོན་ལུ་ཐོབ་མཁན་ལུ་ གནང་བ་ཚུལ་ལྡན་ཅིག་དགོཔ་ཨིན། \n"
+"\n"
+"ཁྱོད་ཀྱིས་ཡིག་སྣོད་འདི་གཞི་བསྟུན་སྦེ་མཉམ་སྦྲགས་འབད་ནི་ཨིན་ན?"
+
+#: ../src/sendmsg-window.c:1699
+msgid "Attach as Reference?"
+msgstr "གཞི་བསྟུན་སྦེ་མཉམ་སྦྲགས་འབད་ག?"
+
+#: ../src/sendmsg-window.c:1812
+msgid "Choose charset"
+msgstr "ཡིག་འབྲུའི་གཞི་སྒྲིག་གདམ་ཁ་བརྐྱབ་"
+
+#: ../src/sendmsg-window.c:1819
+#, c-format
+msgid ""
+"File\n"
+"%s\n"
+"is not encoded in US-ASCII or UTF-8.\n"
+"Please choose the charset used to encode the file."
+msgstr ""
+"ཡིག་སྣོད་\n"
+"%s\n"
+"འདི་ ཡུ་ཨེསི-ཨེ་ཨེསི་སི་ཨའི་ཨའི་ཡང་ན་ཡུ་ཊི་ཨེཕ་-༨ ནང་ཨིན་ཀོ་ཌིང་མ་འབད་བས།\n"
+"ཡིག་སྣོད་ཨིན་ཀོཌི་འབད་ནི་ལུ་  ཡིག་འབྲུའི་གཞི་སྒྲིག་ལག་ལེན་འཐབ་ཡོདཔ་གདམ་ཁ་བརྐྱབ་གནང་།"
+
+#: ../src/sendmsg-window.c:1835
+msgid "Attach as MIME type:"
+msgstr "མ་ཡིམ་དབྱེ་བ་སྦེ་མཉམ་སྦྲགས་འབད:"
+
+#: ../src/sendmsg-window.c:1891
+#, c-format
+msgid "Character set for file %s changed from \"%s\" to \"%s\"."
+msgstr "ཡིག་སྣོད་%sགི་དོན་ལུ་ཡིག་འབྲུ་གཞི་སྒྲིག་འདི་  \"%s\" ལས་\"%s\"ལུ་བསྒྱུར་བཅོས་འབད་ཡོདཔ།"
+
+#: ../src/sendmsg-window.c:1934
+#: ../src/sendmsg-window.c:5384
+msgid "(no subject)"
+msgstr "(དོན་ཚན་མེད་)"
+
+#: ../src/sendmsg-window.c:2020
+msgid "forwarded message"
+msgstr "འཕྲིན་དོན་གདོང་བསྐྱོད་འབད་ཡོདཔ་"
+
+#: ../src/sendmsg-window.c:2025
+#, c-format
+msgid "Message from %s, subject: \"%s\""
+msgstr "%s ལས་འཕྲིན་དོན་ དོན་ཚན: \"%s\""
+
+#: ../src/sendmsg-window.c:2043
+#, c-format
+msgid "Error converting \"%s\" to UTF-8: %s\n"
+msgstr "\"%s\" འདི་ ཡུ་ཊི་ཨེཕ-༨ ལུ་གཞི་བསྒྱུར་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#: ../src/sendmsg-window.c:2113
+#: ../src/sendmsg-window.c:2184
+msgid "Remove"
+msgstr "རྩ་བསྐྲད་གཏང་"
+
+#: ../src/sendmsg-window.c:2196
+msgid "Open..."
+msgstr "ཁ་ཕྱེ..."
+
+#: ../src/sendmsg-window.c:2208
+msgid "(URL)"
+msgstr "(ཡུ་ཨར་ཨེལ)"
+
+#: ../src/sendmsg-window.c:2229
+#, c-format
+msgid "Cannot get info on file '%s': %s"
+msgstr "བརྡ་དོན་འདི་ཡིག་སྣོད་ '%s' གུ་ཐོབ་མ་ཚུགས: %s"
+
+#: ../src/sendmsg-window.c:2234
+#, c-format
+msgid "Attachment %s is not a regular file."
+msgstr "མཉམ་སྦྲགས་ %s འདི་དུས་རྒྱུན་ཡིག་སྣོད་མེན།"
+
+#: ../src/sendmsg-window.c:2237
+#, c-format
+msgid "File %s cannot be read\n"
+msgstr "ཡིག་སྣོད་ %s ལྷག་མ་ཚུགས་ \n"
+
+#: ../src/sendmsg-window.c:2285
+msgid "Attach file"
+msgstr "ཡིག་སྣོད་མཉམ་སྦྲགས་འབད་"
+
+#: ../src/sendmsg-window.c:2380
+#: ../src/sendmsg-window.c:2489
+#: ../src/sendmsg-window.c:4495
+msgid ""
+"Attaching message failed.\n"
+"Possible reason: not enough temporary space"
+msgstr ""
+"འཕྲིན་དོན་མཉམ་སྦྲགས་འབད་མ་ཚུགས། \n"
+"སྲིད་པའི་རྒྱུ་མཚན: གནས་སྐབས་ཀྱི་བར་སྟོང་ལངམ་མེད་"
+
+#: ../src/sendmsg-window.c:2710
+msgid "F_rom:"
+msgstr "ལས: (_r)"
+
+#. Subject:
+#: ../src/sendmsg-window.c:2846
+msgid "S_ubject:"
+msgstr "དོན་ཚན: (_u)"
+
+#. fcc: mailbox folder where the message copy will be written to
+#: ../src/sendmsg-window.c:2860
+msgid "F_cc:"
+msgstr "ཨེཕ་སི་སི: (_c)"
+
+#. Reply To:
+#: ../src/sendmsg-window.c:2892
+msgid "_Reply To:"
+msgstr "ལན་གསལ་ལུ: (_R)"
+
+#. Attachment list
+#: ../src/sendmsg-window.c:2897
+msgid "_Attachments:"
+msgstr "མཉམ་སྦྲགས་ཚུ: (_A)"
+
+#: ../src/sendmsg-window.c:2943
+msgid "Mode"
+msgstr "ཐབས་ལམ་"
+
+#: ../src/sendmsg-window.c:2966
+msgid "Description"
+msgstr "འགྲལ་བཤད་"
+
+#: ../src/sendmsg-window.c:3276
+#, c-format
+msgid "Could not save attachment: %s"
+msgstr "མཉམ་སྦྲགས་སྲུང་མ་ཚུགས: %s"
+
+#: ../src/sendmsg-window.c:3297
+msgid "No subject"
+msgstr "དོན་ཚན་མེད་"
+
+#: ../src/sendmsg-window.c:3329
+msgid "you"
+msgstr "ཁྱོད་"
+
+#: ../src/sendmsg-window.c:3338
+#, c-format
+msgid "------forwarded message from %s------\n"
+msgstr "------f%sལས་འཕྲིན་དོན་གདོང་བསྐྱོད་འབད་ཡོདཔ་------\n"
+
+#: ../src/sendmsg-window.c:3375
+#, c-format
+msgid "Message-ID: %s\n"
+msgstr "འཕྲིན་དོན-ཨའི་ཌི: %s\n"
+
+#: ../src/sendmsg-window.c:3381
+msgid "References:"
+msgstr "གཞི་བསྟུན་ཚུ:"
+
+#: ../src/sendmsg-window.c:3392
+#, c-format
+msgid "On %s, %s wrote:\n"
+msgstr "%sགུ་, %s འབྲི་ཡོདཔ:\n"
+
+#: ../src/sendmsg-window.c:3394
+#, c-format
+msgid "%s wrote:\n"
+msgstr "%s འབྲི་ཡོདཔ:\n"
+
+#: ../src/sendmsg-window.c:3505
+msgid "No signature found!"
+msgstr "མིང་རྟགས་མ་ཐོབ!"
+
+#: ../src/sendmsg-window.c:3688
+msgid "Could not save message."
+msgstr "འཕྲིན་དོན་སྲུང་མ་ཚུགས།"
+
+#: ../src/sendmsg-window.c:3695
+#, c-format
+msgid "Could not open draftbox: %s"
+msgstr "ཟིན་བྲིས་སྒྲོམ་ཁ་ཕྱེ་མ་ཚུགས: %s"
+
+#: ../src/sendmsg-window.c:3716
+msgid "Message saved."
+msgstr "འཕྲིན་དོན་སྲུང་ཡོདཔ།"
+
+#: ../src/sendmsg-window.c:4660
+#: ../src/sendmsg-window.c:4667
+#: ../src/sendmsg-window.c:4673
+#: ../src/sendmsg-window.c:4679
+#: ../src/sendmsg-window.c:4702
+#, c-format
+msgid "Could not attach the file %s: %s."
+msgstr "ཡིག་སྣོད་%s མཉམ་སྦྲགས་འབད་མ་ཚུགས: %s"
+
+#: ../src/sendmsg-window.c:4661
+msgid "not an absolute path"
+msgstr "ཡང་དག་འགྲུལ་ལམ་མེན་"
+
+#: ../src/sendmsg-window.c:4668
+msgid "not in your directory"
+msgstr "ཁྱོད་རའི་སྣོད་ཐོའི་ནང་མེད་"
+
+#: ../src/sendmsg-window.c:4674
+msgid "does not exist"
+msgstr "མེདཔ་"
+
+#: ../src/sendmsg-window.c:4680
+msgid "not a regular file"
+msgstr "དུས་རྒྱུན་ཡིག་སྣོད་མེན་"
+
+#: ../src/sendmsg-window.c:4703
+msgid "not in current directory"
+msgstr "ད་ལྟོའི་སྣོད་ཐོའི་ནང་མེད་"
+
+#: ../src/sendmsg-window.c:4743
+msgid ""
+"The link that you selected created\n"
+"a \"Blind copy\" (Bcc) address.\n"
+"Please check that the address\n"
+"is appropriate."
+msgstr ""
+"ཁྱོད་ཀྱིས་སེལ་འཐུ་འབད་དེ་ཡོད་པའི་འབྲེལ་ལམ་དེ་གིས་\n"
+" \"Blind copy\" (Bcc) ཁ་བྱང་ཅིག་གསར་བསྐྲུན་འབད་ཡོད།\n"
+"ཁ་བྱང་འདི་འོས་ལྡན་ཨིནམ་སྦེ་\n"
+"ཞིབ་དཔྱད་འབད་གནང་།"
+
+#: ../src/sendmsg-window.c:4784
+#, c-format
+msgid "Error executing signature generator %s"
+msgstr "མིང་རྟགས་བཟོ་བཏོན་པའི་%sལག་ལེན་འཐབ་ད་འཛོལ་བ་"
+
+#: ../src/sendmsg-window.c:4796
+#, c-format
+msgid "Cannot open signature file '%s' for reading"
+msgstr "ལྷག་ནིའི་དོན་ལུ་མིང་རྟགས་ཡིག་སྣོད་ '%s'ཁ་ཕྱེ་མ་ཚུགས་"
+
+#: ../src/sendmsg-window.c:4806
+#, c-format
+msgid "Error reading signature from %s"
+msgstr "%sལས་མིང་རྟགས་ལྷགཔ་ད་འཛོལ་བ་"
+
+#: ../src/sendmsg-window.c:4810
+#, c-format
+msgid "Signature in %s is not a UTF-8 text."
+msgstr "%sནང་གི་མིང་རྟགས་འདི་ཡུ་ཊི་ཨེཕ་-ཚིག་ཡིག་ཅིག་མེན།"
+
+#: ../src/sendmsg-window.c:4873
+#, c-format
+msgid "Could not open the file %s.\n"
+msgstr "ཡིག་སྣོད་%sཁ་ཕྱེ་མ་ཚུགས། \n"
+
+#: ../src/sendmsg-window.c:4929
+msgid "Include file"
+msgstr "ཡིག་སྣོད་གྲངས་སུ་བཙུགས་"
+
+#. Translators: please do not translate Face.
+#: ../src/sendmsg-window.c:5143
+#, c-format
+msgid "Could not load Face header file %s: %s"
+msgstr "བཀོད་རྣམ་མགོ་ཡིག་གི་ཡིག་སྣོད་ %sསྔོན་གསལ་འབད་མ་ཚུགས: %s"
+
+#. Translators: please do not translate Face.
+#: ../src/sendmsg-window.c:5146
+#, c-format
+msgid "Could not load X-Face header file %s: %s"
+msgstr "ཨེགསི་-བཀོད་རྣམ་གྱི་མགོ་ཡིག་ཡིག་སྣོད་ %s འདི་མངོན་གསལ་འབད་མ་ཚུགས: %s"
+
+#: ../src/sendmsg-window.c:5226
+msgid "Message contains national (8-bit) characters"
+msgstr "འཕྲིན་དོན་དེ་ལུ་ རྒྱལ་ཡོངས་ (8-བིཊི་) ཡིག་འབྲུ་ཚུ་ཡོདཔ་ཨིན་"
+
+#: ../src/sendmsg-window.c:5230
+msgid ""
+"Balsa will encode the message in UTF-8.\n"
+"Cancel the operation to choose a different language."
+msgstr ""
+"བཱལ་ས་དེ་གིས་འཕྲིན་དོན་འདི་ ཡུ་ཊི་ཨེཕ-༨ ནང་ཨིན་ཀོཌི་འབདཝ་ཨིན།\n"
+"སྐད་ཡིག་སོ་སོ་གདམ་ཁ་བརྐྱབ་ནི་ལུ་  བཀོལ་སྤྱོད་ཆ་མེད་གཏང་།"
+
+#: ../src/sendmsg-window.c:5236
+msgid ""
+"<b><big>Message contains national (8-bit) characters.</big></b> Balsa will encode the message in UTF-8.\n"
+"Cancel the operation to choose a different language."
+msgstr "<b><big>འཕྲིན་དོན་དེ་ལུ་ རྒྱལ་ཡོངས་ (8-བིཊི་) ཡིག་འབྲུ་ཚུ་ཡོདཔ་ཨིན། </big></b> བཱལ་ས་དེ་གིས་ འཕྲིན་དོན་འདི་ཡུ་ཊི་ཨེཕ-༨ནང་ཨིན་ཀོཌི་འབདཝ་ཨིན།སྐད་ཡིག་སོ་སོ་ཅིག་གདམ་ཁ་བརྐྱབ་ནི་ལུ་ བཀོལ་སྤྱོད་ཆ་མེད་གཏང་།"
+
+#: ../src/sendmsg-window.c:5368
+msgid "You did not specify a subject for this message"
+msgstr "འཕྲིན་དོན་འདི་གི་དོན་ལུ་  ཁྱོད་ཀྱིས་དོན་ཚན་ཅིག་གསལ་བཀོད་མ་འབད་བས་"
+
+#: ../src/sendmsg-window.c:5369
+msgid "If you would like to provide one, enter it below."
+msgstr "ཁྱོད་ཀྱིས་གཅིག་བྱིན་དགོ་པ་ཅིན་  འོག་ལུ་ཐོ་བཀོད་འབད།"
+
+#: ../src/sendmsg-window.c:5410
+msgid "_Send"
+msgstr "གཏང་། (_S)"
+
+#: ../src/sendmsg-window.c:5467
+msgid "You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"
+msgstr "ཁྱོད་ཀྱིས་ འཕྲིན་དོན་གྱི་དོན་ལུ་མཉམ་སྦྲགས་དང་ཅིག་ཁར་ པི་ཇི་པི་ཁ་ཕྱེ་ ཐབས་ལམ་སེལ་འཐུ་འབད་ནུག། ཐབས་ལམ་འདི་གི་ནང་ལུ་  ཡན་ལག་དང་པ་རྐྱངམ་ཅིག་  མིང་རྟགས་བཀོད་ནི་དང་/ཡང་ན་གསང་བཟོས་འབད་ཡོདཔ།  འཕྲིན་དོན་ཆ་ཚང་ཉེན་སྐྱོབ་འབད་ནི་ཨིན་པ་ཅིན་  ཁྱོད་ཀྱིས་མ་ཡིམ་ཐབས་ལམ་འདི་སེལ་འཐུ་འབད་དགོ།  ཁྱོད་ཀྱིས་འཕྲོ་མཐུད་ནི་ཨིན་ན?"
+
+#: ../src/sendmsg-window.c:5483
+#, c-format
+msgid "sending message with gpg mode %d"
+msgstr "ཇི་པི་ཇི་ཐབས་ལམ་ %d དང་ཅིག་ཁར་འཕྲིན་དོན་གཏང་དོ་"
+
+#: ../src/sendmsg-window.c:5520
+msgid "Message could not be created"
+msgstr "འཕྲིན་དོན་གསར་བསྐྲུན་འབད་མ་ཚུགས་"
+
+#: ../src/sendmsg-window.c:5522
+msgid "Message could not be queued in outbox"
+msgstr "འཕྲིན་དོན་འདི་ཨའུཊི་བོགསི་ནང་མི་གྲལ་འབད་མ་ཚུགས་"
+
+#: ../src/sendmsg-window.c:5524
+msgid "Message could not be saved in sentbox"
+msgstr "འཕྲིན་དོན་འདི་གཏང་སྒྲོམ་ནང་སྲུང་མ་ཚུགས་"
+
+#: ../src/sendmsg-window.c:5526
+msgid "Message could not be sent"
+msgstr "འཕྲིན་དོན་འདི་གཏང་མ་ཚུགས་"
+
+#: ../src/sendmsg-window.c:5530
+#, c-format
+msgid "Send failed: %s"
+msgstr "གཏང་མ་ཚུགས: %s"
+
+#: ../src/sendmsg-window.c:5613
+#: ../src/sendmsg-window.c:5632
+msgid "Could not postpone message."
+msgstr "འཕྲིན་དོན་ཕར་འགྱངས་འབད་མ་ཚུགས།"
+
+#: ../src/sendmsg-window.c:5627
+msgid "Message postponed."
+msgstr "འཕྲིན་དོན་ཕར་འགྱངས་འབད་ཡོདཔ།"
+
+#: ../src/sendmsg-window.c:5794
+#, c-format
+msgid "Error starting spell checker: %s"
+msgstr "སྡེབ་དཔྱད་འགོ་བཙུགསཔ་ད་འཛོལ་བ: %s"
+
+#: ../src/sendmsg-window.c:5953
+#, c-format
+msgid "Could not compile %s"
+msgstr "%sཕྱོགས་སྒྲིག་འབད་མ་ཚུགས་"
+
+#: ../src/sendmsg-window.c:5954
+msgid "Quoted Text Regular Expression"
+msgstr "འདྲེན་ཚིག་བཀོད་ཡོད་པའི་ཚིག་ཡིག་དུས་རྒྱུན་གསལ་བརྗོད་"
+
+#: ../src/sendmsg-window.c:6510
+#, c-format
+msgid "Reply to %s: %s"
+msgstr "%sལུ་ལན་གསལ་འབད: %s"
+
+#: ../src/sendmsg-window.c:6515
+#, c-format
+msgid "Forward message to %s: %s"
+msgstr "འཕྲིན་དོན་འདི་%sལུ་གདོང་བསྐྱོད་འབད: %s"
+
+#: ../src/sendmsg-window.c:6519
+#, c-format
+msgid "Continue message to %s: %s"
+msgstr "འཕྲིན་དོན་འདི་%sལུ་འཕྲོ་མཐུད: %s"
+
+#: ../src/sendmsg-window.c:6523
+#, c-format
+msgid "New message to %s: %s"
+msgstr "%sལུ་འཕྲིན་དོན་གསརཔ: %s"
+
+#: ../src/spell-check.c:511
+msgid "Replace the current word with the selected suggestion"
+msgstr "ད་ལྟོའི་མིང་ཚིག་འདི་སེལ་འཐུ་འབད་ཡོད་པའི་བསམ་བཀོད་དང་ཅིག་ཁར་ཚབ་བཙུགས་"
+
+#: ../src/spell-check.c:519
+msgid "Replace all occurrences of the current word with the selected suggestion"
+msgstr "སེལ་འཐུ་འབད་དེ་ཡོད་པའི་བསམ་བཀོད་དང་ཅིག་ཁར་  ད་ལྟོའི་མིང་ཚིག་གི་བྱུང་བ་ཆ་མཉམ་ཚབ་བཙུགས་"
+
+#: ../src/spell-check.c:531
+msgid "Skip the current word"
+msgstr "ད་ལྟོའི་མིང་ཚིག་གོམ་འགྱོ་"
+
+#: ../src/spell-check.c:537
+msgid "Skip all occurrences of the current word"
+msgstr "ད་ལྟོའི་མིང་ཚིག་གི་བྱུང་བ་ཆ་མཉམ་གོམ་འགྱོ་"
+
+#: ../src/spell-check.c:547
+msgid "Add the current word to your personal dictionary"
+msgstr "ད་ལྟོའི་མིང་ཚིག་འདི་ཁྱོད་རའི་རང་དོན་སྣོད་ཐོ་ལུ་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/spell-check.c:556
+msgid "Finish spell checking"
+msgstr "སྡེབ་དཔྱད་ཞིབ་དཔྱད་མཇུག་བསྡུ་ད་"
+
+#: ../src/spell-check.c:561
+msgid "Revert all changes and finish spell checking"
+msgstr "བསྒྱུར་བཅོས་ཚུ་ཆ་མཉམ་རྒྱབ་ལོག་འབད་ནི་དང་ སྡེབ་དཔྱད་མཇུག་བསྡུ་ད་"
+
+#: ../src/spell-check.c:592
+msgid "Spell check"
+msgstr "སྡེབ་དཔྱད་"
+
+#: ../src/store-address.c:104
+msgid "Store address: no addresses"
+msgstr "ཁ་བྱང་གསོག་འཇོག་འབད: ཁ་བྱང་མེད་"
+
+#: ../src/store-address.c:181
+msgid "Store Address"
+msgstr "ཁ་བྱང་གསོག་འཇོག་འབད་"
+
+#: ../src/store-address.c:199
+msgid "Save this address and close the dialog?"
+msgstr "ཁ་བྱང་འདི་སྲུང་ནི་དང་ཌའི་ལོག་ཁ་བསྡམས་ག?"
+
+#: ../src/store-address.c:217
+msgid "No address book selected...."
+msgstr "ཁ་བྱང་ཀི་དེབ་སེལ་འཐུ་འབད་དེ་མེདཔ་ཨིན..."
+
+#: ../src/store-address.c:230
+msgid "Address could not be written to this address book."
+msgstr "ཁ་བྱང་འདི་ཁ་བྱང་ཀི་དེབ་ལུ་འབྲི་མ་ཚུགས།"
+
+#: ../src/store-address.c:233
+msgid "Address book could not be accessed."
+msgstr "ཁ་བྱང་ཀི་དེབ་འཛུལ་སྤྱོད་འབད་མ་ཚུགས།"
+
+#: ../src/store-address.c:235
+msgid "This mail address is already in this address book."
+msgstr "ཡིག་འཕྲིན་ཁ་བྱང་འདི་  ཁ་བྱང་ཀི་དེབ་ནང་ཧེ་མ་ལས་རང་འདུག།"
+
+#: ../src/store-address.c:238
+msgid "Unexpected address book error. Report it."
+msgstr "རེ་བ་མེད་པའི་ཁ་བྱང་ཀི་དེབ་ཀྱི་འཛོལ་བ། ཞུབ་བ་འབད།"
+
+#: ../src/store-address.c:254
+msgid "Choose Address Book"
+msgstr "ཁ་བྱང་ཀི་དེབ་གདམ་ཁ་བརྐྱབ་"
+
+#: ../src/store-address.c:293
+msgid "Choose Address"
+msgstr "ཁ་བྱང་གདམ་ཁ་བརྐྱབ་"
+
+#: ../src/toolbar-factory.c:77
+msgid "Separator"
+msgstr "དབྱེ་བྱེད་"
+
+#: ../src/toolbar-factory.c:78
+msgid "Check"
+msgstr "ཞིབ་དཔྱད་"
+
+#: ../src/toolbar-factory.c:79
+msgid "Check for new email"
+msgstr "གློག་འཕྲིན་གསརཔ་གི་དོན་ལུ་ཞིབ་དཔྱད་འབད་"
+
+#: ../src/toolbar-factory.c:80
+msgid "Compose"
+msgstr "བརྩམ་ནི་"
+
+#: ../src/toolbar-factory.c:81
+msgid "Compose message"
+msgstr "འཕྲིན་དོན་བརྩམ་ད་"
+
+#: ../src/toolbar-factory.c:82
+msgid "Continue"
+msgstr "འཕྲོ་མཐུད་"
+
+#: ../src/toolbar-factory.c:83
+msgid "Continue message"
+msgstr "འཕྲིན་དོན་འཕྲོ་མཐུད་ད་"
+
+#: ../src/toolbar-factory.c:84
+msgid "Reply"
+msgstr "ལན་གསལ་"
+
+#: ../src/toolbar-factory.c:86
+msgid ""
+"Reply\n"
+"to all"
+msgstr ""
+"ཆ་མཉམ་ལུ་\n"
+"ལན་གསལ་འབད་"
+
+#: ../src/toolbar-factory.c:87
+msgid "Reply to all recipients"
+msgstr "ཐོབ་མཁན་ཆ་མཉམ་ལུ་ལན་གསལ་"
+
+#: ../src/toolbar-factory.c:88
+msgid ""
+"Reply\n"
+"to group"
+msgstr ""
+"སྡེ་ཚན་ལུ་\n"
+"ལན་གསལ་འབད་"
+
+#: ../src/toolbar-factory.c:90
+msgid "Forward"
+msgstr "གདོང་བསྐྱོད་"
+
+#: ../src/toolbar-factory.c:92
+msgid "Previous"
+msgstr "ཧེ་མའི་"
+
+#: ../src/toolbar-factory.c:93
+msgid "Open previous"
+msgstr "ཧེ་མམ་ཁ་ཕྱེ་"
+
+#: ../src/toolbar-factory.c:94
+msgid "Next"
+msgstr "ཤུལ་མ་"
+
+#: ../src/toolbar-factory.c:95
+msgid "Open next"
+msgstr "ཤུལ་མམ་ཁ་ཕྱེ་"
+
+#: ../src/toolbar-factory.c:96
+msgid ""
+"Next\n"
+"unread"
+msgstr ""
+"ཤུལ་མམ་\n"
+"ལྷག་བཤོལ་"
+
+#: ../src/toolbar-factory.c:97
+msgid "Open next unread message"
+msgstr "ཤུལ་མའི་ལྷག་བཤོལ་འཕྲིན་དོན་ཁ་ཕྱེ་"
+
+#: ../src/toolbar-factory.c:98
+msgid ""
+"Next\n"
+"flagged"
+msgstr ""
+"ཤུལ་མམ་\n"
+"ཟུར་རྟགས་བཀལ་ཡོདཔ་"
+
+#: ../src/toolbar-factory.c:99
+msgid "Open next flagged message"
+msgstr "ཤུལ་མའི་ཟུར་རྟགས་བཀལ་ཡོད་པའི་འཕྲིན་དོན་"
+
+#: ../src/toolbar-factory.c:100
+msgid ""
+"Previous\n"
+"part"
+msgstr ""
+"ཧེ་མའི་\n"
+"ཡན་ལག་"
+
+#: ../src/toolbar-factory.c:101
+msgid "View previous part of message"
+msgstr "འཕྲིན་དོན་གྱི་ཧེ་མའི་ཆ་ཤས་སྟོན་"
+
+#: ../src/toolbar-factory.c:102
+msgid ""
+"Next\n"
+"part"
+msgstr ""
+"ཤུལ་མའི་\n"
+"ཆ་ཤས་"
+
+#: ../src/toolbar-factory.c:103
+msgid "View next part of message"
+msgstr "འཕྲིན་དོན་གྱི་ཤུལ་མའི་ཆ་ཤས་སྟོན་"
+
+#: ../src/toolbar-factory.c:104
+msgid ""
+"Trash /\n"
+"Delete"
+msgstr ""
+"ཕྱགས་ཧོད་ /\n"
+"བཏོན་གཏང་"
+
+#: ../src/toolbar-factory.c:105
+msgid "Move the current message to trash"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་འདི་ཕྱགས་ཧོད་ནང་སྤོ་བཤུད་འབད་"
+
+#: ../src/toolbar-factory.c:106
+msgid "Postpone"
+msgstr "ཕར་འགྱངས་"
+
+#: ../src/toolbar-factory.c:107
+msgid "Postpone current message"
+msgstr "ད་ལྟོའི་འཕྲིན་དོན་ཕར་འགྱངས་འབད་"
+
+#: ../src/toolbar-factory.c:108
+msgid "Print"
+msgstr "དཔར་བསྐྲུན་"
+
+#: ../src/toolbar-factory.c:110
+msgid "Send"
+msgstr "གཏང་"
+
+#: ../src/toolbar-factory.c:112
+msgid "Exchange"
+msgstr "བརྗེ་སོར་"
+
+#: ../src/toolbar-factory.c:114
+msgid "Attach"
+msgstr "མཉམ་སྦྲགས་"
+
+#: ../src/toolbar-factory.c:115
+msgid "Add attachments to this message"
+msgstr "འཕྲིན་དོན་འདི་ལུ་མཉམ་སྦྲགས་ཚུ་ཁ་སྐོང་བརྐྱབ་"
+
+#: ../src/toolbar-factory.c:116
+msgid "Save"
+msgstr "སྲུང་"
+
+#: ../src/toolbar-factory.c:117
+msgid "Save the current item"
+msgstr "ད་ལྟོའི་རྣམ་གྲངས་འདི་སྲུང་"
+
+#: ../src/toolbar-factory.c:118
+msgid "Identity"
+msgstr "ངོ་རྟགས་"
+
+#: ../src/toolbar-factory.c:119
+msgid "Set identity to use for this message"
+msgstr "འཕྲིན་དོན་འདི་གི་དོན་ལུ་ལག་ལེན་འཐབ་ནི་ལུ་ངོ་རྟགས་གཞི་སྒྲིག་འབད་"
+
+#: ../src/toolbar-factory.c:122
+msgid "Toggle spell checker"
+msgstr "སྡེབ་དཔྱད་སོར་སྟོན་འབད་"
+
+#: ../src/toolbar-factory.c:124
+msgid "Run a spell check"
+msgstr "སྡེབ་དཔྱད་ཅིག་གཡོག་བཀོལ་"
+
+#: ../src/toolbar-factory.c:126
+#: ../src/toolbar-factory.c:136
+msgid "Close"
+msgstr "ཁ་བསྡམས་"
+
+#: ../src/toolbar-factory.c:127
+msgid "Close the compose window"
+msgstr "སྒོ་སྒྲིག་བརྩམ་ནི་འདི་ཁ་བསྡམས་"
+
+#: ../src/toolbar-factory.c:128
+msgid ""
+"Toggle\n"
+"new"
+msgstr ""
+"གསརཔ་\n"
+"སོར་སྟོན་འབད་"
+
+#: ../src/toolbar-factory.c:129
+msgid "Toggle new message flag"
+msgstr "འཕྲིན་དོན་ཟུར་རྟགས་གསརཔ་སོར་སྟོན་འབད་"
+
+#: ../src/toolbar-factory.c:130
+msgid "Mark all"
+msgstr "ཆ་མཉམ་རྟགས་བཀལ་"
+
+#: ../src/toolbar-factory.c:131
+msgid "Mark all messages in current mailbox"
+msgstr "ད་ལྟོའི་ཡིག་སྒྲོམ་ནང་འཕྲིན་དོན་ཆ་མཉམ་རྟགས་བཀལ་"
+
+#: ../src/toolbar-factory.c:132
+msgid ""
+"All\n"
+"headers"
+msgstr ""
+"ཆ་མཉམ་\n"
+"མགོ་ཡིག་ཚུ་"
+
+#: ../src/toolbar-factory.c:133
+msgid "Show all headers"
+msgstr "མགོ་ཡིག་ཚུ་ཆ་མཉམ་སྟོན་"
+
+#: ../src/toolbar-factory.c:134
+msgid "Empty Trash"
+msgstr "ཕྱགས་ཧོད་སྟོངམ་སྟོན་"
+
+#: ../src/toolbar-factory.c:137
+msgid "Close current mailbox"
+msgstr "ད་ལྟོའི་ཡིག་སྒྲོམ་ཁ་བསྡམས་"
+
+#: ../src/toolbar-factory.c:138
+msgid "Msg Preview"
+msgstr "ཨེམ་ཨེསི་ཇི་སྔོན་ལྟ་"
+
+#: ../src/toolbar-factory.c:139
+msgid "Show preview pane"
+msgstr "སྔོན་ལྟའི་པེན་སྟོན་"
+
+#: ../src/toolbar-factory.c:141
+msgid "Sign"
+msgstr "མིང་རྟགས་བཀོད་"
+
+#: ../src/toolbar-factory.c:142
+msgid "Sign message using GPG"
+msgstr "ཇི་པི་ཇི་ལག་ལེན་འཐབ་སྟེ་འཕྲིན་དོན་མིང་རྟགས་བཀོད་"
+
+#: ../src/toolbar-factory.c:143
+msgid "Encrypt"
+msgstr "གསང་བ་བཟོ་ནི་"
+
+#: ../src/toolbar-factory.c:144
+msgid "Encrypt message using GPG"
+msgstr "ཇི་པི་ཇི་ལག་ལེན་འཐབ་སྟེ་འཕྲིན་དོན་གསང་བ་བཟོ་"
+
+#: ../src/toolbar-factory.c:146
+msgid "Undo"
+msgstr "འབད་བཤོལ་"
+
+#: ../src/toolbar-factory.c:147
+msgid "Undo most recent change"
+msgstr "འཕྲལ་གྱི་བསྒྱུར་བཅོས་ཚུ་འབད་བཤོལ་"
+
+#: ../src/toolbar-factory.c:148
+msgid "Redo"
+msgstr "ལོག་འབད་"
+
+#: ../src/toolbar-factory.c:149
+msgid "Redo most recent change"
+msgstr "འཕྲལ་གྱི་བསྒྱུར་བཅོས་ཚུ་ལོག་འབད་"
+
+#: ../src/toolbar-factory.c:150
+msgid ""
+"Expunge\n"
+"Deleted"
+msgstr ""
+"བཏོན་གཏང་ཡོདཔ་\n"
+"རྩ་མེད་གཏང་"
+
+#: ../src/toolbar-factory.c:151
+msgid "Expunge messages marked as deleted"
+msgstr "བཏོན་གཏང་ཡོད་ཟེར་རྟགས་བཀལ་ཡོད་པའི་འཕྲིན་དོན་ཚུ་རྩ་མེད་གཏང་"
+
+#: ../src/toolbar-factory.c:239
+#, c-format
+msgid "Unknown toolbar icon \"%s\""
+msgstr "མ་ཤེས་པའི་ལག་ཆས་ཕྲ་རིང་ངོས་དཔར་ \"%s\""
+
+#: ../src/toolbar-factory.c:321
+msgid "Queue"
+msgstr "མི་གྲལ་"
+
+#: ../src/toolbar-factory.c:358
+msgid "Queue this message for sending"
+msgstr "གཏང་ནིའི་དོན་ལུ་འཕྲིན་དོན་འདི་མི་གྲལ་"
+
+#: ../src/toolbar-prefs.c:123
+msgid "Customize Toolbars"
+msgstr "ལག་ཆས་ཕྲ་རིང་ཚུ་སྲོལ་སྒྲིག་འབད་"
+
+#: ../src/toolbar-prefs.c:144
+msgid "Main window"
+msgstr "སྒོ་སྒྲིག་ངོ་མ་"
+
+#: ../src/toolbar-prefs.c:148
+msgid "Compose window"
+msgstr "སྒོ་སྒྲིག་བརྩམ་"
+
+#: ../src/toolbar-prefs.c:152
+msgid "Message window"
+msgstr "འཕྲིན་དོན་སྒོ་སྒྲིག་"
+
+#: ../src/toolbar-prefs.c:154
+msgid "Toolbar options"
+msgstr "ལག་ཆས་ཕྲ་རིང་གདམ་ཁ་ཚུ་"
+
+#: ../src/toolbar-prefs.c:164
+msgid "_Wrap button labels"
+msgstr "ཨེབ་རྟའི་ཁ་ཡིག་ཚུ་ལོག་མཚམས་བཟོ། (_W)"
+
+#: ../src/toolbar-prefs.c:363
+#, c-format
+msgid "Error displaying toolbar help: %s\n"
+msgstr "ལག་ཆས་ཕྲ་རིང་གྲོགས་རམ་བཀྲམ་སྟོན་འབདཝ་ད་འཛོལ་བ: %s\n"
+
+#. Preview display
+#: ../src/toolbar-prefs.c:399
+msgid "Preview"
+msgstr "སྔོན་ལྟ་"
+
+#: ../src/toolbar-prefs.c:427
+msgid "_Restore toolbar to standard buttons"
+msgstr "ལག་ཆས་ཕྲ་རིང་འདི་ཚད་ལྡན་ཨེབ་རྟ་ལུ་སོར་ཆུད། (_R)"
+
+#: ../src/toolbar-prefs.c:446
+msgid "Available buttons"
+msgstr "ཐོབ་ཚུགས་པའི་ཨེབ་རྟ་ཚུ་"
+
+#: ../src/toolbar-prefs.c:462
+msgid "Current toolbar"
+msgstr "ད་ལྟོའི་ལག་ཆས་ཕྲ་རིང་"
+
+#: ../src/toolbar-prefs.c:479
+msgid "Up"
+msgstr "ཡར་"
+
+#: ../src/toolbar-prefs.c:495
+msgid "Down"
+msgstr "མར་"
+

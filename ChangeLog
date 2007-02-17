@@ -1,3 +1,10 @@
+2007-02-17  Pawel Salek
+
+	* src/mailbox-node.c: save cache only for the top-level nodes.
+	* src/main-window.c: remove shortcut conflict.
+	* src/address-book-config.c: add ldap:// prefix (Albrecht Dress).
+	* libbalsa/address-book-ldap.c: AD compatiblity (Albrecht Dress).
+	
 2007-02-09 Pema Geyleg  <pema.geyleg@gmail.com>
 
 	* configure.in: added dz to ALL_LINGUAS.

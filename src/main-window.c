@@ -461,10 +461,8 @@ static GnomeUIInfo file_menu[] = {
      BALSA_PIXMAP_SEND_RECEIVE, 'B', GDK_CONTROL_MASK, NULL},
      GNOMEUIINFO_SEPARATOR,
 #ifdef HAVE_GTK_PRINT
-    { GNOME_APP_UI_ITEM, N_("Page _Setup"), 
-      N_("Set up page for printing"),
-      page_setup_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
-      NULL, 'S', GDK_CONTROL_MASK, NULL},
+    GNOMEUIINFO_ITEM_STOCK(N_("Page _Setup"), N_("Set up page for printing"),
+                           page_setup_cb, GNOME_APP_PIXMAP_NONE),
 #define MENU_FILE_PRINT_POS 8
 #else
 #define MENU_FILE_PRINT_POS 7

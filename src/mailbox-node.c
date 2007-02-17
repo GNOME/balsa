@@ -262,6 +262,8 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * group)
 {
     GPtrArray *children_names;
     GtkTreeIter iter;
+    
+    g_return_if_fail(!mn->parent);
 
     if(mn->name)
 	printf("Saving mailbox node %s with group %s\n", mn->name, group);
@@ -529,7 +531,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
     gnome_appbar_pop(balsa_app.appbar);
 
     /* We can save the cache now... */
-    config_folder_update(mb);
+    config_folder_update(mroot);
 }
 
 BalsaMailboxNode *

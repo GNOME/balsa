@@ -23,7 +23,14 @@
 /*
  * LDAP address book
  * NOTES:
- * ldap caching deleted since it is deprecated in openldap-2.1.x series.
+ * a) ldap caching deleted since it is deprecated in openldap-2.1.x series.
+ * b) In principle, only inetOrgPerson class may have mail attributes, see
+ * eg: http://www.andrew.cmu.edu/user/dd26/ldap.akbkhome.com/objectclass/organizationalPerson.html
+ *
+ * However, ActiveDirectory apparently gets it wrong (or its
+ * administrators, may be?) and all the objects are of
+ * organizationalPerson type. We are lenient.
+ *
  */
 #include "config.h"
 
@@ -388,10 +395,13 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
          */ 
         /* g_print("Performing full lookup...\n"); */
         ldap_filter = filter 
-            ? g_strdup_printf("(&(objectClass=inetOrgPerson)"
+            ? g_strdup_printf("(&(objectClass=organizationalPerson)(mail=*)"
                               "(|(cn=%s*)(sn=%s*)(mail=%s@*)))",
                               filter, filter, filter)
-            : g_strdup("(objectClass=inetOrgPerson)");
+            : g_strdup("(&(objectClass=organizationalPerson)(mail=*))");
+	if(DEBUG_LDAP)
+	    g_print("Send LDAP request: %s (basedn=%s)\n", ldap_filter,
+		    ldap_ab->base_dn);
         if(ldap_search_ext(ldap_ab->directory, ldap_ab->base_dn,
                            LDAP_SCOPE_SUBTREE, 
                            ldap_filter, book_attrs, 0, NULL, NULL,
@@ -958,7 +968,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     if(new_prefix) *new_prefix = NULL;
     ldap = rfc_2254_escape(prefix);
 
-    filter = g_strdup_printf("(&(mail=*)"
+    filter = g_strdup_printf("(&(objectClass=organizationalPerson)(mail=*)"
                              "(|(cn=%s*)(sn=%s*)(mail=%s@*)))",
 			     ldap, ldap, ldap);
     g_free(ldap);

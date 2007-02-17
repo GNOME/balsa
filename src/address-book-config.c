@@ -431,7 +431,7 @@ create_ldap_dialog(AddressBookConfig * abc)
 
     LibBalsaAddressBookLdap* ab;
     GtkWidget* label;
-    gchar *host = libbalsa_guess_ldap_server();
+    gchar *host = g_strdup_printf("ldap://%s", libbalsa_guess_ldap_server());
     gchar *base = libbalsa_guess_ldap_base();
     gchar *name = libbalsa_guess_ldap_name();
 

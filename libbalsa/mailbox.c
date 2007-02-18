@@ -1710,13 +1710,14 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     return message;
 }
 
-void
+gboolean
 libbalsa_mailbox_prepare_threading(LibBalsaMailbox * mailbox, guint start)
 {
-    g_return_if_fail(mailbox != NULL);
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_val_if_fail(mailbox != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->prepare_threading(mailbox, start);
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->prepare_threading(mailbox,
+                                                                  start);
 }
 
 gboolean
@@ -3406,9 +3407,15 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
     gtk_tree_sortable_sort_column_changed(sortable);
 
     if (new_field != LB_MAILBOX_SORT_NO) {
+        gboolean rc;
+
         gdk_threads_leave();
-        libbalsa_mailbox_prepare_threading(mbox, 0);
+        rc = libbalsa_mailbox_prepare_threading(mbox, 0);
         gdk_threads_enter();
+
+        if (!rc)
+            /* Prepare-threading failed--perhaps mailbox was closed. */
+            return;
     }
     lbm_sort(mbox, mbox->msg_tree);
 

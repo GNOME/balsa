@@ -61,8 +61,9 @@ static void libbalsa_mailbox_local_set_threading(LibBalsaMailbox *mailbox,
 static void lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                                          LibBalsaCondition *view_filter);
 
-static void libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *mailbox, 
-                                                     guint start);
+static gboolean libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox *
+                                                         mailbox,
+                                                         guint start);
 
 static gboolean libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox *
                                                        mailbox,
@@ -1163,8 +1164,8 @@ lbm_local_thread_idle(LibBalsaMailboxLocal * local)
 }
 
 /* The class method; prepare messages from start + 1 to the end of the
- * mailbox. */
-static void
+ * mailbox; return TRUE if successful. */
+static gboolean
 libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
                                          guint start)
 {
@@ -1174,6 +1175,7 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
     gchar *text;
     guint total;
     LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
+    gboolean retval = TRUE;
 
     libbalsa_mailbox_local_set_threading_info(local);
 
@@ -1188,12 +1190,17 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
             libbalsa_progress_set_fraction(&progress,
                                            ((gdouble) msgno) /
                                            ((gdouble) (total - start)));
+            if (!MAILBOX_OPEN(mailbox)) {
+                /* Mailbox was closed during set-fraction. */
+                retval = FALSE;
+                break;
+            }
         }
     }
 
     libbalsa_progress_set_text(&progress, NULL, 0);
 
-    if (need_thread && !local->thread_id) {
+    if (retval && need_thread && !local->thread_id) {
         LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
 
         if (libbalsa_mailbox_get_threading_type(mailbox) !=
@@ -1205,6 +1212,8 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
                 g_idle_add((GSourceFunc) lbm_local_thread_idle, local);
         }
     }
+
+    return retval;
 }
 
 /* fetch message structure method: all local mailboxes have their own

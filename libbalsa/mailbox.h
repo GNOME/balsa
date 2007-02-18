@@ -273,7 +273,7 @@ struct _LibBalsaMailboxClass {
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox, GError **err);
     void (*close_mailbox) (LibBalsaMailbox * mailbox, gboolean expunge);
     LibBalsaMessage *(*get_message) (LibBalsaMailbox * mailbox, guint msgno);
-    void (*prepare_threading)(LibBalsaMailbox *mailbox, guint start);
+    gboolean (*prepare_threading)(LibBalsaMailbox *mailbox, guint start);
     gboolean (*fetch_message_structure)(LibBalsaMailbox *mailbox,
                                         LibBalsaMessage * message,
                                         LibBalsaFetchFlag flags);
@@ -363,9 +363,11 @@ LibBalsaMessage *libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox,
 /** libbalsa_mailbox_prepare_threading() requests prefetching of information
     needed for client-side message threading.
     msgnos are related to currently set view.
+    Returns TRUE if successful; FALSE may mean that the mailbox was
+    closed during the operation.
 */
-void libbalsa_mailbox_prepare_threading(LibBalsaMailbox *mailbox,
-					guint start);
+gboolean libbalsa_mailbox_prepare_threading(LibBalsaMailbox * mailbox,
+                                            guint start);
 
 /** libbalsa_mailbox_fetch_message_structure() fetches detailed
     message structure for given message. It can also fetch all RFC822

@@ -122,10 +122,14 @@ balsa_print_object_text_destroy(GObject * self)
     G_OBJECT_CLASS(parent_class)->finalize(self);
 }
 
-
+/* prepare a text/plain part, which gets
+ * - citation bars and colourisation of cited text (prefs dependant)
+ * - syntax highlighting (prefs dependant)
+ * - RFC 3676 "flowed" processing */
 GList *
-balsa_print_object_text(GList *list, GtkPrintContext * context,
-			LibBalsaMessageBody * body, BalsaPrintSetup * psetup)
+balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
+			      LibBalsaMessageBody * body,
+			      BalsaPrintSetup * psetup)
 {
     regex_t rex;
     gchar *textbuf;
@@ -311,6 +315,90 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     /* clean up */
     pango_font_description_free(font);
     g_free(textbuf);
+    return list;
+}
+
+
+/* prepare a text part which is simply printed "as is" without all the bells
+ * and whistles of text/plain (see above) */
+GList *
+balsa_print_object_text(GList *list, GtkPrintContext * context,
+			LibBalsaMessageBody * body,
+			BalsaPrintSetup * psetup)
+{
+    gchar *textbuf;
+    PangoFontDescription *font;
+    gdouble c_at_x;
+    gdouble c_use_width;
+    guint first_page;
+    GList *par_parts;
+    GList *this_par_part;
+    PangoLayout *layout;
+    gdouble c_at_y;
+
+    /* start on new page if less than 2 lines can be printed */
+    if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_body_font_height) >
+	psetup->c_height) {
+	psetup->c_y_pos = 0;
+	psetup->page_count++;
+    }
+    c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
+    c_use_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+
+    /* copy the text body to a buffer */
+    if (body->buffer)
+	textbuf = g_strdup(body->buffer);
+    else
+	libbalsa_message_body_get_content(body, &textbuf, NULL);
+
+    /* fake an empty buffer if textbuf is NULL */
+    if (!textbuf)
+	textbuf = g_strdup("");
+
+    /* be sure the we have correct utf-8 stuff here... */
+    libbalsa_utf8_sanitize(&textbuf, balsa_app.convert_unknown_8bit, NULL);
+
+    /* get the font */
+    font = pango_font_description_from_string(balsa_app.print_body_font);
+
+    /* configure the layout so we can use Pango to split the text into pages */
+    layout = gtk_print_context_create_pango_layout(context);
+    pango_layout_set_font_description(layout, font);
+    pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
+    pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
+    pango_layout_set_width(layout, C_TO_P(c_use_width));
+
+    /* split paragraph if necessary */
+    first_page = psetup->page_count - 1;
+    c_at_y = psetup->c_y_pos;
+    par_parts = split_for_layout(layout, textbuf, NULL, psetup, FALSE, NULL);
+    g_object_unref(G_OBJECT(layout));
+    pango_font_description_free(font);
+    g_free(textbuf);
+
+    /* each part is a new text object */
+    this_par_part = par_parts;
+    while (this_par_part) {
+	BalsaPrintObjectText *pot;
+
+	pot = g_object_new(BALSA_TYPE_PRINT_OBJECT_TEXT, NULL);
+	g_assert(pot != NULL);
+	BALSA_PRINT_OBJECT(pot)->on_page = first_page++;
+	BALSA_PRINT_OBJECT(pot)->c_at_x = c_at_x;
+	BALSA_PRINT_OBJECT(pot)->c_at_y = psetup->c_y0 + c_at_y;
+	BALSA_PRINT_OBJECT(pot)->depth = psetup->curr_depth;
+	c_at_y = 0.0;
+	BALSA_PRINT_OBJECT(pot)->c_width = c_use_width;
+	/* note: height is calculated when the object is drawn */
+	pot->text = (gchar *) this_par_part->data;
+	pot->cite_level = 0;
+	pot->attributes = NULL;
+
+	list = g_list_append(list, pot);
+	this_par_part = g_list_next(this_par_part);
+    }
+    g_list_free(par_parts);
+
     return list;
 }
 

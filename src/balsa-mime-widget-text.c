@@ -29,6 +29,7 @@
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-mime-widget-text.h"
+#include "balsa-cite-bar.h"
 
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksourceview.h>
@@ -40,13 +41,14 @@
 
 static GtkWidget * create_text_widget(const char * content_type);
 static void bm_modify_font_from_string(GtkWidget * widget, const char *font);
-static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level);
+static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level, gint margin);
 static gboolean fix_text_widget(GtkWidget *widget, gpointer data);
 static void text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 				     LibBalsaMessageBody * mime_body);
 
 #ifdef HAVE_GTKHTML
-static BalsaMimeWidget * bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * ptr, size_t len);
+static BalsaMimeWidget * bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
+					    gchar * ptr, size_t len);
 #endif
 
 /* URL related stuff */
@@ -55,6 +57,19 @@ typedef struct _message_url_t {
     gint start, end;             /* pos in the buffer */
     gchar *url;                  /* the link */
 } message_url_t;
+
+
+/* citation bars */
+typedef struct {
+    gint start_offs;
+    gint end_offs;
+    GtkTextIter start_iter;
+    GtkTextIter end_iter;
+    gint y_pos;
+    gint height;
+    guint depth;
+    GtkWidget * bar;
+} cite_bar_t;
 
 /* store the coordinates at which the button was pressed */
 static gint stored_x = -1, stored_y = -1;
@@ -85,6 +100,8 @@ static void balsa_gtk_html_on_url(GtkWidget *html, const gchar *url);
 static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
 			     gunichar tag_char, const gchar * property,
 			     gint value);
+static void destroy_cite_bars(GList * cite_bars);
+static gboolean draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList * cite_bars);
 
 
 #define PHRASE_HIGHLIGHT_ON    1
@@ -104,11 +121,13 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     GList *url_list = NULL;
     const gchar *target_cs;
     GError *err = NULL;
+    gboolean is_text_plain;
 
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
 
+    is_text_plain = !g_ascii_strcasecmp(content_type, "text/plain");
     alloced = libbalsa_message_body_get_content(mime_body, &ptr, &err);
     if (!ptr) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -156,11 +175,18 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	g_free(from);
     }
 
+    mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+    mw->widget = create_text_widget(content_type);
+
     if (libbalsa_message_body_is_flowed(mime_body)) {
 	/* Parse, but don't wrap. */
 	gboolean delsp = libbalsa_message_body_is_delsp(mime_body);
 	ptr = libbalsa_wrap_rfc2646(ptr, G_MAXINT, FALSE, TRUE, delsp);
-    } else if (bm->wrap_text)
+    } else if (bm->wrap_text
+#if HAVE_GTKSOURCEVIEW
+	       && !GTK_IS_SOURCE_VIEW(mw->widget)
+#endif
+	       )
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
@@ -191,6 +217,15 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     } else {
 	gchar *line_start;
 	LibBalsaUrlInsertInfo url_info;
+	GList * cite_bars_list;
+	guint cite_level;
+	guint cite_start;
+	gint margin;
+	PangoFontDescription *font;
+
+	font = pango_font_description_from_string(balsa_app.message_font);
+	margin = pango_font_description_get_size(font) / PANGO_SCALE;
+	pango_font_description_free(font);
 
 	gtk_text_buffer_create_tag(buffer, "url",
 				   "foreground-gdk",
@@ -206,10 +241,12 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	url_info.ml_url_buffer = NULL;
 
 	line_start = ptr;
+	cite_bars_list = NULL;
+	cite_level = 0;
+	cite_start = 0;
 	while (line_start) {
 	    gchar *newline, *this_line;
-	    gint quote_level;
-	    GtkTextTag *tag;
+	    GtkTextTag *tag = NULL;
 	    int len;
 
 	    newline = strchr(line_start, '\n');
@@ -217,8 +254,43 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 		this_line = g_strndup(line_start, newline - line_start);
 	    else
 		this_line = g_strdup(line_start);
-	    quote_level = is_a_quote(this_line, &rex);
-	    tag = quote_tag(buffer, quote_level);
+
+	    if (is_text_plain) {
+		guint quote_level;
+		guint cite_idx;
+
+		/* get the cite level only for text/plain parts */
+		libbalsa_match_regex(this_line, &rex, &quote_level, &cite_idx);
+	    
+		/* check if the citation level changed */
+		if (cite_level != quote_level) {
+		    if (cite_level > 0) {
+			cite_bar_t * cite_bar = g_new0(cite_bar_t, 1);
+		    
+			cite_bar->start_offs = cite_start;
+			cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
+			cite_bar->depth = cite_level;
+			cite_bars_list = g_list_append(cite_bars_list, cite_bar);
+		    }
+		    if (quote_level > 0)
+			cite_start = gtk_text_buffer_get_char_count(buffer);
+		    cite_level = quote_level;
+		}
+
+		/* strip off the citation prefix */
+		if (quote_level) {
+		    gchar *new;
+		
+		    new = this_line + cite_idx;
+		    if (g_unichar_isspace(g_utf8_get_char(new)))
+			new = g_utf8_next_char(new);
+		    new = g_strdup(new);
+		    g_free(this_line);
+		    this_line = new;
+		}
+		tag = quote_tag(buffer, quote_level, margin);
+	    }
+
 	    len = strlen(this_line);
 	    if (len > 0 && this_line[len - 1] == '\r')
 		this_line[len - 1] = '\0';
@@ -231,12 +303,28 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	    g_free(this_line);
 	    line_start = newline ? newline + 1 : NULL;
 	}
+
+	/* add any pending cited part */
+	if (cite_level > 0) {
+	    cite_bar_t * cite_bar = g_new0(cite_bar_t, 1);
+		    
+	    cite_bar->start_offs = cite_start;
+	    cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
+	    cite_bar->depth = cite_level;
+	    cite_bars_list = g_list_append(cite_bars_list, cite_bar);
+	}
+
+	/* add list of citation bars (if any) */
+	if (cite_bars_list) {
+	    g_object_set_data_full(G_OBJECT(mw->widget), "cite-bars", cite_bars_list,
+				   (GDestroyNotify) destroy_cite_bars);
+	    g_object_set_data(G_OBJECT(mw->widget), "cite-margin", GINT_TO_POINTER(margin));
+	    g_signal_connect_after(G_OBJECT(mw->widget), "expose-event",
+				   G_CALLBACK(draw_cite_bars), cite_bars_list);
+	}
 	regfree(&rex);
     }
 
-    if (libbalsa_message_body_is_flowed(mime_body))
-	libbalsa_wrap_view(GTK_TEXT_VIEW(mw->widget),
-			   balsa_app.browse_wrap_length);
     prepare_url_offsets(buffer, url_list);
     g_signal_connect_after(G_OBJECT(mw->widget), "realize",
 			   G_CALLBACK(fix_text_widget), url_list);
@@ -253,7 +341,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 			       (GDestroyNotify)free_url_list);
     }
 
-    if (!g_ascii_strcasecmp(content_type, "text/plain")) {
+    if (is_text_plain) {
 	/* plain-text highlighting */
 	g_object_set_data(G_OBJECT(mw->widget), "phrase-highlight",
 			  GINT_TO_POINTER(PHRASE_HIGHLIGHT_ON));
@@ -321,27 +409,29 @@ bm_modify_font_from_string(GtkWidget * widget, const char *font)
  * returns NULL if the level is 0 (unquoted)
  */
 static GtkTextTag *
-quote_tag(GtkTextBuffer * buffer, gint level)
+quote_tag(GtkTextBuffer * buffer, gint level, gint margin)
 {
     GtkTextTag *tag = NULL;
 
     if (level > 0) {
         GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
         gchar *name;
+	gint q_level;
 
         /* Modulus the quote level by the max,
          * ie, always have "1 <= quote level <= MAX"
          * this allows cycling through the possible
          * quote colors over again as the quote level
          * grows arbitrarily deep. */
-        level = (level - 1) % MAX_QUOTED_COLOR;
+        q_level = (level - 1) % MAX_QUOTED_COLOR;
         name = g_strdup_printf("quote-%d", level);
         tag = gtk_text_tag_table_lookup(table, name);
 
         if (!tag) {
             tag =
                 gtk_text_buffer_create_tag(buffer, name, "foreground-gdk",
-                                           &balsa_app.quoted_color[level],
+                                           &balsa_app.quoted_color[q_level],
+					   "left-margin", margin * level,
                                            NULL);
             /* Set a low priority, so we can set both quote color and
              * URL color, and URL color will take precedence. */
@@ -372,6 +462,7 @@ fix_text_widget(GtkWidget *widget, gpointer data)
         url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
     }
     gdk_window_set_cursor(w, url_cursor_normal);
+
     return FALSE;
 }
 
@@ -833,6 +924,85 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
     }
     g_free(buf_chars);
 }
+
+/* --- citation bar stuff --- */
+static void
+destroy_cite_bars(GList * cite_bars)
+{
+    /* note: the widgets are destroyed by the text view */
+    g_list_foreach(cite_bars, (GFunc) g_free, NULL);
+    g_list_free(cite_bars);
+}
+
+typedef struct {
+    GtkTextView * view;
+    GtkTextBuffer * buffer;
+    gint dimension;
+} cite_bar_draw_mode_t;
+
+
+static void
+draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
+{
+    GdkRectangle location;
+    gint x_pos;
+    gint y_pos;
+    gint height;
+
+    /* initialise iters if we don't have the widget yet */
+    if (!bar->bar) {
+	gtk_text_buffer_get_iter_at_offset(draw_mode->buffer, &bar->start_iter,
+					   bar->start_offs);
+	gtk_text_buffer_get_iter_at_offset(draw_mode->buffer, &bar->end_iter,
+					   bar->end_offs);
+    }
+
+    /* get the locations */
+    gtk_text_view_get_iter_location(draw_mode->view, &bar->start_iter, &location);
+    gtk_text_view_buffer_to_window_coords(draw_mode->view, GTK_TEXT_WINDOW_TEXT,
+					  location.x, location.y,
+					  &x_pos, &y_pos);
+    gtk_text_view_get_iter_location(draw_mode->view, &bar->end_iter, &location);
+    gtk_text_view_buffer_to_window_coords(draw_mode->view, GTK_TEXT_WINDOW_TEXT,
+					  location.x, location.y,
+					  &x_pos, &height);
+    height -= y_pos;
+
+    /* add a new widget if necessary */
+    if (bar->bar == NULL) {
+	bar->bar = balsa_cite_bar_new(height, bar->depth, draw_mode->dimension);
+	gtk_widget_modify_fg(bar->bar, GTK_STATE_NORMAL,
+			     &balsa_app.quoted_color[(bar->depth - 1) % MAX_QUOTED_COLOR]);
+	gtk_widget_modify_bg(bar->bar, GTK_STATE_NORMAL,
+			     &GTK_WIDGET(draw_mode->view)->style->base[GTK_STATE_NORMAL]);
+	gtk_widget_show(bar->bar);
+	gtk_text_view_add_child_in_window(draw_mode->view, bar->bar,
+					  GTK_TEXT_WINDOW_TEXT, 0, y_pos);
+    } else if (bar->y_pos != y_pos || bar->height != height) {
+	/* shift/resize existing widget */
+	balsa_cite_bar_resize(BALSA_CITE_BAR(bar->bar), height);
+	gtk_text_view_move_child(draw_mode->view, bar->bar, 0, y_pos);
+    }
+
+    /* remember current values */
+    bar->y_pos = y_pos;
+    bar->height = height;
+}
+
+
+static gboolean
+draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList * cite_bars)
+{
+    cite_bar_draw_mode_t draw_mode;
+
+    draw_mode.view = GTK_TEXT_VIEW(widget);
+    draw_mode.buffer = gtk_text_view_get_buffer(draw_mode.view);
+    draw_mode.dimension =
+	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "cite-margin"));
+    g_list_foreach(cite_bars, (GFunc)draw_cite_bar_real, &draw_mode);
+    return FALSE;
+}
+
 
 /* --- HTML related functions -- */
 static void

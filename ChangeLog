@@ -1,3 +1,27 @@
+2007-02-20  Albrecht Dreß
+
+	* src/Makefile.am: add balsa-cite-bar.[ch] to
+	balsa_BASE_SRCLIST.
+	* src/balsa-cite-bar.c: (balsa_cite_bar_get_type),
+	(balsa_cite_bar_class_init), (balsa_cite_bar_init),
+	(balsa_cite_bar_new), (balsa_cite_bar_resize),
+	(balsa_cite_bar_destroy), (balsa_cite_bar_realise),
+	(balsa_cite_bar_size_request), (balsa_cite_bar_size_allocate),
+	(balsa_cite_bar_expose): initial commit.
+	* src/balsa-cite-bar.h: initial commit.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text),
+	(quote_tag), (fix_text_widget), (destroy_cite_bars),
+	(draw_cite_bar_real), (draw_cite_bars): use cite-bars with
+	quoted text.
+	* src/balsa-print-object-text.c: (balsa_print_object_text_plain),
+	(balsa_print_object_text): use cite-bars only with text/plain
+	message part.
+	* src/balsa-print-object-text.h: new method
+	balsa_print_object_text_plain.
+	* src/balsa-print-object.c:
+	(balsa_print_objects_append_from_body): use
+	balsa_print_object_text_plain.
+
 2007-02-18  Peter Bloomfield
 
 	* libbalsa/mailbox.c: (libbalsa_mailbox_prepare_threading),

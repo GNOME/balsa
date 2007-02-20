@@ -56,6 +56,10 @@ struct _BalsaPrintObjectTextClass {
 
 
 GType balsa_print_object_text_get_type(void);
+GList *balsa_print_object_text_plain(GList *list,
+				     GtkPrintContext * context,
+				     LibBalsaMessageBody * body,
+				     BalsaPrintSetup * psetup);
 GList *balsa_print_object_text(GList *list,
 			       GtkPrintContext * context,
 			       LibBalsaMessageBody * body,

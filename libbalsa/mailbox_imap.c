@@ -2023,12 +2023,14 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
        messages with a part that can certainly be displayed, there is
        no reason to fetch the structure and the only part
        separately... Observe, that the only part can be in principle
-       something else, like "audio", "*" - we do not prefetch such parts
-       yet. */
+       something else, like "audio", "*" - we do not prefetch such
+       parts yet. Also, we save some RTTS for very small messages by
+       fetching them in their entirety. */
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     if(!imap_mbox_handle_can_do(mimap->handle, IMCAP_FETCHBODY) ||
        libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
                                     ISBUG_FETCH) ||
+       LIBBALSA_MESSAGE_GET_LENGTH(message)<8192 ||
        (message->headers &&
         (!message->headers->content_type ||
          g_mime_content_type_is_type(message->headers->content_type, "text", "*"))) ){

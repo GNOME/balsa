@@ -1,3 +1,8 @@
+2007-02-26  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: fetch small messages in one shot to get
+	rid of one RTT.
+
 2007-02-20  Albrecht Dreß
 
 	* src/Makefile.am: add balsa-cite-bar.[ch] to

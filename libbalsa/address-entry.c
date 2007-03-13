@@ -252,6 +252,9 @@ lbae_entry_setup_matches(GtkEntry * entry, GtkEntryCompletion * completion,
     const gchar *prefix;
     GList *match = NULL;
 
+    if (!info->active)
+        return;
+
     prefix = info->active->data;
     if (*prefix)
 	match = lbae_get_matching_addresses(prefix, type);

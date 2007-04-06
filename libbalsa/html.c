@@ -248,7 +248,7 @@ libbalsa_html_copy(GtkWidget * widget)
  * GtkHTML printing suport.
  */
 
-#ifdef HAVE_GNOME
+#if defined(HAVE_GNOME) && !defined(HAVE_GTKHTML3_GTKPRINT)
 gboolean
 libbalsa_html_can_print(void)
 {

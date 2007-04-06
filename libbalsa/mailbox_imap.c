@@ -1770,13 +1770,21 @@ internet_address_new_from_imap_address(ImapAddress *addr)
 
     if (addr->name) {
 	gchar *tmp =
+#if HAVE_GMIME_2_2_5
+	    g_mime_utils_header_decode_text(addr->name);
+#else  /* HAVE_GMIME_2_2_5 */
 	    g_mime_utils_header_decode_text((unsigned char *) addr->name);
+#endif /* HAVE_GMIME_2_2_5 */
 	internet_address_set_name(address, tmp);
 	g_free(tmp);
     }
     if (addr->addr_spec) {
 	gchar *tmp =
+#if HAVE_GMIME_2_2_5
+	    g_mime_utils_header_decode_text(addr->addr_spec);
+#else  /* HAVE_GMIME_2_2_5 */
 	    g_mime_utils_header_decode_text((unsigned char *) addr->addr_spec);
+#endif /* HAVE_GMIME_2_2_5 */
 	internet_address_set_addr(address, tmp);
 	g_free(tmp);
     } else { /* FIXME: is that a right thing? */
@@ -1820,8 +1828,12 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
 
     if(is_embedded) {
         headers->subject =
+#if HAVE_GMIME_2_2_5
+            g_mime_utils_header_decode_text(envelope->subject);
+#else  /* HAVE_GMIME_2_2_5 */
             g_mime_utils_header_decode_text((unsigned char *) envelope->
                                             subject);
+#endif /* HAVE_GMIME_2_2_5 */
         libbalsa_utf8_sanitize(&headers->subject, TRUE, NULL);
     }
 }
@@ -1940,7 +1952,11 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     if(!str) str = imap_body_get_param(imap_body, "name");
     if(str) {
         lbbody->filename  =
+#if HAVE_GMIME_2_2_5
+	    g_mime_utils_header_decode_text(str);
+#else  /* HAVE_GMIME_2_2_5 */
 	    g_mime_utils_header_decode_text((unsigned char *) str);
+#endif /* HAVE_GMIME_2_2_5 */
         libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
     }
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));

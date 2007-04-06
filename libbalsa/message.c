@@ -499,11 +499,18 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
     value = g_mime_message_get_header(message, "In-Reply-To");
     if (value) {
         res =
+#if HAVE_GMIME_2_2_5
+            g_list_prepend(res,
+                           libbalsa_create_hdr_pair
+                           ("In-Reply-To",
+                            g_mime_utils_header_decode_text(value)));
+#else  /* HAVE_GMIME_2_2_5 */
             g_list_prepend(res,
                            libbalsa_create_hdr_pair
                            ("In-Reply-To",
                             g_mime_utils_header_decode_text
                             ((unsigned char *) value)));
+#endif /* HAVE_GMIME_2_2_5 */
     }
 
     g_mime_header_foreach(GMIME_OBJECT(message)->headers,
@@ -1155,7 +1162,11 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
          * appropriate GMime decoder. */
         gchar *tmp = g_strdup(value);
         libbalsa_utf8_sanitize(&tmp, TRUE, NULL);
+#if HAVE_GMIME_2_2_5
+        val = g_mime_utils_header_encode_text(tmp);
+#else  /* HAVE_GMIME_2_2_5 */
         val = g_mime_utils_header_encode_text((unsigned char *) tmp);
+#endif /* HAVE_GMIME_2_2_5 */
         g_free(tmp);
 #ifdef DEBUG
         g_print("%s: non-ascii \"%s\" header \"%s\" encoded as \"%s\"\n",
@@ -1384,8 +1395,12 @@ libbalsa_message_set_subject_from_header(LibBalsaMessage * message,
 {
     if (header) {
         gchar *subject =
+#if HAVE_GMIME_2_2_5
+            g_mime_utils_header_decode_text(header);
+#else  /* HAVE_GMIME_2_2_5 */
             g_mime_utils_header_decode_text((const unsigned char *)
                                             header);
+#endif /* HAVE_GMIME_2_2_5 */
         libbalsa_message_set_subject(message, subject);
         g_free(subject);
     }

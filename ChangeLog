@@ -1,3 +1,19 @@
+2007-04-05  Peter Bloomfield 
+
+	* configure.in: detect gtkhtml-3.14; detect GtkPrint support in
+	gtkhtml3; detect GMime version 2.2.5 or later.
+	* libbalsa/body.c:
+	(libbalsa_message_body_extract_embedded_headers): new GMime api.
+	* libbalsa/html.c: don't use Gnome printing api if GtkPrint is
+	supported.
+	* libbalsa/mailbox_imap.c: new GMime api.
+	(internet_address_new_from_imap_address), (lb_set_headers),
+	(lbm_imap_construct_body): ditto.
+	* libbalsa/message.c: (libbalsa_message_user_hdrs_from_gmime),
+	(lbmsg_set_header), (libbalsa_message_set_subject_from_header):
+	ditto.
+	* src/sendmsg-window.c: ditto.
+
 2007-03-13  Pawel Salek
 
 	* libbalsa/address-entry.c: fix crash reported on balsa-list.

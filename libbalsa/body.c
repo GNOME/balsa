@@ -109,7 +109,11 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
     subj = g_mime_message_get_subject(msg);
     if (subj) {
 	ehdr->subject =
+#if HAVE_GMIME_2_2_5
+	    g_mime_utils_header_decode_text(subj);
+#else
 	    g_mime_utils_header_decode_text((const unsigned char *) subj);
+#endif
 	libbalsa_utf8_sanitize(&ehdr->subject, TRUE, NULL);
     } else 
 	ehdr->subject = g_strdup(_("(No subject)"));

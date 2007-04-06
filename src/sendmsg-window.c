@@ -1933,8 +1933,12 @@ get_fwd_mail_headers(const gchar *mailfile)
 	if (!subject)
 	    headers->subject = g_strdup(_("(no subject)"));
 	else
+#if HAVE_GMIME_2_2_5
+	    headers->subject = g_mime_utils_header_decode_text(subject);
+#else  /* HAVE_GMIME_2_2_5 */
 	    headers->subject =
 		g_mime_utils_header_decode_text((guchar *) subject);
+#endif /* HAVE_GMIME_2_2_5 */
     }
     libbalsa_utf8_sanitize(&headers->subject,
 			   balsa_app.convert_unknown_8bit,

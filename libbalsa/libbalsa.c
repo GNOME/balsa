@@ -265,6 +265,73 @@ libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags)
 }
 
 
+#ifdef BALSA_USE_THREADS
+#include <pthread.h>
+typedef struct {
+    pthread_mutex_t lock;
+    pthread_cond_t condvar;
+    int (*cb)(void *arg);
+    void *arg;
+    int res;
+} AskData;
+
+/* ask_cert_idle:
+   called in MT mode by the main thread.
+ */
+static gboolean
+ask_idle(gpointer data)
+{
+    AskData* ad = (AskData*)data;
+    printf("ask_idle: ENTER %p\n", data);
+    gdk_threads_enter();
+    ad->res = (ad->cb)(ad->arg);
+    gdk_threads_leave();
+    pthread_cond_signal(&ad->condvar);
+    printf("ask_idle: LEAVE %p\n", data);
+    return FALSE;
+}
+
+/* libbalsa_ask_mt:
+   executed with GDK UNLOCKED. see mailbox_imap_open() and
+   imap_dir_cb()/imap_folder_imap_dir().
+*/
+static int
+libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
+{
+    AskData ad;
+
+    if (pthread_self() == main_thread_id) {
+        int ret;
+        printf("Main thread asks the following question.\n");
+        gdk_threads_enter();
+        ret = cb(arg);
+        gdk_threads_leave();
+        return ret;
+    }
+    printf("Side thread asks the following question.\n");
+    pthread_mutex_init(&ad.lock, NULL);
+    pthread_cond_init(&ad.condvar, NULL);
+    ad.cb  = cb;
+    ad.arg = arg;
+
+    pthread_mutex_lock(&ad.lock);
+    pthread_cond_init(&ad.condvar, NULL);
+    g_idle_add(ask_idle, &ad);
+    pthread_cond_wait(&ad.condvar, &ad.lock);
+
+    pthread_cond_destroy(&ad.condvar);
+    pthread_mutex_unlock(&ad.lock);
+    return ad.res;
+}
+#else /* BALSA_USE_THREADS */
+static gboolean
+libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
+{
+    return cb(arg);
+}
+#endif /* BALSA_USE_THREADS */
+
+
 #if defined(USE_SSL)
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
@@ -419,12 +486,19 @@ libbalsa_is_cert_known(X509* cert, long vfy_result)
    TODO: check treading issues.
 
 */
-static int
-ask_cert_real(X509 *cert, const char *explanation)
-{
+struct AskCertData {
+    X509 *certificate;
+    const char *explanation;
+};
 
-    char *part[] =
+static int
+ask_cert_real(void *data)
+{
+    static const char *part[] =
         {"/CN=", "/Email=", "/O=", "/OU=", "/L=", "/ST=", "/C="};
+
+    struct AskCertData *acd = (struct AskCertData*)data;
+    X509 *cert = acd->certificate;
     char buf[256]; /* fingerprint requires EVP_MAX_MD_SIZE*3 */
     char *name = NULL, *c, *valid_from, *valid_until;
     GtkWidget* dialog, *label;
@@ -436,7 +510,7 @@ ask_cert_real(X509 *cert, const char *explanation)
                            "could not be verified.\n"
                            "<b>Reason:</b> %s\n"
                            "<b>This certificate belongs to:</b>\n"),
-                    explanation);
+                    acd->explanation);
 
     name = X509_NAME_oneline(X509_get_subject_name (cert), buf, sizeof (buf));
     for (i = 0; i < ELEMENTS(part); i++) {
@@ -493,60 +567,49 @@ ask_cert_real(X509 *cert, const char *explanation)
     return i;
 }
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-typedef struct {
-    pthread_cond_t cond;
-    X509 *cert;
-    const char *expl;
-    int res;
-} AskCertData;
-/* ask_cert_idle:
-   called in MT mode by the main thread.
- */
-static gboolean
-ask_cert_idle(gpointer data)
-{
-    AskCertData* acd = (AskCertData*)data;
-    gdk_threads_enter();
-    acd->res = ask_cert_real(acd->cert, acd->expl);
-    gdk_threads_leave();
-    pthread_cond_signal(&acd->cond);
-    return FALSE;
-}
-/* libmutt_ask_for_cert_acceptance:
-   executed with GDK UNLOCKED. see mailbox_imap_open() and
-   imap_dir_cb()/imap_folder_imap_dir().
-*/
 static int
 libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
 {
-    static pthread_mutex_t ask_cert_lock = PTHREAD_MUTEX_INITIALIZER;
-    AskCertData acd;
-
-    if (pthread_self() == main_thread_id)
-	return ask_cert_real(cert, explanation);
-
-    pthread_mutex_lock(&ask_cert_lock);
-    pthread_cond_init(&acd.cond, NULL);
-    acd.cert = cert;
-    acd.expl = explanation;
-    g_idle_add(ask_cert_idle, &acd);
-    pthread_cond_wait(&acd.cond, &ask_cert_lock);
-    
-    pthread_cond_destroy(&acd.cond);
-    pthread_mutex_unlock(&ask_cert_lock);
-    return acd.res;
+    struct AskCertData acd;
+    acd.certificate = cert;
+    acd.explanation = explanation;
+    return libbalsa_ask(ask_cert_real, &acd);
 }
-#else /* BALSA_USE_THREADS */
-static int
-libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
-{
-    return ask_cert_real(cert, explanation);
-}
-#endif /* BALSA_USE_THREADS */
-
 #endif /* WITH_SSL */
+
+
+static int
+ask_timeout_real(void *data)
+{
+    const char *host = (const char*)data;
+    GtkWidget* dialog;
+    int i;
+
+    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
+                                    GTK_BUTTONS_YES_NO,
+                                    _("Connection to %s timed out. Abort?"),
+                                    host);
+    gtk_window_set_wmclass(GTK_WINDOW(dialog), "timeout_dialog", "Balsa");
+    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
+    case GTK_RESPONSE_YES: i = 1; break;
+    case GTK_RESPONSE_NO: i = 0; break;
+    default: printf("Unknown response. Defaulting to 'yes'.\n");
+        i = 1;
+    }
+    gtk_widget_destroy(dialog);
+    /* Process some events to let the window disappear:
+     * not really necessary but helps with debugging. */
+   while(gtk_events_pending()) 
+        gtk_main_iteration_do(FALSE);
+    printf("%s returns %d\n", __FUNCTION__, i);
+    return i;
+}
+
+gboolean
+libbalsa_abort_on_timeout(const char *host)
+{
+    return libbalsa_ask(ask_timeout_real, (void*)host) != 0;
+}
 
 
 #ifdef BALSA_USE_THREADS

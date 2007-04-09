@@ -104,6 +104,7 @@ struct _ImapMboxHandle {
                            inactivity */
   guint async_watch_id;  /* callback to process incoming data */
   ImapTlsMode tls_mode; /* disabled, enabled, required */
+  unsigned op_cancelled:1; /* last op timed out and was cancelled by user */
   unsigned idle_issued:1; /*  idle has been issued */
   unsigned readonly_mbox:1;
   unsigned can_fetch_body:1; /* set for servers that always respond

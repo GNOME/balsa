@@ -32,6 +32,7 @@ typedef void (*recodecb_t) (char **dstbuf, int *dstlen,
 			    const char *srcbuf, int srclen, void *arg);
 typedef void (*monitorcb_t) (const char *buffer, int length, int direction,
 			     void *arg);
+typedef int (*timeoutcb_t) (void *arg);
 
 struct siobuf *sio_attach(int sdr, int sdw, int buffer_size);
 void sio_detach(struct siobuf *sio);
@@ -39,6 +40,7 @@ void sio_set_monitorcb(struct siobuf *sio, monitorcb_t cb, void *arg);
 void sio_set_timeout(struct siobuf *sio, int milliseconds);
 void sio_set_securitycb(struct siobuf *sio, recodecb_t encode_cb,
 		        recodecb_t decode_cb, void *arg);
+void sio_set_timeoutcb(struct siobuf *sio, timeoutcb_t timeout_cb, void *arg);
 int sio_poll(struct siobuf *sio,int want_read, int want_write, int fast);
 void sio_write(struct siobuf *sio, const void *bufp, int buflen);
 void sio_flush(struct siobuf *sio);

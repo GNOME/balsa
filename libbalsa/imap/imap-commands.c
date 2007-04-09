@@ -453,7 +453,7 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
   gchar *mbx7 = imap_utf8_to_mailbox(mbox);
   gchar *cmd;
   char *litstr = use_literal ? "+" : "";
-  char buf[4096];
+  char buf[8192];
   size_t s, delta;
   int c;
 

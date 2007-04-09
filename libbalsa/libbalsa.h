@@ -125,6 +125,8 @@ gboolean libbalsa_is_cert_known(X509* cert, long vfy_result);
 void libbalsa_certs_destroy(void);
 #endif
 
+gboolean libbalsa_abort_on_timeout(const char *host);
+
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
 pthread_t libbalsa_get_main_thread(void);

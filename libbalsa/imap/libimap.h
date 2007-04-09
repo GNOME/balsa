@@ -257,7 +257,8 @@ typedef enum {
   IME_GET_USER,
   IME_TLS_VERIFY_ERROR,
   IME_TLS_NO_PEER_CERT,
-  IME_TLS_WEAK_CIPHER
+  IME_TLS_WEAK_CIPHER,
+  IME_TIMEOUT
 } ImapUserEventType;
 
 typedef void (*ImapUserCb)(ImapUserEventType ue, void *arg, ...);

@@ -536,7 +536,9 @@ mi_reconnect(ImapMboxHandle *h)
     if(imap_mbox_is_disconnected(h) &&mi_reconnect(h)!=IMAP_SUCCESS)\
         {rc=IMR_NO;break;};\
     rc=line; \
-    if(rc==IMR_SEVERED) \
+    if(imap_handle_op_cancelled(h))\
+        break;\
+    else if(rc==IMR_SEVERED)                             \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
     _("IMAP connection has been severed. Reconnecting...")); \
     else if(rc==IMR_BYE) {char *msg = imap_mbox_handle_get_last_msg(h); \
@@ -549,7 +551,9 @@ mi_reconnect(ImapMboxHandle *h)
     if(imap_mbox_is_disconnected(h) &&mi_reconnect(h)!=IMAP_SUCCESS)\
         {rc=0;break;};\
     rc=line; \
-    if(rc != IMR_OK) \
+    if(imap_mbox_op_cancelled(h))\
+        break;\
+    else if(rc != IMR_OK) \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
      _("Async IMAP cmd %s could not be executed. Reconnecting..."),cmd); \
     else break;}while(trials-->0);}

@@ -74,7 +74,8 @@ struct siobuf
     recodecb_t encode_cb;	/* encoder for outbound data */
     recodecb_t decode_cb;	/* decoder for inbound data */
     void *secarg;
-
+    timeoutcb_t timeout_cb;     /* timeout (retry/abort) action callback */
+    void *timeout_arg;          /* argument of timeout callback */
 #ifdef USE_TLS
     SSL *ssl;			/* The SSL connection */
 #endif
@@ -133,6 +134,10 @@ sio_detach (struct siobuf *sio)
 {
   assert (sio != NULL);
 
+  /* We do not want to bug the user when the connection is about to be
+     destroyed anyway. */
+  sio->timeout_cb = NULL;
+  sio->timeout_arg = NULL;
 #ifdef USE_TLS
   if (sio->ssl != NULL)
     {
@@ -159,6 +164,16 @@ sio_set_monitorcb (struct siobuf *sio, monitorcb_t cb, void *arg)
   sio->monitor_cb = cb;
   sio->cbarg = arg;
 }
+
+void
+sio_set_timeoutcb (struct siobuf *sio, timeoutcb_t cb, void *arg)
+{
+  assert (sio != NULL);
+
+  sio->timeout_cb = cb;
+  sio->timeout_arg = arg;
+}
+
 
 void
 sio_set_timeout (struct siobuf *sio, int milliseconds)
@@ -283,9 +298,15 @@ sio_poll (struct siobuf *sio, int want_read, int want_write, int fast)
   if (npoll == 0)
     return 0;
 
-  while ((status = poll (pollfd, npoll, fast ? 0 : sio->milliseconds)) < 0)
-    if (errno != EINTR)
-      return -1;
+  while ((status = poll (pollfd, npoll, fast ? 0 : sio->milliseconds)) <= 0) {
+    if(status == 0 && !fast) {
+      if(sio->timeout_cb && sio->timeout_cb(sio->timeout_arg))
+      break;
+    } else {
+      if (errno != EINTR)
+        return -1;
+    }
+  }
 
   /* Timeout is not an error on the fast poll */
   if (status == 0 && fast)
@@ -312,12 +333,21 @@ sio_sslpoll (struct siobuf *sio, int ret)
 
   err = SSL_get_error (sio->ssl, ret);
   want_read = want_write = 0;
-  if (err == SSL_ERROR_WANT_READ)
+  if (err == SSL_ERROR_SYSCALL) {
+    switch(errno) {
+    case EAGAIN: return 1; 
+    case EPIPE:  return -1; /* EPIPE cannot be salvaged... */
+    }
+    if(sio->timeout_cb && !sio->timeout_cb(sio->timeout_arg))
+      return 1;
+    return -1;
+  } else if (err == SSL_ERROR_WANT_READ)
     want_read = 1;
   else if (err == SSL_ERROR_WANT_WRITE)
     want_write = 1;
-  else
+  else {
     return -1;
+  }
   return sio_poll (sio, want_read, want_write, 0);
 }
 #endif

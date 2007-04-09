@@ -122,7 +122,7 @@ void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
 void imap_handle_set_timeout(ImapMboxHandle *, int milliseconds);
 gboolean imap_handle_idle_enable(ImapMboxHandle *, int seconds);
 gboolean imap_handle_idle_disable(ImapMboxHandle *);
-
+gboolean imap_handle_op_cancelled(ImapMboxHandle *h);
 ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst, 
                                     int over_ssl);
 ImapResult imap_mbox_handle_reconnect(ImapMboxHandle* r,

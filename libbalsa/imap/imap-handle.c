@@ -477,6 +477,12 @@ imap_handle_idle_disable(ImapMboxHandle *h)
   return TRUE;
 }
 
+gboolean
+imap_handle_op_cancelled(ImapMboxHandle *h)
+{
+  return h->op_cancelled;
+}
+
 void
 imap_handle_disconnect(ImapMboxHandle *h)
 {
@@ -636,6 +642,21 @@ imap_socket_open(const char* host, const char *def_port)
   return fd; /* FIXME: provide more info why the connection failed. */
 }
 
+static int
+imap_timeout_cb(void *arg)
+{
+  ImapMboxHandle *h = (ImapMboxHandle*)arg;
+  int ok = 1;
+
+  if(h->user_cb) {
+    h->user_cb(IME_TIMEOUT, h->user_arg, &ok);
+    if(ok)
+      h->op_cancelled = TRUE;
+  }
+
+  return ok;
+}
+
 static ImapResult
 imap_mbox_connect(ImapMboxHandle* handle)
 {
@@ -644,6 +665,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   const char *service = "imap";
 
   /* reset some handle status */
+  handle->op_cancelled = FALSE;
   handle->has_capabilities = FALSE;
   handle->can_fetch_body = TRUE;
   handle->idle_issued = FALSE;
@@ -666,8 +688,10 @@ imap_mbox_connect(ImapMboxHandle* handle)
     close(handle->sd);
     return IMAP_NOMEM;
   }
-  if(handle->timeout>0)
+  if(handle->timeout>0) {
     sio_set_timeout(handle->sio, handle->timeout);
+    sio_set_timeoutcb(handle->sio, imap_timeout_cb, handle);
+  }
 #ifdef USE_TLS
   if(handle->over_ssl) {
     SSL *ssl = imap_create_ssl();

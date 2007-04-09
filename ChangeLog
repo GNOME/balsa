@@ -1,3 +1,16 @@
+2007-04-09  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: do not re-try user-aborted actions.
+	* libbalsa/libbalsa.[ch]: generalize libbalsa_ask() to implement
+	libalsa_abort_on_timeout().
+	* libbalsa/imap/imap-handle.c: support for distinguising aborted
+	operations from those that timed out.
+	* libbalsa/imap/libimap.h: add IME_TIMEOUT event type.
+	* libbalsa/imap/imap-handle.h: add imap_handle_op_cancelled().
+	* libbalsa/imap/imap_private.h: add op_cancelled field.
+	* libbalsa/imap/siobuf.[ch]: core of timeout handling.
+	* libbalsa/server.c: ask user what to do on timeout.
+
 2007-04-05  Peter Bloomfield 
 
 	* configure.in: detect gtkhtml-3.14; detect GtkPrint support in

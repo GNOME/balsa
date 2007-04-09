@@ -410,6 +410,11 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
         printf("IMAP:TLS: Weak cipher accepted.\n");
         break;
     }
+    case IME_TIMEOUT: {
+        ok = va_arg(alist, int*); *ok = 1;
+        *ok = libbalsa_abort_on_timeout(is->host);
+        break;
+    }
     default: g_warning("unhandled imap event type! Fix the code."); break;
     }
     va_end(alist);

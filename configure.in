@@ -130,6 +130,14 @@ AC_ARG_WITH([gtkspell],
 	with_gtkspell=no
 ])
 
+AC_ARG_WITH([libnotify],
+        AC_HELP_STRING([--with-libnotify],
+                [Use libnotify if available (default=yes)]),[
+	with_libnotify=$withval
+],[
+	with_libnotify=yes
+])
+
 AC_ARG_WITH([gtksourceview],
         AC_HELP_STRING([--with-gtksourceview],
                 [Use GtkSourceView if available (default=no)]),[
@@ -568,6 +576,14 @@ if test "x$with_gss" != xno  ; then
    fi
 fi
 
+# Libnotify configuration
+if test x$with_libnotify != xno; then
+    PKG_CHECK_MODULES(NOTIFY, [ libnotify ])
+    AC_DEFINE(HAVE_NOTIFY,1,[Defined when libnotify can be used.])
+    BALSA_LIBS="$BALSA_LIBS -lnotify"
+    BALSA_AB_LIBS="$BALSA_AB_LIBS -lnotify"
+fi
+
 # Compface configuration
 #
 AC_MSG_CHECKING([whether to build Compface support])
@@ -773,6 +789,7 @@ echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
 echo "                   Use SSL: $with_ssl"
 echo "              Use GtkSpell: $with_gtkspell"
+echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use GtkPrint: $with_gtkprint"
 echo "              Use Compface: $with_compface"

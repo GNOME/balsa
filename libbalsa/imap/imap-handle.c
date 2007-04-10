@@ -650,8 +650,10 @@ imap_timeout_cb(void *arg)
 
   if(h->user_cb) {
     h->user_cb(IME_TIMEOUT, h->user_arg, &ok);
-    if(ok)
+    if(ok) {
       h->op_cancelled = TRUE;
+      imap_handle_disconnect(h);
+    }
   }
 
   return ok;

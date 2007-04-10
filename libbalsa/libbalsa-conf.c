@@ -424,7 +424,7 @@ libbalsa_conf_get_double_with_default_(const char *path,
     GError *error = NULL;
 
     key = lbc_get_key(path, &defval);
-#if GLIB_CHECK_VERSION(2, 10, 0)
+#if GLIB_CHECK_VERSION(2, 12, 0)
     retval =
         g_key_file_get_double(LBC_KEY_FILE(priv), lbc_groups->data, key,
 			      &error);
@@ -461,7 +461,7 @@ libbalsa_conf_set_int_(const char *path, int value, gboolean priv)
 void
 libbalsa_conf_set_double_(const char *path, double value, gboolean priv)
 {
-#if GLIB_CHECK_VERSION(2, 10, 0)
+#if GLIB_CHECK_VERSION(2, 12, 0)
     g_key_file_set_double(LBC_KEY_FILE(priv), lbc_groups->data, path,
 			  value);
 #else

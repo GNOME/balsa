@@ -569,7 +569,7 @@ periodic_expunge_cb(void)
 #endif
 
     gdk_threads_enter();
-    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                          _("Compressing mail folders..."));
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc)mbnode_expunge_func,

@@ -1007,7 +1007,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
         snprintf (buf, sizeof buf, _("From %s: %d %s"), 
 	          mailbox, status->code, status->text);
         g_strchomp(buf);
-	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG, buf);
         break;
     case SMTP_EV_RCPTSTATUS:
         mailbox = va_arg (ap, const char *);
@@ -1022,7 +1022,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
         snprintf (buf, sizeof buf, _("To %s: %d %s"),
 	          mailbox, status->code, status->text);
         g_strchomp(buf);
-	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG, buf);
         break;
     case SMTP_EV_MESSAGEDATA:
         message = va_arg (ap, smtp_message_t);
@@ -1047,7 +1047,7 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 	snprintf (buf, sizeof buf, "%d %s", status->code, status->text);
         g_strchomp(buf);
 	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
-	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, buf);
+	libbalsa_information(LIBBALSA_INFORMATION_DEBUG, buf);
         /* Reset 'mqi->sent' for the next message (i.e. bcc copy) */
         mqi = smtp_message_get_application_data (message);
         if (mqi != NULL) {

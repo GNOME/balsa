@@ -33,6 +33,11 @@
 #include <gnome.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+#ifdef HAVE_NOTIFY
+#include <libnotify/notify.h>
+#include <gtk/gtkstock.h>
+#endif
+
 #include "libbalsa.h"
 #include "misc.h"
 #include "html.h"
@@ -3305,6 +3310,9 @@ display_new_mail_notification(int num_new, int has_new)
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
+#ifdef HAVE_NOTIFY
+    NotifyNotification *new_mail_note;
+#endif
 
     if (num_new <= 0 && has_new <= 0)
         return;
@@ -3320,9 +3328,12 @@ display_new_mail_notification(int num_new, int has_new)
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */
         num_total += num_new;
+#ifndef HAVE_NOTIFY 
         gdk_window_raise(dlg->window);
+#endif
     } else {
         num_total = num_new;
+#ifndef HAVE_NOTIFY
         dlg = gtk_message_dialog_new(NULL, /* NOT transient for
                                             * Balsa's main window */
                                      (GtkDialogFlags) 0,
@@ -3337,6 +3348,8 @@ display_new_mail_notification(int num_new, int has_new)
                          G_CALLBACK(gtk_widget_destroy), NULL);
         g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
         gtk_widget_show_all(GTK_WIDGET(dlg));
+
+#endif
     }
 
     msg = num_new > 0 ?
@@ -3344,7 +3357,14 @@ display_new_mail_notification(int num_new, int has_new)
 				 "You have received %d new messages.",
 				 num_total), num_total) :
 	g_strdup(_("You have new mail."));
+#ifndef HAVE_NOTIFY
     gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
+#else
+    new_mail_note=notify_notification_new("Balsa", msg,GTK_STOCK_DIALOG_INFO,NULL);
+    notify_notification_set_timeout (new_mail_note, 30000); /* 30 seconds */
+    notify_notification_show(new_mail_note, NULL);
+    g_object_unref(G_OBJECT(new_mail_note));
+#endif
     g_free(msg);
 }
 

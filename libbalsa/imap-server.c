@@ -21,6 +21,9 @@
 #define REQ_SSL(s) (0)
 #endif
 
+/** wait 20 seconds for packets */
+#define IMAP_CMD_TIMEOUT (20*1000)
+
 static LibBalsaServerClass *parent_class = NULL;
 
 struct LibBalsaImapServer_ {
@@ -286,7 +289,7 @@ lb_imap_server_info_new(LibBalsaServer *server)
      * libbalsa_server_user_cb(). */
 
     handle = imap_mbox_handle_new();
-    imap_handle_set_timeout(handle, 30000); /* wait 30 seconds for packets */
+    imap_handle_set_timeout(handle, IMAP_CMD_TIMEOUT);
     info = g_new0(struct handle_info, 1);
     info->handle = handle;
     imap_handle_set_monitorcb(handle, monitor_cb, info);

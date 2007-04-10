@@ -33,6 +33,10 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+#ifdef HAVE_NOTIFY
+#include <libnotify/notify.h>
+#endif
+
 #if ENABLE_LDAP
 #include <ldap.h>
 #endif
@@ -74,6 +78,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 {
     struct utsname utsname;
 
+#ifdef HAVE_NOTIFY
+    notify_init("Basics");
+#endif
 
 #ifdef BALSA_USE_THREADS
     if (!g_thread_supported()) {

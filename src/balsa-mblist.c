@@ -2296,13 +2296,13 @@ balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 
     /* xgettext: this is the first part of the message
      * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
-    g_string_append_printf(desc, _("Shown mailbox: %s"), mailbox->name);
+    g_string_append_printf(desc, _("Shown mailbox: %s "), mailbox->name);
     if (total_messages > 0) {
         /* xgettext: this is the second part of the message
          * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
         g_string_append_printf(desc,
-                               ngettext(" with %d message",
-                                        " with %d messages",
+                               ngettext("with %d message",
+                                        "with %d messages",
                                         total_messages), total_messages);
         if (unread_messages > 0)
             /* xgettext: this is the third part of the message

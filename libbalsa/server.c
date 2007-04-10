@@ -361,7 +361,7 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
         if(*ok) {
             g_free(*user); *user = g_strdup(is->user);
             g_free(*pass); *pass = g_strdup(is->passwd);
-            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  /* host, authentication method */
                                  _("Logging in to %s using %s"), 
                                    is->host, method);

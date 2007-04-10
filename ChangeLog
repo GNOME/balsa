@@ -1,3 +1,14 @@
+2007-04-10  Johan Brannlund
+
+	* configure.in: detect libnotify.
+	* libbalsa/information.c: use it.
+	* libbalsa/libbalsa.c: init it.
+	* libbalsa/{send,server}.c: downgrade some messages to debug.
+	* src/main-window.c: use libnotify for new mail notification.
+	* src/balsa-mblist.c: prefer trailing spaces instead of leading ones.
+	* libbalsa/imap/imap-handle.c: really disconnect (PS).
+	* libbalsa/libbalsa-conf.c: correct CHECK_VERSION (PB).
+
 2007-04-09  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: do not re-try user-aborted actions.

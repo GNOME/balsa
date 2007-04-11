@@ -1,3 +1,8 @@
+2007-04-11  Pawel Salek
+
+	* libbalsa/imap/siobuf.c: rename external symbols to avoid
+	conflicts with libesmtp.
+	
 2007-04-10  Johan Brannlund
 
 	* configure.in: detect libnotify.

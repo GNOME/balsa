@@ -34,6 +34,31 @@ typedef void (*monitorcb_t) (const char *buffer, int length, int direction,
 			     void *arg);
 typedef int (*timeoutcb_t) (void *arg);
 
+/* Redefine external symbols to avoid conflicts with libsmtp */
+#define sio_attach bnio_attach
+#define sio_detach bnio_detach
+#define sio_set_monitorcb bnio_set_monitorcb
+#define sio_set_timeout bnio_set_timeout
+#define sio_set_securitycb bnio_set_securitycb
+#define sio_set_timeoutcb bnio_set_timeoutcb
+#define sio_poll bnio_poll
+#define sio_write bnio_write
+#define sio_flush bnio_flush
+#define sio_mark bnio_mark
+#define sio_fill bnio_fill
+#define sio_read bnio_read
+#define sio_getc bnio_getc
+#define sio_ungetc bnio_ungetc
+
+#define sio_gets bnio_gets
+#define sio_printf bnio_printf
+#define sio_set_userdata bnio_set_userdata  
+#define sio_get_userdata bnio_get_userdata  
+
+#define sio_set_tlsclient_ssl bnio_set_tlsclient_ssl  
+#define sio_set_tlsserver_ssl bnio_set_tlsserver_ssl  
+
+
 struct siobuf *sio_attach(int sdr, int sdw, int buffer_size);
 void sio_detach(struct siobuf *sio);
 void sio_set_monitorcb(struct siobuf *sio, monitorcb_t cb, void *arg);

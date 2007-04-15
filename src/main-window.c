@@ -35,7 +35,6 @@
 
 #ifdef HAVE_NOTIFY
 #include <libnotify/notify.h>
-#include <gtk/gtkstock.h>
 #endif
 
 #include "libbalsa.h"
@@ -2956,6 +2955,9 @@ check_new_messages_cb(GtkWidget * widget, gpointer data)
     check_new_messages_real(widget, data, TYPE_CALLBACK);
 }
 
+/** Saves the number of messages as the most recent one the user is
+    aware of. If the number has changed since last checking and
+    notification was requested, do notify the user as well.  */
 void
 check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
 {
@@ -3301,8 +3303,25 @@ send_progress_notify_cb()
  
 #endif
 
-/* display_new_mail_notification:
-   num_new is the number of the recently arrived messsages.
+/** Returns properly formatted string informing the user about the
+    amount of the new mail.
+    @param num_new if larger than zero informs that the total number
+    of messages is known and trusted.
+    @param num_total says how many actually new messages are in the
+    mailbox.
+*/
+static gchar*
+get_new_message_notification_string(int num_new, int num_total)
+{
+    return num_new > 0 ?
+	g_strdup_printf(ngettext("You have received %d new message.",
+				 "You have received %d new messages.",
+				 num_total), num_total) :
+	g_strdup(_("You have new mail."));
+}
+
+/** Informs the user that new mail arrived. num_new is the number of
+    the recently arrived messsages.
 */
 static void
 display_new_mail_notification(int num_new, int has_new)
@@ -3310,9 +3329,6 @@ display_new_mail_notification(int num_new, int has_new)
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
-#ifdef HAVE_NOTIFY
-    NotifyNotification *new_mail_note;
-#endif
 
     if (num_new <= 0 && has_new <= 0)
         return;
@@ -3320,6 +3336,22 @@ display_new_mail_notification(int num_new, int has_new)
     if (balsa_app.notify_new_mail_sound)
         gnome_triggers_do("New mail has arrived", "email",
                           "balsa", "newmail", NULL);
+#ifdef HAVE_NOTIFY
+    /* Before attemtping to use the notifications check whether they
+       are actually available - perhaps the underlying connection to
+       dbus could not be created? In any case, we must not continue or
+       ugly things will happen, at least with libnotify-0.4.2. */
+    if(notify_is_initted() && num_new) {
+        NotifyNotification *new_mail_note;
+        msg = get_new_message_notification_string(num_new, num_new);
+        new_mail_note=notify_notification_new("Balsa", 
+                                              msg,GTK_STOCK_DIALOG_INFO,NULL);
+        notify_notification_set_timeout (new_mail_note, 30000);/* 30 seconds */
+        notify_notification_show(new_mail_note, NULL);
+        g_object_unref(G_OBJECT(new_mail_note));
+        return;
+    }
+#endif
 
     if (!balsa_app.notify_new_mail_dialog)
         return;
@@ -3328,12 +3360,9 @@ display_new_mail_notification(int num_new, int has_new)
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */
         num_total += num_new;
-#ifndef HAVE_NOTIFY 
         gdk_window_raise(dlg->window);
-#endif
     } else {
         num_total = num_new;
-#ifndef HAVE_NOTIFY
         dlg = gtk_message_dialog_new(NULL, /* NOT transient for
                                             * Balsa's main window */
                                      (GtkDialogFlags) 0,
@@ -3348,23 +3377,10 @@ display_new_mail_notification(int num_new, int has_new)
                          G_CALLBACK(gtk_widget_destroy), NULL);
         g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
         gtk_widget_show_all(GTK_WIDGET(dlg));
-
-#endif
     }
 
-    msg = num_new > 0 ?
-	g_strdup_printf(ngettext("You have received %d new message.",
-				 "You have received %d new messages.",
-				 num_total), num_total) :
-	g_strdup(_("You have new mail."));
-#ifndef HAVE_NOTIFY
+    msg = get_new_message_notification_string(num_new, num_total);
     gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
-#else
-    new_mail_note=notify_notification_new("Balsa", msg,GTK_STOCK_DIALOG_INFO,NULL);
-    notify_notification_set_timeout (new_mail_note, 30000); /* 30 seconds */
-    notify_notification_show(new_mail_note, NULL);
-    g_object_unref(G_OBJECT(new_mail_note));
-#endif
     g_free(msg);
 }
 

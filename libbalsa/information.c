@@ -34,9 +34,7 @@ struct information_data {
     gchar *msg;
 };
 
-#ifndef HAVE_NOTIFY
 static gboolean libbalsa_information_idle_handler(struct information_data*);
-#endif
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
@@ -54,9 +52,8 @@ void
 libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
                           const char *fmt, va_list ap)
 {
-#ifndef HAVE_NOTIFY
-    struct information_data *data = g_new(struct information_data, 1);
-#else
+    struct information_data *data;
+#ifdef HAVE_NOTIFY
     NotifyNotification *note;
     char *icon_str;
 #endif
@@ -70,7 +67,6 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
      */
 
 #ifdef HAVE_NOTIFY
-
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:
 	icon_str = GTK_STOCK_DIALOG_INFO;
@@ -85,21 +81,23 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
 	icon_str = NULL;
         break;
     }
-    note = notify_notification_new("Balsa", g_strdup_vprintf(fmt,ap),
-                                   icon_str, NULL);
-    notify_notification_set_timeout (note, 7000); /* 7 seconds */
-    notify_notification_show (note, NULL);
-    g_object_unref(G_OBJECT(note));
-
-#else
+    if(notify_is_initted()) {
+        note = notify_notification_new("Balsa", g_strdup_vprintf(fmt,ap),
+                                       icon_str, NULL);
+        notify_notification_set_timeout (note, 7000); /* 7 seconds */
+        notify_notification_show (note, NULL);
+        g_object_unref(G_OBJECT(note));
+        return;
+    }
+    /* Fall through to the ordinary notification scheme */
+#endif
+    data = g_new(struct information_data, 1);
     data->parent = parent;
     data->message_type = type;
     data->msg = g_strdup_vprintf(fmt, ap);
     if(parent)
         g_object_add_weak_pointer(G_OBJECT(parent), (gpointer) &data->parent);
     g_idle_add((GSourceFunc) libbalsa_information_idle_handler, data); 
-#endif
-
 }
 
 void
@@ -130,8 +128,6 @@ libbalsa_information_parented(GtkWindow *parent, LibBalsaInformationType type,
 /*
  * This is an idle handler, so we need to grab the GDK lock 
  */
-
-#ifndef HAVE_NOTIFY
 static gboolean
 libbalsa_information_idle_handler(struct information_data *data)
 {
@@ -148,4 +144,3 @@ libbalsa_information_idle_handler(struct information_data *data)
     g_free(data);
     return FALSE;
 }
-#endif

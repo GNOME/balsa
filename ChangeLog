@@ -1,3 +1,9 @@
+2007-04-15  Pawel Salek
+
+	* src/main-window.c: use libnotify only if the initialization was
+	successful.
+	* libbalsa/information.c: ditto.
+
 2007-04-11  Pawel Salek
 
 	* libbalsa/imap/siobuf.c: rename external symbols to avoid

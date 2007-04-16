@@ -2501,10 +2501,10 @@ balsa_index_pipe(BalsaIndex * index)
     gtk_widget_show(dialog);
 }
 
-/* GtkTreeView can leave no messages showing after changing the view
- * filter, even though the view does contain messages.  We scroll to
- * either the current message, or the last message in the view, if
- * any. */
+/** GtkTreeView can leave no messages showing after changing the view
+ * filter, even though the view does contain messages.  We prefer to
+ * scroll to either the current message. If this one is unavailable -
+ * to the last message in the view, if any. */
 void
 balsa_index_ensure_visible(BalsaIndex * index)
 {
@@ -2512,19 +2512,20 @@ balsa_index_ensure_visible(BalsaIndex * index)
     GdkRectangle rect;
     GtkTreePath *path = NULL;
 
-    gtk_tree_view_get_visible_rect(tree_view, &rect);
-    gtk_tree_view_tree_to_widget_coords(tree_view, rect.x, rect.y,
-                                        &rect.x, &rect.y);
+    if (!bndx_find_message(index, &path, NULL, index->current_message)) {
+        /* Current message not displayed, make sure that something
+           else is... */
+        gtk_tree_view_get_visible_rect(tree_view, &rect);
+        gtk_tree_view_tree_to_widget_coords(tree_view, rect.x, rect.y,
+                                            &rect.x, &rect.y);
 
-    if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
-                                      NULL, NULL, NULL)) {
-        /* We have a message in the view, so we do nothing. */
-        gtk_tree_path_free(path);
-        path = NULL;
-    } else {
-        /* Can we get a path to the current message? */
-        if (!bndx_find_message(index, &path, NULL, index->current_message)) {
-            /* No, scroll to the last message. */
+        if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
+                                          NULL, NULL, NULL)) {
+            /* We have a message in the view, so we do nothing. */
+            gtk_tree_path_free(path);
+            path = NULL;
+        } else {
+            /* Scroll to the last message. */
             GtkTreeModel *model;
             gint n_children;
 

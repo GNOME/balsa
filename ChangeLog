@@ -1,3 +1,8 @@
+2007-04-16  Pawel Salek
+
+	* src/balsa-index.c: keep current message visible in the index on
+	filter changes.
+
 2007-04-15  Pawel Salek
 
 	* src/main-window.c: use libnotify only if the initialization was

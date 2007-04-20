@@ -345,6 +345,11 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab)
     }
 #endif /* HAVE_CYRUS_SASL */
 
+    /* do not follow referrals (OpenLDAP binds anonymously here, which will usually
+     * fail */
+    if (result == LDAP_SUCCESS)
+	result = ldap_set_option(ab->directory, LDAP_OPT_REFERRALS, (void *)LDAP_OPT_OFF);
+
     if (result != LDAP_SUCCESS) {
         libbalsa_address_book_set_status(lbab,
                                          g_strdup(ldap_err2string(result)));
@@ -396,7 +401,7 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
         /* g_print("Performing full lookup...\n"); */
         ldap_filter = filter 
             ? g_strdup_printf("(&(objectClass=organizationalPerson)(mail=*)"
-                              "(|(cn=%s*)(sn=%s*)(mail=%s@*)))",
+                              "(|(cn=%s*)(sn=%s*)(mail=%s*@*)))",
                               filter, filter, filter)
             : g_strdup("(&(objectClass=organizationalPerson)(mail=*))");
 	if(DEBUG_LDAP)
@@ -969,7 +974,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     ldap = rfc_2254_escape(prefix);
 
     filter = g_strdup_printf("(&(objectClass=organizationalPerson)(mail=*)"
-                             "(|(cn=%s*)(sn=%s*)(mail=%s@*)))",
+                             "(|(cn=%s*)(sn=%s*)(mail=%s*@*)))",
 			     ldap, ldap, ldap);
     g_free(ldap);
     result = NULL;
@@ -983,13 +988,15 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
     g_free(filter);
     switch (rc) {
     case LDAP_SUCCESS:
-	for(e = ldap_first_entry(ldap_ab->directory, result);
-	    e != NULL; e = ldap_next_entry(ldap_ab->directory, e)) {
-	    addr = lbabl_get_internet_address(ldap_ab->directory, e);
-	    if(new_prefix && !*new_prefix) 
-		*new_prefix = internet_address_to_string(addr, FALSE);
-	    res = g_list_prepend(res, addr);
-	}
+    case LDAP_PARTIAL_RESULTS:
+	if (result)
+	    for(e = ldap_first_entry(ldap_ab->directory, result);
+		e != NULL; e = ldap_next_entry(ldap_ab->directory, e)) {
+		addr = lbabl_get_internet_address(ldap_ab->directory, e);
+		if(new_prefix && !*new_prefix) 
+		    *new_prefix = internet_address_to_string(addr, FALSE);
+		res = g_list_prepend(res, addr);
+	    }
     case LDAP_SIZELIMIT_EXCEEDED:
     case LDAP_TIMELIMIT_EXCEEDED:
 	/*

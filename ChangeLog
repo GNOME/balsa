@@ -1,3 +1,8 @@
+2007-04-20  Peter Bloomfield
+
+	* src/main-window.c: (display_new_mail_notification): use no
+	more than one NotifyNotification for new mail.
+
 2007-04-16  Pawel Salek
 
 	* src/balsa-index.c: keep current message visible in the index on

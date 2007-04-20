@@ -3326,6 +3326,9 @@ get_new_message_notification_string(int num_new, int num_total)
 static void
 display_new_mail_notification(int num_new, int has_new)
 {
+#ifdef HAVE_NOTIFY
+    static NotifyNotification *new_mail_note = NULL;
+#endif
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
@@ -3341,16 +3344,21 @@ display_new_mail_notification(int num_new, int has_new)
        are actually available - perhaps the underlying connection to
        dbus could not be created? In any case, we must not continue or
        ugly things will happen, at least with libnotify-0.4.2. */
-    if(notify_is_initted() && num_new) {
-        NotifyNotification *new_mail_note;
-        msg = get_new_message_notification_string(num_new, num_new);
-        new_mail_note=notify_notification_new("Balsa", 
-                                              msg,GTK_STOCK_DIALOG_INFO,NULL);
-        notify_notification_set_timeout (new_mail_note, 30000);/* 30 seconds */
-        notify_notification_show(new_mail_note, NULL);
-        g_object_unref(G_OBJECT(new_mail_note));
-        return;
-    }
+    if (notify_is_initted()) {
+        if (new_mail_note) {
+            /* the user didn't acknowledge the last info, so we'll
+             * accumulate the count */
+            num_total += num_new;
+        } else {
+            num_total = num_new;
+            new_mail_note =
+                notify_notification_new("Balsa", NULL, NULL, NULL);
+            g_object_add_weak_pointer(G_OBJECT(new_mail_note),
+                                      (gpointer) & new_mail_note);
+            g_signal_connect(new_mail_note, "closed",
+                             G_CALLBACK(g_object_unref), NULL);
+        }
+    } else {
 #endif
 
     if (!balsa_app.notify_new_mail_dialog)
@@ -3378,9 +3386,22 @@ display_new_mail_notification(int num_new, int has_new)
         g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
         gtk_widget_show_all(GTK_WIDGET(dlg));
     }
+#ifdef HAVE_NOTIFY
+    }
+
+    msg = get_new_message_notification_string(num_new, num_total);
+    if (new_mail_note) {
+        notify_notification_update(new_mail_note, "Balsa", msg, 
+                                   GTK_STOCK_DIALOG_INFO);
+        notify_notification_set_timeout(new_mail_note, 30000); /* 30 seconds */
+        notify_notification_show(new_mail_note, NULL);
+    } else
+        gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
+#else
 
     msg = get_new_message_notification_string(num_new, num_total);
     gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
+#endif
     g_free(msg);
 }
 

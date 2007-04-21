@@ -1,70 +1,66 @@
-# Arabic translations for PACKAGE package.
-# Copyright (C) 2006 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2006.
-#
+# Arabic translations for THIS package.
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as THIS package.
+# Automatically generated, 2007.
+# Djihed Afifi <djihed@gmail.com>, 2007
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa\n"
+"Project-Id-Version: Arabic\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-14 18:20+0100\n"
-"PO-Revision-Date: 2006-11-17 22:40+0100\n"
+"POT-Creation-Date: 2007-04-21 10:46+0100\n"
+"PO-Revision-Date: 2007-04-14 18:49+0100\n"
 "Last-Translator: Djihed Afifi <djihed@gmail.com>\n"
-"Language-Team: Arabic <doc@arabeyes.org>\n"
+"Language-Team: Arabeyes <doc@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n >= "
-"3 && n <= 10 ? 3 : n >= 11 && n <= 99 ? 4 : 5;\n"
-"X-Poedit-Language: Arabic\n"
 
 #: ../balsa.desktop.in.h:1
-#, fuzzy
 msgid "Balsa"
-msgstr "بلزا"
+msgstr "Balsa"
 
 #: ../balsa.desktop.in.h:2
 #, fuzzy
 msgid "E-Mail utility"
-msgstr "/نوافذ/أ_دات"
+msgstr "الميثيلية"
 
 #. The externq database doesn't support Id's, sorry!
-#: ../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:489
+#: ../libbalsa/address-book-extern.c:210 ../libbalsa/address-book-ldap.c:494
 #: ../libbalsa/address-book-ldif.c:329
-#, fuzzy
 msgid "No-Id"
-msgstr "هوية البوّاب:"
+msgstr ""
 
 #: ../libbalsa/address-book-extern.c:215 ../libbalsa/address-book-extern.c:370
-#: ../libbalsa/address-book-ldap.c:495 ../libbalsa/address-book-ldif.c:309
+#: ../libbalsa/address-book-ldap.c:500 ../libbalsa/address-book-ldif.c:309
 #: ../libbalsa/address-book-ldif.c:332 ../libbalsa/address-book-ldif.c:351
 #: ../libbalsa/address-book-ldif.c:355 ../libbalsa/address-book-vcard.c:158
 #: ../libbalsa/address-book-vcard.c:312
 #, fuzzy
 msgid "No-Name"
-msgstr "لا يوجد اسم"
+msgstr "نومي"
 
 #: ../libbalsa/address-book-ldap.c:282
+#, fuzzy
 msgid "SASL Interaction\n"
-msgstr ""
+msgstr "الولايات المتحدة عالمي"
 
 #: ../libbalsa/address-book-ldap.c:329
 msgid "TLS requested but not compiled in"
 msgstr ""
 
 #: ../libbalsa/address-book.c:315 ../libbalsa/filter-error.c:45
-#, fuzzy
 msgid "No error"
 msgstr "لا خطأ"
 
 #: ../libbalsa/address-book.c:316
+#, fuzzy
 msgid "Cannot read from address book"
-msgstr ""
+msgstr "أنشيء دفتر عناوين جديد"
 
 #: ../libbalsa/address-book.c:317
 #, fuzzy
 msgid "Cannot write to address book"
-msgstr "أضف المكالم إلى دفتر العناوين"
+msgstr "لم أستطع إزالة دفتر العناوين."
 
 #: ../libbalsa/address-book.c:318 ../libbalsa/imap-server.c:525
 #, fuzzy
@@ -72,75 +68,75 @@ msgid "Cannot connect to the server"
 msgstr "لا يمكن الإتصال بالخادم عن بعد"
 
 #: ../libbalsa/address-book.c:319
+#, fuzzy
 msgid "Cannot search in the address book"
-msgstr ""
+msgstr "أنشيء دفتر عناوين جديد"
 
 #: ../libbalsa/address-book.c:321
 #, fuzzy
 msgid "Cannot add duplicate entry"
-msgstr "عنصر متكرر `%s' في `%s', تجاهل"
+msgstr "لا يمكن إضافة المستخدمم"
 
 #: ../libbalsa/address-book.c:323
 #, fuzzy
 msgid "Cannot find address in address book"
-msgstr "لم أستطع إيجاد عنوان 'من' في الرّسالة"
+msgstr "تعذر ايجاد عنوان IPخلال الاستجابة السلبية'%s'\n"
 
-#: ../libbalsa/address-book.c:324 ../src/main-window.c:2388
-#: ../src/main-window.c:4517 ../src/sendmsg-window.c:3700
+#: ../libbalsa/address-book.c:324 ../src/main-window.c:2387
+#: ../src/main-window.c:4554 ../src/sendmsg-window.c:3700
 #, fuzzy
 msgid "Unknown error"
-msgstr "خطأ مجهول"
+msgstr "خطأ مجهول."
 
 #: ../libbalsa/address.c:522
 #, fuzzy
 msgid "D_isplayed Name:"
-msgstr "اسم الموصول"
+msgstr "إسم العرض"
 
 #: ../libbalsa/address.c:523
 #, fuzzy
 msgid "_First Name:"
-msgstr "الاسم الأول"
+msgstr "الاسم الأ_ول:"
 
 #: ../libbalsa/address.c:524
 #, fuzzy
 msgid "_Last Name:"
-msgstr "الاسم الأخير"
+msgstr "الكنية"
 
 #: ../libbalsa/address.c:525
-#, fuzzy
 msgid "_Nickname:"
-msgstr "الإسم المستعار"
+msgstr "الك_نية:"
 
 #: ../libbalsa/address.c:526
+#, fuzzy
 msgid "O_rganization:"
-msgstr ""
+msgstr "المؤسسة:"
 
 #: ../libbalsa/address.c:527
-#, fuzzy
 msgid "_Email Address:"
-msgstr "عنوان البريد الإلكتروني"
+msgstr "_عنوان البريد الإلكتروني:"
 
 #. Right/Add button
 #: ../libbalsa/address.c:546 ../src/filter-edit-callbacks.c:1022
 #: ../src/filter-run-dialog.c:327
-#, fuzzy
 msgid "A_dd"
-msgstr "إ_ضافة"
+msgstr "أ_ضف"
 
 #: ../libbalsa/body.c:119 ../libbalsa/mailbox_local.c:1687
 #: ../libbalsa/message.c:901
 #, fuzzy
 msgid "(No subject)"
-msgstr "بدون عنوان"
+msgstr "بلا موضوع"
 
 #: ../libbalsa/files.c:231
-#, fuzzy, c-format
+#, c-format
 msgid "Open with %s"
 msgstr "افتح بـ %s"
 
 #: ../libbalsa/filter-error.c:46
+#, fuzzy
 msgid "Syntax error in the filter configuration file"
-msgstr ""
+msgstr "ملف الإعدادات الإفتراضية البديل"
 
 #: ../libbalsa/filter-error.c:47
 #, fuzzy
@@ -150,31 +146,32 @@ msgstr "لا يمكن تخصيص ذاكرة."
 #: ../libbalsa/filter-error.c:48
 #, fuzzy
 msgid "Error in regular expression syntax"
-msgstr "خطأ صياغي في وصف الجسم"
+msgstr "خطأ عند تجميع التعبير النظامي \"%s\"."
 
 #: ../libbalsa/filter-error.c:49
 #, fuzzy
 msgid "Attempt to apply an invalid filter"
-msgstr "تطبيق قواعدة التصفية على الرسائل المنتقاة"
+msgstr "فشلت محاولة الدخول."
 
 #: ../libbalsa/filter-file.c:141
 #, fuzzy, c-format
 msgid "Invalid filters %s for mailbox %s"
-msgstr "نوع غير صحيح للإعدادات %s في %s"
+msgstr "قيمة '%s' غير مقبولة من أجل %s"
 
 #: ../libbalsa/filter.c:130 ../libbalsa/mailbox_local.c:791
+#, fuzzy
 msgid "Unable to load message body to match filter"
-msgstr ""
+msgstr "تعذّر تحليل محتويات الرّسالة"
 
 #: ../libbalsa/filter.c:236
 #, fuzzy, c-format
 msgid "Invalid filter: %s"
-msgstr "مصفاة ذات الأولويّة \"%s\""
+msgstr "مجلد غير صالح: `%s'"
 
 #: ../libbalsa/filter.c:275 ../libbalsa/filter.c:298
-#, c-format
+#, fuzzy, c-format
 msgid "Bad mailbox name for filter: %s"
-msgstr ""
+msgstr "تعذّر إعادة تسمية المجلّد: %s"
 
 #: ../libbalsa/filter.c:279
 #, fuzzy, c-format
@@ -184,12 +181,14 @@ msgstr "خطأ أثناء النسخ إلى \"%s\"."
 #: ../libbalsa/filter.c:289
 #, fuzzy, c-format
 msgid "Error when trashing messages: %s"
-msgstr "حدث خطأ ما أثناء تثبيت السمة"
+msgstr "خطأ في جلب الرسالة"
 
 #: ../libbalsa/filter.c:302
 #, fuzzy, c-format
 msgid "Error when moving messages: %s"
-msgstr "خطأ أثناء النقل إلى \"%s\"."
+msgstr ""
+"حدث خطأ أثناء حفظ الرسائل إلى: %s:\n"
+" %s"
 
 #: ../libbalsa/gmime-application-pkcs7.c:237
 #: ../libbalsa/gmime-application-pkcs7.c:380
@@ -206,59 +205,59 @@ msgid ""
 msgstr ""
 
 #: ../libbalsa/gmime-gpgme-context.c:284 ../libbalsa/rfc3156.c:1603
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
 "\n"
 "Key: %s"
-msgstr ""
+msgstr "ادخل كلمة السر لـ “%s”."
 
 #: ../libbalsa/gmime-gpgme-context.c:404 ../libbalsa/gmime-gpgme-context.c:486
 #: ../libbalsa/gmime-gpgme-context.c:497 ../libbalsa/gmime-gpgme-context.c:612
 #: ../libbalsa/gmime-gpgme-context.c:703
-#, c-format
+#, fuzzy, c-format
 msgid "%s: could not get data from stream: %s"
-msgstr ""
+msgstr "%s: لم يمكن تلقي اسم مستضيف الخادم: %s!"
 
 #: ../libbalsa/gmime-gpgme-context.c:412 ../libbalsa/gmime-gpgme-context.c:621
 #: ../libbalsa/gmime-gpgme-context.c:711
-#, c-format
+#, fuzzy, c-format
 msgid "%s: could not create new data object: %s"
-msgstr ""
+msgstr "%s:لم أتمكن من كتابة مُدْخَل تخويل جديد: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:422
 #, fuzzy, c-format
 msgid "%s: signing failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "فشل النشر: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:511
 #, fuzzy, c-format
 msgid "%s: signature verification failed: %s"
-msgstr "فشل تسجيل %s إلى %s"
+msgstr "فشل إلغاء التسجيل: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:576
 msgid "combined signing and encryption is only defined for RFC 2440"
 msgstr ""
 
 #: ../libbalsa/gmime-gpgme-context.c:647
-#, c-format
+#, fuzzy, c-format
 msgid "%s: signing and encryption failed: %s"
-msgstr ""
+msgstr "%s: فشل إعادة التشغيل: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:651
 #, fuzzy, c-format
 msgid "%s: encryption failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "%s: فشل إعادة التشغيل: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:723
 #, fuzzy, c-format
 msgid "%s: decryption failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "%s: فشل إعادة التشغيل: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:758
 #, fuzzy, c-format
 msgid "%s: could not create context: %s"
-msgstr "لم يمكن إنشاء الأنبوب: %s"
+msgstr "تعذّر إنشاء مقبس: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:814
 msgid "the crypto engine for protocol OpenPGP is not available"
@@ -271,12 +270,12 @@ msgstr ""
 #: ../libbalsa/gmime-gpgme-context.c:831
 #, fuzzy, c-format
 msgid "invalid crypto engine %d"
-msgstr "ليس دليل مستخدمين صحيح"
+msgstr "نوع غير صحيح للإعدادات %s في %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:863 ../libbalsa/gmime-gpgme-context.c:889
 #, fuzzy, c-format
 msgid "%s: could not list keys for %s: %s"
-msgstr "لم يمكن تحميل الملخّص لـ %s"
+msgstr "تعذّر حذف المجلّد `%s': %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:902
 #, c-format
@@ -287,12 +286,12 @@ msgstr ""
 #: ../libbalsa/gmime-gpgme-context.c:906
 #, fuzzy, c-format
 msgid "%s: could not find a key for %s"
-msgstr "لم يمكن تحميل الملخّص لـ %s"
+msgstr "لم يمكن ايجاد ملف غلايد %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:919
 #, fuzzy, c-format
 msgid "%s: multiple keys for %s"
-msgstr "_لا تقبل إلا المفاتيح المضغوطة لمدة:"
+msgstr "%s: فشل checksum من %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:964
 #, c-format
@@ -305,150 +304,148 @@ msgstr ""
 #: ../src/sendmsg-window.c:3599
 #, fuzzy
 msgid "Re:"
-msgstr "NULL"
+msgstr "أحمر:"
 
 #: ../libbalsa/identity.c:103 ../src/sendmsg-window.c:3543
 #: ../src/sendmsg-window.c:3544 ../src/sendmsg-window.c:3545
+#, fuzzy
 msgid "Fwd:"
-msgstr ""
+msgstr "_جد:"
 
 #: ../libbalsa/identity.c:160
 #, fuzzy
 msgid "New Identity"
-msgstr "فا_صل جديد"
+msgstr "الهويّة"
 
 #: ../libbalsa/identity.c:413
-#, fuzzy
 msgid "Current"
 msgstr "الحالي"
 
 #: ../libbalsa/identity.c:669 ../libbalsa/smtp-server.c:257
 #, fuzzy
 msgid "Default"
-msgstr "الافتراضي"
+msgstr "الإفتراضيّات"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:864
 #, fuzzy
 msgid "_Face Path"
-msgstr "مسار الجهاز"
+msgstr "مسار جديد"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:870
 #, fuzzy
 msgid "_X-Face Path"
-msgstr "مسار الجهاز"
+msgstr "مسار جديد"
 
 #. create the "General" tab
 #: ../libbalsa/identity.c:896
 #, fuzzy
 msgid "General"
-msgstr "عامّ"
+msgstr "_عامّ"
 
 #: ../libbalsa/identity.c:898
 #, fuzzy
 msgid "_Identity Name:"
-msgstr "اسم الموصول"
+msgstr "الهوية:"
 
 #: ../libbalsa/identity.c:900
 #, fuzzy
 msgid "_Full Name:"
-msgstr "الإ_سم الكامل..."
+msgstr "الاسم الكامل:"
 
 #: ../libbalsa/identity.c:902
 #, fuzzy
 msgid "_Mailing Address:"
-msgstr "عنوان البريد الإلكتروني"
+msgstr "عنوان البريد"
 
 #: ../libbalsa/identity.c:904
 #, fuzzy
 msgid "Reply _To:"
-msgstr "الرّد إلى"
+msgstr "_رد إلى"
 
 #: ../libbalsa/identity.c:906
-#, fuzzy
 msgid "_Domain:"
 msgstr "ال_نطاق:"
 
 #: ../libbalsa/identity.c:908
-#, fuzzy
 msgid "_Bcc:"
-msgstr "ن.ك.م"
+msgstr "ن.ك._ع"
 
 #: ../libbalsa/identity.c:910
 #, fuzzy
 msgid "Reply _String:"
-msgstr "سلسلة البحث"
+msgstr "استرجاع:"
 
 #: ../libbalsa/identity.c:912
 #, fuzzy
 msgid "F_orward String:"
-msgstr "سلسلة البحث"
+msgstr "مرر الوصلة"
 
 #: ../libbalsa/identity.c:915
 #, fuzzy
 msgid "SMT_P Server:"
-msgstr "نادل STUN"
+msgstr "STUN خادم"
 
 #. create the "Signature" tab
 #: ../libbalsa/identity.c:920
 #, fuzzy
 msgid "Signature"
-msgstr "التّوقيع (أو التّواقيع)"
+msgstr "توقيعات"
 
 #: ../libbalsa/identity.c:923
 #, fuzzy
 msgid "Signature _Path"
-msgstr "مسار الجهاز"
+msgstr "هوية التوقيع"
 
 #: ../libbalsa/identity.c:926
 #, fuzzy
 msgid "_Execute Signature"
-msgstr "توقيع سليم"
+msgstr "توقيع منتهي الصلاحيته"
 
 #: ../libbalsa/identity.c:929
 #, fuzzy
 msgid "Incl_ude Signature"
-msgstr "تهيئة توقيع غير مدعومة"
+msgstr "توقيع غير صالح"
 
 #: ../libbalsa/identity.c:932
 msgid "Include Signature When For_warding"
 msgstr ""
 
 #: ../libbalsa/identity.c:935
+#, fuzzy
 msgid "Include Signature When Rep_lying"
-msgstr ""
+msgstr "ادرج عنصر القائمة \"إع_داد\""
 
 #: ../libbalsa/identity.c:938
 #, fuzzy
 msgid "_Add Signature Separator"
-msgstr "العرض العمودي للفاصل"
+msgstr "أضِف توقيع"
 
 #: ../libbalsa/identity.c:941
 #, fuzzy
 msgid "Prepend Si_gnature"
-msgstr "ح_جم عادي"
+msgstr "توقيع منتهي الصلاحيته"
 
 #. create the "Security" tab
 #: ../libbalsa/identity.c:953
-#, fuzzy
 msgid "Security"
 msgstr "أمن"
 
 #: ../libbalsa/identity.c:956
 #, fuzzy
 msgid "sign messages by default"
-msgstr "اخفاء عمود القوائم افتراضا"
+msgstr "تشفير الرسائل ال_صادرة (إفتراضياً)"
 
 #: ../libbalsa/identity.c:959
 #, fuzzy
 msgid "encrypt messages by default"
-msgstr "اخفاء عمود القوائم افتراضا"
+msgstr "تشفير الرسائل ال_صادرة (إفتراضياً)"
 
 #: ../libbalsa/identity.c:962
 #, fuzzy
 msgid "default protocol"
-msgstr "بروتوكول غير آمن"
+msgstr "البروتوكول الأفتراضى"
 
 #: ../libbalsa/identity.c:965
 #, fuzzy
@@ -458,7 +455,7 @@ msgstr "وثوق دائم لمفاتيحي عند التشفير"
 #: ../libbalsa/identity.c:1102
 #, fuzzy, c-format
 msgid "Error reading file %s: %s"
-msgstr "خطأ في قراءة الملف '%s': %s"
+msgstr "خطأ عند إعادة تسمية الملف \"%s\": %s"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1113
@@ -468,53 +465,52 @@ msgstr ""
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1123
-#, c-format
+#, fuzzy, c-format
 msgid "Face header file %s contains binary data."
-msgstr ""
+msgstr "لا يحتوي ملف الصورة '%s' على بيانات"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1143 ../src/balsa-message.c:1236
 #, fuzzy, c-format
 msgid "Error loading Face: %s"
-msgstr "خطأ عند تحميل الرزنامة"
+msgstr "خطأ عند تحميل الأيقونة: %s"
 
 #: ../libbalsa/identity.c:1339
 #, fuzzy
 msgid "Error: The identity does not have a name"
-msgstr "لا اسم لمصدر القاموس"
+msgstr "ليس لهذ الخط نموذج"
 
 #: ../libbalsa/identity.c:1349
+#, fuzzy
 msgid "Error: An identity with that name already exists"
-msgstr ""
+msgstr "يوجد بالفعل مجلّد بهاذا الإسم"
 
 #: ../libbalsa/identity.c:1545
+#, fuzzy
 msgid "Do you really want to delete the selected identity?"
-msgstr ""
+msgstr "هل تريد حقاً حذف هذا الدِسكلت ?"
 
 #: ../libbalsa/identity.c:1580
 #, fuzzy, c-format
 msgid "Error displaying help for identities: %s\n"
-msgstr "حدث خطأ عند عرض المساعدة."
+msgstr "خطأ أثناء قراءة الإعدادات: %s\n"
 
 #: ../libbalsa/identity.c:1626
 #, fuzzy
 msgid "Manage Identities"
-msgstr "إدارة الشهادات"
+msgstr "أدر الشهادات"
 
 #: ../libbalsa/identity.c:1984
-#, fuzzy
 msgid "GnuPG MIME mode"
-msgstr "وضع المكالمة الواردة"
+msgstr ""
 
 #: ../libbalsa/identity.c:1986
-#, fuzzy
 msgid "GnuPG OpenPGP mode"
-msgstr "وضع المكالمة الواردة"
+msgstr ""
 
 #: ../libbalsa/identity.c:1989
-#, fuzzy
 msgid "GpgSM S/MIME mode"
-msgstr "وضع المكالمة الواردة"
+msgstr ""
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:261
@@ -522,19 +518,17 @@ msgstr "وضع المكالمة الواردة"
 msgid ""
 "IMAP server %s alert:\n"
 "%s"
-msgstr ""
-"تنبيه من خادم IMAP %s@%s:\n"
-"%s"
+msgstr "خادم IMAP %s"
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:265
 #, fuzzy, c-format
 msgid "IMAP server %s error: %s"
-msgstr "خطأ بينج للخادم : %s"
+msgstr "خدمة IMAP لـ %s على %s"
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:271
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
@@ -544,22 +538,20 @@ msgid "Cannot connect to the server: %s"
 msgstr "لا يمكن الإتصال بالخادم عن بعد"
 
 #: ../libbalsa/imap-server.c:683
-#, c-format
+#, fuzzy, c-format
 msgid "Exceeded the number of connections per server %s"
-msgstr ""
+msgstr "خطأ في الاتصال بالخادم: %s"
 
 #: ../libbalsa/libbalsa-conf.c:203
 msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
 msgstr ""
 
 #: ../libbalsa/libbalsa.c:354
-#, fuzzy
 msgid "Invalid date"
 msgstr "تاريخ غير صحيح"
 
 #: ../libbalsa/libbalsa.c:370 ../src/pref-manager.c:1321
 #: ../src/pref-manager.c:1417
-#, fuzzy
 msgid "Unknown"
 msgstr "مجهول"
 
@@ -572,10 +564,11 @@ msgid ""
 msgstr ""
 
 #: ../libbalsa/libbalsa.c:528
+#, fuzzy
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
-msgstr ""
+msgstr "<b>حقول الشّهادة</b>"
 
 #: ../libbalsa/libbalsa.c:539
 #, c-format
@@ -589,48 +582,46 @@ msgstr ""
 #: ../libbalsa/libbalsa.c:548
 #, fuzzy
 msgid "SSL/TLS certificate"
-msgstr "شهادة عميل SSL"
+msgstr "شهادة خادم SSL"
 
 #: ../libbalsa/libbalsa.c:550
 #, fuzzy
 msgid "_Accept Once"
-msgstr "اسمح مرة _واحدة"
+msgstr "إ_قبل الترخيص"
 
 #: ../libbalsa/libbalsa.c:551
 #, fuzzy
 msgid "Accept&_Save"
-msgstr "لا تحفظ"
+msgstr "مقبول"
 
 #: ../libbalsa/libbalsa.c:552
-#, fuzzy
 msgid "_Reject"
 msgstr "ارفض_"
 
 #: ../libbalsa/libbalsa.c:597
-#, c-format
+#, fuzzy, c-format
 msgid "Connection to %s timed out. Abort?"
-msgstr ""
+msgstr "نفاذ الوقت%sللاتصال ب\n"
 
 #: ../libbalsa/libbalsa.c:836
 #, fuzzy
 msgid "No image data"
-msgstr "لا يحتوي ملف الصورة '%s' على بيانات"
+msgstr "لا صورة"
 
 #: ../libbalsa/libbalsa.c:880
 #, fuzzy
 msgid "Invalid input format"
-msgstr "نمط الملف غير صحيح."
+msgstr "إدخال غير مقبول لـ %s"
 
 #: ../libbalsa/libbalsa.c:884
 #, fuzzy
 msgid "Internal buffer overrun"
-msgstr "أقصى حد لتخزين للتأخير"
+msgstr "خطأ داخلي"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/libbalsa.c:901
-#, fuzzy
 msgid "Bad X-Face data"
-msgstr "بيانات خاطئة في الأسطوانة %d.  متابعة... "
+msgstr ""
 
 #: ../libbalsa/mailbox.c:452
 #, fuzzy, c-format
@@ -640,27 +631,27 @@ msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
 #: ../libbalsa/mailbox.c:459
 #, fuzzy, c-format
 msgid "No such mailbox type: %s"
-msgstr "ليس ثمّة رسالة %s في %s"
+msgstr "لا توجد هذه الخاصية: %s"
 
 #: ../libbalsa/mailbox.c:476
-#, fuzzy, c-format
+#, c-format
 msgid "Bad local mailbox path \"%s\""
-msgstr "المستخدم ليس محلّيّاً؛ سيتم التّحويل لـ <forward-path>"
+msgstr ""
 
 #: ../libbalsa/mailbox.c:481
 #, fuzzy, c-format
 msgid "Could not create a mailbox of type %s"
-msgstr "%s: لم يمكن قراءة نوع الإتصال"
+msgstr "تعذّر إنشاء الأنبوب: %s"
 
 #: ../libbalsa/mailbox.c:789
 #, fuzzy, c-format
 msgid "Applying filter rules to %s"
-msgstr "تطبيق قواعدة التصفية على الرسائل المنتقاة"
+msgstr "تطبيق قواعد الترشيح على الرسائل المنتقاة"
 
 #: ../libbalsa/mailbox.c:892
 #, fuzzy, c-format
 msgid "Copying from %s to %s"
-msgstr "جاري نسخ الرسائل إلى %s"
+msgstr "نسخ `%s' إلى `%s'"
 
 #: ../libbalsa/mailbox.c:1873
 msgid "Removing messages from source mailbox failed"
@@ -669,29 +660,29 @@ msgstr ""
 #: ../libbalsa/mailbox.c:2804
 #, fuzzy
 msgid "from unknown"
-msgstr "%s:  opcode مجهول من المستضيف %s"
+msgstr "مجهول"
 
 #: ../libbalsa/mailbox.c:2806
-#, fuzzy
 msgid "Loading..."
-msgstr "تحميل..."
+msgstr "جاري التحميل..."
 
 #: ../libbalsa/mailbox.c:3734
 #, fuzzy, c-format
 msgid "Searching %s for partial messages"
-msgstr "جاري المسح عن رسائل مغيّرة"
+msgstr "يجري تفقّد رسائل جديدة"
 
 #: ../libbalsa/mailbox.c:3824
 #, fuzzy
 msgid "Reconstructing message"
-msgstr "إر_سال رسالة"
+msgstr "يجري فك تشفير رسالة"
 
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
 #: ../libbalsa/mailbox_imap.c:543
+#, fuzzy
 msgid "IMAP connection has been severed. Reconnecting..."
-msgstr ""
+msgstr "انقطع اتصال الشبكة."
 
 #: ../libbalsa/mailbox_imap.c:546
 #, c-format
@@ -707,12 +698,12 @@ msgstr ""
 #: ../libbalsa/mailbox_mbox.c:733 ../libbalsa/mailbox_mh.c:551
 #, fuzzy, c-format
 msgid "%s: Opening %s Refcount: %d\n"
-msgstr "جاري فتح المجلّد %s"
+msgstr "عرض الملف %s بواسطة %s\n"
 
 #: ../libbalsa/mailbox_imap.c:1103 ../libbalsa/mailbox_imap.c:2272
 #, fuzzy, c-format
 msgid "Downloading %ld kB"
-msgstr "%.0f كيلوبت/الثانية (تقدير)"
+msgstr "جاري تنزيل الملف"
 
 #: ../libbalsa/mailbox_imap.c:1483
 #, c-format
@@ -729,36 +720,37 @@ msgstr ""
 #: ../libbalsa/mailbox_imap.c:1632 ../libbalsa/mailbox_imap.c:1673
 #, fuzzy
 msgid "Cannot get IMAP handle"
-msgstr "لا يستطيع gedit معالجة المواقع %s."
+msgstr "لا يمكن حذف هذا الشريط"
 
 #: ../libbalsa/mailbox_imap.c:2305
 #, fuzzy
 msgid "Cannot create temporary file"
-msgstr "تعذّر إنشاء ملف مؤقّت لحفظ: %s"
+msgstr "خطاء لا يمكننى تكوين ملف مؤقت:%s\n"
 
 #: ../libbalsa/mailbox_imap.c:2324
 #, fuzzy, c-format
 msgid "Cannot write to temporary file %s"
-msgstr "فشل فتح الملف المؤقّت"
+msgstr "خطاء لا يمكننى تكوين ملف مؤقت:%s\n"
 
 #: ../libbalsa/mailbox_imap.c:2541
 #, fuzzy, c-format
 msgid "Uploading %ld kB"
-msgstr "%.0f كيلوبت/الثانية (تقدير)"
+msgstr "يجري رفع المفاتيح..."
 
 #: ../libbalsa/mailbox_imap.c:2732
+#, fuzzy
 msgid "Server-side threading not supported."
-msgstr ""
+msgstr "نوع المحفوظة غير مدعوم."
 
 #: ../libbalsa/mailbox_local.c:493 ../libbalsa/mailbox_mbox.c:430
 #, fuzzy, c-format
 msgid "Failed to create temporary file \"%s\": %s"
-msgstr "فشل فتح الملف المؤقّت"
+msgstr "فشل انشاء الملف `%s': %s"
 
 #: ../libbalsa/mailbox_local.c:512
 #, fuzzy, c-format
 msgid "Failed to save cache file \"%s\": %s."
-msgstr "الملف الذي فيه سيحفظ تقرير الخلال"
+msgstr "فشل تحميل الملف \"%s\": %s"
 
 #: ../libbalsa/mailbox_local.c:522 ../libbalsa/mailbox_mbox.c:442
 #, c-format
@@ -773,7 +765,7 @@ msgstr ""
 #: ../libbalsa/mailbox_local.c:562
 #, fuzzy, c-format
 msgid "Failed to read cache file %s: %s"
-msgstr "فشلت القراءة من الملف '%s': %s"
+msgstr "فشل في قراءة الملف '%s': %s"
 
 #: ../libbalsa/mailbox_local.c:580 ../libbalsa/mailbox_local.c:597
 #: ../libbalsa/mailbox_local.c:621
@@ -784,45 +776,47 @@ msgstr ""
 #: ../libbalsa/mailbox_local.c:1098
 #, fuzzy, c-format
 msgid "Filtering %s"
-msgstr "جاري تصفية الدّليل"
+msgstr "مرشِّحات"
 
 #: ../libbalsa/mailbox_local.c:1182
 #, fuzzy, c-format
 msgid "Preparing %s"
-msgstr "جاري تحضير الصفحات..."
+msgstr "يجري تحضير %d"
 
 #: ../libbalsa/mailbox_local.c:1967
-#, fuzzy, c-format
+#, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr "فشل فتح \"%s\": %s\n"
+msgstr ""
 
 #: ../libbalsa/mailbox_local.c:1989
 #, fuzzy, c-format
 msgid "Failed to sync mailbox \"%s\""
-msgstr "فشلت الكتابة  لصندوق البريد المؤقّت: %s: %s"
+msgstr "فشل فتح العرض \"%s\"\n"
 
 #: ../libbalsa/mailbox_maildir.c:216
 #, fuzzy, c-format
 msgid "Mailbox %s does not appear to be a Maildir mailbox."
-msgstr "يبدو أن الملف ليس ملف GIF"
+msgstr "يبدو أن الملف '%s' ليس صورة سليمة."
 
 #: ../libbalsa/mailbox_maildir.c:225
 #, fuzzy, c-format
 msgid "Could not create a MailDir directory at %s (%s)"
-msgstr "لم يمكن إنشاء دليل مفاتيح الاختصار لجنوم `%s': %s\n"
+msgstr ""
+"تعذّر إنشاء الدّليل %s:\n"
+"%s"
 
 #: ../libbalsa/mailbox_maildir.c:233 ../libbalsa/mailbox_maildir.c:242
 #: ../libbalsa/mailbox_maildir.c:253
 #, fuzzy, c-format
 msgid "Could not create a MailDir at %s (%s)"
-msgstr "لم أستطع إنشاء ذاكرة مخبئيّة لـ%s"
+msgstr "لم يمكن إنشاء صورة مصغرة لـ %s: %s"
 
 #: ../libbalsa/mailbox_maildir.c:360 ../libbalsa/mailbox_mh.c:311
 #, fuzzy, c-format
 msgid ""
 "Could not remove contents of %s:\n"
 "%s"
-msgstr "لم يمكن حذف الملف %s: %s\n"
+msgstr "تعذّر إزالة مدخل الذّاكرة المخبّأة: %s: %s"
 
 #: ../libbalsa/mailbox_maildir.c:366 ../libbalsa/mailbox_mbox.c:315
 #: ../libbalsa/mailbox_mh.c:317
@@ -830,19 +824,19 @@ msgstr "لم يمكن حذف الملف %s: %s\n"
 msgid ""
 "Could not remove %s:\n"
 "%s"
-msgstr "لم يمكن حذف \"%s\": %s\n"
+msgstr "تعذّر حذف \"%s\": %s\n"
 
 #: ../libbalsa/mailbox_maildir.c:504 ../libbalsa/mailbox_mbox.c:681
 #: ../libbalsa/mailbox_mh.c:532
 #, fuzzy
 msgid "Mailbox does not exist."
-msgstr "الدّليل `%s/%s' غير موجود."
+msgstr "الملف غير موجود"
 
 #: ../libbalsa/mailbox_maildir.c:970 ../libbalsa/mailbox_mbox.c:1987
 #: ../libbalsa/mailbox_mh.c:1155
 #, fuzzy
 msgid "Data copy error"
-msgstr "خطأ مزامنة بيانات الإعدادات: %s"
+msgstr "خطأ في القرص"
 
 #: ../libbalsa/mailbox_mbox.c:211
 #, fuzzy, c-format
@@ -852,42 +846,42 @@ msgstr "يبدو أن الملف ليس ملف GIF"
 #: ../libbalsa/mailbox_mbox.c:418
 #, fuzzy, c-format
 msgid "Could not write file %s: %s"
-msgstr "لم يمكن فتح الملف %s: %s"
+msgstr "تعذّر حذف الملف %s: %s\n"
 
 #: ../libbalsa/mailbox_mbox.c:450
 #, fuzzy, c-format
 msgid "Could not unlink file %s: %s"
-msgstr "لم يمكن فتح الملف %s: %s"
+msgstr "تعذّر فتح الملف: %s: %s"
 
 #: ../libbalsa/mailbox_mbox.c:689
 #, fuzzy
 msgid "Cannot open mailbox."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr "تعذر فتح البريد الإلكتروني"
 
 #: ../libbalsa/mailbox_mbox.c:701
 #, fuzzy
 msgid "Mailbox is not in mbox format."
-msgstr "هذا النسق في نمط غير مدعوم."
+msgstr "هذا السِمة ليست بتنسيق مدعوم."
 
 #: ../libbalsa/mailbox_mbox.c:709
 #, fuzzy
 msgid "Cannot lock mailbox."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr "تعذر فتح البريد الإلكتروني"
 
 #: ../libbalsa/mailbox_mbox.c:1944
 #, fuzzy, c-format
 msgid "%s: could not open %s."
-msgstr "تعذّر فتح `%s'"
+msgstr "لايمكن فتح %s."
 
 #: ../libbalsa/mailbox_mbox.c:1955
-#, c-format
+#, fuzzy, c-format
 msgid "%s: could not get new mime stream."
-msgstr ""
+msgstr "تعذّر جلب الرّسائل الجّديدة"
 
 #: ../libbalsa/mailbox_mbox.c:1963
 #, fuzzy, c-format
 msgid "%s: %s is not in mbox format."
-msgstr "هذا النسق في نمط غير مدعوم."
+msgstr "%s: %s غير مملوك من قبل هوية المستخدم %d."
 
 #: ../libbalsa/mailbox_mh.c:192
 #, fuzzy, c-format
@@ -897,64 +891,68 @@ msgstr "يبدو أن الملف ليس ملف GIF"
 #: ../libbalsa/mailbox_mh.c:202
 #, fuzzy, c-format
 msgid "Could not create MH directory at %s (%s)"
-msgstr "لم يمكن إنشاء دليل مفاتيح الاختصار لجنوم `%s': %s\n"
+msgstr ""
+"تعذّر إنشاء الدّليل %s:\n"
+"%s"
 
 #: ../libbalsa/mailbox_mh.c:214
-#, c-format
+#, fuzzy, c-format
 msgid "Could not create MH structure at %s (%s)"
-msgstr ""
+msgstr "تعذّر إنشاء مقبس: %s"
 
 #: ../libbalsa/mailbox_mh.c:1136
 #, fuzzy
 msgid "Cannot create message"
-msgstr "لا يمكن فتح الرّسالة"
+msgstr "لا يمكن انشاء رسالة CMS"
 
 #: ../libbalsa/mailbox_mh.c:1180
 #, fuzzy
 msgid "Message rename error"
-msgstr "خطأ في جلب الرسالة"
+msgstr "ترويسة الرّسالة"
 
 #: ../libbalsa/mailbox_pop3.c:190
 #, fuzzy, c-format
 msgid "Error appending message %d from %s to %s: %s"
-msgstr "خطأ: فشل بعث الرسالة"
+msgstr ""
+"حدث خطأ أثناء حفظ الرسائل إلى: %s:\n"
+" %s"
 
 #: ../libbalsa/mailbox_pop3.c:339
 #, fuzzy, c-format
 msgid "Saving POP message to %s failed"
-msgstr "خطأ: فشل بعث الرسالة"
+msgstr "يجري حفظ الرّسالة في المجلّد"
 
 #: ../libbalsa/mailbox_pop3.c:346
 #, fuzzy, c-format
 msgid "Retrieving Message %d of %d"
-msgstr "جاري سحب الرسالة %s"
+msgstr "يجري جلب الرّسالة %d من أصل %d"
 
 #: ../libbalsa/mailbox_pop3.c:369
 #, fuzzy, c-format
 msgid "Received %ld kB of %ld"
-msgstr "%.0f كيلوبت/الثانية (تقدير)"
+msgstr "العنصر %d من %d"
 
 #: ../libbalsa/mailbox_pop3.c:383
 #, fuzzy, c-format
 msgid "Saving POP message to %s failed."
-msgstr "خطأ: فشل بعث الرسالة"
+msgstr "يجري حفظ الرّسالة في المجلّد"
 
 #: ../libbalsa/mailbox_pop3.c:393
 #, fuzzy, c-format
 msgid "Transferring POP message to %s failed."
-msgstr "خطأ: فشل بعث الرسالة"
+msgstr "جاري نقل المكالمة إلى %s"
 
 #: ../libbalsa/mailbox_pop3.c:469
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
 "%s"
-msgstr "خطأ أثناء كتابة ملف البريد المؤقّت: %s"
+msgstr ""
 
 #: ../libbalsa/mailbox_pop3.c:494
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 mailbox %s error: %s\n"
-msgstr "خطأ أثناء الكتابة لصندوق البريد المؤقّت: %s"
+msgstr ""
 
 #: ../libbalsa/mailbox_pop3.c:531
 #, c-format
@@ -962,21 +960,19 @@ msgid "POP3 message %d oversized: %d kB - skipped."
 msgstr ""
 
 #: ../libbalsa/mailbox_pop3.c:543
-#, c-format
+#, fuzzy, c-format
 msgid "POP3 error: cannot open %s for writing."
-msgstr ""
+msgstr "خطاء :لا يمكن فتح %s للكتابة %s\n"
 
 #: ../libbalsa/mailbox_pop3.c:551
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 error: cannot close %s."
-msgstr "لا يمكن إيجاد ملف رقم  '%s'"
+msgstr ""
 
 #: ../libbalsa/mailbox_pop3.c:584
 #, fuzzy, c-format
 msgid "POP3 error: %s."
-msgstr ""
-"خطأ GConf:\n"
-"  %s"
+msgstr "خطأ CORBA : %s"
 
 #: ../libbalsa/message.c:624 ../libbalsa/message.c:664
 #, c-format
@@ -986,27 +982,27 @@ msgstr ""
 #: ../libbalsa/misc.c:623
 #, fuzzy
 msgid "west european"
-msgstr "وسط أوروبيّة"
+msgstr "غرب أوروبي"
 
 #: ../libbalsa/misc.c:625 ../libbalsa/misc.c:659
 #, fuzzy
 msgid "east european"
-msgstr "وسط أوروبيّة"
+msgstr "غرب أوروبي"
 
 #: ../libbalsa/misc.c:627
 #, fuzzy
 msgid "south european"
-msgstr "جنوب اوروبا"
+msgstr "جنوب اوروبي"
 
 #: ../libbalsa/misc.c:629
 #, fuzzy
 msgid "north european"
-msgstr "وسط أوروبيّة"
+msgstr "جنوب اوروبي"
 
 #: ../libbalsa/misc.c:631 ../libbalsa/misc.c:661
 #, fuzzy
 msgid "cyrillic"
-msgstr "السّريليّة"
+msgstr "انقر"
 
 #: ../libbalsa/misc.c:633 ../libbalsa/misc.c:667
 #, fuzzy
@@ -1016,17 +1012,17 @@ msgstr "عربي"
 #: ../libbalsa/misc.c:635 ../libbalsa/misc.c:663
 #, fuzzy
 msgid "greek"
-msgstr "اليونانيّة"
+msgstr "أخضر"
 
 #: ../libbalsa/misc.c:637 ../libbalsa/misc.c:665
 #, fuzzy
 msgid "hebrew"
-msgstr "العبريّة"
+msgstr "كرة"
 
 #: ../libbalsa/misc.c:639
 #, fuzzy
 msgid "turkish"
-msgstr "التركيّة"
+msgstr "الكردية"
 
 #: ../libbalsa/misc.c:641
 #, fuzzy
@@ -1036,12 +1032,12 @@ msgstr "شمالي"
 #: ../libbalsa/misc.c:643
 #, fuzzy
 msgid "thai"
-msgstr "ا-ص|تايلندي"
+msgstr "الثّالث"
 
 #: ../libbalsa/misc.c:645 ../libbalsa/misc.c:669
 #, fuzzy
 msgid "baltic"
-msgstr "البلطيقيّة"
+msgstr "كلتي"
 
 #: ../libbalsa/misc.c:647
 #, fuzzy
@@ -1049,29 +1045,28 @@ msgid "celtic"
 msgstr "كلتي"
 
 #: ../libbalsa/misc.c:649
-#, fuzzy
 msgid "west europe (euro)"
-msgstr "أوروبا/سان مارينو"
+msgstr ""
 
 #: ../libbalsa/misc.c:651
 #, fuzzy
 msgid "russian"
-msgstr "ا-ص|روسي"
+msgstr "روسيا"
 
 #: ../libbalsa/misc.c:653
 #, fuzzy
 msgid "ukrainian"
-msgstr "الأكرانية"
+msgstr "ا-ص|اكراني"
 
 #: ../libbalsa/misc.c:655
 #, fuzzy
 msgid "japanese"
-msgstr "اليابانية"
+msgstr "ض-ي|ياباني"
 
 #: ../libbalsa/misc.c:657
 #, fuzzy
 msgid "korean"
-msgstr "الكوريّة"
+msgstr "أكثر من"
 
 #: ../libbalsa/misc.c:982
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -1080,31 +1075,31 @@ msgstr ""
 #: ../libbalsa/misc.c:989
 #, fuzzy, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr "قفل القنوات ل %s معا. "
+msgstr "في انتظار نقلة %s."
 
 #: ../libbalsa/misc.c:1017
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr ""
 
 #: ../libbalsa/misc.c:1024
-#, fuzzy, c-format
+#, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr "انتظار التفويض من “%s”..."
+msgstr ""
 
 #: ../libbalsa/misc.c:1322
 #, fuzzy, c-format
 msgid "LDAP Directory for %s"
-msgstr "هيكل الدلائل للملفات"
+msgstr "دليل GPS"
 
 #: ../libbalsa/rfc3156.c:86
-#, c-format
+#, fuzzy, c-format
 msgid "Gpgme has been compiled without support for protocol %s."
-msgstr ""
+msgstr "جُمِّع مِتسِتي دون دعم للنمط المطنب\n"
 
 #: ../libbalsa/rfc3156.c:91
-#, c-format
+#, fuzzy, c-format
 msgid "Crypto engine %s is not installed properly."
-msgstr ""
+msgstr "نوع الجلسة %s المحبذ لديك غير مثبت على هذا الحاسوب."
 
 #: ../libbalsa/rfc3156.c:96
 #, c-format
@@ -1114,21 +1109,21 @@ msgid ""
 msgstr ""
 
 #: ../libbalsa/rfc3156.c:103
-#, c-format
+#, fuzzy, c-format
 msgid "Unknown problem with engine for protocol %s."
-msgstr ""
+msgstr "لا يتوفّر مُزوّد للبرتوكول `%s'"
 
 #: ../libbalsa/rfc3156.c:108
 #, fuzzy, c-format
 msgid "%s: could not retrieve crypto engine information: %s."
-msgstr "لم أستطع تلقي معلومات عن الملف"
+msgstr "%s:لم أتمكن من كتابة مُدْخَل تخويل جديد: %s"
 
 #: ../libbalsa/rfc3156.c:112
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Disable support for protocol %s."
-msgstr "لا مُقدّم متوفّر للبرتوكول `%s'"
+msgstr "عطّل البروتوكولات الغير آمنة"
 
 #: ../libbalsa/rfc3156.c:254 ../libbalsa/rfc3156.c:259
 #: ../libbalsa/rfc3156.c:346 ../libbalsa/rfc3156.c:351
@@ -1141,49 +1136,54 @@ msgid "creating a gpgme context failed"
 msgstr ""
 
 #: ../libbalsa/rfc3156.c:272 ../libbalsa/rfc3156.c:757
+#, fuzzy
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr ""
+"تحتاج إلى جملة سرّ لتفك القفل عن مفتاح\n"
+"المستخدم: \"%s\""
 
 #: ../libbalsa/rfc3156.c:293 ../libbalsa/rfc3156.c:297
 #: ../libbalsa/rfc3156.c:789
 #, fuzzy
 msgid "signing failed"
-msgstr "فشل الاختبار %d"
+msgstr "فشل التوقيع"
 
 #: ../libbalsa/rfc3156.c:400 ../libbalsa/rfc3156.c:405
 #: ../libbalsa/rfc3156.c:792
 #, fuzzy
 msgid "encryption failed"
-msgstr "فشل الاختبار %d"
+msgstr "فشلت التعمية"
 
 #: ../libbalsa/rfc3156.c:548 ../libbalsa/rfc3156.c:553
 #: ../libbalsa/rfc3156.c:868 ../libbalsa/rfc3156.c:874
 #, fuzzy
 msgid "signature verification failed"
-msgstr "فشل تسجيل %s إلى %s"
+msgstr "فشل إلغاء التسجيل"
 
 #: ../libbalsa/rfc3156.c:642 ../libbalsa/rfc3156.c:948
+#, fuzzy
 msgid "Enter passphrase to decrypt message"
-msgstr ""
+msgstr "أدخل عبارة السر لـ'%s'"
 
 #: ../libbalsa/rfc3156.c:675 ../libbalsa/rfc3156.c:680
 #, fuzzy
 msgid "decryption failed"
-msgstr "فشل الاختبار %d"
+msgstr "فشلت التعمية"
 
 #: ../libbalsa/rfc3156.c:785 ../libbalsa/rfc3156.c:799
+#, fuzzy
 msgid "signing and encryption failed"
-msgstr ""
+msgstr "فشلت التعمية"
 
 #: ../libbalsa/rfc3156.c:802
 #, fuzzy, c-format
 msgid "signing failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "فشل النشر: %s"
 
 #: ../libbalsa/rfc3156.c:805
 #, fuzzy, c-format
 msgid "encryption failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "فشلت العمليّة: %s"
 
 #: ../libbalsa/rfc3156.c:957 ../libbalsa/rfc3156.c:964
 msgid "decryption and signature verification failed"
@@ -1192,12 +1192,11 @@ msgstr ""
 #: ../libbalsa/rfc3156.c:995
 #, fuzzy
 msgid "The signature is valid."
-msgstr "ليس %s موقعا سليما."
+msgstr "الاسم الجديد فراغ."
 
 #: ../libbalsa/rfc3156.c:997
-#, fuzzy
 msgid "The signature is valid but expired."
-msgstr "عفوا، لكن \"%s\" ليس اسم ملف صحيح."
+msgstr ""
 
 #: ../libbalsa/rfc3156.c:1000
 msgid ""
@@ -1213,19 +1212,22 @@ msgstr ""
 #: ../libbalsa/rfc3156.c:1006
 #, fuzzy
 msgid "The signature is invalid."
-msgstr "العنوان \"%s\" غير سليم."
+msgstr "تنسيق الملف غير صحيح."
 
 #: ../libbalsa/rfc3156.c:1009
+#, fuzzy
 msgid "The signature could not be verified due to a missing key."
-msgstr ""
+msgstr "لم يمكن حذف العنصر بسبب خطأ ما"
 
 #: ../libbalsa/rfc3156.c:1011
+#, fuzzy
 msgid "This part is not a real PGP signature."
-msgstr ""
+msgstr "هذا ليس مكان صحيح."
 
 #: ../libbalsa/rfc3156.c:1014
+#, fuzzy
 msgid "The signature could not be verified due to an invalid crypto engine."
-msgstr ""
+msgstr "لم يمكن حذف العنصر بسبب خطأ ما"
 
 #: ../libbalsa/rfc3156.c:1017 ../libbalsa/rfc3156.c:1759
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
@@ -1234,23 +1236,26 @@ msgstr ""
 #: ../libbalsa/rfc3156.c:1020
 #, fuzzy
 msgid "An error prevented the signature verification."
-msgstr "خطأ في تحقّق التّطبيق"
+msgstr "حدث خطأ أثناء تطبيق العمليات"
 
 #: ../libbalsa/rfc3156.c:1028
 msgid "The user ID is of unknown validity."
 msgstr ""
 
 #: ../libbalsa/rfc3156.c:1030
+#, fuzzy
 msgid "The validity of the user ID is undefined."
-msgstr ""
+msgstr "العرض الإفتراضي للوح الجانبي في النوافذ الجديدة."
 
 #: ../libbalsa/rfc3156.c:1032
+#, fuzzy
 msgid "The user ID is never valid."
-msgstr ""
+msgstr "تنسيق الملف غير صحيح."
 
 #: ../libbalsa/rfc3156.c:1034
+#, fuzzy
 msgid "The user ID is marginally valid."
-msgstr ""
+msgstr "تنسيق الملف غير صحيح."
 
 #: ../libbalsa/rfc3156.c:1036
 msgid "The user ID is fully valid."
@@ -1263,64 +1268,64 @@ msgstr ""
 #: ../libbalsa/rfc3156.c:1040 ../libbalsa/rfc3156.c:1287
 #, fuzzy
 msgid "bad validity"
-msgstr "بيانات سيّئة"
+msgstr "الصلاحية"
 
 #: ../libbalsa/rfc3156.c:1048
 #, fuzzy
 msgid "PGP signature: "
-msgstr "توقيع سليم"
+msgstr "توقيع جيّد"
 
 #: ../libbalsa/rfc3156.c:1050
 #, fuzzy
 msgid "S/MIME signature: "
-msgstr "توقيع سليم"
+msgstr "تو_قيع:"
 
 #: ../libbalsa/rfc3156.c:1052
 #, fuzzy
 msgid "(unknown protocol) "
-msgstr "بروتوكول غير آمن"
+msgstr "(خطأ مجهول)"
 
 #: ../libbalsa/rfc3156.c:1071
 #, fuzzy, c-format
 msgid ""
 "\n"
 "User ID: %s"
-msgstr "هوية البوّاب:"
+msgstr "هوية المستخدم:"
 
 #: ../libbalsa/rfc3156.c:1074
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Signed by: %s"
-msgstr "المطورون"
+msgstr "المظهر : %s"
 
 #: ../libbalsa/rfc3156.c:1078
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Mail address: %s"
-msgstr "عنوان البريد الإلكتروني"
+msgstr "عنوان البريد الالكترونى:"
 
 #: ../libbalsa/rfc3156.c:1083
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Signed on: %s"
-msgstr "استماع على:"
+msgstr "المظهر : %s"
 
 #: ../libbalsa/rfc3156.c:1085
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "User ID validity: %s"
-msgstr "الهويّة الفريدة للمُصدر"
+msgstr ""
 
 #: ../libbalsa/rfc3156.c:1089
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Key owner trust: %s"
-msgstr "إتّحاد سلطات الشّهادات"
+msgstr "مالك المفتاح:"
 
 #: ../libbalsa/rfc3156.c:1093
 #, fuzzy, c-format
@@ -1334,34 +1339,34 @@ msgstr "بصمة MD5:"
 msgid ""
 "\n"
 "Subkey created on: %s"
-msgstr "على هذا الحاسوب"
+msgstr "انتهت صلاحية هذا المفتاح في: %s"
 
 #: ../libbalsa/rfc3156.c:1103
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Subkey expires on: %s"
-msgstr "على هذا الحاسوب"
+msgstr "انتهت صلاحية هذا المفتاح في: %s"
 
 #: ../libbalsa/rfc3156.c:1112
 #, fuzzy
 msgid " revoked"
-msgstr "أبطلت الشّهادة"
+msgstr "مُبطل"
 
 #: ../libbalsa/rfc3156.c:1117
 #, fuzzy
 msgid " expired"
-msgstr "المؤهّلات المشار إليها قد إنتهت صلاحيّتها."
+msgstr "منتهي الصلاحية"
 
 #: ../libbalsa/rfc3156.c:1122
 #, fuzzy
 msgid " disabled"
-msgstr "معطل"
+msgstr "(معطّل)"
 
 #: ../libbalsa/rfc3156.c:1127
 #, fuzzy
 msgid " invalid"
-msgstr "غير صحيح"
+msgstr "غير صالح"
 
 #. ngettext: string begins with a single space, so no space after
 #. * the colon is correct punctuation (in English).
@@ -1374,33 +1379,33 @@ msgid_plural ""
 "\n"
 "Subkey attributes:%s"
 msgstr[0] "معيار البحث:"
-msgstr[1] ""
+msgstr[1] "معيار البحث:"
 
 #: ../libbalsa/rfc3156.c:1140
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Issuer name: %s"
-msgstr "اسم الموصول"
+msgstr "اسم المستخدم: "
 
 #: ../libbalsa/rfc3156.c:1144
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Issuer serial number: %s"
-msgstr "عدد الصفحات أفقيا"
+msgstr "الرقم المسلسل:"
 
 #: ../libbalsa/rfc3156.c:1147
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Chain ID: %s"
-msgstr "هوية البوّاب:"
+msgstr "المظهر : %s"
 
 #: ../libbalsa/rfc3156.c:1194
-#, c-format
+#, fuzzy, c-format
 msgid "Could not launch %s to get the public key %s."
-msgstr ""
+msgstr "لم يمكن فتح الملف %s."
 
 #: ../libbalsa/rfc3156.c:1244
 #, c-format
@@ -1414,17 +1419,16 @@ msgstr ""
 msgid ""
 "Running gpg successful:\n"
 "%s"
-msgstr "%s: جاري تشغيل XKeepsCrashing script"
+msgstr "_نجح الولوج:"
 
 #: ../libbalsa/rfc3156.c:1275
-#, fuzzy
 msgid "unknown"
 msgstr "مجهول"
 
 #: ../libbalsa/rfc3156.c:1277
 #, fuzzy
 msgid "undefined"
-msgstr "غير معرّف"
+msgstr "سطِّر"
 
 #: ../libbalsa/rfc3156.c:1279 ../src/address-book-config.c:193
 #, fuzzy
@@ -1432,88 +1436,84 @@ msgid "never"
 msgstr "أبداً"
 
 #: ../libbalsa/rfc3156.c:1281
+#, fuzzy
 msgid "marginal"
-msgstr ""
+msgstr "هامشي"
 
 #: ../libbalsa/rfc3156.c:1283
 #, fuzzy
 msgid "full"
-msgstr "_كامل"
+msgstr "كامل"
 
 #: ../libbalsa/rfc3156.c:1285
+#, fuzzy
 msgid "ultimate"
-msgstr ""
+msgstr "نهائي"
 
 #: ../libbalsa/rfc3156.c:1348
-#, fuzzy
 msgid "User ID"
-msgstr "هوية \"ID\" المستخدم:"
+msgstr "هوية المستخدم:"
 
 #: ../libbalsa/rfc3156.c:1348
-#, fuzzy
 msgid "Key ID"
-msgstr "هوية _مفتاح PGP/GPG:"
+msgstr "هويّة (ID) المفتاح"
 
 #: ../libbalsa/rfc3156.c:1348
-#, fuzzy
 msgid "Length"
 msgstr "المدة"
 
 #: ../libbalsa/rfc3156.c:1348
-#, fuzzy
 msgid "Validity"
-msgstr "<b>الصلوحية</b>"
+msgstr "الصلاحية"
 
 #. FIXME: create dialog according to the Gnome HIG
 #: ../libbalsa/rfc3156.c:1392
 #, fuzzy
 msgid "Select key"
-msgstr "اتفاق على المفتاح"
+msgstr "%d مفتاح منتقى"
 
 #: ../libbalsa/rfc3156.c:1403
-#, c-format
+#, fuzzy, c-format
 msgid "Select the private key for the signer %s"
-msgstr ""
+msgstr "اختر ملف المفتاح الشخصي"
 
 #: ../libbalsa/rfc3156.c:1407
-#, c-format
+#, fuzzy, c-format
 msgid "Select the public key for the recipient %s"
-msgstr ""
+msgstr "انتقي سِمة لسطح المكتب"
 
 #: ../libbalsa/rfc3156.c:1538
-#, c-format
+#, fuzzy, c-format
 msgid "Insufficient trust for recipient %s"
-msgstr ""
+msgstr "تصاريح غير كافية لفتح أداة القرص المرن %s."
 
 #: ../libbalsa/rfc3156.c:1540
-#, c-format
+#, fuzzy, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
-msgstr ""
+msgstr "هويّة الحاسوب البعيد (%s) مجهولة."
 
 #: ../libbalsa/rfc3156.c:1551
-#, fuzzy
 msgid "Use this key anyway?"
-msgstr "هل تستخدم هذه العملية توسيط المفاتيح"
+msgstr ""
 
 #: ../libbalsa/rfc3156.c:1760
 #, fuzzy
 msgid "Try again later."
-msgstr "رجاء حاول مرة أخرى."
+msgstr "حاول مرة أخرى"
 
 #: ../libbalsa/send.c:243 ../libbalsa/send.c:250
 #, fuzzy
 msgid "Sending Mail..."
-msgstr "جاري إرسال البريد"
+msgstr "يجري إرسال البريد"
 
-#: ../libbalsa/send.c:246 ../src/main-window.c:2850
-#, fuzzy
+#: ../libbalsa/send.c:246 ../src/main-window.c:2849
 msgid "_Hide"
-msgstr "إ_خفاء"
+msgstr "ا_خفي"
 
 #: ../libbalsa/send.c:453
 #, fuzzy, c-format
 msgid "Copying message to outbox failed: %s"
-msgstr "خطأ: فشل بعث الرسالة"
+msgstr "نسخ الرسائل إلى المجلّد %s"
 
 #: ../libbalsa/send.c:882
 #, c-format
@@ -1526,7 +1526,7 @@ msgstr ""
 #: ../libbalsa/send.c:926
 #, fuzzy, c-format
 msgid "Saving sent message to %s failed: %s"
-msgstr "خطأ: فشل بعث الرسالة"
+msgstr "يجري حفظ الرّسالة في المجلّد"
 
 #: ../libbalsa/send.c:945 ../libbalsa/send.c:957
 #, c-format
@@ -1545,7 +1545,7 @@ msgstr ""
 #: ../libbalsa/send.c:994
 #, fuzzy
 msgid "Connected to MTA"
-msgstr "غير متصل بشريط الإتصال"
+msgstr "التصال ب %s%d\n"
 
 #. status code, mailbox
 #: ../libbalsa/send.c:1003
@@ -1557,36 +1557,38 @@ msgstr "مِن %s"
 #: ../libbalsa/send.c:1007
 #, fuzzy, c-format
 msgid "From %s: %d %s"
-msgstr "مِن %s"
+msgstr "من %s:"
 
 #. status code, mailbox
 #: ../libbalsa/send.c:1018
 #, fuzzy, c-format
 msgid "To: %d <%s>"
-msgstr "إلى:"
+msgstr "الوقت: %s %s"
 
 #. mailbox, status code, status text
 #: ../libbalsa/send.c:1022
 #, fuzzy, c-format
 msgid "To %s: %d %s"
-msgstr "إلى:"
+msgstr "%s %s %s"
 
 #: ../libbalsa/send.c:1060
 #, fuzzy
 msgid "Disconnected"
-msgstr "قطع الإتصال"
+msgstr "اقطع الاتصال"
 
 #: ../libbalsa/send.c:1333
+#, fuzzy
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
-msgstr ""
+msgstr "من فضلك تأكّد من اتصالك بالإنترنت"
 
 #: ../libbalsa/send.c:1338
+#, fuzzy
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
-msgstr ""
+msgstr "من فضلك تأكّد من اتصالك بالإنترنت"
 
 #: ../libbalsa/send.c:1347
 msgid "Message left in Outbox (try again later)"
@@ -1607,22 +1609,22 @@ msgstr ""
 #: ../libbalsa/send.c:1860
 #, fuzzy, c-format
 msgid "Postponing message failed: %s"
-msgstr "فشل عند الرّسالة %d"
+msgstr "فشل النشر: %s"
 
 #: ../libbalsa/send.c:2003 ../libbalsa/send.c:2085
+#, fuzzy
 msgid "This message will not be encrypted for the BCC: recipient(s)."
-msgstr ""
+msgstr "لا يمكن إرسال هذه الرسالة لأنك لم تحدد أي مستلمين لها"
 
 #. host, authentication method
 #: ../libbalsa/server.c:366
 #, fuzzy, c-format
 msgid "Logging in to %s using %s"
-msgstr "إسم الملف الذي سيُعرض في البريد."
+msgstr "جاري الولوج إلى {0}"
 
 #: ../libbalsa/smtp-server.c:375 ../src/mailbox-conf.c:204
 #: ../src/mailbox-conf.c:1393 ../src/pref-manager.c:388
 #: ../src/pref-manager.c:3247
-#, fuzzy
 msgid "Never"
 msgstr "أبداً"
 
@@ -1630,158 +1632,158 @@ msgstr "أبداً"
 #: ../src/mailbox-conf.c:1394
 #, fuzzy
 msgid "If Possible"
-msgstr "انتقل هوائيّاً، بأمانٍ إن أمكن"
+msgstr "دخْل/خرْج ممكن الآن"
 
 #: ../libbalsa/smtp-server.c:377 ../src/mailbox-conf.c:206
 #, fuzzy
 msgid "Required"
-msgstr "الدفع مطلوب"
+msgstr "تتطلّب"
 
 #: ../libbalsa/smtp-server.c:414 ../src/folder-conf.c:105
 #, fuzzy, c-format
 msgid "Error displaying %s: %s\n"
-msgstr ""
-"خطأ GConf:\n"
-"  %s"
+msgstr "فشل في قراءة %s: %s"
 
 #: ../libbalsa/smtp-server.c:530
 #, fuzzy
 msgid "SMTP Server"
-msgstr "خادم SMTP %s"
+msgstr "خادم PPTP"
 
 #: ../libbalsa/smtp-server.c:552
 #, fuzzy
 msgid "_Descriptive Name:"
-msgstr "اسم الموصول"
+msgstr "ال_وصف:"
 
 #. pop server
 #. imap server
 #: ../libbalsa/smtp-server.c:559 ../src/folder-conf.c:361
 #: ../src/mailbox-conf.c:1145 ../src/mailbox-conf.c:1248
-#, fuzzy
 msgid "_Server:"
 msgstr "ال_خادم:"
 
 #: ../libbalsa/smtp-server.c:566
-#, fuzzy
 msgid "_User Name:"
 msgstr "ا_سم المستخدم:"
 
 #: ../libbalsa/smtp-server.c:573
 #, fuzzy
 msgid "_Pass Phrase:"
-msgstr "كلمة الس_ر..."
+msgstr "عبارة السر:"
 
 #: ../libbalsa/smtp-server.c:582 ../src/mailbox-conf.c:225
 #, fuzzy
 msgid "Use _TLS:"
-msgstr "استخدام الثّلاث نقاط"
+msgstr "استخدم توثيق TLS:"
 
 #: ../libbalsa/smtp-server.c:587
 #, fuzzy
 msgid "C_ertificate Pass Phrase:"
-msgstr "جملة غير موجودة"
+msgstr "كلمة سر الشهادة:"
 
 #: ../libbalsa/smtp-server.c:599
+#, fuzzy
 msgid "Sp_lit message larger than"
-msgstr ""
+msgstr "احذف رسالة بعد الت_عامل معها"
 
 #: ../libbalsa/smtp-server.c:605 ../src/pref-manager.c:1826
 #, fuzzy
 msgid "MB"
-msgstr "مب"
+msgstr "MBR"
 
 #. Items
 #: ../libbalsa/source-viewer.c:47 ../src/mailbox-node.c:1069
-#: ../src/main-window.c:766 ../src/main-window.c:871
+#: ../src/main-window.c:765 ../src/main-window.c:870
 #, fuzzy
 msgid "_Close"
-msgstr "أ_غلق"
+msgstr "أغلق"
 
 #: ../libbalsa/source-viewer.c:48
 #, fuzzy
 msgid "Close the window"
-msgstr "غلق النّافذة"
+msgstr "إغلاق النافذة"
 
 #: ../libbalsa/source-viewer.c:49
 #, fuzzy
 msgid "_Copy"
-msgstr "_نسخ"
+msgstr "ان_سخ"
 
 #: ../libbalsa/source-viewer.c:50
 #, fuzzy
 msgid "Copy text"
-msgstr "ال_نص للنسخ:"
+msgstr "سياقي"
 
-#: ../libbalsa/source-viewer.c:51 ../src/main-window.c:675
+#: ../libbalsa/source-viewer.c:51 ../src/main-window.c:674
 #, fuzzy
 msgid "_Select Text"
-msgstr "إنتقاء كامل النّص"
+msgstr "انتقي ك_ل النص"
 
-#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:676
+#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:675
 #, fuzzy
 msgid "Select entire mail"
-msgstr "اختيار كامل الصفحة"
+msgstr "اختر كامل السجلّ"
 
 #: ../libbalsa/source-viewer.c:57
 #, fuzzy
 msgid "_Escape Special Characters"
-msgstr "HTML - حروف خاصة"
+msgstr "رمز الإفلات"
 
 #: ../libbalsa/source-viewer.c:58
+#, fuzzy
 msgid "Escape special and non-ASCII characters"
-msgstr ""
+msgstr "أدرِج محرف خاص %s"
 
 #: ../libbalsa/source-viewer.c:154
 #, fuzzy
 msgid "Mailbox closed"
-msgstr "غطاء مغلق"
+msgstr "موقع صندوق البريد"
 
 #: ../libbalsa/source-viewer.c:257
 #, fuzzy
 msgid "Message Source"
-msgstr "_مصدر الصفحة"
+msgstr "م_صدر الرسالة"
 
 #: ../libinit_balsa/balsa-druid-page-defclient.c:58
+#, fuzzy
 msgid "Use balsa as default email client?"
-msgstr ""
+msgstr "استخدام رقيب وزبون سبامأساسين"
 
 #: ../libinit_balsa/balsa-druid-page-defclient.c:62
-#, fuzzy
 msgid "_Yes"
 msgstr "_نعم"
 
 #: ../libinit_balsa/balsa-druid-page-defclient.c:64
-#, fuzzy
 msgid "_No"
 msgstr "_لا"
 
 #: ../libinit_balsa/balsa-druid-page-defclient.c:100
 #, fuzzy
 msgid "Default Client"
-msgstr "اسم التابع"
+msgstr "عميل البريد الافتراضي"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:43
 #, fuzzy
 msgid "_Inbox:"
-msgstr "_صندوق الوارد:"
+msgstr "_صناديق الدخْل:"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:43
+#, fuzzy
 msgid "_Outbox:"
-msgstr ""
+msgstr "خارج:"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:43
+#, fuzzy
 msgid "_Sentbox:"
-msgstr ""
+msgstr "أرسِل إلى:"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:43
+#, fuzzy
 msgid "_Draftbox:"
-msgstr ""
+msgstr "مسوّدة"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:44
 #, fuzzy
 msgid "_Trash:"
-msgstr "المهملات"
+msgstr "_المهملات"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:71
 #, c-format
@@ -1804,15 +1806,15 @@ msgstr ""
 #: ../libinit_balsa/balsa-druid-page-directory.c:246
 #, fuzzy
 msgid "Mail Files"
-msgstr "كل الملفّات"
+msgstr "مرشحات البريد"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:349
 #: ../libinit_balsa/balsa-druid-page-directory.c:383
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Problem Creating Mailboxes\n"
 "%s"
-msgstr "%s: فشل إنشاء الانبوب"
+msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-finish.c:41
 msgid ""
@@ -1823,16 +1825,15 @@ msgstr ""
 #: ../libinit_balsa/balsa-druid-page-finish.c:47
 #, fuzzy
 msgid "All Done!"
-msgstr "تم الاختبار %d"
+msgstr "اسمح مرة واحدة"
 
 #: ../libinit_balsa/balsa-druid-page-finish.c:77
 #, fuzzy
 msgid "GnomeCard Address Book"
-msgstr "بريد (دفتر العناوين)"
+msgstr "أضف دفتر عناوين"
 
 #: ../libinit_balsa/balsa-druid-page-finish.c:84
 #: ../libinit_balsa/balsa-druid-page-finish.c:92 ../src/ab-window.c:229
-#, fuzzy
 msgid "Address Book"
 msgstr "دفتر العناوين"
 
@@ -1851,49 +1852,47 @@ msgid ""
 msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
-#, fuzzy
 msgid "Yes, remember it"
-msgstr "له منبّهات."
+msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
 msgid "No, type it in every time"
 msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-user.c:114
-#, fuzzy
 msgid "Name of mail server for incoming _mail:"
-msgstr "يحلل البريد الوارد بحثا عن فيروسات"
+msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-user.c:119
 #, fuzzy
 msgid "_Type of mail server:"
-msgstr "نوع التّبليغ ببريدٍ جديد"
+msgstr "نوع المشهد:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:123
 #, fuzzy
 msgid "Connect using _SSL:"
-msgstr "شهادة عميل SSL"
+msgstr "اتصل _كمستخدم:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:126
 #, fuzzy
 msgid "Your email _login name:"
-msgstr "ارسل بريد إلكتروني إلى  <b>%(name)s</b> (%(email)s)"
+msgstr "حاجزك النارى و اسمك "
 
 #: ../libinit_balsa/balsa-druid-page-user.c:129
 #, fuzzy
 msgid "Your _password:"
-msgstr "الرجاء إدخال كلمة السر:"
+msgstr "_كلمة سر المستخدم:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:137
 #, fuzzy
 msgid "_SMTP Server:"
-msgstr "خادم SMTP %s"
+msgstr "STUN خادم"
 
 #. 2.1
 #: ../libinit_balsa/balsa-druid-page-user.c:142
 #, fuzzy
 msgid "Your real _name:"
-msgstr "أدخل اسمك الأول"
+msgstr "حاجزك النارى و اسمك "
 
 #: ../libinit_balsa/balsa-druid-page-user.c:148
 msgid "Your _Email Address, for this email account:"
@@ -1902,22 +1901,22 @@ msgstr ""
 #: ../libinit_balsa/balsa-druid-page-user.c:153
 #, fuzzy
 msgid "_Remember your password:"
-msgstr "تذكّر كلمة السر هذه"
+msgstr "ت_ذكّر كلمة السر"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:156
 #, fuzzy
 msgid "_Refer to this account as:"
-msgstr "إضافة هذا كدرج للشريط"
+msgstr "حسابات مسجلة:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:164
 #, fuzzy
 msgid "_Local mail directory:"
-msgstr "ملف البريد المحلّي %s"
+msgstr "ليس دليل maildir"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:181
 #, fuzzy
 msgid "User Settings"
-msgstr "إعدادات المستخدم %s"
+msgstr "إعدادات المستخدمين"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:333
 #, fuzzy, c-format
@@ -1929,7 +1928,7 @@ msgstr "ملف البريد المحلّي %s"
 #: ../libinit_balsa/balsa-druid-page-welcome.c:32
 #, fuzzy
 msgid "Welcome to Balsa!"
-msgstr "الإ_فتراضي: \"أهلا بك في %n\""
+msgstr "أهلا بك في Iagno!"
 
 #: ../libinit_balsa/balsa-druid-page-welcome.c:35
 msgid ""
@@ -1944,15 +1943,16 @@ msgid ""
 msgstr ""
 
 #: ../libinit_balsa/balsa-initdruid.c:81
+#, fuzzy
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
-msgstr ""
+msgstr "هل تريد حقاً عمل هذا؟"
 
 #: ../libinit_balsa/helper.c:66
 #, fuzzy, c-format
 msgid "Error loading %s: %s\n"
-msgstr "خطأ عند تحميل الرزنامة"
+msgstr "فشل في قراءة %s: %s"
 
 #: ../libinit_balsa/helper.c:202
 #, c-format
@@ -1960,84 +1960,82 @@ msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
 
 #: ../libinit_balsa/helper.c:215 ../libinit_balsa/helper.c:239
-#, c-format
+#, fuzzy, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr ""
+msgstr "تعذّر إنشاء ملف مؤقّت لحفظ: %s"
 
 #: ../libinit_balsa/helper.c:225 ../libinit_balsa/helper.c:248
 #, fuzzy, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "الملف '%s' ليس ملفا أو مجلدا اعتياديا."
+msgstr "اسم الملف المحدد \"%s\" دليل."
 
 #: ../libinit_balsa/init_balsa.c:48
 #, fuzzy
 msgid "Configure Balsa"
-msgstr "إعداد خادم _X..."
+msgstr "اضبط واجهة المستخدم"
 
 #: ../sounds/balsa.soundlist.in.h:1
-#, fuzzy
 msgid "Balsa E-mail reader"
-msgstr "قارئ البريد افوليوشن"
+msgstr ""
 
 #: ../sounds/balsa.soundlist.in.h:2
 #, fuzzy
 msgid "New mail notification"
-msgstr "رسالة بريديّة جديدة"
+msgstr "التنبيه بوجود بريد جديد"
 
 #: ../sounds/balsa.soundlist.in.h:3
 #, fuzzy
 msgid "Program startup"
-msgstr "إضافة برنامج عند بدء التشغيل"
+msgstr "برامج"
 
 #: ../src/ab-main.c:199 ../src/ab-window.c:680
 #, fuzzy
 msgid " address book: "
-msgstr "دفتر العناوين"
+msgstr "أفتح دفتر العناوين"
 
 #: ../src/ab-main.c:470 ../src/address-book-config.c:895
 #, fuzzy
 msgid "VCard Address Book (GnomeCard)"
-msgstr "حجم نافذة دفتر العناوين"
+msgstr "احفظ دفتر العناوين بهيئة VCard"
 
 #: ../src/ab-main.c:472 ../src/address-book-config.c:901
 #, fuzzy
 msgid "External query (a program)"
-msgstr "الرزمة المحتوية على البرنامج"
+msgstr "اخرج من البرنامج"
 
 #: ../src/ab-main.c:474 ../src/address-book-config.c:906
 #, fuzzy
 msgid "LDIF Address Book"
-msgstr "بريد (دفتر العناوين)"
+msgstr "دفتر العناوين"
 
 #: ../src/ab-main.c:477 ../src/address-book-config.c:912
 #, fuzzy
 msgid "LDAP Address Book"
-msgstr "بريد (دفتر العناوين)"
+msgstr "أضف دفتر عناوين"
 
 #: ../src/ab-main.c:481 ../src/address-book-config.c:509
 #: ../src/address-book-config.c:919
 #, fuzzy
 msgid "GPE Address Book"
-msgstr "بريد (دفتر العناوين)"
+msgstr "دفتر العناوين"
 
 #: ../src/ab-main.c:705
-#, fuzzy
 msgid "_Name"
-msgstr "_اسم"
+msgstr "الإ_سم"
 
 #: ../src/ab-main.c:855
+#, fuzzy
 msgid "F_ilter:"
-msgstr ""
+msgstr "مرشِّح:"
 
 #: ../src/ab-window.c:170 ../src/filter-edit-dialog.c:200
 #: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:221
 #: ../src/filter-run-dialog.c:295
 #, fuzzy
 msgid "Name"
-msgstr "اسم"
+msgstr "الإ_سم"
 
 #: ../src/ab-window.c:178
-#, fuzzy
 msgid "E-Mail Address"
 msgstr "عنوان البريد الالكتروني"
 
@@ -2046,24 +2044,24 @@ msgstr "عنوان البريد الالكتروني"
 #: ../src/ab-window.c:279
 #, fuzzy
 msgid "_Search for Name:"
-msgstr "ابحث في <b>%(name)s</b> عن <i>%(text)s</i>"
+msgstr "ا_بحث عن:"
 
 #: ../src/ab-window.c:314
 #, fuzzy
 msgid "Run Editor"
-msgstr "<b>خط المحرر:</b>"
+msgstr "محرر القوائم"
 
 #: ../src/ab-window.c:321
 #, fuzzy
 msgid "_Re-Import"
-msgstr "استيراد مؤشّرات"
+msgstr "استيراد"
 
 #. -- table column 3 --
 #. label for selected addresses in compose mode
 #: ../src/ab-window.c:353
 #, fuzzy
 msgid "Send-To"
-msgstr "إرسال إلى:"
+msgstr "أرسل إلى:"
 
 #. mode switching stuff
 #: ../src/ab-window.c:368
@@ -2071,43 +2069,43 @@ msgid "Treat multiple addresses as:"
 msgstr ""
 
 #: ../src/ab-window.c:372
+#, fuzzy
 msgid "alternative addresses for the same person"
-msgstr ""
+msgstr "ادخل اسم للخيارات المحفوظة"
 
 #: ../src/ab-window.c:377
 #, fuzzy
 msgid "a distribution list"
-msgstr "قائمة الحسابات"
+msgstr "توزيعة مجهولة"
 
 #: ../src/ab-window.c:709
 #, fuzzy, c-format
 msgid ""
 "Error opening address book '%s':\n"
 "%s"
-msgstr "حجم نافذة دفتر العناوين"
+msgstr "خطأ أثناء فتح الدليل '%s': %s"
 
 #: ../src/address-book-config.c:170
 #, fuzzy
 msgid "Suggest complete addresses:"
-msgstr "اكتمل الإعداد - الصفحة %d/%d"
+msgstr "احذف المهام المكتملة"
 
 #: ../src/address-book-config.c:176
 #, fuzzy
 msgid "as I type"
-msgstr "نوع التّنبيه"
+msgstr "نوع اللعبة"
 
 #: ../src/address-book-config.c:185
 #, fuzzy
 msgid "when I hit the Escape key"
-msgstr "صافرة اذا كان المفتاح:"
+msgstr "حرّر المفتاح المنتقى"
 
 #: ../src/address-book-config.c:222 ../src/address-book-config.c:316
 #, fuzzy
 msgid "Modify Address Book"
-msgstr "بريد (دفتر العناوين)"
+msgstr "أضف دفتر عناوين"
 
 #: ../src/address-book-config.c:226 ../src/address-book-config.c:320
-#, fuzzy
 msgid "Add Address Book"
 msgstr "أضف دفتر عناوين"
 
@@ -2118,64 +2116,67 @@ msgstr "أضف دفتر عناوين"
 #: ../src/address-book-config.c:442 ../src/address-book-config.c:507
 #, fuzzy
 msgid "A_ddress Book Name:"
-msgstr "الاسم مطلوب"
+msgstr "دفتر ال_عناوين"
 
 #: ../src/address-book-config.c:360
 #, fuzzy
 msgid "Load program location:"
-msgstr "_نسخ موقع الوصلة"
+msgstr "موقع الرادار"
 
 #: ../src/address-book-config.c:367 ../src/address-book-config.c:372
+#, fuzzy
 msgid "Select load program for address book"
-msgstr ""
+msgstr "انتقي مراسَلين من دفتر العناوين"
 
 #: ../src/address-book-config.c:379
 #, fuzzy
 msgid "Save program location:"
-msgstr "_نسخ موقع الوصلة"
+msgstr "احفظ الموضع"
 
 #: ../src/address-book-config.c:386 ../src/address-book-config.c:391
+#, fuzzy
 msgid "Select save program for address book"
-msgstr ""
+msgstr "انتقي مراسَلين من دفتر العناوين"
 
 #: ../src/address-book-config.c:447
 #, fuzzy
 msgid "_Host Name"
-msgstr "اسم المستضيف:"
+msgstr "أسم المضيف"
 
 #: ../src/address-book-config.c:452
 #, fuzzy
 msgid "Base Domain _Name"
-msgstr "الاسم مطلوب"
+msgstr "اسم ال_نطاق:"
 
 #: ../src/address-book-config.c:457
 #, fuzzy
 msgid "_User Name (Bind DN)"
-msgstr "بإستخدام الإسم المُميّز (DN)"
+msgstr "ا_سم المستخدم:"
 
 #: ../src/address-book-config.c:462
 #, fuzzy
 msgid "_Password"
-msgstr "كلمة السر:"
+msgstr "_كلمة السر:"
 
 #: ../src/address-book-config.c:468
 #, fuzzy
 msgid "_User Address Book DN"
-msgstr "حجم نافذة دفتر العناوين"
+msgstr "دفتر عناوين _جديد"
 
 #: ../src/address-book-config.c:474
 #, fuzzy
 msgid "Enable _TLS"
-msgstr "مكّن ال_تّسجيل"
+msgstr "فعّل ESD"
 
-#: ../src/address-book-config.c:529 ../src/main-window.c:4196
+#: ../src/address-book-config.c:529 ../src/main-window.c:4233
 #, fuzzy, c-format
 msgid "Error displaying help: %s\n"
-msgstr "حدث خطأ عند عرض المساعدة."
+msgstr "خطأ عند تحميل السِمة: %s\n"
 
 #: ../src/address-book-config.c:630
+#, fuzzy
 msgid "No path found.  Do you want to give one?"
-msgstr ""
+msgstr "أتريد إلغاء الإتصال؟"
 
 #: ../src/address-book-config.c:636
 #, c-format
@@ -2195,12 +2196,12 @@ msgstr ""
 #: ../src/address-book-config.c:645
 #, fuzzy, c-format
 msgid "The path \"%s\" is not correct. %s"
-msgstr "الإعدادات غير سليمة"
+msgstr "الموقع \"%s\" غير موجود."
 
 #: ../src/address-book-config.c:648
 #, fuzzy
 msgid "Do you want to correct the path?"
-msgstr "هل تريد حذف <b>%s</b> نهائيّا؟"
+msgstr "أتريد الإتصال؟"
 
 #: ../src/balsa-app.c:69
 #, c-format
@@ -2212,198 +2213,189 @@ msgstr ""
 #: ../src/balsa-app.c:74
 #, fuzzy, c-format
 msgid "Mailbox _password for %s@%s:"
-msgstr "كلمة السر للمستند %s"
+msgstr "ادخل كلمة السر لـ %s"
 
 #: ../src/balsa-app.c:77
 #, fuzzy
 msgid "Password needed"
-msgstr "مطلوب تحوّل بين كلمة السر"
+msgstr "كلمة السر مطلوبة"
 
 #: ../src/balsa-app.c:91 ../src/folder-conf.c:384
-#, fuzzy
 msgid "_Remember password"
-msgstr "تذكّر كلمة السر هذه"
+msgstr "ت_ذكّر كلمة السر"
 
 #: ../src/balsa-app.c:548
 #, fuzzy, c-format
 msgid "Couldn't open mailbox \"%s\""
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr "لم يمكن فتح \"%s\""
 
 #: ../src/balsa-index.c:364
-#, fuzzy
 msgid "From"
-msgstr "من"
+msgstr "مِن"
 
 #: ../src/balsa-index.c:377 ../src/pref-manager.c:402
-#, fuzzy
 msgid "Subject"
 msgstr "الموضوع"
 
 #: ../src/balsa-index.c:391 ../src/pref-manager.c:403
 #, fuzzy
 msgid "Date"
-msgstr "التاريخ"
+msgstr "التّاريخ:"
 
 #: ../src/balsa-index.c:403 ../src/pref-manager.c:404
 #: ../src/sendmsg-window.c:2958
 #, fuzzy
 msgid "Size"
-msgstr "الحجم"
+msgstr "الحجم:"
 
 #: ../src/balsa-index.c:1069
 #, fuzzy, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr "جاري تدريب داشر·-·الرجاء الإنتظار"
+msgstr "يجري التحميل. الرجاء الإنتظار."
 
 #. FIXME: this is hack!
 #: ../src/balsa-index.c:1112
-#, fuzzy
 msgid "To"
 msgstr "إلى"
 
 #: ../src/balsa-index.c:1737
 #, fuzzy, c-format
 msgid "Move to Trash failed: %s"
-msgstr "فشل نقل <b>%s</b> إلى سلة المهملات: %s."
+msgstr "فشل برنامج نقل البريد (Movemail): %s"
 
 #. R
-#: ../src/balsa-index.c:1892 ../src/main-window.c:598
-#: ../src/main-window.c:1067 ../src/message-window.c:161
+#: ../src/balsa-index.c:1892 ../src/main-window.c:597
+#: ../src/main-window.c:1066 ../src/message-window.c:161
 #, fuzzy
 msgid "_Reply..."
-msgstr "رد"
+msgstr "_رد"
 
 #: ../src/balsa-index.c:1894
 #, fuzzy
 msgid "Reply To _All..."
-msgstr "الرّد على ال_كل"
+msgstr "رُد على ال_كل"
 
 #: ../src/balsa-index.c:1896
 #, fuzzy
 msgid "Reply To _Group..."
-msgstr "الرّد على ال_كل"
+msgstr "إلى ال_فرشاة..."
 
 #: ../src/balsa-index.c:1898
 #, fuzzy
 msgid "_Forward Attached..."
-msgstr "حوّل المكالمات"
+msgstr "_مرر المراسَل..."
 
 #: ../src/balsa-index.c:1900
 #, fuzzy
 msgid "Forward _Inline..."
-msgstr "_عرض ضمن السّياق"
+msgstr "مرر الوصلة"
 
-#: ../src/balsa-index.c:1902 ../src/main-window.c:637
+#: ../src/balsa-index.c:1902 ../src/main-window.c:636
 #, fuzzy
 msgid "_Pipe through..."
-msgstr "أنبوب مكسور"
+msgstr "تخ_طّى إلى..."
 
-#: ../src/balsa-index.c:1904 ../src/main-window.c:696
-#: ../src/main-window.c:1051
+#: ../src/balsa-index.c:1904 ../src/main-window.c:695
+#: ../src/main-window.c:1050
 #, fuzzy
 msgid "_Store Address..."
-msgstr "عنوان البريد الإلكتروني"
+msgstr "عنوان المنزل"
 
 #: ../src/balsa-index.c:1919 ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:1061 ../src/mailbox-node.c:1077
 #: ../src/pref-manager.c:1629 ../src/pref-manager.c:1720
 #: ../src/pref-manager.c:2790
-#, fuzzy
 msgid "_Delete"
-msgstr "إح_ذف"
+msgstr "_فسخ"
 
 #: ../src/balsa-index.c:1924
-#, fuzzy
 msgid "_Undelete"
 msgstr "_تراجع عن الحذف"
 
 #: ../src/balsa-index.c:1929
 #, fuzzy
 msgid "Move To _Trash"
-msgstr "نقل إلى سلّة المهملات"
+msgstr "انقل إلى  ال_مهملات"
 
 #: ../src/balsa-index.c:1933
+#, fuzzy
 msgid "T_oggle"
-msgstr ""
+msgstr "تحول"
 
-#: ../src/balsa-index.c:1937 ../src/main-window.c:339 ../src/main-window.c:368
+#: ../src/balsa-index.c:1937 ../src/main-window.c:338 ../src/main-window.c:367
 #, fuzzy
 msgid "_Flagged"
 msgstr "معلّم"
 
 #: ../src/balsa-index.c:1940
-#, fuzzy
 msgid "_Unread"
-msgstr "الرّسالة ال_غير مقروءة التالية"
+msgstr "_غير مقروء"
 
 #: ../src/balsa-index.c:1948
 #, fuzzy
 msgid "_Move to"
-msgstr "نقل إلى سلّة المهملات"
+msgstr "تحريك"
 
 #: ../src/balsa-index.c:1956
-#, fuzzy
 msgid "_View Source"
-msgstr "عرض التشفيرة المصدرية لهذه الصفحة"
+msgstr "اعرض المصدر"
 
 #: ../src/balsa-index.c:2165
 #, fuzzy, c-format
 msgid "Failed to copy %d message to mailbox \"%s\": %s"
 msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
-msgstr[0] "نسخ الرّسائل المنتقاة إلى الحافظة الوسيطة"
-msgstr[1] ""
+msgstr[0] "فشل وضع الرّسالة %s في الذّاكرة المخبّأة: %s"
+msgstr[1] "فشل وضع الرّسالة %s في الذّاكرة المخبّأة: %s"
 
 #: ../src/balsa-index.c:2179
 #, fuzzy, c-format
 msgid "Copied to \"%s\"."
-msgstr "مسجل ل %s"
+msgstr "الخيار \"%s\""
 
 #: ../src/balsa-index.c:2180
 #, fuzzy, c-format
 msgid "Moved to \"%s\"."
-msgstr "مسجل ل %s"
+msgstr "انقل %s إلى %s."
 
 #: ../src/balsa-index.c:2303
 #, fuzzy, c-format
 msgid "Committing mailbox %s failed."
-msgstr "فشلت الكتابة  لصندوق البريد المؤقّت: %s: %s"
+msgstr "فشل تحميل %s."
 
 #: ../src/balsa-index.c:2476
+#, fuzzy
 msgid "Pipe message through a program"
-msgstr ""
+msgstr "مرر للبرنامج"
 
 #: ../src/balsa-index.c:2479
-#, fuzzy
 msgid "_Run"
-msgstr "ت_نفيذ"
+msgstr "_شغّل"
 
 #: ../src/balsa-index.c:2488
 #, fuzzy
 msgid "Specify the program to run:"
-msgstr "تشغيل برنامج لكتابة الأقراص"
+msgstr "اختر برنامج لكتابة أقراص البيانات"
 
 #: ../src/balsa-mblist.c:357
 #, fuzzy
 msgid "Mailbox"
-msgstr "صندوق البريد:%s (%s)"
+msgstr "صندوق بريد"
 
 #: ../src/balsa-mblist.c:1177 ../src/balsa-mblist.c:1213
 #, fuzzy
 msgid "Failed to find mailbox"
-msgstr "فشلت الكتابة  لصندوق البريد المؤقّت: %s: %s"
+msgstr "فشل ايجاد عقدة لـ %s"
 
 #: ../src/balsa-mblist.c:1840
 #, fuzzy
 msgid "_Other..."
-msgstr "_أخرى..."
+msgstr "أخرى..."
 
 #: ../src/balsa-mblist.c:1908
-#, fuzzy
 msgid "Choose destination folder"
-msgstr "لا يمكن انشاء الدليل المرسل اليه: %s."
+msgstr "انتقي المجلّد الهدف"
 
 #: ../src/balsa-mblist.c:2131 ../src/balsa-mblist.c:2134
-#, fuzzy
 msgid "Other..."
 msgstr "أخرى..."
 
@@ -2412,146 +2404,151 @@ msgstr "أخرى..."
 #: ../src/balsa-mblist.c:2299
 #, fuzzy, c-format
 msgid "Shown mailbox: %s "
-msgstr "موقع صندوق البريد"
+msgstr "صندوق البريد:%s (%s)"
 
 #: ../src/balsa-mblist.c:2304
 #, fuzzy, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
-msgstr[0] "إر_سال رسالة"
-msgstr[1] ""
+msgstr[0] "يجري حفظ %d رسالة"
+msgstr[1] "يجري حفظ %d رسالة"
+msgstr[2] "يجري حفظ %d رسالة"
+msgstr[3] "يجري حفظ %d رسالة"
 
 #: ../src/balsa-mblist.c:2311
 #, fuzzy, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
-msgstr[0] "جديد"
-msgstr[1] ""
+msgstr[0] "%d غير مقروء"
+msgstr[1] "%d غير مقروء"
+msgstr[2] "%d غير مقروء"
+msgstr[3] "%d غير مقروء"
 
 #: ../src/balsa-mblist.c:2318
 #, fuzzy, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
 msgstr[0] "إبدأ مخفياً"
-msgstr[1] ""
+msgstr[1] "إبدأ مخفياً"
 
 #: ../src/balsa-message.c:290
-#, fuzzy
 msgid "Check cryptographic signature"
-msgstr "تهيئة توقيع غير مدعومة"
+msgstr ""
 
 #: ../src/balsa-message.c:311
+#, fuzzy
 msgid "Select message part to display"
-msgstr ""
+msgstr "اختر اللعبة"
 
 #: ../src/balsa-message.c:387
 #, fuzzy
 msgid "Content"
-msgstr "المحتويات:"
+msgstr "المحتويات"
 
 #: ../src/balsa-message.c:465
 #, fuzzy
 msgid "Message parts"
-msgstr "<b>الأجزاء الشفّافة</b>"
+msgstr "حالة الرسالة"
 
 #: ../src/balsa-message.c:647
 #, fuzzy
 msgid "Save selected as..."
-msgstr "حفظ المراسَلين المنتقين كفيكارد."
+msgstr "ا_حفظ المنتقَى..."
 
 #: ../src/balsa-message.c:654
 #, fuzzy
 msgid "Save selected to folder..."
-msgstr "نسخ الرّسالة المنتقاة إلى مجلّد آخر"
+msgstr "لقد انتقيت مجلداً"
 
 #: ../src/balsa-message.c:758
 #, fuzzy
 msgid "(No sender)"
-msgstr "مرسِل مجهول"
+msgstr "(لا شيء)"
 
 #: ../src/balsa-message.c:823
-#, c-format
+#, fuzzy, c-format
 msgid "Could not access message %ld in mailbox \"%s\"."
-msgstr ""
+msgstr "تعذّر إلحاق الرّسالة؛ صندوق الوارد أكبر من المخصّص"
 
 #: ../src/balsa-message.c:998
 #, fuzzy
 msgid "mixed parts"
-msgstr "<b>الأجزاء الشفّافة</b>"
+msgstr "أجزاء رسم الإطار"
 
 #: ../src/balsa-message.c:1000
 #, fuzzy
 msgid "alternative parts"
-msgstr "<b>الأجزاء الشفّافة</b>"
+msgstr "رقم المنفذ البديل"
 
 #: ../src/balsa-message.c:1002
 #, fuzzy
 msgid "signed parts"
-msgstr "<b>الأجزاء الشفّافة</b>"
+msgstr "مهمّة _مسندة"
 
 #: ../src/balsa-message.c:1004
 #, fuzzy
 msgid "encrypted parts"
-msgstr "<b>الأجزاء الشفّافة</b>"
+msgstr "غير مشفّرة"
 
 #: ../src/balsa-message.c:1006
 #, fuzzy
 msgid "rfc822 message"
-msgstr "إر_سال رسالة"
+msgstr "رسالة"
 
 #: ../src/balsa-message.c:1008
 #, fuzzy, c-format
 msgid "\"%s\" parts"
-msgstr "<b>الأجزاء الشفّافة</b>"
+msgstr "%s عند الساعة %s"
 
 #: ../src/balsa-message.c:1056
+#, fuzzy
 msgid "force inline for all parts"
-msgstr ""
+msgstr "لون التظليل لكل النتائج"
 
 #: ../src/balsa-message.c:1089
-#, fuzzy, c-format
+#, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
-msgstr "العنوان الإفتراضي للرّسالة."
+msgstr ""
 
 #: ../src/balsa-message.c:1100
 #, fuzzy
 msgid "complete message"
-msgstr "إر_سال رسالة"
+msgstr "رسالة دعوة"
 
 #: ../src/balsa-message.c:1117
 #, fuzzy, c-format
 msgid "part %s: %s (file %s)"
-msgstr "إنتقاء ملف"
+msgstr "%s: فشل setsid() : %s!"
 
 #: ../src/balsa-message.c:1128
 #, fuzzy, c-format
 msgid "part %s: %s"
-msgstr "ليس جزءا من الشهادة"
+msgstr "%s: %s"
 
 #: ../src/balsa-message.c:1143
 #, fuzzy
 msgid "encrypted: "
-msgstr "مشفّرة"
+msgstr "غير مشفّرة"
 
 #: ../src/balsa-message.c:1297 ../src/balsa-mime-widget-text.c:598
 #: ../src/balsa-mime-widget-text.c:1067
-#, fuzzy
 msgid "Save..."
-msgstr "حفظ..."
+msgstr "احفظ..."
 
 #: ../src/balsa-message.c:1373
+#, fuzzy
 msgid "Select folder for saving selected parts"
-msgstr ""
+msgstr "اختر مجلّد لحِفظ المُرفق المحدّد..."
 
 #: ../src/balsa-message.c:1411
 #, fuzzy, c-format
 msgid "%s message part"
-msgstr "إر_سال رسالة"
+msgstr "%s رسالة"
 
 #: ../src/balsa-message.c:1439 ../src/balsa-mime-widget-callbacks.c:202
 #, fuzzy, c-format
 msgid "Could not save %s: %s"
-msgstr "لم يمكن حفظ الملخّص: %s: %s"
+msgstr "تعذّر احصاء `%s': %s"
 
 #: ../src/balsa-message.c:2161
 #, c-format
@@ -2564,7 +2561,7 @@ msgstr ""
 #: ../src/balsa-message.c:2168
 #, fuzzy
 msgid "Reply to MDN?"
-msgstr "الرّد على ال_كل"
+msgstr "رد على الجميع"
 
 #: ../src/balsa-message.c:2363
 msgid ""
@@ -2577,13 +2574,13 @@ msgstr ""
 #: ../src/balsa-message.c:2581
 #, fuzzy, c-format
 msgid "Parsing a message part failed: %s"
-msgstr "فشل جلب الرّسالة"
+msgstr "%s: فشل إعادة التشغيل: %s"
 
 #: ../src/balsa-message.c:2385 ../src/balsa-message.c:2467
 #: ../src/balsa-message.c:2582
 #, fuzzy
 msgid "Possible disk space problem."
-msgstr "حد التنبيه بقلة المساحة المتوفرة على القرص"
+msgstr "مساحة القرص المتوفرة:"
 
 #: ../src/balsa-message.c:2397
 #, c-format
@@ -2623,18 +2620,18 @@ msgstr ""
 #: ../src/balsa-message.c:2498
 #, fuzzy
 msgid "PGP"
-msgstr "تشفير باستعمال PGP"
+msgstr "PAP"
 
 #: ../src/balsa-message.c:2498 ../src/balsa-mime-widget-crypto.c:72
 #: ../src/print.c:1302 ../src/print-gtk.c:191
 #, fuzzy
 msgid "S/MIME"
-msgstr "نوع MIME:"
+msgstr "توقيع باستعمال S/MIME"
 
 #: ../src/balsa-message.c:2517 ../src/balsa-message.c:2643
 #, fuzzy
 msgid "Detected a good signature"
-msgstr "تهيئة توقيع غير مدعومة"
+msgstr "حذف الكلّ عدى التوقيع"
 
 #: ../src/balsa-message.c:2523
 msgid "Detected a good signature with insufficient validity"
@@ -2672,26 +2669,29 @@ msgid ""
 msgstr ""
 
 #: ../src/balsa-message.c:2610
+#, fuzzy
 msgid "Please close the other instances of this message and try again."
-msgstr ""
+msgstr "رجاء اختر عارض آخر ثم أعد المحاولة."
 
 #: ../src/filter-edit-callbacks.c:311
+#, fuzzy
 msgid "One of the specified fields contains:"
-msgstr ""
+msgstr "اسم الخطّ المنتقى"
 
 #: ../src/filter-edit-callbacks.c:312
+#, fuzzy
 msgid "None of the specified fields contains:"
-msgstr ""
+msgstr "اسم الخطّ المنتقى"
 
 #: ../src/filter-edit-callbacks.c:314
 #, fuzzy
 msgid "One of the regular expressions matches"
-msgstr "يطابق الإسم التعبير المنتظم"
+msgstr "الإسم يطابق التعبير المنتظم"
 
 #: ../src/filter-edit-callbacks.c:315
 #, fuzzy
 msgid "None of the regular expressions matches"
-msgstr "يطابق الإسم التعبير المنتظم"
+msgstr "الإسم يطابق التعبير المنتظم"
 
 #: ../src/filter-edit-callbacks.c:317
 msgid "Match when date is in the interval:"
@@ -2702,119 +2702,118 @@ msgid "Match when date is outside the interval:"
 msgstr ""
 
 #: ../src/filter-edit-callbacks.c:320 ../src/filter-edit-callbacks.c:1085
+#, fuzzy
 msgid "Match when one of these flags is set:"
-msgstr ""
+msgstr "اسم المُطْلِق غير محدد."
 
 #: ../src/filter-edit-callbacks.c:321
 msgid "Match when none of these flags is set:"
 msgstr ""
 
 #: ../src/filter-edit-callbacks.c:512
+#, fuzzy
 msgid "You must specify the name of the user header to match on"
-msgstr ""
+msgstr "يجب أن تأكد نوع الطلب الذي تريد تشغيله\n"
 
 #: ../src/filter-edit-callbacks.c:523
+#, fuzzy
 msgid "You must specify at least one field for matching"
-msgstr ""
+msgstr "يجب أن تحدد نمطا و أمرا"
 
 #: ../src/filter-edit-callbacks.c:533
 #, fuzzy
 msgid "You must provide a string"
-msgstr "يجب أن تختار تاريخاً."
+msgstr "يجب أن تحدد نمطا"
 
 #: ../src/filter-edit-callbacks.c:540
+#, fuzzy
 msgid "You must provide at least one regular expression"
-msgstr ""
+msgstr "عليك أن تعطي اسماً لملفك الشخصي على الأقل"
 
 #: ../src/filter-edit-callbacks.c:552
 #, fuzzy
 msgid "Low date is incorrect"
-msgstr "تاريخ البدء خاطئ"
+msgstr "اعرض اليوم في الساعة"
 
 #: ../src/filter-edit-callbacks.c:563
 #, fuzzy
 msgid "High date is incorrect"
-msgstr "تاريخ البدء خاطئ"
+msgstr "الإعدادات غير سليمة"
 
 #: ../src/filter-edit-callbacks.c:571
+#, fuzzy
 msgid "Low date is greater than high date"
-msgstr ""
+msgstr "أكبر من"
 
 #: ../src/filter-edit-callbacks.c:856
 #, fuzzy, c-format
 msgid "Error displaying condition help: %s\n"
-msgstr "حدث خطأ عند عرض المساعدة."
+msgstr "خطأ أثناء حفظ الإعدادات: %s."
 
 #: ../src/filter-edit-callbacks.c:897
 #, fuzzy
 msgid "Match Fields"
-msgstr "_حقول الشهادة"
+msgstr "مطابقات"
 
 #: ../src/filter-edit-callbacks.c:907
-#, fuzzy
 msgid "_All"
 msgstr "ال_كل"
 
 #: ../src/filter-edit-callbacks.c:908
-#, fuzzy
 msgid "C_lear"
 msgstr "_مسح"
 
-#: ../src/filter-edit-callbacks.c:910 ../src/main-window.c:4075
+#: ../src/filter-edit-callbacks.c:910 ../src/main-window.c:4112
 #, fuzzy
 msgid "_Body"
-msgstr "الجسم"
+msgstr "_المتن:"
 
 #. To:
-#: ../src/filter-edit-callbacks.c:911 ../src/main-window.c:4076
+#: ../src/filter-edit-callbacks.c:911 ../src/main-window.c:4113
 #: ../src/sendmsg-window.c:2843
-#, fuzzy
 msgid "_To:"
 msgstr "إ_لى:"
 
-#: ../src/filter-edit-callbacks.c:912 ../src/main-window.c:4077
-#, fuzzy
+#: ../src/filter-edit-callbacks.c:912 ../src/main-window.c:4114
 msgid "_From:"
 msgstr "_من:"
 
 #: ../src/filter-edit-callbacks.c:913
 #, fuzzy
 msgid "_Subject"
-msgstr "<b>الموضوع:</b>"
+msgstr "الموضوع"
 
-#: ../src/filter-edit-callbacks.c:914 ../src/main-window.c:4079
-#, fuzzy
+#: ../src/filter-edit-callbacks.c:914 ../src/main-window.c:4116
 msgid "_Cc:"
-msgstr "ن.ك"
+msgstr "_ن.ك:"
 
 #: ../src/filter-edit-callbacks.c:916
 #, fuzzy
 msgid "_User header:"
-msgstr "التّرويسة/الهامش"
+msgstr "ا_سم المستخدم:"
 
 #: ../src/filter-edit-callbacks.c:946
 #, fuzzy
 msgid "Unread"
-msgstr "الرّسالة ال_غير مقروءة التالية"
+msgstr "_غير مقروء"
 
 #: ../src/filter-edit-callbacks.c:946
-#, fuzzy
 msgid "Deleted"
 msgstr "حُذف"
 
 #: ../src/filter-edit-callbacks.c:946
 #, fuzzy
 msgid "Replied"
-msgstr "أُجيب عليه"
+msgstr "الردود"
 
 #: ../src/filter-edit-callbacks.c:946
-#, fuzzy
 msgid "Flagged"
 msgstr "معلّم"
 
 #: ../src/filter-edit-callbacks.c:961
+#, fuzzy
 msgid "One of the specified f_ields contains"
-msgstr ""
+msgstr "اسم الخطّ المنتقى"
 
 #: ../src/filter-edit-callbacks.c:976
 #, fuzzy
@@ -2824,23 +2823,23 @@ msgstr "لا يحتوي"
 #: ../src/filter-edit-callbacks.c:995
 #, fuzzy
 msgid "_One of the regular expressions matches"
-msgstr "يطابق الإسم التعبير المنتظم"
+msgstr "الإسم يطابق التعبير المنتظم"
 
 #. Left/Remove button
 #: ../src/filter-edit-callbacks.c:1026 ../src/filter-edit-dialog.c:321
 #: ../src/filter-run-dialog.c:332
 #, fuzzy
 msgid "_Remove"
-msgstr "إ_زالة"
+msgstr "احذف"
 
 #: ../src/filter-edit-callbacks.c:1030
-#, fuzzy
 msgid "One _Matches/None Matches"
-msgstr "إظهار يوم واحد"
+msgstr ""
 
 #: ../src/filter-edit-callbacks.c:1047
+#, fuzzy
 msgid "Match when message date is in the interval:"
-msgstr ""
+msgstr "اظهر الرّسائل بالأسلوب العادي"
 
 #: ../src/filter-edit-callbacks.c:1067
 msgid "Inside/outside the date interval"
@@ -2853,12 +2852,12 @@ msgstr ""
 #: ../src/filter-edit-callbacks.c:1132
 #, fuzzy
 msgid "Search T_ype:"
-msgstr "بحسب الن_وع"
+msgstr "مجال البحث:"
 
 #: ../src/filter-edit-callbacks.c:1206
 #, fuzzy
 msgid "Edit condition for filter: "
-msgstr "مصفاة استعلام غير محددة لـ %s"
+msgstr "تحرير الملف الشخصي: "
 
 #: ../src/filter-edit-callbacks.c:1424 ../src/save-restore.c:2002
 msgid "Filter with no condition was omitted"
@@ -2867,12 +2866,12 @@ msgstr ""
 #: ../src/filter-edit-callbacks.c:1450
 #, fuzzy, c-format
 msgid "Error displaying filter help: %s\n"
-msgstr "حدث خطأ عند عرض المساعدة."
+msgstr "خطأ أثناء ترجمة المرشِّح: %s: %s"
 
 #: ../src/filter-edit-callbacks.c:1640
 #, fuzzy
 msgid "New filter"
-msgstr "مصفاة ذات الأولويّة \"%s\""
+msgstr "ملف جديد"
 
 #: ../src/filter-edit-callbacks.c:1772
 #, fuzzy
@@ -2882,17 +2881,17 @@ msgstr "لم يحدَّد إسم مجلّد."
 #: ../src/filter-edit-callbacks.c:1777
 #, fuzzy, c-format
 msgid "Filter \"%s\" already exists."
-msgstr "الشهادة موجودة مسبقا."
+msgstr "الملف '%s'  موجود."
 
 #: ../src/filter-edit-callbacks.c:1787
 #, fuzzy
 msgid "Filter must have conditions."
-msgstr "يجب أن تسمّي هذه المصفاة."
+msgstr "حذف الخيارات المحفوظة..."
 
 #: ../src/filter-edit-callbacks.c:1844
 #, fuzzy
 msgid "Filter has matched"
-msgstr "انتهت صلاحيّة الشهادة"
+msgstr "أُنشيء الملف '%s'"
 
 #: ../src/filter-edit-callbacks.c:1869
 msgid "You must provide a sound to play"
@@ -2904,8 +2903,9 @@ msgid "(Example: write December 31, 2000, as %s)"
 msgstr ""
 
 #: ../src/filter-edit-dialog.c:89 ../src/pref-manager.c:410
+#, fuzzy
 msgid "Simple"
-msgstr ""
+msgstr "عينة"
 
 #: ../src/filter-edit-dialog.c:90
 #, fuzzy
@@ -2915,53 +2915,52 @@ msgstr "_عبارة منتظمة"
 #: ../src/filter-edit-dialog.c:91
 #, fuzzy
 msgid "Date interval"
-msgstr "فترة ال_تحديث"
+msgstr "فترة التحديث"
 
 #: ../src/filter-edit-dialog.c:92
 #, fuzzy
 msgid "Flag condition"
-msgstr "حالة العلم"
+msgstr "تدفق شرطي"
 
 #: ../src/filter-edit-dialog.c:96
 #, fuzzy
 msgid "Copy to folder:"
-msgstr "نسخ للمجلّد"
+msgstr "انسخ للمجلّد"
 
 #: ../src/filter-edit-dialog.c:97
 #, fuzzy
 msgid "Move to folder:"
-msgstr "نقل للمجلّد"
+msgstr "انقل للمجلّد"
 
 #: ../src/filter-edit-dialog.c:98
 #, fuzzy
 msgid "Print on printer:"
-msgstr "تشغيل برنامج الطابعة"
+msgstr "_خط الطبع:"
 
 #: ../src/filter-edit-dialog.c:99
 #, fuzzy
 msgid "Run program:"
-msgstr "تشغيل برنامج"
+msgstr "شغّل برنامج"
 
 #: ../src/filter-edit-dialog.c:100
 #, fuzzy
 msgid "Send to Trash"
-msgstr "نقل إلى سلّة المهملات"
+msgstr "انقل إلى  المهملات"
 
 #: ../src/filter-edit-dialog.c:104
 #, fuzzy
 msgid "OR"
-msgstr "أو"
+msgstr "O"
 
 #: ../src/filter-edit-dialog.c:105
 #, fuzzy
 msgid "AND"
-msgstr "و"
+msgstr "RAD"
 
 #. new button
 #. #define MENU_FILE_NEW_POS 0
 #: ../src/filter-edit-dialog.c:217 ../src/mailbox-node.c:1034
-#: ../src/main-window.c:379 ../src/main-window.c:438
-#, fuzzy
+#: ../src/main-window.c:378 ../src/main-window.c:437
 msgid "_New"
 msgstr "_جديد"
 
@@ -2969,66 +2968,65 @@ msgstr "_جديد"
 #: ../src/filter-edit-dialog.c:249
 #, fuzzy
 msgid "_Filter name:"
-msgstr "اسم الموصول"
+msgstr "إ_سم الملف:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
 #: ../src/filter-edit-dialog.c:267
 #, fuzzy
 msgid "Operation between conditions"
-msgstr "ظروف أخذ الصّورة"
+msgstr "الفراغات بين الأزرار"
 
 #: ../src/filter-edit-dialog.c:312
 #, fuzzy
 msgid "_Edit"
-msgstr "_تحرير"
+msgstr "_تحرير/"
 
 #: ../src/filter-edit-dialog.c:317
 #, fuzzy
 msgid "Ne_w"
-msgstr "عنصر _جديد"
+msgstr "جديد"
 
 #. The notification area
 #: ../src/filter-edit-dialog.c:350
 #, fuzzy
 msgid "Notification:"
-msgstr "اشعار "
+msgstr "مساحة التبليغ"
 
 #. Notification buttons
 #: ../src/filter-edit-dialog.c:360
 #, fuzzy
 msgid "Play sound:"
-msgstr "عزف صوت"
+msgstr "اعزف صوت"
 
 #: ../src/filter-edit-dialog.c:367 ../src/filter-edit-dialog.c:380
 #, fuzzy
 msgid "Use Sound..."
-msgstr "اختر صوتا"
+msgstr "استعمل Mod.1"
 
 #: ../src/filter-edit-dialog.c:399
 #, fuzzy
 msgid "Popup text:"
-msgstr "نص العلامة."
+msgstr "سياق Popt"
 
 #. The action area
 #: ../src/filter-edit-dialog.c:420
 #, fuzzy
 msgid "Action to perform:"
-msgstr "يطلب <b>%s</b> من %s أن يؤدّي مهمّة."
+msgstr "لم يؤدّى الاستخراج"
 
 #: ../src/filter-edit-dialog.c:471
 #, fuzzy
 msgid "Match"
-msgstr "<b>مطابقة</b>"
+msgstr "م_طابقة"
 
 #: ../src/filter-edit-dialog.c:474
 #, fuzzy
 msgid "Action"
-msgstr "حدث"
+msgstr "أفعال"
 
 #: ../src/filter-edit-dialog.c:486
-#, fuzzy
 msgid "Revert"
-msgstr "_استرجاع"
+msgstr "ارتداد"
 
 #: ../src/filter-edit-dialog.c:537
 msgid "A filter run dialog is open.Close it before you can modify filters."
@@ -3037,12 +3035,12 @@ msgstr ""
 #: ../src/filter-edit-dialog.c:550
 #, fuzzy
 msgid "Balsa Filters"
-msgstr "مصفات البريد"
+msgstr "مرشحات البريد"
 
 #: ../src/filter-edit-dialog.c:618
 #, fuzzy, c-format
 msgid "Filter \"%s\" has no condition."
-msgstr "ليس للمضيف عنوان"
+msgstr "الملف%sلم يتغير \n"
 
 #: ../src/filter-export-callbacks.c:57
 #, c-format
@@ -3058,22 +3056,22 @@ msgstr ""
 #: ../src/filter-export-dialog.c:75
 #, fuzzy
 msgid "Balsa Filters Export"
-msgstr "تصدير بصيغة HTML"
+msgstr "مرشحات البريد"
 
 #: ../src/filter-run-callbacks.c:182
 #, fuzzy, c-format
 msgid "Error displaying run filters help: %s\n"
-msgstr "حدث خطأ عند عرض المساعدة."
+msgstr "خطأ أثناء ترجمة المرشِّح: %s: %s"
 
 #: ../src/filter-run-callbacks.c:230 ../src/filter-run-callbacks.c:252
 #, fuzzy
 msgid "Error when applying filters"
-msgstr "حدث خطأ ما أثناء تثبيت السمة"
+msgstr "خطاء في فتح الملف"
 
 #: ../src/filter-run-callbacks.c:233 ../src/filter-run-callbacks.c:255
 #, fuzzy, c-format
 msgid "Filter applied to \"%s\"."
-msgstr "ملف السّجل لتسجيل إجراءات المصفاة"
+msgstr "مسجل ل %s"
 
 #: ../src/filter-run-callbacks.c:292
 #, c-format
@@ -3092,41 +3090,40 @@ msgid ""
 msgstr ""
 
 #: ../src/filter-run-dialog.c:189
-#, fuzzy
 msgid "Balsa Filters of Mailbox: "
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr ""
 
 #: ../src/filter-run-dialog.c:230
 #, fuzzy
 msgid "On reception"
-msgstr "أخطاء الاستقبال:"
+msgstr "أضِف إستثناء"
 
 #: ../src/filter-run-dialog.c:242
 #, fuzzy
 msgid "On exit"
-msgstr "إنهاء البرنامج"
+msgstr "لا يوجد تالي"
 
 #: ../src/filter-run-dialog.c:316
 #, fuzzy
 msgid "Apply Selected"
-msgstr "اليوم المنتقى (%a %b %d %Y)"
+msgstr "طبِّق ال_تأثير:"
 
 #. up button
 #: ../src/filter-run-dialog.c:364
 #, fuzzy
 msgid "_Up"
-msgstr "إلى ال_أعلى"
+msgstr "فوق"
 
 #. down button
 #: ../src/filter-run-dialog.c:369
 #, fuzzy
 msgid "Do_wn"
-msgstr "تك_رار"
+msgstr "تحت"
 
 #: ../src/filter-run-dialog.c:375
 #, fuzzy
 msgid "A_pply Now!"
-msgstr "_بحث الآن"
+msgstr "استخدم ال_خط"
 
 #: ../src/filter-run-dialog.c:419
 msgid ""
@@ -3137,43 +3134,41 @@ msgstr ""
 #: ../src/folder-conf.c:285
 #, fuzzy
 msgid "Remote IMAP folder"
-msgstr "فحص مجلّد _بعيد..."
+msgstr "افحص مجلّد بعيد"
 
 #. must NOT be modal
 #: ../src/folder-conf.c:288 ../src/folder-conf.c:758 ../src/mailbox-conf.c:529
-#, fuzzy
 msgid "_Update"
-msgstr "_تحديث"
+msgstr "_حدّث"
 
 #: ../src/folder-conf.c:288
-#, fuzzy
 msgid "C_reate"
-msgstr "إن_شاء"
+msgstr "أن_شئ"
 
 #: ../src/folder-conf.c:311 ../src/mailbox-conf.c:1137
 #: ../src/mailbox-conf.c:1239
-#, fuzzy
 msgid "_Basic"
-msgstr "أساسي"
+msgstr "_أساسي"
 
 #: ../src/folder-conf.c:316
 #, fuzzy
 msgid "_Max number of connections:"
-msgstr "العدد القصوي لأفعال إلغاءات الأفعال"
+msgstr "أكبر عدد من الألوان:"
 
 #: ../src/folder-conf.c:323 ../src/mailbox-conf.c:1302
 #, fuzzy
 msgid "Enable _persistent cache"
-msgstr "حجم مخبأ القرص"
+msgstr "مكّن ال_تّسجيل"
 
 #: ../src/folder-conf.c:331
+#, fuzzy
 msgid "Use IDLE command"
-msgstr ""
+msgstr "استعمل امرا"
 
 #: ../src/folder-conf.c:338 ../src/mailbox-conf.c:1306
 #, fuzzy
 msgid "Enable _bug workarounds"
-msgstr "أداة تقرير خلال"
+msgstr "تفعيل أصوات اللعبة"
 
 #: ../src/folder-conf.c:345
 msgid "Use STATUS for mailbox checking"
@@ -3181,51 +3176,49 @@ msgstr ""
 
 #: ../src/folder-conf.c:351 ../src/mailbox-conf.c:1191
 #: ../src/mailbox-conf.c:1308
-#, fuzzy
 msgid "_Advanced"
-msgstr "متقدم"
+msgstr "م_تقدم"
 
 #. INPUT FIELD CREATION
 #: ../src/folder-conf.c:354
 #, fuzzy
 msgid "Descriptive _Name:"
-msgstr "اسم الموصول"
+msgstr "ال_وصف:"
 
 #. username
 #: ../src/folder-conf.c:369 ../src/mailbox-conf.c:1153
 #, fuzzy
 msgid "Use_r name:"
-msgstr "رجاء استعمال اسم آخر."
+msgstr "إسم المستخدم: "
 
 #: ../src/folder-conf.c:375
-#, fuzzy
 msgid "_Password:"
 msgstr "_كلمة السر:"
 
 #: ../src/folder-conf.c:380 ../src/mailbox-conf.c:1264
 #, fuzzy
 msgid "_Anonymous access"
-msgstr "اسمح بالنفاذ"
+msgstr "مجهول"
 
 #: ../src/folder-conf.c:389
 #, fuzzy
 msgid "Subscribed _folders only"
-msgstr "اعرض المجلدات _فقط"
+msgstr "ألغاء الإشتراك في المجلّدات"
 
 #: ../src/folder-conf.c:391
 #, fuzzy
 msgid "Always show _INBOX"
-msgstr "اظهار عمود الألسنة دائما"
+msgstr "ا_ظهر التلميحات دائماً"
 
 #: ../src/folder-conf.c:394
 #, fuzzy
 msgid "Pr_efix:"
-msgstr "_تفضيلات"
+msgstr "ملحق التنصيب"
 
 #: ../src/folder-conf.c:540
 #, fuzzy
 msgid "Select parent folder"
-msgstr "مجلّد أب مجهول: %s"
+msgstr "اختر المجلد الذي سينزّل فيه الملف:"
 
 #: ../src/folder-conf.c:614
 #, c-format
@@ -3238,29 +3231,27 @@ msgid ""
 msgstr ""
 
 #: ../src/folder-conf.c:620
-#, fuzzy
 msgid "Question"
 msgstr "سؤال"
 
 #: ../src/folder-conf.c:625
 #, fuzzy
 msgid "Rename INBOX"
-msgstr "إعادة تسمية من:"
+msgstr "اعادة تسمية "
 
 #: ../src/folder-conf.c:627
-#, fuzzy
 msgid "Cancel"
-msgstr "إلغاء"
+msgstr "إلغي"
 
 #: ../src/folder-conf.c:648
 #, fuzzy, c-format
 msgid "Folder rename failed. Reason: %s"
-msgstr "لم يمكن إعادة تسمية المجلّد: %s"
+msgstr "تعذّر إعادة تسمية المجلّد: %s"
 
 #: ../src/folder-conf.c:700
 #, fuzzy, c-format
 msgid "Folder creation failed. Reason: %s"
-msgstr "فشل إنشاء الملف المؤقّت."
+msgstr "فشلت العمليّة: %s"
 
 #: ../src/folder-conf.c:740
 msgid ""
@@ -3271,42 +3262,40 @@ msgstr ""
 #: ../src/folder-conf.c:755
 #, fuzzy
 msgid "Remote IMAP subfolder"
-msgstr "فشل أمر IMAP: %s"
+msgstr "IP بعيد:  %s"
 
 #: ../src/folder-conf.c:758
-#, fuzzy
 msgid "_Create"
-msgstr "إ_نشاء"
+msgstr "إ_نشيء"
 
 #: ../src/folder-conf.c:779
 #, fuzzy
 msgid "Rename or move subfolder"
-msgstr "إعادة تسمية المؤشّر أو الموضوع المنتقى"
+msgstr "اعادة تسمية الملف البعيد"
 
 #: ../src/folder-conf.c:780
 #, fuzzy
 msgid "Create subfolder"
-msgstr "إنشاء مجلّد"
+msgstr "أنشيء مجلّد"
 
 #. INPUT FIELD CREATION
 #: ../src/folder-conf.c:788
-#, fuzzy
 msgid "_Folder name:"
 msgstr "ا_سم المجلّد:"
 
 #: ../src/folder-conf.c:794
-#, fuzzy
 msgid "Host:"
-msgstr "مضيف"
+msgstr "المضيف:"
 
 #: ../src/folder-conf.c:800
 #, fuzzy
 msgid "_Browse..."
-msgstr "_تصفّح..."
+msgstr "_تصفّح"
 
 #: ../src/folder-conf.c:808
+#, fuzzy
 msgid "_Subfolder of:"
-msgstr ""
+msgstr "مجلد التبادل:"
 
 #: ../src/folder-conf.c:837
 msgid ""
@@ -3324,37 +3313,37 @@ msgstr ""
 #: ../src/folder-conf.c:851
 #, fuzzy
 msgid "Confirm"
-msgstr "تأكيد كلمة السر:"
+msgstr "تأكيد الحفظ"
 
 #: ../src/information-dialog.c:222
 #, fuzzy
 msgid "Information - Balsa"
-msgstr "بيانات سيّئة"
+msgstr "_حقول المعلومات"
 
 #: ../src/information-dialog.c:325
 #, fuzzy, c-format
 msgid "WARNING: "
-msgstr "تحذير"
+msgstr "تحذير:"
 
 #: ../src/information-dialog.c:328
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: "
 msgstr "الخطأ: "
 
 #: ../src/information-dialog.c:331
 #, fuzzy, c-format
 msgid "FATAL: "
-msgstr "%s: خطأ X فادح - جاري إعادة التشغيل %s"
+msgstr "ATA"
 
 #: ../src/mailbox-conf.c:221
 #, fuzzy
 msgid "Use _SSL"
-msgstr "SSL غير متوفّر"
+msgstr "ا_ستخدم UTC"
 
 #: ../src/mailbox-conf.c:349
 #, fuzzy
 msgid "No mailbox selected."
-msgstr "لم يتم انتقاء أيّة تطبيقات"
+msgstr "لم يتم انتقاء أيّة أفعال"
 
 #: ../src/mailbox-conf.c:378
 #, c-format
@@ -3377,12 +3366,12 @@ msgstr ""
 #: ../src/mailbox-conf.c:400
 #, fuzzy
 msgid "Remove from _list"
-msgstr "_حذف من القائمة"
+msgstr "أزل من القائمة"
 
 #: ../src/mailbox-conf.c:401
 #, fuzzy
 msgid "Remove from list and _disk"
-msgstr "احذف الصوت المختار من القائمة"
+msgstr "أزل من القائمة"
 
 #: ../src/mailbox-conf.c:409
 #, c-format
@@ -3397,7 +3386,7 @@ msgstr ""
 #: ../src/mailbox-conf.c:422
 #, fuzzy
 msgid "_Remove from server"
-msgstr "_حذف من شريط الأدوات"
+msgstr "ازل من المهملات"
 
 #: ../src/mailbox-conf.c:429
 #, c-format
@@ -3410,21 +3399,21 @@ msgstr ""
 #: ../src/mailbox-conf.c:438
 #, fuzzy
 msgid "_Remove from list"
-msgstr "_حذف من القائمة"
+msgstr "أزل من القائمة"
 
 #: ../src/mailbox-conf.c:476
-#, c-format
+#, fuzzy, c-format
 msgid "Folder deletion failed. Reason: %s"
-msgstr ""
+msgstr "خطأ أثناء حذف الملف '%s':  %s"
 
 #: ../src/mailbox-conf.c:533 ../src/pref-manager.c:1625
 #: ../src/pref-manager.c:1713 ../src/pref-manager.c:2784
 #, fuzzy
 msgid "_Add"
-msgstr "إ_ضافة"
+msgstr "أ_ضف"
 
 #: ../src/mailbox-conf.c:753
-#, fuzzy, c-format
+#, c-format
 msgid "%s on %s"
 msgstr "%s على %s"
 
@@ -3433,82 +3422,81 @@ msgstr "%s على %s"
 msgid ""
 "Rename of %s to %s failed:\n"
 "%s"
-msgstr "فشلت اعادة تسمية `%s' إلى `%s': %s"
+msgstr "فشل تسجيل %s إلى %s"
 
 #: ../src/mailbox-conf.c:1074
 #, fuzzy
 msgid "_Mailbox Name:"
-msgstr "اسم الموصول"
+msgstr "اسم الملف:"
 
 #: ../src/mailbox-conf.c:1085
 #, fuzzy
 msgid "Local Mailbox Configurator"
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr "إعدادات البريد"
 
 #: ../src/mailbox-conf.c:1118
 #, fuzzy
 msgid "Remote Mailbox Configurator"
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr "إعدادات البريد"
 
 #. mailbox name
 #: ../src/mailbox-conf.c:1140 ../src/mailbox-conf.c:1242
 #, fuzzy
 msgid "Mailbox _Name:"
-msgstr "اسم الموصول"
+msgstr "اسم الملف:"
 
 #. password field
 #: ../src/mailbox-conf.c:1159 ../src/mailbox-conf.c:1276
 #, fuzzy
 msgid "Pass_word:"
-msgstr "كلمة الس_ر..."
+msgstr "_كلمة السر:"
 
 #: ../src/mailbox-conf.c:1167
+#, fuzzy
 msgid "_Delete messages from server after download"
-msgstr ""
+msgstr "احذف رسالة بعد الت_عامل معها"
 
 #: ../src/mailbox-conf.c:1172
 #, fuzzy
 msgid "_Enable check for new mail"
-msgstr "تفقّد المحتويات غير المر_غوبة في الرسائل الجديدة"
+msgstr "تحقق من الرسائل ال_جديدة آليا كل"
 
 #: ../src/mailbox-conf.c:1177
-#, fuzzy
 msgid "_Filter messages through procmail"
-msgstr "تطبيق قواعدة التصفية على الرسائل المنتقاة"
+msgstr ""
 
 #: ../src/mailbox-conf.c:1181
 #, fuzzy
 msgid "Fi_lter Command:"
-msgstr "الأمر مطلوب"
+msgstr "الأم_ر:"
 
 #: ../src/mailbox-conf.c:1195
 #, fuzzy
 msgid "Disable _APOP"
-msgstr "تعطيل التاريخ"
+msgstr "عطّل"
 
 #. username
 #: ../src/mailbox-conf.c:1256
 #, fuzzy
 msgid "_Username:"
-msgstr "إ_سم المستخدم:"
+msgstr "ا_سم المستخدم:"
 
 #: ../src/mailbox-conf.c:1270
 #, fuzzy
 msgid "_Remember Password"
-msgstr "تذكّر كلمة السر هذه"
+msgstr "ت_ذكّر كلمة السر"
 
 #: ../src/mailbox-conf.c:1281
 #, fuzzy
 msgid "F_older Path:"
-msgstr "مسار الجهاز"
+msgstr "مسار ال_مجلّد"
 
 #: ../src/mailbox-conf.c:1367
 #, fuzzy
 msgid "_Identity:"
-msgstr "الهويّة"
+msgstr "الهوية:"
 
 #: ../src/mailbox-conf.c:1395 ../src/pref-manager.c:3249
-#, fuzzy
 msgid "Always"
 msgstr "دائماً"
 
@@ -3519,23 +3507,24 @@ msgid ""
 msgstr ""
 
 #: ../src/mailbox-conf.c:1420
+#, fuzzy
 msgid "Show _Recipient column instead of Sender"
-msgstr ""
+msgstr "اعرض عمود إنتهاء الصلاحية في مدير المفاتيح"
 
 #: ../src/mailbox-conf.c:1427
 #, fuzzy
 msgid "_Subscribe for new mail check"
-msgstr "تفقّد المحتويات غير المر_غوبة في الرسائل الجديدة"
+msgstr "اشترك في نشرة صوتية جديدة"
 
 #: ../src/mailbox-node.c:314
 #, fuzzy
 msgid "The folder edition to be written."
-msgstr "يبدو هذا المجلّد فاسداً ز لن يمكن إسترجاعه."
+msgstr "المجلد غير موجود."
 
 #: ../src/mailbox-node.c:478
 #, fuzzy, c-format
 msgid "Scanning %s. Please wait..."
-msgstr "الرجاء الإنتظار: جاري فحص الشبكة المحلية..."
+msgstr "يجري التحميل. الرجاء الإنتظار."
 
 #: ../src/mailbox-node.c:494
 #, c-format
@@ -3547,458 +3536,455 @@ msgstr ""
 #: ../src/mailbox-node.c:496
 #, fuzzy, c-format
 msgid "Scanning of %s failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "فشل تنشيط %s: %s\n"
 
 #: ../src/mailbox-node.c:1019
-#, fuzzy
 msgid "Local _mbox mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr ""
 
 #: ../src/mailbox-node.c:1021
 msgid "Local Mail_dir mailbox..."
 msgstr ""
 
 #: ../src/mailbox-node.c:1023
-#, fuzzy
 msgid "Local M_H mailbox..."
-msgstr "موقع صندوق البريد"
+msgstr ""
 
 #: ../src/mailbox-node.c:1025
-#, fuzzy
 msgid "Remote _IMAP mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr ""
 
 #: ../src/mailbox-node.c:1028
 #, fuzzy
 msgid "Remote IMAP _folder..."
-msgstr "فحص مجلّد _بعيد..."
+msgstr "افحص مجلّد _بعيد..."
 
 #: ../src/mailbox-node.c:1030
 #, fuzzy
 msgid "Remote IMAP _subfolder..."
-msgstr "فشل أمر IMAP: %s"
+msgstr "افحص مجلّد _بعيد..."
 
 #. clicked on the empty space
 #: ../src/mailbox-node.c:1041 ../src/mailbox-node.c:1057
 msgid "_Rescan"
-msgstr ""
+msgstr "أ_عد الفحص"
 
 #: ../src/mailbox-node.c:1051
 #, fuzzy
 msgid "_Properties..."
-msgstr "_خاصيات"
+msgstr "_خاصيات:"
 
 #: ../src/mailbox-node.c:1067
-#, fuzzy
 msgid "_Open"
-msgstr "_فتح"
+msgstr "ا_فتح"
 
 #: ../src/mailbox-node.c:1081
 #, fuzzy
 msgid "_Subscribe"
-msgstr "_إشتراك"
+msgstr "إشترِك"
 
 #: ../src/mailbox-node.c:1083
-#, fuzzy
 msgid "_Unsubscribe"
 msgstr "إل_غاء الإشتراك"
 
 #: ../src/mailbox-node.c:1089
 #, fuzzy
 msgid "Mark as _Inbox"
-msgstr "_تعليم كمكتمل"
+msgstr "علّم ك_نفاية"
 
 #: ../src/mailbox-node.c:1091
 #, fuzzy
 msgid "_Mark as Sentbox"
-msgstr "_تعليم كمكتمل"
+msgstr "_علّم كمكتمل"
 
 #: ../src/mailbox-node.c:1093
 #, fuzzy
 msgid "Mark as _Trash"
-msgstr "_تعليم كمكتمل"
+msgstr "_علّم ك_غير مقروء"
 
 #: ../src/mailbox-node.c:1095
 #, fuzzy
 msgid "Mark as D_raftbox"
-msgstr "_تعليم كمكتمل"
+msgstr "_علّم ك_غير مقروء"
 
 #: ../src/mailbox-node.c:1098
 #, fuzzy
 msgid "_Empty trash"
-msgstr "إفراغ _سلّة المهملات"
+msgstr "افرغ المهملات"
 
 #: ../src/mailbox-node.c:1103
 #, fuzzy
 msgid "_Edit/Apply filters"
-msgstr "فشل تطبيق مصفات الإخراج: %s"
+msgstr "ت_طبيق المرشحات"
 
 #: ../src/mailbox-node.c:1191
-#, c-format
+#, fuzzy, c-format
 msgid "The path \"%s\" does not lead to a mailbox."
-msgstr ""
+msgstr "الموقع \"%s\" غير موجود."
 
 #: ../src/mailbox-node.c:1204
 #, fuzzy, c-format
 msgid "Local mailbox %s loaded as: %s\n"
-msgstr ""
-"تسجيل الدخول عن بعد معطل\n"
-"مثله مثل المحلي"
+msgstr "ملف البريد المحلّي %s"
 
 #: ../src/mailbox-node.c:1233
 #, fuzzy, c-format
 msgid "Local folder %s\n"
-msgstr "افتح مجلد %s"
+msgstr "مجلّدات محلّيّة"
 
-#: ../src/main-window.c:288
+#: ../src/main-window.c:287
 msgid "Balsa closes files and connections. Please wait..."
 msgstr ""
 
-#: ../src/main-window.c:327 ../src/main-window.c:373
+#: ../src/main-window.c:326 ../src/main-window.c:372
 #, fuzzy
 msgid "_Deleted"
-msgstr "حُذف"
+msgstr "_فسخ"
 
-#: ../src/main-window.c:330
+#: ../src/main-window.c:329
 #, fuzzy
 msgid "Un_Deleted"
-msgstr "النص المحذوف"
+msgstr "_فسخ"
 
-#: ../src/main-window.c:333
+#: ../src/main-window.c:332
 #, fuzzy
 msgid "_Read"
-msgstr "_قراءة"
+msgstr "اقرأ"
 
-#: ../src/main-window.c:336
+#: ../src/main-window.c:335
 #, fuzzy
 msgid "Un_read"
-msgstr "وصول قراءة"
+msgstr "_غير مقروء"
 
-#: ../src/main-window.c:342
+#: ../src/main-window.c:341
 #, fuzzy
 msgid "Un_flagged"
-msgstr "عليه علم"
+msgstr "معلّم"
 
-#: ../src/main-window.c:345 ../src/main-window.c:385
+#: ../src/main-window.c:344 ../src/main-window.c:384
 #, fuzzy
 msgid "_Answered"
 msgstr "مجاب"
 
-#: ../src/main-window.c:348
+#: ../src/main-window.c:347
 #, fuzzy
 msgid "Un_answered"
-msgstr "إلغاء الإزاحة"
+msgstr "مجاب"
 
-#: ../src/main-window.c:354
+#: ../src/main-window.c:353
 #, fuzzy
 msgid "_No Headers"
-msgstr "مقدمات POSIX "
+msgstr "ترويسات"
 
-#: ../src/main-window.c:354
+#: ../src/main-window.c:353
 #, fuzzy
 msgid "Display no headers"
-msgstr "لا لوحات مفاتيح للعرض!"
+msgstr "اعرض مخططات ياهو"
+
+#: ../src/main-window.c:355
+#, fuzzy
+msgid "S_elected Headers"
+msgstr "أخفي الرّسائل المنتقاه"
 
 #: ../src/main-window.c:356
 #, fuzzy
-msgid "S_elected Headers"
-msgstr "مقدمات POSIX "
-
-#: ../src/main-window.c:357
-#, fuzzy
 msgid "Display selected headers"
-msgstr "_طبع ترويسات الصفحات"
+msgstr "ترويسات متعلقة بالمحور"
 
-#: ../src/main-window.c:359 ../src/message-window.c:93
+#: ../src/main-window.c:358 ../src/message-window.c:93
 #, fuzzy
 msgid "All _Headers"
-msgstr "مقدمات POSIX "
+msgstr "ترويسة كاملة"
 
-#: ../src/main-window.c:359
+#: ../src/main-window.c:358
 #, fuzzy
 msgid "Display all headers"
-msgstr "عرض كل مساحات العمل"
+msgstr "اعرض كل مساحات العمل"
 
-#: ../src/main-window.c:368
+#: ../src/main-window.c:367
 #, fuzzy
 msgid "Toggle flagged"
-msgstr "عليه علم"
+msgstr "حالة التحول"
 
-#: ../src/main-window.c:374
+#: ../src/main-window.c:373
 #, fuzzy
 msgid "Toggle deleted flag"
-msgstr "_مسح العلم"
+msgstr "احذف الجدول"
 
-#: ../src/main-window.c:379
+#: ../src/main-window.c:378
 #, fuzzy
 msgid "Toggle New"
-msgstr "فا_صل جديد"
+msgstr "تحول"
 
-#: ../src/main-window.c:385
+#: ../src/main-window.c:384
 #, fuzzy
 msgid "Toggle Answered"
-msgstr "<b>مفاتيح التحول</b>"
+msgstr "مجاب"
 
-#: ../src/main-window.c:400
+#: ../src/main-window.c:399
 #, fuzzy
 msgid "_Message..."
-msgstr "رسالة"
+msgstr "_رسالة جديدة..."
 
-#: ../src/main-window.c:400 ../src/main-window.c:1061
+#: ../src/main-window.c:399 ../src/main-window.c:1060
 #, fuzzy
 msgid "Compose a new message"
-msgstr "تأليف رسالة _جديدة"
+msgstr "تأليف رسالة بريديّة جديدة"
 
 #. We could use GNOMEUIINFO_INCLUDE but it appends the menu instead
 #. of including at specified position
-#: ../src/main-window.c:407
-#, fuzzy
+#: ../src/main-window.c:406
 msgid "Local mbox mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr ""
 
-#: ../src/main-window.c:408 ../src/main-window.c:827
+#: ../src/main-window.c:407 ../src/main-window.c:826
+#, fuzzy
 msgid "Add a new mbox style mailbox"
-msgstr ""
+msgstr "اضف ملف جديد فارغ"
 
-#: ../src/main-window.c:411
-#, fuzzy
+#: ../src/main-window.c:410
 msgid "Local Maildir mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
-
-#: ../src/main-window.c:412 ../src/main-window.c:832
-msgid "Add a new Maildir style mailbox"
 msgstr ""
 
-#: ../src/main-window.c:415
+#: ../src/main-window.c:411 ../src/main-window.c:831
 #, fuzzy
-msgid "Local MH mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgid "Add a new Maildir style mailbox"
+msgstr "أضف محطة إذاعية جديدة"
 
-#: ../src/main-window.c:416 ../src/main-window.c:836
-msgid "Add a new MH style mailbox"
+#: ../src/main-window.c:414
+msgid "Local MH mailbox..."
 msgstr ""
 
-#: ../src/main-window.c:419 ../src/main-window.c:839
+#: ../src/main-window.c:415 ../src/main-window.c:835
+#, fuzzy
+msgid "Add a new MH style mailbox"
+msgstr "أضف قاعدة جديدة"
+
+#: ../src/main-window.c:418 ../src/main-window.c:838
 #: ../src/pref-manager.c:3108
 #, fuzzy
 msgid "Remote IMAP mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr "ا_حذف لون..."
 
-#: ../src/main-window.c:420 ../src/main-window.c:840
+#: ../src/main-window.c:419 ../src/main-window.c:839
 #, fuzzy
 msgid "Add a new IMAP mailbox"
-msgstr "إضافة قائمة مهام جديدة"
+msgstr "أضف إجراء جديد"
 
-#: ../src/main-window.c:424 ../src/main-window.c:844
+#: ../src/main-window.c:423 ../src/main-window.c:843
 #: ../src/pref-manager.c:3113
 #, fuzzy
 msgid "Remote IMAP folder..."
-msgstr "فحص مجلّد _بعيد..."
+msgstr "افحص مجلّد _بعيد..."
 
-#: ../src/main-window.c:425 ../src/main-window.c:845
+#: ../src/main-window.c:424 ../src/main-window.c:844
 #, fuzzy
 msgid "Add a new IMAP folder"
-msgstr "خطأ \"%s\" أثناء إنشاء مجلد جديد."
+msgstr "اضف مجلّدا جديدا فارغا"
+
+#: ../src/main-window.c:427 ../src/main-window.c:847
+#, fuzzy
+msgid "Remote IMAP subfolder..."
+msgstr "افحص مجلّد _بعيد..."
 
 #: ../src/main-window.c:428 ../src/main-window.c:848
 #, fuzzy
-msgid "Remote IMAP subfolder..."
-msgstr "فشل أمر IMAP: %s"
-
-#: ../src/main-window.c:429 ../src/main-window.c:849
-#, fuzzy
 msgid "Add a new IMAP subfolder"
-msgstr "إضافة قائمة مهام جديدة"
+msgstr "أضف قاعدة جديدة"
 
-#: ../src/main-window.c:442
-#, fuzzy
+#: ../src/main-window.c:441
 msgid "_Continue"
 msgstr "_مواصلة"
 
-#: ../src/main-window.c:443
+#: ../src/main-window.c:442
+#, fuzzy
 msgid "Continue editing current message"
-msgstr ""
+msgstr "لم أستطع إنشاء رسالة."
 
 #. Ctrl-M
-#: ../src/main-window.c:450 ../src/main-window.c:891
+#: ../src/main-window.c:449 ../src/main-window.c:890
 #, fuzzy
 msgid "_Get New Mail"
-msgstr "رسالة بريديّة جديدة"
+msgstr "كتابةال_بريد الالكتروني"
 
-#: ../src/main-window.c:450 ../src/main-window.c:891
+#: ../src/main-window.c:449 ../src/main-window.c:890
 #, fuzzy
 msgid "Fetch new incoming mail"
-msgstr "مقطع صوتي لرسالة صوتية جديدة"
+msgstr "تنفيذ اختبار النفاية على البريد الوارد"
 
 #. Ctrl-S
-#: ../src/main-window.c:456 ../src/main-window.c:886
+#: ../src/main-window.c:455 ../src/main-window.c:885
 #, fuzzy
 msgid "_Send Queued Mail"
-msgstr "إرسال و تلقي البريد"
+msgstr "أرسل البريد"
 
-#: ../src/main-window.c:457 ../src/main-window.c:887
+#: ../src/main-window.c:456 ../src/main-window.c:886
+#, fuzzy
 msgid "Send messages from the outbox"
-msgstr ""
+msgstr "لصق رسائل من الحافظة"
 
 #. Ctrl-B
-#: ../src/main-window.c:463 ../src/main-window.c:881
+#: ../src/main-window.c:462 ../src/main-window.c:880
 #, fuzzy
 msgid "Send and _Receive Mail"
-msgstr "إرسال بريد HTML افتراضا"
+msgstr "أرسِل و تلقى البريد"
 
-#: ../src/main-window.c:464 ../src/main-window.c:882
+#: ../src/main-window.c:463 ../src/main-window.c:881
 #: ../src/toolbar-factory.c:113
 #, fuzzy
 msgid "Send and Receive messages"
-msgstr "إرسال العناصر المصطفة و جلب العناصر الجديدة"
+msgstr "أرسل واستقبل الفاكسات"
 
-#: ../src/main-window.c:469 ../src/main-window.c:897
+#: ../src/main-window.c:468 ../src/main-window.c:896
 #: ../src/message-window.c:100 ../src/sendmsg-window.c:365
+#, fuzzy
 msgid "Page _Setup"
-msgstr ""
+msgstr "إعداد الصفحة"
 
-#: ../src/main-window.c:469 ../src/main-window.c:898
+#: ../src/main-window.c:468 ../src/main-window.c:897
 #: ../src/message-window.c:101 ../src/sendmsg-window.c:366
 #, fuzzy
 msgid "Set up page for printing"
-msgstr "جسم الخط للطباعة"
+msgstr "اضبط تعيينات الصفحة"
+
+#: ../src/main-window.c:474 ../src/main-window.c:901
+#: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:540
+msgid "_Print..."
+msgstr "ا_طبع..."
 
 #: ../src/main-window.c:475 ../src/main-window.c:902
-#: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:540
-#, fuzzy
-msgid "_Print..."
-msgstr "_طبع..."
-
-#: ../src/main-window.c:476 ../src/main-window.c:903
 #: ../src/toolbar-factory.c:109
 #, fuzzy
 msgid "Print current message"
-msgstr "طبع هذه الرسالة"
+msgstr "إطبع اللعبة الحالية"
 
-#: ../src/main-window.c:482 ../src/main-window.c:1120
+#: ../src/main-window.c:481 ../src/main-window.c:1119
 #, fuzzy
 msgid "_Address Book..."
-msgstr "دفتر العناوين"
+msgstr "دفتر عناوين..."
 
-#: ../src/main-window.c:483 ../src/main-window.c:1121
-#, fuzzy
+#: ../src/main-window.c:482 ../src/main-window.c:1120
 msgid "Open the address book"
 msgstr "إفتح دفتر العناوين"
 
-#: ../src/main-window.c:507
+#: ../src/main-window.c:506
+#, fuzzy
 msgid "F_ilters..."
-msgstr ""
+msgstr "_مرشّح..."
 
-#: ../src/main-window.c:507 ../src/main-window.c:1107
+#: ../src/main-window.c:506 ../src/main-window.c:1106
 #, fuzzy
 msgid "Manage filters"
-msgstr "مصفات البريد"
+msgstr "مرشِّحات الرسائِل"
 
-#: ../src/main-window.c:509 ../src/main-window.c:1113
+#: ../src/main-window.c:508 ../src/main-window.c:1112
 #, fuzzy
 msgid "_Export Filters"
-msgstr "مصفات البريد"
+msgstr "تصدير ملف"
 
-#: ../src/main-window.c:509 ../src/main-window.c:1114
+#: ../src/main-window.c:508 ../src/main-window.c:1113
+#, fuzzy
 msgid "Export filters as Sieve scripts"
-msgstr ""
+msgstr "تصدير المسار النشط"
+
+#: ../src/main-window.c:516
+#, fuzzy
+msgid "_Flat index"
+msgstr "فهرس البداية"
 
 #: ../src/main-window.c:517
 #, fuzzy
-msgid "_Flat index"
-msgstr "الفهرس النهائي"
-
-#: ../src/main-window.c:518
-#, fuzzy
 msgid "No threading at all"
-msgstr "لا سيمة مخزنة عند '%s'\n"
+msgstr "_بتاتا"
+
+#: ../src/main-window.c:522
+#, fuzzy
+msgid "Si_mple threading"
+msgstr "عملية طرح بسيطة"
 
 #: ../src/main-window.c:523
 #, fuzzy
-msgid "Si_mple threading"
-msgstr "ح_جم عادي"
-
-#: ../src/main-window.c:524
-#, fuzzy
 msgid "Simple threading algorithm"
-msgstr "ألغورذم توقيع الشّهادة"
+msgstr "نوع / خوازميّة المفتاح"
+
+#: ../src/main-window.c:528
+#, fuzzy
+msgid "_JWZ threading"
+msgstr "قراءة الكلمات"
 
 #: ../src/main-window.c:529
-msgid "_JWZ threading"
-msgstr ""
-
-#: ../src/main-window.c:530
+#, fuzzy
 msgid "Elaborate JWZ threading"
-msgstr ""
+msgstr "لا يمكن إنشاء خيط"
 
-#: ../src/main-window.c:540
+#: ../src/main-window.c:539
 #, fuzzy
 msgid "_Show Mailbox Tree"
-msgstr "مشهد شجرة GTK"
+msgstr "اظهر الشجرة"
 
-#: ../src/main-window.c:541
+#: ../src/main-window.c:540
 msgid "Toggle display of mailbox and folder tree"
 msgstr ""
 
-#: ../src/main-window.c:545
+#: ../src/main-window.c:544
 #, fuzzy
 msgid "Show Mailbox _Tabs"
-msgstr "إغلاق جميع الألسنة؟"
+msgstr "عرض الألسنة"
 
-#: ../src/main-window.c:546
+#: ../src/main-window.c:545
 msgid "Toggle display of mailbox notebook tabs"
 msgstr ""
 
-#: ../src/main-window.c:550 ../src/main-window.c:972
+#: ../src/main-window.c:549 ../src/main-window.c:971
 #: ../src/message-window.c:134
 #, fuzzy
 msgid "_Wrap"
-msgstr "كسر"
+msgstr "تغطية"
 
-#: ../src/main-window.c:550 ../src/main-window.c:972
+#: ../src/main-window.c:549 ../src/main-window.c:971
 #: ../src/sendmsg-window.c:402 ../src/sendmsg-window.c:565
 #, fuzzy
 msgid "Wrap message lines"
-msgstr "نسخ السّطور المنتقاة"
+msgstr "يجري إنشاء قائمة الرسائل"
+
+#: ../src/main-window.c:558 ../src/main-window.c:977
+#, fuzzy
+msgid "E_xpand All"
+msgstr "مدِّد الكل"
 
 #: ../src/main-window.c:559 ../src/main-window.c:978
 #, fuzzy
-msgid "E_xpand All"
-msgstr "نسخ ال_كل"
-
-#: ../src/main-window.c:560 ../src/main-window.c:979
-#, fuzzy
 msgid "Expand all threads"
-msgstr "عرض مسارات الأعمال"
+msgstr "وس_ع كل الخيوط"
+
+#: ../src/main-window.c:563 ../src/main-window.c:982
+#, fuzzy
+msgid "_Collapse All"
+msgstr "اطوِ الكل"
 
 #: ../src/main-window.c:564 ../src/main-window.c:983
 #, fuzzy
-msgid "_Collapse All"
-msgstr "إنهيار الكل"
-
-#: ../src/main-window.c:565 ../src/main-window.c:984
 msgid "Collapse all expanded threads"
-msgstr ""
+msgstr "إطو كل خيوط المناقشة"
 
-#: ../src/main-window.c:571 ../src/main-window.c:1014
+#: ../src/main-window.c:570 ../src/main-window.c:1013
 #: ../src/message-window.c:140
 #, fuzzy
 msgid "Zoom _In"
 msgstr "ت_كبير"
 
-#: ../src/main-window.c:571 ../src/main-window.c:1014
+#: ../src/main-window.c:570 ../src/main-window.c:1013
 #: ../src/message-window.c:140
 #, fuzzy
 msgid "Increase magnification"
 msgstr "تكبير المؤشّر"
 
-#: ../src/main-window.c:575 ../src/main-window.c:1018
+#: ../src/main-window.c:574 ../src/main-window.c:1017
 #: ../src/message-window.c:144
-#, fuzzy
 msgid "Zoom _Out"
 msgstr "ت_صغير"
 
-#: ../src/main-window.c:575 ../src/main-window.c:1018
+#: ../src/main-window.c:574 ../src/main-window.c:1017
 #: ../src/message-window.c:144
 #, fuzzy
 msgid "Decrease magnification"
@@ -4007,472 +3993,473 @@ msgstr "تكبير المؤشّر"
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
 #. * format specifier:
-#: ../src/main-window.c:581 ../src/main-window.c:1024
+#: ../src/main-window.c:580 ../src/main-window.c:1023
 #: ../src/message-window.c:151
 #, fuzzy, no-c-format
 msgid "Zoom _100%"
-msgstr "تكبير 100%"
+msgstr "كبّر 100%"
 
-#: ../src/main-window.c:581 ../src/main-window.c:1024
+#: ../src/main-window.c:580 ../src/main-window.c:1023
 #: ../src/message-window.c:151
 #, fuzzy
 msgid "No magnification"
 msgstr "تكبير المؤشّر"
 
-#: ../src/main-window.c:599 ../src/main-window.c:1068
+#: ../src/main-window.c:598 ../src/main-window.c:1067
 #: ../src/toolbar-factory.c:85
 #, fuzzy
 msgid "Reply to the current message"
-msgstr "تأليف رد إلى مرسِل الرّسالة المنتقاة"
+msgstr "اضبط اسم الجلسة الحالية"
 
 #. A
-#: ../src/main-window.c:606 ../src/main-window.c:1074
+#: ../src/main-window.c:605 ../src/main-window.c:1073
 #: ../src/message-window.c:166
 #, fuzzy
 msgid "Reply to _All..."
-msgstr "الرّد على ال_كل"
+msgstr "رُد على ال_كل"
 
-#: ../src/main-window.c:607 ../src/main-window.c:1075
+#: ../src/main-window.c:606 ../src/main-window.c:1074
 #, fuzzy
 msgid "Reply to all recipients of the current message"
 msgstr "تأليف ردّ إلى كل المرسَل إليهم للرسالة المنتقاة"
 
-#: ../src/main-window.c:614 ../src/message-window.c:172
+#: ../src/main-window.c:613 ../src/message-window.c:172
 #, fuzzy
 msgid "Reply to _Group..."
-msgstr "الرّد على ال_كل"
+msgstr "رُد على ال_كل"
 
-#: ../src/main-window.c:615 ../src/message-window.c:173
+#: ../src/main-window.c:614 ../src/message-window.c:173
 #: ../src/toolbar-factory.c:89
 #, fuzzy
 msgid "Reply to mailing list"
-msgstr "تصفية باعتبار ال_قائمة البريديّة"
+msgstr "قائمة %s البريديّة"
 
-#: ../src/main-window.c:622 ../src/message-window.c:178
+#: ../src/main-window.c:621 ../src/message-window.c:178
 #, fuzzy
 msgid "_Forward attached..."
-msgstr "حوّل المكالمات"
+msgstr "_مرر المراسَل..."
 
-#: ../src/main-window.c:623
+#: ../src/main-window.c:622
 #, fuzzy
 msgid "Forward the current message as attachment"
 msgstr "توجيه الرسالة المنتقاة إلى شخص ما كمُرفق"
 
-#: ../src/main-window.c:629
+#: ../src/main-window.c:628
 #, fuzzy
 msgid "Forward _inline..."
-msgstr "_عرض ضمن السّياق"
+msgstr "مرر الوصلة"
 
-#: ../src/main-window.c:630
+#: ../src/main-window.c:629
 #, fuzzy
 msgid "Forward the current message inline"
 msgstr "توجيه الرسالة المنتقاة لشخص ما"
 
-#: ../src/main-window.c:638
+#: ../src/main-window.c:637
+#, fuzzy
 msgid "Pipe the message through another program"
-msgstr ""
+msgstr "نسخ الرّسالة المنتقاة إلى مجلّد آخر"
 
-#: ../src/main-window.c:645
+#: ../src/main-window.c:644
 #, fuzzy
 msgid "_Next Part"
-msgstr "الصّورة ال_تّالية"
+msgstr "الصفحة ال_تالية"
 
-#: ../src/main-window.c:645 ../src/message-window.c:190
+#: ../src/main-window.c:644 ../src/message-window.c:190
 #, fuzzy
 msgid "Next part in message"
-msgstr "ليس ثمّة رسالة %s في %s"
+msgstr "الرسالة ال_مهمّة التالية"
 
-#: ../src/main-window.c:651
+#: ../src/main-window.c:650
 #, fuzzy
 msgid "_Previous Part"
-msgstr "الصّ_ورة السّابقة"
+msgstr "الصفحة ال_سابقة"
 
-#: ../src/main-window.c:652 ../src/message-window.c:196
+#: ../src/main-window.c:651 ../src/message-window.c:196
 #, fuzzy
 msgid "Previous part in message"
-msgstr "ليس ثمّة رسالة %s في %s"
+msgstr "الرسالة المهمّة ال_سابقة"
 
-#: ../src/main-window.c:658 ../src/main-window.c:1088
+#: ../src/main-window.c:657 ../src/main-window.c:1087
 #: ../src/message-window.c:200
 #, fuzzy
 msgid "Save Current Part..."
 msgstr "إ_حفظ الصورة الحالية"
 
-#: ../src/main-window.c:659 ../src/main-window.c:1089
+#: ../src/main-window.c:658 ../src/main-window.c:1088
+#, fuzzy
 msgid "Save currently displayed part of message"
-msgstr ""
+msgstr "تحفظ اللسان المعروض حاليا"
 
-#: ../src/main-window.c:665 ../src/main-window.c:1041
+#: ../src/main-window.c:664 ../src/main-window.c:1040
 #: ../src/message-window.c:205
 #, fuzzy
 msgid "_View Source..."
-msgstr "عرض التشفيرة المصدرية لهذه الصفحة"
+msgstr "اعرض المصدر"
 
-#: ../src/main-window.c:666 ../src/main-window.c:1042
+#: ../src/main-window.c:665 ../src/main-window.c:1041
 #: ../src/message-window.c:206
 #, fuzzy
 msgid "View source form of the message"
-msgstr "عرض التشفيرة المصدرية لهذه الصفحة"
+msgstr "اعرض الشفرة المصدرية لهذه الصفحة"
 
-#: ../src/main-window.c:684 ../src/message-window.c:241
-#, fuzzy
+#: ../src/main-window.c:683 ../src/message-window.c:241
 msgid "_Move to Trash"
-msgstr "نقل إلى سلّة المهملات"
+msgstr "_نقل إلى سلّة المهملات"
 
-#: ../src/main-window.c:685 ../src/main-window.c:1096
+#: ../src/main-window.c:684 ../src/main-window.c:1095
+#, fuzzy
 msgid "Move the current message to Trash mailbox"
-msgstr ""
+msgstr "انقل المستند الحالي إلى نافذة جديدة"
 
 #. !
-#: ../src/main-window.c:691 ../src/main-window.c:1047
+#: ../src/main-window.c:690 ../src/main-window.c:1046
 #, fuzzy
 msgid "_Toggle flag"
-msgstr "حالة العلم"
+msgstr "تحول"
 
-#: ../src/main-window.c:697 ../src/main-window.c:1052
+#: ../src/main-window.c:696 ../src/main-window.c:1051
+#, fuzzy
 msgid "Store address of sender in addressbook"
-msgstr ""
+msgstr "اذهب للعنوان المدخل في خانة العناوين"
 
-#: ../src/main-window.c:708 ../src/main-window.c:1005
+#: ../src/main-window.c:707 ../src/main-window.c:1004
 #, fuzzy
 msgid "Next Message"
 msgstr "الرّسالة ال_تّالية"
 
-#: ../src/main-window.c:714 ../src/main-window.c:1009
+#: ../src/main-window.c:713 ../src/main-window.c:1008
 #: ../src/message-window.c:220
 #, fuzzy
 msgid "Previous Message"
 msgstr "ال_رّسالة السابقة"
 
-#: ../src/main-window.c:720 ../src/main-window.c:721 ../src/main-window.c:999
-#: ../src/main-window.c:1000 ../src/message-window.c:226
+#: ../src/main-window.c:719 ../src/main-window.c:720 ../src/main-window.c:998
+#: ../src/main-window.c:999 ../src/message-window.c:226
 #: ../src/message-window.c:227
 #, fuzzy
 msgid "Next Unread Message"
-msgstr "الرّسالة ال_غير مقروءة التالية"
+msgstr "الرّسالة _غير المقروءة التالية"
 
-#: ../src/main-window.c:727 ../src/main-window.c:728 ../src/main-window.c:964
-#: ../src/main-window.c:965 ../src/message-window.c:233
+#: ../src/main-window.c:726 ../src/main-window.c:727 ../src/main-window.c:963
+#: ../src/main-window.c:964 ../src/message-window.c:233
 #: ../src/message-window.c:234
 #, fuzzy
 msgid "Next Flagged Message"
-msgstr "عرض الرسالة التالية"
+msgstr "الرّسالة _غير المقروءة التالية"
 
-#: ../src/main-window.c:735
+#: ../src/main-window.c:734
 #, fuzzy
 msgid "_Hide messages"
-msgstr "إخفاء الرّسائل ال_محذوفة"
+msgstr "رسالة مساعدة"
 
-#: ../src/main-window.c:737
+#: ../src/main-window.c:736
 #, fuzzy
 msgid "_Reset Filter"
-msgstr "مصفاة ذات الأولويّة \"%s\""
+msgstr "تنضيد كل الفلاتر"
 
-#: ../src/main-window.c:737
+#: ../src/main-window.c:736
 #, fuzzy
 msgid "Reset mailbox filter"
-msgstr "تسجيل إجراءات المصفاة"
+msgstr "تنضيد كل الفلاتر"
+
+#: ../src/main-window.c:741
+#, fuzzy
+msgid "_Select All"
+msgstr "اختر الكل"
 
 #: ../src/main-window.c:742
 #, fuzzy
-msgid "_Select All"
-msgstr "_إنتقاء الكلّ"
-
-#: ../src/main-window.c:743
 msgid "Select all messages in current mailbox"
-msgstr ""
+msgstr "هذه الرّسالة غير متوفّرة حاليّاً"
 
-#: ../src/main-window.c:749 ../src/main-window.c:859
-#, fuzzy
+#: ../src/main-window.c:748 ../src/main-window.c:858
 msgid "_Edit..."
-msgstr "_تحرير"
+msgstr "_حرر..."
 
-#: ../src/main-window.c:749 ../src/main-window.c:859
+#: ../src/main-window.c:748 ../src/main-window.c:858
 #, fuzzy
 msgid "Edit the selected mailbox"
-msgstr "تحرير المفتاح المنتقى"
+msgstr "تحرير القالب المحدد"
+
+#: ../src/main-window.c:752 ../src/main-window.c:853
+#, fuzzy
+msgid "_Delete..."
+msgstr "_فسخ"
 
 #: ../src/main-window.c:753 ../src/main-window.c:854
 #, fuzzy
-msgid "_Delete..."
-msgstr "إح_ذف"
-
-#: ../src/main-window.c:754 ../src/main-window.c:855
-#, fuzzy
 msgid "Delete the selected mailbox"
-msgstr "_حذف المهام المنتقاة"
+msgstr "احذف النصّ المنتقى"
 
-#: ../src/main-window.c:760
+#: ../src/main-window.c:759
 #, fuzzy
 msgid "E_xpunge Deleted Messages"
-msgstr "إخفاء الرّسائل ال_محذوفة"
+msgstr "يجري شطب الرّسائل المحذوفة"
 
-#: ../src/main-window.c:761 ../src/main-window.c:866
+#: ../src/main-window.c:760 ../src/main-window.c:865
 msgid "Expunge messages marked as deleted in the currently opened mailbox"
 msgstr ""
 
-#: ../src/main-window.c:766 ../src/main-window.c:872
+#: ../src/main-window.c:765 ../src/main-window.c:871
 #, fuzzy
 msgid "Close mailbox"
-msgstr "موقع صندوق البريد"
+msgstr "اغلق اللسان"
 
-#: ../src/main-window.c:770 ../src/main-window.c:1125
+#: ../src/main-window.c:769 ../src/main-window.c:1124
 #, fuzzy
 msgid "Empty _Trash"
-msgstr "إفراغ _سلّة المهملات"
+msgstr "افرغ المهملات"
 
-#: ../src/main-window.c:771 ../src/main-window.c:1126
+#: ../src/main-window.c:770 ../src/main-window.c:1125
 #: ../src/toolbar-factory.c:135
+#, fuzzy
 msgid "Delete messages from the Trash mailbox"
-msgstr ""
+msgstr "لصق رسائل من الحافظة"
 
-#: ../src/main-window.c:775
+#: ../src/main-window.c:774
 #, fuzzy
 msgid "Select _Filters"
-msgstr "مصفات البريد"
+msgstr "اختر ملف"
 
-#: ../src/main-window.c:776 ../src/main-window.c:1111
+#: ../src/main-window.c:775 ../src/main-window.c:1110
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr ""
 
-#: ../src/main-window.c:781
+#: ../src/main-window.c:780
 #, fuzzy
 msgid "_Remove Duplicates"
-msgstr "ح_ذف النسخ"
+msgstr "اح_ذف التكرار"
 
-#: ../src/main-window.c:782
+#: ../src/main-window.c:781
+#, fuzzy
 msgid "Remove duplicated messages from the selected mailbox"
-msgstr ""
+msgstr "إنشاء صورة جديدة من قالب محدد"
 
-#: ../src/main-window.c:797
+#: ../src/main-window.c:796
 #, fuzzy
 msgid "_Toolbars..."
-msgstr "أ_عمدة الادوات"
+msgstr "أ_شرطة الادوات"
 
-#: ../src/main-window.c:798
-#, fuzzy
+#: ../src/main-window.c:797
 msgid "Customize toolbars"
-msgstr "تخصيص أعمدة الأدوات"
+msgstr "خصّص أشرطة الأدوات"
+
+#: ../src/main-window.c:800 ../src/main-window.c:1128
+#, fuzzy
+msgid "_Identities..."
+msgstr "اضبط ال_عنوان..."
 
 #: ../src/main-window.c:801 ../src/main-window.c:1129
-msgid "_Identities..."
-msgstr ""
-
-#: ../src/main-window.c:802 ../src/main-window.c:1130
+#, fuzzy
 msgid "Create and set current identities"
-msgstr ""
+msgstr "إنشاء واستخدام التح_ديدات"
 
-#: ../src/main-window.c:813
+#: ../src/main-window.c:812
 #, fuzzy
 msgid "Mail_box"
-msgstr "_صندوق البريد:"
+msgstr "صندوق بريد"
 
-#: ../src/main-window.c:814 ../src/main-window.c:1143
+#: ../src/main-window.c:813 ../src/main-window.c:1142
 #: ../src/message-window.c:258
-#, fuzzy
 msgid "_Message"
-msgstr "رسالة"
+msgstr "_رسالة"
 
-#: ../src/main-window.c:826
+#: ../src/main-window.c:825
 #, fuzzy
 msgid "New mailbox..."
-msgstr "موقع صندوق البريد"
+msgstr "ملف تعريف جديد..."
 
-#: ../src/main-window.c:831
-#, fuzzy
+#: ../src/main-window.c:830
 msgid "New \"Maildir\" mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr ""
 
-#: ../src/main-window.c:835
-#, fuzzy
+#: ../src/main-window.c:834
 msgid "New \"MH\" mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr ""
 
-#: ../src/main-window.c:865
+#: ../src/main-window.c:864
 #, fuzzy
 msgid "_Compress Mailbox"
-msgstr "موقع صندوق البريد"
+msgstr "الضغط"
 
-#: ../src/main-window.c:895
+#: ../src/main-window.c:894
 #, fuzzy
 msgid "Mail_boxes"
-msgstr "كتابةال_بريد الالكتروني"
+msgstr "صندوق بريد"
 
-#: ../src/main-window.c:926
-#, fuzzy
+#: ../src/main-window.c:925
 msgid "By _Arrival"
-msgstr "المطورون"
+msgstr ""
 
-#: ../src/main-window.c:926
+#: ../src/main-window.c:925
 #, fuzzy
 msgid "Arrival order"
-msgstr "ترتيب _مقلوب"
+msgstr "ارسم الحدّ"
 
-#: ../src/main-window.c:930
+#: ../src/main-window.c:929
 #, fuzzy
 msgid "By _Sender"
-msgstr "مرسِل مجهول"
+msgstr "حسب ال_مرسِل"
 
-#: ../src/main-window.c:930
+#: ../src/main-window.c:929
 #, fuzzy
 msgid "Sender order"
-msgstr "ترتيب _مقلوب"
+msgstr "الحد الداخلي"
 
-#: ../src/main-window.c:934
+#: ../src/main-window.c:933
 #, fuzzy
 msgid "By S_ubject"
-msgstr "المطورون"
+msgstr "حسب المو_ضوع"
 
-#: ../src/main-window.c:934
+#: ../src/main-window.c:933
 #, fuzzy
 msgid "Subject order"
-msgstr "ترتيب _مقلوب"
+msgstr "الموضوع"
 
-#: ../src/main-window.c:938
+#: ../src/main-window.c:937
 #, fuzzy
 msgid "By Si_ze"
-msgstr "ح_جم عادي"
+msgstr "باعتبار الحجم"
 
-#: ../src/main-window.c:938
+#: ../src/main-window.c:937
 #, fuzzy
 msgid "By message size"
-msgstr "ترتيب بحسب الحجم"
+msgstr "حجم الصورة"
 
-#: ../src/main-window.c:942
+#: ../src/main-window.c:941
 #, fuzzy
 msgid "_Threaded"
-msgstr "قائمة رسائل مشعّبة"
+msgstr "اقرأني"
 
-#: ../src/main-window.c:942
+#: ../src/main-window.c:941
 #, fuzzy
 msgid "Use message threading"
-msgstr "رسالة إجتماع رديئة"
+msgstr "إطو كل خيوط المناقشة"
 
-#: ../src/main-window.c:950
-#, fuzzy
+#: ../src/main-window.c:949
 msgid "_Descending"
 msgstr "_تنازلي"
 
-#: ../src/main-window.c:950
+#: ../src/main-window.c:949
 #, fuzzy
 msgid "Sort in a descending order"
-msgstr "اقلب ترتيب التصنيف في النوافذ الجديدة"
+msgstr "رتبهم تصاعدياً او تنازلياً"
 
-#: ../src/main-window.c:971
+#: ../src/main-window.c:970
 #, fuzzy
 msgid "_Headers"
-msgstr "<b>الترويسات</b>"
+msgstr "ترويسات"
+
+#: ../src/main-window.c:973
+#, fuzzy
+msgid "_Sort Mailbox"
+msgstr "يجري استيراد صندوق البريد"
 
 #: ../src/main-window.c:974
 #, fuzzy
-msgid "_Sort Mailbox"
-msgstr "موقع صندوق البريد"
-
-#: ../src/main-window.c:975
-#, fuzzy
 msgid "H_ide messages"
-msgstr "الرسائل الممرّرة"
+msgstr "رسالة مساعدة"
+
+#: ../src/main-window.c:988
+#, fuzzy
+msgid "_View filter"
+msgstr "ا_عرض ملف"
 
 #: ../src/main-window.c:989
 #, fuzzy
-msgid "_View filter"
-msgstr "مصفاة ذات الأولويّة \"%s\""
-
-#: ../src/main-window.c:990
 msgid "Enable quick message index filter"
-msgstr ""
+msgstr "لا يمكن إرسال الملف"
 
-#: ../src/main-window.c:1028 ../src/main-window.c:1102
+#: ../src/main-window.c:1027 ../src/main-window.c:1101
 #: ../src/sendmsg-window.c:542 ../src/sendmsg-window.c:600
 #: ../src/sendmsg-window.c:664
 #, fuzzy
 msgid "_More"
-msgstr "_المزيد..."
+msgstr "تحريك"
 
-#: ../src/main-window.c:1061
-#, fuzzy
+#: ../src/main-window.c:1060
 msgid "_New..."
-msgstr "جديد"
+msgstr "_جديد..."
 
 #. F
-#: ../src/main-window.c:1081
+#: ../src/main-window.c:1080
 #, fuzzy
 msgid "_Forward..."
-msgstr "_حوّل"
+msgstr "م_رر بهيئة..."
 
-#: ../src/main-window.c:1082 ../src/toolbar-factory.c:91
+#: ../src/main-window.c:1081 ../src/toolbar-factory.c:91
 #, fuzzy
 msgid "Forward the current message"
-msgstr "توجيه الرسالة المنتقاة لشخص ما"
+msgstr "رسالة ممررة"
 
 #. D
-#: ../src/main-window.c:1095
+#: ../src/main-window.c:1094
 #, fuzzy
 msgid "_Delete to Trash"
-msgstr "نقل إلى سلّة المهملات"
+msgstr "ا_حذف من المهملات"
 
-#: ../src/main-window.c:1107
+#: ../src/main-window.c:1106
 #, fuzzy
 msgid "_Manage..."
-msgstr "إدارة الشهادات"
+msgstr "ص_فحة..."
 
-#: ../src/main-window.c:1110
+#: ../src/main-window.c:1109
 #, fuzzy
 msgid "_Select Filters"
-msgstr "مصفات البريد"
+msgstr "الملفات الم_نتقاة"
 
-#: ../src/main-window.c:1128
+#: ../src/main-window.c:1127
 #, fuzzy
 msgid "_Filters"
-msgstr "مصفات"
+msgstr "مرشِّحات"
 
-#: ../src/main-window.c:1144 ../src/sendmsg-window.c:680
-#, fuzzy
+#: ../src/main-window.c:1143 ../src/sendmsg-window.c:680
 msgid "_Tools"
 msgstr "أد_وات"
 
-#: ../src/main-window.c:1248
+#: ../src/main-window.c:1247
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr ""
 
-#: ../src/main-window.c:1490
+#: ../src/main-window.c:1489
+#, fuzzy
 msgid "Subject or Sender Contains:"
-msgstr ""
+msgstr "الموضوع أو المرسِل يحتويان على"
+
+#: ../src/main-window.c:1490
+#, fuzzy
+msgid "Subject or Recipient Contains:"
+msgstr "الموضوع أو المرسِل يحتويان على"
 
 #: ../src/main-window.c:1491
-msgid "Subject or Recipient Contains:"
-msgstr ""
-
-#: ../src/main-window.c:1492
 #, fuzzy
 msgid "Subject Contains:"
 msgstr "الموضوع يحتوي"
 
-#: ../src/main-window.c:1493
+#: ../src/main-window.c:1492
 #, fuzzy
 msgid "Body Contains:"
 msgstr "المتن يحتوي"
 
-#: ../src/main-window.c:1494
-#, fuzzy
+#: ../src/main-window.c:1493
 msgid "Older than (days):"
-msgstr "تنطيف الأحداث الأقدم من"
+msgstr ""
 
-#: ../src/main-window.c:2387
+#: ../src/main-window.c:2386
 #, fuzzy, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
-msgstr "تعذر فتح المستند"
+msgstr "لا يمكن العثور على الملف %s"
 
-#: ../src/main-window.c:2703
+#: ../src/main-window.c:2702
 #, fuzzy
 msgid "translator-credits"
-msgstr "Yousef Raffah يوسف رفه (yousef@raffah.com)"
+msgstr "المترجمون:"
 
-#: ../src/main-window.c:2716 ../src/main-window.c:2743
+#: ../src/main-window.c:2715 ../src/main-window.c:2742
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at http://balsa.gnome.org/\n"
@@ -4480,146 +4467,142 @@ msgid ""
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
 
-#: ../src/main-window.c:2847 ../src/main-window.c:2860
+#: ../src/main-window.c:2846 ../src/main-window.c:2859
 #, fuzzy
 msgid "Checking Mail..."
-msgstr "مراجعة عن بريد جديد"
+msgstr "يجري فحص..."
 
-#: ../src/main-window.c:3047
+#: ../src/main-window.c:3049
 #, fuzzy, c-format
 msgid "IMAP mailbox: %s"
-msgstr "موقع صندوق البريد"
+msgstr "صندوق البريد:%s (%s)"
 
-#: ../src/main-window.c:3051
+#: ../src/main-window.c:3053
 #, fuzzy, c-format
 msgid "Local mailbox: %s"
-msgstr "موقع صندوق البريد"
+msgstr "ملف البريد المحلّي %s"
 
-#: ../src/main-window.c:3189
+#: ../src/main-window.c:3191
 #, fuzzy
 msgid "Finished Checking."
-msgstr "جاري فحص الخدمة"
+msgstr "انتهى في"
 
-#: ../src/main-window.c:3251
+#: ../src/main-window.c:3253
 #, fuzzy, c-format
 msgid "Sending error: %s"
-msgstr ""
-"خطأ GConf:\n"
-"  %s"
+msgstr "خطأ بينج للخادم : %s"
 
-#: ../src/main-window.c:3342
-#, fuzzy
-msgid "Balsa: New mail"
-msgstr "رسالة بريديّة جديدة"
-
-#: ../src/main-window.c:3356
+#: ../src/main-window.c:3317
 #, fuzzy, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
-msgstr[0] "مقطع صوتي لرسالة فورية جديدة"
-msgstr[1] ""
+msgstr[0] "وصلتك رسالة مجهولة من %s."
+msgstr[1] "وصلتك رسالة مجهولة من %s."
 
-#: ../src/main-window.c:3359
+#: ../src/main-window.c:3320
 #, fuzzy
 msgid "You have new mail."
-msgstr "رسالة بريديّة جديدة"
+msgstr "لقد فُزتَ."
 
-#: ../src/main-window.c:3500
+#: ../src/main-window.c:3379
+#, fuzzy
+msgid "Balsa: New mail"
+msgstr "براسيرو - ملف صورة جديد"
+
+#: ../src/main-window.c:3537
 #, fuzzy, c-format
 msgid "The next unread message is in %s"
-msgstr "هذه رسالة نموذجية في حوار نموذجي"
+msgstr "اعرض الرسالة غير المقروءة التالية"
 
-#: ../src/main-window.c:3504
+#: ../src/main-window.c:3541
 #, fuzzy, c-format
 msgid "Do you want to switch to %s?"
-msgstr "هل تريد الإتصال؟"
+msgstr "أتريد السّماح لهم بفعل ذلك؟"
 
-#: ../src/main-window.c:4037
+#: ../src/main-window.c:4074
 #, fuzzy
 msgid "Search mailbox"
-msgstr "موقع صندوق البريد"
+msgstr "ابحث عن ملفات"
 
-#: ../src/main-window.c:4054
-#, fuzzy
+#: ../src/main-window.c:4091
 msgid "_Search for:"
-msgstr "ال_بحث عن:"
+msgstr "ا_بحث عن:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:4067
-#, fuzzy
+#: ../src/main-window.c:4104
 msgid "In:"
 msgstr "داخل:"
 
-#: ../src/main-window.c:4078
-msgid "S_ubject"
-msgstr ""
-
-#. Frame with Apply and Clear buttons
-#: ../src/main-window.c:4083
-#, fuzzy
-msgid "Show only matching messages"
-msgstr "عر_ض الإطار الحالي فقط"
-
-#. Frame with OK button
-#: ../src/main-window.c:4104
-#, fuzzy
-msgid "Open next matching message"
-msgstr "عرض الرسالة المهمة التالية"
-
 #: ../src/main-window.c:4115
 #, fuzzy
-msgid "_Reverse search"
-msgstr "بحث في الويب"
+msgid "S_ubject"
+msgstr "المو_ضوع:"
 
+#. Frame with Apply and Clear buttons
 #: ../src/main-window.c:4120
+#, fuzzy
+msgid "Show only matching messages"
+msgstr "يجري تهيئة الرسالة"
+
+#. Frame with OK button
+#: ../src/main-window.c:4141
+#, fuzzy
+msgid "Open next matching message"
+msgstr "تأليف رسالة بريديّة جديدة"
+
+#: ../src/main-window.c:4152
+#, fuzzy
+msgid "_Reverse search"
+msgstr "اق_لب الترتيب"
+
+#: ../src/main-window.c:4157
 #, fuzzy
 msgid "_Wrap around"
 msgstr "_لف حول"
 
-#: ../src/main-window.c:4282
+#: ../src/main-window.c:4319
 msgid "You can apply filters only on mailbox\n"
 msgstr ""
 
-#: ../src/main-window.c:4296
+#: ../src/main-window.c:4333
 #, fuzzy, c-format
 msgid "Removing duplicates failed: %s"
-msgstr "فشل تسجيل %s إلى %s"
+msgstr "فشل نقل \"%s\": %s."
 
-#: ../src/main-window.c:4516
+#: ../src/main-window.c:4553
 #, fuzzy, c-format
 msgid "Could not open trash: %s"
-msgstr "لم يمكن فتح المجلّد %s: %s"
+msgstr "تعذّر فتح المجلّد: %s: %s "
 
-#: ../src/main-window.c:4645
+#: ../src/main-window.c:4682
 #, fuzzy, c-format
 msgid "Balsa: %s (readonly)"
-msgstr "نص وكلمة مرور للقراءة فقط"
+msgstr "(للقراءة فقط)"
 
-#: ../src/main-window.c:4647
+#: ../src/main-window.c:4684
 #, fuzzy, c-format
 msgid "Balsa: %s"
-msgstr "بلزا"
+msgstr "Balsa"
 
 #: ../src/main.c:212 ../src/main.c:261
 #, fuzzy
 msgid "Get new mail on startup"
-msgstr "إلعب صوتاً في حال رسالة صوتية جديدة"
+msgstr "لا تتَّصل عند بدء التَّشغيل"
 
 #: ../src/main.c:214 ../src/main.c:263
 #, fuzzy
 msgid "Compose a new email to EMAIL@ADDRESS"
-msgstr "إرسال بريد للعنوان “%s”"
+msgstr "تأليف رسالة بريديّة جديدة"
 
 #: ../src/main.c:216 ../src/main.c:265
 #, fuzzy
 msgid "Attach file at PATH"
-msgstr "مسار ملف صورة الخلفية."
+msgstr "إرفاق ملف"
 
 #: ../src/main.c:218 ../src/main.c:268
-#, fuzzy
 msgid "Opens MAILBOXNAME"
-msgstr "افتح مدير الأدوات الخارجية"
+msgstr ""
 
 #: ../src/main.c:218 ../src/main.c:268
 msgid "MAILBOXNAME"
@@ -4630,8 +4613,9 @@ msgid "Opens first unread mailbox"
 msgstr ""
 
 #: ../src/main.c:224 ../src/main.c:274
+#, fuzzy
 msgid "Opens default Inbox on startup"
-msgstr ""
+msgstr "فعّل الصوت عند البدأ"
 
 #: ../src/main.c:227 ../src/main.c:277
 msgid "Prints number unread and unsent messages"
@@ -4640,70 +4624,73 @@ msgstr ""
 #: ../src/main.c:229 ../src/main.c:279
 #, fuzzy
 msgid "Debug POP3 connection"
-msgstr "نوع الاتصال - الصفحة %d/%d"
+msgstr "استخدم اتصال TCP"
 
 #: ../src/main.c:231 ../src/main.c:281
 #, fuzzy
 msgid "Debug IMAP connection"
-msgstr "نوع الاتصال - الصفحة %d/%d"
+msgstr "استخدم اتصال TCP"
 
 #: ../src/main.c:253
 #, fuzzy
 msgid "The Balsa E-Mail Client"
-msgstr "شهادة عميل SSL"
+msgstr "عميل البريد الافتراضي"
 
 #: ../src/main.c:335 ../src/main.c:340 ../src/main.c:346 ../src/main.c:352
 #: ../src/main.c:358
-#, c-format
+#, fuzzy, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
-msgstr ""
+msgstr "لا يمكن فتح صندوق البريد المؤقّت: %s"
 
 #: ../src/main.c:335
 #, fuzzy
 msgid "Inbox"
-msgstr "صندوق البريد الداخل"
+msgstr "معلومات"
 
 #: ../src/main.c:341
+#, fuzzy
 msgid "Outbox"
-msgstr ""
+msgstr "خارج"
 
 #: ../src/main.c:347
+#, fuzzy
 msgid "Sentbox"
-msgstr ""
+msgstr "أَرسِل"
 
 #: ../src/main.c:353
+#, fuzzy
 msgid "Draftbox"
-msgstr ""
+msgstr "مسوّدة"
 
 #: ../src/main.c:358
 #, fuzzy
 msgid "Trash"
-msgstr "المهملات"
+msgstr "_المهملات"
 
 #: ../src/main.c:573
 #, fuzzy
 msgid "Compressing mail folders..."
-msgstr "جاري مسح الرسائل في \"%s\""
+msgstr "إنشاء المجلد '%s'..."
 
 #: ../src/message-window.c:89
 #, fuzzy
 msgid "N_o Headers"
-msgstr "<b>الترويسات</b>"
+msgstr "ترويسات"
 
 #: ../src/message-window.c:91
 #, fuzzy
 msgid "_Selected Headers"
-msgstr "مقدمات POSIX "
+msgstr "الملفات الم_نتقاة"
 
 #: ../src/message-window.c:161
 #, fuzzy
 msgid "Reply to this message"
-msgstr "تأليف رد إلى مرسِل الرّسالة المنتقاة"
+msgstr "أرسِل هذه الرسالة"
 
 #: ../src/message-window.c:167
 #, fuzzy
 msgid "Reply to all recipients of this message"
-msgstr "تأليف ردّ إلى كل المرسَل إليهم للرسالة المنتقاة"
+msgstr "ادخل مستلِميْ الرّسالة"
 
 #: ../src/message-window.c:179
 #, fuzzy
@@ -4713,30 +4700,29 @@ msgstr "توجيه الرسالة المنتقاة إلى شخص ما كمُرف
 #: ../src/message-window.c:183
 #, fuzzy
 msgid "Forward inline..."
-msgstr "_عرض ضمن السّياق"
+msgstr "مرر الوصلة"
 
 #: ../src/message-window.c:184
 #, fuzzy
 msgid "Forward this message inline"
-msgstr "تشفير هذه الرسالة باستخدام PGP"
+msgstr "رسالة ممررة"
 
 #: ../src/message-window.c:190
 #, fuzzy
 msgid "Next Part"
-msgstr "الصّورة ال_تّالية"
+msgstr "الصفحة ال_تالية"
 
 #: ../src/message-window.c:195
 #, fuzzy
 msgid "Previous Part"
-msgstr "الصّ_ورة السّابقة"
+msgstr "الصفحة ال_سابقة"
 
 #: ../src/message-window.c:201
 #, fuzzy
 msgid "Save current part in message"
-msgstr "حفظ الرسالة في مجلّد محدد"
+msgstr "احفظ الصفحة الحالية"
 
 #: ../src/message-window.c:213
-#, fuzzy
 msgid "_Next Message"
 msgstr "الرّسالة ال_تّالية"
 
@@ -4746,42 +4732,39 @@ msgid "Next message"
 msgstr "الرّسالة ال_تّالية"
 
 #: ../src/message-window.c:219
-#, fuzzy
 msgid "_Previous Message"
 msgstr "ال_رّسالة السابقة"
 
 #: ../src/message-window.c:242
 #, fuzzy
 msgid "Move the message to Trash mailbox"
-msgstr "لم يمكن نقل \"%s\" إلى سلة المهملات."
+msgstr "انقل الرسائل المنتقاه إلى مجلد آخر"
 
 #: ../src/message-window.c:257
+#, fuzzy
 msgid "M_ove"
-msgstr ""
+msgstr "تحريك"
 
 #: ../src/message-window.c:380
 #, fuzzy, c-format
 msgid "Message from %s: %s"
-msgstr "لصق رسالة (أو رسائل) من الحافظة"
+msgstr "رسائِل من %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:50
 #: ../src/balsa-mime-widget-callbacks.c:114
 #, fuzzy, c-format
 msgid "Could not create temporary file %s: %s"
-msgstr "لا يمكن قفل الملف الوقتي '%s': %s "
+msgstr "لم يمكن إنشاء ملف مؤقت لـ '%s': %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:140
 #, fuzzy, c-format
 msgid "Save %s MIME Part"
-msgstr "ليس جزءا من الشهادة"
+msgstr "احفظ _كمسودة"
 
 #: ../src/balsa-mime-widget-callbacks.c:187
 #, fuzzy
 msgid "File already exists. Overwrite?"
-msgstr ""
-"الملف \"%s\" موجود مسبقاً\n"
-".\n"
-"%s"
+msgstr "الملف موجود مسبّقا"
 
 #: ../src/balsa-mime-widget-crypto.c:70
 #, fuzzy, c-format
@@ -4792,17 +4775,19 @@ msgstr "هذا جزء من رسالة موقّع رقميّاً"
 
 #: ../src/balsa-mime-widget-crypto.c:72 ../src/print.c:1302
 #: ../src/print-gtk.c:191
+#, fuzzy
 msgid "OpenPGP"
-msgstr ""
+msgstr "ا_فتح"
 
 #: ../src/balsa-mime-widget-crypto.c:89
+#, fuzzy
 msgid "_Run gpg to import this key"
-msgstr ""
+msgstr "أضِف صورة لهذا المفتاح"
 
 #: ../src/balsa-mime-widget-image.c:51 ../src/balsa-mime-widget-image.c:156
 #, fuzzy, c-format
 msgid "Error loading attached image: %s\n"
-msgstr "فشل تحميل الصورة ل %s"
+msgstr "خطأ عند تحميل السِمة: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:162
 #: ../src/balsa-mime-widget-message.c:175
@@ -4810,62 +4795,62 @@ msgstr "فشل تحميل الصورة ل %s"
 #: ../src/balsa-mime-widget-message.c:256
 #, fuzzy
 msgid "Content Type: external-body\n"
-msgstr "جزء متن خارجي مشوّه."
+msgstr "نوع المحتوى (مهجور)"
 
 #: ../src/balsa-mime-widget-message.c:163
 #, fuzzy
 msgid "Access type: local-file\n"
-msgstr "مؤشّر لملف محلّي (%s)"
+msgstr "انفُذ للملفات"
 
 #: ../src/balsa-mime-widget-message.c:164
 #: ../src/balsa-mime-widget-message.c:211 ../src/balsa-mime-widget.c:241
 #, fuzzy, c-format
 msgid "File name: %s"
-msgstr "إسم الملف:"
+msgstr "إ_سم الملف:"
 
 #: ../src/balsa-mime-widget-message.c:176
 #, fuzzy
 msgid "Access type: URL\n"
-msgstr "handler عنوان غير صالح"
+msgstr "نُفِذ إليه:"
 
 #: ../src/balsa-mime-widget-message.c:177
-#, fuzzy, c-format
+#, c-format
 msgid "URL: %s"
 msgstr "العنوان: %s"
 
 #: ../src/balsa-mime-widget-message.c:204
 #, fuzzy, c-format
 msgid "Access type: %s\n"
-msgstr "نوع التّنبيه"
+msgstr "نوع القائمة: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:208
 #, fuzzy, c-format
 msgid "FTP site: %s\n"
-msgstr "مؤشّر لموقع FTP (%s)"
+msgstr "الملف: %s"
 
 #: ../src/balsa-mime-widget-message.c:210
 #, fuzzy, c-format
 msgid "Directory: %s\n"
-msgstr "دليل"
+msgstr "قائمة الدلائل"
 
 #: ../src/balsa-mime-widget-message.c:257
-#, fuzzy
 msgid "Access type: mail-server\n"
-msgstr "نوع التّبليغ ببريدٍ جديد"
+msgstr ""
 
 #: ../src/balsa-mime-widget-message.c:258
 #, fuzzy, c-format
 msgid "Mail server: %s\n"
-msgstr "نادل STUN"
+msgstr "خادم IMAP %s"
 
 #: ../src/balsa-mime-widget-message.c:260
 #, fuzzy, c-format
 msgid "Subject: %s\n"
-msgstr "<b>الموضوع:</b>"
+msgstr "الموضوع:"
 
 #: ../src/balsa-mime-widget-message.c:277
+#, fuzzy
 msgid "Se_nd message to obtain this part"
-msgstr ""
+msgstr "أرسِل رسالة للمراسَل"
 
 #: ../src/balsa-mime-widget-message.c:298 ../src/balsa-mime-widget-text.c:836
 #: ../src/balsa-mime-widget-text.c:1115 ../src/sendmsg-window.c:1773
@@ -4876,9 +4861,7 @@ msgstr "خطأ عند عرض العنوان: %s\n"
 #: ../src/balsa-mime-widget-message.c:332 ../src/print.c:675
 #, fuzzy, c-format
 msgid "Could not get a part: %s"
-msgstr ""
-"لم يمكن جلب تذكرة كرْبِروس:\n"
-"%s"
+msgstr "تعذّر تحليل: %s"
 
 #: ../src/balsa-mime-widget-message.c:463
 #, fuzzy
@@ -4888,20 +4871,18 @@ msgstr "رد"
 #: ../src/balsa-mime-widget-message.c:469
 #, fuzzy
 msgid "Copy to folder..."
-msgstr "نسخ للمجلّد"
+msgstr "نسخ للمجلّد..."
 
 #: ../src/balsa-mime-widget-message.c:661
 #: ../src/balsa-print-object-header.c:152 ../src/print.c:350
 #: ../src/sendmsg-window.c:1118 ../src/sendmsg-window.c:3352
 #: ../src/sendmsg-window.c:5384
-#, fuzzy
 msgid "Subject:"
-msgstr "<b>الموضوع:</b>"
+msgstr "الموضوع:"
 
 #: ../src/balsa-mime-widget-message.c:665
 #: ../src/balsa-print-object-header.c:160 ../src/print.c:356
 #: ../src/sendmsg-window.c:3348
-#, fuzzy
 msgid "Date:"
 msgstr "التّاريخ:"
 
@@ -4909,7 +4890,6 @@ msgstr "التّاريخ:"
 #: ../src/balsa-mime-widget-message.c:671
 #: ../src/balsa-print-object-header.c:165 ../src/print.c:361
 #: ../src/sendmsg-window.c:3359 ../src/store-address.c:305
-#, fuzzy
 msgid "From:"
 msgstr "من:"
 
@@ -4918,13 +4898,12 @@ msgstr "من:"
 #: ../src/balsa-mime-widget-message.c:678 ../src/sendmsg-window.c:1115
 #, fuzzy
 msgid "Reply-To:"
-msgstr "الرّد إلى"
+msgstr "_رد إلى"
 
 #: ../src/balsa-mime-widget-message.c:681
 #: ../src/balsa-print-object-header.c:167 ../src/print.c:365
 #: ../src/sendmsg-window.c:1112 ../src/sendmsg-window.c:3367
 #: ../src/store-address.c:306
-#, fuzzy
 msgid "To:"
 msgstr "إلى:"
 
@@ -4935,7 +4914,7 @@ msgstr "إلى:"
 #: ../src/sendmsg-window.c:3375 ../src/store-address.c:307
 #, fuzzy
 msgid "Cc:"
-msgstr "ن.ك"
+msgstr "_ن.ك:"
 
 #. bcc:
 #: ../src/balsa-mime-widget-message.c:683
@@ -4944,23 +4923,24 @@ msgstr "ن.ك"
 #: ../src/store-address.c:308
 #, fuzzy
 msgid "Bcc:"
-msgstr "ن.ك.م"
+msgstr "ن.ك._ع"
 
 #: ../src/balsa-mime-widget-message.c:687
 #: ../src/balsa-print-object-header.c:173 ../src/print.c:368
+#, fuzzy
 msgid "Fcc:"
-msgstr ""
+msgstr "ن.ك._ع"
 
 #: ../src/balsa-mime-widget-message.c:694
 #: ../src/balsa-print-object-header.c:176 ../src/print.c:374
 #, fuzzy
 msgid "Disposition-Notification-To:"
-msgstr "ا_ستعادة الحالة الأصلية"
+msgstr "اعرض حوار تذكير"
 
 #: ../src/balsa-mime-widget-text.c:134
 #, fuzzy, c-format
 msgid "Could not save a text part: %s"
-msgstr "لم يمكن حفظ المستند \"%s\" في \"%s\"."
+msgstr "لم يمكن حفظ المحفوظة \"%s\""
 
 #: ../src/balsa-mime-widget-text.c:169
 #, c-format
@@ -4972,37 +4952,39 @@ msgstr ""
 #: ../src/balsa-mime-widget-text.c:559
 #, fuzzy
 msgid "Copy link"
-msgstr "_نسخ عنوان الوصلة"
+msgstr "جاري النسخ"
 
 #: ../src/balsa-mime-widget-text.c:564
 #, fuzzy
 msgid "Open link"
-msgstr "_فتح الوصلة"
+msgstr "افتح الوصلة"
 
 #: ../src/balsa-mime-widget-text.c:569
 #, fuzzy
 msgid "Send link..."
-msgstr "بعث وصلة الصفحة الحالية"
+msgstr "يجري الإرسال..."
 
 #: ../src/balsa-mime-widget-text.c:608
 #, fuzzy
 msgid "Highlight structured phrases"
-msgstr "إبراز الإ_قتباسات بـ"
+msgstr "إبراز السطر الحالي"
 
 #: ../src/balsa-mime-widget-text.c:826
 #, fuzzy, c-format
 msgid "Calling URL %s..."
-msgstr "عنوان VoIP"
+msgstr "جاري الاتصال بـ%s"
 
 #: ../src/balsa-mime-widget.c:260
 #, fuzzy, c-format
 msgid "Error reading message part: %s"
-msgstr "خطأ أثناء قراءة ملف البريد: %s"
+msgstr ""
+"حدث خطأ أثناء حفظ الرسائل إلى: %s:\n"
+" %s"
 
 #: ../src/balsa-mime-widget.c:284
 #, fuzzy, c-format
 msgid "Type: %s (%s)"
-msgstr "النّوع:"
+msgstr "الوقت: %s %s"
 
 #: ../src/balsa-mime-widget.c:287
 #, fuzzy, c-format
@@ -5016,12 +4998,12 @@ msgstr ""
 #: ../src/balsa-mime-widget.c:307
 #, fuzzy
 msgid "S_ave part"
-msgstr "ليس جزءا من الشهادة"
+msgstr "احفظ _مسودّة"
 
 #: ../src/balsa-mime-widget.c:329 ../src/balsa-mime-widget.c:353
 #, fuzzy, c-format
 msgid "View _part with %s"
-msgstr "افتح بنمط عرض الشجرة"
+msgstr "ا_فتح بـ \"%s\""
 
 #. gather some info about this part
 #. four fields, one terminator
@@ -5030,53 +5012,49 @@ msgstr "افتح بنمط عرض الشجرة"
 #: ../src/balsa-print-object-default.c:161 ../src/print.c:981
 #, fuzzy
 msgid "Type:"
-msgstr "النّوع:"
+msgstr "_نوع"
 
 #: ../src/balsa-print-object-default.c:165
 #: ../src/balsa-print-object-default.c:169 ../src/print.c:984
 #, fuzzy
 msgid "File name:"
-msgstr "إسم الملف:"
+msgstr "إ_سم الملف:"
 
 #: ../src/pref-manager.c:386
 #, fuzzy
 msgid "While Retrieving Messages"
-msgstr "خطأ عند جلب عن التعريف"
+msgstr "يجري سحب الرسالة %s"
 
 #: ../src/pref-manager.c:387
 #, fuzzy
 msgid "Until Closed"
-msgstr "غطاء مغلق"
+msgstr "بدون عنوان"
 
 #: ../src/pref-manager.c:393
-#, fuzzy
 msgid "Fast"
-msgstr "<i>سريع</i>"
+msgstr "سريع"
 
 #: ../src/pref-manager.c:394
-#, fuzzy
 msgid "Normal"
 msgstr "عادي"
 
 #: ../src/pref-manager.c:395
 #, fuzzy
 msgid "Bad Spellers"
-msgstr "بيانات سيّئة"
+msgstr "معامل رديء"
 
 #: ../src/pref-manager.c:401
 #, fuzzy
 msgid "Message number"
-msgstr "رقم ال_حساب:"
+msgstr "خمن عدداً"
 
 #: ../src/pref-manager.c:405
-#, fuzzy
 msgid "Sender"
 msgstr "المرسِل"
 
 #: ../src/pref-manager.c:409
-#, fuzzy
 msgid "Flat"
-msgstr "معاينة بسيطة"
+msgstr "مسطح"
 
 #: ../src/pref-manager.c:411
 msgid "JWZ"
@@ -5086,132 +5064,130 @@ msgstr ""
 #: ../src/pref-manager.c:509
 #, fuzzy
 msgid "Balsa Preferences"
-msgstr "خيارات داشر"
+msgstr "تفضيلات البريد"
 
 #: ../src/pref-manager.c:558
 #, fuzzy
 msgid "Mail Options"
-msgstr "<b>خيارات العرض:</b>"
+msgstr "خيارات المكالمة"
 
 #: ../src/pref-manager.c:560
 #, fuzzy
 msgid "Display Options"
-msgstr "<b>خيارات العرض:</b>"
+msgstr "خيارات القرص"
 
 #: ../src/pref-manager.c:562 ../src/pref-manager.c:2731
 #, fuzzy
 msgid "Address Books"
-msgstr "كتب فكاهية"
+msgstr "دفتر العناوين"
 
 #: ../src/pref-manager.c:566 ../src/toolbar-factory.c:120
 #, fuzzy
 msgid "Spelling"
-msgstr "_إقتراحات تهجيئ الكلمات... "
+msgstr "التثبت من التهجئة"
 
 #: ../src/pref-manager.c:570
 #, fuzzy
 msgid "Startup"
-msgstr "<b>بدأ التشغيل</b>"
+msgstr "_6 بدء التشغيل"
 
 #: ../src/pref-manager.c:572 ../src/pref-manager.c:2519
-#, fuzzy
 msgid "Miscellaneous"
-msgstr "تقني متنوع"
+msgstr "متنوع"
 
 #: ../src/pref-manager.c:1324
 #, fuzzy, c-format
 msgid "%s (default)"
-msgstr "الافتراضي"
+msgstr "(الافتراضي)"
 
 #: ../src/pref-manager.c:1584
 #, fuzzy
 msgid "Remote Mailbox Servers"
-msgstr "على خوادم LDAP"
+msgstr "خادمات صدفة  بعيدة"
 
 #: ../src/pref-manager.c:1605 ../src/pref-manager.c:2752
 #: ../src/sendmsg-window.c:2940
 #, fuzzy
 msgid "Type"
-msgstr "النّوع"
+msgstr "أنواع"
 
 #: ../src/pref-manager.c:1613
 #, fuzzy
 msgid "Mailbox Name"
-msgstr "اسم الموصول"
+msgstr "إسم العائلة"
 
 #: ../src/pref-manager.c:1627 ../src/pref-manager.c:1716
 #: ../src/pref-manager.c:2787
-#, fuzzy
 msgid "_Modify"
 msgstr "_تعديل"
 
 #: ../src/pref-manager.c:1641
 #, fuzzy
 msgid "Local Mail Directory"
-msgstr "ملف البريد المحلّي %s"
+msgstr "/محلى/تكوين مجلد "
 
 #: ../src/pref-manager.c:1644 ../src/pref-manager.c:1652
+#, fuzzy
 msgid "Select your local mail directory"
-msgstr ""
+msgstr "اختر دليل"
 
 #: ../src/pref-manager.c:1680
 #, fuzzy
 msgid "Outgoing Mail Servers"
-msgstr "تُوصّل بريدك الصادر"
+msgstr "عكس تدرج الخطوط الخارجية"
 
 #: ../src/pref-manager.c:1702
 #, fuzzy
 msgid "Server Name"
-msgstr "\t-l [اسم_الخادم]\n"
+msgstr "إسم الخادم"
 
 #: ../src/pref-manager.c:1742
 #, fuzzy
 msgid "Mail Servers"
-msgstr "<b>خوادم DNS</b>"
+msgstr "الخوادم"
 
 #: ../src/pref-manager.c:1744
-#, fuzzy
 msgid "Incoming"
-msgstr "قادمة"
+msgstr "القادمة"
 
 #: ../src/pref-manager.c:1746
-#, fuzzy
 msgid "Outgoing"
 msgstr "الخارجة"
 
 #: ../src/pref-manager.c:1771
 #, fuzzy
 msgid "Checking"
-msgstr "جاري فحص..."
+msgstr "يجري فحص..."
 
 #: ../src/pref-manager.c:1776
 #, fuzzy
 msgid "_Check mail automatically every"
-msgstr "تثبت من صحة الكلمات في المستند الحالي"
+msgstr "_حدّث آلياً كل:"
 
 #: ../src/pref-manager.c:1787 ../src/pref-manager.c:2542
 #: ../src/pref-manager.c:2602
-#, fuzzy
 msgid "minutes"
 msgstr "دقائق"
 
 #: ../src/pref-manager.c:1793
 #, fuzzy
 msgid "Check _IMAP mailboxes"
-msgstr "فشل أمر IMAP: %s"
+msgstr "إطار ضبط"
 
 #: ../src/pref-manager.c:1799
 #, fuzzy
 msgid "Check INBOX _only"
-msgstr "الاتّصالات المشفّرة فقط"
+msgstr "زر تحول"
 
 #: ../src/pref-manager.c:1804
+#, fuzzy
 msgid "Display message if new mail has arrived"
-msgstr ""
+msgstr "لتوليد رسالة D-BUS عند وصول بريد جديد."
 
 #: ../src/pref-manager.c:1809
+#, fuzzy
 msgid "Play sound if new mail has arrived"
-msgstr ""
+msgstr "إعزف ملف صوت عند وصو_ل بريد جديد"
 
 #: ../src/pref-manager.c:1814
 msgid "Do background check quietly (no messages in status bar)"
@@ -5220,28 +5196,27 @@ msgstr ""
 #: ../src/pref-manager.c:1818
 #, fuzzy
 msgid "_POP message size limit:"
-msgstr "تجاوز حد حجم الملف"
+msgstr "ن_شر رسالة للقائمة"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
 #: ../src/pref-manager.c:1845
-#, fuzzy
 msgid "Quoted and Flowed Text"
-msgstr "نص وكلمة مرور للقراءة فقط"
+msgstr ""
 
 #: ../src/pref-manager.c:1849
+#, fuzzy
 msgid ""
 "Quoted Text\n"
 "Regular Expression:"
-msgstr ""
+msgstr "_عبارة منتظمة"
 
 #: ../src/pref-manager.c:1857
 #, fuzzy
 msgid "Wrap Text at"
-msgstr "نظام الالتواء للنص المتعدد الأسطر"
+msgstr "_كسر النص"
 
 #: ../src/pref-manager.c:1869 ../src/pref-manager.c:2036
-#, fuzzy
 msgid "characters"
 msgstr "محارف"
 
@@ -5251,8 +5226,9 @@ msgid "Display of Multipart/Alternative Parts"
 msgstr ""
 
 #: ../src/pref-manager.c:1887
+#, fuzzy
 msgid "Prefer text/plain over html"
-msgstr ""
+msgstr "افضل نصا عاديا"
 
 #: ../src/pref-manager.c:1903
 msgid "National (8-bit) characters in broken messages without codeset header"
@@ -5261,18 +5237,17 @@ msgstr ""
 #: ../src/pref-manager.c:1910
 #, fuzzy
 msgid "display as \"?\""
-msgstr "ك_خلفية"
+msgstr "عرض المساعدة للمستخدم"
 
 #: ../src/pref-manager.c:1919
 #, fuzzy
 msgid "display in codeset"
-msgstr "إسم الملف الذي سيُعرض في البريد."
+msgstr "عرض على اليسار"
 
 #. How to handle received MDN requests
 #: ../src/pref-manager.c:1949
-#, fuzzy
 msgid "Message Disposition Notification Requests"
-msgstr "هذه الرّسالة تحتوي فقط طلبات غير مدعومة."
+msgstr ""
 
 #: ../src/pref-manager.c:1951
 msgid ""
@@ -5294,26 +5269,26 @@ msgstr ""
 #: ../src/pref-manager.c:2017
 #, fuzzy
 msgid "Word Wrap"
-msgstr "قسم الكلمات"
+msgstr "خريطة العالم"
 
 #: ../src/pref-manager.c:2022
-#, fuzzy
 msgid "Wrap Outgoing Text at"
-msgstr "نظام الالتواء للنص المتعدد الأسطر"
+msgstr ""
 
 #: ../src/pref-manager.c:2050
 #, fuzzy
 msgid "Other Options"
-msgstr "<b>خيارات العرض:</b>"
+msgstr "تطبيقات أخرى"
 
 #: ../src/pref-manager.c:2055
 #, fuzzy
 msgid "Reply Prefix:"
-msgstr "بادئة اسم الحفظ"
+msgstr "ملحق التنصيب"
 
 #: ../src/pref-manager.c:2058
+#, fuzzy
 msgid "Automatically quote original when replying"
-msgstr ""
+msgstr "تحقق من الرسائل ال_جديدة آليا كل"
 
 #: ../src/pref-manager.c:2061
 msgid "Forward a mail as attachment instead of quoting it"
@@ -5322,7 +5297,7 @@ msgstr ""
 #: ../src/pref-manager.c:2064
 #, fuzzy
 msgid "Copy outgoing messages to sentbox"
-msgstr "لا أستطيع نقل/نسخ الرّسائل"
+msgstr "يجري نسخ الرسائل إلى %s"
 
 #: ../src/pref-manager.c:2066
 msgid "Send button always queues outgoing mail in outbox"
@@ -5339,32 +5314,30 @@ msgstr ""
 #: ../src/pref-manager.c:2088
 #, fuzzy
 msgid "Layout"
-msgstr "التصميم"
+msgstr "ت_خطيط"
 
 #: ../src/pref-manager.c:2090
 #, fuzzy
 msgid "Sort and Thread"
-msgstr "تشعيب قائمة الرّسائل."
+msgstr "معياري"
 
 #: ../src/pref-manager.c:2092 ../src/print-gtk.c:483
 #, fuzzy
 msgid "Message"
-msgstr "رسالة"
+msgstr "رسائل"
 
 #: ../src/pref-manager.c:2094
-#, fuzzy
 msgid "Colors"
 msgstr "الألوان"
 
 #: ../src/pref-manager.c:2096 ../src/pref-manager.c:2184
-#, fuzzy
 msgid "Format"
 msgstr "التهيئة"
 
 #: ../src/pref-manager.c:2098
 #, fuzzy
 msgid "Status Messages"
-msgstr "الرسائل الممرّرة"
+msgstr "رسالة الحالة."
 
 #: ../src/pref-manager.c:2123
 #, fuzzy
@@ -5374,83 +5347,84 @@ msgstr "النّافذة الرّئيسيّة"
 #: ../src/pref-manager.c:2126
 #, fuzzy
 msgid "Use preview pane"
-msgstr "إظهار لوح \"المعاينة\""
+msgstr "أظهر لوح المعاينة"
 
 #: ../src/pref-manager.c:2128
+#, fuzzy
 msgid "Show mailbox statistics in left pane"
-msgstr ""
+msgstr "اعرض حالة الحافظة في الشريط"
 
 #: ../src/pref-manager.c:2130
+#, fuzzy
 msgid "Use alternative main window layout"
-msgstr ""
+msgstr "فيما اذا يجب على النافذة الرئيسية أن تبقى في الأعلى"
 
 #: ../src/pref-manager.c:2132
+#, fuzzy
 msgid "Automatically view message when mailbox opened"
-msgstr ""
+msgstr "أخفي الشريط آليّا في الزاوية"
 
 #: ../src/pref-manager.c:2138
 msgid "PageUp/PageDown keys scroll text by"
 msgstr ""
 
 #: ../src/pref-manager.c:2149
-#, fuzzy
 msgid "percent"
-msgstr "بجزء من المائة"
+msgstr "نسبة مئوية"
 
 #: ../src/pref-manager.c:2164
 #, fuzzy
 msgid "Display Progress Dialog"
-msgstr "عرض حوار مقدار التقدم"
+msgstr "اعرض صندوق حوار الخطأ"
 
 #: ../src/pref-manager.c:2189
-#, fuzzy
 msgid "Date encoding (for strftime):"
-msgstr "تشفير السكريبت"
+msgstr ""
 
 #: ../src/pref-manager.c:2191
 #, fuzzy
 msgid "Selected headers:"
-msgstr "مقدمات POSIX "
+msgstr "العناصر الم_نتقاة:"
 
 #: ../src/pref-manager.c:2213
 #, fuzzy
 msgid "Information Messages"
-msgstr "الرسائل الممرّرة"
+msgstr "رسالة إعلام"
 
 #: ../src/pref-manager.c:2218
 #, fuzzy
 msgid "Information Messages:"
-msgstr "الرسائل الممرّرة"
+msgstr "رسالة إعلام"
 
 #: ../src/pref-manager.c:2222
 #, fuzzy
 msgid "Warning Messages:"
-msgstr "الرسائل الممرّرة"
+msgstr "رسالة تحذير"
 
 #: ../src/pref-manager.c:2226
 #, fuzzy
 msgid "Error Messages:"
-msgstr "الرسائل الممرّرة"
+msgstr "رسالة خطأ"
 
 #: ../src/pref-manager.c:2230
 #, fuzzy
 msgid "Fatal Error Messages:"
-msgstr "%s: خطأ X فادح - جاري إعادة التشغيل %s"
+msgstr "رسالة خطأ"
 
 #: ../src/pref-manager.c:2234
 #, fuzzy
 msgid "Debug Messages:"
-msgstr "الرسائل الممرّرة"
+msgstr "الرسائل المقروءة"
 
 #: ../src/pref-manager.c:2260
 #, fuzzy
 msgid "Message Colors"
-msgstr "خط وألوان"
+msgstr "مؤلّف الرّسائل"
 
 #: ../src/pref-manager.c:2265
 #, fuzzy, c-format
 msgid "Quote level %d color"
-msgstr "لون GDK fill"
+msgstr "مستوى الشجرة %d"
 
 #: ../src/pref-manager.c:2278
 #, fuzzy
@@ -5460,105 +5434,107 @@ msgstr "لون الوصلة"
 #: ../src/pref-manager.c:2280
 #, fuzzy
 msgid "Hyperlink color"
-msgstr "إضبط الألوان"
+msgstr "وصله"
 
 #: ../src/pref-manager.c:2291
 #, fuzzy
 msgid "Composition Window"
-msgstr "مبدل النافذة"
+msgstr "تَرْكِيب"
 
 #: ../src/pref-manager.c:2295
+#, fuzzy
 msgid "Invalid or incomplete address label color"
-msgstr ""
+msgstr "لايمكن فتح دفتر العناوين"
 
 #: ../src/pref-manager.c:2318 ../src/print-gtk.c:492
-#, fuzzy
 msgid "Fonts"
 msgstr "خطوط"
 
 #: ../src/pref-manager.c:2322
 #, fuzzy
 msgid "Message Font:"
-msgstr "<b>خط داشر:</b>"
+msgstr "الرسالة:"
 
 #: ../src/pref-manager.c:2330
 #, fuzzy
 msgid "Subject Font:"
-msgstr "<b>خط داشر:</b>"
+msgstr "الموضوع:"
 
 #: ../src/pref-manager.c:2368
 #, fuzzy
 msgid "Sorting and Threading"
-msgstr "احفظ و اخرج"
+msgstr "قراءة الكلمات"
 
 #: ../src/pref-manager.c:2372
 #, fuzzy
 msgid "Default sort column:"
-msgstr "ترتيب التصنيف الإفتراضي"
+msgstr "البروتوكول الأفتراضى"
 
 #: ../src/pref-manager.c:2376
 #, fuzzy
 msgid "Default threading style:"
-msgstr "إفتراضي"
+msgstr "أسلوب التمرير الإفتراضي"
 
 #: ../src/pref-manager.c:2381
 #, fuzzy
 msgid "Expand threads on open"
-msgstr "فتح نوتلس عند إ_دراج الوسائط القابلة للإزاحة."
+msgstr "وس_ع كل الخيوط"
 
 #: ../src/pref-manager.c:2456
 #, fuzzy
 msgid "Pspell Settings"
-msgstr "اختر الإعدادات"
+msgstr "الإعدادات الفيزيائية"
 
 #: ../src/pref-manager.c:2462
 #, fuzzy
 msgid "Spell Check Module"
-msgstr "فحص تهجئة ضمن السّياق"
+msgstr "مدقٌق إملائي"
 
 #: ../src/pref-manager.c:2468
 #, fuzzy
 msgid "Suggestion Level"
-msgstr "مستوى واحد"
+msgstr "إقتراحات"
 
 #. do the ignore length
 #: ../src/pref-manager.c:2473
+#, fuzzy
 msgid "Ignore words shorter than"
-msgstr ""
+msgstr "يُرجع أكبر من"
 
 #: ../src/pref-manager.c:2491
 #, fuzzy
 msgid "Miscellaneous Spelling Settings"
-msgstr "ابق الإعدادات الحالية"
+msgstr "خيارات متنوعة"
 
 #: ../src/pref-manager.c:2493
 #, fuzzy
 msgid "Check signature"
-msgstr "توقيع سليم"
+msgstr "حالة التأكّد"
 
 #: ../src/pref-manager.c:2494
 #, fuzzy
 msgid "Check quoted"
-msgstr "تثبت من تهجيئ الكلمات"
+msgstr "نمط المربعات"
 
 #: ../src/pref-manager.c:2521
 #, fuzzy
 msgid "Debug"
-msgstr "تنقيح"
+msgstr "دايرزبرغ"
 
 #: ../src/pref-manager.c:2522
 #, fuzzy
 msgid "Empty Trash on exit"
-msgstr "إفراغ مجلّدات القمامة عند الإنهاء"
+msgstr "أفرغ مجلّدات المهملات عند الخروج"
 
 #: ../src/pref-manager.c:2528
+#, fuzzy
 msgid "Close mailbox if unused more than"
-msgstr ""
+msgstr "تاريخ التّعديل أكثر من"
 
 #: ../src/pref-manager.c:2557
 #, fuzzy
 msgid "Deleting Messages"
-msgstr "الرسائل الممرّرة"
+msgstr "اح_ذف الرسالة"
 
 #. Translators: this used to be "using Mailbox -> Hide messages";
 #. * the UTF-8 string for the right-arrow symbol is broken out to
@@ -5571,53 +5547,59 @@ msgid ""
 msgstr ""
 
 #: ../src/pref-manager.c:2574
+#, fuzzy
 msgid "Hide messages marked as deleted"
-msgstr ""
+msgstr "حُذِفت الرّسالة"
 
 #: ../src/pref-manager.c:2576
+#, fuzzy
 msgid "The following settings are global:"
-msgstr ""
+msgstr "سيُنشأ الإتصال '%s' التالي:"
 
 #: ../src/pref-manager.c:2582
+#, fuzzy
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr ""
+msgstr "يجري شطب الرّسائل المحذوفة"
 
 #: ../src/pref-manager.c:2589
+#, fuzzy
 msgid "...and if unused more than"
-msgstr ""
+msgstr "تاريخ التّعديل أكثر من"
 
 #: ../src/pref-manager.c:2614
 #, fuzzy
 msgid "Message Window"
-msgstr "إظهار نافذة معاينة الرّسائل"
+msgstr "نوافذ الصورة"
 
 #: ../src/pref-manager.c:2619
 #, fuzzy
 msgid "After moving a message:"
-msgstr "رسالة إجتماع رديئة"
+msgstr "يجري سحب %d رسالة"
 
 #: ../src/pref-manager.c:2648
 #, fuzzy
 msgid "Startup Options"
-msgstr "<b>خيارات العرض:</b>"
+msgstr "احفظ الخيارات"
 
 #: ../src/pref-manager.c:2651
+#, fuzzy
 msgid "Open Inbox upon startup"
-msgstr ""
+msgstr "فعّل الصوت عند البدأ"
 
 #: ../src/pref-manager.c:2653
 #, fuzzy
 msgid "Check mail upon startup"
-msgstr "تفقّد عن كون البريد الوارد تافه"
+msgstr "إظهار التلميحات عند البدء"
 
 #: ../src/pref-manager.c:2655
+#, fuzzy
 msgid "Remember open mailboxes between sessions"
-msgstr ""
+msgstr "_تذكّر لهذه الجلسة"
 
 #: ../src/pref-manager.c:2669
 #, fuzzy
 msgid "Folder Scanning"
-msgstr "اوقف الفحص"
+msgstr "مسح معاكس"
 
 #: ../src/pref-manager.c:2671
 msgid ""
@@ -5626,32 +5608,34 @@ msgid ""
 msgstr ""
 
 #: ../src/pref-manager.c:2682
+#, fuzzy
 msgid "Scan local folders to depth"
-msgstr ""
+msgstr "افحص مجلّد"
 
 #: ../src/pref-manager.c:2695
+#, fuzzy
 msgid "Scan IMAP folders to depth"
-msgstr ""
+msgstr "افحص مجلّد"
 
 #: ../src/pref-manager.c:2760
 #, fuzzy
 msgid "Address Book Name"
-msgstr "بريد (دفتر العناوين)"
+msgstr "دفتر العناوين"
 
 #: ../src/pref-manager.c:2768
 #, fuzzy
 msgid "Auto-complete"
-msgstr "تمَّ التّحديث\n"
+msgstr "تكملة آلية"
 
 #: ../src/pref-manager.c:2793
 #, fuzzy
 msgid "_Set as default"
-msgstr "التّعيين كا_فتراضي"
+msgstr "اضبط كا_فتراضي"
 
 #: ../src/pref-manager.c:3103
 #, fuzzy
 msgid "Remote POP3 mailbox..."
-msgstr "لا يمكن فتح صندوق البريد %s: %s\n"
+msgstr "ا_حذف لون..."
 
 #: ../src/pref-manager.c:3229
 #, fuzzy
@@ -5661,52 +5645,51 @@ msgstr "لا تعمل شيئا"
 #: ../src/pref-manager.c:3231
 #, fuzzy
 msgid "Show dialog"
-msgstr "غلق الحوار"
+msgstr "اظهر الحوار"
 
 #: ../src/pref-manager.c:3233
 #, fuzzy
 msgid "Show in list"
-msgstr "القيمة في القائمة"
+msgstr "عرض كقائمة"
 
 #: ../src/pref-manager.c:3235
 #, fuzzy
 msgid "Show in status bar"
-msgstr "اعرض  شريط الحالة في النوافذ الجديدة"
+msgstr "إظهار شريط الحالة"
 
 #: ../src/pref-manager.c:3237
 #, fuzzy
 msgid "Print to console"
-msgstr "اطبع النتائج للهيكل"
+msgstr "اطبع إلى ملف"
 
 #: ../src/pref-manager.c:3248
-#, fuzzy
 msgid "Ask me"
 msgstr "اسألني"
 
 #: ../src/pref-manager.c:3325
 #, fuzzy
 msgid "Show next unread message"
-msgstr "عرض الرسالة الغير مقروءة التالية"
+msgstr "اعرض الرسالة غير المقروءة التالية"
 
 #: ../src/pref-manager.c:3326
 #, fuzzy
 msgid "Show next message"
-msgstr "عرض الرسالة التالية"
+msgstr "إرسال رسالة"
 
 #: ../src/pref-manager.c:3327
 #, fuzzy
 msgid "Close message window"
-msgstr "غلق نافذة إكيجا"
+msgstr "إغلاق النافذة"
 
 #: ../src/pref-manager.c:3365
 #, fuzzy, c-format
 msgid "Error displaying link_id %s: %s\n"
-msgstr "لا يمكن إيجاد ملف رقم  '%s'"
+msgstr "خطأ سرد الدلائل: %s\n"
 
 #: ../src/print.c:246 ../src/print.c:727
 #, fuzzy, c-format
 msgid "Page: %i/%i"
-msgstr "الصّفحة %d من %d"
+msgstr "الصفحة %d"
 
 #: ../src/print.c:662
 msgid ""
@@ -5722,7 +5705,7 @@ msgstr "هذا جزء من رسالة موقّع رقميّاً"
 #: ../src/print.c:1547
 #, fuzzy
 msgid "Font available for printing"
-msgstr "جسم الخط للطباعة"
+msgstr "لا تتوفّر تلميحةٌ حاليّاً"
 
 #: ../src/print.c:1553
 #, c-format
@@ -5732,49 +5715,48 @@ msgstr ""
 #: ../src/print.c:1566
 #, fuzzy
 msgid "Select Font"
-msgstr "إنتقاء خط"
+msgstr "انتقي خط"
 
 #: ../src/print.c:1599
 #, fuzzy
 msgid "Change..."
-msgstr "تغيير كلمة السر"
+msgstr "_غيِّر"
 
 #: ../src/print.c:1634
 #, fuzzy
 msgid "Print message"
-msgstr "طباعة الرّسالة"
+msgstr "اطبع الرّسالة"
 
 #. create a 2nd notebook page for the fonts
 #: ../src/print.c:1645
-#, fuzzy
 msgid "_Fonts"
-msgstr "خطوط"
+msgstr "الخطوط"
 
 #: ../src/print.c:1648
 #, fuzzy
 msgid "Header font"
-msgstr "خط الترويسة للطباعة"
+msgstr "ترويسة 1"
 
 #: ../src/print.c:1650
 #, fuzzy
 msgid "Body font"
-msgstr "جسم الخط للطباعة"
+msgstr "المتن يحتوي"
 
 #: ../src/print.c:1652
 #, fuzzy
 msgid "Footer font"
-msgstr "خط الترويسة و الهامش"
+msgstr "هامش سفلي"
 
 #. highlight cited stuff
 #: ../src/print.c:1656
 #, fuzzy
 msgid "Highlight cited text"
-msgstr "لون النص المقتبس"
+msgstr "إعتام التمييز اللوني"
 
 #: ../src/print.c:1660
 #, fuzzy
 msgid "_Enable highlighting of cited text"
-msgstr "عدم تفعيل لف السّطور\""
+msgstr "امسح ابراز موافقات البحث"
 
 #: ../src/print.c:1686
 #, c-format
@@ -5786,12 +5768,12 @@ msgstr ""
 #: ../src/print.c:1787
 #, fuzzy
 msgid "Balsa: message print preview"
-msgstr "يغلق نافذة لمحة المطبوعة"
+msgstr "يغلق نافذة معاينة المطبوعة"
 
 #: ../src/print-gtk.c:88 ../src/print-gtk.c:239
-#, fuzzy, c-format
+#, c-format
 msgid "Page %d of %d"
-msgstr "جاري سحب الرسالة %s"
+msgstr "الصّفحة %d من %d"
 
 #: ../src/print-gtk.c:142 ../src/print-gtk.c:161
 msgid "Signed and encrypted matter"
@@ -5800,12 +5782,12 @@ msgstr ""
 #: ../src/print-gtk.c:146 ../src/print-gtk.c:165
 #, fuzzy
 msgid "Signed matter"
-msgstr "إر_سال رسالة"
+msgstr "نص مُوقّع"
 
 #: ../src/print-gtk.c:344
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot print page %d because the document has only %d pages."
-msgstr ""
+msgstr "لا يمكن الاقتصاص لأن التحديد الحالي فارغ"
 
 #. Translate to the default units to use for presenting
 #. * lengths to the user. Translate to default:inch if you
@@ -5814,78 +5796,81 @@ msgstr ""
 #. * it isn't default:mm or default:inch it will not work
 #.
 #: ../src/print-gtk.c:378
-#, fuzzy
 msgid "default:mm"
-msgstr "الافتراضي"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:435
 msgid "inch"
-msgstr ""
+msgstr "بوصة"
 
 #: ../src/print-gtk.c:442
 msgid "mm"
-msgstr ""
+msgstr "مم"
 
 #: ../src/print-gtk.c:513
 #, fuzzy
 msgid "_Header Font:"
-msgstr "خط الترويسة للطباعة"
+msgstr "خط _داشر"
 
 #: ../src/print-gtk.c:516
 #, fuzzy
 msgid "B_ody Font:"
-msgstr "جسم الخط للطباعة"
+msgstr "_خط:"
 
 #: ../src/print-gtk.c:519
 #, fuzzy
 msgid "_Footer Font:"
-msgstr "خط الترويسة و الهامش"
+msgstr "التذييل:"
 
 #: ../src/print-gtk.c:526
 #, fuzzy
 msgid "Highlighting"
-msgstr "لون النص المقتبس"
+msgstr "ابراز"
 
 #: ../src/print-gtk.c:541
 #, fuzzy
 msgid "Highlight _cited text"
-msgstr "لون النص المقتبس"
+msgstr "_نمط الإبراز:"
 
 #: ../src/print-gtk.c:550
 #, fuzzy
 msgid "Highlight _structured phrases"
-msgstr "إبراز الإ_قتباسات بـ"
+msgstr "إبراز السطر الحالي"
 
 #: ../src/print-gtk.c:561
 msgid "Margins"
-msgstr ""
+msgstr "الحواشي"
 
 #: ../src/print-gtk.c:583
 #, fuzzy
 msgid "_Top"
-msgstr "إ_لى:"
+msgstr "الأعلى:"
 
 #: ../src/print-gtk.c:589
+#, fuzzy
 msgid "_Bottom"
-msgstr ""
+msgstr "الأسفل:"
 
 #: ../src/print-gtk.c:601
+#, fuzzy
 msgid "_Left"
-msgstr ""
+msgstr "يسار"
 
 #: ../src/print-gtk.c:607
 msgid "_Right"
-msgstr ""
+msgstr "_يمين"
 
 #: ../src/print-gtk.c:731
 #, fuzzy, c-format
 msgid "Error printing message: %s"
-msgstr "حدث خطأ ما أثناء تثبيت السمة"
+msgstr ""
+"خطأ أثناء طباعة الملف:\n"
+"%s"
 
 #: ../src/save-restore.c:682
 #, fuzzy
 msgid "Error during filters loading: "
-msgstr "خطأ عند تحميل دفتر العناوين الإفتراضي."
+msgstr "خطأ أثناء التحويل: %s"
 
 #: ../src/save-restore.c:684
 #, c-format
@@ -5912,12 +5897,12 @@ msgstr ""
 #: ../src/save-restore.c:2199
 #, fuzzy
 msgid "Error opening GConf database\n"
-msgstr "خطأ مراقبة مفتاح gconf '%s': %s"
+msgstr "خطاء في فتح الملف"
 
 #: ../src/save-restore.c:2207 ../src/save-restore.c:2218
 #, fuzzy, c-format
 msgid "Error setting GConf field: %s\n"
-msgstr "خطأ أثناء إعداد مفتاح gconf %s:%s"
+msgstr "خطأ ضبط مفناح الإعداد %s:%s\n"
 
 #. Translators: please use the initial letter of each language as
 #. * its accelerator; this is a long list, and unique accelerators
@@ -5925,7 +5910,7 @@ msgstr "خطأ أثناء إعداد مفتاح gconf %s:%s"
 #: ../src/sendmsg-window.c:242
 #, fuzzy
 msgid "_Brazilian Portuguese"
-msgstr "ا-ص|برتغالي (برازيلي)"
+msgstr "البرازيلية البرتغاليّة"
 
 #: ../src/sendmsg-window.c:243
 #, fuzzy
@@ -5945,52 +5930,52 @@ msgstr "صيني تقليدي"
 #: ../src/sendmsg-window.c:246
 #, fuzzy
 msgid "_Czech"
-msgstr "ا-ص|تشيكي"
+msgstr "التشيكية"
 
 #: ../src/sendmsg-window.c:247
 #, fuzzy
 msgid "_Danish"
-msgstr "ا-ص|دانماركي"
+msgstr "اسباني"
 
 #: ../src/sendmsg-window.c:248
 #, fuzzy
 msgid "_Dutch"
-msgstr "ض-ي|هولندي"
+msgstr "م_طابقة"
 
 #: ../src/sendmsg-window.c:249
 #, fuzzy
 msgid "_English (American)"
-msgstr "أنكليزية (أمريكية)"
+msgstr "إنجليزي (المملكة المتحدة)"
 
 #: ../src/sendmsg-window.c:250
 #, fuzzy
 msgid "_English (British)"
-msgstr "أنكليزية (بريطانية)"
+msgstr "إنجليزي (المملكة المتحدة)"
 
 #: ../src/sendmsg-window.c:251
 #, fuzzy
 msgid "_Esperanto"
-msgstr "الاسبيرانتو"
+msgstr "الإسبرانتو"
 
 #: ../src/sendmsg-window.c:252
 #, fuzzy
 msgid "_Estonian"
-msgstr "ا-ص|أستوني"
+msgstr "الإستونيّة"
 
 #: ../src/sendmsg-window.c:253
 #, fuzzy
 msgid "_Finnish"
-msgstr "ض-ي|فنلندي"
+msgstr "انهاء"
 
 #: ../src/sendmsg-window.c:254
 #, fuzzy
 msgid "_French"
-msgstr "ض-ي|فرنسي"
+msgstr "فرنسي"
 
 #: ../src/sendmsg-window.c:255
 #, fuzzy
 msgid "_German"
-msgstr "ا-ص|ألماني"
+msgstr "ألمانيا"
 
 #: ../src/sendmsg-window.c:256
 #, fuzzy
@@ -6000,17 +5985,17 @@ msgstr "ا-ص|ألماني (النّمسا)"
 #: ../src/sendmsg-window.c:257
 #, fuzzy
 msgid "_German (Swiss)"
-msgstr "ألمانية (سويسرا)"
+msgstr "ألمانية سويسرية مع يورو"
 
 #: ../src/sendmsg-window.c:258
 #, fuzzy
 msgid "_Greek"
-msgstr "اليونانيّة"
+msgstr "أ_خضر:"
 
 #: ../src/sendmsg-window.c:259
 #, fuzzy
 msgid "_Hebrew"
-msgstr "العبريّة"
+msgstr "ض-ي|عبري"
 
 #: ../src/sendmsg-window.c:260
 #, fuzzy
@@ -6020,76 +6005,77 @@ msgstr "ض-ي|مجري"
 #: ../src/sendmsg-window.c:261
 #, fuzzy
 msgid "_Italian"
-msgstr "ا-ص|إيطالي"
+msgstr "_مائل"
 
 #: ../src/sendmsg-window.c:262
 #, fuzzy
 msgid "_Japanese (JIS)"
-msgstr "ياباني (Shift_JIS)"
+msgstr "ياباني (_Shift-JIS)"
 
 #: ../src/sendmsg-window.c:263
 #, fuzzy
 msgid "_Korean"
-msgstr "الكوريّة"
+msgstr "ض-ي|كوري"
 
 #: ../src/sendmsg-window.c:264
 #, fuzzy
 msgid "_Latvian"
-msgstr "ض-ي|لتوي"
+msgstr "اللتفية"
 
 #: ../src/sendmsg-window.c:265
 #, fuzzy
 msgid "_Lithuanian"
-msgstr "ض-ي|لتواني"
+msgstr "ليتوانيا"
 
 #: ../src/sendmsg-window.c:266
 #, fuzzy
 msgid "_Norwegian"
-msgstr "النرويجية"
+msgstr "نرويجية"
 
 #: ../src/sendmsg-window.c:267
 #, fuzzy
 msgid "_Polish"
-msgstr "ا-ص|بولوني"
+msgstr "بولندية"
 
 #: ../src/sendmsg-window.c:268
+#, fuzzy
 msgid "_Portugese"
-msgstr ""
+msgstr "ا-ص|برتغالي"
 
 #: ../src/sendmsg-window.c:269
 #, fuzzy
 msgid "_Romanian"
-msgstr "ا-ص|روميني"
+msgstr "روماني"
 
 #: ../src/sendmsg-window.c:270
 #, fuzzy
 msgid "_Russian (ISO)"
-msgstr "ISO-8859-1"
+msgstr "روسيا"
 
 #: ../src/sendmsg-window.c:271
 #, fuzzy
 msgid "_Russian (KOI)"
-msgstr "الإتّحاد الروسي"
+msgstr "روسيا"
 
 #: ../src/sendmsg-window.c:272
 #, fuzzy
 msgid "_Serbian"
-msgstr "ا-ص|صربي"
+msgstr "شريدان"
 
 #: ../src/sendmsg-window.c:273
 #, fuzzy
 msgid "_Serbian (Latin)"
-msgstr "ا-ص|صربي (لاتيني)"
+msgstr "صربي (لاتيني)"
 
 #: ../src/sendmsg-window.c:274
 #, fuzzy
 msgid "_Slovak"
-msgstr "ا-ص|سلوفاكي"
+msgstr "سلوفاكيا"
 
 #: ../src/sendmsg-window.c:275
 #, fuzzy
 msgid "_Spanish"
-msgstr "ا-ص|إسباني"
+msgstr "اسباني"
 
 #: ../src/sendmsg-window.c:276
 #, fuzzy
@@ -6099,17 +6085,17 @@ msgstr "ا-ص|سويدي"
 #: ../src/sendmsg-window.c:277
 #, fuzzy
 msgid "_Turkish"
-msgstr "التركيّة"
+msgstr "ا-ص|تركي"
 
 #: ../src/sendmsg-window.c:278
 #, fuzzy
 msgid "_Ukrainian"
-msgstr "الأكرانية"
+msgstr "ا-ص|اكراني"
 
 #: ../src/sendmsg-window.c:279
 #, fuzzy
 msgid "_Generic UTF-8"
-msgstr "يونيكود (يو تي اف-8)"
+msgstr "عام"
 
 #: ../src/sendmsg-window.c:303
 msgid "_GnuPG uses MIME mode"
@@ -6120,19 +6106,18 @@ msgid "_GnuPG uses old OpenPGP mode"
 msgstr ""
 
 #: ../src/sendmsg-window.c:316
-#, fuzzy
 msgid "_S/MIME mode (GpgSM)"
-msgstr "وضع المكالمة الواردة"
+msgstr ""
 
 #: ../src/sendmsg-window.c:331 ../src/sendmsg-window.c:518
 #, fuzzy
 msgid "_Include File..."
-msgstr "إنتقاء ملف"
+msgstr "_تضمّن الملفات:"
 
 #: ../src/sendmsg-window.c:334 ../src/sendmsg-window.c:531
 #, fuzzy
 msgid "_Attach File..."
-msgstr "إرفاق الملف (أو الملفّات)"
+msgstr "_مُرفق..."
 
 #: ../src/sendmsg-window.c:337 ../src/sendmsg-window.c:520
 #, fuzzy
@@ -6142,26 +6127,27 @@ msgstr "إر_سال رسالة"
 #: ../src/sendmsg-window.c:340 ../src/sendmsg-window.c:523
 #, fuzzy
 msgid "Attach _Message(s)"
-msgstr "إرفاق الرّسالة الأصليّة"
+msgstr "رسالة واحدة مرفقة"
 
 #: ../src/sendmsg-window.c:346 ../src/sendmsg-window.c:548
 #, fuzzy
 msgid "Sen_d"
-msgstr "لا ا_رسال للمعلومات"
+msgstr "أرسِل"
 
 #: ../src/sendmsg-window.c:347 ../src/sendmsg-window.c:549
 #: ../src/toolbar-factory.c:111
-#, fuzzy
 msgid "Send this message"
-msgstr "إرسال هذه الرسالة"
+msgstr "أرسِل هذه الرسالة"
 
 #: ../src/sendmsg-window.c:351
+#, fuzzy
 msgid "_Queue"
-msgstr ""
+msgstr "طابور"
 
 #: ../src/sendmsg-window.c:352 ../src/sendmsg-window.c:554
+#, fuzzy
 msgid "Queue this message in Outbox for sending"
-msgstr ""
+msgstr "افتح الرسائل المنتقاه في نافذة التأليف لتحريرها"
 
 #: ../src/sendmsg-window.c:356
 #, fuzzy
@@ -6169,45 +6155,44 @@ msgid "_Postpone"
 msgstr "تأجيل الإ_ستراحة"
 
 #: ../src/sendmsg-window.c:359 ../src/sendmsg-window.c:535
-#, fuzzy
 msgid "_Save"
-msgstr "_حفظ"
+msgstr "حفظ"
 
 #: ../src/sendmsg-window.c:360 ../src/sendmsg-window.c:536
 #, fuzzy
 msgid "Save this message"
-msgstr "طبع هذه الرسالة"
+msgstr "أرسِل هذه الرسالة"
 
 #: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:540
 #, fuzzy
 msgid "Print the edited message"
-msgstr "طبع هذه الرسالة"
+msgstr "لطبع الرسالة"
 
 #: ../src/sendmsg-window.c:402 ../src/sendmsg-window.c:565
 #, fuzzy
 msgid "_Wrap Body"
-msgstr "متن الرّسالة"
+msgstr "نسق اللف"
 
 #: ../src/sendmsg-window.c:406 ../src/sendmsg-window.c:569
 #, fuzzy
 msgid "_Reflow Selected Text"
-msgstr "لون النص المختار"
+msgstr "ا_بحث عن النص المنتقى"
 
 #: ../src/sendmsg-window.c:411 ../src/sendmsg-window.c:597
 #, fuzzy
 msgid "Insert Si_gnature"
-msgstr "ح_جم عادي"
+msgstr "تحقق من التوقيع"
 
 #: ../src/sendmsg-window.c:415 ../src/sendmsg-window.c:573
 #, fuzzy
 msgid "_Quote Message(s)"
-msgstr "إقتباس الرسالة الأصليّة"
+msgstr "افت_ح الرسائل"
 
 #: ../src/sendmsg-window.c:421 ../src/sendmsg-window.c:425
 #: ../src/sendmsg-window.c:649
 #, fuzzy
 msgid "C_heck Spelling"
-msgstr "_إقتراحات تهجيئ الكلمات... "
+msgstr "ت_دقيق هجائي"
 
 #: ../src/sendmsg-window.c:422 ../src/sendmsg-window.c:426
 #: ../src/sendmsg-window.c:651
@@ -6218,54 +6203,56 @@ msgstr "دقق الإملاء للوثيقة"
 #: ../src/sendmsg-window.c:432 ../src/sendmsg-window.c:657
 #, fuzzy
 msgid "Select _Identity..."
-msgstr "إنتقاء ملف"
+msgstr "إختر _جلسة..."
 
 #: ../src/sendmsg-window.c:433 ../src/sendmsg-window.c:658
 #, fuzzy
 msgid "Select the Identity to use for the message"
-msgstr "إ_ختر لغةً لتستعملها لجلستك:"
+msgstr "اختر كامل الصفحة"
 
 #: ../src/sendmsg-window.c:438
-#, fuzzy
 msgid "_Edit with Gnome-Editor"
-msgstr "تحكم محرر HTML لجينوم"
+msgstr ""
 
 #: ../src/sendmsg-window.c:439
+#, fuzzy
 msgid "Edit the current message with the default Gnome editor"
-msgstr ""
+msgstr "شغل gcompris باستعمال المؤشر الإفتراضي ل gnome"
 
 #: ../src/sendmsg-window.c:451 ../src/sendmsg-window.c:610
+#, fuzzy
 msgid "Fr_om"
-msgstr ""
+msgstr "_من:"
 
 #: ../src/sendmsg-window.c:453 ../src/sendmsg-window.c:612
 #, fuzzy
 msgid "_Cc"
-msgstr "ن.ك"
+msgstr "_ن.ك:"
 
 #: ../src/sendmsg-window.c:455 ../src/sendmsg-window.c:614
 #, fuzzy
 msgid "_Bcc"
-msgstr "ن.ك.م"
+msgstr "ن.ك._ع"
 
 #: ../src/sendmsg-window.c:457 ../src/sendmsg-window.c:616
+#, fuzzy
 msgid "_Fcc"
-msgstr ""
+msgstr "ن.ك._ع"
 
 #: ../src/sendmsg-window.c:459
 #, fuzzy
 msgid "_Reply To"
-msgstr "الرّد إلى"
+msgstr "_رد إلى"
 
 #: ../src/sendmsg-window.c:465 ../src/sendmsg-window.c:662
 #, fuzzy
 msgid "_Request Disposition Notification"
-msgstr "تبليغ عند الشحن الكامل للبطارية"
+msgstr "اعرض حوار تذكير"
 
 #: ../src/sendmsg-window.c:468 ../src/sendmsg-window.c:628
 #, fuzzy
 msgid "_Format = Flowed"
-msgstr "تنسيق الفيديو"
+msgstr "_هيء إلى"
 
 #: ../src/sendmsg-window.c:473 ../src/sendmsg-window.c:633
 #, fuzzy
@@ -6275,64 +6262,56 @@ msgstr "إر_سال رسالة"
 #: ../src/sendmsg-window.c:474 ../src/sendmsg-window.c:634
 #, fuzzy
 msgid "signs the message using GnuPG"
-msgstr ""
-"قوبلت رسالة حالة GnuPG غير متوقعة:\n"
-"\n"
-"%s"
+msgstr "لطبع الرسالة"
 
 #: ../src/sendmsg-window.c:477 ../src/sendmsg-window.c:637
 #, fuzzy
 msgid "_Encrypt Message"
-msgstr "إر_سال رسالة"
+msgstr "يجري تشفير رسالة"
 
 #: ../src/sendmsg-window.c:478 ../src/sendmsg-window.c:638
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr ""
 
 #: ../src/sendmsg-window.c:498 ../src/sendmsg-window.c:678
-#, fuzzy
 msgid "_Show"
 msgstr "ا_عرض"
 
 #: ../src/sendmsg-window.c:500 ../src/sendmsg-window.c:655
-#, fuzzy
 msgid "_Language"
 msgstr "ال_لغة"
 
 #: ../src/sendmsg-window.c:502
-#, fuzzy
 msgid "_Options"
 msgstr "_خيارات"
 
 #: ../src/sendmsg-window.c:544
 #, fuzzy
 msgid "Sa_ve and Close"
-msgstr "غلق و _خروج"
+msgstr "احفظ و أغلق"
 
 #: ../src/sendmsg-window.c:553
 #, fuzzy
 msgid "Send _Later"
-msgstr "إر_سال رسالة"
+msgstr "المرسِل"
 
 #: ../src/sendmsg-window.c:647
 #, fuzzy
 msgid "Toggle Spell C_hecker"
-msgstr "فحص تهجئة ضمن السّياق"
+msgstr "مدقٌق إملائي"
 
 #: ../src/sendmsg-window.c:708
-#, fuzzy
 msgid "Attachment"
-msgstr "المُرفق"
+msgstr "مُرفق"
 
 #: ../src/sendmsg-window.c:708
-#, fuzzy
 msgid "Inline"
 msgstr "ضمن السّياق"
 
 #: ../src/sendmsg-window.c:708
 #, fuzzy
 msgid "Reference"
-msgstr "علامة المرجع"
+msgstr "مرجع المرجع"
 
 #: ../src/sendmsg-window.c:939
 #, c-format
@@ -6348,7 +6327,7 @@ msgstr ""
 #: ../src/sendmsg-window.c:1311
 #, fuzzy
 msgid "Select Identity"
-msgstr "إنتقاء ملف"
+msgstr "اختر مَقْصِد"
 
 #: ../src/sendmsg-window.c:1688
 #, c-format
@@ -6363,12 +6342,12 @@ msgstr ""
 #: ../src/sendmsg-window.c:1699
 #, fuzzy
 msgid "Attach as Reference?"
-msgstr "مرجع بيانات كائن"
+msgstr "إرفاق ملف"
 
 #: ../src/sendmsg-window.c:1812
 #, fuzzy
 msgid "Choose charset"
-msgstr "اختر صوتا"
+msgstr "اختر منزلاً"
 
 #: ../src/sendmsg-window.c:1819
 #, c-format
@@ -6382,7 +6361,7 @@ msgstr ""
 #: ../src/sendmsg-window.c:1835
 #, fuzzy
 msgid "Attach as MIME type:"
-msgstr "لا يمكن التعامل مع نوع الـ MIME: \"%s\""
+msgstr "نوع MIME:"
 
 #: ../src/sendmsg-window.c:1891
 #, c-format
@@ -6392,57 +6371,55 @@ msgstr ""
 #: ../src/sendmsg-window.c:1934 ../src/sendmsg-window.c:5388
 #, fuzzy
 msgid "(no subject)"
-msgstr "بدون عنوان"
+msgstr "بلا موضوع"
 
 #: ../src/sendmsg-window.c:2024
 #, fuzzy
 msgid "forwarded message"
-msgstr "-------- رسالة ممرّرة -------- "
+msgstr "رسالة ممررة"
 
 #: ../src/sendmsg-window.c:2029
 #, fuzzy, c-format
 msgid "Message from %s, subject: \"%s\""
-msgstr "العنوان الإفتراضي للرّسالة."
+msgstr "رسائِل من %s"
 
 #: ../src/sendmsg-window.c:2047
 #, fuzzy, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
-msgstr "%s: خطأ في ضبط الإشارة %d لـ %s"
+msgstr "خطأ تحويل URI \"%s\" لاسم ملف: %s\n"
 
 #: ../src/sendmsg-window.c:2117 ../src/sendmsg-window.c:2188
-#, fuzzy
 msgid "Remove"
 msgstr "احذف"
 
 #: ../src/sendmsg-window.c:2200
-#, fuzzy
 msgid "Open..."
-msgstr "افتح %s"
+msgstr "افتح..."
 
 #: ../src/sendmsg-window.c:2212
 #, fuzzy
 msgid "(URL)"
-msgstr "العنوان"
+msgstr "(U)"
 
 #: ../src/sendmsg-window.c:2233
 #, fuzzy, c-format
 msgid "Cannot get info on file '%s': %s"
-msgstr "تلق معلومات احصائية عن المستند الحالي"
+msgstr "لا يمكن جلب المجلّد `%s': %s"
 
 #: ../src/sendmsg-window.c:2238
 #, fuzzy, c-format
 msgid "Attachment %s is not a regular file."
-msgstr "الملف '%s' ليس ملفا أو مجلدا اعتياديا."
+msgstr "%s ليس ملفا عاديا"
 
 #: ../src/sendmsg-window.c:2241
 #, fuzzy, c-format
 msgid "File %s cannot be read\n"
-msgstr "لا يمكن مراقبة هذا الملف."
+msgstr "لا يمكن فتح الملف\"%s\"."
 
 #: ../src/sendmsg-window.c:2289
 #, fuzzy
 msgid "Attach file"
-msgstr "إرفاق الملف (أو الملفّات)"
+msgstr "إرفاق ملف"
 
 #: ../src/sendmsg-window.c:2384 ../src/sendmsg-window.c:2493
 #: ../src/sendmsg-window.c:4499
@@ -6454,50 +6431,50 @@ msgstr ""
 #: ../src/sendmsg-window.c:2714
 #, fuzzy
 msgid "F_rom:"
-msgstr "قرص مدمج"
+msgstr "من:"
 
 #. Subject:
 #: ../src/sendmsg-window.c:2850
 msgid "S_ubject:"
-msgstr ""
+msgstr "المو_ضوع:"
 
 #. fcc: mailbox folder where the message copy will be written to
 #: ../src/sendmsg-window.c:2864
 #, fuzzy
 msgid "F_cc:"
-msgstr "ن.ك"
+msgstr "ن.ك._ع"
 
 #. Reply To:
 #: ../src/sendmsg-window.c:2896
 #, fuzzy
 msgid "_Reply To:"
-msgstr "الرّد إلى"
+msgstr "_رد إلى"
 
 #. Attachment list
 #: ../src/sendmsg-window.c:2901
 #, fuzzy
 msgid "_Attachments:"
-msgstr "مرفقات"
+msgstr "مُرفق"
 
 #: ../src/sendmsg-window.c:2947
 #, fuzzy
 msgid "Mode"
-msgstr "النسق"
+msgstr "النّموذج"
 
 #: ../src/sendmsg-window.c:2970
 #, fuzzy
 msgid "Description"
-msgstr "الوصف"
+msgstr "ال_وصف"
 
 #: ../src/sendmsg-window.c:3280
 #, fuzzy, c-format
 msgid "Could not save attachment: %s"
-msgstr "لم يمكن حفظ الملخّص: %s: %s"
+msgstr "تعذر حفظ المرفق “%s”: %s"
 
 #: ../src/sendmsg-window.c:3301
 #, fuzzy
 msgid "No subject"
-msgstr "بدون عنوان"
+msgstr "بلا موضوع"
 
 #: ../src/sendmsg-window.c:3333
 #, fuzzy
@@ -6507,77 +6484,78 @@ msgstr "أنت"
 #: ../src/sendmsg-window.c:3342
 #, fuzzy, c-format
 msgid "------forwarded message from %s------\n"
-msgstr "لصق رسالة (أو رسائل) من الحافظة"
+msgstr "-------- رسالة ممرّرة -------- "
 
 #: ../src/sendmsg-window.c:3379
 #, fuzzy, c-format
 msgid "Message-ID: %s\n"
-msgstr "هوية البوّاب:"
+msgstr "الاستخدام: %s\n"
 
 #: ../src/sendmsg-window.c:3385
 #, fuzzy
 msgid "References:"
-msgstr "خ_يارات"
+msgstr "تفضيلات"
 
 #: ../src/sendmsg-window.c:3396
-#, fuzzy, c-format
+#, c-format
 msgid "On %s, %s wrote:\n"
-msgstr "كتابة بايت واحدة %d"
+msgstr ""
 
 #: ../src/sendmsg-window.c:3398
 #, fuzzy, c-format
 msgid "%s wrote:\n"
-msgstr "كتابة بايت واحدة %d"
+msgstr "خصائص %s"
 
 #: ../src/sendmsg-window.c:3509
 #, fuzzy
 msgid "No signature found!"
-msgstr "لم يُعثر على أي جهاز"
+msgstr "ليس ملف توقيع صالح"
 
 #: ../src/sendmsg-window.c:3692
 #, fuzzy
 msgid "Could not save message."
-msgstr "لم يمكن إرسال الرّسالة: %s"
+msgstr "تعذّر إرسال الرّسالة"
 
 #: ../src/sendmsg-window.c:3699
 #, fuzzy, c-format
 msgid "Could not open draftbox: %s"
-msgstr "لم يمكن فتح المجلّد %s: %s"
+msgstr "لم يمكن فتح المكان '%s'"
 
 #: ../src/sendmsg-window.c:3720
 #, fuzzy
 msgid "Message saved."
-msgstr "البحث المحفوظ"
+msgstr "مخزن الرّسائل"
 
 #: ../src/sendmsg-window.c:4664 ../src/sendmsg-window.c:4671
 #: ../src/sendmsg-window.c:4677 ../src/sendmsg-window.c:4683
 #: ../src/sendmsg-window.c:4706
 #, fuzzy, c-format
 msgid "Could not attach the file %s: %s."
-msgstr "لم يمكن فتح الملف %s: %s"
+msgstr "لا يمكن حفظ الملف %s."
 
 #: ../src/sendmsg-window.c:4665
+#, fuzzy
 msgid "not an absolute path"
-msgstr ""
+msgstr "جذر المخزن %s ليس مساراً مطلقاً"
 
 #: ../src/sendmsg-window.c:4672
 #, fuzzy
 msgid "not in your directory"
-msgstr "ملف البريد المحلّي %s"
+msgstr "ليس دليل maildir"
 
 #: ../src/sendmsg-window.c:4678
-#, fuzzy
 msgid "does not exist"
-msgstr "الدّليل `%s/%s' غير موجود."
+msgstr "غير موجود"
 
 #: ../src/sendmsg-window.c:4684
 #, fuzzy
 msgid "not a regular file"
-msgstr "الملف '%s' ليس ملفا أو مجلدا اعتياديا."
+msgstr "%s ليس ملفا اعتياديا!\n"
 
 #: ../src/sendmsg-window.c:4707
+#, fuzzy
 msgid "not in current directory"
-msgstr ""
+msgstr "اظهار المجلد المحلى الحالى "
 
 #: ../src/sendmsg-window.c:4747
 msgid ""
@@ -6590,48 +6568,49 @@ msgstr ""
 #: ../src/sendmsg-window.c:4788
 #, fuzzy, c-format
 msgid "Error executing signature generator %s"
-msgstr "خطأ مجهول أثناء التّحقّق من التّوقيع"
+msgstr "خطأ أثناء تنفيذ بحث المرشِّح: %s: %s"
 
 #: ../src/sendmsg-window.c:4800
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot open signature file '%s' for reading"
-msgstr ""
+msgstr "تعذّر فتح الملف %s للكتابة\n"
 
 #: ../src/sendmsg-window.c:4810
 #, fuzzy, c-format
 msgid "Error reading signature from %s"
-msgstr "خطأ عند القراءة من الابن: %s."
+msgstr "خطأ أثناء التّحقّق من التّوقيع"
 
 #: ../src/sendmsg-window.c:4814
-#, c-format
+#, fuzzy, c-format
 msgid "Signature in %s is not a UTF-8 text."
-msgstr ""
+msgstr "قيمة %s ليست نص UTF-8 صالح"
 
 #: ../src/sendmsg-window.c:4877
 #, fuzzy, c-format
 msgid "Could not open the file %s.\n"
-msgstr "لم يمكن فتح الملف %s: %s"
+msgstr "لم يمكن فتح الملف %s."
 
 #: ../src/sendmsg-window.c:4933
 #, fuzzy
 msgid "Include file"
-msgstr "إنتقاء ملف"
+msgstr "_تضمّن الملفات:"
 
 #. Translators: please do not translate Face.
 #: ../src/sendmsg-window.c:5147
-#, c-format
+#, fuzzy, c-format
 msgid "Could not load Face header file %s: %s"
-msgstr ""
+msgstr "لا يمكن قفل الملف الوقتي '%s': %s "
 
 #. Translators: please do not translate Face.
 #: ../src/sendmsg-window.c:5150
-#, c-format
+#, fuzzy, c-format
 msgid "Could not load X-Face header file %s: %s"
-msgstr ""
+msgstr "لا يمكن قفل الملف الوقتي '%s': %s "
 
 #: ../src/sendmsg-window.c:5230
+#, fuzzy
 msgid "Message contains national (8-bit) characters"
-msgstr ""
+msgstr "يحتوي الإسم على حروف ASCII ممنوعة"
 
 #: ../src/sendmsg-window.c:5234
 msgid ""
@@ -6647,17 +6626,17 @@ msgid ""
 msgstr ""
 
 #: ../src/sendmsg-window.c:5372
+#, fuzzy
 msgid "You did not specify a subject for this message"
-msgstr ""
+msgstr "العنوان الإفتراضي للرّسالة."
 
 #: ../src/sendmsg-window.c:5373
 msgid "If you would like to provide one, enter it below."
 msgstr ""
 
 #: ../src/sendmsg-window.c:5414
-#, fuzzy
 msgid "_Send"
-msgstr "إر_سال"
+msgstr "أر_سل"
 
 #: ../src/sendmsg-window.c:5471
 msgid ""
@@ -6667,9 +6646,9 @@ msgid ""
 msgstr ""
 
 #: ../src/sendmsg-window.c:5487
-#, c-format
+#, fuzzy, c-format
 msgid "sending message with gpg mode %d"
-msgstr ""
+msgstr "يجري إرسال الرسالة %d من %d"
 
 #: ../src/sendmsg-window.c:5524
 #, fuzzy
@@ -6677,12 +6656,14 @@ msgid "Message could not be created"
 msgstr "تعذّر انشاء المجلّد"
 
 #: ../src/sendmsg-window.c:5526
+#, fuzzy
 msgid "Message could not be queued in outbox"
-msgstr ""
+msgstr "%s لم يمكن فتحه"
 
 #: ../src/sendmsg-window.c:5528
+#, fuzzy
 msgid "Message could not be saved in sentbox"
-msgstr ""
+msgstr "تعذر حفظ الصورة."
 
 #: ../src/sendmsg-window.c:5530
 #, fuzzy
@@ -6692,56 +6673,57 @@ msgstr "لم يمكن إرسال العنصر!\n"
 #: ../src/sendmsg-window.c:5534
 #, fuzzy, c-format
 msgid "Send failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "فشلت العمليّة: %s"
 
 #: ../src/sendmsg-window.c:5617 ../src/sendmsg-window.c:5636
 #, fuzzy
 msgid "Could not postpone message."
-msgstr "لم يمكن إرسال الرّسالة: %s"
+msgstr "تعذّر إلحاق الرّسالة"
 
 #: ../src/sendmsg-window.c:5631
 #, fuzzy
 msgid "Message postponed."
-msgstr "إر_سال رسالة"
+msgstr "مخزن الرّسائل"
 
 #: ../src/sendmsg-window.c:5798
 #, fuzzy, c-format
 msgid "Error starting spell checker: %s"
-msgstr "حصل خطأ أثناء تشغيل %s: %s"
+msgstr "خطأ ضبط القيمة: %s"
 
 #: ../src/sendmsg-window.c:5957
 #, fuzzy, c-format
 msgid "Could not compile %s"
-msgstr "تعذّر العثور على '%s'"
+msgstr "لم يمكن فتح \"%s\""
 
 #: ../src/sendmsg-window.c:5958
 #, fuzzy
 msgid "Quoted Text Regular Expression"
-msgstr "فشل تجميع التّعبير النّظامي: %s: %s"
+msgstr "_عبارة منتظمة"
 
 #: ../src/sendmsg-window.c:6514
 #, fuzzy, c-format
 msgid "Reply to %s: %s"
-msgstr "الرّد إلى"
+msgstr "رُد على ال_قائمة"
 
 #: ../src/sendmsg-window.c:6519
 #, fuzzy, c-format
 msgid "Forward message to %s: %s"
-msgstr "توجيه الرسالة المنتقاة لشخص ما"
+msgstr "رسالة ممررة - %s"
 
 #: ../src/sendmsg-window.c:6523
 #, fuzzy, c-format
 msgid "Continue message to %s: %s"
-msgstr "جاري حفظ الرّسالة في المجلّد"
+msgstr "يجري نسخ الرسائل إلى %s"
 
 #: ../src/sendmsg-window.c:6527
 #, fuzzy, c-format
 msgid "New message to %s: %s"
-msgstr "رسالة بريديّة جديدة"
+msgstr "رسالة جديدة من %s"
 
 #: ../src/spell-check.c:511
+#, fuzzy
 msgid "Replace the current word with the selected suggestion"
-msgstr ""
+msgstr "استبدل التحديد الحالي"
 
 #: ../src/spell-check.c:519
 msgid ""
@@ -6751,20 +6733,22 @@ msgstr ""
 #: ../src/spell-check.c:531
 #, fuzzy
 msgid "Skip the current word"
-msgstr "نموذج مبني على الكلمات"
+msgstr "تخطى المسار الحالي"
 
 #: ../src/spell-check.c:537
+#, fuzzy
 msgid "Skip all occurrences of the current word"
-msgstr ""
+msgstr "لم يمكن أخذ لقطة للنافذة الحالية."
 
 #: ../src/spell-check.c:547
+#, fuzzy
 msgid "Add the current word to your personal dictionary"
-msgstr ""
+msgstr "إضافة اللون الحالي إلى تاريخ الألوان"
 
 #: ../src/spell-check.c:556
 #, fuzzy
 msgid "Finish spell checking"
-msgstr "إكمال التثبت من التهجئة"
+msgstr "فعّل المدقق الإملائي"
 
 #: ../src/spell-check.c:561
 msgid "Revert all changes and finish spell checking"
@@ -6773,7 +6757,7 @@ msgstr ""
 #: ../src/spell-check.c:592
 #, fuzzy
 msgid "Spell check"
-msgstr "مراجعة التهجئة"
+msgstr "المدقق الإملائي"
 
 #: ../src/store-address.c:104
 #, fuzzy
@@ -6783,28 +6767,32 @@ msgstr "ليس للمضيف عنوان"
 #: ../src/store-address.c:181
 #, fuzzy
 msgid "Store Address"
-msgstr "عنوان البريد الإلكتروني"
+msgstr "عنوان المنزل"
 
 #: ../src/store-address.c:199
+#, fuzzy
 msgid "Save this address and close the dialog?"
-msgstr ""
+msgstr "احفظ الملف الحالي ثم غلق النافذة"
 
 #: ../src/store-address.c:217
 #, fuzzy
 msgid "No address book selected...."
-msgstr "حجم نافذة دفتر العناوين"
+msgstr "لم يتم انتقاء مصدر."
 
 #: ../src/store-address.c:230
+#, fuzzy
 msgid "Address could not be written to this address book."
-msgstr ""
+msgstr "لم أستطع إزالة دفتر العناوين."
 
 #: ../src/store-address.c:233
+#, fuzzy
 msgid "Address book could not be accessed."
-msgstr ""
+msgstr "لا يمكن فتح دفتر العناوين هذا."
 
 #: ../src/store-address.c:235
+#, fuzzy
 msgid "This mail address is already in this address book."
-msgstr ""
+msgstr "أدرج عنوان بريد إلكتروني من دفتر العناوين"
 
 #: ../src/store-address.c:238
 msgid "Unexpected address book error. Report it."
@@ -6813,50 +6801,47 @@ msgstr ""
 #: ../src/store-address.c:254
 #, fuzzy
 msgid "Choose Address Book"
-msgstr "بريد (دفتر العناوين)"
+msgstr "دفتر عناوين جديد"
 
 #: ../src/store-address.c:293
 #, fuzzy
 msgid "Choose Address"
-msgstr "عنوان البريد الإلكتروني"
+msgstr "عنوان المنزل"
 
 #: ../src/toolbar-factory.c:77
-#, fuzzy
 msgid "Separator"
 msgstr "فاصل"
 
 #: ../src/toolbar-factory.c:78
 #, fuzzy
 msgid "Check"
-msgstr "تثبت من تهجيئ الكلمات"
+msgstr "ا_فحص"
 
 #: ../src/toolbar-factory.c:79
 #, fuzzy
 msgid "Check for new email"
-msgstr "تفقّد المحتويات غير المر_غوبة في الرسائل الجديدة"
+msgstr "_تحقق عن امتدادات جديدة"
 
 #: ../src/toolbar-factory.c:80
-#, fuzzy
 msgid "Compose"
 msgstr "تركيب"
 
 #: ../src/toolbar-factory.c:81
 #, fuzzy
 msgid "Compose message"
-msgstr "تأليف رسالة _جديدة"
+msgstr "اكتب رسالة"
 
 #: ../src/toolbar-factory.c:82
 #, fuzzy
 msgid "Continue"
-msgstr "استمر"
+msgstr "_مواصلة"
 
 #: ../src/toolbar-factory.c:83
 #, fuzzy
 msgid "Continue message"
-msgstr "إر_سال رسالة"
+msgstr "_واصِل العملية"
 
 #: ../src/toolbar-factory.c:84
-#, fuzzy
 msgid "Reply"
 msgstr "رد"
 
@@ -6865,245 +6850,236 @@ msgstr "رد"
 msgid ""
 "Reply\n"
 "to all"
-msgstr "الرّد على ال_كل"
+msgstr "رد على الجميع"
 
 #: ../src/toolbar-factory.c:87
 #, fuzzy
 msgid "Reply to all recipients"
-msgstr "استرجاع كافة القوائم إلى الإعدادات الأصلية؟"
+msgstr "إعادة تحميل كل المعاينات"
 
 #: ../src/toolbar-factory.c:88
 #, fuzzy
 msgid ""
 "Reply\n"
 "to group"
-msgstr "مجموعة قائمة المهام"
+msgstr "مجموعة خيارات"
 
 #: ../src/toolbar-factory.c:90
-#, fuzzy
 msgid "Forward"
-msgstr "تمرير"
+msgstr "مرر"
 
 #: ../src/toolbar-factory.c:92
-#, fuzzy
 msgid "Previous"
-msgstr "السّابقة"
+msgstr "سابقا"
 
 #: ../src/toolbar-factory.c:93
 #, fuzzy
 msgid "Open previous"
-msgstr "الصّ_ورة السّابقة"
+msgstr "بدون سابق"
 
 #: ../src/toolbar-factory.c:94
-#, fuzzy
 msgid "Next"
-msgstr "التّالية"
+msgstr "التالي"
 
 #: ../src/toolbar-factory.c:95
 #, fuzzy
 msgid "Open next"
-msgstr "الصّورة ال_تّالية"
+msgstr "لا يوجد تالي"
 
 #: ../src/toolbar-factory.c:96
 #, fuzzy
 msgid ""
 "Next\n"
 "unread"
-msgstr "الصّورة ال_تّالية"
+msgstr " غير مقروء"
 
 #: ../src/toolbar-factory.c:97
 #, fuzzy
 msgid "Open next unread message"
-msgstr "عرض الرسالة الغير مقروءة التالية"
+msgstr "اعرض الرسالة غير المقروءة التالية"
 
 #: ../src/toolbar-factory.c:98
 #, fuzzy
 msgid ""
 "Next\n"
 "flagged"
-msgstr "الصّورة ال_تّالية"
+msgstr "الصفحة ال_تالية"
 
 #: ../src/toolbar-factory.c:99
 #, fuzzy
 msgid "Open next flagged message"
-msgstr "عرض الرسالة المهمة التالية"
+msgstr "اعرض الرسالة غير المقروءة التالية"
 
 #: ../src/toolbar-factory.c:100
 #, fuzzy
 msgid ""
 "Previous\n"
 "part"
-msgstr "الصّ_ورة السّابقة"
+msgstr "سابقا"
 
 #: ../src/toolbar-factory.c:101
 #, fuzzy
 msgid "View previous part of message"
-msgstr "عرض الرسالة المهمة السابقة"
+msgstr "اعرض الصفحة السابقة"
 
 #: ../src/toolbar-factory.c:102
 #, fuzzy
 msgid ""
 "Next\n"
 "part"
-msgstr "الصّورة ال_تّالية"
+msgstr "التحديث التالي:"
 
 #: ../src/toolbar-factory.c:103
 #, fuzzy
 msgid "View next part of message"
-msgstr "عرض الرسالة المهمة التالية"
+msgstr "نوع الرسالة"
 
 #: ../src/toolbar-factory.c:104
 #, fuzzy
 msgid ""
 "Trash /\n"
 "Delete"
-msgstr "إفراغ _سلّة المهملات"
+msgstr "بريمج المهملات"
 
 #: ../src/toolbar-factory.c:105
 #, fuzzy
 msgid "Move the current message to trash"
-msgstr "لم يمكن نقل \"%s\" إلى سلة المهملات."
+msgstr "انقل اللسان الحالي إلى اليمين"
 
 #: ../src/toolbar-factory.c:106
 #, fuzzy
 msgid "Postpone"
-msgstr "تأجيل الإ_ستراحة"
+msgstr "موقّع"
 
 #: ../src/toolbar-factory.c:107
 #, fuzzy
 msgid "Postpone current message"
-msgstr "رسالة إجتماع رديئة"
+msgstr "الرسالة الحالية"
 
 #: ../src/toolbar-factory.c:108
-#, fuzzy
 msgid "Print"
-msgstr "طباعة"
+msgstr "اطبع"
 
 #: ../src/toolbar-factory.c:110
-#, fuzzy
 msgid "Send"
-msgstr "إرسال"
+msgstr "أرسِل"
 
 #: ../src/toolbar-factory.c:112
 #, fuzzy
 msgid "Exchange"
-msgstr "مايكروسوفت إكستشينج"
+msgstr "حرِّر التعديلات"
 
 #: ../src/toolbar-factory.c:114
-#, fuzzy
 msgid "Attach"
 msgstr "إرفاق"
 
 #: ../src/toolbar-factory.c:115
 #, fuzzy
 msgid "Add attachments to this message"
-msgstr "إضافة هذا المطلق إلى الشريط"
+msgstr "مُرفق للإضافة."
 
 #: ../src/toolbar-factory.c:116
-#, fuzzy
 msgid "Save"
-msgstr "حفظ"
+msgstr "احفظ"
 
 #: ../src/toolbar-factory.c:117
 #, fuzzy
 msgid "Save the current item"
-msgstr "إ_حفظ الصورة الحالية"
+msgstr "إحفظ اللعبة الحالية"
 
 #: ../src/toolbar-factory.c:118
-#, fuzzy
 msgid "Identity"
 msgstr "الهويّة"
 
 #: ../src/toolbar-factory.c:119
+#, fuzzy
 msgid "Set identity to use for this message"
-msgstr ""
+msgstr "أطلب إخطاراً بالوصول لهذه الرسالة"
 
 #: ../src/toolbar-factory.c:122
 #, fuzzy
 msgid "Toggle spell checker"
-msgstr "فحص تهجئة ضمن السّياق"
+msgstr "المدقق الإملائي"
 
 #: ../src/toolbar-factory.c:124
 #, fuzzy
 msgid "Run a spell check"
-msgstr "فحص تهجئة ضمن السّياق"
+msgstr "دقِّق إملائيا"
 
 #: ../src/toolbar-factory.c:126 ../src/toolbar-factory.c:136
-#, fuzzy
 msgid "Close"
-msgstr "غلق"
+msgstr "أغلق"
 
 #: ../src/toolbar-factory.c:127
 #, fuzzy
 msgid "Close the compose window"
-msgstr "غلق نافذة إكيجا"
+msgstr "اغلق نافذة الخَرْج"
 
 #: ../src/toolbar-factory.c:128
 #, fuzzy
 msgid ""
 "Toggle\n"
 "new"
-msgstr "<b>مفاتيح التحول</b>"
+msgstr "تحول"
 
 #: ../src/toolbar-factory.c:129
 #, fuzzy
 msgid "Toggle new message flag"
-msgstr "مقطع صوتي لرسالة فورية جديدة"
+msgstr "تعذّر جلب الرّسائل الجّديدة"
 
 #: ../src/toolbar-factory.c:130
 #, fuzzy
 msgid "Mark all"
-msgstr "نسخ ال_كل"
+msgstr "و_ضع علامة"
 
 #: ../src/toolbar-factory.c:131
+#, fuzzy
 msgid "Mark all messages in current mailbox"
-msgstr ""
+msgstr "علم كل الرسائل كمقروء"
 
 #: ../src/toolbar-factory.c:132
 #, fuzzy
 msgid ""
 "All\n"
 "headers"
-msgstr "نسخ ال_كل"
+msgstr "ترويسات"
 
 #: ../src/toolbar-factory.c:133
 #, fuzzy
 msgid "Show all headers"
-msgstr "أظهر كل الأعمال"
+msgstr "أظهر كل العمليات"
 
 #: ../src/toolbar-factory.c:134
-#, fuzzy
 msgid "Empty Trash"
 msgstr "افرغ المهملات"
 
 #: ../src/toolbar-factory.c:137
 #, fuzzy
 msgid "Close current mailbox"
-msgstr "غلق الملف الحالي"
+msgstr "أغلق المحفوظة الحاليّة"
 
 #: ../src/toolbar-factory.c:138
 #, fuzzy
 msgid "Msg Preview"
-msgstr "استعراض الفيديو"
+msgstr "معاينة الصفحة"
 
 #: ../src/toolbar-factory.c:139
-#, fuzzy
 msgid "Show preview pane"
-msgstr "إظهار لوح \"المعاينة\""
+msgstr "أظهر لوح المعاينة"
 
 #: ../src/toolbar-factory.c:141
 #, fuzzy
 msgid "Sign"
-msgstr "نص العلامة"
+msgstr "_وقِّع"
 
 #: ../src/toolbar-factory.c:142
+#, fuzzy
 msgid "Sign message using GPG"
-msgstr ""
+msgstr "_وقِّع الرسالة كـ:"
 
 #: ../src/toolbar-factory.c:143
-#, fuzzy
 msgid "Encrypt"
-msgstr "تشفير باستعمال PGP"
+msgstr "تشفير"
 
 #: ../src/toolbar-factory.c:144
 #, fuzzy
@@ -7111,7 +7087,6 @@ msgid "Encrypt message using GPG"
 msgstr "تشفير هذه الرسالة باستخدام PGP"
 
 #: ../src/toolbar-factory.c:146
-#, fuzzy
 msgid "Undo"
 msgstr "تراجع"
 
@@ -7123,18 +7098,19 @@ msgstr "تراجع عن آخر تغيير للنص"
 #: ../src/toolbar-factory.c:148
 #, fuzzy
 msgid "Redo"
-msgstr "تكرار"
+msgstr "عكس تراجع"
 
 #: ../src/toolbar-factory.c:149
 #, fuzzy
 msgid "Redo most recent change"
-msgstr "تكرار تغيير لم يتم عمله سابقاً"
+msgstr "تراجع عن آخر تغيير للنص"
 
 #: ../src/toolbar-factory.c:150
+#, fuzzy
 msgid ""
 "Expunge\n"
 "Deleted"
-msgstr ""
+msgstr "غير منتقى"
 
 #: ../src/toolbar-factory.c:151
 msgid "Expunge messages marked as deleted"
@@ -7143,20 +7119,21 @@ msgstr ""
 #: ../src/toolbar-factory.c:239
 #, fuzzy, c-format
 msgid "Unknown toolbar icon \"%s\""
-msgstr "حجم أيقونة شريط الأدوات"
+msgstr "خيار مجهول %s"
 
 #: ../src/toolbar-factory.c:321
 msgid "Queue"
-msgstr ""
+msgstr "طابور"
 
 #: ../src/toolbar-factory.c:358
+#, fuzzy
 msgid "Queue this message for sending"
-msgstr ""
+msgstr "احذف رسالة بعد الت_عامل معها"
 
 #: ../src/toolbar-prefs.c:123
 #, fuzzy
 msgid "Customize Toolbars"
-msgstr "تخصيص أعمدة الأدوات"
+msgstr "خصّص أشرطة الأدوات"
 
 #: ../src/toolbar-prefs.c:144
 #, fuzzy
@@ -7166,33 +7143,33 @@ msgstr "النّافذة الرّئيسيّة"
 #: ../src/toolbar-prefs.c:148
 #, fuzzy
 msgid "Compose window"
-msgstr "مبدل النافذة"
+msgstr "اغلق النافذة"
 
 #: ../src/toolbar-prefs.c:152
 #, fuzzy
 msgid "Message window"
-msgstr "إظهار نافذة معاينة الرّسائل"
+msgstr "انشيء نافذة"
 
 #: ../src/toolbar-prefs.c:154
 #, fuzzy
 msgid "Toolbar options"
-msgstr "<b>خيارات العرض:</b>"
+msgstr "خيارات الأداة"
 
 #: ../src/toolbar-prefs.c:164
 #, fuzzy
 msgid "_Wrap button labels"
-msgstr "عناين م_فاتيح عمود الأدوات:"
+msgstr "اسماء أزرار شريط الأدوات"
 
 #: ../src/toolbar-prefs.c:363
 #, fuzzy, c-format
 msgid "Error displaying toolbar help: %s\n"
-msgstr "حدث خطأ عند عرض المساعدة."
+msgstr "خطأ عند تحميل السِمة: %s\n"
 
 #. Preview display
 #: ../src/toolbar-prefs.c:399
 #, fuzzy
 msgid "Preview"
-msgstr "لمحة"
+msgstr "معاينات"
 
 #: ../src/toolbar-prefs.c:427
 msgid "_Restore toolbar to standard buttons"
@@ -7201,19 +7178,18 @@ msgstr ""
 #: ../src/toolbar-prefs.c:446
 #, fuzzy
 msgid "Available buttons"
-msgstr "أزرار التّنبيه"
+msgstr "الخيارات المتوفرة"
 
 #: ../src/toolbar-prefs.c:462
 #, fuzzy
 msgid "Current toolbar"
-msgstr "عرض عمود الأدوات"
+msgstr "اللون الحالي"
 
 #: ../src/toolbar-prefs.c:479
-#, fuzzy
 msgid "Up"
-msgstr "أعلى"
+msgstr "فوق"
 
 #: ../src/toolbar-prefs.c:495
-#, fuzzy
 msgid "Down"
-msgstr "أسفل"
+msgstr "تحت"
+

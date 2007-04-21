@@ -1644,24 +1644,26 @@ lbi_strerror(ImapResult rc)
   }
 }
 
-static char*
+static GString*
 imap_get_string_with_lookahead(struct siobuf* sio, int c)
-{ /* string */
-  char *res;
-  
+{ /* string */  
+  GString *res = NULL;
   if(c=='"') { /* quoted */
-    GString *str = g_string_new("");
+    res = g_string_new("");
     while( (c=sio_getc(sio)) != '"') {
       if(c== '\\')
         c = sio_getc(sio);
-      g_string_append_c(str, c);
+      g_string_append_c(res, c);
     }
-    res = g_string_free(str, FALSE);
   } else { /* this MUST be literal */
     char buf[15];
     int len;
-    if(c!='{')
-      return NULL;
+    if(c=='~') /* BINARY extension literal8 indicator */
+      c = sio_getc(sio);
+    if(c!='{') {
+      g_string_free(res, TRUE);
+      return NULL; /* ERROR */
+    }
 
     c = imap_get_atom(sio, buf, sizeof(buf));
     len = strlen(buf); 
@@ -1670,9 +1672,10 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
     len = atoi(buf);
     if( c != 0x0d) { printf("lit1:%d\n",c); return NULL;}
     if( (c=sio_getc(sio)) != 0x0a) { printf("lit1:%d\n",c); return NULL;}
-    res = g_malloc(len+1);
-    if(len>0) sio_read(sio, res, len);
-    res[len] = '\0';
+    res = g_string_sized_new(len+1);
+    if(len>0) sio_read(sio, res->str, len);
+    res->len = len;
+    res->str[len] = '\0';
   }
   return res;
 }
@@ -1681,7 +1684,8 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
 static char*
 imap_get_string(struct siobuf* sio)
 {
-  return imap_get_string_with_lookahead(sio, sio_getc(sio));
+  GString * s = imap_get_string_with_lookahead(sio, sio_getc(sio));
+  return g_string_free(s, FALSE);
 }
 
 static gboolean
@@ -1699,7 +1703,7 @@ imap_get_nstring(struct siobuf* sio)
   if(toupper(c)=='N') { /* nil */
     sio_getc(sio); sio_getc(sio); /* ignore i and l */
     return NULL;
-  } else return imap_get_string_with_lookahead(sio, c);
+  } else return g_string_free(imap_get_string_with_lookahead(sio, c), FALSE);
 }
 
 /* see the spec for the definition of astring */
@@ -1719,10 +1723,22 @@ imap_get_astring(struct siobuf *sio, int* lookahead)
     res = g_string_free(str, FALSE);
     *lookahead = c;
   } else {
-    res = imap_get_string_with_lookahead(sio, c);
+    res = g_string_free(imap_get_string_with_lookahead(sio, c), FALSE);
     *lookahead = sio_getc(sio);
   }
   return res;
+}
+
+/* nstring / literal8 as in the BINARY extension */
+static GString*
+imap_get_binary_string(struct siobuf *sio)
+{
+  int c = sio_getc(sio);
+  if(toupper(c)=='N') { /* nil */
+    sio_getc(sio); sio_getc(sio); /* ignore i and l */
+    return g_string_new("");
+  } else
+    return imap_get_string_with_lookahead(sio, c);
 }
 
 /* this file contains all the response handlers as defined in
@@ -1761,7 +1777,7 @@ ir_capability_data(ImapMboxHandle *handle)
     "AUTH=ANONYMOUS", "AUTH=CRAM-MD5", "AUTH=GSSAPI", "AUTH=PLAIN",
     "STARTTLS", "LOGINDISABLED", "SORT",
     "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES",
-    "UNSELECT", "SCAN", "CHILDREN", "LITERAL+", "IDLE", "SASL-IR"
+    "UNSELECT", "SCAN", "CHILDREN", "LITERAL+", "IDLE", "SASL-IR", "BINARY"
   };
   unsigned x;
   int c;
@@ -3032,15 +3048,17 @@ static ImapResponse
 ir_body_section(struct siobuf *sio, unsigned seqno,
 		ImapFetchBodyCb body_cb, void *arg)
 {
-  char buf[80], *str;
+  char buf[80];
+  GString *bs;
   int c = imap_get_atom(sio, buf, sizeof(buf));
+
   if(c != ']') { puts("] expected"); return IMR_PROTOCOL; }
   if(sio_getc(sio) != ' ') { puts("space expected"); return IMR_PROTOCOL;}
-  str = imap_get_nstring(sio);
-  if(str) {
-    if(body_cb)
-      body_cb(seqno, str, strlen(str), arg);
-    g_free(str);
+  bs = imap_get_binary_string(sio);
+  if(bs) {
+    if(bs->str && body_cb)
+      body_cb(seqno, bs->str, bs->len, arg);
+    g_string_free(bs, TRUE);
   }
   return IMR_OK;
 }
@@ -3163,6 +3181,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     { "RFC822.HEADER", ir_msg_att_rfc822_header }, 
     { "RFC822.TEXT",   ir_msg_att_rfc822_text }, 
     { "RFC822.SIZE",   ir_msg_att_rfc822_size }, 
+    { "BINARY",        ir_msg_att_body }, 
     { "BODY",          ir_msg_att_body }, 
     { "BODYSTRUCTURE", ir_msg_att_bodystructure }, 
     { "UID",           ir_msg_att_uid }

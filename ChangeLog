@@ -1,3 +1,12 @@
+2007-04-21  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: plug memory leaks.
+	* libbalsa/imap-server.c: enable binary extension.
+	* libbalsa/imap/imap-handle.c: process BINARY output.
+	* libbalsa/imap/imap-handle.h: add BINARY to the known capability list.
+	* libbalsa/imap/imap-commands.c: issue BINARY commands.
+	* libbalsa/information.c: fix memory leak in notify code.
+
 2007-04-21  Peter Bloomfield
 
 	* src/main-window.c: (balsa_window_new),

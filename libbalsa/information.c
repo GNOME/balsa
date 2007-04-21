@@ -82,8 +82,9 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
         break;
     }
     if(notify_is_initted()) {
-        note = notify_notification_new("Balsa", g_strdup_vprintf(fmt,ap),
-                                       icon_str, NULL);
+        gchar *msg = g_strdup_vprintf(fmt,ap);
+        note = notify_notification_new("Balsa", msg, icon_str, NULL);
+        g_free(msg);
         notify_notification_set_timeout (note, 7000); /* 7 seconds */
         notify_notification_show (note, NULL);
         g_object_unref(G_OBJECT(note));

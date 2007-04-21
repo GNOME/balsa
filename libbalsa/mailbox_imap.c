@@ -2289,10 +2289,16 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
                                        section, ifbo, append_str, &dt));
-        if(rc != IMR_OK)
-            g_warning("FIXME: consider adding FETCH error handling!\n");
         libbalsa_unlock_mailbox(msg->mailbox);
-        
+        if(rc != IMR_OK) {
+            fprintf(stderr, "Error fetching imap message no %lu section %s\n",
+                    msg->msgno, section);
+            g_free(dt.block);
+            g_free(section); 
+            g_strfreev(pair);
+            g_free(part_name);
+            return FALSE;
+        }
         libbalsa_assure_balsa_dir();
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
         fp = fopen(part_name, "wb+");
@@ -2328,6 +2334,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             return FALSE; /* something better ? */
             }
         }
+        g_free(dt.block);
 	fseek(fp, 0, SEEK_SET);
     }
     partstream = g_mime_stream_file_new (fp);

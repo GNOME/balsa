@@ -76,6 +76,7 @@ typedef enum
   IMCAP_LITERAL,                /* RFC 2088 */
   IMCAP_IDLE,                   /* RFC 2177 */
   IMCAP_SASLIR,                 /* imap-sasl-initial-response: SASL-IR */
+  IMCAP_BINARY,                 /* RFC 3516 */
   IMCAP_FETCHBODY,              /* basic imap implemented correctly by
                                  * most imap servers but not all. We
                                  * have to detect that. */

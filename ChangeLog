@@ -1,3 +1,10 @@
+2007-04-21  Peter Bloomfield
+
+	* src/main-window.c: (balsa_window_new),
+	(display_new_mail_notification), (cancel_new_mail_notification):
+	pop up new-mail notification only if main-window is not active, and
+	cancel it when main-window becomes active.
+
 2007-04-20  Albrecht Dreß
 
 	* libbalsa/address-book-ldap.c: support LDAP referrals.

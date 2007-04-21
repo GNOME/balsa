@@ -277,6 +277,9 @@ static gboolean notebook_drag_motion_cb (GtkWidget* widget,
 static GtkWidget *balsa_notebook_label_new (BalsaMailboxNode* mbnode);
 static void ident_manage_dialog_cb(GtkWidget*, gpointer);
 
+#ifdef HAVE_NOTIFY
+static gboolean cancel_new_mail_notification(void);
+#endif
 
 static void
 balsa_quit_nicely(GtkWidget * widget, gpointer data)
@@ -1756,6 +1759,12 @@ balsa_window_new()
                      G_CALLBACK (gtk_main_quit), NULL);
     g_signal_connect(G_OBJECT(window), "delete-event",
                      G_CALLBACK(delete_cb), NULL);
+
+#ifdef HAVE_NOTIFY
+    /* Cancel new-mail notification when we get the focus. */
+    g_signal_connect(G_OBJECT(window), "notify::is-active",
+                     G_CALLBACK(cancel_new_mail_notification), NULL);
+#endif
 
     return GTK_WIDGET(window);
 }
@@ -3323,12 +3332,13 @@ get_new_message_notification_string(int num_new, int num_total)
 /** Informs the user that new mail arrived. num_new is the number of
     the recently arrived messsages.
 */
+#ifdef HAVE_NOTIFY
+static NotifyNotification *new_mail_note = NULL;
+#endif
+
 static void
 display_new_mail_notification(int num_new, int has_new)
 {
-#ifdef HAVE_NOTIFY
-    static NotifyNotification *new_mail_note = NULL;
-#endif
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
@@ -3345,6 +3355,9 @@ display_new_mail_notification(int num_new, int has_new)
        dbus could not be created? In any case, we must not continue or
        ugly things will happen, at least with libnotify-0.4.2. */
     if (notify_is_initted()) {
+        if (gtk_window_is_active(GTK_WINDOW(balsa_app.main_window)))
+            return;
+
         if (new_mail_note) {
             /* the user didn't acknowledge the last info, so we'll
              * accumulate the count */
@@ -3404,6 +3417,20 @@ display_new_mail_notification(int num_new, int has_new)
 #endif
     g_free(msg);
 }
+
+#ifdef HAVE_NOTIFY
+static gboolean
+cancel_new_mail_notification(void)
+{
+    if (new_mail_note
+        && gtk_window_is_active(GTK_WINDOW(balsa_app.main_window))) {
+        /* Setting 0 would mean never timeout! */
+        notify_notification_set_timeout(new_mail_note, 1);
+        notify_notification_show(new_mail_note, NULL);
+    }
+    return FALSE;
+}
+#endif
 
 GtkWidget *
 balsa_window_find_current_index(BalsaWindow * window)

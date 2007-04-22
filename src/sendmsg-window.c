@@ -5442,6 +5442,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 #ifdef HAVE_GPGME
     GtkTreeIter iter;
 #endif
+    GError * error = NULL;
 
     if (!is_ready_to_send(bsmsg))
 	return FALSE;
@@ -5492,20 +5493,20 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
 					bsmsg->ident->smtp_server,
-					bsmsg->flow);
+					bsmsg->flow, &error);
     else 
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
                                        balsa_find_sentbox_by_url,
 				       bsmsg->ident->smtp_server,
-                                       bsmsg->flow, balsa_app.debug);
+                                       bsmsg->flow, balsa_app.debug, &error);
 #else
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
-					bsmsg->flow);
+					bsmsg->flow, &error);
     else 
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
                                        balsa_find_sentbox_by_url,
-				       bsmsg->flow, balsa_app.debug); 
+				       bsmsg->flow, balsa_app.debug, &error); 
 #endif
     if (result == LIBBALSA_MESSAGE_CREATE_OK) {
 	if (bsmsg->parent_message && bsmsg->parent_message->mailbox
@@ -5528,12 +5529,25 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
             msg = _("Message could not be saved in sentbox"); break;
         case LIBBALSA_MESSAGE_SEND_ERROR:
             msg = _("Message could not be sent"); break;
+#ifdef HAVE_GPGME
+	case LIBBALSA_MESSAGE_SIGN_ERROR:
+            msg = _("Message could not be signed"); break;
+	case LIBBALSA_MESSAGE_ENCRYPT_ERROR:
+            msg = _("Message could not be encrypted"); break;
+#endif
         }
-        balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                   LIBBALSA_INFORMATION_WARNING,
-				   _("Send failed: %s"), msg);
+	if (error)
+	    balsa_information_parented(GTK_WINDOW(bsmsg->window),
+				       LIBBALSA_INFORMATION_WARNING,
+				       _("Send failed: %s\n%s"), msg,
+				       error->message);
+	else
+	    balsa_information_parented(GTK_WINDOW(bsmsg->window),
+				       LIBBALSA_INFORMATION_WARNING,
+				       _("Send failed: %s"), msg);
 	return FALSE;
     }
+    g_clear_error(&error);
 
     gtk_widget_destroy(bsmsg->window);
 

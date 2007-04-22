@@ -24,6 +24,7 @@
 #include <glib.h>
 #include <gmime/gmime.h>
 #include <gpgme.h>
+#include <time.h>
 #include "gmime-gpgme-context.h"
 #include "i18n.h"
 
@@ -92,6 +93,8 @@ static gpgme_key_t *gpgme_build_recipients(GMimeGpgmeContext * ctx,
 					   GPtrArray * rcpt_list,
 					   GError ** error);
 static void release_keylist(gpgme_key_t * keylist);
+static void g_set_error_from_gpgme(GError ** error, gpgme_error_t gpgme_err,
+				   const gchar * message);
 
 
 static GMimeCipherContextClass *parent_class = NULL;
@@ -399,28 +402,19 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
     if ((err =
 	 gpgme_data_new_from_cbs(&in, &cbs,
 				 istream)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data from stream: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not get data from stream"));
 	return -1;
     }
     if ((err = gpgme_data_new_from_cbs(&out, &cbs,
 				       ostream)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not create new data object: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not create new data object"));
 	gpgme_data_release(in);
 	return -1;
     }
     if ((err =
 	 gpgme_op_sign(gpgme_ctx, in, out,
 		       sig_mode)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: signing failed: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("signing failed"));
 	gpgme_data_release(out);
 	gpgme_data_release(in);
 	return -1;
@@ -481,10 +475,7 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
     /* create the message stream */
     if ((err = gpgme_data_new_from_cbs(&msg, &cbs, istream)) !=
 	GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data from stream: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not get data from stream"));
 	return NULL;
     }
 
@@ -492,10 +483,7 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
      * plaintext */
     if ((err = gpgme_data_new_from_cbs(&sig, &cbs, sigstream)) !=
 	GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data from stream: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not get data from stream"));
 	gpgme_data_release(msg);
 	return NULL;
     }
@@ -506,10 +494,7 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
     else
 	err = gpgme_op_verify(gpgme_ctx, sig, msg, NULL);
     if (err != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: signature verification failed: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("signature verification failed"));
 	ctx->sig_state = g_mime_gpgme_sigstat_new();
 	ctx->sig_state->status = err;
 	ctx->sig_state->protocol = protocol;
@@ -607,19 +592,13 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
     if ((err =
 	 gpgme_data_new_from_cbs(&plain, &cbs,
 				 istream)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data from stream: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not get data from stream"));
 	release_keylist(rcpt);
 	return -1;
     }
     if ((err = gpgme_data_new_from_cbs(&crypt, &cbs, ostream)) !=
 	GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not create new data object: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not create new data object"));
 	gpgme_data_release(plain);
 	release_keylist(rcpt);
 	return -1;
@@ -641,16 +620,10 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
     gpgme_data_release(crypt);
     release_keylist(rcpt);
     if (err != GPG_ERR_NO_ERROR) {
-	if (error) {
-	    if (sign)
-		g_set_error(error, GPGME_ERROR_QUARK, err,
-			    _("%s: signing and encryption failed: %s"),
-			    gpgme_strsource(err), gpgme_strerror(err));
-	    else
-		g_set_error(error, GPGME_ERROR_QUARK, err,
-			    _("%s: encryption failed: %s"),
-			    gpgme_strsource(err), gpgme_strerror(err));
-	}
+	if (sign)
+	    g_set_error_from_gpgme(error, err, _("signing and encryption failed"));
+	else
+	    g_set_error_from_gpgme(error, err, _("encryption failed"));
 	return -1;
     } else
 	return 0;
@@ -698,18 +671,12 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
     if ((err =
 	 gpgme_data_new_from_cbs(&crypt, &cbs,
 				 istream)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not get data from stream: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not get data from stream"));
 	return -1;
     }
     if ((err = gpgme_data_new_from_cbs(&plain, &cbs, ostream)) !=
 	GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not create new data object: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not create new data object"));
 	gpgme_data_release(crypt);
 	return -1;
     }
@@ -718,10 +685,7 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
     if ((err =
 	 gpgme_op_decrypt_verify(gpgme_ctx, crypt,
 				 plain)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: decryption failed: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("decryption failed"));
 	gpgme_data_release(plain);
 	gpgme_data_release(crypt);
 	return -1;
@@ -753,10 +717,7 @@ g_mime_gpgme_context_new(GMimeSession * session,
 
     /* creating the gpgme context may fail, so do this first to get the info */
     if ((err = gpgme_new(&gpgme_ctx)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not create context: %s"),
-			gpgme_strsource(err), gpgme_strerror(err));
+	g_set_error_from_gpgme(error, err, _("could not create context"));
 	return NULL;
     }
 
@@ -854,14 +815,15 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
     gpgme_key_t key;
     gpgme_error_t err;
     gboolean found_bad;
+    time_t now = time(NULL);
 
     /* let gpgme list keys */
     if ((err = gpgme_op_keylist_start(gpgme_ctx, name,
 				      secret_only)) != GPG_ERR_NO_ERROR) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not list keys for %s: %s"),
-			gpgme_strsource(err), name, gpgme_strerror(err));
+	gchar * msg = g_strdup_printf(_("could not list keys for \"%s\""), name);
+
+	g_set_error_from_gpgme(error, err, msg);
+	g_free(msg);
 	return NULL;
     }
 
@@ -876,7 +838,8 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
 			      (!secret_only && !subkey->can_encrypt)))
 		subkey = subkey->next;
 
-	    if (subkey && KEY_IS_OK(subkey))
+	    if (subkey && KEY_IS_OK(subkey) && 
+		(subkey->expires == 0 || subkey->expires > now))
 		keys = g_list_append(keys, key);
 	    else
 		found_bad = TRUE;
@@ -884,10 +847,10 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
 	    found_bad = TRUE;
 
     if (gpg_err_code(err) != GPG_ERR_EOF) {
-	if (error)
-	    g_set_error(error, GPGME_ERROR_QUARK, err,
-			_("%s: could not list keys for %s: %s"),
-			gpgme_strsource(err), name, gpgme_strerror(err));
+	gchar * msg = g_strdup_printf(_("could not list keys for \"%s\""), name);
+
+	g_set_error_from_gpgme(error, err, msg);
+	g_free(msg);
 	gpgme_op_keylist_end(gpgme_ctx);
 	g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
 	g_list_free(keys);
@@ -1038,4 +1001,37 @@ release_keylist(gpgme_key_t * keylist)
 	key++;
     }
     g_free(keylist);
+}
+
+
+#define UTF8_VALID_STR(s)						\
+    do {								\
+	if ((s) && !g_utf8_validate(s, -1, NULL)) {			\
+	    gsize bwr;							\
+	    gchar * newstr = g_locale_to_utf8(s, -1, NULL, &bwr, NULL);	\
+									\
+	    g_free(s);							\
+	    s = newstr;							\
+	}								\
+    } while (0)
+
+
+static void
+g_set_error_from_gpgme(GError ** error, gpgme_error_t gpgme_err,
+		       const gchar * message)
+{
+    gchar * errstr;
+    gchar * srcstr;
+
+    if (!error)
+	return;
+
+    srcstr = g_strdup(gpgme_strsource(gpgme_err));
+    UTF8_VALID_STR(srcstr);
+    errstr = g_strdup(gpgme_strerror(gpgme_err));
+    UTF8_VALID_STR(errstr);
+    g_set_error(error, GPGME_ERROR_QUARK, gpgme_err, "%s: %s: %s", srcstr,
+		message, errstr);
+    g_free(srcstr);
+    g_free(errstr);
 }

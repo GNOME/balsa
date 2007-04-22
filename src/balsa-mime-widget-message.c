@@ -307,6 +307,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     LibBalsaMessageBody *body;
     gchar *data;
     GError *err = NULL;
+    LibBalsaMsgCreateResult result;
 
     /* create a message */
     message = libbalsa_message_new();
@@ -350,15 +351,20 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
 	body->charset = g_strdup("US-ASCII");
     libbalsa_message_append_part(message, body);
 #if ENABLE_ESMTP
-    libbalsa_message_send(message, balsa_app.outbox, NULL,
-                          balsa_find_sentbox_by_url,
-                          balsa_app.current_ident->smtp_server,
-                          FALSE, balsa_app.debug);
+    result = libbalsa_message_send(message, balsa_app.outbox, NULL,
+				   balsa_find_sentbox_by_url,
+				   balsa_app.current_ident->smtp_server,
+				   FALSE, balsa_app.debug, &err);
 #else
-    libbalsa_message_send(message, balsa_app.outbox, NULL,
-                          balsa_find_sentbox_by_url,
-                          FALSE, balsa_app.debug);
+    result = libbalsa_message_send(message, balsa_app.outbox, NULL,
+				   balsa_find_sentbox_by_url,
+				   FALSE, balsa_app.debug, &err);
 #endif
+    if (result != LIBBALSA_MESSAGE_CREATE_OK)
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("Sending the external body request failed: %s"),
+			     err ? err->message : "?");
+    g_error_free(err);
     g_object_unref(G_OBJECT(message));
 }
 

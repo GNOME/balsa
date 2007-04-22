@@ -63,18 +63,21 @@ gint libbalsa_message_body_protection(LibBalsaMessageBody * body);
 gboolean libbalsa_sign_mime_object(GMimeObject ** content,
 				   const gchar * rfc822_for,
 				   gpgme_protocol_t protocol,
-				   GtkWindow * parent);
+				   GtkWindow * parent,
+				   GError ** error);
 gboolean libbalsa_encrypt_mime_object(GMimeObject ** content,
 				      GList * rfc822_for,
 				      gpgme_protocol_t protocol,
 				      gboolean always_trust,
-				      GtkWindow * parent);
+				      GtkWindow * parent,
+				      GError ** error);
 gboolean libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 					   const gchar * rfc822_signer,
 					   GList * rfc822_for,
 					   gpgme_protocol_t protocol,
 					   gboolean always_trust,
-					   GtkWindow * parent);
+					   GtkWindow * parent,
+					   GError ** error);
 gboolean libbalsa_body_check_signature(LibBalsaMessageBody * body,
 				       gpgme_protocol_t protocol);
 LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody * body,
@@ -86,7 +89,8 @@ gboolean libbalsa_rfc2440_sign_encrypt(GMimePart * part,
 				       const gchar * sign_for,
 				       GList * encrypt_for,
 				       gboolean always_trust,
-				       GtkWindow * parent);
+				       GtkWindow * parent,
+				       GError ** error);
 gpgme_error_t libbalsa_rfc2440_verify(GMimePart * part,
 				      GMimeGpgmeSigstat ** sig_info);
 gpgme_error_t libbalsa_rfc2440_decrypt(GMimePart * part,

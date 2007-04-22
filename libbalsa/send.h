@@ -47,14 +47,16 @@ LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message,
                                                LibBalsaMailbox* fccbox,
                                                LibBalsaSmtpServer *
                                                smtp_server,
-					       gboolean flow);
+					       gboolean flow,
+					       GError ** error);
 LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage * message,
                                               LibBalsaMailbox * outbox,
                                               LibBalsaMailbox * fccbox,
                                               LibBalsaFccboxFinder finder,
                                               LibBalsaSmtpServer *
                                               smtp_server, gboolean flow,
-                                              gboolean debug);
+                                              gboolean debug,
+					      GError ** error);
 gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
                                 LibBalsaFccboxFinder finder,
                                 GSList * smtp_servers, gboolean debug);
@@ -63,12 +65,14 @@ gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
 					       LibBalsaMailbox* outbox,
                                                LibBalsaMailbox* fccbox,
-					       gboolean flow);
+					       gboolean flow,
+					       GError ** error);
 LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
 					      LibBalsaMailbox* outbox,  
 					      LibBalsaMailbox* fccbox,
                                               LibBalsaFccboxFinder finder, 
-					      gboolean flow, gboolean debug);
+					      gboolean flow, gboolean debug,
+					      GError ** error);
 gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, 
                                 LibBalsaFccboxFinder finder,
                                 gboolean debug);

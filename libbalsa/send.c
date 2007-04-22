@@ -192,20 +192,21 @@ send_message_info_destroy(SendMessageInfo *smi)
 
 
 #if HAVE_GPGME
-static gint
+static LibBalsaMsgCreateResult
 libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
-			       GtkWindow * parent);
+			       GtkWindow * parent, GError ** error);
 static LibBalsaMsgCreateResult
 do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
-		    GtkWindow * parent);
+		    GtkWindow * parent, GError ** error);
 #endif
 
 static guint balsa_send_message_real(SendMessageInfo* info);
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message,
-				     gboolean flow, gboolean postponing);
+				     gboolean flow, gboolean postponing,
+				     GError ** error);
 static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage * message,
-				    gboolean flow);
+						   gboolean flow, GError ** error);
 static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                        MessageQueueItem *mqi);
@@ -390,7 +391,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 #if ENABLE_ESMTP
                        LibBalsaSmtpServer * smtp_server,
 #endif /* ESMTP */
-		       gboolean flow)
+		       gboolean flow, GError ** error)
 {
     LibBalsaMsgCreateResult result;
 #if ENABLE_ESMTP
@@ -401,7 +402,7 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
-    if ((result = libbalsa_create_msg(message, flow)) !=
+    if ((result = libbalsa_create_msg(message, flow, error)) !=
 	LIBBALSA_MESSAGE_CREATE_OK)
         return result;
 
@@ -485,7 +486,8 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                       LibBalsaMailbox * fccbox,
                       LibBalsaFccboxFinder finder,
                       LibBalsaSmtpServer * smtp_server,
-                      gboolean flow, gboolean debug)
+                      gboolean flow, gboolean debug,
+		      GError ** error)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
@@ -494,7 +496,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 
     if (message != NULL)
         result = libbalsa_message_queue(message, outbox, fccbox,
-                                        smtp_server, flow);
+                                        smtp_server, flow, error);
 
     if (result == LIBBALSA_MESSAGE_CREATE_OK
         && !lbs_process_queue(outbox, finder, smtp_server, debug))
@@ -506,12 +508,13 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
 		      LibBalsaMailbox* fccbox, LibBalsaFccboxFinder finder,
-                      gboolean flow, gboolean debug)
+                      gboolean flow, gboolean debug,
+		      GError ** error)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
     if (message != NULL)
- 	result = libbalsa_message_queue(message, outbox, fccbox, flow);
+ 	result = libbalsa_message_queue(message, outbox, fccbox, flow, error);
     if (result == LIBBALSA_MESSAGE_CREATE_OK)
  	if (!libbalsa_process_queue(outbox, finder, debug))
  	    return LIBBALSA_MESSAGE_SEND_ERROR;
@@ -1574,7 +1577,7 @@ get_tz_offset(time_t *t)
 
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
-				     gboolean postponing)
+				     gboolean postponing, GError ** error)
 {
     gchar **mime_type;
     GMimeObject *mime_root = NULL;
@@ -1704,16 +1707,16 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 	    if (!postponing && body == body->message->body_list &&
 		message->gpg_mode > 0 &&
 		(message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
-		gint result = 
+		LibBalsaMsgCreateResult crypt_res =
 		    libbalsa_create_rfc2440_buffer(body,
 			                           GMIME_PART(mime_part),
-						   parent);
+						   parent, error);
 
-		if (result != LIBBALSA_MESSAGE_CREATE_OK) {
+		if (crypt_res != LIBBALSA_MESSAGE_CREATE_OK) {
 		    g_object_unref(G_OBJECT(mime_part));
 		    if (mime_root)
 			g_object_unref(G_OBJECT(mime_root));
-		    return LIBBALSA_MESSAGE_CREATE_ERROR;
+		    return crypt_res;
 		}
 	    }
 #else
@@ -1735,7 +1738,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 #ifdef HAVE_GPGME
     if (message->body_list != NULL && !postponing) {
 	LibBalsaMsgCreateResult crypt_res =
-	    do_multipart_crypto(message, &mime_root, parent);
+	    do_multipart_crypto(message, &mime_root, parent, error);
 	if (crypt_res != LIBBALSA_MESSAGE_CREATE_OK)
 	    return crypt_res;
     }
@@ -1839,9 +1842,11 @@ libbalsa_message_postpone(LibBalsaMessage * message,
     gboolean retval;
     GError *err = NULL;
 
+    /* in postpone mode no crypto operation is triggered, so we don't need to
+       pass the error */
     if (!message->mime_msg
         && libbalsa_message_create_mime_message(message, flow,
-                                                TRUE) !=
+                                                TRUE, NULL) !=
         LIBBALSA_MESSAGE_CREATE_OK)
         return FALSE;
 
@@ -1903,12 +1908,12 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
    copies message to msg.
 */ 
 static LibBalsaMsgCreateResult
-libbalsa_create_msg(LibBalsaMessage * message, gboolean flow)
+libbalsa_create_msg(LibBalsaMessage * message, gboolean flow, GError ** error)
 {
     if (!message->mime_msg) {
 	LibBalsaMsgCreateResult res =
 	    libbalsa_message_create_mime_message(message, flow,
-						 FALSE);
+						 FALSE, error);
 	if (res != LIBBALSA_MESSAGE_CREATE_OK)
 	    return res;
     }
@@ -1966,9 +1971,9 @@ lb_send_from(LibBalsaMessage *message)
     return ia->value.addr;
 }
 
-static gint
+static LibBalsaMsgCreateResult
 libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
-			       GtkWindow * parent)
+			       GtkWindow * parent, GError ** error)
 {
     LibBalsaMessage *message = body->message;
     gint mode = message->gpg_mode;
@@ -1980,7 +1985,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
 	    if (!libbalsa_rfc2440_sign_encrypt(mime_part, 
 					       lb_send_from(message),
 					       NULL, FALSE,
-					       parent))
+					       parent, error))
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
 	    break;
 	case LIBBALSA_PROTECT_ENCRYPT:
@@ -2008,14 +2013,14 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
 					              lb_send_from(message),
 						      encrypt_for,
 						      always_trust,
-						      parent);
+						      parent, error);
 		else
 		    result = 
 			libbalsa_rfc2440_sign_encrypt(mime_part, 
 						      NULL,
 						      encrypt_for,
 						      always_trust,
-						      parent);
+						      parent, error);
 		g_list_foreach(encrypt_for, (GFunc) g_free, NULL);
 		g_list_free(encrypt_for);
 		if (!result)
@@ -2023,8 +2028,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
 	    }
 	    break;
 	default:
-	    g_error("illegal gpg_mode %d (" __FILE__ " line %d)",
-		    mode, __LINE__);
+	    g_assert_not_reached();
 	}
 
     return LIBBALSA_MESSAGE_CREATE_OK;
@@ -2034,7 +2038,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
 /* handle rfc2633 and rfc3156 signing and/or encryption of a message */
 static LibBalsaMsgCreateResult
 do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
-		    GtkWindow * parent)
+		    GtkWindow * parent, GError ** error)
 {
     gpgme_protocol_t protocol;
     gboolean always_trust;
@@ -2062,7 +2066,7 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
 	case LIBBALSA_PROTECT_SIGN:   /* sign message */
 	    if (!libbalsa_sign_mime_object(mime_root,
 					   lb_send_from(message),
-					   protocol, parent))
+					   protocol, parent, error))
 		return LIBBALSA_MESSAGE_SIGN_ERROR;
 	    break;
 	case LIBBALSA_PROTECT_ENCRYPT:
@@ -2089,12 +2093,13 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
 			libbalsa_sign_encrypt_mime_object(mime_root,
 							  lb_send_from(message),
 							  encrypt_for, protocol,
-							  always_trust, parent);
+							  always_trust, parent,
+							  error);
 		else
 		    success = 
 			libbalsa_encrypt_mime_object(mime_root, encrypt_for,
 						     protocol, always_trust,
-						     parent);
+						     parent, error);
 		g_list_free(encrypt_for);
 		
 		if (!success)

@@ -44,10 +44,18 @@ typedef void (*LibBalsaInformationFunc) (GtkWindow *parent,
 extern LibBalsaInformationFunc libbalsa_real_information_func;
 
 void libbalsa_information(LibBalsaInformationType type,
-                          const char *fmt, ...);
+                          const char *fmt, ...)
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 2, 3)))
+#endif
+;
 void libbalsa_information_parented(GtkWindow *parent,
                                    LibBalsaInformationType type,
-                                   const char *fmt, ...);
+                                   const char *fmt, ...)
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 3, 4)))
+#endif
+;
 void libbalsa_information_varg(GtkWindow *parent,
                                LibBalsaInformationType type,
                                const char *fmt, va_list ap);

@@ -2269,7 +2269,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         dt.pos   = 0;
         if(dt.body->octets>SizeMsgThreshold)
             libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
-                                 _("Downloading %ld kB"),
+                                 _("Downloading %u kB"),
                                  dt.body->octets/1024);
 	/* Imap_mbox_handle_fetch_body fetches the MIME headers of the
          * section, followed by the text. We write this unfiltered to
@@ -2317,8 +2317,9 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                     part->content_type ? part->content_type : "text/plain",
                     encoding_names(dt.body->encoding));
         }
-	if (dt.body->octets) {
-            if(fwrite(dt.block, 1, dt.body->octets, fp) != dt.body->octets
+        /* Carefully save number of bytes actually read from the file. */
+	if (dt.pos) {
+            if(fwrite(dt.block, 1, dt.pos, fp) != dt.pos
                || fflush(fp) != 0) {
             fclose(fp);
             /* we do not want to have an incomplete part in the cache

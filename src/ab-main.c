@@ -96,7 +96,11 @@ bab_config_init(const gchar * group, const gchar * value, gpointer data)
     return FALSE;
 }
 
-static void ab_warning(const char *fmt, ...);
+static void ab_warning(const char *fmt, ...)
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 1, 2)))
+#endif
+;
 
 enum {
     LIST_COLUMN_NAME,

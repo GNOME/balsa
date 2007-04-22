@@ -138,7 +138,11 @@ gboolean libbalsa_threads_has_lock(void);
 #define libbalsa_am_i_subthread() FALSE
 #define libbalsa_threads_has_lock() TRUE
 #endif /* BALSA_USE_THREADS */
-void libbalsa_message(const char *fmt, ...);
+void libbalsa_message(const char *fmt, ...)
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 1, 2)))
+#endif
+;
 gchar * libbalsa_rot(const gchar * pass);
 
 typedef enum {

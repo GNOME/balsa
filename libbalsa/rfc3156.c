@@ -226,12 +226,12 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
  */
 gboolean
 libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
-			  gpgme_protocol_t protocol, GtkWindow * parent)
+			  gpgme_protocol_t protocol, GtkWindow * parent,
+			  GError ** error)
 {
     GMimeSession *session;
     GMimeGpgmeContext *ctx;
     GMimeMultipartSigned *mps;
-    GError *error = NULL;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
@@ -247,17 +247,8 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
-						       &error));
+						       error));
     if (ctx == NULL) {
-	if (error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				 _("creating a gpgme context failed"),
-				 error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("creating a gpgme context failed"),
-				 error->message);
 	g_object_unref(session);
 	return FALSE;
     }
@@ -283,18 +274,10 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 
     if (g_mime_multipart_signed_sign
 	(mps, *content, GMIME_CIPHER_CONTEXT(ctx), rfc822_for,
-	 GMIME_CIPHER_HASH_DEFAULT, &error) != 0) {
+	 GMIME_CIPHER_HASH_DEFAULT, error) != 0) {
 	g_object_unref(mps);
 	g_object_unref(ctx);
 	g_object_unref(session);
-	if (error) {
-	    if (error->code != GPG_ERR_CANCELED)
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				     _("signing failed"), error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("signing failed"));
 	return FALSE;
     }
 
@@ -316,14 +299,13 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 gboolean
 libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 			     gpgme_protocol_t protocol, gboolean always_trust,
-			     GtkWindow * parent)
+			     GtkWindow * parent, GError ** error)
 {
     GMimeSession *session;
     GMimeGpgmeContext *ctx;
     GMimeObject *encrypted_obj = NULL;
     GPtrArray *recipients;
     int result = -1;
-    GError *error = NULL;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
@@ -339,16 +321,8 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
-						       &error));
+						       error));
     if (ctx == NULL) {
-	if (error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				 _("creating a gpgme context failed"),
-				 error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("creating a gpgme context failed"));
 	g_object_unref(session);
 	return FALSE;
     }
@@ -376,7 +350,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 	result = 
 	    g_mime_multipart_encrypted_encrypt(mpe, *content,
 					       GMIME_CIPHER_CONTEXT(ctx),
-					       recipients, &error);
+					       recipients, error);
     }
 #ifdef HAVE_SMIME
     else {
@@ -388,21 +362,12 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 	result = 
 	    g_mime_application_pkcs7_encrypt(pkcs7, *content,
 					     GMIME_CIPHER_CONTEXT(ctx),
-					     recipients, &error);
+					     recipients, error);
     }
 #endif
 
     /* error checking */
     if (result != 0) {
-	if (error) {
-	    if (error->code != GPG_ERR_CANCELED)
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				     _("encryption failed"),
-				     error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("encryption failed"));
 	g_ptr_array_free(recipients, FALSE);
 	g_object_unref(ctx);
 	g_object_unref(session);
@@ -432,7 +397,8 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 				  GList * rfc822_for,
 				  gpgme_protocol_t protocol,
 				  gboolean always_trust,
-				  GtkWindow * parent)
+				  GtkWindow * parent,
+				  GError ** error)
 {
     GMimeObject *signed_object;
 
@@ -453,11 +419,11 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
     g_object_ref(G_OBJECT(signed_object));
 
     if (!libbalsa_sign_mime_object(&signed_object, rfc822_signer, protocol,
-				   parent))
+				   parent, error))
 	return FALSE;
 
     if (!libbalsa_encrypt_mime_object(&signed_object, rfc822_for, protocol,
-				      always_trust, parent)) {
+				      always_trust, parent, error)) {
 	g_object_unref(G_OBJECT(signed_object));
 	return FALSE;
     }
@@ -712,12 +678,11 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 gboolean
 libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
 			      GList * encrypt_for, gboolean always_trust,
-			      GtkWindow * parent)
+			      GtkWindow * parent, GError ** error)
 {
     GMimeSession *session;
     GMimeGpgmeContext *ctx;
     GPtrArray *recipients;
-    GError *error = NULL;
     gint result;
 
     /* paranoia checks */
@@ -732,16 +697,8 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session,
 						       GPGME_PROTOCOL_OpenPGP,
-						       &error));
+						       error));
     if (ctx == NULL) {
-	if (error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				 _("creating a gpgme context failed"),
-				 error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("creating a gpgme context failed"));
 	g_object_unref(session);
 	return FALSE;
     }
@@ -776,36 +733,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
     /* sign and/or encrypt */
     result =
 	g_mime_part_rfc2440_sign_encrypt(part, ctx, recipients, sign_for,
-					 &error);
-    if (result != 0) {
-	if (error) {
-	    if (error->code != GPG_ERR_CANCELED) {
-		if (sign_for && recipients)
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-					 _("signing and encryption failed"),
-					 error->message);
-		else if (sign_for)
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-					 _("signing failed"), error->message);
-		else
-		    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s :%s",
-					 _("encryption failed"),
-					 error->message);
-	    }
-	    g_error_free(error);
-	} else {
-	    if (sign_for && recipients)
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				     _("signing and encryption failed"));
-	    else if (sign_for)
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				     _("signing failed: %s"));
-	    else
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				     _("encryption failed: %s"));
-	}
-    }
-
+					 error);
     /* clean up */
     if (recipients)
 	g_ptr_array_free(recipients, FALSE);
@@ -1754,7 +1682,7 @@ gpg_updates_trustdb(void)
 		g_strdup_printf("%s/.gnupg/trustdb.gpg.lock",
 				pwent->pw_dir);
     if (!stat(lockname, &stat_buf)) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s%s",
 			     _
 			     ("GnuPG is rebuilding the trust database and is currently unavailable."),
 			     _("Try again later."));

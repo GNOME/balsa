@@ -1,3 +1,14 @@
+2007-04-22  Albrecht Dreß
+
+	* src/balsa-mime-widget-message.c: pass the reported sending code
+	to the user.
+	* src/{sendmsg-window,balsa-message}.c: ditto.
+	* libbalsa/gmime-gpgme-context.c: Work around gpgme "pecularities"
+	- fix bug 419903.
+	* libbalsa/{rfc3156,send}.{c,h}: ditto.
+	* libbalsa/mailbox_imap.c: do not get fooled by shorter binary
+	attachments.(PS)
+
 2007-04-21  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: plug memory leaks.

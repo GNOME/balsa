@@ -1,3 +1,7 @@
+2007-04-23  Pawel Salek
+
+	* libbalsa/information.c: build on 64-bit architecture.
+
 2007-04-22  Albrecht Dreß
 
 	* src/balsa-mime-widget-message.c: pass the reported sending code

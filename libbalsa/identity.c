@@ -1111,7 +1111,7 @@ md_face_path_changed(const gchar * filename, gboolean active,
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                 /* Translators: please do not translate Face. */
                              _("Face header file %s is too long "
-                               "(%d bytes)."), filename, size);
+                               "(%lu bytes)."), filename, (unsigned long)size);
         g_free(content);
         gtk_widget_hide(face_box);
         return;

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-24 03:50+0100\n"
-"PO-Revision-Date: 2007-04-25 00:25+0200\n"
+"POT-Creation-Date: 2007-04-24 23:33+0100\n"
+"PO-Revision-Date: 2007-04-25 00:38+0200\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Spanish <traductores@es.gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -829,30 +829,35 @@ msgstr "No se encontró ruta para el buzón «%s», usando «%s»"
 msgid "Cannot get IMAP handle"
 msgstr "No se encontró el manejador de IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2272
+#: ../libbalsa/mailbox_imap.c:2280
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Descargando %u KiB"
 
+#: ../libbalsa/mailbox_imap.c:2312
+#, c-format
+msgid "Error fetching message from IMAP server: %s"
+msgstr "Error al bajar un mensaje del servidor IMAP: %s"
+
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/mailbox_imap.c:2311
+#: ../libbalsa/mailbox_imap.c:2325
 msgid "Cannot create temporary file"
 msgstr "No se pudo crear el archivo temporal"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/mailbox_imap.c:2331
+#: ../libbalsa/mailbox_imap.c:2345
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "No se pudo escribir en el archivo temporal %s"
 
-#: ../libbalsa/mailbox_imap.c:2549
+#: ../libbalsa/mailbox_imap.c:2564
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Subiendo %ld KiB"
 
-#: ../libbalsa/mailbox_imap.c:2740
+#: ../libbalsa/mailbox_imap.c:2755
 msgid "Server-side threading not supported."
 msgstr "Los hilos de conversación en el lado del servidor no están soportados."
 
@@ -2915,18 +2920,18 @@ msgstr ""
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
-#: ../src/balsa-message.c:2398 ../src/balsa-message.c:2480
-#: ../src/balsa-message.c:2595
+#: ../src/balsa-message.c:2398 ../src/balsa-message.c:2482
+#: ../src/balsa-message.c:2599
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Ha fallado al analizar una parte del mensaje: %s"
 
-#: ../src/balsa-message.c:2399 ../src/balsa-message.c:2481
-#: ../src/balsa-message.c:2596
+#: ../src/balsa-message.c:2399 ../src/balsa-message.c:2483
+#: ../src/balsa-message.c:2600
 msgid "Possible disk space problem."
 msgstr "Posible problema de espacio en el disco."
 
-#: ../src/balsa-message.c:2411
+#: ../src/balsa-message.c:2413
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2935,7 +2940,7 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, "
 "pero la estructura es inválida."
 
-#: ../src/balsa-message.c:2419
+#: ../src/balsa-message.c:2421
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2944,7 +2949,7 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, "
 "pero este protocolo criptográfico no está disponible."
 
-#: ../src/balsa-message.c:2432
+#: ../src/balsa-message.c:2434
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2953,7 +2958,7 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada S/"
 "MIME, pero este protocolo criptográfico no está disponible."
 
-#: ../src/balsa-message.c:2496
+#: ../src/balsa-message.c:2500
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
@@ -2963,7 +2968,7 @@ msgstr ""
 "pero su estructura es inválida. La firma, si es que hay alguna, no se puede "
 "comprobar."
 
-#: ../src/balsa-message.c:2509
+#: ../src/balsa-message.c:2513
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2972,34 +2977,34 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte %s, pero "
 "este protocolo criptográfico no está disponible."
 
-#: ../src/balsa-message.c:2512
+#: ../src/balsa-message.c:2516
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2512 ../src/balsa-mime-widget-crypto.c:72
+#: ../src/balsa-message.c:2516 ../src/balsa-mime-widget-crypto.c:72
 #: ../src/print.c:1302 ../src/print-gtk.c:191
 msgid "S/MIME"
 msgstr "S/MIME"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../src/balsa-message.c:2531 ../src/balsa-message.c:2657
+#: ../src/balsa-message.c:2535 ../src/balsa-message.c:2662
 msgid "Detected a good signature"
 msgstr "Se detectó una firma buena"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../src/balsa-message.c:2537
+#: ../src/balsa-message.c:2541
 msgid "Detected a good signature with insufficient validity"
 msgstr "Se detectó una firma buena con validez insuficiente"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../src/balsa-message.c:2542 ../src/balsa-message.c:2661
+#: ../src/balsa-message.c:2546 ../src/balsa-message.c:2666
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Se detectó una firma buena con validez/confianza insuficiente"
 
-#: ../src/balsa-message.c:2549 ../src/balsa-message.c:2667
+#: ../src/balsa-message.c:2553 ../src/balsa-message.c:2672
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -3010,7 +3015,7 @@ msgstr ""
 "devolvió:\n"
 "%s"
 
-#: ../src/balsa-message.c:2561
+#: ../src/balsa-message.c:2565
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -3019,13 +3024,13 @@ msgstr ""
 "La comprobación de la firma del mensaje enviado por %s con el asunto «%s» "
 "falló con un error."
 
-#: ../src/balsa-message.c:2619
+#: ../src/balsa-message.c:2624
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr "No se puede descifrar porque este mensaje se está mostrando más de una vez."
 
-#: ../src/balsa-message.c:2621
+#: ../src/balsa-message.c:2626
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -3033,7 +3038,7 @@ msgstr ""
 "No se comprobar la firma y eliminar la armadura de OpenPGP porque este "
 "mensaje se está mostrando más de una vez."
 
-#: ../src/balsa-message.c:2624
+#: ../src/balsa-message.c:2629
 msgid "Please close the other instances of this message and try again."
 msgstr "Cierre las otras instancias de este mensaje e inténtelo de nuevo."
 

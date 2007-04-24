@@ -1,3 +1,11 @@
+2007-04-24  Pawel Salek
+
+	* src/balsa-message.c: stop encryption processing if mailbox
+	access fails.
+	* libbalsa/mailbox_imap.c: attempt to handle fetch errors better.
+	* libbalsa/imap/imap-commands.c: BINARY falls back to traditional
+	method encountering UNKNOWN-CTE.
+
 2007-04-23  Pawel Salek
 
 	* libbalsa/information.c: build on 64-bit architecture.

@@ -956,6 +956,27 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
   return rc;
 }
 
+struct ImapBinaryData {
+  ImapFetchBodyCb body_cb;
+  void *body_arg;
+  gboolean first_run;
+};
+
+static void
+imap_binary_handler(unsigned seqno, const char *buf,
+                    int buflen, void* arg)
+{
+  struct ImapBinaryData *ibd = (struct ImapBinaryData*)arg;
+  if(ibd->first_run) {
+    static const char binary_header[] =
+      "Content-Transfer-Encoding: binary\r\n\r\n";
+      ibd->body_cb(seqno, binary_header, sizeof(binary_header)-1,
+                   ibd->body_arg);
+      ibd->first_run = FALSE;
+  }
+  ibd->body_cb(seqno, buf, buflen, ibd->body_arg);
+}
+
 ImapResponse
 imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
                             unsigned seqno, const char *section,
@@ -963,46 +984,53 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                             ImapFetchBodyCb body_cb, void *arg)
 {
   char cmd[160];
-  ImapMessage *msg;
   ImapFetchBodyCb fcb = handle->body_cb;
   void          *farg = handle->body_arg;
   ImapResponse rc;
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+
+  /* Use BINARY extension if possible */
+  if(handle->enable_binary && options == IMFB_MIME &&
+     imap_mbox_handle_can_do(handle, IMCAP_BINARY)) {
+    struct ImapBinaryData ibd;
+    ibd.body_cb = body_cb;
+    ibd.body_arg = arg;
+    handle->body_cb = imap_binary_handler;
+    handle->body_arg = &ibd;
+    snprintf(cmd, sizeof(cmd), "FETCH %u BINARY[%s]",
+             seqno, section);
+    rc = imap_cmd_exec(handle, cmd);
+    if(rc != IMR_NO) { /* unknown-cte */
+      handle->body_cb  = fcb;
+      handle->body_arg = farg;
+      return rc;
+    }
+  }
   handle->body_cb  = body_cb;
   handle->body_arg = arg;
-  msg = imap_mbox_handle_get_msg(handle, seqno);
+  /* Pure IMAP without extensions */
   if(options == IMFB_NONE)
     snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]",
              seqno, section);
   else {
-    /* This is the place where we can use the binary fetch... */
-    if(handle->enable_binary && options == IMFB_MIME &&
-       imap_mbox_handle_can_do(handle, IMCAP_BINARY)) {
-      static const char binary_header[] =  "Content-Transfer-Encoding: binary\r\n\r\n";
-      snprintf(cmd, sizeof(cmd), "FETCH %u BINARY[%s]",
-               seqno, section);
-      body_cb(seqno, binary_header, sizeof(binary_header)-1, arg);
-    } else {
-      char prefix[160];
-      if(options == IMFB_HEADER) {
-        /* We have to strip last section part and replace it with HEADER */
-        unsigned sz;
-        char *last_dot = strrchr(section, '.');
-        strncpy(prefix, section, sizeof(prefix));
-
-        if(last_dot) {
-          sz = last_dot-section+1;
-          if(sz>sizeof(prefix)-1) sz = sizeof(prefix)-1;
-        } else sz = 0;
-        strncpy(prefix + sz, "HEADER", sizeof(prefix)-sz-1);
-        prefix[sizeof(prefix)-1] = '\0';
-      } else
-        snprintf(prefix, sizeof(prefix), "%s.MIME", section);
-
-      snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s] BODY[%s])",
-               seqno, prefix, section);
-    }
+    char prefix[160];
+    if(options == IMFB_HEADER) {
+      /* We have to strip last section part and replace it with HEADER */
+      unsigned sz;
+      char *last_dot = strrchr(section, '.');
+      strncpy(prefix, section, sizeof(prefix));
+      
+      if(last_dot) {
+        sz = last_dot-section+1;
+        if(sz>sizeof(prefix)-1) sz = sizeof(prefix)-1;
+      } else sz = 0;
+      strncpy(prefix + sz, "HEADER", sizeof(prefix)-sz-1);
+      prefix[sizeof(prefix)-1] = '\0';
+    } else
+      snprintf(prefix, sizeof(prefix), "%s.MIME", section);
+    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s] BODY[%s])",
+             seqno, prefix, section);
   }
   rc = imap_cmd_exec(handle, cmd);
   handle->body_cb  = fcb;

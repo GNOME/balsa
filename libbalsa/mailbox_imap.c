@@ -2265,6 +2265,14 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         im = mi_get_imsg(mimap, msg->msgno);
         
         dt.body  = imap_message_get_body_from_section(im, section);
+        if(!dt.body) {
+            /* This may happen if we reconnect the data dropping the
+               body structures but still try refetching the
+               message. This can be simulated by randomly
+               disconnecting from the IMAP server. */
+            fprintf(stderr, "Cannot find data for section %s\n", section);
+            return FALSE;
+        }
         dt.block = g_malloc(dt.body->octets+1);
         dt.pos   = 0;
         if(dt.body->octets>SizeMsgThreshold)
@@ -2286,6 +2294,8 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             else
                 ifbo = IMFB_MIME;
         }
+        rc = IMR_OK;
+        if (dt.body->octets > 0)
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
                                        section, ifbo, append_str, &dt));
@@ -2297,6 +2307,10 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             g_free(section); 
             g_strfreev(pair);
             g_free(part_name);
+            g_set_error(err,
+                        LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        _("Error fetching message from IMAP server: %s"), 
+                        imap_mbox_handle_get_last_msg(mimap->handle));
             return FALSE;
         }
         libbalsa_assure_balsa_dir();
@@ -2332,6 +2346,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             g_free(section); 
             g_strfreev(pair);
             g_free(part_name);
+            g_free(dt.block);
             return FALSE; /* something better ? */
             }
         }

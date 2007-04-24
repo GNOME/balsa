@@ -2398,6 +2398,8 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
                      _("Parsing a message part failed: %s"),
                      err ? err->message : _("Possible disk space problem."));
                 g_clear_error(&err);
+                /* There is nothing more we can do... */
+                return body;
             }
 	}
 
@@ -2480,6 +2482,8 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
                  _("Parsing a message part failed: %s"),
                  err ? err->message : _("Possible disk space problem."));
             g_clear_error(&err);
+            /* There is nothing more we can do... */
+            return;
         }
     }
 	
@@ -2595,6 +2599,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
                  _("Parsing a message part failed: %s"),
                  err ? err->message : _("Possible disk space problem."));
             g_clear_error(&err);
+            return;
         }
     }
 

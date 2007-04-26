@@ -956,7 +956,10 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
   return rc;
 }
 
+/** A structure needed to add a faked header to data fetched via
+    binary extension. */
 struct ImapBinaryData {
+  ImapBody *body;
   ImapFetchBodyCb body_cb;
   void *body_arg;
   gboolean first_run;
@@ -970,9 +973,14 @@ imap_binary_handler(unsigned seqno, const char *buf,
   if(ibd->first_run) {
     static const char binary_header[] =
       "Content-Transfer-Encoding: binary\r\n\r\n";
-      ibd->body_cb(seqno, binary_header, sizeof(binary_header)-1,
-                   ibd->body_arg);
-      ibd->first_run = FALSE;
+    char *content_type = imap_body_get_content_type(ibd->body);
+    char *str = g_strdup_printf("Content-Type: %s\r\n", content_type);
+    g_free(content_type);
+    ibd->body_cb(seqno, str, strlen(str), ibd->body_arg);
+    g_free(str);
+    ibd->body_cb(seqno, binary_header, sizeof(binary_header)-1,
+                 ibd->body_arg);
+    ibd->first_run = FALSE;
   }
   ibd->body_cb(seqno, buf, buflen, ibd->body_arg);
 }
@@ -994,6 +1002,8 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
   if(handle->enable_binary && options == IMFB_MIME &&
      imap_mbox_handle_can_do(handle, IMCAP_BINARY)) {
     struct ImapBinaryData ibd;
+    ImapMessage * imsg = imap_mbox_handle_get_msg(handle, seqno);
+    ibd.body = imap_message_get_body_from_section(imsg, section);
     ibd.body_cb = body_cb;
     ibd.body_arg = arg;
     handle->body_cb = imap_binary_handler;

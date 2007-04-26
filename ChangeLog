@@ -1,3 +1,8 @@
+2007-04-26  Pawel Salek
+
+	* src/balsa-message.c: do not crash on empty address groups.
+	* libbalsa/imap/imap-commands.c: make GPGME and BINARY work together.
+
 2007-04-25  Christophe Merlet  <redfox@redfoxcenter.org>
 
 	* configure.in: added "oc" (Occitan) to ALL_LINGUAS.

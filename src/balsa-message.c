@@ -1978,7 +1978,7 @@ bm_get_mailbox(const InternetAddressList * list)
     if (!ia || ia->type == INTERNET_ADDRESS_NONE)
 	return NULL;
 
-    while (ia->type == INTERNET_ADDRESS_GROUP)
+    while (ia->type == INTERNET_ADDRESS_GROUP && ia->value.members)
 	ia = ia->value.members->address;
     if (!ia || ia->type == INTERNET_ADDRESS_NONE)
 	return NULL;

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-22 19:51+0100\n"
-"PO-Revision-Date: 2007-04-22 19:51-0000\n"
+"POT-Creation-Date: 2007-04-27 06:52+0100\n"
+"PO-Revision-Date: 2007-04-27 06:52-0000\n"
 "Last-Translator: David Lodge <dave@cirt.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -187,8 +187,8 @@ msgstr "Error when moving messages: %s"
 msgid "Failed to decrypt MIME part: parse error"
 msgstr "Failed to decrypt MIME part: parse error"
 
-#: ../libbalsa/gmime-gpgme-context.c:279
-#: ../libbalsa/rfc3156.c:1598
+#: ../libbalsa/gmime-gpgme-context.c:282
+#: ../libbalsa/rfc3156.c:1526
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -199,8 +199,8 @@ msgstr ""
 "\n"
 "Key: %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:284
-#: ../libbalsa/rfc3156.c:1603
+#: ../libbalsa/gmime-gpgme-context.c:287
+#: ../libbalsa/rfc3156.c:1531
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -211,91 +211,89 @@ msgstr ""
 "\n"
 "Key: %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:404
+#: ../libbalsa/gmime-gpgme-context.c:405
+#: ../libbalsa/gmime-gpgme-context.c:478
 #: ../libbalsa/gmime-gpgme-context.c:486
+#: ../libbalsa/gmime-gpgme-context.c:595
+#: ../libbalsa/gmime-gpgme-context.c:674
+msgid "could not get data from stream"
+msgstr "could not get data from stream"
+
+#: ../libbalsa/gmime-gpgme-context.c:410
+#: ../libbalsa/gmime-gpgme-context.c:601
+#: ../libbalsa/gmime-gpgme-context.c:679
+msgid "could not create new data object"
+msgstr "could not create new data object"
+
+#: ../libbalsa/gmime-gpgme-context.c:417
+msgid "signing failed"
+msgstr "signing failed"
+
 #: ../libbalsa/gmime-gpgme-context.c:497
-#: ../libbalsa/gmime-gpgme-context.c:612
-#: ../libbalsa/gmime-gpgme-context.c:703
-#, c-format
-msgid "%s: could not get data from stream: %s"
-msgstr "%s: could not get data from stream: %s"
+#: ../libbalsa/rfc3156.c:514
+#: ../libbalsa/rfc3156.c:519
+#: ../libbalsa/rfc3156.c:796
+#: ../libbalsa/rfc3156.c:802
+msgid "signature verification failed"
+msgstr "signature verification failed"
 
-#: ../libbalsa/gmime-gpgme-context.c:412
-#: ../libbalsa/gmime-gpgme-context.c:621
-#: ../libbalsa/gmime-gpgme-context.c:711
-#, c-format
-msgid "%s: could not create new data object: %s"
-msgstr "%s: could not create new data object: %s"
-
-#: ../libbalsa/gmime-gpgme-context.c:422
-#, c-format
-msgid "%s: signing failed: %s"
-msgstr "%s: signing failed: %s"
-
-#: ../libbalsa/gmime-gpgme-context.c:511
-#, c-format
-msgid "%s: signature verification failed: %s"
-msgstr "%s: signature verification failed: %s"
-
-#: ../libbalsa/gmime-gpgme-context.c:576
+#: ../libbalsa/gmime-gpgme-context.c:561
 msgid "combined signing and encryption is only defined for RFC 2440"
 msgstr "combined signing and encryption is only defined for RFC 2440"
 
-#: ../libbalsa/gmime-gpgme-context.c:647
-#, c-format
-msgid "%s: signing and encryption failed: %s"
-msgstr "%s: signing and encryption failed: %s"
+#: ../libbalsa/gmime-gpgme-context.c:624
+msgid "signing and encryption failed"
+msgstr "signing and encryption failed"
 
-#: ../libbalsa/gmime-gpgme-context.c:651
-#, c-format
-msgid "%s: encryption failed: %s"
-msgstr "%s: encryption failed: %s"
+#: ../libbalsa/gmime-gpgme-context.c:626
+msgid "encryption failed"
+msgstr "encryption failed"
 
-#: ../libbalsa/gmime-gpgme-context.c:723
-#, c-format
-msgid "%s: decryption failed: %s"
-msgstr "%s: decryption failed: %s"
+#: ../libbalsa/gmime-gpgme-context.c:688
+#: ../libbalsa/rfc3156.c:641
+#: ../libbalsa/rfc3156.c:646
+msgid "decryption failed"
+msgstr "decryption failed"
 
-#: ../libbalsa/gmime-gpgme-context.c:758
-#, c-format
-msgid "%s: could not create context: %s"
-msgstr "%s: could not create context: %s"
+#: ../libbalsa/gmime-gpgme-context.c:720
+msgid "could not create context"
+msgstr "could not create context"
 
-#: ../libbalsa/gmime-gpgme-context.c:814
+#: ../libbalsa/gmime-gpgme-context.c:775
 msgid "the crypto engine for protocol OpenPGP is not available"
 msgstr "the crypto engine for protocol OpenPGP is not available"
 
-#: ../libbalsa/gmime-gpgme-context.c:824
+#: ../libbalsa/gmime-gpgme-context.c:785
 msgid "the crypto engine for protocol CMS is not available"
 msgstr "the crypto engine for protocol CMS is not available"
 
-#: ../libbalsa/gmime-gpgme-context.c:831
+#: ../libbalsa/gmime-gpgme-context.c:792
 #, c-format
 msgid "invalid crypto engine %d"
 msgstr "invalid crypto engine %d"
 
-#: ../libbalsa/gmime-gpgme-context.c:863
-#: ../libbalsa/gmime-gpgme-context.c:889
+#: ../libbalsa/gmime-gpgme-context.c:823
+#: ../libbalsa/gmime-gpgme-context.c:850
 #, c-format
-msgid "%s: could not list keys for %s: %s"
-msgstr "%s: could not list keys for %s: %s"
+msgid "could not list keys for \"%s\""
+msgstr "could not list keys for \"%s\""
 
-#: ../libbalsa/gmime-gpgme-context.c:902
+#: ../libbalsa/gmime-gpgme-context.c:865
 #, c-format
 msgid "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
 msgstr "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
 
-#: ../libbalsa/gmime-gpgme-context.c:906
+#: ../libbalsa/gmime-gpgme-context.c:869
 #, c-format
 msgid "%s: could not find a key for %s"
 msgstr "%s: could not find a key for %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:919
+#: ../libbalsa/gmime-gpgme-context.c:882
 #, c-format
 msgid "%s: multiple keys for %s"
 msgstr "%s: multiple keys for %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:964
+#: ../libbalsa/gmime-gpgme-context.c:927
 #, c-format
 msgid "%s: insufficient validity for uid %s"
 msgstr "%s: insufficient validity for uid %s"
@@ -442,8 +440,8 @@ msgstr "Error reading file %s: %s"
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1113
 #, c-format
-msgid "Face header file %s is too long (%d bytes)."
-msgstr "Face header file %s is too long (%d bytes)."
+msgid "Face header file %s is too long (%lu bytes)."
+msgstr "Face header file %s is too long (%lu bytes)."
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1123
@@ -691,7 +689,6 @@ msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Opening %s Refcount: %d\n"
 
 #: ../libbalsa/mailbox_imap.c:1103
-#: ../libbalsa/mailbox_imap.c:2272
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Downloading %ld kB"
@@ -715,21 +712,31 @@ msgstr "No path found for mailbox \"%s\", using \"%s\""
 msgid "Cannot get IMAP handle"
 msgstr "Cannot get IMAP handle"
 
-#: ../libbalsa/mailbox_imap.c:2311
+#: ../libbalsa/mailbox_imap.c:2280
+#, c-format
+msgid "Downloading %u kB"
+msgstr "Downloading %u kB"
+
+#: ../libbalsa/mailbox_imap.c:2312
+#, c-format
+msgid "Error fetching message from IMAP server: %s"
+msgstr "Error fetching message from IMAP server: %s"
+
+#: ../libbalsa/mailbox_imap.c:2325
 msgid "Cannot create temporary file"
 msgstr "Cannot create temporary file"
 
-#: ../libbalsa/mailbox_imap.c:2330
+#: ../libbalsa/mailbox_imap.c:2345
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Cannot write to temporary file %s"
 
-#: ../libbalsa/mailbox_imap.c:2548
+#: ../libbalsa/mailbox_imap.c:2564
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Uploading %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:2739
+#: ../libbalsa/mailbox_imap.c:2755
 msgid "Server-side threading not supported."
 msgstr "Server-side threading not supported."
 
@@ -1107,161 +1114,116 @@ msgstr ""
 "\n"
 "Disable support for protocol %s."
 
-#: ../libbalsa/rfc3156.c:254
-#: ../libbalsa/rfc3156.c:259
-#: ../libbalsa/rfc3156.c:346
-#: ../libbalsa/rfc3156.c:351
-#: ../libbalsa/rfc3156.c:515
-#: ../libbalsa/rfc3156.c:520
-#: ../libbalsa/rfc3156.c:625
-#: ../libbalsa/rfc3156.c:630
-#: ../libbalsa/rfc3156.c:739
-#: ../libbalsa/rfc3156.c:744
-#: ../libbalsa/rfc3156.c:852
-#: ../libbalsa/rfc3156.c:857
-#: ../libbalsa/rfc3156.c:932
-#: ../libbalsa/rfc3156.c:937
-msgid "creating a gpgme context failed"
-msgstr "creating a gpgme context failed"
-
-#: ../libbalsa/rfc3156.c:272
-#: ../libbalsa/rfc3156.c:757
+#: ../libbalsa/rfc3156.c:263
+#: ../libbalsa/rfc3156.c:714
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr "Enter passphrase to unlock the secret key for signing"
 
-#: ../libbalsa/rfc3156.c:293
-#: ../libbalsa/rfc3156.c:297
-#: ../libbalsa/rfc3156.c:789
-msgid "signing failed"
-msgstr "signing failed"
+#: ../libbalsa/rfc3156.c:481
+#: ../libbalsa/rfc3156.c:486
+#: ../libbalsa/rfc3156.c:591
+#: ../libbalsa/rfc3156.c:596
+#: ../libbalsa/rfc3156.c:780
+#: ../libbalsa/rfc3156.c:785
+#: ../libbalsa/rfc3156.c:860
+#: ../libbalsa/rfc3156.c:865
+msgid "creating a gpgme context failed"
+msgstr "creating a gpgme context failed"
 
-#: ../libbalsa/rfc3156.c:400
-#: ../libbalsa/rfc3156.c:405
-#: ../libbalsa/rfc3156.c:792
-msgid "encryption failed"
-msgstr "encryption failed"
-
-#: ../libbalsa/rfc3156.c:548
-#: ../libbalsa/rfc3156.c:553
-#: ../libbalsa/rfc3156.c:868
-#: ../libbalsa/rfc3156.c:874
-msgid "signature verification failed"
-msgstr "signature verification failed"
-
-#: ../libbalsa/rfc3156.c:642
-#: ../libbalsa/rfc3156.c:948
+#: ../libbalsa/rfc3156.c:608
+#: ../libbalsa/rfc3156.c:876
 msgid "Enter passphrase to decrypt message"
 msgstr "Enter passphrase to decrypt message"
 
-#: ../libbalsa/rfc3156.c:675
-#: ../libbalsa/rfc3156.c:680
-msgid "decryption failed"
-msgstr "decryption failed"
-
-#: ../libbalsa/rfc3156.c:785
-#: ../libbalsa/rfc3156.c:799
-msgid "signing and encryption failed"
-msgstr "signing and encryption failed"
-
-#: ../libbalsa/rfc3156.c:802
-#, c-format
-msgid "signing failed: %s"
-msgstr "signing failed: %s"
-
-#: ../libbalsa/rfc3156.c:805
-#, c-format
-msgid "encryption failed: %s"
-msgstr "encryption failed: %s"
-
-#: ../libbalsa/rfc3156.c:957
-#: ../libbalsa/rfc3156.c:964
+#: ../libbalsa/rfc3156.c:885
+#: ../libbalsa/rfc3156.c:892
 msgid "decryption and signature verification failed"
 msgstr "decryption and signature verification failed"
 
-#: ../libbalsa/rfc3156.c:995
+#: ../libbalsa/rfc3156.c:923
 msgid "The signature is valid."
 msgstr "The signature is valid."
 
-#: ../libbalsa/rfc3156.c:997
+#: ../libbalsa/rfc3156.c:925
 msgid "The signature is valid but expired."
 msgstr "The signature is valid but expired."
 
-#: ../libbalsa/rfc3156.c:1000
+#: ../libbalsa/rfc3156.c:928
 msgid "The signature is valid but the key used to verify the signature has expired."
 msgstr "The signature is valid but the key used to verify the signature has expired."
 
-#: ../libbalsa/rfc3156.c:1003
+#: ../libbalsa/rfc3156.c:931
 msgid "The signature is valid but the key used to verify the signature has been revoked."
 msgstr "The signature is valid but the key used to verify the signature has been revoked."
 
 #
-#: ../libbalsa/rfc3156.c:1006
+#: ../libbalsa/rfc3156.c:934
 msgid "The signature is invalid."
 msgstr "The signature is invalid."
 
-#: ../libbalsa/rfc3156.c:1009
+#: ../libbalsa/rfc3156.c:937
 msgid "The signature could not be verified due to a missing key."
 msgstr "The signature could not be verified due to a missing key."
 
-#: ../libbalsa/rfc3156.c:1011
+#: ../libbalsa/rfc3156.c:939
 msgid "This part is not a real PGP signature."
 msgstr "This part is not a real PGP signature."
 
-#: ../libbalsa/rfc3156.c:1014
+#: ../libbalsa/rfc3156.c:942
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "The signature could not be verified due to an invalid crypto engine."
 
-#: ../libbalsa/rfc3156.c:1017
-#: ../libbalsa/rfc3156.c:1759
+#: ../libbalsa/rfc3156.c:945
+#: ../libbalsa/rfc3156.c:1687
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "GnuPG is rebuilding the trust database and is currently unavailable."
 
-#: ../libbalsa/rfc3156.c:1020
+#: ../libbalsa/rfc3156.c:948
 msgid "An error prevented the signature verification."
 msgstr "An error prevented the signature verification."
 
-#: ../libbalsa/rfc3156.c:1028
+#: ../libbalsa/rfc3156.c:956
 msgid "The user ID is of unknown validity."
 msgstr "The user ID is of unknown validity."
 
-#: ../libbalsa/rfc3156.c:1030
+#: ../libbalsa/rfc3156.c:958
 msgid "The validity of the user ID is undefined."
 msgstr "The validity of the user ID is undefined."
 
-#: ../libbalsa/rfc3156.c:1032
+#: ../libbalsa/rfc3156.c:960
 msgid "The user ID is never valid."
 msgstr "The user ID is never valid."
 
-#: ../libbalsa/rfc3156.c:1034
+#: ../libbalsa/rfc3156.c:962
 msgid "The user ID is marginally valid."
 msgstr "The user ID is marginally valid."
 
-#: ../libbalsa/rfc3156.c:1036
+#: ../libbalsa/rfc3156.c:964
 msgid "The user ID is fully valid."
 msgstr "The user ID is fully valid."
 
-#: ../libbalsa/rfc3156.c:1038
+#: ../libbalsa/rfc3156.c:966
 msgid "The user ID is ultimately valid."
 msgstr "The user ID is ultimately valid."
 
-#: ../libbalsa/rfc3156.c:1040
-#: ../libbalsa/rfc3156.c:1287
+#: ../libbalsa/rfc3156.c:968
+#: ../libbalsa/rfc3156.c:1215
 msgid "bad validity"
 msgstr "bad validity"
 
-#: ../libbalsa/rfc3156.c:1048
+#: ../libbalsa/rfc3156.c:976
 msgid "PGP signature: "
 msgstr "PGP signature: "
 
-#: ../libbalsa/rfc3156.c:1050
+#: ../libbalsa/rfc3156.c:978
 msgid "S/MIME signature: "
 msgstr "S/MIME signature: "
 
-#: ../libbalsa/rfc3156.c:1052
+#: ../libbalsa/rfc3156.c:980
 msgid "(unknown protocol) "
 msgstr "(unknown protocol) "
 
-#: ../libbalsa/rfc3156.c:1071
+#: ../libbalsa/rfc3156.c:999
 #, c-format
 msgid ""
 "\n"
@@ -1270,7 +1232,7 @@ msgstr ""
 "\n"
 "User ID: %s"
 
-#: ../libbalsa/rfc3156.c:1074
+#: ../libbalsa/rfc3156.c:1002
 #, c-format
 msgid ""
 "\n"
@@ -1279,7 +1241,7 @@ msgstr ""
 "\n"
 "Signed by: %s"
 
-#: ../libbalsa/rfc3156.c:1078
+#: ../libbalsa/rfc3156.c:1006
 #, c-format
 msgid ""
 "\n"
@@ -1288,7 +1250,7 @@ msgstr ""
 "\n"
 "Mail address: %s"
 
-#: ../libbalsa/rfc3156.c:1083
+#: ../libbalsa/rfc3156.c:1011
 #, c-format
 msgid ""
 "\n"
@@ -1297,7 +1259,7 @@ msgstr ""
 "\n"
 "Signed on: %s"
 
-#: ../libbalsa/rfc3156.c:1085
+#: ../libbalsa/rfc3156.c:1013
 #, c-format
 msgid ""
 "\n"
@@ -1306,7 +1268,7 @@ msgstr ""
 "\n"
 "User ID validity: %s"
 
-#: ../libbalsa/rfc3156.c:1089
+#: ../libbalsa/rfc3156.c:1017
 #, c-format
 msgid ""
 "\n"
@@ -1315,7 +1277,7 @@ msgstr ""
 "\n"
 "Key owner trust: %s"
 
-#: ../libbalsa/rfc3156.c:1093
+#: ../libbalsa/rfc3156.c:1021
 #, c-format
 msgid ""
 "\n"
@@ -1324,7 +1286,7 @@ msgstr ""
 "\n"
 "Key fingerprint: %s"
 
-#: ../libbalsa/rfc3156.c:1098
+#: ../libbalsa/rfc3156.c:1026
 #, c-format
 msgid ""
 "\n"
@@ -1333,7 +1295,7 @@ msgstr ""
 "\n"
 "Subkey created on: %s"
 
-#: ../libbalsa/rfc3156.c:1103
+#: ../libbalsa/rfc3156.c:1031
 #, c-format
 msgid ""
 "\n"
@@ -1342,25 +1304,25 @@ msgstr ""
 "\n"
 "Subkey expires on: %s"
 
-#: ../libbalsa/rfc3156.c:1112
+#: ../libbalsa/rfc3156.c:1040
 msgid " revoked"
 msgstr " revoked"
 
-#: ../libbalsa/rfc3156.c:1117
+#: ../libbalsa/rfc3156.c:1045
 msgid " expired"
 msgstr " expired"
 
-#: ../libbalsa/rfc3156.c:1122
+#: ../libbalsa/rfc3156.c:1050
 msgid " disabled"
 msgstr " disabled"
 
-#: ../libbalsa/rfc3156.c:1127
+#: ../libbalsa/rfc3156.c:1055
 msgid " invalid"
 msgstr " invalid"
 
 #. ngettext: string begins with a single space, so no space after
 #. * the colon is correct punctuation (in English).
-#: ../libbalsa/rfc3156.c:1131
+#: ../libbalsa/rfc3156.c:1059
 #, c-format
 msgid ""
 "\n"
@@ -1375,7 +1337,7 @@ msgstr[1] ""
 "\n"
 "Subkey attributes:%s"
 
-#: ../libbalsa/rfc3156.c:1140
+#: ../libbalsa/rfc3156.c:1068
 #, c-format
 msgid ""
 "\n"
@@ -1384,7 +1346,7 @@ msgstr ""
 "\n"
 "Issuer name: %s"
 
-#: ../libbalsa/rfc3156.c:1144
+#: ../libbalsa/rfc3156.c:1072
 #, c-format
 msgid ""
 "\n"
@@ -1393,7 +1355,7 @@ msgstr ""
 "\n"
 "Issuer serial number: %s"
 
-#: ../libbalsa/rfc3156.c:1147
+#: ../libbalsa/rfc3156.c:1075
 #, c-format
 msgid ""
 "\n"
@@ -1402,12 +1364,12 @@ msgstr ""
 "\n"
 "Chain ID: %s"
 
-#: ../libbalsa/rfc3156.c:1194
+#: ../libbalsa/rfc3156.c:1122
 #, c-format
 msgid "Could not launch %s to get the public key %s."
 msgstr "Could not launch %s to get the public key %s."
 
-#: ../libbalsa/rfc3156.c:1244
+#: ../libbalsa/rfc3156.c:1172
 #, c-format
 msgid ""
 "Running gpg failed with return value %d:\n"
@@ -1416,7 +1378,7 @@ msgstr ""
 "Running gpg failed with return value %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1251
+#: ../libbalsa/rfc3156.c:1179
 #, c-format
 msgid ""
 "Running gpg successful:\n"
@@ -1425,96 +1387,96 @@ msgstr ""
 "Running gpg successful:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1275
+#: ../libbalsa/rfc3156.c:1203
 msgid "unknown"
 msgstr "unknown"
 
-#: ../libbalsa/rfc3156.c:1277
+#: ../libbalsa/rfc3156.c:1205
 msgid "undefined"
 msgstr "undefined"
 
-#: ../libbalsa/rfc3156.c:1279
+#: ../libbalsa/rfc3156.c:1207
 #: ../src/address-book-config.c:193
 msgid "never"
 msgstr "never"
 
-#: ../libbalsa/rfc3156.c:1281
+#: ../libbalsa/rfc3156.c:1209
 msgid "marginal"
 msgstr "marginal"
 
-#: ../libbalsa/rfc3156.c:1283
+#: ../libbalsa/rfc3156.c:1211
 msgid "full"
 msgstr "full"
 
-#: ../libbalsa/rfc3156.c:1285
+#: ../libbalsa/rfc3156.c:1213
 msgid "ultimate"
 msgstr "ultimate"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1276
 msgid "User ID"
 msgstr "User ID"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1276
 msgid "Key ID"
 msgstr "Key ID"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1276
 msgid "Length"
 msgstr "Length"
 
-#: ../libbalsa/rfc3156.c:1348
+#: ../libbalsa/rfc3156.c:1276
 msgid "Validity"
 msgstr "Validity"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/rfc3156.c:1392
+#: ../libbalsa/rfc3156.c:1320
 msgid "Select key"
 msgstr "Select key"
 
-#: ../libbalsa/rfc3156.c:1403
+#: ../libbalsa/rfc3156.c:1331
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Select the private key for the signer %s"
 
-#: ../libbalsa/rfc3156.c:1407
+#: ../libbalsa/rfc3156.c:1335
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Select the public key for the recipient %s"
 
-#: ../libbalsa/rfc3156.c:1538
+#: ../libbalsa/rfc3156.c:1466
 #, c-format
 msgid "Insufficient trust for recipient %s"
 msgstr "Insufficient trust for recipient %s"
 
-#: ../libbalsa/rfc3156.c:1540
+#: ../libbalsa/rfc3156.c:1468
 #, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "The validity of the key with user ID \"%s\" is \"%s\"."
 
-#: ../libbalsa/rfc3156.c:1551
+#: ../libbalsa/rfc3156.c:1479
 msgid "Use this key anyway?"
 msgstr "Use this key anyway?"
 
-#: ../libbalsa/rfc3156.c:1760
+#: ../libbalsa/rfc3156.c:1688
 msgid "Try again later."
 msgstr "Try again later."
 
-#: ../libbalsa/send.c:243
-#: ../libbalsa/send.c:250
+#: ../libbalsa/send.c:244
+#: ../libbalsa/send.c:251
 msgid "Sending Mail..."
 msgstr "Sending Mail..."
 
-#: ../libbalsa/send.c:246
+#: ../libbalsa/send.c:247
 #: ../src/main-window.c:2858
 msgid "_Hide"
 msgstr "_Hide"
 
-#: ../libbalsa/send.c:453
+#: ../libbalsa/send.c:454
 #, c-format
 msgid "Copying message to outbox failed: %s"
 msgstr "Copying message to outbox failed: %s"
 
-#: ../libbalsa/send.c:882
+#: ../libbalsa/send.c:885
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1525,13 +1487,13 @@ msgstr ""
 "%d: %s\n"
 "Message left in your outbox.\n"
 
-#: ../libbalsa/send.c:926
+#: ../libbalsa/send.c:929
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr "Saving sent message to %s failed: %s"
 
-#: ../libbalsa/send.c:945
-#: ../libbalsa/send.c:957
+#: ../libbalsa/send.c:948
+#: ../libbalsa/send.c:960
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1542,7 +1504,7 @@ msgstr ""
 "%d: %s\n"
 "Message left in your outbox.\n"
 
-#: ../libbalsa/send.c:964
+#: ../libbalsa/send.c:967
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1550,39 +1512,39 @@ msgstr ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 
-#: ../libbalsa/send.c:994
+#: ../libbalsa/send.c:997
 msgid "Connected to MTA"
 msgstr "Connected to MTA"
 
 #. status code, mailbox
-#: ../libbalsa/send.c:1003
+#: ../libbalsa/send.c:1006
 #, c-format
 msgid "From: %d <%s>"
 msgstr "From: %d <%s>"
 
 #. mailbox, status code, status text
-#: ../libbalsa/send.c:1007
+#: ../libbalsa/send.c:1010
 #, c-format
 msgid "From %s: %d %s"
 msgstr "From %s: %d %s"
 
 #. status code, mailbox
-#: ../libbalsa/send.c:1018
+#: ../libbalsa/send.c:1021
 #, c-format
 msgid "To: %d <%s>"
 msgstr "To: %d <%s>"
 
 #. mailbox, status code, status text
-#: ../libbalsa/send.c:1022
+#: ../libbalsa/send.c:1025
 #, c-format
 msgid "To %s: %d %s"
 msgstr "To %s: %d %s"
 
-#: ../libbalsa/send.c:1060
+#: ../libbalsa/send.c:1063
 msgid "Disconnected"
 msgstr "Disconnected"
 
-#: ../libbalsa/send.c:1333
+#: ../libbalsa/send.c:1336
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -1590,7 +1552,7 @@ msgstr ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
 
-#: ../libbalsa/send.c:1338
+#: ../libbalsa/send.c:1341
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -1598,11 +1560,11 @@ msgstr ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
 
-#: ../libbalsa/send.c:1347
+#: ../libbalsa/send.c:1350
 msgid "Message left in Outbox (try again later)"
 msgstr "Message left in Outbox (try again later)"
 
-#: ../libbalsa/send.c:1351
+#: ../libbalsa/send.c:1354
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1611,18 +1573,18 @@ msgstr ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
 
-#: ../libbalsa/send.c:1656
+#: ../libbalsa/send.c:1659
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 
-#: ../libbalsa/send.c:1860
+#: ../libbalsa/send.c:1865
 #, c-format
 msgid "Postponing message failed: %s"
 msgstr "Postponing message failed: %s"
 
-#: ../libbalsa/send.c:2003
-#: ../libbalsa/send.c:2085
+#: ../libbalsa/send.c:2008
+#: ../libbalsa/send.c:2089
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "This message will not be encrypted for the BCC: recipient(s)."
 
@@ -1976,42 +1938,42 @@ msgstr "New mail notification"
 msgid "Program startup"
 msgstr "Program startup"
 
-#: ../src/ab-main.c:199
+#: ../src/ab-main.c:203
 #: ../src/ab-window.c:680
 msgid " address book: "
 msgstr " address book: "
 
-#: ../src/ab-main.c:470
+#: ../src/ab-main.c:474
 #: ../src/address-book-config.c:895
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard Address Book (GnomeCard)"
 
-#: ../src/ab-main.c:472
+#: ../src/ab-main.c:476
 #: ../src/address-book-config.c:901
 msgid "External query (a program)"
 msgstr "External query (a program)"
 
-#: ../src/ab-main.c:474
+#: ../src/ab-main.c:478
 #: ../src/address-book-config.c:906
 msgid "LDIF Address Book"
 msgstr "LDIF Address Book"
 
-#: ../src/ab-main.c:477
+#: ../src/ab-main.c:481
 #: ../src/address-book-config.c:912
 msgid "LDAP Address Book"
 msgstr "LDAP Address Book"
 
-#: ../src/ab-main.c:481
+#: ../src/ab-main.c:485
 #: ../src/address-book-config.c:509
 #: ../src/address-book-config.c:919
 msgid "GPE Address Book"
 msgstr "GPE Address Book"
 
-#: ../src/ab-main.c:705
+#: ../src/ab-main.c:709
 msgid "_Name"
 msgstr "_Name"
 
-#: ../src/ab-main.c:855
+#: ../src/ab-main.c:859
 msgid "F_ilter:"
 msgstr "F_ilter:"
 
@@ -2505,7 +2467,13 @@ msgstr "%s message part"
 msgid "Could not save %s: %s"
 msgstr "Could not save %s: %s"
 
-#: ../src/balsa-message.c:2161
+#: ../src/balsa-message.c:2075
+#: ../src/balsa-message.c:2206
+#, c-format
+msgid "Sending the disposition notification failed: %s"
+msgstr "Sending the disposition notification failed: %s"
+
+#: ../src/balsa-message.c:2169
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2516,11 +2484,11 @@ msgstr ""
 "a Message Disposition Notification(MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 
-#: ../src/balsa-message.c:2168
+#: ../src/balsa-message.c:2176
 msgid "Reply to MDN?"
 msgstr "Reply to MDN?"
 
-#: ../src/balsa-message.c:2363
+#: ../src/balsa-message.c:2377
 msgid ""
 "The decryption cannot be performed because this message is displayed more than once.\n"
 "Please close the other instances of this message and try again."
@@ -2528,71 +2496,71 @@ msgstr ""
 "The decryption cannot be performed because this message is displayed more than once.\n"
 "Please close the other instances of this message and try again."
 
-#: ../src/balsa-message.c:2384
-#: ../src/balsa-message.c:2466
-#: ../src/balsa-message.c:2581
+#: ../src/balsa-message.c:2398
+#: ../src/balsa-message.c:2482
+#: ../src/balsa-message.c:2599
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Parsing a message part failed: %s"
 
-#: ../src/balsa-message.c:2385
-#: ../src/balsa-message.c:2467
-#: ../src/balsa-message.c:2582
+#: ../src/balsa-message.c:2399
+#: ../src/balsa-message.c:2483
+#: ../src/balsa-message.c:2600
 msgid "Possible disk space problem."
 msgstr "Possible disk space problem."
 
-#: ../src/balsa-message.c:2397
+#: ../src/balsa-message.c:2413
 #, c-format
 msgid "The message sent by %s with subject \"%s\" contains an encrypted part, but it's structure is invalid."
 msgstr "The message sent by %s with subject \"%s\" contains an encrypted part, but it's structure is invalid."
 
-#: ../src/balsa-message.c:2405
+#: ../src/balsa-message.c:2421
 #, c-format
 msgid "The message sent by %s with subject \"%s\" contains a PGP encrypted part, but this crypto protocol is not available."
 msgstr "The message sent by %s with subject \"%s\" contains a PGP encrypted part, but this crypto protocol is not available."
 
-#: ../src/balsa-message.c:2418
+#: ../src/balsa-message.c:2434
 #, c-format
 msgid "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, but this crypto protocol is not available."
 msgstr "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, but this crypto protocol is not available."
 
-#: ../src/balsa-message.c:2482
+#: ../src/balsa-message.c:2500
 #, c-format
 msgid "The message sent by %s with subject \"%s\" contains a signed part, but its structure is invalid. The signature, if there is any, cannot be checked."
 msgstr "The message sent by %s with subject \"%s\" contains a signed part, but its structure is invalid. The signature, if there is any, cannot be checked."
 
-#: ../src/balsa-message.c:2495
+#: ../src/balsa-message.c:2513
 #, c-format
 msgid "The message sent by %s with subject \"%s\" contains a %s signed part, but this crypto protocol is not available."
 msgstr "The message sent by %s with subject \"%s\" contains a %s signed part, but this crypto protocol is not available."
 
-#: ../src/balsa-message.c:2498
+#: ../src/balsa-message.c:2516
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2498
+#: ../src/balsa-message.c:2516
 #: ../src/balsa-mime-widget-crypto.c:72
 #: ../src/print.c:1302
 #: ../src/print-gtk.c:191
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: ../src/balsa-message.c:2517
-#: ../src/balsa-message.c:2643
+#: ../src/balsa-message.c:2535
+#: ../src/balsa-message.c:2662
 msgid "Detected a good signature"
 msgstr "Detected a good signature"
 
-#: ../src/balsa-message.c:2523
+#: ../src/balsa-message.c:2541
 msgid "Detected a good signature with insufficient validity"
 msgstr "Detected a good signature with insufficient validity"
 
-#: ../src/balsa-message.c:2528
-#: ../src/balsa-message.c:2647
+#: ../src/balsa-message.c:2546
+#: ../src/balsa-message.c:2666
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Detected a good signature with insufficient validity/trust"
 
-#: ../src/balsa-message.c:2535
-#: ../src/balsa-message.c:2653
+#: ../src/balsa-message.c:2553
+#: ../src/balsa-message.c:2672
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" returned:\n"
@@ -2601,20 +2569,20 @@ msgstr ""
 "Checking the signature of the message sent by %s with subject \"%s\" returned:\n"
 "%s"
 
-#: ../src/balsa-message.c:2547
+#: ../src/balsa-message.c:2565
 #, c-format
 msgid "Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"
 msgstr "Checking the signature of the message sent by %s with subject \"%s\" failed with an error!"
 
-#: ../src/balsa-message.c:2605
+#: ../src/balsa-message.c:2624
 msgid "The decryption cannot be performed because this message is displayed more than once."
 msgstr "The decryption cannot be performed because this message is displayed more than once."
 
-#: ../src/balsa-message.c:2607
+#: ../src/balsa-message.c:2626
 msgid "The signature check and removal of the OpenPGP armor cannot be performed because this message is displayed more than once."
 msgstr "The signature check and removal of the OpenPGP armour cannot be performed because this message is displayed more than once."
 
-#: ../src/balsa-message.c:2610
+#: ../src/balsa-message.c:2629
 msgid "Please close the other instances of this message and try again."
 msgstr "Please close the other instances of this message and try again."
 
@@ -4673,21 +4641,26 @@ msgstr "Se_nd message to obtain this part"
 msgid "Error showing %s: %s\n"
 msgstr "Error showing %s: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:332
+#: ../src/balsa-mime-widget-message.c:333
 #: ../src/print.c:675
 #, c-format
 msgid "Could not get a part: %s"
 msgstr "Could not get a part: %s"
 
-#: ../src/balsa-mime-widget-message.c:463
+#: ../src/balsa-mime-widget-message.c:365
+#, c-format
+msgid "Sending the external body request failed: %s"
+msgstr "Sending the external body request failed: %s"
+
+#: ../src/balsa-mime-widget-message.c:469
 msgid "Reply..."
 msgstr "Reply..."
 
-#: ../src/balsa-mime-widget-message.c:469
+#: ../src/balsa-mime-widget-message.c:475
 msgid "Copy to folder..."
 msgstr "Copy to folder..."
 
-#: ../src/balsa-mime-widget-message.c:661
+#: ../src/balsa-mime-widget-message.c:667
 #: ../src/balsa-print-object-header.c:152
 #: ../src/print.c:350
 #: ../src/sendmsg-window.c:1118
@@ -4696,7 +4669,7 @@ msgstr "Copy to folder..."
 msgid "Subject:"
 msgstr "Subject:"
 
-#: ../src/balsa-mime-widget-message.c:665
+#: ../src/balsa-mime-widget-message.c:671
 #: ../src/balsa-print-object-header.c:160
 #: ../src/print.c:356
 #: ../src/sendmsg-window.c:3348
@@ -4704,7 +4677,7 @@ msgid "Date:"
 msgstr "Date:"
 
 #. addresses
-#: ../src/balsa-mime-widget-message.c:671
+#: ../src/balsa-mime-widget-message.c:677
 #: ../src/balsa-print-object-header.c:165
 #: ../src/print.c:361
 #: ../src/sendmsg-window.c:3359
@@ -4714,12 +4687,12 @@ msgstr "From:"
 
 #. Cannot edit the new "From:" header.
 #. { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
-#: ../src/balsa-mime-widget-message.c:678
+#: ../src/balsa-mime-widget-message.c:684
 #: ../src/sendmsg-window.c:1115
 msgid "Reply-To:"
 msgstr "Reply-To:"
 
-#: ../src/balsa-mime-widget-message.c:681
+#: ../src/balsa-mime-widget-message.c:687
 #: ../src/balsa-print-object-header.c:167
 #: ../src/print.c:365
 #: ../src/sendmsg-window.c:1112
@@ -4729,7 +4702,7 @@ msgid "To:"
 msgstr "To:"
 
 #. cc:
-#: ../src/balsa-mime-widget-message.c:682
+#: ../src/balsa-mime-widget-message.c:688
 #: ../src/balsa-print-object-header.c:169
 #: ../src/print.c:366
 #: ../src/sendmsg-window.c:1117
@@ -4740,7 +4713,7 @@ msgid "Cc:"
 msgstr "Cc:"
 
 #. bcc:
-#: ../src/balsa-mime-widget-message.c:683
+#: ../src/balsa-mime-widget-message.c:689
 #: ../src/balsa-print-object-header.c:171
 #: ../src/print.c:367
 #: ../src/sendmsg-window.c:1116
@@ -4749,13 +4722,13 @@ msgstr "Cc:"
 msgid "Bcc:"
 msgstr "Bcc:"
 
-#: ../src/balsa-mime-widget-message.c:687
+#: ../src/balsa-mime-widget-message.c:693
 #: ../src/balsa-print-object-header.c:173
 #: ../src/print.c:368
 msgid "Fcc:"
 msgstr "Fcc:"
 
-#: ../src/balsa-mime-widget-message.c:694
+#: ../src/balsa-mime-widget-message.c:700
 #: ../src/balsa-print-object-header.c:176
 #: ../src/print.c:374
 msgid "Disposition-Notification-To:"
@@ -6303,75 +6276,92 @@ msgstr "If you would like to provide one, enter it below."
 msgid "_Send"
 msgstr "_Send"
 
-#: ../src/sendmsg-window.c:5471
+#: ../src/sendmsg-window.c:5472
 msgid "You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"
 msgstr "You selected OpenPGP mode for a message with attachments. In this mode, only the first part will be signed and/or encrypted. You should select MIME mode if the complete message shall be protected. Do you really want to proceed?"
 
-#: ../src/sendmsg-window.c:5487
+#: ../src/sendmsg-window.c:5488
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "sending message with gpg mode %d"
 
-#: ../src/sendmsg-window.c:5524
+#: ../src/sendmsg-window.c:5525
 msgid "Message could not be created"
 msgstr "Message could not be created"
 
-#: ../src/sendmsg-window.c:5526
+#: ../src/sendmsg-window.c:5527
 msgid "Message could not be queued in outbox"
 msgstr "Message could not be queued in outbox"
 
-#: ../src/sendmsg-window.c:5528
+#: ../src/sendmsg-window.c:5529
 msgid "Message could not be saved in sentbox"
 msgstr "Message could not be saved in sentbox"
 
-#: ../src/sendmsg-window.c:5530
+#: ../src/sendmsg-window.c:5531
 msgid "Message could not be sent"
 msgstr "Message could not be sent"
 
 #: ../src/sendmsg-window.c:5534
+msgid "Message could not be signed"
+msgstr "Message could not be signed"
+
+#: ../src/sendmsg-window.c:5536
+msgid "Message could not be encrypted"
+msgstr "Message could not be encrypted"
+
+#: ../src/sendmsg-window.c:5542
+#, c-format
+msgid ""
+"Send failed: %s\n"
+"%s"
+msgstr ""
+"Send failed: %s\n"
+"%s"
+
+#: ../src/sendmsg-window.c:5547
 #, c-format
 msgid "Send failed: %s"
 msgstr "Send failed: %s"
 
-#: ../src/sendmsg-window.c:5617
-#: ../src/sendmsg-window.c:5636
+#: ../src/sendmsg-window.c:5631
+#: ../src/sendmsg-window.c:5650
 msgid "Could not postpone message."
 msgstr "Could not postpone message."
 
-#: ../src/sendmsg-window.c:5631
+#: ../src/sendmsg-window.c:5645
 msgid "Message postponed."
 msgstr "Message postponed."
 
-#: ../src/sendmsg-window.c:5798
+#: ../src/sendmsg-window.c:5812
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Error starting spell checker: %s"
 
-#: ../src/sendmsg-window.c:5957
+#: ../src/sendmsg-window.c:5971
 #, c-format
 msgid "Could not compile %s"
 msgstr "Could not compile %s"
 
-#: ../src/sendmsg-window.c:5958
+#: ../src/sendmsg-window.c:5972
 msgid "Quoted Text Regular Expression"
 msgstr "Quoted Text Regular Expression"
 
-#: ../src/sendmsg-window.c:6514
+#: ../src/sendmsg-window.c:6528
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Reply to %s: %s"
 
-#: ../src/sendmsg-window.c:6519
+#: ../src/sendmsg-window.c:6533
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Forward message to %s: %s"
 
-#: ../src/sendmsg-window.c:6523
+#: ../src/sendmsg-window.c:6537
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Continue message to %s: %s"
 
-#: ../src/sendmsg-window.c:6527
+#: ../src/sendmsg-window.c:6541
 #, c-format
 msgid "New message to %s: %s"
 msgstr "New message to %s: %s"
@@ -6800,6 +6790,20 @@ msgstr "Up"
 msgid "Down"
 msgstr "Down"
 
+#~ msgid "%s: signing failed: %s"
+#~ msgstr "%s: signing failed: %s"
+#~ msgid "%s: signature verification failed: %s"
+#~ msgstr "%s: signature verification failed: %s"
+#~ msgid "%s: signing and encryption failed: %s"
+#~ msgstr "%s: signing and encryption failed: %s"
+#~ msgid "%s: encryption failed: %s"
+#~ msgstr "%s: encryption failed: %s"
+#~ msgid "%s: decryption failed: %s"
+#~ msgstr "%s: decryption failed: %s"
+#~ msgid "signing failed: %s"
+#~ msgstr "signing failed: %s"
+#~ msgid "encryption failed: %s"
+#~ msgstr "encryption failed: %s"
 #~ msgid "Cannot connect to server"
 #~ msgstr "Cannot connect to server"
 #~ msgid "Cannot read message"

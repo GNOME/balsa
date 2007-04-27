@@ -27,6 +27,7 @@
 #include <libnotify/notify.h>
 #include <gtk/gtkstock.h>
 #endif
+#include <string.h>
 
 struct information_data {
     GtkWindow *parent;
@@ -81,13 +82,28 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
 	icon_str = NULL;
         break;
     }
-    if(notify_is_initted()) {
-        gchar *msg = g_strdup_vprintf(fmt,ap);
-        note = notify_notification_new("Balsa", msg, icon_str, NULL);
+    if (notify_is_initted()) {
+        gchar *msg, *p, *q;
+        GString *escaped;
+
+        msg = g_strdup_vprintf(fmt, ap);
+        /* libnotify/DBUS uses "<...>" markup, so we must replace '<'
+         * with the corresponding entity in the message string. */
+        escaped = g_string_new(NULL);
+        for (p = msg; (q = strchr(p, '<')); p = ++q) {
+            g_string_append_len(escaped, p, q - p);
+            g_string_append(escaped, "&lt;");
+        }
+        g_string_append(escaped, p);
         g_free(msg);
-        notify_notification_set_timeout (note, 7000); /* 7 seconds */
-        notify_notification_show (note, NULL);
-        g_object_unref(G_OBJECT(note));
+
+        note =
+            notify_notification_new("Balsa", escaped->str, icon_str, NULL);
+        g_string_free(escaped, TRUE);
+
+        notify_notification_set_timeout(note, 7000);    /* 7 seconds */
+        notify_notification_show(note, NULL);
+        g_object_unref(note);
         return;
     }
     /* Fall through to the ordinary notification scheme */

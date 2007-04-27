@@ -1,3 +1,8 @@
+2007-04-27  Peter Bloomfield
+
+	* libbalsa/information.c: (libbalsa_information_varg): replace
+	'<' with "&lt;" entity in message string.
+
 2007-04-26  Pawel Salek
 
 	* src/balsa-message.c: do not crash on empty address groups.

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2007 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,43 +54,36 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
                           const char *fmt, va_list ap)
 {
     struct information_data *data;
-#ifdef HAVE_NOTIFY
-    NotifyNotification *note;
-    char *icon_str;
-#endif
 
     g_return_if_fail(fmt != NULL);
     g_assert(libbalsa_real_information_func != NULL);
 
-    /* We format the string here. It must be free()d in the idle
-     * handler We parse the args here because by the time the idle
-     * function runs we will no longer be in this stack frame. 
-     */
-
 #ifdef HAVE_NOTIFY
-    switch (type) {
-    case LIBBALSA_INFORMATION_MESSAGE:
-	icon_str = GTK_STOCK_DIALOG_INFO;
-	break;
-    case LIBBALSA_INFORMATION_WARNING:
-	icon_str = GTK_STOCK_DIALOG_WARNING;
-	break;
-    case LIBBALSA_INFORMATION_ERROR:
-	icon_str = GTK_STOCK_DIALOG_ERROR;
-	break;
-    default:
-	icon_str = NULL;
-        break;
-    }
     if (notify_is_initted()) {
         gchar *msg, *p, *q;
         GString *escaped;
+        NotifyNotification *note;
+        char *icon_str;
 
+        switch (type) {
+        case LIBBALSA_INFORMATION_MESSAGE:
+            icon_str = GTK_STOCK_DIALOG_INFO;
+            break;
+        case LIBBALSA_INFORMATION_WARNING:
+            icon_str = GTK_STOCK_DIALOG_WARNING;
+            break;
+        case LIBBALSA_INFORMATION_ERROR:
+            icon_str = GTK_STOCK_DIALOG_ERROR;
+            break;
+        default:
+            icon_str = NULL;
+            break;
+        }
         msg = g_strdup_vprintf(fmt, ap);
-        /* libnotify/DBUS uses "<...>" markup, so we must replace '<'
+        /* libnotify/DBUS uses HTML markup, so we must replace '<'
          * with the corresponding entity in the message string. */
         escaped = g_string_new(NULL);
-        for (p = msg; (q = strchr(p, '<')); p = ++q) {
+        for (p = msg; (q = strchr(p, '<')) != NULL; p = ++q) {
             g_string_append_len(escaped, p, q - p);
             g_string_append(escaped, "&lt;");
         }
@@ -111,10 +104,16 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
     data = g_new(struct information_data, 1);
     data->parent = parent;
     data->message_type = type;
+
+    /* We format the string here. It must be free()d in the idle
+     * handler We parse the args here because by the time the idle
+     * function runs we will no longer be in this stack frame. 
+     */
     data->msg = g_strdup_vprintf(fmt, ap);
-    if(parent)
-        g_object_add_weak_pointer(G_OBJECT(parent), (gpointer) &data->parent);
-    g_idle_add((GSourceFunc) libbalsa_information_idle_handler, data); 
+    if (parent)
+        g_object_add_weak_pointer(G_OBJECT(parent),
+                                  (gpointer) & data->parent);
+    g_idle_add((GSourceFunc) libbalsa_information_idle_handler, data);
 }
 
 void

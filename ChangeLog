@@ -1,5 +1,10 @@
 2007-04-29  Peter Bloomfield
 
+	* src/information-dialog.c: (balsa_information_real): do not try
+	to pop up dialog if main-window is NULL.
+
+2007-04-29  Peter Bloomfield
+
 	* libbalsa/libbalsa.h: add error code for get-duplicates.
 	* libbalsa/mailbox.c: (libbalsa_mailbox_move_duplicates): use
 	it.

@@ -1,5 +1,18 @@
 2007-04-29  Peter Bloomfield
 
+	* libbalsa/libbalsa.h: add error code for get-duplicates.
+	* libbalsa/mailbox.c: (libbalsa_mailbox_move_duplicates): use
+	it.
+	* libbalsa/mailbox_local.c: check error return from
+	prepare-threading.
+	* src/balsa-index.c: (balsa_index_set_threading_type): ditto.
+	* src/main-window.c: (remove_duplicates_cb): ensure-visible only
+	if no error.
+	* src/main.c: (balsa_progress_set_text),
+	(balsa_progress_set_fraction): check for NULL main-window.
+
+2007-04-29  Peter Bloomfield
+
 	* src/balsa-mime-widget-text.c: (bm_widget_new_html): fix popup
 	menu for HTML part.
 

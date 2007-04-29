@@ -609,6 +609,12 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
     gboolean rc = FALSE;
 
     gdk_threads_enter();
+
+    if (!balsa_app.main_window) {
+        gdk_threads_leave();
+        return;
+    }
+
     if (!text || total >= LIBBALSA_PROGRESS_MIN_COUNT)
         rc = balsa_window_setup_progress(balsa_app.main_window, text);
     prev_fraction = 0;
@@ -632,8 +638,9 @@ balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
     prev_fraction = fraction;
 
     gdk_threads_enter();
-    balsa_window_increment_progress(balsa_app.main_window, fraction,
-                                    !libbalsa_am_i_subthread());
+    if (balsa_app.main_window)
+        balsa_window_increment_progress(balsa_app.main_window, fraction,
+                                        !libbalsa_am_i_subthread());
     gdk_threads_leave();
 }
 

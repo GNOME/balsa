@@ -67,7 +67,7 @@ typedef struct _LibBalsaCondition LibBalsaCondition;
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
 /*
- * Error domains for GError: only one for now, more to come.
+ * Error domains for GError:
  */
 enum {
     LIBBALSA_SCANNER_ERROR,
@@ -75,7 +75,7 @@ enum {
 };
 
 /*
- * Error codes for GError: only one for now, more to come.
+ * Error codes for GError:
  */
 enum {
     LIBBALSA_SCANNER_ERROR_IMAP,
@@ -89,7 +89,8 @@ enum {
     LIBBALSA_MAILBOX_NETWORK_ERROR,
     LIBBALSA_MAILBOX_OPEN_ERROR,
     LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR,
-    LIBBALSA_MAILBOX_ACCESS_ERROR
+    LIBBALSA_MAILBOX_ACCESS_ERROR,
+    LIBBALSA_MAILBOX_DUPLICATES_ERROR
 };
 
 

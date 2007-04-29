@@ -4086,6 +4086,14 @@ libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
         msgnos =
             LIBBALSA_MAILBOX_GET_CLASS(mailbox)->duplicate_msgnos(mailbox);
 
+    if (mailbox->state == LB_MAILBOX_STATE_CLOSED) {
+        /* duplicate msgnos was interrupted */
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_DUPLICATES_ERROR,
+                    _("Finding duplicate messages in source mailbox failed"));
+        return;
+    }
+
     if (!msgnos)
         return;
 

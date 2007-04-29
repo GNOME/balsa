@@ -2051,11 +2051,12 @@ libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox * mailbox)
     if (!local->threading_info)
         return NULL;
 
+    /* We need all the message-ids. */
+    if (!libbalsa_mailbox_prepare_threading(mailbox, 0))
+        return NULL;
+
     table = g_hash_table_new(g_str_hash, g_str_equal);
     msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
-
-    /* We need all the message-ids. */
-    libbalsa_mailbox_prepare_threading(mailbox, 0);
 
     for (i = 0; i < local->threading_info->len; i++) {
         LibBalsaMailboxLocalInfo *info;

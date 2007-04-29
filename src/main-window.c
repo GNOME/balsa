@@ -4360,8 +4360,8 @@ remove_duplicates_cb(GtkWidget * widget, gpointer data)
                               _("Removing duplicates failed: %s"),
                               err->message);
             g_error_free(err);
-        }
-        balsa_index_ensure_visible(BALSA_INDEX(index));
+        } else
+            balsa_index_ensure_visible(BALSA_INDEX(index));
     }
 }
 

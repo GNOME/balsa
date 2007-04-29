@@ -1137,7 +1137,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * p
                      G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
     g_signal_connect(G_OBJECT(mw->widget), "key_press_event",
                      G_CALLBACK(balsa_mime_widget_key_press_event), bm);
-    g_signal_connect_swapped(G_OBJECT(mw->widget), "popup-menu",
+    g_signal_connect(G_OBJECT(mw->widget), "popup-menu",
                      G_CALLBACK(balsa_gtk_html_popup), bm);
 
     return mw;

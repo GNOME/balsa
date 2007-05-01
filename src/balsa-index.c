@@ -554,7 +554,7 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
     gboolean have_selected;
     GArray *deselected;
     gint i;
-    gint current_depth = 0;
+    gboolean current_message_is_viewable = FALSE;
 
     if (mailbox->state == LB_MAILBOX_STATE_TREECLEANING)
         return;
@@ -595,9 +595,9 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
 	    }
 	    g_array_append_val(deselected, msgno);
 	    g_array_remove_index(index->selected, i);
+            if (msgno == sci.current_msgno)
+                current_message_is_viewable = TRUE;
 	}
-	if (msgno == sci.current_msgno)
-	    current_depth = gtk_tree_path_get_depth(path);
 	gtk_tree_path_free(path);
     }
 
@@ -628,9 +628,9 @@ bndx_selection_changed(GtkTreeSelection * selection, gpointer data)
      * or:
      * - the thread containing the current message was collapsed, in
      *   which case we leave index->current_message unchanged;
-     * we detect the latter case by checking the depth of the current
-     * message.  */
-    if (sci.msgno || current_depth <= 1) {
+     * we detect the latter case by checking whether the current
+     * message is viewable.  */
+    if (sci.msgno || current_message_is_viewable) {
 	if (index->current_message) {
 	    g_object_unref(index->current_message);
 	    index->current_message = NULL;
@@ -2103,7 +2103,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
 
     if (thtype != LB_MAILBOX_THREADING_FLAT
         && !libbalsa_mailbox_prepare_threading(mailbox, 0))
-            return;
+        return;
     libbalsa_mailbox_set_threading_type(mailbox, thtype);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));

@@ -1,5 +1,10 @@
 2007-05-01  Peter Bloomfield
 
+	* src/balsa-index.c: (bndx_selection_changed): clear preview
+	more reliably.
+
+2007-05-01  Peter Bloomfield
+
 	* src/balsa-index.c: (balsa_index_set_threading_type): fix typo.
 
 2007-05-01  Pawel Salek

@@ -1542,6 +1542,8 @@ bw_create_index_widget(BalsaWindow *bw)
     g_signal_connect(G_OBJECT(bw->sos_entry), "changed",
                              G_CALLBACK(bw_filter_entry_changed),
                              button);
+    g_signal_connect(G_OBJECT(bw->filter_choice), "changed",
+                     G_CALLBACK(bw_filter_entry_changed), button);
     gtk_widget_show_all(button);
     vbox = gtk_vbox_new(FALSE, 0);
 #if defined(ENABLE_TOUCH_UI)

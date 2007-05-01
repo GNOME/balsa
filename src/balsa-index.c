@@ -2102,7 +2102,7 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     g_return_if_fail(mailbox != NULL);
 
     if (thtype != LB_MAILBOX_THREADING_FLAT
-        && !libbalsa_mailbox_prepare_threading(mailbox, 0));
+        && !libbalsa_mailbox_prepare_threading(mailbox, 0))
             return;
     libbalsa_mailbox_set_threading_type(mailbox, thtype);
 

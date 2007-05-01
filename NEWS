@@ -1,4 +1,12 @@
-* Balsa-2.3.13 release. Release date 2006-12-12
+* Balsa-2.3.15 release. Release date 2007-05-01
+
+- Use GtkPrint infrastructure if available.
+- handle LDAP referrals.
+- nicer citation marks.
+- initial libnotify support.
+- IMAP BINARY support.
+
+* Balsa-2.3.14 release. Release date 2006-12-12
 
 - deferred population of the mailbox index.
 - client-side IMAP sorting.

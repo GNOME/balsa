@@ -316,7 +316,7 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
             continue;
 
         tmp = _(toolbar_buttons[button].button_text);
-        if (toolbar_buttons[button].pixmap_id == BALSA_PIXMAP_SEND
+        if (strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND) == 0
             && balsa_app.always_queue_sent_mail)
             tmp = _("Queue");
         if (balsa_app.toolbar_wrap_button_text) {
@@ -353,7 +353,7 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
         g_free(text);
 
         text = _(toolbar_buttons[button].help_text);
-        if (toolbar_buttons[button].pixmap_id == BALSA_PIXMAP_SEND
+        if ( strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND)==0
             && balsa_app.always_queue_sent_mail)
             text = _("Queue this message for sending");
         gtk_tool_item_set_tooltip(tool_item,

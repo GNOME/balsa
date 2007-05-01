@@ -1,3 +1,9 @@
+2007-05-01  Pawel Salek
+
+	* src/mailbox-node.c: do not print null strings.
+	* src/toolbar-factory.c: apply patch from bug 410095 ,extended.
+	* configure.in, NEWS: release 2.3.15.
+
 2007-04-29  Peter Bloomfield
 
 	* src/information-dialog.c: (balsa_information_real): do not try

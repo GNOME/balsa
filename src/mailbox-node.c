@@ -765,7 +765,8 @@ restore_children_from_cache(BalsaMailboxNode *mn)
     imap_scan_item isi;
 
     if(!children) {
-        printf("No cache for %s - quitting.\n", mn->name);
+        if(mn->name)
+            printf("No cache for %s - quitting.\n", mn->name);
         return FALSE;
     }
 

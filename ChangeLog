@@ -2,27 +2,6 @@
 
 	* libbalsa/information.c: (libbalsa_information_varg): escape
 	more HTML special characters.
-
-2007-05-01  Peter Bloomfield  <peter@cp2100>
-
-	reviewed by: <delete if not using a buddy>
-
-	* libbalsa/information.c: (libbalsa_information_varg):
-	* src/balsa-index.c: (bndx_destroy), (bndx_instance_init),
-	(bndx_change_flags), (bndx_selection_changed_func),
-	(bndx_selection_changed), (bndx_tree_expand_cb), (bndx_drag_cb),
-	(balsa_index_load_mailbox_node), (bndx_selected_msgnos_func),
-	(balsa_index_selected_msgnos), (bndx_view_source),
-	(bndx_compose_foreach), (bndx_do_delete),
-	(balsa_index_toggle_flag), (bi_toggle_deleted_cb), (mru_menu_cb),
-	(bndx_do_popup), (balsa_index_pipe):
-	* src/balsa-index.h:
-	* src/balsa-mblist.c: (bmbl_drag_cb):
-	* src/main-window.c: (notebook_drag_received_cb):
-	* src/sendmsg-window.c:
-
-2007-05-01  Peter Bloomfield
-
 	* src/main-window.c: (bw_create_index_widget): sensitize button
 	when type of search is changed.
 	* src/balsa-index.c: (bndx_selection_changed): clear preview

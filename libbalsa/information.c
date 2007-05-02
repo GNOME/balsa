@@ -80,12 +80,18 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
             break;
         }
         msg = g_strdup_vprintf(fmt, ap);
-        /* libnotify/DBUS uses HTML markup, so we must replace '<'
-         * with the corresponding entity in the message string. */
+        /* libnotify/DBUS uses HTML markup, so we must replace '<' and
+         * '&' with the corresponding entity in the message string. */
         escaped = g_string_new(NULL);
-        for (p = msg; (q = strchr(p, '<')) != NULL; p = ++q) {
+        for (p = msg; (q = strpbrk(p, "<>&\"")) != NULL; p = ++q) {
             g_string_append_len(escaped, p, q - p);
-            g_string_append(escaped, "&lt;");
+            switch (*q) {
+                case '<': g_string_append(escaped, "&lt;");   break;
+                case '>': g_string_append(escaped, "&gt;");   break;
+                case '&': g_string_append(escaped, "&amp;");  break;
+                case '"': g_string_append(escaped, "&quot;"); break;
+                default: break;
+            }
         }
         g_string_append(escaped, p);
         g_free(msg);

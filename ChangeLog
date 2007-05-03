@@ -1,3 +1,11 @@
+2007-05-03  Peter Bloomfield
+
+	* src/balsa-message.c: (balsa_message_has_next_part),
+	(balsa_message_has_previous_part): return FALSE unless we have
+	a part.
+	* src/main-window.c: (enable_part_menu_items),
+	(notebook_switch_page_cb): improve message menu item sensitivity.
+
 2007-05-01  Peter Bloomfield
 
 	* libbalsa/information.c: (libbalsa_information_varg): escape

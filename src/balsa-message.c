@@ -1520,9 +1520,10 @@ balsa_message_next_part(BalsaMessage * bmessage)
 gboolean
 balsa_message_has_next_part(BalsaMessage * bmessage)
 {
-    BalsaPartInfo *info = bm_next_part_info(bmessage);
+    BalsaPartInfo *info;
 
-    if (info) {
+    if (bmessage && bmessage->treeview
+        && (info = bm_next_part_info(bmessage))) {
         g_object_unref(info);
         return TRUE;
     }
@@ -1592,9 +1593,10 @@ balsa_message_previous_part(BalsaMessage * bmessage)
 gboolean
 balsa_message_has_previous_part(BalsaMessage * bmessage)
 {
-    BalsaPartInfo *info = bm_previous_part_info(bmessage);
+    BalsaPartInfo *info;
 
-    if (info) {
+    if (bmessage && bmessage->treeview
+        && (info = bm_previous_part_info(bmessage))) {
         g_object_unref(info);
         return TRUE;
     }

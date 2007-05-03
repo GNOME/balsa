@@ -2148,11 +2148,8 @@ balsa_window_enable_continue(BalsaWindow * window)
 static void
 enable_part_menu_items(BalsaWindow * window)
 {
-    BalsaMessage *msg = BALSA_MESSAGE(window->preview);
+    BalsaMessage *msg = window ? BALSA_MESSAGE(window->preview) : NULL;
     gboolean enable;
-
-    if (!msg || !msg->treeview)
-        return;
 
     enable = balsa_message_has_next_part(msg);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_NEXT_PART_POS].
@@ -4734,6 +4731,10 @@ notebook_switch_page_cb(GtkWidget * notebook,
     balsa_index_refresh_size(index);
     balsa_index_ensure_visible(index);
 
+#if !defined(ENABLE_TOUCH_UI)
+    enable_edit_menus(NULL);
+    enable_part_menu_items(NULL);
+#endif /*ENABLE_TOUCH_UI */
 }
 
 static void

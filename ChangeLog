@@ -1,3 +1,8 @@
+2007-05-04  Peter Bloomfield
+
+	* src/balsa-mime-widget-image.c: (img_check_size): use GDK lock
+	in idle callback.
+
 2007-05-03  Peter Bloomfield
 
 	* src/balsa-message.c: (balsa_message_has_next_part),

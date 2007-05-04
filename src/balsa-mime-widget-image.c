@@ -116,13 +116,15 @@ img_check_size(GtkImage ** widget_p)
     LibBalsaMessageBody * mime_body;
     gint curr_w, dst_w;
 
+    gdk_threads_enter();
+
     widget = *widget_p;
+    g_free(widget_p);
     if (!widget) {
-	g_free(widget_p);
+        gdk_threads_leave();
 	return FALSE;
     }
     g_object_remove_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
-    g_free(widget_p);
 
     viewport = gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
     orig_width = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
@@ -131,7 +133,8 @@ img_check_size(GtkImage ** widget_p)
 
     g_object_set_data(G_OBJECT(widget), "check_size_sched",
                       GINT_TO_POINTER(FALSE));
-    g_return_val_if_fail(viewport && mime_body && orig_width > 0, FALSE);
+    g_return_val_if_fail(viewport && mime_body && orig_width > 0,
+                         (gdk_threads_leave(), FALSE));
 
     if (gtk_image_get_storage_type(widget) == GTK_IMAGE_PIXBUF)
 	curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(widget));
@@ -157,6 +160,7 @@ img_check_size(GtkImage ** widget_p)
 			          load_err->message);
 		g_error_free(load_err);
 	    }
+            gdk_threads_leave();
 	    return FALSE;
 	}
 	dst_h = (gfloat)dst_w /
@@ -169,5 +173,6 @@ img_check_size(GtkImage ** widget_p)
 	
     }
 
+    gdk_threads_leave();
     return FALSE;
 }

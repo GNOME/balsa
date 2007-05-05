@@ -27,13 +27,6 @@
 
 #  include <gtk/gtk.h>
 
-/* PRINTING support available only for GTKHTML3.  */
-#ifdef HAVE_GTKHTML3
-#  include <libgnomeprint/gnome-print.h>
-#else
-typedef void GnomePrintContext;
-#endif /* HAVE_GTKHTML3 */
-
 /* We need this enum even if we're not using GtkHtml. */
 typedef enum {
     LIBBALSA_HTML_TYPE_NONE = 0,
@@ -43,6 +36,12 @@ typedef enum {
 } LibBalsaHTMLType;
 
 # ifdef HAVE_GTKHTML
+/* PRINTING support available only for GTKHTML3.  */
+#ifdef HAVE_GTKHTML3
+#  include <libgnomeprint/gnome-print.h>
+#else
+typedef void GnomePrintContext;
+#endif /* HAVE_GTKHTML3 */
 
 #ifdef HAVE_GNOME
 typedef void (*LibBalsaHTMLPrintCallback) (GtkWidget * widget,

@@ -2,6 +2,7 @@
 
 	* libbalsa/identity.[hc]: signature processing belongs here.
 	* src/sendmsg-window.c: use it.
+	* libbalsa/html.h: fix bug 435594.
 
 2007-05-04  Peter Bloomfield
 

@@ -27,9 +27,12 @@
 
 #  include <gtk/gtk.h>
 
-#ifdef HAVE_GNOME
+/* PRINTING support available only for GTKHTML3.  */
+#ifdef HAVE_GTKHTML3
 #  include <libgnomeprint/gnome-print.h>
-#endif /* HAVE_GNOME */
+#else
+typedef void GnomePrintContext;
+#endif /* HAVE_GTKHTML3 */
 
 /* We need this enum even if we're not using GtkHtml. */
 typedef enum {

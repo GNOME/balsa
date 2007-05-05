@@ -305,6 +305,72 @@ libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
     ident->sig_prepend = prepend;
 }
 
+/** Returns a signature for given identity, adding a signature prefix
+    if needed. parent can be NULL. */
+gchar*
+libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
+{
+    FILE *fp = NULL;
+    size_t len = 0;
+    gchar *ret = NULL, *path;
+
+    if (identity->signature_path == NULL ||
+        *identity->signature_path == '\0')
+	return NULL;
+
+    path = libbalsa_expand_path(identity->signature_path);
+    if(identity->sig_executable){
+        /* signature is executable */
+	fp = popen(path,"r");
+        if (fp) {
+            len = libbalsa_readfile_nostat(fp, &ret);
+            pclose(fp);
+        } else
+            libbalsa_information_parented
+                (parent, LIBBALSA_INFORMATION_ERROR,
+                 _("Error executing signature generator %s"),
+                 identity->signature_path);
+    } else {
+        /* sign is normal file */
+        fp = fopen(path, "r");
+        if (fp) {
+            len = libbalsa_readfile_nostat(fp, &ret);
+            fclose(fp);
+        } else
+            libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
+                                          _("Cannot open signature file '%s' "
+                                            "for reading"),
+                                          identity->signature_path);
+    }
+    if(!ret)
+        libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
+                                   _("Error reading signature from %s"), path);
+    else {
+        if(!libbalsa_utf8_sanitize(&ret, FALSE, NULL))
+            libbalsa_information_parented
+                (parent, LIBBALSA_INFORMATION_ERROR,
+                 _("Signature in %s is not a UTF-8 text."),
+                 identity->signature_path);
+    }
+    g_free(path);
+
+    if(ret == NULL) return NULL;
+
+    /* Prepend the separator if needed... */
+
+    if (identity->sig_separator
+        && strncmp(ret, "--\n", 3)
+        && strncmp(ret, "-- \n", 4)) {
+        gchar *sig_tmp = g_strconcat("\n-- \n", ret, NULL);
+        g_free(ret);
+        ret = sig_tmp;
+    } else {
+        gchar *sig_tmp = g_strconcat("\n", ret, NULL);
+        g_free(ret);
+        ret = sig_tmp;
+    }
+    return ret;
+}
 
 #if ENABLE_ESMTP
 void

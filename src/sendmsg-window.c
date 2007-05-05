@@ -88,7 +88,6 @@ typedef struct {
 
 typedef enum { QUOTE_HEADERS, QUOTE_ALL, QUOTE_NOPREFIX } QuoteType;
 
-static gchar *read_signature(BalsaSendmsg *bsmsg);
 static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
 static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
 static void send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
@@ -164,7 +163,6 @@ static void repl_identity_signature(BalsaSendmsg* bsmsg,
                                     LibBalsaIdentity* old_ident,
                                     gint* replace_offset, gint siglen, 
                                     gchar* new_sig);
-static gchar* prep_signature(LibBalsaIdentity* ident, gchar* sig);
 static void update_bsmsg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
@@ -1365,31 +1363,6 @@ repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
     libbalsa_insert_with_url(buffer, new_sig, NULL, NULL, NULL);
 }
 
-
-static gchar*
-prep_signature(LibBalsaIdentity* ident, gchar* sig)
-{
-    gchar* sig_tmp;
-
-    /* empty signature is a legal signature */
-    if(sig == NULL) return NULL;
-
-    if (ident->sig_separator
-        && strncmp(sig, "--\n", 3)
-        && strncmp(sig, "-- \n", 4)) {
-        sig_tmp = g_strconcat("\n-- \n", sig, NULL);
-        g_free(sig);
-        sig = sig_tmp;
-    } else {
-        sig_tmp = g_strconcat("\n", sig, NULL);
-        g_free(sig);
-        sig = sig_tmp;
-    }
-
-    return sig;
-}
-
-
 /*
  * update_bsmsg_identity
  * 
@@ -1490,23 +1463,19 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
      * the signature if path changed */
 
     /* reconstruct the old signature to search with */
-    old_sig = read_signature(bsmsg);
-    old_sig = prep_signature(old_ident, old_sig);
+    old_sig = libbalsa_identity_get_signature(old_ident,
+                                              GTK_WINDOW(bsmsg->window));
 
     /* switch identities in bsmsg here so we can use read_signature
      * again */
     bsmsg->ident = ident;
-    if ((new_sig = read_signature(bsmsg)) != NULL) {
-
-	if ( (reply_type && bsmsg->ident->sig_whenreply)
-	    || (forward_type && bsmsg->ident->sig_whenforward)
-             || (bsmsg->type == SEND_NORMAL && bsmsg->ident->sig_sending))
-	    new_sig = prep_signature(ident, new_sig);
-	else {
-	    g_free(new_sig);
-	    new_sig = NULL;
-	}
-    }
+    if ( (reply_type && ident->sig_whenreply)
+         || (forward_type && ident->sig_whenforward)
+         || (bsmsg->type == SEND_NORMAL && ident->sig_sending))
+        new_sig = libbalsa_identity_get_signature(ident,
+                                                  GTK_WINDOW(bsmsg->window));
+    else
+        new_sig = NULL;
     if(!new_sig) new_sig = g_strdup("");
 
     gtk_text_buffer_get_bounds(buffer, &start, &end);
@@ -3484,20 +3453,14 @@ insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
     
     if(!bsmsg->ident->signature_path || !bsmsg->ident->signature_path[0])
         return TRUE;
-    if ((signature = read_signature(bsmsg)) != NULL) {
+    signature = libbalsa_identity_get_signature(bsmsg->ident,
+                                                GTK_WINDOW(bsmsg->window));
+    if (signature != NULL) {
         GtkTextBuffer *buffer =
             gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 #if !HAVE_GTKSOURCEVIEW
         sw_buffer_save(bsmsg);
-#endif                          /* HAVE_GTKSOURCEVIEW */
-	if (bsmsg->ident->sig_separator
-	    && g_ascii_strncasecmp(signature, "--\n", 3)
-	    && g_ascii_strncasecmp(signature, "-- \n", 4)) {
-	    gchar * tmp = g_strconcat("-- \n", signature, NULL);
-	    g_free(signature);
-	    signature = tmp;
-	}
-	
+#endif                          /* HAVE_GTKSOURCEVIEW */	
         sw_buffer_signals_block(bsmsg, buffer);
         libbalsa_insert_with_url(buffer, signature, NULL, NULL, NULL);
         sw_buffer_signals_unblock(bsmsg, buffer);
@@ -4767,56 +4730,6 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         gtk_widget_show_all(field[2]);
 }
 
-static gchar *
-read_signature(BalsaSendmsg *bsmsg)
-{
-    FILE *fp = NULL;
-    size_t len = 0;
-    gchar *ret = NULL, *path;
-
-    if (bsmsg->ident->signature_path == NULL||
-        *bsmsg->ident->signature_path == '\0')
-	return NULL;
-
-    path = libbalsa_expand_path(bsmsg->ident->signature_path);
-    if(bsmsg->ident->sig_executable){
-        /* signature is executable */
-	fp = popen(path,"r");
-	g_free(path);
-        if (!fp) {
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Error executing signature generator %s"),
-                              bsmsg->ident->signature_path);
-            return NULL;
-        }
-        len = libbalsa_readfile_nostat(fp, &ret);
-        pclose(fp);    
-    } else {
-        /* sign is normal file */
-        fp = fopen(path, "r");
-        g_free(path);
-        if (!fp) {
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Cannot open signature file '%s' "
-                                "for reading"),
-                              bsmsg->ident->signature_path);
-            return NULL;
-        }
-        len = libbalsa_readfile_nostat(fp, &ret);
-        fclose(fp);
-    }
-    if(!ret)
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Error reading signature from %s"), path);
-    else {
-        if(!libbalsa_utf8_sanitize(&ret, FALSE, NULL))
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Signature in %s is not a UTF-8 text."),
-                              bsmsg->ident->signature_path);
-    }
-
-    return ret;
-}
 
 /* opens the load file dialog box, allows selection of the file and includes
    it at current point */

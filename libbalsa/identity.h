@@ -114,6 +114,8 @@ extern "C"
     void libbalsa_identity_set_sig_whenreply(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_separator(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_prepend(LibBalsaIdentity*, gboolean);
+    gchar* libbalsa_identity_get_signature(LibBalsaIdentity*, 
+                                           GtkWindow *parent);
 #if ENABLE_ESMTP
     void libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
                                            LibBalsaSmtpServer *

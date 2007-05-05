@@ -1,3 +1,8 @@
+2007-05-05  Pawel Salek
+
+	* libbalsa/identity.[hc]: signature processing belongs here.
+	* src/sendmsg-window.c: use it.
+
 2007-05-04  Peter Bloomfield
 
 	* src/balsa-mime-widget-image.c: (img_check_size): use GDK lock

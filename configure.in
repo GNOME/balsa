@@ -749,6 +749,10 @@ if $PKG_CONFIG --atleast-version=2.2.5 gmime-2.0 ; then
    AC_DEFINE(HAVE_GMIME_2_2_5,1,[Defined when GMime is at least version
                                  2.2.5.])
 fi
+if $PKG_CONFIG --atleast-version=2.2.7 gmime-2.0 ; then
+   AC_DEFINE(HAVE_GMIME_2_2_7,1,[Defined when GMime is at least version
+                                 2.2.7.])
+fi
 
 dnl #####################################################################
 dnl 8. Output

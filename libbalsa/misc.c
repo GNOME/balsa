@@ -518,8 +518,17 @@ libbalsa_mktempdir (char **s)
 static LibBalsaCodeset sanitize_fallback_codeset = WEST_EUROPE;
 LibBalsaCodeset
 libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
-{     
+{
     LibBalsaCodeset ret = sanitize_fallback_codeset;
+#if defined(HAVE_GMIME_2_2_7)
+    const gchar *charsets[] = {
+        libbalsa_get_codeset_name(NULL, codeset),
+        NULL
+    };
+
+    g_mime_set_user_charsets(charsets);
+#endif                          /* HAVE_GMIME_2_2_7 */
+
     sanitize_fallback_codeset = codeset;
     return ret;
 }

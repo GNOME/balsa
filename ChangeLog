@@ -27,7 +27,9 @@
 	get_message, messages_change_flags, and msgno_has_flags.
 	* libbalsa/mailbox_mbox.c: ditto
 	* libbalsa/mailbox_mh.c: ditto.
-	* src/balsa-message.c: (display_part): ensure UTF-8.
+	* src/balsa-message.c: (display_part): ensure UTF-8;
+	(libbalsa_msg_try_mp_signed), (message_recheck_crypto_cb):
+	notify user only once.
 	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
 	ditto.
 	* configure.in: detect GMime version 2.2.7

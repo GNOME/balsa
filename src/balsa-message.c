@@ -2465,6 +2465,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
 /*
  * Treatment of a multipart/signed body with protocol protocol.
  */
+#define BALSA_MESSAGE_SIGNED_NOTIFIED "balsa-message-signed-notified"
 static void
 libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 			   chk_crypto_t * chk_crypto)
@@ -2534,6 +2535,11 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	return;
                 
     /* evaluate the result */
+    if (g_object_get_data(G_OBJECT(message), BALSA_MESSAGE_SIGNED_NOTIFIED))
+        return;
+    g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_SIGNED_NOTIFIED,
+                      GUINT_TO_POINTER(TRUE));
+
     if (body->parts->next->sig_info) {
 	switch (libbalsa_message_body_protect_state(body->parts->next)) {
 	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
@@ -2800,6 +2806,7 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
         return;
     }
 
+    g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_SIGNED_NOTIFIED, NULL);
     balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_ALWAYS, FALSE, 2);
 
     /* calculate the signature summary state */

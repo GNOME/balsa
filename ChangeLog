@@ -1,5 +1,33 @@
 2007-05-06  Peter Bloomfield
 
+	* libbalsa/mailbox_local.h: new LibBalsaMailboxLocalMessageInfo
+	structure and LibBalsaMailboxLocalClass method get_info; remove
+	load_message class method; do not export 
+	libbalsa_mailbox_local_queue_sync--it's now static.
+	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_class_init),
+	(lbml_add_message_to_pool), (lbm_local_get_message_with_msg_info),
+	(libbalsa_mailbox_local_load_message),
+	(libbalsa_mailbox_local_close_mailbox),
+	(libbalsa_mailbox_local_get_message),
+	(libbalsa_mailbox_local_load_messages): implement
+	LibBalsaMailboxClass methods get_message, messages_change_flags,
+	and msgno_has_flags here instead of in back-ends; keep a pool of
+	object-reffed messages.
+	* libbalsa/mailbox_maildir.c:
+	(libbalsa_mailbox_maildir_class_init), (lbm_maildir_parse),
+	(libbalsa_mailbox_maildir_check), (free_message_info),
+	(maildir_sync_add), (libbalsa_mailbox_maildir_sync),
+	(lbm_maildir_get_info), (libbalsa_mailbox_maildir_add_message):
+	remove LibBalsaMailboxClass methods get_message,
+	messages_change_flags, and msgno_has_flags.
+	* libbalsa/mailbox_mbox.c: (libbalsa_mailbox_mbox_class_init),
+	(parse_mailbox), (free_message_info), (lbm_mbox_restore),
+	(libbalsa_mailbox_mbox_check), (lbm_mbox_rewrite_in_place),
+	(libbalsa_mailbox_mbox_sync), (lbm_mbox_get_info): ditto
+	* libbalsa/mailbox_mh.c: (libbalsa_mailbox_mh_class_init),
+	(lbm_mh_remove_files), (lbm_mh_get_info), (lbm_mh_parse_mailbox),
+	(lbm_mh_free_message_info), (libbalsa_mailbox_mh_check),
+	(lbm_mh_flag_line), (libbalsa_mailbox_mh_sync): ditto.
 	* src/balsa-message.c: (display_part): ensure UTF-8.
 	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
 	ditto.

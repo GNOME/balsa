@@ -47,18 +47,19 @@
 #include "i18n.h"
 
 struct message_info {
+    LibBalsaMailboxLocalMessageInfo local_info;
+    LibBalsaMessageFlag orig_flags;     /* Has only real flags */
     off_t start;
     off_t status;		/* Offset of the "Status:" header. */
     off_t x_status;		/* Offset of the "X-Status:" header. */
     off_t mime_version;		/* Offset of the "MIME-Version:" header. */
     off_t end;
     size_t from_len;
-    LibBalsaMessage *message; /* registers only referenced messages
-			       * to avoid having two objects refering 
-			       * to a single physical message. */
-    LibBalsaMessageFlag flags;
-    LibBalsaMessageFlag orig_flags;
 };
+
+#define REAL_FLAGS(flags) ((flags) & LIBBALSA_MESSAGE_FLAGS_REAL)
+#define FLAGS_REALLY_DIFFER(orig_flags, flags) \
+    ((((orig_flags) ^ (flags)) & LIBBALSA_MESSAGE_FLAGS_REAL) != 0)
 
 static LibBalsaMailboxLocalClass *parent_class = NULL;
 
@@ -78,11 +79,11 @@ static void libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
 static void libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox);
 static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox,
                                            gboolean expunge);
-static LibBalsaMessage *lbm_mbox_get_message(LibBalsaMailbox * mailbox,
-                                             guint msgno);
-static LibBalsaMessageFlag lbm_mbox_load_message(LibBalsaMailboxLocal * local,
-                                                 guint msgno,
-                                                 LibBalsaMessage **msg);
+
+/* LibBalsaMailboxLocal class methods */
+static LibBalsaMailboxLocalMessageInfo
+    *lbm_mbox_get_info(LibBalsaMailboxLocal * local, guint msgno);
+
 static gboolean
 libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
                                               LibBalsaMessage * message,
@@ -92,16 +93,6 @@ static gboolean libbalsa_mailbox_mbox_add_message(LibBalsaMailbox *
                                                   GMimeStream * stream,
                                                   LibBalsaMessageFlag
                                                   flags, GError ** err);
-static gboolean
-libbalsa_mailbox_mbox_messages_change_flags(LibBalsaMailbox * mailbox,
-                                            GArray * msgnos,
-                                            LibBalsaMessageFlag set,
-                                            LibBalsaMessageFlag clear);
-static gboolean
-libbalsa_mailbox_mbox_msgno_has_flags(LibBalsaMailbox * mailbox,
-                                      guint msgno,
-                                      LibBalsaMessageFlag set,
-                                      LibBalsaMessageFlag unset);
 static guint
 libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox);
 #if BALSA_USE_THREADS
@@ -170,14 +161,9 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_class->sync = libbalsa_mailbox_mbox_sync;
     libbalsa_mailbox_class->close_mailbox =
 	libbalsa_mailbox_mbox_close_mailbox;
-    libbalsa_mailbox_class->get_message = lbm_mbox_get_message;
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_mbox_fetch_message_structure;
     libbalsa_mailbox_class->add_message = libbalsa_mailbox_mbox_add_message;
-    libbalsa_mailbox_class->messages_change_flags =
-	libbalsa_mailbox_mbox_messages_change_flags;
-    libbalsa_mailbox_class->msgno_has_flags =
-	libbalsa_mailbox_mbox_msgno_has_flags;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mbox_total_messages;
 #if BALSA_USE_THREADS
@@ -188,7 +174,7 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mbox_remove_files;
 
-    libbalsa_mailbox_local_class->load_message = lbm_mbox_load_message;
+    libbalsa_mailbox_local_class->get_info = lbm_mbox_get_info;
 }
 
 
@@ -479,7 +465,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 				   lbm_mbox_header_cb, &msg_info_p);
 
     libbalsa_mailbox_local_set_threading_info(local);
-    msg_info.message = NULL;
+    msg_info.local_info.message = NULL;
     while (!g_mime_parser_eos(gmime_parser)) {
 	GMimeMessage *mime_message;
         LibBalsaMessage *msg;
@@ -516,7 +502,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
         if (!msg)
             continue;
 
-        msg_info.flags = msg_info.orig_flags;
+        msg_info.local_info.flags = msg_info.orig_flags;
         g_ptr_array_add(mbox->msgno_2_msg_info,
                         g_memdup(&msg_info, sizeof(msg_info)));
         mbox->messages_info_changed = TRUE;
@@ -547,12 +533,12 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 static void
 free_message_info(struct message_info *msg_info)
 {
-    if (msg_info->message) {
-	msg_info->message->mailbox = NULL;
-	msg_info->message->msgno   = 0;
-        g_object_remove_weak_pointer(G_OBJECT(msg_info->message),
-                                     (gpointer) & msg_info->message);
-	msg_info->message = NULL;
+    if (msg_info->local_info.message) {
+	msg_info->local_info.message->mailbox = NULL;
+	msg_info->local_info.message->msgno   = 0;
+        g_object_remove_weak_pointer(G_OBJECT(msg_info->local_info.message),
+                                     (gpointer) & msg_info->local_info.message);
+	msg_info->local_info.message = NULL;
     }
 }
 
@@ -611,7 +597,7 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
 
     end = 0;
     do {
-        msg_info->message = NULL;
+        msg_info->local_info.message = NULL;
         if (msg_info->start != end)
             /* Error: this message doesn't start at the end of the
              * previous one. */
@@ -1035,8 +1021,8 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
         msg_info = message_info_from_msgno(mbox, msgno);
         start = msg_info->start;
 
-        if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-            && !(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+        if ((msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_NEW)
+            && !(msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED))
             --mailbox->unread_messages;
 
 	/* We must drop the mime-stream lock to call
@@ -1236,7 +1222,7 @@ lbm_mbox_rewrite_in_place(struct message_info *msg_info,
 
     /* Get the flags for the "Status" header. */
     header = g_string_new(NULL);
-    lbm_mbox_status_hdr(msg_info->flags, 0, header);
+    lbm_mbox_status_hdr(msg_info->local_info.flags, 0, header);
     g_assert(header->len <= 3);
 
     if (!lbm_mbox_rewrite_helper(msg_info->status, stream, header,
@@ -1248,7 +1234,7 @@ lbm_mbox_rewrite_in_place(struct message_info *msg_info,
 
     /* Get the flags for the "X-Status" header. */
     g_string_truncate(header, 0);
-    lbm_mbox_x_status_hdr(msg_info->flags, 0, header);
+    lbm_mbox_x_status_hdr(msg_info->local_info.flags, 0, header);
     g_assert(header->len <= 3);
 
     if (!lbm_mbox_rewrite_helper(msg_info->x_status, stream, header,
@@ -1269,7 +1255,7 @@ lbm_mbox_rewrite_in_place(struct message_info *msg_info,
 	g_mime_stream_seek(stream, msg_info->x_status, GMIME_STREAM_SEEK_SET);
 	g_mime_stream_write(stream, x_status_buf, sizeof(x_status_buf));
     }
-    msg_info->orig_flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
+    msg_info->orig_flags = REAL_FLAGS(msg_info->local_info.flags);
     return TRUE;
 }
 
@@ -1412,13 +1398,13 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     {
 	msg_info = message_info_from_msgno(mbox, i + 1);
 	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
-	    msg_info->flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
-	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+	    msg_info->local_info.flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
+	if (expunge && (msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    break;
 	if (first < 0 && (msg_info->status < 0 || msg_info->x_status < 0))
 	    first = i;
-        if ((msg_info->orig_flags ^ msg_info->flags)
-            & LIBBALSA_MESSAGE_FLAGS_REAL) {
+        if (FLAGS_REALLY_DIFFER(msg_info->orig_flags,
+                                msg_info->local_info.flags)) {
 	    gboolean can_rewrite_in_place;
 
 	    libbalsa_mime_stream_shared_lock(mbox_stream);
@@ -1471,7 +1457,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	guint status_len, x_status_len;
 
 	msg_info = message_info_from_msgno(mbox, i + 1);
-	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED))
+	if (expunge && (msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    continue;
 
 	if (msg_info->status >= 0) {
@@ -1498,12 +1484,12 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	if (msg_info->status <= msg_info->x_status) {
 	    if (!lbm_mbox_copy_stream(mbox, msg_info->start,
 				      msg_info->status, temp_stream)
-		|| !lbm_mbox_write_status_hdr(temp_stream, msg_info->flags)
+		|| !lbm_mbox_write_status_hdr(temp_stream, msg_info->local_info.flags)
 		|| !lbm_mbox_copy_stream(mbox,
 					 msg_info->status + status_len,
 					 msg_info->x_status, temp_stream)
 		|| !lbm_mbox_write_x_status_hdr(temp_stream,
-						msg_info->flags)
+						msg_info->local_info.flags)
 		|| !lbm_mbox_copy_stream(mbox,
 					 msg_info->x_status +
 					 x_status_len, msg_info->end,
@@ -1513,12 +1499,12 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    if (!lbm_mbox_copy_stream(mbox, msg_info->start,
 				      msg_info->x_status, temp_stream)
 		|| !lbm_mbox_write_x_status_hdr(temp_stream,
-						msg_info->flags)
+						msg_info->local_info.flags)
 		|| !lbm_mbox_copy_stream(mbox,
 					 msg_info->x_status +
 					 x_status_len,
 					 msg_info->status, temp_stream)
-		|| !lbm_mbox_write_status_hdr(temp_stream, msg_info->flags)
+		|| !lbm_mbox_write_status_hdr(temp_stream, msg_info->local_info.flags)
 		|| !lbm_mbox_copy_stream(mbox,
 					 msg_info->status + status_len,
 					 msg_info->end, temp_stream))
@@ -1598,7 +1584,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	for (j = first; j < mbox->msgno_2_msg_info->len; ) {
 	    msg_info = message_info_from_msgno(mbox, j + 1);
 	    if (expunge &&
-		(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
+		(msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	        libbalsa_mailbox_local_msgno_removed(mailbox, j + 1);
 		free_message_info(msg_info);
 		g_ptr_array_remove_index(mbox->msgno_2_msg_info, j);
@@ -1630,7 +1616,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         gchar *from;
 
 	msg_info = message_info_from_msgno(mbox, j + 1);
-	if (expunge && (msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
+	if (expunge && (msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	    /* We must drop the mime-stream lock to call
 	     * libbalsa_mailbox_local_msgno_removed(), as it will grab
 	     * the gdk lock to emit gtk signals; we save and restore the
@@ -1646,8 +1632,8 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
             mbox->messages_info_changed = TRUE;
 	    continue;
 	}
-	if (msg_info->message)
-	    msg_info->message->msgno = j + 1;
+	if (msg_info->local_info.message)
+	    msg_info->local_info.message->msgno = j + 1;
 	j++;
 
 	msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
@@ -1666,18 +1652,18 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         msg_info->from_len = strlen(from) + 1;
         g_free(from);
 	msg_info->end = g_mime_parser_tell(gmime_parser);
-	msg_info->orig_flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
+	msg_info->orig_flags = REAL_FLAGS(msg_info->local_info.flags);
 	g_assert(mime_msg != NULL);
 	g_assert(mime_msg->mime_part != NULL);
-	if (!msg_info->message || !msg_info->message->mime_msg)
+	if (!msg_info->local_info.message || !msg_info->local_info.message->mime_msg)
 	    g_object_unref(mime_msg);
 	else {
-	    g_object_unref(msg_info->message->mime_msg);
-	    msg_info->message->mime_msg = mime_msg;
+	    g_object_unref(msg_info->local_info.message->mime_msg);
+	    msg_info->local_info.message->mime_msg = mime_msg;
 	    /*
 	     * reinit the message parts info
 	     */
-	    libbalsa_message_body_set_mime_body(msg_info->message->body_list,
+	    libbalsa_message_body_set_mime_body(msg_info->local_info.message->body_list,
 						mime_msg->mime_part);
 	}
     }
@@ -1689,42 +1675,13 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     return TRUE;
 }
 
-static LibBalsaMessage *
-lbm_mbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
-{
-    LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
-    struct message_info *msg_info;
-    LibBalsaMessage *message;
-
-    msg_info = message_info_from_msgno(mbox, msgno);
-
-    message = msg_info->message;
-    if (message)
-        return g_object_ref(message);
-
-    msg_info->message = message = libbalsa_message_new();
-    g_object_add_weak_pointer(G_OBJECT(message),
-                              (gpointer) & msg_info->message);
-
-    message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
-    message->mailbox = mailbox;
-    message->msgno = msgno;
-    libbalsa_message_load_envelope(message);
-
-    return message;
-}
-
-static LibBalsaMessageFlag
-lbm_mbox_load_message(LibBalsaMailboxLocal * local, guint msgno,
-                      LibBalsaMessage ** msg)
+static LibBalsaMailboxLocalMessageInfo *
+lbm_mbox_get_info(LibBalsaMailboxLocal * local, guint msgno)
 {
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(local);
     struct message_info *msg_info = message_info_from_msgno(mbox, msgno);
 
-    if (msg_info->message)
-        *msg = g_object_ref(msg_info->message);
-
-    return msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
+    return &msg_info->local_info;
 }
 
 static gboolean
@@ -1998,65 +1955,6 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     g_object_unref(dest);
 
     return retval >= 0;
-}
-
-static gboolean
-libbalsa_mailbox_mbox_messages_change_flags(LibBalsaMailbox * mailbox,
-                                            GArray * msgnos,
-                                            LibBalsaMessageFlag set,
-                                            LibBalsaMessageFlag clear)
-{
-    guint i;
-    guint changed = 0;
-
-    for (i = 0; i < msgnos->len; i++) {
-        guint msgno = g_array_index(msgnos, guint, i);
-        struct message_info *msg_info =
-            message_info_from_msgno(LIBBALSA_MAILBOX_MBOX(mailbox), msgno);
-        LibBalsaMessageFlag old_flags = msg_info->flags;
-        gboolean was_unread_undeleted, is_unread_undeleted;
-
-        msg_info->flags |= set;
-        msg_info->flags &= ~clear;
-        if (!((old_flags ^ msg_info->flags) & LIBBALSA_MESSAGE_FLAGS_REAL))
-	    /* No real flags changed. */
-            continue;
-        ++changed;
-
-        if (msg_info->message)
-            msg_info->message->flags =
-		msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
-
-        libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
-
-        was_unread_undeleted = (old_flags & LIBBALSA_MESSAGE_FLAG_NEW)
-            && !(old_flags & LIBBALSA_MESSAGE_FLAG_DELETED);
-        is_unread_undeleted = (msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-            && !(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED);
-        mailbox->unread_messages +=
-            is_unread_undeleted - was_unread_undeleted;
-    }
-
-    if (changed > 0) {
-        libbalsa_mailbox_set_unread_messages_flag(mailbox,
-                                                  mailbox->unread_messages
-                                                  > 0);
-        libbalsa_mailbox_local_queue_sync(LIBBALSA_MAILBOX_LOCAL(mailbox));
-    }
-
-    return TRUE;
-}
-
-static gboolean
-libbalsa_mailbox_mbox_msgno_has_flags(LibBalsaMailbox * mailbox,
-                                      guint msgno, LibBalsaMessageFlag set,
-                                      LibBalsaMessageFlag unset)
-{
-    struct message_info *msg_info =
-        message_info_from_msgno(LIBBALSA_MAILBOX_MBOX(mailbox), msgno);
-
-    return (msg_info->flags & set) == set
-        && (msg_info->flags & unset) == 0;
 }
 
 static guint

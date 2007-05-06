@@ -44,6 +44,19 @@ GType libbalsa_mailbox_local_get_type(void);
 typedef struct _LibBalsaMailboxLocal LibBalsaMailboxLocal;
 typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 
+struct _LibBalsaMailboxLocalPool {
+    LibBalsaMessage * message;
+    guint pool_seqno;
+};
+typedef struct _LibBalsaMailboxLocalPool LibBalsaMailboxLocalPool;
+#define LBML_POOL_SIZE 32
+
+struct _LibBalsaMailboxLocalMessageInfo {
+    LibBalsaMessageFlag flags;          /* May have pseudo-flags */
+    LibBalsaMessage *message;
+};
+typedef struct _LibBalsaMailboxLocalMessageInfo LibBalsaMailboxLocalMessageInfo;
+
 struct _LibBalsaMailboxLocal {
     LibBalsaMailbox mailbox;
 
@@ -56,18 +69,19 @@ struct _LibBalsaMailboxLocal {
     guint thread_id;    /* id of the idle mailbox thread job */
     guint save_tree_id; /* id of the idle mailbox save-tree job */
     GPtrArray *threading_info;
+    LibBalsaMailboxLocalPool message_pool[LBML_POOL_SIZE];
+    guint pool_seqno;
 };
 
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
-    LibBalsaMessageFlag (*load_message)(LibBalsaMailboxLocal * local,
-                                        guint msgno,
-                                        LibBalsaMessage ** msg);
     gint (*check_files)(const gchar * path, gboolean create);
     void (*set_path)(LibBalsaMailboxLocal * local, const gchar * path);
     void (*remove_files)(LibBalsaMailboxLocal * local);
     guint (*fileno)(LibBalsaMailboxLocal * local, guint msgno);
+    LibBalsaMailboxLocalMessageInfo *(*get_info)(LibBalsaMailboxLocal * local,
+                                                 guint msgno);
 };
 
 GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
@@ -97,8 +111,5 @@ GMimeStream *libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *
 						       mailbox,
 						       const gchar * name1,
 						       const gchar * name2);
-
-/* Queued sync. */
-void libbalsa_mailbox_local_queue_sync(LibBalsaMailboxLocal * local);
 
 #endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */

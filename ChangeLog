@@ -1,5 +1,8 @@
 2007-05-06  Peter Bloomfield
 
+	* libbalsa/html.h: compile with GtkHtml3 and GtkPrint.
+	* libbalsa/mailbox.c: (libbalsa_mailbox_get_message): compile
+	with threads disabled.
 	* libbalsa/mailbox.h: remove LB_MAILBOX_STATE_TREECLEANING from
 	LibBalsaMailboxState enum.
 	* libbalsa/mailbox.c: (libbalsa_mailbox_msgno_filt_out),

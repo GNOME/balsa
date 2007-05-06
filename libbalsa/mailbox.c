@@ -1705,9 +1705,14 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
         return NULL;
     }
 
+#ifdef BALSA_USE_THREADS
     g_return_val_if_fail(msgno > 0 && msgno <=
                          libbalsa_mailbox_total_messages(mailbox),
                          (libbalsa_unlock_mailbox(mailbox), NULL));
+#else                           /* BALSA_USE_THREADS */
+    g_return_val_if_fail(msgno > 0 && msgno <=
+                         libbalsa_mailbox_total_messages(mailbox), NULL);
+#endif                          /* BALSA_USE_THREADS */
 
     message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
                                                                msgno);

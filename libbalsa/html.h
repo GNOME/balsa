@@ -37,7 +37,7 @@ typedef enum {
 
 # ifdef HAVE_GTKHTML
 /* PRINTING support available only for GTKHTML3.  */
-#ifdef HAVE_GTKHTML3
+#if defined(HAVE_GTKHTML3) && !defined(HAVE_GTK_PRINT)
 #  include <libgnomeprint/gnome-print.h>
 #else
 typedef void GnomePrintContext;

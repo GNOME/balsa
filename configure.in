@@ -343,6 +343,8 @@ if test x"$use_gtkhtml" != xno ; then
             AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
         else
             AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
+	    CFLAGS="$CFLAGS $HTML_CFLAGS"
+	    LIBS="$LIBS $HTML_LIBS"
             AC_CHECK_LIB(gtkhtml-$i, gtk_html_print_page_with_header_footer,
                          AC_DEFINE(HAVE_GTKHTML3_GTKPRINT,1,
                                    [Defined when GtkHtml-3 supports GtkPrint.]))

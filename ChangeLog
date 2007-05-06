@@ -1,3 +1,7 @@
+2007-05-06  Albrecht Dreß
+
+	* configure.in: add HTML flags and libs.
+
 2007-05-06  Peter Bloomfield
 
 	* libbalsa/html.h: compile with GtkHtml3 and GtkPrint.

@@ -1085,10 +1085,14 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0 &&
             body->embhdrs) {
             gchar *from = balsa_message_sender_to_gchar(body->embhdrs->from, 0);
+            gchar *subj = g_strdup(body->embhdrs->subject);
+            libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit, NULL);
+            libbalsa_utf8_sanitize(&subj, balsa_app.convert_unknown_8bit, NULL);
             icon_title = 
                 g_strdup_printf(_("rfc822 message (from %s, subject \"%s\")"),
-                                from, body->embhdrs->subject);
+                                from, subj);
             g_free(from);
+            g_free(subj);
         } else if (is_multipart) {
             icon_title = mpart_content_name(content_type);
 	    if (!strcmp(part_id, "1")) {

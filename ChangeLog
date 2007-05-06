@@ -1,5 +1,8 @@
 2007-05-06  Peter Bloomfield
 
+	* src/balsa-message.c: (display_part): ensure UTF-8.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
+	ditto.
 	* configure.in: detect GMime version 2.2.7
 	* libbalsa/misc.c: (libbalsa_set_fallback_codeset): use
 	g_mime_set_user_charsets when it's available.

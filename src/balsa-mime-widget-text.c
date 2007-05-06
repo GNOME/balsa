@@ -107,6 +107,8 @@ static gboolean draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList 
 #define PHRASE_HIGHLIGHT_ON    1
 #define PHRASE_HIGHLIGHT_OFF   2
 
+#define BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED \
+    "balsa-mime-widget-text-new-notified"
 
 BalsaMimeWidget *
 balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
@@ -156,12 +158,16 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     /* prepare a text part */
     if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
-				&target_cs)) {
+				&target_cs)
+        && !g_object_get_data(G_OBJECT(bm->message), 
+                              BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED)) {
 	gchar *from =
 	    balsa_message_sender_to_gchar(bm->message->headers->from, 0);
 	gchar *subject =
 	    g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
         
+	libbalsa_utf8_sanitize(&from,    balsa_app.convert_unknown_8bit, 
+			       NULL);
 	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
 			       NULL);
 	libbalsa_information
@@ -173,6 +179,10 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	     target_cs ? target_cs : "\"?\"");
 	g_free(subject);
 	g_free(from);
+        /* Avoid multiple notifications: */
+        g_object_set_data(G_OBJECT(bm->message),
+                          BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED, 
+                          GUINT_TO_POINTER(TRUE));
     }
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);

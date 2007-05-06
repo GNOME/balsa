@@ -4907,6 +4907,7 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     BalsaIndex* index;
     LibBalsaMailbox* mailbox;
     BalsaIndex *orig_index;
+    GArray *selected;
     LibBalsaMailbox* orig_mailbox;
 
     if (!selection_data)
@@ -4914,10 +4915,13 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
 	return;
 
     orig_index = *(BalsaIndex **) selection_data->data;
-    if (orig_index->selected->len == 0)
+    selected = balsa_index_selected_msgnos(orig_index);
+    if (selected->len == 0) {
         /* it is actually possible to drag from GtkTreeView when no rows
          * are selected: Disable preview for that. */
+        g_array_free(selected, TRUE);
         return;
+    }
 
     orig_mailbox = orig_index->mailbox_node->mailbox;
 
@@ -4929,8 +4933,9 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     mailbox = index->mailbox_node->mailbox;
 
     if (mailbox != NULL && mailbox != orig_mailbox)
-        balsa_index_transfer(orig_index, orig_index->selected, mailbox,
+        balsa_index_transfer(orig_index, selected, mailbox,
                              context->action != GDK_ACTION_MOVE);
+    g_array_free(selected, TRUE);
 }
 
 static gboolean

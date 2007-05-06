@@ -57,16 +57,15 @@ extern "C" {
         GtkWidget *move_to_item;
 
         BalsaMailboxNode* mailbox_node;
+        guint current_msgno;
         LibBalsaMessage* current_message;
 	gboolean current_message_is_deleted;
         gboolean prev_message;
         gboolean next_message;
-	GArray *selected;
         int    filter_no;
         gchar *filter_string; /* Quick view filter string, if any */
 
         /* signal handler ids */
-        gulong selection_changed_id;
         gulong row_expanded_id;
         gulong row_collapsed_id;
 
@@ -147,6 +146,7 @@ extern "C" {
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
     void balsa_index_set_column_widths(BalsaIndex * index);
     GList * balsa_index_selected_list(BalsaIndex * index);
+    GArray * balsa_index_selected_msgnos(BalsaIndex * index);
     void balsa_index_move_subtree(BalsaIndex * index,
                                   GtkTreePath * root,
                                   GtkTreePath * new_parent);

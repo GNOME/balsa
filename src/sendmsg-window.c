@@ -2451,10 +2451,11 @@ attachments_add(GtkWidget * widget,
     if (info == TARGET_MESSAGES) {
 	BalsaIndex *index = *(BalsaIndex **) selection_data->data;
 	LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
+        GArray *selected = balsa_index_selected_msgnos(index);
 	gint i;
         
-	for (i = index->selected->len; --i >= 0;) {
-	    guint msgno = g_array_index(index->selected, guint, i);
+	for (i = selected->len; --i >= 0;) {
+	    guint msgno = g_array_index(selected, guint, i);
 	    LibBalsaMessage *message =
 		libbalsa_mailbox_get_message(mailbox, msgno);
             if(!attach_message(bsmsg, message))
@@ -2463,6 +2464,7 @@ attachments_add(GtkWidget * widget,
                                        "Possible reason: not enough temporary space"));
 	    g_object_unref(message);
         }
+        g_array_free(selected, TRUE);
     } else if (info == TARGET_URI_LIST) {
         GSList *uri_list = uri2gslist((gchar *) selection_data->data);
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
@@ -3006,6 +3008,7 @@ drag_data_quote(GtkWidget * widget,
     GtkTextBuffer *buffer;
     BalsaIndex *index;
     LibBalsaMailbox *mailbox;
+    GArray *selected;
     gint i;
 
     if (context->action == GDK_ACTION_ASK)
@@ -3015,10 +3018,11 @@ drag_data_quote(GtkWidget * widget,
     case TARGET_MESSAGES:
 	index = *(BalsaIndex **) selection_data->data;
 	mailbox = index->mailbox_node->mailbox;
+        selected = balsa_index_selected_msgnos(index);
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
        
-	for (i = index->selected->len; --i >= 0;) {
-	    guint msgno = g_array_index(index->selected, guint, i);
+	for (i = selected->len; --i >= 0;) {
+	    guint msgno = g_array_index(selected, guint, i);
 	    LibBalsaMessage *message;
             GString *body;
 
@@ -3028,6 +3032,7 @@ drag_data_quote(GtkWidget * widget,
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
         }
+        g_array_free(selected, TRUE);
         break;
     case TARGET_URI_LIST: {
         GSList *uri_list = uri2gslist((gchar *) selection_data->data);

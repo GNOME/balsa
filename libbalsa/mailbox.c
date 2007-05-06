@@ -1378,7 +1378,6 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
-    LibBalsaMailboxState saved_state;
     GNode *child, *parent, *node;
 
     lbm_threads_enter(mailbox);
@@ -1402,8 +1401,6 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     /* First promote any children to the node's parent; we'll insert
      * them all before the current node, to keep the path calculation
      * simple. */
-    saved_state = mailbox->state;
-    mailbox->state = LB_MAILBOX_STATE_TREECLEANING;
     parent = node->parent;
     while ((child = node->children)) {
         /* No need to notify the tree-view about unlinking the child--it
@@ -1422,7 +1419,6 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
                           0, path, &iter);
         gtk_tree_path_next(path);
     }
-    mailbox->state = saved_state;
 
     /* Now it's safe to destroy the node. */
     g_node_destroy(node);
@@ -1699,10 +1695,20 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
-    g_return_val_if_fail(msgno > 0 && msgno <=
-                         libbalsa_mailbox_total_messages(mailbox), NULL);
 
     libbalsa_lock_mailbox(mailbox);
+
+    if (!MAILBOX_OPEN(mailbox)) {
+        g_message(_("libbalsa_mailbox_get_message: mailbox %s is closed"),
+                  mailbox->name);
+        libbalsa_unlock_mailbox(mailbox);
+        return NULL;
+    }
+
+    g_return_val_if_fail(msgno > 0 && msgno <=
+                         libbalsa_mailbox_total_messages(mailbox),
+                         (libbalsa_unlock_mailbox(mailbox), NULL));
+
     message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
                                                                msgno);
     libbalsa_unlock_mailbox(mailbox);
@@ -1987,13 +1993,8 @@ static gboolean
 lbm_set_threading(LibBalsaMailbox * mailbox,
                   LibBalsaMailboxThreadingType thread_type)
 {
-    LibBalsaMailboxState saved_state;
-
     if (!MAILBOX_OPEN(mailbox))
         return FALSE;
-
-    saved_state = mailbox->state;
-    mailbox->state = LB_MAILBOX_STATE_TREECLEANING;
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        thread_type);
@@ -2007,8 +2008,6 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 
     libbalsa_mailbox_changed(mailbox);
     gdk_threads_leave();
-
-    mailbox->state = saved_state;
 
     return TRUE;
 }
@@ -2662,6 +2661,9 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
     for (i = 0; i < mailbox->msgnos_pending->len; i++) {
         guint msgno = g_array_index(mailbox->msgnos_pending, guint, i);
         LibBalsaMessage *message;
+
+        if (!MAILBOX_OPEN(mailbox))
+            break;
 
         pthread_mutex_unlock(&get_index_entry_lock);
         if ( (message = libbalsa_mailbox_get_message(mailbox, msgno)) ) {

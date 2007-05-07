@@ -2211,7 +2211,8 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                  _("Sending the disposition notification failed: %s"),
                                  error ? error->message : "?");
-        g_error_free(error);
+        if (error)
+            g_error_free(error);
     }
     g_object_unref(G_OBJECT(send_msg));
     gtk_widget_destroy(dialog);

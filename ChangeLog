@@ -1,3 +1,10 @@
+2007-05-07  Peter Bloomfield
+
+	* libbalsa/misc.c: (libbalsa_set_fallback_codeset): include
+	UTF-8 as a charset.
+	* src/balsa-message.c: (mdn_dialog_response): do not clear NULL
+	error.
+
 2007-05-06  Albrecht Dreß
 
 	* configure.in: add HTML flags and libs.

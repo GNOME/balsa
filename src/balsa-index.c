@@ -456,11 +456,14 @@ static void
 bndx_change_flags(BalsaIndex * index, LibBalsaMessageFlag set,
                   LibBalsaMessageFlag clear)
 {
-    GArray *msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
-    g_array_append_val(msgnos, index->current_message->msgno);
-    libbalsa_mailbox_messages_change_flags(index->mailbox_node->mailbox,
-                                           msgnos, set, clear);
-    g_array_free(msgnos, TRUE);
+    if (index->current_message->msgno) {
+        GArray *msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
+        g_array_append_val(msgnos, index->current_message->msgno);
+        libbalsa_mailbox_messages_change_flags(index->current_message->
+                                               mailbox, msgnos, set,
+                                               clear);
+        g_array_free(msgnos, TRUE);
+    }
 }
 
 /* GtkTreeSelectionForeachFunc: */
@@ -693,7 +696,7 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
     GtkTreePath *current_path;
 
     /* If current message has become viewable, reselect it. */
-    if (index->current_message
+    if (index->current_message && index->current_message->msgno
         && libbalsa_mailbox_msgno_find(mailbox,
                                        index->current_message->msgno,
                                        &current_path, NULL)) {

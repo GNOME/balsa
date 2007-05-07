@@ -819,11 +819,9 @@ libbalsa_mailbox_local_get_message(LibBalsaMailbox * mailbox, guint msgno)
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
     LibBalsaMailboxLocalMessageInfo *msg_info =
         LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info(local, msgno);
-    LibBalsaMessage *message;
 
-    message = msg_info->message;
-    if (message)
-        return g_object_ref(message);
+    if (msg_info->message)
+        return g_object_ref(msg_info->message);
 
     lbm_local_get_message_with_msg_info(local, msgno, msg_info);
 
@@ -2150,10 +2148,18 @@ libbalsa_mailbox_local_messages_change_flags(LibBalsaMailbox * mailbox,
 
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
-        LibBalsaMailboxLocalMessageInfo *msg_info = get_info(local, msgno);
-        LibBalsaMessageFlag old_flags = msg_info->flags;
+        LibBalsaMailboxLocalMessageInfo *msg_info;
+        LibBalsaMessageFlag old_flags;
         gboolean was_unread_undeleted, is_unread_undeleted;
 
+        if (!(msgno > 0
+              && msgno <= libbalsa_mailbox_total_messages(mailbox))) {
+            g_warning("msgno %u out of range", msgno);
+            continue;
+        }
+
+        msg_info = get_info(local, msgno);
+        old_flags = msg_info->flags;
         msg_info->flags |= set;
         msg_info->flags &= ~clear;
         if (!FLAGS_REALLY_DIFFER(msg_info->flags, old_flags))

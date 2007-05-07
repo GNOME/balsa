@@ -1,5 +1,9 @@
 2007-05-07  Peter Bloomfield
 
+	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_get_message):
+	check msgno.
+	* src/balsa-index.c: (bndx_change_flags), (bndx_tree_expand_cb):
+	ditto.
 	* libbalsa/misc.c: (libbalsa_set_fallback_codeset): include
 	UTF-8 as a charset.
 	* src/balsa-message.c: (mdn_dialog_response): do not clear NULL

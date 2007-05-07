@@ -522,12 +522,13 @@ libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
     LibBalsaCodeset ret = sanitize_fallback_codeset;
 #if defined(HAVE_GMIME_2_2_7)
     const gchar *charsets[] = {
-        "UTF-8",
-        libbalsa_get_codeset_name(NULL, codeset),
+        g_strdup("UTF-8"),
+        g_strdup(libbalsa_get_codeset_name(NULL, codeset)),
         NULL
     };
 
     g_mime_set_user_charsets(charsets);
+    /* GMime will free the strings. */
 #endif                          /* HAVE_GMIME_2_2_7 */
 
     sanitize_fallback_codeset = codeset;

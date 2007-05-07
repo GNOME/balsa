@@ -1,5 +1,7 @@
 2007-05-07  Peter Bloomfield
 
+	* libbalsa/misc.c: (libbalsa_set_fallback_codeset): allocate the
+	charset strings.
 	* libbalsa/mailbox_local.c: (libbalsa_mailbox_local_get_message):
 	check msgno.
 	* src/balsa-index.c: (bndx_change_flags), (bndx_tree_expand_cb):

@@ -114,6 +114,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->always_trust = FALSE;
     ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
 #endif
+    ident->request_mdn = FALSE;
     /*
     ident->face = NULL;
     ident->x_face = NULL;
@@ -959,7 +960,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     gpointer path;
 
     /* create the "General" tab */
-    table = append_ident_notebook_page(notebook, 8, _("General"));
+    table = append_ident_notebook_page(notebook, 5, _("General"));
     row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("_Identity Name:"), 
 		           "identity-name");
@@ -971,12 +972,26 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                            "identity-replyto");
     ident_dialog_add_entry(table, row++, dialog, _("_Domain:"), 
                            "identity-domain");
+
+    /* create the "Messages" tab */
+    table = append_ident_notebook_page(notebook, 8, _("Messages"));
+    row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"), 
                            "identity-bcc");
     ident_dialog_add_entry(table, row++, dialog, _("Reply _String:"), 
                            "identity-replystring");
     ident_dialog_add_entry(table, row++, dialog, _("F_orward String:"), 
                            "identity-forwardstring");
+    ident_dialog_add_checkbutton(table, row++, dialog, 
+                                 _("request _Message Disposition Notification by default"),
+                                 "identity-requestmdn", TRUE);
+    ident_dialog_add_file_chooser_button(table, row++, dialog,
+                                         LBI_PATH_TYPE_FACE);
+    ident_dialog_add_file_chooser_button(table, row++, dialog,
+                                         LBI_PATH_TYPE_XFACE);
+    ident_dialog_add_boxes(table, row++, dialog,
+                           path_info[LBI_PATH_TYPE_FACE].box_key,
+                           path_info[LBI_PATH_TYPE_XFACE].box_key);
 #if ENABLE_ESMTP
     ident_dialog_add_smtp_menu(table, row++, dialog, _("SMT_P Server:"),
                                "identity-smtp-server", smtp_servers);
@@ -1006,13 +1021,6 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("Prepend Si_gnature"),
                                  "identity-sigprepend", FALSE);
-    ident_dialog_add_file_chooser_button(table, row++, dialog,
-                                         LBI_PATH_TYPE_FACE);
-    ident_dialog_add_file_chooser_button(table, row++, dialog,
-                                         LBI_PATH_TYPE_XFACE);
-    ident_dialog_add_boxes(table, row++, dialog,
-                           path_info[LBI_PATH_TYPE_FACE].box_key,
-                           path_info[LBI_PATH_TYPE_XFACE].box_key);
 
 #ifdef HAVE_GPGME
     /* create the "Security" tab */
@@ -1462,7 +1470,8 @@ ident_dialog_update(GObject * dlg)
     id->face            = ident_dialog_get_path(dlg, "identity-facepath");
     g_free(id->x_face);
     id->x_face          = ident_dialog_get_path(dlg, "identity-xfacepath");
-    
+    id->request_mdn     = ident_dialog_get_bool(dlg, "identity-requestmdn");
+
 #ifdef HAVE_GPGME
     id->gpg_sign        = ident_dialog_get_bool(dlg, "identity-gpgsign");
     id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
@@ -1837,6 +1846,8 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
     gtk_widget_hide(face_box);
     display_frame_set_path(dialog, path_info[LBI_PATH_TYPE_XFACE].path_key,
                            ident->x_face, TRUE);
+    display_frame_set_boolean(dialog, "identity-requestmdn", 
+                              ident->request_mdn);    
 
 #ifdef HAVE_GPGME
     display_frame_set_boolean(dialog, "identity-gpgsign", 
@@ -1939,6 +1950,7 @@ libbalsa_identity_new_config(const gchar* name)
     ident->sig_prepend = libbalsa_conf_get_bool("SigPrepend");
     ident->face = libbalsa_conf_get_string("FacePath");
     ident->x_face = libbalsa_conf_get_string("XFacePath");
+    ident->request_mdn = libbalsa_conf_get_bool("RequestMDN");
 
 #ifdef HAVE_GPGME
     ident->gpg_sign = libbalsa_conf_get_bool("GpgSign");
@@ -1983,6 +1995,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
         libbalsa_conf_set_string("FacePath", ident->face);
     if (ident->x_face)
         libbalsa_conf_set_string("XFacePath", ident->x_face);
+    libbalsa_conf_set_bool("RequestMDN", ident->request_mdn);
 
 #ifdef HAVE_GPGME
     libbalsa_conf_set_bool("GpgSign", ident->gpg_sign);

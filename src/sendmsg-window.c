@@ -1560,6 +1560,9 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
                                       ident->domain);
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(bsmsg->bcc[1]),
                                       ident->domain);
+
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(DISPNOTIFY_WIDGET),
+				    ident->request_mdn);
 }
 
 

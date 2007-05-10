@@ -866,6 +866,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 		old_file = g_build_filename(path, tmp, NULL);
 		g_free(tmp);
 
+                msg_info->orig_flags =
+                    REAL_FLAGS(msg_info->local_info.flags);
+
 		tmp = MH_BASENAME(msg_info);
 		new_file = g_build_filename(path, tmp, NULL);
 		g_free(tmp);
@@ -876,8 +879,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
 		g_free(old_file);
 		g_free(new_file);
-	    }
-            msg_info->orig_flags = REAL_FLAGS(msg_info->local_info.flags);
+	    } else
+                msg_info->orig_flags =
+                    REAL_FLAGS(msg_info->local_info.flags);
 	    msgno++;
 	}
     }

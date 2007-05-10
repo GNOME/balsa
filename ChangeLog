@@ -1,5 +1,7 @@
 2007-05-10  Peter Bloomfield
 
+	* libbalsa/mailbox_mh.c: (libbalsa_mailbox_mh_sync): rename
+	message files correctly.
 	* libbalsa/mailbox_local.c: (lbm_local_save_tree),
 	(libbalsa_mailbox_local_close_mailbox): really check for empty
 	tree; always save tree on closing.

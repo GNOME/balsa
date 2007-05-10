@@ -1,3 +1,13 @@
+2007-05-09  Albrecht Dreß
+
+	* libbalsa/identity.h: add request_mdn field (request MDN by
+	default).
+	* libbalsa/identity.c: (libbalsa_identity_init),
+	(setup_ident_frame), (ident_dialog_update), (display_frame_update),
+	(libbalsa_identity_new_config), (libbalsa_identity_save): manage
+	it.
+	* src/sendmsg-window.c: (update_bsmsg_identity): use it.
+
 2007-05-07  Peter Bloomfield
 
 	* libbalsa/misc.c: (libbalsa_set_fallback_codeset): allocate the

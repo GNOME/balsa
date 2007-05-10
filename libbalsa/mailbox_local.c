@@ -524,7 +524,7 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
 
     filename = lbm_local_get_cache_filename(local);
 
-    if (libbalsa_mailbox_get_total(mailbox) == 0
+    if (!mailbox->msg_tree->children
         || (libbalsa_mailbox_get_threading_type(mailbox) ==
             LB_MAILBOX_THREADING_FLAT
             && libbalsa_mailbox_get_sort_field(mailbox) ==
@@ -782,8 +782,8 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
         /* Save immediately. */
         g_source_remove(local->save_tree_id);
         local->save_tree_id = 0;
-        lbm_local_save_tree(local);
     }
+    lbm_local_save_tree(local);
 
     if (local->threading_info) {
 	/* Free the memory owned by local->threading_info, but neither

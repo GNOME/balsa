@@ -1,3 +1,9 @@
+2007-05-10  Peter Bloomfield
+
+	* libbalsa/mailbox_local.c: (lbm_local_save_tree),
+	(libbalsa_mailbox_local_close_mailbox): really check for empty
+	tree; always save tree on closing.
+
 2007-05-09  Albrecht Dreß
 
 	* libbalsa/identity.h: add request_mdn field (request MDN by

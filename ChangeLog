@@ -1,3 +1,10 @@
+2007-05-11  Peter Bloomfield
+
+	* libbalsa/html.c: (libbalsa_html_print),
+	(libbalsa_html_print_get_pages_num): build on fc6, and on f7test
+	--without-gtkprint.
+	* libbalsa/html.h: ditto.
+
 2007-05-10  Peter Bloomfield
 
 	* libbalsa/mailbox_mh.c: (libbalsa_mailbox_mh_sync): rename

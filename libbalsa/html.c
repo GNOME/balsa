@@ -248,7 +248,8 @@ libbalsa_html_copy(GtkWidget * widget)
  * GtkHTML printing suport.
  */
 
-#if defined(HAVE_GNOME) && !defined(HAVE_GTKHTML3_GTKPRINT)
+#if defined(HAVE_GNOME) && !defined(HAVE_GTK_PRINT)
+#if !defined(HAVE_GTKHTML3_GTKPRINT)
 gboolean
 libbalsa_html_can_print(void)
 {
@@ -284,14 +285,38 @@ libbalsa_html_print_get_pages_num(GtkWidget * widget,
     return gtk_html_print_get_pages_num(GTK_HTML(widget), print_context,
 					header_height, footer_height);
 }
-#else /* HAVE_GNOME */
+#else /* HAVE_GTKHTML3_GTKPRINT */
 gboolean
 libbalsa_html_can_print(void)
 {
     return FALSE;
 }
+/*
+ * Print the page(s) in the widget with a header and a footer.
+ */
+void
+libbalsa_html_print(GtkWidget * widget,
+		    GnomePrintContext * print_context,
+		    gdouble header_height, gdouble footer_height,
+		    LibBalsaHTMLPrintCallback header_print,
+		    LibBalsaHTMLPrintCallback footer_print,
+		    gpointer user_data)
+{
+}
 
-#endif /* HAVE_GNOME */
+/*
+ * Return the number of pages that will be printed.
+ */
+gint
+libbalsa_html_print_get_pages_num(GtkWidget * widget,
+				  GnomePrintContext * print_context,
+				  gdouble header_height,
+				  gdouble footer_height)
+{
+    return 0;
+}
+#endif /* HAVE_GTKHTML3_GTKPRINT */
+#endif /* defined(HAVE_GNOME) && !defined(HAVE_GTK_PRINT) */
 # else				/* HAVE_GTKHTML3 */
 
 /* Code for GtkHtml-2 */
@@ -412,6 +437,7 @@ libbalsa_html_copy(GtkWidget * widget)
 {
 }
 
+#if defined(HAVE_GNOME) && !defined(HAVE_GTK_PRINT)
 /*
  * HtmlView doesn't support printing.
  */
@@ -421,7 +447,6 @@ libbalsa_html_can_print(void)
     return FALSE;
 }
 
-#ifdef HAVE_GNOME
 /*
  * Do nothing.
  */
@@ -446,7 +471,7 @@ libbalsa_html_print_get_pages_num(GtkWidget * widget,
 {
     return 0;
 }
-#endif /* HAVE_GNOME */
+#endif /* defined(HAVE_GNOME) && !defined(HAVE_GTK_PRINT) */
 
 # endif				/* HAVE_GTKHTML3 */
 

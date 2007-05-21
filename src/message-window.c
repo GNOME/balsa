@@ -298,40 +298,30 @@ static void
 message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
 {
     GArray *messages;
-    LibBalsaMessage *original = mw->bindex->current_message;
+    guint original = mw->bindex->current_msgno;
 
     g_return_if_fail(mailbox != NULL);
 
-   /*Transferring to same mailbox? */
+    /* Transferring to same mailbox? */
     if (mw->message->mailbox == mailbox)
-	return;
+        return;
 
     messages = g_array_new(FALSE, FALSE, sizeof(guint));
     g_array_append_val(messages, mw->message->msgno);
     balsa_index_transfer(mw->bindex, messages, mailbox, FALSE);
     g_array_free(messages, TRUE);
 
-    if ( balsa_app.mw_action_after_move == NEXT_UNREAD )
-    {
-        /* Try selecting the next unread message.
-           If there are no more, close the window anyways. */
-        mw_set_selected( mw, ((void (*)(BalsaIndex *)) 
-                              balsa_index_select_next_unread) );
+    if (balsa_app.mw_action_after_move == NEXT_UNREAD)
+        /* Try selecting the next unread message. */
+        mw_set_selected(mw, ((void (*)(BalsaIndex *))
+                             balsa_index_select_next_unread));
+    else if (balsa_app.mw_action_after_move == NEXT)
+        mw_set_selected(mw, balsa_index_select_next);
 
-        if ( mw->bindex->current_message == original )
-            close_message_window(NULL, (gpointer) mw);
-    }
-    else if ( balsa_app.mw_action_after_move == NEXT )
-    {
-        mw_set_selected( mw, balsa_index_select_next );
-
-        if ( mw->bindex->current_message == original )
-            close_message_window(NULL, (gpointer) mw);
-    }
-    else
-    {
+    if (mw->bindex->current_msgno == original)
+        /* Either action-after-move was CLOSE, or we failed to select
+         * another message; either way, we close the window. */
         close_message_window(NULL, (gpointer) mw);
-    }
 }
 
 static void
@@ -884,7 +874,7 @@ select_all_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-mw_set_selected(MessageWindow * mw, void (*select_func)(BalsaIndex *))
+mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
 {
     LibBalsaMessage *message;
     MessageWindow *tmp;
@@ -892,8 +882,9 @@ mw_set_selected(MessageWindow * mw, void (*select_func)(BalsaIndex *))
     balsa_index_select(mw->bindex, mw->message);
     select_func(mw->bindex);
 
-    message = mw->bindex->current_message;
-    g_object_ref(message);
+    message =
+        libbalsa_mailbox_get_message(mw->bindex->mailbox_node->mailbox,
+                                     mw->bindex->current_msgno);
     tmp = g_object_get_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY);
     if (tmp) {
         /*

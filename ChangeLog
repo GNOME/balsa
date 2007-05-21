@@ -1,3 +1,9 @@
+2007-05-21  Peter Bloomfield
+
+	* src/message-window.c: (message_window_move_message),
+	(mw_set_selected): check BalsaIndex::current_msgno instead of
+	BalsaIndex::current_message.
+
 2007-05-11  Peter Bloomfield
 
 	* libbalsa/html.c: (libbalsa_html_print),

@@ -2653,6 +2653,16 @@ libbalsa_size_to_gchar(glong length)
  * HOLDING IT. */
 static pthread_mutex_t get_index_entry_lock = PTHREAD_MUTEX_INITIALIZER;
 
+static void lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno,
+                              GArray * msgnos);
+static void
+lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
+{
+    pthread_mutex_lock(&get_index_entry_lock);
+    lbm_update_msgnos(mailbox, seqno, mailbox->msgnos_pending);
+    pthread_mutex_unlock(&get_index_entry_lock);
+}
+
 static void
 lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 {
@@ -2706,8 +2716,11 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
         return entry->idle_pending ? NULL : entry;
 
     pthread_mutex_lock(&get_index_entry_lock);
-    if (!lmm->msgnos_pending)
+    if (!lmm->msgnos_pending) {
         lmm->msgnos_pending = g_array_new(FALSE, FALSE, sizeof(guint));
+        g_signal_connect(lmm, "message-expunged",
+                         G_CALLBACK(lbm_get_index_entry_expunged_cb), NULL);
+    }
 
     if (!lmm->msgnos_pending->len) {
         pthread_t get_index_entry_thread;

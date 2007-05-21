@@ -1,5 +1,7 @@
 2007-05-21  Peter Bloomfield
 
+	* libbalsa/mailbox.c: (lbm_get_index_entry_expunged_cb),
+	(lbm_get_index_entry): catch expunged and renumbered messages.
 	* src/message-window.c: (message_window_move_message),
 	(mw_set_selected): check BalsaIndex::current_msgno instead of
 	BalsaIndex::current_message.

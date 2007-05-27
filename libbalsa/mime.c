@@ -1114,7 +1114,6 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
 	do
 	    gtk_text_buffer_insert(buffer, &start, ">", 1);
 	while (--quote_depth);
-	gtk_text_buffer_insert(buffer, &start, " ", 1);
     }
     g_free(line);
 

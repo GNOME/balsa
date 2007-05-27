@@ -1,3 +1,9 @@
+* Balsa-2.3.16 release. Release date 2007-05-27
+
+- fix message threading regression.
+- reorganize "Identity" dialog.
+- code cleanup.
+
 * Balsa-2.3.15 release. Release date 2007-05-01
 
 - Use GtkPrint infrastructure if available.

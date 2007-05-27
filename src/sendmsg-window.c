@@ -3375,7 +3375,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
 	body = content2reply(root,
                              qtype == QUOTE_ALL ? balsa_app.quote_str : NULL,
-			     balsa_app.wordwrap ? balsa_app.wraplength : -1,
+			     bsmsg->flow ? -1 : balsa_app.wraplength,
 			     balsa_app.reply_strip_html, bsmsg->flow,
 			     sw_charset_cb, bsmsg);
 	if (body) {
@@ -4110,7 +4110,7 @@ sendmsg_window_new(GtkWidget *w)
     bsmsg->undo_widget = edit_menu[EDIT_MENU_UNDO].widget;
     bsmsg->redo_widget = edit_menu[EDIT_MENU_REDO].widget;
 
-    bsmsg->flow = balsa_app.wordwrap;
+    bsmsg->flow = !balsa_app.wordwrap;
     bsmsg->flow_widget = edit_menu[EDIT_MENU_REFLOW_SELECTED].widget;
     gtk_widget_set_sensitive(bsmsg->flow_widget, bsmsg->flow);
 
@@ -4142,7 +4142,7 @@ sendmsg_window_new(GtkWidget *w)
                                    FALSE);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                    (opts_menu[OPTS_MENU_FORMAT_POS].
-                                    widget), balsa_app.wordwrap);
+                                    widget), bsmsg->flow);
 
 #ifdef HAVE_GPGME
     bsmsg_setup_gpg_ui(bsmsg, toolbar);
@@ -4938,7 +4938,6 @@ sw_wrap_body(BalsaSendmsg * bsmsg)
     if (bsmsg->flow) {
 	sw_buffer_signals_block(bsmsg, buffer);
         libbalsa_unwrap_buffer(buffer, &start, -1);
-        libbalsa_wrap_view(text_view, balsa_app.wraplength);
 	sw_buffer_signals_unblock(bsmsg, buffer);
     } else {
         GtkTextIter now;
@@ -4958,6 +4957,7 @@ sw_wrap_body(BalsaSendmsg * bsmsg)
         gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
         gtk_text_buffer_place_cursor(buffer, &now);
     }
+    bsmsg->state = SENDMSG_STATE_MODIFIED;
     gtk_text_view_scroll_to_mark(text_view,
                                  gtk_text_buffer_get_insert(buffer),
                                  0, FALSE, 0, 0);
@@ -5080,7 +5080,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     body = libbalsa_message_body_new(message);
 
     /* Get the text from the buffer. First make sure it's wrapped. */
-    if (balsa_app.wordwrap)
+    if (!bsmsg->flow)
 	sw_wrap_body(bsmsg);
     /* Copy it to buffer2, so we can change it without changing the
      * display. */
@@ -5632,7 +5632,7 @@ sw_buffer_insert_text(GtkTextBuffer * buffer, GtkTextIter * iter,
 static void
 sw_buffer_changed(GtkTextBuffer * buffer, BalsaSendmsg * bsmsg)
 {
-    if (bsmsg->flow) {
+    if (!bsmsg->flow) {
         if (bsmsg->wrap_timeout_id)
             g_source_remove(bsmsg->wrap_timeout_id);
         bsmsg->wrap_timeout_id =
@@ -5902,7 +5902,6 @@ reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     buffer = gtk_text_view_get_buffer(text_view);
     sw_buffer_signals_block(bsmsg, buffer);
     libbalsa_unwrap_selection(buffer, &rex);
-    libbalsa_wrap_view(text_view, balsa_app.wraplength);
     sw_buffer_signals_unblock(bsmsg, buffer);
 
     bsmsg->state = SENDMSG_STATE_MODIFIED;

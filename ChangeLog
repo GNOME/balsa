@@ -1,3 +1,11 @@
+2007-05-27  Pawel Salek
+
+	* src/sendmsg-window.c: Do not wrap for view, if flowed format is
+	selected (Albrecht Dreß). 
+	* src/balsa-index.c: extend msgno and size columns.
+	* libbalsa/mailbox_imap.c: silence few devel warnings.
+	* NEWS, configure.in: release 2.3.16.
+
 2007-05-21  Peter Bloomfield
 
 	* libbalsa/mailbox.c: (lbm_get_index_entry_expunged_cb),

@@ -3003,16 +3003,17 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
                                            sizeof(uint32_t), icm->exists);
         ImapSearchKey *k;
         unsigned lo = icm->uidmap->len+1, hi = 0, i;
-        printf("searching range [1:%u]\n", icm->uidmap->len);
+        /* printf("searching range [1:%u]\n", icm->uidmap->len); */
         for(i=1; i<=icm->uidmap->len; i++)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {lo=i; break; }
         for(i=icm->uidmap->len; i>=lo; i--)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {hi=i; break; }
 
         k = imap_search_key_new_range(FALSE, FALSE, lo, hi);
-        printf("Mailbox modified. exists: %u %u uidnext: %u %u "
-               "- syncing uid map for [%u:%u].\n",
-               icm->exists, exists, icm->uidnext, uidnext, lo, hi);
+	/*
+	  printf("Mailbox modified. exists: %u %u uidnext: %u %u "
+	  "- syncing uid map for [%u:%u].\n",
+	  icm->exists, exists, icm->uidnext, uidnext, lo, hi);*/
         if(k) {
             uidmap->len = lo-1;
             rc = imap_search_exec(h, TRUE, k, set_uid, uidmap);
@@ -3023,7 +3024,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
             return;
         }
         g_array_free(icm->uidmap, TRUE); icm->uidmap = uidmap;
-        printf("new uidmap has length: %u\n", icm->uidmap->len);
+        /* printf("new uidmap has length: %u\n", icm->uidmap->len); */
     }
     /* One way or another, we have a valid uid->seqno map now;
      * The mailbox data can be resynced easily. */

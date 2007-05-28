@@ -584,6 +584,11 @@ pop_get_uid(PopHandle *pop, unsigned msgno, GError **err)
   if(!pop->uids) {
     char line[POP_LINE_LEN];
     unsigned curr_msgno = 1;
+    if(!pop->sio) {
+      g_set_error(err, IMAP_ERROR, IMAP_POP_SEVERED_ERROR,
+                  "POP3 Connection severed");
+      return NULL;
+    }
     if(!pop_exec(pop, "UIDL\r\n", err))
       return NULL;
     pop->uids = g_ptr_array_sized_new(pop->msg_cnt);

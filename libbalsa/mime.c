@@ -269,7 +269,8 @@ unwrap_rfc2646(gchar * str, gboolean from_screen, gboolean delsp)
             for (p = str; *p == QUOTE_CHAR; p++)
                 /* nothing */;
             len = p - str;
-            sig_sep = (strncmp(p, "-- \n", 4) == 0);
+            sig_sep = (strncmp(p, "-- \n", 4) == 0
+                       || strncmp(p, "-- \r\n", 5) == 0);
             if (text->quote_depth < 0)
                 text->quote_depth = len;
             else if (len != text->quote_depth || sig_sep)

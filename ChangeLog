@@ -1,3 +1,8 @@
+2007-06-03  Peter Bloomfield
+
+	* libbalsa/mime.c: (unwrap_rfc2646): detect CRLF-terminated
+	signature separator line.
+
 2007-05-28  Peter Bloomfield
 
 	* libbalsa/imap/pop3.c: (pop_get_uid): check for disconnection

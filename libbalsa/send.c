@@ -620,14 +620,13 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	const gchar *smtp_server_name;
         LibBalsaMsgCreateResult created;
 
-	msg = libbalsa_mailbox_get_message(outbox, msgno);
-        if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
-                                      (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-                                       LIBBALSA_MESSAGE_FLAG_DELETED))) {
-	    g_object_unref(msg);
+        if (libbalsa_mailbox_msgno_has_flags(outbox, msgno, 
+                                             (LIBBALSA_MESSAGE_FLAG_FLAGGED |
+                                              LIBBALSA_MESSAGE_FLAG_DELETED),
+                                             0))
             continue;
-	}
 
+	msg = libbalsa_mailbox_get_message(outbox, msgno);
         libbalsa_message_body_ref(msg, TRUE, TRUE);
         smtp_server_name =
             libbalsa_message_get_user_header(msg, "X-Balsa-SmtpServer");
@@ -1175,13 +1174,14 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
     for (msgno = libbalsa_mailbox_total_messages(outbox);
 	 msgno > 0; msgno--) {
         LibBalsaMsgCreateResult created;
-	msg = libbalsa_mailbox_get_message(outbox, msgno);
 
-        if (LIBBALSA_MESSAGE_HAS_FLAG(msg,
-                                      (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-                                       LIBBALSA_MESSAGE_FLAG_DELETED)))
+        if (libbalsa_mailbox_msgno_has_flags(outbox, msgno, 
+                                             (LIBBALSA_MESSAGE_FLAG_FLAGGED |
+                                              LIBBALSA_MESSAGE_FLAG_DELETED),
+                                             0))
             continue;
 
+	msg = libbalsa_mailbox_get_message(outbox, msgno);
         libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need
                                                       * all headers? */
 	new_message = msg_queue_item_new(finder);

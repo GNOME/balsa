@@ -1,5 +1,14 @@
 2007-06-05  Peter Bloomfield
 
+	* libbalsa/mime.c: (unwrap_rfc2646): inline check for "-- \n".
+	* libbalsa/mailbox.c: (lbm_try_reassemble): do not get message
+	just to test flags.
+	* libbalsa/send.c: (lbs_process_queue),
+	(libbalsa_process_queue): ditto.
+	* src/balsa-index.c: (bndx_mailbox_row_inserted_cb): ditto.
+
+2007-06-05  Peter Bloomfield
+
 	* libbalsa/mailbox.[ch]: new convenience methods
 	libbalsa_mailbox_msgno_change_flags and
 	libbalsa_mailbox_register_msgno.

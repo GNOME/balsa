@@ -3779,15 +3779,16 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
 
     for (msgno = 1; msgno <= total_messages && partials->len < total;
          msgno++) {
-        LibBalsaMessage *message =
-            libbalsa_mailbox_get_message(mailbox, msgno);
+        LibBalsaMessage *message;
         gchar *tmp_id;
 
-        if (!message)
+        if (libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                             LIBBALSA_MESSAGE_FLAG_DELETED,
+                                             0)
+            || !(message = libbalsa_mailbox_get_message(mailbox, msgno)))
             continue;
 
-        if (LIBBALSA_MESSAGE_IS_DELETED(message)
-            || !libbalsa_message_is_partial(message, &tmp_id)) {
+        if (!libbalsa_message_is_partial(message, &tmp_id)) {
             g_object_unref(message);
             continue;
         }
@@ -3818,16 +3819,17 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
         libbalsa_progress_set_fraction(&progress, 0);
         for (msgno = 1; msgno <= total_messages && partials->len < total;
              msgno++) {
-            LibBalsaMessage *message =
-                libbalsa_mailbox_get_message(mailbox, msgno);
+            LibBalsaMessage *message;
             GMimeMessage *mime_message;
             GMimeMessagePartial *partial;
 
-            if (!message)
+            if (libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                                 LIBBALSA_MESSAGE_FLAG_DELETED,
+                                                 0)
+                || !(message = libbalsa_mailbox_get_message(mailbox, msgno)))
                 continue;
 
-            if (LIBBALSA_MESSAGE_IS_DELETED(message)
-                || !libbalsa_message_is_multipart(message)) {
+            if (!libbalsa_message_is_multipart(message)) {
                 g_object_unref(message);
                 continue;
             }

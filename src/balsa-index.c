@@ -133,11 +133,6 @@ static gint balsa_index_signals[LAST_SIGNAL] = {
     0
 };
 
-/* marshallers */
-typedef void (*BalsaIndexSignal1) (GtkObject * object,
-				   LibBalsaMessage * message,
-				   GdkEventButton * bevent, gpointer data);
-
 /* General helpers. */
 static void bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path);
 static void bndx_select_row(BalsaIndex * index, GtkTreePath * path);
@@ -870,29 +865,21 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
                              GtkTreeIter * iter, BalsaIndex * index)
 {
     guint msgno;
-#ifdef BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE
-    LibBalsaMessage *message;
 
     if (mailbox->state != LB_MAILBOX_STATE_OPEN)
         return;
 
     gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
-	               LB_MBOX_MSGNO_COL,   &msgno,
-		       -1);
-    message = libbalsa_mailbox_get_message(mailbox, msgno);
+                       LB_MBOX_MSGNO_COL, &msgno, -1);
 
     if (balsa_app.expand_tree
+#ifdef BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE
         || (balsa_app.expand_to_new_unread
-            && LIBBALSA_MESSAGE_IS_UNREAD(message)))
-#else  /* BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE */
-    if (!balsa_app.expand_tree || mailbox->state != LB_MAILBOX_STATE_OPEN)
-        return;
-
-    gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
-	               LB_MBOX_MSGNO_COL, &msgno,
-		       -1);
-
+            && libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                                LIBBALSA_MESSAGE_FLAG_UNREAD,
+                                                0))
 #endif /* BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE */
+        )
     {
 	struct bndx_mailbox_row_inserted_info *info =
 	    g_new(struct bndx_mailbox_row_inserted_info, 1);
@@ -905,9 +892,6 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
 		        (GSourceFunc) bndx_mailbox_row_inserted_idle,
 			info, NULL);
     }
-#ifdef BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE
-    g_object_unref(message);
-#endif /* BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE */
 }
 
 /* balsa_index_load_mailbox_node:

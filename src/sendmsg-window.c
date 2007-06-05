@@ -907,14 +907,10 @@ address_book_response(GtkWidget * ab, gint response,
 static void
 sw_delete_draft(BalsaSendmsg * bsmsg)
 {
-    if (bsmsg->draft_message
-        && bsmsg->draft_message->mailbox
-        && !bsmsg->draft_message->mailbox->readonly) {
-        GList *messages = g_list_prepend(NULL, bsmsg->draft_message);
-        libbalsa_messages_change_flag(messages,
-                                      LIBBALSA_MESSAGE_FLAG_DELETED, TRUE);
-        g_list_free(messages);
-    }
+    LibBalsaMessage *message = bsmsg->draft_message;
+    if (message && message->mailbox && !message->mailbox->readonly)
+        libbalsa_message_change_flags(message,
+                                      LIBBALSA_MESSAGE_FLAG_DELETED, 0);
 }
 
 static gint
@@ -2454,10 +2450,10 @@ attachments_add(GtkWidget * widget,
     if (info == TARGET_MESSAGES) {
 	BalsaIndex *index = *(BalsaIndex **) selection_data->data;
 	LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
-        GArray *selected = balsa_index_selected_msgnos(index);
-	gint i;
+        GArray *selected = balsa_index_selected_msgnos_new(index);
+	guint i;
         
-	for (i = selected->len; --i >= 0;) {
+        for (i = 0; i < selected->len; i++) {
 	    guint msgno = g_array_index(selected, guint, i);
 	    LibBalsaMessage *message =
 		libbalsa_mailbox_get_message(mailbox, msgno);
@@ -2467,7 +2463,7 @@ attachments_add(GtkWidget * widget,
                                        "Possible reason: not enough temporary space"));
 	    g_object_unref(message);
         }
-        g_array_free(selected, TRUE);
+        balsa_index_selected_msgnos_free(index, selected);
     } else if (info == TARGET_URI_LIST) {
         GSList *uri_list = uri2gslist((gchar *) selection_data->data);
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
@@ -3012,7 +3008,7 @@ drag_data_quote(GtkWidget * widget,
     BalsaIndex *index;
     LibBalsaMailbox *mailbox;
     GArray *selected;
-    gint i;
+    guint i;
 
     if (context->action == GDK_ACTION_ASK)
         context->action = GDK_ACTION_COPY;
@@ -3021,10 +3017,10 @@ drag_data_quote(GtkWidget * widget,
     case TARGET_MESSAGES:
 	index = *(BalsaIndex **) selection_data->data;
 	mailbox = index->mailbox_node->mailbox;
-        selected = balsa_index_selected_msgnos(index);
+        selected = balsa_index_selected_msgnos_new(index);
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
        
-	for (i = selected->len; --i >= 0;) {
+        for (i = 0; i < selected->len; i++) {
 	    guint msgno = g_array_index(selected, guint, i);
 	    LibBalsaMessage *message;
             GString *body;
@@ -3035,7 +3031,7 @@ drag_data_quote(GtkWidget * widget,
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
         }
-        g_array_free(selected, TRUE);
+        balsa_index_selected_msgnos_free(index, selected);
         break;
     case TARGET_URI_LIST: {
         GSList *uri_list = uri2gslist((gchar *) selection_data->data);
@@ -4243,7 +4239,6 @@ sendmsg_window_compose(GtkWidget *w)
 static void
 bsm_prepare_for_setup(LibBalsaMessage *message)
 {
-    g_object_ref(message);
     if (message->mailbox)
         libbalsa_mailbox_open(message->mailbox, NULL);
     /* fill in that info:
@@ -4371,9 +4366,11 @@ set_identity(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 }
 
 BalsaSendmsg*
-sendmsg_window_reply(GtkWidget *w, LibBalsaMessage *message,
+sendmsg_window_reply(GtkWidget *w, LibBalsaMailbox *mailbox, guint msgno,
                      SendType reply_type)
 {
+    LibBalsaMessage *message =
+        libbalsa_mailbox_get_message(mailbox, msgno);
     BalsaSendmsg *bsmsg = sendmsg_window_new(w);
 
     g_assert(message);
@@ -4425,7 +4422,7 @@ sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
         bsmsg->type = reply_type;       break;
     default: printf("reply_type: %d\n", reply_type); g_assert_not_reached();
     }
-    bsm_prepare_for_setup(part->message);
+    bsm_prepare_for_setup(g_object_ref(part->message));
     headers = part->embhdrs;
     /* To: */
     set_to(bsmsg, headers);
@@ -4458,8 +4455,11 @@ sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
 }
 
 BalsaSendmsg*
-sendmsg_window_forward(GtkWidget *w, LibBalsaMessage *message, gboolean attach)
+sendmsg_window_forward(GtkWidget *w, LibBalsaMailbox *mailbox, guint msgno,
+                       gboolean attach)
 {
+    LibBalsaMessage *message =
+        libbalsa_mailbox_get_message(mailbox, msgno);
     BalsaSendmsg *bsmsg = sendmsg_window_new(w);
     g_assert(message);
     
@@ -4494,8 +4494,11 @@ sendmsg_window_forward(GtkWidget *w, LibBalsaMessage *message, gboolean attach)
 }
 
 BalsaSendmsg*
-sendmsg_window_continue(GtkWidget *w, LibBalsaMessage * message)
+sendmsg_window_continue(GtkWidget *w, LibBalsaMailbox * mailbox,
+                        guint msgno)
 {
+    LibBalsaMessage *message =
+        libbalsa_mailbox_get_message(mailbox, msgno);
     BalsaSendmsg *bsmsg = sendmsg_window_new(w);
     const gchar *postpone_hdr;
     GList *list, *refs = NULL;
@@ -6274,20 +6277,22 @@ lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
  * called by compose_from_list (balsa-index.c)
  */
 BalsaSendmsg *
-sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
-                             SendType type)
+sendmsg_window_new_from_list(GtkWidget * w, LibBalsaMailbox * mailbox,
+                             GArray * selected, SendType type)
 {
     BalsaSendmsg *bsmsg;
     LibBalsaMessage *message;
     GtkTextBuffer *buffer;
+    guint i;
+    guint msgno = g_array_index(selected, guint, 0);
 
-    g_return_val_if_fail(message_list != NULL, NULL);
+    g_return_val_if_fail(selected->len > 0, NULL);
 
-    message = message_list->data;
+    message = libbalsa_mailbox_get_message(mailbox, msgno);
     switch(type) {
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
-        bsmsg = sendmsg_window_forward(w, message,
+        bsmsg = sendmsg_window_forward(w, mailbox, msgno,
                                        type == SEND_FORWARD_ATTACH);
         break;
     default:
@@ -6295,10 +6300,15 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
         bsmsg = NULL; /** silence invalid warnings */
 
     }
+    g_object_unref(message);
+
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
-    while ((message_list = g_list_next(message_list))) {
-        message = message_list->data;
+    for (i = 1; i < selected->len; i++) {
+        LibBalsaMessage *message;
+
+	msgno = g_array_index(selected, guint, i);
+        message = libbalsa_mailbox_get_message(mailbox, msgno);
         if (type == SEND_FORWARD_ATTACH)
             attach_message(bsmsg, message);
         else if (type == SEND_FORWARD_INLINE) {
@@ -6307,6 +6317,7 @@ sendmsg_window_new_from_list(GtkWidget * w, GList * message_list,
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
             g_string_free(body, TRUE);
         }
+        g_object_unref(message);
     }
 
     bsmsg->state = SENDMSG_STATE_CLEAN;

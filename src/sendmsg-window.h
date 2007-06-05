@@ -130,15 +130,16 @@ extern "C" {
     };
 
     BalsaSendmsg *sendmsg_window_compose(GtkWidget *);
-    BalsaSendmsg *sendmsg_window_reply(GtkWidget *, LibBalsaMessage *,
-                                       SendType rt);
+    BalsaSendmsg *sendmsg_window_reply(GtkWidget *, LibBalsaMailbox *,
+                                       guint msgno, SendType rt);
     BalsaSendmsg *sendmsg_window_reply_embedded(GtkWidget *w,
                                                 LibBalsaMessageBody *part,
                                                 SendType reply_type);
 
-    BalsaSendmsg *sendmsg_window_forward(GtkWidget *, LibBalsaMessage *,
-                                         gboolean attach);
-    BalsaSendmsg *sendmsg_window_continue(GtkWidget *, LibBalsaMessage *);
+    BalsaSendmsg *sendmsg_window_forward(GtkWidget *, LibBalsaMailbox *,
+                                         guint msgno, gboolean attach);
+    BalsaSendmsg *sendmsg_window_continue(GtkWidget *, LibBalsaMailbox *,
+                                          guint msgno);
 
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
                                   const gchar* val);
@@ -152,7 +153,8 @@ extern "C" {
     void sendmsg_window_process_url(const char *url, field_setter func,
 				    void *data);
     BalsaSendmsg *sendmsg_window_new_from_list(GtkWidget * w,
-                                               GList * message_list,
+                                               LibBalsaMailbox * mailbox,
+                                               GArray * selected,
                                                SendType type);
     BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
 

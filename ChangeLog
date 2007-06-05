@@ -1,3 +1,26 @@
+2007-06-05  Peter Bloomfield
+
+	* libbalsa/mailbox.[ch]: new convenience methods
+	libbalsa_mailbox_msgno_change_flags and
+	libbalsa_mailbox_register_msgno.
+	* libbalsa/message.[ch]: new convenience method
+	libbalsa_message_change_flags.
+	* libbalsa/send.c: use libbalsa_message_change_flags.
+	* src/balsa-index.[ch]: replace BalsaIndex::current_message with
+	BalsaIndex::current_msgno; new members
+	BalsaIndex::has_selection_changed_idle and
+	BalsaIndex::has_mailbox_changed_idle to avoid setting GObject
+	data; new api balsa_index_selected_msgnos_{new,free}.
+	* src/balsa-mblist.c: (bmbl_drag_cb): use new
+	balsa_index_selected_msgnos_{new,free} api.
+	* src/balsa-message.[ch]: use mailbox and msgno instead of
+	message.
+	* src/main-window.[ch]: ditto; use new
+	balsa_index_selected_msgnos_{new,free} api.
+	* src/message-window.[ch]: use mailbox and msgno instead of
+	        message.
+	* src/sendmsg-window.[ch]: ditto.
+
 2007-06-03  Peter Bloomfield
 
 	* libbalsa/mime.c: (unwrap_rfc2646): detect CRLF-terminated

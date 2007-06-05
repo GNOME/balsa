@@ -459,18 +459,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     return rc ?  LIBBALSA_MESSAGE_CREATE_OK : LIBBALSA_MESSAGE_QUEUE_ERROR;
 }
 
-static void
-lbs_change_flags(LibBalsaMessage * msg, LibBalsaMessageFlag set,
-                 LibBalsaMessageFlag clear)
-{
-    GArray *array = g_array_new(FALSE, FALSE, sizeof(guint));
-
-    g_array_append_val(array, msg->msgno);
-    libbalsa_mailbox_messages_change_flags(msg->mailbox, array, set,
-                                           clear);
-    g_array_free(array, TRUE);
-}
-
 /* libbalsa_message_send:
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
@@ -661,7 +649,8 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	} else {
 	    InternetAddress *ia;
 
-	    lbs_change_flags(msg, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
+	    libbalsa_message_change_flags(msg,
+                                          LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	    /*
 	       The message needs to be filtered and the newlines converted to
 	       \r\n because internally the lines foolishly terminate with the
@@ -904,7 +893,8 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
       mqi->refcount--;
 
     if(mqi != NULL && mqi->orig != NULL && mqi->orig->mailbox)
-	lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
+	libbalsa_message_change_flags(mqi->orig, 0,
+                                      LIBBALSA_MESSAGE_FLAG_FLAGGED);
     else printf("mqi: %p mqi->orig: %p mqi->orig->mailbox: %p\n",
                   mqi, mqi ? mqi->orig : NULL, 
                   mqi&&mqi->orig ? mqi->orig->mailbox : NULL);
@@ -919,8 +909,9 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
 	    if (mqi->orig->mailbox && fccurl) {
                 LibBalsaMailbox *fccbox = mqi->finder(fccurl);
                 GError *err = NULL;
-                lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW |
-                                 LIBBALSA_MESSAGE_FLAG_FLAGGED);
+                libbalsa_message_change_flags(mqi->orig, 0,
+                                              LIBBALSA_MESSAGE_FLAG_NEW |
+                                              LIBBALSA_MESSAGE_FLAG_FLAGGED);
 		libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
                 remove = libbalsa_message_copy(mqi->orig, fccbox, &err);
                 if(!remove) {
@@ -934,9 +925,9 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
             /* If copy failed, mark the message again as flagged -
                otherwise it will get resent again. And again, and
                again... */
-            lbs_change_flags(mqi->orig, remove ?
-                             LIBBALSA_MESSAGE_FLAG_DELETED :
-                             LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
+            libbalsa_message_change_flags(mqi->orig, remove ?
+                                          LIBBALSA_MESSAGE_FLAG_DELETED :
+                                          LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	}
     } else {
 	/* Check whether it was a problem with transfer. */
@@ -1200,7 +1191,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
-	    lbs_change_flags(msg, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
+	    libbalsa_message_change_flags(msg,
+                                          LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	    if (mqi)
 		mqi->next_message = new_message;
 	    else
@@ -1237,8 +1229,9 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
         const gchar *fccurl =
             libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
 
-        lbs_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW |
-                         LIBBALSA_MESSAGE_FLAG_FLAGGED);
+        libbalsa_message_change_flags(mqi->orig, 0,
+                                      LIBBALSA_MESSAGE_FLAG_NEW |
+                                      LIBBALSA_MESSAGE_FLAG_FLAGGED);
 	libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
 
         if (mqi->orig->mailbox && fccurl) {
@@ -1249,9 +1242,9 @@ handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
         /* If copy failed, mark the message again as flagged -
            otherwise it will get resent again. And again, and
            again... */
-        lbs_change_flags(mqi->orig, remove ?
-                         LIBBALSA_MESSAGE_FLAG_DELETED :
-                         LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
+        libbalsa_message_change_flags(mqi->orig, remove ?
+                                      LIBBALSA_MESSAGE_FLAG_DELETED :
+                                      LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
     }
     mqi->status = MQI_SENT;
 }

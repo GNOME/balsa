@@ -878,12 +878,12 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 	return;
 
     orig_index = *(BalsaIndex **) selection_data->data;
-    selected = balsa_index_selected_msgnos(orig_index);
+    selected = balsa_index_selected_msgnos_new(orig_index);
     if (selected->len == 0) {
 	/* it is actually possible to drag from GtkTreeView when no rows
 	 * are selected: Disable preview for that. */
-        g_array_free(selected, TRUE);
-       return; 
+        balsa_index_selected_msgnos_free(orig_index, selected);
+        return; 
     }
 
     orig_mailbox = orig_index->mailbox_node->mailbox;
@@ -909,7 +909,7 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
                                  context->action != GDK_ACTION_MOVE);
         gtk_tree_path_free(path);
     }
-    g_array_free(selected, TRUE);
+    balsa_index_selected_msgnos_free(orig_index, selected);
 
     if (balsa_find_iter_by_data(&iter, orig_mailbox))
         gtk_tree_selection_select_iter(selection, &iter);

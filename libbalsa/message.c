@@ -590,49 +590,22 @@ libbalsa_message_get_attach_icon(LibBalsaMessage * message)
 	return LIBBALSA_MESSAGE_ATTACH_ICONS_NUM;
 }
 
-/* Helper for mailbox drivers. */
-gboolean
-libbalsa_message_set_msg_flags(LibBalsaMessage * message,
-			       LibBalsaMessageFlag set,
-			       LibBalsaMessageFlag clear)
-{
-    gboolean changed = FALSE;
-    
-    if (!(message->flags & set)) {
-	message->flags |= set;
-	changed = TRUE;
-    }
-    if (message->flags & clear) {
-	message->flags &= ~clear;
-	changed = TRUE;
-    }
-
-    return changed;
-}
-
 /* Tell the mailbox driver to change flags. */
-static void
-libbalsa_message_set_flag(LibBalsaMessage * message,
-			  LibBalsaMessageFlag set,
-			  LibBalsaMessageFlag clear)
+void
+libbalsa_message_change_flags(LibBalsaMessage * message,
+                              LibBalsaMessageFlag set,
+                              LibBalsaMessageFlag clear)
 {
-    GArray *msgnos;
-
     if (message->mailbox->readonly) {
-	libbalsa_information(
-	    LIBBALSA_INFORMATION_WARNING,
-	    _("Mailbox (%s) is readonly: cannot change flags."),
-	    message->mailbox->name);
-	return;
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Mailbox (%s) is readonly: "
+                               "cannot change flags."),
+                             message->mailbox->name);
+        return;
     }
 
-    msgnos = g_array_sized_new(FALSE, FALSE, sizeof(guint), 1);
-    g_array_append_val(msgnos, message->msgno);
-    libbalsa_mailbox_register_msgnos(message->mailbox, msgnos);
-    libbalsa_mailbox_messages_change_flags(message->mailbox, msgnos,
-					   set, clear);
-    libbalsa_mailbox_unregister_msgnos(message->mailbox, msgnos);
-    g_array_free(msgnos, TRUE);
+    libbalsa_mailbox_msgno_change_flags(message->mailbox, message->msgno,
+                                        set, clear);
 }
 
 void
@@ -640,57 +613,8 @@ libbalsa_message_reply(LibBalsaMessage * message)
 {
     g_return_if_fail(message->mailbox);
     libbalsa_lock_mailbox(message->mailbox);
-    libbalsa_message_set_flag(message, LIBBALSA_MESSAGE_FLAG_REPLIED, 0);
+    libbalsa_message_change_flags(message, LIBBALSA_MESSAGE_FLAG_REPLIED, 0);
     libbalsa_unlock_mailbox(message->mailbox);
-}
-
-/* Assume all messages come from the same mailbox */
-void
-libbalsa_messages_change_flag(GList * messages,
-                              LibBalsaMessageFlag flag,
-                              gboolean set)
-{
-    GArray *msgnos;
-    LibBalsaMessage * message = NULL;
-    LibBalsaMailbox *mbox;
-    
-    if (!messages)
-	return;
-
-    mbox = LIBBALSA_MESSAGE(messages->data)->mailbox;
-    if (mbox->readonly) {
-	libbalsa_information(
-	    LIBBALSA_INFORMATION_WARNING,
-	    _("Mailbox (%s) is readonly: cannot change flags."),
-	    mbox->name);
-	return;
-    }
-
-    /* Construct the list of messages that actually change state */
-    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
-    for (; messages; messages = messages->next) {
-	message = LIBBALSA_MESSAGE(messages->data);
- 	if ( (set && !(message->flags & flag)) ||
-             (!set && (message->flags & flag)) )
-	    g_array_append_val(msgnos, message->msgno);
-    }
-    libbalsa_mailbox_register_msgnos(message->mailbox, msgnos);
-    
-    if (msgnos->len > 0) {
-	libbalsa_lock_mailbox(mbox);
-	/* RETURN_IF_MAILBOX_CLOSED(mbox); */
-        /* set flags for entire set in one transaction */
-        if(set)
-            libbalsa_mailbox_messages_change_flags(mbox, msgnos,
-						   flag, 0);
-        else
-            libbalsa_mailbox_messages_change_flags(mbox, msgnos,
-						   0, flag);
-	libbalsa_unlock_mailbox(mbox);
-    }
-
-    libbalsa_mailbox_unregister_msgnos(message->mailbox, msgnos);
-    g_array_free(msgnos, TRUE);
 }
 
 

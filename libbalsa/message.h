@@ -279,14 +279,7 @@ LibBalsaMessage *libbalsa_message_new(void);
 gboolean libbalsa_message_save(LibBalsaMessage * message,
 			       const gchar *filename);
 
-void libbalsa_messages_change_flag(GList * messages,
-                                   LibBalsaMessageFlag flag,
-                                   gboolean set);
-
 void libbalsa_message_reply(LibBalsaMessage * message);
-gboolean libbalsa_message_set_msg_flags(LibBalsaMessage * message,
-					LibBalsaMessageFlag set,
-					LibBalsaMessageFlag clear);
 
 void libbalsa_message_append_part(LibBalsaMessage * message,
 				  LibBalsaMessageBody * body);
@@ -363,4 +356,7 @@ void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
 GMimeStream *libbalsa_message_stream(LibBalsaMessage * message);
 gboolean libbalsa_message_copy(LibBalsaMessage * message,
                                LibBalsaMailbox * dest, GError ** err);
+void libbalsa_message_change_flags(LibBalsaMessage * message,
+                                   LibBalsaMessageFlag set,
+                                   LibBalsaMessageFlag clear);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

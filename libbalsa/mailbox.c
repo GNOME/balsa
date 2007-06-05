@@ -1844,6 +1844,26 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
     return retval;
 }
 
+gboolean
+libbalsa_mailbox_msgno_change_flags(LibBalsaMailbox * mailbox,
+                                    guint msgno,
+                                    LibBalsaMessageFlag set,
+                                    LibBalsaMessageFlag clear)
+{
+    gboolean retval;
+    GArray *msgnos = g_array_sized_new(FALSE, FALSE, sizeof(guint), 1);
+
+    g_array_append_val(msgnos, msgno);
+    libbalsa_mailbox_register_msgnos(mailbox, msgnos);
+    retval =
+        libbalsa_mailbox_messages_change_flags(mailbox, msgnos, set,
+                                               clear);
+    libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
+    g_array_free(msgnos, TRUE);
+
+    return retval;
+}
+
 /* Copy messages with msgnos in the list from mailbox to dest. */
 gboolean
 libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox, GArray * msgnos,
@@ -3837,8 +3857,7 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
 
     if (partials->len == total) {
         LibBalsaMessage *message = libbalsa_message_new();
-        libbalsa_message_set_msg_flags(message, LIBBALSA_MESSAGE_FLAG_NEW,
-                                       0);
+        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
 
         libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                              _("Reconstructing message"));
@@ -3910,7 +3929,24 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
     }
 }
 
-/* Use "message-expunged" signal to update an array of msgnos. */
+/* Use "message-expunged" signal to update a msgno or an array of msgnos. */
+static void
+lbm_update_msgno(LibBalsaMailbox * mailbox, guint seqno, guint * msgno)
+{
+    if (*msgno == seqno)
+        *msgno = 0;
+    else if (*msgno > seqno)
+        --*msgno;
+}
+
+void
+libbalsa_mailbox_register_msgno(LibBalsaMailbox * mailbox,
+                                guint * msgno)
+{
+    g_signal_connect(mailbox, "message-expunged",
+                     G_CALLBACK(lbm_update_msgno), msgno);
+}
+
 static void
 lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno, GArray * msgnos)
 {
@@ -3935,7 +3971,6 @@ libbalsa_mailbox_register_msgnos(LibBalsaMailbox * mailbox,
     g_signal_connect(mailbox, "message-expunged",
                      G_CALLBACK(lbm_update_msgnos), msgnos);
 }
-
 
 void
 libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,

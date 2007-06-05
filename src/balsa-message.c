@@ -112,9 +112,6 @@ static void balsa_message_init(BalsaMessage * bm);
 
 static void balsa_message_destroy(GtkObject * object);
 
-static void bm_message_weak_ref_cb(BalsaMessage * bm,
-                                   LibBalsaMessage * message);
-
 static void display_headers(BalsaMessage * bm);
 static void display_content(BalsaMessage * bm);
 
@@ -486,7 +483,7 @@ balsa_message_destroy(GtkObject * object)
     BalsaMessage* bm = BALSA_MESSAGE(object);
 
     if (bm->treeview) {
-        balsa_message_set(bm, NULL);
+        balsa_message_set(bm, NULL, 0);
         gtk_widget_destroy(bm->treeview);
         bm->treeview = NULL;
     }
@@ -728,24 +725,11 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
     return TRUE;
 }
 
-
-static void
-bm_message_weak_ref_cb(BalsaMessage * bm, LibBalsaMessage * message)
-{
-    if (bm->message == message) {
-	bm->message = NULL;
-	if (bm->close_with_msg)
-	    gtk_widget_destroy(GTK_WIDGET(bm));
-	else
-	    balsa_message_set(bm, NULL);
-    }
-}
-
 /* balsa_message_set:
    returns TRUE on success, FALSE on failure (message content could not be
    accessed).
 
-   if message == NULL, clears the display and returns TRUE
+   if msgno == 0, clears the display and returns TRUE
 */
 
 /* Helpers:
@@ -778,42 +762,32 @@ balsa_message_clear_tree(BalsaMessage * bm)
 }
 
 gboolean
-balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
+balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 {
     gboolean is_new;
     GtkTreeIter iter;
     BalsaPartInfo *info;
     gboolean has_focus = bm->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
+    LibBalsaMessage *message;
 
     g_return_val_if_fail(bm != NULL, FALSE);
-
-    /* Leave this out. When settings (eg wrap) are changed it is OK to 
-       call message_set with the same messagr */
-    /*    if (bm->message == message) */
-    /*      return; */
 
     gtk_widget_hide(GTK_WIDGET(bm));
     select_part(bm, NULL);
     if (bm->message != NULL) {
-        g_object_weak_unref(G_OBJECT(bm->message),
-                            (GWeakNotify) bm_message_weak_ref_cb,
-                            (gpointer) bm);
         libbalsa_message_body_unref(bm->message);
+        g_object_unref(bm->message);
         bm->message = NULL;
     }
     balsa_message_clear_tree(bm);
 
-    if (message == NULL) {
+    if (mailbox == NULL || msgno == 0) {
         gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
         gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
         return TRUE;
     }
 
-    bm->message = message;
-
-    g_object_weak_ref(G_OBJECT(message),
-                      (GWeakNotify) bm_message_weak_ref_cb,
-                      (gpointer) bm);
+    bm->message = message = libbalsa_mailbox_get_message(mailbox, msgno);
 
     is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
     if(!libbalsa_message_body_ref(message, TRUE, TRUE)) {
@@ -822,13 +796,15 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %ld "
                             "in mailbox \"%s\"."),
-			  message->msgno, mailbox->name);
+			  msgno, mailbox->name);
+        g_object_unref(bm->message);
+        bm->message = NULL;
         return FALSE;
     }
 
 #ifdef HAVE_GPGME
-    balsa_message_perform_crypto(bm->message, 
-				 libbalsa_mailbox_get_crypto_mode(bm->message->mailbox),
+    balsa_message_perform_crypto(message, 
+				 libbalsa_mailbox_get_crypto_mode(mailbox),
 				 FALSE, 1);
     /* calculate the signature summary state if not set earlier */
     if(message->prot_state == LIBBALSA_MSG_PROTECT_NONE) {
@@ -840,8 +816,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     }
 #endif
 
-    libbalsa_mailbox_msgno_update_attach(bm->message->mailbox,
-    /* may update the icon */            bm->message->msgno, bm->message);
+    /* may update the icon */           
+    libbalsa_mailbox_msgno_update_attach(mailbox, msgno, message);
 
     display_headers(bm);
     display_content(bm);
@@ -879,13 +855,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMessage * message)
     /*
      * emit read message
      */
-    if (is_new && message->mailbox && !message->mailbox->readonly) {
-	GList * messages = g_list_prepend(NULL, message);
-	
-	libbalsa_messages_change_flag(messages, LIBBALSA_MESSAGE_FLAG_NEW,
-                                      FALSE);
-	g_list_free(messages);
-    }
+    if (is_new && !mailbox->readonly)
+        libbalsa_mailbox_msgno_change_flags(mailbox, msgno, 0,
+                                            LIBBALSA_MESSAGE_FLAG_NEW);
 
     /* restore keyboard focus to the content, if it was there before */
     if (has_focus)
@@ -961,7 +933,7 @@ balsa_message_set_wrap(BalsaMessage * bm, gboolean wrap)
     /* This is easier than reformating all the widgets... */
     if (bm->message) {
         LibBalsaMessage *msg = bm->message;
-        balsa_message_set(bm, msg);
+        balsa_message_set(bm, msg->mailbox, msg->msgno);
     }
 }
 

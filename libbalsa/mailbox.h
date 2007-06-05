@@ -463,7 +463,6 @@ gboolean libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
 					GArray * msgnos,
 					LibBalsaMailbox * dest, GError **err);
 
-                               
 /*
  * misc mailbox releated functions
  */
@@ -584,6 +583,11 @@ gboolean libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox,
 				     guint seqno,
 				     GtkTreePath ** path,
 				     GtkTreeIter * iter);
+/* Manage message flags */
+gboolean libbalsa_mailbox_msgno_change_flags(LibBalsaMailbox * mailbox,
+                                             guint msgno,
+                                             LibBalsaMessageFlag set,
+                                             LibBalsaMessageFlag clear);
 /* Test message flags */
 gboolean libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox * mailbox,
                                           guint seqno,
@@ -608,7 +612,9 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 				     const gchar * id);
 
-/* Message number arrays */
+/* Message numbers and arrays */
+void libbalsa_mailbox_register_msgno(LibBalsaMailbox * mailbox,
+                                     guint * msgno);
 void libbalsa_mailbox_register_msgnos(LibBalsaMailbox * mailbox,
 				      GArray * msgnos);
 void libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,

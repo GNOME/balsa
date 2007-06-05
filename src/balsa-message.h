@@ -94,7 +94,7 @@ void balsa_message_set_close(BalsaMessage * bmessage,
 			     gboolean close_with_msg);
 
 gboolean balsa_message_set(BalsaMessage * bmessage,
-			   LibBalsaMessage * message);
+			   LibBalsaMailbox * mailbox, guint msgno);
 
 void balsa_message_next_part(BalsaMessage * bmessage);
 gboolean balsa_message_has_next_part(BalsaMessage * bmessage);

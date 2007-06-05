@@ -58,10 +58,12 @@ extern "C" {
 
         BalsaMailboxNode* mailbox_node;
         guint current_msgno;
-        LibBalsaMessage* current_message;
-	gboolean current_message_is_deleted;
-        gboolean prev_message;
-        gboolean next_message;
+        guint next_msgno;
+	gboolean current_message_is_deleted:1;
+        gboolean prev_message:1;
+        gboolean next_message:1;
+        gboolean has_selection_changed_idle:1;
+        gboolean has_mailbox_changed_idle:1;
         int    filter_no;
         gchar *filter_string; /* Quick view filter string, if any */
 
@@ -120,7 +122,8 @@ extern "C" {
     gboolean balsa_index_select_next_unread(BalsaIndex * index);
     void balsa_index_select_next_flagged(BalsaIndex * bindex);
     void balsa_index_select_previous(BalsaIndex *);
-    void balsa_index_select(BalsaIndex * index, LibBalsaMessage * message);
+    void balsa_index_set_next_msgno(BalsaIndex * bindex, guint msgno);
+    guint balsa_index_get_next_msgno(BalsaIndex * bindex);
 
     void balsa_index_find(BalsaIndex * bindex,
 			  LibBalsaMailboxSearchIter * search_iter,
@@ -146,7 +149,8 @@ extern "C" {
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
     void balsa_index_set_column_widths(BalsaIndex * index);
     GList * balsa_index_selected_list(BalsaIndex * index);
-    GArray * balsa_index_selected_msgnos(BalsaIndex * index);
+    GArray * balsa_index_selected_msgnos_new(BalsaIndex * index);
+    void balsa_index_selected_msgnos_free(BalsaIndex * index, GArray * msgnos);
     void balsa_index_move_subtree(BalsaIndex * index,
                                   GtkTreePath * root,
                                   GtkTreePath * new_parent);

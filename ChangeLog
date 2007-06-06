@@ -1,3 +1,14 @@
+2007-06-07  Pawel Salek
+
+	* src/store-address.[ch]: add ability to create addresses from
+	VCARD strings.
+	* src/balsa-index.c: use new store_address() function names.
+	* src/main-window.c: ditto.
+	* src/balsa-mime-widget-text.c: add ability to store attached
+	 e-mail addresses.
+	* libbalsa/address-book-vcard.c: use common VCARD functions.
+	* libbalsa/address.[ch]: move common VCARD functions here.
+
 2007-06-05  Peter Bloomfield
 
 	* libbalsa/mime.c: (unwrap_rfc2646): inline check for "-- \n".

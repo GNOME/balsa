@@ -111,6 +111,187 @@ libbalsa_address_new(void)
     return g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
 }
 
+/** Extract full name in order from <string> that has GnomeCard format
+   and returns the pointer to the allocated memory chunk.
+*/
+gchar*
+libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
+                              gchar ** first_name)
+{
+    enum GCardFieldOrder { LAST = 0, FIRST, MIDDLE, PREFIX, SUFFIX };
+    gint cpt, j;
+    gchar **fld, **name_arr;
+    gchar *res = NULL;
+
+    fld = g_strsplit(string, ";", 5);
+
+    cpt = 0;
+    while (fld[cpt] != NULL)
+	cpt++;
+
+    if (cpt == 0)		/* insane empty name */
+	return NULL;
+
+    if (fld[LAST] && *fld[LAST])
+        *last_name = g_strdup(fld[LAST]);
+
+    if (fld[FIRST] && *fld[FIRST])
+        *first_name = fld[MIDDLE] && *fld[MIDDLE] ?
+            g_strconcat(fld[FIRST], " ", fld[MIDDLE], NULL) :
+            g_strdup(fld[FIRST]);
+
+    name_arr = g_malloc((cpt + 1) * sizeof(gchar *));
+
+    j = 0;
+    if (cpt > PREFIX && *fld[PREFIX] != '\0')
+	name_arr[j++] = g_strdup(fld[PREFIX]);
+
+    if (cpt > FIRST && *fld[FIRST] != '\0')
+	name_arr[j++] = g_strdup(fld[FIRST]);
+
+    if (cpt > MIDDLE && *fld[MIDDLE] != '\0')
+	name_arr[j++] = g_strdup(fld[MIDDLE]);
+
+    if (cpt > LAST && *fld[LAST] != '\0')
+	name_arr[j++] = g_strdup(fld[LAST]);
+
+    if (cpt > SUFFIX && *fld[SUFFIX] != '\0')
+	name_arr[j++] = g_strdup(fld[SUFFIX]);
+
+    name_arr[j] = NULL;
+
+    g_strfreev(fld);
+
+    /* collect the data to one string */
+    res = g_strjoinv(" ", name_arr);
+    g_strfreev(name_arr);
+
+    return res;
+}
+
+/* Duplicates some code from address-book-vcard.c:
+ */
+static gchar*
+validate_vcard_string(gchar * vcstr)
+{
+    gchar * utf8res;
+    gsize b_written;
+
+    /* check if it's a utf8 clean string and return it in this case */
+    if (!vcstr || g_utf8_validate(vcstr, -1, NULL))
+	return vcstr;
+
+    /* try to convert from the user's locale setting */
+    utf8res = g_locale_to_utf8(vcstr, -1, NULL, &b_written, NULL);
+    if (!utf8res)
+	return vcstr;
+
+    g_free(vcstr);
+    return utf8res;
+}
+
+LibBalsaAddress*
+libbalsa_address_new_from_vcard(const gchar *str)
+{
+    LibBalsaAddress *address = g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
+    gchar *name = NULL, *nick_name = NULL, *org = NULL;
+    gchar *full_name = NULL, *last_name = NULL, *first_name = NULL;
+    gint in_vcard = FALSE;
+    GList *address_list = NULL;
+    const gchar *string, *next_line;
+
+    g_return_val_if_fail(str, address);
+
+    for(string = str; *string; string = next_line) {
+        next_line = strchr(string, '\n');
+        if(next_line)
+            ++next_line;
+        else
+            next_line = string + strlen(string);
+	/*
+	 * Check if it is a card.
+	 */
+	if (g_ascii_strncasecmp(string, "BEGIN:VCARD", 11) == 0) {
+	    in_vcard = TRUE;
+	} else if (g_ascii_strncasecmp(string, "END:VCARD", 9) == 0) {
+            /*
+             * We are done loading a card.
+             */
+	    if (address_list) {
+                if (address) {
+                    if (full_name) {
+                        address->full_name = full_name;
+                        g_free(name);
+                    } else if (name)
+                        address->full_name = name;
+                    else if (nick_name)
+                        address->full_name = g_strdup(nick_name);
+                    else
+                        address->full_name = g_strdup(_("No-Name"));
+
+                    address->last_name = last_name;
+                    address->first_name = first_name;
+                    address->nick_name = nick_name;
+                    address->organization = org;
+                    address->address_list = g_list_reverse(address_list);
+
+                    break;
+                }
+                g_list_foreach(address_list, (GFunc) g_free, NULL);
+                g_list_free(address_list);
+	    }
+            /* Record without e-mail address, or we're not creating
+             * addresses: free memory. */
+            g_free(full_name);
+            g_free(name);
+            g_free(last_name);
+            g_free(first_name);
+            g_free(nick_name);
+            g_free(org);
+            
+            /* We return just one address... */
+            return address;
+	} else if (in_vcard) {
+            gchar *line = g_strndup(string, next_line-string);
+            g_strchomp(line);
+            if (g_ascii_strncasecmp(line, "FN:", 3) == 0) {
+                
+                full_name = g_strdup(line + 3);
+                full_name = validate_vcard_string(full_name);
+
+            } else if (g_ascii_strncasecmp(line, "N:", 2) == 0) {
+
+                name = libbalsa_address_extract_name(line + 2,
+                                                     &last_name, &first_name);
+                name = validate_vcard_string(name);
+                last_name = validate_vcard_string(last_name);
+                first_name = validate_vcard_string(first_name);
+
+            } else if (g_ascii_strncasecmp(line, "NICKNAME:", 9) == 0) {
+
+                nick_name = g_strdup(line + 9);
+                nick_name = validate_vcard_string(nick_name);
+
+            } else if (g_ascii_strncasecmp(line, "ORG:", 4) == 0) {
+
+                org = g_strdup(line + 4);
+                org = validate_vcard_string(org);
+
+            } else if (g_ascii_strncasecmp(line, "EMAIL;", 6) == 0) {
+
+                gchar *ptr = strchr(line+6, ':');
+                if (ptr) {
+                    address_list =
+                        g_list_prepend(address_list, g_strdup(ptr + 1));
+                }
+            }
+            g_free(line);
+        }
+    }
+
+    return address;
+}
+
 void
 libbalsa_address_set_copy(LibBalsaAddress * dest, LibBalsaAddress * src)
 {
@@ -255,7 +436,7 @@ libbalsa_address_get_mailbox_from_list(const InternetAddressList *
     in entries with values from address
 */
 void
-libbalsa_address_set_edit_entries(LibBalsaAddress * address,
+libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
                                   GtkWidget **entries)
 {
     gchar *new_name = NULL;
@@ -515,7 +696,8 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
 
 
 GtkWidget*
-libbalsa_address_get_edit_widget(LibBalsaAddress *address, GtkWidget **entries,
+libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
+                                 GtkWidget **entries,
                                  GCallback changed_cb, gpointer changed_data)
 {
     const static gchar *labels[NUM_FIELDS] = {

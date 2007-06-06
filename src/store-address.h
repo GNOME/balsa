@@ -22,6 +22,7 @@
 #ifndef __STORE_ADDRESS_DIALOG_H__
 #define __STORE_ADDRESS_DIALOG_H__
 
-void balsa_store_address(GList * messages);
+void balsa_store_address_from_messages(GList * messages);
+void balsa_store_address(const LibBalsaAddress *address);
 
 #endif

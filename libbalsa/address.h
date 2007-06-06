@@ -86,6 +86,11 @@ struct _LibBalsaAddressClass {
 GType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
+LibBalsaAddress *libbalsa_address_new_from_vcard(const gchar *str);
+gchar * libbalsa_address_extract_name(const gchar * string,
+                                      gchar ** last_name,
+                                      gchar ** first_name);
+
 void libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src);
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
 
@@ -102,7 +107,7 @@ const gchar *libbalsa_address_get_mailbox_from_list(const
 /** libbalsa_address_set_edit_entries() initializes the GtkEntry widgets
     in entries with values from address
 */
-void libbalsa_address_set_edit_entries(LibBalsaAddress * address,
+void libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
                                        GtkWidget ** entries);
 /** libbalsa_address_get_edit_widget() returns an widget adapted for a
     LibBalsaAddress edition, with initial values set if address is
@@ -118,7 +123,7 @@ enum {
 
 extern GtkTargetEntry libbalsa_address_target_list[2];
 
-GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
+GtkWidget *libbalsa_address_get_edit_widget(const LibBalsaAddress *addr,
                                             GtkWidget **entries,
                                             GCallback changed_cb,
                                             gpointer changed_data);

@@ -3735,7 +3735,7 @@ store_address_cb(GtkWidget * widget, gpointer data)
     g_assert(index != NULL);
 
     messages = balsa_index_selected_list(BALSA_INDEX(index));
-    balsa_store_address(messages);
+    balsa_store_address_from_messages(messages);
     g_list_foreach(messages, (GFunc)g_object_unref, NULL);
     g_list_free(messages);
 }

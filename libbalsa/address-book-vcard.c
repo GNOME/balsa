@@ -195,62 +195,6 @@ lbab_vcard_write_end(FILE * stream)
         LBABERR_OK : LBABERR_CANNOT_WRITE;
 }
 
-/* Extract full name in order from <string> that has GnomeCard format
-   and returns the pointer to the allocated memory chunk.
-*/
-static gchar *
-extract_name(const gchar * string, gchar ** last_name, gchar ** first_name)
-{
-    enum GCardFieldOrder { LAST = 0, FIRST, MIDDLE, PREFIX, SUFFIX };
-    gint cpt, j;
-    gchar **fld, **name_arr;
-    gchar *res = NULL;
-
-    fld = g_strsplit(string, ";", 5);
-
-    cpt = 0;
-    while (fld[cpt] != NULL)
-	cpt++;
-
-    if (cpt == 0)		/* insane empty name */
-	return NULL;
-
-    if (fld[LAST] && *fld[LAST])
-        *last_name = g_strdup(fld[LAST]);
-
-    if (fld[FIRST] && *fld[FIRST])
-        *first_name = fld[MIDDLE] && *fld[MIDDLE] ?
-            g_strconcat(fld[FIRST], " ", fld[MIDDLE], NULL) :
-            g_strdup(fld[FIRST]);
-
-    name_arr = g_malloc((cpt + 1) * sizeof(gchar *));
-
-    j = 0;
-    if (cpt > PREFIX && *fld[PREFIX] != '\0')
-	name_arr[j++] = g_strdup(fld[PREFIX]);
-
-    if (cpt > FIRST && *fld[FIRST] != '\0')
-	name_arr[j++] = g_strdup(fld[FIRST]);
-
-    if (cpt > MIDDLE && *fld[MIDDLE] != '\0')
-	name_arr[j++] = g_strdup(fld[MIDDLE]);
-
-    if (cpt > LAST && *fld[LAST] != '\0')
-	name_arr[j++] = g_strdup(fld[LAST]);
-
-    if (cpt > SUFFIX && *fld[SUFFIX] != '\0')
-	name_arr[j++] = g_strdup(fld[SUFFIX]);
-
-    name_arr[j] = NULL;
-
-    g_strfreev(fld);
-
-    /* collect the data to one string */
-    res = g_strjoinv(" ", name_arr);
-    g_strfreev(name_arr);
-
-    return res;
-}
 
 /* Class methods */
 
@@ -350,7 +294,8 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
 	}
 
 	if (g_ascii_strncasecmp(string, "N:", 2) == 0) {
-	    name = extract_name(string + 2, &last_name, &first_name);
+	    name = libbalsa_address_extract_name(string + 2, &last_name,
+                                                 &first_name);
 	    name = validate_vcard_string(name);
 	    last_name = validate_vcard_string(last_name);
 	    first_name = validate_vcard_string(first_name);

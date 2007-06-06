@@ -61,6 +61,8 @@ static void store_address_add_address(StoreAddressInfo * info,
                                       const gchar * label,
                                       const InternetAddress * address,
                                       const InternetAddress * group);
+static void store_address_add_lbaddress(StoreAddressInfo * info,
+                                        const LibBalsaAddress *address);
 static void store_address_add_list(StoreAddressInfo * info,
                                    const gchar * label,
 				   const InternetAddressList * list);
@@ -70,7 +72,7 @@ static void store_address_add_list(StoreAddressInfo * info,
  */
 #define BALSA_STORE_ADDRESS_KEY "balsa-store-address"
 void
-balsa_store_address(GList * messages)
+balsa_store_address_from_messages(GList * messages)
 {
     StoreAddressInfo *info = NULL;
     GList *message_list = NULL;
@@ -116,6 +118,24 @@ balsa_store_address(GList * messages)
     g_signal_connect(G_OBJECT(info->dialog), "response",
                      G_CALLBACK(store_address_response), info);
     gtk_widget_show(GTK_WIDGET(info->dialog));
+}
+
+void
+balsa_store_address(const LibBalsaAddress *address)
+{
+    StoreAddressInfo *info = NULL;
+
+    info = g_new(StoreAddressInfo, 1);
+    info->current_address_book = NULL;
+    info->message_list = NULL;
+    info->entries_list = NULL;
+    info->dialog = store_address_dialog(info);
+
+    store_address_add_lbaddress(info, address);
+
+    g_signal_connect(G_OBJECT(info->dialog), "response",
+                     G_CALLBACK(store_address_response), info);
+    gtk_widget_show_all(GTK_WIDGET(info->dialog));
 }
 
 /* Weak notify that a message was deleted; remove it from our list. */
@@ -352,6 +372,29 @@ store_address_add_address(StoreAddressInfo * info,
 
     label_text = g_strconcat(lab, text, NULL);
     g_free(text);
+    if (g_utf8_strlen(label_text, -1) > 10)
+        /* truncate to an arbitrary length: */
+        *g_utf8_offset_to_pointer(label_text, 10) = '\0';
+    gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), ew,
+                             gtk_label_new(label_text));
+    g_free(label_text);
+}
+
+static void
+store_address_add_lbaddress(StoreAddressInfo * info,
+                            const LibBalsaAddress *address)
+{
+    gchar *label_text;
+    GtkWidget **entries, *ew;
+
+    g_return_if_fail(address->address_list);
+    entries = g_new(GtkWidget *, NUM_FIELDS);
+    info->entries_list = g_list_append(info->entries_list, entries);
+
+    ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
+
+    label_text = g_strdup(address->full_name ? address->full_name :
+                          address->address_list->data);
     if (g_utf8_strlen(label_text, -1) > 10)
         /* truncate to an arbitrary length: */
         *g_utf8_offset_to_pointer(label_text, 10) = '\0';

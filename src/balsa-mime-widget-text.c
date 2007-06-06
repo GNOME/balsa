@@ -26,6 +26,7 @@
 #include "i18n.h"
 #include "quote-color.h"
 #include "sendmsg-window.h"
+#include "store-address.h"
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-mime-widget-text.h"
@@ -50,6 +51,9 @@ static void text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 static BalsaMimeWidget * bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 					    gchar * ptr, size_t len);
 #endif
+static BalsaMimeWidget * bm_widget_new_vcard(BalsaMessage * bm,
+                                             LibBalsaMessageBody * mime_body,
+                                             gchar * ptr, size_t len);
 
 /* URL related stuff */
 typedef struct _message_url_t {
@@ -154,6 +158,9 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 #else
         return NULL;
 #endif
+    }
+    if(g_ascii_strcasecmp(content_type, "text/x-vcard") == 0) {
+        return bm_widget_new_vcard(bm, mime_body, ptr, alloced);
     }
 
     /* prepare a text part */
@@ -1153,3 +1160,53 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * p
     return mw;
 }
 #endif /* defined HAVE_GTKHTML */
+
+#define TABLE_ATTACH(t,str,label) \
+    if(str) { GtkWidget *lbl = gtk_label_new(label);              \
+        gtk_table_attach(t, lbl, 0, 1, row, row+1,                \
+                         GTK_FILL, GTK_FILL, 4, 2);               \
+        gtk_misc_set_alignment(GTK_MISC(lbl), 1.0, 0.0); \
+        gtk_table_attach(table, lbl=gtk_label_new(str), 1, 2, row, row+1, \
+                         GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_EXPAND, 4, 2); \
+        gtk_misc_set_alignment(GTK_MISC(lbl), 0.0, 0.0); \
+        row++;                                                    \
+    }
+
+BalsaMimeWidget *
+bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
+                    gchar *ptr, size_t len)
+{
+    BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+    LibBalsaAddress * addr = libbalsa_address_new_from_vcard(ptr);
+    GtkTable *table;
+    GtkWidget *w;
+    int row = 1;
+
+    mw->widget = gtk_table_new(10, 2, FALSE);
+    table = (GtkTable*)mw->widget;
+        
+    gtk_table_attach_defaults(table, w=gtk_label_new(_("Address")),
+                              0, 1, 0, 1);
+    gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.0);
+    w = gtk_button_new_with_mnemonic(_("S_tore"));
+    /* FIXME: Connect signal */
+    gtk_table_attach(table, w, 1, 2, 0, 1, 0,0,  2, 2);
+    g_signal_connect_swapped(w, "clicked",
+                             G_CALLBACK(balsa_store_address), addr);
+    g_object_weak_ref(G_OBJECT(mw), (GWeakNotify)g_object_unref, addr);
+ 
+
+    TABLE_ATTACH(table, addr->full_name,    _("Full Name"));
+    TABLE_ATTACH(table, addr->nick_name,    _("Nick Name"));
+    TABLE_ATTACH(table, addr->first_name,   _("First Name"));
+    TABLE_ATTACH(table, addr->last_name,    _("Last Name"));
+    TABLE_ATTACH(table, addr->organization, _("Organization"));
+    if(addr->address_list) {
+        TABLE_ATTACH(table, addr->address_list->data, _("Email Address"));
+    }
+        
+    g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
+    gtk_widget_show_all(mw->widget);
+    g_free(ptr);
+    return mw;
+}

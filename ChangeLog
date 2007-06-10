@@ -1,3 +1,8 @@
+2007-06-10  Peter Bloomfield
+
+	* src/balsa-index.c: (bndx_expand_to_row): avoid critical
+	warnings from GtkTreeView.
+
 2007-06-07  Pawel Salek
 
 	* src/store-address.[ch]: add ability to create addresses from

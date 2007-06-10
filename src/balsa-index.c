@@ -2076,9 +2076,13 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
 static void
 bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path)
 {
-    GtkTreePath *tmp = gtk_tree_path_copy(path);
+    GtkTreePath *tmp;
     gint i, j;
 
+    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(index)))
+        return;
+
+    tmp = gtk_tree_path_copy(path);
     while (gtk_tree_path_up(tmp) && gtk_tree_path_get_depth(tmp) > 0
 	   && !gtk_tree_view_row_expanded(GTK_TREE_VIEW(index), tmp));
     /* Now we go from the deepest unexpanded ancestor up to full path */

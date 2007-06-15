@@ -1324,8 +1324,8 @@ comp_unsigned(const void *a, const void *b)
 static int
 comp_imap_address(const ImapAddress *a, const ImapAddress *b)
 {
-  if(a->name) {
-    if(b->name)
+  if(a && a->name) {
+    if(b && b->name)
       return g_ascii_strcasecmp(a->name, b->name);
     else return 1;
   } else

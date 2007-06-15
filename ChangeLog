@@ -1,3 +1,11 @@
+2007-06-10  Pawel Salek
+
+	Commit Peter's patches for broader testing...
+	* libbalsa/imap/imap-handle.c: detect disconnection.
+	* libbalsa/imap/imap-commands.c: check for header existence in client
+	side sorting.
+
+
 2007-06-10  Peter Bloomfield
 
 	* src/balsa-index.c: (bndx_expand_to_row): avoid critical

@@ -1562,7 +1562,10 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
       g_free(ci);
     }
   }
-  return lastcmd == cmdno ? rc : IMR_UNTAGGED;
+  if (handle->state == IMHS_DISCONNECTED)
+    return IMR_SEVERED;
+  else
+    return lastcmd == cmdno ? rc : IMR_UNTAGGED;
 }
 
 /* imap_cmd_exec: 

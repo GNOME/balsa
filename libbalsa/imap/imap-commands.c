@@ -702,9 +702,15 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
   int ics;
   gchar *cmd = NULL, *seqno;
   ImapResponse rc = IMR_OK;
+  gchar *cmd_format;
 
   if (h->state == IMHS_DISCONNECTED)
     return IMR_SEVERED;
+
+  if(imap_mbox_handle_can_do(h, IMCAP_ESEARCH))
+    cmd_format = "SEARCH RETURN (ALL) %s %s";
+  else
+    cmd_format = "SEARCH %s %s";
 
   cb  = h->search_cb;  h->search_cb  = (ImapSearchCb)set_flag_cache_cb;
   arg = h->search_arg; 
@@ -735,7 +741,7 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
       default: g_free(seqno); continue;
       }
       if(!cmd) imap_handle_idle_disable(h);
-      cmd = g_strdup_printf("SEARCH %s %s", seqno, flg);
+      cmd = g_strdup_printf(cmd_format, seqno, flg);
       g_free(seqno);
       flag[issued_cmd] = fnd.flag;
       ics = imap_cmd_start(h, cmd, &cmdno[issued_cmd++]);

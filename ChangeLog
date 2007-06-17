@@ -1,10 +1,16 @@
-2007-06-10  Pawel Salek
+2007-06-17  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: handle ESEARCH response.
+	* libbalsa/imap/imap-handle.h: recognize ESEARCH extension.
+	* libbalsa/imap/imap-commands.c: use it to optimize searches.
+	* libbalsa/imap/imap-search.c: ditto.
+
+2007-06-15  Pawel Salek
 
 	Commit Peter's patches for broader testing...
 	* libbalsa/imap/imap-handle.c: detect disconnection.
 	* libbalsa/imap/imap-commands.c: check for header existence in client
 	side sorting.
-
 
 2007-06-10  Peter Bloomfield
 

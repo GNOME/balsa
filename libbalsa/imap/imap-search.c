@@ -383,11 +383,13 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
 {
   int can_do_literals =
     imap_mbox_handle_can_do(h, IMCAP_LITERAL);
+  int can_do_esearch = imap_mbox_handle_can_do(h, IMCAP_ESEARCH);
   ImapResponse ir;
   ImapCmdTag tag;
   ImapSearchCb ocb;
   void *oarg;
   unsigned cmdno;
+  const gchar *cmd_string;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
 
@@ -397,12 +399,17 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
   if(execute_flag_only_search(h, s, cb, cb_arg, &ir))
     return ir;
 
+  if(can_do_esearch)
+    cmd_string = "Search return (all)";
+  else
+    cmd_string = "Search";
+
   ocb  = h->search_cb;  h->search_cb  = (ImapSearchCb)cb;
   oarg = h->search_arg; h->search_arg = cb_arg;
   
   imap_handle_idle_disable(h);
   cmdno = imap_make_tag(tag);
-  sio_printf(h->sio, "%s%s Search ", tag, uid ? " UID" : "");
+  sio_printf(h->sio, "%s%s %s ", tag, uid ? " UID" : "", cmd_string);
   if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
     sio_write(h->sio, "\r\n", 2);
     imap_handle_flush(h);

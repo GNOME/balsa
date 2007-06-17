@@ -761,11 +761,7 @@ imap_get_atom(struct siobuf *sio, char* atom, size_t len)
   for(i=0; i<len-1 && (c=sio_getc(sio)) >=0 && IS_ATOM_CHAR(c); i++)
     atom[i] = c;
 
-  if(i<len-1) {
-    if (c < 0)
-      return c;
-    atom[i] = '\0';
-  } else atom[i+1] = '\0'; /* too long tag?  */
+  atom[i] = '\0';
   return c;
 }
 
@@ -1024,6 +1020,7 @@ imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag fl, gboolean state)
 {
   char *flag;
   gchar * cmd;
+  const gchar *cmd_prefix;
   void *arg;
   ImapSearchCb cb;
   ImapResponse rc;
@@ -1031,6 +1028,11 @@ imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag fl, gboolean state)
   mbox_view_dispose(&h->mbox_view);
   if(fl==0)
     return 1;
+
+  if(imap_mbox_handle_can_do(h, IMCAP_ESEARCH))
+    cmd_prefix = "SEARCH RETURN (ALL) ";
+  else
+    cmd_prefix = "SEARCH ALL ";
 
   switch(fl) {
   case IMSGF_SEEN:     flag = "SEEN"; break;
@@ -1045,7 +1047,7 @@ imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag fl, gboolean state)
   arg = h->search_arg; h->search_arg = NULL;
   g_free(h->mbox_view.filter_str);
   h->mbox_view.filter_str = g_strconcat(state ? "" : "UN", flag, NULL);
-  cmd = g_strconcat("SEARCH ALL ", h->mbox_view.filter_str, NULL);
+  cmd = g_strconcat(cmd_prefix, h->mbox_view.filter_str, NULL);
   rc = imap_cmd_exec(h, cmd);
   g_free(cmd);
   h->search_cb = cb; h->search_arg = arg;
@@ -1780,7 +1782,8 @@ ir_capability_data(ImapMboxHandle *handle)
     "AUTH=ANONYMOUS", "AUTH=CRAM-MD5", "AUTH=GSSAPI", "AUTH=PLAIN",
     "STARTTLS", "LOGINDISABLED", "SORT",
     "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES",
-    "UNSELECT", "SCAN", "CHILDREN", "LITERAL+", "IDLE", "SASL-IR", "BINARY"
+    "UNSELECT", "SCAN", "CHILDREN", "LITERAL+", "IDLE", "SASL-IR",
+    "BINARY", "ESEARCH"
   };
   unsigned x;
   int c;
@@ -2050,6 +2053,101 @@ ir_status(ImapMboxHandle *h)
   g_free(name);
   /* g_return_val_if-fail(c == ')', IMR_BAD) */
   return ir_check_crlf(h, sio_getc(h->sio));
+}
+
+/** Process ESEARCH response. Consult RFC4466 and RFC4731 before
+   modification.  */
+static ImapResponse
+ir_esearch(ImapMboxHandle *h)
+{
+  char atom[LONG_STRING];
+  int uid_data = 0;
+  int c = sio_getc(h->sio);
+  if(c == '(') { /* search correlator */
+    gchar *str;
+    c = imap_get_atom(h->sio, atom, sizeof(atom));
+    if(c == EOF) return IMR_SEVERED;
+    if(strcasecmp(atom, "TAG")) { /* TAG is the only acceptable response here! */
+      printf("ESearch expected TAG encountered %s\n", atom);
+      return IMR_PROTOCOL; 
+    }
+    if(c != ' ')
+      return IMR_PROTOCOL;
+    str = imap_get_string(h->sio);
+    printf("ESearch response for tag %s\n", str);
+    g_free(str);
+    if( (c = sio_getc(h->sio)) != ')') {
+      return c == EOF ? IMR_SEVERED : IMR_PROTOCOL;
+    }
+    c = sio_getc(h->sio);
+  }
+  if(c == EOF) return IMR_SEVERED;  
+  if (c == '\r' || c == '\n')
+    return ir_check_crlf(h, c);
+  /* Now, an atom has to follow */
+  c = imap_get_atom(h->sio, atom, sizeof(atom));
+
+  if(strcasecmp(atom, "UID") == 0) {
+    uid_data = 1;
+    c = imap_get_atom(h->sio, atom, sizeof(atom));
+  }
+  if(c == EOF) return IMR_SEVERED;
+
+  while(c == ' ') {
+    static const unsigned LENGTH_OF_LARGEST_UNSIGNED = 10;
+    char value[30];
+    gchar *p;
+    int offset = 0;
+    /* atom contains search-modifier-name, time to fetch
+       search-return-value. In ESEARCH, it is always an atom, so we
+       cut the corners here. We get values in chunks.  The chunk size
+       is pretty arbitrary as long as it can fit two largest possible
+       32-bit unsigned numbers and a colon. */
+    do {
+      size_t value_len;
+      if(c != '\r' && c != '\n') /* Dont try to read beyond the line. */
+        c = imap_get_atom(h->sio, value + offset, sizeof(value)-offset);
+      value_len = strlen(value);
+
+      if(h->search_cb) {
+        unsigned seq, seq1;
+
+        for(p=value; *p &&
+              (unsigned)(p-value) <=
+              sizeof(value)-(2*LENGTH_OF_LARGEST_UNSIGNED+1); ) {
+          if(sscanf(p, "%u", &seq) != 1)
+            return IMR_PROTOCOL;
+          while(*p && isdigit(*p)) p++;
+          if( *p == ':') {
+            p++;
+            if(sscanf(p, "%u", &seq1) != 1)
+              return IMR_PROTOCOL;
+          } else seq1 = seq;
+
+          for(; seq<=seq1; seq++) {
+            h->search_cb(h, seq, h->search_arg);
+          }
+          while(*p && isdigit(*p)) p++;
+          if(*p == ',') p++;
+        } /* End of for */
+	
+	  /* Reuse what's left. */
+        if(*p) {
+          offset = value_len - (p-value);
+          memmove(value, p, offset+1);
+          printf("Will reuse '%s' of length %u (value %p p=%p p-v=%d)\n",
+                 value, offset, value, p, p-value);
+        } else offset = 0;
+
+      } /* End of if(h->search_cb) */
+
+    }  while (isdigit(c)|| offset);
+
+    if(c == ' ')
+      c = imap_get_atom(h->sio, value, sizeof(value));
+  }
+
+  return ir_check_crlf(h, c);
 }
 
 static ImapResponse
@@ -3205,7 +3303,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     }
     atom[i] = '\0';
     for(i=0; i<ELEMENTS(msg_att); i++) {
-      if(strcmp(atom, msg_att[i].name) == 0) {
+      if(strcasecmp(atom, msg_att[i].name) == 0) {
         if( (rc=msg_att[i].handler(h, c, seqno)) != IMR_OK)
           return rc;
         break;
@@ -3331,11 +3429,11 @@ static const struct {
   { "LIST",       4, ir_list },
   { "LSUB",       4, ir_lsub },
   { "STATUS",     6, ir_status },
+  { "ESEARCH",    7, ir_esearch },
   { "SEARCH",     6, ir_search },
   { "SORT",       4, ir_sort   },
   { "THREAD",     6, ir_thread },
   { "FLAGS",      5, ir_flags  },
-  /* FIXME Is there an unnumbered FETCH response? */
   { "FETCH",      5, ir_fetch  }
 };
 static const struct {

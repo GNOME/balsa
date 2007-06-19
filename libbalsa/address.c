@@ -35,6 +35,8 @@ static void libbalsa_address_class_init(LibBalsaAddressClass * klass);
 static void libbalsa_address_init(LibBalsaAddress * ab);
 static void libbalsa_address_finalize(GObject * object);
 
+static gchar ** vcard_strsplit(const gchar * string);
+
 GType libbalsa_address_get_type(void)
 {
     static GType address_type = 0;
@@ -113,6 +115,11 @@ libbalsa_address_new(void)
 
 /** Extract full name in order from <string> that has GnomeCard format
    and returns the pointer to the allocated memory chunk.
+
+   VCARD code attempts to obey published documentation:
+
+   [1] VCARD 1.2 specs: http://www.imc.org/pdi/vcard-21.txt
+   [2] VCARD 3.0 specs, RFC 2426 (http://www.ietf.org/rfc/rfc2426.txt)
 */
 gchar*
 libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
@@ -123,7 +130,7 @@ libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
     gchar **fld, **name_arr;
     gchar *res = NULL;
 
-    fld = g_strsplit(string, ";", 5);
+    fld = vcard_strsplit(string);
 
     cpt = 0;
     while (fld[cpt] != NULL)
@@ -172,7 +179,7 @@ libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
 /* Duplicates some code from address-book-vcard.c:
  */
 static gchar*
-validate_vcard_string(gchar * vcstr)
+validate_vcard_string(gchar * vcstr, const gchar * charset)
 {
     gchar * utf8res;
     gsize b_written;
@@ -181,8 +188,11 @@ validate_vcard_string(gchar * vcstr)
     if (!vcstr || g_utf8_validate(vcstr, -1, NULL))
 	return vcstr;
 
-    /* try to convert from the user's locale setting */
-    utf8res = g_locale_to_utf8(vcstr, -1, NULL, &b_written, NULL);
+    /* convert from the passed charset or as fallback from the locale setting */
+    if (charset && g_ascii_strcasecmp(charset, "utf-8")) {
+	utf8res = g_convert(vcstr, -1, "utf-8", charset, NULL, &b_written, NULL);
+    } else
+	utf8res = g_locale_to_utf8(vcstr, -1, NULL, &b_written, NULL);
     if (!utf8res)
 	return vcstr;
 
@@ -190,8 +200,123 @@ validate_vcard_string(gchar * vcstr)
     return utf8res;
 }
 
+
+static inline gchar *
+vcard_qp_decode(gchar * str)
+{
+    gint len = strlen(str);
+    gchar * newstr = g_malloc0(len + 1);
+    int state = 0;
+    int save;
+
+    /* qp decode the input string */
+    g_mime_utils_quoted_decode_step((unsigned char *) str, len,
+				    (unsigned char *) newstr, &state, &save);
+
+    /* free input and return new string */
+    g_free(str);
+    return newstr;
+}
+
+
+static inline gchar *
+vcard_b64_decode(gchar * str)
+{
+    gint len = strlen(str);
+    gchar * newstr = g_malloc0(len + 1);
+    int state = 0;
+    guint32 save;
+
+    /* base64 decode the input string */
+    g_mime_utils_base64_decode_step((unsigned char *) str, len,
+				    (unsigned char *) newstr, &state, &save);
+
+    /* free input and return new string */
+    g_free(str);
+    return newstr;
+}
+
+
+static inline gchar *
+vcard_charset_to_utf8(gchar * str, const gchar * charset)
+{
+    gsize bytes_written;
+    gchar * convstr;
+
+    /* convert only if the source is known and not utf-8 */
+    if (!charset || !g_ascii_strcasecmp(charset, "utf-8"))
+	return str;
+
+    convstr = g_convert(str, -1, "utf-8", charset, NULL, &bytes_written, NULL);
+    g_free(str);
+    return convstr ? convstr : strdup("");
+}
+
+
+/* mainly copied from g_strsplit, but (a) with the fixed delimiter ';'
+ * (b) ignoring '\;' sequences (c) always returning as many elements as
+ * possible and (d) unescape '\;' sequences in the resulting array */
+static gchar **
+vcard_strsplit(const gchar * string)
+{
+    GSList *string_list = NULL, *slist;
+    gchar **str_array, *s;
+    guint n = 0;
+    const gchar *remainder;
+    gint max_tokens = G_MAXINT;
+
+    g_return_val_if_fail(string != NULL, NULL);
+
+    max_tokens = G_MAXINT;
+    remainder = string;
+    s = strchr(remainder, ';');
+    while (s && s > remainder && s[-1] == '\\')
+	s = strchr(s + 1, ';');
+
+    while (s) {
+	gsize len;
+
+	len = s - remainder;
+	string_list = g_slist_prepend(string_list,
+				      g_strndup(remainder, len));
+	n++;
+	remainder = s + 1;
+	s = strchr(remainder, ';');
+	while (s && s > remainder && s[-1] == '\\')
+	    s = strchr(s + 1, ';');
+    }
+
+    if (*string) {
+	n++;
+	string_list = g_slist_prepend(string_list, g_strdup(remainder));
+    }
+
+    str_array = g_new(gchar*, n + 1);
+
+    str_array[n--] = NULL;
+    for (slist = string_list; slist; slist = slist->next) {
+	gchar * str = (gchar *) slist->data;
+	gchar * p;
+
+	while ((p = strstr(str, "\\;"))) {
+	    gchar * newstr = g_malloc(strlen(str));
+
+	    strncpy(newstr, str, p - str);
+	    strcpy(newstr + (p - str), p + 1);
+	    g_free(str);
+	    str = newstr;
+	}
+	str_array[n--] = str;
+    }
+
+    g_slist_free(string_list);
+
+    return str_array;
+}
+
+
 LibBalsaAddress*
-libbalsa_address_new_from_vcard(const gchar *str)
+libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 {
     LibBalsaAddress *address = g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
     gchar *name = NULL, *nick_name = NULL, *org = NULL;
@@ -199,12 +324,46 @@ libbalsa_address_new_from_vcard(const gchar *str)
     gint in_vcard = FALSE;
     GList *address_list = NULL;
     const gchar *string, *next_line;
+    gchar * vcard;
 
     g_return_val_if_fail(str, address);
 
-    for(string = str; *string; string = next_line) {
+    /* rfc 2425 unfold the string */
+    vcard = g_strdup(str);
+    while ((string = strstr(vcard, "\r\n ")) ||
+	   (string = strstr(vcard, "\r\n\t"))) {
+	gchar * newstr = g_malloc0(strlen(vcard) - 2);
+
+	strncpy(newstr, vcard, string - vcard);
+	strcpy(newstr + (string - vcard), string + 3);
+	g_free(vcard);
+	vcard = newstr;
+    }
+    while ((string = strstr(vcard, "\n ")) ||
+	   (string = strstr(vcard, "\n\t"))) {
+	gchar * newstr = g_malloc(strlen(vcard) - 1);
+
+	strncpy(newstr, vcard, string - vcard);
+	strcpy(newstr + (string - vcard), string + 2);
+	g_free(vcard);
+	vcard = newstr;
+    }
+
+    /* may contain \r's when decoded from base64... */
+    while ((string = strstr(vcard, "\r\n ")) ||
+	   (string = strstr(vcard, "\r\n\t"))) {
+	gchar * newstr = g_malloc(strlen(vcard) - 2);
+
+	strncpy(newstr, vcard, string - vcard);
+	strcpy(newstr + (string - vcard), string + 3);
+	g_free(vcard);
+	vcard = newstr;
+    }
+
+    /* process */
+    for(string = vcard; *string; string = next_line) {
         next_line = strchr(string, '\n');
-        if(next_line)
+        if (next_line)
             ++next_line;
         else
             next_line = string + strlen(string);
@@ -253,37 +412,90 @@ libbalsa_address_new_from_vcard(const gchar *str)
             return address;
 	} else if (in_vcard) {
             gchar *line = g_strndup(string, next_line-string);
+
             g_strchomp(line);
+
+	    /* Encoding of national characters:
+	     * - vcard 2.1 allows charset=xxx and encoding=(base64|quoted-printable|8bit)
+	     * - Thunderbird claims to use vcard 2.1, but uses only "quoted-printable",
+	     *   and the charset from part MIME header
+	     * - vcard 3.0 (rfc 2426) allows "encoding=b", the charset must be taken
+	     *   from the content-type MIME header */
+	    if (strchr(line, ':')) {
+		gchar ** parts = g_strsplit(line, ":", 2);
+		gchar ** tokens;
+		gint n;
+
+		/* split control stuff into tokens */
+		tokens = g_strsplit(parts[0], ";", -1);
+
+		/* find encoding= */
+		for (n = 0; tokens[n]; n++)
+		    if (!g_ascii_strncasecmp(tokens[n], "encoding=", 9)) {
+			if (!g_ascii_strcasecmp(tokens[n] + 9, "base64")) {
+			    /* vcard 2.1: use the charset parameter (below) */
+			    parts[1] = vcard_b64_decode(parts[1]);
+			} else if (!g_ascii_strcasecmp(tokens[n] + 9, "b")) {
+			    /* rfc 2426: charset from MIME part */
+			    parts[1] = vcard_b64_decode(parts[1]);
+			    parts[1] = vcard_charset_to_utf8(parts[1], charset);
+			} else if (!g_ascii_strcasecmp(tokens[n] + 9, "quoted-printable")) {
+			    /* vcard 2.1: use the charset parameter (below) */
+			    parts[1] = vcard_qp_decode(parts[1]);
+			}
+		    }
+
+		/* find quoted-printable */
+		for (n = 0; tokens[n]; n++)
+		    if (!g_ascii_strcasecmp(tokens[n], "quoted-printable")) {
+			/* Thunderbird: broken vcard 2.1, charset from MIME part */
+			parts[1] = vcard_qp_decode(parts[1]);
+			parts[1] = vcard_charset_to_utf8(parts[1], charset);
+		    }
+
+		/* find charset= (vcard 2.1 only) */
+		for (n = 0; tokens[n]; n++)
+		    if (!g_ascii_strncasecmp(tokens[n], "charset=", 8))
+			parts[1] = vcard_charset_to_utf8(parts[1], tokens[n] + 8);
+
+		/* construct the result */
+		g_free(line);
+		line = g_strdup_printf("%s:%s", tokens[0], parts[1]);
+
+		/* clean up */
+		g_strfreev(tokens);
+		g_strfreev(parts);
+	    }
+
             if (g_ascii_strncasecmp(line, "FN:", 3) == 0) {
-                
+
                 full_name = g_strdup(line + 3);
-                full_name = validate_vcard_string(full_name);
+                full_name = validate_vcard_string(full_name, charset);
 
             } else if (g_ascii_strncasecmp(line, "N:", 2) == 0) {
 
                 name = libbalsa_address_extract_name(line + 2,
                                                      &last_name, &first_name);
-                name = validate_vcard_string(name);
-                last_name = validate_vcard_string(last_name);
-                first_name = validate_vcard_string(first_name);
+                name = validate_vcard_string(name, charset);
+                last_name = validate_vcard_string(last_name, charset);
+                first_name = validate_vcard_string(first_name, charset);
 
             } else if (g_ascii_strncasecmp(line, "NICKNAME:", 9) == 0) {
 
                 nick_name = g_strdup(line + 9);
-                nick_name = validate_vcard_string(nick_name);
+                nick_name = validate_vcard_string(nick_name, charset);
 
             } else if (g_ascii_strncasecmp(line, "ORG:", 4) == 0) {
+		gchar ** org_strs = vcard_strsplit(line + 4);
 
-                org = g_strdup(line + 4);
-                org = validate_vcard_string(org);
+                org = g_strjoinv(", ", org_strs);
+		g_strfreev(org_strs);
+                org = validate_vcard_string(org, charset);
 
-            } else if (g_ascii_strncasecmp(line, "EMAIL;", 6) == 0) {
+            } else if (g_ascii_strncasecmp(line, "EMAIL:", 6) == 0) {
 
-                gchar *ptr = strchr(line+6, ':');
-                if (ptr) {
-                    address_list =
-                        g_list_prepend(address_list, g_strdup(ptr + 1));
-                }
+		address_list =
+		    g_list_prepend(address_list, g_strdup(line + 6));
             }
             g_free(line);
         }

@@ -403,6 +403,140 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 }
 
 
+/* note: a vcard is an icon plus a series of labels/text, so this function actually
+ * returns a BalsaPrintObjectDefault... */
+#ifdef HAVE_GNOME
+#include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#endif
+
+#define ADD_VCARD_FIELD(buf, labwidth, layout, field, descr)		\
+    do {								\
+	if (field) {							\
+	    gint label_width = p_string_width_from_layout(layout, descr); \
+	    if (label_width > labwidth)					\
+		labwidth = label_width;					\
+	    if ((buf)->len > 0)						\
+		g_string_append_c(buf, '\n');				\
+	    g_string_append_printf(buf, "%s\t%s", descr, field);	\
+	}								\
+    } while(0)
+
+GList *
+balsa_print_object_text_vcard(GList * list,
+			      GtkPrintContext * context,
+			      LibBalsaMessageBody * body,
+			      BalsaPrintSetup * psetup)
+{
+    BalsaPrintObjectDefault *pod;
+    BalsaPrintObject *po;
+    PangoFontDescription *header_font;
+    PangoLayout *test_layout;
+    PangoTabArray *tabs;
+    GString *desc_buf;
+    gdouble c_max_height;
+    LibBalsaAddress * addr;
+    gchar *textbuf;
+
+    /* check if we can create an address from the body and fall back to default if 
+    * this fails */
+    if (body->buffer)
+	textbuf = g_strdup(body->buffer);
+    else
+	libbalsa_message_body_get_content(body, &textbuf, NULL);
+    addr = libbalsa_address_new_from_vcard(textbuf, body->charset);
+    if (!addr) {
+	g_free(textbuf);
+	return balsa_print_object_default(list, context, body, psetup);
+    }
+
+    /* proceed with the address information */
+    pod = g_object_new(BALSA_TYPE_PRINT_OBJECT_DEFAULT, NULL);
+    g_assert(pod != NULL);
+    po = BALSA_PRINT_OBJECT(pod);
+
+    /* create the part */
+    po->depth = psetup->curr_depth;
+    po->c_width =
+	psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+
+    /* get the stock contacts icon or the mime type icon on fail */
+    pod->pixbuf =
+	gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
+				 "stock_contact", 48,
+				 GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
+    if (!pod->pixbuf) {
+	gchar *conttype = libbalsa_message_body_get_mime_type(body);
+	
+	pod->pixbuf = libbalsa_icon_finder(conttype, NULL, NULL, GTK_ICON_SIZE_DND);
+    }
+    pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
+    pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);
+
+
+    /* create a layout for calculating the maximum label width */
+    header_font =
+	pango_font_description_from_string(balsa_app.print_header_font);
+    test_layout = gtk_print_context_create_pango_layout(context);
+    pango_layout_set_font_description(test_layout, header_font);
+    pango_font_description_free(header_font);
+
+    /* add fields from the address */
+    desc_buf = g_string_new("");
+    pod->p_label_width = 0;
+    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
+		    addr->full_name,    _("Full Name"));
+    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
+		    addr->nick_name,    _("Nick Name"));
+    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
+		    addr->first_name,   _("First Name"));
+    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
+		    addr->last_name,    _("Last Name"));
+    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
+		    addr->organization, _("Organization"));
+    if (addr->address_list)
+        ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
+			(const gchar *) addr->address_list->data, _("Email Address"));
+    g_object_unref(addr);
+
+    /* add a small space between label and value */
+    pod->p_label_width += C_TO_P(C_LABEL_SEP);
+
+    /* configure the layout so we can calculate the text height */
+    pango_layout_set_indent(test_layout, -pod->p_label_width);
+    tabs =
+	pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT,
+					   pod->p_label_width);
+    pango_layout_set_tabs(test_layout, tabs);
+    pango_tab_array_free(tabs);
+    pango_layout_set_width(test_layout,
+			   C_TO_P(po->c_width -
+				  4 * C_LABEL_SEP - pod->c_image_width));
+    pango_layout_set_alignment(test_layout, PANGO_ALIGN_LEFT);
+    pod->c_text_height =
+	P_TO_C(p_string_height_from_layout(test_layout, desc_buf->str));
+    pod->description = g_string_free(desc_buf, FALSE);
+
+    /* check if we should move to the next page */
+    c_max_height = MAX(pod->c_text_height, pod->c_image_height);
+    if (psetup->c_y_pos + c_max_height > psetup->c_height) {
+	psetup->c_y_pos = 0;
+	psetup->page_count++;
+    }
+
+    /* remember the extent */
+    po->on_page = psetup->page_count - 1;
+    po->c_at_x = psetup->c_x0 + po->depth * C_LABEL_SEP;
+    po->c_at_y = psetup->c_y0 + psetup->c_y_pos;
+    po->c_width = psetup->c_width - 2 * po->depth * C_LABEL_SEP;
+    po->c_height = c_max_height;
+
+    /* adjust the y position */
+    psetup->c_y_pos += c_max_height;
+
+    return g_list_append(list, po);
+}
+
+
 static void
 balsa_print_object_text_draw(BalsaPrintObject * self,
 			     GtkPrintContext * context,

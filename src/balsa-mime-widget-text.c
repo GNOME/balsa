@@ -1177,7 +1177,8 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
                     gchar *ptr, size_t len)
 {
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    LibBalsaAddress * addr = libbalsa_address_new_from_vcard(ptr);
+    LibBalsaAddress * addr =
+	libbalsa_address_new_from_vcard(ptr, mime_body->charset ? mime_body->charset : "us-ascii");
     GtkTable *table;
     GtkWidget *w;
     int row = 1;

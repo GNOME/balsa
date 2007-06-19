@@ -86,7 +86,8 @@ struct _LibBalsaAddressClass {
 GType libbalsa_address_get_type(void);
  
 LibBalsaAddress *libbalsa_address_new(void);
-LibBalsaAddress *libbalsa_address_new_from_vcard(const gchar *str);
+LibBalsaAddress *libbalsa_address_new_from_vcard(const gchar *str,
+						 const gchar *charset);
 gchar * libbalsa_address_extract_name(const gchar * string,
                                       gchar ** last_name,
                                       gchar ** first_name);

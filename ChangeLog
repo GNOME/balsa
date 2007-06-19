@@ -1,3 +1,9 @@
+2007-06-19  Albrecht Dress
+
+	* libbalsa/address.[hc]: make VCARD support more RFC-compatible.
+	* src/balsa-mime-widget-text.c: improve displaying.
+	* balsa-print-object-text.[hc]: add printing.
+	
 2007-06-17  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: handle ESEARCH response.

@@ -113,6 +113,9 @@ balsa_print_objects_append_from_body(GList * list,
 	return balsa_print_object_default(list, context, mime_body, psetup);
 // #endif
 
+    if (!g_ascii_strcasecmp("text/x-vcard", conttype))
+	return balsa_print_object_text_vcard(list, context, mime_body, psetup);
+
     if (!g_ascii_strcasecmp("text/plain", conttype))
 	return balsa_print_object_text_plain(list, context, mime_body, psetup);
 

@@ -207,7 +207,11 @@ vcard_qp_decode(gchar * str)
     gint len = strlen(str);
     gchar * newstr = g_malloc0(len + 1);
     int state = 0;
+#if HAVE_GMIME_2_2_5
+    guint32 save;
+#else  /* HAVE_GMIME_2_2_5 */
     int save;
+#endif /* HAVE_GMIME_2_2_5 */
 
     /* qp decode the input string */
     g_mime_utils_quoted_decode_step((unsigned char *) str, len,

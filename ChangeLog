@@ -1,3 +1,8 @@
+2007-06-21  Peter Bloomfield
+
+	* libbalsa/address.c: (vcard_qp_decode): build with GMime >=
+	2.5.5
+
 2007-06-19  Albrecht Dress
 
 	* libbalsa/address.[hc]: make VCARD support more RFC-compatible.

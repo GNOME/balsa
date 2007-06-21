@@ -1,5 +1,7 @@
 2007-06-21  Peter Bloomfield
 
+	* src/main-window.c: (display_new_mail_notification): respect
+	balsa_app.notify_new_mail_dialog.
 	* libbalsa/address.c: (vcard_qp_decode): build with GMime >=
 	2.5.5
 

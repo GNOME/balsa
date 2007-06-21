@@ -3339,6 +3339,10 @@ display_new_mail_notification(int num_new, int has_new)
     if (balsa_app.notify_new_mail_sound)
         gnome_triggers_do("New mail has arrived", "email",
                           "balsa", "newmail", NULL);
+
+    if (!balsa_app.notify_new_mail_dialog)
+        return;
+
 #ifdef HAVE_NOTIFY
     /* Before attemtping to use the notifications check whether they
        are actually available - perhaps the underlying connection to
@@ -3363,10 +3367,6 @@ display_new_mail_notification(int num_new, int has_new)
         }
     } else {
 #endif
-
-    if (!balsa_app.notify_new_mail_dialog)
-        return;
-
     if (dlg) {
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */

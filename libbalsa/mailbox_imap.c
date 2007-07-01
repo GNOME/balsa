@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* -*-mode:c; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2003 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
@@ -2658,7 +2658,7 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
            imap_mbox_store_flag(handle,
                                 seqno->len, (guint *) seqno->data,
                                 flag_clr, FALSE));
-    return rc;
+    return rc == IMR_OK;
 }
 
 static gboolean

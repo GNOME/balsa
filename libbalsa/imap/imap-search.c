@@ -190,6 +190,56 @@ imap_search_key_free(ImapSearchKey *s)
   }
 }
 
+static gboolean
+imap_search_checks_body(const ImapSearchKey *s)
+{
+  while(s) {
+    switch(s->type) {
+    case IMSE_NOT: /* NOOP */ break; 
+    case IMSE_OR: 
+      if(imap_search_checks_body(s->d.or.l) ||
+         imap_search_checks_body(s->d.or.r))
+        return TRUE;
+      break;
+    case IMSE_FLAG: break;
+    case IMSE_STRING:
+      if(s->d.string.hdr == IMSE_S_BODY)
+        return TRUE;
+    case IMSE_DATE:
+    case IMSE_SIZE:
+    case IMSE_SEQUENCE:
+      break;
+    }
+    s = s->next;
+  }
+  return FALSE;
+}
+
+static gboolean
+imap_search_checks_headers(const ImapSearchKey *s)
+{
+  while(s) {
+    switch(s->type) {
+    case IMSE_NOT: /* NOOP */ break; 
+    case IMSE_OR: 
+      if(imap_search_checks_headers(s->d.or.l) ||
+         imap_search_checks_headers(s->d.or.r))
+        return TRUE;
+      break;
+    case IMSE_FLAG: break;
+    case IMSE_STRING:
+      return TRUE;
+    case IMSE_DATE:
+    case IMSE_SIZE:
+    case IMSE_SEQUENCE:
+      break;
+    }
+    s = s->next;
+  }
+  return FALSE;
+}
+
+
 void
 imap_search_key_set_next(ImapSearchKey *list, ImapSearchKey *next)
 {
@@ -377,18 +427,34 @@ execute_flag_only_search(ImapMboxHandle *h, ImapSearchKey *s,
                          ImapSearchCb cb, void *cb_arg,
                          ImapResponse *rc);
 
+/** Searches the mailbox and calls the specified callback for all
+    messages matching the search key. It tries not to search too many
+    messages at once to avoid session timeouts. The limits on batch
+    lengths are empirical.
+
+    There is one known problem that is due to the fact that we do not
+    separate between easy (flag) and expensive (body) searches: the
+    search will be repeated on every flag change. What we (but also
+    IMAP servers!) could do is to execute the quick search first to
+    get an idea which messages should be searched for the expensive
+    parts. This also coincides with splitting searches into mutable
+    (flags) and immutable terms (anything else).
+ */
 ImapResponse
 imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
                  ImapSearchCb cb, void *cb_arg)
 {
+  static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500;
+  static const unsigned HEADER_TO_SEARCH_AT_ONCE = 2000;
+  static const unsigned UIDS_TO_SEARCH_AT_ONCE   = 100000;
   int can_do_literals =
     imap_mbox_handle_can_do(h, IMCAP_LITERAL);
   int can_do_esearch = imap_mbox_handle_can_do(h, IMCAP_ESEARCH);
-  ImapResponse ir;
+  ImapResponse ir = IMR_OK;
   ImapCmdTag tag;
   ImapSearchCb ocb;
   void *oarg;
-  unsigned cmdno;
+  unsigned cmdno, lo, delta;
   const gchar *cmd_string;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
@@ -408,15 +474,33 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
   oarg = h->search_arg; h->search_arg = cb_arg;
   
   imap_handle_idle_disable(h);
-  cmdno = imap_make_tag(tag);
-  sio_printf(h->sio, "%s%s %s ", tag, uid ? " UID" : "", cmd_string);
-  if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
-    sio_write(h->sio, "\r\n", 2);
-    imap_handle_flush(h);
-    do
-      ir = imap_cmd_step(h, cmdno);
-    while(ir == IMR_UNTAGGED);
+
+  if(imap_search_checks_body(s)) {
+    delta = BODY_TO_SEARCH_AT_ONCE;
+  } else if(imap_search_checks_headers(s)) {
+    delta = HEADER_TO_SEARCH_AT_ONCE;
+  } else {
+    delta = UIDS_TO_SEARCH_AT_ONCE;
   }
+
+  /* This loop may take long time to execute. Consider providing some
+     feedback to the user... */
+  for(lo = 1; ir == IMR_OK && lo<=h->exists; lo += delta) {
+    unsigned hi = lo + delta-1;
+    if(hi>h->exists)
+      hi = h->exists;
+    cmdno = imap_make_tag(tag);
+    sio_printf(h->sio, "%s%s %s %u:%u ", tag, uid ? " UID" : "", cmd_string,
+               lo, hi);
+    if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
+      sio_write(h->sio, "\r\n", 2);
+      imap_handle_flush(h);
+      do {
+        ir = imap_cmd_step(h, cmdno);
+      } while(ir == IMR_UNTAGGED);
+    } else break;
+  }
+
   h->search_cb  = ocb;
   h->search_arg = oarg;
   imap_handle_idle_enable(h, 30);

@@ -255,23 +255,36 @@ pop_auth_cram(PopHandle *pop, const char *greeting, GError **err)
   return IMAP_AUTH_UNAVAIL;
 }
 
-/* getApopStamp:
-   Get the Server Timestamp for APOP authentication -kabir 
-   return TRUE on success.
-*/
+#define IS_ALLOWED_CHAR(s) ( (s) >=32 && (s) <=126  && (s) !='>')
+/** Get the Timestamp as sent by server for APOP authentication
+   verifying that the syntax is correct. Currently we check only
+   roughly the syntax for unallowed characters.  Return TRUE on if
+   stamp is found and validates.
 
+   @param stamp points to a buffer of length POP_LINE_LEN
+*/
 static gboolean
 get_apop_stamp(const char *greeting, char *stamp)
 {
-  char *start, *finish;
+  const char *start;
 
   start = strchr(greeting, '<');
   if (start) {
-    finish = strchr(start, '>');
-    if (finish) {
-      strncpy(stamp, start, finish - start + 1);
-      return TRUE;
-    }
+    int pos = 0;
+    /* '<' */
+    stamp[pos++] = *start++;
+
+    while( pos < POP_LINE_LEN && IS_ALLOWED_CHAR(*start))
+      stamp[pos++] = *start++;
+    if(*start != '>' || !(pos < POP_LINE_LEN) )
+      { return FALSE; }
+
+    /* '>' */
+    stamp[pos++] = *start++;
+    if( !(pos < POP_LINE_LEN) )
+      { return FALSE; }
+    stamp[pos] = '\0';
+    return TRUE;
   } 
   return FALSE;
 }

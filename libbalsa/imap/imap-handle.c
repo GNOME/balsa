@@ -2074,7 +2074,7 @@ ir_esearch(ImapMboxHandle *h)
     if(c != ' ')
       return IMR_PROTOCOL;
     str = imap_get_string(h->sio);
-    printf("ESearch response for tag %s\n", str);
+    /* printf("ESearch response for tag %s\n", str); */
     g_free(str);
     if( (c = sio_getc(h->sio)) != ')') {
       return c == EOF ? IMR_SEVERED : IMR_PROTOCOL;
@@ -2135,8 +2135,6 @@ ir_esearch(ImapMboxHandle *h)
         if(*p) {
           offset = value_len - (p-value);
           memmove(value, p, offset+1);
-          printf("Will reuse '%s' of length %u (value %p p=%p p-v=%d)\n",
-                 value, offset, value, p, p-value);
         } else offset = 0;
 
       } /* End of if(h->search_cb) */

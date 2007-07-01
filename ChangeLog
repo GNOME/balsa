@@ -1,3 +1,10 @@
+2007-07-01  Pawel Salek
+
+	* libbalsa/imap/pop3.c: validate APOP server stamp.
+	* libbalsa/imap/imap-search.c: split long SEARCH commands into
+	several ones.
+	* libbalsa/mailbox_imap.c: return correct bool code on flag store.
+
 2007-06-21  Peter Bloomfield
 
 	* src/main-window.c: (display_new_mail_notification): respect

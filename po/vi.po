@@ -1,6 +1,7 @@
 # Vietnamese translation for Balsa.
 # Copyright © 2007 Free Software Foundation, Inc.
 # Clytie Siddall <clytie@riverland.net.au>, 2006-2007.
+# Nguyễn Thái Ngọc Duy <pclouds@gmail.com>, 2007.
 # 
 msgid ""
 ""
@@ -359,12 +360,12 @@ msgstr "Mặc định"
 #: ../libbalsa/identity.c:931
 #. Translators: please do not translate Face.
 msgid "_Face Path"
-msgstr "Đường dẫn _mặt"
+msgstr "Đường dẫn _Face"
 
 #: ../libbalsa/identity.c:937
 #. Translators: please do not translate Face.
 msgid "_X-Face Path"
-msgstr "Đường dẫn mặt _X"
+msgstr "Đường dẫn _X-Face"
 
 #: ../libbalsa/identity.c:963
 #. create the "General" tab
@@ -479,13 +480,13 @@ msgstr "Gặp lỗi khi đọc tập tin %s: %s"
 #, c-format
 #. Translators: please do not translate Face.
 msgid "Face header file %s is too long (%lu bytes)."
-msgstr "Tập tin phần đầu mặt %s quá dài (%lu byte)."
+msgstr "Tập tin phần đầu Face %s quá dài (%lu byte)."
 
 #: ../libbalsa/identity.c:1197
 #, c-format
 #. Translators: please do not translate Face.
 msgid "Face header file %s contains binary data."
-msgstr "Tập tin phần đầu mặt %s chứa dữ liệu nhị phân."
+msgstr "Tập tin phần đầu Face %s chứa dữ liệu nhị phân."
 
 #: ../libbalsa/identity.c:1217
 #: ../src/balsa-message.c:1212
@@ -699,7 +700,7 @@ msgstr "Đang cấu tạo lại thư..."
 
 #: ../libbalsa/mailbox.c:4150
 msgid "Finding duplicate messages in source mailbox failed"
-msgstr "Việc tìm các thư trùng trong hộp thư nguồn không phải thành công"
+msgstr "Việc tìm các thư trùng trong hộp thư nguồn không thành công"
 
 #: ../libbalsa/mailbox_imap.c:543
 #. ImapIssue macro handles reconnecting. We might issue a
@@ -1216,7 +1217,7 @@ msgstr "Không thể thẩm tra chữ ký do cơ chế mật mã không hợp l�
 #: ../libbalsa/rfc3156.c:945
 #: ../libbalsa/rfc3156.c:1687
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
-msgstr "GnuPG đang xây dụng lại cơ sở dữ liệu tin cây, và hiện thời không sẵn sàng."
+msgstr "GnuPG đang xây dụng lại cơ sở dữ liệu tin cậy, và hiện thời không sẵn sàng."
 
 #: ../libbalsa/rfc3156.c:948
 msgid "An error prevented the signature verification."
@@ -1309,7 +1310,7 @@ msgid ""
 "\n"
 "Key owner trust: %s"
 msgstr "\n"
-"Độ tin cây chủ khóa: %s"
+"Độ tin cậy chủ khóa: %s"
 
 #: ../libbalsa/rfc3156.c:1021
 #, c-format
@@ -1467,7 +1468,7 @@ msgstr "Chọn khoá công cho người nhận %s"
 #: ../libbalsa/rfc3156.c:1466
 #, c-format
 msgid "Insufficient trust for recipient %s"
-msgstr "Không đủ tin cây cho người nhận %s"
+msgstr "Không đủ tin cậy cho người nhận %s"
 
 #: ../libbalsa/rfc3156.c:1468
 #, c-format
@@ -2215,7 +2216,7 @@ msgstr "Cỡ"
 #: ../src/balsa-index.c:922
 #, c-format
 msgid "Opening mailbox %s. Please wait..."
-msgstr "Đang mở hộp thư %s. Hãy đời..."
+msgstr "Đang mở hộp thư %s. Hãy đợi..."
 
 #: ../src/balsa-index.c:964
 #. FIXME: this is hack!
@@ -2492,7 +2493,7 @@ msgstr "Không thể lưu %s: %s"
 #: ../src/balsa-message.c:2184
 #, c-format
 msgid "Sending the disposition notification failed: %s"
-msgstr "Việc gửi thông báo cách phát thư không phải thành công: %s"
+msgstr "Việc gửi thông báo cách phát thư không thành công: %s"
 
 #: ../src/balsa-message.c:2147
 #, c-format
@@ -2594,7 +2595,7 @@ msgstr "Mới phát hiện một chữ ký đúng không có đủ độ hợp l
 #: ../src/balsa-message.c:2531
 #: ../src/balsa-message.c:2651
 msgid "Detected a good signature with insufficient validity/trust"
-msgstr "Mới phát hiện một chữ ký đúng không có đủ độ hợp lệ/tin cây."
+msgstr "Mới phát hiện một chữ ký đúng không có đủ độ hợp lệ/tin cậy."
 
 #: ../src/balsa-message.c:2538
 #: ../src/balsa-message.c:2657
@@ -3434,7 +3435,7 @@ msgstr "Bản sao thư mục cần ghi."
 #: ../src/mailbox-node.c:478
 #, c-format
 msgid "Scanning %s. Please wait..."
-msgstr "Đang quét %s. Hãy đời một chút..."
+msgstr "Đang quét %s. Hãy đợi một chút..."
 
 #: ../src/mailbox-node.c:494
 #, c-format
@@ -3481,7 +3482,7 @@ msgstr "_Quét lại"
 
 #: ../src/mailbox-node.c:1052
 msgid "_Properties..."
-msgstr "Tài _sản..."
+msgstr "_Thuộc tính.."
 
 #: ../src/mailbox-node.c:1068
 msgid "_Open"
@@ -4702,7 +4703,7 @@ msgstr "Không thể lấy phần: %s"
 #: ../src/balsa-mime-widget-message.c:365
 #, c-format
 msgid "Sending the external body request failed: %s"
-msgstr "Việc gửi yêu cầu thân bên ngoài không phải thành công: %s"
+msgstr "Việc gửi yêu cầu thân bên ngoài không thành công: %s"
 
 #: ../src/balsa-mime-widget-message.c:469
 msgid "Reply..."
@@ -5597,7 +5598,7 @@ msgstr "mm"
 
 #: ../src/print-gtk.c:435
 msgid "inch"
-msgstr "insơ"
+msgstr "inch"
 
 #: ../src/print-gtk.c:442
 msgid "mm"

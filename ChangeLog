@@ -1,3 +1,7 @@
+2007-07-04  Pawel Salek
+
+	* NEWS, configure.in: release 2.3.17.
+
 2007-07-01  Pawel Salek
 
 	* libbalsa/imap/pop3.c: validate APOP server stamp.

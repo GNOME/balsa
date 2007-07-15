@@ -1,3 +1,8 @@
+2007-07-15  Albrecht Dreß
+
+	* src/balsa-print-object.c: (cairo_print_pixbuf): print icon
+	colors correctly regardless of endianness.
+
 2007-07-04  Pawel Salek
 
 	* NEWS, configure.in: release 2.3.17.

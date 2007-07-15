@@ -257,14 +257,11 @@ cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
 
 	format = CAIRO_FORMAT_ARGB32;
 	for (line = 0; line < height; line++) {
-	    guint32 *src = (guint32 *) (raw_image + line * rowstride);
+	    guchar *src = raw_image + line * rowstride;
 	    gint col;
 
-	    for (col = width; col; col--) {
-		register guint32 val = *src++;
-
-		*dest++ = (val >> 8) | (val << 24);
-	    }
+	    for (col = width; col; col--, src += 4)
+		*dest++ = (((((src[3] << 8) + src[0]) << 8) + src[1]) << 8) + src[2];
 	}
     } else {
 	/* 3 channels: copy 3 byte R-G-B to Alpha-R-G-B... */

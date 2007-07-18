@@ -1,3 +1,9 @@
+2007-07-18  Albrecht Dreß
+
+	* configure.in: safe gpg2 version detection.
+	* src/main.c: ditto; initialize threads before using any glib
+	functions (pb).
+
 2007-07-15  Albrecht Dreß
 
 	* src/balsa-print-object.c: (cairo_print_pixbuf): print icon

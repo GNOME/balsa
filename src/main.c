@@ -62,6 +62,7 @@
 #include <bonobo-activation/bonobo-activation.h>
 
 #ifdef HAVE_GPGME
+#include <string.h>
 #include <gpgme.h>
 #endif
 
@@ -644,6 +645,26 @@ balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
     gdk_threads_leave();
 }
 
+#if defined(ENABLE_NLS) && defined(HAVE_GPGME)
+static const gchar *
+get_utf8_locale(int category)
+{
+    gchar * locale;
+    static gchar localebuf[64];  /* should be large enough */
+    gchar * dot;
+
+    if (!(locale = setlocale(category, NULL)))
+	return NULL;
+    strncpy(localebuf, locale, 57);
+    localebuf[57] = '\0';
+    dot = strchr(localebuf, '.');
+    if (!dot)
+	dot = localebuf + strlen(localebuf);
+    strcpy(dot, ".UTF-8");
+    return localebuf;
+}
+#endif
+
 /* -------------------------- main --------------------------------- */
 int
 main(int argc, char *argv[])
@@ -663,19 +684,33 @@ main(int argc, char *argv[])
     setlocale(LC_ALL, "");
 #endif
 
+#ifdef BALSA_USE_THREADS
+    /* initiate thread mutexs, variables */
+    threads_init();
+#endif
 
 #ifdef HAVE_GPGME
     /* initialise the gpgme library */
     g_message("init gpgme version %s", gpgme_check_version(NULL));
-#ifdef ENABLE_NLS
-    gpgme_set_locale(NULL, LC_CTYPE, setlocale(LC_CTYPE, NULL));
-    gpgme_set_locale(NULL, LC_MESSAGES, setlocale(LC_MESSAGES, NULL));
-#endif /* ENABLE_NLS */
+#ifdef HAVE_GPG
+    /* configure the GnuPG engine if a specific gpg path has been detected*/
+    gpgme_set_engine_info(GPGME_PROTOCOL_OpenPGP, GPG_PATH, NULL);
 #endif
+#ifdef ENABLE_NLS
+    gpgme_set_locale(NULL, LC_CTYPE, get_utf8_locale(LC_CTYPE));
+    gpgme_set_locale(NULL, LC_MESSAGES, get_utf8_locale(LC_MESSAGES));
+#endif /* ENABLE_NLS */
+    { /* scope */
+	gpgme_engine_info_t e;
 
-#ifdef BALSA_USE_THREADS
-    /* initiate thread mutexs, variables */
-    threads_init();
+	if (gpgme_get_engine_info(&e) == GPG_ERR_NO_ERROR)
+	    while (e) {
+		g_message("protocol %s: engine %s (home %s, version %s)",
+			  gpgme_get_protocol_name(e->protocol),
+			  e->file_name, e->home_dir, e->version);
+		e = e->next;
+	    }
+    }
 #endif
 
     /* FIXME: do we need to allow a non-GUI mode? */

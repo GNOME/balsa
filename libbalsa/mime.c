@@ -1101,6 +1101,7 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
     guint quote_depth;
     guint index;
     GtkTextMark *selection_end;
+    gboolean ins_quote;
 
     gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
     gtk_text_iter_order(&start, &end);
@@ -1109,6 +1110,9 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
     /* Find quote depth and index of first non-quoted character. */
     line = get_line(buffer, &start);
     if (libbalsa_match_regex(line, rex, &quote_depth, &index)) {
+	/* skip one regular space following the quote characters */
+	if (line[index] == ' ')
+	    index++;
 	/* Replace quote string with standard form. */
 	end = start;
 	gtk_text_iter_set_line_index(&end, index);
@@ -1116,10 +1120,12 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
 	do
 	    gtk_text_buffer_insert(buffer, &start, ">", 1);
 	while (--quote_depth);
+	gtk_text_buffer_insert(buffer, &start, " ", 1);
     }
     g_free(line);
 
     /* Unwrap remaining lines. */
+    ins_quote = FALSE;
     while (gtk_text_iter_ends_line(&start)
 	   || gtk_text_iter_forward_to_line_end(&start)) {
 	gtk_text_buffer_get_iter_at_mark(buffer, &end, selection_end);
@@ -1129,10 +1135,25 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
 	if (!gtk_text_iter_forward_line(&end))
 	    break;
 	line = get_line(buffer, &end);
-	libbalsa_match_regex(line, rex, NULL, &index);
-	g_free(line);
+	if (libbalsa_match_regex(line, rex, &quote_depth, &index) &&
+	    line[index] == ' ')
+	    index++;
 	gtk_text_iter_set_line_index(&end, index);
 	gtk_text_buffer_delete(buffer, &start, &end);
+	/* empty lines separate paragraphs */
+	if (line[index] == '\0') {
+	    gtk_text_buffer_insert(buffer, &start, "\n", 1);
+	    while (quote_depth--)
+		gtk_text_buffer_insert(buffer, &start, ">", 1);
+	    gtk_text_buffer_insert(buffer, &start, "\n", 1);
+	    ins_quote = TRUE;
+	} else if (ins_quote) {
+	    while (quote_depth--)
+		gtk_text_buffer_insert(buffer, &start, ">", 1);
+	    gtk_text_buffer_insert(buffer, &start, " ", 1);
+	    ins_quote = FALSE;
+	}
+	g_free(line);
 	/* Insert a space, if the line didn't end with one. */
 	if (!gtk_text_iter_starts_line(&start)) {
 	    gtk_text_iter_backward_char(&start);

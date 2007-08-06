@@ -89,9 +89,7 @@ balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
 	if (app) {
 	    if (libbalsa_message_body_save_temporary(mime_body, &err)) {
 #if HAVE_GNOME_VFS29
-		gchar *uri =
-		    g_strconcat("file://", mime_body->temp_filename,
-				NULL);
+		gchar *uri = g_filename_to_uri(mime_body->temp_filename, NULL, NULL);
 		GList *uris = g_list_prepend(NULL, uri);
 		gnome_vfs_mime_application_launch(app, uris);
 		g_free(uri);
@@ -100,13 +98,14 @@ balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
 		gboolean tmp =
 		    (app->expects_uris ==
 		     GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
+		gchar *uri = g_filename_to_uri(mime_body->temp_filename, NULL, NULL);
 		gchar *exe_str =
-		    g_strdup_printf("%s \"%s%s\"", app->command,
-				    tmp ? "file://" : "",
-				    mime_body->temp_filename);
+		    g_strdup_printf("%s \"%s\"", app->command,
+				    tmp ? uri : mime_body->temp_filename);
 
 		gnome_execute_shell(NULL, exe_str);
 		fprintf(stderr, "Executed: %s\n", exe_str);
+		g_free(uri);
 		g_free(exe_str);
 #endif				/* HAVE_GNOME_VFS29 */
 	    } else {

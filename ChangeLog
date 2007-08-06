@@ -1,3 +1,9 @@
+2007-08-06  Albrecht Dreß
+
+	* libbalsa/mime.c: reflow improvements.
+	* src/balsa-mime-widget-callbacks.c: programs require uris, not
+	filenames.
+
 2007-07-18  Albrecht Dreß
 
 	* configure.in: safe gpg2 version detection.

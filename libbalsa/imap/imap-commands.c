@@ -920,22 +920,30 @@ write_nstring(unsigned seqno, const char *str, int len, void *fl)
 }
 
 ImapResponse
-imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle, unsigned seqno, 
+imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
+			      unsigned cnt, unsigned *set,
                               FILE *fl)
 {
-  char cmd[40];
-  ImapFetchBodyCb cb = handle->body_cb;
-  void          *arg = handle->body_arg;
-  ImapResponse rc;
+  ImapResponse rc = IMR_OK;
+  gchar *seq;
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   HANDLE_LOCK(handle);
-  handle->body_cb  = write_nstring;
-  handle->body_arg = fl;
-  sprintf(cmd, "FETCH %u RFC822", seqno);
-  rc = imap_cmd_exec(handle, cmd);
-  handle->body_cb  = cb;
-  handle->body_arg = arg;
+
+  seq = coalesce_seq_range(0, cnt-1, (CoalesceFunc)simple_coealesce_func, set);
+
+  if(seq) {
+    ImapFetchBodyCb cb = handle->body_cb;
+    void          *arg = handle->body_arg;
+    gchar *cmd = g_strdup_printf("FETCH %s RFC822", seq);
+    handle->body_cb  = write_nstring;
+    handle->body_arg = fl;
+    rc = imap_cmd_exec(handle, cmd);
+    handle->body_cb  = cb;
+    handle->body_arg = arg;
+    g_free(cmd);
+    g_free(seq);
+  }
   HANDLE_UNLOCK(handle);
 
   return rc;

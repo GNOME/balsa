@@ -41,8 +41,6 @@ typedef struct _LibBalsaCondition LibBalsaCondition;
 
 #include "information.h"
 
-#include "server.h"
-
 #include "address-book.h"
 #include "address-book-vcard.h"
 #include "address-book-ldif.h"

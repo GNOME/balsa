@@ -101,7 +101,7 @@ static ImapResult imap_mbox_connect(ImapMboxHandle* handle);
 
 static ImapResponse ir_handle_response(ImapMboxHandle *h);
 
-static ImapAddress* imap_address_from_string(const gchar *string);
+static ImapAddress* imap_address_from_string(const gchar *string, gchar **n);
 static gchar*       imap_address_to_string(const ImapAddress *addr);
 
 static GType
@@ -1084,6 +1084,50 @@ imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr, int ascending)
   g_free(cmd);
   return 1;
 }
+
+/** Parse given source string expected to contain a quoted
+    string. Returns the extracted, allocated string. */
+static gchar*
+get_quoted_string(const gchar *source, gchar const **endpos)
+{
+  GString *s;
+  if(*source == '\0') {
+    *endpos = source;
+    return NULL;
+  }
+  if(*source != '"') { /* *source == 'N' */
+    *endpos = source+1;
+    return NULL;
+  }
+  source++;
+  s = g_string_new("");
+  for(;*source && *source != '"'; source++) {
+    if(source[0] == '\\' && source[1])
+      source++;
+    g_string_append_c(s, *source);
+  }
+  *endpos = *source ? source+1 : source;
+  return g_string_free(s, FALSE);
+}
+
+/** Appends a source string to res, quoting it with quote characters
+    and prefixing any necessary characters in it with backslashes. */
+static void
+append_quoted_string(GString *res, const gchar *source)
+{
+  const gchar *p;
+  if(source) {
+    g_string_append_c(res, '"');
+    for(p=source; *p; p++) {
+      if(*p == '\\' || *p == '"') g_string_append_c(res, '\\');
+      g_string_append_c(res, *p);
+    }
+    g_string_append_c(res, '"');
+  } else {
+    g_string_append_c(res, 'N'); /* N for NULL */
+  }
+}
+
 /* =================================================================== */
 /*            IMAP ENVELOPE HANDLING CODE                              */
 /* =================================================================== */
@@ -1116,6 +1160,79 @@ imap_envelope_free(ImapEnvelope *env)
   g_free(env);
 }
 
+static void
+concat_str(GString *s, gchar *t)
+{
+  g_string_append(s, t); g_free(t);
+  g_string_append_c(s, ';');
+}
+
+gchar*
+imap_envelope_to_string(const ImapEnvelope* env)
+{
+  GString *res;
+  gchar *t;
+
+  if(!env)
+    return NULL;
+
+  res = g_string_new("");
+  g_string_printf(res, "%lu;", (unsigned long)env->date);
+  append_quoted_string(res, env->subject);  g_string_append_c(res, ';');
+  t = imap_address_to_string(env->from);    concat_str(res, t);
+  t = imap_address_to_string(env->sender);  concat_str(res, t);
+  t = imap_address_to_string(env->replyto); concat_str(res, t);
+  t = imap_address_to_string(env->to);      concat_str(res, t);
+  t = imap_address_to_string(env->cc);      concat_str(res, t);
+  t = imap_address_to_string(env->bcc);     concat_str(res, t);
+  append_quoted_string(res, env->in_reply_to);  g_string_append_c(res, ';');
+  append_quoted_string(res, env->message_id);
+  return g_string_free(res, FALSE);
+}
+
+static ImapEnvelope*
+imap_envelope_from_stringi(const gchar *s, gchar const **end)
+{
+  ImapEnvelope *env;
+  gchar *n;
+  const gchar *nc;
+  if(!s || !*s)
+    return NULL;
+
+  env = imap_envelope_new();
+  env->date = strtol(s, &n, 10);
+  s = n; if( *s++ != ';') goto done;
+  env->subject = get_quoted_string(s, &nc);
+  s = nc; if( *s++ != ';') goto done;
+  env->from    = imap_address_from_string(s, &n);
+  s = n; if( *s++ != ';') goto done;
+  env->sender  = imap_address_from_string(s, &n);
+  s = n; if( *s++ != ';') goto done;
+  env->replyto = imap_address_from_string(s, &n);
+  s = n; if( *s++ != ';') goto done;
+  env->to      = imap_address_from_string(s, &n);
+  s = n; if( *s++ != ';') goto done;
+  env->cc      = imap_address_from_string(s, &n);
+  s = n; if( *s++ != ';') goto done;
+  env->bcc     = imap_address_from_string(s, &n);
+  s = n; if( *s++ != ';') goto done;
+  env->in_reply_to = get_quoted_string(s, &nc);
+  s = nc; if( *s++ != ';') goto done;
+  env->message_id  = get_quoted_string(s, &nc);
+
+ done:
+  if(end)
+    *end = nc;
+
+  return env;
+}
+
+ImapEnvelope*
+imap_envelope_from_string(const gchar *s)
+{
+  return imap_envelope_from_stringi(s, NULL);
+}
+
 /* ================ BEGIN OF BODY STRUCTURE FUNCTIONS ================== */
 ImapBody*
 imap_body_new(void)
@@ -1137,18 +1254,25 @@ imap_body_ext_mpart_free (ImapBodyExtMPart * mpart)
 void
 imap_body_free(ImapBody* body)
 {
-  if(body->media_basic == IMBMEDIA_MULTIPART)
-    imap_body_ext_mpart_free(&body->ext.mpart);
-  if (body->dsp_params)
-    g_hash_table_destroy (body->dsp_params);
   g_free(body->media_basic_name);
   g_free(body->media_subtype);
-  g_free(body->desc);
+  g_hash_table_destroy(body->params);
   g_free(body->content_id);
+  g_free(body->desc);
+
+  if(body->envelope)
+    imap_envelope_free(body->envelope);
+  if (body->dsp_params)
+    g_hash_table_destroy (body->dsp_params);
+
   g_free(body->content_dsp_other);
   g_free(body->content_uri);
-  g_hash_table_destroy(body->params);
-  if(body->envelope) imap_envelope_free(body->envelope);
+
+  /* Ext */
+  if(body->media_basic == IMBMEDIA_MULTIPART)
+    imap_body_ext_mpart_free(&body->ext.mpart);
+  else
+    g_free(body->ext.onepart.md5);
   if(body->child) imap_body_free(body->child);
   if(body->next) imap_body_free(body->next);
   g_free(body);
@@ -1188,8 +1312,8 @@ imap_body_get_mime_type(ImapBody *body)
   const gchar* type = NULL;
   gchar *res;
   int i;
-  /* chbm: why not just return media_basic_name always here ? cause we 
-     canonize the common names ... */
+  /* We could be returning media_basic_name but we canonize the common
+     names ... */
   switch(body->media_basic) {
   case IMBMEDIA_MULTIPART:      type = "multipart"; break;
   case IMBMEDIA_APPLICATION:    type = "application"; break;
@@ -1253,7 +1377,7 @@ get_body_from_section(ImapBody *body, const char *section)
   char * dot;
   int is_parent_a_message = 1;
   do {
-    int no = atoi(section);
+    int no = strtol(section, NULL, 10);
 
     /* printf("Section: %s\n", section); print_body_structure(body, 0); */
     if(body &&
@@ -1306,6 +1430,226 @@ imap_body_set_id(ImapBody *body, char *id)
 {
   body->content_id = id;
 }
+
+static void
+append_pair(gpointer key, gpointer value, gpointer user_data)
+{
+  append_quoted_string(user_data, key);
+  append_quoted_string(user_data, value);
+}
+
+static void
+append_hash(GString *res, GHashTable *hash)
+{
+  g_string_append_c(res, '{');
+  if(hash)
+    g_hash_table_foreach(hash, append_pair, res);
+  g_string_append_c(res, '}');
+}
+
+static GHashTable*
+get_hash(const char *s, gchar const **end)
+{
+  GHashTable *hash = NULL;
+
+  if(!s || *s != '{')
+    return NULL;
+  s++;
+  while(*s && *s != '}') {
+    gchar *key, *val;
+    key = get_quoted_string(s, &s);
+    if(!key)
+      break;
+    val = get_quoted_string(s, &s);
+    if(!hash)
+      hash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    g_hash_table_insert(hash, key, val);
+  }
+  if(*s == '}')
+    s++;
+
+  if(end)
+    *end = s;
+
+  return hash;
+}
+
+static void
+append_onepart(GString *res, const ImapBodyExt1Part *onepart)
+{
+  append_quoted_string(res, onepart->md5);
+}
+
+static void
+append_mpart(GString *res, const ImapBodyExtMPart *mpart)
+{
+  GSList *l;
+  /* append_list */
+  g_string_append_c(res, '(');
+  for(l=mpart->lang; l; l = l->next)
+    append_quoted_string(res, l->data);
+  g_string_append_c(res, ')');
+}
+
+static GSList*
+get_slist(const gchar *s, gchar const **end)
+{
+  GSList *res = NULL;
+  if(!s || *s != '(')
+    return NULL;
+  s++;
+  while( *s && *s != ')') {
+    gchar *str = get_quoted_string(s, &s);
+    res = g_slist_append(res, str);
+  }
+  if(*s == ')')
+    s++;
+  if(end)
+    *end = s;
+  return res;
+}
+
+static void
+append_body(GString *res, const ImapBody *body)
+{
+
+  g_string_append_printf(res, "(%d %d", body->encoding, body->media_basic);
+  append_quoted_string(res, body->media_basic_name);
+  append_quoted_string(res, body->media_subtype);
+  append_hash(res, body->params);
+  g_string_append_printf(res, "%d %d", body->octets, body->lines);
+  append_quoted_string(res, body->content_id);
+  append_quoted_string(res, body->desc);
+
+  if(body->envelope) {
+    gchar *env = imap_envelope_to_string(body->envelope);
+    g_string_append_c(res, '(');
+    g_string_append(res, env);
+    g_free(env);
+    g_string_append_c(res, ')');
+  } else g_string_append_c(res, 'X');
+
+  g_string_append_printf(res, " %d", body->content_dsp);
+  append_hash(res, body->dsp_params);
+  append_quoted_string(res, body->content_dsp_other);
+  append_quoted_string(res, body->content_uri);
+  
+  /* Ext */
+  if(body->media_basic != IMBMEDIA_MULTIPART)
+    append_onepart(res, &body->ext.onepart);
+  else
+    append_mpart(res, &body->ext.mpart);
+
+  if(body->child) {
+    g_string_append_c(res, '(');
+    append_body(res, body->child);
+    g_string_append_c(res, ')');
+  }
+  g_string_append_c(res, ')');
+  if(body->next) {
+    g_string_append_c(res, '+');
+    append_body(res, body->next);
+  }
+}
+
+gchar*
+imap_body_to_string(const ImapBody *body)
+{
+  GString *res;
+
+  if(!body)
+    return NULL;
+
+  res = g_string_new("");
+  append_body(res, body);
+  /* printf("Body converted to : '%s'\n", res->str); */
+  return g_string_free(res, FALSE);
+}
+
+static ImapBody*
+imap_body_from_stringi(const gchar *s, gchar const** end)
+{
+  ImapBody *body = NULL;
+  GHashTable *hash;
+  gchar *w;
+
+  if (!s || *s != '(') /* Syntax error */
+    goto done;
+
+  s++;
+  body = imap_body_new();
+
+  body->encoding    = strtol(s, &w, 10); s = w;
+  body->media_basic = strtol(s, &w, 10); s = w;
+
+  body->media_basic_name = get_quoted_string(s, &s);
+  body->media_subtype    = get_quoted_string(s, &s);
+
+  hash = get_hash(s, &s);
+  if(hash) {
+    g_hash_table_destroy(body->params);
+    body->params = hash;
+  }
+
+  body->octets = strtol(s, &w, 10); s = w;
+  body->lines  = strtol(s, &w, 10); s = w;
+  body->content_id = get_quoted_string(s, &s);
+  body->desc = get_quoted_string(s, &s);
+  if(*s == '(') {
+    s++;
+    body->envelope = imap_envelope_from_stringi(s+1, &s);
+    if( *s != ')')
+      goto done;
+    s++;
+  } else s++; /* assuming it points to 'X' */
+
+  body->content_dsp = strtol(s+1, &w, 10); s = w;
+  body->dsp_params = get_hash(s, &s);
+
+  body->content_dsp_other = get_quoted_string(s, &s);
+  body->content_uri = get_quoted_string(s, &s);
+ 
+  /* Ext */
+  if(body->media_basic != IMBMEDIA_MULTIPART)
+    body->ext.onepart.md5 = get_quoted_string(s, &s);
+  else {
+    body->ext.mpart.lang = get_slist(s, &s);
+  }
+
+  if(*s == '(') {
+    s++;
+    body->child = imap_body_from_stringi(s, &s);
+    if(*s != ')')
+      goto done;
+    s++;
+  }
+  s++; /* Skip trailing ')' of itself */
+  if(*s == '+') {
+    s++;
+    body->next = imap_body_from_stringi(s, &s);
+  }
+
+ done:
+  if(end)
+    *end = s;
+  return body;
+}
+
+ImapBody*
+imap_body_from_string(const gchar *s)
+{
+  ImapBody *res = imap_body_from_stringi(s, NULL);
+#if 0
+  gchar *s1 = imap_body_to_string(res);
+  if(s && *s)
+    printf("Creating body from: '%s'\n"
+           "New one is        : '%s'\n",
+           s, s1);
+  g_free(s1);
+#endif
+  return res;
+}
+
 /* ================ END OF BODY STRUCTURE FUNCTIONS ==================== */
 
 
@@ -1338,14 +1682,14 @@ imap_mbox_handle_msg_deserialize(ImapMboxHandle *h, unsigned msgno,
   if(msgno>=1 && msgno <=h->exists && !h->msg_cache[msgno-1])
     h->msg_cache[msgno-1] = imap_message_deserialize(data);
 }
-/* serialize message itself and the envelope - but not the body */
-struct ImapMsgEnvSerialized {
+/* Serialize message itself and the envelope, and the body structure
+   if available. */
+struct ImapMsgSerialized {
   ssize_t total_size; /* for checksumming */
   /* Message */
   ImapUID      uid;
   ImapMsgFlags flags;
   ImapDate     internal_date; /* delivery date */
-  ImapDate     date;          /* sending date */
   int rfc822size;
   ImapFetchType available_headers;
   gchar fetched_headers_first_char;
@@ -1354,29 +1698,24 @@ struct ImapMsgEnvSerialized {
 void*
 imap_message_serialize(ImapMessage *imsg)
 {
-#define SER_STR_CNT 10
-  gchar *strings[SER_STR_CNT];
-  int    lengths[SER_STR_CNT], i;
   ssize_t tot_size;
   gchar *ptr;
-  struct ImapMsgEnvSerialized *imes;
+  gchar *strings[3];
+  size_t lengths[3];
+  struct ImapMsgSerialized *imes;
+  int i;
+
   if(!imsg->envelope) /* envelope is required */
     return NULL; 
   strings[0] = imsg->fetched_header_fields;
-  strings[1] = imsg->envelope->subject;
-  strings[2] = imap_address_to_string(imsg->envelope->from);
-  strings[3] = imap_address_to_string(imsg->envelope->sender);
-  strings[4] = imap_address_to_string(imsg->envelope->replyto);
-  strings[5] = imap_address_to_string(imsg->envelope->to);
-  strings[6] = imap_address_to_string(imsg->envelope->cc);
-  strings[7] = imap_address_to_string(imsg->envelope->bcc);
-  strings[8] = imsg->envelope->in_reply_to;
-  strings[9] = imsg->envelope->message_id;
-  tot_size = sizeof(struct ImapMsgEnvSerialized)-1;
-  for(i=0; i<SER_STR_CNT; i++) {
-    lengths[i] = strings[i] ? strlen(strings[i]) : 0;
-    tot_size += 1 + lengths[i];
+  strings[1] = imap_envelope_to_string(imsg->envelope);
+  strings[2] = imap_body_to_string(imsg->body);
+  tot_size = sizeof(struct ImapMsgSerialized)-1;
+  for(i=0; i<3; i++) {
+    lengths[i] = strings[i]  ? strlen(strings[i])  : 0;
+    tot_size += lengths[i] + 1;
   }
+
   imes = g_malloc(tot_size);
   imes->total_size = tot_size;
   /* Message */
@@ -1385,58 +1724,50 @@ imap_message_serialize(ImapMessage *imsg)
   imes->internal_date = imsg->internal_date; /* delivery date */
   imes->rfc822size    = imsg->rfc822size;
   imes->available_headers = imsg->available_headers;
-  /* Envelope */
-  imes->date = imsg->envelope->date;
+
   ptr = &imes->fetched_headers_first_char;
-  for(i=0; i<SER_STR_CNT; i++) {
-    if(strings[i]) strcpy(ptr, strings[i]);
-    ptr += lengths[i];
-    *ptr++ = '\0';
+  for(i=0; i<3; i++) {
+    if(strings[i])
+      strcpy(ptr, strings[i]);
+    ptr += lengths[i];  *ptr++ = '\0';
   }
-  for(i=2; i<=7; i++)
-    g_free(strings[i]);
+  g_free(strings[1]);
+  g_free(strings[2]);
   /* printf("Serialization offset: %d (tot size %d may include alignment)\n",
      ptr-(gchar*)imes, tot_size); */
   return imes;
 }
-/* obs - no data checking is done as it should be if the data were read
-   from a file or other external source. */
+
+/** Convert given blob to an ImapMessage structure, with properly set
+    envelope and body structure fields as well. */
 ImapMessage*
 imap_message_deserialize(void *data)
 {
-  struct ImapMsgEnvSerialized *imes = (struct ImapMsgEnvSerialized*)data;
+  struct ImapMsgSerialized *imes = (struct ImapMsgSerialized*)data;
   ImapMessage* imsg = imap_message_new();
   gchar *ptr;
 
-  imsg->envelope = imap_envelope_new();
   imsg->uid = imes->uid;
   imsg->flags = imes->flags;
   imsg->internal_date = imes->internal_date; /* delivery date */
   imsg->rfc822size = imes->rfc822size;
   imsg->available_headers = imes->available_headers;
   /* Envelope */
-  imsg->envelope->date = imes->date;
   ptr = &imes->fetched_headers_first_char;
   imsg->fetched_header_fields = *ptr ? g_strdup(ptr) : NULL;
   ptr += strlen(ptr) + 1;
-  imsg->envelope->subject = *ptr ? g_strdup(ptr) : NULL;
+  imsg->envelope = imap_envelope_from_string(ptr);
   ptr += strlen(ptr) + 1;
-  imsg->envelope->from    = *ptr ? imap_address_from_string(ptr) : NULL;
+  imsg->body = imap_body_from_string(ptr);
   ptr += strlen(ptr) + 1;
-  imsg->envelope->sender  = *ptr ? imap_address_from_string(ptr) : NULL;
-  ptr += strlen(ptr) + 1;
-  imsg->envelope->replyto = *ptr ? imap_address_from_string(ptr) : NULL;
-  ptr += strlen(ptr) + 1;
-  imsg->envelope->to      = *ptr ? imap_address_from_string(ptr) : NULL;
-  ptr += strlen(ptr) + 1;
-  imsg->envelope->cc      = *ptr ? imap_address_from_string(ptr) : NULL;
-  ptr += strlen(ptr) + 1;
-  imsg->envelope->bcc     = *ptr ? imap_address_from_string(ptr) : NULL;
-  ptr += strlen(ptr) + 1;
-  imsg->envelope->in_reply_to = *ptr ? g_strdup(ptr) : NULL;
-  ptr += strlen(ptr) + 1;
-  imsg->envelope->message_id  = *ptr ? g_strdup(ptr) : NULL;
   return imsg;
+}
+
+size_t
+imap_serialized_message_size(void *data)
+{
+  struct ImapMsgSerialized *imes = (struct ImapMsgSerialized*)data;
+  return imes->total_size;
 }
 
 /* =================================================================== */
@@ -1674,7 +2005,7 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
     len = strlen(buf); 
     if(len==0 || buf[len-1] != '}') return NULL;
     buf[len-1] = '\0';
-    len = atoi(buf);
+    len = strtol(buf, NULL, 10);
     if( c != 0x0d) { printf("lit1:%d\n",c); return NULL;}
     if( (c=sio_getc(sio)) != 0x0a) { printf("lit1:%d\n",c); return NULL;}
     res = g_string_sized_new(len+1);
@@ -1829,9 +2160,18 @@ ir_resp_text_code(ImapMboxHandle *h)
   case 5: h->readonly_mbox = TRUE;  /* read-only */; break;
   case 6: h->readonly_mbox = FALSE; /* read-write */; break;
   case 7: /* ignore try-create */; break;
-  case 8: imap_get_atom(h->sio, buf, sizeof(buf)); h->uidnext=atoi(buf); break;
-  case 9: imap_get_atom(h->sio, buf, sizeof(buf)); h->uidval =atoi(buf); break;
-  case 10:imap_get_atom(h->sio, buf, sizeof(buf)); h->unseen =atoi(buf); break;
+  case 8:
+    imap_get_atom(h->sio, buf, sizeof(buf));
+    h->uidnext = strtol(buf, NULL, 10);
+    break;
+  case 9:
+    imap_get_atom(h->sio, buf, sizeof(buf));
+    h->uidval = strtol(buf, NULL, 10);
+    break;
+  case 10:
+    imap_get_atom(h->sio, buf, sizeof(buf));
+    h->unseen =strtol(buf, NULL, 10);
+    break;
   default: while( c != ']' && (c=sio_getc(h->sio)) != EOF) ; break;
   }
   return c != EOF ? rc : IMR_SEVERED;
@@ -2156,7 +2496,7 @@ ir_search(ImapMboxHandle *h)
 
   while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0]) {
     if(h->search_cb)
-      h->search_cb(h, atoi(seq), h->search_arg);
+      h->search_cb(h, strtol(seq, NULL, 10), h->search_arg);
     if(c == '\r') break;
   }
   return ir_check_crlf(h, c);
@@ -2173,7 +2513,7 @@ ir_sort(ImapMboxHandle *h)
   int c;
   char seq[12];
   while ((c=imap_get_atom(h->sio, seq, sizeof(seq))), seq[0]) {
-    mbox_view_append_no(&h->mbox_view, atoi(seq));
+    mbox_view_append_no(&h->mbox_view, strtol(seq, NULL, 10));
     if(c == '\r') break;
   }
   return ir_check_crlf(h, c);
@@ -2292,44 +2632,25 @@ imap_address_free(ImapAddress* addr)
   }
 }
 
-static gchar*
-get_quoted_string(const gchar *source, gchar const **endpos)
-{
-  GString *s;
-  if(*source == '\0') {
-    *endpos = source;
-    return NULL;
-  }
-  if(*source != '"') {
-    *endpos = source+1;
-    return NULL;
-  }
-  source++;
-  s = g_string_new("");
-  for(;*source && *source != '"'; source++) {
-    if(source[0] == '\\' && source[1])
-      source++;
-    g_string_append_c(s, *source);
-  }
-  *endpos = *source ? source+1 : source;
-  return g_string_free(s, FALSE);
-}
 static ImapAddress*
-imap_address_from_string(const gchar *string)
+imap_address_from_string(const gchar *string, gchar **n)
 {
-  const gchar *t, *t1;
+  const gchar *t;
   gchar *comment, *mailbox;
   ImapAddress *res = NULL;
 
   comment = get_quoted_string(string, &t);
   if(*t == ' ') {
-    mailbox = get_quoted_string(t+1, &t1);
+    mailbox = get_quoted_string(t+1, &t);
     if(comment || mailbox) {
       res = imap_address_new(comment, mailbox);
-      if(*t1 == ' ')
-        res->next = imap_address_from_string(t1+1);
+      if(*t == ' ')
+        res->next = imap_address_from_string(t+1, (gchar**)&t);
     }
   } else g_free(comment);
+
+  if(n)
+    *n = (gchar*)t;
   return res;
 }
 
@@ -2337,30 +2658,21 @@ static gchar*
 imap_address_to_string(const ImapAddress *addr)
 {
   GString *res = g_string_sized_new(4);
-  gchar *p;
+
   for(; addr; addr = addr->next) {
     if(addr->name) {
-      g_string_append_c(res, '"');
-      for(p=addr->name; *p; p++) {
-        if(*p == '\\' || *p == '"') g_string_append_c(res, '\\');
-        g_string_append_c(res, *p);
-      }
-      g_string_append_c(res, '"');
+      append_quoted_string(res, addr->name);
     } else g_string_append_c(res, 'N');
     g_string_append_c(res, ' ');
     if(addr->addr_spec) {
-      g_string_append_c(res, '"');
-      for(p=addr->addr_spec; *p; p++) {
-        if(*p == '\\' || *p == '"') g_string_append_c(res, '\\');
-        g_string_append_c(res, *p);
-      }
-      g_string_append_c(res, '"');
+      append_quoted_string(res, addr->addr_spec);
     } else g_string_append_c(res, 'N');
     g_string_append_c(res, ' ');
   }
   g_string_append(res, "N N");
   return g_string_free(res, FALSE);
 }
+
 /* imap_get_address: returns null if no beginning of address is found
    (eg., when end of list is found instead).
 */
@@ -2531,7 +2843,7 @@ ir_msg_att_rfc822_size(ImapMboxHandle *h, int c, unsigned seqno)
   CREATE_IMSG_IF_NEEDED(h, seqno);
   msg = h->msg_cache[seqno-1];
   
-  msg->rfc822size = atoi(buf);  
+  msg->rfc822size = strtol(buf, NULL, 10);  
   return IMR_OK;
 }
 
@@ -2649,7 +2961,7 @@ ir_body_fld_octets(struct siobuf* sio, ImapBody *body)
   int c = imap_get_atom(sio, buf, sizeof(buf));
 
   if(c!= -1) sio_ungetc(sio);
-  if(body) body->octets = atoi(buf);  
+  if(body) body->octets = strtol(buf, NULL, 10);  
   
   return IMR_OK;
 }
@@ -2680,7 +2992,7 @@ ir_body_fld_lines(struct siobuf* sio, ImapBody* body)
   int c = imap_get_atom(sio, buf, sizeof(buf));
 
   if(c!= -1) sio_ungetc(sio);
-  if(body) body->lines = atoi(buf);  
+  if(body) body->lines = strtol(buf, NULL, 10);  
   
   return IMR_OK;
 }
@@ -3262,7 +3574,7 @@ ir_msg_att_uid(ImapMboxHandle *h, int c, unsigned seqno)
 
   if(c!= -1) sio_ungetc(h->sio);
   CREATE_IMSG_IF_NEEDED(h, seqno);
-  h->msg_cache[seqno-1]->uid = atoi(buf);
+  h->msg_cache[seqno-1]->uid = strtol(buf, NULL, 10);
   return IMR_OK;
 }
 
@@ -3321,7 +3633,7 @@ ir_fetch(ImapMboxHandle *h)
   int i;
 
   i = imap_get_atom(h->sio, buf, sizeof(buf));
-  seqno = atoi(buf);
+  seqno = strtol(buf, NULL, 10);
   if(seqno == 0) return IMR_PROTOCOL;
   if(i != ' ') return IMR_PROTOCOL;
   return ir_fetch_seq(h, seqno);
@@ -3361,7 +3673,7 @@ ir_thread_sub(ImapMboxHandle *h, GNode *parent, int last)
 
   c = imap_get_atom(h->sio, buf, sizeof(buf));
 
-  seqno = atoi(buf);
+  seqno = strtol(buf, NULL, 10);
   if(seqno == 0 && c == '(') {
       while (c == '(') {
 	  rc = ir_thread_sub(h, parent, c);
@@ -3458,7 +3770,7 @@ ir_handle_response(ImapMboxHandle *h)
   if( isdigit(atom[0]) ) {
     if (c != ' ')
       return IMR_PROTOCOL;
-    seqno = atoi(atom);
+    seqno = strtol(atom, NULL, 10);
     c = imap_get_atom(h->sio, atom, sizeof(atom));
     if (c == 0x0d)
       sio_ungetc(h->sio);

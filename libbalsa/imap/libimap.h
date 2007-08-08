@@ -240,9 +240,13 @@ typedef struct _ImapMboxHandle      ImapMboxHandle;
 
 ImapEnvelope *imap_envelope_new(void);
 void imap_envelope_free(ImapEnvelope *);
+gchar* imap_envelope_to_string(const ImapEnvelope* env);
+ImapEnvelope* imap_envelope_from_string(const gchar *s);
 
 ImapBody* imap_body_new(void);
 void imap_body_free(ImapBody* body);
+gchar* imap_body_to_string(const ImapBody *body);
+ImapBody* imap_body_from_string(const gchar *s);
 
 void imap_body_set_desc(ImapBody* body, char* str);
 void imap_body_add_param(ImapBody *body, char *key, char *val);
@@ -269,6 +273,7 @@ void imap_mbox_handle_msg_deserialize(ImapMboxHandle *h, unsigned msgno,
                                       void *data);
 void*        imap_message_serialize(ImapMessage *);
 ImapMessage* imap_message_deserialize(void *data);
+size_t imap_serialized_message_size(void *data);
 
 const char *lbi_strerror(ImapResult rc);
 

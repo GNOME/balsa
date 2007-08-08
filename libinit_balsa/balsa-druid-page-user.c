@@ -30,6 +30,7 @@
 #include "i18n.h"
 #include "imap-server.h"
 #include "smtp-server.h"
+#include "server.h"
 #include "balsa-app.h"
 #include "save-restore.h"
 

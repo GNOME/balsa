@@ -1,5 +1,12 @@
 #lib_LTLIBRARIES = libimap.la
 noinst_LIBRARIES = libimap.a
+noinst_PROGRAMS  = imap_tst
+
+imap_tst_SOURCES = imap_tst.c
+
+imap_tst_LDADD = \
+	$(top_builddir)/libbalsa/imap/libimap.a	\
+        $(BALSA_LIBS)
 
 #libimap_la_SOURCES =  
 libimap_a_SOURCES = \

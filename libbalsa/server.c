@@ -30,6 +30,7 @@
 #endif
 
 #include "libbalsa.h"
+#include "server.h"
 #include "libbalsa_private.h"
 #include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"

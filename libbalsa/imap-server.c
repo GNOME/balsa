@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* -*-mode:c; c-basic-offset:4; -*- */
 /*
   LibBalsaImapServer is a class for managing connections to one IMAP
   server. Idle connections are disconnected after a timeout, or when
@@ -10,6 +10,8 @@
 
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
+#include "server.h"
+
 #include "imap-handle.h"
 #include "imap-server.h"
 #include "imap-commands.h"
@@ -221,9 +223,19 @@ monitor_cb(const char *buffer, int length, int direction, void *arg)
     int i;
 
     if (direction) {
-      const gchar *login = g_strstr_len(buffer, length, "LOGIN ");
+      const gchar *login;
+      int login_length;
+          
+      login = g_strstr_len(buffer, length, "LOGIN ");
       if (login) {
-        const gchar *user = login + 6;
+        login_length = 6;
+      } else {
+        login = g_strstr_len(buffer, length, "AUTHENTICATE PLAIN");
+        login_length = 18;
+      }
+
+      if (login) {
+        const gchar *user = login + login_length;
         passwd = g_strstr_len(user, length - (user - buffer), " ");
         if (passwd) {
           int new_len = ++passwd - buffer;

@@ -27,6 +27,7 @@
 #include "balsa-app.h"
 #include "save-restore.h"
 #include "misc.h"
+#include "server.h"
 #include "url.h"
 
 #include <sys/types.h>

@@ -1,4 +1,4 @@
-/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* -*-mode:c; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
  * Copyright (C) 1997-2002 Stuart Parmenter and others,
@@ -39,6 +39,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
+#include "server.h"
 #include "send.h"
 #include "misc.h"
 #include "information.h"
@@ -1281,6 +1282,10 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
     }
 
  fputs (writing ? "C: " : "S: ", fp);
+ if (writing && g_ascii_strncasecmp(buf, "auth plain", 10) == 0) {
+     fputs("AUTH (details hidden)\n", fp);
+     return;
+ }
  if (fwrite (buf, 1, buflen, fp) != (size_t) buflen)
    /* FIXME */ return;
  if (buf[buflen - 1] != '\n')

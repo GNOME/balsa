@@ -34,6 +34,7 @@
 
 #include "filter-funcs.h"
 #include "misc.h"
+#include "server.h"
 #include "smtp-server.h"
 #include "balsa-app.h"
 #include "save-restore.h"

@@ -1,3 +1,19 @@
+2007-08-08  Pawel Salek
+
+	* src/mailbox-conf.h: needs server.h
+	* src/{save-restore,balsa-app}.c: ditto.
+	* libinit_balsa/balsa-druid-page-{directory,user}.c: ditto.
+	* libbalsa/send.c: do not disclose auth data. (PB)
+	* libbalsa/imap-server.c: ditto.
+	* libbalsa/{smtp-,}server.c: needs server.h
+	* libbalsa/mailbox_imap.c: rework persistent caching.
+	* libbalsa/libbalsa.c: disable IMAP timeouts for now - there is
+	some deadlock condition.
+	* libbalsa/mailbox_pop3.c: needs server.h
+	* libbalsa/imap/imap-handle.c: serialize ImapBody, too.
+	* libbalsa/imap/imap-commands.[ch]: imap_mbox_handle_fetch_rfc822()
+	can fetch many messages at once now.
+	
 2007-08-06  Albrecht Dreß
 
 	* libbalsa/mime.c: reflow improvements.

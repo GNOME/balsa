@@ -24,6 +24,8 @@
 
 #include "mailbox-node.h"
 
+#include "server.h"
+
 typedef struct _BalsaMailboxConfView BalsaMailboxConfView;
 
 void mailbox_conf_new(GtkType mailbox_type);

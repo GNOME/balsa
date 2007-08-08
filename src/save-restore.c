@@ -28,6 +28,7 @@
 #include "i18n.h"
 #include "balsa-app.h"
 #include "save-restore.h"
+#include "server.h"
 #include "quote-color.h"
 #include "toolbar-prefs.h"
 

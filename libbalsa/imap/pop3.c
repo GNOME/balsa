@@ -608,7 +608,7 @@ pop_get_uid(PopHandle *pop, unsigned msgno, GError **err)
     while( sio_gets(pop->sio, line, sizeof(line)) &&
            strcmp(line, ".\r\n") ) {
       char* cr, *space = strchr(line, ' ');
-      unsigned read_msgno = atoi(line);
+      unsigned read_msgno = strtol(line, NULL, 10);
       if(!space ||read_msgno != curr_msgno) /* Parsing error? */
         continue;
 

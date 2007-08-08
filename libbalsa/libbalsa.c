@@ -615,7 +615,7 @@ ask_timeout_real(void *data)
 gboolean
 libbalsa_abort_on_timeout(const char *host)
 {
-    return libbalsa_ask(ask_timeout_real, (void*)host) != 0;
+    return 0 && libbalsa_ask(ask_timeout_real, (void*)host) != 0; 
 }
 
 

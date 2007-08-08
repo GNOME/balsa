@@ -47,18 +47,20 @@
 #include <pthread.h>
 #endif
 
-#include "libimap.h"
 #include "filter-funcs.h"
 #include "filter.h"
-#include "mailbox-filter.h"
-#include "message.h"
-#include "libbalsa_private.h"
-#include "misc.h"
-#include "imap-handle.h"
 #include "imap-commands.h"
+#include "imap-handle.h"
 #include "imap-server.h"
 #include "libbalsa-conf.h"
+#include "libbalsa_private.h"
+#include "libimap.h"
+#include "mailbox-filter.h"
+#include "message.h"
 #include "mime-stream-shared.h"
+#include "misc.h"
+#include "server.h"
+
 #include "i18n.h"
 
 #define ENABLE_CLIENT_SIDE_SORT 1
@@ -92,7 +94,7 @@ struct message_info {
 
 static LibBalsaMailboxClass *parent_class = NULL;
 
-static off_t ImapCacheSize = 15*1024*1024; /* 15MB */
+static off_t ImapCacheSize = 30*1024*1024; /* 30MB */
 
  /* issue message if downloaded part has more than this size */
 static unsigned SizeMsgThreshold = 50*1024;
@@ -380,24 +382,34 @@ server_host_settings_changed_cb(LibBalsaServer * server,
 }
 
 static gchar*
-get_cache_dir(LibBalsaMailboxImap* mailbox, const gchar* type,
-               gboolean is_persistent)
+get_cache_dir(gboolean is_persistent)
 {
     gchar *fname;
-    if(mailbox && is_persistent) {
-        LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-        gchar *start;
+    if(is_persistent) {
         const gchar *home = g_get_home_dir();
-        fname = g_strconcat(home,
-                            "/.balsa/", s->user, "@", s->host, "-",
-                            (mailbox->path ? mailbox->path : "INBOX"),
-                            "-", type, ".dir", NULL);
-        for(start=fname+strlen(home)+8; *start; start++)
-            if(*start == '/') *start = '-';
+        fname = g_strconcat(home, "/.balsa/imap-cache", NULL);
     } else
         fname = g_strconcat("/tmp/balsa-",  g_get_user_name(), NULL);
 
     return fname;
+}
+
+static gchar*
+get_header_cache_path(LibBalsaMailboxImap *mimap)
+{
+    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE(mimap)->server;
+    gchar *cache_dir = get_cache_dir(TRUE); /* FIXME */
+    gchar *header_file = g_strdup_printf("%s/%s@%s-%s-%u-headers",
+					 cache_dir, s->user, s->host,
+					 (mimap->path ? mimap->path : "INBOX"),
+					 mimap->uid_validity);
+    gchar *start;
+
+    for(start=header_file+strlen(cache_dir)+1; *start; start++)
+	if(*start == '/') *start = '-';
+    g_free(cache_dir);
+
+    return header_file;
 }
 
 static gchar**
@@ -409,20 +421,17 @@ get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
     gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
     gchar **res = g_malloc(3*sizeof(gchar*));
     ImapUID uid_validity = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
+    gchar *start;
 
-    res[0] = get_cache_dir(mailbox, type, is_persistent);
-    if(is_persistent) 
-        res[1] = g_strdup_printf("%u-%u", uid_validity, uid);
-    else {
-        gchar *start;
-        res[1] = g_strdup_printf("%s@%s-%s-%s-%u-%u",
-                                 s->user, s->host,
-                                 (mailbox->path ? mailbox->path : "INBOX"),
-                                 type, uid_validity, uid);
-        for(start=res[1]; *start; start++)
-            if(*start == '/') *start = '-';
-    }
+    res[0] = get_cache_dir(is_persistent);
+    res[1] = g_strdup_printf("%s@%s-%s-%s-%u-%u",
+			     s->user, s->host,
+			     (mailbox->path ? mailbox->path : "INBOX"),
+			     type, uid_validity, uid);
+    for(start=res[1]; *start; start++)
+	if(*start == '/') *start = '-';
     res[2] = NULL;
+
     return res;
 }
 
@@ -492,25 +501,20 @@ clean_cache(LibBalsaMailbox* mailbox)
         libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s));
     gchar* dir;
 
-    dir = get_cache_dir(LIBBALSA_MAILBOX_IMAP(mailbox), "body",
-                        is_persistent);
+    dir = get_cache_dir(is_persistent);
     clean_dir(dir, ImapCacheSize);
     g_free(dir);
-    /* the body and part dirs are different only with persistent caching. */
-    if(is_persistent) {
-        dir = get_cache_dir(LIBBALSA_MAILBOX_IMAP(mailbox), "part",
-                            is_persistent);
-        clean_dir(dir, ImapCacheSize);
-        g_free(dir);
-    }
  
     return TRUE;
 }
 struct ImapCacheManager;
+static struct ImapCacheManager*imap_cache_manager_new_from_file(const char *header_cache_path);
 static void imap_cache_manager_free(struct ImapCacheManager *icm);
 static struct ImapCacheManager *icm_store_cached_data(ImapMboxHandle *h);
 static void icm_restore_from_cache(ImapMboxHandle *h,
                                    struct ImapCacheManager *icm);
+static gboolean icm_save_to_file(struct ImapCacheManager *icm,
+				 const gchar *path);
 
 static ImapResult
 mi_reconnect(ImapMboxHandle *h)
@@ -610,7 +614,7 @@ struct collect_seq_data {
     unsigned has_it;
 };
 
-static const unsigned MAX_CHUNK_LENGTH = 35; 
+static const unsigned MAX_CHUNK_LENGTH = 20; 
 static gboolean
 collect_seq_cb(GNode *node, gpointer data)
 {
@@ -1011,6 +1015,11 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
 	g_ptr_array_add(mimap->msgids, NULL);
     }
     icm = g_object_get_data(G_OBJECT(mailbox), "cache-manager");
+    if(!icm) { /* Try restoring from file... */
+	gchar *header_cache_path = get_header_cache_path(mimap);
+	icm = imap_cache_manager_new_from_file(header_cache_path);
+	g_free(header_cache_path);
+    }
     if (icm) {
         icm_restore_from_cache(mimap->handle, icm);
         g_object_set_data(G_OBJECT(mailbox), "cache-manager", NULL);
@@ -1059,14 +1068,23 @@ free_messages_info(LibBalsaMailboxImap * mbox)
 static void
 libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 {
+    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+    LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
+    gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
     LibBalsaMailboxImap *mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
+    struct ImapCacheManager *icm = icm_store_cached_data(mbox->handle);
 
-    /* FIXME: save headers differently: save_to_cache(mailbox); */
+    if(is_persistent) {
+	/* Implement only for persistent. Cache dir is shared for all
+	   non-persistent caches. */
+	gchar *header_file = get_header_cache_path(mbox);
+	icm_save_to_file(icm, header_file);
+	g_free(header_file);
+    }
     clean_cache(mailbox);
 
     mbox->opened = FALSE;
-    g_object_set_data_full(G_OBJECT(mailbox), "cache-manager",
-                           icm_store_cached_data(mbox->handle),
+    g_object_set_data_full(G_OBJECT(mailbox), "cache-manager", icm,
                            (GDestroyNotify) imap_cache_manager_free);
 
     /* we do not attempt to reconnect here */
@@ -1096,6 +1114,7 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
 	ImapResponse rc;
 
         libbalsa_assure_balsa_dir();
+        printf("A:mkdir %s\n", pair[0]);
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
 #if 0
         if(msg->length>(signed)SizeMsgThreshold)
@@ -2314,6 +2333,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             return FALSE;
         }
         libbalsa_assure_balsa_dir();
+        printf("B:mkdir %s\n", pair[0]);
         mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
         fp = fopen(part_name, "wb+");
         if(!fp) {
@@ -2899,12 +2919,12 @@ libbalsa_imap_set_cache_size(off_t cache_size)
     ImapCacheSize = cache_size;
 }
 
-/* libbalsa_imap_purge_temp_dir() purges the temporary directory used
-   for non-persistent message caching. */
+/** Purges the temporary directory used for non-persistent message
+   caching. */
 void
 libbalsa_imap_purge_temp_dir(off_t cache_size)
 {
-    gchar *dir_name = get_cache_dir(NULL, NULL, FALSE);
+    gchar *dir_name = get_cache_dir(FALSE);
     clean_dir(dir_name, cache_size);
     g_free(dir_name);
 }
@@ -2952,6 +2972,52 @@ imap_cache_manager_new(guint cnt)
     icm->headers = 
         g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, g_free);
     icm->uidmap = g_array_sized_new(FALSE,  TRUE, sizeof(uint32_t), cnt);
+    return icm;
+}
+
+static struct ImapCacheManager*
+imap_cache_manager_new_from_file(const char *header_cache_path)
+{
+    unsigned i;
+    ImapUID uid;
+    struct ImapCacheManager *icm;
+    FILE *f = fopen(header_cache_path, "rb");
+    if(!f) {
+	printf("Could not open cache file %s\n", header_cache_path);
+	return NULL;
+    }
+    if(fread(&i, sizeof(i), 1, f) != 1) {
+	printf("Could not read cache table size.\n");
+	return NULL;
+    }
+    
+    icm = imap_cache_manager_new(i);
+    if(fread(&icm->uidvalidity, sizeof(uint32_t), 1, f) != 1 ||
+       fread(&icm->uidnext,     sizeof(uint32_t), 1, f) != 1 ||
+       fread(&icm->exists,      sizeof(uint32_t), 1, f) != 1) {
+	imap_cache_manager_free(icm);
+	printf("Couldn't read cache - aborting...\n");
+	return NULL;
+    }
+
+    i = 0;
+    while(fread(&uid, sizeof(uid), 1, f) == 1) {
+	if(uid) {
+	    size_t slen;
+	    gchar *s;
+	    if(fread(&slen, sizeof(slen), 1, f) != 1)
+		break;
+	    s = g_malloc(slen+1); /* slen would be sufficient? */
+	    if(fread(s, 1, slen, f) != slen)
+                break;
+	    s[slen] = '\0'; /* Unneeded? */
+	    g_hash_table_insert(icm->headers, GUINT_TO_POINTER(uid), s);
+	}
+        g_array_append_val(icm->uidmap, uid);
+	i++;
+    }
+    fclose(f);
+    printf("Read %u header entries from %s\n", i, header_cache_path);
     return icm;
 }
 
@@ -3037,6 +3103,10 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
             imap_mbox_handle_msg_deserialize(h, i, data);
     }
 }
+
+/** Stores (possibly persistently) data associated with given handle.
+    This allows for quick restore between IMAP sessions and reduces
+    synchronization overhead. */
 static struct ImapCacheManager*
 icm_store_cached_data(ImapMboxHandle *handle)
 {
@@ -3063,4 +3133,49 @@ icm_store_cached_data(ImapMboxHandle *handle)
         g_array_append_val(icm->uidmap, uid);
     }
     return icm;
+}
+
+static gboolean
+icm_save_header(uint32_t uid, gpointer value, FILE *f)
+{
+    if(fwrite(&uid, sizeof(uid), 1, f) != 1) return FALSE;
+    if(uid) {
+	size_t slen = imap_serialized_message_size(value);
+	if(fwrite(&slen, sizeof(slen), 1, f) != 1 ||
+           fwrite(value, 1, slen, f) != slen)
+            return FALSE;
+    }
+    return TRUE;
+}
+
+
+static gboolean
+icm_save_to_file(struct ImapCacheManager *icm, const gchar *file_name)
+{
+    gboolean success;
+    FILE *f = fopen(file_name, "wb");
+
+    success = f != NULL;
+    if(success) {
+	unsigned i = icm->uidmap->len;
+	if(fwrite(&i, sizeof(i), 1, f) != 1                       ||
+           fwrite(&icm->uidvalidity, sizeof(uint32_t), 1, f) != 1 ||
+           fwrite(&icm->uidnext,     sizeof(uint32_t), 1, f) != 1 ||
+           fwrite(&icm->exists,      sizeof(uint32_t), 1, f) != 1) {
+            success = FALSE;
+        } else {
+            for(i = 0; i<icm->uidmap->len; i++) {
+                uint32_t uid = g_array_index(icm->uidmap, uint32_t, i);
+                gpointer value = g_hash_table_lookup(icm->headers,
+                                                     GUINT_TO_POINTER(uid));
+                if(!icm_save_header(uid, value, f)) {
+                    success = FALSE;
+                    break;
+                }
+            }
+        }
+	fclose(f);
+	printf("Saved header entries to %s\n", file_name);
+    }
+    return success;
 }

@@ -27,11 +27,13 @@
 
 #include <string.h>
 #include <libesmtp.h>
+
 #ifdef HAVE_GNOME
 #include <gnome.h>
 #endif                          /* HAVE_GNOME */
 
-
+#include "libbalsa.h"
+#include "server.h"
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
 #include "misc.h"

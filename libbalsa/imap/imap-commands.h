@@ -97,7 +97,8 @@ ImapResponse imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
                                         ImapFetchType ift);
 
 ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
-                                           unsigned seqno, FILE *fl);
+					   unsigned cnt, unsigned *seqno, 
+                                           FILE *fl);
 ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,
                                                unsigned uid, FILE *fl);
 typedef void (*ImapFetchBodyCb)(unsigned seqno, const char *buf,

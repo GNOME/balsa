@@ -387,9 +387,12 @@ get_cache_dir(gboolean is_persistent)
     gchar *fname;
     if(is_persistent) {
         const gchar *home = g_get_home_dir();
-        fname = g_strconcat(home, "/.balsa/imap-cache", NULL);
+        fname = g_strconcat(home, G_DIR_SEPARATOR_S ".balsa"
+                            G_DIR_SEPARATOR_S "imap-cache", NULL);
     } else
-        fname = g_strconcat("/tmp/balsa-",  g_get_user_name(), NULL);
+        fname = g_strconcat(g_get_tmp_dir(),
+                            G_DIR_SEPARATOR_S "/balsa-",
+                            g_get_user_name(), NULL);
 
     return fname;
 }
@@ -399,15 +402,15 @@ get_header_cache_path(LibBalsaMailboxImap *mimap)
 {
     LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE(mimap)->server;
     gchar *cache_dir = get_cache_dir(TRUE); /* FIXME */
-    gchar *header_file = g_strdup_printf("%s/%s@%s-%s-%u-headers",
-					 cache_dir, s->user, s->host,
+    gchar *header_file = g_strdup_printf("%s@%s-%s-%u-headers",
+					 s->user, s->host,
 					 (mimap->path ? mimap->path : "INBOX"),
 					 mimap->uid_validity);
-    gchar *start;
-
-    for(start=header_file+strlen(cache_dir)+1; *start; start++)
-	if(*start == '/') *start = '-';
+    gchar *encoded_path = libbalsa_urlencode(header_file);
+    g_free(header_file);
+    header_file = g_build_filename(cache_dir, encoded_path, NULL);
     g_free(cache_dir);
+    g_free(encoded_path);
 
     return header_file;
 }
@@ -421,15 +424,15 @@ get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
     gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
     gchar **res = g_malloc(3*sizeof(gchar*));
     ImapUID uid_validity = LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity;
-    gchar *start;
+    gchar *fname;
 
     res[0] = get_cache_dir(is_persistent);
-    res[1] = g_strdup_printf("%s@%s-%s-%s-%u-%u",
-			     s->user, s->host,
-			     (mailbox->path ? mailbox->path : "INBOX"),
-			     type, uid_validity, uid);
-    for(start=res[1]; *start; start++)
-	if(*start == '/') *start = '-';
+    fname = g_strdup_printf("%s@%s-%s-%s-%u-%u",
+                            s->user, s->host,
+                            (mailbox->path ? mailbox->path : "INBOX"),
+                            type, uid_validity, uid);
+    res[1] = libbalsa_urlencode(fname);
+    g_free(fname);
     res[2] = NULL;
 
     return res;
@@ -465,7 +468,7 @@ clean_dir(const char *dir_name, off_t cache_size)
     while ( (key=readdir(dir)) != NULL) {
         struct stat st;
         struct file_info *fi;
-        gchar *fname = g_strconcat(dir_name, "/", key->d_name, NULL);
+        gchar *fname = g_build_filename(dir_name, key->d_name, NULL);
         if(stat(fname, &st) == -1 || !S_ISREG(st.st_mode)) {
 	    g_free(fname);
             continue;
@@ -854,7 +857,7 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
      * fetch the message from the server. */
     if ((imsg = imap_mbox_handle_get_msg(mimap->handle, seqno))) {
 	gchar **pair = get_cache_name_pair(mimap, "body", imsg->uid);
-        gchar *fn = g_strconcat(pair[0], "/", pair[1], NULL);
+        gchar *fn = g_build_filename(pair[0], pair[1], NULL);
         unlink(fn); /* ignore error; perhaps the message 
                      * was not in the cache.  */
         g_free(fn);
@@ -1107,15 +1110,13 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
 
     g_assert(mimap->handle);
     pair = get_cache_name_pair(mimap, "body", uid);
-    path = g_strconcat(pair[0], "/", pair[1], NULL);
+    path = g_build_filename(pair[0], pair[1], NULL);
     stream = fopen(path, "rb");
     if(!stream) {
         FILE *cache;
 	ImapResponse rc;
 
-        libbalsa_assure_balsa_dir();
-        printf("A:mkdir %s\n", pair[0]);
-        mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+        g_mkdir_with_parents(pair[0], S_IRUSR|S_IWUSR|S_IXUSR);
 #if 0
         if(msg->length>(signed)SizeMsgThreshold)
             libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
@@ -2268,7 +2269,8 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
    /* look for a part cache */
     section = get_section_for(msg, part);
     pair = get_cache_name_pair(mimap, "part", IMAP_MESSAGE_UID(msg));
-    part_name   = g_strconcat(pair[0], "/", pair[1], "-", section, NULL);
+    part_name   = g_strconcat(pair[0], G_DIR_SEPARATOR_S,
+                              pair[1], "-", section, NULL);
     fp = fopen(part_name,"rb+");
     
     if(!fp) { /* no cache element */
@@ -2332,9 +2334,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                         imap_mbox_handle_get_last_msg(mimap->handle));
             return FALSE;
         }
-        libbalsa_assure_balsa_dir();
-        printf("B:mkdir %s\n", pair[0]);
-        mkdir(pair[0], S_IRUSR|S_IWUSR|S_IXUSR); /* ignore errors */
+        g_mkdir_with_parents(pair[0], S_IRUSR|S_IWUSR|S_IXUSR);
         fp = fopen(part_name, "wb+");
         if(!fp) {
             g_free(section); 
@@ -3069,17 +3069,16 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
                                            sizeof(uint32_t), icm->exists);
         ImapSearchKey *k;
         unsigned lo = icm->uidmap->len+1, hi = 0, i;
-        /* printf("searching range [1:%u]\n", icm->uidmap->len); */
+        /* printf("UIDSYNC:Searching range [1:%u]\n", icm->uidmap->len); */
         for(i=1; i<=icm->uidmap->len; i++)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {lo=i; break; }
         for(i=icm->uidmap->len; i>=lo; i--)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {hi=i; break; }
 
         k = imap_search_key_new_range(FALSE, FALSE, lo, hi);
-	/*
-	  printf("Mailbox modified. exists: %u %u uidnext: %u %u "
-	  "- syncing uid map for [%u:%u].\n",
-	  icm->exists, exists, icm->uidnext, uidnext, lo, hi);*/
+        /* printf("UIDSYNC: Old vs new: exists: %u %u uidnext: %u %u "
+               "- syncing uid map for msgno [%u:%u].\n",
+               icm->exists, exists, icm->uidnext, uidnext, lo, hi); */
         if(k) {
             uidmap->len = lo-1;
             rc = imap_search_exec(h, TRUE, k, set_uid, uidmap);
@@ -3090,7 +3089,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
             return;
         }
         g_array_free(icm->uidmap, TRUE); icm->uidmap = uidmap;
-        /* printf("new uidmap has length: %u\n", icm->uidmap->len); */
+        /* printf("New uidmap has length: %u\n", icm->uidmap->len); */
     }
     /* One way or another, we have a valid uid->seqno map now;
      * The mailbox data can be resynced easily. */

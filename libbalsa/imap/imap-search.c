@@ -449,7 +449,12 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
   static const unsigned UIDS_TO_SEARCH_AT_ONCE   = 100000;
   int can_do_literals =
     imap_mbox_handle_can_do(h, IMCAP_LITERAL);
-  int can_do_esearch = imap_mbox_handle_can_do(h, IMCAP_ESEARCH);
+
+  /* We cannot use ESEARCH for UID searches easily. See the imapext
+     thread starting at:
+     http://www.imc.org/ietf-imapext/mail-archive/msg03946.html
+  */
+  int can_do_esearch = !uid && imap_mbox_handle_can_do(h, IMCAP_ESEARCH);
   ImapResponse ir = IMR_OK;
   ImapCmdTag tag;
   ImapSearchCb ocb;

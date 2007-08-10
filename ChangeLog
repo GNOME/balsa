@@ -1,3 +1,9 @@
+2007-08-10  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: encode cache file names more robustly.
+	* libbalsa/imap/imap-search.c: disable UID ESEARCH for now since
+	some interpretations make it useless.
+
 2007-08-08  Pawel Salek
 
 	* src/mailbox-conf.h: needs server.h

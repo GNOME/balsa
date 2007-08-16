@@ -56,6 +56,7 @@ src/balsa-app.c
 src/balsa-index.c
 src/balsa-mblist.c
 src/balsa-message.c
+src/balsa-print-object-text.c
 src/filter-edit-callbacks.c
 src/filter-edit-dialog.c
 src/filter-export-callbacks.c

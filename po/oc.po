@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: balsa 2.3.14\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-25 21:32+0200\n"
-"PO-Revision-Date: 2007-08-07 14:21+0200\n"
+"PO-Revision-Date: 2007-08-19 16:35+0200\n"
 "Last-Translator: Yannig MARCHEGAY (Kokoyaya) <yannig@marchegay.org>\n"
 "Language-Team: Occitan (post 1500) <ubuntu-l10n-oci@lists.ubuntu.com>\n"
 "MIME-Version: 1.0\n"
@@ -49,7 +49,7 @@ msgstr ""
 
 #: ../libbalsa/address-book.c:315 ../libbalsa/filter-error.c:45
 msgid "No error"
-msgstr "Pas d'error"
+msgstr "Pas cap d'error"
 
 #: ../libbalsa/address-book.c:316
 msgid "Cannot read from address book"
@@ -383,7 +383,7 @@ msgstr ""
 #. create the "Security" tab
 #: ../libbalsa/identity.c:953
 msgid "Security"
-msgstr "Seguritat"
+msgstr "Seguretat"
 
 #: ../libbalsa/identity.c:956
 msgid "sign messages by default"
@@ -597,7 +597,7 @@ msgstr ""
 
 #: ../libbalsa/mailbox.c:2804
 msgid "from unknown"
-msgstr "desconegu"
+msgstr ""
 
 #: ../libbalsa/mailbox.c:2806
 msgid "Loading..."

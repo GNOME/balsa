@@ -19,8 +19,6 @@
  * 02111-1307, USA.
  */
 
-#include <gtk/gtk.h>
-
 #ifndef __BALSA_DRUID_PAGE_DIRECTORY_H__
 #define __BALSA_DRUID_PAGE_DIRECTORY_H__
 
@@ -29,7 +27,9 @@ extern "C" {
 #endif                          /* __cplusplus */
 
 #include "config.h"
-#include <gnome.h>
+
+#include <gtk/gtk.h>
+
 #include "helper.h"
 #include "balsa-initdruid.h"
 
@@ -52,12 +52,13 @@ extern "C" {
     };
 
     struct _BalsaDruidPageDirectory {
+        GtkWidget *page;
         GtkWidget *inbox;
         GtkWidget *outbox;
         GtkWidget *sentbox;
         GtkWidget *draftbox;
         GtkWidget *trash;
-        gboolean paths_locked;
+        gboolean paths_locked, need_set;
         EntryMaster emaster;
         EntryData ed[NUM_EDs];
     };
@@ -65,7 +66,7 @@ extern "C" {
 /*
  * Public methods
  */
-    void balsa_druid_page_directory(GnomeDruid * druid,
+    void balsa_druid_page_directory(GtkAssistant * druid,
                                     GdkPixbuf * default_logo);
     void balsa_druid_page_directory_later(GtkWidget *druid);
 

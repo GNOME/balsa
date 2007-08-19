@@ -19,8 +19,6 @@
  * 02111-1307, USA.
  */
 
-#include <gtk/gtk.h>
-
 #ifndef __BALSA_DRUID_PAGE_USER_H__
 #define __BALSA_DRUID_PAGE_USER_H__
 
@@ -31,7 +29,8 @@ extern "C" {
 
 
 #include "config.h"
-#include <gnome.h>
+
+#include <gtk/gtk.h>
 #include "helper.h"
 #include "balsa-initdruid.h"
 
@@ -44,6 +43,7 @@ extern "C" {
 #endif
 #define BALSA_DRUID_PAGE_USER(obj) ((BalsaDruidPageUser *) obj)
     struct _BalsaDruidPageUser {
+        GtkWidget *page;
         GtkWidget *incoming_srv;
         GtkWidget *incoming_type;
         GtkWidget *using_ssl;
@@ -68,12 +68,13 @@ extern "C" {
         EntryData ed5;
         EntryData ed6;
         EntryData ed7;
+        gboolean need_set;
     };
 
 /*
  * Public methods
  */
-    void balsa_druid_page_user(GnomeDruid * druid, 
+    void balsa_druid_page_user(GtkAssistant * druid, 
                                GdkPixbuf * default_logo);
 
 #ifdef __cplusplus

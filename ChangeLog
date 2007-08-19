@@ -1,3 +1,10 @@
+2007-08-19  Pawel Salek
+
+	* libinit_balsa/balsa-druid-page-{welcome,defclient,directory}.[hc]:
+	* libinit_balsa/balsa-druid-page-{user,finish}.[hc]:
+	* libinit_balsa/init_balsa.c: replace GnomeDruid with GtkAssistant.
+	* libinit_balsa/{balsa-initdruid,helper}.{c,h}: ditto.
+
 2007-08-10  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: encode cache file names more robustly.

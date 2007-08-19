@@ -21,6 +21,15 @@
 
 #define _XOPEN_SOURCE 500
 
+#include "config.h"
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+
 #include "balsa-druid-page-directory.h"
 
 #include "i18n.h"
@@ -30,12 +39,18 @@
 #include "server.h"
 #include "url.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
+#if !defined(ENABLE_TOUCH_UI)
+#define INBOX_NAME    "Inbox"
+#define OUTBOX_NAME   "Outbox"
+#define SENTBOX_NAME  "Sentbox"
+#define DRAFTBOX_NAME "Draftbox"
+#else /* defined(ENABLE_TOUCH_UI) */
+#define INBOX_NAME    "In"
+#define OUTBOX_NAME   "Out"
+#define SENTBOX_NAME  "Sent"
+#define DRAFTBOX_NAME "Drafts"
+#endif /* defined(ENABLE_TOUCH_UI) */
+#define TRASH_NAME    "Trash"
 
 static const gchar * const init_mbnames[NUM_EDs] = {
 #if defined(ENABLE_TOUCH_UI)
@@ -46,6 +61,13 @@ static const gchar * const init_mbnames[NUM_EDs] = {
 #endif
 };
 
+static void balsa_druid_page_directory_prepare(GtkAssistant * druid,
+                                               GtkWidget * page,
+                                               BalsaDruidPageDirectory * dir);
+static gboolean balsa_druid_page_directory_next(GtkAssistant * druid,
+                                                GtkWidget * page,
+                                                BalsaDruidPageDirectory *
+                                                dir);
 static void unconditional_mailbox(const gchar * path,
                                   const gchar * prettyname,
                                   LibBalsaMailbox ** box, gchar ** error);
@@ -141,32 +163,24 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
     (*box)->name = g_strdup(gettext(prettyname));
 
     config_mailbox_add(*box, (char *) prettyname);
-
     if (box == &balsa_app.outbox)
         (*box)->no_reassemble = TRUE;
 }
 
 /* here are local prototypes */
 static void balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
-                                            GnomeDruidPageStandard * page,
-                                            GnomeDruid * druid);
-static void balsa_druid_page_directory_prepare(GnomeDruidPage * page,
-                                               GnomeDruid * druid,
-                                               BalsaDruidPageDirectory *
-                                               dir);
-static gboolean balsa_druid_page_directory_next(GnomeDruidPage * page,
+                                            GtkWidget * page,
+                                            GtkAssistant * druid);
+#if 0
+static gboolean balsa_druid_page_directory_back(GtkWidget * page,
                                                 GtkWidget * druid,
                                                 BalsaDruidPageDirectory *
                                                 dir);
-static gboolean balsa_druid_page_directory_back(GnomeDruidPage * page,
-                                                GtkWidget * druid,
-                                                BalsaDruidPageDirectory *
-                                                dir);
-
+#endif
 static void
 balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
-                                GnomeDruidPageStandard * page,
-                                GnomeDruid * druid)
+                                GtkWidget * page,
+                                GtkAssistant * druid)
 {
     GtkTable *table;
     GtkLabel *label;
@@ -219,56 +233,60 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
 
 #if defined(ENABLE_TOUCH_UI)
         balsa_init_add_table_entry(table, i, init_mbnames[i], preset,
-                                   &(dir->ed[i]), druid, init_widgets[i]);
+                                   &(dir->ed[i]), druid, page, init_widgets[i]);
 #else
         balsa_init_add_table_entry(table, i, _(init_mbnames[i]), preset,
-                                   &(dir->ed[i]), druid, init_widgets[i]);
+                                   &(dir->ed[i]), druid, page, init_widgets[i]);
 #endif
 
         g_free(preset);
     }
 
-    gtk_box_pack_start(GTK_BOX(page->vbox), GTK_WIDGET(table), FALSE, TRUE,
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(table), FALSE, TRUE,
                        8);
     gtk_widget_show_all(GTK_WIDGET(table));
 
-    return;
+    g_signal_connect(G_OBJECT(druid), "prepare",
+                     G_CALLBACK(balsa_druid_page_directory_prepare),
+                     dir);
+    dir->need_set = FALSE;
 }
 
 
 void
-balsa_druid_page_directory(GnomeDruid * druid, GdkPixbuf * default_logo)
+balsa_druid_page_directory(GtkAssistant * druid, GdkPixbuf * default_logo)
 {
     BalsaDruidPageDirectory *dir;
-    GnomeDruidPageStandard *page;
 
     dir = g_new0(BalsaDruidPageDirectory, 1);
-    page = GNOME_DRUID_PAGE_STANDARD(gnome_druid_page_standard_new());
-    gnome_druid_page_standard_set_title(page, _("Mail Files"));
-    gnome_druid_page_standard_set_logo(page, default_logo);
-    balsa_druid_page_directory_init(dir, page, druid);
-    gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
-    g_signal_connect(G_OBJECT(page), "prepare",
-                     G_CALLBACK(balsa_druid_page_directory_prepare), dir);
-    g_signal_connect(G_OBJECT(page), "next",
-                     G_CALLBACK(balsa_druid_page_directory_next), dir);
-    g_signal_connect(G_OBJECT(page), "back",
-                     G_CALLBACK(balsa_druid_page_directory_back), dir);
+    dir->page = gtk_vbox_new(FALSE, FALSE);
+    gtk_assistant_append_page(druid, dir->page);
+    gtk_assistant_set_page_title(druid, dir->page, _("Mail Files"));
+    gtk_assistant_set_page_header_image(druid, dir->page, default_logo);
+    balsa_druid_page_directory_init(dir, dir->page, druid);
 }
 
 static void
-balsa_druid_page_directory_prepare(GnomeDruidPage * page,
-                                   GnomeDruid * druid,
+balsa_druid_page_directory_prepare(GtkAssistant * druid,
+                                   GtkWidget * page,
                                    BalsaDruidPageDirectory * dir)
 {
     gchar *buf;
 
-    /* We want a change in the local mailroot to be reflected in the directories
-     * here, but we don't want to trash user's custom settings if needed. Hence
-     * the paths_locked variable; it should work pretty well, because only a movement
-     * backwards should change the mailroot; going forward should not lock the paths:
-     * envision an error occurring; upon return to the Dir page the entries should be
-     * the same. 
+    if(page != dir->page) { /* This is not the page to be prepared. */
+        if(dir->need_set) {
+            balsa_druid_page_directory_next(druid, page, dir);
+            dir->need_set = FALSE;
+        }
+        return;
+    }
+    /* We want a change in the local mailroot to be reflected in the
+     * directories here, but we don't want to trash user's custom
+     * settings if needed. Hence the paths_locked variable; it should
+     * work pretty well, because only a movement backwards should
+     * change the mailroot; going forward should not lock the paths:
+     * envision an error occurring; upon return to the Dir page the
+     * entries should be the same.
      */
 
     if (!dir->paths_locked) {
@@ -291,32 +309,16 @@ balsa_druid_page_directory_prepare(GnomeDruidPage * page,
         g_free(buf);
     }
 
-
     /* Don't let them continue unless all entries have something. */
-    if (ENTRY_MASTER_DONE(dir->emaster)) {
-        gnome_druid_set_buttons_sensitive(druid, TRUE, TRUE, TRUE, FALSE);
-    } else {
-        gnome_druid_set_buttons_sensitive(druid, TRUE, FALSE, TRUE, FALSE);
-    }
+    gtk_assistant_set_page_complete(druid, page,
+                                    ENTRY_MASTER_DONE(dir->emaster));
 
-    gnome_druid_set_show_finish(druid, FALSE);
+    dir->need_set = TRUE;
 }
 
-#if !defined(ENABLE_TOUCH_UI)
-#define INBOX_NAME    "Inbox"
-#define OUTBOX_NAME   "Outbox"
-#define SENTBOX_NAME  "Sentbox"
-#define DRAFTBOX_NAME "Draftbox"
-#else /* defined(ENABLE_TOUCH_UI) */
-#define INBOX_NAME    "In"
-#define OUTBOX_NAME   "Out"
-#define SENTBOX_NAME  "Sent"
-#define DRAFTBOX_NAME "Drafts"
-#endif /* defined(ENABLE_TOUCH_UI) */
-#define TRASH_NAME    "Trash"
 
 static gboolean
-balsa_druid_page_directory_next(GnomeDruidPage * page, GtkWidget * druid,
+balsa_druid_page_directory_next(GtkAssistant * page, GtkWidget * druid,
                                 BalsaDruidPageDirectory * dir)
 {
     gchar *error = NULL;
@@ -359,7 +361,7 @@ balsa_druid_page_directory_next(GnomeDruidPage * page, GtkWidget * druid,
 }
 
 #define SET_MAILBOX(fname, config, mbx) \
-do { gchar *t=g_strconcat(balsa_app.local_mail_directory,"/",(fname),NULL);\
+do { gchar *t=g_build_filename(balsa_app.local_mail_directory,(fname),NULL);\
  unconditional_mailbox(t, config, (mbx), &error); g_free(t);}while(0)
 
 void
@@ -389,10 +391,12 @@ balsa_druid_page_directory_later(GtkWidget *druid)
     }
 }
 
+#if 0
 static gboolean
-balsa_druid_page_directory_back(GnomeDruidPage * page, GtkWidget * druid,
+balsa_druid_page_directory_back(GtkWidget * page, GtkWidget * druid,
                                 BalsaDruidPageDirectory * dir)
 {
     dir->paths_locked = FALSE;
     return FALSE;
 }
+#endif

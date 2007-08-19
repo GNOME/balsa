@@ -24,11 +24,10 @@
 #include <gtk/gtk.h>
 
 #include "init_balsa.h"
-#ifdef HAVE_GNOME
+
 #include "helper.h"
 #include "balsa-initdruid.h"
 #include "balsa-druid-page-welcome.h"
-#endif /* HAVE_GNOME */
 
 #include "i18n.h"	/* Must come after helper.h. */
 
@@ -42,22 +41,21 @@ dismiss_the_wizard(GtkWidget *wizard)
 void
 balsa_init_begin(void)
 {
-    GtkWidget *window;
+    GtkWidget *assistant;
 
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), _("Configure Balsa"));
-    gtk_window_set_wmclass(GTK_WINDOW(window), "druid", "Balsa");
+    assistant = gtk_assistant_new();
+    gtk_window_set_title(GTK_WINDOW(assistant), _("Configure Balsa"));
+    gtk_window_set_wmclass(GTK_WINDOW(assistant), "druid", "Balsa");
+    gtk_widget_set_size_request(assistant, 780, 580);
 
-#ifdef HAVE_GNOME
-    balsa_initdruid(GTK_WINDOW(window));
-    gtk_widget_show_all(window);
+    balsa_initdruid(GTK_ASSISTANT(assistant));
+    gtk_widget_show_all(assistant);
 
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
-#endif
-
+    printf("Init loop  finished\n");
     /* we do not want to destroy wizard immediately to avoid confusing
        delay between the wizard that left and balsa that entered. */
-    g_idle_add((GSourceFunc)dismiss_the_wizard, window);
+    g_idle_add((GSourceFunc)dismiss_the_wizard, assistant);
 }

@@ -49,7 +49,7 @@ extern "C" {
 /*
  * Public methods
  */
-    void balsa_druid_page_defclient(GnomeDruid * druid, 
+    void balsa_druid_page_defclient(GtkAssistant * druid, 
                                     GdkPixbuf * default_logo);
     void balsa_druid_page_defclient_save(BalsaDruidPageDefclient * defclient);
 

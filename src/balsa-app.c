@@ -769,7 +769,14 @@ gboolean
 balsa_find_iter_by_data(GtkTreeIter * iter , gpointer data)
 {
     struct balsa_find_iter_by_data_info bf;
-    GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+    GtkTreeModel *model;
+
+    /* We may call it from initial config, it's ok for
+       mblist_tree_store not to exist. */
+    if(!balsa_app.mblist_tree_store)
+        return FALSE;
+
+    model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
 
     bf.iter = iter;
     bf.data = data;

@@ -1020,6 +1020,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
     ibd.body = imap_message_get_body_from_section(imsg, section);
     ibd.body_cb = body_cb;
     ibd.body_arg = arg;
+    ibd.first_run = TRUE;
     handle->body_cb = imap_binary_handler;
     handle->body_arg = &ibd;
     snprintf(cmd, sizeof(cmd), "FETCH %u BINARY[%s]",

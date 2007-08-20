@@ -1,3 +1,12 @@
+2007-08-20  Pawel Salek
+
+	* src/save-restore.c: show just one column for mailboxes by default.
+	* src/balsa-app.c: squash a warning.
+	* libinit_balsa/balsa-druid-page-directory.[ch]: finish the port
+	to GtkAssistant.
+	* libbalsa/imap/imap-commands.c: really add headers when BINARY
+	extension is used.
+
 2007-08-19  Pawel Salek
 
 	* libinit_balsa/balsa-druid-page-{welcome,defclient,directory}.[hc]:

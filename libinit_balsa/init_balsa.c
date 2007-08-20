@@ -54,7 +54,7 @@ balsa_init_begin(void)
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
-    printf("Init loop  finished\n");
+
     /* we do not want to destroy wizard immediately to avoid confusing
        delay between the wizard that left and balsa that entered. */
     g_idle_add((GSourceFunc)dismiss_the_wizard, assistant);

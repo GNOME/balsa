@@ -984,7 +984,7 @@ config_global_load(void)
 
     /* ... show mailbox content info */
     balsa_app.mblist_show_mb_content_info =
-	libbalsa_conf_get_bool("ShowMailboxContentInfo=true");
+	libbalsa_conf_get_bool("ShowMailboxContentInfo=false");
 
     libbalsa_conf_pop_group();
 

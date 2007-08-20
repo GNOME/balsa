@@ -58,6 +58,7 @@ extern "C" {
         GtkWidget *sentbox;
         GtkWidget *draftbox;
         GtkWidget *trash;
+        gint my_num;
         gboolean paths_locked, need_set;
         EntryMaster emaster;
         EntryData ed[NUM_EDs];

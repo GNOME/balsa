@@ -171,12 +171,10 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
 static void balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
                                             GtkWidget * page,
                                             GtkAssistant * druid);
-#if 0
-static gboolean balsa_druid_page_directory_back(GtkWidget * page,
-                                                GtkWidget * druid,
+static gboolean balsa_druid_page_directory_back(GtkAssistant * druid,
+                                                GtkWidget * page,
                                                 BalsaDruidPageDirectory *
                                                 dir);
-#endif
 static void
 balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
                                 GtkWidget * page,
@@ -249,6 +247,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
     g_signal_connect(G_OBJECT(druid), "prepare",
                      G_CALLBACK(balsa_druid_page_directory_prepare),
                      dir);
+    dir->my_num = 98765;
     dir->need_set = FALSE;
 }
 
@@ -272,14 +271,19 @@ balsa_druid_page_directory_prepare(GtkAssistant * druid,
                                    BalsaDruidPageDirectory * dir)
 {
     gchar *buf;
+    gint current_page_no = gtk_assistant_get_current_page(druid);
 
     if(page != dir->page) { /* This is not the page to be prepared. */
         if(dir->need_set) {
-            balsa_druid_page_directory_next(druid, page, dir);
+            if(current_page_no > dir->my_num)
+                balsa_druid_page_directory_next(druid, page, dir);
+            else
+                balsa_druid_page_directory_back(druid, page, dir);
             dir->need_set = FALSE;
         }
         return;
     }
+    dir->my_num = current_page_no;
     /* We want a change in the local mailroot to be reflected in the
      * directories here, but we don't want to trash user's custom
      * settings if needed. Hence the paths_locked variable; it should
@@ -391,12 +395,10 @@ balsa_druid_page_directory_later(GtkWidget *druid)
     }
 }
 
-#if 0
 static gboolean
-balsa_druid_page_directory_back(GtkWidget * page, GtkWidget * druid,
+balsa_druid_page_directory_back(GtkAssistant *druid, GtkWidget *page,
                                 BalsaDruidPageDirectory * dir)
 {
     dir->paths_locked = FALSE;
     return FALSE;
 }
-#endif

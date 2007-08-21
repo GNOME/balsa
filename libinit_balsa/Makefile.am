@@ -47,6 +47,7 @@ EXTRA_DIST = 				\
 	assistant_init.h		\
 	assistant_helper.c		\
 	assistant_helper.h
+
 libinit_balsa_a_SOURCES =		\
 	balsa-druid-page-defclient.c	\
 	balsa-druid-page-defclient.h	\
@@ -60,6 +61,8 @@ libinit_balsa_a_SOURCES =		\
 	balsa-druid-page-welcome.h	\
 	balsa-initdruid.c		\
 	balsa-initdruid.h		\
+	init_balsa.c			\
+	init_balsa.h			\
 	helper.c			\
 	helper.h	
 endif

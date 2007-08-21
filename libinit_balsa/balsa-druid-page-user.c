@@ -29,8 +29,10 @@
 
 #include "i18n.h"
 #include "imap-server.h"
+#include "smtp-server.h"
 #include "balsa-app.h"
 #include "save-restore.h"
+#include "server.h"
 
 /* here are local prototypes */
 
@@ -154,7 +156,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                 &(user->remember_passwd));
     balsa_init_add_table_entry(table, row, _("_Refer to this account as:"),
                                "",
-                               &(user->ed3), druid, &(user->account_name));
+                               NULL, druid, &(user->account_name));
     gtk_table_set_row_spacing(table, row++, 10);
     g_signal_connect(user->incoming_srv, "changed",
                      (GCallback)srv_changed_cb, user);
@@ -256,6 +258,9 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
     const gchar *host;
     gchar *uhoh;
     LibBalsaIdentity *ident;
+#if ENABLE_ESMTP
+    LibBalsaSmtpServer *smtp_server;
+#endif /* ENABLE_ESMTP */
     
     /* incoming mail */
     host = gtk_entry_get_text(GTK_ENTRY(user->incoming_srv));
@@ -288,17 +293,24 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
     } else {
         ident = balsa_app.current_ident;
     }
-    g_free(ident->ia->name);
-    ident->ia->name = gtk_editable_get_chars(GTK_EDITABLE(user->name), 0, -1);
-    g_assert(ident->ia->type == INTERNET_ADDRESS_NAME);
-    g_free(ident->ia->value.addr);
-    ident->ia->value.addr =
-        gtk_editable_get_chars(GTK_EDITABLE(user->email), 0, -1);
+    internet_address_set_name(ident->ia,
+                              gtk_entry_get_text(GTK_ENTRY(user->name)));
+    internet_address_set_addr(ident->ia,
+                              gtk_entry_get_text(GTK_ENTRY(user->email)));
+
     /* outgoing mail */
 #if ENABLE_ESMTP
-    g_free(balsa_app.smtp_server);
-    balsa_app.smtp_server =
-        gtk_editable_get_chars(GTK_EDITABLE(user->smtp), 0, -1);
+    if (balsa_app.smtp_servers == NULL) {
+	smtp_server = libbalsa_smtp_server_new();
+        libbalsa_smtp_server_set_name(smtp_server,
+                                      libbalsa_smtp_server_get_name(NULL));
+	balsa_app.smtp_servers = g_slist_prepend(NULL, smtp_server);
+    } else {
+	smtp_server = balsa_app.smtp_servers->data;
+    }
+    libbalsa_server_set_host(LIBBALSA_SERVER(smtp_server),
+                             gtk_entry_get_text(GTK_ENTRY(user->smtp)),
+                             FALSE);
 #endif
 
     g_free(balsa_app.local_mail_directory);

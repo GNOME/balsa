@@ -21,6 +21,13 @@
 
 #define _XOPEN_SOURCE 500
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+
 #include "balsa-druid-page-directory.h"
 
 #include "i18n.h"
@@ -28,13 +35,8 @@
 #include "save-restore.h"
 #include "misc.h"
 #include "url.h"
+#include "server.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
 
 static gchar *init_mbnames[NUM_EDs] = {
 #if defined(ENABLE_TOUCH_UI)

@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#include "balsa-druid-page-user.h"
+#include "assistant_page_user.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -29,20 +29,22 @@
 
 #include "i18n.h"
 #include "imap-server.h"
+#include "smtp-server.h"
+#include "server.h"
 #include "balsa-app.h"
 #include "save-restore.h"
 
 /* here are local prototypes */
 
 static void balsa_druid_page_user_init(BalsaDruidPageUser * user,
-                                       GnomeDruidPageStandard * page,
-                                       GnomeDruid * druid);
-static void balsa_druid_page_user_prepare(GnomeDruidPage * page,
-                                          GnomeDruid * druid,
+                                       GtkWidget * page,
+                                       GtkAssistant * druid);
+static void balsa_druid_page_user_prepare(GtkAssistant * druid,
+                                          GtkWidget * page,
                                           BalsaDruidPageUser * user);
-static gboolean balsa_druid_page_user_next(GnomeDruidPage * page,
-                                           GnomeDruid * druid,
-                                           BalsaDruidPageUser * user);
+static void balsa_druid_page_user_next(GtkAssistant * druid,
+                                       GtkWidget * page,
+                                       BalsaDruidPageUser * user);
 
 static void 
 srv_changed_cb(GtkEditable *incoming_srv, gpointer data)
@@ -63,8 +65,8 @@ srv_changed_cb(GtkEditable *incoming_srv, gpointer data)
 
 static void
 balsa_druid_page_user_init(BalsaDruidPageUser * user,
-                           GnomeDruidPageStandard * page,
-                           GnomeDruid * druid)
+                           GtkWidget * page,
+                           GtkAssistant * druid)
 {
     static const char *header2 =
         N_("The following settings are also needed "
@@ -98,7 +100,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 #endif
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
-    gtk_box_pack_start_defaults(GTK_BOX(page->vbox), GTK_WIDGET(label));
+    gtk_box_pack_start_defaults(GTK_BOX(page), GTK_WIDGET(label));
 
     table = GTK_TABLE(gtk_table_new(10, 2, FALSE));
 
@@ -112,7 +114,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     balsa_init_add_table_entry(table, row++,
                                _("Name of mail server for incoming _mail:"),
                                "", /* no guessing here */
-                               NULL, druid, &(user->incoming_srv));
+                               NULL, druid, page, &(user->incoming_srv));
 
     balsa_init_add_table_option(table, row++,
                                 _("_Type of mail server:"),
@@ -124,37 +126,37 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 
     balsa_init_add_table_entry(table, row++, _("Your email _login name:"),
                                g_get_user_name(),
-                               NULL, druid, &(user->login));
+                               NULL, druid, page, &(user->login));
     balsa_init_add_table_entry(table, row++, _("Your _password:"),
                                "",
-                               NULL, druid, &(user->passwd));
+                               NULL, druid, page, &(user->passwd));
     gtk_entry_set_visibility(GTK_ENTRY(user->passwd), FALSE);
     /* separator line here */
 
 #if ENABLE_ESMTP
     preset = "localhost:25";
     balsa_init_add_table_entry(table, row++, _("_SMTP Server:"), preset,
-                               &(user->ed2), druid, &(user->smtp));
+                               &(user->ed2), druid, page, &(user->smtp));
 #endif
 
     /* 2.1 */
     balsa_init_add_table_entry(table, row++, _("Your real _name:"),
                                g_get_real_name(),
-                               &(user->ed0), druid, &(user->name));
+                               &(user->ed0), druid, page, &(user->name));
 
     preset = libbalsa_guess_email_address();
     balsa_init_add_table_entry
         (table, row++, _("Your _Email Address, for this email account:"),
-         preset, &(user->ed1), druid, &(user->email));
+         preset, &(user->ed1), druid, page, &(user->email));
     g_free(preset);
 
     balsa_init_add_table_option(table, row++,
                                 _("_Remember your password:"),
-                               remember_passwd, druid,
+                                remember_passwd, druid,
                                 &(user->remember_passwd));
     balsa_init_add_table_entry(table, row, _("_Refer to this account as:"),
                                "",
-                               &(user->ed3), druid, &(user->account_name));
+                               NULL, druid, page, &(user->account_name));
     gtk_table_set_row_spacing(table, row++, 10);
     g_signal_connect(user->incoming_srv, "changed",
                      (GCallback)srv_changed_cb, user);
@@ -162,46 +164,51 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     preset = g_strconcat(g_get_home_dir(), "/mail", NULL);
     balsa_init_add_table_entry(table, row++, _("_Local mail directory:"),
                                preset,
-                               &(user->ed4), druid, &(user->localmaildir));
+                               &(user->ed4), druid, page,
+                               &(user->localmaildir));
     g_free(preset);
 #endif
-    gtk_box_pack_start(GTK_BOX(page->vbox), GTK_WIDGET(table), TRUE, TRUE,
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(table), TRUE, TRUE,
                        8);
+
+    user->need_set = FALSE;
 }
 
 void
-balsa_druid_page_user(GnomeDruid * druid, GdkPixbuf * default_logo)
+balsa_druid_page_user(GtkAssistant * druid, GdkPixbuf * default_logo)
 {
     BalsaDruidPageUser *user;
-    GnomeDruidPageStandard *page;
 
     user = g_new0(BalsaDruidPageUser, 1);
-    page = GNOME_DRUID_PAGE_STANDARD(gnome_druid_page_standard_new());
-    gnome_druid_page_standard_set_title(page, _("User Settings"));
-    gnome_druid_page_standard_set_logo(page, default_logo);
-    balsa_druid_page_user_init(user, page, druid);
-    gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
-    g_signal_connect(G_OBJECT(page), "prepare",
+    user->page = gtk_vbox_new(FALSE, FALSE);
+    gtk_assistant_append_page(druid, user->page);
+    gtk_assistant_set_page_title(druid, user->page, _("User Settings"));
+    gtk_assistant_set_page_header_image(druid, user->page, default_logo);
+    balsa_druid_page_user_init(user, user->page, druid);
+
+    g_signal_connect(G_OBJECT(druid), "prepare",
                      G_CALLBACK(balsa_druid_page_user_prepare),
                      user);
-    g_signal_connect(G_OBJECT(page), "next",
-                     G_CALLBACK(balsa_druid_page_user_next), user);
 }
 
 static void
-balsa_druid_page_user_prepare(GnomeDruidPage * page, GnomeDruid * druid,
+balsa_druid_page_user_prepare(GtkAssistant * druid, GtkWidget * page,
                               BalsaDruidPageUser * user)
 {
-    /* Don't let them continue unless all entries have something. */
-
-    if (ENTRY_MASTER_DONE(user->emaster)) {
-        gnome_druid_set_buttons_sensitive(druid, TRUE, TRUE, TRUE, FALSE);
-    } else {
-        gnome_druid_set_buttons_sensitive(druid, TRUE, FALSE, TRUE, FALSE);
+    if(page != user->page) {
+        if(user->need_set) {
+            balsa_druid_page_user_next(druid, page, user);
+            user->need_set = FALSE;
+        }
+        return;
     }
 
-    gnome_druid_set_show_finish(druid, FALSE);
+    /* Don't let them continue unless all entries have something. */
+    gtk_assistant_set_page_complete(druid, page,
+                                    ENTRY_MASTER_DONE(user->emaster));
+
     gtk_widget_grab_focus(user->incoming_srv);
+    user->need_set = TRUE;
 }
 
 static LibBalsaMailbox*
@@ -249,14 +256,23 @@ create_imap_mbx(const gchar *name, const gchar* host, gboolean ssl,
     g_object_unref(mbnode);
 }
 
-static gboolean
-balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
+static void
+balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
                            BalsaDruidPageUser * user)
 {
     const gchar *host;
     gchar *uhoh;
     LibBalsaIdentity *ident;
+#if ENABLE_ESMTP
+    LibBalsaSmtpServer *smtp_server;
+#endif /* ENABLE_ESMTP */
     
+#if 0
+    printf("USER next ENTER %p %p\n", page, user->page);
+    if(page != user->page)
+        return;
+#endif
+
     /* incoming mail */
     host = gtk_entry_get_text(GTK_ENTRY(user->incoming_srv));
     if(host && *host) {
@@ -288,17 +304,24 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
     } else {
         ident = balsa_app.current_ident;
     }
-    g_free(ident->ia->name);
-    ident->ia->name = gtk_editable_get_chars(GTK_EDITABLE(user->name), 0, -1);
-    g_assert(ident->ia->type == INTERNET_ADDRESS_NAME);
-    g_free(ident->ia->value.addr);
-    ident->ia->value.addr =
-        gtk_editable_get_chars(GTK_EDITABLE(user->email), 0, -1);
+    internet_address_set_name(ident->ia,
+                              gtk_entry_get_text(GTK_ENTRY(user->name)));
+    internet_address_set_addr(ident->ia,
+                              gtk_entry_get_text(GTK_ENTRY(user->email)));
+
     /* outgoing mail */
 #if ENABLE_ESMTP
-    g_free(balsa_app.smtp_server);
-    balsa_app.smtp_server =
-        gtk_editable_get_chars(GTK_EDITABLE(user->smtp), 0, -1);
+    if (balsa_app.smtp_servers == NULL) {
+	smtp_server = libbalsa_smtp_server_new();
+        libbalsa_smtp_server_set_name(smtp_server,
+                                      libbalsa_smtp_server_get_name(NULL));
+	balsa_app.smtp_servers = g_slist_prepend(NULL, smtp_server);
+    } else {
+	smtp_server = balsa_app.smtp_servers->data;
+    }
+    libbalsa_server_set_host(LIBBALSA_SERVER(smtp_server),
+                             gtk_entry_get_text(GTK_ENTRY(user->smtp)),
+                             FALSE);
 #endif
 
     g_free(balsa_app.local_mail_directory);
@@ -323,9 +346,8 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
         gtk_dialog_run(GTK_DIALOG(err));
         gtk_widget_destroy(err);
         g_free(uhoh);
-        return TRUE;
+        return; /* FIXME! Do not go to the next page! */
     }
 
     balsa_app.current_ident = ident;
-    return FALSE;
 }

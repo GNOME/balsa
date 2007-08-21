@@ -21,21 +21,37 @@
 
 #include <gtk/gtk.h>
 
-#ifndef __BALSA_INITDRUID_H__
-#define __BALSA_INITDRUID_H__
+#ifndef __BALSA_DRUID_PAGE_DEFCLIENT_H__
+#define __BALSA_DRUID_PAGE_DEFCLIENT_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif                          /* __cplusplus */
 
+
+
 #include "config.h"
-#include <gnome.h>
-#include "helper.h"
+#include "assistant_helper.h"
+#include "assistant_init.h"
+
+/*
+ * Main object structure
+ */
+#ifndef __TYPEDEF_BALSA_DRUID_PAGE_DEFCLIENT__
+#define __TYPEDEF_BALSA_DRUID_PAGE_DEFCLIENT__
+    typedef struct _BalsaDruidPageDefclient BalsaDruidPageDefclient;
+#endif
+#define BALSA_DRUID_PAGE_DEFCLIENT(obj) ((BalsaDruidPageDefclient *) obj)
+    struct _BalsaDruidPageDefclient {
+        int default_client;
+    };
 
 /*
  * Public methods
  */
-    void balsa_initdruid(GtkWindow * window);
+    void balsa_druid_page_defclient(GtkAssistant * druid, 
+                                    GdkPixbuf * default_logo);
+    void balsa_druid_page_defclient_save(BalsaDruidPageDefclient * defclient);
 
 #ifdef __cplusplus
 }

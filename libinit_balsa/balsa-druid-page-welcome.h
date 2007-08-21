@@ -19,6 +19,8 @@
  * 02111-1307, USA.
  */
 
+#include <gtk/gtk.h>
+
 #ifndef __BALSA_DRUID_PAGE_WELCOME_H__
 #define __BALSA_DRUID_PAGE_WELCOME_H__
 
@@ -29,14 +31,14 @@ extern "C" {
 
 
 #include "config.h"
-#include <gtk/gtk.h>
+#include <gnome.h>
 #include "helper.h"
 #include "balsa-initdruid.h"
 
 /*
  * Public methods
  */
-    void balsa_druid_page_welcome(GtkAssistant * druid,
+    void balsa_druid_page_welcome(GnomeDruid * druid,
                                   GdkPixbuf * default_logo);
 
 #ifdef __cplusplus

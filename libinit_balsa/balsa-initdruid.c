@@ -23,9 +23,7 @@
 
 #include "i18n.h"
 #include "libbalsa-conf.h"
-#include "misc.h"
 #include "save-restore.h"
-#include "balsa-app.h"
 
 #include "balsa-druid-page-welcome.h"
 #include "balsa-druid-page-user.h"
@@ -33,8 +31,45 @@
 #include "balsa-druid-page-defclient.h"
 #include "balsa-druid-page-finish.h"
 
+/* here are local prototypes */
+static void balsa_initdruid_init(GnomeDruid * druid);
+static void balsa_initdruid_cancel(GnomeDruid * druid);
+
 static void
-balsa_initdruid_cancel(GtkAssistant * druid)
+balsa_initdruid_init(GnomeDruid * druid)
+{
+    GdkPixbuf *default_logo = balsa_init_get_png("balsa-logo.png");
+
+    balsa_druid_page_welcome(druid, default_logo);
+    balsa_druid_page_user(druid, default_logo);
+#if !defined(ENABLE_TOUCH_UI)
+    balsa_druid_page_directory(druid, default_logo);
+    balsa_druid_page_defclient(druid, default_logo);
+#endif
+    balsa_druid_page_finish(druid, default_logo);
+}
+
+void
+balsa_initdruid(GtkWindow * window)
+{
+    GnomeDruid *druid;
+
+    g_return_if_fail(window != NULL);
+    g_return_if_fail(GTK_IS_WINDOW(window));
+
+    druid = GNOME_DRUID(gnome_druid_new());
+    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(druid));
+    g_signal_connect(G_OBJECT(druid), "cancel",
+                     G_CALLBACK(balsa_initdruid_cancel), NULL);
+    g_signal_connect(G_OBJECT(druid), "destroy",
+                     G_CALLBACK(exit), NULL);
+    g_object_ref(G_OBJECT(window));
+
+    balsa_initdruid_init(druid);
+}
+
+static void
+balsa_initdruid_cancel(GnomeDruid * druid)
 {
     GtkWidget *dialog =
         gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
@@ -54,68 +89,3 @@ balsa_initdruid_cancel(GtkAssistant * druid)
         exit(0);
     }
 }
-
-static void
-balsa_initdruid_apply(GtkAssistant * druid)
-{
-    gchar *address_book;
-    LibBalsaAddressBook *ab = NULL;
-
-#if defined(ENABLE_TOUCH_UI)
-    balsa_druid_page_directory_later(GTK_WIDGET(druid));
-#endif
-    address_book = g_build_filename(g_get_home_dir(), "GnomeCard.gcrd", NULL);
-    if (g_file_test(address_book, G_FILE_TEST_EXISTS))
-        ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
-                                             address_book);
-    g_free(address_book);
-    if(!ab) {
-        address_book = g_build_filename(g_get_home_dir(), 
-                                   ".addressbook.ldif", NULL);
-        if (g_file_test(address_book, G_FILE_TEST_EXISTS))
-            ab = libbalsa_address_book_ldif_new(_("Address Book"),
-                                                address_book);
-        g_free(address_book);
-    }
-    if(!ab) {
-        /* This will be the default address book and its location */
-        address_book = g_build_filename(g_get_home_dir(), 
-                                        ".balsa", "addressbook.ldif", NULL);
-        ab = libbalsa_address_book_ldif_new(_("Address Book"),
-                                            address_book); 
-        g_free(address_book);
-        libbalsa_assure_balsa_dir();
-   }
-
-    balsa_app.address_book_list =
-        g_list_prepend(balsa_app.address_book_list, ab);
-    balsa_app.default_address_book = ab;
-
-    g_signal_handlers_disconnect_by_func(G_OBJECT(druid),
-                                         G_CALLBACK(exit), NULL);
-    config_save();
-    gtk_main_quit();
-}
-
-void
-balsa_initdruid(GtkAssistant * assistant)
-{
-    GdkPixbuf *default_logo = balsa_init_get_png("balsa-logo.png");
-
-    g_return_if_fail(assistant != NULL);
-    g_return_if_fail(GTK_IS_ASSISTANT(assistant));
-
-    g_signal_connect(G_OBJECT(assistant), "cancel",
-                     G_CALLBACK(balsa_initdruid_cancel), NULL);
-    g_signal_connect(G_OBJECT(assistant), "close",
-                     G_CALLBACK(balsa_initdruid_apply), NULL);
-
-    balsa_druid_page_welcome(assistant, default_logo);
-    balsa_druid_page_user(assistant, default_logo);
-#if !defined(ENABLE_TOUCH_UI)
-    balsa_druid_page_directory(assistant, default_logo);
-    balsa_druid_page_defclient(assistant, default_logo);
-#endif
-    balsa_druid_page_finish(assistant, default_logo);
-}
-

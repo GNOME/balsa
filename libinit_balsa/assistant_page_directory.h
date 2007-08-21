@@ -19,23 +19,58 @@
  * 02111-1307, USA.
  */
 
-#include <gtk/gtk.h>
-
-#ifndef __BALSA_INITDRUID_H__
-#define __BALSA_INITDRUID_H__
+#ifndef __BALSA_DRUID_PAGE_DIRECTORY_H__
+#define __BALSA_DRUID_PAGE_DIRECTORY_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif                          /* __cplusplus */
 
 #include "config.h"
-#include <gnome.h>
-#include "helper.h"
+
+#include <gtk/gtk.h>
+
+#include "assistant_helper.h"
+#include "assistant_init.h"
+
+/*
+ * Main object structure
+ */
+#ifndef __TYPEDEF_BALSA_DRUID_PAGE_DIRECTORY__
+#define __TYPEDEF_BALSA_DRUID_PAGE_DIRECTORY__
+    typedef struct _BalsaDruidPageDirectory BalsaDruidPageDirectory;
+#endif
+#define BALSA_DRUID_PAGE_DIRECTORY(obj)	((BalsaDruidPageDirectory *) obj)
+    
+    enum __ed_types {
+        INBOX,
+        OUTBOX,
+        SENTBOX,
+        DRAFTBOX,
+        TRASH,
+        NUM_EDs
+    };
+
+    struct _BalsaDruidPageDirectory {
+        GtkWidget *page;
+        GtkWidget *inbox;
+        GtkWidget *outbox;
+        GtkWidget *sentbox;
+        GtkWidget *draftbox;
+        GtkWidget *trash;
+        gint my_num;
+        gboolean paths_locked, need_set;
+        EntryMaster emaster;
+        EntryData ed[NUM_EDs];
+    };
 
 /*
  * Public methods
  */
-    void balsa_initdruid(GtkWindow * window);
+    void balsa_druid_page_directory(GtkAssistant * druid,
+                                    GdkPixbuf * default_logo);
+    void balsa_druid_page_directory_later(GtkWidget *druid);
+
 
 #ifdef __cplusplus
 }

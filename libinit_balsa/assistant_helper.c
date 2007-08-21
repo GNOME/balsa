@@ -20,7 +20,6 @@
  */
 
 #include "config.h"
-#include <gnome.h>
 
 #include <errno.h>
 #include <sys/types.h>
@@ -28,8 +27,9 @@
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <gtk/gtk.h>
 
-#include "helper.h"
+#include "assistant_helper.h"
 #include "i18n.h"
 #include "libbalsa.h"
 #include "url.h"
@@ -74,7 +74,8 @@ balsa_init_get_png(const gchar * fname)
 void
 balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
                            const gchar * etext, EntryData * ed,
-                           GnomeDruid * druid, GtkWidget ** dest)
+                           GtkAssistant * druid, GtkWidget *page,
+                           GtkWidget ** dest)
 {
     GtkWidget *l, *e;
 
@@ -82,18 +83,19 @@ balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
     gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
     gtk_table_attach(table, GTK_WIDGET(l), 0, 1, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 8, 4);
+                     GTK_FILL, GTK_FILL, 5, 2);
 
     e = gtk_entry_new();
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), e);
     gtk_table_attach(table, GTK_WIDGET(e), 1, 2, num + 1, num + 2,
-                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
+                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 5, 2);
     (*dest) = e;
     if(ed) {
         g_signal_connect(G_OBJECT(e), "changed",
                          G_CALLBACK(entry_changed_cb), ed);
         ed->num = ed->master->numentries++;
         ed->druid = druid;
+        ed->page = page;
         if (etext && etext[0] != '\0')
             ed->master->setbits |= (1 << num);
         
@@ -119,14 +121,12 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
     if (!GTK_WIDGET_VISIBLE(GTK_WIDGET(entry)))
         return;
 
-    if (GNOME_IS_DRUID(ed->druid)) {
+    if (GTK_IS_ASSISTANT(ed->druid)) {
         /* Don't let them continue unless all entries have something. */
         if (ENTRY_MASTER_P_DONE(ed->master)) {
-            gnome_druid_set_buttons_sensitive(ed->druid, TRUE, TRUE, TRUE,
-                                              FALSE);
+            gtk_assistant_set_page_complete(ed->druid, ed->page, TRUE);
         } else {
-            gnome_druid_set_buttons_sensitive(ed->druid, TRUE, FALSE, TRUE,
-                                              FALSE);
+            gtk_assistant_set_page_complete(ed->druid, ed->page, FALSE);
         }
     }
 }
@@ -135,7 +135,7 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
 void
 balsa_init_add_table_option(GtkTable *table, guint num,
                             const gchar *ltext, const gchar **optns,
-                            GnomeDruid *druid, GtkWidget **dest)
+                            GtkAssistant *druid, GtkWidget **dest)
 {
     GtkWidget *l, *om;
     int i;
@@ -143,7 +143,7 @@ balsa_init_add_table_option(GtkTable *table, guint num,
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
     gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
     gtk_table_attach(table, l, 0, 1, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 8, 4);
+                     GTK_FILL, GTK_FILL, 5, 2);
 
     *dest = om = gtk_combo_box_new_text();
     for(i=0; optns[i]; i++)
@@ -151,7 +151,7 @@ balsa_init_add_table_option(GtkTable *table, guint num,
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), om);
     gtk_combo_box_set_active(GTK_COMBO_BOX(om), 0);
     gtk_table_attach(table, om, 1, 2, num + 1, num + 2,
-                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
+                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 5, 2);
 }
 
 gint
@@ -163,7 +163,7 @@ balsa_option_get_active(GtkWidget *option_widget)
 void
 balsa_init_add_table_checkbox(GtkTable *table, guint num,
                               const gchar *ltext, gboolean defval,
-                              GnomeDruid *druid, GtkWidget **dest)
+                              GtkAssistant *druid, GtkWidget **dest)
 {
     GtkWidget *l;
 
@@ -171,11 +171,11 @@ balsa_init_add_table_checkbox(GtkTable *table, guint num,
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
     gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
     gtk_table_attach(table, l, 0, 1, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 8, 4);
+                     GTK_FILL, GTK_FILL, 5, 2);
 
     *dest = gtk_check_button_new();
     gtk_table_attach(table, *dest, 1, 2, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 8, 4);
+                     GTK_FILL, GTK_FILL, 5, 2);
     if(defval)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(*dest), TRUE);
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), *dest);

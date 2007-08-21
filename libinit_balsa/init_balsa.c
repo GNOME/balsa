@@ -25,11 +25,11 @@
 
 #include "init_balsa.h"
 
-#include "helper.h"
+#include "assistant_helper.h"
 #include "balsa-initdruid.h"
 #include "balsa-druid-page-welcome.h"
 
-#include "i18n.h"	/* Must come after helper.h. */
+#include "i18n.h"	/* Must come after assistant_helper.h. */
 
 static gboolean
 dismiss_the_wizard(GtkWidget *wizard)

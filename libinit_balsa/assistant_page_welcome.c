@@ -19,16 +19,13 @@
  * 02111-1307, USA.
  */
 
-#include "balsa-druid-page-welcome.h"
+#include "assistant_page_welcome.h"
 #include "i18n.h"
 
-static void balsa_druid_page_welcome_prepare(GnomeDruidPage * page,
-                                             GnomeDruid * druid);
-
 void
-balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
+balsa_druid_page_welcome(GtkAssistant * druid, GdkPixbuf * default_logo)
 {
-    GnomeDruidPageEdge *page;
+    GtkWidget *page;
     static const gchar title[] = N_("Welcome to Balsa!");
     static const gchar text[] =
         N_
@@ -41,26 +38,14 @@ balsa_druid_page_welcome(GnomeDruid * druid, GdkPixbuf * default_logo)
          "work/study/similar may have set up your computer to "
          "connect to the network.");
 
-    page =
-        GNOME_DRUID_PAGE_EDGE(gnome_druid_page_edge_new
-                              (GNOME_EDGE_START));
-    gnome_druid_page_edge_set_title(page, _(title));
-    gnome_druid_page_edge_set_text(page, _(text));
-    gnome_druid_page_edge_set_logo(page, default_logo);
-    gnome_druid_page_edge_set_watermark(page,
-                                        balsa_init_get_png
-                                        ("balsa-watermark.png"));
-    g_signal_connect(G_OBJECT(page), "prepare",
-                     G_CALLBACK(balsa_druid_page_welcome_prepare),
-                     NULL);
-    gnome_druid_append_page(druid, GNOME_DRUID_PAGE(page));
-    gnome_druid_set_page(druid, GNOME_DRUID_PAGE(page));
-}
-
-static void
-balsa_druid_page_welcome_prepare(GnomeDruidPage * page, GnomeDruid * druid)
-{
-    /* FIXME: provide help */
-    gnome_druid_set_buttons_sensitive(druid, FALSE, TRUE, TRUE, FALSE);
-    gnome_druid_set_show_finish(druid, FALSE);
+    page = gtk_label_new(_(text));
+    gtk_label_set_line_wrap(GTK_LABEL(page), TRUE);
+    
+    gtk_assistant_append_page(druid, page);
+    gtk_assistant_set_page_title(druid, page, _(title));
+    gtk_assistant_set_page_header_image(druid, page, default_logo);
+    gtk_assistant_set_page_side_image(druid, page,
+                                      balsa_init_get_png("balsa-watermark.png"));
+    gtk_assistant_set_page_type(druid, page, GTK_ASSISTANT_PAGE_INTRO);
+    gtk_assistant_set_page_complete(druid, page, TRUE);
 }

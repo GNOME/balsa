@@ -734,7 +734,7 @@ dnl #####################################################################
 dnl 7. extra functions.
 dnl #####################################################################
 AC_CHECK_FUNCS(getaddrinfo getnameinfo gai_strerror)
-SAVE_LIBS="$LIBS"; LIBS="$BALSA_LIBS"; SAVE_CFLAGS="$CFLAGS";
+
 AC_MSG_CHECKING([Whether GtkAssistant widget is available])
 if pkg-config --atleast-version=2.10 gtk+-2.0; then
   has_assistant=yes

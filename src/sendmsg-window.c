@@ -5174,7 +5174,7 @@ sw_confirm_utf8(BalsaSendmsg * bsmsg, const gchar * content)
 }
 
 static gboolean
-is_charset_ok(BalsaSendmsg *bsmsg)
+is_charset_ok(BalsaSendmsg *bsmsg, gboolean auto_utf8)
 {
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
@@ -5228,7 +5228,7 @@ is_charset_ok(BalsaSendmsg *bsmsg)
         }
     }
 
-    if (sw_confirm_utf8(bsmsg, tmp)) {
+    if (auto_utf8 || sw_confirm_utf8(bsmsg, tmp)) {
         g_free(bsmsg->charset);
         bsmsg->charset = g_strdup("UTF-8");
     } else
@@ -5374,7 +5374,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if (balsa_app.debug)
 	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
 
-    if(!is_charset_ok(bsmsg))
+    if(!is_charset_ok(bsmsg, FALSE))
         return FALSE;
 
     if(!subject_not_empty(bsmsg))
@@ -5509,7 +5509,8 @@ message_postpone(BalsaSendmsg * bsmsg)
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
 
-    if(!is_charset_ok(bsmsg))
+    /* Silent fallback to UTF-8 */
+    if(!is_charset_ok(bsmsg, TRUE))
         return FALSE;
     message = bsmsg2message(bsmsg);
 

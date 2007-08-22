@@ -123,23 +123,35 @@ balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
 }
 
 
+/** Pops up a "save part" dialog for a message part.
+
+    @param parent_widget the widget located in the window that is to
+    became a parent for the dialog box.
+
+    @param mime_body message part to be saved.
+*/
 void
-balsa_mime_widget_ctx_menu_save(GtkWidget * menu_item,
+balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 				LibBalsaMessageBody * mime_body)
 {
     gchar *cont_type, *title;
-    GtkWidget *save_dialog;
+    GtkWidget *save_dialog, *parent_window, *a_widget;
     gchar *filename;
     gboolean do_save;
     GError *err = NULL;
 
     g_return_if_fail(mime_body != NULL);
 
+    for(a_widget = parent_widget,
+            parent_window=GTK_WIDGET(balsa_app.main_window);
+        a_widget;
+        a_widget = gtk_widget_get_parent(a_widget)) 
+        parent_window = a_widget;
+
     cont_type = libbalsa_message_body_get_mime_type(mime_body);
     title = g_strdup_printf(_("Save %s MIME Part"), cont_type);
     save_dialog =
-	gtk_file_chooser_dialog_new(title,
-				    GTK_WINDOW(balsa_app.main_window),
+	gtk_file_chooser_dialog_new(title, GTK_WINDOW(parent_window),
 				    GTK_FILE_CHOOSER_ACTION_SAVE,
 				    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 				    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);

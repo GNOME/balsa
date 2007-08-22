@@ -1,3 +1,12 @@
+2007-08-22  Pawel Salek
+
+	* src/sendmsg-window.c: when (auto-)saving a message, do not
+	bother the user asing questions about charsets.
+	* src/balsa-mime-widget-callbacks.[hc]: parent properly "save part"
+	dialog windows.
+	* src/balsa-message.c: pass the parent.
+	* libbalsa/libbalsa.c,libbalsa/{imap-,}server.c: timeout improvements.
+
 2007-08-20  Pawel Salek
 
 	* src/save-restore.c: show just one column for mailboxes by default.

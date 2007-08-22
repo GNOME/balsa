@@ -2983,7 +2983,6 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
     struct ImapCacheManager *icm;
     FILE *f = fopen(header_cache_path, "rb");
     if(!f) {
-	printf("Could not open cache file %s\n", header_cache_path);
 	return NULL;
     }
     if(fread(&i, sizeof(i), 1, f) != 1) {

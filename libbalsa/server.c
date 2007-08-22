@@ -413,7 +413,8 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
     }
     case IME_TIMEOUT: {
         ok = va_arg(alist, int*); *ok = 1;
-        *ok = libbalsa_abort_on_timeout(is->host);
+        /* *ok = libbalsa_abort_on_timeout(is->host); */
+        /* For now, always timeout. The UI needs some work. */
         break;
     }
     default: g_warning("unhandled imap event type! Fix the code."); break;

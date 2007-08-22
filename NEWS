@@ -1,3 +1,9 @@
+* Balsa-2.3.18 release. Release date 2007-08-22
+
+- reflow improvements.
+- Build problems against steaming-hot GNOME fixed.
+- Make BINARY and ESEARCH IMAP extensions usage more robust.
+
 * Balsa-2.3.17 release. Release date 2007-07-04
 
 - check validity of server APOP challenge.

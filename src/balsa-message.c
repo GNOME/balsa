@@ -872,7 +872,7 @@ balsa_message_save_current_part(BalsaMessage * bm)
     g_return_if_fail(bm != NULL);
 
     if (bm->current_part)
-	balsa_mime_widget_ctx_menu_save(NULL, bm->current_part->body);
+	balsa_mime_widget_ctx_menu_save(GTK_WIDGET(bm), bm->current_part->body);
 }
 
 static gboolean
@@ -1326,7 +1326,8 @@ static void
 part_context_save_all_cb(GtkWidget * menu_item, GList * info_list)
 {
     while (info_list) {
-	balsa_mime_widget_ctx_menu_save(NULL, BALSA_PART_INFO(info_list->data)->body);
+	balsa_mime_widget_ctx_menu_save(menu_item,
+                                        BALSA_PART_INFO(info_list->data)->body);
         info_list = g_list_next(info_list);
     }
 }

@@ -23,8 +23,8 @@
 #define REQ_SSL(s) (0)
 #endif
 
-/** wait 20 seconds for packets */
-#define IMAP_CMD_TIMEOUT (20*1000)
+/** wait 60 seconds for packets */
+#define IMAP_CMD_TIMEOUT (60*1000)
 
 static LibBalsaServerClass *parent_class = NULL;
 

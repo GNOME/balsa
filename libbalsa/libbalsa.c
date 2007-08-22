@@ -614,8 +614,9 @@ ask_timeout_real(void *data)
 
 gboolean
 libbalsa_abort_on_timeout(const char *host)
-{
-    return 0 && libbalsa_ask(ask_timeout_real, (void*)host) != 0; 
+{  /* It appears not to be entirely thread safe... Some locks do not
+      get released as they should be. */
+    return libbalsa_ask(ask_timeout_real, (void*)host) != 0; 
 }
 
 

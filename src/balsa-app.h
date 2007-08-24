@@ -390,8 +390,10 @@ extern struct BalsaApplication {
     BalsaInformationShow debug_message;
     BalsaInformationShow fatal_message;
 
+#if !GTK_CHECK_VERSION(2, 11, 0)
     /* Tooltips */
     GtkTooltips *tooltips;
+#endif                          /* !GTK_CHECK_VERSION(2, 11, 0) */
 
     /* how to act if a MDN request is received */
     BalsaMDNReply mdn_reply_clean;

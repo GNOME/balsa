@@ -2380,8 +2380,14 @@ balsa_index_ensure_visible(BalsaIndex * index)
         /* Current message not displayed, make sure that something
            else is... */
         gtk_tree_view_get_visible_rect(tree_view, &rect);
+#if GTK_CHECK_VERSION(2, 11, 0)
+        gtk_tree_view_convert_tree_to_widget_coords(tree_view,
+                                                    rect.x, rect.y,
+                                                    &rect.x, &rect.y);
+#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
         gtk_tree_view_tree_to_widget_coords(tree_view, rect.x, rect.y,
                                             &rect.x, &rect.y);
+#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
 
         if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
                                           NULL, NULL, NULL)) {

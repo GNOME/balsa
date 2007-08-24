@@ -404,8 +404,10 @@ balsa_app_init(void)
     balsa_app.notify_new_mail_sound = 1;
     balsa_app.notify_new_mail_dialog = 0;
 
+#if !GTK_CHECK_VERSION(2, 11, 0)
     /* Tooltips */
     balsa_app.tooltips = gtk_tooltips_new();
+#endif                          /* !GTK_CHECK_VERSION(2, 11, 0) */
 
     /* Local and IMAP */
     balsa_app.local_scan_depth = 1;

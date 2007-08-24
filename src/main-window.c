@@ -2312,7 +2312,11 @@ balsa_notebook_label_new(BalsaMailboxNode * mbnode)
     rcstyle = gtk_rc_style_new();
     rcstyle->xthickness = rcstyle->ythickness = 0;
     gtk_widget_modify_style(but, rcstyle);
+#if GTK_CHECK_VERSION(2, 11, 0)
+    g_object_unref(rcstyle);
+#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_rc_style_unref(rcstyle);
+#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
 
     settings = gtk_widget_get_settings(GTK_WIDGET(lab));
     gtk_icon_size_lookup_for_settings(settings, GTK_ICON_SIZE_MENU, &w, &h);
@@ -2332,10 +2336,14 @@ balsa_notebook_label_new(BalsaMailboxNode * mbnode)
     g_signal_connect(G_OBJECT(but), "clicked",
                      G_CALLBACK(mailbox_tab_close_cb), mbnode);
 
+#if GTK_CHECK_VERSION(2, 11, 0)
+    gtk_widget_set_tooltip_text(ev, mbnode->mailbox->url);
+#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_tooltips_set_tip(balsa_app.tooltips,
                          ev,
                          mbnode->mailbox->url,
                          mbnode->mailbox->url);
+#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     return ev;
 }
 
@@ -4587,9 +4595,15 @@ void
 balsa_change_window_layout(BalsaWindow *window)
 {
 
+#if GTK_CHECK_VERSION(2, 11, 0)
+    g_object_ref(window->notebook);
+    g_object_ref(window->mblist);
+    g_object_ref(window->preview);
+#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_widget_ref(window->notebook);
     gtk_widget_ref(window->mblist);
     gtk_widget_ref(window->preview);
+#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
  
     gtk_container_remove(GTK_CONTAINER(window->notebook->parent), window->notebook);
     gtk_container_remove(GTK_CONTAINER(window->mblist->parent),
@@ -4599,9 +4613,15 @@ balsa_change_window_layout(BalsaWindow *window)
 
     bw_set_panes(window);
 
+#if GTK_CHECK_VERSION(2, 11, 0)
+    g_object_unref(window->notebook);
+    g_object_unref(window->mblist);
+    g_object_unref(window->preview);
+#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_widget_unref(window->notebook);
     gtk_widget_unref(window->mblist);
     gtk_widget_unref(window->preview);
+#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
  
     gtk_paned_set_position(GTK_PANED(window->hpaned), 
                            balsa_app.show_mblist 

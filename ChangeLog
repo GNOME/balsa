@@ -1,3 +1,13 @@
+2007-08-23  Peter Bloomfield
+
+	* src/balsa-app.c: (balsa_app_init): deprecation cleanup.
+	* src/balsa-app.h: ditto.
+	* src/balsa-index.c: (balsa_index_ensure_visible): ditto.
+	* src/balsa-message.c: (bm_header_tl_buttons): ditto.
+	* src/main-window.c: (balsa_notebook_label_new),
+	(balsa_change_window_layout): ditto.
+	* src/toolbar-factory.c: ditto.
+
 2007-08-22  Pawel Salek
 
 	* src/sendmsg-window.c: when (auto-)saving a message, do not

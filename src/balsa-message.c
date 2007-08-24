@@ -265,8 +265,10 @@ bm_header_tl_buttons(BalsaMessage * bm)
     GtkWidget *vbox;
     GtkWidget *button;
 
+#if !GTK_CHECK_VERSION(2, 11, 0)
     /* the event box is needed to set the background correctly */
     GtkTooltips *tooltips = gtk_tooltips_new();
+#endif                          /* !GTK_CHECK_VERSION(2, 11, 0) */
 
     ebox = gtk_event_box_new();
 
@@ -283,8 +285,13 @@ bm_header_tl_buttons(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
     button = gtk_button_new();
+#if GTK_CHECK_VERSION(2, 11, 0)
+    gtk_widget_set_tooltip_text(button,
+			        _("Check cryptographic signature"));
+#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_tooltips_set_tip(tooltips, button,
 			 _("Check cryptographic signature"), NULL);
+#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     g_signal_connect(G_OBJECT(button), "focus_in_event",
 		     G_CALLBACK(balsa_mime_widget_limit_focus),
 		     (gpointer) bm);
@@ -304,8 +311,13 @@ bm_header_tl_buttons(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
     button = gtk_button_new();
+#if GTK_CHECK_VERSION(2, 11, 0)
+    gtk_widget_set_tooltip_text(button,
+			        _("Select message part to display"));
+#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_tooltips_set_tip(tooltips, button,
 			 _("Select message part to display"), NULL);
+#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     g_signal_connect(G_OBJECT(button), "focus_in_event",
 		     G_CALLBACK(balsa_mime_widget_limit_focus),
 		     (gpointer) bm);

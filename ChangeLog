@@ -1,5 +1,10 @@
 2007-08-23  Peter Bloomfield
 
+	* src/toolbar-factory.c: gtk_tool_item_set_tooltip_text is since
+	(2, 11, 6).
+
+2007-08-23  Peter Bloomfield
+
 	* src/balsa-app.c: (balsa_app_init): deprecation cleanup.
 	* src/balsa-app.h: ditto.
 	* src/balsa-index.c: (balsa_index_ensure_visible): ditto.

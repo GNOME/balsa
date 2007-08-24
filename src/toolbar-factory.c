@@ -356,13 +356,13 @@ balsa_toolbar_refresh(GtkWidget * toolbar)
         if ( strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND)==0
             && balsa_app.always_queue_sent_mail)
             text = _("Queue this message for sending");
-#if GTK_CHECK_VERSION(2, 11, 0)
+#if GTK_CHECK_VERSION(2, 11, 6)
         gtk_tool_item_set_tooltip_text(tool_item, text);
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
+#else                           /* GTK_CHECK_VERSION(2, 11, 6) */
         gtk_tool_item_set_tooltip(tool_item,
                                   GTK_TOOLBAR(toolbar)->tooltips,
                                   text, text);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
+#endif                          /* GTK_CHECK_VERSION(2, 11, 6) */
 
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 	bti->widget = GTK_WIDGET(tool_item);

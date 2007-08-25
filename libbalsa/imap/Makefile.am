@@ -4,8 +4,13 @@ noinst_PROGRAMS  = imap_tst
 
 imap_tst_SOURCES = imap_tst.c
 
+# We specify path to libimap.a without directories: it helps make to
+# resolve dependencies and the executable is to be created in the same
+# directory as the imap_tst executable. It clearly does not break the
+# distcheck target either.
+
 imap_tst_LDADD = \
-	$(top_builddir)/libbalsa/imap/libimap.a	\
+	libimap.a	\
         $(BALSA_LIBS)
 
 #libimap_la_SOURCES =  

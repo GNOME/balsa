@@ -1360,7 +1360,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 
     dump_dialog =
         gtk_file_chooser_dialog_new(_("Select folder for saving selected parts"),
-                                    GTK_WINDOW(balsa_app.main_window),
+                                    balsa_get_parent_window(menu_item),
                                     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
@@ -1918,6 +1918,25 @@ balsa_message_current_part_widget(BalsaMessage * bmessage)
 	return bmessage->current_part->mime_widget->widget;
     else
 	return NULL;
+}
+
+GtkWindow*
+balsa_get_parent_window(GtkWidget *widget)
+{
+    GtkWidget *a_widget, *parent_widget;
+
+    if(!widget)
+        return GTK_WINDOW(balsa_app.main_window);
+
+    for(a_widget = widget, parent_widget=NULL;
+        a_widget;
+        a_widget = gtk_widget_get_parent(a_widget)) 
+        parent_widget = a_widget;
+
+    g_return_val_if_fail(GTK_IS_WINDOW(parent_widget),
+                         GTK_WINDOW(balsa_app.main_window));
+
+    return GTK_WINDOW(parent_widget);
 }
 
 

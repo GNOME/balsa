@@ -110,6 +110,7 @@ gboolean balsa_message_can_select(BalsaMessage * bmessage);
 gboolean balsa_message_grab_focus(BalsaMessage * bmessage);
 gchar * balsa_message_sender_to_gchar(InternetAddressList * list, gint which);
 GtkWidget *balsa_message_current_part_widget(BalsaMessage * bmessage);
+GtkWindow *balsa_get_parent_window(GtkWidget *widget);
 
 #ifdef HAVE_GTKHTML
 #define BALSA_MESSAGE_ZOOM_KEY "balsa-message-zoom"

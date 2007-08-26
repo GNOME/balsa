@@ -1361,7 +1361,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 	    else if(mailbox == balsa_app.sentbox)
 		icon = BALSA_PIXMAP_MBOX_SENT;
 	    else if(mailbox == balsa_app.trash)
-		icon = GTK_STOCK_DELETE;
+		icon = BALSA_PIXMAP_MBOX_TRASH;
 	    else
 		icon = (libbalsa_mailbox_total_messages(mailbox) > 0)
 		? BALSA_PIXMAP_MBOX_TRAY_FULL

@@ -111,8 +111,8 @@ AC_ARG_WITH([gpgme],
 	          [ gpgmecfg=$withval ], [ gpgmecfg=no ])
 AC_ARG_ENABLE([smime],
    AC_HELP_STRING([--enable-smime],
-                  [include S/MIME support (needs gpgme and gpgsm, experimental) (default=no)]),
-	          [ have_smime=$enableval ], [ have_smime=no ])
+                  [include S/MIME support (needs gpgme and gpgsm, experimental for gpg < 2.0.4)]),
+	          [ have_smime=$enableval ], [ have_smime=check ])
 AC_ARG_WITH([gpg-app],
    AC_HELP_STRING([--with-gpg-app=PATH],
                   [use PATH as GnuPG application (default=gpg2 if >= 2.0.4, otherwise gpg 1.x)]),
@@ -398,13 +398,6 @@ if test x"$gpgmecfg" != xno ; then
 		AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
 		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
 		gpgmecfg=yes
-		AC_MSG_CHECKING(whether to include experimental S/MIME support)
-		if test x"$have_smime" = xyes ; then
-			AC_MSG_RESULT([yes])
-			AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
-		else
-			AC_MSG_RESULT([no])
-		fi
 	else
 		AC_MSG_WARN([sorry, you need at least gpgme version 0.9.0])
 	fi
@@ -412,7 +405,6 @@ else
 	have_smime=no
 fi
 AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
-AM_CONDITIONAL([BUILD_WITH_SMIME], [test $have_smime = "yes"])
 
 # check the GnuPG engine application version
 # note: gpg2 interacts fine with gpgme only since version 2.0.4
@@ -426,9 +418,13 @@ AC_DEFUN([AC_CHECK_GPG_VER],[
         gpg_ve=`echo $gpgver|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
         gpg_ma=`echo $gpgver|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
         gpg_mi=`echo $gpgver|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+	HAVE_GPG2=no
 	if test \( $gpg_ve -eq 2 \) -a \( $gpg_ma -eq 0 \) -a \( $gpg_mi -lt 4 \) ; then
     		ifelse([$3], , :, [$3])
 	else
+		if test $gpg_ve -eq 2 ; then
+			HAVE_GPG2=yes
+		fi
     		ifelse([$2], , :, [$2])
 	fi])
 
@@ -466,6 +462,18 @@ if test x"$gpgmecfg" != xno ; then
 		AC_MSG_WARN([please consider using --with-gpg-app to specify it])
 	fi
 fi
+
+# s/mime is mature for gpg >= 2.0.4
+AC_MSG_CHECKING(whether to include S/MIME support)
+if test \( x"$have_smime" = xyes \) -o \( \( x"$HAVE_GPG2" = xyes \) -a \( x"$have_smime" = xcheck \) \) ; then
+	AC_MSG_RESULT([yes])
+	have_smime=yes
+	AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
+else
+	AC_MSG_RESULT([no])
+fi
+AM_CONDITIONAL([BUILD_WITH_SMIME], [test $have_smime = "yes"])
+
 
 # OpenLDAP configuration.
 #

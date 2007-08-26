@@ -1,3 +1,10 @@
+2007-08-26  Albrecht Dreß
+
+	* configure.in: s/mime is mature for gpg >= 2.0.4.
+	* src/balsa-mblist.c: (bmbl_store_redraw_mbnode): newer icon
+	sets distinguish between the "delete" (action) and the "trash
+	can" (location) icons.
+
 2007-08-25  Pawel Salek
 
 	* libbalsa/imap/Makefile.am: disable building imap_tst.

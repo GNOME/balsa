@@ -1,3 +1,9 @@
+2007-08-27  Peter Bloomfield
+
+	* libbalsa/send.c: (lbs_process_queue): skip message if it is
+	either flagged or deleted--see
+	http://mail.gnome.org/archives/balsa-list/2007-August/msg00018.html
+
 2007-08-26  Albrecht Dreß
 
 	* configure.in: s/mime is mature for gpg >= 2.0.4.

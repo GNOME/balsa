@@ -621,10 +621,11 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	const gchar *smtp_server_name;
         LibBalsaMsgCreateResult created;
 
-        if (libbalsa_mailbox_msgno_has_flags(outbox, msgno, 
-                                             (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-                                              LIBBALSA_MESSAGE_FLAG_DELETED),
-                                             0))
+        /* Skip this message if it either FLAGGED or DELETED: */
+        if (!libbalsa_mailbox_msgno_has_flags
+            (outbox, msgno, 0,
+             (LIBBALSA_MESSAGE_FLAG_FLAGGED |
+              LIBBALSA_MESSAGE_FLAG_DELETED)))
             continue;
 
 	msg = libbalsa_mailbox_get_message(outbox, msgno);

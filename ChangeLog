@@ -1,3 +1,14 @@
+2007-08-31  Peter Bloomfield
+
+	* src/main-window.c: (bw_enable_next_unread), (balsa_window_new),
+	(enable_expand_collapse), (balsa_window_enable_mailbox_menus),
+	(balsa_window_set_threading_menu), (contents_cb), (show_about_box),
+	(shown_hdrs_radio_cb), (threading_radio_cb), (zoom_in_cb),
+	(zoom_out_cb), (zoom_100_cb): incomplete port to GtkAction and
+	friends (define USE_GNOMEUIINFO to TRUE in src/main-window.h to
+	see how much work remains :()
+	* src/main-window.h: ditto.
+
 2007-08-27  Peter Bloomfield
 
 	* libbalsa/send.c: (lbs_process_queue): skip message if it is

@@ -22,6 +22,8 @@
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
 
+#define USE_GNOMEUIINFO TRUE
+
 #include "toolbar-factory.h"
 
 #define BALSA_TYPE_WINDOW		       (balsa_window_get_type ())
@@ -53,6 +55,10 @@ struct _BalsaWindow {
     GtkWidget *filter_choice;
 
     guint set_message_id;
+
+#if !USE_GNOMEUIINFO
+    GtkActionGroup *action_group;
+#endif                          /* !USE_GNOMEUIINFO */
 };
 
 struct _BalsaWindowClass {

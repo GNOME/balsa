@@ -49,7 +49,7 @@ struct EntryMaster_s {
 
 GdkPixbuf *balsa_init_get_png(const gchar * fname);
 
-void balsa_init_add_table_entry(GtkTable * table, guint num, gchar * ltext,
+void balsa_init_add_table_entry(GtkTable * table, guint num, const gchar * ltext,
                                 const gchar * etext, EntryData * ed,
                                 GtkAssistant * druid, GtkWidget *page,
                                 GtkWidget ** dest);

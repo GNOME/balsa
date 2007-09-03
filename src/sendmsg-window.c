@@ -96,7 +96,9 @@ static gint message_postpone(BalsaSendmsg * bsmsg);
 static void postpone_message_cb(GtkWidget *, BalsaSendmsg *);
 static void save_message_cb(GtkWidget *, BalsaSendmsg *);
 #ifdef HAVE_GTK_PRINT
+#if !defined(ENABLE_TOUCH_UI)
 static void page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+#endif /* ENABLE_TOUCH_UI */
 #endif
 static void print_message_cb(GtkWidget *, BalsaSendmsg *);
 static void attach_clicked(GtkWidget *, gpointer);
@@ -516,7 +518,7 @@ static GnomeUIInfo tu_file_more_menu[] = {
     GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
 			   include_file_cb, GTK_STOCK_OPEN),
     GNOMEUIINFO_ITEM_STOCK(N_("I_nclude Message(s)"), NULL,
-			   include_message_cb, BALSA_PIXMAP_NEW),
+			   include_message_cb, BALSA_PIXMAP_COMPOSE),
 #define MENU_FILE_ATTACH_MSG_POS 3
     GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
 			   attach_message_cb, BALSA_PIXMAP_FORWARD),
@@ -641,14 +643,17 @@ static GnomeUIInfo opts_menu[] = {
 };
 
 static GnomeUIInfo tu_tools_menu[] = {
+#define TU_TOOLS_MENU_SPELL_CHECK_POS 0
 #if HAVE_GTKSPELL
-    GNOMEUIINFO_ITEM_STOCK(N_("Toggle Spell C_hecker"), 
+    GNOMEUIINFO_TOGGLEITEM(N_("Toggle Spell C_hecker"),
+                           N_("Check the spelling of the message"),
+                           spell_check_menu_cb, NULL),
 #else                           /* HAVE_GTKSPELL */
     GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
-#endif                          /* HAVE_GTKSPELL */
                            N_("Check the spelling of the message"),
                            spell_check_cb,
                            GTK_STOCK_SPELL_CHECK),
+#endif                          /* HAVE_GTKSPELL */
 #define MAIN_CHARSET_MENU_POS 1
     GNOMEUIINFO_SUBTREE(N_("_Language"), lang_menu),
     GNOMEUIINFO_SEPARATOR,
@@ -4144,7 +4149,12 @@ sendmsg_window_new(GtkWidget *w)
     bsmsg_setup_gpg_ui(bsmsg, toolbar);
 #endif
 #if HAVE_GTKSPELL
+#if defined(ENABLE_TOUCH_UI)
+    bsmsg->spell_check_menu_item =
+        tu_tools_menu[TU_TOOLS_MENU_SPELL_CHECK_POS].widget;
+#else  /* defined(ENABLE_TOUCH_UI) */
     bsmsg->spell_check_menu_item = edit_menu[EDIT_MENU_SPELL_CHECK].widget;
+#endif /* defined(ENABLE_TOUCH_UI) */
 #endif
 
     /* create the top portion with the to, from, etc in it */
@@ -5585,6 +5595,7 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 }
 
 #ifdef HAVE_GTK_PRINT
+#if !defined(ENABLE_TOUCH_UI)
 static void
 page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 {
@@ -5594,6 +5605,7 @@ page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
     message_print_page_setup(GTK_WINDOW(bsmsg->window));
     g_object_unref(message);
 }
+#endif /* ENABLE_TOUCH_UI */
 #endif
 
 static void

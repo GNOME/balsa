@@ -1,3 +1,20 @@
+2007-09-03  Peter Bloomfield
+
+	* libinit_balsa/assistant_helper.c:
+	(balsa_init_add_table_entry): build with --enable-touch-ui.
+	* libinit_balsa/assistant_helper.h: ditto.
+	* src/main-window.c: (bw_enable_next_unread), (balsa_window_new),
+	(enable_expand_collapse), (balsa_window_enable_mailbox_menus),
+	(balsa_window_update_book_menus), (enable_message_menus),
+	(balsa_window_set_threading_menu), (show_about_box),
+	(show_all_headers_cb), (threading_change_cb), (zoom_cb): remove
+	GtkAction code for now.
+	* src/main-window.h: ditto.
+	* src/sendmsg-window.c: (sendmsg_window_new): build with
+	--enable-touch-ui.
+	* src/spell-check.c: (balsa_spell_check_init): deprecation
+	cleanup.
+
 2007-08-31  Peter Bloomfield
 
 	* src/main-window.c: (bw_enable_next_unread), (balsa_window_new),

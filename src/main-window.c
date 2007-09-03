@@ -164,7 +164,9 @@ static void forward_message_attached_cb(GtkWidget * widget, gpointer data);
 static void forward_message_inline_cb(GtkWidget * widget, gpointer data);
 #endif
 static void forward_message_default_cb(GtkWidget * widget, gpointer data);
+#if !defined(ENABLE_TOUCH_UI)
 static void pipe_message_cb(GtkWidget * widget, gpointer data);
+#endif /* ENABLE_TOUCH_UI */
 static void continue_message_cb(GtkWidget * widget, gpointer data);
 
 static void next_message_cb(GtkWidget * widget, gpointer data);
@@ -193,26 +195,16 @@ static void balsa_window_set_sort_menu(BalsaWindow *window,
                                        LibBalsaMailboxSortType   order);
 #endif /* ENABLE_TOUCH_UI */
 static void wrap_message_cb(GtkWidget * widget, gpointer data);
-#if !USE_GNOMEUIINFO
-static void shown_hdrs_radio_cb(GtkRadioAction * action,
-                                GtkRadioAction * current, gpointer data);
-#else                           /* !USE_GNOMEUIINFO */
 static void show_no_headers_cb(GtkWidget * widget, gpointer data);
 static void show_selected_cb(GtkWidget * widget, gpointer data);
 static void show_all_headers_cb(GtkWidget * widget, gpointer data);
-#endif                          /* !USE_GNOMEUIINFO */
 static void show_all_headers_tool_cb(GtkWidget * widget, gpointer data);
 static void empty_trash_cb(GtkWidget * widget, gpointer data);
 static void reset_show_all_headers(BalsaWindow * window);
 static void show_preview_pane_cb(GtkWidget * widget, gpointer data);
 
 #if !defined(ENABLE_TOUCH_UI)
-#if !USE_GNOMEUIINFO
-static void threading_radio_cb(GtkRadioAction * action,
-                               GtkRadioAction * current, gpointer data);
-#else                           /* !USE_GNOMEUIINFO */
 static void threading_change_cb(GtkWidget * widget, gpointer data);
-#endif                          /* !USE_GNOMEUIINFO */
 static void balsa_window_set_threading_menu(BalsaWindow * window,
 					    int option);
 #endif /* ENABLE_TOUCH_UI */
@@ -222,11 +214,6 @@ static void expand_all_cb(GtkWidget * widget, gpointer data);
 static void collapse_all_cb(GtkWidget * widget, gpointer data);
 #ifdef HAVE_GTKHTML
 static void zoom_cb(GtkWidget * widget, gpointer data);
-#if !USE_GNOMEUIINFO
-static void zoom_in_cb(GtkWidget * widget, gpointer data);
-static void zoom_out_cb(GtkWidget * widget, gpointer data);
-static void zoom_100_cb(GtkWidget * widget, gpointer data);
-#endif                          /* !USE_GNOMEUIINFO */
 #endif				/* HAVE_GTKHTML */
 #if defined(ENABLE_TOUCH_UI)
 static gboolean open_mailbox_cb(GtkWidget *w, GdkEventKey *e, gpointer data);
@@ -252,22 +239,14 @@ static void find_again_cb(GtkWidget * widget, gpointer data);
 static void filter_dlg_cb(GtkWidget * widget, gpointer data);
 static void filter_export_cb(GtkWidget * widget, gpointer data);
 static void filter_run_cb(GtkWidget * widget, gpointer data);
+#if !defined(ENABLE_TOUCH_UI)
 static void remove_duplicates_cb(GtkWidget * widget, gpointer data);
+#endif /* ENABLE_TOUCH_UI */
 
 static void mailbox_close_cb(GtkWidget * widget, gpointer data);
 static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
 static void hide_changed_cb(GtkWidget * widget, gpointer data);
-#if !USE_GNOMEUIINFO
-static void hide_deleted_cb(GtkWidget * widget, gpointer data);
-static void hide_undeleted_cb(GtkWidget * widget, gpointer data);
-static void hide_read_cb(GtkWidget * widget, gpointer data);
-static void hide_unread_cb(GtkWidget * widget, gpointer data);
-static void hide_flagged_cb(GtkWidget * widget, gpointer data);
-static void hide_unflagged_cb(GtkWidget * widget, gpointer data);
-static void hide_answered_cb(GtkWidget * widget, gpointer data);
-static void hide_unanswered_cb(GtkWidget * widget, gpointer data);
-#endif                          /* !USE_GNOMEUIINFO */
 static void reset_filter_cb(GtkWidget * widget, gpointer data);
 static void mailbox_expunge_cb(GtkWidget * widget, gpointer data);
 
@@ -301,10 +280,6 @@ static gboolean notebook_drag_motion_cb (GtkWidget* widget,
 static GtkWidget *balsa_notebook_label_new (BalsaMailboxNode* mbnode);
 static void ident_manage_dialog_cb(GtkWidget*, gpointer);
 
-#if !USE_GNOMEUIINFO
-static void contents_cb(void);
-#endif                          /* !USE_GNOMEUIINFO */
-
 #ifdef HAVE_NOTIFY
 static gboolean cancel_new_mail_notification(void);
 #endif
@@ -329,375 +304,27 @@ balsa_quit_nicely(GtkWidget * widget, gpointer data)
    We first put shared menu items, next we define default balsa
    stuff we put touchpad optimized menus at the end.
 */
-
-#if !USE_GNOMEUIINFO
-/* Normal items */
-static GtkActionEntry entries[] = {
-    /* Menus */
-    {"FileMenu", NULL, "_File"},
-    {"EditMenu", NULL, "_Edit"},
-    {"ViewMenu", NULL, "_View"},
-    {"MailboxMenu", NULL, "_Mailbox"},
-    {"MessageMenu", NULL, "_Message"},
-    {"SettingsMenu", NULL, "_Settings"},
-    {"HelpMenu", NULL, "_Help"},
-    /* File menu items */
-    {"FileNewMenu", NULL, "_New"},
-    {"Continue", BALSA_PIXMAP_CONTINUE, N_("_Continue"), "C",
-     N_("Continue editing current message"),
-     G_CALLBACK(continue_message_cb)},
-    {"GetNewMail", BALSA_PIXMAP_RECEIVE, N_("_Get New Mail"), "<control>M",
-     N_("Fetch new incoming mail"), G_CALLBACK(check_new_messages_cb)},
-    {"SendQueuedMail", BALSA_PIXMAP_SEND, N_("_Send Queued Mail"),
-     "<control>T", N_("Send messages from the outbox"),
-     G_CALLBACK(send_outbox_messages_cb)},
-    {"SendAndReceiveMail", BALSA_PIXMAP_SEND_RECEIVE,
-     N_("Send and _Receive Mail"), "<control>B",
-     N_("Send and Receive messages"),
-     G_CALLBACK(send_receive_messages_cb)},
-#ifdef HAVE_GTK_PRINT
-    {"PageSetup", NULL, N_("Page _Setup"), "<control>S",
-     N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},
-#endif                          /* HAVE_GTK_PRINT */
-    {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
-     N_("Print current message"), G_CALLBACK(message_print_cb)},
-    {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), "B",
-     N_("Open the address book"), G_CALLBACK(address_book_cb)},
-    {"Quit", GTK_STOCK_QUIT, N_("_Quit"), "<control>Q", NULL,
-     G_CALLBACK(balsa_quit_nicely)},
-    /* File:New submenu items */
-    {"NewMessage", BALSA_PIXMAP_COMPOSE, N_("_Message..."), "M",
-     N_("Compose a new message"), G_CALLBACK(new_message_cb)},
-    {"NewMbox", GTK_STOCK_ADD, N_("Local mbox mailbox..."), NULL,
-     N_("Add a new mbox style mailbox"),
-     G_CALLBACK(mailbox_conf_add_mbox_cb)},
-    {"NewMaildir", GTK_STOCK_ADD, N_("Local Maildir mailbox..."), NULL,
-     N_("Add a new Maildir style mailbox"),
-     G_CALLBACK(mailbox_conf_add_maildir_cb)},
-    {"NewMH", GTK_STOCK_ADD, N_("Local MH mailbox..."), NULL,
-     N_("Add a new MH style mailbox"), G_CALLBACK(mailbox_conf_add_mh_cb)},
-    {"NewIMAPBox", GTK_STOCK_ADD, N_("Remote IMAP mailbox..."), NULL,
-     N_("Add a new IMAP mailbox"), G_CALLBACK(mailbox_conf_add_imap_cb)},
-    {"NewIMAPFolder", GTK_STOCK_ADD, N_("Remote IMAP folder..."), NULL,
-     N_("Add a new IMAP folder"), G_CALLBACK(folder_conf_add_imap_cb)},
-    {"NewIMAPSubfolder", GTK_STOCK_ADD, N_("Remote IMAP subfolder..."),
-     NULL, N_("Add a new IMAP subfolder"),
-     G_CALLBACK(folder_conf_add_imap_sub_cb)},
-    /* Edit menu items */
-    {"Copy", GTK_STOCK_COPY, N_("_Copy"), "<control>C", NULL,
-     G_CALLBACK(copy_cb)},
-    {"SelectAll", NULL, N_("Select _All"), "<control>A", NULL,
-     G_CALLBACK(select_all_cb)},
-    {"Find", GTK_STOCK_FIND, N_("_Find"), "<control>F", NULL,
-     G_CALLBACK(find_cb)},
-    {"FindNext", GTK_STOCK_FIND, N_("Find Ne_xt"), "<control>G", NULL,
-     G_CALLBACK(find_again_cb)},
-    {"Filters", GTK_STOCK_PROPERTIES, N_("F_ilters..."), NULL,
-     N_("Manage filters"), G_CALLBACK(filter_dlg_cb)},
-    {"ExportFilters", GTK_STOCK_PROPERTIES, N_("_Export Filters"), NULL,
-     N_("Export filters as Sieve scripts"), G_CALLBACK(filter_export_cb)},
-    {"Preferences", GTK_STOCK_PREFERENCES, N_("Prefere_nces"), NULL, NULL,
-     G_CALLBACK(open_preferences_manager)},
-    /* View menu items */
-    {"ExpandAll", NULL, N_("E_xpand All"), "<control>E",
-     N_("Expand all threads"), G_CALLBACK(expand_all_cb)},
-    {"CollapseAll", NULL, N_("_Collapse All"), "<control>L",
-     N_("Collapse all expanded threads"), G_CALLBACK(collapse_all_cb)},
-#ifdef HAVE_GTKHTML
-    {"ZoomIn", GTK_STOCK_ZOOM_IN, N_("Zoom _In"), "<control>+",
-     N_("Increase magnification"), G_CALLBACK(zoom_in_cb)},
-    {"ZoomOut", GTK_STOCK_ZOOM_OUT, N_("Zoom _Out"), "<control>-",
-     N_("Decrease magnification"), G_CALLBACK(zoom_out_cb)},
-    /* To warn msgfmt that the % sign isn't a format specifier: */
-    /* xgettext:no-c-format */
-    {"Zoom100", GTK_STOCK_ZOOM_100, N_("Zoom _100%"), NULL,
-     N_("No magnification"), G_CALLBACK(zoom_100_cb)},
-#endif                          /* HAVE_GTKHTML */
-    /* Mailbox menu items */
-    {"NextMessage", BALSA_PIXMAP_NEXT, N_("Next Message"), "N",
-     N_("Next Message"), G_CALLBACK(next_message_cb)},
-    {"PreviousMessage", BALSA_PIXMAP_PREVIOUS, N_("Previous Message"), "P",
-     N_("Previous Message"), G_CALLBACK(previous_message_cb)},
-    {"NextUnread", BALSA_PIXMAP_NEXT_UNREAD, N_("Next Unread Message"),
-     "<control>N", N_("Next Unread Message"),
-     G_CALLBACK(next_unread_message_cb)},
-    {"NextFlagged", BALSA_PIXMAP_NEXT_FLAGGED, N_("Next Flagged Message"),
-     "<control><alt>F", N_("Next Flagged Message"),
-     G_CALLBACK(next_flagged_message_cb)},
-    {"MailboxHideMenu", NULL, "_Hide Messages"},
-    {"ResetFilter", GTK_STOCK_CLEAR, N_("_Reset Filter"), NULL,
-     N_("Reset mailbox filter"), G_CALLBACK(reset_filter_cb)},
-    {"MailboxSelectAll", BALSA_PIXMAP_MARK_ALL, N_("_Select All"), NULL,
-     N_("Select all messages in current mailbox"),
-     G_CALLBACK(mark_all_cb)},
-    {"MailboxEdit", GTK_STOCK_PREFERENCES, N_("_Edit..."), NULL,
-     N_("Edit the selected mailbox"), G_CALLBACK(mailbox_conf_edit_cb)},
-    {"MailboxDelete", GTK_STOCK_REMOVE, N_("_Delete..."), NULL,
-     N_("Delete the selected mailbox"),
-     G_CALLBACK(mailbox_conf_delete_cb)},
-    {"Expunge", GTK_STOCK_REMOVE, N_("E_xpunge Deleted Messages"), NULL,
-     N_("Expunge messages marked as deleted in the current mailbox"),
-     G_CALLBACK(mailbox_expunge_cb)},
-    {"Close", GTK_STOCK_CANCEL, N_("_Close"), NULL, N_("Close mailbox"),
-     G_CALLBACK(mailbox_close_cb)},
-    {"EmptyTrash", GTK_STOCK_REMOVE, N_("Empty _Trash"), NULL,
-     N_("Delete messages from the Trash mailbox"),
-     G_CALLBACK(empty_trash_cb)},
-    {"SelectFilters", GTK_STOCK_PROPERTIES, N_("Select _Filters"), NULL,
-     N_("Select filters to be applied automatically to current mailbox"),
-     G_CALLBACK(filter_run_cb)},
-    {"RemoveDuplicates", GTK_STOCK_REMOVE, N_("_Remove Duplicates"), NULL,
-     N_("Remove duplicated messages from the current mailbox"),
-     G_CALLBACK(remove_duplicates_cb)},
-    /* Message menu items */
-    {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), "R",
-     N_("Reply to the current message"), G_CALLBACK(replyto_message_cb)},
-    {"ReplyAll", BALSA_PIXMAP_REPLY_ALL, N_("Reply to _All..."), "A",
-     N_("Reply to all recipients of the current message"),
-     G_CALLBACK(replytoall_message_cb)},
-    {"ReplyGroup", BALSA_PIXMAP_REPLY_GROUP, N_("Reply to _Group..."), "G",
-     N_("Reply to mailing list"), G_CALLBACK(replytogroup_message_cb)},
-    {"ForwardAttached", BALSA_PIXMAP_FORWARD, "F",
-     N_("_Forward attached..."),
-     N_("Forward the current message as attachment"),
-     G_CALLBACK(forward_message_attached_cb)},
-    {"ForwardInline", BALSA_PIXMAP_FORWARD, NULL, N_("Forward _inline..."),
-     N_("Forward the current message inline"),
-     G_CALLBACK(forward_message_inline_cb)},
-    {"Pipe", BALSA_PIXMAP_FORWARD, N_("_Pipe through..."), NULL,
-     N_("Pipe the message through another program"),
-     G_CALLBACK(pipe_message_cb)},
-    {"NextPart", BALSA_PIXMAP_NEXT_PART, N_("_Next Part"), "<control>.",
-     N_("Next part in message"), G_CALLBACK(next_part_cb)},
-    {"PreviousPart", BALSA_PIXMAP_PREVIOUS_PART, N_("_Previous Part"),
-     "<control>,", N_("Previous part in message"),
-     G_CALLBACK(previous_part_cb)},
-    {"SavePart", GTK_STOCK_SAVE, N_("Save Current Part..."), "<control>S",
-     N_("Save currently displayed part of message"),
-     G_CALLBACK(save_current_part_cb)},
-    {"ViewSource", BALSA_PIXMAP_BOOK_OPEN, N_("_View Source..."),
-     "<control>U", N_("View source form of the message"),
-     G_CALLBACK(view_msg_source_cb)},
-    {"CopyMessage", GTK_STOCK_COPY, N_("_Copy"), "<control>C",
-     N_("Copy message"), G_CALLBACK(message_copy_cb)},
-    {"SelectText", NULL, N_("_Select Text"), NULL,
-     N_("Select entire mail"), G_CALLBACK(message_select_all_cb)},
-    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Move to Trash"), "D",
-     N_("Move the current message to Trash mailbox"),
-     G_CALLBACK(trash_message_cb)},
-    {"MessageToggleFlagMenu", NULL, "_Toggle Flag"},
-    {"StoreAddress", BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."), "S",
-     N_("Store address of sender in addressbook"),
-     G_CALLBACK(store_address_cb)},
-    /* Message:toggle-flag submenu items */
-    {"ToggleFlagged", BALSA_PIXMAP_INFO_FLAGGED, N_("_Flagged"), "X",
-     N_("Toggle flagged"), G_CALLBACK(toggle_flagged_message_cb)},
-    {"ToggleDeleted", GTK_STOCK_DELETE, N_("_Deleted"), "<control>D",
-     N_("Toggle deleted flag"), G_CALLBACK(toggle_deleted_message_cb)},
-    {"ToggleNew", BALSA_PIXMAP_INFO_NEW, N_("_New"), "<control>R",
-     N_("Toggle New"), G_CALLBACK(toggle_new_message_cb)},
-    {"ToggleAnswered", BALSA_PIXMAP_INFO_REPLIED, N_("_Answered"), NULL,
-     N_("Toggle Answered"), G_CALLBACK(toggle_answered_message_cb)},
-    /* Settings menu items */
-    {"Toolbars", GTK_STOCK_EXECUTE, N_("_Toolbars..."), NULL,
-     N_("Customize toolbars"), G_CALLBACK(customize_dialog_cb)},
-    {"Identities", BALSA_PIXMAP_IDENTITY, N_("_Identities..."), NULL,
-     N_("Create and set current identities"),
-     G_CALLBACK(ident_manage_dialog_cb)},
-    /* Help menu items */
-    {"TableOfContents", GTK_STOCK_HELP, N_("_Contents"), "F1",
-     N_("Table of Contents"), G_CALLBACK(contents_cb)},
-    {"About", GTK_STOCK_ABOUT, N_("_About"), NULL, N_("About Balsa"),
-     G_CALLBACK(show_about_box)}
-};
-
-/* Toggle items */
-static const GtkToggleActionEntry toggle_entries[] = {
-    /* View menu items */
-    {"ShowMailboxTree", NULL, N_("_Show Mailbox Tree"), "F9",
-     N_("Toggle display of mailbox and folder tree"),
-     G_CALLBACK(show_mbtree_cb), FALSE},
-    {"ShowMailboxTabs", NULL, N_("Show Mailbox _Tabs"), NULL,
-     N_("Toggle display of mailbox notebook tabs"),
-     G_CALLBACK(show_mbtabs_cb), FALSE},
-    {"Wrap", NULL, N_("_Wrap"), NULL, N_("Wrap message lines"),
-     G_CALLBACK(wrap_message_cb), FALSE},
-    /* Hide messages menu items */
-    {"HideDeleted", NULL, N_("_Deleted"), NULL, NULL,
-     G_CALLBACK(hide_deleted_cb), FALSE},
-    {"HideUndeleted", NULL, N_("Un_Deleted"), NULL, NULL,
-     G_CALLBACK(hide_undeleted_cb), FALSE},
-    {"HideRead", NULL, N_("_Read"), NULL, NULL,
-     G_CALLBACK(hide_read_cb), FALSE},
-    {"HideUnread", NULL, N_("Un_read"), NULL, NULL,
-     G_CALLBACK(hide_unread_cb), FALSE},
-    {"HideFlagged", NULL, N_("_Flagged"), NULL, NULL,
-     G_CALLBACK(hide_flagged_cb), FALSE},
-    {"HideUnflagged", NULL, N_("Un_flagged"), NULL, NULL,
-     G_CALLBACK(hide_unflagged_cb), FALSE},
-    {"HideAnswered", NULL, N_("_Answered"), NULL, NULL,
-     G_CALLBACK(hide_answered_cb), FALSE},
-    {"HideUnanswered", NULL, N_("Un_answered"), NULL, NULL,
-     G_CALLBACK(hide_unanswered_cb), FALSE},
-};
-
-/* Radio items */
-static const GtkRadioActionEntry shown_hdrs_radio_entries[] = {
-    {"NoHeaders", NULL, N_("_No Headers"), NULL,
-     N_("Display no headers"), HEADERS_NONE},
-    {"SelectedHeaders", NULL, N_("S_elected Headers"), NULL,
-     N_("Display selected headers"), HEADERS_SELECTED},
-    {"AllHeaders", NULL, N_("All _Headers"), NULL,
-     N_("Display all headers"), HEADERS_ALL}
-};
-static const GtkRadioActionEntry threading_radio_entries[] = {
-    {"FlatIndex", NULL, N_("_Flat index"), NULL,
-     N_("No threading at all"), LB_MAILBOX_THREADING_FLAT},
-    {"SimpleThreading", NULL, N_("Si_mple threading"), NULL,
-     N_("Simple threading algorithm"), LB_MAILBOX_THREADING_SIMPLE},
-    {"JWZThreading", NULL, N_("_JWZ threading"), NULL,
-     N_("Elaborate JWZ threading"), LB_MAILBOX_THREADING_JWZ}
-};
-
-static const char *ui_description =
-"<ui>"
-"  <menubar name='MainMenu'>"
-"    <menu action='FileMenu'>"
-"      <menu action='FileNewMenu'>"
-"        <menuitem action='NewMessage'>"
-"        <separator/>"
-"        <menuitem action='NewMbox'>"
-"        <menuitem action='NewMaildir'>"
-"        <menuitem action='NewMH'>"
-"        <menuitem action='NewIMAPBox'>"
-"        <separator/>"
-"        <menuitem action='NewIMAPFolder'>"
-"        <menuitem action='NewIMAPSubfolder'>"
-"      </menu>"
-"      <menuitem action='Continue'/>"
-"      <separator/>"
-"      <menuitem action='GetNewMail'/>"
-"      <menuitem action='SendQueuedMail'/>"
-"      <menuitem action='SendAndReceiveMail'/>"
-"      <separator/>"
-#ifdef HAVE_GTK_PRINT
-"      <menuitem action='PageSetup'/>"
-#endif                          /* HAVE_GTK_PRINT */
-"      <menuitem action='Print'/>"
-"      <separator/>"
-"      <menuitem action='AddressBook'/>"
-"      <separator/>"
-"      <menuitem action='Quit'/>"
-"    </menu>"
-"    <menu action='EditMenu'>"
-"      <menuitem action='Copy'/>"
-"      <menuitem action='SelectAll'/>"
-"      <separator/>"
-"      <menuitem action='Find'/>"
-"      <menuitem action='FindNext'/>"
-"      <separator/>"
-"      <menuitem action='Filters'/>"
-"      <menuitem action='ExportFilters'/>"
-"      <separator/>"
-"      <menuitem action='Preferences'/>"
-"    </menu>"
-"    <menu action='ViewMenu'>"
-"      <menuitem action='ShowMailboxTree'/>"
-"      <menuitem action='ShowMailboxTabs'/>"
-"      <separator/>"
-"      <menuitem action='Wrap'/>"
-"      <separator/>"
-"      <menuitem action='NoHeaders'/>"
-"      <menuitem action='SelectedHeaders'/>"
-"      <menuitem action='AllHeaders'/>"
-"      <separator/>"
-"      <menuitem action='FlatIndex'/>"
-"      <menuitem action='SimpleThreading'/>"
-"      <menuitem action='JWZThreading'/>"
-"      <separator/>"
-"      <menuitem action='ExpandAll'/>"
-"      <menuitem action='CollapseAll'/>"
-"      <separator/>"
-"      <menuitem action='ZoomIn'/>"
-"      <menuitem action='ZoomOut'/>"
-"      <menuitem action='Zoom100'/>"
-"    </menu>"
-"    <menu action='MailboxMenu'>"
-"      <menuitem action='NextMessage'/>"
-"      <menuitem action='PreviousMessage'/>"
-"      <menuitem action='NextUnread'/>"
-"      <menuitem action='NextFlagged'/>"
-"      <separator/>"
-"      <menu action='MailboxHideMenu'/>"
-"        <menuitem action='HideDeleted'/>"
-"        <menuitem action='HideUndeleted'/>"
-"        <menuitem action='HideRead'/>"
-"        <menuitem action='HideUnread'/>"
-"        <menuitem action='HideFlagged'/>"
-"        <menuitem action='HideUnflagged'/>"
-"        <menuitem action='HideAnswered'/>"
-"        <menuitem action='HideUnanswered'/>"
-"      </menu>"
-"      <menuitem action='ResetFilter'/>"
-"      <separator/>"
-"      <menuitem action='MailboxSelectAll'/>"
-"      <separator/>"
-"      <menuitem action='MailboxEdit'/>"
-"      <menuitem action='MailboxDelete'/>"
-"      <separator/>"
-"      <menuitem action='Expunge'/>"
-"      <menuitem action='Close'/>"
-"      <separator/>"
-"      <menuitem action='EmptyTrash'/>"
-"      <separator/>"
-"      <menuitem action='SelectFilters'/>"
-"      <separator/>"
-"      <menuitem action='RemoveDuplicates'/>"
-"    </menu>"
-"    <menu action='MessageMenu'>"
-"      <menuitem action='Reply'/>"
-"      <menuitem action='ReplyAll'/>"
-"      <menuitem action='ReplyGroup'/>"
-"      <menuitem action='ForwardAttached'/>"
-"      <menuitem action='ForwardInline'/>"
-"      <separator/>"
-"      <menuitem action='Pipe'/>"
-"      <separator/>"
-"      <menuitem action='NextPart'/>"
-"      <menuitem action='PreviousPart'/>"
-"      <menuitem action='SavePart'/>"
-"      <menuitem action='ViewSource'/>"
-"      <separator/>"
-"      <menuitem action='CopyMessage'/>"
-"      <menuitem action='SelectText'/>"
-"      <separator/>"
-"      <menuitem action='MoveToTrash'/>"
-"      <menu action='MessageToggleFlagMenu'/>"
-"        <menuitem action='ToggleFlagged'/>"
-"        <menuitem action='ToggleDeleted'/>"
-"        <menuitem action='ToggleNew'/>"
-"        <menuitem action='ToggleAnswered'/>"
-"      </menu>"
-"      <separator/>"
-"      <menuitem action='StoreAddress'/>"
-"    </menu>"
-"    <menu action='SettingsMenu'>"
-"      <menuitem action='Toolbars'/>"
-"      <menuitem action='Identities'/>"
-"    </menu>"
-"    <menu action='HelpMenu'>"
-"      <menuitem action='TableOfContents'/>"
-"      <menuitem action='About'/>"
-"    </menu>"
-"  </menubar>"
-"</ui>";
-
-#else                           /* !USE_GNOMEUIINFO */
-
 static GnomeUIInfo help_menu[] = {
     GNOMEUIINFO_HELP("balsa"),
     GNOMEUIINFO_MENU_ABOUT_ITEM(show_about_box, NULL),
     GNOMEUIINFO_END
+};
+
+/* Really, entire mailbox_hide_menu should be build dynamically from
+ * the hide_states array since different mailboxes support different
+ * set of flags/keywords. */
+static const struct {
+    LibBalsaMessageFlag flag;
+    unsigned set:1;
+} hide_states[] = {
+    { LIBBALSA_MESSAGE_FLAG_DELETED, 1 },
+    { LIBBALSA_MESSAGE_FLAG_DELETED, 0 },
+    { LIBBALSA_MESSAGE_FLAG_NEW,     0 },
+    { LIBBALSA_MESSAGE_FLAG_NEW,     1 },
+    { LIBBALSA_MESSAGE_FLAG_FLAGGED, 1 },
+    { LIBBALSA_MESSAGE_FLAG_FLAGGED, 0 },
+    { LIBBALSA_MESSAGE_FLAG_REPLIED, 1 },
+    { LIBBALSA_MESSAGE_FLAG_REPLIED, 0 }
 };
 
 static GnomeUIInfo mailbox_hide_menu[] = {
@@ -1527,7 +1154,6 @@ static GnomeUIInfo main_menu[] = {
 /* ===================================================================
  *                End of touchpad-optimized menus.
  * =================================================================== */
-#endif                          /* !USE_GNOMEUIINFO */
 
 static GnomeAppClass *parent_class = NULL;
 static guint window_signals[LAST_SIGNAL] = { 0 };
@@ -1964,18 +1590,12 @@ bw_set_panes(BalsaWindow * window)
 static void
 bw_enable_next_unread(BalsaWindow * window, gboolean has_unread_mailbox)
 {
-#if !USE_GNOMEUIINFO
-    GtkAction *next_unread = gtk_action_group_get_action(window->action_group, "NextUnread");
-
-    gtk_action_set_sensitive(next_unread, has_unread_mailbox);
-#else                           /* !USE_GNOMEUIINFO */
     GtkWidget *toolbar =
         balsa_toolbar_get_from_gnome_app(GNOME_APP(window));
 
     balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_NEXT_UNREAD, 
                                        has_unread_mailbox); 
     gtk_widget_set_sensitive(NEXT_UNREAD_WIDGET, has_unread_mailbox);
-#endif                          /* !USE_GNOMEUIINFO */
 }
 
 GtkWidget *
@@ -1987,13 +1607,6 @@ balsa_window_new()
     GtkWidget *toolbar;
     GnomeAppBar *appbar;
     unsigned i;
-#if !USE_GNOMEUIINFO
-    GtkActionGroup *action_group;
-    GtkUIManager *ui_manager;
-    GtkAccelGroup *accel_group;
-    GError *error;
-    GtkWidget *menubar;
-#endif                          /* !USE_GNOMEUIINFO */
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -2004,47 +1617,7 @@ balsa_window_new()
     gnome_app_construct(GNOME_APP(window), "balsa", "Balsa");
     register_balsa_pixbufs(GTK_WIDGET(window));
 
-#if !USE_GNOMEUIINFO
-    window->action_group = action_group =
-        gtk_action_group_new("MenuActions");
-    gtk_action_group_add_actions(action_group, entries,
-                                 G_N_ELEMENTS(entries),
-                                 GTK_WIDGET(window));
-    gtk_action_group_add_toggle_actions(action_group, toggle_entries,
-                                        G_N_ELEMENTS(toggle_entries),
-                                        GTK_WIDGET(window));
-    gtk_action_group_add_radio_actions(action_group,
-                                       shown_hdrs_radio_entries,
-                                       G_N_ELEMENTS
-                                       (shown_hdrs_radio_entries), 0,
-                                       G_CALLBACK(shown_hdrs_radio_cb),
-                                       GTK_WIDGET(window));
-    gtk_action_group_add_radio_actions(action_group,
-                                       threading_radio_entries,
-                                       G_N_ELEMENTS
-                                       (threading_radio_entries), 0,
-                                       G_CALLBACK(threading_radio_cb),
-                                       GTK_WIDGET(window));
-
-    ui_manager = gtk_ui_manager_new();
-    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
-
-    accel_group = gtk_ui_manager_get_accel_group(ui_manager);
-    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
-
-    error = NULL;
-    if (!gtk_ui_manager_add_ui_from_string
-        (ui_manager, ui_description, -1, &error)) {
-        g_message("building menus failed: %s", error->message);
-        g_error_free(error);
-        return NULL;
-    }
-
-    menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
-    gnome_app_set_menus(GNOME_APP(window), GTK_MENU_BAR(menubar));
-#else                           /* !USE_GNOMEUIINFO */
     gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, window);
-#endif                          /* !USE_GNOMEUIINFO */
 
     model = balsa_window_get_toolbar_model();
     toolbar = balsa_toolbar_new(model);
@@ -2063,10 +1636,8 @@ balsa_window_new()
     balsa_app.appbar = appbar;
     g_object_add_weak_pointer(G_OBJECT(appbar),
                               (gpointer) &balsa_app.appbar);
-#if USE_GNOMEUIINFO
     gnome_app_install_appbar_menu_hints(GNOME_APPBAR(balsa_app.appbar),
                                         main_menu);
-#endif                          /* USE_GNOMEUIINFO */
 
     gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
     gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width,
@@ -2119,17 +1690,11 @@ balsa_window_new()
 
     /*PKGW: do it this way, without the usizes. */
 #if !defined(ENABLE_TOUCH_UI)
-    if (balsa_app.show_mblist) {
-#if !USE_GNOMEUIINFO
-        GtkAction *show_mblist = gtk_action_group_get_action(action_group, "ShowMailboxTree");
-        gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(show_mblist), balsa_app.show_mblist);
-#else                           /* !USE_GNOMEUIINFO */
+    if (balsa_app.show_mblist)
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                        (view_menu[MENU_VIEW_MAILBOX_LIST_POS].widget),
                                        balsa_app.show_mblist);
-#endif                          /* !USE_GNOMEUIINFO */
-    }
-#endif                          /* !defined(ENABLE_TOUCH_UI) */
+#endif
 
     gtk_paned_set_position(GTK_PANED(window->hpaned), 
                            balsa_app.show_mblist 
@@ -2152,37 +1717,12 @@ balsa_window_new()
     balsa_window_refresh(window);
 
     if (balsa_app.shown_headers >= HEADERS_NONE
-        && balsa_app.shown_headers <= HEADERS_ALL) {
-#if !USE_GNOMEUIINFO
-#if GTK_CHECK_VERSION(2, 10, 0)
-        GtkAction *action = gtk_action_group_get_action(window->action_group, "NoHeaders");
-        gtk_radio_action_set_current_value(GTK_RADIO_ACTION(action), balsa_app.shown_headers);
-#else                           /* GTK_CHECK_VERSION(2, 10, 0) */
-        gchar *header_options[] = {
-            "NoHeaders", "SelectedHeaders", "AllHeaders"
-        };
-        gchar *header_option = header_options[balsa_app.shown_headers];
-        GtkAction *action = gtk_action_group_get_action(window->action_group, header_option);
-        gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), TRUE);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
-#else                           /* !USE_GNOMEUIINFO */
+        && balsa_app.shown_headers <= HEADERS_ALL)
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                        (shown_hdrs_menu[balsa_app.shown_headers].widget),
                                        TRUE);
-#endif                          /* !USE_GNOMEUIINFO */
-    }
 
 #if !defined(ENABLE_TOUCH_UI)
-#if !USE_GNOMEUIINFO
-    if (balsa_app.show_notebook_tabs){
-        GtkAction *action = gtk_action_group_get_action(window->action_group, "ShowMailboxTabs");
-        gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), TRUE);
-    }
-    if (balsa_app.browse_wrap) {
-        GtkAction *action = gtk_action_group_get_action(window->action_group, "Wrap");
-        gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), TRUE);
-    }
-#else                           /* !USE_GNOMEUIINFO */
     if (balsa_app.browse_wrap)
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                        (view_menu[MENU_VIEW_WRAP_POS].widget),
@@ -2191,7 +1731,6 @@ balsa_window_new()
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                        (view_menu[MENU_VIEW_MAILBOX_TABS_POS].widget),
                                        TRUE);
-#endif                          /* !USE_GNOMEUIINFO */
 #else
     if (balsa_app.enable_view_filter)
         gtk_check_menu_item_set_active
@@ -2240,25 +1779,15 @@ balsa_window_new()
  * on if there is a mailbox open. 
  */
 static void
-enable_expand_collapse(BalsaWindow * window, LibBalsaMailbox * mailbox)
+enable_expand_collapse(LibBalsaMailbox * mailbox)
 {
     gboolean enable;
-#if !USE_GNOMEUIINFO
-    GtkAction *action;
-#endif                          /* !USE_GNOMEUIINFO */
 
     enable = mailbox &&
         libbalsa_mailbox_get_threading_type(mailbox) !=
         LB_MAILBOX_THREADING_FLAT;
-#if !USE_GNOMEUIINFO
-    action = gtk_action_group_get_action(window->action_group, "ExpandAll");
-    gtk_action_set_sensitive(action, enable);
-    action = gtk_action_group_get_action(window->action_group, "CollapseAll");
-    gtk_action_set_sensitive(action, enable);
-#else                           /* !USE_GNOMEUIINFO */
     gtk_widget_set_sensitive(MENU_EXPAND_ALL_WIDGET,   enable);
     gtk_widget_set_sensitive(MENU_COLLAPSE_ALL_WIDGET, enable);
-#endif                          /* !USE_GNOMEUIINFO */
 }
 
 /*
@@ -2406,12 +1935,13 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     bw_enable_next_unread(window, libbalsa_mailbox_get_unread(mailbox) > 0
                           || bw_next_unread_mailbox(mailbox));
 
-    enable_expand_collapse(window, mailbox);
+    enable_expand_collapse(mailbox);
 }
 
 void
 balsa_window_update_book_menus(BalsaWindow *window)
 {
+#if !defined(ENABLE_TOUCH_UI)
     gboolean has_books = balsa_app.address_book_list != NULL;
     gtk_widget_set_sensitive(file_menu[MENU_FILE_ADDRESS_POS].widget,
        	                     has_books);
@@ -2420,6 +1950,7 @@ balsa_window_update_book_menus(BalsaWindow *window)
 			     window->current_index &&
 			     BALSA_INDEX(window->current_index)
 			     ->current_msgno);
+#endif /* ENABLE_TOUCH_UI */
 }
 
 /*
@@ -2495,10 +2026,12 @@ enable_message_menus(BalsaWindow * window, guint msgno)
         balsa_toolbar_set_button_sensitive(toolbar, tools[i], enable);
 
     balsa_window_enable_continue(window);
+#if !defined(ENABLE_TOUCH_UI)
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 			     .widget,
 			     enable && balsa_app.address_book_list);
 
+#endif /* ENABLE_TOUCH_UI */
 }
 
 /*
@@ -2664,7 +2197,7 @@ balsa_window_set_threading_menu(BalsaWindow * window, int option)
     if ((index = balsa_window_find_current_index(window))
 	&& (mbnode = BALSA_INDEX(index)->mailbox_node)
 	&& (mailbox = mbnode->mailbox))
-	enable_expand_collapse(window, mailbox);
+	enable_expand_collapse(mailbox);
 }
 #endif /* ENABLE_TOUCH_UI */
 
@@ -3156,21 +2689,6 @@ static gboolean is_open_mailbox(LibBalsaMailbox *m)
     return (res != NULL);
 }
 
-#if !USE_GNOMEUIINFO
-static void
-contents_cb(void)
-{
-    GError *err = NULL;
-
-    gnome_help_display("balsa", NULL, &err);
-    if (err) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Error displaying help: %s\n"), err->message);
-        g_error_free(err);
-    }
-}
-#endif                          /* !USE_GNOMEUIINFO */
-
 /*
  * show the about box for Balsa
  */
@@ -3202,7 +2720,7 @@ show_about_box(void)
                           "name", "Balsa",
                           "version", BALSA_VERSION,
                           "copyright",
-                          "Copyright \xc2\xa9 1997-2007 The Balsa Developers",
+                          "Copyright \xc2\xa9 1997-2005 The Balsa Developers",
                           "comments",
                           _("The Balsa email client is part of "
                             "the GNOME desktop environment.  "
@@ -3988,6 +3506,7 @@ forward_message_default_cb(GtkWidget * widget, gpointer data)
         balsa_window_find_current_index(BALSA_WINDOW(data)));
 }
 
+#if !defined(ENABLE_TOUCH_UI)
 static void
 pipe_message_cb(GtkWidget * widget, gpointer data)
 {
@@ -3995,6 +3514,7 @@ pipe_message_cb(GtkWidget * widget, gpointer data)
                      (balsa_window_find_current_index
                       (BALSA_WINDOW(data))));
 }
+#endif /* ENABLE_TOUCH_UI */
 
 static void
 continue_message_cb(GtkWidget * widget, gpointer data)
@@ -4395,14 +3915,6 @@ show_headers_helper(GtkWidget * widget, gpointer data, ShownHeaders sh)
     balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview), sh);
 }
 
-#if !USE_GNOMEUIINFO
-static void
-shown_hdrs_radio_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data) 
-{
-    if (action == current)
-        show_headers_helper(action, data, gtk_radio_action_get_current_value(action));
-}
-#else                           /* !USE_GNOMEUIINFO */
 static void
 show_no_headers_cb(GtkWidget * widget, gpointer data)
 {
@@ -4420,30 +3932,8 @@ show_all_headers_cb(GtkWidget * widget, gpointer data)
 {
     show_headers_helper(widget, data, HEADERS_ALL);
 }
-#endif                          /* !USE_GNOMEUIINFO */
 
 #if !defined(ENABLE_TOUCH_UI)
-#if !USE_GNOMEUIINFO
-static void
-threading_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
-                   gpointer data)
-{
-    BalsaWindow *bw;
-    GtkWidget *index;
-    LibBalsaMailboxThreadingType type;
-
-    if (action != current)
-        return;
-
-    bw = BALSA_WINDOW(data);
-    index = balsa_window_find_current_index(bw);
-    g_return_if_fail(index != NULL);
-
-    type = gtk_radio_action_get_current_value(action);
-    balsa_index_set_threading_type(BALSA_INDEX(index), type);
-    balsa_window_set_threading_menu(bw, type);
-}
-#else                           /* !USE_GNOMEUIINFO */
 static void
 threading_change_cb(GtkWidget * widget, gpointer data)
 {
@@ -4463,7 +3953,6 @@ threading_change_cb(GtkWidget * widget, gpointer data)
     balsa_index_set_threading_type(BALSA_INDEX(index), type);
     balsa_window_set_threading_menu(bw, type);
 }
-#endif                          /* !USE_GNOMEUIINFO */
 #endif /* ENABLE_TOUCH_UI */
 static void
 expand_all_cb(GtkWidget * widget, gpointer data)
@@ -4495,27 +3984,6 @@ zoom_cb(GtkWidget * widget, gpointer data)
 			(G_OBJECT(widget), GNOMEUIINFO_KEY_UIDATA));
     balsa_message_zoom(BALSA_MESSAGE(bm), in_out);
 }
-
-#if !USE_GNOMEUIINFO
-static void
-zoom_in_cb(GtkWidget * widget, gpointer data)
-{
-    zoom_cb(widget, GINT_TO_POINTER(1));
-}
-
-static void
-zoom_out_cb(GtkWidget * widget, gpointer data)
-{
-    zoom_cb(widget, GINT_TO_POINTER(-1));
-}
-
-static void
-zoom_100_cb(GtkWidget * widget, gpointer data)
-{
-    zoom_cb(widget, GINT_TO_POINTER(0));
-}
-
-#endif                          /* !USE_GNOMEUIINFO */
 #endif				/* HAVE_GTKHTML */
 
 #if defined(ENABLE_TOUCH_UI)
@@ -4852,6 +4320,7 @@ filter_run_cb(GtkWidget * widget, gpointer data)
                           _("You can apply filters only on mailbox\n"));
 }
 
+#if !defined(ENABLE_TOUCH_UI)
 static void
 remove_duplicates_cb(GtkWidget * widget, gpointer data)
 {
@@ -4870,6 +4339,7 @@ remove_duplicates_cb(GtkWidget * widget, gpointer data)
             balsa_index_ensure_visible(BALSA_INDEX(index));
     }
 }
+#endif /* ENABLE_TOUCH_UI */
 
 static void
 empty_trash_cb(GtkWidget * widget, gpointer data)
@@ -4896,22 +4366,6 @@ mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 				   BALSA_MAILBOX_NODE(data));
 }
 
-/* Really, entire mailbox_hide_menu should be build dynamically from
- * the hide_states array since different mailboxes support different
- * set of flags/keywords. */
-static const struct {
-    LibBalsaMessageFlag flag;
-    unsigned set:1;
-} hide_states[] = {
-    { LIBBALSA_MESSAGE_FLAG_DELETED, 1 },
-    { LIBBALSA_MESSAGE_FLAG_DELETED, 0 },
-    { LIBBALSA_MESSAGE_FLAG_NEW,     0 },
-    { LIBBALSA_MESSAGE_FLAG_NEW,     1 },
-    { LIBBALSA_MESSAGE_FLAG_FLAGGED, 1 },
-    { LIBBALSA_MESSAGE_FLAG_FLAGGED, 0 },
-    { LIBBALSA_MESSAGE_FLAG_REPLIED, 1 },
-    { LIBBALSA_MESSAGE_FLAG_REPLIED, 0 }
-};
 
 LibBalsaCondition*
 balsa_window_get_view_filter(BalsaWindow *window, gboolean flags_only)

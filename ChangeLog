@@ -1,3 +1,9 @@
+2007-09-04  Peter Bloomfield
+
+	* src/main-window.c: (balsa_window_enable_mailbox_menus),
+	(balsa_window_update_book_menus), (enable_message_menus): manage
+	sensitivity of store-address menu item in touch-pad version.
+
 2007-09-03  Peter Bloomfield
 
 	* libinit_balsa/assistant_helper.c:

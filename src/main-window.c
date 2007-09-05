@@ -1851,7 +1851,6 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
         &tu_sort_l_menu[VIEW_SORT_SENDER_POS],
         &tu_sort_l_menu[VIEW_SORT_SUBJECT_POS],
-        &tu_sort_l_menu[VIEW_SORT_MSGNO_POS],
         &tu_sort_l_menu[VIEW_SORT_SIZE_POS]
     };
 #endif /* ENABLE_TOUCH_UI */
@@ -1941,8 +1940,8 @@ balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 void
 balsa_window_update_book_menus(BalsaWindow *window)
 {
-#if !defined(ENABLE_TOUCH_UI)
     gboolean has_books = balsa_app.address_book_list != NULL;
+#if !defined(ENABLE_TOUCH_UI)
     gtk_widget_set_sensitive(file_menu[MENU_FILE_ADDRESS_POS].widget,
        	                     has_books);
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
@@ -1950,6 +1949,12 @@ balsa_window_update_book_menus(BalsaWindow *window)
 			     window->current_index &&
 			     BALSA_INDEX(window->current_index)
 			     ->current_msgno);
+#else  /* ENABLE_TOUCH_UI */
+    gtk_widget_set_sensitive(tu_message_more_menu
+                             [MENU_MESSAGE_STORE_ADDRESS_POS].widget,
+                             has_books && window->current_index
+                             && BALSA_INDEX(window->current_index)->
+                             current_msgno);
 #endif /* ENABLE_TOUCH_UI */
 }
 
@@ -2030,7 +2035,10 @@ enable_message_menus(BalsaWindow * window, guint msgno)
     gtk_widget_set_sensitive(message_menu[MENU_MESSAGE_STORE_ADDRESS_POS]
 			     .widget,
 			     enable && balsa_app.address_book_list);
-
+#else  /* ENABLE_TOUCH_UI */
+    gtk_widget_set_sensitive(tu_message_more_menu
+                             [MENU_MESSAGE_STORE_ADDRESS_POS].widget,
+                             enable && balsa_app.address_book_list);
 #endif /* ENABLE_TOUCH_UI */
 }
 

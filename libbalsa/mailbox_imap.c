@@ -1124,9 +1124,11 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
                                  msg->length/1024);
 #endif
         cache = fopen(path, "wb");
-        II(rc,mimap->handle,
-           imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache));
-        fclose(cache);
+        if(cache) {
+            II(rc,mimap->handle,
+               imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache));
+            fclose(cache);
+        }
 
 	stream = fopen(path,"rb");
     }
@@ -1159,7 +1161,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
     stream = get_cache_stream(mailbox, msgno);
     libbalsa_unlock_mailbox(mailbox);
 
-    return g_mime_stream_file_new(stream);
+    return stream ? g_mime_stream_file_new(stream) : NULL;
 }
 
 /* libbalsa_mailbox_imap_check:
@@ -2078,8 +2080,9 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
          * keep reopening the stream. */
         GMimeStream *stream = 
             libbalsa_mailbox_imap_get_message_stream(mailbox, message->msgno);
-        if(stream)
-            g_object_unref(stream);
+        if(!stream) /* oops, connection broken or the message disappeared? */
+            return FALSE;
+        g_object_unref(stream);
     }
 
     if(get_struct_from_cache(mailbox, message, flags))

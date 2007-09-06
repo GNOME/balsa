@@ -1,3 +1,7 @@
+2007-09-06  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: handle expunge race.
+
 2007-09-04  Peter Bloomfield
 
 	* src/main-window.c: (balsa_window_enable_mailbox_menus),

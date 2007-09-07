@@ -1,3 +1,8 @@
+* Balsa-2.3.20 release. Release date 2007-09-07
+
+- fix buffer overflow (#474366).
+- avoid sending messages twice under certain conditions.
+
 * Balsa-2.3.19 release. Release date 2007-08-25
 
 - more build fixes.

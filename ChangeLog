@@ -2,6 +2,7 @@
 
 	* libbalsa/imap/imap-handle.c: fix buffer overflow (#474366,
 	credit goes to Evil Ninja Squirrel).
+	* NEWS, configure.in: release 2.3.20.
 
 2007-09-06  Pawel Salek
 

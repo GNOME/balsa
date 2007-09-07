@@ -1,3 +1,8 @@
+2007-09-07  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: fix buffer overflow (#474366,
+	credit goes to Evil Ninja Squirrel).
+
 2007-09-06  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: handle expunge race.

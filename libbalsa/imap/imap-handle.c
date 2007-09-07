@@ -3606,7 +3606,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
   if(seqno<1 || seqno > h->exists) return IMR_PROTOCOL;
   if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;
   do {
-    for(i=0; (c = sio_getc(h->sio)) != -1; i++) {
+    for(i=0; i<sizeof(atom)-1 && (c = sio_getc(h->sio)) != -1; i++) {
       c = toupper(c);
       if( !( (c >='A' && c<='Z') || (c >='0' && c<='9') || c == '.') ) break;
       atom[i] = c;

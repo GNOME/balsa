@@ -1,3 +1,8 @@
+2007-09-08  Albrecht Dreß
+
+	* src/sendmsg-window.c: allow the user to select message parts to
+	be quoted in the response.
+
 2007-09-07  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: fix buffer overflow (#474366,

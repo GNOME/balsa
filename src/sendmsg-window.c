@@ -54,6 +54,7 @@
 #include "libbalsa.h"
 #include "misc.h"
 #include "send.h"
+#include "html.h"
 
 #include "balsa-app.h"
 #include "balsa-message.h"
@@ -3282,6 +3283,385 @@ message_part_get_subject(LibBalsaMessageBody *part)
     return subject;
 }
 
+/* --- stuff for collecting parts for a reply --- */
+
+enum {
+    QUOTE_INCLUDE,
+    QUOTE_DESCRIPTION,
+    QUOTE_BODY,
+    QOUTE_NUM_ELEMS
+};
+
+static void
+tree_add_quote_body(LibBalsaMessageBody * body, GtkTreeStore * store, GtkTreeIter * parent)
+{
+    GtkTreeIter iter;
+    gchar * mime_type = libbalsa_message_body_get_mime_type(body);
+    const gchar * disp_type;
+    static gboolean preselect;
+    gchar * description;
+
+    gtk_tree_store_append(store, &iter, parent);
+    if (body->mime_part)
+	disp_type = g_mime_part_get_content_disposition(GMIME_PART(body->mime_part));
+    else
+	disp_type = NULL;
+    preselect = !disp_type || *disp_type == '\0' ||
+	!g_ascii_strcasecmp(disp_type, "inline");
+    if (body->filename && *body->filename)
+	description = g_strdup_printf(_("%s file \"%s\" (%s)"),
+				      preselect ? _("inlined") : _("attached"),
+				      body->filename, mime_type);
+    else
+	description = g_strdup_printf(_("%s %s part"),
+				      preselect ? _("inlined") : _("attached"),
+				      mime_type);
+    g_free(mime_type);
+    gtk_tree_store_set(store, &iter,
+		       QUOTE_INCLUDE, preselect,
+		       QUOTE_DESCRIPTION, description,
+		       QUOTE_BODY, body,
+		       -1);
+    g_free(description);
+}
+
+static gint
+scan_bodies(GtkTreeStore * bodies, GtkTreeIter * parent, LibBalsaMessageBody * body,
+	    gboolean ignore_html, gboolean container_mp_alt)
+{
+    gchar * mime_type;
+    gint count = 0;
+
+    while (body) {
+	switch (libbalsa_message_body_type(body)) {
+	case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
+	    {
+		gchar *mime_type;
+		LibBalsaHTMLType html_type;
+
+		mime_type = libbalsa_message_body_get_mime_type(body);
+		html_type = libbalsa_html_type(mime_type);
+		g_free(mime_type);
+
+		/* On a multipart/alternative, ignore_html defines if html or
+		 * non-html parts will be added. Eject from the container when
+		 * the first part has been found.
+		 * Otherwise, select all text parts. */
+		if (container_mp_alt) {
+		    if ((ignore_html && html_type == LIBBALSA_HTML_TYPE_NONE) ||
+			(!ignore_html && html_type != LIBBALSA_HTML_TYPE_NONE)) {
+			tree_add_quote_body(body, bodies, parent);
+			return count + 1;
+		    }
+		} else {
+		    tree_add_quote_body(body, bodies, parent);
+		    count++;
+		}
+		break;
+	    }
+
+	case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
+	    mime_type = libbalsa_message_body_get_mime_type(body);
+	    count += scan_bodies(bodies, parent, body->parts, ignore_html,
+				 !g_ascii_strcasecmp(mime_type, "multipart/alternative"));
+	    g_free(mime_type);
+	    break;
+
+	case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
+	    {
+		GtkTreeIter iter;
+		gchar * description = NULL;
+
+		mime_type = libbalsa_message_body_get_mime_type(body);
+		if (g_ascii_strcasecmp(mime_type, "message/rfc822") == 0 &&
+		    body->embhdrs) {
+		    gchar *from = balsa_message_sender_to_gchar(body->embhdrs->from, 0);
+		    gchar *subj = g_strdup(body->embhdrs->subject);
+		
+
+		    libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit, NULL);
+		    libbalsa_utf8_sanitize(&subj, balsa_app.convert_unknown_8bit, NULL);
+		    description = 
+			g_strdup_printf(_("message from %s, subject \"%s\""),
+					from, subj);
+		    g_free(from);
+		    g_free(subj);
+		} else
+		    description = g_strdup(mime_type);
+	    
+		gtk_tree_store_append(bodies, &iter, parent);
+		gtk_tree_store_set(bodies, &iter,
+				   QUOTE_INCLUDE, FALSE,
+				   QUOTE_DESCRIPTION, description,
+				   QUOTE_BODY, NULL,
+				   -1);
+		g_free(mime_type);
+		g_free(description);
+		count += scan_bodies(bodies, &iter, body->parts, ignore_html, 0);
+	    }
+	    
+	default:
+	    break;
+	}
+
+	body = body->next;
+    }
+
+    return count;
+}
+
+static void
+set_all_cells(GtkTreeModel * model, GtkTreeIter * iter, const gboolean value)
+{
+    do {
+	GtkTreeIter children;
+	
+	if (gtk_tree_model_iter_children(model, &children, iter))
+	    set_all_cells(model, &children, value);
+	gtk_tree_store_set(GTK_TREE_STORE(model), iter, QUOTE_INCLUDE, value, -1);
+    } while (gtk_tree_model_iter_next(model, iter));
+}
+
+static gboolean
+calculate_expander_toggles(GtkTreeModel * model, GtkTreeIter * iter)
+{
+    gint count, on;
+    gboolean have_incons;
+
+    count = on = 0;
+    have_incons = FALSE;
+    do {
+	GtkTreeIter children;
+	gboolean value;
+
+	if (gtk_tree_model_iter_children(model, &children, iter)) {
+	    value = calculate_expander_toggles(model, &children);
+	    gtk_tree_store_set(GTK_TREE_STORE(model), iter, QUOTE_INCLUDE, value, -1);
+	} else
+	    gtk_tree_model_get(model, iter, QUOTE_INCLUDE, &value, -1);
+	if (value)
+	    on++;
+	count++;
+    } while (gtk_tree_model_iter_next(model, iter));
+    
+    return count == on;
+}
+
+static void
+cell_toggled_cb(GtkCellRendererToggle *cell, gchar *path_str, GtkTreeView *treeview)
+{
+    GtkTreeModel *model = NULL;
+    GtkTreePath *path;
+    GtkTreeIter iter;
+    GtkTreeIter children;
+    gboolean active;
+  
+    g_return_if_fail (GTK_IS_TREE_VIEW (treeview));
+    if (!(model = gtk_tree_view_get_model(treeview)))
+	return;
+
+    path = gtk_tree_path_new_from_string(path_str);
+    if (!gtk_tree_model_get_iter(model, &iter, path))
+	return;
+    gtk_tree_path_free(path);
+  
+    gtk_tree_model_get(model, &iter,
+		       QUOTE_INCLUDE, &active,
+		       -1);
+    gtk_tree_store_set(GTK_TREE_STORE (model), &iter,
+		       QUOTE_INCLUDE, !active,
+		       -1);
+    if (gtk_tree_model_iter_children(model, &children, &iter))
+	set_all_cells(model, &children, !active);
+    gtk_tree_model_get_iter_first(model, &children);
+    calculate_expander_toggles(model, &children);
+}
+
+static void
+append_parts(GString * q_body, LibBalsaMessage *message, GtkTreeModel * model,
+	     GtkTreeIter * iter, const gchar * from_msg, gchar * reply_prefix_str,
+	     gint llen, gboolean flow, LibBalsaCharsetFunc charset_cb,
+	     gpointer charset_cb_data)
+{
+    gboolean used_from_msg = FALSE;
+
+    do {
+	GtkTreeIter children;
+
+	if (gtk_tree_model_iter_children(model, &children, iter)) {
+	    gchar * description;
+
+	    gtk_tree_model_get(model, iter, QUOTE_DESCRIPTION, &description, -1);
+	    append_parts(q_body, message, model, &children, description,
+			 reply_prefix_str, llen, flow, charset_cb, charset_cb_data);
+	    g_free(description);
+	} else {
+	    gboolean do_include;
+
+	    gtk_tree_model_get(model, iter, QUOTE_INCLUDE, &do_include, -1);
+	    if (do_include) {
+		LibBalsaMessageBody *this_body;
+
+		gtk_tree_model_get(model, iter, QUOTE_BODY, &this_body, -1);
+		if (this_body) {
+		    GString * this_part;
+		    this_part= process_mime_part(message, this_body, reply_prefix_str,
+						 llen, FALSE, flow, charset_cb,
+						 charset_cb_data);
+		    
+		    if (q_body->len > 0 && q_body->str[q_body->len - 1] != '\n')
+			g_string_append_c(q_body, '\n');
+		    if (!used_from_msg && from_msg) {
+			g_string_append_printf(q_body, "\n======%s %s======\n", _("quoted"), from_msg);
+			used_from_msg = TRUE;
+		    } else if (q_body->len > 0) {
+			if (this_body->filename)
+			    g_string_append_printf(q_body, "\n------%s \"%s\"------\n",
+						   _("quoted attachment"), this_body->filename);
+			else
+			    g_string_append_printf(q_body, "\n------%s------\n",
+						   _("quoted attachment"));
+		    }
+		    g_string_append(q_body, this_part->str);
+		    g_string_free(this_part, TRUE);
+		}
+	    }
+	}
+    } while (gtk_tree_model_iter_next(model, iter));
+}
+
+static gboolean
+quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
+{
+    GtkWidget *dialog;
+    GtkWidget *label;
+    GtkWidget *image;
+    GtkWidget *hbox;
+    GtkWidget *vbox;
+    GtkWidget *scroll;
+    GtkWidget *tree_view;
+    GtkTreeViewColumn *column;
+    GtkCellRenderer *renderer;
+    GtkTreeIter iter;
+    gboolean result;
+
+    dialog = gtk_dialog_new_with_buttons(_("Select parts for quotation"),
+					 parent,
+					 GTK_DIALOG_DESTROY_WITH_PARENT,
+					 GTK_STOCK_OK, GTK_RESPONSE_OK,
+					 NULL);
+
+    label = gtk_label_new(_("Select the parts of the message which shall be quoted in the reply"));
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
+
+    image = gtk_image_new_from_stock(GTK_STOCK_DIALOG_QUESTION,
+				     GTK_ICON_SIZE_DIALOG);
+    gtk_misc_set_alignment(GTK_MISC(image), 0.5, 0.0);
+
+    /* stolen form gtk/gtkmessagedialog.c */
+    hbox = gtk_hbox_new (FALSE, 12);
+    vbox = gtk_vbox_new (FALSE, 12);
+
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), hbox, TRUE,
+		       TRUE, 0);
+
+    gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
+    gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 14);
+
+    /* scrolled window for the tree view */
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+
+    /* add the tree view */
+    tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(tree_store));
+    gtk_widget_set_size_request(tree_view, -1, 100);
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), FALSE);
+    renderer = gtk_cell_renderer_toggle_new();
+    g_signal_connect(renderer, "toggled", G_CALLBACK(cell_toggled_cb),
+		     tree_view);
+    column = gtk_tree_view_column_new_with_attributes(NULL, renderer,
+						      "active", QUOTE_INCLUDE,
+                                                      NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+    gtk_tree_view_set_expander_column(GTK_TREE_VIEW(tree_view), column);
+    column = gtk_tree_view_column_new_with_attributes(NULL, gtk_cell_renderer_text_new(),
+						      "text", QUOTE_DESCRIPTION,
+                                                      NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+    gtk_tree_view_expand_all(GTK_TREE_VIEW(tree_view));
+    gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree_store), &iter);
+    calculate_expander_toggles(GTK_TREE_MODEL(tree_store), &iter);
+    
+    /* add, show & run */
+    gtk_container_add(GTK_CONTAINER(scroll), tree_view);
+    gtk_widget_show_all(hbox);
+    result = gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK;
+    gtk_widget_destroy(dialog);
+    return result;
+}
+
+static GString *
+collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
+		  gint llen, gboolean ignore_html, gboolean flow,
+		  LibBalsaCharsetFunc charset_cb, gpointer charset_cb_data)
+{
+    GtkTreeStore * tree_store;
+    gint text_bodies;
+    LibBalsaMessage *message = root->message;
+    GString *q_body = NULL;
+
+    libbalsa_message_body_ref(message, FALSE, FALSE);
+
+    /* scan the message and collect text parts which might be included
+     * in the reply, and if there is only one return this part */
+    tree_store = gtk_tree_store_new(QOUTE_NUM_ELEMS,
+				    G_TYPE_BOOLEAN, G_TYPE_STRING,
+				    G_TYPE_POINTER);
+    text_bodies = scan_bodies(tree_store, NULL, root, ignore_html, FALSE);
+    if (text_bodies == 1) {
+	/* note: the only text body may be buried in an attached message, so
+	 * we have to search the tree store... */
+	GtkTreeIter iter;
+
+	gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree_store), &iter);
+	do {
+	    LibBalsaMessageBody *this_body;
+
+	    gtk_tree_model_get(GTK_TREE_MODEL(tree_store), &iter, QUOTE_BODY,
+			       &this_body, -1);
+	    if (this_body)
+		q_body = process_mime_part(message, this_body, reply_prefix_str,
+					   llen, FALSE, flow, charset_cb,
+					   charset_cb_data);
+	} while (!q_body &&
+		 gtk_tree_model_iter_next(GTK_TREE_MODEL(tree_store), &iter));
+    } else if (text_bodies > 1) {
+	if (quote_parts_select_dlg(tree_store, NULL)) {
+	    GtkTreeIter iter;
+
+	    q_body = g_string_new("");
+	    gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree_store), &iter);
+	    append_parts(q_body, message, GTK_TREE_MODEL(tree_store), &iter, NULL,
+			 reply_prefix_str, llen, flow, charset_cb, charset_cb_data);
+	}
+    }
+
+    /* clean up */
+    g_object_unref(G_OBJECT(tree_store));
+    libbalsa_message_body_unref(message);
+    return q_body;
+}
+
+
 /* quote_body -----------------------------------------------------------
    quotes properly the body of the message.
    Use GString to optimize memory usage.
@@ -3374,11 +3754,14 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 	    str = g_strdup_printf(_("On %s, %s wrote:\n"), date, personStr);
 	else
 	    str = g_strdup_printf(_("%s wrote:\n"), personStr);
-	body = content2reply(root,
-                             qtype == QUOTE_ALL ? balsa_app.quote_str : NULL,
-			     bsmsg->flow ? -1 : balsa_app.wraplength,
-			     balsa_app.reply_strip_html, bsmsg->flow,
-			     sw_charset_cb, bsmsg);
+
+	/* scan the message and collect text parts which might be included
+	 * in the reply */
+	body = collect_for_quote(root,
+				 qtype == QUOTE_ALL ? balsa_app.quote_str : NULL,
+				 bsmsg->flow ? -1 : balsa_app.wraplength,
+				 balsa_app.reply_strip_html, bsmsg->flow,
+				 sw_charset_cb, bsmsg);
 	if (body) {
 	    gchar *buf;
 
@@ -5295,7 +5678,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
 
-    image = gtk_image_new_from_stock ("gtk-dialog-question", GTK_ICON_SIZE_DIALOG);
+    image = gtk_image_new_from_stock (GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0);
 
@@ -5326,7 +5709,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     dialog_action_area = GTK_DIALOG (no_subj_dialog)->action_area;
     gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), GTK_BUTTONBOX_END);
 
-    cnclbutton = gtk_button_new_from_stock ("gtk-cancel");
+    cnclbutton = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
     gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), cnclbutton, GTK_RESPONSE_CANCEL);
     GTK_WIDGET_SET_FLAGS (cnclbutton, GTK_CAN_DEFAULT);
 
@@ -5342,7 +5725,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     hbox = gtk_hbox_new (FALSE, 2);
     gtk_container_add (GTK_CONTAINER (alignment), hbox);
 
-    image = gtk_image_new_from_stock ("balsa_send", GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_stock (BALSA_PIXMAP_SEND, GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
 
     label = gtk_label_new_with_mnemonic (_("_Send"));

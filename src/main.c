@@ -111,6 +111,23 @@ static GSList* opt_attach_list = NULL;
 /* opt_compose_email: To: field for the compose window */
 static gchar *opt_compose_email = NULL;
 
+static void
+accel_map_load(void)
+{
+    gchar *accel_map_filename =
+        g_build_filename(g_get_home_dir(), ".balsa", "accelmap", NULL);
+    gtk_accel_map_load(accel_map_filename);
+    g_free(accel_map_filename);
+}
+
+static void
+accel_map_save(void)
+{
+    gchar *accel_map_filename =
+        g_build_filename(g_get_home_dir(), ".balsa", "accelmap", NULL);
+    gtk_accel_map_save(accel_map_filename);
+    g_free(accel_map_filename);
+}
 
 static void
 balsa_handle_automation_options() {
@@ -793,7 +810,7 @@ main(int argc, char *argv[])
         BalsaSendmsg *snd;
         GSList *lst;
         gdk_threads_enter();
-        snd = sendmsg_window_compose(window);
+        snd = sendmsg_window_compose();
         gdk_threads_leave();
         if(opt_compose_email) {
             if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
@@ -814,10 +831,12 @@ main(int argc, char *argv[])
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
     g_timeout_add(1801*1000, (GSourceFunc) periodic_expunge_cb, NULL);
 
+    accel_map_load();
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
-    
+    accel_map_save();
+
 #ifdef BALSA_USE_THREADS
     threads_destroy();
 #endif

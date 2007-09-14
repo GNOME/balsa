@@ -1,3 +1,27 @@
+2007-09-14  Peter Bloomfield
+
+	* doc/C/balsa.xml: toolbar editing is now really instant-apply.
+	* libbalsa/rfc3156.c: build (--without-ssl ?).
+	* src/ab-window.c:
+	* src/balsa-app.c:
+	* src/balsa-bonobo.c:
+	* src/balsa-index.c:
+	* src/balsa-index.h:
+	* src/balsa-mime-widget-message.c:
+	* src/balsa-mime-widget-text.c: drop GtkWidget from argument list.
+	* src/main.c: GtkAccelMap is now in ~/.balsa/accelmap.
+	* src/pref-manager.c: (apply_prefs): new toolbar api.
+	* src/save-restore.c: (config_global_load): notify user about changes.
+	* src/main-window.c:
+	* src/main-window.h:
+	* src/message-window.c:
+	* src/message-window.h:
+	* src/sendmsg-window.c:
+	* src/sendmsg-window.h:
+	* src/toolbar-factory.c:
+	* src/toolbar-factory.h:
+	* src/toolbar-prefs.c: migrate from GnomeUI to GtkUIManager.
+
 2007-09-08  Albrecht Dreß
 
 	* src/sendmsg-window.c: allow the user to select message parts to

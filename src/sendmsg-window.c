@@ -89,46 +89,60 @@ typedef struct {
 
 typedef enum { QUOTE_HEADERS, QUOTE_ALL, QUOTE_NOPREFIX } QuoteType;
 
-static gint include_file_cb(GtkWidget *, BalsaSendmsg *);
-static gint send_message_cb(GtkWidget *, BalsaSendmsg *);
-static void send_message_toolbar_cb(GtkWidget *, BalsaSendmsg *);
-static gint queue_message_cb(GtkWidget *, BalsaSendmsg *);
+static void include_file_cb    (GtkAction * action, BalsaSendmsg * bsmsg);
+static void send_message_cb    (GtkAction * action, BalsaSendmsg * bsmsg);
+static void queue_message_cb   (GtkAction * action, BalsaSendmsg * bsmsg);
+static void save_message_cb    (GtkAction * action, BalsaSendmsg * bsmsg);
+
 static gint message_postpone(BalsaSendmsg * bsmsg);
-static void postpone_message_cb(GtkWidget *, BalsaSendmsg *);
-static void save_message_cb(GtkWidget *, BalsaSendmsg *);
+static void postpone_message_cb(GtkAction * action, BalsaSendmsg * bsmsg);
+
 #ifdef HAVE_GTK_PRINT
 #if !defined(ENABLE_TOUCH_UI)
-static void page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
+static void page_setup_cb      (GtkAction * action, BalsaSendmsg * bsmsg);
 #endif /* ENABLE_TOUCH_UI */
 #endif
-static void print_message_cb(GtkWidget *, BalsaSendmsg *);
-static void attach_clicked(GtkWidget *, gpointer);
+static void print_message_cb   (GtkAction * action, BalsaSendmsg * bsmsg);
+static void attach_clicked     (GtkAction * action, gpointer data);
+
 static gboolean attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message);
-static gint insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type);
-static gint attach_message_cb(GtkWidget *, BalsaSendmsg *);
-static gint include_message_cb(GtkWidget *, BalsaSendmsg *);
-static void close_window_cb(GtkWidget *, gpointer);
+static void insert_selected_messages(BalsaSendmsg * bsmsg, QuoteType type);
+static void attach_message_cb  (GtkAction * action, BalsaSendmsg * bsmsg);
+static void include_message_cb (GtkAction * action, BalsaSendmsg * bsmsg);
+
+static void close_window_cb    (GtkAction * action, gpointer data);
+
 static gchar* check_if_regular_file(const gchar *);
 static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg);
 static void check_readiness(BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
-static gint toggle_from_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_cc_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_bcc_cb(GtkWidget *, BalsaSendmsg *);
-static gint toggle_fcc_cb(GtkWidget *, BalsaSendmsg *);
+static void toggle_from_cb         (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+static void toggle_cc_cb           (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+static void toggle_bcc_cb          (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+static void toggle_fcc_cb          (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
 #if !defined(ENABLE_TOUCH_UI)
-static gint toggle_reply_cb(GtkWidget *, BalsaSendmsg *);
+static void toggle_reply_cb        (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
 #endif
-static void toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void toggle_format_cb(GtkCheckMenuItem * check_menu_item,
-                             BalsaSendmsg * bsmsg);
+static void toggle_reqdispnotify_cb(GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+static void toggle_format_cb       (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
 #ifdef HAVE_GPGME
-static void toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void toggle_sign_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void toggle_encrypt_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg, GtkWidget *toolbar);
+static void toggle_sign_cb         (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+static void toggle_encrypt_cb      (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+#if !defined(ENABLE_TOUCH_UI)
+static void gpg_mode_radio_cb(GtkRadioAction * action,
+                              GtkRadioAction * current,
+                              BalsaSendmsg * bsmsg);
+#endif                          /* ENABLE_TOUCH_UI */
+static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg);
 static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
                                                 LibBalsaIdentity *new_ident);
 static void bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode);
@@ -140,15 +154,12 @@ static gboolean bsmsg_check_format_compatibility(GtkWindow *parent,
 #endif /* ENABLE_TOUCH_UI */
 
 #if !HAVE_GTKSPELL
-static void spell_check_cb(GtkToggleToolButton * button,
-                           BalsaSendmsg * bsmsg);
+static void spell_check_cb(GtkAction * action, BalsaSendmsg * bsmsg);
 static void sw_spell_check_response(BalsaSpellCheck * spell_check,
                                     gint response, BalsaSendmsg * bsmsg);
 #else
-static void spell_check_menu_cb(GtkCheckMenuItem * item,
-				BalsaSendmsg * bsmsg);
-static void spell_check_tb_cb(GtkToggleToolButton * button,
-			      BalsaSendmsg * bsmsg);
+static void spell_check_menu_cb(GtkToggleAction * action,
+                                BalsaSendmsg * bsmsg);
 #endif                          /* HAVE_GTKSPELL */
 
 static void address_book_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
@@ -158,9 +169,10 @@ static void address_book_response(GtkWidget * ab, gint response,
 static gint set_locale(BalsaSendmsg *, gint);
 
 #if !defined(ENABLE_TOUCH_UI)
-static void edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg);
+static void edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg);
 #endif
-static void change_identity_dialog_cb(GtkWidget*, BalsaSendmsg*);
+static void change_identity_dialog_cb(GtkAction * action,
+                                      BalsaSendmsg * bsmsg);
 static void repl_identity_signature(BalsaSendmsg* bsmsg, 
                                     LibBalsaIdentity* new_ident,
                                     LibBalsaIdentity* old_ident,
@@ -215,16 +227,16 @@ static GtkTargetEntry email_field_drop_types[] = {
     {"x-application/x-email", 0, TARGET_EMAIL}
 };
 
-static void sw_undo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void sw_redo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void cut_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void copy_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static void reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg);
-static gint insert_signature_cb(GtkWidget *, BalsaSendmsg *);
-static gint quote_messages_cb(GtkWidget *, BalsaSendmsg *);
+static void sw_undo_cb         (GtkAction * action, BalsaSendmsg * bsmsg);
+static void sw_redo_cb         (GtkAction * action, BalsaSendmsg * bsmsg);
+static void cut_cb             (GtkAction * action, BalsaSendmsg * bsmsg);
+static void copy_cb            (GtkAction * action, BalsaSendmsg * bsmsg);
+static void paste_cb           (GtkAction * action, BalsaSendmsg * bsmsg);
+static void select_all_cb      (GtkAction * action, BalsaSendmsg * bsmsg);
+static void wrap_body_cb       (GtkAction * action, BalsaSendmsg * bsmsg);
+static void reflow_selected_cb (GtkAction * action, BalsaSendmsg * bsmsg);
+static void insert_signature_cb(GtkAction * action, BalsaSendmsg * bsmsg);
+static void quote_messages_cb  (GtkAction * action, BalsaSendmsg * bsmsg);
 static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
 
 static void set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *body,
@@ -285,411 +297,334 @@ struct SendLocales {
    overlap very much with the default balsa menus. They are here
    because they represent an alternative probably appealing to the all
    proponents of GNOME2 dumbify approach (OK, I am bit unfair here).
-   We first put shared menu items, next we define default balsa
-   stuff we put touchpad optimized menus at the end.
 */
-typedef struct {
-    gchar *name;
-    guint length;
-} headerMenuDesc;
 
-static GnomeUIInfo lang_menu[] = {
-    GNOMEUIINFO_END
+static const GtkActionEntry entries[] = {
+    {"FileMenu", NULL, "_File"},
+    {"EditMenu", NULL, "_Edit"},
+    {"ShowMenu", NULL, "_Show"},
+    {"LanguageMenu", NULL, "_Language"},
+    {"OptionsMenu", NULL, "_Options"},
+#if defined(ENABLE_TOUCH_UI)
+    {"ToolsMenu", NULL, "_Tools"},
+    {"FileMoreMenu", NULL, "_More"},
+    {"EditMoreMenu", NULL, "_More"},
+    {"ToolsMoreMenu", NULL, "_More"},
+#endif                          /* ENABLE_TOUCH_UI */
+    {"IncludeFile", GTK_STOCK_OPEN, N_("_Include File..."), NULL,
+     N_("Include a file"), G_CALLBACK(include_file_cb)},
+    {"AttachFile", BALSA_PIXMAP_ATTACHMENT, N_("_Attach File..."), NULL,
+     N_("Attach a file"), G_CALLBACK(attach_clicked)},
+    {"IncludeMessages", NULL, N_("I_nclude Message(s)"), NULL,
+     N_("Include selected message(s)"), G_CALLBACK(include_message_cb)},
+    {"AttachMessages", NULL, N_("Attach _Message(s)"), NULL,
+     N_("Attach selected message(s)"), G_CALLBACK(attach_message_cb)},
+    {"Save", GTK_STOCK_SAVE, N_("_Save"), "<control>S",
+     N_("Save this message"), G_CALLBACK(save_message_cb)},
+#ifdef HAVE_GTK_PRINT
+#if !defined(ENABLE_TOUCH_UI)
+    {"PageSetup", NULL, N_("Page _Setup"), NULL,
+     N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},
+#endif                          /* ENABLE_TOUCH_UI */
+#endif                          /* HAVE_GTK_PRINT */
+    {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
+     N_("Print the edited message"), G_CALLBACK(print_message_cb)},
+    {"Close", GTK_STOCK_CLOSE, N_("_Close"), "<control>W",
+     NULL, G_CALLBACK(close_window_cb)},
+    {"Undo", GTK_STOCK_UNDO, N_("_Undo"), "<control>Z",
+     N_("Undo most recent change"), G_CALLBACK(sw_undo_cb)},
+    {"Redo", GTK_STOCK_REDO, N_("_Redo"), "<shift><control>Z",
+     N_("Redo most recent change"), G_CALLBACK(sw_redo_cb)},
+    {"Cut", GTK_STOCK_CUT, N_("Cu_t"), "<control>X",
+     N_("Cut the selected text"), G_CALLBACK(cut_cb)},
+    {"Copy", GTK_STOCK_COPY, N_("_Copy"), "<control>C",
+     N_("Copy to the clipboard"), G_CALLBACK(copy_cb)},
+    {"Paste", GTK_STOCK_PASTE, N_("_Paste"), "<control>V",
+     N_("Paste from the clipboard"), G_CALLBACK(paste_cb)},
+    {"SelectAll", NULL, N_("Select _All"), "<control>A",
+     NULL, G_CALLBACK(select_all_cb)},
+    {"WrapBody", NULL, N_("_Wrap Body"), "<control>B",
+     N_("Wrap message lines"), G_CALLBACK(wrap_body_cb)},
+    {"Reflow", NULL, N_("_Reflow Selected Text"), "<control>R",
+     NULL, G_CALLBACK(reflow_selected_cb)},
+    {"InsertSignature", NULL, N_("Insert Si_gnature"), "<control>G",
+     NULL, G_CALLBACK(insert_signature_cb)},
+    {"QuoteMessages", NULL, N_("_Quote Message(s)"), NULL,
+     NULL, G_CALLBACK(quote_messages_cb)},
+#if !HAVE_GTKSPELL
+    {"CheckSpelling", GTK_STOCK_SPELL_CHECK, N_("C_heck Spelling"), NULL,
+     N_("Check the spelling of the message"),
+     G_CALLBACK(spell_check_cb)},
+#endif                          /* HAVE_GTKSPELL */
+    {"SelectIdentity", BALSA_PIXMAP_IDENTITY, N_("Select _Identity..."),
+     NULL, N_("Select the Identity to use for the message"),
+     G_CALLBACK(change_identity_dialog_cb)},
+#if !defined(ENABLE_TOUCH_UI)
+    {"EditWithGnome", GTK_STOCK_EXECUTE, N_("_Edit with Gnome-Editor"),
+     NULL, N_("Edit the current message with the default Gnome editor"),
+     G_CALLBACK(edit_with_gnome)},
+#endif                          /* ENABLE_TOUCH_UI */
 };
 
+/* Actions that are sensitive only when the message is ready to send */
+static const GtkActionEntry ready_entries[] = {
+    {"Send", BALSA_PIXMAP_SEND, N_("Sen_d"), "<control>Return",
+     N_("Send this message"), G_CALLBACK(send_message_cb)},
+#if !defined(ENABLE_TOUCH_UI)
+    {"Queue", BALSA_PIXMAP_SEND, N_("_Queue"), "Q",
+     N_("Queue this message in Outbox for sending"),
+     G_CALLBACK(queue_message_cb)},
+    {"Postpone", BALSA_PIXMAP_POSTPONE, N_("_Postpone"), NULL,
+     NULL, G_CALLBACK(postpone_message_cb)},
+#else                           /* ENABLE_TOUCH_UI */
+    {"Queue", BALSA_PIXMAP_SEND, N_("Send _Later"), "Q",
+     N_("Queue this message in Outbox for sending"),
+     G_CALLBACK(queue_message_cb)},
+    {"Postpone", BALSA_PIXMAP_POSTPONE, N_("Sa_ve and Close"), NULL,
+     NULL, G_CALLBACK(postpone_message_cb)},
+#endif                          /* ENABLE_TOUCH_UI */
+};
 
+/* Toggle items */
+static const GtkToggleActionEntry toggle_entries[] = {
+#if HAVE_GTKSPELL
+    {"CheckSpelling", GTK_STOCK_SPELL_CHECK, N_("C_heck Spelling"), NULL,
+     N_("Check the spelling of the message"),
+     G_CALLBACK(spell_check_menu_cb), FALSE},
+#endif                          /* HAVE_GTKSPELL */
+    {"From", NULL, N_("Fr_om"), NULL, NULL,
+     G_CALLBACK(toggle_from_cb), TRUE},
+    {"Cc", NULL, N_("_Cc"), NULL, NULL,
+     G_CALLBACK(toggle_cc_cb), TRUE},
+    {"Bcc", NULL, N_("_Bcc"), NULL, NULL,
+     G_CALLBACK(toggle_bcc_cb), TRUE},
+    {"Fcc", NULL, N_("_Fcc"), NULL, NULL,
+     G_CALLBACK(toggle_fcc_cb), TRUE},
+#if !defined(ENABLE_TOUCH_UI)
+    {"ReplyTo", NULL, N_("_Reply To"), NULL, NULL,
+     G_CALLBACK(toggle_reply_cb), TRUE},
+#endif                          /* ENABLE_TOUCH_UI */
+    {"RequestMDN", NULL, N_("_Request Disposition Notification"), NULL,
+     NULL, G_CALLBACK(toggle_reqdispnotify_cb), FALSE},
+    {"Flowed", NULL, N_("_Format = Flowed"), NULL,
+     NULL, G_CALLBACK(toggle_format_cb), FALSE},
 #ifdef HAVE_GPGME
-static GnomeUIInfo gpg_mode_list[] = {
-#define OPTS_MENU_GPG_3156_POS 0
-    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses MIME mode"),
-                               NULL,
-                               toggle_gpg_mode_cb,
-                               GINT_TO_POINTER(LIBBALSA_PROTECT_RFC3156),
-                               NULL),
-#define OPTS_MENU_GPG_2440_POS 1
-    GNOMEUIINFO_RADIOITEM_DATA(N_("_GnuPG uses old OpenPGP mode"),
-                               NULL,
-                               toggle_gpg_mode_cb,
-                               GINT_TO_POINTER(LIBBALSA_PROTECT_OPENPGP),
-                               NULL),
-#ifdef HAVE_SMIME
-#define OPTS_MENU_SMIME_POS 2
-    GNOMEUIINFO_RADIOITEM_DATA(N_("_S/MIME mode (GpgSM)"),
-                               NULL,
-                               toggle_gpg_mode_cb,
-                               GINT_TO_POINTER(LIBBALSA_PROTECT_SMIMEV3),
-                               NULL),
-#endif
-    GNOMEUIINFO_END
+#if !defined(ENABLE_TOUCH_UI)
+    {"SignMessage", NULL, N_("_Sign Message"), NULL,
+     NULL, G_CALLBACK(toggle_sign_cb), FALSE},
+    {"EncryptMessage", NULL, N_("_Encrypt Message"), NULL,
+     NULL, G_CALLBACK(toggle_encrypt_cb), FALSE},
+#else                           /* ENABLE_TOUCH_UI */
+    {"SignMessage", NULL, N_("_Sign Message"), NULL,
+     N_("signs the message using GnuPG"),
+     G_CALLBACK(toggle_sign_cb), FALSE},
+    {"EncryptMessage", NULL, N_("_Encrypt Message"), NULL,
+     N_("signs the message using GnuPG for all To: and CC: recipients"),
+     G_CALLBACK(toggle_encrypt_cb), FALSE},
+#endif                          /* ENABLE_TOUCH_UI */
+#endif                          /* HAVE_GPGME */
 };
-#endif
-
 
 #if !defined(ENABLE_TOUCH_UI)
-/* default balsa menu */
-static GnomeUIInfo file_menu[] = {
-#define MENU_FILE_INCLUDE_POS 0
-    GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
-			   include_file_cb, GTK_STOCK_OPEN),
-#define MENU_FILE_ATTACH_POS 1
-    GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
-			   attach_clicked, BALSA_PIXMAP_ATTACHMENT),
-#define MENU_MSG_INCLUDE_POS 2
-    GNOMEUIINFO_ITEM_STOCK(N_("I_nclude Message(s)"), NULL,
-			   include_message_cb, BALSA_PIXMAP_COMPOSE),
-#define MENU_FILE_ATTACH_MSG_POS 3
-    GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
-			   attach_message_cb, BALSA_PIXMAP_FORWARD),
-#define MENU_FILE_SEPARATOR1_POS 4
-    GNOMEUIINFO_SEPARATOR,
+/* Radio items */
+#ifdef HAVE_GPGME
+static const GtkRadioActionEntry gpg_mode_radio_entries[] = {
+    {"MimeMode", NULL, N_("_GnuPG uses MIME mode"),
+     NULL, NULL, LIBBALSA_PROTECT_RFC3156},
+    {"OldOpenPgpMode", NULL, N_("_GnuPG uses old OpenPGP mode"),
+     NULL, NULL, LIBBALSA_PROTECT_OPENPGP},
+#ifdef HAVE_SMIME
+    {"SMimeMode", NULL, N_("_S/MIME mode (GpgSM)"),
+     NULL, NULL, LIBBALSA_PROTECT_SMIMEV3}
+#endif                          /* HAVE_SMIME */
+};
+#endif                          /* HAVE_GPGME */
+#endif                          /* ENABLE_TOUCH_UI */
 
-#define MENU_FILE_SEND_POS 5
-    { GNOME_APP_UI_ITEM, N_("Sen_d"),
-      N_("Send this message"),
-      send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
-#define MENU_FILE_QUEUE_POS 6
-    { GNOME_APP_UI_ITEM, N_("_Queue"),
-      N_("Queue this message in Outbox for sending"),
-      queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_SEND, 'Q', GDK_CONTROL_MASK, NULL },
-#define MENU_FILE_POSTPONE_POS 7
-    GNOMEUIINFO_ITEM_STOCK(N_("_Postpone"), NULL,
-			   postpone_message_cb, BALSA_PIXMAP_POSTPONE),
-#define MENU_FILE_SAVE_POS 8
-    { GNOME_APP_UI_ITEM, N_("_Save"),
-      N_("Save this message"),
-      save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      GTK_STOCK_SAVE, 'S', GDK_CONTROL_MASK, NULL },
-    GNOMEUIINFO_SEPARATOR,
+static const char *ui_description =
+#if !defined(ENABLE_TOUCH_UI)
+"<ui>"
+"  <menubar name='MainMenu'>"
+"    <menu action='FileMenu'>"
+"      <menuitem action='IncludeFile'/>"
+"      <menuitem action='AttachFile'/>"
+"      <menuitem action='IncludeMessages'/>"
+"      <menuitem action='AttachMessages'/>"
+"      <separator/>"
+"      <menuitem action='Send'/>"
+"      <menuitem action='Queue'/>"
+"      <menuitem action='Postpone'/>"
+"      <menuitem action='Save'/>"
+"      <separator/>"
 #ifdef HAVE_GTK_PRINT
-    { GNOME_APP_UI_ITEM, N_("Page _Setup"), 
-      N_("Set up page for printing"),
-      page_setup_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE,
-      NULL, 'S', GDK_CONTROL_MASK, NULL},
-#define MENU_FILE_PRINT_POS 11
-#else
-#define MENU_FILE_PRINT_POS 10
-#endif
-    GNOMEUIINFO_ITEM_STOCK(N_("_Print..."), N_("Print the edited message"),
-			   print_message_cb, GTK_STOCK_PRINT),
-#define MENU_FILE_SEPARATOR2_POS (MENU_FILE_PRINT_POS + 1)
-    GNOMEUIINFO_SEPARATOR,
-
-#define MENU_FILE_CLOSE_POS (MENU_FILE_PRINT_POS + 2)
-    GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
-
-    GNOMEUIINFO_END
-};
-
-/* Cut, Copy&Paste are in our case just a placeholders because they work
-   anyway */
-static GnomeUIInfo edit_menu[] = {
-#define EDIT_MENU_UNDO 0
-    GNOMEUIINFO_MENU_UNDO_ITEM(sw_undo_cb, NULL),
-#define EDIT_MENU_REDO EDIT_MENU_UNDO + 1
-    GNOMEUIINFO_MENU_REDO_ITEM(sw_redo_cb, NULL),
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_CUT EDIT_MENU_REDO + 2
-    GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
-#define EDIT_MENU_COPY EDIT_MENU_CUT + 1
-    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
-#define EDIT_MENU_PASTE EDIT_MENU_COPY + 1
-    GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
-#define EDIT_MENU_SELECT_ALL EDIT_MENU_PASTE + 1
-    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_WRAP_BODY EDIT_MENU_SELECT_ALL + 2
-    {GNOME_APP_UI_ITEM, N_("_Wrap Body"), N_("Wrap message lines"),
-     (gpointer) wrap_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_b, GDK_CONTROL_MASK, NULL},
-#define EDIT_MENU_REFLOW_SELECTED EDIT_MENU_WRAP_BODY + 1
-    {GNOME_APP_UI_ITEM, N_("_Reflow Selected Text"), NULL,
-     (gpointer) reflow_selected_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_r, GDK_CONTROL_MASK, NULL},
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_ADD_SIGNATURE EDIT_MENU_REFLOW_SELECTED + 2
-    {GNOME_APP_UI_ITEM, N_("Insert Si_gnature"), NULL,
-     (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_g, GDK_CONTROL_MASK, NULL},
-#define EDIT_MENU_QUOTE EDIT_MENU_ADD_SIGNATURE + 1
-    {GNOME_APP_UI_ITEM, N_("_Quote Message(s)"), NULL,
-     (gpointer) quote_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     0, 0, NULL},
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SPELL_CHECK EDIT_MENU_QUOTE + 2
-#if HAVE_GTKSPELL
-    GNOMEUIINFO_TOGGLEITEM(N_("C_heck Spelling"), 
-                           N_("Check the spelling of the message"),
-                           spell_check_menu_cb, NULL),
-#else                           /* HAVE_GTKSPELL */
-    GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
-                           N_("Check the spelling of the message"),
-                           spell_check_cb,
-                           GTK_STOCK_SPELL_CHECK),
-#endif                          /* HAVE_GTKSPELL */
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_SELECT_IDENT EDIT_MENU_SPELL_CHECK + 2
-    GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
-                           N_("Select the Identity to use for the message"),
-                           change_identity_dialog_cb,
-                           BALSA_PIXMAP_IDENTITY),
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_EDIT_GNOME EDIT_MENU_SELECT_IDENT + 2
-    GNOMEUIINFO_ITEM_STOCK(N_("_Edit with Gnome-Editor"),
-                           N_("Edit the current message with "
-                              "the default Gnome editor"),
-                           edit_with_gnome,
-                           GTK_STOCK_EXECUTE), /*FIXME: Other icon */
-    GNOMEUIINFO_END
-};
-
-typedef gint (*ViewMenuFunc)(GtkWidget * widget, BalsaSendmsg * bsmsg);
-#define VIEW_MENU_FUNC(f) ((ViewMenuFunc) (f))
-
-static GnomeUIInfo view_menu[] = {
-#define MENU_TOGGLE_FROM_POS 0
-    GNOMEUIINFO_TOGGLEITEM(N_("Fr_om"), NULL, toggle_from_cb, NULL),
-#define MENU_TOGGLE_CC_POS 1
-    GNOMEUIINFO_TOGGLEITEM(N_("_Cc"), NULL, toggle_cc_cb, NULL),
-#define MENU_TOGGLE_BCC_POS 2
-    GNOMEUIINFO_TOGGLEITEM(N_("_Bcc"), NULL, toggle_bcc_cb, NULL),
-#define MENU_TOGGLE_FCC_POS 3
-    GNOMEUIINFO_TOGGLEITEM(N_("_Fcc"), NULL, toggle_fcc_cb, NULL),
-#define MENU_TOGGLE_REPLY_POS 4
-    GNOMEUIINFO_TOGGLEITEM(N_("_Reply To"), NULL, toggle_reply_cb, NULL),
-    GNOMEUIINFO_END
-};
-
-static GnomeUIInfo opts_menu[] = {
-#define OPTS_MENU_DISPNOTIFY_POS 0
-    GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, 
-			   toggle_reqdispnotify_cb, NULL),
-#define OPTS_MENU_FORMAT_POS 1
-    GNOMEUIINFO_TOGGLEITEM(N_("_Format = Flowed"), NULL, 
-			   toggle_format_cb, NULL),
+"      <menuitem action='PageSetup'/>"
+#endif                          /* HAVE_GTK_PRINT */
+"      <menuitem action='Print'/>"
+"      <separator/>"
+"      <menuitem action='Close'/>"
+"    </menu>"
+"    <menu action='EditMenu'>"
+"      <menuitem action='Undo'/>"
+"      <menuitem action='Redo'/>"
+"      <separator/>"
+"      <menuitem action='Cut'/>"
+"      <menuitem action='Copy'/>"
+"      <menuitem action='Paste'/>"
+"      <menuitem action='SelectAll'/>"
+"      <separator/>"
+"      <menuitem action='WrapBody'/>"
+"      <menuitem action='Reflow'/>"
+"      <separator/>"
+"      <menuitem action='InsertSignature'/>"
+"      <menuitem action='QuoteMessages'/>"
+"      <separator/>"
+"      <menuitem action='CheckSpelling'/>"
+"      <separator/>"
+"      <menuitem action='SelectIdentity'/>"
+"      <separator/>"
+"      <menuitem action='EditWithGnome'/>"
+"    </menu>"
+"    <menu action='ShowMenu'>"
+"      <menuitem action='From'/>"
+"      <menuitem action='Cc'/>"
+"      <menuitem action='Bcc'/>"
+"      <menuitem action='Fcc'/>"
+"      <menuitem action='ReplyTo'/>"
+"    </menu>"
+"    <menu action='LanguageMenu'>"
+"    </menu>"
+"    <menu action='OptionsMenu'>"
+"      <menuitem action='RequestMDN'/>"
+"      <menuitem action='Flowed'/>"
 #ifdef HAVE_GPGME
-    GNOMEUIINFO_SEPARATOR,
-#define OPTS_MENU_SIGN_POS 3
-    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), 
-			   N_("signs the message using GnuPG"),
-			   toggle_sign_cb, NULL),
-#define OPTS_MENU_ENCRYPT_POS 4
-    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), 
-			   N_("signs the message using GnuPG for all To: and CC: recipients"),
-			   toggle_encrypt_cb, NULL),
-    GNOMEUIINFO_RADIOLIST(gpg_mode_list),
-#endif
-    GNOMEUIINFO_END
-};
-#define DISPNOTIFY_WIDGET opts_menu[OPTS_MENU_DISPNOTIFY_POS].widget
-
-
-headerMenuDesc headerDescs[] =  {
-    {"from", 3}, {"cc", 3}, {"bcc", 3}, {"fcc", 2}, {"replyto", 3}
-};
-
-#define MAIN_MENUS_COUNT 5
-static GnomeUIInfo main_menu[] = {
-#define MAIN_FILE_MENU 0
-    GNOMEUIINFO_MENU_FILE_TREE(file_menu),
-#define MAIN_EDIT_MENU 1
-    GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
-#define MAIN_VIEW_MENU 2
-    GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
-#define MAIN_CHARSET_MENU 3
-    GNOMEUIINFO_SUBTREE(N_("_Language"), lang_menu),
-#define MAIN_OPTION_MENU 4
-    GNOMEUIINFO_SUBTREE(N_("_Options"), opts_menu),
-    GNOMEUIINFO_END
-};
-#define LANG_MENU_WIDGET main_menu[MAIN_CHARSET_MENU].widget
-
-#if MENU_TOGGLE_REPLY_POS+1 != VIEW_MENU_LENGTH
-#error Inconsistency in defined lengths.
-#endif
-
-
-#else /* ENABLE_TOUCH_UI */
-/* ===================================================================
- * End of default balsa menus and begin touchpad-optimized menus.
- * =================================================================== */
-/* touchpad-optimized menu */
-static GnomeUIInfo tu_file_more_menu[] = {
-    GNOMEUIINFO_ITEM_STOCK(N_("_Include File..."), NULL,
-			   include_file_cb, GTK_STOCK_OPEN),
-    GNOMEUIINFO_ITEM_STOCK(N_("I_nclude Message(s)"), NULL,
-			   include_message_cb, BALSA_PIXMAP_COMPOSE),
-#define MENU_FILE_ATTACH_MSG_POS 3
-    GNOMEUIINFO_ITEM_STOCK(N_("Attach _Message(s)"), NULL,
-			   attach_message_cb, BALSA_PIXMAP_FORWARD),
-    GNOMEUIINFO_END
-};
-
-/* touchpad optimized version of the menu */
-static GnomeUIInfo file_menu[] = {
-#define MENU_FILE_ATTACH_POS 0
-    GNOMEUIINFO_ITEM_STOCK(N_("_Attach File..."), NULL,
-			   attach_clicked, BALSA_PIXMAP_ATTACHMENT),
-    GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_SAVE_POS 2
-    { GNOME_APP_UI_ITEM, N_("_Save"),
-      N_("Save this message"),
-      save_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      GTK_STOCK_SAVE, 'S', GDK_CONTROL_MASK, NULL },
-#define MENU_FILE_PRINT_POS 3
-    GNOMEUIINFO_ITEM_STOCK(N_("_Print..."), N_("Print the edited message"),
-			   print_message_cb, GTK_STOCK_PRINT),
-    GNOMEUIINFO_SUBTREE(N_("_More"), tu_file_more_menu),
-#define MENU_FILE_POSTPONE_POS 5
-    GNOMEUIINFO_ITEM_STOCK(N_("Sa_ve and Close"), NULL,
-			   postpone_message_cb, BALSA_PIXMAP_POSTPONE),
-    GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_SEND_POS 7
-    { GNOME_APP_UI_ITEM, N_("Sen_d"),
-      N_("Send this message"),
-      send_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_SEND, GDK_Return, GDK_CONTROL_MASK, NULL },
-#define MENU_FILE_QUEUE_POS 8
-    { GNOME_APP_UI_ITEM, N_("Send _Later"),
-      N_("Queue this message in Outbox for sending"),
-      queue_message_cb, NULL, NULL, GNOME_APP_PIXMAP_STOCK,
-      BALSA_PIXMAP_SEND, 'Q', GDK_CONTROL_MASK, NULL },
-    GNOMEUIINFO_SEPARATOR,
-#define MENU_FILE_CLOSE_POS 10
-    GNOMEUIINFO_MENU_CLOSE_ITEM(close_window_cb, NULL),
-    GNOMEUIINFO_END
-};
-
-static GnomeUIInfo tu_edit_more_menu[] = {
-#define EDIT_MENU_WRAP_BODY EDIT_MENU_SELECT_ALL + 2
-    {GNOME_APP_UI_ITEM, N_("_Wrap Body"), N_("Wrap message lines"),
-     (gpointer) wrap_body_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_b, GDK_CONTROL_MASK, NULL},
-#define EDIT_MENU_REFLOW_SELECTED EDIT_MENU_WRAP_BODY + 1
-    {GNOME_APP_UI_ITEM, N_("_Reflow Selected Text"), NULL,
-     (gpointer) reflow_selected_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_r, GDK_CONTROL_MASK, NULL},
-    GNOMEUIINFO_SEPARATOR,
-    {GNOME_APP_UI_ITEM, N_("_Quote Message(s)"), NULL,
-     (gpointer) quote_messages_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     0, 0, NULL},
-    GNOMEUIINFO_END
-};
-
-/* Cut, Copy&Paste are in our case just a placeholders because they work
-   anyway */
-static GnomeUIInfo edit_menu[] = {
-#define EDIT_MENU_UNDO 0
-    GNOMEUIINFO_MENU_UNDO_ITEM(sw_undo_cb, NULL),
-#define EDIT_MENU_REDO EDIT_MENU_UNDO + 1
-    GNOMEUIINFO_MENU_REDO_ITEM(sw_redo_cb, NULL),
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_CUT EDIT_MENU_REDO + 2
-    GNOMEUIINFO_MENU_CUT_ITEM(cut_cb, NULL),
-#define EDIT_MENU_COPY EDIT_MENU_CUT + 1
-    GNOMEUIINFO_MENU_COPY_ITEM(copy_cb, NULL),
-#define EDIT_MENU_PASTE EDIT_MENU_COPY + 1
-    GNOMEUIINFO_MENU_PASTE_ITEM(paste_cb, NULL),
-#define EDIT_MENU_SELECT_ALL EDIT_MENU_PASTE + 1
-    GNOMEUIINFO_MENU_SELECT_ALL_ITEM(select_all_cb, NULL),
-    GNOMEUIINFO_SEPARATOR,
-#define EDIT_MENU_ADD_SIGNATURE EDIT_MENU_SELECT_ALL + 2
-    {GNOME_APP_UI_ITEM, N_("Insert Si_gnature"), NULL,
-     (gpointer) insert_signature_cb, NULL, NULL, GNOME_APP_PIXMAP_NONE, NULL,
-     GDK_g, GDK_CONTROL_MASK, NULL},
-    GNOMEUIINFO_SUBTREE(N_("_More"), tu_edit_more_menu),
-    GNOMEUIINFO_END
-};
-
-typedef gint (*ViewMenuFunc)(GtkWidget * widget, BalsaSendmsg * bsmsg);
-#define VIEW_MENU_FUNC(f) ((ViewMenuFunc) (f))
-
-/* touchscreen-optimized version of the menu */
-static GnomeUIInfo view_menu[] = {
-#define MENU_TOGGLE_FROM_POS 0
-    GNOMEUIINFO_TOGGLEITEM(N_("Fr_om"),NULL, toggle_from_cb, NULL),
-#define MENU_TOGGLE_CC_POS 1
-    GNOMEUIINFO_TOGGLEITEM(N_("_Cc"),  NULL, toggle_cc_cb, NULL),
-#define MENU_TOGGLE_BCC_POS 2
-    GNOMEUIINFO_TOGGLEITEM(N_("_Bcc"), NULL, toggle_bcc_cb, NULL),
-#define MENU_TOGGLE_FCC_POS 3
-    GNOMEUIINFO_TOGGLEITEM(N_("_Fcc"), NULL, toggle_fcc_cb, NULL),
-    GNOMEUIINFO_END
-};
-
-headerMenuDesc headerDescs[] =
-    { {"from", 3}, {"cc", 3}, {"bcc", 3}, {"fcc", 2} };
-#if MENU_TOGGLE_FCC_POS+1 != VIEW_MENU_LENGTH
-#error Inconsistency in defined lengths.
-#endif
-
-static GnomeUIInfo opts_menu[] = {
-#define OPTS_MENU_FORMAT_POS 0
-    GNOMEUIINFO_TOGGLEITEM(N_("_Format = Flowed"), NULL, 
-			   toggle_format_cb, NULL),
+"      <separator/>"
+"      <menuitem action='SignMessage'/>"
+"      <menuitem action='EncryptMessage'/>"
+"      <menuitem action='MimeMode'/>"
+"      <menuitem action='OldOpenPgpMode'/>"
+#ifdef HAVE_SMIME
+"      <menuitem action='SMimeMode'/>"
+#endif                          /* HAVE_SMIME */
+#endif                          /* HAVE_GPGME */
+"    </menu>"
+"  </menubar>"
+"  <toolbar name='Toolbar'>"
+"  </toolbar>"
+"</ui>";
+#else                           /* ENABLE_TOUCH_UI */
+"<ui>"
+"  <menubar name='MainMenu'>"
+"    <menu action='FileMenu'>"
+"      <menuitem action='AttachFile'/>"
+"      <separator/>"
+"      <menuitem action='Save'/>"
+"      <menuitem action='Print'/>"
+"      <menu action='FileMoreMenu'>"
+"        <menuitem action='IncludeFile'/>"
+"        <menuitem action='IncludeMessages'/>"
+"        <menuitem action='AttachMessages'/>"
+"      </menu>"
+"      <menuitem action='Postpone'/>"
+"      <separator/>"
+"      <menuitem action='Send'/>"
+"      <menuitem action='Queue'/>"
+"      <separator/>"
+"      <menuitem action='Close'/>"
+"    </menu>"
+"    <menu action='EditMenu'>"
+"      <menuitem action='Undo'/>"
+"      <menuitem action='Redo'/>"
+"      <separator/>"
+"      <menuitem action='Cut'/>"
+"      <menuitem action='Copy'/>"
+"      <menuitem action='Paste'/>"
+"      <menuitem action='SelectAll'/>"
+"      <separator/>"
+"      <separator/>"
+"      <menuitem action='InsertSignature'/>"
+"      <menu action='EditMoreMenu'>"
+"        <menuitem action='WrapBody'/>"
+"        <menuitem action='Reflow'/>"
+"        <separator/>"
+"        <menuitem action='QuoteMessages'/>"
+"      </menu>"
+"    </menu>"
+"    <menu action='ShowMenu'>"
+"      <menuitem action='From'/>"
+"      <menuitem action='Cc'/>"
+"      <menuitem action='Bcc'/>"
+"      <menuitem action='Fcc'/>"
+"    </menu>"
+"    <menu action='ToolsMenu'>"
+"      <menuitem action='CheckSpelling'/>"
+"      <menu action='LanguageMenu'>"
+"      </menu>"
+"      <separator/>"
+"      <menuitem action='SelectIdentity'/>"
+"      <menuitem action='RequestMDN'/>"
+"      <menu action='ToolsMoreMenu'>"
+"        <menuitem action='Flowed'/>"
 #ifdef HAVE_GPGME
-    GNOMEUIINFO_SEPARATOR,
-#define OPTS_MENU_SIGN_POS 2
-    GNOMEUIINFO_TOGGLEITEM(N_("_Sign Message"), 
-			   N_("signs the message using GnuPG"),
-			   toggle_sign_cb, NULL),
-#define OPTS_MENU_ENCRYPT_POS 3
-    GNOMEUIINFO_TOGGLEITEM(N_("_Encrypt Message"), 
-			   N_("signs the message using GnuPG for all To: and CC: recipients"),
-			   toggle_encrypt_cb, NULL),
-    GNOMEUIINFO_RADIOLIST(gpg_mode_list),
-#endif
-    GNOMEUIINFO_END
-};
+"        <separator/>"
+"        <menuitem action='SignMessage'/>"
+"        <menuitem action='EncryptMessage'/>"
+#endif                          /* HAVE_GPGME */
+"      </menu>"
+"    </menu>"
+"  </menubar>"
+"  <toolbar name='Toolbar'>"
+"  </toolbar>"
+"</ui>";
+#endif                          /* ENABLE_TOUCH_UI */
 
-static GnomeUIInfo tu_tools_menu[] = {
-#define TU_TOOLS_MENU_SPELL_CHECK_POS 0
-#if HAVE_GTKSPELL
-    GNOMEUIINFO_TOGGLEITEM(N_("Toggle Spell C_hecker"),
-                           N_("Check the spelling of the message"),
-                           spell_check_menu_cb, NULL),
-#else                           /* HAVE_GTKSPELL */
-    GNOMEUIINFO_ITEM_STOCK(N_("C_heck Spelling"), 
-                           N_("Check the spelling of the message"),
-                           spell_check_cb,
-                           GTK_STOCK_SPELL_CHECK),
-#endif                          /* HAVE_GTKSPELL */
-#define MAIN_CHARSET_MENU_POS 1
-    GNOMEUIINFO_SUBTREE(N_("_Language"), lang_menu),
-    GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_ITEM_STOCK(N_("Select _Identity..."), 
-                           N_("Select the Identity to use for the message"),
-                           change_identity_dialog_cb,
-                           BALSA_PIXMAP_IDENTITY),
-#define OPTS_MENU_DISPNOTIFY_POS 4
-    GNOMEUIINFO_TOGGLEITEM(N_("_Request Disposition Notification"), NULL, 
-			   toggle_reqdispnotify_cb, NULL),
-    GNOMEUIINFO_SUBTREE(N_("_More"), opts_menu),
-    GNOMEUIINFO_END
-};
-#define DISPNOTIFY_WIDGET tu_tools_menu[OPTS_MENU_DISPNOTIFY_POS].widget
-#define LANG_MENU_WIDGET tu_tools_menu[MAIN_CHARSET_MENU_POS].widget
+/* Create a GtkUIManager for a compose window, with all the actions, but
+ * no ui.
+ */
+static GtkUIManager *
+sw_get_ui_manager(BalsaSendmsg * bsmsg)
+{
+    GtkUIManager *ui_manager;
+    GtkActionGroup *action_group;
 
+    ui_manager = gtk_ui_manager_new();
 
-#define MAIN_MENUS_COUNT 5
-static GnomeUIInfo main_menu[] = {
-#define MAIN_FILE_MENU 0
-    GNOMEUIINFO_MENU_FILE_TREE(file_menu),
-#define MAIN_EDIT_MENU 1
-    GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
-#define MAIN_VIEW_MENU 2
-    GNOMEUIINFO_SUBTREE(N_("_Show"), view_menu),
-#define MAIN_OPTION_MENU 4
-    GNOMEUIINFO_SUBTREE(N_("_Tools"), tu_tools_menu),
-    GNOMEUIINFO_END
-};
+    action_group = gtk_action_group_new("ComposeWindow");
+    if (bsmsg)
+        bsmsg->action_group = action_group;
+    gtk_action_group_add_actions(action_group, entries,
+                                 G_N_ELEMENTS(entries), bsmsg);
+    gtk_action_group_add_toggle_actions(action_group, toggle_entries,
+                                        G_N_ELEMENTS(toggle_entries),
+                                        bsmsg);
 
-#endif /* ENABLE_TOUCH_UI */
-/* ===================================================================
- *                End of touchpad-optimized menus.
- * =================================================================== */
+    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
+    action_group = gtk_action_group_new("ComposeWindow");
+    if (bsmsg)
+        bsmsg->ready_action_group = action_group;
+    gtk_action_group_add_actions(action_group, ready_entries,
+                                 G_N_ELEMENTS(ready_entries), bsmsg);
+
+    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
+
+#ifdef HAVE_GPGME
+#if !defined(ENABLE_TOUCH_UI)
+    action_group = gtk_action_group_new("ComposeWindow");
+    if (bsmsg)
+        bsmsg->gpg_action_group = action_group;
+    gtk_action_group_add_radio_actions(action_group,
+                                       gpg_mode_radio_entries,
+                                       G_N_ELEMENTS
+                                       (gpg_mode_radio_entries), 0,
+                                       G_CALLBACK(gpg_mode_radio_cb),
+                                       bsmsg);
+
+    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
+#endif                          /* ENABLE_TOUCH_UI */
+#endif                          /* HAVE_GPGME */
+
+    return ui_manager;
+}
 
 /* ===================================================================
  *                attachment related stuff
@@ -969,7 +904,7 @@ delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 }
 
 static void
-close_window_cb(GtkWidget * widget, gpointer data)
+close_window_cb(GtkAction * action, gpointer data)
 {
     BalsaSendmsg* bsmsg = data;   
     BALSA_DEBUG_MSG("close_window_cb: start\n");
@@ -994,7 +929,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     gboolean quit_on_close;
 
     g_assert(bsmsg != NULL);
-    g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsmsg->view_checkitems));
 
     g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
                                 bsmsg->delete_sig_id);
@@ -1008,6 +942,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
 	g_object_unref(G_OBJECT(bsmsg->parent_message));
+        bsmsg->parent_message = NULL;
     }
 
     if (bsmsg->draft_message) {
@@ -1016,6 +951,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
 	g_object_unref(G_OBJECT(bsmsg->draft_message));
+        bsmsg->draft_message = NULL;
     }
 
     if (balsa_app.debug)
@@ -1030,6 +966,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     if(bsmsg->references) {
         g_list_foreach(bsmsg->references, (GFunc) g_free, NULL);
         g_list_free(bsmsg->references);
+        bsmsg->references = NULL;
     }
     g_slist_foreach(bsmsg->charsets, (GFunc) g_free, NULL);
     g_slist_free(bsmsg->charsets);
@@ -1038,10 +975,14 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     if (bsmsg->spell_checker)
         gtk_widget_destroy(bsmsg->spell_checker);
 #endif                          /* HAVE_GTKSPELL */
-    if (bsmsg->wrap_timeout_id)
+    if (bsmsg->wrap_timeout_id) {
         g_source_remove(bsmsg->wrap_timeout_id);
-    if (bsmsg->autosave_timeout_id)
+        bsmsg->wrap_timeout_id = 0;
+    }
+    if (bsmsg->autosave_timeout_id) {
         g_source_remove(bsmsg->autosave_timeout_id);
+        bsmsg->autosave_timeout_id = 0;
+    }
 
 #if !HAVE_GTKSOURCEVIEW
     g_object_unref(bsmsg->buffer2);
@@ -1195,7 +1136,7 @@ edit_with_gnome_check(gpointer data) {
  * - New (grandchild) process (executes editor)
  */
 static void
-edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
+edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
 {
     static const char TMP_PATTERN[] = "/tmp/balsa-edit-XXXXXX";
     gchar filename[sizeof(TMP_PATTERN)];
@@ -1263,7 +1204,7 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
     }
 
 
-    tmp   = fdopen(tmpfd, "w+");
+    tmp = fdopen(tmpfd, "w+");
     
     if(balsa_app.edit_headers) {
         guint i;
@@ -1305,7 +1246,7 @@ edit_with_gnome(GtkWidget* widget, BalsaSendmsg* bsmsg)
 #endif /* ENABLE_TOUCH_UI */
 
 static void 
-change_identity_dialog_cb(GtkWidget* widget, BalsaSendmsg* bsmsg)
+change_identity_dialog_cb(GtkAction * action, BalsaSendmsg* bsmsg)
 {
     libbalsa_identity_select_dialog(GTK_WINDOW(bsmsg->window),
                                     _("Select Identity"),
@@ -1364,6 +1305,64 @@ repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
     gtk_text_buffer_place_cursor(buffer, &ins);
     libbalsa_insert_with_url(buffer, new_sig, NULL, NULL, NULL);
 }
+
+/*
+ * GtkAction helpers
+ */
+
+static GtkAction *
+sw_get_action(BalsaSendmsg * bsmsg, const gchar * action_name)
+{
+    GtkAction *action =
+        gtk_action_group_get_action(bsmsg->action_group, action_name);
+
+#ifdef HAVE_GPGME
+#if !defined(ENABLE_TOUCH_UI)
+    if (!action)
+        action =
+            gtk_action_group_get_action(bsmsg->gpg_action_group,
+                                        action_name);
+#endif                          /* ENABLE_TOUCH_UI */
+#endif                          /* HAVE_GPGME */
+
+    return action;
+}
+
+static void
+sw_set_sensitive(BalsaSendmsg * bsmsg, const gchar * action_name,
+                 gboolean sensitive)
+{
+    GtkAction *action = sw_get_action(bsmsg, action_name);
+    gtk_action_set_sensitive(action, sensitive);
+}
+
+#if !HAVE_GTKSOURCEVIEW
+static gboolean
+sw_get_sensitive(BalsaSendmsg * bsmsg, const gchar * action_name)
+{
+    GtkAction *action = sw_get_action(bsmsg, action_name);
+    return gtk_action_get_sensitive(action);
+}
+#endif                          /* HAVE_GTKSOURCEVIEW */
+
+static void
+sw_set_active(BalsaSendmsg * bsmsg, const gchar * action_name,
+              gboolean active)
+{
+    GtkAction *action = sw_get_action(bsmsg, action_name);
+    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), active);
+}
+
+static gboolean
+sw_get_active(BalsaSendmsg * bsmsg, const gchar * action_name)
+{
+    GtkAction *action = sw_get_action(bsmsg, action_name);
+    return gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
+}
+
+/*
+ * end of GtkAction helpers
+ */
 
 /*
  * update_bsmsg_identity
@@ -1563,8 +1562,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     libbalsa_address_entry_set_domain(LIBBALSA_ADDRESS_ENTRY(bsmsg->bcc[1]),
                                       ident->domain);
 
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(DISPNOTIFY_WIDGET),
-				    ident->request_mdn);
+    sw_set_active(bsmsg, "RequestMDN", ident->request_mdn);
 }
 
 
@@ -2280,9 +2278,9 @@ sw_attach_dialog(BalsaSendmsg * bsmsg)
     return fc;
 }
 
-/* attach_clicked - menu and toolbar callback */
+/* attach_clicked - menu callback */
 static void
-attach_clicked(GtkWidget * widget, gpointer data)
+attach_clicked(GtkAction * action, gpointer data)
 {
     sw_attach_dialog((BalsaSendmsg *) data);
 }
@@ -2309,7 +2307,7 @@ attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message)
     return TRUE;
 }
 
-static gint
+static void
 insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type)
 {
     GtkTextBuffer *buffer = 
@@ -2330,19 +2328,17 @@ insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type)
 	g_list_foreach(l, (GFunc)g_object_unref, NULL);
         g_list_free(l);
     }
-
-    return TRUE;
 }
 
-static gint
-include_message_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
+static void
+include_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
-    return insert_selected_messages(bsmsg, QUOTE_ALL);
+    insert_selected_messages(bsmsg, QUOTE_ALL);
 }
 
 
-static gint
-attach_message_cb(GtkWidget * widget, BalsaSendmsg *bsmsg) 
+static void
+attach_message_cb(GtkAction * action, BalsaSendmsg *bsmsg) 
 {
     GtkWidget *index =
 	balsa_window_find_current_index(balsa_app.main_window);
@@ -2363,8 +2359,6 @@ attach_message_cb(GtkWidget * widget, BalsaSendmsg *bsmsg)
 	g_list_foreach(l, (GFunc)g_object_unref, NULL);
         g_list_free(l);
     }
-    
-    return TRUE;
 }
 
 
@@ -3073,22 +3067,14 @@ static void
 sw_can_undo_cb(GtkSourceBuffer * source_buffer, gboolean can_undo,
                BalsaSendmsg * bsmsg)
 {
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-    gtk_widget_set_sensitive(bsmsg->undo_widget, can_undo);
-    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_UNDO, can_undo);
+    sw_set_sensitive(bsmsg, "Undo", can_undo);
 }
 
 static void
 sw_can_redo_cb(GtkSourceBuffer * source_buffer, gboolean can_redo,
                BalsaSendmsg * bsmsg)
 {
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-    gtk_widget_set_sensitive(bsmsg->redo_widget, can_redo);
-    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_REDO, can_redo);
+    sw_set_sensitive(bsmsg, "Undo", can_redo);
 }
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
@@ -3838,13 +3824,13 @@ fill_body_from_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message,
 }
 
 
-static gint
-insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
+static void
+insert_signature_cb(GtkAction * action, BalsaSendmsg *bsmsg)
 {
     gchar *signature;
     
     if(!bsmsg->ident->signature_path || !bsmsg->ident->signature_path[0])
-        return TRUE;
+        return;
     signature = libbalsa_identity_get_signature(bsmsg->ident,
                                                 GTK_WINDOW(bsmsg->window));
     if (signature != NULL) {
@@ -3862,14 +3848,13 @@ insert_signature_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
                                    _("No signature found!"));
-    
-    return TRUE;
 }
 
 
-static gint quote_messages_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
+static void
+quote_messages_cb(GtkAction * action, BalsaSendmsg *bsmsg)
 {
-    return insert_selected_messages(bsmsg, QUOTE_ALL);
+    insert_selected_messages(bsmsg, QUOTE_ALL);
 }
 
 
@@ -4253,11 +4238,12 @@ comp_send_locales(const void* a, const void* b)
    create language menu for the compose window. The order cannot be
    hardcoded because it depends on the current locale.
 */
+#define BALSA_LANGUAGE_MENU_POS "balsa-language-menu-pos"
 static void
 create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
 {
     unsigned i, selected_pos;
-    GtkWidget* langs = gtk_menu_item_get_submenu(GTK_MENU_ITEM(parent));
+    GtkWidget *langs = gtk_menu_new();
     static gboolean locales_sorted = FALSE;
     GSList *group = NULL;
 
@@ -4294,39 +4280,15 @@ create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
 
         g_signal_connect(G_OBJECT(w), "activate", 
                          G_CALLBACK(lang_set_cb), bsmsg);
-        g_object_set_data(G_OBJECT(w), GNOMEUIINFO_KEY_UIDATA, 
+        g_object_set_data(G_OBJECT(w), BALSA_LANGUAGE_MENU_POS, 
                           GINT_TO_POINTER(i));
         gtk_widget_show(w);
         gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
-    }                         
+    }
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), langs);
+    gtk_widget_show(parent);
 }
         
-
-/* Toolbar buttons and their callbacks. */
-static const struct callback_item {
-    const char *icon_id;
-    BalsaToolbarFunc callback;
-} callback_table[] = {
-    {BALSA_PIXMAP_ATTACHMENT,  BALSA_TOOLBAR_FUNC(attach_clicked)},
-    {BALSA_PIXMAP_IDENTITY,    BALSA_TOOLBAR_FUNC(change_identity_dialog_cb)},
-    {BALSA_PIXMAP_POSTPONE,    BALSA_TOOLBAR_FUNC(postpone_message_cb)},
-    {GTK_STOCK_PRINT,          BALSA_TOOLBAR_FUNC(print_message_cb)},
-    {GTK_STOCK_SAVE,           BALSA_TOOLBAR_FUNC(save_message_cb)},
-    {BALSA_PIXMAP_SEND,        BALSA_TOOLBAR_FUNC(send_message_toolbar_cb)},
-    {GTK_STOCK_CLOSE,          BALSA_TOOLBAR_FUNC(close_window_cb)},
-#if HAVE_GTKSPELL
-    {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_tb_cb)},
-#else                           /* HAVE_GTKSPELL */
-    {GTK_STOCK_SPELL_CHECK,    BALSA_TOOLBAR_FUNC(spell_check_cb)},
-#endif                          /* HAVE_GTKSPELL */
-#ifdef HAVE_GPGME
-    {BALSA_PIXMAP_GPG_SIGN,    BALSA_TOOLBAR_FUNC(toggle_sign_tb_cb)},
-    {BALSA_PIXMAP_GPG_ENCRYPT, BALSA_TOOLBAR_FUNC(toggle_encrypt_tb_cb)},
-#endif
-    {GTK_STOCK_UNDO,           BALSA_TOOLBAR_FUNC(sw_undo_cb)},
-    {GTK_STOCK_REDO,           BALSA_TOOLBAR_FUNC(sw_redo_cb)},
-};
-
 /* Standard buttons; "" means a separator. */
 static const gchar* compose_toolbar[] = {
 #if defined(ENABLE_TOUCH_UI)
@@ -4365,11 +4327,10 @@ static const gchar* compose_toolbar[] = {
 
 /* Create the toolbar model for the compose window's toolbar.
  */
-BalsaToolbarModel *
-sendmsg_window_get_toolbar_model(void)
+static BalsaToolbarModel *
+sw_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
-    GSList *legal;
     GSList *standard;
     GSList **current;
     guint i;
@@ -4377,28 +4338,49 @@ sendmsg_window_get_toolbar_model(void)
     if (model)
         return model;
 
-    legal = NULL;
-    for (i = 0; i < ELEMENTS(callback_table); i++)
-        legal = g_slist_append(legal, g_strdup(callback_table[i].icon_id));
-
     standard = NULL;
     for (i = 0; i < ELEMENTS(compose_toolbar); i++)
         standard = g_slist_append(standard, g_strdup(compose_toolbar[i]));
 
     current = &balsa_app.compose_window_toolbar_current;
 
-    model = balsa_toolbar_model_new(legal, standard, current);
+    model = balsa_toolbar_model_new(standard, current);
+    balsa_toolbar_model_add_actions(model, entries, G_N_ELEMENTS(entries));
+    balsa_toolbar_model_add_actions(model, ready_entries,
+                                    G_N_ELEMENTS(ready_entries));
+    balsa_toolbar_model_add_toggle_actions(model, toggle_entries,
+                                           G_N_ELEMENTS(toggle_entries));
 
     return model;
 }
 
-static void
-bsmsg_identities_changed_cb(BalsaSendmsg *bsmsg)
+static BalsaToolbarModel *
+sw_get_toolbar_model_and_ui_manager(BalsaSendmsg * bsmsg,
+                                    GtkUIManager ** ui_manager)
 {
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_IDENTITY,
-                                       g_list_length(balsa_app.identities)>1);
+    BalsaToolbarModel *model = sw_get_toolbar_model();
+
+    if (ui_manager) {
+        *ui_manager = sw_get_ui_manager(bsmsg);
+        g_signal_connect(model, "changed",
+                         G_CALLBACK(balsa_toolbar_model_update_ui),
+                         *ui_manager);
+    }
+
+    return model;
+}
+
+BalsaToolbarModel *
+sendmsg_window_get_toolbar_model(GtkUIManager ** ui_manager)
+{
+    return sw_get_toolbar_model_and_ui_manager(NULL, ui_manager);
+}
+
+static void
+bsmsg_identities_changed_cb(BalsaSendmsg * bsmsg)
+{
+    sw_set_sensitive(bsmsg, "SelectIdentity",
+                     balsa_app.identities->next != NULL);
 }
 
 static void
@@ -4427,20 +4409,23 @@ sw_cc_add_list(GString * cc, InternetAddressList * list)
 }
 
 static BalsaSendmsg*
-sendmsg_window_new(GtkWidget *w)
+sendmsg_window_new()
 {
     BalsaToolbarModel *model;
     GtkWidget *toolbar;
     GtkWidget *window;
     GtkWidget *main_box = gtk_vbox_new(FALSE, 0);
     BalsaSendmsg *bsmsg = NULL;
-    unsigned i;
 #if HAVE_GTKSPELL
     gchar* tmp;
 #endif
 #if HAVE_GTKSOURCEVIEW
     GtkSourceBuffer *source_buffer;
 #endif                          /* HAVE_GTKSOURCEVIEW */
+    GtkUIManager *ui_manager;
+    GtkAccelGroup *accel_group;
+    GError *error;
+    GtkWidget *menubar;
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
     bsmsg->in_reply_to = NULL;
@@ -4481,33 +4466,43 @@ sendmsg_window_new(GtkWidget *w)
 
     bsmsg->draft_message = NULL;
     bsmsg->parent_message = NULL;
-    g_signal_connect(G_OBJECT(bsmsg->window), "delete-event",
+    g_signal_connect(G_OBJECT(window), "delete-event",
 		     G_CALLBACK(delete_event_cb), bsmsg);
-    g_signal_connect(G_OBJECT(bsmsg->window), "destroy",
+    g_signal_connect(G_OBJECT(window), "destroy",
 		     G_CALLBACK(destroy_event_cb), bsmsg);
-    g_signal_connect(G_OBJECT(bsmsg->window), "size_allocate",
+    g_signal_connect(G_OBJECT(window), "size_allocate",
 		     G_CALLBACK(sw_size_alloc_cb), bsmsg);
 
-    gnome_app_create_menus_with_data(GNOME_APP(window), main_menu, bsmsg);
-    /* Save the widgets that we need to toggle--they'll be overwritten
-     * if another compose window is opened. */
-    bsmsg->undo_widget = edit_menu[EDIT_MENU_UNDO].widget;
-    bsmsg->redo_widget = edit_menu[EDIT_MENU_REDO].widget;
+    model = sw_get_toolbar_model_and_ui_manager(bsmsg, &ui_manager);
+    g_object_weak_ref(G_OBJECT(bsmsg->window), (GWeakNotify) g_object_unref,
+                      ui_manager);
+
+    accel_group = gtk_ui_manager_get_accel_group(ui_manager);
+    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+    g_object_unref(accel_group);
+
+    error = NULL;
+    if (!gtk_ui_manager_add_ui_from_string
+        (ui_manager, ui_description, -1, &error)) {
+        g_message("building menus failed: %s", error->message);
+        g_error_free(error);
+        g_object_unref(ui_manager);
+        g_object_unref(window);
+        g_free(bsmsg);
+        return NULL;
+    }
+
+    menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
+    gnome_app_set_menus(GNOME_APP(window), GTK_MENU_BAR(menubar));
+
+    toolbar = balsa_toolbar_new(model, ui_manager);
+    gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
 
     bsmsg->flow = !balsa_app.wordwrap;
-    bsmsg->flow_widget = edit_menu[EDIT_MENU_REFLOW_SELECTED].widget;
-    gtk_widget_set_sensitive(bsmsg->flow_widget, bsmsg->flow);
+    sw_set_sensitive(bsmsg, "Reflow", bsmsg->flow);
 
-    model = sendmsg_window_get_toolbar_model();
-    toolbar = balsa_toolbar_new(model);
-    for(i=0; i < ELEMENTS(callback_table); i++)
-        balsa_toolbar_set_callback(toolbar, callback_table[i].icon_id,
-                                   G_CALLBACK(callback_table[i].callback),
-                                   bsmsg);
-
-    gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_IDENTITY,
-                                       g_list_length(balsa_app.identities)>1);
+    sw_set_sensitive(bsmsg, "SelectIdentity",
+                     balsa_app.identities->next != NULL);
     bsmsg->identities_changed_id = 
         g_signal_connect_swapped(balsa_app.main_window, "identities-changed",
                                  (GCallback)bsmsg_identities_changed_cb,
@@ -4516,28 +4511,13 @@ sendmsg_window_new(GtkWidget *w)
     sw_buffer_set_undo(bsmsg, TRUE, FALSE);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-    bsmsg->ready_widgets[0] = file_menu[MENU_FILE_SEND_POS].widget;
-    bsmsg->ready_widgets[1] = file_menu[MENU_FILE_QUEUE_POS].widget;
-    bsmsg->ready_widgets[2] = file_menu[MENU_FILE_POSTPONE_POS].widget;
-
     /* set options */
     bsmsg->req_dispnotify = FALSE;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(DISPNOTIFY_WIDGET),
-                                   FALSE);
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                   (opts_menu[OPTS_MENU_FORMAT_POS].
-                                    widget), bsmsg->flow);
+
+    sw_set_active(bsmsg, "Flowed", bsmsg->flow);
 
 #ifdef HAVE_GPGME
-    bsmsg_setup_gpg_ui(bsmsg, toolbar);
-#endif
-#if HAVE_GTKSPELL
-#if defined(ENABLE_TOUCH_UI)
-    bsmsg->spell_check_menu_item =
-        tu_tools_menu[TU_TOOLS_MENU_SPELL_CHECK_POS].widget;
-#else  /* defined(ENABLE_TOUCH_UI) */
-    bsmsg->spell_check_menu_item = edit_menu[EDIT_MENU_SPELL_CHECK].widget;
-#endif /* defined(ENABLE_TOUCH_UI) */
+    bsmsg_setup_gpg_ui(bsmsg);
 #endif
 
     /* create the top portion with the to, from, etc in it */
@@ -4564,10 +4544,8 @@ sendmsg_window_new(GtkWidget *w)
                       GINT_TO_POINTER(TRUE));
     gtk_source_buffer_begin_not_undoable_action(source_buffer);
     gtk_source_buffer_end_not_undoable_action(source_buffer);
-    gtk_widget_set_sensitive(bsmsg->undo_widget, FALSE);
-    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_UNDO, FALSE);
-    gtk_widget_set_sensitive(bsmsg->redo_widget, FALSE);
-    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_REDO, FALSE);
+    sw_set_sensitive(bsmsg, "Undo", FALSE);
+    sw_set_sensitive(bsmsg, "Redo", FALSE);
 #else                           /* HAVE_GTKSOURCEVIEW */
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 #endif                          /* HAVE_GTKSOURCEVIEW */
@@ -4578,14 +4556,20 @@ sendmsg_window_new(GtkWidget *w)
 	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
 			 G_CALLBACK(delete_event_cb), bsmsg);
     
-    create_lang_menu(LANG_MENU_WIDGET, bsmsg);
+    bsmsg->current_language_menu =
+#if !defined(ENABLE_TOUCH_UI)
+        gtk_ui_manager_get_widget(ui_manager, "/MainMenu/LanguageMenu");
+#else                           /* ENABLE_TOUCH_UI */
+        gtk_ui_manager_get_widget(ui_manager,
+                                  "/MainMenu/ToolsMenu/LanguageMenu");
+#endif                          /* ENABLE_TOUCH_UI */
+    create_lang_menu(bsmsg->current_language_menu, bsmsg);
 
 #if HAVE_GTKSPELL
     /* Steal balsa_app.spell_check_lang and restore it. */
     tmp = balsa_app.spell_check_lang;
     balsa_app.spell_check_lang = NULL;
-    balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
-                                    tmp != NULL);
+    sw_set_active(bsmsg, "CheckSpelling", tmp != NULL);
     g_free(balsa_app.spell_check_lang);
     balsa_app.spell_check_lang = tmp;
 #endif
@@ -4615,9 +4599,9 @@ insert_initial_sig(BalsaSendmsg *bsmsg)
 }
 
 BalsaSendmsg*
-sendmsg_window_compose(GtkWidget *w)
+sendmsg_window_compose(void)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new();
 
     /* set the initial window title */
     bsmsg->type = SEND_NORMAL;
@@ -4758,13 +4742,13 @@ set_identity(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
     setup_headers_from_identity(bsmsg, bsmsg->ident);
 }
 
-BalsaSendmsg*
-sendmsg_window_reply(GtkWidget *w, LibBalsaMailbox *mailbox, guint msgno,
+BalsaSendmsg *
+sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
                      SendType reply_type)
 {
     LibBalsaMessage *message =
         libbalsa_mailbox_get_message(mailbox, msgno);
-    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new();
 
     g_assert(message);
     switch(reply_type) {
@@ -4799,10 +4783,10 @@ sendmsg_window_reply(GtkWidget *w, LibBalsaMailbox *mailbox, guint msgno,
 }
 
 BalsaSendmsg*
-sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
+sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
                               SendType reply_type)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new();
     LibBalsaMessageHeaders *headers;
 
     g_assert(part);
@@ -4848,12 +4832,12 @@ sendmsg_window_reply_embedded(GtkWidget *w, LibBalsaMessageBody *part,
 }
 
 BalsaSendmsg*
-sendmsg_window_forward(GtkWidget *w, LibBalsaMailbox *mailbox, guint msgno,
+sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno,
                        gboolean attach)
 {
     LibBalsaMessage *message =
         libbalsa_mailbox_get_message(mailbox, msgno);
-    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new();
     g_assert(message);
     
     bsmsg->type = attach ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE;
@@ -4887,12 +4871,11 @@ sendmsg_window_forward(GtkWidget *w, LibBalsaMailbox *mailbox, guint msgno,
 }
 
 BalsaSendmsg*
-sendmsg_window_continue(GtkWidget *w, LibBalsaMailbox * mailbox,
-                        guint msgno)
+sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message =
         libbalsa_mailbox_get_message(mailbox, msgno);
-    BalsaSendmsg *bsmsg = sendmsg_window_new(w);
+    BalsaSendmsg *bsmsg = sendmsg_window_new();
     const gchar *postpone_hdr;
     GList *list, *refs = NULL;
 
@@ -4925,13 +4908,12 @@ sendmsg_window_continue(GtkWidget *w, LibBalsaMailbox * mailbox,
 #endif
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-MDN")))
-            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                           (DISPNOTIFY_WIDGET),
-                                           atoi(postpone_hdr) != 0);
+        sw_set_active(bsmsg, "RequestMDN", atoi(postpone_hdr) != 0);
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Lang"))) {
         GtkWidget *langs =
-            gtk_menu_item_get_submenu(GTK_MENU_ITEM(LANG_MENU_WIDGET));
+            gtk_menu_item_get_submenu(GTK_MENU_ITEM
+                                      (bsmsg->current_language_menu));
         GList *children = gtk_container_get_children(GTK_CONTAINER(langs));
         unsigned selected_pos = find_locale_index_by_locale(postpone_hdr);
         set_locale(bsmsg, selected_pos);
@@ -4941,10 +4923,7 @@ sendmsg_window_continue(GtkWidget *w, LibBalsaMailbox * mailbox,
     }
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Format")))
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                       (opts_menu
-                                        [OPTS_MENU_FORMAT_POS].widget),
-                                       strcmp(postpone_hdr, "Fixed"));
+        sw_set_active(bsmsg, "Flowed", strcmp(postpone_hdr, "Fixed"));
 
     for (list = message->references; list; list = list->next)
         refs = g_list_prepend(refs, g_strdup(list->data));
@@ -5241,8 +5220,8 @@ insert_file_response(GtkWidget * selector, gint response,
     g_free(fname);
 }
 
-static gint
-include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+include_file_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     GtkWidget *file_selector;
 
@@ -5263,8 +5242,6 @@ include_file_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 
     /* Display that dialog */
     gtk_widget_show(file_selector);
-
-    return TRUE;
 }
 
 
@@ -5871,26 +5848,19 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     return TRUE;
 }
 
-/* "send message" toolbar callback */
-static void
-send_message_toolbar_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
-}
-
 
 /* "send message" menu callback */
-static gint
-send_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+send_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
-    return send_message_handler(bsmsg, FALSE);
+    send_message_handler(bsmsg, FALSE);
 }
 
 
-static gint
-queue_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+queue_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
-    return send_message_handler(bsmsg, TRUE);
+    send_message_handler(bsmsg, TRUE);
 }
 
 static gboolean
@@ -5899,8 +5869,6 @@ message_postpone(BalsaSendmsg * bsmsg)
     gboolean successp;
     LibBalsaMessage *message;
     GPtrArray *headers;
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
 
     /* Silent fallback to UTF-8 */
     if(!is_charset_ok(bsmsg, TRUE))
@@ -5919,10 +5887,16 @@ message_postpone(BalsaSendmsg * bsmsg)
     g_ptr_array_add(headers, g_strdup("X-Balsa-Crypto"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->gpg_mode));
 #endif
-    if (balsa_toolbar_get_button_active(toolbar, GTK_STOCK_SPELL_CHECK)) {
+
+#if HAVE_GTKSPELL
+    if (sw_get_active(bsmsg, "CheckSpelling")) {
         g_ptr_array_add(headers, g_strdup("X-Balsa-Lang"));
         g_ptr_array_add(headers, g_strdup(bsmsg->spell_check_lang));
     }
+#else  /* HAVE_GTKSPELL */
+    g_ptr_array_add(headers, g_strdup("X-Balsa-Lang"));
+    g_ptr_array_add(headers, g_strdup(bsmsg->spell_check_lang));
+#endif /* HAVE_GTKSPELL */
     g_ptr_array_add(headers, g_strdup("X-Balsa-Format"));
     g_ptr_array_add(headers, g_strdup(bsmsg->flow ? "Flowed" : "Fixed"));
     g_ptr_array_add(headers, NULL);
@@ -5952,9 +5926,9 @@ message_postpone(BalsaSendmsg * bsmsg)
     return successp;
 }
 
-/* "postpone message" menu and toolbar callback */
+/* "postpone message" menu callback */
 static void
-postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+postpone_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     if (is_ready_to_send(bsmsg)) {
         if(message_postpone(bsmsg)) {
@@ -5971,7 +5945,7 @@ postpone_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 }
 
 static void
-save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+save_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     if (sw_save_draft(bsmsg))
         bsmsg->state = SENDMSG_STATE_CLEAN;
@@ -5980,7 +5954,7 @@ save_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 #ifdef HAVE_GTK_PRINT
 #if !defined(ENABLE_TOUCH_UI)
 static void
-page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+page_setup_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message;
 
@@ -5992,7 +5966,7 @@ page_setup_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 #endif
 
 static void
-print_message_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+print_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     LibBalsaMessage *message;
 
@@ -6023,7 +5997,7 @@ sw_buffer_insert_text(GtkTextBuffer * buffer, GtkTextIter * iter,
     /* If this insertion is not from the keyboard, or if we just undid
      * something, save the current buffer for undo. */
     if (len > 1 /* Not keyboard? */
-        || !GTK_WIDGET_IS_SENSITIVE(bsmsg->undo_widget))
+        || !sw_get_sensitive(bsmsg, "Undo"))
         sw_buffer_save(bsmsg);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 }
@@ -6102,13 +6076,8 @@ sw_buffer_signals_disconnect(BalsaSendmsg * bsmsg)
 static void
 sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo, gboolean redo)
 {
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-    gtk_widget_set_sensitive(bsmsg->undo_widget, undo);
-    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_UNDO, undo);
-    gtk_widget_set_sensitive(bsmsg->redo_widget, redo);
-    balsa_toolbar_set_button_sensitive(toolbar, GTK_STOCK_REDO, redo);
+    sw_set_sensitive(bsmsg, "Undo", undo);
+    sw_set_sensitive(bsmsg, "Redo", redo);
 }
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
@@ -6124,9 +6093,6 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
     if (spell)
         bsmsg->spell_check_error = FALSE;
     else {
-        GtkWidget *toolbar =
-            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
         bsmsg->spell_check_error = TRUE;
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error starting spell checker: %s"),
@@ -6134,8 +6100,7 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
         g_error_free(err);
 
         /* No spell checker, so deactivate the button. */
-        balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
-                                        FALSE);
+        sw_set_active(bsmsg, "CheckSpelling", FALSE);
     }
 }
 
@@ -6200,25 +6165,25 @@ sw_buffer_save(BalsaSendmsg * bsmsg)
 
 #if HAVE_GTKSOURCEVIEW
 static void
-sw_undo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+sw_undo_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     g_signal_emit_by_name(bsmsg->text, "undo");
 }
 
 static void
-sw_redo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+sw_redo_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     g_signal_emit_by_name(bsmsg->text, "redo");
 }
 #else                           /* HAVE_GTKSOURCEVIEW */
 static void
-sw_undo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+sw_undo_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     sw_buffer_swap(bsmsg, TRUE);
 }
 
 static void
-sw_redo_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+sw_redo_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     sw_buffer_swap(bsmsg, FALSE);
 }
@@ -6241,19 +6206,19 @@ clipboard_helper(BalsaSendmsg * bsmsg, gchar * signal)
 }
 
 static void
-cut_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+cut_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     clipboard_helper(bsmsg, "cut-clipboard");
 }
 
 static void
-copy_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+copy_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     clipboard_helper(bsmsg, "copy-clipboard");
 }
 
 static void
-paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+paste_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     clipboard_helper(bsmsg, "paste-clipboard");
 }
@@ -6262,13 +6227,13 @@ paste_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
  * More menu callbacks.
  */
 static void
-select_all_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+select_all_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     balsa_window_select_all(GTK_WINDOW(bsmsg->window));
 }
 
 static void
-wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+wrap_body_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
 #if !HAVE_GTKSOURCEVIEW
     sw_buffer_save(bsmsg);
@@ -6277,7 +6242,7 @@ wrap_body_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 }
 
 static void
-reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+reflow_selected_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
@@ -6315,27 +6280,28 @@ reflow_selected_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
 static void
 check_readiness(BalsaSendmsg * bsmsg)
 {
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-    unsigned i;
-    gboolean state = is_ready_to_send(bsmsg);
-
-    for (i = 0; i < ELEMENTS(bsmsg->ready_widgets); i++)
-        gtk_widget_set_sensitive(bsmsg->ready_widgets[i], state);
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_SEND, state);
-    balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_POSTPONE, state);
+    gtk_action_group_set_sensitive(bsmsg->ready_action_group,
+                                   is_ready_to_send(bsmsg));
 }
+
+static const gchar * const header_action_names[] = {
+#if !defined(ENABLE_TOUCH_UI)
+    "From", "Cc", "Bcc", "Fcc", "ReplyTo"
+#else                           /* ENABLE_TOUCH_UI */
+    "From", "Cc", "Bcc", "Fcc"
+#endif                          /* ENABLE_TOUCH_UI */
+};
 
 /* toggle_entry:
    auxiliary function for "header show/hide" toggle menu entries.
    saves the show header configuration.
  */
-static gint
-toggle_entry(BalsaSendmsg * bsmsg, GtkWidget * entry[], int pos)
+static void
+toggle_entry(GtkToggleAction * toggle_action, BalsaSendmsg * bsmsg,
+             GtkWidget * entry[])
 {
-    unsigned i;
-    void (*widget_func)(GtkWidget *) =
-        GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[pos])->active ?
+    void (*widget_func) (GtkWidget *) =
+        gtk_toggle_action_get_active(toggle_action) ?
         gtk_widget_show_all : gtk_widget_hide;
 
     widget_func(entry[0]);
@@ -6343,186 +6309,130 @@ toggle_entry(BalsaSendmsg * bsmsg, GtkWidget * entry[], int pos)
     if (entry[2])
         widget_func(entry[2]);
 
-    if(bsmsg->update_config) { /* then save the config */
+    if (bsmsg->update_config) { /* then save the config */
         GString *str = g_string_new(NULL);
+        unsigned i;
 
-	for (i = 0; i < ELEMENTS(headerDescs); i++)
-	    if (GTK_CHECK_MENU_ITEM(bsmsg->view_checkitems[i])->active) {
+        for (i = 0; i < G_N_ELEMENTS(header_action_names); i++) {
+            if (sw_get_active(bsmsg, header_action_names[i])) {
                 if (str->len > 0)
                     g_string_append_c(str, ' ');
-                g_string_append(str, headerDescs[i].name);
-	    }
-	g_free(balsa_app.compose_headers);
-	balsa_app.compose_headers = g_string_free(str, FALSE);
+                g_string_append(str, header_action_names[i]);
+            }
+        }
+        g_free(balsa_app.compose_headers);
+        balsa_app.compose_headers = g_string_free(str, FALSE);
     }
-
-    return TRUE;
 }
 
-static gint
-toggle_from_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+toggle_from_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->from, MENU_TOGGLE_FROM_POS);
+    toggle_entry(action, bsmsg, bsmsg->from);
 }
 
-static gint
-toggle_cc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+toggle_cc_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->cc, MENU_TOGGLE_CC_POS);
+    toggle_entry(action, bsmsg, bsmsg->cc);
 }
 
-static gint
-toggle_bcc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+toggle_bcc_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->bcc, MENU_TOGGLE_BCC_POS);
+    toggle_entry(action, bsmsg, bsmsg->bcc);
 }
 
-static gint
-toggle_fcc_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+toggle_fcc_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->fcc, MENU_TOGGLE_FCC_POS);
+    toggle_entry(action, bsmsg, bsmsg->fcc);
 }
 
 #if !defined(ENABLE_TOUCH_UI)
-static gint
-toggle_reply_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+toggle_reply_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    return toggle_entry(bsmsg, bsmsg->reply_to, MENU_TOGGLE_REPLY_POS);
+    toggle_entry(action, bsmsg, bsmsg->reply_to);
 }
-#endif /* ENABLE_TOUCH_UI */
+#endif                          /* ENABLE_TOUCH_UI */
 
 static void
-toggle_reqdispnotify_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+toggle_reqdispnotify_cb(GtkToggleAction * action,
+                        BalsaSendmsg * bsmsg)
 {
-    bsmsg->req_dispnotify = GTK_CHECK_MENU_ITEM(widget)->active;
+    bsmsg->req_dispnotify = gtk_toggle_action_get_active(action);
 }
 
 static void
-toggle_format_cb(GtkCheckMenuItem * check_menu_item, BalsaSendmsg * bsmsg)
+toggle_format_cb(GtkToggleAction * toggle_action, BalsaSendmsg * bsmsg)
 {
-    bsmsg->flow = gtk_check_menu_item_get_active(check_menu_item);
-    gtk_widget_set_sensitive(bsmsg->flow_widget, bsmsg->flow);
+    bsmsg->flow = gtk_toggle_action_get_active(toggle_action);
+    sw_set_sensitive(bsmsg, "Reflow", bsmsg->flow);
 }
 
 #ifdef HAVE_GPGME
-static void 
-toggle_sign_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+static void
+toggle_gpg_helper(GtkToggleAction * action, BalsaSendmsg * bsmsg,
+                  guint mask)
 {
     gboolean butval, radio_on;
-    GtkWidget *toolbar = g_object_get_data(G_OBJECT(widget), "toolbar");
-    GtkWidget *rb1 = g_object_get_data(G_OBJECT(widget), "radbut-1");
-    GtkWidget *rb2 = g_object_get_data(G_OBJECT(widget), "radbut-2");
-#ifdef HAVE_SMIME
-    GtkWidget *rb3 = g_object_get_data(G_OBJECT(widget), "radbut-3");
-#endif
 
-    g_return_if_fail(toolbar != NULL);
-    g_return_if_fail(rb1 != NULL);
-    g_return_if_fail(rb2 != NULL);
-    butval = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+    butval = gtk_toggle_action_get_active(action);
     if (butval)
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_SIGN;
+        bsmsg->gpg_mode |= mask;
     else
-	bsmsg->gpg_mode &= ~LIBBALSA_PROTECT_SIGN;
+        bsmsg->gpg_mode &= ~mask;
 
     radio_on = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) > 0;
-    gtk_widget_set_sensitive(rb1, radio_on);
-    gtk_widget_set_sensitive(rb2, radio_on);
-#ifdef HAVE_SMIME
-    gtk_widget_set_sensitive(rb3, radio_on);
-#endif
-
-    balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_GPG_SIGN, butval);
+#if !defined(ENABLE_TOUCH_UI)
+    gtk_action_group_set_sensitive(bsmsg->gpg_action_group, radio_on);
+#endif                          /* ENABLE_TOUCH_UI */
 }
-
-
-static void 
-toggle_sign_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                   (bsmsg->gpg_sign_menu_item),
-                                   gtk_toggle_tool_button_get_active
-                                   (GTK_TOGGLE_TOOL_BUTTON(widget)));
-}
-
-
-static void 
-toggle_encrypt_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    gboolean butval, radio_on;
-    GtkWidget *toolbar = g_object_get_data(G_OBJECT(widget), "toolbar");
-    GtkWidget *rb1 = g_object_get_data(G_OBJECT(widget), "radbut-1");
-    GtkWidget *rb2 = g_object_get_data(G_OBJECT(widget), "radbut-2");
-#ifdef HAVE_SMIME
-    GtkWidget *rb3 = g_object_get_data(G_OBJECT(widget), "radbut-3");
-#endif
-
-    g_return_if_fail(toolbar != NULL);
-    g_return_if_fail(rb1 != NULL);
-    g_return_if_fail(rb2 != NULL);
-    butval = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
-    if (butval)
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_ENCRYPT;
-    else
-	bsmsg->gpg_mode &= ~LIBBALSA_PROTECT_ENCRYPT;
-
-    radio_on = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) > 0;
-    gtk_widget_set_sensitive(rb1, radio_on);
-    gtk_widget_set_sensitive(rb2, radio_on);
-#ifdef HAVE_SMIME
-    gtk_widget_set_sensitive(rb3, radio_on);
-#endif
-
-    balsa_toolbar_set_button_active(toolbar, BALSA_PIXMAP_GPG_ENCRYPT, butval);
-}
-
-
-static void 
-toggle_encrypt_tb_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
-{
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                   (bsmsg->gpg_encrypt_menu_item),
-                                   gtk_toggle_tool_button_get_active
-                                   (GTK_TOGGLE_TOOL_BUTTON(widget)));
-}
-
 
 static void
-toggle_gpg_mode_cb(GtkWidget * widget, BalsaSendmsg * bsmsg)
+toggle_sign_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    gint rfc_flag = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
-						      GNOMEUIINFO_KEY_UIDATA));
-
-    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
-	bsmsg->gpg_mode = (bsmsg->gpg_mode & ~LIBBALSA_PROTECT_PROTOCOL) | rfc_flag;
+    toggle_gpg_helper(action, bsmsg, LIBBALSA_PROTECT_SIGN);
 }
-#endif  /* HAVE_GPGME */
+
+static void
+toggle_encrypt_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
+{
+    toggle_gpg_helper(action, bsmsg, LIBBALSA_PROTECT_ENCRYPT);
+}
+
+#if !defined(ENABLE_TOUCH_UI)
+static void
+gpg_mode_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
+                  BalsaSendmsg * bsmsg)
+{
+    guint rfc_flag = gtk_radio_action_get_current_value(action);
+
+    bsmsg->gpg_mode =
+        (bsmsg->gpg_mode & ~LIBBALSA_PROTECT_PROTOCOL) | rfc_flag;
+}
+#endif                          /* ENABLE_TOUCH_UI */
+#endif                          /* HAVE_GPGME */
 
 
 /* init_menus:
    performs the initial menu setup: shown headers as well as correct
-   message charset. Copies also the the menu pointers for further usage
-   at the message close  - they would be overwritten if another compose
-   window was opened simultaneously.
+   message charset.
 */
 static void
 init_menus(BalsaSendmsg * bsmsg)
 {
     unsigned i;
 
-    g_assert(ELEMENTS(headerDescs) == ELEMENTS(bsmsg->view_checkitems));
-
-    for (i = 0; i < ELEMENTS(headerDescs); i++) {
-	bsmsg->view_checkitems[i] = view_menu[i].widget;
-	if (libbalsa_find_word(headerDescs[i].name, 
-			       balsa_app.compose_headers)) {
-	    /* show... (well, it has already been shown). */
-	    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-					   (view_menu[i].widget), TRUE);
-	} else {
-	    /* or hide... */
-	    VIEW_MENU_FUNC(view_menu[i].moreinfo)(view_menu[i].widget, bsmsg);
-	}
+    for (i = 0; i < G_N_ELEMENTS(header_action_names); i++) {
+        gboolean found =
+            libbalsa_find_word(header_action_names[i],
+                               balsa_app.compose_headers);
+        /* This action is initially active, so if found is FALSE,
+         * setting it inactive will trigger the callback, which will
+         * hide the address line. */
+        sw_set_active(bsmsg, header_action_names[i], found);
     }
 
     /* gray 'send' and 'postpone' */
@@ -6538,11 +6448,7 @@ static gint
 set_locale(BalsaSendmsg * bsmsg, gint idx)
 {
 #if HAVE_GTKSPELL
-    gboolean had_spell;
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-    had_spell = sw_spell_detach(bsmsg);
+    gboolean had_spell = sw_spell_detach(bsmsg);
 
 #endif                          /* HAVE_GTKSPELL */
     g_free(bsmsg->charset);
@@ -6555,27 +6461,21 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
     if (had_spell)
         sw_spell_attach(bsmsg);
     else if (bsmsg->spell_check_error)
-        balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
-                                        TRUE);
+        sw_set_active(bsmsg, "CheckSpelling", TRUE);
 
 #endif                          /* HAVE_GTKSPELL */
     return FALSE;
 }
 
 #if HAVE_GTKSPELL
-/* spell_check_menu_cb, spell_check_tb_cb
+/* spell_check_menu_cb
  *
  * Toggle the spell checker
  */
 static void
-spell_check_menu_cb(GtkCheckMenuItem * item, BalsaSendmsg * bsmsg)
+spell_check_menu_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    gboolean is_active = gtk_check_menu_item_get_active(item);
-    GtkWidget *toolbar =
-        balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-    balsa_toolbar_set_button_active(toolbar, GTK_STOCK_SPELL_CHECK,
-                                    is_active);
+    gboolean is_active = gtk_toggle_action_get_active(action);
 
     sw_spell_detach(bsmsg);
     g_free(balsa_app.spell_check_lang);
@@ -6587,22 +6487,13 @@ spell_check_menu_cb(GtkCheckMenuItem * item, BalsaSendmsg * bsmsg)
     }
 }
 
-static void
-spell_check_tb_cb(GtkToggleToolButton * button, BalsaSendmsg * bsmsg)
-{
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                   (bsmsg->spell_check_menu_item),
-                                   gtk_toggle_tool_button_get_active
-                                   (button));
-}
-
 #else                           /* HAVE_GTKSPELL */
 /* spell_check_cb
  * 
  * Start the spell check
  * */
 static void
-spell_check_cb(GtkToggleToolButton *button, BalsaSendmsg * bsmsg)
+spell_check_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
     BalsaSpellCheck *sc;
@@ -6657,9 +6548,9 @@ static void
 lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 {
     if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w))) {
-	gint i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
-						   GNOMEUIINFO_KEY_UIDATA));
-	set_locale(bsmsg, i);
+        gint i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
+                                                   BALSA_LANGUAGE_MENU_POS));
+        set_locale(bsmsg, i);
     }
 #if HAVE_GTKSPELL
     g_free(balsa_app.spell_check_lang);
@@ -6673,7 +6564,7 @@ lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
  * called by compose_from_list (balsa-index.c)
  */
 BalsaSendmsg *
-sendmsg_window_new_from_list(GtkWidget * w, LibBalsaMailbox * mailbox,
+sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
                              GArray * selected, SendType type)
 {
     BalsaSendmsg *bsmsg;
@@ -6688,7 +6579,7 @@ sendmsg_window_new_from_list(GtkWidget * w, LibBalsaMailbox * mailbox,
     switch(type) {
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
-        bsmsg = sendmsg_window_forward(w, mailbox, msgno,
+        bsmsg = sendmsg_window_forward(mailbox, msgno,
                                        type == SEND_FORWARD_ATTACH);
         break;
     default:
@@ -6878,88 +6769,59 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
 
 #ifdef HAVE_GPGME
 static void
-bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
-                                    LibBalsaIdentity *ident)
+bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg * bsmsg,
+                                    LibBalsaIdentity * ident)
 {
     /* do nothing if we don't support crypto */
     if (!balsa_app.has_openpgp && !balsa_app.has_smime)
-	return;
+        return;
 
     /* preset according to identity */
     bsmsg->gpg_mode = 0;
     if (ident->always_trust)
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_ALWAYS_TRUST;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-				   ident->gpg_sign);
+        bsmsg->gpg_mode |= LIBBALSA_PROTECT_ALWAYS_TRUST;
+
+    sw_set_active(bsmsg, "SignMessage", ident->gpg_sign);
     if (ident->gpg_sign)
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_SIGN;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-				   ident->gpg_encrypt);
+        bsmsg->gpg_mode |= LIBBALSA_PROTECT_SIGN;
+
+    sw_set_active(bsmsg, "EncryptMessage", ident->gpg_encrypt);
     if (ident->gpg_encrypt)
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_ENCRYPT;
+        bsmsg->gpg_mode |= LIBBALSA_PROTECT_ENCRYPT;
+
+#if !defined(ENABLE_TOUCH_UI)
     switch (ident->crypt_protocol) {
     case LIBBALSA_PROTECT_OPENPGP:
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_OPENPGP;
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget),
-				       TRUE);
-	break;
+        bsmsg->gpg_mode |= LIBBALSA_PROTECT_OPENPGP;
+        sw_set_active(bsmsg, "OldOpenPgpMode", TRUE);
+        break;
 #ifdef HAVE_SMIME
     case LIBBALSA_PROTECT_SMIMEV3:
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_SMIMEV3;
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_SMIME_POS].widget),
-				       TRUE);
-	break;
+        bsmsg->gpg_mode |= LIBBALSA_PROTECT_SMIMEV3;
+        sw_set_active(bsmsg, "SMimeMode", TRUE);
+        break;
 #endif
     case LIBBALSA_PROTECT_RFC3156:
     default:
-	bsmsg->gpg_mode |= LIBBALSA_PROTECT_RFC3156;
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget),
-				       TRUE);
+        bsmsg->gpg_mode |= LIBBALSA_PROTECT_RFC3156;
+        sw_set_active(bsmsg, "MimeMode", TRUE);
     }
+#endif                          /* ENABLE_TOUCH_UI */
 }
 
 static void
-bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg, GtkWidget *toolbar)
+bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg)
 {
-    bsmsg->gpg_sign_menu_item = opts_menu[OPTS_MENU_SIGN_POS].widget;
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "toolbar", toolbar);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-1", 
-		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-2", 
-		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
-    bsmsg->gpg_encrypt_menu_item = opts_menu[OPTS_MENU_ENCRYPT_POS].widget;
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "toolbar", 
-                      toolbar);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-1", 
-		      gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-2", 
-		      gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget);
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget,
-			     FALSE);
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget,
-			     FALSE);
-#ifdef HAVE_SMIME
-    g_object_set_data(G_OBJECT(bsmsg->gpg_sign_menu_item), "radbut-3", 
-                      gpg_mode_list[OPTS_MENU_SMIME_POS].widget);
-    g_object_set_data(G_OBJECT(bsmsg->gpg_encrypt_menu_item), "radbut-3", 
-                      gpg_mode_list[OPTS_MENU_SMIME_POS].widget);
-    gtk_widget_set_sensitive(gpg_mode_list[OPTS_MENU_SMIME_POS].widget,
-                             FALSE);
-#endif
+#if !defined(ENABLE_TOUCH_UI)
+    gtk_action_group_set_sensitive(bsmsg->gpg_action_group, FALSE);
+#endif                          /* ENABLE_TOUCH_UI */
 
     /* make everything insensitive if we don't have crypto support */
     if (!balsa_app.has_openpgp && !balsa_app.has_smime) {
-        GtkWidget *toolbar =
-            balsa_toolbar_get_from_gnome_app(GNOME_APP(bsmsg->window));
-
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-                                       FALSE);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-                                       FALSE);
-        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_SIGN_POS].widget, FALSE);
-        gtk_widget_set_sensitive(opts_menu[OPTS_MENU_ENCRYPT_POS].widget, FALSE);
-        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_SIGN, FALSE);
-        balsa_toolbar_set_button_sensitive(toolbar, BALSA_PIXMAP_GPG_ENCRYPT, FALSE);
+        sw_set_active(bsmsg, "SignMessage", FALSE);
+        sw_set_sensitive(bsmsg, "SignMessage", FALSE);
+        sw_set_active(bsmsg, "EncryptMessage", FALSE);
+        sw_set_sensitive(bsmsg, "EncryptMessage", FALSE);
     }
 }
 
@@ -6971,23 +6833,18 @@ bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
 	return;
 
     bsmsg->gpg_mode = mode;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_sign_menu_item),
-				   mode & LIBBALSA_PROTECT_SIGN);
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bsmsg->gpg_encrypt_menu_item),
-				   mode & LIBBALSA_PROTECT_ENCRYPT);
+    sw_set_active(bsmsg, "SignMessage", mode & LIBBALSA_PROTECT_SIGN);
+    sw_set_active(bsmsg, "EncryptMessage", mode & LIBBALSA_PROTECT_ENCRYPT);
 
 #ifdef HAVE_SMIME
     if (mode & LIBBALSA_PROTECT_SMIMEV3)
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_SMIME_POS].widget),
-				       TRUE);
-    else
+        sw_set_active(bsmsg, "SMimeMode", TRUE);
+    else 
 #endif
     if (mode & LIBBALSA_PROTECT_OPENPGP)
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_2440_POS].widget),
-				       TRUE);
+        sw_set_active(bsmsg, "OldOpenPgpMode", TRUE);
     else
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gpg_mode_list[OPTS_MENU_GPG_3156_POS].widget),
-				       TRUE);
+        sw_set_active(bsmsg, "MimeMode", TRUE);
 }
 #endif /* HAVE_GPGME */
 

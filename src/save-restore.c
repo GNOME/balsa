@@ -668,6 +668,7 @@ config_global_load(void)
 {
     gboolean def_used;
     guint tmp;
+    static gboolean new_user = FALSE;
 
     config_address_books_load();
 #if ENABLE_ESMTP
@@ -1127,6 +1128,7 @@ config_global_load(void)
 
     if(!balsa_app.local_mail_directory) {
 	libbalsa_conf_pop_group();
+        new_user = TRUE;
 	return FALSE;
     }
     balsa_app.root_node =
@@ -1185,6 +1187,19 @@ config_global_load(void)
      * files with no smtp server defined (think switching from
      * --without-esmtp build). */
     config_identities_load();
+
+    if (!new_user) {
+        /* Notify user about any changes */
+        libbalsa_conf_push_group("Notifications");
+        if (!libbalsa_conf_get_bool("GtkUIManager")) {
+            g_idle_add((GSourceFunc) config_warning_idle,
+                       _("This version of Balsa uses a new user interface; "
+                         "if you have changed Balsa's keyboard accelerators, "
+                         "you will need to set them again."));
+            libbalsa_conf_set_bool("GtkUIManager", TRUE);
+        }
+        libbalsa_conf_pop_group();
+    }
 
     return TRUE;
 }				/* config_global_load */

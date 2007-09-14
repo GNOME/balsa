@@ -27,6 +27,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"

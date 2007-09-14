@@ -130,17 +130,17 @@ extern "C" {
                           gboolean previous, gboolean wrap);
 
 /* balsa index page stuff */
-    void balsa_message_reply(GtkWidget * widget, gpointer user_data);
-    void balsa_message_replytoall(GtkWidget * widget, gpointer user_data);
-    void balsa_message_replytogroup(GtkWidget * widget, gpointer user_data);
+    void balsa_message_reply(gpointer user_data);
+    void balsa_message_replytoall(gpointer user_data);
+    void balsa_message_replytogroup(gpointer user_data);
 
-    void balsa_message_forward_attached(GtkWidget * widget, gpointer data);
-    void balsa_message_forward_inline(GtkWidget * widget, gpointer data);
-    void balsa_message_forward_quoted(GtkWidget * widget, gpointer data);
-    void balsa_message_forward_default(GtkWidget * widget, gpointer data);
-    void balsa_message_continue(GtkWidget * widget, gpointer data);
+    void balsa_message_forward_attached(gpointer data);
+    void balsa_message_forward_inline(gpointer data);
+    void balsa_message_forward_quoted(gpointer data);
+    void balsa_message_forward_default(gpointer data);
+    void balsa_message_continue(gpointer data);
 
-    void balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data);
+    void balsa_message_move_to_trash(gpointer user_data);
 
     void balsa_index_toggle_flag(BalsaIndex *index,
                                  LibBalsaMessageFlag flag);

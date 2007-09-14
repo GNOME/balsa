@@ -601,8 +601,7 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
          * instead we'll just use the guts of
          * balsa_message_continue: */
         BalsaSendmsg *sm =
-            sendmsg_window_continue(GTK_WIDGET(BALSA_INDEX(tree_view)->window),
-                                    mailbox, msgno);
+            sendmsg_window_continue(mailbox, msgno);
         g_signal_connect(G_OBJECT(sm->window), "destroy",
                          G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     } else
@@ -1492,8 +1491,7 @@ balsa_index_selected_list(BalsaIndex * index)
  * message
  */
 static void
-bndx_compose_foreach(GtkWidget * w, BalsaIndex * index,
-                     SendType send_type)
+bndx_compose_foreach(BalsaIndex * index, SendType send_type)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
     GArray *selected = balsa_index_selected_msgnos_new(index);
@@ -1506,10 +1504,10 @@ bndx_compose_foreach(GtkWidget * w, BalsaIndex * index,
         case SEND_REPLY:
         case SEND_REPLY_ALL:
         case SEND_REPLY_GROUP:
-            sm = sendmsg_window_reply(NULL, mailbox, msgno, send_type);
+            sm = sendmsg_window_reply(mailbox, msgno, send_type);
             break;
         case SEND_CONTINUE:
-            sm = sendmsg_window_continue(NULL, mailbox, msgno);
+            sm = sendmsg_window_continue(mailbox, msgno);
             break;
         default:
             g_assert_not_reached();
@@ -1525,27 +1523,27 @@ bndx_compose_foreach(GtkWidget * w, BalsaIndex * index,
  * Public `reply' methods
  */
 void
-balsa_message_reply(GtkWidget * widget, gpointer user_data)
+balsa_message_reply(gpointer user_data)
 {
-    bndx_compose_foreach(widget, BALSA_INDEX (user_data), SEND_REPLY);
+    bndx_compose_foreach(BALSA_INDEX (user_data), SEND_REPLY);
 }
 
 void
-balsa_message_replytoall(GtkWidget * widget, gpointer user_data)
+balsa_message_replytoall(gpointer user_data)
 {
-    bndx_compose_foreach(widget, BALSA_INDEX (user_data), SEND_REPLY_ALL);
+    bndx_compose_foreach(BALSA_INDEX (user_data), SEND_REPLY_ALL);
 }
 
 void
-balsa_message_replytogroup(GtkWidget * widget, gpointer user_data)
+balsa_message_replytogroup(gpointer user_data)
 {
-    bndx_compose_foreach(widget, BALSA_INDEX (user_data), SEND_REPLY_GROUP);
+    bndx_compose_foreach(BALSA_INDEX (user_data), SEND_REPLY_GROUP);
 }
 
 void
-balsa_message_continue(GtkWidget * widget, gpointer user_data)
+balsa_message_continue(gpointer user_data)
 {
-    bndx_compose_foreach(widget, BALSA_INDEX (user_data), SEND_CONTINUE);
+    bndx_compose_foreach(BALSA_INDEX (user_data), SEND_CONTINUE);
 }
 
 /*
@@ -1553,12 +1551,11 @@ balsa_message_continue(GtkWidget * widget, gpointer user_data)
  * selected messages
  */
 static void
-bndx_compose_from_list(GtkWidget * w, BalsaIndex * index,
-                       SendType send_type)
+bndx_compose_from_list(BalsaIndex * index, SendType send_type)
 {
     GArray *selected = balsa_index_selected_msgnos_new(index);
     BalsaSendmsg *sm =
-        sendmsg_window_new_from_list(w, index->mailbox_node->mailbox,
+        sendmsg_window_new_from_list(index->mailbox_node->mailbox,
                                      selected, send_type);
 
     balsa_index_selected_msgnos_free(index, selected);
@@ -1570,25 +1567,23 @@ bndx_compose_from_list(GtkWidget * w, BalsaIndex * index,
  * Public forwarding methods
  */
 void
-balsa_message_forward_attached(GtkWidget * widget, gpointer user_data)
+balsa_message_forward_attached(gpointer user_data)
 {
-    bndx_compose_from_list(widget, BALSA_INDEX(user_data),
-                           SEND_FORWARD_ATTACH);
+    bndx_compose_from_list(BALSA_INDEX(user_data), SEND_FORWARD_ATTACH);
 }
 
 void
-balsa_message_forward_inline(GtkWidget * widget, gpointer user_data)
+balsa_message_forward_inline(gpointer user_data)
 {
-    bndx_compose_from_list(widget, BALSA_INDEX(user_data),
-                           SEND_FORWARD_INLINE);
+    bndx_compose_from_list(BALSA_INDEX(user_data), SEND_FORWARD_INLINE);
 }
 
 void
-balsa_message_forward_default(GtkWidget * widget, gpointer user_data)
+balsa_message_forward_default(gpointer user_data)
 {
-    bndx_compose_from_list(widget, BALSA_INDEX(user_data),
-                           balsa_app.forward_attached
-                           ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
+    bndx_compose_from_list(BALSA_INDEX(user_data),
+                           balsa_app.forward_attached ?
+                           SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
 }
 
 /*
@@ -1639,7 +1634,7 @@ bndx_do_delete(BalsaIndex* index, gboolean move_to_trash)
  * Public message delete methods
  */
 void
-balsa_message_move_to_trash(GtkWidget * widget, gpointer user_data)
+balsa_message_move_to_trash(gpointer user_data)
 {
     BalsaIndex *index;
 

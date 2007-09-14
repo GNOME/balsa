@@ -25,6 +25,7 @@
 #include "libbalsa.h"
 
 void message_window_new(LibBalsaMailbox * mailbox, guint msgno);
-BalsaToolbarModel *message_window_get_toolbar_model(void);
+BalsaToolbarModel *message_window_get_toolbar_model(GtkUIManager **
+                                                    ui_manager);
 
 #endif				/* __MESSAGE_WINDOW_H__ */

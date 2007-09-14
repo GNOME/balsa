@@ -53,6 +53,12 @@ struct _BalsaWindow {
     GtkWidget *filter_choice;
 
     guint set_message_id;
+
+    GtkActionGroup *action_group;
+    GtkActionGroup *mailbox_action_group;
+    GtkActionGroup *message_action_group;
+    GtkActionGroup *modify_message_action_group;
+    GtkUIManager *ui_manager;
 };
 
 struct _BalsaWindowClass {
@@ -96,12 +102,13 @@ void balsa_window_enable_continue(BalsaWindow * window);
 void balsa_change_window_layout(BalsaWindow *window);
 gboolean mail_progress_notify_cb(void);
 gboolean send_progress_notify_cb(void);
-void check_new_messages_cb(GtkWidget *, gpointer data);
-void check_new_messages_real(GtkWidget *, gpointer data, int type);
+void check_new_messages_cb(GtkAction * action, gpointer data);
+void check_new_messages_real(BalsaWindow * window, int type);
 void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
 void empty_trash(BalsaWindow * window);
 void update_view_menu(BalsaWindow * window);
-BalsaToolbarModel *balsa_window_get_toolbar_model(void);
+BalsaToolbarModel *balsa_window_get_toolbar_model(GtkUIManager **
+                                                  ui_manager);
 void balsa_window_select_all(GtkWindow * window);
 gboolean balsa_window_next_unread(BalsaWindow * window);
 

@@ -72,7 +72,6 @@ extern "C" {
 #if !HAVE_GTKSPELL
 	GtkWidget *spell_checker;
 #else
-	GtkWidget *spell_check_menu_item;
         gboolean   spell_check_error;
 #endif                          /* HAVE_GTKSPELL */
 	GtkWidget *notebook;
@@ -88,9 +87,6 @@ extern "C" {
 	LibBalsaIdentity* ident;
         /* fcc mailbox */
         gchar *fcc_url;
-	/* widgets to be disabled when the address is incorrect */
-	GtkWidget *ready_widgets[3];
-	GtkWidget *view_checkitems[VIEW_MENU_LENGTH];
 	gboolean update_config; /* is the window being set up or in normal  */
 	                        /* operation and user actions should update */
 	                        /* the config */
@@ -105,7 +101,6 @@ extern "C" {
         SendmsgState state;
         gulong identities_changed_id;
 	gboolean flow;          /* send format=flowed */ 
-	GtkWidget *flow_widget;
 	gboolean req_dispnotify; /* send a MDN */ 
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */
@@ -114,31 +109,32 @@ extern "C" {
         GtkStyle *bad_address_style;  
 #ifdef HAVE_GPGME
 	guint gpg_mode;
-	GtkWidget *gpg_sign_menu_item;
-	GtkWidget *gpg_encrypt_menu_item;
 #endif
         GtkWidget *header_table;
 
 #if !HAVE_GTKSOURCEVIEW
         GtkTextBuffer *buffer2;       /* Undo buffer. */
 #endif                          /* HAVE_GTKSOURCEVIEW */
-        GtkWidget *undo_widget;
-        GtkWidget *redo_widget;
 
         /* To update cursor after text is inserted. */
         GtkTextMark *insert_mark;
+
+        GtkActionGroup *action_group;
+	GtkActionGroup *ready_action_group;
+#if !defined(ENABLE_TOUCH_UI)
+        GtkActionGroup *gpg_action_group;
+#endif                          /* ENABLE_TOUCH_UI */
     };
 
-    BalsaSendmsg *sendmsg_window_compose(GtkWidget *);
-    BalsaSendmsg *sendmsg_window_reply(GtkWidget *, LibBalsaMailbox *,
+    BalsaSendmsg *sendmsg_window_compose(void);
+    BalsaSendmsg *sendmsg_window_reply(LibBalsaMailbox *,
                                        guint msgno, SendType rt);
-    BalsaSendmsg *sendmsg_window_reply_embedded(GtkWidget *w,
-                                                LibBalsaMessageBody *part,
+    BalsaSendmsg *sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
                                                 SendType reply_type);
 
-    BalsaSendmsg *sendmsg_window_forward(GtkWidget *, LibBalsaMailbox *,
+    BalsaSendmsg *sendmsg_window_forward(LibBalsaMailbox *,
                                          guint msgno, gboolean attach);
-    BalsaSendmsg *sendmsg_window_continue(GtkWidget *, LibBalsaMailbox *,
+    BalsaSendmsg *sendmsg_window_continue(LibBalsaMailbox *,
                                           guint msgno);
 
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
@@ -152,11 +148,11 @@ extern "C" {
 
     void sendmsg_window_process_url(const char *url, field_setter func,
 				    void *data);
-    BalsaSendmsg *sendmsg_window_new_from_list(GtkWidget * w,
-                                               LibBalsaMailbox * mailbox,
+    BalsaSendmsg *sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
                                                GArray * selected,
                                                SendType type);
-    BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
+    BalsaToolbarModel *sendmsg_window_get_toolbar_model(GtkUIManager **
+                                                        ui_manager);
 
 #define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 

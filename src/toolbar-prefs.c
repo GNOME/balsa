@@ -60,7 +60,6 @@ struct ToolbarPage_ {
     GtkWidget *back_button;
     GtkWidget *forward_button;
     GtkWidget *standard_button;
-    gboolean needs_refresh;
 };
 
 /* Callbacks. */
@@ -85,7 +84,8 @@ static void current_row_activated_cb(GtkTreeView * treeview,
                                      ToolbarPage * page);
 
 /* Helpers. */
-static GtkWidget *create_toolbar_page(BalsaToolbarModel * model);
+static GtkWidget *create_toolbar_page(BalsaToolbarModel * model,
+                                      GtkUIManager * ui_manager);
 static GtkWidget *tp_list_new(void);
 static gboolean tp_list_iter_is_first(GtkWidget * list, GtkTreeIter * iter);
 static gboolean tp_list_iter_is_last(GtkWidget * list, GtkTreeIter * iter);
@@ -112,6 +112,8 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     GtkWidget *option_box;
     GtkWidget *wrap_button;
     GnomeApp *active_window = GNOME_APP(data);
+    BalsaToolbarModel *model;
+    GtkUIManager * ui_manager;
 
     /* There can only be one */
     if (customize_widget) {
@@ -139,15 +141,18 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
                            "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(customize_widget), 600, 440);
 
-    child = create_toolbar_page(balsa_window_get_toolbar_model());
+    model = balsa_window_get_toolbar_model(&ui_manager);
+    child = create_toolbar_page(model, ui_manager);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Main window")));
 
-    child = create_toolbar_page(sendmsg_window_get_toolbar_model());
+    model = sendmsg_window_get_toolbar_model(&ui_manager);
+    child = create_toolbar_page(model, ui_manager);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Compose window")));
 
-    child = create_toolbar_page(message_window_get_toolbar_model());
+    model = message_window_get_toolbar_model(&ui_manager);
+    child = create_toolbar_page(model, ui_manager);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Message window")));
 
@@ -252,7 +257,7 @@ wrap_toggled_cb(GtkWidget * widget, GtkNotebook * notebook)
     j = gtk_notebook_get_current_page(notebook);
     for (i = 0; (child = gtk_notebook_get_nth_page(notebook, i)); i++) {
         page = g_object_get_data(G_OBJECT(child), BALSA_KEY_TOOLBAR_PAGE);
-        balsa_toolbar_refresh(page->toolbar);
+        balsa_toolbar_model_changed(page->model);
     }
 }
 
@@ -289,9 +294,10 @@ static void
 standard_button_cb(GtkWidget *widget, ToolbarPage * page)
 {
     balsa_toolbar_model_clear(page->model);
-    balsa_toolbar_refresh(page->toolbar);
+    gtk_widget_set_sensitive(page->standard_button, FALSE);
     tp_page_refresh_available(page);
     tp_page_refresh_current(page);
+    balsa_toolbar_model_changed(page->model);
 }
 
 /* Callback for the "row-activated" signal for the available list. */
@@ -353,7 +359,6 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
     switch (response) {
     case GTK_RESPONSE_DELETE_EVENT:
     case GTK_RESPONSE_CLOSE:
-        update_all_toolbars();
         gtk_widget_destroy(GTK_WIDGET(dialog));
         break;
     case GTK_RESPONSE_HELP:
@@ -375,7 +380,7 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
 /* Create a page for the main notebook.
  */
 static GtkWidget*
-create_toolbar_page(BalsaToolbarModel * model)
+create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 {
     GtkWidget *outer_box;
     GtkWidget *toolbar_frame, *toolbar_scroll;
@@ -388,7 +393,6 @@ create_toolbar_page(BalsaToolbarModel * model)
 
     page = g_new(ToolbarPage, 1);
     page->model = model;
-    page->needs_refresh = FALSE;
 
     /* The "window itself" */
     outer_box=gtk_vbox_new(FALSE, 0);
@@ -404,10 +408,21 @@ create_toolbar_page(BalsaToolbarModel * model)
     gtk_container_add(GTK_CONTAINER(toolbar_frame), toolbar_ctlbox);
     gtk_container_set_border_width(GTK_CONTAINER(toolbar_ctlbox), 5);
 
+    /* The ui-manager has actions but no ui, so we add an empty toolbar. */
+    gtk_ui_manager_add_ui_from_string(ui_manager,
+                                      "<ui>"
+                                      "  <toolbar name='Toolbar'>"
+                                      "  </toolbar>"
+                                      "</ui>",
+                                      -1, NULL);
+
     /* The preview is an actual, fully functional toolbar */
-    page->toolbar = balsa_toolbar_new(model);
+    page->toolbar = balsa_toolbar_new(model, ui_manager);
     g_object_add_weak_pointer(G_OBJECT(page->toolbar),
                               (gpointer) & page->toolbar);
+    g_object_weak_ref(G_OBJECT(page->toolbar), (GWeakNotify) g_object_unref,
+                      ui_manager);
+    gtk_widget_set_sensitive(page->toolbar, FALSE);
     gtk_toolbar_set_style(GTK_TOOLBAR(page->toolbar), GTK_TOOLBAR_BOTH);
 
     /* embedded in a scrolled_window */
@@ -529,6 +544,8 @@ create_toolbar_page(BalsaToolbarModel * model)
     gtk_widget_set_sensitive(page->remove_button, FALSE);
     gtk_widget_set_sensitive(page->back_button, FALSE);
     gtk_widget_set_sensitive(page->forward_button, FALSE);
+    gtk_widget_set_sensitive(page->standard_button,
+                             !balsa_toolbar_model_is_standard(model));
 
     tp_page_refresh_available(page);
     tp_page_refresh_current(page);
@@ -546,7 +563,7 @@ tp_page_refresh_available(ToolbarPage * page)
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreePath *path;
-    GSList *legal = balsa_toolbar_model_get_legal(page->model);
+    GHashTable *legal = balsa_toolbar_model_get_legal(page->model);
     GSList *current = balsa_toolbar_model_get_current(page->model);
     int item;
 
@@ -561,9 +578,8 @@ tp_page_refresh_available(ToolbarPage * page)
 
     for (item = 0; item < toolbar_button_count; item++) {
         if (item > 0
-            && (!g_slist_find_custom(legal,
-                                     toolbar_buttons[item].pixmap_id,
-                                     (GCompareFunc) strcmp)
+            && (!g_hash_table_lookup(legal,
+                                     toolbar_buttons[item].pixmap_id)
                 || g_slist_find_custom(current,
                                        toolbar_buttons[item].pixmap_id,
                                        (GCompareFunc) strcmp)))
@@ -645,7 +661,6 @@ tp_page_refresh_preview(ToolbarPage * page)
                                             toolbar_buttons[item].pixmap_id,
                                             -1);
     }
-    balsa_toolbar_refresh(page->toolbar);
 }
 
 /* Create a GtkTreeView for an icon list.
@@ -749,7 +764,9 @@ tp_page_swap_rows(ToolbarPage * page, gboolean forward)
                                  tmp_path, NULL, FALSE, 0, 0);
     gtk_tree_path_free(tmp_path);
 
+    gtk_widget_set_sensitive(page->standard_button, TRUE);
     tp_page_refresh_preview(page);
+    balsa_toolbar_model_changed(page->model);
 }
 
 /* Add an item to a GtkTreeView's GtkListStore.
@@ -811,8 +828,10 @@ tp_page_add_selected(ToolbarPage * page)
                                  FALSE, 0, 0);
     gtk_tree_path_free(path);
 
+    gtk_widget_set_sensitive(page->standard_button, TRUE);
     tp_page_refresh_preview(page);
     tp_page_refresh_available(page);
+    balsa_toolbar_model_changed(page->model);
 }
 
 /* Remove an item from the page's current list.
@@ -840,8 +859,10 @@ tp_page_remove_selected(ToolbarPage * page)
     }
     gtk_tree_path_free(path);
 
+    gtk_widget_set_sensitive(page->standard_button, TRUE);
     tp_page_refresh_preview(page);
     tp_page_refresh_available(page);
+    balsa_toolbar_model_changed(page->model);
 }
 
 /* Unwrap text.

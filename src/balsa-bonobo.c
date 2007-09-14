@@ -135,7 +135,7 @@ impl_balsa_composer_sendMessage (PortableServer_Servant _servant,
     guint i;
     
     gdk_threads_enter();
-    snd = sendmsg_window_compose(GTK_WIDGET(balsa_app.main_window));
+    snd = sendmsg_window_compose();
     gdk_threads_leave();
 
     if(strlen(to)) {
@@ -220,7 +220,7 @@ static void
 impl_balsa_application_checkmail (PortableServer_Servant _servant,
 				  CORBA_Environment * ev) {
     
-    check_new_messages_real (NULL, NULL, TYPE_CALLBACK);
+    check_new_messages_real (NULL, TYPE_CALLBACK);
 }
 
 static void

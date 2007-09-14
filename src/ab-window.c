@@ -582,7 +582,7 @@ balsa_ab_window_activate_address(GtkTreeView * view,
         gint which_multiple;
         gchar *addr;
 
-        snd = sendmsg_window_compose(GTK_WIDGET(balsa_app.main_window));
+        snd = sendmsg_window_compose();
         gtk_tree_model_get_iter(model, &iter, path);
         gtk_tree_model_get(model, &iter,
                            LIST_COLUMN_ADDRESS, &address,

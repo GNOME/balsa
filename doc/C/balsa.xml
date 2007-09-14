@@ -3348,12 +3348,11 @@ This is version 2.721 of the &Balsa; manual.
 </para>
 <para>
   This is an <quote>instant apply</quote> dialog: the changes you make
-  take effect immediately, as shown in the Preview toolbar; actual
-  toolbars are updated when you close the dialog. Immediately below the
+  take effect immediately, as shown in the Preview toolbar.  Below the
   Preview toolbar you'll find a button that restores the standard layout
   for that toolbar. <emphasis>Note</emphasis> that the standard layout
-  is the one that you see before the toolbar has been customized. If you
-  use this option, all current <emphasis>and past</emphasis> changes
+  is the one that you see before the toolbar has been customized. If
+  you use this option, all current <emphasis>and past</emphasis> changes
   will be undone.
 </para>
 </sect1>

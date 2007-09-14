@@ -22,65 +22,75 @@
 #ifndef __TOOLBAR_FACTORY_H__
 #define __TOOLBAR_FACTORY_H__
 
-typedef void (*BalsaToolbarFunc)(GtkWidget *, gpointer);
+GType balsa_toolbar_model_get_type(void);
+
+#define BALSA_TYPE_TOOLBAR_MODEL \
+    (balsa_toolbar_model_get_type ())
+#define BALSA_TOOLBAR_MODEL(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_TOOLBAR_MODEL, \
+                                 BalsaToolbarModel))
+#define BALSA_TOOLBAR_MODEL_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_TOOLBAR_MODEL, \
+                              BalsaToolbarModelClass))
+#define BALSA_IS_TOOLBAR_MODEL(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_TOOLBAR_MODEL))
+#define BALSA_IS_TOOLBAR_MODEL_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_TOOLBAR_MODEL))
+
+typedef struct BalsaToolbarModel_ BalsaToolbarModel;
+typedef struct BalsaToolbarModelClass_ BalsaToolbarModelClass;
+
+struct BalsaToolbarModelClass_ {
+    GObjectClass parent_class;
+};
+typedef void (*BalsaToolbarFunc) (GtkWidget *, gpointer);
 #define BALSA_TOOLBAR_FUNC(f) ((BalsaToolbarFunc) (f))
 
-typedef enum { 
+typedef enum {
     TOOLBAR_INVALID = -1,
-    TOOLBAR_MAIN = 0, /* main    window toolbar, main-window.c */
-    TOOLBAR_COMPOSE,  /* compose window toolbar, sendmsg-window.c */
-    TOOLBAR_MESSAGE,  /* message window toolbar, message-window.c */
+    TOOLBAR_MAIN = 0,           /* main    window toolbar, main-window.c */
+    TOOLBAR_COMPOSE,            /* compose window toolbar, sendmsg-window.c */
+    TOOLBAR_MESSAGE,            /* message window toolbar, message-window.c */
     STOCK_TOOLBAR_COUNT
 } BalsaToolbarType;
 
-typedef enum {
-    TOOLBAR_BUTTON_TYPE_BUTTON,
-    TOOLBAR_BUTTON_TYPE_TOGGLE,
-    TOOLBAR_BUTTON_TYPE_RADIO
-} BalsaToolbarButtonType;
-
 typedef struct t_button_data {
-    char *pixmap_id;   /* not translatable */
-    char *button_text; /* translatable */
-    char *help_text;   /* translatable */
-    BalsaToolbarButtonType type;
+    char *pixmap_id;            /* not translatable */
+    char *button_text;          /* translatable */
 } button_data;
 
 extern button_data toolbar_buttons[];
 extern const int toolbar_button_count;
 
-typedef struct BalsaToolbarModel_ BalsaToolbarModel;
-
 void update_all_toolbars(void);
-void balsa_toolbar_remove_all(GtkWidget *toolbar);
+void balsa_toolbar_remove_all(GtkWidget * toolbar);
 
 /* toolbar code for gtk+-2 */
-const gchar * balsa_toolbar_sanitize_id(const gchar *id);
+const gchar *balsa_toolbar_sanitize_id(const gchar * id);
 
 /* BalsaToolbarModel */
-BalsaToolbarModel *balsa_toolbar_model_new(GSList * legal,
-                                           GSList * standard,
+BalsaToolbarModel *balsa_toolbar_model_new(GSList * standard,
                                            GSList ** current);
-GSList *balsa_toolbar_model_get_legal(BalsaToolbarModel * model);
+void balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
+                                     const GtkActionEntry * entries,
+                                     guint n_entries);
+void balsa_toolbar_model_add_toggle_actions(BalsaToolbarModel * model,
+                                            const GtkToggleActionEntry *
+                                            entries, guint n_entries);
+GHashTable *balsa_toolbar_model_get_legal(BalsaToolbarModel * model);
 GSList *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
+gboolean balsa_toolbar_model_is_standard(BalsaToolbarModel * model);
 void balsa_toolbar_model_insert_icon(BalsaToolbarModel * model,
                                      gchar * icon, gint position);
 void balsa_toolbar_model_delete_icon(BalsaToolbarModel * model,
                                      gchar * icon);
 void balsa_toolbar_model_clear(BalsaToolbarModel * model);
+void balsa_toolbar_model_changed(BalsaToolbarModel * model);
 
 /* BalsaToolbar */
-GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model);
-GtkWidget *balsa_toolbar_get_from_gnome_app(GnomeApp * app);
-guint balsa_toolbar_set_callback(GtkWidget * toolbar, const gchar * icon,
-                                 GCallback callback, gpointer user_data);
-void balsa_toolbar_set_button_sensitive(GtkWidget * toolbar,
-                                        const gchar * icon,
-                                        gboolean sensitive);
-gboolean balsa_toolbar_get_button_active(GtkWidget * toolbar,
-                                         const gchar * icon);
-void balsa_toolbar_set_button_active(GtkWidget * toolbar,
-                                     const gchar * icon, gboolean active);
-void balsa_toolbar_refresh(GtkWidget * toolbar);
+GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
+                             GtkUIManager * ui_manager);
+void balsa_toolbar_model_update_ui(BalsaToolbarModel * model,
+                                   GtkUIManager * ui_manager);
 
 #endif

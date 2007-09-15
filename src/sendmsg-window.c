@@ -4492,6 +4492,10 @@ sendmsg_window_new()
     toolbar = balsa_toolbar_new(model, ui_manager);
     gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
 
+    /* Now that we have installed the menubar and toolbar, we no longer
+     * need the UIManager. */
+    g_object_unref(ui_manager);
+
     bsmsg->flow = !balsa_app.wordwrap;
     sw_set_sensitive(bsmsg, "Reflow", bsmsg->flow);
 

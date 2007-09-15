@@ -193,6 +193,7 @@ static void collapse_all_cb            (GtkAction * action, gpointer data);
 static void zoom_in_cb                 (GtkAction * action, gpointer data);
 static void zoom_out_cb                (GtkAction * action, gpointer data);
 static void zoom_100_cb                (GtkAction * action, gpointer data);
+#endif				/* HAVE_GTKHTML */
 
 static void copy_cb                    (GtkAction * action, BalsaWindow *bw);
 static void select_all_cb              (GtkAction * action, gpointer);
@@ -201,7 +202,6 @@ static void message_copy_cb            (GtkAction * action, gpointer data);
 static void message_select_all_cb      (GtkAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
 static void mark_all_cb                (GtkAction * action, gpointer);
-#endif				/* HAVE_GTKHTML */
 
 static void find_cb                    (GtkAction * action, gpointer data);
 static void find_again_cb              (GtkAction * action, gpointer data);
@@ -696,10 +696,12 @@ static const char *ui_description =
 "      <separator/>"
 "      <menuitem action='ExpandAll'/>"
 "      <menuitem action='CollapseAll'/>"
+#ifdef HAVE_GTKHTML
 "      <separator/>"
 "      <menuitem action='ZoomIn'/>"
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='Zoom100'/>"
+#endif				/* HAVE_GTKHTML */
 "    </menu>"
 "    <menu action='MailboxMenu'>"
 "      <menuitem action='NextMessage'/>"
@@ -811,9 +813,12 @@ static const char *ui_description =
 "      <menuitem action='NextUnread'/>"
 "      <menuitem action='NextMessage'/>"
 "      <menuitem action='PreviousMessage'/>"
+#ifdef HAVE_GTKHTML
+"      <separator/>"
 "      <menuitem action='ZoomIn'/>"
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='Zoom100'/>"
+#endif				/* HAVE_GTKHTML */
 "      <separator/>"
 "      <menu action='ViewMoreMenu'>"
 "        <menuitem action='NextFlagged'/>"
@@ -1466,7 +1471,6 @@ balsa_window_new()
     register_balsa_pixbufs(GTK_WIDGET(window));
 
     model = bw_get_toolbar_model_and_ui_manager(window, &ui_manager);
-    window->ui_manager = ui_manager;
 
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
@@ -1487,7 +1491,11 @@ balsa_window_new()
 
     toolbar = balsa_toolbar_new(model, ui_manager);
     gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
-    
+
+    /* Now that we have installed the menubar and toolbar, we no longer
+     * need the UIManager. */
+    g_object_unref(ui_manager);
+
     appbar =
         GNOME_APPBAR(gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER));
     gnome_app_set_statusbar(GNOME_APP(window), GTK_WIDGET(appbar));

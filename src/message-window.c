@@ -329,10 +329,12 @@ static const char *ui_description =
 "      <menuitem action='NoHeaders'/>"
 "      <menuitem action='SelectedHeaders'/>"
 "      <menuitem action='AllHeaders'/>"
+#ifdef HAVE_GTKHTML
 "      <separator/>"
 "      <menuitem action='ZoomIn'/>"
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='Zoom100'/>"
+#endif                          /* HAVE_GTKHTML */
 "    </menu>"
 "    <menu action='MoveMenu'>"
 "    </menu>"
@@ -566,6 +568,10 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     toolbar = balsa_toolbar_new(model, ui_manager);
     gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
+
+    /* Now that we have installed the menubar and toolbar, we no longer
+     * need the UIManager. */
+    g_object_unref(ui_manager);
 
     gtk_window_set_wmclass(GTK_WINDOW(window), "message", "Balsa");
 

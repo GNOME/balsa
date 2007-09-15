@@ -143,16 +143,19 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     model = balsa_window_get_toolbar_model(&ui_manager);
     child = create_toolbar_page(model, ui_manager);
+    g_object_unref(ui_manager);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Main window")));
 
     model = sendmsg_window_get_toolbar_model(&ui_manager);
     child = create_toolbar_page(model, ui_manager);
+    g_object_unref(ui_manager);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Compose window")));
 
     model = message_window_get_toolbar_model(&ui_manager);
     child = create_toolbar_page(model, ui_manager);
+    g_object_unref(ui_manager);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Message window")));
 

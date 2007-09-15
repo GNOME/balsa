@@ -1,3 +1,15 @@
+2007-09-15  Peter Bloomfield
+
+	* src/main-window.c:
+	* src/main-window.h:
+	* src/message-window.c: (message_window_new):  build
+	  --without-gtkhtml.
+	* src/sendmsg-window.c: (sendmsg_window_new):
+	* src/toolbar-factory.c: (tm_changed_cb), (tm_toolbar_weak_notify),
+	(balsa_toolbar_new):
+	* src/toolbar-prefs.c: (customize_dialog_cb): clean up ui-manager
+	  object-ref management.
+
 2007-09-14  Peter Bloomfield
 
 	* src/main-window.c:

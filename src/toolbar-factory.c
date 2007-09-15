@@ -412,7 +412,7 @@ bt_free_merge_ids(GArray * merge_ids)
 /* Update a real toolbar when the model has changed.
  */
 static void
-tm_update_ui(BalsaToolbarModel * model, GtkUIManager * ui_manager)
+tm_changed_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 {
     GArray *merge_ids =
         g_object_get_data(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS);
@@ -427,32 +427,41 @@ tm_update_ui(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     tm_populate(model, ui_manager, merge_ids);
 }
 
+typedef struct {
+    BalsaToolbarModel * model;
+    GtkUIManager * ui_manager;
+} toolbar_info;
+
 static void
-tm_ui_manager_weak_notify(BalsaToolbarModel * model,
-                          GtkUIManager * ui_manager)
+tm_toolbar_weak_notify(toolbar_info * info, GtkWidget * toolbar)
 {
-    g_signal_handlers_disconnect_by_func(model, tm_update_ui, ui_manager);
+    g_signal_handlers_disconnect_by_func(info->model, tm_changed_cb,
+                                         info->ui_manager);
+    g_object_unref(info->ui_manager);
+    g_free(info);
 }
 
-GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
-                             GtkUIManager * ui_manager)
+GtkWidget *
+balsa_toolbar_new(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 {
-    GArray *merge_ids = g_array_new(FALSE, FALSE, sizeof(guint));
     GtkWidget *toolbar;
+    toolbar_info *info;
+    GArray *merge_ids = g_array_new(FALSE, FALSE, sizeof(guint));
 
     g_object_set_data_full(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS,
                            merge_ids, (GDestroyNotify) bt_free_merge_ids);
 
     tm_populate(model, ui_manager, merge_ids);
-
-    g_signal_connect(model, "changed", G_CALLBACK(tm_update_ui),
-                     ui_manager);
-    g_object_weak_ref(G_OBJECT(ui_manager),
-                      (GWeakNotify) tm_ui_manager_weak_notify, model);
-
     toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
-    g_object_weak_ref(G_OBJECT(toolbar), (GWeakNotify) g_object_unref,
-                      ui_manager);
+
+    g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb),
+                     ui_manager);
+
+    info = g_new(toolbar_info, 1);
+    info->model = model;
+    info->ui_manager = g_object_ref(ui_manager);
+    g_object_weak_ref(G_OBJECT(toolbar),
+                      (GWeakNotify) tm_toolbar_weak_notify, info);
 
     return toolbar;
 }

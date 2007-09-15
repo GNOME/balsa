@@ -1,5 +1,11 @@
 2007-09-15  Peter Bloomfield
 
+	* src/main-window.c: translate main menu.
+	* src/message-window.c: ditto.
+	* src/sendmsg-window.c: ditto.
+
+2007-09-15  Peter Bloomfield
+
 	* src/main-window.c:
 	* src/main-window.h:
 	* src/message-window.c: (message_window_new):  build

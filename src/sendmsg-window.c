@@ -300,16 +300,16 @@ struct SendLocales {
 */
 
 static const GtkActionEntry entries[] = {
-    {"FileMenu", NULL, "_File"},
-    {"EditMenu", NULL, "_Edit"},
-    {"ShowMenu", NULL, "_Show"},
-    {"LanguageMenu", NULL, "_Language"},
-    {"OptionsMenu", NULL, "_Options"},
+    {"FileMenu", NULL, N_("_File")},
+    {"EditMenu", NULL, N_("_Edit")},
+    {"ShowMenu", NULL, N_("_Show")},
+    {"LanguageMenu", NULL, N_("_Language")},
+    {"OptionsMenu", NULL, N_("_Options")},
 #if defined(ENABLE_TOUCH_UI)
-    {"ToolsMenu", NULL, "_Tools"},
-    {"FileMoreMenu", NULL, "_More"},
-    {"EditMoreMenu", NULL, "_More"},
-    {"ToolsMoreMenu", NULL, "_More"},
+    {"ToolsMenu", NULL, N_("_Tools")},
+    {"FileMoreMenu", NULL, N_("_More")},
+    {"EditMoreMenu", NULL, N_("_More")},
+    {"ToolsMoreMenu", NULL, N_("_More")},
 #endif                          /* ENABLE_TOUCH_UI */
     {"IncludeFile", GTK_STOCK_OPEN, N_("_Include File..."), NULL,
      N_("Include a file"), G_CALLBACK(include_file_cb)},

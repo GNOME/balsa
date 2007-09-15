@@ -216,11 +216,11 @@ message_window_idle_handler(MessageWindow* mw)
 */
 
 static const GtkActionEntry entries[] = {
-    {"FileMenu", NULL, "_File"},
-    {"EditMenu", NULL, "_Edit"},
-    {"ViewMenu", NULL, "_View"},
-    {"MoveMenu", NULL, "M_ove"},
-    {"MessageMenu", NULL, "_Message"},
+    {"FileMenu", NULL, N_("_File")},
+    {"EditMenu", NULL, N_("_Edit")},
+    {"ViewMenu", NULL, N_("_View")},
+    {"MoveMenu", NULL, N_("M_ove")},
+    {"MessageMenu", NULL, N_("_Message")},
 #ifdef HAVE_GTK_PRINT
     {"PageSetup", NULL, N_("Page _Setup"), "<control>S",
      N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},

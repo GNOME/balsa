@@ -1,5 +1,9 @@
 2007-09-15  Peter Bloomfield
 
+	* src/main-window.c: two more missed translations.
+
+2007-09-15  Peter Bloomfield
+
 	* src/main-window.c: translate main menu.
 	* src/message-window.c: ditto.
 	* src/sendmsg-window.c: ditto.

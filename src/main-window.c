@@ -448,7 +448,7 @@ static const GtkActionEntry mailbox_entries[] = {
     {"NextFlagged", BALSA_PIXMAP_NEXT_FLAGGED, N_("Next Flagged Message"),
      "<control><alt>F", N_("Next Flagged Message"),
      G_CALLBACK(next_flagged_message_cb)},
-    {"MailboxHideMenu", NULL, "_Hide Messages"},
+    {"MailboxHideMenu", NULL, N_("_Hide Messages")},
     {"ResetFilter", GTK_STOCK_CLEAR, N_("_Reset Filter"), NULL,
      N_("Reset mailbox filter"), G_CALLBACK(reset_filter_cb)},
     {"MailboxSelectAll", BALSA_PIXMAP_MARK_ALL, N_("_Select All"), NULL,
@@ -545,7 +545,7 @@ static const GtkActionEntry modify_message_entries[] = {
     {"ToolbarToggleNew", BALSA_PIXMAP_MARKED_NEW, N_("_New"), NULL,
      N_("Toggle New"), G_CALLBACK(toggle_new_message_cb)},
 #endif /* ENABLE_TOUCH_UI */
-    {"MessageToggleFlagMenu", NULL, "_Toggle Flag"},
+    {"MessageToggleFlagMenu", NULL, N_("_Toggle Flag")},
     /* Message:toggle-flag submenu items */
     {"ToggleFlagged", BALSA_PIXMAP_INFO_FLAGGED, N_("_Flagged"), "X",
      N_("Toggle flagged"), G_CALLBACK(toggle_flagged_message_cb)},

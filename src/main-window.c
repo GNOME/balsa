@@ -317,7 +317,7 @@ static const GtkActionEntry entries[] = {
     {"FileMenu", NULL, "_File"},
     {"EditMenu", NULL, "_Edit"},
     {"ViewMenu", NULL, "_View"},
-    {"MailboxMenu", NULL, "_Mailbox"},
+    {"MailboxMenu", NULL, "Mail_box"},
     {"MessageMenu", NULL, "_Message"},
     {"SettingsMenu", NULL, "_Settings"},
     {"HelpMenu", NULL, "_Help"},
@@ -1431,12 +1431,8 @@ bw_get_toolbar_model_and_ui_manager(BalsaWindow * window,
 {
     BalsaToolbarModel *model = bw_get_toolbar_model();
 
-    if (ui_manager) {
+    if (ui_manager)
         *ui_manager = bw_get_ui_manager(window);
-        g_signal_connect(model, "changed",
-                         G_CALLBACK(balsa_toolbar_model_update_ui),
-                         *ui_manager);
-    }
 
     return model;
 }
@@ -1470,8 +1466,6 @@ balsa_window_new()
     register_balsa_pixbufs(GTK_WIDGET(window));
 
     model = bw_get_toolbar_model_and_ui_manager(window, &ui_manager);
-    g_object_weak_ref(G_OBJECT(window), (GWeakNotify) g_object_unref,
-                      ui_manager);
     window->ui_manager = ui_manager;
 
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);

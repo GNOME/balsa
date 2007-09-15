@@ -46,14 +46,6 @@ struct BalsaToolbarModelClass_ {
 typedef void (*BalsaToolbarFunc) (GtkWidget *, gpointer);
 #define BALSA_TOOLBAR_FUNC(f) ((BalsaToolbarFunc) (f))
 
-typedef enum {
-    TOOLBAR_INVALID = -1,
-    TOOLBAR_MAIN = 0,           /* main    window toolbar, main-window.c */
-    TOOLBAR_COMPOSE,            /* compose window toolbar, sendmsg-window.c */
-    TOOLBAR_MESSAGE,            /* message window toolbar, message-window.c */
-    STOCK_TOOLBAR_COUNT
-} BalsaToolbarType;
-
 typedef struct t_button_data {
     char *pixmap_id;            /* not translatable */
     char *button_text;          /* translatable */
@@ -90,7 +82,5 @@ void balsa_toolbar_model_changed(BalsaToolbarModel * model);
 /* BalsaToolbar */
 GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
                              GtkUIManager * ui_manager);
-void balsa_toolbar_model_update_ui(BalsaToolbarModel * model,
-                                   GtkUIManager * ui_manager);
 
 #endif

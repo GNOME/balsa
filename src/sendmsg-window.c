@@ -4360,12 +4360,8 @@ sw_get_toolbar_model_and_ui_manager(BalsaSendmsg * bsmsg,
 {
     BalsaToolbarModel *model = sw_get_toolbar_model();
 
-    if (ui_manager) {
+    if (ui_manager)
         *ui_manager = sw_get_ui_manager(bsmsg);
-        g_signal_connect(model, "changed",
-                         G_CALLBACK(balsa_toolbar_model_update_ui),
-                         *ui_manager);
-    }
 
     return model;
 }
@@ -4474,8 +4470,6 @@ sendmsg_window_new()
 		     G_CALLBACK(sw_size_alloc_cb), bsmsg);
 
     model = sw_get_toolbar_model_and_ui_manager(bsmsg, &ui_manager);
-    g_object_weak_ref(G_OBJECT(bsmsg->window), (GWeakNotify) g_object_unref,
-                      ui_manager);
 
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);

@@ -1,5 +1,15 @@
 2007-09-14  Peter Bloomfield
 
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/sendmsg-window.c:
+	* src/toolbar-factory.c:
+	* src/toolbar-factory.h:
+	* src/toolbar-prefs.c: move toolbar-model's "changed" signal
+	handling to toolbar-factory.c.
+
+2007-09-14  Peter Bloomfield
+
 	* doc/C/balsa.xml: toolbar editing is now really instant-apply.
 	* libbalsa/rfc3156.c: build (--without-ssl ?).
 	* src/ab-window.c:

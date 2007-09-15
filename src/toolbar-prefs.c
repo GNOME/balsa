@@ -248,13 +248,12 @@ get_toolbar_button_index(const char *id)
 static void
 wrap_toggled_cb(GtkWidget * widget, GtkNotebook * notebook)
 {
-    gint i, j;
+    gint i;
     GtkWidget *child;
     ToolbarPage *page;
     
     balsa_app.toolbar_wrap_button_text = GTK_TOGGLE_BUTTON(widget)->active;
 
-    j = gtk_notebook_get_current_page(notebook);
     for (i = 0; (child = gtk_notebook_get_nth_page(notebook, i)); i++) {
         page = g_object_get_data(G_OBJECT(child), BALSA_KEY_TOOLBAR_PAGE);
         balsa_toolbar_model_changed(page->model);
@@ -411,17 +410,12 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     /* The ui-manager has actions but no ui, so we add an empty toolbar. */
     gtk_ui_manager_add_ui_from_string(ui_manager,
                                       "<ui>"
-                                      "  <toolbar name='Toolbar'>"
-                                      "  </toolbar>"
+                                      "  <toolbar name='Toolbar'/>"
                                       "</ui>",
                                       -1, NULL);
 
     /* The preview is an actual, fully functional toolbar */
     page->toolbar = balsa_toolbar_new(model, ui_manager);
-    g_object_add_weak_pointer(G_OBJECT(page->toolbar),
-                              (gpointer) & page->toolbar);
-    g_object_weak_ref(G_OBJECT(page->toolbar), (GWeakNotify) g_object_unref,
-                      ui_manager);
     gtk_widget_set_sensitive(page->toolbar, FALSE);
     gtk_toolbar_set_style(GTK_TOOLBAR(page->toolbar), GTK_TOOLBAR_BOTH);
 

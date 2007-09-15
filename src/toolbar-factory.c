@@ -403,23 +403,16 @@ tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
 }
 
 #define BALSA_TOOLBAR_MERGE_IDS "balsa-toolbar-merge-ids"
-GtkWidget *
-balsa_toolbar_new(BalsaToolbarModel * model, GtkUIManager * ui_manager)
+static void
+bt_free_merge_ids(GArray * merge_ids)
 {
-    GArray *merge_ids = g_array_new(FALSE, FALSE, sizeof(guint));
-
-    g_object_set_data(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS,
-                      merge_ids);
-    tm_populate(model, ui_manager, merge_ids);
-
-    return gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
+     g_array_free(merge_ids, TRUE);
 }
 
 /* Update a real toolbar when the model has changed.
  */
-void
-balsa_toolbar_model_update_ui(BalsaToolbarModel * model,
-                              GtkUIManager * ui_manager)
+static void
+tm_update_ui(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 {
     GArray *merge_ids =
         g_object_get_data(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS);
@@ -432,4 +425,34 @@ balsa_toolbar_model_update_ui(BalsaToolbarModel * model,
     merge_ids->len = 0;
 
     tm_populate(model, ui_manager, merge_ids);
+}
+
+static void
+tm_ui_manager_weak_notify(BalsaToolbarModel * model,
+                          GtkUIManager * ui_manager)
+{
+    g_signal_handlers_disconnect_by_func(model, tm_update_ui, ui_manager);
+}
+
+GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
+                             GtkUIManager * ui_manager)
+{
+    GArray *merge_ids = g_array_new(FALSE, FALSE, sizeof(guint));
+    GtkWidget *toolbar;
+
+    g_object_set_data_full(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS,
+                           merge_ids, (GDestroyNotify) bt_free_merge_ids);
+
+    tm_populate(model, ui_manager, merge_ids);
+
+    g_signal_connect(model, "changed", G_CALLBACK(tm_update_ui),
+                     ui_manager);
+    g_object_weak_ref(G_OBJECT(ui_manager),
+                      (GWeakNotify) tm_ui_manager_weak_notify, model);
+
+    toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
+    g_object_weak_ref(G_OBJECT(toolbar), (GWeakNotify) g_object_unref,
+                      ui_manager);
+
+    return toolbar;
 }

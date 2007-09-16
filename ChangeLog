@@ -1,4 +1,10 @@
-2007-09-15  Peter Bloomfield  <peter@Venus>
+2007-09-16  Peter Bloomfield
+
+	* src/sendmsg-window.c: allow the letter 'q' in messages, by
+	restoring ctrl+Q accelerator for "Queue" (thank you, Jean-Luc);
+	restore Sign and Encrypt toolbar buttons (thank you, Albrecht).
+
+2007-09-15  Peter Bloomfield
 
 	* libbalsa/source-viewer.c: mark more strings for translation.
 	* src/ab-main.c: ditto.

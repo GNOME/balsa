@@ -371,13 +371,13 @@ static const GtkActionEntry ready_entries[] = {
     {"Send", BALSA_PIXMAP_SEND, N_("Sen_d"), "<control>Return",
      N_("Send this message"), G_CALLBACK(send_message_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"Queue", BALSA_PIXMAP_SEND, N_("_Queue"), "Q",
+    {"Queue", BALSA_PIXMAP_SEND, N_("_Queue"), "<control>Q",
      N_("Queue this message in Outbox for sending"),
      G_CALLBACK(queue_message_cb)},
     {"Postpone", BALSA_PIXMAP_POSTPONE, N_("_Postpone"), NULL,
      NULL, G_CALLBACK(postpone_message_cb)},
 #else                           /* ENABLE_TOUCH_UI */
-    {"Queue", BALSA_PIXMAP_SEND, N_("Send _Later"), "Q",
+    {"Queue", BALSA_PIXMAP_SEND, N_("Send _Later"), "<control>Q",
      N_("Queue this message in Outbox for sending"),
      G_CALLBACK(queue_message_cb)},
     {"Postpone", BALSA_PIXMAP_POSTPONE, N_("Sa_ve and Close"), NULL,
@@ -410,15 +410,17 @@ static const GtkToggleActionEntry toggle_entries[] = {
      NULL, G_CALLBACK(toggle_format_cb), FALSE},
 #ifdef HAVE_GPGME
 #if !defined(ENABLE_TOUCH_UI)
-    {"SignMessage", NULL, N_("_Sign Message"), NULL,
-     NULL, G_CALLBACK(toggle_sign_cb), FALSE},
-    {"EncryptMessage", NULL, N_("_Encrypt Message"), NULL,
-     NULL, G_CALLBACK(toggle_encrypt_cb), FALSE},
+    {"SignMessage", BALSA_PIXMAP_GPG_SIGN, N_("_Sign Message"), NULL,
+     N_("Sign message using GPG"), G_CALLBACK(toggle_sign_cb), FALSE},
+    {"EncryptMessage", BALSA_PIXMAP_GPG_ENCRYPT, N_("_Encrypt Message"),
+     NULL, N_("Encrypt message using GPG"), G_CALLBACK(toggle_encrypt_cb),
+     FALSE},
 #else                           /* ENABLE_TOUCH_UI */
-    {"SignMessage", NULL, N_("_Sign Message"), NULL,
+    {"SignMessage", BALSA_PIXMAP_GPG_SIGN, N_("_Sign Message"), NULL,
      N_("signs the message using GnuPG"),
      G_CALLBACK(toggle_sign_cb), FALSE},
-    {"EncryptMessage", NULL, N_("_Encrypt Message"), NULL,
+    {"EncryptMessage", BALSA_PIXMAP_GPG_ENCRYPT, N_("_Encrypt Message"),
+     NULL,
      N_("signs the message using GnuPG for all To: and CC: recipients"),
      G_CALLBACK(toggle_encrypt_cb), FALSE},
 #endif                          /* ENABLE_TOUCH_UI */

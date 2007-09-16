@@ -208,22 +208,14 @@ balsa_toolbar_model_changed(BalsaToolbarModel * model)
     g_signal_emit(model, model_signals[CHANGED], 0);
 }
 
-typedef struct {
-    const gchar *name;
-    const gchar *tooltip;
-} ActionInfo;
-
 static void
 tm_add_action(BalsaToolbarModel * model, const gchar * stock_id,
-              const gchar * name, const gchar * tooltip)
+              const gchar * name)
 {
     /* Check whether we have already seen this icon: */
-    if (stock_id && !g_hash_table_lookup(model->legal, stock_id)) {
-        ActionInfo *info = g_new(ActionInfo, 1);
-        info->name = name;
-        info->tooltip = tooltip;
-        g_hash_table_insert(model->legal, (gchar *) stock_id, info);
-    }
+    if (stock_id && !g_hash_table_lookup(model->legal, stock_id))
+        g_hash_table_insert(model->legal, (gchar *) stock_id,
+                            (gchar *) name);
 }
 
 void
@@ -234,8 +226,7 @@ balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
     guint i;
 
     for (i = 0; i < n_entries; i++)
-        tm_add_action(model, entries[i].stock_id, entries[i].name,
-                      entries[i].tooltip);
+        tm_add_action(model, entries[i].stock_id, entries[i].name);
 }
 
 void
@@ -246,8 +237,7 @@ balsa_toolbar_model_add_toggle_actions(BalsaToolbarModel * model,
     guint i;
 
     for (i = 0; i < n_entries; i++)
-        tm_add_action(model, entries[i].stock_id, entries[i].name,
-                      entries[i].tooltip);
+        tm_add_action(model, entries[i].stock_id, entries[i].name);
 }
 
 /* Return the legal icons.
@@ -380,21 +370,20 @@ tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
             g_free(name);
 #endif                          /* GTK_CHECK_VERSION(2, 11, 6) */
         } else {
-            gchar *path;
+            gchar *path, *name;
             GtkWidget *tool_item;
-            ActionInfo *info;
 
-            info = g_hash_table_lookup(model->legal, stock_id);
-            if (!info) {
-                g_warning("no info for stock_id \"%s\"", stock_id);
+            name = g_hash_table_lookup(model->legal, stock_id);
+            if (!name) {
+                g_warning("no name for stock_id \"%s\"", stock_id);
                 continue;
             }
             gtk_ui_manager_add_ui(ui_manager, merge_id, "/Toolbar",
-                                  info->name, info->name,
+                                  name, name,
                                   GTK_UI_MANAGER_AUTO, FALSE);
             /* Replace the long menu-item label with the short
              * tool-button label: */
-            path = g_strconcat("/Toolbar/", info->name, NULL);
+            path = g_strconcat("/Toolbar/", name, NULL);
             tool_item = gtk_ui_manager_get_widget(ui_manager, path);
             g_free(path);
             tm_set_tool_item_label(GTK_TOOL_BUTTON(tool_item), stock_id, has_second_line);

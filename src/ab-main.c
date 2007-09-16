@@ -467,10 +467,10 @@ edit_new_entry_cb(GtkAction * action, gpointer user_data)
 
 /* Normal items */
 static GtkActionEntry entries[] = {
-    {"FileMenu", NULL, "_File"},
-    {"EntryMenu", NULL, "_Entry"},
-    {"HelpMenu", NULL, "_Help"},
-    {"New", GTK_STOCK_NEW, "_New"},
+    {"FileMenu", NULL, N_("_File")},
+    {"EntryMenu", NULL, N_("_Entry")},
+    {"HelpMenu", NULL, N_("_Help")},
+    {"New", GTK_STOCK_NEW, N_("_New")},
     {"NewVcard", NULL, N_("VCard Address Book (GnomeCard)"), NULL, NULL,
      G_CALLBACK(file_new_vcard_cb)},
     {"NewExtern", NULL, N_("External query (a program)"), NULL, NULL,
@@ -485,21 +485,21 @@ static GtkActionEntry entries[] = {
     {"NewGpe", NULL, N_("GPE Address Book"), NULL, NULL,
      G_CALLBACK(file_new_gpe_cb)},
 #endif /* HAVE_SQLITE */
-    {"Properties", GTK_STOCK_PROPERTIES, "_Properties", NULL,
-     "Edit address book properties", G_CALLBACK(file_properties_cb)},
-    {"Delete", GTK_STOCK_DELETE, "_Delete", NULL,
-     "Delete address book", G_CALLBACK(file_delete_cb)},
-    {"Quit", GTK_STOCK_QUIT, "_Quit", NULL, "Exit the program",
+    {"Properties", GTK_STOCK_PROPERTIES, N_("_Properties"), NULL,
+     N_("Edit address book properties"), G_CALLBACK(file_properties_cb)},
+    {"Delete", GTK_STOCK_DELETE, N_("_Delete"), NULL,
+     N_("Delete address book"), G_CALLBACK(file_delete_cb)},
+    {"Quit", GTK_STOCK_QUIT, N_("_Quit"), NULL, N_("Exit the program"),
      gtk_main_quit},
-    {"NewEntry", GTK_STOCK_NEW, "_New Entry", "<shift><control>N",
-     "Add new entry", G_CALLBACK(edit_new_entry_cb)},
+    {"NewEntry", GTK_STOCK_NEW, N_("_New Entry"), "<shift><control>N",
+     N_("Add new entry"), G_CALLBACK(edit_new_entry_cb)},
     {"About",
 #if GTK_CHECK_VERSION(2, 6, 0)
      GTK_STOCK_ABOUT,
 #else
      GNOME_STOCK_ABOUT,
 #endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
-     "_About", NULL, NULL, NULL}
+     N_("_About"), NULL, NULL, NULL}
 };
 
 static const char *ui_description =

@@ -1,3 +1,12 @@
+2007-09-15  Peter Bloomfield  <peter@Venus>
+
+	* libbalsa/source-viewer.c: mark more strings for translation.
+	* src/ab-main.c: ditto.
+	* src/toolbar-factory.c: (tm_add_action),
+	(balsa_toolbar_model_add_actions),
+	(balsa_toolbar_model_add_toggle_actions), (tm_populate):
+	tooltips are set by the ui-manager.
+
 2007-09-15  Peter Bloomfield
 
 	* libbalsa/source-viewer.c: (lbsv_app_set_menus): set

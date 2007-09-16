@@ -40,9 +40,9 @@ static void lsv_escape_cb(GtkAction * action, gpointer data);
 /* Normal items */
 static GtkActionEntry entries[] = {
     /* Top level */
-    {"FileMenu", NULL, "_File"},
-    {"EditMenu", NULL, "_Edit"},
-    {"ViewMenu", NULL, "_View"},
+    {"FileMenu", NULL, N_("_File")},
+    {"EditMenu", NULL, N_("_Edit")},
+    {"ViewMenu", NULL, N_("_View")},
     /* Items */
     {"Close", GTK_STOCK_CLOSE, N_("_Close"), "<control>W",
      N_("Close the window"), G_CALLBACK(close_cb)},

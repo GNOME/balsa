@@ -1366,6 +1366,7 @@ bw_get_ui_manager(BalsaWindow * window)
     ui_manager = gtk_ui_manager_new();
 
     action_group = gtk_action_group_new("BalsaWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->action_group = action_group;
     gtk_action_group_add_actions(action_group, entries,
@@ -1383,6 +1384,7 @@ bw_get_ui_manager(BalsaWindow * window)
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
     action_group = gtk_action_group_new("BalsaWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->mailbox_action_group = action_group;
     gtk_action_group_add_actions(action_group, mailbox_entries,
@@ -1410,6 +1412,7 @@ bw_get_ui_manager(BalsaWindow * window)
 #endif /* ENABLE_TOUCH_UI */
 
     action_group = gtk_action_group_new("BalsaWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->message_action_group = action_group;
     gtk_action_group_add_actions(action_group, message_entries,
@@ -1419,6 +1422,7 @@ bw_get_ui_manager(BalsaWindow * window)
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
     action_group = gtk_action_group_new("BalsaWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->modify_message_action_group = action_group;
     gtk_action_group_add_actions(action_group, modify_message_entries,

@@ -1,5 +1,14 @@
 2007-09-15  Peter Bloomfield
 
+	* libbalsa/source-viewer.c: (lbsv_app_set_menus): set
+	translation domain to NULL to enable translation.
+	* src/ab-main.c: (get_main_menu): ditto
+	* src/main-window.c: ditto.
+	* src/message-window.c: (mw_get_ui_manager): ditto.
+	* src/sendmsg-window.c: (sw_get_ui_manager): ditto.
+
+2007-09-15  Peter Bloomfield
+
 	* src/main-window.c: two more missed translations.
 
 2007-09-15  Peter Bloomfield

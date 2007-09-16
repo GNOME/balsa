@@ -197,6 +197,8 @@ lbsv_app_set_menus(GtkWindow * app, GtkAction ** action)
     window = GTK_WIDGET(app);
 
     action_group = gtk_action_group_new("MenuActions");
+    gtk_action_group_set_translation_domain(action_group, NULL);
+
     gtk_action_group_add_actions(action_group, entries,
                                  G_N_ELEMENTS(entries), window);
     gtk_action_group_add_toggle_actions(action_group, toggle_entries,

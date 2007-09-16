@@ -589,6 +589,7 @@ sw_get_ui_manager(BalsaSendmsg * bsmsg)
     ui_manager = gtk_ui_manager_new();
 
     action_group = gtk_action_group_new("ComposeWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (bsmsg)
         bsmsg->action_group = action_group;
     gtk_action_group_add_actions(action_group, entries,
@@ -600,6 +601,7 @@ sw_get_ui_manager(BalsaSendmsg * bsmsg)
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
     action_group = gtk_action_group_new("ComposeWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (bsmsg)
         bsmsg->ready_action_group = action_group;
     gtk_action_group_add_actions(action_group, ready_entries,
@@ -610,6 +612,7 @@ sw_get_ui_manager(BalsaSendmsg * bsmsg)
 #ifdef HAVE_GPGME
 #if !defined(ENABLE_TOUCH_UI)
     action_group = gtk_action_group_new("ComposeWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (bsmsg)
         bsmsg->gpg_action_group = action_group;
     gtk_action_group_add_radio_actions(action_group,

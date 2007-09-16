@@ -374,6 +374,7 @@ mw_get_ui_manager(MessageWindow * mw)
     ui_manager = gtk_ui_manager_new();
 
     action_group = gtk_action_group_new("MessageWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     if (mw)
         mw->action_group = action_group;
     gtk_action_group_add_actions(action_group, entries,

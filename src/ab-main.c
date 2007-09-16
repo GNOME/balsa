@@ -544,6 +544,7 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
 
     contacts_app.action_group = action_group =
         gtk_action_group_new("MenuActions");
+    gtk_action_group_set_translation_domain(action_group, NULL);
     gtk_action_group_add_actions(action_group, entries,
                                  G_N_ELEMENTS(entries), window);
 

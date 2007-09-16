@@ -564,7 +564,7 @@ msgid ""
 "<b>This certificate was issued by:</b>\n"
 msgstr ""
 "\n"
-"<b>Tämän varmeenteen myönsi:</b>\n"
+"<b>Tämän varmenteen myönsi:</b>\n"
 
 #: ../libbalsa/libbalsa.c:539
 #, c-format
@@ -1350,7 +1350,7 @@ msgstr[0] ""
 "Aliavaimen ominaisuus:%s"
 msgstr[1] ""
 "\n"
-"Aliavaimen ominaisuude:%s"
+"Aliavaimen ominaisuudet:%s"
 
 #: ../libbalsa/rfc3156.c:1069
 #, c-format
@@ -2467,7 +2467,7 @@ msgid ""
 "Do you want to send this notification?"
 msgstr ""
 "Tämän viestin lähettäjä, %s, pyytää \n"
-"Message Disposition Notificatio-kuittauksen (MDN) palauttamista osoitteeseen "
+"Message Disposition Notification-kuittauksen (MDN) palauttamista osoitteeseen "
 "\"%s\"\n"
 "Lähetetäänkö kuittaus?"
 
@@ -3286,8 +3286,8 @@ msgstr ""
 "Kansio \"%s\" ja kaikki sen viestit poistetaan IMAP-palvelimelta. Jos "
 "kansiolla %s on alikansioita, se näkyy edelleen kansiopuun osana.\n"
 "Voit käyttää komentoa \"Uusi IMAP-kansio\" ja lisätä kansion tällä nimellä "
-"uudestaan\n"
-".Mitä haluat tehdä?"
+"uudestaan.\n"
+"Mitä haluat tehdä?"
 
 #: ../src/mailbox-conf.c:422
 msgid "_Remove from server"
@@ -5978,7 +5978,7 @@ msgid ""
 "Possible reason: not enough temporary space"
 msgstr ""
 "Viestin liittäminen epäonnistui\n"
-"Mahdolinen syy: ei tarpeeksi väliaikaistilaa"
+"Mahdollinen syy: ei tarpeeksi väliaikaistilaa"
 
 #: ../src/sendmsg-window.c:2684
 msgid "F_rom:"

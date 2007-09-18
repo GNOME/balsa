@@ -893,6 +893,21 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
     }
 }
 
+static void
+bndx_mailbox_message_expunged_cb(LibBalsaMailbox * mailbox, guint msgno,
+                                 BalsaIndex * bindex)
+{
+    if (bindex->current_msgno == msgno)
+        bindex->current_msgno = 0;
+    else if (bindex->current_msgno > msgno)
+        --bindex->current_msgno;
+
+    if (bindex->next_msgno == msgno)
+        bindex->next_msgno = 0;
+    else if (bindex->next_msgno > msgno)
+        --bindex->next_msgno;
+}
+
 /* balsa_index_load_mailbox_node:
    open mailbox_node, the opening is done in thread to keep UI alive.
 
@@ -968,9 +983,8 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 			     (gpointer) index);
     g_signal_connect(mailbox, "row-inserted",
 	    	     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
-
-    libbalsa_mailbox_register_msgno(mailbox, &index->current_msgno);
-    libbalsa_mailbox_register_msgno(mailbox, &index->next_msgno);
+    g_signal_connect(mailbox, "message-expunged",
+	    	     G_CALLBACK(bndx_mailbox_message_expunged_cb), index);
 
     balsa_window_enable_mailbox_menus(balsa_app.main_window, index);
     gdk_threads_leave();

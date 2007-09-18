@@ -613,8 +613,6 @@ void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
 				     const gchar * id);
 
 /* Message numbers and arrays */
-void libbalsa_mailbox_register_msgno(LibBalsaMailbox * mailbox,
-                                     guint * msgno);
 void libbalsa_mailbox_register_msgnos(LibBalsaMailbox * mailbox,
 				      GArray * msgnos);
 void libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,

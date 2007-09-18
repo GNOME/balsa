@@ -3931,24 +3931,7 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
     }
 }
 
-/* Use "message-expunged" signal to update a msgno or an array of msgnos. */
-static void
-lbm_update_msgno(LibBalsaMailbox * mailbox, guint seqno, guint * msgno)
-{
-    if (*msgno == seqno)
-        *msgno = 0;
-    else if (*msgno > seqno)
-        --*msgno;
-}
-
-void
-libbalsa_mailbox_register_msgno(LibBalsaMailbox * mailbox,
-                                guint * msgno)
-{
-    g_signal_connect(mailbox, "message-expunged",
-                     G_CALLBACK(lbm_update_msgno), msgno);
-}
-
+/* Use "message-expunged" signal to update an array of msgnos. */
 static void
 lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno, GArray * msgnos)
 {

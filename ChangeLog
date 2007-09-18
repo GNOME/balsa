@@ -1,3 +1,12 @@
+2007-09-18  Peter Bloomfield
+
+	* libbalsa/mailbox.c: scrap libbalsa_mailbox_register_msgno.
+	* libbalsa/mailbox.h: ditto.
+	* src/balsa-index.c: (bndx_mailbox_message_expunged_cb),
+	(balsa_index_load_mailbox_node): change
+	BalsaIndex::{current,next}_msgno if necessary when a message
+	is expunged.
+
 2007-09-16  Peter Bloomfield
 
 	* src/sendmsg-window.c: allow the letter 'q' in messages, by

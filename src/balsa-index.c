@@ -138,7 +138,7 @@ static void bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path);
 static void bndx_select_row(BalsaIndex * index, GtkTreePath * path);
 
 /* Other callbacks. */
-static void bndx_store_address(GtkWidget * widget, gpointer data);
+static void bndx_store_address(gpointer data);
 
 static GtkTreeViewClass *parent_class = NULL;
 
@@ -1439,7 +1439,7 @@ balsa_index_selected_msgnos_free(BalsaIndex * index, GArray * msgnos)
 }
 
 static void
-bndx_view_source(GtkWidget * widget, gpointer data)
+bndx_view_source(gpointer data)
 {
     BalsaIndex *index = BALSA_INDEX(data);
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
@@ -1459,7 +1459,7 @@ bndx_view_source(GtkWidget * widget, gpointer data)
 }
 
 static void
-bndx_store_address(GtkWidget * widget, gpointer data)
+bndx_store_address(gpointer data)
 {
     GList *messages = balsa_index_selected_list(BALSA_INDEX(data));
 
@@ -1716,7 +1716,7 @@ balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
 }
 
 static void
-bi_toggle_deleted_cb(GtkWidget * widget, gpointer user_data)
+bi_toggle_deleted_cb(gpointer user_data, GtkWidget * widget)
 {
     BalsaIndex *index;
     GArray *selected;
@@ -1742,7 +1742,7 @@ bi_toggle_deleted_cb(GtkWidget * widget, gpointer user_data)
 /* This function toggles the FLAGGED attribute of a list of messages
  */
 static void
-bi_toggle_flagged_cb(GtkWidget * widget, gpointer user_data)
+bi_toggle_flagged_cb(gpointer user_data)
 {
     g_return_if_fail(user_data != NULL);
 
@@ -1751,7 +1751,7 @@ bi_toggle_flagged_cb(GtkWidget * widget, gpointer user_data)
 }
 
 static void
-bi_toggle_new_cb(GtkWidget * widget, gpointer user_data)
+bi_toggle_new_cb(gpointer user_data)
 {
     g_return_if_fail(user_data != NULL);
 
@@ -1777,12 +1777,6 @@ mru_menu_cb(gchar * url, BalsaIndex * index)
 /*
  * bndx_popup_menu_create: create the popup menu at init time
  */
-static void
-bndx_pipe_message(GtkWidget *widget, gpointer user_data)
-{
-    balsa_index_pipe(BALSA_INDEX(user_data));
-}
-
 static GtkWidget *
 bndx_popup_menu_create(BalsaIndex * index)
 {
@@ -1802,7 +1796,7 @@ bndx_popup_menu_create(BalsaIndex * index)
         BALSA_PIXMAP_FORWARD, N_("Forward _Inline..."),
                 GTK_SIGNAL_FUNC(balsa_message_forward_inline)}, {
         NULL,                 N_("_Pipe through..."),
-                GTK_SIGNAL_FUNC(bndx_pipe_message)}, {
+                GTK_SIGNAL_FUNC(balsa_index_pipe)}, {
         BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."),
                 GTK_SIGNAL_FUNC(bndx_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
@@ -1944,7 +1938,8 @@ create_stock_menu_item(GtkWidget * menu, const gchar * type,
 
     gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
 
-    g_signal_connect(G_OBJECT(menuitem), "activate", G_CALLBACK(cb), data);
+    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+                             G_CALLBACK(cb), data);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 

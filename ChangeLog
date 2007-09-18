@@ -1,5 +1,12 @@
 2007-09-18  Peter Bloomfield
 
+	* src/balsa-index.c: (bndx_view_source), (bndx_store_address),
+	(bi_toggle_deleted_cb), (bi_toggle_flagged_cb), (bi_toggle_new_cb),
+	(bndx_popup_menu_create), (create_stock_menu_item): connect
+	signals swapped, to match new handler api.
+
+2007-09-18  Peter Bloomfield
+
 	* libbalsa/mailbox.c: scrap libbalsa_mailbox_register_msgno.
 	* libbalsa/mailbox.h: ditto.
 	* src/balsa-index.c: (bndx_mailbox_message_expunged_cb),

@@ -30,6 +30,7 @@
 #include "main-window.h"
 #include "message-window.h"
 #include "sendmsg-window.h"
+#include "libbalsa-conf.h"
 
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
@@ -39,10 +40,13 @@
  */
 
 struct BalsaToolbarModel_ {
-    GObject     object;
-    GHashTable *legal;
-    GSList     *standard;
-    GSList    **current;
+    GObject object;
+
+    GHashTable     *legal;
+    GSList         *standard;
+    GSList         *current;
+    const gchar    *name;
+    GtkToolbarStyle style;
 };
 
 enum {
@@ -183,15 +187,76 @@ balsa_toolbar_remove_all(GtkWidget * widget)
     g_list_free(children);
 }
 
+/* Load and save config
+ */
+static void
+tm_load_model(BalsaToolbarModel * model)
+{
+    gchar *key;
+    gboolean def;
+    guint j;
+
+    key = g_strconcat("toolbar-", model->name, NULL);
+    libbalsa_conf_push_group(key);
+    g_free(key);
+
+    model->style = libbalsa_conf_get_int_with_default("Style", &def);
+    if (def)
+        model->style = GTK_TOOLBAR_BOTH;
+
+    model->current = NULL;
+    for (j = 0;; j++) {
+        gchar *item;
+
+        key = g_strdup_printf("Item%d", j);
+        item = libbalsa_conf_get_string(key);
+        g_free(key);
+
+        if (!item)
+            break;
+
+        model->current = g_slist_prepend(model->current, item);
+    }
+    model->current = g_slist_reverse(model->current);
+
+    libbalsa_conf_pop_group();
+}
+
+static void
+tm_save_model(BalsaToolbarModel * model)
+{
+    gchar *key;
+    guint j;
+    GSList *list;
+
+    key = g_strconcat("toolbar-", model->name, NULL);
+    libbalsa_conf_push_group(key);
+    g_free(key);
+
+    libbalsa_conf_set_int("Style", model->style);
+
+    for (j = 0, list = model->current;
+         list;
+         j++, list = list->next) {
+        key = g_strdup_printf("Item%d", j);
+        libbalsa_conf_set_string(key, list->data);
+        g_free(key);
+    }
+
+    libbalsa_conf_pop_group();
+}
+
 /* Create a BalsaToolbarModel structure.
  */
 BalsaToolbarModel *
-balsa_toolbar_model_new(GSList * standard, GSList ** current)
+balsa_toolbar_model_new(const gchar * name, GSList * standard)
 {
-    BalsaToolbarModel *model = g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
+    BalsaToolbarModel *model =
+        g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
 
+    model->name = name;
     model->standard = standard;
-    model->current = current;
+    tm_load_model(model);
 
     return model;
 }
@@ -253,13 +318,13 @@ balsa_toolbar_model_get_legal(BalsaToolbarModel * model)
 GSList *
 balsa_toolbar_model_get_current(BalsaToolbarModel * model)
 {
-    return *model->current ? *model->current : model->standard;
+    return model->current ? model->current : model->standard;
 }
 
 gboolean
 balsa_toolbar_model_is_standard(BalsaToolbarModel * model)
 {
-    return *model->current == NULL;
+    return model->current == NULL;
 }
 
 /* Add an icon to the list of current icons in a BalsaToolbarModel.
@@ -268,23 +333,24 @@ void
 balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
                                 gint position)
 {
-    const gchar* real_button = balsa_toolbar_sanitize_id(icon);
+    const gchar *real_button = balsa_toolbar_sanitize_id(icon);
 
     if (real_button)
-        *model->current =
-            g_slist_insert(*model->current, g_strdup(real_button), position);
+        model->current =
+            g_slist_insert(model->current, g_strdup(real_button),
+                           position);
     else
         g_warning(_("Unknown toolbar icon \"%s\""), icon);
 }
 
 /* Remove all icons from the BalsaToolbarModel.
  */
-void 
+void
 balsa_toolbar_model_clear(BalsaToolbarModel * model)
 {
-    g_slist_foreach(*model->current, (GFunc) g_free, NULL);
-    g_slist_free(*model->current);
-    *model->current = NULL;
+    g_slist_foreach(model->current, (GFunc) g_free, NULL);
+    g_slist_free(model->current);
+    model->current = NULL;
 }
 
 /* Create a new instance of a toolbar
@@ -296,7 +362,8 @@ tm_has_second_line(BalsaToolbarModel * model)
     GSList *list;
 
     /* Find out whether any button has 2 lines of text. */
-    for (list = balsa_toolbar_model_get_current(model); list; list = list->next) {
+    for (list = balsa_toolbar_model_get_current(model); list;
+         list = list->next) {
         const gchar *icon = list->data;
         gint button = get_toolbar_button_index(icon);
 
@@ -314,7 +381,7 @@ tm_has_second_line(BalsaToolbarModel * model)
 
 static gint
 tm_set_tool_item_label(GtkToolButton * tool_item, const gchar * stock_id,
-                       gboolean has_second_line)
+                       gboolean make_two_line)
 {
     gint button = get_toolbar_button_index(stock_id);
     gchar *tmp, *text;
@@ -329,7 +396,7 @@ tm_set_tool_item_label(GtkToolButton * tool_item, const gchar * stock_id,
     if (balsa_app.toolbar_wrap_button_text) {
         /* Make sure all buttons have the same number of lines of
          * text (1 or 2), to keep icons aligned */
-        text = has_second_line && !strchr(tmp, '\n') ?
+        text = make_two_line && !strchr(tmp, '\n') ?
             g_strconcat(tmp, "\n", NULL) : g_strdup(tmp);
     } else {
         text = tmp = g_strdup(tmp);
@@ -340,6 +407,8 @@ tm_set_tool_item_label(GtkToolButton * tool_item, const gchar * stock_id,
     gtk_tool_button_set_label(tool_item, text);
     g_free(text);
 
+    gtk_tool_item_set_is_important(GTK_TOOL_ITEM(tool_item), TRUE);
+
     return button;
 }
 
@@ -347,7 +416,8 @@ static void
 tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
             GArray * merge_ids)
 {
-    gboolean has_second_line = tm_has_second_line(model);
+    gboolean make_two_line = model->style != GTK_TOOLBAR_BOTH_HORIZ
+        && tm_has_second_line(model);
     GSList *list;
 
     for (list = balsa_toolbar_model_get_current(model); list;
@@ -379,14 +449,14 @@ tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
                 continue;
             }
             gtk_ui_manager_add_ui(ui_manager, merge_id, "/Toolbar",
-                                  name, name,
-                                  GTK_UI_MANAGER_AUTO, FALSE);
+                                  name, name, GTK_UI_MANAGER_AUTO, FALSE);
             /* Replace the long menu-item label with the short
              * tool-button label: */
             path = g_strconcat("/Toolbar/", name, NULL);
             tool_item = gtk_ui_manager_get_widget(ui_manager, path);
             g_free(path);
-            tm_set_tool_item_label(GTK_TOOL_BUTTON(tool_item), stock_id, has_second_line);
+            tm_set_tool_item_label(GTK_TOOL_BUTTON(tool_item), stock_id,
+                                   make_two_line);
         }
     }
 }
@@ -395,7 +465,7 @@ tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
 static void
 bt_free_merge_ids(GArray * merge_ids)
 {
-     g_array_free(merge_ids, TRUE);
+    g_array_free(merge_ids, TRUE);
 }
 
 /* Update a real toolbar when the model has changed.
@@ -406,6 +476,7 @@ tm_changed_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     GArray *merge_ids =
         g_object_get_data(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS);
     guint i;
+    GtkWidget *toolbar;
 
     for (i = 0; i < merge_ids->len; i++) {
         guint merge_id = g_array_index(merge_ids, guint, i);
@@ -414,11 +485,16 @@ tm_changed_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     merge_ids->len = 0;
 
     tm_populate(model, ui_manager, merge_ids);
+
+    toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
+    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), model->style);
+
+    tm_save_model(model);
 }
 
 typedef struct {
-    BalsaToolbarModel * model;
-    GtkUIManager * ui_manager;
+    BalsaToolbarModel *model;
+    GtkUIManager      *ui_manager;
 } toolbar_info;
 
 static void
@@ -428,6 +504,108 @@ tm_toolbar_weak_notify(toolbar_info * info, GtkWidget * toolbar)
                                          info->ui_manager);
     g_object_unref(info->ui_manager);
     g_free(info);
+}
+
+#define BALSA_TOOLBAR_STYLE "balsa-toolbar-style"
+static void
+menu_item_toggled_cb(GtkCheckMenuItem * item, toolbar_info * info)
+{
+    if (gtk_check_menu_item_get_active(item)) {
+        info->model->style =
+            GPOINTER_TO_INT(g_object_get_data
+                            (G_OBJECT(item), BALSA_TOOLBAR_STYLE));
+        balsa_toolbar_model_changed(info->model);
+    }
+}
+
+/* We want to destroy the popup menu after handling the "toggled"
+ * signal; the "deactivate" signal is apparently emitted before
+ * "toggled", so we have to use an idle callback. */
+static gboolean
+do_popup_idle_cb(GtkWidget *menu)
+{
+    gtk_widget_destroy(menu);
+    return FALSE;
+}
+
+static void
+do_popup_deactivated_cb(GtkWidget *menu)
+{
+    g_idle_add((GSourceFunc) do_popup_idle_cb, menu);
+}
+
+static void
+do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
+              toolbar_info * info)
+{
+    GtkWidget *menu;
+    int button, event_time;
+    guint i;
+    GSList *group = NULL;
+    static const struct {
+        const gchar *text;
+        GtkToolbarStyle style;
+    } options[] = {
+        {
+        N_("Text Be_low Icons"),  GTK_TOOLBAR_BOTH}, {
+        N_("Text Be_side Icons"), GTK_TOOLBAR_BOTH_HORIZ}, {
+        N_("_Icons Only"),        GTK_TOOLBAR_ICONS}, {
+        N_("_Text Only"),         GTK_TOOLBAR_TEXT}
+    };
+
+    menu = gtk_menu_new();
+    g_signal_connect(menu, "deactivate",
+                     G_CALLBACK(do_popup_deactivated_cb), NULL);
+
+    /* ... add menu items ... */
+    for (i = 0; i < G_N_ELEMENTS(options); i++) {
+        GtkWidget *item =
+            gtk_radio_menu_item_new_with_mnemonic(group,
+                                                  _(options[i].text));
+        group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+        if (options[i].style == info->model->style)
+            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
+                                           TRUE);
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+        g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_STYLE,
+                          GINT_TO_POINTER(options[i].style));
+        g_signal_connect(item, "toggled", G_CALLBACK(menu_item_toggled_cb),
+                         info);
+    }
+    gtk_widget_show_all(menu);
+
+    if (event) {
+        button = event->button;
+        event_time = event->time;
+    } else {
+        button = 0;
+        event_time = gtk_get_current_event_time();
+    }
+
+    gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,
+                   event_time);
+}
+
+static gboolean
+tm_button_press_cb(GtkWidget * toolbar, GdkEventButton * event,
+                   toolbar_info * info)
+{
+    /* Ignore double-clicks and triple-clicks */
+    if (event->button == 3 && event->type == GDK_BUTTON_PRESS) {
+        do_popup_menu(toolbar, event, info);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static gboolean
+tm_popup_menu_cb(GtkWidget * toolbar, toolbar_info * info)
+{
+    do_popup_menu(toolbar, NULL, info);
+
+    return TRUE;
 }
 
 GtkWidget *
@@ -441,16 +619,22 @@ balsa_toolbar_new(BalsaToolbarModel * model, GtkUIManager * ui_manager)
                            merge_ids, (GDestroyNotify) bt_free_merge_ids);
 
     tm_populate(model, ui_manager, merge_ids);
-    toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
-
     g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb),
                      ui_manager);
 
     info = g_new(toolbar_info, 1);
     info->model = model;
     info->ui_manager = g_object_ref(ui_manager);
+
+    toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
+    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), model->style);
     g_object_weak_ref(G_OBJECT(toolbar),
                       (GWeakNotify) tm_toolbar_weak_notify, info);
+
+    g_signal_connect(toolbar, "button-press-event",
+                     G_CALLBACK(tm_button_press_cb), info);
+    g_signal_connect(toolbar, "popup-menu", G_CALLBACK(tm_popup_menu_cb),
+                     info);
 
     return toolbar;
 }

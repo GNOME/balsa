@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2007 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -292,7 +292,8 @@ static gboolean cancel_new_mail_notification(void);
 
 static void balsa_window_increase_activity(BalsaWindow * window,
                                            const gchar * message);
-static void balsa_window_decrease_activity(BalsaWindow * window);
+static void balsa_window_decrease_activity(BalsaWindow * window,
+                                           const gchar * message);
 
 static void
 balsa_quit_nicely(GtkAction * action, gpointer data)
@@ -1315,7 +1316,6 @@ bw_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
     GSList *standard;
-    GSList **current;
     guint i;
 
     if (model)
@@ -1325,9 +1325,7 @@ bw_get_toolbar_model(void)
     for (i = 0; i < ELEMENTS(main_toolbar); i++)
         standard = g_slist_append(standard, g_strdup(main_toolbar[i]));
 
-    current = &balsa_app.main_window_toolbar_current;
-
-    model = balsa_toolbar_model_new(standard, current);
+    model = balsa_toolbar_model_new("MainWindow", standard);
     balsa_toolbar_model_add_actions(model, entries, G_N_ELEMENTS(entries));
     balsa_toolbar_model_add_actions(model, mailbox_entries, G_N_ELEMENTS(mailbox_entries));
     balsa_toolbar_model_add_actions(model, message_entries, G_N_ELEMENTS(message_entries));
@@ -1494,8 +1492,6 @@ balsa_window_new()
     gtk_widget_set_size_request(window->progress_bar, -1, 1);
     gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(window->progress_bar),
                                     0.01);
-    gtk_progress_bar_set_ellipsize(GTK_PROGRESS_BAR(window->progress_bar),
-                                   PANGO_ELLIPSIZE_MIDDLE);
     gtk_box_pack_start(GTK_BOX(hbox), window->progress_bar, FALSE, FALSE,
                        0);
 
@@ -2131,7 +2127,6 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
 
     message = g_strdup_printf(_("Opening %s"), info->mbnode->mailbox->name);
     balsa_window_increase_activity(info->window, message);
-    g_free(message);
 
     /* Call balsa_index_load_mailbox_node NOT holding the gdk lock. */
     gdk_threads_leave();
@@ -2140,10 +2135,11 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     gdk_threads_enter();
 
     if (info->window) {
-	balsa_window_decrease_activity(info->window);
+	balsa_window_decrease_activity(info->window, message);
 	g_object_remove_weak_pointer(G_OBJECT(info->window),
 				     (gpointer) &info->window);
     }
+    g_free(message);
 
     if (!info->window || failurep) {
         libbalsa_information(
@@ -4730,6 +4726,7 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
 {
     gint activity_handler;
     guint activity_counter = 0;
+    GSList *activity_messages;
     static GtkProgressBar *progress_bar = NULL;
 
     if (!progress_bar) {
@@ -4759,6 +4756,12 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
                       GUINT_TO_POINTER(activity_counter));
 
     gtk_progress_bar_set_text(progress_bar, message);
+    activity_messages = g_object_get_data(G_OBJECT(progress_bar),
+                                          "activity_messages");
+    activity_messages = 
+        g_slist_prepend(activity_messages, (gpointer) message);
+    g_object_set_data(G_OBJECT(progress_bar), "activity_messages", 
+                      activity_messages);
 }
 
 
@@ -4769,10 +4772,11 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
  * cleared.
  **/
 static void 
-balsa_window_decrease_activity(BalsaWindow* window)
+balsa_window_decrease_activity(BalsaWindow* window, const gchar * message)
 {
     gint activity_handler;
     guint activity_counter = 0;
+    GSList *activity_messages;
     GtkProgressBar *progress_bar;
     
     progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
@@ -4800,12 +4804,20 @@ balsa_window_decrease_activity(BalsaWindow* window)
             g_object_set_data(G_OBJECT(progress_bar), "in_use",
                               GINT_TO_POINTER(BALSA_PROGRESS_NONE));
             gtk_progress_bar_set_fraction(progress_bar, 0);
-            gtk_progress_bar_set_text(progress_bar, NULL);
         }
         /* make sure to store the counter value */
         g_object_set_data(G_OBJECT(progress_bar), "activity_counter",
                           GUINT_TO_POINTER(activity_counter));
     }
+
+    activity_messages = g_object_get_data(G_OBJECT(progress_bar),
+                                          "activity_messages");
+    activity_messages = g_slist_remove(activity_messages, message);
+    gtk_progress_bar_set_text(progress_bar,
+                              activity_messages ?
+                              activity_messages->data : NULL);
+    g_object_set_data(G_OBJECT(progress_bar), "activity_messages", 
+                      activity_messages);
 }
 
 

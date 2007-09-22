@@ -4337,7 +4337,6 @@ sw_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
     GSList *standard;
-    GSList **current;
     guint i;
 
     if (model)
@@ -4347,9 +4346,7 @@ sw_get_toolbar_model(void)
     for (i = 0; i < ELEMENTS(compose_toolbar); i++)
         standard = g_slist_append(standard, g_strdup(compose_toolbar[i]));
 
-    current = &balsa_app.compose_window_toolbar_current;
-
-    model = balsa_toolbar_model_new(standard, current);
+    model = balsa_toolbar_model_new("ComposeWindow", standard);
     balsa_toolbar_model_add_actions(model, entries, G_N_ELEMENTS(entries));
     balsa_toolbar_model_add_actions(model, ready_entries,
                                     G_N_ELEMENTS(ready_entries));

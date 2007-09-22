@@ -61,8 +61,8 @@ void balsa_toolbar_remove_all(GtkWidget * toolbar);
 const gchar *balsa_toolbar_sanitize_id(const gchar * id);
 
 /* BalsaToolbarModel */
-BalsaToolbarModel *balsa_toolbar_model_new(GSList * standard,
-                                           GSList ** current);
+BalsaToolbarModel *balsa_toolbar_model_new(const gchar * name,
+                                           GSList * standard);
 void balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
                                      const GtkActionEntry * entries,
                                      guint n_entries);

@@ -126,121 +126,23 @@ d_get_gint(const gchar * key, gint def_val)
 /* save/load_toolbars:
    handle customized toolbars for main/message preview and compose windows.
 */
-static struct {
-    const gchar *key;
-    GSList **current;
-} toolbars[] = {
-    { "toolbar-MainWindow",    &balsa_app.main_window_toolbar_current },
-    { "toolbar-ComposeWindow", &balsa_app.compose_window_toolbar_current },
-    { "toolbar-MessageWindow", &balsa_app.message_window_toolbar_current }
-};
 
 static void
 save_toolbars(void)
 {
-    guint i, j;
-
     libbalsa_conf_remove_group("Toolbars");
     libbalsa_conf_push_group("Toolbars");
     libbalsa_conf_set_int("WrapButtonText",
                          balsa_app.toolbar_wrap_button_text);
     libbalsa_conf_pop_group();
-
-    for (i = 0; i < ELEMENTS(toolbars); i++) {
-        GSList *list;
-
-        libbalsa_conf_remove_group(toolbars[i].key);
-        libbalsa_conf_push_group(toolbars[i].key);
-
-        for (j = 0, list = *toolbars[i].current; list;
-             j++, list = list->next) {
-            gchar *key = g_strdup_printf("Item%d", j);
-            libbalsa_conf_set_string(key, list->data);
-            g_free(key);
-        }
-        libbalsa_conf_pop_group();
-    }
 }
 
 static void
 load_toolbars(void)
 {
-    guint i, j, items;
-    char tmpkey[256];
-    gchar *key;
-    GSList **list;
-    guint changed = 0;
-
-    tmpkey[sizeof tmpkey - 1] = '\0';
-
     libbalsa_conf_push_group("Toolbars");
     balsa_app.toolbar_wrap_button_text = d_get_gint("WrapButtonText", 1);
     libbalsa_conf_pop_group();
-
-    items = 0;
-    for (i = 0; i < ELEMENTS(toolbars); i++) {
-        libbalsa_conf_push_group(toolbars[i].key);
-
-        list = toolbars[i].current;
-        for (j = 0;; j++) {
-            gchar *item;
-	    const gchar *real_item;
-
-            key = g_strdup_printf("Item%d", j);
-            item = libbalsa_conf_get_string(key);
-            g_free(key);
-
-            if (!item)
-                break;
-	    if ((real_item = balsa_toolbar_sanitize_id(item))) {
-		*list = g_slist_append(*list, g_strdup(real_item));
-		items++;
-		if (strcmp(real_item, item) != 0)
-		    ++changed;
-	    }
-	    g_free(item);
-        }
-        libbalsa_conf_pop_group();
-    }
-
-    if (items)
-        return;
-
-    /* We didn't find new-style toolbar configs, so we'll try the old
-     * style */
-    libbalsa_conf_push_group("Toolbars");
-    for (i = 0; i < ELEMENTS(toolbars); i++) {
-        guint type;
-
-        snprintf(tmpkey, sizeof tmpkey - 1, "Toolbar%dID", i);
-        type = d_get_gint(tmpkey, -1);
-
-        if (type >= ELEMENTS(toolbars)) {
-            continue;
-        }
-
-        snprintf(tmpkey, sizeof tmpkey - 1, "Toolbar%dItemCount", i);
-        items = d_get_gint(tmpkey, 0);
-
-        list = toolbars[type].current;
-        for (j = 0; j < items; j++) {
-            gchar *item;
-	    const gchar *real_item;
-
-            snprintf(tmpkey, sizeof tmpkey - 1, "Toolbar%dItem%d", i, j);
-            item = libbalsa_conf_get_string(tmpkey);
- 	    if ((real_item = balsa_toolbar_sanitize_id(item))) {
- 		*list = g_slist_append(*list, g_strdup(real_item));
-		if (strcmp(real_item, item) != 0)
-		    ++changed;
-	    }
- 	    g_free(item);
-        }
-    }
-    libbalsa_conf_pop_group();
-
-    if (changed)
-	save_toolbars();
 }
 
 /* config_mailbox_set_as_special:

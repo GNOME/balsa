@@ -302,6 +302,12 @@ standard_button_cb(GtkWidget *widget, ToolbarPage * page)
     balsa_toolbar_model_changed(page->model);
 }
 
+static void
+style_button_cb(GtkWidget *widget, ToolbarPage * page)
+{
+    g_signal_emit_by_name(page->toolbar, "popup-menu");
+}
+
 /* Callback for the "row-activated" signal for the available list. */
 static void
 available_row_activated_cb(GtkTreeView * treeview, GtkTreeIter * arg1,
@@ -390,6 +396,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     GtkWidget *lower_ctlbox, *button_box, *move_button_box, *center_button_box;
     GtkWidget *list_frame, *list_scroll;
     GtkWidget *destination_frame, *destination_scroll;
+    GtkWidget *style_button;
     ToolbarPage *page;
     GtkTreeSelection *selection;
 
@@ -420,7 +427,6 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     /* The preview is an actual, fully functional toolbar */
     page->toolbar = balsa_toolbar_new(model, ui_manager);
     gtk_widget_set_sensitive(page->toolbar, FALSE);
-    gtk_toolbar_set_style(GTK_TOOLBAR(page->toolbar), GTK_TOOLBAR_BOTH);
 
     /* embedded in a scrolled_window */
     toolbar_scroll=gtk_scrolled_window_new(NULL, NULL);
@@ -434,12 +440,18 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(toolbar_scroll),
                                           page->toolbar);
 
+    /* Button box */
+    button_box = gtk_hbutton_box_new();
+    gtk_box_pack_start(GTK_BOX(toolbar_ctlbox), button_box, FALSE, FALSE, 0);
+
     /* Standard button */
     page->standard_button =
         gtk_button_new_with_mnemonic(_("_Restore toolbar to standard buttons"));
+    gtk_container_add(GTK_CONTAINER(button_box), page->standard_button);
 
-    gtk_box_pack_start(GTK_BOX(toolbar_ctlbox), page->standard_button,
-		       FALSE, FALSE, 0);
+    /* Style button */
+    style_button = gtk_button_new_with_mnemonic(_("Toolbar _style..."));
+    gtk_container_add(GTK_CONTAINER(button_box), style_button);
 
     /* Done with preview */
 	
@@ -536,6 +548,8 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 
     g_signal_connect(G_OBJECT(page->standard_button), "clicked",
 		       G_CALLBACK(standard_button_cb), page);
+    g_signal_connect(G_OBJECT(style_button), "clicked",
+		       G_CALLBACK(style_button_cb), page);
 
     gtk_widget_set_sensitive(page->add_button, FALSE);
     gtk_widget_set_sensitive(page->remove_button, FALSE);

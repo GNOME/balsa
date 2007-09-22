@@ -432,7 +432,6 @@ mw_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
     GSList *standard;
-    GSList **current;
     guint i;
 
     if (model)
@@ -442,9 +441,7 @@ mw_get_toolbar_model(void)
     for (i = 0; i < ELEMENTS(message_toolbar); i++)
         standard = g_slist_append(standard, g_strdup(message_toolbar[i]));
 
-    current = &balsa_app.message_window_toolbar_current;
-
-    model = balsa_toolbar_model_new(standard, current);
+    model = balsa_toolbar_model_new("MessageWindow", standard);
     balsa_toolbar_model_add_actions(model, entries, G_N_ELEMENTS(entries));
     balsa_toolbar_model_add_toggle_actions(model, toggle_entries, G_N_ELEMENTS(toggle_entries));
 

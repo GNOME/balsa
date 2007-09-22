@@ -1,3 +1,16 @@
+2007-09-22  Peter Bloomfield
+
+	* src/main-window.c: make a stack of "opening mailbox..."
+	messages; new toolbar api.
+	* src/message-window.c: (mw_get_toolbar_model): new toolbar api.
+	* src/save-restore.c: (save_toolbars), (load_toolbars): move
+	toolbar save and load to toolbar-factory.c.
+	* src/sendmsg-window.c: (sw_get_toolbar_model): new toolbar api.
+	* src/toolbar-factory.c: create a popup menu for toolbar.
+	* src/toolbar-factory.h: new toolbar api.
+	* src/toolbar-prefs.c: (style_button_cb), (create_toolbar_page):
+	add a button to popup toolbar style menu.
+
 2007-09-21  Peter Bloomfield
 
 	* src/ab-main.c: (bab_window_new): migrate from GnomeApp.

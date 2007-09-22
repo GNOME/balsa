@@ -111,7 +111,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     GtkWidget *option_frame;
     GtkWidget *option_box;
     GtkWidget *wrap_button;
-    GnomeApp *active_window = GNOME_APP(data);
+    GtkWidget *active_window = data;
     BalsaToolbarModel *model;
     GtkUIManager * ui_manager;
 

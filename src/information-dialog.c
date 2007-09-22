@@ -273,10 +273,18 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
                                  gtk_text_buffer_get_insert(buffer),
                                  0, FALSE, 0, 0);
 
-    if (balsa_app.appbar) {
-        gchar *line = g_strdup(msg);
+    if (balsa_app.main_window) {
+        gchar *line;
+        GtkStatusbar *statusbar;
+        guint context_id;
+
+        statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+        context_id = gtk_statusbar_get_context_id(statusbar, "Information list");
+        gtk_statusbar_pop(statusbar, context_id);
+
+        line = g_strdup(msg);
         g_strdelimit(line, "\r\n", ' ');
-	gnome_appbar_set_status(balsa_app.appbar, line);
+        gtk_statusbar_push(statusbar, context_id, line);
         g_free(line);
     }
 }
@@ -287,8 +295,14 @@ status_bar_refresh(gpointer data)
 {
     gdk_threads_enter();
 
-    if (balsa_app.appbar)
-        gnome_appbar_pop(balsa_app.appbar);
+    if (balsa_app.main_window) {
+        GtkStatusbar *statusbar;
+        guint context_id;
+
+        statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+        context_id = gtk_statusbar_get_context_id(statusbar, "Information bar");
+        gtk_statusbar_pop(statusbar, context_id);
+    }
 
     bar_timeout_id = 0;
 
@@ -302,19 +316,24 @@ balsa_information_bar(GtkWindow *parent, LibBalsaInformationType type,
                       const char *msg)
 {
     gchar *line;
+    GtkStatusbar *statusbar;
+    guint context_id;
 
-    if (!balsa_app.appbar)
+    if (!balsa_app.main_window)
         return;
+
+    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+    context_id = gtk_statusbar_get_context_id(statusbar, "Information bar");
 
     /* First clear any current message. */
     if (bar_timeout_id) {
-        gnome_appbar_pop(balsa_app.appbar);
+        gtk_statusbar_pop(statusbar, context_id);
         g_source_remove(bar_timeout_id);
     }
 
     line = g_strdup(msg);
     g_strdelimit(line, "\r\n", ' ');
-    gnome_appbar_push(balsa_app.appbar, line);
+    gtk_statusbar_push(statusbar, context_id, line);
     g_free(line);
 
     bar_timeout_id = g_timeout_add(4000, status_bar_refresh, NULL);

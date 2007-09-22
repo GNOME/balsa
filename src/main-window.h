@@ -40,9 +40,10 @@ typedef struct _BalsaWindow BalsaWindow;
 typedef struct _BalsaWindowClass BalsaWindowClass;
 
 struct _BalsaWindow {
-    GnomeApp window;
+    GtkWindow window;
 
     GtkWidget *progress_bar;
+    GtkWidget *statusbar;
     GtkWidget *mblist;
     GtkWidget *sos_entry;       /* SenderOrSubject filter entry */
     GtkWidget *notebook;
@@ -51,6 +52,8 @@ struct _BalsaWindow {
     GtkWidget *vpaned;
     GtkWidget *current_index;
     GtkWidget *filter_choice;
+    GtkWidget *vbox;
+    GtkWidget *content;
 
     guint set_message_id;
 
@@ -61,7 +64,7 @@ struct _BalsaWindow {
 };
 
 struct _BalsaWindowClass {
-    GnomeAppClass parent_class;
+    GtkWindowClass parent_class;
 
     void (*open_mbnode)  (BalsaWindow * window, BalsaMailboxNode * mbnode);
     void (*close_mbnode) (BalsaWindow * window, BalsaMailboxNode * mbnode);
@@ -99,8 +102,12 @@ void balsa_window_update_tab(BalsaMailboxNode * mbnode);
 void enable_empty_trash(BalsaWindow * window, TrashState status);
 void balsa_window_enable_continue(BalsaWindow * window);
 void balsa_change_window_layout(BalsaWindow *window);
-gboolean mail_progress_notify_cb(void);
-gboolean send_progress_notify_cb(void);
+gboolean mail_progress_notify_cb(GIOChannel * source,
+                                 GIOCondition condition,
+                                 BalsaWindow ** window);
+gboolean send_progress_notify_cb(GIOChannel * source,
+                                 GIOCondition condition,
+                                 BalsaWindow ** window);
 void check_new_messages_cb(GtkAction * action, gpointer data);
 void check_new_messages_real(BalsaWindow * window, int type);
 void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
@@ -112,8 +119,6 @@ void balsa_window_select_all(GtkWindow * window);
 gboolean balsa_window_next_unread(BalsaWindow * window);
 
 /* functions to manipulate the progress bars of the window */
-void balsa_window_increase_activity(BalsaWindow* window);
-void balsa_window_decrease_activity(BalsaWindow* window);
 gboolean balsa_window_setup_progress(BalsaWindow * window,
                                      const gchar * text);
 void balsa_window_clear_progress(BalsaWindow* window);

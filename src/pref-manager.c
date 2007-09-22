@@ -492,7 +492,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     GtkWidget *view;
     GtkTreeSelection * selection;
     GtkWidget *notebook;
-    GnomeApp *active_win = GNOME_APP(data);
+    GtkWidget *active_win = data;
     gint i;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
@@ -1066,8 +1066,8 @@ set_prefs(void)
         }
 
 #if GTK_CHECK_VERSION(2, 6, 0)
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
-                                  (pui->mail_directory),
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
+                                        (pui->mail_directory),
                                   balsa_app.local_mail_directory);
 #else                           /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_entry_set_text(GTK_ENTRY(pui->mail_directory),

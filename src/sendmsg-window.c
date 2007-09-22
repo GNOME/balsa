@@ -4441,7 +4441,8 @@ sendmsg_window_new()
     bsmsg->quit_on_close = FALSE;
     bsmsg->state = SENDMSG_STATE_CLEAN;
 
-    bsmsg->window = window = gnome_app_new("balsa", NULL);
+    bsmsg->window = window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
     /*
      * restore the SendMsg window size
      */
@@ -4450,7 +4451,9 @@ sendmsg_window_new()
                                 balsa_app.sw_height);
 
     gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
-    gtk_widget_show(window);
+
+    gtk_container_add(GTK_CONTAINER(window), main_box);
+    gtk_widget_show_all(window);
 
     bsmsg->type = SEND_NORMAL;
 #if !HAVE_GTKSPELL
@@ -4492,10 +4495,10 @@ sendmsg_window_new()
     }
 
     menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
-    gnome_app_set_menus(GNOME_APP(window), GTK_MENU_BAR(menubar));
+    gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
 
     toolbar = balsa_toolbar_new(model, ui_manager);
-    gnome_app_set_toolbar(GNOME_APP(window), GTK_TOOLBAR(toolbar));
+    gtk_box_pack_start(GTK_BOX(main_box), toolbar, FALSE, FALSE, 0);
 
     /* Now that we have installed the menubar and toolbar, we no longer
      * need the UIManager. */
@@ -4530,8 +4533,6 @@ sendmsg_window_new()
     /* create text area for the message */
     gtk_box_pack_start(GTK_BOX(main_box), create_text_area(bsmsg),
                        TRUE, TRUE, 0);
-
-    gnome_app_set_contents(GNOME_APP(window), main_box);
 
     /* set the menus - and language index */
     init_menus(bsmsg);

@@ -921,7 +921,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 {
     GtkTreeView *tree_view;
     LibBalsaMailbox* mailbox;
-    gchar *msg;
     gboolean successp;
     gint try_cnt;
     LibBalsaCondition *view_filter;
@@ -932,13 +931,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox), TRUE);
 
     mailbox = mbnode->mailbox;
-
-    msg = g_strdup_printf(_("Opening mailbox %s. Please wait..."),
-			  mbnode->mailbox->name);
-    gdk_threads_enter();
-    gnome_appbar_push(balsa_app.appbar, msg);
-    gdk_threads_leave();
-    g_free(msg);
 
     try_cnt = 0;
     do {
@@ -952,10 +944,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
             break;
         balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
     } while(try_cnt++<3);
-
-    gdk_threads_enter();
-    gnome_appbar_pop(balsa_app.appbar);
-    gdk_threads_leave();
 
     if (!successp)
 	return TRUE;

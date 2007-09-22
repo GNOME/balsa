@@ -364,8 +364,7 @@ extern struct BalsaApplication {
     gboolean always_queue_sent_mail;
     gboolean copy_to_sentbox;
 
-    /* appbar */
-    GnomeAppBar *appbar;
+    /* mailbox indices */
     GtkWidget *notebook;
 
     /* address book */

@@ -469,6 +469,14 @@ imap_dir_cb(BalsaMailboxNode* mb)
     GSList *list;
     GError *error = NULL;
     imap_scan_tree imap_tree = { NULL, '.' };
+    GtkStatusbar *statusbar;
+    guint context_id;
+
+    if (!balsa_app.main_window)
+        return;
+
+    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+    context_id = gtk_statusbar_get_context_id(statusbar, "MailboxNode imap");
 
     if(restore_children_from_cache(mb))
         return;
@@ -476,7 +484,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
     while(mroot->parent)
 	mroot = mroot->parent;
     msg = g_strdup_printf(_("Scanning %s. Please wait..."), mroot->name);
-    gnome_appbar_push(balsa_app.appbar, msg);
+    gtk_statusbar_push(statusbar, context_id, msg);
     g_free(msg);
 
     g_return_if_fail(mb->server);
@@ -498,7 +506,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
                              error->message);
         g_error_free(error);
         imap_scan_destroy_tree(&imap_tree);
-        gnome_appbar_pop(balsa_app.appbar);
+        gtk_statusbar_pop(statusbar, context_id);
         return;
     }
 
@@ -528,7 +536,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
         printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
                mb->name, mb->mailbox);
     if(balsa_app.debug) printf("%d: Scanning done.\n", (int)time(NULL));
-    gnome_appbar_pop(balsa_app.appbar);
+    gtk_statusbar_pop(statusbar, context_id);
 
     /* We can save the cache now... */
     config_folder_update(mroot);

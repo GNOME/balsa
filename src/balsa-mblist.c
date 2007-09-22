@@ -2294,6 +2294,8 @@ balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
     gint unread_messages = mailbox->unread_messages;
     gint hidden_messages;
     GString *desc = g_string_new(NULL);
+    GtkStatusbar *statusbar;
+    guint context_id;
 
     hidden_messages =
         mailbox->msg_tree ? total_messages -
@@ -2325,7 +2327,10 @@ balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
                                    hidden_messages);
     }
 
-    gnome_appbar_set_default(balsa_app.appbar, desc->str);
+    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+    context_id = gtk_statusbar_get_context_id(statusbar, "BalsaMBList message");
+    gtk_statusbar_pop(statusbar, context_id);
+    gtk_statusbar_push(statusbar, context_id, desc->str);
 
     g_string_free(desc, TRUE);
 }

@@ -1,3 +1,27 @@
+2007-09-21  Peter Bloomfield
+
+	* src/ab-main.c: (bab_window_new): migrate from GnomeApp.
+	* src/balsa-app.h: ditto.
+	* src/balsa-index.c: (balsa_index_load_mailbox_node): handle
+	status messages in main-window.
+	* src/balsa-mblist.c: (balsa_mblist_set_status_bar): migrate
+	from GnomeApp.
+	* src/balsa-mime-widget-text.c: (statusbar_pop), (handle_url),
+	(balsa_gtk_html_on_url): ditto.
+	* src/information-dialog.c: (balsa_information_list),
+	(status_bar_refresh), (balsa_information_bar): ditto.
+	* src/mailbox-node.c: (imap_dir_cb): ditto.
+	* src/main-window.c: ditto.
+	* src/main-window.h: ditto.
+	* src/main.c: (threads_init): pass balsa_app.main_window as
+	user data.
+	* src/message-window.c: (message_window_new): migrate from
+	GnomeApp.
+	* src/pref-manager.c: (open_preferences_manager), (set_prefs):
+	ditto.
+	* src/sendmsg-window.c: (sendmsg_window_new): ditto.
+	* src/toolbar-prefs.c: (customize_dialog_cb): ditto.
+
 2007-09-18  Peter Bloomfield
 
 	* src/balsa-index.c: (bndx_view_source), (bndx_store_address),

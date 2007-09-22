@@ -895,14 +895,19 @@ static GtkWidget*
 bab_window_new()
 {
     GtkWidget* menubar = NULL, *main_vbox, *cont_box, *vbox, *scroll;
-    GtkWidget *wnd = gnome_app_new("Contacts", "Contacts");
+    GtkWidget *wnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     GtkWidget *edit_box;
+
+    gtk_window_set_title(GTK_WINDOW(wnd), "Contacts");
+
+    /* main vbox */
+    main_vbox = gtk_vbox_new(FALSE, 1);
+    gtk_container_add(GTK_CONTAINER(wnd), main_vbox);
 
     get_main_menu(GTK_WIDGET(wnd), &menubar, contacts_app.address_book_list);
     if (menubar)
-	gnome_app_set_menus(GNOME_APP(wnd), GTK_MENU_BAR(menubar));
-    /* main vbox */
-    main_vbox = gtk_vbox_new(FALSE, 1);
+        gtk_box_pack_start(GTK_BOX(main_vbox),
+                           menubar, FALSE, FALSE, 1);
 
     /* Entry widget for finding an address */
     gtk_box_pack_start(GTK_BOX(main_vbox),
@@ -940,8 +945,8 @@ bab_window_new()
     g_signal_connect(wnd, "key-press-event",
 		     G_CALLBACK(ew_key_pressed), &contacts_app);
     gtk_window_set_default_size(GTK_WINDOW(wnd), 500, 400);
-    gnome_app_set_contents(GNOME_APP(wnd), main_vbox);
 
+    gtk_widget_show_all(wnd);
     return wnd;
 }
 

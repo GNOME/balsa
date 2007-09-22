@@ -822,14 +822,21 @@ find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
 }
 
 static gboolean
-status_bar_refresh(gpointer data)
+statusbar_pop(gpointer data)
 {
+    GtkStatusbar *statusbar;
+    guint context_id;
+
     gdk_threads_enter();
-    gnome_appbar_refresh(balsa_app.appbar);
+
+    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+    context_id = gtk_statusbar_get_context_id(statusbar, "BalsaMimeWidget message");
+    gtk_statusbar_pop(statusbar, context_id);
+
     gdk_threads_leave();
     return FALSE;
 }
-#define SCHEDULE_BAR_REFRESH()  g_timeout_add(5000, status_bar_refresh, NULL);
+#define SCHEDULE_BAR_REFRESH()  g_timeout_add(5000, statusbar_pop, NULL);
 
 static void
 handle_url(const message_url_t* url)
@@ -839,11 +846,16 @@ handle_url(const message_url_t* url)
         sendmsg_window_process_url(url->url + 7,
                                    sendmsg_window_set_field, snd);      
     } else {
+        GtkStatusbar *statusbar;
+        guint context_id;
+
         gchar *notice = g_strdup_printf(_("Calling URL %s..."),
                                         url->url);
         GError *err = NULL;
 
-        gnome_appbar_set_status(balsa_app.appbar, notice);
+        statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+        context_id = gtk_statusbar_get_context_id(statusbar, "BalsaMimeWidget message");
+        gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
         gnome_url_show(url->url, &err);
@@ -1024,11 +1036,17 @@ draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList * cite_bars)
 static void
 balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
 {
+    GtkStatusbar *statusbar;
+    guint context_id;
+
+    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+    context_id = gtk_statusbar_get_context_id(statusbar, "BalsaMimeWidget URL");
+
     if( url ) {
-        gnome_appbar_set_status(balsa_app.appbar, url);
+        gtk_statusbar_push(statusbar, context_id, url);
         SCHEDULE_BAR_REFRESH();
     } else 
-        gnome_appbar_refresh(balsa_app.appbar);
+        gtk_statusbar_pop(statusbar, context_id);
 }
 
 #ifdef HAVE_GTKHTML

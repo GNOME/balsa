@@ -429,7 +429,8 @@ threads_init(void)
     mail_thread_msg_receive =
 	g_io_channel_unix_new(mail_thread_pipes[0]);
     g_io_add_watch(mail_thread_msg_receive, G_IO_IN,
-		   (GIOFunc) mail_progress_notify_cb, NULL);
+		   (GIOFunc) mail_progress_notify_cb, 
+                   &balsa_app.main_window);
     
     if (pipe(send_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
@@ -439,7 +440,8 @@ threads_init(void)
     send_thread_msg_receive =
 	g_io_channel_unix_new(send_thread_pipes[0]);
     g_io_add_watch(send_thread_msg_receive, G_IO_IN,
-		   (GIOFunc) send_progress_notify_cb, NULL);
+		   (GIOFunc) send_progress_notify_cb,
+                   &balsa_app.main_window);
 }
 
 static void

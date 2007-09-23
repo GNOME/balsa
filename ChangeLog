@@ -1,5 +1,10 @@
 2007-09-23  Peter Bloomfield
 
+	* libbalsa/identity.c: use GTK_RESPONSE_HELP, so that the "Help"
+	button is created correctly.
+
+2007-09-23  Peter Bloomfield
+
 	* src/main-window.c: add tooltip for "Quit".
 	* src/toolbar-factory.c: (do_popup_menu): allow "Quit" to be a
 	toolbar button; use gtk_menu_attach_to_widget only if it allows

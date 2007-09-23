@@ -840,10 +840,10 @@ get_selected_identity(GtkTreeView * tree)
 }
 
 enum {
+    IDENTITY_RESPONSE_HELP = GTK_RESPONSE_HELP,
     IDENTITY_RESPONSE_CLOSE,
     IDENTITY_RESPONSE_NEW,
-    IDENTITY_RESPONSE_REMOVE,
-    IDENTITY_RESPONSE_HELP
+    IDENTITY_RESPONSE_REMOVE
 };
     
 /* callback for the "changed" signal */

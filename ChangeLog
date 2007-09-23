@@ -1,5 +1,10 @@
 2007-09-23  Peter Bloomfield
 
+	* src/toolbar-factory.c: (tm_save_model): remove old toolbar
+	config before saving new one.
+
+2007-09-23  Peter Bloomfield
+
 	* libbalsa/identity.c: use GTK_RESPONSE_HELP, so that the "Help"
 	button is created correctly.
 

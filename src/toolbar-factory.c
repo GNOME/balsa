@@ -231,6 +231,7 @@ tm_save_model(BalsaToolbarModel * model)
     GSList *list;
 
     key = g_strconcat("toolbar-", model->name, NULL);
+    libbalsa_conf_remove_group(key);
     libbalsa_conf_push_group(key);
     g_free(key);
 

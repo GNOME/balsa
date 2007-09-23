@@ -359,7 +359,7 @@ static const GtkActionEntry entries[] = {
 #endif                          /* HAVE_GTK_PRINT */
     {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), "B",
      N_("Open the address book"), G_CALLBACK(address_book_cb)},
-    {"Quit", GTK_STOCK_QUIT, N_("_Quit"), "<control>Q", NULL,
+    {"Quit", GTK_STOCK_QUIT, N_("_Quit"), "<control>Q", N_("Quit Balsa"),
      G_CALLBACK(balsa_quit_nicely)},
     /* File:New submenu items */
     {"NewMessage", BALSA_PIXMAP_COMPOSE, N_("_Message..."), "M",

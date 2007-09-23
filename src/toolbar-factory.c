@@ -122,6 +122,7 @@ balsa_toolbar_model_get_type()
 /* The descriptions must be SHORT */
 button_data toolbar_buttons[]={
     {"", N_("Separator")},
+    {GTK_STOCK_QUIT, N_("Quit")},
     {BALSA_PIXMAP_RECEIVE, N_("Check")},
     {BALSA_PIXMAP_COMPOSE, N_("Compose")},
     {BALSA_PIXMAP_CONTINUE, N_("Continue")},
@@ -572,6 +573,21 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         g_signal_connect(item, "toggled", G_CALLBACK(menu_item_toggled_cb),
                          info);
     }
+
+    if (GTK_WIDGET_IS_SENSITIVE(toolbar)) {
+        /* This is a real toolbar, not the template from the
+         * toolbar-prefs dialog. */
+        GtkWidget *item;
+
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+                              gtk_separator_menu_item_new());
+        item =
+            gtk_menu_item_new_with_mnemonic(_("_Customize Toolbars..."));
+        g_signal_connect(item, "activate", G_CALLBACK(customize_dialog_cb),
+                         gtk_widget_get_toplevel(toolbar));
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+    }
+
     gtk_widget_show_all(menu);
 
     if (event) {
@@ -582,7 +598,9 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         event_time = gtk_get_current_event_time();
     }
 
+#if GTK_CHECK_VERSION(2, 10, 0)
     gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,
                    event_time);
 }

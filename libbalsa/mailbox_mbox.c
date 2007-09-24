@@ -1065,16 +1065,16 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
     if (mbox->msgno_2_msg_info->len != len)
         libbalsa_mailbox_changed(mailbox);
 
+    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
+        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+                                                            expunge);
+
+    /* Now it's safe to close the stream and free the message info. */
     if (mbox->gmime_stream) {
         g_object_unref(mbox->gmime_stream);
         mbox->gmime_stream = NULL;
     }
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
-                                                            expunge);
-
-    /* Now it's safe to free the message info. */
     free_messages_info(mbox->msgno_2_msg_info);
     mbox->msgno_2_msg_info = NULL;
 }

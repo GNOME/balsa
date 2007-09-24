@@ -305,7 +305,9 @@ standard_button_cb(GtkWidget *widget, ToolbarPage * page)
 static void
 style_button_cb(GtkWidget *widget, ToolbarPage * page)
 {
-    g_signal_emit_by_name(page->toolbar, "popup-menu");
+    gboolean handled;
+
+    g_signal_emit_by_name(page->toolbar, "popup-menu", &handled);
 }
 
 /* Callback for the "row-activated" signal for the available list. */

@@ -1,3 +1,9 @@
+2007-09-24  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c:
+	(libbalsa_mailbox_mbox_close_mailbox): keep stream open longer.
+	* src/toolbar-prefs.c: (style_button_cb): emit signal correctly.
+
 2007-09-23  Peter Bloomfield
 
 	* src/toolbar-factory.c: (tm_save_model): remove old toolbar

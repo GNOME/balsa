@@ -1,5 +1,12 @@
 2007-09-24  Peter Bloomfield
 
+	* src/toolbar-factory.c: (tm_default_toolbar_style),
+	(tm_load_model), (tm_save_model), (do_popup_menu),
+	(tm_popup_menu_cb), (balsa_toolbar_new): use desktop toolbar
+	style as default.
+
+2007-09-24  Peter Bloomfield
+
 	* src/toolbar-factory.c: (remove_underscore), (do_popup_menu):
 	respect desktop toolbar style.
 

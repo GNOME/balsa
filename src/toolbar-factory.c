@@ -192,6 +192,46 @@ balsa_toolbar_remove_all(GtkWidget * widget)
 
 /* Load and save config
  */
+
+static const struct {
+    const gchar *text;
+    const gchar *config_name;
+    GtkToolbarStyle style;
+} tm_toolbar_options[] = {
+    {
+    N_("Text Be_low Icons"),  "both",       GTK_TOOLBAR_BOTH},       {
+    N_("Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
+    NULL,                     "both_horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
+    N_("_Icons Only"),        "icons",      GTK_TOOLBAR_ICONS},      {
+    N_("_Text Only"),         "text",       GTK_TOOLBAR_TEXT}
+};
+
+static GtkToolbarStyle
+tm_default_toolbar_style(void)
+{
+    GConfClient *conf;
+    gchar *str;
+    GtkToolbarStyle default_style = (GtkToolbarStyle) -1;
+
+    /* Get global setting */
+    conf = gconf_client_get_default();
+    str  = gconf_client_get_string(conf,
+                                   "/desktop/gnome/interface/toolbar_style",
+                                   NULL);
+    if (str) {
+        guint i;
+
+        for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++)
+            if (strcmp(tm_toolbar_options[i].config_name, str) == 0) {
+                default_style = tm_toolbar_options[i].style;
+                break;
+            }
+        g_free(str);
+    }
+
+    return default_style;
+}
+
 static void
 tm_load_model(BalsaToolbarModel * model)
 {
@@ -205,7 +245,7 @@ tm_load_model(BalsaToolbarModel * model)
 
     model->style = libbalsa_conf_get_int_with_default("Style", &def);
     if (def)
-        model->style = GTK_TOOLBAR_BOTH;
+        model->style = tm_default_toolbar_style();
 
     model->current = NULL;
     for (j = 0;; j++) {
@@ -237,7 +277,8 @@ tm_save_model(BalsaToolbarModel * model)
     libbalsa_conf_push_group(key);
     g_free(key);
 
-    libbalsa_conf_set_int("Style", model->style);
+    if (model->style != tm_default_toolbar_style())
+        libbalsa_conf_set_int("Style", model->style);
 
     for (j = 0, list = model->current;
          list;
@@ -559,72 +600,46 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
     int button, event_time;
     guint i;
     GSList *group = NULL;
-    static const struct {
-        const gchar *text;
-        const gchar *config_name;
-        GtkToolbarStyle style;
-    } options[] = {
-        { N_("Text Be_low Icons"),  "both",       GTK_TOOLBAR_BOTH       },
-        { N_("Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ },
-        { NULL,                     "both_horiz", GTK_TOOLBAR_BOTH_HORIZ },
-        { N_("_Icons Only"),        "icons",      GTK_TOOLBAR_ICONS      },
-        { N_("_Text Only"),         "text",       GTK_TOOLBAR_TEXT       }
-    };
-    GtkToolbarStyle default_style = (GtkToolbarStyle) - 1;
-    GConfClient *conf;
-    gchar *str;
-
-    /* Get global setting */
-    conf = gconf_client_get_default();
-    str  = gconf_client_get_string(conf,
-                                   "/desktop/gnome/interface/toolbar_style",
-                                   NULL);
-    if (str) {
-        for (i = 0; i < G_N_ELEMENTS(options); i++)
-            if (strcmp(options[i].config_name, str) == 0) {
-                default_style = options[i].style;
-                break;
-            }
-        g_free(str);
-    }
+    GtkToolbarStyle default_style = tm_default_toolbar_style();
 
     menu = gtk_menu_new();
     g_signal_connect(menu, "deactivate",
                      G_CALLBACK(do_popup_deactivated_cb), NULL);
 
     /* ... add menu items ... */
-    for (i = 0; i < G_N_ELEMENTS(options); i++) {
+    for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
         GtkWidget *item;
 
-        if (!options[i].text)
+        if (!tm_toolbar_options[i].text)
             continue;
 
         item =
             gtk_radio_menu_item_new_with_mnemonic(group,
-                                                  _(options[i].text));
+                                                  _(tm_toolbar_options[i].
+                                                    text));
         group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
 
-        if (options[i].style == info->model->style
+        if (tm_toolbar_options[i].style == info->model->style
             && info->model->style != default_style)
             gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
                                            TRUE);
 
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
         g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_STYLE,
-                          GINT_TO_POINTER(options[i].style));
+                          GINT_TO_POINTER(tm_toolbar_options[i].style));
         g_signal_connect(item, "toggled", G_CALLBACK(menu_item_toggled_cb),
                          info);
     }
 
-    for (i = 0; i < G_N_ELEMENTS(options); i++) {
-        if (options[i].style == default_style) {
+    for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
+        if (tm_toolbar_options[i].style == default_style) {
             gchar *option_text, *text;
             GtkWidget *item;
 
             gtk_menu_shell_append(GTK_MENU_SHELL(menu),
                                   gtk_separator_menu_item_new());
 
-            option_text = remove_underscore(_(options[i].text));
+            option_text = remove_underscore(_(tm_toolbar_options[i].text));
             text =
                 g_strdup_printf(_("Use Desktop _Default (%s)"),
                                 option_text);
@@ -633,13 +648,14 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
             item = gtk_radio_menu_item_new_with_mnemonic(group, text);
             g_free(text);
 
-            if (options[i].style == info->model->style)
+            if (tm_toolbar_options[i].style == info->model->style)
                 gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                                (item), TRUE);
             gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
             g_object_set_data(G_OBJECT(item),
                               BALSA_TOOLBAR_STYLE,
-                              GINT_TO_POINTER(options[i].style));
+                              GINT_TO_POINTER(tm_toolbar_options[i].
+                                              style));
             g_signal_connect(item, "toggled",
                              G_CALLBACK(menu_item_toggled_cb), info);
         }
@@ -689,16 +705,15 @@ tm_button_press_cb(GtkWidget * toolbar, GdkEventButton * event,
     return FALSE;
 }
 
-static gboolean
-tm_popup_menu_cb(GtkWidget * toolbar, toolbar_info * info)
+static gboolean tm_popup_menu_cb(GtkWidget * toolbar, toolbar_info * info)
 {
     do_popup_menu(toolbar, NULL, info);
 
     return TRUE;
 }
 
-GtkWidget *
-balsa_toolbar_new(BalsaToolbarModel * model, GtkUIManager * ui_manager)
+GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
+                             GtkUIManager * ui_manager)
 {
     GtkWidget *toolbar;
     toolbar_info *info;

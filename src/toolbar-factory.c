@@ -23,6 +23,8 @@
 
 #include <string.h>
 #include <gnome.h>
+#include <gconf/gconf-client.h>
+
 #include "i18n.h"
 
 #include "balsa-app.h"
@@ -536,6 +538,19 @@ do_popup_deactivated_cb(GtkWidget *menu)
     g_idle_add((GSourceFunc) do_popup_idle_cb, menu);
 }
 
+static gchar *
+remove_underscore(const gchar * text)
+{
+    gchar *p, *q, *r = g_strdup(text);
+
+    for (p = q = r; *p; p++)
+        if (*p != '_')
+            *q++ = *p;
+    *q = '\0';
+
+    return r;
+}
+
 static void
 do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
               toolbar_info * info)
@@ -546,14 +561,32 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
     GSList *group = NULL;
     static const struct {
         const gchar *text;
+        const gchar *config_name;
         GtkToolbarStyle style;
     } options[] = {
-        {
-        N_("Text Be_low Icons"),  GTK_TOOLBAR_BOTH}, {
-        N_("Text Be_side Icons"), GTK_TOOLBAR_BOTH_HORIZ}, {
-        N_("_Icons Only"),        GTK_TOOLBAR_ICONS}, {
-        N_("_Text Only"),         GTK_TOOLBAR_TEXT}
+        { N_("Text Be_low Icons"),  "both",       GTK_TOOLBAR_BOTH       },
+        { N_("Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ },
+        { NULL,                     "both_horiz", GTK_TOOLBAR_BOTH_HORIZ },
+        { N_("_Icons Only"),        "icons",      GTK_TOOLBAR_ICONS      },
+        { N_("_Text Only"),         "text",       GTK_TOOLBAR_TEXT       }
     };
+    GtkToolbarStyle default_style = (GtkToolbarStyle) - 1;
+    GConfClient *conf;
+    gchar *str;
+
+    /* Get global setting */
+    conf = gconf_client_get_default();
+    str  = gconf_client_get_string(conf,
+                                   "/desktop/gnome/interface/toolbar_style",
+                                   NULL);
+    if (str) {
+        for (i = 0; i < G_N_ELEMENTS(options); i++)
+            if (strcmp(options[i].config_name, str) == 0) {
+                default_style = options[i].style;
+                break;
+            }
+        g_free(str);
+    }
 
     menu = gtk_menu_new();
     g_signal_connect(menu, "deactivate",
@@ -561,18 +594,55 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
 
     /* ... add menu items ... */
     for (i = 0; i < G_N_ELEMENTS(options); i++) {
-        GtkWidget *item =
+        GtkWidget *item;
+
+        if (!options[i].text)
+            continue;
+
+        item =
             gtk_radio_menu_item_new_with_mnemonic(group,
                                                   _(options[i].text));
         group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
-        if (options[i].style == info->model->style)
+
+        if (options[i].style == info->model->style
+            && info->model->style != default_style)
             gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
                                            TRUE);
+
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
         g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_STYLE,
                           GINT_TO_POINTER(options[i].style));
         g_signal_connect(item, "toggled", G_CALLBACK(menu_item_toggled_cb),
                          info);
+    }
+
+    for (i = 0; i < G_N_ELEMENTS(options); i++) {
+        if (options[i].style == default_style) {
+            gchar *option_text, *text;
+            GtkWidget *item;
+
+            gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+                                  gtk_separator_menu_item_new());
+
+            option_text = remove_underscore(_(options[i].text));
+            text =
+                g_strdup_printf(_("Use Desktop _Default (%s)"),
+                                option_text);
+            g_free(option_text);
+
+            item = gtk_radio_menu_item_new_with_mnemonic(group, text);
+            g_free(text);
+
+            if (options[i].style == info->model->style)
+                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
+                                               (item), TRUE);
+            gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+            g_object_set_data(G_OBJECT(item),
+                              BALSA_TOOLBAR_STYLE,
+                              GINT_TO_POINTER(options[i].style));
+            g_signal_connect(item, "toggled",
+                             G_CALLBACK(menu_item_toggled_cb), info);
+        }
     }
 
     if (GTK_WIDGET_IS_SENSITIVE(toolbar)) {

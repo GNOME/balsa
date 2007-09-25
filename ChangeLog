@@ -1,5 +1,10 @@
 2007-09-24  Peter Bloomfield
 
+	* src/toolbar-factory.c: (remove_underscore), (do_popup_menu):
+	respect desktop toolbar style.
+
+2007-09-24  Peter Bloomfield
+
 	* libbalsa/mailbox_mbox.c:
 	(libbalsa_mailbox_mbox_close_mailbox): keep stream open longer.
 	* src/toolbar-prefs.c: (style_button_cb): emit signal correctly.
